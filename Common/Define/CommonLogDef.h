@@ -99,14 +99,8 @@ inline std::string FormatFileLine(const char * file, const int line)
     if(!(obj)) { LOG_ERROR(#obj); return nullptr; }    \
 }
 
-#define LOGIC_THROW_ERROR(obj){ \
-    if(!(obj))                \
-    {              \
-        LOG_ERROR(#obj);      \
-        throw std::logic_error(#obj);\
-        }    \
-}
-
+#define LOG_ERROR_RETURN_CODE(obj, code) \
+    if(!(obj)) { LOG_ERROR(#obj); return code; }    \
 
 #define IF_THROW_ERROR(obj){ \
     if(!(obj))                \

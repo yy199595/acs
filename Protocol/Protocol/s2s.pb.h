@@ -222,32 +222,10 @@ class Mysql_Create :
 
   // accessors -------------------------------------------------------
 
-  // repeated string indexs = 4;
-  int indexs_size() const;
-  void clear_indexs();
-  static const int kIndexsFieldNumber = 4;
-  const ::std::string& indexs(int index) const;
-  ::std::string* mutable_indexs(int index);
-  void set_indexs(int index, const ::std::string& value);
-  #if LANG_CXX11
-  void set_indexs(int index, ::std::string&& value);
-  #endif
-  void set_indexs(int index, const char* value);
-  void set_indexs(int index, const char* value, size_t size);
-  ::std::string* add_indexs();
-  void add_indexs(const ::std::string& value);
-  #if LANG_CXX11
-  void add_indexs(::std::string&& value);
-  #endif
-  void add_indexs(const char* value);
-  void add_indexs(const char* value, size_t size);
-  const ::google::protobuf::RepeatedPtrField<::std::string>& indexs() const;
-  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_indexs();
-
-  // repeated string keys = 5;
+  // repeated string keys = 4;
   int keys_size() const;
   void clear_keys();
-  static const int kKeysFieldNumber = 5;
+  static const int kKeysFieldNumber = 4;
   const ::std::string& keys(int index) const;
   ::std::string* mutable_keys(int index);
   void set_keys(int index, const ::std::string& value);
@@ -265,6 +243,28 @@ class Mysql_Create :
   void add_keys(const char* value, size_t size);
   const ::google::protobuf::RepeatedPtrField<::std::string>& keys() const;
   ::google::protobuf::RepeatedPtrField<::std::string>* mutable_keys();
+
+  // repeated string indexs = 5;
+  int indexs_size() const;
+  void clear_indexs();
+  static const int kIndexsFieldNumber = 5;
+  const ::std::string& indexs(int index) const;
+  ::std::string* mutable_indexs(int index);
+  void set_indexs(int index, const ::std::string& value);
+  #if LANG_CXX11
+  void set_indexs(int index, ::std::string&& value);
+  #endif
+  void set_indexs(int index, const char* value);
+  void set_indexs(int index, const char* value, size_t size);
+  ::std::string* add_indexs();
+  void add_indexs(const ::std::string& value);
+  #if LANG_CXX11
+  void add_indexs(::std::string&& value);
+  #endif
+  void add_indexs(const char* value);
+  void add_indexs(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField<::std::string>& indexs() const;
+  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_indexs();
 
   // string db = 1;
   void clear_db();
@@ -313,8 +313,8 @@ class Mysql_Create :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField<::std::string> indexs_;
   ::google::protobuf::RepeatedPtrField<::std::string> keys_;
+  ::google::protobuf::RepeatedPtrField<::std::string> indexs_;
   ::google::protobuf::internal::ArenaStringPtr db_;
   ::google::protobuf::internal::ArenaStringPtr tab_;
   ::google::protobuf::internal::ArenaStringPtr proto_;
@@ -2530,76 +2530,7 @@ inline void Mysql_Create::set_allocated_proto(::std::string* proto) {
   // @@protoc_insertion_point(field_set_allocated:s2s.Mysql.Create.proto)
 }
 
-// repeated string indexs = 4;
-inline int Mysql_Create::indexs_size() const {
-  return indexs_.size();
-}
-inline void Mysql_Create::clear_indexs() {
-  indexs_.Clear();
-}
-inline const ::std::string& Mysql_Create::indexs(int index) const {
-  // @@protoc_insertion_point(field_get:s2s.Mysql.Create.indexs)
-  return indexs_.Get(index);
-}
-inline ::std::string* Mysql_Create::mutable_indexs(int index) {
-  // @@protoc_insertion_point(field_mutable:s2s.Mysql.Create.indexs)
-  return indexs_.Mutable(index);
-}
-inline void Mysql_Create::set_indexs(int index, const ::std::string& value) {
-  // @@protoc_insertion_point(field_set:s2s.Mysql.Create.indexs)
-  indexs_.Mutable(index)->assign(value);
-}
-#if LANG_CXX11
-inline void Mysql_Create::set_indexs(int index, ::std::string&& value) {
-  // @@protoc_insertion_point(field_set:s2s.Mysql.Create.indexs)
-  indexs_.Mutable(index)->assign(std::move(value));
-}
-#endif
-inline void Mysql_Create::set_indexs(int index, const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  indexs_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:s2s.Mysql.Create.indexs)
-}
-inline void Mysql_Create::set_indexs(int index, const char* value, size_t size) {
-  indexs_.Mutable(index)->assign(
-    reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:s2s.Mysql.Create.indexs)
-}
-inline ::std::string* Mysql_Create::add_indexs() {
-  // @@protoc_insertion_point(field_add_mutable:s2s.Mysql.Create.indexs)
-  return indexs_.Add();
-}
-inline void Mysql_Create::add_indexs(const ::std::string& value) {
-  indexs_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:s2s.Mysql.Create.indexs)
-}
-#if LANG_CXX11
-inline void Mysql_Create::add_indexs(::std::string&& value) {
-  indexs_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:s2s.Mysql.Create.indexs)
-}
-#endif
-inline void Mysql_Create::add_indexs(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  indexs_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:s2s.Mysql.Create.indexs)
-}
-inline void Mysql_Create::add_indexs(const char* value, size_t size) {
-  indexs_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:s2s.Mysql.Create.indexs)
-}
-inline const ::google::protobuf::RepeatedPtrField<::std::string>&
-Mysql_Create::indexs() const {
-  // @@protoc_insertion_point(field_list:s2s.Mysql.Create.indexs)
-  return indexs_;
-}
-inline ::google::protobuf::RepeatedPtrField<::std::string>*
-Mysql_Create::mutable_indexs() {
-  // @@protoc_insertion_point(field_mutable_list:s2s.Mysql.Create.indexs)
-  return &indexs_;
-}
-
-// repeated string keys = 5;
+// repeated string keys = 4;
 inline int Mysql_Create::keys_size() const {
   return keys_.size();
 }
@@ -2666,6 +2597,75 @@ inline ::google::protobuf::RepeatedPtrField<::std::string>*
 Mysql_Create::mutable_keys() {
   // @@protoc_insertion_point(field_mutable_list:s2s.Mysql.Create.keys)
   return &keys_;
+}
+
+// repeated string indexs = 5;
+inline int Mysql_Create::indexs_size() const {
+  return indexs_.size();
+}
+inline void Mysql_Create::clear_indexs() {
+  indexs_.Clear();
+}
+inline const ::std::string& Mysql_Create::indexs(int index) const {
+  // @@protoc_insertion_point(field_get:s2s.Mysql.Create.indexs)
+  return indexs_.Get(index);
+}
+inline ::std::string* Mysql_Create::mutable_indexs(int index) {
+  // @@protoc_insertion_point(field_mutable:s2s.Mysql.Create.indexs)
+  return indexs_.Mutable(index);
+}
+inline void Mysql_Create::set_indexs(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:s2s.Mysql.Create.indexs)
+  indexs_.Mutable(index)->assign(value);
+}
+#if LANG_CXX11
+inline void Mysql_Create::set_indexs(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:s2s.Mysql.Create.indexs)
+  indexs_.Mutable(index)->assign(std::move(value));
+}
+#endif
+inline void Mysql_Create::set_indexs(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  indexs_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:s2s.Mysql.Create.indexs)
+}
+inline void Mysql_Create::set_indexs(int index, const char* value, size_t size) {
+  indexs_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:s2s.Mysql.Create.indexs)
+}
+inline ::std::string* Mysql_Create::add_indexs() {
+  // @@protoc_insertion_point(field_add_mutable:s2s.Mysql.Create.indexs)
+  return indexs_.Add();
+}
+inline void Mysql_Create::add_indexs(const ::std::string& value) {
+  indexs_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:s2s.Mysql.Create.indexs)
+}
+#if LANG_CXX11
+inline void Mysql_Create::add_indexs(::std::string&& value) {
+  indexs_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:s2s.Mysql.Create.indexs)
+}
+#endif
+inline void Mysql_Create::add_indexs(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  indexs_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:s2s.Mysql.Create.indexs)
+}
+inline void Mysql_Create::add_indexs(const char* value, size_t size) {
+  indexs_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:s2s.Mysql.Create.indexs)
+}
+inline const ::google::protobuf::RepeatedPtrField<::std::string>&
+Mysql_Create::indexs() const {
+  // @@protoc_insertion_point(field_list:s2s.Mysql.Create.indexs)
+  return indexs_;
+}
+inline ::google::protobuf::RepeatedPtrField<::std::string>*
+Mysql_Create::mutable_indexs() {
+  // @@protoc_insertion_point(field_mutable_list:s2s.Mysql.Create.indexs)
+  return &indexs_;
 }
 
 // -------------------------------------------------------------------

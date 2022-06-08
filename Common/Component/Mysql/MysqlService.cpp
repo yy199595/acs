@@ -1,5 +1,6 @@
 ﻿#include"MysqlService.h"
 #include"App/App.h"
+#include"Component/Scene/MessageComponent.h"
 #include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {
@@ -12,6 +13,7 @@ namespace Sentry
 		methodRegister.Bind("Query", &MysqlService::Query);
 		methodRegister.Bind("Update", &MysqlService::Update);
 		methodRegister.Bind("Delete", &MysqlService::Delete);
+        this->mMessageComponent = this->GetComponent<MessageComponent>();
 
 		const ServerConfig & config = this->GetApp()->GetConfig();
 		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "ip", this->mConfig.mIp));
@@ -67,8 +69,6 @@ namespace Sentry
 
 	XCode MysqlService::Add(const s2s::Mysql::Add& request)
 	{
-		LOGIC_THROW_ERROR(request.has_data());
-		LOGIC_THROW_ERROR(!request.table().empty());
 		std::shared_ptr<Mysql::MysqlAddCommandTask> commandTask
 				= std::make_shared<Mysql::MysqlAddCommandTask>(request);
 		return this->GetMysqlClient()->Start(commandTask);
@@ -76,8 +76,6 @@ namespace Sentry
 
 	XCode MysqlService::Save(const s2s::Mysql::Save& request)
 	{
-		LOGIC_THROW_ERROR(request.has_data());
-		LOGIC_THROW_ERROR(!request.table().empty());
 		std::shared_ptr<Mysql::MysqlSaveCommandTask> commandTask
 				= std::make_shared<Mysql::MysqlSaveCommandTask>(request);
 		return this->GetMysqlClient()->Start(commandTask);
@@ -85,9 +83,6 @@ namespace Sentry
 
 	XCode MysqlService::Update(const s2s::Mysql::Update& request)
 	{
-		LOGIC_THROW_ERROR(!request.table().empty());
-		LOGIC_THROW_ERROR(!request.where_json().empty());
-
 		std::shared_ptr<Mysql::MysqlUpdateCommandTask> commandTask
 				= std::make_shared<Mysql::MysqlUpdateCommandTask>(request);
 		return this->GetMysqlClient()->Start(commandTask);
@@ -95,9 +90,6 @@ namespace Sentry
 
 	XCode MysqlService::Delete(const s2s::Mysql::Delete& request)
 	{
-		LOGIC_THROW_ERROR(!request.table().empty());
-		LOGIC_THROW_ERROR(!request.where_json().empty());
-
 		std::shared_ptr<Mysql::MysqlDeleteCommandTask> commandTask
 				= std::make_shared<Mysql::MysqlDeleteCommandTask>(request);
 		return this->GetMysqlClient()->Start(commandTask);
@@ -105,11 +97,15 @@ namespace Sentry
 
 	XCode MysqlService::Query(const s2s::Mysql::Query& request, s2s::Mysql::Response& response)
 	{
-		LOGIC_THROW_ERROR(!request.table().empty());
-		LOGIC_THROW_ERROR(!request.where_json().empty());
+        std::shared_ptr<Message> message = this->mMessageComponent->New(request.table());
+        if(message == nullptr)
+        {
+            LOG_ERROR(request.table() << " not exist");
+            return XCode::CallArgsError;
+        }
 
 		std::shared_ptr<Mysql::MysqlQueryCommandTask> commandTask
-				= std::make_shared<Mysql::MysqlQueryCommandTask>(request, response, response);
+				= std::make_shared<Mysql::MysqlQueryCommandTask>(request, response, *message);
 		return this->GetMysqlClient()->Start(commandTask);
 	}
 }// namespace Sentry

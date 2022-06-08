@@ -363,8 +363,8 @@ const ::google::protobuf::uint32 TableStruct_s2s_2eproto::offsets[] PROTOBUF_SEC
   PROTOBUF_FIELD_OFFSET(::s2s::Mysql_Create, db_),
   PROTOBUF_FIELD_OFFSET(::s2s::Mysql_Create, tab_),
   PROTOBUF_FIELD_OFFSET(::s2s::Mysql_Create, proto_),
-  PROTOBUF_FIELD_OFFSET(::s2s::Mysql_Create, indexs_),
   PROTOBUF_FIELD_OFFSET(::s2s::Mysql_Create, keys_),
+  PROTOBUF_FIELD_OFFSET(::s2s::Mysql_Create, indexs_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::s2s::Mysql_Add, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -523,8 +523,8 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 const char descriptor_table_protodef_s2s_2eproto[] =
   "\n\ts2s.proto\022\003s2s\032\031google/protobuf/any.pr"
   "oto\"\355\003\n\005Mysql\032N\n\006Create\022\n\n\002db\030\001 \001(\t\022\013\n\003t"
-  "ab\030\002 \001(\t\022\r\n\005proto\030\003 \001(\t\022\016\n\006indexs\030\004 \003(\t\022"
-  "\014\n\004keys\030\005 \003(\t\032F\n\003Add\022\014\n\004flag\030\001 \001(\003\022\r\n\005ta"
+  "ab\030\002 \001(\t\022\r\n\005proto\030\003 \001(\t\022\014\n\004keys\030\004 \003(\t\022\016\n"
+  "\006indexs\030\005 \003(\t\032F\n\003Add\022\014\n\004flag\030\001 \001(\003\022\r\n\005ta"
   "ble\030\002 \001(\t\022\"\n\004data\030\003 \001(\0132\024.google.protobu"
   "f.Any\032G\n\004Save\022\014\n\004flag\030\001 \001(\003\022\r\n\005table\030\002 \001"
   "(\t\022\"\n\004data\030\003 \001(\0132\024.google.protobuf.Any\0328"
@@ -574,8 +574,8 @@ class Mysql_Create::HasBitSetters {
 const int Mysql_Create::kDbFieldNumber;
 const int Mysql_Create::kTabFieldNumber;
 const int Mysql_Create::kProtoFieldNumber;
-const int Mysql_Create::kIndexsFieldNumber;
 const int Mysql_Create::kKeysFieldNumber;
+const int Mysql_Create::kIndexsFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Mysql_Create::Mysql_Create()
@@ -586,8 +586,8 @@ Mysql_Create::Mysql_Create()
 Mysql_Create::Mysql_Create(const Mysql_Create& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr),
-      indexs_(from.indexs_),
-      keys_(from.keys_) {
+      keys_(from.keys_),
+      indexs_(from.indexs_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   db_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.db().size() > 0) {
@@ -638,8 +638,8 @@ void Mysql_Create::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  indexs_.Clear();
   keys_.Clear();
+  indexs_.Clear();
   db_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   tab_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   proto_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
@@ -707,14 +707,14 @@ const char* Mysql_Create::_InternalParse(const char* begin, const char* end, voi
         ptr += size;
         break;
       }
-      // repeated string indexs = 4;
+      // repeated string keys = 4;
       case 4: {
         if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
         do {
           ptr = ::google::protobuf::io::ReadSize(ptr, &size);
           GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          ctx->extra_parse_data().SetFieldName("s2s.Mysql.Create.indexs");
-          object = msg->add_indexs();
+          ctx->extra_parse_data().SetFieldName("s2s.Mysql.Create.keys");
+          object = msg->add_keys();
           if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
             parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
             goto string_till_end;
@@ -726,14 +726,14 @@ const char* Mysql_Create::_InternalParse(const char* begin, const char* end, voi
         } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 34 && (ptr += 1));
         break;
       }
-      // repeated string keys = 5;
+      // repeated string indexs = 5;
       case 5: {
         if (static_cast<::google::protobuf::uint8>(tag) != 42) goto handle_unusual;
         do {
           ptr = ::google::protobuf::io::ReadSize(ptr, &size);
           GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          ctx->extra_parse_data().SetFieldName("s2s.Mysql.Create.keys");
-          object = msg->add_keys();
+          ctx->extra_parse_data().SetFieldName("s2s.Mysql.Create.indexs");
+          object = msg->add_indexs();
           if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
             parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
             goto string_till_end;
@@ -824,25 +824,9 @@ bool Mysql_Create::MergePartialFromCodedStream(
         break;
       }
 
-      // repeated string indexs = 4;
+      // repeated string keys = 4;
       case 4: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->add_indexs()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->indexs(this->indexs_size() - 1).data(),
-            static_cast<int>(this->indexs(this->indexs_size() - 1).length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "s2s.Mysql.Create.indexs"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // repeated string keys = 5;
-      case 5: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (42 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->add_keys()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
@@ -850,6 +834,22 @@ bool Mysql_Create::MergePartialFromCodedStream(
             static_cast<int>(this->keys(this->keys_size() - 1).length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
             "s2s.Mysql.Create.keys"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // repeated string indexs = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (42 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_indexs()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->indexs(this->indexs_size() - 1).data(),
+            static_cast<int>(this->indexs(this->indexs_size() - 1).length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "s2s.Mysql.Create.indexs"));
         } else {
           goto handle_unusual;
         }
@@ -913,24 +913,24 @@ void Mysql_Create::SerializeWithCachedSizes(
       3, this->proto(), output);
   }
 
-  // repeated string indexs = 4;
-  for (int i = 0, n = this->indexs_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->indexs(i).data(), static_cast<int>(this->indexs(i).length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.Mysql.Create.indexs");
-    ::google::protobuf::internal::WireFormatLite::WriteString(
-      4, this->indexs(i), output);
-  }
-
-  // repeated string keys = 5;
+  // repeated string keys = 4;
   for (int i = 0, n = this->keys_size(); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->keys(i).data(), static_cast<int>(this->keys(i).length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
       "s2s.Mysql.Create.keys");
     ::google::protobuf::internal::WireFormatLite::WriteString(
-      5, this->keys(i), output);
+      4, this->keys(i), output);
+  }
+
+  // repeated string indexs = 5;
+  for (int i = 0, n = this->indexs_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->indexs(i).data(), static_cast<int>(this->indexs(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.Mysql.Create.indexs");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      5, this->indexs(i), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -979,24 +979,24 @@ void Mysql_Create::SerializeWithCachedSizes(
         3, this->proto(), target);
   }
 
-  // repeated string indexs = 4;
-  for (int i = 0, n = this->indexs_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->indexs(i).data(), static_cast<int>(this->indexs(i).length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "s2s.Mysql.Create.indexs");
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteStringToArray(4, this->indexs(i), target);
-  }
-
-  // repeated string keys = 5;
+  // repeated string keys = 4;
   for (int i = 0, n = this->keys_size(); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->keys(i).data(), static_cast<int>(this->keys(i).length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
       "s2s.Mysql.Create.keys");
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteStringToArray(5, this->keys(i), target);
+      WriteStringToArray(4, this->keys(i), target);
+  }
+
+  // repeated string indexs = 5;
+  for (int i = 0, n = this->indexs_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->indexs(i).data(), static_cast<int>(this->indexs(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "s2s.Mysql.Create.indexs");
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(5, this->indexs(i), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1020,20 +1020,20 @@ size_t Mysql_Create::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated string indexs = 4;
-  total_size += 1 *
-      ::google::protobuf::internal::FromIntSize(this->indexs_size());
-  for (int i = 0, n = this->indexs_size(); i < n; i++) {
-    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
-      this->indexs(i));
-  }
-
-  // repeated string keys = 5;
+  // repeated string keys = 4;
   total_size += 1 *
       ::google::protobuf::internal::FromIntSize(this->keys_size());
   for (int i = 0, n = this->keys_size(); i < n; i++) {
     total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
       this->keys(i));
+  }
+
+  // repeated string indexs = 5;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->indexs_size());
+  for (int i = 0, n = this->indexs_size(); i < n; i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->indexs(i));
   }
 
   // string db = 1;
@@ -1084,8 +1084,8 @@ void Mysql_Create::MergeFrom(const Mysql_Create& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  indexs_.MergeFrom(from.indexs_);
   keys_.MergeFrom(from.keys_);
+  indexs_.MergeFrom(from.indexs_);
   if (from.db().size() > 0) {
 
     db_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.db_);
@@ -1125,8 +1125,8 @@ void Mysql_Create::Swap(Mysql_Create* other) {
 void Mysql_Create::InternalSwap(Mysql_Create* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  indexs_.InternalSwap(CastToBase(&other->indexs_));
   keys_.InternalSwap(CastToBase(&other->keys_));
+  indexs_.InternalSwap(CastToBase(&other->indexs_));
   db_.Swap(&other->db_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   tab_.Swap(&other->tab_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),

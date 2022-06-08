@@ -16,7 +16,7 @@ function AccountService.Register(request)
     assert(requestInfo.account, "register account is nil")
     assert(requestInfo.password, "register password is nil")
     assert(requestInfo.phone_num, "register phone number is nil")
-    return MysqlComponent.Add("db_account.tab_user_account", {
+    return MysqlComponent.Add("account.user_info", {
         user_id = Guid.Create(),
         register_time = os.time(),
         account = requestInfo.account,
@@ -30,7 +30,7 @@ function AccountService.Login(request)
     assert(loginInfo, "request data error")
     assert(type(loginInfo.account) == "string", "user account is not string")
     assert(type(loginInfo.password) == "string", "user password is not string")
-    local userInfo = MysqlComponent.QueryOnce("db_account.tab_user_account",{
+    local userInfo = MysqlComponent.QueryOnce("account.user_info",{
         account = loginInfo.account
     })
     if loginInfo.password ~= userInfo.password then

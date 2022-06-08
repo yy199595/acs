@@ -108,7 +108,6 @@ namespace Sentry
 	XCode GateService::Auth(const std::string & address, const c2s::GateAuth::Request & request)
 	{
 		Json::Writer jsonWriter1;
-		LOGIC_THROW_ERROR(!request.token().empty());
 		jsonWriter1.AddMember("token", request.token());
 		long long userId = this->mSyncComponent->GetUserId(request.token());
 		if (userId != 0)

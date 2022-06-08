@@ -32,6 +32,7 @@ namespace Sentry
 	 private:
 		size_t mIndex;
 		MysqlConfig mConfig;
+        class MessageComponent * mMessageComponent;
 		std::vector<std::shared_ptr<MysqlClient>> mMysqlClients;
 	};
 }// namespace Sentry

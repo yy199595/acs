@@ -16,130 +16,100 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 
-class db_account_tab_user_accountDefaultTypeInternal {
+class account_user_infoDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<db_account_tab_user_account> _instance;
-} _db_account_tab_user_account_default_instance_;
-class db_account_tab_user_login_infoDefaultTypeInternal {
+  ::google::protobuf::internal::ExplicitlyConstructed<account_user_info> _instance;
+} _account_user_info_default_instance_;
+class accountDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<db_account_tab_user_login_info> _instance;
-} _db_account_tab_user_login_info_default_instance_;
-class db_accountDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<db_account> _instance;
-} _db_account_default_instance_;
-static void InitDefaultsdb_account_tab_user_account_db_2eproto() {
+  ::google::protobuf::internal::ExplicitlyConstructed<account> _instance;
+} _account_default_instance_;
+static void InitDefaultsaccount_user_info_db_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::_db_account_tab_user_account_default_instance_;
-    new (ptr) ::db_account_tab_user_account();
+    void* ptr = &::_account_user_info_default_instance_;
+    new (ptr) ::account_user_info();
     ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::db_account_tab_user_account::InitAsDefaultInstance();
+  ::account_user_info::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<0> scc_info_db_account_tab_user_account_db_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsdb_account_tab_user_account_db_2eproto}, {}};
+::google::protobuf::internal::SCCInfo<0> scc_info_account_user_info_db_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsaccount_user_info_db_2eproto}, {}};
 
-static void InitDefaultsdb_account_tab_user_login_info_db_2eproto() {
+static void InitDefaultsaccount_db_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::_db_account_tab_user_login_info_default_instance_;
-    new (ptr) ::db_account_tab_user_login_info();
+    void* ptr = &::_account_default_instance_;
+    new (ptr) ::account();
     ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::db_account_tab_user_login_info::InitAsDefaultInstance();
+  ::account::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<0> scc_info_db_account_tab_user_login_info_db_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsdb_account_tab_user_login_info_db_2eproto}, {}};
-
-static void InitDefaultsdb_account_db_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::_db_account_default_instance_;
-    new (ptr) ::db_account();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::db_account::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<0> scc_info_db_account_db_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsdb_account_db_2eproto}, {}};
+::google::protobuf::internal::SCCInfo<0> scc_info_account_db_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsaccount_db_2eproto}, {}};
 
 void InitDefaults_db_2eproto() {
-  ::google::protobuf::internal::InitSCC(&scc_info_db_account_tab_user_account_db_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_db_account_tab_user_login_info_db_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_db_account_db_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_account_user_info_db_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_account_db_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_db_2eproto[3];
+::google::protobuf::Metadata file_level_metadata_db_2eproto[2];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_db_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_db_2eproto = nullptr;
 
 const ::google::protobuf::uint32 TableStruct_db_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::db_account_tab_user_account, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::account_user_info, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::db_account_tab_user_account, account_),
-  PROTOBUF_FIELD_OFFSET(::db_account_tab_user_account, user_id_),
-  PROTOBUF_FIELD_OFFSET(::db_account_tab_user_account, password_),
-  PROTOBUF_FIELD_OFFSET(::db_account_tab_user_account, platform_),
-  PROTOBUF_FIELD_OFFSET(::db_account_tab_user_account, phone_num_),
-  PROTOBUF_FIELD_OFFSET(::db_account_tab_user_account, device_mac_),
-  PROTOBUF_FIELD_OFFSET(::db_account_tab_user_account, register_time_),
-  PROTOBUF_FIELD_OFFSET(::db_account_tab_user_account, last_login_time_),
-  PROTOBUF_FIELD_OFFSET(::db_account_tab_user_account, token_),
+  PROTOBUF_FIELD_OFFSET(::account_user_info, account_),
+  PROTOBUF_FIELD_OFFSET(::account_user_info, user_id_),
+  PROTOBUF_FIELD_OFFSET(::account_user_info, password_),
+  PROTOBUF_FIELD_OFFSET(::account_user_info, platform_),
+  PROTOBUF_FIELD_OFFSET(::account_user_info, phone_num_),
+  PROTOBUF_FIELD_OFFSET(::account_user_info, device_mac_),
+  PROTOBUF_FIELD_OFFSET(::account_user_info, register_time_),
+  PROTOBUF_FIELD_OFFSET(::account_user_info, last_login_time_),
+  PROTOBUF_FIELD_OFFSET(::account_user_info, token_),
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::db_account_tab_user_login_info, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::db_account_tab_user_login_info, user_id_),
-  PROTOBUF_FIELD_OFFSET(::db_account_tab_user_login_info, account_),
-  ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::db_account, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::account, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::db_account_tab_user_account)},
-  { 14, -1, sizeof(::db_account_tab_user_login_info)},
-  { 21, -1, sizeof(::db_account)},
+  { 0, -1, sizeof(::account_user_info)},
+  { 14, -1, sizeof(::account)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::google::protobuf::Message*>(&::_db_account_tab_user_account_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::_db_account_tab_user_login_info_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::_db_account_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::_account_user_info_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::_account_default_instance_),
 };
 
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_db_2eproto = {
   {}, AddDescriptors_db_2eproto, "db.proto", schemas,
   file_default_instances, TableStruct_db_2eproto::offsets,
-  file_level_metadata_db_2eproto, 3, file_level_enum_descriptors_db_2eproto, file_level_service_descriptors_db_2eproto,
+  file_level_metadata_db_2eproto, 2, file_level_enum_descriptors_db_2eproto, file_level_service_descriptors_db_2eproto,
 };
 
 const char descriptor_table_protodef_db_2eproto[] =
-  "\n\010db.proto\"\206\002\n\ndb_account\032\276\001\n\020tab_user_a"
-  "ccount\022\017\n\007account\030\001 \001(\t\022\017\n\007user_id\030\002 \001(\003"
-  "\022\020\n\010password\030\003 \001(\t\022\020\n\010platform\030\004 \001(\t\022\021\n\t"
-  "phone_num\030\005 \001(\003\022\022\n\ndevice_mac\030\006 \001(\t\022\025\n\rr"
-  "egister_time\030\007 \001(\003\022\027\n\017last_login_time\030\010 "
-  "\001(\003\022\r\n\005token\030\t \001(\t\0327\n\023tab_user_login_inf"
-  "o\022\017\n\007user_id\030\001 \001(\003\022\017\n\007account\030\002 \001(\tb\006pro"
-  "to3"
+  "\n\010db.proto\"\303\001\n\007account\032\267\001\n\tuser_info\022\017\n\007"
+  "account\030\001 \001(\t\022\017\n\007user_id\030\002 \001(\003\022\020\n\010passwo"
+  "rd\030\003 \001(\t\022\020\n\010platform\030\004 \001(\t\022\021\n\tphone_num\030"
+  "\005 \001(\003\022\022\n\ndevice_mac\030\006 \001(\t\022\025\n\rregister_ti"
+  "me\030\007 \001(\003\022\027\n\017last_login_time\030\010 \001(\003\022\r\n\005tok"
+  "en\030\t \001(\tb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_db_2eproto = {
   false, InitDefaults_db_2eproto, 
   descriptor_table_protodef_db_2eproto,
-  "db.proto", &assign_descriptors_table_db_2eproto, 283,
+  "db.proto", &assign_descriptors_table_db_2eproto, 216,
 };
 
 void AddDescriptors_db_2eproto() {
@@ -154,30 +124,30 @@ static bool dynamic_init_dummy_db_2eproto = []() { AddDescriptors_db_2eproto(); 
 
 // ===================================================================
 
-void db_account_tab_user_account::InitAsDefaultInstance() {
+void account_user_info::InitAsDefaultInstance() {
 }
-class db_account_tab_user_account::HasBitSetters {
+class account_user_info::HasBitSetters {
  public:
 };
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int db_account_tab_user_account::kAccountFieldNumber;
-const int db_account_tab_user_account::kUserIdFieldNumber;
-const int db_account_tab_user_account::kPasswordFieldNumber;
-const int db_account_tab_user_account::kPlatformFieldNumber;
-const int db_account_tab_user_account::kPhoneNumFieldNumber;
-const int db_account_tab_user_account::kDeviceMacFieldNumber;
-const int db_account_tab_user_account::kRegisterTimeFieldNumber;
-const int db_account_tab_user_account::kLastLoginTimeFieldNumber;
-const int db_account_tab_user_account::kTokenFieldNumber;
+const int account_user_info::kAccountFieldNumber;
+const int account_user_info::kUserIdFieldNumber;
+const int account_user_info::kPasswordFieldNumber;
+const int account_user_info::kPlatformFieldNumber;
+const int account_user_info::kPhoneNumFieldNumber;
+const int account_user_info::kDeviceMacFieldNumber;
+const int account_user_info::kRegisterTimeFieldNumber;
+const int account_user_info::kLastLoginTimeFieldNumber;
+const int account_user_info::kTokenFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
-db_account_tab_user_account::db_account_tab_user_account()
+account_user_info::account_user_info()
   : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:db_account.tab_user_account)
+  // @@protoc_insertion_point(constructor:account.user_info)
 }
-db_account_tab_user_account::db_account_tab_user_account(const db_account_tab_user_account& from)
+account_user_info::account_user_info(const account_user_info& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
@@ -204,12 +174,12 @@ db_account_tab_user_account::db_account_tab_user_account(const db_account_tab_us
   ::memcpy(&user_id_, &from.user_id_,
     static_cast<size_t>(reinterpret_cast<char*>(&last_login_time_) -
     reinterpret_cast<char*>(&user_id_)) + sizeof(last_login_time_));
-  // @@protoc_insertion_point(copy_constructor:db_account.tab_user_account)
+  // @@protoc_insertion_point(copy_constructor:account.user_info)
 }
 
-void db_account_tab_user_account::SharedCtor() {
+void account_user_info::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
-      &scc_info_db_account_tab_user_account_db_2eproto.base);
+      &scc_info_account_user_info_db_2eproto.base);
   account_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   password_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   platform_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
@@ -220,12 +190,12 @@ void db_account_tab_user_account::SharedCtor() {
       reinterpret_cast<char*>(&user_id_)) + sizeof(last_login_time_));
 }
 
-db_account_tab_user_account::~db_account_tab_user_account() {
-  // @@protoc_insertion_point(destructor:db_account.tab_user_account)
+account_user_info::~account_user_info() {
+  // @@protoc_insertion_point(destructor:account.user_info)
   SharedDtor();
 }
 
-void db_account_tab_user_account::SharedDtor() {
+void account_user_info::SharedDtor() {
   account_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   password_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   platform_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
@@ -233,17 +203,17 @@ void db_account_tab_user_account::SharedDtor() {
   token_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
-void db_account_tab_user_account::SetCachedSize(int size) const {
+void account_user_info::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const db_account_tab_user_account& db_account_tab_user_account::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_db_account_tab_user_account_db_2eproto.base);
+const account_user_info& account_user_info::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_account_user_info_db_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void db_account_tab_user_account::Clear() {
-// @@protoc_insertion_point(message_clear_start:db_account.tab_user_account)
+void account_user_info::Clear() {
+// @@protoc_insertion_point(message_clear_start:account.user_info)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -260,9 +230,9 @@ void db_account_tab_user_account::Clear() {
 }
 
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* db_account_tab_user_account::_InternalParse(const char* begin, const char* end, void* object,
+const char* account_user_info::_InternalParse(const char* begin, const char* end, void* object,
                   ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<db_account_tab_user_account*>(object);
+  auto msg = static_cast<account_user_info*>(object);
   ::google::protobuf::int32 size; (void)size;
   int depth; (void)depth;
   ::google::protobuf::uint32 tag;
@@ -277,7 +247,7 @@ const char* db_account_tab_user_account::_InternalParse(const char* begin, const
         if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("db_account.tab_user_account.account");
+        ctx->extra_parse_data().SetFieldName("account.user_info.account");
         object = msg->mutable_account();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
@@ -300,7 +270,7 @@ const char* db_account_tab_user_account::_InternalParse(const char* begin, const
         if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("db_account.tab_user_account.password");
+        ctx->extra_parse_data().SetFieldName("account.user_info.password");
         object = msg->mutable_password();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
@@ -316,7 +286,7 @@ const char* db_account_tab_user_account::_InternalParse(const char* begin, const
         if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("db_account.tab_user_account.platform");
+        ctx->extra_parse_data().SetFieldName("account.user_info.platform");
         object = msg->mutable_platform();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
@@ -339,7 +309,7 @@ const char* db_account_tab_user_account::_InternalParse(const char* begin, const
         if (static_cast<::google::protobuf::uint8>(tag) != 50) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("db_account.tab_user_account.device_mac");
+        ctx->extra_parse_data().SetFieldName("account.user_info.device_mac");
         object = msg->mutable_device_mac();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
@@ -369,7 +339,7 @@ const char* db_account_tab_user_account::_InternalParse(const char* begin, const
         if (static_cast<::google::protobuf::uint8>(tag) != 74) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("db_account.tab_user_account.token");
+        ctx->extra_parse_data().SetFieldName("account.user_info.token");
         object = msg->mutable_token();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
@@ -404,11 +374,11 @@ len_delim_till_end:
                                {parser_till_end, object}, size);
 }
 #else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool db_account_tab_user_account::MergePartialFromCodedStream(
+bool account_user_info::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:db_account.tab_user_account)
+  // @@protoc_insertion_point(parse_start:account.user_info)
   for (;;) {
     ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
@@ -422,7 +392,7 @@ bool db_account_tab_user_account::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
             this->account().data(), static_cast<int>(this->account().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "db_account.tab_user_account.account"));
+            "account.user_info.account"));
         } else {
           goto handle_unusual;
         }
@@ -450,7 +420,7 @@ bool db_account_tab_user_account::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
             this->password().data(), static_cast<int>(this->password().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "db_account.tab_user_account.password"));
+            "account.user_info.password"));
         } else {
           goto handle_unusual;
         }
@@ -465,7 +435,7 @@ bool db_account_tab_user_account::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
             this->platform().data(), static_cast<int>(this->platform().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "db_account.tab_user_account.platform"));
+            "account.user_info.platform"));
         } else {
           goto handle_unusual;
         }
@@ -493,7 +463,7 @@ bool db_account_tab_user_account::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
             this->device_mac().data(), static_cast<int>(this->device_mac().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "db_account.tab_user_account.device_mac"));
+            "account.user_info.device_mac"));
         } else {
           goto handle_unusual;
         }
@@ -534,7 +504,7 @@ bool db_account_tab_user_account::MergePartialFromCodedStream(
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
             this->token().data(), static_cast<int>(this->token().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "db_account.tab_user_account.token"));
+            "account.user_info.token"));
         } else {
           goto handle_unusual;
         }
@@ -553,18 +523,18 @@ bool db_account_tab_user_account::MergePartialFromCodedStream(
     }
   }
 success:
-  // @@protoc_insertion_point(parse_success:db_account.tab_user_account)
+  // @@protoc_insertion_point(parse_success:account.user_info)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:db_account.tab_user_account)
+  // @@protoc_insertion_point(parse_failure:account.user_info)
   return false;
 #undef DO_
 }
 #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
-void db_account_tab_user_account::SerializeWithCachedSizes(
+void account_user_info::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:db_account.tab_user_account)
+  // @@protoc_insertion_point(serialize_start:account.user_info)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -573,7 +543,7 @@ void db_account_tab_user_account::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->account().data(), static_cast<int>(this->account().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "db_account.tab_user_account.account");
+      "account.user_info.account");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
       1, this->account(), output);
   }
@@ -588,7 +558,7 @@ void db_account_tab_user_account::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->password().data(), static_cast<int>(this->password().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "db_account.tab_user_account.password");
+      "account.user_info.password");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
       3, this->password(), output);
   }
@@ -598,7 +568,7 @@ void db_account_tab_user_account::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->platform().data(), static_cast<int>(this->platform().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "db_account.tab_user_account.platform");
+      "account.user_info.platform");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
       4, this->platform(), output);
   }
@@ -613,7 +583,7 @@ void db_account_tab_user_account::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->device_mac().data(), static_cast<int>(this->device_mac().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "db_account.tab_user_account.device_mac");
+      "account.user_info.device_mac");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
       6, this->device_mac(), output);
   }
@@ -633,7 +603,7 @@ void db_account_tab_user_account::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->token().data(), static_cast<int>(this->token().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "db_account.tab_user_account.token");
+      "account.user_info.token");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
       9, this->token(), output);
   }
@@ -642,12 +612,12 @@ void db_account_tab_user_account::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:db_account.tab_user_account)
+  // @@protoc_insertion_point(serialize_end:account.user_info)
 }
 
-::google::protobuf::uint8* db_account_tab_user_account::InternalSerializeWithCachedSizesToArray(
+::google::protobuf::uint8* account_user_info::InternalSerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:db_account.tab_user_account)
+  // @@protoc_insertion_point(serialize_to_array_start:account.user_info)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -656,7 +626,7 @@ void db_account_tab_user_account::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->account().data(), static_cast<int>(this->account().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "db_account.tab_user_account.account");
+      "account.user_info.account");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         1, this->account(), target);
@@ -672,7 +642,7 @@ void db_account_tab_user_account::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->password().data(), static_cast<int>(this->password().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "db_account.tab_user_account.password");
+      "account.user_info.password");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         3, this->password(), target);
@@ -683,7 +653,7 @@ void db_account_tab_user_account::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->platform().data(), static_cast<int>(this->platform().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "db_account.tab_user_account.platform");
+      "account.user_info.platform");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         4, this->platform(), target);
@@ -699,7 +669,7 @@ void db_account_tab_user_account::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->device_mac().data(), static_cast<int>(this->device_mac().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "db_account.tab_user_account.device_mac");
+      "account.user_info.device_mac");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         6, this->device_mac(), target);
@@ -720,7 +690,7 @@ void db_account_tab_user_account::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->token().data(), static_cast<int>(this->token().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "db_account.tab_user_account.token");
+      "account.user_info.token");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         9, this->token(), target);
@@ -730,12 +700,12 @@ void db_account_tab_user_account::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:db_account.tab_user_account)
+  // @@protoc_insertion_point(serialize_to_array_end:account.user_info)
   return target;
 }
 
-size_t db_account_tab_user_account::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:db_account.tab_user_account)
+size_t account_user_info::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:account.user_info)
   size_t total_size = 0;
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -815,23 +785,23 @@ size_t db_account_tab_user_account::ByteSizeLong() const {
   return total_size;
 }
 
-void db_account_tab_user_account::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:db_account.tab_user_account)
+void account_user_info::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:account.user_info)
   GOOGLE_DCHECK_NE(&from, this);
-  const db_account_tab_user_account* source =
-      ::google::protobuf::DynamicCastToGenerated<db_account_tab_user_account>(
+  const account_user_info* source =
+      ::google::protobuf::DynamicCastToGenerated<account_user_info>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:db_account.tab_user_account)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:account.user_info)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:db_account.tab_user_account)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:account.user_info)
     MergeFrom(*source);
   }
 }
 
-void db_account_tab_user_account::MergeFrom(const db_account_tab_user_account& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:db_account.tab_user_account)
+void account_user_info::MergeFrom(const account_user_info& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:account.user_info)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::google::protobuf::uint32 cached_has_bits = 0;
@@ -871,29 +841,29 @@ void db_account_tab_user_account::MergeFrom(const db_account_tab_user_account& f
   }
 }
 
-void db_account_tab_user_account::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:db_account.tab_user_account)
+void account_user_info::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:account.user_info)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void db_account_tab_user_account::CopyFrom(const db_account_tab_user_account& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:db_account.tab_user_account)
+void account_user_info::CopyFrom(const account_user_info& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:account.user_info)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool db_account_tab_user_account::IsInitialized() const {
+bool account_user_info::IsInitialized() const {
   return true;
 }
 
-void db_account_tab_user_account::Swap(db_account_tab_user_account* other) {
+void account_user_info::Swap(account_user_info* other) {
   if (other == this) return;
   InternalSwap(other);
 }
-void db_account_tab_user_account::InternalSwap(db_account_tab_user_account* other) {
+void account_user_info::InternalSwap(account_user_info* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
   account_.Swap(&other->account_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
@@ -912,7 +882,7 @@ void db_account_tab_user_account::InternalSwap(db_account_tab_user_account* othe
   swap(last_login_time_, other->last_login_time_);
 }
 
-::google::protobuf::Metadata db_account_tab_user_account::GetMetadata() const {
+::google::protobuf::Metadata account_user_info::GetMetadata() const {
   ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_db_2eproto);
   return ::file_level_metadata_db_2eproto[kIndexInFileMessages];
 }
@@ -920,391 +890,49 @@ void db_account_tab_user_account::InternalSwap(db_account_tab_user_account* othe
 
 // ===================================================================
 
-void db_account_tab_user_login_info::InitAsDefaultInstance() {
+void account::InitAsDefaultInstance() {
 }
-class db_account_tab_user_login_info::HasBitSetters {
- public:
-};
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int db_account_tab_user_login_info::kUserIdFieldNumber;
-const int db_account_tab_user_login_info::kAccountFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-db_account_tab_user_login_info::db_account_tab_user_login_info()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:db_account.tab_user_login_info)
-}
-db_account_tab_user_login_info::db_account_tab_user_login_info(const db_account_tab_user_login_info& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  account_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.account().size() > 0) {
-    account_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.account_);
-  }
-  user_id_ = from.user_id_;
-  // @@protoc_insertion_point(copy_constructor:db_account.tab_user_login_info)
-}
-
-void db_account_tab_user_login_info::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_db_account_tab_user_login_info_db_2eproto.base);
-  account_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  user_id_ = PROTOBUF_LONGLONG(0);
-}
-
-db_account_tab_user_login_info::~db_account_tab_user_login_info() {
-  // @@protoc_insertion_point(destructor:db_account.tab_user_login_info)
-  SharedDtor();
-}
-
-void db_account_tab_user_login_info::SharedDtor() {
-  account_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-
-void db_account_tab_user_login_info::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const db_account_tab_user_login_info& db_account_tab_user_login_info::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_db_account_tab_user_login_info_db_2eproto.base);
-  return *internal_default_instance();
-}
-
-
-void db_account_tab_user_login_info::Clear() {
-// @@protoc_insertion_point(message_clear_start:db_account.tab_user_login_info)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  account_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  user_id_ = PROTOBUF_LONGLONG(0);
-  _internal_metadata_.Clear();
-}
-
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* db_account_tab_user_login_info::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<db_account_tab_user_login_info*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-    switch (tag >> 3) {
-      // int64 user_id = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
-        msg->set_user_id(::google::protobuf::internal::ReadVarint(&ptr));
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        break;
-      }
-      // string account = 2;
-      case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("db_account.tab_user_login_info.account");
-        object = msg->mutable_account();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
-        }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
-      }
-    }  // switch
-  }  // while
-  return ptr;
-string_till_end:
-  static_cast<::std::string*>(object)->clear();
-  static_cast<::std::string*>(object)->reserve(size);
-  goto len_delim_till_end;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool db_account_tab_user_login_info::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:db_account.tab_user_login_info)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // int64 user_id = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &user_id_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string account = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_account()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->account().data(), static_cast<int>(this->account().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "db_account.tab_user_login_info.account"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:db_account.tab_user_login_info)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:db_account.tab_user_login_info)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void db_account_tab_user_login_info::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:db_account.tab_user_login_info)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // int64 user_id = 1;
-  if (this->user_id() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(1, this->user_id(), output);
-  }
-
-  // string account = 2;
-  if (this->account().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->account().data(), static_cast<int>(this->account().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "db_account.tab_user_login_info.account");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->account(), output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:db_account.tab_user_login_info)
-}
-
-::google::protobuf::uint8* db_account_tab_user_login_info::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:db_account.tab_user_login_info)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // int64 user_id = 1;
-  if (this->user_id() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(1, this->user_id(), target);
-  }
-
-  // string account = 2;
-  if (this->account().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->account().data(), static_cast<int>(this->account().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "db_account.tab_user_login_info.account");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->account(), target);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:db_account.tab_user_login_info)
-  return target;
-}
-
-size_t db_account_tab_user_login_info::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:db_account.tab_user_login_info)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  // string account = 2;
-  if (this->account().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->account());
-  }
-
-  // int64 user_id = 1;
-  if (this->user_id() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->user_id());
-  }
-
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void db_account_tab_user_login_info::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:db_account.tab_user_login_info)
-  GOOGLE_DCHECK_NE(&from, this);
-  const db_account_tab_user_login_info* source =
-      ::google::protobuf::DynamicCastToGenerated<db_account_tab_user_login_info>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:db_account.tab_user_login_info)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:db_account.tab_user_login_info)
-    MergeFrom(*source);
-  }
-}
-
-void db_account_tab_user_login_info::MergeFrom(const db_account_tab_user_login_info& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:db_account.tab_user_login_info)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (from.account().size() > 0) {
-
-    account_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.account_);
-  }
-  if (from.user_id() != 0) {
-    set_user_id(from.user_id());
-  }
-}
-
-void db_account_tab_user_login_info::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:db_account.tab_user_login_info)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void db_account_tab_user_login_info::CopyFrom(const db_account_tab_user_login_info& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:db_account.tab_user_login_info)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool db_account_tab_user_login_info::IsInitialized() const {
-  return true;
-}
-
-void db_account_tab_user_login_info::Swap(db_account_tab_user_login_info* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void db_account_tab_user_login_info::InternalSwap(db_account_tab_user_login_info* other) {
-  using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  account_.Swap(&other->account_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  swap(user_id_, other->user_id_);
-}
-
-::google::protobuf::Metadata db_account_tab_user_login_info::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_db_2eproto);
-  return ::file_level_metadata_db_2eproto[kIndexInFileMessages];
-}
-
-
-// ===================================================================
-
-void db_account::InitAsDefaultInstance() {
-}
-class db_account::HasBitSetters {
+class account::HasBitSetters {
  public:
 };
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
-db_account::db_account()
+account::account()
   : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:db_account)
+  // @@protoc_insertion_point(constructor:account)
 }
-db_account::db_account(const db_account& from)
+account::account(const account& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  // @@protoc_insertion_point(copy_constructor:db_account)
+  // @@protoc_insertion_point(copy_constructor:account)
 }
 
-void db_account::SharedCtor() {
+void account::SharedCtor() {
 }
 
-db_account::~db_account() {
-  // @@protoc_insertion_point(destructor:db_account)
+account::~account() {
+  // @@protoc_insertion_point(destructor:account)
   SharedDtor();
 }
 
-void db_account::SharedDtor() {
+void account::SharedDtor() {
 }
 
-void db_account::SetCachedSize(int size) const {
+void account::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const db_account& db_account::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_db_account_db_2eproto.base);
+const account& account::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_account_db_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void db_account::Clear() {
-// @@protoc_insertion_point(message_clear_start:db_account)
+void account::Clear() {
+// @@protoc_insertion_point(message_clear_start:account)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -1313,9 +941,9 @@ void db_account::Clear() {
 }
 
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* db_account::_InternalParse(const char* begin, const char* end, void* object,
+const char* account::_InternalParse(const char* begin, const char* end, void* object,
                   ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<db_account*>(object);
+  auto msg = static_cast<account*>(object);
   ::google::protobuf::int32 size; (void)size;
   int depth; (void)depth;
   ::google::protobuf::uint32 tag;
@@ -1341,11 +969,11 @@ const char* db_account::_InternalParse(const char* begin, const char* end, void*
   return ptr;
 }
 #else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool db_account::MergePartialFromCodedStream(
+bool account::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:db_account)
+  // @@protoc_insertion_point(parse_start:account)
   for (;;) {
     ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
@@ -1358,18 +986,18 @@ bool db_account::MergePartialFromCodedStream(
           input, tag, _internal_metadata_.mutable_unknown_fields()));
   }
 success:
-  // @@protoc_insertion_point(parse_success:db_account)
+  // @@protoc_insertion_point(parse_success:account)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:db_account)
+  // @@protoc_insertion_point(parse_failure:account)
   return false;
 #undef DO_
 }
 #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
-void db_account::SerializeWithCachedSizes(
+void account::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:db_account)
+  // @@protoc_insertion_point(serialize_start:account)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -1377,12 +1005,12 @@ void db_account::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:db_account)
+  // @@protoc_insertion_point(serialize_end:account)
 }
 
-::google::protobuf::uint8* db_account::InternalSerializeWithCachedSizesToArray(
+::google::protobuf::uint8* account::InternalSerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:db_account)
+  // @@protoc_insertion_point(serialize_to_array_start:account)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -1390,12 +1018,12 @@ void db_account::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:db_account)
+  // @@protoc_insertion_point(serialize_to_array_end:account)
   return target;
 }
 
-size_t db_account::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:db_account)
+size_t account::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:account)
   size_t total_size = 0;
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1412,23 +1040,23 @@ size_t db_account::ByteSizeLong() const {
   return total_size;
 }
 
-void db_account::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:db_account)
+void account::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:account)
   GOOGLE_DCHECK_NE(&from, this);
-  const db_account* source =
-      ::google::protobuf::DynamicCastToGenerated<db_account>(
+  const account* source =
+      ::google::protobuf::DynamicCastToGenerated<account>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:db_account)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:account)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:db_account)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:account)
     MergeFrom(*source);
   }
 }
 
-void db_account::MergeFrom(const db_account& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:db_account)
+void account::MergeFrom(const account& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:account)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::google::protobuf::uint32 cached_has_bits = 0;
@@ -1436,34 +1064,34 @@ void db_account::MergeFrom(const db_account& from) {
 
 }
 
-void db_account::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:db_account)
+void account::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:account)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void db_account::CopyFrom(const db_account& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:db_account)
+void account::CopyFrom(const account& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:account)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool db_account::IsInitialized() const {
+bool account::IsInitialized() const {
   return true;
 }
 
-void db_account::Swap(db_account* other) {
+void account::Swap(account* other) {
   if (other == this) return;
   InternalSwap(other);
 }
-void db_account::InternalSwap(db_account* other) {
+void account::InternalSwap(account* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
 }
 
-::google::protobuf::Metadata db_account::GetMetadata() const {
+::google::protobuf::Metadata account::GetMetadata() const {
   ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_db_2eproto);
   return ::file_level_metadata_db_2eproto[kIndexInFileMessages];
 }
@@ -1472,14 +1100,11 @@ void db_account::InternalSwap(db_account* other) {
 // @@protoc_insertion_point(namespace_scope)
 namespace google {
 namespace protobuf {
-template<> PROTOBUF_NOINLINE ::db_account_tab_user_account* Arena::CreateMaybeMessage< ::db_account_tab_user_account >(Arena* arena) {
-  return Arena::CreateInternal< ::db_account_tab_user_account >(arena);
+template<> PROTOBUF_NOINLINE ::account_user_info* Arena::CreateMaybeMessage< ::account_user_info >(Arena* arena) {
+  return Arena::CreateInternal< ::account_user_info >(arena);
 }
-template<> PROTOBUF_NOINLINE ::db_account_tab_user_login_info* Arena::CreateMaybeMessage< ::db_account_tab_user_login_info >(Arena* arena) {
-  return Arena::CreateInternal< ::db_account_tab_user_login_info >(arena);
-}
-template<> PROTOBUF_NOINLINE ::db_account* Arena::CreateMaybeMessage< ::db_account >(Arena* arena) {
-  return Arena::CreateInternal< ::db_account >(arena);
+template<> PROTOBUF_NOINLINE ::account* Arena::CreateMaybeMessage< ::account >(Arena* arena) {
+  return Arena::CreateInternal< ::account >(arena);
 }
 }  // namespace protobuf
 }  // namespace google

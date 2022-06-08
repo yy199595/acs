@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-message db_account
+message account
 {
-    message tab_user_account
+    message user_info
     {
         string account = 1;     //账户
         int64 user_id = 2;      //用户id
@@ -13,11 +13,5 @@ message db_account
         int64 register_time = 7;    //注册事件
         int64 last_login_time = 8;   //上次登录时间
         string token = 9;   //登陆令牌
-    }
-
-    message tab_user_login_info
-    {
-        int64 user_id = 1;
-        string account = 2;
     }
 }

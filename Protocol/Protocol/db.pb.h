@@ -41,51 +41,47 @@ struct TableStruct_db_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[3]
+  static const ::google::protobuf::internal::ParseTable schema[2]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
 };
 void AddDescriptors_db_2eproto();
-class db_account;
-class db_accountDefaultTypeInternal;
-extern db_accountDefaultTypeInternal _db_account_default_instance_;
-class db_account_tab_user_account;
-class db_account_tab_user_accountDefaultTypeInternal;
-extern db_account_tab_user_accountDefaultTypeInternal _db_account_tab_user_account_default_instance_;
-class db_account_tab_user_login_info;
-class db_account_tab_user_login_infoDefaultTypeInternal;
-extern db_account_tab_user_login_infoDefaultTypeInternal _db_account_tab_user_login_info_default_instance_;
+class account;
+class accountDefaultTypeInternal;
+extern accountDefaultTypeInternal _account_default_instance_;
+class account_user_info;
+class account_user_infoDefaultTypeInternal;
+extern account_user_infoDefaultTypeInternal _account_user_info_default_instance_;
 namespace google {
 namespace protobuf {
-template<> ::db_account* Arena::CreateMaybeMessage<::db_account>(Arena*);
-template<> ::db_account_tab_user_account* Arena::CreateMaybeMessage<::db_account_tab_user_account>(Arena*);
-template<> ::db_account_tab_user_login_info* Arena::CreateMaybeMessage<::db_account_tab_user_login_info>(Arena*);
+template<> ::account* Arena::CreateMaybeMessage<::account>(Arena*);
+template<> ::account_user_info* Arena::CreateMaybeMessage<::account_user_info>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 
 // ===================================================================
 
-class db_account_tab_user_account :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:db_account.tab_user_account) */ {
+class account_user_info :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:account.user_info) */ {
  public:
-  db_account_tab_user_account();
-  virtual ~db_account_tab_user_account();
+  account_user_info();
+  virtual ~account_user_info();
 
-  db_account_tab_user_account(const db_account_tab_user_account& from);
+  account_user_info(const account_user_info& from);
 
-  inline db_account_tab_user_account& operator=(const db_account_tab_user_account& from) {
+  inline account_user_info& operator=(const account_user_info& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  db_account_tab_user_account(db_account_tab_user_account&& from) noexcept
-    : db_account_tab_user_account() {
+  account_user_info(account_user_info&& from) noexcept
+    : account_user_info() {
     *this = ::std::move(from);
   }
 
-  inline db_account_tab_user_account& operator=(db_account_tab_user_account&& from) noexcept {
+  inline account_user_info& operator=(account_user_info&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -97,34 +93,34 @@ class db_account_tab_user_account :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const db_account_tab_user_account& default_instance();
+  static const account_user_info& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const db_account_tab_user_account* internal_default_instance() {
-    return reinterpret_cast<const db_account_tab_user_account*>(
-               &_db_account_tab_user_account_default_instance_);
+  static inline const account_user_info* internal_default_instance() {
+    return reinterpret_cast<const account_user_info*>(
+               &_account_user_info_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     0;
 
-  void Swap(db_account_tab_user_account* other);
-  friend void swap(db_account_tab_user_account& a, db_account_tab_user_account& b) {
+  void Swap(account_user_info* other);
+  friend void swap(account_user_info& a, account_user_info& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline db_account_tab_user_account* New() const final {
-    return CreateMaybeMessage<db_account_tab_user_account>(nullptr);
+  inline account_user_info* New() const final {
+    return CreateMaybeMessage<account_user_info>(nullptr);
   }
 
-  db_account_tab_user_account* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<db_account_tab_user_account>(arena);
+  account_user_info* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<account_user_info>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const db_account_tab_user_account& from);
-  void MergeFrom(const db_account_tab_user_account& from);
+  void CopyFrom(const account_user_info& from);
+  void MergeFrom(const account_user_info& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -146,7 +142,7 @@ class db_account_tab_user_account :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(db_account_tab_user_account* other);
+  void InternalSwap(account_user_info* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -256,7 +252,7 @@ class db_account_tab_user_account :
   ::google::protobuf::int64 last_login_time() const;
   void set_last_login_time(::google::protobuf::int64 value);
 
-  // @@protoc_insertion_point(class_scope:db_account.tab_user_account)
+  // @@protoc_insertion_point(class_scope:account.user_info)
  private:
   class HasBitSetters;
 
@@ -275,25 +271,25 @@ class db_account_tab_user_account :
 };
 // -------------------------------------------------------------------
 
-class db_account_tab_user_login_info :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:db_account.tab_user_login_info) */ {
+class account :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:account) */ {
  public:
-  db_account_tab_user_login_info();
-  virtual ~db_account_tab_user_login_info();
+  account();
+  virtual ~account();
 
-  db_account_tab_user_login_info(const db_account_tab_user_login_info& from);
+  account(const account& from);
 
-  inline db_account_tab_user_login_info& operator=(const db_account_tab_user_login_info& from) {
+  inline account& operator=(const account& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  db_account_tab_user_login_info(db_account_tab_user_login_info&& from) noexcept
-    : db_account_tab_user_login_info() {
+  account(account&& from) noexcept
+    : account() {
     *this = ::std::move(from);
   }
 
-  inline db_account_tab_user_login_info& operator=(db_account_tab_user_login_info&& from) noexcept {
+  inline account& operator=(account&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -305,34 +301,34 @@ class db_account_tab_user_login_info :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const db_account_tab_user_login_info& default_instance();
+  static const account& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const db_account_tab_user_login_info* internal_default_instance() {
-    return reinterpret_cast<const db_account_tab_user_login_info*>(
-               &_db_account_tab_user_login_info_default_instance_);
+  static inline const account* internal_default_instance() {
+    return reinterpret_cast<const account*>(
+               &_account_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     1;
 
-  void Swap(db_account_tab_user_login_info* other);
-  friend void swap(db_account_tab_user_login_info& a, db_account_tab_user_login_info& b) {
+  void Swap(account* other);
+  friend void swap(account& a, account& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline db_account_tab_user_login_info* New() const final {
-    return CreateMaybeMessage<db_account_tab_user_login_info>(nullptr);
+  inline account* New() const final {
+    return CreateMaybeMessage<account>(nullptr);
   }
 
-  db_account_tab_user_login_info* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<db_account_tab_user_login_info>(arena);
+  account* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<account>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const db_account_tab_user_login_info& from);
-  void MergeFrom(const db_account_tab_user_login_info& from);
+  void CopyFrom(const account& from);
+  void MergeFrom(const account& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -354,7 +350,7 @@ class db_account_tab_user_login_info :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(db_account_tab_user_login_info* other);
+  void InternalSwap(account* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -368,139 +364,11 @@ class db_account_tab_user_login_info :
 
   // nested types ----------------------------------------------------
 
-  // accessors -------------------------------------------------------
-
-  // string account = 2;
-  void clear_account();
-  static const int kAccountFieldNumber = 2;
-  const ::std::string& account() const;
-  void set_account(const ::std::string& value);
-  #if LANG_CXX11
-  void set_account(::std::string&& value);
-  #endif
-  void set_account(const char* value);
-  void set_account(const char* value, size_t size);
-  ::std::string* mutable_account();
-  ::std::string* release_account();
-  void set_allocated_account(::std::string* account);
-
-  // int64 user_id = 1;
-  void clear_user_id();
-  static const int kUserIdFieldNumber = 1;
-  ::google::protobuf::int64 user_id() const;
-  void set_user_id(::google::protobuf::int64 value);
-
-  // @@protoc_insertion_point(class_scope:db_account.tab_user_login_info)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr account_;
-  ::google::protobuf::int64 user_id_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_db_2eproto;
-};
-// -------------------------------------------------------------------
-
-class db_account :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:db_account) */ {
- public:
-  db_account();
-  virtual ~db_account();
-
-  db_account(const db_account& from);
-
-  inline db_account& operator=(const db_account& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  db_account(db_account&& from) noexcept
-    : db_account() {
-    *this = ::std::move(from);
-  }
-
-  inline db_account& operator=(db_account&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const db_account& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const db_account* internal_default_instance() {
-    return reinterpret_cast<const db_account*>(
-               &_db_account_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    2;
-
-  void Swap(db_account* other);
-  friend void swap(db_account& a, db_account& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline db_account* New() const final {
-    return CreateMaybeMessage<db_account>(nullptr);
-  }
-
-  db_account* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<db_account>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const db_account& from);
-  void MergeFrom(const db_account& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(db_account* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  typedef db_account_tab_user_account tab_user_account;
-  typedef db_account_tab_user_login_info tab_user_login_info;
+  typedef account_user_info user_info;
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:db_account)
+  // @@protoc_insertion_point(class_scope:account)
  private:
   class HasBitSetters;
 
@@ -517,409 +385,336 @@ class db_account :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
-// db_account_tab_user_account
+// account_user_info
 
 // string account = 1;
-inline void db_account_tab_user_account::clear_account() {
+inline void account_user_info::clear_account() {
   account_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& db_account_tab_user_account::account() const {
-  // @@protoc_insertion_point(field_get:db_account.tab_user_account.account)
+inline const ::std::string& account_user_info::account() const {
+  // @@protoc_insertion_point(field_get:account.user_info.account)
   return account_.GetNoArena();
 }
-inline void db_account_tab_user_account::set_account(const ::std::string& value) {
+inline void account_user_info::set_account(const ::std::string& value) {
   
   account_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:db_account.tab_user_account.account)
+  // @@protoc_insertion_point(field_set:account.user_info.account)
 }
 #if LANG_CXX11
-inline void db_account_tab_user_account::set_account(::std::string&& value) {
+inline void account_user_info::set_account(::std::string&& value) {
   
   account_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:db_account.tab_user_account.account)
+  // @@protoc_insertion_point(field_set_rvalue:account.user_info.account)
 }
 #endif
-inline void db_account_tab_user_account::set_account(const char* value) {
+inline void account_user_info::set_account(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   account_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:db_account.tab_user_account.account)
+  // @@protoc_insertion_point(field_set_char:account.user_info.account)
 }
-inline void db_account_tab_user_account::set_account(const char* value, size_t size) {
+inline void account_user_info::set_account(const char* value, size_t size) {
   
   account_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:db_account.tab_user_account.account)
+  // @@protoc_insertion_point(field_set_pointer:account.user_info.account)
 }
-inline ::std::string* db_account_tab_user_account::mutable_account() {
+inline ::std::string* account_user_info::mutable_account() {
   
-  // @@protoc_insertion_point(field_mutable:db_account.tab_user_account.account)
+  // @@protoc_insertion_point(field_mutable:account.user_info.account)
   return account_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* db_account_tab_user_account::release_account() {
-  // @@protoc_insertion_point(field_release:db_account.tab_user_account.account)
+inline ::std::string* account_user_info::release_account() {
+  // @@protoc_insertion_point(field_release:account.user_info.account)
   
   return account_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void db_account_tab_user_account::set_allocated_account(::std::string* account) {
+inline void account_user_info::set_allocated_account(::std::string* account) {
   if (account != nullptr) {
     
   } else {
     
   }
   account_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), account);
-  // @@protoc_insertion_point(field_set_allocated:db_account.tab_user_account.account)
+  // @@protoc_insertion_point(field_set_allocated:account.user_info.account)
 }
 
 // int64 user_id = 2;
-inline void db_account_tab_user_account::clear_user_id() {
+inline void account_user_info::clear_user_id() {
   user_id_ = PROTOBUF_LONGLONG(0);
 }
-inline ::google::protobuf::int64 db_account_tab_user_account::user_id() const {
-  // @@protoc_insertion_point(field_get:db_account.tab_user_account.user_id)
+inline ::google::protobuf::int64 account_user_info::user_id() const {
+  // @@protoc_insertion_point(field_get:account.user_info.user_id)
   return user_id_;
 }
-inline void db_account_tab_user_account::set_user_id(::google::protobuf::int64 value) {
+inline void account_user_info::set_user_id(::google::protobuf::int64 value) {
   
   user_id_ = value;
-  // @@protoc_insertion_point(field_set:db_account.tab_user_account.user_id)
+  // @@protoc_insertion_point(field_set:account.user_info.user_id)
 }
 
 // string password = 3;
-inline void db_account_tab_user_account::clear_password() {
+inline void account_user_info::clear_password() {
   password_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& db_account_tab_user_account::password() const {
-  // @@protoc_insertion_point(field_get:db_account.tab_user_account.password)
+inline const ::std::string& account_user_info::password() const {
+  // @@protoc_insertion_point(field_get:account.user_info.password)
   return password_.GetNoArena();
 }
-inline void db_account_tab_user_account::set_password(const ::std::string& value) {
+inline void account_user_info::set_password(const ::std::string& value) {
   
   password_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:db_account.tab_user_account.password)
+  // @@protoc_insertion_point(field_set:account.user_info.password)
 }
 #if LANG_CXX11
-inline void db_account_tab_user_account::set_password(::std::string&& value) {
+inline void account_user_info::set_password(::std::string&& value) {
   
   password_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:db_account.tab_user_account.password)
+  // @@protoc_insertion_point(field_set_rvalue:account.user_info.password)
 }
 #endif
-inline void db_account_tab_user_account::set_password(const char* value) {
+inline void account_user_info::set_password(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   password_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:db_account.tab_user_account.password)
+  // @@protoc_insertion_point(field_set_char:account.user_info.password)
 }
-inline void db_account_tab_user_account::set_password(const char* value, size_t size) {
+inline void account_user_info::set_password(const char* value, size_t size) {
   
   password_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:db_account.tab_user_account.password)
+  // @@protoc_insertion_point(field_set_pointer:account.user_info.password)
 }
-inline ::std::string* db_account_tab_user_account::mutable_password() {
+inline ::std::string* account_user_info::mutable_password() {
   
-  // @@protoc_insertion_point(field_mutable:db_account.tab_user_account.password)
+  // @@protoc_insertion_point(field_mutable:account.user_info.password)
   return password_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* db_account_tab_user_account::release_password() {
-  // @@protoc_insertion_point(field_release:db_account.tab_user_account.password)
+inline ::std::string* account_user_info::release_password() {
+  // @@protoc_insertion_point(field_release:account.user_info.password)
   
   return password_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void db_account_tab_user_account::set_allocated_password(::std::string* password) {
+inline void account_user_info::set_allocated_password(::std::string* password) {
   if (password != nullptr) {
     
   } else {
     
   }
   password_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), password);
-  // @@protoc_insertion_point(field_set_allocated:db_account.tab_user_account.password)
+  // @@protoc_insertion_point(field_set_allocated:account.user_info.password)
 }
 
 // string platform = 4;
-inline void db_account_tab_user_account::clear_platform() {
+inline void account_user_info::clear_platform() {
   platform_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& db_account_tab_user_account::platform() const {
-  // @@protoc_insertion_point(field_get:db_account.tab_user_account.platform)
+inline const ::std::string& account_user_info::platform() const {
+  // @@protoc_insertion_point(field_get:account.user_info.platform)
   return platform_.GetNoArena();
 }
-inline void db_account_tab_user_account::set_platform(const ::std::string& value) {
+inline void account_user_info::set_platform(const ::std::string& value) {
   
   platform_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:db_account.tab_user_account.platform)
+  // @@protoc_insertion_point(field_set:account.user_info.platform)
 }
 #if LANG_CXX11
-inline void db_account_tab_user_account::set_platform(::std::string&& value) {
+inline void account_user_info::set_platform(::std::string&& value) {
   
   platform_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:db_account.tab_user_account.platform)
+  // @@protoc_insertion_point(field_set_rvalue:account.user_info.platform)
 }
 #endif
-inline void db_account_tab_user_account::set_platform(const char* value) {
+inline void account_user_info::set_platform(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   platform_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:db_account.tab_user_account.platform)
+  // @@protoc_insertion_point(field_set_char:account.user_info.platform)
 }
-inline void db_account_tab_user_account::set_platform(const char* value, size_t size) {
+inline void account_user_info::set_platform(const char* value, size_t size) {
   
   platform_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:db_account.tab_user_account.platform)
+  // @@protoc_insertion_point(field_set_pointer:account.user_info.platform)
 }
-inline ::std::string* db_account_tab_user_account::mutable_platform() {
+inline ::std::string* account_user_info::mutable_platform() {
   
-  // @@protoc_insertion_point(field_mutable:db_account.tab_user_account.platform)
+  // @@protoc_insertion_point(field_mutable:account.user_info.platform)
   return platform_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* db_account_tab_user_account::release_platform() {
-  // @@protoc_insertion_point(field_release:db_account.tab_user_account.platform)
+inline ::std::string* account_user_info::release_platform() {
+  // @@protoc_insertion_point(field_release:account.user_info.platform)
   
   return platform_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void db_account_tab_user_account::set_allocated_platform(::std::string* platform) {
+inline void account_user_info::set_allocated_platform(::std::string* platform) {
   if (platform != nullptr) {
     
   } else {
     
   }
   platform_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), platform);
-  // @@protoc_insertion_point(field_set_allocated:db_account.tab_user_account.platform)
+  // @@protoc_insertion_point(field_set_allocated:account.user_info.platform)
 }
 
 // int64 phone_num = 5;
-inline void db_account_tab_user_account::clear_phone_num() {
+inline void account_user_info::clear_phone_num() {
   phone_num_ = PROTOBUF_LONGLONG(0);
 }
-inline ::google::protobuf::int64 db_account_tab_user_account::phone_num() const {
-  // @@protoc_insertion_point(field_get:db_account.tab_user_account.phone_num)
+inline ::google::protobuf::int64 account_user_info::phone_num() const {
+  // @@protoc_insertion_point(field_get:account.user_info.phone_num)
   return phone_num_;
 }
-inline void db_account_tab_user_account::set_phone_num(::google::protobuf::int64 value) {
+inline void account_user_info::set_phone_num(::google::protobuf::int64 value) {
   
   phone_num_ = value;
-  // @@protoc_insertion_point(field_set:db_account.tab_user_account.phone_num)
+  // @@protoc_insertion_point(field_set:account.user_info.phone_num)
 }
 
 // string device_mac = 6;
-inline void db_account_tab_user_account::clear_device_mac() {
+inline void account_user_info::clear_device_mac() {
   device_mac_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& db_account_tab_user_account::device_mac() const {
-  // @@protoc_insertion_point(field_get:db_account.tab_user_account.device_mac)
+inline const ::std::string& account_user_info::device_mac() const {
+  // @@protoc_insertion_point(field_get:account.user_info.device_mac)
   return device_mac_.GetNoArena();
 }
-inline void db_account_tab_user_account::set_device_mac(const ::std::string& value) {
+inline void account_user_info::set_device_mac(const ::std::string& value) {
   
   device_mac_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:db_account.tab_user_account.device_mac)
+  // @@protoc_insertion_point(field_set:account.user_info.device_mac)
 }
 #if LANG_CXX11
-inline void db_account_tab_user_account::set_device_mac(::std::string&& value) {
+inline void account_user_info::set_device_mac(::std::string&& value) {
   
   device_mac_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:db_account.tab_user_account.device_mac)
+  // @@protoc_insertion_point(field_set_rvalue:account.user_info.device_mac)
 }
 #endif
-inline void db_account_tab_user_account::set_device_mac(const char* value) {
+inline void account_user_info::set_device_mac(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   device_mac_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:db_account.tab_user_account.device_mac)
+  // @@protoc_insertion_point(field_set_char:account.user_info.device_mac)
 }
-inline void db_account_tab_user_account::set_device_mac(const char* value, size_t size) {
+inline void account_user_info::set_device_mac(const char* value, size_t size) {
   
   device_mac_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:db_account.tab_user_account.device_mac)
+  // @@protoc_insertion_point(field_set_pointer:account.user_info.device_mac)
 }
-inline ::std::string* db_account_tab_user_account::mutable_device_mac() {
+inline ::std::string* account_user_info::mutable_device_mac() {
   
-  // @@protoc_insertion_point(field_mutable:db_account.tab_user_account.device_mac)
+  // @@protoc_insertion_point(field_mutable:account.user_info.device_mac)
   return device_mac_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* db_account_tab_user_account::release_device_mac() {
-  // @@protoc_insertion_point(field_release:db_account.tab_user_account.device_mac)
+inline ::std::string* account_user_info::release_device_mac() {
+  // @@protoc_insertion_point(field_release:account.user_info.device_mac)
   
   return device_mac_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void db_account_tab_user_account::set_allocated_device_mac(::std::string* device_mac) {
+inline void account_user_info::set_allocated_device_mac(::std::string* device_mac) {
   if (device_mac != nullptr) {
     
   } else {
     
   }
   device_mac_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), device_mac);
-  // @@protoc_insertion_point(field_set_allocated:db_account.tab_user_account.device_mac)
+  // @@protoc_insertion_point(field_set_allocated:account.user_info.device_mac)
 }
 
 // int64 register_time = 7;
-inline void db_account_tab_user_account::clear_register_time() {
+inline void account_user_info::clear_register_time() {
   register_time_ = PROTOBUF_LONGLONG(0);
 }
-inline ::google::protobuf::int64 db_account_tab_user_account::register_time() const {
-  // @@protoc_insertion_point(field_get:db_account.tab_user_account.register_time)
+inline ::google::protobuf::int64 account_user_info::register_time() const {
+  // @@protoc_insertion_point(field_get:account.user_info.register_time)
   return register_time_;
 }
-inline void db_account_tab_user_account::set_register_time(::google::protobuf::int64 value) {
+inline void account_user_info::set_register_time(::google::protobuf::int64 value) {
   
   register_time_ = value;
-  // @@protoc_insertion_point(field_set:db_account.tab_user_account.register_time)
+  // @@protoc_insertion_point(field_set:account.user_info.register_time)
 }
 
 // int64 last_login_time = 8;
-inline void db_account_tab_user_account::clear_last_login_time() {
+inline void account_user_info::clear_last_login_time() {
   last_login_time_ = PROTOBUF_LONGLONG(0);
 }
-inline ::google::protobuf::int64 db_account_tab_user_account::last_login_time() const {
-  // @@protoc_insertion_point(field_get:db_account.tab_user_account.last_login_time)
+inline ::google::protobuf::int64 account_user_info::last_login_time() const {
+  // @@protoc_insertion_point(field_get:account.user_info.last_login_time)
   return last_login_time_;
 }
-inline void db_account_tab_user_account::set_last_login_time(::google::protobuf::int64 value) {
+inline void account_user_info::set_last_login_time(::google::protobuf::int64 value) {
   
   last_login_time_ = value;
-  // @@protoc_insertion_point(field_set:db_account.tab_user_account.last_login_time)
+  // @@protoc_insertion_point(field_set:account.user_info.last_login_time)
 }
 
 // string token = 9;
-inline void db_account_tab_user_account::clear_token() {
+inline void account_user_info::clear_token() {
   token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& db_account_tab_user_account::token() const {
-  // @@protoc_insertion_point(field_get:db_account.tab_user_account.token)
+inline const ::std::string& account_user_info::token() const {
+  // @@protoc_insertion_point(field_get:account.user_info.token)
   return token_.GetNoArena();
 }
-inline void db_account_tab_user_account::set_token(const ::std::string& value) {
+inline void account_user_info::set_token(const ::std::string& value) {
   
   token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:db_account.tab_user_account.token)
+  // @@protoc_insertion_point(field_set:account.user_info.token)
 }
 #if LANG_CXX11
-inline void db_account_tab_user_account::set_token(::std::string&& value) {
+inline void account_user_info::set_token(::std::string&& value) {
   
   token_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:db_account.tab_user_account.token)
+  // @@protoc_insertion_point(field_set_rvalue:account.user_info.token)
 }
 #endif
-inline void db_account_tab_user_account::set_token(const char* value) {
+inline void account_user_info::set_token(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:db_account.tab_user_account.token)
+  // @@protoc_insertion_point(field_set_char:account.user_info.token)
 }
-inline void db_account_tab_user_account::set_token(const char* value, size_t size) {
+inline void account_user_info::set_token(const char* value, size_t size) {
   
   token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:db_account.tab_user_account.token)
+  // @@protoc_insertion_point(field_set_pointer:account.user_info.token)
 }
-inline ::std::string* db_account_tab_user_account::mutable_token() {
+inline ::std::string* account_user_info::mutable_token() {
   
-  // @@protoc_insertion_point(field_mutable:db_account.tab_user_account.token)
+  // @@protoc_insertion_point(field_mutable:account.user_info.token)
   return token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* db_account_tab_user_account::release_token() {
-  // @@protoc_insertion_point(field_release:db_account.tab_user_account.token)
+inline ::std::string* account_user_info::release_token() {
+  // @@protoc_insertion_point(field_release:account.user_info.token)
   
   return token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void db_account_tab_user_account::set_allocated_token(::std::string* token) {
+inline void account_user_info::set_allocated_token(::std::string* token) {
   if (token != nullptr) {
     
   } else {
     
   }
   token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
-  // @@protoc_insertion_point(field_set_allocated:db_account.tab_user_account.token)
+  // @@protoc_insertion_point(field_set_allocated:account.user_info.token)
 }
 
 // -------------------------------------------------------------------
 
-// db_account_tab_user_login_info
-
-// int64 user_id = 1;
-inline void db_account_tab_user_login_info::clear_user_id() {
-  user_id_ = PROTOBUF_LONGLONG(0);
-}
-inline ::google::protobuf::int64 db_account_tab_user_login_info::user_id() const {
-  // @@protoc_insertion_point(field_get:db_account.tab_user_login_info.user_id)
-  return user_id_;
-}
-inline void db_account_tab_user_login_info::set_user_id(::google::protobuf::int64 value) {
-  
-  user_id_ = value;
-  // @@protoc_insertion_point(field_set:db_account.tab_user_login_info.user_id)
-}
-
-// string account = 2;
-inline void db_account_tab_user_login_info::clear_account() {
-  account_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& db_account_tab_user_login_info::account() const {
-  // @@protoc_insertion_point(field_get:db_account.tab_user_login_info.account)
-  return account_.GetNoArena();
-}
-inline void db_account_tab_user_login_info::set_account(const ::std::string& value) {
-  
-  account_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:db_account.tab_user_login_info.account)
-}
-#if LANG_CXX11
-inline void db_account_tab_user_login_info::set_account(::std::string&& value) {
-  
-  account_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:db_account.tab_user_login_info.account)
-}
-#endif
-inline void db_account_tab_user_login_info::set_account(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  account_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:db_account.tab_user_login_info.account)
-}
-inline void db_account_tab_user_login_info::set_account(const char* value, size_t size) {
-  
-  account_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:db_account.tab_user_login_info.account)
-}
-inline ::std::string* db_account_tab_user_login_info::mutable_account() {
-  
-  // @@protoc_insertion_point(field_mutable:db_account.tab_user_login_info.account)
-  return account_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* db_account_tab_user_login_info::release_account() {
-  // @@protoc_insertion_point(field_release:db_account.tab_user_login_info.account)
-  
-  return account_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void db_account_tab_user_login_info::set_allocated_account(::std::string* account) {
-  if (account != nullptr) {
-    
-  } else {
-    
-  }
-  account_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), account);
-  // @@protoc_insertion_point(field_set_allocated:db_account.tab_user_login_info.account)
-}
-
-// -------------------------------------------------------------------
-
-// db_account
+// account
 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 
