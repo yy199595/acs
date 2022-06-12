@@ -23,6 +23,7 @@ namespace Sentry
 		XCode StartConnect();
 		bool IsUse() const { return this->mCommandLock->IsLock(); }
 		bool LoadLuaScript(const std::string & path, std::string & key);
+		const std::string & GetName() const { return this->mConfig->Name; }
     private:
         void OnComplete();
         void StartReceive();
@@ -40,8 +41,8 @@ namespace Sentry
         void OnDecodeBinString(std::iostream & readStream);
 		int OnReceiveFirstLine(char type, const std::string & lineData);
 	private:
+		char mReadTempBuffer[1024];
 		const RedisConfig * mConfig;
-        char mReadTempBuffer[10240];
 		TaskSource<XCode> mReadTaskSource;
 		TaskSource<XCode> mSendTaskSource;
 		TaskSource<XCode> mConnectTaskSource;
@@ -53,7 +54,6 @@ namespace Sentry
         int mLineCount;
         int mDataCount;
         asio::streambuf mRecvDataBuffer;
-        asio::streambuf mSendDataBuffer;
     };
 }
 #endif //GAMEKEEPER_REDISCLIENT_H

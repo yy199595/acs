@@ -3,7 +3,7 @@
 #include"Util/Guid.h"
 #include"Json/JsonWriter.h"
 #include"Other/ElapsedTimer.h"
-#include"RedisBaseComponent.h"
+#include"RedisComponent.h"
 #include"DB/Redis/RedisClientContext.h"
 #include"Component/Coroutine/TaskComponent.h"
 
@@ -11,7 +11,7 @@ namespace Sentry
 {
 	class NetThreadComponent;
 
-	class MainRedisComponent final : public RedisBaseComponent, public IStart
+	class MainRedisComponent final : public RedisComponent, public IStart
 	{
 	 public:
 		MainRedisComponent() = default;

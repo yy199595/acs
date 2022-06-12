@@ -4,12 +4,12 @@
 
 #ifndef _DATAREDISCOMPONENT_H_
 #define _DATAREDISCOMPONENT_H_
-#include"RedisBaseComponent.h"
+#include"RedisComponent.h"
 #include"DB/Redis/RedisNode.h"
 namespace Sentry
 {
 	struct RedisConfig;
-	class DataRedisComponent final : public RedisBaseComponent, public IStart, public ISecondUpdate
+	class DataRedisComponent final : public RedisComponent, public IStart, public ISecondUpdate
 	{
 	 public:
 		DataRedisComponent() = default;

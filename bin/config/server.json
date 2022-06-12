@@ -42,9 +42,9 @@
     },
     "mysql": {
         "count": 1,
-        "ip": "114.115.167.51",
+        "ip": "127.0.0.1",
         "port": 3306,
-        "user": "yjz",
+        "user": "root",
         "passwd": "199595yjz."
     },
     "redis": {
