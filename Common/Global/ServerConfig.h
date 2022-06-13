@@ -11,6 +11,7 @@ namespace Sentry
 	{
 	public:
 		int Count;
+		int FreeClient;
 		std::string Ip;
 		std::string Name;
 		unsigned short Port;

@@ -11,8 +11,8 @@ namespace Sentry
 	class RedisAny
 	{
 	 public:
-		virtual bool IsLong() = 0;
-		virtual bool IsString() = 0;
+		virtual bool IsLong() const = 0;
+		virtual bool IsString() const = 0;
 		virtual void Write(std::iostream & io) = 0;
 	};
 
@@ -23,9 +23,9 @@ namespace Sentry
 		RedisLong(long long value);
 	 public:
 		void Write(std::iostream &io) final;
-		bool IsLong() final { return true; }
-		bool IsString() final { return false;}
-		long long GetValue() { return this->mValue;}
+		bool IsLong() const final { return true; }
+		bool IsString() const final { return false;}
+		long long GetValue() const { return this->mValue;}
 	 private:
 		long long mValue;
 	};
@@ -37,9 +37,9 @@ namespace Sentry
 		RedisString(const char * str, size_t size);
 	 public:
 		void Write(std::iostream &io) final;
-		bool IsLong() final { return false; }
-		bool IsString() final { return true;}
-		const std::string & GetValue() { return this->mValue;}
+		bool IsLong() const final { return false; }
+		bool IsString() const final { return true;}
+		const std::string & GetValue() const { return this->mValue;}
 	 private:
 		std::string mValue;
 	};

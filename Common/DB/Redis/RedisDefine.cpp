@@ -154,4 +154,12 @@ namespace Sentry
 		this->mArray.clear();
 		this->mType = RedisRespType::REDIS_NONE;
 	}
+	const RedisAny* RedisResponse::Get(size_t index)
+	{
+		if(index < this->mArray.size() || index >= this->mArray.size())
+		{
+			return nullptr;
+		}
+		return this->mArray[index];
+	}
 }

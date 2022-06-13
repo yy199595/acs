@@ -53,6 +53,7 @@
             "port": 6379,
             "timeout": 3,
             "count": 1,
+            "free": 30,
             "lua": [
                 "redis/lock.lua",
                 "redis/user.lua",
@@ -66,6 +67,7 @@
             "timeout": 3,
             "count": 1,
             "index": 1,
+            "free": 30,
             "passwd": "199595yjz."
         }
     },

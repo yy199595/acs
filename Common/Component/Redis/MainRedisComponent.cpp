@@ -308,7 +308,7 @@ namespace Sentry
 		Json::Writer jsonWriter;
 		jsonWriter.AddMember("key", key);
 		jsonWriter.AddMember("time", timeout);
-		if(!this->CallLua("lock.lock", jsonWriter))
+		if(!this->Call("lock.lock", jsonWriter))
 		{
 			return false;
 		}
