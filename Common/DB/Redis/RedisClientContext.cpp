@@ -6,7 +6,7 @@
 #include"Component/Scene/LoggerComponent.h"
 namespace Sentry
 {
-    RedisClientContext::RedisClientContext(std::shared_ptr<SocketProxy> socket, const RedisConfig * config)
+    RedisClientContext::RedisClientContext(std::shared_ptr<SocketProxy> socket, const RedisConfig & config)
         : Tcp::TcpContext(socket), mConfig(config)
     {
         this->mDataSize = 0;
@@ -18,7 +18,7 @@ namespace Sentry
 
 	RedisClientContext::~RedisClientContext() noexcept
 	{
-		LOG_WARN("remove redis client " << this->mConfig->Name << "[" << this->mConfig->Address << "]");
+		LOG_WARN("remove redis client " << this->mConfig.Name << "[" << this->mConfig.Address << "]");
 	}
 
     XCode RedisClientContext::StartConnect()
@@ -35,10 +35,10 @@ namespace Sentry
 		this->mNetworkThread.Invoke(&RedisClientContext::Connect, this);
 #endif
 		XCode code = this->mConnectTaskSource.Await();
-		if(code == XCode::Successful && !this->mConfig->Password.empty())
+		if(code == XCode::Successful && !this->mConfig.Password.empty())
 		{
 			std::shared_ptr<RedisResponse> response = std::make_shared<RedisResponse>();
-			std::shared_ptr<RedisRequest> request = RedisRequest::Make("AUTH", this->mConfig->Password);
+			std::shared_ptr<RedisRequest> request = RedisRequest::Make("AUTH", this->mConfig.Password);
 			if(this->Run(request, response) != XCode::Successful)
 			{
 				return XCode::RedisSocketError;

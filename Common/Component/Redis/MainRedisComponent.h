@@ -27,14 +27,8 @@ namespace Sentry
 		bool Lock(const std::string & key, int timeout = 10);
 		bool UnLock(const std::string & key);
 	 public:
-		long long AddCounter(const std::string& key);
-		long long SubCounter(const std::string & key);
-	 public:
 		bool SubscribeChannel(const std::string& channel);
-		void GetAllAddress(std::vector<std::string> & chanels);
 		long long Publish(const std::string& channel, const std::string& message);
-	protected:
-		std::shared_ptr<RedisClientContext> GetClient(const std::string &name) final;
 	private:
 		bool StartSubChannel();
 #if __REDIS_DEBUG__

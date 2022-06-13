@@ -37,7 +37,7 @@ namespace Sentry
 		template<typename ... Args>
 		static std::shared_ptr<RedisRequest> Make(const std::string & cmd, Args &&... args);
 
-		static std::shared_ptr<RedisRequest> MakeLua(const std::string & key, const std::string & func, Json::Writer & json);
+		static std::shared_ptr<RedisRequest> MakeLua(const std::string & key, const std::string & func, const std::string & json);
 
         template<typename ... Args>
         static void InitParameter(std::shared_ptr<RedisRequest> self, Args &&... args);

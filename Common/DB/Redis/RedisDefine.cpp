@@ -66,10 +66,10 @@ namespace Sentry
 		return jsonWriter.ToJsonString();
 	}
 
-	std::shared_ptr<RedisRequest> RedisRequest::MakeLua(const std::string& key, const std::string& func, Json::Writer& json)
+	std::shared_ptr<RedisRequest> RedisRequest::MakeLua(const std::string& key, const std::string& func, const std::string & json)
 	{
 		std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>("EVALSHA");
-		RedisRequest::InitParameter(request, key, 1, func, json.ToJsonString());
+		RedisRequest::InitParameter(request, key, 1, func, json);
 		return request;
 	}
 }

@@ -10,7 +10,7 @@ namespace Sentry
 {
 	struct RedisConfig;
 
-	class RedisComponent : public Component
+	class RedisComponent : public Component, public IStart
 	{
 	public:
 		RedisComponent() = default;
@@ -23,18 +23,18 @@ namespace Sentry
 	 public:
 		RedisClientContext * GetClient(const std::string & name);
 		void PushClient(RedisClientContext * redisClientContext);
-	protected:
-		bool LoadLuaScript(const std::string & redis, const std::string & path);
 		RedisClientContext * MakeRedisClient(const RedisConfig* config);
-
-		bool TryReConnect(RedisClientContext * client, int maxCount = 0);
+		bool TryAsyncConnect(RedisClientContext * client, int maxCount = 0);
+	protected:
+		bool OnStart() override;
 
 	 private:
 		bool LateAwake() final;
 		const RedisConfig * GetRedisConfig(const std::string & name);
+		bool LoadLuaScript(const std::string & redis, const std::string & path);
 	private:
-		std::unordered_map<std::string, std::string> mLuaMap;
 		std::unordered_map<std::string, RedisConfig> mConfigs;
+		std::unordered_map<std::string, std::string> mLuaMap;
 		std::unordered_map<std::string, std::queue<RedisClientContext *>> mRedisClients;
 	};
 }

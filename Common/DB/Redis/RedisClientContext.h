@@ -17,13 +17,14 @@ namespace Sentry
     class RedisClientContext final : public Tcp::TcpContext
     {
     public:
-        RedisClientContext(std::shared_ptr<SocketProxy> socket, const RedisConfig * config);
+        RedisClientContext(std::shared_ptr<SocketProxy> socket, const RedisConfig & config);
 		~RedisClientContext();
     public:
 		XCode StartConnect();
+		const RedisConfig & GetConfig() { return mConfig;}
 		bool IsUse() const { return this->mCommandLock->IsLock(); }
 		bool LoadLuaScript(const std::string & path, std::string & key);
-		const std::string & GetName() const { return this->mConfig->Name; }
+		const std::string & GetName() const { return this->mConfig.Name; }
     private:
         void OnComplete();
         void StartReceive();
@@ -41,8 +42,8 @@ namespace Sentry
         void OnDecodeBinString(std::iostream & readStream);
 		int OnReceiveFirstLine(char type, const std::string & lineData);
 	private:
+		const RedisConfig & mConfig;
 		char mReadTempBuffer[1024];
-		const RedisConfig * mConfig;
 		TaskSource<XCode> mReadTaskSource;
 		TaskSource<XCode> mSendTaskSource;
 		TaskSource<XCode> mConnectTaskSource;

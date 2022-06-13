@@ -9,7 +9,6 @@ namespace Sentry
 {
 	bool RedisComponent::LateAwake()
 	{
-		;
 		const rapidjson::Value* jsonValue = this->GetApp()->GetConfig().GetJsonValue("redis");
 		if (jsonValue == nullptr || !jsonValue->IsObject())
 		{
@@ -39,6 +38,41 @@ namespace Sentry
 		}
 		return this->mConfigs.find("main") != this->mConfigs.end();
 	}
+
+	bool RedisComponent::OnStart()
+	{
+		for(auto iter = this->mConfigs.begin(); iter != this->mConfigs.end(); iter++)
+		{
+			RedisClientContext * redisClientContext = this->MakeRedisClient(&iter->second);
+			if(redisClientContext == nullptr)
+			{
+				return false;
+			}
+			this->PushClient(redisClientContext);
+		}
+		return true;
+	}
+
+	bool RedisComponent::TryAsyncConnect(RedisClientContext* client, int maxCount)
+	{
+		XCode code = redisCommandClient->StartConnect();
+		if (code == XCode::RedisAuthFailure)
+		{
+			LOG_ERROR("redis auth failure");
+			return false;
+		}
+
+		while (code != XCode::Successful)
+		{
+			LOG_ERROR(config->Name << " connect redis ["
+								   << config->Address << "] failure count = " << count++);
+			this->GetApp()->GetTaskComponent()->Sleep(3000);
+			code = redisCommandClient->StartConnect();
+		}
+		LOG_INFO(config->Name << " connect redis [" << config->Address << "] successful");
+		return redisCommandClient;
+	}
+
 	RedisClientContext * RedisComponent::MakeRedisClient(const RedisConfig* config)
 	{
 #ifdef ONLY_MAIN_THREAD
@@ -52,23 +86,6 @@ namespace Sentry
 		unsigned short port = config->Port;
 		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread, ip, port));
 		RedisClientContext * redisCommandClient = new RedisClientContext(socketProxy, config);
-
-		XCode code = redisCommandClient->StartConnect();
-		if (code == XCode::RedisAuthFailure)
-		{
-			LOG_ERROR("redis auth failure");
-			return nullptr;
-		}
-
-		while (code != XCode::Successful)
-		{
-			LOG_ERROR(config->Name << " connect redis ["
-										  << config->Address << "] failure count = " << count++);
-			this->GetApp()->GetTaskComponent()->Sleep(3000);
-			code = redisCommandClient->StartConnect();
-		}
-		LOG_INFO(config->Name << " connect redis [" << config->Address << "] successful");
-		return redisCommandClient;
 	}
 
 	const RedisConfig* RedisComponent::GetRedisConfig(const std::string& name)
@@ -113,7 +130,7 @@ namespace Sentry
 	bool RedisComponent::CallLua(const std::string & name, const std::string& fullName, const std::string & json)
 	{
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
-		return this->CallLua(name, fullName, json, response, redis);
+		return this->CallLua(name, fullName, json, response);
 	}
 
 	bool RedisComponent::CallLua(const std::string & name, const std::string& fullName, const std::string& json,
@@ -130,13 +147,13 @@ namespace Sentry
 			return false;
 		}
 		const std::string & tag = iter->second;
-		RedisClientContext * redisClientContext = this->GetClient(redis);
+		RedisClientContext * redisClientContext = this->GetClient(name);
 		if(redisClientContext == nullptr)
 		{
 			return false;
 		}
 		std::shared_ptr<RedisResponse> response1(new RedisResponse());
-		std::shared_ptr<RedisRequest> request = RedisRequest::MakeLua(tag, func, parameter);
+		std::shared_ptr<RedisRequest> request = RedisRequest::MakeLua(tag, func, json);
 		if (redisClientContext->Run(request, response1) != XCode::Successful)
 		{
 			return false;
@@ -185,7 +202,7 @@ namespace Sentry
 	bool RedisComponent::LoadLuaScript(const std::string & redis, const string& path)
 	{
 		std::string key;
-		std::shared_ptr<RedisClientContext> redisClientContext = this->GetClient(redis);
+		RedisClientContext * redisClientContext = this->GetClient(redis);
 		if (!redisClientContext->LoadLuaScript(path, key))
 		{
 			return false;
