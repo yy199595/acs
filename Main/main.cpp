@@ -31,7 +31,6 @@ using namespace Client;
 #endif
 #include"Component/Common/DataMgrComponent.h"
 #include"Component/Gate/GateAgentComponent.h"
-#include"Component/Redis/DataRedisComponent.h"
 #include"Component/User/UserSyncComponent.h"
 using namespace Sentry;
 
@@ -62,7 +61,6 @@ void RegisterComponent()
 	ComponentFactory::Add<GateClientComponent>("GateClientComponent");
 // db
     ComponentFactory::Add<MainRedisComponent>("MainRedisComponent");
-	ComponentFactory::Add<DataRedisComponent>("DataRedisComponent");
 	ComponentFactory::Add<MysqlAgentComponent>("MysqlAgentComponent");
 
 //http

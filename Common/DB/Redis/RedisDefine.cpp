@@ -10,7 +10,7 @@ namespace Sentry
     RedisRequest::RedisRequest(const std::string &cmd)
 		: mCommand(cmd)
     {
-
+        this->mTaskId = 0;
     }
 
     void RedisRequest::AddParameter(int value)
@@ -54,6 +54,20 @@ namespace Sentry
 		return 0;
     }
 
+    std::shared_ptr<RedisTask> RedisRequest::MakeTask()
+    {
+        std::shared_ptr<RedisTask> redisTask(new RedisTask());
+        this->mTaskId = redisTask->GetRpcId();
+        return redisTask;
+    }
+
+    std::shared_ptr<LuaRedisTask> RedisRequest::MakeLuaTask(lua_State *lua)
+    {
+        std::shared_ptr<LuaRedisTask> redisTask(new LuaRedisTask(lua));
+        this->mTaskId = redisTask->GetRpcId();
+        return redisTask;
+    }
+
 	const std::string RedisRequest::ToJson() const
 	{
 		Json::Writer jsonWriter;
@@ -76,8 +90,9 @@ namespace Sentry
 
 namespace Sentry
 {
-    RedisResponse::RedisResponse()
+    RedisResponse::RedisResponse(long long taskId)
     {
+        this->mTaskId = taskId;
         this->mType = RedisRespType::REDIS_NONE;
     }
 
@@ -90,64 +105,117 @@ namespace Sentry
 		this->mArray.clear();
 	}
 
+    bool RedisResponse::OnReceive(const asio::error_code &code, asio::streambuf &stream)
+    {
+        if(code || stream.size() == 0)
+        {
+            return true;
+        }
+        std::iostream readStream(&stream);
+        switch(this->mType)
+        {
+            case RedisRespType::REDIS_NONE:
+                this->OnDecodeHead(readStream);
+                break;
+        }
+        switch(this->mType)
+        {
+            case RedisRespType::REDIS_BIN_STRING:
+                if(stream.size() >= this->mDataSize)
+                {
+                    this->OnDecodeBinString(readStream);
+                }
+                break;
+            case RedisRespType::REDIS_ARRAY:
+                this->OnDecodeArray(readStream);
+                break;
+        }
+        return this->mLineCount >= this->mDataCount;
+    }
+
     bool RedisResponse::IsOk()
     {
-        if (this->HasError() || this->mArray.empty()
-			|| !this->mArray.front()->IsString())
+        return this->mString == "OK";
+    }
+
+    void RedisResponse::OnDecodeHead(std::iostream &readStream)
+    {
+        std::string lineData;
+        char type = readStream.get();
+        if (std::getline(readStream, lineData))
         {
-            return false;
+            lineData.pop_back(); //拿掉\r
+            this->mDataCount = this->OnReceiveFirstLine(type, lineData);
+            if (this->mDataCount == 0)
+            {
+
+            }
         }
-		RedisString * redisString = (RedisString*)this->mArray.front();
-		return redisString != nullptr && redisString->GetValue() == "OK";
     }
 
-	long long RedisResponse::GetNumber(size_t index)
-	{
-		if(index < 0 || index >= this->mArray.size())
-		{
-			return -1;
-		}
-		if(!this->mArray[index]->IsLong())
-		{
-			return -1;
-		}
-		RedisLong * redisLong = (RedisLong*)this->mArray[index];
-		return redisLong == nullptr ? -1 : redisLong->GetValue();
-	}
-
-    void RedisResponse::AddValue(long long value)
+    int RedisResponse::OnReceiveFirstLine(char type, const std::string &lineData)
     {
-		this->mArray.emplace_back(new RedisLong(value));
+        switch (type)
+        {
+            case '+': //字符串类型
+                //STD_ERROR_LOG("str = " << lineData.data());
+                this->mType = RedisRespType::REDIS_STRING;
+                this->mString = std::move(lineData);
+                break;
+            case '-': //错误
+                this->mType = RedisRespType::REDIS_ERROR;
+                this->mString = std::move(lineData);
+                break;
+            case ':': //整型
+            {
+                this->mType = RedisRespType::REDIS_NUMBER;
+                this->mNumber = std::stoll(lineData);
+            }
+                break;
+            case '$': //二进制字符串
+                this->mDataSize = std::stoi(lineData);
+                this->mType = RedisRespType::REDIS_BIN_STRING;
+                return this->mDataSize <= 0 ? 0 : 1;
+            case '*': //数组
+                this->mType = RedisRespType::REDIS_ARRAY;
+                return std::stoi(lineData);
+        }
+        return 0;
     }
 
-    void RedisResponse::AddValue(RedisRespType type)
+    void RedisResponse::OnDecodeBinString(std::iostream &readStream)
     {
-        this->mType = type;
+        std::unique_ptr<char[]> buffer(new char[this->mDataSize]);
+        size_t size = readStream.readsome(buffer.get(), this->mDataSize);
+        if(size >= this->mDataSize)
+        {
+            this->mString.append(buffer.get(), size);
+        }
+        readStream.ignore(2);
+        if(this->mString.size() >= this->mDataSize)
+        {
+            this->mLineCount++;
+        }
     }
 
-    void RedisResponse::AddValue(const std::string &data)
+    void RedisResponse::OnDecodeArray(std::iostream &readStream)
     {
-        this->mArray.emplace_back(new RedisString(data));
+        std::string lineData;
+        char type = readStream.get();
+        if (type == '$' && std::getline(readStream, lineData))
+        {
+            lineData.pop_back();
+            this->mDataSize = std::stoi(lineData);
+            this->OnDecodeBinString(readStream);
+        }
+        else if (type == ':' && std::getline(readStream, lineData))
+        {
+            lineData.pop_back();
+            this->mLineCount++;
+            long long number = std::stoll(lineData);
+            this->mArray.emplace_back(new RedisLong(number));
+        }
     }
-
-    void RedisResponse::AddValue(const char *str, size_t size)
-    {
-        this->mArray.emplace_back(new RedisString(str, size));
-    }
-
-	bool RedisResponse::GetString(string& value, size_t index)
-	{
-		if(index < 0 || index >= this->mArray.size())
-		{
-			return false;
-		}
-		if(!this->mArray[index]->IsString())
-		{
-			return false;
-		}
-		value = ((RedisString*)this->mArray[index])->GetValue();
-		return true;
-	}
 
 	void RedisResponse::Clear()
 	{
@@ -162,4 +230,87 @@ namespace Sentry
 		}
 		return this->mArray[index];
 	}
+}
+
+namespace Sentry
+{
+    RedisTask::RedisTask()
+    {
+        this->mTaskId = Helper::Guid::Create();
+    }
+
+    void RedisTask::OnResponse(std::shared_ptr<RedisResponse> response)
+    {
+        this->mTask.SetResult(response);
+    }
+
+    LuaRedisTask::LuaRedisTask(lua_State *lua)
+        : mLua(lua)
+    {
+        this->mRef = 0;
+        if(lua_isthread(this->mLua, -1))
+        {
+            this->mRef = luaL_ref(lua, LUA_REGISTRYINDEX);
+        }
+        this->mTaskId = Helper::Guid::Create();
+    }
+    LuaRedisTask::~LuaRedisTask()
+    {
+        if(this->mRef != 0)
+        {
+            luaL_unref(this->mLua, LUA_REGISTRYINDEX, this->mRef);
+        }
+    }
+
+    int LuaRedisTask::Await()
+    {
+        if(this->mRef == 0)
+        {
+            luaL_error(this->mLua, "not lua coroutine context yield failure");
+            return 0;
+        }
+        return lua_yield(this->mLua, 0);
+    }
+
+    void LuaRedisTask::OnResponse(std::shared_ptr<RedisResponse> response)
+    {
+        lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
+        lua_State* coroutine = lua_tothread(this->mLua, -1);
+
+        switch(response->GetType())
+        {
+            case RedisRespType::REDIS_NUMBER:
+                lua_pushinteger(this->mLua, response->GetNumber());
+                break;
+            case RedisRespType::REDIS_ERROR:
+            case RedisRespType::REDIS_STRING:
+            case RedisRespType::REDIS_BIN_STRING:
+            {
+                const std::string &str = response->GetString();
+                lua_pushlstring(this->mLua, str.c_str(), str.size());
+            }
+                break;
+            case RedisRespType::REDIS_ARRAY:
+            {
+                lua_createtable(this->mLua, 0, response->GetArraySize());
+                for(size_t index = 0; index < response->GetArraySize(); index++)
+                {
+                    const RedisAny * redisAny = response->Get(index);
+                    if(redisAny->IsString())
+                    {
+                        const std::string & str = ((const RedisString*)redisAny)->GetValue();
+                        lua_pushlstring(this->mLua, str.c_str(), str.size());
+                    }
+                    else if(redisAny->IsLong())
+                    {
+                        long long num = ((const RedisLong*)redisAny)->GetValue();
+                        lua_pushinteger(this->mLua, num);
+                    }
+                    lua_seti(this->mLua, -2, index + 1);
+                }
+            }
+                break;
+        }
+        lua_presume(coroutine, this->mLua, 1);
+    }
 }

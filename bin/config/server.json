@@ -91,7 +91,6 @@
         "MysqlAgentComponent",
         "EntityMgrComponent",
         "GateAgentComponent",
-        "DataRedisComponent",
         "UserSyncComponent",
         "ServiceMgrComponent",
         "ClientComponent"

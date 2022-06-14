@@ -30,10 +30,10 @@ namespace Sentry
 	{
 		if(component->Cast<ServiceComponent>())
 		{
-			Json::Writer json;
-			json.AddMember("address", this->mRpcAddress);
-			json.AddMember("service", component->GetName());
-			if(!this->mRedisComponent->Call("node.add", json))
+			Json::Writer jsonWriter;
+            jsonWriter.AddMember("address", this->mRpcAddress);
+            jsonWriter.AddMember("service", component->GetName());
+			if(!this->mRedisComponent->Call("main", "node.add", jsonWriter))
 			{
 				LOG_ERROR("call node.add failure " << component->GetName());
 			}
@@ -50,7 +50,7 @@ namespace Sentry
 		Json::Writer jsonWriter;
 		jsonWriter.AddMember("address", address);
 		std::shared_ptr<Json::Reader> jsonResponse(new Json::Reader());
-		if(!this->mRedisComponent->Call("node.query", jsonWriter, jsonResponse))
+		if(!this->mRedisComponent->Call("main", "node.query", jsonWriter, jsonResponse))
 		{
 			LOG_ERROR("query " << address << " node info error");
 			return false;
@@ -98,7 +98,7 @@ namespace Sentry
 		json.EndArray();
 		json.AddMember("address", this->mRpcAddress);
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
-		if(!this->mRedisComponent->Call("node.register", json, response))
+		if(!this->mRedisComponent->Call("main", "node.register", json, response))
 		{
 			LOG_ERROR("register failure");
 			return;
@@ -182,7 +182,7 @@ namespace Sentry
 		json.EndArray();
 		json.AddMember("address", this->mRpcAddress);
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
-		if (!this->mRedisComponent->Call("node.refresh", json, response))
+		if (!this->mRedisComponent->Call("main", "node.refresh", json, response))
 		{
 			return false;
 		}
@@ -224,7 +224,7 @@ namespace Sentry
 				Json::Writer jsonWriter;
 				jsonWriter.AddMember("address", this->mRpcAddress);
 				jsonWriter.AddMember("service", component->GetName());
-				this->mRedisComponent->Call("node.del", jsonWriter);
+				this->mRedisComponent->Call("main", "node.del", jsonWriter);
 			}
 		}
 	}

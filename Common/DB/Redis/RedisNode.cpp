@@ -40,7 +40,7 @@ namespace Sentry
 		}
 		for(std::shared_ptr<RedisClientContext> redisClientContext : this->mClients)
 		{
-			if(!redisClientContext->IsUse())
+			//if(!redisClientContext->IsUse())
 			{
 				return redisClientContext;
 			}

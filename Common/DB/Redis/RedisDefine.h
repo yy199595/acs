@@ -2,10 +2,12 @@
 #include<list>
 #include<string>
 #include<vector>
+#include<asio.hpp>
 #include"RedisAny.h"
 #include"XCode/XCode.h"
 #include"Json/JsonWriter.h"
 #include"google/protobuf/message.h"
+#include"Async/RpcTask/RpcTaskSource.h"
 #include"Network/Proto/ProtoMessage.h"
 using namespace google::protobuf;
 
@@ -26,7 +28,9 @@ namespace Sentry
 
 namespace Sentry
 {
-	class RedisRequest : public Tcp::ProtoMessage
+    class RedisTask;
+    class LuaRedisTask;
+    class RedisRequest : public Tcp::ProtoMessage
     {
     public:
         RedisRequest(const std::string & cmd);
@@ -41,7 +45,12 @@ namespace Sentry
 
         template<typename ... Args>
         static void InitParameter(std::shared_ptr<RedisRequest> self, Args &&... args);
-	private:
+
+    public:
+        std::shared_ptr<RedisTask> MakeTask();
+        std::shared_ptr<LuaRedisTask> MakeLuaTask(lua_State * lua);
+        long long GetTaskId() const { return this->mTaskId;}
+    private:
         void AddParameter(int value);
         void AddParameter(long long value);
 		void AddParameter(const Message & message);
@@ -56,6 +65,7 @@ namespace Sentry
 			RedisRequest::Encode(self, std::forward<Args>(args)...);
         }
     private:
+        long long mTaskId;
         std::string mCommand;
         std::list<std::string> mParameters;
     };
@@ -77,26 +87,67 @@ namespace Sentry
     class RedisResponse
     {
 	public:
-		RedisResponse();
+		RedisResponse(long long taskId);
 		~RedisResponse();
     public:
         bool IsOk();
 		void Clear();
-        void AddValue(long long value);
-        void AddValue(RedisRespType type);
-        void AddValue(const std::string & data);
-        void AddValue(const char * str, size_t size);
-
-	 public:
-		const RedisAny * Get(size_t index);
-		RedisRespType GetType() { return this->mType; }
-		size_t GetArraySize() { return this->mArray.size();}
-		bool GetString(std::string & value, size_t index = 0);
-		bool HasError() { return this->mType == RedisRespType::REDIS_ERROR;}
     private:
+        void OnDecodeHead(std::iostream & readStream);
+        void OnDecodeArray(std::iostream & readStream);
+        void OnDecodeBinString(std::iostream & readStream);
+        int OnReceiveFirstLine(char type, const std::string & lineData);
+    public:
+		const RedisAny * Get(size_t index);
+        long long GetTaskId() const { return this->mTaskId; }
+        size_t GetArraySize() { return this->mArray.size();}
+        RedisRespType GetType() const { return this->mType; }
+        long long GetNumber() const { return this->mNumber; }
+        const std::string & GetString() const { return this->mString;}
+        const std::vector<RedisAny *> & GetArray() const { return this->mArray; }
+        bool HasError() { return this->mType == RedisRespType::REDIS_ERROR;}
+        bool OnReceive(const asio::error_code & code, asio::streambuf & stream);
+    private:
+        int mDataSize;
+        int mLineCount;
+        int mDataCount;
+        long long mTaskId;
+        long long mNumber;
+        std::string mString;
         RedisRespType mType;
         std::vector<RedisAny *> mArray;
+        //std::vector<RedisAny *> mArray;
     };
 
+    class RedisTask : public IRpcTask<RedisResponse>
+    {
+    public:
+        RedisTask();
+        ~RedisTask() = default;
+    public:
+        int GetTimeout() final { return 0;}
+        long long GetRpcId() final { return this->mTaskId; }
+        void OnResponse(std::shared_ptr<RedisResponse> response) final;
+        std::shared_ptr<RedisResponse> Await() { return this->mTask.Await(); }
+    private:
+        long long mTaskId;
+        TaskSource<std::shared_ptr<RedisResponse>> mTask;
+    };
+
+    class LuaRedisTask : public IRpcTask<RedisResponse>
+    {
+    public:
+        LuaRedisTask(lua_State * lua);
+        ~LuaRedisTask();
+    public:
+        int Await();
+        int GetTimeout() final { return 0;}
+        long long GetRpcId() final { return this->mTaskId;}
+        void OnResponse(std::shared_ptr<RedisResponse> response) final;
+    private:
+        int mRef;
+        lua_State * mLua;
+        long long mTaskId;
+    };
 }
 

@@ -28,6 +28,7 @@ namespace Sentry
 {
 	bool MainRedisComponent::LateAwake()
 	{
+        RedisComponent::LateAwake();
 		LOG_CHECK_RET_FALSE(this->LoadRedisConfig());
 		this->mTaskComponent = this->GetComponent<TaskComponent>();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
@@ -45,70 +46,14 @@ namespace Sentry
 
 	bool MainRedisComponent::OnStart()
 	{
-#if __REDIS_DEBUG__
-		this->mDebugClient = this->MakeRedisClient(this->mConfig);
-#endif
-		this->mRedisClient = this->MakeRedisClient(this->mConfig);
-		this->mSubRedisClient = this->MakeRedisClient(this->mConfig);
-		if (this->mSubRedisClient == nullptr || this->mRedisClient == nullptr)
-		{
-			LOG_ERROR("connect redis " << this->mConfig->Address << " failure");
-			return false;
-		}
-
-		for (const std::string& path: this->mConfig->LuaFiles)
-		{
-			if(!this->LoadLuaScript("", path))
-			{
-				LOG_ERROR("load " << path << " failure");
-				return false;
-			}
-		}
-
-		LOG_CHECK_RET_FALSE(this->StartSubChannel());
-#if __REDIS_DEBUG__
-		this->mTaskComponent->Start(&MainRedisComponent::StartDebugRedis, this);
-#endif
-		this->mTaskComponent->Start(&MainRedisComponent::StartPubSub, this);
-		this->mTaskComponent->Start(&MainRedisComponent::CheckRedisClient, this);
-		return true;
+        LOG_CHECK_RET_FALSE(RedisComponent::OnStart());
+        this->mSubRedisClient = this->GetClient("main");
+        return this->mSubRedisClient != nullptr && this->StartSubChannel();
 	}
-#if __REDIS_DEBUG__
-	void MainRedisComponent::StartDebugRedis()
-	{
-		std::shared_ptr<RedisResponse> response(new RedisResponse());
-		std::shared_ptr<RedisRequest> request = RedisRequest::Make("MONITOR");
-		if(this->mDebugClient->Run(request, response) != XCode::Successful)
-		{
-			LOG_ERROR("debug redis error");
-			return;
-		}
-		while(this->mDebugClient != nullptr)
-		{
-			if(!this->mDebugClient->IsOpen())
-			{
-				if(!this->TryReConnect(this->mDebugClient))
-				{
-					LOG_ERROR("debug redis client connect failure");
-					return;
-				}
-				LOG_DEBUG("debug redis client connect successful");
-			}
-			response->Clear();
-			if(this->mDebugClient->WaitRedisResponse(response) == XCode::Successful)
-			{
-				std::string content;
-				if(response->GetString(content))
-				{
-					LOG_DEBUG("[redis command] = " << content);
-				}
-			}
-		}
-	}
-#endif
 
 	bool MainRedisComponent::StartSubChannel()
 	{
+        this->mSubRedisClient->EnableSubscribe();
 		if (!this->SubscribeChannel(this->mRpcAddress))
 		{
 			return false;
@@ -133,90 +78,70 @@ namespace Sentry
 
 	long long MainRedisComponent::Publish(const std::string& channel, const std::string& message)
 	{
-		if(!this->mRedisClient->IsOpen())
-		{
-			this->TryReConnect(this->mRedisClient);
-		}
-		std::shared_ptr<RedisResponse> response = std::make_shared<RedisResponse>();
-		std::shared_ptr<RedisRequest> request = RedisRequest::Make("PUBLISH", channel, message);
-		if (this->mRedisClient->Run(request, response) != XCode::Successful)
-		{
-			LOG_ERROR("redis net work error publish error");
-			return -1;
-		}
-		return response->GetNumber();
-	}
-
-	void MainRedisComponent::CheckRedisClient()
-	{
-#ifndef __DEBUG__
-		while (this->mSubRedisClient != nullptr)
-		{
-			this->mTaskComponent->Sleep(1000);
-			std::shared_ptr<RedisRequest> ping = RedisRequest::Make("PING");
-			if(this->mSubRedisClient->Run(ping) != XCode::Successful)
-			{
-
-			}
-		}
-#endif
+        std::shared_ptr<RedisRequest> request = RedisRequest::Make("PUBLISH", channel, message);
+        std::shared_ptr<RedisTask> redisTask = request->MakeTask();
+        if(!this->AddRedisTask(redisTask))
+        {
+            return -1;
+        }
+        if(!this->TryAsyncConnect(this->mSubRedisClient))
+        {
+            LOG_ERROR("redis net work error publish error");
+            return -1;
+        }
+        this->mSubRedisClient->SendCommand(request);
+		return redisTask->Await()->GetNumber();
 	}
 
 	bool MainRedisComponent::SubscribeChannel(const std::string& channel)
 	{
-		assert(!channel.empty());
-		std::shared_ptr<RedisResponse> response = std::make_shared<RedisResponse>();
 		std::shared_ptr<RedisRequest> request = RedisRequest::Make("SUBSCRIBE", channel);
-		if (this->mSubRedisClient->Run(request, response) != XCode::Successful)
-		{
-			LOG_ERROR("redis net work error sub " << channel << " failure");
-			return false;
-		}
-		LOG_INFO("subscribe channel [" << channel << "] successful");
-		return true;
+        std::shared_ptr<RedisTask> redisTask = request->MakeTask();
+        if(!this->AddRedisTask(redisTask))
+        {
+            return false;
+        }
+        if(!this->TryAsyncConnect(this->mSubRedisClient))
+        {
+            LOG_ERROR("redis net work error sub " << channel << " failure");
+            return false;
+        }
+        this->mSubRedisClient->SendCommand(request);
+        return redisTask->Await()->GetNumber() > 0;
 	}
 
-	void MainRedisComponent::StartPubSub()
-	{
-		std::string type;
-		std::shared_ptr<RedisResponse> redisResponse(new RedisResponse());
-		while (this->mSubRedisClient)
-		{
-			redisResponse->Clear();
-			if (!this->mSubRedisClient->IsOpen())
-			{
-				if(!this->TryReConnect(this->mSubRedisClient))
-				{
-					LOG_FATAL("try reconnect sub redis failure");
-					return;
-				}
-				int count = 0;
-				LOG_DEBUG("subscribe redis client connect successful");
-				while(!this->StartSubChannel())
-				{
-					this->mTaskComponent->Sleep(3000);
-					LOG_ERROR("sub client sub chanel failure count = " << count++);
-				}
-			}
-			XCode code = this->mSubRedisClient->WaitRedisResponse(redisResponse);
-			if (code != XCode::Successful || redisResponse->HasError())
-			{
-				LOG_FATAL("sub redis client error");
-				continue;
-			}
+    void MainRedisComponent::OnCommandReply(std::shared_ptr<RedisResponse> response)
+    {
+        long long taskId = response->GetTaskId();
+        auto iter = this->mTasks.find(taskId);
+        if(iter == this->mTasks.end())
+        {
+            LOG_ERROR("not find redis task id = " << response->GetTaskId());
+            return;
+        }
+        iter->second->OnResponse(response);
+        this->mTasks.erase(iter);
+    }
 
-			if (redisResponse->GetArraySize() == 3 && redisResponse->GetString(type) && type == "message")
-			{
-				std::string channel, message;
-				redisResponse->GetString(channel, 1);
-				redisResponse->GetString(message, 2);
-				if(!this->HandlerEvent(channel, message))
-				{
-					LOG_ERROR("handler " << channel << " error : " << message);
-				}
-			}
-		}
-	}
+    bool MainRedisComponent::AddRedisTask(std::shared_ptr<IRpcTask<RedisResponse>> task)
+    {
+        long long taskId = task->GetRpcId();
+        auto iter = this->mTasks.find(taskId);
+        if(iter == this->mTasks.end())
+        {
+            this->mTasks.emplace(taskId, task);
+            return true;
+        }
+        return false;
+    }
+
+    void MainRedisComponent::OnSubscribe(const std::string &channel, const std::string &message)
+    {
+        if(!this->HandlerEvent(channel, message))
+        {
+            LOG_ERROR("handler " << channel << " error : " << message);
+        }
+    }
 
 	bool MainRedisComponent::HandlerEvent(const std::string& channel, const std::string& message)
 	{
@@ -264,51 +189,12 @@ namespace Sentry
 		return localServiceComponent != nullptr && localServiceComponent->Invoke(eveId, jsonReader);
 	}
 
-	void MainRedisComponent::GetAllAddress(std::vector<std::string>& chanels)
-	{
-		std::shared_ptr<RedisResponse> response(new RedisResponse());
-		std::shared_ptr<RedisRequest> request = RedisRequest::Make("PUBSUB", "CHANNELS", "*:*");
-		if(this->mRedisClient->Run(request, response) == XCode::Successful)
-		{
-			for(size_t index = 0; index < response->GetArraySize(); index++)
-			{
-				std::string channel;
-				if(response->GetString(channel, index))
-				{
-					chanels.emplace_back(channel);
-				}
-			}
-		}
-	}
-
-	long long MainRedisComponent::AddCounter(const string& key)
-	{
-		std::shared_ptr<RedisResponse> response(new RedisResponse());
-		std::shared_ptr<RedisRequest> request = RedisRequest::Make("INCR", key);
-		if(this->mRedisClient->Run(request, response) != XCode::Successful)
-		{
-			return 0;
-		}
-		return response->GetNumber();
-	}
-
-	long long MainRedisComponent::SubCounter(const std::string& key)
-	{
-		std::shared_ptr<RedisResponse> response(new RedisResponse());
-		std::shared_ptr<RedisRequest> request = RedisRequest::Make("DECR", key);
-		if(this->mRedisClient->Run(request, response) != XCode::Successful)
-		{
-			return 0;
-		}
-		return response->GetNumber();
-	}
-
 	bool MainRedisComponent::Lock(const string& key, int timeout)
 	{
 		Json::Writer jsonWriter;
 		jsonWriter.AddMember("key", key);
 		jsonWriter.AddMember("time", timeout);
-		if(!this->Call("lock.lock", jsonWriter))
+		if(!this->Call("main", "lock.lock", jsonWriter))
 		{
 			return false;
 		}
@@ -320,13 +206,11 @@ namespace Sentry
 
 	bool MainRedisComponent::UnLock(const string& key)
 	{
-		std::shared_ptr<RedisResponse> response1(new RedisResponse());
-		std::shared_ptr<RedisRequest> request1 = RedisRequest::Make( "DEL", key);
-		if (this->mRedisClient->Run(request1, response1) != XCode::Successful)
-		{
-			LOG_ERROR("unlock " << key << " failure");
-			return false;
-		}
+		std::shared_ptr<RedisResponse> response1 = this->Run("main", "DEL", key);
+        if(response1->GetNumber() != 1)
+        {
+            return false;
+        }
 
 		auto iter = this->mLockTimers.find(key);
 		if(iter != this->mLockTimers.end())
@@ -347,28 +231,15 @@ namespace Sentry
 			this->mLockTimers.erase(iter);
 			this->mTaskComponent->Start([this, key, timeout]()
 			{
-				std::shared_ptr<RedisResponse> response(new RedisResponse());
-				std::shared_ptr<RedisRequest> request = RedisRequest::Make("SETEX", key, 10, 1);
-				if(this->mRedisClient->Run(request, response) == XCode::Successful && response->IsOk())
-				{
-					this->mLockTimers[key] = this->mTimerComponent->DelayCall(
-							(float)timeout - 0.5f, &MainRedisComponent::OnLockTimeout,this, key, timeout);
-					return;
-				}
+				std::shared_ptr<RedisResponse> response = this->Run("main", "SETEX", 10, 1);
+                if(response != nullptr && response->IsOk())
+                {
+                    this->mLockTimers[key] = this->mTimerComponent->DelayCall(
+                            (float)timeout - 0.5f, &MainRedisComponent::OnLockTimeout,this, key, timeout);
+                    return;
+                }
 				LOG_ERROR("redis lock " << key << " delay failure");
 			});
 		}
-	}
-
-	std::shared_ptr<RedisClientContext> MainRedisComponent::GetClient(const std::string& name)
-	{
-		if(!this->mRedisClient->IsOpen())
-		{
-			if(!this->TryReConnect(this->mRedisClient))
-			{
-				return nullptr;
-			}
-		}
-		return this->mRedisClient;
 	}
 }

@@ -14,34 +14,57 @@ namespace Sentry
 	{
 	public:
 		RedisComponent() = default;
-
 	public:
-		bool Call(const std::string & name, const std::string& fullName, const std::string & json);
-
-		bool Call(const std::string & name,const std::string& fullName, const std::string & json,
-				std::shared_ptr<Json::Reader> response);
+		bool Call(const std::string & name, const std::string& fullName, Json::Writer & jsonWriter);
+        std::shared_ptr<RedisRequest> MakeLuaRequest(const std::string & fullName, const std::string & json);
+		bool Call(const std::string & name,const std::string& fullName, Json::Writer & jsonWriter, std::shared_ptr<Json::Reader> response);
 	 public:
-		RedisClientContext * GetClient(const std::string & name);
-		void PushClient(RedisClientContext * redisClientContext);
-		RedisClientContext * MakeRedisClient(const RedisConfig* config);
-		bool TryAsyncConnect(RedisClientContext * client, int maxCount = 5);
+        SharedRedisClient GetClient(const std::string & name);
+		void PushClient(SharedRedisClient redisClientContext);
+        void OnResponse(std::shared_ptr<RedisResponse> response);
+        SharedRedisClient MakeRedisClient(const RedisConfig* config);
+        bool TryAsyncConnect(SharedRedisClient client, int maxCount = 5);
+
+    public:
+        std::shared_ptr<RedisResponse> Run(const std::string & name, std::shared_ptr<RedisRequest> request);
+        std::shared_ptr<RedisResponse> Run(SharedRedisClient redisClientContext, std::shared_ptr<RedisRequest> request);
+        template<typename ... Args>
+        std::shared_ptr<RedisResponse> Run(const std::string & name, const std::string & cmd, Args&& ... args);
+        template<typename ... Args>
+        std::shared_ptr<RedisResponse> Run(SharedRedisClient redisClientContext, const std::string & cmd, Args&& ... args);
 	protected:
 		bool OnStart() override;
-		void OnSecondUpdate() override;
-		void OnResponse(std::shared_ptr<RedisResponse> response);
+        bool LateAwake() override;
+        void OnSecondUpdate() override;
 	 protected:
-		virtual void OnSubscribe(const std::string & channel, const std::string & message);
-	 private:
-		bool LateAwake() final;
+        virtual void OnCommandReply(std::shared_ptr<RedisResponse> response) = 0;
+        virtual bool AddRedisTask(std::shared_ptr<IRpcTask<RedisResponse>> task) = 0;
+        virtual void OnSubscribe(const std::string & channel, const std::string & message) = 0;
+    private:
 		const RedisConfig * GetRedisConfig(const std::string & name);
-		bool LoadLuaScript(RedisClientContext * redisClientContext, const std::string & path);
+		bool LoadLuaScript(SharedRedisClient redisClientContext, const std::string & path);
 	private:
 		int mTimerIndex = 0;
 		TaskComponent * mTaskComponent;
 		std::unordered_map<std::string, RedisConfig> mConfigs;
 		std::unordered_map<std::string, std::string> mLuaMap;
-		std::unordered_map<std::string, std::list<RedisClientContext *>> mRedisClients;
+		std::unordered_map<std::string, std::list<SharedRedisClient>> mRedisClients;
 	};
+
+    template<typename ... Args>
+    std::shared_ptr<RedisResponse> RedisComponent::Run(const std::string &name, const std::string & cmd, Args &&...args)
+    {
+        std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>(cmd);
+        RedisRequest::InitParameter(request, std::forward<Args>(args)...);
+        return this->Run(name, request);
+    }
+    template<typename ... Args>
+    std::shared_ptr<RedisResponse> RedisComponent::Run(SharedRedisClient redisClientContext, const std::string &cmd, Args &&...args)
+    {
+        std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>(cmd);
+        RedisRequest::InitParameter(request, std::forward<Args>(args)...);
+        return this->Run(redisClientContext, request);
+    }
 }
 
 

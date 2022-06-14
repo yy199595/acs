@@ -3,6 +3,7 @@
 //
 
 #include"RedisComponent.h"
+#include"Util/FileHelper.h"
 #include"Util/DirectoryHelper.h"
 #include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
@@ -20,6 +21,7 @@ namespace Sentry
 		{
 			RedisConfig redisConfig;
 			redisConfig.FreeClient = 30;
+            redisConfig.Name = iter->name.GetString();
 			const std::string name(iter->name.GetString());
 			const rapidjson::Value& jsonData = iter->value;
 			redisConfig.Ip = jsonData["ip"].GetString();
@@ -41,6 +43,7 @@ namespace Sentry
 					redisConfig.LuaFiles.emplace_back(lua);
 				}
 			}
+            redisConfig.Address = fmt::format("{0}:{1}", redisConfig.Ip, redisConfig.Port);
 			this->mConfigs.emplace(name, redisConfig);
 		}
 		this->mTaskComponent = this->GetApp()->GetTaskComponent();
@@ -51,17 +54,15 @@ namespace Sentry
 	{
 		for(auto iter = this->mConfigs.begin(); iter != this->mConfigs.end(); iter++)
 		{
-			RedisClientContext * redisClientContext = this->MakeRedisClient(&iter->second);
+            SharedRedisClient redisClientContext = this->MakeRedisClient(&iter->second);
 			if(!this->TryAsyncConnect(redisClientContext))
 			{
-				delete redisClientContext;
 				return false;
 			}
 			for(const std::string & path : iter->second.LuaFiles)
 			{
 				if(!this->LoadLuaScript(redisClientContext, path))
 				{
-					delete redisClientContext;
 					LOG_ERROR("load script " << path << " error");
 					return false;
 				}
@@ -71,7 +72,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool RedisComponent::TryAsyncConnect(RedisClientContext* redisCommandClient, int maxCount)
+	bool RedisComponent::TryAsyncConnect(SharedRedisClient redisCommandClient, int maxCount)
 	{
 		if(redisCommandClient->IsOpen())
 		{
@@ -80,8 +81,19 @@ namespace Sentry
 		const RedisConfig & config = redisCommandClient->GetConfig();
 		for(int index = 0; index < maxCount; index++)
 		{
-			if(redisCommandClient->StartConnect() == XCode::Successful)
+			if(redisCommandClient->StartConnectAsync() == XCode::Successful)
 			{
+                if(!config.Password.empty())
+                {
+                    std::shared_ptr<RedisResponse> redisResponse =
+                            this->Run(redisCommandClient, "AUTH", config.Password);
+                    if(redisResponse == nullptr || !redisResponse->IsOk())
+                    {
+                        LOG_ERROR(config.Name << " auth error");
+                        return false;
+                    }
+                }
+                LOG_INFO(config.Name << " connect redis [" << config.Address << "] successful");
 				return true;
 			}
 			LOG_ERROR(config.Name << " connect redis ["
@@ -96,18 +108,18 @@ namespace Sentry
 		this->mTimerIndex++;
 		if (this->mTimerIndex >= 10)
 		{
+            this->mTimerIndex = 0;
 			long long nowMs = Helper::Time::GetNowMilTime();
 			auto iter = this->mRedisClients.begin();
 			for (; iter != this->mRedisClients.end(); iter++)
 			{
 				for (auto iter1 = iter->second.begin(); iter1 != iter->second.end();)
 				{
-					RedisClientContext* redisClientContext = (*iter1);
+                    SharedRedisClient redisClientContext = (*iter1);
 					const RedisConfig& config = redisClientContext->GetConfig();
 					if (nowMs - redisClientContext->GetLastOperTime() >= config.FreeClient)
 					{
 						iter->second.erase(iter1++);
-						delete redisClientContext;
 						continue;
 					}
 					iter1++;
@@ -116,7 +128,7 @@ namespace Sentry
 		}
 	}
 
-	RedisClientContext * RedisComponent::MakeRedisClient(const RedisConfig* config)
+    SharedRedisClient RedisComponent::MakeRedisClient(const RedisConfig* config)
 	{
 #ifdef ONLY_MAIN_THREAD
 		IAsioThread& workThread = App::Get()->GetTaskScheduler();
@@ -124,10 +136,10 @@ namespace Sentry
 		NetThreadComponent * threadPoolComponent = this->GetComponent<NetThreadComponent>();
 		IAsioThread& workThread = threadPoolComponent->AllocateNetThread();
 #endif
-		const std::string& ip = config->Ip;
 		unsigned short port = config->Port;
-		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread, ip, port));
-		return new RedisClientContext(socketProxy, *config);
+        const std::string& ip = config->Ip;
+        //std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread, ip, port));
+		return std::make_shared<RedisClientContext>(std::make_shared<SocketProxy>(workThread, ip, port), *config, this);
 	}
 
 	const RedisConfig* RedisComponent::GetRedisConfig(const std::string& name)
@@ -136,14 +148,14 @@ namespace Sentry
 		return iter != this->mConfigs.end() ? &iter->second : nullptr;
 	}
 
-	RedisClientContext* RedisComponent::GetClient(const std::string& name)
+    SharedRedisClient RedisComponent::GetClient(const std::string& name)
 	{
 		auto iter = this->mRedisClients.find(name);
 		if(iter != this->mRedisClients.end())
 		{
 			if(!iter->second.empty())
 			{
-				RedisClientContext * clientContext = iter->second.front();
+                SharedRedisClient clientContext = iter->second.front();
 				iter->second.pop_front();
 				return clientContext;
 			}
@@ -157,72 +169,107 @@ namespace Sentry
 		return this->MakeRedisClient(config);
 	}
 
-	void RedisComponent::PushClient(RedisClientContext* redisClientContext)
+	void RedisComponent::PushClient(SharedRedisClient redisClientContext)
 	{
 		const std::string & name = redisClientContext->GetName();
 		auto iter = this->mRedisClients.find(name);
 		if(iter == this->mRedisClients.end())
 		{
-			std::list<RedisClientContext *> clients;
+			std::list<SharedRedisClient> clients;
 			this->mRedisClients.emplace(name, clients);
 		}
 		this->mRedisClients[name].emplace_back(redisClientContext);
 	}
 
-	bool RedisComponent::Call(const std::string & name, const std::string& fullName, const std::string & json)
+	bool RedisComponent::Call(const std::string & name, const std::string& fullName, Json::Writer & jsonWriter)
 	{
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
-		return this->Call(name, fullName, json, response);
+		return this->Call(name, fullName, jsonWriter, response);
 	}
 
-	bool RedisComponent::Call(const std::string & name, const std::string& fullName, const std::string& json,
+    std::shared_ptr<RedisRequest> RedisComponent::MakeLuaRequest(
+            const std::string &fullName, const std::string &json)
+    {
+        size_t pos = fullName.find('.');
+        assert(pos != std::string::npos);
+        std::string tab = fullName.substr(0, pos);
+        std::string func = fullName.substr(pos + 1);
+        auto iter = this->mLuaMap.find(fmt::format("{0}.lua", tab));
+        if(iter == this->mLuaMap.end())
+        {
+            LOG_ERROR("not find redis script " << fullName);
+            return nullptr;
+        }
+        const std::string & tag = iter->second;
+        return RedisRequest::MakeLua(tag, func, json);
+    }
+
+	bool RedisComponent::Call(const std::string & name, const std::string& fullName, Json::Writer & jsonWriter,
 			std::shared_ptr<Json::Reader> response)
 	{
-		size_t pos = fullName.find('.');
-		assert(pos != std::string::npos);
-		std::string tab = fullName.substr(0, pos);
-		std::string func = fullName.substr(pos + 1);
-		auto iter = this->mLuaMap.find(fmt::format("{0}.lua", tab));
-		if(iter == this->mLuaMap.end())
-		{
-			LOG_ERROR("not find redis script " << fullName);
-			return false;
-		}
-		const std::string & tag = iter->second;
-		RedisClientContext * redisClientContext = this->GetClient(name);
-		if(redisClientContext == nullptr)
-		{
-			return false;
-		}
-		std::shared_ptr<RedisResponse> response1(new RedisResponse());
-		std::shared_ptr<RedisRequest> request = RedisRequest::MakeLua(tag, func, json);
-		if (redisClientContext->Run(request, response1) != XCode::Successful)
-		{
-			return false;
-		}
-
-		std::string responseJson;
-		if(!response1->GetString(responseJson) || !response->ParseJson(responseJson))
-		{
-			return false;
-		}
-#ifdef __REDIS_DEBUG__
-		std::string json;
-		LOG_INFO("=========== call redis lua ===========");
-		LOG_INFO("func = " << fullName);
-		if(parameter.WriterStream(json))
-		{
-			LOG_INFO("request = " << json);
-		}
-		LOG_INFO("response = " << responseJson);
-#endif
+        std::string json;
+        jsonWriter.WriterStream(json);
+        std::shared_ptr<RedisRequest> request = this->MakeLuaRequest(fullName, json);
+        if(request == nullptr)
+        {
+            return false;
+        }
+        std::shared_ptr<RedisTask> redisTask = request->MakeTask();
+        SharedRedisClient redisClientContext = this->GetClient(name);
+        if(!this->TryAsyncConnect(redisClientContext))
+        {
+            return false;
+        }
+        redisClientContext->SendCommand(request);
+		std::shared_ptr<RedisResponse> response1 = redisTask->Await();
+        if(response1->HasError())
+        {
+            LOG_ERROR(response1->GetString());
+            return false;
+        }
+        if(!response->ParseJson(response1->GetString()))
+        {
+            return false;
+        }
 		bool res = false;
 		return response->GetMember("res", res) && res;
 	}
 
+    std::shared_ptr<RedisResponse> RedisComponent::Run(
+            SharedRedisClient redisClientContext, std::shared_ptr<RedisRequest> request)
+    {
+        std::shared_ptr<RedisTask> redisTask = request->MakeTask();
+        if(!this->AddRedisTask(redisTask))
+        {
+            return nullptr;
+        }
+        if(!this->TryAsyncConnect(redisClientContext))
+        {
+            return nullptr;
+        }
+        redisClientContext->SendCommand(request);
+        std::shared_ptr<RedisResponse> redisResponse = redisTask->Await();
+        if(redisResponse->HasError())
+        {
+            LOG_ERROR(redisResponse->GetString());
+        }
+        this->PushClient(redisClientContext);
+        return redisResponse;
+    }
+
+    std::shared_ptr<RedisResponse> RedisComponent::Run(const std::string &name, std::shared_ptr<RedisRequest> request)
+    {
+        SharedRedisClient redisClientContext = this->GetClient(name);
+        if(redisClientContext == nullptr)
+        {
+            return nullptr;
+        }
+        return this->Run(redisClientContext, request);
+    }
+
 	void RedisComponent::OnResponse(std::shared_ptr<RedisResponse> response)
 	{
-		if(response->GetArraySize() == 3)
+		if(response->GetArraySize() == 3 && response->GetTaskId() == 0)
 		{
 			const RedisAny * redisAny1 = response->Get(0);
 			const RedisAny * redisAny2 = response->Get(1);
@@ -238,22 +285,30 @@ namespace Sentry
 				}
 			}
 		}
-
+        this->OnCommandReply(response);
 	}
 
-	bool RedisComponent::LoadLuaScript(RedisClientContext * redisClientContext, const string& path)
+	bool RedisComponent::LoadLuaScript(SharedRedisClient redisClientContext, const string& path)
 	{
-		std::string key;
-		if (!redisClientContext->LoadLuaScript(path, key))
-		{
-			return false;
-		}
-		std::string fileName, director;
-		if (!Helper::Directory::GetDirAndFileName(path, director, fileName))
-		{
-			return false;
-		}
-		this->mLuaMap.emplace(fileName, key);
-		return true;
+        std::string content;
+        if (!Helper::File::ReadTxtFile(path, content))
+        {
+            LOG_ERROR("read " << path << " failure");
+            return false;
+        }
+
+        std::shared_ptr<RedisResponse> redisResponse = this->Run(
+                redisClientContext->GetName(), "SCRIPT", "LOAD", content);
+        if(!redisResponse->HasError())
+        {
+            std::string fileName, director;
+            if (!Helper::Directory::GetDirAndFileName(path, director, fileName))
+            {
+                return false;
+            }
+            this->mLuaMap.emplace(fileName, redisResponse->GetString());
+            return true;
+        }
+        return false;
 	}
 }

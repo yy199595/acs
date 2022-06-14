@@ -18,7 +18,7 @@ namespace Sentry
 		Json::Writer jsonWrite;
 		jsonWrite.AddMember("account", account);
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
-		if(!this->mRedisComponent->Call("user.add_user", jsonWrite, response))
+		if(!this->mRedisComponent->Call("main", "user.add_user", jsonWrite, response))
 		{
 			return 0;
 		}
@@ -32,7 +32,7 @@ namespace Sentry
 		jsonWrite.AddMember("time", time);
 		jsonWrite.AddMember("token", token);
 		jsonWrite.AddMember("user_id", userId);
-		return this->mRedisComponent->Call("user.set_token", jsonWrite);
+		return this->mRedisComponent->Call("main", "user.set_token", jsonWrite);
 	}
 
 	long long UserSyncComponent::GetUserId(const std::string& token)
@@ -40,7 +40,7 @@ namespace Sentry
 		Json::Writer jsonWrite;
 		jsonWrite.AddMember("token", token);
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
-		if(!this->mRedisComponent->Call("user.get_token", jsonWrite, response))
+		if(!this->mRedisComponent->Call("main", "user.get_token", jsonWrite, response))
 		{
 			LOG_ERROR("gen user by token failure " << token);
 			return 0;
@@ -54,7 +54,7 @@ namespace Sentry
 		Json::Writer jsonWrite;
 		jsonWrite.AddMember("user_id", userId);
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
-		if(!this->mRedisComponent->Call("user.get_state", jsonWrite))
+		if(!this->mRedisComponent->Call("main", "user.get_state", jsonWrite))
 		{
 			return -1;
 		}
@@ -67,7 +67,7 @@ namespace Sentry
 		Json::Writer jsonWrite;
 		jsonWrite.AddMember("state", state);
 		jsonWrite.AddMember("user_id", userId);
-		return this->mRedisComponent->Call("user.set_state", jsonWrite);
+		return this->mRedisComponent->Call("main", "user.set_state", jsonWrite);
 	}
 
 	const std::string UserSyncComponent::GetAddress(long long userId, const std::string& service)
@@ -77,7 +77,7 @@ namespace Sentry
 		jsonWrite.AddMember("user_id", userId);
 		jsonWrite.AddMember("service", service);
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
-		if(this->mRedisComponent->Call("user.get_address", jsonWrite, response)
+		if(this->mRedisComponent->Call("main", "user.get_address", jsonWrite, response)
 			&& response->GetMember("address", address))
 		{
 
@@ -92,7 +92,7 @@ namespace Sentry
 		jsonWrite.AddMember("service", service);
 		jsonWrite.AddMember("address", address);
 		jsonWrite.AddMember("broadcast", broadcast);
-		return this->mRedisComponent->Call("user.set_address", jsonWrite);
+		return this->mRedisComponent->Call("main", "user.set_address", jsonWrite);
 	}
 
 	bool UserSyncComponent::OnRegisterEvent(NetEventRegistry& eventRegister)

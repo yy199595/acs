@@ -11,16 +11,15 @@ namespace Sentry
 {
 	class NetThreadComponent;
 
-	class MainRedisComponent final : public RedisComponent, public IStart
+    class MainRedisComponent final : public RedisComponent
 	{
 	 public:
 		MainRedisComponent() = default;
 		~MainRedisComponent() final = default;
 	 protected:
-		bool LateAwake() final;                //初始化完成之后
-		bool OnStart() override;
+        bool OnStart() final;
+        bool LateAwake() final;                //初始化完成之后
 	 private:
-		void StartPubSub();
 		bool LoadRedisConfig();
 		void CheckRedisClient();
 	public:
@@ -31,23 +30,22 @@ namespace Sentry
 		long long Publish(const std::string& channel, const std::string& message);
 	private:
 		bool StartSubChannel();
-#if __REDIS_DEBUG__
-		void StartDebugRedis();
-#endif
 		void OnLockTimeout(const std::string & name, int timeout);
 		bool HandlerEvent(const std::string & channel, const std::string & message);
+
+    private:
+        void OnCommandReply(std::shared_ptr<RedisResponse> response) final;
+        bool AddRedisTask(std::shared_ptr<IRpcTask<RedisResponse>> task) final;
+        void OnSubscribe(const std::string &channel, const std::string &message) final;
 	private:
 		std::string mRpcAddress;
 		TaskComponent* mTaskComponent;
 		TimerComponent * mTimerComponent;
 		const struct RedisConfig * mConfig;
-		class RpcHandlerComponent * mRpcComponent;
-#if __REDIS_DEBUG__
-		std::shared_ptr<RedisClientContext> mDebugClient;
-#endif
-		std::shared_ptr<RedisClientContext> mRedisClient;
-		std::shared_ptr<RedisClientContext> mSubRedisClient;
+        SharedRedisClient mSubRedisClient;
+        class RpcHandlerComponent * mRpcComponent;
 		std::unordered_map<std::string, long long> mLockTimers; //分布式锁的续命定时器
+        std::unordered_map<long long,std::shared_ptr<IRpcTask<RedisResponse>>> mTasks;
 	};
 }
 
