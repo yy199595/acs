@@ -65,7 +65,10 @@ namespace Sentry
 		Lua::UserDataParameter::Write(this->mLua, luaTaskSource);
 		if(lua_pcall(this->mLua, 3, 1, 0) != 0)
 		{
-			response.AddHead("error", lua_tostring(this->mLua, -1));
+			size_t size = 0;
+			const char * err = lua_tolstring(this->mLua, -1, &size);
+			response.AddHead("error", std::string(err, size));
+			LOG_ERROR(std::string(err, size));
 			return XCode::CallLuaFunctionFail;
 		}
 		XCode code = luaTaskSource->Await();

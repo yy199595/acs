@@ -4,26 +4,11 @@
 #include"Util/DirectoryHelper.h"
 #include"Script/ClassProxyHelper.h"
 #include"Global/ServiceConfig.h"
+#include"Script/Extension/Redis/LuaRedis.h"
 #include"Component/Scene/NetThreadComponent.h"
 #include"DB/Redis/RedisClientContext.h"
 #include"Component/Rpc/RpcHandlerComponent.h"
 #include"Component/Scene/NetEventComponent.h"
-namespace Sentry
-{
-	AutoRedisLock::AutoRedisLock(MainRedisComponent* component, const std::string& key)
-		: mRedisComponent(component), mKey(key)
-	{
-		this->mIsLock = this->mRedisComponent->Lock(key);
-	}
-	AutoRedisLock::~AutoRedisLock()
-	{
-		if(this->mIsLock)
-		{
-			this->mRedisComponent->UnLock(this->mKey);
-		}
-	}
-}
-
 namespace Sentry
 {
 	bool MainRedisComponent::LateAwake()
@@ -74,17 +59,17 @@ namespace Sentry
 				LOG_INFO(component->GetName() << " start listen event successful");
 			}
 		}
-        for(int index = 0; index < 100; index++)
-        {
-            this->mTaskComponent->Start([index, this]() {
-                ElapsedTimer timer;
-                for(int i = 0; i < 1; i++)
-                {
-                    this->Run("main", "SET", "test", index);
-                }
-                LOG_ERROR(index << " use time = " << timer.GetMs() << "ms");
-            });
-        }
+//        for(int index = 0; index < 100; index++)
+//        {
+//            this->mTaskComponent->Start([index, this]() {
+//                ElapsedTimer timer;
+//                for(int i = 0; i < 1; i++)
+//                {
+//                    this->Run("main", "SET", "test", index);
+//                }
+//                LOG_ERROR(index << " use time = " << timer.GetMs() << "ms");
+//            });
+//        }
         //this->mTaskComponent->WhenAll(tasks);
         return true;
 	}
@@ -243,5 +228,11 @@ namespace Sentry
 				LOG_ERROR("redis lock " << key << " delay failure");
 			});
 		}
+	}
+	void MainRedisComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
+	{
+		luaRegister.BeginRegister<MainRedisComponent>();
+		luaRegister.PushExtensionFunction("Run", Lua::Redis::Run);
+		luaRegister.PushExtensionFunction("Call", Lua::Redis::Call);
 	}
 }

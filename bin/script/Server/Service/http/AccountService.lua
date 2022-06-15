@@ -12,12 +12,15 @@ end
 
 function AccountService.Register(request)
     table.print(request)
+    local redisComponent = RedisComponent
     local requestInfo = Json.Decode(request.data)
     assert(requestInfo.account, "register account is nil")
     assert(requestInfo.password, "register password is nil")
     assert(requestInfo.phone_num, "register phone number is nil")
+    local user_id = redisComponent.AddCounter("main", "user_id")
+    print(user_id)
     return MysqlComponent.Add("account.user_info", {
-        user_id = Guid.Create(),
+        user_id = user_id,
         register_time = os.time(),
         account = requestInfo.account,
         password = requestInfo.password,

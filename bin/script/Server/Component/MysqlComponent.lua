@@ -16,6 +16,7 @@ function MysqlComponent.Add(tabName, data, flag)
     assert(type(data) == "table")
     assert(type(tabName) == "string")
     local address = mysqlService:GetAddress()
+    print("*******", address, Json.Encode(data))
     return mysqlService:Call(address, "Add",  {
         table = tabName,
         flag = flag or 0,

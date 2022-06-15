@@ -7,7 +7,8 @@
 #include"Component/Redis/RedisComponent.h"
 namespace Sentry
 {
-    RedisClientContext::RedisClientContext(std::shared_ptr<SocketProxy> socket, const RedisConfig &config, RedisComponent * component)
+    RedisClientContext::RedisClientContext(std::shared_ptr<SocketProxy> socket,
+		const RedisConfig &config, RedisComponent * component)
             : Tcp::TcpContext(socket), mConfig(config), mRedisComponent(component), mIsEnableSub(false)
     {
         this->mSocket = socket;
@@ -64,7 +65,7 @@ namespace Sentry
             this->Send(command);
         }
         this->mCommands.push(command);
-        printf("redis count = %d\n", (int)this->mCommands.size());
+        //printf("redis count = %d\n", (int)this->mCommands.size());
     }
 
     void RedisClientContext::StartReceive()

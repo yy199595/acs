@@ -38,6 +38,8 @@ namespace Sentry
     public:
 		const std::string ToJson() const;
 		int Serailize(std::ostream &os) final;
+		std::shared_ptr<RedisTask> MakeTask();
+	 public:
 		template<typename ... Args>
 		static std::shared_ptr<RedisRequest> Make(const std::string & cmd, Args &&... args);
 
@@ -47,19 +49,17 @@ namespace Sentry
         static void InitParameter(std::shared_ptr<RedisRequest> self, Args &&... args);
 
     public:
-        std::shared_ptr<RedisTask> MakeTask();
-        std::shared_ptr<LuaRedisTask> MakeLuaTask(lua_State * lua);
+		void AddParameter(int value);
+		void AddParameter(long long value);
+		void AddParameter(const Message & message);
+		void AddParameter(const std::string & value);
+		void AddString(const char * str, size_t size);
+		std::shared_ptr<LuaRedisTask> MakeLuaTask(lua_State * lua);
 
         long long GetTaskId() const { return this->mTaskId;}
         const std::string & GetCommand() const { return this->mCommand;}
-    private:
-        void AddParameter(int value);
-        void AddParameter(long long value);
-		void AddParameter(const Message & message);
-        void AddParameter(const std::string & value);
 	private:
         static void Encode(std::shared_ptr<RedisRequest> self) {}
-
         template<typename T, typename... Args>
         static void Encode(std::shared_ptr<RedisRequest> self, const T &t, Args... args)
         {
