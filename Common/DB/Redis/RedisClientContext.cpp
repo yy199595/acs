@@ -62,8 +62,6 @@ namespace Sentry
         if (this->mCommands.empty())
         {
             this->Send(command);
-            this->mCommands.emplace(command);
-            return;
         }
         this->mCommands.push(command);
         printf("redis count = %d\n", (int)this->mCommands.size());
@@ -109,10 +107,13 @@ namespace Sentry
 #else
         this->mNetworkThread.Invoke(&RedisComponent::OnResponse, this->mRedisComponent,  response);
 #endif
-        this->mCommands.pop();
         if (!this->mCommands.empty())
         {
-            this->Send(this->mCommands.front());
+            this->mCommands.pop();
+            if(!this->mCommands.empty())
+            {
+                this->Send(this->mCommands.front());
+            }
         }
 
         if(this->mIsEnableSub)
