@@ -47,8 +47,13 @@ namespace Sentry
 	bool MainRedisComponent::OnStart()
 	{
         LOG_CHECK_RET_FALSE(RedisComponent::OnStart());
-        this->mSubRedisClient = this->GetClient("main");
-        return this->mSubRedisClient != nullptr && this->StartSubChannel();
+        this->mSubRedisClient = this->MakeRedisClient("main");
+        if(!this->TryAsyncConnect(this->mSubRedisClient))
+        {
+            LOG_ERROR("start sub redis client error");
+            return false;
+        }
+        return this->StartSubChannel();
 	}
 
 	bool MainRedisComponent::StartSubChannel()
@@ -95,19 +100,18 @@ namespace Sentry
 
 	bool MainRedisComponent::SubscribeChannel(const std::string& channel)
 	{
-		std::shared_ptr<RedisRequest> request = RedisRequest::Make("SUBSCRIBE", channel);
-        std::shared_ptr<RedisTask> redisTask = request->MakeTask();
-        if(!this->AddRedisTask(redisTask))
+        std::shared_ptr<RedisResponse> redisResponse =
+                this->Run(this->mSubRedisClient, "SUBSCRIBE", channel);
+        if(redisResponse->GetArraySize() == 3 && redisResponse->Get(2)->IsLong())
         {
-            return false;
+            if(((const RedisLong*)redisResponse->Get(2))->GetValue() > 0)
+            {
+                LOG_INFO("sub " << channel << " successful");
+                return true;
+            }
         }
-        if(!this->TryAsyncConnect(this->mSubRedisClient))
-        {
-            LOG_ERROR("redis net work error sub " << channel << " failure");
-            return false;
-        }
-        this->mSubRedisClient->SendCommand(request);
-        return redisTask->Await()->GetNumber() > 0;
+        LOG_INFO("sub " << channel << " failure");
+        return false;
 	}
 
     void MainRedisComponent::OnCommandReply(std::shared_ptr<RedisResponse> response)

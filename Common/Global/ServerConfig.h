@@ -11,6 +11,7 @@ namespace Sentry
 	{
 	public:
 		int Count;
+        int Index;
 		int FreeClient;
 		std::string Ip;
 		std::string Name;

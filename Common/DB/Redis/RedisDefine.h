@@ -49,7 +49,9 @@ namespace Sentry
     public:
         std::shared_ptr<RedisTask> MakeTask();
         std::shared_ptr<LuaRedisTask> MakeLuaTask(lua_State * lua);
+
         long long GetTaskId() const { return this->mTaskId;}
+        const std::string & GetCommand() const { return this->mCommand;}
     private:
         void AddParameter(int value);
         void AddParameter(long long value);
@@ -94,9 +96,11 @@ namespace Sentry
 		void Clear();
     private:
         void OnDecodeHead(std::iostream & readStream);
-        void OnDecodeArray(std::iostream & readStream);
-        void OnDecodeBinString(std::iostream & readStream);
+        void OnDecodeArray(std::iostream & readStream, size_t size);
+        void OnDecodeMessage(std::iostream & readStream, size_t size);
+        void OnDecodeBinString(std::iostream & readStream, size_t size);
         int OnReceiveFirstLine(char type, const std::string & lineData);
+
     public:
 		const RedisAny * Get(size_t index);
         long long GetTaskId() const { return this->mTaskId; }

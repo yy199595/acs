@@ -91,8 +91,9 @@ namespace Sentry
 namespace Sentry
 {
     RedisResponse::RedisResponse(long long taskId)
+        : mTaskId(taskId), mLineCount(0), mDataSize(0),
+        mNumber(-1), mDataCount(0)
     {
-        this->mTaskId = taskId;
         this->mType = RedisRespType::REDIS_NONE;
     }
 
@@ -107,30 +108,32 @@ namespace Sentry
 
     bool RedisResponse::OnReceive(const asio::error_code &code, asio::streambuf &stream)
     {
-        if(code || stream.size() == 0)
+        if (code || stream.size() == 0)
         {
             return true;
         }
         std::iostream readStream(&stream);
-        switch(this->mType)
+        switch (this->mType)
         {
             case RedisRespType::REDIS_NONE:
                 this->OnDecodeHead(readStream);
                 break;
         }
-        switch(this->mType)
+        this->OnDecodeMessage(readStream, stream.size());
+        return this->mLineCount >= this->mDataCount;
+    }
+
+    void RedisResponse::OnDecodeMessage(std::iostream &readStream, size_t size)
+    {
+        switch (this->mType)
         {
             case RedisRespType::REDIS_BIN_STRING:
-                if(stream.size() >= this->mDataSize)
-                {
-                    this->OnDecodeBinString(readStream);
-                }
+                this->OnDecodeBinString(readStream, size);
                 break;
             case RedisRespType::REDIS_ARRAY:
-                this->OnDecodeArray(readStream);
+                this->OnDecodeArray(readStream, size);
                 break;
         }
-        return this->mLineCount >= this->mDataCount;
     }
 
     bool RedisResponse::IsOk()
@@ -146,10 +149,6 @@ namespace Sentry
         {
             lineData.pop_back(); //拿掉\r
             this->mDataCount = this->OnReceiveFirstLine(type, lineData);
-            if (this->mDataCount == 0)
-            {
-
-            }
         }
     }
 
@@ -167,10 +166,8 @@ namespace Sentry
                 this->mString = std::move(lineData);
                 break;
             case ':': //整型
-            {
                 this->mType = RedisRespType::REDIS_NUMBER;
                 this->mNumber = std::stoll(lineData);
-            }
                 break;
             case '$': //二进制字符串
                 this->mDataSize = std::stoi(lineData);
@@ -183,22 +180,29 @@ namespace Sentry
         return 0;
     }
 
-    void RedisResponse::OnDecodeBinString(std::iostream &readStream)
+    void RedisResponse::OnDecodeBinString(std::iostream &readStream, size_t size)
     {
-        std::unique_ptr<char[]> buffer(new char[this->mDataSize]);
-        size_t size = readStream.readsome(buffer.get(), this->mDataSize);
-        if(size >= this->mDataSize)
+        if (size >= this->mDataSize)
         {
-            this->mString.append(buffer.get(), size);
-        }
-        readStream.ignore(2);
-        if(this->mString.size() >= this->mDataSize)
-        {
+            std::unique_ptr<char[]> buffer(new char[this->mDataSize]);
+            if (readStream.readsome(buffer.get(), this->mDataSize) > 0)
+            {
+                switch (this->mType)
+                {
+                    case RedisRespType::REDIS_ARRAY:
+                        this->mArray.emplace_back(new RedisString(buffer.get(), this->mDataSize));
+                        break;
+                    case RedisRespType::REDIS_BIN_STRING:
+                        this->mString.append(buffer.get(), this->mDataSize);
+                        break;
+                }
+            }
             this->mLineCount++;
+            readStream.ignore(2);
         }
     }
 
-    void RedisResponse::OnDecodeArray(std::iostream &readStream)
+    void RedisResponse::OnDecodeArray(std::iostream &readStream, size_t size)
     {
         std::string lineData;
         char type = readStream.get();
@@ -206,7 +210,7 @@ namespace Sentry
         {
             lineData.pop_back();
             this->mDataSize = std::stoi(lineData);
-            this->OnDecodeBinString(readStream);
+            this->OnDecodeBinString(readStream, size);
         }
         else if (type == ':' && std::getline(readStream, lineData))
         {
@@ -214,6 +218,10 @@ namespace Sentry
             this->mLineCount++;
             long long number = std::stoll(lineData);
             this->mArray.emplace_back(new RedisLong(number));
+        }
+        if(this->mLineCount < this->mDataCount)
+        {
+            this->OnDecodeMessage(readStream, size);
         }
     }
 
@@ -224,11 +232,11 @@ namespace Sentry
 	}
 	const RedisAny* RedisResponse::Get(size_t index)
 	{
-		if(index < this->mArray.size() || index >= this->mArray.size())
+		if(index < this->mArray.size() || index >= 0)
 		{
-			return nullptr;
+			return this->mArray[index];
 		}
-		return this->mArray[index];
+		return nullptr;
 	}
 }
 

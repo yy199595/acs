@@ -25,7 +25,8 @@ namespace Sentry
         XCode StartConnectAsync();
 		const RedisConfig & GetConfig() { return mConfig;}
         void SendCommand(std::shared_ptr<RedisRequest> command);
-		const std::string & GetName() const { return this->mConfig.Name; }
+        bool IsEnableSubscribe() const { return this->mIsEnableSub;}
+        const std::string & GetName() const { return this->mConfig.Name; }
 	protected:
         void StartReceive();
 		void OnConnect(const asio::error_code &error) final;

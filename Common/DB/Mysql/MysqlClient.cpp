@@ -45,7 +45,7 @@ namespace Sentry
 
 	XCode MysqlClient::Start(std::shared_ptr<MysqlAsyncTask> task)
 	{
-		if(task->Init())
+		if(!task->Init())
 		{
 			return XCode::MysqlInitTaskFail;
 		}

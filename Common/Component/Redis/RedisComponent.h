@@ -22,9 +22,9 @@ namespace Sentry
         SharedRedisClient GetClient(const std::string & name);
 		void PushClient(SharedRedisClient redisClientContext);
         void OnResponse(std::shared_ptr<RedisResponse> response);
-        SharedRedisClient MakeRedisClient(const RedisConfig* config);
+        SharedRedisClient MakeRedisClient(const RedisConfig & config);
+        SharedRedisClient MakeRedisClient(const std::string & name);
         bool TryAsyncConnect(SharedRedisClient client, int maxCount = 5);
-
     public:
         std::shared_ptr<RedisResponse> Run(const std::string & name, std::shared_ptr<RedisRequest> request);
         std::shared_ptr<RedisResponse> Run(SharedRedisClient redisClientContext, std::shared_ptr<RedisRequest> request);

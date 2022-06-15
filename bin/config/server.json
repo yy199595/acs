@@ -54,6 +54,7 @@
             "timeout": 3,
             "count": 1,
             "free": 30,
+            "index": 0,
             "lua": [
                 "redis/lock.lua",
                 "redis/user.lua",

@@ -21,7 +21,6 @@ namespace Sentry
         bool LateAwake() final;                //初始化完成之后
 	 private:
 		bool LoadRedisConfig();
-		void CheckRedisClient();
 	public:
 		bool Lock(const std::string & key, int timeout = 10);
 		bool UnLock(const std::string & key);
