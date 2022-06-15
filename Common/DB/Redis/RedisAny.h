@@ -11,19 +11,22 @@ namespace Sentry
 	class RedisAny
 	{
 	 public:
-		virtual bool IsLong() const = 0;
+		virtual bool IsNumber() const = 0;
 		virtual bool IsString() const = 0;
 		virtual void Write(std::iostream & io) = 0;
+
+        template<typename T>
+        const T * Cast() const { return static_cast<const T *>(this);}
 	};
 
-	class RedisLong : public RedisAny
+	class RedisNumber : public RedisAny
 	{
 	 public:
-		RedisLong(int value);
-		RedisLong(long long value);
+		RedisNumber(int value);
+		RedisNumber(long long value);
 	 public:
 		void Write(std::iostream &io) final;
-		bool IsLong() const final { return true; }
+		bool IsNumber() const final { return true; }
 		bool IsString() const final { return false;}
 		long long GetValue() const { return this->mValue;}
 	 private:
@@ -37,7 +40,7 @@ namespace Sentry
 		RedisString(const char * str, size_t size);
 	 public:
 		void Write(std::iostream &io) final;
-		bool IsLong() const final { return false; }
+		bool IsNumber() const final { return false; }
 		bool IsString() const final { return true;}
 		const std::string & GetValue() const { return this->mValue;}
 	 private:

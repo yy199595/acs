@@ -28,7 +28,7 @@ namespace Sentry
 			redisConfig.Ip = jsonData["ip"].GetString();
 			redisConfig.Port = jsonData["port"].GetInt();
             redisConfig.Index = jsonData["index"].GetInt();
-
+            redisConfig.Count = jsonData["count"].GetInt();
 			if(jsonData.HasMember("free"))
 			{
 				redisConfig.FreeClient = jsonData["free"].GetInt();
@@ -121,6 +121,7 @@ namespace Sentry
 			auto iter = this->mRedisClients.begin();
 			for (; iter != this->mRedisClients.end(); iter++)
 			{
+                LOG_DEBUG(iter->first << " redis client count = " << iter->second.size());
 				for (auto iter1 = iter->second.begin(); iter1 != iter->second.end();)
 				{
                     SharedRedisClient redisClientContext = (*iter1);
@@ -171,20 +172,21 @@ namespace Sentry
 		auto iter = this->mRedisClients.find(name);
 		if(iter != this->mRedisClients.end())
 		{
-			if(!iter->second.empty())
-			{
-                SharedRedisClient clientContext = iter->second.front();
-				iter->second.pop_front();
-				return clientContext;
-			}
+            std::list<SharedRedisClient> & redisClients = iter->second;
+            if(!redisClients.empty())
+            {
+                SharedRedisClient redisClient = redisClients.front();
+                redisClients.push_back(redisClient);
+                redisClients.pop_front();
+                return redisClient;
+            }
 		}
-		const RedisConfig * config = this->GetRedisConfig(name);
-		if(config == nullptr)
-		{
-			LOG_ERROR("not find redis config : " << name);
-			return nullptr;
-		}
-		return this->MakeRedisClient(*config);
+        SharedRedisClient redisClientContext = this->MakeRedisClient(name);
+        if(redisClientContext != nullptr)
+        {
+            this->PushClient(redisClientContext);
+        }
+        return redisClientContext;
 	}
 
 	void RedisComponent::PushClient(SharedRedisClient redisClientContext)
@@ -196,6 +198,7 @@ namespace Sentry
 			std::list<SharedRedisClient> clients;
 			this->mRedisClients.emplace(name, clients);
 		}
+        LOG_DEBUG("add redis client " << name << " " << redisClientContext.get());
 		this->mRedisClients[name].emplace_back(redisClientContext);
 	}
 
@@ -263,16 +266,14 @@ namespace Sentry
         redisClientContext->SendCommand(request);
         std::shared_ptr<RedisResponse> redisResponse = redisTask->Await();
 #ifdef __DEBUG__
-        LOG_INFO(request->GetCommand() << " use time = [" << elapsedTimer.GetMs() << "ms]");
+        //LOG_INFO(request->GetCommand() << " use time = [" << elapsedTimer.GetMs() << "ms]");
 #endif
         if (redisResponse->HasError())
         {
+            LOG_ERROR(request->ToJson());
             LOG_ERROR(redisResponse->GetString());
         }
-        if (!redisClientContext->IsEnableSubscribe())
-        {
-            this->PushClient(redisClientContext);
-        }
+
         return redisResponse;
     }
 
@@ -288,7 +289,35 @@ namespace Sentry
 
 	void RedisComponent::OnResponse(std::shared_ptr<RedisResponse> response)
 	{
-		if(response->GetArraySize() == 3)
+//        switch(response->GetType())
+//        {
+//            case RedisRespType::REDIS_NUMBER:
+//            LOG_INFO("number = " << response->GetNumber());
+//                break;
+//            case RedisRespType::REDIS_STRING:
+//            case RedisRespType::REDIS_BIN_STRING:
+//            LOG_INFO("string = " << response->GetString());
+//                break;
+//            case RedisRespType::REDIS_ARRAY:
+//                std::stringstream ss;
+//                ss << "array size = " << response->GetArraySize() << "\r\n";
+//                for (size_t index = 0; index < response->GetArraySize(); index++)
+//                {
+//                    const RedisNumber * redisNumber = response->Cast<RedisNumber>(index);
+//                    const RedisString * redisString = response->Cast<RedisString>(index);
+//                    if(redisNumber != nullptr)
+//                    {
+//                        ss << "[" << index << "] [long] = " << redisNumber->GetValue() << "\r\n";
+//                    }
+//                    else if(redisString != nullptr)
+//                    {
+//                        ss << "[" << index << "] [string] = " << redisString->GetValue() << "\r\n";
+//                    }
+//                }
+//                LOG_INFO(ss.str());
+//                break;
+//        }
+		if(response->GetType() == RedisRespType::REDIS_ARRAY && response->GetArraySize() == 3)
 		{
 			const RedisAny * redisAny1 = response->Get(0);
 			const RedisAny * redisAny2 = response->Get(1);
@@ -297,8 +326,8 @@ namespace Sentry
 			{
 				if(static_cast<const RedisString*>(redisAny1)->GetValue() == "message")
 				{
-					const std::string & channel = static_cast<const RedisString*>(redisAny2)->GetValue();
-					const std::string & message = static_cast<const RedisString*>(redisAny3)->GetValue();
+					const std::string & channel = redisAny2->Cast<RedisString>()->GetValue();
+					const std::string & message = redisAny3->Cast<RedisString>()->GetValue();
 					this->OnSubscribe(channel, message);
 					return;
 				}

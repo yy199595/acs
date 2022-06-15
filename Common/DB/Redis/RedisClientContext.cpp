@@ -62,14 +62,11 @@ namespace Sentry
         if (this->mCommands.empty())
         {
             this->Send(command);
-            this->mCurRequest = command;
-            if(!this->mIsEnableSub)
-            {
-                this->StartReceive();
-            }
+            this->mCommands.emplace(command);
             return;
         }
         this->mCommands.push(command);
+        printf("redis count = %d\n", (int)this->mCommands.size());
     }
 
     void RedisClientContext::StartReceive()
@@ -94,8 +91,11 @@ namespace Sentry
     {
         if(this->mCurResponse == nullptr)
         {
-            long long taskId = this->mCurRequest != nullptr ?
-                               this->mCurRequest->GetTaskId() : 0;
+            long long taskId = 0;
+            if(!this->mCommands.empty())
+            {
+                taskId = this->mCommands.front()->GetTaskId();
+            }
             this->mCurResponse = std::make_shared<RedisResponse>(taskId);
         }
         if (!this->mCurResponse->OnReceive(code, this->mRecvDataBuffer))
@@ -109,35 +109,17 @@ namespace Sentry
 #else
         this->mNetworkThread.Invoke(&RedisComponent::OnResponse, this->mRedisComponent,  response);
 #endif
+        this->mCommands.pop();
+        if (!this->mCommands.empty())
+        {
+            this->Send(this->mCommands.front());
+        }
+
         if(this->mIsEnableSub)
         {
             this->StartReceive();
         }
     }
-
-//    bool RedisClientContext::LoadLuaScriptAsync(const string &path, std::string &key)
-//    {
-//        std::string content;
-//        if (!Helper::File::ReadTxtFile(path, content))
-//        {
-//            LOG_ERROR("read " << path << " failure");
-//            return false;
-//        }
-//        std::shared_ptr<RedisResponse> response = make_shared<RedisResponse>();
-//        std::shared_ptr<RedisRequest> request = RedisRequest::Make("script", "load", content);
-//        if (this->Run(request, response) != XCode::Successful)
-//        {
-//            LOG_ERROR("redis net work error load script failure");
-//            return false;
-//        }
-//        std::string error;
-//        if (response->HasError() && response->GetString(error))
-//        {
-//            LOG_ERROR(error);
-//            return false;
-//        }
-//        return response->GetString(key);
-//    }
 
     void RedisClientContext::OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message)
     {
@@ -148,16 +130,9 @@ namespace Sentry
 #endif
             return;
         }
-        std::move(this->mCurRequest);
-        if (!this->mCommands.empty())
+        if(!this->mIsEnableSub)
         {
-            this->mCurRequest = this->mCommands.front();
-            this->Send(this->mCommands.front());
-            this->mCommands.pop();
-            if(!this->mIsEnableSub)
-            {
-                this->StartReceive();
-            }
+            this->StartReceive();
         }
     }
 }

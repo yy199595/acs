@@ -27,24 +27,21 @@ namespace Sentry
         void SendCommand(std::shared_ptr<RedisRequest> command);
         bool IsEnableSubscribe() const { return this->mIsEnableSub;}
         const std::string & GetName() const { return this->mConfig.Name; }
-	protected:
+    private:
         void StartReceive();
 		void OnConnect(const asio::error_code &error) final;
         void OnReceive(const asio::error_code & code, size_t size);
+        void AddCommandQueue(std::shared_ptr<RedisRequest> command);
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
     private:
-        void AddCommandQueue(std::shared_ptr<RedisRequest> command);
-	private:
-		const RedisConfig & mConfig;
-		TaskSource<XCode> mConnectTaskSource;
-		std::shared_ptr<CoroutineLock> mConnectLock; //连接锁
-        std::queue<std::shared_ptr<RedisRequest>> mCommands;
-    private:
         bool mIsEnableSub;
+        const RedisConfig & mConfig;
         asio::streambuf mRecvDataBuffer;
         RedisComponent * mRedisComponent;
-        std::shared_ptr<RedisRequest> mCurRequest;
+        TaskSource<XCode> mConnectTaskSource;
         std::shared_ptr<RedisResponse> mCurResponse;
+        std::shared_ptr<CoroutineLock> mConnectLock; //连接锁
+        std::queue<std::shared_ptr<RedisRequest>> mCommands;
     };
     typedef std::shared_ptr<RedisClientContext> SharedRedisClient;
 }

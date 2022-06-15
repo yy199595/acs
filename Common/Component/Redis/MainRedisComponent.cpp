@@ -29,7 +29,6 @@ namespace Sentry
 	bool MainRedisComponent::LateAwake()
 	{
         RedisComponent::LateAwake();
-		LOG_CHECK_RET_FALSE(this->LoadRedisConfig());
 		this->mTaskComponent = this->GetComponent<TaskComponent>();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 		LOG_CHECK_RET_FALSE(this->GetComponent<NetThreadComponent>());
@@ -38,16 +37,14 @@ namespace Sentry
 		return true;
 	}
 
-	bool MainRedisComponent::LoadRedisConfig()
-	{
-		this->mConfig = this->GetConfig().GetRedisConfig("main");
-		return this->mConfig != nullptr;
-	}
-
 	bool MainRedisComponent::OnStart()
 	{
         LOG_CHECK_RET_FALSE(RedisComponent::OnStart());
         this->mSubRedisClient = this->MakeRedisClient("main");
+        if(this->mSubRedisClient != nullptr)
+        {
+            this->mSubRedisClient->EnableSubscribe();
+        }
         if(!this->TryAsyncConnect(this->mSubRedisClient))
         {
             LOG_ERROR("start sub redis client error");
@@ -58,7 +55,6 @@ namespace Sentry
 
 	bool MainRedisComponent::StartSubChannel()
 	{
-        this->mSubRedisClient->EnableSubscribe();
 		if (!this->SubscribeChannel(this->mRpcAddress))
 		{
 			return false;
@@ -78,33 +74,35 @@ namespace Sentry
 				LOG_INFO(component->GetName() << " start listen event successful");
 			}
 		}
-		return true;
+        for(int index = 0; index < 100; index++)
+        {
+            this->mTaskComponent->Start([index, this]() {
+                ElapsedTimer timer;
+                for(int i = 0; i < 1; i++)
+                {
+                    this->Run("main", "SET", "test", index);
+                }
+                LOG_ERROR(index << " use time = " << timer.GetMs() << "ms");
+            });
+        }
+        //this->mTaskComponent->WhenAll(tasks);
+        return true;
 	}
 
 	long long MainRedisComponent::Publish(const std::string& channel, const std::string& message)
 	{
-        std::shared_ptr<RedisRequest> request = RedisRequest::Make("PUBLISH", channel, message);
-        std::shared_ptr<RedisTask> redisTask = request->MakeTask();
-        if(!this->AddRedisTask(redisTask))
-        {
-            return -1;
-        }
-        if(!this->TryAsyncConnect(this->mSubRedisClient))
-        {
-            LOG_ERROR("redis net work error publish error");
-            return -1;
-        }
-        this->mSubRedisClient->SendCommand(request);
-		return redisTask->Await()->GetNumber();
+        std::shared_ptr<RedisResponse> redisResponse = this->Run(
+                this->mSubRedisClient, "PUBLISH", channel, message);
+        return redisResponse->GetNumber();
 	}
 
 	bool MainRedisComponent::SubscribeChannel(const std::string& channel)
 	{
         std::shared_ptr<RedisResponse> redisResponse =
                 this->Run(this->mSubRedisClient, "SUBSCRIBE", channel);
-        if(redisResponse->GetArraySize() == 3 && redisResponse->Get(2)->IsLong())
+        if(redisResponse->GetArraySize() == 3 && redisResponse->Get(2)->IsNumber())
         {
-            if(((const RedisLong*)redisResponse->Get(2))->GetValue() > 0)
+            if(((const RedisNumber*)redisResponse->Get(2))->GetValue() > 0)
             {
                 LOG_INFO("sub " << channel << " successful");
                 return true;

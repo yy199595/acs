@@ -102,6 +102,8 @@ namespace Sentry
         int OnReceiveFirstLine(char type, const std::string & lineData);
 
     public:
+        template<typename T>
+        const T * Cast(size_t index);
 		const RedisAny * Get(size_t index);
         long long GetTaskId() const { return this->mTaskId; }
         size_t GetArraySize() { return this->mArray.size();}
@@ -122,6 +124,13 @@ namespace Sentry
         std::vector<RedisAny *> mArray;
         //std::vector<RedisAny *> mArray;
     };
+
+    template<typename T>
+    const T *RedisResponse::Cast(size_t index)
+    {
+        const RedisAny *any = this->Get(index);
+        return dynamic_cast<const T *>(any);
+    }
 
     class RedisTask : public IRpcTask<RedisResponse>
     {

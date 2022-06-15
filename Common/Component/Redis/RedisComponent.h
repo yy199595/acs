@@ -20,7 +20,6 @@ namespace Sentry
 		bool Call(const std::string & name,const std::string& fullName, Json::Writer & jsonWriter, std::shared_ptr<Json::Reader> response);
 	 public:
         SharedRedisClient GetClient(const std::string & name);
-		void PushClient(SharedRedisClient redisClientContext);
         void OnResponse(std::shared_ptr<RedisResponse> response);
         SharedRedisClient MakeRedisClient(const RedisConfig & config);
         SharedRedisClient MakeRedisClient(const std::string & name);
@@ -41,7 +40,8 @@ namespace Sentry
         virtual bool AddRedisTask(std::shared_ptr<IRpcTask<RedisResponse>> task) = 0;
         virtual void OnSubscribe(const std::string & channel, const std::string & message) = 0;
     private:
-		const RedisConfig * GetRedisConfig(const std::string & name);
+        void PushClient(SharedRedisClient redisClientContext);
+        const RedisConfig * GetRedisConfig(const std::string & name);
 		bool LoadLuaScript(SharedRedisClient redisClientContext, const std::string & path);
 	private:
 		int mTimerIndex = 0;

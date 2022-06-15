@@ -16,11 +16,6 @@ namespace Sentry
 	 public:
 		MainRedisComponent() = default;
 		~MainRedisComponent() final = default;
-	 protected:
-        bool OnStart() final;
-        bool LateAwake() final;                //初始化完成之后
-	 private:
-		bool LoadRedisConfig();
 	public:
 		bool Lock(const std::string & key, int timeout = 10);
 		bool UnLock(const std::string & key);
@@ -28,10 +23,11 @@ namespace Sentry
 		bool SubscribeChannel(const std::string& channel);
 		long long Publish(const std::string& channel, const std::string& message);
 	private:
+        bool OnStart() final;
+        bool LateAwake() final;
 		bool StartSubChannel();
 		void OnLockTimeout(const std::string & name, int timeout);
 		bool HandlerEvent(const std::string & channel, const std::string & message);
-
     private:
         void OnCommandReply(std::shared_ptr<RedisResponse> response) final;
         bool AddRedisTask(std::shared_ptr<IRpcTask<RedisResponse>> task) final;

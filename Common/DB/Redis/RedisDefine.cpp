@@ -217,7 +217,7 @@ namespace Sentry
             lineData.pop_back();
             this->mLineCount++;
             long long number = std::stoll(lineData);
-            this->mArray.emplace_back(new RedisLong(number));
+            this->mArray.emplace_back(new RedisNumber(number));
         }
         if(this->mLineCount < this->mDataCount)
         {
@@ -230,6 +230,7 @@ namespace Sentry
 		this->mArray.clear();
 		this->mType = RedisRespType::REDIS_NONE;
 	}
+
 	const RedisAny* RedisResponse::Get(size_t index)
 	{
 		if(index < this->mArray.size() || index >= 0)
@@ -309,9 +310,9 @@ namespace Sentry
                         const std::string & str = ((const RedisString*)redisAny)->GetValue();
                         lua_pushlstring(this->mLua, str.c_str(), str.size());
                     }
-                    else if(redisAny->IsLong())
+                    else if(redisAny->IsNumber())
                     {
-                        long long num = ((const RedisLong*)redisAny)->GetValue();
+                        long long num = ((const RedisNumber*)redisAny)->GetValue();
                         lua_pushinteger(this->mLua, num);
                     }
                     lua_seti(this->mLua, -2, index + 1);
