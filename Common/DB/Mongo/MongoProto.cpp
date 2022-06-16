@@ -26,9 +26,7 @@ namespace Mongo
 
 	int MongoRequest::Serailize(std::ostream& os)
 	{
-		int len = sizeof(MongoHead);
-		int bson = this->GetLength();
-		this->header.messageLength = bson;
+		this->header.messageLength = this->GetLength() + 4 + sizeof(MongoHead);
 		this->Write(os, this->header.messageLength);
 		this->Write(os, this->header.requestID);
 		this->Write(os, this->header.responseTo);
@@ -81,15 +79,6 @@ namespace Mongo
 
 	void MongoInsertRequest::OnWriter(std::ostream& os)
 	{
-		int total = this->document.get_serialized_size()
-			+ sizeof(this->header);
-		this->Write(os, total);
-		this->Write(os, 0);
-		this->Write(os, 0);
-		this->Write(os, OP_INSERT);
-		this->Write(os, 0);
-		this->Write(os, this->collectionName);
-
 		this->Write(os, this->zero);
 		this->Write(os, this->collectionName);
 		this->WriteBson(os, this->document);
@@ -97,8 +86,8 @@ namespace Mongo
 
 	int MongoInsertRequest::GetLength()
 	{
-		return sizeof(this->zero) + this->collectionName.size()
-			 + this->document.get_serialized_size();
+		return sizeof(this->zero) +
+			this->collectionName.size() + this->document.get_serialized_size();
 	}
 }
 

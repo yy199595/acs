@@ -33,7 +33,7 @@ namespace Sentry
 
 			std::shared_ptr<Mongo::MongoInsertRequest> insertRequest
 				= std::make_shared<Mongo::MongoInsertRequest>();
-			insertRequest->collectionName = "db.test";
+			insertRequest->collectionName = "test.user";
 			insertRequest->document.set("age", 20);
 			insertRequest->document.set("_id", 100);
 			insertRequest->document.set("name", "xiaoming");
