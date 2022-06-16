@@ -27,6 +27,7 @@ namespace Sentry
 		bool OnStart() final;
 		bool LateAwake() final;
 		bool StartSubChannel();
+        void OnSecondUpdate(const int tick) final;
 		void OnLockTimeout(const std::string& name, int timeout);
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 		bool HandlerEvent(const std::string& channel, const std::string& message);

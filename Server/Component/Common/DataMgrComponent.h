@@ -7,7 +7,7 @@
 #include"Component/Component.h"
 namespace Sentry
 {
-	class DataMgrComponent final : public Component, public ISecondUpdate
+	class DataMgrComponent final : public Component
 	{
 	 public:
 		XCode Set(long long key, const Message & message);
@@ -20,7 +20,6 @@ namespace Sentry
 		XCode Add(const std::string & key, const Message & message);
 	 protected:
 		bool LateAwake() final;
-		void OnSecondUpdate() final;
 	 private:
 		class MainRedisComponent * mRedisComponent;
 		class MysqlAgentComponent * mMysqlComponent;

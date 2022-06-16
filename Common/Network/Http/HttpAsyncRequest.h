@@ -150,7 +150,7 @@ namespace Sentry
     public:
         bool AddHead(const char * key, int value);
         bool AddHead(const char * key, const std::string & value);
-	 private:
+    private:
 		int Serailize(std::ostream &os) final;
 	 private:
 		size_t mCount;

@@ -214,7 +214,7 @@ namespace Sentry
 					if (clientContext->StartConnectAsync())
 					{
 						clientContext->SendToServer(request);
-						LOG_ERROR("connect [" << address << "] successful count = " << count++);
+						LOG_INFO("connect [" << address << "] successful count = " << count++);
 						return;
 					}
 					taskComponent->Sleep(3000);

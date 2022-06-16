@@ -28,14 +28,11 @@ namespace Sentry
         explicit ServerConfig(int argc, char ** argv);
     public:
         bool LoadConfig();
-        int GetNodeId() { return this->mNodeId; }
-		const std::string& GetNodeName() { return this->mNodeName; }
-		const ListenConfig * GetListen(const std::string & name) const;
-		const RedisConfig * GetRedisConfig(const std::string & name) const;
-		void GetRedisConfigs(std::vector<const RedisConfig *> & configs) const;
 		void GetListeners(std::vector<const ListenConfig *> & listeners) const;
 		bool GetListener(const std::string & name, std::string & address) const;
 	 public:
+        int GetNodeId() const { return this->mNodeId; }
+        const std::string& GetNodeName() const { return this->mNodeName; }
 		const std::string & GetContent() const { return this->mContent;}
 		bool GetPath(const std::string & name, std::string & path) const;
 		const std::string & GetExename() const { return this->mExePath;}
@@ -49,6 +46,5 @@ namespace Sentry
 		std::string mConfigPath;
 		std::unordered_map<std::string, std::string> mPaths;
 		std::unordered_map<std::string, ListenConfig *> mListens;
-		std::unordered_map<std::string, RedisConfig> mRedisConfigs;
     };
 }

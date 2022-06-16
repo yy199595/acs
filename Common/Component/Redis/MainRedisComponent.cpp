@@ -59,20 +59,30 @@ namespace Sentry
 				LOG_INFO(component->GetName() << " start listen event successful");
 			}
 		}
-//        for(int index = 0; index < 100; index++)
-//        {
-//            this->mTaskComponent->Start([index, this]() {
-//                ElapsedTimer timer;
-//                for(int i = 0; i < 1; i++)
-//                {
-//                    this->Run("main", "SET", "test", index);
-//                }
-//                LOG_ERROR(index << " use time = " << timer.GetMs() << "ms");
-//            });
-//        }
-        //this->mTaskComponent->WhenAll(tasks);
         return true;
 	}
+
+    void MainRedisComponent::OnSecondUpdate(const int tick)
+    {
+        if (tick % 10 == 0)
+        {
+            if (!this->mSubRedisClient->IsOpen())
+            {
+                this->mTaskComponent->Start([this]() {
+                    if (!this->TryAsyncConnect(this->mSubRedisClient))
+                    {
+                        LOG_ERROR("sub redis client connect error");
+                        return;
+                    }
+                    this->StartSubChannel();
+                });
+            }
+            else
+            {
+                this->mSubRedisClient->SendCommand(std::make_shared<RedisRequest>("PING"));
+            }
+        }
+    }
 
 	long long MainRedisComponent::Publish(const std::string& channel, const std::string& message)
 	{

@@ -61,6 +61,7 @@ namespace Sentry
 		long long mLogicRunCount;
 		long long mLastUpdateTime;
 	 private:
+        int mTickCount;
 		TaskComponent* mTaskComponent;
 		LoggerComponent* mLogComponent;
 		TimerComponent* mTimerComponent;

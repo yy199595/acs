@@ -1,6 +1,6 @@
 
 RedisComponent = {}
-local redisComponent = nil
+local redisComponent
 function RedisComponent.Awake()
     redisComponent = App.GetComponent("MainRedisComponent")
     return redisComponent ~= nil

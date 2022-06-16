@@ -37,7 +37,7 @@ namespace Sentry
 	class ISecondUpdate
 	{
 	 public:
-		virtual void OnSecondUpdate() = 0;
+		virtual void OnSecondUpdate(const int tick) = 0;
 	};
 
 	class ILastFrameUpdate

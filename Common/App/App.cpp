@@ -17,6 +17,7 @@ namespace Sentry
 			: Entity(0),
 			  mStartTime(Helper::Time::GetNowMilTime()), mConfig(config)
 	{
+        this->mTickCount = 0;
 		this->mLogicRunCount = 0;
 		this->mTimerComponent = nullptr;
 		StaticMethod * staticMethod = NewMethodProxy(&App::LogicMainLoop, this);
@@ -176,10 +177,11 @@ namespace Sentry
 
 			if (this->mStartTimer - this->mSecondTimer >= 1000)
 			{
+                this->mTickCount++;
 				this->UpdateConsoleTitle();
 				for (ISecondUpdate* component: this->mSecondUpdateManagers)
 				{
-					component->OnSecondUpdate();
+					component->OnSecondUpdate(this->mTickCount);
 				}
 				this->mSecondTimer = Helper::Time::GetNowMilTime();
 			}

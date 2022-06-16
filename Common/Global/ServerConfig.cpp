@@ -27,7 +27,6 @@ namespace Sentry
 		}
 
 		IF_THROW_ERROR(this->GetJsonValue("listener", "rpc"));
-		//IF_THROW_ERROR(this->GetJsonValue("listener", "http"));
 		IF_THROW_ERROR(this->GetMember("area_id", this->mNodeId));
 		IF_THROW_ERROR(this->GetMember("node_name", this->mNodeName));
 
@@ -66,38 +65,6 @@ namespace Sentry
 				this->mPaths.emplace(key, this->mWrokDir + value);
 			}
 		}
-
-		std::unordered_map<std::string, const rapidjson::Value*> redisConfigs;
-		IF_THROW_ERROR(this->GetMember("redis", redisConfigs));
-		for (auto iter = redisConfigs.begin(); iter != redisConfigs.end(); iter++)
-		{
-			const rapidjson::Value& jsonObject = *iter->second;
-			IF_THROW_ERROR(jsonObject.IsObject());
-
-			RedisConfig redisConfig;
-			redisConfig.Count = 3;
-			redisConfig.Name = iter->first;
-			redisConfig.Ip = jsonObject["ip"].GetString();
-			redisConfig.Port = jsonObject["port"].GetInt();
-			if (jsonObject.HasMember("count"))
-			{
-				redisConfig.Count = jsonObject["count"].GetInt();
-			}
-			if (jsonObject.HasMember("passwd"))
-			{
-				redisConfig.Password = jsonObject["passwd"].GetString();
-			}
-			if (jsonObject.HasMember("lua") && jsonObject["lua"].IsArray())
-			{
-				for (int index = 0; index < jsonObject["lua"].Size(); index++)
-				{
-					std::string lua = jsonObject["lua"][index].GetString();
-					redisConfig.LuaFiles.emplace_back(this->mWrokDir + lua);
-				}
-			}
-			redisConfig.Address = fmt::format("{0}:{1}", redisConfig.Ip, redisConfig.Port);
-			this->mRedisConfigs.emplace(iter->first, redisConfig);
-		}
 		return true;
 	}
 
@@ -122,26 +89,6 @@ namespace Sentry
 		return false;
 	}
 
-	const ListenConfig* ServerConfig::GetListen(const std::string& name) const
-	{
-		auto iter = this->mListens.find(name);
-		return iter != this->mListens.end() ? iter->second : nullptr;
-	}
-
-	const RedisConfig* ServerConfig::GetRedisConfig(const string& name) const
-	{
-		auto iter = this->mRedisConfigs.find(name);
-		return iter != this->mRedisConfigs.end() ? &iter->second : nullptr;
-	}
-
-	void ServerConfig::GetRedisConfigs(std::vector<const RedisConfig*>& configs) const
-	{
-		auto iter = this->mRedisConfigs.begin();
-		for(; iter != this->mRedisConfigs.end(); iter++)
-		{
-			configs.emplace_back(&iter->second);
-		}
-	}
 	bool ServerConfig::GetPath(const string& name, string& path) const
 	{
 		auto iter = this->mPaths.find(name);

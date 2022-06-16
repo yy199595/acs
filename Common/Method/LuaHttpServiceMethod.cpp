@@ -73,9 +73,18 @@ namespace Sentry
 		}
 		XCode code = luaTaskSource->Await();
 		if(code != XCode::Successful)
-		{
-			return code;
-		}
+        {
+            if (luaTaskSource->GetRef())
+            {
+                if (lua_isstring(this->mLua, -1))
+                {
+                    size_t size = 0;
+                    const char *err = lua_tolstring(this->mLua, -1, &size);
+                    response.AddHead("error", std::string(err, size));
+                }
+            }
+            return code;
+        }
 		if(luaTaskSource->GetRef())
 		{
 			if (lua_isstring(this->mLua, -1))

@@ -38,8 +38,8 @@ end
 function Main.Start()
     coroutine.sleep(1.5)
     local redisComponent = RedisComponent
-    redisComponent.Call("main", "lock.lock", {key = "yjz", time = 10})
-    redisComponent.Run("main", "SET", "yjz", { name="yjz", age = 10 })
+    Log.Error(redisComponent.Lock("yjz", 10))
+    Log.Error(redisComponent.Run("main", "SET", "yjz", { name="yjz", age = 10 }))
     local functions = Main.GetComponentFuncs("Start")
     for key, func in pairs(functions) do
         if not func() then

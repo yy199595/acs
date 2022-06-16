@@ -45,10 +45,4 @@ namespace Sentry
 
 		return XCode::Successful;
 	}
-
-	void DataMgrComponent::OnSecondUpdate()
-	{
-
-
-	}
 }

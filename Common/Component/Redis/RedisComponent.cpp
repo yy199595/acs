@@ -11,7 +11,6 @@ namespace Sentry
 {
 	bool RedisComponent::LateAwake()
 	{
-		this->mTimerIndex = 0;
 		const rapidjson::Value* jsonValue = this->GetApp()->GetConfig().GetJsonValue("redis");
 		if (jsonValue == nullptr || !jsonValue->IsObject())
 		{
@@ -111,40 +110,38 @@ namespace Sentry
 		return false;
 	}
 
-	void RedisComponent::OnSecondUpdate()
+	void RedisComponent::OnSecondUpdate(const int tick)
 	{
-		this->mTimerIndex++;
-		if (this->mTimerIndex >= 10)
-		{
-            this->mTimerIndex = 0;
-			long long nowMs = Helper::Time::GetNowMilTime();
-			auto iter = this->mRedisClients.begin();
-			for (; iter != this->mRedisClients.end(); iter++)
-			{
+        if(tick % 10 == 0)
+        {
+            long long nowMs = Helper::Time::GetNowMilTime();
+            auto iter = this->mRedisClients.begin();
+            for (; iter != this->mRedisClients.end(); iter++)
+            {
                 LOG_DEBUG(iter->first << " redis client count = " << iter->second.size());
-				for (auto iter1 = iter->second.begin(); iter1 != iter->second.end();)
-				{
+                for (auto iter1 = iter->second.begin(); iter1 != iter->second.end();)
+                {
                     SharedRedisClient redisClientContext = (*iter1);
-					const RedisConfig& config = redisClientContext->GetConfig();
-					if (nowMs - redisClientContext->GetLastOperTime() >= config.FreeClient)
-					{
-						iter->second.erase(iter1++);
-						continue;
-					}
-					iter1++;
-				}
-			}
-		}
+                    const RedisConfig& config = redisClientContext->GetConfig();
+                    if (nowMs - redisClientContext->GetLastOperTime() >= config.FreeClient)
+                    {
+                        iter->second.erase(iter1++);
+                        continue;
+                    }
+                    iter1++;
+                }
+            }
+        }
 	}
 
     SharedRedisClient RedisComponent::MakeRedisClient(const std::string &name)
     {
-        auto iter = this->mConfigs.find(name);
-        if(iter == this->mConfigs.end())
+        const RedisConfig * redisConfig = this->GetRedisConfig(name);
+        if(redisConfig == nullptr)
         {
             return nullptr;
         }
-        return this->MakeRedisClient(iter->second);
+        return this->MakeRedisClient(*redisConfig);
     }
 
     SharedRedisClient RedisComponent::MakeRedisClient(const RedisConfig & config)
@@ -289,35 +286,12 @@ namespace Sentry
 
 	void RedisComponent::OnResponse(std::shared_ptr<RedisResponse> response)
 	{
-//        switch(response->GetType())
-//        {
-//            case RedisRespType::REDIS_NUMBER:
-//            LOG_INFO("number = " << response->GetNumber());
-//                break;
-//            case RedisRespType::REDIS_STRING:
-//            case RedisRespType::REDIS_BIN_STRING:
-//            LOG_INFO("string = " << response->GetString());
-//                break;
-//            case RedisRespType::REDIS_ARRAY:
-//                std::stringstream ss;
-//                ss << "array size = " << response->GetArraySize() << "\r\n";
-//                for (size_t index = 0; index < response->GetArraySize(); index++)
-//                {
-//                    const RedisNumber * redisNumber = response->Cast<RedisNumber>(index);
-//                    const RedisString * redisString = response->Cast<RedisString>(index);
-//                    if(redisNumber != nullptr)
-//                    {
-//                        ss << "[" << index << "] [long] = " << redisNumber->GetValue() << "\r\n";
-//                    }
-//                    else if(redisString != nullptr)
-//                    {
-//                        ss << "[" << index << "] [string] = " << redisString->GetValue() << "\r\n";
-//                    }
-//                }
-//                LOG_INFO(ss.str());
-//                break;
-//        }
-		if(response->GetType() == RedisRespType::REDIS_ARRAY && response->GetArraySize() == 3)
+        if(response->GetTaskId() == 0 && response->GetType() == RedisRespType::REDIS_STRING)
+        {
+            LOG_INFO(response->GetString());
+            return;
+        }
+        if(response->GetType() == RedisRespType::REDIS_ARRAY && response->GetArraySize() == 3)
 		{
 			const RedisAny * redisAny1 = response->Get(0);
 			const RedisAny * redisAny2 = response->Get(1);

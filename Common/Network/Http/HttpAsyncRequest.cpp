@@ -56,8 +56,7 @@ namespace Sentry
 		this->mHeadMap.emplace(key, value);
 		return true;
 	}
-
-	int HttpAsyncRequest::Serailize(std::ostream& os)
+    int HttpAsyncRequest::Serailize(std::ostream& os)
 	{
 		os << this->mMethod << " " << this->mPath << " " << HttpVersion << "\r\n";
 		os << "Host:" << this->mHost << "\r\n";

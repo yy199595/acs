@@ -44,10 +44,10 @@ namespace Sentry
 		std::shared_ptr<LuaServiceTaskSource> luaServiceTaskSource =
 			Lua::UserDataParameter::Read<std::shared_ptr<LuaServiceTaskSource>>(lua, 1);
 		luaServiceTaskSource->mCode = (XCode)lua_tointeger(lua, 2);
-		if(luaServiceTaskSource->mCode == XCode::Successful && !lua_isnil(lua, 3))
-		{
-			luaServiceTaskSource->mRef = luaL_ref(lua, LUA_REGISTRYINDEX);
-		}
+        if(!lua_isnil(lua, 3))
+        {
+            luaServiceTaskSource->mRef = luaL_ref(lua, LUA_REGISTRYINDEX);
+        }
 		luaServiceTaskSource->mTaskSource.SetResult(luaServiceTaskSource->mCode);
 	}
 }

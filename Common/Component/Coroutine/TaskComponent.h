@@ -13,7 +13,7 @@
 namespace Sentry
 {
 	class TaskComponent final : public Component,
-						  public ISystemUpdate, public ILastFrameUpdate, public ISecondUpdate
+						  public ISystemUpdate, public ILastFrameUpdate
 	{
 	 public:
 		TaskComponent() = default;
@@ -56,8 +56,6 @@ namespace Sentry
 		void OnSystemUpdate() final;
 
 		void OnLastFrameUpdate() final;
-
-		void OnSecondUpdate() final;
 
 	 public:
 		void RunTask(tb_context_t context);

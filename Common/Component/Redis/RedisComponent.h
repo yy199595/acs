@@ -34,7 +34,7 @@ namespace Sentry
 	protected:
 		bool OnStart() override;
         bool LateAwake() override;
-        void OnSecondUpdate() override;
+        void OnSecondUpdate(const int tick) override;
 	 protected:
         virtual void OnCommandReply(std::shared_ptr<RedisResponse> response) = 0;
         virtual bool AddRedisTask(std::shared_ptr<IRpcTask<RedisResponse>> task) = 0;
@@ -44,7 +44,6 @@ namespace Sentry
         const RedisConfig * GetRedisConfig(const std::string & name);
 		bool LoadLuaScript(SharedRedisClient redisClientContext, const std::string & path);
 	private:
-		int mTimerIndex = 0;
 		TaskComponent * mTaskComponent;
 		std::unordered_map<std::string, RedisConfig> mConfigs;
 		std::unordered_map<std::string, std::string> mLuaMap;

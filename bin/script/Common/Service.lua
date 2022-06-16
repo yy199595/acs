@@ -3,7 +3,7 @@ function RpcCall(func, id, request, taskSource)
     local context = function(luaTaskSource)
         local state, error, response = pcall(func, id, request)
         if not state then
-            Log.Error(error)
+            Log.Error("rpc async call error =>[", error, "]")
             luaTaskSource:SetResult(XCode.CallLuaFunctionFail, error)
         else
             luaTaskSource:SetResult(error, response)
@@ -17,7 +17,7 @@ function HttpCall(func, request, taskSource)
     local context = function(luaTaskSource)
         local state, error = pcall(func, request)
         if not state then
-            Log.Error(error)
+            Log.Error("http async call error =>[", error, "]")
             luaTaskSource:SetResult(XCode.CallLuaFunctionFail, error)
         else
             luaTaskSource:SetResult(error, response)
