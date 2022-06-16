@@ -27,16 +27,14 @@ namespace Tcp
 		{
 			throw std::logic_error("%%%%%%%%%%%%%%%");
 		}
-		virtual bool OnRecvMessage(const asio::error_code & code, const char * message, size_t size)
-		{
-			throw std::logic_error("***********");
-		}
 		virtual void OnSendMessage(const asio::error_code & code, std::shared_ptr<ProtoMessage> message) = 0;
 	protected:
 		void Connect();
-		void ReceiveHead();
+		void ReceiveHead(int size);
 		void ReceiveBody(int size);
-		void Send(std::shared_ptr<ProtoMessage> message);
+        void Send(std::shared_ptr<ProtoMessage> message);
+        virtual void OnReceiveHead(const asio::error_code & code, const char * message, size_t size) {}
+        virtual void OnReceiveBody(const asio::error_code & code, const char * message, size_t size) {}
 	 protected:
 		IAsioThread& mNetworkThread;
 		std::shared_ptr<SocketProxy> mSocket;

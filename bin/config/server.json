@@ -98,7 +98,8 @@
     "service.rpc": [
         "GateService",
         "ChatService",
-        "MysqlService"
+        "MysqlService",
+        "MongoService"
     ],
     "service.http": [
         "AccountService",

@@ -25,7 +25,6 @@ namespace Sentry
 		bool OnStartService(ServiceMethodRegister & methodRegister) final;
 	 private:
 		std::string mAddress;
-		class GateComponent * mGateComponent;
 		class TimerComponent* mTimerComponent;
 		class UserSyncComponent * mSyncComponent;
 		class GateClientComponent* mGateClientComponent;

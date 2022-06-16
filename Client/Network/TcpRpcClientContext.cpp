@@ -48,34 +48,48 @@ namespace Client
 		this->mConnectTask->SetResult(true);
     }
 
-	bool TcpRpcClientContext::OnRecvMessage(const asio::error_code& code, const char* message, size_t size)
-	{
-		if(code)
-		{
+    void TcpRpcClientContext::OnReceiveHead(const asio::error_code &code, const char *message, size_t size)
+    {
+        if (code || message == nullptr || size == 0)
+        {
 #ifdef __DEBUG__
-			CONSOLE_LOG_ERROR(code.message());
+            CONSOLE_LOG_ERROR(code.message());
 #endif
-			return false;
-		}
-		size_t length = size - 1;
-		const char * str = message + 1;
-		switch((MESSAGE_TYPE)message[0])
-		{
-		case MESSAGE_TYPE::MSG_RPC_CALL_CLIENT:
-			return this->OnRequest(str, length);
-		case MESSAGE_TYPE::MSG_RPC_RESPONSE:
-			return this->OnResponse(str, length);
-		}
-		CONSOLE_LOG_FATAL("unknow message type");
-		return false;
-	}
+            return;
+        }
+    }
+
+	void TcpRpcClientContext::OnReceiveBody(const asio::error_code &code, const char *message, size_t size)
+    {
+        if (code || message == nullptr || size == 0)
+        {
+#ifdef __DEBUG__
+            CONSOLE_LOG_ERROR(code.message());
+#endif
+            return;
+        }
+        size_t length = size - 1;
+        const char *str = message + 1;
+        switch ((MESSAGE_TYPE) message[0])
+        {
+            case MESSAGE_TYPE::MSG_RPC_CALL_CLIENT:
+                this->ReceiveHead(sizeof(int));
+                this->OnRequest(str, length);
+                break;
+            case MESSAGE_TYPE::MSG_RPC_RESPONSE:
+                this->ReceiveHead(sizeof(int));
+                this->OnResponse(str, length);
+                break;
+        }
+        CONSOLE_LOG_FATAL("unknow message type");
+    }
 
 	void TcpRpcClientContext::StartReceive()
 	{
 #ifdef ONLY_MAIN_THREAD
-		this->ReceiveHead();
+		this->ReceiveHead(sizeof(int));
 #else
-		this->mNetworkThread.Invoke(&TcpRpcClientContext::ReceiveHead, this);
+		this->mNetworkThread.Invoke(&TcpRpcClientContext::ReceiveHead, this, sizeof(int));
 #endif
 	}
 

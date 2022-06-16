@@ -70,25 +70,40 @@ namespace Sentry
 #endif
 	}
 
-	bool ServerClientContext::OnRecvMessage(const asio::error_code& code, const char* message, size_t size)
-	{
-		if (code || message == nullptr || size == 0)
-		{
+    void ServerClientContext::OnReceiveHead(const asio::error_code &code, const char *message, size_t size)
+    {
+        if(code || message == nullptr || size == 0)
+        {
+            this->CloseSocket(XCode::NetWorkError);
+            return;
+        }
+        size_t lenght = 0;
+        memcpy(&lenght, message, size);
+        this->ReceiveBody(lenght);
+    }
+
+    void ServerClientContext::OnReceiveBody(const asio::error_code &code, const char *message, size_t size)
+    {
+        if (code || message == nullptr || size == 0)
+        {
 #ifdef __NET_ERROR_LOG__
-			CONSOLE_LOG_ERROR(code.message());
+            CONSOLE_LOG_ERROR(code.message());
 #endif
-			this->CloseSocket(XCode::NetWorkError);
-			return false;
-		}
-		switch ((MESSAGE_TYPE)message[0])
-		{
-		case MESSAGE_TYPE::MSG_RPC_REQUEST:
-			return this->OnRequest(message + 1, size - 1);
-		case MESSAGE_TYPE::MSG_RPC_RESPONSE:
-			return this->OnResponse(message + 1, size - 1);
-		}
-		return false;
-	}
+            this->CloseSocket(XCode::NetWorkError);
+            return;
+        }
+        switch ((MESSAGE_TYPE)message[0])
+        {
+            case MESSAGE_TYPE::MSG_RPC_REQUEST:
+                this->ReceiveHead(sizeof(int));
+                this->OnRequest(message + 1, size - 1);
+                break;
+            case MESSAGE_TYPE::MSG_RPC_RESPONSE:
+                this->ReceiveHead(sizeof(int));
+                this->OnResponse(message + 1, size - 1);
+                break;
+        }
+    }
 
 	bool ServerClientContext::OnRequest(const char* buffer, size_t size)
 	{
@@ -148,10 +163,11 @@ namespace Sentry
 
 	void ServerClientContext::StartReceive()
 	{
+        size_t size = sizeof(int);
 #ifdef ONLY_MAIN_THREAD
-		this->ReceiveHead();
+		this->ReceiveHead(size);
 #else
-		this->mNetworkThread.Invoke(&ServerClientContext::ReceiveHead, this);
+		this->mNetworkThread.Invoke(&ServerClientContext::ReceiveHead, this, size);
 #endif
 	}
 
@@ -167,7 +183,7 @@ namespace Sentry
 #endif
 			code = XCode::Failure;
 		}
-		this->ReceiveHead();
+		this->ReceiveHead(sizeof(int));
 		this->mConnectTask->SetResult(code);
 	}
 }

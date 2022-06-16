@@ -39,9 +39,6 @@ namespace Sentry
 			insertRequest->document.set("name", "xiaoming");
 			mongoClientContext->SendMongoCommand(insertRequest);
 
-			std::shared_ptr<Mongo::MongoLateError> lateError
-				= std::make_shared<Mongo::MongoLateError>();
-			mongoClientContext->SendMongoCommand(lateError);
 		}
 		return true;
 	}

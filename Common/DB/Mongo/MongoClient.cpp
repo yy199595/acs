@@ -24,17 +24,22 @@ namespace Mongo
 			this->mConnectTask.SetResult(false);
 			return;
 		}
-		this->ReceiveHead();
 		this->mConnectTask.SetResult(true);
 	}
 
-	bool MongoClientContext::OnRecvMessage(const asio::error_code& code, const char* message, size_t size)
-	{
+    void MongoClientContext::OnReceiveHead(const asio::error_code &code, const char *message, size_t size)
+    {
 #ifdef __NET_ERROR_LOG__
-		CONSOLE_LOG_ERROR(code.message());
+        CONSOLE_LOG_ERROR(code.message());
 #endif
-		return true;
-	}
+    }
+
+    void MongoClientContext::OnReceiveBody(const asio::error_code &code, const char *message, size_t size)
+    {
+#ifdef __NET_ERROR_LOG__
+        CONSOLE_LOG_ERROR(code.message());
+#endif
+    }
 
 	void MongoClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{
@@ -46,7 +51,8 @@ namespace Mongo
 			this->mWriteTask.SetResult(false);
 			return;
 		}
-		this->mWriteTask.SetResult(true);
+        this->ReceiveHead(sizeof(MongoHead));
+        this->mWriteTask.SetResult(true);
 	}
 
 	bool MongoClientContext::StartConnect()
@@ -80,11 +86,6 @@ namespace Mongo
 			return;
 		}
 		LOG_DEBUG("send mongo command successful");
-#ifdef ONLY_MAIN_THREAD
-		//this->ReceiveHead();
-#else
-		this->mNetworkThread.Invoke(&MongoClientContext::ReceiveHead, this);
-#endif
 	}
 
 }

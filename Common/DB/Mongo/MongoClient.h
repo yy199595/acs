@@ -24,10 +24,12 @@ namespace Mongo
 		void SendMongoCommand(std::shared_ptr<Tcp::ProtoMessage> request);
 	 protected:
 		void OnConnect(const asio::error_code &error) final;
-		bool OnRecvMessage(const asio::error_code &code, const char *message, size_t size) final;
+        void OnReceiveHead(const asio::error_code &code, const char *message, size_t size) final;
+        void OnReceiveBody(const asio::error_code &code, const char *message, size_t size) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	private:
-		TaskSource<bool> mWriteTask;
+        asio::streambuf streamBuffer;
+        TaskSource<bool> mWriteTask;
 		TaskSource<bool> mConnectTask;
 		std::shared_ptr<CoroutineLock> mWriteLock;
 		std::shared_ptr<CoroutineLock> mConnectLock;

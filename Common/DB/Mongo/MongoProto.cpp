@@ -124,3 +124,16 @@ namespace Mongo
 		this->WriteBson(os, this->document);
 	}
 }
+
+namespace Mongo
+{
+    int MongoReplyRequest::GetLength()
+    {
+
+    }
+
+    void MongoReplyRequest::OnWriter(std::ostream &os)
+    {
+
+    }
+}

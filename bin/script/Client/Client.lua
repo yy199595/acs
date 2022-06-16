@@ -45,17 +45,17 @@ function Client.Start()
     clientComponent:Call("GateService.Auth", authMessage)
 
 
-    while true do
-
-        local testtMessage = messageComponent:New("lua.Test",{
-            address = "127.0.0.1:7799",  service =
-            {
-                "LoginComponent",
-                "RegisterComponent"
-            }
-        })
-
-        local code, res = clientComponent:Call("ChatService.Test", testtMessage)
-        Log.Error("code = ", code, Json.Encode(res))
-    end
+    --while true do
+    --
+    --    local testtMessage = messageComponent:New("lua.Test",{
+    --        address = "127.0.0.1:7799",  service =
+    --        {
+    --            "LoginComponent",
+    --            "RegisterComponent"
+    --        }
+    --    })
+    --
+    --    local code, res = clientComponent:Call("ChatService.Test", testtMessage)
+    --    Log.Error("code = ", code, Json.Encode(res))
+    --end
 end

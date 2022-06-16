@@ -90,6 +90,16 @@ namespace Mongo
 		int numberToReturn;
 		minibson::document document;
 	};
+
+    class MongoReplyRequest : public MongoRequest
+    {
+    public:
+        MongoReplyRequest() = default;
+
+    protected:
+        int GetLength() final;
+        void OnWriter(std::ostream &os) final;
+    };
 }
 
 

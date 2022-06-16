@@ -60,6 +60,10 @@ function Main.Complete()
     end
 end
 
+function Main.Hotfix()
+
+end
+
 function Main.AllServiceStart()
     local functions = Main.GetComponentFuncs("AllServiceStart")
     for key, func in pairs(functions) do

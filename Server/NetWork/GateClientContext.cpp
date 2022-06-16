@@ -26,13 +26,28 @@ namespace Sentry
 	void GateClientContext::StartReceive()
 	{
 #ifdef ONLY_MAIN_THREAD
-		this->ReceiveHead();
+		this->ReceiveHead(sizeof(int));
 #else
-		this->mNetworkThread.Invoke(&GateClientContext::ReceiveHead, this);
+		this->mNetworkThread.Invoke(&GateClientContext::ReceiveHead, this, sizeof(int));
 #endif
 	}
 
-	bool GateClientContext::OnRecvMessage(const asio::error_code& code, const char* message, size_t size)
+    void GateClientContext::OnReceiveHead(const asio::error_code &code, const char *message, size_t size)
+    {
+        if(code)
+        {
+#ifdef __NET_ERROR_LOG__
+            CONSOLE_LOG_ERROR(code.message());
+#endif
+            this->CloseSocket(XCode::NetReceiveFailure);
+            return;
+        }
+        size_t lenght = 0;
+        memcpy(&lenght, message, size);
+        this->ReceiveBody(lenght);
+    }
+
+	void GateClientContext::OnReceiveBody(const asio::error_code &code, const char *message, size_t size)
 	{
 		if(code)
 		{
@@ -40,7 +55,7 @@ namespace Sentry
 			CONSOLE_LOG_ERROR(code.message());
 #endif
 			this->CloseSocket(XCode::NetReceiveFailure);
-			return false;
+			return;
 		}
 
 		if((MESSAGE_TYPE)message[0] == MESSAGE_TYPE::MSG_RPC_CLIENT_REQUEST)
@@ -48,7 +63,7 @@ namespace Sentry
 			std::shared_ptr<c2s::Rpc_Request> request(new c2s::Rpc_Request());
 			if (!request->ParseFromArray(message + 1, (int)size - 1))
 			{
-				return false;
+				return;
 			}
 			this->mCallCount++;
 			this->mQps += size;
@@ -59,11 +74,10 @@ namespace Sentry
 			MainTaskScheduler &mainTaskScheduler = App::Get()->GetTaskScheduler();
 			mainTaskScheduler.Invoke(&GateClientComponent::OnRequest, this->mGateComponent, request);
 #endif
-
-			return true;
+            this->ReceiveHead(sizeof(int));
+            return;
 		}
 		LOG_FATAL("client unknow message");
-		return false;
 	}
 
 	void GateClientContext::CloseSocket(XCode code)

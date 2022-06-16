@@ -18,14 +18,14 @@ namespace Sentry
 
 	bool GateService::OnStartService(ServiceMethodRegister& methodRegister)
 	{
-		methodRegister.BindAddress("Ping", &GateService::Ping);
+        LOG_CHECK_RET_FALSE(this->GetComponent<GateComponent>());
+        methodRegister.BindAddress("Ping", &GateService::Ping);
 		methodRegister.BindAddress("Auth", &GateService::Auth);
         methodRegister.Bind("AllotUser", &GateService::AllotUser);
         methodRegister.Bind("BroadCast", &GateService::BroadCast);
 		methodRegister.Bind("CallClient", &GateService::CallClient);
 		methodRegister.Bind("SaveAddress", &GateService::SaveAddress);
 		methodRegister.Bind("QueryAddress", &GateService::QueryAddress);
-		LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<GateComponent>());
 		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
 		return true;
 	}
@@ -63,20 +63,29 @@ namespace Sentry
 	}
 
 	XCode GateService::AllotUser(const com::Type::Int64 &request, s2s::Allot::Response &response)
-	{
-		std::string address;
+    {
+        std::string address;
         long long userId = request.value();
-		if (this->GetConfig().GetListener("gate", address))
-		{
-			response.set_address(address);
+        if (this->GetConfig().GetListener("gate", address))
+        {
             std::string str = std::to_string(userId);
             str.append(std::to_string(Helper::Time::GetNowSecTime()));
-            response.set_token(Helper::Md5::GetMd5(str));
+            const std::string token = Helper::Md5::GetMd5(str);
+
+            response.set_token(token);
+            response.set_address(address);
             this->mUserTokens.emplace(response.token(), userId);
-			return XCode::Successful;
-		}
-		return XCode::Failure;
-	}
+            this->mTimerComponent->DelayCall(15, [this, token]() {
+                auto iter = this->mUserTokens.find(token);
+                if (iter != this->mUserTokens.end())
+                {
+                    this->mUserTokens.erase(iter);
+                }
+            });
+            return XCode::Successful;
+        }
+        return XCode::Failure;
+    }
 
 	XCode GateService::QueryAddress(long long userId, const com::Type::String& request, com::Type::String& response)
 	{

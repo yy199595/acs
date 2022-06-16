@@ -48,29 +48,22 @@ namespace Tcp
 		this->mLastOperTime = Helper::Time::GetNowSecTime();
 	}
 
-	void TcpContext::ReceiveHead()
+	void TcpContext::ReceiveHead(int length)
 	{
 		assert(this->mRecvBuffer);
 		this->mLastOperTime = Helper::Time::GetNowSecTime();
 		AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
 		std::shared_ptr<TcpContext> self = this->shared_from_this();
-		tcpSocket.async_read_some(asio::buffer(this->mRecvBuffer, sizeof(int)),
+		tcpSocket.async_read_some(asio::buffer(this->mRecvBuffer, length),
 			[this, self](const asio::error_code & code, size_t size)
 			{
 				//assert(size > 0);
 				if(code || size == 0)
 				{
-					this->OnRecvMessage(code, nullptr, 0);
+					this->OnReceiveHead(code, nullptr, 0);
 					return;
 				}
-				int lenght = 0;
-				memcpy(&lenght, this->mRecvBuffer, sizeof(int));
-				if(lenght <= 0)
-				{
-					this->OnRecvMessage(std::make_error_code(std::errc::no_message), nullptr, 0);
-					return;
-				}
-				this->ReceiveBody(lenght);
+                this->OnReceiveHead(code, this->mRecvBuffer, size);
 			});
 	}
 
@@ -79,7 +72,7 @@ namespace Tcp
 		if(length >= this->mBufferMaxCount)
 		{
 			asio::error_code code = std::make_error_code(std::errc::bad_message);
-			this->OnRecvMessage(code, nullptr, 0);
+			this->OnReceiveBody(code, nullptr, 0);
 			return;
 		}
 		char * bufer = this->mRecvBuffer;
@@ -92,10 +85,7 @@ namespace Tcp
 		tcpSocket.async_read_some(asio::buffer(bufer, length),
 			[this, bufer, self](const asio::error_code & code, size_t size)
 			{
-				if(this->OnRecvMessage(code, bufer, size))
-				{
-					this->mNetworkThread.post(std::bind(&TcpContext::ReceiveHead, this));
-				}
+                this->OnReceiveBody(code, bufer, size);
 				if(bufer != this->mRecvBuffer)
 				{
 					delete [] bufer;
