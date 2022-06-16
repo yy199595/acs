@@ -68,14 +68,13 @@ namespace Sentry
 		class MysqlQueryCommandTask : public MysqlCommandTask
 		{
 		public:
-			MysqlQueryCommandTask(const s2s::Mysql::Query& request, s2s::Mysql::Response & response, Message & message)
-				: mRequest(request), mResponse(response), mTempMessage(message) { }
+			MysqlQueryCommandTask(const s2s::Mysql::Query& request, s2s::Mysql::Response & response)
+				: mRequest(request), mResponse(response) {}
 		private:
 			bool Init() final;
 			XCode OnInvoke() final;
-			bool WriteValue(MYSQL_FIELD *field, const char *data, long size);
+			bool WriteValue(Json::Writer & jsonWriter, MYSQL_FIELD *field, const char *data, long size);
 		private:
-			Message & mTempMessage;
 			s2s::Mysql::Response & mResponse;
 			const s2s::Mysql::Query & mRequest;
 		};

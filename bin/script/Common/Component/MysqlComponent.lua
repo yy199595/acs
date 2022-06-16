@@ -1,10 +1,11 @@
 MysqlComponent = {}
-local mysqlService
-local messageComponent
+
+local self
+local message
 function MysqlComponent.Awake()
-    mysqlService = App.GetComponent("MysqlService")
-    messageComponent = App.GetComponent("MessageComponent")
-    return mysqlService and messageComponent
+    self = App.GetComponent("MysqlService")
+    message = App.GetComponent("MessageComponent")
+    return self ~= nil and message ~= nil
 end
 
 function MysqlComponent.Start()
@@ -15,19 +16,20 @@ end
 function MysqlComponent.Add(tabName, data, flag)
     assert(type(data) == "table")
     assert(type(tabName) == "string")
-    local address = mysqlService:GetAddress()
-    print("*******", address, Json.Encode(data))
-    return mysqlService:Call(address, "Add",  {
+
+    local address = self:GetAddress()
+    return self:Call(address, "Add",  {
         table = tabName,
         flag = flag or 0,
-        data = messageComponent:New(tabName, data)
+        data = message:New(tabName, data)
     })
 end
 
 function MysqlComponent.Delete(tabName, where, flag)
     assert(type(where) == "table")
     assert(type(tabName) == "string")
-    local address = mysqlService:GetAddress()
+
+    local address = self:GetAddress()
     return mysqlService:Call(address, "Delete", {
         table = tabName,
         flag = flag or 0,
@@ -38,8 +40,9 @@ end
 function MysqlComponent.QueryOnce(tabName, where, flag)
     assert(type(where) == "table")
     assert(type(tabName) == "string")
-    local address = mysqlService:GetAddress()
-    local code, response = mysqlService:Call(address, "Query", {
+
+    local address = self:GetAddress()
+    local code, response = self:Call(address, "Query", {
         table = tabName,
         flag = flag or 0,
         where_json = Json.Encode(where)
@@ -47,14 +50,16 @@ function MysqlComponent.QueryOnce(tabName, where, flag)
     if code ~= XCode.Successful then
         return nil
     end
-    return Json.Decode(response.json_array[1])
+    return Json.Decode(response.jsons[1])
 end
 
-function MysqlComponent.QueryOnce(tabName, where, flag)
+function MysqlComponent.QueryAll(tabName, where, flag)
     assert(type(where) == "table")
     assert(type(tabName) == "string")
-    local address = mysqlService:GetAddress()
-    local code, response = mysqlService:Call(address, "Query", {
+
+    local address = self:GetAddress()
+    print(tabName, where, address)
+    local code, response = self:Call(address, "Query", {
         table = tabName,
         flag = flag or 0,
         where_json = Json.Encode(where)
@@ -63,7 +68,7 @@ function MysqlComponent.QueryOnce(tabName, where, flag)
         return nil
     end
     local res = { }
-    for _, json in ipairs(response.json_array) do
+    for _, json in ipairs(response.jsons) do
         table.insert(res, Json.Decode(json))
     end
     return res
@@ -73,8 +78,9 @@ function MysqlComponent.Update(tabName, where, update, flag)
     assert(type(where) == "table")
     assert(type(update) == "table")
     assert(type(tabName) == "string")
-    local address = mysqlService:GetAddress()
-    return mysqlService:Call(address, "Update", {
+
+    local address = self:GetAddress()
+    return self:Call(address, "Update", {
         table = tabName,
         flag = flag or 0,
         where_json = Json.Encode(where),

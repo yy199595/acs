@@ -228,6 +228,20 @@ class account_user_info :
   ::std::string* release_token();
   void set_allocated_token(::std::string* token);
 
+  // string last_login_ip = 10;
+  void clear_last_login_ip();
+  static const int kLastLoginIpFieldNumber = 10;
+  const ::std::string& last_login_ip() const;
+  void set_last_login_ip(const ::std::string& value);
+  #if LANG_CXX11
+  void set_last_login_ip(::std::string&& value);
+  #endif
+  void set_last_login_ip(const char* value);
+  void set_last_login_ip(const char* value, size_t size);
+  ::std::string* mutable_last_login_ip();
+  ::std::string* release_last_login_ip();
+  void set_allocated_last_login_ip(::std::string* last_login_ip);
+
   // int64 user_id = 2;
   void clear_user_id();
   static const int kUserIdFieldNumber = 2;
@@ -262,6 +276,7 @@ class account_user_info :
   ::google::protobuf::internal::ArenaStringPtr platform_;
   ::google::protobuf::internal::ArenaStringPtr device_mac_;
   ::google::protobuf::internal::ArenaStringPtr token_;
+  ::google::protobuf::internal::ArenaStringPtr last_login_ip_;
   ::google::protobuf::int64 user_id_;
   ::google::protobuf::int64 phone_num_;
   ::google::protobuf::int64 register_time_;
@@ -706,6 +721,59 @@ inline void account_user_info::set_allocated_token(::std::string* token) {
   }
   token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
   // @@protoc_insertion_point(field_set_allocated:account.user_info.token)
+}
+
+// string last_login_ip = 10;
+inline void account_user_info::clear_last_login_ip() {
+  last_login_ip_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& account_user_info::last_login_ip() const {
+  // @@protoc_insertion_point(field_get:account.user_info.last_login_ip)
+  return last_login_ip_.GetNoArena();
+}
+inline void account_user_info::set_last_login_ip(const ::std::string& value) {
+  
+  last_login_ip_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:account.user_info.last_login_ip)
+}
+#if LANG_CXX11
+inline void account_user_info::set_last_login_ip(::std::string&& value) {
+  
+  last_login_ip_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:account.user_info.last_login_ip)
+}
+#endif
+inline void account_user_info::set_last_login_ip(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  last_login_ip_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:account.user_info.last_login_ip)
+}
+inline void account_user_info::set_last_login_ip(const char* value, size_t size) {
+  
+  last_login_ip_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:account.user_info.last_login_ip)
+}
+inline ::std::string* account_user_info::mutable_last_login_ip() {
+  
+  // @@protoc_insertion_point(field_mutable:account.user_info.last_login_ip)
+  return last_login_ip_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* account_user_info::release_last_login_ip() {
+  // @@protoc_insertion_point(field_release:account.user_info.last_login_ip)
+  
+  return last_login_ip_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void account_user_info::set_allocated_last_login_ip(::std::string* last_login_ip) {
+  if (last_login_ip != nullptr) {
+    
+  } else {
+    
+  }
+  last_login_ip_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), last_login_ip);
+  // @@protoc_insertion_point(field_set_allocated:account.user_info.last_login_ip)
 }
 
 // -------------------------------------------------------------------

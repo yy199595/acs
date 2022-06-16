@@ -13,5 +13,6 @@ message account
         int64 register_time = 7;    //注册事件
         int64 last_login_time = 8;   //上次登录时间
         string token = 9;   //登陆令牌
+        string last_login_ip = 10; //上次登陆ip
     }
 }

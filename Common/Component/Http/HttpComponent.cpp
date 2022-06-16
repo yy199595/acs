@@ -101,7 +101,7 @@ namespace Sentry
 		if(!httpConfig->IsAsync)
 		{
 			XCode code = httpService->Invoke(httpConfig->Method, request, response);
-
+            LOG_INFO("sync call http service " << httpConfig->Service << "." << httpConfig->Method << " code = [" << (int)code << "]");
             response->AddHead("code", (int)code);
 			httpClient->StartWriter();
             return;
@@ -109,7 +109,7 @@ namespace Sentry
 		this->mTaskComponent->Start([httpService, httpClient, httpConfig, request, response]()
 		{
 			XCode code = httpService->Invoke(httpConfig->Method, request, response);
-
+            LOG_INFO("async call http service " << httpConfig->Service << "." << httpConfig->Method << " code = [" << (int)code << "]");
             response->AddHead("code", (int)code);
 			httpClient->StartWriter();
 		});

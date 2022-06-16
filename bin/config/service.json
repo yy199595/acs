@@ -60,11 +60,12 @@
             "Type": "Client",
             "CallWay": "Net"
         },
-        "QueryListener": {
+        "AllotUser": {
             "Async": false,
             "Type": "Server",
             "CallWay": "Net",
-            "Response": "com.Type.String"
+            "Request": "com.Type.Int64",
+            "Response": "s2s.Allot.Response"
         },
         "CallClient": {
             "Async": false,

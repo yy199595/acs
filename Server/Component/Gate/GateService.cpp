@@ -20,11 +20,11 @@ namespace Sentry
 	{
 		methodRegister.BindAddress("Ping", &GateService::Ping);
 		methodRegister.BindAddress("Auth", &GateService::Auth);
-		methodRegister.Bind("BroadCast", &GateService::BroadCast);
+        methodRegister.Bind("AllotUser", &GateService::AllotUser);
+        methodRegister.Bind("BroadCast", &GateService::BroadCast);
 		methodRegister.Bind("CallClient", &GateService::CallClient);
 		methodRegister.Bind("SaveAddress", &GateService::SaveAddress);
 		methodRegister.Bind("QueryAddress", &GateService::QueryAddress);
-		methodRegister.Bind("QueryListener", &GateService::QueryListener);
 		LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<GateComponent>());
 		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
 		return true;
@@ -62,12 +62,17 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode GateService::QueryListener(com::Type::String& response)
+	XCode GateService::AllotUser(const com::Type::Int64 &request, s2s::Allot::Response &response)
 	{
 		std::string address;
+        long long userId = request.value();
 		if (this->GetConfig().GetListener("gate", address))
 		{
-			response.set_str(address);
+			response.set_address(address);
+            std::string str = std::to_string(userId);
+            str.append(std::to_string(Helper::Time::GetNowSecTime()));
+            response.set_token(Helper::Md5::GetMd5(str));
+            this->mUserTokens.emplace(response.token(), userId);
 			return XCode::Successful;
 		}
 		return XCode::Failure;
@@ -106,17 +111,17 @@ namespace Sentry
 	}
 
 	XCode GateService::Auth(const std::string & address, const c2s::GateAuth::Request & request)
-	{
-		Json::Writer jsonWriter1;
-		jsonWriter1.AddMember("token", request.token());
-		long long userId = this->mSyncComponent->GetUserId(request.token());
-		if (userId != 0)
-		{
-			this->mSyncComponent->SetUserState(userId, 1);
-			this->mGateClientComponent->AddNewUser(address, userId);
-			this->mSyncComponent->SetAddress(userId, this->GetName(), this->mAddress, true);
-			return XCode::Successful;
-		}
-		return XCode::Failure;
-	}
+    {
+        auto iter = this->mUserTokens.find(request.token());
+        if (iter == this->mUserTokens.end())
+        {
+            return XCode::Failure;
+        }
+        long long userId = iter->second;
+        this->mUserTokens.erase(iter);
+        this->mSyncComponent->SetUserState(userId, 1);
+        this->mGateClientComponent->AddNewUser(address, userId);
+        this->mSyncComponent->SetAddress(userId, this->GetName(), this->mAddress, true);
+        return XCode::Successful;
+    }
 }

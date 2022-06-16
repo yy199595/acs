@@ -9,7 +9,7 @@ namespace Sentry
 {
     RedisClientContext::RedisClientContext(std::shared_ptr<SocketProxy> socket,
 		const RedisConfig &config, RedisComponent * component)
-            : Tcp::TcpContext(socket), mConfig(config), mRedisComponent(component), mIsEnableSub(false)
+            : Tcp::TcpContext(socket), mConfig(config), mRedisComponent(component)
     {
         this->mSocket = socket;
         this->mConnectLock = std::make_shared<CoroutineLock>();
@@ -58,6 +58,15 @@ namespace Sentry
 #endif
     }
 
+    void RedisClientContext::StartReceiveMessage()
+    {
+#ifdef ONLY_MAIN_THREAD
+        this->StartReceive();
+#else
+        this->mNetworkThread.Invoke(&RedisClientContext::StartReceive, this);
+#endif
+    }
+
     void RedisClientContext::AddCommandQueue(std::shared_ptr<RedisRequest> command)
     {
         if (this->mCommands.empty())
@@ -76,51 +85,41 @@ namespace Sentry
                          asio::transfer_at_least(1), std::move(cb));
     }
 
-    void RedisClientContext::EnableSubscribe()
-    {
-        this->mIsEnableSub = true;
-#ifdef ONLY_MAIN_THREAD
-        this->StartReceive();
-#else
-        this->mNetworkThread.Invoke(&RedisClientContext::StartReceive, this);
-#endif
-    }
-
     void RedisClientContext::OnReceive(const asio::error_code &code, size_t size)
     {
-        if(this->mCurResponse == nullptr)
+        if (this->mCurResponse == nullptr)
         {
             long long taskId = 0;
-            if(!this->mCommands.empty())
+            if (!this->mCommands.empty())
             {
                 taskId = this->mCommands.front()->GetTaskId();
             }
             this->mCurResponse = std::make_shared<RedisResponse>(taskId);
         }
-        if (!this->mCurResponse->OnReceive(code, this->mRecvDataBuffer))
+        if (code)
         {
-            this->StartReceive();
+            CONSOLE_LOG_ERROR(code.message());
+        }
+        if (this->mCurResponse->OnReceive(code, this->mRecvDataBuffer))
+        {
+            std::shared_ptr<RedisResponse> response = std::move(this->mCurResponse);
+#ifdef ONLY_MAIN_THREAD
+            this->mRedisComponent->OnResponse(response);
+#else
+            SharedRedisClient redisClient = dynamic_pointer_cast<RedisClientContext>(this->shared_from_this());
+            this->mNetworkThread.Invoke(&RedisComponent::OnResponse, this->mRedisComponent, redisClient, response);
+#endif
+            if (!this->mCommands.empty())
+            {
+                this->mCommands.pop();
+                if (!this->mCommands.empty())
+                {
+                    this->Send(this->mCommands.front());
+                }
+            }
             return;
         }
-        std::shared_ptr<RedisResponse> response = std::move(this->mCurResponse);
-#ifdef ONLY_MAIN_THREAD
-        this->mRedisComponent->OnResponse(response);
-#else
-        this->mNetworkThread.Invoke(&RedisComponent::OnResponse, this->mRedisComponent,  response);
-#endif
-        if (!this->mCommands.empty())
-        {
-            this->mCommands.pop();
-            if(!this->mCommands.empty())
-            {
-                this->Send(this->mCommands.front());
-            }
-        }
-
-        if(this->mIsEnableSub)
-        {
-            this->StartReceive();
-        }
+        this->StartReceive();
     }
 
     void RedisClientContext::OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message)
@@ -132,9 +131,6 @@ namespace Sentry
 #endif
             return;
         }
-        if(!this->mIsEnableSub)
-        {
-            this->StartReceive();
-        }
+        this->StartReceive();
     }
 }

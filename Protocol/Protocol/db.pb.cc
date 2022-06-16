@@ -76,6 +76,7 @@ const ::google::protobuf::uint32 TableStruct_db_2eproto::offsets[] PROTOBUF_SECT
   PROTOBUF_FIELD_OFFSET(::account_user_info, register_time_),
   PROTOBUF_FIELD_OFFSET(::account_user_info, last_login_time_),
   PROTOBUF_FIELD_OFFSET(::account_user_info, token_),
+  PROTOBUF_FIELD_OFFSET(::account_user_info, last_login_ip_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::account, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -84,7 +85,7 @@ const ::google::protobuf::uint32 TableStruct_db_2eproto::offsets[] PROTOBUF_SECT
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::account_user_info)},
-  { 14, -1, sizeof(::account)},
+  { 15, -1, sizeof(::account)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -99,17 +100,17 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_db_2eproto[] =
-  "\n\010db.proto\"\303\001\n\007account\032\267\001\n\tuser_info\022\017\n\007"
+  "\n\010db.proto\"\332\001\n\007account\032\316\001\n\tuser_info\022\017\n\007"
   "account\030\001 \001(\t\022\017\n\007user_id\030\002 \001(\003\022\020\n\010passwo"
   "rd\030\003 \001(\t\022\020\n\010platform\030\004 \001(\t\022\021\n\tphone_num\030"
   "\005 \001(\003\022\022\n\ndevice_mac\030\006 \001(\t\022\025\n\rregister_ti"
   "me\030\007 \001(\003\022\027\n\017last_login_time\030\010 \001(\003\022\r\n\005tok"
-  "en\030\t \001(\tb\006proto3"
+  "en\030\t \001(\t\022\025\n\rlast_login_ip\030\n \001(\tb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_db_2eproto = {
   false, InitDefaults_db_2eproto, 
   descriptor_table_protodef_db_2eproto,
-  "db.proto", &assign_descriptors_table_db_2eproto, 216,
+  "db.proto", &assign_descriptors_table_db_2eproto, 239,
 };
 
 void AddDescriptors_db_2eproto() {
@@ -140,6 +141,7 @@ const int account_user_info::kDeviceMacFieldNumber;
 const int account_user_info::kRegisterTimeFieldNumber;
 const int account_user_info::kLastLoginTimeFieldNumber;
 const int account_user_info::kTokenFieldNumber;
+const int account_user_info::kLastLoginIpFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 account_user_info::account_user_info()
@@ -171,6 +173,10 @@ account_user_info::account_user_info(const account_user_info& from)
   if (from.token().size() > 0) {
     token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
   }
+  last_login_ip_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.last_login_ip().size() > 0) {
+    last_login_ip_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.last_login_ip_);
+  }
   ::memcpy(&user_id_, &from.user_id_,
     static_cast<size_t>(reinterpret_cast<char*>(&last_login_time_) -
     reinterpret_cast<char*>(&user_id_)) + sizeof(last_login_time_));
@@ -185,6 +191,7 @@ void account_user_info::SharedCtor() {
   platform_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   device_mac_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  last_login_ip_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&user_id_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&last_login_time_) -
       reinterpret_cast<char*>(&user_id_)) + sizeof(last_login_time_));
@@ -201,6 +208,7 @@ void account_user_info::SharedDtor() {
   platform_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   device_mac_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   token_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  last_login_ip_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void account_user_info::SetCachedSize(int size) const {
@@ -223,6 +231,7 @@ void account_user_info::Clear() {
   platform_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   device_mac_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  last_login_ip_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&user_id_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&last_login_time_) -
       reinterpret_cast<char*>(&user_id_)) + sizeof(last_login_time_));
@@ -341,6 +350,22 @@ const char* account_user_info::_InternalParse(const char* begin, const char* end
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         ctx->extra_parse_data().SetFieldName("account.user_info.token");
         object = msg->mutable_token();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // string last_login_ip = 10;
+      case 10: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 82) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("account.user_info.last_login_ip");
+        object = msg->mutable_last_login_ip();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
           goto string_till_end;
@@ -511,6 +536,21 @@ bool account_user_info::MergePartialFromCodedStream(
         break;
       }
 
+      // string last_login_ip = 10;
+      case 10: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (82 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_last_login_ip()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->last_login_ip().data(), static_cast<int>(this->last_login_ip().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "account.user_info.last_login_ip"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -608,6 +648,16 @@ void account_user_info::SerializeWithCachedSizes(
       9, this->token(), output);
   }
 
+  // string last_login_ip = 10;
+  if (this->last_login_ip().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->last_login_ip().data(), static_cast<int>(this->last_login_ip().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "account.user_info.last_login_ip");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      10, this->last_login_ip(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -696,6 +746,17 @@ void account_user_info::SerializeWithCachedSizes(
         9, this->token(), target);
   }
 
+  // string last_login_ip = 10;
+  if (this->last_login_ip().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->last_login_ip().data(), static_cast<int>(this->last_login_ip().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "account.user_info.last_login_ip");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        10, this->last_login_ip(), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -750,6 +811,13 @@ size_t account_user_info::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->token());
+  }
+
+  // string last_login_ip = 10;
+  if (this->last_login_ip().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->last_login_ip());
   }
 
   // int64 user_id = 2;
@@ -827,6 +895,10 @@ void account_user_info::MergeFrom(const account_user_info& from) {
 
     token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
   }
+  if (from.last_login_ip().size() > 0) {
+
+    last_login_ip_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.last_login_ip_);
+  }
   if (from.user_id() != 0) {
     set_user_id(from.user_id());
   }
@@ -875,6 +947,8 @@ void account_user_info::InternalSwap(account_user_info* other) {
   device_mac_.Swap(&other->device_mac_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   token_.Swap(&other->token_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  last_login_ip_.Swap(&other->last_login_ip_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(user_id_, other->user_id_);
   swap(phone_num_, other->phone_num_);

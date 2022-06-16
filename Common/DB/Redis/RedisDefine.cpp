@@ -112,10 +112,6 @@ namespace Sentry
 
     bool RedisResponse::OnReceive(const asio::error_code &code, asio::streambuf &stream)
     {
-        if (code || stream.size() == 0)
-        {
-            return true;
-        }
         std::iostream readStream(&stream);
         switch (this->mType)
         {

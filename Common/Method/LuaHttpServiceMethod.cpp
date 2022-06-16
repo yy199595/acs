@@ -36,27 +36,26 @@ namespace Sentry
 
     XCode LuaHttpServiceMethod::Call(HttpHandlerResponse &response)
     {
-        if(lua_pcall(this->mLua, 1, 1, 0) != 0)
+        if (lua_pcall(this->mLua, 1, 2, 0) != 0)
         {
             response.AddHead("error", lua_tostring(this->mLua, -1));
             return XCode::CallLuaFunctionFail;
         }
-        if(lua_isstring(this->mLua, -1))
+        if (lua_isstring(this->mLua, -1))
         {
             size_t size = 0;
-            const char * json = lua_tolstring(this->mLua, -1, &size);
+            const char *json = lua_tolstring(this->mLua, -1, &size);
             response.WriteString(json, size);
             return XCode::Successful;
         }
-        if(lua_istable(this->mLua, -1))
+        else if (lua_istable(this->mLua, -1))
         {
             std::string json;
             Lua::Json::Read(this->mLua, -1, &json);
             response.WriteString(json);
             return XCode::Successful;
         }
-        response.WriteString("unknow error");
-        return XCode::Failure;
+        return (XCode) lua_tointeger(this->mLua, -2);
     }
 
     XCode LuaHttpServiceMethod::CallAsync(HttpHandlerResponse &response)

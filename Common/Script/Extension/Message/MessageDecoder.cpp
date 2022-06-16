@@ -137,7 +137,17 @@ namespace Sentry
 			lua_pushboolean(this->mLua, reflection->GetRepeatedBool(message, field, index));
 			break;
 		case FieldDescriptor::CPPTYPE_MESSAGE:
-			this->Decode(reflection->GetRepeatedMessage(message, field, index));
+        {
+            const Message & msg = reflection->GetRepeatedMessage(message, field, index);
+            if(msg.GetTypeName() == "google.protobuf.Any")
+            {
+                const Any & any = static_cast<const Any&>(msg);
+                std::shared_ptr<Message> anyMessage = this->mMsgComponent->New(any);
+                this->Decode(*anyMessage);
+                return true;
+            }
+            this->Decode(msg);
+        }
 			break;
 		case FieldDescriptor::CPPTYPE_STRING:
 		{

@@ -78,13 +78,13 @@ namespace Sentry
 			return code;
 		}
 
-		if (res != nullptr && res->datas_size() > 0)
+		if (res != nullptr && res->jsons_size() > 0)
 		{
-			const Any & any = res->datas(0);
-			if(any.UnpackTo(response.get()))
-			{
-				return XCode::Successful;
-			}
+            const std::string & json = res->jsons(0);
+            if(util::JsonStringToMessage(json, response.get()).ok())
+            {
+                return XCode::Successful;
+            }
 			return XCode::ParseMessageError;
 		}
 		return XCode::Successful;

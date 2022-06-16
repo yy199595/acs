@@ -97,15 +97,8 @@ namespace Sentry
 
 	XCode MysqlService::Query(const s2s::Mysql::Query& request, s2s::Mysql::Response& response)
 	{
-        std::shared_ptr<Message> message = this->mMessageComponent->New(request.table());
-        if(message == nullptr)
-        {
-            LOG_ERROR(request.table() << " not exist");
-            return XCode::CallArgsError;
-        }
-
 		std::shared_ptr<Mysql::MysqlQueryCommandTask> commandTask
-				= std::make_shared<Mysql::MysqlQueryCommandTask>(request, response, *message);
+				= std::make_shared<Mysql::MysqlQueryCommandTask>(request, response);
 		return this->GetMysqlClient()->Start(commandTask);
 	}
 }// namespace Sentry

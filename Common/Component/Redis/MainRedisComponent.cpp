@@ -26,10 +26,6 @@ namespace Sentry
 	{
         LOG_CHECK_RET_FALSE(RedisComponent::OnStart());
         this->mSubRedisClient = this->MakeRedisClient("main");
-        if(this->mSubRedisClient != nullptr)
-        {
-            this->mSubRedisClient->EnableSubscribe();
-        }
         if(!this->TryAsyncConnect(this->mSubRedisClient))
         {
             LOG_ERROR("start sub redis client error");
@@ -59,6 +55,7 @@ namespace Sentry
 				LOG_INFO(component->GetName() << " start listen event successful");
 			}
 		}
+        this->mSubRedisClient->StartReceiveMessage();
         return true;
 	}
 
@@ -107,7 +104,7 @@ namespace Sentry
         return false;
 	}
 
-    void MainRedisComponent::OnCommandReply(std::shared_ptr<RedisResponse> response)
+    void MainRedisComponent::OnCommandReply(SharedRedisClient redisClient, std::shared_ptr<RedisResponse> response)
     {
         long long taskId = response->GetTaskId();
         auto iter = this->mTasks.find(taskId);
@@ -117,6 +114,10 @@ namespace Sentry
             return;
         }
         iter->second->OnResponse(response);
+        if(redisClient == this->mSubRedisClient)
+        {
+            this->mSubRedisClient->StartReceiveMessage();
+        }
         this->mTasks.erase(iter);
     }
 
@@ -132,11 +133,15 @@ namespace Sentry
         return false;
     }
 
-    void MainRedisComponent::OnSubscribe(const std::string &channel, const std::string &message)
+    void MainRedisComponent::OnSubscribe(SharedRedisClient redisClient, const std::string &channel, const std::string &message)
     {
         if(!this->HandlerEvent(channel, message))
         {
             LOG_ERROR("handler " << channel << " error : " << message);
+        }
+        if(redisClient == this->mSubRedisClient)
+        {
+            this->mSubRedisClient->StartReceiveMessage();
         }
     }
 

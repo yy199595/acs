@@ -20,10 +20,10 @@ namespace Sentry
 		bool Call(const std::string & name,const std::string& fullName, Json::Writer & jsonWriter, std::shared_ptr<Json::Reader> response);
 	 public:
         SharedRedisClient GetClient(const std::string & name);
-        void OnResponse(std::shared_ptr<RedisResponse> response);
         SharedRedisClient MakeRedisClient(const RedisConfig & config);
         SharedRedisClient MakeRedisClient(const std::string & name);
         bool TryAsyncConnect(SharedRedisClient client, int maxCount = 5);
+        void OnResponse(SharedRedisClient client, std::shared_ptr<RedisResponse> response);
     public:
         std::shared_ptr<RedisResponse> Run(const std::string & name, std::shared_ptr<RedisRequest> request);
         std::shared_ptr<RedisResponse> Run(SharedRedisClient redisClientContext, std::shared_ptr<RedisRequest> request);
@@ -36,9 +36,9 @@ namespace Sentry
         bool LateAwake() override;
         void OnSecondUpdate(const int tick) override;
 	 protected:
-        virtual void OnCommandReply(std::shared_ptr<RedisResponse> response) = 0;
         virtual bool AddRedisTask(std::shared_ptr<IRpcTask<RedisResponse>> task) = 0;
-        virtual void OnSubscribe(const std::string & channel, const std::string & message) = 0;
+        virtual void OnCommandReply(SharedRedisClient client, std::shared_ptr<RedisResponse> response) = 0;
+        virtual void OnSubscribe(SharedRedisClient client, const std::string & channel, const std::string & message) = 0;
     private:
         void PushClient(SharedRedisClient redisClientContext);
         const RedisConfig * GetRedisConfig(const std::string & name);

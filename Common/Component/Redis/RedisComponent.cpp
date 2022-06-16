@@ -284,13 +284,8 @@ namespace Sentry
         return this->Run(redisClientContext, request);
     }
 
-	void RedisComponent::OnResponse(std::shared_ptr<RedisResponse> response)
+	void RedisComponent::OnResponse(SharedRedisClient redisClient,std::shared_ptr<RedisResponse> response)
 	{
-        if(response->GetTaskId() == 0 && response->GetType() == RedisRespType::REDIS_STRING)
-        {
-            LOG_INFO(response->GetString());
-            return;
-        }
         if(response->GetType() == RedisRespType::REDIS_ARRAY && response->GetArraySize() == 3)
 		{
 			const RedisAny * redisAny1 = response->Get(0);
@@ -302,12 +297,15 @@ namespace Sentry
 				{
 					const std::string & channel = redisAny2->Cast<RedisString>()->GetValue();
 					const std::string & message = redisAny3->Cast<RedisString>()->GetValue();
-					this->OnSubscribe(channel, message);
+					this->OnSubscribe(redisClient, channel, message);
 					return;
 				}
 			}
 		}
-        this->OnCommandReply(response);
+        if(response->GetTaskId() != 0)
+        {
+            this->OnCommandReply(redisClient, response);
+        }
 	}
 
 	bool RedisComponent::LoadLuaScript(SharedRedisClient redisClientContext, const string& path)

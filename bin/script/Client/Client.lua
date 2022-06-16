@@ -21,18 +21,18 @@ local phoneNum = 13716061995
 
 function Client.Start()
 
-    print("&&&&&&&&&&&&")
     local clientComponent = App.GetComponent("ClientComponent")
 
     LoginComponent.Register(account, password, phoneNum)
 
     local loginInfo = LoginComponent.Login(account, password)
+    table.print(loginInfo)
 
     if type(loginInfo) ~= "table" then
         return
     end
 
-    if not clientComponent:StartConnect(loginInfo.address) then
+    if not clientComponent:StartConnectAsync(loginInfo.address) then
         Log.Error("connect [" , loginInfo, "] failure")
         return
     end

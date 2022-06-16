@@ -46,7 +46,7 @@ message Mysql //mysql操作
     message Response
     {
         string error = 1;
-        repeated google.protobuf.Any datas = 2;
+        repeated string jsons = 2;
     }
 }
 
@@ -54,14 +54,10 @@ message Mysql //mysql操作
 
 message Allot
 {
-    message Request
-    {
-        int64 user_id = 1;
-        string login_token = 2;
-    }
     message Response
     {
-        string address = 1; //网关地址
+        string token = 1;
+        string address = 2; //网关地址
     }
 
     message Save

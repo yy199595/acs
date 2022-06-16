@@ -32,8 +32,8 @@ namespace Sentry
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 		bool HandlerEvent(const std::string& channel, const std::string& message);
 	 private:
-		void OnCommandReply(std::shared_ptr<RedisResponse> response) final;
-		void OnSubscribe(const std::string& channel, const std::string& message) final;
+		void OnCommandReply(SharedRedisClient redisClient, std::shared_ptr<RedisResponse> response) final;
+		void OnSubscribe(SharedRedisClient redisClient, const std::string& channel, const std::string& message) final;
 	 private:
 		std::string mRpcAddress;
 		TaskComponent* mTaskComponent;
