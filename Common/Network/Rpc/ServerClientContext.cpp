@@ -14,7 +14,6 @@ namespace Sentry
 		: TcpContext(socket), mTcpComponent(component)
 	{
 		this->mConnectCount = 0;
-		this->SetBufferCount(1024 * 2, 1024 * 20);
 		this->mConnectLock = std::make_shared<CoroutineLock>();
 	}
 
@@ -70,43 +69,40 @@ namespace Sentry
 #endif
 	}
 
-    void ServerClientContext::OnReceiveHead(const asio::error_code &code, const char *message, size_t size)
+    void ServerClientContext::OnReceiveMessage(const asio::error_code &code, const std::string &buffer)
     {
-        if(code || message == nullptr || size == 0)
+        if (code || buffer.size() == 0)
         {
             this->CloseSocket(XCode::NetWorkError);
             return;
         }
-        size_t lenght = 0;
-        memcpy(&lenght, message, size);
-        this->ReceiveBody(lenght);
-    }
-
-    void ServerClientContext::OnReceiveBody(const asio::error_code &code, const char *message, size_t size)
-    {
-        if (code || message == nullptr || size == 0)
+        if (this->mReadState == ReadType::HEAD)
         {
-#ifdef __NET_ERROR_LOG__
-            CONSOLE_LOG_ERROR(code.message());
-#endif
-            this->CloseSocket(XCode::NetWorkError);
-            return;
+            this->mReadState = ReadType::BODY;
+            this->ReceiveMessage(this->GetLength(buffer));
         }
-        switch ((MESSAGE_TYPE)message[0])
+        else if (this->mReadState == ReadType::BODY)
         {
-            case MESSAGE_TYPE::MSG_RPC_REQUEST:
-                this->ReceiveHead(sizeof(int));
-                this->OnRequest(message + 1, size - 1);
-                break;
-            case MESSAGE_TYPE::MSG_RPC_RESPONSE:
-                this->ReceiveHead(sizeof(int));
-                this->OnResponse(message + 1, size - 1);
-                break;
+            this->mReadState = ReadType::HEAD;
+            const char *str = buffer.c_str() + 1;
+            const size_t size = buffer.size() - 1;
+            switch ((MESSAGE_TYPE) buffer[0])
+            {
+                case MESSAGE_TYPE::MSG_RPC_REQUEST:
+                    this->OnRequest(str, size);
+                    this->ReceiveMessage(sizeof(int));
+                    break;
+                case MESSAGE_TYPE::MSG_RPC_RESPONSE:
+                    this->OnResponse(str, size);
+                    this->ReceiveMessage(sizeof(int));
+                    break;
+            }
         }
     }
 
 	bool ServerClientContext::OnRequest(const char* buffer, size_t size)
 	{
+        asio::streambuf s;
 		std::shared_ptr<com::Rpc_Request> requestData(new com::Rpc_Request());
 		if (!requestData->ParseFromArray(buffer, size))
 		{
@@ -164,10 +160,11 @@ namespace Sentry
 	void ServerClientContext::StartReceive()
 	{
         size_t size = sizeof(int);
+        this->mReadState = ReadType::HEAD;
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveHead(size);
 #else
-		this->mNetworkThread.Invoke(&ServerClientContext::ReceiveHead, this, size);
+		this->mNetworkThread.Invoke(&ServerClientContext::ReceiveMessage, this, size);
 #endif
 	}
 
@@ -183,7 +180,8 @@ namespace Sentry
 #endif
 			code = XCode::Failure;
 		}
-		this->ReceiveHead(sizeof(int));
+        this->mReadState = ReadType::HEAD;
+        this->ReceiveMessage(sizeof(int));
 		this->mConnectTask->SetResult(code);
 	}
 }
