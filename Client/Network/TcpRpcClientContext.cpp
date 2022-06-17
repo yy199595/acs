@@ -7,7 +7,6 @@ namespace Client
         : Tcp::TcpContext(socket)
 	{
 		this->mClientComponent = component;
-		this->SetBufferCount(2048, 2048);
 	}
 
 	void TcpRpcClientContext::SendToServer(std::shared_ptr<c2s::Rpc_Request> request)
@@ -48,48 +47,46 @@ namespace Client
 		this->mConnectTask->SetResult(true);
     }
 
-    void TcpRpcClientContext::OnReceiveHead(const asio::error_code &code, const char *message, size_t size)
+    void TcpRpcClientContext::OnReceiveMessage(const asio::error_code &code, const std::string &buffer)
     {
-        if (code || message == nullptr || size == 0)
+        if (code || buffer.size() == 0)
         {
 #ifdef __DEBUG__
             CONSOLE_LOG_ERROR(code.message());
 #endif
             return;
         }
-    }
-
-	void TcpRpcClientContext::OnReceiveBody(const asio::error_code &code, const char *message, size_t size)
-    {
-        if (code || message == nullptr || size == 0)
+        if(this->mReadState == ReadType::HEAD)
         {
-#ifdef __DEBUG__
-            CONSOLE_LOG_ERROR(code.message());
-#endif
-            return;
+            this->mReadState = ReadType::BODY;
+            this->ReceiveMessage(this->GetLength(buffer));
         }
-        size_t length = size - 1;
-        const char *str = message + 1;
-        switch ((MESSAGE_TYPE) message[0])
+        else if(this->mReadState == ReadType::BODY)
         {
-            case MESSAGE_TYPE::MSG_RPC_CALL_CLIENT:
-                this->ReceiveHead(sizeof(int));
-                this->OnRequest(str, length);
-                break;
-            case MESSAGE_TYPE::MSG_RPC_RESPONSE:
-                this->ReceiveHead(sizeof(int));
-                this->OnResponse(str, length);
-                break;
+            this->mReadState = ReadType::HEAD;
+            const char * str = buffer.c_str() + 1;
+            const size_t size = buffer.size() - 1;
+            switch ((MESSAGE_TYPE) buffer[0])
+            {
+                case MESSAGE_TYPE::MSG_RPC_CALL_CLIENT:
+                    this->OnRequest(str, size);
+                    this->ReceiveMessage(sizeof(int));
+                    break;
+                case MESSAGE_TYPE::MSG_RPC_RESPONSE:
+                    this->OnResponse(str, size);
+                    this->ReceiveMessage(sizeof(int));
+                    break;
+            }
         }
-        CONSOLE_LOG_FATAL("unknow message type");
     }
 
 	void TcpRpcClientContext::StartReceive()
 	{
+        this->mReadState = ReadType::HEAD;
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveHead(sizeof(int));
 #else
-		this->mNetworkThread.Invoke(&TcpRpcClientContext::ReceiveHead, this, sizeof(int));
+		this->mNetworkThread.Invoke(&TcpRpcClientContext::ReceiveMessage, this, sizeof(int));
 #endif
 	}
 

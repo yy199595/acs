@@ -95,12 +95,11 @@ namespace Sentry
         bool IsOk();
 		void Clear();
     private:
-        void OnDecodeHead(std::iostream & readStream);
-        void OnDecodeArray(std::iostream & readStream, size_t size);
-        void OnDecodeMessage(std::iostream & readStream, size_t size);
-        void OnDecodeBinString(std::iostream & readStream, size_t size);
-        int OnReceiveFirstLine(char type, const std::string & lineData);
-
+        int OnDecodeArray(const std::string & message);
+        int OnReceiveFirstLine(const std::string & lineData);
+    public:
+        int OnRecvLine(const std::string & message);
+        int OnRecvMessage(const std::string & message);
     public:
         template<typename T>
         const T * Cast(size_t index);
@@ -112,7 +111,6 @@ namespace Sentry
         const std::string & GetString() const { return this->mString;}
         const std::vector<RedisAny *> & GetArray() const { return this->mArray; }
         bool HasError() { return this->mType == RedisRespType::REDIS_ERROR;}
-        bool OnReceive(const asio::error_code & code, asio::streambuf & stream);
     private:
         int mDataSize;
         int mLineCount;

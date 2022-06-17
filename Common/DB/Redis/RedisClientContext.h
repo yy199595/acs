@@ -27,10 +27,12 @@ namespace Sentry
         void SendCommand(std::shared_ptr<RedisRequest> command);
         const std::string & GetName() const { return this->mConfig.Name; }
     private:
-        void StartReceive();
+        void OnReadComplete();
 		void OnConnect(const asio::error_code &error) final;
         void OnReceive(const asio::error_code & code, size_t size);
         void AddCommandQueue(std::shared_ptr<RedisRequest> command);
+        void OnReceiveLine(const asio::error_code &code, const std::string &buffer) final;
+        void OnReceiveMessage(const asio::error_code &code, const std::string &buffer) final;
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
     private:
         const RedisConfig & mConfig;

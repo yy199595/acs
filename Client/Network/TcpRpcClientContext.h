@@ -22,11 +22,9 @@ namespace Client
 		bool OnRequest(const char * buffer, size_t size);
 		bool OnResponse(const char * buffer, size_t size);
 		void OnConnect(const asio::error_code &error) final;
-        void OnReceiveHead(const asio::error_code &code, const char *message, size_t size) final;
-        void OnReceiveBody(const asio::error_code &code, const char *message, size_t size) final;
+        void OnReceiveMessage(const asio::error_code &code, const std::string &buffer) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
     private:
-        char mRecvBuffer[4096];
         ClientComponent * mClientComponent;
         std::shared_ptr<SocketProxy> mTcpSocket;
         std::shared_ptr<TaskSource<bool>> mConnectTask;

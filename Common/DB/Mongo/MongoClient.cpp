@@ -9,7 +9,6 @@ namespace Mongo
 	MongoClientContext::MongoClientContext(std::shared_ptr<SocketProxy> scoket)
 		: Tcp::TcpContext(scoket)
 	{
-		this->SetBufferCount(10240, 10240 * 2);
 		this->mWriteLock = std::make_shared<CoroutineLock>();
 		this->mConnectLock = std::make_shared<CoroutineLock>();
 	}
@@ -27,20 +26,6 @@ namespace Mongo
 		this->mConnectTask.SetResult(true);
 	}
 
-    void MongoClientContext::OnReceiveHead(const asio::error_code &code, const char *message, size_t size)
-    {
-#ifdef __NET_ERROR_LOG__
-        CONSOLE_LOG_ERROR(code.message());
-#endif
-    }
-
-    void MongoClientContext::OnReceiveBody(const asio::error_code &code, const char *message, size_t size)
-    {
-#ifdef __NET_ERROR_LOG__
-        CONSOLE_LOG_ERROR(code.message());
-#endif
-    }
-
 	void MongoClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{
 		if (code)
@@ -51,7 +36,7 @@ namespace Mongo
 			this->mWriteTask.SetResult(false);
 			return;
 		}
-        this->ReceiveHead(sizeof(MongoHead));
+        this->ReceiveMessage(sizeof(MongoHead));
         this->mWriteTask.SetResult(true);
 	}
 

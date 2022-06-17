@@ -110,30 +110,33 @@ namespace Sentry
 		this->mArray.clear();
 	}
 
-    bool RedisResponse::OnReceive(const asio::error_code &code, asio::streambuf &stream)
+    int RedisResponse::OnRecvLine(const std::string &message)
     {
-        std::iostream readStream(&stream);
         switch (this->mType)
         {
             case RedisRespType::REDIS_NONE:
-                this->OnDecodeHead(readStream);
-                break;
-        }
-        this->OnDecodeMessage(readStream, stream.size());
-        return this->mLineCount >= this->mDataCount;
-    }
-
-    void RedisResponse::OnDecodeMessage(std::iostream &readStream, size_t size)
-    {
-        switch (this->mType)
-        {
-            case RedisRespType::REDIS_BIN_STRING:
-                this->OnDecodeBinString(readStream, size);
+                return this->OnReceiveFirstLine(message);
                 break;
             case RedisRespType::REDIS_ARRAY:
-                this->OnDecodeArray(readStream, size);
+                return this->OnDecodeArray(message);
                 break;
         }
+    }
+
+    int RedisResponse::OnRecvMessage(const std::string &message)
+    {
+        switch(this->mType)
+        {
+            case RedisRespType::REDIS_STRING:
+            case RedisRespType::REDIS_BIN_STRING:
+                this->mString.append(message);
+                return 0;
+            case RedisRespType::REDIS_ARRAY:
+                this->mLineCount++;
+                this->mArray.emplace_back(new RedisString(message));
+                return this->mLineCount < this->mDataCount ? -1 : 0; //再读一行
+        }
+        return 0;
     }
 
     bool RedisResponse::IsOk()
@@ -141,88 +144,50 @@ namespace Sentry
         return this->mString == "OK";
     }
 
-    void RedisResponse::OnDecodeHead(std::iostream &readStream)
+    int RedisResponse::OnReceiveFirstLine(const std::string &lineData)
     {
-        std::string lineData;
-        char type = readStream.get();
-        if (std::getline(readStream, lineData))
-        {
-            lineData.pop_back(); //拿掉\r
-            this->mDataCount = this->OnReceiveFirstLine(type, lineData);
-        }
-    }
-
-    int RedisResponse::OnReceiveFirstLine(char type, const std::string &lineData)
-    {
-        switch (type)
+        const char * str = lineData.c_str() + 1;
+        const size_t size = lineData.size() -1;
+        switch (lineData[0])
         {
             case '+': //字符串类型
                 //STD_ERROR_LOG("str = " << lineData.data());
                 this->mType = RedisRespType::REDIS_STRING;
-                this->mString = std::move(lineData);
+                this->mString.append(str, size);
                 break;
             case '-': //错误
                 this->mType = RedisRespType::REDIS_ERROR;
-                this->mString = std::move(lineData);
+                this->mString.append(str, size);
                 break;
             case ':': //整型
                 this->mType = RedisRespType::REDIS_NUMBER;
-                this->mNumber = std::stoll(lineData);
+                this->mNumber = std::atoi(str);
                 break;
             case '$': //二进制字符串
-                this->mDataSize = std::stoi(lineData);
                 this->mType = RedisRespType::REDIS_BIN_STRING;
-                return this->mDataSize <= 0 ? 0 : 1;
+                return std::stoi(lineData);
             case '*': //数组
                 this->mType = RedisRespType::REDIS_ARRAY;
-                return std::stoi(lineData);
+                this->mDataCount = std::stoi(lineData);
+                return -1;
+                break;
         }
         return 0;
     }
 
-    void RedisResponse::OnDecodeBinString(std::iostream &readStream, size_t size)
+    int RedisResponse::OnDecodeArray(const std::string & message)
     {
-        if (size >= this->mDataSize)
+        if (message[0] == '$')
         {
-            std::unique_ptr<char[]> buffer(new char[this->mDataSize]);
-            if (readStream.readsome(buffer.get(), this->mDataSize) > 0)
-            {
-                switch (this->mType)
-                {
-                    case RedisRespType::REDIS_ARRAY:
-                        this->mArray.emplace_back(new RedisString(buffer.get(), this->mDataSize));
-                        break;
-                    case RedisRespType::REDIS_BIN_STRING:
-                        this->mString.append(buffer.get(), this->mDataSize);
-                        break;
-                }
-            }
-            this->mLineCount++;
-            readStream.ignore(2);
+            return std::atoi(message.c_str() + 1);
         }
-    }
-
-    void RedisResponse::OnDecodeArray(std::iostream &readStream, size_t size)
-    {
-        std::string lineData;
-        char type = readStream.get();
-        if (type == '$' && std::getline(readStream, lineData))
+        else if (message[0] == ':')
         {
-            lineData.pop_back();
-            this->mDataSize = std::stoi(lineData);
-            this->OnDecodeBinString(readStream, size);
-        }
-        else if (type == ':' && std::getline(readStream, lineData))
-        {
-            lineData.pop_back();
             this->mLineCount++;
-            long long number = std::stoll(lineData);
+            long long number = std::atoll(message.c_str() + 1);
             this->mArray.emplace_back(new RedisNumber(number));
         }
-        if(this->mLineCount < this->mDataCount)
-        {
-            this->OnDecodeMessage(readStream, size);
-        }
+        return this->mLineCount < this->mDataCount ? -1 : 0;
     }
 
 	void RedisResponse::Clear()

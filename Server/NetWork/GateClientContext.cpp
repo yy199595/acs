@@ -20,19 +20,19 @@ namespace Sentry
 	{
 		this->mQps = 0;
 		this->mCallCount = 0;
-		this->SetBufferCount(2048, 2048);
 	}
 
 	void GateClientContext::StartReceive()
 	{
+        this->mReadState = ReadType::HEAD;
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveHead(sizeof(int));
 #else
-		this->mNetworkThread.Invoke(&GateClientContext::ReceiveHead, this, sizeof(int));
+		this->mNetworkThread.Invoke(&GateClientContext::ReceiveMessage, this, sizeof(int));
 #endif
 	}
 
-    void GateClientContext::OnReceiveHead(const asio::error_code &code, const char *message, size_t size)
+    void GateClientContext::OnReceiveMessage(const asio::error_code &code, const std::string &buffer)
     {
         if(code)
         {
@@ -42,43 +42,35 @@ namespace Sentry
             this->CloseSocket(XCode::NetReceiveFailure);
             return;
         }
-        size_t lenght = 0;
-        memcpy(&lenght, message, size);
-        this->ReceiveBody(lenght);
-    }
-
-	void GateClientContext::OnReceiveBody(const asio::error_code &code, const char *message, size_t size)
-	{
-		if(code)
-		{
-#ifdef __NET_ERROR_LOG__
-			CONSOLE_LOG_ERROR(code.message());
-#endif
-			this->CloseSocket(XCode::NetReceiveFailure);
-			return;
-		}
-
-		if((MESSAGE_TYPE)message[0] == MESSAGE_TYPE::MSG_RPC_CLIENT_REQUEST)
-		{
-			std::shared_ptr<c2s::Rpc_Request> request(new c2s::Rpc_Request());
-			if (!request->ParseFromArray(message + 1, (int)size - 1))
-			{
-				return;
-			}
-			this->mCallCount++;
-			this->mQps += size;
-			request->set_address(this->GetAddress());
+        if (this->mReadState == ReadType::HEAD)
+        {
+            this->mReadState = ReadType::BODY;
+            this->ReceiveMessage(this->GetLength(buffer));
+        }
+        else if (this->mReadState == ReadType::BODY)
+        {
+            this->mReadState = ReadType::HEAD;
+            if((MESSAGE_TYPE)buffer[0] == MESSAGE_TYPE::MSG_RPC_CLIENT_REQUEST)
+            {
+                std::shared_ptr<c2s::Rpc_Request> request(new c2s::Rpc_Request());
+                if (!request->ParseFromArray(buffer.c_str() + 1, buffer.size() - 1))
+                {
+                    return;
+                }
+                this->mCallCount++;
+                this->mQps += buffer.size();
+                request->set_address(this->GetAddress());
 #ifdef ONLY_MAIN_THREAD
-			this->mGateComponent->OnRequest(request);
+                this->mGateComponent->OnRequest(request);
 #else
-			MainTaskScheduler &mainTaskScheduler = App::Get()->GetTaskScheduler();
-			mainTaskScheduler.Invoke(&GateClientComponent::OnRequest, this->mGateComponent, request);
+                MainTaskScheduler &mainTaskScheduler = App::Get()->GetTaskScheduler();
+                mainTaskScheduler.Invoke(&GateClientComponent::OnRequest, this->mGateComponent, request);
 #endif
-            this->ReceiveHead(sizeof(int));
-            return;
-		}
-		LOG_FATAL("client unknow message");
-	}
+                this->ReceiveMessage(sizeof(int));
+                return;
+            }
+        }
+    }
 
 	void GateClientContext::CloseSocket(XCode code)
 	{

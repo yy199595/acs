@@ -7,14 +7,21 @@
 #include"XCode/XCode.h"
 #include"SocketProxy.h"
 #include"Proto/ProtoMessage.h"
-#define TCP_RECEIVE_MAX_SIZE 1024 * 20
 using namespace Sentry;
+
 namespace Tcp
 {
+    enum class ReadType
+    {
+        HEAD,
+        BODY,
+        LINE
+    };
+
  	class TcpContext : public std::enable_shared_from_this<TcpContext>
 	{
 	 public:
-		TcpContext(std::shared_ptr<SocketProxy> socket);
+		TcpContext(std::shared_ptr<SocketProxy> socket, size_t maxCount = 10240);
 		virtual ~TcpContext();
 
 	public:
@@ -22,7 +29,6 @@ namespace Tcp
 		long long GetLastOperTime() const { return this->mLastOperTime;}
 		const std::string & GetAddress() { return this->mSocket->GetAddress();}
 	 protected:
-		void SetBufferCount(int count, int maxCount);
 		virtual void OnConnect(const asio::error_code & error)
 		{
 			throw std::logic_error("%%%%%%%%%%%%%%%");
@@ -30,19 +36,20 @@ namespace Tcp
 		virtual void OnSendMessage(const asio::error_code & code, std::shared_ptr<ProtoMessage> message) = 0;
 	protected:
 		void Connect();
-		void ReceiveHead(int size);
-		void ReceiveBody(int size);
+        void ReceiveLine();
+		void ReceiveMessage(int size);
+        int GetLength(const std::string & buffer);
         void Send(std::shared_ptr<ProtoMessage> message);
-        virtual void OnReceiveHead(const asio::error_code & code, const char * message, size_t size) {}
-        virtual void OnReceiveBody(const asio::error_code & code, const char * message, size_t size) {}
+        virtual void OnReceiveLine(const asio::error_code & code, const std::string & buffer) {}
+        virtual void OnReceiveMessage(const asio::error_code & code, const std::string & buffer) {}
 	 protected:
-		IAsioThread& mNetworkThread;
+        ReadType mReadState;
+        IAsioThread& mNetworkThread;
 		std::shared_ptr<SocketProxy> mSocket;
 	 private:
-		int mBufferCount;
-		char * mRecvBuffer;
-		int mBufferMaxCount;
+        const size_t mMaxCount;
 		long long mLastOperTime;
+        std::string mRecvBuffer;
 		asio::streambuf mSendBuffer;
 	};
 }
