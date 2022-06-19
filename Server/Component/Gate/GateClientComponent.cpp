@@ -76,7 +76,8 @@ namespace Sentry
 		{
 			return false;
 		}
-		return proxyClient->SendToClient(message);
+		proxyClient->SendToClient(message);
+		return true;
 	}
 
 	void GateClientComponent::SendToAllClient(std::shared_ptr<c2s::Rpc::Call> message)
@@ -97,7 +98,8 @@ namespace Sentry
 		std::shared_ptr<GateClientContext> gateClient = this->GetGateClient(address);
 		if(gateClient != nullptr)
 		{
-			return gateClient->SendToClient(message);
+			gateClient->SendToClient(message);
+			return true;
 		}
 		return false;
 	}

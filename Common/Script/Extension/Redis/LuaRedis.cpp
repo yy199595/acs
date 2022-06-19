@@ -14,11 +14,11 @@ namespace Lua
 	int Redis::Run(lua_State* lua)
 	{
 		lua_pushthread(lua);
-		const char * name = lua_tostring(lua, 2);
-		const char * command = lua_tostring(lua, 3);
+		const char* name = lua_tostring(lua, 2);
+		const char* command = lua_tostring(lua, 3);
 		MainRedisComponent* redisComponent = UserDataParameter::Read<MainRedisComponent*>(lua, 1);
 		std::shared_ptr<RedisClientContext> redisClientContext = redisComponent->GetClient(name);
-		if(redisClientContext == nullptr)
+		if (redisClientContext == nullptr)
 		{
 			luaL_error(lua, "not find redis client %s\n", name);
 			return 0;
@@ -48,31 +48,9 @@ namespace Lua
 			}
 			lua_pop(lua, 1);
 		}
-		return Redis::Send(lua, redisComponent, redisClientContext, request);
-	}
-
-	int Redis::Send(lua_State* lua, MainRedisComponent* redisComponent,
-		std::shared_ptr<RedisClientContext> redisClientContext, std::shared_ptr<RedisRequest> request)
-	{
-		std::shared_ptr<LuaRedisTask> luaRedisTask = request->MakeLuaTask(lua);
-		if(!redisClientContext->IsOpen())
-		{
-			TaskComponent * taskComponent = App::Get()->GetTaskComponent();
-			taskComponent->Start([request, redisClientContext, redisComponent, luaRedisTask](){
-				if(!redisComponent->TryAsyncConnect(redisClientContext))
-				{
-					luaRedisTask->OnResponse(nullptr);
-					return;
-				}
-				redisComponent->AddRedisTask(luaRedisTask);
-				redisClientContext->SendCommand(request);
-			});
-		}
-		else
-		{
-			redisComponent->AddRedisTask(luaRedisTask);
-			redisClientContext->SendCommand(request);
-		}
+		std::shared_ptr<LuaRedisTask> luaRedisTask =
+			redisComponent->AddLuaRedisTask(request, lua);
+		redisClientContext->SendCommand(request);
 		return luaRedisTask->Await();
 	}
 
@@ -92,6 +70,10 @@ namespace Lua
 		}
 		std::shared_ptr<RedisRequest> request =
 			redisComponent->MakeLuaRequest(fullName, json);
-		return Redis::Send(lua, redisComponent, redisClientContext, request);
+
+		std::shared_ptr<LuaRedisTask> luaRedisTask =
+			redisComponent->AddLuaRedisTask(request, lua);
+		redisClientContext->SendCommand(request);
+		return luaRedisTask->Await();
 	}
 }

@@ -37,7 +37,7 @@ namespace Client
 
     }
 
-    void TcpRpcClientContext::OnConnect(const asio::error_code& error)
+    void TcpRpcClientContext::OnConnect(const asio::error_code& error, int count)
     {
 		if(error)
 		{
@@ -47,7 +47,7 @@ namespace Client
 		this->mConnectTask->SetResult(true);
     }
 
-    void TcpRpcClientContext::OnReceiveMessage(const asio::error_code &code, const std::string &buffer)
+    void TcpRpcClientContext::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer)
     {
         if (code || buffer.size() == 0)
         {
@@ -63,17 +63,16 @@ namespace Client
         }
         else if(this->mReadState == ReadType::BODY)
         {
+			std::iostream os(&buffer);
             this->mReadState = ReadType::HEAD;
-            const char * str = buffer.c_str() + 1;
-            const size_t size = buffer.size() - 1;
-            switch ((MESSAGE_TYPE) buffer[0])
+            switch ((MESSAGE_TYPE)os.get())
             {
                 case MESSAGE_TYPE::MSG_RPC_CALL_CLIENT:
-                    this->OnRequest(str, size);
+                    this->OnRequest(os);
                     this->ReceiveMessage(sizeof(int));
                     break;
                 case MESSAGE_TYPE::MSG_RPC_RESPONSE:
-                    this->OnResponse(str, size);
+                    this->OnResponse(os);
                     this->ReceiveMessage(sizeof(int));
                     break;
             }
@@ -84,16 +83,16 @@ namespace Client
 	{
         this->mReadState = ReadType::HEAD;
 #ifdef ONLY_MAIN_THREAD
-		this->ReceiveHead(sizeof(int));
+		this->ReceiveMessage(sizeof(int));
 #else
 		this->mNetworkThread.Invoke(&TcpRpcClientContext::ReceiveMessage, this, sizeof(int));
 #endif
 	}
 
-	bool TcpRpcClientContext::OnRequest(const char * buffer, size_t size)
+	bool TcpRpcClientContext::OnRequest(std::iostream & os)
     {
         std::shared_ptr<c2s::Rpc::Call> request(new c2s::Rpc::Call());
-        if (!request->ParseFromArray(buffer, size))
+        if (!request->ParseFromIstream(&os))
         {
 			CONSOLE_LOG_ERROR("parse request message error");
             return false;
@@ -102,10 +101,10 @@ namespace Client
         return true;
     }
 
-	bool TcpRpcClientContext::OnResponse(const char * buffer, size_t size)
+	bool TcpRpcClientContext::OnResponse(std::iostream & os)
     {
         std::shared_ptr<c2s::Rpc::Response> response(new c2s::Rpc::Response());
-        if (!response->ParseFromArray(buffer, size))
+        if (!response->ParseFromIstream(&os))
         {
 			CONSOLE_LOG_ERROR("parse response message error");
 			return false;

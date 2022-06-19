@@ -2,87 +2,74 @@
 #include"TelnetClientContext.h"
 #include"Util/StringHelper.h"
 #include <Define/CommonLogDef.h>
-namespace Sentry
+#include"Component/Telnet/ConsoleComponent.h"
+namespace Tcp
 {
-	TelnetClientContext::TelnetClientContext(std::shared_ptr<SocketProxy> socketProxy)
+	TelnetClientContext::TelnetClientContext(std::shared_ptr<SocketProxy> socketProxy, ConsoleComponent * component)
+		: Tcp::TcpContext(socketProxy), mConsoleComponent(component)
 	{
 		this->mSocket = socketProxy;
 	}
 
-	std::shared_ptr<TelnetContent> TelnetClientContext::ReadCommand()
+	void TelnetClientContext::StartRead()
 	{
-		std::shared_ptr<TelnetContent> telnetContent(new TelnetContent());
-		std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
 #ifdef ONLY_MAIN_THREAD
-		this->ReadData(taskSource, telnetContent);
+		this->ReceiveLine();
 #else
 		IAsioThread & netWorkThread = this->mSocket->GetThread();
-		netWorkThread.Invoke(&TelnetClientContext::ReadData, this, taskSource, telnetContent);
+		netWorkThread.Invoke(&TelnetClientContext::ReceiveLine, this);
 #endif
-
-		telnetContent->IsOk = taskSource->Await();
-		return telnetContent;
 	}
 
-	bool TelnetClientContext::Response(const std::string& content)
+	void TelnetClientContext::OnReceiveLine(const asio::error_code& code, asio::streambuf& buffer)
 	{
-		std::ostream os(&this->mSendBuffer);
-		os << content << "\r\n";
-		std::shared_ptr<TaskSource<bool>> taskSource(new TaskSource<bool>());
+		if(code)
+		{
+			this->CloseContext();
+			CONSOLE_LOG_ERROR(code.message());
+			return;
+		}
+		std::string lineMessage;
+		std::iostream os(&buffer);
+		std::getline(os, lineMessage);
+		std::shared_ptr<TelnetClientContext> self = this->Cast<TelnetClientContext>();
 #ifdef ONLY_MAIN_THREAD
-		this->ResponseData(taskSource);
+		this->mConsoleComponent->OnReceive(self, lineMessage);
+#else
+		IAsioThread & netWorkThread = App::Get()->GetTaskScheduler();
+		netWorkThread.Invoke(&ConsoleComponent::OnReceive, this->mConsoleComponent, self, lineMessage);
+#endif
+	}
+
+	void TelnetClientContext::SendProtoMessage(std::shared_ptr<TelnetProto> message)
+	{
+#ifdef ONLY_MAIN_THREAD
+		this->Send(message);
 #else
 		IAsioThread &netWorkThread = this->mSocket->GetThread();
-		netWorkThread.Invoke(&TelnetClientContext::ResponseData, this, taskSource);
+		netWorkThread.Invoke(&TelnetClientContext::Send, this, message);
 #endif
-		return taskSource->Await();
 	}
 
-	void TelnetClientContext::ResponseData(std::shared_ptr<TaskSource<bool>> taskSource)
+	void TelnetClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{
-		AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
-		asio::async_write(tcpSocket, this->mSendBuffer, [taskSource, this]
-			(const asio::error_code& code, size_t size)
+		if(code)
 		{
-			if (code)
-			{
-				this->mSocket->Close();
-				taskSource->SetResult(false);
-				return;
-			}
-			taskSource->SetResult(true);
-		});
+			this->CloseContext();
+			CONSOLE_LOG_ERROR(code.message());
+		}
 	}
 
-	void TelnetClientContext::ReadData(std::shared_ptr<TaskSource<bool>> taskSource, std::shared_ptr<TelnetContent> content)
+	void TelnetClientContext::CloseContext()
 	{
-		AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
-		asio::async_read(tcpSocket, this->mReceiveBuffer, asio::transfer_at_least(1),
-			[this, taskSource, content](const asio::error_code& code, size_t size)
-			{
-				if (code)
-				{
-					this->mSocket->Close();
-					taskSource->SetResult(false);
-					return;
-				}
-				std::string lineData;
-				std::iostream iostream1(&this->mReceiveBuffer);
-				if (std::getline(iostream1, lineData))
-				{
-					lineData.pop_back();
-					size_t pos = lineData.find(' ');
-					content->Command = lineData;
-					if (pos != std::string::npos)
-					{
-						content->Command = lineData.substr(0, pos);
-						content->Parameter = lineData.substr(pos + 1);
-					}
-					taskSource->SetResult(true);
-					return;
-				}
-				this->ReadData(taskSource, content);
-			});
+		this->mSocket->Close();
+		std::shared_ptr<TelnetClientContext> self = this->Cast<TelnetClientContext>();
+#ifdef ONLY_MAIN_THREAD
+		this->mConsoleComponent->OnClientError(self);
+#else
+		IAsioThread & netWorkThread = App::Get()->GetTaskScheduler();
+		netWorkThread.Invoke(&ConsoleComponent::OnClientError, this->mConsoleComponent, self);
+#endif
 	}
 }
 

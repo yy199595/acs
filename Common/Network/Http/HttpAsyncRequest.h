@@ -13,6 +13,7 @@
 #include<Network/Http/Http.h>
 #include"Protocol/com.pb.h"
 #include"Network/Proto/ProtoMessage.h"
+#include"Async/RpcTask/RpcTaskSource.h"
 
 namespace Sentry
 {
@@ -25,11 +26,11 @@ namespace Sentry
 		bool AddHead(const std::string & key, const std::string & value);
     public:
 		int Serailize(std::ostream &os) final;
-		const std::string & GetHost() { return this->mHost;}
-        const std::string & GetPort() { return this->mPort;}
+		const std::string & GetHost() const { return this->mHost;}
+        const std::string & GetPort() const { return this->mPort;}
 	protected:
 		bool ParseUrl(const std::string & url);
-		virtual void WriteBody(std::ostream & os) = 0;
+		virtual void WriteBody(std::ostream & os) const = 0;
 	private:
         std::string mHost;
         std::string mPort;
@@ -42,6 +43,26 @@ namespace Sentry
 
 namespace Sentry
 {
+	class HttpAsyncResponse;
+	class HttpTask : public IRpcTask<HttpAsyncResponse>
+	{
+	 public:
+		HttpTask(int time = 0);
+	 public:
+		long long GetRpcId() { return this->mTaskId;}
+		int GetTimeout() final { return this->mTimeout;}
+		void OnResponse(std::shared_ptr<HttpAsyncResponse> response);
+		std::shared_ptr<HttpAsyncResponse> Await() { return this->mTask.Await();}
+	 private:
+		int mTimeout;
+		long long mTaskId;
+		TaskSource<std::shared_ptr<HttpAsyncResponse>> mTask;
+	};
+	typedef std::shared_ptr<IRpcTask<HttpAsyncResponse>> SharedHttpRpcTask;
+}
+
+namespace Sentry
+{
 	class HttpGetRequest : public HttpAsyncRequest
 	{
 	public:
@@ -49,7 +70,7 @@ namespace Sentry
 	public:
 		static std::shared_ptr<HttpGetRequest> Create(const std::string & url);
 	protected:
-		void WriteBody(std::ostream & os) final;
+		void WriteBody(std::ostream & os) const final;
 	};
 }
 
@@ -64,7 +85,7 @@ namespace Sentry
 		void AddBody(const char * data, size_t size);
 		static std::shared_ptr<HttpPostRequest> Create(const std::string & url);
 	protected:
-		void WriteBody(std::ostream & os) final;
+		void WriteBody(std::ostream & os) const final;
 	private:
 		std::string mBody;
 	};
@@ -93,17 +114,20 @@ namespace Sentry
     class HttpAsyncResponse : public IHttpContent
     {
     public:
-		HttpAsyncResponse(std::fstream * fs);
+		HttpAsyncResponse(long long taskId, std::fstream * fs = nullptr);
 		~HttpAsyncResponse();
     public:
         HttpStatus OnReceiveData(asio::streambuf &streamBuffer) final;
         HttpStatus GetHttpCode() { return (HttpStatus)this->mHttpCode;}
         const std::string & GetContent() const final { return this->mHttpData.data();}
 	public:
-		bool GetHead(const std::string & key, std::string & value);
+		long long GetTaskId() const { return this->mTaskId;}
+		bool GetHead(const std::string & key, int & value) const;
+		bool GetHead(const std::string & key, std::string & value) const;
 		const com::Http::Data & GetData() const final { return this->mHttpData;}
     private:
         int mHttpCode;
+		long long mTaskId;
 		std::string mHttpError;
         HttpDecodeState mState;
 		std::fstream * mFstream;

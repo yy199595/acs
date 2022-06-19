@@ -13,8 +13,7 @@ namespace Sentry
 		std::shared_ptr<SocketProxy> socket)
 		: TcpContext(socket), mTcpComponent(component)
 	{
-		this->mConnectCount = 0;
-		this->mConnectLock = std::make_shared<CoroutineLock>();
+
 	}
 
 	void ServerClientContext::StartClose()
@@ -50,7 +49,11 @@ namespace Sentry
 
 	void ServerClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{
-
+		if(code && this->mSocket->IsRemote())
+		{
+			this->Connect();
+			this->mSendQueues.emplace(message);
+		}
 	}
 
 	void ServerClientContext::CloseSocket(XCode code)
@@ -69,10 +72,11 @@ namespace Sentry
 #endif
 	}
 
-    void ServerClientContext::OnReceiveMessage(const asio::error_code &code, const std::string &buffer)
+    void ServerClientContext::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer)
     {
         if (code || buffer.size() == 0)
         {
+			CONSOLE_LOG_ERROR(code.message() << " " << buffer.size());
             this->CloseSocket(XCode::NetWorkError);
             return;
         }
@@ -83,28 +87,27 @@ namespace Sentry
         }
         else if (this->mReadState == ReadType::BODY)
         {
+			std::iostream os(&buffer);
+			assert(buffer.size() > 0);
             this->mReadState = ReadType::HEAD;
-            const char *str = buffer.c_str() + 1;
-            const size_t size = buffer.size() - 1;
-            switch ((MESSAGE_TYPE) buffer[0])
+            switch ((MESSAGE_TYPE) os.get())
             {
                 case MESSAGE_TYPE::MSG_RPC_REQUEST:
-                    this->OnRequest(str, size);
+                    this->OnRequest(os);
                     this->ReceiveMessage(sizeof(int));
                     break;
                 case MESSAGE_TYPE::MSG_RPC_RESPONSE:
-                    this->OnResponse(str, size);
+                    this->OnResponse(os);
                     this->ReceiveMessage(sizeof(int));
                     break;
             }
         }
     }
 
-	bool ServerClientContext::OnRequest(const char* buffer, size_t size)
+	bool ServerClientContext::OnRequest(std::iostream & os)
 	{
-        asio::streambuf s;
 		std::shared_ptr<com::Rpc_Request> requestData(new com::Rpc_Request());
-		if (!requestData->ParseFromArray(buffer, size))
+		if (!requestData->ParseFromIstream(&os))
 		{
 #ifdef __DEBUG__
 			CONSOLE_LOG_ERROR("parse server request message error");
@@ -122,10 +125,10 @@ namespace Sentry
 		return true;
 	}
 
-	bool ServerClientContext::OnResponse(const char* buffer, size_t size)
+	bool ServerClientContext::OnResponse(std::iostream & os)
 	{
 		std::shared_ptr<com::Rpc_Response> responseData(new com::Rpc_Response());
-		if (!responseData->ParseFromArray(buffer, size))
+		if (!responseData->ParseFromIstream(&os))
 		{
 #ifdef __NET_ERROR_LOG__
 			CONSOLE_LOG_ERROR("parse server response message error");
@@ -141,47 +144,35 @@ namespace Sentry
 		return true;
 	}
 
-	bool ServerClientContext::StartConnectAsync()
-	{
-		AutoCoroutineLock lock(this->mConnectLock);
-		if(this->mSocket->IsOpen())
-		{
-			return true;
-		}
-#ifdef ONLY_MAIN_THREAD
-		this->Connect();
-#else
-		this->mNetworkThread.Invoke(&ServerClientContext::Connect, this);
-#endif
-		this->mConnectTask = std::make_shared<TaskSource<XCode>>();
-		return mConnectTask->Await() == XCode::Successful;
-	}
-
 	void ServerClientContext::StartReceive()
 	{
         size_t size = sizeof(int);
         this->mReadState = ReadType::HEAD;
 #ifdef ONLY_MAIN_THREAD
-		this->ReceiveHead(size);
+		this->ReceiveMessage(size);
 #else
 		this->mNetworkThread.Invoke(&ServerClientContext::ReceiveMessage, this, size);
 #endif
 	}
 
-	void ServerClientContext::OnConnect(const asio::error_code& error)
+	void ServerClientContext::OnConnect(const asio::error_code& error, int count)
 	{
-		this->mConnectCount++;
-		XCode code = XCode::Successful;
-		assert(this->mConnectTask);
 		if(error)
 		{
 #ifdef __DEBUG__
 			CONSOLE_LOG_ERROR(error.message());
 #endif
-			code = XCode::Failure;
+			AsioContext & context = this->mSocket->GetThread();
+			this->mTimer = std::make_shared<asio::steady_timer>(context, std::chrono::seconds(5));
+			this->mTimer->async_wait(std::bind(std::bind(&ServerClientContext::Connect, this->shared_from_this())));
+			return;
 		}
         this->mReadState = ReadType::HEAD;
         this->ReceiveMessage(sizeof(int));
-		this->mConnectTask->SetResult(code);
+		while(!this->mSendQueues.empty())
+		{
+			this->Send(this->mSendQueues.front());
+			this->mSendQueues.pop();
+		}
 	}
 }

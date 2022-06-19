@@ -35,7 +35,6 @@ namespace Sentry
 		XCode Call(long long userId, std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<Message> response);
 		XCode Call(const std::string& address, std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<Message> response);
 	public:
-		bool SocketIsOpen(const std::string & address);
 		AddressProxy & GetAddressProxy() { return this->mAddressProxy;}
 		const RpcServiceConfig & GetServiceConfig() { return *this->mConfig; }
 		bool IsStartComplete() final{return this->mAddressProxy.GetSize() > 0; };

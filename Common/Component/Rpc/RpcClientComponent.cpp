@@ -57,10 +57,8 @@ namespace Sentry
 		if (iter != this->mRpcClientMap.end())
 		{
 			auto rpcClient = iter->second;
-			if (rpcClient->IsOpen())
-			{
-				rpcClient->StartClose();
-			}
+
+			rpcClient->StartClose();
 			this->mRpcClientMap.erase(iter);
 		}
 	}
@@ -123,7 +121,7 @@ namespace Sentry
 
 	bool RpcClientComponent::Send(const std::string & address, std::shared_ptr<com::Rpc_Request> message)
 	{
-		auto clientSession = this->GetSession(address);
+		auto clientSession = this->GetOrCreateSession(address);
 		if (message == nullptr || clientSession == nullptr)
 		{
 			return false;
@@ -135,7 +133,7 @@ namespace Sentry
 	bool RpcClientComponent::Send(const std::string & address, std::shared_ptr<com::Rpc_Response> message)
 	{
 		std::shared_ptr<ServerClientContext> clientSession = this->GetSession(address);
-		if (clientSession == nullptr || message == nullptr || !clientSession->IsOpen())
+		if (clientSession == nullptr || message == nullptr)
 		{
 			LOG_ERROR("send message to [" << address << "] failure");
 			return false;

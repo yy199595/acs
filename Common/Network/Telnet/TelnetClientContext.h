@@ -1,8 +1,9 @@
 #pragma once
 
 #include<istream>
-#include<Network/SocketProxy.h>
 #include<Async/TaskSource.h>
+#include<Network/SocketProxy.h>
+#include"Network/TcpContext.h"
 namespace Sentry
 {
     class TelnetContent
@@ -13,32 +14,28 @@ namespace Sentry
         std::string Parameter;
     };
 }
+
 namespace Sentry
 {
+	class TelnetProto;
 	class ConsoleComponent;
-	class TelnetClientContext
+}
+
+namespace Tcp
+{
+	class TelnetClientContext : public Tcp::TcpContext
 	{
 	 public:
-		explicit TelnetClientContext(std::shared_ptr<SocketProxy> socketProxy);
+		explicit TelnetClientContext(std::shared_ptr<SocketProxy> socketProxy, ConsoleComponent * component);
 		~TelnetClientContext() = default;
 	 public:
-		bool Response(const std::string& content);
-		std::shared_ptr<TelnetContent> ReadCommand();
-		bool IsOpen()
-		{
-			return this->mSocket->IsOpen();
-		}
-		const std::string& GetAddress()
-		{
-			return this->mSocket->GetAddress();
-		}
+		void StartRead();
+		void SendProtoMessage(std::shared_ptr<TelnetProto> message);
 	 private:
-		void ResponseData(std::shared_ptr<TaskSource<bool>> taskSource);
-		void ReadData(std::shared_ptr<TaskSource<bool>> taskSource, std::shared_ptr<TelnetContent> content);
+		void CloseContext();
+		void OnReceiveLine(const asio::error_code &code, asio::streambuf &buffer) final;
+		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	 private:
-		const std::string mDelim;
-		asio::streambuf mSendBuffer;
-		asio::streambuf mReceiveBuffer;
-		std::shared_ptr<SocketProxy> mSocket;
+		ConsoleComponent * mConsoleComponent;
 	};
 }

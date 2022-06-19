@@ -21,27 +21,27 @@ namespace Sentry
         RedisClientContext(std::shared_ptr<SocketProxy> socket, const RedisConfig & config, RedisComponent * component);
 		~RedisClientContext();
     public:
-        XCode StartConnectAsync();
+        //XCode StartConnectAsync();
         void StartReceiveMessage();
         const RedisConfig & GetConfig() { return mConfig;}
         void SendCommand(std::shared_ptr<RedisRequest> command);
         const std::string & GetName() const { return this->mConfig.Name; }
     private:
-        void OnReadComplete();
-		void OnConnect(const asio::error_code &error) final;
-        void OnReceive(const asio::error_code & code, size_t size);
+		void ConnectServer();
+		void OnReadComplete();
+		void OnConnect(const asio::error_code &error, int count) final;
         void AddCommandQueue(std::shared_ptr<RedisRequest> command);
-        void OnReceiveLine(const asio::error_code &code, const std::string &buffer) final;
-        void OnReceiveMessage(const asio::error_code &code, const std::string &buffer) final;
+        void OnReceiveLine(const asio::error_code &code, asio::streambuf & buffer) final;
+        void OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer) final;
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
     private:
         const RedisConfig & mConfig;
-        asio::streambuf mRecvDataBuffer;
         RedisComponent * mRedisComponent;
-        TaskSource<XCode> mConnectTaskSource;
-        std::shared_ptr<RedisResponse> mCurResponse;
-        std::shared_ptr<CoroutineLock> mConnectLock; //连接锁
-        std::queue<std::shared_ptr<RedisRequest>> mCommands;
+		std::shared_ptr<asio::steady_timer> mTimer;
+		std::shared_ptr<RedisResponse> mCurResponse;
+		std::shared_ptr<RedisRequest> mAuthCommand;
+		std::shared_ptr<RedisRequest> mSelectCommand;
+		std::list<std::shared_ptr<RedisRequest>> mCommands;
     };
     typedef std::shared_ptr<RedisClientContext> SharedRedisClient;
 }

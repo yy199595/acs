@@ -21,8 +21,9 @@ namespace Sentry
 		bool Lock(const std::string& key, int timeout = 10);
 	 public:
 		bool SubscribeChannel(const std::string& channel);
-		bool AddRedisTask(std::shared_ptr<IRpcTask<RedisResponse>> task) final;
 		long long Publish(const std::string& channel, const std::string& message);
+		std::shared_ptr<RedisTask> AddRedisTask(std::shared_ptr<RedisRequest> request) final;
+		std::shared_ptr<LuaRedisTask> AddLuaRedisTask(std::shared_ptr<RedisRequest> request, lua_State * lua);
 	 private:
 		bool OnStart() final;
 		bool LateAwake() final;
@@ -32,8 +33,8 @@ namespace Sentry
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 		bool HandlerEvent(const std::string& channel, const std::string& message);
 	 private:
-		void OnCommandReply(SharedRedisClient redisClient, std::shared_ptr<RedisResponse> response) final;
 		void OnSubscribe(SharedRedisClient redisClient, const std::string& channel, const std::string& message) final;
+		void OnCommandReply(SharedRedisClient redisClient, long long id, std::shared_ptr<RedisResponse> response) final;
 	 private:
 		std::string mRpcAddress;
 		TaskComponent* mTaskComponent;

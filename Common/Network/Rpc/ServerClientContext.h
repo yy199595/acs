@@ -18,21 +18,19 @@ namespace Sentry
 	 public:
 		void StartClose();
 		void StartReceive();
-		bool StartConnectAsync();
 		void SendToServer(std::shared_ptr<com::Rpc_Request> message);
 		void SendToServer(std::shared_ptr<com::Rpc_Response> message);
 	 protected:
-		void OnConnect(const asio::error_code &error) final;
-        void OnReceiveMessage(const asio::error_code &code, const std::string &buffer) final;
+		void OnConnect(const asio::error_code &error, int count) final;
+        void OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	private:
 		void CloseSocket(XCode code);
-		bool OnRequest(const char * message, size_t size);
-		bool OnResponse(const char * message, size_t size);
+		bool OnRequest(std::iostream & os);
+		bool OnResponse(std::iostream & os);
 	private:
-		int mConnectCount;
 		RpcClientComponent* mTcpComponent;
-		std::shared_ptr<CoroutineLock> mConnectLock;
-		std::shared_ptr<TaskSource<XCode>> mConnectTask;
+		std::shared_ptr<asio::steady_timer> mTimer;
+		std::queue<std::shared_ptr<ProtoMessage>> mSendQueues;
 	};
 }// namespace Sentry

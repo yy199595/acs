@@ -4,9 +4,9 @@
 #include"Util/DirectoryHelper.h"
 #include"Script/ClassProxyHelper.h"
 #include"Global/ServiceConfig.h"
+#include"DB/Redis/RedisClientContext.h"
 #include"Script/Extension/Redis/LuaRedis.h"
 #include"Component/Scene/NetThreadComponent.h"
-#include"DB/Redis/RedisClientContext.h"
 #include"Component/Rpc/RpcHandlerComponent.h"
 #include"Component/Scene/NetEventComponent.h"
 namespace Sentry
@@ -24,13 +24,21 @@ namespace Sentry
 
 	bool MainRedisComponent::OnStart()
 	{
-        LOG_CHECK_RET_FALSE(RedisComponent::OnStart());
+		LOG_CHECK_RET_FALSE(RedisComponent::OnStart());
+
+		std::shared_ptr<RedisRequest> request(new RedisRequest("LPUSH"));
+		request->AddParameter("yjz11");
+
+		for(size_t index = 0; index < 100; index++)
+		{
+			long long time = Helper::Time::GetNowSecTime() + index;
+			request->AddParameter(Helper::Time::GetDateStr(time));
+		}
+		this->Run("main", request);
+		std::shared_ptr<RedisResponse> response = this->Run("main", "LRANGE", "yjz11", 0, 100);
+
+
         this->mSubRedisClient = this->MakeRedisClient("main");
-        if(!this->TryAsyncConnect(this->mSubRedisClient))
-        {
-            LOG_ERROR("start sub redis client error");
-            return false;
-        }
         return this->StartSubChannel();
 	}
 
@@ -61,24 +69,10 @@ namespace Sentry
 
     void MainRedisComponent::OnSecondUpdate(const int tick)
     {
-        if (tick % 10 == 0)
-        {
-            if (!this->mSubRedisClient->IsOpen())
-            {
-                this->mTaskComponent->Start([this]() {
-                    if (!this->TryAsyncConnect(this->mSubRedisClient))
-                    {
-                        LOG_ERROR("sub redis client connect error");
-                        return;
-                    }
-                    this->StartSubChannel();
-                });
-            }
-            else
-            {
-                this->mSubRedisClient->SendCommand(std::make_shared<RedisRequest>("PING"));
-            }
-        }
+        if (tick % 10 == 0 && this->mSubRedisClient != nullptr)
+		{
+			this->mSubRedisClient->SendCommand(std::make_shared<RedisRequest>("PING"));
+		}
     }
 
 	long long MainRedisComponent::Publish(const std::string& channel, const std::string& message)
@@ -104,13 +98,12 @@ namespace Sentry
         return false;
 	}
 
-    void MainRedisComponent::OnCommandReply(SharedRedisClient redisClient, std::shared_ptr<RedisResponse> response)
+    void MainRedisComponent::OnCommandReply(SharedRedisClient redisClient, long long taskId, std::shared_ptr<RedisResponse> response)
     {
-        long long taskId = response->GetTaskId();
         auto iter = this->mTasks.find(taskId);
         if(iter == this->mTasks.end())
         {
-            LOG_ERROR("not find redis task id = " << response->GetTaskId());
+            LOG_ERROR("not find redis task id = " << taskId);
             return;
         }
         iter->second->OnResponse(response);
@@ -121,17 +114,31 @@ namespace Sentry
         this->mTasks.erase(iter);
     }
 
-    bool MainRedisComponent::AddRedisTask(std::shared_ptr<IRpcTask<RedisResponse>> task)
+    std::shared_ptr<RedisTask> MainRedisComponent::AddRedisTask(std::shared_ptr<RedisRequest> request)
     {
+		std::shared_ptr<RedisTask> task = request->MakeTask();
         long long taskId = task->GetRpcId();
         auto iter = this->mTasks.find(taskId);
         if(iter == this->mTasks.end())
         {
             this->mTasks.emplace(taskId, task);
-            return true;
+            return task;
         }
-        return false;
+        return nullptr;
     }
+
+	std::shared_ptr<LuaRedisTask> MainRedisComponent::AddLuaRedisTask(std::shared_ptr<RedisRequest> request, lua_State * lua)
+	{
+		std::shared_ptr<LuaRedisTask> task = request->MakeLuaTask(lua);
+		long long taskId = task->GetRpcId();
+		auto iter = this->mTasks.find(taskId);
+		if(iter == this->mTasks.end())
+		{
+			this->mTasks.emplace(taskId, task);
+			return task;
+		}
+		return nullptr;
+	}
 
     void MainRedisComponent::OnSubscribe(SharedRedisClient redisClient, const std::string &channel, const std::string &message)
     {

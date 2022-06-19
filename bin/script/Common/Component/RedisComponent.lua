@@ -35,6 +35,7 @@ function RedisComponent.Lock(key, time)
     local response = self:Call("main", "lock.lock", {
                 key = key, time = time
             })
+    table.print(response)
     return Json.Decode(response).res
 end
 

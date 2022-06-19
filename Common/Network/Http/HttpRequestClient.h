@@ -9,10 +9,11 @@
 #include"Network/TcpContext.h"
 namespace Sentry
 {
+	class HttpComponent;
 	class HttpRequestClient : public Tcp::TcpContext
 	{
 	 public:
-		HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy);
+		HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy, HttpComponent * component);
 	 public:
 		std::shared_ptr<HttpAsyncResponse> Get(const std::string& url);
 		std::shared_ptr<HttpAsyncResponse> Post(const std::string& url, Json::Writer& json);
@@ -25,6 +26,9 @@ namespace Sentry
 	 private:
 		TaskSource<bool> mHttpTask;
 		asio::streambuf mReadBuffer;
+		HttpComponent * mHttpComponent;
+		std::shared_ptr<HttpAsyncRequest> mRequest;
+		std::shared_ptr<HttpAsyncResponse> mResponse;
 	};
 }
 #endif //GAMEKEEPER_HTTPREQUESTCLIENT_H

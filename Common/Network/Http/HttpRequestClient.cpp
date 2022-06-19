@@ -6,10 +6,10 @@
 #include<regex>
 namespace Sentry
 {
-    HttpRequestClient::HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy)
+    HttpRequestClient::HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy, HttpComponent * httpComponent)
 		: Tcp::TcpContext(socketProxy)
     {
-
+		this->mHttpComponent = httpComponent;
     }
 
 	void HttpRequestClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<Tcp::ProtoMessage> message)
@@ -27,12 +27,12 @@ namespace Sentry
 
     std::shared_ptr<HttpAsyncResponse> HttpRequestClient::Get(const std::string &url)
 	{
-		std::shared_ptr<HttpGetRequest> httpRequest = HttpGetRequest::Create(url);
-		if(httpRequest == nullptr)
+		this->mRequest = HttpGetRequest::Create(url);
+		if(this->mRequest == nullptr)
 		{
 			return nullptr;
 		}
-		return this->Request(httpRequest);
+		return this->Request(this->mRequest);
 	}
 
     std::shared_ptr<HttpAsyncResponse> HttpRequestClient::Request(std::shared_ptr<HttpAsyncRequest> httpRequest, std::fstream * fs)
@@ -57,7 +57,7 @@ namespace Sentry
         }
 		this->mHttpTask.Clear();
 		LOG_WARN("send http data to " << host << ":" << port << " successful");
-		std::shared_ptr<HttpAsyncResponse> httpContent(new HttpAsyncResponse());
+		std::shared_ptr<HttpAsyncResponse> httpContent(new HttpAsyncResponse(nullptr));
         this->ReceiveHttpContent(httpContent);
 		LOG_ERROR("recv http data from " << host << ":" << port << " successful");
 		return this->mHttpTask.Await() ? httpContent : nullptr;
@@ -78,7 +78,7 @@ namespace Sentry
             return nullptr;
         }
 		this->mHttpTask.Clear();
-        std::shared_ptr<HttpAsyncResponse> httpContent(new HttpAsyncResponse(fs));
+        std::shared_ptr<HttpAsyncResponse> httpContent(new HttpAsyncResponse(0, fs));
         netWorkThread.Invoke(&HttpRequestClient::ReceiveHttpContent, this, httpContent);
         return this->mHttpTask.Await() ? httpContent : nullptr;
 #endif

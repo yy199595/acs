@@ -13,7 +13,7 @@ namespace Mongo
 		this->mConnectLock = std::make_shared<CoroutineLock>();
 	}
 
-	void MongoClientContext::OnConnect(const asio::error_code& error)
+	void MongoClientContext::OnConnect(const asio::error_code& error, int count)
 	{
 		if(error)
 		{
@@ -43,10 +43,7 @@ namespace Mongo
 	bool MongoClientContext::StartConnect()
 	{
 		AutoCoroutineLock lock(this->mConnectLock);
-		if(this->IsOpen())
-		{
-			return true;
-		}
+
 		this->mConnectTask.Clear();
 #ifdef ONLY_MAIN_THREAD
 		this->Connect();

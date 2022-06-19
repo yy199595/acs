@@ -56,7 +56,7 @@ namespace Sentry
 			std::make_shared<HttpHandlerClient>(this, socket);
 
 		handlerClient->StartReceive();
-		this->mHttpClients.insert(handlerClient);
+		this->mHttpClients.emplace(address, handlerClient);
 	}
 
     const HttpInterfaceConfig *HttpComponent::OnHandler(const HttpHandlerRequest &request, HttpHandlerResponse &response)
@@ -78,7 +78,7 @@ namespace Sentry
 
     }
 
-	void HttpComponent::HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient)
+	void HttpComponent::OnRequest(std::shared_ptr<HttpHandlerClient> httpClient)
 	{
 		std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
 		std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
@@ -123,7 +123,7 @@ namespace Sentry
 		IAsioThread &thread = this->mThreadComponent->AllocateNetThread();
 #endif
 		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread));
-		return std::make_shared<HttpRequestClient>(socketProxy);
+		return std::make_shared<HttpRequestClient>(socketProxy, this);
 	}
 
 	std::shared_ptr<HttpAsyncResponse> HttpComponent::Get(const std::string& url, float second)
@@ -209,12 +209,22 @@ namespace Sentry
 	}
 	void HttpComponent::ClosetHttpClient(std::shared_ptr<HttpHandlerClient> httpClient)
 	{
-		auto iter = this->mHttpClients.find(httpClient);
+		const std::string & address = httpClient->GetAddress();
+		auto iter = this->mHttpClients.find(address);
 		if(iter != this->mHttpClients.end())
 		{
 			this->mHttpClients.erase(iter);
-			LOG_DEBUG("remove http address : " << httpClient->GetAddress());
+			LOG_DEBUG("remove http address : " << address);
 		}
+	}
+	void HttpComponent::OnResponse(long long int taskId, std::shared_ptr<HttpAsyncResponse> response)
+	{
+
+	}
+	bool HttpComponent::AddRequestTask(std::shared_ptr<HttpRequestClient> requestClient)
+	{
+
+		return false;
 	}
 
 }

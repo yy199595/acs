@@ -22,8 +22,7 @@ namespace Sentry
         SharedRedisClient GetClient(const std::string & name);
         SharedRedisClient MakeRedisClient(const RedisConfig & config);
         SharedRedisClient MakeRedisClient(const std::string & name);
-        bool TryAsyncConnect(SharedRedisClient client, int maxCount = 5);
-        void OnResponse(SharedRedisClient client, std::shared_ptr<RedisResponse> response);
+        void OnResponse(SharedRedisClient client, long long id, std::shared_ptr<RedisResponse> response);
     public:
         std::shared_ptr<RedisResponse> Run(const std::string & name, std::shared_ptr<RedisRequest> request);
         std::shared_ptr<RedisResponse> Run(SharedRedisClient redisClientContext, std::shared_ptr<RedisRequest> request);
@@ -36,14 +35,14 @@ namespace Sentry
         bool LateAwake() override;
         void OnSecondUpdate(const int tick) override;
 	 protected:
-        virtual bool AddRedisTask(std::shared_ptr<IRpcTask<RedisResponse>> task) = 0;
-        virtual void OnCommandReply(SharedRedisClient client, std::shared_ptr<RedisResponse> response) = 0;
+        virtual std::shared_ptr<RedisTask> AddRedisTask(std::shared_ptr<RedisRequest> request) = 0;
+        virtual void OnCommandReply(SharedRedisClient client, long long id, std::shared_ptr<RedisResponse> response) = 0;
         virtual void OnSubscribe(SharedRedisClient client, const std::string & channel, const std::string & message) = 0;
     private:
         void PushClient(SharedRedisClient redisClientContext);
         const RedisConfig * GetRedisConfig(const std::string & name);
-		bool LoadLuaScript(SharedRedisClient redisClientContext, const std::string & path);
-	private:
+		bool LoadLuaScript(const std::string & name, const std::string & path);
+	 private:
 		TaskComponent * mTaskComponent;
 		std::unordered_map<std::string, RedisConfig> mConfigs;
 		std::unordered_map<std::string, std::string> mLuaMap;

@@ -20,15 +20,15 @@ namespace Sentry
 		void StartClose();
 		void StartReceive();
 		unsigned int GetQps() const { return this->mQps; }
-		bool SendToClient(std::shared_ptr<c2s::Rpc::Call> message);
-		bool SendToClient(std::shared_ptr<c2s::Rpc::Response> message);
+		void SendToClient(std::shared_ptr<c2s::Rpc::Call> message);
+		void SendToClient(std::shared_ptr<c2s::Rpc::Response> message);
 		unsigned int GetCallCount() const
 		{
 			return this->mCallCount;
 		}
 	 protected:
 		void OnConnect(const asio::error_code &error) {}
-        void OnReceiveMessage(const asio::error_code &code, const std::string &buffer) final;
+        void OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	private:
 		void CloseSocket(XCode code);

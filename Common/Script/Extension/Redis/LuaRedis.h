@@ -19,8 +19,6 @@ namespace Lua
 	{
 		int Run(lua_State * lua);
 		int Call(lua_State * lua);
-		int Send(lua_State * lua, MainRedisComponent * redisComponent,
-			std::shared_ptr<RedisClientContext> redisClientContext, std::shared_ptr<RedisRequest> request);
 	};
 }
 

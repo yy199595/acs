@@ -26,13 +26,13 @@ namespace Sentry
 	{
         this->mReadState = ReadType::HEAD;
 #ifdef ONLY_MAIN_THREAD
-		this->ReceiveHead(sizeof(int));
+		this->ReceiveMessage(sizeof(int));
 #else
 		this->mNetworkThread.Invoke(&GateClientContext::ReceiveMessage, this, sizeof(int));
 #endif
 	}
 
-    void GateClientContext::OnReceiveMessage(const asio::error_code &code, const std::string &buffer)
+    void GateClientContext::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer)
     {
         if(code)
         {
@@ -49,11 +49,12 @@ namespace Sentry
         }
         else if (this->mReadState == ReadType::BODY)
         {
-            this->mReadState = ReadType::HEAD;
-            if((MESSAGE_TYPE)buffer[0] == MESSAGE_TYPE::MSG_RPC_CLIENT_REQUEST)
+			std::iostream os(&buffer);
+			this->mReadState = ReadType::HEAD;
+            if((MESSAGE_TYPE)os.get() == MESSAGE_TYPE::MSG_RPC_CLIENT_REQUEST)
             {
                 std::shared_ptr<c2s::Rpc_Request> request(new c2s::Rpc_Request());
-                if (!request->ParseFromArray(buffer.c_str() + 1, buffer.size() - 1))
+                if (!request->ParseFromIstream(&os))
                 {
                     return;
                 }
@@ -111,12 +112,8 @@ namespace Sentry
 #endif
 	}
 
-	bool GateClientContext::SendToClient(std::shared_ptr<c2s::Rpc::Call> message)
+	void GateClientContext::SendToClient(std::shared_ptr<c2s::Rpc::Call> message)
 	{
-		if (!this->IsOpen())
-		{
-			return false;
-		}
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> requestMessage
 				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_CALL_CLIENT, message);
 #ifdef ONLY_MAIN_THREAD
@@ -124,15 +121,10 @@ namespace Sentry
 #else
 		this->mNetworkThread.Invoke(&GateClientContext::Send, this, requestMessage);
 #endif
-		return true;
 	}
 
-	bool GateClientContext::SendToClient(std::shared_ptr<c2s::Rpc::Response> message)
+	void GateClientContext::SendToClient(std::shared_ptr<c2s::Rpc::Response> message)
 	{
-		if(!this->IsOpen())
-		{
-			return false;
-		}
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> requestMessage
 				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_RESPONSE, message);
 #ifdef ONLY_MAIN_THREAD
@@ -140,7 +132,6 @@ namespace Sentry
 #else
 		this->mNetworkThread.Invoke(&GateClientContext::Send, this, requestMessage);
 #endif
-		return true;
 	}
 
 }

@@ -36,10 +36,12 @@ namespace Sentry
 	class RedisString : public RedisAny
 	{
 	 public:
+		RedisString(const size_t size);
 		RedisString(const std::string & value);
 		RedisString(const char * str, size_t size);
 	 public:
 		void Write(std::iostream &io) final;
+		void Append(const char * str, size_t size);
 		bool IsNumber() const final { return false; }
 		bool IsString() const final { return true;}
 		const std::string & GetValue() const { return this->mValue;}

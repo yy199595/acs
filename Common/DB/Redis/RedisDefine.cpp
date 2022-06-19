@@ -56,14 +56,14 @@ namespace Sentry
 
     std::shared_ptr<RedisTask> RedisRequest::MakeTask()
     {
-        std::shared_ptr<RedisTask> redisTask(new RedisTask());
+        std::shared_ptr<RedisTask> redisTask(new RedisTask(this->shared_from_this()));
         this->mTaskId = redisTask->GetRpcId();
         return redisTask;
     }
 
     std::shared_ptr<LuaRedisTask> RedisRequest::MakeLuaTask(lua_State *lua)
     {
-        std::shared_ptr<LuaRedisTask> redisTask(new LuaRedisTask(lua));
+        std::shared_ptr<LuaRedisTask> redisTask(new LuaRedisTask(lua, this->shared_from_this()));
         this->mTaskId = redisTask->GetRpcId();
         return redisTask;
     }
@@ -94,12 +94,18 @@ namespace Sentry
 
 namespace Sentry
 {
-    RedisResponse::RedisResponse(long long taskId)
-        : mTaskId(taskId), mLineCount(0), mDataSize(0),
+    RedisResponse::RedisResponse()
+        : mLineCount(0), mDataSize(0),
         mNumber(-1), mDataCount(0)
     {
         this->mType = RedisRespType::REDIS_NONE;
     }
+
+	bool RedisResponse::HasError()
+	{
+		return this->mType == RedisRespType::REDIS_NONE
+			   || this->mType == RedisRespType::REDIS_ERROR;
+	}
 
 	RedisResponse::~RedisResponse()
 	{
@@ -110,83 +116,98 @@ namespace Sentry
 		this->mArray.clear();
 	}
 
-    int RedisResponse::OnRecvLine(const std::string &message)
+    int RedisResponse::OnRecvLine(std::iostream &message)
     {
         switch (this->mType)
         {
             case RedisRespType::REDIS_NONE:
                 return this->OnReceiveFirstLine(message);
-                break;
             case RedisRespType::REDIS_ARRAY:
                 return this->OnDecodeArray(message);
-                break;
         }
+		return 0;
     }
 
-    int RedisResponse::OnRecvMessage(const std::string &message)
-    {
-        switch(this->mType)
-        {
-            case RedisRespType::REDIS_STRING:
-            case RedisRespType::REDIS_BIN_STRING:
-                this->mString.append(message);
-                return 0;
-            case RedisRespType::REDIS_ARRAY:
-                this->mLineCount++;
-                this->mArray.emplace_back(new RedisString(message));
-                return this->mLineCount < this->mDataCount ? -1 : 0; //再读一行
-        }
-        return 0;
-    }
+    int RedisResponse::OnRecvMessage(std::iostream& os)
+	{
+		this->mString.clear();
+		std::unique_ptr<char[]> buffer(new char[this->mDataSize]);
+		size_t size = os.readsome(buffer.get(), this->mDataSize);
+		if (size == this->mDataSize)
+		{
+			switch (this->mType)
+			{
+			case RedisRespType::REDIS_STRING:
+			case RedisRespType::REDIS_BIN_STRING:
+				this->mString.append(buffer.get(), this->mDataSize);
+				break;
+			case RedisRespType::REDIS_ARRAY:
+				RedisAny * redisAny = this->mArray[this->mLineCount++];
+				if(redisAny->IsString())
+				{
+					((RedisString*)redisAny)->Append(buffer.get(), this->mDataSize);
+				}
+				break;
+			}
+		}
+		os.ignore(2); //删除/r/n
+		return this->mLineCount < this->mDataCount ? -1 : 0; //再读一行
+	}
 
     bool RedisResponse::IsOk()
     {
         return this->mString == "OK";
     }
 
-    int RedisResponse::OnReceiveFirstLine(const std::string &lineData)
-    {
-        const char * str = lineData.c_str() + 1;
-        const size_t size = lineData.size() -1;
-        switch (lineData[0])
-        {
-            case '+': //字符串类型
-                //STD_ERROR_LOG("str = " << lineData.data());
-                this->mType = RedisRespType::REDIS_STRING;
-                this->mString.append(str, size);
-                break;
-            case '-': //错误
-                this->mType = RedisRespType::REDIS_ERROR;
-                this->mString.append(str, size);
-                break;
-            case ':': //整型
-                this->mType = RedisRespType::REDIS_NUMBER;
-                this->mNumber = std::atoi(str);
-                break;
-            case '$': //二进制字符串
-                this->mType = RedisRespType::REDIS_BIN_STRING;
-                return std::stoi(lineData);
-            case '*': //数组
-                this->mType = RedisRespType::REDIS_ARRAY;
-                this->mDataCount = std::stoi(lineData);
-                return -1;
-                break;
-        }
-        return 0;
-    }
+    int RedisResponse::OnReceiveFirstLine(std::iostream& os)
+	{
+		char cc = os.get();
+		this->mDataSize = 0;
+		std::getline(os, this->mString);
+		this->mString.pop_back();
+		switch (cc)
+		{
+		case '+': //字符串类型
+			this->mType = RedisRespType::REDIS_STRING;
+			break;
+		case '-': //错误
+			this->mType = RedisRespType::REDIS_ERROR;
+			break;
+		case ':': //整型
+			this->mType = RedisRespType::REDIS_NUMBER;
+			this->mNumber = std::stoll(this->mString);
+			break;
+		case '$': //二进制字符串
+			this->mType = RedisRespType::REDIS_BIN_STRING;
+			this->mDataSize = std::stoi(this->mString);
+			break;
+		case '*': //数组
+			this->mDataSize = -1;
+			this->mType = RedisRespType::REDIS_ARRAY;
+			this->mDataCount = std::stoi(this->mString);
+			break;
+		}
+		return this->mDataSize;
+	}
 
-    int RedisResponse::OnDecodeArray(const std::string & message)
+    int RedisResponse::OnDecodeArray(std::iostream & os)
     {
-        if (message[0] == '$')
-        {
-            return std::atoi(message.c_str() + 1);
-        }
-        else if (message[0] == ':')
-        {
-            this->mLineCount++;
-            long long number = std::atoll(message.c_str() + 1);
-            this->mArray.emplace_back(new RedisNumber(number));
-        }
+		char cc = os.get();
+		this->mString.clear();
+		if(cc == '$' && std::getline(os, this->mString))
+		{
+			this->mString.pop_back();
+			this->mDataSize = std::stoi(this->mString);
+			this->mArray.emplace_back(new RedisString(this->mDataSize));
+			return this->mDataSize;
+		}
+		else if(cc == ':' && std::getline(os, this->mString))
+		{
+			this->mLineCount++;
+			this->mString.pop_back();
+			long long number = std::stoll(this->mString);
+			this->mArray.emplace_back(new RedisNumber(number));
+		}
         return this->mLineCount < this->mDataCount ? -1 : 0;
     }
 
@@ -208,9 +229,10 @@ namespace Sentry
 
 namespace Sentry
 {
-    RedisTask::RedisTask()
+    RedisTask::RedisTask(std::shared_ptr<RedisRequest> request)
     {
-        this->mTaskId = Helper::Guid::Create();
+		this->mRequest = request;
+		this->mTaskId = Helper::Guid::Create();
     }
 
     void RedisTask::OnResponse(std::shared_ptr<RedisResponse> response)
@@ -218,7 +240,7 @@ namespace Sentry
         this->mTask.SetResult(response);
     }
 
-    LuaRedisTask::LuaRedisTask(lua_State *lua)
+    LuaRedisTask::LuaRedisTask(lua_State *lua, std::shared_ptr<RedisRequest> request)
         : mLua(lua)
     {
         this->mRef = 0;
@@ -226,7 +248,8 @@ namespace Sentry
         {
             this->mRef = luaL_ref(lua, LUA_REGISTRYINDEX);
         }
-        this->mTaskId = Helper::Guid::Create();
+		this->mRequest = request;
+		this->mTaskId = Helper::Guid::Create();
     }
     LuaRedisTask::~LuaRedisTask()
     {

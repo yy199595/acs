@@ -39,9 +39,11 @@ namespace Sentry
 	 public:
 		void OnListen(std::shared_ptr<SocketProxy> socket) final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
-		void HandlerHttpData(std::shared_ptr<HttpHandlerClient> httpClient);
 		void ClosetHttpClient(std::shared_ptr<HttpHandlerClient> httpClient);
-
+	 public:
+		void OnRequest(std::shared_ptr<HttpHandlerClient> httpClient);
+		bool AddRequestTask(std::shared_ptr<HttpRequestClient> requestClient);
+		void OnResponse(long long taskId, std::shared_ptr<HttpAsyncResponse> response);
     private:
         const HttpInterfaceConfig * OnHandler(const HttpHandlerRequest & requets, HttpHandlerResponse & response);
 	 private:
@@ -50,7 +52,7 @@ namespace Sentry
 #ifndef ONLY_MAIN_THREAD
 		class NetThreadComponent* mThreadComponent;
 #endif
-		std::set<std::shared_ptr<HttpHandlerClient>> mHttpClients;
 		std::unordered_map<std::string, const HttpInterfaceConfig *> mHttpConfigs;
+		std::unordered_map<std::string, std::shared_ptr<HttpHandlerClient>> mHttpClients;
 	};
 }

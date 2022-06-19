@@ -42,7 +42,7 @@ namespace Sentry
 		this->mHttpComponent->HandlerHttpData(httpHandlerClient);
 #else
 		IAsioThread& mainThread = App::Get()->GetTaskScheduler();
-		mainThread.Invoke(&HttpComponent::HandlerHttpData, this->mHttpComponent, httpHandlerClient);
+		mainThread.Invoke(&HttpComponent::OnRequest, this->mHttpComponent, httpHandlerClient);
 #endif
 	}
 

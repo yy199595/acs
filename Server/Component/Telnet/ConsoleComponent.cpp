@@ -8,6 +8,29 @@
 
 namespace Sentry
 {
+	void TelnetProto::Add(const std::string& conetnt)
+	{
+		this->mContents.emplace_back(conetnt);
+	}
+
+	void TelnetProto::Add(const char* str, size_t size)
+	{
+		this->mContents.emplace_back(str, size);
+	}
+
+	int TelnetProto::Serailize(std::ostream& os)
+	{
+		for(const std::string & str : this->mContents)
+		{
+			os << str << "\r\n";
+		}
+		return 0;
+	}
+}
+
+using namespace Tcp;
+namespace Sentry
+{
 	bool ConsoleComponent::LateAwake()
 	{
 		BIND_FUNC("help", ConsoleComponent::Help);
@@ -28,52 +51,30 @@ namespace Sentry
 
 	void ConsoleComponent::OnListen(std::shared_ptr<SocketProxy> socket)
 	{
-		std::shared_ptr<TelnetClientContext> telnetClient(new TelnetClientContext(socket));
-		this->mTaskComponent->Start(&ConsoleComponent::HandleConsoleClient, this, telnetClient);
+		std::shared_ptr<TelnetClientContext> telnetClient =
+			std::make_shared<TelnetClientContext>(socket, this);
+
+		std::shared_ptr<TelnetProto> telnetProto(new TelnetProto());
+		telnetProto->Add("welcome connect sertry server");
+
+
+		telnetClient->StartRead();
+		this->mTelnetClients.emplace(telnetClient);
+		telnetClient->SendProtoMessage(telnetProto);
 	}
 
-	void ConsoleComponent::HandleConsoleClient(std::shared_ptr<TelnetClientContext> telnetClient)
+	void ConsoleComponent::OnReceive(std::shared_ptr<TelnetClientContext> clientContext, const std::string& message)
 	{
-		telnetClient->Response("welcome to sentry server");
-		while (telnetClient->IsOpen())
+		char cc = ' ';
+		std::vector<std::string> splitStrings;
+		std::shared_ptr<TelnetProto> telnetProto(new TelnetProto());
+		google::protobuf::SplitStringUsing(message, &cc, &splitStrings);
+		for(const std::string & str : splitStrings)
 		{
-			std::shared_ptr<TelnetContent> commandContent = telnetClient->ReadCommand();
-			LOG_INFO("==== console command ====");
-			LOG_INFO("command = " << commandContent->Command);
-			if (!commandContent->Parameter.empty())
-			{
-				LOG_INFO("parameter = " << commandContent->Parameter);
-			}
-			if (commandContent->IsOk)
-			{
-				std::stringstream responseStream;
-				auto iter = this->mFunctionMap.find(commandContent->Command);
-				if (iter == this->mFunctionMap.end())
-				{
-					responseStream << "\r\n" << "<CMD NOT>";
-				}
-				else
-				{
-					std::vector<std::string> response;
-					ConsoleFunction function = iter->second;
-					if (function(commandContent->Parameter, response))
-					{
-						for (const std::string& str : response)
-						{
-							responseStream << "\r\n" << str;
-						}
-						responseStream << "\r\n<CMD OK>";
-					}
-					else
-					{
-						responseStream << "\r\n<CMD ERR>";
-					}
-				}
-				std::string res = responseStream.str();
-				telnetClient->Response(responseStream.str());
-			}
+			telnetProto->Add(str);
 		}
-		LOG_ERROR("[console ] " << telnetClient->GetAddress() << " disconnected");
+		clientContext->StartRead();
+		clientContext->SendProtoMessage(telnetProto);
 	}
 
 	bool ConsoleComponent::Help(const std::string& parameter, std::vector<std::string>& response)
@@ -124,5 +125,14 @@ namespace Sentry
 		Helper::Time::SetScaleTotalTime(value);
 		LOG_WARN("now time = " << Helper::Time::GetDateString());
 		return true;
+	}
+	void ConsoleComponent::OnClientError(std::shared_ptr<Tcp::TelnetClientContext> clientContext)
+	{
+		auto iter = this->mTelnetClients.find(clientContext);
+		if(iter != this->mTelnetClients.end())
+		{
+			this->mTelnetClients.erase(iter);
+			CONSOLE_LOG_ERROR("[" << clientContext->GetAddress() << "] disconnect");
+		}
 	}
 }

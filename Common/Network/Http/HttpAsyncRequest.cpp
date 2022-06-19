@@ -81,7 +81,7 @@ namespace Sentry
 
 	}
 
-	void HttpGetRequest::WriteBody(std::ostream& os)
+	void HttpGetRequest::WriteBody(std::ostream& os) const
 	{
 
 	}
@@ -90,6 +90,19 @@ namespace Sentry
 	{
 		std::shared_ptr<HttpGetRequest> request(new HttpGetRequest());
 		return request->ParseUrl(url) ? request : nullptr;
+	}
+}
+
+namespace Sentry
+{
+	HttpTask::HttpTask(int timeout)
+	{
+		this->mTimeout = timeout;
+		this->mTaskId = Helper::Guid::Create();
+	}
+	void HttpTask::OnResponse(std::shared_ptr<HttpAsyncResponse> response)
+	{
+		this->mTask.SetResult(response);
 	}
 }
 
@@ -107,7 +120,7 @@ namespace Sentry
 		this->AddHead("content-length", (int)content.size());
 	}
 
-	void HttpPostRequest::WriteBody(std::ostream& os)
+	void HttpPostRequest::WriteBody(std::ostream& os) const
 	{
 		os.write(this->mBody.c_str(), this->mBody.size());
 	}
@@ -127,10 +140,11 @@ namespace Sentry
 
 namespace Sentry
 {
-	HttpAsyncResponse::HttpAsyncResponse(std::fstream* fs)
+	HttpAsyncResponse::HttpAsyncResponse(long long taskId, std::fstream* fs)
 	{
 		this->mHttpCode = 0;
 		this->mFstream = fs;
+		this->mTaskId = taskId;
 		this->mState = HttpDecodeState::FirstLine;
 	}
 
@@ -191,7 +205,18 @@ namespace Sentry
 		return HttpStatus::CONTINUE;
 	}
 
-	bool HttpAsyncResponse::GetHead(const std::string& key, std::string& value)
+	bool HttpAsyncResponse::GetHead(const std::string& key, int& value) const
+	{
+		auto iter = this->mHttpData.head().find(key);
+		if(iter != this->mHttpData.head().end())
+		{
+			value = std::stoi(iter->second);
+			return true;
+		}
+		return false;
+	}
+
+	bool HttpAsyncResponse::GetHead(const std::string& key, std::string& value) const
 	{
 		auto iter = this->mHttpData.head().find(key);
 		if(iter != this->mHttpData.head().end())

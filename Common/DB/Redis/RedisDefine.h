@@ -30,7 +30,7 @@ namespace Sentry
 {
     class RedisTask;
     class LuaRedisTask;
-    class RedisRequest : public Tcp::ProtoMessage
+ 	class RedisRequest : public Tcp::ProtoMessage, public std::enable_shared_from_this<RedisRequest>
     {
     public:
         RedisRequest(const std::string & cmd);
@@ -89,33 +89,31 @@ namespace Sentry
     class RedisResponse
     {
 	public:
-		RedisResponse(long long taskId);
+		RedisResponse();
 		~RedisResponse();
     public:
         bool IsOk();
 		void Clear();
     private:
-        int OnDecodeArray(const std::string & message);
-        int OnReceiveFirstLine(const std::string & lineData);
+        int OnDecodeArray(std::iostream & os);
+        int OnReceiveFirstLine(std::iostream & os);
     public:
-        int OnRecvLine(const std::string & message);
-        int OnRecvMessage(const std::string & message);
+        int OnRecvLine(std::iostream & os);
+        int OnRecvMessage(std::iostream & os);
     public:
-        template<typename T>
+		bool HasError();
+		template<typename T>
         const T * Cast(size_t index);
 		const RedisAny * Get(size_t index);
-        long long GetTaskId() const { return this->mTaskId; }
         size_t GetArraySize() { return this->mArray.size();}
         RedisRespType GetType() const { return this->mType; }
         long long GetNumber() const { return this->mNumber; }
         const std::string & GetString() const { return this->mString;}
         const std::vector<RedisAny *> & GetArray() const { return this->mArray; }
-        bool HasError() { return this->mType == RedisRespType::REDIS_ERROR;}
     private:
         int mDataSize;
         int mLineCount;
         int mDataCount;
-        long long mTaskId;
         long long mNumber;
         std::string mString;
         RedisRespType mType;
@@ -133,7 +131,7 @@ namespace Sentry
     class RedisTask : public IRpcTask<RedisResponse>
     {
     public:
-        RedisTask();
+        RedisTask(std::shared_ptr<RedisRequest> request);
         ~RedisTask() = default;
     public:
         int GetTimeout() final { return 0;}
@@ -142,13 +140,14 @@ namespace Sentry
         std::shared_ptr<RedisResponse> Await() { return this->mTask.Await(); }
     private:
         long long mTaskId;
-        TaskSource<std::shared_ptr<RedisResponse>> mTask;
+		std::shared_ptr<RedisRequest> mRequest;
+		TaskSource<std::shared_ptr<RedisResponse>> mTask;
     };
 
     class LuaRedisTask : public IRpcTask<RedisResponse>
     {
     public:
-        LuaRedisTask(lua_State * lua);
+        LuaRedisTask(lua_State * lua, std::shared_ptr<RedisRequest> request);
         ~LuaRedisTask();
     public:
         int Await();
@@ -159,6 +158,7 @@ namespace Sentry
         int mRef;
         lua_State * mLua;
         long long mTaskId;
+		std::shared_ptr<RedisRequest> mRequest;
     };
 }
 

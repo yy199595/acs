@@ -198,43 +198,12 @@ namespace Sentry
 
 	XCode ServiceComponent::SendRequest(const std::string& address, std::shared_ptr<com::Rpc::Request> request)
 	{
-		std::shared_ptr<ServerClientContext> clientContext = this->mClientComponent->GetOrCreateSession(address);
-		if(clientContext->IsOpen())
+		if(!this->mAddressProxy.HasAddress(address))
 		{
-			clientContext->SendToServer(request);
-			return XCode::Successful;
+			return XCode::NetWorkError;
 		}
-		TaskComponent * taskComponent = App::Get()->GetTaskComponent();
-		if(taskComponent->GetContextId() ==0)
-		{
-			taskComponent->Start([clientContext, taskComponent, address, request]()
-			{
-				for (int count = 0; count < 10; count++)
-				{
-					if (clientContext->StartConnectAsync())
-					{
-						clientContext->SendToServer(request);
-						LOG_INFO("connect [" << address << "] successful count = " << count++);
-						return;
-					}
-					taskComponent->Sleep(3000);
-					LOG_ERROR("connect [" << address << "] failure count = " << count++);
-				}
-			});
-			return XCode::Successful;
-		}
-		for (int count = 0; count < 10; count++)
-		{
-			if (clientContext->StartConnectAsync())
-			{
-				clientContext->SendToServer(request);
-				LOG_INFO("connect [" << address << "] successful count = " << count++);
-				return XCode::Successful;
-			}
-			taskComponent->Sleep(3000);
-			LOG_ERROR("connect [" << address << "] failure count = " << count++);
-		}
-		return XCode::NetWorkError;
+		this->mClientComponent->Send(address, request);
+		return XCode::Successful;
 	}
 }
 
@@ -301,11 +270,7 @@ namespace Sentry
 		}
 		return this->Call(address, rpcRequest, response);
 	}
-	bool ServiceComponent::SocketIsOpen(const string& address)
-	{
-		std::shared_ptr<ServerClientContext> clientContext = this->mClientComponent->GetSession(address);
-		return clientContext != nullptr && clientContext->IsOpen();
-	}
+
 	bool ServiceComponent::LoadConfig(const rapidjson::Value& json)
 	{
 		if(this->mConfig == nullptr)

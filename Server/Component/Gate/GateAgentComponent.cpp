@@ -37,24 +37,10 @@ namespace Sentry
 			LOG_ERROR("not find user gate address : " << userId);
 			return XCode::NotFindUser;
 		}
-
-		if(this->mGateService->SocketIsOpen(address))
-		{
-			c2s::Rpc::Call callInfo;
-			callInfo.set_func(func);
-			callInfo.mutable_data()->PackFrom(*message);
-			return this->mGateService->Send(userId, "CallClient", callInfo);
-		}
-
-		TaskComponent* taskComponent = this->GetApp()->GetTaskComponent();
-		taskComponent->Start([func, message, this, address, userId]()
-		{
-			c2s::Rpc::Call callInfo;
-			callInfo.set_func(func);
-			callInfo.mutable_data()->PackFrom(*message);
-			this->mGateService->Send(userId, "CallClient", callInfo);
-		});
-		return XCode::Successful;
+		c2s::Rpc::Call callInfo;
+		callInfo.set_func(func);
+		callInfo.mutable_data()->PackFrom(*message);
+		return this->mGateService->Send(userId, "CallClient", callInfo);
 	}
 
 	XCode GateAgentComponent::BroadCast(const std::string& func)

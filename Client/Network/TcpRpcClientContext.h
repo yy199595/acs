@@ -19,10 +19,10 @@ namespace Client
 		std::shared_ptr<TaskSource<bool>> ConnectAsync();
 		void SendToServer(std::shared_ptr<c2s::Rpc::Request> request);
 	protected:
-		bool OnRequest(const char * buffer, size_t size);
-		bool OnResponse(const char * buffer, size_t size);
-		void OnConnect(const asio::error_code &error) final;
-        void OnReceiveMessage(const asio::error_code &code, const std::string &buffer) final;
+		bool OnRequest(std::iostream & os);
+		bool OnResponse(std::iostream & os);
+		void OnConnect(const asio::error_code &error, int count) final;
+        void OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
     private:
         ClientComponent * mClientComponent;

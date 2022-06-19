@@ -25,32 +25,32 @@ namespace Tcp
 		virtual ~TcpContext();
 
 	public:
-		bool IsOpen() { return this->mSocket->IsOpen();}
 		long long GetLastOperTime() const { return this->mLastOperTime;}
 		const std::string & GetAddress() { return this->mSocket->GetAddress();}
-	 protected:
-		virtual void OnConnect(const asio::error_code & error)
-		{
-			throw std::logic_error("%%%%%%%%%%%%%%%");
-		}
-		virtual void OnSendMessage(const asio::error_code & code, std::shared_ptr<ProtoMessage> message) = 0;
 	protected:
 		void Connect();
         void ReceiveLine();
+		void ReceiveSomeMessage();
 		void ReceiveMessage(int size);
-        int GetLength(const std::string & buffer);
+        int GetLength(asio::streambuf & buffer);
         void Send(std::shared_ptr<ProtoMessage> message);
-        virtual void OnReceiveLine(const asio::error_code & code, const std::string & buffer) {}
-        virtual void OnReceiveMessage(const asio::error_code & code, const std::string & buffer) {}
+		template<typename T>
+		std::shared_ptr<T> Cast() { return dynamic_pointer_cast<T>(this->shared_from_this());}
+	 protected:
+		virtual void OnConnect(const asio::error_code & error, int count) { throw std::logic_error("");}
+		virtual void OnReceiveLine(const asio::error_code & code, asio::streambuf & buffer) {}
+        virtual void OnReceiveMessage(const asio::error_code & code, asio::streambuf & buffer) {}
+		virtual void OnSendMessage(const asio::error_code & code, std::shared_ptr<ProtoMessage> message) { };
 	 protected:
         ReadType mReadState;
         IAsioThread& mNetworkThread;
 		std::shared_ptr<SocketProxy> mSocket;
 	 private:
-        const size_t mMaxCount;
+		int mConnectCount;
+		const size_t mMaxCount;
 		long long mLastOperTime;
-        std::string mRecvBuffer;
 		asio::streambuf mSendBuffer;
+		asio::streambuf mRecvBuffer;
 	};
 }
 #endif //GAMEKEEPER_TCPCLIENT_H

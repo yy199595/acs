@@ -16,13 +16,14 @@ namespace Sentry
 		void Close();
 		unsigned short GetPort() { return this->mPort;}
 		inline std::string & GetIp() { return this->mIp;}
+		inline bool IsRemote() const { return this->mIsRemote;}
 		inline AsioTcpSocket& GetSocket() { return *mSocket;}
-		inline bool IsOpen() { return this->mSocket->is_open(); }
 		inline IAsioThread& GetThread() { return this->mNetThread; }
 		inline const std::string& GetAddress() { return this->mAddress; }
-		//inline AsioContext& GetContext() { return this->mNetThread.GetContext(); }
 	 private:
+		bool mIsRemote;
 		std::string mIp;
+		std::mutex mLock;
 		unsigned short mPort;
 		std::string mAddress;
 		IAsioThread& mNetThread;
