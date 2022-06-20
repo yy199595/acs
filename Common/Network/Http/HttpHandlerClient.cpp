@@ -20,7 +20,7 @@ namespace Sentry
 		this->ReadData();
 #else
 		IAsioThread & netWorkThread = this->mSocket->GetThread();
-		netWorkThread.Invoke(&HttpHandlerClient::ReadData, this);
+		netWorkThread.Invoke(&HttpHandlerClient::ReceiveSomeMessage, this);
 #endif
 	}
 
@@ -46,48 +46,28 @@ namespace Sentry
 #endif
 	}
 
-	void HttpHandlerClient::ReadData()
-	{
-		AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
-		asio::async_read(tcpSocket, this->mStreamBuffer, asio::transfer_at_least(1),
-			[this, &tcpSocket](const asio::error_code& code, size_t size)
-			{
-				if (code)
-				{
-					if(code == asio::error::eof)
-					{
-						this->OnComplete();
-						return;
-					}
-					this->ClosetClient();
-#ifdef __NET_ERROR_LOG__
-					CONSOLE_LOG_ERROR(code.message());
-#endif
-					return;
-				}
-				switch(this->mHttpRequest->OnReceiveData(this->mStreamBuffer))
-				{
-				case HttpStatus::OK:
-					this->OnComplete();
-					break;
-				case HttpStatus::BAD_REQUEST:
-					this->ClosetClient();
-					break;
-				default:
-				{
-					asio::error_code code;
-					if (tcpSocket.available(code) <= 0)
-					{
-						this->OnComplete();
-						return;
-					}
-					this->mNetworkThread.post(std::bind(&HttpHandlerClient::ReadData, this));
-				}
-					break;
-
-				}
-			});
-	}
+    void HttpHandlerClient::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer)
+    {
+        assert(this->mHttpRequest);
+        if(code == asio::error::eof)
+        {
+            this->OnComplete();
+            return;
+        }
+        switch(this->mHttpRequest->OnReceiveSome(buffer))
+        {
+            case 0:
+                this->OnComplete();
+                break;
+            case 1:
+            case -1:
+                this->ReceiveSomeMessage();
+                break;
+            default:
+                this->ClosetClient();
+                break;
+        }
+    }
 
 	void HttpHandlerClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<Tcp::ProtoMessage> message)
 	{

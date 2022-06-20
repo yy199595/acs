@@ -2,7 +2,7 @@
 #pragma once
 #include"Json/JsonWriter.h"
 #include"Json/JsonReader.h"
-#include"Component/Component.h"
+#include"Component/Rpc/RpcTaskComponent.h"
 namespace Sentry
 {
     class HttpConfig
@@ -23,7 +23,8 @@ namespace Sentry
 	class HttpHandlerRequest;
 	class HttpRequestClient;
     class HttpHandlerResponse;
-	class HttpComponent : public Component, public ISocketListen, public ILuaRegister
+	class HttpComponent : public RpcTaskComponent<HttpAsyncResponse>,
+            public ISocketListen, public ILuaRegister
 	{
 	 public:
 		HttpComponent() = default;
@@ -42,8 +43,7 @@ namespace Sentry
 		void ClosetHttpClient(std::shared_ptr<HttpHandlerClient> httpClient);
 	 public:
 		void OnRequest(std::shared_ptr<HttpHandlerClient> httpClient);
-		bool AddRequestTask(std::shared_ptr<HttpRequestClient> requestClient);
-		void OnResponse(long long taskId, std::shared_ptr<HttpAsyncResponse> response);
+        TimerComponent * GetTimerComponent() final { return this->mTimeComponent; }
     private:
         const HttpInterfaceConfig * OnHandler(const HttpHandlerRequest & requets, HttpHandlerResponse & response);
 	 private:

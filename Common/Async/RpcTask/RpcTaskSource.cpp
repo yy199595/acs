@@ -1,6 +1,5 @@
 ﻿#include"RpcTaskSource.h"
 #include"Component/Scene/MessageComponent.h"
-#include"Component/Rpc/RpcHandlerComponent.h"
 namespace Sentry
 {
     void RpcTaskSource::OnResponse(std::shared_ptr<com::Rpc_Response> response)

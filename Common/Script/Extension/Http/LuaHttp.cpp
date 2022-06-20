@@ -35,27 +35,16 @@ namespace Lua
 			luaL_error(lua, "parse get url : [%s] failure", str);
 			return 0;
 		}
+        std::shared_ptr<LuaHttpTask> luaHttpTask = getRequest->MakeLuaTask(lua, 0);
+        std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
 
-		TaskComponent* taskComponent = App::Get()->GetTaskComponent();
-		std::shared_ptr<LuaWaitTaskSource> luaRpcTaskSource(new LuaWaitTaskSource(lua));
-		taskComponent->Start([luaRpcTaskSource, httpComponent, getRequest]()
-		{
-			std::string json;
-			std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
-			std::shared_ptr<HttpAsyncResponse> httpResponse = requestClient->Request(getRequest);
-			if (httpResponse != nullptr)
-			{
-				luaRpcTaskSource->SetMessage(httpResponse->GetData());
-				return;
-			}
-			luaRpcTaskSource->SetResult();
-		});
-		return luaRpcTaskSource->Await();
+        httpComponent->AddTask(luaHttpTask);
+        requestClient->Request(getRequest);
+        return luaHttpTask->Await();
 	}
 
 	int Http::Post(lua_State* lua)
 	{
-		lua_pushthread(lua);
 		if (!lua_isuserdata(lua, 1))
 		{
 			luaL_error(lua, "first parameter must httpComponent point");
@@ -84,19 +73,12 @@ namespace Lua
 			return 0;
 		}
 		postRequest->AddBody(lua_tolstring(lua, 3, &size), size);
-		taskComponent->Start([luaWaitTaskSource, httpComponent, postRequest]()
-		{
-			std::string json;
-			std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
-			std::shared_ptr<HttpAsyncResponse> httpResponse = requestClient->Request(postRequest);
-			if (httpResponse != nullptr)
-			{
-				luaWaitTaskSource->SetMessage(httpResponse->GetData());
-				return;
-			}
-			luaWaitTaskSource->SetResult();
-		});
-		return luaWaitTaskSource->Await();
+        std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
+        std::shared_ptr<LuaHttpTask> luaHttpTask = postRequest->MakeLuaTask(lua, 0);
+
+        httpComponent->AddTask(luaHttpTask);
+        requestClient->Request(postRequest);
+        return luaHttpTask->Await();
 	}
 
 	int Http::Download(lua_State* lua)
@@ -147,20 +129,10 @@ namespace Lua
 			luaL_error(lua, "open %s error", path.c_str());
 			return 0;
 		}
+        std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
+        std::shared_ptr<LuaHttpTask> luaHttptask = getRequest->MakeLuaTask(lua, 0);
+        requestClient->Request(getRequest, fs);
 
-		TaskComponent* taskComponent = App::Get()->GetTaskComponent();
-		std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
-		taskComponent->Start([httpComponent, luaWaitTaskSource, getRequest, path, fs]()
-		{
-			std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
-			if(requestClient->Request(getRequest, fs) != nullptr)
-			{
-				luaWaitTaskSource->SetResult(XCode::Successful);
-				return;
-			}
-			luaWaitTaskSource->SetResult(XCode::NetWorkError);
-		});
-
-		return luaWaitTaskSource->Await();
+        return luaHttptask->Await();
 	}
 }

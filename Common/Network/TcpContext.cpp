@@ -69,8 +69,22 @@ namespace Tcp
 
 	void TcpContext::ReceiveSomeMessage()
 	{
+        if(this->mRecvBuffer.size() > 0)
+        {
+            asio::error_code code;
+            this->OnReceiveMessage(code, this->mRecvBuffer);
+            return;
+        }
+        asio::error_code code;
 		this->mLastOperTime = Helper::Time::GetNowSecTime();
 		AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
+
+        if(tcpSocket.available(code) <= 0)
+        {
+            code = asio::error::eof;
+            this->OnReceiveMessage(code, this->mRecvBuffer);
+            return;
+        }
 		std::shared_ptr<TcpContext> self = this->shared_from_this();
 		asio::async_read(tcpSocket, this->mRecvBuffer, asio::transfer_at_least(1),
 			[this, self](const asio::error_code& code, size_t size)

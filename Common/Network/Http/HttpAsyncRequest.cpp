@@ -7,12 +7,74 @@
 #include"Http.h"
 #include<iostream>
 #include"Util/StringHelper.h"
+
+namespace Sentry
+{
+    std::shared_ptr<HttpTask> HttpAsyncRequest::MakeTask(int timeout)
+    {
+        std::shared_ptr<HttpTask> httpTask = std::make_shared<HttpTask>(timeout);
+        this->mTaskId = httpTask->GetRpcId();
+        return httpTask;
+    }
+
+    std::shared_ptr<LuaHttpTask> HttpAsyncRequest::MakeLuaTask(lua_State *lua, int timeout)
+    {
+        std::shared_ptr<LuaHttpTask> luaHttpTask = std::make_shared<LuaHttpTask>(lua, timeout);
+        this->mTaskId = luaHttpTask->GetRpcId();
+        return luaHttpTask;
+    }
+
+    LuaHttpTask::LuaHttpTask(lua_State *lua, int timeout)
+        : mRef(0)
+    {
+        this->mLua = lua;
+        lua_pushthread(lua);
+        this->mTimeout = timeout;
+        this->mTaskId = Helper::Guid::Create();
+        if(lua_isthread(this->mLua, -1))
+        {
+            this->mRef = luaL_ref(lua, LUA_REGISTRYINDEX);
+        }
+    }
+
+    LuaHttpTask::~LuaHttpTask()
+    {
+        if(this->mRef == 0)
+        {
+            luaL_unref(this->mLua, LUA_REGISTRYINDEX, this->mRef);
+        }
+    }
+
+    void LuaHttpTask::OnResponse(std::shared_ptr<HttpAsyncResponse> response)
+    {
+        lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
+        lua_State* coroutine = lua_tothread(this->mLua, -1);
+        if(response != nullptr)
+        {
+            response->GetData().Writer(this->mLua);
+            lua_presume(coroutine, this->mLua, 1);
+            return;
+        }
+        lua_presume(coroutine, this->mLua, 0);
+    }
+
+    int LuaHttpTask::Await()
+    {
+        if(this->mRef == 0)
+        {
+            luaL_error(this->mLua, "not lua coroutine context yield failure");
+            return 0;
+        }
+        return lua_yield(this->mLua, 0);
+    }
+}
+
 namespace Sentry
 {
 	HttpAsyncRequest::HttpAsyncRequest(const std::string& method)
 		: mMethod(method)
 	{
-
+        this->mTaskId = 0;
 	}
 
     bool HttpAsyncRequest::ParseUrl(const std::string &url)
@@ -70,6 +132,62 @@ namespace Sentry
 		this->WriteBody(os);
 		return 0;
 	}
+}
+
+namespace Sentry
+{
+    void HttpData::Add(const std::string &data)
+    {
+        this->mData.append(data);
+    }
+
+    void HttpData::Add(const char *data, size_t size)
+    {
+        this->mData.append(data, size);
+    }
+
+    void HttpData::Add(const std::string &key, const std::string &data)
+    {
+        this->mHead.emplace(key, data);
+    }
+
+    bool HttpData::Get(const std::string &key, std::string &value) const
+    {
+        auto iter = this->mHead.find(key);
+        if(iter != this->mHead.end())
+        {
+            value = iter->second;
+            return true;
+        }
+        return false;
+    }
+
+    void HttpData::WriterString(lua_State *lua, const char *name, const std::string &str) const
+    {
+        lua_pushlstring(lua, str.c_str(), str.size());
+        lua_setfield(lua, -2, name);
+
+    }
+
+    void HttpData::Writer(lua_State *lua) const
+    {
+        lua_createtable(lua, 0, 6);
+        this->WriterString(lua, "data", this->mData);
+        this->WriterString(lua, "path", this->mPath);
+        this->WriterString(lua, "method", this->mMethod);
+        this->WriterString(lua, "version", this->mVersion);
+        this->WriterString(lua, "address", this->mAddress);
+
+        lua_createtable(lua, 0, this->mHead.size());
+        auto iter = this->mHead.begin();
+        for (; iter != this->mHead.end(); iter++)
+        {
+            const std::string &key = iter->first;
+            const std::string &value = iter->second;
+            this->WriterString(lua, key.c_str(), value);
+        }
+        lua_setfield(lua, -2, "head");
+    }
 }
 
 
@@ -140,11 +258,10 @@ namespace Sentry
 
 namespace Sentry
 {
-	HttpAsyncResponse::HttpAsyncResponse(long long taskId, std::fstream* fs)
+	HttpAsyncResponse::HttpAsyncResponse(std::fstream* fs)
 	{
 		this->mHttpCode = 0;
 		this->mFstream = fs;
-		this->mTaskId = taskId;
 		this->mState = HttpDecodeState::FirstLine;
 	}
 
@@ -157,15 +274,13 @@ namespace Sentry
 		}
 	}
 
-    HttpStatus HttpAsyncResponse::OnReceiveData(asio::streambuf &streamBuffer)
+    int HttpAsyncResponse::OnReceiveLine(asio::streambuf &streamBuffer)
 	{
 		std::iostream io(&streamBuffer);
 		if (this->mState == HttpDecodeState::FirstLine)
 		{
-			std::string version;
 			this->mState = HttpDecodeState::HeadLine;
-			io >> version >> this->mHttpCode >> this->mHttpError;
-			this->mHttpData.set_version(version);
+			io >> this->mHttpData.mVersion >> this->mHttpCode >> this->mHttpError;
 			io.ignore(2); //放弃\r\n
 		}
 		if (this->mState == HttpDecodeState::HeadLine)
@@ -175,8 +290,7 @@ namespace Sentry
 			{
 				if (lineData == "\r")
 				{
-					this->mState = HttpDecodeState::Content;
-					break;
+                    return 1; //再读
 				}
 				size_t pos = lineData.find(':');
 				if (pos != std::string::npos)
@@ -184,31 +298,43 @@ namespace Sentry
 					size_t length = lineData.size() - pos - 2;
 					std::string key = lineData.substr(0, pos);
 					Helper::String::Tolower(key);
-					std::string val = lineData.substr(pos + 1, length);
-					this->mHttpData.mutable_head()->insert({key, val});
+                    this->mHttpData.Add(key, lineData.substr(pos + 1, length));
 				}
 			}
 		}
-		if (this->mState == HttpDecodeState::Content)
-		{
-			char buffer[256] = { 0 };
-			while (io.readsome(buffer, 256) > 0)
-			{
-				if (this->mFstream != nullptr)
-				{
-					this->mFstream->write(buffer, io.gcount());
-					continue;
-				}
-				this->mHttpData.mutable_data()->append(buffer, io.gcount());
-			}
-		}
-		return HttpStatus::CONTINUE;
-	}
+        return -1; //再读一行
+    }
+
+    int HttpAsyncResponse::OnReceiveSome(asio::streambuf &streamBuffer)
+    {
+        char buffer[128] = {0};
+        std::iostream io(&streamBuffer);
+        size_t size = io.readsome(buffer, 128);
+        while(size > 0)
+        {
+            if(this->mFstream != nullptr)
+            {
+                this->mFstream->write(buffer, size);
+            }
+            else
+            {
+                this->mHttpData.Add(buffer, size);
+            }
+            size = io.readsome(buffer, 128);
+        }
+        return 1;
+    }
+
+    void HttpAsyncResponse::SetError(const asio::error_code &code)
+    {
+        this->mCode = code;
+        this->mHttpError = code.message();
+    }
 
 	bool HttpAsyncResponse::GetHead(const std::string& key, int& value) const
 	{
-		auto iter = this->mHttpData.head().find(key);
-		if(iter != this->mHttpData.head().end())
+		auto iter = this->mHttpData.mHead.find(key);
+		if(iter != this->mHttpData.mHead.end())
 		{
 			value = std::stoi(iter->second);
 			return true;
@@ -218,8 +344,8 @@ namespace Sentry
 
 	bool HttpAsyncResponse::GetHead(const std::string& key, std::string& value) const
 	{
-		auto iter = this->mHttpData.head().find(key);
-		if(iter != this->mHttpData.head().end())
+		auto iter = this->mHttpData.mHead.find(key);
+		if(iter != this->mHttpData.mHead.end())
 		{
 			value = iter->second;
 			return true;
@@ -232,14 +358,14 @@ namespace Sentry
 {
     HttpHandlerRequest::HttpHandlerRequest(const std::string & address)
     {
-		this->mHttpData.set_address(address);
+		this->mHttpData.mAddress = address;
         this->mState = HttpDecodeState::FirstLine;
     }
 
     bool HttpHandlerRequest::GetHead(const std::string &key, int &value) const
     {
-		auto iter = this->mHttpData.head().find(key);
-		if(iter != this->mHttpData.head().end())
+		auto iter = this->mHttpData.mHead.find(key);
+		if(iter != this->mHttpData.mHead.end())
 		{
 			value = std::stoi(iter->second);
 			return true;
@@ -249,8 +375,8 @@ namespace Sentry
 
     bool HttpHandlerRequest::GetHead(const std::string &key, std::string &value) const
     {
-		auto iter = this->mHttpData.head().find(key);
-		if(iter != this->mHttpData.head().end())
+		auto iter = this->mHttpData.mHead.find(key);
+		if(iter != this->mHttpData.mHead.end())
 		{
 			value = iter->second;
 			return true;
@@ -258,17 +384,30 @@ namespace Sentry
 		return false;
     }
 
-    HttpStatus HttpHandlerRequest::OnReceiveData(asio::streambuf &streamBuffer)
+    int HttpHandlerRequest::OnReceiveSome(asio::streambuf &streamBuffer)
+    {
+        if (this->mState != HttpDecodeState::Content)
+        {
+            return this->OnReceiveLine(streamBuffer);
+        }
+        char buffer[128] = {0 };
+        std::iostream io(&streamBuffer);
+        size_t size = io.readsome(buffer, size);
+        while(size > 0)
+        {
+            this->mHttpData.Add(buffer, size);
+            size = io.readsome(buffer, size);
+        }
+        return 1;
+    }
+
+    int HttpHandlerRequest::OnReceiveLine(asio::streambuf &streamBuffer)
     {
         std::iostream io(&streamBuffer);
         if(this->mState == HttpDecodeState::FirstLine)
         {
-			std::string method, version;
             this->mState = HttpDecodeState::HeadLine;
-            io >> method >> this->mUrl >> version;
-
-			this->mHttpData.set_method(method);
-			this->mHttpData.set_version(version);
+            io >> this->mHttpData.mMethod >> this->mUrl >> this->mHttpData.mVersion;
 
 			io.ignore(2); //去掉\r\n
         }
@@ -289,8 +428,7 @@ namespace Sentry
 					std::string key = lineData.substr(0, pos);
 
 					Helper::String::Tolower(key);
-					std::string val = lineData.substr(pos + 1, length);
-					this->mHttpData.mutable_head()->insert({key, val});
+                    this->mHttpData.Add(key, lineData.substr(pos + 1, length));
 				}
 			}
 			if (this->mState == HttpDecodeState::Content)
@@ -300,29 +438,20 @@ namespace Sentry
 					size_t pos = this->mUrl.find("?");
 					if (pos != std::string::npos)
 					{
-						this->mHttpData.set_data(this->mUrl.substr(pos + 1));
-						this->mHttpData.set_path(this->mUrl.substr(0, pos));
+                        this->mHttpData.mData = this->mUrl.substr(pos + 1);
+                        this->mHttpData.mPath = this->mUrl.substr(0, pos);
 					}
-					return HttpStatus::OK;
+					return 0;
 				}
 				else if (this->GetMethod() != "POST")
 				{
-					return HttpStatus::BAD_REQUEST;
+					return -2;
 				}
-				this->mHttpData.set_path(this->mUrl);
+				this->mHttpData.mPath = this->mUrl;
+                return 1; //读一部分
 			}
 		}
-        if(this->mState == HttpDecodeState::Content)
-        {
-            char buffer[256] = { 0 };
-            size_t size = io.readsome(buffer, 256);
-            while(size > 0)
-            {
-                this->mHttpData.mutable_data()->append(buffer, size);
-                size = io.readsome(buffer, 256);
-            }
-        }
-        return HttpStatus::CONTINUE;
+        return -1; //读一行
     }
 }
 

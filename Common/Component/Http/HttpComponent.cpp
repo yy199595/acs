@@ -128,25 +128,18 @@ namespace Sentry
 
 	std::shared_ptr<HttpAsyncResponse> HttpComponent::Get(const std::string& url, float second)
 	{
-		long long timerId = this->mTimeComponent->DelayCall(second, [this, url]()
-		{
-			LOG_ERROR("get " << url << " timeout");
-		});
-		std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
-		std::shared_ptr<HttpAsyncResponse> httpResponse = httpAsyncClient->Get(url);
-		this->mTimeComponent->CancelTimer(timerId);
-		if(httpResponse == nullptr)
-		{
-			LOG_ERROR(url << " net work error");
-			return nullptr;
-		}
-		if(httpResponse->GetHttpCode() != HttpStatus::OK)
-		{
-			const char * err = HttpStatusToString(httpResponse->GetHttpCode());
-			LOG_FATAL("http error = " << err);
-			return nullptr;
-		}
-		return httpResponse;
+        std::shared_ptr<HttpGetRequest> httpGetRequest = HttpGetRequest::Create(url);
+        if(httpGetRequest == nullptr)
+        {
+            LOG_FATAL("parse [" << url << "] error");
+            return nullptr;
+        }
+        std::shared_ptr<HttpTask> httpRpcTask = httpGetRequest->MakeTask(second);
+        std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
+
+        this->AddTask(httpRpcTask);
+        httpAsyncClient->Request(httpGetRequest);
+        return httpRpcTask->Await();
 	}
 
 	void HttpComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
@@ -176,36 +169,31 @@ namespace Sentry
 		{
 			return XCode::HttpUrlParseError;
 		}
+        std::shared_ptr<HttpTask> httpTask = httpRequest->MakeTask(0);
 		std::shared_ptr<HttpRequestClient> requestClient = this->CreateClient();
-		if(requestClient->Request(httpRequest, fs) != nullptr)
-		{
-			return XCode::Successful;
-		}
-		return XCode::NetWorkError;
+
+        this->AddTask(httpTask);
+        requestClient->Request(httpRequest, fs);
+        std::shared_ptr<HttpAsyncResponse> response = httpTask->Await();
+
+        return response->GetCode() ? XCode::Failure : XCode::Successful;
 	}
 
 	std::shared_ptr<HttpAsyncResponse> HttpComponent::Post(const std::string& url, const std::string& data, float second)
 	{
-		long long timerId = this->mTimeComponent->DelayCall(second, [this, url]()
-		{
-			LOG_ERROR("post " << url << " timeout");
-		});
+        std::shared_ptr<HttpPostRequest> postRequest = HttpPostRequest::Create(url);
+        if(postRequest == nullptr)
+        {
+            return nullptr;
+        }
+        postRequest->AddBody(data);
+        std::shared_ptr<HttpTask> httpTask = postRequest->MakeTask(second);
 		std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
-		std::shared_ptr<HttpAsyncResponse> httpAsyncResponse = httpAsyncClient->Post(url, data);
-		LOG_WARN("post " << url << " successful request = " << data);
-		this->mTimeComponent->CancelTimer(timerId);
-		if(httpAsyncResponse == nullptr)
-		{
-			LOG_FATAL(url << " net work error");
-			return nullptr;
-		}
-		if(httpAsyncResponse->GetHttpCode() != HttpStatus::OK)
-		{
-			const char * err = HttpStatusToString(httpAsyncResponse->GetHttpCode());
-			LOG_FATAL("http error = " << err);
-			return nullptr;
-		}
-		return httpAsyncResponse;
+
+        this->AddTask(httpTask);
+        httpAsyncClient->Request(postRequest);
+
+        return httpTask->Await();
 	}
 	void HttpComponent::ClosetHttpClient(std::shared_ptr<HttpHandlerClient> httpClient)
 	{
@@ -217,14 +205,4 @@ namespace Sentry
 			LOG_DEBUG("remove http address : " << address);
 		}
 	}
-	void HttpComponent::OnResponse(long long int taskId, std::shared_ptr<HttpAsyncResponse> response)
-	{
-
-	}
-	bool HttpComponent::AddRequestTask(std::shared_ptr<HttpRequestClient> requestClient)
-	{
-
-		return false;
-	}
-
 }

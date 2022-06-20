@@ -22,9 +22,9 @@ namespace Sentry
 		std::shared_ptr<HttpHandlerRequest> Request() { return this->mHttpRequest;}
 		std::shared_ptr<HttpHandlerResponse> Response() { return this->mHttpResponse;}
 	 private:
-		void ReadData();
 		void OnComplete();
 		void ClosetClient();
+        void OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
 	 private:
 		asio::streambuf mStreamBuffer;

@@ -29,8 +29,7 @@ namespace Sentry
             response.AddHead("error", "call function not existe");
             return XCode::CallFunctionNotExist;
         }
-		MessageComponent * messageComponent = App::Get()->GetMsgComponent();
-		messageComponent->Write(this->mLua, request.GetData());
+        request.GetData().Writer(this->mLua);
         return this->mConfig->IsAsync ? this->CallAsync(response) : this->Call(response);
     }
 
