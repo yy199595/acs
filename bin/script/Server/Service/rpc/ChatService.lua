@@ -6,14 +6,12 @@ function ChatService.Awake()
 end
 
 ChatService.Chat = function(id, request, response)
-    coroutine.sleep(2.5)
     local messageComponent = App.GetComponent("MessageComponent")
-    local gateComponent = App.GetComponent("GateProxyComponent")
+    local gateComponent = App.GetComponent("GateAgentComponent")
     local chatMessage = messageComponent:New("c2s.Chat.Notice", {
         msg_type = request.msg_type,
         message = request.message
     })
-    gateComponent:Call(id, "ChatComponent.Chat", chatMessage)
     gateComponent:BroadCast("ChatComponent.Chat", chatMessage)
     return 0
 end
