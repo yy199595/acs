@@ -87,11 +87,12 @@ namespace Sentry
 	{
 		for(int y = 0; y < descriptor->nested_type_count(); y++)
 		{
-			auto descriptor1 = descriptor->nested_type(y);
+			const Descriptor * descriptor1 = descriptor->nested_type(y);
 			this->LoopMessage(descriptor1);
 			if(descriptor1->field_count() > 0)
 			{
 				const Message * message = this->mDynamicMessageFactory->GetPrototype(descriptor1);
+				LOG_DEBUG("add new dynamic message " <<  message->GetTypeName());
 				this->mMessageMap.emplace(message->GetTypeName(), message);
 			}
 			LOG_INFO("load protobuf message  [" << descriptor1->full_name() << "]");

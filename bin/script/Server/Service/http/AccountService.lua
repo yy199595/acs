@@ -13,6 +13,7 @@ end
 
 function AccountService.Register(request)
 
+    table.print(request)
     local requestInfo = Json.Decode(request.data)
     assert(requestInfo.account, "register account is nil")
     assert(requestInfo.password, "register password is nil")

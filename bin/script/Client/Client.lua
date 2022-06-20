@@ -21,6 +21,8 @@ local phoneNum = 13716061995
 
 function Client.Start()
 
+    local httpComponent = App.GetComponent("HttpComponent")
+
     local clientComponent = App.GetComponent("ClientComponent")
 
     LoginComponent.Register(account, password, phoneNum)
@@ -45,13 +47,13 @@ function Client.Start()
     clientComponent:Call("GateService.Auth", authMessage)
 
 
-    while true do
-
-        local testtMessage = messageComponent:New("c2s.Chat.Request",{
-            user_id = 1122, msg_type = 1, message = "hello"
-        })
-
-        local code, res = clientComponent:Call("ChatService.Chat", testtMessage)
-        Log.Error("code = ", code, Json.Encode(res))
-    end
+    --while true do
+    --
+    --    local testtMessage = messageComponent:New("c2s.Chat.Request",{
+    --        user_id = 1122, msg_type = 1, message = "hello"
+    --    })
+    --
+    --    local code, res = clientComponent:Call("ChatService.Chat", testtMessage)
+    --    Log.Error("code = ", code, Json.Encode(res))
+    --end
 end
