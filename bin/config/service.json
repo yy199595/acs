@@ -100,7 +100,7 @@
     "ChatService": {
         "Type": "rpc",
         "Chat": {
-            "Async": true,
+            "Async": false,
             "Type": "Client",
             "CallWay": "Net",
             "Request": "c2s.Chat.Request"

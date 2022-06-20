@@ -47,15 +47,11 @@ function Client.Start()
 
     while true do
 
-        local testtMessage = messageComponent:New("lua.Test",{
-            address = "127.0.0.1:7799",  service =
-            {
-                "LoginComponent",
-                "RegisterComponent"
-            }
+        local testtMessage = messageComponent:New("c2s.Chat.Request",{
+            user_id = 1122, msg_type = 1, message = "hello"
         })
 
-        local code, res = clientComponent:Call("ChatService.Test", testtMessage)
+        local code, res = clientComponent:Call("ChatService.Chat", testtMessage)
         Log.Error("code = ", code, Json.Encode(res))
     end
 end
