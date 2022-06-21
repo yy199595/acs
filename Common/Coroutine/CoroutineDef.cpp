@@ -39,7 +39,11 @@ namespace Sentry
         auto iter = this->mCorMap.begin();
         for(; iter != this->mCorMap.end(); iter++)
         {
+#ifdef __COROUTINE_BUFFER_STRING__
+            size += iter->second->mStack.capacity();
+#else
             size += iter->second->mStack.size;
+#endif
         }
         return size;
     }

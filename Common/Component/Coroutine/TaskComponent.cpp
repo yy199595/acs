@@ -102,7 +102,11 @@ namespace Sentry
 		{
 			this->SaveStack(stack.co);
 			stack.co = co->mCoroutineId;
-			memcpy(co->mContext, co->mStack.p, co->mStack.size);
+#ifdef __COROUTINE_BUFFER_STRING__
+			memcpy(co->mContext, co->mStack.c_str(), co->mStack.size());
+#else
+            memcpy(co->mContext, co->mStack.p, co->mStack.size);
+#endif
 		}
 		tb_context_from_t from = tb_context_jump(co->mContext, this);
 		if (from.priv != nullptr)
@@ -124,12 +128,12 @@ namespace Sentry
 
 	void TaskComponent::Resume(unsigned int id)
 	{
-		if (id != 0)
+		if (id > 0)
 		{
 			this->mResumeContexts.Push(id);
 			return;
 		}
-		std::cerr << "try resume context id : " << id << std::endl;
+        LOG_FATAL("try resume context id : " << id);
 	}
 
 	TaskContext* TaskComponent::MakeContext(StaticMethod* func)
@@ -162,16 +166,21 @@ namespace Sentry
 		{
 			return;
 		}
-		char* top = this->mSharedStack[coroutine->sid].top;
-		size_t size = top - (char*)coroutine->mContext;
-		if (coroutine->mStack.size < size)
-		{
-			coroutine->mStack.p = (char*)realloc(coroutine->mStack.p, size);
-			assert(coroutine->mStack.p);
-		}
-		coroutine->mStack.size = size;
-		memcpy(coroutine->mStack.p, coroutine->mContext, size);
-	}
+        char* top = this->mSharedStack[coroutine->sid].top;
+		const size_t size = top - (char*)coroutine->mContext;
+#ifdef __COROUTINE_BUFFER_STRING__
+        coroutine->mStack.clear();
+        coroutine->mStack.append((char*)coroutine->mContext, size);
+#else
+        if (coroutine->mStack.size < size)
+        {
+            coroutine->mStack.p = (char*)realloc(coroutine->mStack.p, size);
+            assert(coroutine->mStack.p);
+        }
+        coroutine->mStack.size = size;
+        memcpy(coroutine->mStack.p, coroutine->mContext, coroutine->mStack.size);
+#endif
+    }
 
 	void TaskComponent::OnSystemUpdate()
 	{

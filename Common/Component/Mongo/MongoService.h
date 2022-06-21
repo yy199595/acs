@@ -8,13 +8,13 @@
 #include"Component/RpcService/LocalServiceComponent.h"
 namespace Sentry
 {
-	class MongoService final : public LocalRpcService, public IStart
+	class MongoService final : public LocalRpcService, public IComplete
 	{
 	public:
 		MongoService() = default;
 	protected:
-		bool OnStart() final;
 		bool LateAwake() final;
+        void OnAllServiceStart() final;
 		bool OnStartService(ServiceMethodRegister &methodRegister) final;
 	};
 }

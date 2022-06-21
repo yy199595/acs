@@ -24,7 +24,7 @@ namespace Mongo
 		void SendMongoCommand(std::shared_ptr<Tcp::ProtoMessage> request);
 	 protected:
 		void OnConnect(const asio::error_code &error, int count) final;
-        //void OnReceiveMessage(const asio::error_code &code, const std::string &buffer) final;
+        void OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	private:
         asio::streambuf streamBuffer;
@@ -32,6 +32,7 @@ namespace Mongo
 		TaskSource<bool> mConnectTask;
 		std::shared_ptr<CoroutineLock> mWriteLock;
 		std::shared_ptr<CoroutineLock> mConnectLock;
+        std::shared_ptr<MongoQueryResponse> mResponse;
 	};
 }
 

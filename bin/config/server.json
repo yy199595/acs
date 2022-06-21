@@ -24,7 +24,7 @@
             "port": 80,
             "count": 1000,
             "ip": "127.0.0.1",
-            "component": "HttpComponent"
+            "component": "HttpHandlerComponent"
         },
         "gate": {
             "port": 1995,
@@ -93,12 +93,14 @@
         "GateAgentComponent",
         "UserSyncComponent",
         "ServiceMgrComponent",
+        "HttpHandlerComponent",
         "ClientComponent"
     ],
     "service.rpc": [
         "GateService",
         "ChatService",
-        "MysqlService"
+        "MysqlService",
+        "MongoService"
     ],
     "service.http": [
         "AccountService",

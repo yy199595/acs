@@ -3,10 +3,12 @@
 //
 
 #include"HttpHandlerClient.h"
-#include"Component/Http/HttpComponent.h"
+#include"DB/Mongo/MongoProto.h"
+#include"Component/Http/HttpHandlerComponent.h"
+
 namespace Sentry
 {
-	HttpHandlerClient::HttpHandlerClient(HttpComponent * httpComponent, std::shared_ptr<SocketProxy> socketProxy)
+	HttpHandlerClient::HttpHandlerClient(HttpHandlerComponent * httpComponent, std::shared_ptr<SocketProxy> socketProxy)
 		: Tcp::TcpContext(socketProxy)
 	{
 		this->mHttpComponent = httpComponent;
@@ -42,13 +44,12 @@ namespace Sentry
 		this->mHttpComponent->HandlerHttpData(httpHandlerClient);
 #else
 		IAsioThread& mainThread = App::Get()->GetTaskScheduler();
-		mainThread.Invoke(&HttpComponent::OnRequest, this->mHttpComponent, httpHandlerClient);
+		mainThread.Invoke(&HttpHandlerComponent::OnRequest, this->mHttpComponent, httpHandlerClient);
 #endif
 	}
 
     void HttpHandlerClient::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer)
     {
-        assert(this->mHttpRequest);
         if(code == asio::error::eof)
         {
             this->OnComplete();
@@ -84,13 +85,12 @@ namespace Sentry
 	{
 		this->mSocket->Close();
 		std::move(this->mSocket);
-		std::shared_ptr<HttpHandlerClient> httpHandlerClient =
-			std::dynamic_pointer_cast<HttpHandlerClient>(this->shared_from_this());
+        const std::string & address = this->mSocket->GetAddress();
 #ifdef ONLY_MAIN_THREAD
-		this->mHttpComponent->ClosetHttpClient(httpHandlerClient);
+		this->mHttpComponent->ClosetHttpClient(address);
 #else
 		IAsioThread& mainThread = App::Get()->GetTaskScheduler();
-		mainThread.Invoke(&HttpComponent::ClosetHttpClient, this->mHttpComponent, httpHandlerClient);
+		mainThread.Invoke(&HttpHandlerComponent::ClosetHttpClient, this->mHttpComponent, address);
 #endif
 	}
 }

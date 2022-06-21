@@ -24,6 +24,7 @@
 #include"Component/Scene/MessageComponent.h"
 #include"Component/Logic/HttpSourceService.h"
 #include"Component/RpcService/LocalLuaService.h"
+#include"Component/Http/HttpHandlerComponent.h"
 #include"Component/HttpService/LocalLuaHttpService.h"
 #ifdef __ENABLE_CLIENT__
 #include"Component/ClientComponent.h"
@@ -33,7 +34,7 @@ using namespace Client;
 #include"Component/Gate/GateAgentComponent.h"
 #include"Component/User/UserSyncComponent.h"
 using namespace Sentry;
-
+#include<asio/ssl.hpp>
 void RegisterComponent()
 {
 // rpc
@@ -65,6 +66,8 @@ void RegisterComponent()
 
 //http
     ComponentFactory::Add<HttpComponent>("HttpComponent");
+    ComponentFactory::Add<HttpHandlerComponent>("HttpHandlerComponent");
+
 // lua
     ComponentFactory::Add<LuaScriptComponent>("LuaScriptComponent");
 #ifdef __ENABLE_CLIENT__

@@ -13,7 +13,7 @@
 namespace Sentry
 {
 	class TaskComponent final : public Component,
-						  public ISystemUpdate, public ILastFrameUpdate
+                                public ISystemUpdate, public ILastFrameUpdate
 	{
 	 public:
 		TaskComponent() = default;
@@ -48,7 +48,7 @@ namespace Sentry
 
 		void WhenAll(std::vector<TaskContext*>& coroutines);
 
-	 protected:
+    private:
 		void Awake() final;
 
 		bool LateAwake() final;

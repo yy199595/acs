@@ -25,6 +25,7 @@ namespace Tcp
 	void ProtoMessage::Write(std::ostream& os, const std::string& value)
 	{
 		os.write(value.c_str(), value.size());
+        os << '\0';
 	}
 
 	void ProtoMessage::Write(std::ostream& os, const char* str, size_t size)

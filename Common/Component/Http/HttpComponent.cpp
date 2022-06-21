@@ -16,12 +16,6 @@
 #include"Component/HttpService/LocalHttpService.h"
 namespace Sentry
 {
-
-	void HttpComponent::Awake()
-	{
-
-	}
-
 	bool HttpComponent::LateAwake()
 	{
 		this->mTaskComponent = this->GetApp()->GetTaskComponent();
@@ -29,90 +23,7 @@ namespace Sentry
 #ifndef ONLY_MAIN_THREAD
 		this->mThreadComponent = this->GetComponent<NetThreadComponent>();
 #endif
-		std::vector<Component *> components;
-		this->GetApp()->GetComponents(components);
-		for(Component * component : components)
-		{
-			LocalHttpService * localHttpService = component->Cast<LocalHttpService>();
-			if(localHttpService != nullptr)
-			{
-				std::vector<const HttpInterfaceConfig *> httpInterConfigs;
-				localHttpService->GetServiceConfig().GetConfigs(httpInterConfigs);
-				for(const HttpInterfaceConfig * httpInterfaceConfig : httpInterConfigs)
-				{
-					this->mHttpConfigs.emplace(httpInterfaceConfig->Path, httpInterfaceConfig);
-				}
-			}
-		}
-
 		return true;
-	}
-
-	void HttpComponent::OnListen(std::shared_ptr<SocketProxy> socket)
-	{
-		const std::string & address = socket->GetAddress();
-
-		std::shared_ptr<HttpHandlerClient> handlerClient =
-			std::make_shared<HttpHandlerClient>(this, socket);
-
-		handlerClient->StartReceive();
-		this->mHttpClients.emplace(address, handlerClient);
-	}
-
-    const HttpInterfaceConfig *HttpComponent::OnHandler(const HttpHandlerRequest &request, HttpHandlerResponse &response)
-    {
-        const std::string& path = request.GetPath();
-        auto iter = this->mHttpConfigs.find(path);
-        if(iter == this->mHttpConfigs.end())
-        {
-            response.SetCode(HttpStatus::NOT_FOUND);
-            return nullptr;
-        }
-        const HttpInterfaceConfig* httpConfig = iter->second;
-        if(httpConfig->Type != request.GetMethod())
-        {
-            response.SetCode(HttpStatus::METHOD_NOT_ALLOWED);
-            return nullptr;
-        }
-        return iter->second;
-
-    }
-
-	void HttpComponent::OnRequest(std::shared_ptr<HttpHandlerClient> httpClient)
-	{
-		std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
-		std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
-
-		const HttpInterfaceConfig* httpConfig = this->OnHandler(*request, *response);
-        if(httpConfig == nullptr)
-        {
-            httpClient->StartWriter();
-            return;
-        }
-
-		LocalHttpService* httpService = this->GetComponent<LocalHttpService>(httpConfig->Service);
-		if(httpService == nullptr || !httpService->IsStartService())
-		{
-			response->AddHead("error", "service not start");
-            response->AddHead("code", (int)XCode::CallFunctionNotExist);
-            httpClient->StartWriter();
-			return;
-		}
-		if(!httpConfig->IsAsync)
-		{
-			XCode code = httpService->Invoke(httpConfig->Method, request, response);
-            LOG_INFO("sync call http service " << httpConfig->Service << "." << httpConfig->Method << " code = [" << (int)code << "]");
-            response->AddHead("code", (int)code);
-			httpClient->StartWriter();
-            return;
-		}
-		this->mTaskComponent->Start([httpService, httpClient, httpConfig, request, response]()
-		{
-			XCode code = httpService->Invoke(httpConfig->Method, request, response);
-            LOG_INFO("async call http service " << httpConfig->Service << "." << httpConfig->Method << " code = [" << (int)code << "]");
-            response->AddHead("code", (int)code);
-			httpClient->StartWriter();
-		});
 	}
 
 	std::shared_ptr<HttpRequestClient> HttpComponent::CreateClient()
@@ -194,15 +105,5 @@ namespace Sentry
         httpAsyncClient->Request(postRequest);
 
         return httpTask->Await();
-	}
-	void HttpComponent::ClosetHttpClient(std::shared_ptr<HttpHandlerClient> httpClient)
-	{
-		const std::string & address = httpClient->GetAddress();
-		auto iter = this->mHttpClients.find(address);
-		if(iter != this->mHttpClients.end())
-		{
-			this->mHttpClients.erase(iter);
-			LOG_DEBUG("remove http address : " << address);
-		}
 	}
 }

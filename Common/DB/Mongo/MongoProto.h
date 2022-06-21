@@ -5,6 +5,7 @@
 #ifndef SERVER_MONGOPROTO_H
 #define SERVER_MONGOPROTO_H
 #include"asio/streambuf.hpp"
+#include"Json/JsonWriter.h"
 #include"DB/Mongo/Bson/minibson.hpp"
 #include"Network/Proto/ProtoMessage.h"
 
@@ -19,86 +20,111 @@
 
 namespace Mongo
 {
-	class MongoHead
-	{
-	 public:
-		int messageLength;
-		int requestID;
-		int responseTo;
-		int opCode;
-	};
-
-	class MongoRequest : public Tcp::ProtoMessage
-	{
-	 public:
-		MongoRequest(int opcode);
-	 public:
-		int Serailize(std::ostream& os) final;
-		void WriteBson(std::ostream& os, minibson::document& document);
-	 protected:
-		virtual int GetLength() = 0;
-		virtual void OnWriter(std::ostream& os) = 0;
-	 public:
-		MongoHead header;
-	};
-
-	class MongoUpdateRequest : public MongoRequest
-	{
-	 public:
-		MongoUpdateRequest();
-	 protected:
-		int GetLength() final;
-		void OnWriter(std::ostream& os) final;
-	 public:
-		int zero;
-		std::string collectionName;
-		int flag;
-		minibson::document selector;
-		minibson::document update;
-	};
-
-	class MongoInsertRequest : public MongoRequest
-	{
-	public:
-		MongoInsertRequest();
-	protected:
-		int GetLength() final;
-		void OnWriter(std::ostream& os) final;
-	public:
-		int zero;
-		std::string collectionName;
-		minibson::document document;
-	};
-
-	class MongoLateError : public Tcp::ProtoMessage
-	{
-	 public:
-		int Serailize(std::ostream& os) final;
-	};
-
-	class MongoQueryRequest : public MongoRequest
-	{
-	 public:
-		MongoQueryRequest();
-	 protected:
-		int GetLength() final;
-		void OnWriter(std::ostream& os) final;
-	 public:
-		int flag;
-		std::string collectionName;
-		int numberToSkip;
-		int numberToReturn;
-		minibson::document document;
-	};
-
-    class MongoReplyRequest : public MongoRequest
+    class MongoHead
     {
     public:
-        MongoReplyRequest() = default;
+        int messageLength;
+        int requestID;
+        int responseTo;
+        int opCode;
+    };
+
+    class MongoRequest : public Tcp::ProtoMessage
+    {
+    public:
+        MongoRequest(int opcode);
+
+    public:
+        int Serailize(std::ostream &os) final;
+
+        void WriteBson(std::ostream &os, minibson::document &document);
+
+    protected:
+        virtual int GetLength() = 0;
+
+        virtual void OnWriter(std::ostream &os) = 0;
+
+    public:
+        MongoHead header;
+    };
+
+    class MongoUpdateRequest : public MongoRequest
+    {
+    public:
+        MongoUpdateRequest();
 
     protected:
         int GetLength() final;
+
         void OnWriter(std::ostream &os) final;
+
+    public:
+        int zero;
+        std::string collectionName;
+        int flag;
+        minibson::document selector;
+        minibson::document update;
+    };
+
+    class MongoInsertRequest : public MongoRequest
+    {
+    public:
+        MongoInsertRequest();
+
+    protected:
+        int GetLength() final;
+
+        void OnWriter(std::ostream &os) final;
+
+    public:
+        int zero;
+        std::string collectionName;
+        minibson::document document;
+    };
+
+    class MongoLateError : public Tcp::ProtoMessage
+    {
+    public:
+        int Serailize(std::ostream &os) final;
+    };
+
+    class MongoQueryRequest : public MongoRequest
+    {
+    public:
+        MongoQueryRequest();
+
+    protected:
+        int GetLength() final;
+
+        void OnWriter(std::ostream &os) final;
+
+    public:
+        int flag;
+        std::string collectionName;
+        int numberToSkip;
+        int numberToReturn;
+        minibson::document document;
+    };
+
+    class MongoQueryResponse
+    {
+    public:
+        MongoQueryResponse() = default;
+
+    public:
+        int OnReceiveHead(asio::streambuf &buffer);
+        int OnReceiveBody(asio::streambuf &buffer);
+
+    private:
+        void CastJson(const std::string & name, minibson::node * node);
+    private:
+        MongoHead mHead;
+        int responseFlags;  // bit vector - see details below
+        long long cursorID;       // cursor id if client needs to do get more's
+        int startingFrom;   // where in the cursor this reply is starting
+        int numberReturned; // number of documents in the reply
+        Json::Writer mJsonWriter;
+        minibson::document * mDocument;
     };
 }
 

@@ -36,9 +36,31 @@ namespace Mongo
 			this->mWriteTask.SetResult(false);
 			return;
 		}
+        this->mReadState == ReadType::HEAD;
         this->ReceiveMessage(sizeof(MongoHead));
         this->mWriteTask.SetResult(true);
 	}
+
+    void MongoClientContext::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer)
+    {
+        std::iostream os(&buffer);
+
+        if(this->mReadState == ReadType::HEAD)
+        {
+            this->mReadState = ReadType::BODY;
+            this->mResponse = std::make_shared<MongoQueryResponse>();
+            int length = this->mResponse->OnReceiveHead(buffer);
+            this->ReceiveMessage(length - sizeof(MongoHead));
+            return;
+        }
+        this->mResponse->OnReceiveBody(buffer);
+        if (code)
+        {
+#ifdef __DEBUG__
+            CONSOLE_LOG_ERROR(code.message());
+#endif
+        }
+    }
 
 	bool MongoClientContext::StartConnect()
 	{

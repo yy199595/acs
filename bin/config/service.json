@@ -53,6 +53,9 @@
             "Path": "/logic/account/register"
         }
     },
+    "MongoService": {
+        "Type": "rpc"
+    },
     "GateService": {
         "Type": "rpc",
         "Ping": {

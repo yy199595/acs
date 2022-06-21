@@ -4,7 +4,8 @@
 namespace Sentry
 {
 	class Component;
-	class Entity : public Object, public std::enable_shared_from_this<Entity>
+    typedef std::unordered_map<std::string, Component*>::iterator ComponentIter;
+    class Entity : public Object, public std::enable_shared_from_this<Entity>
 	{
 	 public:
 		explicit Entity(long long id);
@@ -34,6 +35,9 @@ namespace Sentry
 
 		template<typename T>
 		inline std::shared_ptr<T> Cast();
+
+        ComponentIter ComponentBegin() { return this->mComponentMap.begin();}
+        ComponentIter ComponentEnd() { return this->mComponentMap.end();}
 
 	 public:
 		void OnDestory() override;

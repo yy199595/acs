@@ -26,7 +26,7 @@ namespace Mongo
 
 	int MongoRequest::Serailize(std::ostream& os)
 	{
-		this->header.messageLength = this->GetLength() + 4 + sizeof(MongoHead);
+		this->header.messageLength = this->GetLength() + sizeof(MongoHead);
 		this->Write(os, this->header.messageLength);
 		this->Write(os, this->header.requestID);
 		this->Write(os, this->header.responseTo);
@@ -116,13 +116,71 @@ namespace Mongo
 
 namespace Mongo
 {
-    int MongoReplyRequest::GetLength()
+    int MongoQueryResponse::OnReceiveHead(asio::streambuf &buffer)
     {
+        std::iostream os(&buffer);
+        os.readsome((char *)&this->mHead, sizeof(MongoHead));
+        return this->mHead.messageLength;
+    }
+
+    void MongoQueryResponse::CastJson(const std::string & name, minibson::node *node)
+    {
+        minibson::document *document1 = dynamic_cast<minibson::document *>(node);
+        if (document1 != nullptr)
+        {
+            this->mJsonWriter.StartObject(name.c_str());
+            for (auto iter = document1->begin(); iter != document1->end(); iter++)
+            {
+                const std::string &name1 = iter->first;
+                this->CastJson(name1, iter->second);
+            }
+            this->mJsonWriter.EndObject();
+            return;
+        }
+        minibson::int32 *int321 = dynamic_cast<minibson::int32 *>(node);
+        minibson::int64 *int641 = dynamic_cast<minibson::int64 *>(node);
+        minibson::string *string1 = dynamic_cast<minibson::string *>(node);
+        minibson::Double *aDouble = dynamic_cast<minibson::Double *>(node);
+        if (int321 != nullptr)
+        {
+            this->mJsonWriter.AddMember(name.c_str(), int321->get_value());
+        }
+        else if (int641 != nullptr)
+        {
+            this->mJsonWriter.AddMember(name.c_str(), int641->get_value());
+
+        }
+        else if (string1 != nullptr)
+        {
+            this->mJsonWriter.AddMember(name.c_str(), string1->get_value());
+
+        }
+        else if (aDouble != nullptr)
+        {
+            this->mJsonWriter.AddMember(name.c_str(), aDouble->get_value());
+        }
 
     }
 
-    void MongoReplyRequest::OnWriter(std::ostream &os)
+    int MongoQueryResponse::OnReceiveBody(asio::streambuf &buffer)
     {
+        std::iostream os(&buffer);
+        os.readsome((char*)&responseFlags, sizeof(responseFlags));
+        os.readsome((char*)&cursorID, sizeof(cursorID));
+        os.readsome((char*)&startingFrom, sizeof(startingFrom));
+        os.readsome((char*)&numberReturned, sizeof(numberReturned));
 
+        char * buf = new char[buffer.size()];
+        size_t ss = os.readsome(buf, buffer.size());
+        this->mDocument = new minibson::document(buf, ss);
+
+        for(auto iter = this->mDocument->begin(); iter != this->mDocument->end(); iter++)
+        {
+            this->CastJson(iter->first, iter->second);
+        }
+        std::string json;
+        this->mJsonWriter.WriterStream(json);
+        std::cout << json << std::endl;
+        return 0;
     }
 }
