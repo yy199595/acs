@@ -34,7 +34,6 @@ using namespace Client;
 #include"Component/Gate/GateAgentComponent.h"
 #include"Component/User/UserSyncComponent.h"
 using namespace Sentry;
-#include<asio/ssl.hpp>
 void RegisterComponent()
 {
 // rpc

@@ -13,7 +13,7 @@ add_definitions(-D ASIO_STANDALONE)
 option(__DEBUG__ "debug模式" ON)
 
 option(__ENABLE_CLIENT__ "开启客户端" ON)
-option(__ENABLE_OPEN_SSL__ "开启SSL" ON)
+option(__ENABLE_OPEN_SSL__ "开启SSL" OFF)
 option(__HTTP_DEBUG_LOG__ "打印http日志" OFF)
 option(__REDIS_DEBUG__ "开始redis调试" OFF)
 option(ONLY_MAIN_THREAD "启用单线程模式" OFF)
@@ -21,7 +21,7 @@ option(__NET_ERROR_LOG__ "打印网络层错误" ON)
 option(__ENABLE_MYSQL__ "是否使用mysql" ON)
 
 option(__ENABLE_MONGODB__ "是否使用mongodb" OFF)
-option(__ENABLE_MIMALLOC__ "启用mimalloc管理内存" ON)
+option(__ENABLE_MIMALLOC__ "启用mimalloc管理内存" OFF)
 option(__ENABLE_JEMALLOC__ "启用jemalloc管理内存" OFF)
 option(__COROUTINE_BUFFER_STRING__ "使用string作为协程栈" ON)
 

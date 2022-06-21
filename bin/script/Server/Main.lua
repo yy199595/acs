@@ -36,7 +36,6 @@ function Main.GetComponentFuncs(func)
 end
 
 function Main.Start()
-    coroutine.sleep(1.5)
     local redisComponent = RedisComponent
     Log.Error(redisComponent.Lock("yjz", 10))
     Log.Error(redisComponent.Run("main", "SET", "yjz", { name="yjz", age = 10 }))
