@@ -33,7 +33,6 @@ namespace Mongo
 #ifdef __DEBUG__
 			CONSOLE_LOG_ERROR(code.message());
 #endif
-			this->mWriteTask.SetResult(false);
 			return;
 		}
         this->mReadState == ReadType::HEAD;
@@ -54,6 +53,14 @@ namespace Mongo
             return;
         }
         this->mResponse->OnReceiveBody(buffer);
+
+
+        std::shared_ptr<Mongo::MongoQueryRequest> queryRequest
+                = std::make_shared<Mongo::MongoQueryRequest>();
+        queryRequest->collectionName = "ET.UserLevelData.$cmd";
+        queryRequest->document.set("_id", 444);
+
+        this->Send(queryRequest);
         if (code)
         {
 #ifdef __DEBUG__
