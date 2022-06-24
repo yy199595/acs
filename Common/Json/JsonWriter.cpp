@@ -5,6 +5,51 @@
 
 namespace Json
 {
+	Writer& Writer::operator<<(int value)
+	{
+		this->mJsonWriter.Int(value);
+		return *this;
+	}
+
+	Writer& Writer::operator<<(unsigned int value)
+	{
+		this->mJsonWriter.Uint(value);
+		return *this;
+	}
+
+	Writer& Writer::operator<<(float value)
+	{
+		this->mJsonWriter.Double(value);
+		return *this;
+	}
+
+	Writer& Writer::operator<<(double value)
+	{
+		this->mJsonWriter.Double(value);
+		return *this;
+	}
+
+	Writer& Writer::operator<<(bool value)
+	{
+		this->mJsonWriter.Bool(value);
+		return *this;
+	}
+
+	Writer& Writer::operator<<(long long value)
+	{
+		this->mJsonWriter.Int64(value);
+		return *this;
+	}
+
+	Writer& Writer::operator<<(const std::string & value)
+	{
+		this->mJsonWriter.String(value.c_str(), value.size());
+		return *this;
+	}
+}
+
+namespace Json
+{
 	Writer::Writer(bool isObj)
 		: mIsObject(isObj), mJsonWriter(this->mStringBuf)
 	{
@@ -15,6 +60,8 @@ namespace Json
 		}
 		this->mJsonWriter.StartArray();
 	}
+
+
 	bool Writer::AddMember(const char* key, int value)
 	{
 		return this->mJsonWriter.String(key)

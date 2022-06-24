@@ -201,8 +201,7 @@ namespace Sentry
 	bool MainRedisComponent::Lock(const string& key, int timeout)
 	{
 		Json::Writer jsonWriter;
-		jsonWriter.AddMember("key", key);
-		jsonWriter.AddMember("time", timeout);
+		jsonWriter << "key" << key << "time" << timeout;
 		if(!this->Call("main", "lock.lock", jsonWriter))
 		{
 			return false;

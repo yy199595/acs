@@ -307,6 +307,7 @@ namespace Sentry
 
     int HttpAsyncResponse::OnReceiveSome(asio::streambuf &streamBuffer)
     {
+
         char buffer[128] = {0};
         std::iostream io(&streamBuffer);
         size_t size = io.readsome(buffer, 128);

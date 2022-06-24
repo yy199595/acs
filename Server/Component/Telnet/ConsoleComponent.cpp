@@ -54,27 +54,38 @@ namespace Sentry
 		std::shared_ptr<TelnetClientContext> telnetClient =
 			std::make_shared<TelnetClientContext>(socket, this);
 
+		const std::string & address = socket->GetAddress();
 		std::shared_ptr<TelnetProto> telnetProto(new TelnetProto());
 		telnetProto->Add("welcome connect sertry server");
 
 
 		telnetClient->StartRead();
-		this->mTelnetClients.emplace(telnetClient);
-		telnetClient->SendProtoMessage(telnetProto);
+		this->mTelnetClients.emplace(address, telnetClient);
+		//telnetClient->SendProtoMessage(telnetProto);
 	}
 
-	void ConsoleComponent::OnReceive(std::shared_ptr<TelnetClientContext> clientContext, const std::string& message)
+	void ConsoleComponent::OnReceive(const std::string & address, const std::string& message)
 	{
-		char cc = ' ';
-		std::vector<std::string> splitStrings;
-		std::shared_ptr<TelnetProto> telnetProto(new TelnetProto());
-		google::protobuf::SplitStringUsing(message, &cc, &splitStrings);
-		for(const std::string & str : splitStrings)
+		std::shared_ptr<Tcp::TelnetClientContext> telnetClientContext = this->GetClient(address);
+		if(telnetClientContext != nullptr)
 		{
-			telnetProto->Add(str);
+			char cc = ' ';
+			std::vector<std::string> splitStrings;
+			std::shared_ptr<TelnetProto> telnetProto(new TelnetProto());
+			google::protobuf::SplitStringUsing(message, &cc, &splitStrings);
+			for (const std::string& str: splitStrings)
+			{
+				telnetProto->Add(str);
+			}
+			telnetClientContext->StartRead();
+			telnetClientContext->SendProtoMessage(telnetProto);
 		}
-		clientContext->StartRead();
-		clientContext->SendProtoMessage(telnetProto);
+	}
+
+	std::shared_ptr<Tcp::TelnetClientContext> ConsoleComponent::GetClient(const std::string& address)
+	{
+		auto iter = this->mTelnetClients.find(address);
+		return iter != this->mTelnetClients.end() ? iter->second : nullptr;
 	}
 
 	bool ConsoleComponent::Help(const std::string& parameter, std::vector<std::string>& response)
@@ -126,13 +137,13 @@ namespace Sentry
 		LOG_WARN("now time = " << Helper::Time::GetDateString());
 		return true;
 	}
-	void ConsoleComponent::OnClientError(std::shared_ptr<Tcp::TelnetClientContext> clientContext)
+	void ConsoleComponent::OnClientError(const std::string & address)
 	{
-		auto iter = this->mTelnetClients.find(clientContext);
+		auto iter = this->mTelnetClients.find(address);
 		if(iter != this->mTelnetClients.end())
 		{
 			this->mTelnetClients.erase(iter);
-			CONSOLE_LOG_ERROR("[" << clientContext->GetAddress() << "] disconnect");
+			CONSOLE_LOG_ERROR("[" << address << "] disconnect");
 		}
 	}
 }

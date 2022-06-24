@@ -17,7 +17,16 @@ namespace Json
 	{
 	 public:
 		Writer(bool isObj = true);
-	 public:
+
+	public:
+		Writer& operator <<(int value);
+		Writer& operator <<(bool value);
+		Writer& operator <<(float value);
+		Writer& operator <<(double value);
+		Writer& operator <<(unsigned int value);
+		Writer& operator <<(long long value);
+		Writer& operator <<(const std::string & value);
+	public:
 		bool StartArray();
 		bool StartObject();
 		bool StartArray(const char* key);

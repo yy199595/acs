@@ -33,7 +33,7 @@
             "component": "GateClientComponent"
         },
         "console": {
-            "port": 8088,
+            "port": 27018,
             "count": 100,
             "ip": "127.0.0.1",
             "component": "ConsoleComponent"

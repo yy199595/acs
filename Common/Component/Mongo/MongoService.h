@@ -4,17 +4,18 @@
 
 #ifndef SERVER_MONGOSERVICE_H
 #define SERVER_MONGOSERVICE_H
-
+#include"DB/Mongo/MongoProto.h"
 #include"Component/RpcService/LocalServiceComponent.h"
 namespace Sentry
 {
-	class MongoService final : public LocalRpcService, public IComplete
+	class MongoService final : public LocalRpcService, public ILuaRegister, public IStart
 	{
 	public:
 		MongoService() = default;
-	protected:
+	private:
+		bool OnStart() final;
 		bool LateAwake() final;
-        void OnAllServiceStart() final;
+		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 		bool OnStartService(ServiceMethodRegister &methodRegister) final;
 	};
 }

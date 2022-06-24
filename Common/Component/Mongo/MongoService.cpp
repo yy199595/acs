@@ -4,6 +4,7 @@
 
 #include"MongoService.h"
 #include"DB/Mongo/MongoClient.h"
+#include"Script/Extension/Mongo/LuaMongo.h"
 #include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {
@@ -17,7 +18,13 @@ namespace Sentry
 		return true;
 	}
 
-	void MongoService::OnAllServiceStart()
+	void MongoService::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
+	{
+		luaRegister.BeginRegister<MongoService>();
+		luaRegister.PushExtensionFunction("Run", Lua::MongoEx::Run);
+	}
+
+	bool MongoService::OnStart()
 	{
 #ifdef ONLY_MAIN_THREAD
 		IAsioThread& asioThread = this->GetApp()->GetTaskScheduler();
@@ -31,44 +38,28 @@ namespace Sentry
 		{
 			LOG_DEBUG("连接mongo成功");
 
-//            std::shared_ptr<Mongo::MongoQueryRequest> queryRequest
-//                    = std::make_shared<Mongo::MongoQueryRequest>();
-//            queryRequest->collectionName = "ET.UserLevelData.$cmd";
-//            queryRequest->document.set("_id", 444);
+			LuaScriptComponent * luaScriptComponent = this->GetComponent<LuaScriptComponent>();
+
+			lua_State * lua = luaScriptComponent->GetLuaEnv();
+
 
 			std::shared_ptr<Mongo::MongoQueryRequest> queryRequest
 				= std::make_shared<Mongo::MongoQueryRequest>();
             queryRequest->collectionName = "admin.$cmd";
 
-//            minibson::document document1;
-//            minibson::document document11;
-//            document11.set("name", "robo3t-1.4.4");
-//            document1.set("application", document11);
-//
-//            minibson::document document2;
-//            minibson::document document22;
-//            document22.set("name", "MongoDB Internal Client");
-//            document22.set("version", "4.2.6-18-g6cdb6ab");
-//            document2.set("driver", document22);
-//
-//            minibson::document document3;
-//            minibson::document document33;
-//            document33.set("architecture", "x86_64");
-//            document33.set("name", "Mac OS X");
-//            document33.set("type", "Darwin");
-//            document33.set("version", "21.4.0");
-//
-//            document3.set("os", document33);
-//
-//            minibson::document document4;
-//
-//
-//            queryRequest->document.set("client", document1);
-            queryRequest->document.set("hello", 1);
+			queryRequest->header.requestID = 1;
+			Lua::lua_getfunction(lua, "Main", "Bson");
+			if(lua_pcall(lua, 0, 1, 0) != LUA_OK)
+			{
+				LOG_ERROR(lua_tostring(lua, -1));
+			}
+			size_t size = 0;
+			queryRequest->command.append(luaL_tolstring(lua, -1, &size), size);
 
+			//queryRequest->document.set("hello", 1);
 
 			mongoClientContext->SendMongoCommand(queryRequest);
-
 		}
+		return true;
 	}
 }

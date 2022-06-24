@@ -82,11 +82,16 @@ namespace Mongo
         minibson::document document;
     };
 
-    class MongoLateError : public Tcp::ProtoMessage
-    {
-    public:
-        int Serailize(std::ostream &os) final;
-    };
+	class MongoLuaRequest : public MongoRequest
+	{
+	public:
+		MongoLuaRequest() : MongoRequest(OP_QUERY) {}
+	private:
+		int GetLength();
+		void OnWriter(std::ostream &os);
+	public:
+		std::string mCommand;
+	};
 
     class MongoQueryRequest : public MongoRequest
     {
@@ -103,7 +108,8 @@ namespace Mongo
         std::string collectionName;
         int numberToSkip;
         int numberToReturn;
-        minibson::document document;
+		std::string command;
+        //minibson::document document;
     };
 
     class MongoQueryResponse

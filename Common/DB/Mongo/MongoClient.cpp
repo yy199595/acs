@@ -55,12 +55,12 @@ namespace Mongo
         this->mResponse->OnReceiveBody(buffer);
 
 
-        std::shared_ptr<Mongo::MongoQueryRequest> queryRequest
-                = std::make_shared<Mongo::MongoQueryRequest>();
-        queryRequest->collectionName = "ET.UserLevelData.$cmd";
-        queryRequest->document.set("_id", 444);
+//        std::shared_ptr<Mongo::MongoQueryRequest> queryRequest
+//                = std::make_shared<Mongo::MongoQueryRequest>();
+//        queryRequest->collectionName = "ET.UserLevelData.$cmd";
+//        queryRequest->document.set("_id", 444);
 
-        this->Send(queryRequest);
+       // this->Send(queryRequest);
         if (code)
         {
 #ifdef __DEBUG__

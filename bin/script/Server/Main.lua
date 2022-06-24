@@ -1,6 +1,10 @@
 
 
 Main = {}
+
+function Main.Bson()
+    return Bson.EncodeOrder("ismaster", 1)
+end
 function Main.Awake()
     local messageComponent = App.GetComponent("MessageComponent")
     messageComponent:Load("./proto");

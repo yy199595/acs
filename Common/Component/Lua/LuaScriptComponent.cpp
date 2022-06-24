@@ -91,6 +91,7 @@ namespace Sentry
 		Lua::ClassProxyHelper luaRegister8(this->mLuaEnv, "Bson");
 		luaRegister8.BeginNewTable();
 		luaRegister8.PushExtensionFunction("Encode", luabson::lencode);
+		luaRegister8.PushExtensionFunction("EncodeOrder", luabson::lencode_order);
 		luaRegister8.PushExtensionFunction("Data", luabson::ldate);
 		luaRegister8.PushExtensionFunction("Timestamp", luabson::ltimestamp);
 		luaRegister8.PushExtensionFunction("Regex", luabson::lregex);

@@ -34,9 +34,9 @@ namespace Sentry
 	 public:
 		bool OnStart() final;
 		bool LateAwake() final;
+		void OnClientError(const std::string & address);
 		void OnListen(std::shared_ptr<SocketProxy> socket) final;
-		void OnClientError(std::shared_ptr<Tcp::TelnetClientContext> clientContext);
-		void OnReceive(std::shared_ptr<Tcp::TelnetClientContext> clientContext, const std::string & message);
+		void OnReceive(const std::string & address, const std::string & message);
 	 private:
 		bool Offset(const std::string& parameter, std::vector<string>& response);
 		bool Help(const std::string& parameter, std::vector<std::string>& response);
@@ -44,10 +44,13 @@ namespace Sentry
 		bool Close(const std::string& parameter, std::vector<std::string>& response);
 		bool Hotfix(const std::string& parameter, std::vector<std::string>& response);
 		bool Services(const std::string& parameter, std::vector<std::string>& response);
+
+	private:
+		std::shared_ptr<Tcp::TelnetClientContext> GetClient(const std::string & address);
 	 private:
 		class TaskComponent* mTaskComponent;
 		std::unordered_map<std::string, ConsoleFunction> mFunctionMap;
-		std::set<std::shared_ptr<Tcp::TelnetClientContext>> mTelnetClients;
+		std::unordered_map<std::string, std::shared_ptr<Tcp::TelnetClientContext>> mTelnetClients;
 	};
 }
 

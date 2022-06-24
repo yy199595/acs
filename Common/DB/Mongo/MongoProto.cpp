@@ -34,13 +34,19 @@ namespace Mongo
 		this->OnWriter(os);
 		return 0;
 	}
+}
 
-	int MongoLateError::Serailize(std::ostream& os)
+namespace Mongo
+{
+	int MongoLuaRequest::GetLength()
 	{
-		const std::string str = "getLastError";
-		this->Write(os, str);
-		return 0;
+		return this->mCommand.size();
 	}
+	void MongoLuaRequest::OnWriter(std::ostream& os)
+	{
+		os.write(this->mCommand.c_str(), this->mCommand.size());
+	}
+
 }
 
 namespace Mongo
@@ -102,7 +108,7 @@ namespace Mongo
 	int MongoQueryRequest::GetLength()
 	{
 		return sizeof(this->flag) + this->collectionName.size()
-			   + sizeof(int) * 2 + this->document.get_serialized_size();
+			   + sizeof(int) * 2 + this->command.size() + 4;
 	}
 	void MongoQueryRequest::OnWriter(std::ostream& os)
 	{
@@ -110,7 +116,9 @@ namespace Mongo
 		this->Write(os, this->collectionName);
 		this->Write(os, this->numberToSkip);
 		this->Write(os, this->numberToReturn);
-		this->WriteBson(os, this->document);
+		this->Write(os, (int)this->command.size());
+		os.write(this->command.c_str(), this->command.size());
+		//this->WriteBson(os, this->document);
 	}
 }
 
