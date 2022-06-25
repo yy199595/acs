@@ -917,13 +917,9 @@ lreplace(lua_State *L) {
 }
 
 int ldecode(lua_State *L) {
-	const int32_t * data = (int32_t*)lua_touserdata(L,1);
-	if (data == NULL) {
-		return 0;
-	}
-	const uint8_t * b = (const uint8_t *)data;
-	int32_t len = get_length(b);
-	struct bson_reader br = { b , len };
+	size_t len = 0;
+	const uint8_t * b = (const uint8_t *)luaL_tolstring(L, 1, &len);
+	struct bson_reader br = { b , (int)len };
 
 	unpack_dict(L, &br, false);
 

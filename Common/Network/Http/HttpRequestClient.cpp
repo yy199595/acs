@@ -12,10 +12,22 @@ namespace Sentry
 		this->mHttpComponent = httpComponent;
     }
 
+	void HttpRequestClient::Request(std::shared_ptr<HttpAsyncRequest> httpRequest)
+	{
+		this->mRequest = httpRequest;
+		this->mResponse = std::make_shared<HttpDataResponse>();
+#ifdef ONLY_MAIN_THREAD
+		this->ConnectHost();
+#else
+		IAsioThread & netWorkThread = this->mSocket->GetThread();
+		netWorkThread.Invoke(&HttpRequestClient::ConnectHost, this);
+#endif
+	}
+
     void HttpRequestClient::Request(std::shared_ptr<HttpAsyncRequest> httpRequest, std::fstream * fs)
     {
         this->mRequest = httpRequest;
-        this->mResponse = std::make_shared<HttpAsyncResponse>(fs);
+        this->mResponse = std::make_shared<HttpFileResponse>(fs);
 #ifdef ONLY_MAIN_THREAD
 		this->ConnectHost();
 #else

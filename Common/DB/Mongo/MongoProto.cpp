@@ -3,7 +3,7 @@
 //
 
 #include "MongoProto.h"
-
+#include"DB/Mongo/Bson/MongoBson.h"
 namespace Mongo
 {
 	MongoRequest::MongoRequest(int opcode)
@@ -26,7 +26,7 @@ namespace Mongo
 
 	int MongoRequest::Serailize(std::ostream& os)
 	{
-		this->header.messageLength = this->GetLength() + sizeof(MongoHead);
+		this->header.messageLength = this->GetMessageSize();
 		this->Write(os, this->header.messageLength);
 		this->Write(os, this->header.requestID);
 		this->Write(os, this->header.responseTo);
@@ -38,10 +38,11 @@ namespace Mongo
 
 namespace Mongo
 {
-	int MongoLuaRequest::GetLength()
+	int MongoLuaRequest::GetMessageSize()
 	{
 		return this->mCommand.size();
 	}
+
 	void MongoLuaRequest::OnWriter(std::ostream& os)
 	{
 		os.write(this->mCommand.c_str(), this->mCommand.size());
@@ -58,7 +59,7 @@ namespace Mongo
 		this->zero = 0;
 	}
 
-	int MongoUpdateRequest::GetLength()
+	int MongoUpdateRequest::GetMessageSize() const
 	{
 		return sizeof(this->zero) + this->collectionName.size()
 		 + sizeof(this->flag) + this->selector.get_serialized_size()
@@ -90,7 +91,7 @@ namespace Mongo
 		this->WriteBson(os, this->document);
 	}
 
-	int MongoInsertRequest::GetLength()
+	int MongoInsertRequest::GetMessageSize() const
 	{
 		return sizeof(this->zero) +
 			this->collectionName.size() + this->document.get_serialized_size();
@@ -105,20 +106,22 @@ namespace Mongo
 
 	}
 
-	int MongoQueryRequest::GetLength()
+	int MongoQueryRequest::GetMessageSize() const
 	{
-		return sizeof(this->flag) + this->collectionName.size()
-			   + sizeof(int) * 2 + this->command.size() + 4;
+		size_t size = sizeof(MongoHead);
+		size += (this->collectionName.size() + 1);
+		size += (sizeof(this->flag) + sizeof(int) * 2);
+		size += this->document.GetSize();
+		return size;
 	}
+
 	void MongoQueryRequest::OnWriter(std::ostream& os)
 	{
 		this->Write(os, this->flag);
 		this->Write(os, this->collectionName);
 		this->Write(os, this->numberToSkip);
 		this->Write(os, this->numberToReturn);
-		this->Write(os, (int)this->command.size());
-		os.write(this->command.c_str(), this->command.size());
-		//this->WriteBson(os, this->document);
+		this->document.Serialize(os);
 	}
 }
 
@@ -131,45 +134,6 @@ namespace Mongo
         return this->mHead.messageLength;
     }
 
-    void MongoQueryResponse::CastJson(const std::string & name, minibson::node *node)
-    {
-        minibson::document *document1 = dynamic_cast<minibson::document *>(node);
-        if (document1 != nullptr)
-        {
-            this->mJsonWriter.StartObject(name.c_str());
-            for (auto iter = document1->begin(); iter != document1->end(); iter++)
-            {
-                const std::string &name1 = iter->first;
-                this->CastJson(name1, iter->second);
-            }
-            this->mJsonWriter.EndObject();
-            return;
-        }
-        minibson::int32 *int321 = dynamic_cast<minibson::int32 *>(node);
-        minibson::int64 *int641 = dynamic_cast<minibson::int64 *>(node);
-        minibson::string *string1 = dynamic_cast<minibson::string *>(node);
-        minibson::Double *aDouble = dynamic_cast<minibson::Double *>(node);
-        if (int321 != nullptr)
-        {
-            this->mJsonWriter.AddMember(name.c_str(), int321->get_value());
-        }
-        else if (int641 != nullptr)
-        {
-            this->mJsonWriter.AddMember(name.c_str(), int641->get_value());
-
-        }
-        else if (string1 != nullptr)
-        {
-            this->mJsonWriter.AddMember(name.c_str(), string1->get_value());
-
-        }
-        else if (aDouble != nullptr)
-        {
-            this->mJsonWriter.AddMember(name.c_str(), aDouble->get_value());
-        }
-
-    }
-
     int MongoQueryResponse::OnReceiveBody(asio::streambuf &buffer)
     {
         std::iostream os(&buffer);
@@ -178,17 +142,15 @@ namespace Mongo
         os.readsome((char*)&startingFrom, sizeof(startingFrom));
         os.readsome((char*)&numberReturned, sizeof(numberReturned));
 
-        char * buf = new char[buffer.size()];
-        size_t ss = os.readsome(buf, buffer.size());
-        this->mDocument = new minibson::document(buf, ss);
 
-        for(auto iter = this->mDocument->begin(); iter != this->mDocument->end(); iter++)
-        {
-            this->CastJson(iter->first, iter->second);
-        }
-        std::string json;
-        this->mJsonWriter.WriterStream(json);
-        std::cout << json << std::endl;
+        int length = 0;
+		os.readsome((char *)&length, sizeof(int));
+
+		std::string json;
+		Bson::BsonDocumentNode document(os, length);
+		document.WriterToJson(json);
+
+		document.GetNode("ismaster");
         return 0;
     }
 }

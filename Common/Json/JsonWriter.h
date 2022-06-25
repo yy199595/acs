@@ -19,13 +19,16 @@ namespace Json
 		Writer(bool isObj = true);
 
 	public:
-		Writer& operator <<(int value);
-		Writer& operator <<(bool value);
-		Writer& operator <<(float value);
-		Writer& operator <<(double value);
-		Writer& operator <<(unsigned int value);
-		Writer& operator <<(long long value);
-		Writer& operator <<(const std::string & value);
+		Writer & operator << (std::vector<int> & value);
+		Writer & operator << (std::vector<std::string> & value);
+		inline Writer& operator <<(int value) { this->mJsonWriter.Int(value); return *this;}
+		inline Writer& operator <<(bool value) { this->mJsonWriter.Bool(value); return *this;}
+		inline Writer& operator <<(float value) { this->mJsonWriter.Double(value); return *this;}
+		inline Writer& operator <<(double value) { this->mJsonWriter.Double(value); return *this;}
+		inline Writer& operator <<(unsigned int value) { this->mJsonWriter.Uint(value); return *this;}
+		inline Writer& operator <<(long long value) { this->mJsonWriter.Int64(value); return *this;}
+		inline Writer& operator <<(const char * value) { this->mJsonWriter.String(value); return *this;}
+		inline Writer& operator <<(const std::string & value) { this->mJsonWriter.String(value.c_str(), value.size()); return *this;}
 	public:
 		bool StartArray();
 		bool StartObject();

@@ -15,7 +15,8 @@ namespace Sentry
 	 public:
 		HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy, HttpComponent * component);
 	 public:
-		void Request(std::shared_ptr<HttpAsyncRequest> request, std::fstream * fs = nullptr);
+		void Request(std::shared_ptr<HttpAsyncRequest> request);
+		void Request(std::shared_ptr<HttpAsyncRequest> request, std::fstream * fs);
 	 private:
         void ConnectHost();
         void OnComplete(const asio::error_code & code);
@@ -24,8 +25,6 @@ namespace Sentry
         void OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
 	 private:
-		TaskSource<bool> mHttpTask;
-		asio::streambuf mReadBuffer;
 		HttpComponent * mHttpComponent;
 		std::shared_ptr<HttpAsyncRequest> mRequest;
 		std::shared_ptr<HttpAsyncResponse> mResponse;

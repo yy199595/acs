@@ -5,45 +5,25 @@
 
 namespace Json
 {
-	Writer& Writer::operator<<(int value)
+	Writer& Writer::operator<<(std::vector<int>& value)
 	{
-		this->mJsonWriter.Int(value);
+		this->mJsonWriter.StartArray();
+		for(const int val : value)
+		{
+			this->mJsonWriter.Int(val);
+		}
+		this->mJsonWriter.EndArray();
 		return *this;
 	}
 
-	Writer& Writer::operator<<(unsigned int value)
+	Writer& Writer::operator<<(std::vector<std::string>& value)
 	{
-		this->mJsonWriter.Uint(value);
-		return *this;
-	}
-
-	Writer& Writer::operator<<(float value)
-	{
-		this->mJsonWriter.Double(value);
-		return *this;
-	}
-
-	Writer& Writer::operator<<(double value)
-	{
-		this->mJsonWriter.Double(value);
-		return *this;
-	}
-
-	Writer& Writer::operator<<(bool value)
-	{
-		this->mJsonWriter.Bool(value);
-		return *this;
-	}
-
-	Writer& Writer::operator<<(long long value)
-	{
-		this->mJsonWriter.Int64(value);
-		return *this;
-	}
-
-	Writer& Writer::operator<<(const std::string & value)
-	{
-		this->mJsonWriter.String(value.c_str(), value.size());
+		this->mJsonWriter.StartArray();
+		for(const std::string & val : value)
+		{
+			this->mJsonWriter.String(val.c_str(), val.size());
+		}
+		this->mJsonWriter.EndArray();
 		return *this;
 	}
 }

@@ -6,6 +6,7 @@
 #define SERVER_MONGOPROTO_H
 #include"asio/streambuf.hpp"
 #include"Json/JsonWriter.h"
+#include"DB/Mongo/Bson/MongoBson.h"
 #include"DB/Mongo/Bson/minibson.hpp"
 #include"Network/Proto/ProtoMessage.h"
 
@@ -40,8 +41,8 @@ namespace Mongo
         void WriteBson(std::ostream &os, minibson::document &document);
 
     protected:
-        virtual int GetLength() = 0;
-
+		virtual int GetMessageSize() const = 0;
+		virtual int GetLength() final { return 0; }
         virtual void OnWriter(std::ostream &os) = 0;
 
     public:
@@ -54,7 +55,7 @@ namespace Mongo
         MongoUpdateRequest();
 
     protected:
-        int GetLength() final;
+        int GetMessageSize() const final;
 
         void OnWriter(std::ostream &os) final;
 
@@ -72,7 +73,7 @@ namespace Mongo
         MongoInsertRequest();
 
     protected:
-        int GetLength() final;
+        int GetMessageSize() const final;
 
         void OnWriter(std::ostream &os) final;
 
@@ -87,7 +88,7 @@ namespace Mongo
 	public:
 		MongoLuaRequest() : MongoRequest(OP_QUERY) {}
 	private:
-		int GetLength();
+		int GetMessageSize();
 		void OnWriter(std::ostream &os);
 	public:
 		std::string mCommand;
@@ -99,7 +100,7 @@ namespace Mongo
         MongoQueryRequest();
 
     protected:
-        int GetLength() final;
+        int GetMessageSize() const final;
 
         void OnWriter(std::ostream &os) final;
 
@@ -108,8 +109,7 @@ namespace Mongo
         std::string collectionName;
         int numberToSkip;
         int numberToReturn;
-		std::string command;
-        //minibson::document document;
+		Bson::BsonDocumentNode document;
     };
 
     class MongoQueryResponse
@@ -120,17 +120,12 @@ namespace Mongo
     public:
         int OnReceiveHead(asio::streambuf &buffer);
         int OnReceiveBody(asio::streambuf &buffer);
-
-    private:
-        void CastJson(const std::string & name, minibson::node * node);
     private:
         MongoHead mHead;
         int responseFlags;  // bit vector - see details below
         long long cursorID;       // cursor id if client needs to do get more's
         int startingFrom;   // where in the cursor this reply is starting
         int numberReturned; // number of documents in the reply
-        Json::Writer mJsonWriter;
-        minibson::document * mDocument;
     };
 }
 

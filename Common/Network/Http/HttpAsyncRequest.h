@@ -163,30 +163,63 @@ namespace Sentry
 
 namespace Sentry
 {
-    class HttpAsyncResponse : public IHttpContent
-    {
-    public:
-		HttpAsyncResponse(std::fstream * fs = nullptr);
-		~HttpAsyncResponse();
-    public:
-        int OnReceiveLine(asio::streambuf &streamBuffer) final;
-        int OnReceiveSome(asio::streambuf &streamBuffer) final;
-        HttpStatus GetHttpCode() { return (HttpStatus)this->mHttpCode;}
-        const std::string & GetContent() const final { return this->mHttpData.mData;}
-	public:
-        void SetError(const asio::error_code & code);
-		bool GetHead(const std::string & key, int & value) const;
-        const asio::error_code & GetCode() const { return this->mCode;}
-        bool GetHead(const std::string & key, std::string & value) const;
-		const HttpData & GetData() const final { return this->mHttpData;}
-    private:
-        int mHttpCode;
-        HttpData mHttpData;
-        asio::error_code mCode;
-        std::string mHttpError;
-        HttpDecodeState mState;
-		std::fstream * mFstream;
-    };
+	class HttpAsyncResponse : public IHttpContent
+	{
+	 public:
+		HttpAsyncResponse();
+		virtual ~HttpAsyncResponse() = default;
+	 public:
+		int OnReceiveLine(asio::streambuf& streamBuffer) final;
+		HttpStatus GetHttpCode()
+		{
+			return (HttpStatus)this->mHttpCode;
+		}
+		const std::string& GetContent() const final
+		{
+			return this->mHttpData.mData;
+		}
+	 public:
+		void SetError(const asio::error_code& code);
+		bool GetHead(const std::string& key, int& value) const;
+		const asio::error_code& GetCode() const { return this->mCode; }
+		bool GetHead(const std::string& key, std::string& value) const;
+		const HttpData& GetData() const final { return this->mHttpData; }
+	 protected:
+		HttpData mHttpData;
+	 private:
+		int mHttpCode;
+		asio::error_code mCode;
+		std::string mHttpError;
+		HttpDecodeState mState;
+	};
+}
+
+namespace Sentry
+{
+	class HttpFileResponse : public HttpAsyncResponse
+	{
+	 public:
+		HttpFileResponse(std::fstream* fs);
+		~HttpFileResponse();
+	 private:
+		int OnReceiveSome(asio::streambuf& streamBuffer) final;
+	 private:
+		char mBuffer[128];
+		std::fstream* mFstream;
+	};
+}
+
+namespace Sentry
+{
+	class HttpDataResponse : public HttpAsyncResponse
+	{
+	 public:
+		HttpDataResponse() = default;
+	 private:
+		int OnReceiveSome(asio::streambuf& streamBuffer) final;
+	 private:
+		char mBuffer[128];
+	};
 }
 
 namespace Sentry
@@ -194,25 +227,40 @@ namespace Sentry
 	class HttpHandlerRequest : public IHttpContent
 	{
 	 public:
-		HttpHandlerRequest(const std::string & address);
+		HttpHandlerRequest(const std::string& address);
 	 public:
 
-        int OnReceiveSome(asio::streambuf &streamBuffer) final;
+		int OnReceiveSome(asio::streambuf& streamBuffer) final;
 	 public:
-		const std::string& GetPath() const { return this->mHttpData.mPath; }
-		const HttpData & GetData() const final { return this->mHttpData;}
-		const std::string& GetMethod() const { return this->mHttpData.mMethod; }
-		const std::string& GetAddress() const { return this->mHttpData.mAddress; }
-		const std::string& GetContent() const final { return this->mHttpData.mData; }
-    public:
-        bool GetHead(const std::string& key, int & value) const;
-        bool GetHead(const std::string& key, std::string& value) const;
-    private:
-        int OnReceiveLine(asio::streambuf &streamBuffer) final;
-    private:
+		const std::string& GetPath() const
+		{
+			return this->mHttpData.mPath;
+		}
+		const HttpData& GetData() const final
+		{
+			return this->mHttpData;
+		}
+		const std::string& GetMethod() const
+		{
+			return this->mHttpData.mMethod;
+		}
+		const std::string& GetAddress() const
+		{
+			return this->mHttpData.mAddress;
+		}
+		const std::string& GetContent() const final
+		{
+			return this->mHttpData.mData;
+		}
+	 public:
+		bool GetHead(const std::string& key, int& value) const;
+		bool GetHead(const std::string& key, std::string& value) const;
+	 private:
+		int OnReceiveLine(asio::streambuf& streamBuffer) final;
+	 private:
 		std::string mUrl;
-        HttpData mHttpData;
-        HttpDecodeState mState;
+		HttpData mHttpData;
+		HttpDecodeState mState;
 	};
 }
 
@@ -225,20 +273,20 @@ namespace Sentry
 		~HttpHandlerResponse();
 	 public:
 		void SetCode(HttpStatus code);
-		void WriteFile(std::fstream * fs);
-		void WriteString(const std::string & content);
-        void WriteString(const char * content, size_t size);
-    public:
-        bool AddHead(const char * key, int value);
-        bool AddHead(const char * key, const std::string & value);
-    private:
-		int Serailize(std::ostream &os) final;
+		void WriteFile(std::fstream* fs);
+		void WriteString(const std::string& content);
+		void WriteString(const char* content, size_t size);
+	 public:
+		bool AddHead(const char* key, int value);
+		bool AddHead(const char* key, const std::string& value);
+	 private:
+		int Serailize(std::ostream& os) final;
 	 private:
 		size_t mCount;
 		HttpStatus mCode;
 		size_t mContentSize;
 		std::string mContent;
-		std::fstream * mFstream;
+		std::fstream* mFstream;
 		std::unordered_map<std::string, std::string> mHeadMap;
 	};
 }

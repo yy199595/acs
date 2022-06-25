@@ -28,6 +28,10 @@ namespace Mongo
 
 	void MongoClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{
+		asio::streambuf buf;
+		std::ostream oss(&buf);
+		message->Serailize(oss);
+		size_t size = buf.size();
 		if (code)
 		{
 #ifdef __DEBUG__
@@ -55,12 +59,22 @@ namespace Mongo
         this->mResponse->OnReceiveBody(buffer);
 
 
-//        std::shared_ptr<Mongo::MongoQueryRequest> queryRequest
-//                = std::make_shared<Mongo::MongoQueryRequest>();
-//        queryRequest->collectionName = "ET.UserLevelData.$cmd";
-//        queryRequest->document.set("_id", 444);
+        std::shared_ptr<Mongo::MongoQueryRequest> queryRequest
+                = std::make_shared<Mongo::MongoQueryRequest>();
+        queryRequest->collectionName = "ET.$cmd";
+		queryRequest->header.requestID = 1;
+		queryRequest->flag = 0;
+		queryRequest->numberToSkip = 0;
+		queryRequest->numberToReturn = 1;
 
-       // this->Send(queryRequest);
+		Bson::BsonDocumentNode * bsonDocumentNode = new Bson::BsonDocumentNode();
+		bsonDocumentNode->Add("_id", 444);
+		bsonDocumentNode->Add("name", "yjz");
+		bsonDocumentNode->Add("age", 10);
+        queryRequest->document.Add("insert", "UserLevelData");
+		queryRequest->document.Add("documents", bsonDocumentNode);
+
+        this->Send(queryRequest);
         if (code)
         {
 #ifdef __DEBUG__

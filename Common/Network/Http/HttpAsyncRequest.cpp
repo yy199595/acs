@@ -258,23 +258,13 @@ namespace Sentry
 
 namespace Sentry
 {
-	HttpAsyncResponse::HttpAsyncResponse(std::fstream* fs)
+	HttpAsyncResponse::HttpAsyncResponse()
 	{
 		this->mHttpCode = 0;
-		this->mFstream = fs;
 		this->mState = HttpDecodeState::FirstLine;
 	}
 
-	HttpAsyncResponse::~HttpAsyncResponse()
-	{
-		if(this->mFstream != nullptr)
-		{
-			this->mFstream->close();
-			delete this->mFstream;
-		}
-	}
-
-    int HttpAsyncResponse::OnReceiveLine(asio::streambuf &streamBuffer)
+	int HttpAsyncResponse::OnReceiveLine(asio::streambuf& streamBuffer)
 	{
 		std::iostream io(&streamBuffer);
 		if (this->mState == HttpDecodeState::FirstLine)
@@ -290,7 +280,7 @@ namespace Sentry
 			{
 				if (lineData == "\r")
 				{
-                    return 1; //再读
+					return 1; //再读
 				}
 				size_t pos = lineData.find(':');
 				if (pos != std::string::npos)
@@ -298,33 +288,51 @@ namespace Sentry
 					size_t length = lineData.size() - pos - 2;
 					std::string key = lineData.substr(0, pos);
 					Helper::String::Tolower(key);
-                    this->mHttpData.Add(key, lineData.substr(pos + 1, length));
+					this->mHttpData.Add(key, lineData.substr(pos + 1, length));
 				}
 			}
 		}
-        return -1; //再读一行
-    }
+		return -1; //再读一行
+	}
+}
 
-    int HttpAsyncResponse::OnReceiveSome(asio::streambuf &streamBuffer)
-    {
+namespace Sentry
+{
+	HttpFileResponse::HttpFileResponse(std::fstream* fs)
+	{
+		this->mFstream = fs;
+	}
 
-        char buffer[128] = {0};
-        std::iostream io(&streamBuffer);
-        size_t size = io.readsome(buffer, 128);
-        while(size > 0)
-        {
-            if(this->mFstream != nullptr)
-            {
-                this->mFstream->write(buffer, size);
-            }
-            else
-            {
-                this->mHttpData.Add(buffer, size);
-            }
-            size = io.readsome(buffer, 128);
-        }
-        return 1;
-    }
+	HttpFileResponse::~HttpFileResponse() noexcept
+	{
+		this->mFstream->close();
+		delete this->mFstream;
+	}
+
+	int HttpFileResponse::OnReceiveSome(asio::streambuf& streamBuffer)
+	{
+		std::iostream oss(&streamBuffer);
+		size_t size = oss.readsome(this->mBuffer, 128);
+		while(size > 0)
+		{
+			this->mFstream->write(this->mBuffer, size);
+			size = oss.readsome(this->mBuffer, 128);
+		}
+		return 1;
+	}
+
+	int HttpDataResponse::OnReceiveSome(asio::streambuf& streamBuffer)
+	{
+		std::iostream oss(&streamBuffer);
+		size_t size = oss.readsome(this->mBuffer, 128);
+		while(size > 0)
+		{
+			this->mHttpData.mData.append(this->mBuffer, size);
+			size = oss.readsome(this->mBuffer, 128);
+		}
+		return 1;
+	}
+
 
     void HttpAsyncResponse::SetError(const asio::error_code &code)
     {

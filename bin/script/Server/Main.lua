@@ -2,8 +2,11 @@
 
 Main = {}
 
-function Main.Bson()
-    return Bson.EncodeOrder("ismaster", 1)
+function Main.Bson(str)
+    print("-------------")
+    local bson = Bson.Decode(str)
+    table.print(bson)
+    print("+++++++++++++++")
 end
 function Main.Awake()
     local messageComponent = App.GetComponent("MessageComponent")

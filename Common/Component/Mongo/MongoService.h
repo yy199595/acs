@@ -8,13 +8,13 @@
 #include"Component/RpcService/LocalServiceComponent.h"
 namespace Sentry
 {
-	class MongoService final : public LocalRpcService, public ILuaRegister, public IStart
+	class MongoService final : public LocalRpcService, public ILuaRegister, public IComplete
 	{
 	public:
 		MongoService() = default;
 	private:
-		bool OnStart() final;
 		bool LateAwake() final;
+		void OnAllServiceStart() final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 		bool OnStartService(ServiceMethodRegister &methodRegister) final;
 	};

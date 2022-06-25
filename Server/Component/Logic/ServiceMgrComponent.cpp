@@ -1,7 +1,6 @@
 ﻿#include"ServiceMgrComponent.h"
 #include"App/App.h"
 #include"Network/Listener/NetworkListener.h"
-#include"Network/Http/HttpAsyncRequest.h"
 #include"Network/Listener/TcpServerComponent.h"
 #include"Component/Redis/MainRedisComponent.h"
 #include"Component/RpcService/LocalServiceComponent.h"
@@ -31,8 +30,7 @@ namespace Sentry
 		if(component->Cast<ServiceComponent>())
 		{
 			Json::Writer jsonWriter;
-            jsonWriter.AddMember("address", this->mRpcAddress);
-            jsonWriter.AddMember("service", component->GetName());
+			jsonWriter << "address" << this->mRpcAddress << "service" << component->GetName();
 			if(!this->mRedisComponent->Call("main", "node.add", jsonWriter))
 			{
 				LOG_ERROR("call node.add failure " << component->GetName());
@@ -48,7 +46,7 @@ namespace Sentry
 	bool ServiceMgrComponent::QueryNodeInfo(const std::string& address)
 	{
 		Json::Writer jsonWriter;
-		jsonWriter.AddMember("address", address);
+		jsonWriter << "address" << address;
 		std::shared_ptr<Json::Reader> jsonResponse(new Json::Reader());
 		if(!this->mRedisComponent->Call("main", "node.query", jsonWriter, jsonResponse))
 		{
@@ -222,8 +220,7 @@ namespace Sentry
 			if(component->IsStartService())
 			{
 				Json::Writer jsonWriter;
-				jsonWriter.AddMember("address", this->mRpcAddress);
-				jsonWriter.AddMember("service", component->GetName());
+				jsonWriter << "address" << this->mRpcAddress << "service" << component->GetName();
 				this->mRedisComponent->Call("main", "node.del", jsonWriter);
 			}
 		}
