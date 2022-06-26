@@ -3,7 +3,6 @@
 //
 
 #include"HttpHandlerClient.h"
-#include"DB/Mongo/MongoProto.h"
 #include"Component/Http/HttpHandlerComponent.h"
 
 namespace Sentry

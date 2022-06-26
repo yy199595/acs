@@ -138,7 +138,6 @@ namespace Tcp
 		const int length = message->Serailize(os);
 		AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
 		std::shared_ptr<TcpContext> self = this->shared_from_this();
-		printf("send buffer count = %d\n", (int)this->mSendBuffer.size());
 		asio::async_write(tcpSocket, this->mSendBuffer, [this, self, message, length]
 			(const asio::error_code& code, size_t size)
 		{

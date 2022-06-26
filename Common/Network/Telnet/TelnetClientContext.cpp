@@ -2,7 +2,6 @@
 #include"TelnetClientContext.h"
 #include"Util/StringHelper.h"
 #include <Define/CommonLogDef.h>
-#include"DB/Mongo/MongoProto.h"
 #include"Component/Telnet/ConsoleComponent.h"
 namespace Tcp
 {
@@ -18,43 +17,8 @@ namespace Tcp
 		this->ReceiveLine();
 #else
 		IAsioThread & netWorkThread = this->mSocket->GetThread();
-		netWorkThread.Invoke(&TelnetClientContext::ReceiveMessage, this, sizeof(Mongo::MongoHead));
+		netWorkThread.Invoke(&TelnetClientContext::ReceiveLine, this);
 #endif
-	}
-
-	void TelnetClientContext::OnReceiveMessage(const asio::error_code& code, asio::streambuf& buffer)
-	{
-		std::iostream oss(&buffer);
-		size_t size = buffer.size();
-		if(this->mRequest == nullptr)
-		{
-			this->mRequest = std::make_shared<Mongo::MongoQueryRequest>();
-			oss.readsome((char*)&this->mRequest->header, sizeof(Mongo::MongoHead));
-			this->ReceiveMessage(this->mRequest->header.messageLength - sizeof(Mongo::MongoHead));
-		}
-		else
-		{
-			oss.readsome((char *)&this->mRequest->flag, sizeof(int));
-
-			char cc = oss.get();
-			while(cc != '\0')
-			{
-				this->mRequest->collectionName += cc;
-				cc = oss.get();
-			}
-			int length = 0;
-			oss.readsome((char *)&this->mRequest->numberToSkip, sizeof(int));
-			oss.readsome((char *)&this->mRequest->numberToReturn, sizeof(int));
-			oss.readsome((char *)&length, sizeof(int));
-
-			std::string json;
-			Bson::BsonDocumentNode bsonDocumentNode(oss, length);
-			bsonDocumentNode.WriterToJson(json);
-
-			oss.readsome((char *)&this->mRequest->numberToSkip, sizeof(this-mRequest->numberToSkip));
-			oss.readsome((char *)&this->mRequest->numberToReturn, sizeof(this-mRequest->numberToReturn));
-
-		}
 	}
 
 	void TelnetClientContext::OnReceiveLine(const asio::error_code& code, asio::streambuf& buffer)

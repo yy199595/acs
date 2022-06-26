@@ -20,7 +20,6 @@
 #include"Component/Scene/LoggerComponent.h"
 #include"Component/Gate/GateComponent.h"
 #include"Component/Gate/GateClientComponent.h"
-#include"Component/Mongo/MongoService.h"
 #include"Component/Scene/MessageComponent.h"
 #include"Component/Logic/HttpSourceService.h"
 #include"Component/RpcService/LocalLuaService.h"
@@ -80,7 +79,6 @@ void RegisterServiceComponent()
     ComponentFactory::Add<LocalLuaHttpService>("http");
     ComponentFactory::Add<GateService>("GateService");
 	ComponentFactory::Add<MysqlService>("MysqlService");
-	ComponentFactory::Add<MongoService>("MongoService");
 	ComponentFactory::Add<HttpSourceService>("HttpSourceService");
 }
 int main(int argc, char **argv)

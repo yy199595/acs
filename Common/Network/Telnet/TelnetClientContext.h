@@ -4,7 +4,6 @@
 #include<Async/TaskSource.h>
 #include<Network/SocketProxy.h>
 #include"Network/TcpContext.h"
-#include"DB/Mongo/MongoProto.h"
 namespace Sentry
 {
     class TelnetContent
@@ -35,10 +34,8 @@ namespace Tcp
 	 private:
 		void CloseContext();
 		void OnReceiveLine(const asio::error_code &code, asio::streambuf &buffer) final;
-		void OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	 private:
 		ConsoleComponent * mConsoleComponent;
-		std::shared_ptr<Mongo::MongoQueryRequest> mRequest;
 	};
 }
