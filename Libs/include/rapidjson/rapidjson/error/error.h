@@ -93,7 +93,7 @@ enum ParseErrorCode {
 /*!
     \ingroup RAPIDJSON_ERRORS
     \code
-        Document doc;
+        WriterDocument doc;
         ParseResult ok = doc.Parse("[42]");
         if (!ok) {
             fprintf(stderr, "JSON parse error: %s (%u)",

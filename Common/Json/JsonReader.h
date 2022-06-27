@@ -67,7 +67,7 @@ namespace Json
 		const rapidjson::Value* GetJsonValue(const char* k1, const char* k2) const;
 	 private:
 		std::string mJson;
-		//rapidjson::Document mJsonDocument;
+		//rapidjson::WriterDocument mJsonDocument;
 	};
 }
 

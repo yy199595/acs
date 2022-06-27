@@ -77,7 +77,7 @@ enum WriteFlag {
 
     On the other side, a writer can also be passed to objects that generates events, 
 
-    for example Reader::Parse() and Document::Accept().
+    for example Reader::Parse() and WriterDocument::Accept().
 
     \tparam OutputStream Type of output stream.
     \tparam SourceEncoding Encoding of source string.

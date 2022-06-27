@@ -97,6 +97,9 @@
             "Response": "com.Type.String"
         }
     },
+    "MongoService": {
+        "Type": "rpc"
+    },
     "ChatService": {
         "Type": "rpc",
         "Chat": {

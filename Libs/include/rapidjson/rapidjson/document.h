@@ -2157,7 +2157,7 @@ public:
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
     //! Move constructor in C++11
     GenericDocument(GenericDocument&& rhs) RAPIDJSON_NOEXCEPT
-        : ValueType(std::forward<ValueType>(rhs)), // explicit cast to avoid prohibited move from Document
+        : ValueType(std::forward<ValueType>(rhs)), // explicit cast to avoid prohibited move from WriterDocument
           allocator_(rhs.allocator_),
           ownAllocator_(rhs.ownAllocator_),
           stack_(std::move(rhs.stack_)),
@@ -2398,7 +2398,7 @@ public:
     /*! \return \ref ParseResult of the last parse operation
 
         \code
-          Document doc;
+          WriterDocument doc;
           ParseResult ok = doc.Parse(json);
           if (!ok)
             printf( "JSON parse error: %s (%u)\n", GetParseError_En(ok.Code()), ok.Offset());

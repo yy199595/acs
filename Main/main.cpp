@@ -24,6 +24,7 @@
 #include"Component/Logic/HttpSourceService.h"
 #include"Component/RpcService/LocalLuaService.h"
 #include"Component/Http/HttpHandlerComponent.h"
+#include"Component/Mongo/MongoService.h"
 #include"Component/HttpService/LocalLuaHttpService.h"
 #ifdef __ENABLE_CLIENT__
 #include"Component/ClientComponent.h"
@@ -79,6 +80,7 @@ void RegisterServiceComponent()
     ComponentFactory::Add<LocalLuaHttpService>("http");
     ComponentFactory::Add<GateService>("GateService");
 	ComponentFactory::Add<MysqlService>("MysqlService");
+	ComponentFactory::Add<MongoService>("MongoService");
 	ComponentFactory::Add<HttpSourceService>("HttpSourceService");
 }
 int main(int argc, char **argv)

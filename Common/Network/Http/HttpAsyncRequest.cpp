@@ -324,12 +324,7 @@ namespace Sentry
 	int HttpDataResponse::OnReceiveSome(asio::streambuf& streamBuffer)
 	{
 		std::iostream oss(&streamBuffer);
-		size_t size = oss.readsome(this->mBuffer, 128);
-		while(size > 0)
-		{
-			this->mHttpData.mData.append(this->mBuffer, size);
-			size = oss.readsome(this->mBuffer, 128);
-		}
+		oss >> this->mHttpData.mData;
 		return 1;
 	}
 
