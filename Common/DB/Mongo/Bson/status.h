@@ -3,7 +3,7 @@
 #include <string>
 #include "errorcodes.h"
 
-namespace _bson { 
+namespace Bson {
 
     class Status { 
     public:

@@ -17,7 +17,7 @@
 
 #include <stdexcept>
 
-namespace _bson {
+namespace Bson {
 
     inline int StringData::compare(const StringData& other) const {
         // Sizes might not have been computed yet.

@@ -1,10 +1,8 @@
 //
 // Created by mac on 2022/5/18.
 //
-
-#include <DB/Mongo/Bson/bsonobjbuilder.h>
-#include "MongoProto.h"
-#include"Bson/bsonobj.h"
+#include"MongoProto.h"
+#include"Bson/BsonObject.h"
 namespace Mongo
 {
 	MongoRequest::MongoRequest(int opcode)

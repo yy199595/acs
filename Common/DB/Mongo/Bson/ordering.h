@@ -17,7 +17,7 @@
 
 #pragma once
 
-namespace _bson {
+namespace Bson {
 
     /** A precomputation of a BSON sort key pattern.  That is something like: 
            { a : 1, b : -1 }
@@ -44,12 +44,12 @@ namespace _bson {
         unsigned descending(unsigned mask) const { return bits & mask; }
 
         /*
-        static Ordering make(const bsonobj& obj) {
+        static Ordering make(const BsonObject& obj) {
             unsigned b = 0;
-            bsonobjiterator k(obj);
+            BsonIterator k(obj);
             unsigned n = 0;
             while( 1 ) {
-                bsonelement e = k.next();
+                BsonElement e = k.next();
                 if( e.eoo() )
                     break;
                 uassert( 13103, "too many compound keys", n <= 31 );

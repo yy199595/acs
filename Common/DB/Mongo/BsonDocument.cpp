@@ -15,15 +15,21 @@ namespace Bson
 			this->mBuffer.append(buffer, size);
 			size = is.readsome(buffer, 128);
 		}
-		this->mObject = new _bson::bsonobj(this->mBuffer.c_str());
+		this->mObject = new Bson::BsonObject(this->mBuffer.c_str());
+		return true;
 	}
 
 	bool WriterDocument::WriterToStream(std::ostream& os)
 	{
-		const int size = this->mBsonBuilder.len();
 		const char* str = this->mBsonBuilder._done();
+		const int size = this->mBsonBuilder.len();
 		os.write(str, size);
 		return true;
+	}
+	int WriterDocument::GetStreamLength()
+	{
+		this->mBsonBuilder._done();
+		return this->mBsonBuilder.len();
 	}
 
 	bool WriterDocument::Add(const char* key, int value)
@@ -49,30 +55,31 @@ namespace Bson
 		this->mBsonBuilder.append(key, value);
 		return true;
 	}
+
 }
 namespace Bson
 {
-	bool ReaderDocument::Get(const char* key, int& value)
+	bool ReaderDocument::Get(const char* key, int& value) const
 	{
 		if(this->mObject->hasField(key))
 		{
-			value = this->mObject->getIntField(key);
+			value = this->mObject->getField(key).Int();
 			return true;
 		}
 		return false;
 	}
 
-	bool ReaderDocument::Get(const char* key, bool& value)
+	bool ReaderDocument::Get(const char* key, bool& value) const
 	{
 		if(this->mObject->hasField(key))
 		{
-			value = this->mObject->getIntField(key);
+			value = this->mObject->getField(key).Bool();
 			return true;
 		}
 		return false;
 	}
 
-	bool ReaderDocument::Get(const char* key, long long& value)
+	bool ReaderDocument::Get(const char* key, long long& value) const
 	{
 		if(this->mObject->hasField(key))
 		{
@@ -82,7 +89,7 @@ namespace Bson
 		return false;
 	}
 
-	bool ReaderDocument::Get(const char* key, std::string& value)
+	bool ReaderDocument::Get(const char* key, std::string& value) const
 	{
 		if(this->mObject->hasField(key))
 		{

@@ -2,7 +2,7 @@
 
 #pragma once
 
-namespace _bson {
+namespace Bson {
 
     // no PDP or anything like that at the moment, just big/little.
     //const bool big = true;

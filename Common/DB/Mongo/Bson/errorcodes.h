@@ -2,7 +2,7 @@
 #pragma once
 
 
-namespace _bson { 
+namespace Bson {
 
 enum ErrorCodes {
     Ok = 0,

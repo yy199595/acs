@@ -17,20 +17,20 @@
 
 #include "base.h"
 
-namespace _bson {
+namespace Bson {
 
     /*class BSONArrayBuilder;
-    class bsonelement;
-    class bsonobj;
-    class bsonobjbuilder;
+    class BsonElement;
+    class BsonObject;
+    class BsonObjectBuilder;
     class BSONObjBuilderValueStream;
-    class bsonobjiterator;
+    class BsonIterator;
     class Ordering;
-    struct BSONArray; // empty subclass of bsonobj useful for overloading
+    struct BSONArray; // empty subclass of BsonObject useful for overloading
     struct BSONElementCmpWithoutField;
 
-    extern bsonobj maxKey;
-    extern bsonobj minKey;*/
+    extern BsonObject maxKey;
+    extern BsonObject minKey;*/
 
     /**
         the complete list of valid BSON types
@@ -122,20 +122,20 @@ namespace _bson {
         case NumberInt:
         case NumberLong:
             return 10;
-        case _bson::String:
+        case Bson::String:
         case Symbol:
             return 15;
         case Object:
             return 20;
-        case _bson::Array:
+        case Bson::Array:
             return 25;
         case BinData:
             return 30;
         case jstOID:
             return 35;
-        case _bson::Bool:
+        case Bson::Bool:
             return 40;
-        case _bson::Date:
+        case Bson::Date:
         case Timestamp:
             return 45;
         case RegEx:

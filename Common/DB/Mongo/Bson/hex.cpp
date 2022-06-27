@@ -18,7 +18,7 @@
 #include <string>
 #include "hex.h"
 
-namespace _bson {
+namespace Bson {
 
 
 }

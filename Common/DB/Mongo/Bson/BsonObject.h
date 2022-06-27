@@ -20,14 +20,14 @@
 #include <string>
 #include <string>
 #include <vector>
-#include "bsonelement.h"
+#include "BsonElement.h"
 #include "string_data.h"
 #include "builder.h"
 #include "ordering.h"
 
-namespace _bson {
+namespace Bson {
 
-    class bsonobjiterator;
+    class BsonIterator;
 
     /**
        C++ view of a "BSON" object.
@@ -38,7 +38,7 @@ namespace _bson {
        See bsonspec.org.
 
     */
-    class bsonobj {
+    class BsonObject {
     private:
         const char *_objdata;
         void _assertInvalid() const;
@@ -50,16 +50,16 @@ namespace _bson {
 
     public:
 
-        /** Construct a bsonobj from data in the proper format.
+        /** Construct a BsonObject from data in the proper format.
         */
-        explicit bsonobj(const char *msgdata) {
+        explicit BsonObject(const char *msgdata) {
             init(msgdata);
         }
 
-        /** Construct an empty bsonobj -- that is, {}. */
-        bsonobj();
+        /** Construct an empty BsonObject -- that is, {}. */
+        BsonObject();
 
-        ~bsonobj() {
+        ~BsonObject() {
             _objdata = 0; // defensive
         }
 
@@ -74,7 +74,7 @@ namespace _bson {
         /** Properly formatted JSON string.
             @param pretty if true we try to add some lf's and indentation
         */
-        std::string jsonString( JsonStringFormat format = Strict, int pretty = 0 ) const;
+        std::string JsonString( JsonStringFormat format = Strict, int pretty = 0) const;
 
         /** returns # of top level fields in the object
            note: iterates to count the fields
@@ -88,24 +88,24 @@ namespace _bson {
             @param name field to find. supports dot (".") notation to reach into embedded objects.
              for example "x.y" means "in the nested object in field x, retrieve field y"
         */
-        bsonelement getFieldDotted(const StringData &name) const;
+        BsonElement GetElement(const StringData &name) const;
 
-        /** Like getFieldDotted(), but expands arrays and returns all matching objects.
+        /** Like GetElement(), but expands arrays and returns all matching objects.
          *  Turning off expandLastArray allows you to retrieve nested array objects instead of
          *  their contents.
          */
         //void getFieldsDotted(const StringData& name, BSONElementSet &ret, bool expandLastArray = true ) const;
         //void getFieldsDotted(const StringData& name, BSONElementMSet &ret, bool expandLastArray = true ) const;
 
-        /** Like getFieldDotted(), but returns first array encountered while traversing the
+        /** Like GetElement(), but returns first array encountered while traversing the
             dotted fields of name.  The name variable is updated to represent field
             names with respect to the returned element. */
-        bsonelement getFieldDottedOrArray(const char *&name) const;
+        BsonElement getFieldDottedOrArray(const char *&name) const;
 
         /** Get the field of the specified name. eoo() is true on the returned
             element if not found.
         */
-        bsonelement getField(const StringData& name) const;
+        BsonElement getField(const StringData& name) const;
 
         /** Get several fields at once. This is faster than separate getField() calls as the size of
             elements iterated can then be calculated only once each.
@@ -113,16 +113,16 @@ namespace _bson {
             @param fields if a field is found its element is stored in its corresponding position in this array.
                    if not found the array element is unchanged.
          */
-        void getFields(unsigned n, const char **fieldNames, bsonelement *fields) const;
+        void getFields(unsigned n, const char **fieldNames, BsonElement *fields) const;
 
         /** Get the field of the specified name. eoo() is true on the returned
             element if not found.
         */
-        bsonelement operator[] (const StringData& field) const {
+        BsonElement operator[] (const StringData& field) const {
             return getField(field);
         }
 
-        bsonelement operator[] (int field) const {
+        BsonElement operator[] (int field) const {
             StringBuilder ss;
             ss << field;
             std::string s = ss.str();
@@ -135,18 +135,18 @@ namespace _bson {
         bool hasElement(const StringData& name) const { return hasField(name); }
 
         /** @return "" if DNE or wrong type */
-        const char * getStringField(const StringData& name) const;
+        const char * GetString(const StringData& name) const;
 
         /** @return subobject of the given name */
-        bsonobj getObjectField(const StringData& name) const;
+        BsonObject GetObject(const StringData& name) const;
 
         /** @return INT_MIN if not present - does some type conversions */
-        int getIntField(const StringData& name) const;
+        int GetInt32(const StringData& name) const;
 
         /** @return false if not present
-            @see bsonelement::trueValue()
+            @see BsonElement::trueValue()
          */
-        bool getBoolField(const StringData& name) const;
+        bool GetBool(const StringData& name) const;
 
         /** @param pattern a BSON obj indicating a set of (un-dotted) field
          *  names.  Element values are ignored.
@@ -161,7 +161,7 @@ namespace _bson {
          *
         */
         // todo fix retval
-        bsonobj extractFieldsUnDotted(const bsonobj& pattern) const;
+        BsonObject extractFieldsUnDotted(const BsonObject& pattern) const;
 
         /** extract items from object which match a pattern object.
             e.g., if pattern is { x : 1, y : 1 }, builds an object with
@@ -169,13 +169,13 @@ namespace _bson {
            returns elements with original field names
         */
         // todo fix retval
-        bsonobj extractFields(const bsonobj &pattern, bool fillWithNull = false) const;
+        BsonObject extractFields(const BsonObject &pattern, bool fillWithNull = false) const;
 
         // todo fix retval
-        bsonobj filterFieldsUndotted(const bsonobj &filter, bool inFilter) const;
+        BsonObject filterFieldsUndotted(const BsonObject &filter, bool inFilter) const;
 
-        bsonelement getFieldUsingIndexNames(const StringData& fieldName,
-                                            const bsonobj &indexKey) const;
+        BsonElement getFieldUsingIndexNames(const StringData& fieldName,
+                                            const BsonObject &indexKey) const;
 
         /** @return the raw data of the object */
         const char *objdata() const {
@@ -236,7 +236,7 @@ namespace _bson {
            and allows ascending / descending key mixing.
            @return  <0 if l<r. 0 if l==r. >0 if l>r
         */
-        int woCompare(const bsonobj& r, const Ordering &o,
+        int woCompare(const BsonObject& r, const Ordering &o,
                       bool considerFieldName=true) const;
 
         /**wo='well ordered'.  fields must be in same order in each object.
@@ -244,20 +244,20 @@ namespace _bson {
            and allows ascending / descending key mixing.
            @return  <0 if l<r. 0 if l==r. >0 if l>r
         */
-        int woCompare(const bsonobj& r, const bsonobj &ordering = bsonobj(),
+        int woCompare(const BsonObject& r, const BsonObject &ordering = BsonObject(),
                       bool considerFieldName=true) const;
 
-        bool operator<( const bsonobj& other ) const { return woCompare( other ) < 0; }
-        bool operator<=( const bsonobj& other ) const { return woCompare( other ) <= 0; }
-        bool operator>( const bsonobj& other ) const { return woCompare( other ) > 0; }
-        bool operator>=( const bsonobj& other ) const { return woCompare( other ) >= 0; }
+        bool operator<( const BsonObject& other ) const { return woCompare( other ) < 0; }
+        bool operator<=( const BsonObject& other ) const { return woCompare( other ) <= 0; }
+        bool operator>( const BsonObject& other ) const { return woCompare( other ) > 0; }
+        bool operator>=( const BsonObject& other ) const { return woCompare( other ) >= 0; }
 
         /**
          * @param useDotted whether to treat sort key fields as possibly dotted and expand into them
          */
-        int woSortOrder( const bsonobj& r , const bsonobj& sortKey , bool useDotted=false ) const;
+        int woSortOrder( const BsonObject& r , const BsonObject& sortKey , bool useDotted=false ) const;
 
-        bool equal(const bsonobj& r) const;
+        bool equal(const BsonObject& r) const;
 
         /**
          * @param otherObj
@@ -265,7 +265,7 @@ namespace _bson {
          * otherObj contains the same field names and field vals in the same
          * order as 'this', plus optionally some additional elements.
          */
-        bool isPrefixOf( const bsonobj& otherObj ) const;
+        bool isPrefixOf( const BsonObject& otherObj ) const;
 
         /**
          * @param otherObj
@@ -273,12 +273,12 @@ namespace _bson {
          * of the list of field names in otherObj.  Similar to 'isPrefixOf',
          * but ignores the field values and only looks at field names.
          */
-        bool isFieldNamePrefixOf( const bsonobj& otherObj ) const;
+        bool isFieldNamePrefixOf( const BsonObject& otherObj ) const;
 
         /** This is "shallow equality" -- ints and doubles won't match.  for a
            deep equality test use woCompare (which is slower).
         */
-        bool binaryEqual(const bsonobj& r) const {
+        bool binaryEqual(const BsonObject& r) const {
             int os = objsize();
             if ( os == r.objsize() ) {
                 return (os == 0 || memcmp(objdata(),r.objdata(),os)==0);
@@ -287,7 +287,7 @@ namespace _bson {
         }
 
         /** @return first field of the object */
-        bsonelement firstElement() const { return bsonelement(objdata() + 4); }
+        BsonElement firstElement() const { return BsonElement(objdata() + 4); }
 
         /** faster than firstElement().fieldName() - for the first element we can easily find the fieldname without
             computing the element size.
@@ -307,7 +307,7 @@ namespace _bson {
             is assured regardless.
             @return true if found
         */
-        bool getObjectID(bsonelement& e) const;
+        bool getObjectID(BsonElement& e) const;
 
         /** @return A hash code for the object */
         int hash() const {
@@ -322,11 +322,11 @@ namespace _bson {
         // that are not part of the bson wire protocol are replaced with
         // string identifier equivalents.
         // TODO Support conversion of element types other than min and max.
-        bsonobj clientReadable() const;
+        BsonObject clientReadable() const;
 
         /** Return new object with the field names replaced by those in the
             passed object. */
-        bsonobj replaceFieldNames( const bsonobj &obj ) const;
+        BsonObject replaceFieldNames( const BsonObject &obj ) const;
 
         /** true unless corrupt */
         bool valid() const;
@@ -334,16 +334,16 @@ namespace _bson {
         /** @return an md5 value for this object. */
         std::string md5() const;
 
-        bool operator==( const bsonobj& other ) const { return equal( other ); }
-        bool operator!=(const bsonobj& other) const { return !operator==( other); }
+        bool operator==( const BsonObject& other ) const { return equal( other ); }
+        bool operator!=(const BsonObject& other) const { return !operator==( other); }
 
         /** add all elements of the object to the specified vector */
-        void elems(std::vector<bsonelement> &) const;
+        void elems(std::vector<BsonElement> &) const;
         /** add all elements of the object to the specified list */
-        void elems(std::list<bsonelement> &) const;
+        void elems(std::list<BsonElement> &) const;
 
         /** add all values of the object to the specified vector.  If type mismatches, exception.
-            this is most useful when the bsonobj is an array, but can be used with non-arrays too in theory.
+            this is most useful when the BsonObject is an array, but can be used with non-arrays too in theory.
 
             example:
               bo sub = y["subobj"].Obj();
@@ -363,16 +363,16 @@ namespace _bson {
         template <class T>
         void vals(std::list<T> &) const;
 
-        friend class bsonobjiterator;
-        typedef bsonobjiterator iterator;
+        friend class BsonIterator;
+        typedef BsonIterator iterator;
 
         /** use something like this:
-            for( bsonobj::iterator i = myObj.begin(); i.more(); ) {
-                bsonelement e = i.next();
+            for( BsonObject::iterator i = myObj.begin(); i.more(); ) {
+                BsonElement e = i.next();
                 ...
             }
         */
-        bsonobjiterator begin() const;
+        BsonIterator begin() const;
 
         void appendSelfToBufBuilder(BufBuilder& b) const {
             verify( objsize() != 0 );
@@ -383,25 +383,25 @@ namespace _bson {
 
     };
 
-    std::ostream& operator<<( std::ostream &s, const bsonobj &o );
-    std::ostream& operator<<( std::ostream &s, const bsonelement &e );
+    std::ostream& operator<<( std::ostream &s, const BsonObject &o );
+    std::ostream& operator<<( std::ostream &s, const BsonElement &e );
 
-    StringBuilder& operator<<( StringBuilder &s, const bsonobj &o );
-    StringBuilder& operator<<( StringBuilder &s, const bsonelement &e );
+    StringBuilder& operator<<( StringBuilder &s, const BsonObject &o );
+    StringBuilder& operator<<( StringBuilder &s, const BsonElement &e );
 
 
-    struct BSONArray : bsonobj {
+    struct BSONArray : BsonObject {
         // Don't add anything other than forwarding constructors!!!
-        BSONArray(): bsonobj() {}
-        explicit BSONArray(const bsonobj& obj): bsonobj(obj) {}
+        BSONArray(): BsonObject() {}
+        explicit BSONArray(const BsonObject& obj): BsonObject(obj) {}
     };
 
 
     class bsonobjholder {
         std::string buf;
     public:
-        bsonobjholder(bsonobj& o) : buf(o.objdata(), o.objsize()) { }
-        bsonobj obj() const { return bsonobj(buf.c_str()); }
+        bsonobjholder(BsonObject& o) : buf(o.objdata(), o.objsize()) { }
+        BsonObject obj() const { return BsonObject(buf.c_str()); }
     };
 
 }

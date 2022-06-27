@@ -4,7 +4,11 @@ namespace Helper
 {
     namespace Base64
     {
-        extern std::string Base64Encode(const char *data, const size_t size);
+		extern bool IsBase64(const std::string & str);
+
+		extern bool IsBase64(const char * str, size_t size);
+
+		extern std::string Base64Encode(const char *data, const size_t size);
 
         extern std::string Base64Encode(const std::string &str);
 

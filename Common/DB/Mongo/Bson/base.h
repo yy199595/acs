@@ -4,7 +4,7 @@
 #include<string>
 #define NOINLINE_DECL
 
-namespace _bson {
+namespace Bson {
 
     class MsgAssertionException : public std::exception {
     public:

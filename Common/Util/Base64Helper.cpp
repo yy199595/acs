@@ -1,11 +1,23 @@
 
 #include "Base64Helper.h"
-
+#include<regex>
 namespace Helper
 {
     namespace Base64
     {
-        std::string Base64Encode(const char *data, const size_t lenght)
+		bool IsBase64(const std::string & str)
+		{
+			const std::regex base64Pattern("^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$");
+			return std::regex_match(str, base64Pattern);
+		}
+
+		bool IsBase64(const char * str, size_t size)
+		{
+			const std::regex base64Pattern("^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$");
+			return std::regex_match( std::string(str, size), base64Pattern);
+		}
+
+		std::string Base64Encode(const char *data, const size_t lenght)
         {
             static const char EncodeTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
             std::string strEncode;

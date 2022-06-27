@@ -19,14 +19,13 @@
 #include "string_data.h"
 #include "errorcodes.h"
 #include "status.h"
-#include "base64.h"
-#include "bsonobjbuilder.h"
+#include "BsonObjectBuilder.h"
 #include "hex.h"
 #include "parse_number.h"
-
+#include "Util/Base64Helper.h"
 using namespace std;
 
-namespace _bson {
+namespace Bson {
 
     using std::ostringstream;
     using std::string;
@@ -90,7 +89,7 @@ namespace _bson {
         return parseError("can't parse");
     }
 
-    Status JParse::value(const StringData& fieldName, bsonobjbuilder& builder) {
+    Status JParse::value(const StringData& fieldName, BsonObjectBuilder& builder) {
         MONGO_JSON_DEBUG("fieldName: " << fieldName);
     again:
         char ch;
@@ -226,7 +225,7 @@ namespace _bson {
         return Status::OK();
     }
 
-    Status JParse::object(const StringData& fieldName, bsonobjbuilder& builder, bool subObject) {
+    Status JParse::object(const StringData& fieldName, BsonObjectBuilder& builder, bool subObject) {
         MONGO_JSON_DEBUG("fieldName: " << fieldName);
         if (!readToken(LBRACE)) {
             return parseError("Expected '{'");
@@ -236,7 +235,7 @@ namespace _bson {
         if (peekToken(RBRACE)) {
             readToken(RBRACE);
             if (subObject) {
-                bsonobjbuilder empty(builder.subobjStart(fieldName));
+                BsonObjectBuilder empty(builder.subobjStart(fieldName));
                 empty.obj();
             }
             return Status::OK();
@@ -339,10 +338,10 @@ namespace _bson {
             // Normal object
 
             // Only create a sub builder if this is not the base object
-            bsonobjbuilder* objBuilder = &builder;
-            unique_ptr<bsonobjbuilder> subObjBuilder;
+            BsonObjectBuilder* objBuilder = &builder;
+            unique_ptr<BsonObjectBuilder> subObjBuilder;
             if (subObject) {
-                subObjBuilder.reset(new bsonobjbuilder(builder.subobjStart(fieldName)));
+                subObjBuilder.reset(new BsonObjectBuilder(builder.subobjStart(fieldName)));
                 objBuilder = subObjBuilder.get();
             }
 
@@ -376,7 +375,7 @@ namespace _bson {
         return Status::OK();
     }
 
-    Status JParse::objectIdObject(const StringData& fieldName, bsonobjbuilder& builder) {
+    Status JParse::objectIdObject(const StringData& fieldName, BsonObjectBuilder& builder) {
         if (!readToken(COLON)) {
             return parseError("Expected ':'");
         }
@@ -396,7 +395,7 @@ namespace _bson {
         return Status::OK();
     }
 
-    Status JParse::binaryObject(const StringData& fieldName, bsonobjbuilder& builder) {
+    Status JParse::binaryObject(const StringData& fieldName, BsonObjectBuilder& builder) {
         if (!readToken(COLON)) {
             return parseError("Expected ':'");
         }
@@ -409,11 +408,12 @@ namespace _bson {
         if (binDataString.size() % 4 != 0) {
             return parseError("Invalid length base64 encoded string");
         }
-        if (!isBase64String(binDataString)) {
-            return parseError("Invalid character in base64 encoded string");
-        }
-        const std::string& binData = base64::decode(binDataString);
-        if (!readToken(COMMA)) {
+		if(!Helper::Base64::IsBase64(binDataString)){
+			return parseError("Invalid character in base64 encoded string");
+		}
+
+        const std::string binData = Helper::Base64::Base64Decode(binDataString);
+		if (!readToken(COMMA)) {
             return parseError("Expected ','");
         }
 
@@ -438,7 +438,7 @@ namespace _bson {
         return Status::OK();
     }
 
-    Status JParse::dateObject(const StringData& fieldName, bsonobjbuilder& builder) {
+    Status JParse::dateObject(const StringData& fieldName, BsonObjectBuilder& builder) {
         if (!readToken(COLON)) {
             return parseError("Expected ':'");
         }
@@ -497,7 +497,7 @@ namespace _bson {
             }
             date = static_cast<unsigned long long>(strtoll(s.c_str(), NULL, 10));
             if (errno == ERANGE) {
-                /* Need to handle this because jsonString outputs the value of Date_t as unsigned.
+                /* Need to handle this because JsonString outputs the value of Date_t as unsigned.
                 * See SERVER-8330 and SERVER-8573 */
                 errno = 0;
                 // SERVER-11920: We should use parseNumberFromString here, but that function
@@ -513,7 +513,7 @@ namespace _bson {
         return Status::OK();
     }
 
-    Status JParse::timestampObject(const StringData& fieldName, bsonobjbuilder& builder) {
+    Status JParse::timestampObject(const StringData& fieldName, BsonObjectBuilder& builder) {
         if (!readToken(COLON)) {
             return parseError("Expected ':'");
         }
@@ -572,7 +572,7 @@ namespace _bson {
         return Status::OK();
     }
 
-    Status JParse::regexObject(const StringData& fieldName, bsonobjbuilder& builder) {
+    Status JParse::regexObject(const StringData& fieldName, BsonObjectBuilder& builder) {
         if (!readToken(COLON)) {
             return parseError("Expected ':'");
         }
@@ -607,9 +607,9 @@ namespace _bson {
         return Status::OK();
     }
 
-    Status JParse::dbRefObject(const StringData& fieldName, bsonobjbuilder& builder) {
+    Status JParse::dbRefObject(const StringData& fieldName, BsonObjectBuilder& builder) {
 
-        bsonobjbuilder subBuilder(builder.subobjStart(fieldName));
+        BsonObjectBuilder subBuilder(builder.subobjStart(fieldName));
 
         if (!readToken(COLON)) {
             return parseError("DBRef: Expected ':'");
@@ -657,7 +657,7 @@ namespace _bson {
         return Status::OK();
     }
 
-    Status JParse::undefinedObject(const StringData& fieldName, bsonobjbuilder& builder) {
+    Status JParse::undefinedObject(const StringData& fieldName, BsonObjectBuilder& builder) {
         if (!readToken(COLON)) {
             return parseError("Expected ':'");
         }
@@ -668,7 +668,7 @@ namespace _bson {
         return Status::OK();
     }
 
-    Status JParse::numberLongObject(const StringData& fieldName, bsonobjbuilder& builder) {
+    Status JParse::numberLongObject(const StringData& fieldName, BsonObjectBuilder& builder) {
         if (!readToken(COLON)) {
             return parseError("Expected ':'");
         }
@@ -692,13 +692,13 @@ namespace _bson {
         return Status::OK();
     }
 
-    Status JParse::array(const StringData& fieldName, bsonobjbuilder& builder) {
+    Status JParse::array(const StringData& fieldName, BsonObjectBuilder& builder) {
         MONGO_JSON_DEBUG("fieldName: " << fieldName);
         uint32_t index(0);
         if (!readToken(LBRACKET)) {
             return parseError("Expected '['");
         }
-        bsonobjbuilder subBuilder(builder.subarrayStart(fieldName));
+        BsonObjectBuilder subBuilder(builder.subarrayStart(fieldName));
         if (!peekToken(RBRACKET)) {
             while( 1 ) {
                 Status ret = value(builder.numStr(index), subBuilder);
@@ -723,7 +723,7 @@ namespace _bson {
      * constructors, but for now it only allows "new" before Date().
      * Also note that unlike the interactive shell "Date(x)" and "new Date(x)"
      * have the same behavior.  XXX: this may not be desired. */
-    Status JParse::constructor(const StringData& fieldName, bsonobjbuilder& builder) {
+    Status JParse::constructor(const StringData& fieldName, BsonObjectBuilder& builder) {
         if (readToken("Date")) {
             date(fieldName, builder);
         }
@@ -733,7 +733,7 @@ namespace _bson {
         return Status::OK();
     }
 
-    Status JParse::date(const StringData& fieldName, bsonobjbuilder& builder) {
+    Status JParse::date(const StringData& fieldName, BsonObjectBuilder& builder) {
         if (!readToken(LPAREN)) {
             return parseError("Expected '('");
         }
@@ -748,7 +748,7 @@ namespace _bson {
         }
         Date_t date = static_cast<unsigned long long>(strtoll(s.c_str(), NULL, 10));
         if (errno == ERANGE) {
-            /* Need to handle this because jsonString outputs the value of Date_t as unsigned.
+            /* Need to handle this because JsonString outputs the value of Date_t as unsigned.
             * See SERVER-8330 and SERVER-8573 */
             errno = 0;
             // SERVER-11920: We should use parseNumberFromString here, but that function requires
@@ -765,7 +765,7 @@ namespace _bson {
         return Status::OK();
     }
 
-    Status JParse::timestamp(const StringData& fieldName, bsonobjbuilder& builder) {
+    Status JParse::timestamp(const StringData& fieldName, BsonObjectBuilder& builder) {
         if (!readToken(LPAREN)) {
             return parseError("Expected '('");
         }
@@ -808,7 +808,7 @@ namespace _bson {
         return Status::OK();
     }
 
-    Status JParse::objectId(const StringData& fieldName, bsonobjbuilder& builder) {
+    Status JParse::objectId(const StringData& fieldName, BsonObjectBuilder& builder) {
         if (!readToken(LPAREN)) {
             return parseError("Expected '('");
         }
@@ -831,7 +831,7 @@ namespace _bson {
         return Status::OK();
     }
 
-    Status JParse::numberLong(const StringData& fieldName, bsonobjbuilder& builder) {
+    Status JParse::numberLong(const StringData& fieldName, BsonObjectBuilder& builder) {
         if (!readToken(LPAREN)) {
             return parseError("Expected '('");
         }
@@ -853,7 +853,7 @@ namespace _bson {
         return Status::OK();
     }
 
-    Status JParse::numberInt(const StringData& fieldName, bsonobjbuilder& builder) {
+    Status JParse::numberInt(const StringData& fieldName, BsonObjectBuilder& builder) {
         if (!readToken(LPAREN)) {
             return parseError("Expected '('");
         }
@@ -876,8 +876,8 @@ namespace _bson {
     }
 
 
-    Status JParse::dbRef(const StringData& fieldName, bsonobjbuilder& builder) {
-        bsonobjbuilder subBuilder(builder.subobjStart(fieldName));
+    Status JParse::dbRef(const StringData& fieldName, BsonObjectBuilder& builder) {
+        BsonObjectBuilder subBuilder(builder.subobjStart(fieldName));
 
         if (!readToken(LPAREN)) {
             return parseError("Expected '('");
@@ -917,7 +917,7 @@ namespace _bson {
         return Status::OK();
     }
 
-    Status JParse::regex(const StringData& fieldName, bsonobjbuilder& builder) {
+    Status JParse::regex(const StringData& fieldName, BsonObjectBuilder& builder) {
         if (!readToken(FORWARDSLASH)) {
             return parseError("Expected '/'");
         }
@@ -965,7 +965,7 @@ namespace _bson {
         return Status::OK();
     }
 
-    Status JParse::number(const StringData& fieldName, bsonobjbuilder& builder) {
+    Status JParse::number(const StringData& fieldName, BsonObjectBuilder& builder) {
         double retd;
 
         // note: We should use parseNumberFromString here, but that function requires that
@@ -1261,20 +1261,9 @@ namespace _bson {
         return true;
     }
 
-    bool JParse::isBase64String(const StringData& str) const {
-        MONGO_JSON_DEBUG("str: " << str);
-        std::size_t i;
-        for (i = 0; i < str.size(); i++) {
-            if (!match(str[i], base64::chars)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    bsonobj fromjson(std::istream& i, bsonobjbuilder& builder) {
+    BsonObject Fromjson(std::istream& i, BsonObjectBuilder& builder) {
         if (i.eof()) {
-            return bsonobj();
+            return BsonObject();
         }
         char z = i.peek();
 
@@ -1299,8 +1288,8 @@ namespace _bson {
         return builder.obj();
     }
     /*
-    bsonobj fromjson(const std::string& str, bsonobjbuilder& b) {
-        return fromjson( str.c_str(), b );
+    BsonObject fromjson(const std::string& str, BsonObjectBuilder& b) {
+        return Fromjson( str.c_str(), b );
     }*/
 
 }  /* namespace mongo */
