@@ -1,10 +1,10 @@
 #pragma once
 
 #include <cassert>
-#include<string>
+
 #define NOINLINE_DECL
 
-namespace Bson {
+namespace _bson {
 
     class MsgAssertionException : public std::exception {
     public:

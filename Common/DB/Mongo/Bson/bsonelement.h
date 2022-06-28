@@ -24,23 +24,23 @@
 #include "builder.h"
 #include "endian.h"
 
-namespace Bson {
-    class BsonObject;
-    class BsonElement;
-    class BsonObjectBuilder;
+namespace _bson {
+    class bsonobj;
+    class bsonelement;
+    class bsonobjbuilder;
 }
 
-namespace Bson {
+namespace _bson {
 
     /* l and r MUST have same type when called: check that first. */
-    int compareElementValues(const BsonElement& l, const BsonElement& r);
+    int compareElementValues(const bsonelement& l, const bsonelement& r);
 
 
-    /** BsonElement represents an "element" in a BsonObject.  So for the object { a : 3, b : "abc" },
+    /** bsonelement represents an "element" in a bsonobj.  So for the object { a : 3, b : "abc" },
         'a : 3' is the first element (key+value).
 
-        The BsonElement object points into the BsonObject's data.  Thus the BsonObject must stay in scope
-        for the life of the BsonElement.
+        The bsonelement object points into the bsonobj's data.  Thus the bsonobj must stay in scope
+        for the life of the bsonelement.
 
         internals:
         <type><fieldName    ><value>
@@ -49,7 +49,7 @@ namespace Bson {
         value()
         type()
     */
-    class BsonElement {
+    class bsonelement {
         int _valuesize() const;
         int sizeOld() const;
     public:
@@ -57,7 +57,7 @@ namespace Bson {
                 a redundant strlen() calculation.
                     This can be made private when find_research.h is merged in.
             */
-        explicit BsonElement(int fnSize, const char *d) :
+        explicit bsonelement(int fnSize, const char *d) :
         data(d), fieldNameSize_(fnSize), totalSize(-1)
         {
             if (eoo()) {
@@ -70,35 +70,35 @@ namespace Bson {
 
             std::string foo = obj["foo"].String(); // std::exception if not a std::string type or DNE
         */
-        std::string String()        const { return chk(Bson::String).str(); }
-        Date_t Date()               const { return chk(Bson::Date).date(); }
+        std::string String()        const { return chk(_bson::String).str(); }
+        Date_t Date()               const { return chk(_bson::Date).date(); }
         double Number()             const { return chk(isNumber()).number(); }
         double Double()             const { return chk(NumberDouble)._numberDouble(); }
         long long Long()            const { return chk(NumberLong)._numberLong(); }
         int Int()                   const { return chk(NumberInt)._numberInt(); }
-        bool Bool()                 const { return chk(Bson::Bool).boolean(); }
-        std::vector<BsonElement> Array() const; // see implementation for detailed comments
-        Bson::OID OID()            const { return chk(jstOID).__oid(); }
+        bool Bool()                 const { return chk(_bson::Bool).boolean(); }
+        std::vector<bsonelement> Array() const; // see implementation for detailed comments
+        _bson::OID OID()            const { return chk(jstOID).__oid(); }
         void Null()                 const { chk(isNull()); } // throw MsgAssertionException if not null
         void OK()                   const { chk(ok()); }     // throw MsgAssertionException if element DNE
 
         /** @return the embedded object associated with this field.
             Note the returned object is a reference to within the parent bson object. If that
             object is out of scope, this pointer will no longer be valid. Call getOwned() on the
-            returned BsonObject if you need your own copy.
+            returned bsonobj if you need your own copy.
             throws UserException if the element is not of type object.
         */
-        BsonObject object() const;
-        //BsonObject Obj() const;
+        bsonobj object() const;
+        //bsonobj Obj() const;
 
         /** populate v with the value of the element.  If type does not match, throw exception.
-            useful in templates -- see also BsonObject::Vals().
+            useful in templates -- see also bsonobj::Vals().
         */
         void Val(Date_t& v)         const { v = Date(); }
         void Val(long long& v)      const { v = Long(); }
         void Val(bool& v)           const { v = Bool(); }
-        void Val(BsonObject& v)        const;
-        void Val(Bson::OID& v)     const { v = OID(); }
+        void Val(bsonobj& v)        const;
+        void Val(_bson::OID& v)     const { v = OID(); }
         void Val(int& v)            const { v = Int(); }
         void Val(double& v)         const { v = Double(); }
         void Val(std::string& v)    const { v = String(); }
@@ -119,7 +119,7 @@ namespace Bson {
         /** retrieve a field within this element
             throws exception if *this is not an embedded object
         */
-        BsonElement operator[] (const std::string& field) const;
+        bsonelement operator[] (const std::string& field) const;
 
         /** See canonicalizeBSONType in bsontypes.h */
         int canonicalType() const { return canonicalizeBSONType(type()); }
@@ -136,10 +136,10 @@ namespace Bson {
         int size() const;
 
         /** Wrap this element up as a singleton object. */
-        BsonObject wrap() const;
+        bsonobj wrap() const;
 
         /** Wrap this element up as a singleton object with a new name. */
-        BsonObject wrap( const StringData& newName) const;
+        bsonobj wrap( const StringData& newName) const;
 
         /** field name of the element.  e.g., for
             name : "Joe"
@@ -172,7 +172,7 @@ namespace Bson {
             return size() - fieldNameSize() - 1;
         }
 
-        bool isBoolean() const { return type() == Bson::Bool; }
+        bool isBoolean() const { return type() == _bson::Bool; }
 
         /** @return value of a boolean element.
             You must assure element is a boolean before
@@ -236,7 +236,7 @@ namespace Bson {
 
         /** Retrieve the object ID stored in the object.
             You must ensure the element is of type jstOID first. */
-        const Bson::OID &__oid() const { return *reinterpret_cast< const Bson::OID* >(value()); }
+        const _bson::OID &__oid() const { return *reinterpret_cast< const _bson::OID* >(value()); }
 
         /** True if element is null. */
         bool isNull() const {
@@ -265,11 +265,11 @@ namespace Bson {
 
         /** Get the string value of the element.  If not a string returns "". */
         const char *valuestrsafe() const {
-            return type() == Bson::String ? valuestr() : "";
+            return type() == _bson::String ? valuestr() : "";
         }
         /** Get the string value of the element.  If not a string returns "". */
         std::string str() const {
-            return type() == Bson::String ? std::string(valuestr(), valuestrsize() - 1) : std::string();
+            return type() == _bson::String ? std::string(valuestr(), valuestrsize()-1) : std::string();
         }
 
         /** Get javascript code of a CodeWScope data element. */
@@ -308,9 +308,9 @@ namespace Bson {
         }
 
         /* uasserts if not an object */
-        BsonObject embeddedObjectUserCheck() const;
+        bsonobj embeddedObjectUserCheck() const;
 
-        BsonObject codeWScopeObject() const;
+        bsonobj codeWScopeObject() const;
 
         /** Get raw binary data.  Element must be of type BinData. Doesn't handle type 2 specially */
         const char *binData(int& len) const {
@@ -354,23 +354,23 @@ namespace Bson {
         /** like operator== but doesn't check the fieldname,
             just the value.
         */
-        bool valuesEqual(const BsonElement& r) const {
+        bool valuesEqual(const bsonelement& r) const {
             return woCompare( r , false ) == 0;
         }
 
         /** Returns true if elements are equal. */
-        bool operator==(const BsonElement& r) const {
+        bool operator==(const bsonelement& r) const {
             return woCompare( r , true ) == 0;
         }
         /** Returns true if elements are unequal. */
-        bool operator!=(const BsonElement& r) const { return !operator==(r); }
+        bool operator!=(const bsonelement& r) const { return !operator==(r); }
 
         /** Well ordered comparison.
             @return <0: l<r. 0:l==r. >0:l>r
             order by type, field name, and field value.
             If considerFieldName is true, pay attention to the field name.
         */
-        int woCompare( const BsonElement &e, bool considerFieldName = true ) const;
+        int woCompare( const bsonelement &e, bool considerFieldName = true ) const;
 
         const char * rawdata() const { return data; }
 
@@ -378,13 +378,13 @@ namespace Bson {
         int getGtLtOp( int def = 0 ) const;
 
         /** Constructs an empty element */
-        BsonElement();
+        bsonelement();
 
         /** True if this element may contain subobjects. */
         bool mayEncapsulate() const {
             switch ( type() ) {
             case Object:
-            case Bson::Array:
+            case _bson::Array:
             case CodeWScope:
                 return true;
             default:
@@ -396,7 +396,7 @@ namespace Bson {
         bool isObject() const {
             switch( type() ) {
             case Object:
-            case Bson::Array:
+            case _bson::Array:
                 return true;
             default:
                 return false;
@@ -420,15 +420,15 @@ namespace Bson {
             return value() + 4;
         }
 
-        const Bson::OID& dbrefOID() const {
+        const _bson::OID& dbrefOID() const {
             uassert( 10064 ,  "not a dbref" , type() == DBRef );
             const char * start = value();
             start += 4 + *reinterpret_cast< const int* >( start );  // todo endian
-            return *reinterpret_cast< const Bson::OID* >( start );
+            return *reinterpret_cast< const _bson::OID* >( start );
         }
 
         /** this does not use fieldName in the comparison, just the value */
-        bool operator<( const BsonElement& other ) const {
+        bool operator<( const bsonelement& other ) const {
             int x = (int)canonicalType() - (int)other.canonicalType();
             if ( x < 0 ) return true;
             else if ( x > 0 ) return false;
@@ -436,7 +436,7 @@ namespace Bson {
         }
 
         // @param maxLen don't scan more than maxLen bytes
-        explicit BsonElement(const char *d, int maxLen) : data(d) {
+        explicit bsonelement(const char *d, int maxLen) : data(d) {
             if ( eoo() ) {
                 totalSize = 1;
                 fieldNameSize_ = 0;
@@ -459,7 +459,7 @@ namespace Bson {
             }
         }
 
-        explicit BsonElement(const char *d) : data(d) {
+        explicit bsonelement(const char *d) : data(d) {
             fieldNameSize_ = -1;
             totalSize = -1;
             if ( eoo() ) {
@@ -470,12 +470,12 @@ namespace Bson {
 
         struct FieldNameSizeTag {}; // For disambiguation with ctor taking 'maxLen' above.
 
-        /** Construct a BsonElement where you already know the length of the name. The value
+        /** Construct a bsonelement where you already know the length of the name. The value
          *  passed here includes the null terminator. The data pointed to by 'd' must not
          *  represent an EOO. You may pass -1 to indicate that you don't actually know the
          *  size.
          */
-        BsonElement(const char* d, int fieldNameSize, FieldNameSizeTag)
+        bsonelement(const char* d, int fieldNameSize, FieldNameSizeTag)
             : data(d)
             , fieldNameSize_(fieldNameSize) // internal size includes null terminator
             , totalSize(-1) {
@@ -491,9 +491,9 @@ namespace Bson {
 
         mutable int totalSize; /* caches the computed size */
 
-        friend class BsonIterator;
-        friend class BsonObject;
-        const BsonElement& chk(int t) const {
+        friend class bsonobjiterator;
+        friend class bsonobj;
+        const bsonelement& chk(int t) const {
             if ( t != type() ) {
                 StringBuilder ss;
                 if( eoo() )
@@ -504,13 +504,13 @@ namespace Bson {
             }
             return *this;
         }
-        const BsonElement& chk(bool expr) const {
+        const bsonelement& chk(bool expr) const {
             massert(13118, "unexpected or missing type value in BSON object", expr);
             return *this;
         }
     };
 
-    inline bool BsonElement::trueValue() const {
+    inline bool bsonelement::trueValue() const {
         // NOTE Behavior changes must be replicated in Value::coerceToBool().
         switch( type() ) {
         case NumberLong:
@@ -519,7 +519,7 @@ namespace Bson {
             return _numberDouble() != 0;
         case NumberInt:
             return _numberInt() != 0;
-        case Bson::Bool:
+        case _bson::Bool:
             return boolean();
         case EOO:
         case jstNULL:
@@ -533,7 +533,7 @@ namespace Bson {
     }
 
     /** @return true if element is of a numeric type. */
-    inline bool BsonElement::isNumber() const {
+    inline bool bsonelement::isNumber() const {
         switch( type() ) {
         case NumberLong:
         case NumberDouble:
@@ -544,14 +544,14 @@ namespace Bson {
         }
     }
 
-    inline bool BsonElement::isSimpleType() const {
+    inline bool bsonelement::isSimpleType() const {
         switch( type() ) {
         case NumberLong:
         case NumberDouble:
         case NumberInt:
-        case Bson::String:
-        case Bson::Bool:
-        case Bson::Date:
+        case _bson::String:
+        case _bson::Bool:
+        case _bson::Date:
         case jstOID:
             return true;
         default:
@@ -559,7 +559,7 @@ namespace Bson {
         }
     }
 
-    inline double BsonElement::numberDouble() const {
+    inline double bsonelement::numberDouble() const {
         switch( type() ) {
         case NumberDouble:
             return _numberDouble();
@@ -573,7 +573,7 @@ namespace Bson {
     }
 
     /** Retrieve int value for the element safely.  Zero returned if not a number. Converted to int if another numeric type. */
-    inline int BsonElement::numberInt() const {
+    inline int bsonelement::numberInt() const {
         switch( type() ) {
         case NumberDouble:
             return (int) _numberDouble();
@@ -587,7 +587,7 @@ namespace Bson {
     }
 
     /** Retrieve long value for the element safely.  Zero returned if not a number. */
-    inline long long BsonElement::numberLong() const {
+    inline long long bsonelement::numberLong() const {
         switch( type() ) {
         case NumberDouble:
             return (long long) _numberDouble();
@@ -606,7 +606,7 @@ namespace Bson {
      *  very large doubles -> LLONG_MAX
      *  very small doubles -> LLONG_MIN  */
     /*
-    inline long long BsonElement::safeNumberLong() const {
+    inline long long bsonelement::safeNumberLong() const {
         double d;
         switch( type() ) {
         case NumberDouble:
@@ -625,7 +625,7 @@ namespace Bson {
         }
     }
     */
-    inline BsonElement::BsonElement() {
+    inline bsonelement::bsonelement() {
         static char z = 0;
         data = &z;
         fieldNameSize_ = 0;

@@ -30,12 +30,12 @@
 #include "time_support.h"
 #include <set>
 #include <vector>
-#include "BsonElement.h"
+#include "bsonelement.h"
 #include "bsonobjiterator.h"
-#include "BsonObjectBuilder.h"
+#include "bsonobjbuilder.h"
 #include "parse_number.h"
 
-namespace Bson {
+namespace _bson {
 
     using std::dec;
     using std::endl;
@@ -45,10 +45,10 @@ namespace Bson {
     using std::string;
     using std::stringstream;
 
-    BsonElement eooElement;
+    bsonelement eooElement;
 #if 0
     // need to move to bson/, but has dependency on base64 so move that to bson/util/ first.
-    inline string BsonElement::jsonString( JsonStringFormat format, bool includeFieldNames, int pretty ) const {
+    inline string bsonelement::jsonString( JsonStringFormat format, bool includeFieldNames, int pretty ) const {
         int sign;
 
         stringstream s;
@@ -118,7 +118,7 @@ namespace Bson {
             }
             s << "[ ";
             BSONObjIterator i( embeddedObject() );
-            BsonElement e = i.next();
+            bsonelement e = i.next();
             if ( !e.eoo() ) {
                 int count = 0;
                 while ( 1 ) {
@@ -299,16 +299,16 @@ namespace Bson {
         we match array # positions with their vector position, and ignore
         any fields with non-numeric field names.
         */
-    std::vector<BsonElement> BsonElement::Array() const {
-        chk(Bson::Array);
-        std::vector<BsonElement> v;
-        BsonIterator i(object());
+    std::vector<bsonelement> bsonelement::Array() const {
+        chk(_bson::Array);
+        std::vector<bsonelement> v;
+        bsonobjiterator i(object());
         while( i.more() ) {
-            BsonElement e = i.next();
+            bsonelement e = i.next();
             const char *f = e.fieldName();
 
             unsigned u;
-            Status status = Bson::parseNumberFromString( f, &u );
+            Status status = _bson::parseNumberFromString( f, &u );
             if ( status.isOK() ) {
                 verify( u < 1000000 );
                 if( u >= v.size() )
@@ -344,7 +344,7 @@ namespace Bson {
         StringBuilder s;
         s << "{ ";
         BSONObjIterator i(*this);
-        BsonElement e = i.next();
+        bsonelement e = i.next();
         if ( !e.eoo() )
             while ( 1 ) {
                 s << e.jsonString( format, true, pretty?pretty+1:0 );
@@ -365,7 +365,7 @@ namespace Bson {
         return s.str();
     }
 
-    bool BsonObject::valid() const {
+    bool bsonobj::valid() const {
         return validateBSON( objdata(), objsize() ).isOK();
     }
 
@@ -381,8 +381,8 @@ namespace Bson {
         while ( 1 ) {
             // so far, equal...
 
-            BsonElement l = i.next();
-            BsonElement r = j.next();
+            bsonelement l = i.next();
+            bsonelement r = j.next();
             if ( l.eoo() )
                 return r.eoo() ? 0 : -1;
             if ( r.eoo() )
@@ -417,9 +417,9 @@ namespace Bson {
         while ( 1 ) {
             // so far, equal...
 
-            BsonElement l = i.next();
-            BsonElement r = j.next();
-            BsonElement o;
+            bsonelement l = i.next();
+            bsonelement r = j.next();
+            bsonelement o;
             if ( ordered )
                 o = k.next();
             if ( l.eoo() )
@@ -456,14 +456,14 @@ namespace Bson {
 
         BSONObjIterator i(sortKey);
         while ( 1 ) {
-            BsonElement f = i.next();
+            bsonelement f = i.next();
             if ( f.eoo() )
                 return 0;
 
-            BsonElement l = useDotted ? getFieldDotted( f.fieldName() ) : getField( f.fieldName() );
+            bsonelement l = useDotted ? getFieldDotted( f.fieldName() ) : getField( f.fieldName() );
             if ( l.eoo() )
                 l = staticNull.firstElement();
-            BsonElement r = useDotted ? other.getFieldDotted( f.fieldName() ) : other.getField( f.fieldName() );
+            bsonelement r = useDotted ? other.getFieldDotted( f.fieldName() ) : other.getField( f.fieldName() );
             if ( r.eoo() )
                 r = staticNull.firstElement();
 
@@ -481,8 +481,8 @@ namespace Bson {
         BSONObjIterator b( otherObj );
 
         while ( a.more() && b.more() ) {
-            BsonElement x = a.next();
-            BsonElement y = b.next();
+            bsonelement x = a.next();
+            bsonelement y = b.next();
             if ( x != y )
                 return false;
         }
@@ -492,7 +492,7 @@ namespace Bson {
 
     template <typename BSONElementColl>
     void _getFieldsDotted( const BSONObj* obj, const StringData& name, BSONElementColl &ret, bool expandLastArray ) {
-        BsonElement e = obj->getField( name );
+        bsonelement e = obj->getField( name );
 
         if ( e.eoo() ) {
             size_t idx = name.find( '.' );
@@ -500,7 +500,7 @@ namespace Bson {
                 StringData left = name.substr( 0, idx );
                 StringData next = name.substr( idx + 1, name.size() );
 
-                BsonElement e = obj->getField( left );
+                bsonelement e = obj->getField( left );
 
                 if (e.type() == Object) {
                     e.embeddedObject().getFieldsDotted(next, ret, expandLastArray );
@@ -519,7 +519,7 @@ namespace Bson {
                     else {
                         BSONObjIterator i(e.embeddedObject());
                         while ( i.more() ) {
-                            BsonElement e2 = i.next();
+                            bsonelement e2 = i.next();
                             if (e2.type() == Object || e2.type() == Array)
                                 e2.embeddedObject().getFieldsDotted(next, ret, expandLastArray );
                         }
@@ -549,10 +549,10 @@ namespace Bson {
         _getFieldsDotted( this, name, ret, expandLastArray );
     }
 
-    BsonElement BSONObj::getFieldDottedOrArray(const char *&name) const {
+    bsonelement BSONObj::getFieldDottedOrArray(const char *&name) const {
         const char *p = strchr(name, '.');
 
-        BsonElement sub;
+        bsonelement sub;
 
         if ( p ) {
             sub = getField( string(name, p-name) );
@@ -577,10 +577,10 @@ namespace Bson {
         BSONObjBuilder b;
         BSONObjIterator i(pattern);
         while ( i.moreWithEOO() ) {
-            BsonElement e = i.next();
+            bsonelement e = i.next();
             if ( e.eoo() )
                 break;
-            BsonElement x = getField(e.fieldName());
+            bsonelement x = getField(e.fieldName());
             if ( !x.eoo() )
                 b.appendAs(x, "");
         }
@@ -591,10 +591,10 @@ namespace Bson {
         BSONObjBuilder b(32); // scanandorder.h can make a zillion of these, so we start the allocation very small
         BSONObjIterator i(pattern);
         while ( i.moreWithEOO() ) {
-            BsonElement e = i.next();
+            bsonelement e = i.next();
             if ( e.eoo() )
                 break;
-            BsonElement x = getFieldDotted(e.fieldName());
+            bsonelement x = getFieldDotted(e.fieldName());
             if ( ! x.eoo() )
                 b.appendAs( x, e.fieldName() );
             else if ( fillWithNull )
@@ -607,10 +607,10 @@ namespace Bson {
         BSONObjBuilder b;
         BSONObjIterator i( *this );
         while( i.moreWithEOO() ) {
-            BsonElement e = i.next();
+            bsonelement e = i.next();
             if ( e.eoo() )
                 break;
-            BsonElement x = filter.getField( e.fieldName() );
+            bsonelement x = filter.getField( e.fieldName() );
             if ( ( x.eoo() && !inFilter ) ||
                     ( !x.eoo() && inFilter ) )
                 b.append( e );
@@ -618,37 +618,37 @@ namespace Bson {
         return b.obj();
     }
 
-    BsonElement BSONObj::getFieldUsingIndexNames(const StringData& fieldName,
+    bsonelement BSONObj::getFieldUsingIndexNames(const StringData& fieldName,
                                                  const BSONObj &indexKey) const {
         BSONObjIterator i( indexKey );
         int j = 0;
         while( i.moreWithEOO() ) {
-            BsonElement f = i.next();
+            bsonelement f = i.next();
             if ( f.eoo() )
-                return BsonElement();
+                return bsonelement();
             if ( f.fieldName() == fieldName )
                 break;
             ++j;
         }
         BSONObjIterator k( *this );
         while( k.moreWithEOO() ) {
-            BsonElement g = k.next();
+            bsonelement g = k.next();
             if ( g.eoo() )
-                return BsonElement();
+                return bsonelement();
             if ( j == 0 ) {
                 return g;
             }
             --j;
         }
-        return BsonElement();
+        return bsonelement();
     }
 #endif
     /* grab names of all the fields in this object */
-    int BsonObject::getFieldNames(set<string>& fields) const {
+    int bsonobj::getFieldNames(set<string>& fields) const {
         int n = 0;
-        BsonIterator i(*this);
+        bsonobjiterator i(*this);
         while ( i.moreWithEOO() ) {
-            BsonElement e = i.next();
+            bsonelement e = i.next();
             if ( e.eoo() )
                 break;
             fields.insert(e.fieldName());
@@ -660,7 +660,7 @@ namespace Bson {
     /* note: addFields always adds _id even if not specified
        returns n added not counting _id unless requested.
     */
-    int BsonObject::addFields(BSONObj& from, set<string>& fields) {
+    int bsonobj::addFields(BSONObj& from, set<string>& fields) {
         verify( isEmpty() && !isOwned() ); /* partial implementation for now... */
 
         BSONObjBuilder b;
@@ -670,7 +670,7 @@ namespace Bson {
         BSONObjIterator i(from);
         bool gotId = false;
         while ( i.moreWithEOO() ) {
-            BsonElement e = i.next();
+            bsonelement e = i.next();
             const char *fname = e.fieldName();
             if ( fields.count(fname) ) {
                 b.append(e);
@@ -698,7 +698,7 @@ namespace Bson {
         BSONObjIterator i( *this );
         int index = 0;
         while( i.moreWithEOO() ){
-            BsonElement e = i.next();
+            bsonelement e = i.next();
             if( e.eoo() ) break;
 
             // TODO:  If actually important, may be able to do int->char* much faster
@@ -709,13 +709,13 @@ namespace Bson {
         return true;
     }
 #endif
-    /*BsonObject BsonObject::replaceFieldNames( const BsonObject &names ) const {
-        BsonObjectBuilder b;
-        BsonIterator i( *this );
-        BsonIterator j(names);
-        BsonElement f = j.moreWithEOO() ? j.next() : BsonObject().firstElement();
+    /*bsonobj bsonobj::replaceFieldNames( const bsonobj &names ) const {
+        bsonobjbuilder b;
+        bsonobjiterator i( *this );
+        bsonobjiterator j(names);
+        bsonelement f = j.moreWithEOO() ? j.next() : bsonobj().firstElement();
         while( i.moreWithEOO() ) {
-            BsonElement e = i.next();
+            bsonelement e = i.next();
             if ( e.eoo() )
                 break;
             if ( !f.eoo() ) {
@@ -730,7 +730,7 @@ namespace Bson {
     }*/
 
 #if 0
-    bool BsonObjectBuilder::appendAsNumber( const StringData& fieldName , const string& data ) {
+    bool bsonobjbuilder::appendAsNumber( const StringData& fieldName , const string& data ) {
         if ( data.size() == 0 || data == "-" || data == ".")
             return false;
 

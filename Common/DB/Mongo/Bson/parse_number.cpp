@@ -22,7 +22,7 @@
 #include <string>
 #include "cstdint.h"
 
-namespace Bson {
+namespace _bson {
 
     /**
      * Returns the value of the digit "c", with the same conversion behavior as strtol.

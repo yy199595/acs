@@ -40,7 +40,7 @@ extern "C" time_t timegm(struct tm *const tmp);
 
 using namespace std;
 
-namespace Bson {
+namespace _bson {
 
     StringData getNextToken(const StringData& currentString,
                             const StringData& terminalChars,

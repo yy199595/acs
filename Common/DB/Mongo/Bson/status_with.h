@@ -17,7 +17,7 @@
 
 #include "status.h"
 
-namespace Bson {
+namespace _bson {
 
     /*
      * StatusWith is used to return an error or a value

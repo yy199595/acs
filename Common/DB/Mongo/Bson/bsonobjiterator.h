@@ -17,25 +17,25 @@
 
 #pragma once
 
-#include "BsonObject.h"
+#include "bsonobj.h"
 
-namespace Bson {
+namespace _bson {
 
-    /** iterator for a BsonObject
+    /** iterator for a bsonobj
 
-       Note each BsonObject ends with an EOO element: so you will get more() on an empty
+       Note each bsonobj ends with an EOO element: so you will get more() on an empty
        object, although next().eoo() will be true.
 
-       The BsonObject must stay in scope for the duration of the iterator's execution.
+       The bsonobj must stay in scope for the duration of the iterator's execution.
 
        todo: we may want to make a more stl-like iterator interface for this
              with things like begin() and end()
     */
-    class BsonIterator {
+    class bsonobjiterator {
     public:
         /** Create an iterator for a BSON object.
         */
-        BsonIterator(const BsonObject& jso) {
+        bsonobjiterator(const bsonobj& jso) {
             int sz = jso.objsize();
             if ( sz == 0 ) {
                 _pos = _theend = 0;
@@ -45,7 +45,7 @@ namespace Bson {
             _theend = jso.objdata() + sz - 1;
         }
 
-        BsonIterator( const char * start , const char * end ) {
+        bsonobjiterator( const char * start , const char * end ) {
             _pos = start + 4;
             _theend = end - 1;
         }
@@ -57,7 +57,7 @@ namespace Bson {
         bool moreWithEOO() { return _pos <= _theend; }
 
         /** @return the next element in the object. For the final element, element.eoo() will be true. */
-        BsonElement next( bool checkEnd ) {
+        bsonelement next( bool checkEnd ) {
             verify( _pos <= _theend );
             
             int maxLen = -1;
@@ -66,25 +66,25 @@ namespace Bson {
                 verify( maxLen > 0 );
             }
 
-			BsonElement e( _pos, maxLen );
+            bsonelement e( _pos, maxLen );
             int esize = e.size( maxLen );
-            massert( 16446, "BsonElement has bad size", esize > 0 );
+            massert( 16446, "bsonelement has bad size", esize > 0 );
             _pos += esize;
 
             return e;
         }
-		BsonElement next() {
+        bsonelement next() {
             verify( _pos <= _theend );
-			BsonElement e(_pos);
+            bsonelement e(_pos);
             _pos += e.size();
             return e;
         }
         void operator++() { next(); }
         void operator++(int) { next(); }
 
-		BsonElement operator*() {
+        bsonelement operator*() {
             verify( _pos <= _theend );
-            return BsonElement(_pos);
+            return bsonelement(_pos);
         }
 
     private:
@@ -106,16 +106,16 @@ namespace Bson {
             return _cur < _nfields;
         }
 
-        BsonElement next() {
+        bsonelement next() {
             verify( _fields );
             if ( _cur < _nfields )
-                return BsonElement( _fields[_cur++] );
-            return BsonElement();
+                return bsonelement( _fields[_cur++] );
+            return bsonelement();
         }
 
     protected:
         class ElementFieldCmp;
-        BSONIteratorSorted( const BsonObject &o, const ElementFieldCmp &cmp );
+        BSONIteratorSorted( const bsonobj &o, const ElementFieldCmp &cmp );
         
     private:
         const char ** _fields;
@@ -123,10 +123,10 @@ namespace Bson {
         int _cur;
     };
 
-    /** Provides iteration of a BsonObject's BSONElements in lexical field order. */
+    /** Provides iteration of a bsonobj's BSONElements in lexical field order. */
     class BSONObjIteratorSorted : public BSONIteratorSorted {
     public:
-        BSONObjIteratorSorted( const BsonObject &object );
+        BSONObjIteratorSorted( const bsonobj &object );
     };
 
     /**
@@ -158,8 +158,8 @@ namespace Bson {
      */
 
 #define BSONForEach(e, obj)                                       \
-    ::mongo::BsonIterator BOOST_PP_CAT(it_,__LINE__)(obj);     \
-    for ( ::mongo::BsonElement e;                                 \
+    ::mongo::bsonobjiterator BOOST_PP_CAT(it_,__LINE__)(obj);     \
+    for ( ::mongo::bsonelement e;                                 \
           (BOOST_PP_CAT(it_,__LINE__).more() ?                    \
            (e = BOOST_PP_CAT(it_,__LINE__).next(), true) :        \
            false) ;                                               \

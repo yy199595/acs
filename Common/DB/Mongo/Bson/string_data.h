@@ -22,7 +22,7 @@
 #include <sstream>
 #include "base.h"
 
-  namespace Bson {
+  namespace _bson {
 
   /**
    * A StringData object wraps a 'const string&' or a 'const char*' without copying its

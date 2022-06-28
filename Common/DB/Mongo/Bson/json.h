@@ -18,14 +18,14 @@
 #include <string>
 #include <istream>
 
-namespace Bson {
+namespace _bson {
     class Status;
-    class BsonObject;
+    class bsonobj;
     class StringData;
-    class BsonObjectBuilder;
+    class bsonobjbuilder;
 
     /**
-     * Create a BsonObject from a JSON <http://www.json.org>,
+     * Create a bsonobj from a JSON <http://www.json.org>,
      * <http://www.ietf.org/rfc/rfc4627.txt> string.  In addition to the JSON
      * extensions extensions described here
      * <http://dochub.mongodb.org/core/mongodbextendedjson>, this function
@@ -37,14 +37,14 @@ namespace Bson {
      * @throws MsgAssertionException if parsing fails.  The message included with
      * this assertion includes the character offset where parsing failed.
      */
-     BsonObject Fromjson(std::istream&, BsonObjectBuilder& builder);
+     bsonobj fromjson(std::istream&, bsonobjbuilder& builder);
 
     /** @param len will be size of JSON object in text chars. */
-     //BsonObject  Fromjson(const char* str, int* len=NULL);
+     //bsonobj  fromjson(const char* str, int* len=NULL);
 
     /**
-     * Parser class.  A BsonObject is constructed incrementally by passing a
-     * BsonObjectBuilder to the recursive parsing methods.  The grammar for the
+     * Parser class.  A bsonobj is constructed incrementally by passing a
+     * bsonobjbuilder to the recursive parsing methods.  The grammar for the
      * element parsed is described before each function.
      */
     class JParse {
@@ -87,7 +87,7 @@ namespace Bson {
              *   | new CONSTRUCTOR
              */
         private:
-            Bson::Status value(const StringData& fieldName, BsonObjectBuilder&);
+            _bson::Status value(const StringData& fieldName, bsonobjbuilder&);
 
             /*
              * OBJECT :
@@ -114,7 +114,7 @@ namespace Bson {
              *
              */
         public:
-            Bson::Status object(const StringData& fieldName, BsonObjectBuilder&, bool subObj=true);
+            _bson::Status object(const StringData& fieldName, bsonobjbuilder&, bool subObj=true);
 
         private:
             bool eof() const { return _in.eof(); }
@@ -127,7 +127,7 @@ namespace Bson {
              * OIDOBJECT :
              *     { FIELD("$oid") : <24 character hex string> }
              */
-            Bson::Status objectIdObject(const StringData& fieldName, BsonObjectBuilder&);
+            _bson::Status objectIdObject(const StringData& fieldName, bsonobjbuilder&);
 
             /*
              * BINARYOBJECT :
@@ -135,13 +135,13 @@ namespace Bson {
              *          FIELD("$type") : <hexadecimal representation of a single byte
              *              indicating the data type> }
              */
-            Bson::Status binaryObject(const StringData& fieldName, BsonObjectBuilder&);
+            _bson::Status binaryObject(const StringData& fieldName, bsonobjbuilder&);
 
             /*
              * DATEOBJECT :
              *     { FIELD("$date") : <64 bit signed integer for milliseconds since epoch> }
              */
-            Bson::Status dateObject(const StringData& fieldName, BsonObjectBuilder&);
+            _bson::Status dateObject(const StringData& fieldName, bsonobjbuilder&);
 
             /*
              * TIMESTAMPOBJECT :
@@ -149,7 +149,7 @@ namespace Bson {
              *         FIELD("t") : <32 bit unsigned integer for seconds since epoch>,
              *         FIELD("i") : <32 bit unsigned integer for the increment> } }
              */
-            Bson::Status timestampObject(const StringData& fieldName, BsonObjectBuilder&);
+            _bson::Status timestampObject(const StringData& fieldName, bsonobjbuilder&);
 
             /*
              *     NOTE: the rules for the body of the regex are different here,
@@ -159,7 +159,7 @@ namespace Bson {
              *   | { FIELD("$regex") : <string representing body of regex>,
              *          FIELD("$options") : <string representing regex options> }
              */
-            Bson::Status regexObject(const StringData& fieldName, BsonObjectBuilder&);
+            _bson::Status regexObject(const StringData& fieldName, bsonobjbuilder&);
 
             /*
              * REFOBJECT :
@@ -168,19 +168,19 @@ namespace Bson {
              *   | { FIELD("$ref") : STRING , FIELD("$id") : OBJECTID }
              *   | { FIELD("$ref") : STRING , FIELD("$id") : OIDOBJECT }
              */
-            Bson::Status dbRefObject(const StringData& fieldName, BsonObjectBuilder&);
+            _bson::Status dbRefObject(const StringData& fieldName, bsonobjbuilder&);
 
             /*
              * UNDEFINEDOBJECT :
              *     { FIELD("$undefined") : true }
              */
-            Bson::Status undefinedObject(const StringData& fieldName, BsonObjectBuilder&);
+            _bson::Status undefinedObject(const StringData& fieldName, bsonobjbuilder&);
 
             /*
              * NUMBERLONGOBJECT :
              *     { FIELD("$numberLong") : "<number>" }
              */
-            Bson::Status numberLongObject(const StringData& fieldName, BsonObjectBuilder&);
+            _bson::Status numberLongObject(const StringData& fieldName, bsonobjbuilder&);
 
             /*
              * ARRAY :
@@ -191,14 +191,14 @@ namespace Bson {
              *     VALUE
              *   | VALUE , ELEMENTS
              */
-            Bson::Status array(const StringData& fieldName, BsonObjectBuilder&);
+            _bson::Status array(const StringData& fieldName, bsonobjbuilder&);
 
             /*
              * NOTE: Currently only Date can be preceded by the "new" keyword
              * CONSTRUCTOR :
              *     DATE
              */
-            Bson::Status constructor(const StringData& fieldName, BsonObjectBuilder&);
+            _bson::Status constructor(const StringData& fieldName, bsonobjbuilder&);
 
             /* The following functions only parse the body of the constructor
              * between the parentheses, not including the constructor name */
@@ -206,38 +206,38 @@ namespace Bson {
              * DATE :
              *     Date( <64 bit signed integer for milliseconds since epoch> )
              */
-            Bson::Status date(const StringData& fieldName, BsonObjectBuilder&);
+            _bson::Status date(const StringData& fieldName, bsonobjbuilder&);
 
             /*
              * TIMESTAMP :
              *     Timestamp( <32 bit unsigned integer for seconds since epoch>,
              *          <32 bit unsigned integer for the increment> )
              */
-            Bson::Status timestamp(const StringData& fieldName, BsonObjectBuilder&);
+            _bson::Status timestamp(const StringData& fieldName, bsonobjbuilder&);
 
             /*
              * OBJECTID :
              *     ObjectId( <24 character hex string> )
              */
-            Bson::Status objectId(const StringData& fieldName, BsonObjectBuilder&);
+            _bson::Status objectId(const StringData& fieldName, bsonobjbuilder&);
 
             /*
              * NUMBERLONG :
              *     NumberLong( <number> )
              */
-            Bson::Status numberLong(const StringData& fieldName, BsonObjectBuilder&);
+            _bson::Status numberLong(const StringData& fieldName, bsonobjbuilder&);
 
             /*
              * NUMBERINT :
              *     NumberInt( <number> )
              */
-            Bson::Status numberInt(const StringData& fieldName, BsonObjectBuilder&);
+            _bson::Status numberInt(const StringData& fieldName, bsonobjbuilder&);
 
             /*
              * DBREF :
              *     Dbref( <namespace string> , <24 character hex string> )
              */
-            Bson::Status dbRef(const StringData& fieldName, BsonObjectBuilder&);
+            _bson::Status dbRef(const StringData& fieldName, bsonobjbuilder&);
 
             /*
              * REGEX :
@@ -269,10 +269,10 @@ namespace Bson {
              * REGEXOPTION :
              *     g | i | m | s
              */
-            Bson::Status regex(const StringData& fieldName, BsonObjectBuilder&);
-            Bson::Status regexPat(std::string* result);
-            Bson::Status regexOpt(std::string* result);
-            Bson::Status regexOptCheck(const StringData& opt);
+            _bson::Status regex(const StringData& fieldName, bsonobjbuilder&);
+            _bson::Status regexPat(std::string* result);
+            _bson::Status regexOpt(std::string* result);
+            _bson::Status regexOptCheck(const StringData& opt);
 
             /*
              * NUMBER :
@@ -285,7 +285,7 @@ namespace Bson {
              * Timestamp - strtoul for both timestamp and increment and '-'
              * before a number explicity disallowed
              */
-            Bson::Status number(const StringData& fieldName, BsonObjectBuilder&);
+            _bson::Status number(const StringData& fieldName, bsonobjbuilder&);
 
             /*
              * FIELD :
@@ -296,7 +296,7 @@ namespace Bson {
              *     [a-zA-Z0-9$_]
              *   | [a-zA-Z0-9$_] FIELDCHARS
              */
-            Bson::Status field(std::string* result);
+            _bson::Status field(std::string* result);
 
             /*
              * STRING :
@@ -305,7 +305,7 @@ namespace Bson {
              *   | " CHARS "
              *   | ' CHARS '
              */
-            Bson::Status quotedString(std::string* result);
+            _bson::Status quotedString(std::string* result);
 
             /*
              * CHARS :
@@ -341,7 +341,7 @@ namespace Bson {
              * string, but there is no guarantee that it will not contain other
              * null characters.
              */
-            Bson::Status chars(std::string* result, const char* terminalSet, const char* allowedSet=NULL);
+            _bson::Status chars(std::string* result, const char* terminalSet, const char* allowedSet=NULL);
 
             /**
              * Converts the two byte Unicode code point to its UTF8 character
@@ -395,10 +395,16 @@ namespace Bson {
             bool isHexString(const StringData&) const;
 
             /**
+             * @return true if every character in the string is a valid base64
+             * character
+             */
+            bool isBase64String(const StringData&) const;
+
+            /**
              * @return FailedToParse status with the given message and some
              * additional context information
              */
-            Bson::Status parseError(const StringData& msg);
+            _bson::Status parseError(const StringData& msg);
         public:
             inline long long offset() { return _offset; }
 

@@ -16,7 +16,7 @@
 
 #pragma once
 
-namespace Bson {
+namespace _bson {
 
     inline bool isNaN(double d) { 
         return d != d;

@@ -1,12 +1,12 @@
 #include <string>
-#include "BsonObjectBuilder.h"
+#include "bsonobjbuilder.h"
 #include "bsonobjiterator.h"
 
 using namespace std;
 
 #define q(x)
 
-namespace Bson {
+namespace _bson {
 
     namespace iter {
         // values herein represent size of the element of the corresponding type.
@@ -66,7 +66,7 @@ namespace Bson {
             else {
                 if (z == 0xff) {
                     q(log() << "backcompat" << endl;);
-                    BsonElement e(elem);
+                    bsonelement e(elem);
                     p += e.size();
                 }
                 else {
@@ -82,7 +82,7 @@ namespace Bson {
         }
     }
 
-    int BsonElement::_valuesize() const {
+    int bsonelement::_valuesize() const { 
         unsigned char tp = (unsigned char)type();
         unsigned z = iter::sizeForBsonType[tp ];
         unsigned sz = 0;
@@ -104,13 +104,13 @@ namespace Bson {
         return sz;
     }
 
-    BsonIterator BsonObjectBuilder::iterator() const {
+    bsonobjiterator bsonobjbuilder::iterator() const {
         const char * s = _b.buf() + _offset;
         const char * e = _b.buf() + _b.len();
-        return BsonIterator(s, e);
+        return bsonobjiterator(s, e);
     }
 
-    inline int BsonElement::size() const {
+    inline int bsonelement::size() const {
         if (totalSize >= 0)
             return totalSize;
         int x = _valuesize();
@@ -118,7 +118,7 @@ namespace Bson {
         return totalSize;
     }
 
-    int BsonElement::sizeOld() const {
+    int bsonelement::sizeOld() const {
         if (totalSize >= 0)
             return totalSize;
 
@@ -130,14 +130,14 @@ namespace Bson {
         case MaxKey:
         case MinKey:
             break;
-        case Bson::Bool:
+        case _bson::Bool:
             x = 1;
             break;
         case NumberInt:
             x = 4;
             break;
         case Timestamp:
-        case Bson::Date:
+        case _bson::Date:
         case NumberDouble:
         case NumberLong:
             x = 8;
@@ -147,7 +147,7 @@ namespace Bson {
             break;
         case Symbol:
         case Code:
-        case Bson::String:
+        case _bson::String:
             x = valuestrsize() + 4;
             break;
         case DBRef:
@@ -155,7 +155,7 @@ namespace Bson {
             break;
         case CodeWScope:
         case Object:
-        case Bson::Array:
+        case _bson::Array:
             x = objsize();
             break;
         case BinData:
@@ -174,7 +174,7 @@ namespace Bson {
         default:
         {
             StringBuilder ss;
-            ss << "BsonElement: bad type " << (int)type();
+            ss << "bsonelement: bad type " << (int)type();
             std::string msg = ss.str();
             massert(10320, msg.c_str(), false);
         }
@@ -184,7 +184,7 @@ namespace Bson {
         return totalSize;
     }
 
-    BsonElement BsonObject::getField(const StringData& name) const {
+    bsonelement bsonobj::getField(const StringData& name) const {
         const char *_name = name.begin();
         unsigned name_sz = (unsigned)name.size();
         q(log() << _name << ' ' << name_sz << endl;);
@@ -207,7 +207,7 @@ namespace Bson {
                 q(log() << "memcmp check " << *p << endl;)
                 if (memcmp(_name, p, name_sz) == 0) {
                     q(log() << "match!" << endl;)
-                    BsonElement e = BsonElement(name_sz + 1, elem);
+                    bsonelement e = bsonelement(name_sz + 1, elem);
                     q(log() << e.toString() << endl;)
                     return e;
                 }
@@ -230,10 +230,10 @@ namespace Bson {
 
         }
         q(log() << "returning BSONElement() (mismatch)" << endl;)
-        return BsonElement();
+        return bsonelement();
     }
 
-    const string BsonObjectBuilder::numStrs[] = {
+    const string bsonobjbuilder::numStrs[] = {
         "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
         "10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
         "20", "21", "22", "23", "24", "25", "26", "27", "28", "29",
@@ -248,25 +248,25 @@ namespace Bson {
 
     std::string OID::str() const { return toHexLower(data, kOIDSize); }
 
-    // This is to ensure that BsonObjectBuilder doesn't try to use numStrs before the strings have been constructed
+    // This is to ensure that bsonobjbuilder doesn't try to use numStrs before the strings have been constructed
     // I've tested just making numStrs a char[][], but the overhead of constructing the strings each time was too high
     // numStrsReady will be 0 until after numStrs is initialized because it is a static variable
-    bool BsonObjectBuilder::numStrsReady = (numStrs[0].size() > 0);
+    bool bsonobjbuilder::numStrsReady = (numStrs[0].size() > 0);
 
     // wrap this element up as a singleton object.
-    BsonObject BsonElement::wrap() const {
-        BsonObjectBuilder b(size() + 6);
+    bsonobj bsonelement::wrap() const {
+        bsonobjbuilder b(size() + 6);
         b.append(*this);
         return b.obj();
     }
 
-    BsonObject BsonElement::wrap(const StringData& newName) const {
-        BsonObjectBuilder b(size() + 6 + newName.size());
+    bsonobj bsonelement::wrap(const StringData& newName) const {
+        bsonobjbuilder b(size() + 6 + newName.size());
         b.appendAs(*this, newName);
         return b.obj();
     }
     /* add all the fields from the object specified to this object */
-    BsonObjectBuilder& BsonObjectBuilder::appendElements(BsonObject x) {
+    bsonobjbuilder& bsonobjbuilder::appendElements(bsonobj x) {
         if (!x.isEmpty())
             _b.appendBuf(
             x.objdata() + 4,   // skip over leading length
@@ -274,19 +274,19 @@ namespace Bson {
         return *this;
     }
 
-    std::string BsonElement::toString(bool includeFieldName, bool full) const {
+    std::string bsonelement::toString(bool includeFieldName, bool full) const {
         StringBuilder s;
         toString(s, includeFieldName, full);
         return s.str();
     }
-    void BsonElement::toString(StringBuilder& s, bool includeFieldName, bool full, int depth) const {
+    void bsonelement::toString(StringBuilder& s, bool includeFieldName, bool full, int depth) const {
 
-        if (depth > BsonObject::maxToStringRecursionDepth) {
+        if (depth > bsonobj::maxToStringRecursionDepth) {
             // check if we want the full/complete string
             if (full) {
                 StringBuilder s;
                 s << "Reached maximum recursion depth of ";
-                s << BsonObject::maxToStringRecursionDepth;
+                s << bsonobj::maxToStringRecursionDepth;
                 uassert(16150, s.str(), full != true);
             }
             s << "...";
@@ -300,7 +300,7 @@ namespace Bson {
             //  ??
             s << "EOO";
             break;
-        case Bson::Date:
+        case _bson::Date:
             //s << "new Date(";
             s << "{$date: ";
             s << (long long)date();
@@ -321,13 +321,13 @@ namespace Bson {
         case NumberInt:
             s << _numberInt();
             break;
-        case Bson::Bool:
+        case _bson::Bool:
             s << (boolean() ? "true" : "false");
             break;
         case Object:
             object().toString(s, false, full, depth + 1);
             break;
-        case Bson::Array:
+        case _bson::Array:
             object().toString(s, true, full, depth + 1);
             break;
         case Undefined:
@@ -356,7 +356,7 @@ namespace Bson {
             }
             break;
         case Symbol:
-        case Bson::String:
+        case _bson::String:
             s << '"';
             if (!full &&  valuestrsize() > 160) {
                 s.write(valuestr(), 150);
@@ -370,7 +370,7 @@ namespace Bson {
         case DBRef:
             s << "DBRef('" << valuestr() << "',";
             {
-                Bson::OID *x = (Bson::OID *) (valuestr() + valuestrsize());
+                _bson::OID *x = (_bson::OID *) (valuestr() + valuestrsize());
                 s << x->toString() << ')';
             }
             break;
@@ -403,33 +403,33 @@ namespace Bson {
     /* return has eoo() true if no match
     supports "." notation to reach into embedded objects
     */
-    BsonElement BsonObject::GetElement(const StringData& name) const {
-        BsonElement e = getField(name);
+    bsonelement bsonobj::getFieldDotted(const StringData& name) const {
+        bsonelement e = getField(name);
         if (e.eoo()) {
             size_t dot_offset = name.find('.');
             if (dot_offset != std::string::npos) {
                 StringData left = name.substr(0, dot_offset);
                 StringData right = name.substr(dot_offset + 1);
-                BsonObject sub = GetObject(left);
-                return sub.isEmpty() ? BsonElement() : sub.GetElement(right);
+                bsonobj sub = getObjectField(left);
+                return sub.isEmpty() ? bsonelement() : sub.getFieldDotted(right);
             }
         }
 
         return e;
     }
 
-    void BsonObject::toString(StringBuilder& s, bool isArray, bool full, int depth) const {
+    void bsonobj::toString(StringBuilder& s, bool isArray, bool full, int depth) const {
         if (isEmpty()) {
             s << (isArray ? "[]" : "{}");
             return;
         }
 
         s << (isArray ? "[ " : "{ ");
-        BsonIterator i(*this);
+        bsonobjiterator i(*this);
         bool first = true;
         while (1) {
             massert(10327, "Object does not end with EOO", i.moreWithEOO());
-            BsonElement e = i.next(true);
+            bsonelement e = i.next(true);
             massert(10328, "Invalid element size", e.size() > 0);
             massert(10329, "Element too large", e.size() < (1 << 30));
             int offset = (int)(e.rawdata() - this->objdata());
@@ -450,7 +450,7 @@ namespace Bson {
     }
 
     // version with bound checking (maxLen param)
-    int BsonElement::size(int maxLen) const {
+    int bsonelement::size(int maxLen) const {
         if (totalSize >= 0)
             return totalSize;
 
@@ -464,14 +464,14 @@ namespace Bson {
         case MaxKey:
         case MinKey:
             break;
-        case Bson::Bool:
+        case _bson::Bool:
             x = 1;
             break;
         case NumberInt:
             x = 4;
             break;
         case Timestamp:
-        case Bson::Date:
+        case _bson::Date:
         case NumberDouble:
         case NumberLong:
             x = 8;
@@ -481,7 +481,7 @@ namespace Bson {
             break;
         case Symbol:
         case Code:
-        case Bson::String:
+        case _bson::String:
             massert(10313, "Insufficient bytes to calculate element size", maxLen == -1 || remain > 3);
             x = valuestrsize() + 4;
             break;
@@ -495,7 +495,7 @@ namespace Bson {
             x = valuestrsize() + 4 + 12;
             break;
         case Object:
-        case Bson::Array:
+        case _bson::Array:
             massert(10316, "Insufficient bytes to calculate element size", maxLen == -1 || remain > 3);
             x = objsize();
             break;
@@ -522,7 +522,7 @@ namespace Bson {
             break;
         default: {
             StringBuilder ss;
-            ss << "BsonElement: bad type " << (int)type();
+            ss << "bsonelement: bad type " << (int)type();
             std::string msg = ss.str();
             massert(13655, msg.c_str(), false);
         }
@@ -532,17 +532,17 @@ namespace Bson {
         return totalSize;
     }
 
-    BsonObjectBuilder& BsonObjectBuilder::appendElementsUnique(BsonObject x) {
+    bsonobjbuilder& bsonobjbuilder::appendElementsUnique(bsonobj x) {
         std::set<std::string> have;
         {
-            BsonIterator i = iterator();
+            bsonobjiterator i = iterator();
             while (i.more())
                 have.insert(i.next().fieldName());
         }
 
-        BsonIterator it(x);
+        bsonobjiterator it(x);
         while (it.more()) {
-            BsonElement e = it.next();
+            bsonelement e = it.next();
             if (have.count(e.fieldName()))
                 continue;
             append(e);
@@ -553,7 +553,7 @@ namespace Bson {
     /* must be same type when called, unless both sides are #s
     this large function is in header to facilitate inline-only use of bson
     */
-    inline int compareElementValues(const BsonElement& l, const BsonElement& r) {
+    inline int compareElementValues(const bsonelement& l, const bsonelement& r) {
         int f;
 
         switch (l.type()) {

@@ -4,12 +4,12 @@
 
 #ifndef SERVER_BSONDOCUMENT_H
 #define SERVER_BSONDOCUMENT_H
-#include"Bson/BsonObject.h"
-#include"Bson/BsonObjectBuilder.h"
 
+#include"Bson/bsonobj.h"
+#include"Bson/bsonobjbuilder.h"
 namespace Bson
 {
-	class WriterDocument
+	class WriterDocument : protected _bson::bsonobjbuilder
 	{
 	public:
 		WriterDocument() = default;
@@ -22,21 +22,16 @@ namespace Bson
 
 	public:
 		int GetStreamLength();
-
 		bool WriterToStream(std::ostream& os);
-
-
-	private:
-		Bson::BsonObjectBuilder mBsonBuilder;
 	};
 
-	class ReaderDocument
+	class ReaderDocument : protected _bson::bsonobj
 	{
 	public:
-		ReaderDocument() = default;
-		~ReaderDocument() { delete this->mObject; }
+		ReaderDocument(const char * bson);
 	public:
-	public:
+		void WriterToJson(std::string & json);
+
 		bool Get(const char* key, int& value) const;
 
 		bool Get(const char* key, bool& value) const;
@@ -44,13 +39,6 @@ namespace Bson
 		bool Get(const char* key, long long& value) const;
 
 		bool Get(const char* key, std::string& value) const;
-
-	public:
-		void WriterToJson(std::string & json);
-		bool ParseFromStream(std::istream& is);
-	private:
-		std::string mBuffer;
-		Bson::BsonObject* mObject;
 	};
 }
 

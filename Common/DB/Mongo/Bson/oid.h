@@ -20,7 +20,7 @@
 #include "time_support.h"
 #include "hex.h"
 
-namespace Bson {
+namespace _bson {
 
 #pragma pack(1)
 

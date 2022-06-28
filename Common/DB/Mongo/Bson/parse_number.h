@@ -4,7 +4,7 @@
 #include "status.h"
 #include "string_data.h"
 
-namespace Bson {
+namespace _bson {
 
   /**
    * Parses a number out of a StringData.

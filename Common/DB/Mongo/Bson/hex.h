@@ -21,7 +21,7 @@
 #include "string_data.h"
 #include "builder.h"
 
-namespace Bson {
+namespace _bson {
 
     //can't use hex namespace because it conflicts with hex iostream function
     inline int fromHex( char c ) {

@@ -2,7 +2,7 @@
 // Created by mac on 2022/5/18.
 //
 #include"MongoProto.h"
-#include"Bson/BsonObject.h"
+#include"Bson/bsonobj.h"
 namespace Mongo
 {
 	MongoRequest::MongoRequest(int opcode)
@@ -109,7 +109,7 @@ namespace Mongo
         return this->mHead.messageLength;
     }
 
-	std::shared_ptr<Bson::BsonObject> MongoQueryResponse::GetObject()
+	std::shared_ptr<_bson::bsonobj> MongoQueryResponse::GetObject()
 	{
 		return std::move(this->mBson);
 	}
@@ -125,7 +125,7 @@ namespace Mongo
 
 		os >> this->mBuffer;
 		const char * msgData = this->mBuffer.c_str();
-		this->mBson = std::make_shared<Bson::BsonObject>(msgData);
+		this->mBson = std::make_shared<_bson::bsonobj>(msgData);
 		return 0;
 	}
 }

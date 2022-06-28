@@ -26,6 +26,7 @@
 #include"Component/Http/HttpHandlerComponent.h"
 #include"Component/Mongo/MongoService.h"
 #include"Component/HttpService/LocalLuaHttpService.h"
+#include"Component/Mongo/MongoComponent.h"
 #ifdef __ENABLE_CLIENT__
 #include"Component/ClientComponent.h"
 using namespace Client;
@@ -60,6 +61,7 @@ void RegisterComponent()
 	ComponentFactory::Add<GateAgentComponent>("GateAgentComponent");
 	ComponentFactory::Add<GateClientComponent>("GateClientComponent");
 // db
+	ComponentFactory::Add<MongoComponent>("MongoComponent");
     ComponentFactory::Add<MainRedisComponent>("MainRedisComponent");
 	ComponentFactory::Add<MysqlAgentComponent>("MysqlAgentComponent");
 

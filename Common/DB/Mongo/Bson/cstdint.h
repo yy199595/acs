@@ -30,7 +30,7 @@
 #error "Unsupported compiler family"
 #endif
 
-namespace Bson {
+namespace _bson {
     using _MONGO_STDINT_NAMESPACE::int8_t;
     using _MONGO_STDINT_NAMESPACE::int16_t;
     using _MONGO_STDINT_NAMESPACE::int32_t;

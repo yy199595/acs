@@ -4,7 +4,7 @@
 #include "cstdint.h"
 #include "string_data.h"
 
-namespace Bson {
+namespace _bson { 
 
     struct Date_t {
         // TODO: make signed (and look for related TODO's)
