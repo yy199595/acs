@@ -18,13 +18,12 @@ namespace Sentry
     public:
         bool AddTask(RpcTask task);
         bool OnResponse(long long taskId, std::shared_ptr<T> message);
-    protected:
-        virtual TimerComponent * GetTimerComponent() = 0;
-    private:
-         void OnTimeout(long long id);
-    private:
+
+	protected:
+		virtual void OnAddTask(RpcTask task) { }
+		virtual void OnDelTask(long long taskId, RpcTask task) { }
+	private:
         std::unordered_map<long long, RpcTask> mTasks;
-        std::unordered_map<long long, long long> mTimers;
     };
 
     template<typename T>
@@ -34,23 +33,11 @@ namespace Sentry
         auto iter = this->mTasks.find(taskId);
         if(iter == this->mTasks.end())
         {
-            int timeout = task->GetTimeout();
-            if(timeout > 0)
-            {
-                TimerComponent * timerComponent = this->GetTimerComponent();
-                this->mTimers.emplace(taskId, timerComponent->DelayCall(
-                        timeout / 1000.0f, &RpcTaskComponent<T>::OnTimeout, this, taskId));
-            }
+            this->OnAddTask(task);
             this->mTasks.emplace(taskId, task);
             return true;
         }
         return false;
-    }
-
-    template<typename T>
-    void RpcTaskComponent<T>::OnTimeout(long long id)
-    {
-        this->OnResponse(id, nullptr);
     }
 
     template<typename T>
@@ -61,17 +48,10 @@ namespace Sentry
         {
             return false;
         }
-        TimerComponent * timerComponent = this->GetTimerComponent();
-        auto iter1 = this->mTimers.find(taskId);
-        if(iter1 != this->mTimers.end())
-        {
-            long long timerId = iter1->second;
-            this->mTimers.erase(iter1);
-            timerComponent->CancelTimer(timerId);
-        }
         RpcTask rpcTask = iter->second;
         this->mTasks.erase(iter);
         rpcTask->OnResponse(message);
+		this->OnDelTask(taskId, rpcTask);
         return true;
     }
 }

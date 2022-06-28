@@ -36,7 +36,6 @@ namespace Sentry
     private:
         bool LateAwake() final;
         void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
-        TimerComponent * GetTimerComponent() final { return this->mTimeComponent; }
 	 private:
 		TimerComponent * mTimeComponent;
 		class TaskComponent* mTaskComponent;

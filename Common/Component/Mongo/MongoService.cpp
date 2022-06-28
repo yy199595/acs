@@ -36,11 +36,6 @@ namespace Sentry
 		{
 			LOG_DEBUG("连接mongo成功");
 
-			LuaScriptComponent * luaScriptComponent = this->GetComponent<LuaScriptComponent>();
-
-			lua_State * lua = luaScriptComponent->GetLuaEnv();
-
-
 			std::shared_ptr<Mongo::MongoQueryRequest> queryRequest
 				= std::make_shared<Mongo::MongoQueryRequest>();
             queryRequest->collectionName = "admin.$cmd";
@@ -50,6 +45,12 @@ namespace Sentry
 			queryRequest->numberToSkip = 0;
 			queryRequest->numberToReturn = 1;
 			queryRequest->document.Add("ismaster", 1);
+
+			LuaScriptComponent * luaScriptComponent = this->GetComponent<LuaScriptComponent>();
+
+			lua_State * lua = luaScriptComponent->GetLuaEnv();
+
+
 
 			mongoClientContext->SendMongoCommand(queryRequest);
 		}
