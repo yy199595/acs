@@ -64,7 +64,7 @@ namespace Sentry
 
     XCode MysqlService::Create(const s2s::Mysql::Create &request)
     {
-
+		return XCode::Successful;
     }
 
 	XCode MysqlService::Add(const s2s::Mysql::Add& request)

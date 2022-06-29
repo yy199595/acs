@@ -4,6 +4,7 @@
 
 #ifndef SERVER_EVENTMETHOD_H
 #define SERVER_EVENTMETHOD_H
+#include<memory>
 #include"Json/JsonReader.h"
 
 namespace Sentry

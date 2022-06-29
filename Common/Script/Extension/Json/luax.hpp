@@ -33,7 +33,7 @@ namespace luax {
 
     }
 
-	inline bool isinteger(lua_State* L, int idx, int64_t* out = NULL)
+	inline bool isinteger(lua_State* L, int idx, long long* out = NULL)
 	{
 #if LUA_VERSION_NUM >= 503
 		if (lua_isinteger(L, idx)) // but it maybe not detect all integers.

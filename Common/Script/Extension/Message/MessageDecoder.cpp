@@ -3,6 +3,8 @@
 //
 
 #include"Message.h"
+
+#define NOUSER
 namespace Sentry
 {
 	MessageDecoder::MessageDecoder(lua_State* lua, MessageComponent* component)
@@ -193,6 +195,10 @@ namespace Sentry
 			break;
 		case FieldDescriptor::CPPTYPE_MESSAGE:
 		{
+#ifdef __OS_WIN__
+#undef GetMessage //
+#endif
+
 			const Message & msg = reflection->GetMessage(message, field);
 			if(msg.GetTypeName() == "google.protobuf.Any")
 			{

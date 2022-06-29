@@ -22,5 +22,6 @@ namespace Tcp
 	int BinProtoMessage::Serailize(std::ostream& os)
 	{
 		os.write(this->mBuffer, this->mSize);
+		return 0;
 	}
 }

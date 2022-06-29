@@ -13,7 +13,6 @@
 #include"Script/Extension/Json/Json.h"
 #include"Script/Extension/Coroutine/LuaCoroutine.h"
 #include"Component/RpcService/ServiceComponent.h"
-#include"Script/Extension/Bson/bson.h"
 #include"Script/Extension/Json/Encoder.h"
 using namespace Lua;
 namespace Sentry
@@ -87,16 +86,6 @@ namespace Sentry
 		luaRegister7.BeginNewTable();
 		luaRegister7.PushExtensionFunction("Encode", Lua::Json::Encode);
 		luaRegister7.PushExtensionFunction("Decode", Lua::Json::Decode);
-
-		Lua::ClassProxyHelper luaRegister8(this->mLuaEnv, "Bson");
-		luaRegister8.BeginNewTable();
-		luaRegister8.PushExtensionFunction("Encode", luabson::lencode);
-		luaRegister8.PushExtensionFunction("EncodeOrder", luabson::lencode_order);
-		luaRegister8.PushExtensionFunction("Data", luabson::ldate);
-		luaRegister8.PushExtensionFunction("Timestamp", luabson::ltimestamp);
-		luaRegister8.PushExtensionFunction("Regex", luabson::lregex);
-		luaRegister8.PushExtensionFunction("Objectid", luabson::lobjectid);
-		luaRegister8.PushExtensionFunction("Decode", luabson::ldecode);
 
 		if(lua_getfunction(this->mLuaEnv, "Main", "Awake"))
 		{

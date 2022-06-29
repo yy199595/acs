@@ -49,5 +49,6 @@ namespace Sentry
             luaServiceTaskSource->mRef = luaL_ref(lua, LUA_REGISTRYINDEX);
         }
 		luaServiceTaskSource->mTaskSource.SetResult(luaServiceTaskSource->mCode);
+		return 1;
 	}
 }
