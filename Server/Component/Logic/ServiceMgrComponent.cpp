@@ -83,18 +83,18 @@ namespace Sentry
 	void ServiceMgrComponent::OnComplete()//通知其他服务器 我加入了
 	{
 		Json::Writer json;
-		json.StartArray("services");
+		json << "services" << Json::JsonType::StartArray;
 		std::vector<ServiceComponent*> components;
 		this->GetApp()->GetServices(components);
 		for (ServiceComponent* component: components)
 		{
 			if(component->IsStartService())
 			{
-				json.AddMember(component->GetName());
+				json << component->GetName();
 			}
 		}
-		json.EndArray();
-		json.AddMember("address", this->mRpcAddress);
+		json << Json::JsonType::EndArray;
+		json << "address" << this->mRpcAddress;
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
 		if(!this->mRedisComponent->Call("main", "node.register", json, response))
 		{
@@ -170,15 +170,15 @@ namespace Sentry
 	bool ServiceMgrComponent::RefreshService()
 	{
 		Json::Writer json;
-		json.StartArray("services");
+		json << "services" << Json::JsonType::StartArray;
 		std::vector<ServiceComponent*> components;
 		this->GetApp()->GetServices(components);
 		for (ServiceComponent* component: components)
 		{
-			json.AddMember(component->GetName());
+			json << component->GetName();
 		}
-		json.EndArray();
-		json.AddMember("address", this->mRpcAddress);
+		json << Json::JsonType::EndArray;
+		json << "address" << this->mRpcAddress;
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
 		if (!this->mRedisComponent->Call("main", "node.refresh", json, response))
 		{
