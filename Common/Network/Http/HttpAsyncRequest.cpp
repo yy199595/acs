@@ -403,7 +403,7 @@ namespace Sentry
         }
         char buffer[128] = {0 };
         std::iostream io(&streamBuffer);
-        size_t size = io.readsome(buffer, size);
+        size_t size = io.readsome(buffer, 128);
         while(size > 0)
         {
             this->mHttpData.Add(buffer, size);
