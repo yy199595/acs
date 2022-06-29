@@ -115,9 +115,8 @@ namespace Mongo
 
     public:
         int OnReceiveHead(asio::streambuf &buffer);
-        int OnReceiveBody(asio::streambuf &buffer);
-		std::shared_ptr<_bson::bsonobj> GetObject();
 		const MongoHead & GetHead() const { return this->mHead;}
+		std::shared_ptr<Bson::ReaderDocument> OnReceiveBody(asio::streambuf &buffer);
 	private:
         MongoHead mHead;
         int responseFlags;  // bit vector - see details below
@@ -125,7 +124,7 @@ namespace Mongo
         int startingFrom;   // where in the cursor this reply is starting
         int numberReturned; // number of documents in the reply
 		std::string mBuffer;
-        std::shared_ptr<_bson::bsonobj> mBson;
+		char mReadBuffer[128];
     };
 }
 

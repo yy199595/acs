@@ -77,9 +77,8 @@ namespace Mongo
             this->ReceiveMessage(length - sizeof(MongoHead));
             return;
         }
-        this->mMongoResponse.OnReceiveBody(buffer);
 		const MongoHead & mongoHead = this->mMongoResponse.GetHead();
-		std::shared_ptr<_bson::bsonobj> res = this->mMongoResponse.GetObject();
+		std::shared_ptr<Bson::ReaderDocument> res = this->mMongoResponse.OnReceiveBody(buffer);
 #ifdef ONLY_MAIN_THREAD
 		this->mMongoComponent->OnResponse(mongoHead.responseTo, res);
 #else

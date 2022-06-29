@@ -13,24 +13,24 @@ using namespace Mongo;
 
 namespace Sentry
 {
-	class MongoTask : public IRpcTask<_bson::bsonobj>
+	class MongoTask : public IRpcTask<Bson::ReaderDocument>
 	{
 	public:
 		MongoTask(int taskId);
 	public:
 		int GetTimeout() final { return 0;}
 		long long GetRpcId() final { return this->mTaskId; }
-		void OnResponse(std::shared_ptr<_bson::bsonobj> response) final;
-		std::shared_ptr<_bson::bsonobj> Await() { return mTask.Await(); }
+		void OnResponse(std::shared_ptr<Bson::ReaderDocument> response) final;
+		std::shared_ptr<Bson::ReaderDocument> Await() { return mTask.Await(); }
 	private:
 		int mTaskId;
-		TaskSource<std::shared_ptr<_bson::bsonobj>> mTask;
+		TaskSource<std::shared_ptr<Bson::ReaderDocument>> mTask;
 	};
 }
 
 namespace Sentry
 {
-	class MongoComponent : public RpcTaskComponent<_bson::bsonobj>, public IStart
+	class MongoComponent : public RpcTaskComponent<Bson::ReaderDocument>, public IStart
 	{
 	public:
 		MongoComponent() = default;
@@ -41,7 +41,7 @@ namespace Sentry
 		void OnAddTask(RpcTask task) final;
 		void OnDelTask(long long taskId, RpcTask task) final;
 	public:
-		std::shared_ptr<_bson::bsonobj> Run(std::shared_ptr<MongoRequest> request, int flag = 0);
+		std::shared_ptr<Bson::ReaderDocument> Run(std::shared_ptr<MongoRequest> request, int flag = 0);
 	private:
 		Mongo::Config mConfig;
 		TimerComponent * mTimerComponent;

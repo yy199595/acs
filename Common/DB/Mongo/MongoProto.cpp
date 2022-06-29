@@ -109,12 +109,7 @@ namespace Mongo
         return this->mHead.messageLength;
     }
 
-	std::shared_ptr<_bson::bsonobj> MongoQueryResponse::GetObject()
-	{
-		return std::move(this->mBson);
-	}
-
-    int MongoQueryResponse::OnReceiveBody(asio::streambuf &buffer)
+	std::shared_ptr<Bson::ReaderDocument> MongoQueryResponse::OnReceiveBody(asio::streambuf &buffer)
 	{
 		this->mBuffer.clear();
 		std::iostream os(&buffer);
@@ -123,9 +118,12 @@ namespace Mongo
 		os.readsome((char*)&startingFrom, sizeof(startingFrom));
 		os.readsome((char*)&numberReturned, sizeof(numberReturned));
 
-		os >> this->mBuffer;
-		const char * msgData = this->mBuffer.c_str();
-		this->mBson = std::make_shared<_bson::bsonobj>(msgData);
-		return 0;
+		size_t size = os.readsome(this->mReadBuffer, 128);
+		while(size > 0)
+		{
+			this->mBuffer.append(this->mReadBuffer, size);
+			size = os.readsome(this->mReadBuffer, 128);
+		}
+		return std::make_shared<Bson::ReaderDocument>(this->mBuffer.c_str());
 	}
 }

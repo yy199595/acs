@@ -12,7 +12,7 @@ namespace Sentry
 
 	}
 
-	void MongoTask::OnResponse(std::shared_ptr<_bson::bsonobj> response)
+	void MongoTask::OnResponse(std::shared_ptr<Bson::ReaderDocument> response)
 	{
 		this->mTask.SetResult(response);
 	}
@@ -34,31 +34,33 @@ namespace Sentry
 
 	bool MongoComponent::OnStart()
 	{
-		for(int index = 0; index < this->mConfig.mMaxCount; index++)
+		for (int index = 0; index < this->mConfig.mMaxCount; index++)
 		{
 #ifdef ONLY_MAIN_THREAD
 			IAsioThread & asioThread = this->GetApp()->GetTaskScheduler();
 #else
-			NetThreadComponent * netThreadComponent = this->GetComponent<NetThreadComponent>();
-			IAsioThread & asioThread = netThreadComponent->AllocateNetThread();
+			NetThreadComponent* netThreadComponent = this->GetComponent<NetThreadComponent>();
+			IAsioThread& asioThread = netThreadComponent->AllocateNetThread();
 #endif
 			std::shared_ptr<SocketProxy> socketProxy =
-				std::make_shared<SocketProxy>(asioThread, this->mConfig.mIp, this->mConfig.mPort);
+					std::make_shared<SocketProxy>(asioThread, this->mConfig.mIp, this->mConfig.mPort);
 			std::shared_ptr<MongoClientContext> mongoClientContext =
-				std::make_shared<MongoClientContext>(socketProxy, this->mConfig, this);
+					std::make_shared<MongoClientContext>(socketProxy, this->mConfig, this);
 			this->mMongoClients.emplace_back(mongoClientContext);
 		}
 		std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
 
+		bool res = false;
 		mongoRequest->flag = 0;
 		mongoRequest->numberToSkip = 0;
 		mongoRequest->numberToReturn = 1;
 		mongoRequest->collectionName = "admin.$cmd";
 		mongoRequest->document.Add("ismaster", 1);
-		std::shared_ptr<_bson::bsonobj> mongoResponse = this->Run(mongoRequest);
-		std::set<std::string> files;
-		mongoResponse->getFieldNames(files);
-		return mongoResponse != nullptr && mongoResponse->getField("ismaster").Bool();
+		std::shared_ptr<Bson::ReaderDocument> mongoResponse = this->Run(mongoRequest);
+
+		std::string json;
+		mongoResponse->WriterToJson(json);
+		return mongoResponse != nullptr && mongoResponse->Get("ismaster", res) && res;
 	}
 
 	void MongoComponent::OnDelTask(long long taskId, RpcTask task)
@@ -66,12 +68,12 @@ namespace Sentry
 		this->mRequestId.Push((int)taskId);
 	}
 
-	void MongoComponent::OnAddTask(RpcTaskComponent<_bson::bsonobj>::RpcTask task)
+	void MongoComponent::OnAddTask(RpcTaskComponent<Bson::ReaderDocument>::RpcTask task)
 	{
 
 	}
 
-	std::shared_ptr<_bson::bsonobj> MongoComponent::Run(std::shared_ptr<MongoRequest> request, int flag)
+	std::shared_ptr<Bson::ReaderDocument> MongoComponent::Run(std::shared_ptr<MongoRequest> request, int flag)
 	{
 		if (this->mMongoClients.empty())
 		{
