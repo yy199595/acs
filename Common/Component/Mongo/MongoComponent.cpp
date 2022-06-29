@@ -81,8 +81,20 @@ namespace Sentry
 		mongoRequest->flag = 0;
 		mongoRequest->numberToSkip = 0;
 		mongoRequest->numberToReturn = 1;
-		mongoRequest->collectionName = "admin.$cmd";
-		mongoRequest->document.Add("ismaster", 1);
+		mongoRequest->collectionName = "ET.$cmd";
+		mongoRequest->document.Add("insert", "UserData");
+
+		Bson::WriterDocument writerDocument;
+		writerDocument.Add("_id", 444);
+		writerDocument.Add("level", 20);
+		writerDocument.Add("age", 27);
+		writerDocument.Add("name", "yjz");
+
+
+		Bson::ArrayDocument document3;
+		document3.Add(writerDocument);
+
+		mongoRequest->document.Add("documents", document3);
 		std::shared_ptr<Bson::ReaderDocument> mongoResponse = this->Run(mongoRequest);
 
 		std::string json;
