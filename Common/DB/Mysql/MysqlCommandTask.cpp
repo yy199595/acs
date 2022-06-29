@@ -164,7 +164,8 @@ namespace Sentry
                 case enum_field_types::MYSQL_TYPE_STRING:
                 case enum_field_types::MYSQL_TYPE_VAR_STRING:
                 {
-                    jsonWriter << field->name << std::string(data, size);
+					jsonWriter << field->name;
+                    jsonWriter.AddBinString(data, size);
                     return true;
                 }
             }

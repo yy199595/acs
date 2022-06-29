@@ -6,6 +6,40 @@
 
 namespace Bson
 {
+	void ArrayDocument::Add(int value)
+	{
+		this->append(std::to_string(this->mIndex++), value);
+	}
+
+	void ArrayDocument::Add(bool value)
+	{
+		this->append(std::to_string(this->mIndex++), value);
+	}
+	void ArrayDocument::Add(long long value)
+	{
+		this->append(std::to_string(this->mIndex++), value);
+	}
+	void ArrayDocument::Add(const std::string& value)
+	{
+		this->append(std::to_string(this->mIndex++), value);
+	}
+
+	void ArrayDocument::Add(const char* str, size_t size)
+	{
+		this->append(std::to_string(this->mIndex++), str, size);
+	}
+
+	void ArrayDocument::Add(WriterDocument& document)
+	{
+		_bson::bsonobjbuilder& build = (_bson::bsonobjbuilder&)document;
+		_b.appendNum((char)_bson::Object);
+		_b.appendStr(std::to_string(this->mIndex++));
+		_b.appendBuf(build._done(), build.len());
+	}
+}
+
+namespace Bson
+{
 	ReaderDocument::ReaderDocument(const char* bson)
 		: _bson::bsonobj(bson)
 	{
@@ -44,6 +78,41 @@ namespace Bson
 	}
 
 	bool WriterDocument::Add(const char* key, const std::string& value)
+	{
+		this->append(key, value);
+		return true;
+	}
+
+	bool WriterDocument::Add(const char* key, double value)
+	{
+		this->append(key, value);
+		return true;
+	}
+	const char* WriterDocument::Serialize(int & length)
+	{
+		char * bson = this->_done();
+		length = this->len();
+		return bson;
+	}
+
+	bool WriterDocument::Add(const char* key, WriterDocument& document)
+	{
+		_bson::bsonobjbuilder& build = (_bson::bsonobjbuilder&)document;
+		_b.appendNum((char)_bson::Object);
+		_b.appendStr(key);
+		_b.appendBuf(build._done(), build.len());
+		return true;
+	}
+
+	bool WriterDocument::Add(const char* key, ArrayDocument& document)
+	{
+		_bson::bsonobjbuilder& build = (_bson::bsonobjbuilder&)document;
+		_b.appendNum((char)_bson::Array);
+		_b.appendStr(key);
+		_b.appendBuf(build._done(), build.len());
+		return true;
+	}
+	bool WriterDocument::Add(const char* key, const char* value)
 	{
 		this->append(key, value);
 		return true;
@@ -142,6 +211,20 @@ namespace Bson
 				this->WriterToJson(obj.getField(key), json);
 			}
 			json << Json::JsonType::EndObject;
+		}
+			break;
+		case _bson::BSONType::Array:
+		{
+			json << Json::JsonType::StartArray;
+			std::set<std::string> elements;
+			const _bson::bsonobj obj = bsonelement.object();
+			obj.getFieldNames(elements);
+			for(const std::string & key : elements)
+			{
+				this->WriterToJson(obj.getField(key), json);
+			}
+			json << Json::JsonType::EndArray;
+
 		}
 			break;
 		default:

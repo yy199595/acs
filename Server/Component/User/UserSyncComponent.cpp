@@ -16,7 +16,7 @@ namespace Sentry
 	long long UserSyncComponent::AddNewUser(const std::string & account)
 	{
 		Json::Writer jsonWrite;
-		jsonWrite.AddMember("account", account);
+		jsonWrite << "account" << account;
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
 		if(!this->mRedisComponent->Call("main", "user.add_user", jsonWrite, response))
 		{
@@ -29,16 +29,14 @@ namespace Sentry
 	bool UserSyncComponent::SetToken(const std::string& token, long long userId, int time)
 	{
 		Json::Writer jsonWrite;
-		jsonWrite.AddMember("time", time);
-		jsonWrite.AddMember("token", token);
-		jsonWrite.AddMember("user_id", userId);
+		jsonWrite << "time" << time << "token" << token << "user_id" << userId;
 		return this->mRedisComponent->Call("main", "user.set_token", jsonWrite);
 	}
 
 	long long UserSyncComponent::GetUserId(const std::string& token)
 	{
 		Json::Writer jsonWrite;
-		jsonWrite.AddMember("token", token);
+		jsonWrite << "token" << token;
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
 		if(!this->mRedisComponent->Call("main", "user.get_token", jsonWrite, response))
 		{
@@ -52,7 +50,7 @@ namespace Sentry
 	int UserSyncComponent::GetUserState(long long userId)
 	{
 		Json::Writer jsonWrite;
-		jsonWrite.AddMember("user_id", userId);
+		jsonWrite << "user_id", userId;
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
 		if(!this->mRedisComponent->Call("main", "user.get_state", jsonWrite))
 		{
@@ -65,8 +63,7 @@ namespace Sentry
 	bool UserSyncComponent::SetUserState(long long userId, int state)
 	{
 		Json::Writer jsonWrite;
-		jsonWrite.AddMember("state", state);
-		jsonWrite.AddMember("user_id", userId);
+		jsonWrite << "state" << state << "user_id" << userId;
 		return this->mRedisComponent->Call("main", "user.set_state", jsonWrite);
 	}
 
@@ -74,8 +71,7 @@ namespace Sentry
 	{
 		std::string address;
 		Json::Writer jsonWrite;
-		jsonWrite.AddMember("user_id", userId);
-		jsonWrite.AddMember("service", service);
+		jsonWrite << "user_id" << userId << "service" << service;
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
 		if(this->mRedisComponent->Call("main", "user.get_address", jsonWrite, response)
 			&& response->GetMember("address", address))
@@ -88,10 +84,8 @@ namespace Sentry
 	bool UserSyncComponent::SetAddress(long long userId, const std::string& service, const std::string& address, bool broadcast)
 	{
 		Json::Writer jsonWrite;
-		jsonWrite.AddMember("user_id", userId);
-		jsonWrite.AddMember("service", service);
-		jsonWrite.AddMember("address", address);
-		jsonWrite.AddMember("broadcast", broadcast);
+		jsonWrite << "user_id" << userId << "service" << service;
+		jsonWrite << "address" << address << "broadcast" << broadcast;
 		return this->mRedisComponent->Call("main", "user.set_address", jsonWrite);
 	}
 

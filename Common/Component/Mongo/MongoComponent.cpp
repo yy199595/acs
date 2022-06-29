@@ -48,6 +48,33 @@ namespace Sentry
 					std::make_shared<MongoClientContext>(socketProxy, this->mConfig, this);
 			this->mMongoClients.emplace_back(mongoClientContext);
 		}
+// bson 测试开始
+		Bson::WriterDocument document;
+		document.Add("name", "yjz");
+		document.Add("age", 27);
+		document.Add("lenght", 170.5f);
+
+		Bson::ArrayDocument document1;
+		for(int index = 0; index < 10; index++)
+		{
+			document1.Add(index * 100);
+		}
+
+		Bson::WriterDocument document2;
+		document2.Add("11223", 33445);
+		document2.Add("22334", 66778);
+
+		std::string str;
+		document.Add("arr", document1);
+		document.Add("obj", document2);
+
+		int len;
+		const char * bson = document.Serialize(len);
+
+		Bson::ReaderDocument readerDocument(bson);
+		readerDocument.WriterToJson(str);
+// bson测试结束
+
 		std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
 
 		bool res = false;

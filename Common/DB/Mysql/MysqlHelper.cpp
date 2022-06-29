@@ -115,7 +115,9 @@ namespace Sentry
 		{
 			const char* str = jsonValue.GetString();
 			size_t size = jsonValue.GetStringLength();
-			this->mSqlCommandStream << "'" << std::string(str, size) << "'";
+			this->mSqlCommandStream << "'";
+			this->mSqlCommandStream.write(str, size);
+			this->mSqlCommandStream << "'";
 			return true;
 		}
 		if (jsonValue.IsInt())

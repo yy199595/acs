@@ -10,6 +10,22 @@
 #include"Bson/bsonobjbuilder.h"
 namespace Bson
 {
+	class WriterDocument;
+	class ArrayDocument : protected _bson::bsonobjbuilder
+	{
+	 public:
+		ArrayDocument() : mIndex(0) {}
+	 public:
+		void Add(int value);
+		void Add(bool value);
+		void Add(long long value);
+		void Add(WriterDocument & document);
+		void Add(const std::string & value);
+		void Add(const char * str, size_t size);
+	 private:
+		int mIndex;
+	};
+
 	class WriterDocument : protected _bson::bsonobjbuilder
 	{
 	public:
@@ -18,10 +34,15 @@ namespace Bson
 	public:
 		bool Add(const char* key, int value);
 		bool Add(const char* key, bool value);
+		bool Add(const char* key, double value);
 		bool Add(const char* key, long long value);
+		bool Add(const char* key, const char * value);
 		bool Add(const char* key, const std::string & value);
-
-	public:
+		bool Add(const char * key, ArrayDocument & document);
+		bool Add(const char * key, WriterDocument & document);
+	 public:
+		const char * Serialize(int & length);
+	 public:
 		int GetStreamLength();
 		bool WriterToStream(std::ostream& os);
 	};

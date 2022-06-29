@@ -26,7 +26,6 @@ namespace Json
 	{
 	 public:
 		Writer(bool isObj = true);
-
 	public:
 		Writer& operator <<(JsonType type);
 		Writer & operator << (std::vector<int> & value);
@@ -45,6 +44,7 @@ namespace Json
 		const std::string ToJsonString();
 		size_t WriterStream(std::string& os);
 		size_t WriterStream(std::ostream& os);
+		void AddBinString(const char * str, size_t size);
 		bool GetDocument(rapidjson::Document & jsonDocument);
 	 private:
 		const bool mIsObject;

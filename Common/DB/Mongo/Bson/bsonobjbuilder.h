@@ -39,12 +39,12 @@ namespace _bson {
     See also the BSON() and BSON_ARRAY() macros.
     */
     class bsonobjbuilder {
-        BufBuilder &_b;
         BufBuilder _buf;
         int _offset;
         bool _doneCalled;
-
-    public:
+	 protected:
+		BufBuilder &_b;
+	 public:
         char* _done() {
             if (_doneCalled)
                 return _b.buf() + _offset;

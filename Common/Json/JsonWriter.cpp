@@ -165,6 +165,11 @@ namespace Json
 		return 0;
 	}
 
+	void Writer::AddBinString(const char* str, size_t size)
+	{
+		this->String(str, size);
+	}
+
 
 	bool Writer::GetDocument(rapidjson::Document& jsonDocument)
 	{
