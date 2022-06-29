@@ -38,13 +38,14 @@ namespace Sentry
 
 namespace Sentry
 {
+	class HttpRequestClient;
     class LuaHttpTask : public IRpcTask<HttpAsyncResponse>
     {
     public:
         LuaHttpTask(lua_State * lua, int timeout);
         ~LuaHttpTask();
     public:
-        int Await();
+        int Await(std::shared_ptr<HttpRequestClient> client);
         int GetTimeout() final { return this->mTimeout; }
         long long GetRpcId() final { return this->mTaskId; }
         void OnResponse(std::shared_ptr<HttpAsyncResponse> response) final;
@@ -53,6 +54,7 @@ namespace Sentry
         int mTimeout;
         lua_State * mLua;
         long long mTaskId;
+		std::shared_ptr<HttpRequestClient> mRequestClient;
     };
 }
 

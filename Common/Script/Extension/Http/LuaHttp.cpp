@@ -40,7 +40,7 @@ namespace Lua
 
         httpComponent->AddTask(luaHttpTask);
         requestClient->Request(getRequest);
-        return luaHttpTask->Await();
+        return luaHttpTask->Await(requestClient);
 	}
 
 	int Http::Post(lua_State* lua)
@@ -78,7 +78,7 @@ namespace Lua
 
         httpComponent->AddTask(luaHttpTask);
         requestClient->Request(postRequest);
-        return luaHttpTask->Await();
+        return luaHttpTask->Await(requestClient);
 	}
 
 	int Http::Download(lua_State* lua)
@@ -133,6 +133,6 @@ namespace Lua
         std::shared_ptr<LuaHttpTask> luaHttptask = getRequest->MakeLuaTask(lua, 0);
         requestClient->Request(getRequest, fs);
 
-        return luaHttptask->Await();
+        return luaHttptask->Await(requestClient);
 	}
 }

@@ -58,13 +58,14 @@ namespace Sentry
         lua_presume(coroutine, this->mLua, 0);
     }
 
-    int LuaHttpTask::Await()
+    int LuaHttpTask::Await(std::shared_ptr<HttpRequestClient> client)
     {
         if(this->mRef == 0)
         {
             luaL_error(this->mLua, "not lua coroutine context yield failure");
             return 0;
         }
+		this->mRequestClient = client;
         return lua_yield(this->mLua, 0);
     }
 }

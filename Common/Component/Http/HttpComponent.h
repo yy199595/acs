@@ -42,5 +42,6 @@ namespace Sentry
 #ifndef ONLY_MAIN_THREAD
 		class NetThreadComponent* mThreadComponent;
 #endif
+		std::set<std::shared_ptr<HttpRequestClient>> mRequestClients;
 	};
 }
