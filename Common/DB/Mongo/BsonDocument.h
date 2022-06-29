@@ -6,6 +6,7 @@
 #define SERVER_BSONDOCUMENT_H
 
 #include"Bson/bsonobj.h"
+#include"Json/JsonWriter.h"
 #include"Bson/bsonobjbuilder.h"
 namespace Bson
 {
@@ -39,6 +40,11 @@ namespace Bson
 		bool Get(const char* key, long long& value) const;
 
 		bool Get(const char* key, std::string& value) const;
+
+		const std::string ToString() const { return this->toString(); }
+
+	private:
+		void WriterToJson(const _bson::bsonelement & bsonelement, Json::Writer & json);
 	};
 }
 

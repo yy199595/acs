@@ -94,6 +94,59 @@ namespace Bson
 
 	void ReaderDocument::WriterToJson(std::string& json)
 	{
-		json = this->toString();
+		Json::Writer jsonWriter;
+		std::set<std::string> elements;
+		this->getFieldNames(elements);
+		for(const std::string & key : elements)
+		{
+			jsonWriter << key;
+			this->WriterToJson(this->getField(key), jsonWriter);
+		}
+		jsonWriter.WriterStream(json);
+	}
+
+	void ReaderDocument::WriterToJson(const _bson::bsonelement& bsonelement, Json::Writer& json)
+	{
+		switch(bsonelement.type())
+		{
+		case _bson::BSONType::Bool:
+			json << bsonelement.Bool();
+			break;
+		case _bson::BSONType::String:
+			json << bsonelement.String();
+			break;
+		case _bson::BSONType::NumberInt:
+			json << bsonelement.Int();
+			break;
+		case _bson::BSONType::NumberLong:
+			json << bsonelement.Long();
+			break;
+		case _bson::BSONType::NumberDouble:
+			json << bsonelement.Double();
+			break;
+		case _bson::BSONType::BinData:
+		{
+			int len = 0;
+			json << std::string(bsonelement.binDataClean(len), len);
+		}
+			break;
+		case _bson::BSONType::Object:
+		{
+			json << Json::JsonType::StartObject;
+			std::set<std::string> elements;
+			const _bson::bsonobj obj = bsonelement.object();
+			obj.getFieldNames(elements);
+			for(const std::string & key : elements)
+			{
+				json << key;
+				this->WriterToJson(obj.getField(key), json);
+			}
+			json << Json::JsonType::EndObject;
+		}
+			break;
+		default:
+			json << bsonelement.toString();
+			break;
+		}
 	}
 }

@@ -36,7 +36,7 @@ namespace Sentry
         RedisRequest(const std::string & cmd);
 		~RedisRequest() { }
     public:
-		const std::string ToJson() const;
+		const std::string ToJson();
 		int Serailize(std::ostream &os) final;
 		std::shared_ptr<RedisTask> MakeTask();
 	 public:

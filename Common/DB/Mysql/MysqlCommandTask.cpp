@@ -151,20 +151,20 @@ namespace Sentry
                 case enum_field_types::MYSQL_TYPE_LONGLONG:
                 {
                     long long number = std::atoll(data);
-                    jsonWriter.AddMember(field->name, number);
+					jsonWriter << field->name << number;
                 }
                     return true;
                 case enum_field_types::MYSQL_TYPE_FLOAT:
                 case enum_field_types::MYSQL_TYPE_DOUBLE:
                 {
                     double number = std::atof(data);
-                    jsonWriter.AddMember(field->name, number);
+                    jsonWriter << field->name << number;
                 }
                     return true;
                 case enum_field_types::MYSQL_TYPE_STRING:
                 case enum_field_types::MYSQL_TYPE_VAR_STRING:
                 {
-                    jsonWriter.AddMember(field->name, data, size);
+                    jsonWriter << field->name << std::string(data, size);
                     return true;
                 }
             }

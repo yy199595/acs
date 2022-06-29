@@ -28,12 +28,9 @@ namespace Sentry
 	bool NetEventComponent::PublishEvent(const std::string& id, Json::Writer& json)
 	{
 		std::string content;
-		if(json.AddMember("eveId", id) && json.WriterStream(content))
-		{
-			this->mRedisComponent->Publish(this->GetName(), content);
-			return true;
-		}
-		return false;
+		json << "eventId" << id;
+		json.WriterStream(content);
+		return this->mRedisComponent->Publish(this->GetName(), content) > 0;
 	}
 
 	bool NetEventComponent::PublishEvent(const string& id)
