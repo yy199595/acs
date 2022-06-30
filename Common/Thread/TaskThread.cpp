@@ -30,7 +30,27 @@ namespace Sentry
         this->mIsClose = true;
         this->mThreadVariable.notify_one();
     }
-
+#ifdef __ENABLE_OPEN_SSL__
+	bool IAsioThread::LoadVeriftFile(const std::string & path)
+	{
+		this->mSslContext = new asio::ssl::context(asio::ssl::context::sslv23);
+		if(path.empty())
+		{
+			this->mSslContext->set_default_verify_paths();
+			return true;
+		}
+		try
+		{
+			this->mSslContext->load_verify_file(path);
+			return true;
+		}
+		catch (asio::system_error & code)
+		{
+			printf("load ssl file error : %s\n", code.what());
+			return false;
+		}
+	}
+#endif
 }
 
 namespace Sentry

@@ -11,6 +11,10 @@
 #include<Method/MethodProxy.h>
 #include<Other/DoubleQueue.h>
 
+#ifdef __ENABLE_OPEN_SSL__
+#include<asio/ssl.hpp>
+#endif
+
 namespace Sentry
 {
 	class StaticMethod;
@@ -79,8 +83,16 @@ namespace Sentry
     {
     public:
         IAsioThread(std::string name) :
+#ifdef __ENABLE_OPEN_SSL__
+				IThread(name), asio::io_context(1), mWork(*this),
+				mSslContext(nullptr) {}
+#else
 				IThread(name), asio::io_context(1), mWork(*this) {}
-        //virtual AsioContext & GetContext() = 0;
+#endif
+#ifdef __ENABLE_OPEN_SSL__
+		bool LoadVeriftFile(const std::string & path);
+		asio::ssl::context & GetSSL() { return *mSslContext;}
+#endif
         virtual void InvokeMethod(StaticMethod * task) = 0;
     public:
         template<typename F, typename T, typename ... Args>
@@ -89,6 +101,9 @@ namespace Sentry
         }
 	private:
 		asio::io_context::work mWork;
+#ifdef __ENABLE_OPEN_SSL__
+		asio::ssl::context * mSslContext;
+#endif
     };
 #ifndef ONLY_MAIN_THREAD
     class NetWorkThread : public IAsioThread

@@ -11,6 +11,7 @@
         "log": "log",
         "proto": "proto",
         "source": "source",
+        "ssl": "",
         "service": "config/service.json"
     },
     "listener": {
