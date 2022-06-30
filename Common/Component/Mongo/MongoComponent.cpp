@@ -48,58 +48,24 @@ namespace Sentry
 					std::make_shared<MongoClientContext>(socketProxy, this->mConfig, this);
 			this->mMongoClients.emplace_back(mongoClientContext);
 		}
-// bson 测试开始
-		Bson::WriterDocument document;
-		document.Add("name", "yjz");
-		document.Add("age", 27);
-		document.Add("lenght", 170.5f);
-
-		Bson::ArrayDocument document1;
-		for(int index = 0; index < 10; index++)
-		{
-			document1.Add(index * 100);
-		}
-
-		Bson::WriterDocument document2;
-		document2.Add("11223", 33445);
-		document2.Add("22334", 66778);
-
 		std::string str;
-		document.Add("arr", document1);
-		document.Add("obj", document2);
+		Bson::WriterDocument document;
+		//document.Add("_id", 444);
+		std::shared_ptr<Bson::ReaderDocument> readerDocument = this->QueryOnce("ET", "UserData", document);
+		readerDocument->WriterToJson(str);
+		return true;
+	}
 
-		int len;
-		const char * bson = document.Serialize(len);
-
-		Bson::ReaderDocument readerDocument(bson);
-		readerDocument.WriterToJson(str);
-// bson测试结束
-
-		std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
-
-		bool res = false;
-		mongoRequest->flag = 0;
-		mongoRequest->numberToSkip = 0;
-		mongoRequest->numberToReturn = 1;
-		mongoRequest->collectionName = "ET.$cmd";
-		mongoRequest->document.Add("insert", "UserData");
-
-		Bson::WriterDocument writerDocument;
-		writerDocument.Add("_id", 444);
-		writerDocument.Add("level", 20);
-		writerDocument.Add("age", 27);
-		writerDocument.Add("name", "yjz");
-
-
-		Bson::ArrayDocument document3;
-		document3.Add(writerDocument);
-
-		mongoRequest->document.Add("documents", document3);
-		std::shared_ptr<Bson::ReaderDocument> mongoResponse = this->Run(mongoRequest);
-
-		std::string json;
-		mongoResponse->WriterToJson(json);
-		return mongoResponse != nullptr && mongoResponse->Get("ismaster", res) && res;
+	bool MongoComponent::InsertOne(const std::string& db, const std::string& tab, Bson::WriterDocument& document)
+	{
+		int res = 0;
+		Bson::ArrayDocument documentArray;
+		documentArray.Add(document);
+		std::shared_ptr<MongoQueryRequest> mongoRequest
+				= this->GetRequest(db, tab, "insert");
+		mongoRequest->document.Add("documents", documentArray);
+		std::shared_ptr<Bson::ReaderDocument> response = this->Run(mongoRequest);
+		return response != nullptr && response->Get("n", res) && res > 0;
 	}
 
 	void MongoComponent::OnDelTask(long long taskId, RpcTask task)
@@ -129,6 +95,26 @@ namespace Sentry
 		int index = flag % this->mMongoClients.size();
 		this->mMongoClients[index]->SendMongoCommand(request);
 		return mongoTask->Await();
+	}
+	std::shared_ptr<MongoQueryRequest> MongoComponent::GetRequest(
+		const std::string& db, const std::string& tab, const std::string & cmd)
+	{
+		std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
+
+		mongoRequest->flag = 0;
+		mongoRequest->numberToSkip = 0;
+		mongoRequest->numberToReturn = 1;
+		mongoRequest->collectionName = db + ".$cmd";
+		mongoRequest->document.Add(cmd.c_str(), tab);
+		return mongoRequest;
+	}
+	std::shared_ptr<Bson::ReaderDocument> MongoComponent::QueryOnce(
+		const string& db, const string& tab, Bson::WriterDocument& document)
+	{
+		std::shared_ptr<MongoQueryRequest> mongoRequest
+			= this->GetRequest(db, tab, "find");
+		mongoRequest->document.Add("query", document);
+		return this->Run(mongoRequest);
 	}
 
 }

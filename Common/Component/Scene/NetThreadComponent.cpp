@@ -14,10 +14,7 @@ namespace Sentry
 		std::string sslFile;
 		config.GetPath("ssl", sslFile);
 		this->GetApp()->GetTaskScheduler().LoadVeriftFile("");
-#endif
-#ifndef ONLY_MAIN_THREAD
-		int networkCount = 1;
-		IAsioThread & t = this->GetApp()->GetTaskScheduler();
+
 		asio::ssl::stream<asio::ip::tcp::socket> sslSocket(t, t.GetSSL());
 
 		tcp::resolver resolver(t);
@@ -29,6 +26,11 @@ namespace Sentry
 		sslSocket.set_verify_mode(asio::ssl::verify_peer);
 		sslSocket.set_verify_callback(asio::ssl::host_name_verification("https://baidu.com"));
 		sslSocket.handshake(asio::ssl::stream_base::client);
+
+#endif
+#ifndef ONLY_MAIN_THREAD
+		int networkCount = 1;
+		IAsioThread & t = this->GetApp()->GetTaskScheduler();
 
 		LOG_CHECK_RET(config.GetMember("thread", "network", networkCount));
 		for (int index = 0; index < networkCount; index++)

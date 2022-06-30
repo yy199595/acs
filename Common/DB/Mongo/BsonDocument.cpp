@@ -59,35 +59,6 @@ namespace Bson
 		return this->len();
 	}
 
-	bool WriterDocument::Add(const char* key, int value)
-	{
-		this->append(key, value);
-		return true;
-	}
-
-	bool WriterDocument::Add(const char* key, bool value)
-	{
-		this->append(key, value);
-		return true;
-	}
-
-	bool WriterDocument::Add(const char* key, long long value)
-	{
-		this->append(key, value);
-		return true;
-	}
-
-	bool WriterDocument::Add(const char* key, const std::string& value)
-	{
-		this->append(key, value);
-		return true;
-	}
-
-	bool WriterDocument::Add(const char* key, double value)
-	{
-		this->append(key, value);
-		return true;
-	}
 	const char* WriterDocument::Serialize(int & length)
 	{
 		char * bson = this->_done();
@@ -95,27 +66,20 @@ namespace Bson
 		return bson;
 	}
 
-	bool WriterDocument::Add(const char* key, WriterDocument& document)
+	void WriterDocument::Add(const char* key, WriterDocument& document)
 	{
 		_bson::bsonobjbuilder& build = (_bson::bsonobjbuilder&)document;
 		_b.appendNum((char)_bson::Object);
 		_b.appendStr(key);
 		_b.appendBuf(build._done(), build.len());
-		return true;
 	}
 
-	bool WriterDocument::Add(const char* key, ArrayDocument& document)
+	void WriterDocument::Add(const char* key, ArrayDocument& document)
 	{
 		_bson::bsonobjbuilder& build = (_bson::bsonobjbuilder&)document;
 		_b.appendNum((char)_bson::Array);
 		_b.appendStr(key);
 		_b.appendBuf(build._done(), build.len());
-		return true;
-	}
-	bool WriterDocument::Add(const char* key, const char* value)
-	{
-		this->append(key, value);
-		return true;
 	}
 
 }
@@ -161,6 +125,15 @@ namespace Bson
 		return false;
 	}
 
+	_bson::BSONType ReaderDocument::Type(const char* key) const
+	{
+		if(this->hasField(key))
+		{
+			return this->getField(key).type();
+		}
+		return _bson::EOO;
+	}
+
 	void ReaderDocument::WriterToJson(std::string& json)
 	{
 		Json::Writer jsonWriter;
@@ -196,14 +169,14 @@ namespace Bson
 		case _bson::BSONType::BinData:
 		{
 			int len = 0;
-			json << std::string(bsonelement.binDataClean(len), len);
+			json.AddBinString(bsonelement.binData(len), len);
 		}
 			break;
 		case _bson::BSONType::Object:
 		{
-			json << Json::JsonType::StartObject;
 			std::set<std::string> elements;
-			const _bson::bsonobj obj = bsonelement.object();
+			json << Json::JsonType::StartObject;
+			_bson::bsonobj obj = bsonelement.object();
 			obj.getFieldNames(elements);
 			for(const std::string & key : elements)
 			{
@@ -224,8 +197,13 @@ namespace Bson
 				this->WriterToJson(obj.getField(key), json);
 			}
 			json << Json::JsonType::EndArray;
-
 		}
+			break;
+		case _bson::BSONType::Timestamp:
+			json << (long long)bsonelement.timestampValue();
+			break;
+		case _bson::BSONType::Date:
+			json << bsonelement.date().asInt64();
 			break;
 		default:
 			json << bsonelement.toString();

@@ -32,16 +32,15 @@ namespace Bson
 		WriterDocument() = default;
 		~WriterDocument() = default;
 	public:
-		bool Add(const char* key, int value);
-		bool Add(const char* key, bool value);
-		bool Add(const char* key, double value);
-		bool Add(const char* key, long long value);
-		bool Add(const char* key, const char * value);
-		bool Add(const char* key, const std::string & value);
-		bool Add(const char * key, ArrayDocument & document);
-		bool Add(const char * key, WriterDocument & document);
-	 public:
 		const char * Serialize(int & length);
+		void Add(const char * key, ArrayDocument & document);
+		void Add(const char * key, WriterDocument & document);
+		inline void Add(const char* key, int value) { this->append(key, value);}
+		inline void Add(const char* key, bool value) { this->append(key, value);}
+		inline void Add(const char* key, double value){ this->append(key, value);}
+		inline void Add(const char* key, long long value){ this->append(key, value);}
+		inline void Add(const char* key, const char * value){ this->append(key, value);}
+		inline void Add(const char* key, const std::string & value){ this->append(key, value);}
 	 public:
 		int GetStreamLength();
 		bool WriterToStream(std::ostream& os);
@@ -53,6 +52,8 @@ namespace Bson
 		ReaderDocument(const char * bson);
 	public:
 		void WriterToJson(std::string & json);
+
+		_bson::BSONType Type(const char * key) const;
 
 		bool Get(const char* key, int& value) const;
 

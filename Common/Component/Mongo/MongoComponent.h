@@ -7,6 +7,7 @@
 #include"Util/NumberBuilder.h"
 #include"DB/Mongo/MongoProto.h"
 #include"DB/Mongo/MongoClient.h"
+#include"DB/Mongo/BsonDocument.h"
 #include"Component/Rpc/RpcTaskComponent.h"
 
 using namespace Mongo;
@@ -41,8 +42,13 @@ namespace Sentry
 		void OnAddTask(RpcTask task) final;
 		void OnDelTask(long long taskId, RpcTask task) final;
 	public:
+		bool InsertOne(const std::string & db, const std::string & tab, Bson::WriterDocument & document);
+		std::shared_ptr<Bson::ReaderDocument> QueryOnce(const std::string & db, const std::string & tab, Bson::WriterDocument & document);
+	 public:
 		std::shared_ptr<Bson::ReaderDocument> Run(std::shared_ptr<MongoRequest> request, int flag = 0);
-	private:
+	 private:
+		std::shared_ptr<MongoQueryRequest> GetRequest(const std::string & db, const std::string & tab, const std::string & cmd);
+	 private:
 		Mongo::Config mConfig;
 		TimerComponent * mTimerComponent;
 		Util::NumberBuilder<int> mRequestId;
