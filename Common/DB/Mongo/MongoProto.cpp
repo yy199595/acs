@@ -82,7 +82,9 @@ namespace Mongo
 	MongoQueryRequest::MongoQueryRequest()
 		: MongoRequest(OP_QUERY)
 	{
-
+		this->flag = 0;
+		this->numberToSkip  = 0;
+		this->numberToReturn = 1;
 	}
 
 	int MongoQueryRequest::GetLength()
@@ -124,6 +126,6 @@ namespace Mongo
 			this->mBuffer.append(this->mReadBuffer, size);
 			size = os.readsome(this->mReadBuffer, 128);
 		}
-		return std::make_shared<Bson::ReaderDocument>(this->mBuffer.c_str());
+		return this->mBuffer.empty() ? nullptr : std::make_shared<Bson::ReaderDocument>(this->mBuffer.c_str());
 	}
 }

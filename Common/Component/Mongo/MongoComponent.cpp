@@ -25,6 +25,7 @@ namespace Sentry
 		const ServerConfig & config = this->GetApp()->GetConfig();
 		this->mTimerComponent = this->GetApp()->GetTimerComponent();
 		LOG_CHECK_RET_FALSE(config.GetMember("mongo", "ip", this->mConfig.mIp));
+		LOG_CHECK_RET_FALSE(config.GetMember("mongo", "db", this->mConfig.mDb));
 		LOG_CHECK_RET_FALSE(config.GetMember("mongo", "port", this->mConfig.mPort));
 		LOG_CHECK_RET_FALSE(config.GetMember("mongo", "user", this->mConfig.mUser));
 		LOG_CHECK_RET_FALSE(config.GetMember("mongo", "passwd", this->mConfig.mPasswd));
@@ -45,15 +46,19 @@ namespace Sentry
 			std::shared_ptr<SocketProxy> socketProxy =
 					std::make_shared<SocketProxy>(asioThread, this->mConfig.mIp, this->mConfig.mPort);
 			std::shared_ptr<MongoClientContext> mongoClientContext =
-					std::make_shared<MongoClientContext>(socketProxy, this->mConfig, this);
+					std::make_shared<MongoClientContext>(socketProxy, this->mConfig, this, index);
 			this->mMongoClients.emplace_back(mongoClientContext);
 		}
-		std::string str;
-		Bson::WriterDocument document;
-		//document.Add("_id", 444);
-		std::shared_ptr<Bson::ReaderDocument> readerDocument = this->QueryOnce("ET", "UserData", document);
-		readerDocument->WriterToJson(str);
-		return true;
+//		for(int index = 0; index < 100; index++)
+//		{
+//			Bson::WriterDocument document;
+//			document.Add("_id", 444 + index);
+//			document.Add("age", index + 10);
+//			document.Add("name", "xiaoming" + std::to_string(index));
+//			this->InsertOne("ET", "user", document);
+//		}
+
+		return this->Ping();
 	}
 
 	bool MongoComponent::InsertOne(const std::string& db, const std::string& tab, Bson::WriterDocument& document)
@@ -92,9 +97,19 @@ namespace Sentry
 		{
 			return nullptr;
 		}
+		long long t1 = Time::GetNowMilTime();
 		int index = flag % this->mMongoClients.size();
-		this->mMongoClients[index]->SendMongoCommand(request);
-		return mongoTask->Await();
+		this->mMongoClients[index]->PushMongoCommand(request);
+		std::shared_ptr<Bson::ReaderDocument> readerDocument = mongoTask->Await();
+		if(readerDocument != nullptr)
+		{
+			std::string json;
+			readerDocument->WriterToJson(json);
+			LOG_DEBUG( "[" << Time::GetNowMilTime() - t1 << "ms] response = " << json);
+			return readerDocument;
+		}
+		LOG_FATAL("mongo response nullptr");
+		return nullptr;
 	}
 	std::shared_ptr<MongoQueryRequest> MongoComponent::GetRequest(
 		const std::string& db, const std::string& tab, const std::string & cmd)
@@ -115,6 +130,22 @@ namespace Sentry
 			= this->GetRequest(db, tab, "find");
 		mongoRequest->document.Add("query", document);
 		return this->Run(mongoRequest);
+	}
+
+	bool MongoComponent::Ping()
+	{
+		std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
+		mongoRequest->flag = 0;
+		mongoRequest->numberToSkip = 0;
+		mongoRequest->numberToReturn = 1;
+		mongoRequest->collectionName =  "admin.$cmd";
+		mongoRequest->document.Add("ping", 1);
+		return this->Run(mongoRequest) != nullptr;
+	}
+
+	void MongoComponent::OnClientError(int index, XCode code)
+	{
+
 	}
 
 }

@@ -5,11 +5,14 @@
 #include"MongoClient.h"
 #include"Component/Mongo/MongoComponent.h"
 
+#include"Util/MD5.h"
+#include"Util/StringHelper.h"
+#include"Util/Base64Helper.h"
 namespace Mongo
 {
 	MongoClientContext::MongoClientContext(std::shared_ptr<SocketProxy> scoket,
-			const Mongo::Config& config, MongoComponent* component)
-		: Tcp::TcpContext(scoket), mConfig(config), mMongoComponent(component)
+			const Mongo::Config& config, MongoComponent* component, int index)
+		: Tcp::TcpContext(scoket), mConfig(config), mMongoComponent(component), mIndex(index)
 	{
 
 	}
@@ -34,7 +37,6 @@ namespace Mongo
 			if(!this->mCommands.empty())
 			{
 				this->Send(this->mCommands.front());
-				this->mCommands.pop_front();
 			}
 		}
 	}
@@ -47,15 +49,12 @@ namespace Mongo
 			CONSOLE_LOG_ERROR(code.message());
 #endif
 			this->Connect();
+			this->mCommands.push_front(this->AuthRequest1());
 		}
 		else
 		{
+			this->mCommands.pop_front();
 			this->mReadState == ReadType::HEAD;
-			if (!this->mCommands.empty())
-			{
-				this->Send(this->mCommands.front());
-				this->mCommands.pop_front();
-			}
 			this->ReceiveMessage(sizeof(MongoHead));
 		}
 	}
@@ -64,9 +63,13 @@ namespace Mongo
     {
 		if (code)
 		{
-#ifdef __DEBUG__
-			CONSOLE_LOG_ERROR(code.message());
+#ifdef ONLY_MAIN_THREAD
+			this->mMongoComponent->OnClientError(this->mIndex, XCode::NetReceiveFailure);
+#else
+			MainTaskScheduler & taskScheduler = App::Get()->GetTaskScheduler();
+			taskScheduler.Invoke(&MongoComponent::OnClientError, this->mMongoComponent, this->mIndex, XCode::NetReceiveFailure);
 #endif
+			CONSOLE_LOG_ERROR(code.message());
 			return;
 		}
         std::iostream os(&buffer);
@@ -79,30 +82,63 @@ namespace Mongo
         }
 		const MongoHead & mongoHead = this->mMongoResponse.GetHead();
 		std::shared_ptr<Bson::ReaderDocument> res = this->mMongoResponse.OnReceiveBody(buffer);
-#ifdef ONLY_MAIN_THREAD
-		this->mMongoComponent->OnResponse(mongoHead.responseTo, res);
-#else
-		MainTaskScheduler & taskScheduler = App::Get()->GetTaskScheduler();
-		taskScheduler.Invoke(&MongoComponent::OnResponse, this->mMongoComponent, mongoHead.responseTo, res);
-#endif
-    }
+		std::string json;
+		res->WriterToJson(json);
 
-	void MongoClientContext::SendMongoCommand(std::shared_ptr<Tcp::ProtoMessage> request)
+		if(mongoHead.requestID == 1) //第一次握手
+		{
+
+		}
+		else
+		{
+#ifdef ONLY_MAIN_THREAD
+			this->mMongoComponent->OnResponse(mongoHead.responseTo, res);
+#else
+			MainTaskScheduler& taskScheduler = App::Get()->GetTaskScheduler();
+			taskScheduler.Invoke(&MongoComponent::OnResponse, this->mMongoComponent, mongoHead.responseTo, res);
+#endif
+		}
+
+		if (!this->mCommands.empty())
+		{
+			this->Send(this->mCommands.front());
+		}
+		this->mReadState = ReadType::HEAD;
+	}
+
+	void MongoClientContext::PushMongoCommand(std::shared_ptr<Tcp::ProtoMessage> request)
 	{
 #ifdef ONLY_MAIN_THREAD
-		this->AddToCommandQueue(request);
+		this->PushCommand(request, front);
 #else
-		this->mNetworkThread.Invoke(&MongoClientContext::AddToCommandQueue, this, request);
+		this->mNetworkThread.Invoke(&MongoClientContext::PushCommand, this, request);
 #endif
 	}
 
-	void MongoClientContext::AddToCommandQueue(std::shared_ptr<Tcp::ProtoMessage> request)
+	void MongoClientContext::PushCommand(std::shared_ptr<Tcp::ProtoMessage> request)
 	{
 		if(this->mCommands.empty())
 		{
 			this->Send(request);
 		}
-		this->mCommands.emplace_back(request);
+		this->mCommands.push_back(request);
+	}
+
+	std::shared_ptr<Mongo::MongoQueryRequest> MongoClientContext::AuthRequest1()
+	{
+		std::string random = Helper::String::RandomString(8);
+		std::string nonce = Helper::Base64::Base64Encode(random);
+		std::shared_ptr<Mongo::MongoQueryRequest> request(new MongoQueryRequest());
+		std::string firstBare = fmt::format("n={0}user,r={1}", this->mConfig.mUser, nonce);
+		std::string payload = Helper::Base64::Base64Encode(fmt::format("n,,{0}", firstBare));
+
+		request->header.requestID = 1;
+		request->collectionName = this->mConfig.mDb + ".$cmd";
+		request->document.Add("saslStart", 1);
+		request->document.Add("autoAuthorize", 1);
+		request->document.Add("mechanism", "SCRAM-SHA-1");
+		request->document.Add("payload", payload);
+		return request;
 	}
 
 }

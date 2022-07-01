@@ -18,6 +18,7 @@ namespace Mongo
 	struct Config
 	{
 		int mMaxCount;
+		std::string mDb;
 		std::string mIp;
 		std::string mUser;
 		std::string mPasswd;
@@ -36,15 +37,17 @@ namespace Mongo
 	{
 	 public:
 		MongoClientContext(std::shared_ptr<SocketProxy> scoket,
-				const Mongo::Config & config, MongoComponent * component);
+				const Mongo::Config & config, MongoComponent * component, int index);
 	public:
-		void SendMongoCommand(std::shared_ptr<Tcp::ProtoMessage> request);
+		void PushMongoCommand(std::shared_ptr<Tcp::ProtoMessage> request);
 	private:
+		std::shared_ptr<Mongo::MongoQueryRequest> AuthRequest1();
 		void OnConnect(const asio::error_code &error, int count) final;
-		void AddToCommandQueue(std::shared_ptr<Tcp::ProtoMessage> request);
+		void PushCommand(std::shared_ptr<Tcp::ProtoMessage> request);
 		void OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	private:
+		int mIndex;
 		const Mongo::Config & mConfig;
 		asio::streambuf streamBuffer;
 		MongoComponent * mMongoComponent;
