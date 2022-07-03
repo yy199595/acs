@@ -37,6 +37,12 @@ namespace Tcp
 		template<typename T>
 		std::shared_ptr<T> Cast() { return dynamic_pointer_cast<T>(this->shared_from_this());}
 	 protected:
+		bool ConnectSync(); //同步连接
+		int RecvSync(int read); //同步读取数据
+		int SendSync(std::shared_ptr<ProtoMessage> message); //同步发送
+		std::istream & GetReadStream() { return this->mRecvStream;}
+		std::ostream & GetSendStream() { return this->mSendStream;}
+	 protected:
 		virtual void OnConnect(const asio::error_code & error, int count) { throw std::logic_error("");}
 		virtual void OnReceiveLine(const asio::error_code & code, asio::streambuf & buffer) {}
         virtual void OnReceiveMessage(const asio::error_code & code, asio::streambuf & buffer) {}
@@ -49,6 +55,8 @@ namespace Tcp
 		int mConnectCount;
 		const size_t mMaxCount;
 		long long mLastOperTime;
+		std::ostream mSendStream;
+		std::istream mRecvStream;
 		asio::streambuf mSendBuffer;
 		asio::streambuf mRecvBuffer;
 	};

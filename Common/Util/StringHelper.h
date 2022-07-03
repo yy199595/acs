@@ -1,5 +1,6 @@
 
 #pragma once
+#include<regex>
 #include <string>
 #include <vector>
 namespace Helper
@@ -30,6 +31,6 @@ namespace Helper
 
         extern void ReplaceString(std::string &outstring, const std::string str1, const std::string str2);
 
-        extern void SplitString(const std::string &targetString, const std::string cc, std::vector<std::string> &ret);
+        extern void Split(const std::string &targetString, const std::string & cc, std::vector<std::string> &ret);
     }
 }// namespace StringHelper

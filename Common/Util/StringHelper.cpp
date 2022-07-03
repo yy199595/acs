@@ -22,16 +22,15 @@ namespace Helper
         std::transform(str.begin(), str.end(), str.begin(), ::toupper);
     }
 
-    void String::SplitString(const std::string &targetString, const std::string delim, std::vector<std::string> &ret)
+    void String::Split(const std::string &targetString, const std::string & cc, std::vector<std::string> &ret)
     {
-        ret.clear();
-        if (targetString.length() == 0)
-            return;
-        std::regex re{delim};
-
-        ret = std::vector<std::string>{
-                std::sregex_token_iterator(targetString.begin(), targetString.end(), re, -1),
-                std::sregex_token_iterator()};
+		std::regex re(cc);
+		std::sregex_token_iterator p(targetString.begin(), targetString.end(), re, -1);
+		std::sregex_token_iterator end;
+		for(; p != end; p++)
+		{
+			ret.emplace_back(*p);
+		}
     }
 
     void String::ReplaceString(std::string &outstring, const std::string str1, const std::string str2)

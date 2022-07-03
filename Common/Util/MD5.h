@@ -34,6 +34,10 @@ public:
 
     void reset();
 
+	void encode(const ulong *input, byte *output, size_t length);
+
+	void decode(const byte *input, ulong *output, size_t length);
+
 private:
     void update(const byte *input, size_t length);
 
@@ -41,9 +45,7 @@ private:
 
     void transform(const byte block[64]);
 
-    void encode(const ulong *input, byte *output, size_t length);
 
-    void decode(const byte *input, ulong *output, size_t length);
 
     string bytesToHexString(const byte *input, size_t length);
 
@@ -67,7 +69,8 @@ namespace Helper
     namespace Md5
     {
         extern std::string GetMd5(ifstream &in);
-        extern std::string GetMd5(const std::string & str);
+		extern std::string SumHex(const std::string & key);
+		extern std::string GetMd5(const std::string & str);
         extern std::string GetMd5(const char * str, size_t size);
     }
 }

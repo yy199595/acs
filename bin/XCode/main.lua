@@ -5,6 +5,7 @@ local fs = io.open(filepath, "r")
 fs:read()
 
 local split = function(s, delim)
+
     local split = {}
     local pattern = "[^" .. delim .. "]+"
     string.gsub(

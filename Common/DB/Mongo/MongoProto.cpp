@@ -104,17 +104,15 @@ namespace Mongo
 
 namespace Mongo
 {
-    int MongoQueryResponse::OnReceiveHead(asio::streambuf &buffer)
+    int MongoQueryResponse::OnReceiveHead(std::istream & os)
     {
-        std::iostream os(&buffer);
         os.readsome((char *)&this->mHead, sizeof(MongoHead));
         return this->mHead.messageLength;
     }
 
-	std::shared_ptr<Bson::ReaderDocument> MongoQueryResponse::OnReceiveBody(asio::streambuf &buffer)
+	std::shared_ptr<Bson::ReaderDocument> MongoQueryResponse::OnReceiveBody(std::istream & os)
 	{
 		this->mBuffer.clear();
-		std::iostream os(&buffer);
 		os.readsome((char*)&responseFlags, sizeof(responseFlags));
 		os.readsome((char*)&cursorID, sizeof(cursorID));
 		os.readsome((char*)&startingFrom, sizeof(startingFrom));

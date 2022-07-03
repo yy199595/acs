@@ -11,6 +11,7 @@ namespace Tcp
 {
 	TcpContext::TcpContext(std::shared_ptr<SocketProxy> socket, size_t count)
 		: mNetworkThread(socket->GetThread()), mMaxCount(count), mRecvBuffer(count)
+		, mSendStream(&this->mSendBuffer), mRecvStream(&mRecvBuffer)
 	{
 		this->mSocket = socket;
 		this->mLastOperTime = 0;
@@ -22,6 +23,7 @@ namespace Tcp
 	{
 
 	}
+
 
 	void TcpContext::Connect()
 	{
@@ -134,8 +136,7 @@ namespace Tcp
 
 	void TcpContext::Send(std::shared_ptr<ProtoMessage> message)
 	{
-		std::ostream os(&this->mSendBuffer);
-		const int length = message->Serailize(os);
+		const int length = message->Serailize(this->mSendStream);
 		AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
 		std::shared_ptr<TcpContext> self = this->shared_from_this();
 		asio::async_write(tcpSocket, this->mSendBuffer, [this, self, message, length]
@@ -157,4 +158,59 @@ namespace Tcp
 
 		this->mLastOperTime = Helper::Time::GetNowSecTime();
 	}
+}
+
+namespace Tcp
+{
+	bool TcpContext::ConnectSync()
+	{
+		asio::error_code code;
+		AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
+		auto address = asio::ip::make_address_v4(this->mSocket->GetIp());
+		asio::ip::tcp::endpoint endPoint(address, this->mSocket->GetPort());
+		tcpSocket.connect(endPoint, code);
+		if(code)
+		{
+			printf("sync connect [%s] failure", this->mSocket->GetAddress().c_str());
+			return false;
+		}
+		return true;
+	}
+
+	int TcpContext::RecvSync(int length)
+	{
+		asio::error_code code;
+		if(this->mRecvBuffer.size() >= length)
+		{
+			return length;
+		}
+		AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
+		int size = asio::read(tcpSocket, this->mRecvBuffer,
+			asio::transfer_exactly(length), code);
+		return code ? 0 : size;
+	}
+
+	int TcpContext::SendSync(std::shared_ptr<ProtoMessage> message)
+	{
+		int sum;
+		asio::error_code code;
+		int length = message->Serailize(this->mSendStream);
+		AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
+		sum += asio::write(tcpSocket, this->mSendBuffer, code);
+		while(length > 0 && sum > 0 && !code)
+		{
+			try
+			{
+				sum += asio::write(tcpSocket, this->mSendBuffer);
+				length = message->Serailize(this->mSendStream);
+			}
+			catch (std::system_error & error)
+			{
+				printf("sync send failure %s\n", error.what());
+				return 0;
+			}
+		}
+		return sum;
+	}
+
 }

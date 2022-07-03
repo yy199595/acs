@@ -13,6 +13,7 @@ namespace Sentry
 #ifdef __ENABLE_OPEN_SSL__
 		std::string sslFile;
 		config.GetPath("ssl", sslFile);
+		IAsioThread & t = this->GetApp()->GetTaskScheduler();
 		this->GetApp()->GetTaskScheduler().LoadVeriftFile("");
 
 		asio::ssl::stream<asio::ip::tcp::socket> sslSocket(t, t.GetSSL());
@@ -30,8 +31,6 @@ namespace Sentry
 #endif
 #ifndef ONLY_MAIN_THREAD
 		int networkCount = 1;
-		IAsioThread & t = this->GetApp()->GetTaskScheduler();
-
 		LOG_CHECK_RET(config.GetMember("thread", "network", networkCount));
 		for (int index = 0; index < networkCount; index++)
 		{

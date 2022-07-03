@@ -114,9 +114,9 @@ namespace Mongo
         MongoQueryResponse() = default;
 
     public:
-        int OnReceiveHead(asio::streambuf &buffer);
+        int OnReceiveHead(std::istream & stream);
 		const MongoHead & GetHead() const { return this->mHead;}
-		std::shared_ptr<Bson::ReaderDocument> OnReceiveBody(asio::streambuf &buffer);
+		std::shared_ptr<Bson::ReaderDocument> OnReceiveBody(std::istream & stream);
 	private:
         MongoHead mHead;
         int responseFlags;  // bit vector - see details below

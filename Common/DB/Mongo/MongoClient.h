@@ -41,7 +41,7 @@ namespace Mongo
 	public:
 		void PushMongoCommand(std::shared_ptr<Tcp::ProtoMessage> request);
 	private:
-		std::shared_ptr<Mongo::MongoQueryRequest> AuthRequest1();
+		bool StartAuthUser();
 		void OnConnect(const asio::error_code &error, int count) final;
 		void PushCommand(std::shared_ptr<Tcp::ProtoMessage> request);
 		void OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer) final;
