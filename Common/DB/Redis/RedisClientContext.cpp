@@ -14,8 +14,7 @@ namespace Sentry
 		this->mSocket = socket;
 		if (!config.Password.empty())
 		{
-			this->mAuthCommand = std::make_shared<RedisRequest>("AUTH");
-			this->mAuthCommand->AddParameter(config.Password);
+
 		}
 		if (config.Index != 0)
 		{
@@ -131,63 +130,74 @@ namespace Sentry
 		SharedRedisClient self = this->Cast<RedisClientContext>();
 		if (!this->mCommands.empty())
 		{
-			if (this->mCommands.front() == this->mAuthCommand
-				&& !this->mCurResponse->IsOk()) //验证失败
-			{
-				while (!this->mCommands.empty())
-				{
-					std::shared_ptr<RedisRequest> request = this->mCommands.front();
-					if (request->GetTaskId() != 0)
-					{
-						taskId = request->GetTaskId();
-#ifdef ONLY_MAIN_THREAD
-						this->mRedisComponent->OnResponse(self, taskId,
-							std::make_shared<RedisResponse>(*this->mCurResponse));
-#else
-						std::shared_ptr<RedisResponse> response1 = std::make_shared<RedisResponse>(*this->mCurResponse);
-						this->mNetworkThread.Invoke(&RedisComponent::OnResponse, this->mRedisComponent, self, taskId, response1);
-#endif
-					}
-					this->mCommands.pop_front();
-				}
-				return;
-			}
 			taskId = this->mCommands.front()->GetTaskId();
 			this->mCommands.pop_front();
-			if (!this->mCommands.empty())
-			{
-				this->Send(this->mCommands.front());
-			}
+		}
+		if (!this->mCommands.empty())
+		{
+			this->Send(this->mCommands.front());
 		}
 #ifdef ONLY_MAIN_THREAD
 		this->mRedisComponent->OnResponse(self, taskId, this->mCurResponse);
 #else
-		this->mNetworkThread.Invoke(&RedisComponent::OnResponse, this->mRedisComponent, self, taskId, this->mCurResponse);
+		this->mNetworkThread.Invoke(&RedisComponent::OnResponse,
+			this->mRedisComponent, self, taskId, this->mCurResponse);
 #endif
 	}
 
     void RedisClientContext::OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message)
     {
-		std::string json = dynamic_pointer_cast<RedisRequest>(message)->ToJson();
 		if (code)
         {
-			this->ConnectServer();
-			CONSOLE_LOG_ERROR("send redis cmd failure : " << json);
+			if(!this->AuthUser())
+			{
+				return;
+			}
+			this->ClearSendStream();
+			this->Send(message);
 			return;
         }
-		//CONSOLE_LOG_ERROR("send redis cmd successful : " << json);
 		this->ReceiveLine();
     }
-	void RedisClientContext::ConnectServer()
+
+	bool RedisClientContext::AuthUser()
 	{
-		this->Connect();
-		if(this->mSelectCommand != nullptr)
+		if(!this->ConnectSync())
 		{
-			this->mCommands.push_front(this->mSelectCommand);
+			CONSOLE_LOG_ERROR("connect redis [" << this->mConfig.Address << "] failure");
+			return false;
 		}
-		if(this->mAuthCommand != nullptr)
+		std::shared_ptr<RedisRequest> authCommand
+			= std::make_shared<RedisRequest>("AUTH");
+		authCommand->AddParameter(this->mConfig.Password);
+		std::shared_ptr<RedisResponse> response(new RedisResponse());
+		if(this->SendSync(authCommand) <= 0 || this->RecvLineSync() <= 0)
 		{
-			this->mCommands.push_front(this->mAuthCommand);
+			return false;
 		}
+
+		std::istream & readStream = this->GetReadStream();
+		if(response->OnRecvLine(readStream) != 0 || !response->IsOk())
+		{
+			CONSOLE_LOG_ERROR("auth redis user faliure");
+			return false;
+		}
+
+		std::shared_ptr<RedisRequest> selectCommand
+			= std::make_shared<RedisRequest>("SELECT");
+		selectCommand->AddParameter(this->mConfig.Index);
+
+		if(this->SendSync(selectCommand) <= 0 || this->RecvLineSync() <= 0)
+		{
+			return false;
+		}
+
+		std::shared_ptr<RedisResponse> response2(new RedisResponse());
+		if(response2->OnRecvLine(readStream) != 0 || !response2->IsOk())
+		{
+			CONSOLE_LOG_ERROR("auth redis user faliure");
+			return false;
+		}
+		return true;
 	}
 }

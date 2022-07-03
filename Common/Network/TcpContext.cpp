@@ -46,11 +46,6 @@ namespace Tcp
 			if(!code)
 			{
 				this->mConnectCount = 0;
-				if(this->mRecvBuffer.size() > 0)
-				{
-					std::iostream os(&this->mRecvBuffer);
-					os.ignore(this->mRecvBuffer.size());
-				}
 			}
 			this->OnConnect(code, this->mConnectCount);
 		});
@@ -162,6 +157,24 @@ namespace Tcp
 
 namespace Tcp
 {
+	void TcpContext::ClearRecvStream()
+	{
+		if(this->mRecvBuffer.size() > 0)
+		{
+			std::iostream os(&this->mRecvBuffer);
+			os.ignore(this->mRecvBuffer.size());
+		}
+	}
+
+	void TcpContext::ClearSendStream()
+	{
+		if(this->mRecvBuffer.size() > 0)
+		{
+			std::iostream os(&this->mRecvBuffer);
+			os.ignore(this->mRecvBuffer.size());
+		}
+	}
+
 	bool TcpContext::ConnectSync()
 	{
 		asio::error_code code;
@@ -188,6 +201,13 @@ namespace Tcp
 		int size = asio::read(tcpSocket, this->mRecvBuffer,
 			asio::transfer_exactly(length), code);
 		return code ? 0 : size;
+	}
+
+	int TcpContext::RecvLineSync()
+	{
+		asio::error_code code;
+		AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
+		return asio::read_until(tcpSocket, this->mRecvBuffer, "\r\n", code);
 	}
 
 	int TcpContext::SendSync(std::shared_ptr<ProtoMessage> message)

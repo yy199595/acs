@@ -21,13 +21,12 @@ namespace Sentry
         RedisClientContext(std::shared_ptr<SocketProxy> socket, const RedisConfig & config, RedisComponent * component);
 		~RedisClientContext();
     public:
-        //XCode StartConnectAsync();
         void StartReceiveMessage();
         const RedisConfig & GetConfig() { return mConfig;}
         void SendCommand(std::shared_ptr<RedisRequest> command);
         const std::string & GetName() const { return this->mConfig.Name; }
     private:
-		void ConnectServer();
+		bool AuthUser();
 		void OnReadComplete();
 		void OnConnect(const asio::error_code &error, int count) final;
         void AddCommandQueue(std::shared_ptr<RedisRequest> command);
@@ -39,7 +38,6 @@ namespace Sentry
         RedisComponent * mRedisComponent;
 		std::shared_ptr<asio::steady_timer> mTimer;
 		std::shared_ptr<RedisResponse> mCurResponse;
-		std::shared_ptr<RedisRequest> mAuthCommand;
 		std::shared_ptr<RedisRequest> mSelectCommand;
 		std::list<std::shared_ptr<RedisRequest>> mCommands;
     };

@@ -95,11 +95,11 @@ namespace Sentry
         bool IsOk();
 		void Clear();
     private:
-        int OnDecodeArray(std::iostream & os);
-        int OnReceiveFirstLine(std::iostream & os);
+        int OnDecodeArray(std::istream & os);
+        int OnReceiveFirstLine(std::istream & os);
     public:
-        int OnRecvLine(std::iostream & os);
-        int OnRecvMessage(std::iostream & os);
+        int OnRecvLine(std::istream & os);
+        int OnRecvMessage(std::istream & os);
     public:
 		bool HasError();
 		template<typename T>

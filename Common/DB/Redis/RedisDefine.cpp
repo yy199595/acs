@@ -112,7 +112,7 @@ namespace Sentry
 		this->mArray.clear();
 	}
 
-    int RedisResponse::OnRecvLine(std::iostream &message)
+    int RedisResponse::OnRecvLine(std::istream &message)
     {
         switch (this->mType)
         {
@@ -124,7 +124,7 @@ namespace Sentry
 		return 0;
     }
 
-    int RedisResponse::OnRecvMessage(std::iostream& os)
+    int RedisResponse::OnRecvMessage(std::istream& os)
 	{
 		this->mString.clear();
 		std::unique_ptr<char[]> buffer(new char[this->mDataSize]);
@@ -155,7 +155,7 @@ namespace Sentry
         return this->mString == "OK";
     }
 
-    int RedisResponse::OnReceiveFirstLine(std::iostream& os)
+    int RedisResponse::OnReceiveFirstLine(std::istream& os)
 	{
 		char cc = os.get();
 		this->mDataSize = 0;
@@ -186,7 +186,7 @@ namespace Sentry
 		return this->mDataSize;
 	}
 
-    int RedisResponse::OnDecodeArray(std::iostream & os)
+    int RedisResponse::OnDecodeArray(std::istream & os)
     {
 		char cc = os.get();
 		this->mString.clear();

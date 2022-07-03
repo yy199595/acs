@@ -38,10 +38,13 @@ namespace Tcp
 		std::shared_ptr<T> Cast() { return dynamic_pointer_cast<T>(this->shared_from_this());}
 	 protected:
 		bool ConnectSync(); //同步连接
+		int RecvLineSync(); //同步读一行
 		int RecvSync(int read); //同步读取数据
+		void ClearSendStream();
+		void ClearRecvStream();
 		int SendSync(std::shared_ptr<ProtoMessage> message); //同步发送
-		std::istream & GetReadStream() { return this->mRecvStream;}
-		std::ostream & GetSendStream() { return this->mSendStream;}
+		inline std::istream & GetReadStream() { return this->mRecvStream;}
+		inline std::ostream & GetSendStream() { return this->mSendStream;}
 	 protected:
 		virtual void OnConnect(const asio::error_code & error, int count) { throw std::logic_error("");}
 		virtual void OnReceiveLine(const asio::error_code & code, asio::streambuf & buffer) {}

@@ -50,6 +50,7 @@ namespace Mongo
 #ifdef __DEBUG__
 			CONSOLE_LOG_ERROR(code.message());
 #endif
+			this->ClearSendStream();
 			if(!this->StartAuthUser())
 			{
 				CONSOLE_LOG_ERROR("auth mongo user failure");
@@ -174,7 +175,7 @@ namespace Mongo
 		CONSOLE_LOG_ERROR(key);
 		std::shared_ptr<Mongo::MongoQueryRequest> request2(new MongoQueryRequest());
 
-		request2->header.requestID = 1;
+		request2->header.requestID = 2;
 		request2->collectionName = this->mConfig.mDb + ".$cmd";
 		request2->document.Add("authenticate", 1);
 		request2->document.Add("user", this->mConfig.mUser);
