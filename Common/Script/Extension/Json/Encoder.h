@@ -61,7 +61,7 @@ private:
 	{
 		size_t len;
 		const char* s;
-		int64_t integer;
+		long long integer = 0;
 		int t = lua_type(L, idx);
 		switch (t) {
 		case LUA_TBOOLEAN:
