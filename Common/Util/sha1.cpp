@@ -255,7 +255,7 @@ namespace Helper
 		uint8_t digest[SHA1_DIGEST_SIZE];
 		SHA1_CTX ctx;
 		sat_SHA1_Init(&ctx);
-		sat_SHA1_Update(&ctx, (unsigned char*)str, sz);
+		sat_SHA1_Update(&ctx, (unsigned char*)str, size);
 		sat_SHA1_Final(&ctx, digest);
 		return std::string((const char *)digest, SHA1_DIGEST_SIZE);
 	}
@@ -268,7 +268,7 @@ namespace Helper
 		}
 	}
 
-	std::string Sha1::GetHMacHash(const std::string& text, const std::string& key)
+	std::string Sha1::GetHMacHash(const std::string& key, const std::string& text)
 	{
 		SHA1_CTX ctx1, ctx2;
 		size_t key_sz = key.size();

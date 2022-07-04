@@ -119,14 +119,18 @@ namespace Helper
 
     std::string String::RandomString(size_t size)
     {
-        std::stringstream ss;
-        const static std::string buffer = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890";
-        for (size_t index = 0; index < size; index++)
-        {
-            int pos = Math::Random<int>(0, (int) buffer.size());
-            ss << buffer[pos];
-        }
-        return ss.str();
+		char x = 0;
+		std::unique_ptr<char[]> buffer(new char[size]);
+		for(size_t index = 0; index < size; index++)
+		{
+			buffer[index] = random() & 0XFF;
+			x ^= buffer[index];
+		}
+		if(x == 0)
+		{
+			buffer[x] |= 1;
+		}
+		return std::string(buffer.get(), size);
     }
 
     std::string String::CreateNewToken()
