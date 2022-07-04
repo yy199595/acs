@@ -212,7 +212,7 @@ namespace Tcp
 
 	int TcpContext::SendSync(std::shared_ptr<ProtoMessage> message)
 	{
-		int sum;
+		int sum = 0;
 		asio::error_code code;
 		int length = message->Serailize(this->mSendStream);
 		AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();

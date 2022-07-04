@@ -38,7 +38,6 @@ namespace Sentry
         RedisComponent * mRedisComponent;
 		std::shared_ptr<asio::steady_timer> mTimer;
 		std::shared_ptr<RedisResponse> mCurResponse;
-		std::shared_ptr<RedisRequest> mSelectCommand;
 		std::list<std::shared_ptr<RedisRequest>> mCommands;
     };
     typedef std::shared_ptr<RedisClientContext> SharedRedisClient;

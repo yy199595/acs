@@ -12,15 +12,6 @@ namespace Sentry
 		: Tcp::TcpContext(socket, 1024 * 100), mConfig(config), mRedisComponent(component)
 	{
 		this->mSocket = socket;
-		if (!config.Password.empty())
-		{
-
-		}
-		if (config.Index != 0)
-		{
-			this->mSelectCommand = std::make_shared<RedisRequest>("SELECT");
-			this->mSelectCommand->AddParameter(config.Index);
-		}
 		printf("create new redis client %s\n", config.Name.c_str());
 	}
 
