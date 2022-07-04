@@ -33,6 +33,9 @@ namespace Mongo
 				CONSOLE_LOG_ERROR("auth mongo user failure");
 				return;
 			}
+			CONSOLE_LOG_ERROR("mongo user auth successful");
+			this->Send(message);
+			return;
 		}
 
 		this->mCommands.pop_front();
@@ -64,9 +67,6 @@ namespace Mongo
 		}
 		const MongoHead& mongoHead = this->mMongoResponse.GetHead();
 		std::shared_ptr<Bson::ReaderDocument> res = this->mMongoResponse.OnReceiveBody(os);
-		std::string json;
-		res->WriterToJson(json);
-
 #ifdef ONLY_MAIN_THREAD
 		this->mMongoComponent->OnResponse(mongoHead.responseTo, res);
 #else
@@ -111,65 +111,6 @@ namespace Mongo
 			output = Helper::Sha1::XorString(output, inter);
 		}
 		return output;
-	}
-
-	bool MongoClientContext::StartAuthUser()
-	{
-		if(!this->ConnectSync())
-		{
-			CONSOLE_LOG_ERROR("connect mongo error");
-			return false;
-		}
-
-		std::string password = Helper::Md5::SumHex(fmt::format(
-			"{0}:mongo:{1}", this->mConfig.mUser, this->mConfig.mPasswd));
-		std::shared_ptr<Mongo::MongoQueryRequest> request1(new MongoQueryRequest());
-
-		CONSOLE_LOG_ERROR(password);
-
-		request1->header.requestID = 1;
-		request1->collectionName = this->mConfig.mDb + ".$cmd";
-		request1->document.Add("getnonce", 1);
-		if(this->SendSync(request1) <= 0 || this->RecvSync(sizeof(MongoHead)) <= 0)
-		{
-			return false;
-		}
-		std::istream & readStream1 = this->GetReadStream();
-		int length = this->mMongoResponse.OnReceiveHead(readStream1);
-		if(this->RecvSync(length - sizeof(MongoHead)) <= 0)
-		{
-			return false;
-		}
-		std::string nonce;
-		std::shared_ptr<Bson::ReaderDocument> response1 = this->mMongoResponse.OnReceiveBody(readStream1);
-		if(response1 == nullptr || !response1->Get("nonce", nonce))
-		{
-			return false;
-		}
-		std::string key = Helper::Md5::SumHex(nonce + this->mConfig.mUser + password);
-
-		CONSOLE_LOG_ERROR(key);
-		std::shared_ptr<Mongo::MongoQueryRequest> request2(new MongoQueryRequest());
-
-		request2->header.requestID = 2;
-		request2->collectionName = this->mConfig.mDb + ".$cmd";
-		request2->document.Add("authenticate", 1);
-		request2->document.Add("user", this->mConfig.mUser);
-		request2->document.Add("nonce", nonce);
-		request2->document.Add("key", key);
-		if(this->SendSync(request2) <= 0 || this->RecvSync(sizeof(MongoHead)) <= 0)
-		{
-			return false;
-		}
-		length = this->mMongoResponse.OnReceiveHead(readStream1);
-		if(this->RecvSync(length - sizeof(MongoHead)) <= 0)
-		{
-			return false;
-		}
-		std::string json;
-		std::shared_ptr<Bson::ReaderDocument> response2 = this->mMongoResponse.OnReceiveBody(readStream1);
-		response2->WriterToJson(json);
-		return true;
 	}
 
 	bool MongoClientContext::StartAuthBySha1()
@@ -270,9 +211,41 @@ namespace Mongo
 		{
 			return false;
 		}
+		parsedSource.clear();
+		if(!response2->Get("payload", parsedSource))
+		{
+			return false;
+		}
+		bool done = false;
+		if(response1->Get("done", done) && done)
+		{
+			return true;
+		}
+		std::shared_ptr<MongoQueryRequest> request3(new MongoQueryRequest());
+		request3->header.requestID = 1;
+		request3->collectionName = this->mConfig.mDb + ".$cmd";
+		request3->document.Add("saslContinue", 1);
+		request3->document.Add("conversationId", conversationId);
+		request3->document.Add("payload", "");
+
+		if(this->SendSync(request2) <= 0 || this->RecvSync(sizeof(MongoHead)) <= 0)
+		{
+			return false;
+		}
+		length = this->mMongoResponse.OnReceiveHead(readStream1);
+
+		if(this->RecvSync(length - sizeof(MongoHead)) <= 0)
+		{
+			return false;
+		}
+		std::shared_ptr<Bson::ReaderDocument> response3 = this->mMongoResponse.OnReceiveBody(readStream1);
 		std::string json2;
-		response2->WriterToJson(json2);
-		return true;
+		response3->WriterToJson(json2);
+		if(response3 == nullptr || !response3->IsOk())
+		{
+			return false;
+		}
+		return response3->Get("done", done) && done;
 	}
 
 }

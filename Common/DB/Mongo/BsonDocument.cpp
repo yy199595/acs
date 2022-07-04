@@ -46,6 +46,22 @@ namespace Bson
 
 	}
 
+	bool ReaderDocument::IsOk() const
+	{
+		double isOk = 0;
+		return this->Get("ok", isOk) && isOk != 0;
+	}
+
+	bool ReaderDocument::Get(const char* key, double& value) const
+	{
+		if(this->hasField(key))
+		{
+			value = this->getField(key).Double();
+			return true;
+		}
+		return false;
+	}
+
 	bool WriterDocument::WriterToStream(std::ostream& os)
 	{
 		const char* str = this->_done();

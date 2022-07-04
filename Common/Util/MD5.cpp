@@ -391,7 +391,6 @@ namespace Helper
 		md5(key.c_str(), key.size(), buffer);
 
 		std::string target(buffer, 16);
-		std::match_results<std::string::iterator> results;
 		auto begin = std::sregex_iterator(target.begin(), target.end(), regex1);
 		for(auto iter = begin; iter != std::sregex_iterator(); iter++)
 		{

@@ -43,13 +43,11 @@ namespace Sentry
 		void OnDelTask(long long taskId, RpcTask task) final;
 	public:
 		bool Ping();
-		bool InsertOne(const std::string & db, const std::string & tab, Bson::WriterDocument & document);
-		std::shared_ptr<Bson::ReaderDocument> QueryOnce(const std::string & db, const std::string & tab, Bson::WriterDocument & document);
+		bool InsertOne(const std::string & tab, Bson::WriterDocument & document);
+		std::shared_ptr<Bson::ReaderDocument> QueryOnce(const std::string & tab, Bson::WriterDocument & document);
 	 public:
 		void OnClientError(int index, XCode code);
-		std::shared_ptr<Bson::ReaderDocument> Run(std::shared_ptr<MongoRequest> request, int flag = 0);
-	 private:
-		std::shared_ptr<MongoQueryRequest> GetRequest(const std::string & db, const std::string & tab, const std::string & cmd);
+		std::shared_ptr<Bson::ReaderDocument> Run(std::shared_ptr<MongoQueryRequest> request, int flag = 0);
 	 private:
 		Mongo::Config mConfig;
 		TimerComponent * mTimerComponent;

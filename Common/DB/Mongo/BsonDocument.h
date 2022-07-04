@@ -55,16 +55,19 @@ namespace Bson
 
 		_bson::BSONType Type(const char * key) const;
 
+		bool IsOk() const;
+
 		bool Get(const char* key, int& value) const;
 
 		bool Get(const char* key, bool& value) const;
+
+		bool Get(const char* key, double & value) const;
 
 		bool Get(const char* key, long long& value) const;
 
 		bool Get(const char* key, std::string& value) const;
 
 		const std::string ToString() const { return this->toString(); }
-
 	private:
 		void WriterToJson(const _bson::bsonelement & bsonelement, Json::Writer & json);
 	};

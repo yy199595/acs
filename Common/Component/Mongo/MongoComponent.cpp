@@ -49,25 +49,15 @@ namespace Sentry
 					std::make_shared<MongoClientContext>(socketProxy, this->mConfig, this, index);
 			this->mMongoClients.emplace_back(mongoClientContext);
 		}
-//		for(int index = 0; index < 100; index++)
-//		{
-//			Bson::WriterDocument document;
-//			document.Add("_id", 444 + index);
-//			document.Add("age", index + 10);
-//			document.Add("name", "xiaoming" + std::to_string(index));
-//			this->InsertOne("ET", "user", document);
-//		}
-
 		return this->Ping();
 	}
 
-	bool MongoComponent::InsertOne(const std::string& db, const std::string& tab, Bson::WriterDocument& document)
+	bool MongoComponent::InsertOne(const std::string& tab, Bson::WriterDocument& document)
 	{
 		int res = 0;
 		Bson::ArrayDocument documentArray;
 		documentArray.Add(document);
-		std::shared_ptr<MongoQueryRequest> mongoRequest
-				= this->GetRequest(db, tab, "insert");
+		std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
 		mongoRequest->document.Add("documents", documentArray);
 		std::shared_ptr<Bson::ReaderDocument> response = this->Run(mongoRequest);
 		return response != nullptr && response->Get("n", res) && res > 0;
@@ -83,16 +73,19 @@ namespace Sentry
 
 	}
 
-	std::shared_ptr<Bson::ReaderDocument> MongoComponent::Run(std::shared_ptr<MongoRequest> request, int flag)
+	std::shared_ptr<Bson::ReaderDocument> MongoComponent::Run(std::shared_ptr<MongoQueryRequest> request, int flag)
 	{
 		if (this->mMongoClients.empty())
 		{
 			return nullptr;
 		}
+		request->flag = 0;
+		request->numberToSkip = 0;
+		request->numberToReturn = 1;
 		request->header.responseTo = 0;
 		request->header.requestID = this->mRequestId.Pop();
-		std::shared_ptr<MongoTask> mongoTask =
-				std::make_shared<MongoTask>(request->header.requestID);
+		request->collectionName = this->mConfig.mDb + ".$cmd";
+		std::shared_ptr<MongoTask> mongoTask = std::make_shared<MongoTask>(request->header.requestID);
 		if(!this->AddTask(mongoTask))
 		{
 			return nullptr;
@@ -111,23 +104,11 @@ namespace Sentry
 		LOG_FATAL("mongo response nullptr");
 		return nullptr;
 	}
-	std::shared_ptr<MongoQueryRequest> MongoComponent::GetRequest(
-		const std::string& db, const std::string& tab, const std::string & cmd)
-	{
-		std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
 
-		mongoRequest->flag = 0;
-		mongoRequest->numberToSkip = 0;
-		mongoRequest->numberToReturn = 1;
-		mongoRequest->collectionName = db + ".$cmd";
-		mongoRequest->document.Add(cmd.c_str(), tab);
-		return mongoRequest;
-	}
-	std::shared_ptr<Bson::ReaderDocument> MongoComponent::QueryOnce(
-		const string& db, const string& tab, Bson::WriterDocument& document)
+	std::shared_ptr<Bson::ReaderDocument> MongoComponent::QueryOnce(const string& tab, Bson::WriterDocument& document)
 	{
 		std::shared_ptr<MongoQueryRequest> mongoRequest
-			= this->GetRequest(db, tab, "find");
+			= std::make_shared<MongoQueryRequest>();
 		mongoRequest->document.Add("query", document);
 		return this->Run(mongoRequest);
 	}
@@ -135,10 +116,6 @@ namespace Sentry
 	bool MongoComponent::Ping()
 	{
 		std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
-		mongoRequest->flag = 0;
-		mongoRequest->numberToSkip = 0;
-		mongoRequest->numberToReturn = 1;
-		mongoRequest->collectionName =  "admin.$cmd";
 		mongoRequest->document.Add("ping", 1);
 		return this->Run(mongoRequest) != nullptr;
 	}
