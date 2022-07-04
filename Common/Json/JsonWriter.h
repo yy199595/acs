@@ -38,6 +38,7 @@ namespace Json
 		inline Writer& operator <<(unsigned int value) { this->Uint(value); return *this;}
 		inline Writer& operator <<(long long value) { this->Int64(value); return *this;}
 		inline Writer& operator <<(const char * value) { this->String(value); return *this;}
+		inline Writer& operator <<(unsigned long long value) { this->Uint64(value); return *this;}
 		inline Writer& operator <<(const std::string & value) { this->String(value.c_str(), value.size()); return *this;}
 	 public:
 		size_t GetJsonSize();

@@ -216,7 +216,7 @@ namespace Bson
 		}
 			break;
 		case _bson::BSONType::Timestamp:
-			json << (long long)bsonelement.timestampValue();
+			json << bsonelement.timestampValue();
 			break;
 		case _bson::BSONType::Date:
 			json << bsonelement.date().asInt64();
