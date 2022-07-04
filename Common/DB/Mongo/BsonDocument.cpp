@@ -219,7 +219,7 @@ namespace Bson
 			json << bsonelement.timestampValue();
 			break;
 		case _bson::BSONType::Date:
-			json << bsonelement.date().asInt64();
+			json << (long long)bsonelement.date().asInt64();
 			break;
 		default:
 			json << bsonelement.toString();
