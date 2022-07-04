@@ -18,14 +18,6 @@
 
 using namespace std;
 
-typedef int int32;
-typedef long long int64;
-typedef unsigned int uint32;
-typedef float float32;
-typedef double float64;
-typedef short int16;
-typedef unsigned short uint16;
-
 
 typedef asio::ip::udp AsioUdp;
 typedef asio::ip::tcp AsioTcp;
