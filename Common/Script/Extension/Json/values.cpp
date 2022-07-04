@@ -96,7 +96,7 @@ namespace values {
 
 		Value NumberValue(lua_State* L, int idx)
 		{
-			int64_t integer;
+			long long integer = 0;
 			return luax::isinteger(L, idx, &integer) ?
 				   rapidjson::Value(integer) : rapidjson::Value(lua_tonumber(L, idx));
 		}
