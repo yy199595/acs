@@ -7,43 +7,68 @@
 
 #include"Bson/bsonobj.h"
 #include"Json/JsonWriter.h"
+#include"rapidjson/document.h"
 #include"Bson/bsonobjbuilder.h"
 namespace Bson
 {
+
+	class Document : protected _bson::bsonobjbuilder
+	{
+	public:
+		virtual bool IsArray() = 0;
+		virtual bool IsObject() = 0;
+	public:
+		template<typename T>
+		T & Cast() { return (T&)(*this);}
+	};
+
 	class WriterDocument;
-	class ArrayDocument : protected _bson::bsonobjbuilder
+	class ArrayDocument : public Document
 	{
 	 public:
 		ArrayDocument() : mIndex(0) {}
+	public:
+		bool IsArray() final { return true;}
+		bool IsObject() final { return false;}
 	 public:
 		void Add(int value);
 		void Add(bool value);
+		void Add(double value);
 		void Add(long long value);
-		void Add(WriterDocument & document);
+		void Add(unsigned int value);
+		void Add(Document & document);
 		void Add(const std::string & value);
 		void Add(const char * str, size_t size);
 	 private:
 		int mIndex;
 	};
 
-	class WriterDocument : protected _bson::bsonobjbuilder
+	class WriterDocument : public Document
 	{
 	public:
 		WriterDocument() = default;
 		~WriterDocument() = default;
+
+	public:
+		bool IsArray() final { return false;}
+		bool IsObject() final { return true;}
+	public:
+		bool FromByJson(const std::string & json);
 	public:
 		const char * Serialize(int & length);
-		void Add(const char * key, ArrayDocument & document);
-		void Add(const char * key, WriterDocument & document);
+		void Add(const char * key, Document & document);
 		inline void Add(const char* key, int value) { this->append(key, value);}
 		inline void Add(const char* key, bool value) { this->append(key, value);}
 		inline void Add(const char* key, double value){ this->append(key, value);}
 		inline void Add(const char* key, long long value){ this->append(key, value);}
 		inline void Add(const char* key, const char * value){ this->append(key, value);}
+		inline void Add(const char* key, unsigned int value){ this->append(key, value);}
 		inline void Add(const char* key, const std::string & value){ this->append(key, value);}
-	 public:
+		inline void Add(const char* key, const char * str, size_t size){ this->append(key, str, size + 1);}
+	public:
 		int GetStreamLength();
 		bool WriterToStream(std::ostream& os);
+		bool WriterToBson(const char * key,	Bson::Document & document,  const rapidjson::Value & jsonValue);
 	};
 
 	class ReaderDocument : protected _bson::bsonobj
@@ -67,7 +92,6 @@ namespace Bson
 
 		bool Get(const char* key, std::string& value) const;
 
-		const std::string ToString() const { return this->toString(); }
 	private:
 		void WriterToJson(const _bson::bsonelement & bsonelement, Json::Writer & json);
 	};

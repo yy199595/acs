@@ -83,7 +83,7 @@ namespace Sentry
 	void ServiceMgrComponent::OnComplete()//通知其他服务器 我加入了
 	{
 		Json::Writer json;
-		json << "services" << Json::JsonType::StartArray;
+		json.BeginArray("services");
 		std::vector<ServiceComponent*> components;
 		this->GetApp()->GetServices(components);
 		for (ServiceComponent* component: components)
@@ -93,7 +93,7 @@ namespace Sentry
 				json << component->GetName();
 			}
 		}
-		json << Json::JsonType::EndArray;
+		json << Json::End::EndArray;
 		json << "address" << this->mRpcAddress;
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
 		if(!this->mRedisComponent->Call("main", "node.register", json, response))
@@ -170,14 +170,14 @@ namespace Sentry
 	bool ServiceMgrComponent::RefreshService()
 	{
 		Json::Writer json;
-		json << "services" << Json::JsonType::StartArray;
+		json.BeginArray("services");
 		std::vector<ServiceComponent*> components;
 		this->GetApp()->GetServices(components);
 		for (ServiceComponent* component: components)
 		{
 			json << component->GetName();
 		}
-		json << Json::JsonType::EndArray;
+		json << Json::End::EndArray;
 		json << "address" << this->mRpcAddress;
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
 		if (!this->mRedisComponent->Call("main", "node.refresh", json, response))

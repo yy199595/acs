@@ -71,9 +71,8 @@ namespace Sentry
 	const std::string RedisRequest::ToJson()
 	{
 		Json::Writer jsonWriter;
-		jsonWriter << this->mCommand << Json::JsonType::StartArray;
-		jsonWriter << this->mParameters << Json::JsonType::EndArray;
-		return jsonWriter.ToJsonString();
+		jsonWriter.BeginArray(this->mCommand.c_str()) << this->mParameters << Json::End::EndArray;
+		return jsonWriter.JsonString();
 	}
 
 	std::shared_ptr<RedisRequest> RedisRequest::MakeLua(const std::string& key, const std::string& func, const std::string & json)

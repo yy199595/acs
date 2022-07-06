@@ -14,12 +14,10 @@
 #include<rapidjson/stringbuffer.h>
 namespace Json
 {
-	enum class JsonType
+	enum class End
 	{
-		StartObject = 1,
-		StartArray = 2,
-		EndObject = 3,
-		EndArray = 4
+		EndArray,
+		EndObject,
 	};
 
 	class Writer : protected rapidjson::Writer<rapidjson::StringBuffer>
@@ -27,7 +25,12 @@ namespace Json
 	 public:
 		Writer(bool isObj = true);
 	public:
-		Writer& operator <<(JsonType type);
+		Writer & BeginArray();
+		Writer & BeginObject();
+		Writer & BeginArray(const char * key);
+		Writer & BeginObject(const char * key);
+
+		Writer& operator <<(Json::End type);
 		Writer & operator << (std::vector<int> & value);
 		Writer & operator << (std::list<std::string> & value);
 		Writer & operator << (std::vector<std::string> & value);
@@ -42,7 +45,7 @@ namespace Json
 		inline Writer& operator <<(const std::string & value) { this->String(value.c_str(), value.size()); return *this;}
 	 public:
 		size_t GetJsonSize();
-		const std::string ToJsonString();
+		const std::string JsonString();
 		size_t WriterStream(std::string& os);
 		size_t WriterStream(std::ostream& os);
 		void AddBinString(const char * str, size_t size);

@@ -23,6 +23,7 @@ namespace Mongo
 		std::string mUser;
 		std::string mPasswd;
 		unsigned short mPort;
+		std::string mFullName;
 	};
 }
 

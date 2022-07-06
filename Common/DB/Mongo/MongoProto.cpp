@@ -85,12 +85,13 @@ namespace Mongo
 		this->flag = 0;
 		this->numberToSkip  = 0;
 		this->numberToReturn = 1;
+		this->selector = nullptr;
 	}
 
 	int MongoQueryRequest::GetLength()
 	{
-		return sizeof(this->flag) + this->collectionName.size() + 1
-			   + sizeof(int) * 2 + this->document.GetStreamLength();
+		int size = this->selector != nullptr ? this->selector->GetStreamLength() : 0;
+		return sizeof(this->flag) + this->collectionName.size() + 1 + sizeof(int) * 2 + this->document.GetStreamLength() + size;
 	}
 	void MongoQueryRequest::OnWriter(std::ostream& os)
 	{
@@ -99,6 +100,12 @@ namespace Mongo
 		this->Write(os, this->numberToSkip);
 		this->Write(os, this->numberToReturn);
 		this->document.WriterToStream(os);
+		if(this->selector != nullptr)
+		{
+			this->selector->WriterToStream(os);
+		}
+		delete this->selector;
+		this->selector = nullptr;
 	}
 }
 

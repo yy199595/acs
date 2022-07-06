@@ -106,7 +106,8 @@ namespace Mongo
         int numberToSkip;
         int numberToReturn;
 		Bson::WriterDocument document;
-    };
+		Bson::WriterDocument * selector;
+	};
 
     class MongoQueryResponse
     {

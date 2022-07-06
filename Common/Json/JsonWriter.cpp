@@ -5,20 +5,40 @@
 
 namespace Json
 {
-	Writer& Writer::operator<<(JsonType type)
+	Writer& Writer::BeginArray(const char* key)
+	{
+		this->String(key);
+		this->StartArray();
+		return *this;
+	}
+
+	Writer& Writer::BeginArray()
+	{
+		this->StartArray();
+		return *this;
+	}
+
+	Writer& Writer::BeginObject()
+	{
+		this->StartObject();
+		return *this;
+	}
+
+	Writer& Writer::BeginObject(const char* key)
+	{
+		this->String(key);
+		this->StartObject();
+		return *this;
+	}
+
+	Writer& Writer::operator<<(Json::End type)
 	{
 		switch(type)
 		{
-		case JsonType::StartObject:
-			this->StartObject();
-			break;
-		case JsonType::EndObject:
+		case End::EndObject:
 			this->EndObject();
 			break;
-		case JsonType::StartArray:
-			this->StartArray();
-			break;
-		case JsonType::EndArray:
+		case End::EndArray:
 			this->EndArray();
 			break;
 		}
@@ -27,7 +47,6 @@ namespace Json
 
 	Writer& Writer::operator<<(std::vector<int>& value)
 	{
-		this->StartArray();
 		for(const int val : value)
 		{
 			this->Int(val);
@@ -38,23 +57,19 @@ namespace Json
 
 	Writer& Writer::operator<<(std::vector<std::string>& value)
 	{
-		this->StartArray();
 		for(const std::string & val : value)
 		{
 			this->String(val.c_str(), val.size());
 		}
-		this->EndArray();
 		return *this;
 	}
 
 	Writer& Writer::operator<<(std::list<std::string>& value)
 	{
-		this->StartArray();
 		for(const std::string & val : value)
 		{
 			this->String(val.c_str(), val.size());
 		}
-		this->EndArray();
 		return *this;
 	}
 }
@@ -74,7 +89,7 @@ namespace Json
 
 
 
-	const std::string Writer::ToJsonString()
+	const std::string Writer::JsonString()
 	{
 		if (this->IsComplete())
 		{

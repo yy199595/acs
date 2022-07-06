@@ -43,8 +43,9 @@ namespace Sentry
 		void OnDelTask(long long taskId, RpcTask task) final;
 	public:
 		bool Ping();
-		bool InsertOne(const std::string & tab, Bson::WriterDocument & document);
-		std::shared_ptr<Bson::ReaderDocument> QueryOnce(const std::string & tab, Bson::WriterDocument & document);
+		bool InsertOne(const std::string & tab, const std::string & json);
+		bool Update(const std::string & tab, const std::string & update, const std::string & selector);
+		std::shared_ptr<Bson::ReaderDocument> QueryOnce(const std::string & tab, const std::string & json);
 	 public:
 		void OnClientError(int index, XCode code);
 		std::shared_ptr<Bson::ReaderDocument> Run(std::shared_ptr<MongoQueryRequest> request, int flag = 0);
