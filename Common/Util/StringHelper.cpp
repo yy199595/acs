@@ -123,7 +123,12 @@ namespace Helper
 		std::unique_ptr<char[]> buffer(new char[size]);
 		for(size_t index = 0; index < size; index++)
 		{
-			buffer[index] = random() & 0XFF;
+#ifdef __OS_WIN__
+            buffer[index] = std::rand() & 0XFF;
+#else
+            buffer[index] = std::random() & 0XFF;
+#endif // __OS_WIN__
+
 			x ^= buffer[index];
 		}
 		if(x == 0)
