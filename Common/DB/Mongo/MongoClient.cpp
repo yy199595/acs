@@ -66,7 +66,7 @@ namespace Mongo
 			return;
 		}
 		const MongoHead& mongoHead = this->mMongoResponse.GetHead();
-		std::shared_ptr<Bson::ReaderDocument> res = this->mMongoResponse.OnReceiveBody(os);
+		std::shared_ptr<Bson::Read::Object> res = this->mMongoResponse.OnReceiveBody(os);
 #ifdef ONLY_MAIN_THREAD
 		this->mMongoComponent->OnResponse(mongoHead.responseTo, res);
 #else
@@ -120,7 +120,10 @@ namespace Mongo
 			CONSOLE_LOG_ERROR("connect mongo error");
 			return false;
 		}
-
+		if(this->mConfig.mPasswd.empty())
+		{
+			return true;
+		}
 		std::string nonce = _bson::base64::encode(Helper::String::RandomString(8));
 		std::shared_ptr<Mongo::MongoQueryRequest> request1(new MongoQueryRequest());
 		std::string firstBare = fmt::format("n={0},r={1}", this->mConfig.mUser, nonce);
@@ -152,7 +155,7 @@ namespace Mongo
 
 		int conversationId = 0;
 		std::string server_first;
-		std::shared_ptr<Bson::ReaderDocument> response1 = this->mMongoResponse.OnReceiveBody(readStream1);
+		std::shared_ptr<Bson::Read::Object> response1 = this->mMongoResponse.OnReceiveBody(readStream1);
 		if(response1 == nullptr || !response1->Get("payload", server_first) || !response1->Get("conversationId", conversationId))
 		{
 			return false;
@@ -206,7 +209,7 @@ namespace Mongo
 		{
 			return false;
 		}
-		std::shared_ptr<Bson::ReaderDocument> response2 = this->mMongoResponse.OnReceiveBody(readStream1);
+		std::shared_ptr<Bson::Read::Object> response2 = this->mMongoResponse.OnReceiveBody(readStream1);
 		if(response1 == nullptr || length <= sizeof(MongoHead) || response2 == nullptr)
 		{
 			return false;
@@ -238,7 +241,7 @@ namespace Mongo
 		{
 			return false;
 		}
-		std::shared_ptr<Bson::ReaderDocument> response3 = this->mMongoResponse.OnReceiveBody(readStream1);
+		std::shared_ptr<Bson::Read::Object> response3 = this->mMongoResponse.OnReceiveBody(readStream1);
 		std::string json2;
 		response3->WriterToJson(json2);
 		if(response3 == nullptr || !response3->IsOk())

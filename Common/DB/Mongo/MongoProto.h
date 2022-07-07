@@ -59,8 +59,8 @@ namespace Mongo
         int zero;
         std::string collectionName;
         int flag;
-        Bson::WriterDocument selector;
-		Bson::WriterDocument update;
+        Bson::Writer::Object selector;
+		Bson::Writer::Object update;
     };
 
     class MongoInsertRequest : public MongoRequest
@@ -76,7 +76,7 @@ namespace Mongo
     public:
         int zero;
         std::string collectionName;
-		Bson::WriterDocument document;
+		Bson::Writer::Object document;
     };
 
 	class MongoLuaRequest : public MongoRequest
@@ -105,8 +105,8 @@ namespace Mongo
         std::string collectionName;
         int numberToSkip;
         int numberToReturn;
-		Bson::WriterDocument document;
-		Bson::WriterDocument * selector;
+		Bson::Writer::Object document;
+		Bson::Writer::Object * selector;
 	};
 
     class MongoQueryResponse
@@ -117,7 +117,7 @@ namespace Mongo
     public:
         int OnReceiveHead(std::istream & stream);
 		const MongoHead & GetHead() const { return this->mHead;}
-		std::shared_ptr<Bson::ReaderDocument> OnReceiveBody(std::istream & stream);
+		std::shared_ptr<Bson::Read::Object> OnReceiveBody(std::istream & stream);
 	private:
         MongoHead mHead;
         int responseFlags;  // bit vector - see details below

@@ -117,7 +117,7 @@ namespace Mongo
         return this->mHead.messageLength;
     }
 
-	std::shared_ptr<Bson::ReaderDocument> MongoQueryResponse::OnReceiveBody(std::istream & os)
+	std::shared_ptr<Bson::Read::Object> MongoQueryResponse::OnReceiveBody(std::istream & os)
 	{
 		this->mBuffer.clear();
 		os.readsome((char*)&responseFlags, sizeof(responseFlags));
@@ -131,6 +131,6 @@ namespace Mongo
 			this->mBuffer.append(this->mReadBuffer, size);
 			size = os.readsome(this->mReadBuffer, 128);
 		}
-		return this->mBuffer.empty() ? nullptr : std::make_shared<Bson::ReaderDocument>(this->mBuffer.c_str());
+		return this->mBuffer.empty() ? nullptr : std::make_shared<Bson::Read::Object>(this->mBuffer.c_str());
 	}
 }

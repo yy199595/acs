@@ -158,31 +158,35 @@ namespace Sentry
 			CONSOLE_LOG_ERROR("connect redis [" << this->mConfig.Address << "] failure");
 			return false;
 		}
-		std::shared_ptr<RedisRequest> authCommand
-			= std::make_shared<RedisRequest>("AUTH");
-		authCommand->AddParameter(this->mConfig.Password);
-		std::shared_ptr<RedisResponse> response(new RedisResponse());
-		if(this->SendSync(authCommand) <= 0 || this->RecvLineSync() <= 0)
+		if(!this->mConfig.Password.empty())  //验证密码
 		{
-			return false;
+			std::shared_ptr<RedisRequest> authCommand
+					= std::make_shared<RedisRequest>("AUTH");
+			authCommand->AddParameter(this->mConfig.Password);
+			std::shared_ptr<RedisResponse> response(new RedisResponse());
+			if (this->SendSync(authCommand) <= 0 || this->RecvLineSync() <= 0)
+			{
+				return false;
+			}
+
+			std::istream& readStream = this->GetReadStream();
+			if (response->OnRecvLine(readStream) != 0 || !response->IsOk())
+			{
+				CONSOLE_LOG_ERROR("auth redis user faliure");
+				return false;
+			}
 		}
 
-		std::istream & readStream = this->GetReadStream();
-		if(response->OnRecvLine(readStream) != 0 || !response->IsOk())
-		{
-			CONSOLE_LOG_ERROR("auth redis user faliure");
-			return false;
-		}
-
+		//切换数据库
 		std::shared_ptr<RedisRequest> selectCommand
 			= std::make_shared<RedisRequest>("SELECT");
 		selectCommand->AddParameter(this->mConfig.Index);
-
 		if(this->SendSync(selectCommand) <= 0 || this->RecvLineSync() <= 0)
 		{
 			return false;
 		}
 
+		std::istream& readStream = this->GetReadStream();
 		std::shared_ptr<RedisResponse> response2(new RedisResponse());
 		if(response2->OnRecvLine(readStream) != 0 || !response2->IsOk())
 		{

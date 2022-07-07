@@ -38,19 +38,12 @@ namespace Sentry
     bool MessageComponent::Load(const std::string & path)
     {
         ImportError importError;
-		this->mMessageMap.clear();
-		for(DynamicMessageFactory * messageFactory : this->mDynamicMessageFactorys)
-		{
-			delete messageFactory;
-		}
-		delete this->mImporter;
-		delete this->mSourceTree;
+		this->mDynamicMessageMap.clear();
 		this->mDynamicMessageFactorys.clear();
 		this->mDynamicMessageFactory = nullptr;
-
-		this->mSourceTree = new compiler::DiskSourceTree();
+		this->mSourceTree = std::make_shared<compiler::DiskSourceTree>();
         this->mSourceTree->MapPath("", path);
-        this->mImporter = new compiler::Importer(this->mSourceTree, &importError);
+        this->mImporter = std::make_shared<compiler::Importer>(this->mSourceTree.get(), &importError);
         if (importError.HasError())
         {
             LOG_ERROR("load proto message [" << path << "] error");
@@ -68,7 +61,7 @@ namespace Sentry
 			return false;
 		}
 		LOG_INFO("import [" << fileName << "] successful");
-		this->mDynamicMessageFactory = new DynamicMessageFactory(fileDescriptor->pool());
+		this->mDynamicMessageFactory = std::make_shared<DynamicMessageFactory>(fileDescriptor->pool());
 		for(int x = 0; x < fileDescriptor->message_type_count(); x++)
 		{
 			const Descriptor * descriptor = fileDescriptor->message_type(x);
@@ -76,7 +69,7 @@ namespace Sentry
 			if(descriptor->field_count() > 0)
 			{
 				const Message * message = this->mDynamicMessageFactory->GetPrototype(descriptor);
-				this->mMessageMap.emplace(message->GetTypeName(), message);
+				this->mDynamicMessageMap.emplace(message->GetTypeName(), message);
 			}
 		}
 		this->mDynamicMessageFactorys.emplace_back(mDynamicMessageFactory);
@@ -93,7 +86,7 @@ namespace Sentry
 			{
 				const Message * message = this->mDynamicMessageFactory->GetPrototype(descriptor1);
 				LOG_DEBUG("add new dynamic message " <<  message->GetTypeName());
-				this->mMessageMap.emplace(message->GetTypeName(), message);
+				this->mDynamicMessageMap.emplace(message->GetTypeName(), message);
 			}
 			LOG_INFO("load protobuf message  [" << descriptor1->full_name() << "]");
 		}
@@ -147,8 +140,8 @@ namespace Sentry
 
     const Message * MessageComponent::FindMessage(const std::string &name)
     {
-        auto iter1 = this->mMessageMap.find(name);
-        if(iter1 != this->mMessageMap.end())
+        auto iter1 = this->mDynamicMessageMap.find(name);
+        if(iter1 != this->mDynamicMessageMap.end())
         {
             return iter1->second;
         }
@@ -162,7 +155,7 @@ namespace Sentry
             const Message *pMessage = factory->GetPrototype(pDescriptor);
             if(pMessage != nullptr)
             {
-                this->mMessageMap.emplace(name, pMessage);
+                this->mStaticMessageMap.emplace(name, pMessage);
                 return pMessage;
             }
             return nullptr;

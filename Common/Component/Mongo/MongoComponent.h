@@ -14,24 +14,24 @@ using namespace Mongo;
 
 namespace Sentry
 {
-	class MongoTask : public IRpcTask<Bson::ReaderDocument>
+	class MongoTask : public IRpcTask<Bson::Read::Object>
 	{
 	public:
 		MongoTask(int taskId);
 	public:
 		int GetTimeout() final { return 0;}
 		long long GetRpcId() final { return this->mTaskId; }
-		void OnResponse(std::shared_ptr<Bson::ReaderDocument> response) final;
-		std::shared_ptr<Bson::ReaderDocument> Await() { return mTask.Await(); }
+		void OnResponse(std::shared_ptr<Bson::Read::Object> response) final;
+		std::shared_ptr<Bson::Read::Object> Await() { return mTask.Await(); }
 	private:
 		int mTaskId;
-		TaskSource<std::shared_ptr<Bson::ReaderDocument>> mTask;
+		TaskSource<std::shared_ptr<Bson::Read::Object>> mTask;
 	};
 }
 
 namespace Sentry
 {
-	class MongoComponent : public RpcTaskComponent<Bson::ReaderDocument>, public IStart
+	class MongoComponent : public RpcTaskComponent<Bson::Read::Object>, public IStart
 	{
 	public:
 		MongoComponent() = default;
@@ -43,12 +43,13 @@ namespace Sentry
 		void OnDelTask(long long taskId, RpcTask task) final;
 	public:
 		bool Ping();
-		bool InsertOne(const std::string & tab, const std::string & json);
-		bool Update(const std::string & tab, const std::string & update, const std::string & selector);
-		std::shared_ptr<Bson::ReaderDocument> QueryOnce(const std::string & tab, const std::string & json);
+		bool DeleteOnce(const std::string & tab, const std::string & json);
+		bool InsertOnce(const std::string & tab, const std::string & json);
+		bool UpdateOnce(const std::string & tab, const std::string & update, const std::string & selector);
+		std::shared_ptr<Bson::Read::Object> QueryOnce(const std::string & tab, const std::string & json);
 	 public:
 		void OnClientError(int index, XCode code);
-		std::shared_ptr<Bson::ReaderDocument> Run(std::shared_ptr<MongoQueryRequest> request, int flag = 0);
+		std::shared_ptr<Bson::Read::Object> Run(std::shared_ptr<MongoQueryRequest> request, int flag = 0);
 	 private:
 		Mongo::Config mConfig;
 		TimerComponent * mTimerComponent;
