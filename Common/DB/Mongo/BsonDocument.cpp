@@ -143,12 +143,13 @@ namespace Bson
 			}
 			else if (jsonValue.IsInt64())
 			{
+				long long value = (long long)jsonValue.GetInt64();
 				if (document.IsObject())
 				{
-					document.Cast<Object>().Add(key, jsonValue.GetInt64());
+					document.Cast<Object>().Add(key, value);
 					return true;
 				}
-				document.Cast<Array>().Add(jsonValue.GetInt64());
+				document.Cast<Array>().Add(value);
 				return true;
 			}
 			else if (jsonValue.IsUint())
