@@ -80,9 +80,9 @@
         }
     },
     "lua": [
-        "Script/Common",
-        "Script/Server",
-        "Script/Client"
+        "script/Common",
+        "script/Server",
+        "script/Client"
     ],
     "component": [
         "HttpComponent",
