@@ -284,7 +284,7 @@ namespace Helper
 			sat_SHA1_Final(&ctx, rkey);
 			key_sz = SHA1_DIGEST_SIZE;
 		} else {
-			std::memcpy(rkey, key.c_str(), key_sz);
+			memcpy(rkey, key.c_str(), key_sz);
 		}
 
 		xor_key(rkey, 0x5c5c5c5c);
