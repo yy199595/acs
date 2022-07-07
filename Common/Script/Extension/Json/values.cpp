@@ -98,7 +98,12 @@ namespace values {
 		{
 			long long integer = 0;
 			return luax::isinteger(L, idx, &integer) ?
-				   rapidjson::Value((long long)integer) : rapidjson::Value(lua_tonumber(L, idx));
+#ifdef __OS_WIN__
+				   rapidjson::Value(integer) : rapidjson::Value(lua_tonumber(L, idx));
+#else
+				   rapidjson::Value((int64_t)integer) : rapidjson::Value(lua_tonumber(L, idx));
+
+#endif
 		}
 
 		Value StringValue(lua_State* L, int idx, Allocator& allocator) {
