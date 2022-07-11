@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.1.3)
 
 project(Sentry CXX C)
 include(./cmake/defina.cmake)
+include(./cmake/spdlog.cmake)
+
+include(./cmake/asio.cmake)
+include(./cmake/protobuf.cmake)
 include(./cmake/function.cmake)
 
 
@@ -69,12 +73,6 @@ endif()
 list(APPEND CommonFiles ${CommonSrc} ${ProtocolSrc})
 list(APPEND ServerFiles ${MainSource} ${LogicSource} ${GateSource})
 
-find_program(CCACHE_PROGRAM ccache)
-if (CCACHE_PROGRAM)
-    message("使用 ccache 作为编译缓存")
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
-endif()
-
 ADD_EXECUTABLE(Sentry ${AsmFiles} ${CommonFiles} ${ServerFiles})
 
 list(APPEND StaticLibs Lua53)
@@ -99,19 +97,14 @@ if(MSVC) #创建vs目录
     endforeach()
 endif()
 
-if(MSVC)
-    message("当前为win平台")
-    add_definitions(-D __OS_WIN__)
+if(__OS_WIN__)
     list(APPEND StaticLibs libprotobufd libmysql mysqlclient)
-elseif(APPLE)
-    message("当前为mac平台")
-    add_definitions(-D __OS_MAC__)
+elseif(__OS_MAC__)
     list(APPEND StaticLibs protobuf pthread mysqlclient)
 else()
-    message("当前为linux平台")
-    add_definitions(-D __OS_LINUX__)
     list(APPEND StaticLibs protobuf pthread mysqlclient yassl dl)
 endif()
+
 TARGET_LINK_LIBRARIES(Sentry ${StaticLibs})
 SET(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)

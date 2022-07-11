@@ -126,7 +126,7 @@ namespace Helper
 #ifdef __OS_WIN__
             buffer[index] = std::rand() & 0XFF;
 #else
-            buffer[index] = std::random() & 0XFF;
+            buffer[index] = random() & 0XFF;
 #endif // __OS_WIN__
 
 			x ^= buffer[index];
