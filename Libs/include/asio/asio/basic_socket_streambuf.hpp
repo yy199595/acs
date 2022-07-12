@@ -2,7 +2,7 @@
 // basic_socket_streambuf.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2022 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -530,7 +530,7 @@ protected:
       if (traits_type::eq_int_type(c, traits_type::eof()))
         return traits_type::not_eof(c);
 
-      // Save the new character to the output buffer.
+      // Add the new character to the output buffer.
       *pptr() = ch;
       pbump(1);
     }

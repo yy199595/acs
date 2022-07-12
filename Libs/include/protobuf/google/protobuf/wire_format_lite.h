@@ -366,13 +366,13 @@ class PROTOBUF_EXPORT WireFormatLite {
     return ReadMessage(input, value);
   }
 
-  // WriteFile a tag.  The WriteString*() functions typically include the tag, so
-  // normally there's no need to call this unless using the WriteString*NoTag()
+  // Write a tag.  The Write*() functions typically include the tag, so
+  // normally there's no need to call this unless using the Write*NoTag()
   // variants.
   INL static void WriteTag(int field_number, WireType type,
                            io::CodedOutputStream* output);
 
-  // WriteString fields, without tags.
+  // Write fields, without tags.
   INL static void WriteInt32NoTag(int32 value, io::CodedOutputStream* output);
   INL static void WriteInt64NoTag(int64 value, io::CodedOutputStream* output);
   INL static void WriteUInt32NoTag(uint32 value, io::CodedOutputStream* output);
@@ -392,7 +392,7 @@ class PROTOBUF_EXPORT WireFormatLite {
   INL static void WriteBoolNoTag(bool value, io::CodedOutputStream* output);
   INL static void WriteEnumNoTag(int value, io::CodedOutputStream* output);
 
-  // WriteString array of primitive fields, without tags
+  // Write array of primitive fields, without tags
   static void WriteFloatArray(const float* a, int n,
                               io::CodedOutputStream* output);
   static void WriteDoubleArray(const double* a, int n,
@@ -408,7 +408,7 @@ class PROTOBUF_EXPORT WireFormatLite {
   static void WriteBoolArray(const bool* a, int n,
                              io::CodedOutputStream* output);
 
-  // WriteString fields, including tags.
+  // Write fields, including tags.
   static void WriteInt32(int field_number, int32 value,
                          io::CodedOutputStream* output);
   static void WriteInt64(int field_number, int64 value,
@@ -475,7 +475,7 @@ class PROTOBUF_EXPORT WireFormatLite {
   INL static uint8* WriteTagToArray(int field_number, WireType type,
                                     uint8* target);
 
-  // WriteString fields, without tags.
+  // Write fields, without tags.
   INL static uint8* WriteInt32NoTagToArray(int32 value, uint8* target);
   INL static uint8* WriteInt64NoTagToArray(int64 value, uint8* target);
   INL static uint8* WriteUInt32NoTagToArray(uint32 value, uint8* target);
@@ -491,7 +491,7 @@ class PROTOBUF_EXPORT WireFormatLite {
   INL static uint8* WriteBoolNoTagToArray(bool value, uint8* target);
   INL static uint8* WriteEnumNoTagToArray(int value, uint8* target);
 
-  // WriteString fields, without tags.  These require that value.size() > 0.
+  // Write fields, without tags.  These require that value.size() > 0.
   template <typename T>
   INL static uint8* WritePrimitiveNoTagToArray(const RepeatedField<T>& value,
                                                uint8* (*Writer)(T, uint8*),
@@ -530,7 +530,7 @@ class PROTOBUF_EXPORT WireFormatLite {
   INL static uint8* WriteEnumNoTagToArray(const RepeatedField<int>& value,
                                           uint8* output);
 
-  // WriteString fields, including tags.
+  // Write fields, including tags.
   INL static uint8* WriteInt32ToArray(int field_number, int32 value,
                                       uint8* target);
   INL static uint8* WriteInt64ToArray(int field_number, int64 value,

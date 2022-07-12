@@ -2,7 +2,7 @@
 // detail/push_options.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2022 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -163,9 +163,9 @@
 //
 // Must remain the last #elif since some other vendors (Metrowerks, for example)
 // also #define _MSC_VER
-
 # pragma warning (disable:4103)
 # pragma warning (push)
+# pragma warning (disable:4619) // suppress 'there is no warning number XXXX'
 # pragma warning (disable:4127)
 # pragma warning (disable:4180)
 # pragma warning (disable:4244)

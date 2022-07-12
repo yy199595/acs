@@ -261,12 +261,12 @@ class PROTOBUF_EXPORT Descriptor {
   // available extensions of that message.
   const MessageOptions& options() const;
 
-  // WriteString the contents of this Descriptor into the given DescriptorProto.
+  // Write the contents of this Descriptor into the given DescriptorProto.
   // The target DescriptorProto must be clear before calling this; if it
   // isn't, the result may be garbage.
   void CopyTo(DescriptorProto* proto) const;
 
-  // WriteString the contents of this decriptor in a human-readable form. Output
+  // Write the contents of this decriptor in a human-readable form. Output
   // will be suitable for re-parsing.
   std::string DebugString() const;
 
@@ -1408,7 +1408,7 @@ class PROTOBUF_EXPORT FileDescriptor {
   // - This method does NOT copy source code information since it is relatively
   //   large and rarely needed.  See CopySourceCodeInfoTo() below.
   void CopyTo(FileDescriptorProto* proto) const;
-  // WriteString the source code information of this FileDescriptor into the given
+  // Write the source code information of this FileDescriptor into the given
   // FileDescriptorProto.  See CopyTo() above.
   void CopySourceCodeInfoTo(FileDescriptorProto* proto) const;
   // Fill the json_name field of FieldDescriptorProto for all fields. Can only
@@ -1759,7 +1759,7 @@ class PROTOBUF_EXPORT DescriptorPool {
   bool InternalIsFileLoaded(const std::string& filename) const;
 
 
-  // Save a file to unused_import_track_files_. DescriptorBuilder will log
+  // Add a file to unused_import_track_files_. DescriptorBuilder will log
   // warnings for those files if there is any unused import.
   void AddUnusedImportTrackFile(const std::string& file_name);
   void ClearUnusedImportTrackFiles();

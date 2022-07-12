@@ -8,7 +8,7 @@
 
 #include<vector>
 #include<sstream>
-#include"mysql.h"
+//#include"mysql.h"
 #include<memory>
 #include<unordered_map>
 #include"XCode/XCode.h"
@@ -20,8 +20,8 @@ namespace Sentry
 {
     class MysqlHelper;
 
-    typedef MYSQL_RES MysqlQueryResult;
-    typedef MYSQL MysqlSocket;
+   // typedef MYSQL_RES MysqlQueryResult;
+    //typedef MYSQL MysqlSocket;
 }
 
 namespace Sentry
@@ -34,13 +34,5 @@ namespace Sentry
 		unsigned int mPort;
 		std::string mUser;
 		std::string mPassword;
-	};
-
-	class MysqlAsyncTask
-	{
-	 public:
-		virtual XCode Await() = 0;
-		virtual void Run(MysqlSocket * mysql) = 0;
-		virtual bool Init() { return true;}
 	};
 }

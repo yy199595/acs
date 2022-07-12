@@ -1,43 +1,4 @@
 {
-    "MysqlService": {
-        "Type": "rpc",
-        "Add": {
-            "Async": true,
-            "Timeout": 0,
-            "Type": "Server",
-            "CallWay": "Net",
-            "Request": "s2s.Mysql.Add"
-        },
-        "Save": {
-            "Async": true,
-            "Timeout": 0,
-            "CallWay": "Net",
-            "Type": "Server",
-            "Request": "s2s.Mysql.Save"
-        },
-        "Delete": {
-            "Async": true,
-            "Timeout": 0,
-            "CallWay": "Net",
-            "Type": "Server",
-            "Request": "s2s.Mysql.Delete"
-        },
-        "Query": {
-            "Async": true,
-            "Timeout": 0,
-            "CallWay": "Net",
-            "Type": "Server",
-            "Request": "s2s.Mysql.Query",
-            "Response": "s2s.Mysql.Response"
-        },
-        "Update": {
-            "Async": true,
-            "Timeout": 0,
-            "CallWay": "Net",
-            "Type": "Server",
-            "Request": "s2s.Mysql.Update"
-        }
-    },
     "AccountService": {
         "Type": "http",
         "Login": {

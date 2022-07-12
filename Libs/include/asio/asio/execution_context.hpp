@@ -2,7 +2,7 @@
 // execution_context.hpp
 // ~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2022 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -262,7 +262,7 @@ public:
 
 #endif // defined(ASIO_HAS_VARIADIC_TEMPLATES)
 
-  /// (Deprecated: Use make_service().) Save a service object to the
+  /// (Deprecated: Use make_service().) Add a service object to the
   /// execution_context.
   /**
    * This function is used to add a service to the execution_context.

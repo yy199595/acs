@@ -2,7 +2,7 @@
 // time_traits.hpp
 // ~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2022 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -50,7 +50,7 @@ struct time_traits<boost::posix_time::ptime>
 #endif // defined(BOOST_DATE_TIME_HAS_HIGH_PRECISION_CLOCK)
   }
 
-  /// Save a duration to a time.
+  /// Add a duration to a time.
   static time_type add(const time_type& t, const duration_type& d)
   {
     return t + d;

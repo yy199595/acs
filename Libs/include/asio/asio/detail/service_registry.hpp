@@ -2,7 +2,7 @@
 // detail/service_registry.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2022 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -66,7 +66,7 @@ public:
   template <typename Service>
   Service& use_service(io_context& owner);
 
-  // Save a service object. Throws on error, in which case ownership of the
+  // Add a service object. Throws on error, in which case ownership of the
   // object is retained by the caller.
   template <typename Service>
   void add_service(Service* new_service);
@@ -131,7 +131,7 @@ private:
       const execution_context::service::key& key,
       factory_type factory, void* owner);
 
-  // Save a service object. Throws on error, in which case ownership of the
+  // Add a service object. Throws on error, in which case ownership of the
   // object is retained by the caller.
   ASIO_DECL void do_add_service(
       const execution_context::service::key& key,

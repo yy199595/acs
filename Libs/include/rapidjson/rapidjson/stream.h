@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 //
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -49,7 +49,7 @@ concept Stream {
     //! \return The begin writer pointer.
     Ch* PutBegin();
 
-    //! WriteString a character.
+    //! Write a character.
     void Put(Ch c);
 
     //! Flush the buffer.
@@ -86,7 +86,7 @@ inline void PutReserve(Stream& stream, size_t count) {
     (void)count;
 }
 
-//! WriteString character to a stream, presuming buffer is reserved.
+//! Write character to a stream, presuming buffer is reserved.
 template<typename Stream>
 inline void PutUnsafe(Stream& stream, typename Stream::Ch c) {
     stream.Put(c);
@@ -195,7 +195,7 @@ struct GenericInsituStringStream {
     Ch Take() { return *src_++; }
     size_t Tell() { return static_cast<size_t>(src_ - head_); }
 
-    // WriteString
+    // Write
     void Put(Ch c) { RAPIDJSON_ASSERT(dst_ != 0); *dst_++ = c; }
 
     Ch* PutBegin() { return dst_ = src_; }

@@ -60,15 +60,15 @@ PROTOBUF_EXPORT extern ListValueDefaultTypeInternal _ListValue_default_instance_
 class Struct;
 class StructDefaultTypeInternal;
 PROTOBUF_EXPORT extern StructDefaultTypeInternal _Struct_default_instance_;
-class Struct_FieldGameKeeper_DoNotUse;
-class Struct_FieldGameKeeper_DoNotUseDefaultTypeInternal;
-PROTOBUF_EXPORT extern Struct_FieldGameKeeper_DoNotUseDefaultTypeInternal _Struct_FieldGameKeeper_DoNotUse_default_instance_;
+class Struct_FieldsEntry_DoNotUse;
+class Struct_FieldsEntry_DoNotUseDefaultTypeInternal;
+PROTOBUF_EXPORT extern Struct_FieldsEntry_DoNotUseDefaultTypeInternal _Struct_FieldsEntry_DoNotUse_default_instance_;
 class Value;
 class ValueDefaultTypeInternal;
 PROTOBUF_EXPORT extern ValueDefaultTypeInternal _Value_default_instance_;
 template<> PROTOBUF_EXPORT ::google::protobuf::ListValue* Arena::CreateMaybeMessage<::google::protobuf::ListValue>(Arena*);
 template<> PROTOBUF_EXPORT ::google::protobuf::Struct* Arena::CreateMaybeMessage<::google::protobuf::Struct>(Arena*);
-template<> PROTOBUF_EXPORT ::google::protobuf::Struct_FieldGameKeeper_DoNotUse* Arena::CreateMaybeMessage<::google::protobuf::Struct_FieldGameKeeper_DoNotUse>(Arena*);
+template<> PROTOBUF_EXPORT ::google::protobuf::Struct_FieldsEntry_DoNotUse* Arena::CreateMaybeMessage<::google::protobuf::Struct_FieldsEntry_DoNotUse>(Arena*);
 template<> PROTOBUF_EXPORT ::google::protobuf::Value* Arena::CreateMaybeMessage<::google::protobuf::Value>(Arena*);
 }  // namespace protobuf
 }  // namespace google
@@ -97,7 +97,7 @@ inline bool NullValue_Parse(
 }
 // ===================================================================
 
-class Struct_FieldGameKeeper_DoNotUse : public ::google::protobuf::internal::MapEntry<Struct_FieldGameKeeper_DoNotUse,
+class Struct_FieldsEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<Struct_FieldsEntry_DoNotUse, 
     ::std::string, ::google::protobuf::Value,
     ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
     ::google::protobuf::internal::WireFormatLite::TYPE_MESSAGE,
@@ -106,15 +106,15 @@ public:
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 static bool _ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
 #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  typedef ::google::protobuf::internal::MapEntry<Struct_FieldGameKeeper_DoNotUse,
+  typedef ::google::protobuf::internal::MapEntry<Struct_FieldsEntry_DoNotUse, 
     ::std::string, ::google::protobuf::Value,
     ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
     ::google::protobuf::internal::WireFormatLite::TYPE_MESSAGE,
     0 > SuperType;
-  Struct_FieldGameKeeper_DoNotUse();
-  Struct_FieldGameKeeper_DoNotUse(::google::protobuf::Arena* arena);
-  void MergeFrom(const Struct_FieldGameKeeper_DoNotUse& other);
-  static const Struct_FieldGameKeeper_DoNotUse* internal_default_instance() { return reinterpret_cast<const Struct_FieldGameKeeper_DoNotUse*>(&_Struct_FieldGameKeeper_DoNotUse_default_instance_); }
+  Struct_FieldsEntry_DoNotUse();
+  Struct_FieldsEntry_DoNotUse(::google::protobuf::Arena* arena);
+  void MergeFrom(const Struct_FieldsEntry_DoNotUse& other);
+  static const Struct_FieldsEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const Struct_FieldsEntry_DoNotUse*>(&_Struct_FieldsEntry_DoNotUse_default_instance_); }
   void MergeFrom(const ::google::protobuf::Message& other) final;
   ::google::protobuf::Metadata GetMetadata() const;
 };
@@ -247,7 +247,7 @@ class PROTOBUF_EXPORT Struct :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   ::google::protobuf::internal::MapField<
-      Struct_FieldGameKeeper_DoNotUse,
+      Struct_FieldsEntry_DoNotUse,
       ::std::string, ::google::protobuf::Value,
       ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
       ::google::protobuf::internal::WireFormatLite::TYPE_MESSAGE,

@@ -109,7 +109,7 @@ class PROTOBUF_EXPORT ArenaImpl {
 
   void* AllocateAlignedAndAddCleanup(size_t n, void (*cleanup)(void*));
 
-  // Save object pointer and cleanup function pointer to the list.
+  // Add object pointer and cleanup function pointer to the list.
   void AddCleanup(void* elem, void (*cleanup)(void*));
 
  private:

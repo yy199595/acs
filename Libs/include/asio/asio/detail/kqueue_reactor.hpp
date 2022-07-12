@@ -2,7 +2,7 @@
 // detail/kqueue_reactor.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2022 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2005 Stefan Arentz (stefan at soze dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -154,7 +154,7 @@ public:
   ASIO_DECL void cleanup_descriptor_data(
       per_descriptor_data& descriptor_data);
 
-  // Save a new timer queue to the reactor.
+  // Add a new timer queue to the reactor.
   template <typename Time_Traits>
   void add_timer_queue(timer_queue<Time_Traits>& queue);
 

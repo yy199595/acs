@@ -116,7 +116,7 @@ struct PROTOBUF_EXPORT FieldMetadata {
 };
 
 
-// TODO(ckennelly):  Save a static assertion to ensure that these masks do not
+// TODO(ckennelly):  Add a static assertion to ensure that these masks do not
 // conflict with wiretypes.
 
 // ParseTableField is kept small to help simplify instructions for computing

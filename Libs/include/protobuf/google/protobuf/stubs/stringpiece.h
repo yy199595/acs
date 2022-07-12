@@ -121,7 +121,7 @@
 //
 // Suppose you want to write:
 //   bool TestWhat?(StringPiece sp) { return sp == nullptr; }  // BAD
-// Do not do that.  WriteString one of these instead:
+// Do not do that.  Write one of these instead:
 //   bool TestNull(StringPiece sp) { return sp.data() == nullptr; }
 //   bool TestEmpty(StringPiece sp) { return sp.empty(); }
 // The intent of TestWhat? is unclear.  Did you mean TestNull or TestEmpty?

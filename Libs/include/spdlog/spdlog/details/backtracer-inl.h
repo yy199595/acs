@@ -4,7 +4,7 @@
 #pragma once
 
 #ifndef SPDLOG_HEADER_ONLY
-#include "spdlog/details/backtracer.h"
+#    include <spdlog/details/backtracer.h>
 #endif
 namespace spdlog {
 namespace details {
@@ -26,7 +26,7 @@ SPDLOG_INLINE backtracer &backtracer::operator=(backtracer other)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     enabled_ = other.enabled();
-    messages_ = other.messages_;
+    messages_ = std::move(other.messages_);
     return *this;
 }
 

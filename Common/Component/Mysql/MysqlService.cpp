@@ -33,19 +33,7 @@ namespace Sentry
 
 	bool MysqlService::OnStart()
 	{
-		std::string address = fmt::format("{0}:{1}", this->mConfig.mIp, this->mConfig.mPort);
-		for(std::shared_ptr<MysqlClient> mysqlClient : this->mMysqlClients)
-		{
-			if(mysqlClient->Start() != 0)
-			{
-				LOG_ERROR("connect mysql [" << address << "] failure");
-				return false;
-			}
-			LOG_INFO("connect mysql [" << address << "] successful");
-		}
-		std::shared_ptr<MysqlTableTaskSource> tableTaskSource
-			= std::make_shared<MysqlTableTaskSource>("db.proto");
-		return this->GetMysqlClient()->Start(tableTaskSource) == XCode::Successful;
+        return  true;
 	}
 
 	std::shared_ptr<MysqlClient> MysqlService::GetMysqlClient(long long flag)
@@ -69,36 +57,26 @@ namespace Sentry
 
 	XCode MysqlService::Add(const s2s::Mysql::Add& request)
 	{
-		std::shared_ptr<Mysql::MysqlAddCommandTask> commandTask
-				= std::make_shared<Mysql::MysqlAddCommandTask>(request);
-		return this->GetMysqlClient()->Start(commandTask);
+        return XCode::Successful;
 	}
 
 	XCode MysqlService::Save(const s2s::Mysql::Save& request)
 	{
-		std::shared_ptr<Mysql::MysqlSaveCommandTask> commandTask
-				= std::make_shared<Mysql::MysqlSaveCommandTask>(request);
-		return this->GetMysqlClient()->Start(commandTask);
-	}
+        return XCode::Successful;
+    }
 
 	XCode MysqlService::Update(const s2s::Mysql::Update& request)
 	{
-		std::shared_ptr<Mysql::MysqlUpdateCommandTask> commandTask
-				= std::make_shared<Mysql::MysqlUpdateCommandTask>(request);
-		return this->GetMysqlClient()->Start(commandTask);
-	}
+        return XCode::Successful;
+    }
 
 	XCode MysqlService::Delete(const s2s::Mysql::Delete& request)
 	{
-		std::shared_ptr<Mysql::MysqlDeleteCommandTask> commandTask
-				= std::make_shared<Mysql::MysqlDeleteCommandTask>(request);
-		return this->GetMysqlClient()->Start(commandTask);
-	}
+        return XCode::Successful;
+    }
 
 	XCode MysqlService::Query(const s2s::Mysql::Query& request, s2s::Mysql::Response& response)
 	{
-		std::shared_ptr<Mysql::MysqlQueryCommandTask> commandTask
-				= std::make_shared<Mysql::MysqlQueryCommandTask>(request, response);
-		return this->GetMysqlClient()->Start(commandTask);
-	}
+        return XCode::Successful;
+    }
 }// namespace Sentry

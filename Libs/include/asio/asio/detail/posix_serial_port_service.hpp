@@ -2,7 +2,7 @@
 // detail/posix_serial_port_service.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2022 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2008 Rep Invariant Systems, Inc. (info@repinvariant.com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -152,10 +152,11 @@ public:
   {
     int result = ::tcsendbreak(descriptor_service_.native_handle(impl), 0);
     descriptor_ops::get_last_error(ec, result < 0);
+    ASIO_ERROR_LOCATION(ec);
     return ec;
   }
 
-  // WriteString the given data. Returns the number of bytes sent.
+  // Write the given data. Returns the number of bytes sent.
   template <typename ConstBufferSequence>
   size_t write_some(implementation_type& impl,
       const ConstBufferSequence& buffers, asio::error_code& ec)

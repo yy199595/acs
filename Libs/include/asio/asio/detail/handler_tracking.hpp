@@ -2,7 +2,7 @@
 // detail/handler_tracking.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2022 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -180,7 +180,7 @@ public:
       const tracked_handler& h, const char* op_name,
       const asio::error_code& ec, std::size_t bytes_transferred);
 
-  // WriteString a line of output.
+  // Write a line of output.
   ASIO_DECL static void write_line(const char* format, ...);
 
 private:

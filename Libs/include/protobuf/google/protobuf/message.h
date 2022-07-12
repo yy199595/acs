@@ -410,12 +410,12 @@ class MutableRepeatedFieldRef;
 // - The FieldDescriptor is not a field of this message type.
 // - The method called is not appropriate for the field's type.  For
 //   each field type in FieldDescriptor::TYPE_*, there is only one
-//   Get*() method, one Set*() method, and one Save*() method that is
+//   Get*() method, one Set*() method, and one Add*() method that is
 //   valid for that type.  It should be obvious which (except maybe
 //   for TYPE_BYTES, which are represented using strings in C++).
 // - A Get*() or Set*() method for singular fields is called on a repeated
 //   field.
-// - GetRepeated*(), SetRepeated*(), or Save*() is called on a non-repeated
+// - GetRepeated*(), SetRepeated*(), or Add*() is called on a non-repeated
 //   field.
 // - The Message object passed to any method is not of the right type for
 //   this Reflection object (i.e. message.GetReflection() != reflection).
@@ -765,7 +765,7 @@ class PROTOBUF_EXPORT Reflection {
   virtual void AddEnum  (Message* message,
                          const FieldDescriptor* field,
                          const EnumValueDescriptor* value) const = 0;
-  // Save an integer value to a repeated enum field rather than
+  // Add an integer value to a repeated enum field rather than
   // EnumValueDescriptor. For proto3 this is just setting the enum field to the
   // value specified, for proto2 it's more complicated. If value is a known enum
   // value the field is set as usual. If the value is unknown then it is added
