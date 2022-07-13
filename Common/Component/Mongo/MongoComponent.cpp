@@ -12,7 +12,7 @@ namespace Sentry
 
 	}
 
-	void MongoTask::OnResponse(std::shared_ptr<Bson::Read::Object> response)
+	void MongoTask::OnResponse(std::shared_ptr<Mongo::MongoQueryResponse> response)
 	{
 		this->mTask.SetResult(response);
 	}
@@ -50,32 +50,17 @@ namespace Sentry
 			this->mMongoClients.emplace_back(mongoClientContext);
 		}
 
-		Json::Writer json1;
-		json1 << "_id" << 445;
+        Json::Writer json1;
+        Json::Writer json2;
+        json2 << "_id" << 444;
+        json1.BeginArray("Blacks") << 1 << 2 << 3 << Json::End::EndArray;
 
-		this->DeleteOnce("user1", json1.JsonString());
-
-		Json::Writer jsonDocument1;
-		jsonDocument1 << "_id" << 445 << "age" << 10 << "name" << "yjz" << "height" << 175.5f;
-		jsonDocument1.BeginArray("arr") << 123 << 234 << 345 << 456 << Json::End::EndArray;
-		jsonDocument1.BeginObject("info") << "info1" << 12 << "info2" << "1122" << Json::End::EndObject;
-
-		this->InsertOnce("user1", jsonDocument1.JsonString());
-
-		Json::Writer jsonWriter;
-		jsonWriter << "_id" << 445;
-		this->QueryOnce("user1", jsonWriter.JsonString());
-
-		Json::Writer query;
-		query << "_id" << 445;
-		Json::Writer update;
-		update <<"age" << 20 << "name" << "yjz1995.." << Json::End::EndObject;
-		this->UpdateOnce("user1", update.JsonString(), query.JsonString());
+		this->Update("UserCpData", json1.JsonString(), json2.JsonString(), "$push");
 
 		return this->Ping();
 	}
 
-	bool MongoComponent::DeleteOnce(const std::string& tab, const std::string& json)
+	bool MongoComponent::Delete(const std::string& tab, const std::string& json, int limit)
 	{
 		Bson::Writer::Object document;
 		if(!document.FromByJson(json))
@@ -84,16 +69,15 @@ namespace Sentry
 		}
 		Bson::Writer::Object delDocument;
 		delDocument.Add("q", document);
-		delDocument.Add("limit", 1);
+		delDocument.Add("limit", limit);
 
-		Bson::Writer::Array documentArray;
-		documentArray.Add(delDocument);
+		Bson::Writer::Array documentArray(delDocument);
 		std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
 
 		mongoRequest->document.Add("delete", tab);
 		mongoRequest->document.Add("deletes", documentArray);
-		std::shared_ptr<Bson::Read::Object> response = this->Run(mongoRequest);
-		return response != nullptr && response->IsOk();
+		std::shared_ptr<Mongo::MongoQueryResponse> response = this->Run(mongoRequest);
+		return response != nullptr && response->GetDocumentSize() > 0 && response->Get().IsOk();
 	}
 
 	bool MongoComponent::InsertOnce(const std::string& tab, const std::string& json)
@@ -104,14 +88,13 @@ namespace Sentry
 		{
 			return false;
 		}
-		Bson::Writer::Array documentArray;
-		documentArray.Add(document);
+		Bson::Writer::Array documentArray(document);
 		std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
 
 		mongoRequest->document.Add("insert", tab);
 		mongoRequest->document.Add("documents", documentArray);
-		std::shared_ptr<Bson::Read::Object> response = this->Run(mongoRequest);
-		return response != nullptr && response->Get("n", res) && res > 0;
+		std::shared_ptr<MongoQueryResponse> response = this->Run(mongoRequest);
+		return response != nullptr && response->GetDocumentSize() > 0 && response->Get().Get("n", res) && res > 0;
 	}
 
 	void MongoComponent::OnDelTask(long long taskId, RpcTask task)
@@ -119,22 +102,18 @@ namespace Sentry
 		this->mRequestId.Push((int)taskId);
 	}
 
-	void MongoComponent::OnAddTask(RpcTaskComponent<Bson::Read::Object>::RpcTask task)
+	void MongoComponent::OnAddTask(RpcTaskComponent<Mongo::MongoQueryResponse>::RpcTask task)
 	{
 
 	}
 
-	std::shared_ptr<Bson::Read::Object> MongoComponent::Run(std::shared_ptr<MongoQueryRequest> request, int flag)
+	std::shared_ptr<Mongo::MongoQueryResponse> MongoComponent::Run(std::shared_ptr<MongoQueryRequest> request, int flag)
 	{
 		if (this->mMongoClients.empty())
 		{
 			return nullptr;
 		}
 		request->header.requestID = this->mRequestId.Pop();
-		if(request->numberToReturn == 0)
-		{
-			request->numberToReturn = 1;
-		}
 		if(request->collectionName.empty())
 		{
 			request->collectionName = this->mConfig.mDb + ".$cmd";
@@ -144,22 +123,32 @@ namespace Sentry
 		{
 			return nullptr;
 		}
-		long long t1 = Time::GetNowMilTime();
 		int index = flag % this->mMongoClients.size();
 		this->mMongoClients[index]->PushMongoCommand(request);
-		std::shared_ptr<Bson::Read::Object> readerDocument = mongoTask->Await();
-		if(readerDocument != nullptr)
+#ifdef __DEBUG__
+        long long t1 = Time::GetNowMilTime();
+        std::shared_ptr<Mongo::MongoQueryResponse> mongoResponse = mongoTask->Await();
+		if(mongoResponse != nullptr && mongoResponse->GetDocumentSize() > 0)
 		{
-			std::string json;
-			readerDocument->WriterToJson(json);
-			LOG_DEBUG( "[" << Time::GetNowMilTime() - t1 << "ms] response = " << json);
-			return readerDocument;
+            LOG_DEBUG( "[" << Time::GetNowMilTime() - t1 << "ms] document size = [" << mongoResponse->GetDocumentSize() << "]");
+            for(size_t i = 0; i < mongoResponse->GetDocumentSize(); i++)
+            {
+                std::string json;
+                mongoResponse->Get(i).WriterToJson(json);
+                LOG_DEBUG("[" << i << "] " << json);
+            }
+            return mongoResponse;
 		}
+
 		LOG_DEBUG( "[" << Time::GetNowMilTime() - t1 << "ms] response = null");
 		return nullptr;
+#else
+        return  mongoTask->Await();
+#endif
 	}
 
-	std::shared_ptr<Bson::Read::Object> MongoComponent::QueryOnce(const string& tab, const std::string & json)
+     // $gt:大于   $lt:小于  $gte:大于或等于  $lte:小于或等于 $ne:不等于
+	std::shared_ptr<MongoQueryResponse> MongoComponent::Query(const string& tab, const std::string & json, int limit)
 	{
 		std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest);
 		if(!mongoRequest->document.FromByJson(json))
@@ -167,11 +156,12 @@ namespace Sentry
 			LOG_ERROR(json << " to bson error");
 			return nullptr;
 		}
+        mongoRequest->numberToReturn = limit;
 		mongoRequest->collectionName = fmt::format("{0}.{1}", this->mConfig.mDb, tab);
 		return this->Run(mongoRequest);
 	}
 
-	bool MongoComponent::UpdateOnce(const std::string& tab, const std::string& update, const std::string& selector)
+	bool MongoComponent::Update(const std::string& tab, const std::string& update, const std::string& selector, const std::string & tag)
 	{
 		Bson::Writer::Object dataDocument;
 		if(!dataDocument.FromByJson(update))
@@ -184,7 +174,7 @@ namespace Sentry
 			return false;
 		}
 		Bson::Writer::Object updateDocument;
-		updateDocument.Add("$set", dataDocument);
+		updateDocument.Add(tag.c_str(), dataDocument);
 		std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest);
 
 		Bson::Writer::Object updateInfo;

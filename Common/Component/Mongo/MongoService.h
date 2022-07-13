@@ -11,11 +11,16 @@ namespace Sentry
 	class MongoService final : public LocalRpcService
 	{
 	public:
-		MongoService() = default;
+		MongoService();
 	private:
-		bool LateAwake() final;
 		bool OnStartService(ServiceMethodRegister &methodRegister) final;
-	 private:
+    private:
+        XCode Insert(const s2s::Mongo::Insert & request);
+        XCode Delete(const s2s::Mongo::Delete & request);
+        XCode Update(const s2s::Mongo::Update & request);
+        XCode Query(const s2s::Mongo::Query::Request & request, s2s::Mongo::Query::Response & response);
+    private:
+        std::string mBuffer;
 		class MongoComponent * mMongoComponent;
 	};
 }

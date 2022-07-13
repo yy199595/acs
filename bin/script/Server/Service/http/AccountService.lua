@@ -3,9 +3,7 @@ AccountService = {}
 
 local gateService
 local redisComponent
-local mysqlComponent
 function AccountService.Awake()
-    mysqlComponent = _G.MysqlComponent
     redisComponent = _G.RedisComponent
     gateService = App.GetComponent("GateService")
     return gateService ~= nil
@@ -22,13 +20,6 @@ function AccountService.Register(request)
     if user_id <= 0 then
         return XCode.Failure
     end
-    return mysqlComponent.Add("account.user_info", {
-        user_id = user_id,
-        register_time = os.time(),
-        account = requestInfo.account,
-        password = requestInfo.password,
-        phone_num = requestInfo.phone_num,
-    })
 end
 
 function AccountService.Login(request)

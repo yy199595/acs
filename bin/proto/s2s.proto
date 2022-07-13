@@ -50,6 +50,41 @@ message Mysql //mysql操作
     }
 }
 
+message Mongo
+{
+    message Insert
+    {
+        string tab = 1;
+        string json = 2;
+    }
+    message Query
+    {
+        message Request
+        {
+            string tab = 1;
+            string json = 2;
+            int32 limit = 3;
+        }
+        message Response
+        {
+            repeated string jsons = 1;
+        }
+    }
+    message Delete
+    {
+        string tab = 1;
+        string json = 2;
+        int32 limit = 3;
+    }
+    message Update
+    {
+        string tab = 1;
+        string select = 2;
+        string update = 3;
+        string tag = 4;
+    }
+}
+
 //网关
 
 message Allot

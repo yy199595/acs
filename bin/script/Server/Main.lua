@@ -17,7 +17,7 @@ function Main.Awake()
         print("--------------------")
     end)
 
-    local functions = Main.GetComponentFuncs("Awake")
+    local functions = Main.GetAllFunctions("Awake")
     for key, func in pairs(functions) do
         if not func() then
             Log.Error("Invoke [" .. key .. "] failure")
@@ -29,24 +29,18 @@ function Main.Awake()
    return true
 end
 
-function Main.GetComponentFuncs(func)
+function Main.GetAllFunctions(func)
     local functions = {}
-    for key, component in pairs(_G) do
-        if string.find(key, "Component")
-                or string.find(key,"Service") then
-            if type(component[func]) == "function" then
-                functions[string.format("%s.%s", key, func)] = component[func]
-            end
+    for _, obj in pairs(_G) do
+        if type(obj) == "table" and type(obj[func]) == "function" then
+                functions[string.format("%s.%s", key, func)] = obj[func]
         end
     end
     return functions
 end
 
 function Main.Start()
-    local redisComponent = RedisComponent
-    Log.Error(redisComponent.Lock("yjz", 10))
-    Log.Error(redisComponent.Run("main", "SET", "yjz", { name="yjz", age = 10 }))
-    local functions = Main.GetComponentFuncs("Start")
+    local functions = Main.GetAllFunctions("Start")
     for key, func in pairs(functions) do
         if not func() then
             Log.Error("Invoke [" .. key .. "] failure")
@@ -59,7 +53,7 @@ end
 
 function Main.Complete()
     coroutine.sleep(0.5)
-    local functions = Main.GetComponentFuncs("Complete")
+    local functions = Main.GetAllFunctions("Complete")
     for key, func in pairs(functions) do
         func()
         Log.Debug("Invoke [" .. key .. "] successful")
@@ -71,7 +65,7 @@ function Main.Hotfix()
 end
 
 function Main.AllServiceStart()
-    local functions = Main.GetComponentFuncs("AllServiceStart")
+    local functions = Main.GetAllFunctions("AllServiceStart")
     for key, func in pairs(functions) do
         func()
         Log.Debug("Invoke [" .. key .. "] successful")

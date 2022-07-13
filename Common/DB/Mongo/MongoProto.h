@@ -113,12 +113,14 @@ namespace Mongo
     {
     public:
         MongoQueryResponse() = default;
-
     public:
         int OnReceiveHead(std::istream & stream);
-		const MongoHead & GetHead() const { return this->mHead;}
-		std::shared_ptr<Bson::Read::Object> OnReceiveBody(std::istream & stream);
-	private:
+		size_t OnReceiveBody(std::istream & stream);
+        const MongoHead & GetHead() const { return this->mHead;}
+        size_t GetDocumentSize() const { return this->mDocuments.size();}
+        Bson::Read::Object & Get(size_t index = 0) const { return *this->mDocuments[index];}
+        Bson::Read::Object & operator[](size_t index) const { return *this->mDocuments[index];}
+    private:
         MongoHead mHead;
         int responseFlags;  // bit vector - see details below
         long long cursorID;       // cursor id if client needs to do get more's
@@ -126,6 +128,7 @@ namespace Mongo
         int numberReturned; // number of documents in the reply
 		std::string mBuffer;
 		char mReadBuffer[128];
+        std::vector<std::shared_ptr<Bson::Read::Object>> mDocuments;
     };
 }
 

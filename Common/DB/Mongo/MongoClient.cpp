@@ -15,7 +15,7 @@ namespace Mongo
 {
 	MongoClientContext::MongoClientContext(std::shared_ptr<SocketProxy> scoket,
 			const Mongo::Config& config, MongoComponent* component, int index)
-		: Tcp::TcpContext(scoket), mConfig(config), mMongoComponent(component), mIndex(index)
+		: Tcp::TcpContext(scoket, 1024 * 1024), mConfig(config), mMongoComponent(component), mIndex(index)
 	{
 
 	}
@@ -51,8 +51,8 @@ namespace Mongo
 			this->mMongoComponent->OnClientError(this->mIndex, XCode::NetReceiveFailure);
 #else
 			MainTaskScheduler& taskScheduler = App::Get()->GetTaskScheduler();
-			taskScheduler
-				.Invoke(&MongoComponent::OnClientError, this->mMongoComponent, this->mIndex, XCode::NetReceiveFailure);
+			taskScheduler.Invoke(&MongoComponent::OnClientError, this->mMongoComponent,
+                                 this->mIndex, XCode::NetReceiveFailure);
 #endif
 			CONSOLE_LOG_ERROR(code.message());
 			return;
@@ -61,19 +61,20 @@ namespace Mongo
 		if (this->mReadState == ReadType::HEAD)
 		{
 			this->mReadState = ReadType::BODY;
-			int length = mMongoResponse.OnReceiveHead(os);
+            this->mMongoResponse = std::make_shared<MongoQueryResponse>();
+			int length = this->mMongoResponse->OnReceiveHead(os);
 			this->ReceiveMessage(length - sizeof(MongoHead));
 			return;
 		}
-		const MongoHead& mongoHead = this->mMongoResponse.GetHead();
-		std::shared_ptr<Bson::Read::Object> res = this->mMongoResponse.OnReceiveBody(os);
+        this->mMongoResponse->OnReceiveBody(os);
+        int responseId = this->mMongoResponse->GetHead().responseTo;
+        std::shared_ptr<MongoQueryResponse> response = std::move(this->mMongoResponse);
 #ifdef ONLY_MAIN_THREAD
-		this->mMongoComponent->OnResponse(mongoHead.responseTo, res);
+		this->mMongoComponent->OnResponse(responseId, response);
 #else
 		MainTaskScheduler& taskScheduler = App::Get()->GetTaskScheduler();
-		taskScheduler.Invoke(&MongoComponent::OnResponse, this->mMongoComponent, mongoHead.responseTo, res);
+		taskScheduler.Invoke(&MongoComponent::OnResponse, this->mMongoComponent, responseId, response);
 #endif
-
 		if (!this->mCommands.empty())
 		{
 			this->Send(this->mCommands.front());
@@ -145,9 +146,9 @@ namespace Mongo
 		{
 			return false;
 		}
-
+        MongoQueryResponse response1;
 		std::istream & readStream1 = this->GetReadStream();
-		int length = this->mMongoResponse.OnReceiveHead(readStream1);
+		int length = response1.OnReceiveHead(readStream1);
 		if(this->RecvSync(length - sizeof(MongoHead)) <= 0)
 		{
 			return false;
@@ -155,8 +156,11 @@ namespace Mongo
 
 		int conversationId = 0;
 		std::string server_first;
-		std::shared_ptr<Bson::Read::Object> response1 = this->mMongoResponse.OnReceiveBody(readStream1);
-		if(response1 == nullptr || !response1->Get("payload", server_first) || !response1->Get("conversationId", conversationId))
+        if(response1.OnReceiveBody(readStream1) <= 0)
+        {
+            return false;
+        }
+		if(!response1[0].Get("payload", server_first) || !response1[0].Get("conversationId", conversationId))
 		{
 			return false;
 		}
@@ -203,24 +207,24 @@ namespace Mongo
 		{
 			return false;
 		}
+        MongoQueryResponse response2;
 
-		length = this->mMongoResponse.OnReceiveHead(readStream1);
+		length = response2.OnReceiveHead(readStream1);
 		if(this->RecvSync(length - sizeof(MongoHead)) <= 0)
 		{
 			return false;
 		}
-		std::shared_ptr<Bson::Read::Object> response2 = this->mMongoResponse.OnReceiveBody(readStream1);
-		if(response1 == nullptr || length <= sizeof(MongoHead) || response2 == nullptr)
-		{
-			return false;
-		}
-		parsedSource.clear();
-		if(!response2->Get("payload", parsedSource))
+        if(response2.OnReceiveBody(readStream1) <=0 )
+        {
+            return false;
+        }
+        parsedSource.clear();
+		if(!response2[0].Get("payload", parsedSource))
 		{
 			return false;
 		}
 		bool done = false;
-		if(response1->Get("done", done) && done)
+		if(response2[0].Get("done", done) && done)
 		{
 			return true;
 		}
@@ -235,20 +239,22 @@ namespace Mongo
 		{
 			return false;
 		}
-		length = this->mMongoResponse.OnReceiveHead(readStream1);
+        MongoQueryResponse response3;
+		length = response3.OnReceiveHead(readStream1);
 
 		if(this->RecvSync(length - sizeof(MongoHead)) <= 0)
 		{
 			return false;
 		}
-		std::shared_ptr<Bson::Read::Object> response3 = this->mMongoResponse.OnReceiveBody(readStream1);
-		std::string json2;
-		response3->WriterToJson(json2);
-		if(response3 == nullptr || !response3->IsOk())
+        if(response3.OnReceiveBody(readStream1) <=0)
+        {
+            return false;
+        }
+		if(!response3[0].IsOk())
 		{
 			return false;
 		}
-		return response3->Get("done", done) && done;
+		return response3[0].Get("done", done) && done;
 	}
 
 }

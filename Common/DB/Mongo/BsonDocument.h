@@ -30,7 +30,7 @@ namespace Bson
 		{
 		public:
 			Array() : mIndex(0) { }
-
+            Array(Document & document) : mIndex(0) { this->Add(document); }
 		public:
 			bool IsArray() final
 			{
@@ -165,6 +165,7 @@ namespace Bson
 
 			bool Get(const char* key, std::string& value) const;
 
+            int Length() const { return this->objsize();}
 		private:
 			void WriterToJson(const _bson::bsonelement& bsonelement, Json::Writer& json);
 		};

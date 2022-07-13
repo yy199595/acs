@@ -59,7 +59,28 @@
         }
     },
     "MongoService": {
-        "Type": "rpc"
+        "Type": "rpc",
+        "Insert": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "s2s.Mongo.Insert"
+        },
+        "Delete": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "s2s.Mongo.Delete"
+        },
+        "Query": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "s2s.Mongo.Query.Request",
+            "Response": "s2s.Mongo.Query.Response"
+        },
+        "Update": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "s2s.Mongo.Update"
+        }
     },
     "ChatService": {
         "Type": "rpc",
