@@ -20,6 +20,7 @@ if(WIN32)
 else()
     SET(AsmFiles ${ContextPath}/context.S)
 endif()
+MESSAGE(${AsmFiles})
 
 #第三方库包含
 include_directories(Libs/include/lua)
@@ -93,7 +94,7 @@ if(MSVC) #创建vs目录
     endforeach()
 endif()
 
-if(MSVC)
+if(WIN32)
     message("当前为win平台")
     add_definitions(-D __OS_WIN__)
     list(APPEND StaticLibs libprotobufd)

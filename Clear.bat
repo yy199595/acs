@@ -20,7 +20,6 @@ del /F /S /Q *.tlog
 del /F /S /Q *.sdf
 del /F /S /Q *.vcxproj
 del /F /S /Q *.filters
-del /F /S /Q *.cmake
 del /F /S /Q *.user
 del /F /S /Q *.sln
 rmdir /s/q .vs
