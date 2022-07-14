@@ -5,7 +5,11 @@ PROJECT(Server)
 set(CMAKE_CXX_STANDARD 11)
 include(CMake/define.cmake)
 include(CMake/proto.cmake)
-include(CMake/function.cmake)
+if(WIN32)
+
+else()
+    include(CMake/function.cmake)
+endif()
 message(${CMAKE_BINARY_DIR})
 
 set(ContextPath ${CMAKE_CURRENT_SOURCE_DIR}/Common/Coroutine/Context)
