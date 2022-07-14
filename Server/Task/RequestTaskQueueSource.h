@@ -5,7 +5,7 @@
 #ifndef _REQUESTTASKQUEUESOURCE_H_
 #define _REQUESTTASKQUEUESOURCE_H_
 #include"Async/TaskSource.h"
-#include"Protocol/c2s.pb.h"
+#include"Message/c2s.pb.h"
 namespace Sentry
 {
 	class RequestTaskQueueSource : public WaitTaskSourceBase

@@ -49,7 +49,7 @@ for index, content in ipairs(file_content) do
 end
 
 local lua_write = io.output("../script/Common/XCode.lua")
-local cpp_write = io.output("../../Generate/XCode/XCode.h")
+local cpp_write = io.output("../../Gen/XCode/XCode.h")
 local csharp_write = io.output("./XCode.cs")
 
 lua_write:write(string.format("%s%s%s", "XCode =\n{", lua_string, "\n}\nreturn XCode"))

@@ -4,10 +4,10 @@
 
 #include<XCode/XCode.h>
 #include<Entity/Object.h>
-#include<Protocol/db.pb.h>
-#include<Protocol/c2s.pb.h>
-#include<Protocol/com.pb.h>
-#include<Protocol/s2s.pb.h>
+#include<Message/db.pb.h>
+#include<Message/c2s.pb.h>
+#include<Message/com.pb.h>
+#include<Message/s2s.pb.h>
 #include<Define/CommonLogDef.h>
 #include<Method/EventMethod.h>
 #include<Define/CommonTypeDef.h>

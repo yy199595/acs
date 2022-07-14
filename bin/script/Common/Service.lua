@@ -1,5 +1,6 @@
 
 function RpcCall(func, id, request, taskSource)
+    table.print(request)
     local context = function(luaTaskSource)
         local state, error, response = pcall(func, id, request)
         if not state then
@@ -13,6 +14,7 @@ function RpcCall(func, id, request, taskSource)
 end
 
 function HttpCall(func, request, taskSource)
+    table.print(request)
     local context = function(luaTaskSource)
         local state, error, response = pcall(func, request)
         if not state then

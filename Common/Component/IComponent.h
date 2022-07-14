@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include<Thread/TaskThread.h>
-#include<Protocol/com.pb.h>
-#include"Protocol/c2s.pb.h"
+#include<Message/com.pb.h>
+#include"Message/c2s.pb.h"
 #include"XCode/XCode.h"
 #include"Json/JsonReader.h"
 #include"Json/JsonWriter.h"

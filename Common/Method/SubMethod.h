@@ -6,7 +6,7 @@
 #define GAMEKEEPER_SUBMETHOD_H
 #include<iostream>
 #include"XCode/XCode.h"
-#include"Protocol/com.pb.h"
+#include"Message/com.pb.h"
 #include"Define/CommonLogDef.h"
 #include<google/protobuf/message.h>
 

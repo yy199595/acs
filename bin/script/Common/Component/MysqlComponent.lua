@@ -2,16 +2,11 @@ MysqlComponent = {}
 
 local self
 local message
-function MysqlComponent.Awake()
-    self = App.GetComponent("MysqlService")
-    message = App.GetComponent("MessageComponent")
-    return self ~= nil and message ~= nil
-end
-
-function MysqlComponent.Start()
-    Log.Warning("mysql component start")
-    return true
-end
+--function MysqlComponent.Awake()
+--    self = App.GetComponent("MysqlService")
+--    message = App.GetComponent("MessageComponent")
+--    return self ~= nil and message ~= nil
+--end
 
 function MysqlComponent.Add(tabName, data, flag)
     assert(type(data) == "table")

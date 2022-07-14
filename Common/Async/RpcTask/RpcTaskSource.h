@@ -2,7 +2,7 @@
 #include<Script/LuaInclude.h>
 #include<XCode/XCode.h>
 #include<Util/NumberBuilder.h>
-#include<Protocol/com.pb.h>
+#include<Message/com.pb.h>
 #include"Coroutine/CoroutineDef.h"
 #include"Async/TaskSource.h"
 #include"Async/Lua/LuaWaitTaskSource.h"

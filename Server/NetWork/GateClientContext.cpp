@@ -3,7 +3,7 @@
 //
 
 #include"GateClientContext.h"
-#include"Protocol/c2s.pb.h"
+#include"Message/c2s.pb.h"
 #include"App/App.h"
 #ifdef __DEBUG__
 #include"google/protobuf/util/json_util.h"

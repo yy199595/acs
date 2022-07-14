@@ -73,7 +73,7 @@ namespace Client
 		{
 			return;
 		}
-		Lua::lua_getfunction(luaState, "Client", "Start");
+		Lua::lua_getfunction(luaState, "Client", "StartLogic");
 		if (!lua_isfunction(luaState, -1))
 		{
 			return;

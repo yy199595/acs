@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include<Component/Component.h>
 #include"Async/TaskSource.h"
-#include"Protocol/c2s.pb.h"
+#include"Message/c2s.pb.h"
 using namespace Sentry;
 using namespace google::protobuf;
 

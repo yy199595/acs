@@ -24,9 +24,6 @@ namespace Mongo
 	{
 		if (code)
 		{
-#ifdef __DEBUG__
-			CONSOLE_LOG_ERROR(code.message());
-#endif
 			this->ClearSendStream();
 			if(!this->StartAuthBySha1())
 			{

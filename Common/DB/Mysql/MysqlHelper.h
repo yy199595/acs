@@ -2,7 +2,7 @@
 
 #include"XCode/XCode.h"
 #include"Util/Guid.h"
-#include"Protocol/s2s.pb.h"
+#include"Message/s2s.pb.h"
 #include"rapidjson/document.h"
 #include"DB/Mysql/MysqlDefine.h"
 

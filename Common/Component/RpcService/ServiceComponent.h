@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include<memory>
-#include"Protocol/c2s.pb.h"
+#include"Message/c2s.pb.h"
 #include"Json/JsonWriter.h"
 #include"AddressProxy.h"
 #include"Component/Component.h"

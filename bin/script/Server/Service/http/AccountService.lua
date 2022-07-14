@@ -11,19 +11,29 @@ end
 
 function AccountService.Register(request)
 
-    table.print(request)
     local requestInfo = Json.Decode(request.data)
     assert(requestInfo.account, "register account is nil")
     assert(requestInfo.password, "register password is nil")
     assert(requestInfo.phone_num, "register phone number is nil")
-    local user_id = redisComponent.AddCounter("main", "user_id")
-    if user_id <= 0 then
-        return XCode.Failure
+
+    local userInfo = MongoComponent.QueryOnce("user_account", {
+        _id = requestInfo.account
+    })
+    if userInfo ~= nil then
+        return XCode.AccountAlreadyExists
     end
+
+    requestInfo.login_time = 0
+    requestInfo.login_token = ""
+    requestInfo.user_id = user_id
+    requestInfo.create_time = os.time()
+    requestInfo._id = requestInfo.account
+    requestInfo.address = StringUtil.ParseAddress(request.address)
+    return MongoComponent.InsertOnce("user_account", requestInfo)
 end
 
 function AccountService.Login(request)
-    table.print(request)
+
     local loginInfo = Json.Decode(request.data)
     assert(loginInfo, "request data error")
     assert(type(loginInfo.account) == "string", "user account is not string")

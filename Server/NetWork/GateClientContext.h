@@ -5,7 +5,7 @@
 #ifndef GAMEKEEPER_RPCPROXYCLIENT_H
 #define GAMEKEEPER_RPCPROXYCLIENT_H
 #include"Network/TcpContext.h"
-#include"Protocol/c2s.pb.h"
+#include"Message/c2s.pb.h"
 using namespace Tcp;
 using namespace google::protobuf;
 namespace Sentry

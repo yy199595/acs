@@ -2,15 +2,9 @@
 
 Main = {}
 
-function Main.Bson(str)
-    print("-------------")
-    local bson = Bson.Decode(str)
-    table.print(bson)
-    print("+++++++++++++++")
-end
 function Main.Awake()
     local messageComponent = App.GetComponent("MessageComponent")
-    messageComponent:Load("./proto");
+    messageComponent:Load("./proto/message");
     messageComponent:Import("test.proto")
     local timerComponent = App.GetComponent("TimerComponent")
     timerComponent:AddTimer(2000, function()
@@ -31,9 +25,11 @@ end
 
 function Main.GetAllFunctions(func)
     local functions = {}
-    for _, obj in pairs(_G) do
-        if type(obj) == "table" and type(obj[func]) == "function" then
+    for key, obj in pairs(_G) do
+        if obj ~= Main then
+            if type(obj) == "table" and type(obj[func]) == "function" then
                 functions[string.format("%s.%s", key, func)] = obj[func]
+            end
         end
     end
     return functions
@@ -71,3 +67,5 @@ function Main.AllServiceStart()
         Log.Debug("Invoke [" .. key .. "] successful")
     end
 end
+
+return Main

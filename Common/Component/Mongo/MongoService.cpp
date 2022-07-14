@@ -73,7 +73,7 @@ namespace Sentry
         const std::string & tab = request.tab();
         const std::string & json = request.json();
         std::shared_ptr<MongoQueryResponse> queryResponse = this->mMongoComponent->Query(tab, json, limit);
-        if(queryResponse->GetDocumentSize() <= 0)
+        if(queryResponse == nullptr || queryResponse->GetDocumentSize() <= 0)
         {
             return XCode::Failure;
         }

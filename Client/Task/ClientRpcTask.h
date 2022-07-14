@@ -1,6 +1,6 @@
 #pragma once
 #include<string>
-#include"Protocol/c2s.pb.h"
+#include"Message/c2s.pb.h"
 #include"Async/WaitTaskSourceBase.h"
 #include"google/protobuf/message.h"
 

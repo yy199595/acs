@@ -5,7 +5,7 @@
 #ifndef _PROTOMESSAGE_H_
 #define _PROTOMESSAGE_H_
 #include<ostream>
-#include<Protocol/com.pb.h>
+#include<Message/com.pb.h>
 
 namespace Tcp
 {

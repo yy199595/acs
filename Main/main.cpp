@@ -6,7 +6,6 @@
 #include<Network/Listener/TcpServerComponent.h>
 #include"Global/ServiceConfig.h"
 #include"Component/Redis/MainRedisComponent.h"
-#include"Component/Mysql/MysqlAgentComponent.h"
 #include"Component/Scene/EntityMgrComponent.h"
 #include"Component/Http/HttpComponent.h"
 #include"Component/Gate/GateService.h"
@@ -15,7 +14,6 @@
 #include<Component/Scene/NetThreadComponent.h>
 #include<Component/Rpc/RpcClientComponent.h>
 #include"Component/Logic/ServiceMgrComponent.h"
-#include"Component/Mysql/MysqlService.h"
 #include"Component/Scene/OperatorComponent.h"
 #include"Component/Scene/LoggerComponent.h"
 #include"Component/Gate/GateComponent.h"
@@ -63,7 +61,6 @@ void RegisterComponent()
 // db
 	ComponentFactory::Add<MongoComponent>("MongoComponent");
     ComponentFactory::Add<MainRedisComponent>("MainRedisComponent");
-	ComponentFactory::Add<MysqlAgentComponent>("MysqlAgentComponent");
 
 //http
     ComponentFactory::Add<HttpComponent>("HttpComponent");
@@ -81,7 +78,6 @@ void RegisterServiceComponent()
     ComponentFactory::Add<LocalLuaService>("rpc");
     ComponentFactory::Add<LocalLuaHttpService>("http");
     ComponentFactory::Add<GateService>("GateService");
-	ComponentFactory::Add<MysqlService>("MysqlService");
 	ComponentFactory::Add<MongoService>("MongoService");
 	ComponentFactory::Add<HttpSourceService>("HttpSourceService");
 }

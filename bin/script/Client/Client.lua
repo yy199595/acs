@@ -1,15 +1,6 @@
 
 Client = {}
 local messageComponent
-function Client.Awake()
-    messageComponent = App.GetComponent("MessageComponent")
-    local msg = messageComponent:New("c2s.GateAuth.Request", {
-        token = "112233"
-    })
-    print(msg, type(msg))
-
-    LoginComponent.Awake()
-end
 
 function Client.Test(tab)
     print(Json.Encode(tab))
@@ -19,7 +10,8 @@ local account = "yjz1995"
 local password = "123456"
 local phoneNum = 13716061995
 
-function Client.Start()
+
+function Client.StartLogic()
 
     local httpComponent = App.GetComponent("HttpComponent")
 
