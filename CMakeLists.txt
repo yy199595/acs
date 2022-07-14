@@ -4,11 +4,11 @@ cmake_minimum_required(VERSION 3.1.3)
 PROJECT(Server)
 set(CMAKE_CXX_STANDARD 11)
 include(CMake/define.cmake)
-include(CMake/proto.cmake)
+include(CMake/function.cmake)
 if(WIN32)
 
 else()
-    include(CMake/function.cmake)
+    include(CMake/proto.cmake)
 endif()
 message(${CMAKE_BINARY_DIR})
 
