@@ -24,11 +24,9 @@ namespace Sentry
 	}
 	TaskContext::~TaskContext()
 	{
-#ifndef __COROUTINE_BUFFER_STRING__
 		if (this->mStack.p)
 		{
 			free(this->mStack.p);
 		}
-#endif
 	}
 }

@@ -31,12 +31,8 @@ namespace Sentry
 		void Invoke();
 	 public:
 		int sid;
-		CorState mState;
-#ifdef __COROUTINE_BUFFER_STRING__
-        std::string mStack;
-#else
         Stack mStack;
-#endif
+        CorState mState;
         tb_context_t mContext;
 		CoroutineGroup* mGroup;
 		StaticMethod* mFunction;

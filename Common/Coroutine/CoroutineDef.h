@@ -28,7 +28,6 @@ namespace Sentry
 	public:
 		TaskContext * Pop();
 		void Push(TaskContext * coroutine);
-
     public:
         size_t GetMemorySize();
         size_t GetCorCount() { return this->mCorMap.size();}

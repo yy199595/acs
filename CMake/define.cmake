@@ -21,7 +21,6 @@ option(__ENABLE_MYSQL__ "是否使用mysql" ON)
 option(__ENABLE_MONGODB__ "是否使用mongodb" OFF)
 option(__ENABLE_MIMALLOC__ "启用mimalloc管理内存" OFF)
 option(__ENABLE_JEMALLOC__ "启用jemalloc管理内存" OFF)
-option(__COROUTINE_BUFFER_STRING__ "使用string作为协程栈" ON)
 
 if(__ENABLE_JEMALLOC__)
     message("启用jemalloc管理内存")

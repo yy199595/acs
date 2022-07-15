@@ -102,11 +102,7 @@ namespace Sentry
 		{
 			this->SaveStack(stack.co);
 			stack.co = co->mCoroutineId;
-#ifdef __COROUTINE_BUFFER_STRING__
-			memcpy(co->mContext, co->mStack.c_str(), co->mStack.size());
-#else
             memcpy(co->mContext, co->mStack.p, co->mStack.size);
-#endif
 		}
 		tb_context_from_t from = tb_context_jump(co->mContext, this);
 		if (from.priv != nullptr)
@@ -168,10 +164,6 @@ namespace Sentry
 		}
         char* top = this->mSharedStack[coroutine->sid].top;
 		const size_t size = top - (char*)coroutine->mContext;
-#ifdef __COROUTINE_BUFFER_STRING__
-        coroutine->mStack.clear();
-        coroutine->mStack.append((char*)coroutine->mContext, size);
-#else
         if (coroutine->mStack.size < size)
         {
             coroutine->mStack.p = (char*)realloc(coroutine->mStack.p, size);
@@ -179,7 +171,6 @@ namespace Sentry
         }
         coroutine->mStack.size = size;
         memcpy(coroutine->mStack.p, coroutine->mContext, coroutine->mStack.size);
-#endif
     }
 
 	void TaskComponent::OnSystemUpdate()
