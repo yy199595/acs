@@ -4,15 +4,17 @@
 #include<Util/FileHelper.h>
 #include<spdlog/fmt/fmt.h>
 #include"Util/DirectoryHelper.h"
-#include"Util/StringHelper.h"
 #include"Network/Listener/NetworkListener.h"
 namespace Sentry
 {
     ServerConfig::ServerConfig(int argc, char ** argv)
+        : mExePath(argv[0]), mWrokDir(getcwd(NULL, NULL))
     {
         this->mNodeId = 0;
-		this->mConfigPath = argv[1];
-		Helper::Directory::GetDirAndFileName(argv[0], this->mWrokDir, this->mExePath);
+        this->mWrokDir += "/";
+        this->mConfigPath = argv[1];
+        std::cout << "Exe Path : " << this->mExePath << std::endl;
+        std::cout << "Work Path : " << this->mWrokDir << std::endl;
     }
 
     bool ServerConfig::LoadConfig()
