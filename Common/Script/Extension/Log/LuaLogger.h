@@ -14,6 +14,6 @@ namespace Lua
 
 		extern int DebugWarning(lua_State* luaEnv);
 
-		extern std::string GetLuaString(lua_State* luaEnv);
+		extern void GetLuaString(lua_State* luaEnv, std::string & ret);
 	}
 }

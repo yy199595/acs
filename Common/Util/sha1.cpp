@@ -261,8 +261,7 @@ namespace Helper
 	}
 
 	void xor_key(unsigned char key[BLOCKSIZE], uint32_t xor1) {
-		int i;
-		for (i=0;i<BLOCKSIZE;i+=sizeof(uint32_t)) {
+		for (int i=0;i<BLOCKSIZE;i+=sizeof(uint32_t)) {
 			uint32_t * k = (uint32_t *)&key[i];
 			*k ^= xor1;
 		}

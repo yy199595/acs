@@ -11,7 +11,7 @@ namespace Lua
 {
 	namespace Log
 	{
-		extern std::string GetLuaString(lua_State* luaEnv)
+		extern void GetLuaString(lua_State* luaEnv, std::string & ret)
 		{
 			lua_Debug ar;
 			if (lua_getstack(luaEnv, 1, &ar) == 1)
@@ -34,36 +34,39 @@ namespace Lua
 					lua_pop(luaEnv, 1);
 					stringBuffer << str << " ";
 				}
-				return stringBuffer.str();
+				ret = stringBuffer.str();
 			}
-			return std::string();
 		}
 
 		int DebugLog(lua_State* luaEnv)
 		{
-			const std::string log = GetLuaString(luaEnv);
+			std::string log;
+			GetLuaString(luaEnv, log);
 			App::Get()->GetLogger()->AddLog(spdlog::level::debug, log);
 			return 0;
 		}
 
 		int DebugInfo(lua_State* luaEnv)
 		{
-			const std::string log = GetLuaString(luaEnv);
+			std::string log;
+			GetLuaString(luaEnv, log);
 			App::Get()->GetLogger()->AddLog(spdlog::level::info, log);
 			return 0;
 		}
 
 		int DebugError(lua_State* luaEnv)
 		{
-			const std::string log = GetLuaString(luaEnv);
+			std::string log;
+			GetLuaString(luaEnv, log);
 			App::Get()->GetLogger()->AddLog(spdlog::level::err, log);
 			return 0;
 		}
 
 		int DebugWarning(lua_State* luaEnv)
 		{
-			LoggerComponent* loggerComponent = App::Get()->GetLogger();
-			loggerComponent->AddLog(spdlog::level::warn, GetLuaString(luaEnv));
+			std::string log;
+			GetLuaString(luaEnv, log);
+			App::Get()->GetLogger()->AddLog(spdlog::level::warn, log);
 			return 0;
 		}
 	}
