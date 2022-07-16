@@ -34,20 +34,13 @@ namespace Sentry
         {
             return false;
         }
-        int offset = 0;
-        int threadId = 0;
-        std::string version;
-        long long randNum = 0;
         int index = readStream.get(); //序号
         int proto = readStream.get();
-        char cc = readStream.get();
-        while(cc != '\0')
-        {
-            version += cc;
-            cc = readStream.get();
-        }
-        readStream.readsome((char *)&threadId, sizeof(int));
-        readStream.readsome((char *)&randNum, sizeof(long long));
+		Tcp::ReadStreamHelper streamHelper(readStream);
+		std::string version = streamHelper.ReadString();
+		const int threadId = streamHelper.ReadByType<int>();
+		long long randNum = streamHelper.ReadByType<long long>();
+
         std::string str;
         char buffer[100] = {0};
         size_t size = readStream.readsome(buffer, 100);
