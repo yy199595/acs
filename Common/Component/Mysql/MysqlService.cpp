@@ -26,7 +26,7 @@ namespace Sentry
 
 		for (unsigned int index = 0; index < count; index++)
 		{
-			this->mMysqlClients.emplace_back(std::make_shared<MysqlClient>(this->mConfig));
+			//this->mMysqlClients.emplace_back(std::make_shared<MysqlClient>(this->mConfig));
 		}
 		return !this->mMysqlClients.empty();
 	}

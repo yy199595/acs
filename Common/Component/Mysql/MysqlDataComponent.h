@@ -2,12 +2,12 @@
 #include"google/protobuf/util/json_util.h"
 namespace Sentry
 {
-    class MysqlAgentComponent final : public Component
+    class MysqlDataComponent final : public Component
 	{
 	 public:
-		MysqlAgentComponent() = default;
-		~MysqlAgentComponent() final = default;
-		MysqlAgentComponent(const MysqlAgentComponent &) = delete;
+		MysqlDataComponent() = default;
+		~MysqlDataComponent() final = default;
+		MysqlDataComponent(const MysqlDataComponent &) = delete;
 
 	public:
 		XCode Add(const Message & data, long long flag = 0);
@@ -37,7 +37,7 @@ namespace Sentry
 	};
 
 	template<typename T>
-	std::vector<std::shared_ptr<T>>MysqlAgentComponent::QueryAll(const std::string& queryJson, long long flag)
+	std::vector<std::shared_ptr<T>>MysqlDataComponent::QueryAll(const std::string& queryJson, long long flag)
 	{
 		std::shared_ptr<T> queryData(new T());
 
@@ -66,14 +66,14 @@ namespace Sentry
 	}
 
 	template<typename T>
-	XCode MysqlAgentComponent::Delete(const std::string& deleteJson, long long flag)
+	XCode MysqlDataComponent::Delete(const std::string& deleteJson, long long flag)
 	{
         T data;
         return this->Delete(data.GetTypeName(), deleteJson, flag);
 	}
 
 	template<typename T>
-	XCode MysqlAgentComponent::Update(const std::string& updateJson, const std::string& whereJson, long long flag)
+	XCode MysqlDataComponent::Update(const std::string& updateJson, const std::string& whereJson, long long flag)
 	{
         T data;
         return this->Update(data.GetTypeName(), whereJson, updateJson, flag);

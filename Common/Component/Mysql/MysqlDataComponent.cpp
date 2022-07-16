@@ -1,16 +1,16 @@
-#include "MysqlAgentComponent.h"
+#include "MysqlDataComponent.h"
 
 #include"Util/StringHelper.h"
 #include"Component/Mysql/MysqlService.h"
 
 namespace Sentry
 {
-	bool MysqlAgentComponent::LateAwake()
+	bool MysqlDataComponent::LateAwake()
 	{
 		this->mMysqlService = this->GetComponent<MysqlService>();
 		return this->mMysqlService != nullptr;
 	}
-	XCode MysqlAgentComponent::Add(const Message& message, long long flage)
+	XCode MysqlDataComponent::Add(const Message& message, long long flage)
 	{
 		s2s::Mysql::Add request;
 		request.set_flag(flage);
@@ -19,7 +19,7 @@ namespace Sentry
 		return this->Call("Add", request);
 	}
 
-	XCode MysqlAgentComponent::Save(const Message & data, long long flag)
+	XCode MysqlDataComponent::Save(const Message & data, long long flag)
 	{
 		s2s::Mysql::Save request;
 		request.set_flag(flag);
@@ -28,7 +28,7 @@ namespace Sentry
 		return  this->Call("Save", request);
 	}
 
-    XCode MysqlAgentComponent::Delete(const std::string &table, const std::string &deleteJson, long long flag)
+    XCode MysqlDataComponent::Delete(const std::string &table, const std::string &deleteJson, long long flag)
     {
         s2s::Mysql::Delete request;
         request.set_table(table);
@@ -36,8 +36,8 @@ namespace Sentry
         return this->Call("Delete", request);
     }
 
-    XCode MysqlAgentComponent::Update(const std::string &table, const std::string &updateJson,
-                                      const std::string &whereJson, long long flag)
+    XCode MysqlDataComponent::Update(const std::string &table, const std::string &updateJson,
+                                     const std::string &whereJson, long long flag)
     {
         s2s::Mysql::Update request;
 
@@ -49,7 +49,7 @@ namespace Sentry
     }
 
 
-	XCode MysqlAgentComponent::Call(const std::string& func, const Message& data, std::shared_ptr<s2s::Mysql::Response> response)
+	XCode MysqlDataComponent::Call(const std::string& func, const Message& data, std::shared_ptr<s2s::Mysql::Response> response)
 	{
 		std::string address;
 		if(!this->mMysqlService->GetAddressProxy().GetAddress(address))
@@ -63,7 +63,7 @@ namespace Sentry
 		return this->mMysqlService->Call(address, func, data, response);
 	}
 
-	XCode MysqlAgentComponent::QueryOnce(const std::string& json, std::shared_ptr<Message> response, long long flag)
+	XCode MysqlDataComponent::QueryOnce(const std::string& json, std::shared_ptr<Message> response, long long flag)
 	{
 		s2s::Mysql::Query request;
 		request.set_flag(flag);

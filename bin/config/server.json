@@ -98,6 +98,7 @@
         "RpcHandlerComponent",
         "GateComponent",
         "MongoComponent",
+        "MysqlComponent",
         "GateClientComponent",
         "EntityMgrComponent",
         "GateAgentComponent",

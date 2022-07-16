@@ -14,6 +14,7 @@
 #include"Script/Extension/Coroutine/LuaCoroutine.h"
 #include"Component/RpcService/ServiceComponent.h"
 #include"Script/Extension/Json/Encoder.h"
+#include"Script/Extension/Util/Util.h"
 using namespace Lua;
 namespace Sentry
 {
@@ -87,7 +88,10 @@ namespace Sentry
 		luaRegister7.PushExtensionFunction("Encode", Lua::Json::Encode);
 		luaRegister7.PushExtensionFunction("Decode", Lua::Json::Decode);
 
-		if(lua_getfunction(this->mLuaEnv, "Main", "Awake"))
+        Lua::ClassProxyHelper luaRegister8(this->mLuaEnv, "Md5");
+        luaRegister8.PushExtensionFunction("ToString", Lua::Md5::ToString);
+
+        if(lua_getfunction(this->mLuaEnv, "Main", "Awake"))
 		{
 			if(lua_pcall(this->mLuaEnv, 0, 1, 0) != 0)
 			{

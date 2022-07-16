@@ -6,18 +6,20 @@
 #define SERVER_MYSQLCLIENT_H
 
 #include"MysqlDefine.h"
-#include"Thread/TaskThread.h"
-#include"Define/ThreadQueue.h"
-#include"Define/ThreadQueue.h"
-#include"Coroutine/CoroutineLock.h"
+#include"Network/TcpContext.h"
 namespace Sentry
 {
-	class MysqlClient
+    class MysqlComponent;
+    class MysqlClient : public Tcp::TcpContext
 	{
 	 public:
-		MysqlClient(MysqlConfig& config);
+		MysqlClient(std::shared_ptr<SocketProxy> socket,
+                    MysqlConfig& config, MysqlComponent * component);
+    private:
+        bool StartAuth();
 	 private:
 		const MysqlConfig& mConfig;
+        MysqlComponent * mComponent;
 	};
 }
 #endif //SERVER_MYSQLCLIENT_H

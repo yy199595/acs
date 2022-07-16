@@ -38,10 +38,10 @@ function AccountService.Login(request)
     assert(loginInfo, "request data error")
     assert(type(loginInfo.account) == "string", "user account is not string")
     assert(type(loginInfo.password) == "string", "user password is not string")
-    local userInfo = mysqlComponent.QueryOnce("account.user_info",{
-        account = loginInfo.account
+    local userInfo = MongoComponent.QueryOnce("user_account",{
+        _id = loginInfo.account
     })
-    Log.Warning(userInfo)
+    table.print(userInfo)
     if loginInfo.password ~= userInfo.password then
         return XCode.Failure
     end
@@ -53,7 +53,7 @@ function AccountService.Login(request)
         return XCode.AllotUser
     end
     local ip, _ = StringUtil.ParseAddress(request.address)
-    mysqlComponent.Update("account.user_info", { account = loginInfo.account },
+    MongoComponent.Update("account.user_info", { _id = loginInfo.account },
             {  last_login_time = os.time(), last_login_ip = ip,  token = response.token })
     return XCode.Successful, response
 end

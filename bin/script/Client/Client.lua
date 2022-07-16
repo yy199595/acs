@@ -1,6 +1,5 @@
 
 Client = {}
-local messageComponent
 
 function Client.Test(tab)
     print(Json.Encode(tab))
@@ -13,9 +12,8 @@ local phoneNum = 13716061995
 
 function Client.StartLogic()
 
-    local httpComponent = App.GetComponent("HttpComponent")
-
     local clientComponent = App.GetComponent("ClientComponent")
+    local messageComponent = App.GetComponent("MessageComponent")
 
     LoginComponent.Register(account, password, phoneNum)
 

@@ -4,13 +4,13 @@
 
 #include "DataMgrComponent.h"
 #include"Component/Redis/MainRedisComponent.h"
-#include"Component/Mysql/MysqlAgentComponent.h"
+#include"Component/Mysql/MysqlDataComponent.h"
 namespace Sentry
 {
 	bool DataMgrComponent::LateAwake()
 	{
 		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
-		this->mMysqlComponent = this->GetComponent<MysqlAgentComponent>();
+		this->mMysqlComponent = this->GetComponent<MysqlDataComponent>();
 		return true;
 	}
 
