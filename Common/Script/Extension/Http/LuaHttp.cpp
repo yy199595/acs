@@ -27,7 +27,7 @@ namespace Lua
 			luaL_error(lua, "url must string point");
 		}
 		size_t size = 0;
-		const char * str = lua_tolstring(lua, 2, &size);
+		const char * str = luaL_checklstring(lua, 2, &size);
 		HttpComponent* httpComponent = UserDataParameter::Read<HttpComponent*>(lua, 1);
 		std::shared_ptr<HttpGetRequest> getRequest = HttpGetRequest::Create(std::string(str, size));
 		if(getRequest == nullptr)
@@ -45,24 +45,8 @@ namespace Lua
 
 	int Http::Post(lua_State* lua)
 	{
-		if (!lua_isuserdata(lua, 1))
-		{
-			luaL_error(lua, "first parameter must httpComponent point");
-			return 0;
-		}
-		if (!lua_isstring(lua, 2))
-		{
-			luaL_error(lua, "url must string point");
-			return 0;
-		}
-		if (!lua_isstring(lua, 3))
-		{
-			luaL_error(lua, "content must string");
-			return 0;
-		}
-
 		size_t size = 0;
-		const char * str = lua_tolstring(lua, 2, &size);
+		const char * str = luaL_checklstring(lua, 2, &size);
 		TaskComponent* taskComponent = App::Get()->GetTaskComponent();
 		std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
 		HttpComponent* httpComponent = UserDataParameter::Read<HttpComponent*>(lua, 1);
@@ -72,7 +56,7 @@ namespace Lua
 			luaL_error(lua, "parse post url : [%s] failure", str);
 			return 0;
 		}
-		postRequest->AddBody(lua_tolstring(lua, 3, &size), size);
+		postRequest->AddBody(luaL_checklstring(lua, 3, &size), size);
         std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
         std::shared_ptr<LuaHttpTask> luaHttpTask = postRequest->MakeLuaTask(lua, 0);
 
@@ -83,25 +67,16 @@ namespace Lua
 
 	int Http::Download(lua_State* lua)
 	{
-		lua_pushthread(lua);
-		if (!lua_isuserdata(lua, 1))
-		{
-			luaL_error(lua, "first parameter must httpComponent point");
-			return 0;
-		}
-		if (!lua_isstring(lua, 2))
-		{
-			luaL_error(lua, "url must string point");
-			return 0;
-		}
-		if (!lua_isstring(lua, 3))
-		{
-			luaL_error(lua, "content must string");
-			return 0;
-		}
-		size_t size = 0;
-		const std::string url(lua_tolstring(lua, 2, &size));
-		const std::string path(lua_tolstring(lua, 3, &size));
+        HttpComponent* httpComponent = UserDataParameter::Read<HttpComponent*>(lua, 1);
+        if(httpComponent == nullptr)
+        {
+            return 0;
+        }
+
+        size_t size = 0;
+        lua_pushthread(lua);
+        const std::string url(luaL_checklstring(lua, 2, &size));
+		const std::string path(luaL_checklstring(lua, 3, &size));
 
 		std::string dir, fileName;
 		if(Helper::Directory::GetDirAndFileName(path, dir, fileName))
@@ -113,7 +88,6 @@ namespace Lua
 			}
 		}
 
-		HttpComponent* httpComponent = UserDataParameter::Read<HttpComponent*>(lua, 1);
 		std::shared_ptr<HttpGetRequest> getRequest = HttpGetRequest::Create(url);
 		if(getRequest == nullptr)
 		{

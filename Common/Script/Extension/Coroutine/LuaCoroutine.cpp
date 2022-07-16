@@ -15,7 +15,7 @@ namespace Lua
 			return 0;
 		}
 		lua_pushthread(lua);
-		float second = lua_tonumber(lua, 1);
+		float second = luaL_checknumber(lua, 1);
 		TimerComponent * timerComponent = App::Get()->GetTimerComponent();
 		std::shared_ptr<LuaWaitTaskSource> luaRpcTaskSource(new LuaWaitTaskSource(lua));
 		timerComponent->DelayCall(second, [luaRpcTaskSource]()

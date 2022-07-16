@@ -23,62 +23,52 @@ namespace Lua
 	{
 		template<> inline int Read(lua_State* lua, int index)
 		{
-			assert(lua_isinteger(lua, index));
-			return lua_tointeger(lua, index);
+            return luaL_checkinteger(lua, index);
 		}
 
 		template<> inline bool Read(lua_State* lua, int index)
 		{
-			assert(lua_isboolean(lua, index));
 			return (bool)lua_toboolean(lua, index);
 		}
 
 		template<> inline unsigned int Read(lua_State* lua, int index)
 		{
-			assert(lua_isinteger(lua, index));
-			return lua_tointeger(lua, index);
-		}
+            return luaL_checkinteger(lua, index);
+        }
 
 		template<> inline long long Read(lua_State* lua, int index)
 		{
-			assert(lua_isinteger(lua, index));
-			return lua_tointeger(lua, index);
-		}
+            return luaL_checkinteger(lua, index);
+        }
 		template<> inline unsigned long long Read(lua_State* lua, int index)
 		{
-			assert(lua_isinteger(lua, index));
-			return lua_tointeger(lua, index);
-		}
+            return luaL_checkinteger(lua, index);
+        }
 
 		template<> inline float Read(lua_State* lua, int index)
 		{
-			assert(lua_isnumber(lua, index));
-			return lua_tonumber(lua, index);
+            return (float)luaL_checknumber(lua, index);
 		}
 
 		template<> inline double Read(lua_State* lua, int index)
 		{
-			assert(lua_isnumber(lua, index));
-			return lua_tonumber(lua, index);
+            return luaL_checknumber(lua, index);
 		}
 
 		template<> inline const char* Read(lua_State* lua, int index)
 		{
-			assert(lua_isstring(lua, index));
-			return lua_tostring(lua, index);
+            return luaL_checkstring(lua, index);
 		}
 
 		template<> inline short Read(lua_State* lua, int index)
 		{
-			assert(lua_isinteger(lua, index));
-			return lua_tointeger(lua, index);
+            return (short )luaL_checkinteger(lua, index);
 		}
 
 		template<> inline unsigned short Read(lua_State* lua, int index)
 		{
-			assert(lua_isinteger(lua, index));
-			return lua_tointeger(lua, index);
-		}
+            return (unsigned short)luaL_checkinteger(lua, index);
+        }
 
 		template<> inline void Read(lua_State* lua, int index)
 		{

@@ -15,7 +15,7 @@ namespace Lua
 	int Timer::AddTimer(lua_State* lua)
     {
         TimerComponent *timerComponent = Lua::UserDataParameter::Read<TimerComponent *>(lua, 1);
-        unsigned int ms = Lua::Parameter::Read<unsigned int>(lua, 2);
+        unsigned int ms = (unsigned int)luaL_checkinteger(lua, 2); //Lua::Parameter::Read<unsigned int>(lua, 2);
         lua_pushvalue(lua, 3);
         if (!lua_isfunction(lua, -1))
         {
@@ -32,7 +32,7 @@ namespace Lua
 	int Timer::CancelTimer(lua_State* lua)
 	{
         TimerComponent *timerComponent = Lua::UserDataParameter::Read<TimerComponent *>(lua, 1);
-        unsigned int timerId = Lua::Parameter::Read<unsigned int>(lua, 2);
+        unsigned int timerId = (unsigned int) luaL_checkinteger(lua, 2);//Lua::Parameter::Read<unsigned int>(lua, 2);
 		Lua::Parameter::Write<bool>(lua, timerComponent->CancelTimer(timerId));
 		return 1;
 	}
