@@ -76,11 +76,11 @@ namespace Lua
 		struct ContainerStruct<std::vector<T>&>
 		{
 			//读的时候注意释放内存
-			static std::vector<T>& Read(lua_State* lua, int index)
-			{
-				assert(false);
-				return std::vector<T>();
-			}
+//			static std::vector<T>& Read(lua_State* lua, int index)
+//			{
+//				assert(false);
+//				return std::vector<T>();
+//			}
 
 			static void Write(lua_State* lua, std::vector<T>& data)
 			{

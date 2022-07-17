@@ -95,15 +95,15 @@ namespace Lua
 			return data;
 		}
 
-		template<>
-		inline const std::string& Read(lua_State* lua, int index)
-		{
-			size_t size = 0;
-			static std::string str = "";
-			assert(lua_isstring(lua, index));
-			str.assign(lua_tolstring(lua, index, &size), size);
-			return str;
-		}
+//		template<>
+//		inline const std::string& Read(lua_State* lua, int index)
+//		{
+//			size_t size = 0;
+//			static std::string str = "";
+//			assert(lua_isstring(lua, index));
+//			str.assign(lua_tolstring(lua, index, &size), size);
+//			return str;
+//		}
 
 		template<>
 		inline std::string Read(lua_State* lua, int index)
