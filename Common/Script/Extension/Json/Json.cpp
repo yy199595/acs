@@ -50,8 +50,6 @@ namespace Lua
 		default:
 			return luaL_argerror(lua, 1, "required string or lightuserdata (points to a memory of a string)");
 		}
-
-		rapidjson::extend::StringStream s(contents, len);
-		return values::pushDecoded(lua, s);
+		return values::pushDecoded(lua, contents, len);
 	}
 }
