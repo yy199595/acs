@@ -41,7 +41,7 @@ namespace Sentry
 		TimerComponent* mTimerComponent;
 		const struct RedisConfig* mConfig;
 		SharedRedisClient mSubRedisClient;
-		class RpcHandlerComponent* mRpcComponent;
+		class ServiceRpcComponent* mRpcTaskComponent;
 		std::unordered_map<std::string, long long> mLockTimers; //分布式锁的续命定时器
 		std::unordered_map<long long, std::shared_ptr<IRpcTask<RedisResponse>>> mTasks;
 	};

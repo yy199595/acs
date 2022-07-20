@@ -3,11 +3,11 @@
 //
 
 #include"MysqlClient.h"
-#include"Component/Mysql/MysqlComponent.h"
+#include"Component/Mysql/MysqlRpcComponent.h"
 namespace Sentry
 {
 	MysqlClient::MysqlClient(std::shared_ptr<SocketProxy> socket,
-                             MysqlConfig &config, MysqlComponent *component)
+                             MysqlConfig &config, MysqlRpcComponent *component)
 		: Tcp::TcpContext(socket), mConfig(config)
 	{
         this->mComponent = component;

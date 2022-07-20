@@ -6,7 +6,7 @@
 #include"App/App.h"
 #include"NetWork/GateClientContext.h"
 #include"GateComponent.h"
-#include"Component/Rpc/RpcHandlerComponent.h"
+#include"Component/Rpc/ServiceRpcComponent.h"
 #ifdef __DEBUG__
 #include"Util/StringHelper.h"
 #include"google/protobuf/util/json_util.h"
@@ -16,7 +16,6 @@ namespace Sentry
 {
 	void GateClientComponent::Awake()
 	{
-		this->mRpcComponent = nullptr;
 		this->mTimerComponent = nullptr;
 		this->mGateComponent = nullptr;
 	}
@@ -24,7 +23,6 @@ namespace Sentry
 	bool GateClientComponent::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(this->mTimerComponent = App::Get()->GetTimerComponent());
-		LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcHandlerComponent>());
 		LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<GateComponent>());
 		return true;
 	}

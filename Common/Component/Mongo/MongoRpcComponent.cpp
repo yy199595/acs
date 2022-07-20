@@ -2,7 +2,7 @@
 // Created by mac on 2022/6/28.
 //
 
-#include "MongoComponent.h"
+#include "MongoRpcComponent.h"
 #include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {
@@ -20,7 +20,7 @@ namespace Sentry
 
 namespace Sentry
 {
-	bool MongoComponent::LateAwake()
+	bool MongoRpcComponent::LateAwake()
 	{
 		const ServerConfig & config = this->GetApp()->GetConfig();
 		this->mTimerComponent = this->GetApp()->GetTimerComponent();
@@ -33,7 +33,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool MongoComponent::OnStart()
+	bool MongoRpcComponent::OnStart()
 	{
 		for (int index = 0; index < this->mConfig.mMaxCount; index++)
 		{
@@ -60,7 +60,7 @@ namespace Sentry
 		return this->Ping();
 	}
 
-	bool MongoComponent::Delete(const std::string& tab, const std::string& json, int limit)
+	bool MongoRpcComponent::Delete(const std::string& tab, const std::string& json, int limit)
 	{
 		Bson::Writer::Object document;
 		if(!document.FromByJson(json))
@@ -80,7 +80,7 @@ namespace Sentry
 		return response != nullptr && response->GetDocumentSize() > 0 && response->Get().IsOk();
 	}
 
-	bool MongoComponent::InsertOnce(const std::string& tab, const std::string& json)
+	bool MongoRpcComponent::InsertOnce(const std::string& tab, const std::string& json)
 	{
 		int res = 0;
 		Bson::Writer::Object document;
@@ -97,17 +97,17 @@ namespace Sentry
 		return response != nullptr && response->GetDocumentSize() > 0 && response->Get().Get("n", res) && res > 0;
 	}
 
-	void MongoComponent::OnDelTask(long long taskId, RpcTask task)
+	void MongoRpcComponent::OnDelTask(long long taskId, RpcTask task)
 	{
 		this->mRequestId.Push((int)taskId);
 	}
 
-	void MongoComponent::OnAddTask(RpcTaskComponent<Mongo::MongoQueryResponse>::RpcTask task)
+	void MongoRpcComponent::OnAddTask(RpcTaskComponent<Mongo::MongoQueryResponse>::RpcTask task)
 	{
 
 	}
 
-	std::shared_ptr<Mongo::MongoQueryResponse> MongoComponent::Run(std::shared_ptr<MongoQueryRequest> request, int flag)
+	std::shared_ptr<Mongo::MongoQueryResponse> MongoRpcComponent::Run(std::shared_ptr<MongoQueryRequest> request, int flag)
 	{
 		if (this->mMongoClients.empty())
 		{
@@ -148,7 +148,7 @@ namespace Sentry
 	}
 
      // $gt:大于   $lt:小于  $gte:大于或等于  $lte:小于或等于 $ne:不等于
-	std::shared_ptr<MongoQueryResponse> MongoComponent::Query(const string& tab, const std::string & json, int limit)
+	std::shared_ptr<MongoQueryResponse> MongoRpcComponent::Query(const string& tab, const std::string & json, int limit)
 	{
 		std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest);
 		if(!mongoRequest->document.FromByJson(json))
@@ -161,7 +161,7 @@ namespace Sentry
 		return this->Run(mongoRequest);
 	}
 
-	bool MongoComponent::Update(const std::string& tab, const std::string& update, const std::string& selector, const std::string & tag)
+	bool MongoRpcComponent::Update(const std::string& tab, const std::string& update, const std::string& selector, const std::string & tag)
 	{
 		Bson::Writer::Object dataDocument;
 		if(!dataDocument.FromByJson(update))
@@ -190,14 +190,14 @@ namespace Sentry
 		return this->Run(mongoRequest) != nullptr;
 	}
 
-	bool MongoComponent::Ping()
+	bool MongoRpcComponent::Ping()
 	{
 		std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
 		mongoRequest->document.Add("ping", 1);
 		return this->Run(mongoRequest) != nullptr;
 	}
 
-	void MongoComponent::OnClientError(int index, XCode code)
+	void MongoRpcComponent::OnClientError(int index, XCode code)
 	{
 
 	}

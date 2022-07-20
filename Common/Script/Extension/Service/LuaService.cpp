@@ -8,7 +8,7 @@
 #include"Script/Extension/Json/Json.h"
 #include"Async/RpcTask/RpcTaskSource.h"
 #include"Component/Scene/MessageComponent.h"
-#include"Component/Rpc/RpcHandlerComponent.h"
+#include"Component/Rpc/ServiceRpcComponent.h"
 using namespace Sentry;
 namespace Lua
 {
@@ -69,12 +69,12 @@ namespace Lua
 
 		lua_pushthread(lua);
 		std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource(new LuaRpcTaskSource(lua));
-		RpcHandlerComponent * rpcHandlerComponent = App::Get()->GetComponent<RpcHandlerComponent>();
+		ServiceRpcComponent * rpcHandlerComponent = App::Get()->GetComponent<ServiceRpcComponent>();
 
 
 		request->set_func(rpcInterfaceConfig->FullName);
 		request->set_rpc_id(luaRpcTaskSource->GetRpcId());
-		rpcHandlerComponent->AddRpcTask(luaRpcTaskSource);
+		rpcHandlerComponent->AddTask(luaRpcTaskSource);
 		if(callComponent->SendRequest(address, request) == XCode::Successful)
 		{
 

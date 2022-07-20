@@ -6,7 +6,7 @@ namespace Sentry
 {
 
 	class TaskComponent;
-	class RpcHandlerComponent;
+	class ServiceRpcComponent;
 	class ServiceMgrComponent : public NetEventComponent, public IComplete, public IServiceChange
 	{
 	 public:

@@ -7,7 +7,7 @@
 #include"DB/Redis/RedisClientContext.h"
 #include"Script/Extension/Redis/LuaRedis.h"
 #include"Component/Scene/NetThreadComponent.h"
-#include"Component/Rpc/RpcHandlerComponent.h"
+#include"Component/Rpc/ServiceRpcComponent.h"
 #include"Component/Scene/NetEventComponent.h"
 namespace Sentry
 {
@@ -17,7 +17,7 @@ namespace Sentry
 		this->mTaskComponent = this->GetComponent<TaskComponent>();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 		LOG_CHECK_RET_FALSE(this->GetComponent<NetThreadComponent>());
-		this->mRpcComponent = this->GetComponent<RpcHandlerComponent>();
+		this->mRpcTaskComponent = this->GetComponent<ServiceRpcComponent>();
 		this->GetConfig().GetListener("rpc", this->mRpcAddress);
 		return true;
 	}
@@ -165,7 +165,7 @@ namespace Sentry
 				return false;
 			}
 			assert(!request->address().empty());
-			this->mRpcComponent->OnRequest(request);
+			this->mRpcTaskComponent->OnRequest(request);
 			return true;
 		}
 		else if (message[0] == '-') //回复
@@ -178,7 +178,8 @@ namespace Sentry
 				LOG_ERROR("parse message error");
 				return false;
 			}
-			this->mRpcComponent->OnResponse(response);
+            long long taskId = response->rpc_id();
+			this->mRpcTaskComponent->OnResponse(taskId, response);
 			return true;
 		}
 		std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());

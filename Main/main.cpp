@@ -10,7 +10,7 @@
 #include"Component/Http/HttpComponent.h"
 #include"Component/Gate/GateService.h"
 #include<Component/Telnet/ConsoleComponent.h>
-#include<Component/Rpc/RpcHandlerComponent.h>
+#include<Component/Rpc/ServiceRpcComponent.h>
 #include<Component/Scene/NetThreadComponent.h>
 #include<Component/Rpc/RpcClientComponent.h>
 #include"Component/Logic/ServiceMgrComponent.h"
@@ -24,8 +24,8 @@
 #include"Component/Http/HttpHandlerComponent.h"
 #include"Component/Mongo/MongoService.h"
 #include"Component/HttpService/LocalLuaHttpService.h"
-#include"Component/Mongo/MongoComponent.h"
-#include"Component/Mysql/MysqlComponent.h"
+#include"Component/Mongo/MongoRpcComponent.h"
+#include"Component/Mysql/MysqlRpcComponent.h"
 #ifdef __ENABLE_CLIENT__
 #include"Component/ClientComponent.h"
 using namespace Client;
@@ -37,7 +37,7 @@ using namespace Sentry;
 void RegisterComponent()
 {
 // rpc
-    ComponentFactory::Add<RpcHandlerComponent>("RpcHandlerComponent");
+    ComponentFactory::Add<ServiceRpcComponent>("ServiceRpcComponent");
 	ComponentFactory::Add<ServiceMgrComponent>("ServiceMgrComponent");
 // common
     ComponentFactory::Add<TaskComponent>("TaskComponent");
@@ -60,8 +60,8 @@ void RegisterComponent()
 	ComponentFactory::Add<GateAgentComponent>("GateAgentComponent");
 	ComponentFactory::Add<GateClientComponent>("GateClientComponent");
 // db
-    ComponentFactory::Add<MysqlComponent>("MysqlComponent");
-	ComponentFactory::Add<MongoComponent>("MongoComponent");
+    ComponentFactory::Add<MysqlRpcComponent>("MysqlRpcComponent");
+	ComponentFactory::Add<MongoRpcComponent>("MongoRpcComponent");
     ComponentFactory::Add<MainRedisComponent>("MainRedisComponent");
 
 //http

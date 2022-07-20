@@ -3,7 +3,7 @@
 #include"App/App.h"
 #include"Util/StringHelper.h"
 #include"Network/SocketProxy.h"
-#include"Component/Rpc/RpcHandlerComponent.h"
+#include"Component/Rpc/ServiceRpcComponent.h"
 #include"Global/ServiceConfig.h"
 #include"Component/Scene/NetThreadComponent.h"
 
@@ -20,7 +20,7 @@ namespace Sentry
 	}
 	bool RpcClientComponent::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<RpcHandlerComponent>());
+		LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<ServiceRpcComponent>());
 		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<NetThreadComponent>());
 		return true;
 	}
@@ -83,7 +83,8 @@ namespace Sentry
 
 	void RpcClientComponent::OnResponse(std::shared_ptr<com::Rpc_Response> response)
 	{
-		this->mRpcComponent->OnResponse(response);
+        long long taskId = response->rpc_id();
+		this->mRpcComponent->OnResponse(taskId, response);
 	}
 
 	std::shared_ptr<ServerClientContext> RpcClientComponent::GetOrCreateSession(const std::string& address)

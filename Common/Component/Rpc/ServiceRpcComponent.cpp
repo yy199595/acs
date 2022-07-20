@@ -1,4 +1,4 @@
-﻿#include"RpcHandlerComponent.h"
+﻿#include"ServiceRpcComponent.h"
 #include"Component/Coroutine/TaskComponent.h"
 #include"Util/StringHelper.h"
 #include"App/App.h"
@@ -6,19 +6,17 @@
 #include"Global/ServiceConfig.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Other/ElapsedTimer.h"
-#include"Json/JsonWriter.h"
-#include"Async/RpcTask/RpcTaskSource.h"
 #include"Component/RpcService/LocalServiceComponent.h"
 namespace Sentry
 {
-	void RpcHandlerComponent::Awake()
+	void ServiceRpcComponent::Awake()
 	{
 		this->mTaskComponent = nullptr;
 		this->mTimerComponent = nullptr;
 		this->mRpcClientComponent = nullptr;
 	}
 
-	bool RpcHandlerComponent::LateAwake()
+	bool ServiceRpcComponent::LateAwake()
 	{
 		this->mTaskComponent = App::Get()->GetTaskComponent();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
@@ -27,7 +25,7 @@ namespace Sentry
 		return true;
 	}
 
-	XCode RpcHandlerComponent::OnRequest(std::shared_ptr<com::Rpc_Request> request)
+	XCode ServiceRpcComponent::OnRequest(std::shared_ptr<com::Rpc_Request> request)
 	{
 		if(!RpcServiceConfig::ParseFunName(request->func(), this->mTempService, this->mTempMethod))
 		{
@@ -100,48 +98,5 @@ namespace Sentry
 			return XCode::Successful;
 		});
 		return XCode::Successful;
-	}
-
-	XCode RpcHandlerComponent::OnResponse(std::shared_ptr<com::Rpc_Response> response)
-	{
-		long long rpcId = response->rpc_id();
-        std::shared_ptr<IRpcTask<com::Rpc::Response>> task = this->GetRpcTask(rpcId);
-        if(task != nullptr)
-        {
-            task->OnResponse(response);
-        }
-        return XCode::Successful;
-	}
-
-	void RpcHandlerComponent::AddRpcTask(std::shared_ptr<IRpcTask<com::Rpc::Response>> task)
-	{
-		long long rpcId = task->GetRpcId();
-		this->mRpcTasks.emplace(rpcId, task);
-		if (task->GetTimeout() > 0)
-		{
-			this->mTimerComponent->DelayCall(task->GetTimeout(),
-				&RpcHandlerComponent::OnTaskTimeout, this, rpcId);
-		}
-	}
-
-    std::shared_ptr<IRpcTask<com::Rpc::Response>> RpcHandlerComponent::GetRpcTask(long long rpcId)
-    {
-        auto iter = this->mRpcTasks.find(rpcId);
-        if (iter != this->mRpcTasks.end())
-        {
-            std::shared_ptr<IRpcTask<com::Rpc::Response>> task = iter->second;
-            this->mRpcTasks.erase(iter);
-            return task;
-        }
-        return nullptr;
-    }
-
-	void RpcHandlerComponent::OnTaskTimeout(long long int rpcId)
-	{
-        std::shared_ptr<IRpcTask<com::Rpc::Response>> task = this->GetRpcTask(rpcId);
-        if(task != nullptr)
-        {
-            task->OnResponse(nullptr);
-        }
 	}
 }// namespace Sentry

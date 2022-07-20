@@ -2,8 +2,8 @@
 // Created by mac on 2022/6/28.
 //
 
-#ifndef SERVER_MONGOCOMPONENT_H
-#define SERVER_MONGOCOMPONENT_H
+#ifndef SERVER_MONGORPCCOMPONENT_H
+#define SERVER_MONGORPCCOMPONENT_H
 #include"Util/NumberBuilder.h"
 #include"DB/Mongo/MongoProto.h"
 #include"DB/Mongo/MongoClient.h"
@@ -31,11 +31,11 @@ namespace Sentry
 
 namespace Sentry
 {
-	class MongoComponent : public RpcTaskComponent<Mongo::MongoQueryResponse>, public IStart
+	class MongoRpcComponent : public RpcTaskComponent<Mongo::MongoQueryResponse>, public IStart
 	{
 	public:
-		MongoComponent() = default;
-		~MongoComponent() = default;
+		MongoRpcComponent() = default;
+		~MongoRpcComponent() = default;
 	private:
 		bool OnStart() final;
 		bool LateAwake() final;
@@ -60,4 +60,4 @@ namespace Sentry
 }
 
 
-#endif //SERVER_MONGOCOMPONENT_H
+#endif //SERVER_MONGORPCCOMPONENT_H

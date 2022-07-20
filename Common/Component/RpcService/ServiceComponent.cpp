@@ -5,7 +5,7 @@
 #include"Util/StringHelper.h"
 #include"Async/RpcTask/RpcTaskSource.h"
 #include"Script/Extension/Service/LuaService.h"
-#include"Component/Rpc/RpcHandlerComponent.h"
+#include"Component/Rpc/ServiceRpcComponent.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #ifdef __RPC_DEBUG_LOG__
 #include<google/protobuf/util/json_util.h>
@@ -19,7 +19,7 @@ namespace Sentry
 	bool ServiceComponent::LateAwake()
 	{
 		assert(this->mConfig);
-		this->mRpcComponent = this->GetComponent<RpcHandlerComponent>();
+		this->mRpcComponent = this->GetComponent<ServiceRpcComponent>();
 		this->mClientComponent = this->GetComponent<RpcClientComponent>();
 		return this->GetConfig().GetListener("rpc", this->mLocalAddress);
 	}
@@ -175,7 +175,7 @@ namespace Sentry
 		std::shared_ptr<RpcTaskSource> taskSource =
 			std::make_shared<RpcTaskSource>();
 		request->set_rpc_id(taskSource->GetRpcId());
-		this->mRpcComponent->AddRpcTask(taskSource);
+		this->mRpcComponent->AddTask(taskSource);
 		if(this->SendRequest(address, request) != XCode::Successful)
 		{
 			return XCode::NetWorkError;

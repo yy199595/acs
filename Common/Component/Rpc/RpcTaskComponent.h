@@ -18,7 +18,6 @@ namespace Sentry
     public:
         bool AddTask(RpcTask task);
         bool OnResponse(long long taskId, std::shared_ptr<T> message);
-
 	protected:
 		virtual void OnAddTask(RpcTask task) { }
 		virtual void OnDelTask(long long taskId, RpcTask task) { }

@@ -9,12 +9,12 @@
 #include"Util/sha1.h"
 #include"Bson/base64.h"
 #include"Util/StringHelper.h"
-#include"Component/Mongo/MongoComponent.h"
+#include"Component/Mongo/MongoRpcComponent.h"
 
 namespace Mongo
 {
 	MongoClientContext::MongoClientContext(std::shared_ptr<SocketProxy> scoket,
-			const Mongo::Config& config, MongoComponent* component, int index)
+                                           const Mongo::Config& config, MongoRpcComponent* component, int index)
 		: Tcp::TcpContext(scoket, 1024 * 1024), mConfig(config), mMongoComponent(component), mIndex(index)
 	{
 
@@ -48,7 +48,7 @@ namespace Mongo
 			this->mMongoComponent->OnClientError(this->mIndex, XCode::NetReceiveFailure);
 #else
 			MainTaskScheduler& taskScheduler = App::Get()->GetTaskScheduler();
-			taskScheduler.Invoke(&MongoComponent::OnClientError, this->mMongoComponent,
+			taskScheduler.Invoke(&MongoRpcComponent::OnClientError, this->mMongoComponent,
                                  this->mIndex, XCode::NetReceiveFailure);
 #endif
 			CONSOLE_LOG_ERROR(code.message());
@@ -70,7 +70,7 @@ namespace Mongo
 		this->mMongoComponent->OnResponse(responseId, response);
 #else
 		MainTaskScheduler& taskScheduler = App::Get()->GetTaskScheduler();
-		taskScheduler.Invoke(&MongoComponent::OnResponse, this->mMongoComponent, responseId, response);
+		taskScheduler.Invoke(&MongoRpcComponent::OnResponse, this->mMongoComponent, responseId, response);
 #endif
 		if (!this->mCommands.empty())
 		{

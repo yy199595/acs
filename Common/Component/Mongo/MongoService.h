@@ -21,7 +21,7 @@ namespace Sentry
         XCode Query(const s2s::Mongo::Query::Request & request, s2s::Mongo::Query::Response & response);
     private:
         std::string mBuffer;
-		class MongoComponent * mMongoComponent;
+		class MongoRpcComponent * mMongoComponent;
 	};
 }
 

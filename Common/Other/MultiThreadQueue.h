@@ -19,8 +19,6 @@ namespace Sentry
 	public:
 		void Add(const T &item);
 
-		void AddRange(std::queue<T> &items);
-
 		bool PopItem(T &item);
 
 		void SwapQueueData();
@@ -46,26 +44,6 @@ namespace Sentry
 		mLock.unlock();
 #else
         mQeue.enqueue(item);
-#endif
-	}
-
-	template<typename T>
-	inline void MultiThreadQueue<T>::AddRange(std::queue<T> &item)
-	{
-#ifdef __THREAD_LOCK__
-		mLock.lock();
-		while (!item.empty())
-		{
-			mWriteQueue.emplace(item.front());
-			item.pop();
-		}
-		mLock.unlock();
-#else
-        while(!item.empty())
-        {
-            this->mQeue.enqueue(item.front());
-            item.pop();
-        }
 #endif
 	}
 

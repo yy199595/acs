@@ -6,13 +6,34 @@
 #ifndef GAMEKEEPER_PROTOPROXYCOMPONENT_H
 #define GAMEKEEPER_PROTOPROXYCOMPONENT_H
 #include"Component/Component.h"
-#include"Async/TaskSource.h"
+#include"Async/RpcTask/RpcTaskSource.h"
 #include"Task/RequestTaskQueueSource.h"
 
 namespace Sentry
 {
+    class GateClientComponent;
+    class ClientRpcTask : public IRpcTask<com::Rpc::Response>
+    {
+    public:
+        ClientRpcTask(const c2s::Rpc::Request & request, GateClientComponent * component);
+
+    public:
+        int GetTimeout() final { return 0; }
+        long long GetRpcId() final { return this->mTaskId; }
+    private:
+        void OnResponse(std::shared_ptr<Rpc_Response> response) final;
+    private:
+        long long mTaskId;
+        std::string mAddress;
+        GateClientComponent * mClientComponent;
+        std::shared_ptr<c2s::Rpc::Response> mResponse;
+    };
+}
+
+namespace Sentry
+{
 	class GateComponent final : public Component,
-						  public IClientRpc<c2s::Rpc_Request, c2s::Rpc_Response>
+        public IClientRpc<c2s::Rpc::Request, c2s::Rpc::Response>
 	{
 	 public:
 		GateComponent() = default;
@@ -30,7 +51,7 @@ namespace Sentry
 		class MessageComponent * mMsgComponent;
 		class UserSyncComponent * mUserSyncComponent;
 		class GateClientComponent* mGateClientComponent;
-	};
+    };
 }
 
 

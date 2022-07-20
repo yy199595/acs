@@ -9,17 +9,17 @@
 #include"Network/TcpContext.h"
 namespace Sentry
 {
-    class MysqlComponent;
+    class MysqlRpcComponent;
     class MysqlClient : public Tcp::TcpContext
 	{
 	 public:
 		MysqlClient(std::shared_ptr<SocketProxy> socket,
-                    MysqlConfig& config, MysqlComponent * component);
+                    MysqlConfig& config, MysqlRpcComponent * component);
     private:
         bool StartAuth();
 	 private:
 		const MysqlConfig& mConfig;
-        MysqlComponent * mComponent;
+        MysqlRpcComponent * mComponent;
 	};
 }
 #endif //SERVER_MYSQLCLIENT_H

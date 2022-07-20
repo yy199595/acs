@@ -38,7 +38,6 @@ namespace Sentry
 		std::set<std::string> mBlackList;
 		class GateComponent* mGateComponent;
 		class TimerComponent* mTimerComponent;
-		class RpcHandlerComponent* mRpcComponent;
 		std::unordered_map<std::string, long long> mUserAddressMap;
 		std::unordered_map<long long, std::string> mClientAddressMap;
 		std::unordered_map<std::string, std::shared_ptr<GateClientContext>> mGateClientMap;

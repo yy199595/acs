@@ -29,7 +29,7 @@ namespace Mongo
 
 namespace Sentry
 {
-	class MongoComponent;
+	class MongoRpcComponent;
 }
 
 namespace Mongo
@@ -38,7 +38,7 @@ namespace Mongo
 	{
 	 public:
 		MongoClientContext(std::shared_ptr<SocketProxy> scoket,
-				const Mongo::Config & config, MongoComponent * component, int index);
+                           const Mongo::Config & config, MongoRpcComponent * component, int index);
 	public:
 		void PushMongoCommand(std::shared_ptr<Tcp::ProtoMessage> request);
 	private:
@@ -50,7 +50,7 @@ namespace Mongo
 		int mIndex;
 		const Mongo::Config & mConfig;
 		asio::streambuf streamBuffer;
-		MongoComponent * mMongoComponent;
+		MongoRpcComponent * mMongoComponent;
         std::shared_ptr<MongoQueryResponse> mMongoResponse;
         std::list<std::shared_ptr<Tcp::ProtoMessage>> mCommands;
 	};

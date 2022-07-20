@@ -44,8 +44,8 @@ namespace Sentry
         const Message * FindMessage(const std::string & name);
         void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 	 public:
-        bool Load(const std::string path);
-		bool Import(const std::string proto);
+        bool Load(const char * path);
+		bool Import(const char * proto);
 	 private:
 		std::shared_ptr<compiler::Importer> mImporter;
 		std::shared_ptr<compiler::DiskSourceTree> mSourceTree;

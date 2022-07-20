@@ -36,7 +36,7 @@ namespace Sentry
 		this->mSourceTree = nullptr;
 	}
 
-    bool MessageComponent::Load(const std::string path)
+    bool MessageComponent::Load(const char * path)
     {
         ImportError importError;
 		this->mDynamicMessageMap.clear();
@@ -53,7 +53,7 @@ namespace Sentry
         return true;
     }
 
-	bool MessageComponent::Import(const std::string fileName)
+	bool MessageComponent::Import(const char * fileName)
 	{
 		const FileDescriptor * fileDescriptor = this->mImporter->Import(fileName);
 		if (fileDescriptor == nullptr)

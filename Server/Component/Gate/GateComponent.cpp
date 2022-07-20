@@ -6,18 +6,44 @@
 #include"App/App.h"
 #include"NetWork/GateClientContext.h"
 #include"Global/ServiceConfig.h"
-#include"Component/Rpc/RpcHandlerComponent.h"
+#include"Component/Rpc/ServiceRpcComponent.h"
 #include"GateClientComponent.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Component/RpcService/LocalServiceComponent.h"
-#ifdef __RPC_DEBUG_LOG__
+#ifdef __RPC_DEBUG_LOG__c
 #include"google/protobuf/util/json_util.h"
 #endif
 #include"GateService.h"
-#include"GateAgentComponent.h"
 #include"Component/User/UserSyncComponent.h"
 #include"Component/Redis/MainRedisComponent.h"
 #include"Component/Scene/MessageComponent.h"
+
+namespace Sentry
+{
+    ClientRpcTask::ClientRpcTask(const c2s::Rpc::Request &request, GateClientComponent * component)
+    {
+        this->mClientComponent = component;
+        this->mAddress = request.address();
+        this->mResponse = std::make_shared<c2s::Rpc::Response>();
+        this->mResponse->set_rpc_id(request.rpc_id());
+        this->mResponse->set_code((int)XCode::CallTimeout);
+    }
+
+    void ClientRpcTask::OnResponse(std::shared_ptr<Rpc_Response> response)
+    {
+        if(response != nullptr)
+        {
+            this->mResponse->set_code(response->code());
+            this->mResponse->set_error_str(response->error_str());
+            if (response->code() == (int) XCode::Successful && response->has_data())
+            {
+                this->mResponse->mutable_data()->CopyFrom(response->data());
+            }
+        }
+        this->mClientComponent->SendToClient(this->mAddress, this->mResponse);
+    }
+}
+
 namespace Sentry
 {
 

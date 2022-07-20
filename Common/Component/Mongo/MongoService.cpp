@@ -3,7 +3,7 @@
 //
 
 #include"MongoService.h"
-#include"MongoComponent.h"
+#include"MongoRpcComponent.h"
 namespace Sentry
 {
     MongoService::MongoService()
@@ -13,7 +13,7 @@ namespace Sentry
     }
 	bool MongoService::OnStartService(ServiceMethodRegister& methodRegister)
     {
-        this->mMongoComponent = this->GetComponent<MongoComponent>();
+        this->mMongoComponent = this->GetComponent<MongoRpcComponent>();
         methodRegister.Bind("Query", &MongoService::Query);
         methodRegister.Bind("Insert", &MongoService::Insert);
         methodRegister.Bind("Delete", &MongoService::Delete);
