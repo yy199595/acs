@@ -2,19 +2,19 @@
 // Created by zmhy0073 on 2022/6/21.
 //
 
-#ifndef SERVER_HTTPHANDLERCOMPONENT_H
-#define SERVER_HTTPHANDLERCOMPONENT_H
+#ifndef SERVER_HTTPSERVICECOMPONENT_H
+#define SERVER_HTTPSERVICECOMPONENT_H
 #include"Component/Component.h"
 #include"Component/Rpc/RpcTaskComponent.h"
 namespace Sentry
 {
     class HttpAsyncResponse;
     class HttpHandlerClient;
-    class HttpHandlerComponent : public Component, public ISocketListen
+    class HttpServiceComponent : public Component, public ISocketListen
     {
     public:
-        HttpHandlerComponent() = default;
-        ~HttpHandlerComponent() = default;
+        HttpServiceComponent() = default;
+        ~HttpServiceComponent() = default;
     public:
         void ClosetHttpClient(const std::string & address);
         void OnListen(std::shared_ptr<SocketProxy> socket) final;
@@ -23,9 +23,6 @@ namespace Sentry
         bool LateAwake() final;
         const HttpInterfaceConfig * GetConfig(const std::string & path);
     private:
-#ifndef ONLY_MAIN_THREAD
-        class NetThreadComponent* mThreadComponent;
-#endif
         TaskComponent * mTaskComponent;
         std::unordered_map<std::string, const HttpInterfaceConfig *> mHttpConfigs;
         std::unordered_map<std::string, std::shared_ptr<HttpHandlerClient>> mHttpClients;
@@ -33,4 +30,4 @@ namespace Sentry
 }
 
 
-#endif //SERVER_HTTPHANDLERCOMPONENT_H
+#endif //SERVER_HTTPSERVICECOMPONENT_H

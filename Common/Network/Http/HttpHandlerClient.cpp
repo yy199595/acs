@@ -3,11 +3,11 @@
 //
 
 #include"HttpHandlerClient.h"
-#include"Component/Http/HttpHandlerComponent.h"
+#include"Component/Http/HttpServiceComponent.h"
 
 namespace Sentry
 {
-	HttpHandlerClient::HttpHandlerClient(HttpHandlerComponent * httpComponent, std::shared_ptr<SocketProxy> socketProxy)
+	HttpHandlerClient::HttpHandlerClient(HttpServiceComponent * httpComponent, std::shared_ptr<SocketProxy> socketProxy)
 		: Tcp::TcpContext(socketProxy)
 	{
 		this->mHttpComponent = httpComponent;
@@ -18,7 +18,7 @@ namespace Sentry
 	void HttpHandlerClient::StartReceive()
 	{
 #ifdef ONLY_MAIN_THREAD
-		this->ReadData();
+		this->ReceiveSomeMessage();
 #else
 		IAsioThread & netWorkThread = this->mSocket->GetThread();
 		netWorkThread.Invoke(&HttpHandlerClient::ReceiveSomeMessage, this);
@@ -40,10 +40,10 @@ namespace Sentry
 		std::shared_ptr<HttpHandlerClient> httpHandlerClient =
 			std::dynamic_pointer_cast<HttpHandlerClient>(this->shared_from_this());
 #ifdef ONLY_MAIN_THREAD
-		this->mHttpComponent->HandlerHttpData(httpHandlerClient);
+		this->mHttpComponent->OnRequest(httpHandlerClient);
 #else
 		IAsioThread& mainThread = App::Get()->GetTaskScheduler();
-		mainThread.Invoke(&HttpHandlerComponent::OnRequest, this->mHttpComponent, httpHandlerClient);
+		mainThread.Invoke(&HttpServiceComponent::OnRequest, this->mHttpComponent, httpHandlerClient);
 #endif
 	}
 
@@ -89,7 +89,7 @@ namespace Sentry
 		this->mHttpComponent->ClosetHttpClient(address);
 #else
 		IAsioThread& mainThread = App::Get()->GetTaskScheduler();
-		mainThread.Invoke(&HttpHandlerComponent::ClosetHttpClient, this->mHttpComponent, address);
+		mainThread.Invoke(&HttpServiceComponent::ClosetHttpClient, this->mHttpComponent, address);
 #endif
 	}
 }

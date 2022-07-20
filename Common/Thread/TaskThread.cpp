@@ -53,53 +53,6 @@ namespace Sentry
 #endif
 }
 
-namespace Sentry
-{
-    TaskThread::TaskThread()
-        : IThread("task"),
-		mThread(new std::thread(std::bind(&TaskThread::Update, this)))
-    {
-        this->mThread->detach();
-    }
-
-	int TaskThread::Start()
-	{
-        this->mIsWork = true;
-        this->mThreadVariable.notify_one();
-		return 0;
-	}
-
-	void TaskThread::AddTask(std::shared_ptr<IThreadTask> task)
-    {
-        if(!this->mIsWork)
-        {
-            this->mIsWork = true;
-            this->mThreadVariable.notify_one();
-        }
-        this->mWaitInvokeTask.enqueue(task);
-    }
-
-    void TaskThread::Update()
-    {
-        this->mThreadId = std::this_thread::get_id();
-
-        this->HangUp();
-        std::shared_ptr<IThreadTask> task;
-        while(!this->mIsClose)
-        {
-#ifdef __THREAD_LOCK__
-            this->mWaitInvokeTask.SwapQueueData();
-#endif
-            while(this->mWaitInvokeTask.try_dequeue(task))
-            {
-                task->Run();
-                this->mLastOperTime = Helper::Time::GetNowSecTime();
-            }
-            this->HangUp();
-        }
-    }
-}
-
 #ifndef ONLY_MAIN_THREAD
 namespace Sentry
 {
@@ -119,7 +72,11 @@ namespace Sentry
 
 	void NetWorkThread::InvokeMethod(StaticMethod *task)
 	{
-		this->mWaitInvokeMethod.Push(task);
+#ifdef __THREAD_LOCK__
+        this->mWaitInvokeMethod.Push(task);
+#else
+        this->mWaitInvokeMethod.enqueue(task);
+#endif
 	}
 
     void NetWorkThread::Update()
@@ -134,17 +91,24 @@ namespace Sentry
         {
             this->poll(err);
 #ifdef __THREAD_LOCK__
-            this->mWaitInvokeMethod.SwapQueueData();
-#endif
             this->mWaitInvokeMethod.Swap();
-            while (this->mWaitInvokeMethod.Pop(taskMethod) && taskMethod != nullptr)
+             while (this->mWaitInvokeMethod.Pop(taskMethod) && taskMethod != nullptr)
             {
                 taskMethod->run();
                 delete taskMethod;
 				taskMethod = nullptr;
                 this->mLastOperTime = Helper::Time::GetNowSecTime();
             }
-			std::this_thread::sleep_for(time);
+#else
+            while (this->mWaitInvokeMethod.try_dequeue(taskMethod) && taskMethod != nullptr)
+            {
+                taskMethod->run();
+                delete taskMethod;
+                taskMethod = nullptr;
+                this->mLastOperTime = Helper::Time::GetNowSecTime();
+            }
+#endif
+            std::this_thread::sleep_for(time);
         }
     }
 }
@@ -170,27 +134,38 @@ namespace Sentry
 	}
 
 	void MainTaskScheduler::Update()
-	{
+    {
         this->poll();
-		this->mMainMethod->run();
-		StaticMethod * task = nullptr;
+        this->mMainMethod->run();
+        StaticMethod *task = nullptr;
 #ifdef __THREAD_LOCK__
-		this->mTaskQueue.SwapQueueData();
-#endif
         this->mTaskQueue.Swap();
-		while (this->mTaskQueue.Pop(task) && task != nullptr)
-		{
-			task->run();
-			delete task;
-			task = nullptr;
-		}
+        while (this->mTaskQueue.Pop(task) && task != nullptr)
+        {
+            task->run();
+            delete task;
+            task = nullptr;
+        }
+#else
+        while (this->mTaskQueue.try_dequeue(task) && task != nullptr)
+        {
+            task->run();
+            delete task;
+            task = nullptr;
+        }
+#endif
+
         this->mLastOperTime = Helper::Time::GetNowSecTime();
     }
 	
 	void MainTaskScheduler::InvokeMethod(StaticMethod * task)
 	{
         if(task == nullptr) return;
+#ifdef __THREAD_LOCK__
 		this->mTaskQueue.Push(task);
+#else
+      this->mTaskQueue.enqueue(task);
+#endif
 	}
 }
 

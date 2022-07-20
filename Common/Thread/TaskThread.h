@@ -62,23 +62,6 @@ namespace Sentry
         std::string mName;
     };
 
-    class TaskThread : public IThread
-    {
-    public:
-        explicit TaskThread();
-
-    public:
-		int Start() final;
-
-        void AddTask(std::shared_ptr<IThreadTask> task);
-	private:
-		void Update() final;
-    private:
-		//std::thread * mThread;
-		std::unique_ptr<std::thread> mThread;
-        MultiThread::ConcurrentQueue<std::shared_ptr<IThreadTask>> mWaitInvokeTask;
-    };
-
 	class IAsioThread : public asio::io_context, public IThread
     {
     public:
@@ -117,7 +100,11 @@ namespace Sentry
 		void Update() final;
     private:
 		std::unique_ptr<std::thread> mThread;
+#ifdef ____THREAD_LOCK__
 		DoubleQueue<StaticMethod *> mWaitInvokeMethod;
+#else
+        MultiThread::ConcurrentQueue<StaticMethod *> mWaitInvokeMethod;
+#endif
     };
 #endif
     class MainTaskScheduler : public IAsioThread
@@ -131,7 +118,11 @@ namespace Sentry
 		void Update() final;
 	private:
         StaticMethod * mMainMethod;
+#ifdef ____THREAD_LOCK__
         DoubleQueue<StaticMethod*> mTaskQueue;
+#else
+        MultiThread::ConcurrentQueue<StaticMethod *> mTaskQueue;
+#endif
 	};
 
 }// namespace Sentry

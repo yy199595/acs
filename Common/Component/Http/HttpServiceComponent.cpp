@@ -2,13 +2,13 @@
 // Created by zmhy0073 on 2022/6/21.
 //
 
-#include"HttpHandlerComponent.h"
+#include"HttpServiceComponent.h"
 #include"Util/FileHelper.h"
 #include"Network/Http/HttpHandlerClient.h"
 #include"Component/HttpService/LocalHttpService.h"
 namespace Sentry
 {
-    bool HttpHandlerComponent::LateAwake()
+    bool HttpServiceComponent::LateAwake()
     {
         this->mTaskComponent = this->GetApp()->GetTaskComponent();
         auto iter = this->GetApp()->ComponentBegin();
@@ -29,24 +29,22 @@ namespace Sentry
         return true;
     }
 
-    void HttpHandlerComponent::OnListen(std::shared_ptr<SocketProxy> socket)
+    void HttpServiceComponent::OnListen(std::shared_ptr<SocketProxy> socket)
     {
-        const std::string &address = socket->GetAddress();
-
-        std::shared_ptr<HttpHandlerClient> handlerClient =
-                std::make_shared<HttpHandlerClient>(this, socket);
+        std::shared_ptr<HttpHandlerClient> handlerClient(new HttpHandlerClient(this, socket));
 
         handlerClient->StartReceive();
+        const std::string &address = socket->GetAddress();
         this->mHttpClients.emplace(address, handlerClient);
     }
 
-    const HttpInterfaceConfig *HttpHandlerComponent::GetConfig(const std::string &path)
+    const HttpInterfaceConfig *HttpServiceComponent::GetConfig(const std::string &path)
     {
         auto iter = this->mHttpConfigs.find(path);
         return iter != this->mHttpConfigs.end() ? iter->second : nullptr;
     }
 
-    void HttpHandlerComponent::ClosetHttpClient(const std::string &address)
+    void HttpServiceComponent::ClosetHttpClient(const std::string &address)
     {
         auto iter = this->mHttpClients.find(address);
         if(iter != this->mHttpClients.end())
@@ -56,7 +54,7 @@ namespace Sentry
         }
     }
 
-    void HttpHandlerComponent::OnRequest(std::shared_ptr<HttpHandlerClient> httpClient)
+    void HttpServiceComponent::OnRequest(std::shared_ptr<HttpHandlerClient> httpClient)
     {
         std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
         std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();

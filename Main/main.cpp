@@ -21,7 +21,7 @@
 #include"Component/Scene/MessageComponent.h"
 #include"Component/Logic/HttpSourceService.h"
 #include"Component/RpcService/LocalLuaService.h"
-#include"Component/Http/HttpHandlerComponent.h"
+#include"Component/Http/HttpServiceComponent.h"
 #include"Component/Mongo/MongoService.h"
 #include"Component/HttpService/LocalLuaHttpService.h"
 #include"Component/Mongo/MongoRpcComponent.h"
@@ -66,7 +66,7 @@ void RegisterComponent()
 
 //http
     ComponentFactory::Add<HttpComponent>("HttpComponent");
-    ComponentFactory::Add<HttpHandlerComponent>("HttpHandlerComponent");
+    ComponentFactory::Add<HttpServiceComponent>("HttpServiceComponent");
 
 // lua
     ComponentFactory::Add<LuaScriptComponent>("LuaScriptComponent");

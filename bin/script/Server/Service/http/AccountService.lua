@@ -41,8 +41,8 @@ function AccountService.Login(request)
     local userInfo = MongoComponent.QueryOnce("user_account",{
         _id = loginInfo.account
     })
-    table.print(userInfo)
-    if loginInfo.password ~= userInfo.password then
+
+    if userInfo == nil or loginInfo.password ~= userInfo.password then
         return XCode.Failure
     end
     local address = gateService:GetAddress()

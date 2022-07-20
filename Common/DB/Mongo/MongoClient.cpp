@@ -82,7 +82,7 @@ namespace Mongo
 	void MongoClientContext::PushMongoCommand(std::shared_ptr<Tcp::ProtoMessage> request)
 	{
 #ifdef ONLY_MAIN_THREAD
-		this->PushCommand(request, front);
+		this->PushCommand(request);
 #else
 		this->mNetworkThread.Invoke(&MongoClientContext::PushCommand, this, request);
 #endif
