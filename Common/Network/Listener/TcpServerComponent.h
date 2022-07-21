@@ -20,6 +20,6 @@ namespace Sentry
 		void OnAllServiceStart() final;
 	 private:
 		std::set<std::string> mWhiteList;    //白名单
-		std::vector<std::shared_ptr<NetworkListener>> mListeners;
+		std::vector<NetworkListener *> mListeners;
 	};
 }

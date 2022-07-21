@@ -7,23 +7,26 @@ namespace Sentry
 		: mNetThread(thread)
 	{
 		this->mIsRemote = true;
-		this->mSocket = std::make_shared<AsioTcpSocket>(this->mNetThread);
+		this->mSocket = new AsioTcpSocket(this->mNetThread);
 	}
 
-	SocketProxy::SocketProxy(IAsioThread& thread, std::shared_ptr<AsioTcpSocket> socket)
-		: mNetThread(thread)
-	{
-		asio::error_code code;
-		this->mSocket = socket;
-		this->mIsRemote = false;
-		auto endPoint = this->mSocket->remote_endpoint(code);
-		if (this->mSocket->is_open() && !code)
-		{
-			this->mPort = endPoint.port();
-			this->mIp = endPoint.address().to_string();
-			this->mAddress = fmt::format("{0}:{1}", this->mIp, this->mPort);
-		}
-	}
+    void SocketProxy::Init()
+    {
+        this->mIsRemote = false;
+        asio::error_code code;
+        auto endPoint = this->mSocket->remote_endpoint(code);
+        if (this->mSocket->is_open() && !code)
+        {
+            this->mPort = endPoint.port();
+            this->mIp = endPoint.address().to_string();
+            this->mAddress = fmt::format("{0}:{1}", this->mIp, this->mPort);
+        }
+    }
+
+    SocketProxy::~SocketProxy()
+    {
+        delete this->mSocket;
+    }
 
 	SocketProxy::SocketProxy(IAsioThread& thread, const std::string& ip, unsigned short port)
 			: mNetThread(thread)
@@ -33,7 +36,7 @@ namespace Sentry
 		this->mIsRemote = true;
 		assert(!this->mIp.empty() && this->mPort > 0);
 		this->mAddress = fmt::format("{0}:{1}", ip, port);
-		this->mSocket = std::make_shared<AsioTcpSocket>(this->mNetThread);
+		this->mSocket = new AsioTcpSocket(this->mNetThread);
 	}
 
 	void SocketProxy::Close()

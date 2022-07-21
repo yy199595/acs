@@ -31,6 +31,10 @@ namespace Sentry
 
     void HttpServiceComponent::OnListen(std::shared_ptr<SocketProxy> socket)
     {
+        static int count = 0;
+#ifdef __DEBUG__
+        LOG_DEBUG("handler http socket count = " << count++);
+#endif
         std::shared_ptr<HttpHandlerClient> handlerClient(new HttpHandlerClient(this, socket));
 
         handlerClient->StartReceive();
@@ -50,7 +54,7 @@ namespace Sentry
         if(iter != this->mHttpClients.end())
         {
             this->mHttpClients.erase(iter);
-            LOG_DEBUG("remove http address : " << address);
+            //LOG_DEBUG("remove http address : " << address);
         }
     }
 

@@ -38,8 +38,8 @@ namespace Sentry
 #endif
 			if (listenConfig->Port != 0)
 			{
-				std::shared_ptr<NetworkListener> listener =
-					std::make_shared<NetworkListener>(netThread, *listenConfig);
+				NetworkListener * listener =
+					new NetworkListener(netThread, *listenConfig);
 				this->mListeners.push_back(listener);
 			}
 		}
@@ -48,7 +48,7 @@ namespace Sentry
 
 	void TcpServerComponent::OnAllServiceStart()
 	{
-		for (std::shared_ptr<NetworkListener> listener : this->mListeners)
+		for (NetworkListener * listener : this->mListeners)
 		{
 			const ListenConfig& config = listener->GetConfig();
 			ISocketListen* listenerHandler = this->GetComponent<ISocketListen>(config.Handler);
@@ -65,7 +65,7 @@ namespace Sentry
 
 	bool TcpServerComponent::StartListen(const string& name)
 	{
-		for (std::shared_ptr<NetworkListener> listener : this->mListeners)
+		for (NetworkListener * listener : this->mListeners)
 		{
 			const ListenConfig& config = listener->GetConfig();
 			ISocketListen* listenerHandler = this->GetComponent<ISocketListen>(config.Handler);

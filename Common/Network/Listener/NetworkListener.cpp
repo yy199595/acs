@@ -76,14 +76,13 @@ namespace Sentry
 #else
         IAsioThread & workThread = this->mTaskComponent->AllocateNetThread();
 #endif
-        std::shared_ptr<AsioTcpSocket> tcpSocket(new AsioTcpSocket(workThread));
-		this->mBindAcceptor->async_accept(*tcpSocket,
-			[this, &workThread, tcpSocket](const asio::error_code & code)
+        std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread));
+		this->mBindAcceptor->async_accept(socketProxy->GetSocket(),
+			[this, &workThread, socketProxy](const asio::error_code & code)
 		{
 			if (!code)
             {
-                std::shared_ptr<SocketProxy> socketProxy(
-                        new SocketProxy(workThread, tcpSocket));
+                socketProxy->Init();
 #ifdef __DEBUG__
 				LOG_INFO(socketProxy->GetAddress() << " connect to " << this->mConfig.Name);
 #endif
@@ -94,7 +93,6 @@ namespace Sentry
                 t.Invoke(&ISocketListen::OnListen, this->mListenHandler, socketProxy);
 #endif
             }
-			//AsioContext & context = this->mTaskThread.GetContext();
 			this->mTaskThread.post(std::bind(&NetworkListener::ListenConnect, this));
 		});
 	}
