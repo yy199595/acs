@@ -9,10 +9,8 @@
 namespace Sentry
 {
 	NetworkListener::NetworkListener(IAsioThread & t, const ListenConfig & config)
-		: mTaskThread(t), mConfig(config),
-        mTaskScheduler(App::Get()->GetTaskScheduler())
+		: mTaskThread(t), mConfig(config)
     {
-        this->mIsListen = false;
         this->mBindAcceptor = nullptr;
         this->mListenHandler = nullptr;
 		mTaskComponent = App::Get()->GetComponent<NetThreadComponent>();
@@ -27,10 +25,6 @@ namespace Sentry
 
 	bool NetworkListener::StartListen(ISocketListen * handler)
     {
-		if(this->mIsListen)
-		{
-			return true;
-		}
         this->mListenHandler = handler;
 #ifdef ONLY_MAIN_THREAD
         try
@@ -40,9 +34,7 @@ namespace Sentry
             this->mBindAcceptor = new AsioTcpAcceptor(this->mTaskThread, endPoint);
 
             this->mBindAcceptor->listen(this->mConfig.Count);
-            std::string str = this->mBindAcceptor->local_endpoint().address().to_string();
-            this->mTaskThread.post(std::bind(&NetworkListener::ListenConnect, this));
-			this->mIsListen = true;
+            this->ListenConnect();
             return true;
         }
         catch (std::system_error & err)
@@ -66,10 +58,8 @@ namespace Sentry
             this->mBindAcceptor = new AsioTcpAcceptor(this->mTaskThread, endPoint);
 
             this->mBindAcceptor->listen(this->mConfig.Count);
-            std::string str = this->mBindAcceptor->local_endpoint().address().to_string();
-            this->mTaskThread.post(std::bind(&NetworkListener::ListenConnect, this));
+            this->mTaskThread.Invoke(&NetworkListener::ListenConnect, this);
             taskSource->SetResult(true);
-			this->mIsListen = true;
         }
         catch (std::system_error & err)
         {
@@ -100,7 +90,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
                 this->mListenHandler->OnListen(socketProxy);
 #else
-                this->mTaskScheduler.Invoke(&ISocketListen::OnListen, this->mListenHandler, socketProxy);
+                IAsioThread & t = App::Get()->GetTaskScheduler();
+                t.Invoke(&ISocketListen::OnListen, this->mListenHandler, socketProxy);
 #endif
             }
 			//AsioContext & context = this->mTaskThread.GetContext();

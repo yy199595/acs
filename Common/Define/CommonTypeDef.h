@@ -13,7 +13,6 @@
 #include<vector>
 #include<memory>
 #include<unordered_map>
-#include"ThreadQueue.h"
 #include<asio.hpp>
 
 using namespace std;
@@ -23,7 +22,6 @@ typedef asio::ip::udp AsioUdp;
 typedef asio::ip::tcp AsioTcp;
 typedef asio::io_service AsioContext;
 typedef asio::ip::address AsioAddress;
-typedef asio::error_code AsioErrorCode;
 typedef asio::io_service::work AsioWork;
 typedef asio::ip::tcp::socket AsioTcpSocket;
 typedef asio::ip::tcp::acceptor AsioTcpAcceptor;
@@ -31,13 +29,6 @@ typedef asio::ip::tcp::endpoint AsioTcpEndPoint;
 typedef asio::ip::udp::socket AsioUdpSocket;
 typedef asio::ip::udp::endpoint AsioUdpEndPoint;
 typedef asio::ip::address_v4 AsioAddressV4;
-
-typedef std::function<void(const AsioErrorCode &)> AcceptCallBack;
-typedef std::function<void(const AsioErrorCode &)> AsioConnectCallBack;
-typedef std::function<void(const AsioErrorCode &, const size_t)> AsioSendCallBack;
-typedef std::function<void(const AsioErrorCode &, const size_t)> AsioReceiveCallBack;
-
-typedef std::shared_ptr<AsioTcpSocket> SharedTcpSocket;
 
 typedef std::shared_ptr<std::string> SharedMessage;
 

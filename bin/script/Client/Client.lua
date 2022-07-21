@@ -19,19 +19,18 @@ function Client.StartLogic()
 
     local loginInfo = LoginComponent.Login(account, password)
     table.print(loginInfo)
-
-    if type(loginInfo) ~= "table" then
+    if loginInfo.code ~= XCode.Successful then
         return
     end
-
-    if not clientComponent:StartConnectAsync(loginInfo.address) then
-        Log.Error("connect [" , loginInfo, "] failure")
+    local address = loginInfo.data.address
+    if not clientComponent:StartConnectAsync(address) then
+        Log.Error("connect [" , address, "] failure")
         return
     end
-    Log.Debug("connect h t t[" , loginInfo.address, "] successful")
+    Log.Debug("connect h t t[" , address, "] successful")
 
     local authMessage = messageComponent:New("c2s.GateAuth.Request", {
-        token = loginInfo.token
+        token = loginInfo.data.token
     })
 
     clientComponent:Call("GateService.Auth", authMessage)

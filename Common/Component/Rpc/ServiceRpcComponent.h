@@ -1,6 +1,4 @@
 ﻿#pragma once
-
-#include"Other/MultiThreadQueue.h"
 #include"Async/RpcTask/RpcTaskSource.h"
 #include"Component/Rpc/RpcTaskComponent.h"
 namespace Sentry

@@ -72,11 +72,7 @@ namespace Sentry
 
 	void NetWorkThread::InvokeMethod(StaticMethod *task)
 	{
-#ifdef __THREAD_LOCK__
         this->mWaitInvokeMethod.Push(task);
-#else
-        this->mWaitInvokeMethod.enqueue(task);
-#endif
 	}
 
     void NetWorkThread::Update()
@@ -90,7 +86,6 @@ namespace Sentry
         while(!this->mIsClose)
         {
             this->poll(err);
-#ifdef __THREAD_LOCK__
             this->mWaitInvokeMethod.Swap();
              while (this->mWaitInvokeMethod.Pop(taskMethod) && taskMethod != nullptr)
             {
@@ -99,15 +94,6 @@ namespace Sentry
 				taskMethod = nullptr;
                 this->mLastOperTime = Helper::Time::GetNowSecTime();
             }
-#else
-            while (this->mWaitInvokeMethod.try_dequeue(taskMethod) && taskMethod != nullptr)
-            {
-                taskMethod->run();
-                delete taskMethod;
-                taskMethod = nullptr;
-                this->mLastOperTime = Helper::Time::GetNowSecTime();
-            }
-#endif
             std::this_thread::sleep_for(time);
         }
     }
@@ -136,37 +122,25 @@ namespace Sentry
 	void MainTaskScheduler::Update()
     {
         this->poll();
+        this->mTaskQueue.Swap();
         this->mMainMethod->run();
         StaticMethod *task = nullptr;
-#ifdef __THREAD_LOCK__
-        this->mTaskQueue.Swap();
         while (this->mTaskQueue.Pop(task) && task != nullptr)
         {
             task->run();
             delete task;
             task = nullptr;
         }
-#else
-        while (this->mTaskQueue.try_dequeue(task) && task != nullptr)
-        {
-            task->run();
-            delete task;
-            task = nullptr;
-        }
-#endif
-
         this->mLastOperTime = Helper::Time::GetNowSecTime();
     }
 	
 	void MainTaskScheduler::InvokeMethod(StaticMethod * task)
-	{
-        if(task == nullptr) return;
-#ifdef __THREAD_LOCK__
-		this->mTaskQueue.Push(task);
-#else
-      this->mTaskQueue.enqueue(task);
-#endif
-	}
+    {
+        if (task != nullptr)
+        {
+            this->mTaskQueue.Push(task);
+        }
+    }
 }
 
 // namespace Sentry

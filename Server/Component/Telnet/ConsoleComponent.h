@@ -26,13 +26,12 @@ namespace Tcp
 namespace Sentry
 {
 	using ConsoleFunction = std::function<bool(const std::string&, std::vector<std::string>&)>;
-	class ConsoleComponent : public Component, public ISocketListen, public IStart
+	class ConsoleComponent : public Component, public ISocketListen
 	{
 	 public:
 		ConsoleComponent() = default;
 		~ConsoleComponent() final = default;
 	 public:
-		bool OnStart() final;
 		bool LateAwake() final;
 		void OnClientError(const std::string & address);
 		void OnListen(std::shared_ptr<SocketProxy> socket) final;

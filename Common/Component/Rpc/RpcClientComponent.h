@@ -2,7 +2,6 @@
 
 #include"Component/Component.h"
 #include"Script/Table.h"
-#include"Other/MultiThreadQueue.h"
 #include"Network/Rpc/ServerClientContext.h"
 namespace Sentry
 {

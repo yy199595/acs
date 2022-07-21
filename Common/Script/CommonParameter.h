@@ -74,16 +74,16 @@ namespace Lua
 		{
 		}
 
-		template<>
-		inline std::string& Read(lua_State* lua, int index)
-		{
-			size_t size = 0;
-			static std::string data = "";
-			assert(lua_isstring(lua, index));
-			const char* str = lua_tolstring(lua, index, &size);
-			data.assign(str, size);
-			return data;
-		}
+//		template<>
+//		inline std::string& Read(lua_State* lua, int index)
+//		{
+//			size_t size = 0;
+//			static std::string data = "";
+//			assert(lua_isstring(lua, index));
+//			const char* str = lua_tolstring(lua, index, &size);
+//			data.assign(str, size);
+//			return data;
+//		}
 
 //		template<>
 //		inline const std::string& Read(lua_State* lua, int index)
@@ -99,8 +99,7 @@ namespace Lua
 		inline std::string Read(lua_State* lua, int index)
 		{
 			size_t size = 0;
-			assert(lua_isstring(lua, index));
-			const char* p = lua_tolstring(lua, index, &size);
+            const char * p = luaL_checklstring(lua, index, &size);
 			return std::string(p, size);
 		}
 	}// namespace CommonParameter

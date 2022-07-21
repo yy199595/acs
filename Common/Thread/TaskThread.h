@@ -6,7 +6,6 @@
 #include<queue>
 #include<thread>
 #include<atomic>
-#include"Define/ThreadQueue.h"
 #include<Define/CommonLogDef.h>
 #include<Method/MethodProxy.h>
 #include<Other/DoubleQueue.h>
@@ -100,11 +99,7 @@ namespace Sentry
 		void Update() final;
     private:
 		std::unique_ptr<std::thread> mThread;
-#ifdef ____THREAD_LOCK__
 		DoubleQueue<StaticMethod *> mWaitInvokeMethod;
-#else
-        MultiThread::ConcurrentQueue<StaticMethod *> mWaitInvokeMethod;
-#endif
     };
 #endif
     class MainTaskScheduler : public IAsioThread
@@ -118,11 +113,7 @@ namespace Sentry
 		void Update() final;
 	private:
         StaticMethod * mMainMethod;
-#ifdef ____THREAD_LOCK__
         DoubleQueue<StaticMethod*> mTaskQueue;
-#else
-        MultiThread::ConcurrentQueue<StaticMethod *> mTaskQueue;
-#endif
 	};
 
 }// namespace Sentry

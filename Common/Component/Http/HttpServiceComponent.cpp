@@ -82,10 +82,7 @@ namespace Sentry
         }
         if (!httpConfig->IsAsync)
         {
-            XCode code = httpService->Invoke(httpConfig->Method, request, response);
-            LOG_INFO("sync call http service " << httpConfig->Service << "." << httpConfig->Method << " code = ["
-                                               << (int) code << "]");
-            response->AddHead("code", (int) code);
+            httpService->Invoke(httpConfig->Method, request, response);
             httpClient->StartWriter();
             return;
         }
@@ -94,10 +91,7 @@ namespace Sentry
             std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
             std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
 
-            XCode code = httpService->Invoke(httpConfig->Method, request, response);
-            LOG_INFO("async call http service " << httpConfig->Service << "." << httpConfig->Method << " code = ["
-                                                << (int) code << "]");
-            response->AddHead("code", (int) code);
+            httpService->Invoke(httpConfig->Method, request, response);
             httpClient->StartWriter();
         });
     }

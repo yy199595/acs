@@ -38,13 +38,11 @@ namespace Sentry
 		void InitListener(std::shared_ptr<TaskSource<bool>> taskSource);
 #endif
 	 private:
-		bool mIsListen;
 		unsigned int mCorId;
 		IAsioThread& mTaskThread;
 		const ListenConfig & mConfig;
 		AsioTcpAcceptor* mBindAcceptor;
 		ISocketListen* mListenHandler;
 		NetThreadComponent* mTaskComponent;
-		class MainTaskScheduler& mTaskScheduler;
 	};
 }

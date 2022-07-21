@@ -43,12 +43,6 @@ namespace Sentry
 		return true;
 	}
 
-	bool ConsoleComponent::OnStart()
-	{
-		TcpServerComponent * tcpComponent = this->GetComponent<TcpServerComponent>();
-		return tcpComponent->StartListen("console");
-	}
-
 	void ConsoleComponent::OnListen(std::shared_ptr<SocketProxy> socket)
 	{
 		std::shared_ptr<TelnetClientContext> telnetClient =

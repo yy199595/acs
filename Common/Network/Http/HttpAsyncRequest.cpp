@@ -165,9 +165,11 @@ namespace Sentry
 
     void HttpData::WriterString(lua_State *lua, const char *name, const std::string &str) const
     {
-        lua_pushlstring(lua, str.c_str(), str.size());
-        lua_setfield(lua, -2, name);
-
+        if(!str.empty() && name != nullptr)
+        {
+            lua_pushlstring(lua, str.c_str(), str.size());
+            lua_setfield(lua, -2, name);
+        }
     }
 
     void HttpData::Writer(lua_State *lua) const

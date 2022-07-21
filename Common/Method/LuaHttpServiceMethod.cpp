@@ -26,7 +26,10 @@ namespace Sentry
         const char * method = this->mConfig->Method.c_str();
         if(!Lua::Function::Get(this->mLua, tab, method))
         {
-            response.AddHead("error", "call function not existe");
+            Json::Writer data;
+            data << "code " << (int)XCode::CallFunctionNotExist;
+            data << "error" << "call lua function not existe";
+            response.WriteString(data.JsonString());
             return XCode::CallFunctionNotExist;
         }
         request.GetData().Writer(this->mLua);
@@ -59,47 +62,34 @@ namespace Sentry
 
     XCode LuaHttpServiceMethod::CallAsync(HttpHandlerResponse &response)
     {
-		std::shared_ptr<LuaServiceTaskSource> luaTaskSource(new LuaServiceTaskSource(this->mLua));
-		Lua::UserDataParameter::Write(this->mLua, luaTaskSource);
-		if(lua_pcall(this->mLua, 3, 1, 0) != 0)
-		{
-			size_t size = 0;
-			const char * err = lua_tolstring(this->mLua, -1, &size);
-			response.AddHead("error", std::string(err, size));
-			LOG_ERROR(std::string(err, size));
-			return XCode::CallLuaFunctionFail;
-		}
-		XCode code = luaTaskSource->Await();
-		if(code != XCode::Successful)
+        std::shared_ptr<LuaServiceTaskSource> luaTaskSource(new LuaServiceTaskSource(this->mLua));
+        Lua::UserDataParameter::Write(this->mLua, luaTaskSource);
+        if (lua_pcall(this->mLua, 3, 1, 0) != 0)
         {
-            if (luaTaskSource->GetRef())
-            {
-                if (lua_isstring(this->mLua, -1))
-                {
-                    size_t size = 0;
-                    const char *err = lua_tolstring(this->mLua, -1, &size);
-                    response.AddHead("error", std::string(err, size));
-                }
-            }
-            return code;
+            size_t size = 0;
+            const char *err = lua_tolstring(this->mLua, -1, &size);
+            response.AddHead("error", std::string(err, size));
+            LOG_ERROR(std::string(err, size));
+            return XCode::CallLuaFunctionFail;
         }
-		if(luaTaskSource->GetRef())
-		{
-			if (lua_isstring(this->mLua, -1))
-			{
-				size_t size = 0;
-				const char* json = lua_tolstring(this->mLua, -1, &size);
-				response.WriteString(json, size);
-				return XCode::Successful;
-			}
-			if (lua_istable(this->mLua, -1))
-			{
-				std::string json;
-				Lua::Json::Read(this->mLua, -1, &json);
-				response.WriteString(json);
-				return XCode::Successful;
-			}
-		}
-		return code;
-	}
+        luaTaskSource->Await();
+        if (luaTaskSource->GetRef())
+        {
+            if (lua_isstring(this->mLua, -1))
+            {
+                size_t size = 0;
+                const char *json = lua_tolstring(this->mLua, -1, &size);
+                response.WriteString(json, size);
+                return XCode::Successful;
+            }
+            if (lua_istable(this->mLua, -1))
+            {
+                std::string json;
+                Lua::Json::Read(this->mLua, -1, &json);
+                response.WriteString(json);
+                return XCode::Successful;
+            }
+        }
+        return XCode::Successful;
+    }
 }

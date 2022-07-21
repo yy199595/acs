@@ -20,10 +20,11 @@ namespace Json
 		EndObject,
 	};
 
-	class Writer : protected rapidjson::Writer<rapidjson::StringBuffer>
+	class Writer
 	{
 	 public:
 		Writer(bool isObj = true);
+        ~Writer();
 	public:
 		Writer & BeginArray();
 		Writer & BeginObject();
@@ -34,15 +35,15 @@ namespace Json
 		Writer & operator << (std::vector<int> & value);
 		Writer & operator << (std::list<std::string> & value);
 		Writer & operator << (std::vector<std::string> & value);
-		inline Writer& operator <<(int value) { this->Int(value); return *this;}
-		inline Writer& operator <<(bool value) { this->Bool(value); return *this;}
-		inline Writer& operator <<(float value) { this->Double(value); return *this;}
-		inline Writer& operator <<(double value) { this->Double(value); return *this;}
-		inline Writer& operator <<(unsigned int value) { this->Uint(value); return *this;}
-		inline Writer& operator <<(long long value) { this->Int64(value); return *this;}
-		inline Writer& operator <<(const char * value) { this->String(value); return *this;}
-		inline Writer& operator <<(unsigned long long value) { this->Uint64(value); return *this;}
-		inline Writer& operator <<(const std::string & value) { this->String(value.c_str(), value.size()); return *this;}
+		inline Writer& operator <<(int value) { this->mWriter->Int(value); return *this;}
+		inline Writer& operator <<(bool value) { this->mWriter->Bool(value); return *this;}
+		inline Writer& operator <<(float value) { this->mWriter->Double(value); return *this;}
+		inline Writer& operator <<(double value) { this->mWriter->Double(value); return *this;}
+		inline Writer& operator <<(unsigned int value) { this->mWriter->Uint(value); return *this;}
+		inline Writer& operator <<(long long value) { this->mWriter->Int64(value); return *this;}
+		inline Writer& operator <<(const char * value) { this->mWriter->String(value); return *this;}
+		inline Writer& operator <<(unsigned long long value) { this->mWriter->Uint64(value); return *this;}
+		inline Writer& operator <<(const std::string & value) { this->mWriter->String(value.c_str(), value.size()); return *this;}
 	 public:
 		size_t GetJsonSize();
 		const std::string JsonString();
@@ -52,7 +53,8 @@ namespace Json
 		bool GetDocument(rapidjson::Document & jsonDocument);
 	 private:
 		const bool mIsObject;
-		rapidjson::StringBuffer mStringBuf;
+		rapidjson::StringBuffer * mStringBuf;
+        rapidjson::Writer<rapidjson::StringBuffer> * mWriter;
 	};
 }
 #endif //_JSONWRITER_H_
