@@ -86,7 +86,7 @@ namespace Sentry
 		{
 			this->mCurResponse = std::make_shared<RedisResponse>();
 		}
-		std::istream & os = this->GetReadStream();
+		std::iostream os(&buffer);
 		int lenght = this->mCurResponse->OnRecvLine(os);
 		if (lenght == 0)
 		{
@@ -105,13 +105,12 @@ namespace Sentry
 
 	void RedisClientContext::OnReceiveMessage(const asio::error_code& code, asio::streambuf& buffer)
 	{
-		std::istream & os = this->GetReadStream();
         if(this->mCurResponse == nullptr)
         {
             this->ClearRecvStream();
-            printf("response is null");
             return;
         }
+		std::iostream os(&buffer);
 		if (this->mCurResponse->OnRecvMessage(os) == 0)
 		{
 			this->OnReadComplete();
