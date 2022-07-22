@@ -159,6 +159,7 @@ namespace Sentry
 		char cc = os.get();
 		this->mDataSize = 0;
 		std::getline(os, this->mString);
+        assert(!this->mString.empty());
 		this->mString.pop_back();
 		switch (cc)
 		{
