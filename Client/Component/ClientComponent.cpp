@@ -27,17 +27,7 @@ namespace Client
 
     void ClientComponent::OnRequest(std::shared_ptr<c2s::Rpc::Call> t1)
     {
-#ifdef __CLIENT_RPC_DEBUG_LOG__
-        std::string json;
-		LOG_INFO("========== call client ==========");
-		LOG_INFO("func = " << t1->func());
-		if(Helper::Proto::GetJson(t1->data(), json))
-		{
-			LOG_INFO("json = " << json);
-		}
-		LOG_INFO("=================================");
-#endif
-
+        LOG_INFO("call client func = " << t1->func());
 	}
 
     void ClientComponent::OnResponse(std::shared_ptr<c2s::Rpc::Response> t2)

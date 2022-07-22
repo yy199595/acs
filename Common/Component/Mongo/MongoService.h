@@ -19,6 +19,7 @@ namespace Sentry
         XCode Delete(const s2s::Mongo::Delete & request);
         XCode Update(const s2s::Mongo::Update & request);
         XCode Query(const s2s::Mongo::Query::Request & request, s2s::Mongo::Query::Response & response);
+        XCode AddCounter(const s2s::Mongo::AddCounter::Request & request, s2s::Mongo::AddCounter::Response & response);
     private:
         std::string mBuffer;
 		class MongoRpcComponent * mMongoComponent;

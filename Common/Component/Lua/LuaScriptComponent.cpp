@@ -89,6 +89,7 @@ namespace Sentry
 		luaRegister7.PushExtensionFunction("Decode", Lua::Json::Decode);
 
         Lua::ClassProxyHelper luaRegister8(this->mLuaEnv, "Md5");
+        luaRegister8.BeginNewTable();
         luaRegister8.PushExtensionFunction("ToString", Lua::Md5::ToString);
 
         if(lua_getfunction(this->mLuaEnv, "Main", "Awake"))

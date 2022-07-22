@@ -22,12 +22,15 @@ function AccountService.Register(request)
     if userInfo ~= nil then
         return XCode.AccountAlreadyExists
     end
+    local nowTime = os.time()
+    local user_id = RedisComponent.AddCounter("main", "user_id_counter")
+    local str = string.format("%s%d%d", request.address, nowTime, user_id)
 
     requestInfo.login_time = 0
-    requestInfo.login_token = ""
     requestInfo.user_id = user_id
-    requestInfo.create_time = os.time()
+    requestInfo.create_time = nowTime
     requestInfo._id = requestInfo.account
+    requestInfo.token = Md5.ToString(str)
     requestInfo.address = StringUtil.ParseAddress(request.address)
     return MongoComponent.InsertOnce("user_account", requestInfo)
 end

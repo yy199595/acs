@@ -19,6 +19,7 @@ namespace Sentry
 	class RpcInterfaceConfig final : public InterfaceConfig
 	{
 	public:
+        bool IsAuth;
 		std::string Type;
 		std::string CallWay;
 		std::string Request;

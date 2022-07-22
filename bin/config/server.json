@@ -98,7 +98,6 @@
         "ServiceRpcComponent",
         "GateComponent",
         "MongoRpcComponent",
-        "MysqlRpcComponent",
         "GateClientComponent",
         "EntityMgrComponent",
         "GateAgentComponent",
@@ -108,11 +107,13 @@
         "ClientComponent"
     ],
     "service.rpc": [
+        "RpcTest",
         "GateService",
         "ChatService",
         "MongoService"
     ],
     "service.http": [
+        "HttpTest",
         "AccountService",
         "HttpSourceService"
     ],

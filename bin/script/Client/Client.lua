@@ -18,31 +18,31 @@ function Client.StartLogic()
     LoginComponent.Register(account, password, phoneNum)
 
     local loginInfo = LoginComponent.Login(account, password)
-    table.print(loginInfo)
     if loginInfo.code ~= XCode.Successful then
+        Log.Error("使用http登陆失败")
         return
     end
+
     local address = loginInfo.data.address
     if not clientComponent:StartConnectAsync(address) then
-        Log.Error("connect [" , address, "] failure")
+        Log.Error("连接网关服务器 [" , address, "] 失败")
         return
     end
-    Log.Debug("connect h t t[" , address, "] successful")
+    Log.Debug("连接网关服务器[" , address, "]成功")
 
-    local authMessage = messageComponent:New("c2s.GateAuth.Request", {
+    local code, _ = clientComponent:Call("GateService.Auth", "c2s.GateAuth.Request", {
         token = loginInfo.data.token
     })
+    if code ~= XCode.Successful then
+        Log.Error("user auth failure")
+        return
+    end
 
-    clientComponent:Call("GateService.Auth", authMessage)
+    while true do
 
-
-    --while true do
-    --
-    --    local testtMessage = messageComponent:New("c2s.Chat.Request",{
-    --        user_id = 1122, msg_type = 1, message = "hello"
-    --    })
-    --
-    --    local code, res = clientComponent:Call("ChatService.Chat", testtMessage)
-    --    Log.Error("code = ", code, Json.Encode(res))
-    --end
+        local res, response = clientComponent:Call("ChatService.Chat", "c2s.Chat.Request", {
+            user_id = 1122, msg_type = 1, message = "hello"
+        })
+        Log.Error("code = ", res, Json.Encode(response))
+    end
 end

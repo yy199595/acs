@@ -61,17 +61,12 @@ namespace Sentry
 		return this->mGateService->Send("BroadCast", request);
 	}
 
-	XCode GateAgentComponent::LuaBroadCast(const std::string func, std::shared_ptr<Message> message)
+	XCode GateAgentComponent::LuaBroadCast(const char * func, std::shared_ptr<Message> message)
 	{
-		TaskComponent* taskComponent = this->GetApp()->GetTaskComponent();
-		taskComponent->Start([this, func, message]()
-		{
-			s2s::GateBroadCast::Request request;
-			request.set_func(func);
-			request.mutable_data()->PackFrom(*message);
-			this->mGateService->Send("BroadCast", request);
-		});
-		return XCode::Successful;
+        s2s::GateBroadCast::Request request;
+        request.set_func(func);
+        request.mutable_data()->PackFrom(*message);
+        return this->mGateService->Send("BroadCast", request);
 	}
 
 	void GateAgentComponent::OnLuaRegister(Lua::ClassProxyHelper & luaRegister)

@@ -43,14 +43,13 @@ namespace Sentry
 		XCode OnResponse(const std::string & address, std::shared_ptr<c2s::Rpc_Response> response) final;
 	private:
 		bool LateAwake() final;
-		void OnUserRequest(const RpcInterfaceConfig * config, std::shared_ptr<com::Rpc::Request> request);
-		XCode HandlerRequest(const RpcInterfaceConfig * config, std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<c2s::Rpc::Response> response);
 	 private:
 		class TaskComponent * mTaskComponent;
 		class TimerComponent * mTimerComponent;
 		class MessageComponent * mMsgComponent;
 		class UserSyncComponent * mUserSyncComponent;
 		class GateClientComponent* mGateClientComponent;
+        class ServiceRpcComponent * mServiceRpcComponent;
     };
 }
 

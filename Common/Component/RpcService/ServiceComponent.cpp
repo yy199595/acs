@@ -81,6 +81,12 @@ namespace Sentry
 		{
 			return XCode::NotFoundRpcConfig;
 		}
+        this->mAllAddress.clear();
+        if(!this->mAddressProxy.GetAllAddress(this->mAllAddress))
+        {
+            LOG_ERROR("service addres list empty");
+            return XCode::CallServiceNotFound;
+        }
 		for(const std::string & address : this->mAllAddress)
 		{
 			if(this->SendRequest(address, rpcRequest) != XCode::Successful)

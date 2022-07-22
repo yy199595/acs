@@ -92,4 +92,10 @@ function MongoComponent.Push(tab, select, update)
     return MongoComponent.Update(tab, select, update, "$push")
 end
 
+function MongoComponent.AddCounter(tab, key)
+    return MongoComponent.Update(tab, {
+        _id = key
+    }, {value = 1}, "$inc")
+end
+
 return MongoComponent

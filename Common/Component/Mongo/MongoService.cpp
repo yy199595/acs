@@ -18,6 +18,7 @@ namespace Sentry
         methodRegister.Bind("Insert", &MongoService::Insert);
         methodRegister.Bind("Delete", &MongoService::Delete);
         methodRegister.Bind("Update", &MongoService::Update);
+        methodRegister.Bind("AddCounter", &MongoService::AddCounter);
         return this->mMongoComponent != nullptr;
     }
 
@@ -64,6 +65,12 @@ namespace Sentry
 #endif
             return XCode::Failure;
         }
+        return XCode::Successful;
+    }
+
+    XCode MongoService::AddCounter(const s2s::Mongo::AddCounter::Request &request,
+                                   s2s::Mongo::AddCounter::Response &response)
+    {
         return XCode::Successful;
     }
 

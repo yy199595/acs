@@ -25,5 +25,6 @@ function LoginComponent.Login(account, passwd) -- 获取gate地址
         password = passwd
     }
     local url = "http://127.0.0.1:80/logic/account/login"
-    return httpComponent:Post(url, Json.Encode(loginInfo))
+    local response = httpComponent:Post(url, Json.Encode(loginInfo))
+    return Json.Decode(response.data)
 end

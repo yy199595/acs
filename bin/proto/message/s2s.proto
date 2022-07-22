@@ -83,6 +83,17 @@ message Mongo
         string update = 3;
         string tag = 4;
     }
+    message AddCounter
+    {
+        message Request
+        {
+            string key = 1;
+        }
+        message Response
+        {
+            int64 value = 1;
+        }
+    }
 }
 
 //网关

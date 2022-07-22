@@ -42,7 +42,7 @@ struct TableStruct_s2s_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[23]
+  static const ::google::protobuf::internal::ParseTable schema[26]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -77,6 +77,15 @@ extern GateBroadCast_ResponseDefaultTypeInternal _GateBroadCast_Response_default
 class Mongo;
 class MongoDefaultTypeInternal;
 extern MongoDefaultTypeInternal _Mongo_default_instance_;
+class Mongo_AddCounter;
+class Mongo_AddCounterDefaultTypeInternal;
+extern Mongo_AddCounterDefaultTypeInternal _Mongo_AddCounter_default_instance_;
+class Mongo_AddCounter_Request;
+class Mongo_AddCounter_RequestDefaultTypeInternal;
+extern Mongo_AddCounter_RequestDefaultTypeInternal _Mongo_AddCounter_Request_default_instance_;
+class Mongo_AddCounter_Response;
+class Mongo_AddCounter_ResponseDefaultTypeInternal;
+extern Mongo_AddCounter_ResponseDefaultTypeInternal _Mongo_AddCounter_Response_default_instance_;
 class Mongo_Delete;
 class Mongo_DeleteDefaultTypeInternal;
 extern Mongo_DeleteDefaultTypeInternal _Mongo_Delete_default_instance_;
@@ -131,6 +140,9 @@ template<> ::s2s::GateBroadCast* Arena::CreateMaybeMessage<::s2s::GateBroadCast>
 template<> ::s2s::GateBroadCast_Request* Arena::CreateMaybeMessage<::s2s::GateBroadCast_Request>(Arena*);
 template<> ::s2s::GateBroadCast_Response* Arena::CreateMaybeMessage<::s2s::GateBroadCast_Response>(Arena*);
 template<> ::s2s::Mongo* Arena::CreateMaybeMessage<::s2s::Mongo>(Arena*);
+template<> ::s2s::Mongo_AddCounter* Arena::CreateMaybeMessage<::s2s::Mongo_AddCounter>(Arena*);
+template<> ::s2s::Mongo_AddCounter_Request* Arena::CreateMaybeMessage<::s2s::Mongo_AddCounter_Request>(Arena*);
+template<> ::s2s::Mongo_AddCounter_Response* Arena::CreateMaybeMessage<::s2s::Mongo_AddCounter_Response>(Arena*);
 template<> ::s2s::Mongo_Delete* Arena::CreateMaybeMessage<::s2s::Mongo_Delete>(Arena*);
 template<> ::s2s::Mongo_Insert* Arena::CreateMaybeMessage<::s2s::Mongo_Insert>(Arena*);
 template<> ::s2s::Mongo_Query* Arena::CreateMaybeMessage<::s2s::Mongo_Query>(Arena*);
@@ -2138,6 +2150,346 @@ class Mongo_Update :
 };
 // -------------------------------------------------------------------
 
+class Mongo_AddCounter_Request :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.Mongo.AddCounter.Request) */ {
+ public:
+  Mongo_AddCounter_Request();
+  virtual ~Mongo_AddCounter_Request();
+
+  Mongo_AddCounter_Request(const Mongo_AddCounter_Request& from);
+
+  inline Mongo_AddCounter_Request& operator=(const Mongo_AddCounter_Request& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Mongo_AddCounter_Request(Mongo_AddCounter_Request&& from) noexcept
+    : Mongo_AddCounter_Request() {
+    *this = ::std::move(from);
+  }
+
+  inline Mongo_AddCounter_Request& operator=(Mongo_AddCounter_Request&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const Mongo_AddCounter_Request& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Mongo_AddCounter_Request* internal_default_instance() {
+    return reinterpret_cast<const Mongo_AddCounter_Request*>(
+               &_Mongo_AddCounter_Request_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    14;
+
+  void Swap(Mongo_AddCounter_Request* other);
+  friend void swap(Mongo_AddCounter_Request& a, Mongo_AddCounter_Request& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Mongo_AddCounter_Request* New() const final {
+    return CreateMaybeMessage<Mongo_AddCounter_Request>(nullptr);
+  }
+
+  Mongo_AddCounter_Request* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Mongo_AddCounter_Request>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const Mongo_AddCounter_Request& from);
+  void MergeFrom(const Mongo_AddCounter_Request& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Mongo_AddCounter_Request* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string key = 1;
+  void clear_key();
+  static const int kKeyFieldNumber = 1;
+  const ::std::string& key() const;
+  void set_key(const ::std::string& value);
+  #if LANG_CXX11
+  void set_key(::std::string&& value);
+  #endif
+  void set_key(const char* value);
+  void set_key(const char* value, size_t size);
+  ::std::string* mutable_key();
+  ::std::string* release_key();
+  void set_allocated_key(::std::string* key);
+
+  // @@protoc_insertion_point(class_scope:s2s.Mongo.AddCounter.Request)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr key_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
+// -------------------------------------------------------------------
+
+class Mongo_AddCounter_Response :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.Mongo.AddCounter.Response) */ {
+ public:
+  Mongo_AddCounter_Response();
+  virtual ~Mongo_AddCounter_Response();
+
+  Mongo_AddCounter_Response(const Mongo_AddCounter_Response& from);
+
+  inline Mongo_AddCounter_Response& operator=(const Mongo_AddCounter_Response& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Mongo_AddCounter_Response(Mongo_AddCounter_Response&& from) noexcept
+    : Mongo_AddCounter_Response() {
+    *this = ::std::move(from);
+  }
+
+  inline Mongo_AddCounter_Response& operator=(Mongo_AddCounter_Response&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const Mongo_AddCounter_Response& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Mongo_AddCounter_Response* internal_default_instance() {
+    return reinterpret_cast<const Mongo_AddCounter_Response*>(
+               &_Mongo_AddCounter_Response_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    15;
+
+  void Swap(Mongo_AddCounter_Response* other);
+  friend void swap(Mongo_AddCounter_Response& a, Mongo_AddCounter_Response& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Mongo_AddCounter_Response* New() const final {
+    return CreateMaybeMessage<Mongo_AddCounter_Response>(nullptr);
+  }
+
+  Mongo_AddCounter_Response* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Mongo_AddCounter_Response>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const Mongo_AddCounter_Response& from);
+  void MergeFrom(const Mongo_AddCounter_Response& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Mongo_AddCounter_Response* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // int64 value = 1;
+  void clear_value();
+  static const int kValueFieldNumber = 1;
+  ::google::protobuf::int64 value() const;
+  void set_value(::google::protobuf::int64 value);
+
+  // @@protoc_insertion_point(class_scope:s2s.Mongo.AddCounter.Response)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::int64 value_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
+// -------------------------------------------------------------------
+
+class Mongo_AddCounter :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.Mongo.AddCounter) */ {
+ public:
+  Mongo_AddCounter();
+  virtual ~Mongo_AddCounter();
+
+  Mongo_AddCounter(const Mongo_AddCounter& from);
+
+  inline Mongo_AddCounter& operator=(const Mongo_AddCounter& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Mongo_AddCounter(Mongo_AddCounter&& from) noexcept
+    : Mongo_AddCounter() {
+    *this = ::std::move(from);
+  }
+
+  inline Mongo_AddCounter& operator=(Mongo_AddCounter&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const Mongo_AddCounter& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Mongo_AddCounter* internal_default_instance() {
+    return reinterpret_cast<const Mongo_AddCounter*>(
+               &_Mongo_AddCounter_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    16;
+
+  void Swap(Mongo_AddCounter* other);
+  friend void swap(Mongo_AddCounter& a, Mongo_AddCounter& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Mongo_AddCounter* New() const final {
+    return CreateMaybeMessage<Mongo_AddCounter>(nullptr);
+  }
+
+  Mongo_AddCounter* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Mongo_AddCounter>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const Mongo_AddCounter& from);
+  void MergeFrom(const Mongo_AddCounter& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Mongo_AddCounter* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef Mongo_AddCounter_Request Request;
+  typedef Mongo_AddCounter_Response Response;
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:s2s.Mongo.AddCounter)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
+// -------------------------------------------------------------------
+
 class Mongo :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.Mongo) */ {
  public:
@@ -2176,7 +2528,7 @@ class Mongo :
                &_Mongo_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    17;
 
   void Swap(Mongo* other);
   friend void swap(Mongo& a, Mongo& b) {
@@ -2235,6 +2587,7 @@ class Mongo :
   typedef Mongo_Query Query;
   typedef Mongo_Delete Delete;
   typedef Mongo_Update Update;
+  typedef Mongo_AddCounter AddCounter;
 
   // accessors -------------------------------------------------------
 
@@ -2286,7 +2639,7 @@ class Allot_Response :
                &_Allot_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    18;
 
   void Swap(Allot_Response* other);
   friend void swap(Allot_Response& a, Allot_Response& b) {
@@ -2421,7 +2774,7 @@ class Allot_Save :
                &_Allot_Save_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    19;
 
   void Swap(Allot_Save* other);
   friend void swap(Allot_Save& a, Allot_Save& b) {
@@ -2556,7 +2909,7 @@ class Allot :
                &_Allot_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    20;
 
   void Swap(Allot* other);
   friend void swap(Allot& a, Allot& b) {
@@ -2664,7 +3017,7 @@ class GateBroadCast_Request :
                &_GateBroadCast_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    21;
 
   void Swap(GateBroadCast_Request* other);
   friend void swap(GateBroadCast_Request& a, GateBroadCast_Request& b) {
@@ -2794,7 +3147,7 @@ class GateBroadCast_Response :
                &_GateBroadCast_Response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    19;
+    22;
 
   void Swap(GateBroadCast_Response* other);
   friend void swap(GateBroadCast_Response& a, GateBroadCast_Response& b) {
@@ -2906,7 +3259,7 @@ class GateBroadCast :
                &_GateBroadCast_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    20;
+    23;
 
   void Swap(GateBroadCast* other);
   friend void swap(GateBroadCast& a, GateBroadCast& b) {
@@ -3014,7 +3367,7 @@ class CallClient_Request :
                &_CallClient_Request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    21;
+    24;
 
   void Swap(CallClient_Request* other);
   friend void swap(CallClient_Request& a, CallClient_Request& b) {
@@ -3144,7 +3497,7 @@ class CallClient :
                &_CallClient_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    22;
+    25;
 
   void Swap(CallClient* other);
   friend void swap(CallClient& a, CallClient& b) {
@@ -4959,6 +5312,85 @@ inline void Mongo_Update::set_allocated_tag(::std::string* tag) {
 
 // -------------------------------------------------------------------
 
+// Mongo_AddCounter_Request
+
+// string key = 1;
+inline void Mongo_AddCounter_Request::clear_key() {
+  key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Mongo_AddCounter_Request::key() const {
+  // @@protoc_insertion_point(field_get:s2s.Mongo.AddCounter.Request.key)
+  return key_.GetNoArena();
+}
+inline void Mongo_AddCounter_Request::set_key(const ::std::string& value) {
+  
+  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:s2s.Mongo.AddCounter.Request.key)
+}
+#if LANG_CXX11
+inline void Mongo_AddCounter_Request::set_key(::std::string&& value) {
+  
+  key_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:s2s.Mongo.AddCounter.Request.key)
+}
+#endif
+inline void Mongo_AddCounter_Request::set_key(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:s2s.Mongo.AddCounter.Request.key)
+}
+inline void Mongo_AddCounter_Request::set_key(const char* value, size_t size) {
+  
+  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:s2s.Mongo.AddCounter.Request.key)
+}
+inline ::std::string* Mongo_AddCounter_Request::mutable_key() {
+  
+  // @@protoc_insertion_point(field_mutable:s2s.Mongo.AddCounter.Request.key)
+  return key_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Mongo_AddCounter_Request::release_key() {
+  // @@protoc_insertion_point(field_release:s2s.Mongo.AddCounter.Request.key)
+  
+  return key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Mongo_AddCounter_Request::set_allocated_key(::std::string* key) {
+  if (key != nullptr) {
+    
+  } else {
+    
+  }
+  key_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), key);
+  // @@protoc_insertion_point(field_set_allocated:s2s.Mongo.AddCounter.Request.key)
+}
+
+// -------------------------------------------------------------------
+
+// Mongo_AddCounter_Response
+
+// int64 value = 1;
+inline void Mongo_AddCounter_Response::clear_value() {
+  value_ = PROTOBUF_LONGLONG(0);
+}
+inline ::google::protobuf::int64 Mongo_AddCounter_Response::value() const {
+  // @@protoc_insertion_point(field_get:s2s.Mongo.AddCounter.Response.value)
+  return value_;
+}
+inline void Mongo_AddCounter_Response::set_value(::google::protobuf::int64 value) {
+  
+  value_ = value;
+  // @@protoc_insertion_point(field_set:s2s.Mongo.AddCounter.Response.value)
+}
+
+// -------------------------------------------------------------------
+
+// Mongo_AddCounter
+
+// -------------------------------------------------------------------
+
 // Mongo
 
 // -------------------------------------------------------------------
@@ -5418,6 +5850,12 @@ inline void CallClient_Request::set_allocated_data(::google::protobuf::Any* data
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

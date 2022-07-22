@@ -5,15 +5,16 @@ function ChatService.Awake()
     return true
 end
 
-ChatService.Chat = function(id, request, response)
+ChatService.Chat = function(id, request)
     local messageComponent = App.GetComponent("MessageComponent")
     local gateComponent = App.GetComponent("GateAgentComponent")
     local chatMessage = messageComponent:New("c2s.Chat.Notice", {
         msg_type = request.msg_type,
         message = request.message
     })
+    print(id, request.message)
     gateComponent:BroadCast("ChatComponent.Chat", chatMessage)
-    return 0
+    return XCode.Successful
 end
 
 ChatService.Test = function(id, request)

@@ -80,6 +80,12 @@
             "Async": true,
             "Type": "Server",
             "Request": "s2s.Mongo.Update"
+        },
+        "AddCounter": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "s2s.AddCounter.Request",
+            "Response": "s2s.AddCounter.Response"
         }
     },
     "ChatService": {
@@ -96,6 +102,22 @@
             "CallWay": "Net",
             "Request": "lua.Test",
             "Response": "lua.Test"
+        }
+    },
+    "RpcTest": {
+        "Type": "rpc",
+        "Test": {
+            "Async": false,
+            "Type": "Client"
+        }
+    },
+    "HttpTest": {
+        "Type": "http",
+        "Test": {
+            "Async": false,
+            "Type": "POST",
+            "Content": "application/json",
+            "Path": "/logic/http/test"
         }
     }
 }

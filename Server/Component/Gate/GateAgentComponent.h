@@ -19,7 +19,7 @@ namespace Sentry
 		XCode BroadCast(const std::string & func);
 		XCode BroadCast(const std::string & func, const Message & message);
 	 private:
-		XCode LuaBroadCast(const std::string func, std::shared_ptr<Message> message);
+		XCode LuaBroadCast(const char * func, std::shared_ptr<Message> message);
 		XCode LuaCall(long long userId, const std::string func, std::shared_ptr<Message> message);
 	 protected:
 		bool LateAwake() final;

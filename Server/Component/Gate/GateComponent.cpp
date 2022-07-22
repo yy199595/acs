@@ -53,14 +53,14 @@ namespace Sentry
 		this->mTimerComponent = this->GetApp()->GetTimerComponent();
 		this->mMsgComponent = this->GetComponent<MessageComponent>();
 		this->mUserSyncComponent = this->GetComponent<UserSyncComponent>();
+        this->mServiceRpcComponent = this->GetComponent<ServiceRpcComponent>();
 		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
 		return true;
 	}
 
 	XCode GateComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> request)
 	{
-		std::string method;
-		std::string service;
+		std::string method, service;
 		if(!RpcServiceConfig::ParseFunName(request->method_name(), service, method))
 		{
 			LOG_ERROR("call function " << request->method_name() << " not find");
@@ -73,29 +73,76 @@ namespace Sentry
 		}
 		const RpcServiceConfig & rpcServiceConfig = localServerRpc->GetServiceConfig();
 		const RpcInterfaceConfig* config = rpcServiceConfig.GetConfig(method);
-		if(config == nullptr)
+		if(config == nullptr || config->Type != "Client")
 		{
 			return XCode::NotFoundRpcConfig;
 		}
 
 		if (!config->Request.empty())
 		{
+            if(!request->has_data())
+            {
+                return XCode::CallArgsError;
+            }
 			std::string fullName;
-			if (!request->has_data() || !Any::ParseAnyTypeUrl(
-				request->data().type_url(), &fullName) || fullName != config->Request)
+            const std::string & url = request->data().type_url();
+			if (!Any::ParseAnyTypeUrl(url, &fullName) || fullName != config->Request)
 			{
 				return XCode::CallArgsError;
 			}
 		}
+        long long userId = 0;
+        const std::string & address = request->address();
 
-		std::shared_ptr<com::Rpc::Request> userRequest =
-			std::make_shared<com::Rpc::Request>();
+        std::shared_ptr<com::Rpc::Request> userRequest(new com::Rpc::Request());
 
-		userRequest->set_func(config->FullName);
-		userRequest->set_rpc_id(request->rpc_id());
-		userRequest->set_address(request->address());
-		userRequest->mutable_data()->CopyFrom(request->data());
-		this->mTaskComponent->Start(&GateComponent::OnUserRequest, this, config, userRequest);
+        userRequest->set_func(config->FullName);
+        userRequest->set_rpc_id(request->rpc_id());
+        userRequest->set_address(request->address());
+        userRequest->mutable_data()->CopyFrom(request->data());
+
+        if (!this->mGateClientComponent->GetUserId(address, userId) && config->IsAuth) //没有验证
+        {
+            GateService * gateService = localServerRpc->Cast<GateService>();
+            if(gateService == nullptr)
+            {
+                return XCode::CallServiceNotFound;
+            }
+            this->mTaskComponent->Start([gateService, userRequest, config, this]()
+            {
+                const std::string & userAddress = userRequest->address();
+                std::shared_ptr<com::Rpc::Response> response(new com::Rpc::Response());
+                XCode code = gateService->Invoke(config->Method, userRequest, response);
+                if(code != XCode::Successful)
+                {
+                    this->mGateClientComponent->StartClose(userAddress);
+                    return;
+                }
+                std::shared_ptr<c2s::Rpc::Response> userResponse(new c2s::Rpc::Response());
+
+                userResponse->set_code((int)code);
+                userResponse->set_rpc_id(userRequest->rpc_id());
+                userResponse->mutable_data()->CopyFrom(response->data());
+                this->mGateClientComponent->SendToClient(userAddress, userResponse);
+            });
+        }
+        else
+        {
+            std::string targetAddress;
+            userRequest->set_user_id(userId);
+            AddressProxy & addressProxy = localServerRpc->GetAddressProxy();
+            if(!addressProxy.GetAddress(userId, targetAddress))
+            {
+                addressProxy.GetAddress(targetAddress);
+                addressProxy.AddUserAddress(userId, targetAddress);
+            }
+            std::shared_ptr<ClientRpcTask> clientRpcTask
+                = std::make_shared<ClientRpcTask>(*request, this->mGateClientComponent);
+
+            userRequest->set_rpc_id(clientRpcTask->GetRpcId());
+            this->mServiceRpcComponent->AddTask(clientRpcTask);
+            localServerRpc->SendRequest(targetAddress, userRequest);
+        }
 		return XCode::Successful;
 	}
 
@@ -105,67 +152,6 @@ namespace Sentry
 		{
 			return XCode::NetWorkError;
 		}
-		return XCode::Successful;
-	}
-
-	void GateComponent::OnUserRequest(const RpcInterfaceConfig * config, std::shared_ptr<com::Rpc::Request> request)
-	{
-		std::shared_ptr<c2s::Rpc::Response> response =
-			std::make_shared<c2s::Rpc::Response>();
-		response->set_rpc_id(request->rpc_id());
-		XCode code = this->HandlerRequest(config, request, response);
-		if (code != XCode::Successful)
-		{
-			this->mGateClientComponent->StartClose(request->address());
-			return;
-		}
-		this->mGateClientComponent->SendToClient(request->address(), response);
-	}
-
-	XCode GateComponent::HandlerRequest(const RpcInterfaceConfig * config,
-		std::shared_ptr<com::Rpc::Request> rpcRequest, std::shared_ptr<c2s::Rpc::Response> response)
-	{
-		long long userId = 0;
-		if (!this->mGateClientComponent->GetUserId(rpcRequest->address(), userId)) //没有验证
-		{
-			GateService* gateService = this->GetComponent<GateService>(config->Service);
-			if (gateService == nullptr || !gateService->IsStartService())
-			{
-				return XCode::CallServiceNotFound;
-			}
-			std::shared_ptr<com::Rpc::Response> rpcResponse = std::make_shared<com::Rpc::Response>();
-			XCode code = gateService->Invoke(config->Method, rpcRequest, rpcResponse);
-			if (code == XCode::Successful)
-			{
-				response->mutable_data()->CopyFrom(rpcResponse->data());
-				return XCode::Successful;
-			}
-			LOG_ERROR(rpcRequest->address() << " auth failure");
-			return XCode::NetActiveShutdown;
-		}
-		std::string address;
-		ServiceComponent* localServerRpc = this->GetApp()->GetService(config->Service);
-		AddressProxy & serviceAddressProxy = localServerRpc->GetAddressProxy();
-		if (!serviceAddressProxy.GetAddress(userId, address))
-		{
-			address = this->mUserSyncComponent->GetAddress(userId, config->Service);
-			if (serviceAddressProxy.HasAddress(address) || serviceAddressProxy.GetAddress(address))
-			{
-				localServerRpc->GetAddressProxy().AddUserAddress(userId, address);
-				this->mUserSyncComponent->SetAddress(userId, config->Service, address);
-				LOG_DEBUG(userId << "  " << config->Service << " allot address = " << address);
-			}
-		}
-		rpcRequest->set_user_id(userId);
-		std::shared_ptr<Message> rpcResponse = config->Response.empty()
-											   ? nullptr : this->mMsgComponent->New(config->Response);
-
-		XCode code = localServerRpc->Call(address, rpcRequest, rpcResponse);
-		if (code == XCode::Successful && rpcResponse != nullptr)
-		{
-			response->mutable_data()->PackFrom(*rpcResponse);
-		}
-		response->set_code((int)code);
 		return XCode::Successful;
 	}
 }

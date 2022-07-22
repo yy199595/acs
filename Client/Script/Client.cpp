@@ -4,6 +4,7 @@
 
 #include"Client.h"
 #include"App/App.h"
+#include"Script/Extension/Json/Json.h"
 #include"Util/StringHelper.h"
 #include"Other/ElapsedTimer.h"
 #include"Script/LuaParameter.h"
@@ -21,16 +22,19 @@ namespace Lua
 		std::shared_ptr<c2s::Rpc::Request> request(new c2s::Rpc::Request());
 		const std::string func = CommonParameter::Read<std::string>(lua, 2);
 		std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
-		if(lua_isuserdata(lua, 3))
-		{
-			std::shared_ptr<Message> message = UserDataParameter::Read<std::shared_ptr<Message>>(lua, 3);
-			if(message == nullptr)
-			{
-				luaL_error(lua, "read message type error");
-				return 0;
-			}
-			request->mutable_data()->PackFrom(*message);
-		}
+        MessageComponent * messageComponent = App::Get()->GetMsgComponent();
+        if(lua_isstring(lua, 3) && lua_istable(lua, 4))
+        {
+            size_t size = 0;
+            const char * type = luaL_checkstring(lua, 3);
+            std::shared_ptr<Message> message = messageComponent->Read(lua, type, 4);
+            if(message == nullptr)
+            {
+                LOG_ERROR("new proto message " << type << " error");
+            }
+            request->mutable_data()->PackFrom(*message);
+        }
+
 		request->set_method_name(func);
 		TaskComponent * taskComponent = App::Get()->GetTaskComponent();
 		taskComponent->Start([request, func, clientComponent, luaWaitTaskSource]()

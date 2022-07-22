@@ -47,9 +47,9 @@ namespace Sentry
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) override;
 	private:
 		std::string mLocalAddress;
-		AddressProxy mAddressProxy;
 		RpcServiceConfig * mConfig;
-		std::vector<std::string> mAllAddress;
+        AddressProxy mAddressProxy;
+        std::vector<std::string> mAllAddress;
 		class ServiceRpcComponent* mRpcComponent;
 		class RpcClientComponent* mClientComponent;
 	};
