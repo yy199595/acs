@@ -110,14 +110,6 @@ namespace Sentry
 	};
 
 	template<typename T1, typename T2>
-	class IProtoRpc
-	{
-	 public:
-		virtual XCode OnRequest(std::shared_ptr<T1> request) = 0;
-		virtual XCode OnResponse(std::shared_ptr<T2> response) = 0;
-	};
-
-	template<typename T1, typename T2>
 	class IClientRpc
 	{
 	 public:

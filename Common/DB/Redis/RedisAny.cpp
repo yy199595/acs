@@ -22,6 +22,11 @@ namespace Sentry
 		io << '$' << str.size() << "\r\n" << str << "\r\n";
 	}
 
+    RedisString::RedisString()
+    {
+
+    }
+
 	RedisString::RedisString(const size_t size)
 	{
 		this->mValue.reserve(size);

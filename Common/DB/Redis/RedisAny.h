@@ -36,7 +36,8 @@ namespace Sentry
 	class RedisString : public RedisAny
 	{
 	 public:
-		RedisString(const size_t size);
+        RedisString();
+        RedisString(const size_t size);
 		RedisString(const std::string & value);
 		RedisString(const char * str, size_t size);
 	 public:

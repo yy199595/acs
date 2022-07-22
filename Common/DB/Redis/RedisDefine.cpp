@@ -159,7 +159,10 @@ namespace Sentry
 		char cc = os.get();
 		this->mDataSize = 0;
 		std::getline(os, this->mString);
-        assert(!this->mString.empty());
+        if(this->mString.empty())
+        {
+            return 0;
+        }
 		this->mString.pop_back();
 		switch (cc)
 		{
@@ -194,8 +197,13 @@ namespace Sentry
 		{
 			this->mString.pop_back();
 			this->mDataSize = std::stoi(this->mString);
-			this->mArray.emplace_back(new RedisString(this->mDataSize));
-			return this->mDataSize;
+            if(this->mDataSize > 0)
+            {
+                this->mArray.emplace_back(new RedisString(this->mDataSize));
+                return this->mDataSize;
+            }
+            this->mArray.emplace_back(new RedisString());
+            return -1;
 		}
 		else if(cc == ':' && std::getline(os, this->mString))
 		{
