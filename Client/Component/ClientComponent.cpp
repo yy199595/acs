@@ -3,7 +3,6 @@
 #include"App/App.h"
 #include<Util/StringHelper.h>
 #include"Network/TcpRpcClientContext.h"
-#include"Task/ClientRpcTask.h"
 #include"Script/Client.h"
 #include"Script/Extension/Message/Message.h"
 #include"Component/Http/HttpComponent.h"
@@ -13,34 +12,31 @@
 
 namespace Client
 {
-	ClientComponent::ClientComponent()
+	ClientTask::ClientTask()
 	{
-        this->mTimerComponent = nullptr;
+		this->mTaskId = Guid::Create();
 	}
 
-	unsigned int ClientComponent::AddRpcTask(std::shared_ptr<ClientRpcTask> task, int ms)
+	void ClientTask::OnResponse(std::shared_ptr<c2s::Rpc::Response> response)
 	{
-		long long rpcId = task->GetRpcTaskId();
-		//this->mRpcTasks.emplace(rpcId, task);
-		return ms > 0 ? this->mTimerComponent->DelayCall(ms, &ClientComponent::OnTimeout, this, rpcId) : 0;
+		this->mTask.SetResult(response);
+	}
+
+}
+
+namespace Client
+{
+	ClientComponent::ClientComponent()
+	{
+		this->mPort = 0;
+		this->mLuaComponent = nullptr;
+        this->mTimerComponent = nullptr;
 	}
 
     void ClientComponent::OnRequest(std::shared_ptr<c2s::Rpc::Call> t1)
     {
         LOG_INFO("call client func = " << t1->func());
 	}
-
-    void ClientComponent::OnResponse(std::shared_ptr<c2s::Rpc::Response> t2)
-    {
-		auto iter = this->mRpcTasks.find(t2->rpc_id());
-		if(iter != this->mRpcTasks.end())
-		{
-			iter->second->SetResult(t2);
-			this->mRpcTasks.erase(iter);
-			return;
-		}
-		LOG_ERROR("not find rpc task id = " << t2->rpc_id());
-    }
 
     bool ClientComponent::LateAwake()
     {
@@ -76,16 +72,19 @@ namespace Client
 
 	std::shared_ptr<c2s::Rpc::Response> ClientComponent::Call(std::shared_ptr<c2s::Rpc::Request> request)
 	{
-		std::shared_ptr<TaskSource<std::shared_ptr<c2s::Rpc_Response>>> rpcTask
-				= std::make_shared<TaskSource<std::shared_ptr<c2s::Rpc_Response>>>();
-		request->set_rpc_id(rpcTask->GetTaskId());
-		this->mRpcTasks.emplace(rpcTask->GetTaskId(), rpcTask);
+		std::shared_ptr<ClientTask> clienRpcTask(new ClientTask());
+		request->set_rpc_id(clienRpcTask->GetRpcId());
+		
+		this->AddTask(clienRpcTask);
 		this->mTcpClient->SendToServer(request);
-		return rpcTask->Await();
+		LOG_DEBUG("call [" << request->method_name() 
+			<< "] rpc id = " << clienRpcTask->GetRpcId());
+		return clienRpcTask->Await();
 	}
 
 	void ClientComponent::OnTimeout(long long rpcId)
 	{
+		this->OnResponse(rpcId, nullptr);
 //		auto iter = this->mRpcTasks.find(rpcId);
 //		if (iter != this->mRpcTasks.end())
 //		{
@@ -95,16 +94,17 @@ namespace Client
 //		}
 	}
 
+	void ClientComponent::OnAddTask(RpcTask rpctask)
+	{
+		LOG_WARN(this->GetName() << " add new task " << rpctask->GetRpcId());
+	}
+
 	bool ClientComponent::StartConnect(const std::string& ip, unsigned short port)
 	{
-#ifdef ONLY_MAIN_THREAD
 		IAsioThread& thread = this->GetApp()->GetTaskScheduler();
-#else
-		IAsioThread& thread = this->GetComponent<NetThreadComponent>()->AllocateNetThread();
-#endif
 		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, ip, port));
 		this->mTcpClient = std::make_shared<TcpRpcClientContext>(socketProxy, this);
-		if(this->mTcpClient->ConnectAsync()->Await())
+		if(this->mTcpClient->StartConnect())
 		{
 			this->mTcpClient->StartReceive();
 			return true;

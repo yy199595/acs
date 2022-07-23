@@ -85,7 +85,7 @@ if(__ENABLE_JEMALLOC__)
 endif()
 
 if(__ENABLE_MIMALLOC__)
-    list(APPEND StaticLibs mimalloc)
+    #list(APPEND StaticLibs mimalloc)
 endif()
 
 if(__ENABLE_OPEN_SSL__)

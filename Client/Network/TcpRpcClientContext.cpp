@@ -13,38 +13,19 @@ namespace Client
 	{
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> networkData =
 			std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_CLIENT_REQUEST, request);
-#ifdef ONLY_MAIN_THREAD
-		this->Send(networkData);
-#else
-		this->mNetworkThread.Invoke(&TcpRpcClientContext::Send, this, networkData);
-#endif
+
+        this->Send(networkData);
 	}
 
 
-    std::shared_ptr<TaskSource<bool>> TcpRpcClientContext::ConnectAsync()
+    bool TcpRpcClientContext::StartConnect()
     {
-		this->mConnectTask = std::make_shared<TaskSource<bool>>();
-#ifdef ONLY_MAIN_THREAD
-		this->Connect();
-#else
-		this->mNetworkThread.Invoke(&TcpRpcClientContext::Connect, this);
-#endif
-        return this->mConnectTask;
+        return this->ConnectSync();
     }
 
     void TcpRpcClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
     {
 
-    }
-
-    void TcpRpcClientContext::OnConnect(const asio::error_code& error, int count)
-    {
-		if(error)
-		{
-			this->mConnectTask->SetResult(false);
-			return;
-		}
-		this->mConnectTask->SetResult(true);
     }
 
     void TcpRpcClientContext::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer)
@@ -82,11 +63,7 @@ namespace Client
 	void TcpRpcClientContext::StartReceive()
 	{
         this->mReadState = ReadType::HEAD;
-#ifdef ONLY_MAIN_THREAD
 		this->ReceiveMessage(sizeof(int));
-#else
-		this->mNetworkThread.Invoke(&TcpRpcClientContext::ReceiveMessage, this, sizeof(int));
-#endif
 	}
 
 	bool TcpRpcClientContext::OnRequest(std::iostream & os)
@@ -109,7 +86,8 @@ namespace Client
 			CONSOLE_LOG_ERROR("parse response message error");
 			return false;
         }
-        this->mClientComponent->OnResponse(response);
+        long long taskId = response->rpc_id();
+        this->mClientComponent->OnResponse(taskId, response);
         return true;
     }
 

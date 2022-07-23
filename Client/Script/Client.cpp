@@ -50,8 +50,7 @@ namespace Lua
 			XCode code = (XCode)response->code();
 			if(code == XCode::Successful && response->has_data())
 			{
-				MessageComponent * messageComponent = App::Get()->GetComponent<MessageComponent>();
-				message = messageComponent->New(response->data());
+				message = App::Get()->GetMsgComponent()->New(response->data());
 			}
 			luaWaitTaskSource->SetResult(code, message);
 			LOG_DEBUG("client call " << func << " user time = [" << elapsedTimer.GetMs() << "ms]");
@@ -72,12 +71,6 @@ namespace Lua
 			luaL_error(lua, "parse ip address [%s] error", address.c_str());
 			return 0;
 		}
-		std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
-
-		taskComponent->Start([clientComponent, ip, port, luaWaitTaskSource]()
-		{
-			luaWaitTaskSource->SetResult(clientComponent->StartConnect(ip, port));
-		});
-		return luaWaitTaskSource->Await();
+		return clientComponent->StartConnect(ip, port);
 	}
 }

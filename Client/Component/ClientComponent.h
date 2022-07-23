@@ -1,7 +1,7 @@
 ﻿#pragma once
-#include<Component/Component.h>
-#include"Async/TaskSource.h"
 #include"Message/c2s.pb.h"
+#include"Async/TaskSource.h"
+#include"Component/Rpc/RpcTaskComponent.h"
 using namespace Sentry;
 using namespace google::protobuf;
 
@@ -12,13 +12,30 @@ namespace Sentry
 	class LuaScriptComponent;
 	class NetThreadComponent;
 }
+
+namespace Client
+{
+    class ClientTask : public Sentry::IRpcTask<c2s::Rpc::Response>
+    {
+    public:
+        ClientTask();
+    public:
+        int GetTimeout() { return 0; };
+        long long GetRpcId() { return this->mTaskId; }
+        void OnResponse(std::shared_ptr<c2s::Rpc::Response> response);
+        std::shared_ptr<c2s::Rpc::Response> Await() { return this->mTask.Await(); }
+    private:
+        long long mTaskId;
+        TaskSource<std::shared_ptr<c2s::Rpc::Response>> mTask;
+    };
+}
+
 namespace Client
 {
     class ClientRpcTask;
     class TcpRpcClientContext;
 
-    class ClientComponent : public Component,
-							public IRpc<c2s::Rpc::Call, c2s::Rpc::Response>, public IComplete, public ILuaRegister
+    class ClientComponent : public RpcTaskComponent<c2s::Rpc::Response>, public IComplete, public ILuaRegister
     {
     public:
         ClientComponent();
@@ -26,34 +43,20 @@ namespace Client
         ~ClientComponent() final = default;
 
     public:
-        void StartClose(const std::string & address) final {};
-
-        void OnCloseSocket(const std::string & address, XCode code) final {};
-
-        void OnRequest(std::shared_ptr<c2s::Rpc::Call> t1) final;
-
-        void OnResponse(std::shared_ptr<c2s::Rpc_Response> t2) final;
-
-    public:
+        void OnRequest(std::shared_ptr<c2s::Rpc::Call> t1);
 		bool StartConnect(const std::string & ip, unsigned short port);
 		std::shared_ptr<c2s::Rpc::Response> Call(std::shared_ptr<c2s::Rpc::Request> request);
-    public:
-        unsigned int AddRpcTask(std::shared_ptr<ClientRpcTask> task, int ms);
-
     protected:
 
         bool LateAwake() final;
-
-		void OnAllServiceStart() override;
-
+		void OnAllServiceStart() final;
 		void OnTimeout(long long rpcId);
-
+        void OnAddTask(RpcTask task) final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
     private:
         unsigned short mPort;
         TimerComponent *mTimerComponent;
 		LuaScriptComponent * mLuaComponent;
         std::shared_ptr<TcpRpcClientContext> mTcpClient;
-        std::unordered_map<long long, TaskSourceShared<c2s::Rpc::Response>> mRpcTasks;
     };
 }

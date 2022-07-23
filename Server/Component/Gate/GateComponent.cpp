@@ -10,9 +10,6 @@
 #include"GateClientComponent.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Component/RpcService/LocalServiceComponent.h"
-#ifdef __RPC_DEBUG_LOG__c
-#include"google/protobuf/util/json_util.h"
-#endif
 #include"GateService.h"
 #include"Component/User/UserSyncComponent.h"
 #include"Component/Redis/MainRedisComponent.h"
@@ -22,6 +19,7 @@ namespace Sentry
 {
     ClientRpcTask::ClientRpcTask(const c2s::Rpc::Request &request, GateClientComponent * component)
     {
+        this->mTaskId = Guid::Create();
         this->mClientComponent = component;
         this->mAddress = request.address();
         this->mResponse = std::make_shared<c2s::Rpc::Response>();

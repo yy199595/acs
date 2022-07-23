@@ -15,13 +15,12 @@ namespace Client
 	public:
 		TcpRpcClientContext(std::shared_ptr<SocketProxy> socket, ClientComponent * component);
 	public:
+		bool StartConnect();
 		void StartReceive();
-		std::shared_ptr<TaskSource<bool>> ConnectAsync();
 		void SendToServer(std::shared_ptr<c2s::Rpc::Request> request);
 	protected:
 		bool OnRequest(std::iostream & os);
 		bool OnResponse(std::iostream & os);
-		void OnConnect(const asio::error_code &error, int count) final;
         void OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
     private:
