@@ -21,7 +21,7 @@
             "component": "RpcClientComponent"
         },
         "http": {
-            "port": 80,
+            "port": 8080,
             "count": 1000,
             "ip": "127.0.0.1",
             "component": "HttpServiceComponent"
@@ -31,12 +31,6 @@
             "count": 10000,
             "ip": "127.0.0.1",
             "component": "GateClientComponent"
-        },
-        "console": {
-            "port": 8080,
-            "count": 100,
-            "ip": "127.0.0.1",
-            "component": "ConsoleComponent"
         }
     },
     "mysql": {

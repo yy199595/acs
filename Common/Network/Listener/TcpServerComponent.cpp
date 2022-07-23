@@ -54,11 +54,13 @@ namespace Sentry
 			ISocketListen* listenerHandler = this->GetComponent<ISocketListen>(config.Handler);
 			if(listenerHandler != nullptr)
 			{
-				if (listener->StartListen(listenerHandler))
+                const ListenConfig& config = listener->GetConfig();
+                if (!listener->StartListen(listenerHandler))
 				{
-					const ListenConfig& config = listener->GetConfig();
-					LOG_DEBUG(config.Name << " listen " << config.Address << " successful");
+                    LOG_FATAL(config.Name << " listen " << config.Address << " failure");
+                    continue;
 				}
+                LOG_DEBUG(config.Name << " listen " << config.Address << " successful");
 			}
 		}
 	}

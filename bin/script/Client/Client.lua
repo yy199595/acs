@@ -38,9 +38,15 @@ function Client.StartLogic()
         return
     end
 
+    while true do
+
+        LoginComponent.Register(account, password, phoneNum)
+
+        LoginComponent.Login(account, password)
 
         local res, response = clientComponent:Call("ChatService.Chat", "c2s.Chat.Request", {
             user_id = 1122, msg_type = 1, message = "hello"
         })
         Log.Error("code = ", res, Json.Encode(response))
+    end
 end

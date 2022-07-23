@@ -44,7 +44,7 @@ namespace Client
         }
         else if(this->mReadState == ReadType::BODY)
         {
-			std::iostream os(&buffer);
+			std::istream os(&buffer);
             this->mReadState = ReadType::HEAD;
             switch ((MESSAGE_TYPE)os.get())
             {
@@ -66,7 +66,7 @@ namespace Client
 		this->ReceiveMessage(sizeof(int));
 	}
 
-	bool TcpRpcClientContext::OnRequest(std::iostream & os)
+	bool TcpRpcClientContext::OnRequest(std::istream & os)
     {
         std::shared_ptr<c2s::Rpc::Call> request(new c2s::Rpc::Call());
         if (!request->ParseFromIstream(&os))
@@ -78,7 +78,7 @@ namespace Client
         return true;
     }
 
-	bool TcpRpcClientContext::OnResponse(std::iostream & os)
+	bool TcpRpcClientContext::OnResponse(std::istream & os)
     {
         std::shared_ptr<c2s::Rpc::Response> response(new c2s::Rpc::Response());
         if (!response->ParseFromIstream(&os))

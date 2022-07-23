@@ -35,6 +35,9 @@ namespace Lua
 			luaL_error(lua, "parse get url : [%s] failure", str);
 			return 0;
 		}
+#ifdef __DEBUG__
+        LOG_DEBUG("[http get] url = " << std::string(str, size));
+#endif
         std::shared_ptr<LuaHttpTask> luaHttpTask = getRequest->MakeLuaTask(lua, 0);
         std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
 
@@ -47,7 +50,6 @@ namespace Lua
 	{
 		size_t size = 0;
 		const char * str = luaL_checklstring(lua, 2, &size);
-		TaskComponent* taskComponent = App::Get()->GetTaskComponent();
 		std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
 		HttpComponent* httpComponent = UserDataParameter::Read<HttpComponent*>(lua, 1);
 		std::shared_ptr<HttpPostRequest> postRequest = HttpPostRequest::Create(std::string(str, size));
@@ -56,9 +58,14 @@ namespace Lua
 			luaL_error(lua, "parse post url : [%s] failure", str);
 			return 0;
 		}
-		postRequest->AddBody(luaL_checklstring(lua, 3, &size), size);
+        const char * data = luaL_checklstring(lua, 3, &size);
+		postRequest->AddBody(data, size);
         std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
         std::shared_ptr<LuaHttpTask> luaHttpTask = postRequest->MakeLuaTask(lua, 0);
+
+#ifdef __DEBUG__
+        LOG_DEBUG("[http post] url = " << std::string(str, size) << " data = " << postRequest->GetBody());
+#endif
 
         httpComponent->AddTask(luaHttpTask);
         requestClient->Request(postRequest);
@@ -73,10 +80,9 @@ namespace Lua
             return 0;
         }
 
-        size_t size = 0;
         lua_pushthread(lua);
-        const std::string url(luaL_checklstring(lua, 2, &size));
-		const std::string path(luaL_checklstring(lua, 3, &size));
+        const char * url = luaL_checkstring(lua, 2);
+        const char * path = luaL_checkstring(lua, 3);
 
 		std::string dir, fileName;
 		if(Helper::Directory::GetDirAndFileName(path, dir, fileName))
@@ -91,7 +97,7 @@ namespace Lua
 		std::shared_ptr<HttpGetRequest> getRequest = HttpGetRequest::Create(url);
 		if(getRequest == nullptr)
 		{
-			luaL_error(lua, "parse get url : [%s] failure", url.c_str());
+			luaL_error(lua, "parse get url : [%s] failure", url);
 			return 0;
 		}
 
@@ -100,7 +106,7 @@ namespace Lua
 		if(!fs->is_open())
 		{
 			delete fs;
-			luaL_error(lua, "open %s error", path.c_str());
+			luaL_error(lua, "open %s error", path);
 			return 0;
 		}
         std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
