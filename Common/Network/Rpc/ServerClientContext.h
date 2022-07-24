@@ -22,14 +22,13 @@ namespace Sentry
 		void SendToServer(std::shared_ptr<com::Rpc_Response> message);
 	 protected:
 		void OnConnect(const asio::error_code &error, int count) final;
+		void OnReceiveMessage(const asio::error_code &code, size_t) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
-        void OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer, size_t size) final;
     private:
 		void CloseSocket(XCode code);
-		bool OnRequest(const char * buffer, size_t size);
-		bool OnResponse(const char * buffer, size_t size);
+		bool OnRequest(std::istream & istream1);
+		bool OnResponse(std::istream & istream1);
 	private:
-        char mDataBuffer[1024];
 		RpcClientComponent* mTcpComponent;
 		std::shared_ptr<asio::steady_timer> mTimer;
 		std::queue<std::shared_ptr<ProtoMessage>> mSendQueues;

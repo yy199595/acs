@@ -32,7 +32,7 @@ namespace Sentry
 #endif
 	}
 
-    void GateClientContext::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer, size_t size)
+    void GateClientContext::OnReceiveMessage(const asio::error_code &code, size_t size)
     {
         if(code)
         {
@@ -45,7 +45,7 @@ namespace Sentry
         if (this->mReadState == ReadType::HEAD)
         {
             this->mReadState = ReadType::BODY;
-            this->ReceiveMessage(this->GetLength(buffer));
+            this->ReceiveMessage(this->GetLength());
         }
         else if (this->mReadState == ReadType::BODY)
         {
@@ -53,19 +53,15 @@ namespace Sentry
             std::istream & readStream = this->GetReadStream();
             if((MESSAGE_TYPE)readStream.get() == MESSAGE_TYPE::MSG_RPC_CLIENT_REQUEST)
             {
-                char * dataBuffer = this->mDataBuffer;
-                if(sizeof(this->mDataBuffer) < size)
-                {
-                    dataBuffer = new char[size];
-                }
-                readStream.readsome(dataBuffer, size);
+				std::istream & is = this->GetReadStream();
                 std::shared_ptr<c2s::Rpc_Request> request(new c2s::Rpc_Request());
-                if (!request->ParseFromArray(dataBuffer, size))
+                if (!request->ParseFromIstream(&is))
                 {
+					CONSOLE_LOG_ERROR("parse request message error");
                     return;
                 }
                 this->mCallCount++;
-                this->mQps += buffer.size();
+                this->mQps += size;
                 request->set_address(this->GetAddress());
 #ifdef ONLY_MAIN_THREAD
                 this->mGateComponent->OnRequest(request);
@@ -74,10 +70,6 @@ namespace Sentry
                 mainTaskScheduler.Invoke(&GateClientComponent::OnRequest, this->mGateComponent, request);
 #endif
                 this->ReceiveMessage(sizeof(int));
-                if(dataBuffer != this->mDataBuffer)
-                {
-                    delete[] dataBuffer;
-                }
                 return;
             }
         }

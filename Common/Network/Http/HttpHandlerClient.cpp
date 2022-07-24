@@ -47,14 +47,15 @@ namespace Sentry
 #endif
 	}
 
-    void HttpHandlerClient::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer, size_t)
+    void HttpHandlerClient::OnReceiveMessage(const asio::error_code &code, size_t size)
     {
         if(code == asio::error::eof)
         {
             this->OnComplete();
             return;
         }
-        switch(this->mHttpRequest->OnReceiveSome(buffer))
+		std::istream & is = this->GetReadStream();
+        switch(this->mHttpRequest->OnReceiveSome(is))
         {
             case 0:
                 this->OnComplete();

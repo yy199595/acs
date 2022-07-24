@@ -158,9 +158,9 @@ namespace Sentry
 
         virtual const HttpData &GetData() const = 0;
 
-        virtual int OnReceiveLine(asio::streambuf &streamBuffer) = 0;
+        virtual int OnReceiveLine(std::istream &streamBuffer) = 0;
 
-        virtual int OnReceiveSome(asio::streambuf &streamBuffer) = 0;
+        virtual int OnReceiveSome(std::istream &streamBuffer) = 0;
     };
 }
 
@@ -172,7 +172,7 @@ namespace Sentry
 		HttpAsyncResponse();
 		virtual ~HttpAsyncResponse() = default;
 	 public:
-		int OnReceiveLine(asio::streambuf& streamBuffer) final;
+		int OnReceiveLine(std::istream & streamBuffer) final;
 		HttpStatus GetHttpCode()
 		{
 			return (HttpStatus)this->mHttpCode;
@@ -205,7 +205,7 @@ namespace Sentry
 		HttpFileResponse(std::fstream* fs);
 		~HttpFileResponse();
 	 private:
-		int OnReceiveSome(asio::streambuf& streamBuffer) final;
+		int OnReceiveSome(std::istream & streamBuffer) final;
 	 private:
 		char mBuffer[128];
 		std::fstream* mFstream;
@@ -219,7 +219,7 @@ namespace Sentry
 	 public:
 		HttpDataResponse() = default;
 	 private:
-		int OnReceiveSome(asio::streambuf& streamBuffer) final;
+		int OnReceiveSome(std::istream & streamBuffer) final;
 	 private:
 		char mBuffer[128];
 	};
@@ -233,7 +233,7 @@ namespace Sentry
 		HttpHandlerRequest(const std::string& address);
 	 public:
 
-		int OnReceiveSome(asio::streambuf& streamBuffer) final;
+		int OnReceiveSome(std::istream & streamBuffer) final;
 	 public:
 		const std::string& GetPath() const
 		{
@@ -259,7 +259,7 @@ namespace Sentry
 		bool GetHead(const std::string& key, int& value) const;
 		bool GetHead(const std::string& key, std::string& value) const;
 	 private:
-		int OnReceiveLine(asio::streambuf& streamBuffer) final;
+		int OnReceiveLine(std::istream & streamBuffer) final;
 	 private:
 		std::string mUrl;
 		HttpData mHttpData;

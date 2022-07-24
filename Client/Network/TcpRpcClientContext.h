@@ -19,9 +19,9 @@ namespace Client
 		void StartReceive();
 		void SendToServer(std::shared_ptr<c2s::Rpc::Request> request);
 	protected:
-		bool OnRequest(const char * data, size_t size);
-		bool OnResponse(const char * data, size_t size);
-        void OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer, size_t size) final;
+		bool OnRequest(std::istream & istream1);
+		bool OnResponse(std::istream & istream1);
+        void OnReceiveMessage(const asio::error_code &code, size_t size) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
     private:
         char mDataBuffer[1024];

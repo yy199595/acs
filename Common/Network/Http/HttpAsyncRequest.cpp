@@ -267,19 +267,18 @@ namespace Sentry
 		this->mState = HttpDecodeState::FirstLine;
 	}
 
-	int HttpAsyncResponse::OnReceiveLine(asio::streambuf& streamBuffer)
+	int HttpAsyncResponse::OnReceiveLine(std::istream & streamBuffer)
 	{
-		std::iostream io(&streamBuffer);
 		if (this->mState == HttpDecodeState::FirstLine)
 		{
 			this->mState = HttpDecodeState::HeadLine;
-			io >> this->mHttpData.mVersion >> this->mHttpCode >> this->mHttpError;
-			io.ignore(2); //放弃\r\n
+			streamBuffer >> this->mHttpData.mVersion >> this->mHttpCode >> this->mHttpError;
+			streamBuffer.ignore(2); //放弃\r\n
 		}
 		if (this->mState == HttpDecodeState::HeadLine)
 		{
 			std::string lineData;
-			while (std::getline(io, lineData))
+			while (std::getline(streamBuffer, lineData))
 			{
 				if (lineData == "\r")
 				{
@@ -312,27 +311,25 @@ namespace Sentry
 		delete this->mFstream;
 	}
 
-	int HttpFileResponse::OnReceiveSome(asio::streambuf& streamBuffer)
+	int HttpFileResponse::OnReceiveSome(std::istream & streamBuffer)
 	{
-		std::iostream oss(&streamBuffer);
-		size_t size = oss.readsome(this->mBuffer, 128);
+		size_t size = streamBuffer.readsome(this->mBuffer, 128);
 		while(size > 0)
 		{
 			this->mFstream->write(this->mBuffer, size);
-			size = oss.readsome(this->mBuffer, 128);
+			size = streamBuffer.readsome(this->mBuffer, 128);
 		}
 		return 1;
 	}
 
-	int HttpDataResponse::OnReceiveSome(asio::streambuf& streamBuffer)
+	int HttpDataResponse::OnReceiveSome(std::istream & streamBuffer)
 	{
 		char buffer[128] = {0};
-		std::iostream oss(&streamBuffer);
-		size_t size = oss.readsome(buffer, 128);
+		size_t size = streamBuffer.readsome(buffer, 128);
 		while(size > 0)
 		{
 			this->mHttpData.mData.append(buffer, size);
-			size = oss.readsome(buffer, 128);
+			size = streamBuffer.readsome(buffer, 128);
 		}
 		return 1;
 	}
@@ -397,37 +394,35 @@ namespace Sentry
 		return false;
     }
 
-    int HttpHandlerRequest::OnReceiveSome(asio::streambuf &streamBuffer)
+    int HttpHandlerRequest::OnReceiveSome(std::istream &streamBuffer)
     {
         if (this->mState != HttpDecodeState::Content)
         {
             return this->OnReceiveLine(streamBuffer);
         }
         char buffer[128] = {0 };
-        std::iostream io(&streamBuffer);
-        size_t size = io.readsome(buffer, 128);
+        size_t size = streamBuffer.readsome(buffer, 128);
         while(size > 0)
         {
             this->mHttpData.Add(buffer, size);
-            size = io.readsome(buffer, size);
+            size = streamBuffer.readsome(buffer, size);
         }
         return 1;
     }
 
-    int HttpHandlerRequest::OnReceiveLine(asio::streambuf &streamBuffer)
+    int HttpHandlerRequest::OnReceiveLine(std::istream &streamBuffer)
     {
-        std::iostream io(&streamBuffer);
         if(this->mState == HttpDecodeState::FirstLine)
         {
             this->mState = HttpDecodeState::HeadLine;
-            io >> this->mHttpData.mMethod >> this->mUrl >> this->mHttpData.mVersion;
+			streamBuffer >> this->mHttpData.mMethod >> this->mUrl >> this->mHttpData.mVersion;
 
-			io.ignore(2); //去掉\r\n
+			streamBuffer.ignore(2); //去掉\r\n
         }
         if(this->mState == HttpDecodeState::HeadLine)
 		{
 			std::string lineData;
-			while (std::getline(io, lineData))
+			while (std::getline(streamBuffer, lineData))
 			{
 				if (lineData == "\r")
 				{

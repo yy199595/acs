@@ -33,7 +33,7 @@ namespace Tcp
 		void SendProtoMessage(std::shared_ptr<TelnetProto> message);
 	 private:
 		void CloseContext();
-		void OnReceiveLine(const asio::error_code &code, asio::streambuf &buffer, size_t size) final;
+		void OnReceiveLine(const asio::error_code &code, size_t size) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	 private:
 		ConsoleComponent * mConsoleComponent;

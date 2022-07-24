@@ -72,53 +72,41 @@ namespace Sentry
 #endif
 	}
 
-    void ServerClientContext::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer, size_t size)
+    void ServerClientContext::OnReceiveMessage(const asio::error_code &code, size_t size)
     {
         if (code || size == 0)
         {
-			CONSOLE_LOG_ERROR(code.message() << " " << buffer.size());
+			CONSOLE_LOG_ERROR(code.message() << " " << size);
             this->CloseSocket(XCode::NetWorkError);
             return;
         }
         if (this->mReadState == ReadType::HEAD)
         {
             this->mReadState = ReadType::BODY;
-            this->ReceiveMessage(this->GetLength(buffer));
+            this->ReceiveMessage(this->GetLength());
         }
         else if (this->mReadState == ReadType::BODY)
         {
-            char * dataBuffer = this->mDataBuffer;
             std::istream & readStream = this->GetReadStream();
-            if(sizeof(this->mDataBuffer) < size)
-            {
-                dataBuffer = new char[size];
-            }
-
             this->mReadState = ReadType::HEAD;
             switch ((MESSAGE_TYPE) readStream.get())
             {
                 case MESSAGE_TYPE::MSG_RPC_REQUEST:
-                    readStream.readsome(dataBuffer, size);
-                    this->OnRequest(dataBuffer, size);
+                    this->OnRequest(readStream);
                     this->ReceiveMessage(sizeof(int));
                     break;
                 case MESSAGE_TYPE::MSG_RPC_RESPONSE:
-                    readStream.readsome(dataBuffer, size);
-                    this->OnResponse(dataBuffer, size);
+                    this->OnResponse(readStream);
                     this->ReceiveMessage(sizeof(int));
                     break;
-            }
-            if(dataBuffer != this->mDataBuffer)
-            {
-                delete[] dataBuffer;
             }
         }
     }
 
-	bool ServerClientContext::OnRequest(const char * buffer, size_t size)
+	bool ServerClientContext::OnRequest(std::istream & istream1)
 	{
 		std::shared_ptr<com::Rpc_Request> requestData(new com::Rpc_Request());
-		if (!requestData->ParseFromArray(buffer, size))
+		if (!requestData->ParsePartialFromIstream(&istream1))
 		{
 #ifdef __DEBUG__
 			CONSOLE_LOG_ERROR("parse server request message error");
@@ -136,10 +124,10 @@ namespace Sentry
 		return true;
 	}
 
-	bool ServerClientContext::OnResponse(const char * buffer, size_t size)
+	bool ServerClientContext::OnResponse(std::istream & istream1)
 	{
 		std::shared_ptr<com::Rpc_Response> responseData(new com::Rpc_Response());
-		if (!responseData->ParseFromArray(buffer, size))
+		if (!responseData->ParseFromIstream(&istream1))
 		{
 #ifdef __NET_ERROR_LOG__
 			CONSOLE_LOG_ERROR("parse server response message error");

@@ -60,7 +60,7 @@ namespace Tcp
 		asio::async_read_until(tcpSocket, this->mRecvBuffer, "\r\n",
 			[this, self](const asio::error_code& code, size_t size)
 			{
-				this->OnReceiveLine(code, this->mRecvBuffer, size);
+				this->OnReceiveLine(code, size);
 			});
 	}
 
@@ -70,7 +70,7 @@ namespace Tcp
         {
             asio::error_code code;
 			size_t size = this->mRecvBuffer.size();
-            this->OnReceiveMessage(code, this->mRecvBuffer, size);
+            this->OnReceiveMessage(code, size);
             return;
         }
         asio::error_code code;
@@ -80,14 +80,14 @@ namespace Tcp
         if(tcpSocket.available(code) <= 0)
         {
             code = asio::error::eof;
-            this->OnReceiveMessage(code, this->mRecvBuffer, 0);
+            this->OnReceiveMessage(code, 0);
             return;
         }
 		std::shared_ptr<TcpContext> self = this->shared_from_this();
 		asio::async_read(tcpSocket, this->mRecvBuffer, asio::transfer_at_least(1),
 			[this, self](const asio::error_code& code, size_t size)
 			{
-				this->OnReceiveMessage(code, this->mRecvBuffer, size);
+				this->OnReceiveMessage(code, size);
 			});
 	}
 
@@ -96,13 +96,13 @@ namespace Tcp
 		if (length >= this->mMaxCount)
 		{
 			asio::error_code code = std::make_error_code(std::errc::bad_message);
-			this->OnReceiveMessage(code, this->mRecvBuffer, 0);
+			this->OnReceiveMessage(code, 0);
 			return;
 		}
 		if (this->mRecvBuffer.size() >= length)
 		{
 			asio::error_code code;
-			this->OnReceiveMessage(code, this->mRecvBuffer, length);
+			this->OnReceiveMessage(code, length);
 			return;
 		}
 		length -= this->mRecvBuffer.size();
@@ -112,20 +112,19 @@ namespace Tcp
 		asio::async_read(tcpSocket, this->mRecvBuffer, asio::transfer_exactly(length),
 			[this, self](const asio::error_code& code, size_t size)
 			{
-				this->OnReceiveMessage(code, this->mRecvBuffer, size);
+				this->OnReceiveMessage(code, size);
 			});
 	}
 
-    int TcpContext::GetLength(asio::streambuf &buffer)
+    int TcpContext::GetLength()
 	{
-		if (buffer.size() < sizeof(int))
+		if (this->mRecvBuffer.size() < sizeof(int))
 		{
 			return -1;
 		}
 		int length = 0;
 		char temp[sizeof(int)] = { 0 };
-		std::iostream os(&buffer);
-		os.readsome(temp, sizeof(int));
+		this->mRecvStream.readsome(temp, sizeof(int));
 		memcpy(&length, temp, sizeof(int));
 		return length;
 	}

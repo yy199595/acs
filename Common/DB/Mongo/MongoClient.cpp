@@ -40,9 +40,9 @@ namespace Mongo
 		this->ReceiveMessage(sizeof(MongoHead));
 	}
 
-    void MongoClientContext::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer, size_t)
+    void MongoClientContext::OnReceiveMessage(const asio::error_code &code, size_t size)
 	{
-		if (code)
+		if (code || size == 0)
 		{
 #ifdef ONLY_MAIN_THREAD
 			this->mMongoComponent->OnClientError(this->mIndex, XCode::NetReceiveFailure);
@@ -54,7 +54,7 @@ namespace Mongo
 			CONSOLE_LOG_ERROR(code.message());
 			return;
 		}
-		std::iostream os(&buffer);
+		std::istream & os = this->GetReadStream();
 		if (this->mReadState == ReadType::HEAD)
 		{
 			this->mReadState = ReadType::BODY;
