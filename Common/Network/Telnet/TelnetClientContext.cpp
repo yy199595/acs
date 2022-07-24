@@ -21,7 +21,7 @@ namespace Tcp
 #endif
 	}
 
-	void TelnetClientContext::OnReceiveLine(const asio::error_code& code, asio::streambuf& buffer)
+	void TelnetClientContext::OnReceiveLine(const asio::error_code& code, asio::streambuf& buffer, size_t)
 	{
 		if(code)
 		{

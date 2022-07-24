@@ -44,18 +44,29 @@ namespace Client
         }
         else if(this->mReadState == ReadType::BODY)
         {
-			std::istream os(&buffer);
+            char * dataBuffer = this->mDataBuffer;
+            if(sizeof(this->mDataBuffer) < size)
+            {
+                dataBuffer = new char[size];
+            }
+            std::istream & readStream = this->GetReadStream();
             this->mReadState = ReadType::HEAD;
-            switch ((MESSAGE_TYPE)os.get())
+            switch ((MESSAGE_TYPE)readStream.get())
             {
                 case MESSAGE_TYPE::MSG_RPC_CALL_CLIENT:
-                    this->OnRequest(os, size);
+                    readStream.readsome(dataBuffer, size);
+                    this->OnRequest(dataBuffer, size);
                     this->ReceiveMessage(sizeof(int));
                     break;
                 case MESSAGE_TYPE::MSG_RPC_RESPONSE:
-                    this->OnResponse(os, size);
+                    readStream.readsome(dataBuffer, size);
+                    this->OnResponse(dataBuffer, size);
                     this->ReceiveMessage(sizeof(int));
                     break;
+            }
+            if(dataBuffer != this->mDataBuffer)
+            {
+                delete[] dataBuffer;
             }
         }
     }
@@ -66,10 +77,10 @@ namespace Client
 		this->ReceiveMessage(sizeof(int));
 	}
 
-	bool TcpRpcClientContext::OnRequest(std::istream & os, size_t size)
+	bool TcpRpcClientContext::OnRequest(const char * data, size_t size)
     {
         std::shared_ptr<c2s::Rpc::Call> request(new c2s::Rpc::Call());
-        if (!request->ParseFromIstream(&os))
+        if (!request->ParseFromArray(data, size))
         {
 			CONSOLE_LOG_ERROR("parse request message error");
             return false;
@@ -78,10 +89,10 @@ namespace Client
         return true;
     }
 
-	bool TcpRpcClientContext::OnResponse(std::istream & os, size_t size)
+	bool TcpRpcClientContext::OnResponse(const char * data, size_t size)
     {
         std::shared_ptr<c2s::Rpc::Response> response(new c2s::Rpc::Response());
-        if (!response->ParseFromIstream(&os))
+        if (!response->ParseFromArray(data, size))
         {
 			CONSOLE_LOG_ERROR("parse response message error");
 			return false;

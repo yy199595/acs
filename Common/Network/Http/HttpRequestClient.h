@@ -21,8 +21,8 @@ namespace Sentry
         void ConnectHost();
         void OnComplete(const asio::error_code & code);
         void OnConnect(const asio::error_code &error, int count) final;
-        void OnReceiveLine(const asio::error_code &code, asio::streambuf &buffer) final;
-        void OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer) final;
+        void OnReceiveLine(const asio::error_code &code, asio::streambuf &buffer, size_t) final;
+        void OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer, size_t) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
 	 private:
 		HttpComponent * mHttpComponent;

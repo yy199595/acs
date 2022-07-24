@@ -40,7 +40,7 @@ namespace Mongo
 		this->ReceiveMessage(sizeof(MongoHead));
 	}
 
-    void MongoClientContext::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer)
+    void MongoClientContext::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer, size_t)
 	{
 		if (code)
 		{

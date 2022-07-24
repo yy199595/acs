@@ -30,8 +30,8 @@ namespace Sentry
 		void OnReadComplete();
 		void OnConnect(const asio::error_code &error, int count) final;
         void AddCommandQueue(std::shared_ptr<RedisRequest> command);
-        void OnReceiveLine(const asio::error_code &code, asio::streambuf & buffer) final;
-        void OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer) final;
+        void OnReceiveLine(const asio::error_code &code, asio::streambuf & buffer, size_t) final;
+        void OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer, size_t) final;
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
     private:
         const RedisConfig & mConfig;

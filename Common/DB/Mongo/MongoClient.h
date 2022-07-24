@@ -44,7 +44,7 @@ namespace Mongo
 	private:
 		bool StartAuthBySha1();
 		void PushCommand(std::shared_ptr<Tcp::ProtoMessage> request);
-		void OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer) final;
+		void OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer, size_t) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	private:
 		int mIndex;

@@ -78,7 +78,7 @@ namespace Sentry
         this->mResponse = nullptr;
     }
 
-    void HttpRequestClient::OnReceiveLine(const asio::error_code &code, asio::streambuf &buffer)
+    void HttpRequestClient::OnReceiveLine(const asio::error_code &code, asio::streambuf &buffer, size_t)
     {
         if(code)
         {
@@ -103,7 +103,7 @@ namespace Sentry
         }
     }
 
-    void HttpRequestClient::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer)
+    void HttpRequestClient::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer, size_t)
     {
         if(code == asio::error::eof)
         {

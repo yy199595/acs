@@ -47,7 +47,7 @@ namespace Sentry
 #endif
 	}
 
-    void HttpHandlerClient::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer)
+    void HttpHandlerClient::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer, size_t)
     {
         if(code == asio::error::eof)
         {

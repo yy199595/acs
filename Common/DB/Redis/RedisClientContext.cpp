@@ -76,7 +76,7 @@ namespace Sentry
 		this->mCommands.emplace_back(command);
 	}
 
-	void RedisClientContext::OnReceiveLine(const asio::error_code& code, asio::streambuf& buffer)
+	void RedisClientContext::OnReceiveLine(const asio::error_code& code, asio::streambuf& buffer, size_t)
 	{
 		if (code)
 		{
@@ -87,23 +87,23 @@ namespace Sentry
 			this->mCurResponse = std::make_shared<RedisResponse>();
 		}
 		std::iostream os(&buffer);
-		int lenght = this->mCurResponse->OnRecvLine(os);
-		if (lenght == 0)
+		int length = this->mCurResponse->OnRecvLine(os);
+		if (length == 0)
 		{
 			this->OnReadComplete();
 			this->mCurResponse = nullptr;
 		}
-		else if (lenght == -1)
+		else if (length == -1)
 		{
 			this->ReceiveLine();
 		}
 		else
 		{
-			this->ReceiveMessage(lenght);
+			this->ReceiveMessage(length);
 		}
 	}
 
-	void RedisClientContext::OnReceiveMessage(const asio::error_code& code, asio::streambuf& buffer)
+	void RedisClientContext::OnReceiveMessage(const asio::error_code& code, asio::streambuf& buffer, size_t)
 	{
         if(this->mCurResponse == nullptr)
         {

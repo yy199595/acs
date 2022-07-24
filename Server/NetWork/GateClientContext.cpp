@@ -32,7 +32,7 @@ namespace Sentry
 #endif
 	}
 
-    void GateClientContext::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer)
+    void GateClientContext::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer, size_t size)
     {
         if(code)
         {
@@ -49,12 +49,18 @@ namespace Sentry
         }
         else if (this->mReadState == ReadType::BODY)
         {
-			std::iostream os(&buffer);
 			this->mReadState = ReadType::HEAD;
-            if((MESSAGE_TYPE)os.get() == MESSAGE_TYPE::MSG_RPC_CLIENT_REQUEST)
+            std::istream & readStream = this->GetReadStream();
+            if((MESSAGE_TYPE)readStream.get() == MESSAGE_TYPE::MSG_RPC_CLIENT_REQUEST)
             {
+                char * dataBuffer = this->mDataBuffer;
+                if(sizeof(this->mDataBuffer) < size)
+                {
+                    dataBuffer = new char[size];
+                }
+                readStream.readsome(dataBuffer, size);
                 std::shared_ptr<c2s::Rpc_Request> request(new c2s::Rpc_Request());
-                if (!request->ParseFromIstream(&os))
+                if (!request->ParseFromArray(dataBuffer, size))
                 {
                     return;
                 }
@@ -68,6 +74,10 @@ namespace Sentry
                 mainTaskScheduler.Invoke(&GateClientComponent::OnRequest, this->mGateComponent, request);
 #endif
                 this->ReceiveMessage(sizeof(int));
+                if(dataBuffer != this->mDataBuffer)
+                {
+                    delete[] dataBuffer;
+                }
                 return;
             }
         }
