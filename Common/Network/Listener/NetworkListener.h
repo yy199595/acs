@@ -38,6 +38,8 @@ namespace Sentry
 		void InitListener(std::shared_ptr<TaskSource<bool>> taskSource);
 #endif
 	 private:
+		int mCount;
+		int mErrorCount;
 		unsigned int mCorId;
 		IAsioThread& mTaskThread;
 		const ListenConfig & mConfig;

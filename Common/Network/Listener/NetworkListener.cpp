@@ -11,6 +11,8 @@ namespace Sentry
 	NetworkListener::NetworkListener(IAsioThread & t, const ListenConfig & config)
 		: mTaskThread(t), mConfig(config)
     {
+		this->mCount = 0;
+		this->mErrorCount = 0;
         this->mBindAcceptor = nullptr;
         this->mListenHandler = nullptr;
 		mTaskComponent = App::Get()->GetComponent<NetThreadComponent>();
@@ -57,7 +59,7 @@ namespace Sentry
             AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), this->mConfig.Port);
             this->mBindAcceptor = new AsioTcpAcceptor(this->mTaskThread, endPoint);
 
-            this->mBindAcceptor->listen(this->mConfig.Count);
+            this->mBindAcceptor->listen();
             this->mTaskThread.Invoke(&NetworkListener::ListenConnect, this);
             taskSource->SetResult(true);
         }
@@ -80,11 +82,18 @@ namespace Sentry
 		this->mBindAcceptor->async_accept(socketProxy->GetSocket(),
 			[this, &workThread, socketProxy](const asio::error_code & code)
 		{
-			if (!code)
-            {
+			if (code)
+			{
+				this->mErrorCount++;
+				CONSOLE_LOG_FATAL(this->mConfig.Name << " " << code.message() << " count = " << this->mErrorCount);
+			}
+			else
+			{
+				this->mCount++;
                 socketProxy->Init();
 #ifdef __DEBUG__
-				LOG_INFO(socketProxy->GetAddress() << " connect to " << this->mConfig.Name);
+				CONSOLE_LOG_ERROR(socketProxy->GetAddress() << " connect to "
+					<< this->mConfig.Name << " count = " << this->mCount);
 #endif
 #ifdef ONLY_MAIN_THREAD
                 this->mListenHandler->OnListen(socketProxy);
