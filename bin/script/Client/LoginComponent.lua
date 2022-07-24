@@ -23,5 +23,8 @@ function LoginComponent.Login(account, passwd) -- 获取gate地址
         account = account,
         password = passwd
     }))
-    return Json.Decode(response.data)
+    if type(response.data) == "string" then
+        return Json.Decode(response.data)
+    end
+    return nil
 end

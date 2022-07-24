@@ -35,13 +35,17 @@ namespace Sentry
 		std::shared_ptr<HttpAsyncResponse> Post(const std::string& url, const std::string& data, float second = 15.0f);
     private:
         bool LateAwake() final;
-        void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
+		void OnAddTask(RpcTask task) final;
+		void OnTimerout(long long timerId);
+		void OnDelTask(long long taskId, RpcTask task) final;
+		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 	 private:
 		TimerComponent * mTimeComponent;
 		class TaskComponent* mTaskComponent;
 #ifndef ONLY_MAIN_THREAD
 		class NetThreadComponent* mThreadComponent;
 #endif
+		std::unordered_map<long long, long long> mTimers;
 		std::set<std::shared_ptr<HttpRequestClient>> mRequestClients;
 	};
 }

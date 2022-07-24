@@ -40,10 +40,10 @@ namespace Sentry
     {
         if(error)
         {
-            this->mResponse->SetError(error);
             CONSOLE_LOG_ERROR("connect ]" << this->mRequest->GetHost()
                  << ":" << this->mRequest->GetPort() << "] failure :" << error.message());
-            return;
+			this->OnComplete(error);
+			return;
         }
         this->Send(this->mRequest);
     }

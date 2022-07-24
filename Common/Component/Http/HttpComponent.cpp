@@ -106,4 +106,33 @@ namespace Sentry
 
         return httpTask->Await();
 	}
+
+	void HttpComponent::OnAddTask(RpcTask task)
+	{
+		long long taskId = task->GetRpcId();
+		long long timerId = this->mTimeComponent->DelayCall(
+			10, &HttpComponent::OnTimerout, this, taskId);
+		this->mTimers.emplace(timerId, taskId);
+	}
+
+	void HttpComponent::OnDelTask(long long taskId, RpcTask task)
+	{
+		auto iter = this->mTimers.find(taskId);
+		if(iter != this->mTimers.end())
+		{
+			this->mTimers.erase(iter);
+			LOG_FATAL("http task " << taskId << " time out");
+		}
+	}
+
+	void HttpComponent::OnTimerout(long long timerId)
+	{
+		auto iter = this->mTimers.find(timerId);
+		if(iter != this->mTimers.end())
+		{
+			long long id = iter->second;
+			this->mTimers.erase(iter);
+			this->OnResponse(id, nullptr);
+		}
+	}
 }
