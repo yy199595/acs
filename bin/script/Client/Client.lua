@@ -13,8 +13,6 @@ local phoneNum = 13716061995
 function Client.StartLogic()
 
     local clientComponent = App.GetComponent("ClientComponent")
-    local messageComponent = App.GetComponent("MessageComponent")
-
     LoginComponent.Register(account, password, phoneNum)
 
     local loginInfo = LoginComponent.Login(account, password)
@@ -37,13 +35,29 @@ function Client.StartLogic()
         Log.Error("user auth failure")
         return
     end
+    coroutine.start(LoopCall)
+    coroutine.start(LoopCall)
+    coroutine.start(LoopCall)
+    coroutine.start(LoopLogin)
+    coroutine.start(LoopRegister)
 
+end
+
+function LoopLogin()
     while true do
-
         LoginComponent.Register(account, password, phoneNum)
+    end
+end
 
+function LoopRegister()
+    while true do
         LoginComponent.Login(account, password)
+    end
+end
 
+function LoopCall()
+    local clientComponent = App.GetComponent("ClientComponent")
+    while true do
         local res, response = clientComponent:Call("ChatService.Chat", "c2s.Chat.Request", {
             user_id = 1122, msg_type = 1, message = "hello"
         })

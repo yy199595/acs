@@ -28,15 +28,15 @@ namespace Client
 
     }
 
-    void TcpRpcClientContext::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer)
+    void TcpRpcClientContext::OnReceiveMessage(const asio::error_code &code, asio::streambuf &buffer, size_t size)
     {
-        if (code || buffer.size() == 0)
-        {
+        if (code || size == 0)
+		{
 #ifdef __DEBUG__
-            CONSOLE_LOG_ERROR(code.message());
+			CONSOLE_LOG_ERROR(code.message());
 #endif
-            return;
-        }
+			return;
+		}
         if(this->mReadState == ReadType::HEAD)
         {
             this->mReadState = ReadType::BODY;
@@ -49,11 +49,11 @@ namespace Client
             switch ((MESSAGE_TYPE)os.get())
             {
                 case MESSAGE_TYPE::MSG_RPC_CALL_CLIENT:
-                    this->OnRequest(os);
+                    this->OnRequest(os, size);
                     this->ReceiveMessage(sizeof(int));
                     break;
                 case MESSAGE_TYPE::MSG_RPC_RESPONSE:
-                    this->OnResponse(os);
+                    this->OnResponse(os, size);
                     this->ReceiveMessage(sizeof(int));
                     break;
             }
@@ -66,7 +66,7 @@ namespace Client
 		this->ReceiveMessage(sizeof(int));
 	}
 
-	bool TcpRpcClientContext::OnRequest(std::istream & os)
+	bool TcpRpcClientContext::OnRequest(std::istream & os, size_t size)
     {
         std::shared_ptr<c2s::Rpc::Call> request(new c2s::Rpc::Call());
         if (!request->ParseFromIstream(&os))
@@ -78,7 +78,7 @@ namespace Client
         return true;
     }
 
-	bool TcpRpcClientContext::OnResponse(std::istream & os)
+	bool TcpRpcClientContext::OnResponse(std::istream & os, size_t size)
     {
         std::shared_ptr<c2s::Rpc::Response> response(new c2s::Rpc::Response());
         if (!response->ParseFromIstream(&os))

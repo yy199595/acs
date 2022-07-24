@@ -84,8 +84,8 @@ namespace Tcp
 		inline std::ostream & GetSendStream() { return this->mSendStream;}
 	 protected:
 		virtual void OnConnect(const asio::error_code & error, int count) { throw std::logic_error("");}
-		virtual void OnReceiveLine(const asio::error_code & code, asio::streambuf & buffer) {}
-        virtual void OnReceiveMessage(const asio::error_code & code, asio::streambuf & buffer) {}
+		virtual void OnReceiveLine(const asio::error_code & code, asio::streambuf & buffer, size_t size) {}
+        virtual void OnReceiveMessage(const asio::error_code & code, asio::streambuf & buffer, size_t size) {}
 		virtual void OnSendMessage(const asio::error_code & code, std::shared_ptr<ProtoMessage> message) { };
 	 protected:
         ReadType mReadState;
