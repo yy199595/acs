@@ -75,7 +75,7 @@ namespace Sentry
 
 	void RedisComponent::OnSecondUpdate(const int tick)
 	{
-        if(tick % 10 == 0)
+        if(tick % 1000 == 0)
         {
             long long nowMs = Helper::Time::GetNowMilTime();
             auto iter = this->mRedisClients.begin();

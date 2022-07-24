@@ -127,8 +127,7 @@ namespace Sentry
 	{
 		this->mString.clear();
 		std::unique_ptr<char[]> buffer(new char[this->mDataSize]);
-		size_t size = os.readsome(buffer.get(), this->mDataSize);
-		if (size == this->mDataSize)
+		if (os.readsome(buffer.get(), this->mDataSize) == this->mDataSize)
 		{
 			switch (this->mType)
 			{
@@ -145,7 +144,12 @@ namespace Sentry
 				break;
 			}
 		}
-		os.ignore(2); //删除/r/n
+		else
+		{
+			CONSOLE_LOG_FATAL("message lenght error");
+			return 0;
+		}
+		os.ignore(2);
 		return this->mLineCount < this->mDataCount ? -1 : 0; //再读一行
 	}
 
@@ -200,7 +204,7 @@ namespace Sentry
             if(this->mDataSize > 0)
             {
                 this->mArray.emplace_back(new RedisString(this->mDataSize));
-                return this->mDataSize;
+                return this->mDataSize + 2;
             }
             this->mArray.emplace_back(new RedisString());
             return -1;
