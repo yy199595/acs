@@ -78,9 +78,9 @@ namespace Sentry
         this->mResponse = nullptr;
     }
 
-    void HttpRequestClient::OnReceiveLine(const asio::error_code &code, size_t size)
+    void HttpRequestClient::OnReceiveLine(const asio::error_code &code, std::istream & is)
     {
-        if(code || size == 0)
+        if(code)
         {
 #ifdef __NET_ERROR_LOG__
             CONSOLE_LOG_ERROR(code.message());
@@ -88,8 +88,7 @@ namespace Sentry
             this->OnComplete(code);
             return;
         }
-		std::istream & os = this->GetReadStream();
-        switch(this->mResponse->OnReceiveLine(os))
+        switch(this->mResponse->OnReceiveLine(is))
         {
             case -1: //读一行
                 this->ReceiveLine();
@@ -104,7 +103,7 @@ namespace Sentry
         }
     }
 
-    void HttpRequestClient::OnReceiveMessage(const asio::error_code &code, size_t size)
+    void HttpRequestClient::OnReceiveMessage(const asio::error_code &code, std::istream & is)
     {
         if(code == asio::error::eof)
         {
@@ -112,7 +111,6 @@ namespace Sentry
             this->OnComplete(err);
             return;
         }
-		std::istream & is = this->GetReadStream();
         switch(this->mResponse->OnReceiveSome(is))
         {
             case 1: //继续读

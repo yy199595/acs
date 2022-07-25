@@ -96,7 +96,7 @@ namespace Client
 
 	void ClientComponent::OnAddTask(RpcTask rpctask)
 	{
-		LOG_WARN(this->GetName() << " add new task " << rpctask->GetRpcId());
+		//LOG_WARN(this->GetName() << " add new task " << rpctask->GetRpcId());
 	}
 
 	bool ClientComponent::StartConnect(const std::string& ip, unsigned short port)

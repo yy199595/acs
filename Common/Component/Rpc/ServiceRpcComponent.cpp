@@ -77,7 +77,6 @@ namespace Sentry
 			response->set_rpc_id(request->rpc_id());
 			response->set_user_id(request->user_id());
 			this->mRpcClientComponent->Send(request->address(), response);
-			LOG_INFO("call " << rpcInterfaceConfig->FullName << " use time [" << elapsedTimer.GetMs() << "ms]");
 			return XCode::Successful;
 		}
 

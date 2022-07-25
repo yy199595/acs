@@ -28,42 +28,42 @@ namespace Client
 
     }
 
-    void TcpRpcClientContext::OnReceiveMessage(const asio::error_code &code, size_t size)
+    void TcpRpcClientContext::OnReceiveLength(const asio::error_code &code, int length)
     {
-        if (code || size <= 0)
-		{
+        if (code)
+        {
 #ifdef __DEBUG__
-			CONSOLE_LOG_ERROR(code.message());
+            CONSOLE_LOG_ERROR(code.message());
 #endif
-			return;
-		}
-        if(this->mReadState == ReadType::HEAD)
-        {
-            this->mReadState = ReadType::BODY;
-            this->ReceiveMessage(this->GetLength());
+            return;
         }
-        else if(this->mReadState == ReadType::BODY)
+        this->ReceiveMessage(length);
+    }
+
+    void TcpRpcClientContext::OnReceiveMessage(const asio::error_code &code, std::istream & readStream)
+    {
+        if (code)
         {
-            std::istream & readStream = this->GetReadStream();
-            this->mReadState = ReadType::HEAD;
-            switch ((MESSAGE_TYPE)readStream.get())
-            {
-                case MESSAGE_TYPE::MSG_RPC_CALL_CLIENT:
-                    this->OnRequest(readStream);
-                    this->ReceiveMessage(sizeof(int));
-                    break;
-                case MESSAGE_TYPE::MSG_RPC_RESPONSE:
-                    this->OnResponse(readStream);
-                    this->ReceiveMessage(sizeof(int));
-                    break;
-            }
+#ifdef __DEBUG__
+            CONSOLE_LOG_ERROR(code.message());
+#endif
+            return;
         }
+        switch ((MESSAGE_TYPE) readStream.get())
+        {
+            case MESSAGE_TYPE::MSG_RPC_CALL_CLIENT:
+                this->OnRequest(readStream);
+                break;
+            case MESSAGE_TYPE::MSG_RPC_RESPONSE:
+                this->OnResponse(readStream);
+                break;
+        }
+        this->ReceiveLength();
     }
 
 	void TcpRpcClientContext::StartReceive()
 	{
-        this->mReadState = ReadType::HEAD;
-		this->ReceiveMessage(sizeof(int));
+        this->ReceiveLength();
 	}
 
 	bool TcpRpcClientContext::OnRequest(std::istream & istream1)
@@ -87,6 +87,7 @@ namespace Client
 			return false;
         }
         long long taskId = response->rpc_id();
+        std::cout << response->ShortDebugString() << std::endl;
         this->mClientComponent->OnResponse(taskId, response);
         return true;
     }

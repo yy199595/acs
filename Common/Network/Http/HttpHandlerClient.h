@@ -24,7 +24,7 @@ namespace Sentry
 	 private:
 		void OnComplete();
 		void ClosetClient();
-        void OnReceiveMessage(const asio::error_code &code, size_t) final;
+        void OnReceiveMessage(const asio::error_code &code, std::istream & is) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
 	 private:
 		asio::streambuf mStreamBuffer;

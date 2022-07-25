@@ -4,7 +4,7 @@
 #include<Util/FileHelper.h>
 #include<spdlog/fmt/fmt.h>
 #include"Util/DirectoryHelper.h"
-#include"Network/Listener/NetworkListener.h"
+#include"Network/Listener/TcpServerListener.h"
 namespace Sentry
 {
     ServerConfig::ServerConfig(int argc, char ** argv)
@@ -42,13 +42,11 @@ namespace Sentry
 				ListenConfig* listenConfig = new ListenConfig();
 				IF_THROW_ERROR(jsonObject.HasMember("ip"));
 				IF_THROW_ERROR(jsonObject.HasMember("port"));
-				IF_THROW_ERROR(jsonObject.HasMember("count"));
 				IF_THROW_ERROR(jsonObject.HasMember("component"));
 
 				listenConfig->Name = iter->first;
 				listenConfig->Ip = jsonObject["ip"].GetString();
 				listenConfig->Port = jsonObject["port"].GetUint();
-				listenConfig->Count = jsonObject["count"].GetInt();
 				listenConfig->Handler = jsonObject["component"].GetString();;
 				listenConfig->Address = fmt::format("{0}:{1}", listenConfig->Ip, listenConfig->Port);
 				this->mListens.emplace(listenConfig->Name, listenConfig);

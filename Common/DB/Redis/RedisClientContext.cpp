@@ -76,7 +76,7 @@ namespace Sentry
 		this->mCommands.emplace_back(command);
 	}
 
-	void RedisClientContext::OnReceiveLine(const asio::error_code& code, size_t size)
+	void RedisClientContext::OnReceiveLine(const asio::error_code& code, std::istream & is)
 	{
 		if (code)
 		{
@@ -86,8 +86,7 @@ namespace Sentry
 		{
 			this->mCurResponse = std::make_shared<RedisResponse>();
 		}
-		std::istream & os = this->GetReadStream();
-		int length = this->mCurResponse->OnRecvLine(os);
+		int length = this->mCurResponse->OnRecvLine(is);
 		if (length == 0)
 		{
 			this->OnReadComplete();
@@ -103,15 +102,14 @@ namespace Sentry
 		}
 	}
 
-	void RedisClientContext::OnReceiveMessage(const asio::error_code& code, size_t size)
+	void RedisClientContext::OnReceiveMessage(const asio::error_code& code, std::istream & is)
 	{
         if(this->mCurResponse == nullptr)
         {
             this->ClearRecvStream();
             return;
         }
-		std::istream & os = this->GetReadStream();
-		if (this->mCurResponse->OnRecvMessage(os) == 0)
+		if (this->mCurResponse->OnRecvMessage(is) == 0)
 		{
 			this->OnReadComplete();
 			this->mCurResponse = nullptr;
@@ -173,9 +171,8 @@ namespace Sentry
 			{
 				return false;
 			}
-
-			std::istream& readStream = this->GetReadStream();
-			if (response->OnRecvLine(readStream) != 0 || !response->IsOk())
+            std::istream is(&this->mRecvBuffer);
+			if (response->OnRecvLine(is) != 0 || !response->IsOk())
 			{
 				CONSOLE_LOG_ERROR("auth redis user faliure");
 				return false;
@@ -191,9 +188,9 @@ namespace Sentry
 			return false;
 		}
 
-		std::istream& readStream = this->GetReadStream();
+        std::istream is(&this->mRecvBuffer);
 		std::shared_ptr<RedisResponse> response2(new RedisResponse());
-		if(response2->OnRecvLine(readStream) != 0 || !response2->IsOk())
+		if(response2->OnRecvLine(is) != 0 || !response2->IsOk())
 		{
 			CONSOLE_LOG_ERROR("auth redis user faliure");
 			return false;

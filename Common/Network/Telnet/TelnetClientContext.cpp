@@ -21,7 +21,7 @@ namespace Tcp
 #endif
 	}
 
-	void TelnetClientContext::OnReceiveLine(const asio::error_code& code, size_t size)
+	void TelnetClientContext::OnReceiveLine(const asio::error_code& code, std::istream & is)
 	{
 		if(code)
 		{
@@ -30,7 +30,7 @@ namespace Tcp
 			return;
 		}
 		std::string lineMessage;
-		std::getline(this->GetReadStream(), lineMessage);
+		std::getline(is, lineMessage);
 		const std::string & address = this->GetAddress();
 #ifdef ONLY_MAIN_THREAD
 		this->mConsoleComponent->OnReceive(address, lineMessage);

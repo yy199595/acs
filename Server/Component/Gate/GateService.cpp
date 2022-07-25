@@ -9,7 +9,7 @@
 #include"Component/Gate/GateComponent.h"
 #include"Component/Common/DataMgrComponent.h"
 #include"Component/Gate/GateClientComponent.h"
-#include"Network/Listener/NetworkListener.h"
+#include"Network/Listener/TcpServerListener.h"
 #include"Component/Gate/GateAgentComponent.h"
 #include"Component/User/UserSyncComponent.h"
 #include"Component/Redis/MainRedisComponent.h"

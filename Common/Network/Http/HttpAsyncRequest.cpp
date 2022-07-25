@@ -7,7 +7,7 @@
 #include"Http.h"
 #include<iostream>
 #include"Util/StringHelper.h"
-
+#include"Script/Extension/Coroutine/LuaCoroutine.h"
 namespace Sentry
 {
     std::shared_ptr<HttpTask> HttpAsyncRequest::MakeTask(int timeout)
@@ -52,10 +52,10 @@ namespace Sentry
         if(response != nullptr)
         {
             response->GetData().Writer(this->mLua);
-            lua_presume(coroutine, this->mLua, 1);
+            Lua::Coroutine::Resume(coroutine, this->mLua, 1);
             return;
         }
-        lua_presume(coroutine, this->mLua, 0);
+        Lua::Coroutine::Resume(coroutine, this->mLua, 0);
     }
 
     int LuaHttpTask::Await(std::shared_ptr<HttpRequestClient> client)

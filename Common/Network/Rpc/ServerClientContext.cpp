@@ -72,35 +72,38 @@ namespace Sentry
 #endif
 	}
 
-    void ServerClientContext::OnReceiveMessage(const asio::error_code &code, size_t size)
+    void ServerClientContext::OnReceiveLength(const asio::error_code &code, int length)
     {
-        if (code || size == 0)
+        if(code)
         {
-			CONSOLE_LOG_ERROR(code.message() << " " << size);
+            CONSOLE_LOG_ERROR(code.message());
             this->CloseSocket(XCode::NetWorkError);
             return;
         }
-        if (this->mReadState == ReadType::HEAD)
+        this->ReceiveMessage(length);
+    }
+
+    void ServerClientContext::OnReceiveMessage(const asio::error_code &code, std::istream & readStream)
+    {
+        if (code)
         {
-            this->mReadState = ReadType::BODY;
-            this->ReceiveMessage(this->GetLength());
+            CONSOLE_LOG_ERROR(code.message());
+            this->CloseSocket(XCode::NetWorkError);
+            return;
         }
-        else if (this->mReadState == ReadType::BODY)
+        switch ((MESSAGE_TYPE) readStream.get())
         {
-            std::istream & readStream = this->GetReadStream();
-            this->mReadState = ReadType::HEAD;
-            switch ((MESSAGE_TYPE) readStream.get())
-            {
-                case MESSAGE_TYPE::MSG_RPC_REQUEST:
-                    this->OnRequest(readStream);
-                    this->ReceiveMessage(sizeof(int));
-                    break;
-                case MESSAGE_TYPE::MSG_RPC_RESPONSE:
-                    this->OnResponse(readStream);
-                    this->ReceiveMessage(sizeof(int));
-                    break;
-            }
+            case MESSAGE_TYPE::MSG_RPC_REQUEST:
+                this->OnRequest(readStream);
+                break;
+            case MESSAGE_TYPE::MSG_RPC_RESPONSE:
+                this->OnResponse(readStream);
+                break;
+            default:
+                CONSOLE_LOG_FATAL("unknow message type");
+                return;
         }
+        this->ReceiveLength();
     }
 
 	bool ServerClientContext::OnRequest(std::istream & istream1)
@@ -145,12 +148,10 @@ namespace Sentry
 
 	void ServerClientContext::StartReceive()
 	{
-        size_t size = sizeof(int);
-        this->mReadState = ReadType::HEAD;
 #ifdef ONLY_MAIN_THREAD
-		this->ReceiveMessage(size);
+		this->ReceiveLength();
 #else
-		this->mNetworkThread.Invoke(&ServerClientContext::ReceiveMessage, this, size);
+		this->mNetworkThread.Invoke(&ServerClientContext::ReceiveLength, this);
 #endif
 	}
 
@@ -166,8 +167,7 @@ namespace Sentry
 			this->mTimer->async_wait(std::bind(std::bind(&ServerClientContext::Connect, this->shared_from_this())));
 			return;
 		}
-        this->mReadState = ReadType::HEAD;
-        this->ReceiveMessage(sizeof(int));
+        this->ReceiveLength();
 		while(!this->mSendQueues.empty())
 		{
 			this->Send(this->mSendQueues.front());

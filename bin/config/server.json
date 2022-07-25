@@ -16,19 +16,16 @@
     "listener": {
         "rpc": {
             "port": 7788,
-            "count": 10000,
             "ip": "127.0.0.1",
             "component": "RpcClientComponent"
         },
         "http": {
             "port": 8080,
-            "count": 1000,
             "ip": "127.0.0.1",
             "component": "HttpServiceComponent"
         },
         "gate": {
             "port": 1995,
-            "count": 10000,
             "ip": "127.0.0.1",
             "component": "GateClientComponent"
         }

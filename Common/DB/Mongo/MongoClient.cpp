@@ -36,13 +36,13 @@ namespace Mongo
 		}
 
 		this->mCommands.pop_front();
-		this->mReadState == ReadType::HEAD;
+        assert(this->mRecvBuffer.size() == 0);
 		this->ReceiveMessage(sizeof(MongoHead));
 	}
 
-    void MongoClientContext::OnReceiveMessage(const asio::error_code &code, size_t size)
+    void MongoClientContext::OnReceiveMessage(const asio::error_code &code, std::istream & is)
 	{
-		if (code || size == 0)
+		if (code)
 		{
 #ifdef ONLY_MAIN_THREAD
 			this->mMongoComponent->OnClientError(this->mIndex, XCode::NetReceiveFailure);
@@ -54,16 +54,15 @@ namespace Mongo
 			CONSOLE_LOG_ERROR(code.message());
 			return;
 		}
-		std::istream & os = this->GetReadStream();
-		if (this->mReadState == ReadType::HEAD)
-		{
-			this->mReadState = ReadType::BODY;
+        if(this->mMongoResponse == nullptr)
+        {
+            size_t size = is.rdbuf()->in_avail();
             this->mMongoResponse = std::make_shared<MongoQueryResponse>();
-			int length = this->mMongoResponse->OnReceiveHead(os);
-			this->ReceiveMessage(length - sizeof(MongoHead));
-			return;
-		}
-        this->mMongoResponse->OnReceiveBody(os);
+            int length = this->mMongoResponse->OnReceiveHead(is);
+            this->ReceiveMessage(length - sizeof(MongoHead));
+            return;
+        }
+        this->mMongoResponse->OnReceiveBody(is);
         int responseId = this->mMongoResponse->GetHead().responseTo;
         std::shared_ptr<MongoQueryResponse> response = std::move(this->mMongoResponse);
 #ifdef ONLY_MAIN_THREAD
@@ -76,7 +75,6 @@ namespace Mongo
 		{
 			this->Send(this->mCommands.front());
 		}
-		this->mReadState = ReadType::HEAD;
 	}
 
 	void MongoClientContext::PushMongoCommand(std::shared_ptr<Tcp::ProtoMessage> request)
@@ -144,7 +142,7 @@ namespace Mongo
 			return false;
 		}
         MongoQueryResponse response1;
-		std::istream & readStream1 = this->GetReadStream();
+		std::istream readStream1(&this->mRecvBuffer);
 		int length = response1.OnReceiveHead(readStream1);
 		if(this->RecvSync(length - sizeof(MongoHead)) <= 0)
 		{

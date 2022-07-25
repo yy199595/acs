@@ -9,6 +9,7 @@
 #include"Script/LuaInclude.h"
 #include"Script/LuaParameter.h"
 #include"google/protobuf/message.h"
+#include"Script/Extension/Coroutine/LuaCoroutine.h"
 using namespace google::protobuf;
 namespace Sentry
 {
@@ -43,7 +44,7 @@ namespace Sentry
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
 		lua_State* coroutine = lua_tothread(this->mLua, -1);
 		Lua::Parameter::Write(this->mLua, result);
-		lua_presume(coroutine, this->mLua, 1);
+        Lua::Coroutine::Resume(coroutine, this->mLua, 1);
 	}
 }
 #endif //SERVER_LUAWAITTASKSOURCE_H

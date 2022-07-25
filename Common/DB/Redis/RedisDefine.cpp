@@ -5,6 +5,7 @@
 #include"RedisDefine.h"
 #include"Json/JsonWriter.h"
 #include<google/protobuf/util/json_util.h>
+#include"Script/Extension/Coroutine/LuaCoroutine.h"
 namespace Sentry
 {
     RedisRequest::RedisRequest(const std::string &cmd)
@@ -322,6 +323,6 @@ namespace Sentry
 		{
 			lua_pushnil(this->mLua);
 		}
-        lua_presume(coroutine, this->mLua, 1);
+        Lua::Coroutine::Resume(coroutine, this->mLua, 1);
     }
 }

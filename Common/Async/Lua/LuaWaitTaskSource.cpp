@@ -6,6 +6,7 @@
 #include"Script/Extension/Json/values.hpp"
 #include<google/protobuf/util/json_util.h>
 #include"Component/Scene/MessageComponent.h"
+#include"Script/Extension/Coroutine/LuaCoroutine.h"
 namespace Sentry
 {
 	LuaWaitTaskSource::LuaWaitTaskSource(lua_State* lua)
@@ -43,22 +44,21 @@ namespace Sentry
 		{
 			MessageComponent * messageComponent = App::Get()->GetMsgComponent();
 			messageComponent->Write(this->mLua, *response);
-			lua_presume(coroutine, this->mLua, 2);
+            Lua::Coroutine::Resume(coroutine, this->mLua, 2);
 			return;
 		}
-		lua_presume(coroutine, this->mLua, 1);
+        Lua::Coroutine::Resume(coroutine, this->mLua, 1);
 	}
 	void LuaWaitTaskSource::SetResult()
 	{
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
-		lua_presume(lua_tothread(this->mLua, -1), this->mLua, 0);
+        Lua::Coroutine::Resume(lua_tothread(this->mLua, -1), this->mLua, 0);
 	}
 	void LuaWaitTaskSource::SetMessage(const Message& message)
 	{
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
 		lua_State* coroutine = lua_tothread(this->mLua, -1);
 		App::Get()->GetMsgComponent()->Write(this->mLua, message);
-		lua_presume(coroutine, this->mLua, 1);
-
+        Lua::Coroutine::Resume(coroutine, this->mLua, 1);
 	}
 }

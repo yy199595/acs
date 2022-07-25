@@ -1,6 +1,7 @@
 #include"LuaCoroutine.h"
 #include"App/App.h"
-#include"Define/CommonLogDef.h"
+#include"Script/luadebug.h"
+#include"Script/Extension/Log/LuaLogger.h"
 #include"Async/Lua/LuaWaitTaskSource.h"
 #include"Component/Timer/TimerComponent.h"
 using namespace Sentry;
@@ -39,7 +40,20 @@ namespace Lua
 
 		const int size = lua_gettop(lua);
 		lua_xmove(lua, coroutine, size - 1);
-		lua_presume(coroutine, lua, size - 1);
+        Coroutine::Resume(coroutine, lua, size -1);
 		return 1;
 	}
+
+    void Coroutine::Resume(lua_State *cor, lua_State *lua, int args)
+    {
+        int code = lua_resume(cor, lua, args);
+        if(code != LUA_OK && code != LUA_YIELD)
+        {
+            LuaDebug::onError(cor);
+//            const char * err = lua_tostring(cor, -1);
+//            lua_pushcfunction(lua, Lua::Log::DebugError);
+//            lua_pushstring(lua, err);
+//            lua_pcall(lua, 1, 0, 0);
+        }
+    }
 }

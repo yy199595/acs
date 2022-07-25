@@ -66,8 +66,8 @@ namespace Tcp
 		const std::string & GetAddress() { return this->mSocket->GetAddress();}
 	protected:
 		void Connect();
-		int GetLength();
 		void ReceiveLine();
+        void ReceiveLength();
 		void ReceiveSomeMessage();
 		void ReceiveMessage(int size);
         void Send(std::shared_ptr<ProtoMessage> message);
@@ -80,25 +80,21 @@ namespace Tcp
 		void ClearSendStream();
 		void ClearRecvStream();
 		int SendSync(std::shared_ptr<ProtoMessage> message); //同步发送
-		inline std::istream & GetReadStream() { return this->mRecvStream;}
-		inline std::ostream & GetSendStream() { return this->mSendStream;}
 	 protected:
-		virtual void OnReceiveLine(const asio::error_code & code, size_t) {}
-        virtual void OnReceiveMessage(const asio::error_code & code, size_t) {}
-		virtual void OnConnect(const asio::error_code & error, int count) { throw std::logic_error("");}
+        virtual void OnReceiveLength(const asio::error_code & code, int length) { }
+        virtual void OnReceiveLine(const asio::error_code & code, std::istream & readStream) {}
+        virtual void OnReceiveMessage(const asio::error_code & code, std::istream & readStream) {}
+        virtual void OnConnect(const asio::error_code & error, int count) { throw std::logic_error("");}
 		virtual void OnSendMessage(const asio::error_code & code, std::shared_ptr<ProtoMessage> message) { };
 	 protected:
-        ReadType mReadState;
         IAsioThread& mNetworkThread;
+        asio::streambuf mSendBuffer;
+        asio::streambuf mRecvBuffer;
 		std::shared_ptr<SocketProxy> mSocket;
 	 private:
 		int mConnectCount;
 		const size_t mMaxCount;
 		long long mLastOperTime;
-		std::ostream mSendStream;
-		std::istream mRecvStream;
-		asio::streambuf mSendBuffer;
-		asio::streambuf mRecvBuffer;
 	};
 }
 #endif //GAMEKEEPER_TCPCLIENT_H

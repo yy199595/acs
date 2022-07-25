@@ -25,7 +25,7 @@ namespace Sentry
             return false;
         }
         int len = 0;
-        std::istream &readStream = this->GetReadStream();
+        std::istream readStream(&this->mRecvBuffer);
         if (readStream.readsome((char *) &len, 3) <= 0)
         {
             return false;

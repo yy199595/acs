@@ -53,6 +53,7 @@ namespace Sentry
         this->mTasks.erase(iter);
         rpcTask->OnResponse(message);
 		this->OnDelTask(taskId, rpcTask);
+        LOG_WARN("invoke new rpc task id " << taskId);
         return true;
     }
 }
