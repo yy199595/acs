@@ -7,6 +7,7 @@
 
 #include<queue>
 #include<mutex>
+#include<assert.h>
 namespace Sentry
 {
     template<typename T>
