@@ -48,6 +48,8 @@ namespace Sentry
 			std::shared_ptr<MongoClientContext> mongoClientContext =
 					std::make_shared<MongoClientContext>(socketProxy, this->mConfig, this, index);
 			this->mMongoClients.emplace_back(mongoClientContext);
+
+			bool res = this->Ping(index);
 		}
 
         Json::Writer json1;
@@ -57,7 +59,17 @@ namespace Sentry
 
 		this->Update("UserCpData", json1.JsonString(), json2.JsonString(), "$push");
 
-		return this->Ping();
+
+
+		for(int index = 0; index < 1000; index ++)
+		{
+			this->GetApp()->GetTaskComponent()->Start([this, index](){
+				Json::Writer query;
+				query << "_id" << fmt::format("{0}@qq.com", 1000 + index);
+				this->Query("user_account", query.JsonString(), 1);
+			});
+		}
+		return true;
 	}
 
 	bool MongoRpcComponent::Delete(const std::string& tab, const std::string& json, int limit)
@@ -130,7 +142,8 @@ namespace Sentry
 		int index = flag % this->mMongoClients.size();
 		this->mMongoClients[index]->SendMongoCommand(request);
 #ifdef __DEBUG__
-        long long t1 = Time::GetNowMilTime();
+		assert(this->IsMainThread());
+		long long t1 = Time::GetNowMilTime();
         std::shared_ptr<Mongo::MongoQueryResponse> mongoResponse = mongoTask->Await();
 		if(mongoResponse != nullptr && mongoResponse->GetDocumentSize() > 0)
 		{
@@ -195,11 +208,11 @@ namespace Sentry
 		return this->Run(mongoRequest) != nullptr;
 	}
 
-	bool MongoRpcComponent::Ping()
+	bool MongoRpcComponent::Ping(int index)
 	{
 		std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
 		mongoRequest->document.Add("ping", 1);
-		return this->Run(mongoRequest) != nullptr;
+		return this->Run(mongoRequest, index) != nullptr;
 	}
 
 	void MongoRpcComponent::OnClientError(int index, XCode code)

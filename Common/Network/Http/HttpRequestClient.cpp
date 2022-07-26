@@ -71,7 +71,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
         this->mHttpComponent->OnResponse(taskId, this->mResponse);
 #else
-        IAsioThread & netWorkThread = this->mSocket->GetThread();
+        IAsioThread & netWorkThread = App::Get()->GetTaskScheduler();
         netWorkThread.Invoke(&HttpComponent::OnResponse, this->mHttpComponent, taskId, this->mResponse);
 #endif
         this->mRequest = nullptr;

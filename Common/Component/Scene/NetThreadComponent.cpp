@@ -61,7 +61,7 @@ namespace Sentry
 #ifndef ONLY_MAIN_THREAD
 	IAsioThread & NetThreadComponent::AllocateNetThread(int index)
 	{
-		this->GetApp()->GetTaskScheduler().AssertThread();
+		assert(this->IsMainThread());
 		if (index == 0)
 		{
 			index = rand() % this->mNetThreads.size();

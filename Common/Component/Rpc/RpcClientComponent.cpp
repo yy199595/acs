@@ -65,7 +65,7 @@ namespace Sentry
 
 	void RpcClientComponent::OnRequest(std::shared_ptr<com::Rpc_Request> request)
 	{
-		this->AssertMainThread();
+		assert(this->IsMainThread());
 		const std::string & address = request->address();
 		XCode code = this->mRpcComponent->OnRequest(request);
 		if (code != XCode::Successful)
@@ -84,7 +84,7 @@ namespace Sentry
 
 	void RpcClientComponent::OnResponse(std::shared_ptr<com::Rpc_Response> response)
 	{
-		this->AssertMainThread();
+		assert(this->IsMainThread());
         long long taskId = response->rpc_id();
 		this->mRpcComponent->OnResponse(taskId, response);
 	}

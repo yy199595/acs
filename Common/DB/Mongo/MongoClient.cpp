@@ -17,20 +17,26 @@ namespace Mongo
                                            const Mongo::Config& config, MongoRpcComponent* component, int index)
 		: Tcp::TcpContext(scoket, 1024 * 1024), mConfig(config), mMongoComponent(component), mIndex(index)
 	{
-
+		this->mIsAuth = false;
+		this->mCompleteCount = 0;
 	}
 
 	void MongoClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{
 		if (code)
 		{
+			if(this->mIsAuth)
+			{
+				return;
+			}
 			if(!this->StartAuthBySha1())
 			{
 				CONSOLE_LOG_ERROR("auth mongo user failure");
 				return;
 			}
+			this->mIsAuth = false;
             this->SendFromMessageQueue();
-            CONSOLE_LOG_ERROR("mongo user auth successful");
+            CONSOLE_LOG_ERROR( "["<< this->mIndex << "] mongo user auth successful");
 			return;
 		}
         assert(this->mRecvBuffer.size() == 0);
@@ -58,28 +64,26 @@ namespace Mongo
 			return;
 		}
         if(this->mMongoResponse == nullptr)
-        {
-            assert(this->mRecvBuffer.size() >= sizeof(MongoHead));
-            this->mMongoResponse = std::make_shared<MongoQueryResponse>();
-            int length = this->mMongoResponse->OnReceiveHead(is);
-            if(length <= 0)
-            {
-                std::string json;
-                this->mMongoRequest->document.WriterToJson(json);
-                CONSOLE_LOG_DEBUG(json);
-                assert(false);
-            }
-            else
-            {
-                this->ReceiveMessage(length);
-            }
-            return;
-        }
+		{
+			assert(this->mRecvBuffer.size() >= sizeof(MongoHead));
+			this->mMongoResponse = std::make_shared<MongoQueryResponse>();
+			int length = this->mMongoResponse->OnReceiveHead(is);
+			if (length <= 0)
+			{
+				std::string json;
+				this->mMongoRequest->document.WriterToJson(json);
+				CONSOLE_LOG_DEBUG(json);
+				assert(length > 0);
+			}
+			this->ReceiveMessage(length);
+			return;
+		}
         //std::string json;
+		this->mCompleteCount++;
         this->mMongoResponse->OnReceiveBody(is);
         //this->mMongoResponse->Get().WriterToJson(json);
         int responseId = this->mMongoResponse->GetHead().responseTo;
-        assert(responseId == this->mMongoRequest->header.requestID);
+       	assert(responseId == this->mMongoRequest->header.requestID);
         std::shared_ptr<MongoQueryResponse> response = std::move(this->mMongoResponse);
 #ifdef ONLY_MAIN_THREAD
 		this->mMongoComponent->OnResponse(responseId, response);
@@ -114,6 +118,7 @@ namespace Mongo
 
 	bool MongoClientContext::StartAuthBySha1()
 	{
+		this->mIsAuth = true;
 		if(!this->ConnectSync())
 		{
 			CONSOLE_LOG_ERROR("connect mongo error");

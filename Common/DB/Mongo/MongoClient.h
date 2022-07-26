@@ -47,6 +47,8 @@ namespace Mongo
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	private:
 		int mIndex;
+		int mCompleteCount;
+		bool mIsAuth; //当前是否正在验证
 		const Mongo::Config & mConfig;
 		asio::streambuf streamBuffer;
 		MongoRpcComponent * mMongoComponent;

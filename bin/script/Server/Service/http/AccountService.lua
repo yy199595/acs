@@ -10,7 +10,7 @@ function AccountService.Awake()
     return gateService ~= nil
 end
 
-function AccountService.AllServiceStart()
+function AccountService.AllServiceStart1()
     local test1 = function()
         while true do
             local data = {

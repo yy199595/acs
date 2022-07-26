@@ -43,7 +43,7 @@ namespace Sentry
     template<typename T>
     bool RpcTaskComponent<T>::OnResponse(long long taskId, std::shared_ptr<T> message)
     {
-        this->AssertMainThread();
+		assert(this->IsMainThread());
         auto iter = this->mTasks.find(taskId);
         if(iter == this->mTasks.end())
         {

@@ -113,7 +113,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mRedisComponent->OnResponse(self, this->mTaskId, this->mCurResponse);
 #else
-		this->mNetworkThread.Invoke(&RedisComponent::OnResponse,
+		IAsioThread & taskThread = App::Get()->GetTaskScheduler();
+		taskThread.Invoke(&RedisComponent::OnResponse,
 			this->mRedisComponent, self, this->mTaskId, this->mCurResponse);
 #endif
         this->mTaskId = 0;

@@ -93,10 +93,11 @@ namespace Tcp
         asio::streambuf mRecvBuffer;
 		std::shared_ptr<SocketProxy> mSocket;
 	 private:
+		int mCount;
 		int mConnectCount;
 		const size_t mMaxCount;
 		long long mLastOperTime;
-        std::queue<std::shared_ptr<ProtoMessage>> mMessagqQueue;
+        std::list<std::shared_ptr<ProtoMessage>> mMessagqQueue;
 	};
 }
 #endif //GAMEKEEPER_TCPCLIENT_H

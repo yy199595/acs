@@ -20,9 +20,9 @@ namespace Sentry
 		return this->mEntity->GetComponentByName(type->Name);
 	}
 
-	void Component::AssertMainThread()
+	bool Component::IsMainThread()
 	{
-		this->mApp->GetTaskScheduler().AssertThread();
+		return this->mApp->GetTaskScheduler().IsCurrentThread();
 	}
 
 	Component* Component::GetByName(const std::string& name)

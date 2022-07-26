@@ -43,13 +43,11 @@ namespace Sentry
 
     template<typename T>
     void DoubleQueue<T>::Swap()
-    {
-        this->mLock.lock();
-        if(this->mReadQueue.empty())
-        {
-            std::swap(this->mReadQueue, this->mWriteQueue);
-        }
-        this->mLock.unlock();
-    }
+	{
+		this->mLock.lock();
+		assert(this->mReadQueue.empty());
+		std::swap(this->mReadQueue, this->mWriteQueue);
+		this->mLock.unlock();
+	}
 }
 #endif //GAMEKEEPER_DOUBLEQUEUE_H

@@ -42,7 +42,7 @@ namespace Sentry
 		void OnAddTask(RpcTask task) final;
 		void OnDelTask(long long taskId, RpcTask task) final;
 	public:
-		bool Ping();
+		bool Ping(int index);
 		bool InsertOnce(const std::string & tab, const std::string & json);
         bool Delete(const std::string & tab, const std::string & json, int limit);
         std::shared_ptr<Mongo::MongoQueryResponse> Query(const std::string & tab, const std::string & json, int limit = 1);

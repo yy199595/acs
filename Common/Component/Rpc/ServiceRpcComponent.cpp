@@ -27,7 +27,7 @@ namespace Sentry
 
 	XCode ServiceRpcComponent::OnRequest(std::shared_ptr<com::Rpc_Request> request)
 	{
-		this->AssertMainThread();
+		assert(this->IsMainThread());
 		if(!RpcServiceConfig::ParseFunName(request->func(), this->mTempService, this->mTempMethod))
 		{
 			return XCode::NotFoundRpcConfig;
