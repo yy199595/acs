@@ -396,10 +396,6 @@ namespace Sentry
 
     int HttpHandlerRequest::OnReceiveSome(std::istream &streamBuffer)
     {
-        if (this->mState != HttpDecodeState::Content)
-        {
-            return this->OnReceiveLine(streamBuffer);
-        }
         char buffer[128] = {0 };
         size_t size = streamBuffer.readsome(buffer, 128);
         while(size > 0)

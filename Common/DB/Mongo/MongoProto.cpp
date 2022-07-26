@@ -113,8 +113,10 @@ namespace Mongo
 {
     int MongoQueryResponse::OnReceiveHead(std::istream & os)
     {
-        os.readsome((char *)&this->mHead, sizeof(MongoHead));
-        return this->mHead.messageLength;
+        memset(this->mReadBuffer, 0, 128);
+        assert(os.readsome(this->mReadBuffer, sizeof(MongoHead)) == sizeof(MongoHead));
+        memcpy(&this->mHead, this->mReadBuffer, sizeof(MongoHead));
+        return this->mHead.messageLength - sizeof(MongoHead);
     }
 
 	size_t MongoQueryResponse::OnReceiveBody(std::istream & os)

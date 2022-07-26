@@ -130,7 +130,7 @@ namespace Sentry
             userRequest->set_rpc_id(clientRpcTask->GetRpcId());
             this->mServiceRpcComponent->AddTask(clientRpcTask);
             localServerRpc->SendRequest(targetAddress, userRequest);
-            CONSOLE_LOG_ERROR("send message to [" << targetAddress << "]");
+            //CONSOLE_LOG_ERROR("send message to [" << targetAddress << "]");
         }
 		return XCode::Successful;
 	}

@@ -89,6 +89,13 @@ namespace Bson
 	namespace Writer
 	{
 
+        void Object::WriterToJson(std::string &json)
+        {
+            int length = 0;
+            Bson::Read::Object obj(this->Serialize(length));
+            obj.WriterToJson(json);
+        }
+
 		bool Object::FromByJson(const std::string& json)
 		{
 			rapidjson::Document document;

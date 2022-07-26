@@ -108,6 +108,7 @@ namespace Sentry
 			this->CloseSocket(XCode::SendMessageFail);
 			return;
 		}
+        this->SendFromMessageQueue();
 	}
 
 	void GateClientContext::StartClose()
@@ -140,7 +141,7 @@ namespace Sentry
 #else
 		this->mNetworkThread.Invoke(&GateClientContext::Send, this, requestMessage);
 #endif
-        CONSOLE_LOG_ERROR("send to client [" << this->mSocket->GetAddress() << "] " << message->rpc_id());
+        //CONSOLE_LOG_ERROR("send to client [" << this->mSocket->GetAddress() << "] " << message->rpc_id());
     }
 
 }

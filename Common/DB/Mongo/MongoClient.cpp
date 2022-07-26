@@ -24,20 +24,25 @@ namespace Mongo
 	{
 		if (code)
 		{
-			this->ClearSendStream();
 			if(!this->StartAuthBySha1())
 			{
 				CONSOLE_LOG_ERROR("auth mongo user failure");
 				return;
 			}
-			CONSOLE_LOG_ERROR("mongo user auth successful");
-			this->Send(message);
+            this->SendFromMessageQueue();
+            CONSOLE_LOG_ERROR("mongo user auth successful");
 			return;
 		}
-
-		this->mCommands.pop_front();
         assert(this->mRecvBuffer.size() == 0);
+        assert(this->mSendBuffer.size() == 0);
+        assert(this->mMongoResponse == nullptr);
 		this->ReceiveMessage(sizeof(MongoHead));
+
+        std::string json;
+        this->mMongoRequest = static_pointer_cast<MongoQueryRequest>(message);
+        this->mMongoRequest->document.WriterToJson(json);
+        int size = this->mSocket->GetSocket().available();
+        CONSOLE_LOG_INFO(this->mMongoRequest->collectionName << " = " << json << "\n" << " size = " << size);
 	}
 
     void MongoClientContext::OnReceiveMessage(const asio::error_code &code, std::istream & is)
@@ -56,14 +61,27 @@ namespace Mongo
 		}
         if(this->mMongoResponse == nullptr)
         {
-            size_t size = is.rdbuf()->in_avail();
+            assert(this->mRecvBuffer.size() >= sizeof(MongoHead));
             this->mMongoResponse = std::make_shared<MongoQueryResponse>();
             int length = this->mMongoResponse->OnReceiveHead(is);
-            this->ReceiveMessage(length - sizeof(MongoHead));
+            if(length <= 0)
+            {
+                std::string json;
+                this->mMongoRequest->document.WriterToJson(json);
+                CONSOLE_LOG_DEBUG(json);
+                assert(false);
+            }
+            else
+            {
+                this->ReceiveMessage(length);
+            }
             return;
         }
+        //std::string json;
         this->mMongoResponse->OnReceiveBody(is);
+        //this->mMongoResponse->Get().WriterToJson(json);
         int responseId = this->mMongoResponse->GetHead().responseTo;
+        assert(responseId == this->mMongoRequest->header.requestID);
         std::shared_ptr<MongoQueryResponse> response = std::move(this->mMongoResponse);
 #ifdef ONLY_MAIN_THREAD
 		this->mMongoComponent->OnResponse(responseId, response);
@@ -71,30 +89,17 @@ namespace Mongo
 		MainTaskScheduler& taskScheduler = App::Get()->GetTaskScheduler();
 		taskScheduler.Invoke(&MongoRpcComponent::OnResponse, this->mMongoComponent, responseId, response);
 #endif
-		if (!this->mCommands.empty())
-		{
-			this->Send(this->mCommands.front());
-		}
+        this->SendFromMessageQueue();
 	}
 
-	void MongoClientContext::PushMongoCommand(std::shared_ptr<Tcp::ProtoMessage> request)
+	void MongoClientContext::SendMongoCommand(std::shared_ptr<MongoQueryRequest> request)
 	{
 #ifdef ONLY_MAIN_THREAD
-		this->PushCommand(request);
+		this->Send(request);
 #else
-		this->mNetworkThread.Invoke(&MongoClientContext::PushCommand, this, request);
+		this->mNetworkThread.Invoke(&MongoClientContext::Send, this, request);
 #endif
 	}
-
-	void MongoClientContext::PushCommand(std::shared_ptr<Tcp::ProtoMessage> request)
-	{
-		if(this->mCommands.empty())
-		{
-			this->Send(request);
-		}
-		this->mCommands.push_back(request);
-	}
-
 
 	std::string SaltPassword(std::string & pwd, std::string salt, int iter)
 	{
@@ -143,8 +148,7 @@ namespace Mongo
 		}
         MongoQueryResponse response1;
 		std::istream readStream1(&this->mRecvBuffer);
-		int length = response1.OnReceiveHead(readStream1);
-		if(this->RecvSync(length - sizeof(MongoHead)) <= 0)
+		if(this->RecvSync(response1.OnReceiveHead(readStream1)) <= 0)
 		{
 			return false;
 		}
@@ -203,9 +207,7 @@ namespace Mongo
 			return false;
 		}
         MongoQueryResponse response2;
-
-		length = response2.OnReceiveHead(readStream1);
-		if(this->RecvSync(length - sizeof(MongoHead)) <= 0)
+		if(this->RecvSync(response2.OnReceiveHead(readStream1)) <= 0)
 		{
 			return false;
 		}
@@ -235,9 +237,7 @@ namespace Mongo
 			return false;
 		}
         MongoQueryResponse response3;
-		length = response3.OnReceiveHead(readStream1);
-
-		if(this->RecvSync(length - sizeof(MongoHead)) <= 0)
+		if(this->RecvSync(response3.OnReceiveHead(readStream1)) <= 0)
 		{
 			return false;
 		}

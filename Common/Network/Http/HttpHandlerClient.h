@@ -17,15 +17,16 @@ namespace Sentry
 	 public:
 		HttpHandlerClient(HttpServiceComponent * httpComponent, std::shared_ptr<SocketProxy> socketProxy);
 	 public:
-		void StartWriter();
 		void StartReceive();
-		std::shared_ptr<HttpHandlerRequest> Request() { return this->mHttpRequest;}
+        void StartWriter(HttpStatus code);
+        std::shared_ptr<HttpHandlerRequest> Request() { return this->mHttpRequest;}
 		std::shared_ptr<HttpHandlerResponse> Response() { return this->mHttpResponse;}
 	 private:
 		void OnComplete();
 		void ClosetClient();
+        void OnReceiveLine(const asio::error_code &code, std::istream &is) final;
         void OnReceiveMessage(const asio::error_code &code, std::istream & is) final;
-		void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
+        void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
 	 private:
 		asio::streambuf mStreamBuffer;
         HttpServiceComponent * mHttpComponent;

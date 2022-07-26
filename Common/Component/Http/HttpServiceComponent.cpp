@@ -63,31 +63,36 @@ namespace Sentry
         std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
         std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
 
-        const HttpInterfaceConfig *httpConfig = this->GetConfig(request->GetPath());
+        const std::string & path = request->GetPath();
+        const std::string & type = request->GetMethod();
+        const std::string & data = request->GetContent();
+        const std::string & address = request->GetAddress();
+
+        const HttpInterfaceConfig *httpConfig = this->GetConfig(path);
         if (httpConfig == nullptr)
         {
-            response->SetCode(HttpStatus::NOT_FOUND);
-            httpClient->StartWriter();
+            httpClient->StartWriter(HttpStatus::NOT_FOUND);
+            CONSOLE_LOG_ERROR("[" << path << "] " << HttpStatusToString(HttpStatus::NOT_FOUND));
             return;
         }
-        if (httpConfig->Type != request->GetMethod())
+        if (httpConfig->Type != type)
         {
-            response->SetCode(HttpStatus::METHOD_NOT_ALLOWED);
-            httpClient->StartWriter();
+            httpClient->StartWriter(HttpStatus::METHOD_NOT_ALLOWED);
+            CONSOLE_LOG_ERROR("[" << path << "] " << HttpStatusToString(HttpStatus::METHOD_NOT_ALLOWED));
             return;
         }
 
         LocalHttpService *httpService = this->GetComponent<LocalHttpService>(httpConfig->Service);
         if (httpService == nullptr || !httpService->IsStartService())
         {
-            response->SetCode(HttpStatus::NOT_FOUND);
-            httpClient->StartWriter();
+            httpClient->StartWriter(HttpStatus::NOT_FOUND);
+            CONSOLE_LOG_ERROR("[" << path << "] " << HttpStatusToString(HttpStatus::NOT_FOUND));
             return;
         }
         if (!httpConfig->IsAsync)
         {
             httpService->Invoke(httpConfig->Method, request, response);
-            httpClient->StartWriter();
+            httpClient->StartWriter(HttpStatus::OK);
             return;
         }
         this->mTaskComponent->Start([httpService, httpClient, httpConfig]() {
@@ -96,7 +101,7 @@ namespace Sentry
             std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
 
             httpService->Invoke(httpConfig->Method, request, response);
-            httpClient->StartWriter();
+            httpClient->StartWriter(HttpStatus::OK);
         });
     }
 }

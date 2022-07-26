@@ -129,3 +129,17 @@ inline std::string FormatFileLine(const char * file, const int line)
 	ss << f << content;                \
 	LoggerComponent::AddFatalLog(ss.str());\
 }
+
+#define CONSOLE_LOG_INFO(content){ \
+	std::string f = FormatFileLine(__FILE__, __LINE__); \
+	std::stringstream ss;                \
+	ss << f << content;                \
+	LoggerComponent::AddInfoLog(ss.str());\
+}
+
+#define CONSOLE_LOG_DEBUG(content){ \
+	std::string f = FormatFileLine(__FILE__, __LINE__); \
+	std::stringstream ss;                \
+	ss << f << content;                \
+	LoggerComponent::AddDebugLog(ss.str());\
+}

@@ -46,14 +46,14 @@ namespace Sentry
         auto iter = this->mTasks.find(taskId);
         if(iter == this->mTasks.end())
         {
-            LOG_ERROR(this->GetName() << " not find rpc task id " << taskId);
+            LOG_FATAL(this->GetName() << " not find rpc task id " << taskId);
             return false;
         }
         RpcTask rpcTask = iter->second;
         this->mTasks.erase(iter);
         rpcTask->OnResponse(message);
 		this->OnDelTask(taskId, rpcTask);
-        LOG_WARN("invoke new rpc task id " << taskId);
+       // LOG_WARN("invoke new rpc task id " << taskId);
         return true;
     }
 }

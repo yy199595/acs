@@ -21,19 +21,20 @@ namespace Sentry
 		this->ReceiveSomeMessage();
 #else
 		IAsioThread & netWorkThread = this->mSocket->GetThread();
-		netWorkThread.Invoke(&HttpHandlerClient::ReceiveSomeMessage, this);
+		netWorkThread.Invoke(&HttpHandlerClient::ReceiveLine, this);
 #endif
 	}
 
-	void HttpHandlerClient::StartWriter()
-	{
+    void HttpHandlerClient::StartWriter(HttpStatus code)
+    {
+        this->mHttpResponse->SetCode(code);
 #ifdef ONLY_MAIN_THREAD
-		this->Send(this->mHttpResponse);
+        this->Send(this->mHttpResponse);
 #else
-		IAsioThread& netWorkThread = this->mSocket->GetThread();
-		netWorkThread.Invoke(&HttpHandlerClient::Send, this, this->mHttpResponse);
+        IAsioThread& netWorkThread = this->mSocket->GetThread();
+        netWorkThread.Invoke(&HttpHandlerClient::Send, this, this->mHttpResponse);
 #endif
-	}
+    }
 
 	void HttpHandlerClient::OnComplete()
 	{
@@ -46,6 +47,30 @@ namespace Sentry
 		mainThread.Invoke(&HttpServiceComponent::OnRequest, this->mHttpComponent, httpHandlerClient);
 #endif
 	}
+
+    void HttpHandlerClient::OnReceiveLine(const asio::error_code &code, std::istream &is)
+    {
+        if(code == asio::error::eof)
+        {
+            this->OnComplete();
+            return;
+        }
+        switch(this->mHttpRequest->OnReceiveLine(is))
+        {
+            case 0:
+                this->OnComplete();
+                break;
+            case -1:
+                this->ReceiveLine();
+                break;
+            case 1:
+                this->ReceiveSomeMessage();
+                break;
+            default:
+                this->ClosetClient();
+                break;
+        }
+    }
 
     void HttpHandlerClient::OnReceiveMessage(const asio::error_code &code, std::istream & is)
     {
@@ -60,7 +85,6 @@ namespace Sentry
                 this->OnComplete();
                 break;
             case 1:
-            case -1:
                 this->ReceiveSomeMessage();
                 break;
             default:

@@ -62,7 +62,7 @@ namespace Tcp
 		virtual ~TcpContext();
 
 	public:
-		long long GetLastOperTime() const { return this->mLastOperTime;}
+        long long GetLastOperTime() const { return this->mLastOperTime;}
 		const std::string & GetAddress() { return this->mSocket->GetAddress();}
 	protected:
 		void Connect();
@@ -79,6 +79,7 @@ namespace Tcp
 		int RecvSync(int read); //同步读取数据
 		void ClearSendStream();
 		void ClearRecvStream();
+        void SendFromMessageQueue();
 		int SendSync(std::shared_ptr<ProtoMessage> message); //同步发送
 	 protected:
         virtual void OnReceiveLength(const asio::error_code & code, int length) { }
@@ -95,6 +96,7 @@ namespace Tcp
 		int mConnectCount;
 		const size_t mMaxCount;
 		long long mLastOperTime;
+        std::queue<std::shared_ptr<ProtoMessage>> mMessagqQueue;
 	};
 }
 #endif //GAMEKEEPER_TCPCLIENT_H

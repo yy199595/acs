@@ -7,6 +7,7 @@
 #include"Util/TimeHelper.h"
 #include"Util/StringHelper.h"
 #include"Define/CommonLogDef.h"
+#include"App/App.h"
 namespace Tcp
 {
 	TcpContext::TcpContext(std::shared_ptr<SocketProxy> socket, size_t count)
@@ -134,7 +135,11 @@ namespace Tcp
 
 	void TcpContext::ReceiveMessage(int length)
 	{
-        assert(length > 0);
+        if(length <= 0)
+        {
+            CONSOLE_LOG_FATAL("length = " << length);
+            return;
+        }
 		if (length >= this->mMaxCount)
 		{
 			asio::error_code code =
@@ -164,29 +169,43 @@ namespace Tcp
 
 	void TcpContext::Send(std::shared_ptr<ProtoMessage> message)
 	{
-        std::ostream os(&this->mSendBuffer);
-		const int length = message->Serailize(os);
-		AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
-		std::shared_ptr<TcpContext> self = this->shared_from_this();
-		asio::async_write(tcpSocket, this->mSendBuffer, [this, self, message, length]
-			(const asio::error_code& code, size_t size)
-		{
-			if(code && this->mSendBuffer.size() > 0)
-			{
-				std::iostream os(&this->mSendBuffer);
-				os.ignore(this->mSendBuffer.size());
-			}
-			if(length > 0 && !code)
-			{
-				this->Send(message);
-				return;
-			}
-
-			this->OnSendMessage(code, message);
-		});
-
-		this->mLastOperTime = Helper::Time::GetNowSecTime();
+        if(this->mMessagqQueue.empty())
+        {
+            this->mMessagqQueue.push(message);
+            this->SendFromMessageQueue();
+            return;
+        }
+        this->mMessagqQueue.push(message);
 	}
+
+    void TcpContext::SendFromMessageQueue()
+    {
+        if(!this->mMessagqQueue.empty())
+        {
+            std::shared_ptr<ProtoMessage> message = this->mMessagqQueue.front();
+
+            std::ostream os(&this->mSendBuffer);
+            const int length = message->Serailize(os);
+            AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
+            std::shared_ptr<TcpContext> self = this->shared_from_this();
+            asio::async_write(tcpSocket, this->mSendBuffer, [this, self, message, length]
+                    (const asio::error_code& code, size_t size)
+            {
+                if(!code)
+                {
+                    if(length > 0)
+                    {
+                        this->SendFromMessageQueue();
+                        return;
+                    }
+                    this->mMessagqQueue.pop();
+                }
+                this->ClearSendStream();
+                this->OnSendMessage(code, message);
+            });
+            this->mLastOperTime = Helper::Time::GetNowSecTime();
+        }
+    }
 }
 
 namespace Tcp
@@ -202,10 +221,10 @@ namespace Tcp
 
 	void TcpContext::ClearSendStream()
 	{
-		if(this->mRecvBuffer.size() > 0)
+		if(this->mSendBuffer.size() > 0)
 		{
-			std::iostream os(&this->mRecvBuffer);
-			os.ignore(this->mRecvBuffer.size());
+			std::iostream os(&this->mSendBuffer);
+			os.ignore(this->mSendBuffer.size());
 		}
 	}
 

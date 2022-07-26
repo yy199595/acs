@@ -35,18 +35,18 @@ function Client.StartLogic()
         Log.Error("user auth failure")
         return
     end
-    LoginComponent.Register(account, password, phoneNum)
-    LoginComponent.Login(account, password)
+    --LoginComponent.Register(account, password, phoneNum)
+    --LoginComponent.Login(account, password)
 
     local res, response = clientComponent:Call("ChatService.Chat", "c2s.Chat.Request", {
         user_id = 1122, msg_type = 1, message = "hello"
     })
     Log.Error("code = ", res, Json.Encode(response))
-    coroutine.start(LoopCall)
     --coroutine.start(LoopCall)
     --coroutine.start(LoopCall)
-    --coroutine.start(LoopLogin)
-    --coroutine.start(LoopRegister)
+    --coroutine.start(LoopCall)
+    coroutine.start(LoopLogin)
+    coroutine.start(LoopRegister)
 
 end
 

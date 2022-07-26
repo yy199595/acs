@@ -52,8 +52,11 @@ namespace Sentry
 		if(code && this->mSocket->IsRemote())
 		{
 			this->Connect();
-			this->mSendQueues.emplace(message);
 		}
+        else
+        {
+            this->SendFromMessageQueue();
+        }
 	}
 
 	void ServerClientContext::CloseSocket(XCode code)
@@ -168,10 +171,6 @@ namespace Sentry
 			return;
 		}
         this->ReceiveLength();
-		while(!this->mSendQueues.empty())
-		{
-			this->Send(this->mSendQueues.front());
-			this->mSendQueues.pop();
-		}
+        this->SendFromMessageQueue();
 	}
 }

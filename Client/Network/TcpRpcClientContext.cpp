@@ -25,7 +25,7 @@ namespace Client
 
     void TcpRpcClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
     {
-
+        this->SendFromMessageQueue();
     }
 
     void TcpRpcClientContext::OnReceiveLength(const asio::error_code &code, int length)
@@ -87,7 +87,7 @@ namespace Client
 			return false;
         }
         long long taskId = response->rpc_id();
-        std::cout << response->ShortDebugString() << std::endl;
+        //std::cout << response->ShortDebugString() << std::endl;
         this->mClientComponent->OnResponse(taskId, response);
         return true;
     }

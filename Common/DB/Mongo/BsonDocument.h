@@ -85,8 +85,8 @@ namespace Bson
 			}
 
 		public:
-			bool FromByJson(const std::string& json);
-
+            void WriterToJson(std::string & json);
+            bool FromByJson(const std::string& json);
 		public:
 			const char* Serialize(int& length);
 

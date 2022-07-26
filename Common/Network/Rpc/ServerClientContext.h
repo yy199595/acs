@@ -32,6 +32,5 @@ namespace Sentry
 	private:
 		RpcClientComponent* mTcpComponent;
 		std::shared_ptr<asio::steady_timer> mTimer;
-		std::queue<std::shared_ptr<ProtoMessage>> mSendQueues;
 	};
 }// namespace Sentry

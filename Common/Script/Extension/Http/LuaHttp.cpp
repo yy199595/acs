@@ -64,7 +64,7 @@ namespace Lua
         std::shared_ptr<LuaHttpTask> luaHttpTask = postRequest->MakeLuaTask(lua, 0);
 
 #ifdef __DEBUG__
-        LOG_DEBUG("[http post] url = " << std::string(str, size) << " data = " << postRequest->GetBody());
+        //LOG_DEBUG("[http post] url = " << std::string(str, size) << " data = " << postRequest->GetBody());
 #endif
 
         httpComponent->AddTask(luaHttpTask);

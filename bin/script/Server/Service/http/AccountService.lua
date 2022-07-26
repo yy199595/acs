@@ -56,6 +56,6 @@ function AccountService.Login(request)
     end
     local ip, _ = StringUtil.ParseAddress(request.address)
     MongoComponent.Update("account.user_info", { _id = loginInfo.account },
-            {  last_login_time = os.time(), last_login_ip = ip,  token = response.token })
+                {  last_login_time = os.time(), last_login_ip = ip,  token = response.token })
     return XCode.Successful, response
 end

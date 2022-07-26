@@ -77,8 +77,8 @@ namespace Client
 		
 		this->AddTask(clienRpcTask);
 		this->mTcpClient->SendToServer(request);
-		LOG_DEBUG("call [" << request->method_name() 
-			<< "] rpc id = " << clienRpcTask->GetRpcId());
+//		LOG_DEBUG("call [" << request->method_name()
+//			<< "] rpc id = " << clienRpcTask->GetRpcId());
 		return clienRpcTask->Await();
 	}
 

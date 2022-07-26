@@ -99,7 +99,7 @@ namespace Sentry
 
 	void MongoRpcComponent::OnDelTask(long long taskId, RpcTask task)
 	{
-		this->mRequestId.Push((int)taskId);
+		//this->mRequestId.Push((int)taskId);
 	}
 
 	void MongoRpcComponent::OnAddTask(RpcTaskComponent<Mongo::MongoQueryResponse>::RpcTask task)
@@ -124,7 +124,7 @@ namespace Sentry
 			return nullptr;
 		}
 		int index = flag % this->mMongoClients.size();
-		this->mMongoClients[index]->PushMongoCommand(request);
+		this->mMongoClients[0]->SendMongoCommand(request);
 #ifdef __DEBUG__
         long long t1 = Time::GetNowMilTime();
         std::shared_ptr<Mongo::MongoQueryResponse> mongoResponse = mongoTask->Await();
@@ -158,6 +158,7 @@ namespace Sentry
 		}
         mongoRequest->numberToReturn = limit;
 		mongoRequest->collectionName = fmt::format("{0}.{1}", this->mConfig.mDb, tab);
+        LOG_INFO(mongoRequest->collectionName << " " << json);
 		return this->Run(mongoRequest);
 	}
 

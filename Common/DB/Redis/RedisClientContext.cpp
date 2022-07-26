@@ -11,6 +11,7 @@ namespace Sentry
 		const RedisConfig& config, RedisComponent* component)
 		: Tcp::TcpContext(socket, 1024 * 100), mConfig(config), mRedisComponent(component)
 	{
+        this->mTaskId = 0;
 		this->mSocket = socket;
 		printf("create new redis client %s\n", config.Name.c_str());
 	}
@@ -43,18 +44,15 @@ namespace Sentry
 			asio::error_code code;
 			this->mTimer->cancel(code);
 		}
-		if (!this->mCommands.empty())
-		{
-			this->Send(this->mCommands.front());
-		}
+        this->SendFromMessageQueue();
 	}
 
 	void RedisClientContext::SendCommand(std::shared_ptr<RedisRequest> command)
 	{
 #ifdef ONLY_MAIN_THREAD
-		this->AddCommandQueue(command);
+		this->Send(command);
 #else
-		this->mNetworkThread.Invoke(&RedisClientContext::AddCommandQueue, this, command);
+		this->mNetworkThread.Invoke(&RedisClientContext::Send, this, command);
 #endif
 	}
 
@@ -65,15 +63,6 @@ namespace Sentry
 #else
 		this->mNetworkThread.Invoke(&RedisClientContext::ReceiveLine, this);
 #endif
-	}
-
-	void RedisClientContext::AddCommandQueue(std::shared_ptr<RedisRequest> command)
-	{
-		if (this->mCommands.empty())
-		{
-			this->Send(command);
-		}
-		this->mCommands.emplace_back(command);
 	}
 
 	void RedisClientContext::OnReceiveLine(const asio::error_code& code, std::istream & is)
@@ -120,38 +109,30 @@ namespace Sentry
 
 	void RedisClientContext::OnReadComplete()
 	{
-		long long taskId = 0;
 		SharedRedisClient self = this->Cast<RedisClientContext>();
-		if (!this->mCommands.empty())
-		{
-			taskId = this->mCommands.front()->GetTaskId();
-			this->mCommands.pop_front();
-		}
-		if (!this->mCommands.empty())
-		{
-			this->Send(this->mCommands.front());
-		}
 #ifdef ONLY_MAIN_THREAD
-		this->mRedisComponent->OnResponse(self, taskId, this->mCurResponse);
+		this->mRedisComponent->OnResponse(self, this->mTaskId, this->mCurResponse);
 #else
 		this->mNetworkThread.Invoke(&RedisComponent::OnResponse,
-			this->mRedisComponent, self, taskId, this->mCurResponse);
+			this->mRedisComponent, self, this->mTaskId, this->mCurResponse);
 #endif
+        this->mTaskId = 0;
+        this->SendFromMessageQueue();
 	}
 
     void RedisClientContext::OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message)
     {
-		if (code)
+        if (code)
         {
-			if(!this->AuthUser())
-			{
-				return;
-			}
-			this->ClearSendStream();
-			this->Send(message);
-			return;
+            if (!this->AuthUser())
+            {
+                return;
+            }
+            this->SendFromMessageQueue();
+            return;
         }
-		this->ReceiveLine();
+        this->mTaskId = static_pointer_cast<RedisRequest>(message)->GetTaskId();
+        this->ReceiveLine();
     }
 
 	bool RedisClientContext::AuthUser()
@@ -161,6 +142,8 @@ namespace Sentry
 			CONSOLE_LOG_ERROR("connect redis [" << this->mConfig.Address << "] failure");
 			return false;
 		}
+        assert(this->mSendBuffer.size() == 0);
+        assert(this->mRecvBuffer.size() == 0);
 		if(!this->mConfig.Password.empty())  //验证密码
 		{
 			std::shared_ptr<RedisRequest> authCommand

@@ -40,10 +40,10 @@
     "mongo": {
         "count" : 5,
         "db": "yjz",
-        "ip": "114.115.167.51",
+        "ip": "127.0.0.1",
         "port" : 27017,
-        "user" : "yjz",
-        "passwd" : "199595yjz."
+        "user" : "",
+        "passwd" : ""
     },
     "redis": {
         "main": {

@@ -29,16 +29,15 @@ namespace Sentry
 		bool AuthUser();
 		void OnReadComplete();
 		void OnConnect(const asio::error_code &error, int count) final;
-        void AddCommandQueue(std::shared_ptr<RedisRequest> command);
         void OnReceiveLine(const asio::error_code &code, std::istream & is) final;
         void OnReceiveMessage(const asio::error_code &code, std::istream & is) final;
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
     private:
+        long long mTaskId;
         const RedisConfig & mConfig;
         RedisComponent * mRedisComponent;
 		std::shared_ptr<asio::steady_timer> mTimer;
 		std::shared_ptr<RedisResponse> mCurResponse;
-		std::list<std::shared_ptr<RedisRequest>> mCommands;
     };
     typedef std::shared_ptr<RedisClientContext> SharedRedisClient;
 }
