@@ -6,7 +6,41 @@ local redisComponent
 function AccountService.Awake()
     redisComponent = _G.RedisComponent
     gateService = App.GetComponent("GateService")
+
     return gateService ~= nil
+end
+
+function AccountService.AllServiceStart()
+    local test1 = function()
+        while true do
+            local data = {
+                account = "646585122@qq.com",
+                password = "199595yjz.",
+                phone_num = 11223344
+            }
+            AccountService.Register({
+                data = Json.Encode(data),
+                address = "127.0.0.1:7788"
+            })
+        end
+    end
+
+    local tese2 = function()
+        while true do
+            local data = {
+                account = "646585122@qq.com",
+                password = "199595yjz."
+            }
+            AccountService.Login({
+                data = Json.Encode(data),
+                address = "127.0.0.1:7788"
+            })
+        end
+    end
+    for i = 1, 10 do
+        coroutine.start(test1)
+        coroutine.start(tese2)
+    end
 end
 
 function AccountService.Register(request)
@@ -40,9 +74,14 @@ function AccountService.Login(request)
     assert(loginInfo, "request data error")
     assert(type(loginInfo.account) == "string", "user account is not string")
     assert(type(loginInfo.password) == "string", "user password is not string")
-    local userInfo = MongoComponent.QueryOnce("user_account",{
-        _id = loginInfo.account
-    })
+    local count = 0
+    while true do
+        local userInfo = MongoComponent.QueryOnce("user_account",{
+            _id = loginInfo.account
+        })
+        count = count + 1
+        print("count = ", count)
+    end
 
     if userInfo == nil or loginInfo.password ~= userInfo.password then
         return XCode.Failure

@@ -18,7 +18,7 @@ namespace Sentry
 	void HttpHandlerClient::StartReceive()
 	{
 #ifdef ONLY_MAIN_THREAD
-		this->ReceiveSomeMessage();
+		this->ReceiveLine();
 #else
 		IAsioThread & netWorkThread = this->mSocket->GetThread();
 		netWorkThread.Invoke(&HttpHandlerClient::ReceiveLine, this);

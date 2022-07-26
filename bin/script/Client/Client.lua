@@ -45,8 +45,8 @@ function Client.StartLogic()
     --coroutine.start(LoopCall)
     --coroutine.start(LoopCall)
     --coroutine.start(LoopCall)
-    coroutine.start(LoopLogin)
-    coroutine.start(LoopRegister)
+    --coroutine.start(LoopLogin)
+    --coroutine.start(LoopRegister)
 
 end
 

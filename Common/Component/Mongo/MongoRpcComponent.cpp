@@ -123,8 +123,9 @@ namespace Sentry
 		{
 			return nullptr;
 		}
+
 		int index = flag % this->mMongoClients.size();
-		this->mMongoClients[0]->SendMongoCommand(request);
+		this->mMongoClients[index]->SendMongoCommand(request);
 #ifdef __DEBUG__
         long long t1 = Time::GetNowMilTime();
         std::shared_ptr<Mongo::MongoQueryResponse> mongoResponse = mongoTask->Await();
