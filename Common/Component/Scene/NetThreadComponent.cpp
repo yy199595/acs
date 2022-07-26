@@ -59,9 +59,14 @@ namespace Sentry
 	}
 
 #ifndef ONLY_MAIN_THREAD
-	IAsioThread & NetThreadComponent::AllocateNetThread()
+	IAsioThread & NetThreadComponent::AllocateNetThread(int index)
 	{
-		std::lock_guard<std::mutex> lock(this->mLock);
+		this->GetApp()->GetTaskScheduler().AssertThread();
+		if (index == 0)
+		{
+			index = rand() % this->mNetThreads.size();
+			return *(mNetThreads[index]);
+		}
 		if (this->mIndex >= mNetThreads.size())
 		{
 			this->mIndex = 0;

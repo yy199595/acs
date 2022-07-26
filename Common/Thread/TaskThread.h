@@ -48,6 +48,7 @@ namespace Sentry
 
         bool IsCurrentThread() const { return std::this_thread::get_id() == this->mThreadId; }
 
+        void AssertThread() const { assert(std::this_thread::get_id() == this->mThreadId); }
 	protected:
 		virtual void Update() = 0;
     protected:

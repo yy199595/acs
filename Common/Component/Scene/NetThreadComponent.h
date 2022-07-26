@@ -20,11 +20,10 @@ namespace Sentry
 	 public:
 	 public:
 #ifndef ONLY_MAIN_THREAD
-		IAsioThread & AllocateNetThread();
+		IAsioThread & AllocateNetThread(int index = 0);
 #endif
 	 private:
 		size_t mIndex;
-		std::mutex mLock;
 		std::thread* mMonitorThread;
 #ifndef ONLY_MAIN_THREAD
 		std::vector<NetWorkThread *> mNetThreads;

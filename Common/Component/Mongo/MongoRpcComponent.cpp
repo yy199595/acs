@@ -123,7 +123,10 @@ namespace Sentry
 		{
 			return nullptr;
 		}
-
+		if (flag == 0)
+		{
+			flag = rand();
+		}
 		int index = flag % this->mMongoClients.size();
 		this->mMongoClients[index]->SendMongoCommand(request);
 #ifdef __DEBUG__
@@ -131,7 +134,7 @@ namespace Sentry
         std::shared_ptr<Mongo::MongoQueryResponse> mongoResponse = mongoTask->Await();
 		if(mongoResponse != nullptr && mongoResponse->GetDocumentSize() > 0)
 		{
-            LOG_DEBUG( "[" << Time::GetNowMilTime() - t1 << "ms] document size = [" << mongoResponse->GetDocumentSize() << "]");
+            //LOG_DEBUG( "[" << Time::GetNowMilTime() - t1 << "ms] document size = [" << mongoResponse->GetDocumentSize() << "]");
             for(size_t i = 0; i < mongoResponse->GetDocumentSize(); i++)
             {
                 std::string json;
