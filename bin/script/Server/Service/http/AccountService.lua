@@ -74,14 +74,9 @@ function AccountService.Login(request)
     assert(loginInfo, "request data error")
     assert(type(loginInfo.account) == "string", "user account is not string")
     assert(type(loginInfo.password) == "string", "user password is not string")
-    local count = 0
-    while true do
-        local userInfo = MongoComponent.QueryOnce("user_account",{
+    local userInfo = MongoComponent.QueryOnce("user_account",{
             _id = loginInfo.account
-        })
-        count = count + 1
-        print("count = ", count)
-    end
+    })
 
     if userInfo == nil or loginInfo.password ~= userInfo.password then
         return XCode.Failure

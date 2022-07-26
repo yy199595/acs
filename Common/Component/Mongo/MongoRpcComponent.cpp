@@ -49,25 +49,10 @@ namespace Sentry
 					std::make_shared<MongoClientContext>(socketProxy, this->mConfig, this, index);
 			this->mMongoClients.emplace_back(mongoClientContext);
 
-			bool res = this->Ping(index);
-		}
-
-        Json::Writer json1;
-        Json::Writer json2;
-        json2 << "_id" << 444;
-        json1.BeginArray("Blacks") << 1 << 2 << 3 << Json::End::EndArray;
-
-		this->Update("UserCpData", json1.JsonString(), json2.JsonString(), "$push");
-
-
-
-		for(int index = 0; index < 1000; index ++)
-		{
-			this->GetApp()->GetTaskComponent()->Start([this, index](){
-				Json::Writer query;
-				query << "_id" << fmt::format("{0}@qq.com", 1000 + index);
-				this->Query("user_account", query.JsonString(), 1);
-			});
+			if(!this->Ping(index))
+			{
+				return false;
+			}
 		}
 		return true;
 	}
@@ -152,7 +137,7 @@ namespace Sentry
             {
                 std::string json;
                 mongoResponse->Get(i).WriterToJson(json);
-                LOG_DEBUG("[" << i << "] " << json);
+                //LOG_DEBUG("[" << i << "] " << json);
             }
             return mongoResponse;
 		}
@@ -175,7 +160,6 @@ namespace Sentry
 		}
         mongoRequest->numberToReturn = limit;
 		mongoRequest->collectionName = fmt::format("{0}.{1}", this->mConfig.mDb, tab);
-        LOG_INFO(mongoRequest->collectionName << " " << json);
 		return this->Run(mongoRequest);
 	}
 

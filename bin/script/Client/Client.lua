@@ -42,32 +42,39 @@ function Client.StartLogic()
         user_id = 1122, msg_type = 1, message = "hello"
     })
     Log.Error("code = ", res, Json.Encode(response))
-    --coroutine.start(LoopCall)
-    --coroutine.start(LoopCall)
-    --coroutine.start(LoopCall)
-    --coroutine.start(LoopLogin)
-    --coroutine.start(LoopRegister)
+    coroutine.start(LoopCall)
+    coroutine.start(LoopCall)
+    coroutine.start(LoopCall)
+    coroutine.start(LoopLogin)
+    coroutine.start(LoopRegister)
+    coroutine.start(LoopLogin)
+    coroutine.start(LoopRegister)
 
 end
 
 function LoopLogin()
     while true do
+        local t1 = Time.GetNowMilTime()
         LoginComponent.Register(account, password, phoneNum)
+        print("register use time = ", Time.GetNowMilTime() - t1)
     end
 end
 
 function LoopRegister()
     while true do
+        local t1 = Time.GetNowMilTime()
         LoginComponent.Login(account, password)
+        print("login use time = ", Time.GetNowMilTime() - t1)
     end
 end
 
 function LoopCall()
     local clientComponent = App.GetComponent("ClientComponent")
     while true do
+        local t1 = Time.GetNowMilTime()
         local res, response = clientComponent:Call("ChatService.Chat", "c2s.Chat.Request", {
             user_id = 1122, msg_type = 1, message = "hello"
         })
-        Log.Error("code = ", res, Json.Encode(response))
+        Log.Error("code = ", res, Json.Encode(response), " time = ", Time.GetNowMilTime() - t1)
     end
 end
