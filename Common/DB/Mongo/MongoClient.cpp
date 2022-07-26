@@ -37,12 +37,10 @@ namespace Mongo
         assert(this->mSendBuffer.size() == 0);
         assert(this->mMongoResponse == nullptr);
 		this->ReceiveMessage(sizeof(MongoHead));
-
-        std::string json;
         this->mMongoRequest = static_pointer_cast<MongoQueryRequest>(message);
-        this->mMongoRequest->document.WriterToJson(json);
-        int size = this->mSocket->GetSocket().available();
-        CONSOLE_LOG_INFO(this->mMongoRequest->collectionName << " = " << json << "\n" << " size = " << size);
+        //this->mMongoRequest->document.WriterToJson(json);
+        //int size = this->mSocket->GetSocket().available();
+        //CONSOLE_LOG_INFO(this->mMongoRequest->collectionName << " = " << json << "\n" << " size = " << size);
 	}
 
     void MongoClientContext::OnReceiveMessage(const asio::error_code &code, std::istream & is)
