@@ -38,6 +38,8 @@ if(__ENABLE_OPEN_SSL__)
     include_directories(Libs/include/openssl)
 endif()
 #公共组件
+add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/lua)
+add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/protobuf/cmake)
 
 LINK_DIRECTORIES(Libs/lib)
 
