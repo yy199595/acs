@@ -14,7 +14,7 @@ option(__ENABLE_OPEN_SSL__ "开启SSL" OFF)
 option(__ENABLE_OPEN_SSL__ "开启SSL" OFF)
 option(__HTTP_DEBUG_LOG__ "打印http日志" OFF)
 option(__REDIS_DEBUG__ "开始redis调试" OFF)
-option(ONLY_MAIN_THREAD "启用单线程模式" ON)
+option(ONLY_MAIN_THREAD "启用单线程模式" OFF)
 option(__NET_ERROR_LOG__ "打印网络层错误" ON)
 option(__ENABLE_MYSQL__ "是否使用mysql" ON)
 

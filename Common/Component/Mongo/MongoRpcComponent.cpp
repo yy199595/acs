@@ -6,8 +6,8 @@
 #include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {
-	MongoTask::MongoTask(int taskId)
-		: mTaskId(taskId)
+	MongoTask::MongoTask(int id)
+        : mTaskId(id)
 	{
 
 	}
@@ -22,6 +22,7 @@ namespace Sentry
 {
 	bool MongoRpcComponent::LateAwake()
 	{
+        this->mIndex = 0;
 		const ServerConfig & config = this->GetApp()->GetConfig();
 		this->mTimerComponent = this->GetApp()->GetTimerComponent();
 		LOG_CHECK_RET_FALSE(config.GetMember("mongo", "ip", this->mConfig.mIp));
@@ -34,28 +35,41 @@ namespace Sentry
 	}
 
 	bool MongoRpcComponent::OnStart()
-	{
-		for (int index = 0; index < this->mConfig.mMaxCount; index++)
-		{
+    {
+        for (int index = 0; index < this->mConfig.mMaxCount; index++)
+        {
 #ifdef ONLY_MAIN_THREAD
-			IAsioThread & asioThread = this->GetApp()->GetTaskScheduler();
+            IAsioThread & asioThread = this->GetApp()->GetTaskScheduler();
 #else
-			NetThreadComponent* netThreadComponent = this->GetComponent<NetThreadComponent>();
-			IAsioThread& asioThread = netThreadComponent->AllocateNetThread();
+            NetThreadComponent *netThreadComponent = this->GetComponent<NetThreadComponent>();
+            IAsioThread &asioThread = netThreadComponent->AllocateNetThread();
 #endif
-			std::shared_ptr<SocketProxy> socketProxy =
-					std::make_shared<SocketProxy>(asioThread, this->mConfig.mIp, this->mConfig.mPort);
-			std::shared_ptr<MongoClientContext> mongoClientContext =
-					std::make_shared<MongoClientContext>(socketProxy, this->mConfig, this, index);
-			this->mMongoClients.emplace_back(mongoClientContext);
+            std::shared_ptr<SocketProxy> socketProxy =
+                    std::make_shared<SocketProxy>(asioThread, this->mConfig.mIp, this->mConfig.mPort);
+            std::shared_ptr<MongoClientContext> mongoClientContext =
+                    std::make_shared<MongoClientContext>(socketProxy, this->mConfig, this, index);
 
-			if(!this->Ping(index))
-			{
-				return false;
-			}
-		}
-		return true;
-	}
+            this->mMongoClients.emplace_back(mongoClientContext);
+            if (!this->Ping(index))
+            {
+                return false;
+            }
+        }
+//        for (int index = 0; index < 10; index++)
+//        {
+//            this->GetApp()->GetTaskComponent()->Start([this]() {
+//                Json::Writer json;
+//                json << "_id" << fmt::format("{0}@qq.com", 646585122);
+//                while (true)
+//                {
+//                    std::string str = json.JsonString();
+//                    this->Query("account_user", str, 1);
+//                }
+//            });
+//        }
+
+        return true;
+    }
 
 	bool MongoRpcComponent::Delete(const std::string& tab, const std::string& json, int limit)
 	{
@@ -96,7 +110,7 @@ namespace Sentry
 
 	void MongoRpcComponent::OnDelTask(long long taskId, RpcTask task)
 	{
-		//this->mRequestId.Push((int)taskId);
+		this->mRequestId.Push((int)taskId);
 	}
 
 	void MongoRpcComponent::OnAddTask(RpcTaskComponent<Mongo::MongoQueryResponse>::RpcTask task)
@@ -110,34 +124,32 @@ namespace Sentry
 		{
 			return nullptr;
 		}
-		request->header.requestID = this->mRequestId.Pop();
+		request->header.requestID = 1;
 		if(request->collectionName.empty())
 		{
 			request->collectionName = this->mConfig.mDb + ".$cmd";
 		}
-		std::shared_ptr<MongoTask> mongoTask = std::make_shared<MongoTask>(request->header.requestID);
+        request->mTaskId = this->mRequestId.Pop();
+		std::shared_ptr<MongoTask> mongoTask(new MongoTask(request->mTaskId));
 		if(!this->AddTask(mongoTask))
 		{
 			return nullptr;
 		}
-		if (flag == 0)
-		{
-			flag = rand();
-		}
-		int index = flag % this->mMongoClients.size();
+        int index = this->mIndex % this->mMongoClients.size();
 		this->mMongoClients[index]->SendMongoCommand(request);
+        this->mIndex++;
 #ifdef __DEBUG__
 		assert(this->IsMainThread());
 		long long t1 = Time::GetNowMilTime();
         std::shared_ptr<Mongo::MongoQueryResponse> mongoResponse = mongoTask->Await();
 		if(mongoResponse != nullptr && mongoResponse->GetDocumentSize() > 0)
 		{
-            //LOG_DEBUG( "[" << Time::GetNowMilTime() - t1 << "ms] document size = [" << mongoResponse->GetDocumentSize() << "]");
+            LOG_DEBUG( "[" << Time::GetNowMilTime() - t1 << "ms] document size = [" << mongoResponse->GetDocumentSize() << "]");
             for(size_t i = 0; i < mongoResponse->GetDocumentSize(); i++)
             {
                 std::string json;
                 mongoResponse->Get(i).WriterToJson(json);
-                //LOG_DEBUG("[" << i << "] " << json);
+                LOG_DEBUG("[" << i << "] " << json);
             }
             return mongoResponse;
 		}

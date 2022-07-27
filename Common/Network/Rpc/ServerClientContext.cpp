@@ -21,7 +21,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->CloseSocket(XCode::NetActiveShutdown);
 #else
-		this->mNetworkThread.Invoke(&ServerClientContext::CloseSocket, this, XCode::NetActiveShutdown);
+        IAsioThread & t = this->mSocket->GetThread();
+		t.Invoke(&ServerClientContext::CloseSocket, this, XCode::NetActiveShutdown);
 #endif
 	}
 
@@ -32,7 +33,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->Send(responseMessage);
 #else
-		this->mNetworkThread.Invoke(&ServerClientContext::Send, this, responseMessage);
+        IAsioThread & t = this->mSocket->GetThread();
+        t.Invoke(&ServerClientContext::Send, this, responseMessage);
 #endif
 	}
 
@@ -43,7 +45,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->Send(requestMessage);
 #else
-		this->mNetworkThread.Invoke(&ServerClientContext::Send, this, requestMessage);
+        IAsioThread & t = this->mSocket->GetThread();
+        t.Invoke(&ServerClientContext::Send, this, requestMessage);
 #endif
 	}
 
@@ -154,7 +157,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLength();
 #else
-		this->mNetworkThread.Invoke(&ServerClientContext::ReceiveLength, this);
+        IAsioThread & t = this->mSocket->GetThread();
+        t.Invoke(&ServerClientContext::ReceiveLength, this);
 #endif
 	}
 

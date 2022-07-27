@@ -10,39 +10,6 @@ function AccountService.Awake()
     return gateService ~= nil
 end
 
-function AccountService.AllServiceStart1()
-    local test1 = function()
-        while true do
-            local data = {
-                account = "646585122@qq.com",
-                password = "199595yjz.",
-                phone_num = 11223344
-            }
-            AccountService.Register({
-                data = Json.Encode(data),
-                address = "127.0.0.1:7788"
-            })
-        end
-    end
-
-    local tese2 = function()
-        while true do
-            local data = {
-                account = "646585122@qq.com",
-                password = "199595yjz."
-            }
-            AccountService.Login({
-                data = Json.Encode(data),
-                address = "127.0.0.1:7788"
-            })
-        end
-    end
-    for i = 1, 10 do
-        coroutine.start(test1)
-        coroutine.start(tese2)
-    end
-end
-
 function AccountService.Register(request)
     local requestInfo = Json.Decode(request.data)
     assert(requestInfo.account, "register account is nil")

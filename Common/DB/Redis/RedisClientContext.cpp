@@ -52,7 +52,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->Send(command);
 #else
-		this->mNetworkThread.Invoke(&RedisClientContext::Send, this, command);
+        IAsioThread & t = this->mSocket->GetThread();
+		t.Invoke(&RedisClientContext::Send, this, command);
 #endif
 	}
 
@@ -61,7 +62,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLine();
 #else
-		this->mNetworkThread.Invoke(&RedisClientContext::ReceiveLine, this);
+        IAsioThread & t = this->mSocket->GetThread();
+        t.Invoke(&RedisClientContext::ReceiveLine, this);
 #endif
 	}
 

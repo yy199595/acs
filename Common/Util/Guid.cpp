@@ -23,7 +23,7 @@ namespace Helper
             mIndex1 = 0;
             mLastTime = nowTime;
         }
-        return mLastTime << 32 | (++mIndex1);
+        return (mLastTime << 32 | (++mIndex1));
     }
 
     long long Guid::Create(short type)

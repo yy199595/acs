@@ -8,6 +8,7 @@
 #include"DB/Mongo/MongoProto.h"
 #include"DB/Mongo/MongoClient.h"
 #include"DB/Mongo/BsonDocument.h"
+#include"Util/NumberBuilder.h"
 #include"Component/Rpc/RpcTaskComponent.h"
 
 using namespace Mongo;
@@ -24,7 +25,7 @@ namespace Sentry
 		void OnResponse(std::shared_ptr<Mongo::MongoQueryResponse> response) final;
 		std::shared_ptr<Mongo::MongoQueryResponse> Await() { return mTask.Await(); }
 	private:
-		int mTaskId;
+        int mTaskId;
 		TaskSource<std::shared_ptr<Mongo::MongoQueryResponse>> mTask;
 	};
 }
@@ -51,12 +52,13 @@ namespace Sentry
 		void OnClientError(int index, XCode code);
 		std::shared_ptr<Mongo::MongoQueryResponse> Run(std::shared_ptr<MongoQueryRequest> request, int flag = 0);
 	 private:
+        int mIndex;
 		Mongo::Config mConfig;
 		TimerComponent * mTimerComponent;
 		Util::NumberBuilder<int, 10> mRequestId;
 		std::unordered_map<long long, long long> mTimers;
-		std::vector<std::shared_ptr<MongoClientContext>> mMongoClients;
-	};
+        std::vector<std::shared_ptr<MongoClientContext>> mMongoClients;
+    };
 }
 
 

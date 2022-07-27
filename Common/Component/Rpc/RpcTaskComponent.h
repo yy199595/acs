@@ -36,7 +36,7 @@ namespace Sentry
             this->mTasks.emplace(taskId, task);
             return true;
         }
-        LOG_FATAL(this->GetName() << "add task error id = " << task->GetRpcId());
+        LOG_FATAL(this->GetName() << " add task error id = " << task->GetRpcId());
         return false;
     }
 

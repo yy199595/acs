@@ -62,6 +62,7 @@ namespace Tcp
 		virtual ~TcpContext();
 
 	public:
+        void Reset(std::shared_ptr<SocketProxy> socket);
         long long GetLastOperTime() const { return this->mLastOperTime;}
 		const std::string & GetAddress() { return this->mSocket->GetAddress();}
 	protected:
@@ -88,12 +89,11 @@ namespace Tcp
         virtual void OnConnect(const asio::error_code & error, int count) { throw std::logic_error("");}
 		virtual void OnSendMessage(const asio::error_code & code, std::shared_ptr<ProtoMessage> message) { };
 	 protected:
-        IAsioThread& mNetworkThread;
+        //IAsioThread& mNetworkThread;
         asio::streambuf mSendBuffer;
         asio::streambuf mRecvBuffer;
 		std::shared_ptr<SocketProxy> mSocket;
 	 private:
-		int mCount;
 		int mConnectCount;
 		const size_t mMaxCount;
 		long long mLastOperTime;

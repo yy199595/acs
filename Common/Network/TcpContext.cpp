@@ -2,22 +2,23 @@
 // Created by zmhy0073 on 2022/1/15.
 //
 #include"TcpContext.h"
-#include<iostream>
-#include<stdlib.h>
 #include"Util/TimeHelper.h"
 #include"Util/StringHelper.h"
 #include"Define/CommonLogDef.h"
-#include"App/App.h"
 namespace Tcp
 {
 	TcpContext::TcpContext(std::shared_ptr<SocketProxy> socket, size_t count)
-		: mNetworkThread(socket->GetThread()), mMaxCount(count), mRecvBuffer(count)
+		: mMaxCount(count), mRecvBuffer(count)
 	{
-		this->mCount = 0;
 		this->mSocket = socket;
 		this->mLastOperTime = 0;
 		this->mConnectCount = 0;
 	}
+
+    void TcpContext::Reset(std::shared_ptr<SocketProxy> socket)
+    {
+        this->mSocket = socket;
+    }
 
 	TcpContext::~TcpContext()
 	{
@@ -29,7 +30,7 @@ namespace Tcp
 	{
 		this->mConnectCount++;
 		assert(this->mSocket->IsRemote());
-		assert(this->mNetworkThread.IsCurrentThread());
+		assert(this->mSocket->GetThread().IsCurrentThread());
 		unsigned short port = this->mSocket->GetPort();
 		const std::string& ip = this->mSocket->GetIp();
 		AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
@@ -55,8 +56,8 @@ namespace Tcp
 
     void TcpContext::ReceiveLine()
 	{
-		assert(this->mNetworkThread.IsCurrentThread());
-		this->mLastOperTime = Helper::Time::GetNowSecTime();
+        assert(this->mSocket->GetThread().IsCurrentThread());
+        this->mLastOperTime = Helper::Time::GetNowSecTime();
 		AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
 		std::shared_ptr<TcpContext> self = this->shared_from_this();
 		asio::async_read_until(tcpSocket, this->mRecvBuffer, "\r\n",
@@ -69,8 +70,8 @@ namespace Tcp
 
 	void TcpContext::ReceiveSomeMessage()
 	{
-		assert(this->mNetworkThread.IsCurrentThread());
-		if(this->mRecvBuffer.size() > 0)
+        assert(this->mSocket->GetThread().IsCurrentThread());
+        if(this->mRecvBuffer.size() > 0)
         {
             asio::error_code code;
             std::istream is(&this->mRecvBuffer);
@@ -89,7 +90,8 @@ namespace Tcp
             return;
         }
 		std::shared_ptr<TcpContext> self = this->shared_from_this();
-		asio::async_read(tcpSocket, this->mRecvBuffer, asio::transfer_at_least(1),
+		asio::async_read(tcpSocket, this->mRecvBuffer,
+                         asio::transfer_at_least(1),
 			[this, self](const asio::error_code& code, size_t size)
 			{
                 std::istream is(&this->mRecvBuffer);
@@ -100,8 +102,8 @@ namespace Tcp
     void TcpContext::ReceiveLength()
     {
         int length = sizeof(int);
-		assert(this->mNetworkThread.IsCurrentThread());
-		if (this->mRecvBuffer.size() >= length)
+        assert(this->mSocket->GetThread().IsCurrentThread());
+        if (this->mRecvBuffer.size() >= length)
         {
             asio::error_code code;
             std::istream is(&this->mRecvBuffer);
@@ -141,8 +143,8 @@ namespace Tcp
 	void TcpContext::ReceiveMessage(int length)
 	{
 		assert(length > 0);
-		assert(this->mNetworkThread.IsCurrentThread());
-		if (length >= this->mMaxCount)
+        assert(this->mSocket->GetThread().IsCurrentThread());
+        if (length >= this->mMaxCount)
 		{
 			asio::error_code code =
                     std::make_error_code(std::errc::bad_message);
@@ -161,7 +163,8 @@ namespace Tcp
 		this->mLastOperTime = Helper::Time::GetNowSecTime();
 		AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
 		std::shared_ptr<TcpContext> self = this->shared_from_this();
-		asio::async_read(tcpSocket, this->mRecvBuffer, asio::transfer_exactly(length),
+		asio::async_read(tcpSocket, this->mRecvBuffer,
+                         asio::transfer_exactly(length),
 			[this, self](const asio::error_code& code, size_t size)
 			{
                 std::istream is(&this->mRecvBuffer);
@@ -171,9 +174,8 @@ namespace Tcp
 
 	void TcpContext::Send(std::shared_ptr<ProtoMessage> message)
 	{
-		this->mCount++;
-		assert(this->mNetworkThread.IsCurrentThread());
-		if(this->mMessagqQueue.empty())
+        assert(this->mSocket->GetThread().IsCurrentThread());
+        if(this->mMessagqQueue.empty())
         {
             this->mMessagqQueue.emplace_back(message);
             this->SendFromMessageQueue();
@@ -184,25 +186,25 @@ namespace Tcp
 
     void TcpContext::SendFromMessageQueue()
     {
-		assert(this->mNetworkThread.IsCurrentThread());
-		if(!this->mMessagqQueue.empty())
+        assert(this->mSendBuffer.size() == 0);
+        assert(this->mSocket->GetThread().IsCurrentThread());
+        if(!this->mMessagqQueue.empty())
         {
-            std::shared_ptr<ProtoMessage> message = this->mMessagqQueue.front();
-
             std::ostream os(&this->mSendBuffer);
-            const int length = message->Serailize(os);
             AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
             std::shared_ptr<TcpContext> self = this->shared_from_this();
-            asio::async_write(tcpSocket, this->mSendBuffer, [this, self, message, length]
+            const int length = this->mMessagqQueue.front()->Serailize(os);
+            asio::async_write(tcpSocket, this->mSendBuffer, [this, self]
                     (const asio::error_code& code, size_t size)
             {
+                std::shared_ptr<Tcp::ProtoMessage> message = this->mMessagqQueue.front();
                 if(!code)
                 {
-                    if(length > 0)
-                    {
-                        this->SendFromMessageQueue();
-                        return;
-                    }
+//                    if(length > 0)
+//                    {
+//                        this->SendFromMessageQueue();
+//                        return;
+//                    }
                     this->mMessagqQueue.pop_front();
                 }
                 this->ClearSendStream();
@@ -217,8 +219,8 @@ namespace Tcp
 {
 	void TcpContext::ClearRecvStream()
 	{
-		assert(this->mNetworkThread.IsCurrentThread());
-		if(this->mRecvBuffer.size() > 0)
+        assert(this->mSocket->GetThread().IsCurrentThread());
+        if(this->mRecvBuffer.size() > 0)
 		{
 			std::iostream os(&this->mRecvBuffer);
 			os.ignore(this->mRecvBuffer.size());
@@ -227,8 +229,8 @@ namespace Tcp
 
 	void TcpContext::ClearSendStream()
 	{
-		assert(this->mNetworkThread.IsCurrentThread());
-		if(this->mSendBuffer.size() > 0)
+        assert(this->mSocket->GetThread().IsCurrentThread());
+        if(this->mSendBuffer.size() > 0)
 		{
 			std::iostream os(&this->mSendBuffer);
 			os.ignore(this->mSendBuffer.size());
@@ -238,8 +240,8 @@ namespace Tcp
 	bool TcpContext::ConnectSync()
 	{
 		asio::error_code code;
-		assert(this->mNetworkThread.IsCurrentThread());
-		AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
+        assert(this->mSocket->GetThread().IsCurrentThread());
+        AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
 		auto address = asio::ip::make_address_v4(this->mSocket->GetIp());
 		asio::ip::tcp::endpoint endPoint(address, this->mSocket->GetPort());
 		tcpSocket.connect(endPoint, code);
@@ -254,8 +256,8 @@ namespace Tcp
 	int TcpContext::RecvSync(int length)
 	{
 		asio::error_code code;
-		assert(this->mNetworkThread.IsCurrentThread());
-		if(this->mRecvBuffer.size() >= length)
+        assert(this->mSocket->GetThread().IsCurrentThread());
+        if(this->mRecvBuffer.size() >= length)
 		{
 			return length;
 		}
@@ -268,8 +270,8 @@ namespace Tcp
 	int TcpContext::RecvLineSync()
 	{
 		asio::error_code code;
-		assert(this->mNetworkThread.IsCurrentThread());
-		AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
+        assert(this->mSocket->GetThread().IsCurrentThread());
+        AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
 		return asio::read_until(tcpSocket, this->mRecvBuffer, "\r\n", code);
 	}
 
@@ -277,8 +279,8 @@ namespace Tcp
 	{
 		int sum = 0;
 		asio::error_code code;
-		assert(this->mNetworkThread.IsCurrentThread());
-		std::ostream os(&this->mSendBuffer);
+        assert(this->mSocket->GetThread().IsCurrentThread());
+        std::ostream os(&this->mSendBuffer);
 		int length = message->Serailize(os);
 		AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
 		sum += asio::write(tcpSocket, this->mSendBuffer, code);
@@ -297,5 +299,4 @@ namespace Tcp
 		}
 		return sum;
 	}
-
 }

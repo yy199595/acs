@@ -27,7 +27,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLength();
 #else
-		this->mNetworkThread.Invoke(&GateClientContext::ReceiveLength, this);
+        IAsioThread & t = this->mSocket->GetThread();
+        t.Invoke(&GateClientContext::ReceiveLength, this);
 #endif
 	}
 
@@ -117,7 +118,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->CloseSocket(code);
 #else
-		this->mNetworkThread.Invoke(&GateClientContext::CloseSocket, this, code);
+        IAsioThread & t = this->mSocket->GetThread();
+        t.Invoke(&GateClientContext::CloseSocket, this, code);
 #endif
 	}
 
@@ -128,7 +130,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->Send(requestMessage);
 #else
-		this->mNetworkThread.Invoke(&GateClientContext::Send, this, requestMessage);
+        IAsioThread & t = this->mSocket->GetThread();
+        t.Invoke(&GateClientContext::Send, this, requestMessage);
 #endif
 	}
 
@@ -139,7 +142,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->Send(requestMessage);
 #else
-		this->mNetworkThread.Invoke(&GateClientContext::Send, this, requestMessage);
+        IAsioThread & t = this->mSocket->GetThread();
+        t.Invoke(&GateClientContext::Send, this, requestMessage);
 #endif
         //CONSOLE_LOG_ERROR("send to client [" << this->mSocket->GetAddress() << "] " << message->rpc_id());
     }

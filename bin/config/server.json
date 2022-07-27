@@ -5,7 +5,7 @@
     "node_name": "Server",
     "thread": {
         "task": 1,
-        "network": 10
+        "network": 1
     },
     "path": {
         "log": "log",
@@ -38,12 +38,12 @@
         "passwd": "199595yjz."
     },
     "mongo": {
-        "count" : 5,
+        "count" : 10,
         "db": "yjz",
-        "ip": "114.115.167.51",
+        "ip": "127.0.0.1",
         "port" : 27017,
-        "user" : "yjz",
-        "passwd" : "199595yjz."
+        "user" : "",
+        "passwd" : ""
     },
     "redis": {
         "main": {

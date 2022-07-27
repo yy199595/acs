@@ -17,8 +17,8 @@ namespace Mongo
                                            const Mongo::Config& config, MongoRpcComponent* component, int index)
 		: Tcp::TcpContext(scoket, 1024 * 1024), mConfig(config), mMongoComponent(component), mIndex(index)
 	{
+        this->mCount = 0;
 		this->mIsAuth = false;
-		this->mCompleteCount = 0;
 	}
 
 	void MongoClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
@@ -78,12 +78,9 @@ namespace Mongo
 			this->ReceiveMessage(length);
 			return;
 		}
-        //std::string json;
-		this->mCompleteCount++;
+        this->mCount++;
         this->mMongoResponse->OnReceiveBody(is);
-        //this->mMongoResponse->Get().WriterToJson(json);
-        int responseId = this->mMongoResponse->GetHead().responseTo;
-       	assert(responseId == this->mMongoRequest->header.requestID);
+        long long responseId = this->mMongoRequest->mTaskId;
         std::shared_ptr<MongoQueryResponse> response = std::move(this->mMongoResponse);
 #ifdef ONLY_MAIN_THREAD
 		this->mMongoComponent->OnResponse(responseId, response);
@@ -99,7 +96,8 @@ namespace Mongo
 #ifdef ONLY_MAIN_THREAD
 		this->Send(request);
 #else
-		this->mNetworkThread.Invoke(&MongoClientContext::Send, this, request);
+        IAsioThread & t = this->mSocket->GetThread();
+		t.Invoke(&MongoClientContext::Send, this, request);
 #endif
 	}
 
