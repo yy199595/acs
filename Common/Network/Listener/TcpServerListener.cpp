@@ -15,6 +15,7 @@ namespace Sentry
 		this->mCount = 0;
 		this->mErrorCount = 0;
         this->mConfig = nullptr;
+        this->mTcpComponent = nullptr;
         this->mBindAcceptor = nullptr;
     }
 
@@ -48,6 +49,7 @@ namespace Sentry
     }
 	void TcpServerListener::ListenConnect()
 	{
+        assert(this->mTaskThread.IsCurrentThread());
         IAsioThread & workThread = this->mTcpComponent->GetThread();
         std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread));
 		this->mBindAcceptor->async_accept(socketProxy->GetSocket(),

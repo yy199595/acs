@@ -29,7 +29,6 @@ namespace Sentry
 	 private:
 		int mCount;
 		int mErrorCount;
-		unsigned int mCorId;
 		IAsioThread& mTaskThread;
 		const ListenConfig * mConfig;
         AsioTcpAcceptor* mBindAcceptor;

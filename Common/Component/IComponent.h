@@ -11,62 +11,62 @@ namespace Sentry
 	class Component;
 	class IStart
 	{
-	 public:
+	public:
 		virtual bool OnStart() = 0;
 	};
 
 	class IComplete
 	{
-	 public:
+	public:
 		virtual void OnComplete() { };
 		virtual void OnAllServiceStart() { }
 	};
 
 	class IFrameUpdate
 	{
-	 public:
+	public:
 		virtual void OnFrameUpdate(float t) = 0;
 	};
 
 	class ISystemUpdate
 	{
-	 public:
+	public:
 		virtual void OnSystemUpdate() = 0;
 	};
 
 	class ISecondUpdate
 	{
-	 public:
+	public:
 		virtual void OnSecondUpdate(const int tick) = 0;
 	};
 
 	class ILastFrameUpdate
 	{
-	 public:
+	public:
 		virtual void OnLastFrameUpdate() = 0;
 	};
 
 	class ILuaRegister
 	{
-	 public:
-		virtual void OnLuaRegister(Lua::ClassProxyHelper & luaRegister) = 0;
+	public:
+		virtual void OnLuaRegister(Lua::ClassProxyHelper& luaRegister) = 0;
 	};
 
 	class IHotfix
 	{
-	 public:
+	public:
 		virtual void OnHotFix() = 0;
 	};
 
 	class ILoadConfig
 	{
-	 public:
+	public:
 		virtual bool OnLoadConfig() = 0;
 	};
 
 	class IZeroRefresh
 	{
-	 public:
+	public:
 		virtual void OnZeroRefresh() = 0;
 		virtual void GetRefreshTime(int& hour, int& min)
 		{
@@ -82,46 +82,46 @@ namespace Sentry
 		virtual bool CloseService() = 0;
 		virtual bool IsStartService() = 0;
 		virtual bool IsStartComplete() = 0;
-		virtual bool LoadConfig(const rapidjson::Value & json) = 0;
+		virtual bool LoadConfig(const rapidjson::Value& json) = 0;
 	};
 
 	template<typename T1, typename T2>
 	class IService : public IServiceBase
 	{
-	 public:
-		virtual XCode Invoke(const std::string &, std::shared_ptr<T1>, std::shared_ptr<T2>) = 0;
+	public:
+		virtual XCode Invoke(const std::string&, std::shared_ptr<T1>, std::shared_ptr<T2>) = 0;
 	};
 
 	class IServiceChange
 	{
-	 public:
-		virtual void OnAddService(class Component * component) = 0;
-		virtual void OnDelService(class Component * component) = 0;
+	public:
+		virtual void OnAddService(class Component* component) = 0;
+		virtual void OnDelService(class Component* component) = 0;
 	};
 
 	template<typename T1, typename T2>
 	class IRpc
 	{
-	 public:
+	public:
 		virtual void OnRequest(std::shared_ptr<T1> t1) = 0;
 		virtual void OnResponse(std::shared_ptr<T2> t2) = 0;
-		virtual void StartClose(const std::string & address) = 0;
-		virtual void OnCloseSocket(const std::string & address, XCode code) = 0;
+		virtual void StartClose(const std::string& address) = 0;
+		virtual void OnCloseSocket(const std::string& address, XCode code) = 0;
 	};
 
 	template<typename T1, typename T2>
 	class IClientRpc
 	{
-	 public:
-		virtual void OnConnect(const std::string & address)  { }
+	public:
+		virtual void OnConnect(const std::string& address) { }
 		virtual XCode OnRequest(std::shared_ptr<T1> request) = 0;
-		virtual XCode OnResponse(const std::string &, const std::shared_ptr<T2> response) = 0;
+		virtual XCode OnResponse(const std::string&, const std::shared_ptr<T2> response) = 0;
 	};
 
 	class SocketProxy;
 	class ISocketListen
 	{
-	 public:
+	public:
 		virtual void OnListen(std::shared_ptr<SocketProxy> socket) = 0;
 	};
 }

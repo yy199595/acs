@@ -3,7 +3,7 @@
 #include"CoroutineDef.h"
 namespace Sentry
 {
-	enum CorState
+	enum class CorState
 	{
 		Ready,
 		Running,
