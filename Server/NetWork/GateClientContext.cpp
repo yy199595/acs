@@ -75,8 +75,8 @@ namespace Sentry
         }
         else
         {
-            this->CloseSocket(XCode::UnKnowPacket);
             CONSOLE_LOG_FATAL("unknow message type");
+            this->CloseSocket(XCode::UnKnowPacket);
             return;
         }
         this->ReceiveLength();
