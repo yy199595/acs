@@ -20,8 +20,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLine();
 #else
-		IAsioThread & netWorkThread = this->mSocket->GetThread();
-		netWorkThread.Invoke(&HttpHandlerClient::ReceiveLine, this);
+		asio::io_service & netWorkThread = this->mSocket->GetThread();
+		netWorkThread.post(std::bind(&HttpHandlerClient::ReceiveLine, this));
 #endif
 	}
 
@@ -31,8 +31,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
         this->Send(this->mHttpResponse);
 #else
-        IAsioThread& netWorkThread = this->mSocket->GetThread();
-        netWorkThread.Invoke(&HttpHandlerClient::Send, this, this->mHttpResponse);
+        asio::io_service& netWorkThread = this->mSocket->GetThread();
+        netWorkThread.post(std::bind(&HttpHandlerClient::Send, this, this->mHttpResponse));
 #endif
     }
 
@@ -43,8 +43,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mHttpComponent->OnRequest(httpHandlerClient);
 #else
-		IAsioThread& mainThread = App::Get()->GetTaskScheduler();
-		mainThread.Invoke(&HttpServiceComponent::OnRequest, this->mHttpComponent, httpHandlerClient);
+		asio::io_service& mainThread = App::Get()->GetThread();
+		mainThread.post(std::bind(&HttpServiceComponent::OnRequest, this->mHttpComponent, httpHandlerClient));
 #endif
 	}
 
@@ -112,8 +112,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mHttpComponent->ClosetHttpClient(address);
 #else
-		IAsioThread& mainThread = App::Get()->GetTaskScheduler();
-		mainThread.Invoke(&HttpServiceComponent::ClosetHttpClient, this->mHttpComponent, address);
+		asio::io_service& mainThread = App::Get()->GetThread();
+		mainThread.post(std::bind(&HttpServiceComponent::ClosetHttpClient, this->mHttpComponent, address));
 #endif
 	}
 }

@@ -56,9 +56,9 @@ namespace Mongo
 #ifdef ONLY_MAIN_THREAD
 			this->mMongoComponent->OnClientError(this->mIndex, XCode::NetReceiveFailure);
 #else
-			MainTaskScheduler& taskScheduler = App::Get()->GetTaskScheduler();
-			taskScheduler.Invoke(&MongoRpcComponent::OnClientError, this->mMongoComponent,
-                                 this->mIndex, XCode::NetReceiveFailure);
+			asio::io_service& io = App::Get()->GetThread();
+            io.post(std::bind(&MongoRpcComponent::OnClientError,
+                              this->mMongoComponent, this->mIndex, XCode::NetReceiveFailure));
 #endif
 			CONSOLE_LOG_ERROR(code.message());
 			return;
@@ -85,8 +85,9 @@ namespace Mongo
 #ifdef ONLY_MAIN_THREAD
 		this->mMongoComponent->OnResponse(responseId, response);
 #else
-		MainTaskScheduler& taskScheduler = App::Get()->GetTaskScheduler();
-		taskScheduler.Invoke(&MongoRpcComponent::OnResponse, this->mMongoComponent, responseId, response);
+        asio::io_service& io = App::Get()->GetThread();
+        io.post(std::bind(&MongoRpcComponent::OnResponse,
+                          this->mMongoComponent, responseId, response));
 #endif
         this->SendFromMessageQueue();
 	}
@@ -96,8 +97,8 @@ namespace Mongo
 #ifdef ONLY_MAIN_THREAD
 		this->Send(request);
 #else
-        IAsioThread & t = this->mSocket->GetThread();
-		t.Invoke(&MongoClientContext::Send, this, request);
+        asio::io_service & t = this->mSocket->GetThread();
+		t.post(std::bind(&MongoClientContext::Send, this, request));
 #endif
 	}
 

@@ -7,10 +7,7 @@
 namespace Sentry
 {
 	MongoTask::MongoTask(int id)
-        : mTaskId(id)
-	{
-
-	}
+        : mTaskId(id) { }
 
 	void MongoTask::OnResponse(std::shared_ptr<Mongo::MongoQueryResponse> response)
 	{
@@ -39,10 +36,10 @@ namespace Sentry
         for (int index = 0; index < this->mConfig.mMaxCount; index++)
         {
 #ifdef ONLY_MAIN_THREAD
-            IAsioThread & asioThread = this->GetApp()->GetTaskScheduler();
+            asio::io_context & asioThread = this->GetApp()->GetThread();
 #else
             NetThreadComponent *netThreadComponent = this->GetComponent<NetThreadComponent>();
-            IAsioThread &asioThread = netThreadComponent->AllocateNetThread();
+            asio::io_service &asioThread = netThreadComponent->AllocateNetThread();
 #endif
             std::shared_ptr<SocketProxy> socketProxy =
                     std::make_shared<SocketProxy>(asioThread, this->mConfig.mIp, this->mConfig.mPort);
@@ -110,7 +107,8 @@ namespace Sentry
 
 	void MongoRpcComponent::OnDelTask(long long taskId, RpcTask task)
 	{
-		this->mRequestId.Push((int)taskId);
+        assert(this->GetApp()->IsMainThread());
+        this->mRequestId.Push((int)taskId);
 	}
 
 	void MongoRpcComponent::OnAddTask(RpcTaskComponent<Mongo::MongoQueryResponse>::RpcTask task)
@@ -139,7 +137,6 @@ namespace Sentry
 		this->mMongoClients[index]->SendMongoCommand(request);
         this->mIndex++;
 #ifdef __DEBUG__
-		assert(this->IsMainThread());
 		long long t1 = Time::GetNowMilTime();
         std::shared_ptr<Mongo::MongoQueryResponse> mongoResponse = mongoTask->Await();
 		if(mongoResponse != nullptr && mongoResponse->GetDocumentSize() > 0)

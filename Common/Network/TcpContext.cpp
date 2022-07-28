@@ -30,7 +30,6 @@ namespace Tcp
 	{
 		this->mConnectCount++;
 		assert(this->mSocket->IsRemote());
-		assert(this->mSocket->GetThread().IsCurrentThread());
 		unsigned short port = this->mSocket->GetPort();
 		const std::string& ip = this->mSocket->GetIp();
 		AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
@@ -56,7 +55,6 @@ namespace Tcp
 
     void TcpContext::ReceiveLine()
 	{
-        assert(this->mSocket->GetThread().IsCurrentThread());
         this->mLastOperTime = Helper::Time::GetNowSecTime();
 		AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
 		std::shared_ptr<TcpContext> self = this->shared_from_this();
@@ -70,7 +68,6 @@ namespace Tcp
 
 	void TcpContext::ReceiveSomeMessage()
 	{
-        assert(this->mSocket->GetThread().IsCurrentThread());
         if(this->mRecvBuffer.size() > 0)
         {
             asio::error_code code;
@@ -102,7 +99,6 @@ namespace Tcp
     void TcpContext::ReceiveLength()
     {
         int length = sizeof(int);
-        assert(this->mSocket->GetThread().IsCurrentThread());
         if (this->mRecvBuffer.size() >= length)
         {
             asio::error_code code;
@@ -143,7 +139,6 @@ namespace Tcp
 	void TcpContext::ReceiveMessage(int length)
 	{
 		assert(length > 0);
-        assert(this->mSocket->GetThread().IsCurrentThread());
         if (length >= this->mMaxCount)
 		{
 			asio::error_code code =
@@ -174,7 +169,6 @@ namespace Tcp
 
 	void TcpContext::Send(std::shared_ptr<ProtoMessage> message)
 	{
-        assert(this->mSocket->GetThread().IsCurrentThread());
         if(this->mMessagqQueue.empty())
         {
             this->mMessagqQueue.emplace_back(message);
@@ -187,7 +181,6 @@ namespace Tcp
     void TcpContext::SendFromMessageQueue()
     {
         assert(this->mSendBuffer.size() == 0);
-        assert(this->mSocket->GetThread().IsCurrentThread());
         if(!this->mMessagqQueue.empty())
         {
             std::ostream os(&this->mSendBuffer);
@@ -219,7 +212,6 @@ namespace Tcp
 {
 	void TcpContext::ClearRecvStream()
 	{
-        assert(this->mSocket->GetThread().IsCurrentThread());
         if(this->mRecvBuffer.size() > 0)
 		{
 			std::iostream os(&this->mRecvBuffer);
@@ -229,7 +221,6 @@ namespace Tcp
 
 	void TcpContext::ClearSendStream()
 	{
-        assert(this->mSocket->GetThread().IsCurrentThread());
         if(this->mSendBuffer.size() > 0)
 		{
 			std::iostream os(&this->mSendBuffer);
@@ -240,7 +231,6 @@ namespace Tcp
 	bool TcpContext::ConnectSync()
 	{
 		asio::error_code code;
-        assert(this->mSocket->GetThread().IsCurrentThread());
         AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
 		auto address = asio::ip::make_address_v4(this->mSocket->GetIp());
 		asio::ip::tcp::endpoint endPoint(address, this->mSocket->GetPort());
@@ -256,7 +246,6 @@ namespace Tcp
 	int TcpContext::RecvSync(int length)
 	{
 		asio::error_code code;
-        assert(this->mSocket->GetThread().IsCurrentThread());
         if(this->mRecvBuffer.size() >= length)
 		{
 			return length;
@@ -270,7 +259,6 @@ namespace Tcp
 	int TcpContext::RecvLineSync()
 	{
 		asio::error_code code;
-        assert(this->mSocket->GetThread().IsCurrentThread());
         AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
 		return asio::read_until(tcpSocket, this->mRecvBuffer, "\r\n", code);
 	}
@@ -279,7 +267,6 @@ namespace Tcp
 	{
 		int sum = 0;
 		asio::error_code code;
-        assert(this->mSocket->GetThread().IsCurrentThread());
         std::ostream os(&this->mSendBuffer);
 		int length = message->Serailize(os);
 		AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();

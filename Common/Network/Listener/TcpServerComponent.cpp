@@ -1,6 +1,5 @@
 ﻿#include"TcpServerComponent.h"
 #include"App/App.h"
-#include<Thread/TaskThread.h>
 #include<Util/StringHelper.h>
 #include"Network/SocketProxy.h"
 #include<Component/Scene/NetThreadComponent.h>
@@ -31,11 +30,10 @@ namespace Sentry
 				return false;
 			}
 
-			IAsioThread& netThread = App::Get()->GetTaskScheduler();
 			if (listenConfig->Port != 0)
 			{
 				TcpServerListener * listener =
-					new TcpServerListener(netThread);
+					new TcpServerListener(listenConfig);
 				this->mListeners.emplace(listenConfig->Name ,listener);
                 this->mListenConfigs.emplace(listenConfig->Name, listenConfig);
 			}
@@ -54,6 +52,7 @@ namespace Sentry
 
 	void TcpServerComponent::OnAllServiceStart()
 	{
+        asio::io_service & io = this->GetApp()->GetThread();
         auto iter = this->mListenConfigs.begin();
         for(; iter != this->mListenConfigs.end(); iter++)
         {
@@ -64,7 +63,7 @@ namespace Sentry
                 LOG_FATAL("not find listener " << listenConfig->Name);
                 continue;
             }
-            if(!tcpServerListener->StartListen(listenConfig, this))
+            if(!tcpServerListener->StartListen(io, this))
             {
                 LOG_FATAL(listenConfig->Name << " listen " << listenConfig->Ip << ":" << listenConfig->Port << " failure");
                 continue;
@@ -73,10 +72,10 @@ namespace Sentry
         }
 	}
 
-    IAsioThread &TcpServerComponent::GetThread()
+    asio::io_service &TcpServerComponent::GetThread()
     {
 #ifdef ONLY_MAIN_THREAD
-        return App::Get()->GetTaskScheduler();
+        return App::Get()->GetThread();
 #else
         return this->mThreadComponent->AllocateNetThread();
 #endif

@@ -35,6 +35,7 @@ namespace Sentry
 #ifdef __DEBUG__
         LOG_DEBUG("handler http socket count = " << count++);
 #endif
+        assert(this->GetApp()->IsMainThread());
         std::shared_ptr<HttpHandlerClient> handlerClient(new HttpHandlerClient(this, socket));
 
         handlerClient->StartReceive();
@@ -50,6 +51,7 @@ namespace Sentry
 
     void HttpServiceComponent::ClosetHttpClient(const std::string &address)
     {
+        assert(this->GetApp()->IsMainThread());
         auto iter = this->mHttpClients.find(address);
         if(iter != this->mHttpClients.end())
         {
@@ -60,6 +62,7 @@ namespace Sentry
 
     void HttpServiceComponent::OnRequest(std::shared_ptr<HttpHandlerClient> httpClient)
     {
+        assert(this->GetApp()->IsMainThread());
         std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
         std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
 

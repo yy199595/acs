@@ -21,8 +21,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->CloseSocket(XCode::NetActiveShutdown);
 #else
-        IAsioThread & t = this->mSocket->GetThread();
-		t.Invoke(&ServerClientContext::CloseSocket, this, XCode::NetActiveShutdown);
+        asio::io_service & t = this->mSocket->GetThread();
+		t.post(std::bind(&ServerClientContext::CloseSocket, this, XCode::NetActiveShutdown));
 #endif
 	}
 
@@ -33,8 +33,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->Send(responseMessage);
 #else
-        IAsioThread & t = this->mSocket->GetThread();
-        t.Invoke(&ServerClientContext::Send, this, responseMessage);
+        asio::io_service & t = this->mSocket->GetThread();
+        t.post(std::bind(&ServerClientContext::Send, this, responseMessage));
 #endif
 	}
 
@@ -45,8 +45,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->Send(requestMessage);
 #else
-        IAsioThread & t = this->mSocket->GetThread();
-        t.Invoke(&ServerClientContext::Send, this, requestMessage);
+        asio::io_service & t = this->mSocket->GetThread();
+        t.post(std::bind(&ServerClientContext::Send, this, requestMessage));
 #endif
 	}
 
@@ -73,8 +73,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mTcpComponent->OnCloseSocket(address, code);
 #else
-		MainTaskScheduler & taskScheduler = App::Get()->GetTaskScheduler();
-		taskScheduler.Invoke(&RpcClientComponent::OnCloseSocket, this->mTcpComponent, address, code);
+		asio::io_service & taskScheduler = App::Get()->GetThread();
+		taskScheduler.post(std::bind(&RpcClientComponent::OnCloseSocket, this->mTcpComponent, address, code));
 #endif
 	}
 
@@ -126,8 +126,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mTcpComponent->OnRequest(requestData);
 #else
-		MainTaskScheduler & taskScheduler = App::Get()->GetTaskScheduler();
-		taskScheduler.Invoke(&RpcClientComponent::OnRequest, mTcpComponent, requestData);
+		asio::io_service & taskScheduler = App::Get()->GetThread();
+		taskScheduler.post(std::bind(&RpcClientComponent::OnRequest, mTcpComponent, requestData));
 #endif
 
 		return true;
@@ -146,8 +146,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mTcpComponent->OnResponse(responseData);
 #else
-		MainTaskScheduler & taskScheduler = App::Get()->GetTaskScheduler();
-		taskScheduler.Invoke(&RpcClientComponent::OnResponse, mTcpComponent, responseData);
+		asio::io_service & taskScheduler = App::Get()->GetThread();
+		taskScheduler.post(std::bind(&RpcClientComponent::OnResponse, mTcpComponent, responseData));
 #endif
 		return true;
 	}
@@ -157,8 +157,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLength();
 #else
-        IAsioThread & t = this->mSocket->GetThread();
-        t.Invoke(&ServerClientContext::ReceiveLength, this);
+        asio::io_service & t = this->mSocket->GetThread();
+        t.post(std::bind(&ServerClientContext::ReceiveLength, this));
 #endif
 	}
 

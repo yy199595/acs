@@ -52,8 +52,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->Send(command);
 #else
-        IAsioThread & t = this->mSocket->GetThread();
-		t.Invoke(&RedisClientContext::Send, this, command);
+        asio::io_service & t = this->mSocket->GetThread();
+		t.post(std::bind(&RedisClientContext::Send, this, command));
 #endif
 	}
 
@@ -62,8 +62,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLine();
 #else
-        IAsioThread & t = this->mSocket->GetThread();
-        t.Invoke(&RedisClientContext::ReceiveLine, this);
+        asio::io_service & t = this->mSocket->GetThread();
+        t.post(std::bind(&RedisClientContext::ReceiveLine, this));
 #endif
 	}
 
@@ -115,9 +115,9 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mRedisComponent->OnResponse(self, this->mTaskId, this->mCurResponse);
 #else
-		IAsioThread & taskThread = App::Get()->GetTaskScheduler();
-		taskThread.Invoke(&RedisComponent::OnResponse,
-			this->mRedisComponent, self, this->mTaskId, this->mCurResponse);
+		asio::io_service & taskThread = App::Get()->GetThread();
+		taskThread.post(std::bind(&RedisComponent::OnResponse,
+			this->mRedisComponent, self, this->mTaskId, this->mCurResponse));
 #endif
         this->mTaskId = 0;
         this->SendFromMessageQueue();

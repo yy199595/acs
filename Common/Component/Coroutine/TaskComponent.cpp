@@ -124,12 +124,13 @@ namespace Sentry
 
 	void TaskComponent::Resume(unsigned int id)
 	{
-		if (id > 0)
-		{
-			this->mResumeContexts.Push(id);
-			return;
-		}
-        LOG_FATAL("try resume context id : " << id);
+        assert(this->GetApp()->IsMainThread());
+        if(this->mCorPool.Get(id) == nullptr)
+        {
+            LOG_FATAL("try resume context id : " << id);
+            return;
+        }
+        this->mResumeContexts.push(id);
 	}
 
 	TaskContext* TaskComponent::MakeContext(StaticMethod* func)
@@ -176,23 +177,24 @@ namespace Sentry
 	void TaskComponent::OnSystemUpdate()
 	{
 		unsigned int contextId = 0;
-		this->mResumeContexts.Swap();
-		while (this->mResumeContexts.Pop(contextId))
-		{
-			TaskContext* logicCoroutine = this->mCorPool.Get(contextId);
-			if(logicCoroutine == nullptr)
-			{
-				LOG_FATAL("not find task context : " << contextId);
-				continue;
-			}
-			if (logicCoroutine->mState == CorState::Ready
-				|| logicCoroutine->mState == CorState::Suspend)
-			{
-				this->mRunContext = logicCoroutine;
-				this->ResumeContext(logicCoroutine);
-			}
-			this->mRunContext = nullptr;
-		}
+        while(!this->mResumeContexts.empty())
+        {
+            contextId = this->mResumeContexts.front();
+            TaskContext* logicCoroutine = this->mCorPool.Get(contextId);
+            if(logicCoroutine == nullptr)
+            {
+                LOG_FATAL("not find task context : " << contextId);
+                continue;
+            }
+            if (logicCoroutine->mState == CorState::Ready
+                || logicCoroutine->mState == CorState::Suspend)
+            {
+                this->mRunContext = logicCoroutine;
+                this->ResumeContext(logicCoroutine);
+            }
+            this->mRunContext = nullptr;
+            this->mResumeContexts.pop();
+        }
 	}
 	void TaskComponent::OnLastFrameUpdate()
 	{
@@ -202,7 +204,7 @@ namespace Sentry
 			TaskContext* coroutine = this->mCorPool.Get(id);
 			if (coroutine != nullptr)
 			{
-				this->mResumeContexts.Push(id);
+				this->mResumeContexts.push(id);
 			}
 			this->mLastQueues.pop();
 		}

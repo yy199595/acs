@@ -27,8 +27,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLength();
 #else
-        IAsioThread & t = this->mSocket->GetThread();
-        t.Invoke(&GateClientContext::ReceiveLength, this);
+        asio::io_service & t = this->mSocket->GetThread();
+        t.post(std::bind(&GateClientContext::ReceiveLength, this));
 #endif
 	}
 
@@ -69,8 +69,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
             this->mGateComponent->OnRequest(request);
 #else
-            MainTaskScheduler &mainTaskScheduler = App::Get()->GetTaskScheduler();
-            mainTaskScheduler.Invoke(&GateClientComponent::OnRequest, this->mGateComponent, request);
+            asio::io_service &mainTaskScheduler = App::Get()->GetThread();
+            mainTaskScheduler.post(std::bind(&GateClientComponent::OnRequest, this->mGateComponent, request));
 #endif
         }
         else
@@ -93,8 +93,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mGateComponent->OnCloseSocket(address, code);
 #else
-		MainTaskScheduler &mainTaskScheduler = App::Get()->GetTaskScheduler();
-		mainTaskScheduler.Invoke(&GateClientComponent::OnCloseSocket, this->mGateComponent, address, code);
+		asio::io_service &mainTaskScheduler = App::Get()->GetThread();
+		mainTaskScheduler.post(std::bind(&GateClientComponent::OnCloseSocket, this->mGateComponent, address, code));
 #endif
 
 	}
@@ -118,8 +118,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->CloseSocket(code);
 #else
-        IAsioThread & t = this->mSocket->GetThread();
-        t.Invoke(&GateClientContext::CloseSocket, this, code);
+        asio::io_service & t = this->mSocket->GetThread();
+        t.post(std::bind(&GateClientContext::CloseSocket, this, code));
 #endif
 	}
 
@@ -130,8 +130,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->Send(requestMessage);
 #else
-        IAsioThread & t = this->mSocket->GetThread();
-        t.Invoke(&GateClientContext::Send, this, requestMessage);
+        asio::io_service & t = this->mSocket->GetThread();
+        t.post(std::bind(&GateClientContext::Send, this, requestMessage));
 #endif
 	}
 
@@ -142,8 +142,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->Send(requestMessage);
 #else
-        IAsioThread & t = this->mSocket->GetThread();
-        t.Invoke(&GateClientContext::Send, this, requestMessage);
+        asio::io_service & t = this->mSocket->GetThread();
+        t.post(std::bind(&GateClientContext::Send, this, requestMessage));
 #endif
         //CONSOLE_LOG_ERROR("send to client [" << this->mSocket->GetAddress() << "] " << message->rpc_id());
     }

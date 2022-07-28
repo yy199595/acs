@@ -52,7 +52,8 @@ namespace Sentry
 	XCode GateComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> request)
 	{
 		std::string method, service;
-		if(!RpcServiceConfig::ParseFunName(request->method_name(), service, method))
+        assert(this->GetApp()->IsMainThread());
+        if(!RpcServiceConfig::ParseFunName(request->method_name(), service, method))
 		{
 			LOG_ERROR("call function " << request->method_name() << " not find");
 			return XCode::NotFoundRpcConfig;
@@ -137,6 +138,7 @@ namespace Sentry
 
 	XCode GateComponent::OnResponse(const std::string & address, std::shared_ptr<com::Rpc::Response> response)
 	{
+        assert(this->GetApp()->IsMainThread());
         if(response->code() == (int)XCode::NetActiveShutdown)
         {
             this->mGateClientComponent->StartClose(address);

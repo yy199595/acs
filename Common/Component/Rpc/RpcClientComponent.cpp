@@ -65,8 +65,8 @@ namespace Sentry
 
 	void RpcClientComponent::OnRequest(std::shared_ptr<com::Rpc_Request> request)
 	{
-		assert(this->IsMainThread());
-		const std::string & address = request->address();
+        assert(this->GetApp()->IsMainThread());
+        const std::string & address = request->address();
 		XCode code = this->mRpcComponent->OnRequest(request);
 		if (code != XCode::Successful)
 		{
@@ -84,9 +84,9 @@ namespace Sentry
 
 	void RpcClientComponent::OnResponse(std::shared_ptr<com::Rpc_Response> response)
 	{
-		assert(this->IsMainThread());
         long long taskId = response->rpc_id();
-		this->mRpcComponent->OnResponse(taskId, response);
+        assert(this->GetApp()->IsMainThread());
+        this->mRpcComponent->OnResponse(taskId, response);
 	}
 
 	std::shared_ptr<ServerClientContext> RpcClientComponent::GetOrCreateSession(const std::string& address)
@@ -97,9 +97,9 @@ namespace Sentry
 			return localSession;
 		}
 #ifdef ONLY_MAIN_THREAD
-		IAsioThread& workThread = App::Get()->GetTaskScheduler();
+		asio::io_context& workThread = App::Get()->GetThread();
 #else
-		IAsioThread & workThread = this->mTaskComponent->AllocateNetThread();
+		asio::io_service & workThread = this->mTaskComponent->AllocateNetThread();
 #endif
 		std::string ip;
 		unsigned short port = 0;

@@ -34,7 +34,10 @@ namespace Sentry
 		LOG_CHECK_RET(config.GetMember("thread", "network", networkCount));
 		for (int index = 0; index < networkCount; index++)
 		{
-			this->mNetThreads.push_back(new NetWorkThread());
+            asio::io_service * io = new asio::io_service(1);
+            asio::io_service::work * work = new asio::io_service::work(*io);
+            this->mNetThreads.emplace_back(io);
+            this->mNetThreadWorks.emplace_back(work);
 #ifdef __ENABLE_OPEN_SSL__
 			this->mNetThreads[index]->LoadVeriftFile(sslFile);
 #endif
@@ -45,10 +48,15 @@ namespace Sentry
 	bool NetThreadComponent::LateAwake()
 	{
 #ifndef ONLY_MAIN_THREAD
-		for (auto taskThread: this->mNetThreads)
-		{
-			taskThread->Start();
-		}
+		for (asio::io_service * io: this->mNetThreads)
+        {
+            std::thread *t = new std::thread([io]() {
+                asio::error_code code;
+                io->run(code);
+            });
+            t->detach();
+            this->mThreads.emplace_back(t);
+        }
 #endif
 		return true;
 	}
@@ -59,9 +67,8 @@ namespace Sentry
 	}
 
 #ifndef ONLY_MAIN_THREAD
-	IAsioThread & NetThreadComponent::AllocateNetThread(int index)
+	asio::io_service  & NetThreadComponent::AllocateNetThread(int index)
 	{
-		assert(this->IsMainThread());
 		if (index == 0)
 		{
 			index = rand() % this->mNetThreads.size();

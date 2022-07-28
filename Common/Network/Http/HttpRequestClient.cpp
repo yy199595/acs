@@ -19,8 +19,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->ConnectHost();
 #else
-		IAsioThread & netWorkThread = this->mSocket->GetThread();
-		netWorkThread.Invoke(&HttpRequestClient::ConnectHost, this);
+		asio::io_service & netWorkThread = this->mSocket->GetThread();
+		netWorkThread.post(std::bind(&HttpRequestClient::ConnectHost, this));
 #endif
 	}
 
@@ -31,8 +31,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->ConnectHost();
 #else
-        IAsioThread & netWorkThread = this->mSocket->GetThread();
-        netWorkThread.Invoke(&HttpRequestClient::ConnectHost, this);
+        asio::io_service & netWorkThread = this->mSocket->GetThread();
+        netWorkThread.post(std::bind(&HttpRequestClient::ConnectHost, this));
 #endif
     }
 
@@ -71,8 +71,8 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
         this->mHttpComponent->OnResponse(taskId, this->mResponse);
 #else
-        IAsioThread & netWorkThread = App::Get()->GetTaskScheduler();
-        netWorkThread.Invoke(&HttpComponent::OnResponse, this->mHttpComponent, taskId, this->mResponse);
+        asio::io_service & netWorkThread = App::Get()->GetThread();
+        netWorkThread.post(std::bind(&HttpComponent::OnResponse, this->mHttpComponent, taskId, this->mResponse));
 #endif
         this->mRequest = nullptr;
         this->mResponse = nullptr;
@@ -125,10 +125,9 @@ namespace Sentry
 
     void HttpRequestClient::ConnectHost()
     {
-        IAsioThread & context = this->mSocket->GetThread();
-        assert(context.IsCurrentThread());
         const std::string & host = this->mRequest->GetHost();
         const std::string & port = this->mRequest->GetPort();
+        asio::io_service & context = this->mSocket->GetThread();
         std::shared_ptr<asio::ip::tcp::resolver> resolver(new asio::ip::tcp::resolver(context));
         std::shared_ptr<asio::ip::tcp::resolver::query> query(new asio::ip::tcp::resolver::query(host, port));
         resolver->async_resolve(*query, [this, resolver, query, port, host]

@@ -92,7 +92,6 @@ namespace Sentry
 
 		const ServerConfig & GetConfig();
 
-		bool IsMainThread();
 	 private:
 		Component* GetByHash(size_t hash);
 	private:

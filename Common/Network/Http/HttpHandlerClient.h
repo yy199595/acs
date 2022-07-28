@@ -28,7 +28,6 @@ namespace Sentry
         void OnReceiveMessage(const asio::error_code &code, std::istream & is) final;
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
 	 private:
-		asio::streambuf mStreamBuffer;
         HttpServiceComponent * mHttpComponent;
         std::shared_ptr<HttpHandlerRequest> mHttpRequest;
 		std::shared_ptr<HttpHandlerResponse> mHttpResponse;

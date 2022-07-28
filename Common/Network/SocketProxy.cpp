@@ -3,7 +3,7 @@
 #include<spdlog/fmt/fmt.h>
 namespace Sentry
 {
-	SocketProxy::SocketProxy(IAsioThread& thread)
+	SocketProxy::SocketProxy(asio::io_service& thread)
 		: mNetThread(thread)
 	{
 		this->mIsRemote = true;
@@ -28,7 +28,7 @@ namespace Sentry
         delete this->mSocket;
     }
 
-	SocketProxy::SocketProxy(IAsioThread& thread, const std::string& ip, unsigned short port)
+	SocketProxy::SocketProxy(asio::io_service& thread, const std::string& ip, unsigned short port)
 			: mNetThread(thread)
 	{
 		this->mIp = ip;

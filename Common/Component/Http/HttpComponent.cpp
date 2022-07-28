@@ -2,18 +2,14 @@
 // Created by 64658 on 2021/8/5.
 //
 #include"App/App.h"
-#include"Thread/TaskThread.h"
 #include"HttpComponent.h"
 #include"Method/HttpServiceMethod.h"
 #include"Other/InterfaceConfig.h"
-#include"Util/StringHelper.h"
 #include"Util/DirectoryHelper.h"
 #include"Component/Scene/LoggerComponent.h"
 #include"Component/Scene/NetThreadComponent.h"
 #include"Network//Http/HttpRequestClient.h"
-#include"Network/Http/HttpHandlerClient.h"
 #include"Script/Extension/Http/LuaHttp.h"
-#include"Component/HttpService/LocalHttpService.h"
 namespace Sentry
 {
 	bool HttpComponent::LateAwake()
@@ -29,9 +25,9 @@ namespace Sentry
 	std::shared_ptr<HttpRequestClient> HttpComponent::CreateClient()
 	{
 #ifdef ONLY_MAIN_THREAD
-		IAsioThread& thread = this->GetApp()->GetTaskScheduler();
+		asio::io_context& thread = this->GetApp()->GetThread();
 #else
-		IAsioThread &thread = this->mThreadComponent->AllocateNetThread();
+		asio::io_service &thread = this->mThreadComponent->AllocateNetThread();
 #endif
 		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread));
 		return std::make_shared<HttpRequestClient>(socketProxy, this);

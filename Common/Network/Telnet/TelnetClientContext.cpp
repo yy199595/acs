@@ -16,8 +16,8 @@ namespace Tcp
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLine();
 #else
-		IAsioThread & netWorkThread = this->mSocket->GetThread();
-		netWorkThread.Invoke(&TelnetClientContext::ReceiveLine, this);
+		asio::io_service & netWorkThread = this->mSocket->GetThread();
+		netWorkThread.post(std::bind(&TelnetClientContext::ReceiveLine, this));
 #endif
 	}
 
@@ -35,8 +35,8 @@ namespace Tcp
 #ifdef ONLY_MAIN_THREAD
 		this->mConsoleComponent->OnReceive(address, lineMessage);
 #else
-		IAsioThread & netWorkThread = App::Get()->GetTaskScheduler();
-		netWorkThread.Invoke(&ConsoleComponent::OnReceive, this->mConsoleComponent,address , lineMessage);
+		asio::io_service & netWorkThread = App::Get()->GetThread();
+		netWorkThread.post(std::bind(&ConsoleComponent::OnReceive, this->mConsoleComponent,address , lineMessage));
 #endif
 	}
 
@@ -45,8 +45,8 @@ namespace Tcp
 #ifdef ONLY_MAIN_THREAD
 		this->Send(message);
 #else
-		IAsioThread &netWorkThread = this->mSocket->GetThread();
-		netWorkThread.Invoke(&TelnetClientContext::Send, this, message);
+		asio::io_service &netWorkThread = this->mSocket->GetThread();
+		netWorkThread.post(std::bind(&TelnetClientContext::Send, this, message));
 #endif
 	}
 
@@ -66,8 +66,8 @@ namespace Tcp
 #ifdef ONLY_MAIN_THREAD
 		this->mConsoleComponent->OnClientError(address);
 #else
-		IAsioThread & netWorkThread = App::Get()->GetTaskScheduler();
-		netWorkThread.Invoke(&ConsoleComponent::OnClientError, this->mConsoleComponent, address);
+		asio::io_service & netWorkThread = App::Get()->GetThread();
+		netWorkThread.post(std::bind(&ConsoleComponent::OnClientError, this->mConsoleComponent, address));
 #endif
 	}
 }

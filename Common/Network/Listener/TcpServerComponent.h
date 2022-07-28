@@ -14,7 +14,7 @@ namespace Sentry
 		TcpServerComponent() = default;
 		~TcpServerComponent() final = default;
 	public:
-        IAsioThread & GetThread();
+        asio::io_service & GetThread();
         bool AddBlackList(const std::string & ip);
         bool AddWhiteList(const std::string & ip);
         bool OnListenConnect(const std::string & name, std::shared_ptr<SocketProxy> socket);

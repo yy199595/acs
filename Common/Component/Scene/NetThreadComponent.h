@@ -1,8 +1,7 @@
 ﻿#pragma once
 
 #include"Component/Component.h"
-#include "Thread/TaskThread.h"
-#include "Util/NumberBuilder.h"
+#include"Util/NumberBuilder.h"
 namespace Sentry
 {
 	class IThreadTask;
@@ -20,13 +19,15 @@ namespace Sentry
 	 public:
 	 public:
 #ifndef ONLY_MAIN_THREAD
-		IAsioThread & AllocateNetThread(int index = 0);
+        asio::io_service & AllocateNetThread(int index = 0);
 #endif
 	 private:
 		size_t mIndex;
 		std::thread* mMonitorThread;
 #ifndef ONLY_MAIN_THREAD
-		std::vector<NetWorkThread *> mNetThreads;
+        std::vector<std::thread *> mThreads;
+        std::vector<asio::io_service *> mNetThreads;
+        std::vector<asio::io_service::work *> mNetThreadWorks;
 #endif
 	};
 }

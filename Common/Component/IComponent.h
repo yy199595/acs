@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include<Thread/TaskThread.h>
 #include<Message/com.pb.h>
 #include"Message/c2s.pb.h"
 #include"XCode/XCode.h"

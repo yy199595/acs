@@ -1,7 +1,6 @@
 #pragma once
 #include"Async/TaskSource.h"
-#include<Define/CommonTypeDef.h>
-#include<Thread/TaskThread.h>
+#include"Define/CommonTypeDef.h"
 namespace Sentry
 {
 	struct ListenConfig
@@ -20,16 +19,15 @@ namespace Sentry
 	class TcpServerListener
 	{
 	 public:
-		TcpServerListener(IAsioThread& thread);
+		TcpServerListener(const ListenConfig * config);
 		~TcpServerListener();
 	 public:
-		bool StartListen(const ListenConfig* config, TcpServerComponent * component);
+		bool StartListen( asio::io_service& io, TcpServerComponent * component);
 	 private:
 		void ListenConnect();
 	 private:
 		int mCount;
 		int mErrorCount;
-		IAsioThread& mTaskThread;
 		const ListenConfig * mConfig;
         AsioTcpAcceptor* mBindAcceptor;
         TcpServerComponent * mTcpComponent;

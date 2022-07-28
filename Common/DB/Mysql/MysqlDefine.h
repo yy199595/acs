@@ -12,10 +12,8 @@
 #include<memory>
 #include<unordered_map>
 #include"XCode/XCode.h"
-#include"Thread/IThreadTask.h"
 
 using namespace std;
-using namespace Sentry;
 namespace Sentry
 {
     class MysqlHelper;

@@ -180,14 +180,16 @@ namespace Sentry
         this->WriterString(lua, "method", this->mMethod);
         this->WriterString(lua, "version", this->mVersion);
         this->WriterString(lua, "address", this->mAddress);
-
-        lua_createtable(lua, 0, this->mHead.size());
-        auto iter = this->mHead.begin();
-        for (; iter != this->mHead.end(); iter++)
+        if(this->mHead.size() > 0)
         {
-            const std::string &key = iter->first;
-            const std::string &value = iter->second;
-            this->WriterString(lua, key.c_str(), value);
+            lua_createtable(lua, 0, this->mHead.size());
+            auto iter = this->mHead.begin();
+            for (; iter != this->mHead.end(); iter++)
+            {
+                const std::string &key = iter->first;
+                const std::string &value = iter->second;
+                this->WriterString(lua, key.c_str(), value);
+            }
         }
         lua_setfield(lua, -2, "head");
     }

@@ -10,10 +10,10 @@ namespace Sentry
     bool MysqlRpcComponent::OnStart()
     {
 #ifdef ONLY_MAIN_THREAD
-        IAsioThread & t = this->GetApp()->GetTaskScheduler();
+        asio::io_context & t = this->GetApp()->GetThread();
 #else
         NetThreadComponent * component = this->GetComponent<NetThreadComponent>();
-        IAsioThread & t = component->AllocateNetThread();
+        asio::io_service & t = component->AllocateNetThread();
 #endif
         std::shared_ptr<SocketProxy> socketProxy = std::make_shared<SocketProxy>(t, "114.115.167.51", 3306);
         MysqlClient mysqlClient(socketProxy, this->mConfig, this);

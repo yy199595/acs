@@ -43,7 +43,6 @@ namespace Sentry
     template<typename T>
     bool RpcTaskComponent<T>::OnResponse(long long taskId, std::shared_ptr<T> message)
     {
-		assert(this->IsMainThread());
         auto iter = this->mTasks.find(taskId);
         if(iter == this->mTasks.end())
         {
@@ -54,7 +53,6 @@ namespace Sentry
         this->mTasks.erase(iter);
         rpcTask->OnResponse(message);
 		this->OnDelTask(taskId, rpcTask);
-       // LOG_WARN("invoke new rpc task id " << taskId);
         return true;
     }
 }

@@ -5,7 +5,6 @@
 #include"Util/TimeHelper.h"
 #include"Entity/Entity.h"
 #include"Global/ServerPath.h"
-#include"Thread/TaskThread.h"
 #include"Global/ServiceConfig.h"
 #include"Component/Timer/TimerComponent.h"
 #include"Component/Scene/LoggerComponent.h"
@@ -28,7 +27,7 @@ namespace Sentry
 		static std::shared_ptr<App> Get() { return mApp; }
 		const ServerConfig& GetConfig() { return *mConfig; }
 		inline LoggerComponent* GetLogger() { return this->mLogComponent; }
-		inline MainTaskScheduler& GetTaskScheduler() { return *mTaskScheduler; }
+		inline asio::io_service& GetThread() { return *this->mMainThread; }
 		inline TaskComponent* GetTaskComponent() { return this->mTaskComponent; }
 		inline TimerComponent* GetTimerComponent() { return this->mTimerComponent; }
 		inline MessageComponent * GetMsgComponent() { return this->mMessageComponent; }
@@ -42,7 +41,8 @@ namespace Sentry
 		void Stop();
 		ServiceComponent * GetService(const std::string & name);
 		bool GetServices(std::vector<ServiceComponent *> & services);
-	private:
+        inline bool IsMainThread() const { return this->mThreadId == std::this_thread::get_id();}
+    private:
 		void LogicMainLoop();
 		bool StartNewComponent();
 		void UpdateConsoleTitle();
@@ -62,13 +62,14 @@ namespace Sentry
 		long long mLastUpdateTime;
 	 private:
         int mTickCount;
-		TaskComponent* mTaskComponent;
+        std::thread::id mThreadId;
+        asio::io_service * mMainThread;
+        TaskComponent* mTaskComponent;
 		LoggerComponent* mLogComponent;
 		TimerComponent* mTimerComponent;
 		static std::shared_ptr<App> mApp;
 		MessageComponent * mMessageComponent;
 		std::vector<IFrameUpdate*> mFrameUpdateManagers;
-		std::shared_ptr<MainTaskScheduler> mTaskScheduler;
 		std::vector<ISystemUpdate*> mSystemUpdateManagers;
 		std::vector<ISecondUpdate*> mSecondUpdateManagers;
 		std::vector<ILastFrameUpdate*> mLastFrameUpdateManager;

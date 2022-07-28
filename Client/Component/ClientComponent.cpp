@@ -101,7 +101,7 @@ namespace Client
 
 	bool ClientComponent::StartConnect(const std::string& ip, unsigned short port)
 	{
-		IAsioThread& thread = this->GetApp()->GetTaskScheduler();
+		asio::io_service& thread = this->GetApp()->GetThread();
 		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, ip, port));
 		this->mTcpClient = std::make_shared<TcpRpcClientContext>(socketProxy, this);
 		if(this->mTcpClient->StartConnect())

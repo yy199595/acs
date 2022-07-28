@@ -110,10 +110,10 @@ namespace Sentry
     SharedRedisClient RedisComponent::MakeRedisClient(const RedisConfig & config)
 	{
 #ifdef ONLY_MAIN_THREAD
-		IAsioThread& workThread = App::Get()->GetTaskScheduler();
+		asio::io_context& workThread = App::Get()->GetThread();
 #else
 		NetThreadComponent * threadPoolComponent = this->GetComponent<NetThreadComponent>();
-		IAsioThread& workThread = threadPoolComponent->AllocateNetThread();
+		asio::io_service & workThread = threadPoolComponent->AllocateNetThread();
 #endif
 		unsigned short port = config.Port;
         const std::string& ip = config.Ip;
@@ -242,7 +242,8 @@ namespace Sentry
 
 	void RedisComponent::OnResponse(SharedRedisClient redisClient, long long taskId, std::shared_ptr<RedisResponse> response)
 	{
-		if(response->GetType() == RedisRespType::REDIS_ERROR)
+        assert(this->GetApp()->IsMainThread());
+        if(response->GetType() == RedisRespType::REDIS_ERROR)
 		{
 			LOG_ERROR(response->GetString());
 		}

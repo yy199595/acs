@@ -3,18 +3,15 @@
 #include<Network/SocketProxy.h>
 #include<Method/MethodProxy.h>
 #include<Define/CommonLogDef.h>
-#include<Thread/TaskThread.h>
 #include"TcpServerComponent.h"
-#include"Component/Scene/NetThreadComponent.h"
 
 namespace Sentry
 {
-	TcpServerListener::TcpServerListener(IAsioThread & t)
-		: mTaskThread(t)
+	TcpServerListener::TcpServerListener(const ListenConfig *config)
     {
 		this->mCount = 0;
-		this->mErrorCount = 0;
-        this->mConfig = nullptr;
+        this->mConfig = config;
+        this->mErrorCount = 0;
         this->mTcpComponent = nullptr;
         this->mBindAcceptor = nullptr;
     }
@@ -26,15 +23,14 @@ namespace Sentry
 		delete this->mBindAcceptor;
 	}
 
-	bool TcpServerListener::StartListen(const ListenConfig *config, TcpServerComponent *component)
+	bool TcpServerListener::StartListen(asio::io_service &io, TcpServerComponent *component)
     {
         try
         {
-            this->mConfig = config;
             this->mTcpComponent = component;
-            unsigned short port = config->Port;
+            unsigned short port = this->mConfig->Port;
             AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), port);
-            this->mBindAcceptor = new AsioTcpAcceptor(this->mTaskThread, endPoint);
+            this->mBindAcceptor = new AsioTcpAcceptor(io, endPoint);
 
             this->mBindAcceptor->listen();
             this->ListenConnect();
@@ -49,8 +45,7 @@ namespace Sentry
     }
 	void TcpServerListener::ListenConnect()
 	{
-        assert(this->mTaskThread.IsCurrentThread());
-        IAsioThread & workThread = this->mTcpComponent->GetThread();
+        asio::io_service & workThread = this->mTcpComponent->GetThread();
         std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread));
 		this->mBindAcceptor->async_accept(socketProxy->GetSocket(),
 			[this, &workThread, socketProxy](const asio::error_code & code)
@@ -66,7 +61,7 @@ namespace Sentry
                 socketProxy->Init();
                 this->mTcpComponent->OnListenConnect(this->mConfig->Name, socketProxy);
             }
-			this->mTaskThread.post(std::bind(&TcpServerListener::ListenConnect, this));
+            this->ListenConnect();
 		});
 	}
 }

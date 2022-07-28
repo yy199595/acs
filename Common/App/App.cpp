@@ -20,8 +20,7 @@ namespace Sentry
         this->mTickCount = 0;
 		this->mLogicRunCount = 0;
 		this->mTimerComponent = nullptr;
-		StaticMethod * staticMethod = NewMethodProxy(&App::LogicMainLoop, this);
-		this->mTaskScheduler = std::make_shared<MainTaskScheduler>(staticMethod);
+        this->mThreadId = std::this_thread::get_id();
 	}
 
 	bool App::LoadComponent()
@@ -142,7 +141,22 @@ namespace Sentry
 		this->mStartTime = Helper::Time::GetNowMilTime();
 		this->mSecondTimer = Helper::Time::GetNowMilTime();
 		this->mLastUpdateTime = Helper::Time::GetNowMilTime();
-		return this->mTaskScheduler->Start();
+
+        std::chrono::milliseconds time(1);
+        this->mMainThread = new asio::io_service(1);
+        asio::io_service::work * work = new asio::io_service::work(*mMainThread);
+        while(!this->mMainThread->stopped())
+        {
+            asio::error_code err;
+            this->mMainThread->poll(err);
+            if(err)
+            {
+                CONSOLE_LOG_ERROR(err.message());
+            }
+            this->LogicMainLoop();
+            std::this_thread::sleep_for(time);
+        }
+		return 0;
 	}
 
 	void App::Stop()
@@ -153,7 +167,7 @@ namespace Sentry
 			this->mTaskComponent->Start([this, timer]()
 			{
 				this->OnDestory();
-				this->mTaskScheduler->Stop();
+                this->mMainThread->stop();
 				LOG_WARN("close server successful " << timer->GetMs() << " ms");
 			});
 		}
