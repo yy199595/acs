@@ -43,7 +43,7 @@ namespace Sentry
 		return true;
 	}
 
-	void ConsoleComponent::OnListen(std::shared_ptr<SocketProxy> socket)
+	bool ConsoleComponent::OnListen(std::shared_ptr<SocketProxy> socket)
 	{
 		std::shared_ptr<TelnetClientContext> telnetClient =
 			std::make_shared<TelnetClientContext>(socket, this);
@@ -56,6 +56,7 @@ namespace Sentry
 		telnetClient->StartRead();
 		this->mTelnetClients.emplace(address, telnetClient);
 		//telnetClient->SendProtoMessage(telnetProto);
+        return true;
 	}
 
 	void ConsoleComponent::OnReceive(const std::string & address, const std::string& message)

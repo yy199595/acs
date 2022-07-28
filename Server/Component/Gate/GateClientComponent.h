@@ -31,15 +31,16 @@ namespace Sentry
 	 public:
 		void Awake() final;
 		bool LateAwake() final;
-		void OnListen(std::shared_ptr<SocketProxy> socket) final;
+		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 private:
 		void CheckPlayerLogout(const std::string & address);
 	 private:
-		std::set<std::string> mBlackList;
 		class GateComponent* mGateComponent;
 		class TimerComponent* mTimerComponent;
+        class TcpServerComponent * mTcpComponent;
 		std::unordered_map<std::string, long long> mUserAddressMap;
-		std::unordered_map<long long, std::string> mClientAddressMap;
+        std::queue<std::shared_ptr<GateClientContext>> mClientPools;
+        std::unordered_map<long long, std::string> mClientAddressMap;
 		std::unordered_map<std::string, std::shared_ptr<GateClientContext>> mGateClientMap;
 	};
 }

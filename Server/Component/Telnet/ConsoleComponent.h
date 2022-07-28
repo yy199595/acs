@@ -34,7 +34,7 @@ namespace Sentry
 	 public:
 		bool LateAwake() final;
 		void OnClientError(const std::string & address);
-		void OnListen(std::shared_ptr<SocketProxy> socket) final;
+		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
 		void OnReceive(const std::string & address, const std::string & message);
 	 private:
 		bool Offset(const std::string& parameter, std::vector<string>& response);

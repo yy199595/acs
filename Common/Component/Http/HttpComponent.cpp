@@ -10,26 +10,28 @@
 #include"Component/Scene/NetThreadComponent.h"
 #include"Network//Http/HttpRequestClient.h"
 #include"Script/Extension/Http/LuaHttp.h"
+#include"Network/Listener/TcpServerComponent.h"
 namespace Sentry
 {
 	bool HttpComponent::LateAwake()
 	{
 		this->mTaskComponent = this->GetApp()->GetTaskComponent();
 		this->mTimeComponent = this->GetApp()->GetTimerComponent();
-#ifndef ONLY_MAIN_THREAD
-		this->mThreadComponent = this->GetComponent<NetThreadComponent>();
-#endif
+        this->mTcpComponent = this->GetComponent<TcpServerComponent>();
 		return true;
 	}
 
 	std::shared_ptr<HttpRequestClient> HttpComponent::CreateClient()
 	{
-#ifdef ONLY_MAIN_THREAD
-		asio::io_context& thread = this->GetApp()->GetThread();
-#else
-		asio::io_service &thread = this->mThreadComponent->AllocateNetThread();
-#endif
-		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread));
+        std::shared_ptr<HttpRequestClient> httpClient;
+		std::shared_ptr<SocketProxy> socketProxy  = this->mTcpComponent->CreateSocket();
+        if(!this->mClientPools.empty())
+        {
+            httpClient = this->mClientPools.front();
+            this->mClientPools.pop();
+            assert(httpClient->Reset(socketProxy));
+            return httpClient;
+        }
 		return std::make_shared<HttpRequestClient>(socketProxy, this);
 	}
 
@@ -46,7 +48,13 @@ namespace Sentry
 
         this->AddTask(httpRpcTask);
         httpAsyncClient->Request(httpGetRequest);
-        return httpRpcTask->Await();
+        std::shared_ptr<HttpAsyncResponse> response = httpRpcTask->Await();
+        if(this->mClientPools.size() < 100)
+        {
+            this->mClientPools.push(httpAsyncClient);
+            this->mTcpComponent->DeleteSocket(httpAsyncClient->MoveSocket());
+        }
+        return response;
 	}
 
 	void HttpComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
@@ -82,6 +90,11 @@ namespace Sentry
         this->AddTask(httpTask);
         requestClient->Request(httpRequest, fs);
         std::shared_ptr<HttpAsyncResponse> response = httpTask->Await();
+        if(this->mClientPools.size() < 100)
+        {
+            this->mClientPools.push(requestClient);
+            this->mTcpComponent->DeleteSocket(requestClient->MoveSocket());
+        }
 
         return response->GetCode() ? XCode::Failure : XCode::Successful;
 	}
@@ -99,8 +112,13 @@ namespace Sentry
 
         this->AddTask(httpTask);
         httpAsyncClient->Request(postRequest);
-
-        return httpTask->Await();
+        std::shared_ptr<HttpAsyncResponse> response = httpTask->Await();
+        if(this->mClientPools.size() < 100)
+        {
+            this->mClientPools.push(httpAsyncClient);
+            this->mTcpComponent->DeleteSocket(httpAsyncClient->MoveSocket());
+        }
+        return response;
 	}
 
 	void HttpComponent::OnAddTask(RpcTask task)

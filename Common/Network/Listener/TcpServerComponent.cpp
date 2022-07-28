@@ -72,13 +72,33 @@ namespace Sentry
         }
 	}
 
-    asio::io_service &TcpServerComponent::GetThread()
+    void TcpServerComponent::DeleteSocket(std::shared_ptr<SocketProxy> socket)
     {
+        if(this->mSocketQueue.size() < 1000)
+        {
+            this->mSocketQueue.push(socket);
+        }
+    }
+
+    std::shared_ptr<SocketProxy> TcpServerComponent::CreateSocket()
+    {
+        std::shared_ptr<SocketProxy> socket;
+        assert(this->GetApp()->IsMainThread());
+        if(!this->mSocketQueue.empty())
+        {
+            socket = this->mSocketQueue.front();
+            this->mSocketQueue.pop();
+        }
+        else
+        {
 #ifdef ONLY_MAIN_THREAD
-        return App::Get()->GetThread();
+            asio::io_service & io = App::Get()->GetThread();
 #else
-        return this->mThreadComponent->AllocateNetThread();
+            asio::io_service &io = this->mThreadComponent->AllocateNetThread();
 #endif
+            socket = std::make_shared<SocketProxy>(io);
+        }
+        return socket;
     }
 
     bool TcpServerComponent::AddBlackList(const std::string &ip)

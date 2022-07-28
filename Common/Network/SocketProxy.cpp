@@ -1,5 +1,4 @@
 #include"SocketProxy.h"
-#include<Util/Guid.h>
 #include<spdlog/fmt/fmt.h>
 namespace Sentry
 {
@@ -12,8 +11,8 @@ namespace Sentry
 
     void SocketProxy::Init()
     {
-        this->mIsRemote = false;
         asio::error_code code;
+        this->mIsRemote = false;
         auto endPoint = this->mSocket->remote_endpoint(code);
         if (this->mSocket->is_open() && !code)
         {
@@ -23,21 +22,19 @@ namespace Sentry
         }
     }
 
+    void SocketProxy::Init(const std::string &ip, unsigned short port)
+    {
+        this->mIp = ip;
+        this->mPort = port;
+        this->mIsRemote = true;
+        assert(!this->mIp.empty() && this->mPort > 0);
+        this->mAddress = fmt::format("{0}:{1}", ip, port);
+    }
+
     SocketProxy::~SocketProxy()
     {
         delete this->mSocket;
     }
-
-	SocketProxy::SocketProxy(asio::io_service& thread, const std::string& ip, unsigned short port)
-			: mNetThread(thread)
-	{
-		this->mIp = ip;
-		this->mPort = port;
-		this->mIsRemote = true;
-		assert(!this->mIp.empty() && this->mPort > 0);
-		this->mAddress = fmt::format("{0}:{1}", ip, port);
-		this->mSocket = new AsioTcpSocket(this->mNetThread);
-	}
 
 	void SocketProxy::Close()
 	{
@@ -45,6 +42,7 @@ namespace Sentry
 		{
 			asio::error_code code;
 			this->mSocket->close(code);
+            this->mSocket->shutdown(asio::socket_base::shutdown_both, code);
 		}
 		asio::error_code code;
 		this->mSocket->cancel(code);

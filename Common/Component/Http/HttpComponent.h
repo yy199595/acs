@@ -42,10 +42,9 @@ namespace Sentry
 	 private:
 		TimerComponent * mTimeComponent;
 		class TaskComponent* mTaskComponent;
-#ifndef ONLY_MAIN_THREAD
-		class NetThreadComponent* mThreadComponent;
-#endif
+        class TcpServerComponent * mTcpComponent;
 		std::unordered_map<long long, long long> mTimers;
-		std::set<std::shared_ptr<HttpRequestClient>> mRequestClients;
+        std::queue<std::shared_ptr<HttpRequestClient>> mClientPools;
+        std::set<std::shared_ptr<HttpRequestClient>> mRequestClients;
 	};
 }

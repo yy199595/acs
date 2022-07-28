@@ -56,7 +56,8 @@ namespace Sentry
 		Mongo::Config mConfig;
 		TimerComponent * mTimerComponent;
 		Util::NumberBuilder<int, 10> mRequestId;
-		std::unordered_map<long long, long long> mTimers;
+        class TcpServerComponent * mTcpComponent;
+        std::unordered_map<long long, long long> mTimers;
         std::vector<std::shared_ptr<MongoClientContext>> mMongoClients;
     };
 }

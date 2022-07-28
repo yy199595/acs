@@ -62,9 +62,10 @@ namespace Tcp
 		virtual ~TcpContext();
 
 	public:
-        void Reset(std::shared_ptr<SocketProxy> socket);
+        bool Reset(std::shared_ptr<SocketProxy> socket);
         long long GetLastOperTime() const { return this->mLastOperTime;}
 		const std::string & GetAddress() { return this->mSocket->GetAddress();}
+        std::shared_ptr<SocketProxy> MoveSocket() { return std::move(this->mSocket); }
 	protected:
 		void Connect();
 		void ReceiveLine();

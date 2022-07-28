@@ -5,12 +5,12 @@
 #include"HttpServiceComponent.h"
 #include"Util/FileHelper.h"
 #include"Network/Http/HttpHandlerClient.h"
+#include"Network/Listener/TcpServerComponent.h"
 #include"Component/HttpService/LocalHttpService.h"
 namespace Sentry
 {
     bool HttpServiceComponent::LateAwake()
     {
-        this->mTaskComponent = this->GetApp()->GetTaskComponent();
         auto iter = this->GetApp()->ComponentBegin();
         for(; iter != this->GetApp()->ComponentEnd(); iter++)
         {
@@ -26,21 +26,39 @@ namespace Sentry
                 }
             }
         }
+        this->mTaskComponent = this->GetApp()->GetTaskComponent();
+        this->mTcpComponent = this->GetComponent<TcpServerComponent>();
         return true;
     }
 
-    void HttpServiceComponent::OnListen(std::shared_ptr<SocketProxy> socket)
+    bool HttpServiceComponent::OnListen(std::shared_ptr<SocketProxy> socket)
     {
         static int count = 0;
 #ifdef __DEBUG__
         LOG_DEBUG("handler http socket count = " << count++);
 #endif
         assert(this->GetApp()->IsMainThread());
-        std::shared_ptr<HttpHandlerClient> handlerClient(new HttpHandlerClient(this, socket));
+        if(this->mHttpClients.size() >= 1000)
+        {
+            return false;
+        }
+
+        std::shared_ptr<HttpHandlerClient> handlerClient;
+        if(!this->mClientPools.empty())
+        {
+            handlerClient = this->mClientPools.front();
+            assert(handlerClient->Reset(socket));
+            this->mClientPools.pop();
+        }
+        else
+        {
+            handlerClient = std::make_shared<HttpHandlerClient>(this, socket);
+        }
 
         handlerClient->StartReceive();
         const std::string &address = socket->GetAddress();
         this->mHttpClients.emplace(address, handlerClient);
+        return true;
     }
 
     const HttpInterfaceConfig *HttpServiceComponent::GetConfig(const std::string &path)
@@ -55,8 +73,13 @@ namespace Sentry
         auto iter = this->mHttpClients.find(address);
         if(iter != this->mHttpClients.end())
         {
+            std::shared_ptr<HttpHandlerClient> handlerClient = iter->second;
+            if(this->mClientPools.size() <= 100)
+            {
+                this->mClientPools.push(handlerClient);
+            }
             this->mHttpClients.erase(iter);
-            //LOG_DEBUG("remove http address : " << address);
+            this->mTcpComponent->DeleteSocket(handlerClient->MoveSocket());
         }
     }
 

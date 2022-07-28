@@ -7,6 +7,7 @@
 #include"NetWork/GateClientContext.h"
 #include"GateComponent.h"
 #include"Component/Rpc/ServiceRpcComponent.h"
+#include"Network/Listener/TcpServerComponent.h"
 #ifdef __DEBUG__
 #include"Util/StringHelper.h"
 #include"google/protobuf/util/json_util.h"
@@ -22,26 +23,38 @@ namespace Sentry
 
 	bool GateClientComponent::LateAwake()
 	{
+        this->mTcpComponent = this->GetComponent<TcpServerComponent>();
 		LOG_CHECK_RET_FALSE(this->mTimerComponent = App::Get()->GetTimerComponent());
 		LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<GateComponent>());
 		return true;
 	}
 
-	void GateClientComponent::OnListen(std::shared_ptr<SocketProxy> socket)
-	{
-		const std::string & address = socket->GetAddress();
-		auto iter = this->mGateClientMap.find(address);
-		LOG_CHECK_RET(iter == this->mGateClientMap.end());
-		if (this->mBlackList.find(socket->GetIp()) == this->mBlackList.end())
-		{
-			std::shared_ptr<GateClientContext> gateClient(
-				new GateClientContext(socket, this));
+	bool GateClientComponent::OnListen(std::shared_ptr<SocketProxy> socket)
+    {
+        const std::string &address = socket->GetAddress();
+        auto iter = this->mGateClientMap.find(address);
+        if (iter != this->mGateClientMap.end())
+        {
+            LOG_FATAL("handler socket error " << socket->GetAddress());
+            return false;
+        }
+        std::shared_ptr<GateClientContext> gateClient;
+        if (!this->mClientPools.empty())
+        {
+            gateClient = this->mClientPools.front();
+            gateClient->Reset(socket);
+            this->mClientPools.pop();
+        }
+        else
+        {
+            gateClient = std::make_shared<GateClientContext>(socket, this);
+        }
 
-			gateClient->StartReceive();
-			this->mGateComponent->OnConnect(address);
-			this->mGateClientMap.emplace(address, gateClient);
-		}
-	}
+        gateClient->StartReceive();
+        this->mGateComponent->OnConnect(address);
+        this->mGateClientMap.emplace(address, gateClient);
+        return true;
+    }
 
 	void GateClientComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> request) //客户端调过来的
 	{
@@ -63,7 +76,13 @@ namespace Sentry
 #ifdef __DEBUG__
 			LOG_WARN("remove client " << address  << " code = " << (int)code);
 #endif
-			this->mGateClientMap.erase(iter);
+            std::shared_ptr<GateClientContext> gateClient = iter->second;
+            if(this->mClientPools.size() < 100)
+            {
+                this->mClientPools.push(gateClient);
+                this->mTcpComponent->DeleteSocket(gateClient->MoveSocket());
+            }
+            this->mGateClientMap.erase(iter);
 		}
 	}
 

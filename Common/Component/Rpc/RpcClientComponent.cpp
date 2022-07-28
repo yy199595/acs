@@ -10,18 +10,19 @@
 #ifdef __DEBUG__
 #include"Async/RpcTask/RpcTaskSource.h"
 #include<google/protobuf/util/json_util.h>
+#include"Network/Listener/TcpServerComponent.h"
 #endif
 namespace Sentry
 {
 	void RpcClientComponent::Awake()
 	{
 		this->mRpcComponent = nullptr;
-		this->mTaskComponent = nullptr;
+        this->mTcpComponent = nullptr;
 	}
 	bool RpcClientComponent::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<ServiceRpcComponent>());
-		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<NetThreadComponent>());
+        LOG_CHECK_RET_FALSE(this->mTcpComponent = this->GetComponent<TcpServerComponent>());
+        LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<ServiceRpcComponent>());
 		return true;
 	}
 
@@ -35,9 +36,8 @@ namespace Sentry
 		}
 	}
 
-	void RpcClientComponent::OnListen(std::shared_ptr<SocketProxy> socket)
+	bool RpcClientComponent::OnListen(std::shared_ptr<SocketProxy> socket)
 	{
-		// 判断是不是服务器根据 白名单
 		const std::string& address = socket->GetAddress();
 		auto iter = this->mRpcClientMap.find(address);
 		if (iter == this->mRpcClientMap.end())
@@ -48,7 +48,9 @@ namespace Sentry
 
 			tcpSession->StartReceive();
 			this->mRpcClientMap.emplace(address, tcpSession);
+            return true;
 		}
+        return false;
 	}
 
 	void RpcClientComponent::StartClose(const std::string & address)
@@ -96,15 +98,15 @@ namespace Sentry
 		{
 			return localSession;
 		}
-#ifdef ONLY_MAIN_THREAD
-		asio::io_context& workThread = App::Get()->GetThread();
-#else
-		asio::io_service & workThread = this->mTaskComponent->AllocateNetThread();
-#endif
 		std::string ip;
 		unsigned short port = 0;
 		assert(Helper::String::ParseIpAddress(address, ip, port));
-		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread, ip, port));
+		std::shared_ptr<SocketProxy> socketProxy = this->mTcpComponent->CreateSocket();
+        if(socketProxy == nullptr)
+        {
+            return nullptr;
+        }
+        socketProxy->Init(ip, port);
 		localSession = make_shared<ServerClientContext>(this, socketProxy);
 
 		this->mRpcClientMap.emplace(socketProxy->GetAddress(), localSession);

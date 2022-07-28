@@ -8,10 +8,11 @@ namespace Sentry
 	{
 	 public:
 		SocketProxy(asio::io_context& io);
-		SocketProxy(asio::io_context& io, const std::string & ip, unsigned short port);
 		~SocketProxy();
 	 public:
         void Init();
+        void Init(const std::string & ip, unsigned short port);
+    public:
         void Close();
 		unsigned short GetPort() { return this->mPort;}
 		inline std::string & GetIp() { return this->mIp;}
@@ -22,7 +23,6 @@ namespace Sentry
 	 private:
 		bool mIsRemote;
 		std::string mIp;
-		std::mutex mLock;
 		unsigned short mPort;
 		std::string mAddress;
 		AsioTcpSocket * mSocket;

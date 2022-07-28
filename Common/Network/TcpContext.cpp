@@ -4,7 +4,6 @@
 #include"TcpContext.h"
 #include"Util/TimeHelper.h"
 #include"Util/StringHelper.h"
-#include"Define/CommonLogDef.h"
 namespace Tcp
 {
 	TcpContext::TcpContext(std::shared_ptr<SocketProxy> socket, size_t count)
@@ -15,9 +14,16 @@ namespace Tcp
 		this->mConnectCount = 0;
 	}
 
-    void TcpContext::Reset(std::shared_ptr<SocketProxy> socket)
+    bool TcpContext::Reset(std::shared_ptr<SocketProxy> socket)
     {
-        this->mSocket = socket;
+        if(this->mSocket == nullptr)
+        {
+            this->mSocket = socket;
+            this->mLastOperTime = 0;
+            this->mConnectCount = 0;
+            return true;
+        }
+        return false;
     }
 
 	TcpContext::~TcpContext()

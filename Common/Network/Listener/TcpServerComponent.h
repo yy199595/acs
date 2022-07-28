@@ -14,9 +14,10 @@ namespace Sentry
 		TcpServerComponent() = default;
 		~TcpServerComponent() final = default;
 	public:
-        asio::io_service & GetThread();
         bool AddBlackList(const std::string & ip);
         bool AddWhiteList(const std::string & ip);
+        std::shared_ptr<SocketProxy> CreateSocket();
+        void DeleteSocket(std::shared_ptr<SocketProxy> socket);
         bool OnListenConnect(const std::string & name, std::shared_ptr<SocketProxy> socket);
 	private:
 		bool LateAwake() final;
@@ -29,6 +30,7 @@ namespace Sentry
 #ifndef ONLY_MAIN_THREAD
        class NetThreadComponent * mThreadComponent;
 #endif
+        std::queue<std::shared_ptr<SocketProxy>> mSocketQueue;
         std::unordered_map<std::string, TcpServerListener *> mListeners;
         std::unordered_map<std::string, const ListenConfig *> mListenConfigs;
     };

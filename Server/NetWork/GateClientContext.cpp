@@ -84,19 +84,14 @@ namespace Sentry
 
 	void GateClientContext::CloseSocket(XCode code)
 	{
-		if (code == XCode::NetActiveShutdown)
-		{
-			this->mSocket->Close();
-			return;
-		}
-		const std::string & address = this->GetAddress();
+        this->mSocket->Close();
+        const std::string & address = this->GetAddress();
 #ifdef ONLY_MAIN_THREAD
 		this->mGateComponent->OnCloseSocket(address, code);
 #else
 		asio::io_service &mainTaskScheduler = App::Get()->GetThread();
 		mainTaskScheduler.post(std::bind(&GateClientComponent::OnCloseSocket, this->mGateComponent, address, code));
 #endif
-
 	}
 
 	void GateClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)

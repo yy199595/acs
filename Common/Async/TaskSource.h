@@ -113,7 +113,7 @@ namespace Sentry
     std::shared_ptr<T> TaskSource<std::shared_ptr<T>>::Await()
     {
         this->YieldTask();
-        return this->mData;
+        return std::move(this->mData);
     }
     template<typename T>
     bool TaskSource<std::shared_ptr<T>>::SetResult(std::shared_ptr<T> data)

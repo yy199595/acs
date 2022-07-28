@@ -44,6 +44,7 @@ namespace Sentry
 		bool LoadLuaScript(const std::string & name, const std::string & path);
 	 private:
 		TaskComponent * mTaskComponent;
+        class TcpServerComponent * mTcpComponent;
 		std::unordered_map<std::string, RedisConfig> mConfigs;
 		std::unordered_map<std::string, std::string> mLuaMap;
 		std::unordered_map<std::string, std::list<SharedRedisClient>> mRedisClients;

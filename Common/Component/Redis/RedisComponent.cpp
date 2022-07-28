@@ -7,6 +7,7 @@
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
 #include"Component/Scene/NetThreadComponent.h"
+#include"Network/Listener/TcpServerComponent.h"
 namespace Sentry
 {
 	bool RedisComponent::LateAwake()
@@ -48,6 +49,7 @@ namespace Sentry
 			this->mConfigs.emplace(name, redisConfig);
 		}
 		this->mTaskComponent = this->GetApp()->GetTaskComponent();
+        this->mTcpComponent = this->GetComponent<TcpServerComponent>();
 		return this->mConfigs.find("main") != this->mConfigs.end();
 	}
 
@@ -109,15 +111,12 @@ namespace Sentry
 
     SharedRedisClient RedisComponent::MakeRedisClient(const RedisConfig & config)
 	{
-#ifdef ONLY_MAIN_THREAD
-		asio::io_context& workThread = App::Get()->GetThread();
-#else
-		NetThreadComponent * threadPoolComponent = this->GetComponent<NetThreadComponent>();
-		asio::io_service & workThread = threadPoolComponent->AllocateNetThread();
-#endif
-		unsigned short port = config.Port;
-        const std::string& ip = config.Ip;
-        std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread, ip, port));
+        std::shared_ptr<SocketProxy> socketProxy = this->mTcpComponent->CreateSocket();
+        if(socketProxy == nullptr)
+        {
+            return nullptr;
+        }
+        socketProxy->Init(config.Ip, config.Port);
 		return std::make_shared<RedisClientContext>(socketProxy, config, this);
 	}
 

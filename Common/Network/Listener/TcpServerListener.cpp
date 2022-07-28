@@ -45,14 +45,14 @@ namespace Sentry
     }
 	void TcpServerListener::ListenConnect()
 	{
-        asio::io_service & workThread = this->mTcpComponent->GetThread();
-        std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(workThread));
+        std::shared_ptr<SocketProxy> socketProxy = this->mTcpComponent->CreateSocket();
 		this->mBindAcceptor->async_accept(socketProxy->GetSocket(),
-			[this, &workThread, socketProxy](const asio::error_code & code)
+			[this, socketProxy](const asio::error_code & code)
 		{
 			if (code)
 			{
 				this->mErrorCount++;
+                this->mTcpComponent->DeleteSocket(socketProxy);
 				CONSOLE_LOG_FATAL(this->mConfig->Name << " " << code.message() << " count = " << this->mErrorCount);
 			}
 			else

@@ -11,12 +11,13 @@ namespace Sentry
 		: Tcp::TcpContext(socketProxy)
 	{
 		this->mHttpComponent = httpComponent;
-		this->mHttpResponse = std::make_shared<HttpHandlerResponse>();
-		this->mHttpRequest = std::make_shared<HttpHandlerRequest>(socketProxy->GetAddress());
 	}
 
 	void HttpHandlerClient::StartReceive()
 	{
+        const std::string & address = this->mSocket->GetAddress();
+        this->mHttpResponse = std::make_shared<HttpHandlerResponse>();
+        this->mHttpRequest = std::make_shared<HttpHandlerRequest>(address);
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLine();
 #else
@@ -95,19 +96,17 @@ namespace Sentry
 
 	void HttpHandlerClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<Tcp::ProtoMessage> message)
 	{
-		this->ClosetClient();
 		if(code)
 		{
 #ifdef __DEBUG__
 			CONSOLE_LOG_ERROR(code.message());
 #endif
-			return;
 		}
-	}
+        this->ClosetClient();
+    }
 	void HttpHandlerClient::ClosetClient()
 	{
-		this->mSocket->Close();
-		std::move(this->mSocket);
+        this->mSocket->Close();
         const std::string & address = this->mSocket->GetAddress();
 #ifdef ONLY_MAIN_THREAD
 		this->mHttpComponent->ClosetHttpClient(address);

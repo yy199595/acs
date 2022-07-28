@@ -5,10 +5,8 @@
 #include"Network/TcpRpcClientContext.h"
 #include"Script/Client.h"
 #include"Script/Extension/Message/Message.h"
-#include"Component/Http/HttpComponent.h"
 #include"google/protobuf/util/json_util.h"
 #include"Component/Lua/LuaScriptComponent.h"
-#include"Component/Scene/NetThreadComponent.h"
 
 namespace Client
 {
@@ -102,7 +100,9 @@ namespace Client
 	bool ClientComponent::StartConnect(const std::string& ip, unsigned short port)
 	{
 		asio::io_service& thread = this->GetApp()->GetThread();
-		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread, ip, port));
+		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread));
+
+        socketProxy->Init(ip, port);
 		this->mTcpClient = std::make_shared<TcpRpcClientContext>(socketProxy, this);
 		if(this->mTcpClient->StartConnect())
 		{

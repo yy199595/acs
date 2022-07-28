@@ -4,6 +4,7 @@
 
 #include "MongoRpcComponent.h"
 #include"Component/Scene/NetThreadComponent.h"
+#include"Network/Listener/TcpServerComponent.h"
 namespace Sentry
 {
 	MongoTask::MongoTask(int id)
@@ -22,7 +23,8 @@ namespace Sentry
         this->mIndex = 0;
 		const ServerConfig & config = this->GetApp()->GetConfig();
 		this->mTimerComponent = this->GetApp()->GetTimerComponent();
-		LOG_CHECK_RET_FALSE(config.GetMember("mongo", "ip", this->mConfig.mIp));
+        this->mTcpComponent = this->GetComponent<TcpServerComponent>();
+        LOG_CHECK_RET_FALSE(config.GetMember("mongo", "ip", this->mConfig.mIp));
 		LOG_CHECK_RET_FALSE(config.GetMember("mongo", "db", this->mConfig.mDb));
 		LOG_CHECK_RET_FALSE(config.GetMember("mongo", "port", this->mConfig.mPort));
 		LOG_CHECK_RET_FALSE(config.GetMember("mongo", "user", this->mConfig.mUser));
@@ -35,14 +37,12 @@ namespace Sentry
     {
         for (int index = 0; index < this->mConfig.mMaxCount; index++)
         {
-#ifdef ONLY_MAIN_THREAD
-            asio::io_context & asioThread = this->GetApp()->GetThread();
-#else
-            NetThreadComponent *netThreadComponent = this->GetComponent<NetThreadComponent>();
-            asio::io_service &asioThread = netThreadComponent->AllocateNetThread();
-#endif
-            std::shared_ptr<SocketProxy> socketProxy =
-                    std::make_shared<SocketProxy>(asioThread, this->mConfig.mIp, this->mConfig.mPort);
+            std::shared_ptr<SocketProxy> socketProxy = this->mTcpComponent->CreateSocket();
+            if(socketProxy == nullptr)
+            {
+                return false;
+            }
+            socketProxy->Init(this->mConfig.mIp, this->mConfig.mPort);
             std::shared_ptr<MongoClientContext> mongoClientContext =
                     std::make_shared<MongoClientContext>(socketProxy, this->mConfig, this, index);
 

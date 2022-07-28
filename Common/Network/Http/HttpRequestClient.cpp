@@ -67,12 +67,14 @@ namespace Sentry
         {
             this->mResponse->SetError(code);
         }
+        this->mSocket->Close();
+        std::move(this->mRequest);
         long long taskId = this->mRequest->GetTaskId();
 #ifdef ONLY_MAIN_THREAD
-        this->mHttpComponent->OnResponse(taskId, this->mResponse);
+        this->mHttpComponent->OnResponse(taskId, std::move(this->mResponse));
 #else
         asio::io_service & netWorkThread = App::Get()->GetThread();
-        netWorkThread.post(std::bind(&HttpComponent::OnResponse, this->mHttpComponent, taskId, this->mResponse));
+        netWorkThread.post(std::bind(&HttpComponent::OnResponse, this->mHttpComponent, taskId, std::move(this->mResponse)));
 #endif
         this->mRequest = nullptr;
         this->mResponse = nullptr;

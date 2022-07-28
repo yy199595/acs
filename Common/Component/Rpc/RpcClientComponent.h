@@ -19,7 +19,7 @@ namespace Sentry
 		void OnResponse(std::shared_ptr<com::Rpc_Response> response) final;
 
 	 protected:
-		void OnListen(std::shared_ptr<SocketProxy> socket) final;
+		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 public:
 		std::shared_ptr<ServerClientContext> GetSession(const std::string& address);
 		std::shared_ptr<ServerClientContext> GetOrCreateSession(const std::string& address);
@@ -32,7 +32,7 @@ namespace Sentry
 		bool Send(const std::string & address, std::shared_ptr<com::Rpc_Response> message);
 	 private:
 		class ServiceRpcComponent* mRpcComponent;
-		class NetThreadComponent* mTaskComponent;
-		std::unordered_map<std::string, std::shared_ptr<ServerClientContext>> mRpcClientMap;
+        class TcpServerComponent * mTcpComponent;
+        std::unordered_map<std::string, std::shared_ptr<ServerClientContext>> mRpcClientMap;
 	};
 }
