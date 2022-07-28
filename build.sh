@@ -7,6 +7,7 @@ find ./ -name CMakeCache.txt -delete
 cmake ./CMakeLists.txt
 
 make lua
+make spdlog
 make libprotobuf
 make Sentry
 
