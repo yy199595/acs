@@ -29,6 +29,7 @@ namespace Sentry
     private:
 		void OnTaskTimeout(long long rpcId);
 	 private:
+		std::string mFullName;
 		std::string mTempMethod;
 		std::string mTempService;
 		class TaskComponent* mTaskComponent;

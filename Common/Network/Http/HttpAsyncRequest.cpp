@@ -81,17 +81,16 @@ namespace Sentry
     bool HttpAsyncRequest::ParseUrl(const std::string &url)
     {
         std::cmatch what;
-        std::string protocol;
         std::regex pattern("(http|https)://([^/ :]+):?([^/ ]*)(/.*)?");
         if (std::regex_match(url.c_str(), what, pattern))
 		{
             this->mHost = std::string(what[2].first, what[2].second);
             this->mPath = std::string(what[4].first, what[4].second);
-            protocol = std::string(what[1].first, what[1].second);
+			this->mProtocol.append(what[1].first, what[1].second);
             this->mPort = std::string(what[3].first, what[3].second);
 
             if (0 == this->mPort.length()) {
-                this->mPort = "http" == protocol ? "80" : "443";
+                this->mPort = "http" == this->mProtocol ? "80" : "443";
             }
             return true;
         }

@@ -51,12 +51,12 @@ namespace Sentry
 					<< " need proto type " << rpcInterfaceConfig->Request);
 				return XCode::CallArgsError;
 			}
-			std::string fullName;
-			if(!Any::ParseAnyTypeUrl(request->data().type_url(), &fullName)
-				|| rpcInterfaceConfig->Request != fullName)
+			this->mFullName.clear();
+			if(!Any::ParseAnyTypeUrl(request->data().type_url(), &this->mFullName)
+				|| rpcInterfaceConfig->Request != this->mFullName)
 			{
 				LOG_ERROR("call " << rpcInterfaceConfig->FullName << " need "
-					<< rpcInterfaceConfig->FullName << " but use " << fullName);
+					<< rpcInterfaceConfig->FullName << " but use " << this->mFullName);
 				return XCode::CallArgsError;
 			}
 		}

@@ -36,7 +36,6 @@ namespace Sentry
     private:
         bool LateAwake() final;
 		void OnAddTask(RpcTask task) final;
-		void OnTimerout(long long timerId);
 		void OnDelTask(long long taskId, RpcTask task) final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 	 private:

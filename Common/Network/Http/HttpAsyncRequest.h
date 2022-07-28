@@ -83,6 +83,7 @@ namespace Sentry
         std::string mPort;
         std::string mPath;
         long long mTaskId;
+		std::string mProtocol;
 		const std::string mMethod;
         std::unordered_map<std::string, std::string> mHeadMap;
     };
