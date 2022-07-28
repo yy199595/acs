@@ -25,7 +25,7 @@ namespace Sentry
 		}
 		return method->Invoke(*request, *response);
 	}
-	bool LocalHttpService::StartService()
+	bool LocalHttpService::StartNewService()
     {
         this->mServiceRegister = std::make_shared<HttpServiceRegister>(this);
         if (!this->OnStartService(*this->mServiceRegister))

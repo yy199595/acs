@@ -31,7 +31,7 @@ namespace Sentry
 		return serviceMethod->Invoke(*request, *response);
 	}
 
-	bool LocalRpcService::StartService()
+	bool LocalRpcService::StartNewService()
 	{
 		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
 		if (!this->OnStartService(*this->mMethodRegister))

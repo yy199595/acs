@@ -17,7 +17,7 @@ namespace Sentry
 		bool OnStart() final;
 		bool LateAwake() final;
 	 public:
-		bool StartService() final;
+		bool StartNewService() final;
 		bool CloseService() final;
 		bool IsStartService() final { return this->mMethodRegister != nullptr; }
 		XCode Invoke(const std::string& name, std::shared_ptr<com::Rpc::Request> request,

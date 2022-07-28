@@ -77,7 +77,7 @@ namespace Sentry
 	class IServiceBase
 	{
 	public:
-		virtual bool StartService() = 0;
+		virtual bool StartNewService() = 0;
 		virtual bool CloseService() = 0;
 		virtual bool IsStartService() = 0;
 		virtual bool IsStartComplete() = 0;

@@ -268,7 +268,7 @@ namespace Sentry
         for (const std::string& name: components)
 		{
 			IServiceBase* localServerRpc = this->GetComponent<IServiceBase>(name);
-			if (localServerRpc != nullptr && !localServerRpc->StartService())
+			if (localServerRpc != nullptr && !localServerRpc->StartNewService())
 			{
 				LOG_ERROR(name << " load failure");
 				return false;
@@ -327,7 +327,7 @@ namespace Sentry
 		IServiceBase* serviceBase = component->Cast<IServiceBase>();
 		if (serviceBase != nullptr && !serviceBase->IsStartService())
 		{
-			LOG_CHECK_RET_FALSE(serviceBase->StartService());
+			LOG_CHECK_RET_FALSE(serviceBase->StartNewService());
 
 			IStart* start = component->Cast<IStart>();
 			IComplete* complete = component->Cast<IComplete>();

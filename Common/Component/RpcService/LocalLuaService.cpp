@@ -18,7 +18,7 @@ namespace Sentry
 		//luaL_unref(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
 	}
 
-	bool LocalLuaService::StartService()
+	bool LocalLuaService::StartNewService()
 	{
 		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
 

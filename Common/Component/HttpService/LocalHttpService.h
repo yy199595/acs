@@ -17,7 +17,7 @@ namespace Sentry
 		LocalHttpService();
 		virtual ~LocalHttpService() = default;
 	 protected:
-		bool StartService() final;
+		bool StartNewService() final;
 		bool CloseService() final;
 		bool IsStartComplete() final { return true; }
 		bool LoadConfig(const rapidjson::Value & json) final;

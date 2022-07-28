@@ -13,7 +13,7 @@ namespace Sentry
 		ServiceAgentComponent() = default;
 		~ServiceAgentComponent() = default;
 	 private:
-		bool StartService() final { return false;}
+		bool StartNewService() final { return false;}
 		bool CloseService() final { return false;}
 		bool IsStartService() final { return false; }
 	 private:
