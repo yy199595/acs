@@ -28,7 +28,6 @@ namespace Sentry
     private:
 		bool AuthUser();
 		void OnReadComplete();
-		void OnConnect(const asio::error_code &error, int count) final;
         void OnReceiveLine(const asio::error_code &code, std::istream & is) final;
         void OnReceiveMessage(const asio::error_code &code, std::istream & is) final;
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;

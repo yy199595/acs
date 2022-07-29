@@ -21,32 +21,6 @@ namespace Sentry
 		LOG_WARN("remove redis client " << this->mConfig.Name << "[" << this->mConfig.Address << "]");
 	}
 
-	void RedisClientContext::OnConnect(const asio::error_code& error, int count)
-	{
-		if (error)
-		{
-#ifdef __DEBUG__
-			CONSOLE_LOG_ERROR(error.message());
-			CONSOLE_LOG_ERROR("connect redis server [" <<
-													   this->mConfig.Address << "] failure count = "
-													   << count);
-#endif
-			AsioContext& context = this->mSocket->GetThread();
-			this->mTimer = std::make_shared<asio::steady_timer>(context, std::chrono::seconds(5));
-			this->mTimer->async_wait(std::bind(&RedisClientContext::Connect, this->shared_from_this()));
-			return;
-		}
-#ifdef __DEBUG__
-		CONSOLE_LOG_ERROR("connect redis server [" << this->mConfig.Name << "=>" << this->mConfig.Address << "] successful");
-#endif
-		if (this->mTimer != nullptr)
-		{
-			asio::error_code code;
-			this->mTimer->cancel(code);
-		}
-        this->SendFromMessageQueue();
-	}
-
 	void RedisClientContext::SendCommand(std::shared_ptr<RedisRequest> command)
 	{
 #ifdef ONLY_MAIN_THREAD
@@ -129,7 +103,8 @@ namespace Sentry
         {
             if (!this->AuthUser())
             {
-                return;
+				CONSOLE_LOG_FATAL("redis auth failure");
+				return;
             }
             this->SendFromMessageQueue();
             return;
