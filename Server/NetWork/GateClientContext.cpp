@@ -34,7 +34,7 @@ namespace Sentry
 
     void GateClientContext::OnReceiveLength(const asio::error_code &code, int length)
     {
-        if(code || length == 0)
+        if(code || length <= 0)
         {
 #ifdef __NET_ERROR_LOG__
             CONSOLE_LOG_ERROR(code.message());

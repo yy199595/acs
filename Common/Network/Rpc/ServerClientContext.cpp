@@ -80,7 +80,7 @@ namespace Sentry
 
     void ServerClientContext::OnReceiveLength(const asio::error_code &code, int length)
     {
-        if(code)
+        if(code || length <= 0)
         {
             CONSOLE_LOG_ERROR(code.message());
             this->CloseSocket(XCode::NetWorkError);
