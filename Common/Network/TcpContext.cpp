@@ -2,6 +2,7 @@
 // Created by zmhy0073 on 2022/1/15.
 //
 #include"TcpContext.h"
+#include"App/App.h"
 #include"Util/TimeHelper.h"
 #include"Util/StringHelper.h"
 namespace Tcp
@@ -144,7 +145,11 @@ namespace Tcp
 
 	void TcpContext::ReceiveMessage(int length)
 	{
-		assert(length > 0);
+		if(length <= 0)
+		{
+			CONSOLE_LOG_ERROR(length);
+			return;
+		}
         if (length >= this->mMaxCount)
 		{
 			asio::error_code code =
