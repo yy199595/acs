@@ -12,19 +12,27 @@ namespace Client
 	void TcpRpcClientContext::SendToServer(std::shared_ptr<c2s::Rpc_Request> request)
 	{
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> networkData =
-			std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_CLIENT_REQUEST, request);
-
+                std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_CLIENT_REQUEST, request);
+#ifdef ONLY_MAIN_THREAD
         this->Send(networkData);
+#else
+        asio::io_service & io = this->mSocket->GetThread();
+        io.post(std::bind(&TcpRpcClientContext::Send, this, networkData));
+#endif
 	}
-
-
-    bool TcpRpcClientContext::StartConnect()
-    {
-        return this->ConnectSync();
-    }
 
     void TcpRpcClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
     {
+        if(code)
+        {
+            CONSOLE_LOG_DEBUG(code.message());
+            if(!this->ConnectSync())
+            {
+                CONSOLE_LOG_FATAL("connect server error");
+                return;
+            }
+            this->ReceiveLength();
+        }
         this->SendFromMessageQueue();
     }
 
@@ -61,11 +69,6 @@ namespace Client
         this->ReceiveLength();
     }
 
-	void TcpRpcClientContext::StartReceive()
-	{
-        this->ReceiveLength();
-	}
-
 	bool TcpRpcClientContext::OnRequest(std::istream & istream1)
     {
         std::shared_ptr<c2s::Rpc::Call> request(new c2s::Rpc::Call());
@@ -74,7 +77,12 @@ namespace Client
 			CONSOLE_LOG_ERROR("parse request message error");
             return false;
         }
+#ifdef ONLY_MAIN_THREAD
         this->mClientComponent->OnRequest(request);
+#else
+        asio::io_service & io = App::Get()->GetThread();
+        io.post(std::bind(&ClientComponent::OnRequest, this->mClientComponent, request));
+#endif
         return true;
     }
 
@@ -87,8 +95,12 @@ namespace Client
 			return false;
         }
         long long taskId = response->rpc_id();
-        //std::cout << response->ShortDebugString() << std::endl;
+#ifdef ONLY_MAIN_THREAD
         this->mClientComponent->OnResponse(taskId, response);
+#else
+        asio::io_service & io = App::Get()->GetThread();
+        io.post(std::bind(&ClientComponent::OnResponse, this->mClientComponent, taskId, response));
+#endif
         return true;
     }
 

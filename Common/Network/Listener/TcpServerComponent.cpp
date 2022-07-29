@@ -80,6 +80,13 @@ namespace Sentry
         }
     }
 
+    std::shared_ptr<SocketProxy> TcpServerComponent::CreateSocket(const std::string &ip, unsigned short port)
+    {
+        std::shared_ptr<SocketProxy> socket = this->CreateSocket();
+        socket->Init(ip, port);
+        return socket;
+    }
+
     std::shared_ptr<SocketProxy> TcpServerComponent::CreateSocket()
     {
         std::shared_ptr<SocketProxy> socket;

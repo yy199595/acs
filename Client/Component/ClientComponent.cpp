@@ -7,10 +7,11 @@
 #include"Script/Extension/Message/Message.h"
 #include"google/protobuf/util/json_util.h"
 #include"Component/Lua/LuaScriptComponent.h"
-
+#include"Network/Listener/TcpServerComponent.h"
 namespace Client
 {
-	ClientTask::ClientTask()
+	ClientTask::ClientTask(int ms)
+        : Sentry::IRpcTask<c2s::Rpc::Response>(ms)
 	{
 		this->mTaskId = Guid::Create();
 	}
@@ -19,6 +20,13 @@ namespace Client
 	{
 		this->mTask.SetResult(response);
 	}
+
+    void ClientTask::OnTimeout()
+    {
+        std::shared_ptr<c2s::Rpc::Response> response(new c2s::Rpc::Response());
+        response->set_code((int)XCode::CallTimeout);
+        this->mTask.SetResult(response);
+    }
 
 }
 
@@ -70,7 +78,7 @@ namespace Client
 
 	std::shared_ptr<c2s::Rpc::Response> ClientComponent::Call(std::shared_ptr<c2s::Rpc::Request> request)
 	{
-		std::shared_ptr<ClientTask> clienRpcTask(new ClientTask());
+		std::shared_ptr<ClientTask> clienRpcTask(new ClientTask(0));
 		request->set_rpc_id(clienRpcTask->GetRpcId());
 		
 		this->AddTask(clienRpcTask);
@@ -99,17 +107,11 @@ namespace Client
 
 	bool ClientComponent::StartConnect(const std::string& ip, unsigned short port)
 	{
-		asio::io_service& thread = this->GetApp()->GetThread();
-		std::shared_ptr<SocketProxy> socketProxy(new SocketProxy(thread));
-
-        socketProxy->Init(ip, port);
+        TcpServerComponent * tcpComponent = this->GetComponent<TcpServerComponent>();
+		std::shared_ptr<SocketProxy> socketProxy = tcpComponent->CreateSocket(ip, port);
 		this->mTcpClient = std::make_shared<TcpRpcClientContext>(socketProxy, this);
-		if(this->mTcpClient->StartConnect())
-		{
-			this->mTcpClient->StartReceive();
-			return true;
-		}
-		return false;
+
+		return true;
 	}
 
 	void ClientComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)

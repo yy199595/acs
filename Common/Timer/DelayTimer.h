@@ -12,13 +12,7 @@ namespace Sentry
 			: TimerBase(ms), mFunc(func) {}
         ~DelayTimer() final { delete this->mFunc;}
 	public:
-		void Invoke(TimerState state) final
-		{
-			if(state == TimerState::Ok)
-			{
-				this->mFunc->run();
-			}
-		}
+		void Invoke() final { this->mFunc->run(); }
 	private:
 		StaticMethod * mFunc;
 	};
@@ -33,7 +27,7 @@ namespace Sentry
 			: TimerBase(ms), ref(ref), mLua(lua) { }
 			~LuaTimer() { luaL_unref(this->mLua, LUA_REGISTRYINDEX, ref);}
 	public:
-		void Invoke(TimerState state = TimerState::Ok) final
+		void Invoke() final
 		{
 			lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, ref);
 			if (lua_pcall(this->mLua, 0, 0, 0) != 0)

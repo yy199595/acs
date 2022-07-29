@@ -15,12 +15,12 @@ namespace Sentry
     class ClientRpcTask : public IRpcTask<com::Rpc::Response>
     {
     public:
-        ClientRpcTask(const c2s::Rpc::Request & request, GateComponent * component);
+        ClientRpcTask(const c2s::Rpc::Request & request, GateComponent * component, int ms);
 
     public:
-        int GetTimeout() final { return 0; }
         long long GetRpcId() final { return this->mTaskId; }
     private:
+        void OnTimeout() final;
         void OnResponse(std::shared_ptr<com::Rpc::Response> response) final;
     private:
         long long mRpcId;

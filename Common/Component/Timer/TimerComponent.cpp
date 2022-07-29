@@ -51,12 +51,7 @@ namespace Sentry
 		auto iter = this->mTimerMap.find(id);
 		if (iter != this->mTimerMap.end())
 		{
-			std::shared_ptr<TimerBase> timer = iter->second;
-			if (timer != nullptr)
-			{
-				timer->Invoke(TimerState::Cancel);
-			}
-			this->mTimerMap.erase(iter);
+            this->mRemoveTimers.push(id);
 			return true;
 		}
 		return false;
@@ -74,6 +69,18 @@ namespace Sentry
 		const int tick = subTime / this->TimerPrecision;
 
 		if (tick <= 0) return;
+
+        while(!this->mRemoveTimers.empty())
+        {
+            long long id = this->mRemoveTimers.front();
+            auto iter = this->mTimerMap.find(id);
+            if(iter != this->mTimerMap.end())
+            {
+                this->mTimerMap.erase(iter);
+            }
+            this->mRemoveTimers.pop();
+        }
+
 		this->mNextUpdateTime = nowTime - (subTime % this->TimerPrecision);
 
 		for (int count = 0; count < tick; count++)

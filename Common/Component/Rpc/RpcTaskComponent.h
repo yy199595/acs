@@ -17,6 +17,7 @@ namespace Sentry
         typedef std::shared_ptr<IRpcTask<T>> RpcTask;
     public:
         bool AddTask(RpcTask task);
+        void OnTimeout(long long taskId);
         bool OnResponse(long long taskId, std::shared_ptr<T> message);
 	protected:
 		virtual void OnAddTask(RpcTask task) { }
@@ -38,6 +39,18 @@ namespace Sentry
         }
         LOG_FATAL(this->GetName() << " add task error id = " << task->GetRpcId());
         return false;
+    }
+    template<typename T>
+    void RpcTaskComponent<T>::OnTimeout(long long taskId)
+    {
+        auto iter = this->mTasks.find(taskId);
+        if(iter != this->mTasks.end())
+        {
+            RpcTask rpcTask = iter->second;
+            rpcTask->OnTimeout();
+            this->mTasks.erase(iter);
+            LOG_FATAL(this->GetName() << " rpc task time out id " << taskId);
+        }
     }
 
     template<typename T>

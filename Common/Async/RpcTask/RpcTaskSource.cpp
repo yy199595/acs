@@ -7,6 +7,15 @@ namespace Sentry
         this->mTaskSource.SetResult(response);
     }
 
+    void RpcTaskSource::OnTimeout()
+    {
+        std::shared_ptr<com::Rpc::Response> response(new com::Rpc::Response());
+
+        response->set_error_str("rpc call time out");
+        response->set_code((int)XCode::CallTimeout);
+        this->mTaskSource.SetResult(response);
+    }
+
 	std::shared_ptr<com::Rpc_Response> RpcTaskSource::Await()
 	{
 		return this->mTaskSource.Await();
@@ -15,19 +24,19 @@ namespace Sentry
 
 namespace Sentry
 {
-	LuaRpcTaskSource::LuaRpcTaskSource(lua_State* lua)
-		: mTask(lua)
+	LuaRpcTaskSource::LuaRpcTaskSource(lua_State* lua, int ms)
+		: IRpcTask<com::Rpc::Response>(ms), mTask(lua)
 	{
 		this->mTaskId = Guid::Create();
 	}
 
+    void LuaRpcTaskSource::OnTimeout()
+    {
+        this->mTask.SetResult(XCode::CallTimeout, nullptr);
+    }
+
 	void LuaRpcTaskSource::OnResponse(std::shared_ptr<com::Rpc_Response> response)
 	{
-		if(response == nullptr)
-		{
-			this->mTask.SetResult(XCode::CallTimeout, nullptr);
-			return;
-		}
 		XCode code = (XCode)response->code();
 		if(code == XCode::Successful && response->has_data())
 		{

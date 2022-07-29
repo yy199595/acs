@@ -125,7 +125,7 @@ namespace Sentry
 	{
 		long long taskId = task->GetRpcId();
 		long long timerId = this->mTimeComponent->DelayCall(
-			10, &HttpComponent::OnResponse, this, taskId, nullptr);
+			10, &HttpComponent::OnTimeout, this, taskId);
 		this->mTimers.emplace(taskId, timerId);
 	}
 

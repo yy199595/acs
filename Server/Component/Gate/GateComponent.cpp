@@ -17,7 +17,8 @@
 
 namespace Sentry
 {
-    ClientRpcTask::ClientRpcTask(const c2s::Rpc::Request &request, GateComponent * component)
+    ClientRpcTask::ClientRpcTask(const c2s::Rpc::Request &request, GateComponent * component, int ms)
+        : IRpcTask<com::Rpc::Response>(ms)
     {
         this->mTaskId = Guid::Create();
         this->mRpcId = request.rpc_id();
@@ -25,13 +26,17 @@ namespace Sentry
         this->mAddress = request.address();
     }
 
+    void ClientRpcTask::OnTimeout()
+    {
+        std::shared_ptr<com::Rpc::Response> response(new com::Rpc::Response());
+
+        response->set_rpc_id(this->mRpcId);
+        response->set_code((int)XCode::CallTimeout);
+        this->mGateComponent->OnResponse(this->mAddress, response);
+    }
+
     void ClientRpcTask::OnResponse(std::shared_ptr<com::Rpc::Response> response)
     {
-        if(response == nullptr)
-        {
-            response = std::make_shared<com::Rpc::Response>();
-            response->set_code((int)XCode::CallTimeout);
-        }
         response->set_rpc_id(this->mRpcId);
         this->mGateComponent->OnResponse(this->mAddress, response);
     }
@@ -126,7 +131,7 @@ namespace Sentry
                 addressProxy.AddUserAddress(userId, targetAddress);
             }
             std::shared_ptr<ClientRpcTask> clientRpcTask
-                = std::make_shared<ClientRpcTask>(*request, this);
+                = std::make_shared<ClientRpcTask>(*request, this, 0);
 
             userRequest->set_rpc_id(clientRpcTask->GetRpcId());
             this->mServiceRpcComponent->AddTask(clientRpcTask);

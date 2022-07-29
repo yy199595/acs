@@ -7,13 +7,18 @@
 #include"Network/Listener/TcpServerComponent.h"
 namespace Sentry
 {
-	MongoTask::MongoTask(int id)
-        : mTaskId(id) { }
+	MongoTask::MongoTask(int id, int ms)
+        : IRpcTask<Mongo::MongoQueryResponse>(ms), mTaskId(id) { }
 
 	void MongoTask::OnResponse(std::shared_ptr<Mongo::MongoQueryResponse> response)
 	{
 		this->mTask.SetResult(response);
 	}
+
+    void MongoTask::OnTimeout()
+    {
+        this->mTask.SetResult(nullptr);
+    }
 }
 
 namespace Sentry
@@ -128,7 +133,7 @@ namespace Sentry
 			request->collectionName = this->mConfig.mDb + ".$cmd";
 		}
         request->mTaskId = this->mRequestId.Pop();
-		std::shared_ptr<MongoTask> mongoTask(new MongoTask(request->mTaskId));
+		std::shared_ptr<MongoTask> mongoTask(new MongoTask(request->mTaskId, 0));
 		if(!this->AddTask(mongoTask))
 		{
 			return nullptr;

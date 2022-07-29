@@ -14,36 +14,41 @@ namespace Sentry
     class IRpcTask : public std::enable_shared_from_this<IRpcTask<T>>
     {
     public:
-        virtual int GetTimeout() = 0;
+        IRpcTask(int ms) : mTimeout(ms) { }
+        virtual ~IRpcTask() { }
+    public:
         virtual long long GetRpcId() = 0;
+        int GetTimeout() const { return this->mTimeout; };
+    public:
+        virtual void OnTimeout() { throw logic_error("");};
         virtual void OnResponse(std::shared_ptr<T> response) = 0;
+    private:
+        int mTimeout;
     };
 
     class RpcTaskSource : public IRpcTask<com::Rpc::Response>
     {
     public:
-        RpcTaskSource(float timeout = 0) : mTimeout(timeout * 1000) { }
+        RpcTaskSource(int ms) : IRpcTask<com::Rpc::Response>(ms) { }
         long long GetRpcId() final { return mTaskSource.GetTaskId(); }
     protected:
-        int GetTimeout() final { return this->mTimeout;}
+        void OnTimeout() final;
         void OnResponse(std::shared_ptr<com::Rpc_Response> response) final;
-
     public:
 		std::shared_ptr<com::Rpc_Response> Await();
     private:
-        const int mTimeout;
         TaskSource<std::shared_ptr<com::Rpc_Response>> mTaskSource;
     };
 
 	class LuaRpcTaskSource :  public IRpcTask<com::Rpc::Response>
 	{
 	 public:
-		LuaRpcTaskSource(lua_State * lua);
+		LuaRpcTaskSource(lua_State * lua, int ms);
 	 public:
 		int Await() { return this->mTask.Await(); }
 		long long GetRpcId() final { return this->mTaskId; }
 	 private:
-		int GetTimeout() final { return 0;}
+        void OnTimeout() final;
 		void OnResponse(std::shared_ptr<com::Rpc::Response> response) final;
 	 private:
 		long long mTaskId;

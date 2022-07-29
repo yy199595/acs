@@ -102,7 +102,8 @@ namespace Sentry
 	class IRpc
 	{
 	public:
-		virtual void OnRequest(std::shared_ptr<T1> t1) = 0;
+        virtual ~IRpc() { }
+        virtual void OnRequest(std::shared_ptr<T1> t1) = 0;
 		virtual void OnResponse(std::shared_ptr<T2> t2) = 0;
 		virtual void StartClose(const std::string& address) = 0;
 		virtual void OnCloseSocket(const std::string& address, XCode code) = 0;

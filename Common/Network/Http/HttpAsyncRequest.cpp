@@ -25,11 +25,10 @@ namespace Sentry
     }
 
     LuaHttpTask::LuaHttpTask(lua_State *lua, int timeout)
-        : mRef(0)
+        : IRpcTask<HttpAsyncResponse>(timeout),mRef(0)
     {
         this->mLua = lua;
         lua_pushthread(lua);
-        this->mTimeout = timeout;
         this->mTaskId = Helper::Guid::Create();
         if(lua_isthread(this->mLua, -1))
         {
@@ -39,10 +38,17 @@ namespace Sentry
 
     LuaHttpTask::~LuaHttpTask()
     {
-        if(this->mRef == 0)
+        if(this->mRef != 0)
         {
             luaL_unref(this->mLua, LUA_REGISTRYINDEX, this->mRef);
         }
+    }
+
+    void LuaHttpTask::OnTimeout()
+    {
+        constexpr HttpStatus code = HttpStatus::INTERNAL_SERVER_ERROR;
+        std::shared_ptr<HttpAsyncResponse> response(new HttpDataResponse(code));
+        this->OnResponse(response);
     }
 
     void LuaHttpTask::OnResponse(std::shared_ptr<HttpAsyncResponse> response)
@@ -162,7 +168,19 @@ namespace Sentry
         return false;
     }
 
-    void HttpData::WriterString(lua_State *lua, const char *name, const std::string &str) const
+    void HttpData::WriterStatus(lua_State *lua) const
+    {
+        if(this->mStatus != 0)
+        {
+            lua_pushinteger(lua, this->mStatus);
+            lua_setfield(lua, -2, "status");
+            const char * err = HttpStatusToString((HttpStatus)this->mStatus);
+            lua_pushstring(lua, err);
+            lua_setfield(lua, -2, "error");
+        }
+    }
+
+    void HttpData::Writer(lua_State *lua, const char *name, const std::string &str) const
     {
         if(!str.empty() && name != nullptr)
         {
@@ -173,12 +191,14 @@ namespace Sentry
 
     void HttpData::Writer(lua_State *lua) const
     {
-        lua_createtable(lua, 0, 6);
-        this->WriterString(lua, "data", this->mData);
-        this->WriterString(lua, "path", this->mPath);
-        this->WriterString(lua, "method", this->mMethod);
-        this->WriterString(lua, "version", this->mVersion);
-        this->WriterString(lua, "address", this->mAddress);
+        lua_createtable(lua, 0, 8);
+
+        this->WriterStatus(lua);
+        this->Writer(lua, "data", this->mData);
+        this->Writer(lua, "path", this->mPath);
+        this->Writer(lua, "method", this->mMethod);
+        this->Writer(lua, "version", this->mVersion);
+        this->Writer(lua, "address", this->mAddress);
         if(this->mHead.size() > 0)
         {
             lua_createtable(lua, 0, this->mHead.size());
@@ -187,10 +207,10 @@ namespace Sentry
             {
                 const std::string &key = iter->first;
                 const std::string &value = iter->second;
-                this->WriterString(lua, key.c_str(), value);
+                this->Writer(lua, key.c_str(), value);
             }
+            lua_setfield(lua, -2, "head");
         }
-        lua_setfield(lua, -2, "head");
     }
 }
 
@@ -218,10 +238,18 @@ namespace Sentry
 namespace Sentry
 {
 	HttpTask::HttpTask(int timeout)
+        : IRpcTask<HttpAsyncResponse>(timeout)
 	{
-		this->mTimeout = timeout;
 		this->mTaskId = Helper::Guid::Create();
 	}
+
+    void HttpTask::OnTimeout()
+    {
+        std::shared_ptr<HttpDataResponse> response(
+                new HttpDataResponse(HttpStatus::REQUEST_TIMEOUT));
+        this->OnResponse(response);
+    }
+
 	void HttpTask::OnResponse(std::shared_ptr<HttpAsyncResponse> response)
 	{
 		this->mTask.SetResult(response);
@@ -262,10 +290,10 @@ namespace Sentry
 
 namespace Sentry
 {
-	HttpAsyncResponse::HttpAsyncResponse()
+	HttpAsyncResponse::HttpAsyncResponse(HttpStatus code)
 	{
-		this->mHttpCode = 0;
-		this->mState = HttpDecodeState::FirstLine;
+        this->mHttpData.mStatus = (int)code;
+        this->mState = HttpDecodeState::FirstLine;
 	}
 
 	int HttpAsyncResponse::OnReceiveLine(std::istream & streamBuffer)
@@ -273,9 +301,9 @@ namespace Sentry
 		if (this->mState == HttpDecodeState::FirstLine)
 		{
 			this->mState = HttpDecodeState::HeadLine;
-			streamBuffer >> this->mHttpData.mVersion >> this->mHttpCode >> this->mHttpError;
-			streamBuffer.ignore(2); //放弃\r\n
-		}
+			streamBuffer >> this->mHttpData.mVersion >> this->mHttpData.mStatus >> this->mHttpError;
+            streamBuffer.ignore(2); //放弃\r\n
+        }
 		if (this->mState == HttpDecodeState::HeadLine)
 		{
 			std::string lineData;
@@ -301,10 +329,11 @@ namespace Sentry
 
 namespace Sentry
 {
-	HttpFileResponse::HttpFileResponse(std::fstream* fs)
+	HttpFileResponse::HttpFileResponse(std::fstream* fs, HttpStatus code)
+        : HttpAsyncResponse(code)
 	{
 		this->mFstream = fs;
-	}
+    }
 
 	HttpFileResponse::~HttpFileResponse() noexcept
 	{

@@ -19,7 +19,8 @@ namespace Sentry
         std::shared_ptr<SocketProxy> CreateSocket();
         void DeleteSocket(std::shared_ptr<SocketProxy> socket);
         bool OnListenConnect(const std::string & name, std::shared_ptr<SocketProxy> socket);
-	private:
+        std::shared_ptr<SocketProxy> CreateSocket(const std::string & ip, unsigned short port);
+    private:
 		bool LateAwake() final;
 		bool LoadServerConfig();
 		void OnAllServiceStart() final;

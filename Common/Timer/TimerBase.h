@@ -6,14 +6,6 @@
 
 namespace Sentry
 {
-	enum class TimerState
-	{
-		None,
-		Ok,
-		Cancel
-	};
-
-
     class TimerBase
     {
     public:
@@ -23,7 +15,7 @@ namespace Sentry
         virtual ~TimerBase() = default;
 
     public:
-        virtual void Invoke(TimerState state = TimerState::Ok) = 0;
+        virtual void Invoke() = 0;
     public:
         long long GetTimerId() const { return mTimerId; }
         long long GetTargetTime() const { return this->mTargetTime; }

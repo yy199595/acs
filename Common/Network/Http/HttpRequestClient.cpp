@@ -15,7 +15,8 @@ namespace Sentry
 	void HttpRequestClient::Request(std::shared_ptr<HttpAsyncRequest> httpRequest)
 	{
 		this->mRequest = httpRequest;
-		this->mResponse = std::make_shared<HttpDataResponse>();
+        constexpr HttpStatus defaulStatus = HttpStatus::INTERNAL_SERVER_ERROR;
+		this->mResponse = std::make_shared<HttpDataResponse>(defaulStatus);
 #ifdef ONLY_MAIN_THREAD
 		this->ConnectHost();
 #else
@@ -27,7 +28,8 @@ namespace Sentry
     void HttpRequestClient::Request(std::shared_ptr<HttpAsyncRequest> httpRequest, std::fstream * fs)
     {
         this->mRequest = httpRequest;
-        this->mResponse = std::make_shared<HttpFileResponse>(fs);
+        constexpr HttpStatus defaulStatus = HttpStatus::INTERNAL_SERVER_ERROR;
+        this->mResponse = std::make_shared<HttpFileResponse>(fs, defaulStatus);
 #ifdef ONLY_MAIN_THREAD
 		this->ConnectHost();
 #else

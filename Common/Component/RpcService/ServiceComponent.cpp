@@ -179,7 +179,7 @@ namespace Sentry
 	XCode ServiceComponent::Call(const std::string& address, std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<Message> response)
 	{
 		std::shared_ptr<RpcTaskSource> taskSource =
-			std::make_shared<RpcTaskSource>();
+			std::make_shared<RpcTaskSource>(0);
 		request->set_rpc_id(taskSource->GetRpcId());
 		this->mRpcComponent->AddTask(taskSource);
 		if(this->SendRequest(address, request) != XCode::Successful)

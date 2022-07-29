@@ -18,9 +18,9 @@ namespace Client
     class ClientTask : public Sentry::IRpcTask<c2s::Rpc::Response>
     {
     public:
-        ClientTask();
+        ClientTask(int ms);
     public:
-        int GetTimeout() { return 0; };
+        void OnTimeout() final;
         long long GetRpcId() { return this->mTaskId; }
         void OnResponse(std::shared_ptr<c2s::Rpc::Response> response);
         std::shared_ptr<c2s::Rpc::Response> Await() { return this->mTask.Await(); }
@@ -32,7 +32,6 @@ namespace Client
 
 namespace Client
 {
-    class ClientRpcTask;
     class TcpRpcClientContext;
 
     class ClientComponent : public RpcTaskComponent<c2s::Rpc::Response>, public IComplete, public ILuaRegister

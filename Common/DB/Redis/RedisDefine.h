@@ -38,8 +38,9 @@ namespace Sentry
     public:
 		const std::string ToJson();
 		int Serailize(std::ostream &os) final;
-		std::shared_ptr<RedisTask> MakeTask();
-	 public:
+		std::shared_ptr<RedisTask> MakeTask(int ms = 0);
+        std::shared_ptr<LuaRedisTask> MakeLuaTask(lua_State * lua, int ms = 0);
+    public:
 		template<typename ... Args>
 		static std::shared_ptr<RedisRequest> Make(const std::string & cmd, Args &&... args);
 
@@ -54,7 +55,6 @@ namespace Sentry
 		void AddParameter(const Message & message);
 		void AddParameter(const std::string & value);
 		void AddString(const char * str, size_t size);
-		std::shared_ptr<LuaRedisTask> MakeLuaTask(lua_State * lua);
 
         long long GetTaskId() const { return this->mTaskId;}
         const std::string & GetCommand() const { return this->mCommand;}
@@ -131,10 +131,9 @@ namespace Sentry
     class RedisTask : public IRpcTask<RedisResponse>
     {
     public:
-        RedisTask(std::shared_ptr<RedisRequest> request);
+        RedisTask(std::shared_ptr<RedisRequest> request, int ms);
         ~RedisTask() = default;
     public:
-        int GetTimeout() final { return 0;}
         long long GetRpcId() final { return this->mTaskId; }
         void OnResponse(std::shared_ptr<RedisResponse> response) final;
         std::shared_ptr<RedisResponse> Await() { return this->mTask.Await(); }
@@ -147,11 +146,10 @@ namespace Sentry
     class LuaRedisTask : public IRpcTask<RedisResponse>
     {
     public:
-        LuaRedisTask(lua_State * lua, std::shared_ptr<RedisRequest> request);
+        LuaRedisTask(lua_State * lua, std::shared_ptr<RedisRequest> request, int ms);
         ~LuaRedisTask();
     public:
         int Await();
-        int GetTimeout() final { return 0;}
         long long GetRpcId() final { return this->mTaskId;}
         void OnResponse(std::shared_ptr<RedisResponse> response) final;
     private:

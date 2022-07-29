@@ -18,10 +18,12 @@ namespace Sentry
 	class MongoTask : public IRpcTask<Mongo::MongoQueryResponse>
 	{
 	public:
-		MongoTask(int taskId);
+		MongoTask(int taskId, int ms);
 	public:
-		int GetTimeout() final { return 0;}
 		long long GetRpcId() final { return this->mTaskId; }
+
+    public:
+        void OnTimeout() final;
 		void OnResponse(std::shared_ptr<Mongo::MongoQueryResponse> response) final;
 		std::shared_ptr<Mongo::MongoQueryResponse> Await() { return mTask.Await(); }
 	private:

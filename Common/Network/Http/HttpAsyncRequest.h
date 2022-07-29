@@ -25,11 +25,12 @@ namespace Sentry
         HttpTask(int time = 0);
     public:
         long long GetRpcId() { return this->mTaskId;}
-        int GetTimeout() final { return this->mTimeout;}
+
+    public:
+        void OnTimeout();
         void OnResponse(std::shared_ptr<HttpAsyncResponse> response);
         std::shared_ptr<HttpAsyncResponse> Await() { return this->mTask.Await();}
     private:
-        int mTimeout;
         long long mTaskId;
         TaskSource<std::shared_ptr<HttpAsyncResponse>> mTask;
     };
@@ -45,13 +46,14 @@ namespace Sentry
         LuaHttpTask(lua_State * lua, int timeout);
         ~LuaHttpTask();
     public:
-        int Await(std::shared_ptr<HttpRequestClient> client);
-        int GetTimeout() final { return this->mTimeout; }
         long long GetRpcId() final { return this->mTaskId; }
+        int Await(std::shared_ptr<HttpRequestClient> client);
+
+    public:
+        void OnTimeout() final;
         void OnResponse(std::shared_ptr<HttpAsyncResponse> response) final;
     private:
         int mRef;
-        int mTimeout;
         lua_State * mLua;
         long long mTaskId;
 		std::shared_ptr<HttpRequestClient> mRequestClient;
@@ -142,8 +144,10 @@ namespace Sentry
 
     public:
         void Writer(lua_State *lua) const;
-        void WriterString(lua_State * lua, const char * name, const std::string & str) const;
+        void WriterStatus(lua_State * lua) const;
+        void Writer(lua_State * lua, const char * name, const std::string & str) const;
     public:
+        int mStatus;
         std::string mPath;
         std::string mData;
         std::string mMethod;
@@ -170,18 +174,11 @@ namespace Sentry
 	class HttpAsyncResponse : public IHttpContent
 	{
 	 public:
-		HttpAsyncResponse();
+		HttpAsyncResponse(HttpStatus code);
 		virtual ~HttpAsyncResponse() = default;
 	 public:
 		int OnReceiveLine(std::istream & streamBuffer) final;
-		HttpStatus GetHttpCode()
-		{
-			return (HttpStatus)this->mHttpCode;
-		}
-		const std::string& GetContent() const final
-		{
-			return this->mHttpData.mData;
-		}
+		const std::string& GetContent() const final { return this->mHttpData.mData; }
 	 public:
 		void SetError(const asio::error_code& code);
 		bool GetHead(const std::string& key, int& value) const;
@@ -191,7 +188,6 @@ namespace Sentry
 	 protected:
 		HttpData mHttpData;
 	 private:
-		int mHttpCode;
 		asio::error_code mCode;
 		std::string mHttpError;
 		HttpDecodeState mState;
@@ -203,7 +199,7 @@ namespace Sentry
 	class HttpFileResponse : public HttpAsyncResponse
 	{
 	 public:
-		HttpFileResponse(std::fstream* fs);
+		HttpFileResponse(std::fstream* fs, HttpStatus code);
 		~HttpFileResponse();
 	 private:
 		int OnReceiveSome(std::istream & streamBuffer) final;
@@ -218,7 +214,7 @@ namespace Sentry
 	class HttpDataResponse : public HttpAsyncResponse
 	{
 	 public:
-		HttpDataResponse() = default;
+		HttpDataResponse(HttpStatus code) : HttpAsyncResponse(code) { }
 	 private:
 		int OnReceiveSome(std::istream & streamBuffer) final;
 	 private:

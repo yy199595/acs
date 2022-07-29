@@ -55,16 +55,16 @@ namespace Sentry
 		return 0;
     }
 
-    std::shared_ptr<RedisTask> RedisRequest::MakeTask()
+    std::shared_ptr<RedisTask> RedisRequest::MakeTask(int ms)
     {
-        std::shared_ptr<RedisTask> redisTask(new RedisTask(this->shared_from_this()));
+        std::shared_ptr<RedisTask> redisTask(new RedisTask(this->shared_from_this(), ms));
         this->mTaskId = redisTask->GetRpcId();
         return redisTask;
     }
 
-    std::shared_ptr<LuaRedisTask> RedisRequest::MakeLuaTask(lua_State *lua)
+    std::shared_ptr<LuaRedisTask> RedisRequest::MakeLuaTask(lua_State *lua, int ms)
     {
-        std::shared_ptr<LuaRedisTask> redisTask(new LuaRedisTask(lua, this->shared_from_this()));
+        std::shared_ptr<LuaRedisTask> redisTask(new LuaRedisTask(lua, this->shared_from_this(), ms));
         this->mTaskId = redisTask->GetRpcId();
         return redisTask;
     }
@@ -238,7 +238,8 @@ namespace Sentry
 
 namespace Sentry
 {
-    RedisTask::RedisTask(std::shared_ptr<RedisRequest> request)
+    RedisTask::RedisTask(std::shared_ptr<RedisRequest> request, int ms)
+        : IRpcTask<RedisResponse>(ms)
     {
 		this->mRequest = request;
 		this->mTaskId = Helper::Guid::Create();
@@ -249,8 +250,8 @@ namespace Sentry
         this->mTask.SetResult(response);
     }
 
-    LuaRedisTask::LuaRedisTask(lua_State *lua, std::shared_ptr<RedisRequest> request)
-        : mLua(lua)
+    LuaRedisTask::LuaRedisTask(lua_State *lua, std::shared_ptr<RedisRequest> request, int ms)
+        : IRpcTask<RedisResponse>(ms), mLua(lua)
     {
         this->mRef = 0;
         if(lua_isthread(this->mLua, -1))

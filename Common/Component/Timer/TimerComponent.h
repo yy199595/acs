@@ -50,6 +50,7 @@ namespace Sentry
 		const int FirstLayerCount = 256;
 	 private:
 		long long mNextUpdateTime;
+        std::queue<long long> mRemoveTimers;
 		std::vector<TimeWheelLayer*> mTimerLayers;
 		std::unordered_map<long long, std::shared_ptr<TimerBase>> mTimerMap;//所有timer的列表
 	};

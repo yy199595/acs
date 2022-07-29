@@ -68,7 +68,7 @@ namespace Lua
 		}
 
 		lua_pushthread(lua);
-		std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource(new LuaRpcTaskSource(lua));
+		std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource(new LuaRpcTaskSource(lua, 0));
 		ServiceRpcComponent * rpcHandlerComponent = App::Get()->GetComponent<ServiceRpcComponent>();
 
 
