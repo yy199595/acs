@@ -398,6 +398,7 @@ namespace Sentry
 {
     HttpHandlerRequest::HttpHandlerRequest(const std::string & address)
     {
+		this->mHttpData.mStatus = 0;
 		this->mHttpData.mAddress = address;
         this->mState = HttpDecodeState::FirstLine;
     }
