@@ -73,8 +73,7 @@ namespace Mongo
 				std::string json;
 				this->mMongoRequest->document.WriterToJson(json);
 				CONSOLE_LOG_DEBUG(json);
-                return;
-				//assert(length > 0);
+				assert(length > 0);
 			}
 			this->ReceiveMessage(length);
 			return;
