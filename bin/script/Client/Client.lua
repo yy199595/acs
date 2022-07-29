@@ -42,13 +42,13 @@ function Client.StartLogic()
         user_id = 1122, msg_type = 1, message = "hello"
     })
     Log.Error("code = ", res, Json.Encode(response))
-    coroutine.start(LoopCall)
-    coroutine.start(LoopCall)
-    coroutine.start(LoopCall)
-    coroutine.start(LoopLogin)
-    coroutine.start(LoopRegister)
-    coroutine.start(LoopLogin)
-    coroutine.start(LoopRegister)
+    --coroutine.start(LoopCall)
+    --coroutine.start(LoopCall)
+    --coroutine.start(LoopCall)
+    --coroutine.start(LoopLogin)
+    --coroutine.start(LoopRegister)
+    --coroutine.start(LoopLogin)
+    --coroutine.start(LoopRegister)
 
 end
 
