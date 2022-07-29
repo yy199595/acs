@@ -147,7 +147,7 @@ namespace Tcp
 	{
 		if(length <= 0)
 		{
-			CONSOLE_LOG_ERROR(length);
+			CONSOLE_LOG_FATAL(length);
 			return;
 		}
         if (length >= this->mMaxCount)
