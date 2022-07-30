@@ -15,6 +15,8 @@ namespace Sentry
 
 	void HttpHandlerClient::StartReceive()
 	{
+        assert(this->mRecvBuffer.size() == 0);
+        assert(this->mSendBuffer.size() == 0);
         const std::string & address = this->mSocket->GetAddress();
         this->mHttpResponse = std::make_shared<HttpHandlerResponse>();
         this->mHttpRequest = std::make_shared<HttpHandlerRequest>(address);

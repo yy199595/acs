@@ -34,7 +34,7 @@ namespace Sentry
 		LOG_CHECK_RET(config.GetMember("thread", "network", networkCount));
 		for (int index = 0; index < networkCount; index++)
 		{
-            asio::io_service * io = new asio::io_service(1);
+            asio::io_service * io = new asio::io_service();
             asio::io_service::work * work = new asio::io_service::work(*io);
             this->mNetThreads.emplace_back(io);
             this->mNetThreadWorks.emplace_back(work);
@@ -50,7 +50,7 @@ namespace Sentry
 #ifndef ONLY_MAIN_THREAD
 		for (asio::io_service * io: this->mNetThreads)
         {
-            std::thread *t = new std::thread([io]() {
+            std::thread *t = new std::thread([io](){
                 asio::error_code code;
                 io->run(code);
             });

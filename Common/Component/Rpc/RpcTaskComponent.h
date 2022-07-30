@@ -37,7 +37,7 @@ namespace Sentry
             this->mTasks.emplace(taskId, task);
             return true;
         }
-        LOG_FATAL(this->GetName() << " add task error id = " << task->GetRpcId());
+        LOG_ERROR(this->GetName() << " add task error id = " << task->GetRpcId());
         return false;
     }
     template<typename T>
@@ -49,7 +49,7 @@ namespace Sentry
             RpcTask rpcTask = iter->second;
             rpcTask->OnTimeout();
             this->mTasks.erase(iter);
-            LOG_FATAL(this->GetName() << " rpc task time out id " << taskId);
+            LOG_ERROR(this->GetName() << " rpc task time out id " << taskId);
         }
     }
 

@@ -120,23 +120,4 @@ namespace Sentry
         }
         return response;
 	}
-
-	void HttpComponent::OnAddTask(RpcTask task)
-	{
-		long long taskId = task->GetRpcId();
-		long long timerId = this->mTimeComponent->DelayCall(
-			10, &HttpComponent::OnTimeout, this, taskId);
-		this->mTimers.emplace(taskId, timerId);
-	}
-
-	void HttpComponent::OnDelTask(long long taskId, RpcTask task)
-	{
-		auto iter = this->mTimers.find(taskId);
-		if(iter != this->mTimers.end())
-		{
-			long long id = iter->second;
-			this->mTimers.erase(iter);
-			this->mTimeComponent->CancelTimer(id);
-		}
-	}
 }

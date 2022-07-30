@@ -143,7 +143,7 @@ namespace Sentry
 		this->mLastUpdateTime = Helper::Time::GetNowMilTime();
 
         std::chrono::milliseconds time(1);
-        this->mMainThread = new asio::io_service(1);
+        this->mMainThread = new asio::io_service();
         asio::io_service::work * work = new asio::io_service::work(*mMainThread);
         while(!this->mMainThread->stopped())
         {

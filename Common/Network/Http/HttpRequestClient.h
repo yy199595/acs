@@ -15,9 +15,10 @@ namespace Sentry
 	 public:
 		HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy, HttpComponent * component);
 	 public:
-		void Request(std::shared_ptr<HttpAsyncRequest> request);
-		void Request(std::shared_ptr<HttpAsyncRequest> request, std::fstream * fs);
+		void Request(std::shared_ptr<HttpAsyncRequest> request, int time = 15);
+		void Request(std::shared_ptr<HttpAsyncRequest> request, std::fstream * fs, int time = 15);
 	 private:
+        void OnTimeout();
         void ConnectHost();
         void OnComplete(const asio::error_code & code);
         void OnConnect(const asio::error_code &error, int count) final;
@@ -25,8 +26,10 @@ namespace Sentry
         void OnReceiveMessage(const asio::error_code &code, std::istream & is) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
 	 private:
+        int mTimeout;
 		HttpComponent * mHttpComponent;
-		std::shared_ptr<HttpAsyncRequest> mRequest;
+        std::shared_ptr<asio::steady_timer> mTimer;
+        std::shared_ptr<HttpAsyncRequest> mRequest;
 		std::shared_ptr<HttpAsyncResponse> mResponse;
 	};
 }
