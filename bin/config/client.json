@@ -10,8 +10,7 @@
     "path": {
         "log": "log",
         "source": "source",
-        "proto": "proto/message",
-        "service": "config/service.json"
+        "proto": "proto/message"
     },
     "lua": {
         "require": [
@@ -23,12 +22,6 @@
         "HttpComponent",
         "NetThreadComponent",
         "LuaScriptComponent",
-        "RpcClientComponent",
-        "ServiceRpcComponent",
-        "GateClientComponent",
-        "UserSyncComponent",
-        "ServiceMgrComponent",
-        "HttpServiceComponent",
         "ClientComponent"
     ]
 }

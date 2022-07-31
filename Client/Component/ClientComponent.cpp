@@ -7,7 +7,7 @@
 #include"Script/Extension/Message/Message.h"
 #include"google/protobuf/util/json_util.h"
 #include"Component/Lua/LuaScriptComponent.h"
-#include"Network/Listener/TcpServerComponent.h"
+#include"Component/Scene/NetThreadComponent.h"
 namespace Client
 {
 	ClientTask::ClientTask(int ms)
@@ -107,8 +107,8 @@ namespace Client
 
 	bool ClientComponent::StartConnect(const std::string& ip, unsigned short port)
 	{
-        TcpServerComponent * tcpComponent = this->GetComponent<TcpServerComponent>();
-		std::shared_ptr<SocketProxy> socketProxy = tcpComponent->CreateSocket(ip, port);
+        NetThreadComponent * netComponent = this->GetComponent<NetThreadComponent>();
+		std::shared_ptr<SocketProxy> socketProxy = netComponent->CreateSocket(ip, port);
 		this->mTcpClient = std::make_shared<TcpRpcClientContext>(socketProxy, this);
 
 		return true;

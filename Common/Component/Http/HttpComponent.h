@@ -39,7 +39,7 @@ namespace Sentry
 	 private:
 		TimerComponent * mTimeComponent;
 		class TaskComponent* mTaskComponent;
-        class TcpServerComponent * mTcpComponent;
+        class NetThreadComponent * mNetComponent;
         std::queue<std::shared_ptr<HttpRequestClient>> mClientPools;
         std::set<std::shared_ptr<HttpRequestClient>> mRequestClients;
 	};

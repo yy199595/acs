@@ -4,7 +4,7 @@
 #include<Method/MethodProxy.h>
 #include<Define/CommonLogDef.h>
 #include"TcpServerComponent.h"
-
+#include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {
 	TcpServerListener::TcpServerListener(const ListenConfig *config)
@@ -14,6 +14,7 @@ namespace Sentry
         this->mErrorCount = 0;
         this->mTcpComponent = nullptr;
         this->mBindAcceptor = nullptr;
+        this->mNetComponent = nullptr;
     }
 
 	TcpServerListener::~TcpServerListener()
@@ -31,6 +32,7 @@ namespace Sentry
             unsigned short port = this->mConfig->Port;
             AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), port);
             this->mBindAcceptor = new AsioTcpAcceptor(io, endPoint);
+            this->mNetComponent = App::Get()->GetComponent<NetThreadComponent>();
 
             this->mBindAcceptor->listen();
             this->ListenConnect();
@@ -45,14 +47,14 @@ namespace Sentry
     }
 	void TcpServerListener::ListenConnect()
 	{
-        std::shared_ptr<SocketProxy> socketProxy = this->mTcpComponent->CreateSocket();
+        std::shared_ptr<SocketProxy> socketProxy = this->mNetComponent->CreateSocket();
 		this->mBindAcceptor->async_accept(socketProxy->GetSocket(),
 			[this, socketProxy](const asio::error_code & code)
 		{
 			if (code)
 			{
 				this->mErrorCount++;
-                this->mTcpComponent->DeleteSocket(socketProxy);
+                this->mNetComponent->DeleteSocket(socketProxy);
 				CONSOLE_LOG_FATAL(this->mConfig->Name << " " << code.message() << " count = " << this->mErrorCount);
 			}
 			else

@@ -16,7 +16,9 @@ namespace Sentry
 
 	class ISocketListen;
     class TcpServerComponent;
-	class TcpServerListener
+    class NetThreadComponent;
+
+    class TcpServerListener
 	{
 	 public:
 		TcpServerListener(const ListenConfig * config);
@@ -31,5 +33,6 @@ namespace Sentry
 		const ListenConfig * mConfig;
         AsioTcpAcceptor* mBindAcceptor;
         TcpServerComponent * mTcpComponent;
+        NetThreadComponent * mNetComponent;
     };
 }

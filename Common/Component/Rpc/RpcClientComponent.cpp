@@ -7,21 +7,19 @@
 #include"Global/ServiceConfig.h"
 #include"Component/Scene/NetThreadComponent.h"
 
-#ifdef __DEBUG__
 #include"Async/RpcTask/RpcTaskSource.h"
 #include<google/protobuf/util/json_util.h>
-#include"Network/Listener/TcpServerComponent.h"
-#endif
+#include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {
 	void RpcClientComponent::Awake()
 	{
 		this->mRpcComponent = nullptr;
-        this->mTcpComponent = nullptr;
+        this->mNetComponent = nullptr;
 	}
 	bool RpcClientComponent::LateAwake()
 	{
-        LOG_CHECK_RET_FALSE(this->mTcpComponent = this->GetComponent<TcpServerComponent>());
+        LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<NetThreadComponent>());
         LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<ServiceRpcComponent>());
 		return true;
 	}
@@ -101,7 +99,7 @@ namespace Sentry
 		std::string ip;
 		unsigned short port = 0;
 		assert(Helper::String::ParseIpAddress(address, ip, port));
-		std::shared_ptr<SocketProxy> socketProxy = this->mTcpComponent->CreateSocket();
+		std::shared_ptr<SocketProxy> socketProxy = this->mNetComponent->CreateSocket();
         if(socketProxy == nullptr)
         {
             return nullptr;

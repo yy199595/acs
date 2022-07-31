@@ -2,6 +2,7 @@
 #include "Util/Guid.h"
 #include "App/App.h"
 #include "Method/MethodProxy.h"
+#include"Network/SocketProxy.h"
 namespace Sentry
 {
 	void NetThreadComponent::Awake()
@@ -66,19 +67,43 @@ namespace Sentry
 
 	}
 
-#ifndef ONLY_MAIN_THREAD
-	asio::io_service  & NetThreadComponent::AllocateNetThread(int index)
-	{
-		if (index == 0)
-		{
-			index = rand() % this->mNetThreads.size();
-			return *(mNetThreads[index]);
-		}
-		if (this->mIndex >= mNetThreads.size())
-		{
-			this->mIndex = 0;
-		}
-		return *(mNetThreads[this->mIndex++]);
-	}
+    std::shared_ptr<SocketProxy> NetThreadComponent::CreateSocket()
+    {
+        std::shared_ptr<SocketProxy> socket;
+        if(!this->mSocketQueue.empty())
+        {
+            socket = this->mSocketQueue.front();
+            this->mSocketQueue.pop();
+        }
+        else
+        {
+#ifdef ONLY_MAIN_THREAD
+            asio::io_service & io = this->GetApp()->GetThread();
+#else
+            if (this->mIndex >= mNetThreads.size())
+            {
+                this->mIndex = 0;
+            }
+            asio::io_service &io = *(mNetThreads[this->mIndex++]);
 #endif
+            socket = std::make_shared<SocketProxy>(io);
+        }
+        return socket;
+    }
+
+    void NetThreadComponent::DeleteSocket(std::shared_ptr<SocketProxy> socket)
+    {
+        if(this->mSocketQueue.size() < 100)
+        {
+            this->mSocketQueue.push(socket);
+        }
+    }
+
+
+    std::shared_ptr<SocketProxy> NetThreadComponent::CreateSocket(const std::string &ip, unsigned short port)
+    {
+        std::shared_ptr<SocketProxy> socket = this->CreateSocket();
+        socket->Init(ip, port);
+        return socket;
+    }
 }

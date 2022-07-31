@@ -10,21 +10,20 @@
 #include"Component/Scene/NetThreadComponent.h"
 #include"Network//Http/HttpRequestClient.h"
 #include"Script/Extension/Http/LuaHttp.h"
-#include"Network/Listener/TcpServerComponent.h"
 namespace Sentry
 {
 	bool HttpComponent::LateAwake()
 	{
 		this->mTaskComponent = this->GetApp()->GetTaskComponent();
 		this->mTimeComponent = this->GetApp()->GetTimerComponent();
-        this->mTcpComponent = this->GetComponent<TcpServerComponent>();
+        this->mNetComponent = this->GetComponent<NetThreadComponent>();
 		return true;
 	}
 
 	std::shared_ptr<HttpRequestClient> HttpComponent::CreateClient()
 	{
         std::shared_ptr<HttpRequestClient> httpClient;
-		std::shared_ptr<SocketProxy> socketProxy  = this->mTcpComponent->CreateSocket();
+		std::shared_ptr<SocketProxy> socketProxy  = this->mNetComponent->CreateSocket();
         if(!this->mClientPools.empty())
         {
             httpClient = this->mClientPools.front();
@@ -52,7 +51,7 @@ namespace Sentry
         if(this->mClientPools.size() < 100)
         {
             this->mClientPools.push(httpAsyncClient);
-            this->mTcpComponent->DeleteSocket(httpAsyncClient->MoveSocket());
+            this->mNetComponent->DeleteSocket(httpAsyncClient->MoveSocket());
         }
         return response;
 	}
@@ -93,7 +92,7 @@ namespace Sentry
         if(this->mClientPools.size() < 100)
         {
             this->mClientPools.push(requestClient);
-            this->mTcpComponent->DeleteSocket(requestClient->MoveSocket());
+            this->mNetComponent->DeleteSocket(requestClient->MoveSocket());
         }
 
         return response->GetCode() ? XCode::Failure : XCode::Successful;
@@ -116,7 +115,7 @@ namespace Sentry
         if(this->mClientPools.size() < 100)
         {
             this->mClientPools.push(httpAsyncClient);
-            this->mTcpComponent->DeleteSocket(httpAsyncClient->MoveSocket());
+            this->mNetComponent->DeleteSocket(httpAsyncClient->MoveSocket());
         }
         return response;
 	}

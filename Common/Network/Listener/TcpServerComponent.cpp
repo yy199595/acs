@@ -72,42 +72,6 @@ namespace Sentry
         }
 	}
 
-    void TcpServerComponent::DeleteSocket(std::shared_ptr<SocketProxy> socket)
-    {
-        if(this->mSocketQueue.size() < 1000)
-        {
-            this->mSocketQueue.push(socket);
-        }
-    }
-
-    std::shared_ptr<SocketProxy> TcpServerComponent::CreateSocket(const std::string &ip, unsigned short port)
-    {
-        std::shared_ptr<SocketProxy> socket = this->CreateSocket();
-        socket->Init(ip, port);
-        return socket;
-    }
-
-    std::shared_ptr<SocketProxy> TcpServerComponent::CreateSocket()
-    {
-        std::shared_ptr<SocketProxy> socket;
-        assert(this->GetApp()->IsMainThread());
-        if(!this->mSocketQueue.empty())
-        {
-            socket = this->mSocketQueue.front();
-            this->mSocketQueue.pop();
-        }
-        else
-        {
-#ifdef ONLY_MAIN_THREAD
-            asio::io_service & io = App::Get()->GetThread();
-#else
-            asio::io_service &io = this->mThreadComponent->AllocateNetThread();
-#endif
-            socket = std::make_shared<SocketProxy>(io);
-        }
-        return socket;
-    }
-
     bool TcpServerComponent::AddBlackList(const std::string &ip)
     {
         if(this->mBlackList.find(ip) == this->mBlackList.end())

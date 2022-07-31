@@ -5,7 +5,7 @@
 #include"HttpServiceComponent.h"
 #include"Util/FileHelper.h"
 #include"Network/Http/HttpHandlerClient.h"
-#include"Network/Listener/TcpServerComponent.h"
+#include"Component/Scene/NetThreadComponent.h"
 #include"Component/HttpService/LocalHttpService.h"
 namespace Sentry
 {
@@ -27,7 +27,7 @@ namespace Sentry
             }
         }
         this->mTaskComponent = this->GetApp()->GetTaskComponent();
-        this->mTcpComponent = this->GetComponent<TcpServerComponent>();
+        this->mNetComponent = this->GetComponent<NetThreadComponent>();
         return true;
     }
 
@@ -79,7 +79,7 @@ namespace Sentry
                 this->mClientPools.push(handlerClient);
             }
             this->mHttpClients.erase(iter);
-            this->mTcpComponent->DeleteSocket(handlerClient->MoveSocket());
+            this->mNetComponent->DeleteSocket(handlerClient->MoveSocket());
         }
     }
 

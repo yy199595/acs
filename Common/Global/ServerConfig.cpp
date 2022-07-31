@@ -27,31 +27,34 @@ namespace Sentry
 		{
 			throw std::logic_error("parse json : " + mConfigPath + " failure");
 		}
+        IF_THROW_ERROR(this->GetMember("area_id",this->mNodeId));
+        IF_THROW_ERROR(this->GetMember("node_name",this->mNodeName));
 
-		IF_THROW_ERROR(this->GetJsonValue("listener", "rpc"));
-		IF_THROW_ERROR(this->GetMember("area_id", this->mNodeId));
-		IF_THROW_ERROR(this->GetMember("node_name", this->mNodeName));
+        if(this->GetJsonValue("listener") != nullptr)
+        {
+            IF_THROW_ERROR(this->GetJsonValue("listener","rpc"));
 
-		std::unordered_map<std::string, const rapidjson::Value*> listeners;
-		IF_THROW_ERROR(this->GetMember("listener", listeners));
-		for (auto iter = listeners.begin(); iter != listeners.end(); iter++)
-		{
-			const rapidjson::Value& jsonObject = *iter->second;
-			if (jsonObject.IsObject())
-			{
-				ListenConfig* listenConfig = new ListenConfig();
-				IF_THROW_ERROR(jsonObject.HasMember("ip"));
-				IF_THROW_ERROR(jsonObject.HasMember("port"));
-				IF_THROW_ERROR(jsonObject.HasMember("component"));
+            std::unordered_map<std::string, const rapidjson::Value *> listeners;
+            IF_THROW_ERROR(this->GetMember("listener", listeners));
+            for (auto iter = listeners.begin(); iter != listeners.end(); iter++)
+            {
+                const rapidjson::Value &jsonObject = *iter->second;
+                if (jsonObject.IsObject())
+                {
+                    ListenConfig *listenConfig = new ListenConfig();
+                    IF_THROW_ERROR(jsonObject.HasMember("ip"));
+                    IF_THROW_ERROR(jsonObject.HasMember("port"));
+                    IF_THROW_ERROR(jsonObject.HasMember("component"));
 
-				listenConfig->Name = iter->first;
-				listenConfig->Ip = jsonObject["ip"].GetString();
-				listenConfig->Port = jsonObject["port"].GetUint();
-				listenConfig->Handler = jsonObject["component"].GetString();;
-				listenConfig->Address = fmt::format("{0}:{1}", listenConfig->Ip, listenConfig->Port);
-				this->mListens.emplace(listenConfig->Name, listenConfig);
-			}
-		}
+                    listenConfig->Name = iter->first;
+                    listenConfig->Ip = jsonObject["ip"].GetString();
+                    listenConfig->Port = jsonObject["port"].GetUint();
+                    listenConfig->Handler = jsonObject["component"].GetString();;
+                    listenConfig->Address = fmt::format("{0}:{1}",listenConfig->Ip,listenConfig->Port);
+                    this->mListens.emplace(listenConfig->Name, listenConfig);
+                }
+            }
+        }
 
 		if (this->HasMember("path") && (*this)["path"].IsObject())
 		{

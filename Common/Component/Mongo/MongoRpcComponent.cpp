@@ -4,7 +4,6 @@
 
 #include "MongoRpcComponent.h"
 #include"Component/Scene/NetThreadComponent.h"
-#include"Network/Listener/TcpServerComponent.h"
 namespace Sentry
 {
 	MongoTask::MongoTask(int id, int ms)
@@ -28,7 +27,7 @@ namespace Sentry
         this->mIndex = 0;
 		const ServerConfig & config = this->GetApp()->GetConfig();
 		this->mTimerComponent = this->GetApp()->GetTimerComponent();
-        this->mTcpComponent = this->GetComponent<TcpServerComponent>();
+        this->mNetComponent = this->GetComponent<NetThreadComponent>();
         LOG_CHECK_RET_FALSE(config.GetMember("mongo", "ip", this->mConfig.mIp));
 		LOG_CHECK_RET_FALSE(config.GetMember("mongo", "db", this->mConfig.mDb));
 		LOG_CHECK_RET_FALSE(config.GetMember("mongo", "port", this->mConfig.mPort));
@@ -42,7 +41,7 @@ namespace Sentry
     {
         for (int index = 0; index < this->mConfig.mMaxCount; index++)
         {
-            std::shared_ptr<SocketProxy> socketProxy = this->mTcpComponent->CreateSocket();
+            std::shared_ptr<SocketProxy> socketProxy = this->mNetComponent->CreateSocket();
             if(socketProxy == nullptr)
             {
                 return false;

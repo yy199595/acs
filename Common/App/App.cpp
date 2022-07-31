@@ -28,15 +28,7 @@ namespace Sentry
 		std::string path;
 		if (!this->mConfig->GetPath("service", path))
 		{
-			CONSOLE_LOG_ERROR("not find serice config");
-			return false;
-		}
-
-		rapidjson::Document jsonDocument;
-		if(!Helper::File::ReadJsonFile(path, jsonDocument))
-		{
-			CONSOLE_LOG_ERROR("load service [" << path << "] error");
-			return false;
+			CONSOLE_LOG_ERROR("not find service config");
 		}
 
 		this->mTaskComponent = this->GetOrAddComponent<TaskComponent>();
@@ -57,33 +49,37 @@ namespace Sentry
 				}
 			}
 		}
-		auto iter = jsonDocument.MemberBegin();
-		for(;iter != jsonDocument.MemberEnd(); iter++)
-		{
-			const rapidjson::Value & josnValue = iter->value;
-            const std::string name(iter->name.GetString());
-            std::string type(josnValue["Type"].GetString());
-            Component* component = ComponentFactory::CreateComponent(name);
-            if(component == nullptr)
+        rapidjson::Document jsonDocument;
+        if(Helper::File::ReadJsonFile(path, jsonDocument))
+        {
+            auto iter = jsonDocument.MemberBegin();
+            for (; iter != jsonDocument.MemberEnd(); iter++)
             {
-                component = ComponentFactory::CreateComponent(type);
-                if(component == nullptr && type == "rpc")
+                const rapidjson::Value &jsonValue = iter->value;
+                const std::string name(iter->name.GetString());
+                std::string type(jsonValue["Type"].GetString());
+                Component *component = ComponentFactory::CreateComponent(name);
+                if (component == nullptr)
                 {
-                    component = new ServiceAgentComponent();
+                    component = ComponentFactory::CreateComponent(type);
+                    if (component == nullptr && type == "rpc")
+                    {
+                        component = new ServiceAgentComponent();
+                    }
+                }
+                if (component == nullptr || !this->AddComponent(name, component))
+                {
+                    CONSOLE_LOG_ERROR("add " << name << " failure");
+                    return false;
+                }
+                IServiceBase *serviceBase = component->Cast<IServiceBase>();
+                if (serviceBase == nullptr || !serviceBase->LoadConfig(iter->value))
+                {
+                    CONSOLE_LOG_ERROR("load " << name << " config error");
+                    return false;
                 }
             }
-			if(component == nullptr || !this->AddComponent(name, component))
-			{
-				CONSOLE_LOG_ERROR("add " << name << " failure");
-				return false;
-			}
-			IServiceBase * serviceBase =component->Cast<IServiceBase>();
-			if(serviceBase == nullptr || !serviceBase->LoadConfig(iter->value))
-			{
-				CONSOLE_LOG_ERROR("load " << name << " config error");
-				return false;
-			}
-		}
+        }
 
 		this->GetComponents(components);
 		for (const std::string& name: components)

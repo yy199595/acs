@@ -7,7 +7,6 @@
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
 #include"Component/Scene/NetThreadComponent.h"
-#include"Network/Listener/TcpServerComponent.h"
 namespace Sentry
 {
 	bool RedisComponent::LateAwake()
@@ -49,7 +48,7 @@ namespace Sentry
 			this->mConfigs.emplace(name, redisConfig);
 		}
 		this->mTaskComponent = this->GetApp()->GetTaskComponent();
-        this->mTcpComponent = this->GetComponent<TcpServerComponent>();
+        this->mNetComponent = this->GetComponent<NetThreadComponent>();
 		return this->mConfigs.find("main") != this->mConfigs.end();
 	}
 
@@ -111,7 +110,7 @@ namespace Sentry
 
     SharedRedisClient RedisComponent::MakeRedisClient(const RedisConfig & config)
 	{
-        std::shared_ptr<SocketProxy> socketProxy = this->mTcpComponent->CreateSocket();
+        std::shared_ptr<SocketProxy> socketProxy = this->mNetComponent->CreateSocket();
         if(socketProxy == nullptr)
         {
             return nullptr;

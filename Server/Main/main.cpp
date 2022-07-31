@@ -30,6 +30,7 @@
 #include"Component/Common/DataMgrComponent.h"
 #include"Component/Gate/GateAgentComponent.h"
 #include"Component/User/UserSyncComponent.h"
+#include"Component/ClientComponent.h"
 using namespace Sentry;
 void RegisterComponent()
 {
@@ -67,6 +68,8 @@ void RegisterComponent()
 
 // lua
     ComponentFactory::Add<LuaScriptComponent>("LuaScriptComponent");
+
+    ComponentFactory::Add<Client::ClientComponent>("ClientComponent");
 }
 
 void RegisterServiceComponent()

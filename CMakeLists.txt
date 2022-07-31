@@ -53,16 +53,16 @@ LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/Libs/bin/lua)
 LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/Libs/bin/spdlog)
 LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/Libs/bin/protobuf)
 
-include_directories(Server/Gate)
-include_directories(Server/Logic)
-include_directories(${PROJECT_SOURCE_DIR}/Common)
 include_directories(${PROJECT_SOURCE_DIR}/Gen)
+include_directories(${PROJECT_SOURCE_DIR}/Common)
 include_directories(${PROJECT_SOURCE_DIR}/Server)
+include_directories(${PROJECT_SOURCE_DIR}/Client)
 
-file(GLOB_RECURSE CommonSrc "Common/*.h" "Common/*.cpp" "Common/*.hpp" "Common/*.cc" "Common/*.h" "Common/*.c")
+file(GLOB_RECURSE CommonSrc "Common/*.h" "Common/*.cpp")
 file(GLOB_RECURSE ProtocolSrc "Gen/*.h" "Gen/*.cpp" "Gen/*.hpp" "Gen/*.cc")
 
-file(GLOB_RECURSE GateSource "Server/*.h" "Server/*.cpp" "Server/*.hpp" "Server/*.cc")
+file(GLOB_RECURSE ServerSource "Server/*.h" "Server/*.cpp")
+file(GLOB_RECURSE ClientSource "Client/*.h" "Client/*.cpp")
 
 #LINK_DIRECTORIES(Libs/lib)
 
@@ -73,7 +73,7 @@ else()
 endif()
 
 list(APPEND CommonFiles ${CommonSrc} ${ProtocolSrc})
-list(APPEND ServerFiles ${MainSource} ${LogicSource} ${GateSource})
+list(APPEND ServerFiles ${MainSource} ${LogicSource} ${ServerSource})
 
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
@@ -81,7 +81,7 @@ if (CCACHE_PROGRAM)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
 
-ADD_EXECUTABLE(Sentry ${AsmFiles} ${CommonFiles} ${ServerFiles})
+ADD_EXECUTABLE(Sentry ${AsmFiles} ${CommonFiles} ${ServerFiles} ${ClientSource})
 
 list(APPEND StaticLibs lua)
 
@@ -99,7 +99,7 @@ endif()
 
 if(MSVC) #创建vs目录
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-    list(APPEND CxxFiles ${AsmFiles} ${CommonFiles} ${ServerFiles})
+    list(APPEND CxxFiles ${AsmFiles} ${CommonFiles} ${ServerFiles} ${ClientSource})
     foreach(file_name ${CxxFiles})
         source_group_by_dir(${PROJECT_SOURCE_DIR} ${file_name})
     endforeach()

@@ -7,7 +7,7 @@
 #include"NetWork/GateMessageClient.h"
 #include"GateComponent.h"
 #include"Component/Rpc/ServiceRpcComponent.h"
-#include"Network/Listener/TcpServerComponent.h"
+#include"Component/Scene/NetThreadComponent.h"
 #ifdef __DEBUG__
 #include"Util/StringHelper.h"
 #include"google/protobuf/util/json_util.h"
@@ -17,13 +17,15 @@ namespace Sentry
 {
 	void GateClientComponent::Awake()
 	{
-		this->mTimerComponent = nullptr;
-		this->mGateComponent = nullptr;
-	}
+        this->mNetComponent = nullptr;
+        this->mGateComponent = nullptr;
+        this->mTimerComponent = nullptr;
+
+    }
 
 	bool GateClientComponent::LateAwake()
 	{
-        this->mTcpComponent = this->GetComponent<TcpServerComponent>();
+        this->mNetComponent = this->GetComponent<NetThreadComponent>();
 		LOG_CHECK_RET_FALSE(this->mTimerComponent = App::Get()->GetTimerComponent());
 		LOG_CHECK_RET_FALSE(this->mGateComponent = this->GetComponent<GateComponent>());
 		return true;
@@ -80,7 +82,7 @@ namespace Sentry
             if(this->mClientPools.size() < 100)
             {
                 this->mClientPools.push(gateClient);
-                this->mTcpComponent->DeleteSocket(gateClient->MoveSocket());
+                this->mNetComponent->DeleteSocket(gateClient->MoveSocket());
             }
             this->mGateClientMap.erase(iter);
 		}

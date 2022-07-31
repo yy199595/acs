@@ -11,6 +11,7 @@ local phoneNum = 13716061995
 
 
 function Client.StartLogic()
+    LoginComponent.Awake()
 
     local clientComponent = App.GetComponent("ClientComponent")
     LoginComponent.Register(account, password, phoneNum)

@@ -37,7 +37,7 @@ namespace Sentry
 	 private:
 		class GateComponent* mGateComponent;
 		class TimerComponent* mTimerComponent;
-        class TcpServerComponent * mTcpComponent;
+        class NetThreadComponent * mNetComponent;
 		std::unordered_map<std::string, long long> mUserAddressMap;
         std::queue<std::shared_ptr<GateMessageClient>> mClientPools;
         std::unordered_map<long long, std::string> mClientAddressMap;

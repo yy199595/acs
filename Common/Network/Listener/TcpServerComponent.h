@@ -16,10 +16,7 @@ namespace Sentry
 	public:
         bool AddBlackList(const std::string & ip);
         bool AddWhiteList(const std::string & ip);
-        std::shared_ptr<SocketProxy> CreateSocket();
-        void DeleteSocket(std::shared_ptr<SocketProxy> socket);
         bool OnListenConnect(const std::string & name, std::shared_ptr<SocketProxy> socket);
-        std::shared_ptr<SocketProxy> CreateSocket(const std::string & ip, unsigned short port);
     private:
 		bool LateAwake() final;
 		bool LoadServerConfig();
@@ -31,7 +28,6 @@ namespace Sentry
 #ifndef ONLY_MAIN_THREAD
        class NetThreadComponent * mThreadComponent;
 #endif
-        std::queue<std::shared_ptr<SocketProxy>> mSocketQueue;
         std::unordered_map<std::string, TcpServerListener *> mListeners;
         std::unordered_map<std::string, const ListenConfig *> mListenConfigs;
     };
