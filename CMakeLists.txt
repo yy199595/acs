@@ -46,7 +46,7 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/lua ${PROJECT_SOURCE_DIR}/Libs/bin/l
 add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/spdlog ${PROJECT_SOURCE_DIR}/Libs/bin/spdlog)
 add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/protobuf/cmake ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf)
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/Client ${PROJECT_SOURCE_DIRr}/bin)
+#add_subdirectory(${PROJECT_SOURCE_DIR}/Client ${PROJECT_SOURCE_DIRr}/bin)
 
 #LINK_DIRECTORIES(Libs/lib)
 LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/Libs/bin/lua)
@@ -59,16 +59,10 @@ include_directories(${PROJECT_SOURCE_DIR}/Common)
 include_directories(${PROJECT_SOURCE_DIR}/Gen)
 include_directories(${PROJECT_SOURCE_DIR}/Server)
 
-if (__ENABLE_CLIENT__)
-    include_directories(${PROJECT_SOURCE_DIR}/Client)
-    file(GLOB_RECURSE LogicSource "Client/*.h" "Client/*.cpp" "Client/*.hpp" "Client/*.cc")
-endif()
-
 file(GLOB_RECURSE CommonSrc "Common/*.h" "Common/*.cpp" "Common/*.hpp" "Common/*.cc" "Common/*.h" "Common/*.c")
 file(GLOB_RECURSE ProtocolSrc "Gen/*.h" "Gen/*.cpp" "Gen/*.hpp" "Gen/*.cc")
 
 file(GLOB_RECURSE GateSource "Server/*.h" "Server/*.cpp" "Server/*.hpp" "Server/*.cc")
-file(GLOB_RECURSE MainSource "Main/*.h" "Main/*.cpp" "Main/*.hpp" "Main/*.cc")
 
 #LINK_DIRECTORIES(Libs/lib)
 
