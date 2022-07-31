@@ -6,7 +6,7 @@
 
 namespace Sentry
 {
-	std::shared_ptr<c2s::Rpc::Request> RequestTaskQueueSource::Await()
+	std::shared_ptr<c2s::rpc::request> RequestTaskQueueSource::Await()
 	{
 		this->YieldTask();
 		if(!this->mTaskQueue.empty())
@@ -17,7 +17,7 @@ namespace Sentry
 		return mRequest;
 	}
 
-	void RequestTaskQueueSource::AddResult(std::shared_ptr<c2s::Rpc::Request>& data)
+	void RequestTaskQueueSource::AddResult(std::shared_ptr<c2s::rpc::request>& data)
 	{
 		this->mTaskQueue.push(data);
 		this->ResumeTask(TaskState::TaskReady);

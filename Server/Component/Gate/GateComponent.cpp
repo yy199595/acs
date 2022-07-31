@@ -4,7 +4,7 @@
 
 #include"GateComponent.h"
 #include"App/App.h"
-#include"NetWork/GateClientContext.h"
+#include"NetWork/GateMessageClient.h"
 #include"Global/ServiceConfig.h"
 #include"Component/Rpc/ServiceRpcComponent.h"
 #include"GateClientComponent.h"
@@ -17,8 +17,8 @@
 
 namespace Sentry
 {
-    ClientRpcTask::ClientRpcTask(const c2s::Rpc::Request &request, GateComponent * component, int ms)
-        : IRpcTask<com::Rpc::Response>(ms)
+    ClientRpcTask::ClientRpcTask(const c2s::rpc::request &request, GateComponent * component, int ms)
+        : IRpcTask<com::rpc::response>(ms)
     {
         this->mTaskId = Guid::Create();
         this->mRpcId = request.rpc_id();
@@ -28,14 +28,14 @@ namespace Sentry
 
     void ClientRpcTask::OnTimeout()
     {
-        std::shared_ptr<com::Rpc::Response> response(new com::Rpc::Response());
+        std::shared_ptr<com::rpc::response> response(new com::rpc::response());
 
         response->set_rpc_id(this->mRpcId);
         response->set_code((int)XCode::CallTimeout);
         this->mGateComponent->OnResponse(this->mAddress, response);
     }
 
-    void ClientRpcTask::OnResponse(std::shared_ptr<com::Rpc::Response> response)
+    void ClientRpcTask::OnResponse(std::shared_ptr<com::rpc::response> response)
     {
         response->set_rpc_id(this->mRpcId);
         this->mGateComponent->OnResponse(this->mAddress, response);
@@ -54,7 +54,7 @@ namespace Sentry
 		return true;
 	}
 
-	XCode GateComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> request)
+	XCode GateComponent::OnRequest(std::shared_ptr<c2s::rpc::request> request)
 	{
 		std::string method, service;
         assert(this->GetApp()->IsMainThread());
@@ -91,7 +91,7 @@ namespace Sentry
         long long userId = 0;
         const std::string & address = request->address();
 
-        std::shared_ptr<com::Rpc::Request> userRequest(new com::Rpc::Request());
+        std::shared_ptr<com::rpc::request> userRequest(new com::rpc::request());
 
         userRequest->set_func(config->FullName);
         userRequest->set_rpc_id(request->rpc_id());
@@ -108,7 +108,7 @@ namespace Sentry
             this->mTaskComponent->Start([gateService, userRequest, config, this]()
             {
                 const std::string & userAddress = userRequest->address();
-                std::shared_ptr<com::Rpc::Response> response(new com::Rpc::Response());
+                std::shared_ptr<com::rpc::response> response(new com::rpc::response());
                 XCode code = gateService->Invoke(config->Method, userRequest, response);
                 if(code != XCode::Successful)
                 {
@@ -141,7 +141,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode GateComponent::OnResponse(const std::string & address, std::shared_ptr<com::Rpc::Response> response)
+	XCode GateComponent::OnResponse(const std::string & address, std::shared_ptr<com::rpc::response> response)
 	{
         assert(this->GetApp()->IsMainThread());
         if(response->code() == (int)XCode::NetActiveShutdown)
@@ -149,7 +149,7 @@ namespace Sentry
             this->mGateClientComponent->StartClose(address);
             return XCode::NetActiveShutdown;
         }
-        std::shared_ptr<c2s::Rpc::Response> clientResponse(new c2s::Rpc::Response());
+        std::shared_ptr<c2s::rpc::response> clientResponse(new c2s::rpc::response());
 
         clientResponse->set_code(response->code());
         clientResponse->set_rpc_id(response->rpc_id());

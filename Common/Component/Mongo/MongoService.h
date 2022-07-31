@@ -15,11 +15,11 @@ namespace Sentry
 	private:
 		bool OnStartService(ServiceMethodRegister &methodRegister) final;
     private:
-        XCode Insert(const s2s::Mongo::Insert & request);
-        XCode Delete(const s2s::Mongo::Delete & request);
-        XCode Update(const s2s::Mongo::Update & request);
-        XCode Query(const s2s::Mongo::Query::Request & request, s2s::Mongo::Query::Response & response);
-        XCode AddCounter(const s2s::Mongo::AddCounter::Request & request, s2s::Mongo::AddCounter::Response & response);
+        XCode Insert(const s2s::mongo::insert & request);
+        XCode Delete(const s2s::mongo::remove & request);
+        XCode Update(const s2s::mongo::update & request);
+        XCode Query(const s2s::mongo::query::request & request, s2s::mongo::query::response & response);
+        XCode AddCounter(const s2s::mongo::add_counter::request & request, s2s::mongo::add_counter::response & response);
     private:
         std::string mBuffer;
 		class MongoRpcComponent * mMongoComponent;

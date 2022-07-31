@@ -13,9 +13,9 @@
 
 namespace Mongo
 {
-	MongoClientContext::MongoClientContext(std::shared_ptr<SocketProxy> scoket,
+	MongoClientContext::MongoClientContext(std::shared_ptr<SocketProxy> socket,
                                            const Mongo::Config& config, MongoRpcComponent* component, int index)
-		: Tcp::TcpContext(scoket, 1024 * 1024), mConfig(config), mMongoComponent(component), mIndex(index)
+		: Tcp::TcpContext(socket, 1024 * 1024), mConfig(config), mMongoComponent(component), mIndex(index)
 	{
         this->mCount = 0;
 		this->mIsAuth = false;
@@ -36,7 +36,7 @@ namespace Mongo
 			}
 			this->mIsAuth = false;
             this->SendFromMessageQueue();
-            CONSOLE_LOG_ERROR( "["<< this->mIndex << "] mongo user auth successful");
+            CONSOLE_LOG_INFO( "["<< this->mIndex << "] mongo user auth successful");
 			return;
 		}
         assert(this->mRecvBuffer.size() == 0);
@@ -68,6 +68,7 @@ namespace Mongo
 			assert(this->mRecvBuffer.size() >= sizeof(MongoHead));
 			this->mMongoResponse = std::make_shared<MongoQueryResponse>();
 			int length = this->mMongoResponse->OnReceiveHead(is);
+            int length1 = this->mSocket->GetSocket().available();
 			if (length <= 0)
 			{
 				std::string json;

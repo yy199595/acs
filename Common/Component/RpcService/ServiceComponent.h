@@ -11,9 +11,9 @@ using namespace std;
 namespace Sentry
 {
 	class ServiceMethod;
-	class ServerClientContext;
+	class MessageRpcClient;
 	class ServiceComponent : public Component, public ILuaRegister,
-							 public IService<com::Rpc::Request, com::Rpc::Response>
+							 public IService<com::rpc::request, com::rpc::response>
 	{
 	 public:
 		ServiceComponent();
@@ -32,15 +32,15 @@ namespace Sentry
 		XCode Call(long long userId, const std::string& func, const Message& message);
 		XCode Call(long long userId, const std::string& func, std::shared_ptr<Message> response);
 		XCode Call(long long userId, const std::string& func, const Message& message, std::shared_ptr<Message> response);
-		XCode Call(long long userId, std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<Message> response);
-		XCode Call(const std::string& address, std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<Message> response);
+		XCode Call(long long userId, std::shared_ptr<com::rpc::request> request, std::shared_ptr<Message> response);
+		XCode Call(const std::string& address, std::shared_ptr<com::rpc::request> request, std::shared_ptr<Message> response);
 	public:
 		AddressProxy & GetAddressProxy() { return this->mAddressProxy;}
 		const RpcServiceConfig & GetServiceConfig() { return *this->mConfig; }
 		bool IsStartComplete() final{return this->mAddressProxy.GetSize() > 0; };
-		XCode SendRequest(const std::string& address, std::shared_ptr<com::Rpc::Request> request);
-		std::shared_ptr<com::Rpc::Request> NewRpcRequest(const std::string& func, long long userId);
-		std::shared_ptr<com::Rpc::Request> NewRpcRequest(const std::string& func, long long userId, const Message& message);
+		XCode SendRequest(const std::string& address, std::shared_ptr<com::rpc::request> request);
+		std::shared_ptr<com::rpc::request> NewRpcRequest(const std::string& func, long long userId);
+		std::shared_ptr<com::rpc::request> NewRpcRequest(const std::string& func, long long userId, const Message& message);
 	 protected:
 		bool LateAwake() override;
 		bool LoadConfig(const rapidjson::Value & json);

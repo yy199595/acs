@@ -94,8 +94,7 @@
         "GateAgentComponent",
         "UserSyncComponent",
         "ServiceMgrComponent",
-        "HttpServiceComponent",
-        "ClientComponent"
+        "HttpServiceComponent"
     ],
     "service.rpc": [
         "RpcTest",

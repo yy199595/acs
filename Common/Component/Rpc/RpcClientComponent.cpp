@@ -43,8 +43,8 @@ namespace Sentry
 		if (iter == this->mRpcClientMap.end())
 		{
 			assert(!address.empty());
-			std::shared_ptr<ServerClientContext> tcpSession
-					= std::make_shared<ServerClientContext>(this, socket);
+			std::shared_ptr<MessageRpcClient> tcpSession
+					= std::make_shared<MessageRpcClient>(this, socket);
 
 			tcpSession->StartReceive();
 			this->mRpcClientMap.emplace(address, tcpSession);
@@ -65,14 +65,14 @@ namespace Sentry
 		}
 	}
 
-	void RpcClientComponent::OnRequest(std::shared_ptr<com::Rpc_Request> request)
+	void RpcClientComponent::OnRequest(std::shared_ptr<com::rpc::request> request)
 	{
         assert(this->GetApp()->IsMainThread());
         const std::string & address = request->address();
 		XCode code = this->mRpcComponent->OnRequest(request);
 		if (code != XCode::Successful)
 		{
-			std::shared_ptr<com::Rpc_Response> response(new com::Rpc_Response());
+			std::shared_ptr<com::rpc::response> response(new com::rpc::response());
 
 			response->set_code((int)code);
 			response->set_rpc_id(request->rpc_id());
@@ -84,16 +84,16 @@ namespace Sentry
 		}
 	}
 
-	void RpcClientComponent::OnResponse(std::shared_ptr<com::Rpc_Response> response)
+	void RpcClientComponent::OnResponse(std::shared_ptr<com::rpc::response> response)
 	{
         long long taskId = response->rpc_id();
         assert(this->GetApp()->IsMainThread());
         this->mRpcComponent->OnResponse(taskId, response);
 	}
 
-	std::shared_ptr<ServerClientContext> RpcClientComponent::GetOrCreateSession(const std::string& address)
+	std::shared_ptr<MessageRpcClient> RpcClientComponent::GetOrCreateSession(const std::string& address)
 	{
-		std::shared_ptr<ServerClientContext> localSession = this->GetSession(address);
+		std::shared_ptr<MessageRpcClient> localSession = this->GetSession(address);
 		if (localSession != nullptr)
 		{
 			return localSession;
@@ -107,13 +107,13 @@ namespace Sentry
             return nullptr;
         }
         socketProxy->Init(ip, port);
-		localSession = make_shared<ServerClientContext>(this, socketProxy);
+		localSession = make_shared<MessageRpcClient>(this, socketProxy);
 
 		this->mRpcClientMap.emplace(socketProxy->GetAddress(), localSession);
 		return localSession;
 	}
 
-	std::shared_ptr<ServerClientContext> RpcClientComponent::GetSession(const std::string& address)
+	std::shared_ptr<MessageRpcClient> RpcClientComponent::GetSession(const std::string& address)
 	{
 		auto iter = this->mRpcClientMap.find(address);
 		if (iter == this->mRpcClientMap.end())
@@ -124,7 +124,7 @@ namespace Sentry
 	}
 
 
-	bool RpcClientComponent::Send(const std::string & address, std::shared_ptr<com::Rpc_Request> message)
+	bool RpcClientComponent::Send(const std::string & address, std::shared_ptr<com::rpc::request> message)
 	{
 		auto clientSession = this->GetOrCreateSession(address);
 		if (message == nullptr || clientSession == nullptr)
@@ -135,9 +135,9 @@ namespace Sentry
 		return true;
 	}
 
-	bool RpcClientComponent::Send(const std::string & address, std::shared_ptr<com::Rpc_Response> message)
+	bool RpcClientComponent::Send(const std::string & address, std::shared_ptr<com::rpc::response> message)
 	{
-		std::shared_ptr<ServerClientContext> clientSession = this->GetSession(address);
+		std::shared_ptr<MessageRpcClient> clientSession = this->GetSession(address);
 		if (clientSession == nullptr || message == nullptr)
 		{
 			LOG_ERROR("send message to [" << address << "] failure");

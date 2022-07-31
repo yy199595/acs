@@ -15,7 +15,7 @@ namespace Sentry
 		this->mMsgComponent = App::Get()->GetComponent<MessageComponent>();
 	}
 
-	XCode LuaServiceMethod::Call(int count, com::Rpc::Response & response)
+	XCode LuaServiceMethod::Call(int count, com::rpc::response & response)
 	{
 		if (lua_pcall(this->mLuaEnv, count, 2, 0) != 0)
 		{
@@ -38,7 +38,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode LuaServiceMethod::CallAsync(int count, com::Rpc::Response & response)
+	XCode LuaServiceMethod::CallAsync(int count, com::rpc::response & response)
 	{
 		std::shared_ptr<LuaServiceTaskSource> luaTaskSource(new LuaServiceTaskSource(this->mLuaEnv));
 
@@ -67,7 +67,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode LuaServiceMethod::Invoke(const com::Rpc_Request& request, com::Rpc_Response& response)
+	XCode LuaServiceMethod::Invoke(const com::rpc::request& request, com::rpc::response& response)
 	{
         if(this->mConfig->IsAsync && !Lua::Function::Get(this->mLuaEnv, "RpcCall"))
         {

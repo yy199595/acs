@@ -158,7 +158,7 @@ namespace Sentry
 		{
 			const char* data = message.c_str() + 1;
 			const size_t size = message.size() - 1;
-			std::shared_ptr<com::Rpc::Request> request(new com::Rpc::Request());
+			std::shared_ptr<com::rpc::request> request(new com::rpc::request());
 			if (!request->ParseFromArray(data, size))
 			{
 				LOG_ERROR("parse message error");
@@ -172,7 +172,7 @@ namespace Sentry
 		{
 			const char* data = message.c_str() + 1;
 			const size_t size = message.size() - 1;
-			std::shared_ptr<com::Rpc::Response> response(new com::Rpc::Response());
+			std::shared_ptr<com::rpc::response> response(new com::rpc::response());
 			if (!response->ParseFromArray(data, size))
 			{
 				LOG_ERROR("parse message error");

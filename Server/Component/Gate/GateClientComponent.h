@@ -7,9 +7,9 @@
 #include"Component/Component.h"
 namespace Sentry
 {
-	class GateClientContext;
+	class GateMessageClient;
 	class GateClientComponent : public Component, public ISocketListen,
-								public IRpc<c2s::Rpc_Request, c2s::Rpc_Response>
+                            public IRpc<c2s::rpc::request, c2s::rpc::response>
 	{
 	 public:
 		GateClientComponent() = default;
@@ -17,17 +17,17 @@ namespace Sentry
 	 public:
 		void StartClose(const std::string & address) final;
 		void OnCloseSocket(const std::string & address, XCode code) final;
-		void OnRequest(std::shared_ptr<c2s::Rpc_Request> request) final;
-		void OnResponse(std::shared_ptr<c2s::Rpc_Response> response) final {}
+		void OnRequest(std::shared_ptr<c2s::rpc::request> request) final;
+		void OnResponse(std::shared_ptr<c2s::rpc::response> response) final {}
 	 public:
 		bool AddNewUser(const std::string & address, long long userId);
 		bool GetUserId(const std::string & address, long long & userId);
 		bool GetUserAddress(long long userId, std::string & address);
-		std::shared_ptr<GateClientContext> GetGateClient(const std::string & address);
+		std::shared_ptr<GateMessageClient> GetGateClient(const std::string & address);
 	 public:
-		void SendToAllClient(std::shared_ptr<c2s::Rpc::Call> message);
-		bool SendToClient(const std::string & address, std::shared_ptr<c2s::Rpc::Call> message);
-		bool SendToClient(const std::string & address, std::shared_ptr<c2s::Rpc_Response> message);
+		void SendToAllClient(std::shared_ptr<c2s::rpc::call> message);
+		bool SendToClient(const std::string & address, std::shared_ptr<c2s::rpc::call> message);
+		bool SendToClient(const std::string & address, std::shared_ptr<c2s::rpc::response> message);
 	 public:
 		void Awake() final;
 		bool LateAwake() final;
@@ -39,9 +39,9 @@ namespace Sentry
 		class TimerComponent* mTimerComponent;
         class TcpServerComponent * mTcpComponent;
 		std::unordered_map<std::string, long long> mUserAddressMap;
-        std::queue<std::shared_ptr<GateClientContext>> mClientPools;
+        std::queue<std::shared_ptr<GateMessageClient>> mClientPools;
         std::unordered_map<long long, std::string> mClientAddressMap;
-		std::unordered_map<std::string, std::shared_ptr<GateClientContext>> mGateClientMap;
+		std::unordered_map<std::string, std::shared_ptr<GateMessageClient>> mGateClientMap;
 	};
 }
 

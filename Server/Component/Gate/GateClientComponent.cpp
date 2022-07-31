@@ -4,7 +4,7 @@
 
 #include"GateClientComponent.h"
 #include"App/App.h"
-#include"NetWork/GateClientContext.h"
+#include"NetWork/GateMessageClient.h"
 #include"GateComponent.h"
 #include"Component/Rpc/ServiceRpcComponent.h"
 #include"Network/Listener/TcpServerComponent.h"
@@ -38,7 +38,7 @@ namespace Sentry
             LOG_FATAL("handler socket error " << socket->GetAddress());
             return false;
         }
-        std::shared_ptr<GateClientContext> gateClient;
+        std::shared_ptr<GateMessageClient> gateClient;
         if (!this->mClientPools.empty())
         {
             gateClient = this->mClientPools.front();
@@ -47,7 +47,7 @@ namespace Sentry
         }
         else
         {
-            gateClient = std::make_shared<GateClientContext>(socket, this);
+            gateClient = std::make_shared<GateMessageClient>(socket, this);
         }
 
         gateClient->StartReceive();
@@ -56,7 +56,7 @@ namespace Sentry
         return true;
     }
 
-	void GateClientComponent::OnRequest(std::shared_ptr<c2s::Rpc_Request> request) //客户端调过来的
+	void GateClientComponent::OnRequest(std::shared_ptr<c2s::rpc::request> request) //客户端调过来的
 	{
 		XCode code = this->mGateComponent->OnRequest(request);
 		if (code != XCode::Successful)
@@ -76,7 +76,7 @@ namespace Sentry
 #ifdef __DEBUG__
 			LOG_WARN("remove client " << address  << " code = " << (int)code);
 #endif
-            std::shared_ptr<GateClientContext> gateClient = iter->second;
+            std::shared_ptr<GateMessageClient> gateClient = iter->second;
             if(this->mClientPools.size() < 100)
             {
                 this->mClientPools.push(gateClient);
@@ -86,9 +86,9 @@ namespace Sentry
 		}
 	}
 
-	bool GateClientComponent::SendToClient(const std::string & address, std::shared_ptr<c2s::Rpc_Response> message)
+	bool GateClientComponent::SendToClient(const std::string & address, std::shared_ptr<c2s::rpc::response> message)
 	{
-		std::shared_ptr<GateClientContext> proxyClient = this->GetGateClient(address);
+		std::shared_ptr<GateMessageClient> proxyClient = this->GetGateClient(address);
 		if (proxyClient == nullptr)
 		{
 			return false;
@@ -97,12 +97,12 @@ namespace Sentry
 		return true;
 	}
 
-	void GateClientComponent::SendToAllClient(std::shared_ptr<c2s::Rpc::Call> message)
+	void GateClientComponent::SendToAllClient(std::shared_ptr<c2s::rpc::call> message)
 	{
 		auto iter = this->mGateClientMap.begin();
 		for(;iter != this->mGateClientMap.end(); iter++)
 		{
-			std::shared_ptr<GateClientContext> proxyClient = iter->second;
+			std::shared_ptr<GateMessageClient> proxyClient = iter->second;
 			if(proxyClient != nullptr)
 			{
 				proxyClient->SendToClient(message);
@@ -110,9 +110,9 @@ namespace Sentry
 		}
 	}
 
-	bool GateClientComponent::SendToClient(const std::string& address, std::shared_ptr<c2s::Rpc::Call> message)
+	bool GateClientComponent::SendToClient(const std::string& address, std::shared_ptr<c2s::rpc::call> message)
 	{
-		std::shared_ptr<GateClientContext> gateClient = this->GetGateClient(address);
+		std::shared_ptr<GateMessageClient> gateClient = this->GetGateClient(address);
 		if(gateClient != nullptr)
 		{
 			gateClient->SendToClient(message);
@@ -121,7 +121,7 @@ namespace Sentry
 		return false;
 	}
 
-	std::shared_ptr<GateClientContext> GateClientComponent::GetGateClient(const std::string & address)
+	std::shared_ptr<GateMessageClient> GateClientComponent::GetGateClient(const std::string & address)
 	{
 		auto iter = this->mGateClientMap.find(address);
 		return iter != this->mGateClientMap.end() ? iter->second : nullptr;
@@ -129,7 +129,7 @@ namespace Sentry
 
 	void GateClientComponent::StartClose(const std::string & address)
 	{
-		std::shared_ptr<GateClientContext> proxyClient = this->GetGateClient(address);
+		std::shared_ptr<GateMessageClient> proxyClient = this->GetGateClient(address);
 		if (proxyClient != nullptr)
 		{
 			proxyClient->StartClose();
@@ -138,7 +138,7 @@ namespace Sentry
 
 	void GateClientComponent::CheckPlayerLogout(const std::string & address)
 	{
-		std::shared_ptr<GateClientContext> proxyClient = this->GetGateClient(address);
+		std::shared_ptr<GateMessageClient> proxyClient = this->GetGateClient(address);
 		if (proxyClient != nullptr)
 		{
 			long long nowTime = Helper::Time::GetNowSecTime();

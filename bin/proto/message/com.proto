@@ -3,66 +3,66 @@ syntax = "proto3";
 package com;
 import "google/protobuf/any.proto";
 
-message Array
+message array
 {
-     message Int32
+     message int32
      {
           repeated int32 array = 1;
      }
-     message Int64
+     message int64
      {
           repeated int64 array = 1;
      }
-     message String
+     message string
      {
           repeated string array = 1;
      }
-     message Float
+     message float32
      {
           repeated float array = 1;
      }
-     message Double
+     message float64
      {
           repeated double array = 1;
      }
 }
 
-message Type
+message type
 {
 
-  message Int32
+  message int32
   {
     int32 value = 1;
   }
 
-  message Int64
+  message int64
   {
     int64 value = 1;
   }
 
-  message Float
+  message float32
   {
     float value = 1;
   }
 
-  message Double
+  message float64
   {
     double value = 1;
   }
 
-  message Json
+  message json
   {
     string json = 1;
   }
-  message String
+  message string
   {
     string str = 1;
   }
 }
 
-message Rpc
+message rpc
 {
-     message Request
+     message request
      {
           int64 user_id = 1;
           int64 rpc_id = 2;
@@ -70,7 +70,7 @@ message Rpc
           string address = 4;
           google.protobuf.Any Data = 5;
      }
-     message Response
+     message response
      {
           int32 code = 1;
           int64 rpc_id = 2;
@@ -78,15 +78,15 @@ message Rpc
           string error_str = 4;
           google.protobuf.Any Data = 5;
      }
-     message Auth
+     message auth
      {
           string token = 1;
      }
 }
 
-message Http
+message http
 {
-    message Data
+    message data
     {
         string path = 1;
         string method = 2;

@@ -13,8 +13,8 @@
 
 namespace Sentry
 {
-	XCode LocalRpcService::Invoke(const std::string& func, std::shared_ptr<com::Rpc::Request> request,
-	    std::shared_ptr<com::Rpc::Response> response)
+	XCode LocalRpcService::Invoke(const std::string& func, std::shared_ptr<com::rpc::request> request,
+	    std::shared_ptr<com::rpc::response> response)
 	{
 		if (!this->IsStartService())
 		{

@@ -1,4 +1,4 @@
-﻿#include"ServerClientContext.h"
+﻿#include"MessageRpcClient.h"
 #include"App/App.h"
 #include"Network/Rpc.h"
 #include"Network/Proto/RpcProtoMessage.h"
@@ -9,24 +9,24 @@
 #endif
 namespace Sentry
 {
-	ServerClientContext::ServerClientContext(RpcClientComponent* component,
+	MessageRpcClient::MessageRpcClient(RpcClientComponent* component,
 		std::shared_ptr<SocketProxy> socket)
 		: TcpContext(socket), mTcpComponent(component)
 	{
 
 	}
 
-	void ServerClientContext::StartClose()
+	void MessageRpcClient::StartClose()
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->CloseSocket(XCode::NetActiveShutdown);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-		t.post(std::bind(&ServerClientContext::CloseSocket, this, XCode::NetActiveShutdown));
+		t.post(std::bind(&MessageRpcClient::CloseSocket, this, XCode::NetActiveShutdown));
 #endif
 	}
 
-	void ServerClientContext::SendToServer(std::shared_ptr<com::Rpc_Response> message)
+	void MessageRpcClient::SendToServer(std::shared_ptr<com::rpc::response> message)
 	{
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> responseMessage
 				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_RESPONSE, message);
@@ -34,11 +34,11 @@ namespace Sentry
 		this->Send(responseMessage);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-        t.post(std::bind(&ServerClientContext::Send, this, responseMessage));
+        t.post(std::bind(&MessageRpcClient::Send, this, responseMessage));
 #endif
 	}
 
-	void ServerClientContext::SendToServer(std::shared_ptr<com::Rpc_Request> message)
+	void MessageRpcClient::SendToServer(std::shared_ptr<com::rpc::request> message)
 	{
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> requestMessage
 				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_REQUEST,message);
@@ -46,11 +46,11 @@ namespace Sentry
 		this->Send(requestMessage);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-        t.post(std::bind(&ServerClientContext::Send, this, requestMessage));
+        t.post(std::bind(&MessageRpcClient::Send, this, requestMessage));
 #endif
 	}
 
-	void ServerClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
+	void MessageRpcClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{
 		if(code && this->mSocket->IsRemote())
 		{
@@ -62,7 +62,7 @@ namespace Sentry
         }
 	}
 
-	void ServerClientContext::CloseSocket(XCode code)
+	void MessageRpcClient::CloseSocket(XCode code)
 	{
 		if (code == XCode::NetActiveShutdown) //主动关闭不需要通知回主线
 		{
@@ -78,7 +78,7 @@ namespace Sentry
 #endif
 	}
 
-    void ServerClientContext::OnReceiveLength(const asio::error_code &code, int length)
+    void MessageRpcClient::OnReceiveLength(const asio::error_code &code, int length)
     {
         if(code || length <= 0)
         {
@@ -89,7 +89,7 @@ namespace Sentry
         this->ReceiveMessage(length);
     }
 
-    void ServerClientContext::OnReceiveMessage(const asio::error_code &code, std::istream & readStream)
+    void MessageRpcClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream)
     {
         if (code)
         {
@@ -112,9 +112,9 @@ namespace Sentry
         this->ReceiveLength();
     }
 
-	bool ServerClientContext::OnRequest(std::istream & istream1)
+	bool MessageRpcClient::OnRequest(std::istream & istream1)
 	{
-		std::shared_ptr<com::Rpc_Request> requestData(new com::Rpc_Request());
+		std::shared_ptr<com::rpc::request> requestData(new com::rpc::request());
 		if (!requestData->ParsePartialFromIstream(&istream1))
 		{
 #ifdef __DEBUG__
@@ -133,9 +133,9 @@ namespace Sentry
 		return true;
 	}
 
-	bool ServerClientContext::OnResponse(std::istream & istream1)
+	bool MessageRpcClient::OnResponse(std::istream & istream1)
 	{
-		std::shared_ptr<com::Rpc_Response> responseData(new com::Rpc_Response());
+		std::shared_ptr<com::rpc::response> responseData(new com::rpc::response());
 		if (!responseData->ParseFromIstream(&istream1))
 		{
 #ifdef __NET_ERROR_LOG__
@@ -152,17 +152,17 @@ namespace Sentry
 		return true;
 	}
 
-	void ServerClientContext::StartReceive()
+	void MessageRpcClient::StartReceive()
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLength();
 #else
         asio::io_service & t = this->mSocket->GetThread();
-        t.post(std::bind(&ServerClientContext::ReceiveLength, this));
+        t.post(std::bind(&MessageRpcClient::ReceiveLength, this));
 #endif
 	}
 
-	void ServerClientContext::OnConnect(const asio::error_code& error, int count)
+	void MessageRpcClient::OnConnect(const asio::error_code& error, int count)
 	{
 		if(error)
 		{
@@ -171,7 +171,7 @@ namespace Sentry
 #endif
 			AsioContext & context = this->mSocket->GetThread();
 			this->mTimer = std::make_shared<asio::steady_timer>(context, std::chrono::seconds(5));
-			this->mTimer->async_wait(std::bind(std::bind(&ServerClientContext::Connect, this->shared_from_this())));
+			this->mTimer->async_wait(std::bind(std::bind(&MessageRpcClient::Connect, this->shared_from_this())));
 			return;
 		}
         this->ReceiveLength();

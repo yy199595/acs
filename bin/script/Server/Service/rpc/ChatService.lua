@@ -8,7 +8,7 @@ end
 ChatService.Chat = function(id, request)
     local messageComponent = App.GetComponent("MessageComponent")
     local gateComponent = App.GetComponent("GateAgentComponent")
-    local chatMessage = messageComponent:New("c2s.Chat.Notice", {
+    local chatMessage = messageComponent:New("c2s.chat.notice", {
         msg_type = request.msg_type,
         message = request.message
     })

@@ -5,7 +5,6 @@
 #ifndef SERVER_METHODREGISTER_H
 #define SERVER_METHODREGISTER_H
 
-#include"SubMethod.h"
 #include"ServiceMethod.h"
 #include"HttpServiceMethod.h"
 #include"Script/LuaInclude.h"

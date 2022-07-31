@@ -11,19 +11,19 @@
 namespace Client
 {
 	ClientTask::ClientTask(int ms)
-        : Sentry::IRpcTask<c2s::Rpc::Response>(ms)
+        : Sentry::IRpcTask<c2s::rpc::response>(ms)
 	{
 		this->mTaskId = Guid::Create();
 	}
 
-	void ClientTask::OnResponse(std::shared_ptr<c2s::Rpc::Response> response)
+	void ClientTask::OnResponse(std::shared_ptr<c2s::rpc::response> response)
 	{
 		this->mTask.SetResult(response);
 	}
 
     void ClientTask::OnTimeout()
     {
-        std::shared_ptr<c2s::Rpc::Response> response(new c2s::Rpc::Response());
+        std::shared_ptr<c2s::rpc::response> response(new c2s::rpc::response());
         response->set_code((int)XCode::CallTimeout);
         this->mTask.SetResult(response);
     }
@@ -39,7 +39,7 @@ namespace Client
         this->mTimerComponent = nullptr;
 	}
 
-    void ClientComponent::OnRequest(std::shared_ptr<c2s::Rpc::Call> t1)
+    void ClientComponent::OnRequest(std::shared_ptr<c2s::rpc::call> t1)
     {
         LOG_INFO("call client func = " << t1->func());
 	}
@@ -76,7 +76,7 @@ namespace Client
 		}
 	}
 
-	std::shared_ptr<c2s::Rpc::Response> ClientComponent::Call(std::shared_ptr<c2s::Rpc::Request> request)
+	std::shared_ptr<c2s::rpc::response> ClientComponent::Call(std::shared_ptr<c2s::rpc::request> request)
 	{
 		std::shared_ptr<ClientTask> clienRpcTask(new ClientTask(0));
 		request->set_rpc_id(clienRpcTask->GetRpcId());

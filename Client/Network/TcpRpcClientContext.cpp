@@ -9,7 +9,7 @@ namespace Client
 		this->mClientComponent = component;
 	}
 
-	void TcpRpcClientContext::SendToServer(std::shared_ptr<c2s::Rpc_Request> request)
+	void TcpRpcClientContext::SendToServer(std::shared_ptr<c2s::rpc::request> request)
 	{
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> networkData =
                 std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_CLIENT_REQUEST, request);
@@ -71,7 +71,7 @@ namespace Client
 
 	bool TcpRpcClientContext::OnRequest(std::istream & istream1)
     {
-        std::shared_ptr<c2s::Rpc::Call> request(new c2s::Rpc::Call());
+        std::shared_ptr<c2s::rpc::call> request(new c2s::rpc::call());
         if (!request->ParseFromIstream(&istream1))
         {
 			CONSOLE_LOG_ERROR("parse request message error");
@@ -88,7 +88,7 @@ namespace Client
 
 	bool TcpRpcClientContext::OnResponse(std::istream & istream1)
     {
-        std::shared_ptr<c2s::Rpc::Response> response(new c2s::Rpc::Response());
+        std::shared_ptr<c2s::rpc::response> response(new c2s::rpc::response());
         if (!response->ParseFromIstream(&istream1))
         {
 			CONSOLE_LOG_ERROR("parse response message error");

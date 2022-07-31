@@ -25,37 +25,37 @@
             "Async": false,
             "Type": "Server",
             "CallWay": "Net",
-            "Request": "com.Type.Int64",
-            "Response": "s2s.Allot.Response"
+            "Request": "com.type.int64",
+            "Response": "s2s.allot.response"
         },
         "CallClient": {
             "Async": false,
             "Type": "Server",
             "CallWay": "Net",
-            "Request": "c2s.Rpc.Call"
+            "Request": "c2s.rpc.call"
         },
         "BroadCast": {
             "Async": false,
             "Type": "Server",
             "CallWay": "Net",
-            "Request": "s2s.GateBroadCast.Request"
+            "Request": "s2s.broadcast.request"
         },
         "Auth": {
             "Async": true,
             "Type": "Client",
             "CallWay": "Net",
-            "Request":"c2s.GateAuth.Request"
+            "Request":"c2s.auth.request"
         },
         "SaveAddress": {
             "Async": false,
             "Type": "Server",
-            "Request": "s2s.Allot.Save"
+            "Request": "s2s.allot.save"
         },
         "QueryAddress": {
             "Async": false,
             "Type": "Server",
-            "Request": "com.Type.String",
-            "Response": "com.Type.String"
+            "Request": "com.type.string",
+            "Response": "com.type.string"
         }
     },
     "MongoService": {
@@ -63,29 +63,29 @@
         "Insert": {
             "Async": true,
             "Type": "Server",
-            "Request": "s2s.Mongo.Insert"
+            "Request": "s2s.mongo.insert"
         },
         "Delete": {
             "Async": true,
             "Type": "Server",
-            "Request": "s2s.Mongo.Delete"
+            "Request": "s2s.mongo.remove"
         },
         "Query": {
             "Async": true,
             "Type": "Server",
-            "Request": "s2s.Mongo.Query.Request",
-            "Response": "s2s.Mongo.Query.Response"
+            "Request": "s2s.mongo.query.request",
+            "Response": "s2s.mongo.query.response"
         },
         "Update": {
             "Async": true,
             "Type": "Server",
-            "Request": "s2s.Mongo.Update"
+            "Request": "s2s.mongo.update"
         },
         "AddCounter": {
             "Async": true,
             "Type": "Server",
-            "Request": "s2s.AddCounter.Request",
-            "Response": "s2s.AddCounter.Response"
+            "Request": "s2s.add_counter.request",
+            "Response": "s2s.add_counter.response"
         }
     },
     "ChatService": {
@@ -94,7 +94,7 @@
             "Async": false,
             "Type": "Client",
             "CallWay": "Net",
-            "Request": "c2s.Chat.Request"
+            "Request": "c2s.chat.request"
         },
         "Test": {
             "Async": false,

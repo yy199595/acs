@@ -11,11 +11,11 @@ namespace Sentry
 	class RequestTaskQueueSource : public WaitTaskSourceBase
 	{
 	 public:
-		std::shared_ptr<c2s::Rpc::Request> Await();
-		void AddResult(std::shared_ptr<c2s::Rpc::Request> & data);
+		std::shared_ptr<c2s::rpc::request> Await();
+		void AddResult(std::shared_ptr<c2s::rpc::request> & data);
 	 private:
-		std::shared_ptr<c2s::Rpc::Request> mRequest;
-		std::queue<std::shared_ptr<c2s::Rpc::Request>> mTaskQueue;
+		std::shared_ptr<c2s::rpc::request> mRequest;
+		std::queue<std::shared_ptr<c2s::rpc::request>> mTaskQueue;
 	};
 }
 

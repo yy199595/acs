@@ -46,6 +46,8 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/lua ${PROJECT_SOURCE_DIR}/Libs/bin/l
 add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/spdlog ${PROJECT_SOURCE_DIR}/Libs/bin/spdlog)
 add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/protobuf/cmake ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf)
 
+add_subdirectory(${PROJECT_SOURCE_DIR}/Client ${PROJECT_SOURCE_DIRr}/bin)
+
 #LINK_DIRECTORIES(Libs/lib)
 LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/Libs/bin/lua)
 LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/Libs/bin/spdlog)

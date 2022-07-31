@@ -48,7 +48,7 @@ function Main.Start()
 end
 
 function Main.Complete()
-    coroutine.sleep(0.5)
+
     local functions = Main.GetAllFunctions("Complete")
     for key, func in pairs(functions) do
         func()

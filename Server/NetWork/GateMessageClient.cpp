@@ -2,7 +2,7 @@
 // Created by mac on 2021/11/28.
 //
 
-#include"GateClientContext.h"
+#include"GateMessageClient.h"
 #include"Message/c2s.pb.h"
 #include"App/App.h"
 #ifdef __DEBUG__
@@ -14,7 +14,7 @@
 using namespace Tcp::Rpc;
 namespace Sentry
 {
-	GateClientContext::GateClientContext(std::shared_ptr<SocketProxy> socket,
+	GateMessageClient::GateMessageClient(std::shared_ptr<SocketProxy> socket,
 		GateClientComponent* component)
 		: TcpContext(socket), mGateComponent(component)
 	{
@@ -22,17 +22,17 @@ namespace Sentry
 		this->mCallCount = 0;
 	}
 
-	void GateClientContext::StartReceive()
+	void GateMessageClient::StartReceive()
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLength();
 #else
         asio::io_service & t = this->mSocket->GetThread();
-        t.post(std::bind(&GateClientContext::ReceiveLength, this));
+        t.post(std::bind(&GateMessageClient::ReceiveLength, this));
 #endif
 	}
 
-    void GateClientContext::OnReceiveLength(const asio::error_code &code, int length)
+    void GateMessageClient::OnReceiveLength(const asio::error_code &code, int length)
     {
         if(code || length <= 0)
         {
@@ -45,7 +45,7 @@ namespace Sentry
         this->ReceiveMessage(length);
     }
 
-    void GateClientContext::OnReceiveMessage(const asio::error_code &code, std::istream & readStream)
+    void GateMessageClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream)
     {
         if (code)
         {
@@ -58,7 +58,7 @@ namespace Sentry
         if ((MESSAGE_TYPE) readStream.get() == MESSAGE_TYPE::MSG_RPC_CLIENT_REQUEST)
         {
             this->mQps += readStream.rdbuf()->in_avail();
-            std::shared_ptr<c2s::Rpc_Request> request(new c2s::Rpc_Request());
+            std::shared_ptr<c2s::rpc::request> request(new c2s::rpc::request());
             if (!request->ParseFromIstream(&readStream))
             {
                 CONSOLE_LOG_ERROR("parse request message error");
@@ -82,7 +82,7 @@ namespace Sentry
         this->ReceiveLength();
     }
 
-	void GateClientContext::CloseSocket(XCode code)
+	void GateMessageClient::CloseSocket(XCode code)
 	{
         this->mSocket->Close();
         const std::string & address = this->GetAddress();
@@ -94,7 +94,7 @@ namespace Sentry
 #endif
 	}
 
-	void GateClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
+	void GateMessageClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{
 		if(code)
 		{
@@ -107,18 +107,18 @@ namespace Sentry
         this->SendFromMessageQueue();
 	}
 
-	void GateClientContext::StartClose()
+	void GateMessageClient::StartClose()
 	{
 		XCode code = XCode::NetActiveShutdown;
 #ifdef ONLY_MAIN_THREAD
 		this->CloseSocket(code);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-        t.post(std::bind(&GateClientContext::CloseSocket, this, code));
+        t.post(std::bind(&GateMessageClient::CloseSocket, this, code));
 #endif
 	}
 
-	void GateClientContext::SendToClient(std::shared_ptr<c2s::Rpc::Call> message)
+	void GateMessageClient::SendToClient(std::shared_ptr<c2s::rpc::call> message)
 	{
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> requestMessage
 				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_CALL_CLIENT, message);
@@ -126,11 +126,11 @@ namespace Sentry
 		this->Send(requestMessage);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-        t.post(std::bind(&GateClientContext::Send, this, requestMessage));
+        t.post(std::bind(&GateMessageClient::Send, this, requestMessage));
 #endif
 	}
 
-	void GateClientContext::SendToClient(std::shared_ptr<c2s::Rpc::Response> message)
+	void GateMessageClient::SendToClient(std::shared_ptr<c2s::rpc::response> message)
 	{
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> requestMessage
 				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_RESPONSE, message);
@@ -138,7 +138,7 @@ namespace Sentry
 		this->Send(requestMessage);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-        t.post(std::bind(&GateClientContext::Send, this, requestMessage));
+        t.post(std::bind(&GateMessageClient::Send, this, requestMessage));
 #endif
         //CONSOLE_LOG_ERROR("send to client [" << this->mSocket->GetAddress() << "] " << message->rpc_id());
     }

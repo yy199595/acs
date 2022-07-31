@@ -1,0 +1,34 @@
+{
+    "area_id": 1,
+    "node_id": 1,
+    "fps": 30,
+    "node_name": "Client",
+    "thread": {
+        "task": 1,
+        "network": 4
+    },
+    "path": {
+        "log": "log",
+        "source": "source",
+        "proto": "proto/message",
+        "service": "config/service.json"
+    },
+    "lua": {
+        "require": [
+            "script/Common",
+            "script/Client"
+        ]
+    },
+    "component": [
+        "HttpComponent",
+        "NetThreadComponent",
+        "LuaScriptComponent",
+        "RpcClientComponent",
+        "ServiceRpcComponent",
+        "GateClientComponent",
+        "UserSyncComponent",
+        "ServiceMgrComponent",
+        "HttpServiceComponent",
+        "ClientComponent"
+    ]
+}

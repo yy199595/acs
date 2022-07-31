@@ -16,7 +16,7 @@ namespace Sentry
 		long long Time;
 	};
 #endif
-    class ServiceRpcComponent : public RpcTaskComponent<com::Rpc::Response>
+    class ServiceRpcComponent : public RpcTaskComponent<com::rpc::response>
 	{
 	 public:
 		ServiceRpcComponent() = default;
@@ -25,7 +25,7 @@ namespace Sentry
 		void Awake() final;
 		bool LateAwake() final;
 	 public:
-		XCode OnRequest(std::shared_ptr<com::Rpc_Request> request);
+		XCode OnRequest(std::shared_ptr<com::rpc::request> request);
     private:
 		void OnTaskTimeout(long long rpcId);
 	 private:

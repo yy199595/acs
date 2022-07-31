@@ -15,7 +15,7 @@ namespace Client
 	public:
 		TcpRpcClientContext(std::shared_ptr<SocketProxy> socket, ClientComponent * component);
 	public:
-		void SendToServer(std::shared_ptr<c2s::Rpc::Request> request);
+		void SendToServer(std::shared_ptr<c2s::rpc::request> request);
 	protected:
 		bool OnRequest(std::istream & istream1);
 		bool OnResponse(std::istream & istream1);

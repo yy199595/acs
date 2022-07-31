@@ -25,7 +25,7 @@ namespace Sentry
 		return true;
 	}
 
-	XCode ServiceRpcComponent::OnRequest(std::shared_ptr<com::Rpc_Request> request)
+	XCode ServiceRpcComponent::OnRequest(std::shared_ptr<com::rpc::request> request)
 	{
 		if(!RpcServiceConfig::ParseFunName(request->func(), this->mTempService, this->mTempMethod))
 		{
@@ -62,8 +62,7 @@ namespace Sentry
 		}
 
 		const std::string& service = rpcInterfaceConfig->Service;
-
-		std::shared_ptr<com::Rpc::Response> response = std::make_shared<com::Rpc::Response>();
+		std::shared_ptr<com::rpc::response> response = std::make_shared<com::rpc::response>();
 		if (!rpcInterfaceConfig->IsAsync)
 		{
 			ElapsedTimer elapsedTimer;

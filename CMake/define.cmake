@@ -22,6 +22,8 @@ option(__ENABLE_MONGODB__ "是否使用mongodb" OFF)
 option(__ENABLE_MIMALLOC__ "启用mimalloc管理内存" OFF)
 option(__ENABLE_JEMALLOC__ "启用jemalloc管理内存" OFF)
 
+set(CMAKE_COMMON_DIR ${PROJECT_SOURCE_DIR})
+
 if(__ENABLE_JEMALLOC__)
     message("启用jemalloc管理内存")
     add_definitions(-D __ENABLE_JEMALLOC__)

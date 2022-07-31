@@ -50,49 +50,49 @@ struct TableStruct_c2s_2eproto {
 };
 void AddDescriptors_c2s_2eproto();
 namespace c2s {
-class Chat;
-class ChatDefaultTypeInternal;
-extern ChatDefaultTypeInternal _Chat_default_instance_;
-class Chat_Notice;
-class Chat_NoticeDefaultTypeInternal;
-extern Chat_NoticeDefaultTypeInternal _Chat_Notice_default_instance_;
-class Chat_Request;
-class Chat_RequestDefaultTypeInternal;
-extern Chat_RequestDefaultTypeInternal _Chat_Request_default_instance_;
-class GateAuth;
-class GateAuthDefaultTypeInternal;
-extern GateAuthDefaultTypeInternal _GateAuth_default_instance_;
-class GateAuth_Request;
-class GateAuth_RequestDefaultTypeInternal;
-extern GateAuth_RequestDefaultTypeInternal _GateAuth_Request_default_instance_;
-class Rpc;
-class RpcDefaultTypeInternal;
-extern RpcDefaultTypeInternal _Rpc_default_instance_;
-class Rpc_Call;
-class Rpc_CallDefaultTypeInternal;
-extern Rpc_CallDefaultTypeInternal _Rpc_Call_default_instance_;
-class Rpc_Request;
-class Rpc_RequestDefaultTypeInternal;
-extern Rpc_RequestDefaultTypeInternal _Rpc_Request_default_instance_;
-class Rpc_Response;
-class Rpc_ResponseDefaultTypeInternal;
-extern Rpc_ResponseDefaultTypeInternal _Rpc_Response_default_instance_;
 class ServerInfo;
 class ServerInfoDefaultTypeInternal;
 extern ServerInfoDefaultTypeInternal _ServerInfo_default_instance_;
+class auth;
+class authDefaultTypeInternal;
+extern authDefaultTypeInternal _auth_default_instance_;
+class auth_request;
+class auth_requestDefaultTypeInternal;
+extern auth_requestDefaultTypeInternal _auth_request_default_instance_;
+class chat;
+class chatDefaultTypeInternal;
+extern chatDefaultTypeInternal _chat_default_instance_;
+class chat_notice;
+class chat_noticeDefaultTypeInternal;
+extern chat_noticeDefaultTypeInternal _chat_notice_default_instance_;
+class chat_request;
+class chat_requestDefaultTypeInternal;
+extern chat_requestDefaultTypeInternal _chat_request_default_instance_;
+class rpc;
+class rpcDefaultTypeInternal;
+extern rpcDefaultTypeInternal _rpc_default_instance_;
+class rpc_call;
+class rpc_callDefaultTypeInternal;
+extern rpc_callDefaultTypeInternal _rpc_call_default_instance_;
+class rpc_request;
+class rpc_requestDefaultTypeInternal;
+extern rpc_requestDefaultTypeInternal _rpc_request_default_instance_;
+class rpc_response;
+class rpc_responseDefaultTypeInternal;
+extern rpc_responseDefaultTypeInternal _rpc_response_default_instance_;
 }  // namespace c2s
 namespace google {
 namespace protobuf {
-template<> ::c2s::Chat* Arena::CreateMaybeMessage<::c2s::Chat>(Arena*);
-template<> ::c2s::Chat_Notice* Arena::CreateMaybeMessage<::c2s::Chat_Notice>(Arena*);
-template<> ::c2s::Chat_Request* Arena::CreateMaybeMessage<::c2s::Chat_Request>(Arena*);
-template<> ::c2s::GateAuth* Arena::CreateMaybeMessage<::c2s::GateAuth>(Arena*);
-template<> ::c2s::GateAuth_Request* Arena::CreateMaybeMessage<::c2s::GateAuth_Request>(Arena*);
-template<> ::c2s::Rpc* Arena::CreateMaybeMessage<::c2s::Rpc>(Arena*);
-template<> ::c2s::Rpc_Call* Arena::CreateMaybeMessage<::c2s::Rpc_Call>(Arena*);
-template<> ::c2s::Rpc_Request* Arena::CreateMaybeMessage<::c2s::Rpc_Request>(Arena*);
-template<> ::c2s::Rpc_Response* Arena::CreateMaybeMessage<::c2s::Rpc_Response>(Arena*);
 template<> ::c2s::ServerInfo* Arena::CreateMaybeMessage<::c2s::ServerInfo>(Arena*);
+template<> ::c2s::auth* Arena::CreateMaybeMessage<::c2s::auth>(Arena*);
+template<> ::c2s::auth_request* Arena::CreateMaybeMessage<::c2s::auth_request>(Arena*);
+template<> ::c2s::chat* Arena::CreateMaybeMessage<::c2s::chat>(Arena*);
+template<> ::c2s::chat_notice* Arena::CreateMaybeMessage<::c2s::chat_notice>(Arena*);
+template<> ::c2s::chat_request* Arena::CreateMaybeMessage<::c2s::chat_request>(Arena*);
+template<> ::c2s::rpc* Arena::CreateMaybeMessage<::c2s::rpc>(Arena*);
+template<> ::c2s::rpc_call* Arena::CreateMaybeMessage<::c2s::rpc_call>(Arena*);
+template<> ::c2s::rpc_request* Arena::CreateMaybeMessage<::c2s::rpc_request>(Arena*);
+template<> ::c2s::rpc_response* Arena::CreateMaybeMessage<::c2s::rpc_response>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace c2s {
@@ -241,25 +241,25 @@ class ServerInfo :
 };
 // -------------------------------------------------------------------
 
-class Rpc_Request :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.Rpc.Request) */ {
+class rpc_request :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.rpc.request) */ {
  public:
-  Rpc_Request();
-  virtual ~Rpc_Request();
+  rpc_request();
+  virtual ~rpc_request();
 
-  Rpc_Request(const Rpc_Request& from);
+  rpc_request(const rpc_request& from);
 
-  inline Rpc_Request& operator=(const Rpc_Request& from) {
+  inline rpc_request& operator=(const rpc_request& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  Rpc_Request(Rpc_Request&& from) noexcept
-    : Rpc_Request() {
+  rpc_request(rpc_request&& from) noexcept
+    : rpc_request() {
     *this = ::std::move(from);
   }
 
-  inline Rpc_Request& operator=(Rpc_Request&& from) noexcept {
+  inline rpc_request& operator=(rpc_request&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -271,34 +271,34 @@ class Rpc_Request :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const Rpc_Request& default_instance();
+  static const rpc_request& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Rpc_Request* internal_default_instance() {
-    return reinterpret_cast<const Rpc_Request*>(
-               &_Rpc_Request_default_instance_);
+  static inline const rpc_request* internal_default_instance() {
+    return reinterpret_cast<const rpc_request*>(
+               &_rpc_request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     1;
 
-  void Swap(Rpc_Request* other);
-  friend void swap(Rpc_Request& a, Rpc_Request& b) {
+  void Swap(rpc_request* other);
+  friend void swap(rpc_request& a, rpc_request& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline Rpc_Request* New() const final {
-    return CreateMaybeMessage<Rpc_Request>(nullptr);
+  inline rpc_request* New() const final {
+    return CreateMaybeMessage<rpc_request>(nullptr);
   }
 
-  Rpc_Request* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<Rpc_Request>(arena);
+  rpc_request* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<rpc_request>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const Rpc_Request& from);
-  void MergeFrom(const Rpc_Request& from);
+  void CopyFrom(const rpc_request& from);
+  void MergeFrom(const rpc_request& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -320,7 +320,7 @@ class Rpc_Request :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(Rpc_Request* other);
+  void InternalSwap(rpc_request* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -385,7 +385,7 @@ class Rpc_Request :
   ::google::protobuf::uint32 message_idx() const;
   void set_message_idx(::google::protobuf::uint32 value);
 
-  // @@protoc_insertion_point(class_scope:c2s.Rpc.Request)
+  // @@protoc_insertion_point(class_scope:c2s.rpc.request)
  private:
   class HasBitSetters;
 
@@ -400,25 +400,25 @@ class Rpc_Request :
 };
 // -------------------------------------------------------------------
 
-class Rpc_Response :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.Rpc.Response) */ {
+class rpc_response :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.rpc.response) */ {
  public:
-  Rpc_Response();
-  virtual ~Rpc_Response();
+  rpc_response();
+  virtual ~rpc_response();
 
-  Rpc_Response(const Rpc_Response& from);
+  rpc_response(const rpc_response& from);
 
-  inline Rpc_Response& operator=(const Rpc_Response& from) {
+  inline rpc_response& operator=(const rpc_response& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  Rpc_Response(Rpc_Response&& from) noexcept
-    : Rpc_Response() {
+  rpc_response(rpc_response&& from) noexcept
+    : rpc_response() {
     *this = ::std::move(from);
   }
 
-  inline Rpc_Response& operator=(Rpc_Response&& from) noexcept {
+  inline rpc_response& operator=(rpc_response&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -430,34 +430,34 @@ class Rpc_Response :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const Rpc_Response& default_instance();
+  static const rpc_response& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Rpc_Response* internal_default_instance() {
-    return reinterpret_cast<const Rpc_Response*>(
-               &_Rpc_Response_default_instance_);
+  static inline const rpc_response* internal_default_instance() {
+    return reinterpret_cast<const rpc_response*>(
+               &_rpc_response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     2;
 
-  void Swap(Rpc_Response* other);
-  friend void swap(Rpc_Response& a, Rpc_Response& b) {
+  void Swap(rpc_response* other);
+  friend void swap(rpc_response& a, rpc_response& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline Rpc_Response* New() const final {
-    return CreateMaybeMessage<Rpc_Response>(nullptr);
+  inline rpc_response* New() const final {
+    return CreateMaybeMessage<rpc_response>(nullptr);
   }
 
-  Rpc_Response* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<Rpc_Response>(arena);
+  rpc_response* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<rpc_response>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const Rpc_Response& from);
-  void MergeFrom(const Rpc_Response& from);
+  void CopyFrom(const rpc_response& from);
+  void MergeFrom(const rpc_response& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -479,7 +479,7 @@ class Rpc_Response :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(Rpc_Response* other);
+  void InternalSwap(rpc_response* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -536,7 +536,7 @@ class Rpc_Response :
   ::google::protobuf::int32 code() const;
   void set_code(::google::protobuf::int32 value);
 
-  // @@protoc_insertion_point(class_scope:c2s.Rpc.Response)
+  // @@protoc_insertion_point(class_scope:c2s.rpc.response)
  private:
   class HasBitSetters;
 
@@ -551,25 +551,25 @@ class Rpc_Response :
 };
 // -------------------------------------------------------------------
 
-class Rpc_Call :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.Rpc.Call) */ {
+class rpc_call :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.rpc.call) */ {
  public:
-  Rpc_Call();
-  virtual ~Rpc_Call();
+  rpc_call();
+  virtual ~rpc_call();
 
-  Rpc_Call(const Rpc_Call& from);
+  rpc_call(const rpc_call& from);
 
-  inline Rpc_Call& operator=(const Rpc_Call& from) {
+  inline rpc_call& operator=(const rpc_call& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  Rpc_Call(Rpc_Call&& from) noexcept
-    : Rpc_Call() {
+  rpc_call(rpc_call&& from) noexcept
+    : rpc_call() {
     *this = ::std::move(from);
   }
 
-  inline Rpc_Call& operator=(Rpc_Call&& from) noexcept {
+  inline rpc_call& operator=(rpc_call&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -581,34 +581,34 @@ class Rpc_Call :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const Rpc_Call& default_instance();
+  static const rpc_call& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Rpc_Call* internal_default_instance() {
-    return reinterpret_cast<const Rpc_Call*>(
-               &_Rpc_Call_default_instance_);
+  static inline const rpc_call* internal_default_instance() {
+    return reinterpret_cast<const rpc_call*>(
+               &_rpc_call_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     3;
 
-  void Swap(Rpc_Call* other);
-  friend void swap(Rpc_Call& a, Rpc_Call& b) {
+  void Swap(rpc_call* other);
+  friend void swap(rpc_call& a, rpc_call& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline Rpc_Call* New() const final {
-    return CreateMaybeMessage<Rpc_Call>(nullptr);
+  inline rpc_call* New() const final {
+    return CreateMaybeMessage<rpc_call>(nullptr);
   }
 
-  Rpc_Call* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<Rpc_Call>(arena);
+  rpc_call* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<rpc_call>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const Rpc_Call& from);
-  void MergeFrom(const Rpc_Call& from);
+  void CopyFrom(const rpc_call& from);
+  void MergeFrom(const rpc_call& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -630,7 +630,7 @@ class Rpc_Call :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(Rpc_Call* other);
+  void InternalSwap(rpc_call* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -669,7 +669,7 @@ class Rpc_Call :
   ::google::protobuf::Any* mutable_data();
   void set_allocated_data(::google::protobuf::Any* data);
 
-  // @@protoc_insertion_point(class_scope:c2s.Rpc.Call)
+  // @@protoc_insertion_point(class_scope:c2s.rpc.call)
  private:
   class HasBitSetters;
 
@@ -681,25 +681,25 @@ class Rpc_Call :
 };
 // -------------------------------------------------------------------
 
-class Rpc :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.Rpc) */ {
+class rpc :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.rpc) */ {
  public:
-  Rpc();
-  virtual ~Rpc();
+  rpc();
+  virtual ~rpc();
 
-  Rpc(const Rpc& from);
+  rpc(const rpc& from);
 
-  inline Rpc& operator=(const Rpc& from) {
+  inline rpc& operator=(const rpc& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  Rpc(Rpc&& from) noexcept
-    : Rpc() {
+  rpc(rpc&& from) noexcept
+    : rpc() {
     *this = ::std::move(from);
   }
 
-  inline Rpc& operator=(Rpc&& from) noexcept {
+  inline rpc& operator=(rpc&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -711,34 +711,34 @@ class Rpc :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const Rpc& default_instance();
+  static const rpc& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Rpc* internal_default_instance() {
-    return reinterpret_cast<const Rpc*>(
-               &_Rpc_default_instance_);
+  static inline const rpc* internal_default_instance() {
+    return reinterpret_cast<const rpc*>(
+               &_rpc_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     4;
 
-  void Swap(Rpc* other);
-  friend void swap(Rpc& a, Rpc& b) {
+  void Swap(rpc* other);
+  friend void swap(rpc& a, rpc& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline Rpc* New() const final {
-    return CreateMaybeMessage<Rpc>(nullptr);
+  inline rpc* New() const final {
+    return CreateMaybeMessage<rpc>(nullptr);
   }
 
-  Rpc* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<Rpc>(arena);
+  rpc* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<rpc>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const Rpc& from);
-  void MergeFrom(const Rpc& from);
+  void CopyFrom(const rpc& from);
+  void MergeFrom(const rpc& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -760,7 +760,7 @@ class Rpc :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(Rpc* other);
+  void InternalSwap(rpc* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -774,13 +774,13 @@ class Rpc :
 
   // nested types ----------------------------------------------------
 
-  typedef Rpc_Request Request;
-  typedef Rpc_Response Response;
-  typedef Rpc_Call Call;
+  typedef rpc_request request;
+  typedef rpc_response response;
+  typedef rpc_call call;
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:c2s.Rpc)
+  // @@protoc_insertion_point(class_scope:c2s.rpc)
  private:
   class HasBitSetters;
 
@@ -790,25 +790,25 @@ class Rpc :
 };
 // -------------------------------------------------------------------
 
-class GateAuth_Request :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.GateAuth.Request) */ {
+class auth_request :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.auth.request) */ {
  public:
-  GateAuth_Request();
-  virtual ~GateAuth_Request();
+  auth_request();
+  virtual ~auth_request();
 
-  GateAuth_Request(const GateAuth_Request& from);
+  auth_request(const auth_request& from);
 
-  inline GateAuth_Request& operator=(const GateAuth_Request& from) {
+  inline auth_request& operator=(const auth_request& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  GateAuth_Request(GateAuth_Request&& from) noexcept
-    : GateAuth_Request() {
+  auth_request(auth_request&& from) noexcept
+    : auth_request() {
     *this = ::std::move(from);
   }
 
-  inline GateAuth_Request& operator=(GateAuth_Request&& from) noexcept {
+  inline auth_request& operator=(auth_request&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -820,34 +820,34 @@ class GateAuth_Request :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const GateAuth_Request& default_instance();
+  static const auth_request& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const GateAuth_Request* internal_default_instance() {
-    return reinterpret_cast<const GateAuth_Request*>(
-               &_GateAuth_Request_default_instance_);
+  static inline const auth_request* internal_default_instance() {
+    return reinterpret_cast<const auth_request*>(
+               &_auth_request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     5;
 
-  void Swap(GateAuth_Request* other);
-  friend void swap(GateAuth_Request& a, GateAuth_Request& b) {
+  void Swap(auth_request* other);
+  friend void swap(auth_request& a, auth_request& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline GateAuth_Request* New() const final {
-    return CreateMaybeMessage<GateAuth_Request>(nullptr);
+  inline auth_request* New() const final {
+    return CreateMaybeMessage<auth_request>(nullptr);
   }
 
-  GateAuth_Request* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<GateAuth_Request>(arena);
+  auth_request* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<auth_request>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const GateAuth_Request& from);
-  void MergeFrom(const GateAuth_Request& from);
+  void CopyFrom(const auth_request& from);
+  void MergeFrom(const auth_request& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -869,7 +869,7 @@ class GateAuth_Request :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(GateAuth_Request* other);
+  void InternalSwap(auth_request* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -899,7 +899,7 @@ class GateAuth_Request :
   ::std::string* release_token();
   void set_allocated_token(::std::string* token);
 
-  // @@protoc_insertion_point(class_scope:c2s.GateAuth.Request)
+  // @@protoc_insertion_point(class_scope:c2s.auth.request)
  private:
   class HasBitSetters;
 
@@ -910,25 +910,25 @@ class GateAuth_Request :
 };
 // -------------------------------------------------------------------
 
-class GateAuth :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.GateAuth) */ {
+class auth :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.auth) */ {
  public:
-  GateAuth();
-  virtual ~GateAuth();
+  auth();
+  virtual ~auth();
 
-  GateAuth(const GateAuth& from);
+  auth(const auth& from);
 
-  inline GateAuth& operator=(const GateAuth& from) {
+  inline auth& operator=(const auth& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  GateAuth(GateAuth&& from) noexcept
-    : GateAuth() {
+  auth(auth&& from) noexcept
+    : auth() {
     *this = ::std::move(from);
   }
 
-  inline GateAuth& operator=(GateAuth&& from) noexcept {
+  inline auth& operator=(auth&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -940,34 +940,34 @@ class GateAuth :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const GateAuth& default_instance();
+  static const auth& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const GateAuth* internal_default_instance() {
-    return reinterpret_cast<const GateAuth*>(
-               &_GateAuth_default_instance_);
+  static inline const auth* internal_default_instance() {
+    return reinterpret_cast<const auth*>(
+               &_auth_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     6;
 
-  void Swap(GateAuth* other);
-  friend void swap(GateAuth& a, GateAuth& b) {
+  void Swap(auth* other);
+  friend void swap(auth& a, auth& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline GateAuth* New() const final {
-    return CreateMaybeMessage<GateAuth>(nullptr);
+  inline auth* New() const final {
+    return CreateMaybeMessage<auth>(nullptr);
   }
 
-  GateAuth* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<GateAuth>(arena);
+  auth* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<auth>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const GateAuth& from);
-  void MergeFrom(const GateAuth& from);
+  void CopyFrom(const auth& from);
+  void MergeFrom(const auth& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -989,7 +989,7 @@ class GateAuth :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(GateAuth* other);
+  void InternalSwap(auth* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -1003,11 +1003,11 @@ class GateAuth :
 
   // nested types ----------------------------------------------------
 
-  typedef GateAuth_Request Request;
+  typedef auth_request request;
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:c2s.GateAuth)
+  // @@protoc_insertion_point(class_scope:c2s.auth)
  private:
   class HasBitSetters;
 
@@ -1017,25 +1017,25 @@ class GateAuth :
 };
 // -------------------------------------------------------------------
 
-class Chat_Request :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.Chat.Request) */ {
+class chat_request :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.chat.request) */ {
  public:
-  Chat_Request();
-  virtual ~Chat_Request();
+  chat_request();
+  virtual ~chat_request();
 
-  Chat_Request(const Chat_Request& from);
+  chat_request(const chat_request& from);
 
-  inline Chat_Request& operator=(const Chat_Request& from) {
+  inline chat_request& operator=(const chat_request& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  Chat_Request(Chat_Request&& from) noexcept
-    : Chat_Request() {
+  chat_request(chat_request&& from) noexcept
+    : chat_request() {
     *this = ::std::move(from);
   }
 
-  inline Chat_Request& operator=(Chat_Request&& from) noexcept {
+  inline chat_request& operator=(chat_request&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1047,34 +1047,34 @@ class Chat_Request :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const Chat_Request& default_instance();
+  static const chat_request& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Chat_Request* internal_default_instance() {
-    return reinterpret_cast<const Chat_Request*>(
-               &_Chat_Request_default_instance_);
+  static inline const chat_request* internal_default_instance() {
+    return reinterpret_cast<const chat_request*>(
+               &_chat_request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     7;
 
-  void Swap(Chat_Request* other);
-  friend void swap(Chat_Request& a, Chat_Request& b) {
+  void Swap(chat_request* other);
+  friend void swap(chat_request& a, chat_request& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline Chat_Request* New() const final {
-    return CreateMaybeMessage<Chat_Request>(nullptr);
+  inline chat_request* New() const final {
+    return CreateMaybeMessage<chat_request>(nullptr);
   }
 
-  Chat_Request* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<Chat_Request>(arena);
+  chat_request* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<chat_request>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const Chat_Request& from);
-  void MergeFrom(const Chat_Request& from);
+  void CopyFrom(const chat_request& from);
+  void MergeFrom(const chat_request& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1096,7 +1096,7 @@ class Chat_Request :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(Chat_Request* other);
+  void InternalSwap(chat_request* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -1138,7 +1138,7 @@ class Chat_Request :
   ::google::protobuf::int32 msg_type() const;
   void set_msg_type(::google::protobuf::int32 value);
 
-  // @@protoc_insertion_point(class_scope:c2s.Chat.Request)
+  // @@protoc_insertion_point(class_scope:c2s.chat.request)
  private:
   class HasBitSetters;
 
@@ -1151,25 +1151,25 @@ class Chat_Request :
 };
 // -------------------------------------------------------------------
 
-class Chat_Notice :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.Chat.Notice) */ {
+class chat_notice :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.chat.notice) */ {
  public:
-  Chat_Notice();
-  virtual ~Chat_Notice();
+  chat_notice();
+  virtual ~chat_notice();
 
-  Chat_Notice(const Chat_Notice& from);
+  chat_notice(const chat_notice& from);
 
-  inline Chat_Notice& operator=(const Chat_Notice& from) {
+  inline chat_notice& operator=(const chat_notice& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  Chat_Notice(Chat_Notice&& from) noexcept
-    : Chat_Notice() {
+  chat_notice(chat_notice&& from) noexcept
+    : chat_notice() {
     *this = ::std::move(from);
   }
 
-  inline Chat_Notice& operator=(Chat_Notice&& from) noexcept {
+  inline chat_notice& operator=(chat_notice&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1181,34 +1181,34 @@ class Chat_Notice :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const Chat_Notice& default_instance();
+  static const chat_notice& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Chat_Notice* internal_default_instance() {
-    return reinterpret_cast<const Chat_Notice*>(
-               &_Chat_Notice_default_instance_);
+  static inline const chat_notice* internal_default_instance() {
+    return reinterpret_cast<const chat_notice*>(
+               &_chat_notice_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     8;
 
-  void Swap(Chat_Notice* other);
-  friend void swap(Chat_Notice& a, Chat_Notice& b) {
+  void Swap(chat_notice* other);
+  friend void swap(chat_notice& a, chat_notice& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline Chat_Notice* New() const final {
-    return CreateMaybeMessage<Chat_Notice>(nullptr);
+  inline chat_notice* New() const final {
+    return CreateMaybeMessage<chat_notice>(nullptr);
   }
 
-  Chat_Notice* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<Chat_Notice>(arena);
+  chat_notice* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<chat_notice>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const Chat_Notice& from);
-  void MergeFrom(const Chat_Notice& from);
+  void CopyFrom(const chat_notice& from);
+  void MergeFrom(const chat_notice& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1230,7 +1230,7 @@ class Chat_Notice :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(Chat_Notice* other);
+  void InternalSwap(chat_notice* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -1266,7 +1266,7 @@ class Chat_Notice :
   ::google::protobuf::int32 msg_type() const;
   void set_msg_type(::google::protobuf::int32 value);
 
-  // @@protoc_insertion_point(class_scope:c2s.Chat.Notice)
+  // @@protoc_insertion_point(class_scope:c2s.chat.notice)
  private:
   class HasBitSetters;
 
@@ -1278,25 +1278,25 @@ class Chat_Notice :
 };
 // -------------------------------------------------------------------
 
-class Chat :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.Chat) */ {
+class chat :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.chat) */ {
  public:
-  Chat();
-  virtual ~Chat();
+  chat();
+  virtual ~chat();
 
-  Chat(const Chat& from);
+  chat(const chat& from);
 
-  inline Chat& operator=(const Chat& from) {
+  inline chat& operator=(const chat& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  Chat(Chat&& from) noexcept
-    : Chat() {
+  chat(chat&& from) noexcept
+    : chat() {
     *this = ::std::move(from);
   }
 
-  inline Chat& operator=(Chat&& from) noexcept {
+  inline chat& operator=(chat&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -1308,34 +1308,34 @@ class Chat :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const Chat& default_instance();
+  static const chat& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Chat* internal_default_instance() {
-    return reinterpret_cast<const Chat*>(
-               &_Chat_default_instance_);
+  static inline const chat* internal_default_instance() {
+    return reinterpret_cast<const chat*>(
+               &_chat_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     9;
 
-  void Swap(Chat* other);
-  friend void swap(Chat& a, Chat& b) {
+  void Swap(chat* other);
+  friend void swap(chat& a, chat& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline Chat* New() const final {
-    return CreateMaybeMessage<Chat>(nullptr);
+  inline chat* New() const final {
+    return CreateMaybeMessage<chat>(nullptr);
   }
 
-  Chat* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<Chat>(arena);
+  chat* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<chat>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const Chat& from);
-  void MergeFrom(const Chat& from);
+  void CopyFrom(const chat& from);
+  void MergeFrom(const chat& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -1357,7 +1357,7 @@ class Chat :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(Chat* other);
+  void InternalSwap(chat* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -1371,12 +1371,12 @@ class Chat :
 
   // nested types ----------------------------------------------------
 
-  typedef Chat_Request Request;
-  typedef Chat_Notice Notice;
+  typedef chat_request request;
+  typedef chat_notice notice;
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:c2s.Chat)
+  // @@protoc_insertion_point(class_scope:c2s.chat)
  private:
   class HasBitSetters;
 
@@ -1517,169 +1517,169 @@ inline void ServerInfo::set_server_state(::google::protobuf::int32 value) {
 
 // -------------------------------------------------------------------
 
-// Rpc_Request
+// rpc_request
 
 // int64 rpc_id = 1;
-inline void Rpc_Request::clear_rpc_id() {
+inline void rpc_request::clear_rpc_id() {
   rpc_id_ = PROTOBUF_LONGLONG(0);
 }
-inline ::google::protobuf::int64 Rpc_Request::rpc_id() const {
-  // @@protoc_insertion_point(field_get:c2s.Rpc.Request.rpc_id)
+inline ::google::protobuf::int64 rpc_request::rpc_id() const {
+  // @@protoc_insertion_point(field_get:c2s.rpc.request.rpc_id)
   return rpc_id_;
 }
-inline void Rpc_Request::set_rpc_id(::google::protobuf::int64 value) {
+inline void rpc_request::set_rpc_id(::google::protobuf::int64 value) {
   
   rpc_id_ = value;
-  // @@protoc_insertion_point(field_set:c2s.Rpc.Request.rpc_id)
+  // @@protoc_insertion_point(field_set:c2s.rpc.request.rpc_id)
 }
 
 // string address = 2;
-inline void Rpc_Request::clear_address() {
+inline void rpc_request::clear_address() {
   address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& Rpc_Request::address() const {
-  // @@protoc_insertion_point(field_get:c2s.Rpc.Request.address)
+inline const ::std::string& rpc_request::address() const {
+  // @@protoc_insertion_point(field_get:c2s.rpc.request.address)
   return address_.GetNoArena();
 }
-inline void Rpc_Request::set_address(const ::std::string& value) {
+inline void rpc_request::set_address(const ::std::string& value) {
   
   address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.Rpc.Request.address)
+  // @@protoc_insertion_point(field_set:c2s.rpc.request.address)
 }
 #if LANG_CXX11
-inline void Rpc_Request::set_address(::std::string&& value) {
+inline void rpc_request::set_address(::std::string&& value) {
   
   address_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.Rpc.Request.address)
+  // @@protoc_insertion_point(field_set_rvalue:c2s.rpc.request.address)
 }
 #endif
-inline void Rpc_Request::set_address(const char* value) {
+inline void rpc_request::set_address(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.Rpc.Request.address)
+  // @@protoc_insertion_point(field_set_char:c2s.rpc.request.address)
 }
-inline void Rpc_Request::set_address(const char* value, size_t size) {
+inline void rpc_request::set_address(const char* value, size_t size) {
   
   address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.Rpc.Request.address)
+  // @@protoc_insertion_point(field_set_pointer:c2s.rpc.request.address)
 }
-inline ::std::string* Rpc_Request::mutable_address() {
+inline ::std::string* rpc_request::mutable_address() {
   
-  // @@protoc_insertion_point(field_mutable:c2s.Rpc.Request.address)
+  // @@protoc_insertion_point(field_mutable:c2s.rpc.request.address)
   return address_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* Rpc_Request::release_address() {
-  // @@protoc_insertion_point(field_release:c2s.Rpc.Request.address)
+inline ::std::string* rpc_request::release_address() {
+  // @@protoc_insertion_point(field_release:c2s.rpc.request.address)
   
   return address_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void Rpc_Request::set_allocated_address(::std::string* address) {
+inline void rpc_request::set_allocated_address(::std::string* address) {
   if (address != nullptr) {
     
   } else {
     
   }
   address_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), address);
-  // @@protoc_insertion_point(field_set_allocated:c2s.Rpc.Request.address)
+  // @@protoc_insertion_point(field_set_allocated:c2s.rpc.request.address)
 }
 
 // string method_name = 3;
-inline void Rpc_Request::clear_method_name() {
+inline void rpc_request::clear_method_name() {
   method_name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& Rpc_Request::method_name() const {
-  // @@protoc_insertion_point(field_get:c2s.Rpc.Request.method_name)
+inline const ::std::string& rpc_request::method_name() const {
+  // @@protoc_insertion_point(field_get:c2s.rpc.request.method_name)
   return method_name_.GetNoArena();
 }
-inline void Rpc_Request::set_method_name(const ::std::string& value) {
+inline void rpc_request::set_method_name(const ::std::string& value) {
   
   method_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.Rpc.Request.method_name)
+  // @@protoc_insertion_point(field_set:c2s.rpc.request.method_name)
 }
 #if LANG_CXX11
-inline void Rpc_Request::set_method_name(::std::string&& value) {
+inline void rpc_request::set_method_name(::std::string&& value) {
   
   method_name_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.Rpc.Request.method_name)
+  // @@protoc_insertion_point(field_set_rvalue:c2s.rpc.request.method_name)
 }
 #endif
-inline void Rpc_Request::set_method_name(const char* value) {
+inline void rpc_request::set_method_name(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   method_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.Rpc.Request.method_name)
+  // @@protoc_insertion_point(field_set_char:c2s.rpc.request.method_name)
 }
-inline void Rpc_Request::set_method_name(const char* value, size_t size) {
+inline void rpc_request::set_method_name(const char* value, size_t size) {
   
   method_name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.Rpc.Request.method_name)
+  // @@protoc_insertion_point(field_set_pointer:c2s.rpc.request.method_name)
 }
-inline ::std::string* Rpc_Request::mutable_method_name() {
+inline ::std::string* rpc_request::mutable_method_name() {
   
-  // @@protoc_insertion_point(field_mutable:c2s.Rpc.Request.method_name)
+  // @@protoc_insertion_point(field_mutable:c2s.rpc.request.method_name)
   return method_name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* Rpc_Request::release_method_name() {
-  // @@protoc_insertion_point(field_release:c2s.Rpc.Request.method_name)
+inline ::std::string* rpc_request::release_method_name() {
+  // @@protoc_insertion_point(field_release:c2s.rpc.request.method_name)
   
   return method_name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void Rpc_Request::set_allocated_method_name(::std::string* method_name) {
+inline void rpc_request::set_allocated_method_name(::std::string* method_name) {
   if (method_name != nullptr) {
     
   } else {
     
   }
   method_name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), method_name);
-  // @@protoc_insertion_point(field_set_allocated:c2s.Rpc.Request.method_name)
+  // @@protoc_insertion_point(field_set_allocated:c2s.rpc.request.method_name)
 }
 
 // uint32 message_idx = 4;
-inline void Rpc_Request::clear_message_idx() {
+inline void rpc_request::clear_message_idx() {
   message_idx_ = 0u;
 }
-inline ::google::protobuf::uint32 Rpc_Request::message_idx() const {
-  // @@protoc_insertion_point(field_get:c2s.Rpc.Request.message_idx)
+inline ::google::protobuf::uint32 rpc_request::message_idx() const {
+  // @@protoc_insertion_point(field_get:c2s.rpc.request.message_idx)
   return message_idx_;
 }
-inline void Rpc_Request::set_message_idx(::google::protobuf::uint32 value) {
+inline void rpc_request::set_message_idx(::google::protobuf::uint32 value) {
   
   message_idx_ = value;
-  // @@protoc_insertion_point(field_set:c2s.Rpc.Request.message_idx)
+  // @@protoc_insertion_point(field_set:c2s.rpc.request.message_idx)
 }
 
 // .google.protobuf.Any data = 5;
-inline bool Rpc_Request::has_data() const {
+inline bool rpc_request::has_data() const {
   return this != internal_default_instance() && data_ != nullptr;
 }
-inline const ::google::protobuf::Any& Rpc_Request::data() const {
+inline const ::google::protobuf::Any& rpc_request::data() const {
   const ::google::protobuf::Any* p = data_;
-  // @@protoc_insertion_point(field_get:c2s.Rpc.Request.data)
+  // @@protoc_insertion_point(field_get:c2s.rpc.request.data)
   return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Any*>(
       &::google::protobuf::_Any_default_instance_);
 }
-inline ::google::protobuf::Any* Rpc_Request::release_data() {
-  // @@protoc_insertion_point(field_release:c2s.Rpc.Request.data)
+inline ::google::protobuf::Any* rpc_request::release_data() {
+  // @@protoc_insertion_point(field_release:c2s.rpc.request.data)
   
   ::google::protobuf::Any* temp = data_;
   data_ = nullptr;
   return temp;
 }
-inline ::google::protobuf::Any* Rpc_Request::mutable_data() {
+inline ::google::protobuf::Any* rpc_request::mutable_data() {
   
   if (data_ == nullptr) {
     auto* p = CreateMaybeMessage<::google::protobuf::Any>(GetArenaNoVirtual());
     data_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:c2s.Rpc.Request.data)
+  // @@protoc_insertion_point(field_mutable:c2s.rpc.request.data)
   return data_;
 }
-inline void Rpc_Request::set_allocated_data(::google::protobuf::Any* data) {
+inline void rpc_request::set_allocated_data(::google::protobuf::Any* data) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   if (message_arena == nullptr) {
     delete reinterpret_cast< ::google::protobuf::MessageLite*>(data_);
@@ -1695,135 +1695,135 @@ inline void Rpc_Request::set_allocated_data(::google::protobuf::Any* data) {
     
   }
   data_ = data;
-  // @@protoc_insertion_point(field_set_allocated:c2s.Rpc.Request.data)
+  // @@protoc_insertion_point(field_set_allocated:c2s.rpc.request.data)
 }
 
 // -------------------------------------------------------------------
 
-// Rpc_Response
+// rpc_response
 
 // int32 code = 1;
-inline void Rpc_Response::clear_code() {
+inline void rpc_response::clear_code() {
   code_ = 0;
 }
-inline ::google::protobuf::int32 Rpc_Response::code() const {
-  // @@protoc_insertion_point(field_get:c2s.Rpc.Response.code)
+inline ::google::protobuf::int32 rpc_response::code() const {
+  // @@protoc_insertion_point(field_get:c2s.rpc.response.code)
   return code_;
 }
-inline void Rpc_Response::set_code(::google::protobuf::int32 value) {
+inline void rpc_response::set_code(::google::protobuf::int32 value) {
   
   code_ = value;
-  // @@protoc_insertion_point(field_set:c2s.Rpc.Response.code)
+  // @@protoc_insertion_point(field_set:c2s.rpc.response.code)
 }
 
 // int64 rpc_id = 2;
-inline void Rpc_Response::clear_rpc_id() {
+inline void rpc_response::clear_rpc_id() {
   rpc_id_ = PROTOBUF_LONGLONG(0);
 }
-inline ::google::protobuf::int64 Rpc_Response::rpc_id() const {
-  // @@protoc_insertion_point(field_get:c2s.Rpc.Response.rpc_id)
+inline ::google::protobuf::int64 rpc_response::rpc_id() const {
+  // @@protoc_insertion_point(field_get:c2s.rpc.response.rpc_id)
   return rpc_id_;
 }
-inline void Rpc_Response::set_rpc_id(::google::protobuf::int64 value) {
+inline void rpc_response::set_rpc_id(::google::protobuf::int64 value) {
   
   rpc_id_ = value;
-  // @@protoc_insertion_point(field_set:c2s.Rpc.Response.rpc_id)
+  // @@protoc_insertion_point(field_set:c2s.rpc.response.rpc_id)
 }
 
 // int64 sock_id = 3;
-inline void Rpc_Response::clear_sock_id() {
+inline void rpc_response::clear_sock_id() {
   sock_id_ = PROTOBUF_LONGLONG(0);
 }
-inline ::google::protobuf::int64 Rpc_Response::sock_id() const {
-  // @@protoc_insertion_point(field_get:c2s.Rpc.Response.sock_id)
+inline ::google::protobuf::int64 rpc_response::sock_id() const {
+  // @@protoc_insertion_point(field_get:c2s.rpc.response.sock_id)
   return sock_id_;
 }
-inline void Rpc_Response::set_sock_id(::google::protobuf::int64 value) {
+inline void rpc_response::set_sock_id(::google::protobuf::int64 value) {
   
   sock_id_ = value;
-  // @@protoc_insertion_point(field_set:c2s.Rpc.Response.sock_id)
+  // @@protoc_insertion_point(field_set:c2s.rpc.response.sock_id)
 }
 
 // string error_str = 4;
-inline void Rpc_Response::clear_error_str() {
+inline void rpc_response::clear_error_str() {
   error_str_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& Rpc_Response::error_str() const {
-  // @@protoc_insertion_point(field_get:c2s.Rpc.Response.error_str)
+inline const ::std::string& rpc_response::error_str() const {
+  // @@protoc_insertion_point(field_get:c2s.rpc.response.error_str)
   return error_str_.GetNoArena();
 }
-inline void Rpc_Response::set_error_str(const ::std::string& value) {
+inline void rpc_response::set_error_str(const ::std::string& value) {
   
   error_str_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_set:c2s.rpc.response.error_str)
 }
 #if LANG_CXX11
-inline void Rpc_Response::set_error_str(::std::string&& value) {
+inline void rpc_response::set_error_str(::std::string&& value) {
   
   error_str_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_set_rvalue:c2s.rpc.response.error_str)
 }
 #endif
-inline void Rpc_Response::set_error_str(const char* value) {
+inline void rpc_response::set_error_str(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   error_str_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_set_char:c2s.rpc.response.error_str)
 }
-inline void Rpc_Response::set_error_str(const char* value, size_t size) {
+inline void rpc_response::set_error_str(const char* value, size_t size) {
   
   error_str_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_set_pointer:c2s.rpc.response.error_str)
 }
-inline ::std::string* Rpc_Response::mutable_error_str() {
+inline ::std::string* rpc_response::mutable_error_str() {
   
-  // @@protoc_insertion_point(field_mutable:c2s.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_mutable:c2s.rpc.response.error_str)
   return error_str_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* Rpc_Response::release_error_str() {
-  // @@protoc_insertion_point(field_release:c2s.Rpc.Response.error_str)
+inline ::std::string* rpc_response::release_error_str() {
+  // @@protoc_insertion_point(field_release:c2s.rpc.response.error_str)
   
   return error_str_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void Rpc_Response::set_allocated_error_str(::std::string* error_str) {
+inline void rpc_response::set_allocated_error_str(::std::string* error_str) {
   if (error_str != nullptr) {
     
   } else {
     
   }
   error_str_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), error_str);
-  // @@protoc_insertion_point(field_set_allocated:c2s.Rpc.Response.error_str)
+  // @@protoc_insertion_point(field_set_allocated:c2s.rpc.response.error_str)
 }
 
 // .google.protobuf.Any data = 5;
-inline bool Rpc_Response::has_data() const {
+inline bool rpc_response::has_data() const {
   return this != internal_default_instance() && data_ != nullptr;
 }
-inline const ::google::protobuf::Any& Rpc_Response::data() const {
+inline const ::google::protobuf::Any& rpc_response::data() const {
   const ::google::protobuf::Any* p = data_;
-  // @@protoc_insertion_point(field_get:c2s.Rpc.Response.data)
+  // @@protoc_insertion_point(field_get:c2s.rpc.response.data)
   return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Any*>(
       &::google::protobuf::_Any_default_instance_);
 }
-inline ::google::protobuf::Any* Rpc_Response::release_data() {
-  // @@protoc_insertion_point(field_release:c2s.Rpc.Response.data)
+inline ::google::protobuf::Any* rpc_response::release_data() {
+  // @@protoc_insertion_point(field_release:c2s.rpc.response.data)
   
   ::google::protobuf::Any* temp = data_;
   data_ = nullptr;
   return temp;
 }
-inline ::google::protobuf::Any* Rpc_Response::mutable_data() {
+inline ::google::protobuf::Any* rpc_response::mutable_data() {
   
   if (data_ == nullptr) {
     auto* p = CreateMaybeMessage<::google::protobuf::Any>(GetArenaNoVirtual());
     data_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:c2s.Rpc.Response.data)
+  // @@protoc_insertion_point(field_mutable:c2s.rpc.response.data)
   return data_;
 }
-inline void Rpc_Response::set_allocated_data(::google::protobuf::Any* data) {
+inline void rpc_response::set_allocated_data(::google::protobuf::Any* data) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   if (message_arena == nullptr) {
     delete reinterpret_cast< ::google::protobuf::MessageLite*>(data_);
@@ -1839,93 +1839,93 @@ inline void Rpc_Response::set_allocated_data(::google::protobuf::Any* data) {
     
   }
   data_ = data;
-  // @@protoc_insertion_point(field_set_allocated:c2s.Rpc.Response.data)
+  // @@protoc_insertion_point(field_set_allocated:c2s.rpc.response.data)
 }
 
 // -------------------------------------------------------------------
 
-// Rpc_Call
+// rpc_call
 
 // string func = 1;
-inline void Rpc_Call::clear_func() {
+inline void rpc_call::clear_func() {
   func_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& Rpc_Call::func() const {
-  // @@protoc_insertion_point(field_get:c2s.Rpc.Call.func)
+inline const ::std::string& rpc_call::func() const {
+  // @@protoc_insertion_point(field_get:c2s.rpc.call.func)
   return func_.GetNoArena();
 }
-inline void Rpc_Call::set_func(const ::std::string& value) {
+inline void rpc_call::set_func(const ::std::string& value) {
   
   func_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.Rpc.Call.func)
+  // @@protoc_insertion_point(field_set:c2s.rpc.call.func)
 }
 #if LANG_CXX11
-inline void Rpc_Call::set_func(::std::string&& value) {
+inline void rpc_call::set_func(::std::string&& value) {
   
   func_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.Rpc.Call.func)
+  // @@protoc_insertion_point(field_set_rvalue:c2s.rpc.call.func)
 }
 #endif
-inline void Rpc_Call::set_func(const char* value) {
+inline void rpc_call::set_func(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   func_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.Rpc.Call.func)
+  // @@protoc_insertion_point(field_set_char:c2s.rpc.call.func)
 }
-inline void Rpc_Call::set_func(const char* value, size_t size) {
+inline void rpc_call::set_func(const char* value, size_t size) {
   
   func_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.Rpc.Call.func)
+  // @@protoc_insertion_point(field_set_pointer:c2s.rpc.call.func)
 }
-inline ::std::string* Rpc_Call::mutable_func() {
+inline ::std::string* rpc_call::mutable_func() {
   
-  // @@protoc_insertion_point(field_mutable:c2s.Rpc.Call.func)
+  // @@protoc_insertion_point(field_mutable:c2s.rpc.call.func)
   return func_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* Rpc_Call::release_func() {
-  // @@protoc_insertion_point(field_release:c2s.Rpc.Call.func)
+inline ::std::string* rpc_call::release_func() {
+  // @@protoc_insertion_point(field_release:c2s.rpc.call.func)
   
   return func_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void Rpc_Call::set_allocated_func(::std::string* func) {
+inline void rpc_call::set_allocated_func(::std::string* func) {
   if (func != nullptr) {
     
   } else {
     
   }
   func_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), func);
-  // @@protoc_insertion_point(field_set_allocated:c2s.Rpc.Call.func)
+  // @@protoc_insertion_point(field_set_allocated:c2s.rpc.call.func)
 }
 
 // .google.protobuf.Any data = 2;
-inline bool Rpc_Call::has_data() const {
+inline bool rpc_call::has_data() const {
   return this != internal_default_instance() && data_ != nullptr;
 }
-inline const ::google::protobuf::Any& Rpc_Call::data() const {
+inline const ::google::protobuf::Any& rpc_call::data() const {
   const ::google::protobuf::Any* p = data_;
-  // @@protoc_insertion_point(field_get:c2s.Rpc.Call.data)
+  // @@protoc_insertion_point(field_get:c2s.rpc.call.data)
   return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Any*>(
       &::google::protobuf::_Any_default_instance_);
 }
-inline ::google::protobuf::Any* Rpc_Call::release_data() {
-  // @@protoc_insertion_point(field_release:c2s.Rpc.Call.data)
+inline ::google::protobuf::Any* rpc_call::release_data() {
+  // @@protoc_insertion_point(field_release:c2s.rpc.call.data)
   
   ::google::protobuf::Any* temp = data_;
   data_ = nullptr;
   return temp;
 }
-inline ::google::protobuf::Any* Rpc_Call::mutable_data() {
+inline ::google::protobuf::Any* rpc_call::mutable_data() {
   
   if (data_ == nullptr) {
     auto* p = CreateMaybeMessage<::google::protobuf::Any>(GetArenaNoVirtual());
     data_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:c2s.Rpc.Call.data)
+  // @@protoc_insertion_point(field_mutable:c2s.rpc.call.data)
   return data_;
 }
-inline void Rpc_Call::set_allocated_data(::google::protobuf::Any* data) {
+inline void rpc_call::set_allocated_data(::google::protobuf::Any* data) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   if (message_arena == nullptr) {
     delete reinterpret_cast< ::google::protobuf::MessageLite*>(data_);
@@ -1941,233 +1941,233 @@ inline void Rpc_Call::set_allocated_data(::google::protobuf::Any* data) {
     
   }
   data_ = data;
-  // @@protoc_insertion_point(field_set_allocated:c2s.Rpc.Call.data)
+  // @@protoc_insertion_point(field_set_allocated:c2s.rpc.call.data)
 }
 
 // -------------------------------------------------------------------
 
-// Rpc
+// rpc
 
 // -------------------------------------------------------------------
 
-// GateAuth_Request
+// auth_request
 
 // string token = 1;
-inline void GateAuth_Request::clear_token() {
+inline void auth_request::clear_token() {
   token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& GateAuth_Request::token() const {
-  // @@protoc_insertion_point(field_get:c2s.GateAuth.Request.token)
+inline const ::std::string& auth_request::token() const {
+  // @@protoc_insertion_point(field_get:c2s.auth.request.token)
   return token_.GetNoArena();
 }
-inline void GateAuth_Request::set_token(const ::std::string& value) {
+inline void auth_request::set_token(const ::std::string& value) {
   
   token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.GateAuth.Request.token)
+  // @@protoc_insertion_point(field_set:c2s.auth.request.token)
 }
 #if LANG_CXX11
-inline void GateAuth_Request::set_token(::std::string&& value) {
+inline void auth_request::set_token(::std::string&& value) {
   
   token_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.GateAuth.Request.token)
+  // @@protoc_insertion_point(field_set_rvalue:c2s.auth.request.token)
 }
 #endif
-inline void GateAuth_Request::set_token(const char* value) {
+inline void auth_request::set_token(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.GateAuth.Request.token)
+  // @@protoc_insertion_point(field_set_char:c2s.auth.request.token)
 }
-inline void GateAuth_Request::set_token(const char* value, size_t size) {
+inline void auth_request::set_token(const char* value, size_t size) {
   
   token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.GateAuth.Request.token)
+  // @@protoc_insertion_point(field_set_pointer:c2s.auth.request.token)
 }
-inline ::std::string* GateAuth_Request::mutable_token() {
+inline ::std::string* auth_request::mutable_token() {
   
-  // @@protoc_insertion_point(field_mutable:c2s.GateAuth.Request.token)
+  // @@protoc_insertion_point(field_mutable:c2s.auth.request.token)
   return token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* GateAuth_Request::release_token() {
-  // @@protoc_insertion_point(field_release:c2s.GateAuth.Request.token)
+inline ::std::string* auth_request::release_token() {
+  // @@protoc_insertion_point(field_release:c2s.auth.request.token)
   
   return token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void GateAuth_Request::set_allocated_token(::std::string* token) {
+inline void auth_request::set_allocated_token(::std::string* token) {
   if (token != nullptr) {
     
   } else {
     
   }
   token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
-  // @@protoc_insertion_point(field_set_allocated:c2s.GateAuth.Request.token)
+  // @@protoc_insertion_point(field_set_allocated:c2s.auth.request.token)
 }
 
 // -------------------------------------------------------------------
 
-// GateAuth
+// auth
 
 // -------------------------------------------------------------------
 
-// Chat_Request
+// chat_request
 
 // int64 user_id = 1;
-inline void Chat_Request::clear_user_id() {
+inline void chat_request::clear_user_id() {
   user_id_ = PROTOBUF_LONGLONG(0);
 }
-inline ::google::protobuf::int64 Chat_Request::user_id() const {
-  // @@protoc_insertion_point(field_get:c2s.Chat.Request.user_id)
+inline ::google::protobuf::int64 chat_request::user_id() const {
+  // @@protoc_insertion_point(field_get:c2s.chat.request.user_id)
   return user_id_;
 }
-inline void Chat_Request::set_user_id(::google::protobuf::int64 value) {
+inline void chat_request::set_user_id(::google::protobuf::int64 value) {
   
   user_id_ = value;
-  // @@protoc_insertion_point(field_set:c2s.Chat.Request.user_id)
+  // @@protoc_insertion_point(field_set:c2s.chat.request.user_id)
 }
 
 // int32 msg_type = 2;
-inline void Chat_Request::clear_msg_type() {
+inline void chat_request::clear_msg_type() {
   msg_type_ = 0;
 }
-inline ::google::protobuf::int32 Chat_Request::msg_type() const {
-  // @@protoc_insertion_point(field_get:c2s.Chat.Request.msg_type)
+inline ::google::protobuf::int32 chat_request::msg_type() const {
+  // @@protoc_insertion_point(field_get:c2s.chat.request.msg_type)
   return msg_type_;
 }
-inline void Chat_Request::set_msg_type(::google::protobuf::int32 value) {
+inline void chat_request::set_msg_type(::google::protobuf::int32 value) {
   
   msg_type_ = value;
-  // @@protoc_insertion_point(field_set:c2s.Chat.Request.msg_type)
+  // @@protoc_insertion_point(field_set:c2s.chat.request.msg_type)
 }
 
 // string message = 3;
-inline void Chat_Request::clear_message() {
+inline void chat_request::clear_message() {
   message_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& Chat_Request::message() const {
-  // @@protoc_insertion_point(field_get:c2s.Chat.Request.message)
+inline const ::std::string& chat_request::message() const {
+  // @@protoc_insertion_point(field_get:c2s.chat.request.message)
   return message_.GetNoArena();
 }
-inline void Chat_Request::set_message(const ::std::string& value) {
+inline void chat_request::set_message(const ::std::string& value) {
   
   message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.Chat.Request.message)
+  // @@protoc_insertion_point(field_set:c2s.chat.request.message)
 }
 #if LANG_CXX11
-inline void Chat_Request::set_message(::std::string&& value) {
+inline void chat_request::set_message(::std::string&& value) {
   
   message_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.Chat.Request.message)
+  // @@protoc_insertion_point(field_set_rvalue:c2s.chat.request.message)
 }
 #endif
-inline void Chat_Request::set_message(const char* value) {
+inline void chat_request::set_message(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.Chat.Request.message)
+  // @@protoc_insertion_point(field_set_char:c2s.chat.request.message)
 }
-inline void Chat_Request::set_message(const char* value, size_t size) {
+inline void chat_request::set_message(const char* value, size_t size) {
   
   message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.Chat.Request.message)
+  // @@protoc_insertion_point(field_set_pointer:c2s.chat.request.message)
 }
-inline ::std::string* Chat_Request::mutable_message() {
+inline ::std::string* chat_request::mutable_message() {
   
-  // @@protoc_insertion_point(field_mutable:c2s.Chat.Request.message)
+  // @@protoc_insertion_point(field_mutable:c2s.chat.request.message)
   return message_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* Chat_Request::release_message() {
-  // @@protoc_insertion_point(field_release:c2s.Chat.Request.message)
+inline ::std::string* chat_request::release_message() {
+  // @@protoc_insertion_point(field_release:c2s.chat.request.message)
   
   return message_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void Chat_Request::set_allocated_message(::std::string* message) {
+inline void chat_request::set_allocated_message(::std::string* message) {
   if (message != nullptr) {
     
   } else {
     
   }
   message_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), message);
-  // @@protoc_insertion_point(field_set_allocated:c2s.Chat.Request.message)
+  // @@protoc_insertion_point(field_set_allocated:c2s.chat.request.message)
 }
 
 // -------------------------------------------------------------------
 
-// Chat_Notice
+// chat_notice
 
 // int32 msg_type = 1;
-inline void Chat_Notice::clear_msg_type() {
+inline void chat_notice::clear_msg_type() {
   msg_type_ = 0;
 }
-inline ::google::protobuf::int32 Chat_Notice::msg_type() const {
-  // @@protoc_insertion_point(field_get:c2s.Chat.Notice.msg_type)
+inline ::google::protobuf::int32 chat_notice::msg_type() const {
+  // @@protoc_insertion_point(field_get:c2s.chat.notice.msg_type)
   return msg_type_;
 }
-inline void Chat_Notice::set_msg_type(::google::protobuf::int32 value) {
+inline void chat_notice::set_msg_type(::google::protobuf::int32 value) {
   
   msg_type_ = value;
-  // @@protoc_insertion_point(field_set:c2s.Chat.Notice.msg_type)
+  // @@protoc_insertion_point(field_set:c2s.chat.notice.msg_type)
 }
 
 // string message = 2;
-inline void Chat_Notice::clear_message() {
+inline void chat_notice::clear_message() {
   message_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& Chat_Notice::message() const {
-  // @@protoc_insertion_point(field_get:c2s.Chat.Notice.message)
+inline const ::std::string& chat_notice::message() const {
+  // @@protoc_insertion_point(field_get:c2s.chat.notice.message)
   return message_.GetNoArena();
 }
-inline void Chat_Notice::set_message(const ::std::string& value) {
+inline void chat_notice::set_message(const ::std::string& value) {
   
   message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:c2s.Chat.Notice.message)
+  // @@protoc_insertion_point(field_set:c2s.chat.notice.message)
 }
 #if LANG_CXX11
-inline void Chat_Notice::set_message(::std::string&& value) {
+inline void chat_notice::set_message(::std::string&& value) {
   
   message_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:c2s.Chat.Notice.message)
+  // @@protoc_insertion_point(field_set_rvalue:c2s.chat.notice.message)
 }
 #endif
-inline void Chat_Notice::set_message(const char* value) {
+inline void chat_notice::set_message(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:c2s.Chat.Notice.message)
+  // @@protoc_insertion_point(field_set_char:c2s.chat.notice.message)
 }
-inline void Chat_Notice::set_message(const char* value, size_t size) {
+inline void chat_notice::set_message(const char* value, size_t size) {
   
   message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:c2s.Chat.Notice.message)
+  // @@protoc_insertion_point(field_set_pointer:c2s.chat.notice.message)
 }
-inline ::std::string* Chat_Notice::mutable_message() {
+inline ::std::string* chat_notice::mutable_message() {
   
-  // @@protoc_insertion_point(field_mutable:c2s.Chat.Notice.message)
+  // @@protoc_insertion_point(field_mutable:c2s.chat.notice.message)
   return message_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* Chat_Notice::release_message() {
-  // @@protoc_insertion_point(field_release:c2s.Chat.Notice.message)
+inline ::std::string* chat_notice::release_message() {
+  // @@protoc_insertion_point(field_release:c2s.chat.notice.message)
   
   return message_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void Chat_Notice::set_allocated_message(::std::string* message) {
+inline void chat_notice::set_allocated_message(::std::string* message) {
   if (message != nullptr) {
     
   } else {
     
   }
   message_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), message);
-  // @@protoc_insertion_point(field_set_allocated:c2s.Chat.Notice.message)
+  // @@protoc_insertion_point(field_set_allocated:c2s.chat.notice.message)
 }
 
 // -------------------------------------------------------------------
 
-// Chat
+// chat
 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop

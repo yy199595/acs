@@ -2,12 +2,12 @@
 
 #include"Component/Component.h"
 #include"Script/Table.h"
-#include"Network/Rpc/ServerClientContext.h"
+#include"Network/Rpc/MessageRpcClient.h"
 namespace Sentry
 {
 	// 管理所有session
 	class RpcClientComponent : public Component, public ISocketListen,
-							   public IRpc<com::Rpc_Request, com::Rpc_Response>
+                    public IRpc<com::rpc::request, com::rpc::response>
 	{
 	 public:
 		RpcClientComponent() = default;
@@ -15,24 +15,24 @@ namespace Sentry
 	 public:
 		void StartClose(const std::string & address) final;
 		void OnCloseSocket(const std::string & address, XCode code) final;
-		void OnRequest(std::shared_ptr<com::Rpc_Request> request) final;
-		void OnResponse(std::shared_ptr<com::Rpc_Response> response) final;
+		void OnRequest(std::shared_ptr<com::rpc::request> request) final;
+		void OnResponse(std::shared_ptr<com::rpc::response> response) final;
 
 	 protected:
 		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 public:
-		std::shared_ptr<ServerClientContext> GetSession(const std::string& address);
-		std::shared_ptr<ServerClientContext> GetOrCreateSession(const std::string& address);
+		std::shared_ptr<MessageRpcClient> GetSession(const std::string& address);
+		std::shared_ptr<MessageRpcClient> GetOrCreateSession(const std::string& address);
 	 protected:
 		void Awake() final;
 		bool LateAwake() final;
 	 public:
 		bool CloseSession(long long id);
-		bool Send(const std::string & address, std::shared_ptr<com::Rpc_Request> message);
-		bool Send(const std::string & address, std::shared_ptr<com::Rpc_Response> message);
+		bool Send(const std::string & address, std::shared_ptr<com::rpc::request> message);
+		bool Send(const std::string & address, std::shared_ptr<com::rpc::response> message);
 	 private:
 		class ServiceRpcComponent* mRpcComponent;
         class TcpServerComponent * mTcpComponent;
-        std::unordered_map<std::string, std::shared_ptr<ServerClientContext>> mRpcClientMap;
+        std::unordered_map<std::string, std::shared_ptr<MessageRpcClient>> mRpcClientMap;
 	};
 }

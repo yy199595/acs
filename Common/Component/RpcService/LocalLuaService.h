@@ -20,8 +20,8 @@ namespace Sentry
 		bool StartNewService() final;
 		bool CloseService() final;
 		bool IsStartService() final { return this->mMethodRegister != nullptr; }
-		XCode Invoke(const std::string& name, std::shared_ptr<com::Rpc::Request> request,
-			std::shared_ptr<com::Rpc::Response> response) final;
+		XCode Invoke(const std::string& name, std::shared_ptr<com::rpc::request> request,
+			std::shared_ptr<com::rpc::response> response) final;
 	 private:
 		lua_State* mLuaEnv;
 		class LuaScriptComponent* mLuaComponent;

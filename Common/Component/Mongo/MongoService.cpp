@@ -22,7 +22,7 @@ namespace Sentry
         return this->mMongoComponent != nullptr;
     }
 
-    XCode MongoService::Insert(const s2s::Mongo::Insert &request)
+    XCode MongoService::Insert(const s2s::mongo::insert &request)
     {
         const std::string & tab = request.tab();
         const std::string & json = request.json();
@@ -36,7 +36,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode MongoService::Delete(const s2s::Mongo::Delete &request)
+    XCode MongoService::Delete(const s2s::mongo::remove &request)
     {
         int limit = request.limit();
         const std::string & tab = request.tab();
@@ -51,7 +51,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode MongoService::Update(const s2s::Mongo::Update &request)
+    XCode MongoService::Update(const s2s::mongo::update &request)
     {
         const std::string & tab = request.tab();
         const std::string & tag = request.tag();
@@ -68,13 +68,13 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode MongoService::AddCounter(const s2s::Mongo::AddCounter::Request &request,
-                                   s2s::Mongo::AddCounter::Response &response)
+    XCode MongoService::AddCounter(const s2s::mongo::add_counter::request &request,
+                                   s2s::mongo::add_counter::response &response)
     {
         return XCode::Successful;
     }
 
-    XCode MongoService::Query(const s2s::Mongo::Query::Request &request, s2s::Mongo::Query::Response &response)
+    XCode MongoService::Query(const s2s::mongo::query::request &request, s2s::mongo::query::response &response)
     {
         int limit = request.limit();
         const std::string & tab = request.tab();

@@ -28,7 +28,7 @@ function Client.StartLogic()
     end
     Log.Debug("连接网关服务器[" , address, "]成功")
 
-    local code, _ = clientComponent:Call("GateService.Auth", "c2s.GateAuth.Request", {
+    local code, _ = clientComponent:Call("GateService.Auth", "c2s.auth.request", {
         token = loginInfo.data.token
     })
     if code ~= XCode.Successful then
@@ -38,17 +38,17 @@ function Client.StartLogic()
     --LoginComponent.Register(account, password, phoneNum)
     --LoginComponent.Login(account, password)
 
-    local res, response = clientComponent:Call("ChatService.Chat", "c2s.Chat.Request", {
+    local res, response = clientComponent:Call("ChatService.Chat", "c2s.chat.request", {
         user_id = 1122, msg_type = 1, message = "hello"
     })
     Log.Error("code = ", res, Json.Encode(response))
-    --coroutine.start(LoopCall)
-    --coroutine.start(LoopCall)
-    --coroutine.start(LoopCall)
-    --coroutine.start(LoopLogin)
-    --coroutine.start(LoopRegister)
-    --coroutine.start(LoopLogin)
-    --coroutine.start(LoopRegister)
+    coroutine.start(LoopCall)
+    coroutine.start(LoopCall)
+    coroutine.start(LoopCall)
+    coroutine.start(LoopLogin)
+    coroutine.start(LoopRegister)
+    coroutine.start(LoopLogin)
+    coroutine.start(LoopRegister)
 
 end
 
@@ -72,7 +72,7 @@ function LoopCall()
     local clientComponent = App.GetComponent("ClientComponent")
     while true do
         local t1 = Time.GetNowMilTime()
-        local res, response = clientComponent:Call("ChatService.Chat", "c2s.Chat.Request", {
+        local res, response = clientComponent:Call("ChatService.Chat", "c2s.chat.request", {
             user_id = 1122, msg_type = 1, message = "hello"
         })
         Log.Error("code = ", res, Json.Encode(response), " time = ", Time.GetNowMilTime() - t1)

@@ -16,14 +16,14 @@ namespace Sentry
 
 	XCode GateAgentComponent::Call(long long userId, const std::string& func)
 	{
-		c2s::Rpc::Call request;
+		c2s::rpc::call request;
 		request.set_func(func);
 		return this->mGateService->Call(userId, "CallClient", request);
 	}
 
 	XCode GateAgentComponent::Call(long long userId, const std::string& func, const Message& message)
 	{
-		c2s::Rpc::Call request;
+		c2s::rpc::call request;
 		request.set_func(func);
 		request.mutable_data()->PackFrom(message);
 		return this->mGateService->Call(userId, "CallClient", request);
@@ -37,7 +37,7 @@ namespace Sentry
 			LOG_ERROR("not find user gate address : " << userId);
 			return XCode::NotFindUser;
 		}
-		c2s::Rpc::Call callInfo;
+		c2s::rpc::call callInfo;
 		callInfo.set_func(func);
 		callInfo.mutable_data()->PackFrom(*message);
 		return this->mGateService->Send(userId, "CallClient", callInfo);
@@ -45,7 +45,7 @@ namespace Sentry
 
 	XCode GateAgentComponent::BroadCast(const std::string& func)
 	{
-		c2s::Rpc::Call request;
+		c2s::rpc::call request;
 		request.set_func(func);
 		//TODO
 
@@ -54,7 +54,7 @@ namespace Sentry
 
 	XCode GateAgentComponent::BroadCast(const std::string& func, const Message& message)
 	{
-		s2s::GateBroadCast::Request request;
+		s2s::broadcast::request request;
 		request.set_func(func);
 		std::list<std::string> allAddress;
 		request.mutable_data()->PackFrom(message);
@@ -63,7 +63,7 @@ namespace Sentry
 
 	XCode GateAgentComponent::LuaBroadCast(const char * func, std::shared_ptr<Message> message)
 	{
-        s2s::GateBroadCast::Request request;
+        s2s::broadcast::request request;
         request.set_func(func);
         request.mutable_data()->PackFrom(*message);
         return this->mGateService->Send("BroadCast", request);

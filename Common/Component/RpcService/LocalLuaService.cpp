@@ -45,8 +45,8 @@ namespace Sentry
 		return true;
 	}
 
-	XCode LocalLuaService::Invoke(const std::string& name, std::shared_ptr<com::Rpc::Request> request,
-		std::shared_ptr<com::Rpc::Response> response)
+	XCode LocalLuaService::Invoke(const std::string& name, std::shared_ptr<com::rpc::request> request,
+		std::shared_ptr<com::rpc::response> response)
 	{
 		if(!this->IsStartService())
 		{

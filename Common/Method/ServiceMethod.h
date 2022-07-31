@@ -55,7 +55,7 @@ namespace Sentry
 			: mName(std::move(name)) {}
 	 public:
 		virtual bool IsLuaMethod() = 0;
-		virtual XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) = 0;
+		virtual XCode Invoke(const com::rpc::request& request, com::rpc::response& response) = 0;
 		const std::string& GetName()
 		{
 			return this->mName;
@@ -79,7 +79,7 @@ namespace Sentry
 		}
 	 public:
 
-		XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) override
+		XCode Invoke(const com::rpc::request& request, com::rpc::response& response) override
 		{
 			if (!this->mHasUserId)
 			{
@@ -112,7 +112,7 @@ namespace Sentry
 		{
 		}
 	 public:
-		XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) override
+		XCode Invoke(const com::rpc::request& request, com::rpc::response& response) override
 		{
 			std::shared_ptr<T1> requestData(new T1());
 			request.data().UnpackTo(requestData.get());
@@ -148,7 +148,7 @@ namespace Sentry
 		{
 		}
 	 public:
-		XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) override
+		XCode Invoke(const com::rpc::request& request, com::rpc::response& response) override
 		{
 			std::shared_ptr<T1> requestData(new T1());
 			request.data().UnpackTo(requestData.get());
@@ -194,7 +194,7 @@ namespace Sentry
 		{
 		}
 	 public:
-		XCode Invoke(const com::Rpc_Request& request, com::Rpc_Response& response) override
+		XCode Invoke(const com::rpc::request& request, com::rpc::response& response) override
 		{
 			std::shared_ptr<T1> responseData(new T1());
 			if (this->mHasUserId)
@@ -240,7 +240,7 @@ namespace Sentry
 		{
 			return false;
 		};
-		XCode Invoke(const com::Rpc_Request& request, com::Rpc::Response& response) override
+		XCode Invoke(const com::rpc::request& request, com::rpc::response& response) override
 		{
 			std::shared_ptr<T1> requestData(new T1());
 			request.data().UnpackTo(requestData.get());
@@ -264,7 +264,7 @@ namespace Sentry
 
 	 public:
 		bool IsLuaMethod() override { return false; };
-		XCode Invoke(const com::Rpc_Request& request, com::Rpc::Response& response) override
+		XCode Invoke(const com::rpc::request& request, com::rpc::response& response) override
 		{
 			assert(!request.address().empty());
 			return (_o->*_func)(request.address());

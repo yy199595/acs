@@ -5,7 +5,7 @@
 #include"GateService.h"
 #include"App/App.h"
 #include"Util/MD5.h"
-#include"NetWork/GateClientContext.h"
+#include"NetWork/GateMessageClient.h"
 #include"Component/Gate/GateComponent.h"
 #include"Component/Common/DataMgrComponent.h"
 #include"Component/Gate/GateClientComponent.h"
@@ -44,14 +44,14 @@ namespace Sentry
 		return XCode::Failure;
 	}
 
-	XCode GateService::CallClient(long long userId, c2s::Rpc::Call& request)
+	XCode GateService::CallClient(long long userId, c2s::rpc::call& request)
 	{
 		std::string address;
 		if(!this->mGateClientComponent->GetUserAddress(userId, address))
 		{
 			return XCode::NotFindUser;
 		}
-		std::shared_ptr<c2s::Rpc::Call> message(new c2s::Rpc::Call());
+		std::shared_ptr<c2s::rpc::call> message(new c2s::rpc::call());
 
 		message->set_func(request.func());
 		message->mutable_data()->PackFrom(request.data());
@@ -62,7 +62,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode GateService::AllotUser(const com::Type::Int64 &request, s2s::Allot::Response &response)
+	XCode GateService::AllotUser(const com::type::int64 &request, s2s::allot::response &response)
     {
         std::string address;
         long long userId = request.value();
@@ -87,7 +87,7 @@ namespace Sentry
         return XCode::Failure;
     }
 
-	XCode GateService::QueryAddress(long long userId, const com::Type::String& request, com::Type::String& response)
+	XCode GateService::QueryAddress(long long userId, const com::type::string& request, com::type::string& response)
 	{
 		std::string address;
 		ServiceComponent * component = this->GetComponent<ServiceComponent>(request.str());
@@ -99,7 +99,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode GateService::SaveAddress(long long userId, const s2s::Allot::Save& request)
+	XCode GateService::SaveAddress(long long userId, const s2s::allot::save& request)
 	{
 		ServiceComponent * component = this->GetComponent<ServiceComponent>(request.service());
 		if(component == nullptr || !component->GetAddressProxy().HasAddress(request.address()))
@@ -110,16 +110,16 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode GateService::BroadCast(const s2s::GateBroadCast::Request& request)
+	XCode GateService::BroadCast(const s2s::broadcast::request& request)
 	{
-		std::shared_ptr<c2s::Rpc::Call> message(new c2s::Rpc::Call());
+		std::shared_ptr<c2s::rpc::call> message(new c2s::rpc::call());
 		message->set_func(request.func());
 		message->mutable_data()->PackFrom(request.data());
 		this->mGateClientComponent->SendToAllClient(message);
 		return XCode::Successful;
 	}
 
-	XCode GateService::Auth(const std::string & address, const c2s::GateAuth::Request & request)
+	XCode GateService::Auth(const std::string & address, const c2s::auth::request & request)
     {
         auto iter = this->mUserTokens.find(request.token());
         if (iter == this->mUserTokens.end())

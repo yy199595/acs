@@ -11,21 +11,18 @@ using namespace google::protobuf;
 namespace Sentry
 {
 	class GateClientComponent;
- 	class GateClientContext : public Tcp::TcpContext
+ 	class GateMessageClient : public Tcp::TcpContext
 	{
 	 public:
-		GateClientContext(std::shared_ptr<SocketProxy> socket, GateClientComponent* component);
-		~GateClientContext() final = default;
+		GateMessageClient(std::shared_ptr<SocketProxy> socket, GateClientComponent* component);
+		~GateMessageClient() final = default;
 	 public:
 		void StartClose();
 		void StartReceive();
 		unsigned int GetQps() const { return this->mQps; }
-		void SendToClient(std::shared_ptr<c2s::Rpc::Call> message);
-		void SendToClient(std::shared_ptr<c2s::Rpc::Response> message);
-		unsigned int GetCallCount() const
-		{
-			return this->mCallCount;
-		}
+		void SendToClient(std::shared_ptr<c2s::rpc::call> message);
+		void SendToClient(std::shared_ptr<c2s::rpc::response> message);
+		unsigned int GetCallCount() const { return this->mCallCount; }
 	 protected:
 		void OnConnect(const asio::error_code &error) {}
         void OnReceiveLength(const asio::error_code &code, int length) final;

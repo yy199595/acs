@@ -19,18 +19,18 @@ namespace Lua
 	{
 		lua_pushthread(lua);
 		ClientComponent * clientComponent = UserDataParameter::Read<ClientComponent*>(lua, 1);
-		std::shared_ptr<c2s::Rpc::Request> request(new c2s::Rpc::Request());
+		std::shared_ptr<c2s::rpc::request> request(new c2s::rpc::request());
 		const std::string func = CommonParameter::Read<std::string>(lua, 2);
 		std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
         MessageComponent * messageComponent = App::Get()->GetMsgComponent();
         if(lua_isstring(lua, 3) && lua_istable(lua, 4))
         {
-            size_t size = 0;
             const char * type = luaL_checkstring(lua, 3);
             std::shared_ptr<Message> message = messageComponent->Read(lua, type, 4);
             if(message == nullptr)
             {
                 LOG_ERROR("new proto message " << type << " error");
+                return 0;
             }
             request->mutable_data()->PackFrom(*message);
         }
@@ -40,7 +40,7 @@ namespace Lua
 		taskComponent->Start([request, func, clientComponent, luaWaitTaskSource]()
 		{
 			ElapsedTimer elapsedTimer;
-			std::shared_ptr<c2s::Rpc::Response> response = clientComponent->Call(request);
+			std::shared_ptr<c2s::rpc::response> response = clientComponent->Call(request);
 			if(response == nullptr)
 			{
 				luaWaitTaskSource->SetResult(XCode::CallTimeout, nullptr);

@@ -31,7 +31,7 @@ namespace Sentry
 		luaRegister.PushExtensionFunction("GetAddress", Lua::Service::GetAddress);
 	}
 
-	std::shared_ptr<com::Rpc::Request> ServiceComponent::NewRpcRequest(const std::string& func, long long userId)
+	std::shared_ptr<com::rpc::request> ServiceComponent::NewRpcRequest(const std::string& func, long long userId)
 	{
 		const RpcInterfaceConfig * interfaceConfig = this->mConfig->GetConfig(func);
 		if (interfaceConfig == nullptr)
@@ -44,15 +44,15 @@ namespace Sentry
 		{
 			return nullptr;
 		}
-		std::shared_ptr<com::Rpc::Request> request
-			= std::make_shared<com::Rpc::Request>();
+		std::shared_ptr<com::rpc::request> request
+			= std::make_shared<com::rpc::request>();
 
 		request->set_user_id(userId);
 		request->set_func(interfaceConfig->FullName);
 		return request;
 	}
 
-	std::shared_ptr<com::Rpc::Request> ServiceComponent::NewRpcRequest(const std::string& func, long long userId, const Message& message)
+	std::shared_ptr<com::rpc::request> ServiceComponent::NewRpcRequest(const std::string& func, long long userId, const Message& message)
 	{
 		const RpcInterfaceConfig* protoConfig = this->mConfig->GetConfig(func);
 		if (protoConfig == nullptr)
@@ -61,8 +61,8 @@ namespace Sentry
 				<< fmt::format("{0}.{1}", this->GetName(), func));
 			return nullptr;
 		}
-		std::shared_ptr<com::Rpc::Request> request
-			= std::make_shared<com::Rpc::Request>();
+		std::shared_ptr<com::rpc::request> request
+			= std::make_shared<com::rpc::request>();
 
 		request->set_user_id(userId);
 		request->mutable_data()->PackFrom(message);
@@ -76,7 +76,7 @@ namespace Sentry
 {
 	XCode ServiceComponent::Send(const std::string& func, const Message& message)
 	{
-		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, 0, message);
+		std::shared_ptr<com::rpc::request> rpcRequest = this->NewRpcRequest(func, 0, message);
 		if(rpcRequest == nullptr)
 		{
 			return XCode::NotFoundRpcConfig;
@@ -84,7 +84,7 @@ namespace Sentry
         this->mAllAddress.clear();
         if(!this->mAddressProxy.GetAllAddress(this->mAllAddress))
         {
-            LOG_ERROR("service addres list empty");
+            LOG_ERROR("service address list empty");
             return XCode::CallServiceNotFound;
         }
 		for(const std::string & address : this->mAllAddress)
@@ -104,7 +104,7 @@ namespace Sentry
 		{
 			return XCode::NotFindUser;
 		}
-		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, userId, message);
+		std::shared_ptr<com::rpc::request> rpcRequest = this->NewRpcRequest(func, userId, message);
 		if(rpcRequest == nullptr)
 		{
 			return XCode::NotFoundRpcConfig;
@@ -114,7 +114,7 @@ namespace Sentry
 
 	XCode ServiceComponent::Send(const std::string& address, const std::string& func, const Message& message)
 	{
-		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, 0, message);
+		std::shared_ptr<com::rpc::request> rpcRequest = this->NewRpcRequest(func, 0, message);
 		if(rpcRequest == nullptr)
 		{
 			return XCode::NotFoundRpcConfig;
@@ -124,7 +124,7 @@ namespace Sentry
 
 	XCode ServiceComponent::Call(const std::string & address, const string& func)
 	{
-		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, 0);
+		std::shared_ptr<com::rpc::request> rpcRequest = this->NewRpcRequest(func, 0);
 		if(rpcRequest == nullptr)
 		{
 			return XCode::NotFoundRpcConfig;
@@ -134,7 +134,7 @@ namespace Sentry
 
 	XCode ServiceComponent::Call(const std::string & address, const string& func, const Message& message)
 	{
-		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, 0, message);
+		std::shared_ptr<com::rpc::request> rpcRequest = this->NewRpcRequest(func, 0, message);
 		if(rpcRequest == nullptr)
 		{
 			return XCode::NotFoundRpcConfig;
@@ -145,7 +145,7 @@ namespace Sentry
 	XCode ServiceComponent::Call(const std::string & address, const string& func, std::shared_ptr<Message> response)
 	{
 		assert(response != nullptr);
-		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, 0);
+		std::shared_ptr<com::rpc::request> rpcRequest = this->NewRpcRequest(func, 0);
 		if(rpcRequest == nullptr)
 		{
 			return XCode::NotFoundRpcConfig;
@@ -158,7 +158,7 @@ namespace Sentry
 			std::shared_ptr<Message> response)
 	{
 		assert(response != nullptr);
-		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, 0, message);
+		std::shared_ptr<com::rpc::request> rpcRequest = this->NewRpcRequest(func, 0, message);
 		if(rpcRequest == nullptr)
 		{
 			return XCode::NotFoundRpcConfig;
@@ -166,7 +166,7 @@ namespace Sentry
 		return this->Call(address, rpcRequest, response);
 	}
 
-	XCode ServiceComponent::Call(long long userId, std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<Message> response)
+	XCode ServiceComponent::Call(long long userId, std::shared_ptr<com::rpc::request> request, std::shared_ptr<Message> response)
 	{
 		std::string address;
 		if(!this->mAddressProxy.GetAddress(userId, address))
@@ -176,7 +176,7 @@ namespace Sentry
 		return this->Call(address, request, response);
 	}
 
-	XCode ServiceComponent::Call(const std::string& address, std::shared_ptr<com::Rpc::Request> request, std::shared_ptr<Message> response)
+	XCode ServiceComponent::Call(const std::string& address, std::shared_ptr<com::rpc::request> request, std::shared_ptr<Message> response)
 	{
 		std::shared_ptr<RpcTaskSource> taskSource =
 			std::make_shared<RpcTaskSource>(0);
@@ -186,7 +186,7 @@ namespace Sentry
 		{
 			return XCode::NetWorkError;
 		}
-		std::shared_ptr<com::Rpc::Response> responsedata = taskSource->Await();
+		std::shared_ptr<com::rpc::response> responsedata = taskSource->Await();
 		if(responsedata == nullptr)
 		{
 			return XCode::CallTimeout;
@@ -202,7 +202,7 @@ namespace Sentry
 		return (XCode)responsedata->code();
 	}
 
-	XCode ServiceComponent::SendRequest(const std::string& address, std::shared_ptr<com::Rpc::Request> request)
+	XCode ServiceComponent::SendRequest(const std::string& address, std::shared_ptr<com::rpc::request> request)
 	{
 		if(!this->mAddressProxy.HasAddress(address))
 		{
@@ -222,7 +222,7 @@ namespace Sentry
 		{
 			return XCode::NotFindUser;
 		}
-		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, userId);
+		std::shared_ptr<com::rpc::request> rpcRequest = this->NewRpcRequest(func, userId);
 		if(rpcRequest == nullptr)
 		{
 			return XCode::NotFoundRpcConfig;
@@ -237,7 +237,7 @@ namespace Sentry
 		{
 			return XCode::NotFindUser;
 		}
-		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, userId, message);
+		std::shared_ptr<com::rpc::request> rpcRequest = this->NewRpcRequest(func, userId, message);
 		if(rpcRequest == nullptr)
 		{
 			return XCode::NotFoundRpcConfig;
@@ -253,7 +253,7 @@ namespace Sentry
 		{
 			return XCode::NotFindUser;
 		}
-		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, userId);
+		std::shared_ptr<com::rpc::request> rpcRequest = this->NewRpcRequest(func, userId);
 		if(rpcRequest == nullptr)
 		{
 			return XCode::NotFoundRpcConfig;
@@ -269,7 +269,7 @@ namespace Sentry
 		{
 			return XCode::NotFindUser;
 		}
-		std::shared_ptr<com::Rpc::Request> rpcRequest = this->NewRpcRequest(func, userId, message);
+		std::shared_ptr<com::rpc::request> rpcRequest = this->NewRpcRequest(func, userId, message);
 		if(rpcRequest == nullptr)
 		{
 			return XCode::NotFoundRpcConfig;

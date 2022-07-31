@@ -21,7 +21,7 @@ namespace Lua
 		}
 		std::string address;
 		long long userId = 0;
-		std::shared_ptr<com::Rpc::Request> request(new com::Rpc::Request());
+		std::shared_ptr<com::rpc::request> request(new com::rpc::request());
 		ServiceComponent* callComponent = UserDataParameter::Read<ServiceComponent*>(lua, 1);
 		if (lua_isinteger(lua, 2)) //userId
 		{

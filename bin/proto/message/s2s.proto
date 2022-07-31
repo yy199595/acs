@@ -2,9 +2,9 @@ syntax = "proto3";
 package s2s;
 import "google/protobuf/any.proto";
 
-message Mysql //mysql操作
+message mysql //mysql操作
 {
-    message Create
+    message create
     {
         string db = 1; //库
         string tab = 2;  //表
@@ -12,84 +12,84 @@ message Mysql //mysql操作
         repeated string keys = 4; //主键
         repeated string indexs = 5; //索引
     }
-    message Add
+    message add
     {
         int64 flag = 1;
         string table = 2;
         google.protobuf.Any data = 3;
     }
-    message Save
+    message save
     {
         int64 flag = 1;
         string table = 2;
         google.protobuf.Any data = 3;
     }
-    message Query
+    message query
     {
         int64 flag = 1;
         string table = 2;
         string where_json = 3;
     }
-    message Delete
+    message remove
     {
         int64 flag = 1;
         string table = 2;
         string where_json = 3;
     }
-    message Update
+    message update
     {
         int64 flag = 1;
         string table = 2;
         string update_json = 3;
         string where_json = 4;
     }
-    message Response
+    message response
     {
         string error = 1;
         repeated string jsons = 2;
     }
 }
 
-message Mongo
+message mongo
 {
-    message Insert
+    message insert
     {
         string tab = 1;
         string json = 2;
     }
-    message Query
+    message query
     {
-        message Request
+        message request
         {
             string tab = 1;
             string json = 2;
             int32 limit = 3;
         }
-        message Response
+        message response
         {
             repeated string jsons = 1;
         }
     }
-    message Delete
+    message remove
     {
         string tab = 1;
         string json = 2;
         int32 limit = 3;
     }
-    message Update
+    message update
     {
         string tab = 1;
         string select = 2;
         string update = 3;
         string tag = 4;
     }
-    message AddCounter
+    message add_counter
     {
-        message Request
+        message request
         {
             string key = 1;
         }
-        message Response
+        message response
         {
             int64 value = 1;
         }
@@ -98,37 +98,37 @@ message Mongo
 
 //网关
 
-message Allot
+message allot
 {
-    message Response
+    message response
     {
         string token = 1;
         string address = 2; //网关地址
     }
 
-    message Save
+    message save
     {
         string service = 1;
         string address = 2;
     }
 }
 
-message GateBroadCast
+message broadcast
 {
-    message Request
+    message request
     {
         string func = 1;
         google.protobuf.Any data = 2;
     }
-    message Response
+    message response
     {
         int32 count = 1;
     }
 }
 
-message CallClient
+message client
 {
-    message Request
+    message call
     {
         string func = 1;
         google.protobuf.Any data = 2;
