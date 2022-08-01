@@ -17,14 +17,16 @@ namespace Tcp
 
     bool TcpContext::Reset(std::shared_ptr<SocketProxy> socket)
     {
-        if(this->mSocket == nullptr)
+        if(this->mSocket != nullptr && this->mSocket->GetSocket().is_open())
         {
-            this->mSocket = socket;
-            this->mLastOperTime = 0;
-            this->mConnectCount = 0;
-            return true;
+            return false;
         }
-        return false;
+        this->mSocket = socket;
+        this->mLastOperTime = 0;
+        this->mConnectCount = 0;
+        this->ClearSendStream();
+        this->ClearRecvStream();
+        return true;
     }
 
 	TcpContext::~TcpContext()

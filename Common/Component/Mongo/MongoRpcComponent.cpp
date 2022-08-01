@@ -112,7 +112,7 @@ namespace Sentry
 	void MongoRpcComponent::OnDelTask(long long taskId, RpcTask task)
 	{
         assert(this->GetApp()->IsMainThread());
-        this->mRequestId.Push((int)taskId);
+        //this->mRequestId.Push((int)taskId);
 	}
 
 	void MongoRpcComponent::OnAddTask(RpcTaskComponent<Mongo::MongoQueryResponse>::RpcTask task)
@@ -126,13 +126,12 @@ namespace Sentry
 		{
 			return nullptr;
 		}
-		request->header.requestID = 1;
 		if(request->collectionName.empty())
 		{
 			request->collectionName = this->mConfig.mDb + ".$cmd";
 		}
-        request->mTaskId = this->mRequestId.Pop();
-		std::shared_ptr<MongoTask> mongoTask(new MongoTask(request->mTaskId, 0));
+        request->header.requestID = this->mRequestId.Pop();
+        std::shared_ptr<MongoTask> mongoTask(new MongoTask(request->header.requestID, 0));
 		if(!this->AddTask(mongoTask))
 		{
 			return nullptr;
@@ -145,12 +144,12 @@ namespace Sentry
         std::shared_ptr<Mongo::MongoQueryResponse> mongoResponse = mongoTask->Await();
 		if(mongoResponse != nullptr && mongoResponse->GetDocumentSize() > 0)
 		{
-            LOG_DEBUG( "[" << Time::GetNowMilTime() - t1 << "ms] document size = [" << mongoResponse->GetDocumentSize() << "]");
+            //LOG_DEBUG( "[" << Time::GetNowMilTime() - t1 << "ms] document size = [" << mongoResponse->GetDocumentSize() << "]");
             for(size_t i = 0; i < mongoResponse->GetDocumentSize(); i++)
             {
                 std::string json;
                 mongoResponse->Get(i).WriterToJson(json);
-                LOG_DEBUG("[" << i << "] " << json);
+                //LOG_DEBUG("[" << i << "] " << json);
             }
             return mongoResponse;
 		}

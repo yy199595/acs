@@ -113,19 +113,40 @@ namespace Mongo
 {
     int MongoQueryResponse::OnReceiveHead(std::istream & os)
     {
-        memset(this->mReadBuffer, 0, 128);
-        assert(os.readsome(this->mReadBuffer, sizeof(MongoHead)) == sizeof(MongoHead));
-        memcpy(&this->mHead, this->mReadBuffer, sizeof(MongoHead));
+        this->mHead.messageLength = this->ReadInt(os);
+        this->mHead.requestID = this->ReadInt(os);
+        this->mHead.responseTo = this->ReadInt(os);
+        this->mHead.opCode = this->ReadInt(os);
         return this->mHead.messageLength - sizeof(MongoHead);
+    }
+
+    int MongoQueryResponse::ReadInt(std::istream & is)
+    {
+        union {
+            int v;
+            char b[sizeof(int)];
+        } u;
+        is.readsome(u.b, sizeof(int));
+        return u.v;
+    }
+
+    long long MongoQueryResponse::ReadLong(std::istream &is)
+    {
+        union {
+            long long v;
+            char b[sizeof(long long)];
+        } u;
+        is.readsome(u.b, sizeof(long long));
+        return u.v;
     }
 
 	size_t MongoQueryResponse::OnReceiveBody(std::istream & os)
 	{
 		this->mBuffer.clear();
-		os.readsome((char*)&responseFlags, sizeof(responseFlags));
-		os.readsome((char*)&cursorID, sizeof(cursorID));
-		os.readsome((char*)&startingFrom, sizeof(startingFrom));
-		os.readsome((char*)&numberReturned, sizeof(numberReturned));
+        this->responseFlags = this->ReadInt(os);
+        this->cursorID = this->ReadLong(os);
+        this->startingFrom = this->ReadInt(os);
+        this->numberReturned = this->ReadInt(os);
 
 		size_t size = os.readsome(this->mReadBuffer, 128);
 		while(size > 0)

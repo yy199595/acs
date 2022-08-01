@@ -124,7 +124,7 @@ namespace Sentry
             return false;
         }
         socketComponent->OnListen(socket);
-        LOG_DEBUG(name << " listen new socket " << socket->GetAddress());
+       // LOG_DEBUG(name << " listen new socket " << socket->GetAddress());
         return true;
     }
 }

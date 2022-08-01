@@ -35,7 +35,7 @@ namespace Sentry
     {
         static int count = 0;
 #ifdef __DEBUG__
-        LOG_DEBUG("handler http socket count = " << count++);
+        //LOG_DEBUG("handler http socket count = " << count++);
 #endif
         assert(this->GetApp()->IsMainThread());
         if(this->mHttpClients.size() >= 1000)
@@ -79,7 +79,6 @@ namespace Sentry
                 this->mClientPools.push(handlerClient);
             }
             this->mHttpClients.erase(iter);
-            this->mNetComponent->DeleteSocket(handlerClient->MoveSocket());
         }
     }
 
@@ -119,15 +118,17 @@ namespace Sentry
         {
             httpService->Invoke(httpConfig->Method, request, response);
             httpClient->StartWriter(HttpStatus::OK);
-            return;
         }
-        this->mTaskComponent->Start([httpService, httpClient, httpConfig]() {
+        else
+        {
+            this->mTaskComponent->Start([httpService, httpClient, httpConfig]() {
 
-            std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
-            std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
+                std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
+                std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
 
-            httpService->Invoke(httpConfig->Method, request, response);
-            httpClient->StartWriter(HttpStatus::OK);
-        });
+                httpService->Invoke(httpConfig->Method, request, response);
+                httpClient->StartWriter(HttpStatus::OK);
+            });
+        }
     }
 }

@@ -69,14 +69,6 @@ namespace Sentry
 
     std::shared_ptr<SocketProxy> NetThreadComponent::CreateSocket()
     {
-        std::shared_ptr<SocketProxy> socket;
-        if(!this->mSocketQueue.empty())
-        {
-            socket = this->mSocketQueue.front();
-            this->mSocketQueue.pop();
-        }
-        else
-        {
 #ifdef ONLY_MAIN_THREAD
             asio::io_service & io = this->GetApp()->GetThread();
 #else
@@ -86,19 +78,8 @@ namespace Sentry
             }
             asio::io_service &io = *(mNetThreads[this->mIndex++]);
 #endif
-            socket = std::make_shared<SocketProxy>(io);
-        }
-        return socket;
+        return std::make_shared<SocketProxy>(io);
     }
-
-    void NetThreadComponent::DeleteSocket(std::shared_ptr<SocketProxy> socket)
-    {
-        if(this->mSocketQueue.size() < 100)
-        {
-            this->mSocketQueue.push(socket);
-        }
-    }
-
 
     std::shared_ptr<SocketProxy> NetThreadComponent::CreateSocket(const std::string &ip, unsigned short port)
     {

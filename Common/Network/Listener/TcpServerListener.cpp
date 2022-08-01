@@ -54,7 +54,7 @@ namespace Sentry
 			if (code)
 			{
 				this->mErrorCount++;
-                this->mNetComponent->DeleteSocket(socketProxy);
+                socketProxy->Close();
 				CONSOLE_LOG_FATAL(this->mConfig->Name << " " << code.message() << " count = " << this->mErrorCount);
 			}
 			else

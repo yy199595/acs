@@ -95,7 +95,7 @@ namespace Tcp
         asio::streambuf mRecvBuffer;
 		std::shared_ptr<SocketProxy> mSocket;
 	 private:
-		int mConnectCount;
+        int mConnectCount;
 		const size_t mMaxCount;
 		long long mLastOperTime;
         std::list<std::shared_ptr<ProtoMessage>> mMessagqQueue;

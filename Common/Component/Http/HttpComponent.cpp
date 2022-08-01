@@ -51,7 +51,6 @@ namespace Sentry
         if(this->mClientPools.size() < 100)
         {
             this->mClientPools.push(httpAsyncClient);
-            this->mNetComponent->DeleteSocket(httpAsyncClient->MoveSocket());
         }
         return response;
 	}
@@ -92,7 +91,6 @@ namespace Sentry
         if(this->mClientPools.size() < 100)
         {
             this->mClientPools.push(requestClient);
-            this->mNetComponent->DeleteSocket(requestClient->MoveSocket());
         }
 
         return response->GetCode() ? XCode::Failure : XCode::Successful;
@@ -115,7 +113,6 @@ namespace Sentry
         if(this->mClientPools.size() < 100)
         {
             this->mClientPools.push(httpAsyncClient);
-            this->mNetComponent->DeleteSocket(httpAsyncClient->MoveSocket());
         }
         return response;
 	}

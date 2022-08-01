@@ -16,7 +16,6 @@ namespace Sentry
 		void OnDestory() final;
     public:
         std::shared_ptr<SocketProxy> CreateSocket();
-        void DeleteSocket(std::shared_ptr<SocketProxy> socket);
         std::shared_ptr<SocketProxy> CreateSocket(const std::string & ip, unsigned short port);
     private:
 		size_t mIndex;
@@ -26,6 +25,5 @@ namespace Sentry
         std::vector<asio::io_service *> mNetThreads;
         std::vector<asio::io_service::work *> mNetThreadWorks;
 #endif
-        std::queue<std::shared_ptr<SocketProxy>> mSocketQueue;
 	};
 }

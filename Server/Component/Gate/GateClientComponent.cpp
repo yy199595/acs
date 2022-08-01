@@ -82,7 +82,6 @@ namespace Sentry
             if(this->mClientPools.size() < 100)
             {
                 this->mClientPools.push(gateClient);
-                this->mNetComponent->DeleteSocket(gateClient->MoveSocket());
             }
             this->mGateClientMap.erase(iter);
 		}

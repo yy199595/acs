@@ -59,7 +59,7 @@ namespace Sentry
         auto iter = this->mTasks.find(taskId);
         if(iter == this->mTasks.end())
         {
-            LOG_FATAL(this->GetName() << " not find rpc task id " << taskId);
+            LOG_ERROR(this->GetName() << " not find rpc task id " << taskId);
             return false;
         }
         RpcTask rpcTask = iter->second;

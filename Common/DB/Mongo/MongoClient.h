@@ -52,7 +52,6 @@ namespace Mongo
 		const Mongo::Config & mConfig;
 		asio::streambuf streamBuffer;
 		MongoRpcComponent * mMongoComponent;
-        std::shared_ptr<MongoQueryRequest> mMongoRequest;
         std::shared_ptr<MongoQueryResponse> mMongoResponse;
 	};
 }

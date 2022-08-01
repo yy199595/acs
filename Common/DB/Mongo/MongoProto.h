@@ -121,6 +121,11 @@ namespace Mongo
         size_t GetDocumentSize() const { return this->mDocuments.size();}
         Bson::Read::Object & Get(size_t index = 0) const { return *this->mDocuments[index];}
         Bson::Read::Object & operator[](size_t index) const { return *this->mDocuments[index];}
+
+    private:
+        int ReadInt(std::istream & is);
+        long long ReadLong(std::istream & is);
+
     private:
         MongoHead mHead;
         int responseFlags;  // bit vector - see details below
