@@ -28,6 +28,11 @@
             "port": 1995,
             "ip": "127.0.0.1",
             "component": "GateClientComponent"
+        },
+        "json": {
+            "port": 1996,
+            "ip" : "127.0.0.1",
+            "component" : "JsonClientComponent"
         }
     },
     "mysql": {
@@ -94,7 +99,8 @@
         "GateAgentComponent",
         "UserSyncComponent",
         "ServiceMgrComponent",
-        "HttpServiceComponent"
+        "HttpServiceComponent",
+        "JsonClientComponent"
     ],
     "service.rpc": [
         "RpcTest",

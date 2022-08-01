@@ -24,8 +24,8 @@ namespace Tcp
         this->mSocket = socket;
         this->mLastOperTime = 0;
         this->mConnectCount = 0;
-        this->ClearSendStream();
-        this->ClearRecvStream();
+        assert(this->mSendBuffer.size() == 0);
+        assert(this->mRecvBuffer.size() == 0);
         return true;
     }
 
@@ -112,8 +112,13 @@ namespace Tcp
         {
             asio::error_code code;
             std::istream is(&this->mRecvBuffer);
-            is.readsome((char *) &length, sizeof(int));
-            this->OnReceiveLength(code, length);
+
+            union {
+                int value;
+                char buffer[sizeof(int)];
+            } data;
+            is.readsome(data.buffer, sizeof(int));
+            this->OnReceiveLength(code, data.value);
             return;
         }
         else

@@ -31,6 +31,8 @@
 #include"Component/Gate/GateAgentComponent.h"
 #include"Component/User/UserSyncComponent.h"
 #include"Component/ClientComponent.h"
+
+#include"Component/Gate/JsonClientComponent.h"
 using namespace Sentry;
 void RegisterComponent()
 {
@@ -70,6 +72,9 @@ void RegisterComponent()
     ComponentFactory::Add<LuaScriptComponent>("LuaScriptComponent");
 
     ComponentFactory::Add<Client::ClientComponent>("ClientComponent");
+
+    ComponentFactory::Add<JsonClientComponent>("JsonClientComponent");
+
 }
 
 void RegisterServiceComponent()
