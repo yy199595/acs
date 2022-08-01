@@ -113,11 +113,13 @@ namespace Mongo
 {
     int MongoQueryResponse::OnReceiveHead(std::istream & os)
     {
-        this->mHead.messageLength = this->ReadInt(os);
-        this->mHead.requestID = this->ReadInt(os);
-        this->mHead.responseTo = this->ReadInt(os);
-        this->mHead.opCode = this->ReadInt(os);
-        return this->mHead.messageLength - sizeof(MongoHead);
+		union {
+			MongoHead Head;
+			char buffer[sizeof(MongoHead)];
+		} head;
+		os.readsome(head.buffer, sizeof(MongoHead));
+		this->mHead = head.Head;
+        return head.Head.messageLength - sizeof(MongoHead);
     }
 
     int MongoQueryResponse::ReadInt(std::istream & is)

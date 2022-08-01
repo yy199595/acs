@@ -29,6 +29,13 @@ namespace Mongo
         int opCode;
     };
 
+	class MongoHeadBuffer
+	{
+	 public:
+		MongoHead head;
+		char buffer[sizeof(MongoHead)];
+	};
+
     class MongoRequest : public Tcp::ProtoMessage
     {
     public:

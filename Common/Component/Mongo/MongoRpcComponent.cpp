@@ -137,7 +137,7 @@ namespace Sentry
 			return nullptr;
 		}
         int index = this->mIndex % this->mMongoClients.size();
-		this->mMongoClients[index]->SendMongoCommand(request);
+		this->mMongoClients[0]->SendMongoCommand(request);
         this->mIndex++;
 #ifdef __DEBUG__
 		long long t1 = Time::GetNowMilTime();
@@ -149,7 +149,7 @@ namespace Sentry
             {
                 std::string json;
                 mongoResponse->Get(i).WriterToJson(json);
-                //LOG_DEBUG("[" << i << "] " << json);
+                LOG_DEBUG("[" << i << "] " << json);
             }
             return mongoResponse;
 		}
@@ -207,7 +207,7 @@ namespace Sentry
 	bool MongoRpcComponent::Ping(int index)
 	{
 		std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
-		mongoRequest->document.Add("ping", 1);
+		mongoRequest->document.Add("ismaster", 1);
 		return this->Run(mongoRequest, index) != nullptr;
 	}
 
