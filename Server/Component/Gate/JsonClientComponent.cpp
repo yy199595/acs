@@ -3,7 +3,7 @@
 //
 
 #include "JsonClientComponent.h"
-#include"Network/JsonRpcClient.h"
+#include"NetWork/JsonRpcClient.h"
 namespace Sentry
 {
     bool JsonClientComponent::OnListen(std::shared_ptr<SocketProxy> socket)
