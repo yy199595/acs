@@ -273,9 +273,10 @@ namespace Sentry
 	 public:
 		void SetCode(HttpStatus code);
 		void WriteFile(std::fstream* fs);
-		void WriteString(const std::string& content);
+        void WriteString(Json::Writer & json);
+        void WriteString(const std::string& content);
 		void WriteString(const char* content, size_t size);
-	 public:
+    public:
 		bool AddHead(const char* key, int value);
 		bool AddHead(const char* key, const std::string& value);
 	 private:

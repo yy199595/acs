@@ -570,6 +570,12 @@ namespace Sentry
         this->mContent.append(content);
     }
 
+    void HttpHandlerResponse::WriteString(Json::Writer &json)
+    {
+        json.WriterStream(this->mContent);
+        this->mContentSize += this->mContent.size();
+    }
+
     void HttpHandlerResponse::WriteString(const char *content, size_t size)
     {
         this->mContentSize += size;

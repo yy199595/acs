@@ -33,63 +33,69 @@ namespace Sentry
             return XCode::CallFunctionNotExist;
         }
         request.GetData().Writer(this->mLua);
-        return this->mConfig->IsAsync ? this->CallAsync(response) : this->Call(response);
+        std::shared_ptr<Json::Writer> jsonWriter = std::make_shared<Json::Writer>();
+        XCode code = this->mConfig->IsAsync ? this->CallAsync(*jsonWriter) : this->Call(*jsonWriter);
+
+        (*jsonWriter) << "code" << (int)code;
+        response.WriteString(*jsonWriter);
+
+        return code;
     }
 
-    XCode LuaHttpServiceMethod::Call(HttpHandlerResponse &response)
+    XCode LuaHttpServiceMethod::Call(Json::Writer &response)
     {
-        if (lua_pcall(this->mLua, 1, 2, 0) != 0)
+        if (lua_pcall(this->mLua, 1, 2, 0) != LUA_OK)
         {
-            response.AddHead("error", lua_tostring(this->mLua, -1));
+            response << "error" << lua_tostring(this->mLua, -1);
             return XCode::CallLuaFunctionFail;
         }
         if (lua_isstring(this->mLua, -1))
         {
             size_t size = 0;
             const char *json = lua_tolstring(this->mLua, -1, &size);
-            response.WriteString(json, size);
+            response << "data"; response.AddBinString(json, size);
             return XCode::Successful;
         }
         else if (lua_istable(this->mLua, -1))
         {
-            std::string json;
-            Lua::Json::Read(this->mLua, -1, &json);
-            response.WriteString(json);
+            this->mData.clear();
+            Lua::Json::Read(this->mLua, -1, &this->mData);
+            response << "data" << this->mData;
             return XCode::Successful;
         }
         return (XCode) lua_tointeger(this->mLua, -2);
     }
 
-    XCode LuaHttpServiceMethod::CallAsync(HttpHandlerResponse &response)
+    XCode LuaHttpServiceMethod::CallAsync(Json::Writer &response)
     {
-        std::shared_ptr<LuaServiceTaskSource> luaTaskSource(new LuaServiceTaskSource(this->mLua));
+        LuaServiceTaskSource * luaTaskSource = new LuaServiceTaskSource(this->mLua);
         Lua::UserDataParameter::Write(this->mLua, luaTaskSource);
-        if (lua_pcall(this->mLua, 3, 1, 0) != 0)
+        if (lua_pcall(this->mLua, 3, 1, 0) != LUA_OK)
         {
-            size_t size = 0;
-            const char *err = lua_tolstring(this->mLua, -1, &size);
-            response.AddHead("error", std::string(err, size));
-            LOG_ERROR(std::string(err, size));
+            delete luaTaskSource;
+            response << "error" << lua_tostring(this->mLua, -1);
             return XCode::CallLuaFunctionFail;
         }
-        luaTaskSource->Await();
+        XCode code = luaTaskSource->Await();
         if (luaTaskSource->GetRef())
         {
+            delete luaTaskSource;
             if (lua_isstring(this->mLua, -1))
             {
                 size_t size = 0;
                 const char *json = lua_tolstring(this->mLua, -1, &size);
-                response.WriteString(json, size);
+                response << "data";
+                response.AddBinString(json, size);
                 return XCode::Successful;
             }
             if (lua_istable(this->mLua, -1))
             {
-                std::string json;
-                Lua::Json::Read(this->mLua, -1, &json);
-                response.WriteString(json);
+                this->mData.clear();
+                Lua::Json::Read(this->mLua, -1, &this->mData);
+                response << "data" << this->mData;
                 return XCode::Successful;
             }
         }
-        return XCode::Successful;
+        return code;
     }
 }
