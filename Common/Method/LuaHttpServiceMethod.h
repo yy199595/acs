@@ -19,8 +19,8 @@ namespace Sentry
         XCode Invoke(const HttpHandlerRequest &request, HttpHandlerResponse &response) final;
 
     private:
-        XCode Call(Json::Writer & response);
-        XCode CallAsync(Json::Writer & response);
+        XCode Call(HttpHandlerResponse & response);
+        XCode CallAsync(HttpHandlerResponse & response);
     private:
         lua_State * mLua;
         std::string mData;

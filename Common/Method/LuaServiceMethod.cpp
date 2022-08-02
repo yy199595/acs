@@ -40,17 +40,19 @@ namespace Sentry
 
 	XCode LuaServiceMethod::CallAsync(int count, com::rpc::response & response)
 	{
-		std::shared_ptr<LuaServiceTaskSource> luaTaskSource(new LuaServiceTaskSource(this->mLuaEnv));
-
+		LuaServiceTaskSource * luaTaskSource = new LuaServiceTaskSource(this->mLuaEnv);
 		Lua::UserDataParameter::Write(this->mLuaEnv, luaTaskSource);
 		if (lua_pcall(this->mLuaEnv, count + 2, 1, 0) != 0)
 		{
+            delete luaTaskSource;
 			response.set_error_str(lua_tostring(this->mLuaEnv, -1));
 			LOG_ERROR("call lua " << this->mConfig->FullName << " " << response.error_str());
 			return XCode::CallLuaFunctionFail;
 		}
 		XCode code = luaTaskSource->Await();
-		if(code != XCode::Successful)
+
+        delete luaTaskSource;
+        if(code != XCode::Successful)
 		{
 			return code;
 		}

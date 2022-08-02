@@ -41,8 +41,8 @@ namespace Sentry
 
 	int LuaServiceTaskSource::SetResult(lua_State* lua)
 	{
-		std::shared_ptr<LuaServiceTaskSource> luaServiceTaskSource =
-			Lua::UserDataParameter::Read<std::shared_ptr<LuaServiceTaskSource>>(lua, 1);
+		LuaServiceTaskSource * luaServiceTaskSource =
+			Lua::UserDataParameter::Read<LuaServiceTaskSource *>(lua, 1);
 		luaServiceTaskSource->mCode = (XCode)luaL_checkinteger(lua, 2);
         if(!lua_isnil(lua, 3))
         {

@@ -570,10 +570,13 @@ namespace Sentry
         this->mContent.append(content);
     }
 
-    void HttpHandlerResponse::WriteString(Json::Writer &json)
+    Json::Writer &HttpHandlerResponse::GetJson()
     {
-        json.WriterStream(this->mContent);
-        this->mContentSize += this->mContent.size();
+        if(this->mJson == nullptr)
+        {
+            this->mJson = std::make_shared<Json::Writer>();
+        }
+        return *this->mJson;
     }
 
     void HttpHandlerResponse::WriteString(const char *content, size_t size)

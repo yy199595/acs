@@ -49,19 +49,24 @@ function Client.StartLogic()
     end
 end
 
-function LoopLogin()
-    while true do
-        local t1 = Time.GetNowMilTime()
-        LoginComponent.Register(account, password, phoneNum)
-        print("register use time = ", Time.GetNowMilTime() - t1)
-    end
-end
+local loginCount = 0
+local registerCount = 0
 
 function LoopRegister()
     while true do
         local t1 = Time.GetNowMilTime()
+        LoginComponent.Register(account, password, phoneNum)
+        registerCount = registerCount + 1
+        print(string.format("register use time = [%dms] count = %d", Time.GetNowMilTime() - t1, registerCount))
+    end
+end
+
+function LoopLogin()
+    while true do
+        local t1 = Time.GetNowMilTime()
         LoginComponent.Login(account, password)
-        print("login use time = ", Time.GetNowMilTime() - t1)
+        loginCount = loginCount + 1
+        print(string.format("login use time = [%dms] count = %d", Time.GetNowMilTime() - t1, loginCount))
     end
 end
 
