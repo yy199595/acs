@@ -196,6 +196,17 @@ namespace Tcp
         this->mMessagqQueue.emplace_back(message);
 	}
 
+    std::shared_ptr<ProtoMessage> TcpContext::PopMessage()
+    {
+        std::shared_ptr<ProtoMessage> message;
+        if(!this->mMessagqQueue.empty())
+        {
+            message = this->mMessagqQueue.front();
+            this->mMessagqQueue.pop_front();
+        }
+        return message;
+    }
+
     void TcpContext::SendFromMessageQueue()
     {
         assert(this->mSendBuffer.size() == 0);
@@ -208,18 +219,8 @@ namespace Tcp
             asio::async_write(tcpSocket, this->mSendBuffer, [this, self]
                     (const asio::error_code& code, size_t size)
             {
-                std::shared_ptr<Tcp::ProtoMessage> message = this->mMessagqQueue.front();
-                if(!code)
-                {
-//                    if(length > 0)
-//                    {
-//                        this->SendFromMessageQueue();
-//                        return;
-//                    }
-                    this->mMessagqQueue.pop_front();
-                }
                 this->ClearSendStream();
-                this->OnSendMessage(code, message);
+                this->OnSendMessage(code, this->mMessagqQueue.front());
             });
             this->mLastOperTime = Helper::Time::GetNowSecTime();
         }

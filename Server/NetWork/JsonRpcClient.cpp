@@ -87,6 +87,7 @@ namespace Tcp
             CONSOLE_LOG_ERROR(code.message());
             return;
         }
+        this->PopMessage();
         this->SendFromMessageQueue();
     }
 

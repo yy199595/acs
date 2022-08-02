@@ -49,7 +49,6 @@ namespace Mongo
 		int mIndex;
         int mSendCount;
 		int mRecvCount;
-		bool mIsAuth; //当前是否正在验证
 		const Mongo::Config & mConfig;
 		asio::streambuf streamBuffer;
 		MongoRpcComponent * mMongoComponent;

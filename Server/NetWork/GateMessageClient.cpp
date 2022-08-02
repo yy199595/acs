@@ -104,6 +104,7 @@ namespace Sentry
 			this->CloseSocket(XCode::SendMessageFail);
 			return;
 		}
+        this->PopMessage();
         this->SendFromMessageQueue();
 	}
 

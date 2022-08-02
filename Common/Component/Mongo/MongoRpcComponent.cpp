@@ -112,7 +112,7 @@ namespace Sentry
 	void MongoRpcComponent::OnDelTask(long long taskId, RpcTask task)
 	{
         assert(this->GetApp()->IsMainThread());
-        //this->mRequestId.Push((int)taskId);
+        this->mRequestId.Push((int)taskId);
 	}
 
 	void MongoRpcComponent::OnAddTask(RpcTaskComponent<Mongo::MongoQueryResponse>::RpcTask task)
@@ -137,7 +137,7 @@ namespace Sentry
 			return nullptr;
 		}
         int index = this->mIndex % this->mMongoClients.size();
-		this->mMongoClients[0]->SendMongoCommand(request);
+		this->mMongoClients[index]->SendMongoCommand(request);
         this->mIndex++;
 #ifdef __DEBUG__
 		long long t1 = Time::GetNowMilTime();

@@ -11,7 +11,6 @@ namespace Sentry
 		const RedisConfig& config, RedisComponent* component)
 		: Tcp::TcpContext(socket, 1024 * 100), mConfig(config), mRedisComponent(component)
 	{
-        this->mTaskId = 0;
 		this->mSocket = socket;
 		printf("create new redis client %s\n", config.Name.c_str());
 	}
@@ -85,15 +84,18 @@ namespace Sentry
 
 	void RedisClientContext::OnReadComplete()
 	{
-		SharedRedisClient self = this->Cast<RedisClientContext>();
+        std::shared_ptr<RedisRequest> request = dynamic_pointer_cast<RedisRequest>(this->PopMessage());
+
+        SharedRedisClient self = this->Cast<RedisClientContext>();
+        long long taskId = request != nullptr ? request->GetTaskId() : 0;
+
 #ifdef ONLY_MAIN_THREAD
-		this->mRedisComponent->OnResponse(self, this->mTaskId, this->mCurResponse);
+		this->mRedisComponent->OnResponse(self, taskId, this->mCurResponse);
 #else
 		asio::io_service & taskThread = App::Get()->GetThread();
 		taskThread.post(std::bind(&RedisComponent::OnResponse,
-			this->mRedisComponent, self, this->mTaskId, this->mCurResponse));
+			this->mRedisComponent, self, taskId, this->mCurResponse));
 #endif
-        this->mTaskId = 0;
         this->SendFromMessageQueue();
 	}
 
@@ -109,7 +111,6 @@ namespace Sentry
             this->SendFromMessageQueue();
             return;
         }
-        this->mTaskId = static_pointer_cast<RedisRequest>(message)->GetTaskId();
         this->ReceiveLine();
     }
 

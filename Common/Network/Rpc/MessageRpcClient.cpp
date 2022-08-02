@@ -58,6 +58,7 @@ namespace Sentry
 		}
         else
         {
+            this->PopMessage();
             this->SendFromMessageQueue();
         }
 	}

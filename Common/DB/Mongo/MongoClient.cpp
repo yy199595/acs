@@ -19,26 +19,20 @@ namespace Mongo
 	{
         this->mSendCount = 0;
 		this->mRecvCount = 0;
-		this->mIsAuth = false;
 	}
 
 	void MongoClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{
 		if (code)
 		{
-			if(this->mIsAuth)
-			{
-				return;
-			}
 			if(!this->StartAuthBySha1())
 			{
 				CONSOLE_LOG_ERROR("auth mongo user failure");
 				return;
 			}
-			this->mIsAuth = false;
             this->SendFromMessageQueue();
             CONSOLE_LOG_INFO( "["<< this->mIndex << "] mongo user auth successful");
-			return;
+            return;
 		}
 		this->mSendCount++;
         assert(this->mRecvBuffer.size() == 0);
@@ -62,48 +56,51 @@ namespace Mongo
 			return;
 		}
 
-		static int FailureCount = 0;
-		static int SuccessfulCount = 0;
 		if (this->mMongoResponse == nullptr)
 		{
 			assert(this->mRecvBuffer.size() >= sizeof(MongoHead));
 			this->mMongoResponse = std::make_shared<MongoQueryResponse>();
 			int length = this->mMongoResponse->OnReceiveHead(is);
+            assert(length > 0);
 
-			if (length <= 0)
-			{
-				this->RecvSync(this->mSocket->GetSocket().available());
-				std::istream is(&this->mRecvBuffer);
-
-				std::string data;
-				char buffer[100] = { 0 };
-				size_t size = is.readsome(buffer, 100);
-				while (size > 0)
-				{
-					data.append(buffer, size);
-					size = is.readsome(buffer, 100);
-				}
-				CONSOLE_LOG_ERROR(data);
-				long long responseId = std::move(this->mMongoResponse)->GetHead().responseTo;
-#ifdef ONLY_MAIN_THREAD
-				this->mMongoComponent->OnTimeout(responseId);
-#else
-				asio::io_service& io = App::Get()->GetThread();
-				io.post(std::bind(&MongoRpcComponent::OnTimeout, this->mMongoComponent, responseId));
-#endif
-				FailureCount++;
-				this->mRecvCount++;
-				this->SendFromMessageQueue();
-				CONSOLE_LOG_INFO("失败次数 = " << FailureCount << "  成功次数 = " << SuccessfulCount);
-				return;
-			}
+//			if (length <= 0)
+//			{
+//				this->RecvSync(this->mSocket->GetSocket().available());
+//				std::istream is(&this->mRecvBuffer);
+//
+//				std::string data;
+//				char buffer[100] = { 0 };
+//				size_t size = is.readsome(buffer, 100);
+//				while (size > 0)
+//				{
+//					data.append(buffer, size);
+//					size = is.readsome(buffer, 100);
+//				}
+//				CONSOLE_LOG_ERROR(data);
+//				long long responseId = std::move(this->mMongoResponse)->GetHead().responseTo;
+//#ifdef ONLY_MAIN_THREAD
+//				this->mMongoComponent->OnTimeout(responseId);
+//#else
+//				asio::io_service& io = App::Get()->GetThread();
+//				io.post(std::bind(&MongoRpcComponent::OnTimeout, this->mMongoComponent, responseId));
+//#endif
+//				FailureCount++;
+//				this->mRecvCount++;
+//				this->SendFromMessageQueue();
+//				CONSOLE_LOG_INFO("失败次数 = " << FailureCount << "  成功次数 = " << SuccessfulCount);
+//				return;
+//			}
 			this->ReceiveMessage(length);
 		}
 		else
 		{
-			SuccessfulCount++;
 			this->mRecvCount++;
 			this->mMongoResponse->OnReceiveBody(is);
+#ifdef __DEBUG__
+            std::shared_ptr<MongoQueryRequest> request =
+                    static_pointer_cast<MongoQueryRequest>(this->PopMessage());
+            assert(request->header.requestID == this->mMongoResponse->GetHead().responseTo);
+#endif
 			long long responseId = this->mMongoResponse->GetHead().responseTo;
 			std::shared_ptr<MongoQueryResponse> response = std::move(this->mMongoResponse);
 #ifdef ONLY_MAIN_THREAD
@@ -114,7 +111,7 @@ namespace Mongo
 				this->mMongoComponent, responseId, response));
 #endif
 			//CONSOLE_LOG_INFO("成功次数 = " << SuccessfulCount);
-
+            this->PopMessage();
 			this->SendFromMessageQueue();
 		}
 
@@ -145,7 +142,6 @@ namespace Mongo
 
 	bool MongoClientContext::StartAuthBySha1()
 	{
-		this->mIsAuth = true;
 		if(!this->ConnectSync())
 		{
 			CONSOLE_LOG_ERROR("connect mongo error");

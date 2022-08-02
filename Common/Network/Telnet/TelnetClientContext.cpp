@@ -57,6 +57,7 @@ namespace Tcp
 			this->CloseContext();
 			CONSOLE_LOG_ERROR(code.message());
 		}
+        this->PopMessage();
 	}
 
 	void TelnetClientContext::CloseContext()

@@ -104,6 +104,7 @@ namespace Sentry
 			CONSOLE_LOG_ERROR(code.message());
 #endif
 		}
+        this->PopMessage();
         this->ClosetClient();
     }
 	void HttpHandlerClient::ClosetClient()

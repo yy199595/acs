@@ -55,6 +55,7 @@ namespace Sentry
 
     void HttpRequestClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<Tcp::ProtoMessage> message)
     {
+        this->PopMessage();
         if (code)
         {
 #ifdef __NET_ERROR_LOG__

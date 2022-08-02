@@ -32,8 +32,13 @@ namespace Client
                 return;
             }
             this->ReceiveLength();
+            this->SendFromMessageQueue();
         }
-        this->SendFromMessageQueue();
+        else
+        {
+            this->PopMessage();
+            this->SendFromMessageQueue();
+        }
     }
 
     void TcpRpcClientContext::OnReceiveLength(const asio::error_code &code, int length)
