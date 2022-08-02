@@ -7,19 +7,19 @@ namespace Sentry
 {
 	TaskContext::TaskContext()
 	{
-		memset(this, 0, (sizeof(TaskContext)));
+        this->sid = 0;
+        this->mCoroutineId = 0;
+        this->mContext = nullptr;
+        this->mFunction = nullptr;
+        memset(&this->mStack, 0, sizeof(Stack));
 	}
 
 	void TaskContext::Invoke()
 	{
 		this->mFunction->run();
-		if (this->mGroup != nullptr)
-		{
-			this->mGroup->FinishAny();
-		}
 		delete this->mFunction;
-		this->mGroup = nullptr;
 		this->mFunction = nullptr;
+        std::move(this->mGroup);
 		this->mState = CorState::Finish;
 	}
 	TaskContext::~TaskContext()

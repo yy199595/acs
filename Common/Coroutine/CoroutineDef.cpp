@@ -69,20 +69,38 @@ namespace Sentry
 
 namespace Sentry
 {
-	CoroutineGroup::CoroutineGroup(size_t size)
+	CoroutineGroup::CoroutineGroup()
 	{
-		this->mCount = size;
-		this->mCorComponent = App::Get()->GetTaskComponent();
+        this->mCoroutineId = 0;
+        this->mCorComponent = nullptr;
 		this->mCoroutineId = this->mCorComponent->GetContextId();
 	}
 
-	void CoroutineGroup::FinishAny()
-	{
-		this->mCount--;
-		if (this->mCount == 0)
-		{
-			this->mCorComponent->Resume(this->mCoroutineId);
-			delete this;
-		}
-	}
+    CoroutineGroup::~CoroutineGroup()
+    {
+        if(this->mCoroutineId != 0)
+        {
+            this->mCorComponent->Resume(this->mCoroutineId);
+        }
+    }
+
+    void CoroutineGroup::WaitAll()
+    {
+        this->mCorComponent = App::Get()->GetTaskComponent();
+        this->mCorComponent->YieldCoroutine(this->mCoroutineId);
+    }
+
+    void CoroutineGroup::WaitAll(std::vector<TaskContext *> &taskContexts)
+    {
+        if(!taskContexts.empty())
+        {
+            this->mCorComponent = App::Get()->GetTaskComponent();
+            for(TaskContext * taskContext : taskContexts)
+            {
+                assert(taskContext->mGroup == nullptr);
+                taskContext->mGroup = this->shared_from_this();
+            }
+            this->mCorComponent->YieldCoroutine(this->mCoroutineId);
+        }
+    }
 }

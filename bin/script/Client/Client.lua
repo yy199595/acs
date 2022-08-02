@@ -9,9 +9,21 @@ local account = "yjz1995"
 local password = "123456"
 local phoneNum = 13716061995
 
+function Test()
+    for i = 1, 10 do
+        coroutine.start(LoopLogin)
+    end
+    return false
+end
 
 function Client.StartLogic()
+
     LoginComponent.Awake()
+
+    if Test() == false then
+        return
+    end
+
 
     local clientComponent = App.GetComponent("ClientComponent")
     LoginComponent.Register(account, password, phoneNum)
@@ -44,9 +56,6 @@ function Client.StartLogic()
     })
     Log.Error("code = ", res, Json.Encode(response))
 
-    for i = 1, 10 do
-        coroutine.start(LoopLogin)
-    end
 end
 
 local loginCount = 0

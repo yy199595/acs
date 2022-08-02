@@ -43,15 +43,15 @@ namespace Sentry
 namespace Sentry
 {
 	class TaskComponent;
-	class CoroutineGroup
+    class CoroutineGroup : public std::enable_shared_from_this<CoroutineGroup>
 	{
 	 public:
-		explicit CoroutineGroup(size_t count);
-		~CoroutineGroup() = default;
+		explicit CoroutineGroup();
+        ~CoroutineGroup();
 	 public:
-		void FinishAny();
-	 private:
-		size_t mCount;
+        void WaitAll();
+        void WaitAll(std::vector<TaskContext *> & taskContexts);
+    private:
 		unsigned int mCoroutineId;
 		TaskComponent* mCorComponent;
 	};

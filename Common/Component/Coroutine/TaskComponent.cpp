@@ -50,32 +50,6 @@ namespace Sentry
 		return true;
 	}
 
-	void TaskComponent::WhenAny(TaskContext* coroutine)
-	{
-		if (this->mRunContext == nullptr)
-		{
-			LOG_FATAL("please in coroutine wait");
-			return;
-		}
-		coroutine->mGroup = new CoroutineGroup(1);
-		this->YieldCoroutine();
-	}
-
-	void TaskComponent::WhenAll(std::vector<TaskContext*>& coroutines)
-	{
-		if (this->mRunContext == nullptr)
-		{
-			LOG_FATAL("please in coroutine wait");
-			return;
-		}
-		auto group = new CoroutineGroup(coroutines.size());
-		for (auto coroutine : coroutines)
-		{
-			coroutine->mGroup = group;
-		}
-		this->YieldCoroutine();
-	}
-
 	void TaskComponent::Sleep(long long ms)
 	{
 		unsigned int id = this->mRunContext->mCoroutineId;

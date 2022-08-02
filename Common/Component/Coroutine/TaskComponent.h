@@ -44,10 +44,6 @@ namespace Sentry
 
 		void Resume(unsigned int id);
 
-		void WhenAny(TaskContext* coroutine);
-
-		void WhenAll(std::vector<TaskContext*>& coroutines);
-
     private:
 		void Awake() final;
 
