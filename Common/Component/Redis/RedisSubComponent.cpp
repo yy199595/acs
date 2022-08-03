@@ -16,8 +16,9 @@ namespace Sentry
             LOG_ERROR("not find main redis config");
             return false;
         }
+		config.GetListener("rpc", this->mAddress);
         LOG_CHECK_RET_FALSE(this->ParseConfig("sub", *jsonValue));
-        return true;
+		return this->StartSubChannel();
     }
 
     bool RedisSubComponent::StartSubChannel()
@@ -59,10 +60,28 @@ namespace Sentry
                 {
                     const std::string & channel = redisAny2->Cast<RedisString>()->GetValue();
                     const std::string & message = redisAny3->Cast<RedisString>()->GetValue();
+					NetEventComponent* localServiceComponent = this->GetComponent<NetEventComponent>(channel);
+
+					std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
+					if (!jsonReader->ParseJson(message))
+					{
+						return;
+					}
+
+					if(localServiceComponent == nullptr)
+					{
+						std::string service;
+						LOG_CHECK_RET(jsonReader->GetMember("service", service));
+						localServiceComponent = this->GetComponent<NetEventComponent>(service);
+					}
+					std::string eveId;
+					LOG_CHECK_RET(jsonReader->GetMember("eveId", eveId));
+					localServiceComponent != nullptr && localServiceComponent->Invoke(eveId, jsonReader);
                     // 处理事件
                 }
             }
         }
+		this->mSubClient->StartReceiveMessage();
     }
 
     long long RedisSubComponent::Publish(const std::string& channel, const std::string& message)
@@ -87,4 +106,9 @@ namespace Sentry
         LOG_INFO("sub " << channel << " failure");
         return false;
     }
+
+	void RedisSubComponent::OnLoadScript(const std::string& name, const std::string& md5)
+	{
+		throw std::logic_error("");
+	}
 }

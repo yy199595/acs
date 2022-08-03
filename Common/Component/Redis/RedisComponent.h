@@ -18,12 +18,12 @@ namespace Sentry
         bool LateAwake() override;
         void OnSecondUpdate(const int tick) override;
 	 protected:
-        SharedRedisClient GetClient(const std::string & name);
         SharedRedisClient MakeRedisClient(const std::string &name);
         SharedRedisClient MakeRedisClient(const RedisConfig & config);
         const RedisConfig * ParseConfig(const char * name, const rapidjson::Value & json);
     public:
-        virtual void OnLoadScript(const std::string & name, const std::string & md5) = 0;
+		SharedRedisClient GetClient(const std::string & name);
+		virtual void OnLoadScript(const std::string & name, const std::string & md5) = 0;
     protected:
         std::shared_ptr<RedisResponse> Run(const std::string & name, std::shared_ptr<RedisRequest> request);
         std::shared_ptr<RedisResponse> Run(SharedRedisClient redisClientContext, std::shared_ptr<RedisRequest> request);

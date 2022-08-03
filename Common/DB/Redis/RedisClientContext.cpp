@@ -7,11 +7,10 @@
 #include"Component/Redis/RedisComponent.h"
 namespace Sentry
 {
-	RedisClientContext::RedisClientContext(std::shared_ptr<SocketProxy> socket, const RedisConfig& config)
-		: Tcp::TcpContext(socket, 1024 * 100), mConfig(config), mRedisComponent(nullptr)
+	RedisClientContext::RedisClientContext(std::shared_ptr<SocketProxy> socket, const RedisConfig& config, RedisComponent * component)
+		: Tcp::TcpContext(socket, 1024 * 100), mConfig(config), mRedisComponent(component)
 	{
 		this->mSocket = socket;
-        LOG_CHECK_FATAL(this->mRedisComponent = App::Get()->GetComponent<RedisComponent>());
 	}
 
 	RedisClientContext::~RedisClientContext() noexcept
@@ -85,15 +84,13 @@ namespace Sentry
 	{
         std::shared_ptr<RedisRequest> request = dynamic_pointer_cast<RedisRequest>(this->PopMessage());
 
-        SharedRedisClient self = this->Cast<RedisClientContext>();
         long long taskId = request != nullptr ? request->GetTaskId() : 0;
 
 #ifdef ONLY_MAIN_THREAD
-		this->mRedisComponent->OnResponse(self, taskId, this->mCurResponse);
+		this->mRedisComponent->OnResponse(taskId, this->mCurResponse);
 #else
 		asio::io_service & taskThread = App::Get()->GetThread();
-		taskThread.post(std::bind(&RedisComponent::OnResponse,
-			this->mRedisComponent, self, taskId, this->mCurResponse));
+		taskThread.post(std::bind(&RedisComponent::OnResponse, this->mRedisComponent, taskId, this->mCurResponse));
 #endif
         this->SendFromMessageQueue();
 	}
@@ -115,24 +112,24 @@ namespace Sentry
 
 	bool RedisClientContext::AuthUser()
 	{
-		if(!this->ConnectSync())
+		if (!this->ConnectSync())
 		{
 			CONSOLE_LOG_ERROR("connect redis [" << this->mConfig.Address << "] failure");
 			return false;
 		}
-        assert(this->mSendBuffer.size() == 0);
-        assert(this->mRecvBuffer.size() == 0);
-		if(!this->mConfig.Password.empty())  //验证密码
+		assert(this->mSendBuffer.size() == 0);
+		assert(this->mRecvBuffer.size() == 0);
+		if (!this->mConfig.Password.empty())  //验证密码
 		{
 			std::shared_ptr<RedisRequest> authCommand
-					= std::make_shared<RedisRequest>("AUTH");
+				= std::make_shared<RedisRequest>("AUTH");
 			authCommand->AddParameter(this->mConfig.Password);
 			std::shared_ptr<RedisResponse> response(new RedisResponse());
 			if (this->SendSync(authCommand) <= 0 || this->RecvLineSync() <= 0)
 			{
 				return false;
 			}
-            std::istream is(&this->mRecvBuffer);
+			std::istream is(&this->mRecvBuffer);
 			if (response->OnRecvLine(is) != 0 || !response->IsOk())
 			{
 				CONSOLE_LOG_ERROR("auth redis user faliure");
@@ -144,17 +141,59 @@ namespace Sentry
 		std::shared_ptr<RedisRequest> selectCommand
 			= std::make_shared<RedisRequest>("SELECT");
 		selectCommand->AddParameter(this->mConfig.Index);
-		if(this->SendSync(selectCommand) <= 0 || this->RecvLineSync() <= 0)
+		if (this->SendSync(selectCommand) <= 0 || this->RecvLineSync() <= 0)
 		{
 			return false;
 		}
 
-        std::istream is(&this->mRecvBuffer);
+		std::istream is(&this->mRecvBuffer);
 		std::shared_ptr<RedisResponse> response2(new RedisResponse());
-		if(response2->OnRecvLine(is) != 0 || !response2->IsOk())
+		if (response2->OnRecvLine(is) != 0 || !response2->IsOk())
 		{
 			CONSOLE_LOG_ERROR("auth redis user faliure");
 			return false;
+		}
+		if (this->mConfig.LuaFiles.empty())
+		{
+			return true;
+		}
+		for (const std::string& path : this->mConfig.LuaFiles)
+		{
+			std::string content;
+			if (!Helper::File::ReadTxtFile(path, content))
+			{
+				CONSOLE_LOG_ERROR("load lua script error");
+				return false;
+			}
+			std::shared_ptr<RedisRequest> loadRequest = RedisRequest::Make("SCRIPT", "LOAD", content);
+			if (this->SendSync(loadRequest) <= 0 || this->RecvLineSync() <= 0)
+			{
+				return false;
+			}
+			std::istream is(&this->mRecvBuffer);
+			std::shared_ptr<RedisResponse> response(new RedisResponse());
+			if (this->RecvSync(response->OnRecvLine(is)) <= 0)
+			{
+				return false;
+			}
+			response->OnRecvMessage(is);
+
+			if (response->GetType() != RedisRespType::REDIS_BIN_STRING)
+			{
+				return false;
+			}
+			if (response->HasError())
+			{
+				CONSOLE_LOG_ERROR(response->GetString());
+				return false;
+			}
+			const std::string& md5 = response->GetString();
+#ifdef ONLY_MAIN_THREAD
+			this->mRedisComponent->OnLoadScript(path, md5);
+#else
+			asio::io_service& io = App::Get()->GetThread();
+			io.post(std::bind(&RedisComponent::OnLoadScript, this->mRedisComponent, path, md5));
+#endif
 		}
 		return true;
 	}

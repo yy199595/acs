@@ -23,7 +23,7 @@ namespace Sentry
 		virtual bool OnRegisterEvent(NetEventRegistry & eventRegister) = 0;
 	private:
 		NetEventRegistry mEventRegistry;
-		class MainRedisComponent * mRedisComponent;
+		class RedisSubComponent * mRedisComponent;
 	};
 }
 

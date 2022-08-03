@@ -18,7 +18,6 @@ namespace Sentry
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 		LOG_CHECK_RET_FALSE(this->GetComponent<NetThreadComponent>());
 		this->mRpcTaskComponent = this->GetComponent<ServiceRpcComponent>();
-		this->GetConfig().GetListener("rpc", this->mRpcAddress);
 		return true;
 	}
 
@@ -43,10 +42,8 @@ namespace Sentry
                 return false;
             }
         }
-
         return true;
 	}
-
 
     void MainRedisComponent::OnSecondUpdate(const int tick)
     {
@@ -55,53 +52,6 @@ namespace Sentry
 			this->mSubRedisClient->SendCommand(std::make_shared<RedisRequest>("PING"));
 		}
     }
-
-	bool MainRedisComponent::HandlerEvent(const std::string& channel, const std::string& message)
-	{
-		if (message[0] == '+') //请求
-		{
-			const char* data = message.c_str() + 1;
-			const size_t size = message.size() - 1;
-			std::shared_ptr<com::rpc::request> request(new com::rpc::request());
-			if (!request->ParseFromArray(data, size))
-			{
-				LOG_ERROR("parse message error");
-				return false;
-			}
-			assert(!request->address().empty());
-			this->mRpcTaskComponent->OnRequest(request);
-			return true;
-		}
-		else if (message[0] == '-') //回复
-		{
-			const char* data = message.c_str() + 1;
-			const size_t size = message.size() - 1;
-			std::shared_ptr<com::rpc::response> response(new com::rpc::response());
-			if (!response->ParseFromArray(data, size))
-			{
-				LOG_ERROR("parse message error");
-				return false;
-			}
-            long long taskId = response->rpc_id();
-			this->mRpcTaskComponent->OnResponse(taskId, response);
-			return true;
-		}
-		std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
-		if (!jsonReader->ParseJson(message))
-		{
-			return false;
-		}
-		NetEventComponent* localServiceComponent = this->GetComponent<NetEventComponent>(channel);
-		if(localServiceComponent == nullptr)
-		{
-			std::string service;
-			LOG_CHECK_RET_FALSE(jsonReader->GetMember("service", service));
-			localServiceComponent = this->GetComponent<NetEventComponent>(service);
-		}
-		std::string eveId;
-		LOG_CHECK_RET_FALSE(jsonReader->GetMember("eveId", eveId));
-		return localServiceComponent != nullptr && localServiceComponent->Invoke(eveId, jsonReader);
-	}
 
 	bool MainRedisComponent::Lock(const string& key, int timeout)
 	{

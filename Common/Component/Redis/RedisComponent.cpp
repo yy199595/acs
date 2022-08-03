@@ -135,7 +135,7 @@ namespace Sentry
             return nullptr;
         }
         socketProxy->Init(config.Ip, config.Port);
-		return std::make_shared<RedisClientContext>(socketProxy, config);
+		return std::make_shared<RedisClientContext>(socketProxy, config, this);
 	}
 
 	const RedisConfig* RedisComponent::GetRedisConfig(const std::string& name)
@@ -211,28 +211,4 @@ namespace Sentry
         }
         return this->Run(redisClientContext, request);
     }
-
-	bool RedisComponent::LoadLuaScript(const std::string & name, const string& path)
-	{
-        std::string content;
-        if (!Helper::File::ReadTxtFile(path, content))
-        {
-            LOG_ERROR("read " << path << " failure");
-            return false;
-        }
-        std::shared_ptr<RedisRequest> request = RedisRequest::Make("SCRIPT", "LOAD", content);
-
-        std::shared_ptr<RedisResponse> redisResponse = this->Run(name, request);
-        if(!redisResponse->HasError())
-        {
-            std::string fileName, director;
-            if (!Helper::Directory::GetDirAndFileName(path, director, fileName))
-            {
-                return false;
-            }
-            this->mLuaMap.emplace(fileName, redisResponse->GetString());
-            return true;
-        }
-        return false;
-	}
 }

@@ -3,12 +3,12 @@
 //
 
 #include"NetEventComponent.h"
-#include"Component/Redis/MainRedisComponent.h"
+#include"Component/Redis/RedisSubComponent.h"
 namespace Sentry
 {
 	bool NetEventComponent::StartRegisterEvent()
 	{
-		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
+		this->mRedisComponent = this->GetComponent<RedisSubComponent>();
 		if(this->OnRegisterEvent(this->mEventRegistry))
 		{
 			if(this->mEventRegistry.GetEventSize() > 0)
