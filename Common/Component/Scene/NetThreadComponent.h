@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include"Component/Component.h"
-#include"Util/NumberBuilder.h"
 namespace Sentry
 {
 	class NetThreadComponent : public Component

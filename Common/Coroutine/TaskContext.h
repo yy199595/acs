@@ -8,7 +8,7 @@ namespace Method
     class IFucntion
     {
     public:
-        virtual void Invoke() = 0;
+        inline virtual void Invoke() = 0;
     };
 
     template<typename T, typename ... Args>
@@ -21,8 +21,9 @@ namespace Method
 
         Function(std::shared_ptr<T> o, ClassFunc && func, Args && ... t1)
             : mFunc(std::bind(func, o, std::forward<Args>(t1) ...)) { }
+        Function(const Function<T, Args...> & obj) { this->mFunc = obj.mFunc; }
     public:
-        void Invoke() final { this->mFunc(); }
+        inline void Invoke() final { this->mFunc(); }
     private:
         std::function<void(Args ...)> mFunc;
     };
@@ -30,10 +31,10 @@ namespace Method
     template<> class Function<void> : public IFucntion
     {
     public:
-        Function(std::function<void(void)> && func)
-            : mFunc(func) { }
+        Function(std::function<void(void)> && func) : mFunc(std::move(func)) { }
+        Function(const Function<void> & obj) { this->mFunc = obj.mFunc; }
     public:
-        void Invoke() final { this->mFunc(); }
+        inline void Invoke() final { this->mFunc(); }
     private:
         std::function<void(void)> mFunc;
     };

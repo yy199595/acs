@@ -1,5 +1,4 @@
 ﻿#include "NetThreadComponent.h"
-#include "Util/Guid.h"
 #include "App/App.h"
 #include "Method/MethodProxy.h"
 #include"Network/SocketProxy.h"
@@ -70,13 +69,13 @@ namespace Sentry
     std::shared_ptr<SocketProxy> NetThreadComponent::CreateSocket()
     {
 #ifdef ONLY_MAIN_THREAD
-            asio::io_service & io = this->GetApp()->GetThread();
+        asio::io_service & io = this->GetApp()->GetThread();
 #else
-            if (this->mIndex >= mNetThreads.size())
-            {
-                this->mIndex = 0;
-            }
-            asio::io_service &io = *(mNetThreads[this->mIndex++]);
+        if (this->mIndex >= mNetThreads.size())
+        {
+            this->mIndex = 0;
+        }
+        asio::io_service &io = *(mNetThreads[this->mIndex++]);
 #endif
         return std::make_shared<SocketProxy>(io);
     }
