@@ -8,7 +8,7 @@
 #include"Script/Extension/Redis/LuaRedis.h"
 #include"Component/Scene/NetThreadComponent.h"
 #include"Component/Rpc/ServiceRpcComponent.h"
-#include"Component/Scene/NetEventComponent.h"
+
 namespace Sentry
 {
 	bool MainRedisComponent::LateAwake()
@@ -24,48 +24,29 @@ namespace Sentry
 
 	bool MainRedisComponent::OnStart()
 	{
-		LOG_CHECK_RET_FALSE(RedisComponent::OnStart());
+        const rapidjson::Value* jsonValue = this->GetApp()->GetConfig().GetJsonValue("redis");
+        if (jsonValue == nullptr || !jsonValue->IsObject())
+        {
+            return false;
+        }
+        auto iter = jsonValue->MemberBegin();
+        for (; iter != jsonValue->MemberEnd(); iter++)
+        {
+            const char * name = iter->name.GetString();
+            if(this->ParseConfig(name, iter->value) == nullptr)
+            {
+                LOG_ERROR("check " << name << " redis config error");
+                return false;
+            }
+            if(this->RunCmd(name, "PING")->HasError())
+            {
+                return false;
+            }
+        }
 
-		std::shared_ptr<RedisRequest> request(new RedisRequest("LPUSH"));
-		request->AddParameter("yjz11");
-
-		for(size_t index = 0; index < 100; index++)
-		{
-			long long time = Helper::Time::GetNowSecTime() + index;
-			request->AddParameter(Helper::Time::GetDateStr(time));
-		}
-		this->Run("main", request);
-		std::shared_ptr<RedisResponse> response = this->Run("main", "LRANGE", "yjz11", 0, 100);
-
-
-        this->mSubRedisClient = this->MakeRedisClient("main");
-        return this->StartSubChannel();
-	}
-
-	bool MainRedisComponent::StartSubChannel()
-	{
-		if (!this->SubscribeChannel(this->mRpcAddress))
-		{
-			return false;
-		}
-		std::vector<Component*> components;
-		this->GetApp()->GetComponents(components);
-		for (Component* component: components)
-		{
-			NetEventComponent* localServiceComponent = component->Cast<NetEventComponent>();
-			if (localServiceComponent != nullptr)
-			{
-				if(!localServiceComponent->StartRegisterEvent())
-				{
-					LOG_INFO(component->GetName() << " start listen event failure");
-					return false;
-				}
-				LOG_INFO(component->GetName() << " start listen event successful");
-			}
-		}
-        this->mSubRedisClient->StartReceiveMessage();
         return true;
 	}
+
 
     void MainRedisComponent::OnSecondUpdate(const int tick)
     {
@@ -73,83 +54,6 @@ namespace Sentry
 		{
 			this->mSubRedisClient->SendCommand(std::make_shared<RedisRequest>("PING"));
 		}
-    }
-
-	long long MainRedisComponent::Publish(const std::string& channel, const std::string& message)
-	{
-        std::shared_ptr<RedisResponse> redisResponse = this->Run(
-                this->mSubRedisClient, "PUBLISH", channel, message);
-        return redisResponse->GetNumber();
-	}
-
-	bool MainRedisComponent::SubscribeChannel(const std::string& channel)
-	{
-        std::shared_ptr<RedisResponse> redisResponse =
-                this->Run(this->mSubRedisClient, "SUBSCRIBE", channel);
-        if(redisResponse->GetArraySize() == 3 && redisResponse->Get(2)->IsNumber())
-        {
-            if(((const RedisNumber*)redisResponse->Get(2))->GetValue() > 0)
-            {
-                LOG_INFO("sub " << channel << " successful");
-                return true;
-            }
-        }
-        LOG_INFO("sub " << channel << " failure");
-        return false;
-	}
-
-    void MainRedisComponent::OnCommandReply(SharedRedisClient redisClient, long long taskId, std::shared_ptr<RedisResponse> response)
-    {
-        auto iter = this->mTasks.find(taskId);
-        if(iter == this->mTasks.end())
-        {
-            LOG_ERROR("not find redis task id = " << taskId);
-            return;
-        }
-        iter->second->OnResponse(response);
-        if(redisClient == this->mSubRedisClient)
-        {
-            this->mSubRedisClient->StartReceiveMessage();
-        }
-        this->mTasks.erase(iter);
-    }
-
-    std::shared_ptr<RedisTask> MainRedisComponent::AddRedisTask(std::shared_ptr<RedisRequest> request)
-    {
-		std::shared_ptr<RedisTask> task = request->MakeTask();
-        long long taskId = task->GetRpcId();
-        auto iter = this->mTasks.find(taskId);
-        if(iter == this->mTasks.end())
-        {
-            this->mTasks.emplace(taskId, task);
-            return task;
-        }
-        return nullptr;
-    }
-
-	std::shared_ptr<LuaRedisTask> MainRedisComponent::AddLuaRedisTask(std::shared_ptr<RedisRequest> request, lua_State * lua)
-	{
-		std::shared_ptr<LuaRedisTask> task = request->MakeLuaTask(lua);
-		long long taskId = task->GetRpcId();
-		auto iter = this->mTasks.find(taskId);
-		if(iter == this->mTasks.end())
-		{
-			this->mTasks.emplace(taskId, task);
-			return task;
-		}
-		return nullptr;
-	}
-
-    void MainRedisComponent::OnSubscribe(SharedRedisClient redisClient, const std::string &channel, const std::string &message)
-    {
-        if(!this->HandlerEvent(channel, message))
-        {
-            LOG_ERROR("handler " << channel << " error : " << message);
-        }
-        if(redisClient == this->mSubRedisClient)
-        {
-            this->mSubRedisClient->StartReceiveMessage();
-        }
     }
 
 	bool MainRedisComponent::HandlerEvent(const std::string& channel, const std::string& message)
@@ -215,7 +119,7 @@ namespace Sentry
 
 	bool MainRedisComponent::UnLock(const string& key)
 	{
-		std::shared_ptr<RedisResponse> response1 = this->Run("main", "DEL", key);
+		std::shared_ptr<RedisResponse> response1 = this->RunCmd("main", "DEL", key);
         if(response1->GetNumber() != 1)
         {
             return false;
@@ -240,7 +144,7 @@ namespace Sentry
 			this->mLockTimers.erase(iter);
 			this->mTaskComponent->Start([this, key, timeout]()
 			{
-				std::shared_ptr<RedisResponse> response = this->Run("main", "SETEX", 10, 1);
+				std::shared_ptr<RedisResponse> response = this->RunCmd("main", "SETEX", 10, 1);
                 if(response != nullptr && response->IsOk())
                 {
                     this->mLockTimers[key] = this->mTimerComponent->DelayCall(
@@ -257,4 +161,63 @@ namespace Sentry
 		luaRegister.PushExtensionFunction("Run", Lua::Redis::Run);
 		luaRegister.PushExtensionFunction("Call", Lua::Redis::Call);
 	}
+}
+
+namespace Sentry
+{
+    bool MainRedisComponent::Call(const std::string & name, const std::string& fullName, Json::Writer & jsonWriter)
+    {
+        std::shared_ptr<Json::Reader> response(new Json::Reader());
+        return this->Call(name, fullName, jsonWriter, response);
+    }
+
+    std::shared_ptr<RedisRequest> MainRedisComponent::MakeLuaRequest(const std::string &fullName, const std::string &json)
+    {
+        size_t pos = fullName.find('.');
+        assert(pos != std::string::npos);
+        std::string tab = fullName.substr(0, pos);
+        std::string func = fullName.substr(pos + 1);
+        auto iter = this->mLuaMap.find(fmt::format("{0}.lua", tab));
+        if(iter == this->mLuaMap.end())
+        {
+            LOG_ERROR("not find redis script " << fullName);
+            return nullptr;
+        }
+        const std::string & tag = iter->second;
+        return RedisRequest::MakeLua(tag, func, json);
+    }
+
+    void MainRedisComponent::OnLoadScript(const std::string &name, const std::string &md5)
+    {
+        auto iter = this->mLuaMap.find(name);
+        if(iter != this->mLuaMap.end())
+        {
+            this->mLuaMap.erase(iter);
+        }
+        this->mLuaMap[name] = md5;
+    }
+
+    bool MainRedisComponent::Call(const std::string & name, const std::string& fullName, Json::Writer & jsonWriter,
+                              std::shared_ptr<Json::Reader> response)
+    {
+        std::string json;
+        jsonWriter.WriterStream(json);
+        std::shared_ptr<RedisRequest> request = this->MakeLuaRequest(fullName, json);
+        if(request == nullptr)
+        {
+            return false;
+        }
+        std::shared_ptr<RedisResponse> response1 = this->Run(name, request);
+        if(response1->HasError())
+        {
+            LOG_ERROR(response1->GetString());
+            return false;
+        }
+        if(!response->ParseJson(response1->GetString()))
+        {
+            return false;
+        }
+        bool res = false;
+        return response->GetMember("res", res) && res;
+    }
 }

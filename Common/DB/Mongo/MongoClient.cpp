@@ -13,12 +13,12 @@
 
 namespace Mongo
 {
-	MongoClientContext::MongoClientContext(std::shared_ptr<SocketProxy> socket,
-                                           const Mongo::Config& config, MongoRpcComponent* component, int index)
-		: Tcp::TcpContext(socket, 1024 * 1024), mConfig(config), mMongoComponent(component), mIndex(index)
+	MongoClientContext::MongoClientContext(std::shared_ptr<SocketProxy> socket, const Mongo::Config& config)
+		: Tcp::TcpContext(socket, 1024 * 1024), mConfig(config), mMongoComponent(nullptr)
 	{
         this->mSendCount = 0;
 		this->mRecvCount = 0;
+        LOG_CHECK_FATAL(this->mMongoComponent = App::Get()->GetComponent<MongoRpcComponent>());
 	}
 
 	void MongoClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)

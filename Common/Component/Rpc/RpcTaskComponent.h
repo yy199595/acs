@@ -22,7 +22,8 @@ namespace Sentry
 	protected:
 		virtual void OnAddTask(RpcTask task) { }
 		virtual void OnDelTask(long long taskId, RpcTask task) { }
-	private:
+        virtual void OnNotFindResponse(long long taskId, std::shared_ptr<T> message);
+    private:
         std::unordered_map<long long, RpcTask> mTasks;
     };
 
@@ -59,7 +60,7 @@ namespace Sentry
         auto iter = this->mTasks.find(taskId);
         if(iter == this->mTasks.end())
         {
-            LOG_ERROR(this->GetName() << " not find rpc task id " << taskId);
+            this->OnNotFindResponse(taskId, message);
             return false;
         }
         RpcTask rpcTask = iter->second;
@@ -67,6 +68,12 @@ namespace Sentry
         rpcTask->OnResponse(message);
 		this->OnDelTask(taskId, rpcTask);
         return true;
+    }
+
+    template<typename T>
+    void RpcTaskComponent<T>::OnNotFindResponse(long long taskId, std::shared_ptr<T> message)
+    {
+        LOG_ERROR(this->GetName() << " not find rpc task id " << taskId);
     }
 }
 

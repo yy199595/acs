@@ -81,6 +81,15 @@ namespace Sentry
 			Component* component = iter->second;
 			return dynamic_cast<T*>(component);
 		}
+        auto iter1 = this->mComponentMap.begin();
+        for(; iter1 != this->mComponentMap.end(); iter1++)
+        {
+            T* component = dynamic_cast<T *>(iter1->second);
+            if(component != nullptr)
+            {
+                return component;
+            }
+        }
 		return nullptr;
 	}
 

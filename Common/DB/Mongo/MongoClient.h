@@ -37,8 +37,7 @@ namespace Mongo
 	class MongoClientContext : public Tcp::TcpContext
 	{
 	 public:
-		MongoClientContext(std::shared_ptr<SocketProxy> scoket,
-                           const Mongo::Config & config, MongoRpcComponent * component, int index);
+		MongoClientContext(std::shared_ptr<SocketProxy> scoket, const Mongo::Config & config);
 	public:
 		void SendMongoCommand(std::shared_ptr<MongoQueryRequest> request);
 	private:

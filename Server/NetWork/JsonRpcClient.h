@@ -60,7 +60,6 @@ namespace Tcp
         void StartReceive();
         void SendMesageData(const std::string & json);
     private:
-        void OnReceiveLine(const asio::error_code &code, std::istream &readStream) final;
         void OnReceiveMessage(const asio::error_code &code, std::istream &readStream) final;
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 

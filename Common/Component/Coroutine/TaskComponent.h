@@ -23,17 +23,19 @@ namespace Sentry
 		TaskContext* Start(F&& f, T* o, Args&& ... args)
 		{
 			TaskContext* co = this->MakeContext(
-				NewMethodProxy(std::forward<F>(f),
-					o, std::forward<Args>(args)...));
+				NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...));
 			this->Resume(co->mCoroutineId);
 			return co;
 		}
 		TaskContext* Start(std::function<void()>&& func)
 		{
-			TaskContext* co = this->MakeContext(new LambdaMethod(std::move(func)));
+			TaskContext* co = this->MakeContext(
+                    new LambdaMethod(std::move(func)));
 			this->Resume(co->mCoroutineId);
 			return co;
 		}
+
+    private:
 		TaskContext* MakeContext(StaticMethod* func);
 	 public:
 		bool YieldCoroutine();

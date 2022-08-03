@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1.3)
 
-PROJECT(Server)
+PROJECT(app)
 set(CMAKE_CXX_STANDARD 11)
 include(CMake/define.cmake)
 include(CMake/function.cmake)
@@ -80,7 +80,7 @@ if (CCACHE_PROGRAM)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
 
-ADD_EXECUTABLE(Sentry ${AsmFiles} ${CommonFiles} ${ServerFiles} ${ClientSource})
+ADD_EXECUTABLE(app ${AsmFiles} ${CommonFiles} ${ServerFiles} ${ClientSource})
 
 list(APPEND StaticLibs lua)
 
@@ -117,7 +117,7 @@ else()
     add_definitions(-D __OS_LINUX__)
     list(APPEND StaticLibs protobuf pthread)
 endif()
-TARGET_LINK_LIBRARIES(Sentry ${StaticLibs})
+TARGET_LINK_LIBRARIES(app ${StaticLibs})
 SET(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 

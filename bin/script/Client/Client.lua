@@ -9,21 +9,10 @@ local account = "yjz1995"
 local password = "123456"
 local phoneNum = 13716061995
 
-function Test()
-    for i = 1, 10 do
-        coroutine.start(LoopLogin)
-    end
-    return false
-end
 
 function Client.StartLogic()
 
     LoginComponent.Awake()
-
-    if Test() == false then
-        return
-    end
-
 
     local clientComponent = App.GetComponent("ClientComponent")
     LoginComponent.Register(account, password, phoneNum)
@@ -48,16 +37,14 @@ function Client.StartLogic()
         Log.Error("user auth failure")
         return
     end
-    --LoginComponent.Register(account, password, phoneNum)
-    --LoginComponent.Login(account, password)
-
-    local res, response = clientComponent:Call("ChatService.Chat", "c2s.chat.request", {
-        user_id = 1122, msg_type = 1, message = "hello"
-    })
-    Log.Error("code = ", res, Json.Encode(response))
+    for i = 1, 5 do
+        coroutine.start(LoopCall)
+        coroutine.start(LoopLogin)
+        coroutine.start(LoopRegister)
+    end
 
 end
-
+local callCount = 0
 local loginCount = 0
 local registerCount = 0
 
@@ -66,7 +53,7 @@ function LoopRegister()
         local t1 = Time.GetNowMilTime()
         LoginComponent.Register(account, password, phoneNum)
         registerCount = registerCount + 1
-        print(string.format("register use time = [%dms] count = %d", Time.GetNowMilTime() - t1, registerCount))
+        Log.Warning(string.format("register use time = [%dms] count = %d", Time.GetNowMilTime() - t1, registerCount))
     end
 end
 
@@ -75,7 +62,8 @@ function LoopLogin()
         local t1 = Time.GetNowMilTime()
         LoginComponent.Login(account, password)
         loginCount = loginCount + 1
-        print(string.format("login use time = [%dms] count = %d", Time.GetNowMilTime() - t1, loginCount))
+        local t = Time.GetNowMilTime() - t1
+        Log.Info(string.format("login use time = [%dms] count = %d", t, loginCount))
     end
 end
 
@@ -86,6 +74,8 @@ function LoopCall()
         local res, response = clientComponent:Call("ChatService.Chat", "c2s.chat.request", {
             user_id = 1122, msg_type = 1, message = "hello"
         })
-        Log.Error("code = ", res, Json.Encode(response), " time = ", Time.GetNowMilTime() - t1)
+        callCount = callCount + 1
+        local t = Time.GetNowMilTime() - t1
+        Log.Error(string.format("call use time = [%dms] count = %d", t, callCount))
     end
 end

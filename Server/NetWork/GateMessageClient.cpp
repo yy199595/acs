@@ -101,8 +101,9 @@ namespace Sentry
 #ifdef __NET_ERROR_LOG__
 			CONSOLE_LOG_ERROR(code.message());
 #endif
+            this->PopAllMessage();
 			this->CloseSocket(XCode::SendMessageFail);
-			return;
+            return;
 		}
         this->PopMessage();
         this->SendFromMessageQueue();

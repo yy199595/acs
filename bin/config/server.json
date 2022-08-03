@@ -55,7 +55,7 @@
             "ip": "114.115.167.51",
             "port": 6379,
             "timeout": 3,
-            "count": 20,
+            "count": 5,
             "free": 30,
             "index": 0,
             "lua": [
@@ -69,7 +69,7 @@
             "ip": "114.115.167.51",
             "port": 6379,
             "timeout": 3,
-            "count": 1,
+            "count": 5,
             "index": 1,
             "free": 30,
             "passwd": "199595yjz."

@@ -7,12 +7,11 @@
 #include"Component/Redis/RedisComponent.h"
 namespace Sentry
 {
-	RedisClientContext::RedisClientContext(std::shared_ptr<SocketProxy> socket,
-		const RedisConfig& config, RedisComponent* component)
-		: Tcp::TcpContext(socket, 1024 * 100), mConfig(config), mRedisComponent(component)
+	RedisClientContext::RedisClientContext(std::shared_ptr<SocketProxy> socket, const RedisConfig& config)
+		: Tcp::TcpContext(socket, 1024 * 100), mConfig(config), mRedisComponent(nullptr)
 	{
 		this->mSocket = socket;
-		printf("create new redis client %s\n", config.Name.c_str());
+        LOG_CHECK_FATAL(this->mRedisComponent = App::Get()->GetComponent<RedisComponent>());
 	}
 
 	RedisClientContext::~RedisClientContext() noexcept

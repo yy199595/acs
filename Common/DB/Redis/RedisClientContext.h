@@ -18,7 +18,7 @@ namespace Sentry
     class RedisClientContext final : public Tcp::TcpContext
     {
     public:
-        RedisClientContext(std::shared_ptr<SocketProxy> socket, const RedisConfig & config, RedisComponent * component);
+        RedisClientContext(std::shared_ptr<SocketProxy> socket, const RedisConfig & config);
 		~RedisClientContext();
     public:
         void StartReceiveMessage();

@@ -63,6 +63,7 @@ namespace Tcp
 
 	public:
         bool Reset(std::shared_ptr<SocketProxy> socket);
+        size_t WaitSendCount() const { return this->mSendCount; }
         long long GetLastOperTime() const { return this->mLastOperTime;}
 		const std::string & GetAddress() { return this->mSocket->GetAddress();}
         std::shared_ptr<SocketProxy> MoveSocket() { return std::move(this->mSocket); }
@@ -82,8 +83,10 @@ namespace Tcp
 		void ClearSendStream();
 		void ClearRecvStream();
         void SendFromMessageQueue();
-        std::shared_ptr<ProtoMessage> PopMessage();
         int SendSync(std::shared_ptr<ProtoMessage> message); //同步发送
+    protected:
+        size_t PopAllMessage();
+        std::shared_ptr<ProtoMessage> PopMessage();
 	 protected:
         virtual void OnReceiveLength(const asio::error_code & code, int length) { }
         virtual void OnReceiveLine(const asio::error_code & code, std::istream & readStream) {}
@@ -95,6 +98,7 @@ namespace Tcp
         asio::streambuf mRecvBuffer;
 		std::shared_ptr<SocketProxy> mSocket;
 	 private:
+        size_t mSendCount;
         int mConnectCount;
 		const size_t mMaxCount;
 		long long mLastOperTime;

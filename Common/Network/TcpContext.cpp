@@ -10,6 +10,7 @@ namespace Tcp
 	TcpContext::TcpContext(std::shared_ptr<SocketProxy> socket, size_t count)
 		: mMaxCount(count), mRecvBuffer(count)
 	{
+        this->mSendCount = 0;
 		this->mSocket = socket;
 		this->mLastOperTime = 0;
 		this->mConnectCount = 0;
@@ -190,11 +191,25 @@ namespace Tcp
         if(this->mMessagqQueue.empty())
         {
             this->mMessagqQueue.emplace_back(message);
+            this->mSendCount = this->mMessagqQueue.size();
             this->SendFromMessageQueue();
             return;
         }
         this->mMessagqQueue.emplace_back(message);
+        this->mSendCount = this->mMessagqQueue.size();
 	}
+
+    size_t TcpContext::PopAllMessage()
+    {
+        size_t count = 0;
+        while(!this->mMessagqQueue.empty())
+        {
+            count++;
+            this->mMessagqQueue.pop_front();
+        }
+        this->mSendCount = this->mMessagqQueue.size();
+        return count;
+    }
 
     std::shared_ptr<ProtoMessage> TcpContext::PopMessage()
     {
@@ -203,6 +218,7 @@ namespace Tcp
         {
             message = this->mMessagqQueue.front();
             this->mMessagqQueue.pop_front();
+            this->mSendCount = this->mMessagqQueue.size();
         }
         return message;
     }

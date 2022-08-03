@@ -52,27 +52,46 @@ namespace Sentry
 		return this->mConfigs.find("main") != this->mConfigs.end();
 	}
 
-	bool RedisComponent::OnStart()
-	{
-		for(auto iter = this->mConfigs.begin(); iter != this->mConfigs.end(); iter++)
-		{
-			const RedisConfig & config = iter->second;
-			if(this->Run(config.Name, "PING")->HasError())
-			{
-				LOG_ERROR("connect " << config.Name << " failure");
-				return false;
-			}
-			for(const std::string & path : iter->second.LuaFiles)
-			{
-				if(!this->LoadLuaScript(config.Name, path))
-				{
-					LOG_ERROR("load script " << path << " error");
-					return false;
-				}
-			}
-		}
-		return true;
-	}
+    const RedisConfig * RedisComponent::ParseConfig(const char *name, const rapidjson::Value &jsonData)
+    {
+        auto iter = this->mConfigs.find(name);
+        if(iter != this->mConfigs.end())
+        {
+            return &iter->second;
+        }
+
+        LOG_CHECK_RET_NULL(jsonData.HasMember("ip"));
+        LOG_CHECK_RET_NULL(jsonData.HasMember("port"));
+        LOG_CHECK_RET_NULL(jsonData.HasMember("index"));
+        LOG_CHECK_RET_NULL(jsonData.HasMember("count"));
+
+        RedisConfig redisConfig;
+        redisConfig.Name = name;
+        redisConfig.FreeClient = 30;
+        redisConfig.Ip = jsonData["ip"].GetString();
+        redisConfig.Port = jsonData["port"].GetInt();
+        redisConfig.Index = jsonData["index"].GetInt();
+        redisConfig.Count = jsonData["count"].GetInt();
+        if(jsonData.HasMember("free"))
+        {
+            redisConfig.FreeClient = jsonData["free"].GetInt();
+        }
+        if (jsonData.HasMember("passwd"))
+        {
+            redisConfig.Password = jsonData["passwd"].GetString();
+        }
+        if (jsonData.HasMember("lua") && jsonData["lua"].IsArray())
+        {
+            for (int index = 0; index < jsonData["lua"].Size(); index++)
+            {
+                std::string lua(jsonData["lua"][index].GetString());
+                redisConfig.LuaFiles.emplace_back(lua);
+            }
+        }
+        redisConfig.Address = fmt::format("{0}:{1}", redisConfig.Ip, redisConfig.Port);
+        this->mConfigs.emplace(name, redisConfig);
+        return &this->mConfigs[name];
+    }
 
 	void RedisComponent::OnSecondUpdate(const int tick)
 	{
@@ -116,7 +135,7 @@ namespace Sentry
             return nullptr;
         }
         socketProxy->Init(config.Ip, config.Port);
-		return std::make_shared<RedisClientContext>(socketProxy, config, this);
+		return std::make_shared<RedisClientContext>(socketProxy, config);
 	}
 
 	const RedisConfig* RedisComponent::GetRedisConfig(const std::string& name)
@@ -160,52 +179,6 @@ namespace Sentry
 		this->mRedisClients[name].emplace_back(redisClientContext);
 	}
 
-	bool RedisComponent::Call(const std::string & name, const std::string& fullName, Json::Writer & jsonWriter)
-	{
-		std::shared_ptr<Json::Reader> response(new Json::Reader());
-		return this->Call(name, fullName, jsonWriter, response);
-	}
-
-    std::shared_ptr<RedisRequest> RedisComponent::MakeLuaRequest(
-            const std::string &fullName, const std::string &json)
-    {
-        size_t pos = fullName.find('.');
-        assert(pos != std::string::npos);
-        std::string tab = fullName.substr(0, pos);
-        std::string func = fullName.substr(pos + 1);
-        auto iter = this->mLuaMap.find(fmt::format("{0}.lua", tab));
-        if(iter == this->mLuaMap.end())
-        {
-            LOG_ERROR("not find redis script " << fullName);
-            return nullptr;
-        }
-        const std::string & tag = iter->second;
-        return RedisRequest::MakeLua(tag, func, json);
-    }
-
-	bool RedisComponent::Call(const std::string & name, const std::string& fullName, Json::Writer & jsonWriter,
-			std::shared_ptr<Json::Reader> response)
-	{
-        std::string json;
-        jsonWriter.WriterStream(json);
-        std::shared_ptr<RedisRequest> request = this->MakeLuaRequest(fullName, json);
-        if(request == nullptr)
-        {
-            return false;
-        }
-		std::shared_ptr<RedisResponse> response1 = this->Run(name, request);
-        if(response1->HasError())
-        {
-            LOG_ERROR(response1->GetString());
-            return false;
-        }
-        if(!response->ParseJson(response1->GetString()))
-        {
-            return false;
-        }
-		bool res = false;
-		return response->GetMember("res", res) && res;
-	}
 
     std::shared_ptr<RedisResponse> RedisComponent::Run(
             SharedRedisClient redisClientContext, std::shared_ptr<RedisRequest> request)
@@ -213,7 +186,8 @@ namespace Sentry
 #ifdef __DEBUG__
         ElapsedTimer elapsedTimer;
 #endif
-		std::shared_ptr<RedisTask> redisTask = this->AddRedisTask(request);
+		std::shared_ptr<RedisTask> redisTask = request->MakeTask();
+        this->AddTask(redisTask);
 		redisClientContext->SendCommand(request);
         std::shared_ptr<RedisResponse> redisResponse = redisTask->Await();
 #ifdef __DEBUG__
@@ -238,35 +212,6 @@ namespace Sentry
         return this->Run(redisClientContext, request);
     }
 
-	void RedisComponent::OnResponse(SharedRedisClient redisClient, long long taskId, std::shared_ptr<RedisResponse> response)
-	{
-        assert(this->GetApp()->IsMainThread());
-        if(response->GetType() == RedisRespType::REDIS_ERROR)
-		{
-			LOG_ERROR(response->GetString());
-		}
-        if(response->GetType() == RedisRespType::REDIS_ARRAY && response->GetArraySize() == 3)
-		{
-			const RedisAny * redisAny1 = response->Get(0);
-			const RedisAny * redisAny2 = response->Get(1);
-			const RedisAny * redisAny3 = response->Get(2);
-			if(redisAny1->IsString() && redisAny2->IsString() && redisAny3->IsString())
-			{
-				if(static_cast<const RedisString*>(redisAny1)->GetValue() == "message")
-				{
-					const std::string & channel = redisAny2->Cast<RedisString>()->GetValue();
-					const std::string & message = redisAny3->Cast<RedisString>()->GetValue();
-					this->OnSubscribe(redisClient, channel, message);
-					return;
-				}
-			}
-		}
-        if(taskId != 0)
-        {
-            this->OnCommandReply(redisClient, taskId, response);
-        }
-	}
-
 	bool RedisComponent::LoadLuaScript(const std::string & name, const string& path)
 	{
         std::string content;
@@ -275,9 +220,9 @@ namespace Sentry
             LOG_ERROR("read " << path << " failure");
             return false;
         }
+        std::shared_ptr<RedisRequest> request = RedisRequest::Make("SCRIPT", "LOAD", content);
 
-        std::shared_ptr<RedisResponse> redisResponse =
-			this->Run(name, "SCRIPT", "LOAD", content);
+        std::shared_ptr<RedisResponse> redisResponse = this->Run(name, request);
         if(!redisResponse->HasError())
         {
             std::string fileName, director;

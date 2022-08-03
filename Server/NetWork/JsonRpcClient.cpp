@@ -30,14 +30,18 @@ namespace Tcp
     {
         size_t size = is.rdbuf()->in_avail();
         std::unique_ptr<char[]> buffer(new char[size]);
+        size_t len = is.readsome(buffer.get(), size);
+        CONSOLE_LOG_INFO("json = " << std::string(buffer.get(), len));
         if (!this->mJson.ParseJson(buffer.get(), size))
         {
             return false;
         }
         this->mAddress = address;
-        this->mJson.GetMember("func", this->mFunc);
-        this->mJson.GetMember("rpc_id", this->mRpcId);
-        this->mJson.GetMember("data", this->mData);
+        std::vector<const rapidjson::Value *> params;
+        assert(this->mJson.GetMember("params", params));
+        assert(this->mJson.GetMember("id", this->mRpcId));
+        assert(this->mJson.GetMember("method", this->mFunc));
+        assert(!params.empty());
         return true;
     }
 }
@@ -67,17 +71,8 @@ namespace Tcp
         this->ReceiveLine();
 #else
         asio::io_service & io = this->mSocket->GetThread();
-        io.post(std::bind(&JsonRpcClient::ReceiveLine, this));
+        io.post(std::bind(&JsonRpcClient::ReceiveSomeMessage, this));
 #endif
-    }
-
-    void JsonRpcClient::OnReceiveLine(const asio::error_code &code, std::istream &readStream)
-    {
-        std::string line;
-        std::getline(readStream, line);
-        assert(line.back() == '\r');
-        line.pop_back();
-        this->ReceiveMessage(std::stoi(line));
     }
 
     void JsonRpcClient::OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message)
@@ -104,7 +99,7 @@ namespace Tcp
 #ifdef ONLY_MAIN_THREAD
             this->mGateComponent->OnRequest(jsonRequest);
 #else
-            asio::io_service & io = this->mSocket->GetThread();
+            asio::io_service & io = App::Get()->GetThread();
             io.post(std::bind(&JsonClientComponent::OnRequest, this->mGateComponent, jsonRequest));
 #endif
         }

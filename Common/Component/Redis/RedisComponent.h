@@ -4,66 +4,38 @@
 
 #ifndef SERVER_REDISBASECOMPONENT_H
 #define SERVER_REDISBASECOMPONENT_H
-#include"Component/Component.h"
 #include"DB/Redis/RedisClientContext.h"
+#include"Component/Rpc/RpcTaskComponent.h"
 namespace Sentry
 {
 	struct RedisConfig;
 
-	class RedisComponent : public Component, public IStart, public ISecondUpdate
+	class RedisComponent : public RpcTaskComponent<RedisResponse>, public ISecondUpdate
 	{
 	public:
 		RedisComponent() = default;
-	public:
-		bool Call(const std::string & name, const std::string& fullName, Json::Writer & jsonWriter);
-        std::shared_ptr<RedisRequest> MakeLuaRequest(const std::string & fullName, const std::string & json);
-		bool Call(const std::string & name,const std::string& fullName, Json::Writer & jsonWriter, std::shared_ptr<Json::Reader> response);
-	 public:
-        SharedRedisClient GetClient(const std::string & name);
-        SharedRedisClient MakeRedisClient(const RedisConfig & config);
-        SharedRedisClient MakeRedisClient(const std::string & name);
-        void OnResponse(SharedRedisClient client, long long id, std::shared_ptr<RedisResponse> response);
-    public:
-        std::shared_ptr<RedisResponse> Run(const std::string & name, std::shared_ptr<RedisRequest> request);
-        std::shared_ptr<RedisResponse> Run(SharedRedisClient redisClientContext, std::shared_ptr<RedisRequest> request);
-        template<typename ... Args>
-        std::shared_ptr<RedisResponse> Run(const std::string & name, const std::string & cmd, Args&& ... args);
-        template<typename ... Args>
-        std::shared_ptr<RedisResponse> Run(SharedRedisClient redisClientContext, const std::string & cmd, Args&& ... args);
 	protected:
-		bool OnStart() override;
         bool LateAwake() override;
         void OnSecondUpdate(const int tick) override;
 	 protected:
-        virtual std::shared_ptr<RedisTask> AddRedisTask(std::shared_ptr<RedisRequest> request) = 0;
-        virtual void OnCommandReply(SharedRedisClient client, long long id, std::shared_ptr<RedisResponse> response) = 0;
-        virtual void OnSubscribe(SharedRedisClient client, const std::string & channel, const std::string & message) = 0;
+        SharedRedisClient GetClient(const std::string & name);
+        SharedRedisClient MakeRedisClient(const std::string &name);
+        SharedRedisClient MakeRedisClient(const RedisConfig & config);
+        const RedisConfig * ParseConfig(const char * name, const rapidjson::Value & json);
+    public:
+        virtual void OnLoadScript(const std::string & name, const std::string & md5) = 0;
+    protected:
+        std::shared_ptr<RedisResponse> Run(const std::string & name, std::shared_ptr<RedisRequest> request);
+        std::shared_ptr<RedisResponse> Run(SharedRedisClient redisClientContext, std::shared_ptr<RedisRequest> request);
     private:
         void PushClient(SharedRedisClient redisClientContext);
         const RedisConfig * GetRedisConfig(const std::string & name);
-		bool LoadLuaScript(const std::string & name, const std::string & path);
-	 private:
+    private:
 		TaskComponent * mTaskComponent;
         class NetThreadComponent * mNetComponent;
 		std::unordered_map<std::string, RedisConfig> mConfigs;
-		std::unordered_map<std::string, std::string> mLuaMap;
 		std::unordered_map<std::string, std::list<SharedRedisClient>> mRedisClients;
 	};
-
-    template<typename ... Args>
-    std::shared_ptr<RedisResponse> RedisComponent::Run(const std::string &name, const std::string & cmd, Args &&...args)
-    {
-        std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>(cmd);
-        RedisRequest::InitParameter(request, std::forward<Args>(args)...);
-        return this->Run(name, request);
-    }
-    template<typename ... Args>
-    std::shared_ptr<RedisResponse> RedisComponent::Run(SharedRedisClient redisClientContext, const std::string &cmd, Args &&...args)
-    {
-        std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>(cmd);
-        RedisRequest::InitParameter(request, std::forward<Args>(args)...);
-        return this->Run(redisClientContext, request);
-    }
 }
 
 

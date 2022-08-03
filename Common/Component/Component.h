@@ -99,7 +99,6 @@ namespace Sentry
 		std::string mName;
 		long long mEntityId;
 		std::shared_ptr<App> mApp;
-		NetEventRegistry mEventRegistry;
 		std::shared_ptr<Entity> mEntity;
 	};
 	template<typename T>

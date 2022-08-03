@@ -48,7 +48,7 @@ namespace Sentry
             }
             socketProxy->Init(this->mConfig.mIp, this->mConfig.mPort);
             std::shared_ptr<MongoClientContext> mongoClientContext =
-                    std::make_shared<MongoClientContext>(socketProxy, this->mConfig, this, index);
+                    std::make_shared<MongoClientContext>(socketProxy, this->mConfig);
 
             this->mMongoClients.emplace_back(mongoClientContext);
             if (!this->Ping(index))
