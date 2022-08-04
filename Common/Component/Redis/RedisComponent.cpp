@@ -4,9 +4,29 @@
 
 #include"RedisComponent.h"
 #include"Util/FileHelper.h"
+#include"Util/StringHelper.h"
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
 #include"Component/Scene/NetThreadComponent.h"
+
+namespace Sentry
+{
+    bool RedisLuaResponse::ParseJson(const std::string &json)
+    {
+        if(this->mJson.ParseJson(json))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    bool RedisLuaResponse::GetResult()
+    {
+        bool res = false;
+        return this->mJson.GetMember("res", res) && res;
+    }
+}
+
 namespace Sentry
 {
 	bool RedisComponent::LateAwake()
@@ -27,7 +47,13 @@ namespace Sentry
 			redisConfig.Ip = jsonData["ip"].GetString();
 			redisConfig.Port = jsonData["port"].GetInt();
             redisConfig.Index = jsonData["index"].GetInt();
-            redisConfig.Count = jsonData["count"].GetInt();
+
+            redisConfig.Count = 1;
+            if(jsonData.HasMember("count"))
+            {
+                redisConfig.Count = jsonData["count"].GetInt();
+            }
+
 			if(jsonData.HasMember("free"))
 			{
 				redisConfig.FreeClient = jsonData["free"].GetInt();
@@ -36,14 +62,22 @@ namespace Sentry
 			{
 				redisConfig.Password = jsonData["passwd"].GetString();
 			}
-			if (jsonData.HasMember("lua") && jsonData["lua"].IsArray())
+			if (jsonData.HasMember("scripts") && jsonData["scripts"].IsArray())
 			{
-				for (int index = 0; index < jsonData["lua"].Size(); index++)
+				for (int index = 0; index < jsonData["scripts"].Size(); index++)
 				{
-					std::string lua(jsonData["lua"][index].GetString());
+					std::string lua(jsonData["scripts"][index].GetString());
 					redisConfig.LuaFiles.emplace_back(lua);
 				}
 			}
+            if (jsonData.HasMember("channels") && jsonData["channels"].IsArray())
+            {
+                for (int index = 0; index < jsonData["channels"].Size(); index++)
+                {
+                    std::string lua(jsonData["channels"][index].GetString());
+                    redisConfig.Channels.emplace_back(lua);
+                }
+            }
             redisConfig.Address = fmt::format("{0}:{1}", redisConfig.Ip, redisConfig.Port);
 			this->mConfigs.emplace(name, redisConfig);
 		}
@@ -210,5 +244,47 @@ namespace Sentry
             return nullptr;
         }
         return this->Run(redisClientContext, request);
+    }
+}
+
+namespace Sentry
+{
+    std::shared_ptr<RedisRequest> RedisComponent::MakeLuaRequest(const std::string &fullName, const std::string &json)
+    {
+        std::vector<std::string> tempArray;
+        if(Helper::String::Split(fullName, ".",tempArray) != 2)
+        {
+            LOG_ERROR("call lua file error");
+            return nullptr;
+        }
+        const std::string & tab = tempArray[0];
+        const std::string & func = tempArray[1];
+        auto iter = this->mLuaMap.find(tab);
+        if(iter == this->mLuaMap.end())
+        {
+            LOG_ERROR("not find redis script " << fullName);
+            return nullptr;
+        }
+        const std::string & tag = iter->second;
+        return RedisRequest::MakeLua(tag, func, json);
+    }
+
+    void RedisComponent::OnLoadScript(const std::string &path, const std::string &md5)
+    {
+        std::string fileName;
+        std::vector<std::string> tempArray;
+        Helper::String::GetFileName(path, fileName);
+        if(Helper::String::Split(fileName, ".",tempArray) != 2)
+        {
+            LOG_ERROR("add lua script error");
+            return;
+        }
+        const std::string & name = tempArray[0];
+        auto iter = this->mLuaMap.find(name);
+        if(iter != this->mLuaMap.end())
+        {
+            this->mLuaMap.erase(iter);
+        }
+        this->mLuaMap[name] = md5;
     }
 }

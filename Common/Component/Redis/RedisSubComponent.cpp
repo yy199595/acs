@@ -2,7 +2,10 @@
 // Created by zmhy0073 on 2022/8/3.
 //
 
-#include "RedisSubComponent.h"
+#include"RedisSubComponent.h"
+#include"Script/Function.h"
+#include"Script/Extension/Json/Json.h"
+#include"Component/Lua/LuaScriptComponent.h"
 #include"Component/Scene/NetEventComponent.h"
 namespace Sentry
 {
@@ -10,42 +13,28 @@ namespace Sentry
     {
         LOG_CHECK_RET_FALSE(RedisComponent::LateAwake());
         const ServerConfig & config = this->GetApp()->GetConfig();
-        const rapidjson::Value * jsonValue = config.GetJsonValue("redis", "sub");
+        this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
+        const rapidjson::Value * jsonValue = config.GetJsonValue("redis", "main");
         if(jsonValue == nullptr)
         {
             LOG_ERROR("not find main redis config");
             return false;
         }
 		config.GetListener("rpc", this->mAddress);
-        LOG_CHECK_RET_FALSE(this->ParseConfig("sub", *jsonValue));
-		return this->StartSubChannel();
+		return this->ParseConfig("main", *jsonValue) != nullptr;
     }
 
-    bool RedisSubComponent::StartSubChannel()
+    bool RedisSubComponent::OnStart()
     {
-        if (!this->SubscribeChannel(this->mAddress))
+        this->mSubClient = this->MakeRedisClient("main");
+        std::shared_ptr<RedisRequest> request = RedisRequest::Make("PING");
+        if(this->Run(this->mSubClient, request) != nullptr)
         {
-            return false;
+            this->mSubClient->StartReceiveMessage();
+            return true;
         }
-        std::vector<Component*> components;
-        this->GetApp()->GetComponents(components);
-        for (Component* component: components)
-        {
-            NetEventComponent* localServiceComponent = component->Cast<NetEventComponent>();
-            if (localServiceComponent != nullptr)
-            {
-                if(!localServiceComponent->StartRegisterEvent())
-                {
-                    LOG_INFO(component->GetName() << " start listen event failure");
-                    return false;
-                }
-                LOG_INFO(component->GetName() << " start listen event successful");
-            }
-        }
-        this->mSubClient->StartReceiveMessage();
-        return true;
+        return false;
     }
-
 
     void RedisSubComponent::OnNotFindResponse(long long taskId, std::shared_ptr<RedisResponse> response)
     {
@@ -58,26 +47,42 @@ namespace Sentry
             {
                 if(static_cast<const RedisString*>(redisAny1)->GetValue() == "message")
                 {
+                    std::vector<std::string> methodInfos;
                     const std::string & channel = redisAny2->Cast<RedisString>()->GetValue();
                     const std::string & message = redisAny3->Cast<RedisString>()->GetValue();
-					NetEventComponent* localServiceComponent = this->GetComponent<NetEventComponent>(channel);
-
-					std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
-					if (!jsonReader->ParseJson(message))
+                    google::protobuf::SplitStringUsing(channel, ".", &methodInfos);
+					if (methodInfos.size() != 2)
 					{
-						return;
+                        LOG_INFO("handler redis event json = " << redisAny3->Cast<RedisString>()->GetValue());
+                        return;
 					}
+                    const std::string & method = methodInfos[1];
+                    const std::string & component = methodInfos[0];
+                    if(this->mLuaComponent != nullptr)
+                    {
+                        lua_State * lua = this->mLuaComponent->GetLuaEnv();
+                        if(Lua::Function::Get(lua, component.c_str(), method.c_str()))
+                        {
+                            Lua::Json::Write(lua, message);
+                            if(lua_pcall(lua, 1, 0, 0) != LUA_OK)
+                            {
+                                LOG_ERROR("handler lua event " << channel << " error = " << lua_tostring(lua, -1));
+                            }
+                            return;
+                        }
+                    }
 
-					if(localServiceComponent == nullptr)
-					{
-						std::string service;
-						LOG_CHECK_RET(jsonReader->GetMember("service", service));
-						localServiceComponent = this->GetComponent<NetEventComponent>(service);
-					}
-					std::string eveId;
-					LOG_CHECK_RET(jsonReader->GetMember("eveId", eveId));
-					localServiceComponent != nullptr && localServiceComponent->Invoke(eveId, jsonReader);
-                    // 处理事件
+                    NetEventComponent* localServiceComponent = this->GetComponent<NetEventComponent>(component);
+                    if(localServiceComponent != nullptr)
+                    {
+                        std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
+                        if(!localServiceComponent->Invoke(method, jsonReader))
+                        {
+                            LOG_ERROR("handler event " << channel << " error");
+                            return;
+                        }
+                        LOG_INFO("handler redis event json = " << redisAny3->Cast<RedisString>()->GetValue());
+                    }
                 }
             }
         }
@@ -106,9 +111,4 @@ namespace Sentry
         LOG_INFO("sub " << channel << " failure");
         return false;
     }
-
-	void RedisSubComponent::OnLoadScript(const std::string& name, const std::string& md5)
-	{
-		throw std::logic_error("");
-	}
 }

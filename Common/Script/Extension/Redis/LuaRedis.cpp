@@ -69,8 +69,7 @@ namespace Lua
 			luaL_error(lua, "not find redis client %s\n", name);
 			return 0;
 		}
-		std::shared_ptr<RedisRequest> request =
-			redisComponent->MakeLuaRequest(fullName, json);
+		std::shared_ptr<RedisRequest> request = redisComponent->MakeLuaRequest(fullName, json);
 
 		std::shared_ptr<LuaRedisTask> luaRedisTask = request->MakeLuaTask(lua);
 		redisComponent->AddTask(luaRedisTask);

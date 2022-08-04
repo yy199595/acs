@@ -33,6 +33,7 @@
 #include"Component/ClientComponent.h"
 
 #include"Component/Gate/JsonClientComponent.h"
+#include"Component/Redis/RedisSubComponent.h"
 using namespace Sentry;
 void RegisterComponent()
 {
@@ -63,6 +64,7 @@ void RegisterComponent()
     ComponentFactory::Add<MysqlRpcComponent>("MysqlRpcComponent");
 	ComponentFactory::Add<MongoRpcComponent>("MongoRpcComponent");
     ComponentFactory::Add<MainRedisComponent>("MainRedisComponent");
+    ComponentFactory::Add<RedisSubComponent>("RedisSubComponent");
 
 //http
     ComponentFactory::Add<HttpComponent>("HttpComponent");

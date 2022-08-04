@@ -29,8 +29,14 @@ namespace Sentry
 	bool UserSyncComponent::SetToken(const std::string& token, long long userId, int time)
 	{
 		Json::Writer jsonWrite;
+        std::shared_ptr<Json::Reader> response(new Json::Reader());
 		jsonWrite << "time" << time << "token" << token << "user_id" << userId;
-		return this->mRedisComponent->Call("main", "user.set_token", jsonWrite);
+		if(!this->mRedisComponent->Call("main", "user.set_token", jsonWrite, response))
+        {
+            return false;
+        }
+        bool res = false;
+        return response->GetMember("res", res) && res;
 	}
 
 	long long UserSyncComponent::GetUserId(const std::string& token)
@@ -52,7 +58,7 @@ namespace Sentry
 		Json::Writer jsonWrite;
 		jsonWrite << "user_id", userId;
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
-		if(!this->mRedisComponent->Call("main", "user.get_state", jsonWrite))
+		if(!this->mRedisComponent->Call("main", "user.get_state", jsonWrite, response))
 		{
 			return -1;
 		}
@@ -64,7 +70,8 @@ namespace Sentry
 	{
 		Json::Writer jsonWrite;
 		jsonWrite << "state" << state << "user_id" << userId;
-		return this->mRedisComponent->Call("main", "user.set_state", jsonWrite);
+        std::shared_ptr<Json::Reader> response(new Json::Reader());
+		return this->mRedisComponent->Call("main", "user.set_state", jsonWrite, response);
 	}
 
 	const std::string UserSyncComponent::GetAddress(long long userId, const std::string& service)
@@ -86,7 +93,8 @@ namespace Sentry
 		Json::Writer jsonWrite;
 		jsonWrite << "user_id" << userId << "service" << service;
 		jsonWrite << "address" << address << "broadcast" << broadcast;
-		return this->mRedisComponent->Call("main", "user.set_address", jsonWrite);
+        std::shared_ptr<Json::Reader> response(new Json::Reader());
+        return this->mRedisComponent->Call("main", "user.set_address", jsonWrite, response);
 	}
 
 	bool UserSyncComponent::OnRegisterEvent(NetEventRegistry& eventRegister)

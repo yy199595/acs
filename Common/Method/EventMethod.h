@@ -92,8 +92,17 @@ namespace Sentry
 			this->mEventMethodMap.emplace(id, std::make_shared<EventMethod2<T>>(id, obj, func));
 			return true;
 		}
-		inline std::shared_ptr<EventMethod> GetEvent(const std::string & eveId);
-		const size_t GetEventSize() { return this->mEventMethodMap.size();}
+        void GetEvents(std::vector<std::string> & funcs)
+        {
+            auto iter = this->mEventMethodMap.begin();
+            for(; iter != this->mEventMethodMap.end(); iter++)
+            {
+                funcs.emplace_back(iter->first);
+            }
+        }
+
+        const size_t GetEventSize() { return this->mEventMethodMap.size();}
+        inline std::shared_ptr<EventMethod> GetEvent(const std::string & eveId);
 	private:
 		std::unordered_map<std::string, std::shared_ptr<EventMethod>> mEventMethodMap;
 	};

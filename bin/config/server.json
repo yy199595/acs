@@ -58,10 +58,15 @@
             "count": 5,
             "free": 30,
             "index": 0,
-            "lua": [
+            "scripts": [
                 "redis/lock.lua",
                 "redis/user.lua",
                 "redis/node.lua"
+            ],
+            "channels": [
+                "ServiceMgrComponent.OnServiceAdd",
+                "ServiceMgrComponent.OnServiceDel",
+                "ServiceMgrComponent.OnNodeRegister"
             ],
             "passwd": "199595yjz."
         },
@@ -88,6 +93,7 @@
         "DataMgrComponent",
         "NetThreadComponent",
         "TcpServerComponent",
+        "RedisSubComponent",
         "MainRedisComponent",
         "LuaScriptComponent",
         "RpcClientComponent",

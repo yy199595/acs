@@ -18,7 +18,8 @@ namespace Sentry
 		unsigned short Port;
 		std::string Address;
 		std::string Password;
-		std::vector<std::string> LuaFiles;
+        std::vector<std::string> Channels;
+        std::vector<std::string> LuaFiles;
 	};
 
 	struct ListenConfig;

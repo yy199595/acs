@@ -45,9 +45,6 @@ namespace Mongo
 		void OnReceiveMessage(const asio::error_code &code, std::istream & is) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	private:
-		int mIndex;
-        int mSendCount;
-		int mRecvCount;
 		const Mongo::Config & mConfig;
 		asio::streambuf streamBuffer;
 		MongoRpcComponent * mMongoComponent;

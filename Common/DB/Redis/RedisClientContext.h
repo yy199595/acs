@@ -27,10 +27,15 @@ namespace Sentry
         const std::string & GetName() const { return this->mConfig.Name; }
     private:
 		bool AuthUser();
+        bool LoadScript();
+        bool SubChannel();
 		void OnReadComplete();
         void OnReceiveLine(const asio::error_code &code, std::istream & is) final;
         void OnReceiveMessage(const asio::error_code &code, std::istream & is) final;
+        std::shared_ptr<RedisResponse> SyncCommand(std::shared_ptr<RedisRequest> command);
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
+
+    private:
     private:
         const RedisConfig & mConfig;
         RedisComponent * mRedisComponent;

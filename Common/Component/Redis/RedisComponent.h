@@ -6,6 +6,20 @@
 #define SERVER_REDISBASECOMPONENT_H
 #include"DB/Redis/RedisClientContext.h"
 #include"Component/Rpc/RpcTaskComponent.h"
+
+namespace Sentry
+{
+    class RedisLuaResponse
+    {
+    public:
+        bool GetResult();
+        bool ParseJson(const std::string & json);
+        const Json::Reader & GetData() const { return this->mJson; }
+    private:
+        Json::Reader mJson;
+    };
+}
+
 namespace Sentry
 {
 	struct RedisConfig;
@@ -22,8 +36,9 @@ namespace Sentry
         SharedRedisClient MakeRedisClient(const RedisConfig & config);
         const RedisConfig * ParseConfig(const char * name, const rapidjson::Value & json);
     public:
-		SharedRedisClient GetClient(const std::string & name);
-		virtual void OnLoadScript(const std::string & name, const std::string & md5) = 0;
+		virtual SharedRedisClient GetClient(const std::string & name);
+        void OnLoadScript(const std::string & name, const std::string & md5);
+        std::shared_ptr<RedisRequest> MakeLuaRequest(const std::string & fullName, const std::string & json);
     protected:
         std::shared_ptr<RedisResponse> Run(const std::string & name, std::shared_ptr<RedisRequest> request);
         std::shared_ptr<RedisResponse> Run(SharedRedisClient redisClientContext, std::shared_ptr<RedisRequest> request);
@@ -33,8 +48,9 @@ namespace Sentry
     private:
 		TaskComponent * mTaskComponent;
         class NetThreadComponent * mNetComponent;
-		std::unordered_map<std::string, RedisConfig> mConfigs;
-		std::unordered_map<std::string, std::list<SharedRedisClient>> mRedisClients;
+        std::unordered_map<std::string, RedisConfig> mConfigs;
+        std::unordered_map<std::string, std::string> mLuaMap;
+        std::unordered_map<std::string, std::list<SharedRedisClient>> mRedisClients;
 	};
 }
 

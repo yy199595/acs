@@ -16,14 +16,11 @@ namespace Sentry
 		virtual ~NetEventComponent() = default;
 	public:
 		bool StartRegisterEvent();
-		bool PublishEvent(const std::string & id);
-		bool PublishEvent(const std::string & id, Json::Writer & json);
 		bool Invoke(const std::string & id, std::shared_ptr<Json::Reader> json);
 	protected:
 		virtual bool OnRegisterEvent(NetEventRegistry & eventRegister) = 0;
 	private:
 		NetEventRegistry mEventRegistry;
-		class RedisSubComponent * mRedisComponent;
 	};
 }
 

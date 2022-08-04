@@ -7,7 +7,6 @@
 
 namespace Sentry
 {
-
 	bool ServiceMgrComponent::LateAwake()
 	{
 		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
@@ -19,9 +18,9 @@ namespace Sentry
 
 	bool ServiceMgrComponent::OnRegisterEvent(NetEventRegistry& eventRegister)
 	{
-		eventRegister.Sub("service_add", &ServiceMgrComponent::OnServiceAdd, this);
-		eventRegister.Sub("service_del", &ServiceMgrComponent::OnServiceDel, this);
-		eventRegister.Sub("node_register", &ServiceMgrComponent::OnNodeRegister, this);
+		eventRegister.Sub("OnServiceAdd", &ServiceMgrComponent::OnServiceAdd, this);
+		eventRegister.Sub("OnServiceDel", &ServiceMgrComponent::OnServiceDel, this);
+		eventRegister.Sub("OnNodeRegister", &ServiceMgrComponent::OnNodeRegister, this);
 		return true;
 	}
 
@@ -30,8 +29,9 @@ namespace Sentry
 		if(component->Cast<ServiceComponent>())
 		{
 			Json::Writer jsonWriter;
+            std::shared_ptr<Json::Reader> response(new Json::Reader());
 			jsonWriter << "address" << this->mRpcAddress << "service" << component->GetName();
-			if(!this->mRedisComponent->Call("main", "node.add", jsonWriter))
+			if(!this->mRedisComponent->Call("main", "node.add", jsonWriter, response))
 			{
 				LOG_ERROR("call node.add failure " << component->GetName());
 			}
@@ -94,9 +94,10 @@ namespace Sentry
 			}
 		}
 		json << Json::End::EndArray;
-		json << "address" << this->mRpcAddress;
+        json << "broacast" << true;
+        json << "address" << this->mRpcAddress;
 		std::shared_ptr<Json::Reader> response(new Json::Reader());
-		if(!this->mRedisComponent->Call("main", "node.register", json, response))
+		if(!this->mRedisComponent->Call("main", "node.update", json, response))
 		{
 			LOG_ERROR("register failure");
 			return;
@@ -220,8 +221,9 @@ namespace Sentry
 			if(component->IsStartService())
 			{
 				Json::Writer jsonWriter;
-				jsonWriter << "address" << this->mRpcAddress << "service" << component->GetName();
-				this->mRedisComponent->Call("main", "node.del", jsonWriter);
+                std::shared_ptr<Json::Reader> response(new Json::Reader());
+                jsonWriter << "address" << this->mRpcAddress << "service" << component->GetName();
+				this->mRedisComponent->Call("main", "node.del", jsonWriter, response);
 			}
 		}
 	}

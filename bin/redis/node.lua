@@ -1,24 +1,60 @@
 local node = {}
 
-function node.register(request, response) --注册服务
-    local json = cjson.encode(request)
-    print("json = ", json)
-    redis.call("SET", request.address, json)
-    redis.call("EXPIRE", request.address, 15)
+function node.set(key, value, time)
 
-    local message = cjson.encode({
-        eveId = "node_register",
-        address = request.address,
-        services = request.services
-    })
-    response.nodes = redis.call("KEYS", "*:*")
-    redis.call("PUBLISH", "ServiceMgrComponent", message)
+    redis.call("SET", key, cjson.encode(value))
+    redis.call("EXPIRE", key, time)
+end
+
+local check_services = function(address)
+    local services = { }
+    if type(address) == "string" then
+        if redis.call("EXISTS", address) then
+            services[address] = redis.call("GET", address)
+        else
+            redis.call("SREM", "address", address)
+            print("remove address = [", address, "]")
+        end
+    else
+        local addressInfos = redis.call("SMEMBERS", "address")
+        if type(addressInfos) ~= "table" then
+            return false
+        end
+        for _, key in ipairs(addressInfos) do
+            if redis.call("EXISTS", key) then
+                services[key] = redis.call("GET", key)
+            else
+                redis.call("SREM", "address", key)
+                print("remove address = [", key, "]")
+            end
+        end
+    end
+    return services
+end
+
+function node.update(request, response) --更新服务
+
+    redis.call("SADD", "address", request.address)
+    node.set(request.address, request.services, 10)
+
+    local nowTime = redis.call("TIME")
+    if request.broacast then
+        local data = {
+            address = request.address,
+            services = request.services,
+            end_time = tonumber(nowTime[1])
+        }
+    end
+    response.services = check_services()
     return true
 end
 
 function node.query(request, response)
-    assert(type(request.address) == "string")
-    response.json = redis.call("GET", request.address)
+    if type(request.address) == "string" then
+        response.services = check_services(request.address)
+    else
+        response.services = check_services()
+    end
     return true
 end
 
@@ -60,6 +96,7 @@ function node.del(request)
     redis.call("PUBLISH", "ServiceMgrComponent", cjson.encode(message))
 end
 
+print(KEYS[1], ARGV[1])
 local func = KEYS[1]
 local response = {}
 local request = cjson.decode(ARGV[1])

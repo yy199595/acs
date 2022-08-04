@@ -31,6 +31,6 @@ namespace Helper
 
         extern void ReplaceString(std::string &outstring, const std::string str1, const std::string str2);
 
-        extern void Split(const std::string &targetString, const std::string & cc, std::vector<std::string> &ret);
+        extern size_t Split(const std::string &targetString, const char * cc, std::vector<std::string> &ret);
     }
 }// namespace StringHelper

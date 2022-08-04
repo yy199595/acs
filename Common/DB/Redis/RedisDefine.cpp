@@ -202,7 +202,7 @@ namespace Sentry
 		{
 			this->mString.pop_back();
 			this->mDataSize = std::stoi(this->mString);
-            if(this->mDataSize > 0)
+            if(this->mDataSize >= 0)
             {
                 this->mArray.emplace_back(new RedisString(this->mDataSize));
                 return this->mDataSize + 2;
