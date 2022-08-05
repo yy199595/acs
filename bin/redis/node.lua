@@ -10,7 +10,8 @@ local check_services = function(address)
     local services = { }
     if type(address) == "string" then
         if redis.call("EXISTS", address) then
-            services[address] = redis.call("GET", address)
+            local str = redis.call("GET", address)
+            services[address] = cjson.decode(str)
         else
             redis.call("SREM", "address", address)
             print("remove address = [", address, "]")
@@ -22,7 +23,9 @@ local check_services = function(address)
         end
         for _, key in ipairs(addressInfos) do
             if redis.call("EXISTS", key) then
-                services[key] = redis.call("GET", key)
+                local str = redis.call("GET", key)
+                print("str = ", str)
+                services[key] = cjson.decode(str)
             else
                 redis.call("SREM", "address", key)
                 print("remove address = [", key, "]")
@@ -35,27 +38,26 @@ end
 function node.update(request, response) --更新服务
 
     redis.call("SADD", "address", request.address)
-    node.set(request.address, request.services, 10)
+    node.set(request.address, request.services, 15)
 
-    local nowTime = redis.call("TIME")
     if request.broacast then
         local data = {
+            t = 10,
             address = request.address,
-            services = request.services,
-            end_time = tonumber(nowTime[1])
+            services = request.services
         }
+        local message = cjson.encode(data)
+        response.services = check_services()
+        redis.call("PUBLISH", "ServiceMgrComponent.OnNodeRegister", message)
     end
-    response.services = check_services()
     return true
 end
 
 function node.query(request, response)
     if type(request.address) == "string" then
-        response.services = check_services(request.address)
-    else
-        response.services = check_services()
+        return redis.call("EXISTS", request.address) == 1
     end
-    return true
+    return false
 end
 
 function node.refresh(request, response)

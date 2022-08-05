@@ -32,6 +32,7 @@ namespace Sentry
 	};
 }
 
+
 namespace Sentry
 {
 	class MongoRpcComponent : public RpcTaskComponent<Mongo::MongoQueryResponse>, public IStart
@@ -52,14 +53,13 @@ namespace Sentry
         bool Update(const std::string & tab, const std::string & update, const std::string & selector, const std::string & tag);
     public:
 		void OnClientError(int index, XCode code);
-		std::shared_ptr<Mongo::MongoQueryResponse> Run(std::shared_ptr<MongoQueryRequest> request, int flag = 0);
+        std::shared_ptr<MongoClientContext> GetClient(int index = 0);
+		std::shared_ptr<Mongo::MongoQueryResponse> Run(std::shared_ptr<MongoClientContext> mongoClient, std::shared_ptr<MongoQueryRequest> request);
 	 private:
-        int mIndex;
 		Mongo::Config mConfig;
 		TimerComponent * mTimerComponent;
 		Util::NumberBuilder<int, 10> mRequestId;
         class NetThreadComponent * mNetComponent;
-        std::unordered_map<long long, long long> mTimers;
         std::vector<std::shared_ptr<MongoClientContext>> mMongoClients;
     };
 }

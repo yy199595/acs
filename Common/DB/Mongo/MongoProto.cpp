@@ -3,6 +3,7 @@
 //
 #include"MongoProto.h"
 #include"Bson/bsonobj.h"
+#include"spdlog/fmt/fmt.h"
 namespace Mongo
 {
 	MongoRequest::MongoRequest(int opcode)

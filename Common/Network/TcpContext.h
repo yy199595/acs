@@ -82,7 +82,7 @@ namespace Tcp
 		int RecvSync(int read); //同步读取数据
 		void ClearSendStream();
 		void ClearRecvStream();
-        void SendFromMessageQueue();
+        bool SendFromMessageQueue();
         int SendSync(std::shared_ptr<ProtoMessage> message); //同步发送
     protected:
         size_t PopAllMessage();

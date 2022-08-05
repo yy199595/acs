@@ -2,66 +2,69 @@
     "area_id": 1,
     "node_id": 1,
     "fps": 30,
-    "node_name": "Data",
-    "log":
-    {
-        "save":1,
-        "path":"./Log",
-        "hour":0,
-        "min":0
+    "node_name": "MongoServer",
+    "thread": {
+        "network": 4
     },
-    "thread":
-    {
-        "task":1,
-        "network":2
-    },
-    "path":
-    {
-        "code": "./XCode/XCode.csv",
-        "service": "./Config/service.json"
+    "path": {
+        "log": "log",
+        "source": "source",
+        "proto": "proto/message",
+        "service": "config/service.json"
     },
     "listener": {
-        "rpc":
-        {
-            "port":7787,
-            "count":10000,
+        "rpc": {
+            "port": 7787,
             "ip": "127.0.0.1",
-            "component":"RpcClientComponent"
+            "component": "RpcClientComponent"
         }
     },
-    "mysql": {
-        "count": 1,
+    "mongo": {
+        "count" : 10,
+        "db": "yjz",
         "ip": "114.115.167.51",
-        "port": 3306,
-        "user": "yjz",
-        "passwd": "199595yjz."
+        "port" : 27017,
+        "user" : "yjz",
+        "passwd" : "199595yjz."
     },
-    "redis":
-    {
+    "redis": {
         "main": {
-            "ip": "114.115.167.51",
+            "ip": "127.0.0.1",
             "port": 6379,
             "timeout": 3,
-            "count": 1,
-            "lua": [
-                "./redis/lock.lua",
-                "./redis/user.lua",
-                "./redis/node.lua"
+            "count": 2,
+            "free": 30,
+            "index": 0,
+            "scripts": [
+                "redis/node.lua"
             ],
-            "passwd": "199595yjz."
+            "channels": [
+                "ServiceMgrComponent.OnServiceAdd",
+                "ServiceMgrComponent.OnServiceDel",
+                "ServiceMgrComponent.OnNodeRegister"
+            ],
+            "passwd": ""
         }
+    },
+    "lua": {
+        "require": [
+            "script/Common",
+            "script/Server"
+        ]
     },
     "component": [
         "NetThreadComponent",
         "TcpServerComponent",
+        "RedisSubComponent",
         "MainRedisComponent",
+        "LuaScriptComponent",
         "RpcClientComponent",
-        "RpcHandlerComponent",
+        "ServiceRpcComponent",
+        "MongoRpcComponent",
         "ServiceMgrComponent"
     ],
-    "service":
-    [
-        "MysqlService"
+    "service.rpc": [
+        "MongoService"
     ],
     "white_list": [
         "127.0.0.1"

@@ -55,7 +55,7 @@
             "ip": "114.115.167.51",
             "port": 6379,
             "timeout": 3,
-            "count": 5,
+            "count": 2,
             "free": 30,
             "index": 0,
             "scripts": [

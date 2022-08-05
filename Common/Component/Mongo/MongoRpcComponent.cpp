@@ -24,7 +24,6 @@ namespace Sentry
 {
 	bool MongoRpcComponent::LateAwake()
 	{
-        this->mIndex = 0;
 		const ServerConfig & config = this->GetApp()->GetConfig();
 		this->mTimerComponent = this->GetApp()->GetTimerComponent();
         this->mNetComponent = this->GetComponent<NetThreadComponent>();
@@ -41,35 +40,15 @@ namespace Sentry
     {
         for (int index = 0; index < this->mConfig.mMaxCount; index++)
         {
-            std::shared_ptr<SocketProxy> socketProxy = this->mNetComponent->CreateSocket();
-            if(socketProxy == nullptr)
-            {
-                return false;
-            }
-            socketProxy->Init(this->mConfig.mIp, this->mConfig.mPort);
+            const std::string & ip = this->mConfig.mIp;
+            const unsigned short port = this->mConfig.mPort;
+            std::shared_ptr<SocketProxy> socketProxy = this->mNetComponent->CreateSocket(ip, port);
             std::shared_ptr<MongoClientContext> mongoClientContext =
                     std::make_shared<MongoClientContext>(socketProxy, this->mConfig);
 
             this->mMongoClients.emplace_back(mongoClientContext);
-            if (!this->Ping(index))
-            {
-                return false;
-            }
         }
-//        for (int index = 0; index < 10; index++)
-//        {
-//            this->GetApp()->GetTaskComponent()->Start([this]() {
-//                Json::Writer json;
-//                json << "_id" << fmt::format("{0}@qq.com", 646585122);
-//                while (true)
-//                {
-//                    std::string str = json.JsonString();
-//                    this->Query("account_user", str, 1);
-//                }
-//            });
-//        }
-
-        return true;
+        return this->Ping(0);
     }
 
 	bool MongoRpcComponent::Delete(const std::string& tab, const std::string& json, int limit)
@@ -88,9 +67,33 @@ namespace Sentry
 
 		mongoRequest->document.Add("delete", tab);
 		mongoRequest->document.Add("deletes", documentArray);
-		std::shared_ptr<Mongo::MongoQueryResponse> response = this->Run(mongoRequest);
+        std::shared_ptr<MongoClientContext> mongoClient = this->GetClient();
+        std::shared_ptr<Mongo::MongoQueryResponse> response = this->Run(mongoClient, mongoRequest);
 		return response != nullptr && response->GetDocumentSize() > 0 && response->Get().IsOk();
 	}
+
+    std::shared_ptr<MongoClientContext> MongoRpcComponent::GetClient(int index)
+    {
+        if(index > 0)
+        {
+            index = index % this->mMongoClients.size();
+            return this->mMongoClients[index];
+        }
+        std::shared_ptr<MongoClientContext> retunrClient = this->mMongoClients.front();
+        for(size_t i = 0; i < this->mMongoClients.size(); i++)
+        {
+            std::shared_ptr<MongoClientContext> mongoClient = this->mMongoClients[i];
+            if(mongoClient->WaitSendCount() <= 5)
+            {
+                return mongoClient;
+            }
+            if(mongoClient->WaitSendCount() < retunrClient->WaitSendCount())
+            {
+                retunrClient = mongoClient;
+            }
+        }
+        return retunrClient;
+    }
 
 	bool MongoRpcComponent::InsertOnce(const std::string& tab, const std::string& json)
 	{
@@ -105,7 +108,8 @@ namespace Sentry
 
 		mongoRequest->document.Add("insert", tab);
 		mongoRequest->document.Add("documents", documentArray);
-		std::shared_ptr<MongoQueryResponse> response = this->Run(mongoRequest);
+        std::shared_ptr<MongoClientContext> mongoClient = this->GetClient();
+		std::shared_ptr<MongoQueryResponse> response = this->Run(mongoClient, mongoRequest);
 		return response != nullptr && response->GetDocumentSize() > 0 && response->Get().Get("n", res) && res > 0;
 	}
 
@@ -120,12 +124,9 @@ namespace Sentry
 
 	}
 
-	std::shared_ptr<Mongo::MongoQueryResponse> MongoRpcComponent::Run(std::shared_ptr<MongoQueryRequest> request, int flag)
+	std::shared_ptr<Mongo::MongoQueryResponse> MongoRpcComponent::Run(
+            std::shared_ptr<MongoClientContext> mongoClient, std::shared_ptr<MongoQueryRequest> request)
 	{
-		if (this->mMongoClients.empty())
-		{
-			return nullptr;
-		}
 		if(request->collectionName.empty())
 		{
 			request->collectionName = this->mConfig.mDb + ".$cmd";
@@ -136,9 +137,7 @@ namespace Sentry
 		{
 			return nullptr;
 		}
-        int index = this->mIndex % this->mMongoClients.size();
-		this->mMongoClients[index]->SendMongoCommand(request);
-        this->mIndex++;
+		mongoClient->SendMongoCommand(request);
 #ifdef __DEBUG__
 		long long t1 = Time::GetNowMilTime();
         std::shared_ptr<Mongo::MongoQueryResponse> mongoResponse = mongoTask->Await();
@@ -149,12 +148,12 @@ namespace Sentry
             {
                 std::string json;
                 mongoResponse->Get(i).WriterToJson(json);
-                LOG_DEBUG("[" << i << "] " << json);
+                CONSOLE_LOG_DEBUG("[" << i << "] " << json);
             }
             return mongoResponse;
 		}
 
-		LOG_DEBUG( "[" << Time::GetNowMilTime() - t1 << "ms] response = null");
+		CONSOLE_LOG_DEBUG(request->collectionName << "[" << Time::GetNowMilTime() - t1 << "ms] response = null");
 		return nullptr;
 #else
         return  mongoTask->Await();
@@ -171,8 +170,9 @@ namespace Sentry
 			return nullptr;
 		}
         mongoRequest->numberToReturn = limit;
-		mongoRequest->collectionName = fmt::format("{0}.{1}", this->mConfig.mDb, tab);
-		return this->Run(mongoRequest);
+        std::shared_ptr<MongoClientContext> mongoClient = this->GetClient();
+        mongoRequest->collectionName = fmt::format("{0}.{1}", this->mConfig.mDb, tab);
+		return this->Run(mongoClient, mongoRequest);
 	}
 
 	bool MongoRpcComponent::Update(const std::string& tab, const std::string& update, const std::string& selector, const std::string & tag)
@@ -201,14 +201,16 @@ namespace Sentry
 		updates.Add(updateInfo);
 		mongoRequest->document.Add("update", tab);
 		mongoRequest->document.Add("updates", updates);
-		return this->Run(mongoRequest) != nullptr;
+        std::shared_ptr<MongoClientContext> mongoClient = this->GetClient();
+        return this->Run(mongoClient, mongoRequest) != nullptr;
 	}
 
 	bool MongoRpcComponent::Ping(int index)
 	{
-		std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
+        std::shared_ptr<MongoClientContext> mongoClient = this->GetClient(index);
+        std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
 		mongoRequest->document.Add("ismaster", 1);
-		return this->Run(mongoRequest, index) != nullptr;
+		return this->Run(mongoClient, mongoRequest) != nullptr;
 	}
 
 	void MongoRpcComponent::OnClientError(int index, XCode code)

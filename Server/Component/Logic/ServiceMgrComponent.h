@@ -17,23 +17,26 @@ namespace Sentry
 		void OnDestory() final;
 		void OnComplete() final;
 	 private:
-		bool RefreshService();
+        void Update();
+        bool RegisterService();
 		void OnAddService(Component *component) final;
 		void OnDelService(Component *component) final;
-	 private:
+        bool RefreshService(const std::string & address);
+    private:
 		bool OnServiceAdd(const Json::Reader & json);
 		bool OnServiceDel(const Json::Reader & json);
 		bool OnNodeRegister(const Json::Reader & json);
 		void RemoveAddress(const std::string & address);
-		bool QueryNodeInfo(const std::string & address);
 		bool OnRegisterEvent(NetEventRegistry &eventRegister) final;
+        std::shared_ptr<Json::Writer> GetServiceJson(bool broacast);
 	 private:
 		int mAreaId;
 		std::string mNodeName;
 		std::string mRpcAddress;
-		std::set<std::string> mAllAddress;
 		std::vector<std::string> mServices;
-		std::vector<std::string> mJsonMessages;
+        class TaskComponent * mTaskComponent;
+        std::vector<std::string> mJsonMessages;
 		class MainRedisComponent * mRedisComponent;
+        std::unordered_map<std::string, std::set<std::string>> mAddressInfos;
 	};
 }

@@ -9,31 +9,18 @@
 #include"Component/Scene/NetEventComponent.h"
 namespace Sentry
 {
-    bool RedisSubComponent::LateAwake()
+    bool RedisSubComponent::OnInitRedisClient(RedisConfig config)
     {
-        LOG_CHECK_RET_FALSE(RedisComponent::LateAwake());
-        const ServerConfig & config = this->GetApp()->GetConfig();
-        this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
-        const rapidjson::Value * jsonValue = config.GetJsonValue("redis", "main");
-        if(jsonValue == nullptr)
+        if(!config.Channels.empty())
         {
-            LOG_ERROR("not find main redis config");
-            return false;
+            config.LuaFiles.clear();
+            SharedRedisClient redisClient = this->MakeRedisClient(config);
+            if(redisClient == nullptr || !this->Ping(redisClient))
+            {
+                return false;
+            }
         }
-		config.GetListener("rpc", this->mAddress);
-		return this->ParseConfig("main", *jsonValue) != nullptr;
-    }
-
-    bool RedisSubComponent::OnStart()
-    {
-        this->mSubClient = this->MakeRedisClient("main");
-        std::shared_ptr<RedisRequest> request = RedisRequest::Make("PING");
-        if(this->Run(this->mSubClient, request) != nullptr)
-        {
-            this->mSubClient->StartReceiveMessage();
-            return true;
-        }
-        return false;
+        return true;
     }
 
     void RedisSubComponent::OnNotFindResponse(long long taskId, std::shared_ptr<RedisResponse> response)
@@ -76,7 +63,7 @@ namespace Sentry
                     if(localServiceComponent != nullptr)
                     {
                         std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
-                        if(!localServiceComponent->Invoke(method, jsonReader))
+                        if((!jsonReader->ParseJson(message)) || (!localServiceComponent->Invoke(method, jsonReader)))
                         {
                             LOG_ERROR("handler event " << channel << " error");
                             return;
@@ -86,20 +73,35 @@ namespace Sentry
                 }
             }
         }
-		this->mSubClient->StartReceiveMessage();
     }
 
-    long long RedisSubComponent::Publish(const std::string& channel, const std::string& message)
+    long long RedisSubComponent::Publish(const std::string & name, const std::string& channel, const std::string& message)
     {
+        SharedRedisClient redisClient = this->GetClient(name);
+        if(redisClient == nullptr)
+        {
+            LOG_FATAL("not find redis client : " << name);
+            return 0;
+        }
         std::shared_ptr<RedisRequest> request = RedisRequest::Make("PUBLISH", channel, message);
-        std::shared_ptr<RedisResponse> redisResponse = this->Run(this->mSubClient, request);
+        std::shared_ptr<RedisResponse> redisResponse = this->Run(redisClient, request);
         return redisResponse == nullptr ? 0 : redisResponse->GetNumber();
     }
 
-    bool RedisSubComponent::SubscribeChannel(const std::string& channel)
+    bool RedisSubComponent::SubscribeChannel(const std::string & name, const std::string& channel)
     {
+        SharedRedisClient redisClient = this->GetClient(name);
+        if(redisClient == nullptr)
+        {
+            LOG_FATAL("not find redis client : " << name);
+            return 0;
+        }
         std::shared_ptr<RedisRequest> request = RedisRequest::Make("SUBSCRIBE", channel);
-        std::shared_ptr<RedisResponse> redisResponse = this->Run(this->mSubClient, request);
+        std::shared_ptr<RedisResponse> redisResponse = this->Run(redisClient, request);
+        if(redisResponse == nullptr)
+        {
+            return false;
+        }
         if(redisResponse->GetArraySize() == 3 && redisResponse->Get(2)->IsNumber())
         {
             if(((const RedisNumber*)redisResponse->Get(2))->GetValue() > 0)

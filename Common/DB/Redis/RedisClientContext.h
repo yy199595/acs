@@ -30,17 +30,18 @@ namespace Sentry
         bool LoadScript();
         bool SubChannel();
 		void OnReadComplete();
+        void StartPingServer();
+        void CloseFreeClient();
         void OnReceiveLine(const asio::error_code &code, std::istream & is) final;
         void OnReceiveMessage(const asio::error_code &code, std::istream & is) final;
         std::shared_ptr<RedisResponse> SyncCommand(std::shared_ptr<RedisRequest> command);
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
-
     private:
-    private:
-        const RedisConfig & mConfig;
+        RedisConfig mConfig;
         RedisComponent * mRedisComponent;
 		std::shared_ptr<asio::steady_timer> mTimer;
-		std::shared_ptr<RedisResponse> mCurResponse;
+        std::shared_ptr<RedisResponse> mCurResponse;
+        std::shared_ptr<asio::steady_timer> mCloseTimer;
     };
     typedef std::shared_ptr<RedisClientContext> SharedRedisClient;
 }

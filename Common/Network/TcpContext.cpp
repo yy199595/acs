@@ -223,7 +223,7 @@ namespace Tcp
         return message;
     }
 
-    void TcpContext::SendFromMessageQueue()
+    bool TcpContext::SendFromMessageQueue()
     {
         assert(this->mSendBuffer.size() == 0);
         if(!this->mMessagqQueue.empty())
@@ -239,7 +239,9 @@ namespace Tcp
                 this->OnSendMessage(code, this->mMessagqQueue.front());
             });
             this->mLastOperTime = Helper::Time::GetNowSecTime();
+            return true;
         }
+        return false;
     }
 }
 

@@ -97,7 +97,13 @@ namespace Sentry
 		asio::io_service & taskThread = App::Get()->GetThread();
 		taskThread.post(std::bind(&RedisComponent::OnResponse, this->mRedisComponent, taskId, response));
 #endif
-        this->SendFromMessageQueue();
+        if(!this->SendFromMessageQueue())
+        {
+            if(!this->mConfig.Channels.empty())
+            {
+                this->ReceiveLine();
+            }
+        }
 	}
 
     void RedisClientContext::OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message)
@@ -144,6 +150,7 @@ namespace Sentry
             CONSOLE_LOG_ERROR("auth redis user faliure");
             return false;
         }
+
         if(!this->LoadScript())
         {
             CONSOLE_LOG_ERROR("load lua script error");
@@ -153,6 +160,13 @@ namespace Sentry
         {
             CONSOLE_LOG_ERROR("sub redis channel error");
             return false;
+        }
+        if(this->mConfig.FreeClient > 0 && this->mConfig.Channels.empty())
+        {
+            int s = this->mConfig.FreeClient;
+            asio::io_service & io = this->mSocket->GetThread();
+            this->mCloseTimer = std::make_shared<asio::steady_timer>(io, std::chrono::seconds(s));
+            this->mCloseTimer->async_wait(std::bind(&RedisClientContext::CloseFreeClient, this));
         }
 		return true;
 	}
@@ -225,26 +239,63 @@ namespace Sentry
 
     bool RedisClientContext::SubChannel()
     {
-        for(const std::string & channel : this->mConfig.Channels)
+        if(this->mConfig.Channels.empty())
+        {
+            return true;
+        }
+        for (const std::string &channel: this->mConfig.Channels)
         {
             std::shared_ptr<RedisRequest> request = RedisRequest::Make("SUBSCRIBE", channel);
             std::shared_ptr<RedisResponse> redisResponse = this->SyncCommand(request);
-            if(redisResponse == nullptr || redisResponse->GetArraySize() != 3)
+            if (redisResponse == nullptr || redisResponse->GetArraySize() != 3)
             {
                 CONSOLE_LOG_INFO("sub " << channel << " failure");
                 return false;
             }
-            if(!redisResponse->Get(2)->IsNumber())
+            if (!redisResponse->Get(2)->IsNumber())
             {
                 CONSOLE_LOG_INFO("sub " << channel << " failure");
                 return false;
             }
-            if(redisResponse->Get(2)->Cast<RedisNumber>()->GetValue() <= 0)
+            if (redisResponse->Get(2)->Cast<RedisNumber>()->GetValue() <= 0)
             {
                 return false;
             }
             CONSOLE_LOG_INFO("sub " << channel << " successful");
         }
+        asio::io_service &io = this->mSocket->GetThread();
+        this->mTimer = std::make_shared<asio::steady_timer>(io, std::chrono::seconds(10));
+        this->mTimer->async_wait(std::bind(&RedisClientContext::StartPingServer, this));
         return true;
+    }
+
+    void RedisClientContext::StartPingServer()
+    {
+        long long nowTime = Helper::Time::GetNowSecTime();
+        if(nowTime - this->GetLastOperTime() >= 10) //十秒没进行操作 ping一下
+        {
+            this->Send(RedisRequest::Make("PING"));
+            CONSOLE_LOG_INFO("[" << this->mConfig.Name << "] start ping server");
+        }
+        asio::io_service &io = this->mSocket->GetThread();
+        this->mTimer = std::make_shared<asio::steady_timer>(io, std::chrono::seconds(10));
+        this->mTimer->async_wait(std::bind(&RedisClientContext::StartPingServer, this));
+    }
+
+    void RedisClientContext::CloseFreeClient()
+    {
+        int second = this->mConfig.FreeClient;
+        long long nowTime = Helper::Time::GetNowSecTime();
+        if(nowTime - this->GetLastOperTime() >= second)
+        {
+            this->mSocket->Close();
+            CONSOLE_LOG_INFO("[" << this->mConfig.Name << "] close free client");
+        }
+        else
+        {
+            asio::io_service &io = this->mSocket->GetThread();
+            this->mCloseTimer = std::make_shared<asio::steady_timer>(io, std::chrono::seconds(second));
+            this->mCloseTimer->async_wait(std::bind(&RedisClientContext::CloseFreeClient, this));
+        }
     }
 }

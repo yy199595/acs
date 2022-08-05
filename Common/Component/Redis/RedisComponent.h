@@ -24,33 +24,27 @@ namespace Sentry
 {
 	struct RedisConfig;
 
-	class RedisComponent : public RpcTaskComponent<RedisResponse>, public ISecondUpdate
+    class RedisComponent : public RpcTaskComponent<RedisResponse>, public IStart
 	{
 	public:
 		RedisComponent() = default;
-	protected:
-        bool LateAwake() override;
-        void OnSecondUpdate(const int tick) override;
 	 protected:
-        SharedRedisClient MakeRedisClient(const std::string &name);
+        bool OnStart() final;
+        bool LateAwake() final;
         SharedRedisClient MakeRedisClient(const RedisConfig & config);
-        const RedisConfig * ParseConfig(const char * name, const rapidjson::Value & json);
+        bool ParseConfig(const char * name, const rapidjson::Value & json);
     public:
+        bool Ping(SharedRedisClient redisClient);
 		virtual SharedRedisClient GetClient(const std::string & name);
-        void OnLoadScript(const std::string & name, const std::string & md5);
-        std::shared_ptr<RedisRequest> MakeLuaRequest(const std::string & fullName, const std::string & json);
+        virtual void OnLoadScript(const std::string & name, const std::string & md5) { }
     protected:
+        virtual bool OnInitRedisClient(RedisConfig config) = 0;
         std::shared_ptr<RedisResponse> Run(const std::string & name, std::shared_ptr<RedisRequest> request);
         std::shared_ptr<RedisResponse> Run(SharedRedisClient redisClientContext, std::shared_ptr<RedisRequest> request);
     private:
-        void PushClient(SharedRedisClient redisClientContext);
-        const RedisConfig * GetRedisConfig(const std::string & name);
-    private:
-		TaskComponent * mTaskComponent;
         class NetThreadComponent * mNetComponent;
         std::unordered_map<std::string, RedisConfig> mConfigs;
-        std::unordered_map<std::string, std::string> mLuaMap;
-        std::unordered_map<std::string, std::list<SharedRedisClient>> mRedisClients;
+        std::unordered_map<std::string, std::vector<SharedRedisClient>> mRedisClients;
 	};
 }
 

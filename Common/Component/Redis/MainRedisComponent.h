@@ -11,7 +11,7 @@ namespace Sentry
 {
 	class NetThreadComponent;
 
-    class MainRedisComponent final : public RedisComponent, public ILuaRegister, public IStart
+    class MainRedisComponent final : public RedisComponent, public ILuaRegister
 	{
 	 public:
 		MainRedisComponent() = default;
@@ -22,19 +22,20 @@ namespace Sentry
         std::shared_ptr<RedisResponse> RunCmd(const std::string & name, const std::string & cmd, Args&& ... args);
         template<typename ... Args>
         std::shared_ptr<RedisResponse> RunCmd(SharedRedisClient redisClientContext, const std::string & cmd, Args&& ... args);
-
     public:
+        std::shared_ptr<RedisRequest> MakeLuaRequest(const std::string & fullName, const std::string & json);
         bool Call(const std::string & name, const std::string & func, Json::Writer & request, std::shared_ptr<Json::Reader> response);
 	 private:
-        bool OnStart() final;
-        bool LateAwake() final;
-        void OnSecondUpdate(const int tick) final;
+        bool OnInitRedisClient(RedisConfig config) final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
-	 private:
+        void OnLoadScript(const std::string & name, const std::string & md5) final;
+    private:
 		TaskComponent* mTaskComponent;
 		const struct RedisConfig* mConfig;
         std::vector<std::string> mTempArray;
-	};
+        std::unordered_map<std::string, std::string> mLuaMap;
+
+    };
 
     template<typename ... Args>
     std::shared_ptr<RedisResponse> MainRedisComponent::RunCmd(const std::string &name, const std::string & cmd, Args &&...args)
