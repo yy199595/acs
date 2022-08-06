@@ -9,7 +9,7 @@
 #include"Component/Rpc/ServiceRpcComponent.h"
 #include"GateClientComponent.h"
 #include"Component/Rpc/RpcClientComponent.h"
-#include"Component/RpcService/LocalServiceComponent.h"
+#include"Component/RpcService/LocalService.h"
 #include"GateService.h"
 #include"Component/User/UserSyncComponent.h"
 #include"Component/Redis/MainRedisComponent.h"
@@ -63,7 +63,7 @@ namespace Sentry
 			LOG_ERROR("call function " << request->method_name() << " not find");
 			return XCode::NotFoundRpcConfig;
 		}
-		ServiceComponent* localServerRpc = this->GetApp()->GetService(service);
+		Service* localServerRpc = this->GetApp()->GetService(service);
 		if(localServerRpc == nullptr)
 		{
 			return XCode::CallServiceNotFound;

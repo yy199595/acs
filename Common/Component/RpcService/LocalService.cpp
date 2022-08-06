@@ -4,7 +4,7 @@
 
 #include <Method/MethodRegister.h>
 
-#include"LocalServiceComponent.h"
+#include"LocalService.h"
 #include"App/App.h"
 #include"Global/ServiceConfig.h"
 #include"Method/LuaServiceMethod.h"

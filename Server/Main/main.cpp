@@ -20,7 +20,7 @@
 #include"Component/Gate/GateClientComponent.h"
 #include"Component/Scene/MessageComponent.h"
 #include"Component/Logic/HttpSourceService.h"
-#include"Component/RpcService/LocalLuaService.h"
+#include"Component/RpcService/LuaService.h"
 #include"Component/Http/HttpServiceComponent.h"
 #include"Component/Mongo/MongoService.h"
 #include"Component/HttpService/LocalLuaHttpService.h"
@@ -81,7 +81,7 @@ void RegisterComponent()
 
 void RegisterServiceComponent()
 {
-    ComponentFactory::Add<LocalLuaService>("rpc");
+    ComponentFactory::Add<LuaService>("rpc");
     ComponentFactory::Add<LocalLuaHttpService>("http");
     ComponentFactory::Add<GateService>("GateService");
 	ComponentFactory::Add<MongoService>("MongoService");

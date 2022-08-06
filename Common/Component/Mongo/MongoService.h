@@ -5,7 +5,7 @@
 #ifndef SERVER_MONGOSERVICE_H
 #define SERVER_MONGOSERVICE_H
 #include"DB/Mongo/MongoProto.h"
-#include"Component/RpcService/LocalServiceComponent.h"
+#include"Component/RpcService/LocalService.h"
 namespace Sentry
 {
 	class MongoService final : public LocalRpcService

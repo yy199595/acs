@@ -3,7 +3,7 @@
 #include"Network/Listener/TcpServerListener.h"
 #include"Network/Listener/TcpServerComponent.h"
 #include"Component/Redis/MainRedisComponent.h"
-#include"Component/RpcService/LocalServiceComponent.h"
+#include"Component/RpcService/LocalService.h"
 
 namespace Sentry
 {
@@ -27,7 +27,7 @@ namespace Sentry
 
 	void ServiceMgrComponent::OnAddService(Component* component)
 	{
-		if(component->Cast<ServiceComponent>())
+		if(component->Cast<Service>())
 		{
 			Json::Writer jsonWriter;
             std::shared_ptr<Json::Reader> response(new Json::Reader());
@@ -82,9 +82,9 @@ namespace Sentry
     {
         std::shared_ptr<Json::Writer> json(new Json::Writer());
         json->BeginArray("services");
-        std::vector<ServiceComponent *> components;
+        std::vector<Service *> components;
         this->GetApp()->GetServices(components);
-        for (ServiceComponent *component: components)
+        for (Service *component: components)
         {
             if (component->IsStartService())
             {
@@ -121,7 +121,7 @@ namespace Sentry
             {
                 assert(jsonData[index].IsString());
                 std::string service(jsonData[index].GetString());
-                ServiceComponent *component = this->GetApp()->GetService(service);
+                Service *component = this->GetApp()->GetService(service);
                 if (component != nullptr && !component->GetAddressProxy().HasAddress(address))
                 {
                     component->GetAddressProxy().AddAddress(address);
@@ -134,9 +134,9 @@ namespace Sentry
 
 	void ServiceMgrComponent::RemoveAddress(const std::string & address)
 	{
-		std::vector<ServiceComponent *> services;
+		std::vector<Service *> services;
 		this->GetApp()->GetServices(services);
-		for(ServiceComponent * component : services)
+		for(Service * component : services)
 		{
 			if(component->GetAddressProxy().DelAddress(address))
 			{
@@ -156,7 +156,7 @@ namespace Sentry
         LOG_CHECK_RET_FALSE(json.GetMember("services", services));
 		for(const std::string & service : services)
 		{
-			ServiceComponent * localRpcService = this->GetApp()->GetService(service);
+			Service * localRpcService = this->GetApp()->GetService(service);
 			if(localRpcService != nullptr)
 			{
 				localRpcService->GetAddressProxy().AddAddress(address);
@@ -183,7 +183,7 @@ namespace Sentry
             {
                 for (const std::string &service: iter->second)
                 {
-                    ServiceComponent *component = this->GetApp()->GetService(service);
+                    Service *component = this->GetApp()->GetService(service);
                     if (component != nullptr && component->GetAddressProxy().HasAddress(address))
                     {
                         component->GetAddressProxy().DelAddress(address);
@@ -201,7 +201,7 @@ namespace Sentry
 		std::string address, service;
 		LOG_CHECK_RET_FALSE(json.GetMember("address", address));
 		LOG_CHECK_RET_FALSE(json.GetMember("service", service));
-		ServiceComponent * localRpcService = this->GetApp()->GetService(service);
+		Service * localRpcService = this->GetApp()->GetService(service);
 		if(localRpcService != nullptr)
 		{
 			localRpcService->GetAddressProxy().AddAddress(address);
@@ -215,15 +215,15 @@ namespace Sentry
 		std::string address, service;
 		LOG_CHECK_RET_FALSE(json.GetMember("address", address));
 		LOG_CHECK_RET_FALSE(json.GetMember("service", service));
-		ServiceComponent* localRpcService = this->GetApp()->GetService(service);
+		Service* localRpcService = this->GetApp()->GetService(service);
 		return localRpcService != nullptr && localRpcService->GetAddressProxy().DelAddress(address);
 	}
 
 	void ServiceMgrComponent::OnDestory()
 	{
-		std::vector<ServiceComponent*> compontns;
+		std::vector<Service*> compontns;
 		this->GetApp()->GetServices(compontns);
-		for(ServiceComponent * component : compontns)
+		for(Service * component : compontns)
 		{
 			if(component->IsStartService())
 			{

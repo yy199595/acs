@@ -4,7 +4,7 @@
 
 #include"UserSyncComponent.h"
 #include"Component/Redis/MainRedisComponent.h"
-#include"Component/RpcService/LocalServiceComponent.h"
+#include"Component/RpcService/LocalService.h"
 namespace Sentry
 {
 	bool UserSyncComponent::LateAwake()
@@ -111,7 +111,7 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(json.GetMember("user_id", userId));
 		LOG_CHECK_RET_FALSE(json.GetMember("address", address));
 		LOG_CHECK_RET_FALSE(json.GetMember("service", service));
-		ServiceComponent * component = this->GetComponent<ServiceComponent>(service);
+		Service * component = this->GetComponent<Service>(service);
 		return component != nullptr && component->GetAddressProxy().AddUserAddress(userId, address);
 	}
 
@@ -123,7 +123,7 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(json.GetMember("services", services));
 		for(const std::string & service : services)
 		{
-			ServiceComponent * component = this->GetComponent<ServiceComponent>(service);
+			Service * component = this->GetComponent<Service>(service);
 			if(component != nullptr && component->GetAddressProxy().DelUserAddress(userId))
 			{
 				LOG_INFO("remove " << userId << " form " << service);

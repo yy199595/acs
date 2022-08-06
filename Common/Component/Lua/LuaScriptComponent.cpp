@@ -12,7 +12,7 @@
 #include"Script/Extension/Log/LuaLogger.h"
 #include"Script/Extension/Json/Json.h"
 #include"Script/Extension/Coroutine/LuaCoroutine.h"
-#include"Component/RpcService/ServiceComponent.h"
+#include"Component/RpcService/Service.h"
 #include"Script/Extension/Json/Encoder.h"
 #include"Script/Extension/Util/Util.h"
 using namespace Lua;

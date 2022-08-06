@@ -1,8 +1,8 @@
 #include"ConsoleComponent.h"
 #include"Component/Scene/OperatorComponent.h"
-#include"Component/RpcService/ServiceComponent.h"
+#include"Component/RpcService/Service.h"
 #include"Component/Coroutine/TaskComponent.h"
-#include"Component/RpcService/LocalServiceComponent.h"
+#include"Component/RpcService/LocalService.h"
 #include"Network/Listener/TcpServerComponent.h"
 #define BIND_FUNC(name, func) this->mFunctionMap.emplace(name, std::bind(&func, this, args1, args2));
 

@@ -22,7 +22,7 @@ namespace Lua
 		std::string address;
 		long long userId = 0;
 		std::shared_ptr<com::rpc::request> request(new com::rpc::request());
-		ServiceComponent* callComponent = UserDataParameter::Read<ServiceComponent*>(lua, 1);
+		Sentry::Service* callComponent = UserDataParameter::Read<Sentry::Service*>(lua, 1);
 		if (lua_isinteger(lua, 2)) //userId
 		{
 			userId = lua_tointeger(lua, 2);
@@ -85,8 +85,7 @@ namespace Lua
 	int Service::GetAddress(lua_State* lua)
 	{
 		std::string address;
-		ServiceComponent* callComponent = UserDataParameter::Read<ServiceComponent*>(lua, 1);
-
+		Sentry::Service* callComponent = UserDataParameter::Read<Sentry::Service*>(lua, 1);
 		if(callComponent->GetAddressProxy().GetAddress(address))
 		{
 			lua_pushlstring(lua, address.c_str(), address.size());

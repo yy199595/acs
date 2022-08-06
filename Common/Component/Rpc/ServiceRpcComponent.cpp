@@ -6,7 +6,7 @@
 #include"Global/ServiceConfig.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Other/ElapsedTimer.h"
-#include"Component/RpcService/LocalServiceComponent.h"
+#include"Component/RpcService/LocalService.h"
 namespace Sentry
 {
 	void ServiceRpcComponent::Awake()
@@ -31,7 +31,7 @@ namespace Sentry
 		{
 			return XCode::NotFoundRpcConfig;
 		}
-		ServiceComponent * logicService = this->GetApp()->GetService(this->mTempService);
+		Service * logicService = this->GetApp()->GetService(this->mTempService);
 		if (logicService == nullptr || !logicService->IsStartService())
 		{
 			LOG_ERROR("call service not exist : [" << this->mTempService << "]");

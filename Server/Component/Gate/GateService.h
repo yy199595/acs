@@ -4,7 +4,7 @@
 
 #ifndef GAMEKEEPER_GATESERVICE_H
 #define GAMEKEEPER_GATESERVICE_H
-#include"Component/RpcService/LocalServiceComponent.h"
+#include"Component/RpcService/LocalService.h"
 namespace Sentry
 {
 	class GateService final : public LocalRpcService

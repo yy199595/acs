@@ -2,16 +2,16 @@
 // Created by yjz on 2022/6/5.
 //
 
-#ifndef _SERVICEAGENTCOMPONENT_H_
-#define _SERVICEAGENTCOMPONENT_H_
-#include"ServiceComponent.h"
+#ifndef _SERVICEAGENT_H_
+#define _SERVICEAGENT_H_
+#include"Service.h"
 namespace Sentry
 {
-	class ServiceAgentComponent : public ServiceComponent
+	class ServiceAgent : public Service
 	{
 	 public:
-		ServiceAgentComponent() = default;
-		~ServiceAgentComponent() = default;
+		ServiceAgent() = default;
+		~ServiceAgent() = default;
 	 private:
 		bool StartNewService() final { return false;}
 		bool CloseService() final { return false;}
@@ -22,4 +22,4 @@ namespace Sentry
 	};
 }
 
-#endif //_SERVICEAGENTCOMPONENT_H_
+#endif //_SERVICEAGENT_H_

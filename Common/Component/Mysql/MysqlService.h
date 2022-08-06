@@ -2,7 +2,7 @@
 
 #include"DB/Mysql/MysqlClient.h"
 #include"DB/Mysql/MysqlHelper.h"
-#include"Component/RpcService/LocalServiceComponent.h"
+#include"Component/RpcService/LocalService.h"
 
 namespace Sentry
 {

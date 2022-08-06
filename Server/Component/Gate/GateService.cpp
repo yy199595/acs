@@ -90,7 +90,7 @@ namespace Sentry
 	XCode GateService::QueryAddress(long long userId, const com::type::string& request, com::type::string& response)
 	{
 		std::string address;
-		ServiceComponent * component = this->GetComponent<ServiceComponent>(request.str());
+		Service * component = this->GetComponent<Service>(request.str());
 		if(component == nullptr || !component->GetAddressProxy().GetAddress(userId, address))
 		{
 			return XCode::Failure;
@@ -101,7 +101,7 @@ namespace Sentry
 
 	XCode GateService::SaveAddress(long long userId, const s2s::allot::save& request)
 	{
-		ServiceComponent * component = this->GetComponent<ServiceComponent>(request.service());
+		Service * component = this->GetComponent<Service>(request.service());
 		if(component == nullptr || !component->GetAddressProxy().HasAddress(request.address()))
 		{
 			return XCode::Failure;

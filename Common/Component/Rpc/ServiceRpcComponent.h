@@ -3,9 +3,9 @@
 #include"Component/Rpc/RpcTaskComponent.h"
 namespace Sentry
 {
-	class ServiceComponent;
+	class Service;
 
-	class LocalLuaService;
+	class LuaService;
 
 	class ServiceMethod;
 

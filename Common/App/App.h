@@ -15,7 +15,7 @@ using namespace asio::ip;
 namespace Sentry
 {
 	class MainTaskScheduler;
-	class ServiceComponent;
+	class Service;
 	class MessageComponent;
 	class App final : public Entity
 	{
@@ -39,8 +39,8 @@ namespace Sentry
 	 public:
 		int Run();
 		void Stop();
-		ServiceComponent * GetService(const std::string & name);
-		bool GetServices(std::vector<ServiceComponent *> & services);
+		Service * GetService(const std::string & name);
+		bool GetServices(std::vector<Service *> & services);
         inline bool IsMainThread() const { return this->mThreadId == std::this_thread::get_id();}
     private:
 		void LogicMainLoop();
@@ -73,6 +73,6 @@ namespace Sentry
 		std::vector<ISystemUpdate*> mSystemUpdateManagers;
 		std::vector<ISecondUpdate*> mSecondUpdateManagers;
 		std::vector<ILastFrameUpdate*> mLastFrameUpdateManager;
-		std::unordered_map<std::string, ServiceComponent*> mSeviceMap;
+		std::unordered_map<std::string, Service*> mSeviceMap;
 	};
 }// namespace Sentry

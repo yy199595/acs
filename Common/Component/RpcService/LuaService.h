@@ -2,17 +2,17 @@
 
 
 #include"Script/LuaInclude.h"
-#include"ServiceComponent.h"
+#include"Service.h"
 
 namespace Sentry
 {
 	class LuaScriptComponent;
 	class ServiceMethodRegister;
-	class LocalLuaService : public ServiceComponent, public IStart
+	class LuaService : public Service, public IStart
 	{
 	 public:
-		LocalLuaService();
-		~LocalLuaService() override;
+		LuaService();
+		~LuaService() override;
 	 protected:
 		bool OnStart() final;
 		bool LateAwake() final;

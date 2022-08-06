@@ -5,7 +5,7 @@
 #ifndef _SERVICE_H_
 #define _SERVICE_H_
 #include"Script/LuaInclude.h"
-#include"Component/RpcService/ServiceComponent.h"
+#include"Component/RpcService/Service.h"
 namespace Lua
 {
 	namespace Service

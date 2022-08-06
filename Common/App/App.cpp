@@ -5,8 +5,8 @@
 #include"Util/DirectoryHelper.h"
 #include"Component/Scene/MessageComponent.h"
 #include"Component/Scene/NetEventComponent.h"
-#include"Component/RpcService/LocalLuaService.h"
-#include"Component/RpcService/ServiceAgentComponent.h"
+#include"Component/RpcService/LuaService.h"
+#include"Component/RpcService/ServiceAgent.h"
 using namespace Sentry;
 using namespace std::chrono;
 
@@ -65,7 +65,7 @@ namespace Sentry
                     component = ComponentFactory::CreateComponent(type);
                     if (component == nullptr && type == "rpc")
                     {
-                        component = new ServiceAgentComponent();
+                        component = new ServiceAgent();
                     }
                 }
                 if (component == nullptr || !this->AddComponent(name, component))
@@ -108,7 +108,7 @@ namespace Sentry
 		ISecondUpdate* manager3 = component->Cast<ISecondUpdate>();
 		ILastFrameUpdate* manager4 = component->Cast<ILastFrameUpdate>();
         NetEventComponent * eveComponent = component->Cast<NetEventComponent>();
-        ServiceComponent * serviceComponent = component->Cast<ServiceComponent>();
+        Service * serviceComponent = component->Cast<Service>();
 
         TryInvoke(eveComponent, eveComponent->StartRegisterEvent());
         TryInvoke(manager1, this->mFrameUpdateManagers.emplace_back(manager1));
@@ -360,13 +360,13 @@ namespace Sentry
 		}
 	}
 
-	ServiceComponent* App::GetService(const std::string& name)
+	Service* App::GetService(const std::string& name)
 	{
 		auto iter = this->mSeviceMap.find(name);
 		return iter != this->mSeviceMap.end() ? iter->second : nullptr;
 	}
 
-	bool App::GetServices(std::vector<ServiceComponent*>& services)
+	bool App::GetServices(std::vector<Service*>& services)
 	{
 		services.clear();
 		auto iter = this->mSeviceMap.begin();

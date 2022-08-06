@@ -4,13 +4,13 @@
 
 #ifndef SERVER_LOCALSERVICECOMPONENT_H
 #define SERVER_LOCALSERVICECOMPONENT_H
-#include"ServiceComponent.h"
+#include"Service.h"
 #include"Method/MethodRegister.h"
 #include"Component/Lua/LuaScriptComponent.h"
 
 namespace Sentry
 {
-	class LocalRpcService : public ServiceComponent
+	class LocalRpcService : public Service
 	{
 	public:
 		LocalRpcService() = default;
