@@ -24,7 +24,7 @@ namespace Sentry
         const HttpInterfaceConfig * GetConfig(const std::string & path);
     private:
         TaskComponent * mTaskComponent;
-    class NetThreadComponent * mNetComponent;
+    	class NetThreadComponent * mNetComponent;
         std::queue<std::shared_ptr<HttpHandlerClient>> mClientPools;
         std::unordered_map<std::string, const HttpInterfaceConfig *> mHttpConfigs;
         std::unordered_map<std::string, std::shared_ptr<HttpHandlerClient>> mHttpClients;
