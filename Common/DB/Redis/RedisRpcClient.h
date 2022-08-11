@@ -15,11 +15,11 @@ namespace Sentry
 {
 	struct RedisConfig;
     class RedisComponent;
-    class RedisClientContext final : public Tcp::TcpContext
+    class RedisRpcClient final : public Tcp::TcpContext
     {
     public:
-        RedisClientContext(std::shared_ptr<SocketProxy> socket, const RedisConfig & config, RedisComponent * component);
-		~RedisClientContext();
+        RedisRpcClient(std::shared_ptr<SocketProxy> socket, const RedisConfig & config, RedisComponent * component);
+		~RedisRpcClient();
     public:
         void StartReceiveMessage();
         const RedisConfig & GetConfig() { return mConfig;}
@@ -32,8 +32,8 @@ namespace Sentry
 		void OnReadComplete();
         void StartPingServer();
         void CloseFreeClient();
-        void OnReceiveLine(const asio::error_code &code, std::istream & is) final;
-        void OnReceiveMessage(const asio::error_code &code, std::istream & is) final;
+        void OnReceiveLine(const asio::error_code &code, std::istream & is, size_t) final;
+        void OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t) final;
         std::shared_ptr<RedisResponse> SyncCommand(std::shared_ptr<RedisRequest> command);
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
     private:
@@ -43,6 +43,6 @@ namespace Sentry
         std::shared_ptr<RedisResponse> mCurResponse;
         std::shared_ptr<asio::steady_timer> mCloseTimer;
     };
-    typedef std::shared_ptr<RedisClientContext> SharedRedisClient;
+    typedef std::shared_ptr<RedisRpcClient> SharedRedisClient;
 }
 #endif //GAMEKEEPER_REDISCLIENT_H

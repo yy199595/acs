@@ -1,45 +1,45 @@
 //
 // Created by zmhy0073 on 2022/1/15.
 //
-#include"RedisClientContext.h"
+#include"RedisRpcClient.h"
 #include"Util/FileHelper.h"
 #include"Component/Scene/LoggerComponent.h"
 #include"Component/Redis/RedisComponent.h"
 namespace Sentry
 {
-	RedisClientContext::RedisClientContext(std::shared_ptr<SocketProxy> socket, const RedisConfig& config, RedisComponent * component)
+	RedisRpcClient::RedisRpcClient(std::shared_ptr<SocketProxy> socket, const RedisConfig& config, RedisComponent * component)
 		: Tcp::TcpContext(socket, 1024 * 100), mConfig(config), mRedisComponent(component)
 	{
 		this->mSocket = socket;
 	}
 
-	RedisClientContext::~RedisClientContext() noexcept
+	RedisRpcClient::~RedisRpcClient() noexcept
 	{
 		LOG_WARN("remove redis client " << this->mConfig.Name << "[" << this->mConfig.Address << "]");
 	}
 
-	void RedisClientContext::SendCommand(std::shared_ptr<RedisRequest> command)
+	void RedisRpcClient::SendCommand(std::shared_ptr<RedisRequest> command)
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->Send(command);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-		t.post(std::bind(&RedisClientContext::Send, this, command));
+		t.post(std::bind(&RedisRpcClient::Send, this, command));
 #endif
         CONSOLE_LOG_INFO("async command = " << command->ToJson());
 	}
 
-	void RedisClientContext::StartReceiveMessage()
+	void RedisRpcClient::StartReceiveMessage()
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLine();
 #else
         asio::io_service & t = this->mSocket->GetThread();
-        t.post(std::bind(&RedisClientContext::ReceiveLine, this));
+        t.post(std::bind(&RedisRpcClient::ReceiveLine, this));
 #endif
 	}
 
-	void RedisClientContext::OnReceiveLine(const asio::error_code& code, std::istream & is)
+	void RedisRpcClient::OnReceiveLine(const asio::error_code& code, std::istream & is, size_t size)
 	{
 		if (code)
 		{
@@ -65,7 +65,7 @@ namespace Sentry
 		}
 	}
 
-	void RedisClientContext::OnReceiveMessage(const asio::error_code& code, std::istream & is)
+	void RedisRpcClient::OnReceiveMessage(const asio::error_code& code, std::istream & is, size_t size)
 	{
         if(this->mCurResponse == nullptr)
         {
@@ -81,7 +81,7 @@ namespace Sentry
 		this->ReceiveLine();
 	}
 
-	void RedisClientContext::OnReadComplete()
+	void RedisRpcClient::OnReadComplete()
 	{
         std::shared_ptr<RedisRequest> request = dynamic_pointer_cast<RedisRequest>(this->PopMessage());
 
@@ -106,7 +106,7 @@ namespace Sentry
         }
 	}
 
-    void RedisClientContext::OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message)
+    void RedisRpcClient::OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message)
     {
         if (code)
         {
@@ -122,7 +122,7 @@ namespace Sentry
         this->ReceiveLine();
     }
 
-	bool RedisClientContext::AuthUser()
+	bool RedisRpcClient::AuthUser()
 	{
 		if (!this->ConnectSync())
 		{
@@ -166,12 +166,12 @@ namespace Sentry
             int s = this->mConfig.FreeClient;
             asio::io_service & io = this->mSocket->GetThread();
             this->mCloseTimer = std::make_shared<asio::steady_timer>(io, std::chrono::seconds(s));
-            this->mCloseTimer->async_wait(std::bind(&RedisClientContext::CloseFreeClient, this));
+            this->mCloseTimer->async_wait(std::bind(&RedisRpcClient::CloseFreeClient, this));
         }
 		return true;
 	}
 
-    bool RedisClientContext::LoadScript()
+    bool RedisRpcClient::LoadScript()
     {
         for (const std::string& path : this->mConfig.LuaFiles)
         {
@@ -203,7 +203,7 @@ namespace Sentry
         return true;
     }
 
-    std::shared_ptr<RedisResponse> RedisClientContext::SyncCommand(std::shared_ptr<RedisRequest> request)
+    std::shared_ptr<RedisResponse> RedisRpcClient::SyncCommand(std::shared_ptr<RedisRequest> request)
     {
         assert(this->mRecvBuffer.size() == 0);
         CONSOLE_LOG_DEBUG("sync command = " << request->ToJson());
@@ -237,7 +237,7 @@ namespace Sentry
         return redisResponse;
     }
 
-    bool RedisClientContext::SubChannel()
+    bool RedisRpcClient::SubChannel()
     {
         if(this->mConfig.Channels.empty())
         {
@@ -265,11 +265,11 @@ namespace Sentry
         }
         asio::io_service &io = this->mSocket->GetThread();
         this->mTimer = std::make_shared<asio::steady_timer>(io, std::chrono::seconds(10));
-        this->mTimer->async_wait(std::bind(&RedisClientContext::StartPingServer, this));
+        this->mTimer->async_wait(std::bind(&RedisRpcClient::StartPingServer, this));
         return true;
     }
 
-    void RedisClientContext::StartPingServer()
+    void RedisRpcClient::StartPingServer()
     {
         long long nowTime = Helper::Time::GetNowSecTime();
         if(nowTime - this->GetLastOperTime() >= 10) //十秒没进行操作 ping一下
@@ -279,10 +279,10 @@ namespace Sentry
         }
         asio::io_service &io = this->mSocket->GetThread();
         this->mTimer = std::make_shared<asio::steady_timer>(io, std::chrono::seconds(10));
-        this->mTimer->async_wait(std::bind(&RedisClientContext::StartPingServer, this));
+        this->mTimer->async_wait(std::bind(&RedisRpcClient::StartPingServer, this));
     }
 
-    void RedisClientContext::CloseFreeClient()
+    void RedisRpcClient::CloseFreeClient()
     {
         int second = this->mConfig.FreeClient;
         long long nowTime = Helper::Time::GetNowSecTime();
@@ -295,7 +295,7 @@ namespace Sentry
         {
             asio::io_service &io = this->mSocket->GetThread();
             this->mCloseTimer = std::make_shared<asio::steady_timer>(io, std::chrono::seconds(second));
-            this->mCloseTimer->async_wait(std::bind(&RedisClientContext::CloseFreeClient, this));
+            this->mCloseTimer->async_wait(std::bind(&RedisRpcClient::CloseFreeClient, this));
         }
     }
 }

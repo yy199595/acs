@@ -120,7 +120,7 @@ namespace Sentry
             return nullptr;
         }
         socketProxy->Init(config.Ip, config.Port);
-        SharedRedisClient redisClient = std::make_shared<RedisClientContext>(socketProxy, config, this);
+        SharedRedisClient redisClient = std::make_shared<RedisRpcClient>(socketProxy, config, this);
         this->mRedisClients[config.Name].emplace_back(redisClient);
         return redisClient;
 	}

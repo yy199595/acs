@@ -109,7 +109,7 @@ namespace Sentry
         std::move(this->mResponse);
     }
 
-    void HttpRequestClient::OnReceiveLine(const asio::error_code &code, std::istream & is)
+    void HttpRequestClient::OnReceiveLine(const asio::error_code &code, std::istream & is, size_t)
     {
         if(code)
         {
@@ -134,7 +134,7 @@ namespace Sentry
         }
     }
 
-    void HttpRequestClient::OnReceiveMessage(const asio::error_code &code, std::istream & is)
+    void HttpRequestClient::OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t)
     {
         if(code == asio::error::eof)
         {

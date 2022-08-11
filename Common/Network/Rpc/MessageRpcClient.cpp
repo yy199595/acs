@@ -90,7 +90,7 @@ namespace Sentry
         this->ReceiveMessage(length);
     }
 
-    void MessageRpcClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream)
+    void MessageRpcClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t size)
     {
         if (code)
         {

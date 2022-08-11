@@ -4,7 +4,7 @@
 
 #ifndef SERVER_REDISBASECOMPONENT_H
 #define SERVER_REDISBASECOMPONENT_H
-#include"DB/Redis/RedisClientContext.h"
+#include"DB/Redis/RedisRpcClient.h"
 #include"Component/Rpc/RpcTaskComponent.h"
 
 namespace Sentry

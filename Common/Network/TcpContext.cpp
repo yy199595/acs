@@ -72,7 +72,7 @@ namespace Tcp
 			[this, self](const asio::error_code& code, size_t size)
 			{
                 std::istream is(&this->mRecvBuffer);
-                this->OnReceiveLine(code, is);
+                this->OnReceiveLine(code, is, size);
 			});
 	}
 
@@ -81,8 +81,9 @@ namespace Tcp
         if(this->mRecvBuffer.size() > 0)
         {
             asio::error_code code;
+            size_t size = this->mRecvBuffer.size();
             std::istream is(&this->mRecvBuffer);
-            this->OnReceiveMessage(code, is);
+            this->OnReceiveMessage(code, is, size);
             return;
         }
         asio::error_code code;
@@ -93,7 +94,7 @@ namespace Tcp
         {
             code = asio::error::eof;
             std::istream is(&this->mRecvBuffer);
-            this->OnReceiveMessage(code, is);
+            this->OnReceiveMessage(code, is, 0);
             return;
         }
 		std::shared_ptr<TcpContext> self = this->shared_from_this();
@@ -102,7 +103,7 @@ namespace Tcp
 			[this, self](const asio::error_code& code, size_t size)
 			{
                 std::istream is(&this->mRecvBuffer);
-				this->OnReceiveMessage(code, is);
+				this->OnReceiveMessage(code, is, size);
 			});
 	}
 
@@ -163,14 +164,14 @@ namespace Tcp
 			asio::error_code code =
                     std::make_error_code(std::errc::bad_message);
             std::istream is(&this->mRecvBuffer);
-            this->OnReceiveMessage(code, is);
+            this->OnReceiveMessage(code, is, length);
 			return;
 		}
 		if (this->mRecvBuffer.size() >= length)
 		{
 			asio::error_code code;
             std::istream is(&this->mRecvBuffer);
-            this->OnReceiveMessage(code, is);
+            this->OnReceiveMessage(code, is, length);
 			return;
 		}
 		length -= this->mRecvBuffer.size();
@@ -182,7 +183,7 @@ namespace Tcp
 			[this, self](const asio::error_code& code, size_t size)
 			{
                 std::istream is(&this->mRecvBuffer);
-                this->OnReceiveMessage(code, is);
+                this->OnReceiveMessage(code, is, size);
 			});
 	}
 

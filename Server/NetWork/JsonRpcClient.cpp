@@ -86,7 +86,7 @@ namespace Tcp
         this->SendFromMessageQueue();
     }
 
-    void JsonRpcClient::OnReceiveMessage(const asio::error_code &code, std::istream &readStream)
+    void JsonRpcClient::OnReceiveMessage(const asio::error_code &code, std::istream &readStream, size_t)
     {
         const std::string & address = this->mSocket->GetAddress();
         std::shared_ptr<JsonRequest> jsonRequest(new JsonRequest());

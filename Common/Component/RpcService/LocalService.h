@@ -10,10 +10,10 @@
 
 namespace Sentry
 {
-	class LocalRpcService : public Service
+	class LocalService : public Service
 	{
 	public:
-		LocalRpcService() = default;
+		LocalService() = default;
 	protected:
 		virtual void OnCloseService() { }
 		virtual bool OnStartService(ServiceMethodRegister & methodRegister) = 0;

@@ -5,7 +5,7 @@
 #include"Util/StringHelper.h"
 #include"Async/RpcTask/RpcTaskSource.h"
 #include"Script/Extension/Service/LuaService.h"
-#include"Component/Rpc/ServiceRpcComponent.h"
+#include"Component/Rpc/TcpRpcComponent.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #ifdef __RPC_DEBUG_LOG__
 #include<google/protobuf/util/json_util.h>
@@ -19,7 +19,7 @@ namespace Sentry
 	bool Service::LateAwake()
 	{
 		assert(this->mConfig);
-		this->mRpcComponent = this->GetComponent<ServiceRpcComponent>();
+		this->mRpcComponent = this->GetComponent<TcpRpcComponent>();
 		this->mClientComponent = this->GetComponent<RpcClientComponent>();
 		return this->GetConfig().GetListener("rpc", this->mLocalAddress);
 	}

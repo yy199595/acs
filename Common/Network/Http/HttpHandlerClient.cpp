@@ -3,11 +3,11 @@
 //
 
 #include"HttpHandlerClient.h"
-#include"Component/Http/HttpServiceComponent.h"
+#include"Component/Http/HttpListenComponent.h"
 
 namespace Sentry
 {
-	HttpHandlerClient::HttpHandlerClient(HttpServiceComponent * httpComponent, std::shared_ptr<SocketProxy> socketProxy)
+	HttpHandlerClient::HttpHandlerClient(HttpListenComponent * httpComponent, std::shared_ptr<SocketProxy> socketProxy)
 		: Tcp::TcpContext(socketProxy)
 	{
 		this->mHttpComponent = httpComponent;
@@ -31,6 +31,7 @@ namespace Sentry
     void HttpHandlerClient::StartWriter(HttpStatus code)
     {
         this->mHttpResponse->SetCode(code);
+        CONSOLE_LOG_ERROR("[" << this->mHttpRequest->GetPath() << "] " << HttpStatusToString(code));
 #ifdef ONLY_MAIN_THREAD
         this->Send(this->mHttpResponse);
 #else
@@ -47,11 +48,11 @@ namespace Sentry
 		this->mHttpComponent->OnRequest(httpHandlerClient);
 #else
 		asio::io_service& mainThread = App::Get()->GetThread();
-		mainThread.post(std::bind(&HttpServiceComponent::OnRequest, this->mHttpComponent, httpHandlerClient));
+		mainThread.post(std::bind(&HttpListenComponent::OnRequest, this->mHttpComponent, httpHandlerClient));
 #endif
 	}
 
-    void HttpHandlerClient::OnReceiveLine(const asio::error_code &code, std::istream &is)
+    void HttpHandlerClient::OnReceiveLine(const asio::error_code &code, std::istream &is, size_t)
     {
         if(code == asio::error::eof)
         {
@@ -75,7 +76,7 @@ namespace Sentry
         }
     }
 
-    void HttpHandlerClient::OnReceiveMessage(const asio::error_code &code, std::istream & is)
+    void HttpHandlerClient::OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t)
     {
         if(code == asio::error::eof)
         {
@@ -115,7 +116,7 @@ namespace Sentry
 		this->mHttpComponent->ClosetHttpClient(address);
 #else
 		asio::io_service& mainThread = App::Get()->GetThread();
-		mainThread.post(std::bind(&HttpServiceComponent::ClosetHttpClient, this->mHttpComponent, address));
+		mainThread.post(std::bind(&HttpListenComponent::ClosetHttpClient, this->mHttpComponent, address));
 #endif
 	}
 }

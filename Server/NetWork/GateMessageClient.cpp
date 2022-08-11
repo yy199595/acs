@@ -45,7 +45,7 @@ namespace Sentry
         this->ReceiveMessage(length);
     }
 
-    void GateMessageClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream)
+    void GateMessageClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t size)
     {
         if (code)
         {

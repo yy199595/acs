@@ -4,7 +4,7 @@
 #include"Util/StringHelper.h"
 #include"Util/DirectoryHelper.h"
 #include"Script/ClassProxyHelper.h"
-#include"DB/Redis/RedisClientContext.h"
+#include"DB/Redis/RedisRpcClient.h"
 #include"Script/Extension/Redis/LuaRedis.h"
 #include"Component/Scene/NetThreadComponent.h"
 

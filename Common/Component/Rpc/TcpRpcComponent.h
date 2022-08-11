@@ -16,11 +16,11 @@ namespace Sentry
 		long long Time;
 	};
 #endif
-    class ServiceRpcComponent : public RpcTaskComponent<com::rpc::response>
+    class TcpRpcComponent : public RpcTaskComponent<com::rpc::response>
 	{
 	 public:
-		ServiceRpcComponent() = default;
-		~ServiceRpcComponent() final = default;
+		TcpRpcComponent() = default;
+		~TcpRpcComponent() final = default;
 	 protected:
 		void Awake() final;
 		bool LateAwake() final;

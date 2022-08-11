@@ -42,7 +42,7 @@ namespace Mongo
 		void SendMongoCommand(std::shared_ptr<MongoQueryRequest> request);
 	private:
 		bool StartAuthBySha1();
-		void OnReceiveMessage(const asio::error_code &code, std::istream & is) final;
+		void OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	private:
 		const Mongo::Config & mConfig;

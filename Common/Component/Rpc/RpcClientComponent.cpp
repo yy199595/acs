@@ -3,7 +3,7 @@
 #include"App/App.h"
 #include"Util/StringHelper.h"
 #include"Network/SocketProxy.h"
-#include"Component/Rpc/ServiceRpcComponent.h"
+#include"Component/Rpc/TcpRpcComponent.h"
 #include"Global/ServiceConfig.h"
 #include"Component/Scene/NetThreadComponent.h"
 
@@ -20,7 +20,7 @@ namespace Sentry
 	bool RpcClientComponent::LateAwake()
 	{
         LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<NetThreadComponent>());
-        LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<ServiceRpcComponent>());
+        LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<TcpRpcComponent>());
 		return true;
 	}
 

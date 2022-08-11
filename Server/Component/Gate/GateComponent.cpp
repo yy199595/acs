@@ -6,7 +6,7 @@
 #include"App/App.h"
 #include"NetWork/GateMessageClient.h"
 #include"Global/ServiceConfig.h"
-#include"Component/Rpc/ServiceRpcComponent.h"
+#include"Component/Rpc/TcpRpcComponent.h"
 #include"GateClientComponent.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Component/RpcService/LocalService.h"
@@ -49,7 +49,7 @@ namespace Sentry
 	{
 		this->mTaskComponent = this->GetApp()->GetTaskComponent();
 		this->mTimerComponent = this->GetApp()->GetTimerComponent();
-        this->mServiceRpcComponent = this->GetComponent<ServiceRpcComponent>();
+        this->mServiceRpcComponent = this->GetComponent<TcpRpcComponent>();
 		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
 		return true;
 	}

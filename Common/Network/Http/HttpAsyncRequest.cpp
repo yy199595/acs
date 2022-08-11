@@ -318,7 +318,6 @@ namespace Sentry
 				{
 					size_t length = lineData.size() - pos - 2;
 					std::string key = lineData.substr(0, pos);
-					Helper::String::Tolower(key);
 					this->mHttpData.Add(key, lineData.substr(pos + 1, length));
 				}
 			}

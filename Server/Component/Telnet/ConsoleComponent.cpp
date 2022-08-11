@@ -110,7 +110,7 @@ namespace Sentry
 		this->GetApp()->GetComponents(components);
 		for(const std::string & name : components)
 		{
-			if(this->GetComponent<LocalRpcService>(name) != nullptr)
+			if(this->GetComponent<LocalService>(name) != nullptr)
 			{
 				response.emplace_back(name);
 			}

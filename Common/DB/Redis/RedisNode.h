@@ -6,7 +6,7 @@
 #define SERVER_REDISNODE_H
 #include<vector>
 #include<memory>
-#include"RedisClientContext.h"
+#include"RedisRpcClient.h"
 namespace Sentry
 {
 	class RedisNode
@@ -14,15 +14,15 @@ namespace Sentry
 	public:
 		RedisNode(const RedisConfig * config);
 	public:
-		std::shared_ptr<RedisClientContext> GetFreeClient();
-		void AddClient(std::shared_ptr<RedisClientContext> client);
+		std::shared_ptr<RedisRpcClient> GetFreeClient();
+		void AddClient(std::shared_ptr<RedisRpcClient> client);
 		const RedisConfig * GetConfig() const { return this->mConfig;}
 	public:
 		void CheckAllClient(long long nowTime);
 	private:
 		size_t mIndex;
 		const RedisConfig * mConfig;
-		std::vector<std::shared_ptr<RedisClientContext>> mClients;
+		std::vector<std::shared_ptr<RedisRpcClient>> mClients;
 	};
 }
 

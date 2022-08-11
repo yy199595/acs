@@ -50,7 +50,7 @@ namespace Sentry
 		RpcServiceConfig * mConfig;
         AddressProxy mAddressProxy;
         std::vector<std::string> mAllAddress;
-		class ServiceRpcComponent* mRpcComponent;
+		class TcpRpcComponent* mRpcComponent;
 		class RpcClientComponent* mClientComponent;
 	};
 }

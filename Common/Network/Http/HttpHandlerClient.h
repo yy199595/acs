@@ -11,11 +11,11 @@
 #include"Network/TcpContext.h"
 namespace Sentry
 {
-	class HttpServiceComponent;
+	class HttpListenComponent;
 	class HttpHandlerClient final : public Tcp::TcpContext
 	{
 	 public:
-		HttpHandlerClient(HttpServiceComponent * httpComponent, std::shared_ptr<SocketProxy> socketProxy);
+		HttpHandlerClient(HttpListenComponent * httpComponent, std::shared_ptr<SocketProxy> socketProxy);
 	 public:
 		void StartReceive();
         void StartWriter(HttpStatus code);
@@ -24,11 +24,11 @@ namespace Sentry
 	 private:
 		void OnComplete();
 		void ClosetClient();
-        void OnReceiveLine(const asio::error_code &code, std::istream &is) final;
-        void OnReceiveMessage(const asio::error_code &code, std::istream & is) final;
+        void OnReceiveLine(const asio::error_code &code, std::istream &is, size_t) final;
+        void OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t) final;
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
 	 private:
-        HttpServiceComponent * mHttpComponent;
+        HttpListenComponent * mHttpComponent;
         std::shared_ptr<HttpHandlerRequest> mHttpRequest;
 		std::shared_ptr<HttpHandlerResponse> mHttpResponse;
 	};

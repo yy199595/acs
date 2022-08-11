@@ -13,8 +13,8 @@
 
 namespace Sentry
 {
-	XCode LocalRpcService::Invoke(const std::string& func, std::shared_ptr<com::rpc::request> request,
-	    std::shared_ptr<com::rpc::response> response)
+	XCode LocalService::Invoke(const std::string& func, std::shared_ptr<com::rpc::request> request,
+                               std::shared_ptr<com::rpc::response> response)
 	{
 		if (!this->IsStartService())
 		{
@@ -31,7 +31,7 @@ namespace Sentry
 		return serviceMethod->Invoke(*request, *response);
 	}
 
-	bool LocalRpcService::StartNewService()
+	bool LocalService::StartNewService()
 	{
 		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
 		if (!this->OnStartService(*this->mMethodRegister))
@@ -74,7 +74,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool LocalRpcService::CloseService()
+	bool LocalService::CloseService()
 	{
 		if(this->IsStartService())
 		{

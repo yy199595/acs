@@ -2,14 +2,14 @@
 // Created by zmhy0073 on 2022/6/21.
 //
 
-#include"HttpServiceComponent.h"
+#include"HttpWebComponent.h"
 #include"Util/FileHelper.h"
 #include"Network/Http/HttpHandlerClient.h"
 #include"Component/Scene/NetThreadComponent.h"
 #include"Component/HttpService/LocalHttpService.h"
 namespace Sentry
 {
-    bool HttpServiceComponent::LateAwake()
+    bool HttpWebComponent::LateAwake()
     {
         auto iter = this->GetApp()->ComponentBegin();
         for(; iter != this->GetApp()->ComponentEnd(); iter++)
@@ -28,61 +28,17 @@ namespace Sentry
         }
         this->mTaskComponent = this->GetApp()->GetTaskComponent();
         this->mNetComponent = this->GetComponent<NetThreadComponent>();
-        return true;
+        return HttpListenComponent::LateAwake();
     }
 
-    bool HttpServiceComponent::OnListen(std::shared_ptr<SocketProxy> socket)
-    {
-        static int count = 0;
-#ifdef __DEBUG__
-        //LOG_DEBUG("handler http socket count = " << count++);
-#endif
-        assert(this->GetApp()->IsMainThread());
-        if(this->mHttpClients.size() >= 1000)
-        {
-            return false;
-        }
 
-        std::shared_ptr<HttpHandlerClient> handlerClient;
-        if(!this->mClientPools.empty())
-        {
-            handlerClient = this->mClientPools.front();
-            assert(handlerClient->Reset(socket));
-            this->mClientPools.pop();
-        }
-        else
-        {
-            handlerClient = std::make_shared<HttpHandlerClient>(this, socket);
-        }
-
-        handlerClient->StartReceive();
-        const std::string &address = socket->GetAddress();
-        this->mHttpClients.emplace(address, handlerClient);
-        return true;
-    }
-
-    const HttpInterfaceConfig *HttpServiceComponent::GetConfig(const std::string &path)
+    const HttpInterfaceConfig *HttpWebComponent::GetConfig(const std::string &path)
     {
         auto iter = this->mHttpConfigs.find(path);
         return iter != this->mHttpConfigs.end() ? iter->second : nullptr;
     }
 
-    void HttpServiceComponent::ClosetHttpClient(const std::string &address)
-    {
-        assert(this->GetApp()->IsMainThread());
-        auto iter = this->mHttpClients.find(address);
-        if(iter != this->mHttpClients.end())
-        {
-            std::shared_ptr<HttpHandlerClient> handlerClient = iter->second;
-            if(this->mClientPools.size() <= 100)
-            {
-                this->mClientPools.push(handlerClient);
-            }
-            this->mHttpClients.erase(iter);
-        }
-    }
-
-    void HttpServiceComponent::OnRequest(std::shared_ptr<HttpHandlerClient> httpClient)
+    void HttpWebComponent::OnRequest(std::shared_ptr<HttpHandlerClient> httpClient)
     {
         assert(this->GetApp()->IsMainThread());
         std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();

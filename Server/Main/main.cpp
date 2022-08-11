@@ -10,7 +10,7 @@
 #include"Component/Http/HttpComponent.h"
 #include"Component/Gate/GateService.h"
 #include"Component/Telnet/ConsoleComponent.h"
-#include"Component/Rpc/ServiceRpcComponent.h"
+#include"Component/Rpc/TcpRpcComponent.h"
 #include"Component/Scene/NetThreadComponent.h"
 #include"Component/Rpc/RpcClientComponent.h"
 #include"Component/Logic/ServiceMgrComponent.h"
@@ -21,7 +21,7 @@
 #include"Component/Scene/MessageComponent.h"
 #include"Component/Logic/HttpSourceService.h"
 #include"Component/RpcService/LuaService.h"
-#include"Component/Http/HttpServiceComponent.h"
+#include"Component/Http/HttpWebComponent.h"
 #include"Component/Mongo/MongoService.h"
 #include"Component/HttpService/LocalLuaHttpService.h"
 #include"Component/Mongo/MongoRpcComponent.h"
@@ -34,11 +34,13 @@
 
 #include"Component/Gate/JsonClientComponent.h"
 #include"Component/Redis/RedisSubComponent.h"
+#include"Component/Http/HttpWebComponent.h"
+#include"Component/Http/HttpRpcComponent.h"
 using namespace Sentry;
 void RegisterComponent()
 {
 // rpc
-    ComponentFactory::Add<ServiceRpcComponent>("ServiceRpcComponent");
+    ComponentFactory::Add<TcpRpcComponent>("TcpRpcComponent");
 	ComponentFactory::Add<ServiceMgrComponent>("ServiceMgrComponent");
 // common
     ComponentFactory::Add<TaskComponent>("TaskComponent");
@@ -68,7 +70,8 @@ void RegisterComponent()
 
 //http
     ComponentFactory::Add<HttpComponent>("HttpComponent");
-    ComponentFactory::Add<HttpServiceComponent>("HttpServiceComponent");
+    ComponentFactory::Add<HttpWebComponent>("HttpWebComponent");
+    ComponentFactory::Add<HttpRpcComponent>("HttpRpcComponent");
 
 // lua
     ComponentFactory::Add<LuaScriptComponent>("LuaScriptComponent");

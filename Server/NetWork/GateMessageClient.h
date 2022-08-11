@@ -26,7 +26,7 @@ namespace Sentry
 	 protected:
 		void OnConnect(const asio::error_code &error) {}
         void OnReceiveLength(const asio::error_code &code, int length) final;
-        void OnReceiveMessage(const asio::error_code &code, std::istream & readStream) final;
+        void OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	private:
 		void CloseSocket(XCode code);

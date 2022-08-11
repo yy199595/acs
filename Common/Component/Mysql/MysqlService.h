@@ -6,7 +6,7 @@
 
 namespace Sentry
 {
-	class MysqlService : public LocalRpcService, public IStart
+	class MysqlService : public LocalService, public IStart
 	{
 	 public:
 		MysqlService() = default;

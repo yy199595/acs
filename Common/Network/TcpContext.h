@@ -89,9 +89,9 @@ namespace Tcp
         std::shared_ptr<ProtoMessage> PopMessage();
 	 protected:
         virtual void OnReceiveLength(const asio::error_code & code, int length) { }
-        virtual void OnReceiveLine(const asio::error_code & code, std::istream & readStream) {}
-        virtual void OnReceiveMessage(const asio::error_code & code, std::istream & readStream) {}
         virtual void OnConnect(const asio::error_code & error, int count) { throw std::logic_error("");}
+        virtual void OnReceiveLine(const asio::error_code & code, std::istream & readStream, size_t size) {}
+        virtual void OnReceiveMessage(const asio::error_code & code, std::istream & readStream, size_t size) {}
 		virtual void OnSendMessage(const asio::error_code & code, std::shared_ptr<ProtoMessage> message) {  };
 	 protected:
         asio::streambuf mSendBuffer;

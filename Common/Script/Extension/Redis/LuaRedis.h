@@ -8,7 +8,7 @@
 namespace Sentry
 {
 	class RedisRequest;
-	class RedisClientContext;
+	class RedisRpcClient;
 	class MainRedisComponent;
 }
 

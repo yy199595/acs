@@ -6,7 +6,7 @@
 #include"App/App.h"
 #include"NetWork/GateMessageClient.h"
 #include"GateComponent.h"
-#include"Component/Rpc/ServiceRpcComponent.h"
+#include"Component/Rpc/TcpRpcComponent.h"
 #include"Component/Scene/NetThreadComponent.h"
 #ifdef __DEBUG__
 #include"Util/StringHelper.h"

@@ -1,4 +1,4 @@
-﻿#include"ServiceRpcComponent.h"
+﻿#include"TcpRpcComponent.h"
 #include"Component/Coroutine/TaskComponent.h"
 #include"Util/StringHelper.h"
 #include"App/App.h"
@@ -9,14 +9,14 @@
 #include"Component/RpcService/LocalService.h"
 namespace Sentry
 {
-	void ServiceRpcComponent::Awake()
+	void TcpRpcComponent::Awake()
 	{
 		this->mTaskComponent = nullptr;
 		this->mTimerComponent = nullptr;
 		this->mRpcClientComponent = nullptr;
 	}
 
-	bool ServiceRpcComponent::LateAwake()
+	bool TcpRpcComponent::LateAwake()
 	{
 		this->mTaskComponent = App::Get()->GetTaskComponent();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
@@ -25,7 +25,7 @@ namespace Sentry
 		return true;
 	}
 
-	XCode ServiceRpcComponent::OnRequest(std::shared_ptr<com::rpc::request> request)
+	XCode TcpRpcComponent::OnRequest(std::shared_ptr<com::rpc::request> request)
 	{
 		if(!RpcServiceConfig::ParseFunName(request->func(), this->mTempService, this->mTempMethod))
 		{
