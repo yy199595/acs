@@ -37,7 +37,7 @@ function Client.StartLogic()
     --    Log.Error("user auth failure")
     --    return
     --end
-    for i = 1, 5 do
+    for i = 1, 20 do
         --coroutine.start(LoopCall)
         coroutine.start(LoopLogin)
         coroutine.start(LoopRegister)
