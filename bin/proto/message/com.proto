@@ -62,21 +62,29 @@ message type
 
 message rpc
 {
+    enum msg_type
+    {
+        none = 0;
+        json = 1;
+        proto = 2;
+    }
      message request
      {
           int64 user_id = 1;
           int64 rpc_id = 2;
           string func = 3;
           string address = 4;
-          google.protobuf.Any Data = 5;
+          bytes json = 6;
+          msg_type type = 7;
+          google.protobuf.Any data = 5;
      }
      message response
      {
           int32 code = 1;
           int64 rpc_id = 2;
-          int64 user_id = 3;
-          string error_str = 4;
-          google.protobuf.Any Data = 5;
+          string error_str = 3;
+          bytes json = 6;
+          google.protobuf.Any data = 5;
      }
      message auth
      {

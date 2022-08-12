@@ -1,18 +1,18 @@
-#include"EntityMgrComponent.h"
+#include"UnitMgrComponent.h"
 #include"App/App.h"
-#include"Entity/Entity.h"
+#include"Entity/Unit.h"
 namespace Sentry
 {
-	bool EntityMgrComponent::LateAwake()
+	bool UnitMgrComponent::LateAwake()
 	{
 		this->mCorComponent = App::Get()->GetTaskComponent();
 		return true;
 	}
 
-	bool EntityMgrComponent::Add(std::shared_ptr<Entity> gameObject)
+	bool UnitMgrComponent::Add(std::shared_ptr<Unit> gameObject)
 	{
 		LOG_CHECK_RET_FALSE(gameObject);
-		long long id = gameObject->GetId();
+		long long id = gameObject->GetUnitId();
 		auto iter = this->mGameObjects.find(id);
 		LOG_CHECK_RET_FALSE(iter == this->mGameObjects.end());
 		std::vector<std::string> components;
@@ -27,23 +27,23 @@ namespace Sentry
 			}
 		}
 		this->mGameObjects.emplace(id, gameObject);
-		this->mCorComponent->Start(&EntityMgrComponent::StartComponents, this, id);
+		this->mCorComponent->Start(&UnitMgrComponent::StartComponents, this, id);
 		return true;
 	}
 
-	bool EntityMgrComponent::Del(std::shared_ptr<Entity> gameObject)
+	bool UnitMgrComponent::Del(std::shared_ptr<Unit> gameObject)
 	{
-		long long id = gameObject->GetId();
+		long long id = gameObject->GetUnitId();
 		return this->Del(id);
 	}
-	bool EntityMgrComponent::Del(long long id)
+	bool UnitMgrComponent::Del(long long id)
 	{
 		auto iter = this->mGameObjects.find(id);
 		if (iter == this->mGameObjects.end())
 		{
 			return false;
 		}
-		std::shared_ptr<Entity> gameObject = iter->second;
+		std::shared_ptr<Unit> gameObject = iter->second;
 		if (gameObject != nullptr)
 		{
 			gameObject->OnDestory();
@@ -52,7 +52,7 @@ namespace Sentry
 		return true;
 	}
 
-	std::shared_ptr<Entity> EntityMgrComponent::Find(long long id)
+	std::shared_ptr<Unit> UnitMgrComponent::Find(long long id)
 	{
 		auto iter = this->mGameObjects.find(id);
 		if (iter == this->mGameObjects.end())
@@ -70,7 +70,7 @@ namespace Sentry
 		return gameObject;
 	}
 
-	void EntityMgrComponent::GetGameObjects(std::vector<std::shared_ptr<Entity>>& gameObjects)
+	void UnitMgrComponent::GetGameObjects(std::vector<std::shared_ptr<Unit>>& gameObjects)
 	{
 		auto iter = this->mGameObjects.begin();
 		for (; iter != this->mGameObjects.end(); iter++)
@@ -86,7 +86,7 @@ namespace Sentry
 		}
 	}
 
-	void EntityMgrComponent::StartComponents(long long objectId)
+	void UnitMgrComponent::StartComponents(long long objectId)
 	{
 		auto gameObject = this->Find(objectId);
 		LOG_CHECK_RET(gameObject);

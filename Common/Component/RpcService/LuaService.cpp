@@ -54,8 +54,6 @@ namespace Sentry
 			return XCode::CallServiceNotFound;
 		}
 		response->set_rpc_id(request->rpc_id());
-		response->set_user_id(request->user_id());
-
 		std::shared_ptr<ServiceMethod> serviceMethod = this->mMethodRegister->GetMethod(name);
 		if (serviceMethod == nullptr)
 		{

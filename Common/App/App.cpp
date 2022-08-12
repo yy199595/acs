@@ -15,8 +15,8 @@ namespace Sentry
 	std::shared_ptr<App> App::mApp = nullptr;
 
 	App::App(ServerConfig* config)
-			: Entity(0),
-			  mStartTime(Helper::Time::GetNowMilTime()), mConfig(config)
+			: Unit(0),
+              mStartTime(Helper::Time::GetNowMilTime()), mConfig(config)
 	{
         this->mTickCount = 0;
 		this->mLogicRunCount = 0;

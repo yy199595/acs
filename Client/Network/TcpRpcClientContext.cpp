@@ -53,7 +53,7 @@ namespace Client
         this->ReceiveMessage(length);
     }
 
-    void TcpRpcClientContext::OnReceiveMessage(const asio::error_code &code, std::istream & readStream)
+    void TcpRpcClientContext::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t)
     {
         if (code)
         {

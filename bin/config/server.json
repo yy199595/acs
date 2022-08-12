@@ -101,7 +101,7 @@
         "GateComponent",
         "MongoRpcComponent",
         "GateClientComponent",
-        "EntityMgrComponent",
+        "UnitMgrComponent",
         "GateAgentComponent",
         "UserSyncComponent",
         "ServiceMgrComponent",

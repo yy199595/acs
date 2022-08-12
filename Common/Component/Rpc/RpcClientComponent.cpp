@@ -66,6 +66,7 @@ namespace Sentry
 	void RpcClientComponent::OnRequest(std::shared_ptr<com::rpc::request> request)
 	{
         assert(this->GetApp()->IsMainThread());
+        request->set_type(com::rpc_msg_type_proto);
         const std::string & address = request->address();
 		XCode code = this->mRpcComponent->OnRequest(request);
 		if (code != XCode::Successful)
@@ -74,7 +75,6 @@ namespace Sentry
 
 			response->set_code((int)code);
 			response->set_rpc_id(request->rpc_id());
-			response->set_user_id(request->user_id());
 			if (!this->Send(address, response))
 			{
 

@@ -6,7 +6,7 @@
 #include"Network/Listener/TcpServerComponent.h"
 #include"Global/ServiceConfig.h"
 #include"Component/Redis/MainRedisComponent.h"
-#include"Component/Scene/EntityMgrComponent.h"
+#include"Component/Scene/UnitMgrComponent.h"
 #include"Component/Http/HttpComponent.h"
 #include"Component/Gate/GateService.h"
 #include"Component/Telnet/ConsoleComponent.h"
@@ -49,7 +49,7 @@ void RegisterComponent()
 	ComponentFactory::Add<DataMgrComponent>("DataMgrComponent");
 	ComponentFactory::Add<UserSyncComponent>("UserSyncComponent");
 	ComponentFactory::Add<OperatorComponent>("OperatorComponent");
-    ComponentFactory::Add<EntityMgrComponent>("EntityMgrComponent");
+    ComponentFactory::Add<UnitMgrComponent>("UnitMgrComponent");
     ComponentFactory::Add<NetThreadComponent>("NetThreadComponent");
     ComponentFactory::Add<MessageComponent>("MessageComponent");
 

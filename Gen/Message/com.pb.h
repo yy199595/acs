@@ -33,6 +33,7 @@
 #include <google/protobuf/map.h>  // IWYU pragma: export
 #include <google/protobuf/map_entry.h>
 #include <google/protobuf/map_field_inl.h>
+#include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 #include <google/protobuf/any.pb.h>
 // @@protoc_insertion_point(includes)
@@ -140,6 +141,28 @@ template<> ::com::type_string* Arena::CreateMaybeMessage<::com::type_string>(Are
 }  // namespace google
 namespace com {
 
+enum rpc_msg_type {
+  rpc_msg_type_none = 0,
+  rpc_msg_type_json = 1,
+  rpc_msg_type_proto = 2,
+  rpc_msg_type_rpc_msg_type_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  rpc_msg_type_rpc_msg_type_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+};
+bool rpc_msg_type_IsValid(int value);
+const rpc_msg_type rpc_msg_type_msg_type_MIN = rpc_msg_type_none;
+const rpc_msg_type rpc_msg_type_msg_type_MAX = rpc_msg_type_proto;
+const int rpc_msg_type_msg_type_ARRAYSIZE = rpc_msg_type_msg_type_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* rpc_msg_type_descriptor();
+inline const ::std::string& rpc_msg_type_Name(rpc_msg_type value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    rpc_msg_type_descriptor(), value);
+}
+inline bool rpc_msg_type_Parse(
+    const ::std::string& name, rpc_msg_type* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<rpc_msg_type>(
+    rpc_msg_type_descriptor(), name, value);
+}
 // ===================================================================
 
 class array_int32 :
@@ -1780,7 +1803,21 @@ class rpc_request :
   ::std::string* release_address();
   void set_allocated_address(::std::string* address);
 
-  // .google.protobuf.Any Data = 5;
+  // bytes json = 6;
+  void clear_json();
+  static const int kJsonFieldNumber = 6;
+  const ::std::string& json() const;
+  void set_json(const ::std::string& value);
+  #if LANG_CXX11
+  void set_json(::std::string&& value);
+  #endif
+  void set_json(const char* value);
+  void set_json(const void* value, size_t size);
+  ::std::string* mutable_json();
+  ::std::string* release_json();
+  void set_allocated_json(::std::string* json);
+
+  // .google.protobuf.Any data = 5;
   bool has_data() const;
   void clear_data();
   static const int kDataFieldNumber = 5;
@@ -1801,6 +1838,12 @@ class rpc_request :
   ::google::protobuf::int64 rpc_id() const;
   void set_rpc_id(::google::protobuf::int64 value);
 
+  // .com.rpc.msg_type type = 7;
+  void clear_type();
+  static const int kTypeFieldNumber = 7;
+  ::com::rpc_msg_type type() const;
+  void set_type(::com::rpc_msg_type value);
+
   // @@protoc_insertion_point(class_scope:com.rpc.request)
  private:
   class HasBitSetters;
@@ -1808,9 +1851,11 @@ class rpc_request :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr func_;
   ::google::protobuf::internal::ArenaStringPtr address_;
+  ::google::protobuf::internal::ArenaStringPtr json_;
   ::google::protobuf::Any* data_;
   ::google::protobuf::int64 user_id_;
   ::google::protobuf::int64 rpc_id_;
+  int type_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_com_2eproto;
 };
@@ -1911,9 +1956,9 @@ class rpc_response :
 
   // accessors -------------------------------------------------------
 
-  // string error_str = 4;
+  // string error_str = 3;
   void clear_error_str();
-  static const int kErrorStrFieldNumber = 4;
+  static const int kErrorStrFieldNumber = 3;
   const ::std::string& error_str() const;
   void set_error_str(const ::std::string& value);
   #if LANG_CXX11
@@ -1925,7 +1970,21 @@ class rpc_response :
   ::std::string* release_error_str();
   void set_allocated_error_str(::std::string* error_str);
 
-  // .google.protobuf.Any Data = 5;
+  // bytes json = 6;
+  void clear_json();
+  static const int kJsonFieldNumber = 6;
+  const ::std::string& json() const;
+  void set_json(const ::std::string& value);
+  #if LANG_CXX11
+  void set_json(::std::string&& value);
+  #endif
+  void set_json(const char* value);
+  void set_json(const void* value, size_t size);
+  ::std::string* mutable_json();
+  ::std::string* release_json();
+  void set_allocated_json(::std::string* json);
+
+  // .google.protobuf.Any data = 5;
   bool has_data() const;
   void clear_data();
   static const int kDataFieldNumber = 5;
@@ -1940,12 +1999,6 @@ class rpc_response :
   ::google::protobuf::int64 rpc_id() const;
   void set_rpc_id(::google::protobuf::int64 value);
 
-  // int64 user_id = 3;
-  void clear_user_id();
-  static const int kUserIdFieldNumber = 3;
-  ::google::protobuf::int64 user_id() const;
-  void set_user_id(::google::protobuf::int64 value);
-
   // int32 code = 1;
   void clear_code();
   static const int kCodeFieldNumber = 1;
@@ -1958,9 +2011,9 @@ class rpc_response :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr error_str_;
+  ::google::protobuf::internal::ArenaStringPtr json_;
   ::google::protobuf::Any* data_;
   ::google::protobuf::int64 rpc_id_;
-  ::google::protobuf::int64 user_id_;
   ::google::protobuf::int32 code_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_com_2eproto;
@@ -2183,6 +2236,34 @@ class rpc :
   typedef rpc_request request;
   typedef rpc_response response;
   typedef rpc_auth auth;
+
+  typedef rpc_msg_type msg_type;
+  static const msg_type none =
+    rpc_msg_type_none;
+  static const msg_type json =
+    rpc_msg_type_json;
+  static const msg_type proto =
+    rpc_msg_type_proto;
+  static inline bool msg_type_IsValid(int value) {
+    return rpc_msg_type_IsValid(value);
+  }
+  static const msg_type msg_type_MIN =
+    rpc_msg_type_msg_type_MIN;
+  static const msg_type msg_type_MAX =
+    rpc_msg_type_msg_type_MAX;
+  static const int msg_type_ARRAYSIZE =
+    rpc_msg_type_msg_type_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  msg_type_descriptor() {
+    return rpc_msg_type_descriptor();
+  }
+  static inline const ::std::string& msg_type_Name(msg_type value) {
+    return rpc_msg_type_Name(value);
+  }
+  static inline bool msg_type_Parse(const ::std::string& name,
+      msg_type* value) {
+    return rpc_msg_type_Parse(name, value);
+  }
 
   // accessors -------------------------------------------------------
 
@@ -3069,18 +3150,85 @@ inline void rpc_request::set_allocated_address(::std::string* address) {
   // @@protoc_insertion_point(field_set_allocated:com.rpc.request.address)
 }
 
-// .google.protobuf.Any Data = 5;
+// bytes json = 6;
+inline void rpc_request::clear_json() {
+  json_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& rpc_request::json() const {
+  // @@protoc_insertion_point(field_get:com.rpc.request.json)
+  return json_.GetNoArena();
+}
+inline void rpc_request::set_json(const ::std::string& value) {
+  
+  json_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:com.rpc.request.json)
+}
+#if LANG_CXX11
+inline void rpc_request::set_json(::std::string&& value) {
+  
+  json_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:com.rpc.request.json)
+}
+#endif
+inline void rpc_request::set_json(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  json_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:com.rpc.request.json)
+}
+inline void rpc_request::set_json(const void* value, size_t size) {
+  
+  json_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:com.rpc.request.json)
+}
+inline ::std::string* rpc_request::mutable_json() {
+  
+  // @@protoc_insertion_point(field_mutable:com.rpc.request.json)
+  return json_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* rpc_request::release_json() {
+  // @@protoc_insertion_point(field_release:com.rpc.request.json)
+  
+  return json_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void rpc_request::set_allocated_json(::std::string* json) {
+  if (json != nullptr) {
+    
+  } else {
+    
+  }
+  json_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), json);
+  // @@protoc_insertion_point(field_set_allocated:com.rpc.request.json)
+}
+
+// .com.rpc.msg_type type = 7;
+inline void rpc_request::clear_type() {
+  type_ = 0;
+}
+inline ::com::rpc_msg_type rpc_request::type() const {
+  // @@protoc_insertion_point(field_get:com.rpc.request.type)
+  return static_cast< ::com::rpc_msg_type >(type_);
+}
+inline void rpc_request::set_type(::com::rpc_msg_type value) {
+  
+  type_ = value;
+  // @@protoc_insertion_point(field_set:com.rpc.request.type)
+}
+
+// .google.protobuf.Any data = 5;
 inline bool rpc_request::has_data() const {
   return this != internal_default_instance() && data_ != nullptr;
 }
 inline const ::google::protobuf::Any& rpc_request::data() const {
   const ::google::protobuf::Any* p = data_;
-  // @@protoc_insertion_point(field_get:com.rpc.request.Data)
+  // @@protoc_insertion_point(field_get:com.rpc.request.data)
   return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Any*>(
       &::google::protobuf::_Any_default_instance_);
 }
 inline ::google::protobuf::Any* rpc_request::release_data() {
-  // @@protoc_insertion_point(field_release:com.rpc.request.Data)
+  // @@protoc_insertion_point(field_release:com.rpc.request.data)
   
   ::google::protobuf::Any* temp = data_;
   data_ = nullptr;
@@ -3092,7 +3240,7 @@ inline ::google::protobuf::Any* rpc_request::mutable_data() {
     auto* p = CreateMaybeMessage<::google::protobuf::Any>(GetArenaNoVirtual());
     data_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:com.rpc.request.Data)
+  // @@protoc_insertion_point(field_mutable:com.rpc.request.data)
   return data_;
 }
 inline void rpc_request::set_allocated_data(::google::protobuf::Any* data) {
@@ -3111,7 +3259,7 @@ inline void rpc_request::set_allocated_data(::google::protobuf::Any* data) {
     
   }
   data_ = data;
-  // @@protoc_insertion_point(field_set_allocated:com.rpc.request.Data)
+  // @@protoc_insertion_point(field_set_allocated:com.rpc.request.data)
 }
 
 // -------------------------------------------------------------------
@@ -3146,21 +3294,7 @@ inline void rpc_response::set_rpc_id(::google::protobuf::int64 value) {
   // @@protoc_insertion_point(field_set:com.rpc.response.rpc_id)
 }
 
-// int64 user_id = 3;
-inline void rpc_response::clear_user_id() {
-  user_id_ = PROTOBUF_LONGLONG(0);
-}
-inline ::google::protobuf::int64 rpc_response::user_id() const {
-  // @@protoc_insertion_point(field_get:com.rpc.response.user_id)
-  return user_id_;
-}
-inline void rpc_response::set_user_id(::google::protobuf::int64 value) {
-  
-  user_id_ = value;
-  // @@protoc_insertion_point(field_set:com.rpc.response.user_id)
-}
-
-// string error_str = 4;
+// string error_str = 3;
 inline void rpc_response::clear_error_str() {
   error_str_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -3213,18 +3347,71 @@ inline void rpc_response::set_allocated_error_str(::std::string* error_str) {
   // @@protoc_insertion_point(field_set_allocated:com.rpc.response.error_str)
 }
 
-// .google.protobuf.Any Data = 5;
+// bytes json = 6;
+inline void rpc_response::clear_json() {
+  json_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& rpc_response::json() const {
+  // @@protoc_insertion_point(field_get:com.rpc.response.json)
+  return json_.GetNoArena();
+}
+inline void rpc_response::set_json(const ::std::string& value) {
+  
+  json_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:com.rpc.response.json)
+}
+#if LANG_CXX11
+inline void rpc_response::set_json(::std::string&& value) {
+  
+  json_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:com.rpc.response.json)
+}
+#endif
+inline void rpc_response::set_json(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  json_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:com.rpc.response.json)
+}
+inline void rpc_response::set_json(const void* value, size_t size) {
+  
+  json_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:com.rpc.response.json)
+}
+inline ::std::string* rpc_response::mutable_json() {
+  
+  // @@protoc_insertion_point(field_mutable:com.rpc.response.json)
+  return json_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* rpc_response::release_json() {
+  // @@protoc_insertion_point(field_release:com.rpc.response.json)
+  
+  return json_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void rpc_response::set_allocated_json(::std::string* json) {
+  if (json != nullptr) {
+    
+  } else {
+    
+  }
+  json_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), json);
+  // @@protoc_insertion_point(field_set_allocated:com.rpc.response.json)
+}
+
+// .google.protobuf.Any data = 5;
 inline bool rpc_response::has_data() const {
   return this != internal_default_instance() && data_ != nullptr;
 }
 inline const ::google::protobuf::Any& rpc_response::data() const {
   const ::google::protobuf::Any* p = data_;
-  // @@protoc_insertion_point(field_get:com.rpc.response.Data)
+  // @@protoc_insertion_point(field_get:com.rpc.response.data)
   return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Any*>(
       &::google::protobuf::_Any_default_instance_);
 }
 inline ::google::protobuf::Any* rpc_response::release_data() {
-  // @@protoc_insertion_point(field_release:com.rpc.response.Data)
+  // @@protoc_insertion_point(field_release:com.rpc.response.data)
   
   ::google::protobuf::Any* temp = data_;
   data_ = nullptr;
@@ -3236,7 +3423,7 @@ inline ::google::protobuf::Any* rpc_response::mutable_data() {
     auto* p = CreateMaybeMessage<::google::protobuf::Any>(GetArenaNoVirtual());
     data_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:com.rpc.response.Data)
+  // @@protoc_insertion_point(field_mutable:com.rpc.response.data)
   return data_;
 }
 inline void rpc_response::set_allocated_data(::google::protobuf::Any* data) {
@@ -3255,7 +3442,7 @@ inline void rpc_response::set_allocated_data(::google::protobuf::Any* data) {
     
   }
   data_ = data;
-  // @@protoc_insertion_point(field_set_allocated:com.rpc.response.Data)
+  // @@protoc_insertion_point(field_set_allocated:com.rpc.response.data)
 }
 
 // -------------------------------------------------------------------
@@ -3657,6 +3844,18 @@ http_data::mutable_head() {
 // @@protoc_insertion_point(namespace_scope)
 
 }  // namespace com
+
+namespace google {
+namespace protobuf {
+
+template <> struct is_proto_enum< ::com::rpc_msg_type> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::com::rpc_msg_type>() {
+  return ::com::rpc_msg_type_descriptor();
+}
+
+}  // namespace protobuf
+}  // namespace google
 
 // @@protoc_insertion_point(global_scope)
 

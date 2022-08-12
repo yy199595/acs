@@ -31,7 +31,7 @@ namespace Sentry
 
 namespace Sentry
 {
-	class Entity;
+	class Unit;
 	class ServerConfig;
 	class Component : public Object
 	{
@@ -41,14 +41,14 @@ namespace Sentry
 		Component(const Component &) = delete;
 
 	public:
-		friend class Entity;
+		friend class Unit;
 		friend class ComponentFactory;
 		inline long long GetEntityId() const
 		{
 			return this->mEntityId;
 		}
 
-		inline std::shared_ptr<Entity> GetEntity()
+		inline std::shared_ptr<Unit> GetUnit()
 		{
 			return this->mEntity;
 		}
@@ -99,7 +99,7 @@ namespace Sentry
 		std::string mName;
 		long long mEntityId;
 		std::shared_ptr<App> mApp;
-		std::shared_ptr<Entity> mEntity;
+		std::shared_ptr<Unit> mEntity;
 	};
 	template<typename T>
 	inline T* Component::GetComponent()

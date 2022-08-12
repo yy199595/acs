@@ -5,12 +5,12 @@ namespace Sentry
 {
 	class Component;
     typedef std::unordered_map<std::string, Component*>::iterator ComponentIter;
-    class Entity : public Object, public std::enable_shared_from_this<Entity>
+    class Unit : public Object, public std::enable_shared_from_this<Unit>
 	{
 	 public:
-		explicit Entity(long long id);
-		Entity(const Entity &) = delete;
-		virtual ~Entity() override = default;
+		explicit Unit(long long id);
+		Unit(const Unit &) = delete;
+		virtual ~Unit() override = default;
 	 public:
 		template<typename T>
 		inline bool AddComponent();
@@ -47,17 +47,17 @@ namespace Sentry
 		virtual void OnAddComponent(Component * component) {}
 		virtual void OnDelComponent(Component * component) {}
 	 public:
-		inline long long GetId() const
+		inline long long GetUnitId() const
 		{
-			return this->mGameObjectId;
+			return this->mUnitId;
 		}
 	 private:
-		long long mGameObjectId;
+		long long mUnitId;
 		std::vector<std::string> mSortComponents;
 		std::unordered_map<std::string, Component*> mComponentMap;
 	};
 	template<typename T>
-	inline T* Entity::GetComponent() const
+	inline T* Unit::GetComponent() const
 	{
 		Type* type = ComponentFactory::GetType<T>();
 		if (type == nullptr)
@@ -73,7 +73,7 @@ namespace Sentry
 	}
 
 	template<typename T>
-	T* Entity::GetComponent(const std::string& name) const
+	T* Unit::GetComponent(const std::string& name) const
 	{
 		auto iter = this->mComponentMap.find(name);
 		if (iter != this->mComponentMap.end())
@@ -85,7 +85,7 @@ namespace Sentry
 	}
 
 	template<typename T>
-	inline bool Entity::AddComponent()
+	inline bool Unit::AddComponent()
 	{
 		if (this->GetComponent<T>() == nullptr)
 		{
@@ -96,7 +96,7 @@ namespace Sentry
 	}
 
 	template<typename T>
-	inline bool Entity::RemoveComponent()
+	inline bool Unit::RemoveComponent()
 	{
 		Type* type = ComponentFactory::GetType<T>();
 		if (type == nullptr)
@@ -107,7 +107,7 @@ namespace Sentry
 	}
 
 	template<typename T>
-	inline T* Entity::GetOrAddComponent()
+	inline T* Unit::GetOrAddComponent()
 	{
 		T* component = this->GetComponent<T>();
 		if (component == nullptr)
@@ -119,7 +119,7 @@ namespace Sentry
 	}
 
 	template<typename T>
-	inline std::shared_ptr<T> Entity::Cast()
+	inline std::shared_ptr<T> Unit::Cast()
 	{
 		return std::dynamic_pointer_cast<T>(this->shared_from_this());
 	}

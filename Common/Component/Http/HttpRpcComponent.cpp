@@ -7,7 +7,6 @@
 #include"Component/RpcService/Service.h"
 #include"Network/Http/HttpHandlerClient.h"
 #include"Component/Scene/MessageComponent.h"
-#include"google/protobuf/util/json_util.h"
 namespace Sentry
 {
     void HttpRpcComponent::OnRequest(std::shared_ptr<HttpHandlerClient> httpClient)
@@ -61,16 +60,8 @@ namespace Sentry
 
         if(!rpcInterfaceConfig->Request.empty())
         {
-            const std::string & data = request->GetContent();
-            const std::string & type = rpcInterfaceConfig->Request;
-            MessageComponent  * msgComponent = this->GetApp()->GetMsgComponent();
-            std::shared_ptr<Message> message = msgComponent->New(type, data.c_str(), data.size());
-            if(message == nullptr)
-            {
-                httpClient->StartWriter(HttpStatus::BAD_REQUEST);
-                return;
-            }
-            rpcRequest->mutable_data()->PackFrom(*message);
+            rpcRequest->set_json(request->GetContent());
+            rpcRequest->set_type(com::rpc_msg_type_json);
         }
 
         std::string userId;
@@ -86,16 +77,9 @@ namespace Sentry
             XCode code = targetService->Invoke(method, rpcRequest, rpcResponse);
             if(code == XCode::Successful && !rpcInterfaceConfig->Response.empty())
             {
-                const std::string & type = rpcInterfaceConfig->Response;
-                MessageComponent  * msgComponent = this->GetApp()->GetMsgComponent();
-                std::shared_ptr<Message> message = msgComponent->New(rpcResponse->data());
-                if(message != nullptr)
+                if(!rpcResponse->json().empty())
                 {
-                    std::string json;
-                    if(google::protobuf::util::MessageToJsonString(*message, &json).ok())
-                    {
-                        response->WriteString(json);
-                    }
+                    response->WriteString(rpcResponse->json());
                 }
             }
             response->AddHead("code", (int)code);
@@ -108,16 +92,9 @@ namespace Sentry
             XCode code = targetService->Invoke(method, rpcRequest, rpcResponse);
             if(code == XCode::Successful && !rpcInterfaceConfig->Response.empty())
             {
-                const std::string & type = rpcInterfaceConfig->Response;
-                MessageComponent  * msgComponent = this->GetApp()->GetMsgComponent();
-                std::shared_ptr<Message> message = msgComponent->New(rpcResponse->data());
-                if(message != nullptr)
+                if(!rpcResponse->json().empty())
                 {
-                    std::string json;
-                    if(google::protobuf::util::MessageToJsonString(*message, &json).ok())
-                    {
-                        response->WriteString(json);
-                    }
+                    response->WriteString(rpcResponse->json());
                 }
             }
             response->AddHead("code", (int)code);

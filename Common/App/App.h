@@ -3,7 +3,7 @@
 #include"Define/CommonTypeDef.h"
 #include"Global/ServerConfig.h"
 #include"Util/TimeHelper.h"
-#include"Entity/Entity.h"
+#include"Entity/Unit.h"
 #include"Global/ServerPath.h"
 #include"Global/ServiceConfig.h"
 #include"Component/Timer/TimerComponent.h"
@@ -17,7 +17,7 @@ namespace Sentry
 	class MainTaskScheduler;
 	class Service;
 	class MessageComponent;
-	class App final : public Entity
+	class App final : public Unit
 	{
 	 public:
 		explicit App(ServerConfig* config);

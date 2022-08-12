@@ -5,7 +5,8 @@
 #include<google/protobuf/any.h>
 #include<google/protobuf/any.pb.h>
 #include"Json/JsonReader.h"
-#include <utility>
+#include"google/protobuf/util/json_util.h"
+using namespace google::protobuf;
 namespace Sentry
 {
 	template<typename T>
@@ -60,6 +61,38 @@ namespace Sentry
 		{
 			return this->mName;
 		}
+
+    protected:
+        template<typename T1>
+        std::shared_ptr<T1> GetRequest(const com::rpc::request& request)
+        {
+            if(request.type() == com::rpc_msg_type_json)
+            {
+                if(request.json().empty())
+                {
+                    return nullptr;
+                }
+                std::shared_ptr<T1> requestData(new T1());
+                const std::string & json = request.json();
+                if(util::JsonStringToMessage(json, requestData.get()).ok())
+                {
+                    return requestData;
+                }
+            }
+            else if(request.type() == com::rpc_msg_type_proto)
+            {
+                if(!request.has_data())
+                {
+                    return nullptr;
+                }
+                std::shared_ptr<T1> requestData(new T1());
+                if(request.data().UnpackTo(requestData.get()))
+                {
+                    return requestData;
+                }
+            }
+            return nullptr;
+        }
 	 private:
 		std::string mName;
 	};
@@ -114,8 +147,11 @@ namespace Sentry
 	 public:
 		XCode Invoke(const com::rpc::request& request, com::rpc::response& response) override
 		{
-			std::shared_ptr<T1> requestData(new T1());
-			request.data().UnpackTo(requestData.get());
+            std::shared_ptr<T1> requestData = this->GetRequest<T1>(request);
+            if(requestData == nullptr)
+            {
+                return XCode::CallArgsError;
+            }
 			if (!this->mHasUserId)
 			{
 				return (_o->*_func)(*requestData);
@@ -150,22 +186,41 @@ namespace Sentry
 	 public:
 		XCode Invoke(const com::rpc::request& request, com::rpc::response& response) override
 		{
-			std::shared_ptr<T1> requestData(new T1());
-			request.data().UnpackTo(requestData.get());
-			std::shared_ptr<T2> responseData(new T2());
+            std::shared_ptr<T2> responseData(new T2());
+            std::shared_ptr<T1> requestData = this->GetRequest<T1>(request);
 			if (this->mHasUserId)
 			{
 				XCode code = (_o->*_objfunc)(request.user_id(), *requestData, *responseData);
 				if (code == XCode::Successful)
 				{
-					response.mutable_data()->PackFrom(*responseData);
+                    if(request.type() == com::rpc_msg_type_json &&
+                            util::MessageToJsonString(*responseData, response.mutable_json()).ok())
+                    {
+                        return XCode::Successful;
+                    }
+                    if(request.type() == com::rpc_msg_type_proto)
+                    {
+                        response.mutable_data()->PackFrom(*responseData);
+                        return XCode::Successful;
+                    }
+                    return XCode::SerializationFailure;
 				}
 				return code;
 			}
 			XCode code = (_o->*_func)(*requestData, *responseData);
 			if (code == XCode::Successful)
 			{
-				response.mutable_data()->PackFrom(*responseData);
+                if(request.type() == com::rpc_msg_type_json &&
+                   util::MessageToJsonString(*responseData, response.mutable_json()).ok())
+                {
+                    return XCode::Successful;
+                }
+                if(request.type() == com::rpc_msg_type_proto)
+                {
+                    response.mutable_data()->PackFrom(*responseData);
+                    return XCode::Successful;
+                }
+                return XCode::SerializationFailure;
 			}
 			return code;
 		}
@@ -202,14 +257,34 @@ namespace Sentry
 				XCode code = (_o->*_objfunc)(request.user_id(), *responseData);
 				if (code == XCode::Successful)
 				{
-					response.mutable_data()->PackFrom(*responseData);
+                    if(request.type() == com::rpc_msg_type_json &&
+                       util::MessageToJsonString(*responseData, response.mutable_json()).ok())
+                    {
+                        return XCode::Successful;
+                    }
+                    if(request.type() == com::rpc_msg_type_proto)
+                    {
+                        response.mutable_data()->PackFrom(*responseData);
+                        return XCode::Successful;
+                    }
+                    return XCode::SerializationFailure;
 				}
 				return code;
 			}
 			XCode code = (_o->*_func)(*responseData);
 			if (code == XCode::Successful)
 			{
-				response.mutable_data()->PackFrom(*responseData);
+                if(request.type() == com::rpc_msg_type_json &&
+                   util::MessageToJsonString(*responseData, response.mutable_json()).ok())
+                {
+                    return XCode::Successful;
+                }
+                if(request.type() == com::rpc_msg_type_proto)
+                {
+                    response.mutable_data()->PackFrom(*responseData);
+                    return XCode::Successful;
+                }
+                return XCode::SerializationFailure;
 			}
 			return code;
 		}
@@ -242,8 +317,7 @@ namespace Sentry
 		};
 		XCode Invoke(const com::rpc::request& request, com::rpc::response& response) override
 		{
-			std::shared_ptr<T1> requestData(new T1());
-			request.data().UnpackTo(requestData.get());
+			std::shared_ptr<T1> requestData = this->GetRequest<T1>(request);
 			return (_o->*_func)(request.address(), *requestData);
 		}
 
