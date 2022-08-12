@@ -91,7 +91,7 @@ namespace Sentry
 	{
 		std::string address;
 		Service * component = this->GetComponent<Service>(request.str());
-		if(component == nullptr || !component->GetAddressProxy().GetAddress(userId, address))
+		if(component == nullptr || !component->GetHost(userId, address))
 		{
 			return XCode::Failure;
 		}
@@ -102,11 +102,11 @@ namespace Sentry
 	XCode GateService::SaveAddress(long long userId, const s2s::allot::save& request)
 	{
 		Service * component = this->GetComponent<Service>(request.service());
-		if(component == nullptr || !component->GetAddressProxy().HasAddress(request.address()))
+		if(component == nullptr || !component->HasHost(request.address()))
 		{
 			return XCode::Failure;
 		}
-		component->GetAddressProxy().AddUserAddress(userId, request.address());
+		component->AddHost(request.address(), userId);
 		return XCode::Successful;
 	}
 

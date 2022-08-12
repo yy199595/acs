@@ -81,13 +81,13 @@ namespace Sentry
 		{
 			return XCode::NotFoundRpcConfig;
 		}
-        this->mAllAddress.clear();
-        if(!this->mAddressProxy.GetAllAddress(this->mAllAddress))
+        this->mServiceHosts.clear();
+        if(!this->GetHosts(this->mServiceHosts))
         {
             LOG_ERROR("service address list empty");
             return XCode::CallServiceNotFound;
         }
-		for(const std::string & address : this->mAllAddress)
+		for(const std::string & address : this->mServiceHosts)
 		{
 			if(this->SendRequest(address, rpcRequest) != XCode::Successful)
 			{
@@ -100,7 +100,7 @@ namespace Sentry
 	XCode Service::Send(long long int userId, const string& func, const Message& message)
 	{
 		std::string address;
-		if(!this->mAddressProxy.GetAddress(userId, address))
+		if(!this->GetHost(userId, address))
 		{
 			return XCode::NotFindUser;
 		}
@@ -169,7 +169,7 @@ namespace Sentry
 	XCode Service::Call(long long userId, std::shared_ptr<com::rpc::request> request, std::shared_ptr<Message> response)
 	{
 		std::string address;
-		if(!this->mAddressProxy.GetAddress(userId, address))
+		if(!this->GetHost(userId, address))
 		{
 			return XCode::NotFindUser;
 		}
@@ -204,7 +204,7 @@ namespace Sentry
 
 	XCode Service::SendRequest(const std::string& address, std::shared_ptr<com::rpc::request> request)
 	{
-		if(!this->mAddressProxy.HasAddress(address))
+		if(!this->HasHost(address))
 		{
 			return XCode::NetWorkError;
 		}
@@ -218,7 +218,7 @@ namespace Sentry
 	XCode Service::Call(long long userId, const std::string& func)
 	{
 		std::string address;
-		if(!this->mAddressProxy.GetAddress(userId, address))
+		if(!this->GetHost(userId, address))
 		{
 			return XCode::NotFindUser;
 		}
@@ -233,7 +233,7 @@ namespace Sentry
 	XCode Service::Call(long long userId, const std::string& func, const Message& message)
 	{
 		std::string address;
-		if(!this->mAddressProxy.GetAddress(userId, address))
+		if(!this->GetHost(userId, address))
 		{
 			return XCode::NotFindUser;
 		}
@@ -249,7 +249,7 @@ namespace Sentry
 	{
 		std::string address;
 		assert(response != nullptr);
-		if(!this->mAddressProxy.GetAddress(userId, address))
+		if(!this->GetHost(userId, address))
 		{
 			return XCode::NotFindUser;
 		}
@@ -265,7 +265,7 @@ namespace Sentry
 	{
 		std::string address;
 		assert(response != nullptr);
-		if(!this->mAddressProxy.GetAddress(userId, address))
+		if(!this->GetHost(userId, address))
 		{
 			return XCode::NotFindUser;
 		}

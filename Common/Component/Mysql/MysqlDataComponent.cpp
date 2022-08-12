@@ -52,7 +52,7 @@ namespace Sentry
 	XCode MysqlDataComponent::Call(const std::string& func, const Message& data, std::shared_ptr<s2s::mysql::response> response)
 	{
 		std::string address;
-		if(!this->mMysqlService->GetAddressProxy().GetAddress(address))
+		if(!this->mMysqlService->GetHost(address))
 		{
 			return XCode::CallServiceNotFound;
 		}

@@ -27,7 +27,7 @@ namespace Lua
 		{
 			userId = lua_tointeger(lua, 2);
 			request->set_user_id(userId);
-			if(!callComponent->GetAddressProxy().GetAddress(userId, address))
+			if(!callComponent->GetHost(userId, address))
 			{
 				luaL_error(lua, "not find user address : %lld", userId);
 				return 0;
@@ -86,7 +86,7 @@ namespace Lua
 	{
 		std::string address;
 		Sentry::Service* callComponent = UserDataParameter::Read<Sentry::Service*>(lua, 1);
-		if(callComponent->GetAddressProxy().GetAddress(address))
+		if(callComponent->GetHost(address))
 		{
 			lua_pushlstring(lua, address.c_str(), address.size());
 			return 1;

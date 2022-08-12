@@ -112,23 +112,11 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(json.GetMember("address", address));
 		LOG_CHECK_RET_FALSE(json.GetMember("service", service));
 		Service * component = this->GetComponent<Service>(service);
-		return component != nullptr && component->GetAddressProxy().AddUserAddress(userId, address);
+        return true;
 	}
 
 	bool UserSyncComponent::OnUserExit(const Json::Reader& json)
 	{
-		long long userId = 0;
-		std::vector<std::string> services;
-		LOG_CHECK_RET_FALSE(json.GetMember("user_id", userId));
-		LOG_CHECK_RET_FALSE(json.GetMember("services", services));
-		for(const std::string & service : services)
-		{
-			Service * component = this->GetComponent<Service>(service);
-			if(component != nullptr && component->GetAddressProxy().DelUserAddress(userId))
-			{
-				LOG_INFO("remove " << userId << " form " << service);
-			}
-		}
 		return true;
 	}
 }

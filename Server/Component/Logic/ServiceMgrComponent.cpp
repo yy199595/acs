@@ -122,9 +122,9 @@ namespace Sentry
                 assert(jsonData[index].IsString());
                 std::string service(jsonData[index].GetString());
                 Service *component = this->GetApp()->GetService(service);
-                if (component != nullptr && !component->GetAddressProxy().HasAddress(address))
+                if (component != nullptr && !component->HasHost(address))
                 {
-                    component->GetAddressProxy().AddAddress(address);
+                    component->AddHost(address);
                     LOG_INFO(service << " add new address [" << address << "]");
                 }
             }
@@ -138,7 +138,7 @@ namespace Sentry
 		this->GetApp()->GetServices(services);
 		for(Service * component : services)
 		{
-			if(component->GetAddressProxy().DelAddress(address))
+			if(component->DelHost(address))
 			{
 				LOG_ERROR("remove [" << address << "] from " << component->GetName());
 			}
@@ -159,7 +159,7 @@ namespace Sentry
 			Service * localRpcService = this->GetApp()->GetService(service);
 			if(localRpcService != nullptr)
 			{
-				localRpcService->GetAddressProxy().AddAddress(address);
+				localRpcService->AddHost(address);
 			}
             this->mAddressInfos[address].insert(service);
 		}
@@ -184,9 +184,9 @@ namespace Sentry
                 for (const std::string &service: iter->second)
                 {
                     Service *component = this->GetApp()->GetService(service);
-                    if (component != nullptr && component->GetAddressProxy().HasAddress(address))
+                    if (component != nullptr && component->HasHost(address))
                     {
-                        component->GetAddressProxy().DelAddress(address);
+                        component->DelHost(address);
                         CONSOLE_LOG_FATAL("remove [" << address << "] from " << service);
                     }
                 }
@@ -204,7 +204,7 @@ namespace Sentry
 		Service * localRpcService = this->GetApp()->GetService(service);
 		if(localRpcService != nullptr)
 		{
-			localRpcService->GetAddressProxy().AddAddress(address);
+			localRpcService->AddHost(address);
 			return true;
 		}
 		return false;
@@ -216,7 +216,7 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(json.GetMember("address", address));
 		LOG_CHECK_RET_FALSE(json.GetMember("service", service));
 		Service* localRpcService = this->GetApp()->GetService(service);
-		return localRpcService != nullptr && localRpcService->GetAddressProxy().DelAddress(address);
+		return localRpcService != nullptr && localRpcService->DelHost(address);
 	}
 
 	void ServiceMgrComponent::OnDestory()

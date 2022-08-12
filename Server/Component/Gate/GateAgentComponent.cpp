@@ -32,7 +32,7 @@ namespace Sentry
 	XCode GateAgentComponent::LuaCall(long long userId, const std::string func, std::shared_ptr<Message> message)
 	{
 		std::string address;
-		if (!this->mGateService->GetAddressProxy().GetAddress(userId, address))
+		if (!this->mGateService->GetHost(userId, address))
 		{
 			LOG_ERROR("not find user gate address : " << userId);
 			return XCode::NotFindUser;

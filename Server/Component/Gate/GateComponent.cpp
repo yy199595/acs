@@ -124,11 +124,10 @@ namespace Sentry
         {
             std::string targetAddress;
             userRequest->set_user_id(userId);
-            AddressProxy & addressProxy = localServerRpc->GetAddressProxy();
-            if(!addressProxy.GetAddress(userId, targetAddress))
+            if(!localServerRpc->GetHost(userId, targetAddress))
             {
-                addressProxy.GetAddress(targetAddress);
-                addressProxy.AddUserAddress(userId, targetAddress);
+                localServerRpc->GetHost(targetAddress);
+                localServerRpc->AddHost(targetAddress, userId);
             }
             std::shared_ptr<ClientRpcTask> clientRpcTask
                 = std::make_shared<ClientRpcTask>(*request, this, 0);
