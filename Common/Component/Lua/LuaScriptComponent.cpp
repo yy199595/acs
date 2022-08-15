@@ -150,9 +150,9 @@ namespace Sentry
 				return false;
 			}
 		}
-
-		std::string dir, name, luaFile;
-		for (std::string& path : luaFiles)
+        std::string dir, name, luaFile;
+        Lua::Function::Clear(this->mLuaEnv);
+		for (const std::string& path : luaFiles)
 		{
 			if (Helper::File::ReadTxtFile(path, luaFile)
 				&& Helper::Directory::GetDirAndFileName(path, dir, name))

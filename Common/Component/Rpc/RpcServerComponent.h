@@ -6,12 +6,12 @@
 namespace Sentry
 {
 	// 管理所有session
-	class RpcClientComponent : public Component, public ISocketListen,
-                    public IRpc<com::rpc::request, com::rpc::response>
+	class RpcServerComponent : public Component, public ISocketListen,
+                               public IRpc<com::rpc::request, com::rpc::response>
 	{
 	 public:
-		RpcClientComponent() = default;
-		~RpcClientComponent() override = default;
+		RpcServerComponent() = default;
+		~RpcServerComponent() override = default;
 	 public:
 		void StartClose(const std::string & address) final;
 		void OnCloseSocket(const std::string & address, XCode code) final;

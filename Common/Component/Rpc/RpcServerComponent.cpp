@@ -1,5 +1,5 @@
 ﻿
-#include"RpcClientComponent.h"
+#include"RpcServerComponent.h"
 #include"App/App.h"
 #include"Util/StringHelper.h"
 #include"Network/SocketProxy.h"
@@ -12,19 +12,19 @@
 #include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {
-	void RpcClientComponent::Awake()
+	void RpcServerComponent::Awake()
 	{
 		this->mRpcComponent = nullptr;
         this->mNetComponent = nullptr;
 	}
-	bool RpcClientComponent::LateAwake()
+	bool RpcServerComponent::LateAwake()
 	{
         LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<NetThreadComponent>());
         LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<TcpRpcComponent>());
 		return true;
 	}
 
-	void RpcClientComponent::OnCloseSocket(const std::string & address, XCode code)
+	void RpcServerComponent::OnCloseSocket(const std::string & address, XCode code)
 	{
 		auto iter = this->mRpcClientMap.find(address);
 		if (iter != this->mRpcClientMap.end())
@@ -34,7 +34,7 @@ namespace Sentry
 		}
 	}
 
-	bool RpcClientComponent::OnListen(std::shared_ptr<SocketProxy> socket)
+	bool RpcServerComponent::OnListen(std::shared_ptr<SocketProxy> socket)
 	{
 		const std::string& address = socket->GetAddress();
 		auto iter = this->mRpcClientMap.find(address);
@@ -51,7 +51,7 @@ namespace Sentry
         return false;
 	}
 
-	void RpcClientComponent::StartClose(const std::string & address)
+	void RpcServerComponent::StartClose(const std::string & address)
 	{
 		auto iter = this->mRpcClientMap.find(address);
 		if (iter != this->mRpcClientMap.end())
@@ -63,7 +63,7 @@ namespace Sentry
 		}
 	}
 
-	void RpcClientComponent::OnRequest(std::shared_ptr<com::rpc::request> request)
+	void RpcServerComponent::OnRequest(std::shared_ptr<com::rpc::request> request)
 	{
         assert(this->GetApp()->IsMainThread());
         request->set_type(com::rpc_msg_type_proto);
@@ -82,14 +82,14 @@ namespace Sentry
 		}
 	}
 
-	void RpcClientComponent::OnResponse(std::shared_ptr<com::rpc::response> response)
+	void RpcServerComponent::OnResponse(std::shared_ptr<com::rpc::response> response)
 	{
         long long taskId = response->rpc_id();
         assert(this->GetApp()->IsMainThread());
         this->mRpcComponent->OnResponse(taskId, response);
 	}
 
-	std::shared_ptr<MessageRpcClient> RpcClientComponent::GetOrCreateSession(const std::string& address)
+	std::shared_ptr<MessageRpcClient> RpcServerComponent::GetOrCreateSession(const std::string& address)
 	{
 		std::shared_ptr<MessageRpcClient> localSession = this->GetSession(address);
 		if (localSession != nullptr)
@@ -111,7 +111,7 @@ namespace Sentry
 		return localSession;
 	}
 
-	std::shared_ptr<MessageRpcClient> RpcClientComponent::GetSession(const std::string& address)
+	std::shared_ptr<MessageRpcClient> RpcServerComponent::GetSession(const std::string& address)
 	{
 		auto iter = this->mRpcClientMap.find(address);
 		if (iter == this->mRpcClientMap.end())
@@ -122,7 +122,7 @@ namespace Sentry
 	}
 
 
-	bool RpcClientComponent::Send(const std::string & address, std::shared_ptr<com::rpc::request> message)
+	bool RpcServerComponent::Send(const std::string & address, std::shared_ptr<com::rpc::request> message)
 	{
 		auto clientSession = this->GetOrCreateSession(address);
 		if (message == nullptr || clientSession == nullptr)
@@ -133,7 +133,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool RpcClientComponent::Send(const std::string & address, std::shared_ptr<com::rpc::response> message)
+	bool RpcServerComponent::Send(const std::string & address, std::shared_ptr<com::rpc::response> message)
 	{
 		std::shared_ptr<MessageRpcClient> clientSession = this->GetSession(address);
 		if (clientSession == nullptr || message == nullptr)

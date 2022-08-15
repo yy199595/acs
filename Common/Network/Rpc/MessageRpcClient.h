@@ -9,11 +9,11 @@ using namespace google::protobuf;
 
 namespace Sentry
 {
-	class RpcClientComponent;
+	class RpcServerComponent;
 	class MessageRpcClient : public Tcp::TcpContext
 	{
 	 public:
-		explicit MessageRpcClient(RpcClientComponent* component, std::shared_ptr<SocketProxy> socket);
+		explicit MessageRpcClient(RpcServerComponent* component, std::shared_ptr<SocketProxy> socket);
 		~MessageRpcClient() override = default;
 	 public:
 		void StartClose();
@@ -30,7 +30,7 @@ namespace Sentry
 		bool OnRequest(std::istream & istream1);
 		bool OnResponse(std::istream & istream1);
 	private:
-		RpcClientComponent* mTcpComponent;
+		RpcServerComponent* mTcpComponent;
 		std::shared_ptr<asio::steady_timer> mTimer;
 	};
 }// namespace Sentry

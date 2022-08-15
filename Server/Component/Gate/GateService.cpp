@@ -8,7 +8,7 @@
 #include"NetWork/GateMessageClient.h"
 #include"Component/Gate/GateComponent.h"
 #include"Component/Common/DataMgrComponent.h"
-#include"Component/Gate/GateClientComponent.h"
+#include"Component/Gate/RpcGateComponent.h"
 #include"Network/Listener/TcpServerListener.h"
 #include"Component/Gate/GateAgentComponent.h"
 #include"Component/User/UserSyncComponent.h"
@@ -26,7 +26,7 @@ namespace Sentry
 		methodRegister.Bind("CallClient", &GateService::CallClient);
 		methodRegister.Bind("SaveAddress", &GateService::SaveAddress);
 		methodRegister.Bind("QueryAddress", &GateService::QueryAddress);
-		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
+		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<RpcGateComponent>());
 		return true;
 	}
 

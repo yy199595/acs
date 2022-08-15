@@ -7,8 +7,8 @@
 #include"NetWork/GateMessageClient.h"
 #include"Global/ServiceConfig.h"
 #include"Component/Rpc/TcpRpcComponent.h"
-#include"GateClientComponent.h"
-#include"Component/Rpc/RpcClientComponent.h"
+#include"RpcGateComponent.h"
+#include"Component/Rpc/RpcServerComponent.h"
 #include"Component/RpcService/LocalService.h"
 #include"GateService.h"
 #include"Component/User/UserSyncComponent.h"
@@ -50,7 +50,7 @@ namespace Sentry
 		this->mTaskComponent = this->GetApp()->GetTaskComponent();
 		this->mTimerComponent = this->GetApp()->GetTimerComponent();
         this->mServiceRpcComponent = this->GetComponent<TcpRpcComponent>();
-		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<GateClientComponent>());
+		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<RpcGateComponent>());
 		return true;
 	}
 

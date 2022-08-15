@@ -7,7 +7,7 @@ namespace Sentry
     class SocketProxy;
 	struct ListenConfig;
 	class TcpServerListener;
-	class RpcClientComponent;
+	class RpcServerComponent;
 	class TcpServerComponent : public Component, public IComplete
 	{
 	 public:

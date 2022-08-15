@@ -6,7 +6,7 @@
 #include"Async/RpcTask/RpcTaskSource.h"
 #include"Script/Extension/Service/LuaService.h"
 #include"Component/Rpc/TcpRpcComponent.h"
-#include"Component/Rpc/RpcClientComponent.h"
+#include"Component/Rpc/RpcServerComponent.h"
 #ifdef __RPC_DEBUG_LOG__
 #include<google/protobuf/util/json_util.h>
 #endif
@@ -20,7 +20,7 @@ namespace Sentry
 	{
 		assert(this->mConfig);
 		this->mRpcComponent = this->GetComponent<TcpRpcComponent>();
-		this->mClientComponent = this->GetComponent<RpcClientComponent>();
+		this->mClientComponent = this->GetComponent<RpcServerComponent>();
 		return this->GetConfig().GetListener("rpc", this->mLocalAddress);
 	}
 

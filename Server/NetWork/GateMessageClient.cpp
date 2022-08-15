@@ -9,13 +9,13 @@
 #include"google/protobuf/util/json_util.h"
 #endif
 #include"Network/Proto/RpcProtoMessage.h"
-#include"Component/Gate/GateClientComponent.h"
+#include"Component/Gate/RpcGateComponent.h"
 
 using namespace Tcp::Rpc;
 namespace Sentry
 {
 	GateMessageClient::GateMessageClient(std::shared_ptr<SocketProxy> socket,
-		GateClientComponent* component)
+                                         RpcGateComponent* component)
 		: TcpContext(socket), mGateComponent(component)
 	{
 		this->mQps = 0;
@@ -70,7 +70,7 @@ namespace Sentry
             this->mGateComponent->OnRequest(request);
 #else
             asio::io_service &mainTaskScheduler = App::Get()->GetThread();
-            mainTaskScheduler.post(std::bind(&GateClientComponent::OnRequest, this->mGateComponent, request));
+            mainTaskScheduler.post(std::bind(&RpcGateComponent::OnRequest, this->mGateComponent, request));
 #endif
         }
         else
@@ -90,7 +90,7 @@ namespace Sentry
 		this->mGateComponent->OnCloseSocket(address, code);
 #else
 		asio::io_service &mainTaskScheduler = App::Get()->GetThread();
-		mainTaskScheduler.post(std::bind(&GateClientComponent::OnCloseSocket, this->mGateComponent, address, code));
+		mainTaskScheduler.post(std::bind(&RpcGateComponent::OnCloseSocket, this->mGateComponent, address, code));
 #endif
 	}
 

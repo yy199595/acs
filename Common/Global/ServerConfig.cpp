@@ -41,17 +41,46 @@ namespace Sentry
                 const rapidjson::Value &jsonObject = *iter->second;
                 if (jsonObject.IsObject())
                 {
-                    ListenConfig *listenConfig = new ListenConfig();
-                    IF_THROW_ERROR(jsonObject.HasMember("ip"));
-                    IF_THROW_ERROR(jsonObject.HasMember("port"));
-                    IF_THROW_ERROR(jsonObject.HasMember("component"));
+                    ListenConfig listenConfig;
 
-                    listenConfig->Name = iter->first;
-                    listenConfig->Ip = jsonObject["ip"].GetString();
-                    listenConfig->Port = jsonObject["port"].GetUint();
-                    listenConfig->Handler = jsonObject["component"].GetString();;
-                    listenConfig->Address = fmt::format("{0}:{1}",listenConfig->Ip,listenConfig->Port);
-                    this->mListens.emplace(listenConfig->Name, listenConfig);
+                    listenConfig.Name = iter->first;
+                    listenConfig.Ip = jsonObject["ip"].GetString();
+                    listenConfig.Port = jsonObject["port"].GetUint();
+                    listenConfig.Handler = jsonObject["component"].GetString();;
+                    listenConfig.Address = fmt::format("{0}:{1}",listenConfig.Ip,listenConfig.Port);
+                    this->mListens.emplace(listenConfig.Name, listenConfig);
+                }
+            }
+        }
+        if(this->GetJsonValue("services") != nullptr)
+        {
+            std::unordered_map<std::string, const rapidjson::Value *> services;
+            IF_THROW_ERROR(this->GetMember("services", services));
+            for (auto iter = services.begin(); iter != services.end(); iter++)
+            {
+                const std::string & name = iter->first;
+                const rapidjson::Value &jsonObject = *iter->second;
+                if(jsonObject.IsObject())
+                {
+                    ServiceConfig serviceConfig;
+                    if(!jsonObject.HasMember("Type"))
+                    {
+                        CONSOLE_LOG_FATAL(name << " not config [Type]");
+                        return false;
+                    }
+                    if(!jsonObject.HasMember("IsStart"))
+                    {
+                        CONSOLE_LOG_FATAL(name << " not config [IsStart]");
+                        return false;
+                    }
+                    serviceConfig.Type = jsonObject["Type"].GetString();
+                    serviceConfig.IsStart = jsonObject["IsStart"].GetBool();
+                    if(jsonObject.HasMember("Address"))
+                    {
+                        serviceConfig.Address = jsonObject["Address"].GetString();
+                    }
+                    serviceConfig.Name = name;
+                    this->mServiceConfigs.emplace(name, serviceConfig);
                 }
             }
         }
@@ -70,13 +99,29 @@ namespace Sentry
 		return true;
 	}
 
+    const ServiceConfig *ServerConfig::GetServiceConfig(const std::string &name) const
+    {
+        auto iter = this->mServiceConfigs.find(name);
+        return iter != this->mServiceConfigs.end() ? &iter->second : nullptr;
+    }
+
+    size_t ServerConfig::GetServiceConfigs(std::vector<const ServiceConfig *> &configs) const
+    {
+        auto iter = this->mServiceConfigs.begin();
+        for(; iter != this->mServiceConfigs.end(); iter++)
+        {
+            configs.emplace_back(&iter->second);
+        }
+        return configs.size();
+    }
+
 	void ServerConfig::GetListeners(std::vector<const ListenConfig*>& listeners) const
 	{
 		listeners.clear();
 		auto iter = this->mListens.begin();
 		for (; iter != this->mListens.end(); iter++)
 		{
-			listeners.emplace_back(iter->second);
+			listeners.emplace_back(&iter->second);
 		}
 	}
 
@@ -85,7 +130,7 @@ namespace Sentry
 		auto iter = this->mListens.find(name);
 		if(iter != this->mListens.end())
 		{
-			address = iter->second->Address;
+			address = iter->second.Address;
 			return true;
 		}
 		return false;

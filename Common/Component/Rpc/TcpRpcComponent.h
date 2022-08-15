@@ -34,6 +34,6 @@ namespace Sentry
 		std::string mTempService;
 		class TaskComponent* mTaskComponent;
 		class TimerComponent* mTimerComponent;
-		class RpcClientComponent* mRpcClientComponent;
+		class RpcServerComponent* mRpcClientComponent;
 	};
 }

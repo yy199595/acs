@@ -47,7 +47,7 @@ namespace Sentry
 		class TaskComponent * mTaskComponent;
 		class TimerComponent * mTimerComponent;
         class TcpRpcComponent * mServiceRpcComponent;
-        class GateClientComponent* mGateClientComponent;
+        class RpcGateComponent* mGateClientComponent;
     };
 }
 

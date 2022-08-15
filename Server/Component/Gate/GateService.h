@@ -27,7 +27,7 @@ namespace Sentry
 		std::string mAddress;
 		class TimerComponent* mTimerComponent;
 		class UserSyncComponent * mSyncComponent;
-		class GateClientComponent* mGateClientComponent;
+		class RpcGateComponent* mGateClientComponent;
         std::unordered_map<string, long long> mUserTokens;
 	};
 

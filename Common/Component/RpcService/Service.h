@@ -50,6 +50,6 @@ namespace Sentry
         std::string mLocalAddress;
         class TcpRpcComponent* mRpcComponent;
         std::vector<std::string> mServiceHosts;
-        class RpcClientComponent* mClientComponent;
+        class RpcServerComponent* mClientComponent;
 	};
 }

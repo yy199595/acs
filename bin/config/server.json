@@ -17,7 +17,7 @@
         "rpc": {
             "port": 7788,
             "ip": "127.0.0.1",
-            "component": "RpcClientComponent"
+            "component": "RpcServerComponent"
         },
         "http": {
             "port": 8080,
@@ -27,7 +27,7 @@
         "gate": {
             "port": 1995,
             "ip": "127.0.0.1",
-            "component": "GateClientComponent"
+            "component": "RpcGateComponent"
         },
         "rpc.http": {
             "port": 1996,
@@ -83,8 +83,7 @@
     "lua": {
         "require": [
         "script/Common",
-        "script/Server",
-        "script/Client"
+        "script/Server"
         ]
     },
     "component": [
@@ -96,11 +95,11 @@
         "RedisSubComponent",
         "MainRedisComponent",
         "LuaScriptComponent",
-        "RpcClientComponent",
+        "RpcServerComponent",
         "TcpRpcComponent",
         "GateComponent",
         "MongoRpcComponent",
-        "GateClientComponent",
+        "RpcGateComponent",
         "UnitMgrComponent",
         "GateAgentComponent",
         "UserSyncComponent",
@@ -109,17 +108,28 @@
         "HttpRpcComponent",
         "JsonClientComponent"
     ],
-    "service.rpc": [
-        "RpcTest",
-        "GateService",
-        "ChatService",
-        "MongoService"
-    ],
-    "service.http": [
-        "HttpTest",
-        "AccountService",
-        "HttpSourceService"
-    ],
+    "services": {
+        "RpcTest": {
+            "Type": "rpc",
+            "IsStart": true
+        },
+        "ChatService": {
+            "Type": "rpc",
+            "IsStart": true
+        },
+        "MongoService": {
+            "Type": "rpc",
+            "IsStart": true
+        },
+        "GateService": {
+            "Type": "rpc",
+            "IsStart": true
+        },
+        "AccountService": {
+            "Type": "http",
+            "IsStart": true
+        }
+    },
     "white_list": [
         "127.0.0.1"
     ]

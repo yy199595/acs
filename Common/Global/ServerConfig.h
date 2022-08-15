@@ -1,6 +1,7 @@
 #pragma once
 
 #include<set>
+#include<vector>
 #include<unordered_map>
 #include"Json/JsonReader.h"
 #include<Define/CommonTypeDef.h>
@@ -22,6 +23,15 @@ namespace Sentry
         std::vector<std::string> LuaFiles;
 	};
 
+    struct ServiceConfig
+    {
+    public:
+        bool IsStart;
+        std::string Type;
+        std::string Name;
+        std::string Address;
+    };
+
 	struct ListenConfig;
     class ServerConfig : public Json::Reader
     {
@@ -38,6 +48,8 @@ namespace Sentry
 		bool GetPath(const std::string & name, std::string & path) const;
 		const std::string & GetExename() const { return this->mExePath;}
 		const std::string & GetWorkPath() const { return this->mWrokDir; }
+        const ServiceConfig * GetServiceConfig(const std::string & name) const;
+        size_t GetServiceConfigs(std::vector<const ServiceConfig *> & configs) const;
     private:
         int mNodeId;
 		std::string mContent;
@@ -46,6 +58,7 @@ namespace Sentry
         std::string mNodeName;
 		std::string mConfigPath;
 		std::unordered_map<std::string, std::string> mPaths;
-		std::unordered_map<std::string, ListenConfig *> mListens;
+		std::unordered_map<std::string, ListenConfig> mListens;
+        std::unordered_map<std::string , ServiceConfig> mServiceConfigs;
     };
 }

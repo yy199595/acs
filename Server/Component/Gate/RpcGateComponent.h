@@ -8,12 +8,12 @@
 namespace Sentry
 {
 	class GateMessageClient;
-	class GateClientComponent : public Component, public ISocketListen,
-                            public IRpc<c2s::rpc::request, c2s::rpc::response>
+	class RpcGateComponent : public Component, public ISocketListen,
+                             public IRpc<c2s::rpc::request, c2s::rpc::response>
 	{
 	 public:
-		GateClientComponent() = default;
-		~GateClientComponent() final = default;
+		RpcGateComponent() = default;
+		~RpcGateComponent() final = default;
 	 public:
 		void StartClose(const std::string & address) final;
 		void OnCloseSocket(const std::string & address, XCode code) final;

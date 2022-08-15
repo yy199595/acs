@@ -2,7 +2,7 @@
 // Created by mac on 2021/11/28.
 //
 
-#include"GateClientComponent.h"
+#include"RpcGateComponent.h"
 #include"App/App.h"
 #include"NetWork/GateMessageClient.h"
 #include"GateComponent.h"
@@ -15,7 +15,7 @@
 #endif
 namespace Sentry
 {
-	void GateClientComponent::Awake()
+	void RpcGateComponent::Awake()
 	{
         this->mNetComponent = nullptr;
         this->mGateComponent = nullptr;
@@ -23,7 +23,7 @@ namespace Sentry
 
     }
 
-	bool GateClientComponent::LateAwake()
+	bool RpcGateComponent::LateAwake()
 	{
         this->mNetComponent = this->GetComponent<NetThreadComponent>();
 		LOG_CHECK_RET_FALSE(this->mTimerComponent = App::Get()->GetTimerComponent());
@@ -31,7 +31,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool GateClientComponent::OnListen(std::shared_ptr<SocketProxy> socket)
+	bool RpcGateComponent::OnListen(std::shared_ptr<SocketProxy> socket)
     {
         const std::string &address = socket->GetAddress();
         auto iter = this->mGateClientMap.find(address);
@@ -58,7 +58,7 @@ namespace Sentry
         return true;
     }
 
-	void GateClientComponent::OnRequest(std::shared_ptr<c2s::rpc::request> request) //客户端调过来的
+	void RpcGateComponent::OnRequest(std::shared_ptr<c2s::rpc::request> request) //客户端调过来的
 	{
 		XCode code = this->mGateComponent->OnRequest(request);
 		if (code != XCode::Successful)
@@ -70,7 +70,7 @@ namespace Sentry
 		}
 	}
 
-	void GateClientComponent::OnCloseSocket(const std::string & address, XCode code)
+	void RpcGateComponent::OnCloseSocket(const std::string & address, XCode code)
 	{
 		auto iter = this->mGateClientMap.find(address);
 		if (iter != this->mGateClientMap.end())
@@ -87,7 +87,7 @@ namespace Sentry
 		}
 	}
 
-	bool GateClientComponent::SendToClient(const std::string & address, std::shared_ptr<c2s::rpc::response> message)
+	bool RpcGateComponent::SendToClient(const std::string & address, std::shared_ptr<c2s::rpc::response> message)
 	{
 		std::shared_ptr<GateMessageClient> proxyClient = this->GetGateClient(address);
 		if (proxyClient == nullptr)
@@ -98,7 +98,7 @@ namespace Sentry
 		return true;
 	}
 
-	void GateClientComponent::SendToAllClient(std::shared_ptr<c2s::rpc::call> message)
+	void RpcGateComponent::SendToAllClient(std::shared_ptr<c2s::rpc::call> message)
 	{
 		auto iter = this->mGateClientMap.begin();
 		for(;iter != this->mGateClientMap.end(); iter++)
@@ -111,7 +111,7 @@ namespace Sentry
 		}
 	}
 
-	bool GateClientComponent::SendToClient(const std::string& address, std::shared_ptr<c2s::rpc::call> message)
+	bool RpcGateComponent::SendToClient(const std::string& address, std::shared_ptr<c2s::rpc::call> message)
 	{
 		std::shared_ptr<GateMessageClient> gateClient = this->GetGateClient(address);
 		if(gateClient != nullptr)
@@ -122,13 +122,13 @@ namespace Sentry
 		return false;
 	}
 
-	std::shared_ptr<GateMessageClient> GateClientComponent::GetGateClient(const std::string & address)
+	std::shared_ptr<GateMessageClient> RpcGateComponent::GetGateClient(const std::string & address)
 	{
 		auto iter = this->mGateClientMap.find(address);
 		return iter != this->mGateClientMap.end() ? iter->second : nullptr;
 	}
 
-	void GateClientComponent::StartClose(const std::string & address)
+	void RpcGateComponent::StartClose(const std::string & address)
 	{
 		std::shared_ptr<GateMessageClient> proxyClient = this->GetGateClient(address);
 		if (proxyClient != nullptr)
@@ -137,7 +137,7 @@ namespace Sentry
 		}
 	}
 
-	void GateClientComponent::CheckPlayerLogout(const std::string & address)
+	void RpcGateComponent::CheckPlayerLogout(const std::string & address)
 	{
 		std::shared_ptr<GateMessageClient> proxyClient = this->GetGateClient(address);
 		if (proxyClient != nullptr)
@@ -150,10 +150,10 @@ namespace Sentry
 				return;
 			}
 		}
-		this->mTimerComponent->DelayCall(5000, &GateClientComponent::CheckPlayerLogout, this, address);
+		this->mTimerComponent->DelayCall(5000, &RpcGateComponent::CheckPlayerLogout, this, address);
 	}
 
-	bool GateClientComponent::AddNewUser(const std::string& address, long long userId)
+	bool RpcGateComponent::AddNewUser(const std::string& address, long long userId)
 	{
 		auto iter = this->mGateClientMap.find(address);
 		if(iter == this->mGateClientMap.end())
@@ -173,7 +173,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool GateClientComponent::GetUserId(const std::string& address, long long& userId)
+	bool RpcGateComponent::GetUserId(const std::string& address, long long& userId)
 	{
 		auto iter = this->mUserAddressMap.find(address);
 		if(iter != this->mUserAddressMap.end())
@@ -184,7 +184,7 @@ namespace Sentry
 		return false;
 	}
 
-	bool GateClientComponent::GetUserAddress(long long userId, std::string& address)
+	bool RpcGateComponent::GetUserAddress(long long userId, std::string& address)
 	{
 		auto iter = this->mClientAddressMap.find(userId);
 		if(iter != this->mClientAddressMap.end())

@@ -72,7 +72,7 @@ namespace Sentry
 		std::vector<IFrameUpdate*> mFrameUpdateManagers;
 		std::vector<ISystemUpdate*> mSystemUpdateManagers;
 		std::vector<ISecondUpdate*> mSecondUpdateManagers;
-		std::vector<ILastFrameUpdate*> mLastFrameUpdateManager;
-		std::unordered_map<std::string, Service*> mSeviceMap;
+        std::unordered_map<std::string, Service*> mSeviceMap;
+        std::vector<ILastFrameUpdate*> mLastFrameUpdateManager;
 	};
 }// namespace Sentry

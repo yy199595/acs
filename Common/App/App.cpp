@@ -51,19 +51,22 @@ namespace Sentry
 			}
 		}
         rapidjson::Document jsonDocument;
-        if(Helper::File::ReadJsonFile(path, jsonDocument))
+        std::vector<const ServiceConfig *> serviceConfigs;
+        if(Helper::File::ReadJsonFile(path, jsonDocument) && this->mConfig->GetServiceConfigs(serviceConfigs) > 0)
         {
-            auto iter = jsonDocument.MemberBegin();
-            for (; iter != jsonDocument.MemberEnd(); iter++)
+            for (const ServiceConfig *config: serviceConfigs)
             {
-                const rapidjson::Value &jsonValue = iter->value;
-                const std::string name(iter->name.GetString());
-                std::string type(jsonValue["Type"].GetString());
+                const std::string &name = config->Name;
+                if (!jsonDocument.HasMember(name.c_str()))
+                {
+                    CONSOLE_LOG_FATAL("not find service config " << name);
+                    return false;
+                }
                 Component *component = ComponentFactory::CreateComponent(name);
                 if (component == nullptr)
                 {
-                    component = ComponentFactory::CreateComponent(type);
-                    if (component == nullptr && type == "rpc")
+                    component = ComponentFactory::CreateComponent(config->Type);
+                    if (component == nullptr && config->Type == "rpc")
                     {
                         component = new ServiceAgent();
                     }
@@ -73,14 +76,16 @@ namespace Sentry
                     CONSOLE_LOG_ERROR("add " << name << " failure");
                     return false;
                 }
+                rapidjson::Value &json = jsonDocument[name.c_str()];
                 IServiceBase *serviceBase = component->Cast<IServiceBase>();
-                if (serviceBase == nullptr || !serviceBase->LoadConfig(iter->value))
+                if (serviceBase == nullptr || !serviceBase->LoadConfig(json))
                 {
                     CONSOLE_LOG_ERROR("load " << name << " config error");
                     return false;
                 }
             }
         }
+
 
 		this->GetComponents(components);
 		for (const std::string& name: components)
@@ -103,12 +108,12 @@ namespace Sentry
 			return false;
 		}
 
-		IFrameUpdate* manager1 = component->Cast<IFrameUpdate>();
+        Service * serviceComponent = component->Cast<Service>();
+        IFrameUpdate* manager1 = component->Cast<IFrameUpdate>();
 		ISystemUpdate* manager2 = component->Cast<ISystemUpdate>();
 		ISecondUpdate* manager3 = component->Cast<ISecondUpdate>();
 		ILastFrameUpdate* manager4 = component->Cast<ILastFrameUpdate>();
         NetEventComponent * eveComponent = component->Cast<NetEventComponent>();
-        Service * serviceComponent = component->Cast<Service>();
 
         TryInvoke(eveComponent, eveComponent->StartRegisterEvent());
         TryInvoke(manager1, this->mFrameUpdateManagers.emplace_back(manager1));
@@ -209,71 +214,68 @@ namespace Sentry
 	}
 
 	void App::StartAllComponent()
-	{
-		std::vector<std::string> components;
-		this->GetComponents(components);
-		for (const std::string& name: components)
-		{
-			Component* component = this->GetComponentByName(name);
-			if (component != nullptr)
-			{
-				IStart* startComponent = component->Cast<IStart>();
-				IServiceBase* localServerRpc = component->Cast<IServiceBase>();
-				if (localServerRpc != nullptr && !localServerRpc->IsStartService())
-				{
-					continue;
-				}
-				if(startComponent != nullptr)
-				{
-					ElapsedTimer timer;
-					long long timeId = this->mTimerComponent->DelayCall(5.0f, [component]()
-					{
-						LOG_FATAL(component->GetName() << " start time out");
-					});
-					if(!startComponent->OnStart())
-					{
-						throw std::logic_error(fmt::format(
-							"start {0} failure", component->GetName()));
-					}
-					this->mTimerComponent->CancelTimer(timeId);
-					LOG_DEBUG("start " << name << " successful use time = [" << timer.GetSecond() << "s]")
-				}
-			}
-		}
+    {
+        std::vector<std::string> components;
+        this->GetComponents(components);
+        for (const std::string &name: components)
+        {
+            Component *component = this->GetComponentByName(name);
+            IServiceBase *localServerRpc = component->Cast<IServiceBase>();
+            if (localServerRpc != nullptr && !localServerRpc->IsStartService())
+            {
+                continue;
+            }
+            if (component->Cast<IStart>() != nullptr)
+            {
+                ElapsedTimer timer;
+                long long timeId = this->mTimerComponent->DelayCall(5.0f, [component]() {
+                    LOG_FATAL(component->GetName() << " start time out");
+                });
+                if (!component->Cast<IStart>()->OnStart())
+                {
+                    throw std::logic_error(fmt::format(
+                            "start {0} failure", component->GetName()));
+                }
+                this->mTimerComponent->CancelTimer(timeId);
+                LOG_DEBUG("start " << name << " successful use time = [" << timer.GetSecond() << "s]")
+            }
+        }
 
-		LOG_WARN("start all component complete");
-		for (const std::string& name: components)
-		{
-			Component* component = this->GetComponentByName(name);
-			if (component != nullptr)
-			{
-				IServiceBase* localServerRpc = component->Cast<IServiceBase>();
-				if (localServerRpc == nullptr || localServerRpc->IsStartService())
-				{
-					IComplete* complete = component->Cast<IComplete>();
-					if (complete != nullptr)
-					{
-						complete->OnComplete();
-					}
-				}
-			}
-		}
-	}
+        LOG_WARN("start all component complete");
+        for (const std::string &name: components)
+        {
+            Component *component = this->GetComponentByName(name);
+            IServiceBase *localServerRpc = component->Cast<IServiceBase>();
+            if (localServerRpc == nullptr || localServerRpc->IsStartService())
+            {
+                IComplete *complete = component->Cast<IComplete>();
+                if (complete != nullptr)
+                {
+                    complete->OnComplete();
+                }
+            }
+        }
+    }
 
 	bool App::StartNewComponent()
 	{
-		std::vector<std::string> components;
-		this->mConfig->GetMember("service.rpc", components);
-        this->mConfig->GetMember("service.http", components);
-        for (const std::string& name: components)
-		{
-			IServiceBase* localServerRpc = this->GetComponent<IServiceBase>(name);
-			if (localServerRpc != nullptr && !localServerRpc->StartNewService())
-			{
-				LOG_ERROR(name << " load failure");
-				return false;
-			}
-		}
+		std::vector<const ServiceConfig *> components;
+        this->mConfig->GetServiceConfigs(components);
+        for (const ServiceConfig * config: components)
+        {
+            const std::string &name = config->Name;
+            Service * service = this->GetComponent<Service>(name);
+            IServiceBase *localServerRpc = this->GetComponent<IServiceBase>(name);
+            if (config->IsStart && localServerRpc != nullptr && !localServerRpc->StartNewService())
+            {
+                LOG_ERROR(name << " load failure");
+                return false;
+            }
+            if(service != nullptr && !config->Address.empty())
+            {
+                service->AddHost(config->Address);
+            }
+        }
 		this->mTaskComponent->Start(&App::StartAllComponent, this);
 		this->mTaskComponent->Start(&App::WaitAllServiceStart, this);
 		return true;
@@ -281,11 +283,12 @@ namespace Sentry
 
 	void App::WaitAllServiceStart()
 	{
-		std::vector<std::string> components;
-		this->GetComponents(components);
-		for (const std::string& name: components)
+        std::vector<const ServiceConfig *> components;
+        this->mConfig->GetServiceConfigs(components);
+		for (const ServiceConfig * config: components)
 		{
 			int count = 0;
+            const std::string & name = config->Name;
 			IServiceBase* serviceBase = this->GetComponent<IServiceBase>(name);
 			while (serviceBase != nullptr && !serviceBase->IsStartComplete())
 			{
@@ -293,14 +296,15 @@ namespace Sentry
 				LOG_WARN("wait " << name << " start count = " << ++count);
 			}
 		}
-		for (const std::string& name: components)
-		{
-			IComplete* complete = this->GetComponent<IComplete>(name);
-			if (complete != nullptr)
-			{
-				complete->OnAllServiceStart();
-			}
-		}
+        for (const ServiceConfig * config: components)
+        {
+            const std::string & name = config->Name;
+            IComplete* complete = this->GetComponent<IComplete>(name);
+            if (complete != nullptr)
+            {
+                complete->OnAllServiceStart();
+            }
+        }
 		long long t = Helper::Time::GetNowMilTime() - this->mStartTime;
 		LOG_DEBUG("===== start " << this->mServerName << " successful [" << t / 1000.0f << "]s ===========");
 	}

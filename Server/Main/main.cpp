@@ -12,12 +12,12 @@
 #include"Component/Telnet/ConsoleComponent.h"
 #include"Component/Rpc/TcpRpcComponent.h"
 #include"Component/Scene/NetThreadComponent.h"
-#include"Component/Rpc/RpcClientComponent.h"
+#include"Component/Rpc/RpcServerComponent.h"
 #include"Component/Logic/ServiceMgrComponent.h"
 #include"Component/Scene/OperatorComponent.h"
 #include"Component/Scene/LoggerComponent.h"
 #include"Component/Gate/GateComponent.h"
-#include"Component/Gate/GateClientComponent.h"
+#include"Component/Gate/RpcGateComponent.h"
 #include"Component/Scene/MessageComponent.h"
 #include"Component/Logic/HttpSourceService.h"
 #include"Component/RpcService/LuaService.h"
@@ -56,12 +56,12 @@ void RegisterComponent()
 //server
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
     ComponentFactory::Add<TcpServerComponent>("TcpServerComponent");
-    ComponentFactory::Add<RpcClientComponent>("RpcClientComponent");
+    ComponentFactory::Add<RpcServerComponent>("RpcServerComponent");
 
 // gate
     ComponentFactory::Add<GateComponent>("GateComponent");
 	ComponentFactory::Add<GateAgentComponent>("GateAgentComponent");
-	ComponentFactory::Add<GateClientComponent>("GateClientComponent");
+	ComponentFactory::Add<RpcGateComponent>("RpcGateComponent");
 // db
     ComponentFactory::Add<MysqlRpcComponent>("MysqlRpcComponent");
 	ComponentFactory::Add<MongoRpcComponent>("MongoRpcComponent");

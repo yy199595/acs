@@ -60,3 +60,5 @@ function AccountService.Login(request)
                 {  last_login_time = os.time(), last_login_ip = ip,  token = response.token })
     return XCode.Successful, response
 end
+
+return AccountService

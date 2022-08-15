@@ -40,9 +40,15 @@ namespace Sentry
 			{
 				return false;
 			}
-
 		}
-		return true;
+        const char * tab = this->GetName().c_str();
+        if(Lua::Table::Get(this->mLuaEnv, this->GetName()))
+        {
+            lua_pushboolean(this->mLuaEnv, true);
+            lua_setfield(this->mLuaEnv, -2, "IsStartService");
+        }
+        WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv, tab, "Start");
+		return luaTaskSource == nullptr || luaTaskSource->Await<bool>();
 	}
 
 	XCode LuaService::Invoke(const std::string& name, std::shared_ptr<com::rpc::request> request,
@@ -64,29 +70,27 @@ namespace Sentry
 		return serviceMethod->Invoke(*request, *response);
 	}
 
-
 	bool LuaService::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(Service::LateAwake());
 		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
 		LOG_CHECK_RET_FALSE(this->mLuaEnv = this->mLuaComponent->GetLuaEnv());
+
         if(!Lua::Table::Get(this->mLuaEnv, this->GetName()))
         {
             LOG_ERROR(this->GetName() << " is not lua table");
             return false;
         }
+        lua_pushboolean(this->mLuaEnv, false);
+        lua_setfield(this->mLuaEnv, -2, "IsStartService");
 		return true;
 	}
 
-	bool LuaService::OnStart()
-	{
-		const char * tab = this->GetName().c_str();
-		WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv, tab, "OnStart");
-		return(luaTaskSource == nullptr || luaTaskSource->Await<bool>());
-	}
 	bool LuaService::CloseService()
 	{
-		return false;
+        const char * tab = this->GetName().c_str();
+        WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv, tab, "Close");
+        return luaTaskSource == nullptr || luaTaskSource->Await<bool>();
 	}
 
 }

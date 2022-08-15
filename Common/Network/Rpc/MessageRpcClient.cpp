@@ -2,15 +2,15 @@
 #include"App/App.h"
 #include"Network/Rpc.h"
 #include"Network/Proto/RpcProtoMessage.h"
-#include<Component/Rpc/RpcClientComponent.h>
+#include<Component/Rpc/RpcServerComponent.h>
 
 #ifdef __DEBUG__
 #include<google/protobuf/util/json_util.h>
 #endif
 namespace Sentry
 {
-	MessageRpcClient::MessageRpcClient(RpcClientComponent* component,
-		std::shared_ptr<SocketProxy> socket)
+	MessageRpcClient::MessageRpcClient(RpcServerComponent* component,
+                                       std::shared_ptr<SocketProxy> socket)
 		: TcpContext(socket), mTcpComponent(component)
 	{
 
@@ -75,7 +75,7 @@ namespace Sentry
 		this->mTcpComponent->OnCloseSocket(address, code);
 #else
 		asio::io_service & taskScheduler = App::Get()->GetThread();
-		taskScheduler.post(std::bind(&RpcClientComponent::OnCloseSocket, this->mTcpComponent, address, code));
+		taskScheduler.post(std::bind(&RpcServerComponent::OnCloseSocket, this->mTcpComponent, address, code));
 #endif
 	}
 
@@ -128,7 +128,7 @@ namespace Sentry
 		this->mTcpComponent->OnRequest(requestData);
 #else
 		asio::io_service & taskScheduler = App::Get()->GetThread();
-		taskScheduler.post(std::bind(&RpcClientComponent::OnRequest, mTcpComponent, requestData));
+		taskScheduler.post(std::bind(&RpcServerComponent::OnRequest, mTcpComponent, requestData));
 #endif
 
 		return true;
@@ -148,7 +148,7 @@ namespace Sentry
 		this->mTcpComponent->OnResponse(responseData);
 #else
 		asio::io_service & taskScheduler = App::Get()->GetThread();
-		taskScheduler.post(std::bind(&RpcClientComponent::OnResponse, mTcpComponent, responseData));
+		taskScheduler.post(std::bind(&RpcServerComponent::OnResponse, mTcpComponent, responseData));
 #endif
 		return true;
 	}

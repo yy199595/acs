@@ -4,7 +4,7 @@
 #include"App/App.h"
 #include"Method/LuaServiceMethod.h"
 #include"Global/ServiceConfig.h"
-#include"Component/Rpc/RpcClientComponent.h"
+#include"Component/Rpc/RpcServerComponent.h"
 #include"Other/ElapsedTimer.h"
 #include"Component/RpcService/LocalService.h"
 namespace Sentry
@@ -21,7 +21,7 @@ namespace Sentry
 		this->mTaskComponent = App::Get()->GetTaskComponent();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<TaskComponent>());
-		LOG_CHECK_RET_FALSE(this->mRpcClientComponent = this->GetComponent<RpcClientComponent>());
+		LOG_CHECK_RET_FALSE(this->mRpcClientComponent = this->GetComponent<RpcServerComponent>());
 		return true;
 	}
 

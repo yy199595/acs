@@ -116,16 +116,18 @@ namespace Sentry
         {
             std::string address(iter->name.GetString());
             const rapidjson::Value &jsonData = iter->value;
-            rapidjson::Type type = jsonData.GetType();
-            for (int index = 0; index < jsonData.Size(); index++)
+            if(jsonData.GetType() == rapidjson::kArrayType)
             {
-                assert(jsonData[index].IsString());
-                std::string service(jsonData[index].GetString());
-                Service *component = this->GetApp()->GetService(service);
-                if (component != nullptr && !component->HasHost(address))
+                for (int index = 0; index < jsonData.Size(); index++)
                 {
-                    component->AddHost(address);
-                    LOG_INFO(service << " add new address [" << address << "]");
+                    assert(jsonData[index].IsString());
+                    std::string service(jsonData[index].GetString());
+                    Service *component = this->GetApp()->GetService(service);
+                    if (component != nullptr && !component->HasHost(address))
+                    {
+                        component->AddHost(address);
+                        LOG_INFO(service << " add new address [" << address << "]");
+                    }
                 }
             }
         }

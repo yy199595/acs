@@ -66,6 +66,34 @@ namespace Lua
 		return false;
 	}
 
+    WaitLuaTaskSource *Function::Call(lua_State *lua)
+    {
+        if(!Lua::Function::Get(lua, "coroutine", "call"))
+        {
+            return nullptr;
+        }
+        if(!lua_isfunction(lua, -1))
+        {
+            return nullptr;
+        }
+        if (lua_pcall(lua, 1, 1, 0) != 0)
+        {
+            LOG_ERROR(lua_tostring(lua, -1));
+            return nullptr;
+        }
+        return PtrProxy<WaitLuaTaskSource>::Read(lua, -1);
+    }
+
+    void Function::Clear(lua_State * lua)
+    {
+        auto iter = mRefFunctions.begin();
+        for(; iter != mRefFunctions.end(); iter++)
+        {
+            lua_unref(lua, iter->second);
+        }
+        mRefFunctions.clear();
+    }
+
 	WaitLuaTaskSource* Function::Call(lua_State * lua, int ref)
 	{
 		if(!Lua::Function::Get(lua, "coroutine", "call"))
@@ -84,6 +112,30 @@ namespace Lua
 		}
 		return PtrProxy<WaitLuaTaskSource>::Read(lua, -1);
 	}
+
+    WaitLuaTaskSource *Function::Call(lua_State *lua, int ref, const char *func)
+    {
+        if(!Lua::Function::Get(lua, "coroutine", "call"))
+        {
+            return nullptr;
+        }
+        lua_rawgeti(lua, LUA_REGISTRYINDEX, ref);
+        if (!lua_istable(lua, -1))
+        {
+            return nullptr;
+        }
+        if(!lua_getfield(lua, -1, func))
+        {
+            return nullptr;
+        }
+        lua_remove(lua, -2);
+        if (lua_pcall(lua, 1, 1, 0) != 0)
+        {
+            LOG_ERROR(lua_tostring(lua, -1));
+            return nullptr;
+        }
+        return PtrProxy<WaitLuaTaskSource>::Read(lua, -1);
+    }
 
 	WaitLuaTaskSource* Function::Call(lua_State* lua, const char* tab, const char* func)
 	{
