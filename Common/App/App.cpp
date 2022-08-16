@@ -296,10 +296,11 @@ namespace Sentry
 				LOG_WARN("wait " << name << " start count = " << ++count);
 			}
 		}
-        for (const ServiceConfig * config: components)
+        std::vector<Component *> componentList;
+        this->GetComponents(componentList);
+        for (Component * component: componentList)
         {
-            const std::string & name = config->Name;
-            IComplete* complete = this->GetComponent<IComplete>(name);
+            IComplete* complete = component->Cast<IComplete>();
             if (complete != nullptr)
             {
                 complete->OnAllServiceStart();

@@ -37,7 +37,7 @@ namespace Lua
         this->mIndexMap.clear();
     }
 
-    bool LocalTable::GetFunction(const std::string &func)
+    bool LocalTable::GetFunction(const std::string &func, bool ref)
     {
         auto iter = this->mIndexMap.find(func);
         if(iter != this->mIndexMap.end())
@@ -46,10 +46,15 @@ namespace Lua
             return lua_isfunction(this->mLua, -1);
         }
         lua_getref(this->mLua, this->mIndex);
+        const char * n = lua_typename(this->mLua, -1);
         if(lua_getfunction(this->mLua, -1, func.c_str()))
         {
-            int ref = lua_ref(this->mLua);
-            this->mIndexMap.emplace(func, ref);
+            if(ref)
+            {
+                int index = lua_ref(this->mLua);
+                lua_getref(this->mLua, index);
+                this->mIndexMap.emplace(func, index);
+            }
             return true;
         }
         return false;
@@ -62,8 +67,13 @@ namespace Lua
         {
             return false;
         }
-        std::string content, dir;
-        if (!Helper::Directory::GetDirAndFileName(path, dir, this->mTableName))
+        this->mPath = path;
+        if (!Helper::Directory::GetFileName(path, this->mTableName))
+        {
+            return false;
+        }
+        size_t pos = this->mTableName.find('.');
+        if(pos == std::string::npos)
         {
             return false;
         }
@@ -73,15 +83,25 @@ namespace Lua
         {
             return true;
         }
+        if(!this->mTableName.empty())
+        {
+            lua_getglobal(this->mLua, this->mTableName.c_str());
+            if(lua_istable(this->mLua, -1))
+            {
+                lua_pushnil(this->mLua);
+                lua_setglobal(this->mLua, this->mTableName.c_str());
+            }
+        }
 
-        lua_pushcclosure(this->mLua, LuaDebug::onError, 0);
-        int top = lua_gettop(this->mLua);
         if (luaL_dofile(this->mLua, path.c_str()) == LUA_OK)
         {
+            this->mTableName = this->mTableName.substr(0, pos);
+            lua_getglobal(this->mLua, this->mTableName.c_str());
             if (lua_istable(this->mLua, -1))
             {
                 this->Clear();
                 this->mMd5 = str;
+                const char * n = lua_typename(this->mLua, -1);
                 this->mIndex = lua_ref(this->mLua);
                 return true;
             }

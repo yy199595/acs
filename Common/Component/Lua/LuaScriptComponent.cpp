@@ -22,7 +22,6 @@ namespace Sentry
 	{
 		this->mLuaEnv = luaL_newstate();
 		luaL_openlibs(mLuaEnv);
-		LOG_CHECK_RET(this->LoadAllFile());
 	}
 
 	bool LuaScriptComponent::LateAwake()
@@ -92,52 +91,69 @@ namespace Sentry
         luaRegister8.BeginNewTable();
         luaRegister8.PushExtensionFunction("ToString", Lua::Md5::ToString);
 
-        if(lua_getfunction(this->mLuaEnv, "Main", "Awake"))
-		{
-			if(lua_pcall(this->mLuaEnv, 0, 1, 0) != 0)
-			{
-				LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
-				LOG_ERROR("invoke " << "Main" << ".Awake" << " error");
-				return false;
-			}
-		}
+        if(!this->LoadAllFile())
+        {
+            return false;
+        }
+
+        if(this->mMainTable->GetFunction("Awake"))
+        {
+            if(lua_pcall(this->mLuaEnv, 0, 1, 0) != 0)
+            {
+                LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+                return false;
+            }
+        }
 		return true;
 	}
 
 	bool LuaScriptComponent::OnStart()
 	{
-		WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv, "Main", "Start");
-		if(luaTaskSource != nullptr)
-		{
-			return luaTaskSource->Await<bool>();
-		}
+        if(this->mMainTable->GetFunction("Start"))
+        {
+            WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv);
+            if(luaTaskSource != nullptr)
+            {
+                return luaTaskSource->Await<bool>();
+            }
+        }
 		return true;
 	}
 
 	void LuaScriptComponent::OnComplete()
 	{
-		WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv, "Main", "Complete");
-		if(luaTaskSource != nullptr)
-		{
-			luaTaskSource->Await<void>();
-		}
+        if(this->mMainTable->GetFunction("Complete"))
+        {
+            WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv);
+            if(luaTaskSource != nullptr)
+            {
+                luaTaskSource->Await<void>();
+            }
+        }
 	}
 
 	void LuaScriptComponent::OnAllServiceStart()
 	{
-		WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv, "Main", "AllServiceStart");
-		if(luaTaskSource != nullptr)
-		{
-			luaTaskSource->Await<void>();
-		}
+        if(this->mMainTable->GetFunction("AllServiceStart"))
+        {
+            WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv);
+            if(luaTaskSource != nullptr)
+            {
+                luaTaskSource->Await<void>();
+            }
+        }
 	}
 
 	bool LuaScriptComponent::LoadAllFile()
 	{
+        std::string mainFilePath;
 		std::vector<std::string> luaPaths;
 		std::vector<std::string> luaFiles;
 		const ServerConfig& config = App::Get()->GetConfig();
-		if(!config.GetMember("lua", "require", luaPaths))
+        LOG_CHECK_RET_FALSE(config.GetMember("lua", "require", luaPaths));
+        LOG_CHECK_RET_FALSE(config.GetMember("lua", "main", mainFilePath));
+        this->mMainTable = std::make_shared<Lua::LocalTable>(this->mLuaEnv);
+        if(!this->mMainTable->Load(config.GetWorkPath() + mainFilePath))
         {
             return false;
         }
@@ -189,12 +205,9 @@ namespace Sentry
 		if (luaL_loadfile(mLuaEnv, filePath.c_str()) == 0)
 		{
 			lua_pcall(mLuaEnv, 0, 1, top);
-			lua_pop(mLuaEnv, 2);
-			//LOG_DEBUG(fmt::format("load [{0}] successful", filePath));
 			return true;
 		}
 		LOG_ERROR("load "<< filePath << " failure : " << lua_tostring(mLuaEnv, -1));
-		lua_pop(mLuaEnv, 1);
 		return false;
 	}
 }

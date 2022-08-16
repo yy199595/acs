@@ -1,10 +1,6 @@
 
 MongoComponent = {}
-local mongoService
-function MongoComponent.Awake()
-    mongoService = App.GetComponent("MongoService")
-    return mongoService ~= nil
-end
+local mongoService = App.GetComponent("MongoService")
 
 function MongoComponent.InsertOnce(tab, data)
     if type(data) == "table" then

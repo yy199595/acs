@@ -4,6 +4,7 @@
 #include"Component/Component.h"
 #include"Script/ClassProxyHelper.h"
 #include"Script/Table.h"
+#include"Script/LocalTable.h"
 namespace Sentry
 {
 	class LuaScriptComponent : public Component, public IStart, public IComplete
@@ -26,6 +27,7 @@ namespace Sentry
 		bool LoadLuaScript(const std::string filePath);
 	 private:
 		struct lua_State* mLuaEnv;
+        std::shared_ptr<Lua::LocalTable> mMainTable;
 		std::unordered_map<std::string, std::string> mLuaFileMd5s;
 	};
 }

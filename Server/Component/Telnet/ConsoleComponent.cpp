@@ -1,9 +1,7 @@
 #include"ConsoleComponent.h"
 #include"Component/Scene/OperatorComponent.h"
-#include"Component/RpcService/Service.h"
 #include"Component/Coroutine/TaskComponent.h"
 #include"Component/RpcService/LocalService.h"
-#include"Network/Listener/TcpServerComponent.h"
 #define BIND_FUNC(name, func) this->mFunctionMap.emplace(name, std::bind(&func, this, args1, args2));
 
 namespace Sentry
@@ -55,7 +53,7 @@ namespace Sentry
 
 		telnetClient->StartRead();
 		this->mTelnetClients.emplace(address, telnetClient);
-		//telnetClient->SendProtoMessage(telnetProto);
+		telnetClient->SendProtoMessage(telnetProto);
         return true;
 	}
 
@@ -64,18 +62,50 @@ namespace Sentry
 		std::shared_ptr<Tcp::TelnetClientContext> telnetClientContext = this->GetClient(address);
 		if(telnetClientContext != nullptr)
 		{
-			char cc = ' ';
 			std::vector<std::string> splitStrings;
 			std::shared_ptr<TelnetProto> telnetProto(new TelnetProto());
-			google::protobuf::SplitStringUsing(message, &cc, &splitStrings);
-			for (const std::string& str: splitStrings)
-			{
-				telnetProto->Add(str);
-			}
+			google::protobuf::SplitStringUsing(message, "\r\n", &splitStrings);
+            if(!this->Invoke(splitStrings, telnetProto))
+            {
+                telnetProto->Add("===== CMD ERR =====");
+            }
+            else
+            {
+                telnetProto->Add("===== CMD OK =====");
+            }
+
 			telnetClientContext->StartRead();
 			telnetClientContext->SendProtoMessage(telnetProto);
 		}
 	}
+
+    bool ConsoleComponent::Invoke(std::vector<std::string> &request, std::shared_ptr<TelnetProto> response)
+    {
+        if(request.empty())
+        {
+            response->Add("request empty");
+            return false;
+        }
+        const std::string & cmd = request[0];
+        auto iter = this->mFunctionMap.find(cmd);
+        if(iter == this->mFunctionMap.end())
+        {
+            response->Add("unknow cmd " + cmd);
+            return false;
+        }
+        std::vector<Component *> components;
+        this->GetApp()->GetComponents(components);
+        for(Component * component : components)
+        {
+           IHotfix *hotfix = component->Cast<IHotfix>();
+           if(hotfix != nullptr)
+           {
+               hotfix->OnHotFix();
+               response->Add(component->GetName());
+           }
+        }
+        return true;
+    }
 
 	std::shared_ptr<Tcp::TelnetClientContext> ConsoleComponent::GetClient(const std::string& address)
 	{

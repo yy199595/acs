@@ -41,16 +41,17 @@ namespace Sentry
 		return true;
 	}
 
-	void Unit::GetComponents(std::vector<Component*>& components) const
+	size_t Unit::GetComponents(std::vector<Component*>& components) const
 	{
 		auto iter = this->mComponentMap.begin();
 		for(;iter != this->mComponentMap.end(); iter++)
 		{
 			components.emplace_back(iter->second);
 		}
+        return components.size();
 	}
 
-	void Unit::GetComponents(std::vector<std::string>& components) const
+	size_t Unit::GetComponents(std::vector<std::string>& components) const
 	{
 		components.clear();
 		for (const std::string& name : this->mSortComponents)
@@ -61,6 +62,7 @@ namespace Sentry
 				components.emplace_back(component->GetName());
 			}
 		}
+        return components.size();
 	}
 
 	void Unit::OnDestory()

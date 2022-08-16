@@ -41,8 +41,8 @@ namespace Sentry
 
 	 public:
 		void OnDestory() override;
-		void GetComponents(std::vector<Component*>& components) const;
-		void GetComponents(std::vector<std::string>& components) const;
+		size_t GetComponents(std::vector<Component*>& components) const;
+		size_t GetComponents(std::vector<std::string>& components) const;
 	 protected:
 		virtual void OnAddComponent(Component * component) {}
 		virtual void OnDelComponent(Component * component) {}

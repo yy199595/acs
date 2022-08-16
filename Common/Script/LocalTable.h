@@ -16,7 +16,8 @@ namespace Lua
     public:
         void Clear();
         bool Load(const std::string & path);
-        bool GetFunction(const std::string & func);
+        bool GetFunction(const std::string & func, bool ref = false);
+        const std::string & GetPath() const { return this->mPath; }
         const std::string & GetName() const { return this->mTableName; }
     private:
         int mIndex;

@@ -36,6 +36,9 @@ namespace Sentry
 		void OnClientError(const std::string & address);
 		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
 		void OnReceive(const std::string & address, const std::string & message);
+
+    private:
+        bool Invoke(std::vector<std::string> & request, std::shared_ptr<TelnetProto> response);
 	 private:
 		bool Offset(const std::string& parameter, std::vector<string>& response);
 		bool Help(const std::string& parameter, std::vector<std::string>& response);
