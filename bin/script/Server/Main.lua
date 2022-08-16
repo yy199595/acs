@@ -1,6 +1,7 @@
 
 
 Main = {}
+Main.Modules = { }
 function Main.Awake()
     local messageComponent = App.GetComponent("MessageComponent")
     messageComponent:Load("./proto/message");
@@ -14,8 +15,24 @@ function Main.Complete()
 
 end
 
-function Main.OnLoadModule(name)
-    print("load module " .. name)
+function Main.OnLoadModule(path)
+    local module = require(path)
+    print("module = " .. path, module)
+end
+
+function Main.Hotfix()
+    print("--------", MongoComponent)
+    _G.temp = { }
+    for _, key in ipairs(Main.Modules) do
+        if _G[key] ~= nil then
+            _G.temp[key] = _G[key]
+            _G[key] = nil
+        end
+    end
+end
+
+function Main.HotfixAfter()
+    print("======", MongoComponent)
 end
 
 function Main.Init()

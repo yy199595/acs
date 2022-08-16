@@ -190,6 +190,21 @@ namespace Sentry
 		return true;
 	}
 
+    void LuaScriptComponent::OnHotFix()
+    {
+        if(this->mMainTable->GetFunction("Hotfix"))
+        {
+            lua_pcall(this->mLuaEnv, 0, 0, 0);
+        }
+        Lua::Function::Clear(this->mLuaEnv);
+        this->LoadAllFile();
+
+        if(this->mMainTable->GetFunction("HotfixAfter"))
+        {
+            lua_pcall(this->mLuaEnv, 0, 0, 0);
+        }
+    }
+
 	void LuaScriptComponent::OnDestory()
 	{
 		if (this->mLuaEnv != nullptr)
@@ -198,25 +213,39 @@ namespace Sentry
 		}
 	}
 
+    void LuaScriptComponent::AddRequire(const std::string &path)
+    {
+        if (this->mDirectorys.find(path) == this->mDirectorys.end())
+        {
+            size_t size = 0;
+            this->mDirectorys.insert(path);
+            lua_getglobal(this->mLuaEnv, "package");
+            lua_getfield(this->mLuaEnv, -1, "path");
+            const char *str = lua_tolstring(this->mLuaEnv, -1, &size);
+            std::string fullPath = std::string(str, size) + ";" + path + "/?.lua";
+            lua_pushlstring(this->mLuaEnv, fullPath.c_str(), fullPath.size());
+            lua_setfield(this->mLuaEnv, -3, "path");
+        }
+    }
+
 	bool LuaScriptComponent::LoadLuaScript(const std::string filePath)
-	{
-		if (luaL_dofile(mLuaEnv, filePath.c_str()) == LUA_OK)
-		{
-            if(this->mMainTable->GetFunction("OnLoadModule"))
+    {
+        std::string directory, moduleName;
+        if (!Helper::Directory::GetDirAndFileName(filePath, directory, moduleName))
+        {
+            return false;
+        }
+        this->AddRequire(directory);
+        moduleName = moduleName.substr(0, moduleName.find('.'));
+        if (this->mMainTable->GetFunction("OnLoadModule"))
+        {
+            lua_pushstring(this->mLuaEnv, moduleName.c_str());
+            if (lua_pcall(this->mLuaEnv, 1, 0, 0) != LUA_OK)
             {
-                std::string fileName;
-                Helper::Directory::GetFileName(filePath, fileName);
-                fileName = fileName.substr(0, fileName.find('.'));
-                lua_pushstring(this->mLuaEnv, fileName.c_str());
-                if (lua_pcall(this->mLuaEnv, 1, 0, 0) != LUA_OK)
-                {
-                    LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
-                    return false;
-                }
+                LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+                return false;
             }
-			return true;
-		}
-		LOG_ERROR("load "<< filePath << " failure : " << lua_tostring(mLuaEnv, -1));
-		return false;
-	}
+        }
+        return true;
+    }
 }

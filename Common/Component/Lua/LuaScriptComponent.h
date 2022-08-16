@@ -7,7 +7,7 @@
 #include"Script/LocalTable.h"
 namespace Sentry
 {
-	class LuaScriptComponent : public Component, public IStart, public IComplete
+    class LuaScriptComponent : public Component, public IStart, public IComplete, public IHotfix
 	{
 	 public:
 		LuaScriptComponent() = default;
@@ -18,15 +18,18 @@ namespace Sentry
 	 protected:
 		void Awake() final;
 		bool OnStart() final;
+        void OnHotFix() final;
 		bool LateAwake() final;
 		void OnDestory() final;
 		void OnComplete() final;
 		void OnAllServiceStart() final;
 	 private:
 		bool LoadAllFile();
+        void AddRequire(const std::string & path);
 		bool LoadLuaScript(const std::string filePath);
 	 private:
 		struct lua_State* mLuaEnv;
+        std::set<std::string> mDirectorys;
         std::shared_ptr<Lua::LocalTable> mMainTable;
 		std::unordered_map<std::string, std::string> mLuaFileMd5s;
 	};
