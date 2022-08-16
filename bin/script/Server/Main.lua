@@ -6,7 +6,7 @@ function Main.Awake()
     messageComponent:Load("./proto/message");
     messageComponent:Import("test.proto")
     local service = package.loaded["AccountService"]
-    print("service = ", service, package.path)
+    --table.print(_G)
    return true
 end
 
@@ -14,6 +14,9 @@ function Main.Complete()
 
 end
 
+function Main.OnLoadModule(name)
+    print("load module " .. name)
+end
 
 function Main.Init()
     require("Component.RedisComponent")

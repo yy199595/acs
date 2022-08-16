@@ -200,11 +200,20 @@ namespace Sentry
 
 	bool LuaScriptComponent::LoadLuaScript(const std::string filePath)
 	{
-		lua_pushcclosure(mLuaEnv, LuaDebug::onError, 0);
-		int top = lua_gettop(mLuaEnv);
-		if (luaL_loadfile(mLuaEnv, filePath.c_str()) == 0)
+		if (luaL_dofile(mLuaEnv, filePath.c_str()) == LUA_OK)
 		{
-			lua_pcall(mLuaEnv, 0, 1, top);
+            if(this->mMainTable->GetFunction("OnLoadModule"))
+            {
+                std::string fileName;
+                Helper::Directory::GetFileName(filePath, fileName);
+                fileName = fileName.substr(0, fileName.find('.'));
+                lua_pushstring(this->mLuaEnv, fileName.c_str());
+                if (lua_pcall(this->mLuaEnv, 1, 0, 0) != LUA_OK)
+                {
+                    LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+                    return false;
+                }
+            }
 			return true;
 		}
 		LOG_ERROR("load "<< filePath << " failure : " << lua_tostring(mLuaEnv, -1));
