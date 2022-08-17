@@ -111,7 +111,6 @@ namespace Sentry
 	{
 	 public:
 		HttpServiceRegister(Component * o) : mComponent(o) { }
-		std::shared_ptr<HttpServiceMethod> GetMethod(const std::string & name);
 	 public:
 		template<typename T>
 		bool Bind(const std::string& name, HttpJsonMethod<T> func)
@@ -129,7 +128,9 @@ namespace Sentry
 
     public:
         bool AddMethod(std::shared_ptr<HttpServiceMethod> method);
-	 private:
+        std::shared_ptr<HttpServiceMethod> GetMethod(const std::string & name);
+        void Clear() { this->mHttpMethodMap.clear(); this->mLuaHttpMethodMap.clear(); }
+    private:
 		Component * mComponent;
 		std::unordered_map<std::string, std::shared_ptr<HttpServiceMethod>> mHttpMethodMap;
         std::unordered_map<std::string, std::shared_ptr<HttpServiceMethod>> mLuaHttpMethodMap;

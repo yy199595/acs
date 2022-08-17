@@ -64,7 +64,8 @@ namespace Sentry
 
 	bool LocalHttpService::CloseService()
 	{
-		return false;
+        this->mServiceRegister->Clear();
+		return this->OnCloseService();
 	}
 	bool LocalHttpService::LoadConfig(const rapidjson::Value& json)
 	{
