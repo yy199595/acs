@@ -21,6 +21,7 @@ namespace Sentry
 		bool CloseService() final;
 		bool IsStartComplete() final { return true; }
 		bool LoadConfig(const rapidjson::Value & json) final;
+        virtual bool OnCloseService() { return true; };
 		virtual bool OnStartService(HttpServiceRegister & serviceRegister) = 0;
 	 public:
 		bool IsStartService() final { return this->mServiceRegister != nullptr;}

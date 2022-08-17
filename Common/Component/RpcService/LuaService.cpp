@@ -47,8 +47,16 @@ namespace Sentry
             lua_pushboolean(this->mLuaEnv, true);
             lua_setfield(this->mLuaEnv, -2, "IsStartService");
         }
-        WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv, tab, "Start");
-		return luaTaskSource == nullptr || luaTaskSource->Await<bool>();
+        const char * t = this->GetName().c_str();
+        if(Lua::lua_getfunction(this->mLuaEnv, t, "OnServiceStart"))
+        {
+            if(lua_pcall(this->mLuaEnv, 0, 0, 0) != LUA_OK)
+            {
+                LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+                return false;
+            }
+        }
+        return true;
 	}
 
 	XCode LuaService::Invoke(const std::string& name, std::shared_ptr<com::rpc::request> request,
@@ -89,8 +97,15 @@ namespace Sentry
 	bool LuaService::CloseService()
 	{
         const char * tab = this->GetName().c_str();
-        WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv, tab, "Close");
-        return luaTaskSource == nullptr || luaTaskSource->Await<bool>();
+        if(Lua::lua_getfunction(this->mLuaEnv, tab, "OnServiceStart"))
+        {
+            if(lua_pcall(this->mLuaEnv, 0, 0, 0) != LUA_OK)
+            {
+                LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+                return false;
+            }
+        }
+        return true;
 	}
 
 }

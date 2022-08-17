@@ -36,8 +36,23 @@ namespace Sentry
 		this->mSourceTree = nullptr;
 	}
 
+    bool MessageComponent::LateAwake()
+    {
+        std::string path;
+        if(this->GetConfig().GetPath("proto", path))
+        {
+            return this->Load(path.c_str());
+        }
+        return true;
+    }
+
     bool MessageComponent::Load(const char * path)
     {
+        if(!Helper::Directory::DirectorIsExist(path))
+        {
+            LOG_ERROR("director [" << path << "] not exist");
+            return false;
+        }
         ImportError importError;
 		this->mDynamicMessageMap.clear();
 		this->mDynamicMessageFactorys.clear();
@@ -50,11 +65,18 @@ namespace Sentry
             LOG_ERROR("load proto message [" << path << "] error");
             return false;
         }
+        LOG_INFO("load proto path : " << path);
         return true;
     }
 
 	bool MessageComponent::Import(const char * fileName)
 	{
+        io::ZeroCopyInputStream * fs = this->mSourceTree->Open(fileName);
+        if(fs == nullptr)
+        {
+            LOG_ERROR("not proto file [" << fileName << "]");
+            return false;
+        }
 		const FileDescriptor * fileDescriptor = this->mImporter->Import(fileName);
 		if (fileDescriptor == nullptr)
 		{
@@ -70,7 +92,8 @@ namespace Sentry
 			if(descriptor->field_count() > 0)
 			{
 				const Message * message = this->mDynamicMessageFactory->GetPrototype(descriptor);
-				this->mDynamicMessageMap.emplace(message->GetTypeName(), message);
+                LOG_DEBUG("add new dynamic message " <<  message->GetTypeName());
+                this->mDynamicMessageMap.emplace(message->GetTypeName(), message);
 			}
 		}
 		this->mDynamicMessageFactorys.emplace_back(mDynamicMessageFactory);
@@ -89,7 +112,6 @@ namespace Sentry
 				LOG_DEBUG("add new dynamic message " <<  message->GetTypeName());
 				this->mDynamicMessageMap.emplace(message->GetTypeName(), message);
 			}
-			LOG_INFO("load protobuf message  [" << descriptor1->full_name() << "]");
 		}
 	}
 
@@ -167,7 +189,7 @@ namespace Sentry
     void MessageComponent::OnLuaRegister(Lua::ClassProxyHelper &luaRegister)
     {
         luaRegister.BeginRegister<MessageComponent>();
-        luaRegister.PushMemberFunction("Load", &MessageComponent::Load);
+        //luaRegister.PushMemberFunction("Load", &MessageComponent::Load);
 		luaRegister.PushExtensionFunction("New", Lua::MessageEx::New);
 		luaRegister.PushMemberFunction("Import", &MessageComponent::Import);
 		luaRegister.PushExtensionFunction("Decode", &Lua::MessageEx::Decode);

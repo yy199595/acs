@@ -2,48 +2,51 @@
 
 Main = {}
 Main.Modules = { }
+
+function GetModules()
+    local modules = { }
+    for _, module in pairs(package.loaded) do
+        if type(module) == "table" then
+            table.insert(modules, module)
+        end
+    end
+    return modules
+end
+
 function Main.Awake()
-    local messageComponent = App.GetComponent("MessageComponent")
-    messageComponent:Load("./proto/message");
-    messageComponent:Import("test.proto")
-    local service = package.loaded["AccountService"]
-    --table.print(_G)
-   return true
+    print("***************")
 end
 
-function Main.Complete()
+function Main.OnLoadModule(moduleName)
 
-end
-
-function Main.OnLoadModule(path)
-    local module = require(path)
-    print("module = " .. path, module)
+    local oldModule = package.loaded[moduleName] or {}
+    package.loaded[moduleName] = nil
+    local newModule = require(moduleName)
+    if type(newModule) == "table" then
+        for k, member in pairs(newModule) do
+            if type(member) == "function" then
+                oldModule[k] = member
+            elseif oldModule[k] == nil then
+                oldModule[k] = member
+            end
+        end
+    end
+    package[moduleName] = oldModule
+    Log.Info("load " .. moduleName .. " Successful")
+    return oldModule
 end
 
 function Main.Hotfix()
-    print("--------", MongoComponent)
-    _G.temp = { }
-    for _, key in ipairs(Main.Modules) do
-        if _G[key] ~= nil then
-            _G.temp[key] = _G[key]
-            _G[key] = nil
+    local modules = GetModules()
+    for _, module in pairs(modules) do
+        local method = module["Hotfix"]
+        if type(method) == "function" then
+            local state, err = pcall(method)
+            if not state then
+                Log.Error(err)
+            end
         end
     end
-end
-
-function Main.HotfixAfter()
-    print("======", MongoComponent)
-end
-
-function Main.Init()
-    require("Component.RedisComponent")
-    require("Component.MongoComponent")
-    require("Component.MongoComponent")
-    table.print(package.loaded)
-end
-
-function Main.AllServiceStart()
-
 end
 
 return Main

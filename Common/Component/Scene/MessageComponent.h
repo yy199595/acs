@@ -40,6 +40,7 @@ namespace Sentry
 		bool Write(lua_State * lua, const Message & message);
 		std::shared_ptr<Message> Read(lua_State * lua, const std::string & name, int index);
 	 private:
+        bool LateAwake() final;
 		void LoopMessage(const Descriptor * descriptor);
         const Message * FindMessage(const std::string & name);
         void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;

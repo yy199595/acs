@@ -1,13 +1,10 @@
 
 AccountService = {}
 
-local gateService
-local redisComponent
-function AccountService.Awake()
-    redisComponent = _G.RedisComponent
-    gateService = App.GetComponent("GateService")
+local gateService = App.GetComponent("GateService")
 
-    return gateService ~= nil
+function AccountService.OnServiceStart()
+    print("启动账号服务")
 end
 
 function AccountService.Register(request)

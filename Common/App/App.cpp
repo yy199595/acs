@@ -52,7 +52,8 @@ namespace Sentry
 		}
         rapidjson::Document jsonDocument;
         std::vector<const ServiceConfig *> serviceConfigs;
-        if(Helper::File::ReadJsonFile(path, jsonDocument) && this->mConfig->GetServiceConfigs(serviceConfigs) > 0)
+        if(Helper::File::ReadJsonFile(path, jsonDocument)
+            && this->mConfig->GetServiceConfigs(serviceConfigs) > 0)
         {
             for (const ServiceConfig *config: serviceConfigs)
             {

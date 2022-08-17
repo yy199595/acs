@@ -18,7 +18,7 @@ namespace Sentry
 		~GateMessageClient() final = default;
 	 public:
 		void StartClose();
-		void StartReceive();
+		void StartReceive(int second = 0);
 		unsigned int GetQps() const { return this->mQps; }
 		void SendToClient(std::shared_ptr<c2s::rpc::call> message);
 		void SendToClient(std::shared_ptr<c2s::rpc::response> message);
@@ -29,11 +29,14 @@ namespace Sentry
         void OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	private:
-		void CloseSocket(XCode code);
+        void OnTimerEnd(int timeout);
+        void StartTimer(int second);
+        void CloseSocket(XCode code);
 	 private:
 		unsigned int mQps;
         unsigned int mCallCount;
 		RpcGateComponent* mGateComponent;
+        std::shared_ptr<asio::steady_timer> mTimer;
 	};
 }
 

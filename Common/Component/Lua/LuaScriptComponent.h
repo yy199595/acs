@@ -29,6 +29,7 @@ namespace Sentry
 		bool LoadLuaScript(const std::string filePath);
 	 private:
 		struct lua_State* mLuaEnv;
+        std::set<std::string> mModules;
         std::set<std::string> mDirectorys;
         std::shared_ptr<Lua::LocalTable> mMainTable;
 		std::unordered_map<std::string, std::string> mLuaFileMd5s;

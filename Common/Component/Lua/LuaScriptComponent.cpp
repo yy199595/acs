@@ -91,17 +91,26 @@ namespace Sentry
         luaRegister8.BeginNewTable();
         luaRegister8.PushExtensionFunction("ToString", Lua::Md5::ToString);
 
-        if(!this->LoadAllFile())
+        if(this->LoadAllFile())
         {
-            return false;
-        }
-
-        if(this->mMainTable->GetFunction("Awake"))
-        {
-            if(lua_pcall(this->mLuaEnv, 0, 1, 0) != 0)
+            for(const std::string & module : this->mModules)
             {
-                LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
-                return false;
+                if(lua_getfunction(this->mLuaEnv, module.c_str(), "Awake"))
+                {
+                    if (lua_pcall(this->mLuaEnv, 0, 0, 0) != LUA_OK)
+                    {
+                        LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+                        return false;
+                    }
+                }
+            }
+            if(this->mMainTable->GetFunction("Awake"))
+            {
+                if (lua_pcall(this->mLuaEnv, 0, 0, 0) != LUA_OK)
+                {
+                    LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+                    return false;
+                }
             }
         }
 		return true;
@@ -170,10 +179,16 @@ namespace Sentry
         Lua::Function::Clear(this->mLuaEnv);
 		for (const std::string& path : luaFiles)
 		{
-			if (Helper::File::ReadTxtFile(path, luaFile)
-				&& Helper::Directory::GetDirAndFileName(path, dir, name))
+            std::ifstream is(path);
+            if(!is.is_open())
+            {
+                LOG_ERROR("read lua file error : " << path);
+                return false;
+            }
+            MD5 fileMd5(is);
+			if (Helper::Directory::GetDirAndFileName(path, dir, name))
 			{
-				const std::string& md5 = Helper::Md5::GetMd5(luaFile);
+				const std::string md5 = fileMd5.toString();
 				auto iter = this->mLuaFileMd5s.find(name);
 				if (iter == this->mLuaFileMd5s.end())
 				{
@@ -192,16 +207,29 @@ namespace Sentry
 
     void LuaScriptComponent::OnHotFix()
     {
-        if(this->mMainTable->GetFunction("Hotfix"))
-        {
-            lua_pcall(this->mLuaEnv, 0, 0, 0);
-        }
         Lua::Function::Clear(this->mLuaEnv);
-        this->LoadAllFile();
-
-        if(this->mMainTable->GetFunction("HotfixAfter"))
+        if(this->LoadAllFile())
         {
-            lua_pcall(this->mLuaEnv, 0, 0, 0);
+            for(const std::string & module : this->mModules)
+            {
+                if(lua_getfunction(this->mLuaEnv, module.c_str(), "Hotfix"))
+                {
+                    if (lua_pcall(this->mLuaEnv, 0, 0, 0) != LUA_OK)
+                    {
+                        LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+                        return;
+                    }
+                }
+            }
+            if(this->mMainTable->GetFunction("Hotfix"))
+            {
+                if (lua_pcall(this->mLuaEnv, 0, 0, 0) != LUA_OK)
+                {
+                    LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+                    return;
+                }
+            }
+            LOG_INFO("start hotfix successful");
         }
     }
 
@@ -246,6 +274,7 @@ namespace Sentry
                 return false;
             }
         }
+        this->mModules.insert(moduleName);
         return true;
     }
 }

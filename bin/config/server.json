@@ -9,8 +9,8 @@
     },
     "path": {
         "log": "log",
+        "proto": "proto",
         "source": "source",
-        "proto": "proto/message",
         "service": "config/service.json"
     },
     "listener": {

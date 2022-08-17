@@ -14,7 +14,11 @@ namespace Sentry
         ~LocalLuaHttpService() = default;
     private:
         bool LateAwake() final;
+        bool OnCloseService() final;
         bool OnStartService(HttpServiceRegister &serviceRegister) final;
+
+    private:
+        struct lua_State * mLuaEnv;
     };
 }
 

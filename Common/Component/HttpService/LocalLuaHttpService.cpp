@@ -16,11 +16,29 @@ namespace Sentry
             LOG_ERROR(this->GetName() << " is not lua table");
             return false;
         }
-
+        this->mLuaEnv = luaComponent->GetLuaEnv();
         const char * tab = this->GetName().c_str();
-        if(Lua::lua_getfunction(luaComponent->GetLuaEnv(), tab, "Awake"))
+        if(Lua::lua_getfunction(this->mLuaEnv, tab, "Awake"))
         {
-            LOG_CHECK_RET_FALSE(Lua::Function::Invoke<bool>(luaComponent->GetLuaEnv()));
+            if(lua_pcall(this->mLuaEnv, 0, 0, 0) != LUA_OK)
+            {
+                LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool LocalLuaHttpService::OnCloseService()
+    {
+        const char * t = this->GetName().c_str();
+        if(Lua::lua_getfunction(this->mLuaEnv, t, "OnServiceClose"))
+        {
+            if(lua_pcall(this->mLuaEnv, 0, 0, 0) != LUA_OK)
+            {
+                LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+                return false;
+            }
         }
         return true;
     }
@@ -36,6 +54,16 @@ namespace Sentry
             const char * method = config->Method.c_str();
             if(!Lua::Function::Get(luaComponent->GetLuaEnv(), tab, method))
             {
+                return false;
+            }
+        }
+
+        const char * t = this->GetName().c_str();
+        if(Lua::lua_getfunction(this->mLuaEnv, t, "OnServiceStart"))
+        {
+            if(lua_pcall(this->mLuaEnv, 0, 0, 0) != LUA_OK)
+            {
+                LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
                 return false;
             }
         }

@@ -4,6 +4,7 @@
 
 #include"GateMessageClient.h"
 #include"Message/c2s.pb.h"
+#include"Util/TimeHelper.h"
 #include"App/App.h"
 #ifdef __DEBUG__
 #include"google/protobuf/util/json_util.h"
@@ -22,15 +23,38 @@ namespace Sentry
 		this->mCallCount = 0;
 	}
 
-	void GateMessageClient::StartReceive()
+	void GateMessageClient::StartReceive(int second)
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLength();
 #else
         asio::io_service & t = this->mSocket->GetThread();
         t.post(std::bind(&GateMessageClient::ReceiveLength, this));
+        if(second != 0)
+        {
+            t.post(std::bind(&GateMessageClient::StartTimer, this, second));
+        }
 #endif
 	}
+
+    void GateMessageClient::StartTimer(int second)
+    {
+        auto timeout = std::chrono::seconds(second);
+        asio::io_service & io = this->mSocket->GetThread();
+        this->mTimer = std::make_shared<asio::steady_timer>(io, timeout);
+        this->mTimer->async_wait(std::bind(&GateMessageClient::OnTimerEnd, this, second));
+    }
+
+    void GateMessageClient::OnTimerEnd(int timeout)
+    {
+        long long nowTime = Helper::Time::GetNowSecTime();
+        if (nowTime - this->GetLastOperTime() < timeout) //超时
+        {
+            this->StartTimer(timeout);
+            return;
+        }
+        this->CloseSocket(XCode::NetTimeout);
+    }
 
     void GateMessageClient::OnReceiveLength(const asio::error_code &code, int length)
     {
