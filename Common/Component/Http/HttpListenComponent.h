@@ -5,10 +5,11 @@
 #ifndef APP_HTTPLISTENCOMPONENT_H
 #define APP_HTTPLISTENCOMPONENT_H
 #include"Component/Component.h"
+#include"Network/Listener/TcpServerListener.h"
 namespace Sentry
 {
     class HttpHandlerClient;
-    class HttpListenComponent :  public Component, public ISocketListen
+    class HttpListenComponent :  public Component, public TcpServerListener
     {
     public:
         bool LateAwake() override;

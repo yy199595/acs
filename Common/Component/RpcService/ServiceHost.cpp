@@ -14,6 +14,7 @@ namespace Sentry
         }
     }
 
+
     void ServiceHost::AddHost(const std::string &address, long long unitId)
     {
         this->mUnitHosts[unitId] = address;

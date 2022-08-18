@@ -119,9 +119,4 @@ namespace Sentry
 	};
 
 	class SocketProxy;
-	class ISocketListen
-	{
-	public:
-		virtual bool OnListen(std::shared_ptr<SocketProxy> socket) = 0;
-	};
 }

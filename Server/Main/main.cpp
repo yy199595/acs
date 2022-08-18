@@ -13,7 +13,7 @@
 #include"Component/Rpc/TcpRpcComponent.h"
 #include"Component/Scene/NetThreadComponent.h"
 #include"Component/Rpc/RpcServerComponent.h"
-#include"Component/Logic/ServiceMgrComponent.h"
+#include"Component/Logic/RedisRegistryComponent.h"
 #include"Component/Scene/OperatorComponent.h"
 #include"Component/Scene/LoggerComponent.h"
 #include"Component/Gate/GateComponent.h"
@@ -41,7 +41,7 @@ void RegisterComponent()
 {
 // rpc
     ComponentFactory::Add<TcpRpcComponent>("TcpRpcComponent");
-	ComponentFactory::Add<ServiceMgrComponent>("ServiceMgrComponent");
+	ComponentFactory::Add<RedisRegistryComponent>("RedisRegistryComponent");
 // common
     ComponentFactory::Add<TaskComponent>("TaskComponent");
     ComponentFactory::Add<TimerComponent>("TimerComponent");

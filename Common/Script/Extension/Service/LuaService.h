@@ -11,7 +11,8 @@ namespace Lua
 	namespace Service
 	{
 		int Call(lua_State * lua);
-		int GetAddress(lua_State * lua);
+		int GetHost(lua_State * lua);
+        int AddHost(lua_State * lua);
 	}
 }
 

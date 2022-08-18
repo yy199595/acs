@@ -42,7 +42,7 @@ struct TableStruct_s2s_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[26]
+  static const ::google::protobuf::internal::ParseTable schema[27]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -128,6 +128,9 @@ extern mysql_saveDefaultTypeInternal _mysql_save_default_instance_;
 class mysql_update;
 class mysql_updateDefaultTypeInternal;
 extern mysql_updateDefaultTypeInternal _mysql_update_default_instance_;
+class node_info;
+class node_infoDefaultTypeInternal;
+extern node_infoDefaultTypeInternal _node_info_default_instance_;
 }  // namespace s2s
 namespace google {
 namespace protobuf {
@@ -157,6 +160,7 @@ template<> ::s2s::mysql_remove* Arena::CreateMaybeMessage<::s2s::mysql_remove>(A
 template<> ::s2s::mysql_response* Arena::CreateMaybeMessage<::s2s::mysql_response>(Arena*);
 template<> ::s2s::mysql_save* Arena::CreateMaybeMessage<::s2s::mysql_save>(Arena*);
 template<> ::s2s::mysql_update* Arena::CreateMaybeMessage<::s2s::mysql_update>(Arena*);
+template<> ::s2s::node_info* Arena::CreateMaybeMessage<::s2s::node_info>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace s2s {
@@ -2979,6 +2983,149 @@ class allot :
 };
 // -------------------------------------------------------------------
 
+class node_info :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.node_info) */ {
+ public:
+  node_info();
+  virtual ~node_info();
+
+  node_info(const node_info& from);
+
+  inline node_info& operator=(const node_info& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  node_info(node_info&& from) noexcept
+    : node_info() {
+    *this = ::std::move(from);
+  }
+
+  inline node_info& operator=(node_info&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const node_info& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const node_info* internal_default_instance() {
+    return reinterpret_cast<const node_info*>(
+               &_node_info_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    21;
+
+  void Swap(node_info* other);
+  friend void swap(node_info& a, node_info& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline node_info* New() const final {
+    return CreateMaybeMessage<node_info>(nullptr);
+  }
+
+  node_info* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<node_info>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const node_info& from);
+  void MergeFrom(const node_info& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(node_info* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated string services = 2;
+  int services_size() const;
+  void clear_services();
+  static const int kServicesFieldNumber = 2;
+  const ::std::string& services(int index) const;
+  ::std::string* mutable_services(int index);
+  void set_services(int index, const ::std::string& value);
+  #if LANG_CXX11
+  void set_services(int index, ::std::string&& value);
+  #endif
+  void set_services(int index, const char* value);
+  void set_services(int index, const char* value, size_t size);
+  ::std::string* add_services();
+  void add_services(const ::std::string& value);
+  #if LANG_CXX11
+  void add_services(::std::string&& value);
+  #endif
+  void add_services(const char* value);
+  void add_services(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField<::std::string>& services() const;
+  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_services();
+
+  // string address = 1;
+  void clear_address();
+  static const int kAddressFieldNumber = 1;
+  const ::std::string& address() const;
+  void set_address(const ::std::string& value);
+  #if LANG_CXX11
+  void set_address(::std::string&& value);
+  #endif
+  void set_address(const char* value);
+  void set_address(const char* value, size_t size);
+  ::std::string* mutable_address();
+  ::std::string* release_address();
+  void set_allocated_address(::std::string* address);
+
+  // @@protoc_insertion_point(class_scope:s2s.node_info)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField<::std::string> services_;
+  ::google::protobuf::internal::ArenaStringPtr address_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
+// -------------------------------------------------------------------
+
 class broadcast_request :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.broadcast.request) */ {
  public:
@@ -3017,7 +3164,7 @@ class broadcast_request :
                &_broadcast_request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    21;
+    22;
 
   void Swap(broadcast_request* other);
   friend void swap(broadcast_request& a, broadcast_request& b) {
@@ -3147,7 +3294,7 @@ class broadcast_response :
                &_broadcast_response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    22;
+    23;
 
   void Swap(broadcast_response* other);
   friend void swap(broadcast_response& a, broadcast_response& b) {
@@ -3259,7 +3406,7 @@ class broadcast :
                &_broadcast_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    23;
+    24;
 
   void Swap(broadcast* other);
   friend void swap(broadcast& a, broadcast& b) {
@@ -3367,7 +3514,7 @@ class client_call :
                &_client_call_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    24;
+    25;
 
   void Swap(client_call* other);
   friend void swap(client_call& a, client_call& b) {
@@ -3497,7 +3644,7 @@ class client :
                &_client_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    25;
+    26;
 
   void Swap(client* other);
   friend void swap(client& a, client& b) {
@@ -5619,6 +5766,132 @@ inline void allot_save::set_allocated_address(::std::string* address) {
 
 // -------------------------------------------------------------------
 
+// node_info
+
+// string address = 1;
+inline void node_info::clear_address() {
+  address_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& node_info::address() const {
+  // @@protoc_insertion_point(field_get:s2s.node_info.address)
+  return address_.GetNoArena();
+}
+inline void node_info::set_address(const ::std::string& value) {
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:s2s.node_info.address)
+}
+#if LANG_CXX11
+inline void node_info::set_address(::std::string&& value) {
+  
+  address_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:s2s.node_info.address)
+}
+#endif
+inline void node_info::set_address(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:s2s.node_info.address)
+}
+inline void node_info::set_address(const char* value, size_t size) {
+  
+  address_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:s2s.node_info.address)
+}
+inline ::std::string* node_info::mutable_address() {
+  
+  // @@protoc_insertion_point(field_mutable:s2s.node_info.address)
+  return address_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* node_info::release_address() {
+  // @@protoc_insertion_point(field_release:s2s.node_info.address)
+  
+  return address_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void node_info::set_allocated_address(::std::string* address) {
+  if (address != nullptr) {
+    
+  } else {
+    
+  }
+  address_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), address);
+  // @@protoc_insertion_point(field_set_allocated:s2s.node_info.address)
+}
+
+// repeated string services = 2;
+inline int node_info::services_size() const {
+  return services_.size();
+}
+inline void node_info::clear_services() {
+  services_.Clear();
+}
+inline const ::std::string& node_info::services(int index) const {
+  // @@protoc_insertion_point(field_get:s2s.node_info.services)
+  return services_.Get(index);
+}
+inline ::std::string* node_info::mutable_services(int index) {
+  // @@protoc_insertion_point(field_mutable:s2s.node_info.services)
+  return services_.Mutable(index);
+}
+inline void node_info::set_services(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:s2s.node_info.services)
+  services_.Mutable(index)->assign(value);
+}
+#if LANG_CXX11
+inline void node_info::set_services(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:s2s.node_info.services)
+  services_.Mutable(index)->assign(std::move(value));
+}
+#endif
+inline void node_info::set_services(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  services_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:s2s.node_info.services)
+}
+inline void node_info::set_services(int index, const char* value, size_t size) {
+  services_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:s2s.node_info.services)
+}
+inline ::std::string* node_info::add_services() {
+  // @@protoc_insertion_point(field_add_mutable:s2s.node_info.services)
+  return services_.Add();
+}
+inline void node_info::add_services(const ::std::string& value) {
+  services_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:s2s.node_info.services)
+}
+#if LANG_CXX11
+inline void node_info::add_services(::std::string&& value) {
+  services_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:s2s.node_info.services)
+}
+#endif
+inline void node_info::add_services(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  services_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:s2s.node_info.services)
+}
+inline void node_info::add_services(const char* value, size_t size) {
+  services_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:s2s.node_info.services)
+}
+inline const ::google::protobuf::RepeatedPtrField<::std::string>&
+node_info::services() const {
+  // @@protoc_insertion_point(field_list:s2s.node_info.services)
+  return services_;
+}
+inline ::google::protobuf::RepeatedPtrField<::std::string>*
+node_info::mutable_services() {
+  // @@protoc_insertion_point(field_mutable_list:s2s.node_info.services)
+  return &services_;
+}
+
+// -------------------------------------------------------------------
+
 // broadcast_request
 
 // string func = 1;
@@ -5850,6 +6123,8 @@ inline void client_call::set_allocated_data(::google::protobuf::Any* data) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

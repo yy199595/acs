@@ -8,7 +8,7 @@ namespace Sentry
 	struct ListenConfig;
 	class TcpServerListener;
 	class RpcServerComponent;
-	class TcpServerComponent : public Component, public IComplete
+    class TcpServerComponent : public Component, public IComplete
 	{
 	 public:
 		TcpServerComponent() = default;
@@ -16,19 +16,16 @@ namespace Sentry
 	public:
         bool AddBlackList(const std::string & ip);
         bool AddWhiteList(const std::string & ip);
-        bool OnListenConnect(const std::string & name, std::shared_ptr<SocketProxy> socket);
+        bool OnListenConnect(std::shared_ptr<SocketProxy> socket);
     private:
 		bool LateAwake() final;
-		bool LoadServerConfig();
-		void OnAllServiceStart() final;
+        void OnComplete() final;
+        bool LoadServerConfig();
+        void OnAllServiceStart() final;
         TcpServerListener * GetListener(const std::string & name);
 	 private:
         std::set<std::string> mBlackList;    //黑名单
         std::set<std::string> mWhiteList;    //白名单
-#ifndef ONLY_MAIN_THREAD
-       class NetThreadComponent * mThreadComponent;
-#endif
-        std::unordered_map<std::string, TcpServerListener *> mListeners;
         std::unordered_map<std::string, const ListenConfig *> mListenConfigs;
     };
 }

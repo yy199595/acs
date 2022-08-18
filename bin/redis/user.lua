@@ -1,29 +1,27 @@
 
 local user = {}
 local channel = "UserSyncComponent"
-user.add_user = function(request, response)
+user.add_user = function(request)
     if redis.call("SADD", "user_account", request.account) == 0 then
-        return false
+        return 0
     end
-    response.user_id = redis.call("INCR", "user_id") + 1995;
-   return true
+    return redis.call("INCR", "user_id") + 1995;
 end
 
-user.set_token = function(request, response)
+user.set_token = function(request)
     redis.call("SET", request.token, request.user_id)
     redis.call("EXPIRE", request.token, request.time)
     return true
 end
 
-user.get_token = function(request, response)
+user.get_token = function(request)
     local user_id = redis.call("GET", request.token)
     if user_id ~= nil then
         print(type(user_id), tonumber(user_id))
         redis.call("DEL", request.token)
-        response.user_id = tonumber(user_id)
-        return true
+        return tonumber(user_id)
     end
-    return false
+    return 0
 end
 
 user.set_state = function(request)
@@ -39,9 +37,8 @@ user.set_state = function(request)
     return true
 end
 
-user.get_state = function(request, response)
-    response.state = redis.call("HGET", "user_state", request.user_id)
-    return true
+user.get_state = function(request)
+    return redis.call("HGET", "user_state", request.user_id)
 end
 
 user.set_address = function(request)
@@ -61,18 +58,25 @@ user.set_address = function(request)
     return true
 end
 
-user.get_address = function(request, response)
+user.get_address = function(request)
     local state = redis.call("HGET", "user_state", request.user_id)
     if tonumber(state) >= 1 then
         local key = tostring(request.user_id)
-        response.address = redis.call("HGET", key, request.service)
-        return true
+        return redis.call("HGET", key, request.service)
     end
-    return false
 end
 
-local func = KEYS[1]
-local response = {}
-local request = cjson.decode(ARGV[1])
-response.res = user[func](request, response)
-return cjson.encode(response)
+local result = { }
+local method = user[KEYS[1]]
+if type(method) ~= "function" then
+    result.error = KEYS[1] .. " not lua function"
+else
+    local request = cjson.decode(ARGV[1])
+    local state, err, response = pcall(method, request)
+    if not state then
+        result.error = err
+    else
+        result.data = response
+    end
+end
+return cjson.encode(result)

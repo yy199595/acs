@@ -9,11 +9,11 @@
 
 namespace Sentry
 {
-	class NetEventComponent : public Component
+	class RedisChannelComponent : public Component
 	{
 	public:
-		NetEventComponent() = default;
-		virtual ~NetEventComponent() = default;
+		RedisChannelComponent() = default;
+		virtual ~RedisChannelComponent() = default;
 	public:
 		bool StartRegisterEvent();
 		bool Invoke(const std::string & id, std::shared_ptr<Json::Reader> json);

@@ -7,10 +7,10 @@
 #include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {
-	TcpServerListener::TcpServerListener(const ListenConfig *config)
+	TcpServerListener::TcpServerListener()
     {
 		this->mCount = 0;
-        this->mConfig = config;
+        this->mConfig = nullptr;
         this->mErrorCount = 0;
         this->mTcpComponent = nullptr;
         this->mBindAcceptor = nullptr;
@@ -24,12 +24,23 @@ namespace Sentry
 		delete this->mBindAcceptor;
 	}
 
-	bool TcpServerListener::StartListen(asio::io_service &io, TcpServerComponent *component)
+    bool TcpServerListener::Init(const ListenConfig *config)
+    {
+        this->mConfig = config;
+        this->mTcpComponent = App::Get()->GetComponent<TcpServerComponent>();
+        return this->mConfig != nullptr && this->mTcpComponent != nullptr;
+    }
+
+	bool TcpServerListener::StartListen()
     {
         try
         {
-            this->mTcpComponent = component;
+            if(this->mConfig == nullptr || this->mTcpComponent == nullptr)
+            {
+                return false;
+            }
             unsigned short port = this->mConfig->Port;
+            asio::io_context & io = App::Get()->GetThread();
             AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), port);
             this->mBindAcceptor = new AsioTcpAcceptor(io, endPoint);
             this->mNetComponent = App::Get()->GetComponent<NetThreadComponent>();
@@ -61,7 +72,10 @@ namespace Sentry
 			{
 				this->mCount++;
                 socketProxy->Init();
-                this->mTcpComponent->OnListenConnect(this->mConfig->Name, socketProxy);
+                if(this->mTcpComponent->OnListenConnect(socketProxy))
+                {
+                    this->OnListen(socketProxy);
+                }
             }
             this->ListenConnect();
 		});

@@ -37,9 +37,9 @@ namespace Sentry
         bool Ping(SharedRedisClient redisClient);
 		virtual SharedRedisClient GetClient(const std::string & name);
         virtual void OnLoadScript(const std::string & name, const std::string & md5) { }
+        std::shared_ptr<RedisResponse> Run(const std::string & name, std::shared_ptr<RedisRequest> request);
     protected:
         virtual bool OnInitRedisClient(RedisConfig config) = 0;
-        std::shared_ptr<RedisResponse> Run(const std::string & name, std::shared_ptr<RedisRequest> request);
         std::shared_ptr<RedisResponse> Run(SharedRedisClient redisClientContext, std::shared_ptr<RedisRequest> request);
     private:
         class NetThreadComponent * mNetComponent;

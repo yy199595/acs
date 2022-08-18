@@ -64,14 +64,12 @@
             "free": 30,
             "index": 0,
             "scripts": [
-                "redis/lock.lua",
-                "redis/user.lua",
-                "redis/node.lua"
+
             ],
             "channels": [
-                "ServiceMgrComponent.OnServiceAdd",
-                "ServiceMgrComponent.OnServiceDel",
-                "ServiceMgrComponent.OnNodeRegister"
+                "RedisRegistryComponent.Ping",
+                "RedisRegistryComponent.AddNode",
+                "RedisRegistryComponent.AddService"
             ],
             "passwd": "199595yjz."
         },
@@ -114,10 +112,10 @@
         "UnitMgrComponent",
         "GateAgentComponent",
         "UserSyncComponent",
-        "ServiceMgrComponent",
         "HttpWebComponent",
         "HttpRpcComponent",
-        "JsonClientComponent"
+        "JsonClientComponent",
+        "RedisRegistryComponent"
     ],
     "services": {
         "RpcTest": {

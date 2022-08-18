@@ -5,10 +5,11 @@
 #ifndef GAMEKEEPER_GATECLIENTCOMPONENT_H
 #define GAMEKEEPER_GATECLIENTCOMPONENT_H
 #include"Component/Component.h"
+#include"Network/Listener/TcpServerListener.h"
 namespace Sentry
 {
 	class GateMessageClient;
-	class RpcGateComponent : public Component, public ISocketListen,
+	class RpcGateComponent : public Component, public TcpServerListener,
                              public IRpc<c2s::rpc::request, c2s::rpc::response>
 	{
 	 public:
@@ -33,6 +34,7 @@ namespace Sentry
 		bool LateAwake() final;
 		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 private:
+        bool StartInComplete() final { return false; }
 		void CheckPlayerLogout(const std::string & address);
 	 private:
 		class GateComponent* mGateComponent;

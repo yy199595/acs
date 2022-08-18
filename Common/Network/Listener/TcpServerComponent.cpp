@@ -24,53 +24,55 @@ namespace Sentry
 		this->GetConfig().GetListeners(listenerConfigs);
 		for (const ListenConfig * listenConfig : listenerConfigs)
 		{
-			if (this->GetComponent<ISocketListen>(listenConfig->Handler) == nullptr)
-			{
-				LOG_ERROR("not find socket handler " << listenConfig->Handler);
-				return false;
-			}
-
-			if (listenConfig->Port != 0)
-			{
-				TcpServerListener * listener =
-					new TcpServerListener(listenConfig);
-				this->mListeners.emplace(listenConfig->Name ,listener);
-                this->mListenConfigs.emplace(listenConfig->Name, listenConfig);
-			}
+            const std::string & name = listenConfig->Handler;
+            TcpServerListener * tcpComponent = this->GetComponent<TcpServerListener>(name);
+            if(tcpComponent == nullptr || !tcpComponent->Init(listenConfig))
+            {
+                return false;
+            }
 		}
-#ifndef ONLY_MAIN_THREAD
-        this->mThreadComponent = this->GetComponent<NetThreadComponent>();
-#endif
 		return true;
 	}
 
-    TcpServerListener *TcpServerComponent::GetListener(const std::string &name)
+    void TcpServerComponent::OnComplete()
     {
-        auto iter = this->mListeners.find(name);
-        return iter != this->mListeners.end() ? iter->second : nullptr;
+        std::vector<const ListenConfig *> listenerConfigs;
+        this->GetConfig().GetListeners(listenerConfigs);
+        for (const ListenConfig * listenConfig : listenerConfigs)
+        {
+            const std::string &name = listenConfig->Handler;
+            TcpServerListener *tcpComponent = this->GetComponent<TcpServerListener>(name);
+            if(tcpComponent->StartInComplete())
+            {
+                if(tcpComponent->StartListen())
+                {
+                    LOG_INFO(listenConfig->Name << " listen [" << listenConfig->Address << "] successful");
+                    continue;
+                }
+                LOG_ERROR(listenConfig->Name << " listen [" << listenConfig->Address << "] failure");
+            }
+        }
     }
 
-	void TcpServerComponent::OnAllServiceStart()
-	{
-        asio::io_service & io = this->GetApp()->GetThread();
-        auto iter = this->mListenConfigs.begin();
-        for(; iter != this->mListenConfigs.end(); iter++)
+    void TcpServerComponent::OnAllServiceStart()
+    {
+        std::vector<const ListenConfig *> listenerConfigs;
+        this->GetConfig().GetListeners(listenerConfigs);
+        for (const ListenConfig * listenConfig : listenerConfigs)
         {
-            const ListenConfig * listenConfig = iter->second;
-            TcpServerListener * tcpServerListener = this->GetListener(listenConfig->Name);
-            if(tcpServerListener == nullptr)
+            const std::string &name = listenConfig->Handler;
+            TcpServerListener *tcpComponent = this->GetComponent<TcpServerListener>(name);
+            if(!tcpComponent->StartInComplete())
             {
-                LOG_FATAL("not find listener " << listenConfig->Name);
-                continue;
+                if(tcpComponent->StartListen())
+                {
+                    LOG_INFO(listenConfig->Name << " listen [" << listenConfig->Address << "] successful");
+                    continue;
+                }
+                LOG_ERROR(listenConfig->Name << " listen [" << listenConfig->Address << "] failure");
             }
-            if(!tcpServerListener->StartListen(io, this))
-            {
-                LOG_FATAL(listenConfig->Name << " listen " << listenConfig->Ip << ":" << listenConfig->Port << " failure");
-                continue;
-            }
-            LOG_DEBUG(listenConfig->Name << " listen " << listenConfig->Ip << ":" << listenConfig->Port << " successful");
         }
-	}
+    }
 
     bool TcpServerComponent::AddBlackList(const std::string &ip)
     {
@@ -92,13 +94,8 @@ namespace Sentry
         return false;
     }
 
-    bool TcpServerComponent::OnListenConnect(const std::string &name, std::shared_ptr<SocketProxy> socket)
+    bool TcpServerComponent::OnListenConnect(std::shared_ptr<SocketProxy> socket)
     {
-        auto iter = this->mListenConfigs.find(name);
-        if(iter == this->mListenConfigs.end())
-        {
-            return false;
-        }
         if(!this->mWhiteList.empty())
         {
             const std::string & ip = socket->GetIp();
@@ -117,14 +114,6 @@ namespace Sentry
                 return false;
             }
         }
-        const std::string & component = iter->second->Handler;
-        ISocketListen * socketComponent = this->GetComponent<ISocketListen>(component);
-        if(socketComponent == nullptr)
-        {
-            return false;
-        }
-        socketComponent->OnListen(socket);
-       // LOG_DEBUG(name << " listen new socket " << socket->GetAddress());
         return true;
     }
 }

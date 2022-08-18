@@ -4,7 +4,7 @@
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
 #include"Component/Scene/MessageComponent.h"
-#include"Component/Scene/NetEventComponent.h"
+#include"Component/Scene/RedisChannelComponent.h"
 #include"Component/RpcService/LuaService.h"
 #include"Component/RpcService/ServiceAgent.h"
 using namespace Sentry;
@@ -114,7 +114,7 @@ namespace Sentry
 		ISystemUpdate* manager2 = component->Cast<ISystemUpdate>();
 		ISecondUpdate* manager3 = component->Cast<ISecondUpdate>();
 		ILastFrameUpdate* manager4 = component->Cast<ILastFrameUpdate>();
-        NetEventComponent * eveComponent = component->Cast<NetEventComponent>();
+        RedisChannelComponent * eveComponent = component->Cast<RedisChannelComponent>();
 
         TryInvoke(eveComponent, eveComponent->StartRegisterEvent());
         TryInvoke(manager1, this->mFrameUpdateManagers.emplace_back(manager1));

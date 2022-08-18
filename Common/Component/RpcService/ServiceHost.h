@@ -30,7 +30,6 @@ namespace Sentry
         void AddHost(const std::string & address);
         bool DelHost(const std::string & address);
         void AddHost(const std::string & address, long long unitId);
-
     public:
         bool HasHost(const std::string & address);
         bool GetHosts(std::vector<std::string> & hosts);

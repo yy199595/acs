@@ -4,7 +4,7 @@
 
 #ifndef _GATEAGENTCOMPONENT_H_
 #define _GATEAGENTCOMPONENT_H_
-#include"Component/Scene/NetEventComponent.h"
+#include"Component/Scene/RedisChannelComponent.h"
 namespace Sentry
 {
 	class GateAgentComponent final : public Component, public ILuaRegister

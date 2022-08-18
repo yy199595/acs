@@ -189,6 +189,10 @@ namespace Sentry
 			this->mDataSize = -1;
 			this->mType = RedisRespType::REDIS_ARRAY;
 			this->mDataCount = std::stoi(this->mString);
+            if(this->mDataCount == 0)
+            {
+                return 0;
+            }
 			break;
 		}
 		return this->mDataSize;

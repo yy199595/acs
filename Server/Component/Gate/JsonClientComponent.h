@@ -5,7 +5,7 @@
 #ifndef SERVER_JSONCLIENTCOMPONENT_H
 #define SERVER_JSONCLIENTCOMPONENT_H
 #include"Component/Component.h"
-
+#include"Network/Listener/TcpServerListener.h"
 namespace Tcp
 {
     class JsonRequest;
@@ -14,7 +14,7 @@ namespace Tcp
 
 namespace Sentry
 {
-    class JsonClientComponent : public Component, public ISocketListen
+    class JsonClientComponent : public Component, public TcpServerListener
     {
     public:
         JsonClientComponent() = default;

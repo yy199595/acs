@@ -4,10 +4,10 @@
 
 #ifndef _USERSYNCCOMPONENT_H_
 #define _USERSYNCCOMPONENT_H_
-#include"Component/Scene/NetEventComponent.h"
+#include"Component/Scene/RedisChannelComponent.h"
 namespace Sentry
 {
-	class UserSyncComponent final : public NetEventComponent
+	class UserSyncComponent final : public RedisChannelComponent
 	{
 	 public:
 		UserSyncComponent() = default;

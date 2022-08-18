@@ -28,7 +28,7 @@ namespace Sentry
 	{
 		luaRegister.BeginRegister<Service>();
 		luaRegister.PushExtensionFunction("Call", Lua::Service::Call);
-		luaRegister.PushExtensionFunction("GetAddress", Lua::Service::GetAddress);
+		luaRegister.PushExtensionFunction("GetHost", Lua::Service::GetHost);
 	}
 
 	std::shared_ptr<com::rpc::request> Service::NewRpcRequest(const std::string& func, long long userId)

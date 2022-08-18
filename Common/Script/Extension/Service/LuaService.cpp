@@ -82,15 +82,32 @@ namespace Lua
 		return luaRpcTaskSource->Await();
 	}
 
-	int Service::GetAddress(lua_State* lua)
+	int Service::GetHost(lua_State *lua)
 	{
 		std::string address;
-		Sentry::Service* callComponent = UserDataParameter::Read<Sentry::Service*>(lua, 1);
-		if(callComponent->GetHost(address))
+		Sentry::Service* service = UserDataParameter::Read<Sentry::Service*>(lua, 1);
+		if(service->GetHost(address))
 		{
 			lua_pushlstring(lua, address.c_str(), address.size());
 			return 1;
 		}
 		return 0;
 	}
+
+    int Service::AddHost(lua_State *lua)
+    {
+        long long unitId = 0;
+        Sentry::Service* service = UserDataParameter::Read<Sentry::Service*>(lua, 1);
+        const char * address = luaL_checkstring(lua, 2);
+        if(lua_isinteger(lua, 3) && service != nullptr)
+        {
+            unitId = lua_tointeger(lua, 2);
+            service->AddHost(address, unitId);
+            return 0;
+        }
+        if(service != nullptr)
+        {
+            service->AddHost(address);
+        }
+    }
 }

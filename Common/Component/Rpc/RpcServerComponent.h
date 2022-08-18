@@ -3,10 +3,11 @@
 #include"Component/Component.h"
 #include"Script/Table.h"
 #include"Network/Rpc/MessageRpcClient.h"
+#include"Network/Listener/TcpServerListener.h"
 namespace Sentry
 {
 	// 管理所有session
-	class RpcServerComponent : public Component, public ISocketListen,
+	class RpcServerComponent : public Component, public TcpServerListener,
                                public IRpc<com::rpc::request, com::rpc::response>
 	{
 	 public:

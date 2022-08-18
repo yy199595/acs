@@ -6,7 +6,7 @@
 #include"Script/Function.h"
 #include"Script/Extension/Json/Json.h"
 #include"Component/Lua/LuaScriptComponent.h"
-#include"Component/Scene/NetEventComponent.h"
+#include"Component/Scene/RedisChannelComponent.h"
 namespace Sentry
 {
     bool RedisSubComponent::OnInitRedisClient(RedisConfig config)
@@ -14,6 +14,10 @@ namespace Sentry
         if(!config.Channels.empty())
         {
             config.LuaFiles.clear();
+            if(this->GetConfig().GetListener("rpc", this->mLocalHost))
+            {
+                config.Channels.emplace_back(this->mLocalHost);
+            }
             SharedRedisClient redisClient = this->MakeRedisClient(config);
             if(redisClient == nullptr || !this->Ping(redisClient))
             {
@@ -34,45 +38,66 @@ namespace Sentry
             {
                 if(static_cast<const RedisString*>(redisAny1)->GetValue() == "message")
                 {
-                    std::vector<std::string> methodInfos;
                     const std::string & channel = redisAny2->Cast<RedisString>()->GetValue();
                     const std::string & message = redisAny3->Cast<RedisString>()->GetValue();
-                    google::protobuf::SplitStringUsing(channel, ".", &methodInfos);
-					if (methodInfos.size() != 2)
-					{
-                        LOG_INFO("handler redis event json = " << redisAny3->Cast<RedisString>()->GetValue());
+                    if(channel == this->mLocalHost && !this->Invoke(message))
+                    {
+                        LOG_ERROR("handler redis sub event error channel = "
+                                          << channel << " message = " << message);
                         return;
-					}
-                    const std::string & method = methodInfos[1];
-                    const std::string & component = methodInfos[0];
-                    if(this->mLuaComponent != nullptr)
-                    {
-                        lua_State * lua = this->mLuaComponent->GetLuaEnv();
-                        if(Lua::Function::Get(lua, component.c_str(), method.c_str()))
-                        {
-                            Lua::Json::Write(lua, message);
-                            if(lua_pcall(lua, 1, 0, 0) != LUA_OK)
-                            {
-                                LOG_ERROR("handler lua event " << channel << " error = " << lua_tostring(lua, -1));
-                            }
-                            return;
-                        }
                     }
-
-                    NetEventComponent* localServiceComponent = this->GetComponent<NetEventComponent>(component);
-                    if(localServiceComponent != nullptr)
+                    if(!this->Invoke(channel, message))
                     {
-                        std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
-                        if((!jsonReader->ParseJson(message)) || (!localServiceComponent->Invoke(method, jsonReader)))
-                        {
-                            LOG_ERROR("handler event " << channel << " error");
-                            return;
-                        }
-                        LOG_INFO("handler redis event json = " << redisAny3->Cast<RedisString>()->GetValue());
+                        LOG_ERROR("handler redis sub event error channel = "
+                                          << channel << " message = " << message);
                     }
                 }
             }
         }
+    }
+
+    bool RedisSubComponent::Invoke(const std::string &message)
+    {
+        return false;
+    }
+
+    bool RedisSubComponent::Invoke(const std::string &channel, const std::string &message)
+    {
+        std::vector<std::string> methodInfos;
+        google::protobuf::SplitStringUsing(channel, ".", &methodInfos);
+        if (methodInfos.size() != 2)
+        {
+            return false;
+        }
+        const std::string & method = methodInfos[1];
+        const std::string & component = methodInfos[0];
+        if(this->mLuaComponent != nullptr)
+        {
+            lua_State * lua = this->mLuaComponent->GetLuaEnv();
+            if(Lua::Function::Get(lua, component.c_str(), method.c_str()))
+            {
+                Lua::Json::Write(lua, message);
+                if(lua_pcall(lua, 1, 0, 0) != LUA_OK)
+                {
+                    LOG_ERROR("handler lua event " << channel << " error = " << lua_tostring(lua, -1));
+                    return false;
+                }
+                return true;
+            }
+        }
+
+        RedisChannelComponent* localServiceComponent = this->GetComponent<RedisChannelComponent>(component);
+        if(localServiceComponent != nullptr)
+        {
+            std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
+            if((!jsonReader->ParseJson(message)) || (!localServiceComponent->Invoke(method, jsonReader)))
+            {
+                LOG_ERROR("handler event " << channel << " error");
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 
     long long RedisSubComponent::Publish(const std::string & name, const std::string& channel, const std::string& message)

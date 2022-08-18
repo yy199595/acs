@@ -2,21 +2,27 @@
     "area_id": 1,
     "node_id": 1,
     "fps": 30,
-    "node_name": "MongoServer",
+    "node_name": "MongoDB",
     "thread": {
+        "task": 1,
         "network": 4
     },
     "path": {
         "log": "log",
+        "proto": "proto",
         "source": "source",
-        "proto": "proto/message",
         "service": "config/service.json"
     },
     "listener": {
         "rpc": {
             "port": 7787,
             "ip": "127.0.0.1",
-            "component": "RpcClientComponent"
+            "component": "RpcServerComponent"
+        },
+        "rpc.http": {
+            "port": 1997,
+            "ip" : "127.0.0.1",
+            "component" : "HttpRpcComponent"
         }
     },
     "mongo": {
@@ -29,13 +35,15 @@
     },
     "redis": {
         "main": {
-            "ip": "127.0.0.1",
+            "ip": "114.115.167.51",
             "port": 6379,
             "timeout": 3,
             "count": 2,
             "free": 30,
             "index": 0,
             "scripts": [
+                "redis/lock.lua",
+                "redis/user.lua",
                 "redis/node.lua"
             ],
             "channels": [
@@ -43,13 +51,19 @@
                 "ServiceMgrComponent.OnServiceDel",
                 "ServiceMgrComponent.OnNodeRegister"
             ],
-            "passwd": ""
+            "passwd": "199595yjz."
         }
     },
     "lua": {
         "require": [
             "script/Common",
-            "script/Server"
+            "script/Server/Service"
+        ],
+        "common": "script/Common",
+        "main": "script/Server/Main.lua",
+        "service": [
+            "script/Service/rpc",
+            "script/Service/http"
         ]
     },
     "component": [
@@ -58,14 +72,34 @@
         "RedisSubComponent",
         "MainRedisComponent",
         "LuaScriptComponent",
-        "RpcClientComponent",
-        "ServiceRpcComponent",
+        "RpcServerComponent",
+        "TcpRpcComponent",
         "MongoRpcComponent",
+        "HttpRpcComponent",
         "ServiceMgrComponent"
     ],
-    "service.rpc": [
-        "MongoService"
-    ],
+    "services": {
+        "RpcTest": {
+            "Type": "rpc",
+            "IsStart": false
+        },
+        "ChatService": {
+            "Type": "rpc",
+            "IsStart": false
+        },
+        "MongoService": {
+            "Type": "rpc",
+            "IsStart": true
+        },
+        "GateService": {
+            "Type": "rpc",
+            "IsStart": false
+        },
+        "AccountService": {
+            "Type": "http",
+            "IsStart": false
+        }
+    },
     "white_list": [
         "127.0.0.1"
     ]

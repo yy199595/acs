@@ -21,13 +21,18 @@ namespace Sentry
     class TcpServerListener
 	{
 	 public:
-		TcpServerListener(const ListenConfig * config);
+		TcpServerListener();
 		~TcpServerListener();
 	 public:
-		bool StartListen( asio::io_service& io, TcpServerComponent * component);
-	 private:
-		void ListenConnect();
-	 private:
+        bool StartListen();
+        bool Init(const ListenConfig * config);
+        virtual bool StartInComplete() { return true; }
+        const ListenConfig & GetListenConfig() const { return *this->mConfig; }
+        const std::string & GetListenAddress() const { return this->mConfig->Address; }
+    protected:
+        void ListenConnect();
+        virtual bool OnListen(std::shared_ptr<SocketProxy> socket) = 0;
+    private:
 		int mCount;
 		int mErrorCount;
 		const ListenConfig * mConfig;

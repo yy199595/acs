@@ -83,9 +83,25 @@ namespace Sentry
 
 	void RedisRpcClient::OnReadComplete()
 	{
-        std::shared_ptr<RedisRequest> request = dynamic_pointer_cast<RedisRequest>(this->PopMessage());
-
-        long long taskId = request != nullptr ? request->GetTaskId() : 0;
+        long long taskId = 0;
+        std::shared_ptr<Tcp::ProtoMessage> message = this->PopMessage();
+        if(message != nullptr)
+        {
+            std::shared_ptr<RedisRequest> request = dynamic_pointer_cast<RedisRequest>(message);
+            if(request != nullptr && request->GetTaskId() == 0)
+            {
+                std::move(this->mCurResponse);
+                if(!this->SendFromMessageQueue())
+                {
+                    if(!this->mConfig.Channels.empty())
+                    {
+                        this->ReceiveLine();
+                    }
+                }
+                return;
+            }
+            taskId = request->GetTaskId();
+        }
         std::shared_ptr<RedisResponse> response = std::move(this->mCurResponse);
         if(response->HasError())
         {
@@ -275,7 +291,6 @@ namespace Sentry
         if(nowTime - this->GetLastOperTime() >= 10) //十秒没进行操作 ping一下
         {
             this->Send(RedisRequest::Make("PING"));
-            CONSOLE_LOG_INFO("[" << this->mConfig.Name << "] start ping server");
         }
         asio::io_service &io = this->mSocket->GetThread();
         this->mTimer = std::make_shared<asio::steady_timer>(io, std::chrono::seconds(10));

@@ -24,7 +24,6 @@ local check_services = function(address)
         for _, key in ipairs(addressInfos) do
             if redis.call("EXISTS", key) then
                 local str = redis.call("GET", key)
-                print("str = ", str)
                 services[key] = cjson.decode(str)
             else
                 redis.call("SREM", "address", key)
@@ -98,9 +97,17 @@ function node.del(request)
     redis.call("PUBLISH", "ServiceMgrComponent", cjson.encode(message))
 end
 
-print(KEYS[1], ARGV[1])
-local func = KEYS[1]
-local response = {}
-local request = cjson.decode(ARGV[1])
-response.res = node[func](request, response)
-return cjson.encode(response)
+local result = { }
+local method = node[KEYS[1]]
+if type(method) ~= "function" then
+    result.error = KEYS[1] .. " not lua function"
+else
+    local request = cjson.decode(ARGV[1])
+    local state, err, response = pcall(method, request)
+    if not state then
+        result.error = err
+    else
+        result.data = response
+    end
+end
+return cjson.encode(result)

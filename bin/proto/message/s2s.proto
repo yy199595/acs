@@ -113,6 +113,12 @@ message allot
     }
 }
 
+message node_info
+{
+    string address = 1;
+    repeated string services = 2;
+}
+
 message broadcast
 {
     message request
