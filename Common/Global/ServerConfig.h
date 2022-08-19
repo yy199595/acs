@@ -23,6 +23,17 @@ namespace Sentry
         std::vector<std::string> LuaFiles;
 	};
 
+    struct ListenConfig
+    {
+    public:
+        std::string Ip;
+        std::string Name;
+        std::string Token;
+        std::string Handler;
+        std::string Address;
+        unsigned short Port = 0;
+    };
+
     struct ServiceConfig
     {
     public:

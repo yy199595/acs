@@ -1,18 +1,10 @@
 #pragma once
 #include"Async/TaskSource.h"
+#include"Global/ServerConfig.h"
 #include"Define/CommonTypeDef.h"
+
 namespace Sentry
 {
-	struct ListenConfig
-	{
-	 public:
-		std::string Ip;
-		std::string Name;
-		std::string Token;
-		std::string Handler;
-		std::string Address;
-		unsigned short Port = 0;
-	};
 
 	class ISocketListen;
     class TcpServerComponent;
