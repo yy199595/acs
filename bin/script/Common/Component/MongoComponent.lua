@@ -68,6 +68,16 @@ function MongoComponent.Query(tab, data, limit)
     return responses
 end
 
+function MongoComponent.SetIndex(tab, name)
+    assert(type(tab) == "string")
+    assert(type(name) == "string")
+    local address = mongoService:GetHost()
+    return mongoService:Call(address, "SetIndex", {
+        tab = tab,
+        name = name
+    })
+end
+
 function MongoComponent.Update(tab, select, update, tag, flag)
     if type(select) == "table" then
         select = Json.Encode(select)

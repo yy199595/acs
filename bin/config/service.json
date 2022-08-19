@@ -81,6 +81,11 @@
             "Type": "Server",
             "Request": "s2s.mongo.update"
         },
+        "SetIndex": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "s2s.mongo.index"
+        },
         "AddCounter": {
             "Async": true,
             "Type": "Server",

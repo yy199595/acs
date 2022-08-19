@@ -18,6 +18,7 @@ namespace Sentry
         XCode Insert(const s2s::mongo::insert & request);
         XCode Delete(const s2s::mongo::remove & request);
         XCode Update(const s2s::mongo::update & request);
+        XCode SetIndex(const s2s::mongo::index & request);
         XCode Query(const s2s::mongo::query::request & request, s2s::mongo::query::response & response);
         XCode AddCounter(const s2s::mongo::add_counter::request & request, s2s::mongo::add_counter::response & response);
     private:

@@ -218,6 +218,21 @@ namespace Sentry
         return this->Run(mongoClient, mongoRequest) != nullptr;
 	}
 
+    bool MongoRpcComponent::SetIndex(const std::string &tab, const std::string &name)
+    {
+        std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
+
+        Bson::Writer::Object document;
+        document.Add(name.c_str(), 1);
+
+
+        Bson::Writer::Array documentArray(document);
+        mongoRequest->document.Add("createIndexes", tab);
+        mongoRequest->document.Add("indexes", documentArray);
+        std::shared_ptr<MongoClientContext> mongoClient = this->GetClient();
+        return this->Run(mongoClient, mongoRequest) != nullptr;
+    }
+
 	bool MongoRpcComponent::Ping(int index)
 	{
         std::shared_ptr<MongoClientContext> mongoClient = this->GetClient(index);

@@ -78,6 +78,11 @@ message mongo
         int32 limit = 3;
         int32 flag = 4;
     }
+    message index
+    {
+        string tab = 1;
+        string name = 2;
+    }
     message update
     {
         string tab = 1;

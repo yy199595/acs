@@ -18,6 +18,7 @@ namespace Sentry
         methodRegister.Bind("Insert", &MongoService::Insert);
         methodRegister.Bind("Delete", &MongoService::Delete);
         methodRegister.Bind("Update", &MongoService::Update);
+        methodRegister.Bind("SetIndex", &MongoService::SetIndex);
         methodRegister.Bind("AddCounter", &MongoService::AddCounter);
         return this->mMongoComponent != nullptr;
     }
@@ -76,6 +77,17 @@ namespace Sentry
     XCode MongoService::AddCounter(const s2s::mongo::add_counter::request &request,
                                    s2s::mongo::add_counter::response &response)
     {
+        return XCode::Successful;
+    }
+
+    XCode MongoService::SetIndex(const s2s::mongo::index &request)
+    {
+        const std::string & tab = request.tab();
+        const std::string & name = request.name();
+        if(!this->mMongoComponent->SetIndex(tab, name))
+        {
+            return XCode::Failure;
+        }
         return XCode::Successful;
     }
 

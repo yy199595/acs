@@ -16,7 +16,7 @@
     "listener": {
         "rpc": {
             "port": 7788,
-            "ip": "10.10.14.104",
+            "ip": "127.0.0.1",
             "component": "RpcServerComponent"
         },
         "http": {
@@ -123,7 +123,7 @@
         },
         "MongoService": {
             "Type": "rpc",
-            "IsStart": false
+            "IsStart": true
         },
         "GateService": {
             "Type": "rpc",
