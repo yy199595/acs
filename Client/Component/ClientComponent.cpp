@@ -48,33 +48,8 @@ namespace Client
     {
         this->mTimerComponent = this->GetComponent<TimerComponent>();
 		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
-		lua_State * luaState = this->mLuaComponent->GetLuaEnv();
-
-		std::shared_ptr<Lua::Function> luaFunction = Lua::Function::Create(luaState, "Client", "Awake");
-		if (luaFunction != nullptr)
-		{
-			luaFunction->Action();
-		}
 		return true;
     }
-
-	void ClientComponent::OnAllServiceStart()
-	{
-		lua_State * luaState = this->mLuaComponent->GetLuaEnv();
-		if(!Lua::Function::Get(luaState, "coroutine", "start"))
-		{
-			return;
-		}
-		Lua::lua_getfunction(luaState, "Client", "StartLogic");
-		if (!lua_isfunction(luaState, -1))
-		{
-			return;
-		}
-		if (lua_pcall(luaState, 1, 0, 0) != 0)
-		{
-			LOG_ERROR(lua_tostring(luaState, -1));
-		}
-	}
 
 	std::shared_ptr<c2s::rpc::response> ClientComponent::Call(std::shared_ptr<c2s::rpc::request> request)
 	{

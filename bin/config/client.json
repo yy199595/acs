@@ -10,13 +10,14 @@
     "path": {
         "log": "log",
         "source": "source",
-        "proto": "proto/message"
+        "proto": "proto"
     },
     "lua": {
         "require": [
             "script/Common",
-            "script/Client"
-        ]
+            "script/Client/component"
+        ],
+        "main": "script/Client/Client.lua"
     },
     "component": [
         "HttpComponent",

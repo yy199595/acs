@@ -10,33 +10,33 @@ local password = "123456"
 local phoneNum = 13716061995
 
 
-function Client.StartLogic()
+function Client.Start()
 
     LoginComponent.Awake()
+    print("------------")
+    local clientComponent = App.GetComponent("ClientComponent")
+    LoginComponent.Register(account, password, phoneNum)
 
-    --local clientComponent = App.GetComponent("ClientComponent")
-    --LoginComponent.Register(account, password, phoneNum)
-    --
-    --local loginInfo = LoginComponent.Login(account, password)
-    --if loginInfo.code ~= XCode.Successful then
-    --    Log.Error("使用http登陆失败")
-    --    return
-    --end
-    --
-    --local address = loginInfo.data.address
-    --if not clientComponent:StartConnectAsync(address) then
-    --    Log.Error("连接网关服务器 [" , address, "] 失败")
-    --    return
-    --end
-    --Log.Debug("连接网关服务器[" , address, "]成功")
-    --
-    --local code, _ = clientComponent:Call("GateService.Auth", "c2s.auth.request", {
-    --    token = loginInfo.data.token
-    --})
-    --if code ~= XCode.Successful then
-    --    Log.Error("user auth failure")
-    --    return
-    --end
+    local loginInfo = LoginComponent.Login(account, password)
+    if loginInfo.code ~= XCode.Successful then
+        Log.Error("使用http登陆失败")
+        return
+    end
+
+    local address = loginInfo.data.address
+    if not clientComponent:StartConnectAsync(address) then
+        Log.Error("连接网关服务器 [" , address, "] 失败")
+        return
+    end
+    Log.Debug("连接网关服务器[" , address, "]成功")
+
+    local code, _ = clientComponent:Call("GateService.Auth", "c2s.auth.request", {
+        token = loginInfo.data.token
+    })
+    if code ~= XCode.Successful then
+        Log.Error("user auth failure")
+        return
+    end
     for i = 1, 20 do
         --coroutine.start(LoopCall)
         coroutine.start(LoopLogin)
@@ -82,3 +82,5 @@ function LoopCall()
         Log.Error(string.format("call use time = [%dms] count = %d", t, callCount))
     end
 end
+
+return Client

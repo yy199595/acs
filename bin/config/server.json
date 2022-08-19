@@ -88,12 +88,7 @@
             "script/Common",
             "script/Server/Service"
         ],
-        "common": "script/Common",
-        "main": "script/Server/Main.lua",
-        "service": [
-            "script/Service/rpc",
-            "script/Service/http"
-        ]
+        "main": "script/Server/Server.lua"
     },
     "component": [
         "HttpComponent",

@@ -274,6 +274,15 @@ namespace Sentry
                 return false;
             }
         }
+        else
+        {
+            if(luaL_dofile(this->mLuaEnv, filePath.c_str()) != LUA_OK)
+            {
+                LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+                return false;
+            }
+            LOG_WARN("[" << this->mMainTable->GetName() << ".OnLoadModule] not found");
+        }
         this->mModules.insert(moduleName);
         return true;
     }

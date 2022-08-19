@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include"Message/c2s.pb.h"
 #include"Async/TaskSource.h"
+#include"Script/LocalTable.h"
 #include"Component/Rpc/RpcTaskComponent.h"
 using namespace Sentry;
 using namespace google::protobuf;
@@ -34,7 +35,7 @@ namespace Client
 {
     class TcpRpcClientContext;
 
-    class ClientComponent : public RpcTaskComponent<c2s::rpc::response>, public IComplete, public ILuaRegister
+    class ClientComponent : public RpcTaskComponent<c2s::rpc::response>, public ILuaRegister
     {
     public:
         ClientComponent();
@@ -48,7 +49,6 @@ namespace Client
     protected:
 
         bool LateAwake() final;
-		void OnAllServiceStart() final;
 		void OnTimeout(long long rpcId);
         void OnAddTask(RpcTask task) final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
