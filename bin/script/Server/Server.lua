@@ -1,7 +1,7 @@
 
 
-Main = {}
-Main.Modules = { }
+Server = {}
+Server.Modules = { }
 
 function GetModules()
     local modules = { }
@@ -13,11 +13,11 @@ function GetModules()
     return modules
 end
 
-function Main.Awake()
+function Server.Awake()
     print("***************")
 end
 
-function Main.AllServiceStart()
+function Server.AllServiceStart()
     for i = 1, 10 do
         local account = string.format("%d@qq.com",1000 + i)
         local userInfo = MongoComponent.QueryOnce("user_account", {
@@ -27,7 +27,7 @@ function Main.AllServiceStart()
     end
 end
 
-function Main.OnLoadModule(moduleName)
+function Server.OnLoadModule(moduleName)
 
     local oldModule = package.loaded[moduleName] or {}
     package.loaded[moduleName] = nil
@@ -46,7 +46,7 @@ function Main.OnLoadModule(moduleName)
     return oldModule
 end
 
-function Main.Hotfix()
+function Server.Hotfix()
     local modules = GetModules()
     for _, module in pairs(modules) do
         local method = module["Hotfix"]
@@ -59,4 +59,4 @@ function Main.Hotfix()
     end
 end
 
-return Main
+return Server
