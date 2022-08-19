@@ -9,7 +9,7 @@ cmake ./CMakeLists.txt
 make lua
 make spdlog
 make libprotobuf
-make Sentry
+make app
 
 # shellcheck disable=SC2038
 find ./ -name CMakeFiles | xargs rm -r
