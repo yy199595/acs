@@ -24,8 +24,10 @@ namespace Sentry
 
     XCode MongoService::Insert(const s2s::mongo::insert &request)
     {
+        const int index = request.flag();
         const std::string & tab = request.tab();
         const std::string & json = request.json();
+        this->mMongoComponent->SelectMongoClient(index);
         if(!this->mMongoComponent->InsertOnce(tab, json))
         {
 #ifdef __DEBUG__
@@ -39,8 +41,10 @@ namespace Sentry
     XCode MongoService::Delete(const s2s::mongo::remove &request)
     {
         int limit = request.limit();
+        const int index = request.flag();
         const std::string & tab = request.tab();
         const std::string & json = request.json();
+        this->mMongoComponent->SelectMongoClient(index);
         if(!this->mMongoComponent->Delete(tab, json, limit))
         {
 #ifdef __DEBUG__
@@ -57,6 +61,7 @@ namespace Sentry
         const std::string & tag = request.tag();
         const std::string & select = request.select();
         const std::string & update = request.update();
+        this->mMongoComponent->SelectMongoClient(request.flag());
         if(!this->mMongoComponent->Update(tab, update, select, tag))
         {
 #ifdef __DEBUG__

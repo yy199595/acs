@@ -92,7 +92,6 @@ namespace Sentry
             std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
             if((!jsonReader->ParseJson(message)) || (!localServiceComponent->Invoke(method, jsonReader)))
             {
-                LOG_ERROR("handler event " << channel << " error");
                 return false;
             }
             return true;

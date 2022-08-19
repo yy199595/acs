@@ -256,6 +256,7 @@ namespace Sentry
                 }
             }
         }
+        this->WaitAllServiceStart();
     }
 
 	bool App::StartNewComponent()
@@ -278,7 +279,6 @@ namespace Sentry
             }
         }
 		this->mTaskComponent->Start(&App::StartAllComponent, this);
-		this->mTaskComponent->Start(&App::WaitAllServiceStart, this);
 		return true;
 	}
 

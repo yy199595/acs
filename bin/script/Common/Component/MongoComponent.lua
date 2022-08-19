@@ -2,27 +2,29 @@
 MongoComponent = {}
 local mongoService = App.GetComponent("MongoService")
 
-function MongoComponent.InsertOnce(tab, data)
+function MongoComponent.InsertOnce(tab, data, flag)
     if type(data) == "table" then
         data = Json.Encode(data)
     end
-    local address = mongoService:GetAddress()
+    local address = mongoService:GetHost()
     return mongoService:Call(address, "Insert", {
         tab = tab,
-        json = data
+        json = data,
+        flag = flag or 0
     })
 end
 
-function MongoComponent.Delete(tab, data, limit)
+function MongoComponent.Delete(tab, data, limit, flag)
     if type(data) == "table" then
         data = Json.Encode(data)
     end
     assert(type(data) == "string")
-    local address = mongoService:GetAddress()
+    local address = mongoService:GetHost()
     return mongoService:Call(address, "Delete", {
         tab = tab,
         json = data,
-        limit = limit or 1
+        limit = limit or 1,
+        flag = flag or 0
     })
 end
 
@@ -31,7 +33,7 @@ function MongoComponent.QueryOnce(tab, data)
         data = Json.Encode(data)
     end
     assert(type(data) == "string")
-    local address = mongoService:GetAddress()
+    local address = mongoService:GetHost()
     local code, response = mongoService:Call(address, "Query", {
         tab = tab,
         json = data,
@@ -51,7 +53,7 @@ function MongoComponent.Query(tab, data, limit)
     end
     local responses = {}
     assert(type(data) == "string")
-    local address = mongoService:GetAddress()
+    local address = mongoService:GetHost()
     local code, response = mongoService:Call(address, "Query", {
         tab = tab,
         json = data,
@@ -66,7 +68,7 @@ function MongoComponent.Query(tab, data, limit)
     return responses
 end
 
-function MongoComponent.Update(tab, select, update, tag)
+function MongoComponent.Update(tab, select, update, tag, flag)
     if type(select) == "table" then
         select = Json.Encode(select)
     end
@@ -75,12 +77,13 @@ function MongoComponent.Update(tab, select, update, tag)
     end
     assert(type(select) == "string")
     assert(type(update) == "string")
-    local address = mongoService:GetAddress()
+    local address = mongoService:GetHost()
     return mongoService:Call(address, "Update", {
         tab = tab,
         select = select,
         update = update,
-        tag = tag or "$set"
+        tag = tag or "$set",
+        flag = flag or 0
     })
 end
 
@@ -88,7 +91,8 @@ function MongoComponent.Push(tab, select, update)
     return MongoComponent.Update(tab, select, update, "$push")
 end
 
-function MongoComponent.AddCounter(tab, key)
+function MongoComponent.AddCounter(key)
+    local tab = "custom_counter";
     return MongoComponent.Update(tab, {
         _id = key
     }, {value = 1}, "$inc")

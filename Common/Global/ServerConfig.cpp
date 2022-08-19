@@ -51,6 +51,7 @@ namespace Sentry
                     this->mListens.emplace(listenConfig.Name, listenConfig);
                 }
             }
+            this->GetListener("rpc", this->mLocalHost);
         }
         if(this->GetJsonValue("services") != nullptr)
         {

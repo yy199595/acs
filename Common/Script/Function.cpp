@@ -68,14 +68,15 @@ namespace Lua
 
     WaitLuaTaskSource *Function::Call(lua_State *lua)
     {
-        if(!Lua::Function::Get(lua, "coroutine", "call"))
-        {
-            return nullptr;
-        }
         if(!lua_isfunction(lua, -1))
         {
             return nullptr;
         }
+        if(!Lua::Function::Get(lua, "coroutine", "call"))
+        {
+            return nullptr;
+        }
+        lua_pushvalue(lua, -2);
         if (lua_pcall(lua, 1, 1, 0) != 0)
         {
             LOG_ERROR(lua_tostring(lua, -1));

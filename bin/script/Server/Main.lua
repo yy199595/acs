@@ -17,6 +17,16 @@ function Main.Awake()
     print("***************")
 end
 
+function Main.AllServiceStart()
+    for i = 1, 10 do
+        local account = string.format("%d@qq.com",1000 + i)
+        local userInfo = MongoComponent.QueryOnce("user_account", {
+            _id = account
+        })
+
+    end
+end
+
 function Main.OnLoadModule(moduleName)
 
     local oldModule = package.loaded[moduleName] or {}

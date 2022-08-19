@@ -52,7 +52,8 @@ namespace Sentry
         std::shared_ptr<Mongo::MongoQueryResponse> Query(const std::string & tab, const std::string & json, int limit = 1);
         bool Update(const std::string & tab, const std::string & update, const std::string & selector, const std::string & tag);
     public:
-		void OnClientError(int index, XCode code);
+        void SelectMongoClient(int index);
+        void OnClientError(int index, XCode code);
         std::shared_ptr<MongoClientContext> GetClient(int index = 0);
 		std::shared_ptr<Mongo::MongoQueryResponse> Run(std::shared_ptr<MongoClientContext> mongoClient, std::shared_ptr<MongoQueryRequest> request);
 	 private:
@@ -60,6 +61,7 @@ namespace Sentry
 		TimerComponent * mTimerComponent;
 		Util::NumberBuilder<int, 10> mRequestId;
         class NetThreadComponent * mNetComponent;
+        std::shared_ptr<MongoClientContext> mCurClient;
         std::vector<std::shared_ptr<MongoClientContext>> mMongoClients;
     };
 }

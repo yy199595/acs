@@ -72,8 +72,21 @@ namespace Sentry
 		return response != nullptr && response->GetDocumentSize() > 0 && response->Get().IsOk();
 	}
 
+    void MongoRpcComponent::SelectMongoClient(int index)
+    {
+        if(this->mCurClient != nullptr)
+        {
+            std::move(this->mCurClient);
+            this->mCurClient = this->GetClient(index);
+        }
+    }
+
     std::shared_ptr<MongoClientContext> MongoRpcComponent::GetClient(int index)
     {
+        if(this->mCurClient != nullptr)
+        {
+            return std::move(this->mCurClient);
+        }
         if(index > 0)
         {
             index = index % this->mMongoClients.size();
@@ -143,7 +156,7 @@ namespace Sentry
         std::shared_ptr<Mongo::MongoQueryResponse> mongoResponse = mongoTask->Await();
 		if(mongoResponse != nullptr && mongoResponse->GetDocumentSize() > 0)
 		{
-            //LOG_DEBUG( "[" << Time::GetNowMilTime() - t1 << "ms] document size = [" << mongoResponse->GetDocumentSize() << "]");
+            LOG_DEBUG( "[" << Time::GetNowMilTime() - t1 << "ms] document size = [" << mongoResponse->GetDocumentSize() << "]");
             for(size_t i = 0; i < mongoResponse->GetDocumentSize(); i++)
             {
                 std::string json;

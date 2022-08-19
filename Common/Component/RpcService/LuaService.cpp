@@ -56,6 +56,7 @@ namespace Sentry
                 return false;
             }
         }
+        this->AddHost(this->GetConfig().GetLocalHost());
         return true;
 	}
 

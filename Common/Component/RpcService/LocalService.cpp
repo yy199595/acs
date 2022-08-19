@@ -70,7 +70,7 @@ namespace Sentry
                 return false;
             }
         }
-
+        this->AddHost(this->GetApp()->GetConfig().GetLocalHost());
 		return true;
 	}
 

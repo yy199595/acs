@@ -1457,6 +1457,12 @@ class mongo_insert :
   ::std::string* release_json();
   void set_allocated_json(::std::string* json);
 
+  // int32 flag = 3;
+  void clear_flag();
+  static const int kFlagFieldNumber = 3;
+  ::google::protobuf::int32 flag() const;
+  void set_flag(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:s2s.mongo.insert)
  private:
   class HasBitSetters;
@@ -1464,6 +1470,7 @@ class mongo_insert :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr tab_;
   ::google::protobuf::internal::ArenaStringPtr json_;
+  ::google::protobuf::int32 flag_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2eproto;
 };
@@ -1976,6 +1983,12 @@ class mongo_remove :
   ::google::protobuf::int32 limit() const;
   void set_limit(::google::protobuf::int32 value);
 
+  // int32 flag = 4;
+  void clear_flag();
+  static const int kFlagFieldNumber = 4;
+  ::google::protobuf::int32 flag() const;
+  void set_flag(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:s2s.mongo.remove)
  private:
   class HasBitSetters;
@@ -1984,6 +1997,7 @@ class mongo_remove :
   ::google::protobuf::internal::ArenaStringPtr tab_;
   ::google::protobuf::internal::ArenaStringPtr json_;
   ::google::protobuf::int32 limit_;
+  ::google::protobuf::int32 flag_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2eproto;
 };
@@ -2140,6 +2154,12 @@ class mongo_update :
   ::std::string* release_tag();
   void set_allocated_tag(::std::string* tag);
 
+  // int32 flag = 5;
+  void clear_flag();
+  static const int kFlagFieldNumber = 5;
+  ::google::protobuf::int32 flag() const;
+  void set_flag(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:s2s.mongo.update)
  private:
   class HasBitSetters;
@@ -2149,6 +2169,7 @@ class mongo_update :
   ::google::protobuf::internal::ArenaStringPtr select_;
   ::google::protobuf::internal::ArenaStringPtr update_;
   ::google::protobuf::internal::ArenaStringPtr tag_;
+  ::google::protobuf::int32 flag_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2eproto;
 };
@@ -4916,6 +4937,20 @@ inline void mongo_insert::set_allocated_json(::std::string* json) {
   // @@protoc_insertion_point(field_set_allocated:s2s.mongo.insert.json)
 }
 
+// int32 flag = 3;
+inline void mongo_insert::clear_flag() {
+  flag_ = 0;
+}
+inline ::google::protobuf::int32 mongo_insert::flag() const {
+  // @@protoc_insertion_point(field_get:s2s.mongo.insert.flag)
+  return flag_;
+}
+inline void mongo_insert::set_flag(::google::protobuf::int32 value) {
+  
+  flag_ = value;
+  // @@protoc_insertion_point(field_set:s2s.mongo.insert.flag)
+}
+
 // -------------------------------------------------------------------
 
 // mongo_query_request
@@ -5241,6 +5276,20 @@ inline void mongo_remove::set_limit(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:s2s.mongo.remove.limit)
 }
 
+// int32 flag = 4;
+inline void mongo_remove::clear_flag() {
+  flag_ = 0;
+}
+inline ::google::protobuf::int32 mongo_remove::flag() const {
+  // @@protoc_insertion_point(field_get:s2s.mongo.remove.flag)
+  return flag_;
+}
+inline void mongo_remove::set_flag(::google::protobuf::int32 value) {
+  
+  flag_ = value;
+  // @@protoc_insertion_point(field_set:s2s.mongo.remove.flag)
+}
+
 // -------------------------------------------------------------------
 
 // mongo_update
@@ -5455,6 +5504,20 @@ inline void mongo_update::set_allocated_tag(::std::string* tag) {
   }
   tag_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), tag);
   // @@protoc_insertion_point(field_set_allocated:s2s.mongo.update.tag)
+}
+
+// int32 flag = 5;
+inline void mongo_update::clear_flag() {
+  flag_ = 0;
+}
+inline ::google::protobuf::int32 mongo_update::flag() const {
+  // @@protoc_insertion_point(field_get:s2s.mongo.update.flag)
+  return flag_;
+}
+inline void mongo_update::set_flag(::google::protobuf::int32 value) {
+  
+  flag_ = value;
+  // @@protoc_insertion_point(field_set:s2s.mongo.update.flag)
 }
 
 // -------------------------------------------------------------------

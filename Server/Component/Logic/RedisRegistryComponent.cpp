@@ -49,6 +49,7 @@ namespace Sentry
         auto iter = this->mNodes.find(address);
         if(iter == this->mNodes.end())
         {
+            LOG_ERROR("not find node address = " << address);
             return false;
         }
         iter->second->UpdateTime();
@@ -199,15 +200,17 @@ namespace Sentry
             for(size_t index = 0; index < response->GetArraySize(); index++)
             {
                 const RedisString * redisString = response->Get(index)->Cast<RedisString>();
+                ServiceNode * serviceNode = new ServiceNode(redisString->GetValue());
                 std::shared_ptr<RedisResponse> response1 =
                         this->mRedisComponent->RunCmd("main", "SMEMBERS", redisString->GetValue());
                 for(size_t x = 0; x < response1->GetArraySize(); x ++)
                 {
-                    redisString = response1->Get(x)->Cast<RedisString>();
-                    Service * service = this->GetApp()->GetService(redisString->GetValue());
+                    const RedisString * redisString2 = response1->Get(x)->Cast<RedisString>();
+                    Service * service = this->GetApp()->GetService(redisString2->GetValue());
                     if(service != nullptr)
                     {
                         service->AddHost(redisString->GetValue());
+                        serviceNode->AddService(redisString2->GetValue());
                     }
                 }
             }

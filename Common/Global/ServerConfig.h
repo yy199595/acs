@@ -50,6 +50,7 @@ namespace Sentry
 		const std::string & GetWorkPath() const { return this->mWrokDir; }
         const ServiceConfig * GetServiceConfig(const std::string & name) const;
         size_t GetServiceConfigs(std::vector<const ServiceConfig *> & configs) const;
+        const std::string & GetLocalHost() const { return this->mLocalHost; }
     private:
         int mNodeId;
 		std::string mContent;
@@ -57,7 +58,8 @@ namespace Sentry
 		std::string mWrokDir;
         std::string mNodeName;
 		std::string mConfigPath;
-		std::unordered_map<std::string, std::string> mPaths;
+        std::string mLocalHost;
+        std::unordered_map<std::string, std::string> mPaths;
 		std::unordered_map<std::string, ListenConfig> mListens;
         std::unordered_map<std::string , ServiceConfig> mServiceConfigs;
     };
