@@ -31,7 +31,10 @@ namespace Sentry
     void HttpHandlerClient::StartWriter(HttpStatus code)
     {
         this->mHttpResponse->SetCode(code);
-        CONSOLE_LOG_ERROR("[" << this->mHttpRequest->GetPath() << "] " << HttpStatusToString(code));
+        if(code != HttpStatus::OK)
+        {
+            CONSOLE_LOG_ERROR("[" << this->mHttpRequest->GetPath() << "] " << HttpStatusToString(code));
+        }
 #ifdef ONLY_MAIN_THREAD
         this->Send(this->mHttpResponse);
 #else

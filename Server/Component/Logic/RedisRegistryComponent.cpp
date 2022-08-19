@@ -213,6 +213,7 @@ namespace Sentry
                         serviceNode->AddService(redisString2->GetValue());
                     }
                 }
+                this->mNodes.emplace(serviceNode->GetHost(), serviceNode);
             }
         }
     }
