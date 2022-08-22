@@ -30,25 +30,28 @@ namespace Sentry
         {
             return false;
         }
-        if(this->RecvSync(len) <= 0)
+        if (this->RecvSync(len) <= 0)
         {
             return false;
         }
-        int index = readStream.get(); //序号
-        int proto = readStream.get();
-		Tcp::ReadStreamHelper streamHelper(readStream);
-		std::string version = streamHelper.ReadString();
-		const int threadId = streamHelper.ReadByType<int>();
-		long long randNum = streamHelper.ReadByType<long long>();
-
-        std::string str;
-        char buffer[100] = {0};
-        size_t size = readStream.readsome(buffer, 100);
-        while(size > 0)
+        size_t pos = 0;
+        std::unique_ptr<char[]> buffer(new char[len]);
+        size_t size = readStream.readsome(buffer.get(), 100);
+        while (size > 0)
         {
-            str.append(buffer, size);
-            size = readStream.readsome(buffer, 100);
+            pos += size;
+            size = readStream.readsome(buffer.get() + pos, 100);
         }
+        pos = 2;
+        int protocol = buffer[0];
+        std::string version(buffer.get() + pos);
+        pos += version.size();
+        int threadId = 0;
+        memcpy(&threadId, buffer.get() + pos, sizeof(int));
+        pos += 4;
+        std::string scramble1(buffer.get() + pos, pos + 8 -1);
+        pos += 9;
+
         return true;
     }
 }

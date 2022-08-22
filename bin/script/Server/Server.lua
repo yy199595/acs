@@ -19,15 +19,6 @@ end
 
 function Server.AllServiceStart()
 
-    MongoComponent.SetIndex("user_account", "user_id")
-
-    for i = 1, 10 do
-        local account = string.format("%d@qq.com",1000 + i)
-        local userInfo = MongoComponent.QueryOnce("user_account", {
-            _id = account
-        })
-
-    end
 end
 
 function Server.OnLoadModule(moduleName)

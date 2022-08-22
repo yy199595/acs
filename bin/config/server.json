@@ -109,6 +109,7 @@
         "UserSyncComponent",
         "HttpWebComponent",
         "HttpRpcComponent",
+        "MysqlRpcComponent",
         "JsonClientComponent",
         "RedisRegistryComponent"
     ],

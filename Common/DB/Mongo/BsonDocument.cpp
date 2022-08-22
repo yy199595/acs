@@ -103,15 +103,29 @@ namespace Bson
 			{
 				return false;
 			}
-			for (auto iter = document.MemberBegin(); iter != document.MemberEnd(); iter++)
-			{
-				const char* key = iter->name.GetString();
-				if (!this->WriterToBson(key, *this, iter->value))
-				{
-					return false;
-				}
-			}
-			return true;
+            if(document.IsArray())
+            {
+                for(size_t index = 0; index < document.Size(); index++)
+                {
+                    std::string key = std::to_string(index);
+                    this->WriterToBson(key.c_str(), *this, document[index]);
+                }
+                return true;
+            }
+            if(document.IsObject())
+            {
+                auto iter = document.MemberBegin();
+                for (; iter != document.MemberEnd(); iter++)
+                {
+                    const char *key = iter->name.GetString();
+                    if (!this->WriterToBson(key, *this, iter->value))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
 		}
 
 		bool Object::WriterToBson(const char* key, Document& document, const rapidjson::Value& jsonValue)

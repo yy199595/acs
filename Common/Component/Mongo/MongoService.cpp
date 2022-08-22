@@ -19,8 +19,47 @@ namespace Sentry
         methodRegister.Bind("Delete", &MongoService::Delete);
         methodRegister.Bind("Update", &MongoService::Update);
         methodRegister.Bind("SetIndex", &MongoService::SetIndex);
-        methodRegister.Bind("AddCounter", &MongoService::AddCounter);
+        methodRegister.Bind("RunCommand", &MongoService::RunCommand);
+
+        Json::Writer json(false);
+        json << 1 << 2 << 3 << 4;
+        std::string str = json.JsonString();
+
+        Bson::Writer::Object add;
+        add.FromByJson(str);
+
+        int length = 0;
+        const char * str1 = add.Serialize(length);
+
+        Bson::Read::Object obj(str1);
+
+        std::string json1;
+        obj.WriterToJson(json1);
+
         return this->mMongoComponent != nullptr;
+    }
+
+    XCode MongoService::RunCommand(const s2s::mongo::command::request &request, s2s::mongo::command::response &response)
+    {
+        std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
+
+        const std::string & json = request.json();
+        if(!mongoRequest->document.FromByJson(json))
+        {
+            return XCode::CallArgsError;
+        }
+        std::shared_ptr<MongoClientContext> client = this->mMongoComponent->GetClient();
+        std::shared_ptr<MongoQueryResponse> mongoResponse = this->mMongoComponent->Run(client, mongoRequest);
+        if(mongoResponse != nullptr)
+        {
+            for(size_t index = 0; index < mongoResponse->GetDocumentSize(); index++)
+            {
+                std::string * json = response.add_jsons();
+                mongoResponse->Get().WriterToJson(*json);
+            }
+            return XCode::Successful;
+        }
+        return XCode::Failure;
     }
 
     XCode MongoService::Insert(const s2s::mongo::insert &request)
@@ -71,12 +110,6 @@ namespace Sentry
 #endif
             return XCode::Failure;
         }
-        return XCode::Successful;
-    }
-
-    XCode MongoService::AddCounter(const s2s::mongo::add_counter::request &request,
-                                   s2s::mongo::add_counter::response &response)
-    {
         return XCode::Successful;
     }
 

@@ -86,11 +86,11 @@
             "Type": "Server",
             "Request": "s2s.mongo.index"
         },
-        "AddCounter": {
+        "RunCommand": {
             "Async": true,
             "Type": "Server",
-            "Request": "s2s.add_counter.request",
-            "Response": "s2s.add_counter.response"
+            "Request": "s2s.mongo.command.request",
+            "Response": "s2s.mongo.command.response"
         }
     },
     "ChatService": {

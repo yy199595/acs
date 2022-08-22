@@ -20,6 +20,7 @@ namespace Sentry
 
     private:
         bool OnStart() final;
+        bool LateAwake() final;
 
     private:
         MysqlConfig mConfig;

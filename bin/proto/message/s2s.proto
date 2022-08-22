@@ -91,15 +91,15 @@ message mongo
         string tag = 4;
         int32 flag = 5;
     }
-    message add_counter
+    message command
     {
         message request
         {
-            string key = 1;
+            string json = 1;
         }
         message response
         {
-            int64 value = 1;
+            repeated string jsons = 1;
         }
     }
 }
