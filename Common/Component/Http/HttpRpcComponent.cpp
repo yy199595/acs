@@ -105,5 +105,6 @@ namespace Sentry
     HttpStatus HttpRpcComponent::Invoke(std::shared_ptr<HttpHandlerClient> httpClient)
     {
 
+        return HttpStatus::OK;
     }
 }
