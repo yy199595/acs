@@ -13,13 +13,13 @@
 
 namespace Mongo
 {
-	MongoClientContext::MongoClientContext(std::shared_ptr<SocketProxy> socket, const Mongo::Config& config)
+	TcpMongoClient::TcpMongoClient(std::shared_ptr<SocketProxy> socket, const Mongo::Config& config)
 		: Tcp::TcpContext(socket, 1024 * 1024), mConfig(config), mMongoComponent(nullptr)
 	{
         LOG_CHECK_FATAL(this->mMongoComponent = App::Get()->GetComponent<MongoRpcComponent>());
 	}
 
-	void MongoClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
+	void TcpMongoClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{
 		if (code)
 		{
@@ -40,7 +40,7 @@ namespace Mongo
 		this->ReceiveMessage(sizeof(MongoHead));
 	}
 
-    void MongoClientContext::OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t size)
+    void TcpMongoClient::OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t size)
 	{
 		if (code)
 		{
@@ -88,13 +88,13 @@ namespace Mongo
 
 	}
 
-	void MongoClientContext::SendMongoCommand(std::shared_ptr<MongoQueryRequest> request)
+	void TcpMongoClient::SendMongoCommand(std::shared_ptr<MongoQueryRequest> request)
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->Send(request);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-		t.post(std::bind(&MongoClientContext::Send, this, request));
+		t.post(std::bind(&TcpMongoClient::Send, this, request));
 #endif
 	}
 
@@ -111,7 +111,7 @@ namespace Mongo
 		return output;
 	}
 
-	bool MongoClientContext::StartAuthBySha1()
+	bool TcpMongoClient::StartAuthBySha1()
 	{
 		if(!this->ConnectSync())
 		{

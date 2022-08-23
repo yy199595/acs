@@ -48,7 +48,7 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-        std::shared_ptr<MongoClientContext> client = this->mMongoComponent->GetClient();
+        std::shared_ptr<TcpMongoClient> client = this->mMongoComponent->GetClient();
         std::shared_ptr<MongoQueryResponse> mongoResponse = this->mMongoComponent->Run(client, mongoRequest);
         if(mongoResponse != nullptr)
         {

@@ -55,15 +55,15 @@ namespace Sentry
     public:
         void SelectMongoClient(int index);
         void OnClientError(int index, XCode code);
-        std::shared_ptr<MongoClientContext> GetClient(int index = 0);
-		std::shared_ptr<Mongo::MongoQueryResponse> Run(std::shared_ptr<MongoClientContext> mongoClient, std::shared_ptr<MongoQueryRequest> request);
+        std::shared_ptr<TcpMongoClient> GetClient(int index = 0);
+		std::shared_ptr<Mongo::MongoQueryResponse> Run(std::shared_ptr<TcpMongoClient> mongoClient, std::shared_ptr<MongoQueryRequest> request);
 	 private:
 		Mongo::Config mConfig;
 		TimerComponent * mTimerComponent;
 		Util::NumberBuilder<int, 10> mRequestId;
         class NetThreadComponent * mNetComponent;
-        std::shared_ptr<MongoClientContext> mCurClient;
-        std::vector<std::shared_ptr<MongoClientContext>> mMongoClients;
+        std::shared_ptr<TcpMongoClient> mCurClient;
+        std::vector<std::shared_ptr<TcpMongoClient>> mMongoClients;
     };
 }
 

@@ -11,7 +11,7 @@ namespace Sentry
 {
 	MessageRpcClient::MessageRpcClient(RpcServerComponent* component,
                                        std::shared_ptr<SocketProxy> socket)
-		: TcpContext(socket), mTcpComponent(component)
+		: TcpContext(socket, 1024 * 1024), mTcpComponent(component)
 	{
 
 	}

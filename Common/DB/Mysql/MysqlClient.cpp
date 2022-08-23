@@ -34,23 +34,11 @@ namespace Sentry
         {
             return false;
         }
-        size_t pos = 0;
-        std::unique_ptr<char[]> buffer(new char[len]);
-        size_t size = readStream.readsome(buffer.get(), 100);
-        while (size > 0)
-        {
-            pos += size;
-            size = readStream.readsome(buffer.get() + pos, 100);
-        }
-        pos = 2;
-        int protocol = buffer[0];
-        std::string version(buffer.get() + pos);
-        pos += version.size();
-        int threadId = 0;
-        memcpy(&threadId, buffer.get() + pos, sizeof(int));
-        pos += 4;
-        std::string scramble1(buffer.get() + pos, pos + 8 -1);
-        pos += 9;
+        int protocol = readStream.get();
+        Tcp::ReadStreamHelper helper(readStream);
+        const std::string version = helper.ReadString();
+        const int threadId = helper.ReadByType<int>();
+        std::string scramble1 = helper.ReadString(7);
 
         return true;
     }

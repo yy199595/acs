@@ -17,7 +17,7 @@ namespace Lua
 		const char* name = lua_tostring(lua, 2);
 		const char* command = lua_tostring(lua, 3);
 		MainRedisComponent* redisComponent = UserDataParameter::Read<MainRedisComponent*>(lua, 1);
-		std::shared_ptr<RedisRpcClient> redisClientContext = redisComponent->GetClient(name);
+		std::shared_ptr<TcpRedisClient> redisClientContext = redisComponent->GetClient(name);
 		if (redisClientContext == nullptr)
 		{
 			luaL_error(lua, "not find redis client %s\n", name);
@@ -63,7 +63,7 @@ namespace Lua
 		const char* fullName = lua_tostring(lua, 3);
 		Lua::Json::Read(lua, 4, &json);
 		MainRedisComponent* redisComponent = UserDataParameter::Read<MainRedisComponent*>(lua, 1);
-		std::shared_ptr<RedisRpcClient> redisClientContext = redisComponent->GetClient(name);
+		std::shared_ptr<TcpRedisClient> redisClientContext = redisComponent->GetClient(name);
 		if (redisClientContext == nullptr)
 		{
 			luaL_error(lua, "not find redis client %s\n", name);

@@ -15,13 +15,12 @@ namespace Sentry
 {
 	struct RedisConfig;
     class RedisComponent;
-    class RedisRpcClient final : public Tcp::TcpContext
+    class TcpRedisClient final : public Tcp::TcpContext
     {
     public:
-        RedisRpcClient(std::shared_ptr<SocketProxy> socket, const RedisConfig & config, RedisComponent * component);
-		~RedisRpcClient();
+        TcpRedisClient(std::shared_ptr<SocketProxy> socket, const RedisConfig & config, RedisComponent * component);
+		~TcpRedisClient();
     public:
-        void StartReceiveMessage();
         const RedisConfig & GetConfig() { return mConfig;}
         void SendCommand(std::shared_ptr<RedisRequest> command);
         const std::string & GetName() const { return this->mConfig.Name; }
@@ -43,6 +42,6 @@ namespace Sentry
         std::shared_ptr<RedisResponse> mCurResponse;
         std::shared_ptr<asio::steady_timer> mCloseTimer;
     };
-    typedef std::shared_ptr<RedisRpcClient> SharedRedisClient;
+    typedef std::shared_ptr<TcpRedisClient> SharedRedisClient;
 }
 #endif //GAMEKEEPER_REDISCLIENT_H

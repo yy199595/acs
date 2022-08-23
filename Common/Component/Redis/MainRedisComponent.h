@@ -4,7 +4,7 @@
 #include"Json/JsonWriter.h"
 #include"Other/ElapsedTimer.h"
 #include"RedisComponent.h"
-#include"DB/Redis/RedisRpcClient.h"
+#include"DB/Redis/TcpRedisClient.h"
 #include"Component/Coroutine/TaskComponent.h"
 
 namespace Sentry

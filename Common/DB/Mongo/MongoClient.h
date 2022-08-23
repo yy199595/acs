@@ -34,10 +34,10 @@ namespace Sentry
 
 namespace Mongo
 {
-	class MongoClientContext : public Tcp::TcpContext
+	class TcpMongoClient : public Tcp::TcpContext
 	{
 	 public:
-		MongoClientContext(std::shared_ptr<SocketProxy> scoket, const Mongo::Config & config);
+		TcpMongoClient(std::shared_ptr<SocketProxy> scoket, const Mongo::Config & config);
 	public:
 		void SendMongoCommand(std::shared_ptr<MongoQueryRequest> request);
 	private:
