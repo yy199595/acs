@@ -92,7 +92,7 @@ namespace Sentry
             index = index % this->mMongoClients.size();
             return this->mMongoClients[index];
         }
-        std::shared_ptr<TcpMongoClient> retunrClient = this->mMongoClients.front();
+        std::shared_ptr<TcpMongoClient> returnClient = this->mMongoClients.front();
         for(size_t i = 0; i < this->mMongoClients.size(); i++)
         {
             std::shared_ptr<TcpMongoClient> mongoClient = this->mMongoClients[i];
@@ -100,12 +100,12 @@ namespace Sentry
             {
                 return mongoClient;
             }
-            if(mongoClient->WaitSendCount() < retunrClient->WaitSendCount())
+            if(mongoClient->WaitSendCount() < returnClient->WaitSendCount())
             {
-                retunrClient = mongoClient;
+                returnClient = mongoClient;
             }
         }
-        return retunrClient;
+        return returnClient;
     }
 
 	bool MongoRpcComponent::InsertOnce(const std::string& tab, const std::string& json)
