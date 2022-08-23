@@ -110,6 +110,7 @@
         "HttpWebComponent",
         "HttpRpcComponent",
         "JsonClientComponent",
+        "MysqlRpcComponent",
         "RedisRegistryComponent"
     ],
     "services": {

@@ -34,12 +34,26 @@ namespace Sentry
         {
             return false;
         }
+        int index = readStream.get();
         int protocol = readStream.get();
         Tcp::ReadStreamHelper helper(readStream);
         const std::string version = helper.ReadString();
         const int threadId = helper.ReadByType<int>();
-        std::string scramble1 = helper.ReadString(7);
+        int size = 1 + version.size() + 1 + sizeof(int);
+        std::string scramble1 = helper.ReadString(8);
 
+        unsigned int _server_capabilities = helper.ReadByType<unsigned short>();
+        unsigned int _server_lang = readStream.get();
+
+        unsigned int _server_status = helper.ReadByType<unsigned short>();
+        unsigned int more_capabilities = helper.ReadByType<unsigned short>();
+        _server_capabilities = _server_capabilities | more_capabilities << 16;
+
+        std::string scramble_part2 = helper.ReadString(12);
+
+        std::string scramble = scramble1 + scramble_part2;
+
+        size_t size1 = scramble.size();
         return true;
     }
 }
