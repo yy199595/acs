@@ -17,6 +17,7 @@ namespace Sentry
                     MysqlConfig& config, MysqlRpcComponent * component);
     private:
         bool StartAuth();
+        std::string ComputeToken(const std::string & password, const std::string & scramble);
 	 private:
 		const MysqlConfig& mConfig;
         MysqlRpcComponent * mComponent;
