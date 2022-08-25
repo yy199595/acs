@@ -5,7 +5,7 @@
 
 #include"Network/Listener/TcpServerComponent.h"
 #include"Global/ServiceConfig.h"
-#include"Component/Redis/MainRedisComponent.h"
+#include"Component/Redis/DataRedisComponent.h"
 #include"Component/Scene/UnitMgrComponent.h"
 #include"Component/Http/HttpComponent.h"
 #include"Component/Gate/GateService.h"
@@ -36,6 +36,7 @@
 #include"Component/Redis/RedisSubComponent.h"
 #include"Component/Http/HttpWebComponent.h"
 #include"Component/Http/HttpRpcComponent.h"
+#include"Component/RpcService/ServiceAgent.h"
 using namespace Sentry;
 void RegisterComponent()
 {
@@ -65,7 +66,7 @@ void RegisterComponent()
 // db
     ComponentFactory::Add<MysqlRpcComponent>("MysqlRpcComponent");
 	ComponentFactory::Add<MongoRpcComponent>("MongoRpcComponent");
-    ComponentFactory::Add<MainRedisComponent>("MainRedisComponent");
+    ComponentFactory::Add<DataRedisComponent>("DataRedisComponent");
     ComponentFactory::Add<RedisSubComponent>("RedisSubComponent");
 
 //http
@@ -85,6 +86,7 @@ void RegisterComponent()
 void RegisterServiceComponent()
 {
     ComponentFactory::Add<LuaService>("rpc");
+    ComponentFactory::Add<ServiceAgent>("agent");
     ComponentFactory::Add<LocalLuaHttpService>("http");
     ComponentFactory::Add<GateService>("GateService");
 	ComponentFactory::Add<MongoService>("MongoService");

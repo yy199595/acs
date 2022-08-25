@@ -21,8 +21,7 @@ namespace Sentry
 	 protected:
 		bool LateAwake() final;
 	 private:
-		class MainRedisComponent * mRedisComponent;
-		class MysqlDataComponent * mMysqlComponent;
+		class DataRedisComponent * mRedisComponent;
 	};
 }
 

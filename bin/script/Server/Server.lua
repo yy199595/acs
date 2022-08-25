@@ -21,7 +21,7 @@ function Server.AllServiceStart()
     local t1 = Time.GetNowMilTime()
     local response = MongoComponent.Query("user_account", {}, 100)
     Log.Error("time = ", Time.GetNowMilTime() - t1)
-    --table.print(response)
+    table.print(response)
 end
 
 function Server.OnLoadModule(moduleName)

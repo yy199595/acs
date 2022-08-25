@@ -2,7 +2,7 @@
 #include"App/App.h"
 #include"Network/Listener/TcpServerListener.h"
 #include"Network/Listener/TcpServerComponent.h"
-#include"Component/Redis/MainRedisComponent.h"
+#include"Component/Redis/DataRedisComponent.h"
 #include"Component/RpcService/LocalService.h"
 #include"Component/Redis/RedisSubComponent.h"
 
@@ -26,7 +26,7 @@ namespace Sentry
 	{
         this->mTaskComponent = this->GetComponent<TaskComponent>();
         this->mSubComponent = this->GetComponent<RedisSubComponent>();
-        this->mRedisComponent = this->GetComponent<MainRedisComponent>();
+        this->mRedisComponent = this->GetComponent<DataRedisComponent>();
 		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("area_id", this->mAreaId));
 		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("node_name", this->mNodeName));
 		LOG_CHECK_RET_FALSE(this->GetConfig().GetListener("rpc", this->mRpcAddress));

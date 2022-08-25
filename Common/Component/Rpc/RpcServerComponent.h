@@ -20,15 +20,13 @@ namespace Sentry
 		void OnResponse(std::shared_ptr<com::rpc::response> response) final;
 
 	 protected:
+        void Awake() final;
+        bool LateAwake() final;
 		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 public:
 		std::shared_ptr<MessageRpcClient> GetSession(const std::string& address);
 		std::shared_ptr<MessageRpcClient> GetOrCreateSession(const std::string& address);
-	 protected:
-		void Awake() final;
-		bool LateAwake() final;
 	 public:
-		bool CloseSession(long long id);
 		bool Send(const std::string & address, std::shared_ptr<com::rpc::request> message);
 		bool Send(const std::string & address, std::shared_ptr<com::rpc::response> message);
 	 private:

@@ -12,7 +12,7 @@
 #include"Component/RpcService/LocalService.h"
 #include"GateService.h"
 #include"Component/User/UserSyncComponent.h"
-#include"Component/Redis/MainRedisComponent.h"
+#include"Component/Redis/DataRedisComponent.h"
 #include"Component/Scene/MessageComponent.h"
 
 namespace Sentry

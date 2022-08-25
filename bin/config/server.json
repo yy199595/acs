@@ -97,7 +97,7 @@
         "NetThreadComponent",
         "TcpServerComponent",
         "RedisSubComponent",
-        "MainRedisComponent",
+        "DataRedisComponent",
         "LuaScriptComponent",
         "RpcServerComponent",
         "TcpRpcComponent",
@@ -128,11 +128,6 @@
         "GateService": {
             "Type": "rpc",
             "IsStart": true
-        },
-        "MysqlService": {
-            "Type": "rpc",
-            "IsStart": false,
-            "Address": ""
         },
         "AccountService": {
             "Type": "http",

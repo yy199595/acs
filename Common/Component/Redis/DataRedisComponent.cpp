@@ -1,4 +1,4 @@
-﻿#include"MainRedisComponent.h"
+﻿#include"DataRedisComponent.h"
 
 #include"App/App.h"
 #include"Util/StringHelper.h"
@@ -10,7 +10,7 @@
 
 namespace Sentry
 {
-    bool MainRedisComponent::OnInitRedisClient(RedisConfig config)
+    bool DataRedisComponent::OnInitRedisClient(RedisConfig config)
     {
         config.Channels.clear();
         for (int index = 0; index < config.Count; index++)
@@ -29,7 +29,7 @@ namespace Sentry
     }
 
 
-    bool MainRedisComponent::Call(const std::string &name, const std::string &func, Json::Writer &request,
+    bool DataRedisComponent::Call(const std::string &name, const std::string &func, Json::Writer &request,
                                   std::shared_ptr<Json::Reader> response)
     {
         SharedRedisClient redisClientContext = this->GetClient(name);
@@ -45,17 +45,18 @@ namespace Sentry
         return response->ParseJson(redisResponse->GetString());
     }
 
-	void MainRedisComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
+	void DataRedisComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
 	{
-		luaRegister.BeginRegister<MainRedisComponent>();
+		luaRegister.BeginRegister<DataRedisComponent>();
 		luaRegister.PushExtensionFunction("Run", Lua::Redis::Run);
 		luaRegister.PushExtensionFunction("Call", Lua::Redis::Call);
-	}
+        luaRegister.PushExtensionFunction("Send", Lua::Redis::Send);
+    }
 }
 
 namespace Sentry
 {
-    std::shared_ptr<RedisRequest> MainRedisComponent::MakeLuaRequest(const std::string &fullName, const std::string &json)
+    std::shared_ptr<RedisRequest> DataRedisComponent::MakeLuaRequest(const std::string &fullName, const std::string &json)
     {
         std::vector<std::string> tempArray;
         if(Helper::String::Split(fullName, ".",tempArray) != 2)
@@ -75,7 +76,7 @@ namespace Sentry
         return RedisRequest::MakeLua(tag, func, json);
     }
 
-    void MainRedisComponent::OnLoadScript(const std::string &path, const std::string &md5)
+    void DataRedisComponent::OnLoadScript(const std::string &path, const std::string &md5)
     {
         std::string fileName;
         std::vector<std::string> tempArray;

@@ -16,4 +16,32 @@ enum class MESSAGE_TYPE
 	MSG_NET_EVENT = 0x05 //redis事件
 };
 
+enum class MESSAGE_PROTO
+{
+    MSG_RPC_JSON = 0x01, //json
+    MSG_RPC_PROTOBUF = 0x02 //protobuf
+};
+
+namespace Rpc
+{
+    class Message
+    {
+    public:
+        Message();
+        ~Message();
+        int DecodeHead(std::istream & is);
+        int DecodeBody(std::istream & is);
+
+    public:
+        int GetType() const { return this->mType; }
+        int GetPorot() const { return this->mProto; }
+        const char * GetData(int & size) const;
+    private:
+        int mSize;
+        int mType;
+        int mProto;
+        char * mBuffer;
+    };
+}
+
 #endif //GameKeeper_MESSAGESTREAM_H

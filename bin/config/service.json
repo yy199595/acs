@@ -58,6 +58,9 @@
             "Response": "com.type.string"
         }
     },
+    "MysqlService": {
+        "Type": "agent"
+    },
     "MongoService": {
         "Type": "rpc",
         "Insert": {

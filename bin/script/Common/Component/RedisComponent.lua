@@ -1,11 +1,17 @@
 
 local RedisComponent = {}
-local component = App.GetComponent("MainRedisComponent")
+local component = App.GetComponent("DataRedisComponent")
 
 function RedisComponent.Run(name, cmd, ...)
     assert(type(cmd) == "string")
     assert(type(name) == "string")
     return component:Run(name, cmd, table.pack(...))
+end
+
+function RedisComponent.Send(name, cmd, ...)
+    assert(type(cmd) == "string")
+    assert(type(name) == "string")
+    return component:Send(name, cmd, table.pack(...))
 end
 
 function RedisComponent.AddCounter(name, key)

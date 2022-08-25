@@ -6,7 +6,7 @@
 #include"DB/Redis/RedisDefine.h"
 #include"Script/Extension/Json/Json.h"
 #include"Component/Scene/MessageComponent.h"
-#include"Component/Redis/MainRedisComponent.h"
+#include"Component/Redis/DataRedisComponent.h"
 
 using namespace Sentry;
 namespace Lua
@@ -16,7 +16,7 @@ namespace Lua
 		lua_pushthread(lua);
 		const char* name = lua_tostring(lua, 2);
 		const char* command = lua_tostring(lua, 3);
-		MainRedisComponent* redisComponent = UserDataParameter::Read<MainRedisComponent*>(lua, 1);
+		DataRedisComponent* redisComponent = UserDataParameter::Read<DataRedisComponent*>(lua, 1);
 		std::shared_ptr<TcpRedisClient> redisClientContext = redisComponent->GetClient(name);
 		if (redisClientContext == nullptr)
 		{
@@ -62,7 +62,7 @@ namespace Lua
 		const char* name = lua_tostring(lua, 2);
 		const char* fullName = lua_tostring(lua, 3);
 		Lua::Json::Read(lua, 4, &json);
-		MainRedisComponent* redisComponent = UserDataParameter::Read<MainRedisComponent*>(lua, 1);
+		DataRedisComponent* redisComponent = UserDataParameter::Read<DataRedisComponent*>(lua, 1);
 		std::shared_ptr<TcpRedisClient> redisClientContext = redisComponent->GetClient(name);
 		if (redisClientContext == nullptr)
 		{
@@ -76,4 +76,24 @@ namespace Lua
 		redisClientContext->SendCommand(request);
 		return luaRedisTask->Await();
 	}
+
+    int Redis::Send(lua_State *lua)
+    {
+        std::string json;
+        lua_pushthread(lua);
+        const char* name = lua_tostring(lua, 2);
+        const char* fullName = lua_tostring(lua, 3);
+        Lua::Json::Read(lua, 4, &json);
+        DataRedisComponent* redisComponent = UserDataParameter::Read<DataRedisComponent*>(lua, 1);
+        std::shared_ptr<TcpRedisClient> redisClientContext = redisComponent->GetClient(name);
+        if (redisClientContext == nullptr)
+        {
+            luaL_error(lua, "not find redis client %s\n", name);
+            lua_pushboolean(lua, false);
+            return 1;
+        }
+        lua_pushboolean(lua, true);
+        redisClientContext->SendCommand(redisComponent->MakeLuaRequest(fullName, json));
+        return 1;
+    }
 }

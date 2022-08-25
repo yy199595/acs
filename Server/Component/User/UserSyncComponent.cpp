@@ -3,13 +3,13 @@
 //
 
 #include"UserSyncComponent.h"
-#include"Component/Redis/MainRedisComponent.h"
+#include"Component/Redis/DataRedisComponent.h"
 #include"Component/RpcService/LocalService.h"
 namespace Sentry
 {
 	bool UserSyncComponent::LateAwake()
 	{
-		this->mRedisComponent = this->GetComponent<MainRedisComponent>();
+		this->mRedisComponent = this->GetComponent<DataRedisComponent>();
 		return true;
 	}
 

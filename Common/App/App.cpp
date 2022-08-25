@@ -67,10 +67,6 @@ namespace Sentry
                 if (component == nullptr)
                 {
                     component = ComponentFactory::CreateComponent(config->Type);
-                    if (component == nullptr && config->Type == "rpc")
-                    {
-                        component = new ServiceAgent();
-                    }
                 }
                 if (component == nullptr || !this->AddComponent(name, component))
                 {
