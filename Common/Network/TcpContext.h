@@ -11,13 +11,12 @@ using namespace Sentry;
 
 namespace Tcp
 {
-    enum class ReadType
+    enum DecodeState
     {
-        HEAD,
-        BODY,
-        LINE
+        None,
+        Head,
+        Body
     };
-
 
 	class ReadStreamHelper
 	{
@@ -70,7 +69,6 @@ namespace Tcp
 	protected:
 		void Connect();
 		void ReceiveLine();
-        void ReceiveLength();
 		void ReceiveSomeMessage();
 		void ReceiveMessage(int size);
         void Send(std::shared_ptr<ProtoMessage> message);
@@ -88,7 +86,6 @@ namespace Tcp
         size_t PopAllMessage();
         std::shared_ptr<ProtoMessage> PopMessage();
 	 protected:
-        virtual void OnReceiveLength(const asio::error_code & code, int length) { }
         virtual void OnConnect(const asio::error_code & error, int count) { throw std::logic_error("");}
         virtual void OnReceiveLine(const asio::error_code & code, std::istream & readStream, size_t size) {}
         virtual void OnReceiveMessage(const asio::error_code & code, std::istream & readStream, size_t size) {}

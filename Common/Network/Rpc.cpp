@@ -2,9 +2,9 @@
 // Created by zmhy0073 on 2022/8/25.
 //
 #include"Rpc.h"
-namespace Rpc
+namespace Tcp
 {
-    Message::Message()
+    RpcMessage::RpcMessage()
     {
         this->mType = 0;
         this->mSize = 0;
@@ -12,7 +12,7 @@ namespace Rpc
         this->mBuffer = nullptr;
     }
 
-    Message::~Message()
+    RpcMessage::~RpcMessage()
     {
         if(this->mBuffer != nullptr)
         {
@@ -20,7 +20,7 @@ namespace Rpc
         }
     }
 
-    int Message::DecodeHead(std::istream &is)
+    int RpcMessage::DecodeHead(std::istream &is)
     {
         this->mType = is.get();
         this->mProto = is.get();
@@ -33,16 +33,16 @@ namespace Rpc
         return this->mSize;
     }
 
-    int Message::DecodeBody(std::istream &is)
+    bool RpcMessage::DecodeBody(std::istream &is)
     {
         if (this->mBuffer == nullptr)
         {
             this->mBuffer = new char[this->mSize];
         }
-        return is.readsome(this->mBuffer, this->mSize);
+        return is.readsome(this->mBuffer, this->mSize) == this->mSize;
     }
 
-    const char *Message::GetData(int &size) const
+    const char *RpcMessage::GetData(int &size) const
     {
         size = this->mSize;
         return this->mBuffer;

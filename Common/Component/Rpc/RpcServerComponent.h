@@ -16,9 +16,7 @@ namespace Sentry
 	 public:
 		void StartClose(const std::string & address) final;
 		void OnCloseSocket(const std::string & address, XCode code) final;
-		void OnRequest(std::shared_ptr<com::rpc::request> request) final;
-		void OnResponse(std::shared_ptr<com::rpc::response> response) final;
-
+        void OnMessage(const std::string & address, std::shared_ptr<Tcp::RpcMessage> message);
 	 protected:
         void Awake() final;
         bool LateAwake() final;
@@ -26,9 +24,13 @@ namespace Sentry
 	 public:
 		std::shared_ptr<MessageRpcClient> GetSession(const std::string& address);
 		std::shared_ptr<MessageRpcClient> GetOrCreateSession(const std::string& address);
+
 	 public:
 		bool Send(const std::string & address, std::shared_ptr<com::rpc::request> message);
 		bool Send(const std::string & address, std::shared_ptr<com::rpc::response> message);
+    private:
+        void OnRequest(std::shared_ptr<com::rpc::request> request) final;
+        void OnResponse(std::shared_ptr<com::rpc::response> response) final;
 	 private:
 		class TcpRpcComponent* mRpcComponent;
         class NetThreadComponent * mNetComponent;

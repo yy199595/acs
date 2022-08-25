@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include"Network/Rpc.h"
 #include"Network/TcpContext.h"
 #include"Async/TaskSource.h"
 #include"Coroutine/CoroutineLock.h"
@@ -22,15 +23,15 @@ namespace Sentry
 		void SendToServer(std::shared_ptr<com::rpc::response> message);
 	 protected:
 		void OnConnect(const asio::error_code &error, int count) final;
-        void OnReceiveLength(const asio::error_code &code, int length) final;
         void OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t) final;
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
     private:
-		void CloseSocket(XCode code);
-		bool OnRequest(std::istream & istream1);
-		bool OnResponse(std::istream & istream1);
+        void OnDecodeComplete();
+        void CloseSocket(XCode code);
 	private:
+        Tcp::DecodeState mState;
 		RpcServerComponent* mTcpComponent;
-		std::shared_ptr<asio::steady_timer> mTimer;
+        std::shared_ptr<Tcp::RpcMessage> mMessage;
+        std::shared_ptr<asio::steady_timer> mTimer;
 	};
 }// namespace Sentry

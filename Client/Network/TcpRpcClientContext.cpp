@@ -12,7 +12,10 @@ namespace Client
 	void TcpRpcClientContext::SendToServer(std::shared_ptr<c2s::rpc::request> request)
 	{
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> networkData =
-                std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_CLIENT_REQUEST, request);
+                std::make_shared<Tcp::Rpc::RpcProtoMessage>();
+
+        networkData->mMessage = request;
+        networkData->mType = MESSAGE_TYPE::MSG_RPC_REQUEST;
 #ifdef ONLY_MAIN_THREAD
         this->Send(networkData);
 #else
@@ -31,26 +34,14 @@ namespace Client
                 CONSOLE_LOG_FATAL("connect server error");
                 return;
             }
-            this->ReceiveLength();
             this->SendFromMessageQueue();
+            this->ReceiveMessage(sizeof(int) + 2);
         }
         else
         {
             this->PopMessage();
             this->SendFromMessageQueue();
         }
-    }
-
-    void TcpRpcClientContext::OnReceiveLength(const asio::error_code &code, int length)
-    {
-        if (code || length <= 0)
-        {
-#ifdef __DEBUG__
-            CONSOLE_LOG_ERROR(code.message());
-#endif
-            return;
-        }
-        this->ReceiveMessage(length);
     }
 
     void TcpRpcClientContext::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t)
@@ -71,7 +62,7 @@ namespace Client
                 this->OnResponse(readStream);
                 break;
         }
-        this->ReceiveLength();
+        this->ReceiveMessage(sizeof(int) + 2);
     }
 
 	bool TcpRpcClientContext::OnRequest(std::istream & istream1)

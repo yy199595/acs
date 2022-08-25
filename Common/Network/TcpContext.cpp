@@ -106,52 +106,7 @@ namespace Tcp
 				this->OnReceiveMessage(code, is, size);
 			});
 	}
-
-    void TcpContext::ReceiveLength()
-    {
-        int length = sizeof(int);
-        if (this->mRecvBuffer.size() >= length)
-        {
-            asio::error_code code;
-            std::istream is(&this->mRecvBuffer);
-
-            union {
-                int value;
-                char buffer[sizeof(int)];
-            } data;
-            is.readsome(data.buffer, sizeof(int));
-            this->OnReceiveLength(code, data.value);
-            return;
-        }
-        else
-        {
-            length -= this->mRecvBuffer.size();
-            this->mLastOperTime = Helper::Time::GetNowSecTime();
-            AsioTcpSocket &tcpSocket = this->mSocket->GetSocket();
-            std::shared_ptr<TcpContext> self = this->shared_from_this();
-            asio::async_read(tcpSocket, this->mRecvBuffer,
-                             asio::transfer_exactly(length),
-                             [this, self](const asio::error_code &code, size_t size)
-                             {
-                                 char buffer[sizeof(int)] = { 0};
-                                 size_t size1 = this->mRecvBuffer.size();
-                                 std::istream is(&this->mRecvBuffer);
-                                 size_t len = is.readsome(buffer, sizeof(int));
-                                 if(len == sizeof(int))
-                                 {
-                                     int length = 0;
-                                     memcpy(&length, buffer, sizeof(int));
-                                     this->OnReceiveLength(code, length);
-                                 }
-                                 else
-                                 {
-                                     asio::error_code code;
-                                     this->OnReceiveLength(code, 0);
-                                 }
-                             });
-        }
-    }
-
+    
 	void TcpContext::ReceiveMessage(int length)
 	{
 		if(length <= 0)

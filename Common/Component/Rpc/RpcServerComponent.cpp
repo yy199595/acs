@@ -24,6 +24,39 @@ namespace Sentry
 		return true;
 	}
 
+    void RpcServerComponent::OnMessage(const std::string &address, std::shared_ptr<Tcp::RpcMessage> message)
+    {
+        MESSAGE_TYPE type = (MESSAGE_TYPE)message->GetType();
+        MESSAGE_PROTO proto = (MESSAGE_PROTO)message->GetPorot();
+        switch(proto)
+        {
+            case MESSAGE_PROTO::MSG_RPC_JSON:
+            {
+                if(type == MESSAGE_TYPE::MSG_RPC_REQUEST)
+                {
+
+                }
+                else if(type == MESSAGE_TYPE::MSG_RPC_RESPONSE)
+                {
+
+                }
+            }
+                break;
+            case MESSAGE_PROTO::MSG_RPC_PROTOBUF:
+            {
+                if(type == MESSAGE_TYPE::MSG_RPC_REQUEST)
+                {
+
+                }
+                else if(type == MESSAGE_TYPE::MSG_RPC_RESPONSE)
+                {
+
+                }
+            }
+                break;
+        }
+    }
+
 	void RpcServerComponent::OnCloseSocket(const std::string & address, XCode code)
 	{
 		auto iter = this->mRpcClientMap.find(address);

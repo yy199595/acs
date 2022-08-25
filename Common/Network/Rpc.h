@@ -22,15 +22,15 @@ enum class MESSAGE_PROTO
     MSG_RPC_PROTOBUF = 0x02 //protobuf
 };
 
-namespace Rpc
+namespace Tcp
 {
-    class Message
+    class RpcMessage
     {
     public:
-        Message();
-        ~Message();
+        RpcMessage();
+        ~RpcMessage();
         int DecodeHead(std::istream & is);
-        int DecodeBody(std::istream & is);
+        bool DecodeBody(std::istream & is);
 
     public:
         int GetType() const { return this->mType; }

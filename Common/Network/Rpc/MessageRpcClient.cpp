@@ -13,7 +13,7 @@ namespace Sentry
                                        std::shared_ptr<SocketProxy> socket)
 		: TcpContext(socket, 1024 * 1024), mTcpComponent(component)
 	{
-
+        this->mState = Tcp::DecodeState::Head;
 	}
 
 	void MessageRpcClient::StartClose()
@@ -28,25 +28,31 @@ namespace Sentry
 
 	void MessageRpcClient::SendToServer(std::shared_ptr<com::rpc::response> message)
 	{
-		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> responseMessage
-				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_RESPONSE, message);
+		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> response
+            = std::make_shared<Tcp::Rpc::RpcProtoMessage>();
+
+        response->mMessage = message;
+        response->mType = MESSAGE_TYPE::MSG_RPC_RESPONSE;
 #ifdef ONLY_MAIN_THREAD
-		this->Send(responseMessage);
+		this->Send(response);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-        t.post(std::bind(&MessageRpcClient::Send, this, responseMessage));
+        t.post(std::bind(&MessageRpcClient::Send, this, response));
 #endif
 	}
 
 	void MessageRpcClient::SendToServer(std::shared_ptr<com::rpc::request> message)
 	{
-		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> requestMessage
-				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_REQUEST,message);
+		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> request
+				= std::make_shared<Tcp::Rpc::RpcProtoMessage>();
+
+        request->mMessage = message;
+        request->mType = MESSAGE_TYPE::MSG_RPC_REQUEST;
 #ifdef ONLY_MAIN_THREAD
-		this->Send(requestMessage);
+		this->Send(request);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-        t.post(std::bind(&MessageRpcClient::Send, this, requestMessage));
+        t.post(std::bind(&MessageRpcClient::Send, this, request));
 #endif
 	}
 
@@ -79,17 +85,6 @@ namespace Sentry
 #endif
 	}
 
-    void MessageRpcClient::OnReceiveLength(const asio::error_code &code, int length)
-    {
-        if(code || length <= 0)
-        {
-            CONSOLE_LOG_ERROR(code.message());
-            this->CloseSocket(XCode::NetWorkError);
-            return;
-        }
-        this->ReceiveMessage(length);
-    }
-
     void MessageRpcClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t size)
     {
         if (code)
@@ -98,68 +93,50 @@ namespace Sentry
             this->CloseSocket(XCode::NetWorkError);
             return;
         }
-        switch ((MESSAGE_TYPE) readStream.get())
+        switch(this->mState)
         {
-            case MESSAGE_TYPE::MSG_RPC_REQUEST:
-                this->OnRequest(readStream);
+            case Tcp::DecodeState::Head:
+            {
+                this->mState = Tcp::DecodeState::Body;
+                this->mMessage = std::make_shared<Tcp::RpcMessage>();
+                int len = this->mMessage->DecodeHead(readStream);
+                this->ReceiveMessage(len);
+            }
                 break;
-            case MESSAGE_TYPE::MSG_RPC_RESPONSE:
-                this->OnResponse(readStream);
+            case Tcp::DecodeState::Body:
+            {
+                this->mState = Tcp::DecodeState::Head;
+                if (!this->mMessage->DecodeBody(readStream))
+                {
+                    this->CloseSocket(XCode::UnKnowPacket);
+                    return;
+                }
+                this->OnDecodeComplete();
+                this->ReceiveMessage(sizeof(int) + 2);
+            }
                 break;
-            default:
-                CONSOLE_LOG_FATAL("unknow message type");
-                return;
         }
-        this->ReceiveLength();
     }
 
-	bool MessageRpcClient::OnRequest(std::istream & istream1)
-	{
-		std::shared_ptr<com::rpc::request> requestData(new com::rpc::request());
-		if (!requestData->ParsePartialFromIstream(&istream1))
-		{
-#ifdef __DEBUG__
-			CONSOLE_LOG_ERROR("parse server request message error");
-#endif
-			return false;
-		}
-		requestData->set_address(this->GetAddress());
+    void MessageRpcClient::OnDecodeComplete()
+    {
+        const std::string & address = this->mSocket->GetAddress();
 #ifdef ONLY_MAIN_THREAD
-		this->mTcpComponent->OnRequest(requestData);
+        this->mTcpComponent->OnMessage(address, std::move(this->mMessage));
 #else
-		asio::io_service & taskScheduler = App::Get()->GetThread();
-		taskScheduler.post(std::bind(&RpcServerComponent::OnRequest, mTcpComponent, requestData));
+        asio::io_service & taskScheduler = App::Get()->GetThread();
+        taskScheduler.post(std::bind(&RpcServerComponent::OnMessage, mTcpComponent, address, std::move(this->mMessage)));
 #endif
-
-		return true;
-	}
-
-	bool MessageRpcClient::OnResponse(std::istream & istream1)
-	{
-		std::shared_ptr<com::rpc::response> responseData(new com::rpc::response());
-		if (!responseData->ParseFromIstream(&istream1))
-		{
-#ifdef __NET_ERROR_LOG__
-			CONSOLE_LOG_ERROR("parse server response message error");
-#endif
-			return false;
-		}
-#ifdef ONLY_MAIN_THREAD
-		this->mTcpComponent->OnResponse(responseData);
-#else
-		asio::io_service & taskScheduler = App::Get()->GetThread();
-		taskScheduler.post(std::bind(&RpcServerComponent::OnResponse, mTcpComponent, responseData));
-#endif
-		return true;
-	}
+    }
 
 	void MessageRpcClient::StartReceive()
 	{
+        int len = sizeof(int) + 2;
 #ifdef ONLY_MAIN_THREAD
-		this->ReceiveLength();
+		this->ReceiveMessage(len);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-        t.post(std::bind(&MessageRpcClient::ReceiveLength, this));
+        t.post(std::bind(&MessageRpcClient::ReceiveMessage, this, len));
 #endif
 	}
 
@@ -175,7 +152,7 @@ namespace Sentry
 			this->mTimer->async_wait(std::bind(std::bind(&MessageRpcClient::Connect, this->shared_from_this())));
 			return;
 		}
-        this->ReceiveLength();
         this->SendFromMessageQueue();
-	}
+        this->ReceiveMessage(sizeof(int) + 2);
+    }
 }

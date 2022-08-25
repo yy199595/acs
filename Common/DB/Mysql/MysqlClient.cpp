@@ -4,6 +4,7 @@
 
 #include"MysqlClient.h"
 #include"Component/Mysql/MysqlRpcComponent.h"
+#include"MysqlMessage.h"
 #include"Util/sha1.h"
 namespace Sentry
 {
@@ -24,7 +25,18 @@ namespace Sentry
         std::string stage1 = Helper::Sha1::GetHash(password);
         std::string stage2 = Helper::Sha1::GetHash(stage1);
         std::string stage3 = Helper::Sha1::GetHash(scramble + stage2);
-        return Helper::Sha1::XorString(stage3, stage1);
+        std::cout << stage3 << std::endl << stage1 << std::endl;
+
+        size_t pos = stage3.find('.');
+        if(pos != std::string::npos)
+        {
+            for(size_t index =0 ;index<stage3.size(); index++)
+            {
+                unsigned char v1 = stage3[index];
+                unsigned char v2 = stage1[index];
+            }
+        }
+        return stage3;
 
     }
 
@@ -70,7 +82,35 @@ namespace Sentry
 
         std::string token = this->ComputeToken(this->mConfig.mPassword, scramble);
 
-        const int client_flags = 260047;
+        const unsigned int client_flags = 260047;
+        const unsigned int maxPackCount = 1024 * 1024;
+
+        std::shared_ptr<Tcp::MysqlMessage> message(new Tcp::MysqlMessage(1));
+
+        char rep[23] = { 0};
+        memset(rep, '\0', 23);
+        message->Add(client_flags);
+        message->Add(maxPackCount);
+        message->Add('_');
+        message->Add(rep, 23);
+        message->Add(this->mConfig.mUser.c_str());
+        message->Add(token.c_str());
+        message->Add("");
+        message->Add('\0');
+        size_t s = token.size();
+        if(this->SendSync(message) <= 0)
+        {
+            return false;
+        }
+        this->RecvSync(3);
+        if (readStream.readsome((char *) &len, 3) <= 0)
+        {
+            return false;
+        }
+        if (this->RecvSync(len) <= 0)
+        {
+            return false;
+        }
 
         return true;
     }

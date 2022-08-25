@@ -4,6 +4,7 @@
 
 #ifndef GAMEKEEPER_RPCPROXYCLIENT_H
 #define GAMEKEEPER_RPCPROXYCLIENT_H
+#include"Network/Rpc.h"
 #include"Network/TcpContext.h"
 #include"Message/c2s.pb.h"
 using namespace Tcp;
@@ -25,7 +26,6 @@ namespace Sentry
 		unsigned int GetCallCount() const { return this->mCallCount; }
 	 protected:
 		void OnConnect(const asio::error_code &error) {}
-        void OnReceiveLength(const asio::error_code &code, int length) final;
         void OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	private:
@@ -36,6 +36,7 @@ namespace Sentry
 		unsigned int mQps;
         unsigned int mCallCount;
 		RpcGateComponent* mGateComponent;
+        std::shared_ptr<Tcp::RpcMessage> mMessage;
         std::shared_ptr<asio::steady_timer> mTimer;
 	};
 }

@@ -13,11 +13,12 @@ namespace Tcp
 	{
 		class RpcProtoMessage final : public Tcp::ProtoMessage
 		{
-		public:
-			RpcProtoMessage(MESSAGE_TYPE type, std::shared_ptr<Message> message);
+        public:
+            RpcProtoMessage();
 			int Serailize(std::ostream &os) final;
-		private:
+        public:
 			MESSAGE_TYPE mType;
+            MESSAGE_PROTO mPorto;
 			std::shared_ptr<Message> mMessage;
 		};
 	}

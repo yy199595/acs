@@ -25,11 +25,12 @@ namespace Sentry
 
 	void GateMessageClient::StartReceive(int second)
 	{
+        const int size = sizeof(int) + 2;
 #ifdef ONLY_MAIN_THREAD
-		this->ReceiveLength();
+		this->ReceiveMessage(size);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-        t.post(std::bind(&GateMessageClient::ReceiveLength, this));
+        t.post(std::bind(&GateMessageClient::ReceiveMessage, this, size));
         if(second != 0)
         {
             t.post(std::bind(&GateMessageClient::StartTimer, this, second));
@@ -54,19 +55,6 @@ namespace Sentry
             return;
         }
         this->CloseSocket(XCode::NetTimeout);
-    }
-
-    void GateMessageClient::OnReceiveLength(const asio::error_code &code, int length)
-    {
-        if(code || length <= 0)
-        {
-#ifdef __NET_ERROR_LOG__
-            CONSOLE_LOG_ERROR(code.message());
-#endif
-            this->CloseSocket(XCode::NetReceiveFailure);
-            return;
-        }
-        this->ReceiveMessage(length);
     }
 
     void GateMessageClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t size)
@@ -103,7 +91,7 @@ namespace Sentry
             this->CloseSocket(XCode::UnKnowPacket);
             return;
         }
-        this->ReceiveLength();
+        this->ReceiveMessage(sizeof(int) + 2);
     }
 
 	void GateMessageClient::CloseSocket(XCode code)
@@ -146,25 +134,31 @@ namespace Sentry
 
 	void GateMessageClient::SendToClient(std::shared_ptr<c2s::rpc::call> message)
 	{
-		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> requestMessage
-				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_CALL_CLIENT, message);
+		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> request
+				= std::make_shared<Tcp::Rpc::RpcProtoMessage>();
+
+        request->mMessage = message;
+        request->mType = MESSAGE_TYPE::MSG_RPC_REQUEST;
 #ifdef ONLY_MAIN_THREAD
-		this->Send(requestMessage);
+		this->Send(request);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-        t.post(std::bind(&GateMessageClient::Send, this, requestMessage));
+        t.post(std::bind(&GateMessageClient::Send, this, request));
 #endif
 	}
 
 	void GateMessageClient::SendToClient(std::shared_ptr<c2s::rpc::response> message)
 	{
-		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> requestMessage
-				= std::make_shared<Tcp::Rpc::RpcProtoMessage>(MESSAGE_TYPE::MSG_RPC_RESPONSE, message);
+		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> response
+				= std::make_shared<Tcp::Rpc::RpcProtoMessage>();
+
+        response->mMessage = message;
+        response->mType = MESSAGE_TYPE::MSG_RPC_RESPONSE;
 #ifdef ONLY_MAIN_THREAD
-		this->Send(requestMessage);
+		this->Send(response);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-        t.post(std::bind(&GateMessageClient::Send, this, requestMessage));
+        t.post(std::bind(&GateMessageClient::Send, this, response));
 #endif
         //CONSOLE_LOG_ERROR("send to client [" << this->mSocket->GetAddress() << "] " << message->rpc_id());
     }
