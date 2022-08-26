@@ -6,7 +6,7 @@
 #include"DB/Redis/RedisDefine.h"
 #include"Script/Extension/Json/Json.h"
 #include"Component/Scene/MessageComponent.h"
-#include"Component/Redis/DataRedisComponent.h"
+#include"Component/Redis/RedisDataComponent.h"
 
 using namespace Sentry;
 namespace Lua
@@ -16,7 +16,7 @@ namespace Lua
 		lua_pushthread(lua);
 		const char* name = lua_tostring(lua, 2);
 		const char* command = lua_tostring(lua, 3);
-		DataRedisComponent* redisComponent = UserDataParameter::Read<DataRedisComponent*>(lua, 1);
+		RedisDataComponent* redisComponent = UserDataParameter::Read<RedisDataComponent*>(lua, 1);
 		std::shared_ptr<TcpRedisClient> redisClientContext = redisComponent->GetClient(name);
 		if (redisClientContext == nullptr)
 		{
@@ -62,7 +62,7 @@ namespace Lua
 		const char* name = lua_tostring(lua, 2);
 		const char* fullName = lua_tostring(lua, 3);
 		Lua::Json::Read(lua, 4, &json);
-		DataRedisComponent* redisComponent = UserDataParameter::Read<DataRedisComponent*>(lua, 1);
+		RedisDataComponent* redisComponent = UserDataParameter::Read<RedisDataComponent*>(lua, 1);
 		std::shared_ptr<TcpRedisClient> redisClientContext = redisComponent->GetClient(name);
 		if (redisClientContext == nullptr)
 		{
@@ -84,7 +84,7 @@ namespace Lua
         const char* name = lua_tostring(lua, 2);
         const char* fullName = lua_tostring(lua, 3);
         Lua::Json::Read(lua, 4, &json);
-        DataRedisComponent* redisComponent = UserDataParameter::Read<DataRedisComponent*>(lua, 1);
+        RedisDataComponent* redisComponent = UserDataParameter::Read<RedisDataComponent*>(lua, 1);
         std::shared_ptr<TcpRedisClient> redisClientContext = redisComponent->GetClient(name);
         if (redisClientContext == nullptr)
         {

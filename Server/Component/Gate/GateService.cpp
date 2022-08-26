@@ -12,7 +12,7 @@
 #include"Network/Listener/TcpServerListener.h"
 #include"Component/Gate/GateAgentComponent.h"
 #include"Component/User/UserSyncComponent.h"
-#include"Component/Redis/DataRedisComponent.h"
+#include"Component/Redis/RedisDataComponent.h"
 namespace Sentry
 {
 

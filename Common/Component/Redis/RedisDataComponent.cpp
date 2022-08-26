@@ -1,4 +1,4 @@
-﻿#include"DataRedisComponent.h"
+﻿#include"RedisDataComponent.h"
 
 #include"App/App.h"
 #include"Util/StringHelper.h"
@@ -10,7 +10,7 @@
 
 namespace Sentry
 {
-    bool DataRedisComponent::OnInitRedisClient(RedisConfig config)
+    bool RedisDataComponent::OnInitRedisClient(RedisConfig config)
     {
         config.Channels.clear();
         for (int index = 0; index < config.Count; index++)
@@ -29,7 +29,7 @@ namespace Sentry
     }
 
 
-    bool DataRedisComponent::Call(const std::string &name, const std::string &func, Json::Writer &request,
+    bool RedisDataComponent::Call(const std::string &name, const std::string &func, Json::Writer &request,
                                   std::shared_ptr<Json::Reader> response)
     {
         SharedRedisClient redisClientContext = this->GetClient(name);
@@ -49,9 +49,9 @@ namespace Sentry
         return response->ParseJson(redisResponse->GetString());
     }
 
-	void DataRedisComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
+	void RedisDataComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
 	{
-		luaRegister.BeginRegister<DataRedisComponent>();
+		luaRegister.BeginRegister<RedisDataComponent>();
 		luaRegister.PushExtensionFunction("Run", Lua::Redis::Run);
 		luaRegister.PushExtensionFunction("Call", Lua::Redis::Call);
         luaRegister.PushExtensionFunction("Send", Lua::Redis::Send);
@@ -60,7 +60,7 @@ namespace Sentry
 
 namespace Sentry
 {
-    std::shared_ptr<RedisRequest> DataRedisComponent::MakeLuaRequest(const std::string &fullName, const std::string &json)
+    std::shared_ptr<RedisRequest> RedisDataComponent::MakeLuaRequest(const std::string &fullName, const std::string &json)
     {
         std::vector<std::string> tempArray;
         if(Helper::String::Split(fullName, ".",tempArray) != 2)
@@ -80,7 +80,7 @@ namespace Sentry
         return RedisRequest::MakeLua(tag, func, json);
     }
 
-    void DataRedisComponent::OnLoadScript(const std::string &path, const std::string &md5)
+    void RedisDataComponent::OnLoadScript(const std::string &path, const std::string &md5)
     {
         std::string fileName;
         std::vector<std::string> tempArray;

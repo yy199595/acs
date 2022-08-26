@@ -34,7 +34,8 @@ namespace Sentry
 
 	class TaskComponent;
 	class InnerNetMessageComponent;
-    class RedisRegistryComponent : public RedisChannelComponent, public IComplete, public IServiceChange, public ISecondUpdate
+    class RedisRegistryComponent : public RedisChannelComponent,
+            public IComplete, public IServiceChange, public ISecondUpdate
 	{
 	 public:
 		RedisRegistryComponent() = default;
@@ -61,7 +62,7 @@ namespace Sentry
 		std::vector<std::string> mServices;
         class TaskComponent * mTaskComponent;
         class RedisSubComponent * mSubComponent;
-        class DataRedisComponent * mRedisComponent;
+        class RedisDataComponent * mRedisComponent;
         std::unordered_map<std::string, ServiceNode *> mNodes;
 	};
 }

@@ -11,11 +11,11 @@ namespace Sentry
 {
 	class NetThreadComponent;
 
-    class DataRedisComponent final : public RedisComponent, public ILuaRegister
+    class RedisDataComponent final : public RedisComponent, public ILuaRegister
 	{
 	 public:
-		DataRedisComponent() = default;
-		~DataRedisComponent() final = default;
+		RedisDataComponent() = default;
+		~RedisDataComponent() final = default;
     public:
         template<typename ... Args>
         bool SenCommond(const std::string & name, const std::string & cmd, Args&& ... args);
@@ -38,21 +38,21 @@ namespace Sentry
     };
 
     template<typename ... Args>
-    std::shared_ptr<RedisResponse> DataRedisComponent::RunCmd(const std::string &name, const std::string & cmd, Args &&...args)
+    std::shared_ptr<RedisResponse> RedisDataComponent::RunCmd(const std::string &name, const std::string & cmd, Args &&...args)
     {
         std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>(cmd);
         RedisRequest::InitParameter(request, std::forward<Args>(args)...);
         return this->Run(name, request);
     }
     template<typename ... Args>
-    std::shared_ptr<RedisResponse> DataRedisComponent::RunCmd(SharedRedisClient redisClientContext, const std::string &cmd, Args &&...args)
+    std::shared_ptr<RedisResponse> RedisDataComponent::RunCmd(SharedRedisClient redisClientContext, const std::string &cmd, Args &&...args)
     {
         std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>(cmd);
         RedisRequest::InitParameter(request, std::forward<Args>(args)...);
         return this->Run(redisClientContext, request);
     }
     template<typename ... Args>
-    bool DataRedisComponent::SenCommond(const std::string &name, const std::string &cmd, Args &&...args)
+    bool RedisDataComponent::SenCommond(const std::string &name, const std::string &cmd, Args &&...args)
     {
         SharedRedisClient redisClient = this->GetClient(name);
         if(redisClient == nullptr)

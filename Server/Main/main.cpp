@@ -5,7 +5,7 @@
 
 #include"Network/Listener/TcpServerComponent.h"
 #include"Global/ServiceConfig.h"
-#include"Component/Redis/DataRedisComponent.h"
+#include"Component/Redis/RedisDataComponent.h"
 #include"Component/Scene/UnitMgrComponent.h"
 #include"Component/Http/HttpComponent.h"
 #include"Component/Gate/GateService.h"
@@ -66,7 +66,7 @@ void RegisterComponent()
 // db
     ComponentFactory::Add<MysqlRpcComponent>("MysqlRpcComponent");
 	ComponentFactory::Add<MongoRpcComponent>("MongoRpcComponent");
-    ComponentFactory::Add<DataRedisComponent>("DataRedisComponent");
+    ComponentFactory::Add<RedisDataComponent>("RedisDataComponent");
     ComponentFactory::Add<RedisSubComponent>("RedisSubComponent");
 
 //http

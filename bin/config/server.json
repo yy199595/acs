@@ -99,7 +99,7 @@
         "NetThreadComponent",
         "TcpServerComponent",
         "RedisSubComponent",
-        "DataRedisComponent",
+        "RedisDataComponent",
         "LuaScriptComponent",
         "InnerNetComponent",
         "InnerNetMessageComponent",

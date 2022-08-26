@@ -27,7 +27,7 @@ namespace Sentry
 		bool OnUserJoin(const Json::Reader & json);
 		bool OnUserExit(const Json::Reader & json);
 	private:
-		class DataRedisComponent * mRedisComponent;
+		class RedisDataComponent * mRedisComponent;
 	};
 }
 

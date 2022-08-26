@@ -17,7 +17,7 @@
         "rpc": {
             "port": 7787,
             "ip": "10.10.8.137",
-            "component": "RpcServerComponent"
+            "component": "InnerNetComponent"
         }
     },
     "mongo": {
@@ -60,10 +60,10 @@
         "NetThreadComponent",
         "TcpServerComponent",
         "RedisSubComponent",
-        "MainRedisComponent",
+        "RedisDataComponent",
         "LuaScriptComponent",
-        "RpcServerComponent",
-        "TcpRpcComponent",
+        "InnerNetComponent",
+        "InnerNetMessageComponent",
         "MongoRpcComponent",
         "HttpRpcComponent",
         "RedisRegistryComponent"
