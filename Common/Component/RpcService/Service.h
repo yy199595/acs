@@ -11,7 +11,7 @@ using namespace std;
 namespace Sentry
 {
 	class ServiceMethod;
-	class MessageRpcClient;
+	class InnerNetClient;
     class Service : public Component, public ILuaRegister, public ServiceHost,
 							 public IService<com::rpc::request, com::rpc::response>
 	{
@@ -48,8 +48,8 @@ namespace Sentry
 	private:
 		RpcServiceConfig * mConfig;
         std::string mLocalAddress;
-        class TcpRpcComponent* mRpcComponent;
         std::vector<std::string> mServiceHosts;
-        class RpcServerComponent* mClientComponent;
-	};
+        class InnerNetComponent* mClientComponent;
+        class InnerNetMessageComponent* mMessageComponent;
+    };
 }

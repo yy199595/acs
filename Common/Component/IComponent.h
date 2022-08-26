@@ -98,16 +98,15 @@ namespace Sentry
 		virtual void OnDelService(class Component* component) = 0;
 	};
 
-	template<typename T1, typename T2>
+	template<typename T>
 	class IRpc
 	{
 	public:
         virtual ~IRpc() { }
-        virtual void OnRequest(std::shared_ptr<T1> t1) = 0;
-		virtual void OnResponse(std::shared_ptr<T2> t2) = 0;
 		virtual void StartClose(const std::string& address) = 0;
 		virtual void OnCloseSocket(const std::string& address, XCode code) = 0;
-	};
+        virtual void OnMessage(const std::string & address, std::shared_ptr<T> message) = 0;
+    };
 
 	template<typename T1, typename T2>
 	class IClientRpc

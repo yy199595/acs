@@ -11,12 +11,12 @@ using namespace Tcp;
 using namespace google::protobuf;
 namespace Sentry
 {
-	class RpcGateComponent;
- 	class GateMessageClient : public Tcp::TcpContext
+	class OuterNetComponent;
+ 	class OuterNetClient : public Tcp::TcpContext
 	{
 	 public:
-		GateMessageClient(std::shared_ptr<SocketProxy> socket, RpcGateComponent* component);
-		~GateMessageClient() final = default;
+		OuterNetClient(std::shared_ptr<SocketProxy> socket, OuterNetComponent* component);
+		~OuterNetClient() final = default;
 	 public:
 		void StartClose();
 		void StartReceive(int second = 0);
@@ -35,7 +35,8 @@ namespace Sentry
 	 private:
 		unsigned int mQps;
         unsigned int mCallCount;
-		RpcGateComponent* mGateComponent;
+        Tcp::DecodeState mState;
+        OuterNetComponent* mGateComponent;
         std::shared_ptr<Tcp::RpcMessage> mMessage;
         std::shared_ptr<asio::steady_timer> mTimer;
 	};

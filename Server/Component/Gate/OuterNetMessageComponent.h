@@ -11,11 +11,11 @@
 
 namespace Sentry
 {
-    class GateComponent;
+    class OuterNetMessageComponent;
     class ClientRpcTask : public IRpcTask<com::rpc::response>
     {
     public:
-        ClientRpcTask(const c2s::rpc::request & request, GateComponent * component, int ms);
+        ClientRpcTask(const c2s::rpc::request & request, OuterNetMessageComponent * component, int ms);
 
     public:
         long long GetRpcId() final { return this->mTaskId; }
@@ -26,28 +26,29 @@ namespace Sentry
         long long mRpcId;
         long long mTaskId;
         std::string mAddress;
-        GateComponent * mGateComponent;
+        OuterNetMessageComponent * mGateComponent;
     };
 }
 
 namespace Sentry
 {
-	class GateComponent final : public Component,
-        public IClientRpc<c2s::rpc::request, com::rpc::response>
+	class OuterNetMessageComponent final : public Component,
+                                           public IClientRpc<c2s::rpc::request, com::rpc::response>
 	{
 	 public:
-		GateComponent() = default;
-		~GateComponent() final = default;
+		OuterNetMessageComponent() = default;
+		~OuterNetMessageComponent() final = default;
 	 public:
-		XCode OnRequest(std::shared_ptr<c2s::rpc::request> request) final;
-		XCode OnResponse(const std::string & address, std::shared_ptr<com::rpc::response> response) final;
-	private:
+        bool OnProtoRequest(const std::string & address, const char * data, int len);
+        XCode OnResponse(const std::string & address, std::shared_ptr<com::rpc::response> response) final;
+    private:
 		bool LateAwake() final;
+        XCode OnRequest(std::shared_ptr<c2s::rpc::request> request) final;
 	 private:
 		class TaskComponent * mTaskComponent;
 		class TimerComponent * mTimerComponent;
-        class TcpRpcComponent * mServiceRpcComponent;
-        class RpcGateComponent* mGateClientComponent;
+        class OuterNetComponent* mOutNetComponent;
+        class InnerNetMessageComponent * mInnerMessageComponent;
     };
 }
 

@@ -2,13 +2,13 @@
 // Created by mac on 2021/11/28.
 //
 
-#include"GateComponent.h"
+#include"OuterNetMessageComponent.h"
 #include"App/App.h"
-#include"NetWork/GateMessageClient.h"
+#include"NetWork/OuterNetClient.h"
 #include"Global/ServiceConfig.h"
-#include"Component/Rpc/TcpRpcComponent.h"
-#include"RpcGateComponent.h"
-#include"Component/Rpc/RpcServerComponent.h"
+#include"Component/Rpc/InnerNetMessageComponent.h"
+#include"OuterNetComponent.h"
+#include"Component/Rpc/InnerNetComponent.h"
 #include"Component/RpcService/LocalService.h"
 #include"GateService.h"
 #include"Component/User/UserSyncComponent.h"
@@ -17,7 +17,7 @@
 
 namespace Sentry
 {
-    ClientRpcTask::ClientRpcTask(const c2s::rpc::request &request, GateComponent * component, int ms)
+    ClientRpcTask::ClientRpcTask(const c2s::rpc::request &request, OuterNetMessageComponent * component, int ms)
         : IRpcTask<com::rpc::response>(ms)
     {
         this->mTaskId = Guid::Create();
@@ -45,16 +45,27 @@ namespace Sentry
 namespace Sentry
 {
 
-	bool GateComponent::LateAwake()
+	bool OuterNetMessageComponent::LateAwake()
 	{
 		this->mTaskComponent = this->GetApp()->GetTaskComponent();
 		this->mTimerComponent = this->GetApp()->GetTimerComponent();
-        this->mServiceRpcComponent = this->GetComponent<TcpRpcComponent>();
-		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<RpcGateComponent>());
+        this->mInnerMessageComponent = this->GetComponent<InnerNetMessageComponent>();
+		LOG_CHECK_RET_FALSE(this->mOutNetComponent = this->GetComponent<OuterNetComponent>());
 		return true;
 	}
 
-	XCode GateComponent::OnRequest(std::shared_ptr<c2s::rpc::request> request)
+    bool OuterNetMessageComponent::OnProtoRequest(const std::string &address, const char *data, int len)
+    {
+        std::shared_ptr<c2s::rpc::request> request(new c2s::rpc::request());
+        if(!request->ParseFromArray(data, len))
+        {
+            return false;
+        }
+        request->set_address(address);
+        return this->OnRequest(request) == XCode::Successful;
+    }
+
+	XCode OuterNetMessageComponent::OnRequest(std::shared_ptr<c2s::rpc::request> request)
 	{
 		std::string method, service;
         assert(this->GetApp()->IsMainThread());
@@ -96,9 +107,10 @@ namespace Sentry
         userRequest->set_func(config->FullName);
         userRequest->set_rpc_id(request->rpc_id());
         userRequest->set_address(request->address());
+        userRequest->set_type(com::rpc_msg_type_proto);
         userRequest->mutable_data()->CopyFrom(request->data());
 
-        if (!this->mGateClientComponent->GetUserId(address, userId) && config->IsAuth) //没有验证
+        if (!this->mOutNetComponent->GetUserId(address, userId) && config->IsAuth) //没有验证
         {
             GateService * gateService = localServerRpc->Cast<GateService>();
             if(gateService == nullptr)
@@ -112,7 +124,7 @@ namespace Sentry
                 XCode code = gateService->Invoke(config->Method, userRequest, response);
                 if(code != XCode::Successful)
                 {
-                    this->mGateClientComponent->StartClose(userAddress);
+                    this->mOutNetComponent->StartClose(userAddress);
                     return;
                 }
                 response->set_code((int)code);
@@ -133,19 +145,19 @@ namespace Sentry
                 = std::make_shared<ClientRpcTask>(*request, this, 0);
 
             userRequest->set_rpc_id(clientRpcTask->GetRpcId());
-            this->mServiceRpcComponent->AddTask(clientRpcTask);
+            this->mInnerMessageComponent->AddTask(clientRpcTask);
             localServerRpc->SendRequest(targetAddress, userRequest);
             //CONSOLE_LOG_ERROR("send message to [" << targetAddress << "]");
         }
 		return XCode::Successful;
 	}
 
-	XCode GateComponent::OnResponse(const std::string & address, std::shared_ptr<com::rpc::response> response)
+	XCode OuterNetMessageComponent::OnResponse(const std::string & address, std::shared_ptr<com::rpc::response> response)
 	{
         assert(this->GetApp()->IsMainThread());
         if(response->code() == (int)XCode::NetActiveShutdown)
         {
-            this->mGateClientComponent->StartClose(address);
+            this->mOutNetComponent->StartClose(address);
             return XCode::NetActiveShutdown;
         }
         std::shared_ptr<c2s::rpc::response> clientResponse(new c2s::rpc::response());
@@ -154,7 +166,7 @@ namespace Sentry
         clientResponse->set_rpc_id(response->rpc_id());
         clientResponse->set_error_str(response->error_str());
         clientResponse->mutable_data()->CopyFrom(response->data());
-		if (!this->mGateClientComponent->SendToClient(address, clientResponse))
+		if (!this->mOutNetComponent->SendToClient(address, clientResponse))
 		{
             CONSOLE_LOG_ERROR("send message to client " << address << " error");
 			return XCode::NetWorkError;

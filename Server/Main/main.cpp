@@ -10,14 +10,14 @@
 #include"Component/Http/HttpComponent.h"
 #include"Component/Gate/GateService.h"
 #include"Component/Telnet/ConsoleComponent.h"
-#include"Component/Rpc/TcpRpcComponent.h"
+#include"Component/Rpc/InnerNetMessageComponent.h"
 #include"Component/Scene/NetThreadComponent.h"
-#include"Component/Rpc/RpcServerComponent.h"
+#include"Component/Rpc/InnerNetComponent.h"
 #include"Component/Logic/RedisRegistryComponent.h"
 #include"Component/Scene/OperatorComponent.h"
 #include"Component/Scene/LoggerComponent.h"
-#include"Component/Gate/GateComponent.h"
-#include"Component/Gate/RpcGateComponent.h"
+#include"Component/Gate/OuterNetMessageComponent.h"
+#include"Component/Gate/OuterNetComponent.h"
 #include"Component/Scene/MessageComponent.h"
 #include"Component/Logic/HttpSourceService.h"
 #include"Component/RpcService/LuaService.h"
@@ -41,7 +41,7 @@ using namespace Sentry;
 void RegisterComponent()
 {
 // rpc
-    ComponentFactory::Add<TcpRpcComponent>("TcpRpcComponent");
+    ComponentFactory::Add<InnerNetMessageComponent>("InnerNetMessageComponent");
 	ComponentFactory::Add<RedisRegistryComponent>("RedisRegistryComponent");
 // common
     ComponentFactory::Add<TaskComponent>("TaskComponent");
@@ -57,12 +57,12 @@ void RegisterComponent()
 //server
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
     ComponentFactory::Add<TcpServerComponent>("TcpServerComponent");
-    ComponentFactory::Add<RpcServerComponent>("RpcServerComponent");
+    ComponentFactory::Add<InnerNetComponent>("InnerNetComponent");
 
 // gate
-    ComponentFactory::Add<GateComponent>("GateComponent");
+    ComponentFactory::Add<OuterNetMessageComponent>("OuterNetMessageComponent");
 	ComponentFactory::Add<GateAgentComponent>("GateAgentComponent");
-	ComponentFactory::Add<RpcGateComponent>("RpcGateComponent");
+	ComponentFactory::Add<OuterNetComponent>("OuterNetComponent");
 // db
     ComponentFactory::Add<MysqlRpcComponent>("MysqlRpcComponent");
 	ComponentFactory::Add<MongoRpcComponent>("MongoRpcComponent");

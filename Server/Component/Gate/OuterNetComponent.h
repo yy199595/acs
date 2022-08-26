@@ -5,26 +5,26 @@
 #ifndef GAMEKEEPER_GATECLIENTCOMPONENT_H
 #define GAMEKEEPER_GATECLIENTCOMPONENT_H
 #include"Component/Component.h"
+#include"Network/Rpc.h"
 #include"Network/Listener/TcpServerListener.h"
 namespace Sentry
 {
-	class GateMessageClient;
-	class RpcGateComponent : public Component, public TcpServerListener,
-                             public IRpc<c2s::rpc::request, c2s::rpc::response>
+	class OuterNetClient;
+	class OuterNetComponent : public Component, public TcpServerListener,
+                              public IRpc<Tcp::RpcMessage>
 	{
 	 public:
-		RpcGateComponent() = default;
-		~RpcGateComponent() final = default;
+		OuterNetComponent() = default;
+		~OuterNetComponent() final = default;
 	 public:
 		void StartClose(const std::string & address) final;
 		void OnCloseSocket(const std::string & address, XCode code) final;
-		void OnRequest(std::shared_ptr<c2s::rpc::request> request) final;
-		void OnResponse(std::shared_ptr<c2s::rpc::response> response) final {}
-	 public:
+        void OnMessage(const std::string &address, std::shared_ptr<Tcp::RpcMessage> message) final;
+    public:
 		bool AddNewUser(const std::string & address, long long userId);
 		bool GetUserId(const std::string & address, long long & userId);
 		bool GetUserAddress(long long userId, std::string & address);
-		std::shared_ptr<GateMessageClient> GetGateClient(const std::string & address);
+		std::shared_ptr<OuterNetClient> GetGateClient(const std::string & address);
 	 public:
 		void SendToAllClient(std::shared_ptr<c2s::rpc::call> message);
 		bool SendToClient(const std::string & address, std::shared_ptr<c2s::rpc::call> message);
@@ -35,15 +35,14 @@ namespace Sentry
 		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 private:
         bool StartInComplete() final { return false; }
-		void CheckPlayerLogout(const std::string & address);
-	 private:
-		class GateComponent* mGateComponent;
+    private:
 		class TimerComponent* mTimerComponent;
         class NetThreadComponent * mNetComponent;
-		std::unordered_map<std::string, long long> mUserAddressMap;
-        std::queue<std::shared_ptr<GateMessageClient>> mClientPools;
+        class OuterNetMessageComponent* mOuterMessageComponent;
+        std::queue<std::shared_ptr<OuterNetClient>> mClientPools;
+        std::unordered_map<std::string, long long> mUserAddressMap;
         std::unordered_map<long long, std::string> mClientAddressMap;
-		std::unordered_map<std::string, std::shared_ptr<GateMessageClient>> mGateClientMap;
+		std::unordered_map<std::string, std::shared_ptr<OuterNetClient>> mGateClientMap;
 	};
 }
 

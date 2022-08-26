@@ -1,4 +1,5 @@
 #pragma once
+#include"Network/Rpc.h"
 #include"XCode/XCode.h"
 #include"Message/c2s.pb.h"
 #include"Async/TaskSource.h"
@@ -17,12 +18,12 @@ namespace Client
 	public:
 		void SendToServer(std::shared_ptr<c2s::rpc::request> request);
 	protected:
-		bool OnRequest(std::istream & istream1);
-		bool OnResponse(std::istream & istream1);
         void OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
     private:
         char mDataBuffer[1024];
+        Tcp::DecodeState mState;
         ClientComponent * mClientComponent;
+        std::shared_ptr<Tcp::RpcMessage> mMessage;
     };
 }

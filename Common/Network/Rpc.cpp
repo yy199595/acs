@@ -22,14 +22,9 @@ namespace Tcp
 
     int RpcMessage::DecodeHead(std::istream &is)
     {
+        is.readsome((char *)&this->mSize, sizeof(int));
         this->mType = is.get();
         this->mProto = is.get();
-        union {
-            int len;
-            char buffer[sizeof(int)];
-        } buf;
-        is.readsome(buf.buffer, sizeof(int));
-        this->mSize = buf.len;
         return this->mSize;
     }
 

@@ -15,7 +15,7 @@ namespace Tcp
 
 		int RpcProtoMessage::Serailize(std::ostream& os)
         {
-            this->Write(os, this->mMessage->ByteSize() + 2);
+            this->Write(os, this->mMessage->ByteSize());
             this->Write(os, (char) this->mType);
             this->Write(os, (char) this->mPorto);
             this->mMessage->SerializePartialToOstream(&os);

@@ -5,10 +5,10 @@
 #include"GateService.h"
 #include"App/App.h"
 #include"Util/MD5.h"
-#include"NetWork/GateMessageClient.h"
-#include"Component/Gate/GateComponent.h"
+#include"NetWork/OuterNetClient.h"
+#include"Component/Gate/OuterNetMessageComponent.h"
 #include"Component/Common/DataMgrComponent.h"
-#include"Component/Gate/RpcGateComponent.h"
+#include"Component/Gate/OuterNetComponent.h"
 #include"Network/Listener/TcpServerListener.h"
 #include"Component/Gate/GateAgentComponent.h"
 #include"Component/User/UserSyncComponent.h"
@@ -18,7 +18,7 @@ namespace Sentry
 
 	bool GateService::OnStartService(ServiceMethodRegister& methodRegister)
 	{
-        LOG_CHECK_RET_FALSE(this->GetComponent<GateComponent>());
+        LOG_CHECK_RET_FALSE(this->GetComponent<OuterNetMessageComponent>());
         methodRegister.BindAddress("Ping", &GateService::Ping);
 		methodRegister.BindAddress("Auth", &GateService::Auth);
         methodRegister.Bind("AllotUser", &GateService::AllotUser);
@@ -26,7 +26,7 @@ namespace Sentry
 		methodRegister.Bind("CallClient", &GateService::CallClient);
 		methodRegister.Bind("SaveAddress", &GateService::SaveAddress);
 		methodRegister.Bind("QueryAddress", &GateService::QueryAddress);
-		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<RpcGateComponent>());
+		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<OuterNetComponent>());
 		return true;
 	}
 

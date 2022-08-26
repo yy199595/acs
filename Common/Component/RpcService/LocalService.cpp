@@ -8,7 +8,7 @@
 #include"App/App.h"
 #include"Global/ServiceConfig.h"
 #include"Method/LuaServiceMethod.h"
-#include"Component/Rpc/RpcServerComponent.h"
+#include"Component/Rpc/InnerNetComponent.h"
 #include"Component/Lua/LuaScriptComponent.h"
 
 namespace Sentry

@@ -44,6 +44,53 @@ namespace Client
         LOG_INFO("call client func = " << t1->func());
 	}
 
+    void ClientComponent::OnMessage(const std::string &address, std::shared_ptr<Tcp::RpcMessage> message)
+    {
+        int len = 0;
+        const char * data = message->GetData(len);
+        MESSAGE_TYPE type = (MESSAGE_TYPE)message->GetType();
+        MESSAGE_PROTO proto = (MESSAGE_PROTO)message->GetPorot();
+        switch(proto)
+        {
+            case MESSAGE_PROTO::MSG_RPC_JSON:
+            {
+
+            }
+                break;
+            case MESSAGE_PROTO::MSG_RPC_PROTOBUF:
+            {
+                if(type == MESSAGE_TYPE::MSG_RPC_REQUEST)
+                {
+                    std::shared_ptr<c2s::rpc::call> request
+                            = std::make_shared<c2s::rpc::call>();
+                    if(request->ParseFromArray(data, len))
+                    {
+                        this->OnRequest(request);
+                    }
+                }
+                else if(type == MESSAGE_TYPE::MSG_RPC_RESPONSE)
+                {
+                    std::shared_ptr<c2s::rpc::response> response
+                        = std::make_shared<c2s::rpc::response>();
+                    if(response->ParseFromArray(data, len))
+                    {
+                        this->OnResponse(response->rpc_id(), response);
+                    }
+                }
+            }
+        }
+    }
+
+    void ClientComponent::StartClose(const std::string &address)
+    {
+
+    }
+
+    void ClientComponent::OnCloseSocket(const std::string &address, XCode code)
+    {
+
+    }
+
     bool ClientComponent::LateAwake()
     {
         this->mTimerComponent = this->GetComponent<TimerComponent>();
@@ -58,21 +105,12 @@ namespace Client
 		
 		this->AddTask(clienRpcTask);
 		this->mTcpClient->SendToServer(request);
-//		LOG_DEBUG("call [" << request->method_name()
-//			<< "] rpc id = " << clienRpcTask->GetRpcId());
 		return clienRpcTask->Await();
 	}
 
 	void ClientComponent::OnTimeout(long long rpcId)
 	{
 		this->OnResponse(rpcId, nullptr);
-//		auto iter = this->mRpcTasks.find(rpcId);
-//		if (iter != this->mRpcTasks.end())
-//		{
-//			auto rpcTask = iter->second;
-//			this->mRpcTasks.erase(iter);
-//			rpcTask->SetResult(nullptr);
-//		}
 	}
 
 	void ClientComponent::OnAddTask(RpcTask rpctask)

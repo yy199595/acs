@@ -1,9 +1,9 @@
 ﻿
-#include"RpcServerComponent.h"
+#include"InnerNetComponent.h"
 #include"App/App.h"
 #include"Util/StringHelper.h"
 #include"Network/SocketProxy.h"
-#include"Component/Rpc/TcpRpcComponent.h"
+#include"Component/Rpc/InnerNetMessageComponent.h"
 #include"Global/ServiceConfig.h"
 #include"Component/Scene/NetThreadComponent.h"
 
@@ -12,52 +12,55 @@
 #include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {
-	void RpcServerComponent::Awake()
+	void InnerNetComponent::Awake()
 	{
-		this->mRpcComponent = nullptr;
         this->mNetComponent = nullptr;
-	}
-	bool RpcServerComponent::LateAwake()
+        this->mMessageComponent = nullptr;
+    }
+	bool InnerNetComponent::LateAwake()
 	{
         LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<NetThreadComponent>());
-        LOG_CHECK_RET_FALSE(this->mRpcComponent = this->GetComponent<TcpRpcComponent>());
+        LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>());
 		return true;
 	}
 
-    void RpcServerComponent::OnMessage(const std::string &address, std::shared_ptr<Tcp::RpcMessage> message)
+    void InnerNetComponent::OnMessage(const std::string &address, std::shared_ptr<Tcp::RpcMessage> message)
     {
+        int len = 0;
+        const char * data = message->GetData(len);
         MESSAGE_TYPE type = (MESSAGE_TYPE)message->GetType();
         MESSAGE_PROTO proto = (MESSAGE_PROTO)message->GetPorot();
         switch(proto)
         {
             case MESSAGE_PROTO::MSG_RPC_JSON:
             {
-                if(type == MESSAGE_TYPE::MSG_RPC_REQUEST)
-                {
 
-                }
-                else if(type == MESSAGE_TYPE::MSG_RPC_RESPONSE)
-                {
-
-                }
             }
                 break;
             case MESSAGE_PROTO::MSG_RPC_PROTOBUF:
             {
                 if(type == MESSAGE_TYPE::MSG_RPC_REQUEST)
                 {
-
+                    if(!this->mMessageComponent->OnProtoRequest(address, data, len))
+                    {
+                        this->StartClose(address);
+                        return;
+                    }
                 }
                 else if(type == MESSAGE_TYPE::MSG_RPC_RESPONSE)
                 {
-
+                    if(!this->mMessageComponent->OnProtoResponse(address, data, len))
+                    {
+                        this->StartClose(address);
+                        return;
+                    }
                 }
             }
                 break;
         }
     }
 
-	void RpcServerComponent::OnCloseSocket(const std::string & address, XCode code)
+	void InnerNetComponent::OnCloseSocket(const std::string & address, XCode code)
 	{
 		auto iter = this->mRpcClientMap.find(address);
 		if (iter != this->mRpcClientMap.end())
@@ -67,15 +70,15 @@ namespace Sentry
 		}
 	}
 
-	bool RpcServerComponent::OnListen(std::shared_ptr<SocketProxy> socket)
+	bool InnerNetComponent::OnListen(std::shared_ptr<SocketProxy> socket)
 	{
 		const std::string& address = socket->GetAddress();
 		auto iter = this->mRpcClientMap.find(address);
 		if (iter == this->mRpcClientMap.end())
 		{
 			assert(!address.empty());
-			std::shared_ptr<MessageRpcClient> tcpSession
-					= std::make_shared<MessageRpcClient>(this, socket);
+			std::shared_ptr<InnerNetClient> tcpSession
+					= std::make_shared<InnerNetClient>(this, socket);
 
 			tcpSession->StartReceive();
 			this->mRpcClientMap.emplace(address, tcpSession);
@@ -84,7 +87,7 @@ namespace Sentry
         return false;
 	}
 
-	void RpcServerComponent::StartClose(const std::string & address)
+	void InnerNetComponent::StartClose(const std::string & address)
 	{
 		auto iter = this->mRpcClientMap.find(address);
 		if (iter != this->mRpcClientMap.end())
@@ -96,35 +99,9 @@ namespace Sentry
 		}
 	}
 
-	void RpcServerComponent::OnRequest(std::shared_ptr<com::rpc::request> request)
+	std::shared_ptr<InnerNetClient> InnerNetComponent::GetOrCreateSession(const std::string& address)
 	{
-        assert(this->GetApp()->IsMainThread());
-        request->set_type(com::rpc_msg_type_proto);
-        const std::string & address = request->address();
-		XCode code = this->mRpcComponent->OnRequest(request);
-		if (code != XCode::Successful)
-		{
-			std::shared_ptr<com::rpc::response> response(new com::rpc::response());
-
-			response->set_code((int)code);
-			response->set_rpc_id(request->rpc_id());
-			if (!this->Send(address, response))
-			{
-
-			}
-		}
-	}
-
-	void RpcServerComponent::OnResponse(std::shared_ptr<com::rpc::response> response)
-	{
-        long long taskId = response->rpc_id();
-        assert(this->GetApp()->IsMainThread());
-        this->mRpcComponent->OnResponse(taskId, response);
-	}
-
-	std::shared_ptr<MessageRpcClient> RpcServerComponent::GetOrCreateSession(const std::string& address)
-	{
-		std::shared_ptr<MessageRpcClient> localSession = this->GetSession(address);
+		std::shared_ptr<InnerNetClient> localSession = this->GetSession(address);
 		if (localSession != nullptr)
 		{
 			return localSession;
@@ -138,13 +115,13 @@ namespace Sentry
             return nullptr;
         }
         socketProxy->Init(ip, port);
-		localSession = make_shared<MessageRpcClient>(this, socketProxy);
+		localSession = make_shared<InnerNetClient>(this, socketProxy);
 
 		this->mRpcClientMap.emplace(socketProxy->GetAddress(), localSession);
 		return localSession;
 	}
 
-	std::shared_ptr<MessageRpcClient> RpcServerComponent::GetSession(const std::string& address)
+	std::shared_ptr<InnerNetClient> InnerNetComponent::GetSession(const std::string& address)
 	{
 		auto iter = this->mRpcClientMap.find(address);
 		if (iter == this->mRpcClientMap.end())
@@ -155,7 +132,7 @@ namespace Sentry
 	}
 
 
-	bool RpcServerComponent::Send(const std::string & address, std::shared_ptr<com::rpc::request> message)
+	bool InnerNetComponent::Send(const std::string & address, std::shared_ptr<com::rpc::request> message)
 	{
 		auto clientSession = this->GetOrCreateSession(address);
 		if (message == nullptr || clientSession == nullptr)
@@ -166,9 +143,9 @@ namespace Sentry
 		return true;
 	}
 
-	bool RpcServerComponent::Send(const std::string & address, std::shared_ptr<com::rpc::response> message)
+	bool InnerNetComponent::Send(const std::string & address, std::shared_ptr<com::rpc::response> message)
 	{
-		std::shared_ptr<MessageRpcClient> clientSession = this->GetSession(address);
+		std::shared_ptr<InnerNetClient> clientSession = this->GetSession(address);
 		if (clientSession == nullptr || message == nullptr)
 		{
 			LOG_ERROR("send message to [" << address << "] failure");

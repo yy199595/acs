@@ -7,7 +7,8 @@ namespace Client
         : Tcp::TcpContext(socket)
 	{
 		this->mClientComponent = component;
-	}
+        this->mState = Tcp::DecodeState::Head;
+    }
 
 	void TcpRpcClientContext::SendToServer(std::shared_ptr<c2s::rpc::request> request)
 	{
@@ -35,7 +36,7 @@ namespace Client
                 return;
             }
             this->SendFromMessageQueue();
-            this->ReceiveMessage(sizeof(int) + 2);
+            this->ReceiveMessage(RPC_PACK_HEAD_LEN);
         }
         else
         {
@@ -53,51 +54,31 @@ namespace Client
 #endif
             return;
         }
-        switch ((MESSAGE_TYPE) readStream.get())
+        switch(this->mState)
         {
-            case MESSAGE_TYPE::MSG_RPC_CALL_CLIENT:
-                this->OnRequest(readStream);
+            case Tcp::DecodeState::Head:
+            {
+                this->mState = Tcp::DecodeState::Body;
+                this->mMessage = std::make_shared<Tcp::RpcMessage>();
+                int len = this->mMessage->DecodeHead(readStream);
+                this->ReceiveMessage(len);
+            }
                 break;
-            case MESSAGE_TYPE::MSG_RPC_RESPONSE:
-                this->OnResponse(readStream);
+            case Tcp::DecodeState::Body:
+            {
+                this->mState = Tcp::DecodeState::Head;
+                this->mMessage->DecodeBody(readStream);
+                const std::string & address = this->mSocket->GetAddress();
+#ifdef ONLY_MAIN_THREAD
+                this->mClientComponent->OnMessage(address, std::move(this->mMessage));
+#else
+                asio::io_service & io = App::Get()->GetThread();
+                io.post(std::bind(&ClientComponent::OnMessage,
+                                  this->mClientComponent, address, std::move(this->mMessage)));
+#endif
+            }
                 break;
         }
-        this->ReceiveMessage(sizeof(int) + 2);
+        this->ReceiveMessage(RPC_PACK_HEAD_LEN);
     }
-
-	bool TcpRpcClientContext::OnRequest(std::istream & istream1)
-    {
-        std::shared_ptr<c2s::rpc::call> request(new c2s::rpc::call());
-        if (!request->ParseFromIstream(&istream1))
-        {
-			CONSOLE_LOG_ERROR("parse request message error");
-            return false;
-        }
-#ifdef ONLY_MAIN_THREAD
-        this->mClientComponent->OnRequest(request);
-#else
-        asio::io_service & io = App::Get()->GetThread();
-        io.post(std::bind(&ClientComponent::OnRequest, this->mClientComponent, request));
-#endif
-        return true;
-    }
-
-	bool TcpRpcClientContext::OnResponse(std::istream & istream1)
-    {
-        std::shared_ptr<c2s::rpc::response> response(new c2s::rpc::response());
-        if (!response->ParseFromIstream(&istream1))
-        {
-			CONSOLE_LOG_ERROR("parse response message error");
-			return false;
-        }
-        long long taskId = response->rpc_id();
-#ifdef ONLY_MAIN_THREAD
-        this->mClientComponent->OnResponse(taskId, response);
-#else
-        asio::io_service & io = App::Get()->GetThread();
-        io.post(std::bind(&ClientComponent::OnResponse, this->mClientComponent, taskId, response));
-#endif
-        return true;
-    }
-
 }

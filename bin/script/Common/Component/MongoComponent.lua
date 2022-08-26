@@ -42,7 +42,7 @@ function MongoComponent.QueryOnce(tab, data)
     if code ~= XCode.Successful or response == nil then
         return nil
     end
-    if #response.json > 0 then
+    if #response.jsons > 0 then
         return Json.Decode(response.jsons[1])
     end
     return nil

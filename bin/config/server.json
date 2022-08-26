@@ -17,7 +17,7 @@
         "rpc": {
             "port": 7788,
             "ip": "127.0.0.1",
-            "component": "RpcServerComponent"
+            "component": "InnerNetComponent"
         },
         "http": {
             "port": 8080,
@@ -27,7 +27,7 @@
         "gate": {
             "port": 1995,
             "ip": "127.0.0.1",
-            "component": "RpcGateComponent"
+            "component": "OuterNetComponent"
         },
         "rpc.http": {
             "port": 1996,
@@ -99,17 +99,16 @@
         "RedisSubComponent",
         "DataRedisComponent",
         "LuaScriptComponent",
-        "RpcServerComponent",
-        "TcpRpcComponent",
-        "GateComponent",
+        "InnerNetComponent",
+        "InnerNetMessageComponent",
+        "OuterNetMessageComponent",
         "MongoRpcComponent",
-        "RpcGateComponent",
+        "OuterNetComponent",
         "UnitMgrComponent",
         "GateAgentComponent",
         "UserSyncComponent",
         "HttpWebComponent",
         "HttpRpcComponent",
-        "MysqlRpcComponent",
         "JsonClientComponent",
         "RedisRegistryComponent"
     ],

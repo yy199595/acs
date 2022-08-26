@@ -188,6 +188,10 @@ namespace Sentry
 		{
             std::shared_ptr<T2> responseData(new T2());
             std::shared_ptr<T1> requestData = this->GetRequest<T1>(request);
+            if(requestData == nullptr)
+            {
+                return XCode::CallArgsError;
+            }
 			if (this->mHasUserId)
 			{
 				XCode code = (_o->*_objfunc)(request.user_id(), *requestData, *responseData);
@@ -318,6 +322,10 @@ namespace Sentry
 		XCode Invoke(const com::rpc::request& request, com::rpc::response& response) override
 		{
 			std::shared_ptr<T1> requestData = this->GetRequest<T1>(request);
+            if(requestData == nullptr)
+            {
+                return XCode::CallArgsError;
+            }
 			return (_o->*_func)(request.address(), *requestData);
 		}
 

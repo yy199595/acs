@@ -33,7 +33,7 @@ namespace Sentry
 {
 
 	class TaskComponent;
-	class TcpRpcComponent;
+	class InnerNetMessageComponent;
     class RedisRegistryComponent : public RedisChannelComponent, public IComplete, public IServiceChange, public ISecondUpdate
 	{
 	 public:

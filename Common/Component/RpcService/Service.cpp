@@ -5,8 +5,8 @@
 #include"Util/StringHelper.h"
 #include"Async/RpcTask/RpcTaskSource.h"
 #include"Script/Extension/Service/LuaService.h"
-#include"Component/Rpc/TcpRpcComponent.h"
-#include"Component/Rpc/RpcServerComponent.h"
+#include"Component/Rpc/InnerNetMessageComponent.h"
+#include"Component/Rpc/InnerNetComponent.h"
 #ifdef __RPC_DEBUG_LOG__
 #include<google/protobuf/util/json_util.h>
 #endif
@@ -19,9 +19,9 @@ namespace Sentry
 	bool Service::LateAwake()
 	{
 		assert(this->mConfig);
-		this->mRpcComponent = this->GetComponent<TcpRpcComponent>();
-		this->mClientComponent = this->GetComponent<RpcServerComponent>();
-		return this->GetConfig().GetListener("rpc", this->mLocalAddress);
+		this->mClientComponent = this->GetComponent<InnerNetComponent>();
+        this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>();
+        return this->GetConfig().GetListener("rpc", this->mLocalAddress);
 	}
 
 	void Service::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
@@ -181,7 +181,7 @@ namespace Sentry
 		std::shared_ptr<RpcTaskSource> taskSource =
 			std::make_shared<RpcTaskSource>(0);
 		request->set_rpc_id(taskSource->GetRpcId());
-		this->mRpcComponent->AddTask(taskSource);
+		this->mMessageComponent->AddTask(taskSource);
 		if(this->SendRequest(address, request) != XCode::Successful)
 		{
 			return XCode::NetWorkError;

@@ -44,4 +44,6 @@ namespace Tcp
     };
 }
 
+constexpr int RPC_PACK_HEAD_LEN = sizeof(int) + sizeof(char) + sizeof(char);
+
 #endif //GameKeeper_MESSAGESTREAM_H

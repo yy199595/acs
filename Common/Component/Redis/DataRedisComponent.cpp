@@ -34,6 +34,10 @@ namespace Sentry
     {
         SharedRedisClient redisClientContext = this->GetClient(name);
         std::shared_ptr<RedisRequest> redisRequets = this->MakeLuaRequest(func, request.JsonString());
+        if(redisRequets == nullptr)
+        {
+            return false;
+        }
         std::shared_ptr<RedisResponse> redisResponse = this->Run(redisClientContext, redisRequets);
         if (redisResponse == nullptr || redisResponse->HasError())
         {

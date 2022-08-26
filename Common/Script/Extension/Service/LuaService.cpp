@@ -8,7 +8,7 @@
 #include"Script/Extension/Json/Json.h"
 #include"Async/RpcTask/RpcTaskSource.h"
 #include"Component/Scene/MessageComponent.h"
-#include"Component/Rpc/TcpRpcComponent.h"
+#include"Component/Rpc/InnerNetMessageComponent.h"
 using namespace Sentry;
 namespace Lua
 {
@@ -69,7 +69,7 @@ namespace Lua
 
 		lua_pushthread(lua);
 		std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource(new LuaRpcTaskSource(lua, 0));
-		TcpRpcComponent * rpcHandlerComponent = App::Get()->GetComponent<TcpRpcComponent>();
+		InnerNetMessageComponent * rpcHandlerComponent = App::Get()->GetComponent<InnerNetMessageComponent>();
 
 
 		request->set_func(rpcInterfaceConfig->FullName);

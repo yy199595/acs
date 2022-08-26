@@ -1,44 +1,68 @@
-﻿#include"TcpRpcComponent.h"
+﻿#include"InnerNetMessageComponent.h"
 #include"Component/Coroutine/TaskComponent.h"
 #include"Util/StringHelper.h"
 #include"App/App.h"
 #include"Method/LuaServiceMethod.h"
 #include"Global/ServiceConfig.h"
-#include"Component/Rpc/RpcServerComponent.h"
+#include"Component/Rpc/InnerNetComponent.h"
 #include"Other/ElapsedTimer.h"
 #include"Component/RpcService/LocalService.h"
 namespace Sentry
 {
-	void TcpRpcComponent::Awake()
+	void InnerNetMessageComponent::Awake()
 	{
 		this->mTaskComponent = nullptr;
 		this->mTimerComponent = nullptr;
 		this->mRpcClientComponent = nullptr;
 	}
 
-	bool TcpRpcComponent::LateAwake()
+	bool InnerNetMessageComponent::LateAwake()
 	{
 		this->mTaskComponent = App::Get()->GetTaskComponent();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<TaskComponent>());
-		LOG_CHECK_RET_FALSE(this->mRpcClientComponent = this->GetComponent<RpcServerComponent>());
+		LOG_CHECK_RET_FALSE(this->mRpcClientComponent = this->GetComponent<InnerNetComponent>());
 		return true;
 	}
 
-	XCode TcpRpcComponent::OnRequest(std::shared_ptr<com::rpc::request> request)
+    bool InnerNetMessageComponent::OnProtoRequest(const std::string &address, const char *data, int len)
+    {
+        std::shared_ptr<com::rpc::request> request(new com::rpc::request());
+        if(!request->ParseFromArray(data, len))
+        {
+            return false;
+        }
+        request->set_address(address);
+        request->set_type(com::rpc_msg_type_proto);
+        return this->OnRequest(request) == XCode::Successful;
+    }
+
+    bool InnerNetMessageComponent::OnProtoResponse(const std::string &address, const char *data, int len)
+    {
+        std::shared_ptr<com::rpc::response> response(new com::rpc::response());
+        if(!response->ParseFromArray(data, len))
+        {
+            return false;
+        }
+        long long taskId = response->rpc_id();
+        this->OnResponse(taskId, response);
+        return true;
+    }
+
+	XCode InnerNetMessageComponent::OnRequest(std::shared_ptr<com::rpc::request> request)
 	{
-		if(!RpcServiceConfig::ParseFunName(request->func(), this->mTempService, this->mTempMethod))
+		if(!RpcServiceConfig::ParseFunName(request->func(), this->mService, this->mMethod))
 		{
 			return XCode::NotFoundRpcConfig;
 		}
-		Service * logicService = this->GetApp()->GetService(this->mTempService);
+		Service * logicService = this->GetApp()->GetService(this->mService);
 		if (logicService == nullptr || !logicService->IsStartService())
 		{
-			LOG_ERROR("call service not exist : [" << this->mTempService << "]");
+			LOG_ERROR("call service not exist : [" << this->mService << "]");
 			return XCode::CallServiceNotFound;
 		}
 		const RpcServiceConfig & rpcServiceConfig = logicService->GetServiceConfig();
-		const RpcInterfaceConfig* rpcInterfaceConfig = rpcServiceConfig.GetConfig(this->mTempMethod);
+		const RpcInterfaceConfig* rpcInterfaceConfig = rpcServiceConfig.GetConfig(this->mMethod);
 		if (rpcInterfaceConfig == nullptr)
 		{
 			return XCode::NotFoundRpcConfig;
@@ -68,13 +92,12 @@ namespace Sentry
 			ElapsedTimer elapsedTimer;
 			const std::string& func = rpcInterfaceConfig->Method;
 			XCode code = logicService->Invoke(func, request, response);
-			if(request->rpc_id() == 0)
+			if(request->rpc_id() != 0)
 			{
-				return XCode::Successful;
+                response->set_code((int)code);
+                response->set_rpc_id(request->rpc_id());
+                this->mRpcClientComponent->Send(request->address(), response);
 			}
-			response->set_code((int)code);
-			response->set_rpc_id(request->rpc_id());
-			this->mRpcClientComponent->Send(request->address(), response);
 			return XCode::Successful;
 		}
 
@@ -83,15 +106,12 @@ namespace Sentry
 			ElapsedTimer elapsedTimer;
 			const std::string& func = rpcInterfaceConfig->Method;
 			XCode code = logicService->Invoke(func, request, response);
-			if(request->rpc_id() == 0)
-			{
-				return XCode::Successful;
-			}
-			response->set_code((int)code);
-			response->set_rpc_id(request->rpc_id());
-			this->mRpcClientComponent->Send(request->address(), response);
-			//LOG_INFO("async call " << rpcInterfaceConfig->FullName << " use time [" << elapsedTimer.GetMs() << "ms]");
-			return XCode::Successful;
+			if(request->rpc_id() != 0)
+            {
+                response->set_code((int) code);
+                response->set_rpc_id(request->rpc_id());
+                this->mRpcClientComponent->Send(request->address(), response);
+            }
 		});
 		return XCode::Successful;
 	}

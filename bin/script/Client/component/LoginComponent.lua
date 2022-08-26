@@ -1,6 +1,7 @@
 
 LoginComponent = {}
 local httpComponent
+local url = "http://127.0.0.1:8080/logic/%s"
 function LoginComponent.Awake()
     httpComponent = App.GetComponent("HttpComponent")
     return httpComponent ~= nil
@@ -8,8 +9,7 @@ end
 
 function LoginComponent.Register(account, passwd, phoneNum)
 
-    local url = "http://49.233.13.138:33000/logic/account/register"
-    return httpComponent:Post(url, Json.Encode({
+    return httpComponent:Post(string.format(url, "account/register"), Json.Encode({
         account = account,
         password = passwd,
         phone_num = phoneNum
@@ -18,8 +18,7 @@ end
 
 function LoginComponent.Login(account, passwd) -- 获取gate地址
 
-    local url = "http://49.233.13.138:33000/logic/account/login"
-    local response = httpComponent:Post(url, Json.Encode({
+    local response = httpComponent:Post(string.format(url, "account/login"), Json.Encode({
         account = account,
         password = passwd
     }))

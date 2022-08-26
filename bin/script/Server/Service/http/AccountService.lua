@@ -45,7 +45,7 @@ function AccountService.Login(request)
     if userInfo == nil or loginInfo.password ~= userInfo.password then
         return XCode.Failure
     end
-    local address = gateService:GetAddress()
+    local address = gateService:GetHost()
     local code, response = gateService:Call(address, "AllotUser", {
         value = userInfo.user_id
     })

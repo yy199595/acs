@@ -2,7 +2,7 @@
 // Created by mac on 2021/11/28.
 //
 
-#include"GateMessageClient.h"
+#include"OuterNetClient.h"
 #include"Message/c2s.pb.h"
 #include"Util/TimeHelper.h"
 #include"App/App.h"
@@ -10,43 +10,43 @@
 #include"google/protobuf/util/json_util.h"
 #endif
 #include"Network/Proto/RpcProtoMessage.h"
-#include"Component/Gate/RpcGateComponent.h"
+#include"Component/Gate/OuterNetComponent.h"
 
 using namespace Tcp::Rpc;
 namespace Sentry
 {
-	GateMessageClient::GateMessageClient(std::shared_ptr<SocketProxy> socket,
-                                         RpcGateComponent* component)
+	OuterNetClient::OuterNetClient(std::shared_ptr<SocketProxy> socket,
+                                   OuterNetComponent* component)
 		: TcpContext(socket), mGateComponent(component)
 	{
 		this->mQps = 0;
 		this->mCallCount = 0;
+        this->mState = Tcp::DecodeState::Head;
 	}
 
-	void GateMessageClient::StartReceive(int second)
+	void OuterNetClient::StartReceive(int second)
 	{
-        const int size = sizeof(int) + 2;
 #ifdef ONLY_MAIN_THREAD
-		this->ReceiveMessage(size);
+		this->ReceiveMessage(RPC_PACK_HEAD_LEN);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-        t.post(std::bind(&GateMessageClient::ReceiveMessage, this, size));
+        t.post(std::bind(&OuterNetClient::ReceiveMessage, this, RPC_PACK_HEAD_LEN));
         if(second != 0)
         {
-            t.post(std::bind(&GateMessageClient::StartTimer, this, second));
+            t.post(std::bind(&OuterNetClient::StartTimer, this, second));
         }
 #endif
 	}
 
-    void GateMessageClient::StartTimer(int second)
+    void OuterNetClient::StartTimer(int second)
     {
         auto timeout = std::chrono::seconds(second);
         asio::io_service & io = this->mSocket->GetThread();
         this->mTimer = std::make_shared<asio::steady_timer>(io, timeout);
-        this->mTimer->async_wait(std::bind(&GateMessageClient::OnTimerEnd, this, second));
+        this->mTimer->async_wait(std::bind(&OuterNetClient::OnTimerEnd, this, second));
     }
 
-    void GateMessageClient::OnTimerEnd(int timeout)
+    void OuterNetClient::OnTimerEnd(int timeout)
     {
         long long nowTime = Helper::Time::GetNowSecTime();
         if (nowTime - this->GetLastOperTime() < timeout) //超时
@@ -57,7 +57,7 @@ namespace Sentry
         this->CloseSocket(XCode::NetTimeout);
     }
 
-    void GateMessageClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t size)
+    void OuterNetClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t size)
     {
         if (code)
         {
@@ -67,34 +67,40 @@ namespace Sentry
             this->CloseSocket(XCode::NetReceiveFailure);
             return;
         }
-        if ((MESSAGE_TYPE) readStream.get() == MESSAGE_TYPE::MSG_RPC_CLIENT_REQUEST)
+        this->mQps += size;
+        switch (this->mState)
         {
-            this->mQps += readStream.rdbuf()->in_avail();
-            std::shared_ptr<c2s::rpc::request> request(new c2s::rpc::request());
-            if (!request->ParseFromIstream(&readStream))
+            case Tcp::DecodeState::Head:
             {
-                CONSOLE_LOG_ERROR("parse request message error");
-                return;
+                this->mState = Tcp::DecodeState::Body;
+                this->mMessage = std::make_shared<Tcp::RpcMessage>();
+                int len = this->mMessage->DecodeHead(readStream);
+                this->ReceiveMessage(len);
             }
-            this->mCallCount++;
-            request->set_address(this->GetAddress());
+                break;
+            case Tcp::DecodeState::Body:
+            {
+                this->mState = Tcp::DecodeState::Head;
+                if (!this->mMessage->DecodeBody(readStream))
+                {
+                    this->CloseSocket(XCode::UnKnowPacket);
+                    return;
+                }
+                this->ReceiveMessage(RPC_PACK_HEAD_LEN);
+                const std::string &address = this->mSocket->GetAddress();
 #ifdef ONLY_MAIN_THREAD
-            this->mGateComponent->OnRequest(request);
+                this->mGateComponent->OnMessage(address, std::move(this->mMessage));
 #else
-            asio::io_service &mainTaskScheduler = App::Get()->GetThread();
-            mainTaskScheduler.post(std::bind(&RpcGateComponent::OnRequest, this->mGateComponent, request));
+                asio::io_service &io = App::Get()->GetThread();
+                io.post(std::bind(&OuterNetComponent::OnMessage,
+                                  this->mGateComponent, address, std::move(this->mMessage)));
 #endif
+            }
+                break;
         }
-        else
-        {
-            CONSOLE_LOG_FATAL("unknow message type");
-            this->CloseSocket(XCode::UnKnowPacket);
-            return;
-        }
-        this->ReceiveMessage(sizeof(int) + 2);
     }
 
-	void GateMessageClient::CloseSocket(XCode code)
+	void OuterNetClient::CloseSocket(XCode code)
 	{
         this->mSocket->Close();
         const std::string & address = this->GetAddress();
@@ -102,11 +108,11 @@ namespace Sentry
 		this->mGateComponent->OnCloseSocket(address, code);
 #else
 		asio::io_service &mainTaskScheduler = App::Get()->GetThread();
-		mainTaskScheduler.post(std::bind(&RpcGateComponent::OnCloseSocket, this->mGateComponent, address, code));
+		mainTaskScheduler.post(std::bind(&OuterNetComponent::OnCloseSocket, this->mGateComponent, address, code));
 #endif
 	}
 
-	void GateMessageClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
+	void OuterNetClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{
 		if(code)
 		{
@@ -121,18 +127,18 @@ namespace Sentry
         this->SendFromMessageQueue();
 	}
 
-	void GateMessageClient::StartClose()
+	void OuterNetClient::StartClose()
 	{
 		XCode code = XCode::NetActiveShutdown;
 #ifdef ONLY_MAIN_THREAD
 		this->CloseSocket(code);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-        t.post(std::bind(&GateMessageClient::CloseSocket, this, code));
+        t.post(std::bind(&OuterNetClient::CloseSocket, this, code));
 #endif
 	}
 
-	void GateMessageClient::SendToClient(std::shared_ptr<c2s::rpc::call> message)
+	void OuterNetClient::SendToClient(std::shared_ptr<c2s::rpc::call> message)
 	{
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> request
 				= std::make_shared<Tcp::Rpc::RpcProtoMessage>();
@@ -143,11 +149,11 @@ namespace Sentry
 		this->Send(request);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-        t.post(std::bind(&GateMessageClient::Send, this, request));
+        t.post(std::bind(&OuterNetClient::Send, this, request));
 #endif
 	}
 
-	void GateMessageClient::SendToClient(std::shared_ptr<c2s::rpc::response> message)
+	void OuterNetClient::SendToClient(std::shared_ptr<c2s::rpc::response> message)
 	{
 		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> response
 				= std::make_shared<Tcp::Rpc::RpcProtoMessage>();
@@ -158,7 +164,7 @@ namespace Sentry
 		this->Send(response);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-        t.post(std::bind(&GateMessageClient::Send, this, response));
+        t.post(std::bind(&OuterNetClient::Send, this, response));
 #endif
         //CONSOLE_LOG_ERROR("send to client [" << this->mSocket->GetAddress() << "] " << message->rpc_id());
     }

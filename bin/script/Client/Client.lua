@@ -20,13 +20,13 @@ function Client.Start()
     local loginInfo = LoginComponent.Login(account, password)
     if loginInfo.code ~= XCode.Successful then
         Log.Error("使用http登陆失败")
-        return
+        return false
     end
 
     local address = loginInfo.data.address
     if not clientComponent:StartConnectAsync(address) then
         Log.Error("连接网关服务器 [" , address, "] 失败")
-        return
+        return false
     end
     Log.Debug("连接网关服务器[" , address, "]成功")
 
@@ -35,14 +35,14 @@ function Client.Start()
     })
     if code ~= XCode.Successful then
         Log.Error("user auth failure")
-        return
+        return false
     end
     for i = 1, 20 do
         --coroutine.start(LoopCall)
         coroutine.start(LoopLogin)
         coroutine.start(LoopRegister)
     end
-
+    return true
 end
 local callCount = 0
 local loginCount = 0
