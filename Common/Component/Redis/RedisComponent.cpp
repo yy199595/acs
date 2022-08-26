@@ -181,6 +181,7 @@ namespace Sentry
         SharedRedisClient redisClientContext = this->GetClient(name);
         if(redisClientContext == nullptr)
         {
+            CONSOLE_LOG_ERROR("not find redis client : " << name);
             return nullptr;
         }
         return this->Run(redisClientContext, request);

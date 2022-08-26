@@ -1,7 +1,6 @@
 
-local RedisComponent = {}
-local component = App.GetComponent("DataRedisComponent")
-
+RedisComponent = {}
+local component = App.GetComponent("RedisDataComponent")
 function RedisComponent.Run(name, cmd, ...)
     assert(type(cmd) == "string")
     assert(type(name) == "string")
@@ -17,7 +16,7 @@ end
 function RedisComponent.AddCounter(name, key)
     assert(type(key) == "string")
     assert(type(name) == "string")
-    local response = component.Run(name, "INCRBY", key, 1)
+    local response = RedisComponent.Run(name, "INCRBY", key, 1)
     return type(response) == "number" and response or -1
 end
 

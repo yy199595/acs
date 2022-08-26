@@ -2,7 +2,9 @@
 // Created by zmhy0073 on 2022/8/12.
 //
 
-#include "ServiceHost.h"
+#include"ServiceHost.h"
+#include"Define/CommonLogDef.h"
+#include"App/App.h"
 namespace Sentry
 {
     void ServiceHost::AddHost(const std::string &address)
@@ -10,7 +12,9 @@ namespace Sentry
         if(!this->HasHost(address))
         {
             this->OnAddHost(address);
+            const std::string & name = this->GetServiceName();
             this->mHosts.emplace_back(new HostCounter(address));
+            CONSOLE_LOG_ERROR(name << " add host [" << address <<"]");
         }
     }
 

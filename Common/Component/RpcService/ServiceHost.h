@@ -37,6 +37,7 @@ namespace Sentry
         bool GetHost(long long unitId, std::string & address);
         size_t GetHostSize() const { return this->mHosts.size(); }
         size_t GetUnitSize() const { return this->mUnitHosts.size(); }
+        virtual const std::string & GetServiceName() = 0;
     protected:
         virtual void OnUnitJoin(long long unitId) { }
         virtual void OnUnitExit(long long unitId) { }

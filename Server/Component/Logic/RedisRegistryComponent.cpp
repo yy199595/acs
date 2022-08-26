@@ -53,7 +53,7 @@ namespace Sentry
             return false;
         }
         iter->second->UpdateTime();
-        LOG_INFO("[" << address << "] update time");
+        //LOG_INFO("[" << address << "] update time");
         return true;
     }
 
@@ -150,6 +150,8 @@ namespace Sentry
         if(response1 != nullptr && response1->GetArraySize() > 0)
         {
             std::shared_ptr<RedisRequest> redisRequest(new RedisRequest("SREM"));
+
+            redisRequest->AddParameter(this->mRpcAddress);
             for(size_t index = 0; index < response1->GetArraySize(); index++)
             {
                 const RedisString * redisString = response1->Get(index)->Cast<RedisString>();
@@ -158,7 +160,8 @@ namespace Sentry
                     redisRequest->AddParameter(redisString->GetValue());
                 }
             }
-            this->mRedisComponent->Run("name", redisRequest);
+            response1 = this->mRedisComponent->Run("main", redisRequest);
+            LOG_INFO("remove number = " << response1->GetNumber());
         }
         Json::Writer json;
         std::shared_ptr<RedisRequest> redisRequest(new RedisRequest("SADD"));

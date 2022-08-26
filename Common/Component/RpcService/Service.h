@@ -38,6 +38,7 @@ namespace Sentry
         bool IsStartComplete() final{return this->GetHostSize() > 0; };
         const RpcServiceConfig & GetServiceConfig() { return *this->mConfig; }
         const std::string & GetLocalHost() final { return this->mLocalAddress; }
+        const std::string & GetServiceName() final { return this->GetName(); }
 		XCode SendRequest(const std::string& address, std::shared_ptr<com::rpc::request> request);
 		std::shared_ptr<com::rpc::request> NewRpcRequest(const std::string& func, long long userId);
 		std::shared_ptr<com::rpc::request> NewRpcRequest(const std::string& func, long long userId, const Message& message);
