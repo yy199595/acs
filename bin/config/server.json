@@ -22,6 +22,7 @@
         "http": {
             "port": 8080,
             "ip": "127.0.0.1",
+            "route": "/app/logic",
             "component": "HttpWebComponent"
         },
         "gate": {
@@ -32,6 +33,7 @@
         "rpc.http": {
             "port": 1996,
             "ip" : "127.0.0.1",
+            "route": "/app/rpc/call",
             "component" : "HttpRpcComponent"
         },
         "console": {

@@ -5,13 +5,13 @@
             "Type": "POST",
             "Async": true,
             "Content": "application/json",
-            "Path": "/logic/account/login"
+            "Path": "/user/login"
         },
         "Register": {
             "Type": "POST",
             "Async": true,
             "Content": "application/json",
-            "Path": "/logic/account/register"
+            "Path": "/user/register"
         }
     },
     "GateService": {

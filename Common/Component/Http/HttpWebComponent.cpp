@@ -48,8 +48,9 @@ namespace Sentry
         const std::string & type = request->GetMethod();
         const std::string & data = request->GetContent();
         const std::string & address = request->GetAddress();
-
-        const HttpInterfaceConfig *httpConfig = this->GetConfig(path);
+        const ListenConfig & listenConfig = this->GetListenConfig();
+        std::string childRoute = path.substr(listenConfig.Route.size());
+        const HttpInterfaceConfig *httpConfig = this->GetConfig(childRoute);
         if (httpConfig == nullptr)
         {
             httpClient->StartWriter(HttpStatus::NOT_FOUND);

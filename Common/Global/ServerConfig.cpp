@@ -47,6 +47,10 @@ namespace Sentry
                     listenConfig.Ip = jsonObject["ip"].GetString();
                     listenConfig.Port = jsonObject["port"].GetUint();
                     listenConfig.Handler = jsonObject["component"].GetString();;
+                    if(jsonObject.HasMember("route"))
+                    {
+                        listenConfig.Route = jsonObject["route"].GetString();
+                    }
                     listenConfig.Address = fmt::format("{0}:{1}",listenConfig.Ip,listenConfig.Port);
                     this->mListens.emplace(listenConfig.Name, listenConfig);
                 }

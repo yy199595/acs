@@ -28,7 +28,7 @@ namespace Sentry
     public:
         std::string Ip;
         std::string Name;
-        std::string Token;
+        std::string Route;
         std::string Handler;
         std::string Address;
         unsigned short Port = 0;

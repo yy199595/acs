@@ -18,30 +18,22 @@ namespace Sentry
 
         const std::string & path = request->GetPath();
         const std::string & address = request->GetAddress();
+        const ListenConfig & listenConfig = this->GetListenConfig();
+        std::string childRoute = path.substr(listenConfig.Route.size());
 
         if (request->GetMethod() != "POST")
         {
             httpClient->StartWriter(HttpStatus::METHOD_NOT_ALLOWED);
             return;
         }
-        if(request->GetPath() != "/logic/rpc")
+        std::vector<std::string> tempArray;
+        if(Helper::String::Split(childRoute, "/", tempArray) != 2)
         {
             httpClient->StartWriter(HttpStatus::NOT_FOUND);
             return;
         }
-        std::string fullName, service, method;
-        if(!request->GetHead("method", fullName))
-        {
-            httpClient->StartWriter(HttpStatus::BAD_REQUEST);
-            return;
-        }
-
-        Helper::String::ClearBlank(fullName);
-        if(!RpcServiceConfig::ParseFunName(fullName, service, method))
-        {
-            httpClient->StartWriter(HttpStatus::NOT_FOUND);
-            return;
-        }
+        const std::string & method = tempArray[1];
+        const std::string & service = tempArray[0];
         Service * targetService = this->GetApp()->GetService(service);
         if(targetService == nullptr || !targetService->IsStartService())
         {
