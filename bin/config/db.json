@@ -16,21 +16,21 @@
     "listener": {
         "rpc": {
             "port": 7787,
-            "ip": "10.10.8.137",
+            "ip": "114.115.167.51",
             "component": "InnerNetComponent"
         }
     },
     "mongo": {
         "count" : 10,
         "db": "yjz",
-        "ip": "114.115.167.51",
+        "ip": "127.0.0.1",
         "port" : 27017,
         "user" : "yjz",
         "passwd" : "199595yjz."
     },
     "redis": {
         "main": {
-            "ip": "114.115.167.51",
+            "ip": "127.0.0.1",
             "port": 6379,
             "timeout": 3,
             "count": 2,
