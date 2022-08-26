@@ -2,7 +2,7 @@
 // Created by zmhy0073 on 2022/6/2.
 //
 
-#include"MessageComponent.h"
+#include"ProtoBufferComponent.h"
 #include"App/App.h"
 #include<fstream>
 #include"Util/MD5.h"
@@ -32,13 +32,13 @@ namespace Sentry
 
 namespace Sentry
 {
-	MessageComponent::MessageComponent()
+	ProtoBufferComponent::ProtoBufferComponent()
 	{
 		this->mImporter = nullptr;
 		this->mSourceTree = nullptr;
 	}
 
-    bool MessageComponent::LateAwake()
+    bool ProtoBufferComponent::LateAwake()
     {
         std::string path;
         if(this->GetConfig().GetPath("proto", path))
@@ -48,7 +48,7 @@ namespace Sentry
         return true;
     }
 
-    bool MessageComponent::Load(const char * path)
+    bool ProtoBufferComponent::Load(const char * path)
     {
         if(!Helper::Directory::DirectorIsExist(path))
         {
@@ -71,7 +71,7 @@ namespace Sentry
         return true;
     }
 
-	bool MessageComponent::Import(const char * fileName)
+	bool ProtoBufferComponent::Import(const char * fileName)
 	{
         io::ZeroCopyInputStream * inputStream = this->mSourceTree->Open(fileName);
         if(inputStream == nullptr)
@@ -118,7 +118,7 @@ namespace Sentry
 		return true;
 	}
 
-	void MessageComponent::LoopMessage(const Descriptor* descriptor)
+	void ProtoBufferComponent::LoopMessage(const Descriptor* descriptor)
 	{
 		for(int y = 0; y < descriptor->nested_type_count(); y++)
 		{
@@ -133,7 +133,7 @@ namespace Sentry
 		}
 	}
 
-    std::shared_ptr<Message> MessageComponent::New(const Any &any)
+    std::shared_ptr<Message> ProtoBufferComponent::New(const Any &any)
     {
         std::string fullName;
         if(!Any::ParseAnyTypeUrl(any.type_url(), &fullName))
@@ -148,7 +148,7 @@ namespace Sentry
         return nullptr;
     }
 
-    std::shared_ptr<Message> MessageComponent::New(const std::string & name)
+    std::shared_ptr<Message> ProtoBufferComponent::New(const std::string & name)
     {
         const Message * message = this->FindMessage(name);
         if(message == nullptr)
@@ -159,7 +159,7 @@ namespace Sentry
         return std::shared_ptr<Message>(message->New());
     }
 
-    std::shared_ptr<Message> MessageComponent::New(const std::string &name, const std::string &json)
+    std::shared_ptr<Message> ProtoBufferComponent::New(const std::string &name, const std::string &json)
     {
         std::shared_ptr<Message> message = this->New(name);
         if(message != nullptr && util::JsonStringToMessage(json, message.get()).ok())
@@ -169,7 +169,7 @@ namespace Sentry
         return nullptr;
     }
 
-	std::shared_ptr<Message> MessageComponent::New(const string& name, const char* json, size_t size)
+	std::shared_ptr<Message> ProtoBufferComponent::New(const string& name, const char* json, size_t size)
 	{
 		std::shared_ptr<Message> message = this->New(name);
 		if(message != nullptr && util::JsonStringToMessage(StringPiece(json, size), message.get()).ok())
@@ -179,7 +179,7 @@ namespace Sentry
 		return nullptr;
 	}
 
-    const Message * MessageComponent::FindMessage(const std::string &name)
+    const Message * ProtoBufferComponent::FindMessage(const std::string &name)
     {
         auto iter1 = this->mDynamicMessageMap.find(name);
         if(iter1 != this->mDynamicMessageMap.end())
@@ -204,22 +204,22 @@ namespace Sentry
         return nullptr;
     }
 
-    void MessageComponent::OnLuaRegister(Lua::ClassProxyHelper &luaRegister)
+    void ProtoBufferComponent::OnLuaRegister(Lua::ClassProxyHelper &luaRegister)
     {
-        luaRegister.BeginRegister<MessageComponent>();
-        //luaRegister.PushMemberFunction("Load", &MessageComponent::Load);
+        luaRegister.BeginRegister<ProtoBufferComponent>();
+        //luaRegister.PushMemberFunction("Load", &ProtoBufferComponent::Load);
 		luaRegister.PushExtensionFunction("New", Lua::MessageEx::New);
-		luaRegister.PushMemberFunction("Import", &MessageComponent::Import);
+		luaRegister.PushMemberFunction("Import", &ProtoBufferComponent::Import);
 		luaRegister.PushExtensionFunction("Decode", &Lua::MessageEx::Decode);
 		luaRegister.PushExtensionFunction("NewJson", &Lua::MessageEx::NewJson);
 	}
 
-	bool MessageComponent::Write(lua_State* lua, const Message& message)
+	bool ProtoBufferComponent::Write(lua_State* lua, const Message& message)
 	{
 		MessageDecoder messageDecoder(lua, this);
 		return messageDecoder.Decode(message);
 	}
-	std::shared_ptr<Message> MessageComponent::Read(lua_State* lua, const std::string& name, int index)
+	std::shared_ptr<Message> ProtoBufferComponent::Read(lua_State* lua, const std::string& name, int index)
 	{
 		MessageEncoder messageEncoder(lua, this);
 		return messageEncoder.Encode(name, index);

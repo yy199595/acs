@@ -6,7 +6,7 @@
 #include"Script/Function.h"
 #include"Script/Extension/Json/Json.h"
 #include"Async/LuaServiceTaskSource.h"
-#include"Component/Scene/MessageComponent.h"
+#include"Component/Scene/ProtoBufferComponent.h"
 namespace Sentry
 {
     LuaHttpServiceMethod::LuaHttpServiceMethod(const HttpInterfaceConfig *config, lua_State *lua)

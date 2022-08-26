@@ -16,7 +16,7 @@ namespace Sentry
 {
 	class MainTaskScheduler;
 	class Service;
-	class MessageComponent;
+	class ProtoBufferComponent;
 	class App final : public Unit
 	{
 	 public:
@@ -30,7 +30,7 @@ namespace Sentry
 		inline asio::io_service& GetThread() { return *this->mMainThread; }
 		inline TaskComponent* GetTaskComponent() { return this->mTaskComponent; }
 		inline TimerComponent* GetTimerComponent() { return this->mTimerComponent; }
-		inline MessageComponent * GetMsgComponent() { return this->mMessageComponent; }
+		inline ProtoBufferComponent * GetMsgComponent() { return this->mMessageComponent; }
 	 private:
 		bool LoadComponent();
 		void StartAllComponent();
@@ -68,7 +68,7 @@ namespace Sentry
 		LoggerComponent* mLogComponent;
 		TimerComponent* mTimerComponent;
 		static std::shared_ptr<App> mApp;
-		MessageComponent * mMessageComponent;
+		ProtoBufferComponent * mMessageComponent;
 		std::vector<IFrameUpdate*> mFrameUpdateManagers;
 		std::vector<ISystemUpdate*> mSystemUpdateManagers;
 		std::vector<ISecondUpdate*> mSecondUpdateManagers;

@@ -10,7 +10,7 @@
 #include"Network/Http/HttpAsyncRequest.h"
 #include"Component/Http/HttpComponent.h"
 #include"Network/Http/HttpRequestClient.h"
-#include"Component/Scene/MessageComponent.h"
+#include"Component/Scene/ProtoBufferComponent.h"
 using namespace Sentry;
 namespace Lua
 {

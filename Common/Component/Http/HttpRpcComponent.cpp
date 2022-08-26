@@ -6,7 +6,7 @@
 #include"Util/StringHelper.h"
 #include"Component/RpcService/Service.h"
 #include"Network/Http/HttpHandlerClient.h"
-#include"Component/Scene/MessageComponent.h"
+#include"Component/Scene/ProtoBufferComponent.h"
 namespace Sentry
 {
     void HttpRpcComponent::OnRequest(std::shared_ptr<HttpHandlerClient> httpClient)

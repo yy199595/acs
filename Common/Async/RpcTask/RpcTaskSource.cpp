@@ -1,5 +1,5 @@
 ﻿#include"RpcTaskSource.h"
-#include"Component/Scene/MessageComponent.h"
+#include"Component/Scene/ProtoBufferComponent.h"
 namespace Sentry
 {
     void RpcTaskSource::OnResponse(std::shared_ptr<com::rpc::response> response)
@@ -40,7 +40,7 @@ namespace Sentry
 		XCode code = (XCode)response->code();
 		if(code == XCode::Successful && response->has_data())
 		{
-			MessageComponent * messageComponent = App::Get()->GetMsgComponent();
+			ProtoBufferComponent * messageComponent = App::Get()->GetMsgComponent();
 			std::shared_ptr<Message> message = messageComponent->New(response->data());
 			this->mTask.SetResult(XCode::Successful, message);
 			return;

@@ -7,7 +7,7 @@
 #define NOUSER
 namespace Sentry
 {
-	MessageDecoder::MessageDecoder(lua_State* lua, MessageComponent* component)
+	MessageDecoder::MessageDecoder(lua_State* lua, ProtoBufferComponent* component)
 	{
 		this->mLua = lua;
 		this->mMsgComponent = component;

@@ -18,7 +18,7 @@
 #include"Component/Scene/LoggerComponent.h"
 #include"Component/Gate/OuterNetMessageComponent.h"
 #include"Component/Gate/OuterNetComponent.h"
-#include"Component/Scene/MessageComponent.h"
+#include"Component/Scene/ProtoBufferComponent.h"
 #include"Component/Logic/HttpSourceService.h"
 #include"Component/RpcService/LuaService.h"
 #include"Component/Http/HttpWebComponent.h"
@@ -52,7 +52,7 @@ void RegisterComponent()
 	ComponentFactory::Add<OperatorComponent>("OperatorComponent");
     ComponentFactory::Add<UnitMgrComponent>("UnitMgrComponent");
     ComponentFactory::Add<NetThreadComponent>("NetThreadComponent");
-    ComponentFactory::Add<MessageComponent>("MessageComponent");
+    ComponentFactory::Add<ProtoBufferComponent>("ProtoBufferComponent");
 
 //server
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");

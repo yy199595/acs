@@ -5,7 +5,7 @@
 #include"LuaRedis.h"
 #include"DB/Redis/RedisDefine.h"
 #include"Script/Extension/Json/Json.h"
-#include"Component/Scene/MessageComponent.h"
+#include"Component/Scene/ProtoBufferComponent.h"
 #include"Component/Redis/RedisDataComponent.h"
 
 using namespace Sentry;

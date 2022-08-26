@@ -13,7 +13,7 @@ namespace Lua
 {
 	int MessageEx::New(lua_State* lua)
 	{
-        MessageComponent * messageComponent = UserDataParameter::Read<MessageComponent*>(lua, 1);
+        ProtoBufferComponent * messageComponent = UserDataParameter::Read<ProtoBufferComponent*>(lua, 1);
 		if (!lua_isstring(lua, 2))
 		{
 			luaL_error(lua, "first parameter must string");
@@ -31,7 +31,7 @@ namespace Lua
 
 	int MessageEx::NewJson(lua_State* lua)
 	{
-		MessageComponent* messageComponent = UserDataParameter::Read<MessageComponent*>(lua, 1);
+		ProtoBufferComponent* messageComponent = UserDataParameter::Read<ProtoBufferComponent*>(lua, 1);
 		if (!lua_isstring(lua, 2))
 		{
 			luaL_error(lua, "first parameter must string");
@@ -59,7 +59,7 @@ namespace Lua
 
 	int MessageEx::Decode(lua_State* lua)
 	{
-		MessageComponent* messageComponent = UserDataParameter::Read<MessageComponent*>(lua, 1);
+		ProtoBufferComponent* messageComponent = UserDataParameter::Read<ProtoBufferComponent*>(lua, 1);
 		std::shared_ptr<Message> message = UserDataParameter::Read<std::shared_ptr<Message>>(lua, 2);
 		return messageComponent->Write(lua, *message) ? 1 : 0;
 	}
