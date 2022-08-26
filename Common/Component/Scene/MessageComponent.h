@@ -49,7 +49,8 @@ namespace Sentry
 		bool Import(const char * proto);
 	 private:
 		std::shared_ptr<compiler::Importer> mImporter;
-		std::shared_ptr<compiler::DiskSourceTree> mSourceTree;
+        std::unordered_map<std::string, std::string> mFiles;
+        std::shared_ptr<compiler::DiskSourceTree> mSourceTree;
 		std::shared_ptr<DynamicMessageFactory> mDynamicMessageFactory;
 		std::unordered_map<std::string, const Message *> mStaticMessageMap;
 		std::unordered_map<std::string, const Message *> mDynamicMessageMap;

@@ -4,6 +4,8 @@
 
 #include"MessageComponent.h"
 #include"App/App.h"
+#include<fstream>
+#include"Util/MD5.h"
 #include"Util/DirectoryHelper.h"
 #include<google/protobuf/util/json_util.h>
 #include<google/protobuf/dynamic_message.h>
@@ -71,13 +73,29 @@ namespace Sentry
 
 	bool MessageComponent::Import(const char * fileName)
 	{
-        io::ZeroCopyInputStream * fs = this->mSourceTree->Open(fileName);
-        if(fs == nullptr)
+        io::ZeroCopyInputStream * inputStream = this->mSourceTree->Open(fileName);
+        if(inputStream == nullptr)
         {
             LOG_ERROR("not proto file [" << fileName << "]");
             return false;
         }
-		const FileDescriptor * fileDescriptor = this->mImporter->Import(fileName);
+        std::string path;
+        this->GetConfig().GetPath("proto", path);
+        const std::string fullPath(fmt::format("{0}/{1}", path, fileName));
+
+
+        std::ifstream fs(fullPath);
+        const std::string md5 = Helper::Md5::GetMd5(fs);
+        auto iter = this->mFiles.find(fileName);
+        if(iter != this->mFiles.end())
+        {
+            if(iter->second == md5)
+            {
+                return true;
+            }
+        }
+        this->mFiles[fileName] = md5;
+        const FileDescriptor * fileDescriptor = this->mImporter->Import(fileName);
 		if (fileDescriptor == nullptr)
 		{
 			LOG_ERROR("import [" << fileName << "] error");

@@ -1,13 +1,15 @@
 
 MongoComponent = {}
-local mongoService = App.GetComponent("MongoService")
 MongoComponent.Counters = { }
+
+local this = MongoComponent
+local self = App.GetComponent("MongoService")
 function MongoComponent.InsertOnce(tab, data, flag)
     if type(data) == "table" then
         data = Json.Encode(data)
     end
-    local address = mongoService:GetHost()
-    return mongoService:Call(address, "Insert", {
+    local address = self:GetHost()
+    return self:Call(address, "Insert", {
         tab = tab,
         json = data,
         flag = flag or 0
@@ -18,9 +20,9 @@ function MongoComponent.Delete(tab, data, limit, flag)
     if type(data) == "table" then
         data = Json.Encode(data)
     end
+    local address = self:GetHost()
     assert(type(data) == "string")
-    local address = mongoService:GetHost()
-    return mongoService:Call(address, "Delete", {
+    return self:Call(address, "Delete", {
         tab = tab,
         json = data,
         limit = limit or 1,
@@ -32,9 +34,9 @@ function MongoComponent.QueryOnce(tab, data)
     if type(data) == "table" then
         data = Json.Encode(data)
     end
+    local address = self:GetHost()
     assert(type(data) == "string")
-    local address = mongoService:GetHost()
-    local code, response = mongoService:Call(address, "Query", {
+    local code, response = self:Call(address, "Query", {
         tab = tab,
         json = data,
         limit = 1
@@ -53,8 +55,8 @@ function MongoComponent.Query(tab, data, limit)
         data = Json.Encode(data)
     end
     assert(type(data) == "string")
-    local address = mongoService:GetHost()
-    local code, response = mongoService:Call(address, "Query", {
+    local address = self:GetHost()
+    local code, response = self:Call(address, "Query", {
         tab = tab,
         json = data,
         limit = limit or 0
@@ -74,8 +76,8 @@ end
 function MongoComponent.SetIndex(tab, name)
     assert(type(tab) == "string")
     assert(type(name) == "string")
-    local address = mongoService:GetHost()
-    return mongoService:Call(address, "SetIndex", {
+    local address = self:GetHost()
+    return self:Call(address, "SetIndex", {
         tab = tab,
         name = name
     })
@@ -90,8 +92,9 @@ function MongoComponent.Update(tab, select, update, tag, flag)
     end
     assert(type(select) == "string")
     assert(type(update) == "string")
-    local address = mongoService:GetHost()
-    return mongoService:Call(address, "Update", {
+
+    local address = self:GetHost()
+    return self:Call(address, "Update", {
         tab = tab,
         select = select,
         update = update,
@@ -101,25 +104,25 @@ function MongoComponent.Update(tab, select, update, tag, flag)
 end
 
 function MongoComponent.Push(tab, select, update)
-    return MongoComponent.Update(tab, select, update, "$push")
+    return this.Update(tab, select, update, "$push")
 end
 
 function MongoComponent.AddCounter(key, value)
     local tab = "common_counter"
-    if MongoComponent.Counters[key] == nil then
-        local code = MongoComponent.InsertOnce(tab, {
+    if this.Counters[key] == nil then
+        local code = this.InsertOnce(tab, {
             _id = key,
             value = 1
         })
         if code ~= XCode.Successful then
             return -1
         end
-        MongoComponent.Counters[key] = os.time()
+        this.Counters[key] = os.time()
     end
-    MongoComponent.Update(tab, {
+    this.Update(tab, {
         _id = key
     }, {value = value or 1}, "$inc")
-    return MongoComponent.Query(tab, {_id = key}, 1)
+    return this.Query(tab, {_id = key}, 1)
 end
 
 function MongoComponent.GetCount(tab, query)
@@ -128,14 +131,14 @@ function MongoComponent.GetCount(tab, query)
     if type(query) == "table" then
         requset.query = query
     end
-    local response = MongoComponent.RunCommand(requset)
+    local response = this.RunCommand(requset)
     return response.n
 end
 
 function MongoComponent.RunCommand(parameter)
+    local address = self:GetHost()
     local json = Json.Encode(parameter)
-    local address = mongoService:GetHost()
-    local code, response = mongoService:Call(address, "RunCommand", {
+    local code, response = self:Call(address, "RunCommand", {
         tab = tab,
         cmd = cmd,
         json = json
@@ -161,7 +164,7 @@ function MongoComponent.RumTableCommand(tab, cmd, parameter)
     assert(type(cmd) == "string")
     assert(type(parameter) == "table")
     parameter[cmd] = tab
-    return MongoComponent.RunCommand(parameter)
+    return this.RunCommand(parameter)
 end
 
 return MongoComponent
