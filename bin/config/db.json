@@ -15,7 +15,7 @@
     },
     "listener": {
         "rpc": {
-            "port": 7787,
+            "port": 7788,
             "ip": "114.115.167.51",
             "component": "InnerNetComponent"
         }
