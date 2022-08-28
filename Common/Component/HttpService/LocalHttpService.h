@@ -11,7 +11,8 @@
 #include"Network/Http/HttpAsyncRequest.h"
 namespace Sentry
 {
-	class LocalHttpService : public Component, public IService<HttpHandlerRequest, HttpHandlerResponse>
+	class LocalHttpService : public Component,
+		public IService<HttpHandlerRequest, HttpHandlerResponse>
 	{
 	 public:
 		LocalHttpService();

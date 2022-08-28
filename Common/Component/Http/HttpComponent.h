@@ -5,18 +5,6 @@
 #include"Component/Rpc/RpcTaskComponent.h"
 namespace Sentry
 {
-    class HttpConfig
-    {
-    public:
-        std::string Url;
-        std::string Type;
-		std::string Content;
-		std::string Component;
-        std::string MethodName;
-    };
-}
-namespace Sentry
-{
 	class HttpServiceMethod;
 	class HttpHandlerClient;
 	class HttpAsyncResponse;

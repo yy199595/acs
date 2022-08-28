@@ -9,12 +9,10 @@
 #include"Component/Timer/TimerComponent.h"
 #include"Component/Scene/LoggerComponent.h"
 #include"Component/Coroutine/TaskComponent.h"
-using namespace std;
 using namespace asio::ip;
 
 namespace Sentry
 {
-	class MainTaskScheduler;
 	class Service;
 	class ProtoBufferComponent;
 	class App final : public Unit

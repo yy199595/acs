@@ -32,11 +32,11 @@
 #include"Component/User/UserSyncComponent.h"
 #include"Component/ClientComponent.h"
 
-#include"Component/Gate/JsonClientComponent.h"
 #include"Component/Redis/RedisSubComponent.h"
 #include"Component/Http/HttpWebComponent.h"
 #include"Component/Http/HttpRpcComponent.h"
 #include"Component/RpcService/ServiceAgent.h"
+#include"Component/Mongo/MongoAgentComponent.h"
 using namespace Sentry;
 void RegisterComponent()
 {
@@ -60,14 +60,15 @@ void RegisterComponent()
     ComponentFactory::Add<InnerNetComponent>("InnerNetComponent");
 
 // gate
-    ComponentFactory::Add<OuterNetMessageComponent>("OuterNetMessageComponent");
 	ComponentFactory::Add<GateAgentComponent>("GateAgentComponent");
 	ComponentFactory::Add<OuterNetComponent>("OuterNetComponent");
+	ComponentFactory::Add<OuterNetMessageComponent>("OuterNetMessageComponent");
 // db
     ComponentFactory::Add<MysqlRpcComponent>("MysqlRpcComponent");
 	ComponentFactory::Add<MongoRpcComponent>("MongoRpcComponent");
     ComponentFactory::Add<RedisDataComponent>("RedisDataComponent");
     ComponentFactory::Add<RedisSubComponent>("RedisSubComponent");
+	ComponentFactory::Add<MongoAgentComponent>("MongoAgentComponent");
 
 //http
     ComponentFactory::Add<HttpComponent>("HttpComponent");
@@ -76,10 +77,7 @@ void RegisterComponent()
 
 // lua
     ComponentFactory::Add<LuaScriptComponent>("LuaScriptComponent");
-
     ComponentFactory::Add<Client::ClientComponent>("ClientComponent");
-
-    ComponentFactory::Add<JsonClientComponent>("JsonClientComponent");
 
 }
 

@@ -3,10 +3,9 @@
 #include"Util/FileHelper.h"
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
+#include"Component/RpcService/LuaService.h"
 #include"Component/Scene/ProtoBufferComponent.h"
 #include"Component/Scene/RedisChannelComponent.h"
-#include"Component/RpcService/LuaService.h"
-#include"Component/RpcService/ServiceAgent.h"
 using namespace Sentry;
 using namespace std::chrono;
 

@@ -28,8 +28,8 @@ namespace Sentry
         this->mSubComponent = this->GetComponent<RedisSubComponent>();
         this->mRedisComponent = this->GetComponent<RedisDataComponent>();
 		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("area_id", this->mAreaId));
-		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("node_name", this->mNodeName));
 		LOG_CHECK_RET_FALSE(this->GetConfig().GetListener("rpc", this->mRpcAddress));
+		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("node_name", this->mNodeName));
 		return true;
 	}
 
@@ -53,7 +53,6 @@ namespace Sentry
             return false;
         }
         iter->second->UpdateTime();
-        //LOG_INFO("[" << address << "] update time");
         return true;
     }
 
@@ -75,10 +74,13 @@ namespace Sentry
            for(; iter != this->mNodes.end(); iter++)
            {
                ServiceNode * node = iter->second;
-               if(nowTime - node->GetLastTime() >= 20)
-               {
-                   LOG_ERROR(node->GetHost() << " time out");
-               }
+			   if(node->GetHost() != this->mRpcAddress)
+			   {
+				   if (nowTime - node->GetLastTime() >= 20)
+				   {
+					   LOG_ERROR(node->GetHost() << " time out");
+				   }
+			   }
            }
         }
     }
