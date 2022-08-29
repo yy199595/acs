@@ -18,10 +18,20 @@ function Server.Awake()
 end
 
 function Server.AllServiceStart()
-    local t1 = Time.GetNowMilTime()
-    --local response = MongoComponent.Query("user_account", {}, 100)
-    --Log.Error("time = ", Time.GetNowMilTime() - t1)
-    --table.print(response)
+    MongoComponent.InsertOnce("data_account", {
+        _id = "646585122@qq.com",
+        login_ip = "127.0.0.1",
+        user_id = 1122,
+        login_time = os.time(),
+        register_time = os.time(),
+        token = "0x00ssdjsaklj"
+    })
+
+    MongoComponent.Update("data_account", {
+        _id = "646585122@qq.com"
+    }, {
+        login_time = os.time()
+    })
 end
 
 function Server.OnLoadModule(moduleName)

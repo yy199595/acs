@@ -232,30 +232,12 @@ namespace Sentry
         int OnReceiveLine(std::istream & streamBuffer) final;
 		int OnReceiveSome(std::istream & streamBuffer) final;
 	 public:
-		const std::string& GetPath() const
-		{
-			return this->mHttpData.mPath;
-		}
-		const HttpData& GetData() const final
-		{
-			return this->mHttpData;
-		}
-		const std::string& GetMethod() const
-		{
-			return this->mHttpData.mMethod;
-		}
-		const std::string& GetAddress() const
-		{
-			return this->mHttpData.mAddress;
-		}
-		const std::string& GetContent() const final
-		{
-			return this->mHttpData.mData;
-		}
+        const std::string &GetUrl() const { return this->mUrl; }
+		const HttpData& GetData() const final { return this->mHttpData; }
+        const std::string & GetContent() const final { return this->mHttpData.mData; }
 	 public:
 		bool GetHead(const std::string& key, int& value) const;
 		bool GetHead(const std::string& key, std::string& value) const;
-	 private:
 	 private:
 		std::string mUrl;
 		HttpData mHttpData;

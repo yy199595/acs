@@ -14,14 +14,12 @@ namespace Sentry
         assert(this->GetApp()->IsMainThread());
         std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
         std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
+        const HttpData & httpData = request->GetData();
 
-
-        const std::string & path = request->GetPath();
-        const std::string & address = request->GetAddress();
         const ListenConfig & listenConfig = this->GetListenConfig();
-        std::string childRoute = path.substr(listenConfig.Route.size());
+        std::string childRoute = httpData.mPath.substr(listenConfig.Route.size());
 
-        if (request->GetMethod() != "POST")
+        if (request->GetData().mMethod != "POST")
         {
             httpClient->StartWriter(HttpStatus::METHOD_NOT_ALLOWED);
             return;

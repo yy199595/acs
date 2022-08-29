@@ -34,7 +34,8 @@ namespace Sentry
         this->mHttpResponse->SetCode(code);
         if(code != HttpStatus::OK)
         {
-            CONSOLE_LOG_ERROR("[" << this->mHttpRequest->GetPath() << "] " << HttpStatusToString(code));
+            const HttpData & httpData = this->mHttpRequest->GetData();
+            CONSOLE_LOG_ERROR("[" << httpData.mPath << "] " << HttpStatusToString(code));
         }
 #ifdef ONLY_MAIN_THREAD
         this->Send(this->mHttpResponse);
@@ -46,8 +47,8 @@ namespace Sentry
 
 	void HttpHandlerClient::OnComplete()
 	{
-        const std::string & path = this->mHttpRequest->GetPath();
-        if(!this->mRoute.empty() && path.find(this->mRoute) == std::string::npos) //判断根路由是否匹配
+        const HttpData & httpData = this->mHttpRequest->GetData();
+        if(!this->mRoute.empty() && httpData.mPath.find(this->mRoute) == std::string::npos) //判断根路由是否匹配
         {
             this->mHttpResponse->SetCode(HttpStatus::NOT_FOUND);
             this->Send(this->mHttpResponse);

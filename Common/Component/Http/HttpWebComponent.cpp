@@ -11,16 +11,17 @@ namespace Sentry
 {
     bool HttpWebComponent::LateAwake()
     {
+        HttpListenComponent::LateAwake();
         auto iter = this->GetApp()->ComponentBegin();
-        for(; iter != this->GetApp()->ComponentEnd(); iter++)
+        for (; iter != this->GetApp()->ComponentEnd(); iter++)
         {
-            Component * component = iter->second;
-            LocalHttpService * localHttpService = component->Cast<LocalHttpService>();
-            if(localHttpService != nullptr)
+            Component *component = iter->second;
+            LocalHttpService *localHttpService = component->Cast<LocalHttpService>();
+            if (localHttpService != nullptr)
             {
                 std::vector<const HttpInterfaceConfig *> httpInterConfigs;
                 localHttpService->GetServiceConfig().GetConfigs(httpInterConfigs);
-                for(const HttpInterfaceConfig * httpInterfaceConfig : httpInterConfigs)
+                for (const HttpInterfaceConfig *httpInterfaceConfig: httpInterConfigs)
                 {
                     this->mHttpConfigs.emplace(httpInterfaceConfig->Path, httpInterfaceConfig);
                 }
@@ -28,7 +29,7 @@ namespace Sentry
         }
         this->mTaskComponent = this->GetApp()->GetTaskComponent();
         this->mNetComponent = this->GetComponent<NetThreadComponent>();
-        return HttpListenComponent::LateAwake();
+        return true;
     }
 
 
@@ -44,23 +45,20 @@ namespace Sentry
         std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
         std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
 
-        const std::string & path = request->GetPath();
-        const std::string & type = request->GetMethod();
-        const std::string & data = request->GetContent();
-        const std::string & address = request->GetAddress();
+        const HttpData & httpData = request->GetData();
         const ListenConfig & listenConfig = this->GetListenConfig();
-        std::string childRoute = path.substr(listenConfig.Route.size());
+        std::string childRoute = httpData.mPath.substr(listenConfig.Route.size());
         const HttpInterfaceConfig *httpConfig = this->GetConfig(childRoute);
         if (httpConfig == nullptr)
         {
             httpClient->StartWriter(HttpStatus::NOT_FOUND);
-            CONSOLE_LOG_ERROR("[" << path << "] " << HttpStatusToString(HttpStatus::NOT_FOUND));
+            CONSOLE_LOG_ERROR("[" << httpData.mPath << "] " << HttpStatusToString(HttpStatus::NOT_FOUND));
             return;
         }
-        if (httpConfig->Type != type)
+        if (httpConfig->Type != httpData.mMethod)
         {
             httpClient->StartWriter(HttpStatus::METHOD_NOT_ALLOWED);
-            CONSOLE_LOG_ERROR("[" << path << "] " << HttpStatusToString(HttpStatus::METHOD_NOT_ALLOWED));
+            CONSOLE_LOG_ERROR("[" << httpData.mPath << "] " << HttpStatusToString(HttpStatus::METHOD_NOT_ALLOWED));
             return;
         }
 
@@ -68,7 +66,7 @@ namespace Sentry
         if (httpService == nullptr || !httpService->IsStartService())
         {
             httpClient->StartWriter(HttpStatus::NOT_FOUND);
-            CONSOLE_LOG_ERROR("[" << path << "] " << HttpStatusToString(HttpStatus::NOT_FOUND));
+            CONSOLE_LOG_ERROR("[" << httpData.mPath << "] " << HttpStatusToString(HttpStatus::NOT_FOUND));
             return;
         }
         if (!httpConfig->IsAsync)

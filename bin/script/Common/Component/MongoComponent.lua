@@ -109,19 +109,16 @@ end
 
 function MongoComponent.AddCounter(key, value)
     local tab = "common_counter"
-    if this.Counters[key] == nil then
-        local code = this.InsertOnce(tab, {
-            _id = key,
-            value = 1
-        })
-        if code ~= XCode.Successful then
-            return -1
-        end
-        this.Counters[key] = os.time()
-    end
-    this.Update(tab, {
+    local code = this.Update(tab, {
         _id = key
-    }, {value = value or 1}, "$inc")
+    }, {value = value or 1} )
+    if code ~= XCode.Successful then
+        this.InsertOnce(tab, {
+            _id = key,
+            value = value or 1
+        })
+        return value
+    end
     return this.Query(tab, {_id = key}, 1)
 end
 

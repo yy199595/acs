@@ -14,6 +14,19 @@
             "Path": "/user/register"
         }
     },
+    "HttpWebService": {
+        "Type": "http",
+        "Async": {
+            "Type": "GET",
+            "Async": true,
+            "Path": "/web/async/index"
+        },
+        "Sync": {
+            "Type": "GET",
+            "Async": false,
+            "Path": "web/sync/index"
+        }
+    },
     "GateService": {
         "Type": "rpc",
         "Ping": {

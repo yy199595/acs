@@ -4,6 +4,8 @@
 
 #include"MongoService.h"
 #include"MongoRpcComponent.h"
+
+
 namespace Sentry
 {
     MongoService::MongoService()
@@ -20,22 +22,6 @@ namespace Sentry
         methodRegister.Bind("Update", &MongoService::Update);
         methodRegister.Bind("SetIndex", &MongoService::SetIndex);
         methodRegister.Bind("RunCommand", &MongoService::RunCommand);
-
-        Json::Writer json(false);
-        json << 1 << 2 << 3 << 4;
-        std::string str = json.JsonString();
-
-        Bson::Writer::Object add;
-        add.FromByJson(str);
-
-        int length = 0;
-        const char * str1 = add.Serialize(length);
-
-        Bson::Read::Object obj(str1);
-
-        std::string json1;
-        obj.WriterToJson(json1);
-
         return this->mMongoComponent != nullptr;
     }
 

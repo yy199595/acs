@@ -35,6 +35,20 @@ namespace Sentry
 		return this->mMongoService->Call(address, "Insert", request);
 	}
 
+    XCode MongoAgentComponent::Update(const char *tab, const std::string &select, const std::string &data, int index)
+    {
+        std::string address;
+        if(!this->mMongoService->GetHost(address))
+        {
+            return XCode::CallServiceNotFound;
+        }
+        s2s::mongo::update request;
+        request.set_tab(tab);
+        request.set_update(std::move(data));
+        request.set_select(std::move(select));
+        return this->mMongoService->Call(address, "Update", request);
+    }
+
 	XCode MongoAgentComponent::Insert(const char* tab, const std::string& json, int index)
 	{
 		std::string address;
@@ -44,9 +58,9 @@ namespace Sentry
 		}
 		s2s::mongo::insert request;
 		request.set_tab(tab);
-		request.set_json(json);
 		request.set_flag(index);
-		return this->mMongoService->Call(address, "Insert", request);
+        request.set_json(std::move(json));
+        return this->mMongoService->Call(address, "Insert", request);
 	}
 
 	XCode MongoAgentComponent::Remove(const char* tab, const std::string& select, int limit, int index)
@@ -59,9 +73,9 @@ namespace Sentry
 		s2s::mongo::remove request;
 		request.set_tab(tab);
 		request.set_flag(index);
-		request.set_json(select);
 		request.set_limit(limit);
-		return this->mMongoService->Call(address, "Remove", request);
+        request.set_json(std::move(select));
+        return this->mMongoService->Call(address, "Remove", request);
 	}
 
 	XCode MongoAgentComponent::Query(const char* tab,
@@ -75,7 +89,7 @@ namespace Sentry
 		s2s::mongo::query::request request;
 		request.set_tab(tab);
 		request.set_limit(1);
-		request.set_json(select);
+		request.set_json(std::move(select));
 		std::shared_ptr<s2s::mongo::query::response> result(new s2s::mongo::query::response());
 		XCode code = this->mMongoService->Call(address, "Query", request, result);
 		if(code == XCode::Successful && result->jsons_size() > 0)
@@ -88,4 +102,64 @@ namespace Sentry
 		}
 		return code;
 	}
+
+    XCode MongoAgentComponent::Save(const Message &message)
+    {
+        const Reflection * reflection = message.GetReflection();
+        const Descriptor * descriptor = message.GetDescriptor();
+        const FieldDescriptor * fileDesc = descriptor->FindFieldByName("_id");
+        if(fileDesc == nullptr)
+        {
+            return XCode::Failure;
+        }
+        Json::Writer select;
+        switch(fileDesc->type())
+        {
+            case FieldDescriptor::TYPE_INT32:
+                select << "_id" << reflection->GetInt32(message, fileDesc);
+                break;
+            case FieldDescriptor::TYPE_UINT32:
+                select << "_id" << reflection->GetUInt32(message, fileDesc);
+                break;
+            case FieldDescriptor::TYPE_INT64:
+                select << "_id" << reflection->GetInt64(message, fileDesc);
+                break;
+            case FieldDescriptor::CPPTYPE_UINT64:
+                select << "_id" << reflection->GetUInt64(message, fileDesc);
+                break;
+            case FieldDescriptor::TYPE_STRING:
+                select << "_id" << reflection->GetString(message, fileDesc);
+                break;
+            default:
+                return XCode::CallArgsError;
+        }
+        std::string address;
+        if(!this->mMongoService->GetHost(address))
+        {
+            return XCode::CallServiceNotFound;
+        }
+        s2s::mongo::update request;
+        if(!util::MessageToJsonString(message, request.mutable_update()).ok())
+        {
+            return XCode::ProtoCastJsonFailure;
+        }
+        request.set_tab(std::move(message.GetTypeName()));
+        request.set_select(std::move(select.JsonString()));
+        return this->mMongoService->Call(address, "Update", request);
+    }
+
+    XCode MongoAgentComponent::Save(const char *tab, long long id, const std::string &data)
+    {
+        Json::Writer select;
+        select << "_id" << id;
+        int index = id % 10000;
+        return this->Update(tab, select.JsonString(), data, index);
+    }
+
+    XCode MongoAgentComponent::Save(const char *tab, const std::string &id, const std::string &data)
+    {
+        Json::Writer select;
+        select << "_id" << id;
+        return this->Update(tab, select.JsonString(), data, 0);
+    }
 }

@@ -67,6 +67,7 @@ namespace Sentry
 
 		mongoRequest->document.Add("delete", tab);
 		mongoRequest->document.Add("deletes", documentArray);
+
         std::shared_ptr<TcpMongoClient> mongoClient = this->GetClient();
         std::shared_ptr<Mongo::MongoQueryResponse> response = this->Run(mongoClient, mongoRequest);
 		return response != nullptr && response->GetDocumentSize() > 0 && response->Get().IsOk();
@@ -109,22 +110,22 @@ namespace Sentry
     }
 
 	bool MongoRpcComponent::InsertOnce(const std::string& tab, const std::string& json)
-	{
-		int res = 0;
-		Bson::Writer::Object document;
-		if(!document.FromByJson(json))
-		{
-			return false;
-		}
-		Bson::Writer::Array documentArray(document);
-		std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
+    {
+        int res = 0;
+        Bson::Writer::Object document;
+        if (!document.FromByJson(json))
+        {
+            return false;
+        }
+        Bson::Writer::Array documentArray(document);
+        std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
 
-		mongoRequest->document.Add("insert", tab);
-		mongoRequest->document.Add("documents", documentArray);
+        mongoRequest->document.Add("insert", tab);
+        mongoRequest->document.Add("documents", documentArray);
         std::shared_ptr<TcpMongoClient> mongoClient = this->GetClient();
-		std::shared_ptr<MongoQueryResponse> response = this->Run(mongoClient, mongoRequest);
-		return response != nullptr && response->GetDocumentSize() > 0 && response->Get().Get("n", res) && res > 0;
-	}
+        std::shared_ptr<MongoQueryResponse> response = this->Run(mongoClient, mongoRequest);
+        return response != nullptr && response->GetDocumentSize() > 0 && response->Get().Get("n", res) && res > 0;
+    }
 
 	void MongoRpcComponent::OnDelTask(long long taskId, RpcTask task)
 	{
@@ -192,7 +193,7 @@ namespace Sentry
         mongoRequest->numberToReturn = limit;
         std::shared_ptr<TcpMongoClient> mongoClient = this->GetClient();
         mongoRequest->collectionName = fmt::format("{0}.{1}", this->mConfig.mDb, tab);
-		return this->Run(mongoClient, mongoRequest);
+        return this->Run(mongoClient, mongoRequest);
 	}
 
 	bool MongoRpcComponent::Update(const std::string& tab, const std::string& update, const std::string& selector, const std::string & tag)

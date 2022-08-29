@@ -148,7 +148,7 @@ namespace Sentry
 	void RedisRegistryComponent::OnComplete()//通知其他服务器 我加入了
     {
         std::shared_ptr<RedisResponse> response1 =
-                this->mRedisComponent->RunCmd("main", "SMEMBERS", this->mRpcAddress);
+                this->mRedisComponent->RunCommand("main", "SMEMBERS", this->mRpcAddress);
         if(response1 != nullptr && response1->GetArraySize() > 0)
         {
             std::shared_ptr<RedisRequest> redisRequest(new RedisRequest("SREM"));
@@ -188,7 +188,7 @@ namespace Sentry
         const std::string message = json.JsonString();
         const std::string channel = "RedisRegistryComponent.AddNode";
         std::shared_ptr<RedisResponse> response2 =
-                this->mRedisComponent->RunCmd("main", "PUBLISH", channel, message);
+                this->mRedisComponent->RunCommand("main", "PUBLISH", channel, message);
         if(response2 != nullptr && response2->GetNumber() > 0)
         {
             LOG_INFO("publish channel number = " << response2->GetNumber());
@@ -199,7 +199,7 @@ namespace Sentry
     void RedisRegistryComponent::QueryAllNodes()
     {
         std::shared_ptr<RedisResponse> response =
-                this->mRedisComponent->RunCmd("main", "PUBSUB", "CHANNELS", "*:*");
+                this->mRedisComponent->RunCommand("main", "PUBSUB", "CHANNELS", "*:*");
         if(response != nullptr && response->GetArraySize() > 0)
         {
             for(size_t index = 0; index < response->GetArraySize(); index++)
@@ -207,7 +207,7 @@ namespace Sentry
                 const RedisString * redisString = response->Get(index)->Cast<RedisString>();
                 ServiceNode * serviceNode = new ServiceNode(redisString->GetValue());
                 std::shared_ptr<RedisResponse> response1 =
-                        this->mRedisComponent->RunCmd("main", "SMEMBERS", redisString->GetValue());
+                        this->mRedisComponent->RunCommand("main", "SMEMBERS", redisString->GetValue());
                 for(size_t x = 0; x < response1->GetArraySize(); x ++)
                 {
                     const RedisString * redisString2 = response1->Get(x)->Cast<RedisString>();

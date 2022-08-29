@@ -20,9 +20,9 @@ namespace Sentry
         template<typename ... Args>
         bool SenCommond(const std::string & name, const std::string & cmd, Args&& ... args);
         template<typename ... Args>
-        std::shared_ptr<RedisResponse> RunCmd(const std::string & name, const std::string & cmd, Args&& ... args);
+        std::shared_ptr<RedisResponse> RunCommand(const std::string & name, const std::string & cmd, Args&& ... args);
         template<typename ... Args>
-        std::shared_ptr<RedisResponse> RunCmd(SharedRedisClient redisClientContext, const std::string & cmd, Args&& ... args);
+        std::shared_ptr<RedisResponse> RunCommand(SharedRedisClient redisClientContext, const std::string & cmd, Args&& ... args);
     public:
         std::shared_ptr<RedisRequest> MakeLuaRequest(const std::string & fullName, const std::string & json);
         bool Call(const std::string & name, const std::string & func, Json::Writer & request, std::shared_ptr<Json::Reader> response);
@@ -38,14 +38,14 @@ namespace Sentry
     };
 
     template<typename ... Args>
-    std::shared_ptr<RedisResponse> RedisDataComponent::RunCmd(const std::string &name, const std::string & cmd, Args &&...args)
+    std::shared_ptr<RedisResponse> RedisDataComponent::RunCommand(const std::string &name, const std::string & cmd, Args &&...args)
     {
         std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>(cmd);
         RedisRequest::InitParameter(request, std::forward<Args>(args)...);
         return this->Run(name, request);
     }
     template<typename ... Args>
-    std::shared_ptr<RedisResponse> RedisDataComponent::RunCmd(SharedRedisClient redisClientContext, const std::string &cmd, Args &&...args)
+    std::shared_ptr<RedisResponse> RedisDataComponent::RunCommand(SharedRedisClient redisClientContext, const std::string &cmd, Args &&...args)
     {
         std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>(cmd);
         RedisRequest::InitParameter(request, std::forward<Args>(args)...);

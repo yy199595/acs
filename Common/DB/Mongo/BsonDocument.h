@@ -87,6 +87,7 @@ namespace Bson
 		public:
             void WriterToJson(std::string & json);
             bool FromByJson(const std::string& json);
+            const std::string & GetId() const { return this->mId; }
 		public:
 			const char* Serialize(int& length);
 
@@ -138,6 +139,9 @@ namespace Bson
 			bool WriterToStream(std::ostream& os);
 
 			bool WriterToBson(const char* key, Document& document, const rapidjson::Value& jsonValue);
+
+        private:
+            std::string mId;
 		};
 	}
 
@@ -164,7 +168,7 @@ namespace Bson
 			bool Get(const char* key, long long& value) const;
 
 			bool Get(const char* key, std::string& value) const;
-
+            
             int Length() const { return this->objsize();}
 		private:
 			void WriterToJson(const _bson::bsonelement& bsonelement, Json::Writer& json);

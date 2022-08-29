@@ -467,7 +467,7 @@ namespace Sentry
 			}
 			if (this->mState == HttpDecodeState::Content)
 			{
-				if (this->GetMethod() == "GET")
+				if (this->mHttpData.mMethod == "GET")
 				{
 					size_t pos = this->mUrl.find("?");
 					if (pos != std::string::npos)
@@ -477,7 +477,7 @@ namespace Sentry
 					}
 					return 0;
 				}
-				else if (this->GetMethod() != "POST")
+				else if (this->mHttpData.mMethod != "POST")
 				{
 					return -2;
 				}

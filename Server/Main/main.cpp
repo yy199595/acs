@@ -37,12 +37,14 @@
 #include"Component/Http/HttpRpcComponent.h"
 #include"Component/RpcService/ServiceAgent.h"
 #include"Component/Mongo/MongoAgentComponent.h"
+#include"Component/HttpService/HttpWebService.h"
+#include"Component/Mongo/DataSyncRedisComponent.h"
 using namespace Sentry;
 void RegisterComponent()
 {
 // rpc
+    ComponentFactory::Add<RedisRegistryComponent>("RedisRegistryComponent");
     ComponentFactory::Add<InnerNetMessageComponent>("InnerNetMessageComponent");
-	ComponentFactory::Add<RedisRegistryComponent>("RedisRegistryComponent");
 // common
     ComponentFactory::Add<TaskComponent>("TaskComponent");
     ComponentFactory::Add<TimerComponent>("TimerComponent");
@@ -69,11 +71,13 @@ void RegisterComponent()
     ComponentFactory::Add<RedisDataComponent>("RedisDataComponent");
     ComponentFactory::Add<RedisSubComponent>("RedisSubComponent");
 	ComponentFactory::Add<MongoAgentComponent>("MongoAgentComponent");
+    ComponentFactory::Add<DataSyncRedisComponent>("DataSyncRedisComponent");
 
 //http
     ComponentFactory::Add<HttpComponent>("HttpComponent");
     ComponentFactory::Add<HttpWebComponent>("HttpWebComponent");
     ComponentFactory::Add<HttpRpcComponent>("HttpRpcComponent");
+    ComponentFactory::Add<HttpWebService>("HttpWebService");
 
 // lua
     ComponentFactory::Add<LuaScriptComponent>("LuaScriptComponent");

@@ -96,6 +96,7 @@ namespace Bson
             obj.WriterToJson(json);
         }
 
+
 		bool Object::FromByJson(const std::string& json)
 		{
 			rapidjson::Document document;
@@ -103,6 +104,18 @@ namespace Bson
 			{
 				return false;
 			}
+            if(document.HasMember("_id"))
+            {
+                if(document["_id"].IsInt64())
+                {
+                    long long id = document["_id"].GetInt64();
+                    this->mId = std::to_string(id);
+                }
+                else if(document["_id"].IsString())
+                {
+                    this->mId = document["_id"].GetString();
+                }
+            }
             if(document.IsArray())
             {
                 for(size_t index = 0; index < document.Size(); index++)

@@ -13,14 +13,13 @@ function AccountService.Register(request)
     assert(requestInfo.password, "register password is nil")
     assert(requestInfo.phone_num, "register phone number is nil")
 
-    local userInfo = MongoComponent.QueryOnce("user_account", {
-        _id = requestInfo.account
-    })
+    local userInfo = DataMgrComponent.Get("data_account", requestInfo.account)
+
     if userInfo ~= nil then
         return XCode.AccountAlreadyExists
     end
     local nowTime = os.time()
-    local user_id = RedisComponent.AddCounter("main", "user_id_counter")
+    local user_id = MongoComponent.AddCounter("user_id")
     local str = string.format("%s%d%d", request.address, nowTime, user_id)
 
     requestInfo.login_time = 0
@@ -29,7 +28,8 @@ function AccountService.Register(request)
     requestInfo._id = requestInfo.account
     requestInfo.token = Md5.ToString(str)
     requestInfo.address = StringUtil.ParseAddress(request.address)
-    return MongoComponent.InsertOnce("user_account", requestInfo)
+    DataMgrComponent.Set("data_account", requestInfo, true)
+    return XCode.Successful
 end
 
 function AccountService.Login(request)

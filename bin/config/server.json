@@ -11,6 +11,7 @@
         "log": "log",
         "proto": "proto",
         "source": "source",
+        "http": "script/Server/web",
         "service": "config/service.json"
     },
     "listener": {
@@ -22,7 +23,7 @@
         "http": {
             "port": 8080,
             "ip": "127.0.0.1",
-            "route": "/app/logic",
+            "route": "/app/web",
             "component": "HttpWebComponent"
         },
         "gate": {
@@ -111,8 +112,9 @@
         "UserSyncComponent",
         "HttpWebComponent",
         "HttpRpcComponent",
-        "JsonClientComponent",
-        "RedisRegistryComponent"
+        "MongoAgentComponent",
+        "RedisRegistryComponent",
+        "DataSyncRedisComponent"
     ],
     "services": {
         "RpcTest": {
@@ -125,13 +127,17 @@
         },
         "MongoService": {
             "Type": "rpc",
-            "IsStart": false
+            "IsStart": true
         },
         "GateService": {
             "Type": "rpc",
             "IsStart": true
         },
         "AccountService": {
+            "Type": "http",
+            "IsStart": true
+        },
+        "HttpWebService": {
             "Type": "http",
             "IsStart": true
         }
