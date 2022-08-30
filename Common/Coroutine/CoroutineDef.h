@@ -20,7 +20,8 @@ namespace Sentry
 {
 
 	class TaskContext;
-	class TaskContextPool
+    typedef std::unordered_map<unsigned int, TaskContext *>::iterator MapIter;
+    class TaskContextPool : protected std::unordered_map<unsigned int, TaskContext *>
 	{
 	public:
 		explicit TaskContextPool() = default;
@@ -29,14 +30,14 @@ namespace Sentry
 		TaskContext * Pop();
 		void Push(TaskContext * coroutine);
     public:
-        size_t GetMemorySize();
-        size_t GetCorCount() { return this->mCorMap.size();}
+        MapIter End() { return this->end(); }
+        MapIter Begin() { return this->begin(); }
+        size_t GetCorCount() { return this->size();}
 	public:
 		TaskContext * Get(unsigned int id);
 	private:
         std::queue<TaskContext *> mCorPool;
         Util::NumberBuilder<unsigned int, 10> mNumPool;
-        std::unordered_map<unsigned int , TaskContext *> mCorMap;
     };
 }
 

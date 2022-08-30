@@ -227,7 +227,7 @@ namespace Sentry
 	class HttpHandlerRequest : public IHttpContent
 	{
 	 public:
-		HttpHandlerRequest(const std::string& address);
+		HttpHandlerRequest(const std::string& address, const std::string & route);
 	 public:
         int OnReceiveLine(std::istream & streamBuffer) final;
 		int OnReceiveSome(std::istream & streamBuffer) final;
@@ -241,6 +241,7 @@ namespace Sentry
 	 private:
 		std::string mUrl;
 		HttpData mHttpData;
+        std::string mRoute;
 		HttpDecodeState mState;
 	};
 }

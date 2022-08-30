@@ -18,17 +18,17 @@ namespace Sentry
         std::shared_ptr<Message> Get(const std::string & key, const std::string & tab);
     private:
 		bool LateAwake() final;
-        pool::DataPool<long long, Message> * GetPool1(const std::string & name);
-        pool::DataPool<std::string , Message> * GetPool2(const std::string & name);
+        Pool::DataPool<long long, Message> * GetPool1(const std::string & name);
+        Pool::DataPool<std::string , Message> * GetPool2(const std::string & name);
     private:
         class RedisDataComponent * mRedisComponent;
         class MongoAgentComponent * mMongoComponent;
-        class ProtoBufferComponent * mProtoComponent;
+        class ProtocolComponent * mProtoComponent;
         class DataSyncRedisComponent * mSyncComponent;
-        typedef pool::DataPool<long long, Message> NumberMessagePool;
-        typedef pool::DataPool<std::string, Message> StringMessagePool;
-        std::unordered_map<std::string, pool::DataPool<long long, Message> *> mNumberMap;
-        std::unordered_map<std::string, pool::DataPool<std::string, Message> *> mStringMap;
+        typedef Pool::DataPool<long long, Message> NumberMessagePool;
+        typedef Pool::DataPool<std::string, Message> StringMessagePool;
+        std::unordered_map<std::string, Pool::DataPool<long long, Message> *> mNumberMap;
+        std::unordered_map<std::string, Pool::DataPool<std::string, Message> *> mStringMap;
     };
 }
 

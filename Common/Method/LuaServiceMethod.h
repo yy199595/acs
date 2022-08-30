@@ -20,6 +20,6 @@ namespace Sentry
 	 private:
 		lua_State* mLuaEnv;
         const RpcInterfaceConfig * mConfig;
-		class ProtoBufferComponent * mMsgComponent;
+		class ProtocolComponent * mMsgComponent;
 	};
 }

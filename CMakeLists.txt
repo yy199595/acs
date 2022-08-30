@@ -30,10 +30,13 @@ MESSAGE(${AsmFiles})
 
 #第三方库包含
 #include_directories(Libs/include/lua)
+
+include_directories(Libs/amy)
 include_directories(Libs/lua/src)
 include_directories(Libs/protobuf/src)
 include_directories(Libs/spdlog/include)
 include_directories(Libs/asio/include)
+
 #include_directories(Libs/include/spdlog)
 #include_directories(Libs/include/protobuf)
 include_directories(Libs/json)

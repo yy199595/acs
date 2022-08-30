@@ -1,6 +1,6 @@
 
 ProtoComponent = {}
-local self = App.GetComponent("ProtoBufferComponent")
+local self = App.GetComponent("ProtocolComponent")
 function ProtoComponent.Awake()
     assert(self:Import("message/s2s.proto"))
 end

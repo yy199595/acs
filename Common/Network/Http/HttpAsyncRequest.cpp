@@ -395,9 +395,10 @@ namespace Sentry
 
 namespace Sentry
 {
-    HttpHandlerRequest::HttpHandlerRequest(const std::string & address)
+    HttpHandlerRequest::HttpHandlerRequest(const std::string & address, const std::string & route)
     {
-		this->mHttpData.mStatus = 0;
+        this->mRoute = route;
+        this->mHttpData.mStatus = 0;
 		this->mHttpData.mAddress = address;
         this->mState = HttpDecodeState::FirstLine;
     }
@@ -442,7 +443,10 @@ namespace Sentry
         {
             this->mState = HttpDecodeState::HeadLine;
 			streamBuffer >> this->mHttpData.mMethod >> this->mUrl >> this->mHttpData.mVersion;
-
+            if(this->mUrl.find(this->mRoute) == std::string::npos) //路由不匹配
+            {
+                return 2;
+            }
 			streamBuffer.ignore(2); //去掉\r\n
         }
         if(this->mState == HttpDecodeState::HeadLine)
@@ -474,7 +478,9 @@ namespace Sentry
 					{
                         this->mHttpData.mData = this->mUrl.substr(pos + 1);
                         this->mHttpData.mPath = this->mUrl.substr(0, pos);
+                        return 0;
 					}
+                    this->mHttpData.mPath = this->mUrl.substr(this->mRoute.size());
 					return 0;
 				}
 				else if (this->mHttpData.mMethod != "POST")

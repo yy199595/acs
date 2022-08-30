@@ -8,7 +8,7 @@
 #include"Component/Mysql/MysqlDataComponent.h"
 #include"Component/Mongo/MongoAgentComponent.h"
 #include"Component/Mongo/DataSyncRedisComponent.h"
-#include"Component/Scene/ProtoBufferComponent.h"
+#include"Component/Scene/ProtocolComponent.h"
 namespace Sentry
 {
 	bool DataMgrComponent::LateAwake()
@@ -16,30 +16,30 @@ namespace Sentry
         this->mRedisComponent = this->GetComponent<RedisDataComponent>();
         this->mMongoComponent = this->GetComponent<MongoAgentComponent>();
         this->mSyncComponent = this->GetComponent<DataSyncRedisComponent>();
-        this->mProtoComponent = this->GetComponent<ProtoBufferComponent>();
+        this->mProtoComponent = this->GetComponent<ProtocolComponent>();
         return this->mRedisComponent != nullptr && this->mMongoComponent != nullptr;
     }
 
-    pool::DataPool<long long, Message> * DataMgrComponent::GetPool1(const std::string &name)
+    Pool::DataPool<long long, Message> * DataMgrComponent::GetPool1(const std::string &name)
     {
         auto iter = this->mNumberMap.find(name);
         if(iter == this->mNumberMap.end())
         {
-            pool::DataPool<long long, Message> * pool =
-                    new pool::DataPool<long long, Message>(10000);
+            Pool::DataPool<long long, Message> * pool =
+                    new Pool::DataPool<long long, Message>(10000);
             this->mNumberMap.emplace(name, pool);
             return pool;
         }
         return iter->second;
     }
 
-    pool::DataPool<std::string, Message> * DataMgrComponent::GetPool2(const std::string &name)
+    Pool::DataPool<std::string, Message> * DataMgrComponent::GetPool2(const std::string &name)
     {
         auto iter = this->mStringMap.find(name);
         if(iter == this->mStringMap.end())
         {
-            pool::DataPool<std::string, Message> * pool =
-                    new pool::DataPool<std::string, Message>(10000);
+            Pool::DataPool<std::string, Message> * pool =
+                    new Pool::DataPool<std::string, Message>(10000);
             this->mStringMap.emplace(name, pool);
             return pool;
         }

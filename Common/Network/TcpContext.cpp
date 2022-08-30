@@ -25,8 +25,8 @@ namespace Tcp
         this->mSocket = socket;
         this->mLastOperTime = 0;
         this->mConnectCount = 0;
-        assert(this->mSendBuffer.size() == 0);
-        assert(this->mRecvBuffer.size() == 0);
+        this->ClearSendStream();
+        this->ClearRecvStream();
         return true;
     }
 
@@ -188,9 +188,14 @@ namespace Tcp
             AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
             std::shared_ptr<TcpContext> self = this->shared_from_this();
             const int length = this->mMessagqQueue.front()->Serailize(os);
-            asio::async_write(tcpSocket, this->mSendBuffer, [this, self]
+            asio::async_write(tcpSocket, this->mSendBuffer, [this, self, length]
                     (const asio::error_code& code, size_t size)
             {
+                if(length > 0 && !code)
+                {
+                    this->SendFromMessageQueue();
+                    return;
+                }
                 this->ClearSendStream();
                 this->OnSendMessage(code, this->mMessagqQueue.front());
             });

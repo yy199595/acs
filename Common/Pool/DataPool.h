@@ -9,7 +9,7 @@
 #include<string>
 #include<memory>
 #include<unordered_map>
-namespace pool
+namespace Pool
 {
     template<typename TKey, typename TValue>
     class DataPool
@@ -93,6 +93,37 @@ namespace pool
         return nullptr;
     }
 }
+
+namespace Pool
+{
+    template<typename T, size_t MAX_COUNT>
+    class ChchePool
+    {
+    public:
+        std::shared_ptr<T> Get()
+        {
+            std::shared_ptr<T> data;
+            if(!this->mDatas.empty())
+            {
+                data = this->mDatas.front();
+                this->mDatas.pop_front();
+                return data;
+            }
+            return std::make_shared<T>();
+        }
+        void Add(std::shared_ptr<T> data)
+        {
+            if(this->mDatas.size() + 1 < this->mMaxCount)
+            {
+                data->Clear();
+                this->mDatas.emplace_back(data);
+            }
+        }
+    private:
+        std::list<std::shared_ptr<T>> mDatas;
+    };
+}
+
 
 
 #endif //APP_DATAPOOL_H

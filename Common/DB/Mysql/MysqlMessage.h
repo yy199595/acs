@@ -23,6 +23,12 @@ namespace Tcp
         int mIndex;
         std::string mBuffer;
     };
+
+    class MysqlAuthMessage : public ProtoMessage
+    {
+    public:
+        int Serailize(std::ostream &os) final { return 0; }
+    };
 }
 
 

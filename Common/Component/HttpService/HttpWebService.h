@@ -16,8 +16,10 @@ namespace Sentry
         bool OnStartService(HttpServiceRegister &serviceRegister) final;
         XCode Sync(const HttpHandlerRequest& request, HttpHandlerResponse& response);
         XCode Async(const HttpHandlerRequest& request, HttpHandlerResponse& response);
+        XCode DownLoad(const HttpHandlerRequest& request, HttpHandlerResponse& response);
     private:
-        std::string mPath;
+        std::string mLuaPath;
+        std::string mDownloadPath;
         class LuaScriptComponent * mLuaComponent;
     };
 }

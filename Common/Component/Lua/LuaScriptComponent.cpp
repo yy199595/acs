@@ -165,6 +165,11 @@ namespace Sentry
         {
             return false;
         }
+        std::string index;
+        if(config.GetMember("lua", "http", index))
+        {
+            this->AddRequire(config.GetWorkPath() + index);
+        }
 		for (const std::string& path : luaPaths)
 		{
 			const std::string fullPath = config.GetWorkPath() + path;

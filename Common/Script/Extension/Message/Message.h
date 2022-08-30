@@ -5,13 +5,13 @@
 #ifndef SERVER_MESSAGE_H
 #define SERVER_MESSAGE_H
 #include"Script/LuaInclude.h"
-#include"Component/Scene/ProtoBufferComponent.h"
+#include"Component/Scene/ProtocolComponent.h"
 namespace Sentry
 {
 	class MessageDecoder //转lua
 	{
 	 public:
-		MessageDecoder(lua_State * lua, ProtoBufferComponent * component);
+		MessageDecoder(lua_State * lua, ProtocolComponent * component);
 		bool Decode(const Message & message);
 	 private:
 		bool DecodeField(const Message & message, const FieldDescriptor * field);
@@ -23,7 +23,7 @@ namespace Sentry
 		bool DecodeMutiple(const Message & message, const FieldDescriptor * field, int index);
 	 private:
 		lua_State * mLua;
-		ProtoBufferComponent * mMsgComponent;
+		ProtocolComponent * mMsgComponent;
 	};
 }
 
@@ -32,7 +32,7 @@ namespace Sentry
 	class MessageEncoder
 	{
 	 public:
-		MessageEncoder(lua_State * lua, ProtoBufferComponent * component);
+		MessageEncoder(lua_State * lua, ProtocolComponent * component);
 	 public:
 		std::shared_ptr<Message> Encode(const std::string & proto, int index);
 	 private:
@@ -46,7 +46,7 @@ namespace Sentry
 		bool EncoddeMessage(Message & message, const Descriptor * descriptor, int index);
 	 private:
 		lua_State * mLua;
-		ProtoBufferComponent * mMsgComponent;
+		ProtocolComponent * mMsgComponent;
 	};
 }
 

@@ -168,6 +168,8 @@ namespace Bson
 			bool Get(const char* key, long long& value) const;
 
 			bool Get(const char* key, std::string& value) const;
+
+            bool GetKeys(std::set<std::string> & keys);
             
             int Length() const { return this->objsize();}
 		private:

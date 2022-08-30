@@ -7,7 +7,7 @@
 #include"Util/StringHelper.h"
 #include"Script/Extension/Json/Json.h"
 #include"Async/RpcTask/RpcTaskSource.h"
-#include"Component/Scene/ProtoBufferComponent.h"
+#include"Component/Scene/ProtocolComponent.h"
 #include"Component/Rpc/InnerNetMessageComponent.h"
 using namespace Sentry;
 namespace Lua
@@ -57,7 +57,7 @@ namespace Lua
 		}
 		if (!rpcInterfaceConfig->Request.empty())
 		{
-			ProtoBufferComponent * messageComponent = App::Get()->GetMsgComponent();
+			ProtocolComponent * messageComponent = App::Get()->GetMsgComponent();
 			std::shared_ptr<Message> message = messageComponent->Read(lua, rpcInterfaceConfig->Request, 4);
 			if(message == nullptr)
 			{

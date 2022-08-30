@@ -3,7 +3,7 @@
 #include"App/App.h"
 #include"Global/ServiceConfig.h"
 #include"Async/LuaServiceTaskSource.h"
-#include"Component/Scene/ProtoBufferComponent.h"
+#include"Component/Scene/ProtocolComponent.h"
 #include<google/protobuf/util/json_util.h>
 #include<Script/Extension/Coroutine/LuaCoroutine.h>
 namespace Sentry
@@ -12,7 +12,7 @@ namespace Sentry
 	LuaServiceMethod::LuaServiceMethod(const RpcInterfaceConfig * config, lua_State* lua)
 		: ServiceMethod(config->Method), mConfig(config), mLuaEnv(lua)
 	{
-		this->mMsgComponent = App::Get()->GetComponent<ProtoBufferComponent>();
+		this->mMsgComponent = App::Get()->GetComponent<ProtocolComponent>();
 	}
 
 	XCode LuaServiceMethod::Call(int count, com::rpc::response & response)

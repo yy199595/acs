@@ -18,6 +18,9 @@ function Server.Awake()
 end
 
 function Server.AllServiceStart()
+
+    local id = MongoComponent.AddCounter("user_id", 1)
+    print(id)
     MongoComponent.InsertOnce("data_account", {
         _id = "646585122@qq.com",
         login_ip = "127.0.0.1",
@@ -30,7 +33,7 @@ function Server.AllServiceStart()
     MongoComponent.Update("data_account", {
         _id = "646585122@qq.com"
     }, {
-        login_time = os.time()
+        login_time_1 = os.time()
     })
 end
 

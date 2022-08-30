@@ -307,9 +307,16 @@ namespace Bson
 {
 	namespace Read
 	{
+        bool Object::GetKeys(std::set<std::string> &keys)
+        {
+            this->getFieldNames(keys);
+            return keys.size() > 0;
+        }
+
 		bool Object::Get(const char* key, int& value) const
 		{
-			if (this->hasField(key))
+            _bson::bsonelement bsonelement = this->getField(key);
+            if (bsonelement.type() == _bson::BSONType::NumberInt)
 			{
 				value = this->getField(key).Int();
 				return true;
@@ -319,9 +326,10 @@ namespace Bson
 
 		bool Object::Get(const char* key, bool& value) const
 		{
-			if (this->hasField(key))
+            _bson::bsonelement bsonelement = this->getField(key);
+            if (bsonelement.type() == _bson::BSONType::Bool)
 			{
-				value = this->getField(key).Bool();
+				value = bsonelement.Bool();
 				return true;
 			}
 			return false;
@@ -329,19 +337,25 @@ namespace Bson
 
 		bool Object::Get(const char* key, long long& value) const
 		{
-			if (this->hasField(key))
-			{
-				value = this->getField(key).Long();
-				return true;
-			}
+            _bson::bsonelement bsonelement = this->getField(key);
+            switch(bsonelement.type())
+            {
+                case _bson::BSONType::NumberInt:
+                    value = bsonelement.Int();
+                    return true;
+                case _bson::BSONType::NumberLong:
+                    value = bsonelement.Long();
+                    return true;
+            }
 			return false;
 		}
 
 		bool Object::Get(const char* key, std::string& value) const
 		{
-			if (this->hasField(key))
+            _bson::bsonelement bsonelement = this->getField(key);
+            if (bsonelement.type() == _bson::BSONType::String)
 			{
-				value = this->getField(key).str();
+				value = bsonelement.String();
 				return true;
 			}
 			return false;

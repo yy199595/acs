@@ -1,8 +1,10 @@
 ﻿#include"TaskComponent.h"
 #include"App/App.h"
-#include"Util/Guid.h"
 #include"Coroutine/TaskContext.h"
 #include"Component/Timer/TimerComponent.h"
+#ifdef __DEBUG__
+#include"Util/TimeHelper.h"
+#endif
 using namespace std::chrono;
 namespace Sentry
 {
@@ -49,6 +51,25 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(this->mTimerComponent = this->GetComponent<TimerComponent>());
 		return true;
 	}
+#ifdef __DEBUG__
+    void TaskComponent::OnSecondUpdate(const int tick)
+    {
+        if(tick % 10 == 0)
+        {
+            auto iter = this->mCorPool.Begin();
+            long long nowTime = Helper::Time::GetNowSecTime();
+
+            for(; iter != this->mCorPool.End(); iter++)
+            {
+                TaskContext * taskContext = iter->second;
+                if(nowTime - taskContext->mSwitchTime >= 10)
+                {
+                    LOG_FATAL(taskContext->mCoroutineId << " long time not switch");
+                }
+            }
+        }
+    }
+#endif
 
 	void TaskComponent::Sleep(long long ms)
 	{
@@ -92,6 +113,9 @@ namespace Sentry
 
 		this->mRunContext->mSwitchCount++;
 		this->mRunContext->mState = CorState::Suspend;
+#ifdef __DEBUG__
+      this->mRunContext->mSwitchTime = Helper::Time::GetNowSecTime();
+#endif
 		tb_context_jump(this->mMainContext, this->mRunContext);
 		return true;
 	}
@@ -115,6 +139,9 @@ namespace Sentry
 			coroutine->mFunction = func;
 			coroutine->mState = CorState::Ready;
 		}
+#ifdef __DEBUG__
+        coroutine->mSwitchTime = Helper::Time::GetNowSecTime();
+#endif
 		return coroutine;
 	}
 

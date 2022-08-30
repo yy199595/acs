@@ -17,14 +17,19 @@
     "HttpWebService": {
         "Type": "http",
         "Async": {
-            "Type": "GET",
+            "Type": "",
             "Async": true,
-            "Path": "/web/async/index"
+            "Path": "/index/async"
         },
         "Sync": {
+            "Type": "",
+            "Async": false,
+            "Path": "/index/sync"
+        },
+        "DownLoad": {
             "Type": "GET",
             "Async": false,
-            "Path": "web/sync/index"
+            "Path": "/download"
         }
     },
     "GateService": {
@@ -101,6 +106,12 @@
             "Async": true,
             "Type": "Server",
             "Request": "s2s.mongo.index"
+        },
+        "AddCounter": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "s2s.mongo.counter.request",
+            "Response": "s2s.mongo.counter.response"
         },
         "RunCommand": {
             "Async": true,

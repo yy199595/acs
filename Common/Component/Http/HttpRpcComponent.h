@@ -17,7 +17,7 @@ namespace Sentry
     public:
         void OnRequest(std::shared_ptr<HttpHandlerClient> httpClient) final;
     private:
-        HttpStatus Invoke(std::shared_ptr<HttpHandlerClient> httpClient);
+
     };
 }
 

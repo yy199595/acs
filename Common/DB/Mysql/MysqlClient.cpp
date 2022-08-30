@@ -18,26 +18,24 @@ namespace Sentry
 
     std::string MysqlClient::ComputeToken(const std::string &password, const std::string &scramble)
     {
-        if(password.empty())
+        if (password.empty())
         {
             return std::string();
         }
+        std::string output;
         std::string stage1 = Helper::Sha1::GetHash(password);
         std::string stage2 = Helper::Sha1::GetHash(stage1);
         std::string stage3 = Helper::Sha1::GetHash(scramble + stage2);
         std::cout << stage3 << std::endl << stage1 << std::endl;
 
-        size_t pos = stage3.find('.');
-        if(pos != std::string::npos)
+        std::unique_ptr<char[]> buffer(new char[stage3.size()]);
+        for (size_t index = 0; index < stage3.size(); index++)
         {
-            for(size_t index =0 ;index<stage3.size(); index++)
-            {
-                unsigned char v1 = stage3[index];
-                unsigned char v2 = stage1[index];
-            }
+            unsigned char v1 = stage3[index];
+            unsigned char v2 = stage1[index];
+            buffer[index] = v1 ^ v2;
         }
-        return stage3;
-
+        return std::string(buffer.get(), stage3.size());
     }
 
     bool MysqlClient::StartAuth()

@@ -6,7 +6,7 @@
 #include"Util/StringHelper.h"
 #include"Component/RpcService/Service.h"
 #include"Network/Http/HttpHandlerClient.h"
-#include"Component/Scene/ProtoBufferComponent.h"
+#include"Component/Scene/ProtocolComponent.h"
 namespace Sentry
 {
     void HttpRpcComponent::OnRequest(std::shared_ptr<HttpHandlerClient> httpClient)
@@ -16,16 +16,20 @@ namespace Sentry
         std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
         const HttpData & httpData = request->GetData();
 
-        const ListenConfig & listenConfig = this->GetListenConfig();
-        std::string childRoute = httpData.mPath.substr(listenConfig.Route.size());
-
-        if (request->GetData().mMethod != "POST")
+        if (httpData.mMethod != "POST")
         {
             httpClient->StartWriter(HttpStatus::METHOD_NOT_ALLOWED);
             return;
         }
+        std::string fullName;
+        if(!httpData.Get("method", fullName))
+        {
+            httpClient->StartWriter(HttpStatus::BAD_REQUEST);
+        }
         std::vector<std::string> tempArray;
-        if(Helper::String::Split(childRoute, "/", tempArray) != 2)
+        Helper::String::ClearBlank(fullName);
+        const ListenConfig & listenConfig = this->GetListenConfig();
+        if(Helper::String::Split(fullName, ".", tempArray) != 2)
         {
             httpClient->StartWriter(HttpStatus::NOT_FOUND);
             return;
@@ -90,11 +94,5 @@ namespace Sentry
             response->AddHead("code", (int)code);
             httpClient->StartWriter(HttpStatus::OK);
         });
-    }
-
-    HttpStatus HttpRpcComponent::Invoke(std::shared_ptr<HttpHandlerClient> httpClient)
-    {
-
-        return HttpStatus::OK;
     }
 }

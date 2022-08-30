@@ -15,12 +15,11 @@ namespace Sentry
 
 	void HttpHandlerClient::StartReceive(const std::string & route)
 	{
-        this->mRoute = route;
         assert(this->mRecvBuffer.size() == 0);
         assert(this->mSendBuffer.size() == 0);
         const std::string & address = this->mSocket->GetAddress();
         this->mHttpResponse = std::make_shared<HttpHandlerResponse>();
-        this->mHttpRequest = std::make_shared<HttpHandlerRequest>(address);
+        this->mHttpRequest = std::make_shared<HttpHandlerRequest>(address, route);
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLine();
 #else
@@ -46,25 +45,16 @@ namespace Sentry
     }
 
 	void HttpHandlerClient::OnComplete()
-	{
-        const HttpData & httpData = this->mHttpRequest->GetData();
-        if(!this->mRoute.empty() && httpData.mPath.find(this->mRoute) == std::string::npos) //判断根路由是否匹配
-        {
-            this->mHttpResponse->SetCode(HttpStatus::NOT_FOUND);
-            this->Send(this->mHttpResponse);
-        }
-        else
-        {
-            std::shared_ptr<HttpHandlerClient> httpHandlerClient =
-                    std::dynamic_pointer_cast<HttpHandlerClient>(this->shared_from_this());
+    {
+        std::shared_ptr<HttpHandlerClient> httpHandlerClient =
+                std::dynamic_pointer_cast<HttpHandlerClient>(this->shared_from_this());
 #ifdef ONLY_MAIN_THREAD
-            this->mHttpComponent->OnRequest(httpHandlerClient);
+        this->mHttpComponent->OnRequest(httpHandlerClient);
 #else
-            asio::io_service &mainThread = App::Get()->GetThread();
-            mainThread.post(std::bind(&HttpListenComponent::OnRequest, this->mHttpComponent, httpHandlerClient));
+        asio::io_service &mainThread = App::Get()->GetThread();
+        mainThread.post(std::bind(&HttpListenComponent::OnRequest, this->mHttpComponent, httpHandlerClient));
 #endif
-        }
-	}
+    }
 
     void HttpHandlerClient::OnReceiveLine(const asio::error_code &code, std::istream &is, size_t)
     {

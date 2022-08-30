@@ -28,7 +28,6 @@ namespace Sentry
             }
         }
         this->mTaskComponent = this->GetApp()->GetTaskComponent();
-        this->mNetComponent = this->GetComponent<NetThreadComponent>();
         return true;
     }
 
@@ -36,29 +35,40 @@ namespace Sentry
     const HttpInterfaceConfig *HttpWebComponent::GetConfig(const std::string &path)
     {
         auto iter = this->mHttpConfigs.find(path);
-        return iter != this->mHttpConfigs.end() ? iter->second : nullptr;
+        if(iter != this->mHttpConfigs.end())
+        {
+            return iter->second;
+        }
+        iter = this->mHttpConfigs.begin();
+        for(; iter != this->mHttpConfigs.end(); iter++)
+        {
+            size_t pos = path.find(iter->first);
+            if(pos != std::string::npos)
+            {
+                return iter->second;
+            }
+        }
+        return nullptr;
     }
 
     void HttpWebComponent::OnRequest(std::shared_ptr<HttpHandlerClient> httpClient)
     {
         assert(this->GetApp()->IsMainThread());
         std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
-        std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
 
         const HttpData & httpData = request->GetData();
-        const ListenConfig & listenConfig = this->GetListenConfig();
-        std::string childRoute = httpData.mPath.substr(listenConfig.Route.size());
-        const HttpInterfaceConfig *httpConfig = this->GetConfig(childRoute);
+        const HttpInterfaceConfig *httpConfig = this->GetConfig(httpData.mPath);
         if (httpConfig == nullptr)
         {
             httpClient->StartWriter(HttpStatus::NOT_FOUND);
-            CONSOLE_LOG_ERROR("[" << httpData.mPath << "] " << HttpStatusToString(HttpStatus::NOT_FOUND));
+            CONSOLE_LOG_ERROR("[" << request->GetUrl() << "] " << HttpStatusToString(HttpStatus::NOT_FOUND));
             return;
         }
-        if (httpConfig->Type != httpData.mMethod)
+
+        if (!httpConfig->Type.empty() && httpConfig->Type != httpData.mMethod)
         {
             httpClient->StartWriter(HttpStatus::METHOD_NOT_ALLOWED);
-            CONSOLE_LOG_ERROR("[" << httpData.mPath << "] " << HttpStatusToString(HttpStatus::METHOD_NOT_ALLOWED));
+            CONSOLE_LOG_ERROR("[" << request->GetUrl() << "] " << HttpStatusToString(HttpStatus::METHOD_NOT_ALLOWED));
             return;
         }
 
@@ -71,8 +81,12 @@ namespace Sentry
         }
         if (!httpConfig->IsAsync)
         {
-            httpService->Invoke(httpConfig->Method, request, response);
-            httpClient->StartWriter(HttpStatus::OK);
+            std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
+            XCode code = httpService->Invoke(httpConfig->Method, request, response);
+            {
+                response->AddHead("code", (int) code);
+                httpClient->StartWriter(HttpStatus::OK);
+            }
         }
         else
         {
@@ -80,9 +94,11 @@ namespace Sentry
 
                 std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
                 std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
-
-                httpService->Invoke(httpConfig->Method, request, response);
-                httpClient->StartWriter(HttpStatus::OK);
+                XCode code = httpService->Invoke(httpConfig->Method, request, response);
+                {
+                    response->AddHead("code", (int) code);
+                    httpClient->StartWriter(HttpStatus::OK);
+                }
             });
         }
     }

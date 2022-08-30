@@ -8,11 +8,12 @@
 #include"Component/RpcService/LocalService.h"
 namespace Sentry
 {
-    class MongoService final : public LocalService
+    class MongoService final : public LocalService, public IStart
 	{
 	public:
 		MongoService();
 	private:
+        bool OnStart() final;
 		bool OnStartService(ServiceMethodRegister &methodRegister) final;
     private:
         XCode Insert(const s2s::mongo::insert & request);
@@ -20,12 +21,18 @@ namespace Sentry
         XCode Update(const s2s::mongo::update & request);
         XCode SetIndex(const s2s::mongo::index & request);
         XCode Query(const s2s::mongo::query::request & request, s2s::mongo::query::response & response);
+        XCode AddCounter(const s2s::mongo::counter::request &request, s2s::mongo::counter::response & response);
         XCode RunCommand(const s2s::mongo::command::request & request, s2s::mongo::command::response & response);
+
+    private:
+        bool RefreshCounter();
     private:
         std::string mBuffer;
-        std::set<std::string> mCounters;
+        std::string mCounterId;
+        std::string mCounterTable;
         class MongoRpcComponent * mMongoComponent;
-	};
+        std::unordered_map<std::string, long long> mCounters;
+    };
 }
 
 

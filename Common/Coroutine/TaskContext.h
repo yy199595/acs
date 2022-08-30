@@ -77,6 +77,9 @@ namespace Sentry
 		StaticMethod* mFunction;
 		unsigned int mSwitchCount;
 		unsigned int mCoroutineId;
+#ifdef __DEBUG__
+        long long mSwitchTime;
+#endif
         std::shared_ptr<CoroutineGroup> mGroup;
     };
 }

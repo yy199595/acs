@@ -18,8 +18,7 @@
 #include"Component/Scene/LoggerComponent.h"
 #include"Component/Gate/OuterNetMessageComponent.h"
 #include"Component/Gate/OuterNetComponent.h"
-#include"Component/Scene/ProtoBufferComponent.h"
-#include"Component/Logic/HttpSourceService.h"
+#include"Component/Scene/ProtocolComponent.h"
 #include"Component/RpcService/LuaService.h"
 #include"Component/Http/HttpWebComponent.h"
 #include"Component/Mongo/MongoService.h"
@@ -54,7 +53,7 @@ void RegisterComponent()
 	ComponentFactory::Add<OperatorComponent>("OperatorComponent");
     ComponentFactory::Add<UnitMgrComponent>("UnitMgrComponent");
     ComponentFactory::Add<NetThreadComponent>("NetThreadComponent");
-    ComponentFactory::Add<ProtoBufferComponent>("ProtoBufferComponent");
+    ComponentFactory::Add<ProtocolComponent>("ProtocolComponent");
 
 //server
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
@@ -92,7 +91,6 @@ void RegisterServiceComponent()
     ComponentFactory::Add<LocalLuaHttpService>("http");
     ComponentFactory::Add<GateService>("GateService");
 	ComponentFactory::Add<MongoService>("MongoService");
-	ComponentFactory::Add<HttpSourceService>("HttpSourceService");
 }
 int main(int argc, char **argv)
 {

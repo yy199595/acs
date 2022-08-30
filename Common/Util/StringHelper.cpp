@@ -41,14 +41,7 @@ namespace Helper
 
     extern void String::ClearBlank(std::string &input)
     {
-        int index = 0;
-        if (!input.empty())
-        {
-            while ((index = input.find(' ', index)) != std::string::npos)
-            {
-                input.erase(index, 1);
-            }
-        }
+        input.erase(std::remove(input.begin(), input.end(), ' '), input.end());
     }
 
     bool String::GetFileName(const std::string &path, std::string & name)

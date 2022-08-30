@@ -5,12 +5,12 @@ namespace Sentry
 {
 	TaskContextPool::~TaskContextPool()
 	{
-        auto iter = this->mCorMap.begin();
-        for(;iter != this->mCorMap.end(); iter++)
+        auto iter = this->begin();
+        for(;iter != this->end(); iter++)
         {
             delete iter->second;
         }
-        this->mCorMap.clear();
+        this->clear();
 	}
 	TaskContext * TaskContextPool::Pop()
     {
@@ -29,29 +29,18 @@ namespace Sentry
         }
         coroutine->mCoroutineId = this->mNumPool.Pop();
         coroutine->sid = coroutine->mCoroutineId & (SHARED_STACK_NUM - 1);
-        this->mCorMap.emplace(coroutine->mCoroutineId, coroutine);
+        this->emplace(coroutine->mCoroutineId, coroutine);
         return coroutine;
-    }
-
-    size_t TaskContextPool::GetMemorySize()
-    {
-        size_t size = 0;
-        auto iter = this->mCorMap.begin();
-        for(; iter != this->mCorMap.end(); iter++)
-        {
-            size += iter->second->mStack.size;
-        }
-        return size;
     }
 
 	void TaskContextPool::Push(TaskContext * coroutine)
 	{
         unsigned int id = coroutine->mCoroutineId;
-        auto iter = this->mCorMap.find(id);
-        if(iter != this->mCorMap.end())
+        auto iter = this->find(id);
+        if(iter != this->end())
         {
             this->mNumPool.Push(id);
-            this->mCorMap.erase(iter);
+            this->erase(iter);
         }
         if(this->mCorPool.size() >=COR_POOL_COUNT)
         {
@@ -62,8 +51,8 @@ namespace Sentry
 	}
 	TaskContext * TaskContextPool::Get(unsigned int id)
 	{
-        auto iter = this->mCorMap.find(id);
-        return iter != this->mCorMap.end() ? iter->second : nullptr;
+        auto iter = this->find(id);
+        return iter != this->end() ? iter->second : nullptr;
 	}
 }
 

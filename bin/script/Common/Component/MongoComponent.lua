@@ -108,18 +108,13 @@ function MongoComponent.Push(tab, select, update)
 end
 
 function MongoComponent.AddCounter(key, value)
-    local tab = "common_counter"
-    local code = this.Update(tab, {
-        _id = key
-    }, {value = value or 1} )
-    if code ~= XCode.Successful then
-        this.InsertOnce(tab, {
-            _id = key,
-            value = value or 1
-        })
-        return value
-    end
-    return this.Query(tab, {_id = key}, 1)
+
+    local address = self:GetHost()
+    local code, response = self:Call(address, "AddCounter", {
+        key = key,
+        value = value
+    })
+    return code == XCode.Successful and response.value or 0
 end
 
 function MongoComponent.GetCount(tab, query)

@@ -1,6 +1,6 @@
 ﻿#include "MysqlHelper.h"
 #include"App/App.h"
-#include"Component/Scene/ProtoBufferComponent.h"
+#include"Component/Scene/ProtocolComponent.h"
 namespace Sentry
 {
 	bool MysqlHelper::ToSqlCommand(const std::string& table, const std::string& cmd,
@@ -180,7 +180,7 @@ namespace Sentry
 
 	bool MysqlHelper::ToSqlCommand(const s2s::mysql::add& request, std::string& sqlCommand)
 	{
-		ProtoBufferComponent * messageComponent = App::Get()->GetComponent<ProtoBufferComponent>();
+		ProtocolComponent * messageComponent = App::Get()->GetComponent<ProtocolComponent>();
 		std::shared_ptr<Message> message = messageComponent->New(request.data());
 		if (message == nullptr)
 		{
@@ -192,7 +192,7 @@ namespace Sentry
 
 	bool MysqlHelper::ToSqlCommand(const s2s::mysql::save& request, std::string& sqlCommand)
 	{
-		ProtoBufferComponent * messageComponent = App::Get()->GetComponent<ProtoBufferComponent>();
+		ProtocolComponent * messageComponent = App::Get()->GetComponent<ProtocolComponent>();
 		std::shared_ptr<Message> message = messageComponent->New(request.data());
 		if (message == nullptr)
 		{

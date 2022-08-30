@@ -11,7 +11,8 @@ namespace Sentry
     MongoService::MongoService()
         : mMongoComponent(nullptr)
     {
-
+        this->mCounterId = "CounterKey";
+        this->mCounterTable = "Common_Counter";
     }
 	bool MongoService::OnStartService(ServiceMethodRegister& methodRegister)
     {
@@ -21,8 +22,68 @@ namespace Sentry
         methodRegister.Bind("Delete", &MongoService::Delete);
         methodRegister.Bind("Update", &MongoService::Update);
         methodRegister.Bind("SetIndex", &MongoService::SetIndex);
+        methodRegister.Bind("AddCounter", &MongoService::AddCounter);
         methodRegister.Bind("RunCommand", &MongoService::RunCommand);
         return this->mMongoComponent != nullptr;
+    }
+
+    bool MongoService::OnStart()
+    {
+        Json::Writer select;
+        select << "_id" << this->mCounterId;
+        this->mMongoComponent->InsertOnce(this->mCounterTable, select.JsonString());
+        return this->RefreshCounter();
+    }
+
+    bool MongoService::RefreshCounter()
+    {
+        Json::Writer select;
+        select << "_id" << this->mCounterId;
+        std::shared_ptr<MongoQueryResponse> response =
+                this->mMongoComponent->Query(this->mCounterTable, select.JsonString());
+        if(response == nullptr)
+        {
+            return false;
+        }
+        if(response->GetDocumentSize() > 0)
+        {
+            std::set<std::string> keys;
+            Bson::Read::Object & bsonObject = response->Get(0);
+            if(bsonObject.GetKeys(keys))
+            {
+                for(const std::string & key : keys)
+                {
+                    long long value = 0;
+                    if(bsonObject.Get(key.c_str(),value))
+                    {
+                        this->mCounters[key] = value;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    XCode MongoService::AddCounter(const s2s::mongo::counter::request & request, s2s::mongo::counter::response &response)
+    {
+        Json::Writer json1;
+        Json::Writer json2;
+        json1 << "_id" << this->mCounterId;
+        json2 << request.key() << request.value();
+        if(this->mMongoComponent->Update(this->mCounterTable, json2.JsonString(), json1.JsonString(), "$inc"))
+        {
+            auto iter = this->mCounters.find(request.key());
+            if(iter == this->mCounters.end())
+            {
+                this->RefreshCounter();
+            }
+            iter = this->mCounters.find(request.key());
+            if(iter != this->mCounters.end())
+            {
+                response.set_counter(iter->second);
+            }
+        }
+        return XCode::Successful;
     }
 
     XCode MongoService::RunCommand(const s2s::mongo::command::request &request, s2s::mongo::command::response &response)

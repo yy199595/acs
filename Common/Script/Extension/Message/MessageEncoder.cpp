@@ -5,7 +5,7 @@
 
 namespace Sentry
 {
-	MessageEncoder::MessageEncoder(lua_State* lua, ProtoBufferComponent* component)
+	MessageEncoder::MessageEncoder(lua_State* lua, ProtocolComponent* component)
 	{
 		this->mLua = lua;
 		this->mMsgComponent = component;
