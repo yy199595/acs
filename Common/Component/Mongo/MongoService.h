@@ -4,34 +4,27 @@
 
 #ifndef SERVER_MONGOSERVICE_H
 #define SERVER_MONGOSERVICE_H
+#include"Message/db.pb.h"
 #include"DB/Mongo/MongoProto.h"
 #include"Component/RpcService/LocalService.h"
 namespace Sentry
 {
-    class MongoService final : public LocalService, public IStart
+    class MongoService final : public LocalService
 	{
 	public:
 		MongoService();
 	private:
-        bool OnStart() final;
 		bool OnStartService(ServiceMethodRegister &methodRegister) final;
     private:
-        XCode Insert(const s2s::mongo::insert & request);
-        XCode Delete(const s2s::mongo::remove & request);
-        XCode Update(const s2s::mongo::update & request);
-        XCode SetIndex(const s2s::mongo::index & request);
-        XCode Query(const s2s::mongo::query::request & request, s2s::mongo::query::response & response);
-        XCode AddCounter(const s2s::mongo::counter::request &request, s2s::mongo::counter::response & response);
-        XCode RunCommand(const s2s::mongo::command::request & request, s2s::mongo::command::response & response);
-
-    private:
-        bool RefreshCounter();
+        XCode Insert(const db::mongo::insert & request);
+        XCode Delete(const db::mongo::remove & request);
+        XCode Update(const db::mongo::update & request);
+        XCode SetIndex(const db::mongo::index & request);
+        XCode Query(const db::mongo::query::request & request, db::mongo::query::response & response);
+        XCode RunCommand(const db::mongo::command::request & request, db::mongo::command::response & response);
     private:
         std::string mBuffer;
-        std::string mCounterId;
-        std::string mCounterTable;
         class MongoRpcComponent * mMongoComponent;
-        std::unordered_map<std::string, long long> mCounters;
     };
 }
 

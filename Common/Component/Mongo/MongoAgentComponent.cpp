@@ -25,7 +25,7 @@ namespace Sentry
 		{
 			return XCode::CallServiceNotFound;
 		}
-		s2s::mongo::insert request;
+		db::mongo::insert request;
 		request.set_tab(tab);
 		request.set_flag(index);
 		if(!util::MessageToJsonString(message, request.mutable_json()).ok())
@@ -42,7 +42,7 @@ namespace Sentry
         {
             return XCode::CallServiceNotFound;
         }
-        s2s::mongo::update request;
+        db::mongo::update request;
         request.set_tab(tab);
         request.set_update(std::move(data));
         request.set_select(std::move(select));
@@ -56,11 +56,10 @@ namespace Sentry
 		{
 			return XCode::CallServiceNotFound;
 		}
-		s2s::mongo::insert request;
-		request.set_tab(tab);
-		request.set_flag(index);
-        request.set_json(std::move(json));
-        return this->mMongoService->Call(address, "Insert", request);
+		this->mInsertRequest.set_tab(tab);
+        this->mInsertRequest.set_flag(index);
+        this->mInsertRequest.set_json(std::move(json));
+        return this->mMongoService->Call(address, "Insert", this->mInsertRequest);
 	}
 
 	XCode MongoAgentComponent::Remove(const char* tab, const std::string& select, int limit, int index)
@@ -70,12 +69,11 @@ namespace Sentry
 		{
 			return XCode::CallServiceNotFound;
 		}
-		s2s::mongo::remove request;
-		request.set_tab(tab);
-		request.set_flag(index);
-		request.set_limit(limit);
-        request.set_json(std::move(select));
-        return this->mMongoService->Call(address, "Remove", request);
+		this->mRemoveRequest.set_tab(tab);
+        this->mRemoveRequest.set_flag(index);
+        this->mRemoveRequest.set_limit(limit);
+        this->mRemoveRequest.set_json(std::move(select));
+        return this->mMongoService->Call(address, "Remove", this->mRemoveRequest);
 	}
 
 	XCode MongoAgentComponent::Query(const char* tab,
@@ -86,12 +84,11 @@ namespace Sentry
 		{
 			return XCode::CallServiceNotFound;
 		}
-		s2s::mongo::query::request request;
-		request.set_tab(tab);
-		request.set_limit(1);
-		request.set_json(std::move(select));
-		std::shared_ptr<s2s::mongo::query::response> result(new s2s::mongo::query::response());
-		XCode code = this->mMongoService->Call(address, "Query", request, result);
+		this->mQueryRequest.set_tab(tab);
+        this->mQueryRequest.set_limit(1);
+        this->mQueryRequest.set_json(std::move(select));
+		std::shared_ptr<db::mongo::query::response> result(new db::mongo::query::response());
+		XCode code = this->mMongoService->Call(address, "Query", this->mQueryRequest, result);
 		if(code == XCode::Successful && result->jsons_size() > 0)
 		{
 			const std::string & json = result->jsons(0);
@@ -138,14 +135,14 @@ namespace Sentry
         {
             return XCode::CallServiceNotFound;
         }
-        s2s::mongo::update request;
-        if(!util::MessageToJsonString(message, request.mutable_update()).ok())
+        this->mUpdateRequest.Clear();
+        if(!util::MessageToJsonString(message, this->mUpdateRequest.mutable_update()).ok())
         {
             return XCode::ProtoCastJsonFailure;
         }
-        request.set_tab(std::move(message.GetTypeName()));
-        request.set_select(std::move(select.JsonString()));
-        return this->mMongoService->Call(address, "Update", request);
+        this->mUpdateRequest.set_tab(std::move(message.GetTypeName()));
+        this->mUpdateRequest.set_select(std::move(select.JsonString()));
+        return this->mMongoService->Call(address, "Update", this->mUpdateRequest);
     }
 
     XCode MongoAgentComponent::Save(const char *tab, long long id, const std::string &data)

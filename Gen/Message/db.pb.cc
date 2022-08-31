@@ -16,101 +16,352 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 
-class account_user_infoDefaultTypeInternal {
+namespace db {
+class mongo_insertDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<account_user_info> _instance;
-} _account_user_info_default_instance_;
-class accountDefaultTypeInternal {
+  ::google::protobuf::internal::ExplicitlyConstructed<mongo_insert> _instance;
+} _mongo_insert_default_instance_;
+class mongo_query_requestDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<account> _instance;
-} _account_default_instance_;
-static void InitDefaultsaccount_user_info_db_2eproto() {
+  ::google::protobuf::internal::ExplicitlyConstructed<mongo_query_request> _instance;
+} _mongo_query_request_default_instance_;
+class mongo_query_responseDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<mongo_query_response> _instance;
+} _mongo_query_response_default_instance_;
+class mongo_queryDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<mongo_query> _instance;
+} _mongo_query_default_instance_;
+class mongo_removeDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<mongo_remove> _instance;
+} _mongo_remove_default_instance_;
+class mongo_indexDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<mongo_index> _instance;
+} _mongo_index_default_instance_;
+class mongo_updateDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<mongo_update> _instance;
+} _mongo_update_default_instance_;
+class mongo_command_requestDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<mongo_command_request> _instance;
+} _mongo_command_request_default_instance_;
+class mongo_command_responseDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<mongo_command_response> _instance;
+} _mongo_command_response_default_instance_;
+class mongo_commandDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<mongo_command> _instance;
+} _mongo_command_default_instance_;
+class mongoDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<mongo> _instance;
+} _mongo_default_instance_;
+}  // namespace db
+static void InitDefaultsmongo_insert_db_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::_account_user_info_default_instance_;
-    new (ptr) ::account_user_info();
+    void* ptr = &::db::_mongo_insert_default_instance_;
+    new (ptr) ::db::mongo_insert();
     ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::account_user_info::InitAsDefaultInstance();
+  ::db::mongo_insert::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<0> scc_info_account_user_info_db_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsaccount_user_info_db_2eproto}, {}};
+::google::protobuf::internal::SCCInfo<0> scc_info_mongo_insert_db_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsmongo_insert_db_2eproto}, {}};
 
-static void InitDefaultsaccount_db_2eproto() {
+static void InitDefaultsmongo_query_request_db_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::_account_default_instance_;
-    new (ptr) ::account();
+    void* ptr = &::db::_mongo_query_request_default_instance_;
+    new (ptr) ::db::mongo_query_request();
     ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::account::InitAsDefaultInstance();
+  ::db::mongo_query_request::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<0> scc_info_account_db_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsaccount_db_2eproto}, {}};
+::google::protobuf::internal::SCCInfo<0> scc_info_mongo_query_request_db_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsmongo_query_request_db_2eproto}, {}};
+
+static void InitDefaultsmongo_query_response_db_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::db::_mongo_query_response_default_instance_;
+    new (ptr) ::db::mongo_query_response();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::db::mongo_query_response::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_mongo_query_response_db_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsmongo_query_response_db_2eproto}, {}};
+
+static void InitDefaultsmongo_query_db_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::db::_mongo_query_default_instance_;
+    new (ptr) ::db::mongo_query();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::db::mongo_query::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_mongo_query_db_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsmongo_query_db_2eproto}, {}};
+
+static void InitDefaultsmongo_remove_db_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::db::_mongo_remove_default_instance_;
+    new (ptr) ::db::mongo_remove();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::db::mongo_remove::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_mongo_remove_db_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsmongo_remove_db_2eproto}, {}};
+
+static void InitDefaultsmongo_index_db_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::db::_mongo_index_default_instance_;
+    new (ptr) ::db::mongo_index();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::db::mongo_index::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_mongo_index_db_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsmongo_index_db_2eproto}, {}};
+
+static void InitDefaultsmongo_update_db_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::db::_mongo_update_default_instance_;
+    new (ptr) ::db::mongo_update();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::db::mongo_update::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_mongo_update_db_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsmongo_update_db_2eproto}, {}};
+
+static void InitDefaultsmongo_command_request_db_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::db::_mongo_command_request_default_instance_;
+    new (ptr) ::db::mongo_command_request();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::db::mongo_command_request::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_mongo_command_request_db_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsmongo_command_request_db_2eproto}, {}};
+
+static void InitDefaultsmongo_command_response_db_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::db::_mongo_command_response_default_instance_;
+    new (ptr) ::db::mongo_command_response();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::db::mongo_command_response::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_mongo_command_response_db_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsmongo_command_response_db_2eproto}, {}};
+
+static void InitDefaultsmongo_command_db_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::db::_mongo_command_default_instance_;
+    new (ptr) ::db::mongo_command();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::db::mongo_command::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_mongo_command_db_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsmongo_command_db_2eproto}, {}};
+
+static void InitDefaultsmongo_db_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::db::_mongo_default_instance_;
+    new (ptr) ::db::mongo();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::db::mongo::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_mongo_db_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsmongo_db_2eproto}, {}};
 
 void InitDefaults_db_2eproto() {
-  ::google::protobuf::internal::InitSCC(&scc_info_account_user_info_db_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_account_db_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_mongo_insert_db_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_mongo_query_request_db_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_mongo_query_response_db_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_mongo_query_db_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_mongo_remove_db_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_mongo_index_db_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_mongo_update_db_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_mongo_command_request_db_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_mongo_command_response_db_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_mongo_command_db_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_mongo_db_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_db_2eproto[2];
+::google::protobuf::Metadata file_level_metadata_db_2eproto[11];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_db_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_db_2eproto = nullptr;
 
 const ::google::protobuf::uint32 TableStruct_db_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::account_user_info, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::db::mongo_insert, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::account_user_info, account_),
-  PROTOBUF_FIELD_OFFSET(::account_user_info, user_id_),
-  PROTOBUF_FIELD_OFFSET(::account_user_info, password_),
-  PROTOBUF_FIELD_OFFSET(::account_user_info, platform_),
-  PROTOBUF_FIELD_OFFSET(::account_user_info, phone_num_),
-  PROTOBUF_FIELD_OFFSET(::account_user_info, device_mac_),
-  PROTOBUF_FIELD_OFFSET(::account_user_info, register_time_),
-  PROTOBUF_FIELD_OFFSET(::account_user_info, last_login_time_),
-  PROTOBUF_FIELD_OFFSET(::account_user_info, token_),
-  PROTOBUF_FIELD_OFFSET(::account_user_info, last_login_ip_),
+  PROTOBUF_FIELD_OFFSET(::db::mongo_insert, tab_),
+  PROTOBUF_FIELD_OFFSET(::db::mongo_insert, json_),
+  PROTOBUF_FIELD_OFFSET(::db::mongo_insert, flag_),
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::account, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::db::mongo_query_request, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::db::mongo_query_request, tab_),
+  PROTOBUF_FIELD_OFFSET(::db::mongo_query_request, json_),
+  PROTOBUF_FIELD_OFFSET(::db::mongo_query_request, limit_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::db::mongo_query_response, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::db::mongo_query_response, jsons_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::db::mongo_query, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::db::mongo_remove, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::db::mongo_remove, tab_),
+  PROTOBUF_FIELD_OFFSET(::db::mongo_remove, json_),
+  PROTOBUF_FIELD_OFFSET(::db::mongo_remove, limit_),
+  PROTOBUF_FIELD_OFFSET(::db::mongo_remove, flag_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::db::mongo_index, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::db::mongo_index, tab_),
+  PROTOBUF_FIELD_OFFSET(::db::mongo_index, name_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::db::mongo_update, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::db::mongo_update, tab_),
+  PROTOBUF_FIELD_OFFSET(::db::mongo_update, select_),
+  PROTOBUF_FIELD_OFFSET(::db::mongo_update, update_),
+  PROTOBUF_FIELD_OFFSET(::db::mongo_update, tag_),
+  PROTOBUF_FIELD_OFFSET(::db::mongo_update, flag_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::db::mongo_command_request, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::db::mongo_command_request, json_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::db::mongo_command_response, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::db::mongo_command_response, jsons_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::db::mongo_command, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::db::mongo, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::account_user_info)},
-  { 15, -1, sizeof(::account)},
+  { 0, -1, sizeof(::db::mongo_insert)},
+  { 8, -1, sizeof(::db::mongo_query_request)},
+  { 16, -1, sizeof(::db::mongo_query_response)},
+  { 22, -1, sizeof(::db::mongo_query)},
+  { 27, -1, sizeof(::db::mongo_remove)},
+  { 36, -1, sizeof(::db::mongo_index)},
+  { 43, -1, sizeof(::db::mongo_update)},
+  { 53, -1, sizeof(::db::mongo_command_request)},
+  { 59, -1, sizeof(::db::mongo_command_response)},
+  { 65, -1, sizeof(::db::mongo_command)},
+  { 70, -1, sizeof(::db::mongo)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::google::protobuf::Message*>(&::_account_user_info_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::_account_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::db::_mongo_insert_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::db::_mongo_query_request_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::db::_mongo_query_response_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::db::_mongo_query_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::db::_mongo_remove_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::db::_mongo_index_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::db::_mongo_update_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::db::_mongo_command_request_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::db::_mongo_command_response_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::db::_mongo_command_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::db::_mongo_default_instance_),
 };
 
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_db_2eproto = {
   {}, AddDescriptors_db_2eproto, "db.proto", schemas,
   file_default_instances, TableStruct_db_2eproto::offsets,
-  file_level_metadata_db_2eproto, 2, file_level_enum_descriptors_db_2eproto, file_level_service_descriptors_db_2eproto,
+  file_level_metadata_db_2eproto, 11, file_level_enum_descriptors_db_2eproto, file_level_service_descriptors_db_2eproto,
 };
 
 const char descriptor_table_protodef_db_2eproto[] =
-  "\n\010db.proto\"\332\001\n\007account\032\316\001\n\tuser_info\022\017\n\007"
-  "account\030\001 \001(\t\022\017\n\007user_id\030\002 \001(\003\022\020\n\010passwo"
-  "rd\030\003 \001(\t\022\020\n\010platform\030\004 \001(\t\022\021\n\tphone_num\030"
-  "\005 \001(\003\022\022\n\ndevice_mac\030\006 \001(\t\022\025\n\rregister_ti"
-  "me\030\007 \001(\003\022\027\n\017last_login_time\030\010 \001(\003\022\r\n\005tok"
-  "en\030\t \001(\t\022\025\n\rlast_login_ip\030\n \001(\tb\006proto3"
+  "\n\010db.proto\022\002db\"\212\003\n\005mongo\0321\n\006insert\022\013\n\003ta"
+  "b\030\001 \001(\t\022\014\n\004json\030\002 \001(\t\022\014\n\004flag\030\003 \001(\005\032W\n\005q"
+  "uery\0323\n\007request\022\013\n\003tab\030\001 \001(\t\022\014\n\004json\030\002 \001"
+  "(\t\022\r\n\005limit\030\003 \001(\005\032\031\n\010response\022\r\n\005jsons\030\001"
+  " \003(\t\032@\n\006remove\022\013\n\003tab\030\001 \001(\t\022\014\n\004json\030\002 \001("
+  "\t\022\r\n\005limit\030\003 \001(\005\022\014\n\004flag\030\004 \001(\005\032\"\n\005index\022"
+  "\013\n\003tab\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\032P\n\006update\022\013\n\003"
+  "tab\030\001 \001(\t\022\016\n\006select\030\002 \001(\t\022\016\n\006update\030\003 \001("
+  "\t\022\013\n\003tag\030\004 \001(\t\022\014\n\004flag\030\005 \001(\005\032=\n\007command\032"
+  "\027\n\007request\022\014\n\004json\030\001 \001(\t\032\031\n\010response\022\r\n\005"
+  "jsons\030\001 \003(\tb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_db_2eproto = {
   false, InitDefaults_db_2eproto, 
   descriptor_table_protodef_db_2eproto,
-  "db.proto", &assign_descriptors_table_db_2eproto, 239,
+  "db.proto", &assign_descriptors_table_db_2eproto, 419,
 };
 
 void AddDescriptors_db_2eproto() {
@@ -122,126 +373,86 @@ void AddDescriptors_db_2eproto() {
 
 // Force running AddDescriptors() at dynamic initialization time.
 static bool dynamic_init_dummy_db_2eproto = []() { AddDescriptors_db_2eproto(); return true; }();
+namespace db {
 
 // ===================================================================
 
-void account_user_info::InitAsDefaultInstance() {
+void mongo_insert::InitAsDefaultInstance() {
 }
-class account_user_info::HasBitSetters {
+class mongo_insert::HasBitSetters {
  public:
 };
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int account_user_info::kAccountFieldNumber;
-const int account_user_info::kUserIdFieldNumber;
-const int account_user_info::kPasswordFieldNumber;
-const int account_user_info::kPlatformFieldNumber;
-const int account_user_info::kPhoneNumFieldNumber;
-const int account_user_info::kDeviceMacFieldNumber;
-const int account_user_info::kRegisterTimeFieldNumber;
-const int account_user_info::kLastLoginTimeFieldNumber;
-const int account_user_info::kTokenFieldNumber;
-const int account_user_info::kLastLoginIpFieldNumber;
+const int mongo_insert::kTabFieldNumber;
+const int mongo_insert::kJsonFieldNumber;
+const int mongo_insert::kFlagFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
-account_user_info::account_user_info()
+mongo_insert::mongo_insert()
   : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:account.user_info)
+  // @@protoc_insertion_point(constructor:db.mongo.insert)
 }
-account_user_info::account_user_info(const account_user_info& from)
+mongo_insert::mongo_insert(const mongo_insert& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  account_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.account().size() > 0) {
-    account_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.account_);
+  tab_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.tab().size() > 0) {
+    tab_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.tab_);
   }
-  password_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.password().size() > 0) {
-    password_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.password_);
+  json_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.json().size() > 0) {
+    json_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.json_);
   }
-  platform_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.platform().size() > 0) {
-    platform_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.platform_);
-  }
-  device_mac_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.device_mac().size() > 0) {
-    device_mac_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.device_mac_);
-  }
-  token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.token().size() > 0) {
-    token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
-  }
-  last_login_ip_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.last_login_ip().size() > 0) {
-    last_login_ip_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.last_login_ip_);
-  }
-  ::memcpy(&user_id_, &from.user_id_,
-    static_cast<size_t>(reinterpret_cast<char*>(&last_login_time_) -
-    reinterpret_cast<char*>(&user_id_)) + sizeof(last_login_time_));
-  // @@protoc_insertion_point(copy_constructor:account.user_info)
+  flag_ = from.flag_;
+  // @@protoc_insertion_point(copy_constructor:db.mongo.insert)
 }
 
-void account_user_info::SharedCtor() {
+void mongo_insert::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
-      &scc_info_account_user_info_db_2eproto.base);
-  account_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  password_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  platform_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  device_mac_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  last_login_ip_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&user_id_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&last_login_time_) -
-      reinterpret_cast<char*>(&user_id_)) + sizeof(last_login_time_));
+      &scc_info_mongo_insert_db_2eproto.base);
+  tab_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  json_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  flag_ = 0;
 }
 
-account_user_info::~account_user_info() {
-  // @@protoc_insertion_point(destructor:account.user_info)
+mongo_insert::~mongo_insert() {
+  // @@protoc_insertion_point(destructor:db.mongo.insert)
   SharedDtor();
 }
 
-void account_user_info::SharedDtor() {
-  account_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  password_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  platform_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  device_mac_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  token_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  last_login_ip_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+void mongo_insert::SharedDtor() {
+  tab_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  json_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
-void account_user_info::SetCachedSize(int size) const {
+void mongo_insert::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const account_user_info& account_user_info::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_account_user_info_db_2eproto.base);
+const mongo_insert& mongo_insert::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_mongo_insert_db_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void account_user_info::Clear() {
-// @@protoc_insertion_point(message_clear_start:account.user_info)
+void mongo_insert::Clear() {
+// @@protoc_insertion_point(message_clear_start:db.mongo.insert)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  account_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  password_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  platform_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  device_mac_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  last_login_ip_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&user_id_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&last_login_time_) -
-      reinterpret_cast<char*>(&user_id_)) + sizeof(last_login_time_));
+  tab_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  json_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  flag_ = 0;
   _internal_metadata_.Clear();
 }
 
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* account_user_info::_InternalParse(const char* begin, const char* end, void* object,
+const char* mongo_insert::_InternalParse(const char* begin, const char* end, void* object,
                   ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<account_user_info*>(object);
+  auto msg = static_cast<mongo_insert*>(object);
   ::google::protobuf::int32 size; (void)size;
   int depth; (void)depth;
   ::google::protobuf::uint32 tag;
@@ -251,13 +462,13 @@ const char* account_user_info::_InternalParse(const char* begin, const char* end
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // string account = 1;
+      // string tab = 1;
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("account.user_info.account");
-        object = msg->mutable_account();
+        ctx->extra_parse_data().SetFieldName("db.mongo.insert.tab");
+        object = msg->mutable_tab();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
           goto string_till_end;
@@ -267,20 +478,412 @@ const char* account_user_info::_InternalParse(const char* begin, const char* end
         ptr += size;
         break;
       }
-      // int64 user_id = 2;
+      // string json = 2;
       case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 16) goto handle_unusual;
-        msg->set_user_id(::google::protobuf::internal::ReadVarint(&ptr));
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("db.mongo.insert.json");
+        object = msg->mutable_json();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
         break;
       }
-      // string password = 3;
+      // int32 flag = 3;
       case 3: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
+        msg->set_flag(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool mongo_insert::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:db.mongo.insert)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // string tab = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_tab()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->tab().data(), static_cast<int>(this->tab().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "db.mongo.insert.tab"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string json = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_json()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->json().data(), static_cast<int>(this->json().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "db.mongo.insert.json"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // int32 flag = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (24 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &flag_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:db.mongo.insert)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:db.mongo.insert)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void mongo_insert::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:db.mongo.insert)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string tab = 1;
+  if (this->tab().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->tab().data(), static_cast<int>(this->tab().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.insert.tab");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->tab(), output);
+  }
+
+  // string json = 2;
+  if (this->json().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->json().data(), static_cast<int>(this->json().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.insert.json");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->json(), output);
+  }
+
+  // int32 flag = 3;
+  if (this->flag() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->flag(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:db.mongo.insert)
+}
+
+::google::protobuf::uint8* mongo_insert::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:db.mongo.insert)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string tab = 1;
+  if (this->tab().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->tab().data(), static_cast<int>(this->tab().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.insert.tab");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->tab(), target);
+  }
+
+  // string json = 2;
+  if (this->json().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->json().data(), static_cast<int>(this->json().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.insert.json");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->json(), target);
+  }
+
+  // int32 flag = 3;
+  if (this->flag() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->flag(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:db.mongo.insert)
+  return target;
+}
+
+size_t mongo_insert::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:db.mongo.insert)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string tab = 1;
+  if (this->tab().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->tab());
+  }
+
+  // string json = 2;
+  if (this->json().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->json());
+  }
+
+  // int32 flag = 3;
+  if (this->flag() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->flag());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void mongo_insert::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:db.mongo.insert)
+  GOOGLE_DCHECK_NE(&from, this);
+  const mongo_insert* source =
+      ::google::protobuf::DynamicCastToGenerated<mongo_insert>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:db.mongo.insert)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:db.mongo.insert)
+    MergeFrom(*source);
+  }
+}
+
+void mongo_insert::MergeFrom(const mongo_insert& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:db.mongo.insert)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.tab().size() > 0) {
+
+    tab_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.tab_);
+  }
+  if (from.json().size() > 0) {
+
+    json_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.json_);
+  }
+  if (from.flag() != 0) {
+    set_flag(from.flag());
+  }
+}
+
+void mongo_insert::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:db.mongo.insert)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void mongo_insert::CopyFrom(const mongo_insert& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:db.mongo.insert)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool mongo_insert::IsInitialized() const {
+  return true;
+}
+
+void mongo_insert::Swap(mongo_insert* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void mongo_insert::InternalSwap(mongo_insert* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  tab_.Swap(&other->tab_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  json_.Swap(&other->json_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  swap(flag_, other->flag_);
+}
+
+::google::protobuf::Metadata mongo_insert::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_db_2eproto);
+  return ::file_level_metadata_db_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void mongo_query_request::InitAsDefaultInstance() {
+}
+class mongo_query_request::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int mongo_query_request::kTabFieldNumber;
+const int mongo_query_request::kJsonFieldNumber;
+const int mongo_query_request::kLimitFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+mongo_query_request::mongo_query_request()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:db.mongo.query.request)
+}
+mongo_query_request::mongo_query_request(const mongo_query_request& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  tab_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.tab().size() > 0) {
+    tab_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.tab_);
+  }
+  json_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.json().size() > 0) {
+    json_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.json_);
+  }
+  limit_ = from.limit_;
+  // @@protoc_insertion_point(copy_constructor:db.mongo.query.request)
+}
+
+void mongo_query_request::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_mongo_query_request_db_2eproto.base);
+  tab_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  json_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  limit_ = 0;
+}
+
+mongo_query_request::~mongo_query_request() {
+  // @@protoc_insertion_point(destructor:db.mongo.query.request)
+  SharedDtor();
+}
+
+void mongo_query_request::SharedDtor() {
+  tab_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  json_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void mongo_query_request::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const mongo_query_request& mongo_query_request::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_mongo_query_request_db_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void mongo_query_request::Clear() {
+// @@protoc_insertion_point(message_clear_start:db.mongo.query.request)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  tab_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  json_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  limit_ = 0;
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* mongo_query_request::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<mongo_query_request*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // string tab = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("account.user_info.password");
-        object = msg->mutable_password();
+        ctx->extra_parse_data().SetFieldName("db.mongo.query.request.tab");
+        object = msg->mutable_tab();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
           goto string_till_end;
@@ -290,13 +893,1372 @@ const char* account_user_info::_InternalParse(const char* begin, const char* end
         ptr += size;
         break;
       }
-      // string platform = 4;
+      // string json = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("db.mongo.query.request.json");
+        object = msg->mutable_json();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // int32 limit = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
+        msg->set_limit(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool mongo_query_request::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:db.mongo.query.request)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // string tab = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_tab()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->tab().data(), static_cast<int>(this->tab().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "db.mongo.query.request.tab"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string json = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_json()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->json().data(), static_cast<int>(this->json().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "db.mongo.query.request.json"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // int32 limit = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (24 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &limit_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:db.mongo.query.request)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:db.mongo.query.request)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void mongo_query_request::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:db.mongo.query.request)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string tab = 1;
+  if (this->tab().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->tab().data(), static_cast<int>(this->tab().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.query.request.tab");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->tab(), output);
+  }
+
+  // string json = 2;
+  if (this->json().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->json().data(), static_cast<int>(this->json().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.query.request.json");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->json(), output);
+  }
+
+  // int32 limit = 3;
+  if (this->limit() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->limit(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:db.mongo.query.request)
+}
+
+::google::protobuf::uint8* mongo_query_request::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:db.mongo.query.request)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string tab = 1;
+  if (this->tab().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->tab().data(), static_cast<int>(this->tab().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.query.request.tab");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->tab(), target);
+  }
+
+  // string json = 2;
+  if (this->json().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->json().data(), static_cast<int>(this->json().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.query.request.json");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->json(), target);
+  }
+
+  // int32 limit = 3;
+  if (this->limit() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->limit(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:db.mongo.query.request)
+  return target;
+}
+
+size_t mongo_query_request::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:db.mongo.query.request)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string tab = 1;
+  if (this->tab().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->tab());
+  }
+
+  // string json = 2;
+  if (this->json().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->json());
+  }
+
+  // int32 limit = 3;
+  if (this->limit() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->limit());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void mongo_query_request::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:db.mongo.query.request)
+  GOOGLE_DCHECK_NE(&from, this);
+  const mongo_query_request* source =
+      ::google::protobuf::DynamicCastToGenerated<mongo_query_request>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:db.mongo.query.request)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:db.mongo.query.request)
+    MergeFrom(*source);
+  }
+}
+
+void mongo_query_request::MergeFrom(const mongo_query_request& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:db.mongo.query.request)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.tab().size() > 0) {
+
+    tab_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.tab_);
+  }
+  if (from.json().size() > 0) {
+
+    json_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.json_);
+  }
+  if (from.limit() != 0) {
+    set_limit(from.limit());
+  }
+}
+
+void mongo_query_request::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:db.mongo.query.request)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void mongo_query_request::CopyFrom(const mongo_query_request& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:db.mongo.query.request)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool mongo_query_request::IsInitialized() const {
+  return true;
+}
+
+void mongo_query_request::Swap(mongo_query_request* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void mongo_query_request::InternalSwap(mongo_query_request* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  tab_.Swap(&other->tab_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  json_.Swap(&other->json_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  swap(limit_, other->limit_);
+}
+
+::google::protobuf::Metadata mongo_query_request::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_db_2eproto);
+  return ::file_level_metadata_db_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void mongo_query_response::InitAsDefaultInstance() {
+}
+class mongo_query_response::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int mongo_query_response::kJsonsFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+mongo_query_response::mongo_query_response()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:db.mongo.query.response)
+}
+mongo_query_response::mongo_query_response(const mongo_query_response& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr),
+      jsons_(from.jsons_) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:db.mongo.query.response)
+}
+
+void mongo_query_response::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_mongo_query_response_db_2eproto.base);
+}
+
+mongo_query_response::~mongo_query_response() {
+  // @@protoc_insertion_point(destructor:db.mongo.query.response)
+  SharedDtor();
+}
+
+void mongo_query_response::SharedDtor() {
+}
+
+void mongo_query_response::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const mongo_query_response& mongo_query_response::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_mongo_query_response_db_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void mongo_query_response::Clear() {
+// @@protoc_insertion_point(message_clear_start:db.mongo.query.response)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  jsons_.Clear();
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* mongo_query_response::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<mongo_query_response*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // repeated string jsons = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          ctx->extra_parse_data().SetFieldName("db.mongo.query.response.jsons");
+          object = msg->add_jsons();
+          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+            goto string_till_end;
+          }
+          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+          ptr += size;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 10 && (ptr += 1));
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool mongo_query_response::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:db.mongo.query.response)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // repeated string jsons = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_jsons()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->jsons(this->jsons_size() - 1).data(),
+            static_cast<int>(this->jsons(this->jsons_size() - 1).length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "db.mongo.query.response.jsons"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:db.mongo.query.response)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:db.mongo.query.response)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void mongo_query_response::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:db.mongo.query.response)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated string jsons = 1;
+  for (int i = 0, n = this->jsons_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->jsons(i).data(), static_cast<int>(this->jsons(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.query.response.jsons");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      1, this->jsons(i), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:db.mongo.query.response)
+}
+
+::google::protobuf::uint8* mongo_query_response::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:db.mongo.query.response)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated string jsons = 1;
+  for (int i = 0, n = this->jsons_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->jsons(i).data(), static_cast<int>(this->jsons(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.query.response.jsons");
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(1, this->jsons(i), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:db.mongo.query.response)
+  return target;
+}
+
+size_t mongo_query_response::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:db.mongo.query.response)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated string jsons = 1;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->jsons_size());
+  for (int i = 0, n = this->jsons_size(); i < n; i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->jsons(i));
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void mongo_query_response::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:db.mongo.query.response)
+  GOOGLE_DCHECK_NE(&from, this);
+  const mongo_query_response* source =
+      ::google::protobuf::DynamicCastToGenerated<mongo_query_response>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:db.mongo.query.response)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:db.mongo.query.response)
+    MergeFrom(*source);
+  }
+}
+
+void mongo_query_response::MergeFrom(const mongo_query_response& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:db.mongo.query.response)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  jsons_.MergeFrom(from.jsons_);
+}
+
+void mongo_query_response::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:db.mongo.query.response)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void mongo_query_response::CopyFrom(const mongo_query_response& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:db.mongo.query.response)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool mongo_query_response::IsInitialized() const {
+  return true;
+}
+
+void mongo_query_response::Swap(mongo_query_response* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void mongo_query_response::InternalSwap(mongo_query_response* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  jsons_.InternalSwap(CastToBase(&other->jsons_));
+}
+
+::google::protobuf::Metadata mongo_query_response::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_db_2eproto);
+  return ::file_level_metadata_db_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void mongo_query::InitAsDefaultInstance() {
+}
+class mongo_query::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+mongo_query::mongo_query()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:db.mongo.query)
+}
+mongo_query::mongo_query(const mongo_query& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:db.mongo.query)
+}
+
+void mongo_query::SharedCtor() {
+}
+
+mongo_query::~mongo_query() {
+  // @@protoc_insertion_point(destructor:db.mongo.query)
+  SharedDtor();
+}
+
+void mongo_query::SharedDtor() {
+}
+
+void mongo_query::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const mongo_query& mongo_query::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_mongo_query_db_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void mongo_query::Clear() {
+// @@protoc_insertion_point(message_clear_start:db.mongo.query)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* mongo_query::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<mongo_query*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      default: {
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool mongo_query::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:db.mongo.query)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+  handle_unusual:
+    if (tag == 0) {
+      goto success;
+    }
+    DO_(::google::protobuf::internal::WireFormat::SkipField(
+          input, tag, _internal_metadata_.mutable_unknown_fields()));
+  }
+success:
+  // @@protoc_insertion_point(parse_success:db.mongo.query)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:db.mongo.query)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void mongo_query::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:db.mongo.query)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:db.mongo.query)
+}
+
+::google::protobuf::uint8* mongo_query::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:db.mongo.query)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:db.mongo.query)
+  return target;
+}
+
+size_t mongo_query::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:db.mongo.query)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void mongo_query::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:db.mongo.query)
+  GOOGLE_DCHECK_NE(&from, this);
+  const mongo_query* source =
+      ::google::protobuf::DynamicCastToGenerated<mongo_query>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:db.mongo.query)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:db.mongo.query)
+    MergeFrom(*source);
+  }
+}
+
+void mongo_query::MergeFrom(const mongo_query& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:db.mongo.query)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+}
+
+void mongo_query::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:db.mongo.query)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void mongo_query::CopyFrom(const mongo_query& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:db.mongo.query)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool mongo_query::IsInitialized() const {
+  return true;
+}
+
+void mongo_query::Swap(mongo_query* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void mongo_query::InternalSwap(mongo_query* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+}
+
+::google::protobuf::Metadata mongo_query::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_db_2eproto);
+  return ::file_level_metadata_db_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void mongo_remove::InitAsDefaultInstance() {
+}
+class mongo_remove::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int mongo_remove::kTabFieldNumber;
+const int mongo_remove::kJsonFieldNumber;
+const int mongo_remove::kLimitFieldNumber;
+const int mongo_remove::kFlagFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+mongo_remove::mongo_remove()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:db.mongo.remove)
+}
+mongo_remove::mongo_remove(const mongo_remove& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  tab_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.tab().size() > 0) {
+    tab_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.tab_);
+  }
+  json_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.json().size() > 0) {
+    json_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.json_);
+  }
+  ::memcpy(&limit_, &from.limit_,
+    static_cast<size_t>(reinterpret_cast<char*>(&flag_) -
+    reinterpret_cast<char*>(&limit_)) + sizeof(flag_));
+  // @@protoc_insertion_point(copy_constructor:db.mongo.remove)
+}
+
+void mongo_remove::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_mongo_remove_db_2eproto.base);
+  tab_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  json_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::memset(&limit_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&flag_) -
+      reinterpret_cast<char*>(&limit_)) + sizeof(flag_));
+}
+
+mongo_remove::~mongo_remove() {
+  // @@protoc_insertion_point(destructor:db.mongo.remove)
+  SharedDtor();
+}
+
+void mongo_remove::SharedDtor() {
+  tab_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  json_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void mongo_remove::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const mongo_remove& mongo_remove::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_mongo_remove_db_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void mongo_remove::Clear() {
+// @@protoc_insertion_point(message_clear_start:db.mongo.remove)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  tab_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  json_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::memset(&limit_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&flag_) -
+      reinterpret_cast<char*>(&limit_)) + sizeof(flag_));
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* mongo_remove::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<mongo_remove*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // string tab = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("db.mongo.remove.tab");
+        object = msg->mutable_tab();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // string json = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("db.mongo.remove.json");
+        object = msg->mutable_json();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // int32 limit = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
+        msg->set_limit(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // int32 flag = 4;
       case 4: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        if (static_cast<::google::protobuf::uint8>(tag) != 32) goto handle_unusual;
+        msg->set_flag(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool mongo_remove::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:db.mongo.remove)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // string tab = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_tab()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->tab().data(), static_cast<int>(this->tab().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "db.mongo.remove.tab"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string json = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_json()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->json().data(), static_cast<int>(this->json().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "db.mongo.remove.json"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // int32 limit = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (24 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &limit_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // int32 flag = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (32 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &flag_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:db.mongo.remove)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:db.mongo.remove)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void mongo_remove::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:db.mongo.remove)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string tab = 1;
+  if (this->tab().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->tab().data(), static_cast<int>(this->tab().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.remove.tab");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->tab(), output);
+  }
+
+  // string json = 2;
+  if (this->json().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->json().data(), static_cast<int>(this->json().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.remove.json");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->json(), output);
+  }
+
+  // int32 limit = 3;
+  if (this->limit() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->limit(), output);
+  }
+
+  // int32 flag = 4;
+  if (this->flag() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(4, this->flag(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:db.mongo.remove)
+}
+
+::google::protobuf::uint8* mongo_remove::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:db.mongo.remove)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string tab = 1;
+  if (this->tab().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->tab().data(), static_cast<int>(this->tab().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.remove.tab");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->tab(), target);
+  }
+
+  // string json = 2;
+  if (this->json().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->json().data(), static_cast<int>(this->json().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.remove.json");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->json(), target);
+  }
+
+  // int32 limit = 3;
+  if (this->limit() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->limit(), target);
+  }
+
+  // int32 flag = 4;
+  if (this->flag() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(4, this->flag(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:db.mongo.remove)
+  return target;
+}
+
+size_t mongo_remove::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:db.mongo.remove)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string tab = 1;
+  if (this->tab().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->tab());
+  }
+
+  // string json = 2;
+  if (this->json().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->json());
+  }
+
+  // int32 limit = 3;
+  if (this->limit() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->limit());
+  }
+
+  // int32 flag = 4;
+  if (this->flag() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->flag());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void mongo_remove::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:db.mongo.remove)
+  GOOGLE_DCHECK_NE(&from, this);
+  const mongo_remove* source =
+      ::google::protobuf::DynamicCastToGenerated<mongo_remove>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:db.mongo.remove)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:db.mongo.remove)
+    MergeFrom(*source);
+  }
+}
+
+void mongo_remove::MergeFrom(const mongo_remove& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:db.mongo.remove)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.tab().size() > 0) {
+
+    tab_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.tab_);
+  }
+  if (from.json().size() > 0) {
+
+    json_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.json_);
+  }
+  if (from.limit() != 0) {
+    set_limit(from.limit());
+  }
+  if (from.flag() != 0) {
+    set_flag(from.flag());
+  }
+}
+
+void mongo_remove::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:db.mongo.remove)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void mongo_remove::CopyFrom(const mongo_remove& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:db.mongo.remove)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool mongo_remove::IsInitialized() const {
+  return true;
+}
+
+void mongo_remove::Swap(mongo_remove* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void mongo_remove::InternalSwap(mongo_remove* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  tab_.Swap(&other->tab_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  json_.Swap(&other->json_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  swap(limit_, other->limit_);
+  swap(flag_, other->flag_);
+}
+
+::google::protobuf::Metadata mongo_remove::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_db_2eproto);
+  return ::file_level_metadata_db_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void mongo_index::InitAsDefaultInstance() {
+}
+class mongo_index::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int mongo_index::kTabFieldNumber;
+const int mongo_index::kNameFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+mongo_index::mongo_index()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:db.mongo.index)
+}
+mongo_index::mongo_index(const mongo_index& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  tab_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.tab().size() > 0) {
+    tab_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.tab_);
+  }
+  name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.name().size() > 0) {
+    name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
+  }
+  // @@protoc_insertion_point(copy_constructor:db.mongo.index)
+}
+
+void mongo_index::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_mongo_index_db_2eproto.base);
+  tab_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+mongo_index::~mongo_index() {
+  // @@protoc_insertion_point(destructor:db.mongo.index)
+  SharedDtor();
+}
+
+void mongo_index::SharedDtor() {
+  tab_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void mongo_index::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const mongo_index& mongo_index::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_mongo_index_db_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void mongo_index::Clear() {
+// @@protoc_insertion_point(message_clear_start:db.mongo.index)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  tab_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* mongo_index::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<mongo_index*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // string tab = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("account.user_info.platform");
-        object = msg->mutable_platform();
+        ctx->extra_parse_data().SetFieldName("db.mongo.index.tab");
+        object = msg->mutable_tab();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
           goto string_till_end;
@@ -306,66 +2268,13 @@ const char* account_user_info::_InternalParse(const char* begin, const char* end
         ptr += size;
         break;
       }
-      // int64 phone_num = 5;
-      case 5: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 40) goto handle_unusual;
-        msg->set_phone_num(::google::protobuf::internal::ReadVarint(&ptr));
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        break;
-      }
-      // string device_mac = 6;
-      case 6: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 50) goto handle_unusual;
+      // string name = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("account.user_info.device_mac");
-        object = msg->mutable_device_mac();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      // int64 register_time = 7;
-      case 7: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 56) goto handle_unusual;
-        msg->set_register_time(::google::protobuf::internal::ReadVarint(&ptr));
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        break;
-      }
-      // int64 last_login_time = 8;
-      case 8: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 64) goto handle_unusual;
-        msg->set_last_login_time(::google::protobuf::internal::ReadVarint(&ptr));
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        break;
-      }
-      // string token = 9;
-      case 9: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 74) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("account.user_info.token");
-        object = msg->mutable_token();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      // string last_login_ip = 10;
-      case 10: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 82) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("account.user_info.last_login_ip");
-        object = msg->mutable_last_login_ip();
+        ctx->extra_parse_data().SetFieldName("db.mongo.index.name");
+        object = msg->mutable_name();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
           goto string_till_end;
@@ -399,152 +2308,40 @@ len_delim_till_end:
                                {parser_till_end, object}, size);
 }
 #else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool account_user_info::MergePartialFromCodedStream(
+bool mongo_index::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:account.user_info)
+  // @@protoc_insertion_point(parse_start:db.mongo.index)
   for (;;) {
     ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // string account = 1;
+      // string tab = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_account()));
+                input, this->mutable_tab()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->account().data(), static_cast<int>(this->account().length()),
+            this->tab().data(), static_cast<int>(this->tab().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "account.user_info.account"));
+            "db.mongo.index.tab"));
         } else {
           goto handle_unusual;
         }
         break;
       }
 
-      // int64 user_id = 2;
+      // string name = 2;
       case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (16 & 0xFF)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &user_id_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string password = 3;
-      case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_password()));
+                input, this->mutable_name()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->password().data(), static_cast<int>(this->password().length()),
+            this->name().data(), static_cast<int>(this->name().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "account.user_info.password"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string platform = 4;
-      case 4: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_platform()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->platform().data(), static_cast<int>(this->platform().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "account.user_info.platform"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // int64 phone_num = 5;
-      case 5: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (40 & 0xFF)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &phone_num_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string device_mac = 6;
-      case 6: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (50 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_device_mac()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->device_mac().data(), static_cast<int>(this->device_mac().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "account.user_info.device_mac"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // int64 register_time = 7;
-      case 7: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (56 & 0xFF)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &register_time_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // int64 last_login_time = 8;
-      case 8: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (64 & 0xFF)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &last_login_time_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string token = 9;
-      case 9: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (74 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_token()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->token().data(), static_cast<int>(this->token().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "account.user_info.token"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string last_login_ip = 10;
-      case 10: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (82 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_last_login_ip()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->last_login_ip().data(), static_cast<int>(this->last_login_ip().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "account.user_info.last_login_ip"));
+            "db.mongo.index.name"));
         } else {
           goto handle_unusual;
         }
@@ -563,210 +2360,86 @@ bool account_user_info::MergePartialFromCodedStream(
     }
   }
 success:
-  // @@protoc_insertion_point(parse_success:account.user_info)
+  // @@protoc_insertion_point(parse_success:db.mongo.index)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:account.user_info)
+  // @@protoc_insertion_point(parse_failure:db.mongo.index)
   return false;
 #undef DO_
 }
 #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
-void account_user_info::SerializeWithCachedSizes(
+void mongo_index::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:account.user_info)
+  // @@protoc_insertion_point(serialize_start:db.mongo.index)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string account = 1;
-  if (this->account().size() > 0) {
+  // string tab = 1;
+  if (this->tab().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->account().data(), static_cast<int>(this->account().length()),
+      this->tab().data(), static_cast<int>(this->tab().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "account.user_info.account");
+      "db.mongo.index.tab");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      1, this->account(), output);
+      1, this->tab(), output);
   }
 
-  // int64 user_id = 2;
-  if (this->user_id() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(2, this->user_id(), output);
-  }
-
-  // string password = 3;
-  if (this->password().size() > 0) {
+  // string name = 2;
+  if (this->name().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->password().data(), static_cast<int>(this->password().length()),
+      this->name().data(), static_cast<int>(this->name().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "account.user_info.password");
+      "db.mongo.index.name");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      3, this->password(), output);
-  }
-
-  // string platform = 4;
-  if (this->platform().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->platform().data(), static_cast<int>(this->platform().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "account.user_info.platform");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      4, this->platform(), output);
-  }
-
-  // int64 phone_num = 5;
-  if (this->phone_num() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(5, this->phone_num(), output);
-  }
-
-  // string device_mac = 6;
-  if (this->device_mac().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->device_mac().data(), static_cast<int>(this->device_mac().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "account.user_info.device_mac");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      6, this->device_mac(), output);
-  }
-
-  // int64 register_time = 7;
-  if (this->register_time() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(7, this->register_time(), output);
-  }
-
-  // int64 last_login_time = 8;
-  if (this->last_login_time() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(8, this->last_login_time(), output);
-  }
-
-  // string token = 9;
-  if (this->token().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->token().data(), static_cast<int>(this->token().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "account.user_info.token");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      9, this->token(), output);
-  }
-
-  // string last_login_ip = 10;
-  if (this->last_login_ip().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->last_login_ip().data(), static_cast<int>(this->last_login_ip().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "account.user_info.last_login_ip");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      10, this->last_login_ip(), output);
+      2, this->name(), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:account.user_info)
+  // @@protoc_insertion_point(serialize_end:db.mongo.index)
 }
 
-::google::protobuf::uint8* account_user_info::InternalSerializeWithCachedSizesToArray(
+::google::protobuf::uint8* mongo_index::InternalSerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:account.user_info)
+  // @@protoc_insertion_point(serialize_to_array_start:db.mongo.index)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string account = 1;
-  if (this->account().size() > 0) {
+  // string tab = 1;
+  if (this->tab().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->account().data(), static_cast<int>(this->account().length()),
+      this->tab().data(), static_cast<int>(this->tab().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "account.user_info.account");
+      "db.mongo.index.tab");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        1, this->account(), target);
+        1, this->tab(), target);
   }
 
-  // int64 user_id = 2;
-  if (this->user_id() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(2, this->user_id(), target);
-  }
-
-  // string password = 3;
-  if (this->password().size() > 0) {
+  // string name = 2;
+  if (this->name().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->password().data(), static_cast<int>(this->password().length()),
+      this->name().data(), static_cast<int>(this->name().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "account.user_info.password");
+      "db.mongo.index.name");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        3, this->password(), target);
-  }
-
-  // string platform = 4;
-  if (this->platform().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->platform().data(), static_cast<int>(this->platform().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "account.user_info.platform");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        4, this->platform(), target);
-  }
-
-  // int64 phone_num = 5;
-  if (this->phone_num() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(5, this->phone_num(), target);
-  }
-
-  // string device_mac = 6;
-  if (this->device_mac().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->device_mac().data(), static_cast<int>(this->device_mac().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "account.user_info.device_mac");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        6, this->device_mac(), target);
-  }
-
-  // int64 register_time = 7;
-  if (this->register_time() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(7, this->register_time(), target);
-  }
-
-  // int64 last_login_time = 8;
-  if (this->last_login_time() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(8, this->last_login_time(), target);
-  }
-
-  // string token = 9;
-  if (this->token().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->token().data(), static_cast<int>(this->token().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "account.user_info.token");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        9, this->token(), target);
-  }
-
-  // string last_login_ip = 10;
-  if (this->last_login_ip().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->last_login_ip().data(), static_cast<int>(this->last_login_ip().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "account.user_info.last_login_ip");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        10, this->last_login_ip(), target);
+        2, this->name(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:account.user_info)
+  // @@protoc_insertion_point(serialize_to_array_end:db.mongo.index)
   return target;
 }
 
-size_t account_user_info::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:account.user_info)
+size_t mongo_index::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:db.mongo.index)
   size_t total_size = 0;
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -778,74 +2451,18 @@ size_t account_user_info::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string account = 1;
-  if (this->account().size() > 0) {
+  // string tab = 1;
+  if (this->tab().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->account());
+        this->tab());
   }
 
-  // string password = 3;
-  if (this->password().size() > 0) {
+  // string name = 2;
+  if (this->name().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->password());
-  }
-
-  // string platform = 4;
-  if (this->platform().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->platform());
-  }
-
-  // string device_mac = 6;
-  if (this->device_mac().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->device_mac());
-  }
-
-  // string token = 9;
-  if (this->token().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->token());
-  }
-
-  // string last_login_ip = 10;
-  if (this->last_login_ip().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->last_login_ip());
-  }
-
-  // int64 user_id = 2;
-  if (this->user_id() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->user_id());
-  }
-
-  // int64 phone_num = 5;
-  if (this->phone_num() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->phone_num());
-  }
-
-  // int64 register_time = 7;
-  if (this->register_time() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->register_time());
-  }
-
-  // int64 last_login_time = 8;
-  if (this->last_login_time() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->last_login_time());
+        this->name());
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -853,110 +2470,70 @@ size_t account_user_info::ByteSizeLong() const {
   return total_size;
 }
 
-void account_user_info::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:account.user_info)
+void mongo_index::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:db.mongo.index)
   GOOGLE_DCHECK_NE(&from, this);
-  const account_user_info* source =
-      ::google::protobuf::DynamicCastToGenerated<account_user_info>(
+  const mongo_index* source =
+      ::google::protobuf::DynamicCastToGenerated<mongo_index>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:account.user_info)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:db.mongo.index)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:account.user_info)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:db.mongo.index)
     MergeFrom(*source);
   }
 }
 
-void account_user_info::MergeFrom(const account_user_info& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:account.user_info)
+void mongo_index::MergeFrom(const mongo_index& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:db.mongo.index)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.account().size() > 0) {
+  if (from.tab().size() > 0) {
 
-    account_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.account_);
+    tab_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.tab_);
   }
-  if (from.password().size() > 0) {
+  if (from.name().size() > 0) {
 
-    password_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.password_);
-  }
-  if (from.platform().size() > 0) {
-
-    platform_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.platform_);
-  }
-  if (from.device_mac().size() > 0) {
-
-    device_mac_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.device_mac_);
-  }
-  if (from.token().size() > 0) {
-
-    token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
-  }
-  if (from.last_login_ip().size() > 0) {
-
-    last_login_ip_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.last_login_ip_);
-  }
-  if (from.user_id() != 0) {
-    set_user_id(from.user_id());
-  }
-  if (from.phone_num() != 0) {
-    set_phone_num(from.phone_num());
-  }
-  if (from.register_time() != 0) {
-    set_register_time(from.register_time());
-  }
-  if (from.last_login_time() != 0) {
-    set_last_login_time(from.last_login_time());
+    name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
   }
 }
 
-void account_user_info::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:account.user_info)
+void mongo_index::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:db.mongo.index)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void account_user_info::CopyFrom(const account_user_info& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:account.user_info)
+void mongo_index::CopyFrom(const mongo_index& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:db.mongo.index)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool account_user_info::IsInitialized() const {
+bool mongo_index::IsInitialized() const {
   return true;
 }
 
-void account_user_info::Swap(account_user_info* other) {
+void mongo_index::Swap(mongo_index* other) {
   if (other == this) return;
   InternalSwap(other);
 }
-void account_user_info::InternalSwap(account_user_info* other) {
+void mongo_index::InternalSwap(mongo_index* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  account_.Swap(&other->account_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  tab_.Swap(&other->tab_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  password_.Swap(&other->password_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  name_.Swap(&other->name_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  platform_.Swap(&other->platform_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  device_mac_.Swap(&other->device_mac_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  token_.Swap(&other->token_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  last_login_ip_.Swap(&other->last_login_ip_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  swap(user_id_, other->user_id_);
-  swap(phone_num_, other->phone_num_);
-  swap(register_time_, other->register_time_);
-  swap(last_login_time_, other->last_login_time_);
 }
 
-::google::protobuf::Metadata account_user_info::GetMetadata() const {
+::google::protobuf::Metadata mongo_index::GetMetadata() const {
   ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_db_2eproto);
   return ::file_level_metadata_db_2eproto[kIndexInFileMessages];
 }
@@ -964,49 +2541,1199 @@ void account_user_info::InternalSwap(account_user_info* other) {
 
 // ===================================================================
 
-void account::InitAsDefaultInstance() {
+void mongo_update::InitAsDefaultInstance() {
 }
-class account::HasBitSetters {
+class mongo_update::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int mongo_update::kTabFieldNumber;
+const int mongo_update::kSelectFieldNumber;
+const int mongo_update::kUpdateFieldNumber;
+const int mongo_update::kTagFieldNumber;
+const int mongo_update::kFlagFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+mongo_update::mongo_update()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:db.mongo.update)
+}
+mongo_update::mongo_update(const mongo_update& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  tab_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.tab().size() > 0) {
+    tab_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.tab_);
+  }
+  select_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.select().size() > 0) {
+    select_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.select_);
+  }
+  update_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.update().size() > 0) {
+    update_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.update_);
+  }
+  tag_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.tag().size() > 0) {
+    tag_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.tag_);
+  }
+  flag_ = from.flag_;
+  // @@protoc_insertion_point(copy_constructor:db.mongo.update)
+}
+
+void mongo_update::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_mongo_update_db_2eproto.base);
+  tab_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  select_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  update_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  tag_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  flag_ = 0;
+}
+
+mongo_update::~mongo_update() {
+  // @@protoc_insertion_point(destructor:db.mongo.update)
+  SharedDtor();
+}
+
+void mongo_update::SharedDtor() {
+  tab_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  select_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  update_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  tag_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void mongo_update::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const mongo_update& mongo_update::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_mongo_update_db_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void mongo_update::Clear() {
+// @@protoc_insertion_point(message_clear_start:db.mongo.update)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  tab_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  select_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  update_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  tag_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  flag_ = 0;
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* mongo_update::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<mongo_update*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // string tab = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("db.mongo.update.tab");
+        object = msg->mutable_tab();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // string select = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("db.mongo.update.select");
+        object = msg->mutable_select();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // string update = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("db.mongo.update.update");
+        object = msg->mutable_update();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // string tag = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("db.mongo.update.tag");
+        object = msg->mutable_tag();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // int32 flag = 5;
+      case 5: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 40) goto handle_unusual;
+        msg->set_flag(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool mongo_update::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:db.mongo.update)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // string tab = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_tab()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->tab().data(), static_cast<int>(this->tab().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "db.mongo.update.tab"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string select = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_select()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->select().data(), static_cast<int>(this->select().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "db.mongo.update.select"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string update = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_update()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->update().data(), static_cast<int>(this->update().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "db.mongo.update.update"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string tag = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_tag()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->tag().data(), static_cast<int>(this->tag().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "db.mongo.update.tag"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // int32 flag = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (40 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &flag_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:db.mongo.update)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:db.mongo.update)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void mongo_update::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:db.mongo.update)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string tab = 1;
+  if (this->tab().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->tab().data(), static_cast<int>(this->tab().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.update.tab");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->tab(), output);
+  }
+
+  // string select = 2;
+  if (this->select().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->select().data(), static_cast<int>(this->select().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.update.select");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->select(), output);
+  }
+
+  // string update = 3;
+  if (this->update().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->update().data(), static_cast<int>(this->update().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.update.update");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      3, this->update(), output);
+  }
+
+  // string tag = 4;
+  if (this->tag().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->tag().data(), static_cast<int>(this->tag().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.update.tag");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      4, this->tag(), output);
+  }
+
+  // int32 flag = 5;
+  if (this->flag() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(5, this->flag(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:db.mongo.update)
+}
+
+::google::protobuf::uint8* mongo_update::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:db.mongo.update)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string tab = 1;
+  if (this->tab().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->tab().data(), static_cast<int>(this->tab().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.update.tab");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->tab(), target);
+  }
+
+  // string select = 2;
+  if (this->select().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->select().data(), static_cast<int>(this->select().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.update.select");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->select(), target);
+  }
+
+  // string update = 3;
+  if (this->update().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->update().data(), static_cast<int>(this->update().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.update.update");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        3, this->update(), target);
+  }
+
+  // string tag = 4;
+  if (this->tag().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->tag().data(), static_cast<int>(this->tag().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.update.tag");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        4, this->tag(), target);
+  }
+
+  // int32 flag = 5;
+  if (this->flag() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(5, this->flag(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:db.mongo.update)
+  return target;
+}
+
+size_t mongo_update::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:db.mongo.update)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string tab = 1;
+  if (this->tab().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->tab());
+  }
+
+  // string select = 2;
+  if (this->select().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->select());
+  }
+
+  // string update = 3;
+  if (this->update().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->update());
+  }
+
+  // string tag = 4;
+  if (this->tag().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->tag());
+  }
+
+  // int32 flag = 5;
+  if (this->flag() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->flag());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void mongo_update::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:db.mongo.update)
+  GOOGLE_DCHECK_NE(&from, this);
+  const mongo_update* source =
+      ::google::protobuf::DynamicCastToGenerated<mongo_update>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:db.mongo.update)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:db.mongo.update)
+    MergeFrom(*source);
+  }
+}
+
+void mongo_update::MergeFrom(const mongo_update& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:db.mongo.update)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.tab().size() > 0) {
+
+    tab_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.tab_);
+  }
+  if (from.select().size() > 0) {
+
+    select_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.select_);
+  }
+  if (from.update().size() > 0) {
+
+    update_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.update_);
+  }
+  if (from.tag().size() > 0) {
+
+    tag_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.tag_);
+  }
+  if (from.flag() != 0) {
+    set_flag(from.flag());
+  }
+}
+
+void mongo_update::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:db.mongo.update)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void mongo_update::CopyFrom(const mongo_update& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:db.mongo.update)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool mongo_update::IsInitialized() const {
+  return true;
+}
+
+void mongo_update::Swap(mongo_update* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void mongo_update::InternalSwap(mongo_update* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  tab_.Swap(&other->tab_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  select_.Swap(&other->select_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  update_.Swap(&other->update_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  tag_.Swap(&other->tag_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  swap(flag_, other->flag_);
+}
+
+::google::protobuf::Metadata mongo_update::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_db_2eproto);
+  return ::file_level_metadata_db_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void mongo_command_request::InitAsDefaultInstance() {
+}
+class mongo_command_request::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int mongo_command_request::kJsonFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+mongo_command_request::mongo_command_request()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:db.mongo.command.request)
+}
+mongo_command_request::mongo_command_request(const mongo_command_request& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  json_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.json().size() > 0) {
+    json_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.json_);
+  }
+  // @@protoc_insertion_point(copy_constructor:db.mongo.command.request)
+}
+
+void mongo_command_request::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_mongo_command_request_db_2eproto.base);
+  json_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+mongo_command_request::~mongo_command_request() {
+  // @@protoc_insertion_point(destructor:db.mongo.command.request)
+  SharedDtor();
+}
+
+void mongo_command_request::SharedDtor() {
+  json_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void mongo_command_request::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const mongo_command_request& mongo_command_request::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_mongo_command_request_db_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void mongo_command_request::Clear() {
+// @@protoc_insertion_point(message_clear_start:db.mongo.command.request)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  json_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* mongo_command_request::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<mongo_command_request*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // string json = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("db.mongo.command.request.json");
+        object = msg->mutable_json();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool mongo_command_request::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:db.mongo.command.request)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // string json = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_json()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->json().data(), static_cast<int>(this->json().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "db.mongo.command.request.json"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:db.mongo.command.request)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:db.mongo.command.request)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void mongo_command_request::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:db.mongo.command.request)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string json = 1;
+  if (this->json().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->json().data(), static_cast<int>(this->json().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.command.request.json");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->json(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:db.mongo.command.request)
+}
+
+::google::protobuf::uint8* mongo_command_request::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:db.mongo.command.request)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string json = 1;
+  if (this->json().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->json().data(), static_cast<int>(this->json().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.command.request.json");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->json(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:db.mongo.command.request)
+  return target;
+}
+
+size_t mongo_command_request::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:db.mongo.command.request)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string json = 1;
+  if (this->json().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->json());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void mongo_command_request::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:db.mongo.command.request)
+  GOOGLE_DCHECK_NE(&from, this);
+  const mongo_command_request* source =
+      ::google::protobuf::DynamicCastToGenerated<mongo_command_request>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:db.mongo.command.request)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:db.mongo.command.request)
+    MergeFrom(*source);
+  }
+}
+
+void mongo_command_request::MergeFrom(const mongo_command_request& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:db.mongo.command.request)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.json().size() > 0) {
+
+    json_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.json_);
+  }
+}
+
+void mongo_command_request::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:db.mongo.command.request)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void mongo_command_request::CopyFrom(const mongo_command_request& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:db.mongo.command.request)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool mongo_command_request::IsInitialized() const {
+  return true;
+}
+
+void mongo_command_request::Swap(mongo_command_request* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void mongo_command_request::InternalSwap(mongo_command_request* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  json_.Swap(&other->json_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+}
+
+::google::protobuf::Metadata mongo_command_request::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_db_2eproto);
+  return ::file_level_metadata_db_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void mongo_command_response::InitAsDefaultInstance() {
+}
+class mongo_command_response::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int mongo_command_response::kJsonsFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+mongo_command_response::mongo_command_response()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:db.mongo.command.response)
+}
+mongo_command_response::mongo_command_response(const mongo_command_response& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr),
+      jsons_(from.jsons_) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:db.mongo.command.response)
+}
+
+void mongo_command_response::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_mongo_command_response_db_2eproto.base);
+}
+
+mongo_command_response::~mongo_command_response() {
+  // @@protoc_insertion_point(destructor:db.mongo.command.response)
+  SharedDtor();
+}
+
+void mongo_command_response::SharedDtor() {
+}
+
+void mongo_command_response::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const mongo_command_response& mongo_command_response::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_mongo_command_response_db_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void mongo_command_response::Clear() {
+// @@protoc_insertion_point(message_clear_start:db.mongo.command.response)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  jsons_.Clear();
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* mongo_command_response::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<mongo_command_response*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // repeated string jsons = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          ctx->extra_parse_data().SetFieldName("db.mongo.command.response.jsons");
+          object = msg->add_jsons();
+          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+            goto string_till_end;
+          }
+          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+          ptr += size;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 10 && (ptr += 1));
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool mongo_command_response::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:db.mongo.command.response)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // repeated string jsons = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_jsons()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->jsons(this->jsons_size() - 1).data(),
+            static_cast<int>(this->jsons(this->jsons_size() - 1).length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "db.mongo.command.response.jsons"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:db.mongo.command.response)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:db.mongo.command.response)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void mongo_command_response::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:db.mongo.command.response)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated string jsons = 1;
+  for (int i = 0, n = this->jsons_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->jsons(i).data(), static_cast<int>(this->jsons(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.command.response.jsons");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      1, this->jsons(i), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:db.mongo.command.response)
+}
+
+::google::protobuf::uint8* mongo_command_response::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:db.mongo.command.response)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated string jsons = 1;
+  for (int i = 0, n = this->jsons_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->jsons(i).data(), static_cast<int>(this->jsons(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.command.response.jsons");
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(1, this->jsons(i), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:db.mongo.command.response)
+  return target;
+}
+
+size_t mongo_command_response::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:db.mongo.command.response)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated string jsons = 1;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->jsons_size());
+  for (int i = 0, n = this->jsons_size(); i < n; i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->jsons(i));
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void mongo_command_response::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:db.mongo.command.response)
+  GOOGLE_DCHECK_NE(&from, this);
+  const mongo_command_response* source =
+      ::google::protobuf::DynamicCastToGenerated<mongo_command_response>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:db.mongo.command.response)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:db.mongo.command.response)
+    MergeFrom(*source);
+  }
+}
+
+void mongo_command_response::MergeFrom(const mongo_command_response& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:db.mongo.command.response)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  jsons_.MergeFrom(from.jsons_);
+}
+
+void mongo_command_response::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:db.mongo.command.response)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void mongo_command_response::CopyFrom(const mongo_command_response& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:db.mongo.command.response)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool mongo_command_response::IsInitialized() const {
+  return true;
+}
+
+void mongo_command_response::Swap(mongo_command_response* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void mongo_command_response::InternalSwap(mongo_command_response* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  jsons_.InternalSwap(CastToBase(&other->jsons_));
+}
+
+::google::protobuf::Metadata mongo_command_response::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_db_2eproto);
+  return ::file_level_metadata_db_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void mongo_command::InitAsDefaultInstance() {
+}
+class mongo_command::HasBitSetters {
  public:
 };
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
-account::account()
+mongo_command::mongo_command()
   : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:account)
+  // @@protoc_insertion_point(constructor:db.mongo.command)
 }
-account::account(const account& from)
+mongo_command::mongo_command(const mongo_command& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  // @@protoc_insertion_point(copy_constructor:account)
+  // @@protoc_insertion_point(copy_constructor:db.mongo.command)
 }
 
-void account::SharedCtor() {
+void mongo_command::SharedCtor() {
 }
 
-account::~account() {
-  // @@protoc_insertion_point(destructor:account)
+mongo_command::~mongo_command() {
+  // @@protoc_insertion_point(destructor:db.mongo.command)
   SharedDtor();
 }
 
-void account::SharedDtor() {
+void mongo_command::SharedDtor() {
 }
 
-void account::SetCachedSize(int size) const {
+void mongo_command::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const account& account::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_account_db_2eproto.base);
+const mongo_command& mongo_command::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_mongo_command_db_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void account::Clear() {
-// @@protoc_insertion_point(message_clear_start:account)
+void mongo_command::Clear() {
+// @@protoc_insertion_point(message_clear_start:db.mongo.command)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -1015,9 +3742,9 @@ void account::Clear() {
 }
 
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* account::_InternalParse(const char* begin, const char* end, void* object,
+const char* mongo_command::_InternalParse(const char* begin, const char* end, void* object,
                   ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<account*>(object);
+  auto msg = static_cast<mongo_command*>(object);
   ::google::protobuf::int32 size; (void)size;
   int depth; (void)depth;
   ::google::protobuf::uint32 tag;
@@ -1043,11 +3770,11 @@ const char* account::_InternalParse(const char* begin, const char* end, void* ob
   return ptr;
 }
 #else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool account::MergePartialFromCodedStream(
+bool mongo_command::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:account)
+  // @@protoc_insertion_point(parse_start:db.mongo.command)
   for (;;) {
     ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
@@ -1060,18 +3787,18 @@ bool account::MergePartialFromCodedStream(
           input, tag, _internal_metadata_.mutable_unknown_fields()));
   }
 success:
-  // @@protoc_insertion_point(parse_success:account)
+  // @@protoc_insertion_point(parse_success:db.mongo.command)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:account)
+  // @@protoc_insertion_point(parse_failure:db.mongo.command)
   return false;
 #undef DO_
 }
 #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
-void account::SerializeWithCachedSizes(
+void mongo_command::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:account)
+  // @@protoc_insertion_point(serialize_start:db.mongo.command)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -1079,12 +3806,12 @@ void account::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:account)
+  // @@protoc_insertion_point(serialize_end:db.mongo.command)
 }
 
-::google::protobuf::uint8* account::InternalSerializeWithCachedSizesToArray(
+::google::protobuf::uint8* mongo_command::InternalSerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:account)
+  // @@protoc_insertion_point(serialize_to_array_start:db.mongo.command)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -1092,12 +3819,12 @@ void account::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:account)
+  // @@protoc_insertion_point(serialize_to_array_end:db.mongo.command)
   return target;
 }
 
-size_t account::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:account)
+size_t mongo_command::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:db.mongo.command)
   size_t total_size = 0;
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1114,23 +3841,23 @@ size_t account::ByteSizeLong() const {
   return total_size;
 }
 
-void account::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:account)
+void mongo_command::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:db.mongo.command)
   GOOGLE_DCHECK_NE(&from, this);
-  const account* source =
-      ::google::protobuf::DynamicCastToGenerated<account>(
+  const mongo_command* source =
+      ::google::protobuf::DynamicCastToGenerated<mongo_command>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:account)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:db.mongo.command)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:account)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:db.mongo.command)
     MergeFrom(*source);
   }
 }
 
-void account::MergeFrom(const account& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:account)
+void mongo_command::MergeFrom(const mongo_command& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:db.mongo.command)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::google::protobuf::uint32 cached_has_bits = 0;
@@ -1138,47 +3865,284 @@ void account::MergeFrom(const account& from) {
 
 }
 
-void account::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:account)
+void mongo_command::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:db.mongo.command)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void account::CopyFrom(const account& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:account)
+void mongo_command::CopyFrom(const mongo_command& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:db.mongo.command)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool account::IsInitialized() const {
+bool mongo_command::IsInitialized() const {
   return true;
 }
 
-void account::Swap(account* other) {
+void mongo_command::Swap(mongo_command* other) {
   if (other == this) return;
   InternalSwap(other);
 }
-void account::InternalSwap(account* other) {
+void mongo_command::InternalSwap(mongo_command* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
 }
 
-::google::protobuf::Metadata account::GetMetadata() const {
+::google::protobuf::Metadata mongo_command::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_db_2eproto);
+  return ::file_level_metadata_db_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void mongo::InitAsDefaultInstance() {
+}
+class mongo::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+mongo::mongo()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:db.mongo)
+}
+mongo::mongo(const mongo& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:db.mongo)
+}
+
+void mongo::SharedCtor() {
+}
+
+mongo::~mongo() {
+  // @@protoc_insertion_point(destructor:db.mongo)
+  SharedDtor();
+}
+
+void mongo::SharedDtor() {
+}
+
+void mongo::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const mongo& mongo::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_mongo_db_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void mongo::Clear() {
+// @@protoc_insertion_point(message_clear_start:db.mongo)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* mongo::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<mongo*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      default: {
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool mongo::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:db.mongo)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+  handle_unusual:
+    if (tag == 0) {
+      goto success;
+    }
+    DO_(::google::protobuf::internal::WireFormat::SkipField(
+          input, tag, _internal_metadata_.mutable_unknown_fields()));
+  }
+success:
+  // @@protoc_insertion_point(parse_success:db.mongo)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:db.mongo)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void mongo::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:db.mongo)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:db.mongo)
+}
+
+::google::protobuf::uint8* mongo::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:db.mongo)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:db.mongo)
+  return target;
+}
+
+size_t mongo::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:db.mongo)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void mongo::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:db.mongo)
+  GOOGLE_DCHECK_NE(&from, this);
+  const mongo* source =
+      ::google::protobuf::DynamicCastToGenerated<mongo>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:db.mongo)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:db.mongo)
+    MergeFrom(*source);
+  }
+}
+
+void mongo::MergeFrom(const mongo& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:db.mongo)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+}
+
+void mongo::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:db.mongo)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void mongo::CopyFrom(const mongo& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:db.mongo)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool mongo::IsInitialized() const {
+  return true;
+}
+
+void mongo::Swap(mongo* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void mongo::InternalSwap(mongo* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+}
+
+::google::protobuf::Metadata mongo::GetMetadata() const {
   ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_db_2eproto);
   return ::file_level_metadata_db_2eproto[kIndexInFileMessages];
 }
 
 
 // @@protoc_insertion_point(namespace_scope)
+}  // namespace db
 namespace google {
 namespace protobuf {
-template<> PROTOBUF_NOINLINE ::account_user_info* Arena::CreateMaybeMessage< ::account_user_info >(Arena* arena) {
-  return Arena::CreateInternal< ::account_user_info >(arena);
+template<> PROTOBUF_NOINLINE ::db::mongo_insert* Arena::CreateMaybeMessage< ::db::mongo_insert >(Arena* arena) {
+  return Arena::CreateInternal< ::db::mongo_insert >(arena);
 }
-template<> PROTOBUF_NOINLINE ::account* Arena::CreateMaybeMessage< ::account >(Arena* arena) {
-  return Arena::CreateInternal< ::account >(arena);
+template<> PROTOBUF_NOINLINE ::db::mongo_query_request* Arena::CreateMaybeMessage< ::db::mongo_query_request >(Arena* arena) {
+  return Arena::CreateInternal< ::db::mongo_query_request >(arena);
+}
+template<> PROTOBUF_NOINLINE ::db::mongo_query_response* Arena::CreateMaybeMessage< ::db::mongo_query_response >(Arena* arena) {
+  return Arena::CreateInternal< ::db::mongo_query_response >(arena);
+}
+template<> PROTOBUF_NOINLINE ::db::mongo_query* Arena::CreateMaybeMessage< ::db::mongo_query >(Arena* arena) {
+  return Arena::CreateInternal< ::db::mongo_query >(arena);
+}
+template<> PROTOBUF_NOINLINE ::db::mongo_remove* Arena::CreateMaybeMessage< ::db::mongo_remove >(Arena* arena) {
+  return Arena::CreateInternal< ::db::mongo_remove >(arena);
+}
+template<> PROTOBUF_NOINLINE ::db::mongo_index* Arena::CreateMaybeMessage< ::db::mongo_index >(Arena* arena) {
+  return Arena::CreateInternal< ::db::mongo_index >(arena);
+}
+template<> PROTOBUF_NOINLINE ::db::mongo_update* Arena::CreateMaybeMessage< ::db::mongo_update >(Arena* arena) {
+  return Arena::CreateInternal< ::db::mongo_update >(arena);
+}
+template<> PROTOBUF_NOINLINE ::db::mongo_command_request* Arena::CreateMaybeMessage< ::db::mongo_command_request >(Arena* arena) {
+  return Arena::CreateInternal< ::db::mongo_command_request >(arena);
+}
+template<> PROTOBUF_NOINLINE ::db::mongo_command_response* Arena::CreateMaybeMessage< ::db::mongo_command_response >(Arena* arena) {
+  return Arena::CreateInternal< ::db::mongo_command_response >(arena);
+}
+template<> PROTOBUF_NOINLINE ::db::mongo_command* Arena::CreateMaybeMessage< ::db::mongo_command >(Arena* arena) {
+  return Arena::CreateInternal< ::db::mongo_command >(arena);
+}
+template<> PROTOBUF_NOINLINE ::db::mongo* Arena::CreateMaybeMessage< ::db::mongo >(Arena* arena) {
+  return Arena::CreateInternal< ::db::mongo >(arena);
 }
 }  // namespace protobuf
 }  // namespace google

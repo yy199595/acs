@@ -13,7 +13,7 @@ namespace Sentry
 		return this->mRedisComponent != nullptr;
 	}
 
-    void DataSyncRedisComponent::Set(const std::string &_id, const s2s::mongo::insert &data)
+    void DataSyncRedisComponent::Set(const std::string &_id, const db::mongo::insert &data)
     {
         const std::string & tab = data.tab();
         this->Set(_id, tab, data.json());

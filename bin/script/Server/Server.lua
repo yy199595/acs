@@ -19,9 +19,7 @@ end
 
 function Server.AllServiceStart()
 
-    local id = MongoComponent.AddCounter("user_id", 1)
-    print(id)
-    MongoComponent.InsertOnce("data_account", {
+    local r1 = MongoComponent.InsertOnce("data_account", {
         _id = "646585122@qq.com",
         login_ip = "127.0.0.1",
         user_id = 1122,
@@ -30,11 +28,16 @@ function Server.AllServiceStart()
         token = "0x00ssdjsaklj"
     })
 
-    MongoComponent.Update("data_account", {
+    local r2 = MongoComponent.Update("data_account", {
         _id = "646585122@qq.com"
     }, {
-        login_time_1 = os.time()
+        login_time_1 = 11223
     })
+
+    local response = MongoComponent.QueryOnce("data_account", {
+        _id = "646585122@qq.com"
+    })
+    print(r1, r2, response)
 end
 
 function Server.OnLoadModule(moduleName)

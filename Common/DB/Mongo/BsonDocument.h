@@ -66,6 +66,13 @@ namespace Bson
 
 	namespace Writer
 	{
+        enum class BsonDocumentType
+        {
+            None,
+            Array,
+            Object,
+        };
+
 		class Object : public Document
 		{
 		public:
@@ -86,12 +93,13 @@ namespace Bson
 
 		public:
             void WriterToJson(std::string & json);
-            bool FromByJson(const std::string& json);
+            BsonDocumentType FromByJson(const std::string& json);
             const std::string & GetId() const { return this->mId; }
 		public:
 			const char* Serialize(int& length);
 
-			void Add(const char* key, Document& document);
+            void Add(const char* key, Document& document);
+            void Add(const char* key, Document& document, BsonDocumentType type);
 
 			inline void Add(const char* key, int value)
 			{

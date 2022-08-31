@@ -84,40 +84,34 @@
         "Insert": {
             "Async": true,
             "Type": "Server",
-            "Request": "s2s.mongo.insert"
+            "Request": "db.mongo.insert"
         },
         "Delete": {
             "Async": true,
             "Type": "Server",
-            "Request": "s2s.mongo.remove"
+            "Request": "db.mongo.remove"
         },
         "Query": {
             "Async": true,
             "Type": "Server",
-            "Request": "s2s.mongo.query.request",
-            "Response": "s2s.mongo.query.response"
+            "Request": "db.mongo.query.request",
+            "Response": "db.mongo.query.response"
         },
         "Update": {
             "Async": true,
             "Type": "Server",
-            "Request": "s2s.mongo.update"
+            "Request": "db.mongo.update"
         },
         "SetIndex": {
             "Async": true,
             "Type": "Server",
-            "Request": "s2s.mongo.index"
-        },
-        "AddCounter": {
-            "Async": true,
-            "Type": "Server",
-            "Request": "s2s.mongo.counter.request",
-            "Response": "s2s.mongo.counter.response"
+            "Request": "db.mongo.index"
         },
         "RunCommand": {
             "Async": true,
             "Type": "Server",
-            "Request": "s2s.mongo.command.request",
-            "Response": "s2s.mongo.command.response"
+            "Request": "db.mongo.command.request",
+            "Response": "db.mongo.command.response"
         }
     },
     "ChatService": {

@@ -48,21 +48,16 @@ namespace Sentry
 	public:
 		bool Ping(int index);
         bool SetIndex(const std::string & tab, const std::string & name);
-		bool InsertOnce(const std::string & tab, const std::string & json);
-        bool Delete(const std::string & tab, const std::string & json, int limit);
-        std::shared_ptr<Mongo::MongoQueryResponse> Query(const std::string & tab, const std::string & json, int limit = 1);
-        bool Update(const std::string & tab, const std::string & update, const std::string & selector, const std::string & tag);
     public:
-        void SelectMongoClient(int index);
         void OnClientError(int index, XCode code);
         std::shared_ptr<TcpMongoClient> GetClient(int index = 0);
+        const Mongo::Config & GetConfig() const { return this->mConfig;}
 		std::shared_ptr<Mongo::MongoQueryResponse> Run(std::shared_ptr<TcpMongoClient> mongoClient, std::shared_ptr<MongoQueryRequest> request);
 	 private:
 		Mongo::Config mConfig;
 		TimerComponent * mTimerComponent;
 		Util::NumberBuilder<int, 10> mRequestId;
         class NetThreadComponent * mNetComponent;
-        std::shared_ptr<TcpMongoClient> mCurClient;
         std::vector<std::shared_ptr<TcpMongoClient>> mMongoClients;
     };
 }

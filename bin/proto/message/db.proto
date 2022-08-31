@@ -1,18 +1,56 @@
 syntax = "proto3";
 
-message account
+package db;
+message mongo
 {
-    message user_info
+    message insert
     {
-        string account = 1;     //账户
-        int64 user_id = 2;      //用户id
-        string password = 3;      //密码
-        string platform = 4;    //平台
-        int64 phone_num = 5;     //手机号
-        string device_mac = 6;  //设备id
-        int64 register_time = 7;    //注册事件
-        int64 last_login_time = 8;   //上次登录时间
-        string token = 9;   //登陆令牌
-        string last_login_ip = 10; //上次登陆ip
+        string tab = 1;
+        string json = 2;
+        int32 flag = 3;
+    }
+    message query
+    {
+        message request
+        {
+            string tab = 1;
+            string json = 2;
+            int32 limit = 3;
+        }
+        message response
+        {
+            repeated string jsons = 1;
+        }
+    }
+    message remove
+    {
+        string tab = 1;
+        string json = 2;
+        int32 limit = 3;
+        int32 flag = 4;
+    }
+    message index
+    {
+        string tab = 1;
+        string name = 2;
+    }
+    message update
+    {
+        string tab = 1;
+        string select = 2;
+        string update = 3;
+        string tag = 4;
+        int32 flag = 5;
+    }
+    message command
+    {
+        message request
+        {
+            string json = 1;
+        }
+        message response
+        {
+            repeated string jsons = 1;
+        }
     }
 }

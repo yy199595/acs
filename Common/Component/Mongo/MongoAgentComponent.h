@@ -27,7 +27,11 @@ namespace Sentry
     private:
 		bool LateAwake() final;
 	 private:
-		class MongoService * mMongoService;
+        db::mongo::update mUpdateRequest;
+        db::mongo::insert mInsertRequest;
+        db::mongo::remove mRemoveRequest;
+        db::mongo::query::request mQueryRequest;
+        class MongoService * mMongoService;
 	};
 }
 
