@@ -31,7 +31,7 @@ namespace Sentry
         std::shared_ptr<MongoQueryRequest> mongoRequest
                 = std::make_shared<MongoQueryRequest>();
         if (mongoRequest->document.FromByJson(
-                request.json()) == Bson::Writer::BsonDocumentType::None)
+                request.json()) == Bson::DocumentType::None)
         {
             return XCode::CallArgsError;
         }
@@ -51,7 +51,7 @@ namespace Sentry
 
     XCode MongoService::Insert(const db::mongo::insert &request)
     {
-        Bson::Writer::Object document;
+        Bson::Writer::Document document;
         std::shared_ptr<MongoQueryRequest> mongoRequest
                 = std::make_shared<MongoQueryRequest>();
 
@@ -59,16 +59,18 @@ namespace Sentry
         mongoRequest->document.Add("insert", tab);
         switch(document.FromByJson(request.json()))
         {
-            case Bson::Writer::BsonDocumentType::None:
+            case Bson::DocumentType::None:
                 return XCode::CallArgsError;
-            case Bson::Writer::BsonDocumentType::Object:
+            case Bson::DocumentType::Object:
             {
-                Bson::Writer::Array documentArray(document);
+                Bson::Writer::Document documentArray(Bson::DocumentType::Array);
+
+                documentArray.Add("0", document);
                 mongoRequest->document.Add("documents", documentArray);
             }
                 break;
-            case Bson::Writer::BsonDocumentType::Array:
-                mongoRequest->document.Add("documents", document, Bson::Writer::BsonDocumentType::Array);
+            case Bson::DocumentType::Array:
+                mongoRequest->document.Add("documents", document);
                 break;
         }
 
@@ -88,18 +90,20 @@ namespace Sentry
 
     XCode MongoService::Delete(const db::mongo::remove &request)
     {
-        Bson::Writer::Object document;
+        Bson::Writer::Document document;
         switch(document.FromByJson(request.json()))
         {
-            case Bson::Writer::BsonDocumentType::None:
-            case Bson::Writer::BsonDocumentType::Array:
+            case Bson::DocumentType::None:
+            case Bson::DocumentType::Array:
                 return XCode::CallArgsError;
         }
-        Bson::Writer::Object delDocument;
+        Bson::Writer::Document delDocument;
         delDocument.Add("q", document);
         delDocument.Add("limit", request.limit());
 
-        Bson::Writer::Array documentArray(delDocument);
+        Bson::Writer::Document documentArray(Bson::DocumentType::Array);
+
+        documentArray.Add("0", delDocument);
         std::shared_ptr<MongoQueryRequest> mongoRequest
                 = std::make_shared<MongoQueryRequest>();
 
@@ -121,32 +125,34 @@ namespace Sentry
     // $gt:大于   $lt:小于  $gte:大于或等于  $lte:小于或等于 $ne:不等于
     XCode MongoService::Update(const db::mongo::update &request)
     {
-        Bson::Writer::Object dataDocument;
+        Bson::Writer::Document dataDocument;
         switch(dataDocument.FromByJson(request.update()))
         {
-            case Bson::Writer::BsonDocumentType::None:
-            case Bson::Writer::BsonDocumentType::Array:
+            case Bson::DocumentType::None:
+            case Bson::DocumentType::Array:
                 return XCode::CallArgsError;
         }
-        Bson::Writer::Object selectorDocument;
+        Bson::Writer::Document selectorDocument;
         switch(selectorDocument.FromByJson(request.select()))
         {
-            case Bson::Writer::BsonDocumentType::None:
-            case Bson::Writer::BsonDocumentType::Array:
+            case Bson::DocumentType::None:
+            case Bson::DocumentType::Array:
                 return XCode::CallArgsError;
         }
-        Bson::Writer::Object updateDocument;
+        Bson::Writer::Document updateDocument(Bson::DocumentType::Object);
         updateDocument.Add(request.tag().c_str(), dataDocument);
         std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest);
 
-        Bson::Writer::Object updateInfo;
+        Bson::Writer::Document updateInfo(Bson::DocumentType::Object);
         const std::string & tab = request.tab();
         updateInfo.Add("multi", true);
         updateInfo.Add("upsert", false);
         updateInfo.Add("u", updateDocument);
         updateInfo.Add("q", selectorDocument);
 
-        Bson::Writer::Array updates(updateInfo);
+        Bson::Writer::Document updates(Bson::DocumentType::Array);
+
+        updates.Add("0", updateInfo);
         mongoRequest->document.Add("update", tab);
         mongoRequest->document.Add("updates", updates);
         std::shared_ptr<TcpMongoClient> mongoClient = this->mMongoComponent->GetClient(request.flag());
@@ -172,26 +178,26 @@ namespace Sentry
 
     XCode MongoService::Query(const db::mongo::query::request &request, db::mongo::query::response &response)
     {
-        std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest);
-        switch(mongoRequest->document.FromByJson(request.json()))
+        std::shared_ptr<MongoQueryRequest> mongoRequest
+                = std::make_shared<MongoQueryRequest>();
+        switch (mongoRequest->document.FromByJson(request.json()))
         {
-            case Bson::Writer::BsonDocumentType::None:
-            case Bson::Writer::BsonDocumentType::Array:
+            case Bson::DocumentType::None:
                 return XCode::CallArgsError;
         }
         mongoRequest->numberToReturn = request.limit();
-        const Mongo::Config & config = this->mMongoComponent->GetConfig();
+        const Mongo::Config &config = this->mMongoComponent->GetConfig();
         std::shared_ptr<TcpMongoClient> mongoClient = this->mMongoComponent->GetClient();
         mongoRequest->collectionName = fmt::format("{0}.{1}", config.mDb, request.tab());
         std::shared_ptr<MongoQueryResponse> queryResponse = this->mMongoComponent->Run(mongoClient, mongoRequest);
 
-        if(queryResponse == nullptr || queryResponse->GetDocumentSize() <= 0)
+        if (queryResponse == nullptr || queryResponse->GetDocumentSize() <= 0)
         {
             return XCode::Failure;
         }
-        for(size_t index = 0; index < queryResponse->GetDocumentSize(); index++)
+        for (size_t index = 0; index < queryResponse->GetDocumentSize(); index++)
         {
-            std::string * json = response.add_jsons();
+            std::string *json = response.add_jsons();
             queryResponse->Get().WriterToJson(*json);
         }
         return XCode::Successful;

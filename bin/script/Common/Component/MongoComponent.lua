@@ -54,6 +54,7 @@ function MongoComponent.Query(tab, data, limit)
     if type(data) == "table" then
         data = Json.Encode(data)
     end
+    print("query json ", data)
     assert(type(data) == "string")
     local address = self:GetHost()
     local code, response = self:Call(address, "Query", {

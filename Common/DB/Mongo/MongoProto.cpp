@@ -81,18 +81,16 @@ namespace Mongo
 namespace Mongo
 {
 	MongoQueryRequest::MongoQueryRequest()
-		: MongoRequest(OP_QUERY)
+		: MongoRequest(OP_QUERY), document(Bson::DocumentType::Object)
 	{
 		this->flag = 0;
 		this->numberToSkip  = 0;
 		this->numberToReturn = 1;
-		this->selector = nullptr;
 	}
 
 	int MongoQueryRequest::GetLength()
 	{
-		int size = this->selector != nullptr ? this->selector->GetStreamLength() : 0;
-		return sizeof(this->flag) + this->collectionName.size() + 1 + sizeof(int) * 2 + this->document.GetStreamLength() + size;
+		return sizeof(this->flag) + this->collectionName.size() + 1 + sizeof(int) * 2 + this->document.GetStreamLength();
 	}
 	void MongoQueryRequest::OnWriter(std::ostream& os)
 	{
@@ -101,12 +99,6 @@ namespace Mongo
 		this->Write(os, this->numberToSkip);
 		this->Write(os, this->numberToReturn);
 		this->document.WriterToStream(os);
-		if(this->selector != nullptr)
-		{
-			this->selector->WriterToStream(os);
-		}
-		delete this->selector;
-		this->selector = nullptr;
 	}
 }
 
@@ -160,7 +152,7 @@ namespace Mongo
         for(int index = 0; index < this->mBuffer.size();)
         {
             const char * bson = this->mBuffer.c_str() + index;
-            std::shared_ptr<Bson::Read::Object> obj(new Bson::Read::Object(bson));
+            std::shared_ptr<Bson::Reader::Document> obj(new Bson::Reader::Document(bson));
             index += obj->Length();
             this->mDocuments.emplace_back(obj);
         }

@@ -11,95 +11,30 @@
 #include"Bson/bsonobjbuilder.h"
 namespace Bson
 {
-
+    enum class DocumentType
+    {
+        None,
+        Array,
+        Object,
+    };
 	namespace Writer
 	{
-		class WriterDocument;
-
 		class Document : protected _bson::bsonobjbuilder
 		{
 		public:
-			virtual bool IsArray() = 0;
-			virtual bool IsObject() = 0;
-		public:
-			template<typename T>
-			T & Cast() { return (T&)(*this);}
-		};
+            Document(DocumentType type = DocumentType::None)
+                : mType(type), mIndex(0) { }
 
-		class Array : public Document
-		{
-		public:
-			Array() : mIndex(0) { }
-            Array(Document & document) : mIndex(0) { this->Add(document); }
-		public:
-			bool IsArray() final
-			{
-				return true;
-			}
-
-			bool IsObject() final
-			{
-				return false;
-			}
-
-		public:
-			void Add(int value);
-
-			void Add(bool value);
-
-			void Add(double value);
-
-			void Add(long long value);
-
-			void Add(unsigned int value);
-
-			void Add(Document& document);
-
-			void Add(const std::string& value);
-
-			void Add(const char* str, size_t size);
-
-		private:
-			int mIndex;
-		};
-	}
-
-	namespace Writer
-	{
-        enum class BsonDocumentType
-        {
-            None,
-            Array,
-            Object,
-        };
-
-		class Object : public Document
-		{
-		public:
-			Object() = default;
-
-			~Object() = default;
-
-		public:
-			bool IsArray() final
-			{
-				return false;
-			}
-
-			bool IsObject() final
-			{
-				return true;
-			}
+			~Document() = default;
 
 		public:
             void WriterToJson(std::string & json);
-            BsonDocumentType FromByJson(const std::string& json);
+            DocumentType FromByJson(const std::string& json);
             const std::string & GetId() const { return this->mId; }
 		public:
 			const char* Serialize(int& length);
 
             void Add(const char* key, Document& document);
-            void Add(const char* key, Document& document, BsonDocumentType type);
 
 			inline void Add(const char* key, int value)
 			{
@@ -108,57 +43,57 @@ namespace Bson
 
 			inline void Add(const char* key, bool value)
 			{
-				this->append(key, value);
+                this->append(key, value);
 			}
 
 			inline void Add(const char* key, double value)
 			{
-				this->append(key, value);
+                this->append(key, value);
 			}
 
 			inline void Add(const char* key, long long value)
 			{
-				this->append(key, value);
+                this->append(key, value);
 			}
 
 			inline void Add(const char* key, const char* value)
 			{
-				this->append(key, value);
+                this->append(key, value);
 			}
 
 			inline void Add(const char* key, unsigned int value)
 			{
-				this->append(key, value);
+                this->append(key, value);
 			}
 
 			inline void Add(const char* key, const std::string& value)
 			{
-				this->append(key, value);
+                this->append(key, value);
 			}
 
 			inline void Add(const char* key, const char* str, size_t size)
 			{
-				this->append(key, str, size + 1);
+                this->append(key, str, size + 1);
 			}
 
-		public:
+        public:
 			int GetStreamLength();
-
 			bool WriterToStream(std::ostream& os);
-
+            DocumentType GetType() const { return this->mType; }
 			bool WriterToBson(const char* key, Document& document, const rapidjson::Value& jsonValue);
-
         private:
+            int mIndex;
             std::string mId;
+            DocumentType mType;
 		};
 	}
 
-	namespace Read
+	namespace Reader
 	{
-		class Object : protected _bson::bsonobj
+		class Document : protected _bson::bsonobj
 		{
 		public:
-			Object(const char* bson);
+            Document(const char* bson);
 
 		public:
 			void WriterToJson(std::string& json);

@@ -28,16 +28,33 @@ function Server.AllServiceStart()
         token = "0x00ssdjsaklj"
     })
 
+    local r3 = MongoComponent.InsertOnce("data_account", {
+        _id = "646585123@qq.com",
+        login_ip = "127.0.0.1",
+        user_id = 1122,
+        login_time = os.time(),
+        register_time = os.time(),
+        token = "0x00ssdjsaklj"
+    })
+
     local r2 = MongoComponent.Update("data_account", {
-        _id = "646585122@qq.com"
+        id = "646585122@qq.com"
     }, {
         login_time_1 = 11223
     })
 
-    local response = MongoComponent.QueryOnce("data_account", {
-        _id = "646585122@qq.com"
+    local tab = { }
+    table.insert(tab, {_id = "646585123@qq.com"})
+    table.insert(tab, {_id = "646585122@qq.com"})
+    local response = MongoComponent.Query("data_account", {
+        _id = {
+            ["$in"] = {
+                "646585123@qq.com",
+                "646585122@qq.com"
+            }
+        }
     })
-    print(r1, r2, response)
+    table.print(response)
 end
 
 function Server.OnLoadModule(moduleName)

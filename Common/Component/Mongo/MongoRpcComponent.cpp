@@ -108,7 +108,8 @@ namespace Sentry
             for(size_t i = 0; i < mongoResponse->GetDocumentSize(); i++)
             {
                 std::string json;
-                if(mongoResponse->Get(i).Get("errmsg", json))
+                Bson::Reader::Document & document = mongoResponse->Get(i);
+                if(document.Get("errmsg", json) || document.Get("writeErrors", json))
                 {
                     LOG_ERROR("error[" << i << "] = " << json);
                 }
@@ -132,14 +133,14 @@ namespace Sentry
     {
         std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
 
-        Bson::Writer::Object keys;
+        Bson::Writer::Document keys(Bson::DocumentType::Object);
+        Bson::Writer::Document document(Bson::DocumentType::Object);
+        Bson::Writer::Document documentArray1(Bson::DocumentType::Array);
         keys.Add(name.c_str(), 1);
 
-        Bson::Writer::Object document;
         document.Add("key", keys);
         document.Add("unique", true);
         document.Add("name", name.c_str());
-        Bson::Writer::Array documentArray1(document);
         mongoRequest->document.Add("createIndexes", tab);
         mongoRequest->document.Add("indexes", documentArray1);
         std::shared_ptr<TcpMongoClient> mongoClient = this->GetClient();

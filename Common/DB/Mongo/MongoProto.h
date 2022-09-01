@@ -66,8 +66,8 @@ namespace Mongo
         int zero;
         std::string collectionName;
         int flag;
-        Bson::Writer::Object selector;
-		Bson::Writer::Object update;
+        Bson::Writer::Document selector;
+		Bson::Writer::Document update;
     };
 
     class MongoInsertRequest : public MongoRequest
@@ -83,7 +83,7 @@ namespace Mongo
     public:
         int zero;
         std::string collectionName;
-		Bson::Writer::Object document;
+		Bson::Writer::Document document;
     };
 
 	class MongoLuaRequest : public MongoRequest
@@ -113,8 +113,7 @@ namespace Mongo
         std::string collectionName;
         int numberToSkip;
         int numberToReturn;
-		Bson::Writer::Object document;
-		Bson::Writer::Object * selector;
+		Bson::Writer::Document document;
 	};
 
     class MongoQueryResponse
@@ -126,8 +125,8 @@ namespace Mongo
 		size_t OnReceiveBody(std::istream & stream);
         const MongoHead & GetHead() const { return this->mHead;}
         size_t GetDocumentSize() const { return this->mDocuments.size();}
-        Bson::Read::Object & Get(size_t index = 0) const { return *this->mDocuments[index];}
-        Bson::Read::Object & operator[](size_t index) const { return *this->mDocuments[index];}
+        Bson::Reader::Document & Get(size_t index = 0) const { return *this->mDocuments[index];}
+        Bson::Reader::Document & operator[](size_t index) const { return *this->mDocuments[index];}
     private:
         int ReadInt(std::istream & is);
         long long ReadLong(std::istream & is);
@@ -140,7 +139,7 @@ namespace Mongo
         int numberReturned; // number of documents in the reply
 		std::string mBuffer;
 		char mReadBuffer[128];
-        std::vector<std::shared_ptr<Bson::Read::Object>> mDocuments;
+        std::vector<std::shared_ptr<Bson::Reader::Document>> mDocuments;
     };
 }
 
