@@ -128,9 +128,9 @@ namespace Sentry
         }
         long long userId = iter->second;
         this->mUserTokens.erase(iter);
-        this->mSyncComponent->SetUserState(userId, 1);
+        //this->mSyncComponent->SetUserState(userId, 1);
         this->mGateClientComponent->AddNewUser(address, userId);
-        this->mSyncComponent->SetAddress(userId, this->GetName(), this->mAddress, true);
+        //this->mSyncComponent->SetAddress(userId, this->GetName(), this->mAddress, true);
         return XCode::Successful;
     }
 }

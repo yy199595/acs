@@ -119,10 +119,10 @@ namespace Sentry
                 select << "_id" << reflection->GetUInt32(message, fileDesc);
                 break;
             case FieldDescriptor::TYPE_INT64:
-                select << "_id" << reflection->GetInt64(message, fileDesc);
+                select << "_id" << (long long)reflection->GetInt64(message, fileDesc);
                 break;
             case FieldDescriptor::CPPTYPE_UINT64:
-                select << "_id" << reflection->GetUInt64(message, fileDesc);
+                select << "_id" << (unsigned long long)reflection->GetUInt64(message, fileDesc);
                 break;
             case FieldDescriptor::TYPE_STRING:
                 select << "_id" << reflection->GetString(message, fileDesc);
