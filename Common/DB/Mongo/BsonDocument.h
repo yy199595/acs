@@ -34,7 +34,9 @@ namespace Bson
 		public:
 			const char* Serialize(int& length);
 
-            void Add(const char* key, Document& document);
+			void Add(Document& document);
+		 public:
+			void Add(const char* key, Document& document);
 
 			inline void Add(const char* key, int value)
 			{

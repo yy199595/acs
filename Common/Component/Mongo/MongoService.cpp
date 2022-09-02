@@ -65,7 +65,7 @@ namespace Sentry
             {
                 Bson::Writer::Document documentArray(Bson::DocumentType::Array);
 
-                documentArray.Add("0", document);
+                documentArray.Add(document);
                 mongoRequest->document.Add("documents", documentArray);
             }
                 break;
@@ -103,7 +103,7 @@ namespace Sentry
 
         Bson::Writer::Document documentArray(Bson::DocumentType::Array);
 
-        documentArray.Add("0", delDocument);
+        documentArray.Add(delDocument);
         std::shared_ptr<MongoQueryRequest> mongoRequest
                 = std::make_shared<MongoQueryRequest>();
 
@@ -152,7 +152,7 @@ namespace Sentry
 
         Bson::Writer::Document updates(Bson::DocumentType::Array);
 
-        updates.Add("0", updateInfo);
+        updates.Add(updateInfo);
         mongoRequest->document.Add("update", tab);
         mongoRequest->document.Add("updates", updates);
         std::shared_ptr<TcpMongoClient> mongoClient = this->mMongoComponent->GetClient(request.flag());

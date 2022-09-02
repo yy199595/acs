@@ -150,22 +150,38 @@ namespace Bson
 			return bson;
 		}
 
+		void Document::Add(Document& document)
+		{
+			assert(this->mType == Bson::DocumentType::Array);
+			_bson::bsonobjbuilder &build = (_bson::bsonobjbuilder &) document;
+
+			switch(document.GetType())
+			{
+			case DocumentType::Array:
+				_b.appendNum((char) _bson::Array);
+				break;
+			case DocumentType::Object:
+				_b.appendNum((char) _bson::Object);
+				break;
+			}
+			_b.appendStr(std::to_string(this->mIndex++));
+			_b.appendBuf(build._done(), build.len());
+		}
+
         void Document::Add(const char *key, Document &document)
         {
-            _bson::bsonobjbuilder &build = (_bson::bsonobjbuilder &) document;
-            switch(document.GetType())
-            {
-                case DocumentType::None:
-                    assert(false);
-                    return;
-                case DocumentType::Array:
-                    _b.appendNum((char) _bson::Array);
-                    break;
-                case DocumentType::Object:
-                    _b.appendNum((char) _bson::Object);
-                    break;
-            }
-            _b.appendStr(key);
+			assert(this->mType == Bson::DocumentType::Object);
+			_bson::bsonobjbuilder &build = (_bson::bsonobjbuilder &) document;
+			switch(document.GetType())
+			{
+			case DocumentType::Array:
+				_b.appendNum((char) _bson::Array);
+				break;
+			case DocumentType::Object:
+				_b.appendNum((char) _bson::Object);
+				break;
+			}
+			_b.appendStr(key);
             _b.appendBuf(build._done(), build.len());
         }
 	}
