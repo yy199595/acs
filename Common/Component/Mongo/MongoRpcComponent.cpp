@@ -100,13 +100,7 @@ namespace Sentry
 		}
 		mongoClient->SendMongoCommand(request);
 #ifdef __DEBUG__
-		int len = 0;
-		int index = 0;
-		std::string json1;
 		long long t1 = Time::GetNowMilTime();
-		const char * str = request->document.Serialize(len);
-		Bson::Reader::Document document1(str);
-		document1.WriterToJson(json1);
         std::shared_ptr<Mongo::MongoQueryResponse> mongoResponse = mongoTask->Await();
 		if(mongoResponse != nullptr && mongoResponse->GetDocumentSize() > 0)
 		{
@@ -141,13 +135,12 @@ namespace Sentry
 
         Bson::Writer::Document keys;
         Bson::Writer::Document document;
-        Bson::Writer::Array documentArray1;
         keys.Add(name.c_str(), 1);
 
         document.Add("key", keys);
         document.Add("unique", true);
         document.Add("name", name.c_str());
-		documentArray1.Append(document);
+		Bson::Writer::Array documentArray1(document);
         mongoRequest->document.Add("createIndexes", tab);
         mongoRequest->document.Add("indexes", documentArray1);
         std::shared_ptr<TcpMongoClient> mongoClient = this->GetClient();

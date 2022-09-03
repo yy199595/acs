@@ -6,122 +6,241 @@
 
 namespace Bson
 {
-    namespace Writer
-    {
-        bool Document::FromByJson(const std::string& json)
-        {
-            rapidjson::Document document;
-            if (document.Parse(json.c_str(), json.size()).HasParseError())
-            {
-                return false;
-            }
-            if(document.IsArray())
-            {
-				return false;
-            }
-            else if(document.IsObject())
-            {
-                auto iter = document.MemberBegin();
-                for (; iter != document.MemberEnd(); iter++)
-                {
-                    const char *key = iter->name.GetString();
-                    if (!this->WriterToBson(key, *this, iter->value))
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-
-    }
-
 	namespace Writer
 	{
+		void Array::Add(int value)
+		{
+			this->append(std::to_string(this->mIndex++), value);
+		}
+
+		void Array::Add(bool value)
+		{
+			this->append(std::to_string(this->mIndex++), value);
+		}
+
+		void Array::Add(long long value)
+		{
+			this->append(std::to_string(this->mIndex++), value);
+		}
+
+		void Array::Add(const std::string& value)
+		{
+			this->append(std::to_string(this->mIndex++), value);
+		}
+
+		void Array::Add(const char* str, size_t size)
+		{
+			this->append(std::to_string(this->mIndex++), str, size + 1);
+		}
+
+		void Array::Add(unsigned int value)
+		{
+			this->append(std::to_string(this->mIndex++), value);
+		}
+
+		void Array::Add(double value)
+		{
+			this->append(std::to_string(this->mIndex++), value);
+		}
+
+		void Array::Add(Builder& document)
+		{
+			_bson::bsonobjbuilder& build = (_bson::bsonobjbuilder&)document;
+			if (document.IsObject())
+			{
+				_b.appendNum((char)_bson::Object);
+			}
+			else
+			{
+				_b.appendNum((char)_bson::Array);
+			}
+			_b.appendStr(std::to_string(this->mIndex++));
+			_b.appendBuf(build._done(), build.len());
+		}
+	}
+}
+
+namespace Bson
+{
+	namespace Reader
+	{
+		Document::Document(const char* bson)
+				: _bson::bsonobj(bson)
+		{
+
+		}
+
+		bool Document::IsOk() const
+		{
+			double isOk = 0;
+			return this->Get("ok", isOk) && isOk != 0;
+		}
+
+		bool Document::Get(const char* key, double& value) const
+		{
+			_bson::bsonelement bsonelement = this->getField(key);
+			switch(bsonelement.type())
+			{
+			case _bson::BSONType::NumberDouble:
+				value = bsonelement.Double();
+				return true;
+			}
+			return false;
+		}
+	}
+	namespace Writer
+	{
+
         void Document::WriterToJson(std::string &json)
         {
             int length = 0;
-            const char * bson = this->Serialize(length);
-            Bson::Reader::Document obj(bson);
+            Bson::Reader::Document obj(this->Serialize(length));
             obj.WriterToJson(json);
         }
 
+		bool Document::FromByJson(const std::string& json)
+		{
+			rapidjson::Document document;
+			if (document.Parse(json.c_str(), json.size()).HasParseError())
+			{
+				return false;
+			}
+			auto iter = document.MemberBegin();
+			for ( ;iter != document.MemberEnd(); iter++)
+			{
+				const char* key = iter->name.GetString();
+				if (!this->WriterToBson(key, *this, iter->value))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
 
-		bool Document::WriterToBson(const char* key, Document& document, const rapidjson::Value& jsonValue)
-        {
-            if (jsonValue.IsString())
-            {
-                const char *str = jsonValue.GetString();
-                const size_t size = jsonValue.GetStringLength();
-                document.Add(key, str, size);
-                return true;
-            }
-            else if (jsonValue.IsBool())
-            {
-                document.Add(key, jsonValue.GetBool());
-                return true;
-            }
-            else if (jsonValue.IsInt())
-            {
-                document.Add(key, jsonValue.GetInt());
-                return true;
-            }
-            else if (jsonValue.IsInt64())
-            {
-                long long value = (long long) jsonValue.GetInt64();
-                document.Add(key, value);
-                return true;
-            }
-            else if (jsonValue.IsUint())
-            {
-                document.Add(key, jsonValue.GetUint());
-                return true;
-            }
-            else if (jsonValue.IsUint64())
-            {
-                document.Add(key, (long long) jsonValue.GetUint64());
-                return true;
-            }
-            else if (jsonValue.IsDouble())
-            {
-                document.Add(key, jsonValue.GetDouble());
-                return true;
-            }
-            else if (jsonValue.IsFloat())
-            {
-                document.Add(key, jsonValue.GetFloat());
-                return true;
-            }
-            else if (jsonValue.IsObject())
-            {
-                Bson::Writer::Document obj;
-                for (auto iter = jsonValue.MemberBegin(); iter != jsonValue.MemberEnd(); iter++)
-                {
-                    const char *key = iter->name.GetString();
-                    if (!this->WriterToBson(key, obj, iter->value))
-                    {
-                        return false;
-                    }
-                }
-                document.Add(key, obj);
-                return true;
-            }
-            else if (jsonValue.IsArray())
-            {
-                Bson::Writer::Array arrayDocument;
-                for (int index = 0; index < jsonValue.Size(); index++)
-                {
-                    std::string key = std::to_string(index);
-                    if (!this->WriterToBson(key.c_str(), arrayDocument, jsonValue[index]))
-                    {
-                        return false;
-                    }
-                }
-                document.Add(key, arrayDocument);
-                return true;
-            }
-            return false;
-        }
+		bool Document::WriterToBson(const char* key, Builder& document, const rapidjson::Value& jsonValue)
+		{
+			if (jsonValue.IsString())
+			{
+				const char* str = jsonValue.GetString();
+				const size_t size = jsonValue.GetStringLength();
+				if (document.IsObject())
+				{
+					document.Cast<Document>().Add(key, str, size);
+					return true;
+				}
+				document.Cast<Array>().Add(str, size);
+				return true;
+			}
+			else if (jsonValue.IsBool())
+			{
+				if (document.IsObject())
+				{
+					document.Cast<Document>().Add(key, jsonValue.GetBool());
+					return true;
+				}
+				document.Cast<Array>().Add(jsonValue.GetBool());
+				return true;
+			}
+			else if (jsonValue.IsInt())
+			{
+				if (document.IsObject())
+				{
+					document.Cast<Document>().Add(key, jsonValue.GetInt());
+					return true;
+				}
+				document.Cast<Array>().Add(jsonValue.GetInt());
+				return true;
+			}
+			else if (jsonValue.IsInt64())
+			{
+				long long value = (long long)jsonValue.GetInt64();
+				if (document.IsObject())
+				{
+					document.Cast<Document>().Add(key, value);
+					return true;
+				}
+				document.Cast<Array>().Add(value);
+				return true;
+			}
+			else if (jsonValue.IsUint())
+			{
+				if (document.IsObject())
+				{
+					document.Cast<Document>().Add(key, jsonValue.GetUint());
+					return true;
+				}
+				document.Cast<Array>().Add(jsonValue.GetUint());
+				return true;
+			}
+			else if (jsonValue.IsUint64())
+			{
+				if (document.IsObject())
+				{
+					document.Cast<Document>().Add(key, (long long)jsonValue.GetUint64());
+					return true;
+				}
+				document.Cast<Array>().Add((long long)jsonValue.GetUint64());
+				return true;
+			}
+			else if (jsonValue.IsDouble())
+			{
+				if (document.IsObject())
+				{
+					document.Cast<Document>().Add(key, jsonValue.GetDouble());
+					return true;
+				}
+				document.Cast<Array>().Add(jsonValue.GetDouble());
+				return true;
+			}
+			else if (jsonValue.IsFloat())
+			{
+				if (document.IsObject())
+				{
+					document.Cast<Document>().Add(key, jsonValue.GetFloat());
+					return true;
+				}
+				document.Cast<Array>().Add(jsonValue.GetFloat());
+				return true;
+			}
+			else if (jsonValue.IsObject())
+			{
+				Document obj;
+				for (auto iter = jsonValue.MemberBegin(); iter != jsonValue.MemberEnd(); iter++)
+				{
+					const char* key = iter->name.GetString();
+					if (!this->WriterToBson(key, obj, iter->value))
+					{
+						return false;
+					}
+				}
+				if (document.IsObject())
+				{
+					document.Cast<Document>().Add(key, obj);
+					return true;
+				}
+				document.Cast<Array>().Add(obj);
+				return true;
+			}
+			else if (jsonValue.IsArray())
+			{
+				Bson::Writer::Array arrayDocument;
+				for (int index = 0; index < jsonValue.Size(); index++)
+				{
+					if (!this->WriterToBson(nullptr, arrayDocument, jsonValue[index]))
+					{
+						return false;
+					}
+				}
+				if (document.IsObject())
+				{
+					document.Cast<Document>().Add(key, arrayDocument);
+					return true;
+				}
+				document.Cast<Array>().Add(arrayDocument);
+				return true;
+			}
+			return false;
+		}
 
 		bool Document::WriterToStream(std::ostream& os)
 		{
@@ -144,97 +263,41 @@ namespace Bson
 			return bson;
 		}
 
-
-        void Document::Add(const char *key, Document &document)
-        {
-			_bson::bsonobjbuilder &build = (_bson::bsonobjbuilder &) document;
-			switch(document.GetType())
+		void Document::Add(const char* key, Builder& document)
+		{
+			_bson::bsonobjbuilder& build = (_bson::bsonobjbuilder&)document;
+			if (document.IsObject())
 			{
-			case DocumentType::Array:
-				_b.appendNum((char) _bson::Array);
-				break;
-			case DocumentType::Object:
-				_b.appendNum((char) _bson::Object);
-				break;
+				_b.appendNum((char)_bson::Object);
+			}
+			else
+			{
+				_b.appendNum((char)_bson::Array);
 			}
 			_b.appendStr(key);
-            _b.appendBuf(build._done(), build.len());
-        }
-	}
-}
-
-namespace Bson
-{
-	namespace Writer
-	{
-		void Array::Append(Document& document)
-		{
-			_bson::bsonobjbuilder &build = (_bson::bsonobjbuilder &) document;
-
-			switch(document.GetType())
-			{
-			case DocumentType::Array:
-				_b.appendNum((char) _bson::Array);
-				break;
-			case DocumentType::Object:
-				_b.appendNum((char) _bson::Object);
-				break;
-			}
-			_b.appendStr(std::to_string(this->mIndex++));
 			_b.appendBuf(build._done(), build.len());
 		}
 	}
 }
-
 namespace Bson
 {
 	namespace Reader
 	{
-        Document::Document(const char* bson)
-                : _bson::bsonobj(bson)
-        {
-
-        }
-
-        bool Document::IsOk() const
-        {
-            double isOk = 0;
-            return this->Get("ok", isOk) && isOk != 0;
-        }
-
-        bool Document::GetKeys(std::set<std::string> &keys)
-        {
-            this->getFieldNames(keys);
-            return keys.size() > 0;
-        }
-
 		bool Document::Get(const char* key, int& value) const
 		{
-            _bson::bsonelement bsonelement = this->getField(key);
-            if (bsonelement.type() == _bson::BSONType::NumberInt)
+			_bson::bsonelement bsonelement = this->getField(key);
+			if(bsonelement.type() == _bson::BSONType::NumberInt)
 			{
-				value = this->getField(key).Int();
+				value = bsonelement.Int();
 				return true;
 			}
 			return false;
 		}
 
-        bool Document::Get(const char* key, double& value) const
-        {
-            _bson::bsonelement bsonelement = this->getField(key);
-            switch(bsonelement.type())
-            {
-                case _bson::BSONType::NumberDouble:
-                    value = bsonelement.Double();
-                    return true;
-            }
-            return false;
-        }
-
 		bool Document::Get(const char* key, bool& value) const
 		{
-            _bson::bsonelement bsonelement = this->getField(key);
-            if (bsonelement.type() == _bson::BSONType::Bool)
+			_bson::bsonelement bsonelement = this->getField(key);
+			if(bsonelement.type() == _bson::BSONType::Bool)
 			{
 				value = bsonelement.Bool();
 				return true;
@@ -244,37 +307,42 @@ namespace Bson
 
 		bool Document::Get(const char* key, long long& value) const
 		{
-            _bson::bsonelement bsonelement = this->getField(key);
-            switch(bsonelement.type())
-            {
-                case _bson::BSONType::NumberInt:
-                    value = bsonelement.Int();
-                    return true;
-                case _bson::BSONType::NumberLong:
-                    value = bsonelement.Long();
-                    return true;
-            }
+			_bson::bsonelement bsonelement = this->getField(key);
+			switch(bsonelement.type())
+			{
+			case _bson::BSONType::NumberInt:
+				value = bsonelement.Int();
+				return true;
+			case _bson::BSONType::NumberLong:
+				value = bsonelement.Long();
+				return true;
+			}
 			return false;
 		}
 
 		bool Document::Get(const char* key, std::string& value) const
 		{
-            _bson::bsonelement bsonelement = this->getField(key);
-            if (bsonelement.type() == _bson::BSONType::String)
+			_bson::bsonelement bsonelement = this->getField(key);
+			switch(bsonelement.type())
 			{
+			case _bson::BSONType::String:
 				value = bsonelement.String();
 				return true;
+			case _bson::BSONType::BinData:
+			{
+				int len = 0;
+				const char * str = bsonelement.binData(len);
+				value.append(str, len);
+				return true;
+			}
 			}
 			return false;
 		}
 
 		_bson::BSONType Document::Type(const char* key) const
 		{
-			if (this->hasField(key))
-			{
-				return this->getField(key).type();
-			}
-			return _bson::EOO;
+			_bson::bsonelement bsonelement = this->getField(key);
+			return bsonelement.type();
 		}
 
 		void Document::WriterToJson(std::string& json)
@@ -312,8 +380,7 @@ namespace Bson
 			case _bson::BSONType::BinData:
 			{
 				int len = 0;
-                const char * bin = bsonelement.binData(len);
-				json.AddBinString(bin, len);
+				json.AddBinString(bsonelement.binData(len), len);
 			}
 				break;
 			case _bson::BSONType::Object:

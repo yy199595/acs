@@ -62,7 +62,7 @@ namespace Sentry
 			return XCode::CallArgsError;
 		}
 		Bson::Writer::Array documentArray;
-		documentArray.Append(document);
+		documentArray.Add(document);
 		mongoRequest->document.Add("documents", documentArray);
 		std::shared_ptr<TcpMongoClient> mongoClient = this->mMongoComponent->GetClient(request.flag());
 		std::shared_ptr<MongoQueryResponse> response = this->mMongoComponent->Run(mongoClient, mongoRequest);
@@ -88,8 +88,7 @@ namespace Sentry
         delDocument.Add("q", document);
         delDocument.Add("limit", request.limit());
 
-        Bson::Writer::Array documentArray;
-        documentArray.Append(delDocument);
+        Bson::Writer::Array documentArray(delDocument);
         std::shared_ptr<MongoQueryRequest> mongoRequest
                 = std::make_shared<MongoQueryRequest>();
 
@@ -132,9 +131,7 @@ namespace Sentry
         updateInfo.Add("u", updateDocument);
         updateInfo.Add("q", selectorDocument);
 
-        Bson::Writer::Array updates;
-
-        updates.Append(updateInfo);
+        Bson::Writer::Array updates(updateInfo);
         mongoRequest->document.Add("update", tab);
         mongoRequest->document.Add("updates", updates);
         std::shared_ptr<TcpMongoClient> mongoClient = this->mMongoComponent->GetClient(request.flag());
@@ -144,7 +141,8 @@ namespace Sentry
             return XCode::Failure;
         }
         int count = 0;
-        return response->Get().Get("n", count) && count > 0 ? XCode::Successful : XCode::Failure;
+		Bson::Reader::Document & result = response->Get();
+        return result.Get("n", count) && count > 0 ? XCode::Successful : XCode::Failure;
     }
 
     XCode MongoService::SetIndex(const db::mongo::index &request)

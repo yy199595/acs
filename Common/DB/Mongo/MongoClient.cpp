@@ -21,6 +21,13 @@ namespace Mongo
 
 	void TcpMongoClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{
+		int len = 0;
+		std::string json;
+		std::shared_ptr<MongoQueryRequest> resuet = std::dynamic_pointer_cast<MongoQueryRequest>(message);
+		Bson::Reader::Document document(resuet->document.Serialize(len));
+		document.WriterToJson(json);
+		CONSOLE_LOG_ERROR("send json = " << json);
+
 		if (code)
 		{
 			if(!this->StartAuthBySha1())
