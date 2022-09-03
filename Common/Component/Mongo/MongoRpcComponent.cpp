@@ -139,14 +139,15 @@ namespace Sentry
     {
         std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
 
-        Bson::Writer::Document keys(Bson::DocumentType::Object);
-        Bson::Writer::Document document(Bson::DocumentType::Object);
-        Bson::Writer::Document documentArray1(Bson::DocumentType::Array);
+        Bson::Writer::Document keys;
+        Bson::Writer::Document document;
+        Bson::Writer::Array documentArray1;
         keys.Add(name.c_str(), 1);
 
         document.Add("key", keys);
         document.Add("unique", true);
         document.Add("name", name.c_str());
+		documentArray1.Append(document);
         mongoRequest->document.Add("createIndexes", tab);
         mongoRequest->document.Add("indexes", documentArray1);
         std::shared_ptr<TcpMongoClient> mongoClient = this->GetClient();

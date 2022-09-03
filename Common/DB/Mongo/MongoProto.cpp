@@ -81,7 +81,7 @@ namespace Mongo
 namespace Mongo
 {
 	MongoQueryRequest::MongoQueryRequest()
-		: MongoRequest(OP_QUERY), document(Bson::DocumentType::Object)
+		: MongoRequest(OP_QUERY)
 	{
 		this->flag = 0;
 		this->numberToSkip  = 0;

@@ -8,36 +8,30 @@ namespace Bson
 {
     namespace Writer
     {
-        DocumentType Document::FromByJson(const std::string& json)
+        bool Document::FromByJson(const std::string& json)
         {
             rapidjson::Document document;
             if (document.Parse(json.c_str(), json.size()).HasParseError())
             {
-                return DocumentType::None;
+                return false;
             }
             if(document.IsArray())
             {
-                this->mType = DocumentType::Array;
-                for(size_t index = 0; index < document.Size(); index++)
-                {
-                    std::string key = std::to_string(index);
-                    this->WriterToBson(key.c_str(), *this, document[index]);
-                }
+				return false;
             }
             else if(document.IsObject())
             {
-                this->mType = DocumentType::Object;
                 auto iter = document.MemberBegin();
                 for (; iter != document.MemberEnd(); iter++)
                 {
                     const char *key = iter->name.GetString();
                     if (!this->WriterToBson(key, *this, iter->value))
                     {
-                        return DocumentType::None;
+                        return false;
                     }
                 }
             }
-            return this->mType;
+            return true;
         }
 
     }
@@ -100,7 +94,7 @@ namespace Bson
             }
             else if (jsonValue.IsObject())
             {
-                Bson::Writer::Document obj(DocumentType::Object);
+                Bson::Writer::Document obj;
                 for (auto iter = jsonValue.MemberBegin(); iter != jsonValue.MemberEnd(); iter++)
                 {
                     const char *key = iter->name.GetString();
@@ -114,7 +108,7 @@ namespace Bson
             }
             else if (jsonValue.IsArray())
             {
-                Bson::Writer::Document arrayDocument(DocumentType::Array);
+                Bson::Writer::Array arrayDocument;
                 for (int index = 0; index < jsonValue.Size(); index++)
                 {
                     std::string key = std::to_string(index);
@@ -150,27 +144,9 @@ namespace Bson
 			return bson;
 		}
 
-		void Document::Add(Document& document)
-		{
-			assert(this->mType == Bson::DocumentType::Array);
-			_bson::bsonobjbuilder &build = (_bson::bsonobjbuilder &) document;
-
-			switch(document.GetType())
-			{
-			case DocumentType::Array:
-				_b.appendNum((char) _bson::Array);
-				break;
-			case DocumentType::Object:
-				_b.appendNum((char) _bson::Object);
-				break;
-			}
-			_b.appendStr(std::to_string(this->mIndex++));
-			_b.appendBuf(build._done(), build.len());
-		}
 
         void Document::Add(const char *key, Document &document)
         {
-			assert(this->mType == Bson::DocumentType::Object);
 			_bson::bsonobjbuilder &build = (_bson::bsonobjbuilder &) document;
 			switch(document.GetType())
 			{
@@ -186,6 +162,30 @@ namespace Bson
         }
 	}
 }
+
+namespace Bson
+{
+	namespace Writer
+	{
+		void Array::Append(Document& document)
+		{
+			_bson::bsonobjbuilder &build = (_bson::bsonobjbuilder &) document;
+
+			switch(document.GetType())
+			{
+			case DocumentType::Array:
+				_b.appendNum((char) _bson::Array);
+				break;
+			case DocumentType::Object:
+				_b.appendNum((char) _bson::Object);
+				break;
+			}
+			_b.appendStr(std::to_string(this->mIndex++));
+			_b.appendBuf(build._done(), build.len());
+		}
+	}
+}
+
 namespace Bson
 {
 	namespace Reader

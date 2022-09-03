@@ -30,8 +30,7 @@ namespace Sentry
     {
         std::shared_ptr<MongoQueryRequest> mongoRequest
                 = std::make_shared<MongoQueryRequest>();
-        if (mongoRequest->document.FromByJson(
-                request.json()) == Bson::DocumentType::None)
+        if (!mongoRequest->document.FromByJson(request.json()))
         {
             return XCode::CallArgsError;
         }
@@ -50,60 +49,47 @@ namespace Sentry
     }
 
     XCode MongoService::Insert(const db::mongo::insert &request)
-    {
-        Bson::Writer::Document document;
-        std::shared_ptr<MongoQueryRequest> mongoRequest
-                = std::make_shared<MongoQueryRequest>();
+	{
+		Bson::Writer::Document document;
+		std::shared_ptr<MongoQueryRequest> mongoRequest
+			= std::make_shared<MongoQueryRequest>();
 
-        const std::string &tab = request.tab();
-        mongoRequest->document.Add("insert", tab);
-        switch(document.FromByJson(request.json()))
-        {
-            case Bson::DocumentType::None:
-                return XCode::CallArgsError;
-            case Bson::DocumentType::Object:
-            {
-                Bson::Writer::Document documentArray(Bson::DocumentType::Array);
+		const std::string& tab = request.tab();
+		mongoRequest->document.Add("insert", tab);
 
-                documentArray.Add(document);
-                mongoRequest->document.Add("documents", documentArray);
-            }
-                break;
-            case Bson::DocumentType::Array:
-                mongoRequest->document.Add("documents", document);
-                break;
-        }
-
-
-        std::shared_ptr<TcpMongoClient> mongoClient = this->mMongoComponent->GetClient(request.flag());
-        std::shared_ptr<MongoQueryResponse> response = this->mMongoComponent->Run(mongoClient, mongoRequest);
-        if(response == nullptr || response->GetDocumentSize() <= 0)
-        {
+		if (!document.FromByJson(request.json()))
+		{
+			return XCode::CallArgsError;
+		}
+		Bson::Writer::Array documentArray;
+		documentArray.Append(document);
+		mongoRequest->document.Add("documents", documentArray);
+		std::shared_ptr<TcpMongoClient> mongoClient = this->mMongoComponent->GetClient(request.flag());
+		std::shared_ptr<MongoQueryResponse> response = this->mMongoComponent->Run(mongoClient, mongoRequest);
+		if (response == nullptr || response->GetDocumentSize() <= 0)
+		{
 #ifdef __DEBUG__
-            LOG_ERROR("insert [" << tab << "] failure json =" << request.json());
+			LOG_ERROR("insert [" << tab << "] failure json =" << request.json());
 #endif
-            return XCode::Failure;
-        }
-        double res = 0;
-        return response->Get().Get("n", res) && res > 0 ? XCode::Successful : XCode::Failure;
-    }
+			return XCode::Failure;
+		}
+		double res = 0;
+		return response->Get().Get("n", res) && res > 0 ? XCode::Successful : XCode::Failure;
+	}
 
     XCode MongoService::Delete(const db::mongo::remove &request)
     {
         Bson::Writer::Document document;
-        switch(document.FromByJson(request.json()))
-        {
-            case Bson::DocumentType::None:
-            case Bson::DocumentType::Array:
-                return XCode::CallArgsError;
-        }
+        if(!document.FromByJson(request.json()))
+		{
+			return XCode::CallArgsError;
+		}
         Bson::Writer::Document delDocument;
         delDocument.Add("q", document);
         delDocument.Add("limit", request.limit());
 
-        Bson::Writer::Document documentArray(Bson::DocumentType::Array);
-
-        documentArray.Add(delDocument);
+        Bson::Writer::Array documentArray;
+        documentArray.Append(delDocument);
         std::shared_ptr<MongoQueryRequest> mongoRequest
                 = std::make_shared<MongoQueryRequest>();
 
@@ -126,33 +112,29 @@ namespace Sentry
     XCode MongoService::Update(const db::mongo::update &request)
     {
         Bson::Writer::Document dataDocument;
-        switch(dataDocument.FromByJson(request.update()))
+        if(!dataDocument.FromByJson(request.update()))
         {
-            case Bson::DocumentType::None:
-            case Bson::DocumentType::Array:
                 return XCode::CallArgsError;
         }
         Bson::Writer::Document selectorDocument;
-        switch(selectorDocument.FromByJson(request.select()))
+        if(!selectorDocument.FromByJson(request.select()))
         {
-            case Bson::DocumentType::None:
-            case Bson::DocumentType::Array:
                 return XCode::CallArgsError;
         }
-        Bson::Writer::Document updateDocument(Bson::DocumentType::Object);
+        Bson::Writer::Document updateDocument;
         updateDocument.Add(request.tag().c_str(), dataDocument);
         std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest);
 
-        Bson::Writer::Document updateInfo(Bson::DocumentType::Object);
+        Bson::Writer::Document updateInfo;
         const std::string & tab = request.tab();
         updateInfo.Add("multi", true);
         updateInfo.Add("upsert", false);
         updateInfo.Add("u", updateDocument);
         updateInfo.Add("q", selectorDocument);
 
-        Bson::Writer::Document updates(Bson::DocumentType::Array);
+        Bson::Writer::Array updates;
 
-        updates.Add(updateInfo);
+        updates.Append(updateInfo);
         mongoRequest->document.Add("update", tab);
         mongoRequest->document.Add("updates", updates);
         std::shared_ptr<TcpMongoClient> mongoClient = this->mMongoComponent->GetClient(request.flag());
@@ -180,11 +162,10 @@ namespace Sentry
     {
         std::shared_ptr<MongoQueryRequest> mongoRequest
                 = std::make_shared<MongoQueryRequest>();
-        switch (mongoRequest->document.FromByJson(request.json()))
-        {
-            case Bson::DocumentType::None:
-                return XCode::CallArgsError;
-        }
+        if (!mongoRequest->document.FromByJson(request.json()))
+		{
+			return XCode::CallArgsError;
+		}
         mongoRequest->numberToReturn = request.limit();
         const Mongo::Config &config = this->mMongoComponent->GetConfig();
         std::shared_ptr<TcpMongoClient> mongoClient = this->mMongoComponent->GetClient();

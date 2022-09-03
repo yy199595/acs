@@ -22,14 +22,12 @@ namespace Bson
 		class Document : protected _bson::bsonobjbuilder
 		{
 		public:
-            Document(DocumentType type = DocumentType::None)
-                : mType(type), mIndex(0) { }
-
+            Document() = default;
 			~Document() = default;
 
 		public:
             void WriterToJson(std::string & json);
-            DocumentType FromByJson(const std::string& json);
+            bool FromByJson(const std::string& json);
             const std::string & GetId() const { return this->mId; }
 		public:
 			const char* Serialize(int& length);
@@ -81,12 +79,23 @@ namespace Bson
         public:
 			int GetStreamLength();
 			bool WriterToStream(std::ostream& os);
-            DocumentType GetType() const { return this->mType; }
+            virtual DocumentType GetType() const { return DocumentType::Object; }
 			bool WriterToBson(const char* key, Document& document, const rapidjson::Value& jsonValue);
         private:
-            int mIndex;
             std::string mId;
-            DocumentType mType;
+		};
+	}
+
+	namespace Writer
+	{
+		class Array : public Document
+		{
+		 public:
+			Array() : mIndex(0) { }
+			void Append(Document & document);
+			virtual DocumentType GetType() const { return DocumentType::Array; }
+		 private:
+			int mIndex;
 		};
 	}
 
