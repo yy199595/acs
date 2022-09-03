@@ -100,7 +100,13 @@ namespace Sentry
 		}
 		mongoClient->SendMongoCommand(request);
 #ifdef __DEBUG__
+        int len = 0;
+        std::string json1;
 		long long t1 = Time::GetNowMilTime();
+        const char * str = request->document.Serialize(len);
+        Bson::Reader::Document document1(str);
+    document1.WriterToJson(json1);
+
         std::shared_ptr<Mongo::MongoQueryResponse> mongoResponse = mongoTask->Await();
 		if(mongoResponse != nullptr && mongoResponse->GetDocumentSize() > 0)
 		{

@@ -14,34 +14,14 @@ namespace Bson
 
 	namespace Writer
 	{
+		class Document;
 		class WriterDocument;
 
-		class Builder : protected _bson::bsonobjbuilder
-		{
-		public:
-			virtual bool IsArray() = 0;
-			virtual bool IsObject() = 0;
-		public:
-			template<typename T>
-			T & Cast() { return (T&)(*this);}
-		};
-
-		class Array : public Builder
+		class Array : public _bson::bsonobjbuilder
 		{
 		public:
 			Array() : mIndex(0) { }
-            Array(Builder & document) : mIndex(0) { this->Add(document); }
-		public:
-			bool IsArray() final
-			{
-				return true;
-			}
-
-			bool IsObject() final
-			{
-				return false;
-			}
-
+            Array(Document & document) : mIndex(0) { this->Add(document); }
 		public:
 			void Add(int value);
 
@@ -53,7 +33,9 @@ namespace Bson
 
 			void Add(unsigned int value);
 
-			void Add(Builder& document);
+			void Add(Array& document);
+
+			void Add(Document& document);
 
 			void Add(const std::string& value);
 
@@ -66,22 +48,13 @@ namespace Bson
 
 	namespace Writer
 	{
-		class Document : public Builder
+		class Document : public _bson::bsonobjbuilder
 		{
 		public:
 			Document() = default;
 			~Document() = default;
 
 		public:
-			bool IsArray() final
-			{
-				return false;
-			}
-
-			bool IsObject() final
-			{
-				return true;
-			}
 
 		public:
             void WriterToJson(std::string & json);
@@ -89,7 +62,8 @@ namespace Bson
 		public:
 			const char* Serialize(int& length);
 
-			void Add(const char* key, Builder& document);
+			void Add(const char* key, Array& document);
+			void Add(const char* key, Document& document);
 
 			inline void Add(const char* key, int value)
 			{
@@ -136,7 +110,9 @@ namespace Bson
 
 			bool WriterToStream(std::ostream& os);
 
-			bool WriterToBson(const char* key, Builder& document, const rapidjson::Value& jsonValue);
+			bool WriterToBson(Array& document, const rapidjson::Value& jsonValue);
+
+			bool WriterToBson(const char* key, Document& document, const rapidjson::Value& jsonValue);
 		};
 	}
 

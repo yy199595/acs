@@ -90,7 +90,8 @@ namespace Mongo
 
 	int MongoQueryRequest::GetLength()
 	{
-		return sizeof(this->flag) + this->collectionName.size() + 1 + sizeof(int) * 2 + this->document.GetStreamLength();
+		return sizeof(this->flag) + this->collectionName.size() 
+			+ 1 + sizeof(int) * 2 + this->document.GetStreamLength();
 	}
 	void MongoQueryRequest::OnWriter(std::ostream& os)
 	{
