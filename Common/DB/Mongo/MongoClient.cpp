@@ -118,6 +118,29 @@ namespace Mongo
 		return output;
 	}
 
+	std::shared_ptr<MongoQueryResponse> TcpMongoClient::SyncSendMongoCommand(std::shared_ptr<MongoQueryRequest> request)
+	{
+		if(this->SendSync(request) <= 0)
+		{
+			return nullptr;
+		}
+		if(this->RecvSync(sizeof(MongoHead)) <= 0)
+		{
+			return nullptr;
+		}
+		std::istream readStream1(&this->mRecvBuffer);
+		std::shared_ptr<MongoQueryResponse> response(new MongoQueryResponse());
+		if(this->RecvSync(response->OnReceiveHead(readStream1)) <= 0)
+		{
+			return nullptr;
+		}
+		if(response->OnReceiveBody(readStream1) <= 0)
+		{
+			return nullptr;
+		}
+		return response;
+	}
+
 	bool TcpMongoClient::StartAuthBySha1()
 	{
 		if(!this->ConnectSync())

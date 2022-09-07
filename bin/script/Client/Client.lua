@@ -8,22 +8,21 @@ end
 local account = "yjz1995"
 local password = "123456"
 local phoneNum = 13716061995
-
+local clientComponent = App.GetComponent("ClientComponent")
 
 function Client.Start()
 
-    LoginComponent.Awake()
-    print("------------")
-    local clientComponent = App.GetComponent("ClientComponent")
-    LoginComponent.Register(account, password, phoneNum)
+    --LoginComponent.Awake()
+    --print("------------")
+    --LoginComponent.Register(account, password, phoneNum)
+    --
+    --local loginInfo = LoginComponent.Login(account, password)
+    --if loginInfo.code ~= XCode.Successful then
+    --    Log.Error("使用http登陆失败")
+    --    return false
+    --end
 
-    local loginInfo = LoginComponent.Login(account, password)
-    if loginInfo.code ~= XCode.Successful then
-        Log.Error("使用http登陆失败")
-        return false
-    end
-
-    local address = loginInfo.data.address
+    local address = "114.115.167.51:1995"--loginInfo.data.address
     if not clientComponent:StartConnectAsync(address) then
         Log.Error("连接网关服务器 [" , address, "] 失败")
         return false
@@ -31,7 +30,7 @@ function Client.Start()
     Log.Debug("连接网关服务器[" , address, "]成功")
 
     local code, _ = clientComponent:Call("GateService.Auth", "c2s.auth.request", {
-        token = loginInfo.data.token
+        token = ""
     })
     if code ~= XCode.Successful then
         Log.Error("user auth failure")

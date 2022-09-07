@@ -26,7 +26,7 @@ namespace Sentry
         asio::io_service & t = this->mSocket->GetThread();
 		t.post(std::bind(&TcpRedisClient::Send, this, command));
 #endif
-        CONSOLE_LOG_INFO("async command = " << command->ToJson());
+        //CONSOLE_LOG_INFO("async command = " << command->ToJson());
 	}
 
 	void TcpRedisClient::OnReceiveLine(const asio::error_code& code, std::istream & is, size_t size)

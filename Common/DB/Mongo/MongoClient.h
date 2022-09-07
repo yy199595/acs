@@ -44,6 +44,7 @@ namespace Mongo
 		bool StartAuthBySha1();
 		void OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
+		std::shared_ptr<MongoQueryResponse> SyncSendMongoCommand(std::shared_ptr<MongoQueryRequest> request);
 	private:
 		const Mongo::Config & mConfig;
 		asio::streambuf streamBuffer;
