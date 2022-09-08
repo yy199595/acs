@@ -148,6 +148,13 @@ namespace Mongo
 			CONSOLE_LOG_ERROR("connect mongo error");
 			return false;
 		}
+//		string json;
+//		std::shared_ptr<Mongo::MongoQueryRequest> request(new MongoQueryRequest());
+//		request->header.requestID = 1;
+//		request->document.Add("use", this->mConfig.mDb);
+//		std::shared_ptr<MongoQueryResponse> response =
+//					this->SyncSendMongoCommand(request);
+//		response->Get().WriterToJson(json);
 		if(this->mConfig.mPasswd.empty())
 		{
 			return true;
@@ -165,28 +172,17 @@ namespace Mongo
 		request1->document.Add("mechanism", "SCRAM-SHA-1");
 		request1->document.Add("payload", payload);
 
-		if(this->SendSync(request1) <= 0)
+        std::shared_ptr<MongoQueryResponse> response1 =
+				this->SyncSendMongoCommand(request1);
+		if(response1 == nullptr && response1->GetDocumentSize() == 0)
 		{
 			return false;
 		}
-		if(this->RecvSync(sizeof(MongoHead)) <= 0)
-		{
-			return false;
-		}
-        MongoQueryResponse response1;
-		std::istream readStream1(&this->mRecvBuffer);
-		if(this->RecvSync(response1.OnReceiveHead(readStream1)) <= 0)
-		{
-			return false;
-		}
-
 		int conversationId = 0;
 		std::string server_first;
-        if(response1.OnReceiveBody(readStream1) <= 0)
-        {
-            return false;
-        }
-		if(!response1[0].Get("payload", server_first) || !response1[0].Get("conversationId", conversationId))
+		Bson::Reader::Document & document1 = response1->Get();
+		if(!document1.Get("payload", server_first) ||
+			!document1.Get("conversationId", conversationId))
 		{
 			return false;
 		}
@@ -225,30 +221,21 @@ namespace Mongo
 		request2->document.Add("saslContinue", 1);
 		request2->document.Add("conversationId", conversationId);
 		request2->document.Add("payload", client_final);
-		if(this->SendSync(request2) <= 0)
+
+        std::shared_ptr<MongoQueryResponse> response2 =
+				this->SyncSendMongoCommand(request2);
+		if(response2 == nullptr || response2->GetDocumentSize() == 0)
 		{
 			return false;
 		}
-		if(this->RecvSync(sizeof(MongoHead)) <= 0)
-		{
-			return false;
-		}
-        MongoQueryResponse response2;
-		if(this->RecvSync(response2.OnReceiveHead(readStream1)) <= 0)
-		{
-			return false;
-		}
-        if(response2.OnReceiveBody(readStream1) <=0 )
-        {
-            return false;
-        }
         parsedSource.clear();
-		if(!response2[0].Get("payload", parsedSource))
+		Bson::Reader::Document & document2 = response2->Get();
+		if(!document2.Get("payload", parsedSource))
 		{
 			return false;
 		}
 		bool done = false;
-		if(response2[0].Get("done", done) && done)
+		if(document2.Get("done", done) && done)
 		{
 			return true;
 		}
@@ -259,24 +246,14 @@ namespace Mongo
 		request3->document.Add("conversationId", conversationId);
 		request3->document.Add("payload", "");
 
-		if(this->SendSync(request2) <= 0 || this->RecvSync(sizeof(MongoHead)) <= 0)
+        std::shared_ptr<MongoQueryResponse> response3 =
+				this->SyncSendMongoCommand(request3);
+		if(response3 == nullptr && response3->GetDocumentSize() == 0)
 		{
 			return false;
 		}
-        MongoQueryResponse response3;
-		if(this->RecvSync(response3.OnReceiveHead(readStream1)) <= 0)
-		{
-			return false;
-		}
-        if(response3.OnReceiveBody(readStream1) <=0)
-        {
-            return false;
-        }
-		if(!response3[0].IsOk())
-		{
-			return false;
-		}
-		return response3[0].Get("done", done) && done;
+		Bson::Reader::Document & document3 = response3->Get();
+		return document3.IsOk() && document3.Get("done", done) && done;
 	}
 
 }
