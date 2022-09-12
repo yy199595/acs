@@ -48,18 +48,18 @@ namespace Client
     {
         int len = 0;
         const char * data = message->GetData(len);
-        MESSAGE_TYPE type = (MESSAGE_TYPE)message->GetType();
-        MESSAGE_PROTO proto = (MESSAGE_PROTO)message->GetPorot();
+        Tcp::Type type = (Tcp::Type)message->GetType();
+        Tcp::Porto proto = (Tcp::Porto)message->GetProto();
         switch(proto)
         {
-            case MESSAGE_PROTO::MSG_RPC_JSON:
+            case Tcp::Porto::Json:
             {
 
             }
                 break;
-            case MESSAGE_PROTO::MSG_RPC_PROTOBUF:
+            case Tcp::Porto::Protobuf:
             {
-                if(type == MESSAGE_TYPE::MSG_RPC_REQUEST)
+                if(type == Tcp::Type::Request)
                 {
                     std::shared_ptr<c2s::rpc::call> request
                             = std::make_shared<c2s::rpc::call>();
@@ -68,7 +68,7 @@ namespace Client
                         this->OnRequest(request);
                     }
                 }
-                else if(type == MESSAGE_TYPE::MSG_RPC_RESPONSE)
+                else if(type == Tcp::Type::Response)
                 {
                     std::shared_ptr<c2s::rpc::response> response
                         = std::make_shared<c2s::rpc::response>();

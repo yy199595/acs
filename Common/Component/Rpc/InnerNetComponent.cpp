@@ -26,39 +26,52 @@ namespace Sentry
 
     void InnerNetComponent::OnMessage(const std::string &address, std::shared_ptr<Tcp::RpcMessage> message)
     {
-        int len = 0;
-        const char * data = message->GetData(len);
-        MESSAGE_TYPE type = (MESSAGE_TYPE)message->GetType();
-        MESSAGE_PROTO proto = (MESSAGE_PROTO)message->GetPorot();
-        switch(proto)
-        {
-            case MESSAGE_PROTO::MSG_RPC_JSON:
-            {
-
-            }
-                break;
-            case MESSAGE_PROTO::MSG_RPC_PROTOBUF:
-            {
-                if(type == MESSAGE_TYPE::MSG_RPC_REQUEST)
-                {
-                    if(!this->mMessageComponent->OnProtoRequest(address, data, len))
-                    {
-                        this->StartClose(address);
-                        return;
-                    }
-                }
-                else if(type == MESSAGE_TYPE::MSG_RPC_RESPONSE)
-                {
-                    if(!this->mMessageComponent->OnProtoResponse(address, data, len))
-                    {
-                        this->StartClose(address);
-                        return;
-                    }
-                }
-            }
-                break;
-        }
+		switch ((Tcp::Type)message->GetType())
+		{
+		case Tcp::Type::Request:
+			if (!this->OnRequest(address, *message))
+			{
+				this->StartClose(address);
+			}
+			break;
+		case Tcp::Type::Response:
+			if (!this->OnResponse(address, *message))
+			{
+				this->StartClose(address);
+			}
+			break;
+		}      
     }
+
+	bool InnerNetComponent::OnRequest(const std::string& address, const Tcp::RpcMessage& message)
+	{
+		int len = 0;
+		const char * data = message.GetData(len);
+		std::shared_ptr<com::rpc::request> request
+			= std::make_shared<com::rpc::request>();
+		if (!request->ParseFromArray(data, len))
+		{
+			return false;
+		}
+		request->set_address(address);
+		request->set_type(com::rpc_msg_type::rpc_msg_type_proto);
+		return this->mMessageComponent->OnRequest(request) == XCode::Successful;
+	}
+
+	bool InnerNetComponent::OnResponse(const std::string& address, const Tcp::RpcMessage& message)
+	{
+		int len = 0;
+		const char* data = message.GetData(len);
+		std::shared_ptr<com::rpc::response> response
+			= std::make_shared<com::rpc::response>();
+		if (!response->ParseFromArray(data, len))
+		{
+			return false;
+		}
+		long long rpcId = response->rpc_id();
+		this->mMessageComponent->OnResponse(rpcId, response);
+		return true;
+	}
 
 	void InnerNetComponent::OnCloseSocket(const std::string & address, XCode code)
 	{

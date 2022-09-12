@@ -16,7 +16,7 @@ namespace Client
                 std::make_shared<Tcp::Rpc::RpcProtoMessage>();
 
         networkData->mMessage = request;
-        networkData->mType = MESSAGE_TYPE::MSG_RPC_REQUEST;
+        networkData->mType = Tcp::Type ::Request;
 #ifdef ONLY_MAIN_THREAD
         this->Send(networkData);
 #else

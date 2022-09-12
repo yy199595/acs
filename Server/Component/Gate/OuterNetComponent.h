@@ -32,9 +32,11 @@ namespace Sentry
 	 public:
 		void Awake() final;
 		bool LateAwake() final;
+
 		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 private:
         bool StartInComplete() final { return false; }
+		bool OnRequest(const std::string& address, const Tcp::RpcMessage & message);	
     private:
 		class TimerComponent* mTimerComponent;
         class NetThreadComponent * mNetComponent;

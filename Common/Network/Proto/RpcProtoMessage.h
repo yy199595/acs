@@ -17,8 +17,8 @@ namespace Tcp
             RpcProtoMessage();
 			int Serailize(std::ostream &os) final;
         public:
-			MESSAGE_TYPE mType;
-            MESSAGE_PROTO mPorto;
+			Tcp::Type mType;
+            Tcp::Porto mPorto;
 			std::shared_ptr<Message> mMessage;
 		};
 	}

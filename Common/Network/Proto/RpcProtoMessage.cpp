@@ -10,7 +10,7 @@ namespace Tcp
 	{
 		RpcProtoMessage::RpcProtoMessage()
 		{
-            this->mPorto = MESSAGE_PROTO::MSG_RPC_PROTOBUF;
+            this->mPorto = Tcp::Porto::Protobuf;
 		}
 
 		int RpcProtoMessage::Serailize(std::ostream& os)

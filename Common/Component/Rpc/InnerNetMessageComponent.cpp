@@ -25,31 +25,6 @@ namespace Sentry
 		return true;
 	}
 
-    bool InnerNetMessageComponent::OnProtoRequest(const std::string &address, const char *data, int len)
-    {
-        std::shared_ptr<com::rpc::request> request =
-                    std::make_shared<com::rpc::request>();
-        if(!request->ParseFromArray(data, len))
-        {
-            return false;
-        }
-        request->set_address(address);
-        request->set_type(com::rpc_msg_type_proto);
-        return this->OnRequest(request) == XCode::Successful;
-    }
-
-    bool InnerNetMessageComponent::OnProtoResponse(const std::string &address, const char *data, int len)
-    {
-        std::shared_ptr<com::rpc::response> response(new com::rpc::response());
-        if(!response->ParseFromArray(data, len))
-        {
-            return false;
-        }
-        long long taskId = response->rpc_id();
-        this->OnResponse(taskId, response);
-        return true;
-    }
-
 	XCode InnerNetMessageComponent::OnRequest(std::shared_ptr<com::rpc::request> request)
 	{
 		if(!RpcServiceConfig::ParseFunName(request->func(), this->mService, this->mMethod))

@@ -33,7 +33,7 @@ namespace Sentry
             = std::make_shared<Tcp::Rpc::RpcProtoMessage>();
 
         response->mMessage = message;
-        response->mType = MESSAGE_TYPE::MSG_RPC_RESPONSE;
+        response->mType = Tcp::Type::Response;
 #ifdef ONLY_MAIN_THREAD
 		this->Send(response);
 #else
@@ -48,7 +48,7 @@ namespace Sentry
 				= std::make_shared<Tcp::Rpc::RpcProtoMessage>();
 
         request->mMessage = message;
-        request->mType = MESSAGE_TYPE::MSG_RPC_REQUEST;
+        request->mType = Tcp::Type::Request;
 #ifdef ONLY_MAIN_THREAD
 		this->Send(request);
 #else

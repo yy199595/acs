@@ -7,23 +7,20 @@
 #include <Define/CommonLogDef.h>
 #include <Define/CommonTypeDef.h>
 
-enum class MESSAGE_TYPE
-{
-	MSG_RPC_REQUEST = 0x01, //服务器请求
-	MSG_RPC_RESPONSE = 0x02, //服务器返回
-	MSG_RPC_CALL_CLIENT = 0x03, //服务器调用客户端
-	MSG_RPC_CLIENT_REQUEST = 0x04, //客户端请求
-	MSG_NET_EVENT = 0x05 //redis事件
-};
-
-enum class MESSAGE_PROTO
-{
-    MSG_RPC_JSON = 0x01, //json
-    MSG_RPC_PROTOBUF = 0x02 //protobuf
-};
-
 namespace Tcp
 {
+    enum class Type
+    {
+        None,
+        Request,
+        Response
+    };
+    enum class Porto
+    {
+        None,
+        Json,
+        Protobuf
+    };
     class RpcMessage
     {
     public:
@@ -34,7 +31,7 @@ namespace Tcp
 
     public:
         int GetType() const { return this->mType; }
-        int GetPorot() const { return this->mProto; }
+        int GetProto() const { return this->mProto; }
         const char * GetData(int & size) const;
     private:
         int mSize;

@@ -30,32 +30,35 @@ namespace Sentry
 		return true;
 	}
 
-    void OuterNetComponent::OnMessage(const std::string &address, std::shared_ptr<Tcp::RpcMessage> message)
-    {
-        int len = 0;
-        const char * data = message->GetData(len);
-        MESSAGE_TYPE type = (MESSAGE_TYPE)message->GetType();
-        MESSAGE_PROTO proto = (MESSAGE_PROTO)message->GetPorot();
-        switch(proto)
-        {
-            case MESSAGE_PROTO::MSG_RPC_JSON:
-            {
+	void OuterNetComponent::OnMessage(const std::string& address, std::shared_ptr<Tcp::RpcMessage> message)
+	{		
+		switch ((Tcp::Type)message->GetType())
+		{
+		case Tcp::Type::Request:
+			if (!this->OnRequest(address, *message))
+			{
+				this->StartClose(address);
+			}
+			break;
+		default:
+			this->StartClose(address);
+			break;
+		}
+	}
 
-            }
-                break;
-            case MESSAGE_PROTO::MSG_RPC_PROTOBUF:
-            {
-                if(type == MESSAGE_TYPE::MSG_RPC_REQUEST)
-                {
-                    if(!this->mOuterMessageComponent->OnProtoRequest(address, data, len))
-                    {
-                        this->StartClose(address);
-                        return;
-                    }
-                }
-            }
-        }
-    }
+	bool OuterNetComponent::OnRequest(const std::string& address, const Tcp::RpcMessage& message)
+	{
+		int len = 0;
+		const char* data = message.GetData(len);
+		std::shared_ptr<c2s::rpc::request> request
+			= std::make_shared<c2s::rpc::request>();
+		if (!request->ParseFromArray(data, len))
+		{
+			return false;
+		}
+		request->set_address(address);
+		return this->mOuterMessageComponent->OnRequest(request) == XCode::Successful;
+	}
 
 	bool OuterNetComponent::OnListen(std::shared_ptr<SocketProxy> socket)
     {

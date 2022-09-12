@@ -27,11 +27,8 @@ namespace Sentry
 		bool LateAwake() final;
         void OnTaskTimeout(long long rpcId);
     public:
-        bool OnProtoRequest(const std::string & address, const char * data, int len);
-        bool OnProtoResponse(const std::string & address, const char * data, int len);
-
+		XCode OnRequest(std::shared_ptr<com::rpc::request> request);      
     private:
-        XCode OnRequest(std::shared_ptr<com::rpc::request> request);
     private:
         std::string mMethod;
         std::string mService;

@@ -27,6 +27,9 @@ namespace Sentry
 	 public:
 		bool Send(const std::string & address, std::shared_ptr<com::rpc::request> message);
 		bool Send(const std::string & address, std::shared_ptr<com::rpc::response> message);
+	private:
+		bool OnRequest(const std::string & address, const Tcp::RpcMessage& message);
+		bool OnResponse(const std::string& address, const Tcp::RpcMessage& message);
 	 private:
         class NetThreadComponent * mNetComponent;
         class InnerNetMessageComponent* mMessageComponent;

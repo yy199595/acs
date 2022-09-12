@@ -54,17 +54,6 @@ namespace Sentry
 		return true;
 	}
 
-    bool OuterNetMessageComponent::OnProtoRequest(const std::string &address, const char *data, int len)
-    {
-        std::shared_ptr<c2s::rpc::request> request(new c2s::rpc::request());
-        if(!request->ParseFromArray(data, len))
-        {
-            return false;
-        }
-        request->set_address(address);
-        return this->OnRequest(request) == XCode::Successful;
-    }
-
 	XCode OuterNetMessageComponent::OnRequest(std::shared_ptr<c2s::rpc::request> request)
 	{
 		std::string method, service;
