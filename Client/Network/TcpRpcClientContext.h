@@ -24,6 +24,6 @@ namespace Client
         char mDataBuffer[1024];
         Tcp::DecodeState mState;
         ClientComponent * mClientComponent;
-        std::shared_ptr<Tcp::RpcMessage> mMessage;
+        std::shared_ptr<Tcp::BinMessage> mMessage;
     };
 }

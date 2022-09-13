@@ -15,7 +15,7 @@ using namespace Mongo;
 
 namespace Sentry
 {
-	class MongoTask : public IRpcTask<Mongo::MongoQueryResponse>
+	class MongoTask : public IRpcTask<Mongo::CommandResponse>
 	{
 	public:
 		MongoTask(int taskId, int ms);
@@ -24,18 +24,18 @@ namespace Sentry
 
     public:
         void OnTimeout() final;
-		void OnResponse(std::shared_ptr<Mongo::MongoQueryResponse> response) final;
-		std::shared_ptr<Mongo::MongoQueryResponse> Await() { return mTask.Await(); }
+		void OnResponse(std::shared_ptr<Mongo::CommandResponse> response) final;
+		std::shared_ptr<Mongo::CommandResponse> Await() { return mTask.Await(); }
 	private:
         int mTaskId;
-		TaskSource<std::shared_ptr<Mongo::MongoQueryResponse>> mTask;
+		TaskSource<std::shared_ptr<Mongo::CommandResponse>> mTask;
 	};
 }
 
 
 namespace Sentry
 {
-	class MongoRpcComponent : public RpcTaskComponent<Mongo::MongoQueryResponse>, public IStart
+	class MongoRpcComponent : public RpcTaskComponent<Mongo::CommandResponse>, public IStart
 	{
 	public:
 		MongoRpcComponent() = default;
@@ -52,7 +52,7 @@ namespace Sentry
         void OnClientError(int index, XCode code);
         std::shared_ptr<TcpMongoClient> GetClient(int index = 0);
         const Mongo::Config & GetConfig() const { return this->mConfig;}
-		std::shared_ptr<Mongo::MongoQueryResponse> Run(std::shared_ptr<TcpMongoClient> mongoClient, std::shared_ptr<MongoQueryRequest> request);
+		std::shared_ptr<Mongo::CommandResponse> Run(std::shared_ptr<TcpMongoClient> mongoClient, std::shared_ptr<CommandRequest> request);
 	 private:
 		Mongo::Config mConfig;
 		TimerComponent * mTimerComponent;

@@ -5,7 +5,7 @@
 #include"LuaWaitTaskSource.h"
 #include"Script/Extension/Json/values.hpp"
 #include<google/protobuf/util/json_util.h>
-#include"Component/Scene/ProtocolComponent.h"
+#include"Component/Scene/ProtoComponent.h"
 #include"Script/Extension/Coroutine/LuaCoroutine.h"
 namespace Sentry
 {
@@ -42,7 +42,7 @@ namespace Sentry
 		lua_pushinteger(this->mLua, (int)code);
 		if (code == XCode::Successful && response != nullptr)
 		{
-			ProtocolComponent * messageComponent = App::Get()->GetMsgComponent();
+			ProtoComponent * messageComponent = App::Get()->GetMsgComponent();
 			messageComponent->Write(this->mLua, *response);
             Lua::Coroutine::Resume(coroutine, this->mLua, 2);
 			return;

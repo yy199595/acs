@@ -37,7 +37,7 @@ namespace Sentry
         unsigned int mCallCount;
         Tcp::DecodeState mState;
         OuterNetComponent* mGateComponent;
-        std::shared_ptr<Tcp::RpcMessage> mMessage;
+        std::shared_ptr<Tcp::BinMessage> mMessage;
         std::shared_ptr<asio::steady_timer> mTimer;
 	};
 }

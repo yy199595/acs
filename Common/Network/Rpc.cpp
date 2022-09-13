@@ -4,7 +4,7 @@
 #include"Rpc.h"
 namespace Tcp
 {
-    RpcMessage::RpcMessage()
+    BinMessage::BinMessage()
     {
         this->mType = 0;
         this->mSize = 0;
@@ -12,7 +12,7 @@ namespace Tcp
         this->mBuffer = nullptr;
     }
 
-    RpcMessage::~RpcMessage()
+    BinMessage::~BinMessage()
     {
         if(this->mBuffer != nullptr)
         {
@@ -20,7 +20,7 @@ namespace Tcp
         }
     }
 
-    int RpcMessage::DecodeHead(std::istream &is)
+    int BinMessage::DecodeHead(std::istream &is)
     {
         is.readsome((char *)&this->mSize, sizeof(int));
         this->mType = is.get();
@@ -28,7 +28,7 @@ namespace Tcp
         return this->mSize;
     }
 
-    bool RpcMessage::DecodeBody(std::istream &is)
+    bool BinMessage::DecodeBody(std::istream &is)
     {
         if (this->mBuffer == nullptr)
         {
@@ -37,7 +37,7 @@ namespace Tcp
         return is.readsome(this->mBuffer, this->mSize) == this->mSize;
     }
 
-    const char *RpcMessage::GetData(int &size) const
+    const char *BinMessage::GetData(int &size) const
     {
         size = this->mSize;
         return this->mBuffer;

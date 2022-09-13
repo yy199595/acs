@@ -24,7 +24,7 @@ namespace Sentry
 		return true;
 	}
 
-    void InnerNetComponent::OnMessage(const std::string &address, std::shared_ptr<Tcp::RpcMessage> message)
+    void InnerNetComponent::OnMessage(const std::string &address, std::shared_ptr<Tcp::BinMessage> message)
     {
 		switch ((Tcp::Type)message->GetType())
 		{
@@ -43,7 +43,7 @@ namespace Sentry
 		}      
     }
 
-	bool InnerNetComponent::OnRequest(const std::string& address, const Tcp::RpcMessage& message)
+	bool InnerNetComponent::OnRequest(const std::string& address, const Tcp::BinMessage& message)
 	{
 		int len = 0;
 		const char * data = message.GetData(len);
@@ -58,7 +58,7 @@ namespace Sentry
 		return this->mMessageComponent->OnRequest(request) == XCode::Successful;
 	}
 
-	bool InnerNetComponent::OnResponse(const std::string& address, const Tcp::RpcMessage& message)
+	bool InnerNetComponent::OnResponse(const std::string& address, const Tcp::BinMessage& message)
 	{
 		int len = 0;
 		const char* data = message.GetData(len);

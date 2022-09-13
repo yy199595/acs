@@ -18,7 +18,7 @@
 #include"Component/Scene/LoggerComponent.h"
 #include"Component/Gate/OuterNetMessageComponent.h"
 #include"Component/Gate/OuterNetComponent.h"
-#include"Component/Scene/ProtocolComponent.h"
+#include"Component/Scene/ProtoComponent.h"
 #include"Component/RpcService/LuaService.h"
 #include"Component/Http/HttpWebComponent.h"
 #include"Component/Mongo/MongoService.h"
@@ -37,7 +37,7 @@
 #include"Component/RpcService/ServiceAgent.h"
 #include"Component/Mongo/MongoAgentComponent.h"
 #include"Component/HttpService/HttpWebService.h"
-#include"Component/Mongo/DataSyncRedisComponent.h"
+#include"Component/Mongo/DataSyncComponent.h"
 using namespace Sentry;
 void RegisterComponent()
 {
@@ -53,7 +53,7 @@ void RegisterComponent()
 	ComponentFactory::Add<OperatorComponent>("OperatorComponent");
     ComponentFactory::Add<UnitMgrComponent>("UnitMgrComponent");
     ComponentFactory::Add<NetThreadComponent>("NetThreadComponent");
-    ComponentFactory::Add<ProtocolComponent>("ProtocolComponent");
+    ComponentFactory::Add<ProtoComponent>("ProtoComponent");
 
 //server
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
@@ -70,7 +70,7 @@ void RegisterComponent()
     ComponentFactory::Add<RedisDataComponent>("RedisDataComponent");
     ComponentFactory::Add<RedisSubComponent>("RedisSubComponent");
 	ComponentFactory::Add<MongoAgentComponent>("MongoAgentComponent");
-    ComponentFactory::Add<DataSyncRedisComponent>("DataSyncRedisComponent");
+    ComponentFactory::Add<DataSyncComponent>("DataSyncComponent");
 
 //http
     ComponentFactory::Add<HttpComponent>("HttpComponent");

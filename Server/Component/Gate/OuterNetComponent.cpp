@@ -30,7 +30,7 @@ namespace Sentry
 		return true;
 	}
 
-	void OuterNetComponent::OnMessage(const std::string& address, std::shared_ptr<Tcp::RpcMessage> message)
+	void OuterNetComponent::OnMessage(const std::string& address, std::shared_ptr<Tcp::BinMessage> message)
 	{		
 		switch ((Tcp::Type)message->GetType())
 		{
@@ -46,7 +46,7 @@ namespace Sentry
 		}
 	}
 
-	bool OuterNetComponent::OnRequest(const std::string& address, const Tcp::RpcMessage& message)
+	bool OuterNetComponent::OnRequest(const std::string& address, const Tcp::BinMessage& message)
 	{
 		int len = 0;
 		const char* data = message.GetData(len);

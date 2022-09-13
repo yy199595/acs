@@ -480,14 +480,13 @@ namespace Sentry
                         this->mHttpData.mPath = this->mUrl.substr(0, pos);
                         return 0;
 					}
-                    this->mHttpData.mPath = this->mUrl.substr(this->mRoute.size());
 					return 0;
 				}
 				else if (this->mHttpData.mMethod != "POST")
 				{
 					return -2;
 				}
-				this->mHttpData.mPath = this->mUrl;
+                this->mHttpData.mPath = this->mUrl.substr(this->mRoute.size() + 1);
                 return 1; //读一部分
 			}
 		}

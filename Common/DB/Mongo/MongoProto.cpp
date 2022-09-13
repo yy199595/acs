@@ -28,59 +28,7 @@ namespace Mongo
 
 namespace Mongo
 {
-	int MongoLuaRequest::GetLength()
-	{
-		return this->mCommand.size();
-	}
-	void MongoLuaRequest::OnWriter(std::ostream& os)
-	{
-		os.write(this->mCommand.c_str(), this->mCommand.size());
-	}
-
-}
-
-namespace Mongo
-{
-	MongoUpdateRequest::MongoUpdateRequest()
-		: MongoRequest(OP_UPDATE)
-	{
-		this->flag = 0;
-		this->zero = 0;
-	}
-
-	int MongoUpdateRequest::GetLength()
-	{
-		return 0;
-	}
-
-	void MongoUpdateRequest::OnWriter(std::ostream& os)
-	{
-
-	}
-}
-
-namespace Mongo
-{
-	MongoInsertRequest::MongoInsertRequest()
-		: MongoRequest(OP_INSERT)
-	{
-
-	}
-
-	void MongoInsertRequest::OnWriter(std::ostream& os)
-	{
-
-	}
-
-	int MongoInsertRequest::GetLength()
-	{
-		return 0;
-	}
-}
-
-namespace Mongo
-{
-	MongoQueryRequest::MongoQueryRequest()
+	CommandRequest::CommandRequest()
 		: MongoRequest(OP_QUERY)
 	{
 		this->flag = 0;
@@ -88,12 +36,12 @@ namespace Mongo
 		this->numberToReturn = 1;
 	}
 
-	int MongoQueryRequest::GetLength()
+	int CommandRequest::GetLength()
 	{
 		return sizeof(this->flag) + this->collectionName.size() 
 			+ 1 + sizeof(int) * 2 + this->document.GetStreamLength();
 	}
-	void MongoQueryRequest::OnWriter(std::ostream& os)
+	void CommandRequest::OnWriter(std::ostream& os)
 	{
 		this->Write(os, this->flag);
 		this->Write(os, this->collectionName);
@@ -105,7 +53,7 @@ namespace Mongo
 
 namespace Mongo
 {
-    int MongoQueryResponse::OnReceiveHead(std::istream & os)
+    int CommandResponse::OnReceiveHead(std::istream & os)
     {
 		union {
 			MongoHead Head;
@@ -116,7 +64,16 @@ namespace Mongo
         return head.Head.messageLength - sizeof(MongoHead);
     }
 
-    int MongoQueryResponse::ReadInt(std::istream & is)
+    CommandResponse::~CommandResponse()
+    {
+        for(Bson::Reader::Document * doc : *this)
+        {
+            delete doc;
+        }
+        this->clear();
+    }
+
+    int CommandResponse::ReadInt(std::istream & is)
     {
         union {
             int v;
@@ -126,7 +83,7 @@ namespace Mongo
         return u.v;
     }
 
-    long long MongoQueryResponse::ReadLong(std::istream &is)
+    long long CommandResponse::ReadLong(std::istream &is)
     {
         union {
             long long v;
@@ -136,7 +93,7 @@ namespace Mongo
         return u.v;
     }
 
-	size_t MongoQueryResponse::OnReceiveBody(std::istream & os)
+	size_t CommandResponse::OnReceiveBody(std::istream & os)
 	{
 		this->mBuffer.clear();
         this->responseFlags = this->ReadInt(os);
@@ -153,10 +110,10 @@ namespace Mongo
         for(int index = 0; index < this->mBuffer.size();)
         {
             const char * bson = this->mBuffer.c_str() + index;
-            std::shared_ptr<Bson::Reader::Document> obj(new Bson::Reader::Document(bson));
-            index += obj->Length();
-            this->mDocuments.emplace_back(obj);
+            Bson::Reader::Document * document = new Bson::Reader::Document(bson);
+            index+= document->Length();
+            this->emplace_back(document);
         }
-		return this->mDocuments.size();
+		return this->size();
 	}
 }

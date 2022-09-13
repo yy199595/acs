@@ -4,7 +4,7 @@
 #include"Other/ElapsedTimer.h"
 #include"Util/DirectoryHelper.h"
 #include"Component/RpcService/LuaService.h"
-#include"Component/Scene/ProtocolComponent.h"
+#include"Component/Scene/ProtoComponent.h"
 #include"Component/Scene/RedisChannelComponent.h"
 using namespace Sentry;
 using namespace std::chrono;
@@ -34,7 +34,7 @@ namespace Sentry
 		this->mTaskComponent = this->GetOrAddComponent<TaskComponent>();
 		this->mLogComponent = this->GetOrAddComponent<LoggerComponent>();
 		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
-		this->mMessageComponent = this->GetOrAddComponent<ProtocolComponent>();
+		this->mMessageComponent = this->GetOrAddComponent<ProtoComponent>();
 
 		std::vector<std::string> components;
 		if (this->mConfig->GetMember("component", components)) //添加组件

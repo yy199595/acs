@@ -13,7 +13,7 @@
 #include"GateService.h"
 #include"Component/User/UserSyncComponent.h"
 #include"Component/Redis/RedisDataComponent.h"
-#include"Component/Scene/ProtocolComponent.h"
+#include"Component/Scene/ProtoComponent.h"
 
 namespace Sentry
 {

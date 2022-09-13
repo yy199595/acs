@@ -44,7 +44,7 @@ namespace Client
         LOG_INFO("call client func = " << t1->func());
 	}
 
-    void ClientComponent::OnMessage(const std::string &address, std::shared_ptr<Tcp::RpcMessage> message)
+    void ClientComponent::OnMessage(const std::string &address, std::shared_ptr<Tcp::BinMessage> message)
     {
         int len = 0;
         const char * data = message->GetData(len);

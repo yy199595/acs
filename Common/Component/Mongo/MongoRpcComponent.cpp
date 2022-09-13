@@ -7,9 +7,9 @@
 namespace Sentry
 {
 	MongoTask::MongoTask(int id, int ms)
-        : IRpcTask<Mongo::MongoQueryResponse>(ms), mTaskId(id) { }
+        : IRpcTask<Mongo::CommandResponse>(ms), mTaskId(id) { }
 
-	void MongoTask::OnResponse(std::shared_ptr<Mongo::MongoQueryResponse> response)
+	void MongoTask::OnResponse(std::shared_ptr<Mongo::CommandResponse> response)
 	{
 		this->mTask.SetResult(response);
 	}
@@ -80,13 +80,13 @@ namespace Sentry
         this->mRequestId.Push((int)taskId);
 	}
 
-	void MongoRpcComponent::OnAddTask(RpcTaskComponent<Mongo::MongoQueryResponse>::RpcTask task)
+	void MongoRpcComponent::OnAddTask(RpcTaskComponent<Mongo::CommandResponse>::RpcTask task)
 	{
 
 	}
 
-	std::shared_ptr<Mongo::MongoQueryResponse> MongoRpcComponent::Run(
-            std::shared_ptr<TcpMongoClient> mongoClient, std::shared_ptr<MongoQueryRequest> request)
+	std::shared_ptr<Mongo::CommandResponse> MongoRpcComponent::Run(
+            std::shared_ptr<TcpMongoClient> mongoClient, std::shared_ptr<CommandRequest> request)
 	{
 		if(request->collectionName.empty())
 		{
@@ -107,7 +107,7 @@ namespace Sentry
         Bson::Reader::Document document1(str);
         document1.WriterToJson(json1);
 
-        std::shared_ptr<Mongo::MongoQueryResponse> mongoResponse = mongoTask->Await();
+        std::shared_ptr<Mongo::CommandResponse> mongoResponse = mongoTask->Await();
 		if(mongoResponse != nullptr && mongoResponse->GetDocumentSize() > 0)
 		{
             LOG_DEBUG( "[" << Time::GetNowMilTime() - t1 << "ms] document size = [" << mongoResponse->GetDocumentSize() << "]");
@@ -137,7 +137,7 @@ namespace Sentry
 
     bool MongoRpcComponent::SetIndex(const std::string &tab, const std::string &name)
     {
-        std::shared_ptr<MongoQueryRequest> mongoRequest(new MongoQueryRequest());
+        std::shared_ptr<CommandRequest> mongoRequest(new CommandRequest());
 
         Bson::Writer::Document keys;
         Bson::Writer::Document document;
@@ -155,8 +155,8 @@ namespace Sentry
 
 	bool MongoRpcComponent::Ping(int index)
     {
-        std::shared_ptr<MongoQueryRequest> mongoRequest
-                = std::make_shared<MongoQueryRequest>();
+        std::shared_ptr<CommandRequest> mongoRequest
+                = std::make_shared<CommandRequest>();
         mongoRequest->document.Add("ping", 1);
         std::shared_ptr<TcpMongoClient> mongoClient = this->GetClient(index);
         return this->Run(mongoClient, mongoRequest) != nullptr;

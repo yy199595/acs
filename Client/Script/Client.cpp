@@ -10,7 +10,7 @@
 #include"Script/LuaParameter.h"
 #include"Component/ClientComponent.h"
 #include "Async/Lua/LuaWaitTaskSource.h"
-#include"Component/Scene/ProtocolComponent.h"
+#include"Component/Scene/ProtoComponent.h"
 using namespace Client;
 using namespace Sentry;
 namespace Lua
@@ -22,7 +22,7 @@ namespace Lua
 		std::shared_ptr<c2s::rpc::request> request(new c2s::rpc::request());
 		const std::string func = CommonParameter::Read<std::string>(lua, 2);
 		std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
-        ProtocolComponent * messageComponent = App::Get()->GetMsgComponent();
+        ProtoComponent * messageComponent = App::Get()->GetMsgComponent();
         if(lua_isstring(lua, 3) && lua_istable(lua, 4))
         {
             const char * type = luaL_checkstring(lua, 3);

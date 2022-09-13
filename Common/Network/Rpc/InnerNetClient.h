@@ -29,7 +29,7 @@ namespace Sentry
 	private:
         Tcp::DecodeState mState;
 		InnerNetComponent* mTcpComponent;
-        std::shared_ptr<Tcp::RpcMessage> mMessage;
+        std::shared_ptr<Tcp::BinMessage> mMessage;
         std::shared_ptr<asio::steady_timer> mTimer;
 	};
 }// namespace Sentry

@@ -6,7 +6,7 @@
 #include"Util/StringHelper.h"
 #include"Component/RpcService/Service.h"
 #include"Network/Http/HttpHandlerClient.h"
-#include"Component/Scene/ProtocolComponent.h"
+#include"Component/Scene/ProtoComponent.h"
 namespace Sentry
 {
     void HttpRpcComponent::OnRequest(std::shared_ptr<HttpHandlerClient> httpClient)
@@ -16,20 +16,10 @@ namespace Sentry
         std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
         const HttpData & httpData = request->GetData();
 
-        if (httpData.mMethod != "POST")
-        {
-            httpClient->StartWriter(HttpStatus::METHOD_NOT_ALLOWED);
-            return;
-        }
-        std::string fullName;
-        if(!httpData.Get("method", fullName))
-        {
-            httpClient->StartWriter(HttpStatus::BAD_REQUEST);
-        }
+
         std::vector<std::string> tempArray;
-        Helper::String::ClearBlank(fullName);
         const ListenConfig & listenConfig = this->GetListenConfig();
-        if(Helper::String::Split(fullName, ".", tempArray) != 2)
+        if(Helper::String::Split(httpData.mPath, "/", tempArray) != 2)
         {
             httpClient->StartWriter(HttpStatus::NOT_FOUND);
             return;
@@ -47,6 +37,11 @@ namespace Sentry
         if(rpcInterfaceConfig == nullptr)
         {
             httpClient->StartWriter(HttpStatus::NOT_FOUND);
+            return;
+        }
+        if(!rpcInterfaceConfig->Request.empty() && httpData.mMethod != "POST")
+        {
+            httpClient->StartWriter(HttpStatus::METHOD_NOT_ALLOWED);
             return;
         }
         TaskComponent * taskComponent = this->GetApp()->GetTaskComponent();

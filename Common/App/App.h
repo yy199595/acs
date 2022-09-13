@@ -14,7 +14,7 @@ using namespace asio::ip;
 namespace Sentry
 {
 	class Service;
-	class ProtocolComponent;
+	class ProtoComponent;
 	class App final : public Unit
 	{
 	 public:
@@ -28,7 +28,7 @@ namespace Sentry
 		inline asio::io_service& GetThread() { return *this->mMainThread; }
 		inline TaskComponent* GetTaskComponent() { return this->mTaskComponent; }
 		inline TimerComponent* GetTimerComponent() { return this->mTimerComponent; }
-		inline ProtocolComponent * GetMsgComponent() { return this->mMessageComponent; }
+		inline ProtoComponent * GetMsgComponent() { return this->mMessageComponent; }
 	 private:
 		bool LoadComponent();
 		void StartAllComponent();
@@ -66,7 +66,7 @@ namespace Sentry
 		LoggerComponent* mLogComponent;
 		TimerComponent* mTimerComponent;
 		static std::shared_ptr<App> mApp;
-		ProtocolComponent * mMessageComponent;
+		ProtoComponent * mMessageComponent;
 		std::vector<IFrameUpdate*> mFrameUpdateManagers;
 		std::vector<ISystemUpdate*> mSystemUpdateManagers;
 		std::vector<ISecondUpdate*> mSecondUpdateManagers;

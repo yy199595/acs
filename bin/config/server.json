@@ -56,7 +56,7 @@
     },
     "mongo": {
         "count" : 10,
-        "db": "admin",
+        "db": "yjz1",
         "ip": "43.143.76.75",
         "port" : 27017,
         "user" : "admin",
@@ -119,7 +119,7 @@
         "HttpRpcComponent",
         "MongoAgentComponent",
         "RedisRegistryComponent",
-        "DataSyncRedisComponent"
+        "DataSyncComponent"
     ],
     "services": {
         "RpcTest": {

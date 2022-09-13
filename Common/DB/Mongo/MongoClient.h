@@ -39,17 +39,18 @@ namespace Mongo
 	 public:
 		TcpMongoClient(std::shared_ptr<SocketProxy> scoket, const Mongo::Config & config);
 	public:
-		void SendMongoCommand(std::shared_ptr<MongoQueryRequest> request);
+		void SendMongoCommand(std::shared_ptr<CommandRequest> request);
 	private:
 		bool StartAuthBySha1();
+        bool Auth(const std::string & user, const std::string & db, const std::string & pwd);
 		void OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
-		std::shared_ptr<MongoQueryResponse> SyncSendMongoCommand(std::shared_ptr<MongoQueryRequest> request);
+		std::shared_ptr<CommandResponse> SyncSendMongoCommand(std::shared_ptr<CommandRequest> request);
 	private:
 		const Mongo::Config & mConfig;
 		asio::streambuf streamBuffer;
 		MongoRpcComponent * mMongoComponent;
-        std::shared_ptr<MongoQueryResponse> mMongoResponse;
+        std::shared_ptr<CommandResponse> mMongoResponse;
 	};
 }
 

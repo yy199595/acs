@@ -21,11 +21,11 @@ namespace Tcp
         Json,
         Protobuf
     };
-    class RpcMessage
+    class BinMessage
     {
     public:
-        RpcMessage();
-        ~RpcMessage();
+        BinMessage();
+        ~BinMessage();
         int DecodeHead(std::istream & is);
         bool DecodeBody(std::istream & is);
 

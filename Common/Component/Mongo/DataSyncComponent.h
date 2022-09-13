@@ -8,14 +8,13 @@
 #include"Component/Component.h"
 namespace Sentry
 {
-	class DataSyncRedisComponent : public Component
+	class DataSyncComponent : public Component
 	{
 	 public:
-		DataSyncRedisComponent() = default;
-		~DataSyncRedisComponent() = default;
+		DataSyncComponent() = default;
+		~DataSyncComponent() = default;
 	 public:
         void Del(const std::string & id, const std::string & tab);
-        void Set(const std::string & id, const db::mongo::insert & data);
 		void Set(const std::string & id, const std::string & tab, const std::string & json);
     private:
 		bool LateAwake() final;

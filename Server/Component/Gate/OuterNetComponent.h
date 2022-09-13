@@ -11,7 +11,7 @@ namespace Sentry
 {
 	class OuterNetClient;
 	class OuterNetComponent : public Component, public TcpServerListener,
-                              public IRpc<Tcp::RpcMessage>
+                              public IRpc<Tcp::BinMessage>
 	{
 	 public:
 		OuterNetComponent() = default;
@@ -19,7 +19,7 @@ namespace Sentry
 	 public:
 		void StartClose(const std::string & address) final;
 		void OnCloseSocket(const std::string & address, XCode code) final;
-        void OnMessage(const std::string &address, std::shared_ptr<Tcp::RpcMessage> message) final;
+        void OnMessage(const std::string &address, std::shared_ptr<Tcp::BinMessage> message) final;
     public:
 		bool AddNewUser(const std::string & address, long long userId);
 		bool GetUserId(const std::string & address, long long & userId);
@@ -36,7 +36,7 @@ namespace Sentry
 		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 private:
         bool StartInComplete() final { return false; }
-		bool OnRequest(const std::string& address, const Tcp::RpcMessage & message);	
+		bool OnRequest(const std::string& address, const Tcp::BinMessage & message);
     private:
 		class TimerComponent* mTimerComponent;
         class NetThreadComponent * mNetComponent;

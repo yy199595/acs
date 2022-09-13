@@ -8,7 +8,7 @@ namespace Sentry
 {
 	// 管理内网rpc的session
 	class InnerNetComponent : public Component, public TcpServerListener,
-                              public IRpc<Tcp::RpcMessage>
+                              public IRpc<Tcp::BinMessage>
 	{
 	 public:
 		InnerNetComponent() = default;
@@ -16,7 +16,7 @@ namespace Sentry
 	 public:
 		void StartClose(const std::string & address) final;
 		void OnCloseSocket(const std::string & address, XCode code) final;
-        void OnMessage(const std::string & address, std::shared_ptr<Tcp::RpcMessage> message) final;
+        void OnMessage(const std::string & address, std::shared_ptr<Tcp::BinMessage> message) final;
 	 protected:
         void Awake() final;
         bool LateAwake() final;
@@ -28,8 +28,8 @@ namespace Sentry
 		bool Send(const std::string & address, std::shared_ptr<com::rpc::request> message);
 		bool Send(const std::string & address, std::shared_ptr<com::rpc::response> message);
 	private:
-		bool OnRequest(const std::string & address, const Tcp::RpcMessage& message);
-		bool OnResponse(const std::string& address, const Tcp::RpcMessage& message);
+		bool OnRequest(const std::string & address, const Tcp::BinMessage& message);
+		bool OnResponse(const std::string& address, const Tcp::BinMessage& message);
 	 private:
         class NetThreadComponent * mNetComponent;
         class InnerNetMessageComponent* mMessageComponent;

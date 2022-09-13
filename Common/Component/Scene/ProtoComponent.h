@@ -26,11 +26,11 @@ namespace Sentry
         bool mHasWarning;
     };
 
-    class ProtocolComponent final : public Component, public ILuaRegister
+    class ProtoComponent final : public Component, public ILuaRegister
     {
     public:
-        ProtocolComponent();
-        ~ProtocolComponent() = default;
+        ProtoComponent();
+        ~ProtoComponent() = default;
     public:
         std::shared_ptr<Message> New(const Any & any);
         std::shared_ptr<Message> New(const std::string & name);

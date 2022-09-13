@@ -1,6 +1,6 @@
 ﻿#include"MysqlService.h"
 #include"App/App.h"
-#include"Component/Scene/ProtocolComponent.h"
+#include"Component/Scene/ProtoComponent.h"
 #include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {
@@ -13,7 +13,7 @@ namespace Sentry
 		methodRegister.Bind("Query", &MysqlService::Query);
 		methodRegister.Bind("Update", &MysqlService::Update);
 		methodRegister.Bind("Delete", &MysqlService::Delete);
-        this->mMessageComponent = this->GetComponent<ProtocolComponent>();
+        this->mMessageComponent = this->GetComponent<ProtoComponent>();
 
 		const ServerConfig & config = this->GetApp()->GetConfig();
 		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "ip", this->mConfig.mIp));

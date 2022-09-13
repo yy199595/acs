@@ -73,7 +73,7 @@ namespace Sentry
             case Tcp::DecodeState::Head:
             {
                 this->mState = Tcp::DecodeState::Body;
-                this->mMessage = std::make_shared<Tcp::RpcMessage>();
+                this->mMessage = std::make_shared<Tcp::BinMessage>();
                 int len = this->mMessage->DecodeHead(readStream);
                 this->ReceiveMessage(len);
             }
