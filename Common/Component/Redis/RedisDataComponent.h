@@ -24,6 +24,8 @@ namespace Sentry
         template<typename ... Args>
         std::shared_ptr<RedisResponse> RunCommand(SharedRedisClient redisClientContext, const std::string & cmd, Args&& ... args);
     public:
+        long long AddCounter(const std::string & id);
+        long long SubCounter(const std::string & id);
         std::shared_ptr<RedisRequest> MakeLuaRequest(const std::string & fullName, const std::string & json);
         bool Call(const std::string & name, const std::string & func, Json::Writer & request, std::shared_ptr<Json::Reader> response);
 	 private:

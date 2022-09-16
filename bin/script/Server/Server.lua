@@ -18,7 +18,11 @@ function Server.Awake()
 end
 
 function Server.AllServiceStart()
-
+    MongoComponent.Update("MarriageCertificate", {
+        _id = 87101936763324
+    }, {
+        ItemId = 2206
+    })
     local r1 = MongoComponent.InsertOnce("data_account", {
         _id = "646585122@qq.com",
         login_ip = "127.0.0.1",

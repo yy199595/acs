@@ -6,10 +6,10 @@ namespace Tcp
 {
     BinMessage::BinMessage()
     {
-        this->mType = 0;
         this->mSize = 0;
-        this->mProto = 0;
         this->mBuffer = nullptr;
+        this->mType = Tcp::Type::None;
+        this->mProto = Tcp::Porto::None;
     }
 
     BinMessage::~BinMessage()
@@ -22,9 +22,15 @@ namespace Tcp
 
     int BinMessage::DecodeHead(std::istream &is)
     {
-        is.readsome((char *)&this->mSize, sizeof(int));
-        this->mType = is.get();
-        this->mProto = is.get();
+        union {
+            int len;
+            char buf[sizeof(int)];
+        } buffer;
+        is.readsome(buffer.buf, sizeof(int));
+
+        this->mSize = buffer.len;
+        this->mType = (Tcp::Type)is.get();
+        this->mProto = (Tcp::Porto)is.get();
         return this->mSize;
     }
 
@@ -32,6 +38,15 @@ namespace Tcp
     {
         if (this->mBuffer == nullptr)
         {
+            if(this->mType == Tcp::Type::UnitRequest)
+            {
+                this->mSize -= sizeof(long long);
+                union{
+                    long long id;
+                    char buf[sizeof(long long)];
+                } bb;
+                is.readsome(bb.buf, sizeof(long long));
+            }
             this->mBuffer = new char[this->mSize];
         }
         return is.readsome(this->mBuffer, this->mSize) == this->mSize;

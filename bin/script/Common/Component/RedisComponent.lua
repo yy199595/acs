@@ -14,10 +14,15 @@ function RedisComponent.Send(name, cmd, ...)
     return self:Send(name, cmd, table.pack(...))
 end
 
-function RedisComponent.AddCounter(name, key)
+function RedisComponent.AddCounter(key)
     assert(type(key) == "string")
-    assert(type(name) == "string")
-    local response = this.Run(name, "INCRBY", key, 1)
+    local response = this.Run("main", "INCR", key)
+    return type(response) == "number" and response or 0
+end
+
+function RedisComponent.SubCounter(key)
+    assert(type(key) == "string")
+    local response = this.Run("main", "DECR", key)
     return type(response) == "number" and response or 0
 end
 

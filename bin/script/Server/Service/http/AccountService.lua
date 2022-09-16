@@ -28,7 +28,7 @@ function AccountService.Register(request)
     requestInfo._id = requestInfo.account
     requestInfo.token = Md5.ToString(str)
     requestInfo.address = StringUtil.ParseAddress(request.address)
-    DataMgrComponent.Set("data_account", requestInfo, true)
+    DataMgrComponent.Set("data_account", requestInfo.account, requestInfo, true)
     return XCode.Successful
 end
 
@@ -38,9 +38,8 @@ function AccountService.Login(request)
     assert(loginInfo, "request data error")
     assert(type(loginInfo.account) == "string", "user account is not string")
     assert(type(loginInfo.password) == "string", "user password is not string")
-    local userInfo = MongoComponent.QueryOnce("user_account",{
-            _id = loginInfo.account
-    })
+
+    local userInfo = DataMgrComponent.Get("user_account",loginInfo.account)
 
     if userInfo == nil or loginInfo.password ~= userInfo.password then
         return XCode.Failure

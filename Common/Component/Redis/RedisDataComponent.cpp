@@ -28,6 +28,30 @@ namespace Sentry
         return true;
     }
 
+    long long RedisDataComponent::AddCounter(const std::string &id)
+    {
+        SharedRedisClient redisClientContext = this->GetClient("main");
+        std::shared_ptr<RedisResponse> redisResponse =
+                this->RunCommand(redisClientContext, "INCR", id);
+        if (redisResponse == nullptr || redisResponse->HasError())
+        {
+            return -1;
+        }
+        return redisResponse->GetNumber();
+    }
+
+    long long RedisDataComponent::SubCounter(const std::string &id)
+    {
+        SharedRedisClient redisClientContext = this->GetClient("main");
+        std::shared_ptr<RedisResponse> redisResponse =
+                this->RunCommand(redisClientContext, "DECR", id);
+        if (redisResponse == nullptr || redisResponse->HasError())
+        {
+            return -1;
+        }
+        return redisResponse->GetNumber();
+    }
+
 
     bool RedisDataComponent::Call(const std::string &name, const std::string &func, Json::Writer &request,
                                   std::shared_ptr<Json::Reader> response)

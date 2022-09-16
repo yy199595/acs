@@ -11,6 +11,7 @@ using namespace Tcp;
 using namespace google::protobuf;
 namespace Sentry
 {
+    // 网关session
 	class OuterNetComponent;
  	class OuterNetClient : public Tcp::TcpContext
 	{

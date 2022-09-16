@@ -13,7 +13,8 @@ namespace Tcp
     {
         None,
         Request,
-        Response
+        Response,
+        UnitRequest
     };
     enum class Porto
     {
@@ -30,14 +31,16 @@ namespace Tcp
         bool DecodeBody(std::istream & is);
 
     public:
-        int GetType() const { return this->mType; }
-        int GetProto() const { return this->mProto; }
         const char * GetData(int & size) const;
+        Tcp::Type GetType() const { return this->mType; }
+        Tcp::Porto GetProto() const { return this->mProto; }
+        long long GetUnitId() const { return this->mUnitId; }
     private:
         int mSize;
-        int mType;
-        int mProto;
         char * mBuffer;
+        Tcp::Type mType;
+        Tcp::Porto mProto;
+        long long mUnitId;
     };
 }
 

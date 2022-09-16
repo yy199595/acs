@@ -97,6 +97,12 @@ namespace Sentry
 		{
 			return XCode::CallArgsError;
 		}
+
+        if(!id.empty() && this->mSyncRedisComponent != nullptr)
+        {
+            this->mSyncRedisComponent->Del(id, request.tab());
+        }
+
         Bson::Writer::Document delDocument;
         delDocument.Add("q", document);
         delDocument.Add("limit", request.limit());
@@ -117,15 +123,7 @@ namespace Sentry
             return XCode::Failure;
         }
         int count = 0;
-        if(response->Get().Get("n", count) && count > 0)
-        {
-            if(!id.empty() && this->mSyncRedisComponent != nullptr)
-            {
-                this->mSyncRedisComponent->Del(id, request.tab());
-            }
-            return XCode::Successful;
-        }
-        return XCode::Failure;
+        return (response->Get().Get("n", count) && count > 0) ? XCode::Successful : XCode::Failure;
     }
 
     // $gt:大于   $lt:小于  $gte:大于或等于  $lte:小于或等于 $ne:不等于
@@ -142,6 +140,12 @@ namespace Sentry
         {
                 return XCode::CallArgsError;
         }
+
+        if(!id.empty() && this->mSyncRedisComponent != nullptr)
+        {
+        this->mSyncRedisComponent->Del(id, request.tab());
+        }
+
         Bson::Writer::Document updateDocument;
         updateDocument.Add(request.tag().c_str(), dataDocument);
         std::shared_ptr<CommandRequest> mongoRequest(new CommandRequest);
@@ -164,15 +168,7 @@ namespace Sentry
         }
         int count = 0;
 		Bson::Reader::Document & result = response->Get();
-        if(result.Get("n", count) && count > 0)
-        {
-            if(!id.empty() && this->mSyncRedisComponent != nullptr)
-            {
-                this->mSyncRedisComponent->Del(id, request.tab());
-            }
-            return XCode::Successful;
-        }
-        return XCode::Failure;
+        return (result.Get("n", count) && count > 0) ? XCode::Successful : XCode::Failure;
     }
 
     XCode MongoService::SetIndex(const db::mongo::index &request)
