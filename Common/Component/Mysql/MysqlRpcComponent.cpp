@@ -8,22 +8,28 @@
 namespace Sentry
 {
     bool MysqlRpcComponent::LateAwake()
-    {
-        const ServerConfig &config = this->GetConfig();
-        config.GetMember("mysql", "ip", this->mConfig.mIp);
-        config.GetMember("mysql", "port", this->mConfig.mPort);
-        config.GetMember("mysql", "user", this->mConfig.mUser);
-        config.GetMember("mysql", "passwd", this->mConfig.mPassword);
-
-        return true;
-    }
+	{
+		const ServerConfig& config = this->GetConfig();
+		config.GetMember("mysql", "ip", this->mConfig.mIp);
+		config.GetMember("mysql", "port", this->mConfig.mPort);
+		config.GetMember("mysql", "user", this->mConfig.mUser);
+		config.GetMember("mysql", "count", this->mConfig.mMaxCount);
+		config.GetMember("mysql", "passwd", this->mConfig.mPassword);
+		return true;
+	}
 
     bool MysqlRpcComponent::OnStart()
-    {
-        NetThreadComponent * threadComponent = this->GetComponent<NetThreadComponent>();
-        std::shared_ptr<SocketProxy> socketProxy = threadComponent->CreateSocket(this->mConfig.mIp, this->mConfig.mPort);
-
-        std::shared_ptr<MysqlClient> mysqlClient(new MysqlClient(socketProxy, this->mConfig, this));
-        return true;
-    }
+	{
+		for (int index = 0; index < this->mConfig.mMaxCount; index++)
+		{
+			std::shared_ptr<MysqlClient> mysqlClient
+				= std::make_shared<MysqlClient>(this->mConfig, this);
+			if (!mysqlClient->StartConnect())
+			{
+				return false;
+			}
+			this->mMysqlClients.emplace_back(mysqlClient);
+		}
+		return true;
+	}
 }

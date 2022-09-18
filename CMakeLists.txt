@@ -44,6 +44,9 @@ include_directories(Libs/EmmyLuaDebugger/include)
 if(__ENABLE_OPEN_SSL__)
     include_directories(Libs/include/openssl)
 endif()
+if(__ENABLE_MYSQL__)
+    include_directories(Libs/mysql/include)
+endif()
 #公共组件
 add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/lua ${PROJECT_SOURCE_DIR}/Libs/bin/lua)
 add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/spdlog ${PROJECT_SOURCE_DIR}/Libs/bin/spdlog)
@@ -53,8 +56,12 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/protobuf/cmake ${PROJECT_SOURCE_DIR}
 
 #LINK_DIRECTORIES(Libs/lib)
 LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/Libs/bin/lua)
+if(__ENABLE_MYSQL__)
+    LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/Libs/mysql/lib)
+endif()
 LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/Libs/bin/spdlog)
 LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/Libs/bin/protobuf)
+
 
 include_directories(${PROJECT_SOURCE_DIR}/Gen)
 include_directories(${PROJECT_SOURCE_DIR}/Common)
@@ -99,6 +106,11 @@ endif()
 if(__ENABLE_OPEN_SSL__)
     list(APPEND StaticLibs ssl crypto)
 endif()
+
+if(__ENABLE_MYSQL__)
+    list(APPEND StaticLibs mysqlclient yassl taocrypt)
+endif()
+
 
 if(MSVC) #创建vs目录
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)

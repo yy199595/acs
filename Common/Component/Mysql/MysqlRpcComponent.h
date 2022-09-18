@@ -23,7 +23,8 @@ namespace Sentry
         bool LateAwake() final;
 
     private:
-        MysqlConfig mConfig;
+		MysqlConfig mConfig;
+		std::vector<std::shared_ptr<MysqlClient>> mMysqlClients;
     };
 }
 

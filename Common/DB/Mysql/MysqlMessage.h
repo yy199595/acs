@@ -4,31 +4,25 @@
 
 #ifndef APP_MYSQLMESSAGE_H
 #define APP_MYSQLMESSAGE_H
-
-#include "Network/Proto/ProtoMessage.h"
-
-namespace Tcp
+#include"mysql.h"
+#include<memory>
+namespace Mysql
 {
-    class MysqlMessage : public ProtoMessage
-    {
-    public:
-        MysqlMessage(int index);
-        int Serailize(std::ostream &os) final;
-    public:
-        void Add(char value);
-        void Add(unsigned int value);
-        void Add(const char * value);
-        void Add(const char * value, int size);
-    private:
-        int mIndex;
-        std::string mBuffer;
-    };
+	class Response
+	{
 
-    class MysqlAuthMessage : public ProtoMessage
-    {
-    public:
-        int Serailize(std::ostream &os) final { return 0; }
-    };
+	};
+    class ICommand
+	{
+	 public:
+		virtual MYSQL_RES * Invoke(MYSQL *, std::string & error) = 0;
+	};
+
+	class SqlCommand : public ICommand
+	{
+	 public:
+		MYSQL_RES * Invoke(MYSQL *, std::string & error) final;
+	};
 }
 
 

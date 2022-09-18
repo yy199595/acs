@@ -28,9 +28,11 @@ namespace Sentry
 	class MysqlConfig
 	{
 	public:
+		int mMaxCount;
 		std::string mIp;
 		unsigned int mPort;
 		std::string mUser;
+		std::string mAddress;
 		std::string mPassword;
 	};
 }
