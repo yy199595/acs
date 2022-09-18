@@ -15,6 +15,7 @@ namespace Sentry
 		config.GetMember("mysql", "user", this->mConfig.mUser);
 		config.GetMember("mysql", "count", this->mConfig.mMaxCount);
 		config.GetMember("mysql", "passwd", this->mConfig.mPassword);
+		this->mConfig.mAddress = fmt::format("{0}:{1}", this->mConfig.mIp, this->mConfig.mPort);
 		return true;
 	}
 

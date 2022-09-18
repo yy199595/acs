@@ -37,10 +37,7 @@ include_directories(Libs/protobuf/src)
 include_directories(Libs/spdlog/include)
 include_directories(Libs/asio/include)
 
-#include_directories(Libs/include/spdlog)
-#include_directories(Libs/include/protobuf)
 include_directories(Libs/json)
-include_directories(Libs/EmmyLuaDebugger/include)
 if(__ENABLE_OPEN_SSL__)
     include_directories(Libs/include/openssl)
 endif()
@@ -108,7 +105,11 @@ if(__ENABLE_OPEN_SSL__)
 endif()
 
 if(__ENABLE_MYSQL__)
-    list(APPEND StaticLibs mysqlclient yassl taocrypt)
+    if(WIN32)
+        list(APPEND StaticLibs libmysql mysqlclient)
+    else()
+        list(APPEND StaticLibs mysqlclient yassl taocrypt)
+    endif()
 endif()
 
 

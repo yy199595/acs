@@ -8,6 +8,6 @@ namespace Mysql
 {
 	MYSQL_RES *SqlCommand::Invoke(MYSQL*, std::string & error)
 	{
-
+		return nullptr;
 	}
 }

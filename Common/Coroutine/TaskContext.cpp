@@ -1,8 +1,4 @@
 #include"TaskContext.h"
-
-#ifdef _WIN32
-#include<Windows.h>
-#endif
 namespace Sentry
 {
 	TaskContext::TaskContext()

@@ -4,8 +4,13 @@
 
 #ifndef APP_MYSQLMESSAGE_H
 #define APP_MYSQLMESSAGE_H
+#ifdef _WIN32
+#include<WinSock2.h>
+#include<windows.h>
+#endif
 #include"mysql.h"
 #include<memory>
+#include<string>
 namespace Mysql
 {
 	class Response
