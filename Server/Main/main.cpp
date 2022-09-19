@@ -23,10 +23,10 @@
 #include"Component/Http/HttpWebComponent.h"
 #include"Component/Mongo/MongoService.h"
 #include"Component/HttpService/LocalLuaHttpService.h"
-#include"Component/Mongo/MongoRpcComponent.h"
-#include"Component/Mysql/MysqlRpcComponent.h"
+#include"Component/Mongo/MongoDBComponent.h"
+#include"Component/Mysql/MysqlDBComponent.h"
 
-#include"Component/Common/DataMgrComponent.h"
+#include"Component/Common/MongoDataComponent.h"
 #include"Component/Gate/GateAgentComponent.h"
 #include"Component/User/UserSyncComponent.h"
 #include"Component/ClientComponent.h"
@@ -48,7 +48,7 @@ void RegisterComponent()
     ComponentFactory::Add<TaskComponent>("TaskComponent");
     ComponentFactory::Add<TimerComponent>("TimerComponent");
     ComponentFactory::Add<LoggerComponent>("LoggerComponent");
-	ComponentFactory::Add<DataMgrComponent>("DataMgrComponent");
+	ComponentFactory::Add<MongoDataComponent>("MongoDataComponent");
 	ComponentFactory::Add<UserSyncComponent>("UserSyncComponent");
 	ComponentFactory::Add<OperatorComponent>("OperatorComponent");
     ComponentFactory::Add<UnitMgrComponent>("UnitMgrComponent");
@@ -65,8 +65,8 @@ void RegisterComponent()
 	ComponentFactory::Add<OuterNetComponent>("OuterNetComponent");
 	ComponentFactory::Add<OuterNetMessageComponent>("OuterNetMessageComponent");
 // db
-    ComponentFactory::Add<MysqlRpcComponent>("MysqlRpcComponent");
-	ComponentFactory::Add<MongoRpcComponent>("MongoRpcComponent");
+    ComponentFactory::Add<MysqlDBComponent>("MysqlDBComponent");
+	ComponentFactory::Add<MongoDBComponent>("MongoDBComponent");
     ComponentFactory::Add<RedisDataComponent>("RedisDataComponent");
     ComponentFactory::Add<RedisSubComponent>("RedisSubComponent");
 	ComponentFactory::Add<MongoAgentComponent>("MongoAgentComponent");

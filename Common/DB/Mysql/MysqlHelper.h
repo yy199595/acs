@@ -9,10 +9,6 @@
 using namespace google::protobuf;
 namespace Sentry
 {
-	class MysqlTaskAction;
-
-	class MysqlTaskSource;
-
 	class MysqlHelper
 	{
 	 public:

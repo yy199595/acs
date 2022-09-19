@@ -15,19 +15,57 @@ namespace Mysql
 {
 	class Response
 	{
-
+    public:
+        Response(MYSQL_RES * result);
+        Response(const std::string & error);
+        ~Response();
+    public:
+        bool HasError() const { return !this->mError.empty();}
+        const std::string & GetError() const { return this->mError;}
+    private:
+        std::string mError;
+        MYSQL_RES * mResult;
 	};
     class ICommand
 	{
 	 public:
-		virtual MYSQL_RES * Invoke(MYSQL *, std::string & error) = 0;
+        ICommand(int id) : mRpcId(id) { }
+        int GetRpcId() const{ return this->mRpcId;}
+        virtual MYSQL_RES * Invoke(MYSQL *, std::string & error) = 0;
+    private:
+        int mRpcId;
 	};
+
+    class PingCommand : public ICommand
+    {
+    public:
+        using ICommand::ICommand;
+        MYSQL_RES * Invoke(MYSQL *, std::string &error) final;
+    };
 
 	class SqlCommand : public ICommand
 	{
 	 public:
-		MYSQL_RES * Invoke(MYSQL *, std::string & error) final;
+        using ICommand::ICommand;
+        MYSQL_RES * Invoke(MYSQL *, std::string & error) final;
 	};
+
+    class QueryCommand : public ICommand
+    {
+    public:
+        using ICommand::ICommand;
+        MYSQL_RES * Invoke(MYSQL *, std::string &error) final;
+    };
+}
+
+namespace Mysql
+{
+    class InitCommand : public ICommand
+    {
+    public:
+        using ICommand::ICommand;
+        MYSQL_RES * Invoke(MYSQL *, std::string &error) final;
+    };
 }
 
 

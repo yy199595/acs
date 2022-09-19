@@ -29,7 +29,7 @@ namespace Sentry
 	{
 	public:
 		int mMaxCount;
-		std::string mIp;
+        std::string mIp;
 		unsigned int mPort;
 		std::string mUser;
 		std::string mAddress;

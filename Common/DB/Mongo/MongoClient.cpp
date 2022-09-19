@@ -9,7 +9,7 @@
 #include"Util/sha1.h"
 #include"Bson/base64.h"
 #include"Util/StringHelper.h"
-#include"Component/Mongo/MongoRpcComponent.h"
+#include"Component/Mongo/MongoDBComponent.h"
 
 namespace Mongo
 {
@@ -29,7 +29,7 @@ namespace Mongo
     TcpMongoClient::TcpMongoClient(std::shared_ptr<SocketProxy> socket, const Mongo::Config& config)
 		: Tcp::TcpContext(socket, 1024 * 1024), mConfig(config), mMongoComponent(nullptr)
 	{
-        LOG_CHECK_FATAL(this->mMongoComponent = App::Get()->GetComponent<MongoRpcComponent>());
+        LOG_CHECK_FATAL(this->mMongoComponent = App::Get()->GetComponent<MongoDBComponent>());
 	}
 
 	void TcpMongoClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
@@ -194,7 +194,7 @@ namespace Mongo
 			this->mMongoComponent->OnResponse(responseId, response);
 #else
 			asio::io_service& io = App::Get()->GetThread();
-			io.post(std::bind(&MongoRpcComponent::OnResponse,
+			io.post(std::bind(&MongoDBComponent::OnResponse,
 				this->mMongoComponent, responseId, response));
 #endif
 			//CONSOLE_LOG_INFO("成功次数 = " << SuccessfulCount);

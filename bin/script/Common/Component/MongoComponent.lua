@@ -74,6 +74,33 @@ function MongoComponent.Query(tab, data, limit)
     return responses
 end
 
+function MongoComponent.QueryDatas(tab, querys)
+    assert(type(tab) == "string")
+    assert(type(querys) == "table" and #querys > 0)
+
+    local address = self:GetHost()
+    local requset = {
+        _id = {
+            ["$in"] = querys
+        }
+    }
+    local code, response = self:Call(address, "Query", {
+        tab = tab,
+        limit = #querys,
+        json = Json.Encode(requset)
+    })
+    if code ~= XCode.Successful or response == nil then
+        return nil
+    end
+    local responses = {}
+    if #response.jsons > 0 then
+        for _, json in ipairs(response.jsons) do
+            table.insert(responses, Json.Decode(json))
+        end
+    end
+    return responses
+end
+
 function MongoComponent.SetIndex(tab, name)
     assert(type(tab) == "string")
     assert(type(name) == "string")

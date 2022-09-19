@@ -2,7 +2,7 @@
 // Created by yjz on 2022/4/16.
 //
 
-#include"DataMgrComponent.h"
+#include"MongoDataComponent.h"
 #include"Util/ProtoHelper.h"
 #include"Component/Redis/RedisDataComponent.h"
 #include"Component/Mysql/MysqlDataComponent.h"
@@ -10,7 +10,7 @@
 #include"Component/Scene/ProtoComponent.h"
 namespace Sentry
 {
-	bool DataMgrComponent::LateAwake()
+	bool MongoDataComponent::LateAwake()
     {
         this->mProtoComponent = this->GetComponent<ProtoComponent>();
         this->mRedisComponent = this->GetComponent<RedisDataComponent>();
@@ -18,30 +18,30 @@ namespace Sentry
         return this->mRedisComponent != nullptr && this->mMongoComponent != nullptr;
     }
 
-	XCode DataMgrComponent::Set(long long id, std::shared_ptr<Message> message, bool insert)
-	{
-			std::string json;
-			if (Helper::Protocol::GetJson(*message, &json))
-			{
-					char buffer[100] = {0};
-					size_t size = sprintf(buffer, "{_id:%lld}", id);
-					const std::string select(buffer, size);
-					const std::string name = message->GetTypeName();
-					XCode code = this->mMongoComponent->Update(name.c_str(), select, json, (int) id);
-                    if(code != XCode::Successful)
-                    {
+	XCode MongoDataComponent::Set(long long id, std::shared_ptr<Message> message, bool insert)
+    {
+        std::string json;
+        if (Helper::Protocol::GetJson(*message, &json))
+        {
+            char buffer[100] = {0};
+            size_t size = sprintf(buffer, "{_id:%lld}", id);
+            const std::string select(buffer, size);
+            const std::string name = message->GetTypeName();
+            XCode code = this->mMongoComponent->Update(name.c_str(), select, json, (int) id);
+            if (code != XCode::Successful)
+            {
 
-                    }
-			}
-			return XCode::Failure;
-	}
+            }
+        }
+        return XCode::Failure;
+    }
 
-    XCode DataMgrComponent::Set(const std::string &id, std::shared_ptr<Message> message, bool insert)
-	{
-			return XCode::Successful;
-	}
+    XCode MongoDataComponent::Set(const std::string &id, std::shared_ptr<Message> message, bool insert)
+    {
+        return XCode::Successful;
+    }
 
-	std::shared_ptr<Message> DataMgrComponent::Get(long long id, const std::string &name)
+	std::shared_ptr<Message> MongoDataComponent::Get(long long id, const std::string &name)
 	{
         size_t pos = name.find('_');
         if(pos != std::string::npos)
@@ -69,7 +69,7 @@ namespace Sentry
         return code == XCode::Successful ? result : nullptr;
 	}
 
-    std::shared_ptr<Message> DataMgrComponent::Get(const std::string& id, const std::string & name)
+    std::shared_ptr<Message> MongoDataComponent::Get(const std::string& id, const std::string & name)
 	{
         size_t pos = name.find('_');
         if(pos != std::string::npos)

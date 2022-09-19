@@ -9,7 +9,7 @@
 #include"Coroutine/CoroutineLock.h"
 namespace Sentry
 {
-    class DataMgrComponent final : public Component
+    class MongoDataComponent final : public Component
 	{
     public:
 		XCode Set(long long key, std::shared_ptr<Message> message, bool insert = true);
@@ -23,10 +23,6 @@ namespace Sentry
         class ProtoComponent * mProtoComponent;
         class RedisDataComponent * mRedisComponent;
         class MongoAgentComponent * mMongoComponent;
-        typedef Pool::DataPool<long long, Message> NumberMessagePool;
-        typedef Pool::DataPool<std::string, Message> StringMessagePool;
-        std::unordered_map<long long, std::shared_ptr<CoroutineLock>> mNumberLocks;
-        std::unordered_map<std::string, std::shared_ptr<CoroutineLock>> mStringLocks;
     };
 }
 

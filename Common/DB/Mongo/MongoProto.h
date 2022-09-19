@@ -58,9 +58,10 @@ namespace Mongo
     public:
         int flag;
         int mTaskId;
-        std::string collectionName;
         int numberToSkip;
         int numberToReturn;
+        std::string dataBase;
+        std::string collectionName;
 		Bson::Writer::Document document;
 	};
 

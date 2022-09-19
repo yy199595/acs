@@ -10,26 +10,33 @@
 #include"Network/TcpContext.h"
 namespace Sentry
 {
-	class MysqlRpcComponent;
-	class MysqlClient
-	{
-	 public:
-		MysqlClient(const MysqlConfig& config, MysqlRpcComponent* component);
-	 public:
-		 void Stop();
-		bool StartConnect();
-		void SendCommand(std::shared_ptr<Mysql::ICommand> command);
-	 private:
-		void Update();
-		bool GetCommand(std::shared_ptr<Mysql::ICommand> & command);
-	 private:
-		 bool mIsClose;
-		std::mutex mLock;
-		MYSQL * mMysqlClient;
-		std::thread* mThread;
-		const MysqlConfig& mConfig;
-		MysqlRpcComponent* mComponent;
-		std::queue<std::shared_ptr<Mysql::ICommand>> mCommands;
-	};
+    class MysqlDBComponent;
+
+    class MysqlClient
+    {
+    public:
+        MysqlClient(const MysqlConfig &config, MysqlDBComponent *component);
+
+    public:
+        void Stop();
+        bool Start();
+        bool StartConnect();
+        size_t GetTaskCount() const { return this->mTaskCount; }
+        void SendCommand(std::shared_ptr<Mysql::ICommand> command);
+
+    private:
+        void Update();
+        bool GetCommand(std::shared_ptr<Mysql::ICommand> &command);
+    private:
+        bool mIsClose;
+        std::mutex mLock;
+        size_t mTaskCount;
+        MYSQL *mMysqlClient;
+        std::thread *mThread;
+        long long mLastTime;
+        const MysqlConfig &mConfig;
+        MysqlDBComponent *mComponent;
+        std::queue<std::shared_ptr<Mysql::ICommand>> mCommands;
+    };
 }
 #endif //SERVER_MYSQLCLIENT_H

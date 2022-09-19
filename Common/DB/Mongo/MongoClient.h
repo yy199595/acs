@@ -29,7 +29,7 @@ namespace Mongo
 
 namespace Sentry
 {
-	class MongoRpcComponent;
+	class MongoDBComponent;
 }
 
 namespace Mongo
@@ -49,7 +49,7 @@ namespace Mongo
 	private:
 		const Mongo::Config & mConfig;
 		asio::streambuf streamBuffer;
-		MongoRpcComponent * mMongoComponent;
+		MongoDBComponent * mMongoComponent;
         std::shared_ptr<CommandResponse> mMongoResponse;
 	};
 }

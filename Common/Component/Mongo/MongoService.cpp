@@ -3,7 +3,7 @@
 //
 
 #include"MongoService.h"
-#include"MongoRpcComponent.h"
+#include"MongoDBComponent.h"
 #include"DataSyncComponent.h"
 
 namespace Sentry
@@ -23,7 +23,7 @@ namespace Sentry
         methodRegister.Bind("SetIndex", &MongoService::SetIndex);
         methodRegister.Bind("RunCommand", &MongoService::RunCommand);
         this->mSyncRedisComponent = this->GetComponent<DataSyncComponent>();
-        LOG_CHECK_RET_FALSE(this->mMongoComponent = this->GetComponent<MongoRpcComponent>());
+        LOG_CHECK_RET_FALSE(this->mMongoComponent = this->GetComponent<MongoDBComponent>());
         return true;
     }
 
@@ -52,20 +52,28 @@ namespace Sentry
 
     XCode MongoService::Insert(const db::mongo::insert &request)
 	{
-		Bson::Writer::Document document;
-		std::shared_ptr<CommandRequest> mongoRequest
-			= std::make_shared<CommandRequest>();
-
-		const std::string& tab = request.tab();
-		mongoRequest->document.Add("insert", tab);
+        const size_t pos = request.tab().find('.');
+        if(pos == std::string::npos)
+        {
+            CONSOLE_LOG_ERROR("[" << request.tab() << "] parse error xxx.xxx");
+            return XCode::CallArgsError;
+        }
 
         std::string id;
-		if (!document.FromByJson(request.json(), id))
-		{
-			return XCode::CallArgsError;
-		}
-		Bson::Writer::Array documentArray;
-		documentArray.Add(document);
+        Bson::Writer::Document document;
+        if (!document.FromByJson(request.json(), id))
+        {
+            return XCode::CallArgsError;
+        }
+
+        std::shared_ptr<CommandRequest> mongoRequest
+            = std::make_shared<CommandRequest>();
+
+        const std::string tab = request.tab().substr(pos + 1);
+        mongoRequest->dataBase = request.tab().substr(0, pos);
+
+        Bson::Writer::Array documentArray(document);
+        mongoRequest->document.Add("insert", tab);
 		mongoRequest->document.Add("documents", documentArray);
 		std::shared_ptr<TcpMongoClient> mongoClient = this->mMongoComponent->GetClient(request.flag());
 		std::shared_ptr<CommandResponse> response = this->mMongoComponent->Run(mongoClient, mongoRequest);
@@ -82,7 +90,8 @@ namespace Sentry
         {
             if(this->mSyncRedisComponent != nullptr && !id.empty())
             {
-                this->mSyncRedisComponent->Set(id, tab, request.json());
+                const std::string & db = mongoRequest->dataBase;
+                this->mSyncRedisComponent->Set(id, db,  tab, request.json());
             }
             return XCode::Successful;
         }
@@ -91,6 +100,13 @@ namespace Sentry
 
     XCode MongoService::Delete(const db::mongo::remove &request)
     {
+        const size_t pos = request.tab().find('.');
+        if(pos == std::string::npos)
+        {
+            CONSOLE_LOG_ERROR("[" << request.tab() << "] parse error xxx.xxx");
+            return XCode::CallArgsError;
+        }
+
         std::string id;
         Bson::Writer::Document document;
         if(!document.FromByJson(request.json(), id))
@@ -98,9 +114,15 @@ namespace Sentry
 			return XCode::CallArgsError;
 		}
 
+        std::shared_ptr<CommandRequest> mongoRequest
+            = std::make_shared<CommandRequest>();
+        const std::string tab = request.tab().substr(pos + 1);
+        mongoRequest->dataBase = request.tab().substr(0, pos);
+
         if(!id.empty() && this->mSyncRedisComponent != nullptr)
         {
-            this->mSyncRedisComponent->Del(id, request.tab());
+            const std::string &db = mongoRequest->dataBase;
+            this->mSyncRedisComponent->Del(id, db, request.tab());
         }
 
         Bson::Writer::Document delDocument;
@@ -108,11 +130,9 @@ namespace Sentry
         delDocument.Add("limit", request.limit());
 
         Bson::Writer::Array documentArray(delDocument);
-        std::shared_ptr<CommandRequest> mongoRequest
-                = std::make_shared<CommandRequest>();
 
+        mongoRequest->document.Add("delete", tab);
         mongoRequest->document.Add("deletes", documentArray);
-        mongoRequest->document.Add("delete", request.tab());
         std::shared_ptr<TcpMongoClient> mongoClient = this->mMongoComponent->GetClient(request.flag());
         std::shared_ptr<CommandResponse> response = this->mMongoComponent->Run(mongoClient, mongoRequest);
         if(response == nullptr || response->GetDocumentSize() <= 0)
@@ -129,71 +149,88 @@ namespace Sentry
     // $gt:大于   $lt:小于  $gte:大于或等于  $lte:小于或等于 $ne:不等于
     XCode MongoService::Update(const db::mongo::update &request)
     {
-        Bson::Writer::Document dataDocument;
-        if(!dataDocument.FromByJson(request.update()))
+        const size_t pos = request.tab().find('.');
+        if (pos == std::string::npos)
         {
-                return XCode::CallArgsError;
+            CONSOLE_LOG_ERROR("[" << request.tab() << "] parse error xxx.xxx");
+            return XCode::CallArgsError;
+        }
+
+        Bson::Writer::Document dataDocument;
+        if (!dataDocument.FromByJson(request.update()))
+        {
+            return XCode::CallArgsError;
         }
         std::string id;
         Bson::Writer::Document selectorDocument;
-        if(!selectorDocument.FromByJson(request.select(), id))
+        if (!selectorDocument.FromByJson(request.select(), id))
         {
-                return XCode::CallArgsError;
+            return XCode::CallArgsError;
         }
+        std::shared_ptr<CommandRequest> mongoRequest(new CommandRequest);
 
-        if(!id.empty() && this->mSyncRedisComponent != nullptr)
+        const std::string tab = request.tab().substr(pos + 1);
+        mongoRequest->dataBase = request.tab().substr(0, pos);
+
+        if (!id.empty() && this->mSyncRedisComponent != nullptr)
         {
-        this->mSyncRedisComponent->Del(id, request.tab());
+            const std::string & db = mongoRequest->dataBase;
+            this->mSyncRedisComponent->Del(id, db, request.tab());
         }
 
         Bson::Writer::Document updateDocument;
         updateDocument.Add(request.tag().c_str(), dataDocument);
-        std::shared_ptr<CommandRequest> mongoRequest(new CommandRequest);
 
         Bson::Writer::Document updateInfo;
-        const std::string & tab = request.tab();
         updateInfo.Add("multi", true);
         updateInfo.Add("upsert", false);
         updateInfo.Add("u", updateDocument);
         updateInfo.Add("q", selectorDocument);
+
 
         Bson::Writer::Array updates(updateInfo);
         mongoRequest->document.Add("update", tab);
         mongoRequest->document.Add("updates", updates);
         std::shared_ptr<TcpMongoClient> mongoClient = this->mMongoComponent->GetClient(request.flag());
         std::shared_ptr<CommandResponse> response = this->mMongoComponent->Run(mongoClient, mongoRequest);
-        if(response == nullptr || response->GetDocumentSize() == 0)
+        if (response == nullptr || response->GetDocumentSize() == 0)
         {
             return XCode::Failure;
         }
         int count = 0;
-		Bson::Reader::Document & result = response->Get();
+        Bson::Reader::Document &result = response->Get();
         return (result.Get("n", count) && count > 0) ? XCode::Successful : XCode::Failure;
     }
 
     XCode MongoService::SetIndex(const db::mongo::index &request)
     {
+        const size_t pos = request.tab().find('.');
+        if (pos == std::string::npos)
+        {
+            CONSOLE_LOG_ERROR("[" << request.tab() << "] parse error xxx.xxx");
+            return XCode::CallArgsError;
+        }
         const std::string & tab = request.tab();
         const std::string & name = request.name();
-        if(!this->mMongoComponent->SetIndex(tab, name))
-        {
-            return XCode::Failure;
-        }
-        return XCode::Successful;
+        return this->mMongoComponent->SetIndex(tab, name) ? XCode::Successful : XCode::Failure;
     }
 
     XCode MongoService::Query(const db::mongo::query::request &request, db::mongo::query::response &response)
     {
+        const size_t pos = request.tab().find('.');
+        if(pos == std::string::npos)
+        {
+            return XCode::CallArgsError;
+        }
         std::shared_ptr<CommandRequest> mongoRequest
                 = std::make_shared<CommandRequest>();
         if (!mongoRequest->document.FromByJson(request.json()))
 		{
 			return XCode::CallArgsError;
 		}
+        mongoRequest->collectionName = request.tab();
         mongoRequest->numberToReturn = request.limit();
-        const Mongo::Config &config = this->mMongoComponent->GetConfig();
         std::shared_ptr<TcpMongoClient> mongoClient = this->mMongoComponent->GetClient();
-        mongoRequest->collectionName = fmt::format("{0}.{1}", config.mDb, request.tab());
         std::shared_ptr<CommandResponse> queryResponse = this->mMongoComponent->Run(mongoClient, mongoRequest);
 
         if (queryResponse == nullptr || queryResponse->GetDocumentSize() <= 0)
@@ -210,14 +247,15 @@ namespace Sentry
                 long long numberId = 0;
                 std::string stringId = "";
                 const std::string & tab = request.tab();
+                const std::string & db = mongoRequest->dataBase;
                 if(document->Get("_id", stringId))
                 {
-                    this->mSyncRedisComponent->Set(stringId, tab, *json);
+                    this->mSyncRedisComponent->Set(stringId, db, tab, *json);
                 }
                 else if (document->Get("_id", numberId))
                 {
                     stringId = std::to_string(numberId);
-                    this->mSyncRedisComponent->Set(stringId, tab, *json);
+                    this->mSyncRedisComponent->Set(stringId, db, tab, *json);
                 }
             }
         }

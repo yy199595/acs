@@ -18,12 +18,8 @@ function Server.Awake()
 end
 
 function Server.AllServiceStart()
-    MongoComponent.Update("MarriageCertificate", {
-        _id = 87101936763324
-    }, {
-        ItemId = 2206
-    })
-    local r1 = MongoComponent.InsertOnce("data_account", {
+
+    local r1 = MongoComponent.InsertOnce("user1.data_account", {
         _id = "646585122@qq.com",
         login_ip = "127.0.0.1",
         user_id = 1122,
@@ -32,7 +28,7 @@ function Server.AllServiceStart()
         token = "0x00ssdjsaklj"
     })
 
-    local r3 = MongoComponent.InsertOnce("data_account", {
+    local r3 = MongoComponent.InsertOnce("user2.data_account", {
         _id = "646585123@qq.com",
         login_ip = "127.0.0.1",
         user_id = 1122,
@@ -41,23 +37,28 @@ function Server.AllServiceStart()
         token = "0x00ssdjsaklj"
     })
 
-    local r2 = MongoComponent.Update("data_account", {
-        id = "646585122@qq.com"
+    local r2 = MongoComponent.Update("user1.data_account", {
+        _id = "646585122@qq.com"
     }, {
-        login_time_1 = 11223
+        login_time_1 = 199595
+    })
+
+    MongoComponent.Delete("user2.data_account", {
+        _id = "646585122@qq.com"
     })
 
     local tab = { }
-    table.insert(tab, {_id = "646585123@qq.com"})
-    table.insert(tab, {_id = "646585122@qq.com"})
-    local response = MongoComponent.Query("data_account", {
-        _id = {
-            ["$in"] = {
-                "646585123@qq.com",
-                "646585122@qq.com"
-            }
-        }
-    })
+    table.insert(tab, "646585123@qq.com")
+    table.insert(tab, "646585122@qq.com")
+    local response = MongoComponent.QueryDatas("user1.data_account", tab)
+    --local response = MongoComponent.Query("data_account", {
+    --    _id = {
+    --        ["$in"] = {
+    --            "646585123@qq.com",
+    --            "646585122@qq.com"
+    --        }
+    --    }
+    --})
     table.print(response)
 end
 

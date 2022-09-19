@@ -2,7 +2,7 @@
 // Created by mac on 2022/6/28.
 //
 
-#include"MongoRpcComponent.h"
+#include"MongoDBComponent.h"
 #include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
 {
@@ -22,7 +22,7 @@ namespace Sentry
 
 namespace Sentry
 {
-	bool MongoRpcComponent::LateAwake()
+	bool MongoDBComponent::LateAwake()
 	{
 		const ServerConfig & config = this->GetApp()->GetConfig();
 		this->mTimerComponent = this->GetApp()->GetTimerComponent();
@@ -36,7 +36,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool MongoRpcComponent::OnStart()
+	bool MongoDBComponent::OnStart()
     {
         for (int index = 0; index < this->mConfig.mMaxCount; index++)
         {
@@ -51,7 +51,7 @@ namespace Sentry
         return this->Ping(0);
     }
 
-    std::shared_ptr<TcpMongoClient> MongoRpcComponent::GetClient(int index)
+    std::shared_ptr<TcpMongoClient> MongoDBComponent::GetClient(int index)
     {
         if(index > 0)
         {
@@ -74,23 +74,28 @@ namespace Sentry
         return returnClient;
     }
 
-	void MongoRpcComponent::OnDelTask(long long taskId, RpcTask task)
+	void MongoDBComponent::OnDelTask(long long taskId, RpcTask task)
 	{
         assert(this->GetApp()->IsMainThread());
         this->mRequestId.Push((int)taskId);
 	}
 
-	void MongoRpcComponent::OnAddTask(RpcTaskComponent<Mongo::CommandResponse>::RpcTask task)
+	void MongoDBComponent::OnAddTask(RpcTaskComponent<Mongo::CommandResponse>::RpcTask task)
 	{
 
 	}
 
-	std::shared_ptr<Mongo::CommandResponse> MongoRpcComponent::Run(
+    void MongoDBComponent::Send(std::shared_ptr<TcpMongoClient> mongoClient, std::shared_ptr<CommandRequest> request)
+    {
+
+    }
+
+	std::shared_ptr<Mongo::CommandResponse> MongoDBComponent::Run(
             std::shared_ptr<TcpMongoClient> mongoClient, std::shared_ptr<CommandRequest> request)
 	{
 		if(request->collectionName.empty())
 		{
-			request->collectionName = this->mConfig.mDb + ".$cmd";
+			request->collectionName = request->dataBase + ".$cmd";
 		}
         request->header.requestID = this->mRequestId.Pop();
         std::shared_ptr<MongoTask> mongoTask(new MongoTask(request->header.requestID, 0));
@@ -100,13 +105,7 @@ namespace Sentry
 		}
 		mongoClient->SendMongoCommand(request);
 #ifdef __DEBUG__
-        int len = 0;
-        std::string json1;
 		long long t1 = Time::GetNowMilTime();
-        const char * str = request->document.Serialize(len);
-        Bson::Reader::Document document1(str);
-        document1.WriterToJson(json1);
-
         std::shared_ptr<Mongo::CommandResponse> mongoResponse = mongoTask->Await();
 		if(mongoResponse != nullptr && mongoResponse->GetDocumentSize() > 0)
 		{
@@ -135,9 +134,10 @@ namespace Sentry
 #endif
 	}
 
-    bool MongoRpcComponent::SetIndex(const std::string &tab, const std::string &name)
+    bool MongoDBComponent::SetIndex(const std::string &tab, const std::string &name)
     {
-        std::shared_ptr<CommandRequest> mongoRequest(new CommandRequest());
+        std::shared_ptr<CommandRequest> mongoRequest
+            = std::make_shared<CommandRequest>();
 
         Bson::Writer::Document keys;
         Bson::Writer::Document document;
@@ -146,14 +146,23 @@ namespace Sentry
         document.Add("key", keys);
         document.Add("unique", true);
         document.Add("name", name.c_str());
-		Bson::Writer::Array documentArray1(document);
-        mongoRequest->document.Add("createIndexes", tab);
+        Bson::Writer::Array documentArray1(document);
+
+        const size_t pos = tab.find('.');
+        if(pos == std::string::npos)
+        {
+            return false;
+        }
+
+        std::string tab1 = tab.substr(pos + 1);
+        mongoRequest->dataBase = tab.substr(0, pos);
+        mongoRequest->document.Add("createIndexes", tab1);
         mongoRequest->document.Add("indexes", documentArray1);
         std::shared_ptr<TcpMongoClient> mongoClient = this->GetClient();
         return this->Run(mongoClient, mongoRequest) != nullptr;
     }
 
-	bool MongoRpcComponent::Ping(int index)
+	bool MongoDBComponent::Ping(int index)
     {
         std::shared_ptr<CommandRequest> mongoRequest
                 = std::make_shared<CommandRequest>();
@@ -162,7 +171,7 @@ namespace Sentry
         return this->Run(mongoClient, mongoRequest) != nullptr;
     }
 
-	void MongoRpcComponent::OnClientError(int index, XCode code)
+	void MongoDBComponent::OnClientError(int index, XCode code)
 	{
 
 	}

@@ -24,7 +24,7 @@ namespace Sentry
         XCode RunCommand(const db::mongo::command::request & request, db::mongo::command::response & response);
     private:
         std::string mBuffer;
-        class MongoRpcComponent * mMongoComponent;
+        class MongoDBComponent * mMongoComponent;
         class DataSyncComponent * mSyncRedisComponent;
     };
 }
