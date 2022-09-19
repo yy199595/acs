@@ -4,7 +4,8 @@
 
 #include"MysqlMessage.h"
 #include"errmsg.h"
-
+#include"spdlog/fmt/fmt.h"
+#include"sstream"
 namespace Mysql
 {
     Response::Response(MYSQL_RES *result)
@@ -61,18 +62,109 @@ namespace Mysql
 
 namespace Mysql
 {
-    MYSQL_RES *InitCommand::Invoke(MYSQL * sock, std::string &error)
+    CreateTabCommand::CreateTabCommand(std::shared_ptr<google::protobuf::Message> message, int id)
+        : ICommand(id), mMessage(message)
     {
-        MYSQL_RES * res = mysql_list_dbs(sock, NULL);
-        if(res == nullptr)
+
+    }
+    MYSQL_RES *CreateTabCommand::Invoke(MYSQL * sock, std::string &error)
+    {
+        std::string name = this->mMessage->GetTypeName();
+        const size_t pos = name.find('.');
+        if(pos == std::string::npos)
         {
-            error.append(mysql_error(sock));
+            error = "proto name not xxx.xxx";
             return nullptr;
         }
-        while(st_mysql_field * field = mysql_fetch_field(res))
+        std::string db = name.substr(0, pos);
+        if(mysql_select_db(sock, db.c_str()) !=0)
         {
-            printf(field->name);
+            this->mBuffer << "CREATE DATABASE IF NOT EXISTS " << db;
+            this->mBuffer << "DEFAULT CHARSET utf8 COLLATE utf8_general_ci;";
+
+            const std::string sql = mBuffer.str();
+            if(mysql_real_query(sock, sql.c_str(), sql.length()) != 0)
+            {
+                error = mysql_error(sock);
+                return nullptr;
+            }
+            this->mBuffer.clear();
+            this->mBuffer.str("");
+            mysql_select_db(sock, db.c_str());
+        }
+        const Descriptor * descriptor = this->mMessage->GetDescriptor();
+        for(int index = 0; index < descriptor->field_count(); index++)
+        {
+            const FieldDescriptor * fileDescriptor = descriptor->field(index);
+            if(fileDescriptor == nullptr)
+            {
+                error = fmt::format("proto field error index = {0}", index);
+                return nullptr;
+            }
+            if(!this->ForeachMessage(fileDescriptor))
+            {
+                error = fmt::format("proto field error field = {0}", fileDescriptor->name());
+                return nullptr;
+            }
+        }
+        std::string sql = this->mBuffer.str();
+        if(mysql_real_query(sock, sql.c_str(), sql.length()) != 0)
+        {
+            error = mysql_error(sock);
+            return nullptr;
+        }
+        MYSQL_RES * res = mysql_store_result(sock);
+        MYSQL_ROW row = mysql_fetch_row(res);
+        unsigned int fieldCount = mysql_field_count(sock);
+        unsigned long * lengths = mysql_fetch_lengths(res);
+        for(unsigned int index = 0; index < fieldCount; index++)
+        {
+            st_mysql_field * field = mysql_fetch_field(res);
+            std::string data(row[index], lengths[index]);
         }
         return res;
+    }
+
+    bool CreateTabCommand::ForeachMessage(const FieldDescriptor *field)
+    {
+        const Message & message = *this->mMessage;
+        const Reflection * reflection = this->mMessage->GetReflection();
+        switch(field->type())
+        {
+            case FieldDescriptor::TYPE_INT32:
+            {
+                int value = reflection->GetInt32(message, field);
+            }
+                return true;
+            case FieldDescriptor::TYPE_UINT32:
+            {
+                int value = reflection->GetInt32(message, field);
+            }
+                return true;
+            case FieldDescriptor::TYPE_UINT64:
+            {
+                int value = reflection->GetInt32(message, field);
+            }
+                return true;
+            case FieldDescriptor::TYPE_INT64:
+
+                break;
+            case FieldDescriptor::TYPE_FLOAT:
+
+                break;
+            case FieldDescriptor::TYPE_DOUBLE:
+
+                break;
+            case FieldDescriptor::TYPE_STRING:
+
+                break;
+            case FieldDescriptor::TYPE_BYTES:
+
+                break;
+            case FieldDescriptor::TYPE_BOOL:
+
+                break;
+        }
+        return false;
     }
 }

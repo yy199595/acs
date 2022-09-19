@@ -11,6 +11,9 @@
 #include"mysql.h"
 #include<memory>
 #include<string>
+#include<sstream>
+#include"google/protobuf/message.h"
+using namespace google::protobuf;
 namespace Mysql
 {
 	class Response
@@ -60,11 +63,19 @@ namespace Mysql
 
 namespace Mysql
 {
-    class InitCommand : public ICommand
+    class CreateTabCommand : public ICommand
     {
     public:
-        using ICommand::ICommand;
+        CreateTabCommand(std::shared_ptr<google::protobuf::Message> message, int id);
+
+    public:
         MYSQL_RES * Invoke(MYSQL *, std::string &error) final;
+
+    private:
+        bool ForeachMessage(const FieldDescriptor * field);
+    private:
+        std::stringstream mBuffer;
+        std::shared_ptr<google::protobuf::Message> mMessage;
     };
 }
 

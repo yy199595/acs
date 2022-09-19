@@ -46,7 +46,12 @@ namespace Sentry
 				= std::make_shared<MysqlClient>(this->mConfig, this);
 			this->mMysqlClients.emplace_back(std::move(mysqlClient));
 		}
-        return this->Ping();
+
+        std::shared_ptr<Mysql::CreateDBCommand> command
+            = std::make_shared<Mysql::CreateDBCommand>("yjz", 1);
+        std::shared_ptr<Mysql::Response> response = this->Run(this->GetClient(0), command);
+
+        return this->Ping(0);
 	}
 
     bool MysqlDBComponent::Ping(int index)
