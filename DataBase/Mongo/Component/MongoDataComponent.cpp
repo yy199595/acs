@@ -6,7 +6,8 @@
 #include"Util/ProtoHelper.h"
 #include"Component/Redis/RedisDataComponent.h"
 #include"Component/Mysql/MysqlDataComponent.h"
-#include"Component/Mongo/MongoAgentComponent.h"
+
+#include"Component/MongoAgentComponent.h"
 #include"Component/Scene/ProtoComponent.h"
 namespace Sentry
 {

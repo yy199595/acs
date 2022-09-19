@@ -3,8 +3,8 @@
 //
 
 #include"MongoService.h"
-#include"MongoDBComponent.h"
-#include"DataSyncComponent.h"
+#include"Component/MongoDBComponent.h"
+#include"Component/DataSyncComponent.h"
 
 namespace Sentry
 {

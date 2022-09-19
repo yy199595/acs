@@ -9,7 +9,7 @@
 #include"Util/sha1.h"
 #include"Bson/base64.h"
 #include"Util/StringHelper.h"
-#include"Component/Mongo/MongoDBComponent.h"
+#include"Component/MongoDBComponent.h"
 
 namespace Mongo
 {

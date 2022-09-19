@@ -166,6 +166,8 @@ namespace Sentry
     {
         std::shared_ptr<CommandRequest> mongoRequest
                 = std::make_shared<CommandRequest>();
+
+        mongoRequest->dataBase = this->mConfig.mDb;
         mongoRequest->document.Add("ping", 1);
         std::shared_ptr<TcpMongoClient> mongoClient = this->GetClient(index);
         return this->Run(mongoClient, mongoRequest) != nullptr;

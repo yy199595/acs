@@ -21,12 +21,11 @@
 #include"Component/Scene/ProtoComponent.h"
 #include"Component/RpcService/LuaService.h"
 #include"Component/Http/HttpWebComponent.h"
-#include"Component/Mongo/MongoService.h"
+
 #include"Component/HttpService/LocalLuaHttpService.h"
-#include"Component/Mongo/MongoDBComponent.h"
 #include"Component/Mysql/MysqlDBComponent.h"
 
-#include"Component/Common/MongoDataComponent.h"
+
 #include"Component/Gate/GateAgentComponent.h"
 #include"Component/User/UserSyncComponent.h"
 #include"Component/ClientComponent.h"
@@ -35,9 +34,16 @@
 #include"Component/Http/HttpWebComponent.h"
 #include"Component/Http/HttpRpcComponent.h"
 #include"Component/RpcService/ServiceAgent.h"
-#include"Component/Mongo/MongoAgentComponent.h"
+
 #include"Component/HttpService/HttpWebService.h"
-#include"Component/Mongo/DataSyncComponent.h"
+
+#ifdef __ENABLE_MONGODB__
+#include"Service/MongoService.h"
+#include"Component/MongoDBComponent.h"
+#include"Component/DataSyncComponent.h"
+#include"Component/MongoAgentComponent.h"
+#include"Component/MongoDataComponent.h"
+#endif
 using namespace Sentry;
 void RegisterComponent()
 {
@@ -48,7 +54,6 @@ void RegisterComponent()
     ComponentFactory::Add<TaskComponent>("TaskComponent");
     ComponentFactory::Add<TimerComponent>("TimerComponent");
     ComponentFactory::Add<LoggerComponent>("LoggerComponent");
-	ComponentFactory::Add<MongoDataComponent>("MongoDataComponent");
 	ComponentFactory::Add<UserSyncComponent>("UserSyncComponent");
 	ComponentFactory::Add<OperatorComponent>("OperatorComponent");
     ComponentFactory::Add<UnitMgrComponent>("UnitMgrComponent");
@@ -66,12 +71,15 @@ void RegisterComponent()
 	ComponentFactory::Add<OuterNetMessageComponent>("OuterNetMessageComponent");
 // db
     ComponentFactory::Add<MysqlDBComponent>("MysqlDBComponent");
-	ComponentFactory::Add<MongoDBComponent>("MongoDBComponent");
     ComponentFactory::Add<RedisDataComponent>("RedisDataComponent");
     ComponentFactory::Add<RedisSubComponent>("RedisSubComponent");
-	ComponentFactory::Add<MongoAgentComponent>("MongoAgentComponent");
-    ComponentFactory::Add<DataSyncComponent>("DataSyncComponent");
 
+#ifdef __ENABLE_MONGODB__
+    ComponentFactory::Add<MongoDBComponent>("MongoDBComponent");
+    ComponentFactory::Add<DataSyncComponent>("DataSyncComponent");
+    ComponentFactory::Add<MongoDataComponent>("MongoDataComponent");
+    ComponentFactory::Add<MongoAgentComponent>("MongoAgentComponent");
+#endif
 //http
     ComponentFactory::Add<HttpComponent>("HttpComponent");
     ComponentFactory::Add<HttpWebComponent>("HttpWebComponent");
@@ -90,7 +98,9 @@ void RegisterServiceComponent()
     ComponentFactory::Add<ServiceAgent>("agent");
     ComponentFactory::Add<LocalLuaHttpService>("http");
     ComponentFactory::Add<GateService>("GateService");
+#ifdef __ENABLE_MONGODB__
 	ComponentFactory::Add<MongoService>("MongoService");
+#endif
 }
 int main(int argc, char **argv)
 {

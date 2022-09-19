@@ -18,7 +18,7 @@ option(ONLY_MAIN_THREAD "启用单线程模式" OFF)
 option(__NET_ERROR_LOG__ "打印网络层错误" ON)
 option(__ENABLE_MYSQL__ "是否使用mysql" ON)
 
-option(__ENABLE_MONGODB__ "是否使用mongodb" OFF)
+option(__ENABLE_MONGODB__ "是否使用mongodb" ON)
 option(__ENABLE_MIMALLOC__ "启用mimalloc管理内存" OFF)
 option(__ENABLE_JEMALLOC__ "启用jemalloc管理内存" OFF)
 

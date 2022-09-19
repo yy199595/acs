@@ -5,7 +5,7 @@
 #ifndef SERVER_MONGOSERVICE_H
 #define SERVER_MONGOSERVICE_H
 #include"Message/db.pb.h"
-#include"DB/Mongo/MongoProto.h"
+#include"Client/MongoProto.h"
 #include"Component/RpcService/LocalService.h"
 namespace Sentry
 {

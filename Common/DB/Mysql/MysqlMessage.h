@@ -1,7 +1,7 @@
 //
 // Created by zmhy0073 on 2022/8/25.
 //
-
+#ifdef __ENABLE_MYSQL__
 #ifndef APP_MYSQLMESSAGE_H
 #define APP_MYSQLMESSAGE_H
 #ifdef _WIN32
@@ -70,3 +70,4 @@ namespace Mysql
 
 
 #endif //APP_MYSQLMESSAGE_H
+#endif

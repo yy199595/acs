@@ -7,7 +7,7 @@
 #include"Util/MD5.h"
 #include"NetWork/OuterNetClient.h"
 #include"Component/Gate/OuterNetMessageComponent.h"
-#include"Component/Common/MongoDataComponent.h"
+#include"../../../DataBase/Mongo/Component/MongoDataComponent.h"
 #include"Component/Gate/OuterNetComponent.h"
 #include"Network/Listener/TcpServerListener.h"
 #include"Component/Gate/GateAgentComponent.h"

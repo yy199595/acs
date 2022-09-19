@@ -6,7 +6,7 @@
 #define SERVER_MONGOPROTO_H
 #include"asio/streambuf.hpp"
 #include"Json/JsonWriter.h"
-#include"DB/Mongo/BsonDocument.h"
+#include"BsonDocument.h"
 #include"Network/Proto/ProtoMessage.h"
 
 #define OP_REPLY 1

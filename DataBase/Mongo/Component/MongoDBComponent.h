@@ -5,9 +5,9 @@
 #ifndef SERVER_MONGORPCCOMPONENT_H
 #define SERVER_MONGORPCCOMPONENT_H
 #include"Util/NumberBuilder.h"
-#include"DB/Mongo/MongoProto.h"
-#include"DB/Mongo/MongoClient.h"
-#include"DB/Mongo/BsonDocument.h"
+#include"../Client/MongoProto.h"
+#include"../Client/MongoClient.h"
+#include"../Client/BsonDocument.h"
 #include"Util/NumberBuilder.h"
 #include"Component/Rpc/RpcTaskComponent.h"
 

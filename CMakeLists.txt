@@ -65,6 +65,11 @@ include_directories(${PROJECT_SOURCE_DIR}/Common)
 include_directories(${PROJECT_SOURCE_DIR}/Server)
 include_directories(${PROJECT_SOURCE_DIR}/Client)
 
+if(__ENABLE_MONGODB__)
+    include_directories(${PROJECT_SOURCE_DIR}/DataBase/Mongo)
+    file(GLOB_RECURSE MongoFiles "DataBase/Mongo/*.h" "DataBase/Mongo/*.cpp")
+endif()
+
 file(GLOB_RECURSE CommonSrc "Common/*.h" "Common/*.cpp")
 file(GLOB_RECURSE ProtocolSrc "Gen/*.h" "Gen/*.cpp" "Gen/*.hpp" "Gen/*.cc")
 
@@ -79,7 +84,7 @@ else()
     SET(CMAKE_BUILD_TYPE "Release")
 endif()
 
-list(APPEND CommonFiles ${CommonSrc} ${ProtocolSrc})
+list(APPEND CommonFiles ${CommonSrc} ${ProtocolSrc} ${MongoFiles})
 list(APPEND ServerFiles ${MainSource} ${LogicSource} ${ServerSource})
 
 find_program(CCACHE_PROGRAM ccache)

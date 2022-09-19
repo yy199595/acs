@@ -1,7 +1,7 @@
 //
 // Created by mac on 2022/4/14.
 //
-
+#ifdef __ENABLE_MYSQL__
 #ifndef SERVER_MYSQLCLIENT_H
 #define SERVER_MYSQLCLIENT_H
 
@@ -40,3 +40,4 @@ namespace Sentry
     };
 }
 #endif //SERVER_MYSQLCLIENT_H
+#endif
