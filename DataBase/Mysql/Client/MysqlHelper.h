@@ -4,7 +4,7 @@
 #include"Util/Guid.h"
 #include"Message/s2s.pb.h"
 #include"rapidjson/document.h"
-#include"DB/Mysql/MysqlDefine.h"
+#include"MysqlDefine.h"
 
 using namespace google::protobuf;
 namespace Sentry

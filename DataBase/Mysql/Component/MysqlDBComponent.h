@@ -5,8 +5,8 @@
 #ifndef SERVER_MYSQLRPCCOMPONENT_H
 #define SERVER_MYSQLRPCCOMPONENT_H
 
-#include"DB/Mysql/MysqlDefine.h"
-#include"DB/Mysql/MysqlMessage.h"
+#include"../Client/MysqlDefine.h"
+#include"../Client/MysqlMessage.h"
 #include"Util/NumberBuilder.h"
 #include"Component/Rpc/RpcTaskComponent.h"
 

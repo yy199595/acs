@@ -1,7 +1,7 @@
 #pragma once
 
-#include"DB/Mysql/MysqlClient.h"
-#include"DB/Mysql/MysqlHelper.h"
+#include"../Client/MysqlClient.h"
+#include"../Client/MysqlHelper.h"
 #include"Component/RpcService/LocalService.h"
 
 namespace Sentry

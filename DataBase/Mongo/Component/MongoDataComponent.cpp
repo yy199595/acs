@@ -5,7 +5,7 @@
 #include"MongoDataComponent.h"
 #include"Util/ProtoHelper.h"
 #include"Component/Redis/RedisDataComponent.h"
-#include"Component/Mysql/MysqlDataComponent.h"
+#include"../../Mysql/Component/MysqlDataComponent.h"
 
 #include"Component/MongoAgentComponent.h"
 #include"Component/Scene/ProtoComponent.h"

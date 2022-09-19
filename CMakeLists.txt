@@ -70,6 +70,11 @@ if(__ENABLE_MONGODB__)
     file(GLOB_RECURSE MongoFiles "DataBase/Mongo/*.h" "DataBase/Mongo/*.cpp")
 endif()
 
+if(__ENABLE_MYSQL__)
+    include_directories(${PROJECT_SOURCE_DIR}/DataBase/Mysql)
+    file(GLOB_RECURSE MysqlFiles "DataBase/Mysql/*.h" "DataBase/Mysql/*.cpp")
+endif()
+
 file(GLOB_RECURSE CommonSrc "Common/*.h" "Common/*.cpp")
 file(GLOB_RECURSE ProtocolSrc "Gen/*.h" "Gen/*.cpp" "Gen/*.hpp" "Gen/*.cc")
 
@@ -84,7 +89,7 @@ else()
     SET(CMAKE_BUILD_TYPE "Release")
 endif()
 
-list(APPEND CommonFiles ${CommonSrc} ${ProtocolSrc} ${MongoFiles})
+list(APPEND CommonFiles ${CommonSrc} ${ProtocolSrc} ${MongoFiles} ${MysqlFiles})
 list(APPEND ServerFiles ${MainSource} ${LogicSource} ${ServerSource})
 
 find_program(CCACHE_PROGRAM ccache)

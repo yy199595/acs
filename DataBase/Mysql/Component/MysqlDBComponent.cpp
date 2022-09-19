@@ -3,7 +3,7 @@
 //
 
 #include"MysqlDBComponent.h"
-#include"DB/Mysql/MysqlClient.h"
+#include"../Client/MysqlClient.h"
 
 namespace Sentry
 {

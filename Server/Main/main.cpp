@@ -23,15 +23,12 @@
 #include"Component/Http/HttpWebComponent.h"
 
 #include"Component/HttpService/LocalLuaHttpService.h"
-#include"Component/Mysql/MysqlDBComponent.h"
-
 
 #include"Component/Gate/GateAgentComponent.h"
 #include"Component/User/UserSyncComponent.h"
 #include"Component/ClientComponent.h"
 
 #include"Component/Redis/RedisSubComponent.h"
-#include"Component/Http/HttpWebComponent.h"
 #include"Component/Http/HttpRpcComponent.h"
 #include"Component/RpcService/ServiceAgent.h"
 
@@ -43,6 +40,10 @@
 #include"Component/DataSyncComponent.h"
 #include"Component/MongoAgentComponent.h"
 #include"Component/MongoDataComponent.h"
+#endif
+
+#ifdef __ENABLE_MYSQL__
+#include"Component/MysqlDBComponent.h"
 #endif
 using namespace Sentry;
 void RegisterComponent()
@@ -70,7 +71,6 @@ void RegisterComponent()
 	ComponentFactory::Add<OuterNetComponent>("OuterNetComponent");
 	ComponentFactory::Add<OuterNetMessageComponent>("OuterNetMessageComponent");
 // db
-    ComponentFactory::Add<MysqlDBComponent>("MysqlDBComponent");
     ComponentFactory::Add<RedisDataComponent>("RedisDataComponent");
     ComponentFactory::Add<RedisSubComponent>("RedisSubComponent");
 
@@ -79,6 +79,10 @@ void RegisterComponent()
     ComponentFactory::Add<DataSyncComponent>("DataSyncComponent");
     ComponentFactory::Add<MongoDataComponent>("MongoDataComponent");
     ComponentFactory::Add<MongoAgentComponent>("MongoAgentComponent");
+#endif
+
+#ifdef __ENABLE_MYSQL__
+    ComponentFactory::Add<MysqlDBComponent>("MysqlDBComponent");
 #endif
 //http
     ComponentFactory::Add<HttpComponent>("HttpComponent");
