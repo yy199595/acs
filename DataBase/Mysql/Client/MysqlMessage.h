@@ -72,6 +72,7 @@ namespace Mysql
         MYSQL_RES * Invoke(MYSQL *, std::string &error) final;
 
     private:
+        bool CreateTable(MYSQL * sock, std::string & eror);
         bool ForeachMessage(const FieldDescriptor * field);
     private:
         std::stringstream mBuffer;

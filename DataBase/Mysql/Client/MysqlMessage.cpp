@@ -77,10 +77,11 @@ namespace Mysql
             return nullptr;
         }
         std::string db = name.substr(0, pos);
+        std::string tab = name.substr(pos + 1);
         if (mysql_select_db(sock, db.c_str()) != 0)
         {
             this->mBuffer << "CREATE DATABASE IF NOT EXISTS " << db;
-            this->mBuffer << "DEFAULT CHARSET utf8 COLLATE utf8_general_ci;";
+            this->mBuffer << " DEFAULT CHARSET utf8 COLLATE utf8_general_ci;";
 
             const std::string sql = mBuffer.str();
             if (mysql_real_query(sock, sql.c_str(), sql.length()) != 0)
@@ -90,15 +91,49 @@ namespace Mysql
             }
             this->mBuffer.clear();
             this->mBuffer.str("");
-            mysql_select_db(sock, db.c_str());
+            if (mysql_select_db(sock, db.c_str()) != 0)
+            {
+                error = mysql_error(sock);
+                return nullptr;
+            }
         }
         if (mysql_query(sock, "SHOW TABLES") != 0)
         {
             error = mysql_error(sock);
             return nullptr;
         }
+        std::set<std::string> tables;
         MYSQL_RES * result1 = mysql_store_result(sock);
 
+        MYSQL_ROW row = mysql_fetch_row(result1);
+        if (row != nullptr)
+        {
+            unsigned int fieldCount = mysql_field_count(sock);
+            unsigned long* lengths = mysql_fetch_lengths(result1);
+            for (unsigned int index = 0; index < fieldCount; index++)
+            {
+                st_mysql_field* field = mysql_fetch_field(result1);
+                tables.emplace(std::string(row[index], lengths[index]));
+            }
+        }
+        mysql_free_result(result1);
+        if (tables.find(tab) == tables.end())
+        {
+            if (!this->CreateTable(sock, error))
+            {              
+                return nullptr;
+            }
+        }
+        else
+        {
+
+        }
+
+        return nullptr;
+    }
+
+    bool CreateTabCommand::CreateTable(MYSQL* sock, std::string & error)
+    {
         const Descriptor* descriptor = this->mMessage->GetDescriptor();
         for (int index = 0; index < descriptor->field_count(); index++)
         {
@@ -106,30 +141,21 @@ namespace Mysql
             if (fileDescriptor == nullptr)
             {
                 error = fmt::format("proto field error index = {0}", index);
-                return nullptr;
+                return false;
             }
             if (!this->ForeachMessage(fileDescriptor))
             {
                 error = fmt::format("proto field error field = {0}", fileDescriptor->name());
-                return nullptr;
+                return false;
             }
         }
         std::string sql = this->mBuffer.str();
         if (mysql_real_query(sock, sql.c_str(), sql.length()) != 0)
         {
             error = mysql_error(sock);
-            return nullptr;
+            return false;
         }
-        MYSQL_RES* res = mysql_store_result(sock);
-        MYSQL_ROW row = mysql_fetch_row(res);
-        unsigned int fieldCount = mysql_field_count(sock);
-        unsigned long* lengths = mysql_fetch_lengths(res);
-        for (unsigned int index = 0; index < fieldCount; index++)
-        {
-            st_mysql_field* field = mysql_fetch_field(res);
-            std::string data(row[index], lengths[index]);
-        }
-        return res;
+        return true;
     }
 
     bool CreateTabCommand::ForeachMessage(const FieldDescriptor *field)

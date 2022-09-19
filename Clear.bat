@@ -32,3 +32,4 @@ rmdir /s/q Server.dir
 cd bin
 rmdir /s/q Debug
 rmdir /s/q Logs
+rm

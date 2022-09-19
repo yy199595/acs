@@ -1,5 +1,6 @@
 if(MSVC)
     enable_language(C CXX ASM_MASM)
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
 else()
     enable_language(C CXX ASM)
