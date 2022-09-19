@@ -3,8 +3,8 @@
 //
 
 #include"MysqlDBComponent.h"
-#include"../Client/MysqlClient.h"
-
+#include"Client/MysqlClient.h"
+#include"Message/user.pb.h"
 namespace Sentry
 {
     MysqlTask::MysqlTask(int taskId, int ms)
@@ -47,8 +47,11 @@ namespace Sentry
 			this->mMysqlClients.emplace_back(std::move(mysqlClient));
 		}
 
-        std::shared_ptr<Mysql::CreateDBCommand> command
-            = std::make_shared<Mysql::CreateDBCommand>("yjz", 1);
+        std::shared_ptr<user::account_info> account(new user::account_info());
+
+
+        std::shared_ptr<Mysql::CreateTabCommand> command
+            = std::make_shared<Mysql::CreateTabCommand>(account, 1);
         std::shared_ptr<Mysql::Response> response = this->Run(this->GetClient(0), command);
 
         return this->Ping(0);

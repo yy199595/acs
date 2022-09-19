@@ -67,23 +67,23 @@ namespace Mysql
     {
 
     }
-    MYSQL_RES *CreateTabCommand::Invoke(MYSQL * sock, std::string &error)
+    MYSQL_RES* CreateTabCommand::Invoke(MYSQL* sock, std::string& error)
     {
         std::string name = this->mMessage->GetTypeName();
         const size_t pos = name.find('.');
-        if(pos == std::string::npos)
+        if (pos == std::string::npos)
         {
             error = "proto name not xxx.xxx";
             return nullptr;
         }
         std::string db = name.substr(0, pos);
-        if(mysql_select_db(sock, db.c_str()) !=0)
+        if (mysql_select_db(sock, db.c_str()) != 0)
         {
             this->mBuffer << "CREATE DATABASE IF NOT EXISTS " << db;
             this->mBuffer << "DEFAULT CHARSET utf8 COLLATE utf8_general_ci;";
 
             const std::string sql = mBuffer.str();
-            if(mysql_real_query(sock, sql.c_str(), sql.length()) != 0)
+            if (mysql_real_query(sock, sql.c_str(), sql.length()) != 0)
             {
                 error = mysql_error(sock);
                 return nullptr;
@@ -92,34 +92,41 @@ namespace Mysql
             this->mBuffer.str("");
             mysql_select_db(sock, db.c_str());
         }
-        const Descriptor * descriptor = this->mMessage->GetDescriptor();
-        for(int index = 0; index < descriptor->field_count(); index++)
+        if (mysql_query(sock, "SHOW TABLES") != 0)
         {
-            const FieldDescriptor * fileDescriptor = descriptor->field(index);
-            if(fileDescriptor == nullptr)
+            error = mysql_error(sock);
+            return nullptr;
+        }
+        MYSQL_RES * result1 = mysql_store_result(sock);
+
+        const Descriptor* descriptor = this->mMessage->GetDescriptor();
+        for (int index = 0; index < descriptor->field_count(); index++)
+        {
+            const FieldDescriptor* fileDescriptor = descriptor->field(index);
+            if (fileDescriptor == nullptr)
             {
                 error = fmt::format("proto field error index = {0}", index);
                 return nullptr;
             }
-            if(!this->ForeachMessage(fileDescriptor))
+            if (!this->ForeachMessage(fileDescriptor))
             {
                 error = fmt::format("proto field error field = {0}", fileDescriptor->name());
                 return nullptr;
             }
         }
         std::string sql = this->mBuffer.str();
-        if(mysql_real_query(sock, sql.c_str(), sql.length()) != 0)
+        if (mysql_real_query(sock, sql.c_str(), sql.length()) != 0)
         {
             error = mysql_error(sock);
             return nullptr;
         }
-        MYSQL_RES * res = mysql_store_result(sock);
+        MYSQL_RES* res = mysql_store_result(sock);
         MYSQL_ROW row = mysql_fetch_row(res);
         unsigned int fieldCount = mysql_field_count(sock);
-        unsigned long * lengths = mysql_fetch_lengths(res);
-        for(unsigned int index = 0; index < fieldCount; index++)
+        unsigned long* lengths = mysql_fetch_lengths(res);
+        for (unsigned int index = 0; index < fieldCount; index++)
         {
-            st_mysql_field * field = mysql_fetch_field(res);
+            st_mysql_field* field = mysql_fetch_field(res);
             std::string data(row[index], lengths[index]);
         }
         return res;

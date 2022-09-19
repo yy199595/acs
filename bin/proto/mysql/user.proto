@@ -1,0 +1,13 @@
+syntax = "proto3";
+package user;
+message account_info
+{
+	string account = 1;
+	int64 phone_num = 2;
+	string pass_word = 3;
+	int64 user_id = 4;
+	int64 login_time = 5;
+	int64 register_time = 6;
+	string last_login_ip = 7;
+}
+
