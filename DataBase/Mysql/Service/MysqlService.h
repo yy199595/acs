@@ -13,17 +13,17 @@ namespace Sentry
 		~MysqlService() final = default;
 	private:
 
-        XCode Add(const s2s::mysql::add& request);
+        XCode Add(const db::mysql::add& request);
 
-		XCode Save(const s2s::mysql::save& request);
+		XCode Save(const db::mysql::save& request);
 
-		XCode Update(const s2s::mysql::update& request);
+		XCode Update(const db::mysql::update& request);
 
-		XCode Delete(const s2s::mysql::remove& request);
+		XCode Delete(const db::mysql::remove& request);
 
-        XCode Create(const s2s::mysql::create& request);
+        XCode Create(const db::mysql::create& request);
 
-        XCode Query(const s2s::mysql::query& request, s2s::mysql::response& response);
+        XCode Query(const db::mysql::query& request, db::mysql::response& response);
 
 	 private:
 		bool OnStart() final;

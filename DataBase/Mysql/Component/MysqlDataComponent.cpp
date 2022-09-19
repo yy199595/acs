@@ -12,7 +12,7 @@ namespace Sentry
 	}
 	XCode MysqlDataComponent::Add(const Message& message, long long flag)
 	{
-		s2s::mysql::add request;
+		db::mysql::add request;
 		request.set_flag(flag);
 		request.mutable_data()->PackFrom(message);
 		request.set_table(message.GetTypeName());
@@ -21,7 +21,7 @@ namespace Sentry
 
 	XCode MysqlDataComponent::Save(const Message & data, long long flag)
 	{
-		s2s::mysql::save request;
+		db::mysql::save request;
 		request.set_flag(flag);
 		request.set_table(data.GetTypeName());
 		request.mutable_data()->PackFrom(data);
@@ -30,7 +30,7 @@ namespace Sentry
 
     XCode MysqlDataComponent::Delete(const std::string &table, const std::string &deleteJson, long long flag)
     {
-        s2s::mysql::remove request;
+        db::mysql::remove request;
         request.set_table(table);
         request.set_where_json(deleteJson);
         return this->Call("Delete", request);
@@ -39,7 +39,7 @@ namespace Sentry
     XCode MysqlDataComponent::Update(const std::string &table, const std::string &updateJson,
                                      const std::string &whereJson, long long flag)
     {
-        s2s::mysql::update request;
+        db::mysql::update request;
 
         request.set_flag(flag);
         request.set_table(table);
@@ -49,7 +49,7 @@ namespace Sentry
     }
 
 
-	XCode MysqlDataComponent::Call(const std::string& func, const Message& data, std::shared_ptr<s2s::mysql::response> response)
+	XCode MysqlDataComponent::Call(const std::string& func, const Message& data, std::shared_ptr<db::mysql::response> response)
 	{
 		std::string address;
 		if(!this->mMysqlService->GetHost(address))
@@ -65,13 +65,13 @@ namespace Sentry
 
 	XCode MysqlDataComponent::QueryOnce(const std::string& json, std::shared_ptr<Message> response, long long flag)
 	{
-		s2s::mysql::query request;
+		db::mysql::query request;
 		request.set_flag(flag);
 		request.set_where_json(json);
 		request.set_table(response->GetTypeName());
 
-		std::shared_ptr<s2s::mysql::response>
-			res = std::make_shared<s2s::mysql::response>();
+		std::shared_ptr<db::mysql::response>
+			res = std::make_shared<db::mysql::response>();
 		XCode code = this->Call("Query", request, res);
 		if(code != XCode::Successful)
 		{

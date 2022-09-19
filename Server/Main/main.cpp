@@ -43,6 +43,7 @@
 #endif
 
 #ifdef __ENABLE_MYSQL__
+#include"Service/MysqlService.h"
 #include"Component/MysqlDBComponent.h"
 #endif
 using namespace Sentry;
@@ -104,6 +105,10 @@ void RegisterServiceComponent()
     ComponentFactory::Add<GateService>("GateService");
 #ifdef __ENABLE_MONGODB__
 	ComponentFactory::Add<MongoService>("MongoService");
+#endif
+
+#ifdef __ENABLE_MYSQL__
+    ComponentFactory::Add<MysqlService>("MysqlService");
 #endif
 }
 int main(int argc, char **argv)

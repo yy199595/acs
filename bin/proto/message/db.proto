@@ -1,5 +1,5 @@
 syntax = "proto3";
-
+import "google/protobuf/any.proto";
 package db;
 message mongo
 {
@@ -54,3 +54,52 @@ message mongo
         }
     }
 }
+
+message mysql //mysql操作
+{
+    message create
+    {
+        string db = 1; //库
+        string tab = 2;  //表
+        string proto = 3; //对应的pb协议
+        repeated string keys = 4; //主键
+        repeated string indexs = 5; //索引
+    }
+    message add
+    {
+        int64 flag = 1;
+        string table = 2;
+        google.protobuf.Any data = 3;
+    }
+    message save
+    {
+        int64 flag = 1;
+        string table = 2;
+        google.protobuf.Any data = 3;
+    }
+    message query
+    {
+        int64 flag = 1;
+        string table = 2;
+        string where_json = 3;
+    }
+    message remove
+    {
+        int64 flag = 1;
+        string table = 2;
+        string where_json = 3;
+    }
+    message update
+    {
+        int64 flag = 1;
+        string table = 2;
+        string update_json = 3;
+        string where_json = 4;
+    }
+    message response
+    {
+        string error = 1;
+        repeated string jsons = 2;
+    }
+}
+

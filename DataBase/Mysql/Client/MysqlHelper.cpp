@@ -57,7 +57,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool MysqlHelper::ToSqlCommand(const s2s::mysql::update& messageData, std::string& sqlCommand)
+	bool MysqlHelper::ToSqlCommand(const db::mysql::update& messageData, std::string& sqlCommand)
 	{
 		rapidjson::Document whereJsonDocument;
 		rapidjson::Document updateJsonDocument;
@@ -147,7 +147,7 @@ namespace Sentry
 		return false;
 	}
 
-	bool MysqlHelper::ToSqlCommand(const s2s::mysql::remove& messageData, std::string& sqlCommand)
+	bool MysqlHelper::ToSqlCommand(const db::mysql::remove& messageData, std::string& sqlCommand)
 	{
 		rapidjson::Document jsonDocument;
 		const std::string& json = messageData.where_json();
@@ -178,7 +178,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool MysqlHelper::ToSqlCommand(const s2s::mysql::add& request, std::string& sqlCommand)
+	bool MysqlHelper::ToSqlCommand(const db::mysql::add& request, std::string& sqlCommand)
 	{
 		ProtoComponent * messageComponent = App::Get()->GetComponent<ProtoComponent>();
 		std::shared_ptr<Message> message = messageComponent->New(request.data());
@@ -190,7 +190,7 @@ namespace Sentry
 		return this->ToSqlCommand(table, "insert", *message, sqlCommand);
 	}
 
-	bool MysqlHelper::ToSqlCommand(const s2s::mysql::save& request, std::string& sqlCommand)
+	bool MysqlHelper::ToSqlCommand(const db::mysql::save& request, std::string& sqlCommand)
 	{
 		ProtoComponent * messageComponent = App::Get()->GetComponent<ProtoComponent>();
 		std::shared_ptr<Message> message = messageComponent->New(request.data());
@@ -202,7 +202,7 @@ namespace Sentry
 		return this->ToSqlCommand(table, "replace", *message, sqlCommand);
 	}
 
-	bool MysqlHelper::ToSqlCommand(const s2s::mysql::query& request, std::string& sqlCommand)
+	bool MysqlHelper::ToSqlCommand(const db::mysql::query& request, std::string& sqlCommand)
 	{
 		this->mSqlCommandStream.str("");
 		rapidjson::Document jsonDocument;

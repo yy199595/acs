@@ -2,7 +2,7 @@
 
 #include"XCode/XCode.h"
 #include"Util/Guid.h"
-#include"Message/s2s.pb.h"
+#include"Message/db.pb.h"
 #include"rapidjson/document.h"
 #include"MysqlDefine.h"
 
@@ -14,15 +14,15 @@ namespace Sentry
 	 public:
 		MysqlHelper() = default;
 	 public:
-		bool ToSqlCommand(const s2s::mysql::add& messageData, std::string& sqlCommand);
+		bool ToSqlCommand(const db::mysql::add& messageData, std::string& sqlCommand);
 
-		bool ToSqlCommand(const s2s::mysql::save& messageData, std::string& sqlCommand);
+		bool ToSqlCommand(const db::mysql::save& messageData, std::string& sqlCommand);
 
-		bool ToSqlCommand(const s2s::mysql::query& messageData, std::string& sqlCommand);
+		bool ToSqlCommand(const db::mysql::query& messageData, std::string& sqlCommand);
 
-		bool ToSqlCommand(const s2s::mysql::update& messageData, std::string& sqlCommand);
+		bool ToSqlCommand(const db::mysql::update& messageData, std::string& sqlCommand);
 
-		bool ToSqlCommand(const s2s::mysql::remove& messageData, std::string& sqlCommand);
+		bool ToSqlCommand(const db::mysql::remove& messageData, std::string& sqlCommand);
 
 		bool ToSqlCommand(const std::string& table, const std::string& cmd, Message& message, std::string& sql);
 

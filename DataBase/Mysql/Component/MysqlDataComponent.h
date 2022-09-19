@@ -31,7 +31,7 @@ namespace Sentry
 
     private:
 		bool LateAwake() final;
-		XCode Call(const std::string& func, const Message& data, std::shared_ptr<s2s::mysql::response> response = nullptr);
+		XCode Call(const std::string& func, const Message& data, std::shared_ptr<db::mysql::response> response = nullptr);
 	private:
 		class MysqlService * mMysqlService;
 	};
@@ -41,13 +41,13 @@ namespace Sentry
 	{
 		std::shared_ptr<T> queryData(new T());
 
-		s2s::mysql::query request;
+		db::mysql::query request;
 		request.set_flag(flag);
 		request.set_where_json(queryJson);
 		request.set_table(queryData->GetTypeName());
 
-		std::shared_ptr<s2s::mysql::response>
-			response = std::make_shared<s2s::mysql::response>();
+		std::shared_ptr<db::mysql::response>
+			response = std::make_shared<db::mysql::response>();
 		if(this->Call("Query", request, response) != XCode::Successful)
 		{
 			return std::vector<std::shared_ptr<T>>();

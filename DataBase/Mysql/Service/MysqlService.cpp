@@ -50,32 +50,32 @@ namespace Sentry
 		return this->mMysqlClients[index];
 	}
 
-    XCode MysqlService::Create(const s2s::mysql::create &request)
+    XCode MysqlService::Create(const db::mysql::create &request)
     {
 		return XCode::Successful;
     }
 
-	XCode MysqlService::Add(const s2s::mysql::add& request)
+	XCode MysqlService::Add(const db::mysql::add& request)
 	{
         return XCode::Successful;
 	}
 
-	XCode MysqlService::Save(const s2s::mysql::save& request)
+	XCode MysqlService::Save(const db::mysql::save& request)
 	{
         return XCode::Successful;
     }
 
-	XCode MysqlService::Update(const s2s::mysql::update& request)
+	XCode MysqlService::Update(const db::mysql::update& request)
 	{
         return XCode::Successful;
     }
 
-	XCode MysqlService::Delete(const s2s::mysql::remove& request)
+	XCode MysqlService::Delete(const db::mysql::remove& request)
 	{
         return XCode::Successful;
     }
 
-	XCode MysqlService::Query(const s2s::mysql::query& request, s2s::mysql::response& response)
+	XCode MysqlService::Query(const db::mysql::query& request, db::mysql::response& response)
 	{
         return XCode::Successful;
     }
