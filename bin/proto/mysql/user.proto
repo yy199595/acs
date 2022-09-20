@@ -9,5 +9,6 @@ message account_info
 	int64 login_time = 5;
 	int64 register_time = 6;
 	string last_login_ip = 7;
+	bool is_new_user = 8;
 }
 

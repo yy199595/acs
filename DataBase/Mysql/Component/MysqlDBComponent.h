@@ -15,7 +15,7 @@ namespace Sentry
     class MysqlTask : public IRpcTask<Mysql::Response>
     {
     public:
-        MysqlTask(int taskId, int ms);
+        MysqlTask(long long taskId, int ms);
     public:
         long long GetRpcId() final { return this->mTaskId; }
 
@@ -24,7 +24,7 @@ namespace Sentry
         void OnResponse(std::shared_ptr<Mysql::Response> response) final;
         std::shared_ptr<Mysql::Response> Await() { return mTask.Await(); }
     private:
-        int mTaskId;
+        long long mTaskId;
         TaskSource<std::shared_ptr<Mysql::Response>> mTask;
     };
 }
@@ -40,14 +40,12 @@ namespace Sentry
     public:
         bool Ping(int index = 0);
         std::shared_ptr<MysqlClient> GetClient(int index = -1);
-        std::shared_ptr<Mysql::Response> Run(std::shared_ptr<MysqlClient> client, std::shared_ptr<Mysql::ICommand> command);
+        bool Run(std::shared_ptr<MysqlClient> client, std::shared_ptr<Mysql::ICommand> command);
     private:
         bool OnStart() final;
         bool LateAwake() final;
-        void OnDelTask(long long taskId, RpcTask task) final;
     private:
 		MysqlConfig mConfig;
-        Util::NumberBuilder<int, 10> mNumberPool;
 		std::vector<std::shared_ptr<MysqlClient>> mMysqlClients;
     };
 }

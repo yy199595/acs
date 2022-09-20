@@ -6,36 +6,26 @@
 #include"errmsg.h"
 #include"spdlog/fmt/fmt.h"
 #include"sstream"
+#include"Util/Guid.h"
+#include"App/App.h"
+#include"Define/CommonLogDef.h"
+#include"Component/Scene/LoggerComponent.h"
+using namespace Sentry;
 namespace Mysql
 {
-    Response::Response(MYSQL_RES *result)
+    ICommand::ICommand()
     {
-        this->mResult = result;
-    }
-
-    Response::Response(const std::string &error)
-        : mError(error)
-    {
-        this->mResult = nullptr;
-    }
-
-    Response::~Response()
-    {
-        if(this->mResult != nullptr)
-        {
-            mysql_free_result(this->mResult);
-        }
+        this->mRpcId = Helper::Guid::Create();
     }
 }
 
 namespace Mysql
 {
-    MYSQL_RES *PingCommand::Invoke(MYSQL * sock, std::string &error)
+    bool PingCommand::Invoke(MYSQL * sock, std::string &error)
     {
         switch(mysql_ping(sock))
         {
-            case 0:
-                break;
+            case 0: return true;
             case CR_UNKNOWN_ERROR:
                 error = "CR_UNKNOWN_ERROR";
                 break;
@@ -46,35 +36,117 @@ namespace Mysql
                 error = "CR_COMMANDS_OUT_OF_SYNC";
                 break;
         }
-        return nullptr;
+        return false;
     }
 
-	MYSQL_RES *SqlCommand::Invoke(MYSQL*, std::string & error)
-	{
-		return nullptr;
-	}
+}
 
-    MYSQL_RES *QueryCommand::Invoke(MYSQL *, std::string &error)
+namespace Mysql
+{
+    SqlCommand::SqlCommand(const std::string &sql)
+        : mSql(std::move(sql))
     {
-        return nullptr;
+
+    }
+
+    bool SqlCommand::Invoke(MYSQL * sock, std::string &error)
+    {
+        if (mysql_real_query(sock, this->mSql.c_str(), this->mSql.size()) != 0)
+        {
+            error = mysql_error(sock);
+            return false;
+        }
+        return true;
+    }
+
+    QueryCommand::QueryCommand(const std::string &sql)
+        : mSql(std::move(sql))
+    {
+
+    }
+
+    bool QueryCommand::Invoke(MYSQL * sock, std::string &error)
+    {
+        if (mysql_real_query(sock, this->mSql.c_str(), this->mSql.size()) != 0)
+        {
+            error = mysql_error(sock);
+            return false;
+        }
+        MYSQL_RES *result1 = mysql_store_result(sock);
+        if(result1 == nullptr)
+        {
+            return false;
+        }
+        while(MYSQL_ROW row = mysql_fetch_row(result1))
+        {
+            std::string json;
+            Json::Writer jsonDocument;
+            unsigned int fieldCount = mysql_field_count(sock);
+            unsigned long* lengths = mysql_fetch_lengths(result1);
+            for (unsigned int index = 0; index < fieldCount; index++)
+            {
+                st_mysql_field* field = mysql_fetch_field(result1);
+                this->Write(jsonDocument, field, row[index], lengths[index]);
+            }
+            jsonDocument.WriterStream(json);
+            this->emplace_back(std::move(json));
+        }
+        mysql_free_result(result1);
+        return true;
+    }
+
+    bool QueryCommand::Write(Json::Writer &document, st_mysql_field *filed, const char *str, int len)
+    {
+        if(str == nullptr || len == 0)
+        {
+            return true;
+        }
+        document << filed->name;
+        switch(filed->type)
+        {
+            case enum_field_types::MYSQL_TYPE_TINY:
+            {
+                int value = std::atol(str);
+                document << (value != 0);
+            }
+                return true;
+            case enum_field_types::MYSQL_TYPE_LONG:
+            case enum_field_types::MYSQL_TYPE_LONGLONG:
+                document << std::atoll(str);
+                return true;
+            case enum_field_types::MYSQL_TYPE_FLOAT:
+            case enum_field_types::MYSQL_TYPE_DOUBLE:
+                document << std::atof(str);
+                return true;
+            case enum_field_types::MYSQL_TYPE_BLOB:
+            case enum_field_types::MYSQL_TYPE_STRING:
+            case enum_field_types::MYSQL_TYPE_VARCHAR:
+            case enum_field_types::MYSQL_TYPE_VAR_STRING:
+                document.AddBinString(str, len);
+                return true;
+        }
+        CONSOLE_LOG_ERROR(filed->name << " : " << (int)filed->type);
+        return false;
     }
 }
 
 namespace Mysql
 {
-    CreateTabCommand::CreateTabCommand(std::shared_ptr<google::protobuf::Message> message, int id)
-        : ICommand(id), mMessage(message)
+    CreateTabCommand::CreateTabCommand(std::shared_ptr<google::protobuf::Message> message, std::vector<std::string> & keys)
+        : mMessage(message), mKeys(keys)
     {
 
     }
-    MYSQL_RES* CreateTabCommand::Invoke(MYSQL* sock, std::string& error)
+
+    bool CreateTabCommand::Invoke(MYSQL* sock, std::string& error)
     {
         std::string name = this->mMessage->GetTypeName();
         const size_t pos = name.find('.');
         if (pos == std::string::npos)
         {
             error = "proto name not xxx.xxx";
-            return nullptr;
+            CONSOLE_LOG_ERROR(error);
+            return false;
         }
         std::string db = name.substr(0, pos);
         std::string tab = name.substr(pos + 1);
@@ -87,26 +159,25 @@ namespace Mysql
             if (mysql_real_query(sock, sql.c_str(), sql.length()) != 0)
             {
                 error = mysql_error(sock);
-                return nullptr;
+                CONSOLE_LOG_ERROR(error);
+                return false;
             }
-            this->mBuffer.clear();
-            this->mBuffer.str("");
             if (mysql_select_db(sock, db.c_str()) != 0)
             {
                 error = mysql_error(sock);
-                return nullptr;
+                CONSOLE_LOG_ERROR(error);
+                return false;
             }
         }
         if (mysql_query(sock, "SHOW TABLES") != 0)
         {
             error = mysql_error(sock);
-            return nullptr;
+            CONSOLE_LOG_ERROR(error);
+            return false;
         }
         std::set<std::string> tables;
         MYSQL_RES * result1 = mysql_store_result(sock);
-
-        MYSQL_ROW row = mysql_fetch_row(result1);
-        if (row != nullptr)
+        while(MYSQL_ROW row = mysql_fetch_row(result1))
         {
             unsigned int fieldCount = mysql_field_count(sock);
             unsigned long* lengths = mysql_fetch_lengths(result1);
@@ -119,40 +190,137 @@ namespace Mysql
         mysql_free_result(result1);
         if (tables.find(tab) == tables.end())
         {
-            if (!this->CreateTable(sock, error))
+            if (!this->CreateTable(sock, tab, error))
             {              
-                return nullptr;
+                return false;
             }
+            return true;
         }
-        else
-        {
-
-        }
-
-        return nullptr;
+        return this->CheckTableField(sock, tab, error);
     }
 
-    bool CreateTabCommand::CreateTable(MYSQL* sock, std::string & error)
+    void CreateTabCommand::ClearBuffer()
     {
+        this->mBuffer.clear();
+        this->mBuffer.str("");
+    }
+
+    bool CreateTabCommand::CheckTableField(MYSQL *sock, const std::string &tab, std::string &error)
+    {
+        this->ClearBuffer();
+        this->mBuffer << "DESC " << tab << ';';
+        const std::string sql = this->mBuffer.str();
+        if (mysql_query(sock, sql.c_str()) != 0)
+        {
+            error = mysql_error(sock);
+            CONSOLE_LOG_ERROR(error);
+            return false;
+        }
+
+        std::set<std::string> tableFileds;
+        MYSQL_RES * result1 = mysql_store_result(sock);
+        while(MYSQL_ROW row = mysql_fetch_row(result1))
+        {
+            unsigned int fieldCount = mysql_field_count(sock);
+            unsigned long *lengths = mysql_fetch_lengths(result1);
+            if (fieldCount > 0 && lengths != nullptr)
+            {
+                tableFileds.emplace(std::string(row[0], lengths[0]));
+            }
+        }
+        mysql_free_result(result1);
         const Descriptor* descriptor = this->mMessage->GetDescriptor();
         for (int index = 0; index < descriptor->field_count(); index++)
         {
-            const FieldDescriptor* fileDescriptor = descriptor->field(index);
+            const FieldDescriptor *fileDescriptor = descriptor->field(index);
             if (fileDescriptor == nullptr)
             {
                 error = fmt::format("proto field error index = {0}", index);
                 return false;
             }
+            if(tableFileds.find(fileDescriptor->name()) == tableFileds.end()) //没有这个字段
+            {
+                if(!this->AddNewField(sock, tab, fileDescriptor->name(), error))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    bool CreateTabCommand::AddNewField(MYSQL *sock, const std::string &tab,
+                                       const std::string &field, std::string &error)
+    {
+        const FieldDescriptor * fieldDescriptor = this->mMessage->GetDescriptor()->FindFieldByName(field);
+        if(fieldDescriptor == nullptr)
+        {
+            error = fmt::format("not find filed : {0}", field);
+            CONSOLE_LOG_ERROR(error);
+            return false;
+        }
+        this->ClearBuffer();
+        this->mBuffer << "ALTER TABLE " << tab << " ADD ";
+        if(!this->ForeachMessage(fieldDescriptor))
+        {
+            error = fmt::format("field error : {0}", field);
+            CONSOLE_LOG_ERROR(error);
+            return false;
+        }
+        const std::string sql = this->mBuffer.str();
+        if(mysql_query(sock, sql.c_str()) != 0)
+        {
+            error = mysql_error(sock);
+            CONSOLE_LOG_ERROR(error);
+            return false;
+        }
+        return true;
+    }
+
+    bool CreateTabCommand::CreateTable(MYSQL* sock, const std::string & tab, std::string & error)
+    {
+        this->ClearBuffer();
+        this->mBuffer << "CREATE TABLE `" << tab << "`(";
+        const Descriptor *descriptor = this->mMessage->GetDescriptor();
+        for (int index = 0; index < descriptor->field_count(); index++)
+        {
+            const FieldDescriptor *fileDescriptor = descriptor->field(index);
+            if (fileDescriptor == nullptr)
+            {
+                error = fmt::format("proto field error index = {0}", index);
+                CONSOLE_LOG_ERROR(error);
+                return false;
+            }
             if (!this->ForeachMessage(fileDescriptor))
             {
                 error = fmt::format("proto field error field = {0}", fileDescriptor->name());
+                CONSOLE_LOG_ERROR(error);
                 return false;
             }
+            if (index != descriptor->field_count() - 1)
+            {
+                this->mBuffer << ',';
+            }
         }
-        std::string sql = this->mBuffer.str();
+        if(!this->mKeys.empty())
+        {
+            this->mBuffer << ", PRIMARY KEY (";
+            for (size_t index = 0; index < this->mKeys.size(); index++)
+            {
+                this->mBuffer << '`' << this->mKeys[index] << '`';
+                if(index != this->mKeys.size() - 1)
+                {
+                    this->mBuffer << ',';
+                }
+            }
+            this->mBuffer << ')';
+        }
+        this->mBuffer << ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+        const std::string sql = this->mBuffer.str();
         if (mysql_real_query(sock, sql.c_str(), sql.length()) != 0)
         {
             error = mysql_error(sock);
+            CONSOLE_LOG_ERROR(error);
             return false;
         }
         return true;
@@ -161,43 +329,79 @@ namespace Mysql
     bool CreateTabCommand::ForeachMessage(const FieldDescriptor *field)
     {
         const Message & message = *this->mMessage;
+        this->mBuffer << "`" << field->name() << "` ";
         const Reflection * reflection = this->mMessage->GetReflection();
         switch(field->type())
         {
             case FieldDescriptor::TYPE_INT32:
             {
                 int value = reflection->GetInt32(message, field);
+                this->mBuffer << "INT(20) NOT NULL DEFAULT " << value;
             }
                 return true;
             case FieldDescriptor::TYPE_UINT32:
             {
-                int value = reflection->GetInt32(message, field);
+                unsigned int value = reflection->GetUInt32(message, field);
+                this->mBuffer << "INT(20) NOT NULL DEFAULT " << value;
             }
                 return true;
             case FieldDescriptor::TYPE_UINT64:
             {
-                int value = reflection->GetInt32(message, field);
+                unsigned long long value = reflection->GetUInt64(message, field);
+                this->mBuffer << "BIGINT(32) NOT NULL DEFAULT " << value;
             }
                 return true;
             case FieldDescriptor::TYPE_INT64:
-
-                break;
+            {
+                long long value = reflection->GetInt64(message, field);
+                this->mBuffer << "BIGINT(32) NOT NULL DEFAULT " << value;
+            }
+                return true;
             case FieldDescriptor::TYPE_FLOAT:
-
-                break;
+            {
+                float value = reflection->GetFloat(message, field);
+                this->mBuffer << "FLOAT(20) NOT NULL DEFAULT " << value;
+            }
+                return true;
             case FieldDescriptor::TYPE_DOUBLE:
-
-                break;
+            {
+                double value = reflection->GetDouble(message, field);
+                this->mBuffer << "DOUBLE(32) NOT NULL DEFAULT " << value;
+            }
+                return true;
             case FieldDescriptor::TYPE_STRING:
-
-                break;
+            {
+                std::string value = reflection->GetString(message, field);
+                this->mBuffer << "VARCHAR(64) NOT NULL DEFAULT '" << value << "'";
+            }
+                return true;
             case FieldDescriptor::TYPE_BYTES:
-
-                break;
+            {
+                std::string value = reflection->GetString(message, field);
+                this->mBuffer << "BLOB(64) NOT NULL DEFAULT '" << value << "'";
+            }
+                return true;
             case FieldDescriptor::TYPE_BOOL:
-
-                break;
+            {
+                bool value = reflection->GetBool(message, field);
+                this->mBuffer << "BOOLEAN NOT NULL DEFAULT " << value;
+            }
+                return true;
         }
+        return false;
+    }
+}
+
+namespace Mysql
+{
+    SetMainKeyCommand::SetMainKeyCommand(const std::string &tab, std::vector<std::string> &keys)
+        : mKeys(keys), mTable(tab)
+    {
+
+    }
+
+    bool SetMainKeyCommand::Invoke(MYSQL * sock, std::string &error)
+    {
         return false;
     }
 }

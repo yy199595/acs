@@ -10,7 +10,7 @@ namespace Sentry
 		this->mMysqlService = this->GetComponent<MysqlService>();
 		return this->mMysqlService != nullptr;
 	}
-	XCode MysqlDataComponent::Add(const Message& message, long long flag)
+	XCode MysqlDataComponent::Add(const Message& message, int flag)
 	{
 		db::mysql::add request;
 		request.set_flag(flag);
@@ -19,7 +19,7 @@ namespace Sentry
 		return this->Call("Add", request);
 	}
 
-	XCode MysqlDataComponent::Save(const Message & data, long long flag)
+	XCode MysqlDataComponent::Save(const Message & data, int flag)
 	{
 		db::mysql::save request;
 		request.set_flag(flag);
@@ -28,7 +28,7 @@ namespace Sentry
 		return  this->Call("Save", request);
 	}
 
-    XCode MysqlDataComponent::Delete(const std::string &table, const std::string &deleteJson, long long flag)
+    XCode MysqlDataComponent::Delete(const std::string &table, const std::string &deleteJson, int flag)
     {
         db::mysql::remove request;
         request.set_table(table);
@@ -37,7 +37,7 @@ namespace Sentry
     }
 
     XCode MysqlDataComponent::Update(const std::string &table, const std::string &updateJson,
-                                     const std::string &whereJson, long long flag)
+                                     const std::string &whereJson, int flag)
     {
         db::mysql::update request;
 
@@ -63,10 +63,9 @@ namespace Sentry
 		return this->mMysqlService->Call(address, func, data, response);
 	}
 
-	XCode MysqlDataComponent::QueryOnce(const std::string& json, std::shared_ptr<Message> response, long long flag)
+	XCode MysqlDataComponent::QueryOnce(const std::string& json, std::shared_ptr<Message> response)
 	{
 		db::mysql::query request;
-		request.set_flag(flag);
 		request.set_where_json(json);
 		request.set_table(response->GetTypeName());
 

@@ -9,13 +9,17 @@ else()
     SET(DST_DIR ${MESSAGE_DIR})
 endif()
 
+set(MESSAGE_SRC "")
+set(MESSAGE_HDRS "")
 #设置protoc的搜索路径
 LIST(APPEND PROTO_FLAGS -I${CMAKE_SOURCE_DIR}/bin/proto/message)
+LIST(APPEND PROTO_FLAGS -I${CMAKE_SOURCE_DIR}/bin/proto/mysql)
 
 #获取需要编译的proto文件
 file(GLOB_RECURSE MSG_PROTOS ${CMAKE_SOURCE_DIR}/bin/proto/message/*.proto)
-set(MESSAGE_SRC "")
-set(MESSAGE_HDRS "")
+file(GLOB_RECURSE MYSQL_PROTOS ${CMAKE_SOURCE_DIR}/bin/proto/mysql/*.proto)
+
+list(APPEND ${MSG_PROTOS} ${MYSQL_PROTOS})
 foreach(msg ${MSG_PROTOS})
     get_filename_component(FIL_WE ${msg} NAME_WE)
     message(${FIL_WE})

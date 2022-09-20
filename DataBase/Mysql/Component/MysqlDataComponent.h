@@ -10,24 +10,24 @@ namespace Sentry
 		MysqlDataComponent(const MysqlDataComponent &) = delete;
 
 	public:
-		XCode Add(const Message & data, long long flag = 0);
+		XCode Add(const Message & data, int flag);
 
-		XCode Save(const Message & data, long long flag = 0);
+		XCode Save(const Message & data, int flag);
 
-		XCode QueryOnce(const std::string & json, std::shared_ptr<Message> response, long long flag = 0);
+		XCode QueryOnce(const std::string & json, std::shared_ptr<Message> response);
 
         template<typename T>
-		std::vector<std::shared_ptr<T>> QueryAll(const std::string& queryJson, long long flag = 0);
+		std::vector<std::shared_ptr<T>> QueryAll(const std::string& queryJson);
 
 		template<typename T>
-		XCode Delete(const std::string& deleteJson, long long flag = 0);
+		XCode Delete(const std::string& deleteJson, int flag);
 
-        XCode Delete(const std::string & table, const std::string& deleteJson, long long flag = 0);
+        XCode Delete(const std::string & table, const std::string& deleteJson, int flag);
 
         template<typename T>
-		XCode Update(const std::string& updateJson, const std::string& whereJson, long long flag = 0);
+		XCode Update(const std::string& updateJson, const std::string& whereJson, int flag);
 
-        XCode Update(const std::string & table, const std::string& updateJson, const std::string& whereJson, long long flag = 0);
+        XCode Update(const std::string & table, const std::string& updateJson, const std::string& whereJson, int flag);
 
     private:
 		bool LateAwake() final;
@@ -37,12 +37,11 @@ namespace Sentry
 	};
 
 	template<typename T>
-	std::vector<std::shared_ptr<T>>MysqlDataComponent::QueryAll(const std::string& queryJson, long long flag)
+	std::vector<std::shared_ptr<T>>MysqlDataComponent::QueryAll(const std::string& queryJson)
 	{
 		std::shared_ptr<T> queryData(new T());
 
 		db::mysql::query request;
-		request.set_flag(flag);
 		request.set_where_json(queryJson);
 		request.set_table(queryData->GetTypeName());
 
@@ -66,14 +65,14 @@ namespace Sentry
 	}
 
 	template<typename T>
-	XCode MysqlDataComponent::Delete(const std::string& deleteJson, long long flag)
+	XCode MysqlDataComponent::Delete(const std::string& deleteJson, int flag)
 	{
         T data;
         return this->Delete(data.GetTypeName(), deleteJson, flag);
 	}
 
 	template<typename T>
-	XCode MysqlDataComponent::Update(const std::string& updateJson, const std::string& whereJson, long long flag)
+	XCode MysqlDataComponent::Update(const std::string& updateJson, const std::string& whereJson, int flag)
 	{
         T data;
         return this->Update(data.GetTypeName(), whereJson, updateJson, flag);

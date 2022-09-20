@@ -223,6 +223,12 @@ class account_info :
   ::google::protobuf::int64 register_time() const;
   void set_register_time(::google::protobuf::int64 value);
 
+  // bool is_new_user = 8;
+  void clear_is_new_user();
+  static const int kIsNewUserFieldNumber = 8;
+  bool is_new_user() const;
+  void set_is_new_user(bool value);
+
   // @@protoc_insertion_point(class_scope:user.account_info)
  private:
   class HasBitSetters;
@@ -235,6 +241,7 @@ class account_info :
   ::google::protobuf::int64 user_id_;
   ::google::protobuf::int64 login_time_;
   ::google::protobuf::int64 register_time_;
+  bool is_new_user_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_user_2eproto;
 };
@@ -462,6 +469,20 @@ inline void account_info::set_allocated_last_login_ip(::std::string* last_login_
   }
   last_login_ip_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), last_login_ip);
   // @@protoc_insertion_point(field_set_allocated:user.account_info.last_login_ip)
+}
+
+// bool is_new_user = 8;
+inline void account_info::clear_is_new_user() {
+  is_new_user_ = false;
+}
+inline bool account_info::is_new_user() const {
+  // @@protoc_insertion_point(field_get:user.account_info.is_new_user)
+  return is_new_user_;
+}
+inline void account_info::set_is_new_user(bool value) {
+  
+  is_new_user_ = value;
+  // @@protoc_insertion_point(field_set:user.account_info.is_new_user)
 }
 
 #ifdef __GNUC__

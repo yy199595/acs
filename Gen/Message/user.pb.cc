@@ -57,6 +57,7 @@ const ::google::protobuf::uint32 TableStruct_user_2eproto::offsets[] PROTOBUF_SE
   PROTOBUF_FIELD_OFFSET(::user::account_info, login_time_),
   PROTOBUF_FIELD_OFFSET(::user::account_info, register_time_),
   PROTOBUF_FIELD_OFFSET(::user::account_info, last_login_ip_),
+  PROTOBUF_FIELD_OFFSET(::user::account_info, is_new_user_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::user::account_info)},
@@ -73,16 +74,17 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_user_2eproto[] =
-  "\n\nuser.proto\022\004user\"\230\001\n\014account_info\022\017\n\007a"
+  "\n\nuser.proto\022\004user\"\255\001\n\014account_info\022\017\n\007a"
   "ccount\030\001 \001(\t\022\021\n\tphone_num\030\002 \001(\003\022\021\n\tpass_"
   "word\030\003 \001(\t\022\017\n\007user_id\030\004 \001(\003\022\022\n\nlogin_tim"
   "e\030\005 \001(\003\022\025\n\rregister_time\030\006 \001(\003\022\025\n\rlast_l"
-  "ogin_ip\030\007 \001(\tb\006proto3"
+  "ogin_ip\030\007 \001(\t\022\023\n\013is_new_user\030\010 \001(\010b\006prot"
+  "o3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_user_2eproto = {
   false, InitDefaults_user_2eproto, 
   descriptor_table_protodef_user_2eproto,
-  "user.proto", &assign_descriptors_table_user_2eproto, 181,
+  "user.proto", &assign_descriptors_table_user_2eproto, 202,
 };
 
 void AddDescriptors_user_2eproto() {
@@ -112,6 +114,7 @@ const int account_info::kUserIdFieldNumber;
 const int account_info::kLoginTimeFieldNumber;
 const int account_info::kRegisterTimeFieldNumber;
 const int account_info::kLastLoginIpFieldNumber;
+const int account_info::kIsNewUserFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 account_info::account_info()
@@ -136,8 +139,8 @@ account_info::account_info(const account_info& from)
     last_login_ip_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.last_login_ip_);
   }
   ::memcpy(&phone_num_, &from.phone_num_,
-    static_cast<size_t>(reinterpret_cast<char*>(&register_time_) -
-    reinterpret_cast<char*>(&phone_num_)) + sizeof(register_time_));
+    static_cast<size_t>(reinterpret_cast<char*>(&is_new_user_) -
+    reinterpret_cast<char*>(&phone_num_)) + sizeof(is_new_user_));
   // @@protoc_insertion_point(copy_constructor:user.account_info)
 }
 
@@ -148,8 +151,8 @@ void account_info::SharedCtor() {
   pass_word_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   last_login_ip_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&phone_num_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&register_time_) -
-      reinterpret_cast<char*>(&phone_num_)) + sizeof(register_time_));
+      reinterpret_cast<char*>(&is_new_user_) -
+      reinterpret_cast<char*>(&phone_num_)) + sizeof(is_new_user_));
 }
 
 account_info::~account_info() {
@@ -182,8 +185,8 @@ void account_info::Clear() {
   pass_word_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   last_login_ip_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&phone_num_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&register_time_) -
-      reinterpret_cast<char*>(&phone_num_)) + sizeof(register_time_));
+      reinterpret_cast<char*>(&is_new_user_) -
+      reinterpret_cast<char*>(&phone_num_)) + sizeof(is_new_user_));
   _internal_metadata_.Clear();
 }
 
@@ -274,6 +277,13 @@ const char* account_info::_InternalParse(const char* begin, const char* end, voi
         GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
         ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
         ptr += size;
+        break;
+      }
+      // bool is_new_user = 8;
+      case 8: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 64) goto handle_unusual;
+        msg->set_is_new_user(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
       default: {
@@ -407,6 +417,19 @@ bool account_info::MergePartialFromCodedStream(
         break;
       }
 
+      // bool is_new_user = 8;
+      case 8: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (64 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &is_new_user_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -484,6 +507,11 @@ void account_info::SerializeWithCachedSizes(
       7, this->last_login_ip(), output);
   }
 
+  // bool is_new_user = 8;
+  if (this->is_new_user() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(8, this->is_new_user(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -548,6 +576,11 @@ void account_info::SerializeWithCachedSizes(
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         7, this->last_login_ip(), target);
+  }
+
+  // bool is_new_user = 8;
+  if (this->is_new_user() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(8, this->is_new_user(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -620,6 +653,11 @@ size_t account_info::ByteSizeLong() const {
         this->register_time());
   }
 
+  // bool is_new_user = 8;
+  if (this->is_new_user() != 0) {
+    total_size += 1 + 1;
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -671,6 +709,9 @@ void account_info::MergeFrom(const account_info& from) {
   if (from.register_time() != 0) {
     set_register_time(from.register_time());
   }
+  if (from.is_new_user() != 0) {
+    set_is_new_user(from.is_new_user());
+  }
 }
 
 void account_info::CopyFrom(const ::google::protobuf::Message& from) {
@@ -708,6 +749,7 @@ void account_info::InternalSwap(account_info* other) {
   swap(user_id_, other->user_id_);
   swap(login_time_, other->login_time_);
   swap(register_time_, other->register_time_);
+  swap(is_new_user_, other->is_new_user_);
 }
 
 ::google::protobuf::Metadata account_info::GetMetadata() const {

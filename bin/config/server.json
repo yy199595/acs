@@ -131,6 +131,10 @@
             "Type": "rpc",
             "IsStart": true
         },
+        "MysqlService": {
+            "Type": "rpc",
+            "IsStart": true
+        },
         "MongoService": {
             "Type": "rpc",
             "IsStart": true

@@ -6,7 +6,7 @@
 
 namespace Sentry
 {
-	class MysqlService : public LocalService, public IStart
+	class MysqlService : public LocalService
 	{
 	 public:
 		MysqlService() = default;
@@ -26,13 +26,10 @@ namespace Sentry
         XCode Query(const db::mysql::query& request, db::mysql::response& response);
 
 	 private:
-		bool OnStart() final;
-		std::shared_ptr<MysqlClient> GetMysqlClient(long long flag = 0);
 		bool OnStartService(ServiceMethodRegister & methodRegister);
 	 private:
-		size_t mIndex;
-		MysqlConfig mConfig;
-        class ProtoComponent * mMessageComponent;
-		std::vector<std::shared_ptr<MysqlClient>> mMysqlClients;
+        MysqlHelper mMysqlHelper;
+        class ProtoComponent * mProtoComponent;
+        class MysqlDBComponent * mMysqlComponent;
 	};
 }// namespace Sentry

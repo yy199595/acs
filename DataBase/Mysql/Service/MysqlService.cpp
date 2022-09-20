@@ -1,5 +1,6 @@
 ﻿#include"MysqlService.h"
-#include"App/App.h"
+#include"Client/MysqlMessage.h"
+#include"Component/MysqlDBComponent.h"
 #include"Component/Scene/ProtoComponent.h"
 #include"Component/Scene/NetThreadComponent.h"
 namespace Sentry
@@ -7,76 +8,139 @@ namespace Sentry
 
 	bool MysqlService::OnStartService(ServiceMethodRegister & methodRegister)
 	{
-		this->mIndex = 0;
 		methodRegister.Bind("Add", &MysqlService::Add);
 		methodRegister.Bind("Save", &MysqlService::Save);
 		methodRegister.Bind("Query", &MysqlService::Query);
 		methodRegister.Bind("Update", &MysqlService::Update);
 		methodRegister.Bind("Delete", &MysqlService::Delete);
-        this->mMessageComponent = this->GetComponent<ProtoComponent>();
-
-		const ServerConfig & config = this->GetApp()->GetConfig();
-		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "ip", this->mConfig.mIp));
-		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "port", this->mConfig.mPort));
-		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "user", this->mConfig.mUser));
-		LOG_CHECK_RET_FALSE(config.GetMember("mysql", "passwd", this->mConfig.mPassword));
-
-		unsigned int count = std::thread::hardware_concurrency();
-		this->GetConfig().GetMember("mysql", "count", count);
-
-		for (unsigned int index = 0; index < count; index++)
-		{
-			//this->mMysqlClients.emplace_back(std::make_shared<MysqlClient>(this->mConfig));
-		}
-		return !this->mMysqlClients.empty();
-	}
-
-	bool MysqlService::OnStart()
-	{
-        return  true;
-	}
-
-	std::shared_ptr<MysqlClient> MysqlService::GetMysqlClient(long long flag)
-	{
-		if(flag == 0)
-		{
-			if(this->mIndex >= this->mMysqlClients.size())
-			{
-				this->mIndex = 0;
-			}
-			return this->mMysqlClients[this->mIndex++];
-		}
-		size_t index = flag % this->mMysqlClients.size();
-		return this->mMysqlClients[index];
+        methodRegister.Bind("Create", &MysqlService::Create);
+        LOG_CHECK_RET_FALSE(this->mProtoComponent = this->GetComponent<ProtoComponent>());
+        LOG_CHECK_RET_FALSE(this->mMysqlComponent = this->GetComponent<MysqlDBComponent>());
+        return true;
 	}
 
     XCode MysqlService::Create(const db::mysql::create &request)
     {
-		return XCode::Successful;
+        std::shared_ptr<Message> message = this->mProtoComponent->New(request.data());
+        if (message == nullptr || request.keys().empty())
+        {
+            return XCode::CallArgsError;
+        }
+        std::vector<std::string> keys;
+        for (const std::string &key: request.keys())
+        {
+            keys.emplace_back(std::move(key));
+        }
+        std::shared_ptr<Mysql::CreateTabCommand> command
+            = std::make_shared<Mysql::CreateTabCommand>(message, keys);
+        std::shared_ptr<MysqlClient> mysqlClient =
+            this->mMysqlComponent->GetClient(0);
+
+        if (!this->mMysqlComponent->Run(mysqlClient, command))
+        {
+            return XCode::Failure;
+        }
+        return XCode::Successful;
     }
 
 	XCode MysqlService::Add(const db::mysql::add& request)
-	{
+    {
+        std::string sql;
+        if (!this->mMysqlHelper.ToSqlCommand(request, sql))
+        {
+            return XCode::CallArgsError;
+        }
+        std::shared_ptr<Mysql::SqlCommand> command
+            = std::make_shared<Mysql::SqlCommand>(sql);
+        std::shared_ptr<MysqlClient> mysqlClient =
+            this->mMysqlComponent->GetClient(request.flag());
+
+        if (!this->mMysqlComponent->Run(mysqlClient, command))
+        {
+            return XCode::Failure;
+        }
         return XCode::Successful;
-	}
+    }
 
 	XCode MysqlService::Save(const db::mysql::save& request)
-	{
+    {
+        std::string sql;
+        if (!this->mMysqlHelper.ToSqlCommand(request, sql))
+        {
+            return XCode::CallArgsError;
+        }
+        std::shared_ptr<Mysql::SqlCommand> command
+            = std::make_shared<Mysql::SqlCommand>(sql);
+        std::shared_ptr<MysqlClient> mysqlClient =
+            this->mMysqlComponent->GetClient(request.flag());
+
+        if (!this->mMysqlComponent->Run(mysqlClient, command))
+        {
+            return XCode::Failure;
+        }
         return XCode::Successful;
     }
 
 	XCode MysqlService::Update(const db::mysql::update& request)
-	{
+    {
+        std::string sql;
+        if (!this->mMysqlHelper.ToSqlCommand(request, sql))
+        {
+            return XCode::CallArgsError;
+        }
+        std::shared_ptr<Mysql::SqlCommand> command
+            = std::make_shared<Mysql::SqlCommand>(sql);
+
+        std::shared_ptr<MysqlClient> mysqlClient =
+            this->mMysqlComponent->GetClient(request.flag());
+        if(!this->mMysqlComponent->Run(mysqlClient, command))
+        {
+            return XCode::Failure;
+        }
         return XCode::Successful;
     }
 
 	XCode MysqlService::Delete(const db::mysql::remove& request)
-	{
+    {
+        std::string sql;
+        if (!this->mMysqlHelper.ToSqlCommand(request, sql))
+        {
+            return XCode::CallArgsError;
+        }
+        std::shared_ptr<Mysql::SqlCommand> command
+            = std::make_shared<Mysql::SqlCommand>(sql);
+        std::shared_ptr<MysqlClient> mysqlClient =
+            this->mMysqlComponent->GetClient(request.flag());
+
+        if(!this->mMysqlComponent->Run(mysqlClient, command))
+        {
+            return XCode::Failure;
+        }
         return XCode::Successful;
     }
 
 	XCode MysqlService::Query(const db::mysql::query& request, db::mysql::response& response)
-	{
+    {
+        std::string sql;
+        if (!this->mMysqlHelper.ToSqlCommand(request, sql))
+        {
+            return XCode::CallArgsError;
+        }
+        std::shared_ptr<MysqlClient> mysqlClient
+            = this->mMysqlComponent->GetClient();
+
+        std::shared_ptr<Mysql::QueryCommand> command
+            = std::make_shared<Mysql::QueryCommand>(sql);
+
+        if (!this->mMysqlComponent->Run(mysqlClient, command))
+        {
+            return XCode::Failure;
+        }
+
+        for (size_t index = 0; index < command->size(); index++)
+        {
+            response.add_jsons(std::move(command->at(index)));
+        }
         return XCode::Successful;
     }
 }// namespace Sentry

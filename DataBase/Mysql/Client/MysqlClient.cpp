@@ -18,38 +18,31 @@ namespace Sentry
 	}
 
 	void MysqlClient::Update()
-	{
-		std::string error;
+    {
+        std::string error;
         this->mIsClose = !this->StartConnect();
         std::shared_ptr<Mysql::ICommand> command;
-        asio::io_service & io = App::Get()->GetThread();
+        asio::io_service &io = App::Get()->GetThread();
         this->mLastTime = Helper::Time::GetNowSecTime();
-		while (!this->mIsClose)
-		{
-			while (this->GetCommand(command))
-			{
+        while (!this->mIsClose)
+        {
+            while (this->GetCommand(command))
+            {
                 std::shared_ptr<Mysql::Response> response;
-				MYSQL_RES * result = command->Invoke(this->mMysqlClient, error);
-                if(command->GetRpcId() != 0)
+                bool res = command->Invoke(this->mMysqlClient, error);
+                response = std::make_shared<Mysql::Response>(res, error);
+                if (command->GetRpcId() != 0)
                 {
-                    if(!error.empty())
-                    {
-                        response = std::make_shared<Mysql::Response>(error);
-                    }
-                    else
-                    {
-                        response = std::make_shared<Mysql::Response>(result);
-                    }
                     long long rpcId = command->GetRpcId();
                     io.post(std::bind(&MysqlDBComponent::OnResponse, this->mComponent, rpcId, response));
                 }
                 this->mLastTime = Helper::Time::GetNowSecTime();
-			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
-		}
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
         delete this->mThread;
         mysql_close(this->mMysqlClient);
-	}
+    }
 
 	void MysqlClient::Stop()
 	{

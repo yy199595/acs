@@ -19,6 +19,20 @@ end
 
 function Server.AllServiceStart()
 
+    MysqlComponent.Add("user.account_info", {
+        account = "646585122@qq.com",
+        user_id = 199595,
+        phone_num = 13716061995,
+        pass_word = "199595yjz.",
+        register_time = os.time(),
+        last_login_ip = "127.0.0.1"
+    }, 1)
+
+    local res = MysqlComponent.QueryOnce("user.account_info", {
+        account = "646585122@qq.com"
+    })
+    table.print(res)
+
     local r1 = MongoComponent.InsertOnce("user1.data_account", {
         _id = "646585122@qq.com",
         login_ip = "127.0.0.1",

@@ -7,7 +7,7 @@
 #include"Message/user.pb.h"
 namespace Sentry
 {
-    MysqlTask::MysqlTask(int taskId, int ms)
+    MysqlTask::MysqlTask(long long taskId, int ms)
         : IRpcTask<Mysql::Response>(ms)
     {
         this->mTaskId = taskId;
@@ -39,59 +39,42 @@ namespace Sentry
 	}
 
     bool MysqlDBComponent::OnStart()
-	{
-		for (int index = 0; index < this->mConfig.mMaxCount; index++)
-		{
-			std::shared_ptr<MysqlClient> mysqlClient
-				= std::make_shared<MysqlClient>(this->mConfig, this);
-			this->mMysqlClients.emplace_back(std::move(mysqlClient));
-		}
-
-        std::shared_ptr<user::account_info> account(new user::account_info());
-
-
-        std::shared_ptr<Mysql::CreateTabCommand> command
-            = std::make_shared<Mysql::CreateTabCommand>(account, 1);
-        std::shared_ptr<Mysql::Response> response = this->Run(this->GetClient(0), command);
-
+    {
+        for (int index = 0; index < this->mConfig.mMaxCount; index++)
+        {
+            std::shared_ptr<MysqlClient> mysqlClient
+                = std::make_shared<MysqlClient>(this->mConfig, this);
+            this->mMysqlClients.emplace_back(std::move(mysqlClient));
+        }
         return this->Ping(0);
-	}
+    }
 
     bool MysqlDBComponent::Ping(int index)
     {
-        int id = this->mNumberPool.Pop();
         std::shared_ptr<Mysql::PingCommand> command
-            = std::make_shared<Mysql::PingCommand>(id);
+            = std::make_shared<Mysql::PingCommand>();
         std::shared_ptr<MysqlClient> mysqlCLient = this->GetClient(index);
-        std::shared_ptr<Mysql::Response> response = this->Run(mysqlCLient, command);
-        return response != nullptr && !response->HasError();
+        return this->Run(mysqlCLient, command);
     }
 
-    std::shared_ptr<Mysql::Response> MysqlDBComponent::Run(
+    bool MysqlDBComponent::Run(
         std::shared_ptr<MysqlClient> client, std::shared_ptr<Mysql::ICommand> command)
     {
         std::shared_ptr<MysqlTask> mysqlTask
             = std::make_shared<MysqlTask>(command->GetRpcId(), 0);
         this->AddTask(mysqlTask);
         client->SendCommand(command);
+        std::shared_ptr<Mysql::Response> response = mysqlTask->Await();
 #ifdef __DEBUG__
         long long t1 = Helper::Time::GetNowMilTime();
-        std::shared_ptr<Mysql::Response> response = mysqlTask->Await();
-        if(response->HasError())
+        if(response != nullptr && !response->IsOk())
         {
             CONSOLE_LOG_ERROR(response->GetError());
         }
         long long t2 = Helper::Time::GetNowMilTime();
         CONSOLE_LOG_INFO("sql use time = [" << t2 - t1 << "ms]");
-        return response;
-#else
-        return mysqlTask->Await();
 #endif
-    }
-
-    void MysqlDBComponent::OnDelTask(long long taskId, RpcTask task)
-    {
-        this->mNumberPool.Push((int) taskId);
+        return response != nullptr && response->IsOk();
     }
 
     std::shared_ptr<MysqlClient> MysqlDBComponent::GetClient(int index)

@@ -12,6 +12,8 @@
 #include<memory>
 #include<string>
 #include<sstream>
+#include<vector>
+#include"Json/JsonWriter.h"
 #include"google/protobuf/message.h"
 using namespace google::protobuf;
 namespace Mysql
@@ -19,45 +21,50 @@ namespace Mysql
 	class Response
 	{
     public:
-        Response(MYSQL_RES * result);
-        Response(const std::string & error);
-        ~Response();
+        Response(bool res, const std::string & error)
+            : mIsOk(res), mError(error) { }
     public:
-        bool HasError() const { return !this->mError.empty();}
+        bool IsOk() const { return this->mIsOk;}
         const std::string & GetError() const { return this->mError;}
     private:
+        bool mIsOk;
         std::string mError;
-        MYSQL_RES * mResult;
 	};
     class ICommand
 	{
 	 public:
-        ICommand(int id) : mRpcId(id) { }
-        int GetRpcId() const{ return this->mRpcId;}
-        virtual MYSQL_RES * Invoke(MYSQL *, std::string & error) = 0;
+        ICommand();
+        long long GetRpcId() const{ return this->mRpcId;}
+        virtual bool Invoke(MYSQL *, std::string & error) = 0;
     private:
-        int mRpcId;
+        long long mRpcId;
 	};
 
     class PingCommand : public ICommand
     {
     public:
         using ICommand::ICommand;
-        MYSQL_RES * Invoke(MYSQL *, std::string &error) final;
+        bool Invoke(MYSQL *, std::string &error) final;
     };
 
 	class SqlCommand : public ICommand
 	{
 	 public:
-        using ICommand::ICommand;
-        MYSQL_RES * Invoke(MYSQL *, std::string & error) final;
+        SqlCommand(const std::string & sql);
+        bool Invoke(MYSQL *, std::string & error) final;
+    private:
+        const std::string mSql;
 	};
 
-    class QueryCommand : public ICommand
+    class QueryCommand : public ICommand, public std::vector<std::string>
     {
     public:
-        using ICommand::ICommand;
-        MYSQL_RES * Invoke(MYSQL *, std::string &error) final;
+        QueryCommand(const std::string & sql);
+        bool Invoke(MYSQL *, std::string &error) final;
+    private:
+        bool Write(Json::Writer & document, st_mysql_field * filed, const char * str, int len);
+    private:
+        const std::string mSql;
     };
 }
 
@@ -66,17 +73,33 @@ namespace Mysql
     class CreateTabCommand : public ICommand
     {
     public:
-        CreateTabCommand(std::shared_ptr<google::protobuf::Message> message, int id);
-
+        CreateTabCommand(std::shared_ptr<Message> message, std::vector<std::string> & keys);
     public:
-        MYSQL_RES * Invoke(MYSQL *, std::string &error) final;
-
+        bool Invoke(MYSQL *, std::string &error) final;
     private:
-        bool CreateTable(MYSQL * sock, std::string & eror);
+        void ClearBuffer();
         bool ForeachMessage(const FieldDescriptor * field);
+        bool CreateTable(MYSQL * sock, const std::string & tab, std::string & eror);
+        bool CheckTableField(MYSQL * sock, const std::string & tab, std::string & error);
+        bool AddNewField(MYSQL * sock, const std::string & tab, const std::string & field, std::string & error);
     private:
         std::stringstream mBuffer;
-        std::shared_ptr<google::protobuf::Message> mMessage;
+        std::vector<std::string> mKeys;
+        std::shared_ptr<Message> mMessage;
+    };
+}
+
+namespace Mysql
+{
+    class SetMainKeyCommand : public ICommand
+    {
+    public:
+        SetMainKeyCommand(const std::string & tab, std::vector<std::string> & keys);
+    public:
+        bool Invoke(MYSQL *, std::string &error) final;
+    private:
+        std::string mTable;
+        std::vector<std::string> mKeys;
     };
 }
 

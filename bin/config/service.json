@@ -77,7 +77,38 @@
         }
     },
     "MysqlService": {
-        "Type": "agent"
+        "Type": "rpc",
+        "Add": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "db.mysql.add"
+        },
+        "Save": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "db.mysql.save"
+        },
+        "Query": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "db.mysql.query",
+            "Response": "db.mysql.response"
+        },
+        "Update": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "db.mysql.update"
+        },
+        "Create": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "db.mysql.create"
+        },
+        "Delete": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "db.mysql.remove"
+        }
     },
     "MongoService": {
         "Type": "rpc",
