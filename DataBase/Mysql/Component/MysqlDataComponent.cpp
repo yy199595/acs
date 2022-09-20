@@ -1,7 +1,7 @@
 #include "MysqlDataComponent.h"
 
 #include"Util/StringHelper.h"
-#include"../Service/MysqlService.h"
+#include"Service/MysqlService.h"
 
 namespace Sentry
 {

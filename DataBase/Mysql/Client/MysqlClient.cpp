@@ -4,7 +4,7 @@
 
 #include"MysqlClient.h"
 #include"MysqlMessage.h"
-#include"../Component/MysqlDBComponent.h"
+#include"Component/MysqlDBComponent.h"
 namespace Sentry
 {
 	MysqlClient::MysqlClient(const MysqlConfig &config, MysqlDBComponent *component)

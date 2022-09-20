@@ -19,6 +19,8 @@ end
 
 function Server.AllServiceStart()
 
+    MysqlComponent.Create("user.account_info", {"account"})
+    
     MysqlComponent.Add("user.account_info", {
         account = "646585122@qq.com",
         user_id = 199595,

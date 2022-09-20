@@ -10,5 +10,7 @@ message account_info
 	int64 register_time = 6;
 	string last_login_ip = 7;
 	bool is_new_user = 8;
+	int32 ared_id = 9;
+	int32 login_channel = 10;
 }
 
