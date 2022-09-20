@@ -229,6 +229,18 @@ class account_info :
   bool is_new_user() const;
   void set_is_new_user(bool value);
 
+  // int32 ared_id = 9;
+  void clear_ared_id();
+  static const int kAredIdFieldNumber = 9;
+  ::google::protobuf::int32 ared_id() const;
+  void set_ared_id(::google::protobuf::int32 value);
+
+  // int32 login_channel = 10;
+  void clear_login_channel();
+  static const int kLoginChannelFieldNumber = 10;
+  ::google::protobuf::int32 login_channel() const;
+  void set_login_channel(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:user.account_info)
  private:
   class HasBitSetters;
@@ -242,6 +254,8 @@ class account_info :
   ::google::protobuf::int64 login_time_;
   ::google::protobuf::int64 register_time_;
   bool is_new_user_;
+  ::google::protobuf::int32 ared_id_;
+  ::google::protobuf::int32 login_channel_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_user_2eproto;
 };
@@ -483,6 +497,34 @@ inline void account_info::set_is_new_user(bool value) {
   
   is_new_user_ = value;
   // @@protoc_insertion_point(field_set:user.account_info.is_new_user)
+}
+
+// int32 ared_id = 9;
+inline void account_info::clear_ared_id() {
+  ared_id_ = 0;
+}
+inline ::google::protobuf::int32 account_info::ared_id() const {
+  // @@protoc_insertion_point(field_get:user.account_info.ared_id)
+  return ared_id_;
+}
+inline void account_info::set_ared_id(::google::protobuf::int32 value) {
+  
+  ared_id_ = value;
+  // @@protoc_insertion_point(field_set:user.account_info.ared_id)
+}
+
+// int32 login_channel = 10;
+inline void account_info::clear_login_channel() {
+  login_channel_ = 0;
+}
+inline ::google::protobuf::int32 account_info::login_channel() const {
+  // @@protoc_insertion_point(field_get:user.account_info.login_channel)
+  return login_channel_;
+}
+inline void account_info::set_login_channel(::google::protobuf::int32 value) {
+  
+  login_channel_ = value;
+  // @@protoc_insertion_point(field_set:user.account_info.login_channel)
 }
 
 #ifdef __GNUC__

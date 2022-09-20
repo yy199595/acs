@@ -3,6 +3,10 @@
 #include"Component/Scene/ProtoComponent.h"
 namespace Sentry
 {
+    MysqlHelper::MysqlHelper(ProtoComponent *component)
+    {
+        this->mPorotComponent = component;
+    }
 	bool MysqlHelper::ToSqlCommand(const std::string& table, const std::string& cmd,
 		Message& message, std::string& sql)
 	{
@@ -180,8 +184,8 @@ namespace Sentry
 
 	bool MysqlHelper::ToSqlCommand(const db::mysql::add& request, std::string& sqlCommand)
 	{
-		ProtoComponent * messageComponent = App::Get()->GetComponent<ProtoComponent>();
-		std::shared_ptr<Message> message = messageComponent->New(request.data());
+        LOG_CHECK_RET_FALSE(this->mPorotComponent);
+		std::shared_ptr<Message> message = this->mPorotComponent->New(request.data());
 		if (message == nullptr)
 		{
 			return false;
@@ -192,8 +196,8 @@ namespace Sentry
 
 	bool MysqlHelper::ToSqlCommand(const db::mysql::save& request, std::string& sqlCommand)
 	{
-		ProtoComponent * messageComponent = App::Get()->GetComponent<ProtoComponent>();
-		std::shared_ptr<Message> message = messageComponent->New(request.data());
+        LOG_CHECK_RET_FALSE(this->mPorotComponent);
+		std::shared_ptr<Message> message = this->mPorotComponent->New(request.data());
 		if (message == nullptr)
 		{
 			return false;

@@ -14,14 +14,14 @@ namespace Sentry
         this->mMongoComponent = nullptr;
         this->mSyncRedisComponent = nullptr;
     }
-	bool MongoService::OnStartService(ServiceMethodRegister& methodRegister)
+	bool MongoService::OnStartService()
     {
-        methodRegister.Bind("Query", &MongoService::Query);
-        methodRegister.Bind("Insert", &MongoService::Insert);
-        methodRegister.Bind("Delete", &MongoService::Delete);
-        methodRegister.Bind("Update", &MongoService::Update);
-        methodRegister.Bind("SetIndex", &MongoService::SetIndex);
-        methodRegister.Bind("RunCommand", &MongoService::RunCommand);
+        BIND_COMMON_RPC_METHOD(MongoService::Query);
+        BIND_COMMON_RPC_METHOD(MongoService::Insert);
+        BIND_COMMON_RPC_METHOD(MongoService::Delete);
+        BIND_COMMON_RPC_METHOD(MongoService::Update);
+        BIND_COMMON_RPC_METHOD(MongoService::SetIndex);
+        BIND_COMMON_RPC_METHOD(MongoService::RunCommand);
         this->mSyncRedisComponent = this->GetComponent<DataSyncComponent>();
         LOG_CHECK_RET_FALSE(this->mMongoComponent = this->GetComponent<MongoDBComponent>());
         return true;

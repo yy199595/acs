@@ -37,7 +37,7 @@ namespace Sentry
 		auto iter = this->mMethodMap.find(name);
 		if (iter != this->mMethodMap.end())
 		{
-			LOG_FATAL(this->mComponent->GetName() << "." << name << " add failure");
+			LOG_FATAL(this->mComponent->GetName() << "." << name << " already exist");
 			return false;
 		}
 		this->mMethodMap.emplace(name, method);

@@ -22,7 +22,7 @@ namespace Sentry
 		XCode QueryAddress(long long userId, const com::type::string &request, com::type::string & response); //查询玩家服务地址
 	private:
 		bool LateAwake() final;
-		bool OnStartService(ServiceMethodRegister & methodRegister) final;
+		bool OnStartService() final;
 	 private:
 		std::string mAddress;
 		class TimerComponent* mTimerComponent;

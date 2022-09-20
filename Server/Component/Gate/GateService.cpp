@@ -14,17 +14,17 @@
 namespace Sentry
 {
 
-	bool GateService::OnStartService(ServiceMethodRegister& methodRegister)
+	bool GateService::OnStartService()
 	{
+        BIND_ADDRESS_RPC_METHOD(GateService::Ping);
+        BIND_ADDRESS_RPC_METHOD(GateService::Auth);
+        BIND_COMMON_RPC_METHOD(GateService::AllotUser);
+        BIND_COMMON_RPC_METHOD(GateService::BroadCast);
+        BIND_COMMON_RPC_METHOD(GateService::CallClient);
+        BIND_COMMON_RPC_METHOD(GateService::SaveAddress);
+        BIND_COMMON_RPC_METHOD(GateService::QueryAddress);
         LOG_CHECK_RET_FALSE(this->GetComponent<OuterNetMessageComponent>());
-        methodRegister.BindAddress("Ping", &GateService::Ping);
-		methodRegister.BindAddress("Auth", &GateService::Auth);
-        methodRegister.Bind("AllotUser", &GateService::AllotUser);
-        methodRegister.Bind("BroadCast", &GateService::BroadCast);
-		methodRegister.Bind("CallClient", &GateService::CallClient);
-		methodRegister.Bind("SaveAddress", &GateService::SaveAddress);
-		methodRegister.Bind("QueryAddress", &GateService::QueryAddress);
-		LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<OuterNetComponent>());
+        LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<OuterNetComponent>());
 		return true;
 	}
 

@@ -9,10 +9,11 @@
 using namespace google::protobuf;
 namespace Sentry
 {
+    class ProtoComponent;
 	class MysqlHelper
 	{
 	 public:
-		MysqlHelper() = default;
+		MysqlHelper(ProtoComponent * component);
 	 public:
 		bool ToSqlCommand(const db::mysql::add& messageData, std::string& sqlCommand);
 
@@ -30,7 +31,8 @@ namespace Sentry
 		bool WriterToStream(std::stringstream& stream, const rapidjson::Value& jsonValue);
 
 	 private:
-		std::stringstream mSqlCommandStream;
+        ProtoComponent * mPorotComponent;
+        std::stringstream mSqlCommandStream;
 		std::stringstream mSqlCommandStream2;
 	};
 }

@@ -2,20 +2,22 @@
 #include"Client/MysqlMessage.h"
 #include"Component/MysqlDBComponent.h"
 #include"Component/Scene/ProtoComponent.h"
-#include"Component/Scene/NetThreadComponent.h"
+#include"Component/DataSyncComponent.h"
 namespace Sentry
 {
 
-	bool MysqlService::OnStartService(ServiceMethodRegister & methodRegister)
+	bool MysqlService::OnStartService()
 	{
-		methodRegister.Bind("Add", &MysqlService::Add);
-		methodRegister.Bind("Save", &MysqlService::Save);
-		methodRegister.Bind("Query", &MysqlService::Query);
-		methodRegister.Bind("Update", &MysqlService::Update);
-		methodRegister.Bind("Delete", &MysqlService::Delete);
-        methodRegister.Bind("Create", &MysqlService::Create);
+        BIND_COMMON_RPC_METHOD(MysqlService::Add);
+        BIND_COMMON_RPC_METHOD(MysqlService::Save);
+        BIND_COMMON_RPC_METHOD(MysqlService::Query);
+        BIND_COMMON_RPC_METHOD(MysqlService::Update);
+        BIND_COMMON_RPC_METHOD(MysqlService::Delete);
+        BIND_COMMON_RPC_METHOD(MysqlService::Create);
+        this->mSyncComponent = this->GetComponent<DataSyncComponent>();
         LOG_CHECK_RET_FALSE(this->mProtoComponent = this->GetComponent<ProtoComponent>());
         LOG_CHECK_RET_FALSE(this->mMysqlComponent = this->GetComponent<MysqlDBComponent>());
+        this->mMysqlHelper = std::make_shared<MysqlHelper>(this->mProtoComponent);
         return true;
 	}
 
@@ -46,7 +48,7 @@ namespace Sentry
 	XCode MysqlService::Add(const db::mysql::add& request)
     {
         std::string sql;
-        if (!this->mMysqlHelper.ToSqlCommand(request, sql))
+        if (!this->mMysqlHelper->ToSqlCommand(request, sql))
         {
             return XCode::CallArgsError;
         }
@@ -65,7 +67,7 @@ namespace Sentry
 	XCode MysqlService::Save(const db::mysql::save& request)
     {
         std::string sql;
-        if (!this->mMysqlHelper.ToSqlCommand(request, sql))
+        if (!this->mMysqlHelper->ToSqlCommand(request, sql))
         {
             return XCode::CallArgsError;
         }
@@ -84,7 +86,7 @@ namespace Sentry
 	XCode MysqlService::Update(const db::mysql::update& request)
     {
         std::string sql;
-        if (!this->mMysqlHelper.ToSqlCommand(request, sql))
+        if (!this->mMysqlHelper->ToSqlCommand(request, sql))
         {
             return XCode::CallArgsError;
         }
@@ -103,7 +105,7 @@ namespace Sentry
 	XCode MysqlService::Delete(const db::mysql::remove& request)
     {
         std::string sql;
-        if (!this->mMysqlHelper.ToSqlCommand(request, sql))
+        if (!this->mMysqlHelper->ToSqlCommand(request, sql))
         {
             return XCode::CallArgsError;
         }
@@ -122,7 +124,7 @@ namespace Sentry
 	XCode MysqlService::Query(const db::mysql::query& request, db::mysql::response& response)
     {
         std::string sql;
-        if (!this->mMysqlHelper.ToSqlCommand(request, sql))
+        if (!this->mMysqlHelper->ToSqlCommand(request, sql))
         {
             return XCode::CallArgsError;
         }

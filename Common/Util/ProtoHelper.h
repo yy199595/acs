@@ -12,7 +12,7 @@ namespace Helper
     namespace Protocol
     {
         bool GetJson(const Message & message, std::string * json);
-        FieldDescriptor::Type GetMember(const char * key, const Message & message, std::string & value);
+        bool GetMember(const char * key, const Message & message, std::string & value);
     }
 };
 

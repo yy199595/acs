@@ -19,10 +19,10 @@ LIST(APPEND PROTO_FLAGS -I${CMAKE_SOURCE_DIR}/bin/proto/mysql)
 file(GLOB_RECURSE MSG_PROTOS ${CMAKE_SOURCE_DIR}/bin/proto/message/*.proto)
 file(GLOB_RECURSE MYSQL_PROTOS ${CMAKE_SOURCE_DIR}/bin/proto/mysql/*.proto)
 
-list(APPEND ${MSG_PROTOS} ${MYSQL_PROTOS})
+list(APPEND MSG_PROTOS ${MYSQL_PROTOS})
 foreach(msg ${MSG_PROTOS})
+    message(${msg})
     get_filename_component(FIL_WE ${msg} NAME_WE)
-    message(${FIL_WE})
     list(APPEND MESSAGE_SRC "${CMAKE_SOURCE_DIR}/Gen/Message/${FIL_WE}.pb.cc")
     list(APPEND MESSAGE_HDRS "${CMAKE_SOURCE_DIR}Gen/Message/${FIL_WE}.pb.h")
 

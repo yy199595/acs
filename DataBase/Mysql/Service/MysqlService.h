@@ -26,10 +26,11 @@ namespace Sentry
         XCode Query(const db::mysql::query& request, db::mysql::response& response);
 
 	 private:
-		bool OnStartService(ServiceMethodRegister & methodRegister);
+		bool OnStartService();
 	 private:
-        MysqlHelper mMysqlHelper;
         class ProtoComponent * mProtoComponent;
         class MysqlDBComponent * mMysqlComponent;
-	};
+        class DataSyncComponent * mSyncComponent;
+        std::shared_ptr<MysqlHelper> mMysqlHelper;
+    };
 }// namespace Sentry

@@ -11,20 +11,15 @@ namespace Helper
         return util::MessageToJsonString(message, json).ok();
     }
 
-    FieldDescriptor::Type Protocol::GetMember(const char *key, const Message & message, std::string &value)
+    bool Protocol::GetMember(const char *key, const Message & message, std::string &value)
     {
         const Reflection *reflection = message.GetReflection();
         const Descriptor *descriptor = message.GetDescriptor();
         const FieldDescriptor *fileDesc = descriptor->FindFieldByName(key);
-        if (fileDesc == nullptr)
+        if(fileDesc == nullptr || fileDesc->is_repeated())
         {
-            return FieldDescriptor::Type::MAX_TYPE;
+            return false;
         }
-        if (fileDesc->is_repeated())
-        {
-            return FieldDescriptor::Type::MAX_TYPE;
-        }
-
         switch (fileDesc->cpp_type())
         {
             case FieldDescriptor::TYPE_INT32:
@@ -49,6 +44,6 @@ namespace Helper
                 value = reflection->GetString(message, fileDesc);
                 break;
         }
-        return fileDesc->type();
+        return true;
     }
 }
