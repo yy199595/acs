@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include<sstream>
 #include<string>
+#include<string.h>
 #define args1 std::placeholders::_1
 #define args2 std::placeholders::_2
 #define args3 std::placeholders::_3
