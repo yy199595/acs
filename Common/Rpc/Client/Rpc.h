@@ -4,7 +4,8 @@
 
 #ifndef GameKeeper_MESSAGESTREAM_H
 #define GameKeeper_MESSAGESTREAM_H
-#include <Define/CommonLogDef.h>
+#include<stdexcept>
+#include<Define/CommonLogDef.h>
 namespace Tcp
 {
     enum class Type
@@ -41,7 +42,7 @@ namespace Tcp
         long long mUnitId;
     };
 }
-
+typedef std::logic_error rpc_error;
 constexpr int RPC_PACK_HEAD_LEN = sizeof(int) + sizeof(char) + sizeof(char);
 
 #endif //GameKeeper_MESSAGESTREAM_H

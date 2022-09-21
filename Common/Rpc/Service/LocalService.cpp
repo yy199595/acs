@@ -33,7 +33,15 @@ namespace Sentry
 			LOG_ERROR("not find [" << this->GetName() << "." << func << "]");
 			return XCode::CallServiceNotFound;
 		}
-		return serviceMethod->Invoke(*request, *response);
+		try
+		{
+			return serviceMethod->Invoke(*request, *response);
+		}
+		catch (std::logic_error & error)
+		{
+			response->set_error_str(error.what());
+			return XCode::ThrowError;
+		}
 	}
 
 	bool LocalService::StartNewService()

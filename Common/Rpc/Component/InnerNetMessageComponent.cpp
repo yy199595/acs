@@ -1,6 +1,5 @@
 ﻿#include"InnerNetMessageComponent.h"
 #include"Component/TaskComponent.h"
-#include"String/StringHelper.h"
 #include"App/App.h"
 #include"Lua/LuaServiceMethod.h"
 #include"Config/ServiceConfig.h"
@@ -52,7 +51,8 @@ namespace Sentry
 				return XCode::CallArgsError;
 			}
 			this->mFullName.clear();
-			if(!Any::ParseAnyTypeUrl(request->data().type_url(), &this->mFullName)
+			const std::string & url = request->data().type_url();
+			if(!Any::ParseAnyTypeUrl(url, &this->mFullName)
 				|| rpcInterfaceConfig->Request != this->mFullName)
 			{
                 LOG_ERROR("call " << rpcInterfaceConfig->FullName << " need "
@@ -65,7 +65,6 @@ namespace Sentry
 		std::shared_ptr<com::rpc::response> response = std::make_shared<com::rpc::response>();
 		if (!rpcInterfaceConfig->IsAsync)
 		{
-			ElapsedTimer elapsedTimer;
 			const std::string& func = rpcInterfaceConfig->Method;
 			XCode code = logicService->Invoke(func, request, response);
 			if(request->rpc_id() != 0)
@@ -79,7 +78,6 @@ namespace Sentry
 
 		this->mTaskComponent->Start([request, this, logicService, rpcInterfaceConfig, response]()
 		{
-			ElapsedTimer elapsedTimer;
 			const std::string& func = rpcInterfaceConfig->Method;
 			XCode code = logicService->Invoke(func, request, response);
 			if(request->rpc_id() != 0)

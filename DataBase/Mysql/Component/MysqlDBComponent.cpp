@@ -70,6 +70,7 @@ namespace Sentry
         if(response != nullptr && !response->IsOk())
         {
             CONSOLE_LOG_ERROR(response->GetError());
+			throw std::logic_error(response->GetError());
         }
         long long t2 = Helper::Time::GetNowMilTime();
         CONSOLE_LOG_INFO("sql use time = [" << t2 - t1 << "ms]");
