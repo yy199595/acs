@@ -7,7 +7,7 @@
 
 #include"MysqlDefine.h"
 #include"MysqlMessage.h"
-#include"Network/TcpContext.h"
+#include"Tcp/TcpContext.h"
 namespace Sentry
 {
     class MysqlDBComponent;

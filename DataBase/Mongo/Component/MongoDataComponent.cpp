@@ -3,12 +3,12 @@
 //
 
 #include"MongoDataComponent.h"
-#include"Util/ProtoHelper.h"
+#include"Proto/ProtoHelper.h"
 #include"Component/MysqlDataComponent.h"
-#include"Component/Redis/RedisDataComponent.h"
+#include"Component/RedisDataComponent.h"
 
 #include"Component/MongoAgentComponent.h"
-#include"Component/Scene/ProtoComponent.h"
+#include"Component/ProtoComponent.h"
 namespace Sentry
 {
 	bool MongoDataComponent::LateAwake()

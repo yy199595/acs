@@ -6,10 +6,10 @@
 #include"errmsg.h"
 #include"spdlog/fmt/fmt.h"
 #include"sstream"
-#include"Util/Guid.h"
+#include"Guid/Guid.h"
 #include"App/App.h"
 #include"Define/CommonLogDef.h"
-#include"Component/Scene/LoggerComponent.h"
+#include"Component/LoggerComponent.h"
 using namespace Sentry;
 namespace Mysql
 {

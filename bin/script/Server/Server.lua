@@ -30,6 +30,12 @@ function Server.AllServiceStart()
         last_login_ip = "127.0.0.1"
     }, 1)
 
+    MysqlComponent.Update("user.account_info", {
+        account = "646585122@qq.com"
+    }, {
+        pass_word = "QWERTYUI"
+    })
+
     local res = MysqlComponent.QueryOnce("user.account_info", {
         account = "646585122@qq.com"
     })

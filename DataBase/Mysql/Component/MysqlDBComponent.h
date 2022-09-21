@@ -7,8 +7,8 @@
 
 #include"Client/MysqlDefine.h"
 #include"Client/MysqlMessage.h"
-#include"Util/NumberBuilder.h"
-#include"Component/Rpc/RpcTaskComponent.h"
+#include"Guid/NumberBuilder.h"
+#include"Component/RpcTaskComponent.h"
 
 namespace Sentry
 {

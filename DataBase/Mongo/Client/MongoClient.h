@@ -6,9 +6,9 @@
 #define SERVER_MONGOCLIENT_H
 #include"asio.hpp"
 #include"MongoProto.h"
-#include"Async/TaskSource.h"
-#include"Network/SocketProxy.h"
-#include"Network/TcpContext.h"
+#include"Tcp/TcpContext.h"
+#include"Tcp/SocketProxy.h"
+#include"Source/TaskSource.h"
 #include"Coroutine/CoroutineLock.h"
 using namespace Tcp;
 using namespace Sentry;

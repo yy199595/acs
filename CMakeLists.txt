@@ -12,7 +12,7 @@ else()
 endif()
 message(${CMAKE_BINARY_DIR})
 
-set(ContextPath ${CMAKE_CURRENT_SOURCE_DIR}/Common/Coroutine/Context)
+set(ContextPath ${CMAKE_CURRENT_SOURCE_DIR}/Common/Task/Coroutine/Context)
 if(WIN32)
     SET(AsmFiles ${ContextPath}/context_x64.asm)
     if(MSVC)
@@ -61,9 +61,30 @@ LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/Libs/bin/protobuf)
 
 
 include_directories(${PROJECT_SOURCE_DIR}/Gen)
-include_directories(${PROJECT_SOURCE_DIR}/Common)
-include_directories(${PROJECT_SOURCE_DIR}/Server)
 include_directories(${PROJECT_SOURCE_DIR}/Client)
+
+include_directories(${PROJECT_SOURCE_DIR}/Common/Rpc)
+include_directories(${PROJECT_SOURCE_DIR}/Common/Log)
+include_directories(${PROJECT_SOURCE_DIR}/Common/Core)
+include_directories(${PROJECT_SOURCE_DIR}/Common/Data)
+include_directories(${PROJECT_SOURCE_DIR}/Common/Util)
+include_directories(${PROJECT_SOURCE_DIR}/Common/Task)
+include_directories(${PROJECT_SOURCE_DIR}/Common/Http)
+include_directories(${PROJECT_SOURCE_DIR}/Common/Proto)
+include_directories(${PROJECT_SOURCE_DIR}/Common/Timer)
+include_directories(${PROJECT_SOURCE_DIR}/Common/Redis)
+include_directories(${PROJECT_SOURCE_DIR}/Common/Entity)
+include_directories(${PROJECT_SOURCE_DIR}/Common/Server)
+include_directories(${PROJECT_SOURCE_DIR}/Common/Script)
+include_directories(${PROJECT_SOURCE_DIR}/Common/Network)
+
+
+
+include_directories(${PROJECT_SOURCE_DIR}/Server/Gate)
+include_directories(${PROJECT_SOURCE_DIR}/Server/User)
+include_directories(${PROJECT_SOURCE_DIR}/Server/Redis)
+include_directories(${PROJECT_SOURCE_DIR}/Server/Telnet)
+
 
 if(__ENABLE_MONGODB__)
     include_directories(${PROJECT_SOURCE_DIR}/DataBase/Mongo)

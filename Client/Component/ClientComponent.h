@@ -1,9 +1,9 @@
 ﻿#pragma once
-#include"Network/Rpc.h"
+#include"Client/Rpc.h"
 #include"Message/c2s.pb.h"
-#include"Async/TaskSource.h"
-#include"Script/LocalTable.h"
-#include"Component/Rpc/RpcTaskComponent.h"
+#include"Lua/LocalTable.h"
+#include"Source/TaskSource.h"
+#include"Component/RpcTaskComponent.h"
 using namespace Sentry;
 using namespace google::protobuf;
 

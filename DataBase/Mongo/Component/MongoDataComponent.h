@@ -4,7 +4,6 @@
 
 #ifndef _DATAMGRCOMPONENT_H_
 #define _DATAMGRCOMPONENT_H_
-#include"Pool/DataPool.h"
 #include"Component/Component.h"
 #include"Coroutine/CoroutineLock.h"
 namespace Sentry

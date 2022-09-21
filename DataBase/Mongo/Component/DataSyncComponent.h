@@ -14,8 +14,10 @@ namespace Sentry
 		DataSyncComponent() = default;
 		~DataSyncComponent() = default;
 	 public:
+        void Del(const std::string & id, const std::string & fullName);
         void Del(const std::string & id, const std::string & db, const std::string & tab);
-		void Set(const std::string & id, const std::string & db, const std::string & tab, const std::string & json);
+        void Set(const std::string & id, const std::string & fullName, const std::string & json);
+        void Set(const std::string & id, const std::string & db, const std::string & tab, const std::string & json);
     private:
 		bool LateAwake() final;
 	 private:

@@ -1,13 +1,13 @@
 ﻿
 #include"ClientComponent.h"
 #include"App/App.h"
-#include<Util/StringHelper.h>
-#include"Network/TcpRpcClientContext.h"
-#include"Script/Client.h"
-#include"Script/Extension/Message/Message.h"
+#include"String/StringHelper.h"
+#include"Client/TcpRpcClientContext.h"
+#include"Lua/Client.h"
+#include"Lua/Message.h"
 #include"google/protobuf/util/json_util.h"
-#include"Component/Lua/LuaScriptComponent.h"
-#include"Component/Scene/NetThreadComponent.h"
+#include"Component/LuaScriptComponent.h"
+#include"Component/NetThreadComponent.h"
 namespace Client
 {
 	ClientTask::ClientTask(int ms)

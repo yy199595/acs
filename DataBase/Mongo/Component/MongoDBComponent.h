@@ -4,12 +4,12 @@
 
 #ifndef SERVER_MONGORPCCOMPONENT_H
 #define SERVER_MONGORPCCOMPONENT_H
-#include"Util/NumberBuilder.h"
+#include"Guid/NumberBuilder.h"
 #include"Client/MongoProto.h"
 #include"Client/MongoClient.h"
 #include"Client/BsonDocument.h"
-#include"Util/NumberBuilder.h"
-#include"Component/Rpc/RpcTaskComponent.h"
+#include"Guid/NumberBuilder.h"
+#include"Component/RpcTaskComponent.h"
 
 using namespace Mongo;
 

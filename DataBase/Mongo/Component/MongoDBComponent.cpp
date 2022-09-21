@@ -3,7 +3,7 @@
 //
 
 #include"MongoDBComponent.h"
-#include"Component/Scene/NetThreadComponent.h"
+#include"Component/NetThreadComponent.h"
 namespace Sentry
 {
 	MongoTask::MongoTask(int id, int ms)

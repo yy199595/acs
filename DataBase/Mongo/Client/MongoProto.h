@@ -7,7 +7,7 @@
 #include"asio/streambuf.hpp"
 #include"Json/JsonWriter.h"
 #include"BsonDocument.h"
-#include"Network/Proto/ProtoMessage.h"
+#include"Message/ProtoMessage.h"
 
 #define OP_REPLY 1
 #define OP_MSG    1000

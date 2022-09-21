@@ -5,10 +5,10 @@
 #include"MongoClient.h"
 
 #include<regex>
-#include"Util/MD5.h"
-#include"Util/sha1.h"
+#include"Md5/MD5.h"
+#include"Sha1/sha1.h"
 #include"Bson/base64.h"
-#include"Util/StringHelper.h"
+#include"String/StringHelper.h"
 #include"Component/MongoDBComponent.h"
 
 namespace Mongo

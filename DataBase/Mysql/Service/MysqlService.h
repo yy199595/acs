@@ -2,7 +2,7 @@
 
 #include"Client/MysqlClient.h"
 #include"Client/MysqlHelper.h"
-#include"Component/RpcService/LocalService.h"
+#include"Service/LocalService.h"
 
 namespace Sentry
 {
@@ -32,5 +32,6 @@ namespace Sentry
         class MysqlDBComponent * mMysqlComponent;
         class DataSyncComponent * mSyncComponent;
         std::shared_ptr<MysqlHelper> mMysqlHelper;
+        std::unordered_map<std::string, std::string> mMainKeys;
     };
 }// namespace Sentry
