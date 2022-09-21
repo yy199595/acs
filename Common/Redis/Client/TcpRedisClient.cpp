@@ -78,7 +78,7 @@ namespace Sentry
         std::shared_ptr<Tcp::ProtoMessage> message = this->PopMessage();
         if(message != nullptr)
         {
-            std::shared_ptr<RedisRequest> request = dynamic_pointer_cast<RedisRequest>(message);
+            std::shared_ptr<RedisRequest> request = std::dynamic_pointer_cast<RedisRequest>(message);
             if(request != nullptr && request->GetTaskId() == 0)
             {
                 std::move(this->mCurResponse);

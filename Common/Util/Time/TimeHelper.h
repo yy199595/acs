@@ -1,5 +1,6 @@
 #pragma once
-#include <string>
+#include<time.h>
+#include<string>
 #define _MinSecond 60
 #define _HourSecond 3600
 #define _DaySecond 86400

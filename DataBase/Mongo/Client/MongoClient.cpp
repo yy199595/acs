@@ -185,7 +185,7 @@ namespace Mongo
 			this->mMongoResponse->OnReceiveBody(is);
 #ifdef __DEBUG__
             std::shared_ptr<CommandRequest> request =
-                    static_pointer_cast<CommandRequest>(this->PopMessage());
+                    std::static_pointer_cast<CommandRequest>(this->PopMessage());
             assert(request->header.requestID == this->mMongoResponse->GetHead().responseTo);
 #endif
 			long long responseId = this->mMongoResponse->GetHead().responseTo;

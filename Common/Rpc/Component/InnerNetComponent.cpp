@@ -125,7 +125,7 @@ namespace Sentry
             return nullptr;
         }
         socketProxy->Init(ip, port);
-		localSession = make_shared<InnerNetClient>(this, socketProxy);
+		localSession = std::make_shared<InnerNetClient>(this, socketProxy);
 
 		this->mRpcClientMap.emplace(socketProxy->GetAddress(), localSession);
 		return localSession;
