@@ -4,7 +4,7 @@
 #ifdef __ENABLE_MYSQL__
 #ifndef SERVER_MYSQLCLIENT_H
 #define SERVER_MYSQLCLIENT_H
-
+#include<queue>
 #include"MysqlDefine.h"
 #include"MysqlMessage.h"
 #include"Tcp/TcpContext.h"

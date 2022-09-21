@@ -22,7 +22,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->ConnectHost();
 #else
-		asio::io_service & netWorkThread = this->mSocket->GetThread();
+		Asio::Context & netWorkThread = this->mSocket->GetThread();
 		netWorkThread.post(std::bind(&HttpRequestClient::ConnectHost, this));
 #endif
 	}
@@ -36,7 +36,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->ConnectHost();
 #else
-        asio::io_service & netWorkThread = this->mSocket->GetThread();
+        Asio::Context & netWorkThread = this->mSocket->GetThread();
         netWorkThread.post(std::bind(&HttpRequestClient::ConnectHost, this));
 #endif
     }
@@ -74,7 +74,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
         this->mHttpComponent->OnTimeout(taskId);
 #else
-        asio::io_service &io = App::Get()->GetThread();
+        Asio::Context &io = App::Get()->GetThread();
         io.post(std::bind(&HttpComponent::OnTimeout, this->mHttpComponent, taskId));
 #endif
     }
@@ -101,7 +101,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
         this->mHttpComponent->OnResponse(taskId, std::move(this->mResponse));
 #else
-        asio::io_service &io = App::Get()->GetThread();
+        Asio::Context &io = App::Get()->GetThread();
         io.post(std::bind(&HttpComponent::OnResponse,
                           this->mHttpComponent, taskId, std::move(this->mResponse)));
 #endif
@@ -160,28 +160,28 @@ namespace Sentry
         assert(this->mRecvBuffer.size() == 0);
         const std::string & host = this->mRequest->GetHost();
         const std::string & port = this->mRequest->GetPort();
-        asio::io_service & context = this->mSocket->GetThread();
+        Asio::Context & context = this->mSocket->GetThread();
 
         if(this->mTimeout > 0)
         {
-            asio::error_code code{asio::error::timed_out};
+            Asio::Code code{asio::error::timed_out};
             std::chrono::seconds timeout{this->mTimeout};
             this->mTimer = std::make_shared<asio::steady_timer>(context, timeout);
             this->mTimer->async_wait(std::bind(&HttpRequestClient::OnTimeout, this));
         }
-        std::shared_ptr<asio::ip::tcp::resolver> resolver(new asio::ip::tcp::resolver(context));
-        std::shared_ptr<asio::ip::tcp::resolver::query> query(new asio::ip::tcp::resolver::query(host, port));
+        std::shared_ptr<Asio::Resolver> resolver(new Asio::Resolver (context));
+        std::shared_ptr<Asio::ResolverQuery> query(new Asio::ResolverQuery(host, port));
         resolver->async_resolve(*query, [this, resolver, query, port, host]
-            (const asio::error_code &err, asio::ip::tcp::resolver::iterator iterator)
+            (const asio::error_code &err, Asio::Resolver::iterator iterator)
         {
             if(err)
             {
 				this->OnConnect(err, 0);
                 return;
             }
-            AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
+            Asio::Socket & tcpSocket = this->mSocket->GetSocket();
             asio::async_connect(tcpSocket, iterator, [this]
-                (const asio::error_code & code, asio::ip::tcp::resolver::iterator iter)
+                (const asio::error_code & code, Asio::Resolver::iterator iter)
             {
                 this->OnConnect(code, 0);
             });

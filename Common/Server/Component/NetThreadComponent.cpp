@@ -34,8 +34,8 @@ namespace Sentry
 		LOG_CHECK_RET(config.GetMember("thread", "network", networkCount));
 		for (int index = 0; index < networkCount; index++)
 		{
-            asio::io_service * io = new asio::io_service();
-            asio::io_service::work * work = new asio::io_service::work(*io);
+            Asio::Context * io = new Asio::Context();
+            Asio::ContextWork * work = new Asio::ContextWork(*io);
             this->mNetThreads.emplace_back(io);
             this->mNetThreadWorks.emplace_back(work);
 #ifdef __ENABLE_OPEN_SSL__
@@ -48,7 +48,7 @@ namespace Sentry
 	bool NetThreadComponent::LateAwake()
 	{
 #ifndef ONLY_MAIN_THREAD
-		for (asio::io_service * io: this->mNetThreads)
+		for (Asio::Context * io: this->mNetThreads)
         {
             std::thread *t = new std::thread([io](){
                 asio::error_code code;

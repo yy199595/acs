@@ -42,17 +42,17 @@ namespace Tcp
 		assert(this->mSocket->IsRemote());
 		unsigned short port = this->mSocket->GetPort();
 		const std::string& ip = this->mSocket->GetIp();
-		AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
-		auto address = asio::ip::make_address_v4(ip);
-		asio::ip::tcp::endpoint endPoint(address, port);
+        Asio::Socket & tcpSocket = this->mSocket->GetSocket();
+		Asio::AddressV4 address = asio::ip::make_address_v4(ip);
+		Asio::EndPoint endPoint(address, port);
 		std::shared_ptr<TcpContext> self = this->shared_from_this();
 
 		printf("start connect %s\n" , this->mSocket->GetAddress().c_str());
 
-		asio::error_code code;
+		Asio::Code code;
 		tcpSocket.close(code);
 		tcpSocket.async_connect(endPoint, [this, self]
-			(const asio::error_code& code)
+			(const Asio::Code & code)
 		{
 			if(!code)
 			{
@@ -66,10 +66,10 @@ namespace Tcp
     void TcpContext::ReceiveLine()
 	{
         this->mLastOperTime = Helper::Time::GetNowSecTime();
-		AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
+        Asio::Socket & tcpSocket = this->mSocket->GetSocket();
 		std::shared_ptr<TcpContext> self = this->shared_from_this();
 		asio::async_read_until(tcpSocket, this->mRecvBuffer, "\r\n",
-			[this, self](const asio::error_code& code, size_t size)
+			[this, self](const Asio::Code & code, size_t size)
 			{
                 std::istream is(&this->mRecvBuffer);
                 this->OnReceiveLine(code, is, size);
@@ -80,15 +80,15 @@ namespace Tcp
 	{
         if(this->mRecvBuffer.size() > 0)
         {
-            asio::error_code code;
+            Asio::Code code;
             size_t size = this->mRecvBuffer.size();
             std::istream is(&this->mRecvBuffer);
             this->OnReceiveMessage(code, is, size);
             return;
         }
-        asio::error_code code;
+        Asio::Code code;
 		this->mLastOperTime = Helper::Time::GetNowSecTime();
-		AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
+		Asio::Socket & tcpSocket = this->mSocket->GetSocket();
 
         if(tcpSocket.available(code) <= 0)
         {
@@ -116,22 +116,21 @@ namespace Tcp
 		}
         if (length >= this->mMaxCount)
 		{
-			asio::error_code code =
-                    std::make_error_code(std::errc::bad_message);
             std::istream is(&this->mRecvBuffer);
+            Asio::Code code = std::make_error_code(std::errc::bad_message);
             this->OnReceiveMessage(code, is, length);
 			return;
 		}
 		if (this->mRecvBuffer.size() >= length)
 		{
-			asio::error_code code;
+			Asio::Code code;
             std::istream is(&this->mRecvBuffer);
             this->OnReceiveMessage(code, is, length);
 			return;
 		}
 		length -= this->mRecvBuffer.size();
 		this->mLastOperTime = Helper::Time::GetNowSecTime();
-		AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
+        Asio::Socket & tcpSocket = this->mSocket->GetSocket();
 		std::shared_ptr<TcpContext> self = this->shared_from_this();
 		asio::async_read(tcpSocket, this->mRecvBuffer,
                          asio::transfer_exactly(length),
@@ -185,11 +184,11 @@ namespace Tcp
         if(!this->mMessagqQueue.empty())
         {
             std::ostream os(&this->mSendBuffer);
-            AsioTcpSocket& tcpSocket = this->mSocket->GetSocket();
+            Asio::Socket & tcpSocket = this->mSocket->GetSocket();
             std::shared_ptr<TcpContext> self = this->shared_from_this();
             const int length = this->mMessagqQueue.front()->Serailize(os);
             asio::async_write(tcpSocket, this->mSendBuffer, [this, self, length]
-                    (const asio::error_code& code, size_t size)
+                    (const Asio::Code & code, size_t size)
             {
                 if(length > 0 && !code)
                 {
@@ -228,10 +227,10 @@ namespace Tcp
 
 	bool TcpContext::ConnectSync()
 	{
-		asio::error_code code;
-        AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
-		auto address = asio::ip::make_address_v4(this->mSocket->GetIp());
-		asio::ip::tcp::endpoint endPoint(address, this->mSocket->GetPort());
+		Asio::Code code;
+        Asio::Socket & tcpSocket = this->mSocket->GetSocket();
+		Asio::AddressV4 address = asio::ip::make_address_v4(this->mSocket->GetIp());
+		Asio::EndPoint endPoint(address, this->mSocket->GetPort());
 		tcpSocket.connect(endPoint, code);
 		if(code)
 		{
@@ -243,12 +242,12 @@ namespace Tcp
 
 	int TcpContext::RecvSync(int length)
 	{
-		asio::error_code code;
+		Asio::Code code;
         if(this->mRecvBuffer.size() >= length)
 		{
 			return length;
 		}
-		AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
+        Asio::Socket & tcpSocket = this->mSocket->GetSocket();
 		int size = asio::read(tcpSocket, this->mRecvBuffer,
 			asio::transfer_exactly(length), code);
 		return code ? 0 : size;
@@ -256,18 +255,18 @@ namespace Tcp
 
 	int TcpContext::RecvLineSync()
 	{
-		asio::error_code code;
-        AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
+		Asio::Code code;
+        Asio::Socket & tcpSocket = this->mSocket->GetSocket();
 		return asio::read_until(tcpSocket, this->mRecvBuffer, "\r\n", code);
 	}
 
 	int TcpContext::SendSync(std::shared_ptr<ProtoMessage> message)
 	{
 		int sum = 0;
-		asio::error_code code;
+		Asio::Code code;
         std::ostream os(&this->mSendBuffer);
 		int length = message->Serailize(os);
-		AsioTcpSocket & tcpSocket = this->mSocket->GetSocket();
+		Asio::Socket & tcpSocket = this->mSocket->GetSocket();
 		sum += asio::write(tcpSocket, this->mSendBuffer, code);
 		while(length > 0 && sum > 0 && !code)
 		{

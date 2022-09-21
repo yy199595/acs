@@ -10,7 +10,6 @@
 #include"Message/s2s.pb.h"
 #include"Define/CommonLogDef.h"
 #include"Method/EventMethod.h"
-#include"Define/CommonTypeDef.h"
 using namespace google::protobuf;
 namespace Sentry
 {

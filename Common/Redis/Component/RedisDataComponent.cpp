@@ -1,7 +1,7 @@
 ﻿#include"RedisDataComponent.h"
 
 #include"App/App.h"
-#include"lua/LuaRedis.h"
+#include"Lua/LuaRedis.h"
 #include"String/StringHelper.h"
 #include"File/DirectoryHelper.h"
 #include"Lua/ClassProxyHelper.h"

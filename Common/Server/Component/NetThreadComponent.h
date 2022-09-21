@@ -1,5 +1,6 @@
 ﻿#pragma once
-
+#include<vector>
+#include"Tcp/Asio.h"
 #include"Component/Component.h"
 namespace Sentry
 {
@@ -21,8 +22,8 @@ namespace Sentry
 		std::thread* mMonitorThread;
 #ifndef ONLY_MAIN_THREAD
         std::vector<std::thread *> mThreads;
-        std::vector<asio::io_service *> mNetThreads;
-        std::vector<asio::io_service::work *> mNetThreadWorks;
+        std::vector<Asio::Context *> mNetThreads;
+        std::vector<Asio::ContextWork *> mNetThreadWorks;
 #endif
 	};
 }

@@ -4,6 +4,7 @@
 
 #ifndef GAMEKEEPER_TCPCLIENT_H
 #define GAMEKEEPER_TCPCLIENT_H
+#include<list>
 #include"XCode/XCode.h"
 #include"SocketProxy.h"
 #include"Message/ProtoMessage.h"
@@ -86,10 +87,10 @@ namespace Tcp
         size_t PopAllMessage();
         std::shared_ptr<ProtoMessage> PopMessage();
 	 protected:
-        virtual void OnConnect(const asio::error_code & error, int count) { throw std::logic_error("");}
-        virtual void OnReceiveLine(const asio::error_code & code, std::istream & readStream, size_t size) {}
-        virtual void OnReceiveMessage(const asio::error_code & code, std::istream & readStream, size_t size) {}
-		virtual void OnSendMessage(const asio::error_code & code, std::shared_ptr<ProtoMessage> message) {  };
+        virtual void OnConnect(const Asio::Code & error, int count) { throw std::logic_error("");}
+        virtual void OnReceiveLine(const Asio::Code & code, std::istream & readStream, size_t size) {}
+        virtual void OnReceiveMessage(const Asio::Code & code, std::istream & readStream, size_t size) {}
+		virtual void OnSendMessage(const Asio::Code & code, std::shared_ptr<ProtoMessage> message) {  };
 	 protected:
         asio::streambuf mSendBuffer;
         asio::streambuf mRecvBuffer;

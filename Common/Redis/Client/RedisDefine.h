@@ -2,7 +2,6 @@
 #include<list>
 #include<string>
 #include<vector>
-#include"asio.hpp"
 #include"RedisAny.h"
 #include"XCode/XCode.h"
 #include"Json/JsonWriter.h"

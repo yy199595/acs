@@ -6,14 +6,14 @@ namespace Sentry
 		: mNetThread(thread)
 	{
 		this->mIsRemote = true;
-		this->mSocket = new AsioTcpSocket(this->mNetThread);
+		this->mSocket = new Asio::Socket(this->mNetThread);
 	}
 
     void SocketProxy::Init()
     {
         asio::error_code code;
         this->mIsRemote = false;
-        auto endPoint = this->mSocket->remote_endpoint(code);
+        Asio::EndPoint endPoint = this->mSocket->remote_endpoint(code);
         if (this->mSocket->is_open() && !code)
         {
             this->mPort = endPoint.port();

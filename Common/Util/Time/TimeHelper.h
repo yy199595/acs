@@ -1,5 +1,4 @@
 #pragma once
-#include "Define/CommonTypeDef.h"
 #include <string>
 #define _MinSecond 60
 #define _HourSecond 3600

@@ -22,7 +22,7 @@ namespace Sentry
         std::string error;
         this->mIsClose = !this->StartConnect();
         std::shared_ptr<Mysql::ICommand> command;
-        asio::io_service &io = App::Get()->GetThread();
+        Asio::Context &io = App::Get()->GetThread();
         this->mLastTime = Helper::Time::GetNowSecTime();
         while (!this->mIsClose)
         {

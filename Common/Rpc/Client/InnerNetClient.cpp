@@ -22,7 +22,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->CloseSocket(XCode::NetActiveShutdown);
 #else
-        asio::io_service & t = this->mSocket->GetThread();
+        Asio::Context & t = this->mSocket->GetThread();
 		t.post(std::bind(&InnerNetClient::CloseSocket, this, XCode::NetActiveShutdown));
 #endif
 	}
@@ -131,7 +131,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveMessage(PackeHeadtLength);
 #else
-        asio::io_service & t = this->mSocket->GetThread();
+        Asio::Context & t = this->mSocket->GetThread();
         t.post(std::bind(&InnerNetClient::ReceiveMessage, this, RPC_PACK_HEAD_LEN));
 #endif
 	}
@@ -143,7 +143,7 @@ namespace Sentry
 #ifdef __DEBUG__
 			CONSOLE_LOG_ERROR(error.message());
 #endif
-			AsioContext & context = this->mSocket->GetThread();
+			Asio::Context & context = this->mSocket->GetThread();
 			this->mTimer = std::make_shared<asio::steady_timer>(context, std::chrono::seconds(5));
 			this->mTimer->async_wait(std::bind(std::bind(&InnerNetClient::Connect, this->shared_from_this())));
 			return;

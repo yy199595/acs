@@ -20,7 +20,7 @@ namespace Sentry
         virtual long long GetRpcId() = 0;
         int GetTimeout() const { return this->mTimeout; };
     public:
-        virtual void OnTimeout() { throw logic_error("");};
+        virtual void OnTimeout() { throw std::logic_error("");};
         virtual void OnResponse(std::shared_ptr<T> response) = 0;
     private:
         int mTimeout;

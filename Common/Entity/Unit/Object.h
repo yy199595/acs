@@ -2,7 +2,6 @@
 
 #include "Define/ClassStatement.h"
 #include "Define/CommonLogDef.h"
-#include "Define/CommonTypeDef.h"
 
 namespace Sentry
 {

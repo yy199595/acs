@@ -4,7 +4,6 @@
 
 #ifndef SERVER_MONGOCLIENT_H
 #define SERVER_MONGOCLIENT_H
-#include"asio.hpp"
 #include"MongoProto.h"
 #include"Tcp/TcpContext.h"
 #include"Tcp/SocketProxy.h"

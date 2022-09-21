@@ -1,7 +1,6 @@
 ﻿#pragma once
-
+#include"Tcp/Asio.h"
 #include"Unit/Unit.h"
-#include"Define/CommonTypeDef.h"
 #include"Config/ServerConfig.h"
 #include"Time/TimeHelper.h"
 #include"Config/ServerPath.h"
@@ -9,7 +8,6 @@
 #include"Component/TaskComponent.h"
 #include"Component/TimerComponent.h"
 #include"Component/LoggerComponent.h"
-using namespace asio::ip;
 
 namespace Sentry
 {
@@ -25,7 +23,7 @@ namespace Sentry
 		static std::shared_ptr<App> Get() { return mApp; }
 		const ServerConfig& GetConfig() { return *mConfig; }
 		inline LoggerComponent* GetLogger() { return this->mLogComponent; }
-		inline asio::io_service& GetThread() { return *this->mMainThread; }
+		inline Asio::Context & GetThread() { return *this->mMainThread; }
 		inline TaskComponent* GetTaskComponent() { return this->mTaskComponent; }
 		inline TimerComponent* GetTimerComponent() { return this->mTimerComponent; }
 		inline ProtoComponent * GetMsgComponent() { return this->mMessageComponent; }
@@ -61,7 +59,7 @@ namespace Sentry
 	 private:
         int mTickCount;
         std::thread::id mThreadId;
-        asio::io_service * mMainThread;
+        Asio::Context * mMainThread;
         TaskComponent* mTaskComponent;
 		LoggerComponent* mLogComponent;
 		TimerComponent* mTimerComponent;

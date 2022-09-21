@@ -19,7 +19,7 @@ namespace Sentry
 
 	TcpServerListener::~TcpServerListener()
 	{
-		asio::error_code err;
+		Asio::Code err;
 		this->mBindAcceptor->close(err);
 		delete this->mBindAcceptor;
 	}
@@ -40,9 +40,9 @@ namespace Sentry
                 return false;
             }
             unsigned short port = this->mConfig->Port;
-            asio::io_context & io = App::Get()->GetThread();
-            AsioTcpEndPoint endPoint(asio::ip::tcp::v4(), port);
-            this->mBindAcceptor = new AsioTcpAcceptor(io, endPoint);
+            Asio::Context & io = App::Get()->GetThread();
+            Asio::EndPoint endPoint(asio::ip::tcp::v4(), port);
+            this->mBindAcceptor = new Asio::Acceptor (io, endPoint);
             this->mNetComponent = App::Get()->GetComponent<NetThreadComponent>();
 
             this->mBindAcceptor->listen();

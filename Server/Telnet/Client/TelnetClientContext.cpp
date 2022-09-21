@@ -16,12 +16,12 @@ namespace Tcp
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLine();
 #else
-		asio::io_service & netWorkThread = this->mSocket->GetThread();
+		Asio::Context & netWorkThread = this->mSocket->GetThread();
 		netWorkThread.post(std::bind(&TelnetClientContext::ReceiveLine, this));
 #endif
 	}
 
-	void TelnetClientContext::OnReceiveLine(const asio::error_code& code, std::istream & is, size_t)
+	void TelnetClientContext::OnReceiveLine(const Asio::Code & code, std::istream & is, size_t)
 	{
 		if(code)
 		{
@@ -35,7 +35,7 @@ namespace Tcp
 #ifdef ONLY_MAIN_THREAD
 		this->mConsoleComponent->OnReceive(address, lineMessage);
 #else
-		asio::io_service & netWorkThread = App::Get()->GetThread();
+		Asio::Context & netWorkThread = App::Get()->GetThread();
 		netWorkThread.post(std::bind(&ConsoleComponent::OnReceive, this->mConsoleComponent,address , lineMessage));
 #endif
 	}
@@ -45,12 +45,12 @@ namespace Tcp
 #ifdef ONLY_MAIN_THREAD
 		this->Send(message);
 #else
-		asio::io_service &netWorkThread = this->mSocket->GetThread();
+		Asio::Context &netWorkThread = this->mSocket->GetThread();
 		netWorkThread.post(std::bind(&TelnetClientContext::Send, this, message));
 #endif
 	}
 
-	void TelnetClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
+	void TelnetClientContext::OnSendMessage(const Asio::Code & code, std::shared_ptr<ProtoMessage> message)
 	{
 		if(code)
 		{

@@ -5,7 +5,6 @@
 #ifndef GAMEKEEPER_HTTPASYNCREQUEST_H
 #define GAMEKEEPER_HTTPASYNCREQUEST_H
 #include<string>
-#include"asio.hpp"
 #include<fstream>
 #include<unordered_map>
 #include"Json/JsonWriter.h"

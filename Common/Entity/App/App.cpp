@@ -144,11 +144,11 @@ namespace Sentry
 		this->mLastUpdateTime = Helper::Time::GetNowMilTime();
 
         std::chrono::milliseconds time(1);
-        this->mMainThread = new asio::io_service();
-        asio::io_service::work * work = new asio::io_service::work(*mMainThread);
+        this->mMainThread = new Asio::Context ();
+        Asio::ContextWork * work = new Asio::ContextWork (*mMainThread);
         while(!this->mMainThread->stopped())
         {
-            asio::error_code err;
+            Asio::Code err;
             this->mMainThread->poll(err);
             if(err)
             {
@@ -157,6 +157,7 @@ namespace Sentry
             this->LogicMainLoop();
             std::this_thread::sleep_for(time);
         }
+        delete work;
 		return 0;
 	}
 

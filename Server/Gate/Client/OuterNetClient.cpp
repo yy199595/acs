@@ -29,7 +29,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveMessage(RPC_PACK_HEAD_LEN);
 #else
-        asio::io_service & t = this->mSocket->GetThread();
+        Asio::Context & t = this->mSocket->GetThread();
         t.post(std::bind(&OuterNetClient::ReceiveMessage, this, RPC_PACK_HEAD_LEN));
         if(second != 0)
         {
@@ -41,7 +41,7 @@ namespace Sentry
     void OuterNetClient::StartTimer(int second)
     {
         auto timeout = std::chrono::seconds(second);
-        asio::io_service & io = this->mSocket->GetThread();
+        Asio::Context & io = this->mSocket->GetThread();
         this->mTimer = std::make_shared<asio::steady_timer>(io, timeout);
         this->mTimer->async_wait(std::bind(&OuterNetClient::OnTimerEnd, this, second));
     }
@@ -91,7 +91,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
                 this->mGateComponent->OnMessage(address, std::move(this->mMessage));
 #else
-                asio::io_service &io = App::Get()->GetThread();
+                Asio::Context &io = App::Get()->GetThread();
                 io.post(std::bind(&OuterNetComponent::OnMessage,
                                   this->mGateComponent, address, std::move(this->mMessage)));
 #endif
@@ -107,7 +107,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mGateComponent->OnCloseSocket(address, code);
 #else
-		asio::io_service &mainTaskScheduler = App::Get()->GetThread();
+		Asio::Context &mainTaskScheduler = App::Get()->GetThread();
 		mainTaskScheduler.post(std::bind(&OuterNetComponent::OnCloseSocket, this->mGateComponent, address, code));
 #endif
 	}
@@ -133,7 +133,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->CloseSocket(code);
 #else
-        asio::io_service & t = this->mSocket->GetThread();
+        Asio::Context & t = this->mSocket->GetThread();
         t.post(std::bind(&OuterNetClient::CloseSocket, this, code));
 #endif
 	}
@@ -148,7 +148,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->Send(request);
 #else
-        asio::io_service & t = this->mSocket->GetThread();
+        Asio::Context & t = this->mSocket->GetThread();
         t.post(std::bind(&OuterNetClient::Send, this, request));
 #endif
 	}
@@ -163,7 +163,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->Send(response);
 #else
-        asio::io_service & t = this->mSocket->GetThread();
+        Asio::Context & t = this->mSocket->GetThread();
         t.post(std::bind(&OuterNetClient::Send, this, response));
 #endif
         //CONSOLE_LOG_ERROR("send to client [" << this->mSocket->GetAddress() << "] " << message->rpc_id());

@@ -32,7 +32,7 @@ namespace Mongo
         LOG_CHECK_FATAL(this->mMongoComponent = App::Get()->GetComponent<MongoDBComponent>());
 	}
 
-	void TcpMongoClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
+	void TcpMongoClient::OnSendMessage(const Asio::Code & code, std::shared_ptr<ProtoMessage> message)
 	{
 		if (code)
 		{

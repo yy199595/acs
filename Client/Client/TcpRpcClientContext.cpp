@@ -20,12 +20,12 @@ namespace Client
 #ifdef ONLY_MAIN_THREAD
         this->Send(networkData);
 #else
-        asio::io_service & io = this->mSocket->GetThread();
+        Asio::Context & io = this->mSocket->GetThread();
         io.post(std::bind(&TcpRpcClientContext::Send, this, networkData));
 #endif
 	}
 
-    void TcpRpcClientContext::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
+    void TcpRpcClientContext::OnSendMessage(const Asio::Code & code, std::shared_ptr<ProtoMessage> message)
     {
         if(code)
         {
@@ -72,7 +72,7 @@ namespace Client
 #ifdef ONLY_MAIN_THREAD
                 this->mClientComponent->OnMessage(address, std::move(this->mMessage));
 #else
-                asio::io_service & io = App::Get()->GetThread();
+                Asio::Context & io = App::Get()->GetThread();
                 io.post(std::bind(&ClientComponent::OnMessage,
                                   this->mClientComponent, address, std::move(this->mMessage)));
 #endif

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Define/CommonTypeDef.h"
-#include <random>
+#include<random>
 namespace Helper
 {
 namespace Math {

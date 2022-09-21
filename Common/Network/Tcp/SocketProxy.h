@@ -1,5 +1,6 @@
 #pragma once
 #include<mutex>
+#include"Tcp/Asio.h"
 #include"Define/CommonLogDef.h"
 
 namespace Sentry
@@ -7,7 +8,7 @@ namespace Sentry
 	class SocketProxy
 	{
 	 public:
-		SocketProxy(asio::io_context& io);
+		SocketProxy(Asio::Context & io);
 		~SocketProxy();
 	 public:
         void Init();
@@ -17,16 +18,16 @@ namespace Sentry
 		unsigned short GetPort() { return this->mPort;}
 		inline std::string & GetIp() { return this->mIp;}
 		inline bool IsRemote() const { return this->mIsRemote;}
-		inline AsioTcpSocket& GetSocket() { return *mSocket;}
-		inline asio::io_service& GetThread() { return this->mNetThread; }
+		inline Asio::Socket & GetSocket() { return *mSocket;}
+		inline Asio::Context & GetThread() { return this->mNetThread; }
 		inline const std::string& GetAddress() { return this->mAddress; }
 	 private:
 		bool mIsRemote;
 		std::string mIp;
 		unsigned short mPort;
 		std::string mAddress;
-		AsioTcpSocket * mSocket;
-        asio::io_service& mNetThread;
+        Asio::Socket * mSocket;
+        Asio::Context & mNetThread;
     };
 }
 

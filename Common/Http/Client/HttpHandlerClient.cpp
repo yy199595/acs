@@ -23,7 +23,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLine();
 #else
-		asio::io_service & netWorkThread = this->mSocket->GetThread();
+		Asio::Context & netWorkThread = this->mSocket->GetThread();
 		netWorkThread.post(std::bind(&HttpHandlerClient::ReceiveLine, this));
 #endif
 	}
@@ -39,7 +39,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
         this->Send(this->mHttpResponse);
 #else
-        asio::io_service& netWorkThread = this->mSocket->GetThread();
+        Asio::Context & netWorkThread = this->mSocket->GetThread();
         netWorkThread.post(std::bind(&HttpHandlerClient::Send, this, this->mHttpResponse));
 #endif
     }
@@ -51,12 +51,12 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
         this->mHttpComponent->OnRequest(httpHandlerClient);
 #else
-        asio::io_service &mainThread = App::Get()->GetThread();
+        Asio::Context &mainThread = App::Get()->GetThread();
         mainThread.post(std::bind(&HttpListenComponent::OnRequest, this->mHttpComponent, httpHandlerClient));
 #endif
     }
 
-    void HttpHandlerClient::OnReceiveLine(const asio::error_code &code, std::istream &is, size_t)
+    void HttpHandlerClient::OnReceiveLine(const Asio::Code &code, std::istream &is, size_t)
     {
         if(code == asio::error::eof)
         {
@@ -119,7 +119,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mHttpComponent->ClosetHttpClient(address);
 #else
-		asio::io_service& mainThread = App::Get()->GetThread();
+		Asio::Context & mainThread = App::Get()->GetThread();
 		mainThread.post(std::bind(&HttpListenComponent::ClosetHttpClient, this->mHttpComponent, address));
 #endif
 	}

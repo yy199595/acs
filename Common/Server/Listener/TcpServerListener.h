@@ -1,7 +1,6 @@
 #pragma once
 #include"Source/TaskSource.h"
 #include"Config/ServerConfig.h"
-#include"Define/CommonTypeDef.h"
 
 namespace Sentry
 {
@@ -28,8 +27,8 @@ namespace Sentry
 		int mCount;
 		int mErrorCount;
 		const ListenConfig * mConfig;
-        AsioTcpAcceptor* mBindAcceptor;
         TcpServerComponent * mTcpComponent;
         NetThreadComponent * mNetComponent;
+        asio::ip::tcp::acceptor * mBindAcceptor;
     };
 }

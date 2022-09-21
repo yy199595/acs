@@ -2,9 +2,9 @@
 
 #include<set>
 #include<vector>
+#include<string>
 #include<unordered_map>
 #include"Json/JsonReader.h"
-#include"Define/CommonTypeDef.h"
 
 namespace Sentry
 {
