@@ -1,5 +1,5 @@
-#include "Function.h"
-#include <Define/CommonLogDef.h>
+#include"Function.h"
+#include"Log/CommonLogDef.h"
 namespace Lua
 {
 	std::unordered_map<std::string, int> Function::mRefFunctions;

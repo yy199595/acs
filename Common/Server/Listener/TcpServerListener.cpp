@@ -2,7 +2,7 @@
 #include"App/App.h"
 #include"Tcp/SocketProxy.h"
 #include"Method/MethodProxy.h"
-#include<Define/CommonLogDef.h>
+#include"Log/CommonLogDef.h"
 #include"Component/TcpServerComponent.h"
 #include"Component/NetThreadComponent.h"
 namespace Sentry

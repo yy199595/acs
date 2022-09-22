@@ -1,7 +1,7 @@
 
 #include"TelnetClientContext.h"
 #include"String/StringHelper.h"
-#include"Define/CommonLogDef.h"
+#include"Log/CommonLogDef.h"
 #include"Component/ConsoleComponent.h"
 namespace Tcp
 {

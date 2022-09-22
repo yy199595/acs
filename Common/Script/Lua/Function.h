@@ -2,7 +2,7 @@
 
 #include"App/App.h"
 #include"Lua/LuaParameter.h"
-#include"Define/CommonLogDef.h"
+#include"Log/CommonLogDef.h"
 #include"Lua/WaitLuaTaskSource.h"
 using namespace Sentry;
 

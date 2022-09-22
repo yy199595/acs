@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Define/ClassStatement.h"
-#include "Define/CommonLogDef.h"
+#include"Log/CommonLogDef.h"
+#include"Define/ClassStatement.h"
 
 namespace Sentry
 {

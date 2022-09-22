@@ -1,5 +1,4 @@
 #include"TimeWheelLayer.h"
-#include"Define/CommonLogDef.h"
 namespace Sentry
 {
     TimeWheelLayer::TimeWheelLayer(int layerId, int count, int min, int max)

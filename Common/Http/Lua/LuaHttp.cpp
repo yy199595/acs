@@ -3,7 +3,6 @@
 //
 
 #include"LuaHttp.h"
-#include"App/App.h"
 #include"File/DirectoryHelper.h"
 #include"Lua/UserDataParameter.h"
 #include"Lua/LuaWaitTaskSource.h"

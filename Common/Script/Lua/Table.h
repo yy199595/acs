@@ -1,7 +1,7 @@
 #pragma once
 
 #include"Lua/Function.h"
-#include"Define/CommonLogDef.h"
+#include"Log/CommonLogDef.h"
 #include<google/protobuf/message.h>
 using namespace google::protobuf;
 

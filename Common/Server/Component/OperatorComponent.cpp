@@ -74,8 +74,8 @@ namespace Sentry
 
 	void OperatorComponent::StartRefreshDay(const std::string& name)
 	{
-		auto component = this->GetComponent<Component>(name);
-		if (auto zeroRefresh = dynamic_cast<IZeroRefresh*>(component))
+		Component * component = this->GetComponent<Component>(name);
+		if (IZeroRefresh * zeroRefresh = dynamic_cast<IZeroRefresh*>(component))
 		{
 			zeroRefresh->OnZeroRefresh();
 			this->AddRefreshTimer(component);

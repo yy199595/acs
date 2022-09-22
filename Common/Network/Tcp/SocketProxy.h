@@ -1,7 +1,7 @@
 #pragma once
 #include<mutex>
 #include"Tcp/Asio.h"
-#include"Define/CommonLogDef.h"
+#include"Log/CommonLogDef.h"
 
 namespace Sentry
 {

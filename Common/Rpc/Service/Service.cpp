@@ -184,12 +184,14 @@ namespace Sentry
 		this->mMessageComponent->AddTask(taskSource);
 		if(this->SendRequest(address, request) != XCode::Successful)
 		{
+            CONSOLE_LOG_ERROR("call [" << address << "] [" << request->func() << "]" << " net work error");
 			return XCode::NetWorkError;
 		}
 		std::shared_ptr<com::rpc::response> responsedata = taskSource->Await();
 		if(responsedata == nullptr)
 		{
-			return XCode::CallTimeout;
+            CONSOLE_LOG_ERROR("call [" << address << "] [" << request->func() << "]" << " time out");
+            return XCode::CallTimeout;
 		}
 		if(responsedata->code() == (int)XCode::Successful && response != nullptr)
 		{
@@ -199,7 +201,8 @@ namespace Sentry
 				return XCode::Successful;
 			}
 		}
-		return (XCode)responsedata->code();
+        CONSOLE_LOG_ERROR("call [" << address << "] [" << request->func() << "] error : " << responsedata->error_str());
+        return (XCode)responsedata->code();
 	}
 
 	XCode Service::SendRequest(const std::string& address, std::shared_ptr<com::rpc::request> request)

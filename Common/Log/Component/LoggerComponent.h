@@ -22,12 +22,6 @@ namespace Sentry
 		void OnZeroRefresh() final;
 	public:
 		void CreateLogFile();
-		static void AddInfoLog(const std::string& log);
-		static void AddErrorLog(const std::string& log);
-		static void AddDebugLog(const std::string& log);
-		static void AddFatalLog(const std::string& log);
-		static void AddWarningLog(const std::string& log);
-
 	 private:
 		int mLogSaveTime;
 		std::string mServerName;

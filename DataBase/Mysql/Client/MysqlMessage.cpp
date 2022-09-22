@@ -7,8 +7,7 @@
 #include"spdlog/fmt/fmt.h"
 #include"sstream"
 #include"Guid/Guid.h"
-#include"App/App.h"
-#include"Define/CommonLogDef.h"
+#include"Log/CommonLogDef.h"
 #include"Component/LoggerComponent.h"
 using namespace Sentry;
 namespace Mysql

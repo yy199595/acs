@@ -5,7 +5,7 @@
 #ifndef GameKeeper_MESSAGESTREAM_H
 #define GameKeeper_MESSAGESTREAM_H
 #include<stdexcept>
-#include<Define/CommonLogDef.h>
+#include"Log/CommonLogDef.h"
 namespace Tcp
 {
     enum class Type

@@ -102,9 +102,11 @@ namespace Sentry
 		auto iter = this->mRpcClientMap.find(address);
 		if (iter != this->mRpcClientMap.end())
 		{
-			auto rpcClient = iter->second;
-
-			rpcClient->StartClose();
+			std::shared_ptr<InnerNetClient> innerNetClient = iter->second;
+            if(innerNetClient != nullptr)
+            {
+                innerNetClient->StartClose();
+            }
 			this->mRpcClientMap.erase(iter);
 		}
 	}

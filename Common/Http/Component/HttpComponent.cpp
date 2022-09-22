@@ -1,7 +1,6 @@
 //
 // Created by 64658 on 2021/8/5.
 //
-#include"App/App.h"
 #include"HttpComponent.h"
 #include"Method/HttpServiceMethod.h"
 #include"Config/InterfaceConfig.h"

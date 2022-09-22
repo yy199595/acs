@@ -1,6 +1,5 @@
 #include"Unit.h"
 #include"App/App.h"
-#include"Define/CommonLogDef.h"
 #include"Component/Component.h"
 namespace Sentry
 {

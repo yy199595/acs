@@ -2,6 +2,7 @@
 #include<sstream>
 #include<string>
 #include<string.h>
+#include"Log/Debug.h"
 #define args1 std::placeholders::_1
 #define args2 std::placeholders::_2
 #define args3 std::placeholders::_3
@@ -38,7 +39,7 @@ inline std::string FormatFileLine(const char * file, const int line)
 {                                     \
 	std::stringstream ss;                \
 	ss << f << content;\
-    App::Get()->GetLogger()->AddLog(type, ss.str());		\
+    Debug::Log(type, ss.str());		\
 }													\
 
 
@@ -120,26 +121,26 @@ inline std::string FormatFileLine(const char * file, const int line)
 	std::string f = FormatFileLine(__FILE__, __LINE__); \
 	std::stringstream ss;                \
 	ss << f << content;                \
-	LoggerComponent::AddErrorLog(ss.str());\
+	Debug::Console(Debug::Level::err, ss.str());\
 }
 
 #define CONSOLE_LOG_FATAL(content){ \
 	std::string f = FormatFileLine(__FILE__, __LINE__); \
 	std::stringstream ss;                \
 	ss << f << content;                \
-	LoggerComponent::AddFatalLog(ss.str());\
+	Debug::Console(Debug::Level::critical, ss.str());\
 }
 
 #define CONSOLE_LOG_INFO(content){ \
 	std::string f = FormatFileLine(__FILE__, __LINE__); \
 	std::stringstream ss;                \
 	ss << f << content;                \
-	LoggerComponent::AddInfoLog(ss.str());\
+	Debug::Console(Debug::Level::info, ss.str());\
 }
 
 #define CONSOLE_LOG_DEBUG(content){ \
 	std::string f = FormatFileLine(__FILE__, __LINE__); \
 	std::stringstream ss;                \
 	ss << f << content;                \
-	LoggerComponent::AddDebugLog(ss.str());\
+	Debug::Console(Debug::Level::debug, ss.str());\
 }

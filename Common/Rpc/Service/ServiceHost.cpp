@@ -3,7 +3,7 @@
 //
 
 #include"ServiceHost.h"
-#include"Define/CommonLogDef.h"
+#include"Log/CommonLogDef.h"
 #include"App/App.h"
 namespace Sentry
 {

@@ -3,10 +3,7 @@
 //
 
 #include"LocalTable.h"
-#include"luadebug.h"
 #include"Md5/MD5.h"
-#include"File/FileHelper.h"
-#include"Define/CommonLogDef.h"
 #include"File/DirectoryHelper.h"
 
 namespace Lua
