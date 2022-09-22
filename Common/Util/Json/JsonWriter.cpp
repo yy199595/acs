@@ -191,6 +191,8 @@ namespace Json
 
 	void Writer::AddBinString(const char* str, size_t size)
 	{
+        rapidjson::Document document;
+        document.AddMember("1122", document, document.GetAllocator());
 		this->mWriter->String(str, size);
 	}
 

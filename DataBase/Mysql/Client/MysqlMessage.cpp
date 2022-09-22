@@ -9,6 +9,7 @@
 #include"Guid/Guid.h"
 #include"Log/CommonLogDef.h"
 #include"Component/LoggerComponent.h"
+#include"google/protobuf/util/json_util.h"
 using namespace Sentry;
 namespace Mysql
 {
@@ -79,50 +80,70 @@ namespace Mysql
         while(MYSQL_ROW row = mysql_fetch_row(result1))
         {
             std::string json;
-            Json::Writer jsonDocument;
+            rapidjson::Document * jsonDocument =
+                new rapidjson::Document(rapidjson::kObjectType);
+
             unsigned int fieldCount = mysql_field_count(sock);
             unsigned long* lengths = mysql_fetch_lengths(result1);
             for (unsigned int index = 0; index < fieldCount; index++)
             {
                 st_mysql_field* field = mysql_fetch_field(result1);
-                this->Write(jsonDocument, field, row[index], lengths[index]);
+                this->Write(*jsonDocument, field, row[index], lengths[index]);
             }
-            jsonDocument.WriterStream(json);
-            this->emplace_back(std::move(json));
+            this->emplace_back(std::move(jsonDocument));
         }
         mysql_free_result(result1);
         return true;
     }
 
-    bool QueryCommand::Write(Json::Writer &document, st_mysql_field *filed, const char *str, int len)
+    bool QueryCommand::Write(rapidjson::Document &document, st_mysql_field *filed, const char *str, int len)
     {
         if(str == nullptr || len == 0)
         {
             return true;
         }
-        document << filed->name;
+        rapidjson::GenericStringRef<char> key(filed->name);
         switch(filed->type)
         {
             case enum_field_types::MYSQL_TYPE_TINY:
             {
                 int value = std::atol(str);
-                document << (value != 0);
+                document.AddMember(key, value, document.GetAllocator());
             }
                 return true;
             case enum_field_types::MYSQL_TYPE_LONG:
             case enum_field_types::MYSQL_TYPE_LONGLONG:
-                document << std::atoll(str);
+            {
+                long long value = std::atoll(str);
+                document.AddMember(key, value, document.GetAllocator());
+            }
                 return true;
             case enum_field_types::MYSQL_TYPE_FLOAT:
             case enum_field_types::MYSQL_TYPE_DOUBLE:
-                document << std::atof(str);
+            {
+                double value = std::atof(str);
+                document.AddMember(key, value, document.GetAllocator());
+            }
                 return true;
             case enum_field_types::MYSQL_TYPE_BLOB:
             case enum_field_types::MYSQL_TYPE_STRING:
             case enum_field_types::MYSQL_TYPE_VARCHAR:
             case enum_field_types::MYSQL_TYPE_VAR_STRING:
-                document.AddBinString(str, len);
+            {
+                rapidjson::Value value(str, len);
+                document.AddMember(key, value, document.GetAllocator());
+            }
                 return true;
+            case enum_field_types::MYSQL_TYPE_JSON:
+            {
+                rapidjson::Document doc;
+                if(doc.Parse(str, len).HasParseError())
+                {
+                    return false;
+                }
+                document.AddMember(key, doc, document.GetAllocator());
+            }
+                break;
         }
         CONSOLE_LOG_ERROR(filed->name << " : " << (int)filed->type);
         return false;
@@ -386,6 +407,16 @@ namespace Mysql
                 this->mBuffer << "BOOLEAN NOT NULL DEFAULT " << value;
             }
                 return true;
+            case FieldDescriptor::TYPE_MESSAGE:
+            {
+                std::string json;
+                const Message & message = reflection->GetMessage(message, field);
+                if(util::MessageToJsonString(message, &json).ok())
+                {
+                    this->mBuffer << "JSON NOT NULL DEFAULT " << json;
+                    return true;
+                }
+            }
         }
         return false;
     }
