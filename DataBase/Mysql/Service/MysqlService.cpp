@@ -235,9 +235,7 @@ namespace Sentry
                 rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 
                 document->Accept(writer);
-
-                const char *json = buffer.GetString();
-                const size_t size = buffer.GetSize();
+                const std::string json(buffer.GetString(), buffer.GetLength());
                 this->mSyncComponent->Set(value, request.table(), json);
             }
         }
@@ -247,9 +245,11 @@ namespace Sentry
             rapidjson::Document * document = command->at(index);
             if(document != nullptr)
             {
-                const char * json = document->GetString();
-                const size_t size = document->GetStringLength();
-                response.add_jsons(json, size);
+                rapidjson::StringBuffer buffer;
+                rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+                document->Accept(writer);
+
+                response.add_jsons(buffer.GetString(), buffer.GetLength());
             }
         }
         return XCode::Successful;

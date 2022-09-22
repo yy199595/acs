@@ -109,22 +109,26 @@ namespace Mysql
             {
                 int value = std::atol(str);
                 document.AddMember(key, value, document.GetAllocator());
-            }
                 return true;
+            }
             case enum_field_types::MYSQL_TYPE_LONG:
             case enum_field_types::MYSQL_TYPE_LONGLONG:
             {
+#ifdef __OS_LINUX__
+                int64 value = (int64)std::atoll(str);
+#else
                 long long value = std::atoll(str);
+#endif
                 document.AddMember(key, value, document.GetAllocator());
-            }
                 return true;
+            }
             case enum_field_types::MYSQL_TYPE_FLOAT:
             case enum_field_types::MYSQL_TYPE_DOUBLE:
             {
                 double value = std::atof(str);
                 document.AddMember(key, value, document.GetAllocator());
-            }
                 return true;
+            }
             case enum_field_types::MYSQL_TYPE_BLOB:
             case enum_field_types::MYSQL_TYPE_STRING:
             case enum_field_types::MYSQL_TYPE_VARCHAR:
@@ -132,8 +136,8 @@ namespace Mysql
             {
                 rapidjson::Value value(str, len);
                 document.AddMember(key, value, document.GetAllocator());
-            }
                 return true;
+            }
             case enum_field_types::MYSQL_TYPE_JSON:
             {
                 rapidjson::Document doc;
@@ -142,8 +146,8 @@ namespace Mysql
                     return false;
                 }
                 document.AddMember(key, doc, document.GetAllocator());
+                return true;
             }
-                break;
         }
         CONSOLE_LOG_ERROR(filed->name << " : " << (int)filed->type);
         return false;
