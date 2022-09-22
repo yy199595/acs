@@ -1,78 +1,70 @@
 #pragma once
 #include <string>
-class StringStream
+
+namespace String
 {
-public:
-    StringStream() { this->stringBuffer = ""; }
-
-    StringStream(const char *str) { stringBuffer = str; }
-
-    StringStream(const std::string str) { stringBuffer = str; }
-
-    StringStream &operator<<(int data)
+    class Stream
     {
-        stringBuffer.append(std::to_string(data));
-        return (*this);
-    }
+    public:
+        Stream(size_t size = 256) { this->stringBuffer.reserve(size); }
 
-    StringStream &operator<<(unsigned int data)
-    {
-        stringBuffer.append(std::to_string(data));
-        return (*this);
-    }
+        Stream(const char *str) { stringBuffer = str; }
 
-    StringStream &operator<<(long long data)
-    {
-        stringBuffer.append(std::to_string(data));
-        return (*this);
-    }
+        Stream(const std::string str) { stringBuffer = str; }
 
-    StringStream &operator<<(unsigned long long data)
-    {
-        stringBuffer.append(std::to_string(data));
-        return (*this);
-    }
+        Stream &operator<<(int data)
+        {
+            stringBuffer.append(std::to_string(data));
+            return (*this);
+        }
 
-    StringStream &operator<<(float data)
-    {
-        stringBuffer.append(std::to_string(data));
-        return (*this);
-    }
+        Stream &operator<<(unsigned int data)
+        {
+            stringBuffer.append(std::to_string(data));
+            return (*this);
+        }
 
-    StringStream &operator<<(double data)
-    {
-        stringBuffer.append(std::to_string(data));
-        return (*this);
-    }
+        Stream &operator<<(long long data)
+        {
+            stringBuffer.append(std::to_string(data));
+            return (*this);
+        }
 
-    StringStream &operator<<(const char *data)
-    {
-        stringBuffer.append(data);
-        return (*this);
-    }
+        Stream &operator<<(unsigned long long data)
+        {
+            stringBuffer.append(std::to_string(data));
+            return (*this);
+        }
 
-    StringStream &operator<<(const std::string data)
-    {
-        stringBuffer.append(data);
-        return (*this);
-    }
+        Stream &operator<<(float data)
+        {
+            stringBuffer.append(std::to_string(data));
+            return (*this);
+        }
 
-    void operator>>(int &data) { data = std::atoi(this->stringBuffer.c_str()); }
+        Stream &operator<<(double data)
+        {
+            stringBuffer.append(std::to_string(data));
+            return (*this);
+        }
 
-    void operator>>(unsigned int &data) { data = std::atoi(this->stringBuffer.c_str()); }
+        Stream &operator<<(const char *data)
+        {
+            stringBuffer.append(data);
+            return (*this);
+        }
 
-    void operator>>(long &data) { data = std::atol(this->stringBuffer.c_str()); }
+        Stream &operator<<(const std::string & data)
+        {
+            stringBuffer.append(data);
+            return (*this);
+        }
 
-    void operator>>(long long &data) { data = std::atoll(this->stringBuffer.c_str()); }
+        const std::string &Serialize() { return this->stringBuffer; }
 
-    void operator>>(float &data) { data = (float) std::atof(this->stringBuffer.c_str()); }
+        inline void Clear() { this->stringBuffer = ""; }
 
-    void operator>>(double &data) { data = std::atof(this->stringBuffer.c_str()); }
-
-   const std::string & Serialize() { return this->stringBuffer; }
-
-    void Clear() { this->stringBuffer = ""; }
-
-private:
-    std::string stringBuffer;
-};
+    private:
+        std::string stringBuffer;
+    };
+}

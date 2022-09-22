@@ -1,4 +1,4 @@
-/* Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.
+/* Copyright (c) 2000, 2015, Oracle and/or its affiliates. All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -163,7 +163,9 @@ enum mysql_option
   MYSQL_SERVER_PUBLIC_KEY,
   MYSQL_ENABLE_CLEARTEXT_PLUGIN,
   MYSQL_OPT_CAN_HANDLE_EXPIRED_PASSWORDS,
-  MYSQL_OPT_SSL_ENFORCE
+  MYSQL_OPT_SSL_ENFORCE,
+  MYSQL_OPT_MAX_ALLOWED_PACKET, MYSQL_OPT_NET_BUFFER_LENGTH,
+  MYSQL_OPT_TLS_VERSION
 };
 
 /**
@@ -315,19 +317,6 @@ typedef struct st_mysql_res {
 #define MYSQL_CLIENT
 #endif
 
-
-typedef struct st_mysql_parameters
-{
-  unsigned long *p_max_allowed_packet;
-  unsigned long *p_net_buffer_length;
-  void *extension;
-} MYSQL_PARAMETERS;
-
-#if !defined(MYSQL_SERVER) && !defined(EMBEDDED_LIBRARY)
-#define max_allowed_packet (*mysql_get_parameters()->p_max_allowed_packet)
-#define net_buffer_length (*mysql_get_parameters()->p_net_buffer_length)
-#endif
-
 /*
   Set up and bring down the server; to ensure that applications will
   work when linked against either the standard client library or the
@@ -348,7 +337,6 @@ void STDCALL mysql_server_end(void);
 #define mysql_library_init mysql_server_init
 #define mysql_library_end mysql_server_end
 
-MYSQL_PARAMETERS *STDCALL mysql_get_parameters(void);
 
 /*
   Set up and bring down a thread; these function should be called
@@ -483,12 +471,15 @@ unsigned long	STDCALL mysql_hex_string(char *to,const char *from,
 unsigned long STDCALL mysql_real_escape_string(MYSQL *mysql,
 					       char *to,const char *from,
 					       unsigned long length);
-void		STDCALL mysql_debug(const char *debug);
-void 		STDCALL myodbc_remove_escape(MYSQL *mysql,char *name);
-unsigned int	STDCALL mysql_thread_safe(void);
-my_bool		STDCALL mysql_embedded(void);
-my_bool         STDCALL mysql_read_query_result(MYSQL *mysql);
-int             STDCALL mysql_reset_connection(MYSQL *mysql);
+unsigned long STDCALL mysql_real_escape_string_quote(MYSQL *mysql,
+                 char *to, const char *from,
+                 unsigned long length, char quote);
+void          STDCALL mysql_debug(const char *debug);
+void          STDCALL myodbc_remove_escape(MYSQL *mysql,char *name);
+unsigned int  STDCALL mysql_thread_safe(void);
+my_bool       STDCALL mysql_embedded(void);
+my_bool       STDCALL mysql_read_query_result(MYSQL *mysql);
+int           STDCALL mysql_reset_connection(MYSQL *mysql);
 
 /*
   The following definitions are added for the enhanced 

@@ -105,6 +105,8 @@ struct st_mysql_options_extention {
   my_bool enable_cleartext_plugin;
   /** false if it is possible to fall back on unencrypted connections */
   my_bool ssl_enforce;
+  char *tls_version; /* TLS version option */
+  long ssl_ctx_flags; /* SSL ctx options flag */
 };
 
 typedef struct st_mysql_methods
@@ -155,7 +157,8 @@ MYSQL_FIELD *unpack_fields(MYSQL *mysql, MYSQL_ROWS *data,MEM_ROOT *alloc,
                            uint fields, my_bool default_value,
                            uint server_capabilities);
 MYSQL_FIELD * cli_read_metadata_ex(MYSQL *mysql, MEM_ROOT *alloc,
-                                unsigned long field_count, unsigned int fields);
+                                   unsigned long field_count,
+                                   unsigned int fields);
 MYSQL_FIELD * cli_read_metadata(MYSQL *mysql, unsigned long field_count,
                                unsigned int fields);
 void free_rows(MYSQL_DATA *cur);

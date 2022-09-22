@@ -1,4 +1,4 @@
-/* Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.
+/* Copyright (c) 2000, 2015, Oracle and/or its affiliates. All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ static char *opt_ssl_cipher  = 0;
 static char *opt_ssl_key     = 0;
 static char *opt_ssl_crl     = 0;
 static char *opt_ssl_crlpath = 0;
+static char *opt_tls_version = 0;
 #ifndef MYSQL_CLIENT
 #error This header is supposed to be used only in the client
 #endif
@@ -37,7 +38,15 @@ static char *opt_ssl_crlpath = 0;
     mysql_ssl_set(mysql, opt_ssl_key, opt_ssl_cert, opt_ssl_ca, \
       opt_ssl_capath, opt_ssl_cipher); \
     mysql_options(mysql, MYSQL_OPT_SSL_CRL, opt_ssl_crl); \
+    mysql_options(mysql, MYSQL_OPT_TLS_VERSION, opt_tls_version); \
     mysql_options(mysql, MYSQL_OPT_SSL_CRLPATH, opt_ssl_crlpath); \
+    if (opt_ssl_enforce) \
+    { \
+      mysql_options(mysql, MYSQL_OPT_SSL_ENFORCE, &opt_ssl_enforce);\
+    } \
+  } \
+  else \
+  { \
     mysql_options(mysql, MYSQL_OPT_SSL_ENFORCE, &opt_ssl_enforce); \
   } \
   mysql_options(mysql, MYSQL_OPT_SSL_VERIFY_SERVER_CERT, \

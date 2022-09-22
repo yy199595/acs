@@ -1,4 +1,4 @@
-/* Copyright (c) 2000, 2014, Oracle and/or its affiliates. All rights reserved.
+/* Copyright (c) 2000, 2015, Oracle and/or its affiliates. All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -42,5 +42,11 @@
       opt_ssl_crl= NULL;
       opt_ssl_crlpath= NULL;
 #endif
+      break;
+    case OPT_TLS_VERSION:
+#ifdef MYSQL_CLIENT
+      opt_ssl_enforce= TRUE;
+#endif
+      opt_use_ssl= TRUE;
       break;
 #endif
