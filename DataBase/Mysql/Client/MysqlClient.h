@@ -12,15 +12,14 @@ namespace Sentry
 {
     class MysqlDBComponent;
 
-    class MysqlClient
+    class MysqlClient : protected std::thread
     {
     public:
         MysqlClient(const MysqlConfig &config, MysqlDBComponent *component);
-
     public:
         void Stop();
-        bool Start();
         bool StartConnect();
+        void Start() { this->detach(); }
         size_t GetTaskCount() const { return this->mTaskCount; }
         void SendCommand(std::shared_ptr<Mysql::ICommand> command);
 
@@ -32,7 +31,6 @@ namespace Sentry
         std::mutex mLock;
         size_t mTaskCount;
         MYSQL *mMysqlClient;
-        std::thread *mThread;
         long long mLastTime;
         const MysqlConfig &mConfig;
         MysqlDBComponent *mComponent;

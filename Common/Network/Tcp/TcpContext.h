@@ -19,42 +19,6 @@ namespace Tcp
         Body
     };
 
-	class ReadStreamHelper
-	{
-	public:
-		ReadStreamHelper(std::istream & ss)
-			: mStream(ss) {}
-
-	public:
-		inline std::string ReadString()
-		{
-			std::string ret;
-			char cc = this->mStream.get();
-			while(cc != '\0')
-			{
-				ret += cc;
-				cc = this->mStream.get();
-			}
-			return ret;
-		}
-		inline std::string ReadString(int size)
-		{
-			std::unique_ptr<char[]> buffer(new char[size]);
-			this->mStream.readsome(buffer.get(), size);
-			return std::string(buffer.get(), size);
-		}
-
-		template<typename T>
-		inline T ReadByType()
-		{
-			T data;
-			this->mStream.readsome((char *)&data, sizeof(T));
-			return data;
-		}
-	private:
-		std::istream & mStream;
-	};
-
  	class TcpContext : public std::enable_shared_from_this<TcpContext>
 	{
 	 public:

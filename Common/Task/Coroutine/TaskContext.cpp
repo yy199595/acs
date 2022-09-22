@@ -1,4 +1,5 @@
 #include"TaskContext.h"
+#include"memory.h"
 namespace Sentry
 {
 	TaskContext::TaskContext()

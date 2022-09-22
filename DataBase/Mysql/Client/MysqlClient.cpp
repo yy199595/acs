@@ -8,14 +8,14 @@
 namespace Sentry
 {
 	MysqlClient::MysqlClient(const MysqlConfig &config, MysqlDBComponent *component)
-							 : mConfig(config), mComponent(component)
-	{
+							 : mConfig(config), mComponent(component),
+                              std::thread(std::bind(&MysqlClient::Update, this))
+    {
         this->mLastTime = 0;
-		this->mIsClose = true;
+        this->mIsClose = true;
         this->mTaskCount = 0;
-        this->mThread = nullptr;
-		this->mMysqlClient = nullptr;
-	}
+        this->mMysqlClient = nullptr;
+    }
 
 	void MysqlClient::Update()
     {
@@ -40,7 +40,6 @@ namespace Sentry
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
-        delete this->mThread;
         mysql_close(this->mMysqlClient);
     }
 
@@ -56,11 +55,6 @@ namespace Sentry
 
         this->mTaskCount++;
 		this->mCommands.emplace(std::move(command));
-        if(this->mThread == nullptr)
-        {
-            this->mThread = new std::thread(std::bind(&MysqlClient::Update, this));
-            this->mThread->detach();
-        }
 	}
 
 	bool MysqlClient::GetCommand(std::shared_ptr<Mysql::ICommand>& command)

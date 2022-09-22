@@ -44,6 +44,8 @@ namespace Sentry
         {
             std::shared_ptr<MysqlClient> mysqlClient
                 = std::make_shared<MysqlClient>(this->mConfig, this);
+
+            mysqlClient->Start();
             this->mMysqlClients.emplace_back(std::move(mysqlClient));
         }
         return this->Ping(0);
