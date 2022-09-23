@@ -228,28 +228,21 @@ namespace Sentry
         }
         if(!value.empty() && this->mSyncComponent != nullptr && command->size() == 1)
         {
-            rapidjson::Document * document = command->at(0);
+            Json::Document * document = command->at(0);
             if(document != nullptr)
             {
-                rapidjson::StringBuffer buffer;
-                rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-
-                document->Accept(writer);
-                const std::string json(buffer.GetString(), buffer.GetLength());
+                std::string json;
+                document->Serialize(&json);
                 this->mSyncComponent->Set(value, request.table(), json);
             }
         }
 
         for (size_t index = 0; index < command->size(); index++)
         {
-            rapidjson::Document * document = command->at(index);
+            Json::Document * document = command->at(index);
             if(document != nullptr)
             {
-                rapidjson::StringBuffer buffer;
-                rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-                document->Accept(writer);
-
-                response.add_jsons(buffer.GetString(), buffer.GetLength());
+                document->Serialize(response.add_jsons());
             }
         }
         return XCode::Successful;

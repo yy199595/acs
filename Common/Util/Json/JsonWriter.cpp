@@ -220,3 +220,101 @@ namespace Json
 		return false;
 	}
 }
+
+namespace Json
+{
+    Document &Document::Add(const char *key, int value)
+    {
+        rapidjson::GenericStringRef<char> name(key);
+        this->AddMember(name, value, this->GetAllocator());
+        return *this;
+    }
+
+    Document &Document::Add(const char *key, bool value)
+    {
+        rapidjson::GenericStringRef<char> name(key);
+        this->AddMember(name, value, this->GetAllocator());
+        return *this;
+    }
+
+    Document &Document::Add(const char *key, long long value)
+    {
+        rapidjson::GenericStringRef<char> name(key);
+        this->AddMember(name, value, this->GetAllocator());
+        return *this;
+    }
+
+    Document &Document::Add(const char *key, const char *value)
+    {
+        rapidjson::GenericStringRef<char> name(key);
+        this->AddMember(name, rapidjson::StringRef(value),
+                                  this->GetAllocator());
+        return *this;
+    }
+
+    Document &Document::Add(const char *key, const char *value, size_t size)
+    {
+        rapidjson::GenericStringRef<char> name(key);
+        this->AddMember(name, rapidjson::StringRef(value, size),
+                                  this->GetAllocator());
+        return *this;
+    }
+
+    Document &Document::Add(const char *key, const std::string &value)
+    {
+        rapidjson::GenericStringRef<char> name(key);
+        this->AddMember(name, rapidjson::StringRef(
+            value.c_str(), value.size()),this->GetAllocator());
+        return *this;
+    }
+
+    Document &Document::Add(const char *key, unsigned int value)
+    {
+        rapidjson::GenericStringRef<char> name(key);
+        this->AddMember(name, value, this->GetAllocator());
+        return *this;
+    }
+
+    Document &Document::Add(const char *key, float value)
+    {
+        rapidjson::GenericStringRef<char> name(key);
+        this->AddMember(name, value, this->GetAllocator());
+        return *this;
+    }
+
+    Document &Document::Add(const char *key, double value)
+    {
+        rapidjson::GenericStringRef<char> name(key);
+        this->AddMember(name, value, this->GetAllocator());
+        return *this;
+    }
+
+    Document &Document::Add(const char *key, unsigned long long value)
+    {
+        rapidjson::GenericStringRef<char> name(key);
+        this->AddMember(name, value, this->GetAllocator());
+        return *this;
+    }
+
+    Document &Document::Add(const char *key, Document &value)
+    {
+        rapidjson::GenericStringRef<char> name(key);
+        this->AddMember(name, (rapidjson::Document&)value, this->GetAllocator());
+        return *this;
+    }
+
+    Document &Document::Add(const char *key, rapidjson::Document &value)
+    {
+        rapidjson::GenericStringRef<char> name(key);
+        this->AddMember(name, value, this->GetAllocator());
+        return *this;
+    }
+
+    void Document::Serialize(std::string *json)
+    {
+        rapidjson::StringBuffer buffer;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+        this->Accept(writer);
+        json->append(buffer.GetString(), buffer.GetLength());
+    }
+}

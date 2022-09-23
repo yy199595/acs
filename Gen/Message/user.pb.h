@@ -41,7 +41,7 @@ struct TableStruct_user_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[1]
+  static const ::google::protobuf::internal::ParseTable schema[2]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -52,15 +52,138 @@ namespace user {
 class account_info;
 class account_infoDefaultTypeInternal;
 extern account_infoDefaultTypeInternal _account_info_default_instance_;
+class area_list;
+class area_listDefaultTypeInternal;
+extern area_listDefaultTypeInternal _area_list_default_instance_;
 }  // namespace user
 namespace google {
 namespace protobuf {
 template<> ::user::account_info* Arena::CreateMaybeMessage<::user::account_info>(Arena*);
+template<> ::user::area_list* Arena::CreateMaybeMessage<::user::area_list>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace user {
 
 // ===================================================================
+
+class area_list :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:user.area_list) */ {
+ public:
+  area_list();
+  virtual ~area_list();
+
+  area_list(const area_list& from);
+
+  inline area_list& operator=(const area_list& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  area_list(area_list&& from) noexcept
+    : area_list() {
+    *this = ::std::move(from);
+  }
+
+  inline area_list& operator=(area_list&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const area_list& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const area_list* internal_default_instance() {
+    return reinterpret_cast<const area_list*>(
+               &_area_list_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    0;
+
+  void Swap(area_list* other);
+  friend void swap(area_list& a, area_list& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline area_list* New() const final {
+    return CreateMaybeMessage<area_list>(nullptr);
+  }
+
+  area_list* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<area_list>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const area_list& from);
+  void MergeFrom(const area_list& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(area_list* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated int32 list = 1;
+  int list_size() const;
+  void clear_list();
+  static const int kListFieldNumber = 1;
+  ::google::protobuf::int32 list(int index) const;
+  void set_list(int index, ::google::protobuf::int32 value);
+  void add_list(::google::protobuf::int32 value);
+  const ::google::protobuf::RepeatedField< ::google::protobuf::int32 >&
+      list() const;
+  ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
+      mutable_list();
+
+  // @@protoc_insertion_point(class_scope:user.area_list)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::int32 > list_;
+  mutable std::atomic<int> _list_cached_byte_size_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_user_2eproto;
+};
+// -------------------------------------------------------------------
 
 class account_info :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:user.account_info) */ {
@@ -100,7 +223,7 @@ class account_info :
                &_account_info_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    0;
+    1;
 
   void Swap(account_info* other);
   friend void swap(account_info& a, account_info& b) {
@@ -199,6 +322,15 @@ class account_info :
   ::std::string* release_last_login_ip();
   void set_allocated_last_login_ip(::std::string* last_login_ip);
 
+  // .user.area_list user_area_list = 11;
+  bool has_user_area_list() const;
+  void clear_user_area_list();
+  static const int kUserAreaListFieldNumber = 11;
+  const ::user::area_list& user_area_list() const;
+  ::user::area_list* release_user_area_list();
+  ::user::area_list* mutable_user_area_list();
+  void set_allocated_user_area_list(::user::area_list* user_area_list);
+
   // int64 phone_num = 2;
   void clear_phone_num();
   static const int kPhoneNumFieldNumber = 2;
@@ -249,6 +381,7 @@ class account_info :
   ::google::protobuf::internal::ArenaStringPtr account_;
   ::google::protobuf::internal::ArenaStringPtr pass_word_;
   ::google::protobuf::internal::ArenaStringPtr last_login_ip_;
+  ::user::area_list* user_area_list_;
   ::google::protobuf::int64 phone_num_;
   ::google::protobuf::int64 user_id_;
   ::google::protobuf::int64 login_time_;
@@ -268,6 +401,40 @@ class account_info :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
+// area_list
+
+// repeated int32 list = 1;
+inline int area_list::list_size() const {
+  return list_.size();
+}
+inline void area_list::clear_list() {
+  list_.Clear();
+}
+inline ::google::protobuf::int32 area_list::list(int index) const {
+  // @@protoc_insertion_point(field_get:user.area_list.list)
+  return list_.Get(index);
+}
+inline void area_list::set_list(int index, ::google::protobuf::int32 value) {
+  list_.Set(index, value);
+  // @@protoc_insertion_point(field_set:user.area_list.list)
+}
+inline void area_list::add_list(::google::protobuf::int32 value) {
+  list_.Add(value);
+  // @@protoc_insertion_point(field_add:user.area_list.list)
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::int32 >&
+area_list::list() const {
+  // @@protoc_insertion_point(field_list:user.area_list.list)
+  return list_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
+area_list::mutable_list() {
+  // @@protoc_insertion_point(field_mutable_list:user.area_list.list)
+  return &list_;
+}
+
+// -------------------------------------------------------------------
+
 // account_info
 
 // string account = 1;
@@ -527,9 +694,62 @@ inline void account_info::set_login_channel(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:user.account_info.login_channel)
 }
 
+// .user.area_list user_area_list = 11;
+inline bool account_info::has_user_area_list() const {
+  return this != internal_default_instance() && user_area_list_ != nullptr;
+}
+inline void account_info::clear_user_area_list() {
+  if (GetArenaNoVirtual() == nullptr && user_area_list_ != nullptr) {
+    delete user_area_list_;
+  }
+  user_area_list_ = nullptr;
+}
+inline const ::user::area_list& account_info::user_area_list() const {
+  const ::user::area_list* p = user_area_list_;
+  // @@protoc_insertion_point(field_get:user.account_info.user_area_list)
+  return p != nullptr ? *p : *reinterpret_cast<const ::user::area_list*>(
+      &::user::_area_list_default_instance_);
+}
+inline ::user::area_list* account_info::release_user_area_list() {
+  // @@protoc_insertion_point(field_release:user.account_info.user_area_list)
+  
+  ::user::area_list* temp = user_area_list_;
+  user_area_list_ = nullptr;
+  return temp;
+}
+inline ::user::area_list* account_info::mutable_user_area_list() {
+  
+  if (user_area_list_ == nullptr) {
+    auto* p = CreateMaybeMessage<::user::area_list>(GetArenaNoVirtual());
+    user_area_list_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:user.account_info.user_area_list)
+  return user_area_list_;
+}
+inline void account_info::set_allocated_user_area_list(::user::area_list* user_area_list) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete user_area_list_;
+  }
+  if (user_area_list) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      user_area_list = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, user_area_list, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  user_area_list_ = user_area_list;
+  // @@protoc_insertion_point(field_set_allocated:user.account_info.user_area_list)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 

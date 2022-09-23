@@ -29,13 +29,14 @@ namespace Sentry
         bool ToSqlCommand(const db::mysql::update& messageData, std::string& sqlCommand, const std::string & key, std::string & value);
 
     private:
-		bool WriterToStream(std::stringstream& stream, const rapidjson::Value& jsonValue);
-
+        void GetFiles(const Message & message, std::stringstream & ss, char cc = ',');
+        bool WriterToStream(std::stringstream& stream, const rapidjson::Value& jsonValue);
         bool GetValue(rapidjson::Document & document, const std::string & key, std::string & value);
 
     private:
         ProtoComponent * mPorotComponent;
         std::stringstream mSqlCommandStream;
 		std::stringstream mSqlCommandStream2;
-	};
+        std::vector<const FieldDescriptor *> mFieldList;
+    };
 }

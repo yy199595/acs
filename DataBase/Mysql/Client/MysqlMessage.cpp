@@ -80,9 +80,7 @@ namespace Mysql
         while(MYSQL_ROW row = mysql_fetch_row(result1))
         {
             std::string json;
-            rapidjson::Document * jsonDocument =
-                new rapidjson::Document(rapidjson::kObjectType);
-
+            Json::Document * jsonDocument = new Json::Document();
             unsigned int fieldCount = mysql_field_count(sock);
             unsigned long* lengths = mysql_fetch_lengths(result1);
             for (unsigned int index = 0; index < fieldCount; index++)
@@ -96,19 +94,18 @@ namespace Mysql
         return true;
     }
 
-    bool QueryCommand::Write(rapidjson::Document &document, st_mysql_field *filed, const char *str, int len)
+    bool QueryCommand::Write(Json::Document &document, st_mysql_field *filed, const char *str, int len)
     {
         if(str == nullptr || len == 0)
         {
             return true;
         }
-        rapidjson::GenericStringRef<char> key(filed->name);
         switch(filed->type)
         {
             case enum_field_types::MYSQL_TYPE_TINY:
             {
                 int value = std::atol(str);
-                document.AddMember(key, value, document.GetAllocator());
+                document.Add(filed->name, value);
                 return true;
             }
             case enum_field_types::MYSQL_TYPE_LONG:
@@ -119,14 +116,14 @@ namespace Mysql
 #else
                 long long value = std::atoll(str);
 #endif
-                document.AddMember(key, value, document.GetAllocator());
+                document.Add(filed->name, value);
                 return true;
             }
             case enum_field_types::MYSQL_TYPE_FLOAT:
             case enum_field_types::MYSQL_TYPE_DOUBLE:
             {
                 double value = std::atof(str);
-                document.AddMember(key, value, document.GetAllocator());
+                document.Add(filed->name, value);
                 return true;
             }
             case enum_field_types::MYSQL_TYPE_BLOB:
@@ -135,7 +132,7 @@ namespace Mysql
             case enum_field_types::MYSQL_TYPE_VAR_STRING:
             {
                 rapidjson::Value value(str, len);
-                document.AddMember(key, value, document.GetAllocator());
+                document.Add(filed->name, str, len);
                 return true;
             }
             case enum_field_types::MYSQL_TYPE_JSON:
@@ -145,7 +142,7 @@ namespace Mysql
                 {
                     return false;
                 }
-                document.AddMember(key, doc, document.GetAllocator());
+                document.Add(filed->name, doc);
                 return true;
             }
         }
@@ -352,75 +349,44 @@ namespace Mysql
 
     bool CreateTabCommand::ForeachMessage(const FieldDescriptor *field)
     {
-        const Message & message = *this->mMessage;
+        const Message &message = *this->mMessage;
         this->mBuffer << "`" << field->name() << "` ";
-        const Reflection * reflection = this->mMessage->GetReflection();
-        switch(field->type())
+        if (field->is_repeated())
+        {
+            return false;
+        }
+        switch (field->type())
         {
             case FieldDescriptor::TYPE_INT32:
-            {
-                int value = reflection->GetInt32(message, field);
-                this->mBuffer << "INT(20) NOT NULL DEFAULT " << value;
-            }
+                this->mBuffer << "INT(20) NOT NULL DEFAULT 0";
                 return true;
             case FieldDescriptor::TYPE_UINT32:
-            {
-                unsigned int value = reflection->GetUInt32(message, field);
-                this->mBuffer << "INT(20) NOT NULL DEFAULT " << value;
-            }
+                this->mBuffer << "INT(20) NOT NULL DEFAULT 0";
                 return true;
             case FieldDescriptor::TYPE_UINT64:
-            {
-                unsigned long long value = reflection->GetUInt64(message, field);
-                this->mBuffer << "BIGINT(32) NOT NULL DEFAULT " << value;
-            }
+                this->mBuffer << "BIGINT(32) NOT NULL DEFAULT 0";
                 return true;
             case FieldDescriptor::TYPE_INT64:
-            {
-                long long value = reflection->GetInt64(message, field);
-                this->mBuffer << "BIGINT(32) NOT NULL DEFAULT " << value;
-            }
+                this->mBuffer << "BIGINT(32) NOT NULL DEFAULT 0";
                 return true;
             case FieldDescriptor::TYPE_FLOAT:
-            {
-                float value = reflection->GetFloat(message, field);
-                this->mBuffer << "FLOAT(20) NOT NULL DEFAULT " << value;
-            }
+                this->mBuffer << "FLOAT(20) NOT NULL DEFAULT 0";
                 return true;
             case FieldDescriptor::TYPE_DOUBLE:
-            {
-                double value = reflection->GetDouble(message, field);
-                this->mBuffer << "DOUBLE(32) NOT NULL DEFAULT " << value;
-            }
+                this->mBuffer << "DOUBLE(32) NOT NULL DEFAULT 0";
                 return true;
             case FieldDescriptor::TYPE_STRING:
-            {
-                std::string value = reflection->GetString(message, field);
-                this->mBuffer << "VARCHAR(64) NOT NULL DEFAULT '" << value << "'";
-            }
+                this->mBuffer << "VARCHAR(64) NOT NULL DEFAULT ''";
                 return true;
             case FieldDescriptor::TYPE_BYTES:
-            {
-                std::string value = reflection->GetString(message, field);
-                this->mBuffer << "BLOB(64) NOT NULL DEFAULT '" << value << "'";
-            }
+                this->mBuffer << "BLOB(64) NOT NULL DEFAULT ''";
                 return true;
             case FieldDescriptor::TYPE_BOOL:
-            {
-                bool value = reflection->GetBool(message, field);
-                this->mBuffer << "BOOLEAN NOT NULL DEFAULT " << value;
-            }
+                this->mBuffer << "BOOLEAN NOT NULL DEFAULT 0";
                 return true;
             case FieldDescriptor::TYPE_MESSAGE:
-            {
-                std::string json;
-                const Message & message = reflection->GetMessage(message, field);
-                if(util::MessageToJsonString(message, &json).ok())
-                {
-                    this->mBuffer << "JSON NOT NULL DEFAULT " << json;
-                    return true;
-                }
-            }
+                this->mBuffer << "JSON";
+                return true;
         }
         return false;
     }

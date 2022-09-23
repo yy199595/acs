@@ -57,4 +57,29 @@ namespace Json
         rapidjson::Writer<rapidjson::StringBuffer> * mWriter;
 	};
 }
+
+namespace Json
+{
+    class Document : protected rapidjson::Document
+    {
+    public:
+        Document() { this->SetObject(); }
+    public:
+        Document & Add(const char * key, int value);
+        Document & Add(const char * key, bool value);
+        Document & Add(const char * key, float value);
+        Document & Add(const char * key, double value);
+        Document & Add(const char * key, long long value);
+        Document & Add(const char * key, Document & value);
+        Document & Add(const char * key, const char * value);
+        Document & Add(const char * key, unsigned int value);
+        Document & Add(const char * key, unsigned long long value);
+        Document & Add(const char * key, const std::string & value);
+        Document & Add(const char * key, rapidjson::Document & value);
+        Document & Add(const char * key, const char * value, size_t len);
+
+    public:
+        void Serialize(std::string * json);
+    };
+}
 #endif //_JSONWRITER_H_

@@ -16,12 +16,31 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 
+extern PROTOBUF_INTERNAL_EXPORT_user_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_area_list_user_2eproto;
 namespace user {
+class area_listDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<area_list> _instance;
+} _area_list_default_instance_;
 class account_infoDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<account_info> _instance;
 } _account_info_default_instance_;
 }  // namespace user
+static void InitDefaultsarea_list_user_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::user::_area_list_default_instance_;
+    new (ptr) ::user::area_list();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::user::area_list::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_area_list_user_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsarea_list_user_2eproto}, {}};
+
 static void InitDefaultsaccount_info_user_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -33,18 +52,26 @@ static void InitDefaultsaccount_info_user_2eproto() {
   ::user::account_info::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<0> scc_info_account_info_user_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsaccount_info_user_2eproto}, {}};
+::google::protobuf::internal::SCCInfo<1> scc_info_account_info_user_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsaccount_info_user_2eproto}, {
+      &scc_info_area_list_user_2eproto.base,}};
 
 void InitDefaults_user_2eproto() {
+  ::google::protobuf::internal::InitSCC(&scc_info_area_list_user_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_account_info_user_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_user_2eproto[1];
+::google::protobuf::Metadata file_level_metadata_user_2eproto[2];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_user_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_user_2eproto = nullptr;
 
 const ::google::protobuf::uint32 TableStruct_user_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::user::area_list, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::user::area_list, list_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::user::account_info, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -60,34 +87,38 @@ const ::google::protobuf::uint32 TableStruct_user_2eproto::offsets[] PROTOBUF_SE
   PROTOBUF_FIELD_OFFSET(::user::account_info, is_new_user_),
   PROTOBUF_FIELD_OFFSET(::user::account_info, ared_id_),
   PROTOBUF_FIELD_OFFSET(::user::account_info, login_channel_),
+  PROTOBUF_FIELD_OFFSET(::user::account_info, user_area_list_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::user::account_info)},
+  { 0, -1, sizeof(::user::area_list)},
+  { 6, -1, sizeof(::user::account_info)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
+  reinterpret_cast<const ::google::protobuf::Message*>(&::user::_area_list_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::user::_account_info_default_instance_),
 };
 
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_user_2eproto = {
   {}, AddDescriptors_user_2eproto, "user.proto", schemas,
   file_default_instances, TableStruct_user_2eproto::offsets,
-  file_level_metadata_user_2eproto, 1, file_level_enum_descriptors_user_2eproto, file_level_service_descriptors_user_2eproto,
+  file_level_metadata_user_2eproto, 2, file_level_enum_descriptors_user_2eproto, file_level_service_descriptors_user_2eproto,
 };
 
 const char descriptor_table_protodef_user_2eproto[] =
-  "\n\nuser.proto\022\004user\"\325\001\n\014account_info\022\017\n\007a"
-  "ccount\030\001 \001(\t\022\021\n\tphone_num\030\002 \001(\003\022\021\n\tpass_"
-  "word\030\003 \001(\t\022\017\n\007user_id\030\004 \001(\003\022\022\n\nlogin_tim"
-  "e\030\005 \001(\003\022\025\n\rregister_time\030\006 \001(\003\022\025\n\rlast_l"
-  "ogin_ip\030\007 \001(\t\022\023\n\013is_new_user\030\010 \001(\010\022\017\n\007ar"
-  "ed_id\030\t \001(\005\022\025\n\rlogin_channel\030\n \001(\005b\006prot"
-  "o3"
+  "\n\nuser.proto\022\004user\"\031\n\tarea_list\022\014\n\004list\030"
+  "\001 \003(\005\"\376\001\n\014account_info\022\017\n\007account\030\001 \001(\t\022"
+  "\021\n\tphone_num\030\002 \001(\003\022\021\n\tpass_word\030\003 \001(\t\022\017\n"
+  "\007user_id\030\004 \001(\003\022\022\n\nlogin_time\030\005 \001(\003\022\025\n\rre"
+  "gister_time\030\006 \001(\003\022\025\n\rlast_login_ip\030\007 \001(\t"
+  "\022\023\n\013is_new_user\030\010 \001(\010\022\017\n\007ared_id\030\t \001(\005\022\025"
+  "\n\rlogin_channel\030\n \001(\005\022\'\n\016user_area_list\030"
+  "\013 \001(\0132\017.user.area_listb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_user_2eproto = {
   false, InitDefaults_user_2eproto, 
   descriptor_table_protodef_user_2eproto,
-  "user.proto", &assign_descriptors_table_user_2eproto, 242,
+  "user.proto", &assign_descriptors_table_user_2eproto, 310,
 };
 
 void AddDescriptors_user_2eproto() {
@@ -103,12 +134,317 @@ namespace user {
 
 // ===================================================================
 
-void account_info::InitAsDefaultInstance() {
+void area_list::InitAsDefaultInstance() {
 }
-class account_info::HasBitSetters {
+class area_list::HasBitSetters {
  public:
 };
 
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int area_list::kListFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+area_list::area_list()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:user.area_list)
+}
+area_list::area_list(const area_list& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr),
+      list_(from.list_) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:user.area_list)
+}
+
+void area_list::SharedCtor() {
+}
+
+area_list::~area_list() {
+  // @@protoc_insertion_point(destructor:user.area_list)
+  SharedDtor();
+}
+
+void area_list::SharedDtor() {
+}
+
+void area_list::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const area_list& area_list::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_area_list_user_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void area_list::Clear() {
+// @@protoc_insertion_point(message_clear_start:user.area_list)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  list_.Clear();
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* area_list::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<area_list*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // repeated int32 list = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) == 10) {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          parser_till_end = ::google::protobuf::internal::PackedInt32Parser;
+          object = msg->mutable_list();
+          if (size > end - ptr) goto len_delim_till_end;
+          auto newend = ptr + size;
+          if (size) ptr = parser_till_end(ptr, newend, object, ctx);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr == newend);
+          break;
+        } else if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
+        do {
+          msg->add_list(::google::protobuf::internal::ReadVarint(&ptr));
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 8 && (ptr += 1));
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool area_list::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:user.area_list)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // repeated int32 list = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, this->mutable_list())));
+        } else if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitiveNoInline<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 1, 10u, input, this->mutable_list())));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:user.area_list)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:user.area_list)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void area_list::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:user.area_list)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated int32 list = 1;
+  if (this->list_size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteTag(1, ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED, output);
+    output->WriteVarint32(_list_cached_byte_size_.load(
+        std::memory_order_relaxed));
+  }
+  for (int i = 0, n = this->list_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32NoTag(
+      this->list(i), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:user.area_list)
+}
+
+::google::protobuf::uint8* area_list::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:user.area_list)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated int32 list = 1;
+  if (this->list_size() > 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteTagToArray(
+      1,
+      ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED,
+      target);
+    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(
+        _list_cached_byte_size_.load(std::memory_order_relaxed),
+         target);
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteInt32NoTagToArray(this->list_, target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:user.area_list)
+  return target;
+}
+
+size_t area_list::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:user.area_list)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated int32 list = 1;
+  {
+    size_t data_size = ::google::protobuf::internal::WireFormatLite::
+      Int32Size(this->list_);
+    if (data_size > 0) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+            static_cast<::google::protobuf::int32>(data_size));
+    }
+    int cached_size = ::google::protobuf::internal::ToCachedSize(data_size);
+    _list_cached_byte_size_.store(cached_size,
+                                    std::memory_order_relaxed);
+    total_size += data_size;
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void area_list::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:user.area_list)
+  GOOGLE_DCHECK_NE(&from, this);
+  const area_list* source =
+      ::google::protobuf::DynamicCastToGenerated<area_list>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:user.area_list)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:user.area_list)
+    MergeFrom(*source);
+  }
+}
+
+void area_list::MergeFrom(const area_list& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:user.area_list)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  list_.MergeFrom(from.list_);
+}
+
+void area_list::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:user.area_list)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void area_list::CopyFrom(const area_list& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:user.area_list)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool area_list::IsInitialized() const {
+  return true;
+}
+
+void area_list::Swap(area_list* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void area_list::InternalSwap(area_list* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  list_.InternalSwap(&other->list_);
+}
+
+::google::protobuf::Metadata area_list::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_user_2eproto);
+  return ::file_level_metadata_user_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
+void account_info::InitAsDefaultInstance() {
+  ::user::_account_info_default_instance_._instance.get_mutable()->user_area_list_ = const_cast< ::user::area_list*>(
+      ::user::area_list::internal_default_instance());
+}
+class account_info::HasBitSetters {
+ public:
+  static const ::user::area_list& user_area_list(const account_info* msg);
+};
+
+const ::user::area_list&
+account_info::HasBitSetters::user_area_list(const account_info* msg) {
+  return *msg->user_area_list_;
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int account_info::kAccountFieldNumber;
 const int account_info::kPhoneNumFieldNumber;
@@ -120,6 +456,7 @@ const int account_info::kLastLoginIpFieldNumber;
 const int account_info::kIsNewUserFieldNumber;
 const int account_info::kAredIdFieldNumber;
 const int account_info::kLoginChannelFieldNumber;
+const int account_info::kUserAreaListFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 account_info::account_info()
@@ -143,6 +480,11 @@ account_info::account_info(const account_info& from)
   if (from.last_login_ip().size() > 0) {
     last_login_ip_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.last_login_ip_);
   }
+  if (from.has_user_area_list()) {
+    user_area_list_ = new ::user::area_list(*from.user_area_list_);
+  } else {
+    user_area_list_ = nullptr;
+  }
   ::memcpy(&phone_num_, &from.phone_num_,
     static_cast<size_t>(reinterpret_cast<char*>(&login_channel_) -
     reinterpret_cast<char*>(&phone_num_)) + sizeof(login_channel_));
@@ -155,9 +497,9 @@ void account_info::SharedCtor() {
   account_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   pass_word_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   last_login_ip_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&phone_num_, 0, static_cast<size_t>(
+  ::memset(&user_area_list_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&login_channel_) -
-      reinterpret_cast<char*>(&phone_num_)) + sizeof(login_channel_));
+      reinterpret_cast<char*>(&user_area_list_)) + sizeof(login_channel_));
 }
 
 account_info::~account_info() {
@@ -169,6 +511,7 @@ void account_info::SharedDtor() {
   account_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   pass_word_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   last_login_ip_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (this != internal_default_instance()) delete user_area_list_;
 }
 
 void account_info::SetCachedSize(int size) const {
@@ -189,6 +532,10 @@ void account_info::Clear() {
   account_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   pass_word_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   last_login_ip_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (GetArenaNoVirtual() == nullptr && user_area_list_ != nullptr) {
+    delete user_area_list_;
+  }
+  user_area_list_ = nullptr;
   ::memset(&phone_num_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&login_channel_) -
       reinterpret_cast<char*>(&phone_num_)) + sizeof(login_channel_));
@@ -303,6 +650,19 @@ const char* account_info::_InternalParse(const char* begin, const char* end, voi
         if (static_cast<::google::protobuf::uint8>(tag) != 80) goto handle_unusual;
         msg->set_login_channel(::google::protobuf::internal::ReadVarint(&ptr));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // .user.area_list user_area_list = 11;
+      case 11: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 90) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::user::area_list::_InternalParse;
+        object = msg->mutable_user_area_list();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
         break;
       }
       default: {
@@ -475,6 +835,17 @@ bool account_info::MergePartialFromCodedStream(
         break;
       }
 
+      // .user.area_list user_area_list = 11;
+      case 11: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (90 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_user_area_list()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -567,6 +938,12 @@ void account_info::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(10, this->login_channel(), output);
   }
 
+  // .user.area_list user_area_list = 11;
+  if (this->has_user_area_list()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      11, HasBitSetters::user_area_list(this), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -648,6 +1025,13 @@ void account_info::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(10, this->login_channel(), target);
   }
 
+  // .user.area_list user_area_list = 11;
+  if (this->has_user_area_list()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        11, HasBitSetters::user_area_list(this), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -688,6 +1072,13 @@ size_t account_info::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->last_login_ip());
+  }
+
+  // .user.area_list user_area_list = 11;
+  if (this->has_user_area_list()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *user_area_list_);
   }
 
   // int64 phone_num = 2;
@@ -776,6 +1167,9 @@ void account_info::MergeFrom(const account_info& from) {
 
     last_login_ip_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.last_login_ip_);
   }
+  if (from.has_user_area_list()) {
+    mutable_user_area_list()->::user::area_list::MergeFrom(from.user_area_list());
+  }
   if (from.phone_num() != 0) {
     set_phone_num(from.phone_num());
   }
@@ -830,6 +1224,7 @@ void account_info::InternalSwap(account_info* other) {
     GetArenaNoVirtual());
   last_login_ip_.Swap(&other->last_login_ip_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
+  swap(user_area_list_, other->user_area_list_);
   swap(phone_num_, other->phone_num_);
   swap(user_id_, other->user_id_);
   swap(login_time_, other->login_time_);
@@ -849,6 +1244,9 @@ void account_info::InternalSwap(account_info* other) {
 }  // namespace user
 namespace google {
 namespace protobuf {
+template<> PROTOBUF_NOINLINE ::user::area_list* Arena::CreateMaybeMessage< ::user::area_list >(Arena* arena) {
+  return Arena::CreateInternal< ::user::area_list >(arena);
+}
 template<> PROTOBUF_NOINLINE ::user::account_info* Arena::CreateMaybeMessage< ::user::account_info >(Arena* arena) {
   return Arena::CreateInternal< ::user::account_info >(arena);
 }

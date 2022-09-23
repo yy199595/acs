@@ -48,6 +48,9 @@ namespace Sentry
             mysqlClient->Start();
             this->mMysqlClients.emplace_back(std::move(mysqlClient));
         }
+        std::shared_ptr<Mysql::SqlCommand> command
+            = std::make_shared<Mysql::SqlCommand>("DROP TABLE user.account_info");
+        this->Run(this->GetClient(), command);
         return this->Ping(0);
     }
 
@@ -72,7 +75,6 @@ namespace Sentry
         if(response != nullptr && !response->IsOk())
         {
             CONSOLE_LOG_ERROR(response->GetError());
-			throw std::logic_error(response->GetError());
         }
         long long t2 = Helper::Time::GetNowMilTime();
         CONSOLE_LOG_INFO("sql use time = [" << t2 - t1 << "ms]");

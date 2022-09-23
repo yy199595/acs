@@ -1,65 +1,88 @@
 ﻿#include"MysqlHelper.h"
 #include"App/App.h"
 #include"Component/ProtoComponent.h"
+#include"google/protobuf/util/json_util.h"
 namespace Sentry
 {
     MysqlHelper::MysqlHelper(ProtoComponent *component)
     {
         this->mPorotComponent = component;
     }
+
+    void MysqlHelper::GetFiles(const Message &message, std::stringstream &ss, char cc)
+    {
+        this->mFieldList.clear();
+        const Reflection *pReflection = message.GetReflection();
+        pReflection->ListFields(message, &this->mFieldList);
+        for (size_t index = 0; index < this->mFieldList.size(); index++)
+        {
+            if(index != this->mFieldList.size() - 1)
+            {
+                ss << this->mFieldList[index]->name() << cc;
+                continue;
+            }
+            ss << this->mFieldList[index]->name();
+        }
+    }
+
 	bool MysqlHelper::ToSqlCommand(const std::string& table, const std::string& cmd,
 		Message& message, std::string& sql)
-	{
-		this->mSqlCommandStream.str("");
-		std::vector<const FieldDescriptor*> fieldList;
-		const Reflection* pReflection = message.GetReflection();
-		pReflection->ListFields(message, &fieldList);
-		mSqlCommandStream << cmd << " into " << table << "(";
-		for (size_t index = 0; index < fieldList.size(); index++)
-		{
-			if (index < fieldList.size() - 1)
-			{
-				mSqlCommandStream << fieldList[index]->name() << ",";
-				continue;
-			}
-			mSqlCommandStream << fieldList[index]->name();
-		}
-		mSqlCommandStream << ")values(";
+    {
+        this->mSqlCommandStream.str("");
+        this->mSqlCommandStream << cmd << " into " << table << '(';
 
-		for (auto fieldDesc : fieldList)
-		{
-			switch (fieldDesc->type())
-			{
-			case FieldDescriptor::Type::TYPE_STRING:
-			case FieldDescriptor::Type::TYPE_BYTES:
-				mSqlCommandStream << "'" << pReflection->GetString(message, fieldDesc) << "',";
-				break;
-			case FieldDescriptor::Type::TYPE_INT32:
-				mSqlCommandStream << pReflection->GetInt32(message, fieldDesc) << ",";
-				break;
-			case FieldDescriptor::Type::TYPE_UINT32:
-				mSqlCommandStream << pReflection->GetUInt32(message, fieldDesc) << ",";
-				break;
-			case FieldDescriptor::Type::TYPE_INT64:
-				mSqlCommandStream << pReflection->GetInt64(message, fieldDesc) << ",";
-				break;
-			case FieldDescriptor::Type::TYPE_UINT64:
-				mSqlCommandStream << pReflection->GetUInt64(message, fieldDesc) << ",";
-				break;
-			case FieldDescriptor::Type::TYPE_FLOAT:
-				mSqlCommandStream << pReflection->GetFloat(message, fieldDesc) << ",";
-				break;
-			case FieldDescriptor::Type::TYPE_DOUBLE:
-				mSqlCommandStream << pReflection->GetDouble(message, fieldDesc) << ",";
-				break;
-			default:
-				return false;
-			}
-		}
-		sql = mSqlCommandStream.str();
-		sql[sql.size() - 1] = ')';
-		return true;
-	}
+        this->GetFiles(message, this->mSqlCommandStream);
+        
+        this->mSqlCommandStream << ")values(";
+        const Reflection *pReflection = message.GetReflection();
+        for (const FieldDescriptor * fieldDesc: this->mFieldList)
+        {
+            if(fieldDesc->is_repeated())
+            {
+                return false;
+            }
+            switch (fieldDesc->type())
+            {
+                case FieldDescriptor::Type::TYPE_STRING:
+                case FieldDescriptor::Type::TYPE_BYTES:
+                    mSqlCommandStream << "'" << pReflection->GetString(message, fieldDesc) << "',";
+                    break;
+                case FieldDescriptor::Type::TYPE_INT32:
+                    mSqlCommandStream << pReflection->GetInt32(message, fieldDesc) << ",";
+                    break;
+                case FieldDescriptor::Type::TYPE_UINT32:
+                    mSqlCommandStream << pReflection->GetUInt32(message, fieldDesc) << ",";
+                    break;
+                case FieldDescriptor::Type::TYPE_INT64:
+                    mSqlCommandStream << pReflection->GetInt64(message, fieldDesc) << ",";
+                    break;
+                case FieldDescriptor::Type::TYPE_UINT64:
+                    mSqlCommandStream << pReflection->GetUInt64(message, fieldDesc) << ",";
+                    break;
+                case FieldDescriptor::Type::TYPE_FLOAT:
+                    mSqlCommandStream << pReflection->GetFloat(message, fieldDesc) << ",";
+                    break;
+                case FieldDescriptor::Type::TYPE_DOUBLE:
+                    mSqlCommandStream << pReflection->GetDouble(message, fieldDesc) << ",";
+                    break;
+                case FieldDescriptor::Type::TYPE_MESSAGE:
+                {
+                    std::string json;
+                    const Message & value = pReflection->GetMessage(message, fieldDesc);
+                    if(util::MessageToJsonString(value, &json).ok())
+                    {
+                        mSqlCommandStream << "'" << json << "',";
+                    }
+                    break;
+                }
+                default:
+                    return false;
+            }
+        }
+        sql = mSqlCommandStream.str();
+        sql[sql.size() - 1] = ')';
+        return true;
+    }
 
 	bool MysqlHelper::ToSqlCommand(const db::mysql::update& messageData, std::string& sqlCommand, const std::string & key, std::string & value)
 	{
@@ -178,6 +201,24 @@ namespace Sentry
 			this->mSqlCommandStream << number;
 			return true;
 		}
+        if(jsonValue.IsBool())
+        {
+            bool value = jsonValue.GetBool();
+            this->mSqlCommandStream << value ? 1 : 0;
+            return true;
+        }
+        if(jsonValue.IsObject())
+        {
+            rapidjson::StringBuffer buffer;
+            rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+            jsonValue.Accept(writer);
+            this->mSqlCommandStream << "'";
+            const char * str = buffer.GetString();
+            const size_t size = buffer.GetLength();
+            this->mSqlCommandStream.write(str, size);
+            this->mSqlCommandStream << "'";
+            return true;
+        }
 		return false;
 	}
 
