@@ -58,3 +58,81 @@ namespace Tcp
         return this->mBuffer;
     }
 }
+
+namespace Tcp
+{
+	bool Head::Add(const std::string& key, int value)
+	{
+		auto iter = this->find(key);
+		if(iter != this->end())
+		{
+			return false;
+		}
+		this->emplace(key, std::to_string(value));
+		return true;
+	}
+
+	bool Head::Parse(std::istream& os)
+	{
+		std::string line, key, value;
+		this->mType = (Tcp::Type)os.get();
+		this->mProto = (Tcp::Porto)os.get();
+		while (std::getline(os, line))
+		{
+			if (line.empty())
+			{
+				break;
+			}
+			size_t pos = line.find('=');
+			if (pos == std::string::npos)
+			{
+				return false;
+			}
+			key = line.substr(0, pos);
+			value = line.substr(pos + 1);
+			this->emplace(key, value);
+			line.clear();
+		}
+		return true;
+	}
+
+	bool Head::Serialize(std::ostream& os)
+	{
+		auto iter = this->begin();
+		for(; iter != this->end(); iter++)
+		{
+			const std::string & key = iter->first;
+			const std::string & val = iter->second;
+			os << key << '=' << val << "\n";
+		}
+		os << "\n";
+		return true;
+	}
+
+	bool Head::Add(const std::string& key, long long value)
+	{
+		auto iter = this->find(key);
+		if(iter != this->end())
+		{
+			return false;
+		}
+		this->emplace(key, std::to_string(value));
+		return true;
+	}
+
+	bool Head::Add(const std::string& key, const std::string& value)
+	{
+		auto iter = this->find(key);
+		if(iter != this->end())
+		{
+			return false;
+		}
+		this->emplace(key, value);
+		return true;
+	}
+
+	bool Head::Get(const std::string& key, std::string& value)
+	{
+
+	}
+}
