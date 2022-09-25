@@ -113,15 +113,7 @@ void RegisterServiceComponent()
 }
 int main(int argc, char **argv)
 {
-	try
-    {
-        RegisterComponent();
-        RegisterServiceComponent();
-        return (std::make_shared<App>(new ServerConfig(argc, argv)))->Run();
-    }
-    catch(std::logic_error & err)
-    {
-        std::cerr << err.what() << std::endl;
-        return -1;
-    }
+	RegisterComponent();
+	RegisterServiceComponent();
+	return (std::make_shared<App>(new ServerConfig(argc, argv)))->Run();
 }

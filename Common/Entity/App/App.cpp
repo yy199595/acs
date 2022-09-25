@@ -222,6 +222,7 @@ namespace Sentry
             {
                 continue;
             }
+			CONSOLE_LOG_INFO("start " << component->GetName());
             if (component->Cast<IStart>() != nullptr)
             {
                 ElapsedTimer timer;
@@ -230,8 +231,8 @@ namespace Sentry
                 });
                 if (!component->Cast<IStart>()->OnStart())
                 {
-                    throw std::logic_error(fmt::format(
-                            "start {0} failure", component->GetName()));
+					LOG_FATAL("start " << component->GetName() << " failure");
+					return;
                 }
                 this->mTimerComponent->CancelTimer(timeId);
                 LOG_DEBUG("start " << name << " successful use time = [" << timer.GetSecond() << "s]")

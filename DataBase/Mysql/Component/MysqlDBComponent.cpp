@@ -39,20 +39,27 @@ namespace Sentry
 	}
 
     bool MysqlDBComponent::OnStart()
-    {
-        for (int index = 0; index < this->mConfig.mMaxCount; index++)
-        {
-            std::shared_ptr<MysqlClient> mysqlClient
-                = std::make_shared<MysqlClient>(this->mConfig, this);
+	{
+		for (int index = 0; index < this->mConfig.mMaxCount; index++)
+		{
+			std::shared_ptr<MysqlClient> mysqlClient
+				= std::make_shared<MysqlClient>(this->mConfig, this);
 
-            mysqlClient->Start();
-            this->mMysqlClients.emplace_back(std::move(mysqlClient));
-        }
-        std::shared_ptr<Mysql::SqlCommand> command
-            = std::make_shared<Mysql::SqlCommand>("DROP TABLE user.account_info");
-        this->Run(this->GetClient(), command);
-        return this->Ping(0);
-    }
+			mysqlClient->Start();
+			this->mMysqlClients.emplace_back(std::move(mysqlClient));
+		}
+		try
+		{
+			std::shared_ptr<Mysql::SqlCommand> command
+				= std::make_shared<Mysql::SqlCommand>("DROP TABLE user.account_info");
+			this->Run(this->GetClient(), command);
+		}
+		catch (std::exception& e)
+		{
+			CONSOLE_LOG_ERROR(e.what());
+		}
+		return this->Ping(0);
+	}
 
     bool MysqlDBComponent::Ping(int index)
     {
@@ -75,6 +82,7 @@ namespace Sentry
         if(response != nullptr && !response->IsOk())
         {
             CONSOLE_LOG_ERROR(response->GetError());
+			throw std::logic_error(response->GetError());
         }
         long long t2 = Helper::Time::GetNowMilTime();
         CONSOLE_LOG_INFO("sql use time = [" << t2 - t1 << "ms]");
