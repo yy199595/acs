@@ -64,6 +64,8 @@ namespace Json
     {
     public:
         Document() { this->SetObject(); }
+        Document(const std::string & json);
+        Document(const char * json, size_t size);
     public:
         Document & Add(const char * key, int value);
         Document & Add(const char * key, bool value);
@@ -79,7 +81,13 @@ namespace Json
         Document & Add(const char * key, const char * value, size_t len);
 
     public:
-        void Serialize(std::string * json);
+        const rapidjson::Value * Get(const char * key) const;
+        const rapidjson::Value * Get(const char * k1, const char * k2) const;
+    public:
+        bool HasError() { return !this->HasParseError();}
+
+    public:
+        std::string * Serialize(std::string * json);
     };
 }
 #endif //_JSONWRITER_H_

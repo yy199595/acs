@@ -22,24 +22,7 @@ namespace Tcp
         Json,
         Protobuf
     };
- 	class Head : protected std::unordered_map<std::string, std::string>
-	{
-	 public:
-		bool Get(const std::string & key, std::string & value);
-	 public:
-		Tcp::Type GetType() const { return this->mType;}
-		Tcp::Porto GetProto() const { return this->mProto; }
-	 public:
-		bool Parse(std::istream & os);
-		bool Serialize(std::ostream & os);
-	 public:
-		bool Add(const std::string & key, int value);
-		bool Add(const std::string & key, long long value);
-		bool Add(const std::string & key, const std::string & value);
-	 private:
-		Tcp::Type mType;
-		Tcp::Porto mProto;
-	};
+
     class BinMessage
     {
     public:
@@ -61,6 +44,38 @@ namespace Tcp
         long long mUnitId;
     };
 }
+
+namespace Rpc
+{
+    class Head : protected std::unordered_map<std::string, std::string>
+    {
+    public:
+        bool Get(const std::string & key, std::string & value);
+    public:
+        Tcp::Type GetType() const { return this->mType;}
+        Tcp::Porto GetProto() const { return this->mProto; }
+    public:
+        bool Parse(std::istream & os);
+        bool Serialize(std::ostream & os);
+    public:
+        bool Add(const std::string & key, int value);
+        bool Add(const std::string & key, long long value);
+        bool Add(const std::string & key, const std::string & value);
+    private:
+        Tcp::Type mType;
+        Tcp::Porto mProto;
+    };
+
+    class Data
+    {
+    public:
+
+    public:
+        Head mHead;
+        std::string mBody;
+    };
+}
+
 typedef std::logic_error rpc_error;
 constexpr int RPC_PACK_HEAD_LEN = sizeof(int) + sizeof(char) + sizeof(char);
 

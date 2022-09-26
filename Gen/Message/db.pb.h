@@ -2114,6 +2114,12 @@ class mysql_query :
   ::std::string* release_where_json();
   void set_allocated_where_json(::std::string* where_json);
 
+  // int32 limit = 3;
+  void clear_limit();
+  static const int kLimitFieldNumber = 3;
+  ::google::protobuf::int32 limit() const;
+  void set_limit(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:db.mysql.query)
  private:
   class HasBitSetters;
@@ -2121,6 +2127,7 @@ class mysql_query :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr table_;
   ::google::protobuf::internal::ArenaStringPtr where_json_;
+  ::google::protobuf::int32 limit_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_db_2eproto;
 };
@@ -4085,6 +4092,20 @@ inline void mysql_query::set_allocated_where_json(::std::string* where_json) {
   }
   where_json_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), where_json);
   // @@protoc_insertion_point(field_set_allocated:db.mysql.query.where_json)
+}
+
+// int32 limit = 3;
+inline void mysql_query::clear_limit() {
+  limit_ = 0;
+}
+inline ::google::protobuf::int32 mysql_query::limit() const {
+  // @@protoc_insertion_point(field_get:db.mysql.query.limit)
+  return limit_;
+}
+inline void mysql_query::set_limit(::google::protobuf::int32 value) {
+  
+  limit_ = value;
+  // @@protoc_insertion_point(field_set:db.mysql.query.limit)
 }
 
 // -------------------------------------------------------------------

@@ -66,6 +66,11 @@ namespace Sentry
 			return false;
 		}
 		long long rpcId = response->rpc_id();
+        if(response->code() != (int)XCode::Successful)
+        {
+            LOG_ERROR("code = " << response->code()
+                << " error = " << response->error_str());
+        }
 		this->mMessageComponent->OnResponse(rpcId, response);
 		return true;
 	}

@@ -84,32 +84,22 @@ namespace Sentry
         return true;
     }
 
-	bool MysqlHelper::ToSqlCommand(const db::mysql::update& messageData, std::string& sqlCommand, const std::string & key, std::string & value)
+	bool MysqlHelper::ToSqlCommand(const db::mysql::update& messageData, std::string& sqlCommand)
 	{
-		rapidjson::Document whereJsonDocument;
-		rapidjson::Document updateJsonDocument;
-        const char * json1 = messageData.where_json().c_str();
-        const size_t length1 = messageData.where_json().size();
-		if (whereJsonDocument.Parse(json1, length1).HasParseError()
-            || !whereJsonDocument.IsObject())
-		{
-			return false;
-		}
-        this->GetValue(whereJsonDocument, key, value);
-        const char * json2 = messageData.update_json().c_str();
-        const size_t length2 = messageData.update_json().size();
-		if (updateJsonDocument.Parse(json2, length2).HasParseError()
-            || !updateJsonDocument.IsObject())
-		{
-			return false;
-		}
+        const std::string & json1 = messageData.where_json();
+        const std::string & json2 = messageData.update_json();
+        if(!this->Parse(this->mDocument1, json1)
+            || !this->Parse(this->mDocument2, json2))
+        {
+            return false;
+        }
 
 		size_t index = 0;
 		this->mSqlCommandStream.str("");
 		const std::string& table = messageData.table();
 		this->mSqlCommandStream << "update " << table << " set ";
-		auto iter1 = updateJsonDocument.MemberBegin();
-		for (; iter1 != updateJsonDocument.MemberEnd(); iter1++, index++)
+		auto iter1 = this->mDocument2.MemberBegin();
+		for (; iter1 != this->mDocument2.MemberEnd(); iter1++, index++)
 		{
 			const rapidjson::Value& jsonValue = iter1->value;
 			this->mSqlCommandStream << iter1->name.GetString() << "=";
@@ -117,15 +107,15 @@ namespace Sentry
 			{
 				return false;
 			}
-			if (index + 1 < updateJsonDocument.MemberCount())
+			if (index + 1 < this->mDocument2.MemberCount())
 			{
 				this->mSqlCommandStream << ",";
 			}
 		}
 		index = 0;
 		this->mSqlCommandStream << " where ";
-		auto iter2 = whereJsonDocument.MemberBegin();
-		for (; iter2 != whereJsonDocument.MemberEnd(); iter2++, index++)
+		auto iter2 = this->mDocument1.MemberBegin();
+		for (; iter2 != this->mDocument1.MemberEnd(); iter2++, index++)
 		{
 			const rapidjson::Value& jsonValue = iter2->value;
 			this->mSqlCommandStream << iter2->name.GetString() << "=";
@@ -133,7 +123,7 @@ namespace Sentry
 			{
 				return false;
 			}
-			if (index + 1 < whereJsonDocument.MemberCount())
+			if (index + 1 < this->mDocument1.MemberCount())
 			{
 				this->mSqlCommandStream << " and ";
 			}
@@ -164,6 +154,18 @@ namespace Sentry
             }
         }
         return false;
+    }
+
+    bool MysqlHelper::Parse(rapidjson::Document &doc, const std::string &json)
+    {
+        const char * str = json.c_str();
+        const size_t size = json.size();
+        return !doc.Parse(str, size).HasParseError() && doc.IsObject();
+    }
+
+    bool MysqlHelper::GetValue(const std::string &key, std::string &value)
+    {
+        return this->GetValue(this->mDocument1, key, value);
     }
 
 	bool MysqlHelper::WriterToStream(std::stringstream& stream, const rapidjson::Value& jsonValue)
@@ -222,23 +224,20 @@ namespace Sentry
 		return false;
 	}
 
-	bool MysqlHelper::ToSqlCommand(const db::mysql::remove& messageData, std::string& sqlCommand, const std::string & key, std::string & value)
+	bool MysqlHelper::ToSqlCommand(const db::mysql::remove& messageData, std::string& sqlCommand)
 	{
-		rapidjson::Document jsonDocument;
 		const std::string& json = messageData.where_json();
-		if (jsonDocument.Parse(json.c_str(), json.size()).HasParseError()
-            || !jsonDocument.IsObject())
-		{
-			return false;
-		}
-        this->GetValue(jsonDocument, key, value);
+        if(!this->Parse(this->mDocument1, json))
+        {
+            return false;
+        }
 
 		size_t index = 0;
 		this->mSqlCommandStream.str("");
 		const std::string& table = messageData.table();
 		this->mSqlCommandStream << "delete from " << table << " where ";
-		auto iter = jsonDocument.MemberBegin();
-		for (; iter != jsonDocument.MemberEnd(); iter++, index++)
+		auto iter = this->mDocument1.MemberBegin();
+		for (; iter != this->mDocument1.MemberEnd(); iter++, index++)
 		{
 			const char* key = iter->name.GetString();
 			this->mSqlCommandStream << key << "=";
@@ -247,7 +246,7 @@ namespace Sentry
 			{
 				return false;
 			}
-			if (index + 1 < jsonDocument.MemberCount())
+			if (index + 1 < this->mDocument1.MemberCount())
 			{
 				this->mSqlCommandStream << " and ";
 			}
@@ -256,51 +255,49 @@ namespace Sentry
 		return true;
 	}
 
-	bool MysqlHelper::ToSqlCommand(const db::mysql::add& request, std::string& sqlCommand, std::shared_ptr<Message> & message)
+	bool MysqlHelper::ToSqlCommand(const db::mysql::add& request, std::string& sqlCommand)
 	{
         LOG_CHECK_RET_FALSE(this->mPorotComponent);
-		message = this->mPorotComponent->New(request.data());
-		if (message == nullptr)
+		this->mMessage = this->mPorotComponent->New(request.data());
+		if (this->mMessage == nullptr)
 		{
 			return false;
 		}
 		const std::string& table = request.table();
-		return this->ToSqlCommand(table, "insert", *message, sqlCommand);
+		return this->ToSqlCommand(table, "insert", *this->mMessage, sqlCommand);
 	}
 
-	bool MysqlHelper::ToSqlCommand(const db::mysql::save& request, std::string& sqlCommand, std::shared_ptr<Message> & message)
+	bool MysqlHelper::ToSqlCommand(const db::mysql::save& request, std::string& sqlCommand)
 	{
         LOG_CHECK_RET_FALSE(this->mPorotComponent);
-		message = this->mPorotComponent->New(request.data());
-		if (message == nullptr)
+		this->mMessage = this->mPorotComponent->New(request.data());
+		if (this->mMessage == nullptr)
 		{
 			return false;
 		}
 		const std::string& table = request.table();
-		return this->ToSqlCommand(table, "replace", *message, sqlCommand);
+		return this->ToSqlCommand(table, "replace", *this->mMessage, sqlCommand);
 	}
 
-	bool MysqlHelper::ToSqlCommand(const db::mysql::query& request, std::string& sqlCommand, const std::string & key, std::string & value)
+	bool MysqlHelper::ToSqlCommand(const db::mysql::query& request, std::string& sqlCommand)
 	{
 		this->mSqlCommandStream.str("");
-		rapidjson::Document jsonDocument;
 		const std::string& json = request.where_json();
-		if (jsonDocument.Parse(json.c_str(), json.size()).HasParseError()
-            && !jsonDocument.IsObject())
-		{
-			return false;
-		}
-        this->GetValue(jsonDocument, key, value);
+        if(!this->Parse(this->mDocument1, json))
+        {
+            return false;
+        }
+
 		this->mSqlCommandStream << "select * from " << request.table();
-		if (jsonDocument.MemberCount() == 0)
+		if (this->mDocument1.MemberCount() == 0)
 		{
 			sqlCommand = this->mSqlCommandStream.str();
 			return true;
 		}
 		size_t index = 0;
 		this->mSqlCommandStream << " where ";
-		auto iter = jsonDocument.MemberBegin();
-		for (; iter != jsonDocument.MemberEnd(); iter++, index++)
+		auto iter = this->mDocument1.MemberBegin();
+		for (; iter != this->mDocument1.MemberEnd(); iter++, index++)
 		{
 			const char* key = iter->name.GetString();
 			const rapidjson::Value& jsonValue = iter->value;
@@ -326,11 +323,15 @@ namespace Sentry
 			{
 				return false;
 			}
-			if (index + 1 < jsonDocument.MemberCount())
+			if (index + 1 < this->mDocument1.MemberCount())
 			{
 				this->mSqlCommandStream << " and ";
 			}
 		}
+        if(request.limit() != 0)
+        {
+            this->mSqlCommandStream << " limit " << request.limit();
+        }
 		sqlCommand = this->mSqlCommandStream.str();
 		return true;
 	}

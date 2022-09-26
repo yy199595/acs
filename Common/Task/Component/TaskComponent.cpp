@@ -46,11 +46,6 @@ namespace Sentry
 		}
 	}
 
-	bool TaskComponent::LateAwake()
-	{
-		LOG_CHECK_RET_FALSE(this->mTimerComponent = this->GetComponent<TimerComponent>());
-		return true;
-	}
 #ifdef __DEBUG__
     void TaskComponent::OnSecondUpdate(const int tick)
     {
@@ -73,11 +68,16 @@ namespace Sentry
 
 	void TaskComponent::Sleep(long long ms)
 	{
-		unsigned int id = this->mRunContext->mCoroutineId;
-		StaticMethod* sleepMethod = NewMethodProxy(
-			&TaskComponent::Resume, this, id);
-		this->mTimerComponent->AddTimer(ms, sleepMethod);
-		this->YieldCoroutine();
+        TimerComponent * timerComponent = this->GetApp()->GetTimerComponent();
+
+        if(timerComponent != nullptr)
+        {
+            unsigned int id = this->mRunContext->mCoroutineId;
+            StaticMethod *sleepMethod = NewMethodProxy(
+                &TaskComponent::Resume, this, id);
+            timerComponent->AddTimer(ms, sleepMethod);
+            this->YieldCoroutine();
+        }
 	}
 
 	void TaskComponent::ResumeContext(TaskContext* co)

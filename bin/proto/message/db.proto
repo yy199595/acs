@@ -79,6 +79,7 @@ message mysql //mysql操作
     {
         string table = 1;
         string where_json = 2;
+        int32 limit = 3;
     }
     message remove
     {

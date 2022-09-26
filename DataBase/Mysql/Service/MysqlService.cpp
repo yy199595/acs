@@ -76,11 +76,11 @@ namespace Sentry
 	XCode MysqlService::Add(const db::mysql::add& request)
     {
         std::string sql;
-        std::shared_ptr<Message> message;
-        if (!this->mMysqlHelper->ToSqlCommand(request, sql, message))
+        if (!this->mMysqlHelper->ToSqlCommand(request, sql))
         {
             return XCode::CallArgsError;
         }
+        std::shared_ptr<Message> message = this->mMysqlHelper->GetData();
         std::shared_ptr<Mysql::SqlCommand> command
             = std::make_shared<Mysql::SqlCommand>(sql);
         std::shared_ptr<MysqlClient> mysqlClient =
@@ -114,8 +114,7 @@ namespace Sentry
 	XCode MysqlService::Save(const db::mysql::save& request)
     {
         std::string sql;
-        std::shared_ptr<Message> message;
-        if (!this->mMysqlHelper->ToSqlCommand(request, sql, message))
+        if (!this->mMysqlHelper->ToSqlCommand(request, sql))
         {
             return XCode::CallArgsError;
         }
@@ -123,7 +122,7 @@ namespace Sentry
             = std::make_shared<Mysql::SqlCommand>(sql);
         std::shared_ptr<MysqlClient> mysqlClient =
             this->mMysqlComponent->GetClient(request.flag());
-
+        std::shared_ptr<Message> message = this->mMysqlHelper->GetData();
         if (this->mSyncComponent != nullptr && message != nullptr)
         {
             std::string fullName = message->GetTypeName();
@@ -147,22 +146,22 @@ namespace Sentry
 
 	XCode MysqlService::Update(const db::mysql::update& request)
     {
-        std::string sql, key, value;
-        const std::string & fullName = request.table();
-        auto iter = this->mMainKeys.find(fullName);
-        if(iter != this->mMainKeys.end())
-        {
-            key = iter->second;
-        }
-        if (!this->mMysqlHelper->ToSqlCommand(request, sql, key, value))
+        std::string sql;
+        if (!this->mMysqlHelper->ToSqlCommand(request, sql))
         {
             return XCode::CallArgsError;
         }
-
-        if(this->mSyncComponent != nullptr && !key.empty() && !value.empty())
+        const std::string & fullName = request.table();
+        auto iter = this->mMainKeys.find(fullName);
+        if(this->mSyncComponent != nullptr && iter != this->mMainKeys.end())
         {
-            this->mSyncComponent->Del(value, fullName);
+            std::string value;
+            if (this->mMysqlHelper->GetValue(iter->second, value))
+            {
+                this->mSyncComponent->Del(value, fullName);
+            }
         }
+
         std::shared_ptr<Mysql::SqlCommand> command
             = std::make_shared<Mysql::SqlCommand>(sql);
 
@@ -177,19 +176,19 @@ namespace Sentry
 
 	XCode MysqlService::Delete(const db::mysql::remove& request)
     {
-        std::string sql, key, value;
-        auto iter = this->mMainKeys.find(request.table());
-        if(iter != this->mMainKeys.end())
-        {
-            key = iter->second;
-        }
-        if (!this->mMysqlHelper->ToSqlCommand(request, sql, key, value))
+        std::string sql;
+        if (!this->mMysqlHelper->ToSqlCommand(request, sql))
         {
             return XCode::CallArgsError;
         }
-        if(this->mSyncComponent != nullptr && !value.empty())
+        auto iter = this->mMainKeys.find(request.table());
+        if(this->mSyncComponent != nullptr && iter != this->mMainKeys.end())
         {
-            this->mSyncComponent->Del(value, request.table());
+            std::string value;
+            if (this->mMysqlHelper->GetValue(iter->second, value))
+            {
+                this->mSyncComponent->Del(value, request.table());
+            }
         }
         std::shared_ptr<Mysql::SqlCommand> command
             = std::make_shared<Mysql::SqlCommand>(sql);
@@ -207,12 +206,8 @@ namespace Sentry
     {
         std::string sql, key, value;
         const std::string & fullName = request.table();
-        auto iter = this->mMainKeys.find(fullName);
-        if(iter != this->mMainKeys.end())
-        {
-            key = iter->second;
-        }
-        if (!this->mMysqlHelper->ToSqlCommand(request, sql, key, value))
+
+        if (!this->mMysqlHelper->ToSqlCommand(request, sql))
         {
             return XCode::CallArgsError;
         }
@@ -226,25 +221,27 @@ namespace Sentry
         {
             return XCode::Failure;
         }
-        if(!value.empty() && this->mSyncComponent != nullptr && command->size() == 1)
-        {
-            Json::Document * document = command->at(0);
-            if(document != nullptr)
-            {
-                std::string json;
-                document->Serialize(&json);
-                this->mSyncComponent->Set(value, request.table(), json);
-            }
-        }
 
+        auto iter = this->mMainKeys.find(fullName);
         for (size_t index = 0; index < command->size(); index++)
         {
             Json::Document * document = command->at(index);
             if(document != nullptr)
             {
-                document->Serialize(response.add_jsons());
+                rapidjson::Document & doc = (rapidjson::Document&)(*document);
+                std::string * json = document->Serialize(response.add_jsons());
+                if (this->mSyncComponent != nullptr && iter != this->mMainKeys.end())
+                {
+                    std::string value;
+                    const std::string &key = iter->second;
+                    if (this->mMysqlHelper->GetValue(doc, key, value))
+                    {
+                        this->mSyncComponent->Set(value, fullName, *json);
+                    }
+                }
             }
         }
+
         return XCode::Successful;
     }
 }// namespace Sentry

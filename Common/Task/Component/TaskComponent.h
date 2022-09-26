@@ -51,8 +51,6 @@ namespace Sentry
     private:
 		void Awake() final;
 
-		bool LateAwake() final;
-
 		void OnSystemUpdate() final;
 
 		void OnLastFrameUpdate() final;
@@ -76,7 +74,6 @@ namespace Sentry
 		TaskContext* mRunContext;
 		Stack mSharedStack[SHARED_STACK_NUM];
 		std::queue<unsigned int> mLastQueues;
-		class TimerComponent* mTimerComponent;
 		std::queue<unsigned int> mResumeContexts;
 	};
 }

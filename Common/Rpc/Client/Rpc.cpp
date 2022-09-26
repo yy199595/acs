@@ -59,7 +59,7 @@ namespace Tcp
     }
 }
 
-namespace Tcp
+namespace Rpc
 {
 	bool Head::Add(const std::string& key, int value)
 	{

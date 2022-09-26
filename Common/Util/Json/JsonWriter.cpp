@@ -223,6 +223,16 @@ namespace Json
 
 namespace Json
 {
+    Document::Document(const std::string &json)
+    {
+        this->Parse(json.c_str(), json.size());
+    }
+
+    Document::Document(const char *json, size_t size)
+    {
+        this->Parse(json, size);
+    }
+
     Document &Document::Add(const char *key, int value)
     {
         rapidjson::GenericStringRef<char> name(key);
@@ -310,11 +320,41 @@ namespace Json
         return *this;
     }
 
-    void Document::Serialize(std::string *json)
+    std::string * Document::Serialize(std::string *json)
     {
         rapidjson::StringBuffer buffer;
         rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
         this->Accept(writer);
         json->append(buffer.GetString(), buffer.GetLength());
+        return json;
+    }
+
+    const rapidjson::Value *Document::Get(const char *key) const
+    {
+        if(!this->IsObject())
+        {
+            return nullptr;
+        }
+        auto iter = this->FindMember(key);
+        if(iter == this->MemberEnd())
+        {
+            return nullptr;
+        }
+        return &iter->value;
+    }
+
+    const rapidjson::Value *Document::Get(const char *k1, const char *k2) const
+    {
+        const rapidjson::Value * value = this->Get(k1);
+        if(value == nullptr || !value->IsObject())
+        {
+            return nullptr;
+        }
+        auto iter = value->FindMember(k2);
+        if(iter == value->MemberEnd())
+        {
+            return nullptr;
+        }
+        return &iter->value;
     }
 }
