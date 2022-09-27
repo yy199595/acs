@@ -151,12 +151,12 @@ namespace Rpc
         {
             size_t len = Helper::Math::Min(
                 this->mLen, (int)sizeof(buffer));
-            if(os.readsome(buffer, len) != len)
+            size_t count = os.readsome(buffer, len);
+            if(count > 0)
             {
-                return false;
+                this->mLen -= count;
+                this->mBody.append(buffer, count);
             }
-            this->mLen -= len;
-            this->mBody.append(buffer, len);
         }
         return true;
     }

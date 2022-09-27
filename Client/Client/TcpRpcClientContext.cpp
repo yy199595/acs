@@ -1,5 +1,5 @@
 #include"TcpRpcClientContext.h"
-#include"Message/RpcProtoMessage.h"
+#include"Client/Message.h"
 #include"Component/ClientComponent.h"
 namespace Client
 {
@@ -12,16 +12,16 @@ namespace Client
 
 	void TcpRpcClientContext::SendToServer(std::shared_ptr<c2s::rpc::request> request)
 	{
-		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> networkData =
-                std::make_shared<Tcp::Rpc::RpcProtoMessage>();
+		std::shared_ptr<Rpc::Data> data(new Rpc::Data());
 
-        networkData->mMessage = request;
-        networkData->mType = Tcp::Type ::Request;
+        data->SetType(Tcp::Type::Request);
+        data->SetProto(Tcp::Porto::Protobuf);
+        request->SerializeToString(data->GetBody());
 #ifdef ONLY_MAIN_THREAD
         this->Send(networkData);
 #else
         Asio::Context & io = this->mSocket->GetThread();
-        io.post(std::bind(&TcpRpcClientContext::Send, this, networkData));
+        io.post(std::bind(&TcpRpcClientContext::Send, this, data));
 #endif
 	}
 
@@ -45,7 +45,7 @@ namespace Client
         }
     }
 
-    void TcpRpcClientContext::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t)
+    void TcpRpcClientContext::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t size)
     {
         if (code)
         {
@@ -59,15 +59,15 @@ namespace Client
             case Tcp::DecodeState::Head:
             {
                 this->mState = Tcp::DecodeState::Body;
-                this->mMessage = std::make_shared<Tcp::BinMessage>();
-                int len = this->mMessage->DecodeHead(readStream);
+                this->mMessage = std::make_shared<Rpc::Data>();
+                int len = this->mMessage->ParseLen(readStream);
                 this->ReceiveMessage(len);
             }
                 break;
             case Tcp::DecodeState::Body:
             {
                 this->mState = Tcp::DecodeState::Head;
-                this->mMessage->DecodeBody(readStream);
+                this->mMessage->Parse(readStream, size);
                 const std::string & address = this->mSocket->GetAddress();
 #ifdef ONLY_MAIN_THREAD
                 this->mClientComponent->OnMessage(address, std::move(this->mMessage));

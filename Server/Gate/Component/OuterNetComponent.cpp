@@ -30,7 +30,7 @@ namespace Sentry
 		return true;
 	}
 
-	void OuterNetComponent::OnMessage(const std::string& address, std::shared_ptr<Tcp::BinMessage> message)
+	void OuterNetComponent::OnMessage(const std::string& address, std::shared_ptr<Rpc::Data> message)
 	{		
 		switch ((Tcp::Type)message->GetType())
 		{
@@ -46,16 +46,14 @@ namespace Sentry
 		}
 	}
 
-	bool OuterNetComponent::OnRequest(const std::string& address, const Tcp::BinMessage& message)
+	bool OuterNetComponent::OnRequest(const std::string& address, const Rpc::Data& message)
 	{
-		int len = 0;
-		const char* data = message.GetData(len);
 		std::shared_ptr<c2s::rpc::request> request
 			= std::make_shared<c2s::rpc::request>();
-		if (!request->ParseFromArray(data, len))
-		{
-			return false;
-		}
+        if(!message.ParseMessage(request))
+        {
+            return false;
+        }
 		request->set_address(address);
 		return this->mOuterMessageComponent->OnRequest(request) == XCode::Successful;
 	}

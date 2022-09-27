@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include"Lua/Table.h"
+#include"Client/Message.h"
 #include"Component/Component.h"
 #include"Client/InnerNetClient.h"
 #include"Listener/TcpServerListener.h"
@@ -8,7 +9,7 @@ namespace Sentry
 {
 	// 管理内网rpc的session
 	class InnerNetComponent : public Component, public TcpServerListener,
-                              public IRpc<Tcp::BinMessage>
+                              public IRpc<Rpc::Data>
 	{
 	 public:
 		InnerNetComponent() = default;
@@ -16,7 +17,7 @@ namespace Sentry
 	 public:
 		void StartClose(const std::string & address) final;
 		void OnCloseSocket(const std::string & address, XCode code) final;
-        void OnMessage(const std::string & address, std::shared_ptr<Tcp::BinMessage> message) final;
+        void OnMessage(const std::string & address, std::shared_ptr<Rpc::Data> message) final;
 	 protected:
         void Awake() final;
         bool LateAwake() final;
@@ -28,8 +29,8 @@ namespace Sentry
 		bool Send(const std::string & address, std::shared_ptr<com::rpc::request> message);
 		bool Send(const std::string & address, std::shared_ptr<com::rpc::response> message);
 	private:
-		bool OnRequest(const std::string & address, const Tcp::BinMessage& message);
-		bool OnResponse(const std::string& address, const Tcp::BinMessage& message);
+		bool OnRequest(const std::string & address, const Rpc::Data& message);
+		bool OnResponse(const std::string& address, const Rpc::Data& message);
 	 private:
         class NetThreadComponent * mNetComponent;
         class InnerNetMessageComponent* mMessageComponent;

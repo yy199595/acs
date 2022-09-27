@@ -21,7 +21,7 @@ namespace Sentry
 		return true;
 	}
 
-    void InnerNetComponent::OnMessage(const std::string &address, std::shared_ptr<Tcp::BinMessage> message)
+    void InnerNetComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Data> message)
     {
 		switch ((Tcp::Type)message->GetType())
 		{
@@ -40,31 +40,27 @@ namespace Sentry
 		}      
     }
 
-	bool InnerNetComponent::OnRequest(const std::string& address, const Tcp::BinMessage& message)
+	bool InnerNetComponent::OnRequest(const std::string& address, const Rpc::Data& message)
 	{
-		int len = 0;
-		const char * data = message.GetData(len);
 		std::shared_ptr<com::rpc::request> request
 			= std::make_shared<com::rpc::request>();
-		if (!request->ParseFromArray(data, len))
-		{
-			return false;
-		}
+        if(!message.ParseMessage(request))
+        {
+            return false;
+        }
 		request->set_address(address);
 		request->set_type(com::rpc_msg_type::rpc_msg_type_proto);
 		return this->mMessageComponent->OnRequest(request) == XCode::Successful;
 	}
 
-	bool InnerNetComponent::OnResponse(const std::string& address, const Tcp::BinMessage& message)
+	bool InnerNetComponent::OnResponse(const std::string& address, const Rpc::Data& message)
 	{
-		int len = 0;
-		const char* data = message.GetData(len);
 		std::shared_ptr<com::rpc::response> response
 			= std::make_shared<com::rpc::response>();
-		if (!response->ParseFromArray(data, len))
-		{
-			return false;
-		}
+        if(!message.ParseMessage(response))
+        {
+            return false;
+        }
 		long long rpcId = response->rpc_id();
         if(response->code() != (int)XCode::Successful)
         {

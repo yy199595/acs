@@ -1,6 +1,6 @@
 #pragma once
-#include"Client/Rpc.h"
 #include"XCode/XCode.h"
+#include"Client/Message.h"
 #include"Tcp/TcpContext.h"
 #include"Message/c2s.pb.h"
 #include"Source/TaskSource.h"
@@ -24,6 +24,6 @@ namespace Client
         char mDataBuffer[1024];
         Tcp::DecodeState mState;
         ClientComponent * mClientComponent;
-        std::shared_ptr<Tcp::BinMessage> mMessage;
+        std::shared_ptr<Rpc::Data> mMessage;
     };
 }

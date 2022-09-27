@@ -9,10 +9,9 @@
 #ifdef __DEBUG__
 #include"google/protobuf/util/json_util.h"
 #endif
-#include"Message/RpcProtoMessage.h"
+#include"Client/Message.h"
 #include"Component/OuterNetComponent.h"
 
-using namespace Tcp::Rpc;
 namespace Sentry
 {
 	OuterNetClient::OuterNetClient(std::shared_ptr<SocketProxy> socket,
@@ -73,15 +72,15 @@ namespace Sentry
             case Tcp::DecodeState::Head:
             {
                 this->mState = Tcp::DecodeState::Body;
-                this->mMessage = std::make_shared<Tcp::BinMessage>();
-                int len = this->mMessage->DecodeHead(readStream);
+                this->mMessage = std::make_shared<Rpc::Data>();
+                int len = this->mMessage->ParseLen(readStream);
                 this->ReceiveMessage(len);
             }
                 break;
             case Tcp::DecodeState::Body:
             {
                 this->mState = Tcp::DecodeState::Head;
-                if (!this->mMessage->DecodeBody(readStream))
+                if (!this->mMessage->Parse(readStream, size))
                 {
                     this->CloseSocket(XCode::UnKnowPacket);
                     return;
@@ -140,11 +139,11 @@ namespace Sentry
 
 	void OuterNetClient::SendToClient(std::shared_ptr<c2s::rpc::call> message)
 	{
-		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> request
-				= std::make_shared<Tcp::Rpc::RpcProtoMessage>();
+		std::shared_ptr<Rpc::Data> request(new Rpc::Data());
 
-        request->mMessage = message;
-        request->mType = Tcp::Type::Request;
+        request->SetType(Tcp::Type::Request);
+        request->SetProto(Tcp::Porto::Protobuf);
+        message->SerializeToString(request->GetBody());
 #ifdef ONLY_MAIN_THREAD
 		this->Send(request);
 #else
@@ -155,11 +154,11 @@ namespace Sentry
 
 	void OuterNetClient::SendToClient(std::shared_ptr<c2s::rpc::response> message)
 	{
-		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> response
-				= std::make_shared<Tcp::Rpc::RpcProtoMessage>();
+		std::shared_ptr<Rpc::Data> response(new Rpc::Data());
 
-        response->mMessage = message;
-        response->mType = Tcp::Type::Response;
+        response->SetType(Tcp::Type::Response);
+        response->SetProto(Tcp::Porto::Protobuf);
+        message->SerializeToString(response->GetBody());
 #ifdef ONLY_MAIN_THREAD
 		this->Send(response);
 #else

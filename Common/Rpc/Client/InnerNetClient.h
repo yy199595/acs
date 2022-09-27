@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include"Client/Rpc.h"
 #include"Tcp/TcpContext.h"
+#include"Client/Message.h"
 #include"Source/TaskSource.h"
 #include"Coroutine/CoroutineLock.h"
 #include<google/protobuf/message.h>
@@ -29,7 +30,7 @@ namespace Sentry
 	private:
         Tcp::DecodeState mState;
 		InnerNetComponent* mTcpComponent;
-        std::shared_ptr<Tcp::BinMessage> mMessage;
+        std::shared_ptr<Rpc::Data> mMessage;
         std::shared_ptr<asio::steady_timer> mTimer;
 	};
 }// namespace Sentry

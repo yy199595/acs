@@ -4,7 +4,7 @@
 
 #ifndef GAMEKEEPER_RPCPROXYCLIENT_H
 #define GAMEKEEPER_RPCPROXYCLIENT_H
-#include"Client/Rpc.h"
+#include"Client/Message.h"
 #include"Tcp/TcpContext.h"
 #include"Message/c2s.pb.h"
 using namespace Tcp;
@@ -38,7 +38,7 @@ namespace Sentry
         unsigned int mCallCount;
         Tcp::DecodeState mState;
         OuterNetComponent* mGateComponent;
-        std::shared_ptr<Tcp::BinMessage> mMessage;
+        std::shared_ptr<Rpc::Data> mMessage;
         std::shared_ptr<asio::steady_timer> mTimer;
 	};
 }

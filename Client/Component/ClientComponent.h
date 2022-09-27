@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include"Client/Rpc.h"
+#include"Client/Message.h"
 #include"Message/c2s.pb.h"
 #include"Lua/LocalTable.h"
 #include"Source/TaskSource.h"
@@ -37,7 +37,7 @@ namespace Client
     class TcpRpcClientContext;
 
     class ClientComponent : public RpcTaskComponent<c2s::rpc::response>,
-            public ILuaRegister,  public IRpc<Tcp::BinMessage>
+            public ILuaRegister,  public IRpc<Rpc::Data>
     {
     public:
         ClientComponent();
@@ -48,7 +48,7 @@ namespace Client
         void OnRequest(std::shared_ptr<c2s::rpc::call> t1);
 		bool StartConnect(const std::string & ip, unsigned short port);
 		std::shared_ptr<c2s::rpc::response> Call(std::shared_ptr<c2s::rpc::request> request);
-        void OnMessage(const std::string &address, std::shared_ptr<Tcp::BinMessage> message) final;
+        void OnMessage(const std::string &address, std::shared_ptr<Rpc::Data> message) final;
     protected:
 
         bool LateAwake() final;

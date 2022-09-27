@@ -39,11 +39,15 @@ namespace Rpc
         bool Parse(std::istream & os, size_t size);
     public:
         Head & GetHead() { return this->mHead;}
-        std::string & GetBody() { return this->mBody; }
+        std::string * GetBody() { return &mBody; }
         void SetType(Tcp::Type type) { this->mType = type; }
         void SetProto(Tcp::Porto proto) { this->mProto = proto; }
         const Tcp::Type & GetType() const { return this->mType; }
         const Tcp::Porto & GetProto() const { return this->mProto; }
+
+    public:
+        template<typename T>
+        bool ParseMessage(std::shared_ptr<T> message) const;
     private:
         int mLen;
         Head mHead;
@@ -51,6 +55,14 @@ namespace Rpc
         Tcp::Porto mProto;
         std::string mBody;
     };
+
+    template<typename T>
+    bool Data::ParseMessage(std::shared_ptr<T> message) const
+    {
+        const char * data = this->mBody.c_str();
+        const int size = (int)this->mBody.size();
+        return message->ParseFromArray(data, size);
+    }
 }
 
 

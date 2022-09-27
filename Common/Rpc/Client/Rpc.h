@@ -22,25 +22,6 @@ namespace Tcp
         Json,
         Protobuf
     };
-
-    class BinMessage
-    {
-    public:
-        BinMessage();
-        int DecodeHead(std::istream & is);
-        bool DecodeBody(std::istream & is);
-    public:
-        const char * GetData(int & size) const;
-        Tcp::Type GetType() const { return this->mType; }
-        Tcp::Porto GetProto() const { return this->mProto; }
-        long long GetUnitId() const { return this->mUnitId; }
-    private:
-        size_t mSize;
-        Tcp::Type mType;
-        Tcp::Porto mProto;
-        long long mUnitId;
-        std::string mBuffer;
-    };
 }
 
 

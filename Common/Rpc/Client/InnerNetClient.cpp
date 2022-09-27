@@ -1,7 +1,7 @@
 ﻿#include"InnerNetClient.h"
 #include"App/App.h"
 #include"Client/Rpc.h"
-#include"Message/RpcProtoMessage.h"
+#include"Client/Message.h"
 #include"Component/InnerNetComponent.h"
 
 #ifdef __DEBUG__
@@ -28,27 +28,28 @@ namespace Sentry
 	}
 
 	void InnerNetClient::SendToServer(std::shared_ptr<com::rpc::response> message)
-	{
-		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> response
-            = std::make_shared<Tcp::Rpc::RpcProtoMessage>();
+    {
+        std::shared_ptr<Rpc::Data> response = std::make_shared<Rpc::Data>();
 
-        response->mMessage = message;
-        response->mType = Tcp::Type::Response;
+        response->SetType(Tcp::Type::Response);
+        response->SetProto(Tcp::Porto::Protobuf);
+        message->SerializeToString(response->GetBody());
+
 #ifdef ONLY_MAIN_THREAD
-		this->Send(response);
+        this->Send(response);
 #else
-        asio::io_service & t = this->mSocket->GetThread();
+        asio::io_service &t = this->mSocket->GetThread();
         t.post(std::bind(&InnerNetClient::Send, this, response));
 #endif
-	}
+    }
 
 	void InnerNetClient::SendToServer(std::shared_ptr<com::rpc::request> message)
 	{
-		std::shared_ptr<Tcp::Rpc::RpcProtoMessage> request
-				= std::make_shared<Tcp::Rpc::RpcProtoMessage>();
+		std::shared_ptr<Rpc::Data> request(new Rpc::Data());
 
-        request->mMessage = message;
-        request->mType = Tcp::Type::Request;
+        request->SetType(Tcp::Type::Request);
+        request->SetProto(Tcp::Porto::Protobuf);
+        message->SerializeToString(request->GetBody());
 #ifdef ONLY_MAIN_THREAD
 		this->Send(request);
 #else
@@ -99,15 +100,15 @@ namespace Sentry
             case Tcp::DecodeState::Head:
             {
                 this->mState = Tcp::DecodeState::Body;
-                this->mMessage = std::make_shared<Tcp::BinMessage>();
-                int len = this->mMessage->DecodeHead(readStream);
+                this->mMessage = std::make_shared<Rpc::Data>();
+                int len = this->mMessage->ParseLen(readStream);
                 this->ReceiveMessage(len);
             }
                 break;
             case Tcp::DecodeState::Body:
             {
                 this->mState = Tcp::DecodeState::Head;
-                if (!this->mMessage->DecodeBody(readStream))
+                if (!this->mMessage->Parse(readStream, size))
                 {
                     this->CloseSocket(XCode::UnKnowPacket);
                     return;

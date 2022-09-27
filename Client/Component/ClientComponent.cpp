@@ -44,10 +44,8 @@ namespace Client
         LOG_INFO("call client func = " << t1->func());
 	}
 
-    void ClientComponent::OnMessage(const std::string &address, std::shared_ptr<Tcp::BinMessage> message)
+    void ClientComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Data> message)
     {
-        int len = 0;
-        const char * data = message->GetData(len);
         Tcp::Type type = (Tcp::Type)message->GetType();
         Tcp::Porto proto = (Tcp::Porto)message->GetProto();
         switch(proto)
@@ -63,7 +61,7 @@ namespace Client
                 {
                     std::shared_ptr<c2s::rpc::call> request
                             = std::make_shared<c2s::rpc::call>();
-                    if(request->ParseFromArray(data, len))
+                    if(message->ParseMessage(request))
                     {
                         this->OnRequest(request);
                     }
@@ -72,7 +70,7 @@ namespace Client
                 {
                     std::shared_ptr<c2s::rpc::response> response
                         = std::make_shared<c2s::rpc::response>();
-                    if(response->ParseFromArray(data, len))
+                    if(message->ParseMessage(response))
                     {
                         this->OnResponse(response->rpc_id(), response);
                     }
