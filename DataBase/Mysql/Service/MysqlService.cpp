@@ -222,6 +222,11 @@ namespace Sentry
             return XCode::Failure;
         }
 
+        if(command->size() == 0)
+        {
+            throw std::logic_error("query data form " + fullName + " size = 0");
+        }
+
         auto iter = this->mMainKeys.find(fullName);
         for (size_t index = 0; index < command->size(); index++)
         {

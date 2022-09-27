@@ -1,38 +1,40 @@
 ﻿#include"App/App.h"
+#include"Config/ServiceConfig.h"
+
 #include"Component/TimerComponent.h"
 #include"Component/TaskComponent.h"
 #include"Component/LuaScriptComponent.h"
-
 #include"Component/TcpServerComponent.h"
-#include"Config/ServiceConfig.h"
 #include"Component/RedisDataComponent.h"
 #include"Component/UnitMgrComponent.h"
-#include"Component/HttpComponent.h"
-#include"Service/GateService.h"
 #include"Component/ConsoleComponent.h"
-#include"Component/InnerNetMessageComponent.h"
 #include"Component/NetThreadComponent.h"
-#include"Component/InnerNetComponent.h"
 #include"Component/RedisRegistryComponent.h"
 #include"Component/OperatorComponent.h"
 #include"Component/LoggerComponent.h"
-#include"Component/OuterNetMessageComponent.h"
-#include"Component/OuterNetComponent.h"
 #include"Component/ProtoComponent.h"
-#include"Service/LuaService.h"
-#include"Component/HttpWebComponent.h"
 
-#include"Service/LocalLuaHttpService.h"
+#include"Component/InnerNetComponent.h"
+#include"Component/OuterNetComponent.h"
+#include"Component/OuterNetMessageComponent.h"
+#include"Component/InnerNetMessageComponent.h"
 
 #include"Component/GateAgentComponent.h"
 #include"Component/UserSyncComponent.h"
 #include"Component/ClientComponent.h"
-
 #include"Component/RedisSubComponent.h"
-#include"Component/HttpRpcComponent.h"
-#include"Service/ServiceAgent.h"
 
+
+#include"Component/HttpComponent.h"
+#include"Component/HttpWebComponent.h"
+#include"Component/HttpRpcComponent.h"
+
+
+#include"Service/LuaService.h"
+#include"Service/GateService.h"
+#include"Service/ServiceAgent.h"
 #include"Service/HttpWebService.h"
+#include"Service/LocalLuaHttpService.h"
 
 #ifdef __ENABLE_MONGODB__
 #include"Service/MongoService.h"
@@ -115,5 +117,5 @@ int main(int argc, char **argv)
 {
 	RegisterComponent();
 	RegisterServiceComponent();
-	return (std::make_shared<App>(new ServerConfig(argc, argv)))->Run();
+	return std::make_shared<App>(new ServerConfig(argc, argv))->Run();
 }

@@ -21,14 +21,16 @@ namespace Sentry
 	{
 		if (!Helper::File::ReadTxtFile(this->mConfigPath, this->mContent))
 		{
-			throw std::logic_error("not find config : " + mConfigPath);
+            CONSOLE_LOG_ERROR("not find config " << this->mConfigPath);
+            return false;
 		}
 		if (!this->ParseJson(this->mContent))
 		{
-			throw std::logic_error("parse json : " + mConfigPath + " failure");
+            CONSOLE_LOG_ERROR("parse " << this->mConfigPath << " failure");
+            return false;
 		}
-        IF_THROW_ERROR(this->GetMember("area_id",this->mNodeId));
-        IF_THROW_ERROR(this->GetMember("node_name",this->mNodeName));
+        this->GetMember("area_id",this->mNodeId);
+        this->GetMember("node_name",this->mNodeName);
 
         if(this->GetJsonValue("listener") != nullptr)
         {

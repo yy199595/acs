@@ -42,13 +42,22 @@ function Server.AllServiceStart()
 
     MysqlComponent.Create("user.account_info", {"account"})
 
-    coroutine.start(Server.StartInsert)
-    coroutine.start(Server.StartInsert)
-    coroutine.start(Server.StartInsert)
-    coroutine.start(Server.StartInsert)
-    coroutine.start(Server.StartInsert)
-
-
+    MysqlComponent.Add("user.account_info", {
+        account = "646585122@qq.com",
+        user_id = 199595,
+        phone_num = 13716061995,
+        pass_word = "199595yjz.",
+        register_time = os.time(),
+        last_login_ip = "127.0.0.1",
+    })
+    local r1 = MongoComponent.InsertOnce("user.data_account", {
+        _id = "646585122@qq.com",
+        login_ip = "127.0.0.1",
+        user_id = 1122,
+        login_time = os.time(),
+        register_time = os.time(),
+        token = "0x00ssdjsaklj"
+    })
 
     MysqlComponent.Update("user.account_info", {
         account = "646585122@qq.com"
@@ -63,14 +72,6 @@ function Server.AllServiceStart()
     })
     table.print(res)
 
-    local r1 = MongoComponent.InsertOnce("user1.data_account", {
-        _id = "646585122@qq.com",
-        login_ip = "127.0.0.1",
-        user_id = 1122,
-        login_time = os.time(),
-        register_time = os.time(),
-        token = "0x00ssdjsaklj"
-    })
 
     local r3 = MongoComponent.InsertOnce("user2.data_account", {
         _id = "646585123@qq.com",

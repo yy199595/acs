@@ -68,11 +68,6 @@ message rpc
         json = 1;
         proto = 2;
     }
-    message data
-    {
-        map<string, string> head = 1;
-        google.protobuf.Any data = 2;
-    }
      message request
      {
           int64 user_id = 1;
