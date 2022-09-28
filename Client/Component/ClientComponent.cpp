@@ -11,20 +11,21 @@
 namespace Client
 {
 	ClientTask::ClientTask(int ms)
-        : Sentry::IRpcTask<c2s::rpc::response>(ms)
+        : Sentry::IRpcTask<Rpc::Data>(ms)
 	{
 		this->mTaskId = Guid::Create();
 	}
 
-	void ClientTask::OnResponse(std::shared_ptr<c2s::rpc::response> response)
+	void ClientTask::OnResponse(std::shared_ptr<Rpc::Data> response)
 	{
 		this->mTask.SetResult(response);
 	}
 
     void ClientTask::OnTimeout()
     {
-        std::shared_ptr<c2s::rpc::response> response(new c2s::rpc::response());
-        response->set_code((int)XCode::CallTimeout);
+        std::shared_ptr<Rpc::Data> response(new Rpc::Data());
+
+        response->GetHead().Add("code", (int)XCode::CallTimeout);
         this->mTask.SetResult(response);
     }
 
@@ -48,34 +49,20 @@ namespace Client
     {
         Tcp::Type type = (Tcp::Type)message->GetType();
         Tcp::Porto proto = (Tcp::Porto)message->GetProto();
-        switch(proto)
+        switch(type)
         {
-            case Tcp::Porto::Json:
+            case Tcp::Type::Request:
             {
 
             }
                 break;
-            case Tcp::Porto::Protobuf:
-            {
-                if(type == Tcp::Type::Request)
+            case Tcp::Type::Response:
+                long long rpcId = 0;
+                if(message->GetHead().Get("rpc", rpcId))
                 {
-                    std::shared_ptr<c2s::rpc::call> request
-                            = std::make_shared<c2s::rpc::call>();
-                    if(message->ParseMessage(request))
-                    {
-                        this->OnRequest(request);
-                    }
+                    this->OnResponse(rpcId, message);
                 }
-                else if(type == Tcp::Type::Response)
-                {
-                    std::shared_ptr<c2s::rpc::response> response
-                        = std::make_shared<c2s::rpc::response>();
-                    if(message->ParseMessage(response))
-                    {
-                        this->OnResponse(response->rpc_id(), response);
-                    }
-                }
-            }
+                break;
         }
     }
 
@@ -96,10 +83,11 @@ namespace Client
 		return true;
     }
 
-	std::shared_ptr<c2s::rpc::response> ClientComponent::Call(std::shared_ptr<c2s::rpc::request> request)
+	std::shared_ptr<Rpc::Data> ClientComponent::Call(std::shared_ptr<Rpc::Data> request)
     {
         std::shared_ptr<ClientTask> clienRpcTask(new ClientTask(0));
-        request->set_rpc_id(clienRpcTask->GetRpcId());
+
+        request->GetHead().Add("rpc", clienRpcTask->GetRpcId());
 
         this->mTcpClient->SendToServer(request);
         return this->AddTask(clienRpcTask)->Await();

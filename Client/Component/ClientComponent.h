@@ -17,18 +17,18 @@ namespace Sentry
 
 namespace Client
 {
-    class ClientTask : public Sentry::IRpcTask<c2s::rpc::response>
+    class ClientTask : public Sentry::IRpcTask<Rpc::Data>
     {
     public:
         ClientTask(int ms);
     public:
         void OnTimeout() final;
         long long GetRpcId() { return this->mTaskId; }
-        void OnResponse(std::shared_ptr<c2s::rpc::response> response);
-        std::shared_ptr<c2s::rpc::response> Await() { return this->mTask.Await(); }
+        void OnResponse(std::shared_ptr<Rpc::Data> response);
+        std::shared_ptr<Rpc::Data> Await() { return this->mTask.Await(); }
     private:
         long long mTaskId;
-        TaskSource<std::shared_ptr<c2s::rpc::response>> mTask;
+        TaskSource<std::shared_ptr<Rpc::Data>> mTask;
     };
 }
 
@@ -36,7 +36,7 @@ namespace Client
 {
     class TcpRpcClientContext;
 
-    class ClientComponent : public RpcTaskComponent<c2s::rpc::response>,
+    class ClientComponent : public RpcTaskComponent<Rpc::Data>,
             public ILuaRegister,  public IRpc<Rpc::Data>
     {
     public:
@@ -47,7 +47,7 @@ namespace Client
     public:
         void OnRequest(std::shared_ptr<c2s::rpc::call> t1);
 		bool StartConnect(const std::string & ip, unsigned short port);
-		std::shared_ptr<c2s::rpc::response> Call(std::shared_ptr<c2s::rpc::request> request);
+		std::shared_ptr<Rpc::Data> Call(std::shared_ptr<Rpc::Data> request);
         void OnMessage(const std::string &address, std::shared_ptr<Rpc::Data> message) final;
     protected:
 

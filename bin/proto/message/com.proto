@@ -60,38 +60,6 @@ message type
   }
 }
 
-message rpc
-{
-    enum msg_type
-    {
-        none = 0;
-        json = 1;
-        proto = 2;
-    }
-     message request
-     {
-          int64 user_id = 1;
-          int64 rpc_id = 2;
-          string func = 3;
-          string address = 4;
-          bytes json = 6;
-          msg_type type = 7;
-          google.protobuf.Any data = 5;
-     }
-     message response
-     {
-          int32 code = 1;
-          int64 rpc_id = 2;
-          string error_str = 3;
-          bytes json = 6;
-          google.protobuf.Any data = 5;
-     }
-     message auth
-     {
-          string token = 1;
-     }
-}
-
 message http
 {
     message data

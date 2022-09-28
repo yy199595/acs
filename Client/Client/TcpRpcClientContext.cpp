@@ -10,18 +10,13 @@ namespace Client
         this->mState = Tcp::DecodeState::Head;
     }
 
-	void TcpRpcClientContext::SendToServer(std::shared_ptr<c2s::rpc::request> request)
+	void TcpRpcClientContext::SendToServer(std::shared_ptr<Rpc::Data> message)
 	{
-		std::shared_ptr<Rpc::Data> data(new Rpc::Data());
-
-        data->SetType(Tcp::Type::Request);
-        data->SetProto(Tcp::Porto::Protobuf);
-        request->SerializeToString(data->GetBody());
 #ifdef ONLY_MAIN_THREAD
-        this->Send(networkData);
+        this->Send(message);
 #else
         Asio::Context & io = this->mSocket->GetThread();
-        io.post(std::bind(&TcpRpcClientContext::Send, this, data));
+        io.post(std::bind(&TcpRpcClientContext::Send, this, message));
 #endif
 	}
 

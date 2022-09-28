@@ -11,22 +11,6 @@ message ServerInfo
 
 message rpc
 {
-    message request
-    {
-        int64 rpc_id = 1;
-        string address = 2;
-        string method_name = 3;
-        uint32 message_idx = 4;
-        google.protobuf.Any data = 5;
-    }
-    message response
-    {
-        int32 code = 1;
-        int64 rpc_id = 2;
-        int64 sock_id = 3;
-        string error_str = 4;
-        google.protobuf.Any data = 5;
-    }
     message call
     {
         string func = 1;

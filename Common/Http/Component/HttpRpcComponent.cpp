@@ -3,6 +3,7 @@
 //
 
 #include"HttpRpcComponent.h"
+#include"Client/Message.h"
 #include"Service/Service.h"
 #include"String/StringHelper.h"
 #include"Client/HttpHandlerClient.h"
@@ -45,19 +46,19 @@ namespace Sentry
             return;
         }
         TaskComponent * taskComponent = this->GetApp()->GetTaskComponent();
-        std::shared_ptr<com::rpc::request> rpcRequest(new com::rpc::request());
+
+
+        std::shared_ptr<Rpc::Data> data(Rpc::Data());
 
         if(!rpcInterfaceConfig->Request.empty())
         {
-            rpcRequest->set_json(request->GetContent());
-            rpcRequest->set_type(com::rpc_msg_type_json);
+
         }
 
         std::string userId;
         if(request->GetHead("user_id", userId))
         {
             long long id = std::stoll(userId);
-            rpcRequest->set_user_id(id);
         }
 
         if(!rpcInterfaceConfig->IsAsync)
@@ -65,7 +66,7 @@ namespace Sentry
 
             return;
         }
-        taskComponent->Start([targetService, method, rpcRequest, rpcInterfaceConfig, this, response, httpClient]()
+        taskComponent->Start([targetService, method, rpcInterfaceConfig, this, response, httpClient]()
         {
 
         });
