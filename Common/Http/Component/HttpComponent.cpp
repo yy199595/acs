@@ -43,10 +43,9 @@ namespace Sentry
         }
         std::shared_ptr<HttpTask> httpRpcTask = httpGetRequest->MakeTask(second);
         std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
-
-        this->AddTask(httpRpcTask);
+        
         httpAsyncClient->Request(httpGetRequest);
-        std::shared_ptr<HttpAsyncResponse> response = httpRpcTask->Await();
+        std::shared_ptr<HttpAsyncResponse> response = this->AddTask(httpRpcTask)->Await();
         if(this->mClientPools.size() < 100)
         {
             this->mClientPools.push(httpAsyncClient);
@@ -63,37 +62,36 @@ namespace Sentry
 	}
 
 	XCode HttpComponent::Download(const string& url, const string& path)
-	{
-		if(!Helper::Directory::MakeDir(path))
-		{
-			return XCode::Failure;
-		}
+    {
+        if (!Helper::Directory::MakeDir(path))
+        {
+            return XCode::Failure;
+        }
 
-		std::fstream * fs = new std::fstream();
-		fs->open(path, std::ios::binary | std::ios::in | std::ios::out);
-		if(!fs->is_open())
-		{
-			delete fs;
-			return XCode::Failure;
-		}
-		std::shared_ptr<HttpGetRequest> httpRequest = HttpGetRequest::Create(url);
-		if(httpRequest == nullptr)
-		{
-			return XCode::HttpUrlParseError;
-		}
+        std::fstream *fs = new std::fstream();
+        fs->open(path, std::ios::binary | std::ios::in | std::ios::out);
+        if (!fs->is_open())
+        {
+            delete fs;
+            return XCode::Failure;
+        }
+        std::shared_ptr<HttpGetRequest> httpRequest = HttpGetRequest::Create(url);
+        if (httpRequest == nullptr)
+        {
+            return XCode::HttpUrlParseError;
+        }
         std::shared_ptr<HttpTask> httpTask = httpRequest->MakeTask(0);
-		std::shared_ptr<HttpRequestClient> requestClient = this->CreateClient();
+        std::shared_ptr<HttpRequestClient> requestClient = this->CreateClient();
 
-        this->AddTask(httpTask);
         requestClient->Request(httpRequest, fs);
-        std::shared_ptr<HttpAsyncResponse> response = httpTask->Await();
-        if(this->mClientPools.size() < 100)
+        std::shared_ptr<HttpAsyncResponse> response = this->AddTask(httpTask)->Await();
+        if (this->mClientPools.size() < 100)
         {
             this->mClientPools.push(requestClient);
         }
 
         return response->GetCode() ? XCode::Failure : XCode::Successful;
-	}
+    }
 
 	std::shared_ptr<HttpAsyncResponse> HttpComponent::Post(const std::string& url, const std::string& data, float second)
 	{

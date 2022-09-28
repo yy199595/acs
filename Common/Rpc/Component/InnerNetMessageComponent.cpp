@@ -6,6 +6,7 @@
 #include"InnerNetComponent.h"
 #include"Timer/ElapsedTimer.h"
 #include"Service/LocalService.h"
+#include"Async/RpcTaskSource.h"
 namespace Sentry
 {
 	void InnerNetMessageComponent::Awake()
@@ -24,12 +25,14 @@ namespace Sentry
 		return true;
 	}
 
-	XCode InnerNetMessageComponent::OnRequest(std::shared_ptr<com::rpc::request> request)
+	XCode InnerNetMessageComponent::OnRequest(std::shared_ptr<Rpc::Data> message)
 	{
-		if(!RpcServiceConfig::ParseFunName(request->func(), this->mService, this->mMethod))
-		{
-            return XCode::NotFoundRpcConfig;
-		}
+        std::string func, address;
+        const Rpc::Head & head = message->GetHead();
+        LOG_RPC_CHECK_ARGS(head.Get("func", func));
+        LOG_RPC_CHECK_ARGS(head.Get("address", address));
+        LOG_RPC_CHECK_ARGS(message->GetMethod(this->mService, this->mMethod));
+
 		Service * logicService = this->GetApp()->GetService(this->mService);
 		if (logicService == nullptr || !logicService->IsStartService())
 		{
@@ -42,51 +45,60 @@ namespace Sentry
 		{
             return XCode::NotFoundRpcConfig;
 		}
-		if(!rpcInterfaceConfig->Request.empty())
-		{
-			if(!request->has_data())
-			{
-                LOG_ERROR("call " << rpcInterfaceConfig->FullName << " not proto data"
-					<< " need proto type " << rpcInterfaceConfig->Request);
-				return XCode::CallArgsError;
-			}
-			this->mFullName.clear();
-			const std::string & url = request->data().type_url();
-			if(!Any::ParseAnyTypeUrl(url, &this->mFullName)
-				|| rpcInterfaceConfig->Request != this->mFullName)
-			{
-                LOG_ERROR("call " << rpcInterfaceConfig->FullName << " need "
-					<< rpcInterfaceConfig->FullName << " but use " << this->mFullName);
-				return XCode::CallArgsError;
-			}
-		}
+		if(!rpcInterfaceConfig->Request.empty() && message->GetBody()->empty())
+        {
+            return XCode::CallArgsError;
+        }
 
 		const std::string& service = rpcInterfaceConfig->Service;
-		std::shared_ptr<com::rpc::response> response = std::make_shared<com::rpc::response>();
 		if (!rpcInterfaceConfig->IsAsync)
-		{
-			const std::string& func = rpcInterfaceConfig->Method;
-			XCode code = logicService->Invoke(func, request, response);
-			if(request->rpc_id() != 0)
-			{
-                response->set_code((int)code);
-                response->set_rpc_id(request->rpc_id());
-                this->mRpcClientComponent->Send(request->address(), response);
-			}
-            return XCode::Successful;
-		}
-
-		this->mTaskComponent->Start([request, this, logicService, rpcInterfaceConfig, response]()
-		{
-			const std::string& func = rpcInterfaceConfig->Method;
-			XCode code = logicService->Invoke(func, request, response);
-			if(request->rpc_id() != 0)
+        {
+            const std::string &func = rpcInterfaceConfig->Method;
+            XCode code = logicService->Invoke(func, message);
+            if (head.Has("rpc"))
             {
-                response->set_code((int) code);
-                response->set_rpc_id(request->rpc_id());
-                this->mRpcClientComponent->Send(request->address(), response);
+                message->GetHead().Add("code", (int) code);
+                this->mRpcClientComponent->Send(address, message);
+            }
+            return XCode::Successful;
+        }
+
+		this->mTaskComponent->Start([message, address, this, logicService, rpcInterfaceConfig]()
+		{
+			const std::string& func = rpcInterfaceConfig->Method;
+			XCode code = logicService->Invoke(func, message);
+            if(message->GetHead().Has("rpc"))
+            {
+                message->GetHead().Add("code", (int) code);
+                this->mRpcClientComponent->Send(address, message);
             }
         });
 		return XCode::Successful;
 	}
+
+    std::shared_ptr<Rpc::Data> InnerNetMessageComponent::Call(
+        const std::string &address, std::shared_ptr<Rpc::Data> message)
+    {
+        if (!this->mRpcClientComponent->Send(address, message))
+        {
+            return nullptr;
+        }
+        std::shared_ptr<RpcTaskSource> taskSource =
+            std::make_shared<RpcTaskSource>(0);
+        return this->AddTask(taskSource)->Await();
+    }
+
+    bool InnerNetMessageComponent::Send(const std::string &address, std::shared_ptr<Rpc::Data> message)
+    {
+        assert(message->GetType() != Tcp::Type::None);
+        assert(message->GetProto() != Tcp::Porto::None);
+        std::shared_ptr<InnerNetClient> netClient =
+            this->mRpcClientComponent->GetOrCreateSession(address);
+        if(netClient == nullptr)
+        {
+            return false;
+        }
+        netClient->SendData(message);
+        return true;
+    }
 }// namespace Sentry

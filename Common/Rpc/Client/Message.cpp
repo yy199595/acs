@@ -18,7 +18,8 @@ namespace Rpc
         return true;
     }
 
-    bool Head::Get(const std::string &key, int &value)
+
+    bool Head::Get(const std::string &key, int &value) const
     {
         auto iter = this->find(key);
         if(iter == this->end())
@@ -29,7 +30,7 @@ namespace Rpc
         return true;
     }
 
-    bool Head::Get(const std::string &key, long long &value)
+    bool Head::Get(const std::string &key, long long &value) const
     {
         auto iter = this->find(key);
         if(iter == this->end())
@@ -38,6 +39,12 @@ namespace Rpc
         }
         value = std::stoll(iter->second);
         return true;
+    }
+
+    bool Head::Has(const std::string &key) const
+    {
+        auto iter = this->find(key);
+        return iter != this->end();
     }
 
     bool Head::Remove(const std::string &key)
@@ -51,7 +58,7 @@ namespace Rpc
         return true;
     }
 
-    bool Head::Get(const std::string& key, std::string& value)
+    bool Head::Get(const std::string& key, std::string& value) const
     {
         auto iter = this->find(key);
         if(iter == this->end())
@@ -64,6 +71,7 @@ namespace Rpc
 
     size_t Head::Parse(std::istream& os)
     {
+        this->clear();
         size_t len = 0;
         std::string line, key, value;
         while (std::getline(os, line))
@@ -76,7 +84,7 @@ namespace Rpc
             size_t pos = line.find('=');
             if (pos == std::string::npos)
             {
-                return false;
+                return -1;
             }
             key = line.substr(0, pos);
             value = line.substr(pos + 1);
@@ -86,16 +94,27 @@ namespace Rpc
         return len;
     }
 
+    size_t Head::GetLength()
+    {
+        size_t len = 0;
+        auto iter = this->begin();
+        for (; iter != this->end(); iter++)
+        {
+            len += (iter->first.size() + 1);
+            len += (iter->second.size() + 1);
+        }
+        return len + 1;
+    }
+
     bool Head::Serialize(std::ostream& os)
     {
         auto iter = this->begin();
         for(; iter != this->end(); iter++)
         {
-            const std::string & key = iter->first;
-            const std::string & val = iter->second;
-            os << key << '=' << val << "\n";
+            os.write(iter->first.c_str(), iter->first.size()) << '=';
+            os.write(iter->second.c_str(), iter->second.size()) << '\n';
         }
-        os << "\n";
+        os << '\n';
         return true;
     }
 
@@ -141,23 +160,56 @@ namespace Rpc
         {
             return false;
         }
-        char buffer[128] = { 0 };
-        this->mLen -= this->mHead.Parse(os);
-        if(this->mLen > 0)
+        this->mBody.clear();
+        char buffer[128] = {0};
+        size_t len = this->mHead.Parse(os);
+        if (len == -1)
+        {
+            return false;
+        }
+        this->mLen -= len;
+        if (this->mLen > 0)
         {
             this->mBody.reserve(this->mLen);
         }
-        while(this->mLen > 0)
+        while (this->mLen > 0)
         {
             size_t len = Helper::Math::Min(
-                this->mLen, (int)sizeof(buffer));
+                this->mLen, (int) sizeof(buffer));
             size_t count = os.readsome(buffer, len);
-            if(count > 0)
+            if (count > 0)
             {
                 this->mLen -= count;
                 this->mBody.append(buffer, count);
             }
         }
+        return true;
+    }
+
+    XCode Data::GetCode(XCode code) const
+    {
+        int value = (int)code;
+        if(this->mHead.Get("code", value))
+        {
+            return (XCode)value;
+        }
+        return code;
+    }
+
+    bool Data::GetMethod(std::string &service, std::string &method) const
+    {
+        std::string value;
+        if(!this->mHead.Get("func", value))
+        {
+            return false;
+        }
+        size_t pos = value.find('.');
+        if(pos == std::string::npos)
+        {
+            return false;
+        }
+        service = value.substr(0, pos);
+        method = value.substr(pos + 1);
         return true;
     }
 
@@ -169,8 +221,11 @@ namespace Rpc
             char buf[sizeof(int)];
         } buffer;
         buffer.len = this->mHead.GetLength() + this->mBody.size();
+
         os.write(buffer.buf, sizeof(int));
         os << (char) this->mType << (char) this->mProto;
+
+        this->mHead.Serialize(os);
         os.write(this->mBody.c_str(), this->mBody.size());
         return 0;
     }

@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include"RpcTaskComponent.h"
+#include"Client/Message.h"
 #include"Async/RpcTaskSource.h"
 
 namespace Sentry
@@ -17,7 +18,7 @@ namespace Sentry
 		long long Time;
 	};
 #endif
-    class InnerNetMessageComponent : public RpcTaskComponent<com::rpc::response>
+    class InnerNetMessageComponent : public RpcTaskComponent<Rpc::Data>
 	{
 	 public:
 		InnerNetMessageComponent() = default;
@@ -27,7 +28,11 @@ namespace Sentry
 		bool LateAwake() final;
         void OnTaskTimeout(long long rpcId);
     public:
-		XCode OnRequest(std::shared_ptr<com::rpc::request> request);      
+		XCode OnRequest(std::shared_ptr<Rpc::Data> request);
+
+    public:
+        bool Send(const std::string & address, std::shared_ptr<Rpc::Data> message);
+        std::shared_ptr<Rpc::Data> Call(const std::string & address, std::shared_ptr<Rpc::Data> message);
     private:
     private:
         std::string mMethod;

@@ -2,6 +2,7 @@
 
 #include<memory>
 #include"ServiceHost.h"
+#include"Client/Message.h"
 #include"Message/c2s.pb.h"
 #include"Json/JsonWriter.h"
 #include"Config/ServiceConfig.h"
@@ -13,8 +14,7 @@ namespace Sentry
 {
 	class ServiceMethod;
 	class InnerNetClient;
-    class Service : public Component, public ILuaRegister, public ServiceHost,
-							 public IService<com::rpc::request, com::rpc::response>
+    class Service : public Component, public ILuaRegister, public ServiceHost, public IServiceBase
 	{
 	 public:
 		Service();
@@ -32,21 +32,22 @@ namespace Sentry
 		XCode Call(long long userId, const std::string& func);
 		XCode Call(long long userId, const std::string& func, const Message& message);
 		XCode Call(long long userId, const std::string& func, std::shared_ptr<Message> response);
-        XCode Call(long long userId, std::shared_ptr<com::rpc::request> request, std::shared_ptr<Message> response);
         XCode Call(long long userId, const std::string& func, const Message& message, std::shared_ptr<Message> response);
-		XCode Call(const std::string& address, std::shared_ptr<com::rpc::request> request, std::shared_ptr<Message> response);
 	public:
         bool IsStartComplete() final{return this->GetHostSize() > 0; };
         const RpcServiceConfig & GetServiceConfig() { return *this->mConfig; }
         const std::string & GetLocalHost() final { return this->mLocalAddress; }
         const std::string & GetServiceName() final { return this->GetName(); }
-		XCode SendRequest(const std::string& address, std::shared_ptr<com::rpc::request> request);
-		std::shared_ptr<com::rpc::request> NewRpcRequest(const std::string& func, long long userId);
-		std::shared_ptr<com::rpc::request> NewRpcRequest(const std::string& func, long long userId, const Message& message);
+    public:
+        bool StartSend(const std::string & address, const std::string & func, long long userId, const Message * message);
+        std::shared_ptr<Rpc::Data> StartCall(const std::string & address, const std::string & func, long long userId, const Message * message);
 	 protected:
 		bool LateAwake() override;
 		bool LoadConfig(const rapidjson::Value & json);
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) override;
+
+    public:
+        virtual XCode Invoke(const std::string & method, std::shared_ptr<Rpc::Data> message) = 0;
 	private:
 		RpcServiceConfig * mConfig;
         std::string mLocalAddress;

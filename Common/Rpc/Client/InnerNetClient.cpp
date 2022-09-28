@@ -27,36 +27,15 @@ namespace Sentry
 #endif
 	}
 
-	void InnerNetClient::SendToServer(std::shared_ptr<com::rpc::response> message)
+    void InnerNetClient::SendData(std::shared_ptr<Rpc::Data> message)
     {
-        std::shared_ptr<Rpc::Data> response = std::make_shared<Rpc::Data>();
-
-        response->SetType(Tcp::Type::Response);
-        response->SetProto(Tcp::Porto::Protobuf);
-        message->SerializeToString(response->GetBody());
-
 #ifdef ONLY_MAIN_THREAD
-        this->Send(response);
+        this->Send(message);
 #else
         asio::io_service &t = this->mSocket->GetThread();
-        t.post(std::bind(&InnerNetClient::Send, this, response));
+        t.post(std::bind(&InnerNetClient::Send, this, message));
 #endif
     }
-
-	void InnerNetClient::SendToServer(std::shared_ptr<com::rpc::request> message)
-	{
-		std::shared_ptr<Rpc::Data> request(new Rpc::Data());
-
-        request->SetType(Tcp::Type::Request);
-        request->SetProto(Tcp::Porto::Protobuf);
-        message->SerializeToString(request->GetBody());
-#ifdef ONLY_MAIN_THREAD
-		this->Send(request);
-#else
-        asio::io_service & t = this->mSocket->GetThread();
-        t.post(std::bind(&InnerNetClient::Send, this, request));
-#endif
-	}
 
 	void InnerNetClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{
@@ -99,9 +78,12 @@ namespace Sentry
         {
             case Tcp::DecodeState::Head:
             {
+                Asio::Code code;
                 this->mState = Tcp::DecodeState::Body;
                 this->mMessage = std::make_shared<Rpc::Data>();
                 int len = this->mMessage->ParseLen(readStream);
+                size_t count = this->mSocket->GetSocket().available(code);
+                assert(count >= len);
                 this->ReceiveMessage(len);
             }
                 break;

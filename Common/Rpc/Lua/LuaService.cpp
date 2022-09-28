@@ -13,74 +13,87 @@ using namespace Sentry;
 namespace Lua
 {
 	int Service::Call(lua_State* lua)
-	{
-		if (!lua_isuserdata(lua, 1))
-		{
-			luaL_error(lua, "call paremeter first is service");
-			return 0;
-		}
-		std::string address;
-		long long userId = 0;
-		std::shared_ptr<com::rpc::request> request(new com::rpc::request());
-		Sentry::Service* callComponent = UserDataParameter::Read<Sentry::Service*>(lua, 1);
-		if (lua_isinteger(lua, 2)) //userId
-		{
-			userId = lua_tointeger(lua, 2);
-			request->set_user_id(userId);
-			if(!callComponent->GetHost(userId, address))
-			{
-				luaL_error(lua, "not find user address : %lld", userId);
-				return 0;
-			}
-		}
-		else if (lua_isstring(lua, 2)) //address
-		{
-			address.append(lua_tostring(lua, 2));
-		}
-		if (address.empty())
-		{
-			luaL_error(lua, "call service address is empty");
-			return 0;
-		}
-		if (!lua_isstring(lua, 3))
-		{
-			luaL_error(lua, "not find service function");
-			return 1;
-		}
-		std::string method = lua_tostring(lua, 3);
-		const RpcServiceConfig & rpcServiceConfig = callComponent->GetServiceConfig();
-		const RpcInterfaceConfig* rpcInterfaceConfig = rpcServiceConfig.GetConfig(method);
-		if (rpcInterfaceConfig == nullptr)
-		{
-			luaL_error(lua, "call [%s] not found", method.c_str());
-			return 0;
-		}
-		if (!rpcInterfaceConfig->Request.empty())
-		{
-			ProtoComponent * messageComponent = App::Get()->GetMsgComponent();
-			std::shared_ptr<Message> message = messageComponent->Read(lua, rpcInterfaceConfig->Request, 4);
-			if(message == nullptr)
-			{
-				luaL_error(lua, "read request paremeter error");
-				return 0;
-			}
-			request->mutable_data()->PackFrom(*message);
-		}
+    {
+        if (!lua_isuserdata(lua, 1))
+        {
+            luaL_error(lua, "call paremeter first is service");
+            return 0;
+        }
+        std::string address;
+        long long userId = 0;
+        Sentry::Service *service = UserDataParameter::Read<Sentry::Service *>(lua, 1);
+        InnerNetMessageComponent *netMessageComponent = App::Get()->GetComponent<InnerNetMessageComponent>();
+        if (netMessageComponent == nullptr)
+        {
+            luaL_error(lua, "not find InnerNetMessageComponent");
+            return 0;
+        }
+        if (lua_isinteger(lua, 2)) //userId
+        {
+            userId = lua_tointeger(lua, 2);
+            if (!service->GetHost(userId, address))
+            {
+                luaL_error(lua, "not find user address : %lld", userId);
+                return 0;
+            }
+        }
+        else if (lua_isstring(lua, 2)) //address
+        {
+            address.append(lua_tostring(lua, 2));
+        }
+        if (address.empty())
+        {
+            luaL_error(lua, "call service address is empty");
+            return 0;
+        }
+        if (!lua_isstring(lua, 3))
+        {
+            luaL_error(lua, "not find service function");
+            return 1;
+        }
+        std::string method = lua_tostring(lua, 3);
+        const RpcServiceConfig &rpcServiceConfig = service->GetServiceConfig();
+        const RpcInterfaceConfig *rpcInterfaceConfig = rpcServiceConfig.GetConfig(method);
+        if (rpcInterfaceConfig == nullptr)
+        {
+            luaL_error(lua, "call [%s] not found", method.c_str());
+            return 0;
+        }
+        std::shared_ptr<Rpc::Data> request(new Rpc::Data());
+        const std::string &func = rpcInterfaceConfig->FullName;
+        if (!rpcInterfaceConfig->Request.empty())
+        {
+            const std::string &pb = rpcInterfaceConfig->Request;
+            ProtoComponent *messageComponent = App::Get()->GetMsgComponent();
+            std::shared_ptr<Message> message = messageComponent->Read(lua, pb, 4);
+            if (message == nullptr)
+            {
+                luaL_error(lua, "read request paremeter error");
+                return 0;
+            }
+            if (!message->SerializeToString(request->GetBody()))
+            {
+                luaL_error(lua, "serialize message error");
+                return 0;
+            }
+        }
+        request->SetType(Tcp::Type::Request);
+        request->SetProto(Tcp::Porto::Protobuf);
 
-		lua_pushthread(lua);
-		std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource(new LuaRpcTaskSource(lua, 0));
-		InnerNetMessageComponent * rpcHandlerComponent = App::Get()->GetComponent<InnerNetMessageComponent>();
+        lua_pushthread(lua);
+        const std::string &response = rpcInterfaceConfig->Response;
+        std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource
+            = std::make_shared<LuaRpcTaskSource>(lua, 0, response);
 
-
-		request->set_func(rpcInterfaceConfig->FullName);
-		request->set_rpc_id(luaRpcTaskSource->GetRpcId());
-		rpcHandlerComponent->AddTask(luaRpcTaskSource);
-		if(callComponent->SendRequest(address, request) == XCode::Successful)
-		{
-
-		}
-		return luaRpcTaskSource->Await();
-	}
+        request->GetHead().Add("func", func);
+        request->GetHead().Add("rpc", luaRpcTaskSource->GetRpcId());
+        if (!netMessageComponent->Send(address, request))
+        {
+            luaL_error(lua, "send request message error");
+            return 0;
+        }
+        return netMessageComponent->AddTask(luaRpcTaskSource)->Await();
+    }
 
 	int Service::GetHost(lua_State *lua)
 	{

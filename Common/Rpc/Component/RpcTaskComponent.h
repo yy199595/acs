@@ -16,8 +16,19 @@ namespace Sentry
         ~RpcTaskComponent() = default;
         typedef std::shared_ptr<IRpcTask<T>> RpcTask;
     public:
-        bool AddTask(RpcTask task);
         void OnTimeout(long long taskId);
+        template<typename T1>
+        std::shared_ptr<T1> AddTask(std::shared_ptr<T1> task)
+        {
+            long long taskId = task->GetRpcId();
+            auto iter = this->mTasks.find(taskId);
+            if(iter == this->mTasks.end())
+            {
+                this->OnAddTask(task);
+                this->mTasks.emplace(taskId, task);
+            }
+            return task;
+        }
         bool OnResponse(long long taskId, std::shared_ptr<T> message);
 	protected:
 		virtual void OnAddTask(RpcTask task) { }
@@ -27,20 +38,6 @@ namespace Sentry
         std::unordered_map<long long, RpcTask> mTasks;
     };
 
-    template<typename T>
-    bool RpcTaskComponent<T>::AddTask(RpcTask task)
-    {
-        long long taskId = task->GetRpcId();
-        auto iter = this->mTasks.find(taskId);
-        if(iter == this->mTasks.end())
-        {
-            this->OnAddTask(task);
-            this->mTasks.emplace(taskId, task);
-            return true;
-        }
-        LOG_ERROR(this->GetName() << " add task error id = " << task->GetRpcId());
-        return false;
-    }
     template<typename T>
     void RpcTaskComponent<T>::OnTimeout(long long taskId)
     {

@@ -23,51 +23,56 @@ namespace Sentry
 
     void InnerNetComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Data> message)
     {
-		switch ((Tcp::Type)message->GetType())
-		{
-		case Tcp::Type::Request:
-			if (!this->OnRequest(address, *message))
-			{
-				this->StartClose(address);
-			}
-			break;
-		case Tcp::Type::Response:
-			if (!this->OnResponse(address, *message))
-			{
-				this->StartClose(address);
-			}
-			break;
-		}      
+        switch ((Tcp::Type) message->GetType())
+        {
+            case Tcp::Type::Request:
+                if (!this->OnRequest(address, message))
+                {
+                    this->StartClose(address);
+                    CONSOLE_LOG_ERROR("request message error close : " << address);
+                }
+                break;
+            case Tcp::Type::Response:
+                if (!this->OnResponse(address, message))
+                {
+                    this->StartClose(address);
+                    CONSOLE_LOG_ERROR("response message error close : " << address);
+                }
+                break;
+            default:
+            {
+                std::string func;
+                message->GetHead().Get("func", func);
+                LOG_ERROR("call " << func << " type error");
+            }
+        }
     }
 
-	bool InnerNetComponent::OnRequest(const std::string& address, const Rpc::Data& message)
+	bool InnerNetComponent::OnRequest(const std::string& address, std::shared_ptr<Rpc::Data> message)
 	{
-		std::shared_ptr<com::rpc::request> request
-			= std::make_shared<com::rpc::request>();
-        if(!message.ParseMessage(request))
-        {
-            return false;
-        }
-		request->set_address(address);
-		request->set_type(com::rpc_msg_type::rpc_msg_type_proto);
-		return this->mMessageComponent->OnRequest(request) == XCode::Successful;
+        message->GetHead().Add("address", address);
+        LOG_CHECK_RET_FALSE(message->GetHead().Has("func"));
+        return this->mMessageComponent->OnRequest(message) == XCode::Successful;
 	}
 
-	bool InnerNetComponent::OnResponse(const std::string& address, const Rpc::Data& message)
+	bool InnerNetComponent::OnResponse(const std::string& address, std::shared_ptr<Rpc::Data> message)
 	{
-		std::shared_ptr<com::rpc::response> response
-			= std::make_shared<com::rpc::response>();
-        if(!message.ParseMessage(response))
+        int code = 0;
+		long long rpcId = 0;
+        const Rpc::Head & head = message->GetHead();
+        LOG_CHECK_RET_FALSE(head.Get("rpc", rpcId));
+        LOG_CHECK_RET_FALSE(head.Get("code", code));
+        if(code != (int)XCode::Successful)
         {
-            return false;
+#ifdef __DEBUG__
+            std::string error, func;
+            if(head.Get("func", func) && head.Get("error", error))
+            {
+                CONSOLE_LOG_ERROR("func = " << func << "  error = " << error);
+            }
+#endif
         }
-		long long rpcId = response->rpc_id();
-        if(response->code() != (int)XCode::Successful)
-        {
-            LOG_ERROR("code = " << response->code()
-                << " error = " << response->error_str());
-        }
-		this->mMessageComponent->OnResponse(rpcId, response);
+		this->mMessageComponent->OnResponse(rpcId, message);
 		return true;
 	}
 
@@ -145,26 +150,16 @@ namespace Sentry
 	}
 
 
-	bool InnerNetComponent::Send(const std::string & address, std::shared_ptr<com::rpc::request> message)
+	bool InnerNetComponent::Send(const std::string & address, std::shared_ptr<Rpc::Data> message)
 	{
-		auto clientSession = this->GetOrCreateSession(address);
+        assert(message->GetType() != Tcp::Type::None);
+        assert(message->GetProto() != Tcp::Porto::None);
+        std::shared_ptr<InnerNetClient> clientSession = this->GetOrCreateSession(address);
 		if (message == nullptr || clientSession == nullptr)
 		{
 			return false;
 		}
-		clientSession->SendToServer(message);
-		return true;
-	}
-
-	bool InnerNetComponent::Send(const std::string & address, std::shared_ptr<com::rpc::response> message)
-	{
-		std::shared_ptr<InnerNetClient> clientSession = this->GetSession(address);
-		if (clientSession == nullptr || message == nullptr)
-		{
-			LOG_ERROR("send message to [" << address << "] failure");
-			return false;
-		}
-		clientSession->SendToServer(message);
+		clientSession->SendData(message);
 		return true;
 	}
 }// namespace Sentry

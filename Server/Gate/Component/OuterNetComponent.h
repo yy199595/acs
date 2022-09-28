@@ -27,8 +27,7 @@ namespace Sentry
 		std::shared_ptr<OuterNetClient> GetGateClient(const std::string & address);
 	 public:
 		void SendToAllClient(std::shared_ptr<c2s::rpc::call> message);
-		bool SendToClient(const std::string & address, std::shared_ptr<c2s::rpc::call> message);
-		bool SendToClient(const std::string & address, std::shared_ptr<c2s::rpc::response> message);
+		bool SendData(const std::string & address, std::shared_ptr<Rpc::Data> message);
 	 public:
 		void Awake() final;
 		bool LateAwake() final;
@@ -36,7 +35,6 @@ namespace Sentry
 		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 private:
         bool StartInComplete() final { return false; }
-		bool OnRequest(const std::string& address, const Rpc::Data & message);
     private:
 		class TimerComponent* mTimerComponent;
         class NetThreadComponent * mNetComponent;

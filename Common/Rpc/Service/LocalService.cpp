@@ -18,8 +18,7 @@ namespace Sentry
         size_t pos = fullName.find("::");
         return fullName.substr(pos + 2);
     }
-    XCode LocalService::Invoke(const std::string& func, std::shared_ptr<com::rpc::request> request,
-                               std::shared_ptr<com::rpc::response> response)
+    XCode LocalService::Invoke(const std::string &func, std::shared_ptr<Rpc::Data> message)
 	{
 		if (!this->IsStartService())
 		{
@@ -33,14 +32,24 @@ namespace Sentry
 			LOG_ERROR("not find [" << this->GetName() << "." << func << "]");
 			return XCode::CallServiceNotFound;
 		}
+#ifndef __DEBUG__
+        message->GetHead().Remove("func");
+#endif
 		try
 		{
-			return serviceMethod->Invoke(*request, *response);
+			XCode code = serviceMethod->Invoke(*message);
+
+            message->SetType(Tcp::Type::Response);
+            message->GetHead().Remove("address");
+            message->GetHead().Add("code", (int)code);
 		}
 		catch (std::logic_error & error)
 		{
-			response->set_error_str(error.what());
-			return XCode::ThrowError;
+            message->SetType(Tcp::Type::Response);
+            message->GetHead().Remove("address");
+            message->GetHead().Add("error", error.what());
+            message->GetHead().Add("code", (int)XCode::ThrowError);
+            return XCode::ThrowError;
 		}
 	}
 

@@ -74,15 +74,15 @@ namespace Sentry
     {
         std::shared_ptr<MysqlTask> mysqlTask
             = std::make_shared<MysqlTask>(command->GetRpcId(), 0);
-        this->AddTask(mysqlTask);
+
         client->SendCommand(command);
-        std::shared_ptr<Mysql::Response> response = mysqlTask->Await();
+        std::shared_ptr<Mysql::Response> response = this->AddTask(mysqlTask)->Await();
 #ifdef __DEBUG__
         long long t1 = Helper::Time::GetNowMilTime();
-        if(response != nullptr && !response->IsOk())
+        if (response != nullptr && !response->IsOk())
         {
             CONSOLE_LOG_ERROR(response->GetError());
-			throw std::logic_error(response->GetError());
+            throw std::logic_error(response->GetError());
         }
         long long t2 = Helper::Time::GetNowMilTime();
         CONSOLE_LOG_INFO("sql use time = [" << t2 - t1 << "ms]");

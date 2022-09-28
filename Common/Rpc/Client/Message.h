@@ -6,6 +6,7 @@
 #define APP_MESSAGE_H
 #include"Rpc.h"
 #include<string>
+#include"XCode/XCode.h"
 #include<unordered_map>
 #include"Message/ProtoMessage.h"
 
@@ -15,20 +16,19 @@ namespace Rpc
     class Head : protected std::unordered_map<std::string, std::string>
     {
     public:
-        bool Get(const std::string & key, int & value);
-        bool Get(const std::string & key, long long & value);
-        bool Get(const std::string & key, std::string & value);
+        bool Has(const std::string & key) const;
+        bool Get(const std::string & key, int & value) const;
+        bool Get(const std::string & key, long long & value) const;
+        bool Get(const std::string & key, std::string & value) const;
     public:
+        size_t GetLength();
         size_t Parse(std::istream & os);
         bool Serialize(std::ostream & os);
-        size_t GetLength() const { return this->mLen; }
     public:
         bool Remove(const std::string & key);
         bool Add(const std::string & key, int value);
         bool Add(const std::string & key, long long value);
         bool Add(const std::string & key, const std::string & value);
-    private:
-        size_t mLen;
     };
 
     class Data : public Tcp::ProtoMessage
@@ -38,13 +38,15 @@ namespace Rpc
         int Serailize(std::ostream &os) final;
         bool Parse(std::istream & os, size_t size);
     public:
+        XCode GetCode(XCode code) const;
         Head & GetHead() { return this->mHead;}
         std::string * GetBody() { return &mBody; }
+        bool ClearBody() { this->mBody.clear(); }
         void SetType(Tcp::Type type) { this->mType = type; }
         void SetProto(Tcp::Porto proto) { this->mProto = proto; }
         const Tcp::Type & GetType() const { return this->mType; }
         const Tcp::Porto & GetProto() const { return this->mProto; }
-
+        bool GetMethod(std::string & service, std::string & method) const;
     public:
         template<typename T>
         bool ParseMessage(std::shared_ptr<T> message) const;

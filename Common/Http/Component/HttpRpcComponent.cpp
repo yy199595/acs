@@ -62,32 +62,12 @@ namespace Sentry
 
         if(!rpcInterfaceConfig->IsAsync)
         {
-            std::shared_ptr<com::rpc::response> rpcResponse(new com::rpc::response());
-            XCode code = targetService->Invoke(method, rpcRequest, rpcResponse);
-            if(code == XCode::Successful && !rpcInterfaceConfig->Response.empty())
-            {
-                if(!rpcResponse->json().empty())
-                {
-                    response->WriteString(rpcResponse->json());
-                }
-            }
-            response->AddHead("code", (int)code);
-            httpClient->StartWriter(HttpStatus::OK);
+
             return;
         }
         taskComponent->Start([targetService, method, rpcRequest, rpcInterfaceConfig, this, response, httpClient]()
         {
-            std::shared_ptr<com::rpc::response> rpcResponse(new com::rpc::response());
-            XCode code = targetService->Invoke(method, rpcRequest, rpcResponse);
-            if(code == XCode::Successful && !rpcInterfaceConfig->Response.empty())
-            {
-                if(!rpcResponse->json().empty())
-                {
-                    response->WriteString(rpcResponse->json());
-                }
-            }
-            response->AddHead("code", (int)code);
-            httpClient->StartWriter(HttpStatus::OK);
+
         });
     }
 }

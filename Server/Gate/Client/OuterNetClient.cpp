@@ -137,35 +137,13 @@ namespace Sentry
 #endif
 	}
 
-	void OuterNetClient::SendToClient(std::shared_ptr<c2s::rpc::call> message)
+	void OuterNetClient::SendData(std::shared_ptr<Rpc::Data> message)
 	{
-		std::shared_ptr<Rpc::Data> request(new Rpc::Data());
-
-        request->SetType(Tcp::Type::Request);
-        request->SetProto(Tcp::Porto::Protobuf);
-        message->SerializeToString(request->GetBody());
 #ifdef ONLY_MAIN_THREAD
-		this->Send(request);
+		this->Send(message);
 #else
         Asio::Context & t = this->mSocket->GetThread();
-        t.post(std::bind(&OuterNetClient::Send, this, request));
+        t.post(std::bind(&OuterNetClient::Send, this, message));
 #endif
 	}
-
-	void OuterNetClient::SendToClient(std::shared_ptr<c2s::rpc::response> message)
-	{
-		std::shared_ptr<Rpc::Data> response(new Rpc::Data());
-
-        response->SetType(Tcp::Type::Response);
-        response->SetProto(Tcp::Porto::Protobuf);
-        message->SerializeToString(response->GetBody());
-#ifdef ONLY_MAIN_THREAD
-		this->Send(response);
-#else
-        Asio::Context & t = this->mSocket->GetThread();
-        t.post(std::bind(&OuterNetClient::Send, this, response));
-#endif
-        //CONSOLE_LOG_ERROR("send to client [" << this->mSocket->GetAddress() << "] " << message->rpc_id());
-    }
-
 }

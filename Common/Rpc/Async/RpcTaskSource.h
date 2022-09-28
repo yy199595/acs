@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include"Lua/LuaInclude.h"
 #include"XCode/XCode.h"
+#include"Client/Message.h"
 #include"Guid/NumberBuilder.h"
-#include"Message/com.pb.h"
 #include"Coroutine/CoroutineDef.h"
 #include"Source/TaskSource.h"
 #include"Lua/LuaWaitTaskSource.h"
@@ -26,32 +26,39 @@ namespace Sentry
         int mTimeout;
     };
 
-    class RpcTaskSource : public IRpcTask<com::rpc::response>
+    class RpcTaskSource : public IRpcTask<Rpc::Data>
     {
     public:
-        RpcTaskSource(int ms) : IRpcTask<com::rpc::response>(ms) { }
+        RpcTaskSource(int ms);
         long long GetRpcId() final { return mTaskSource.GetTaskId(); }
     protected:
         void OnTimeout() final;
-        void OnResponse(std::shared_ptr<com::rpc::response> response) final;
+        void OnResponse(std::shared_ptr<Rpc::Data> response) final;
     public:
-		std::shared_ptr<com::rpc::response> Await();
+		std::shared_ptr<Rpc::Data> Await();
     private:
-        TaskSource<std::shared_ptr<com::rpc::response>> mTaskSource;
+#ifdef __DEBUG__
+        long long t1;
+#endif
+        TaskSource<std::shared_ptr<Rpc::Data>> mTaskSource;
     };
 
-	class LuaRpcTaskSource :  public IRpcTask<com::rpc::response>
+	class LuaRpcTaskSource :  public IRpcTask<Rpc::Data>
 	{
 	 public:
-		LuaRpcTaskSource(lua_State * lua, int ms);
+		LuaRpcTaskSource(lua_State * lua, int ms, const std::string & response);
 	 public:
 		int Await() { return this->mTask.Await(); }
 		long long GetRpcId() final { return this->mTaskId; }
 	 private:
         void OnTimeout() final;
-		void OnResponse(std::shared_ptr<com::rpc::response> response) final;
+		void OnResponse(std::shared_ptr<Rpc::Data> response) final;
 	 private:
 		long long mTaskId;
 		LuaWaitTaskSource mTask;
+        const std::string mResp;
+#ifdef __DEBUG__
+       long long t1;
+#endif
 	};
 }

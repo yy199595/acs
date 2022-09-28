@@ -103,6 +103,9 @@ inline std::string FormatFileLine(const char * file, const int line)
 #define LOG_ERROR_RETURN_CODE(obj, code) \
     if(!(obj)) { LOG_ERROR(#obj); return code; }    \
 
+#define LOG_RPC_CHECK_ARGS(obj) \
+           if(!(obj)) { LOG_ERROR(#obj); return XCode::CallArgsError; }    \
+
 #define IF_THROW_ERROR(obj){ \
     if(!(obj))                \
     {              \

@@ -20,8 +20,7 @@ namespace Sentry
 	 public:
 		void StartClose();
 		void StartReceive();
-		void SendToServer(std::shared_ptr<com::rpc::request> message);
-		void SendToServer(std::shared_ptr<com::rpc::response> message);
+        void SendData(std::shared_ptr<Rpc::Data> message);
     private:
         void CloseSocket(XCode code);
         void OnConnect(const asio::error_code &error, int count) final;

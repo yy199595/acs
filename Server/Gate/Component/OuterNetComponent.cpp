@@ -31,32 +31,21 @@ namespace Sentry
 	}
 
 	void OuterNetComponent::OnMessage(const std::string& address, std::shared_ptr<Rpc::Data> message)
-	{		
-		switch ((Tcp::Type)message->GetType())
-		{
-		case Tcp::Type::Request:
-			if (!this->OnRequest(address, *message))
-			{
-				this->StartClose(address);
-			}
-			break;
-		default:
-			this->StartClose(address);
-			break;
-		}
-	}
-
-	bool OuterNetComponent::OnRequest(const std::string& address, const Rpc::Data& message)
-	{
-		std::shared_ptr<c2s::rpc::request> request
-			= std::make_shared<c2s::rpc::request>();
-        if(!message.ParseMessage(request))
+    {
+        LOG_CHECK_RET(message->GetHead().Has("func"));
+        switch ((Tcp::Type) message->GetType())
         {
-            return false;
+            case Tcp::Type::Request:
+                if (this->mOuterMessageComponent->OnRequest(address, message) != XCode::Successful)
+                {
+                    this->StartClose(address);
+                }
+                break;
+            default:
+                this->StartClose(address);
+                break;
         }
-		request->set_address(address);
-		return this->mOuterMessageComponent->OnRequest(request) == XCode::Successful;
-	}
+    }
 
 	bool OuterNetComponent::OnListen(std::shared_ptr<SocketProxy> socket)
     {
@@ -80,7 +69,6 @@ namespace Sentry
         }
 
         outerNetClient->StartReceive();
-        this->mOuterMessageComponent->OnConnect(address);
         this->mGateClientMap.emplace(address, outerNetClient);
         return true;
     }
@@ -102,17 +90,6 @@ namespace Sentry
 		}
 	}
 
-	bool OuterNetComponent::SendToClient(const std::string & address, std::shared_ptr<c2s::rpc::response> message)
-	{
-		std::shared_ptr<OuterNetClient> outerNetClient = this->GetGateClient(address);
-		if (outerNetClient == nullptr)
-		{
-			return false;
-		}
-        outerNetClient->SendToClient(message);
-		return true;
-	}
-
 	void OuterNetComponent::SendToAllClient(std::shared_ptr<c2s::rpc::call> message)
 	{
 		auto iter = this->mGateClientMap.begin();
@@ -121,17 +98,26 @@ namespace Sentry
 			std::shared_ptr<OuterNetClient> proxyClient = iter->second;
 			if(proxyClient != nullptr)
 			{
-				proxyClient->SendToClient(message);
+                std::shared_ptr<Rpc::Data> request(new Rpc::Data());
+
+                request->SetType(Tcp::Type::Request);
+                request->SetProto(Tcp::Porto::Protobuf);
+                request->GetHead().Add("func", message->func());
+                if(message->has_data())
+                {
+                    message->data().SerializeToString(request->GetBody());
+                }
+				proxyClient->SendData(request);
 			}
 		}
 	}
 
-	bool OuterNetComponent::SendToClient(const std::string& address, std::shared_ptr<c2s::rpc::call> message)
+	bool OuterNetComponent::SendData(const std::string &address, std::shared_ptr<Rpc::Data> message)
 	{
 		std::shared_ptr<OuterNetClient> gateClient = this->GetGateClient(address);
 		if(gateClient != nullptr)
 		{
-			gateClient->SendToClient(message);
+			gateClient->SendData(message);
 			return true;
 		}
 		return false;

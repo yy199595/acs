@@ -98,15 +98,13 @@ namespace Sentry
 			request->collectionName = request->dataBase + ".$cmd";
 		}
         request->header.requestID = this->mRequestId.Pop();
+
+        mongoClient->SendMongoCommand(request);
         std::shared_ptr<MongoTask> mongoTask(new MongoTask(request->header.requestID, 0));
-		if(!this->AddTask(mongoTask))
-		{
-			return nullptr;
-		}
-		mongoClient->SendMongoCommand(request);
+
 #ifdef __DEBUG__
 		long long t1 = Time::GetNowMilTime();
-        std::shared_ptr<Mongo::CommandResponse> mongoResponse = mongoTask->Await();
+        std::shared_ptr<Mongo::CommandResponse> mongoResponse = this->AddTask(mongoTask)->Await();
 		if(mongoResponse != nullptr && mongoResponse->GetDocumentSize() > 0)
 		{
             LOG_DEBUG( "[" << Time::GetNowMilTime() - t1 << "ms] document size = [" << mongoResponse->GetDocumentSize() << "]");
@@ -130,7 +128,7 @@ namespace Sentry
 		CONSOLE_LOG_DEBUG(request->collectionName << "[" << Time::GetNowMilTime() - t1 << "ms] response = null");
 		return nullptr;
 #else
-        return  mongoTask->Await();
+        return  this->AddTask(mongoTask)->Await();
 #endif
 	}
 

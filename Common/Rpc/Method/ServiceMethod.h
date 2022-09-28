@@ -1,8 +1,7 @@
 ﻿#pragma once
 #include<Message/com.pb.h>
 #include<XCode/XCode.h>
-#include<google/protobuf/any.h>
-#include<google/protobuf/any.pb.h>
+#include"Client/Message.h"
 #include"Json/JsonReader.h"
 #include"google/protobuf/util/json_util.h"
 using namespace google::protobuf;
@@ -55,43 +54,11 @@ namespace Sentry
 			: mName(std::move(name)) {}
 	 public:
 		virtual bool IsLuaMethod() = 0;
-		virtual XCode Invoke(const com::rpc::request& request, com::rpc::response& response) = 0;
+		virtual XCode Invoke(Rpc::Data & message) = 0;
 		const std::string& GetName()
 		{
 			return this->mName;
 		}
-
-    protected:
-        template<typename T1>
-        std::shared_ptr<T1> GetRequest(const com::rpc::request& request)
-        {
-            if(request.type() == com::rpc_msg_type_json)
-            {
-                if(request.json().empty())
-                {
-                    return nullptr;
-                }
-                std::shared_ptr<T1> requestData(new T1());
-                const std::string & json = request.json();
-                if(util::JsonStringToMessage(json, requestData.get()).ok())
-                {
-                    return requestData;
-                }
-            }
-            else if(request.type() == com::rpc_msg_type_proto)
-            {
-                if(!request.has_data())
-                {
-                    return nullptr;
-                }
-                std::shared_ptr<T1> requestData(new T1());
-                if(request.data().UnpackTo(requestData.get()))
-                {
-                    return requestData;
-                }
-            }
-            return nullptr;
-        }
 	 private:
 		std::string mName;
 	};
@@ -111,13 +78,18 @@ namespace Sentry
 		}
 	 public:
 
-		XCode Invoke(const com::rpc::request& request, com::rpc::response& response) override
+		XCode Invoke(Rpc::Data & message) final
 		{
 			if (!this->mHasUserId)
 			{
 				return (_o->*_func)();
 			}
-			return (_o->*_objfunc)(request.user_id());
+            long long userId = 0;
+            if(!message.GetHead().Get("id", userId))
+            {
+                return XCode::CallArgsError;
+            }
+			return (_o->*_objfunc)(userId);
 		}
 
 		bool IsLuaMethod() override
@@ -144,18 +116,23 @@ namespace Sentry
 		{
 		}
 	 public:
-		XCode Invoke(const com::rpc::request& request, com::rpc::response& response) override
+		XCode Invoke(Rpc::Data & message) override
 		{
-            std::shared_ptr<T1> requestData = this->GetRequest<T1>(request);
-            if(requestData == nullptr)
+            std::shared_ptr<T1> request(new T1());
+            if(!message.ParseMessage(request))
             {
                 return XCode::CallArgsError;
             }
 			if (!this->mHasUserId)
 			{
-				return (_o->*_func)(*requestData);
+				return (_o->*_func)(*request);
 			}
-			return (_o->*_objfunc)(request.user_id(), *requestData);
+            long long userId = 0;
+            if(!message.GetHead().Get("id", userId))
+            {
+                return XCode::CallArgsError;
+            }
+			return (_o->*_objfunc)(userId, *request);
 		}
 		bool IsLuaMethod() override
 		{
@@ -183,47 +160,43 @@ namespace Sentry
 		{
 		}
 	 public:
-		XCode Invoke(const com::rpc::request& request, com::rpc::response& response) override
+		XCode Invoke(Rpc::Data & message) override
 		{
-            std::shared_ptr<T2> responseData(new T2());
-            std::shared_ptr<T1> requestData = this->GetRequest<T1>(request);
-            if(requestData == nullptr)
+            std::shared_ptr<T1> request(new T1());
+            std::shared_ptr<T2> response(new T2());
+            if(!message.ParseMessage(request))
             {
                 return XCode::CallArgsError;
             }
-			if (this->mHasUserId)
+            message.ClearBody();
+            if (this->mHasUserId)
 			{
-				XCode code = (_o->*_objfunc)(request.user_id(), *requestData, *responseData);
+                long long userId = 0;
+                if(!message.GetHead().Get("id", userId))
+                {
+                    return XCode::CallArgsError;
+                }
+				XCode code = (_o->*_objfunc)(userId, *request, *response);
 				if (code == XCode::Successful)
 				{
-                    if(request.type() == com::rpc_msg_type_json &&
-                            util::MessageToJsonString(*responseData, response.mutable_json()).ok())
+                    message.GetBody()->clear();
+                    if(!response->SerializeToString(message.GetBody()))
                     {
-                        return XCode::Successful;
+                        return XCode::SerializationFailure;
                     }
-                    if(request.type() == com::rpc_msg_type_proto)
-                    {
-                        response.mutable_data()->PackFrom(*responseData);
-                        return XCode::Successful;
-                    }
-                    return XCode::SerializationFailure;
+                    return XCode::Successful;
 				}
 				return code;
 			}
-			XCode code = (_o->*_func)(*requestData, *responseData);
+			XCode code = (_o->*_func)(*request, *response);
 			if (code == XCode::Successful)
 			{
-                if(request.type() == com::rpc_msg_type_json &&
-                   util::MessageToJsonString(*responseData, response.mutable_json()).ok())
+                message.GetBody()->clear();
+                if(!response->SerializeToString(message.GetBody()))
                 {
-                    return XCode::Successful;
+                    return XCode::SerializationFailure;
                 }
-                if(request.type() == com::rpc_msg_type_proto)
-                {
-                    response.mutable_data()->PackFrom(*responseData);
-                    return XCode::Successful;
-                }
-                return XCode::SerializationFailure;
+                return XCode::Successful;
 			}
 			return code;
 		}
@@ -252,44 +225,24 @@ namespace Sentry
 		{
 		}
 	 public:
-		XCode Invoke(const com::rpc::request& request, com::rpc::response& response) override
+		XCode Invoke(Rpc::Data & message) override
 		{
-			std::shared_ptr<T1> responseData(new T1());
+			std::shared_ptr<T1> request(new T1());
+            if(!message.ParseMessage(request))
+            {
+                return XCode::CallArgsError;
+            }
+            message.ClearBody();
 			if (this->mHasUserId)
 			{
-				XCode code = (_o->*_objfunc)(request.user_id(), *responseData);
-				if (code == XCode::Successful)
-				{
-                    if(request.type() == com::rpc_msg_type_json &&
-                       util::MessageToJsonString(*responseData, response.mutable_json()).ok())
-                    {
-                        return XCode::Successful;
-                    }
-                    if(request.type() == com::rpc_msg_type_proto)
-                    {
-                        response.mutable_data()->PackFrom(*responseData);
-                        return XCode::Successful;
-                    }
-                    return XCode::SerializationFailure;
-				}
-				return code;
-			}
-			XCode code = (_o->*_func)(*responseData);
-			if (code == XCode::Successful)
-			{
-                if(request.type() == com::rpc_msg_type_json &&
-                   util::MessageToJsonString(*responseData, response.mutable_json()).ok())
+                long long userId = 0;
+                if(!message.GetHead().Get("id", userId))
                 {
-                    return XCode::Successful;
+                    return XCode::CallArgsError;
                 }
-                if(request.type() == com::rpc_msg_type_proto)
-                {
-                    response.mutable_data()->PackFrom(*responseData);
-                    return XCode::Successful;
-                }
-                return XCode::SerializationFailure;
+				return (_o->*_objfunc)(userId, *request);
 			}
-			return code;
+			return (_o->*_func)(*request);
 		}
 		bool IsLuaMethod() override
 		{
@@ -318,14 +271,19 @@ namespace Sentry
 		{
 			return false;
 		};
-		XCode Invoke(const com::rpc::request& request, com::rpc::response& response) override
+		XCode Invoke(Rpc::Data & message) override
 		{
-			std::shared_ptr<T1> requestData = this->GetRequest<T1>(request);
-            if(requestData == nullptr)
+			std::shared_ptr<T1> request(new T1());
+            if(!message.ParseMessage(request))
             {
                 return XCode::CallArgsError;
             }
-			return (_o->*_func)(request.address(), *requestData);
+            std::string address;
+            if(!message.GetHead().Get("address", address))
+            {
+                return XCode::CallArgsError;
+            }
+			return (_o->*_func)(address, *request);
 		}
 
 	private:
@@ -345,10 +303,14 @@ namespace Sentry
 
 	 public:
 		bool IsLuaMethod() override { return false; };
-		XCode Invoke(const com::rpc::request& request, com::rpc::response& response) override
+		XCode Invoke(Rpc::Data & message) override
 		{
-			assert(!request.address().empty());
-			return (_o->*_func)(request.address());
+            std::string address;
+            if(!message.GetHead().Get("address", address))
+            {
+                return XCode::CallArgsError;
+            }
+			return (_o->*_func)(address);
 		}
 	 private:
 		T* _o;

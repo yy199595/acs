@@ -1,4 +1,5 @@
 #pragma once
+#include"Client/Message.h"
 #include"Method/ServiceMethod.h"
 #include<google/protobuf/message.h>
 using namespace google::protobuf;
@@ -13,10 +14,10 @@ namespace Sentry
 		LuaServiceMethod(const RpcInterfaceConfig * config, lua_State* lua);
 	 public:
 		bool IsLuaMethod() final { return true; }
-		XCode Invoke(const com::rpc::request& request, com::rpc::response& response) final;
+		XCode Invoke(Rpc::Data & message) final;
 	 private:
-		XCode Call(int count, com::rpc::response & response);
-		XCode CallAsync(int count, com::rpc::response & response);
+		XCode Call(int count, Rpc::Data & message);
+		XCode CallAsync(int count, Rpc::Data & message);
 	 private:
 		lua_State* mLuaEnv;
         const RpcInterfaceConfig * mConfig;

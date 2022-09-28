@@ -5,22 +5,23 @@
 
 #ifndef GAMEKEEPER_PROTOPROXYCOMPONENT_H
 #define GAMEKEEPER_PROTOPROXYCOMPONENT_H
+#include"Client/Message.h"
 #include"Component/Component.h"
 #include"Async/RpcTaskSource.h"
 
 namespace Sentry
 {
     class OuterNetMessageComponent;
-    class ClientRpcTask : public IRpcTask<com::rpc::response>
+    class ClientRpcTask : public IRpcTask<Rpc::Data>
     {
     public:
-        ClientRpcTask(const c2s::rpc::request & request, OuterNetMessageComponent * component, int ms);
+        ClientRpcTask(Rpc::Data & request, OuterNetMessageComponent * component, int ms);
 
     public:
         long long GetRpcId() final { return this->mTaskId; }
     private:
         void OnTimeout() final;
-        void OnResponse(std::shared_ptr<com::rpc::response> response) final;
+        void OnResponse(std::shared_ptr<Rpc::Data> response) final;
     private:
         long long mRpcId;
         long long mTaskId;
@@ -31,15 +32,14 @@ namespace Sentry
 
 namespace Sentry
 {
-	class OuterNetMessageComponent final : public Component,
-                                           public IClientRpc<c2s::rpc::request, com::rpc::response>
+	class OuterNetMessageComponent final : public Component
 	{
 	 public:
 		OuterNetMessageComponent() = default;
 		~OuterNetMessageComponent() final = default;
 	 public:       
-        XCode OnRequest(std::shared_ptr<c2s::rpc::request> request) final;
-        XCode OnResponse(const std::string & address, std::shared_ptr<com::rpc::response> response) final;
+        XCode OnRequest(const std::string & address, std::shared_ptr<Rpc::Data> message);
+        XCode OnResponse(const std::string & address, std::shared_ptr<Rpc::Data> message);
     private:
 		bool LateAwake() final;
 	 private:

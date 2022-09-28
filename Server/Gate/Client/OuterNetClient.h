@@ -22,8 +22,7 @@ namespace Sentry
 		void StartClose();
 		void StartReceive(int second = 0);
 		unsigned int GetQps() const { return this->mQps; }
-		void SendToClient(std::shared_ptr<c2s::rpc::call> message);
-		void SendToClient(std::shared_ptr<c2s::rpc::response> message);
+		void SendData(std::shared_ptr<Rpc::Data> message);
 		unsigned int GetCallCount() const { return this->mCallCount; }
 	 protected:
 		void OnConnect(const asio::error_code &error) {}

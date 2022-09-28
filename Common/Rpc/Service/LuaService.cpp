@@ -60,23 +60,19 @@ namespace Sentry
         return true;
 	}
 
-	XCode LuaService::Invoke(const std::string& name, std::shared_ptr<com::rpc::request> request,
-		std::shared_ptr<com::rpc::response> response)
+	XCode LuaService::Invoke(const std::string &name, std::shared_ptr<Rpc::Data> message)
 	{
 		if(!this->IsStartService())
 		{
 			LOG_ERROR(this->GetName() << " is not start");
 			return XCode::CallServiceNotFound;
 		}
-		response->set_rpc_id(request->rpc_id());
 		std::shared_ptr<ServiceMethod> serviceMethod = this->mMethodRegister->GetMethod(name);
 		if (serviceMethod == nullptr)
 		{
-			response->set_code((int)XCode::CallServiceNotFound);
-			LOG_ERROR("not find lua [" << this->GetName() << "." << name << "]");
 			return XCode::CallServiceNotFound;
 		}
-		return serviceMethod->Invoke(*request, *response);
+		return serviceMethod->Invoke(*message);
 	}
 
 	bool LuaService::LateAwake()

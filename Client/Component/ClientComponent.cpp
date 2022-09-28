@@ -97,14 +97,13 @@ namespace Client
     }
 
 	std::shared_ptr<c2s::rpc::response> ClientComponent::Call(std::shared_ptr<c2s::rpc::request> request)
-	{
-		std::shared_ptr<ClientTask> clienRpcTask(new ClientTask(0));
-		request->set_rpc_id(clienRpcTask->GetRpcId());
-		
-		this->AddTask(clienRpcTask);
-		this->mTcpClient->SendToServer(request);
-		return clienRpcTask->Await();
-	}
+    {
+        std::shared_ptr<ClientTask> clienRpcTask(new ClientTask(0));
+        request->set_rpc_id(clienRpcTask->GetRpcId());
+
+        this->mTcpClient->SendToServer(request);
+        return this->AddTask(clienRpcTask)->Await();
+    }
 
 	void ClientComponent::OnTimeout(long long rpcId)
 	{

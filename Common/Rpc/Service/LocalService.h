@@ -21,7 +21,7 @@ namespace Sentry
 		bool StartNewService() final;
 		bool CloseService() final;
 		bool IsStartService() { return this->mMethodRegister != nullptr; }
-		XCode Invoke(const std::string &func, std::shared_ptr<com::rpc::request>, std::shared_ptr<com::rpc::response> response) final;
+		XCode Invoke(const std::string &func, std::shared_ptr<Rpc::Data> message) final;
     protected:
         ServiceMethodRegister & GetMethodRegistry() { return *this->mMethodRegister; }
 	private:

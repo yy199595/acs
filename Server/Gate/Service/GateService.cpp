@@ -49,11 +49,17 @@ namespace Sentry
 		{
 			return XCode::NotFindUser;
 		}
-		std::shared_ptr<c2s::rpc::call> message(new c2s::rpc::call());
+        std::shared_ptr<Rpc::Data> message(new Rpc::Data());
 
-		message->set_func(request.func());
-		message->mutable_data()->PackFrom(request.data());
-		if(!this->mGateClientComponent->SendToClient(address, message))
+        message->SetType(Tcp::Type::Request);
+        message->SetProto(Tcp::Porto::Protobuf);
+        message->GetHead().Add("func", request.func());
+        if(request.has_data())
+        {
+            request.data().SerializeToString(message->GetBody());
+        }
+
+		if(!this->mGateClientComponent->SendData(address, message))
 		{
 			return XCode::NetWorkError;
 		}

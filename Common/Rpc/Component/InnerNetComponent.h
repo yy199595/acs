@@ -26,11 +26,10 @@ namespace Sentry
 		std::shared_ptr<InnerNetClient> GetSession(const std::string& address);
 		std::shared_ptr<InnerNetClient> GetOrCreateSession(const std::string& address);
 	 public:
-		bool Send(const std::string & address, std::shared_ptr<com::rpc::request> message);
-		bool Send(const std::string & address, std::shared_ptr<com::rpc::response> message);
+		bool Send(const std::string & address, std::shared_ptr<Rpc::Data> message);
 	private:
-		bool OnRequest(const std::string & address, const Rpc::Data& message);
-		bool OnResponse(const std::string& address, const Rpc::Data& message);
+		bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Data> message);
+		bool OnResponse(const std::string& address, std::shared_ptr<Rpc::Data> message);
 	 private:
         class NetThreadComponent * mNetComponent;
         class InnerNetMessageComponent* mMessageComponent;
