@@ -41,7 +41,7 @@ namespace Rpc
         XCode GetCode(XCode code) const;
         Head & GetHead() { return this->mHead;}
         std::string * GetBody() { return &mBody; }
-        bool ClearBody() { this->mBody.clear(); }
+        void ClearBody() { this->mBody.clear(); }
         void SetType(Tcp::Type type) { this->mType = type; }
         void SetProto(Tcp::Porto proto) { this->mProto = proto; }
         const Tcp::Type & GetType() const { return this->mType; }

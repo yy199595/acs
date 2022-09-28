@@ -68,6 +68,9 @@ namespace Sentry
                 case FieldDescriptor::Type::TYPE_MESSAGE:
                 {
                     std::string json;
+#ifdef __OS_WIN__
+#undef GetMessage //
+#endif
                     const Message & value = pReflection->GetMessage(message, fieldDesc);
                     if(util::MessageToJsonString(value, &json).ok())
                     {
