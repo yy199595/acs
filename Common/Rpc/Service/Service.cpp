@@ -73,8 +73,8 @@ namespace Sentry
     std::shared_ptr<Rpc::Data> Service::StartCall(
         const std::string &address, const std::string &func, long long userId, const Message *message)
     {
-        const RpcInterfaceConfig * config  = this->mConfig->GetConfig(func);
-        if(config == nullptr)
+        const RpcMethodConfig * methodConfig  = this->mConfig->GetConfig(func);
+        if(methodConfig == nullptr)
         {
             return nullptr;
         }
@@ -87,6 +87,11 @@ namespace Sentry
         if(userId != 0)
         {
             request->GetHead().Add("id", userId);
+        }
+        if(!methodConfig->Request.empty() && message == nullptr)
+        {
+            CONSOLE_LOG_ERROR("call " << func << " request error");
+            return nullptr;
         }
         request->WriteMessage(message);
         return this->mMessageComponent->Call(address, request);

@@ -53,8 +53,8 @@ namespace Lua
         }
         std::string method = lua_tostring(lua, 3);
         const RpcServiceConfig &rpcServiceConfig = service->GetServiceConfig();
-        const RpcInterfaceConfig *rpcInterfaceConfig = rpcServiceConfig.GetConfig(method);
-        if (rpcInterfaceConfig == nullptr)
+        const RpcMethodConfig *methodConfig = rpcServiceConfig.GetConfig(method);
+        if (methodConfig == nullptr)
         {
             luaL_error(lua, "call [%s] not found", method.c_str());
             return 0;
@@ -63,10 +63,10 @@ namespace Lua
 
         request->SetType(Tcp::Type::Request);
         request->SetProto(Tcp::Porto::Protobuf);
-        const std::string &func = rpcInterfaceConfig->FullName;
-        if (!rpcInterfaceConfig->Request.empty())
+        const std::string &func = methodConfig->FullName;
+        if (!methodConfig->Request.empty())
         {
-            const std::string &pb = rpcInterfaceConfig->Request;
+            const std::string &pb = methodConfig->Request;
             ProtoComponent *messageComponent = App::Get()->GetMsgComponent();
             std::shared_ptr<Message> message = messageComponent->Read(lua, pb, 4);
             if (message == nullptr)
@@ -78,7 +78,7 @@ namespace Lua
         }
 
         lua_pushthread(lua);
-        const std::string &response = rpcInterfaceConfig->Response;
+        const std::string &response = methodConfig->Response;
         std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource
             = std::make_shared<LuaRpcTaskSource>(lua, 0, response);
 

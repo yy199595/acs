@@ -7,11 +7,11 @@ struct lua_State;
 namespace Sentry
 {
 
-	class RpcInterfaceConfig;
+	class RpcMethodConfig;
 	class LuaServiceMethod : public ServiceMethod
 	{
 	 public:
-		LuaServiceMethod(const RpcInterfaceConfig * config, lua_State* lua);
+		LuaServiceMethod(const RpcMethodConfig * config, lua_State* lua);
 	 public:
 		bool IsLuaMethod() final { return true; }
 		XCode Invoke(Rpc::Data & message) final;
@@ -20,7 +20,7 @@ namespace Sentry
 		XCode CallAsync(int count, Rpc::Data & message);
 	 private:
 		lua_State* mLuaEnv;
-        const RpcInterfaceConfig * mConfig;
+        const RpcMethodConfig * mConfig;
 		class ProtoComponent * mMsgComponent;
 	};
 }

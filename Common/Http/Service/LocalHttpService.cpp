@@ -31,10 +31,10 @@ namespace Sentry
             return false;
         }
 
-        std::vector<const HttpInterfaceConfig *> configs;
+        std::vector<const HttpMethodConfig *> configs;
         this->GetServiceConfig().GetConfigs(configs);
         LuaScriptComponent * luaComponent = this->GetComponent<LuaScriptComponent>();
-        for(const HttpInterfaceConfig * config : configs)
+        for(const HttpMethodConfig * config : configs)
         {
             const char * tab = config->Service.c_str();
             const char * method = config->Method.c_str();
@@ -50,7 +50,7 @@ namespace Sentry
             }
         }
 
-        for(const HttpInterfaceConfig * config : configs)
+        for(const HttpMethodConfig * config : configs)
         {
             if(this->mServiceRegister->GetMethod(config->Method) == nullptr)
             {

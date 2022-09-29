@@ -11,6 +11,7 @@ namespace Lua
 	namespace ClientEx
 	{
 		int Call(lua_State * lua);
+        int Auth(lua_State * lua);
 		int StartConnect(lua_State * lua);
 	};
 }

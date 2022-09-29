@@ -9,7 +9,7 @@
 #include"Component/ProtoComponent.h"
 namespace Sentry
 {
-    LuaHttpServiceMethod::LuaHttpServiceMethod(const HttpInterfaceConfig *config, lua_State *lua)
+    LuaHttpServiceMethod::LuaHttpServiceMethod(const HttpMethodConfig *config, lua_State *lua)
         : HttpServiceMethod(config->Method)
     {
         this->mLua = lua;

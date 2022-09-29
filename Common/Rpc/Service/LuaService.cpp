@@ -22,11 +22,11 @@ namespace Sentry
 	{
 		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
 
-		std::vector<const RpcInterfaceConfig *> rpcInterConfigs;
+		std::vector<const RpcMethodConfig *> rpcInterConfigs;
 		const RpcServiceConfig & rpcServiceConfig = this->GetServiceConfig();
 		rpcServiceConfig.GetConfigs(rpcInterConfigs);
 
-		for(const RpcInterfaceConfig * rpcInterfaceConfig : rpcInterConfigs)
+		for(const RpcMethodConfig * rpcInterfaceConfig : rpcInterConfigs)
 		{
 			const char* func = rpcInterfaceConfig->Method.c_str();
 			const char * tab = rpcInterfaceConfig->Service.c_str();

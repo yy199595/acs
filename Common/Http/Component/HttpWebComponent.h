@@ -19,10 +19,10 @@ namespace Sentry
         void OnRequest(std::shared_ptr<HttpHandlerClient> httpClient);
     private:
         bool LateAwake() final;
-        const HttpInterfaceConfig * GetConfig(const std::string & path);
+        const HttpMethodConfig * GetConfig(const std::string & path);
     private:
         TaskComponent * mTaskComponent;
-        std::unordered_map<std::string, const HttpInterfaceConfig *> mHttpConfigs;
+        std::unordered_map<std::string, const HttpMethodConfig *> mHttpConfigs;
     };
 }
 

@@ -3,7 +3,7 @@
 //
 #include"HttpComponent.h"
 #include"Method/HttpServiceMethod.h"
-#include"Config/InterfaceConfig.h"
+#include"Config/MethodConfig.h"
 #include"File/DirectoryHelper.h"
 #include"Component/LoggerComponent.h"
 #include"Component/NetThreadComponent.h"
@@ -34,24 +34,29 @@ namespace Sentry
 	}
 
 	std::shared_ptr<HttpAsyncResponse> HttpComponent::Get(const std::string& url, float second)
-	{
+    {
         std::shared_ptr<HttpGetRequest> httpGetRequest = HttpGetRequest::Create(url);
-        if(httpGetRequest == nullptr)
+        if (httpGetRequest == nullptr)
         {
             LOG_FATAL("parse [" << url << "] error");
             return nullptr;
         }
         std::shared_ptr<HttpTask> httpRpcTask = httpGetRequest->MakeTask(second);
         std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
-        
+
         httpAsyncClient->Request(httpGetRequest);
         std::shared_ptr<HttpAsyncResponse> response = this->AddTask(httpRpcTask)->Await();
-        if(this->mClientPools.size() < 100)
+        if (response->GetData().GetStatus() != HttpStatus::OK)
+        {
+            LOG_ERROR("[GET] " << url << " error = "
+                               << HttpStatusToString(response->GetData().GetStatus()));
+        }
+        if (this->mClientPools.size() < 100)
         {
             this->mClientPools.push(httpAsyncClient);
         }
         return response;
-	}
+    }
 
 	void HttpComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
 	{
@@ -94,23 +99,28 @@ namespace Sentry
     }
 
 	std::shared_ptr<HttpAsyncResponse> HttpComponent::Post(const std::string& url, const std::string& data, float second)
-	{
+    {
         std::shared_ptr<HttpPostRequest> postRequest = HttpPostRequest::Create(url);
-        if(postRequest == nullptr)
+        if (postRequest == nullptr)
         {
             return nullptr;
         }
         postRequest->AddBody(data);
         std::shared_ptr<HttpTask> httpTask = postRequest->MakeTask(second);
-		std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
+        std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
 
-        this->AddTask(httpTask);
         httpAsyncClient->Request(postRequest);
-        std::shared_ptr<HttpAsyncResponse> response = httpTask->Await();
-        if(this->mClientPools.size() < 100)
+        std::shared_ptr<HttpAsyncResponse> response = this->AddTask(httpTask)->Await();
+
+        if (response->GetData().GetStatus() != HttpStatus::OK)
+        {
+            LOG_ERROR("[POST] " << url << " error = "
+                               << HttpStatusToString(response->GetData().GetStatus()));
+        }
+        if (this->mClientPools.size() < 100)
         {
             this->mClientPools.push(httpAsyncClient);
         }
         return response;
-	}
+    }
 }

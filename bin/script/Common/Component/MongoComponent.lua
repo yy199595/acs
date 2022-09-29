@@ -135,16 +135,6 @@ function MongoComponent.Push(tab, select, update)
     return this.Update(tab, select, update, "$push")
 end
 
-function MongoComponent.AddCounter(key, value)
-
-    local address = self:GetHost()
-    local code, response = self:Call(address, "AddCounter", {
-        key = key,
-        value = value
-    })
-    return code == XCode.Successful and response.value or 0
-end
-
 function MongoComponent.GetCount(tab, query)
     local requset = { }
     requset.count = tab

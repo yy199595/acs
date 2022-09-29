@@ -19,39 +19,24 @@ namespace Sentry
         return fullName.substr(pos + 2);
     }
     XCode LocalService::Invoke(const std::string &func, std::shared_ptr<Rpc::Data> message)
-	{
-		if (!this->IsStartService())
-		{
-			LOG_ERROR(this->GetName() << " is not start");
-			return XCode::CallServiceNotFound;
-		}
+    {
+        if (!this->IsStartService())
+        {
+            LOG_ERROR(this->GetName() << " is not start");
+            return XCode::CallServiceNotFound;
+        }
 
-		std::shared_ptr<ServiceMethod> serviceMethod = this->mMethodRegister->GetMethod(func);
-		if (serviceMethod == nullptr)
-		{
-			LOG_ERROR("not find [" << this->GetName() << "." << func << "]");
-			return XCode::CallServiceNotFound;
-		}
+        std::shared_ptr<ServiceMethod> serviceMethod = this->mMethodRegister->GetMethod(func);
+        if (serviceMethod == nullptr)
+        {
+            LOG_ERROR("not find [" << this->GetName() << "." << func << "]");
+            return XCode::CallServiceNotFound;
+        }
 #ifndef __DEBUG__
         message->GetHead().Remove("func");
 #endif
-		try
-		{
-			XCode code = serviceMethod->Invoke(*message);
-
-            message->SetType(Tcp::Type::Response);
-            message->GetHead().Remove("address");
-            message->GetHead().Add("code", (int)code);
-		}
-		catch (std::logic_error & error)
-		{
-            message->SetType(Tcp::Type::Response);
-            message->GetHead().Remove("address");
-            message->GetHead().Add("error", error.what());
-            message->GetHead().Add("code", (int)XCode::ThrowError);
-            return XCode::ThrowError;
-		}
-	}
+        return serviceMethod->Invoke(*message);
+    }
 
 	bool LocalService::StartNewService()
 	{
@@ -60,31 +45,31 @@ namespace Sentry
 		{
 			return false;
 		}
-        std::vector<const RpcInterfaceConfig *> rpcInterfaceConfigs;
-        this->GetServiceConfig().GetConfigs(rpcInterfaceConfigs);
+        std::vector<const RpcMethodConfig *> methodConfigs;
+        this->GetServiceConfig().GetConfigs(methodConfigs);
 		LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();
 
 		if (luaScriptComponent != nullptr)
 		{
             lua_State * lua = luaScriptComponent->GetLuaEnv();
-            for(const RpcInterfaceConfig * rpcInterfaceConfig : rpcInterfaceConfigs)
+            for(const RpcMethodConfig * methodConfig : methodConfigs)
             {
-                const char* tab = rpcInterfaceConfig->Service.c_str();
-                const char * func = rpcInterfaceConfig->Method.c_str();
+                const char* tab = methodConfig->Service.c_str();
+                const char * func = methodConfig->Method.c_str();
                 if (Lua::Function::Get(lua, tab, func))
                 {
                     std::shared_ptr<LuaServiceMethod> luaServiceMethod
-                            = std::make_shared<LuaServiceMethod>(rpcInterfaceConfig, lua);
+                            = std::make_shared<LuaServiceMethod>(methodConfig, lua);
                     this->mMethodRegister->AddMethod(luaServiceMethod);
                 }
-                else if (this->mMethodRegister->GetMethod(rpcInterfaceConfig->Method) == nullptr)
+                else if (this->mMethodRegister->GetMethod(methodConfig->Method) == nullptr)
                 {
                     return false;
                 }
             }
 		}
 
-        for(const RpcInterfaceConfig * config : rpcInterfaceConfigs)
+        for(const RpcMethodConfig * config : methodConfigs)
         {
             if(this->mMethodRegister->GetMethod(config->Method) == nullptr)
             {

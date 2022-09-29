@@ -34,6 +34,7 @@ namespace Sentry
         bool Send(const std::string & address, std::shared_ptr<Rpc::Data> message);
         std::shared_ptr<Rpc::Data> Call(const std::string & address, std::shared_ptr<Rpc::Data> message);
     private:
+        void Invoke(const RpcMethodConfig * config, std::shared_ptr<Rpc::Data> message);
     private:
         std::string mMethod;
         std::string mService;

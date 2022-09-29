@@ -49,7 +49,7 @@ namespace Sentry
     public:
         virtual XCode Invoke(const std::string & method, std::shared_ptr<Rpc::Data> message) = 0;
 	private:
-		RpcServiceConfig * mConfig;
+        RpcServiceConfig * mConfig;
         std::string mLocalAddress;
         std::vector<std::string> mServiceHosts;
         class InnerNetComponent* mClientComponent;

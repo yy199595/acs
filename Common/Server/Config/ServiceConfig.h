@@ -5,7 +5,7 @@
 #include<unordered_map>
 #include"XCode/XCode.h"
 #include"rapidjson/document.h"
-#include"InterfaceConfig.h"
+#include"MethodConfig.h"
 namespace Sentry
 {
 	struct CodeConfig
@@ -49,7 +49,7 @@ namespace Sentry
 		}
 	}
 
- 	class RpcServiceConfig :  public IServiceConfig<RpcInterfaceConfig>
+ 	class RpcServiceConfig :  public IServiceConfig<RpcMethodConfig>
 	{
 	 public:
 		using IServiceConfig::IServiceConfig;
@@ -59,7 +59,7 @@ namespace Sentry
 		static bool ParseFunName(const std::string & func, std::string & service, std::string & method);
 	};
 
-	class HttpServiceConfig : public IServiceConfig<HttpInterfaceConfig>
+	class HttpServiceConfig : public IServiceConfig<HttpMethodConfig>
 	{
 	 public:
 		using IServiceConfig::IServiceConfig;

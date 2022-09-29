@@ -8,6 +8,8 @@
 #include<iostream>
 #include"Lua/LuaCoroutine.h"
 #include"String/StringHelper.h"
+#include"Client/HttpRequestClient.h"
+
 namespace Sentry
 {
     std::shared_ptr<HttpTask> HttpAsyncRequest::MakeTask(int timeout)
@@ -46,7 +48,7 @@ namespace Sentry
 
     void LuaHttpTask::OnTimeout()
     {
-        constexpr HttpStatus code = HttpStatus::INTERNAL_SERVER_ERROR;
+        constexpr HttpStatus code = HttpStatus::REQUEST_TIMEOUT;
         std::shared_ptr<HttpAsyncResponse> response(new HttpDataResponse(code));
         this->OnResponse(response);
     }

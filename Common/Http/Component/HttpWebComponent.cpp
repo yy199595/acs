@@ -19,9 +19,9 @@ namespace Sentry
             LocalHttpService *localHttpService = component->Cast<LocalHttpService>();
             if (localHttpService != nullptr)
             {
-                std::vector<const HttpInterfaceConfig *> httpInterConfigs;
+                std::vector<const HttpMethodConfig *> httpInterConfigs;
                 localHttpService->GetServiceConfig().GetConfigs(httpInterConfigs);
-                for (const HttpInterfaceConfig *httpInterfaceConfig: httpInterConfigs)
+                for (const HttpMethodConfig *httpInterfaceConfig: httpInterConfigs)
                 {
                     this->mHttpConfigs.emplace(httpInterfaceConfig->Path, httpInterfaceConfig);
                 }
@@ -32,7 +32,7 @@ namespace Sentry
     }
 
 
-    const HttpInterfaceConfig *HttpWebComponent::GetConfig(const std::string &path)
+    const HttpMethodConfig *HttpWebComponent::GetConfig(const std::string &path)
     {
         auto iter = this->mHttpConfigs.find(path);
         if(iter != this->mHttpConfigs.end())
@@ -57,7 +57,7 @@ namespace Sentry
         std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
 
         const HttpData & httpData = request->GetData();
-        const HttpInterfaceConfig *httpConfig = this->GetConfig(httpData.mPath);
+        const HttpMethodConfig *httpConfig = this->GetConfig(httpData.mPath);
         if (httpConfig == nullptr)
         {
             httpClient->StartWriter(HttpStatus::NOT_FOUND);

@@ -4,7 +4,7 @@
 
 namespace Sentry
 {
-    class InterfaceConfig
+    class MethodConfig
     {
     public:
 		int Timeout;
@@ -16,7 +16,7 @@ namespace Sentry
 		virtual bool IsHttpInterface() = 0;
 	};
 
-	class RpcInterfaceConfig final : public InterfaceConfig
+	class RpcMethodConfig final : public MethodConfig
 	{
 	public:
         bool IsAuth;
@@ -30,7 +30,7 @@ namespace Sentry
 		bool IsHttpInterface() final { return false;}
 	};
 
-	class HttpInterfaceConfig final : public InterfaceConfig
+	class HttpMethodConfig final : public MethodConfig
 	{
 	public:
 		std::string Path;

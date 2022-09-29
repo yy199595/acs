@@ -9,11 +9,11 @@
 struct lua_State;
 namespace Sentry
 {
-    class HttpInterfaceConfig;
+    class HttpMethodConfig;
     class LuaHttpServiceMethod : public HttpServiceMethod
     {
     public:
-        LuaHttpServiceMethod(const HttpInterfaceConfig * config,  lua_State * lua);
+        LuaHttpServiceMethod(const HttpMethodConfig * config, lua_State * lua);
     public:
         bool IsLuaMethod() const { return true; }
         XCode Invoke(const HttpHandlerRequest &request, HttpHandlerResponse &response) final;
@@ -24,7 +24,7 @@ namespace Sentry
     private:
         lua_State * mLua;
         std::string mData;
-        const HttpInterfaceConfig * mConfig;
+        const HttpMethodConfig * mConfig;
     };
 }
 

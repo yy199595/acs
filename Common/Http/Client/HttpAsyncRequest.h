@@ -140,7 +140,7 @@ namespace Sentry
     public:
         const std::string & GetData() const { return this->mData;}
         bool Get(const std::string & key, std::string & value) const;
-
+        HttpStatus GetStatus() const { return (HttpStatus)this->mStatus; }
     public:
         void Writer(lua_State *lua) const;
         void WriterStatus(lua_State * lua) const;

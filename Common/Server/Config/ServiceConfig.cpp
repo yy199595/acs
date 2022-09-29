@@ -18,7 +18,7 @@ namespace Sentry
 			const rapidjson::Value & jsonValue = iter->value;
 			if(jsonValue.IsObject())
 			{
-				RpcInterfaceConfig serviceConfog;
+				RpcMethodConfig serviceConfog;
 				const char* name = iter->name.GetString();
 
 				serviceConfog.Method = name;
@@ -70,7 +70,7 @@ namespace Sentry
 			const rapidjson::Value & jsonValue = iter->value;
 			if(jsonValue.IsObject())
 			{
-				HttpInterfaceConfig serviceConfog;
+				HttpMethodConfig serviceConfog;
 				const char* name = iter->name.GetString();
 
 				serviceConfog.Method = name;

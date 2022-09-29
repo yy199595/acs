@@ -67,7 +67,7 @@ namespace Sentry
             return XCode::CallServiceNotFound;
         }
         const RpcServiceConfig &rpcServiceConfig = localServerRpc->GetServiceConfig();
-        const RpcInterfaceConfig *config = rpcServiceConfig.GetConfig(method);
+        const RpcMethodConfig *config = rpcServiceConfig.GetConfig(method);
         if (config == nullptr || config->Type != "Client")
         {
             return XCode::NotFoundRpcConfig;

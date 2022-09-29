@@ -5,6 +5,7 @@
 #ifndef APP_HTTPRPCCOMPONENT_H
 #define APP_HTTPRPCCOMPONENT_H
 #include"Client/Http.h"
+#include"Client/Message.h"
 #include"HttpListenComponent.h"
 
 namespace Sentry
@@ -16,6 +17,9 @@ namespace Sentry
         HttpRpcComponent() = default;
     public:
         void OnRequest(std::shared_ptr<HttpHandlerClient> httpClient) final;
+
+    private:
+        void Invoke(std::shared_ptr<HttpHandlerClient> httpClient, const RpcMethodConfig * config, std::shared_ptr<Rpc::Data> message);
     private:
 
     };

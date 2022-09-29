@@ -116,6 +116,7 @@ namespace Client
 	{
 		luaRegister.BeginRegister<ClientComponent>();
 		luaRegister.PushExtensionFunction("Call", Lua::ClientEx::Call);
-		luaRegister.PushExtensionFunction("StartConnectAsync", Lua::ClientEx::StartConnect);
+        luaRegister.PushExtensionFunction("Auth", Lua::ClientEx::Auth);
+        luaRegister.PushExtensionFunction("StartConnectAsync", Lua::ClientEx::StartConnect);
 	}
 }
