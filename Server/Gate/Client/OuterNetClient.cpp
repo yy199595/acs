@@ -80,8 +80,7 @@ namespace Sentry
             case Tcp::DecodeState::Body:
             {
                 this->mState = Tcp::DecodeState::Head;
-                if (!this->mMessage->Parse(readStream, size)
-                    || !this->mMessage->GetHead().Has("func"))
+                if (!this->mMessage->Parse(readStream, size))
                 {
                     this->CloseSocket(XCode::UnKnowPacket);
                     return;

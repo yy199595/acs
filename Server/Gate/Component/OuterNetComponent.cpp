@@ -35,7 +35,6 @@ namespace Sentry
 
 	void OuterNetComponent::OnMessage(const std::string& address, std::shared_ptr<Rpc::Data> message)
     {
-        LOG_CHECK_RET(message->GetHead().Has("func"));
         switch ((Tcp::Type) message->GetType())
         {
             case Tcp::Type::Request:

@@ -116,6 +116,7 @@ namespace Sentry
             return XCode::NetActiveShutdown;
         }
 
+        response->SetType(Tcp::Type::Response);
 		if (!this->mOutNetComponent->SendData(address, response))
 		{
             CONSOLE_LOG_ERROR("send message to client " << address << " error");
