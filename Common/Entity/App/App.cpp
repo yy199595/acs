@@ -206,7 +206,7 @@ namespace Sentry
 			{
 				component->OnLastFrameUpdate();
 			}
-			this->mStartTimer = mLastUpdateTime = Helper::Time::GetNowMilTime();
+			this->mLastUpdateTime = Helper::Time::GetNowMilTime();
 		}
 	}
 
@@ -222,7 +222,6 @@ namespace Sentry
             {
                 continue;
             }
-			CONSOLE_LOG_INFO("start " << component->GetName());
             if (component->Cast<IStart>() != nullptr)
             {
                 ElapsedTimer timer;
