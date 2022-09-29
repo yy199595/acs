@@ -145,18 +145,40 @@ namespace Rpc
         return true;
     }
 
-    int Data::ParseLen(std::istream &is)
+    bool Data::ParseLen(std::istream &is, int & len)
     {
-        union {
+        union
+        {
             int len;
             char buf[sizeof(int)];
         } buffer;
-        is.readsome(buffer.buf, sizeof(int));
+        if (is.readsome(buffer.buf, sizeof(int)) != sizeof(int))
+        {
+            return false;
+        }
 
+        this->mType = is.get();
+        this->mProto = is.get();
+        switch(this->mType)
+        {
+            case (int)Tcp::Type::Request:
+            case (int)Tcp::Type::Response:
+                break;
+            default:
+                return false;
+        }
+
+        switch(this->mProto)
+        {
+            case (int)Tcp::Porto::Json:
+            case (int)Tcp::Porto::Protobuf:
+                break;
+            default:
+                return false;
+        }
+        len = buffer.len;
         this->mLen = buffer.len;
-        this->mType = (Tcp::Type)is.get();
-        this->mProto = (Tcp::Porto)is.get();
-        return this->mLen;
+        return true;
     }
 
     bool Data::Parse(std::istream &os, size_t size)

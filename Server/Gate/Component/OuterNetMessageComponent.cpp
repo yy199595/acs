@@ -79,11 +79,13 @@ namespace Sentry
             localServerRpc->GetHost(address);
             localServerRpc->AddHost(address, userId);
         }
-        long long rpcId = 0;
-        if (message->GetHead().Get("rpc", rpcId))
+        if (message->GetHead().Has("rpc"))
         {
             std::shared_ptr<ClientRpcTask> clientRpcTask
                 = std::make_shared<ClientRpcTask>(*message, this, 0);
+
+            message->GetHead().Remove("rpc");
+            message->GetHead().Add("rpc", clientRpcTask->GetRpcId());
             if (!this->mInnerMessageComponent->Send(address, message))
             {
                 return XCode::SendMessageFail;
@@ -106,22 +108,22 @@ namespace Sentry
 
     }
 
-	XCode OuterNetMessageComponent::OnResponse(const std::string & address, std::shared_ptr<Rpc::Data> response)
+	XCode OuterNetMessageComponent::OnResponse(const std::string & address, std::shared_ptr<Rpc::Data> message)
 	{
-        assert(this->GetApp()->IsMainThread());
-        LOG_RPC_CHECK_ARGS(response->GetHead().Has("rpc"));
-        if(response->GetCode(XCode::Failure) == XCode::NetActiveShutdown)
+        LOG_RPC_CHECK_ARGS(message->GetHead().Has("rpc"));
+        if(message->GetCode(XCode::Failure) == XCode::NetActiveShutdown)
         {
             this->mOutNetComponent->StartClose(address);
             return XCode::NetActiveShutdown;
         }
 
-        response->SetType(Tcp::Type::Response);
-		if (!this->mOutNetComponent->SendData(address, response))
+        message->SetType(Tcp::Type::Response);
+		if (!this->mOutNetComponent->SendData(address, message))
 		{
             CONSOLE_LOG_ERROR("send message to client " << address << " error");
 			return XCode::NetWorkError;
 		}
+        CONSOLE_LOG_DEBUG("send message to client " << address << " successful");
 		return XCode::Successful;
 	}
 }

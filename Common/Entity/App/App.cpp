@@ -239,7 +239,7 @@ namespace Sentry
             }
         }
 
-        LOG_WARN("start all component complete");
+        CONSOLE_LOG_DEBUG("start all component complete");
         for (const std::string &name: components)
         {
             Component *component = this->GetComponentByName(name);
@@ -305,7 +305,7 @@ namespace Sentry
             }
         }
 		long long t = Helper::Time::GetNowMilTime() - this->mStartTime;
-		LOG_DEBUG("===== start " << this->mServerName << " successful [" << t / 1000.0f << "]s ===========");
+		LOG_INFO("===== start " << this->mServerName << " successful [" << t / 1000.0f << "]s ===========");
 	}
 
 	void App::UpdateConsoleTitle()

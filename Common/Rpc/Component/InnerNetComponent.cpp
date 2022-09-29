@@ -134,7 +134,11 @@ namespace Sentry
 		}
 		std::string ip;
 		unsigned short port = 0;
-		assert(Helper::String::ParseIpAddress(address, ip, port));
+        if(!Helper::String::ParseIpAddress(address, ip, port))
+        {
+            CONSOLE_LOG_ERROR("parse address error : [" << address << "]");
+            return nullptr;
+        }
 		std::shared_ptr<SocketProxy> socketProxy = this->mNetComponent->CreateSocket();
         if(socketProxy == nullptr)
         {
@@ -160,8 +164,8 @@ namespace Sentry
 
 	bool InnerNetComponent::Send(const std::string & address, std::shared_ptr<Rpc::Data> message)
 	{
-        assert(message->GetType() != Tcp::Type::None);
-        assert(message->GetProto() != Tcp::Porto::None);
+        assert(message->GetType() == (int)Tcp::Type::Request
+            || message->GetType() == (int)Tcp::Type::Response);
         std::shared_ptr<InnerNetClient> clientSession = this->GetOrCreateSession(address);
 		if (message == nullptr || clientSession == nullptr)
 		{

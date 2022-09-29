@@ -53,16 +53,27 @@ namespace Client
         {
             case Tcp::DecodeState::Head:
             {
+                int len = 0;
                 this->mState = Tcp::DecodeState::Body;
                 this->mMessage = std::make_shared<Rpc::Data>();
-                int len = this->mMessage->ParseLen(readStream);
+                if(!this->mMessage->ParseLen(readStream, len))
+                {
+                    CONSOLE_LOG_ERROR("unknow message type = "
+                        << this->mMessage->GetType() << "  proto = " << this->mMessage->GetProto());
+                    return;
+                }
                 this->ReceiveMessage(len);
             }
                 break;
             case Tcp::DecodeState::Body:
             {
                 this->mState = Tcp::DecodeState::Head;
-                this->mMessage->Parse(readStream, size);
+                if(!this->mMessage->Parse(readStream, size))
+                {
+                    CONSOLE_LOG_ERROR("parse server message error");
+                    return;
+                }
+                this->ReceiveMessage(RPC_PACK_HEAD_LEN);
                 const std::string & address = this->mSocket->GetAddress();
 #ifdef ONLY_MAIN_THREAD
                 this->mClientComponent->OnMessage(address, std::move(this->mMessage));
@@ -74,6 +85,5 @@ namespace Client
             }
                 break;
         }
-        this->ReceiveMessage(RPC_PACK_HEAD_LEN);
     }
 }

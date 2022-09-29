@@ -78,10 +78,15 @@ namespace Sentry
         {
             case Tcp::DecodeState::Head:
             {
+                int len = 0;
                 Asio::Code code;
                 this->mState = Tcp::DecodeState::Body;
                 this->mMessage = std::make_shared<Rpc::Data>();
-                int len = this->mMessage->ParseLen(readStream);
+                if(!this->mMessage->ParseLen(readStream, len))
+                {
+                    this->CloseSocket(XCode::UnKnowPacket);
+                    return;
+                }
                 size_t count = this->mSocket->GetSocket().available(code);
                 assert(count >= len);
                 this->ReceiveMessage(len);

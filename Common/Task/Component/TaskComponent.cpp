@@ -57,9 +57,9 @@ namespace Sentry
             for(; iter != this->mCorPool.End(); iter++)
             {
                 TaskContext * taskContext = iter->second;
-                if(nowTime - taskContext->mSwitchTime >= 10)
+                if(nowTime - taskContext->mSwitchTime >= 20)
                 {
-                    LOG_FATAL(taskContext->mCoroutineId << " long time not switch");
+                    LOG_ERROR(taskContext->mCoroutineId << " long time not switch");
                 }
             }
         }

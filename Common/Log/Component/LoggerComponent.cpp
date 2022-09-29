@@ -51,16 +51,16 @@ namespace Sentry
         switch (type)
         {
             case spdlog::level::level_enum::info:
-                this->mAllLog->info(log);
+                this->mInfoLog->info(log);
                 break;
             case spdlog::level::level_enum::warn:
-                this->mAllLog->warn(log);
+                this->mWarningLog->warn(log);
                 break;
             case spdlog::level::level_enum::err:
-                this->mAllLog->error(log);
+                this->mErrorLog->error(log);
                 break;
             case spdlog::level::level_enum::critical:
-                this->mAllLog->critical(log);
+                this->mFatalLog->critical(log);
                 break;
         }
     }

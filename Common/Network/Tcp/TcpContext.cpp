@@ -37,18 +37,23 @@ namespace Tcp
 
 	void TcpContext::Connect()
 	{
-		this->mConnectCount++;
+        Asio::Code code;
+        this->mConnectCount++;
 		assert(this->mSocket->IsRemote());
 		unsigned short port = this->mSocket->GetPort();
 		const std::string& ip = this->mSocket->GetIp();
         Asio::Socket & tcpSocket = this->mSocket->GetSocket();
-		Asio::AddressV4 address = asio::ip::make_address_v4(ip);
+		Asio::AddressV4 address = asio::ip::make_address_v4(ip, code);
+        if(code)
+        {
+            CONSOLE_LOG_ERROR("[" << ip << ":" << port << "] " << code.message());
+            return;
+        }
 		Asio::EndPoint endPoint(address, port);
 		std::shared_ptr<TcpContext> self = this->shared_from_this();
 
 		printf("start connect %s\n" , this->mSocket->GetAddress().c_str());
 
-		Asio::Code code;
 		tcpSocket.close(code);
 		tcpSocket.async_connect(endPoint, [this, self]
 			(const Asio::Code & code)

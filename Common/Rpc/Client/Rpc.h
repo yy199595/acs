@@ -13,8 +13,7 @@ namespace Tcp
     {
         None,
         Request,
-        Response,
-        UnitRequest
+        Response
     };
     enum class Porto
     {

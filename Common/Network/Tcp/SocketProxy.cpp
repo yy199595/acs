@@ -27,7 +27,11 @@ namespace Sentry
         this->mIp = ip;
         this->mPort = port;
         this->mIsRemote = true;
-        assert(!this->mIp.empty() && this->mPort > 0);
+        if(this->mIp.empty() || this->mPort == 0)
+        {
+            CONSOLE_LOG_ERROR("Inti Socket Error Address Error");
+            return;
+        }
         this->mAddress = fmt::format("{0}:{1}", ip, port);
     }
 

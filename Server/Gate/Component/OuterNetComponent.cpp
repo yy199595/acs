@@ -74,6 +74,7 @@ namespace Sentry
             this->mOuterMessageComponent->OnResponse(address, message);
             return true;
         }
+        message->GetHead().Add("address", address);
         XCode code = this->mOuterMessageComponent->OnRequest(userId, message);
         if (code != XCode::Successful)
         {
@@ -162,10 +163,11 @@ namespace Sentry
 
 	bool OuterNetComponent::SendData(const std::string &address, std::shared_ptr<Rpc::Data> message)
 	{
-		std::shared_ptr<OuterNetClient> gateClient = this->GetGateClient(address);
-		if(gateClient != nullptr)
+        message->GetHead().Remove("address");
+		std::shared_ptr<OuterNetClient> outerNetClient = this->GetGateClient(address);
+		if(outerNetClient != nullptr)
 		{
-			gateClient->SendData(message);
+            outerNetClient->SendData(message);
 			return true;
 		}
 		return false;

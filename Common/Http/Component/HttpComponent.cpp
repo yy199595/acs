@@ -27,7 +27,7 @@ namespace Sentry
         {
             httpClient = this->mClientPools.front();
             this->mClientPools.pop();
-            assert(httpClient->Reset(socketProxy));
+            httpClient->Reset(socketProxy);
             return httpClient;
         }
 		return std::make_shared<HttpRequestClient>(socketProxy, this);

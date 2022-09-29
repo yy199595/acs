@@ -47,7 +47,7 @@ namespace Rpc
     class Data : public Tcp::ProtoMessage
     {
     public:
-        int ParseLen(std::istream &os);
+        bool ParseLen(std::istream &os, int & len);
 
         int Serailize(std::ostream &os) final;
 
@@ -56,20 +56,15 @@ namespace Rpc
     public:
         XCode GetCode(XCode code) const;
 
-        Head &GetHead()
-        { return this->mHead; }
+        Head &GetHead() { return this->mHead; }
 
-        void SetType(Tcp::Type type)
-        { this->mType = type; }
+        void SetType(Tcp::Type type) { this->mType = (int)type; }
 
-        void SetProto(Tcp::Porto proto)
-        { this->mProto = proto; }
+        void SetProto(Tcp::Porto proto) { this->mProto = (int)proto; }
 
-        const Tcp::Type &GetType() const
-        { return this->mType; }
+        int GetType() const { return this->mType; }
 
-        const Tcp::Porto &GetProto() const
-        { return this->mProto; }
+        int GetProto() const { return this->mProto; }
 
         void Clear() { this->mBody.clear();}
         size_t GetSize() const { return this->mBody.size(); }
@@ -87,8 +82,8 @@ namespace Rpc
     private:
         int mLen;
         Head mHead;
-        Tcp::Type mType;
-        Tcp::Porto mProto;
+        int mType;
+        int mProto;
         std::string mBody;
     };
 
@@ -97,14 +92,14 @@ namespace Rpc
     {
         switch (this->mProto)
         {
-            case Tcp::Porto::Protobuf:
+            case (int)Tcp::Porto::Protobuf:
                 if(message->ParseFromString(this->mBody))
                 {
                     this->mBody.clear();
                     return true;
                 }
                 return false;
-            case Tcp::Porto::Json:
+            case (int)Tcp::Porto::Json:
                 if(Helper::Protocol::FromJson(message, this->mBody))
                 {
                     this->mBody.clear();
@@ -126,9 +121,9 @@ namespace Rpc
         }
         switch (this->mProto)
         {
-            case Tcp::Porto::Protobuf:
+            case (int)Tcp::Porto::Protobuf:
                 return message->SerializeToString(&mBody);
-            case Tcp::Porto::Json:
+            case (int)Tcp::Porto::Json:
                 return Helper::Protocol::GetJson(*message, &mBody);
         }
         CONSOLE_LOG_FATAL("proto error write error");

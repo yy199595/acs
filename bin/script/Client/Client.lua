@@ -36,16 +36,20 @@ function Client.Start()
         Log.Error("user auth failure")
         return false
     end
-    for i = 1, 20 do
-        --coroutine.start(LoopCall)
-        coroutine.start(LoopLogin)
-        coroutine.start(LoopRegister)
-    end
+    coroutine.start(LoopPing)
     return true
 end
 local callCount = 0
 local loginCount = 0
 local registerCount = 0
+
+function LoopPing()
+    while true do
+        local t1 = Time.GetNowMilTime()
+        local code = clientComponent:Call("GateService.Ping")
+        Log.Info("ping use time ", Time.GetNowMilTime() - t1)
+    end
+end
 
 function LoopRegister()
     while true do
@@ -70,7 +74,6 @@ function LoopLogin()
 end
 
 function LoopCall()
-    local clientComponent = App.GetComponent("ClientComponent")
     while true do
         local t1 = Time.GetNowMilTime()
         local res, response = clientComponent:Call("ChatService.Chat", "c2s.chat.request", {

@@ -47,23 +47,26 @@ namespace Client
 
     void ClientComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Data> message)
     {
-        Tcp::Type type = (Tcp::Type)message->GetType();
-        Tcp::Porto proto = (Tcp::Porto)message->GetProto();
-        switch(type)
+        int type = message->GetType();
+        int proto = message->GetProto();
+        switch (type)
         {
-            case Tcp::Type::Request:
+            case (int)Tcp::Type::Request:
             {
 
             }
-                break;
-            case Tcp::Type::Response:
+                return;
+            case (int)Tcp::Type::Response:
+            {
                 long long rpcId = 0;
-                if(message->GetHead().Get("rpc", rpcId))
+                if (message->GetHead().Get("rpc", rpcId))
                 {
                     this->OnResponse(rpcId, message);
                 }
-                break;
+            }
+                return;
         }
+        CONSOLE_LOG_ERROR("unknow message type = " << type);
     }
 
     void ClientComponent::StartClose(const std::string &address)

@@ -28,7 +28,7 @@ namespace Sentry
         if(!this->mClientPools.empty())
         {
             handlerClient = this->mClientPools.front();
-            assert(handlerClient->Reset(socket));
+            handlerClient->Reset(socket);
             this->mClientPools.pop();
         }
         else

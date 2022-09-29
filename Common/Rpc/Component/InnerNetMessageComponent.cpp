@@ -89,6 +89,7 @@ namespace Sentry
     std::shared_ptr<Rpc::Data> InnerNetMessageComponent::Call(
         const std::string &address, std::shared_ptr<Rpc::Data> message)
     {
+        message->GetHead().Remove("address");
         if (!this->mRpcClientComponent->Send(address, message))
         {
             return nullptr;
@@ -100,15 +101,9 @@ namespace Sentry
 
     bool InnerNetMessageComponent::Send(const std::string &address, std::shared_ptr<Rpc::Data> message)
     {
-        assert(message->GetType() != Tcp::Type::None);
-        assert(message->GetProto() != Tcp::Porto::None);
-        std::shared_ptr<InnerNetClient> netClient =
-            this->mRpcClientComponent->GetOrCreateSession(address);
-        if(netClient == nullptr)
-        {
-            return false;
-        }
-        netClient->SendData(message);
-        return true;
+        message->GetHead().Remove("address");
+        assert(message->GetType() != (int)Tcp::Type::None);
+        assert(message->GetProto() != (int)Tcp::Porto::None);
+        return this->mRpcClientComponent->Send(address, message);
     }
 }// namespace Sentry
