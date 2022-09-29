@@ -18,6 +18,11 @@ namespace Rpc
         return true;
     }
 
+    bool Head::Add(const std::string &key, XCode value)
+    {
+        return this->Add(key, (int)value);
+    }
+
 
     bool Head::Get(const std::string &key, int &value) const
     {

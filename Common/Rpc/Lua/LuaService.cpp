@@ -60,6 +60,9 @@ namespace Lua
             return 0;
         }
         std::shared_ptr<Rpc::Data> request(new Rpc::Data());
+
+        request->SetType(Tcp::Type::Request);
+        request->SetProto(Tcp::Porto::Protobuf);
         const std::string &func = rpcInterfaceConfig->FullName;
         if (!rpcInterfaceConfig->Request.empty())
         {
@@ -71,14 +74,8 @@ namespace Lua
                 luaL_error(lua, "read request paremeter error");
                 return 0;
             }
-            if (!message->SerializeToString(request->GetBody()))
-            {
-                luaL_error(lua, "serialize message error");
-                return 0;
-            }
+            request->WriteMessage(message.get());
         }
-        request->SetType(Tcp::Type::Request);
-        request->SetProto(Tcp::Porto::Protobuf);
 
         lua_pushthread(lua);
         const std::string &response = rpcInterfaceConfig->Response;

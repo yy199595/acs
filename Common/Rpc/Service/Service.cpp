@@ -66,10 +66,7 @@ namespace Sentry
         {
             request->GetHead().Add("id", userId);
         }
-        if(message != nullptr)
-        {
-            LOG_CHECK_RET_FALSE(message->SerializeToString(request->GetBody()));
-        }
+        request->WriteMessage(message);
         return this->mMessageComponent->Send(address, request);
     }
 
@@ -91,13 +88,7 @@ namespace Sentry
         {
             request->GetHead().Add("id", userId);
         }
-        if(message != nullptr)
-        {
-            if (!message->SerializePartialToString(request->GetBody()))
-            {
-                return nullptr;
-            }
-        }
+        request->WriteMessage(message);
         return this->mMessageComponent->Call(address, request);
     }
 
@@ -120,13 +111,10 @@ namespace Sentry
         std::shared_ptr<Rpc::Data> request
             = std::make_shared<Rpc::Data>();
 
+        request->WriteMessage(&message);
         request->SetType(Tcp::Type::Request);
         request->SetProto(Tcp::Porto::Protobuf);
         request->GetHead().Add("func", func);
-        if(!message.SerializePartialToString(request->GetBody()))
-        {
-            return XCode::SerializationFailure;
-        }
         return this->mMessageComponent->Send(address, request) ? XCode::Successful : XCode::NetWorkError;
 	}
 
@@ -160,7 +148,7 @@ namespace Sentry
         }
         if(data->GetCode(XCode::Failure) == XCode::Successful)
         {
-            if (!data->ParseMessage(response))
+            if (!data->ParseMessage(response.get()))
             {
                 return XCode::ParseMessageError;
             }
@@ -182,7 +170,7 @@ namespace Sentry
         }
         if(data->GetCode(XCode::Failure) == XCode::Successful)
         {
-            if (!data->ParseMessage(response))
+            if (!data->ParseMessage(response.get()))
             {
                 return XCode::ParseMessageError;
             }
@@ -243,7 +231,7 @@ namespace Sentry
         }
         if(data->GetCode(XCode::Failure) == XCode::Successful)
         {
-            if(!data->ParseMessage(response))
+            if(!data->ParseMessage(response.get()))
             {
                 return XCode::ParseMessageError;
             }
@@ -268,7 +256,7 @@ namespace Sentry
         }
         if(data->GetCode(XCode::Failure) == XCode::Successful)
         {
-            if(!data->ParseMessage(response))
+            if(!data->ParseMessage(response.get()))
             {
                 return XCode::ParseMessageError;
             }

@@ -6,13 +6,15 @@
 #include"App/App.h"
 #include"Client/OuterNetClient.h"
 #include"OuterNetMessageComponent.h"
-#include"Component/InnerNetMessageComponent.h"
+#include"Component/RedisDataComponent.h"
 #include"Component/NetThreadComponent.h"
+#include"Component/InnerNetMessageComponent.h"
+
 #ifdef __DEBUG__
 #include"String/StringHelper.h"
-#include"google/protobuf/util/json_util.h"
 #include"Config/ServiceConfig.h"
 #endif
+#include"Md5/MD5.h"
 namespace Sentry
 {
 	void OuterNetComponent::Awake()
@@ -24,8 +26,9 @@ namespace Sentry
 
 	bool OuterNetComponent::LateAwake()
 	{
+        this->mTimerComponent = this->GetApp()->GetTimerComponent();
         this->mNetComponent = this->GetComponent<NetThreadComponent>();
-		LOG_CHECK_RET_FALSE(this->mTimerComponent = App::Get()->GetTimerComponent());
+        LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisDataComponent>());
 		LOG_CHECK_RET_FALSE(this->mOuterMessageComponent = this->GetComponent<OuterNetMessageComponent>());
 		return true;
 	}
@@ -36,7 +39,7 @@ namespace Sentry
         switch ((Tcp::Type) message->GetType())
         {
             case Tcp::Type::Request:
-                if (this->mOuterMessageComponent->OnRequest(address, message) != XCode::Successful)
+                if (!this->OnRequest(address, message))
                 {
                     this->StartClose(address);
                 }
@@ -45,6 +48,52 @@ namespace Sentry
                 this->StartClose(address);
                 break;
         }
+    }
+
+    bool OuterNetComponent::OnRequest(const std::string &address, std::shared_ptr<Rpc::Data> message)
+    {
+        long long userId = 0;
+        if (!this->GetUserId(address, userId)) //没有验证
+        {
+            std::string token;
+            if (!message->GetHead().Get("token", token))
+            {
+                LOG_ERROR(address << " auth failure not find token");
+                return false;
+            }
+            message->GetHead().Remove("token");
+            auto iter = this->mTokens.find(token);
+            if (iter == this->mTokens.end())
+            {
+                LOG_ERROR(address << " auth failure not find token");
+                return false;
+            }
+            userId = iter->second;
+            this->mTokens.erase(iter);
+            this->mUserAddressMap.emplace(address, userId);
+            message->GetHead().Add("code", XCode::Successful);
+            this->mOuterMessageComponent->OnResponse(address, message);
+            return true;
+        }
+        XCode code = this->mOuterMessageComponent->OnRequest(userId, message);
+        if (code != XCode::Successful)
+        {
+            message->Clear();
+            message->GetHead().Remove("address");
+            message->GetHead().Add("code", code);
+            this->mOuterMessageComponent->OnResponse(address, message);
+            return false;
+        }
+        return true;
+    }
+
+    std::string OuterNetComponent::CreateToken(long long userId, float second)
+    {
+        long long nowTime = Helper::Time::GetNowSecTime();
+        std::string rand = fmt::format("{0}:{1}", userId, nowTime);
+        const std::string token = Helper::Md5::GetMd5(rand);
+        this->mTokens.emplace(token, userId);
+        return token;
     }
 
 	bool OuterNetComponent::OnListen(std::shared_ptr<SocketProxy> socket)
@@ -105,7 +154,7 @@ namespace Sentry
                 request->GetHead().Add("func", message->func());
                 if(message->has_data())
                 {
-                    message->data().SerializeToString(request->GetBody());
+                    request->WriteMessage(message->mutable_data());
                 }
 				proxyClient->SendData(request);
 			}
@@ -136,26 +185,6 @@ namespace Sentry
 		{
 			proxyClient->StartClose();
 		}
-	}
-
-	bool OuterNetComponent::AddNewUser(const std::string& address, long long userId)
-	{
-		auto iter = this->mGateClientMap.find(address);
-		if(iter == this->mGateClientMap.end())
-		{
-			LOG_ERROR("not find user address = [" << address << "]");
-			return false;
-		}
-		auto iter1 = this->mUserAddressMap.find(address);
-		if(iter1 != this->mUserAddressMap.end())
-		{
-			LOG_ERROR("user [" << userId << "] have login");
-			return false;
-		}
-		this->mUserAddressMap.emplace(address, userId);
-		this->mClientAddressMap.emplace(userId, address);
-		LOG_DEBUG(userId << " add to gate address = " << "[" << address << "]");
-		return true;
 	}
 
 	bool OuterNetComponent::GetUserId(const std::string& address, long long& userId)

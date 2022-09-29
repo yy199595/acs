@@ -37,7 +37,7 @@ namespace Lua
                 LOG_ERROR("new proto message " << type << " error");
                 return 0;
             }
-            message->SerializeToString(request->GetBody());
+            request->WriteMessage(message.get());
         }
         request->GetHead().Add("func", func);
 		TaskComponent * taskComponent = App::Get()->GetTaskComponent();

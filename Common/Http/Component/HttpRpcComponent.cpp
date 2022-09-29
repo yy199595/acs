@@ -45,27 +45,32 @@ namespace Sentry
             httpClient->StartWriter(HttpStatus::METHOD_NOT_ALLOWED);
             return;
         }
-        TaskComponent * taskComponent = this->GetApp()->GetTaskComponent();
 
 
-        std::shared_ptr<Rpc::Data> data(Rpc::Data());
+        std::shared_ptr<Rpc::Data> data(new Rpc::Data());
 
+
+        data->SetProto(Tcp::Porto::Json);
+        data->SetType(Tcp::Type::Request);
         if(!rpcInterfaceConfig->Request.empty())
         {
-
+            data->Append(request->GetContent());
         }
 
         std::string userId;
         if(request->GetHead("user_id", userId))
         {
-            long long id = std::stoll(userId);
+            data->GetHead().Add("id", userId);
         }
 
         if(!rpcInterfaceConfig->IsAsync)
         {
+            XCode code = targetService->Invoke(method, data);
 
+            data->GetHead().Add("code", code);
             return;
         }
+        TaskComponent * taskComponent = this->GetApp()->GetTaskComponent();
         taskComponent->Start([targetService, method, rpcInterfaceConfig, this, response, httpClient]()
         {
 

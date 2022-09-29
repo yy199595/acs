@@ -21,23 +21,25 @@ namespace Sentry
 		void OnCloseSocket(const std::string & address, XCode code) final;
         void OnMessage(const std::string &address, std::shared_ptr<Rpc::Data> message) final;
     public:
-		bool AddNewUser(const std::string & address, long long userId);
-		bool GetUserId(const std::string & address, long long & userId);
 		bool GetUserAddress(long long userId, std::string & address);
-		std::shared_ptr<OuterNetClient> GetGateClient(const std::string & address);
+        bool GetUserId(const std::string & address, long long & userId);
+        std::shared_ptr<OuterNetClient> GetGateClient(const std::string & address);
 	 public:
-		void SendToAllClient(std::shared_ptr<c2s::rpc::call> message);
+        std::string CreateToken(long long userId, float second = 10);
+        void SendToAllClient(std::shared_ptr<c2s::rpc::call> message);
 		bool SendData(const std::string & address, std::shared_ptr<Rpc::Data> message);
 	 public:
 		void Awake() final;
 		bool LateAwake() final;
-
 		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 private:
         bool StartInComplete() final { return false; }
+        bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Data> message);
     private:
 		class TimerComponent* mTimerComponent;
         class NetThreadComponent * mNetComponent;
+        class RedisDataComponent * mRedisComponent;
+        std::unordered_map<std::string, long long> mTokens;
         class OuterNetMessageComponent* mOuterMessageComponent;
         std::queue<std::shared_ptr<OuterNetClient>> mClientPools;
         std::unordered_map<std::string, long long> mUserAddressMap;

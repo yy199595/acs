@@ -119,11 +119,12 @@ namespace Sentry
 		XCode Invoke(Rpc::Data & message) override
 		{
             std::shared_ptr<T1> request(new T1());
-            if(!message.ParseMessage(request))
+            if(!message.ParseMessage(request.get()))
             {
                 return XCode::CallArgsError;
             }
-			if (!this->mHasUserId)
+            message.Clear();
+            if (!this->mHasUserId)
 			{
 				return (_o->*_func)(*request);
 			}
@@ -164,35 +165,33 @@ namespace Sentry
 		{
             std::shared_ptr<T1> request(new T1());
             std::shared_ptr<T2> response(new T2());
-            if(!message.ParseMessage(request))
+            if(!message.ParseMessage(request.get()))
             {
                 return XCode::CallArgsError;
             }
-            message.ClearBody();
+            message.Clear();
             if (this->mHasUserId)
-			{
+            {
                 long long userId = 0;
-                if(!message.GetHead().Get("id", userId))
+                if (!message.GetHead().Get("id", userId))
                 {
                     return XCode::CallArgsError;
                 }
-				XCode code = (_o->*_objfunc)(userId, *request, *response);
-				if (code == XCode::Successful)
-				{
-                    message.GetBody()->clear();
-                    if(!response->SerializeToString(message.GetBody()))
+                XCode code = (_o->*_objfunc)(userId, *request, *response);
+                if (code == XCode::Successful)
+                {
+                    if (!message.WriteMessage(response.get()))
                     {
                         return XCode::SerializationFailure;
                     }
                     return XCode::Successful;
-				}
-				return code;
-			}
+                }
+                return code;
+            }
 			XCode code = (_o->*_func)(*request, *response);
 			if (code == XCode::Successful)
 			{
-                message.GetBody()->clear();
-                if(!response->SerializeToString(message.GetBody()))
+                if(!message.WriteMessage(response.get()))
                 {
                     return XCode::SerializationFailure;
                 }
@@ -227,13 +226,13 @@ namespace Sentry
 	 public:
 		XCode Invoke(Rpc::Data & message) override
 		{
-			std::shared_ptr<T1> request(new T1());
-            if(!message.ParseMessage(request))
+			std::unique_ptr<T1> request(new T1());
+            if(!message.ParseMessage(request.get()))
             {
                 return XCode::CallArgsError;
             }
-            message.ClearBody();
-			if (this->mHasUserId)
+            message.Clear();
+            if (this->mHasUserId)
 			{
                 long long userId = 0;
                 if(!message.GetHead().Get("id", userId))
@@ -278,6 +277,7 @@ namespace Sentry
             {
                 return XCode::CallArgsError;
             }
+            message.Clear();
             std::string address;
             if(!message.GetHead().Get("address", address))
             {

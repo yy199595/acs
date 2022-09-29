@@ -17,7 +17,6 @@ namespace Sentry
 	bool GateService::OnStartService()
 	{
         BIND_ADDRESS_RPC_METHOD(GateService::Ping);
-        BIND_ADDRESS_RPC_METHOD(GateService::Auth);
         BIND_COMMON_RPC_METHOD(GateService::AllotUser);
         BIND_COMMON_RPC_METHOD(GateService::BroadCast);
         BIND_COMMON_RPC_METHOD(GateService::CallClient);
@@ -56,7 +55,7 @@ namespace Sentry
         message->GetHead().Add("func", request.func());
         if(request.has_data())
         {
-            request.data().SerializeToString(message->GetBody());
+            message->WriteMessage(request.mutable_data());
         }
 
 		if(!this->mGateClientComponent->SendData(address, message))
@@ -72,20 +71,9 @@ namespace Sentry
         long long userId = request.value();
         if (this->GetConfig().GetListener("gate", address))
         {
-            std::string str = std::to_string(userId);
-            str.append(std::to_string(Helper::Time::GetNowSecTime()));
-            const std::string token = Helper::Md5::GetMd5(str);
-
+            std::string token = this->mGateClientComponent->CreateToken(userId);
             response.set_token(token);
             response.set_address(address);
-            this->mUserTokens.emplace(response.token(), userId);
-            this->mTimerComponent->DelayCall(15, [this, token]() {
-                auto iter = this->mUserTokens.find(token);
-                if (iter != this->mUserTokens.end())
-                {
-                    this->mUserTokens.erase(iter);
-                }
-            });
             return XCode::Successful;
         }
         return XCode::Failure;
@@ -122,19 +110,4 @@ namespace Sentry
 		this->mGateClientComponent->SendToAllClient(message);
 		return XCode::Successful;
 	}
-
-	XCode GateService::Auth(const std::string & address, const c2s::auth::request & request)
-    {
-        auto iter = this->mUserTokens.find(request.token());
-        if (iter == this->mUserTokens.end())
-        {
-            return XCode::Failure;
-        }
-        long long userId = iter->second;
-        this->mUserTokens.erase(iter);
-        //this->mSyncComponent->SetUserState(userId, 1);
-        this->mGateClientComponent->AddNewUser(address, userId);
-        //this->mSyncComponent->SetAddress(userId, this->GetName(), this->mAddress, true);
-        return XCode::Successful;
-    }
 }

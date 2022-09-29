@@ -52,7 +52,15 @@ namespace Sentry
 	{
         message->GetHead().Add("address", address);
         LOG_CHECK_RET_FALSE(message->GetHead().Has("func"));
-        return this->mMessageComponent->OnRequest(message) == XCode::Successful;
+        XCode code = this->mMessageComponent->OnRequest(message);
+        if(code != XCode::Successful)
+        {
+            std::string func;
+            message->GetHead().Get("func", func);
+            CONSOLE_LOG_ERROR("call " << func << " code = " << (int)code);
+            return false;
+        }
+        return true;
 	}
 
 	bool InnerNetComponent::OnResponse(const std::string& address, std::shared_ptr<Rpc::Data> message)

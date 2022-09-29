@@ -12,6 +12,7 @@ namespace Helper
     namespace Protocol
     {
         bool GetJson(const Message & message, std::string * json);
+        bool FromJson(Message * message, const std::string & json);
         bool GetMember(const std::string & key, const Message & message, std::string & value);
     }
 };

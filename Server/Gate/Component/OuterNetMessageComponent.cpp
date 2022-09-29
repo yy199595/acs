@@ -57,7 +57,7 @@ namespace Sentry
 		return true;
 	}
 
-	XCode OuterNetMessageComponent::OnRequest(const std::string & address, std::shared_ptr<Rpc::Data> message)
+	XCode OuterNetMessageComponent::OnRequest(long long userId, std::shared_ptr<Rpc::Data> message)
     {
         std::string method, service;
         LOG_RPC_CHECK_ARGS(message->GetMethod(service, method));
@@ -72,53 +72,38 @@ namespace Sentry
         {
             return XCode::NotFoundRpcConfig;
         }
-        long long userId = 0;
-        LOG_RPC_CHECK_ARGS(!config->Request.empty() && message->GetBody()->empty());
-        if (!this->mOutNetComponent->GetUserId(address, userId) && config->IsAuth) //没有验证
+
+        std::string address;
+        if (!localServerRpc->GetHost(userId, address))
         {
-            GateService *gateService = localServerRpc->Cast<GateService>();
-            if (gateService == nullptr)
+            localServerRpc->GetHost(address);
+            localServerRpc->AddHost(address, userId);
+        }
+        long long rpcId = 0;
+        if (message->GetHead().Get("rpc", rpcId))
+        {
+            std::shared_ptr<ClientRpcTask> clientRpcTask
+                = std::make_shared<ClientRpcTask>(*message, this, 0);
+            if (!this->mInnerMessageComponent->Send(address, message))
             {
-                return XCode::CallServiceNotFound;
+                return XCode::SendMessageFail;
             }
-            this->mTaskComponent->Start([gateService, message, config, this, address]() {
-                XCode code = gateService->Invoke(config->Method, message);
-                if (code != XCode::Successful)
-                {
-                    this->mOutNetComponent->StartClose(address);
-                    return;
-                }
-                this->mOutNetComponent->SendData(address, message);
-            });
+            this->mInnerMessageComponent->AddTask(clientRpcTask);
         }
         else
         {
-            std::string targetAddress;
-            if (!localServerRpc->GetHost(userId, targetAddress))
+            if (!this->mInnerMessageComponent->Send(address, message))
             {
-                localServerRpc->GetHost(targetAddress);
-                localServerRpc->AddHost(targetAddress, userId);
-            }
-            long long rpcId = 0;
-            if (message->GetHead().Get("rpc", rpcId))
-            {
-                std::shared_ptr<ClientRpcTask> clientRpcTask
-                    = std::make_shared<ClientRpcTask>(*message, this, 0);
-                if (!this->mInnerMessageComponent->Send(address, message))
-                {
-                    return XCode::SendMessageFail;
-                }
-                this->mInnerMessageComponent->AddTask(clientRpcTask);
-            }
-            else
-            {
-                if (!this->mInnerMessageComponent->Send(address, message))
-                {
-                    return XCode::SendMessageFail;
-                }
+                return XCode::SendMessageFail;
             }
         }
         return XCode::Successful;
+    }
+
+
+    void OuterNetMessageComponent::Auth(const std::string &address, const std::string &token)
+    {
+
     }
 
 	XCode OuterNetMessageComponent::OnResponse(const std::string & address, std::shared_ptr<Rpc::Data> response)

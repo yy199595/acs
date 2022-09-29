@@ -32,47 +32,42 @@ namespace Sentry
 		{
 			return XCode::CreateProtoFailure;
 		}
-        message.ClearBody();
-        if(!response->SerializePartialToString(message.GetBody()))
-        {
-            return XCode::SerializationFailure;
-        }
+        message.WriteMessage(response.get());
 		return XCode::Successful;
 	}
 
 	XCode LuaServiceMethod::CallAsync(int count, Rpc::Data & message)
-	{
-		LuaServiceTaskSource * luaTaskSource = new LuaServiceTaskSource(this->mLuaEnv);
-		Lua::UserDataParameter::Write(this->mLuaEnv, luaTaskSource);
-		if (lua_pcall(this->mLuaEnv, count + 2, 1, 0) != 0)
-		{
+    {
+        LuaServiceTaskSource *luaTaskSource = new LuaServiceTaskSource(this->mLuaEnv);
+        Lua::UserDataParameter::Write(this->mLuaEnv, luaTaskSource);
+        if (lua_pcall(this->mLuaEnv, count + 2, 1, 0) != 0)
+        {
             delete luaTaskSource;
             message.GetHead().Add("error", lua_tostring(this->mLuaEnv, -1));
             return XCode::CallLuaFunctionFail;
-		}
-		XCode code = luaTaskSource->Await();
+        }
+        XCode code = luaTaskSource->Await();
 
         delete luaTaskSource;
-        if(code != XCode::Successful)
-		{
-			return code;
-		}
-		if(!this->mConfig->Response.empty() && luaTaskSource->GetRef())
-		{
-			std::shared_ptr<Message> response = this->mMsgComponent->Read(
-				this->mLuaEnv, this->mConfig->Response, -1);
-			if (response == nullptr)
-			{
-				return XCode::JsonCastProtoFailure;
-			}
-			message.ClearBody();
-            if(!response->SerializePartialToString(message.GetBody()))
+        if (code != XCode::Successful)
+        {
+            return code;
+        }
+        if (!this->mConfig->Response.empty() && luaTaskSource->GetRef())
+        {
+            std::shared_ptr<Message> response = this->mMsgComponent->Read(
+                this->mLuaEnv, this->mConfig->Response, -1);
+            if (response == nullptr)
+            {
+                return XCode::JsonCastProtoFailure;
+            }
+            if (message.WriteMessage(response.get()))
             {
                 return XCode::SerializationFailure;
             }
-		}
-		return XCode::Successful;
-	}
+        }
+        return XCode::Successful;
+    }
 
 	XCode LuaServiceMethod::Invoke(Rpc::Data & message)
     {
@@ -90,7 +85,7 @@ namespace Sentry
         if (!this->mConfig->Request.empty())
         {
             request = this->mMsgComponent->New(this->mConfig->Request);
-            if (request == nullptr || !message.ParseMessage(request))
+            if (request == nullptr || !message.ParseMessage(request.get()))
             {
                 return XCode::CallLuaFunctionFail;
             }

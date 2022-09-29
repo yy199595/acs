@@ -45,7 +45,7 @@ namespace Sentry
 		{
             return XCode::NotFoundRpcConfig;
 		}
-		if(!rpcInterfaceConfig->Request.empty() && message->GetBody()->empty())
+		if(!rpcInterfaceConfig->Request.empty() && message->GetSize() == 0)
         {
             return XCode::CallArgsError;
         }

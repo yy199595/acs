@@ -6,6 +6,19 @@
 #include"google/protobuf/util/json_util.h"
 namespace Helper
 {
+    bool Protocol::FromJson(Message *message, const std::string &json)
+    {
+        if(message == nullptr || json.empty())
+        {
+            return false;
+        }
+        if(!util::JsonStringToMessage(json, message).ok())
+        {
+            return false;
+        }
+        return true;
+    }
+
     bool Protocol::GetJson(const Message &message, std::string *json)
     {
         return util::MessageToJsonString(message, json).ok();

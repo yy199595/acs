@@ -58,12 +58,6 @@
             "CallWay": "Net",
             "Request": "s2s.broadcast.request"
         },
-        "Auth": {
-            "Async": true,
-            "Type": "Client",
-            "CallWay": "Net",
-            "Request":"c2s.auth.request"
-        },
         "SaveAddress": {
             "Async": false,
             "Type": "Server",

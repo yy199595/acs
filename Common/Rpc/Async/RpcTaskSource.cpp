@@ -68,7 +68,7 @@ namespace Sentry
         {
             ProtoComponent * messageComponent = App::Get()->GetMsgComponent();
             std::shared_ptr<Message> message = messageComponent->New(this->mResp);
-            if(message != nullptr && response->ParseMessage(message))
+            if(message != nullptr && response->ParseMessage(message.get()))
             {
                 this->mTask.SetResult(XCode::Successful, message);
             }
