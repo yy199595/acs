@@ -111,11 +111,7 @@ namespace Mysql
             case enum_field_types::MYSQL_TYPE_LONG:
             case enum_field_types::MYSQL_TYPE_LONGLONG:
             {
-#ifdef __OS_LINUX__
-                int64 value = (int64)std::atoll(str);
-#else
                 long long value = std::atoll(str);
-#endif
                 document.Add(filed->name, value);
                 return true;
             }

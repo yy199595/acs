@@ -250,7 +250,11 @@ namespace Json
     Document &Document::Add(const char *key, long long value)
     {
         rapidjson::GenericStringRef<char> name(key);
+#ifndef __OS_LINUX__
         this->AddMember(name, value, this->GetAllocator());
+#else
+        this->AddMember(name, (int64_t)value, this->GetAllocator());
+#endif
         return *this;
     }
 
@@ -302,7 +306,11 @@ namespace Json
     Document &Document::Add(const char *key, unsigned long long value)
     {
         rapidjson::GenericStringRef<char> name(key);
+#ifndef __OS_LINUX__
         this->AddMember(name, value, this->GetAllocator());
+#else
+        this->AddMember(name, (uint64_t)value, this->GetAllocator());
+#endif
         return *this;
     }
 

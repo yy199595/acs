@@ -226,7 +226,7 @@ namespace Sentry
             if (component->Cast<IStart>() != nullptr)
             {
                 ElapsedTimer timer;
-                long long timeId = this->mTimerComponent->DelayCall(5.0f, [component]() {
+                long long timeId = this->mTimerComponent->DelayCall(10.0f, [component]() {
                     LOG_FATAL(component->GetName() << " start time out");
                 });
                 if (!component->Cast<IStart>()->OnStart())

@@ -46,21 +46,41 @@ namespace Sentry
 	void LoggerComponent::AddLog(spdlog::level::level_enum type, const std::string& log)
     {
 #ifdef __DEBUG__
-        Debug::Console(type, log);
+        Debug::Console(type,
+                       log);
 #endif
         switch (type)
         {
             case spdlog::level::level_enum::info:
+#ifdef __DEBUG__
+                this->mAllLog->info(log);
+#else
                 this->mInfoLog->info(log);
+
+#endif
                 break;
             case spdlog::level::level_enum::warn:
+#ifdef __DEBUG__
+                this->mAllLog->warn(log);
+#else
                 this->mWarningLog->warn(log);
+
+#endif
                 break;
             case spdlog::level::level_enum::err:
+#ifdef __DEBUG__
+                this->mAllLog->error(log);
+#else
                 this->mErrorLog->error(log);
+
+#endif
                 break;
             case spdlog::level::level_enum::critical:
+#ifdef __DEBUG__
+                this->mAllLog->critical(log);
+#else
                 this->mFatalLog->critical(log);
+#endif
                 break;
         }
     }
