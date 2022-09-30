@@ -100,7 +100,6 @@ namespace Lua
 		std::string ip;
 		unsigned short port;
 		lua_pushthread(lua);
-		TaskComponent * taskComponent = App::Get()->GetTaskComponent();
 		ClientComponent * clientComponent = UserDataParameter::Read<ClientComponent*>(lua, 1);
 		const std::string address = CommonParameter::Read<std::string>(lua, 2);
 		if(!Helper::String::ParseIpAddress(address, ip, port))

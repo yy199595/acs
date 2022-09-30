@@ -14,7 +14,6 @@ namespace Tcp
 {
     enum DecodeState
     {
-        None,
         Head,
         Body
     };

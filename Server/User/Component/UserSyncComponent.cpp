@@ -27,7 +27,7 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(json.GetMember("user_id", userId));
 		LOG_CHECK_RET_FALSE(json.GetMember("address", address));
 		LOG_CHECK_RET_FALSE(json.GetMember("service", service));
-		Service * component = this->GetComponent<Service>(service);
+		//Service * component = this->GetComponent<Service>(service);
         return true;
 	}
 

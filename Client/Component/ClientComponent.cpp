@@ -48,7 +48,7 @@ namespace Client
     void ClientComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Data> message)
     {
         int type = message->GetType();
-        int proto = message->GetProto();
+        //int proto = message->GetProto();
         switch (type)
         {
             case (int)Tcp::Type::Request:

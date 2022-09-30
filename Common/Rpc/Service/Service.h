@@ -43,7 +43,7 @@ namespace Sentry
         std::shared_ptr<Rpc::Data> StartCall(const std::string & address, const std::string & func, long long userId, const Message * message);
 	 protected:
 		bool LateAwake() override;
-		bool LoadConfig(const rapidjson::Value & json);
+		bool LoadConfig(const rapidjson::Value & json) final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) override;
 
     public:

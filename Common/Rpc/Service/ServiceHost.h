@@ -14,7 +14,7 @@ namespace Sentry
     {
     public:
         HostCounter(const std::string & address)
-            : Address(address), Count(0) { }
+            : Count(0), Address(address) { }
     public:
         unsigned int Count;
         const std::string Address;
