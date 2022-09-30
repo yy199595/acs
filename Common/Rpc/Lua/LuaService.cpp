@@ -119,5 +119,6 @@ namespace Lua
         {
             service->AddHost(address);
         }
+        return 0;
     }
 }

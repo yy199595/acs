@@ -1,4 +1,11 @@
+
+#ifdef _MSC_VER
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0501
+#endif // !_WIN32_WINNT
+#endif
 #include"asio.hpp"
+
 namespace Asio
 {
     typedef asio::error_code Code;

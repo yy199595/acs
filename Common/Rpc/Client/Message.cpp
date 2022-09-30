@@ -201,7 +201,7 @@ namespace Rpc
         }
         while (this->mLen > 0)
         {
-            size_t len = Helper::Math::Min(
+            len = Helper::Math::Min(
                 this->mLen, (int) sizeof(buffer));
             size_t count = os.readsome(buffer, len);
             if (count > 0)

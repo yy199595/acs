@@ -238,8 +238,8 @@ namespace Sentry
                 if (this->mSyncComponent != nullptr && iter != this->mMainKeys.end())
                 {
                     std::string value;
-                    const std::string &key = iter->second;
-                    if (this->mMysqlHelper->GetValue(doc, key, value))
+                    const std::string &field = iter->second;
+                    if (this->mMysqlHelper->GetValue(doc, field, value))
                     {
                         this->mSyncComponent->Set(value, fullName, *json);
                     }

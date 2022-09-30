@@ -79,8 +79,8 @@ namespace Sentry
 
 		if (res != nullptr && res->jsons_size() > 0)
 		{
-            const std::string & json = res->jsons(0);
-            if(util::JsonStringToMessage(json, response.get()).ok())
+            const std::string & data = res->jsons(0);
+            if(util::JsonStringToMessage(data, response.get()).ok())
             {
                 return XCode::Successful;
             }
