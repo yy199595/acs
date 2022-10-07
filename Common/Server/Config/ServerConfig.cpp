@@ -8,7 +8,7 @@
 namespace Sentry
 {
     ServerConfig::ServerConfig(int argc, char ** argv)
-        : mExePath(argv[0]), mWrokDir(getcwd(NULL, NULL))
+        : mExePath(argv[0]), mWrokDir(getcwd(NULL, 0))
     {
         this->mNodeId = 0;
         this->mWrokDir += "/";

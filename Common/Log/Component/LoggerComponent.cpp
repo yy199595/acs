@@ -82,6 +82,8 @@ namespace Sentry
                 this->mFatalLog->critical(log);
 #endif
                 break;
+            default:
+                break;
         }
     }
 

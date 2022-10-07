@@ -21,9 +21,9 @@ namespace Lua
 				lua_getglobal(luaEnv, "tostring");
 				std::stringstream stringBuffer;
 
-				std::string filrName;
-				Helper::String::GetFileName(ar.short_src, filrName);
-				stringBuffer << filrName << ":" << ar.currentline << "  ";
+				std::string fillName;
+				Helper::String::GetFileName(ar.short_src, fillName);
+				stringBuffer << fillName << ":" << ar.currentline << "  ";
 				for (int i = 1; i <= n; i++)
 				{
 					size_t size;

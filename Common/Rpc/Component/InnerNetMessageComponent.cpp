@@ -50,7 +50,6 @@ namespace Sentry
             return XCode::CallArgsError;
         }
 
-		const std::string& service = methodConfig->Service;
 		if (!methodConfig->IsAsync)
         {
             this->Invoke(methodConfig, message);

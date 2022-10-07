@@ -10,7 +10,7 @@
 namespace Sentry
 {
 	LuaWaitTaskSource::LuaWaitTaskSource(lua_State* lua)
-			: mLua(lua), mRef(0)
+			: mRef(0), mLua(lua)
 	{
 		if(lua_isthread(this->mLua, -1))
 		{

@@ -383,6 +383,8 @@ namespace Mysql
             case FieldDescriptor::TYPE_MESSAGE:
                 this->mBuffer << "JSON";
                 return true;
+            default:
+                return false;
         }
         return false;
     }
@@ -391,7 +393,7 @@ namespace Mysql
 namespace Mysql
 {
     SetMainKeyCommand::SetMainKeyCommand(const std::string &tab, std::vector<std::string> &keys)
-        : mKeys(keys), mTable(tab)
+        : mTable(tab), mKeys(keys)
     {
 
     }

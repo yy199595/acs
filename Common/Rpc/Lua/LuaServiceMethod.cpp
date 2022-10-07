@@ -9,7 +9,7 @@ namespace Sentry
 {
 
 	LuaServiceMethod::LuaServiceMethod(const RpcMethodConfig * config, lua_State* lua)
-		: ServiceMethod(config->Method), mConfig(config), mLuaEnv(lua)
+		: ServiceMethod(config->Method), mLuaEnv(lua), mConfig(config)
 	{
 		this->mMsgComponent = App::Get()->GetComponent<ProtoComponent>();
 	}

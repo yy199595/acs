@@ -8,7 +8,7 @@
 using namespace Helper;
 namespace Sentry
 {
-	class LoggerComponent : public Component, public IZeroRefresh
+	class LoggerComponent final : public Component, public IZeroRefresh
 	{
 	 public:
 		LoggerComponent() = default;

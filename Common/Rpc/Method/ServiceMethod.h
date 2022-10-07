@@ -98,7 +98,7 @@ namespace Sentry
 		};
 	 private:
 		T* _o;
-		bool mHasUserId;
+		const bool mHasUserId;
 		ServiceMethodType1<T> _func;
 		ServiceMethodType11<T> _objfunc;
 	};
@@ -141,7 +141,7 @@ namespace Sentry
 		};
 	 private:
 		T* _o;
-		bool mHasUserId;
+		const bool mHasUserId;
 		ServiceMethodType2<T, T1> _func;
 		ServiceMethodType22<T, T1> _objfunc;
 	};
@@ -205,7 +205,7 @@ namespace Sentry
 		};
 	 private:
 		T* _o;
-		bool mHasUserId;
+		const bool mHasUserId;
 		ServiceMethodType3<T, T1, T2> _func;
 		ServiceMethodType33<T, T1, T2> _objfunc;
 	};
@@ -249,7 +249,7 @@ namespace Sentry
 		};
 	 private:
 		T* _o;
-		bool mHasUserId;
+		const bool mHasUserId;
 		ServiceMethodType4<T, T1> _func;
 		ServiceMethodType44<T, T1> _objfunc;
 	};

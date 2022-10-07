@@ -8,8 +8,8 @@
 namespace Sentry
 {
 	MysqlClient::MysqlClient(const MysqlConfig &config, MysqlDBComponent *component)
-							 : mConfig(config), mComponent(component),
-                              std::thread(std::bind(&MysqlClient::Update, this))
+							 : std::thread(std::bind(&MysqlClient::Update, this)),
+                             mConfig(config), mComponent(component)
     {
         this->mLastTime = 0;
         this->mIsClose = true;
