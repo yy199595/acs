@@ -20,7 +20,6 @@ namespace Sentry
 
 
         std::vector<std::string> tempArray;
-        const ListenConfig & listenConfig = this->GetListenConfig();
         if(Helper::String::Split(httpData.mPath, "/", tempArray) != 2)
         {
             httpClient->StartWriter(HttpStatus::NOT_FOUND);

@@ -60,7 +60,7 @@ namespace Sentry
 		{
 			return;
 		}
-		int hour, minute, second = 0;
+		int hour, minute = 0;
 		zeroRefresh->GetRefreshTime(hour, minute);
 		long long nextTime = Helper::Time::GetNewTime(0, hour, minute);
 		if (Helper::Time::GetNowSecTime() - nextTime > 0)

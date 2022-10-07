@@ -41,7 +41,6 @@ namespace Sentry
 				return false;
 			}
 		}
-        const char * tab = this->GetName().c_str();
         if(Lua::Table::Get(this->mLuaEnv, this->GetName()))
         {
             lua_pushboolean(this->mLuaEnv, true);

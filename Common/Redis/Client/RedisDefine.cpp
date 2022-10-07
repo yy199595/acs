@@ -91,8 +91,8 @@ namespace Sentry
 namespace Sentry
 {
     RedisResponse::RedisResponse()
-        : mLineCount(0), mDataSize(0),
-        mNumber(-1), mDataCount(0)
+        : mDataSize(0), mLineCount(0),
+        mDataCount(0), mNumber(-1)
     {
         this->mType = RedisRespType::REDIS_NONE;
     }
@@ -120,6 +120,8 @@ namespace Sentry
                 return this->OnReceiveFirstLine(message);
             case RedisRespType::REDIS_ARRAY:
                 return this->OnDecodeArray(message);
+            default:
+                break;
         }
 		return 0;
     }
@@ -129,22 +131,30 @@ namespace Sentry
 		this->mString.clear();
 		std::unique_ptr<char[]> buffer(new char[this->mDataSize]);
 		if (os.readsome(buffer.get(), this->mDataSize) == this->mDataSize)
-		{
-			switch (this->mType)
-			{
-			case RedisRespType::REDIS_STRING:
-			case RedisRespType::REDIS_BIN_STRING:
-				this->mString.append(buffer.get(), this->mDataSize);
-				break;
-			case RedisRespType::REDIS_ARRAY:
-				RedisAny * redisAny = this->mArray[this->mLineCount++];
-				if(redisAny->IsString())
-				{
-					((RedisString*)redisAny)->Append(buffer.get(), this->mDataSize);
-				}
-				break;
-			}
-		}
+        {
+            switch (this->mType)
+            {
+                case RedisRespType::REDIS_STRING:
+                case RedisRespType::REDIS_BIN_STRING:
+                {
+                    this->mString.append(buffer.get(),
+                                         this->mDataSize);
+                }
+                    break;
+                case RedisRespType::REDIS_ARRAY:
+                {
+                    RedisAny *redisAny = this->mArray[this->mLineCount++];
+                    if (redisAny->IsString())
+                    {
+                        ((RedisString *) redisAny)->Append(buffer.get(),
+                                                           this->mDataSize);
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
 		else
 		{
 			CONSOLE_LOG_FATAL("message lenght error");
@@ -322,7 +332,9 @@ namespace Sentry
 				}
 			}
 				break;
-			}
+                case RedisRespType::REDIS_NONE:
+                    break;
+            }
 		}
 		else
 		{

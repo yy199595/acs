@@ -99,7 +99,6 @@ namespace Lua
             {
                 this->Clear();
                 this->mMd5 = str;
-                const char * n = lua_typename(this->mLua, -1);
                 this->mIndex = lua_ref(this->mLua);
                 return true;
             }
