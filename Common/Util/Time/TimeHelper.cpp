@@ -52,13 +52,13 @@ namespace Helper
         t->tm_hour = hour;
         t->tm_min = minute;
         t->tm_sec = second;
-        return mktime(t) + _DaySecond * day;
+        return mktime(t) + Time::DaySecond * day;
     }
 
     void Time::GetHourMinSecond(const long long sec, int &hour, int &min, int &second)
     {
-        hour = sec / _HourSecond;
-        min = (sec - hour * _HourSecond) / _MinSecond;
+        hour = sec / Time::HourSecond;
+        min = (sec - hour * Time::HourSecond) / Time::MinSecond;
         second = sec % 60;
     }
 

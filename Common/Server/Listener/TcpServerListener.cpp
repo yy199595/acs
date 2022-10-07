@@ -41,7 +41,7 @@ namespace Sentry
             }
             unsigned short port = this->mConfig->Port;
             Asio::Context & io = App::Get()->GetThread();
-            Asio::EndPoint endPoint(asio::ip::tcp::v4(), port);
+            Asio::EndPoint endPoint(asio::ip::make_address(this->mConfig->Ip), port);
             this->mBindAcceptor = new Asio::Acceptor (io, endPoint);
             this->mNetComponent = App::Get()->GetComponent<NetThreadComponent>();
 

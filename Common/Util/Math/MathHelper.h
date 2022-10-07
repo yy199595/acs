@@ -123,15 +123,24 @@ namespace Math {
     {
         return T();
     }
-    template<>
-    inline int ToNumber(const std::string & str)
+    template<> inline int ToNumber(const std::string & str)
     {
         return std::stoi(str);
     }
-    template<>
-    inline float ToNumber(const std::string & str)
+
+    template<> inline float ToNumber(const std::string & str)
     {
         return std::stof(str);
     }
+
+	template<> inline double ToNumber(const std::string & str)
+	{
+		return std::stod(str);
+	}
+
+	template<> inline long long ToNumber(const std::string & str)
+	{
+		return std::stoll(str);
+	}
 }
 }// namespace MathHelper

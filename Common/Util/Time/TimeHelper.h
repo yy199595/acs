@@ -1,13 +1,15 @@
 #pragma once
 #include<time.h>
 #include<string>
-#define _MinSecond 60
-#define _HourSecond 3600
-#define _DaySecond 86400
+
 namespace Helper
 {
     namespace Time
     {
+		constexpr int MinSecond = 60;
+		constexpr int HourSecond = 3600;
+		constexpr int DaySecond = 86400;
+
         extern long long ScaleTotalTime;
 
         extern void SetScaleTotalTime(int second);
