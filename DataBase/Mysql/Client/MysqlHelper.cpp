@@ -79,7 +79,14 @@ namespace Sentry
                     }
                     break;
                 }
+				case FieldDescriptor::Type::TYPE_BOOL:
+				{
+					int value = pReflection->GetBool(message, fieldDesc) ? 1 : 0;
+					this->mSqlCommandStream << value << ",";
+					break;
+				}
                 default:
+					CONSOLE_LOG_ERROR("unknow type [" << fieldDesc->type_name() << "]" << fieldDesc->full_name());
                     return false;
             }
         }
