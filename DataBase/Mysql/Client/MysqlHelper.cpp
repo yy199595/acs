@@ -11,17 +11,16 @@ namespace Sentry
 
     void MysqlHelper::GetFiles(const Message &message, std::stringstream &ss, char cc)
     {
-        this->mFieldList.clear();
-        const Reflection *pReflection = message.GetReflection();
-        pReflection->ListFields(message, &this->mFieldList);
-        for (size_t index = 0; index < this->mFieldList.size(); index++)
+        const Descriptor * descriptor = message.GetDescriptor();
+        for(int index = 0; index < descriptor->field_count(); index++)
         {
-            if(index != this->mFieldList.size() - 1)
+            const FieldDescriptor * fieldDescriptor = descriptor->field(index);
+            if(index != descriptor->field_count() - 1)
             {
-                ss << this->mFieldList[index]->name() << cc;
+                ss << fieldDescriptor->name() << cc;
                 continue;
             }
-            ss << this->mFieldList[index]->name();
+            ss << fieldDescriptor->name();
         }
     }
 
@@ -35,8 +34,10 @@ namespace Sentry
         
         this->mSqlCommandStream << ")values(";
         const Reflection *pReflection = message.GetReflection();
-        for (const FieldDescriptor * fieldDesc: this->mFieldList)
+        const Descriptor * descriptor = message.GetDescriptor();
+        for(int index = 0; index < descriptor->field_count(); index++)
         {
+            const FieldDescriptor * fieldDesc = descriptor->field(index);
             if(fieldDesc->is_repeated())
             {
                 return false;
@@ -290,8 +291,15 @@ namespace Sentry
         {
             return false;
         }
-
-		this->mSqlCommandStream << "select * from " << request.table();
+        const std::string & name = request.table();
+        std::shared_ptr<Message> message = this->mPorotComponent->New(name);
+        if(message == nullptr)
+        {
+            return false;
+        }
+        this->mSqlCommandStream << "SELECT ";
+        this->GetFiles(*message, this->mSqlCommandStream);
+		this->mSqlCommandStream << " from " << request.table();
 		if (this->mDocument1.MemberCount() == 0)
 		{
 			sqlCommand = this->mSqlCommandStream.str();

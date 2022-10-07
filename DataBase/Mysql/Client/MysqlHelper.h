@@ -44,6 +44,5 @@ namespace Sentry
         std::shared_ptr<Message> mMessage;
         std::stringstream mSqlCommandStream;
 		std::stringstream mSqlCommandStream2;
-        std::vector<const FieldDescriptor *> mFieldList;
     };
 }
