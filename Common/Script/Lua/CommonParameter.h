@@ -23,7 +23,7 @@ namespace Lua
 	{
 		template<> inline int Read(lua_State* lua, int index)
 		{
-            return luaL_checkinteger(lua, index);
+            return static_cast<int>(luaL_checkinteger(lua, index));
 		}
 
 		template<> inline bool Read(lua_State* lua, int index)
@@ -33,26 +33,26 @@ namespace Lua
 
 		template<> inline unsigned int Read(lua_State* lua, int index)
 		{
-            return luaL_checkinteger(lua, index);
+			return static_cast<unsigned int>(luaL_checkinteger(lua, index));
         }
 
 		template<> inline long long Read(lua_State* lua, int index)
 		{
-            return luaL_checkinteger(lua, index);
+			return static_cast<long long>(luaL_checkinteger(lua, index));
         }
 		template<> inline unsigned long long Read(lua_State* lua, int index)
 		{
-            return luaL_checkinteger(lua, index);
+			return static_cast<unsigned long long>(luaL_checkinteger(lua, index));
         }
 
 		template<> inline float Read(lua_State* lua, int index)
 		{
-            return (float)luaL_checknumber(lua, index);
+			return static_cast<float>(luaL_checknumber(lua, index));
 		}
 
 		template<> inline double Read(lua_State* lua, int index)
 		{
-            return luaL_checknumber(lua, index);
+			return static_cast<double>(luaL_checknumber(lua, index));
 		}
 
 		template<> inline const char* Read(lua_State* lua, int index)
@@ -62,12 +62,12 @@ namespace Lua
 
 		template<> inline short Read(lua_State* lua, int index)
 		{
-            return (short )luaL_checkinteger(lua, index);
+            return static_cast<short>(luaL_checkinteger(lua, index));
 		}
 
 		template<> inline unsigned short Read(lua_State* lua, int index)
 		{
-            return (unsigned short)luaL_checkinteger(lua, index);
+            return static_cast<unsigned short>(luaL_checkinteger(lua, index));
         }
 
 		template<> inline void Read(lua_State* lua, int index)
@@ -95,8 +95,7 @@ namespace Lua
 //			return str;
 //		}
 
-		template<>
-		inline std::string Read(lua_State* lua, int index)
+		template<> inline std::string Read(lua_State* lua, int index)
 		{
 			size_t size = 0;
             const char * p = luaL_checklstring(lua, index, &size);
