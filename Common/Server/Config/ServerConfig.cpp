@@ -35,20 +35,16 @@ namespace Sentry
         if(this->GetJsonValue("listener") != nullptr)
         {
             IF_THROW_ERROR(this->GetJsonValue("listener","rpc"));
-
-            std::unordered_map<std::string, const rapidjson::Value *> listeners;
-            IF_THROW_ERROR(this->GetMember("listener", listeners));
-            for (auto iter = listeners.begin(); iter != listeners.end(); iter++)
+            const rapidjson::Value * json = this->GetJsonValue("listener");
+            for (auto iter = json->MemberBegin(); iter != json->MemberEnd(); iter++)
             {
-                const rapidjson::Value &jsonObject = *iter->second;
+                const rapidjson::Value& jsonObject = iter->value;
                 if (jsonObject.IsObject())
                 {
                     ListenConfig listenConfig;
-
-                    listenConfig.Name = iter->first;
+                    listenConfig.Name = iter->name.GetString();
                     listenConfig.Ip = jsonObject["ip"].GetString();
-                    listenConfig.Port = jsonObject["port"].GetUint();
-                    listenConfig.Handler = jsonObject["component"].GetString();;
+                    listenConfig.Port = jsonObject["port"].GetUint();                  
                     if(jsonObject.HasMember("route"))
                     {
                         listenConfig.Route = jsonObject["route"].GetString();

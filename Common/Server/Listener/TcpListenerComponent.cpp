@@ -24,7 +24,7 @@ namespace Sentry
 
 	bool TcpListenerComponent::StartListen(const char * name)
     {
-        this->mConfig = App::Get()->GetConfig().GetListenConfig(name);
+        this->mConfig = this->GetConfig().GetListenConfig(name);
         try
         {
             if(this->mConfig == nullptr)
@@ -33,9 +33,9 @@ namespace Sentry
             }
             unsigned short port = this->mConfig->Port;
             Asio::Context & io = App::Get()->GetThread();
-            Asio::EndPoint endPoint(asio::ip::make_address(this->mConfig->Ip), port);
-            this->mBindAcceptor = new Asio::Acceptor (io, endPoint);
-            this->mNetComponent = App::Get()->GetComponent<NetThreadComponent>();
+            this->mBindAcceptor = new Asio::Acceptor (io, 
+                Asio::EndPoint(asio::ip::make_address(this->mConfig->Ip), port));
+            this->mNetComponent = this->GetComponent<NetThreadComponent>();
 
             this->mBindAcceptor->listen();
             LOG_INFO(this->mConfig->Name << " listen [" << this->mConfig->Address << "] successful");
@@ -44,7 +44,7 @@ namespace Sentry
         }
         catch (std::system_error & err)
         {
-            LOG_FATAL(fmt::format("listen {0}:{1} failure {2}",
+            LOG_ERROR(fmt::format("listen {0}:{1} failure {2}",
                                   this->mConfig->Ip, this->mConfig->Port, err.what()));
             return false;
         }

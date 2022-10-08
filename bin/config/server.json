@@ -17,23 +17,23 @@
     "listener": {
         "rpc": {
             "port": 7788,
-            "ip": "10.10.14.104",
+            "ip": "127.0.0.1",
             "component": "InnerNetComponent"
         },
         "web": {
             "port": 8080,
-            "ip": "10.10.14.104",
+            "ip": "127.0.0.1",
             "route": "/app/web",
             "component": "HttpWebComponent"
         },
         "gate": {
             "port": 1995,
-            "ip": "10.10.14.104",
+            "ip": "127.0.0.1",
             "component": "OuterNetComponent"
         },
         "rpc.http": {
             "port": 1996,
-            "ip" : "10.10.14.104",
+            "ip" : "127.0.0.1",
             "route": "/app/rpc",
             "component" : "HttpRpcComponent"
         },

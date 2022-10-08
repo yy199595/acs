@@ -17,4 +17,5 @@ namespace Asio
     typedef asio::ip::tcp::resolver Resolver;
     typedef asio::ip::tcp::acceptor Acceptor;
     typedef asio::ip::tcp::resolver::query ResolverQuery;
+    typedef asio::ip::address Address;
 }
