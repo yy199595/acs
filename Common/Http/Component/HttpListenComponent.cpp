@@ -39,6 +39,7 @@ namespace Sentry
         handlerClient->StartReceive(route);
         const std::string &address = socket->GetAddress();
         this->mHttpClients.emplace(address, handlerClient);
+        return true;
     }
 
     void HttpListenComponent::ClosetHttpClient(const std::string &address)
