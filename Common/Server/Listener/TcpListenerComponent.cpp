@@ -70,6 +70,7 @@ namespace Sentry
                     CONSOLE_LOG_ERROR("stop listen " << this->mConfig->Address);
                     return ;
                 }
+                CONSOLE_LOG_DEBUG(socketProxy->GetAddress() << " connect to " << this->mConfig->Name);
             }
             Asio::Context& io = this->GetApp()->GetThread();
             io.post(std::bind(&TcpListenerComponent::ListenConnect, this));
