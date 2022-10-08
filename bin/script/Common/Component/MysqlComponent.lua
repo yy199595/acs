@@ -52,7 +52,7 @@ function MysqlComponent.QueryOnce(tabName, where, flag)
     return Json.Decode(response.jsons[1])
 end
 
-function MysqlComponent.QueryAll(tabName, where, flag, limit)
+function MysqlComponent.QueryAll(tabName, where, limit)
     assert(type(where) == "table")
     assert(type(tabName) == "string")
 
@@ -60,8 +60,29 @@ function MysqlComponent.QueryAll(tabName, where, flag, limit)
     print(tabName, where, address)
     local code, response = self:Call(address, "Query", {
         table = tabName,
-        flag = flag or 0,
         limit = limit or 0,
+        where_json = Json.Encode(where)
+    })
+    if code ~= XCode.Successful then
+        return nil
+    end
+    local res = { }
+    for _, json in ipairs(response.jsons) do
+        table.insert(res, Json.Decode(json))
+    end
+    return res
+end
+
+function MysqlComponent.QueryFields(tabName, fields, where, limit)
+    assert(type(fields) == "table")
+    assert(type(where) == "table")
+    assert(type(tabName) == "string")
+
+    local address = self:GetHost()
+    local code, response = self:Call(address, "Query", {
+        table = tabName,
+        limit = limit or 0,
+        fields = fields,
         where_json = Json.Encode(where)
     })
     if code ~= XCode.Successful then

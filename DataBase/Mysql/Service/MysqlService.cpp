@@ -204,9 +204,8 @@ namespace Sentry
 
 	XCode MysqlService::Query(const db::mysql::query& request, db::mysql::response& response)
     {
-        std::string sql, key, value;
+        std::string sql, key;
         const std::string & fullName = request.table();
-
         if (!this->mMysqlHelper->ToSqlCommand(request, sql))
         {
             return XCode::CallArgsError;
@@ -235,7 +234,7 @@ namespace Sentry
             {
                 rapidjson::Document & doc = (rapidjson::Document&)(*document);
                 std::string * json = document->Serialize(response.add_jsons());
-                if (this->mSyncComponent != nullptr && iter != this->mMainKeys.end())
+                if (request.fields_size() == 0 && this->mSyncComponent != nullptr && iter != this->mMainKeys.end())
                 {
                     std::string value;
                     const std::string &field = iter->second;

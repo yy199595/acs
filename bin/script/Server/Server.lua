@@ -50,6 +50,12 @@ function Server.AllServiceStart()
         register_time = os.time(),
         last_login_ip = "127.0.0.1",
     })
+
+    local res = MysqlComponent.QueryFields("user.account_info", {"user_id", "phone_num"}, {
+        account = "646585122@qq.com"
+    }, 1)
+    table.print(res)
+
     local r1 = MongoComponent.InsertOnce("user.data_account", {
         _id = "646585122@qq.com",
         login_ip = "127.0.0.1",

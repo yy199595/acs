@@ -304,8 +304,28 @@ namespace Sentry
         {
             return false;
         }
+        const Descriptor * descriptor = message->GetDescriptor();
         this->mSqlCommandStream << "SELECT ";
-        this->GetFiles(*message, this->mSqlCommandStream);
+        if(request.fields_size() > 0)
+        {
+            for (int index = 0; index < request.fields_size(); index++)
+            {
+                const std::string & field = request.fields(index);
+                if(descriptor->FindFieldByName(field) == nullptr)
+                {
+                    return false;
+                }
+                this->mSqlCommandStream << field;
+                if(index != request.fields_size() - 1)
+                {
+                    this->mSqlCommandStream << ",";
+                }
+            }
+        }
+        else
+        {
+            this->GetFiles(*message, this->mSqlCommandStream);
+        }
 		this->mSqlCommandStream << " from " << request.table();
 		if (this->mDocument1.MemberCount() == 0)
 		{

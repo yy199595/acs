@@ -372,6 +372,28 @@ class mongo_query_request :
 
   // accessors -------------------------------------------------------
 
+  // repeated string fields = 4;
+  int fields_size() const;
+  void clear_fields();
+  static const int kFieldsFieldNumber = 4;
+  const ::std::string& fields(int index) const;
+  ::std::string* mutable_fields(int index);
+  void set_fields(int index, const ::std::string& value);
+  #if LANG_CXX11
+  void set_fields(int index, ::std::string&& value);
+  #endif
+  void set_fields(int index, const char* value);
+  void set_fields(int index, const char* value, size_t size);
+  ::std::string* add_fields();
+  void add_fields(const ::std::string& value);
+  #if LANG_CXX11
+  void add_fields(::std::string&& value);
+  #endif
+  void add_fields(const char* value);
+  void add_fields(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField<::std::string>& fields() const;
+  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_fields();
+
   // string tab = 1;
   void clear_tab();
   static const int kTabFieldNumber = 1;
@@ -411,6 +433,7 @@ class mongo_query_request :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField<::std::string> fields_;
   ::google::protobuf::internal::ArenaStringPtr tab_;
   ::google::protobuf::internal::ArenaStringPtr json_;
   ::google::protobuf::int32 limit_;
@@ -2086,6 +2109,28 @@ class mysql_query :
 
   // accessors -------------------------------------------------------
 
+  // repeated string fields = 4;
+  int fields_size() const;
+  void clear_fields();
+  static const int kFieldsFieldNumber = 4;
+  const ::std::string& fields(int index) const;
+  ::std::string* mutable_fields(int index);
+  void set_fields(int index, const ::std::string& value);
+  #if LANG_CXX11
+  void set_fields(int index, ::std::string&& value);
+  #endif
+  void set_fields(int index, const char* value);
+  void set_fields(int index, const char* value, size_t size);
+  ::std::string* add_fields();
+  void add_fields(const ::std::string& value);
+  #if LANG_CXX11
+  void add_fields(::std::string&& value);
+  #endif
+  void add_fields(const char* value);
+  void add_fields(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField<::std::string>& fields() const;
+  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_fields();
+
   // string table = 1;
   void clear_table();
   static const int kTableFieldNumber = 1;
@@ -2125,6 +2170,7 @@ class mysql_query :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField<::std::string> fields_;
   ::google::protobuf::internal::ArenaStringPtr table_;
   ::google::protobuf::internal::ArenaStringPtr where_json_;
   ::google::protobuf::int32 limit_;
@@ -2939,6 +2985,75 @@ inline void mongo_query_request::set_limit(::google::protobuf::int32 value) {
   
   limit_ = value;
   // @@protoc_insertion_point(field_set:db.mongo.query.request.limit)
+}
+
+// repeated string fields = 4;
+inline int mongo_query_request::fields_size() const {
+  return fields_.size();
+}
+inline void mongo_query_request::clear_fields() {
+  fields_.Clear();
+}
+inline const ::std::string& mongo_query_request::fields(int index) const {
+  // @@protoc_insertion_point(field_get:db.mongo.query.request.fields)
+  return fields_.Get(index);
+}
+inline ::std::string* mongo_query_request::mutable_fields(int index) {
+  // @@protoc_insertion_point(field_mutable:db.mongo.query.request.fields)
+  return fields_.Mutable(index);
+}
+inline void mongo_query_request::set_fields(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:db.mongo.query.request.fields)
+  fields_.Mutable(index)->assign(value);
+}
+#if LANG_CXX11
+inline void mongo_query_request::set_fields(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:db.mongo.query.request.fields)
+  fields_.Mutable(index)->assign(std::move(value));
+}
+#endif
+inline void mongo_query_request::set_fields(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  fields_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:db.mongo.query.request.fields)
+}
+inline void mongo_query_request::set_fields(int index, const char* value, size_t size) {
+  fields_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:db.mongo.query.request.fields)
+}
+inline ::std::string* mongo_query_request::add_fields() {
+  // @@protoc_insertion_point(field_add_mutable:db.mongo.query.request.fields)
+  return fields_.Add();
+}
+inline void mongo_query_request::add_fields(const ::std::string& value) {
+  fields_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:db.mongo.query.request.fields)
+}
+#if LANG_CXX11
+inline void mongo_query_request::add_fields(::std::string&& value) {
+  fields_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:db.mongo.query.request.fields)
+}
+#endif
+inline void mongo_query_request::add_fields(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  fields_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:db.mongo.query.request.fields)
+}
+inline void mongo_query_request::add_fields(const char* value, size_t size) {
+  fields_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:db.mongo.query.request.fields)
+}
+inline const ::google::protobuf::RepeatedPtrField<::std::string>&
+mongo_query_request::fields() const {
+  // @@protoc_insertion_point(field_list:db.mongo.query.request.fields)
+  return fields_;
+}
+inline ::google::protobuf::RepeatedPtrField<::std::string>*
+mongo_query_request::mutable_fields() {
+  // @@protoc_insertion_point(field_mutable_list:db.mongo.query.request.fields)
+  return &fields_;
 }
 
 // -------------------------------------------------------------------
@@ -4106,6 +4221,75 @@ inline void mysql_query::set_limit(::google::protobuf::int32 value) {
   
   limit_ = value;
   // @@protoc_insertion_point(field_set:db.mysql.query.limit)
+}
+
+// repeated string fields = 4;
+inline int mysql_query::fields_size() const {
+  return fields_.size();
+}
+inline void mysql_query::clear_fields() {
+  fields_.Clear();
+}
+inline const ::std::string& mysql_query::fields(int index) const {
+  // @@protoc_insertion_point(field_get:db.mysql.query.fields)
+  return fields_.Get(index);
+}
+inline ::std::string* mysql_query::mutable_fields(int index) {
+  // @@protoc_insertion_point(field_mutable:db.mysql.query.fields)
+  return fields_.Mutable(index);
+}
+inline void mysql_query::set_fields(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:db.mysql.query.fields)
+  fields_.Mutable(index)->assign(value);
+}
+#if LANG_CXX11
+inline void mysql_query::set_fields(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:db.mysql.query.fields)
+  fields_.Mutable(index)->assign(std::move(value));
+}
+#endif
+inline void mysql_query::set_fields(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  fields_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:db.mysql.query.fields)
+}
+inline void mysql_query::set_fields(int index, const char* value, size_t size) {
+  fields_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:db.mysql.query.fields)
+}
+inline ::std::string* mysql_query::add_fields() {
+  // @@protoc_insertion_point(field_add_mutable:db.mysql.query.fields)
+  return fields_.Add();
+}
+inline void mysql_query::add_fields(const ::std::string& value) {
+  fields_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:db.mysql.query.fields)
+}
+#if LANG_CXX11
+inline void mysql_query::add_fields(::std::string&& value) {
+  fields_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:db.mysql.query.fields)
+}
+#endif
+inline void mysql_query::add_fields(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  fields_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:db.mysql.query.fields)
+}
+inline void mysql_query::add_fields(const char* value, size_t size) {
+  fields_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:db.mysql.query.fields)
+}
+inline const ::google::protobuf::RepeatedPtrField<::std::string>&
+mysql_query::fields() const {
+  // @@protoc_insertion_point(field_list:db.mysql.query.fields)
+  return fields_;
+}
+inline ::google::protobuf::RepeatedPtrField<::std::string>*
+mysql_query::mutable_fields() {
+  // @@protoc_insertion_point(field_mutable_list:db.mysql.query.fields)
+  return &fields_;
 }
 
 // -------------------------------------------------------------------

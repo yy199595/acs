@@ -407,6 +407,7 @@ const ::google::protobuf::uint32 TableStruct_db_2eproto::offsets[] PROTOBUF_SECT
   PROTOBUF_FIELD_OFFSET(::db::mongo_query_request, tab_),
   PROTOBUF_FIELD_OFFSET(::db::mongo_query_request, json_),
   PROTOBUF_FIELD_OFFSET(::db::mongo_query_request, limit_),
+  PROTOBUF_FIELD_OFFSET(::db::mongo_query_request, fields_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::db::mongo_query_response, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -497,6 +498,7 @@ const ::google::protobuf::uint32 TableStruct_db_2eproto::offsets[] PROTOBUF_SECT
   PROTOBUF_FIELD_OFFSET(::db::mysql_query, table_),
   PROTOBUF_FIELD_OFFSET(::db::mysql_query, where_json_),
   PROTOBUF_FIELD_OFFSET(::db::mysql_query, limit_),
+  PROTOBUF_FIELD_OFFSET(::db::mysql_query, fields_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::db::mysql_remove, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -530,23 +532,23 @@ const ::google::protobuf::uint32 TableStruct_db_2eproto::offsets[] PROTOBUF_SECT
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::db::mongo_insert)},
   { 8, -1, sizeof(::db::mongo_query_request)},
-  { 16, -1, sizeof(::db::mongo_query_response)},
-  { 22, -1, sizeof(::db::mongo_query)},
-  { 27, -1, sizeof(::db::mongo_remove)},
-  { 36, -1, sizeof(::db::mongo_index)},
-  { 43, -1, sizeof(::db::mongo_update)},
-  { 53, -1, sizeof(::db::mongo_command_request)},
-  { 59, -1, sizeof(::db::mongo_command_response)},
-  { 65, -1, sizeof(::db::mongo_command)},
-  { 70, -1, sizeof(::db::mongo)},
-  { 75, -1, sizeof(::db::mysql_create)},
-  { 82, -1, sizeof(::db::mysql_add)},
-  { 90, -1, sizeof(::db::mysql_save)},
-  { 98, -1, sizeof(::db::mysql_query)},
-  { 106, -1, sizeof(::db::mysql_remove)},
-  { 114, -1, sizeof(::db::mysql_update)},
-  { 123, -1, sizeof(::db::mysql_response)},
-  { 130, -1, sizeof(::db::mysql)},
+  { 17, -1, sizeof(::db::mongo_query_response)},
+  { 23, -1, sizeof(::db::mongo_query)},
+  { 28, -1, sizeof(::db::mongo_remove)},
+  { 37, -1, sizeof(::db::mongo_index)},
+  { 44, -1, sizeof(::db::mongo_update)},
+  { 54, -1, sizeof(::db::mongo_command_request)},
+  { 60, -1, sizeof(::db::mongo_command_response)},
+  { 66, -1, sizeof(::db::mongo_command)},
+  { 71, -1, sizeof(::db::mongo)},
+  { 76, -1, sizeof(::db::mysql_create)},
+  { 83, -1, sizeof(::db::mysql_add)},
+  { 91, -1, sizeof(::db::mysql_save)},
+  { 99, -1, sizeof(::db::mysql_query)},
+  { 108, -1, sizeof(::db::mysql_remove)},
+  { 116, -1, sizeof(::db::mysql_update)},
+  { 125, -1, sizeof(::db::mysql_response)},
+  { 132, -1, sizeof(::db::mysql)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -579,33 +581,34 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 
 const char descriptor_table_protodef_db_2eproto[] =
   "\n\010db.proto\022\002db\032\031google/protobuf/any.prot"
-  "o\"\212\003\n\005mongo\0321\n\006insert\022\013\n\003tab\030\001 \001(\t\022\014\n\004js"
-  "on\030\002 \001(\t\022\014\n\004flag\030\003 \001(\005\032W\n\005query\0323\n\007reque"
+  "o\"\232\003\n\005mongo\0321\n\006insert\022\013\n\003tab\030\001 \001(\t\022\014\n\004js"
+  "on\030\002 \001(\t\022\014\n\004flag\030\003 \001(\005\032g\n\005query\032C\n\007reque"
   "st\022\013\n\003tab\030\001 \001(\t\022\014\n\004json\030\002 \001(\t\022\r\n\005limit\030\003"
-  " \001(\005\032\031\n\010response\022\r\n\005jsons\030\001 \003(\t\032@\n\006remov"
-  "e\022\013\n\003tab\030\001 \001(\t\022\014\n\004json\030\002 \001(\t\022\r\n\005limit\030\003 "
-  "\001(\005\022\014\n\004flag\030\004 \001(\005\032\"\n\005index\022\013\n\003tab\030\001 \001(\t\022"
-  "\014\n\004name\030\002 \001(\t\032P\n\006update\022\013\n\003tab\030\001 \001(\t\022\016\n\006"
-  "select\030\002 \001(\t\022\016\n\006update\030\003 \001(\t\022\013\n\003tag\030\004 \001("
-  "\t\022\014\n\004flag\030\005 \001(\005\032=\n\007command\032\027\n\007request\022\014\n"
-  "\004json\030\001 \001(\t\032\031\n\010response\022\r\n\005jsons\030\001 \003(\t\"\304"
-  "\003\n\005mysql\032:\n\006create\022\014\n\004keys\030\001 \003(\t\022\"\n\004data"
-  "\030\002 \001(\0132\024.google.protobuf.Any\032F\n\003add\022\014\n\004f"
-  "lag\030\001 \001(\005\022\r\n\005table\030\002 \001(\t\022\"\n\004data\030\003 \001(\0132\024"
-  ".google.protobuf.Any\032G\n\004save\022\014\n\004flag\030\001 \001"
-  "(\005\022\r\n\005table\030\002 \001(\t\022\"\n\004data\030\003 \001(\0132\024.google"
-  ".protobuf.Any\0329\n\005query\022\r\n\005table\030\001 \001(\t\022\022\n"
-  "\nwhere_json\030\002 \001(\t\022\r\n\005limit\030\003 \001(\005\0329\n\006remo"
-  "ve\022\014\n\004flag\030\001 \001(\005\022\r\n\005table\030\002 \001(\t\022\022\n\nwhere"
-  "_json\030\003 \001(\t\032N\n\006update\022\014\n\004flag\030\001 \001(\005\022\r\n\005t"
-  "able\030\002 \001(\t\022\023\n\013update_json\030\003 \001(\t\022\022\n\nwhere"
-  "_json\030\004 \001(\t\032(\n\010response\022\r\n\005error\030\001 \001(\t\022\r"
-  "\n\005jsons\030\002 \003(\tb\006proto3"
+  " \001(\005\022\016\n\006fields\030\004 \003(\t\032\031\n\010response\022\r\n\005json"
+  "s\030\001 \003(\t\032@\n\006remove\022\013\n\003tab\030\001 \001(\t\022\014\n\004json\030\002"
+  " \001(\t\022\r\n\005limit\030\003 \001(\005\022\014\n\004flag\030\004 \001(\005\032\"\n\005ind"
+  "ex\022\013\n\003tab\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\032P\n\006update\022"
+  "\013\n\003tab\030\001 \001(\t\022\016\n\006select\030\002 \001(\t\022\016\n\006update\030\003"
+  " \001(\t\022\013\n\003tag\030\004 \001(\t\022\014\n\004flag\030\005 \001(\005\032=\n\007comma"
+  "nd\032\027\n\007request\022\014\n\004json\030\001 \001(\t\032\031\n\010response\022"
+  "\r\n\005jsons\030\001 \003(\t\"\324\003\n\005mysql\032:\n\006create\022\014\n\004ke"
+  "ys\030\001 \003(\t\022\"\n\004data\030\002 \001(\0132\024.google.protobuf"
+  ".Any\032F\n\003add\022\014\n\004flag\030\001 \001(\005\022\r\n\005table\030\002 \001(\t"
+  "\022\"\n\004data\030\003 \001(\0132\024.google.protobuf.Any\032G\n\004"
+  "save\022\014\n\004flag\030\001 \001(\005\022\r\n\005table\030\002 \001(\t\022\"\n\004dat"
+  "a\030\003 \001(\0132\024.google.protobuf.Any\032I\n\005query\022\r"
+  "\n\005table\030\001 \001(\t\022\022\n\nwhere_json\030\002 \001(\t\022\r\n\005lim"
+  "it\030\003 \001(\005\022\016\n\006fields\030\004 \003(\t\0329\n\006remove\022\014\n\004fl"
+  "ag\030\001 \001(\005\022\r\n\005table\030\002 \001(\t\022\022\n\nwhere_json\030\003 "
+  "\001(\t\032N\n\006update\022\014\n\004flag\030\001 \001(\005\022\r\n\005table\030\002 \001"
+  "(\t\022\023\n\013update_json\030\003 \001(\t\022\022\n\nwhere_json\030\004 "
+  "\001(\t\032(\n\010response\022\r\n\005error\030\001 \001(\t\022\r\n\005jsons\030"
+  "\002 \003(\tb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_db_2eproto = {
   false, InitDefaults_db_2eproto, 
   descriptor_table_protodef_db_2eproto,
-  "db.proto", &assign_descriptors_table_db_2eproto, 901,
+  "db.proto", &assign_descriptors_table_db_2eproto, 933,
 };
 
 void AddDescriptors_db_2eproto() {
@@ -1047,6 +1050,7 @@ class mongo_query_request::HasBitSetters {
 const int mongo_query_request::kTabFieldNumber;
 const int mongo_query_request::kJsonFieldNumber;
 const int mongo_query_request::kLimitFieldNumber;
+const int mongo_query_request::kFieldsFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 mongo_query_request::mongo_query_request()
@@ -1056,7 +1060,8 @@ mongo_query_request::mongo_query_request()
 }
 mongo_query_request::mongo_query_request(const mongo_query_request& from)
   : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr) {
+      _internal_metadata_(nullptr),
+      fields_(from.fields_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   tab_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.tab().size() > 0) {
@@ -1103,6 +1108,7 @@ void mongo_query_request::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  fields_.Clear();
   tab_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   json_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   limit_ = 0;
@@ -1159,6 +1165,25 @@ const char* mongo_query_request::_InternalParse(const char* begin, const char* e
         if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
         msg->set_limit(::google::protobuf::internal::ReadVarint(&ptr));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // repeated string fields = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          ctx->extra_parse_data().SetFieldName("db.mongo.query.request.fields");
+          object = msg->add_fields();
+          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+            goto string_till_end;
+          }
+          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+          ptr += size;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 34 && (ptr += 1));
         break;
       }
       default: {
@@ -1238,6 +1263,22 @@ bool mongo_query_request::MergePartialFromCodedStream(
         break;
       }
 
+      // repeated string fields = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_fields()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->fields(this->fields_size() - 1).data(),
+            static_cast<int>(this->fields(this->fields_size() - 1).length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "db.mongo.query.request.fields"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -1290,6 +1331,16 @@ void mongo_query_request::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->limit(), output);
   }
 
+  // repeated string fields = 4;
+  for (int i = 0, n = this->fields_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->fields(i).data(), static_cast<int>(this->fields(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.query.request.fields");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      4, this->fields(i), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1330,6 +1381,16 @@ void mongo_query_request::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->limit(), target);
   }
 
+  // repeated string fields = 4;
+  for (int i = 0, n = this->fields_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->fields(i).data(), static_cast<int>(this->fields(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mongo.query.request.fields");
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(4, this->fields(i), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -1350,6 +1411,14 @@ size_t mongo_query_request::ByteSizeLong() const {
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // repeated string fields = 4;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->fields_size());
+  for (int i = 0, n = this->fields_size(); i < n; i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->fields(i));
+  }
 
   // string tab = 1;
   if (this->tab().size() > 0) {
@@ -1399,6 +1468,7 @@ void mongo_query_request::MergeFrom(const mongo_query_request& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  fields_.MergeFrom(from.fields_);
   if (from.tab().size() > 0) {
 
     tab_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.tab_);
@@ -1437,6 +1507,7 @@ void mongo_query_request::Swap(mongo_query_request* other) {
 void mongo_query_request::InternalSwap(mongo_query_request* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  fields_.InternalSwap(CastToBase(&other->fields_));
   tab_.Swap(&other->tab_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   json_.Swap(&other->json_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
@@ -5561,6 +5632,7 @@ class mysql_query::HasBitSetters {
 const int mysql_query::kTableFieldNumber;
 const int mysql_query::kWhereJsonFieldNumber;
 const int mysql_query::kLimitFieldNumber;
+const int mysql_query::kFieldsFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 mysql_query::mysql_query()
@@ -5570,7 +5642,8 @@ mysql_query::mysql_query()
 }
 mysql_query::mysql_query(const mysql_query& from)
   : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr) {
+      _internal_metadata_(nullptr),
+      fields_(from.fields_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   table_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.table().size() > 0) {
@@ -5617,6 +5690,7 @@ void mysql_query::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  fields_.Clear();
   table_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   where_json_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   limit_ = 0;
@@ -5673,6 +5747,25 @@ const char* mysql_query::_InternalParse(const char* begin, const char* end, void
         if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
         msg->set_limit(::google::protobuf::internal::ReadVarint(&ptr));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // repeated string fields = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          ctx->extra_parse_data().SetFieldName("db.mysql.query.fields");
+          object = msg->add_fields();
+          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+            goto string_till_end;
+          }
+          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+          ptr += size;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 34 && (ptr += 1));
         break;
       }
       default: {
@@ -5752,6 +5845,22 @@ bool mysql_query::MergePartialFromCodedStream(
         break;
       }
 
+      // repeated string fields = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_fields()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->fields(this->fields_size() - 1).data(),
+            static_cast<int>(this->fields(this->fields_size() - 1).length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "db.mysql.query.fields"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -5804,6 +5913,16 @@ void mysql_query::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->limit(), output);
   }
 
+  // repeated string fields = 4;
+  for (int i = 0, n = this->fields_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->fields(i).data(), static_cast<int>(this->fields(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mysql.query.fields");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      4, this->fields(i), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -5844,6 +5963,16 @@ void mysql_query::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->limit(), target);
   }
 
+  // repeated string fields = 4;
+  for (int i = 0, n = this->fields_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->fields(i).data(), static_cast<int>(this->fields(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "db.mysql.query.fields");
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(4, this->fields(i), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -5864,6 +5993,14 @@ size_t mysql_query::ByteSizeLong() const {
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // repeated string fields = 4;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->fields_size());
+  for (int i = 0, n = this->fields_size(); i < n; i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->fields(i));
+  }
 
   // string table = 1;
   if (this->table().size() > 0) {
@@ -5913,6 +6050,7 @@ void mysql_query::MergeFrom(const mysql_query& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  fields_.MergeFrom(from.fields_);
   if (from.table().size() > 0) {
 
     table_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.table_);
@@ -5951,6 +6089,7 @@ void mysql_query::Swap(mysql_query* other) {
 void mysql_query::InternalSwap(mysql_query* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  fields_.InternalSwap(CastToBase(&other->fields_));
   table_.Swap(&other->table_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   where_json_.Swap(&other->where_json_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),

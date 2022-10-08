@@ -17,6 +17,7 @@ message mongo
             string tab = 1;
             string json = 2;
             int32 limit = 3;
+            repeated string fields = 4;
         }
         message response
         {
@@ -80,6 +81,7 @@ message mysql //mysql操作
         string table = 1;
         string where_json = 2;
         int32 limit = 3;
+        repeated string fields = 4;
     }
     message remove
     {
