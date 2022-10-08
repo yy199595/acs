@@ -19,7 +19,6 @@ namespace Sentry
 		explicit App(ServerConfig* config);
 		~App() final = default;
 	 public:
-		bool StartNewService(const std::string & name);
 		static std::shared_ptr<App> Get() { return mApp; }
 		const ServerConfig& GetConfig() { return *mConfig; }
 		inline LoggerComponent* GetLogger() { return this->mLogComponent; }
@@ -31,7 +30,6 @@ namespace Sentry
 		bool LoadComponent();
 		void StartAllComponent();
 		bool InitComponent(Component* component);
-		void OnAddNewService(Component * component);
 	 public:
 		int Run();
 		void Stop();
@@ -40,7 +38,6 @@ namespace Sentry
         inline bool IsMainThread() const { return this->mThreadId == std::this_thread::get_id();}
     private:
 		void LogicMainLoop();
-		bool StartNewComponent();
 		void UpdateConsoleTitle();
 		void WaitAllServiceStart();
 	 private:

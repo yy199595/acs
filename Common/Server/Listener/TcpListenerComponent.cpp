@@ -1,41 +1,33 @@
-#include"TcpServerListener.h"
+#include"TcpListenerComponent.h"
 #include"App/App.h"
 #include"Tcp/SocketProxy.h"
 #include"Method/MethodProxy.h"
 #include"Log/CommonLogDef.h"
-#include"Component/TcpServerComponent.h"
 #include"Component/NetThreadComponent.h"
 namespace Sentry
 {
-	TcpServerListener::TcpServerListener()
+	TcpListenerComponent::TcpListenerComponent()
     {
 		this->mCount = 0;
         this->mConfig = nullptr;
         this->mErrorCount = 0;
-        this->mTcpComponent = nullptr;
         this->mBindAcceptor = nullptr;
         this->mNetComponent = nullptr;
     }
 
-	TcpServerListener::~TcpServerListener()
+	TcpListenerComponent::~TcpListenerComponent()
 	{
 		Asio::Code err;
 		this->mBindAcceptor->close(err);
 		delete this->mBindAcceptor;
 	}
 
-    bool TcpServerListener::Init(const ListenConfig *config)
+	bool TcpListenerComponent::StartListen(const char * name)
     {
-        this->mConfig = config;
-        this->mTcpComponent = App::Get()->GetComponent<TcpServerComponent>();
-        return this->mConfig != nullptr && this->mTcpComponent != nullptr;
-    }
-
-	bool TcpServerListener::StartListen()
-    {
+        this->mConfig = App::Get()->GetConfig().GetListenConfig(name);
         try
         {
-            if(this->mConfig == nullptr || this->mTcpComponent == nullptr)
+            if(this->mConfig == nullptr)
             {
                 return false;
             }
@@ -46,6 +38,7 @@ namespace Sentry
             this->mNetComponent = App::Get()->GetComponent<NetThreadComponent>();
 
             this->mBindAcceptor->listen();
+            LOG_INFO(this->mConfig->Name << " listen [" << this->mConfig->Address << "] successful");
             this->ListenConnect();
             return true;
         }
@@ -56,7 +49,7 @@ namespace Sentry
             return false;
         }
     }
-	void TcpServerListener::ListenConnect()
+	void TcpListenerComponent::ListenConnect()
 	{
         std::shared_ptr<SocketProxy> socketProxy = this->mNetComponent->CreateSocket();
 		this->mBindAcceptor->async_accept(socketProxy->GetSocket(),
@@ -72,9 +65,10 @@ namespace Sentry
 			{
 				this->mCount++;
                 socketProxy->Init();
-                if(this->mTcpComponent->OnListenConnect(socketProxy))
+                if(!this->OnListen(socketProxy))
                 {
-                    this->OnListen(socketProxy);
+                    CONSOLE_LOG_ERROR("stop listen " << this->mConfig->Address);
+                    return ;
                 }
             }
             this->ListenConnect();

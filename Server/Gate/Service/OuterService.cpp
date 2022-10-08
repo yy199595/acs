@@ -2,7 +2,7 @@
 // Created by zmhy0073 on 2021/12/1.
 //
 
-#include"GateService.h"
+#include"OuterService.h"
 #include"App/App.h"
 #include"Md5/MD5.h"
 #include"Client/OuterNetClient.h"
@@ -14,37 +14,36 @@
 namespace Sentry
 {
 
-	bool GateService::OnStartService()
+    void OuterService::Awake()
+    {
+        this->mTimerComponent = nullptr;
+        this->mOuterNetComponent = nullptr;
+        this->GetApp()->AddComponent<OuterNetComponent>();
+        this->GetApp()->AddComponent<OuterNetMessageComponent>();
+    }
+
+	bool OuterService::OnStartService()
 	{
-        BIND_ADDRESS_RPC_METHOD(GateService::Ping);
-        BIND_COMMON_RPC_METHOD(GateService::AllotUser);
-        BIND_COMMON_RPC_METHOD(GateService::BroadCast);
-        BIND_COMMON_RPC_METHOD(GateService::CallClient);
-        BIND_COMMON_RPC_METHOD(GateService::SaveAddress);
-        BIND_COMMON_RPC_METHOD(GateService::QueryAddress);
-        LOG_CHECK_RET_FALSE(this->GetComponent<OuterNetMessageComponent>());
-        LOG_CHECK_RET_FALSE(this->mGateClientComponent = this->GetComponent<OuterNetComponent>());
-		return true;
+        BIND_ADDRESS_RPC_METHOD(OuterService::Ping);
+        BIND_COMMON_RPC_METHOD(OuterService::AllotUser);
+        BIND_COMMON_RPC_METHOD(OuterService::BroadCast);
+        BIND_COMMON_RPC_METHOD(OuterService::CallClient);
+        BIND_COMMON_RPC_METHOD(OuterService::SaveAddress);
+        BIND_COMMON_RPC_METHOD(OuterService::QueryAddress);
+        this->mOuterNetComponent = this->GetComponent<OuterNetComponent>();
+		return this->mOuterNetComponent->StartListen("gate");
 	}
 
-	bool GateService::LateAwake()
-	{
-		LOG_CHECK_RET_FALSE(LocalService::LateAwake());
-		this->mSyncComponent = this->GetComponent<UserSyncComponent>();
-		LOG_CHECK_RET_FALSE(this->mTimerComponent = this->GetComponent<TimerComponent>());
-		return this->GetConfig().GetListener("rpc", this->mAddress);
-	}
-
-	XCode GateService::Ping(const std::string & address)
+	XCode OuterService::Ping(const std::string & address)
 	{
 		LOG_ERROR(address << " ping gate server");
 		return XCode::Failure;
 	}
 
-	XCode GateService::CallClient(long long userId, c2s::rpc::call& request)
+	XCode OuterService::CallClient(long long userId, c2s::rpc::call& request)
 	{
 		std::string address;
-		if(!this->mGateClientComponent->GetUserAddress(userId, address))
+		if(!this->mOuterNetComponent->GetUserAddress(userId, address))
 		{
 			return XCode::NotFindUser;
 		}
@@ -58,20 +57,20 @@ namespace Sentry
             message->WriteMessage(request.mutable_data());
         }
 
-		if(!this->mGateClientComponent->SendData(address, message))
+		if(!this->mOuterNetComponent->SendData(address, message))
 		{
 			return XCode::NetWorkError;
 		}
 		return XCode::Successful;
 	}
 
-	XCode GateService::AllotUser(const com::type::int64 &request, s2s::allot::response &response)
+	XCode OuterService::AllotUser(const com::type::int64 &request, s2s::allot::response &response)
     {
         std::string address;
         long long userId = request.value();
         if (this->GetConfig().GetListener("gate", address))
         {
-            std::string token = this->mGateClientComponent->CreateToken(userId);
+            std::string token = this->mOuterNetComponent->CreateToken(userId);
             response.set_token(token);
             response.set_address(address);
             return XCode::Successful;
@@ -79,7 +78,7 @@ namespace Sentry
         return XCode::Failure;
     }
 
-	XCode GateService::QueryAddress(long long userId, const com::type::string& request, com::type::string& response)
+	XCode OuterService::QueryAddress(long long userId, const com::type::string& request, com::type::string& response)
 	{
 		std::string address;
 		Service * component = this->GetComponent<Service>(request.str());
@@ -91,7 +90,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode GateService::SaveAddress(long long userId, const s2s::allot::save& request)
+	XCode OuterService::SaveAddress(long long userId, const s2s::allot::save& request)
 	{
 		Service * component = this->GetComponent<Service>(request.service());
 		if(component == nullptr || !component->HasHost(request.address()))
@@ -102,12 +101,12 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode GateService::BroadCast(const s2s::broadcast::request& request)
+	XCode OuterService::BroadCast(const s2s::broadcast::request& request)
 	{
 		std::shared_ptr<c2s::rpc::call> message(new c2s::rpc::call());
 		message->set_func(request.func());
 		message->mutable_data()->PackFrom(request.data());
-		this->mGateClientComponent->SendToAllClient(message);
+		this->mOuterNetComponent->SendToAllClient(message);
 		return XCode::Successful;
 	}
 }

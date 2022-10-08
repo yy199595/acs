@@ -4,7 +4,7 @@
 #include"File/FileHelper.h"
 #include"spdlog/fmt/fmt.h"
 #include"File/DirectoryHelper.h"
-#include"Listener/TcpServerListener.h"
+#include"Listener/TcpListenerComponent.h"
 namespace Sentry
 {
     ServerConfig::ServerConfig(int argc, char ** argv)
@@ -122,15 +122,11 @@ namespace Sentry
         return configs.size();
     }
 
-	void ServerConfig::GetListeners(std::vector<const ListenConfig*>& listeners) const
-	{
-		listeners.clear();
-		auto iter = this->mListens.begin();
-		for (; iter != this->mListens.end(); iter++)
-		{
-			listeners.emplace_back(&iter->second);
-		}
-	}
+    const ListenConfig *ServerConfig::GetListenConfig(const char *name) const
+    {
+        auto iter = this->mListens.find(name);
+        return iter != this->mListens.end() ? &iter->second : nullptr;
+    }
 
 	bool ServerConfig::GetListener(const std::string& name, std::string& address) const
 	{

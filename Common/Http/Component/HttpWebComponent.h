@@ -10,7 +10,7 @@ namespace Sentry
 {
     class HttpAsyncResponse;
     class HttpHandlerClient;
-    class HttpWebComponent : public HttpListenComponent
+    class HttpWebComponent : public HttpListenComponent, public IStart
     {
     public:
         HttpWebComponent() = default;
@@ -18,6 +18,7 @@ namespace Sentry
     public:
         void OnRequest(std::shared_ptr<HttpHandlerClient> httpClient);
     private:
+        bool OnStart() final;
         bool LateAwake() final;
         const HttpMethodConfig * GetConfig(const std::string & path);
     private:

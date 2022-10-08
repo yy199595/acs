@@ -50,7 +50,7 @@ namespace Sentry
         explicit ServerConfig(int argc, char ** argv);
     public:
         bool LoadConfig();
-		void GetListeners(std::vector<const ListenConfig *> & listeners) const;
+        const ListenConfig * GetListenConfig(const char * name) const;
 		bool GetListener(const std::string & name, std::string & address) const;
 	 public:
         int GetNodeId() const { return this->mNodeId; }

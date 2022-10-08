@@ -24,16 +24,16 @@ namespace Sentry
 {
 	struct RedisConfig;
 
-    class RedisComponent : public RpcTaskComponent<RedisResponse>, public IStart
+    class RedisComponent : public RpcTaskComponent<RedisResponse>
 	{
 	public:
 		RedisComponent() = default;
 	 protected:
-        bool OnStart() final;
-        bool LateAwake() final;
+        bool LoadConfig();
         SharedRedisClient MakeRedisClient(const RedisConfig & config);
         bool ParseConfig(const char * name, const rapidjson::Value & json);
     public:
+        bool StartConnectRedis();
         bool Ping(SharedRedisClient redisClient);
 		virtual SharedRedisClient GetClient(const std::string & name);
         virtual void OnLoadScript(const std::string & name, const std::string & md5) { }

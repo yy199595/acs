@@ -25,7 +25,7 @@ namespace Sentry
 		bool LateAwake() final;
 		void OnLuaRegister(Lua::ClassProxyHelper & luaRegister) final;
 	 private:
-		class GateService * mGateService;
+		class OuterService * mGateService;
 	};
 }
 

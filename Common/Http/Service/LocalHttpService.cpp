@@ -23,7 +23,7 @@ namespace Sentry
 		}
 		return method->Invoke(*request, *response);
 	}
-	bool LocalHttpService::StartNewService()
+	bool LocalHttpService::Start()
     {
         this->mServiceRegister = std::make_shared<HttpServiceRegister>(this);
         if (!this->OnStartService(*this->mServiceRegister))
@@ -61,7 +61,7 @@ namespace Sentry
         return true;
     }
 
-	bool LocalHttpService::CloseService()
+	bool LocalHttpService::Close()
 	{
         this->mServiceRegister->Clear();
         std::move(this->mServiceRegister);

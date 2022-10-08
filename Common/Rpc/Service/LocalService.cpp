@@ -38,7 +38,7 @@ namespace Sentry
         return serviceMethod->Invoke(*message);
     }
 
-	bool LocalService::StartNewService()
+	bool LocalService::Start()
 	{
 		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
 		if (!this->OnStartService())
@@ -81,7 +81,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool LocalService::CloseService()
+	bool LocalService::Close()
 	{
 		if(this->IsStartService())
 		{

@@ -42,6 +42,11 @@ namespace Sentry
 		return true;
 	}
 
+    bool ConsoleComponent::OnStart()
+    {
+        return this->StartListen("console");
+    }
+
 	bool ConsoleComponent::OnListen(std::shared_ptr<SocketProxy> socket)
 	{
 		std::shared_ptr<TelnetClientContext> telnetClient =
@@ -126,7 +131,7 @@ namespace Sentry
 
 	bool ConsoleComponent::Start(const std::string& parameter, std::vector<std::string>& response)
 	{
-		return this->GetApp()->StartNewService(parameter);
+		return true;
 	}
 
 	bool ConsoleComponent::Close(const std::string& parameter, std::vector<std::string>& response)

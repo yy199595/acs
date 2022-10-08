@@ -93,7 +93,8 @@ namespace Sentry
 				return false;
 			}
 		}
-		return true;
+        this->mTaskComponent->Start(&App::StartAllComponent, this);
+        return true;
 	}
 
 	bool App::InitComponent(Component* component)
@@ -130,11 +131,6 @@ namespace Sentry
 		{
 			this->GetLogger()->SaveAllLog();
 			return -1;
-		}
-		if(!this->StartNewComponent())
-		{
-			this->GetLogger()->SaveAllLog();
-			return -2;
 		}
 		this->mFps = 15;
 		mConfig->GetMember("fps", this->mFps);
@@ -218,65 +214,53 @@ namespace Sentry
         {
             Component *component = this->GetComponentByName(name);
             IServiceBase *localServerRpc = component->Cast<IServiceBase>();
-            if (localServerRpc != nullptr && !localServerRpc->IsStartService())
+            const ServiceConfig * serviceConfig = this->mConfig->GetServiceConfig(name);
+
+            ElapsedTimer timer;
+            long long timeId = this->mTimerComponent->DelayCall(10.0f, [component]() {
+                LOG_FATAL(component->GetName() << " start time out");
+            });
+            if(localServerRpc != nullptr && serviceConfig != nullptr)
             {
-                continue;
+                if(serviceConfig->IsStart && !localServerRpc->Start())
+                {
+                    LOG_ERROR("start " << name << " failure");
+                    this->Stop();
+                    return;
+                }
+                Service * service = this->GetComponent<Service>(name);
+                if(service != nullptr && !serviceConfig->Address.empty())
+                {
+                    service->AddHost(serviceConfig->Address);
+                }
             }
             if (component->Cast<IStart>() != nullptr)
             {
-                ElapsedTimer timer;
-                long long timeId = this->mTimerComponent->DelayCall(10.0f, [component]() {
-                    LOG_FATAL(component->GetName() << " start time out");
-                });
                 if (!component->Cast<IStart>()->OnStart())
                 {
 					LOG_FATAL("start " << component->GetName() << " failure");
+                    this->Stop();
 					return;
                 }
-                this->mTimerComponent->CancelTimer(timeId);
+            }
+            if(timer.GetSecond() > 0)
+            {
                 LOG_DEBUG("start " << name << " successful use time = [" << timer.GetSecond() << "s]")
             }
+            this->mTimerComponent->CancelTimer(timeId);
         }
 
         CONSOLE_LOG_DEBUG("start all component complete");
         for (const std::string &name: components)
         {
-            Component *component = this->GetComponentByName(name);
-            IServiceBase *localServerRpc = component->Cast<IServiceBase>();
-            if (localServerRpc == nullptr || localServerRpc->IsStartService())
+            IComplete *complete = this->GetComponent<IComplete>(name);
+            if(complete != nullptr)
             {
-                IComplete *complete = component->Cast<IComplete>();
-                if (complete != nullptr)
-                {
-                    complete->OnComplete();
-                }
+                complete->OnComplete();
             }
         }
         this->WaitAllServiceStart();
     }
-
-	bool App::StartNewComponent()
-	{
-		std::vector<const ServiceConfig *> components;
-        this->mConfig->GetServiceConfigs(components);
-        for (const ServiceConfig * config: components)
-        {
-            const std::string &name = config->Name;
-            Service * service = this->GetComponent<Service>(name);
-            IServiceBase *localServerRpc = this->GetComponent<IServiceBase>(name);
-            if (config->IsStart && localServerRpc != nullptr && !localServerRpc->StartNewService())
-            {
-                LOG_ERROR(name << " load failure");
-                return false;
-            }
-            if(service != nullptr && !config->Address.empty())
-            {
-                service->AddHost(config->Address);
-            }
-        }
-		this->mTaskComponent->Start(&App::StartAllComponent, this);
-		return true;
-	}
 
 	void App::WaitAllServiceStart()
 	{
@@ -320,46 +304,6 @@ namespace Sentry
 		//LOG_INFO("fps = " << this->mLogicFps);
 #endif
 		this->mLogicRunCount = 0;
-	}
-
-	bool App::StartNewService(const std::string& name)
-	{
-		ElapsedTimer timer;
-		Component* component = this->GetComponentByName(name);
-		IServiceBase* serviceBase = component->Cast<IServiceBase>();
-		if (serviceBase != nullptr && !serviceBase->IsStartService())
-		{
-			LOG_CHECK_RET_FALSE(serviceBase->StartNewService());
-
-			IStart* start = component->Cast<IStart>();
-			IComplete* complete = component->Cast<IComplete>();
-			if (start != nullptr && !start->OnStart())
-			{
-				LOG_FATAL("start " << name << " failure");
-				return false;
-			}
-			if (complete != nullptr)
-			{
-				complete->OnComplete();
-			}
-			this->OnAddNewService(component);
-			LOG_INFO("start " << name << " user time " << timer.GetMs() << " ms");
-			return true;
-		}
-		return false;
-	}
-	void App::OnAddNewService(Component* component)
-	{
-		std::vector<Component *> components;
-		this->GetComponents(components);
-		for(Component * component1 : components)
-		{
-			IServiceChange * serviceChange = component1->Cast<IServiceChange>();
-			if(serviceChange != nullptr)
-			{
-				serviceChange->OnAddService(component);
-			}
-		}
 	}
 
 	Service* App::GetService(const std::string& name)

@@ -213,7 +213,7 @@ namespace Sentry
     std::shared_ptr<RedisResponse> TcpRedisClient::SyncCommand(std::shared_ptr<RedisRequest> request)
     {
         assert(this->mRecvBuffer.size() == 0);
-        CONSOLE_LOG_DEBUG("sync command = " << request->ToJson());
+        //CONSOLE_LOG_DEBUG("sync command = " << request->ToJson());
         if(this->SendSync(request) <= 0)
         {
             return nullptr;

@@ -13,8 +13,8 @@ namespace Sentry
 		ServiceAgent() = default;
 		~ServiceAgent() = default;
 	 private:
-		bool StartNewService() final { return false;}
-		bool CloseService() final { return false;}
+		bool Start() final { return false;}
+		bool Close() final { return false;}
 		bool IsStartService() final { return false; }
 	 private:
 		XCode Invoke(const std::string& name, std::shared_ptr<Rpc::Data> message) final;

@@ -26,7 +26,7 @@ namespace Sentry
 
 namespace Sentry
 {
-    bool MysqlDBComponent::LateAwake()
+    bool MysqlDBComponent::LoadConfig()
 	{
 		const ServerConfig& config = this->GetConfig();
 		config.GetMember("mysql", "ip", this->mConfig.mIp);
@@ -38,8 +38,12 @@ namespace Sentry
 		return true;
 	}
 
-    bool MysqlDBComponent::OnStart()
+    bool MysqlDBComponent::StartConnectMysql()
 	{
+        if(!this->LoadConfig())
+        {
+            return false;
+        }
 		for (int index = 0; index < this->mConfig.mMaxCount; index++)
 		{
 			std::shared_ptr<MysqlClient> mysqlClient

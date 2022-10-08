@@ -4,7 +4,6 @@
 
 #include"ServiceHost.h"
 #include"Log/CommonLogDef.h"
-#include"App/App.h"
 namespace Sentry
 {
     void ServiceHost::AddHost(const std::string &address)
@@ -14,7 +13,7 @@ namespace Sentry
             this->OnAddHost(address);
             const std::string & name = this->GetServiceName();
             this->mHosts.emplace_back(new HostCounter(address));
-            CONSOLE_LOG_ERROR(name << " add host [" << address <<"]");
+            CONSOLE_LOG_DEBUG(name << " add host [" << address <<"]");
         }
     }
 

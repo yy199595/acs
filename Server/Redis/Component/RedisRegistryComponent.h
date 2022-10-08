@@ -61,7 +61,6 @@ namespace Sentry
 		std::string mRpcAddress;
 		std::vector<std::string> mServices;
         class TaskComponent * mTaskComponent;
-        class RedisSubComponent * mSubComponent;
         class RedisDataComponent * mRedisComponent;
         std::unordered_map<std::string, ServiceNode *> mNodes;
 	};

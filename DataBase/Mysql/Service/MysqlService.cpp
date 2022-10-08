@@ -7,6 +7,11 @@
 namespace Sentry
 {
 
+    void MysqlService::Awake()
+    {
+        this->GetApp()->AddComponent<MysqlDBComponent>();
+    }
+
 	bool MysqlService::OnStartService()
 	{
         BIND_COMMON_RPC_METHOD(MysqlService::Add);
@@ -15,11 +20,11 @@ namespace Sentry
         BIND_COMMON_RPC_METHOD(MysqlService::Update);
         BIND_COMMON_RPC_METHOD(MysqlService::Delete);
         BIND_COMMON_RPC_METHOD(MysqlService::Create);
+        this->mMysqlComponent = this->GetComponent<MysqlDBComponent>();
         this->mSyncComponent = this->GetComponent<DataSyncComponent>();
         LOG_CHECK_RET_FALSE(this->mProtoComponent = this->GetComponent<ProtoComponent>());
-        LOG_CHECK_RET_FALSE(this->mMysqlComponent = this->GetComponent<MysqlDBComponent>());
         this->mMysqlHelper = std::make_shared<MysqlHelper>(this->mProtoComponent);
-        return true;
+        return this->mMysqlComponent->StartConnectMysql();
 	}
 
     XCode MysqlService::Create(const db::mysql::create &request)

@@ -26,6 +26,7 @@ namespace Sentry
         XCode Query(const db::mysql::query& request, db::mysql::response& response);
 
 	 private:
+        void Awake();
 		bool OnStartService();
 	 private:
         class ProtoComponent * mProtoComponent;

@@ -1,23 +1,18 @@
 #pragma once
 #include"Source/TaskSource.h"
 #include"Config/ServerConfig.h"
-
+#include"Component/Component.h"
 namespace Sentry
 {
-
-	class ISocketListen;
-    class TcpServerComponent;
     class NetThreadComponent;
 
-    class TcpServerListener
+    class TcpListenerComponent : public Component
 	{
 	 public:
-		TcpServerListener();
-		~TcpServerListener();
+		TcpListenerComponent();
+		~TcpListenerComponent();
 	 public:
-        bool StartListen();
-        bool Init(const ListenConfig * config);
-        virtual bool StartInComplete() { return true; }
+        bool StartListen(const char * name);
         const ListenConfig & GetListenConfig() const { return *this->mConfig; }
         const std::string & GetListenAddress() const { return this->mConfig->Address; }
     protected:
@@ -27,7 +22,6 @@ namespace Sentry
 		int mCount;
 		int mErrorCount;
 		const ListenConfig * mConfig;
-        TcpServerComponent * mTcpComponent;
         NetThreadComponent * mNetComponent;
         asio::ip::tcp::acceptor * mBindAcceptor;
     };

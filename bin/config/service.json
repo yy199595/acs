@@ -32,7 +32,7 @@
             "Path": "/download"
         }
     },
-    "GateService": {
+    "OuterService": {
         "Type": "rpc",
         "Ping": {
             "Async": true,
@@ -102,6 +102,23 @@
             "Async": true,
             "Type": "Server",
             "Request": "db.mysql.remove"
+        }
+    },
+    "InnerService": {
+        "Type": "rpc",
+        "Ping": {
+            "Async": false,
+            "Type": "Server"
+        },
+        "StartService": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "com.type.string"
+        },
+        "CloseService": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "com.type.string"
         }
     },
     "MongoService": {

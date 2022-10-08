@@ -22,7 +22,7 @@ namespace Sentry
 
 namespace Sentry
 {
-	bool MongoDBComponent::LateAwake()
+	bool MongoDBComponent::LoadConfig()
 	{
 		const ServerConfig & config = this->GetApp()->GetConfig();
 		this->mTimerComponent = this->GetApp()->GetTimerComponent();
@@ -36,8 +36,12 @@ namespace Sentry
 		return true;
 	}
 
-	bool MongoDBComponent::OnStart()
+	bool MongoDBComponent::StartConnectMongo()
     {
+        if(!this->LoadConfig())
+        {
+            return false;
+        }
         for (int index = 0; index < this->mConfig.mMaxCount; index++)
         {
             const std::string & ip = this->mConfig.mIp;

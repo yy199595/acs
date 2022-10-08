@@ -31,6 +31,11 @@ namespace Sentry
         return true;
     }
 
+    bool HttpWebComponent::OnStart()
+    {
+        return this->StartListen("web");
+    }
+
 
     const HttpMethodConfig *HttpWebComponent::GetConfig(const std::string &path)
     {

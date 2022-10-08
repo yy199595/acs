@@ -17,23 +17,23 @@
     "listener": {
         "rpc": {
             "port": 7788,
-            "ip": "127.0.0.1",
+            "ip": "10.10.14.104",
             "component": "InnerNetComponent"
         },
         "web": {
             "port": 8080,
-            "ip": "127.0.0.1",
+            "ip": "10.10.14.104",
             "route": "/app/web",
             "component": "HttpWebComponent"
         },
         "gate": {
             "port": 1995,
-            "ip": "127.0.0.1",
+            "ip": "10.10.14.104",
             "component": "OuterNetComponent"
         },
         "rpc.http": {
             "port": 1996,
-            "ip" : "127.0.0.1",
+            "ip" : "10.10.14.104",
             "route": "/app/rpc",
             "component" : "HttpRpcComponent"
         },
@@ -103,23 +103,13 @@
         "ConsoleComponent",
         "MongoDataComponent",
         "NetThreadComponent",
-        "TcpServerComponent",
-        "RedisSubComponent",
-        "RedisDataComponent",
         "LuaScriptComponent",
-        "InnerNetComponent",
-        "InnerNetMessageComponent",
-        "OuterNetMessageComponent",
-        "MongoDBComponent",
-        "OuterNetComponent",
         "UnitMgrComponent",
         "GateAgentComponent",
         "UserSyncComponent",
         "HttpWebComponent",
         "HttpRpcComponent",
         "MongoAgentComponent",
-        "MysqlDBComponent",
-        "RedisRegistryComponent",
         "DataSyncComponent"
     ],
     "services": {
@@ -139,7 +129,11 @@
             "Type": "rpc",
             "IsStart": true
         },
-        "GateService": {
+        "OuterService": {
+            "Type": "rpc",
+            "IsStart": true
+        },
+        "InnerService": {
             "Type": "rpc",
             "IsStart": true
         },

@@ -14,6 +14,7 @@ namespace Sentry
 	public:
 		MongoService();
 	private:
+        void Awake() final;
 		bool OnStartService() final;
     private:
         XCode Insert(const db::mongo::insert & request);

@@ -4,7 +4,6 @@
 #include"Component/TimerComponent.h"
 #include"Component/TaskComponent.h"
 #include"Component/LuaScriptComponent.h"
-#include"Component/TcpServerComponent.h"
 #include"Component/RedisDataComponent.h"
 #include"Component/UnitMgrComponent.h"
 #include"Component/ConsoleComponent.h"
@@ -31,7 +30,8 @@
 
 
 #include"Service/LuaService.h"
-#include"Service/GateService.h"
+#include"Service/OuterService.h"
+#include"Service/InnerService.h"
 #include"Service/ServiceAgent.h"
 #include"Service/HttpWebService.h"
 #include"Service/LocalLuaHttpService.h"
@@ -47,6 +47,7 @@
 #ifdef __ENABLE_MYSQL__
 #include"Service/MysqlService.h"
 #include"Component/MysqlDBComponent.h"
+#include"Component/MysqlDataComponent.h"
 #endif
 using namespace Sentry;
 void RegisterComponent()
@@ -66,7 +67,6 @@ void RegisterComponent()
 
 //server
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
-    ComponentFactory::Add<TcpServerComponent>("TcpServerComponent");
     ComponentFactory::Add<InnerNetComponent>("InnerNetComponent");
 
 // gate
@@ -86,6 +86,7 @@ void RegisterComponent()
 
 #ifdef __ENABLE_MYSQL__
     ComponentFactory::Add<MysqlDBComponent>("MysqlDBComponent");
+    ComponentFactory::Add<MysqlDataComponent>("MysqlDataComponent");
 #endif
 //http
     ComponentFactory::Add<HttpComponent>("HttpComponent");
@@ -104,7 +105,8 @@ void RegisterServiceComponent()
     ComponentFactory::Add<LuaService>("rpc");
     ComponentFactory::Add<ServiceAgent>("agent");
     ComponentFactory::Add<LocalLuaHttpService>("http");
-    ComponentFactory::Add<GateService>("GateService");
+    ComponentFactory::Add<OuterService>("OuterService");
+    ComponentFactory::Add<InnerService>("InnerService");
 #ifdef __ENABLE_MONGODB__
 	ComponentFactory::Add<MongoService>("MongoService");
 #endif

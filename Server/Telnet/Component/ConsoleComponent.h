@@ -1,6 +1,6 @@
 #pragma once
 #include"Component/Component.h"
-#include"Listener/TcpServerListener.h"
+#include"Listener/TcpListenerComponent.h"
 #include"Client/TelnetClientContext.h"
 
 namespace Sentry
@@ -27,13 +27,14 @@ namespace Tcp
 namespace Sentry
 {
 	using ConsoleFunction = std::function<bool(const std::string&, std::vector<std::string>&)>;
-	class ConsoleComponent : public Component, public TcpServerListener
+    class ConsoleComponent : public TcpListenerComponent, public IStart
 	{
 	 public:
 		ConsoleComponent() = default;
 		~ConsoleComponent() final = default;
 	 public:
-		bool LateAwake() final;
+        bool OnStart() final;
+        bool LateAwake() final;
 		void OnClientError(const std::string & address);
 		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
 		void OnReceive(const std::string & address, const std::string & message);

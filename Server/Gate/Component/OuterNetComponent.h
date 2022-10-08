@@ -6,12 +6,11 @@
 #define GAMEKEEPER_GATECLIENTCOMPONENT_H
 #include"Component/Component.h"
 #include"Client/Message.h"
-#include"Listener/TcpServerListener.h"
+#include"Listener/TcpListenerComponent.h"
 namespace Sentry
 {
 	class OuterNetClient;
-	class OuterNetComponent : public Component, public TcpServerListener,
-                              public IRpc<Rpc::Data>
+	class OuterNetComponent : public TcpListenerComponent, public IRpc<Rpc::Data>
 	{
 	 public:
 		OuterNetComponent() = default;
@@ -33,7 +32,6 @@ namespace Sentry
 		bool LateAwake() final;
 		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 private:
-        bool StartInComplete() final { return false; }
         bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Data> message);
     private:
 		class TimerComponent* mTimerComponent;

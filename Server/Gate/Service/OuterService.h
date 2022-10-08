@@ -7,11 +7,11 @@
 #include"Service/LocalService.h"
 namespace Sentry
 {
-	class GateService final : public LocalService
+	class OuterService final : public LocalService
 	{
 	 public:
-		GateService() = default;
-		~GateService() final = default;
+		OuterService() = default;
+		~OuterService() final = default;
 	 private:
 		XCode Ping(const std::string & address);
 		XCode CallClient(long long userId, c2s::rpc::call & request);
@@ -20,13 +20,13 @@ namespace Sentry
         XCode AllotUser(const com::type::int64 & userId, s2s::allot::response & response);
 		XCode QueryAddress(long long userId, const com::type::string &request, com::type::string & response); //查询玩家服务地址
 	private:
-		bool LateAwake() final;
+		void Awake() final;
 		bool OnStartService() final;
 	 private:
 		std::string mAddress;
 		class TimerComponent* mTimerComponent;
 		class UserSyncComponent * mSyncComponent;
-		class OuterNetComponent* mGateClientComponent;
+		class OuterNetComponent* mOuterNetComponent;
 	};
 
 }

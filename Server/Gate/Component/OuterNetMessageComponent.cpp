@@ -10,7 +10,7 @@
 #include"OuterNetComponent.h"
 #include"Component/InnerNetComponent.h"
 #include"Service/LocalService.h"
-#include"Service/GateService.h"
+#include"Service/OuterService.h"
 #include"Component/UserSyncComponent.h"
 #include"Component/RedisDataComponent.h"
 #include"Component/ProtoComponent.h"

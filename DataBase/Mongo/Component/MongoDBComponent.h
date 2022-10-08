@@ -35,18 +35,18 @@ namespace Sentry
 
 namespace Sentry
 {
-	class MongoDBComponent : public RpcTaskComponent<Mongo::CommandResponse>, public IStart
+	class MongoDBComponent : public RpcTaskComponent<Mongo::CommandResponse>
 	{
 	public:
 		MongoDBComponent() = default;
 		~MongoDBComponent() = default;
 	private:
-		bool OnStart() final;
-		bool LateAwake() final;
+        bool LoadConfig();
 		void OnAddTask(RpcTask task) final;
 		void OnDelTask(long long taskId, RpcTask task) final;
 	public:
 		bool Ping(int index);
+        bool StartConnectMongo();
         bool SetIndex(const std::string & tab, const std::string & name);
     public:
         void OnClientError(int index, XCode code);

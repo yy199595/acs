@@ -1,8 +1,7 @@
 ﻿#include"RedisRegistryComponent.h"
 #include"App/App.h"
 #include"Service/LocalService.h"
-#include"Listener/TcpServerListener.h"
-#include"Component/TcpServerComponent.h"
+#include"Listener/TcpListenerComponent.h"
 #include"Component/RedisDataComponent.h"
 #include"Component/RedisSubComponent.h"
 
@@ -25,7 +24,6 @@ namespace Sentry
 	bool RedisRegistryComponent::LateAwake()
 	{
         this->mTaskComponent = this->GetComponent<TaskComponent>();
-        this->mSubComponent = this->GetComponent<RedisSubComponent>();
         this->mRedisComponent = this->GetComponent<RedisDataComponent>();
 		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("area_id", this->mAreaId));
 		LOG_CHECK_RET_FALSE(this->GetConfig().GetListener("rpc", this->mRpcAddress));

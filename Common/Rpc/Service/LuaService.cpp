@@ -18,7 +18,7 @@ namespace Sentry
 		//luaL_unref(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
 	}
 
-	bool LuaService::StartNewService()
+	bool LuaService::Start()
 	{
 		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
 
@@ -90,7 +90,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool LuaService::CloseService()
+	bool LuaService::Close()
 	{
         const char * tab = this->GetName().c_str();
         if(Lua::lua_getfunction(this->mLuaEnv, tab, "OnServiceStart"))

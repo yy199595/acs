@@ -3,13 +3,13 @@
 //
 
 #include"GateAgentComponent.h"
-#include"Service/GateService.h"
+#include"Service/OuterService.h"
 #include"Lua/LuaParameter.h"
 namespace Sentry
 {
 	bool GateAgentComponent::LateAwake()
 	{
-		this->mGateService = this->GetComponent<GateService>();
+		this->mGateService = this->GetComponent<OuterService>();
 		return true;
 	}
 

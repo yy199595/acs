@@ -28,7 +28,7 @@ namespace Sentry
 
 namespace Sentry
 {
-	bool RedisComponent::LateAwake()
+	bool RedisComponent::LoadConfig()
 	{
         const ServerConfig & config = this->GetApp()->GetConfig();
         const rapidjson::Value * jsonValue = config.GetJsonValue("redis");
@@ -49,8 +49,12 @@ namespace Sentry
         return true;
 	}
 
-    bool RedisComponent::OnStart()
+    bool RedisComponent::StartConnectRedis()
     {
+        if(!this->LoadConfig())
+        {
+            return false;
+        }
         auto iter = this->mConfigs.begin();
         for(; iter != this->mConfigs.end(); iter++)
         {

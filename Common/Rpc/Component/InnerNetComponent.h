@@ -2,14 +2,12 @@
 
 #include"Lua/Table.h"
 #include"Client/Message.h"
-#include"Component/Component.h"
 #include"Client/InnerNetClient.h"
-#include"Listener/TcpServerListener.h"
+#include"Listener/TcpListenerComponent.h"
 namespace Sentry
 {
 	// 管理内网rpc的session
-	class InnerNetComponent : public Component, public TcpServerListener,
-                              public IRpc<Rpc::Data>
+	class InnerNetComponent : public TcpListenerComponent, public IRpc<Rpc::Data>
 	{
 	 public:
 		InnerNetComponent() = default;
