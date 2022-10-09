@@ -258,6 +258,7 @@ namespace Sentry
 		void WriteFile(std::fstream* fs);
         void WriteString(const std::string& content);
 		void WriteString(const char* content, size_t size);
+        std::string * Content() { return &mContent;}
     public:
 		bool AddHead(const char* key, int value);
 		bool AddHead(const char* key, const std::string& value);

@@ -67,7 +67,8 @@
             "channels": [
                 "RedisRegistryComponent.Ping",
                 "RedisRegistryComponent.AddNode",
-                "RedisRegistryComponent.AddService"
+                "RedisRegistryComponent.AddService",
+                "RedisRegistryComponent.RemoveService"
             ],
             "passwd": "199595yjz."
         },

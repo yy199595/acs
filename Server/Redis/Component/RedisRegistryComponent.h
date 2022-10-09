@@ -46,8 +46,8 @@ namespace Sentry
 		void OnComplete() final;
         void OnSecondUpdate(const int tick) final;
 	 private:
-		void OnAddService(Component *component) final;
-		void OnDelService(Component *component) final;
+		void OnAddService(const std::string & name) final;
+		void OnDelService(const std::string & name) final;
     private:
         void QueryAllNodes();
         bool Ping(const Json::Reader & json);

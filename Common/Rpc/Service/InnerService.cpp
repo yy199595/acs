@@ -41,14 +41,13 @@ namespace Sentry
         BIND_COMMON_RPC_METHOD(InnerService::Hotfix);
         BIND_COMMON_RPC_METHOD(InnerService::StartService);
         BIND_COMMON_RPC_METHOD(InnerService::CloseService);
-        RedisSubComponent * subComponent = this->GetComponent<RedisSubComponent>();
-        RedisDataComponent * dataComponent = this->GetComponent<RedisDataComponent>();
-        InnerNetComponent * listenComponent = this->GetComponent<InnerNetComponent>();
+        RedisSubComponent *subComponent = this->GetComponent<RedisSubComponent>();
+        RedisDataComponent *dataComponent = this->GetComponent<RedisDataComponent>();
+        InnerNetComponent *listenComponent = this->GetComponent<InnerNetComponent>();
 
         LOG_CHECK_RET_FALSE(subComponent && subComponent->StartConnectRedis());
         LOG_CHECK_RET_FALSE(dataComponent && dataComponent->StartConnectRedis());
-        LOG_CHECK_RET_FALSE(listenComponent && listenComponent->StartListen("rpc"));
-        return true;
+        return listenComponent != nullptr && listenComponent->StartListen("rpc");
     }
 
     XCode InnerService::Ping()
@@ -87,15 +86,11 @@ namespace Sentry
         {
             return XCode::Failure;
         }
-        std::vector<Component *> components;
+        std::vector<IServiceChange *> components;
         this->GetApp()->GetComponents(components);
-        for(Component * component : components)
+        for(IServiceChange * component : components)
         {
-            IServiceChange * serviceChange = component->Cast<IServiceChange>();
-            if(serviceChange != nullptr)
-            {
-                serviceChange->OnAddService(service);
-            }
+            component->OnAddService(name);
         }
         return XCode::Successful;
     }
@@ -116,15 +111,11 @@ namespace Sentry
         {
             return XCode::Failure;
         }
-        std::vector<Component *> components;
+        std::vector<IServiceChange *> components;
         this->GetApp()->GetComponents(components);
-        for (Component *component: components)
+        for (IServiceChange *component: components)
         {
-            IServiceChange *serviceChange = component->Cast<IServiceChange>();
-            if (serviceChange != nullptr)
-            {
-                serviceChange->OnDelService(service);
-            }
+            component->OnDelService(name);
         }
         return XCode::Successful;
     }

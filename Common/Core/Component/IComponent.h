@@ -96,8 +96,8 @@ namespace Sentry
 	class IServiceChange
 	{
 	public:
-		virtual void OnAddService(class Component* component) = 0;
-		virtual void OnDelService(class Component* component) = 0;
+		virtual void OnAddService(const std::string & name) = 0;
+		virtual void OnDelService(const std::string & name) = 0;
 	};
 
 	template<typename T>

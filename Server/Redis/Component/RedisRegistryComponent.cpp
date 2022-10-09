@@ -83,47 +83,28 @@ namespace Sentry
         }
     }
 
-	void RedisRegistryComponent::OnAddService(Component* component)
-	{
-		if(component->Cast<Service>())
-		{
-            const std::string & name = component->GetName();
-            SharedRedisClient redisClient = this->mRedisComponent->GetClient("main");
-            if(redisClient != nullptr)
-            {
-                std::shared_ptr<RedisRequest> cmd =
-                        RedisRequest::Make("SADD", this->mRpcAddress, name);
-                redisClient->SendCommand(cmd);
-            }
-			Json::Writer jsonWriter;
-			jsonWriter << "address" << this->mRpcAddress << "service" << component->GetName();
-            const std::string message = jsonWriter.JsonString();
-            std::shared_ptr<RedisRequest> request =
-                    RedisRequest::Make("PUBLISH", "RedisRegistryComponent.AddService", message);
-            redisClient->SendCommand(request);
-		}
-	}
+	void RedisRegistryComponent::OnAddService(const std::string & name)
+    {
+        Json::Writer jsonWriter;
+        jsonWriter << "address" << this->mRpcAddress << "service" << name;
+        const std::string message = jsonWriter.JsonString();
+        const std::string channel("RedisRegistryComponent.AddService");
+        this->mRedisComponent->SenCommond("main", "PUBLISH", channel, message);
+        this->mRedisComponent->SenCommond("main", "SADD", this->mRpcAddress, name);
+    }
 
-	void RedisRegistryComponent::OnDelService(Component* component)
-	{
-        if(component->Cast<Service>())
-        {
-            const std::string &name = component->GetName();
-            SharedRedisClient redisClient = this->mRedisComponent->GetClient("main");
-            if (redisClient != nullptr)
-            {
-                std::shared_ptr<RedisRequest> cmd =
-                        RedisRequest::Make("SREM", this->mRpcAddress, name);
-                redisClient->SendCommand(cmd);
-            }
-            Json::Writer jsonWriter;
-            jsonWriter << "address" << this->mRpcAddress << "service" << component->GetName();
-            const std::string message = jsonWriter.JsonString();
-            std::shared_ptr<RedisRequest> request =
-                    RedisRequest::Make("PUBLISH", "RedisRegistryComponent.RemoveService", message);
-            redisClient->SendCommand(request);
-        }
-	}
+	void RedisRegistryComponent::OnDelService(const std::string & name)
+    {
+        std::string message;
+        Json::Document document;
+        document.Add("service", name);
+        document.Add("address", this->mRpcAddress);
+
+        document.Serialize(&message);
+        const std::string chanel("RedisRegistryComponent.RemoveService");
+        this->mRedisComponent->SenCommond("main", "PUBLISH", chanel, message);
+        this->mRedisComponent->SenCommond("main", "SREM", this->mRpcAddress, name);
+    }
 
     bool RedisRegistryComponent::RemoveService(const Json::Reader &json)
     {
@@ -197,27 +178,28 @@ namespace Sentry
     void RedisRegistryComponent::QueryAllNodes()
     {
         std::shared_ptr<RedisResponse> response =
-                this->mRedisComponent->RunCommand("main", "PUBSUB", "CHANNELS", "*:*");
-        if(response != nullptr && response->GetArraySize() > 0)
+            this->mRedisComponent->RunCommand("main", "PUBSUB", "CHANNELS", "*:*");
+        if (response == nullptr || response->GetArraySize() == 0)
         {
-            for(size_t index = 0; index < response->GetArraySize(); index++)
+            return;
+        }
+        for (size_t index = 0; index < response->GetArraySize(); index++)
+        {
+            const RedisString *redisString = response->Get(index)->Cast<RedisString>();
+            ServiceNode *serviceNode = new ServiceNode(redisString->GetValue());
+            std::shared_ptr<RedisResponse> response1 =
+                this->mRedisComponent->RunCommand("main", "SMEMBERS", redisString->GetValue());
+            for (size_t x = 0; x < response1->GetArraySize(); x++)
             {
-                const RedisString * redisString = response->Get(index)->Cast<RedisString>();
-                ServiceNode * serviceNode = new ServiceNode(redisString->GetValue());
-                std::shared_ptr<RedisResponse> response1 =
-                        this->mRedisComponent->RunCommand("main", "SMEMBERS", redisString->GetValue());
-                for(size_t x = 0; x < response1->GetArraySize(); x ++)
+                const RedisString *redisString2 = response1->Get(x)->Cast<RedisString>();
+                Service *service = this->GetApp()->GetService(redisString2->GetValue());
+                if (service != nullptr)
                 {
-                    const RedisString * redisString2 = response1->Get(x)->Cast<RedisString>();
-                    Service * service = this->GetApp()->GetService(redisString2->GetValue());
-                    if(service != nullptr)
-                    {
-                        service->AddHost(redisString->GetValue());
-                        serviceNode->AddService(redisString2->GetValue());
-                    }
+                    service->AddHost(redisString->GetValue());
+                    serviceNode->AddService(redisString2->GetValue());
                 }
-                this->mNodes.emplace(serviceNode->GetHost(), serviceNode);
             }
+            this->mNodes.emplace(serviceNode->GetHost(), serviceNode);
         }
     }
 

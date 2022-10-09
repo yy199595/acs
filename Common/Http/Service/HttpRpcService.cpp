@@ -22,16 +22,20 @@ namespace Sentry
         std::string value, func;
         const HttpData & httpData = request.GetData();
         std::shared_ptr<Rpc::Data> message(new Rpc::Data());
-        if(httpData.Get("func", func))
+        const size_t pos = httpData.mPath.find_last_of('/');
+
+        std::shared_ptr<Json::Document> document
+            = std::make_shared<Json::Document>();
+        if(pos == std::string::npos)
         {
-            Helper::String::ClearBlank(func);
-            message->GetHead().Add("func", func);
+            document->Add("error", "调用方法错误");
+            document->Add("code", (int) XCode::CallServiceNotFound);
+
+            document->Serialize(response.Content());
+            return XCode::CallServiceNotFound;
         }
-        else
-        {
-            response.WriteString("请求头中没有func字段");
-            return XCode::CallArgsError;
-        }
+        func = httpData.mPath.substr(pos + 1);
+        message->GetHead().Add("func", func);
 
         if(httpData.Get("id", value))
         {
@@ -42,8 +46,6 @@ namespace Sentry
         message->SetProto(Tcp::Porto::Json);
         message->SetType(Tcp::Type::Request);
         message->Append(request.GetContent());
-        std::shared_ptr<Json::Document> document
-            = std::make_shared<Json::Document>();
 
         XCode code = XCode::Failure;
         try
@@ -57,7 +59,7 @@ namespace Sentry
         }
         std::string json;
         document->Add("code", (int)code);
-        response.WriteString(*document->Serialize(&json));
+        document->Serialize(response.Content());
         return XCode::Successful;
     }
 
@@ -87,6 +89,17 @@ namespace Sentry
             throw std::logic_error("请求参数不能为空");
             return XCode::CallArgsError;
         }
-        return targetService->Invoke(method, data);
+        XCode code = targetService->Invoke(method, data);
+        if(code == XCode::Successful && !methodConfig->Response.empty())
+        {
+            rapidjson::Document json;
+            const std::string & str = data->GetBody();
+            if(json.Parse(str.c_str(), str.size()).HasParseError())
+            {
+                throw std::logic_error("解析返回json失败");
+            }
+            document->Add("message", json);
+        }
+        return code;
     }
 }

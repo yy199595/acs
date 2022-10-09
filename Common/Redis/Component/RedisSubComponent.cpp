@@ -29,28 +29,29 @@ namespace Sentry
 
     void RedisSubComponent::OnNotFindResponse(long long taskId, std::shared_ptr<RedisResponse> response)
     {
-        if(response->GetType() == RedisRespType::REDIS_ARRAY && response->GetArraySize() == 3)
+        if (response->GetType() != RedisRespType::REDIS_ARRAY || response->GetArraySize() != 3)
         {
-            const RedisAny * redisAny1 = response->Get(0);
-            const RedisAny * redisAny2 = response->Get(1);
-            const RedisAny * redisAny3 = response->Get(2);
-            if(redisAny1->IsString() && redisAny2->IsString() && redisAny3->IsString())
+            return;
+        }
+        const RedisAny *redisAny1 = response->Get(0);
+        const RedisAny *redisAny2 = response->Get(1);
+        const RedisAny *redisAny3 = response->Get(2);
+        if (redisAny1->IsString() && redisAny2->IsString() && redisAny3->IsString())
+        {
+            if (static_cast<const RedisString *>(redisAny1)->GetValue() == "message")
             {
-                if(static_cast<const RedisString*>(redisAny1)->GetValue() == "message")
+                const std::string &channel = redisAny2->Cast<RedisString>()->GetValue();
+                const std::string &message = redisAny3->Cast<RedisString>()->GetValue();
+                if (channel == this->mLocalHost && !this->Invoke(message))
                 {
-                    const std::string & channel = redisAny2->Cast<RedisString>()->GetValue();
-                    const std::string & message = redisAny3->Cast<RedisString>()->GetValue();
-                    if(channel == this->mLocalHost && !this->Invoke(message))
-                    {
-                        LOG_ERROR("handler redis sub event error channel = "
-                                          << channel << " message = " << message);
-                        return;
-                    }
-                    if(!this->Invoke(channel, message))
-                    {
-                        LOG_ERROR("handler redis sub event error channel = "
-                                          << channel << " message = " << message);
-                    }
+                    LOG_ERROR("handler redis sub event error channel = "
+                                  << channel << " message = " << message);
+                    return;
+                }
+                if (!this->Invoke(channel, message))
+                {
+                    LOG_ERROR("handler redis sub event error channel = "
+                                  << channel << " message = " << message);
                 }
             }
         }
