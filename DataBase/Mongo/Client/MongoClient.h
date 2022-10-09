@@ -38,6 +38,7 @@ namespace Mongo
 	 public:
 		TcpMongoClient(std::shared_ptr<SocketProxy> scoket, const Mongo::Config & config);
 	public:
+        void Stop();
 		void SendMongoCommand(std::shared_ptr<CommandRequest> request);
 	private:
 		bool StartAuthBySha1();

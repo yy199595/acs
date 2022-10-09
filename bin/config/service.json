@@ -32,6 +32,14 @@
             "Path": "/download"
         }
     },
+    "HttpRpcService": {
+        "Type": "http",
+        "Call": {
+            "Type": "",
+            "Async": true,
+            "Path": "/rpc/call"
+        }
+    },
     "OuterService": {
         "Type": "rpc",
         "Ping": {

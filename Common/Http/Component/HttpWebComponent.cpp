@@ -11,31 +11,28 @@ namespace Sentry
 {
     bool HttpWebComponent::LateAwake()
     {
-        HttpListenComponent::LateAwake();
-        auto iter = this->GetApp()->ComponentBegin();
-        for (; iter != this->GetApp()->ComponentEnd(); iter++)
+        std::vector<LocalHttpService *> httpServices;
+        if (this->GetApp()->GetComponents(httpServices) <= 0)
         {
-            Component *component = iter->second;
-            LocalHttpService *localHttpService = component->Cast<LocalHttpService>();
-            if (localHttpService != nullptr)
+            return false;
+        }
+        for(const LocalHttpService * httpService : httpServices)
+        {
+            std::vector<const HttpMethodConfig *> httpMethodConfigs;
+            httpService->GetServiceConfig().GetConfigs(httpMethodConfigs);
+            for(const HttpMethodConfig * methodConfig : httpMethodConfigs)
             {
-                std::vector<const HttpMethodConfig *> httpInterConfigs;
-                localHttpService->GetServiceConfig().GetConfigs(httpInterConfigs);
-                for (const HttpMethodConfig *httpInterfaceConfig: httpInterConfigs)
-                {
-                    this->mHttpConfigs.emplace(httpInterfaceConfig->Path, httpInterfaceConfig);
-                }
+                this->mHttpConfigs.emplace(methodConfig->Path, methodConfig);
             }
         }
         this->mTaskComponent = this->GetApp()->GetTaskComponent();
         return true;
     }
 
-    bool HttpWebComponent::OnStart()
+    bool HttpWebComponent::Start()
     {
         return this->StartListen("web");
     }
-
 
     const HttpMethodConfig *HttpWebComponent::GetConfig(const std::string &path)
     {

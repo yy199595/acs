@@ -38,6 +38,15 @@ namespace Sentry
 		return true;
 	}
 
+    void MysqlDBComponent::CloseClients()
+    {
+        for(std::shared_ptr<MysqlClient> mysqlClient : this->mMysqlClients)
+        {
+            mysqlClient->Stop();
+        }
+        this->mMysqlClients.clear();
+    }
+
     bool MysqlDBComponent::StartConnectMysql()
 	{
         if(!this->LoadConfig())

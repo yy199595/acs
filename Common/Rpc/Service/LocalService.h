@@ -13,18 +13,22 @@ namespace Sentry
 	class LocalService : public Service
 	{
 	public:
-		LocalService() = default;
+		LocalService();
 	protected:
-		virtual void OnCloseService() { }
-		virtual bool OnStartService() = 0;
+		virtual bool OnClose() = 0;
+		virtual bool OnStart() = 0;
 	public:
 		bool Start() final;
 		bool Close() final;
+        int GetWaitMessageCount() const final { return this->mWaitCount; }
 		bool IsStartService() { return this->mMethodRegister != nullptr; }
 		XCode Invoke(const std::string &func, std::shared_ptr<Rpc::Data> message) final;
     protected:
+        void WaitAllMessageComplete() final;
         ServiceMethodRegister & GetMethodRegistry() { return *this->mMethodRegister; }
 	private:
+        int mWaitCount;
+        bool mIsHandlerMessage;
 		std::shared_ptr<ServiceMethodRegister> mMethodRegister;
 	};
     extern std::string GET_FUNC_NAME(std::string fullName);

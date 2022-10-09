@@ -18,6 +18,24 @@ namespace Sentry
         size_t pos = fullName.find("::");
         return fullName.substr(pos + 2);
     }
+
+    LocalService::LocalService()
+    {
+        this->mWaitCount = 0;
+        this->mIsHandlerMessage = false;
+    }
+
+    void LocalService::WaitAllMessageComplete()
+    {
+        this->mIsHandlerMessage = false;
+        TaskComponent *taskComponent = this->GetApp()->GetTaskComponent();
+        while (this->mWaitCount > 0)
+        {
+            taskComponent->Sleep(100);
+        }
+        CONSOLE_LOG_ERROR(this->GetName() << " handler all message complete");
+    }
+
     XCode LocalService::Invoke(const std::string &func, std::shared_ptr<Rpc::Data> message)
     {
         if (!this->IsStartService())
@@ -25,7 +43,10 @@ namespace Sentry
             LOG_ERROR(this->GetName() << " is not start");
             return XCode::CallServiceNotFound;
         }
-
+        if(!this->mIsHandlerMessage)
+        {
+            return XCode::CallServiceNotFound;
+        }
         std::shared_ptr<ServiceMethod> serviceMethod = this->mMethodRegister->GetMethod(func);
         if (serviceMethod == nullptr)
         {
@@ -35,13 +56,16 @@ namespace Sentry
 #ifndef __DEBUG__
         message->GetHead().Remove("func");
 #endif
-        return serviceMethod->Invoke(*message);
+        this->mWaitCount++;
+        XCode code = serviceMethod->Invoke(*message);
+        this->mWaitCount--;
+        return code;
     }
 
 	bool LocalService::Start()
 	{
 		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
-		if (!this->OnStartService())
+		if (!this->OnStart())
 		{
 			return false;
 		}
@@ -77,17 +101,18 @@ namespace Sentry
                 return false;
             }
         }
+        this->mIsHandlerMessage = true;
         this->AddHost(this->GetApp()->GetConfig().GetLocalHost());
 		return true;
 	}
 
 	bool LocalService::Close()
-	{
-		if(this->IsStartService())
-		{
-			std::move(this->mMethodRegister);
-			return true;
-		}
-		return false;
-	}
+    {
+        if (!this->IsStartService() || !this->OnClose())
+        {
+            return false;
+        }
+        std::move(this->mMethodRegister);
+        return true;
+    }
 }

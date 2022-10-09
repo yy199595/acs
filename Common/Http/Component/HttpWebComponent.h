@@ -18,7 +18,7 @@ namespace Sentry
     public:
         void OnRequest(std::shared_ptr<HttpHandlerClient> httpClient);
     private:
-        bool OnStart() final;
+        bool Start() final;
         bool LateAwake() final;
         const HttpMethodConfig * GetConfig(const std::string & path);
     private:

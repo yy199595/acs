@@ -11,7 +11,7 @@ namespace Sentry
 	class IStart
 	{
 	public:
-		virtual bool OnStart() = 0;
+		virtual bool Start() = 0;
 	};
 
 	class IComplete
@@ -81,7 +81,9 @@ namespace Sentry
 		virtual bool Close() = 0;
 		virtual bool IsStartService() = 0;
 		virtual bool IsStartComplete() = 0;
-		virtual bool LoadConfig(const rapidjson::Value& json) = 0;
+        virtual void WaitAllMessageComplete() { };
+        virtual int GetWaitMessageCount() const { return 0; }
+        virtual bool LoadConfig(const rapidjson::Value& json) = 0;
 	};
 
 	template<typename T1, typename T2>

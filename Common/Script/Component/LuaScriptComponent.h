@@ -17,7 +17,7 @@ namespace Sentry
 		struct lua_State* GetLuaEnv() { return this->mLuaEnv; }
 	 protected:
 		void Awake() final;
-		bool OnStart() final;
+		bool Start() final;
         void OnHotFix() final;
 		bool LateAwake() final;
 		void OnDestory() final;

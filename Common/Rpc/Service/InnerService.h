@@ -20,7 +20,8 @@ namespace Sentry
         XCode CloseService(const com::type::string & request);
     private:
         void Awake();
-        bool OnStartService() final;
+        bool OnStart() final;
+        bool OnClose() final { return false; }
     };
 }
 

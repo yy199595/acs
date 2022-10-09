@@ -26,6 +26,11 @@ namespace Mongo
         return output;
     }
 
+    void TcpMongoClient::Stop()
+    {
+        //TODO
+    }
+
     TcpMongoClient::TcpMongoClient(std::shared_ptr<SocketProxy> socket, const Mongo::Config& config)
 		: Tcp::TcpContext(socket, 1024 * 1024), mConfig(config), mMongoComponent(nullptr)
 	{

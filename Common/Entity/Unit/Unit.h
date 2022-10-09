@@ -36,13 +36,13 @@ namespace Sentry
 		template<typename T>
 		inline std::shared_ptr<T> Cast();
 
-        ComponentIter ComponentBegin() { return this->mComponentMap.begin();}
-        ComponentIter ComponentEnd() { return this->mComponentMap.end();}
-
 	 public:
 		void OnDestory() override;
 		size_t GetComponents(std::vector<Component*>& components) const;
 		size_t GetComponents(std::vector<std::string>& components) const;
+
+        template<typename T>
+        size_t GetComponents(std::vector<T *> & components) const;
 	 protected:
 		virtual void OnAddComponent(Component * component) {}
 		virtual void OnDelComponent(Component * component) {}
@@ -56,6 +56,22 @@ namespace Sentry
 		std::vector<std::string> mSortComponents;
 		std::unordered_map<std::string, Component*> mComponentMap;
 	};
+
+    template<typename T>
+    size_t Unit::GetComponents(std::vector<T *> &components) const
+    {
+        auto iter = this->mComponentMap.begin();
+        for(; iter != this->mComponentMap.end(); iter++)
+        {
+            T * component = iter->second->Cast<T>();
+            if(component != nullptr)
+            {
+                components.emplace_back(component);
+            }
+        }
+        return components.size();
+    }
+
 	template<typename T>
 	inline T* Unit::GetComponent() const
 	{

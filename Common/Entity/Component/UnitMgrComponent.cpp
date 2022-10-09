@@ -100,7 +100,7 @@ namespace Sentry
 				IStart * start = component->Cast<IStart>();
 				if(start != nullptr)
 				{
-					start->OnStart();
+                    start->Start();
 				}
 			}
 		}

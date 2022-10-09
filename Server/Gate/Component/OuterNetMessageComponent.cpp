@@ -64,12 +64,16 @@ namespace Sentry
         Service *localServerRpc = this->GetApp()->GetService(service);
         if (localServerRpc == nullptr)
         {
+            CONSOLE_LOG_ERROR("userid=" << userId <<
+                " call [" << service << "] not find");
             return XCode::CallServiceNotFound;
         }
         const RpcServiceConfig &rpcServiceConfig = localServerRpc->GetServiceConfig();
         const RpcMethodConfig *config = rpcServiceConfig.GetConfig(method);
         if (config == nullptr || config->Type != "Client")
         {
+            CONSOLE_LOG_ERROR("userid=" << userId <<
+                " call [" << service << "." << method << "] not permissions");
             return XCode::NotFoundRpcConfig;
         }
 
@@ -100,12 +104,6 @@ namespace Sentry
             }
         }
         return XCode::Successful;
-    }
-
-
-    void OuterNetMessageComponent::Auth(const std::string &address, const std::string &token)
-    {
-
     }
 
 	XCode OuterNetMessageComponent::OnResponse(const std::string & address, std::shared_ptr<Rpc::Data> message)

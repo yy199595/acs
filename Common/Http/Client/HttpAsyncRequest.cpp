@@ -473,22 +473,27 @@ namespace Sentry
 			}
 			if (this->mState == HttpDecodeState::Content)
 			{
+                size_t len = this->mRoute.size();
 				if (this->mHttpData.mMethod == "GET")
 				{
 					size_t pos = this->mUrl.find("?");
 					if (pos != std::string::npos)
 					{
                         this->mHttpData.mData = this->mUrl.substr(pos + 1);
-                        this->mHttpData.mPath = this->mUrl.substr(0, pos);
+                        this->mHttpData.mPath = this->mUrl.substr(len, pos - len);
                         return 0;
 					}
+                    else
+                    {
+                        this->mHttpData.mPath = this->mUrl.substr(len);
+                    }
 					return 0;
 				}
 				else if (this->mHttpData.mMethod != "POST")
 				{
 					return -2;
 				}
-                this->mHttpData.mPath = this->mUrl.substr(this->mRoute.size() + 1);
+                this->mHttpData.mPath = this->mUrl.substr(len);
                 return 1; //读一部分
 			}
 		}

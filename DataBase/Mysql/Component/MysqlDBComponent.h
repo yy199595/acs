@@ -38,6 +38,7 @@ namespace Sentry
         MysqlDBComponent() = default;
         ~MysqlDBComponent() = default;
     public:
+        void CloseClients();
         bool Ping(int index = 0);
         bool StartConnectMysql();
         std::shared_ptr<MysqlClient> GetClient(int index = -1);

@@ -42,7 +42,6 @@ namespace Sentry
         XCode OnResponse(const std::string & address, std::shared_ptr<Rpc::Data> message);
     private:
 		bool LateAwake() final;
-        void Auth(const std::string & address, const std::string & token);
 	 private:
 		class TaskComponent * mTaskComponent;
 		class TimerComponent * mTimerComponent;

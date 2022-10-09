@@ -115,7 +115,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool LuaScriptComponent::OnStart()
+	bool LuaScriptComponent::Start()
 	{
         if(this->mMainTable->GetFunction("Start"))
         {

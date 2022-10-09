@@ -36,6 +36,15 @@ namespace Sentry
 		return true;
 	}
 
+    void MongoDBComponent::CloseClients()
+    {
+        for(std::shared_ptr<TcpMongoClient> client : this->mMongoClients)
+        {
+            client->Stop();
+        }
+        this->mMongoClients.clear();
+    }
+
 	bool MongoDBComponent::StartConnectMongo()
     {
         if(!this->LoadConfig())

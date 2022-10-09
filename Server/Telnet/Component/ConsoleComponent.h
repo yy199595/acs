@@ -33,7 +33,7 @@ namespace Sentry
 		ConsoleComponent() = default;
 		~ConsoleComponent() final = default;
 	 public:
-        bool OnStart() final;
+        bool Start() final;
         bool LateAwake() final;
 		void OnClientError(const std::string & address);
 		bool OnListen(std::shared_ptr<SocketProxy> socket) final;

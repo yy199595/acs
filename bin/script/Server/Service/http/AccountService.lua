@@ -1,7 +1,7 @@
 
 AccountService = {}
 
-local gateService = App.GetComponent("GateService")
+local outerService = App.GetComponent("OuterService")
 
 function AccountService.OnServiceStart()
     print("启动账号服务")
@@ -44,8 +44,8 @@ function AccountService.Login(request)
     if userInfo == nil or loginInfo.password ~= userInfo.password then
         return XCode.Failure
     end
-    local address = gateService:GetHost()
-    local code, response = gateService:Call(address, "AllotUser", {
+    local address = outerService:GetHost()
+    local code, response = outerService:Call(address, "AllotUser", {
         value = userInfo.user_id
     })
     if code ~= XCode.Successful then

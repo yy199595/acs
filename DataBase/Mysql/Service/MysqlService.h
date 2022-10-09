@@ -27,7 +27,8 @@ namespace Sentry
 
 	 private:
         void Awake();
-		bool OnStartService();
+		bool OnStart() final;
+        bool OnClose() final;
 	 private:
         class ProtoComponent * mProtoComponent;
         class MysqlDBComponent * mMysqlComponent;

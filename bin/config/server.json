@@ -23,24 +23,15 @@
         "web": {
             "port": 8080,
             "ip": "127.0.0.1",
-            "route": "/app/web",
-            "component": "HttpWebComponent"
+            "route": "/app/web"
         },
         "gate": {
             "port": 1995,
-            "ip": "127.0.0.1",
-            "component": "OuterNetComponent"
-        },
-        "rpc.http": {
-            "port": 1996,
-            "ip" : "127.0.0.1",
-            "route": "/app/rpc",
-            "component" : "HttpRpcComponent"
+            "ip": "127.0.0.1"
         },
         "console": {
             "port": 1122,
-            "ip": "127.0.0.1",
-            "component": "ConsoleComponent"
+            "ip": "127.0.0.1"
         }
     },
     "web": {
@@ -108,7 +99,6 @@
         "GateAgentComponent",
         "UserSyncComponent",
         "HttpWebComponent",
-        "HttpRpcComponent",
         "MongoAgentComponent",
         "DataSyncComponent"
     ],
@@ -142,6 +132,10 @@
             "IsStart": true
         },
         "HttpWebService": {
+            "Type": "http",
+            "IsStart": true
+        },
+        "HttpRpcService": {
             "Type": "http",
             "IsStart": true
         }

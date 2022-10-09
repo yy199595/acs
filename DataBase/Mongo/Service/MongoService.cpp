@@ -20,7 +20,7 @@ namespace Sentry
         this->GetApp()->AddComponent<MongoDBComponent>();
     }
 
-	bool MongoService::OnStartService()
+	bool MongoService::OnStart()
     {
         BIND_COMMON_RPC_METHOD(MongoService::Query);
         BIND_COMMON_RPC_METHOD(MongoService::Insert);
@@ -31,6 +31,13 @@ namespace Sentry
         this->mMongoComponent = this->GetComponent<MongoDBComponent>();
         this->mSyncRedisComponent = this->GetComponent<DataSyncComponent>();
         return this->mMongoComponent->StartConnectMongo();
+    }
+
+    bool MongoService::OnClose()
+    {
+        this->WaitAllMessageComplete(); //等待所有任务完成
+        this->mMongoComponent->CloseClients();
+        return true;
     }
 
     XCode MongoService::RunCommand(const db::mongo::command::request &request, db::mongo::command::response &response)

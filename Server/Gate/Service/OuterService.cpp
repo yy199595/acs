@@ -22,7 +22,7 @@ namespace Sentry
         this->GetApp()->AddComponent<OuterNetMessageComponent>();
     }
 
-	bool OuterService::OnStartService()
+	bool OuterService::OnStart()
 	{
         BIND_ADDRESS_RPC_METHOD(OuterService::Ping);
         BIND_COMMON_RPC_METHOD(OuterService::AllotUser);
@@ -33,6 +33,11 @@ namespace Sentry
         this->mOuterNetComponent = this->GetComponent<OuterNetComponent>();
 		return this->mOuterNetComponent->StartListen("gate");
 	}
+
+    bool OuterService::OnClose()
+    {
+        this->mOuterNetComponent->StopListen();
+    }
 
 	XCode OuterService::Ping(const std::string & address)
 	{

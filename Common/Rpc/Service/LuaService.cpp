@@ -10,7 +10,8 @@ namespace Sentry
 	LuaService::LuaService()
 		: mLuaEnv(nullptr)
 	{
-
+        this->mWaitCount = 0;
+        this->mIsHandlerMessage = false;
 	}
 
 	LuaService::~LuaService()
@@ -47,7 +48,7 @@ namespace Sentry
             lua_setfield(this->mLuaEnv, -2, "IsStartService");
         }
         const char * t = this->GetName().c_str();
-        if(Lua::lua_getfunction(this->mLuaEnv, t, "OnServiceStart"))
+        if(Lua::lua_getfunction(this->mLuaEnv, t, "OnStart"))
         {
             if(lua_pcall(this->mLuaEnv, 0, 0, 0) != LUA_OK)
             {
@@ -55,6 +56,7 @@ namespace Sentry
                 return false;
             }
         }
+        this->mIsHandlerMessage = true;
         this->AddHost(this->GetConfig().GetLocalHost());
         return true;
 	}
@@ -66,13 +68,31 @@ namespace Sentry
 			LOG_ERROR(this->GetName() << " is not start");
 			return XCode::CallServiceNotFound;
 		}
+        if(!this->mIsHandlerMessage)
+        {
+            return XCode::CallServiceNotFound;
+        }
 		std::shared_ptr<ServiceMethod> serviceMethod = this->mMethodRegister->GetMethod(name);
 		if (serviceMethod == nullptr)
 		{
 			return XCode::CallServiceNotFound;
 		}
-		return serviceMethod->Invoke(*message);
+        this->mWaitCount++;
+		XCode code = serviceMethod->Invoke(*message);
+        this->mWaitCount--;
+        return code;
 	}
+
+    void LuaService::WaitAllMessageComplete()
+    {
+        this->mIsHandlerMessage = false;
+        TaskComponent *taskComponent = this->GetApp()->GetTaskComponent();
+        while (this->mWaitCount > 0)
+        {
+            taskComponent->Sleep(100);
+        }
+        CONSOLE_LOG_ERROR(this->GetName() << " handler all message complete");
+    }
 
 	bool LuaService::LateAwake()
 	{
@@ -93,13 +113,14 @@ namespace Sentry
 	bool LuaService::Close()
 	{
         const char * tab = this->GetName().c_str();
-        if(Lua::lua_getfunction(this->mLuaEnv, tab, "OnServiceStart"))
+        if(Lua::lua_getfunction(this->mLuaEnv, tab, "OnStop"))
         {
             if(lua_pcall(this->mLuaEnv, 0, 0, 0) != LUA_OK)
             {
                 LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
                 return false;
             }
+            return (bool)lua_toboolean(this->mLuaEnv, -1);
         }
         return true;
 	}

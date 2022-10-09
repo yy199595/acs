@@ -32,17 +32,11 @@ namespace Sentry
 {
 	bool ConsoleComponent::LateAwake()
 	{
-		BIND_FUNC("help", ConsoleComponent::Help);
-		BIND_FUNC("close", ConsoleComponent::Close);
-		BIND_FUNC("hotfix", ConsoleComponent::Hotfix);
-		BIND_FUNC("start", ConsoleComponent::Start);
-		BIND_FUNC("offset", ConsoleComponent::Offset);
-		BIND_FUNC("service", ConsoleComponent::Services);
 		this->mTaskComponent = this->GetComponent<TaskComponent>();
 		return true;
 	}
 
-    bool ConsoleComponent::OnStart()
+    bool ConsoleComponent::Start()
     {
         return this->StartListen("console");
     }

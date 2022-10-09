@@ -22,6 +22,18 @@ namespace Sentry
 		delete this->mBindAcceptor;
 	}
 
+    bool TcpListenerComponent::StopListen()
+    {
+        asio::error_code code;
+        this->mBindAcceptor->close(code);
+        if(code)
+        {
+            CONSOLE_LOG_ERROR(code.message());
+            return false;
+        }
+        return true;
+    }
+
 	bool TcpListenerComponent::StartListen(const char * name)
     {
         this->mConfig = this->GetConfig().GetListenConfig(name);
@@ -37,6 +49,7 @@ namespace Sentry
                 Asio::EndPoint(asio::ip::make_address(this->mConfig->Ip), port));
             this->mNetComponent = this->GetComponent<NetThreadComponent>();
 
+            this->mIsClose = false;
             this->mBindAcceptor->listen();
             io.post(std::bind(&TcpListenerComponent::ListenConnect, this));
             LOG_INFO(this->mConfig->Name << " listen [" << this->mConfig->Address << "] successful");           
@@ -55,6 +68,14 @@ namespace Sentry
 		this->mBindAcceptor->async_accept(socketProxy->GetSocket(),
 			[this, socketProxy](const asio::error_code & code)
 		{
+            if(code == asio::error::operation_aborted) //强制取消
+            {
+                delete this->mBindAcceptor;
+                this->mBindAcceptor = nullptr;
+                CONSOLE_LOG_ERROR("close listen " << this->mConfig->Name);
+                this->OnStopListen();
+                return;
+            }
 			if (code)
 			{
 				this->mErrorCount++;

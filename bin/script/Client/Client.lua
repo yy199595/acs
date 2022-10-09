@@ -46,7 +46,7 @@ local registerCount = 0
 function LoopPing()
     while true do
         local t1 = Time.GetNowMilTime()
-        local code = clientComponent:Call("GateService.Ping")
+        local code = clientComponent:Call("InnerService.Ping")
         Log.Info("ping use time ", Time.GetNowMilTime() - t1)
     end
 end

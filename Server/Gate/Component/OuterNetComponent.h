@@ -30,8 +30,9 @@ namespace Sentry
 	 public:
 		void Awake() final;
 		bool LateAwake() final;
-		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 private:
+        void OnStopListen() final;
+        bool OnListen(std::shared_ptr<SocketProxy> socket) final;
         bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Data> message);
     private:
 		class TimerComponent* mTimerComponent;

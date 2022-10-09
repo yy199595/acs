@@ -139,6 +139,18 @@ namespace Sentry
 		}
 	}
 
+    void OuterNetComponent::OnStopListen()
+    {
+        auto iter = this->mGateClientMap.begin();
+        for(; iter != this->mGateClientMap.end(); iter++)
+        {
+            iter->second->StartClose();
+        }
+        this->mTokens.clear();
+        this->mGateClientMap.clear();
+        this->mUserAddressMap.clear();
+    }
+
 	void OuterNetComponent::SendToAllClient(std::shared_ptr<c2s::rpc::call> message)
 	{
 		auto iter = this->mGateClientMap.begin();

@@ -35,7 +35,7 @@ namespace Sentry
         this->GetApp()->AddComponent<InnerNetMessageComponent>();
     }
 
-    bool InnerService::OnStartService()
+    bool InnerService::OnStart()
     {
         BIND_COMMON_RPC_METHOD(InnerService::Ping);
         BIND_COMMON_RPC_METHOD(InnerService::Hotfix);

@@ -12,6 +12,7 @@
 #include"Component/OperatorComponent.h"
 #include"Component/LoggerComponent.h"
 #include"Component/ProtoComponent.h"
+#include"Component/ServiceLaunchComponent.h"
 
 #include"Component/InnerNetComponent.h"
 #include"Component/OuterNetComponent.h"
@@ -26,7 +27,6 @@
 
 #include"Component/HttpComponent.h"
 #include"Component/HttpWebComponent.h"
-#include"Component/HttpRpcComponent.h"
 
 
 #include"Service/LuaService.h"
@@ -34,6 +34,7 @@
 #include"Service/InnerService.h"
 #include"Service/ServiceAgent.h"
 #include"Service/HttpWebService.h"
+#include"Service/HttpRpcService.h"
 #include"Service/LocalLuaHttpService.h"
 
 #ifdef __ENABLE_MONGODB__
@@ -54,6 +55,7 @@ void RegisterComponent()
 {
 // rpc
     ComponentFactory::Add<RedisRegistryComponent>("RedisRegistryComponent");
+    ComponentFactory::Add<ServiceLaunchComponent>("ServiceLaunchComponent");
     ComponentFactory::Add<InnerNetMessageComponent>("InnerNetMessageComponent");
 // common
     ComponentFactory::Add<TaskComponent>("TaskComponent");
@@ -91,7 +93,8 @@ void RegisterComponent()
 //http
     ComponentFactory::Add<HttpComponent>("HttpComponent");
     ComponentFactory::Add<HttpWebComponent>("HttpWebComponent");
-    ComponentFactory::Add<HttpRpcComponent>("HttpRpcComponent");
+
+    ComponentFactory::Add<HttpRpcService>("HttpRpcService");
     ComponentFactory::Add<HttpWebService>("HttpWebService");
 
 // lua

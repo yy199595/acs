@@ -1,11 +1,12 @@
 ﻿
 #include"App.h"
-#include"File/FileHelper.h"
 #include"Timer/ElapsedTimer.h"
 #include"File/DirectoryHelper.h"
 #include"Service/LuaService.h"
 #include"Component/ProtoComponent.h"
 #include"Component/RedisChannelComponent.h"
+#include"Component/ServiceLaunchComponent.h"
+
 using namespace Sentry;
 using namespace std::chrono;
 
@@ -25,16 +26,11 @@ namespace Sentry
 
 	bool App::LoadComponent()
 	{
-		std::string path;
-		if (!this->mConfig->GetPath("service", path))
-		{
-			CONSOLE_LOG_ERROR("not find service config");
-		}
-
 		this->mTaskComponent = this->GetOrAddComponent<TaskComponent>();
 		this->mLogComponent = this->GetOrAddComponent<LoggerComponent>();
 		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
 		this->mMessageComponent = this->GetOrAddComponent<ProtoComponent>();
+        ServiceLaunchComponent * launchComponent = this->GetOrAddComponent<ServiceLaunchComponent>();
 
 		std::vector<std::string> components;
 		if (this->mConfig->GetMember("component", components)) //添加组件
@@ -49,39 +45,11 @@ namespace Sentry
 				}
 			}
 		}
-        rapidjson::Document jsonDocument;
-        std::vector<const ServiceConfig *> serviceConfigs;
-        if(Helper::File::ReadJsonFile(path, jsonDocument)
-            && this->mConfig->GetServiceConfigs(serviceConfigs) > 0)
-        {
-            for (const ServiceConfig *config: serviceConfigs)
-            {
-                const std::string &name = config->Name;
-                if (!jsonDocument.HasMember(name.c_str()))
-                {
-                    CONSOLE_LOG_FATAL("not find service config " << name);
-                    return false;
-                }
-                Component *component = ComponentFactory::CreateComponent(name);
-                if (component == nullptr)
-                {
-                    component = ComponentFactory::CreateComponent(config->Type);
-                }
-                if (component == nullptr || !this->AddComponent(name, component))
-                {
-                    CONSOLE_LOG_ERROR("add " << name << " failure");
-                    return false;
-                }
-                rapidjson::Value &json = jsonDocument[name.c_str()];
-                IServiceBase *serviceBase = component->Cast<IServiceBase>();
-                if (serviceBase == nullptr || !serviceBase->LoadConfig(json))
-                {
-                    CONSOLE_LOG_ERROR("load " << name << " config error");
-                    return false;
-                }
-            }
-        }
 
+        if(!launchComponent->InitService())
+        {
+            return false;
+        }
 
 		this->GetComponents(components);
 		for (const std::string& name: components)
@@ -212,31 +180,14 @@ namespace Sentry
         this->GetComponents(components);
         for (const std::string &name: components)
         {
-            Component *component = this->GetComponentByName(name);
-            IServiceBase *localServerRpc = component->Cast<IServiceBase>();
-            const ServiceConfig * serviceConfig = this->mConfig->GetServiceConfig(name);
-
             ElapsedTimer timer;
+            Component *component = this->GetComponentByName(name);
             long long timeId = this->mTimerComponent->DelayCall(10.0f, [component]() {
                 LOG_FATAL(component->GetName() << " start time out");
             });
-            if(localServerRpc != nullptr && serviceConfig != nullptr)
-            {
-                if(serviceConfig->IsStart && !localServerRpc->Start())
-                {
-                    LOG_ERROR("start " << name << " failure");
-                    this->Stop();
-                    return;
-                }
-                Service * service = this->GetComponent<Service>(name);
-                if(service != nullptr && !serviceConfig->Address.empty())
-                {
-                    service->AddHost(serviceConfig->Address);
-                }
-            }
             if (component->Cast<IStart>() != nullptr)
             {
-                if (!component->Cast<IStart>()->OnStart())
+                if (!component->Cast<IStart>()->Start())
                 {
 					LOG_FATAL("start " << component->GetName() << " failure");
                     this->Stop();

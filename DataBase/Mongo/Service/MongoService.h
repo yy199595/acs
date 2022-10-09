@@ -15,7 +15,8 @@ namespace Sentry
 		MongoService();
 	private:
         void Awake() final;
-		bool OnStartService() final;
+		bool OnStart() final;
+        bool OnClose() final;
     private:
         XCode Insert(const db::mongo::insert & request);
         XCode Delete(const db::mongo::remove & request);
