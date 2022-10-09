@@ -37,6 +37,7 @@ namespace Sentry
     bool OuterService::OnClose()
     {
         this->mOuterNetComponent->StopListen();
+		return true;
     }
 
 	XCode OuterService::Ping(const std::string & address)

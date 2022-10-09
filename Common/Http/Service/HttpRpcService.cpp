@@ -74,20 +74,17 @@ namespace Sentry
         Service * targetService = this->GetApp()->GetService(service);
         if(targetService == nullptr || !targetService->IsStartService())
         {
-            throw std::logic_error("调用服务不存在或者没有启动");
-            return XCode::CallServiceNotFound;
+            throw std::logic_error("calling service does not exist or is not started");           
         }
         const RpcServiceConfig & config = targetService->GetServiceConfig();
         const RpcMethodConfig* methodConfig =  config.GetConfig(method);
         if(methodConfig == nullptr)
         {
-            throw std::logic_error("调用方法不存在");
-            return XCode::CallServiceNotFound;
+            throw std::logic_error("calling method does not exist");
         }
         if(!methodConfig->Request.empty() && data->GetBody().empty())
         {
-            throw std::logic_error("请求参数不能为空");
-            return XCode::CallArgsError;
+            throw std::logic_error("request parameter cannot be empty");
         }
         XCode code = targetService->Invoke(method, data);
         if(code == XCode::Successful && !methodConfig->Response.empty())
@@ -96,7 +93,7 @@ namespace Sentry
             const std::string & str = data->GetBody();
             if(json.Parse(str.c_str(), str.size()).HasParseError())
             {
-                throw std::logic_error("解析返回json失败");
+                throw std::logic_error("failed to parse the returned data");
             }
             document->Add("message", json);
         }
