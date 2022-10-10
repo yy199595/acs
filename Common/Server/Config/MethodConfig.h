@@ -21,7 +21,6 @@ namespace Sentry
 	public:
         bool IsAuth;
 		std::string Type;
-		std::string CallWay;
 		std::string Request;
 		std::string Response;
 		std::string FullName;

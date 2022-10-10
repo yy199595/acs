@@ -39,6 +39,7 @@ namespace Sentry
     {
         BIND_COMMON_RPC_METHOD(InnerService::Ping);
         BIND_COMMON_RPC_METHOD(InnerService::Hotfix);
+        BIND_COMMON_RPC_METHOD(InnerService::OnUserJoin);
         BIND_COMMON_RPC_METHOD(InnerService::StartService);
         BIND_COMMON_RPC_METHOD(InnerService::CloseService);
         RedisSubComponent *subComponent = this->GetComponent<RedisSubComponent>();
@@ -51,6 +52,11 @@ namespace Sentry
     }
 
     XCode InnerService::Ping()
+    {
+        return XCode::Successful;
+    }
+
+    XCode InnerService::OnUserJoin(long long userId)
     {
         return XCode::Successful;
     }
