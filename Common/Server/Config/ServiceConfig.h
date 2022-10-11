@@ -27,6 +27,7 @@ namespace Sentry
 		virtual bool OnLoadConfig(const rapidjson::Value & json) = 0;
 	 public:
 		const std::string & GetName() const { return this->mName; }
+        virtual const std::string & GetServer() const = 0;
 	 protected:
 		const std::string mName;
 		std::unordered_map<std::string, T> mConfigs;
@@ -55,9 +56,12 @@ namespace Sentry
 		using IServiceConfig::IServiceConfig;
 	 public:
 		bool OnLoadConfig(const rapidjson::Value &json) final;
-	 public:
+        const std::string & GetServer() const final { return this->mServer; }
+    public:
 		static bool ParseFunName(const std::string & func, std::string & service, std::string & method);
-	};
+    private:
+        std::string mServer;
+    };
 
 	class HttpServiceConfig : public IServiceConfig<HttpMethodConfig>
 	{
@@ -65,6 +69,8 @@ namespace Sentry
 		using IServiceConfig::IServiceConfig;
 	 public:
 		bool OnLoadConfig(const rapidjson::Value &json) final;
+        const std::string & GetServer() const final { return this->mServer; }
 	 private:
+        std::string mServer;
 	};
 }// namespace Sentry

@@ -5,6 +5,8 @@
 #include"ServiceLaunchComponent.h"
 #include"App/App.h"
 #include"File/FileHelper.h"
+#include"Service/LocalService.h"
+#include"Service/LocalHttpService.h"
 namespace Sentry
 {
     bool ServiceLaunchComponent::InitService()
@@ -19,34 +21,31 @@ namespace Sentry
 
         rapidjson::Document jsonDocument;
         std::vector<const ServiceConfig *> serviceConfigs;
-        if(Helper::File::ReadJsonFile(path, jsonDocument)
-           && config.GetServiceConfigs(serviceConfigs) > 0)
+        if(!Helper::File::ReadJsonFile(path, jsonDocument))
         {
-            for (const ServiceConfig *config: serviceConfigs)
+            return false;
+        }
+        auto iter = jsonDocument.MemberBegin();
+        for(; iter != jsonDocument.MemberEnd(); iter++)
+        {
+            const rapidjson::Value &value = iter->value;
+            const std::string name(iter->name.GetString());
+            Component *component = ComponentFactory::CreateComponent(name);
+            if (component == nullptr)
             {
-                const std::string &name = config->Name;
-                if (!jsonDocument.HasMember(name.c_str()))
-                {
-                    CONSOLE_LOG_FATAL("not find service config " << name);
-                    return false;
-                }
-                Component *component = ComponentFactory::CreateComponent(name);
-                if (component == nullptr)
-                {
-                    component = ComponentFactory::CreateComponent(config->Type);
-                }
-                if (component == nullptr || !this->GetApp()->AddComponent(name, component))
-                {
-                    CONSOLE_LOG_ERROR("add " << name << " failure");
-                    return false;
-                }
-                rapidjson::Value &json = jsonDocument[name.c_str()];
-                IServiceBase *serviceBase = component->Cast<IServiceBase>();
-                if (serviceBase == nullptr || !serviceBase->LoadConfig(json))
-                {
-                    CONSOLE_LOG_ERROR("load " << name << " config error");
-                    return false;
-                }
+                std::string type(value["Type"].GetString());
+                component = ComponentFactory::CreateComponent(type);
+            }
+            if (component == nullptr || !this->GetApp()->AddComponent(name, component))
+            {
+                CONSOLE_LOG_ERROR("add " << name << " failure");
+                return false;
+            }
+            IServiceBase *serviceBase = component->Cast<IServiceBase>();
+            if(serviceBase == nullptr || !serviceBase->LoadConfig(value))
+            {
+                CONSOLE_LOG_ERROR("load service config error : " << name);
+                return false;
             }
         }
         return true;
@@ -54,20 +53,28 @@ namespace Sentry
 
     bool ServiceLaunchComponent::Start()
     {
-        std::vector<const ServiceConfig *> serviceConfigs;
-        this->GetConfig().GetServiceConfigs(serviceConfigs);
-        for (const ServiceConfig *config: serviceConfigs)
+        std::vector<IServiceBase *> components;
+        this->GetApp()->GetComponents(components);
+        const std::string name = this->GetConfig().GetNodeName();
+        for(IServiceBase * component : components)
         {
-            const std::string &name = config->Name;
-            IServiceBase * service = this->GetComponent<IServiceBase>(name);
-            if(service == nullptr)
+            LocalService * localService = dynamic_cast<LocalService*>(component);
+            LocalHttpService * localHttpService = dynamic_cast<LocalHttpService*>(component);
+            if(localService != nullptr)
             {
-                return false;
+                const RpcServiceConfig & config = localService->GetServiceConfig();
+                if(config.GetServer() == "AllServer" || config.GetServer() == name)
+                {
+                    if(!localService->Start())
+                    {
+                        LOG_ERROR("start service [" << config.GetName() << "] faillure");
+                        return false;
+                    }
+                }
             }
-            if(config->IsStart && !service->Start())
+            else if(localHttpService != nullptr)
             {
-                LOG_ERROR("start service [" << name << "] faillure");
-                return false;
+                const HttpServiceConfig & config = localHttpService->GetServiceConfig();
             }
             CONSOLE_LOG_INFO("start service [" << name << "] successful");
         }

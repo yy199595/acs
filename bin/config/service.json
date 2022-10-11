@@ -1,6 +1,7 @@
 {
     "AccountService": {
         "Type": "http",
+        "Server": "HttpServer",
         "Login": {
             "Type": "POST",
             "Async": true,
@@ -16,6 +17,7 @@
     },
     "HttpWebService": {
         "Type": "http",
+        "Server": "HttpServer",
         "Async": {
             "Type": "",
             "Async": true,
@@ -34,6 +36,7 @@
     },
     "HttpRpcService": {
         "Type": "http",
+        "Server": "AllServer",
         "Call": {
             "Type": "",
             "Async": true,
@@ -42,6 +45,7 @@
     },
     "OuterService": {
         "Type": "rpc",
+        "Server": "GateServer",
         "Ping": {
             "Async": true,
             "Type": "Client",
@@ -68,6 +72,7 @@
     },
     "MysqlService": {
         "Type": "rpc",
+        "Server": "DataServer",
         "Add": {
             "Async": true,
             "Type": "Server",
@@ -102,7 +107,12 @@
     },
     "InnerService": {
         "Type": "rpc",
+        "Server": "AllServer",
         "Ping": {
+            "Async": false,
+            "Type": "Server"
+        },
+        "OnUserJoin": {
             "Async": false,
             "Type": "Server"
         },
@@ -119,6 +129,7 @@
     },
     "MongoService": {
         "Type": "rpc",
+        "Server": "DataServer",
         "Insert": {
             "Async": true,
             "Type": "Server",
@@ -154,6 +165,7 @@
     },
     "ChatService": {
         "Type": "rpc",
+        "Server": "ChatServer",
         "Chat": {
             "Async": true,
             "Type": "Client",
@@ -177,6 +189,7 @@
     },
     "HttpTest": {
         "Type": "http",
+        "Server": "HttpServer",
         "Test": {
             "Async": false,
             "Type": "POST",

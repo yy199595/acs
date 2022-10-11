@@ -103,6 +103,29 @@
         "MongoAgentComponent",
         "DataSyncComponent"
     ],
+    "AllServer": [
+        "InnerService",
+        "OuterService",
+        "MysqlService",
+        "MongoService",
+        "ChatService"
+    ],
+    "ChatService": [
+        "InnerService",
+        "ChatService"
+    ],
+    "DataServer": [
+        "InnerService",
+        "MysqlService",
+        "MongoService"
+    ],
+    "LoginService": [
+        "AccountService"
+    ],
+    "GateServer": [
+        "InnerService",
+        "OuterService"
+    ],
     "services": {
         "RpcTest": {
             "Type": "rpc",

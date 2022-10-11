@@ -7,11 +7,12 @@ namespace Sentry
 {
 	bool RpcServiceConfig::OnLoadConfig(const rapidjson::Value & json)
 	{
-		if(!json.IsObject())
+		if(!json.IsObject() || !json.HasMember("Server"))
 		{
 			return false;
 		}
 		this->mConfigs.clear();
+        this->mServer = json["Server"].GetString();
 		auto iter = json.MemberBegin();
 		for(; iter != json.MemberEnd(); iter++)
 		{
@@ -32,10 +33,6 @@ namespace Sentry
 				if (jsonValue.HasMember("Response"))
 				{
 					serviceConfog.Response = jsonValue["Response"].GetString();
-				}
-				if (jsonValue.HasMember("CallWay"))
-				{
-					serviceConfog.CallWay = jsonValue["CallWay"].GetString();
 				}
 				serviceConfog.FullName = fmt::format("{0}.{1}", this->mName, name);
 				this->mConfigs.emplace(name, serviceConfog);
@@ -64,7 +61,8 @@ namespace Sentry
 		{
 			return false;
 		}
-		auto iter = json.MemberBegin();
+        this->mServer = json["Server"].GetString();
+        auto iter = json.MemberBegin();
 		for(; iter != json.MemberEnd(); iter++)
 		{
 			const rapidjson::Value & jsonValue = iter->value;
