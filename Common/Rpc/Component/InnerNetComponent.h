@@ -26,10 +26,13 @@ namespace Sentry
 	 public:
 		bool Send(const std::string & address, std::shared_ptr<Rpc::Data> message);
 	private:
-		bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Data> message);
+        bool OnForward(std::shared_ptr<Rpc::Data> message);
+        bool OnBroadcast(std::shared_ptr<Rpc::Data> message);
+        bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Data> message);
 		bool OnResponse(const std::string& address, std::shared_ptr<Rpc::Data> message);
 	 private:
         class NetThreadComponent * mNetComponent;
+        class OuterNetComponent * mOuterComponent;
         class InnerNetMessageComponent* mMessageComponent;
         std::unordered_map<std::string, std::shared_ptr<InnerNetClient>> mRpcClientMap;
 	};

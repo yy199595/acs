@@ -14,12 +14,16 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(gameObject);
 		long long id = gameObject->GetUnitId();
 		auto iter = this->mGameObjects.find(id);
-		LOG_CHECK_RET_FALSE(iter == this->mGameObjects.end());
-		std::vector<std::string> components;
+		if(iter != this->mGameObjects.end())
+        {
+            CONSOLE_LOG_ERROR("add unit error id : " << id);
+            return false;
+        }
+
+		std::vector<Component *> components;
 		gameObject->GetComponents(components);
-		for (const std::string& name : components)
+		for (Component * component : components)
 		{
-			Component* component = gameObject->GetComponent<Component>(name);
 			if (!component->LateAwake())
 			{
 				LOG_ERROR("Init" << component->GetName() << "failure");
@@ -59,15 +63,7 @@ namespace Sentry
 		{
 			return nullptr;
 		}
-
-		auto gameObject = iter->second;
-		if (!gameObject->IsActive())
-		{
-			gameObject->OnDestory();
-			this->mGameObjects.erase(iter);
-			return nullptr;
-		}
-		return gameObject;
+        return iter->second;
 	}
 
 	void UnitMgrComponent::GetGameObjects(std::vector<std::shared_ptr<Unit>>& gameObjects)

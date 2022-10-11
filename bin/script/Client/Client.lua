@@ -40,36 +40,12 @@ function Client.Start()
     return true
 end
 local callCount = 0
-local loginCount = 0
-local registerCount = 0
 
 function LoopPing()
     while true do
         local t1 = Time.GetNowMilTime()
-        local code = clientComponent:Call("InnerService.Ping")
+        local code = clientComponent:Call("OuterService.Ping")
         Log.Info("ping use time ", Time.GetNowMilTime() - t1)
-    end
-end
-
-function LoopRegister()
-    while true do
-        local t1 = Time.GetNowMilTime()
-        local account1 = string.format("%d@qq.com", 1000 + registerCount)
-        LoginComponent.Register(account1, password, phoneNum)
-        registerCount = registerCount + 1
-        Log.Warning(string.format("register use time = [%dms] count = %d", Time.GetNowMilTime() - t1, registerCount))
-    end
-end
-
-function LoopLogin()
-    while true do
-        local t1 = Time.GetNowMilTime()
-        local account1 = string.format("%d@qq.com", 1000 + loginCount)
-
-        LoginComponent.Login(account1, password)
-        loginCount = loginCount + 1
-        local t = Time.GetNowMilTime() - t1
-        Log.Info(string.format("login use time = [%dms] count = %d", t, loginCount))
     end
 end
 

@@ -15,10 +15,10 @@ namespace Tcp
 		ProtoMessage() = default;
 		virtual int Serailize(std::ostream & os) = 0; //返回剩余要发送的字节数
 	 protected:
-		void Write(std::ostream & os, char cc);
-		void Write(std::ostream & os, int value);
-		void Write(std::ostream & os, const std::string & value);
-		void Write(std::ostream & os, const char * str, size_t size);
+		void Write(std::ostream & os, char cc) const;
+		void Write(std::ostream & os, int value) const;
+		void Write(std::ostream & os, const std::string & value) const;
+		void Write(std::ostream & os, const char * str, size_t size) const;
 	};
 }
 #endif //_PROTOMESSAGE_H_

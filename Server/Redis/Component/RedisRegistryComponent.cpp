@@ -114,7 +114,7 @@ namespace Sentry
         Service * component = this->GetApp()->GetService(service);
         if(component != nullptr)
         {
-            component->DelHost(address);
+            component->DelLocation(address);
         }
         auto iter = this->mNodes.find(address);
         if(iter != this->mNodes.end())
@@ -195,7 +195,7 @@ namespace Sentry
                 Service *service = this->GetApp()->GetService(redisString2->GetValue());
                 if (service != nullptr)
                 {
-                    service->AddHost(redisString->GetValue());
+                    service->AddLocation(redisString->GetValue());
                     serviceNode->AddService(redisString2->GetValue());
                 }
             }
@@ -221,7 +221,7 @@ namespace Sentry
 			Service * localRpcService = this->GetApp()->GetService(service);
 			if(localRpcService != nullptr)
 			{
-				localRpcService->AddHost(address);
+                localRpcService->AddLocation(address);
 			}
             node->AddService(service);
 		}
@@ -240,7 +240,7 @@ namespace Sentry
 		if(localRpcService != nullptr)
 		{
             node->AddService(service);
-			localRpcService->AddHost(address);
+            localRpcService->AddLocation(address);
 			return true;
 		}
 		return false;

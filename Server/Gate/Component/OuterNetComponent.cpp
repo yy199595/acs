@@ -15,6 +15,8 @@
 #include"Config/ServiceConfig.h"
 #endif
 #include"Md5/MD5.h"
+#include"Component/UnitMgrComponent.h"
+#include"Component/UnitLocationComponent.h"
 namespace Sentry
 {
 	void OuterNetComponent::Awake()
@@ -22,11 +24,13 @@ namespace Sentry
         this->mNetComponent = nullptr;
         this->mTimerComponent = nullptr;
         this->mOuterMessageComponent = nullptr;
+        this->GetApp()->GetOrAddComponent<UnitMgrComponent>();
     }
 
 	bool OuterNetComponent::LateAwake()
 	{
         this->mTimerComponent = this->GetApp()->GetTimerComponent();
+        this->mUnitComponent = this->GetComponent<UnitMgrComponent>();
         this->mNetComponent = this->GetComponent<NetThreadComponent>();
         LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisDataComponent>());
 		LOG_CHECK_RET_FALSE(this->mOuterMessageComponent = this->GetComponent<OuterNetMessageComponent>());
@@ -69,12 +73,12 @@ namespace Sentry
             }
             userId = iter->second;
             this->mTokens.erase(iter);
-            this->mUserAddressMap.emplace(address, userId);
+            this->OnAuthSuccessful(userId, address);
             message->GetHead().Add("code", XCode::Successful);
             this->mOuterMessageComponent->OnResponse(address, message);
             return true;
         }
-        message->GetHead().Add("address", address);
+        message->GetHead().Add("client", address);
         XCode code = this->mOuterMessageComponent->OnRequest(userId, message);
         if (code != XCode::Successful)
         {
@@ -85,6 +89,25 @@ namespace Sentry
             return false;
         }
         return true;
+    }
+
+    void OuterNetComponent::OnAuthSuccessful(long long userId, const std::string &address)
+    {
+        std::shared_ptr<Unit> player;
+        player = this->mUnitComponent->Find(userId);
+        if(player == nullptr)
+        {
+            player = std::make_shared<Unit>(userId);
+            player->AddComponent<UnitLocationComponent>();
+            this->mUnitComponent->Add(player);
+        }
+        UnitLocationComponent * locationComponent = player->GetComponent<UnitLocationComponent>();
+        if(locationComponent != nullptr)
+        {
+            locationComponent->Add(address);
+        }
+        this->mUserAddressMap.emplace(address, userId);
+        this->mClientAddressMap.emplace(userId, address);
     }
 
     std::string OuterNetComponent::CreateToken(long long userId, float second)
@@ -123,21 +146,32 @@ namespace Sentry
     }
 
 	void OuterNetComponent::OnCloseSocket(const std::string & address, XCode code)
-	{
-		auto iter = this->mGateClientMap.find(address);
-		if (iter != this->mGateClientMap.end())
-		{
+    {
+        auto iter = this->mGateClientMap.find(address);
+        if (iter != this->mGateClientMap.end())
+        {
 #ifdef __DEBUG__
-			LOG_WARN("remove client " << address  << " code = " << (int)code);
+            LOG_WARN("remove client " << address << " code = " << (int) code);
 #endif
             std::shared_ptr<OuterNetClient> gateClient = iter->second;
-            if(this->mClientPools.size() < 100)
+            if (this->mClientPools.size() < 100)
             {
                 this->mClientPools.push(gateClient);
             }
             this->mGateClientMap.erase(iter);
-		}
-	}
+        }
+        auto iter1 = this->mUserAddressMap.find(address);
+        if (iter1 != this->mUserAddressMap.end())
+        {
+            long long userId = iter1->second;
+            auto iter2 = this->mClientAddressMap.find(userId);
+            if (iter2 != this->mClientAddressMap.end())
+            {
+                this->mClientAddressMap.erase(iter2);
+            }
+            this->mUserAddressMap.erase(iter1);
+        }
+    }
 
     void OuterNetComponent::OnStopListen()
     {
@@ -151,27 +185,32 @@ namespace Sentry
         this->mUserAddressMap.clear();
     }
 
-	void OuterNetComponent::SendToAllClient(std::shared_ptr<c2s::rpc::call> message)
-	{
-		auto iter = this->mGateClientMap.begin();
-		for(;iter != this->mGateClientMap.end(); iter++)
-		{
-			std::shared_ptr<OuterNetClient> proxyClient = iter->second;
-			if(proxyClient != nullptr)
-			{
-                std::shared_ptr<Rpc::Data> request(new Rpc::Data());
+    bool OuterNetComponent::SendData(std::shared_ptr<Rpc::Data> message)
+    {
+        message->SetType(Tcp::Type::Request);
+        auto iter = this->mGateClientMap.begin();
+        for(;iter != this->mGateClientMap.end(); iter++)
+        {
+            std::shared_ptr<OuterNetClient> proxyClient = iter->second;
+            if (proxyClient != nullptr)
+            {
+                proxyClient->SendData(message);
+            }
+        }
+        return true;
+    }
 
-                request->SetType(Tcp::Type::Request);
-                request->SetProto(Tcp::Porto::Protobuf);
-                request->GetHead().Add("func", message->func());
-                if(message->has_data())
-                {
-                    request->WriteMessage(message->mutable_data());
-                }
-				proxyClient->SendData(request);
-			}
-		}
-	}
+    bool OuterNetComponent::SendData(long long userId, std::shared_ptr<Rpc::Data> message)
+    {
+        std::string address;
+        message->SetType(Tcp::Type::Request);
+        if(!this->GetUserAddress(userId, address))
+        {
+            CONSOLE_LOG_ERROR("send message to user:" << userId << " failure");
+            return false;
+        }
+        return this->SendData(address, message);
+    }
 
 	bool OuterNetComponent::SendData(const std::string &address, std::shared_ptr<Rpc::Data> message)
 	{
@@ -182,6 +221,7 @@ namespace Sentry
             outerNetClient->SendData(message);
 			return true;
 		}
+        CONSOLE_LOG_ERROR("send outer message to " << address << " error");
 		return false;
 	}
 

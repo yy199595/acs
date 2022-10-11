@@ -13,8 +13,13 @@ namespace Sentry
 		GateAgentComponent() = default;
 		~GateAgentComponent() = default;
 	 public:
+        bool RemoveUserAddress(long long userId);
+        bool GetUserAddress(long long userId, std::string & address);
+        bool AddUserAddress(long long userId, std::string & address);
+    public:
+
 		XCode Call(long long userId, const std::string & func);
-		XCode Call(long long UserId, const std::string & func, const Message & message);
+        XCode Call(long long UserId, const std::string & func, const Message & message);
 	 public:
 		XCode BroadCast(const std::string & func);
 		XCode BroadCast(const std::string & func, const Message & message);
@@ -26,6 +31,8 @@ namespace Sentry
 		void OnLuaRegister(Lua::ClassProxyHelper & luaRegister) final;
 	 private:
 		class OuterService * mGateService;
+        class InnerNetComponent * mInnerComponent;
+        std::unordered_map<long long, std::string> mUserHosts;
 	};
 }
 

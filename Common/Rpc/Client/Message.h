@@ -26,11 +26,11 @@ namespace Rpc
         bool Get(const std::string &key, std::string &value) const;
 
     public:
-        size_t GetLength();
+        size_t GetLength() const;
 
         size_t Parse(std::istream &os);
 
-        bool Serialize(std::ostream &os);
+        bool Serialize(std::ostream &os) const;
 
     public:
         bool Remove(const std::string &key);
@@ -52,6 +52,8 @@ namespace Rpc
         int Serailize(std::ostream &os) final;
 
         bool Parse(std::istream &os, size_t size);
+
+        static std::shared_ptr<Data> New(Tcp::Type type, Tcp::Porto proto);
 
     public:
         XCode GetCode(XCode code) const;

@@ -13,7 +13,9 @@ namespace Tcp
     {
         None,
         Request,
-        Response
+        Response,
+        Forward,
+        Broadcast,
     };
     enum class Porto
     {

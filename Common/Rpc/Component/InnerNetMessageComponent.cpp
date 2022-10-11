@@ -76,7 +76,11 @@ namespace Sentry
         message->GetHead().Add("code", code);
         if(message->GetHead().Get("address", address))
         {
+            message->GetHead().Remove("id");
             message->GetHead().Remove("address");
+#ifndef __DEBUG__
+            message->GetHead().Remove("func");
+#endif
             if(message->GetHead().Has("rpc"))
             {
                 message->SetType(Tcp::Type::Response);

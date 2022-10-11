@@ -69,6 +69,7 @@ namespace Sentry
                 LOG_ERROR("start service [" << name << "] faillure");
                 return false;
             }
+            CONSOLE_LOG_INFO("start service [" << name << "] successful");
         }
         return true;
     }

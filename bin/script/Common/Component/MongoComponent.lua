@@ -8,7 +8,7 @@ function MongoComponent.InsertOnce(tab, data, flag)
     if type(data) == "table" then
         data = Json.Encode(data)
     end
-    local address = self:GetHost()
+    local address = self:GetLocation()
     return self:Call(address, "Insert", {
         tab = tab,
         json = data,
@@ -20,8 +20,8 @@ function MongoComponent.Delete(tab, data, limit, flag)
     if type(data) == "table" then
         data = Json.Encode(data)
     end
-    local address = self:GetHost()
     assert(type(data) == "string")
+    local address = self:GetLocation()
     return self:Call(address, "Delete", {
         tab = tab,
         json = data,
@@ -34,8 +34,8 @@ function MongoComponent.QueryOnce(tab, data)
     if type(data) == "table" then
         data = Json.Encode(data)
     end
-    local address = self:GetHost()
     assert(type(data) == "string")
+    local address = self:GetLocation()
     local code, response = self:Call(address, "Query", {
         tab = tab,
         json = data,
@@ -56,7 +56,7 @@ function MongoComponent.Query(tab, data, limit)
     end
     print("query json ", data)
     assert(type(data) == "string")
-    local address = self:GetHost()
+    local address = self:GetLocation()
     local code, response = self:Call(address, "Query", {
         tab = tab,
         json = data,
@@ -78,12 +78,12 @@ function MongoComponent.QueryDatas(tab, querys)
     assert(type(tab) == "string")
     assert(type(querys) == "table" and #querys > 0)
 
-    local address = self:GetHost()
     local requset = {
         _id = {
             ["$in"] = querys
         }
     }
+    local address = self:GetLocation()
     local code, response = self:Call(address, "Query", {
         tab = tab,
         limit = #querys,

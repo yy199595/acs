@@ -18,13 +18,13 @@ namespace Sentry
 		LocalHttpService();
 		virtual ~LocalHttpService() = default;
 	 protected:
-		bool Start() final;
-		bool Close() final;
 		bool IsStartComplete() final { return true; }
 		bool LoadConfig(const rapidjson::Value & json) final;
         virtual bool OnCloseService() { return true; };
 		virtual bool OnStartService(HttpServiceRegister & serviceRegister) = 0;
 	 public:
+        bool Start() final;
+        bool Close() final;
 		bool IsStartService() final { return this->mServiceRegister != nullptr;}
 		const HttpServiceConfig & GetServiceConfig() const { return *this->mConfig; }
 		XCode Invoke(const std::string & name, std::shared_ptr<HttpHandlerRequest>, std::shared_ptr<HttpHandlerResponse>) final;

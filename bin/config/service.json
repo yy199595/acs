@@ -54,18 +54,6 @@
             "Request": "com.type.int64",
             "Response": "s2s.allot.response"
         },
-        "CallClient": {
-            "Async": false,
-            "Type": "Server",
-            "CallWay": "Net",
-            "Request": "c2s.rpc.call"
-        },
-        "BroadCast": {
-            "Async": false,
-            "Type": "Server",
-            "CallWay": "Net",
-            "Request": "s2s.broadcast.request"
-        },
         "SaveAddress": {
             "Async": false,
             "Type": "Server",

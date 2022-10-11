@@ -55,6 +55,11 @@ namespace Sentry
         return XCode::Successful;
     }
 
+    XCode InnerService::OnUserJoin(long long userId)
+    {
+
+    }
+
     XCode InnerService::Hotfix()
     {
         std::vector<Component *> components;

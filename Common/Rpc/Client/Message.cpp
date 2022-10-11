@@ -99,7 +99,7 @@ namespace Rpc
         return len;
     }
 
-    size_t Head::GetLength()
+    size_t Head::GetLength() const
     {
         size_t len = 0;
         auto iter = this->begin();
@@ -111,7 +111,7 @@ namespace Rpc
         return len + 1;
     }
 
-    bool Head::Serialize(std::ostream& os)
+    bool Head::Serialize(std::ostream& os) const
     {
         auto iter = this->begin();
         for(; iter != this->end(); iter++)
@@ -143,6 +143,14 @@ namespace Rpc
         }
         this->emplace(key, value);
         return true;
+    }
+
+    std::shared_ptr<Data> Data::New(Tcp::Type type, Tcp::Porto proto)
+    {
+        std::shared_ptr<Data> message = std::make_shared<Data>();
+        message->SetType(type);
+        message->SetProto(proto);
+        return message;
     }
 
     bool Data::ParseLen(std::istream &is, int & len)

@@ -16,6 +16,7 @@ namespace Sentry
     private:
         XCode Ping();
         XCode Hotfix();
+        XCode OnUserJoin(long long userId);
         XCode StartService(const com::type::string & request);
         XCode CloseService(const com::type::string & request);
     private:

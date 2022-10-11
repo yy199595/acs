@@ -365,7 +365,6 @@ namespace Sentry
 		return 1;
 	}
 
-
     void HttpAsyncResponse::SetError(const asio::error_code &code)
     {
         this->mCode = code;

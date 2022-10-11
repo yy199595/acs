@@ -5,9 +5,15 @@
 #include"HttpWebService.h"
 #include"File/FileHelper.h"
 #include"Json/Lua/Json.h"
+#include"Component/HttpWebComponent.h"
 #include"Component/LuaScriptComponent.h"
 namespace Sentry
 {
+    void HttpWebService::Awake()
+    {
+        this->GetApp()->AddComponent<HttpWebComponent>();
+    }
+
     bool HttpWebService::OnStartService(HttpServiceRegister &serviceRegister)
     {
         const ServerConfig & config = this->GetApp()->GetConfig();
@@ -20,7 +26,7 @@ namespace Sentry
 
         this->mLuaPath = config.GetWorkPath() + this->mLuaPath;
         this->mDownloadPath = config.GetWorkPath() + this->mDownloadPath;
-        return true;
+        return this->GetComponent<HttpWebComponent>()->StartListen("web");
     }
 
     XCode HttpWebService::Sync(const HttpHandlerRequest &request, HttpHandlerResponse &response)
@@ -51,6 +57,12 @@ namespace Sentry
             Lua::Json::Read(luaEnv, -1, &json);
             response.WriteString(json);
         }
+        return XCode::Successful;
+    }
+
+    XCode HttpWebService::Ping(const HttpHandlerRequest &request, HttpHandlerResponse &response)
+    {
+        response.WriteString("pong");
         return XCode::Successful;
     }
 

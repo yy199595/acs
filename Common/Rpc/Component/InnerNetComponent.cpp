@@ -1,10 +1,10 @@
 ﻿
 #include"InnerNetComponent.h"
-#include"App/App.h"
 #include"String/StringHelper.h"
 #include"Tcp/SocketProxy.h"
 #include"InnerNetMessageComponent.h"
 #include"Config/ServiceConfig.h"
+#include"Component/OuterNetComponent.h"
 #include"Component/NetThreadComponent.h"
 #include"google/protobuf/util/json_util.h"
 namespace Sentry
@@ -16,6 +16,7 @@ namespace Sentry
     }
 	bool InnerNetComponent::LateAwake()
 	{
+        this->mOuterComponent = this->GetComponent<OuterNetComponent>();
         LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<NetThreadComponent>());
         LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>());
 		return true;
@@ -31,6 +32,12 @@ namespace Sentry
                     this->StartClose(address);
                     CONSOLE_LOG_ERROR("request message error close : " << address);
                 }
+                break;
+            case Tcp::Type::Forward:
+                this->OnForward(message);
+                break;
+            case Tcp::Type::Broadcast:
+                this->OnBroadcast(message);
                 break;
             case Tcp::Type::Response:
                 if (!this->OnResponse(address, message))
@@ -63,23 +70,54 @@ namespace Sentry
         return true;
 	}
 
+    bool InnerNetComponent::OnForward(std::shared_ptr<Rpc::Data> message)
+    {
+        long long userId = 0;
+        LOG_CHECK_RET_FALSE(this->mOuterComponent != nullptr);
+        LOG_CHECK_RET_FALSE(message->GetHead().Has("func"));
+        LOG_CHECK_RET_FALSE(message->GetHead().Get("id", userId));
+        message->GetHead().Remove("id");
+        message->SetType(Tcp::Type::Request);
+        message->GetHead().Remove("address");
+        return this->mOuterComponent->SendData(userId, message);
+    }
+
+    bool InnerNetComponent::OnBroadcast(std::shared_ptr<Rpc::Data> message)
+    {
+        LOG_CHECK_RET_FALSE(this->mOuterComponent != nullptr);
+        LOG_CHECK_RET_FALSE(message->GetHead().Has("func"));
+        message->SetType(Tcp::Type::Request);
+        message->GetHead().Remove("address");
+        return this->mOuterComponent->SendData(message);
+    }
+
 	bool InnerNetComponent::OnResponse(const std::string& address, std::shared_ptr<Rpc::Data> message)
 	{
+        const Rpc::Head &head = message->GetHead();
+        if(this->mOuterComponent != nullptr)
+        {
+            std::string address;
+            if (head.Get("client", address)) //address
+            {
+                message->GetHead().Remove("client");
+                this->mOuterComponent->SendData(address, message);
+                return true;
+            }
+        }
+#ifdef __DEBUG__
         int code = 0;
-		long long rpcId = 0;
-        const Rpc::Head & head = message->GetHead();
-        LOG_CHECK_RET_FALSE(head.Get("rpc", rpcId));
         LOG_CHECK_RET_FALSE(head.Get("code", code));
         if(code != (int)XCode::Successful)
         {
-#ifdef __DEBUG__
             std::string error, func;
             if(head.Get("func", func) && head.Get("error", error))
             {
                 CONSOLE_LOG_ERROR("func = " << func << "  error = " << error);
             }
-#endif
         }
+#endif
+        long long rpcId = 0;
+        LOG_CHECK_RET_FALSE(head.Get("rpc", rpcId));
 		this->mMessageComponent->OnResponse(rpcId, message);
 		return true;
 	}

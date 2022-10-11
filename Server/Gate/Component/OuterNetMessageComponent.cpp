@@ -10,41 +10,10 @@
 #include"OuterNetComponent.h"
 #include"Component/InnerNetComponent.h"
 #include"Service/LocalService.h"
-#include"Service/OuterService.h"
-#include"Component/UserSyncComponent.h"
 #include"Component/RedisDataComponent.h"
 #include"Component/ProtoComponent.h"
-
-namespace Sentry
-{
-    ClientRpcTask::ClientRpcTask(Rpc::Data &request, OuterNetMessageComponent * component, int ms)
-        : IRpcTask<Rpc::Data>(ms)
-    {
-        this->mTaskId = Guid::Create();
-        this->mGateComponent = component;
-        request.GetHead().Get("rpc", this->mRpcId);
-        request.GetHead().Get("address", this->mAddress);
-    }
-
-    void ClientRpcTask::OnTimeout()
-    {
-        std::shared_ptr<Rpc::Data> message(new Rpc::Data());
-
-        message->SetType(Tcp::Type::Response);
-        message->SetProto(Tcp::Porto::Protobuf);
-        message->GetHead().Add("rpc", this->mRpcId);
-        message->GetHead().Add("code", (int)XCode::CallTimeout);
-        this->mGateComponent->OnResponse(this->mAddress, message);
-    }
-
-    void ClientRpcTask::OnResponse(std::shared_ptr<Rpc::Data> response)
-    {
-        response->GetHead().Remove("rpc");
-        response->GetHead().Add("rpc", this->mRpcId);
-        this->mGateComponent->OnResponse(this->mAddress, response);
-    }
-}
-
+#include"Component/UnitMgrComponent.h"
+#include"Component/UnitLocationComponent.h"
 namespace Sentry
 {
 
@@ -52,6 +21,7 @@ namespace Sentry
 	{
 		this->mTaskComponent = this->GetApp()->GetTaskComponent();
 		this->mTimerComponent = this->GetApp()->GetTimerComponent();
+        this->mUnitComponent = this->GetComponent<UnitMgrComponent>();
         this->mInnerMessageComponent = this->GetComponent<InnerNetMessageComponent>();
 		LOG_CHECK_RET_FALSE(this->mOutNetComponent = this->GetComponent<OuterNetComponent>());
 		return true;
@@ -60,16 +30,20 @@ namespace Sentry
 	XCode OuterNetMessageComponent::OnRequest(long long userId, std::shared_ptr<Rpc::Data> message)
     {
         std::string method, service;
+        std::shared_ptr<Unit> player = this->mUnitComponent->Find(userId);
+        if(player == nullptr)
+        {
+            return XCode::NotFindUser;
+        }
         LOG_RPC_CHECK_ARGS(message->GetMethod(service, method));
-        Service *localServerRpc = this->GetApp()->GetService(service);
-        if (localServerRpc == nullptr)
+        Service *targetService = this->GetApp()->GetService(service);
+        if (targetService == nullptr)
         {
             CONSOLE_LOG_ERROR("userid=" << userId <<
                 " call [" << service << "] not find");
             return XCode::CallServiceNotFound;
         }
-        const RpcServiceConfig &rpcServiceConfig = localServerRpc->GetServiceConfig();
-        const RpcMethodConfig *config = rpcServiceConfig.GetConfig(method);
+        const RpcMethodConfig *config = targetService->GetMethodConfig(method);
         if (config == nullptr || config->Type != "Client")
         {
             CONSOLE_LOG_ERROR("userid=" << userId <<
@@ -77,32 +51,26 @@ namespace Sentry
             return XCode::NotFoundRpcConfig;
         }
 
-        std::string address;
-        if (!localServerRpc->GetHost(userId, address))
+        UnitLocationComponent * locationComponent = player->GetComponent<UnitLocationComponent>();
+        if(locationComponent == nullptr)
         {
-            localServerRpc->GetHost(address);
-            localServerRpc->AddHost(address, userId);
         }
-        if (message->GetHead().Has("rpc"))
+        std::string address;        // TODO
+        if(!locationComponent->Get(service, address))
         {
-            std::shared_ptr<ClientRpcTask> clientRpcTask
-                = std::make_shared<ClientRpcTask>(*message, this, 0);
-
-            message->GetHead().Remove("rpc");
-            message->GetHead().Add("rpc", clientRpcTask->GetRpcId());
-            if (!this->mInnerMessageComponent->Send(address, message))
+            if(!targetService->GetLocation(address))
             {
-                return XCode::SendMessageFail;
+                return XCode::CallServiceNotFound;
             }
-            this->mInnerMessageComponent->AddTask(clientRpcTask);
-        }
-        else
-        {
-            if (!this->mInnerMessageComponent->Send(address, message))
+            locationComponent->Add(service, address);
+            Service * innerService = this->GetApp()->GetService("InnerService");
+            if(innerService != nullptr)
             {
-                return XCode::SendMessageFail;
+                innerService->Call(address, "OnUserJoin");
             }
         }
+        message->GetHead().Add("id", userId);
+        this->mInnerMessageComponent->Send(address, message);
         return XCode::Successful;
     }
 

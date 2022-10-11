@@ -1,20 +1,18 @@
 ﻿#pragma once
 
 #include<memory>
-#include"ServiceHost.h"
 #include"Client/Message.h"
 #include"Message/c2s.pb.h"
 #include"Json/JsonWriter.h"
 #include"Config/ServiceConfig.h"
-#include"Component/Component.h"
-
+#include"Component/LocationComponent.h"
 using namespace std;
 
 namespace Sentry
 {
 	class ServiceMethod;
 	class InnerNetClient;
-    class Service : public Component, public ILuaRegister, public ServiceHost, public IServiceBase
+    class Service : public ILuaRegister, public LocationComponent, public IServiceBase
 	{
 	 public:
 		Service();
@@ -36,7 +34,7 @@ namespace Sentry
 	public:
         bool IsStartComplete() final{return this->GetHostSize() > 0; };
         const RpcServiceConfig & GetServiceConfig() { return *this->mConfig; }
-        const std::string & GetLocalHost() final { return this->mLocalAddress; }
+        const RpcMethodConfig * GetMethodConfig(const std::string & method) const;
         const std::string & GetServiceName() final { return this->GetName(); }
     public:
         bool StartSend(const std::string & address, const std::string & func, long long userId, const Message * message);
@@ -45,7 +43,6 @@ namespace Sentry
 		bool LateAwake() override;
 		bool LoadConfig(const rapidjson::Value & json) final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) override;
-
     public:
         virtual XCode Invoke(const std::string & method, std::shared_ptr<Rpc::Data> message) = 0;
 	private:

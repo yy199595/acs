@@ -25,17 +25,21 @@ namespace Sentry
         std::shared_ptr<OuterNetClient> GetGateClient(const std::string & address);
 	 public:
         std::string CreateToken(long long userId, float second = 10);
-        void SendToAllClient(std::shared_ptr<c2s::rpc::call> message);
-		bool SendData(const std::string & address, std::shared_ptr<Rpc::Data> message);
+    public:
+        bool SendData(std::shared_ptr<Rpc::Data> message);
+        bool SendData(long long userId, std::shared_ptr<Rpc::Data> message);
+        bool SendData(const std::string & address, std::shared_ptr<Rpc::Data> message);
 	 public:
 		void Awake() final;
 		bool LateAwake() final;
 	 private:
         void OnStopListen() final;
         bool OnListen(std::shared_ptr<SocketProxy> socket) final;
+        void OnAuthSuccessful(long long userId, const std::string & address);
         bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Data> message);
     private:
 		class TimerComponent* mTimerComponent;
+        class UnitMgrComponent * mUnitComponent;
         class NetThreadComponent * mNetComponent;
         class RedisDataComponent * mRedisComponent;
         std::unordered_map<std::string, long long> mTokens;

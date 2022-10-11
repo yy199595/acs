@@ -31,11 +31,7 @@ namespace Lua
         if (lua_isinteger(lua, 2)) //userId
         {
             userId = lua_tointeger(lua, 2);
-            if (!service->GetHost(userId, address))
-            {
-                luaL_error(lua, "not find user address : %lld", userId);
-                return 0;
-            }
+            //TODO
         }
         else if (lua_isstring(lua, 2)) //address
         {
@@ -92,11 +88,11 @@ namespace Lua
         return netMessageComponent->AddTask(luaRpcTaskSource)->Await();
     }
 
-	int Service::GetHost(lua_State *lua)
+	int Service::GetLocation(lua_State *lua)
 	{
 		std::string address;
 		Sentry::Service* service = UserDataParameter::Read<Sentry::Service*>(lua, 1);
-		if(service->GetHost(address))
+		if(service->GetLocation(address))
 		{
 			lua_pushlstring(lua, address.c_str(), address.size());
 			return 1;
@@ -104,7 +100,7 @@ namespace Lua
 		return 0;
 	}
 
-    int Service::AddHost(lua_State *lua)
+    int Service::AddLocation(lua_State *lua)
     {
         long long unitId = 0;
         Sentry::Service* service = UserDataParameter::Read<Sentry::Service*>(lua, 1);
@@ -112,12 +108,12 @@ namespace Lua
         if(lua_isinteger(lua, 3) && service != nullptr)
         {
             unitId = lua_tointeger(lua, 2);
-            service->AddHost(address, unitId);
+            //TODO
             return 0;
         }
         if(service != nullptr)
         {
-            service->AddHost(address);
+            service->AddLocation(address);
         }
         return 0;
     }

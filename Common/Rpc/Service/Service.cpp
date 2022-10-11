@@ -28,8 +28,13 @@ namespace Sentry
 	{
 		luaRegister.BeginRegister<Service>();
 		luaRegister.PushExtensionFunction("Call", Lua::Service::Call);
-		luaRegister.PushExtensionFunction("GetHost", Lua::Service::GetHost);
+        luaRegister.PushExtensionFunction("GetLocation", Lua::Service::GetLocation);
 	}
+
+    const RpcMethodConfig *Service::GetMethodConfig(const std::string &method) const
+    {
+        return this->mConfig->GetConfig(method);
+    }
 
 }
 
@@ -78,11 +83,8 @@ namespace Sentry
         {
             return nullptr;
         }
-        std::shared_ptr<Rpc::Data> request
-            = std::make_shared<Rpc::Data>();
-
-        request->SetType(Tcp::Type::Request);
-        request->SetProto(Tcp::Porto::Protobuf);
+        std::shared_ptr<Rpc::Data> request =
+            Rpc::Data::New(Tcp::Type::Request, Tcp::Porto::Protobuf);
         request->GetHead().Add("func", func);
         if(userId != 0)
         {
@@ -99,15 +101,6 @@ namespace Sentry
 
 	XCode Service::Send(long long int userId, const string& func, const Message& message)
 	{
-		std::string address;
-		if(!this->GetHost(userId, address))
-		{
-			return XCode::NotFindUser;
-		}
-        if(!this->StartSend(address, func, userId, &message))
-        {
-            return XCode::Failure;
-        }
         return XCode::Successful;
 	}
 
@@ -190,84 +183,24 @@ namespace Sentry
 {
 	XCode Service::Call(long long userId, const std::string& func)
 	{
-		std::string address;
-		if(!this->GetHost(userId, address))
-		{
-			return XCode::NotFindUser;
-		}
-        std::shared_ptr<Rpc::Data> data =
-            this->StartCall(address, func, userId, nullptr);
-        if(data == nullptr)
-        {
-            return XCode::Failure;
-        }
-        return data->GetCode(XCode::Failure);
+        return XCode::Successful;
 	}
 
 	XCode Service::Call(long long userId, const std::string& func, const Message& message)
 	{
-		std::string address;
-		if(!this->GetHost(userId, address))
-		{
-			return XCode::NotFindUser;
-		}
-        std::shared_ptr<Rpc::Data> data =
-            this->StartCall(address, func, userId, &message);
-        if(data == nullptr)
-        {
-            return XCode::Failure;
-        }
-        return data->GetCode(XCode::Failure);
+
+        return XCode::Successful;
 	}
 
 	XCode Service::Call(long long userId, const std::string& func, std::shared_ptr<Message> response)
 	{
-		std::string address;
-		assert(response != nullptr);
-		if(!this->GetHost(userId, address))
-		{
-			return XCode::NotFindUser;
-		}
-        std::shared_ptr<Rpc::Data> data =
-            this->StartCall(address, func, 0, nullptr);
-        if(data == nullptr)
-        {
-            return XCode::Failure;
-        }
-        if(data->GetCode(XCode::Failure) == XCode::Successful)
-        {
-            if(!data->ParseMessage(response.get()))
-            {
-                return XCode::ParseMessageError;
-            }
-            return XCode::Successful;
-        }
-        return data->GetCode(XCode::Failure);
+        return XCode::Successful;
 	}
 
 	XCode Service::Call(long long userId, const std::string& func, const Message& message, std::shared_ptr<Message> response)
 	{
-		std::string address;
-		assert(response != nullptr);
-		if(!this->GetHost(userId, address))
-		{
-			return XCode::NotFindUser;
-		}
-		std::shared_ptr<Rpc::Data> data =
-            this->StartCall(address, func, 0, &message);
-        if(data == nullptr)
-        {
-            return XCode::Failure;
-        }
-        if(data->GetCode(XCode::Failure) == XCode::Successful)
-        {
-            if(!data->ParseMessage(response.get()))
-            {
-                return XCode::ParseMessageError;
-            }
-            return XCode::Successful;
-        }
-        return data->GetCode(XCode::Failure);
+
+        return XCode::Successful;
 	}
 
 	bool Service::LoadConfig(const rapidjson::Value& json)

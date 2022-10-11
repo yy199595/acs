@@ -11,33 +11,12 @@
 
 namespace Sentry
 {
-    class OuterNetMessageComponent;
-    class ClientRpcTask : public IRpcTask<Rpc::Data>
-    {
-    public:
-        ClientRpcTask(Rpc::Data & request, OuterNetMessageComponent * component, int ms);
-
-    public:
-        long long GetRpcId() final { return this->mTaskId; }
-    private:
-        void OnTimeout() final;
-        void OnResponse(std::shared_ptr<Rpc::Data> response) final;
-    private:
-        long long mRpcId;
-        long long mTaskId;
-        std::string mAddress;
-        OuterNetMessageComponent * mGateComponent;
-    };
-}
-
-namespace Sentry
-{
 	class OuterNetMessageComponent final : public Component
 	{
 	 public:
 		OuterNetMessageComponent() = default;
 		~OuterNetMessageComponent() final = default;
-	 public:       
+	 public:
         XCode OnRequest(long long userId, std::shared_ptr<Rpc::Data> message);
         XCode OnResponse(const std::string & address, std::shared_ptr<Rpc::Data> message);
     private:
@@ -45,6 +24,7 @@ namespace Sentry
 	 private:
 		class TaskComponent * mTaskComponent;
 		class TimerComponent * mTimerComponent;
+        class UnitMgrComponent * mUnitComponent;
         class OuterNetComponent* mOutNetComponent;
         class InnerNetMessageComponent * mInnerMessageComponent;
     };

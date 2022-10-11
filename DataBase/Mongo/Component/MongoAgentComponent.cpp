@@ -21,7 +21,7 @@ namespace Sentry
 	XCode MongoAgentComponent::Insert(const char* tab, const Message& message, int index)
 	{
 		std::string address;
-		if(!this->mMongoService->GetHost(address))
+		if(!this->mMongoService->GetLocation(address))
 		{
 			return XCode::CallServiceNotFound;
 		}
@@ -38,7 +38,7 @@ namespace Sentry
     XCode MongoAgentComponent::Update(const char *tab, const std::string &select, const std::string &data, int index)
     {
         std::string address;
-        if(!this->mMongoService->GetHost(address))
+        if(!this->mMongoService->GetLocation(address))
         {
             return XCode::CallServiceNotFound;
         }
@@ -52,7 +52,7 @@ namespace Sentry
 	XCode MongoAgentComponent::Insert(const char* tab, const std::string& json, int index)
 	{
 		std::string address;
-		if(!this->mMongoService->GetHost(address))
+		if(!this->mMongoService->GetLocation(address))
 		{
 			return XCode::CallServiceNotFound;
 		}
@@ -65,7 +65,7 @@ namespace Sentry
 	XCode MongoAgentComponent::Remove(const char* tab, const std::string& select, int limit, int index)
 	{
 		std::string address;
-		if(!this->mMongoService->GetHost(address))
+		if(!this->mMongoService->GetLocation(address))
 		{
 			return XCode::CallServiceNotFound;
 		}
@@ -80,7 +80,7 @@ namespace Sentry
 		const std::string& select, std::shared_ptr<Message> response)
 	{
 		std::string address;
-		if(!this->mMongoService->GetHost(address))
+		if(!this->mMongoService->GetLocation(address))
 		{
 			return XCode::CallServiceNotFound;
 		}
@@ -131,7 +131,7 @@ namespace Sentry
                 return XCode::CallArgsError;
         }
         std::string address;
-        if(!this->mMongoService->GetHost(address))
+        if(!this->mMongoService->GetLocation(address))
         {
             return XCode::CallServiceNotFound;
         }

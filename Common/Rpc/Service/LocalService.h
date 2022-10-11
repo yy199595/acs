@@ -14,9 +14,6 @@ namespace Sentry
 	{
 	public:
 		LocalService();
-	protected:
-		virtual bool OnClose() = 0;
-		virtual bool OnStart() = 0;
 	public:
 		bool Start() final;
 		bool Close() final;
@@ -24,6 +21,8 @@ namespace Sentry
 		bool IsStartService() { return this->mMethodRegister != nullptr; }
 		XCode Invoke(const std::string &func, std::shared_ptr<Rpc::Data> message) final;
     protected:
+        virtual bool OnClose() = 0;
+        virtual bool OnStart() = 0;
         void WaitAllMessageComplete() final;
         ServiceMethodRegister & GetMethodRegistry() { return *this->mMethodRegister; }
 	private:

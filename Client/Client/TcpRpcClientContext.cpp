@@ -24,7 +24,6 @@ namespace Client
     {
         if(code)
         {
-            CONSOLE_LOG_DEBUG(code.message());
             if(!this->ConnectSync())
             {
                 CONSOLE_LOG_FATAL("connect server error");

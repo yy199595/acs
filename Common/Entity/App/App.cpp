@@ -30,7 +30,6 @@ namespace Sentry
 		this->mLogComponent = this->GetOrAddComponent<LoggerComponent>();
 		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
 		this->mMessageComponent = this->GetOrAddComponent<ProtoComponent>();
-        ServiceLaunchComponent * launchComponent = this->GetOrAddComponent<ServiceLaunchComponent>();
 
 		std::vector<std::string> components;
 		if (this->mConfig->GetMember("component", components)) //添加组件
@@ -45,10 +44,14 @@ namespace Sentry
 				}
 			}
 		}
-
-        if(!launchComponent->InitService())
+        std::vector<const ServiceConfig *> configs;
+        if(this->mConfig->GetServiceConfigs(configs) > 0)
         {
-            return false;
+            ServiceLaunchComponent *launchComponent = this->GetOrAddComponent<ServiceLaunchComponent>();
+            if (!launchComponent->InitService())
+            {
+                return false;
+            }
         }
 
 		this->GetComponents(components);
