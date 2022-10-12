@@ -147,13 +147,14 @@ namespace Sentry
             authMessage->GetHead().Add("passwd", this->mPassword);
             authMessage->GetHead().Add("location", this->mLocation);
         }
-        if(this->SendSync(authMessage) <=0)
+        if(this->SendSync(authMessage) > 0)
         {
-            assert(false);
-            return;
+            this->SendFromMessageQueue();
+            this->ReceiveMessage(RPC_PACK_HEAD_LEN);
         }
-        CONSOLE_LOG_ERROR("send auth message successful");
-        this->SendFromMessageQueue();
-        this->ReceiveMessage(RPC_PACK_HEAD_LEN);
+        else
+        {
+            this->CloseSocket(XCode::NetWorkError);
+        }
     }
 }

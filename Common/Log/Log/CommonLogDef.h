@@ -147,3 +147,10 @@ inline std::string FormatFileLine(const char * file, const int line)
 	ss << f << content;                \
 	Debug::Console(Debug::Level::debug, ss.str());\
 }
+
+#define THROW_LOGIC_ERROR(content){ \
+    std::string f = FormatFileLine(__FILE__, __LINE__); \
+	std::stringstream ss;                \
+	ss << f << content;                \
+    throw std::logic_error(ss.str());                                    \
+}

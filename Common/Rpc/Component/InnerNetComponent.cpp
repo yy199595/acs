@@ -38,14 +38,13 @@ namespace Sentry
         this->mOuterComponent = this->GetComponent<OuterNetComponent>();
         LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<NetThreadComponent>());
         LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("user", "name", this->mUserName));
-        LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("user", "passwd", this->mUserName));
+        LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("user", "passwd", this->mPassword));
         LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>());
 		return true;
 	}
 
     void InnerNetComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Data> message)
     {
-        CONSOLE_LOG_ERROR("receive message typ " << message->GetType());
         switch ((Tcp::Type) message->GetType())
         {
             case Tcp::Type::Auth:

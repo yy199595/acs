@@ -27,20 +27,23 @@ namespace Sentry
 
 	XCode InnerNetMessageComponent::OnRequest(std::shared_ptr<Rpc::Data> message)
 	{
-        std::string func, address;
+        std::string address, service, method;
         const Rpc::Head & head = message->GetHead();
-        LOG_RPC_CHECK_ARGS(head.Get("func", func));
         LOG_RPC_CHECK_ARGS(head.Get("address", address));
-        LOG_RPC_CHECK_ARGS(message->GetMethod(this->mService, this->mMethod));
+        if(!message->GetMethod(service, method))
+        {
+            CONSOLE_LOG_ERROR("call func field error");
+            return XCode::CallArgsError;
+        }
 
-		Service * logicService = this->GetApp()->GetService(this->mService);
+		Service * logicService = this->GetApp()->GetService(service);
 		if (logicService == nullptr || !logicService->IsStartService())
 		{
-            LOG_ERROR("call service not exist : [" << this->mService << "]");
+            LOG_ERROR("call service not exist : [" << service << "]");
 			return XCode::CallServiceNotFound;
 		}
 		const RpcServiceConfig & rpcServiceConfig = logicService->GetServiceConfig();
-		const RpcMethodConfig* methodConfig = rpcServiceConfig.GetConfig(this->mMethod);
+		const RpcMethodConfig* methodConfig = rpcServiceConfig.GetConfig(method);
 		if (methodConfig == nullptr)
 		{
             return XCode::NotFoundRpcConfig;

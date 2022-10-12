@@ -3,7 +3,6 @@
 //
 
 #include"OuterNetMessageComponent.h"
-#include"App/App.h"
 #include"Client/OuterNetClient.h"
 #include"Config/ServiceConfig.h"
 #include"Component/InnerNetMessageComponent.h"
@@ -13,7 +12,6 @@
 #include"Service/InnerService.h"
 #include"Component/RedisDataComponent.h"
 #include"Component/ProtoComponent.h"
-#include"Component/UnitMgrComponent.h"
 
 namespace Sentry
 {
@@ -22,7 +20,6 @@ namespace Sentry
 	{
 		this->mTaskComponent = this->GetApp()->GetTaskComponent();
 		this->mTimerComponent = this->GetApp()->GetTimerComponent();
-        this->mUnitComponent = this->GetComponent<UnitMgrComponent>();
         this->mInnerMessageComponent = this->GetComponent<InnerNetMessageComponent>();
 		LOG_CHECK_RET_FALSE(this->mOutNetComponent = this->GetComponent<OuterNetComponent>());
 		return true;
@@ -31,11 +28,6 @@ namespace Sentry
 	XCode OuterNetMessageComponent::OnRequest(long long userId, std::shared_ptr<Rpc::Data> message)
     {
         std::string method, service;
-        std::shared_ptr<Unit> player = this->mUnitComponent->Find(userId);
-        if(player == nullptr)
-        {
-            return XCode::NotFindUser;
-        }
         LOG_RPC_CHECK_ARGS(message->GetMethod(service, method));
         Service *targetService = this->GetApp()->GetService(service);
         if (targetService == nullptr)

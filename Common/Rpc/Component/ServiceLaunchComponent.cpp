@@ -9,25 +9,21 @@
 #include"Service/LocalHttpService.h"
 namespace Sentry
 {
-    bool ServiceLaunchComponent::InitService()
+    void ServiceLaunchComponent::Awake()
     {
         std::string path;
         const ServerConfig & config = this->GetConfig();
         if (!config.GetPath("service", path))
         {
-            CONSOLE_LOG_ERROR("not find service config");
-            return false;
+            throw std::logic_error("not find service config");
         }
 
-        std::vector<std::string> services;
-        if(config.GetServices(services) == 0)
-        {
-            return false;
-        }
         rapidjson::Document jsonDocument;
-        if(!Helper::File::ReadJsonFile(path, jsonDocument))
+        std::vector<std::string> services;
+        if(config.GetServices(services) == 0 ||
+            !Helper::File::ReadJsonFile(path, jsonDocument))
         {
-            return false;
+            throw std::logic_error("not find start service");
         }
         auto iter = jsonDocument.MemberBegin();
         for(; iter != jsonDocument.MemberEnd(); iter++)
@@ -44,31 +40,40 @@ namespace Sentry
                 }
                 if (component == nullptr || !this->GetApp()->AddComponent(name, component))
                 {
-                    CONSOLE_LOG_ERROR("add " << name << " failure");
-                    return false;
+                    throw std::logic_error("add " + name + " failure");
                 }
                 IServiceBase *serviceBase = component->Cast<IServiceBase>();
                 if (serviceBase == nullptr || (!serviceBase->LoadConfig(value)))
                 {
-                    CONSOLE_LOG_ERROR("load service config error : " << name);
-                    return false;
+                    throw std::logic_error("load service config error : " + name);
                 }
             }
         }
-        return true;
     }
 
     bool ServiceLaunchComponent::Start()
     {
         std::vector<std::string> startServices;
         this->GetConfig().GetServices(startServices, true);
+        const std::string & location = this->GetConfig().GetLocalHost();
         for(const std::string & name : startServices)
         {
             IServiceBase * component = this->GetComponent<IServiceBase>(name);
+            LocalService * localService = dynamic_cast<LocalService*>(component);
+            LocalHttpService * localHttpService = dynamic_cast<LocalHttpService*>(component);
             if(component != nullptr && !component->Start())
             {
                 LOG_ERROR("start service [" << name << "] faillure");
                 return false;
+            }
+            if(localService != nullptr)
+            {
+                localService->AddLocation(location);
+                CONSOLE_LOG_ERROR("start rpc service " << name << " successful");
+            }
+            else if(localHttpService != nullptr)
+            {
+                CONSOLE_LOG_ERROR("start http service " << name << " successful");
             }
         }
         return true;

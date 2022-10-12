@@ -85,9 +85,8 @@ namespace Sentry
     {
         for(auto & value : this->mServiceConfigs)
         {
-            if(start && value.second)
+            if(start && !value.second)
             {
-                services.emplace_back(value.first);
                 continue;
             }
             services.emplace_back(value.first);

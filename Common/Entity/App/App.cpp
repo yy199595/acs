@@ -5,7 +5,6 @@
 #include"Service/LuaService.h"
 #include"Component/ProtoComponent.h"
 #include"Component/RedisChannelComponent.h"
-#include"Component/ServiceLaunchComponent.h"
 
 using namespace Sentry;
 using namespace std::chrono;
@@ -36,20 +35,22 @@ namespace Sentry
 		{
 			for (const std::string& name: components)
 			{
-				Component * component = ComponentFactory::CreateComponent(name);
-				if(component == nullptr || !this->AddComponent(name, component))
-				{
-					CONSOLE_LOG_ERROR("add " << name << " failure");
-					return false;
-				}
+                try
+                {
+                    Component * component = ComponentFactory::CreateComponent(name);
+                    if(component == nullptr || !this->AddComponent(name, component))
+                    {
+                        CONSOLE_LOG_ERROR("add " << name << " failure");
+                        return false;
+                    }
+                }
+                catch (std::exception & e)
+                {
+                    CONSOLE_LOG_ERROR("Init" + name + "error:" + e.what());
+                    return false;
+                }
 			}
 		}
-        ServiceLaunchComponent *launchComponent = this->GetComponent<ServiceLaunchComponent>();
-        if(launchComponent != nullptr && !launchComponent->InitService())
-        {
-            return false;
-        }
-
         this->GetComponents(components);
 		for (const std::string& name: components)
 		{

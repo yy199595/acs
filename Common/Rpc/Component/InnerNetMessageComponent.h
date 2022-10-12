@@ -36,8 +36,6 @@ namespace Sentry
     private:
         void Invoke(const RpcMethodConfig * config, std::shared_ptr<Rpc::Data> message);
     private:
-        std::string mMethod;
-        std::string mService;
 		std::string mFullName;
 		class TaskComponent* mTaskComponent;
 		class TimerComponent* mTimerComponent;

@@ -7,12 +7,13 @@
 #include"Component/Component.h"
 namespace Sentry
 {
-    class ServiceLaunchComponent : public Component, public IStart
+    class ServiceLaunchComponent final : public Component, public IStart
     {
     public:
-        bool InitService();
-
+        ServiceLaunchComponent() = default;
+        ~ServiceLaunchComponent() = default;
     private:
+        void Awake() final;
         bool Start() final;
     };
 }

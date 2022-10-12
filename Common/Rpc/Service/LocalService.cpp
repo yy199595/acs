@@ -102,7 +102,6 @@ namespace Sentry
             }
         }
         this->mIsHandlerMessage = true;
-        this->AddLocation(this->GetApp()->GetConfig().GetLocalHost());
 		return true;
 	}
 

@@ -167,23 +167,6 @@ namespace Rpc
 
         this->mType = is.get();
         this->mProto = is.get();
-        switch(this->mType)
-        {
-            case (int)Tcp::Type::Request:
-            case (int)Tcp::Type::Response:
-                break;
-            default:
-                return false;
-        }
-
-        switch(this->mProto)
-        {
-            case (int)Tcp::Porto::Json:
-            case (int)Tcp::Porto::Protobuf:
-                break;
-            default:
-                return false;
-        }
         len = buffer.len;
         this->mLen = buffer.len;
         return true;

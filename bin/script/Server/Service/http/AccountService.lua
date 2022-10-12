@@ -44,7 +44,7 @@ function AccountService.Login(request)
     if userInfo == nil or loginInfo.password ~= userInfo.password then
         return XCode.Failure
     end
-    local address = outerService:GetHost()
+    local address = outerService:AllotLocation()
     local code, response = outerService:Call(address, "AllotUser", {
         value = userInfo.user_id
     })

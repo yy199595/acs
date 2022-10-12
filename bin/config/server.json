@@ -13,7 +13,9 @@
         "source": "source",
         "user": "config/user.json",
         "http": "script/Server/web",
-        "service": "config/service.json"
+        "service": "config/service.json",
+        "cluster": "config/cluster/cluster.json",
+        "location": "config/cluster/location.json"
     },
     "user": {
         "name": "root",

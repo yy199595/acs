@@ -90,9 +90,11 @@ namespace Sentry
 
     void OuterNetComponent::OnAuthSuccessful(long long userId, const std::string &address)
     {
+        // 分配服务器
 
         this->mUserAddressMap.emplace(address, userId);
         this->mClientAddressMap.emplace(userId, address);
+        CONSOLE_LOG_INFO(userId << " auth successful ......");
     }
 
     std::string OuterNetComponent::CreateToken(long long userId, float second)

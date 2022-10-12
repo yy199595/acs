@@ -24,7 +24,6 @@ namespace Sentry
 	 private:
 		class TaskComponent * mTaskComponent;
 		class TimerComponent * mTimerComponent;
-        class UnitMgrComponent * mUnitComponent;
         class OuterNetComponent* mOutNetComponent;
         class InnerNetMessageComponent * mInnerMessageComponent;
     };

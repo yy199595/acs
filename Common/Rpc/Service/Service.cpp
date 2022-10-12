@@ -42,6 +42,11 @@ namespace Sentry
 {
 	XCode Service::Send(const std::string& func, const Message& message)
 	{
+        const RpcMethodConfig * methodConfig = this->mConfig->GetConfig(func);
+        if(methodConfig == nullptr)
+        {
+            return XCode::CallFunctionNotExist;
+        }
         this->mServiceHosts.clear();
         if(!this->GetHosts(this->mServiceHosts))
         {
@@ -61,12 +66,18 @@ namespace Sentry
     bool Service::StartSend(const std::string &address,
                             const std::string &func, long long userId, const Message *message)
     {
+        const RpcMethodConfig * methodConfig = this->mConfig->GetConfig(func);
+        if(methodConfig == nullptr)
+        {
+            CONSOLE_LOG_ERROR("call " << func << " not find config");
+            return false;
+        }
         std::shared_ptr<Rpc::Data> request
             = std::make_shared<Rpc::Data>();
 
         request->SetType(Tcp::Type::Request);
         request->SetProto(Tcp::Porto::Protobuf);
-        request->GetHead().Add("func", func);
+        request->GetHead().Add("func", methodConfig->FullName);
         if(userId != 0)
         {
             request->GetHead().Add("id", userId);
@@ -105,16 +116,13 @@ namespace Sentry
 	}
 
 	XCode Service::Send(const std::string& address, const std::string& func, const Message& message)
-	{
-        std::shared_ptr<Rpc::Data> request
-            = std::make_shared<Rpc::Data>();
-
-        request->WriteMessage(&message);
-        request->SetType(Tcp::Type::Request);
-        request->SetProto(Tcp::Porto::Protobuf);
-        request->GetHead().Add("func", func);
-        return this->mMessageComponent->Send(address, request) ? XCode::Successful : XCode::NetWorkError;
-	}
+    {
+        if(!this->StartSend(address, func, 0, &message))
+        {
+            return XCode::Failure;
+        }
+        return XCode::Successful;
+    }
 
 	XCode Service::Call(const std::string & address, const string& func)
     {

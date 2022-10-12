@@ -1,0 +1,52 @@
+{
+	"AllServer":
+	{
+		"AutoAllot": true,
+		"Start":
+		[
+			"InnerService",
+			"OuterService",
+			"MysqlService",
+			"MongoService",
+			"ChatService",
+			"AccountService"
+		]
+	},
+	"ChatServer":
+	{
+		"AutoAllot": true,
+		"Start":
+		[
+			"InnerService",
+			"ChatService"
+		]
+	},
+	"HttpServer":
+	{
+		"AutoAllot": true,
+		"Start":
+		[
+			"AccountService",
+			"HttpWebService"
+		]
+	},
+	"GateServer":
+	{
+		"AutoAllot": false,
+		"Start":
+		[
+			"OuterService",
+			"InnerService"
+		]
+	},
+	"DataServer":
+	{
+		"AutoAllot":false,
+		"Start":
+		[
+			"InnerService",
+			"MysqlService",
+			"MongoService"
+		]
+	}
+}
