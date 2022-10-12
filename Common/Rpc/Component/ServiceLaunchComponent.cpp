@@ -19,8 +19,12 @@ namespace Sentry
             return false;
         }
 
+        std::vector<std::string> services;
+        if(config.GetServices(services) == 0)
+        {
+            return false;
+        }
         rapidjson::Document jsonDocument;
-        std::vector<const ServiceConfig *> serviceConfigs;
         if(!Helper::File::ReadJsonFile(path, jsonDocument))
         {
             return false;
@@ -30,22 +34,25 @@ namespace Sentry
         {
             const rapidjson::Value &value = iter->value;
             const std::string name(iter->name.GetString());
-            Component *component = ComponentFactory::CreateComponent(name);
-            if (component == nullptr)
+            if(std::find(services.begin(), services.end(), name) != services.end())
             {
-                std::string type(value["Type"].GetString());
-                component = ComponentFactory::CreateComponent(type);
-            }
-            if (component == nullptr || !this->GetApp()->AddComponent(name, component))
-            {
-                CONSOLE_LOG_ERROR("add " << name << " failure");
-                return false;
-            }
-            IServiceBase *serviceBase = component->Cast<IServiceBase>();
-            if(serviceBase == nullptr || !serviceBase->LoadConfig(value))
-            {
-                CONSOLE_LOG_ERROR("load service config error : " << name);
-                return false;
+                Component *component = ComponentFactory::CreateComponent(name);
+                if (component == nullptr)
+                {
+                    std::string type(value["Type"].GetString());
+                    component = ComponentFactory::CreateComponent(type);
+                }
+                if (component == nullptr || !this->GetApp()->AddComponent(name, component))
+                {
+                    CONSOLE_LOG_ERROR("add " << name << " failure");
+                    return false;
+                }
+                IServiceBase *serviceBase = component->Cast<IServiceBase>();
+                if (serviceBase == nullptr || (!serviceBase->LoadConfig(value)))
+                {
+                    CONSOLE_LOG_ERROR("load service config error : " << name);
+                    return false;
+                }
             }
         }
         return true;
@@ -53,30 +60,16 @@ namespace Sentry
 
     bool ServiceLaunchComponent::Start()
     {
-        std::vector<IServiceBase *> components;
-        this->GetApp()->GetComponents(components);
-        const std::string name = this->GetConfig().GetNodeName();
-        for(IServiceBase * component : components)
+        std::vector<std::string> startServices;
+        this->GetConfig().GetServices(startServices, true);
+        for(const std::string & name : startServices)
         {
-            LocalService * localService = dynamic_cast<LocalService*>(component);
-            LocalHttpService * localHttpService = dynamic_cast<LocalHttpService*>(component);
-            if(localService != nullptr)
+            IServiceBase * component = this->GetComponent<IServiceBase>(name);
+            if(component != nullptr && !component->Start())
             {
-                const RpcServiceConfig & config = localService->GetServiceConfig();
-                if(config.GetServer() == "AllServer" || config.GetServer() == name)
-                {
-                    if(!localService->Start())
-                    {
-                        LOG_ERROR("start service [" << config.GetName() << "] faillure");
-                        return false;
-                    }
-                }
+                LOG_ERROR("start service [" << name << "] faillure");
+                return false;
             }
-            else if(localHttpService != nullptr)
-            {
-                const HttpServiceConfig & config = localHttpService->GetServiceConfig();
-            }
-            CONSOLE_LOG_INFO("start service [" << name << "] successful");
         }
         return true;
     }

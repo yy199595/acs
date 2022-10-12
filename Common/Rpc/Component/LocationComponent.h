@@ -25,16 +25,19 @@ namespace Sentry
     class LocationComponent : public Component
     {
     public:
-        void AddLocation(const std::string & address);
+        bool DelLocation(long long useId);
         bool DelLocation(const std::string & address);
-        bool AddLocation(long long userId, const std::string & address);
+        void AddLocation(const std::string & address);
+        void AddLocation(const std::string & address, long long userId);
     public:
         bool HasLocation(const std::string & address);
         bool GetHosts(std::vector<std::string> & hosts);
-        bool GetLocation(std::string & address, int max = 100);
         bool GetLocation(long long userId, std::string & address);
         size_t GetHostSize() const { return this->mHosts.size(); }
         virtual const std::string & GetServiceName() = 0;
+    public:
+        virtual bool AllotLocation(std::string & address);
+        virtual bool AllotLocation(long long userId, std::string & address);
     protected:
         virtual void OnAddHost(const std::string & address) { }
         virtual void OnDelHost(const std::string & address) { }

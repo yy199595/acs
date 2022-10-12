@@ -31,7 +31,7 @@ namespace Sentry
 		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
 		this->mMessageComponent = this->GetOrAddComponent<ProtoComponent>();
 
-		std::vector<std::string> components;
+        std::vector<std::string> components;
 		if (this->mConfig->GetMember("component", components)) //添加组件
 		{
 			for (const std::string& name: components)
@@ -44,17 +44,13 @@ namespace Sentry
 				}
 			}
 		}
-        std::vector<const ServiceConfig *> configs;
-        if(this->mConfig->GetServiceConfigs(configs) > 0)
+        ServiceLaunchComponent *launchComponent = this->GetComponent<ServiceLaunchComponent>();
+        if(launchComponent != nullptr && !launchComponent->InitService())
         {
-            ServiceLaunchComponent *launchComponent = this->GetOrAddComponent<ServiceLaunchComponent>();
-            if (!launchComponent->InitService())
-            {
-                return false;
-            }
+            return false;
         }
 
-		this->GetComponents(components);
+        this->GetComponents(components);
 		for (const std::string& name: components)
 		{
 			Component* component = this->GetComponentByName(name);
@@ -218,12 +214,11 @@ namespace Sentry
 
 	void App::WaitAllServiceStart()
 	{
-        std::vector<const ServiceConfig *> components;
-        this->mConfig->GetServiceConfigs(components);
-		for (const ServiceConfig * config: components)
+        std::vector<std::string> components;
+        this->mConfig->GetServices(components);
+		for (const std::string name: components)
 		{
 			int count = 0;
-            const std::string & name = config->Name;
 			IServiceBase* serviceBase = this->GetComponent<IServiceBase>(name);
 			while (serviceBase != nullptr && !serviceBase->IsStartComplete())
 			{

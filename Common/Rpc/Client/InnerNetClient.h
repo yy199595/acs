@@ -27,6 +27,9 @@ namespace Sentry
         void OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t) final;
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	private:
+        std::string mUserName;
+        std::string mPassword;
+        std::string mLocation;
         Tcp::DecodeState mState;
 		InnerNetComponent* mTcpComponent;
         std::shared_ptr<Rpc::Data> mMessage;

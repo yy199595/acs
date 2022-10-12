@@ -10,10 +10,11 @@
 #include"OuterNetComponent.h"
 #include"Component/InnerNetComponent.h"
 #include"Service/LocalService.h"
+#include"Service/InnerService.h"
 #include"Component/RedisDataComponent.h"
 #include"Component/ProtoComponent.h"
 #include"Component/UnitMgrComponent.h"
-#include"Component/UnitLocationComponent.h"
+
 namespace Sentry
 {
 
@@ -51,22 +52,20 @@ namespace Sentry
             return XCode::NotFoundRpcConfig;
         }
 
-        UnitLocationComponent * locationComponent = player->GetComponent<UnitLocationComponent>();
-        if(locationComponent == nullptr)
+        std::string address;
+        if(!targetService->GetLocation(userId, address))
         {
-        }
-        std::string address;        // TODO
-        if(!locationComponent->Get(service, address))
-        {
-            if(!targetService->GetLocation(address))
+            if(!targetService->AllotLocation(userId, address))
             {
-                return XCode::CallServiceNotFound;
+                return XCode::Failure;
             }
-            locationComponent->Add(service, address);
-            Service * innerService = this->GetApp()->GetService("InnerService");
-            if(innerService != nullptr)
+            s2s::location::sync request;
+            request.set_name(service);
+            request.set_user_id(userId);
+            InnerService * service = this->GetComponent<InnerService>();
+            if(service->Send(address, "OnUserJoin", request) != XCode::Successful)
             {
-                innerService->Call(address, "OnUserJoin");
+                return XCode::NetWorkError;
             }
         }
         message->GetHead().Add("id", userId);

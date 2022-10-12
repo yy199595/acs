@@ -12,7 +12,7 @@ namespace Sentry
 {
 	class ServiceMethod;
 	class InnerNetClient;
-    class Service : public ILuaRegister, public LocationComponent, public IServiceBase
+    class Service : public LocationComponent, public ILuaRegister, public IServiceBase
 	{
 	 public:
 		Service();

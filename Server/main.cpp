@@ -37,8 +37,6 @@
 #include"Service/HttpRpcService.h"
 #include"Service/LocalLuaHttpService.h"
 
-#include"Component/UnitLocationComponent.h"
-
 #ifdef __ENABLE_MONGODB__
 #include"Service/MongoService.h"
 #include"Component/MongoDBComponent.h"
@@ -102,9 +100,6 @@ void RegisterComponent()
 // lua
     ComponentFactory::Add<LuaScriptComponent>("LuaScriptComponent");
     ComponentFactory::Add<Client::ClientComponent>("ClientComponent");
-
-// unit
-    ComponentFactory::Add<UnitLocationComponent>("UnitLocationComponent");
 
 }
 

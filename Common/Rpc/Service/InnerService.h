@@ -16,7 +16,9 @@ namespace Sentry
     private:
         XCode Ping();
         XCode Hotfix();
-        XCode OnUserJoin(long long userId);
+        XCode Push(const s2s::location::push & request);
+        XCode OnUserJoin(const s2s::location::sync & request);
+        XCode OnUserExit(const s2s::location::sync & request);
         XCode StartService(const com::type::string & request);
         XCode CloseService(const com::type::string & request);
     private:

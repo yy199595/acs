@@ -11,14 +11,18 @@
         "log": "log",
         "proto": "proto",
         "source": "source",
+        "user": "config/user.json",
         "http": "script/Server/web",
         "service": "config/service.json"
+    },
+    "user": {
+        "name": "root",
+        "passwd": "199595yjz."
     },
     "listener": {
         "rpc": {
             "port": 7788,
-            "ip": "127.0.0.1",
-            "component": "InnerNetComponent"
+            "ip": "127.0.0.1"
         },
         "web": {
             "port": 8080,
@@ -91,7 +95,6 @@
         "main": "script/Server/Server.lua"
     },
     "component": [
-        "HttpComponent",
         "ConsoleComponent",
         "MongoDataComponent",
         "NetThreadComponent",
@@ -99,70 +102,18 @@
         "UnitMgrComponent",
         "GateAgentComponent",
         "UserSyncComponent",
-        "HttpWebComponent",
-        "MongoAgentComponent",
-        "DataSyncComponent"
-    ],
-    "AllServer": [
-        "InnerService",
-        "OuterService",
-        "MysqlService",
-        "MongoService",
-        "ChatService"
-    ],
-    "ChatService": [
-        "InnerService",
-        "ChatService"
-    ],
-    "DataServer": [
-        "InnerService",
-        "MysqlService",
-        "MongoService"
-    ],
-    "LoginService": [
-        "AccountService"
-    ],
-    "GateServer": [
-        "InnerService",
-        "OuterService"
+        "DataSyncComponent",
+        "ServiceLaunchComponent"
     ],
     "services": {
-        "RpcTest": {
-            "Type": "rpc",
-            "IsStart": true
-        },
-        "ChatService": {
-            "Type": "rpc",
-            "IsStart": true
-        },
-        "MysqlService": {
-            "Type": "rpc",
-            "IsStart": true
-        },
-        "MongoService": {
-            "Type": "rpc",
-            "IsStart": true
-        },
-        "OuterService": {
-            "Type": "rpc",
-            "IsStart": true
-        },
-        "InnerService": {
-            "Type": "rpc",
-            "IsStart": true
-        },
-        "AccountService": {
-            "Type": "http",
-            "IsStart": true
-        },
-        "HttpWebService": {
-            "Type": "http",
-            "IsStart": true
-        },
-        "HttpRpcService": {
-            "Type": "http",
-            "IsStart": true
-        }
+        "ChatService": true,
+        "MysqlService": true,
+        "MongoService": true,
+        "OuterService": true,
+        "InnerService": true,
+        "AccountService": true,
+        "HttpWebService": true,
+        "HttpRpcService": true
     },
     "white_list": [
         "127.0.0.1"

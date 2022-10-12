@@ -33,15 +33,6 @@ namespace Sentry
         unsigned short Port = 0;
     };
 
-    struct ServiceConfig
-    {
-    public:
-        bool IsStart;
-        std::string Type;
-        std::string Name;
-        std::string Address;
-    };
-
 	struct ListenConfig;
     class ServerConfig : public Json::Reader
     {
@@ -58,9 +49,8 @@ namespace Sentry
 		bool GetPath(const std::string & name, std::string & path) const;
 		const std::string & GetExename() const { return this->mExePath;}
 		const std::string & GetWorkPath() const { return this->mWrokDir; }
-        const ServiceConfig * GetServiceConfig(const std::string & name) const;
-        size_t GetServiceConfigs(std::vector<const ServiceConfig *> & configs) const;
         const std::string & GetLocalHost() const { return this->mLocalHost; }
+        size_t GetServices(std::vector<std::string> & services, bool start = false) const;
     private:
         int mNodeId;
 		std::string mContent;
@@ -71,6 +61,6 @@ namespace Sentry
         std::string mLocalHost;
         std::unordered_map<std::string, std::string> mPaths;
 		std::unordered_map<std::string, ListenConfig> mListens;
-        std::unordered_map<std::string , ServiceConfig> mServiceConfigs;
+        std::unordered_map<std::string , bool> mServiceConfigs;
     };
 }

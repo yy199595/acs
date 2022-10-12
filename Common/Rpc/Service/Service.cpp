@@ -28,7 +28,7 @@ namespace Sentry
 	{
 		luaRegister.BeginRegister<Service>();
 		luaRegister.PushExtensionFunction("Call", Lua::Service::Call);
-        luaRegister.PushExtensionFunction("GetLocation", Lua::Service::GetLocation);
+        luaRegister.PushExtensionFunction("AllotLocation", Lua::Service::AllotLocation);
 	}
 
     const RpcMethodConfig *Service::GetMethodConfig(const std::string &method) const

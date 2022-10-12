@@ -15,6 +15,9 @@ namespace Sentry
 		: TcpContext(socket, 1024 * 1024), mTcpComponent(component)
 	{
         this->mState = Tcp::DecodeState::Head;
+        this->mUserName = component->GetUser();
+        this->mPassword = component->GetPassword();
+        this->mLocation = App::Get()->GetConfig().GetLocalHost();
 	}
 
 	void InnerNetClient::StartClose()
@@ -136,6 +139,20 @@ namespace Sentry
 			this->mTimer->async_wait(std::bind(std::bind(&InnerNetClient::Connect, this->shared_from_this())));
 			return;
 		}
+
+        std::shared_ptr<Rpc::Data> authMessage =
+            Rpc::Data::New(Tcp::Type::Auth, Tcp::Porto::Protobuf);
+        {
+            authMessage->GetHead().Add("user", this->mUserName);
+            authMessage->GetHead().Add("passwd", this->mPassword);
+            authMessage->GetHead().Add("location", this->mLocation);
+        }
+        if(this->SendSync(authMessage) <=0)
+        {
+            assert(false);
+            return;
+        }
+        CONSOLE_LOG_ERROR("send auth message successful");
         this->SendFromMessageQueue();
         this->ReceiveMessage(RPC_PACK_HEAD_LEN);
     }

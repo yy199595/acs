@@ -55,36 +55,15 @@ namespace Sentry
             }
             this->GetListener("rpc", this->mLocalHost);
         }
-        if(this->GetJsonValue("services") != nullptr)
+        const rapidjson::Value  * value1 = this->GetJsonValue("services");
+        if(value1 != nullptr && value1->IsObject())
         {
-            std::unordered_map<std::string, const rapidjson::Value *> services;
-            IF_THROW_ERROR(this->GetMember("services", services));
-            for (auto iter = services.begin(); iter != services.end(); iter++)
+            auto iter = value1->MemberBegin();
+            for(; iter != value1->MemberEnd(); iter++)
             {
-                const std::string & name = iter->first;
-                const rapidjson::Value &jsonObject = *iter->second;
-                if(jsonObject.IsObject())
-                {
-                    ServiceConfig serviceConfig;
-                    if(!jsonObject.HasMember("Type"))
-                    {
-                        CONSOLE_LOG_FATAL(name << " not config [Type]");
-                        return false;
-                    }
-                    if(!jsonObject.HasMember("IsStart"))
-                    {
-                        CONSOLE_LOG_FATAL(name << " not config [IsStart]");
-                        return false;
-                    }
-                    serviceConfig.Type = jsonObject["Type"].GetString();
-                    serviceConfig.IsStart = jsonObject["IsStart"].GetBool();
-                    if(jsonObject.HasMember("Address"))
-                    {
-                        serviceConfig.Address = jsonObject["Address"].GetString();
-                    }
-                    serviceConfig.Name = name;
-                    this->mServiceConfigs.emplace(name, serviceConfig);
-                }
+                bool start = iter->value.GetBool();
+                const std::string name(iter->name.GetString());
+                this->mServiceConfigs.emplace(name, start);
             }
         }
 
@@ -102,20 +81,18 @@ namespace Sentry
 		return true;
 	}
 
-    const ServiceConfig *ServerConfig::GetServiceConfig(const std::string &name) const
+    size_t ServerConfig::GetServices(std::vector<std::string> &services, bool start) const
     {
-        auto iter = this->mServiceConfigs.find(name);
-        return iter != this->mServiceConfigs.end() ? &iter->second : nullptr;
-    }
-
-    size_t ServerConfig::GetServiceConfigs(std::vector<const ServiceConfig *> &configs) const
-    {
-        auto iter = this->mServiceConfigs.begin();
-        for(; iter != this->mServiceConfigs.end(); iter++)
+        for(auto & value : this->mServiceConfigs)
         {
-            configs.emplace_back(&iter->second);
+            if(start && value.second)
+            {
+                services.emplace_back(value.first);
+                continue;
+            }
+            services.emplace_back(value.first);
         }
-        return configs.size();
+        return services.size();
     }
 
     const ListenConfig *ServerConfig::GetListenConfig(const char *name) const

@@ -12,6 +12,7 @@ namespace Tcp
     enum class Type
     {
         None,
+        Auth,
         Request,
         Response,
         Forward,

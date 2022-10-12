@@ -4,6 +4,7 @@
 #include"Tcp/SocketProxy.h"
 #include"InnerNetMessageComponent.h"
 #include"Config/ServiceConfig.h"
+#include"File/FileHelper.h"
 #include"Component/OuterNetComponent.h"
 #include"Component/NetThreadComponent.h"
 #include"google/protobuf/util/json_util.h"
@@ -16,35 +17,85 @@ namespace Sentry
     }
 	bool InnerNetComponent::LateAwake()
 	{
+        std::string path;
+        if(!this->GetConfig().GetPath("user", path))
+        {
+            return false;
+        }
+        rapidjson::Document document;
+        if(!Helper::File::ReadJsonFile(path, document))
+        {
+            return false;
+        }
+        auto iter = document.MemberBegin();
+        for(; iter != document.MemberEnd(); iter++)
+        {
+            const std::string user(iter->name.GetString());
+            const std::string passwd(iter->value.GetString());
+            this->mUserMaps.emplace(user, passwd);
+        }
+
         this->mOuterComponent = this->GetComponent<OuterNetComponent>();
         LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<NetThreadComponent>());
+        LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("user", "name", this->mUserName));
+        LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("user", "passwd", this->mUserName));
         LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>());
 		return true;
 	}
 
     void InnerNetComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Data> message)
     {
+        CONSOLE_LOG_ERROR("receive message typ " << message->GetType());
         switch ((Tcp::Type) message->GetType())
         {
+            case Tcp::Type::Auth:
+            {
+                if (!this->OnAuth(address, message))
+                {
+                    this->StartClose(address);
+                    CONSOLE_LOG_ERROR("auth error " << address);
+                }
+            }
+                break;
             case Tcp::Type::Request:
-                if (!this->OnRequest(address, message))
+            {
+                if (!this->IsAuth(address))
                 {
                     this->StartClose(address);
                     CONSOLE_LOG_ERROR("request message error close : " << address);
                 }
+                this->OnRequest(address, message);
+            }
                 break;
             case Tcp::Type::Forward:
-                this->OnForward(message);
-                break;
-            case Tcp::Type::Broadcast:
-                this->OnBroadcast(message);
-                break;
-            case Tcp::Type::Response:
-                if (!this->OnResponse(address, message))
+            {
+                if (!this->IsAuth(address))
                 {
                     this->StartClose(address);
-                    CONSOLE_LOG_ERROR("response message error close : " << address);
+                    CONSOLE_LOG_ERROR("request message error close : " << address);
                 }
+                this->OnForward(message);
+            }
+                break;
+            case Tcp::Type::Broadcast:
+            {
+                if (!this->IsAuth(address))
+                {
+                    this->StartClose(address);
+                    CONSOLE_LOG_ERROR("request message error close : " << address);
+                }
+                this->OnBroadcast(message);
+            }
+                break;
+            case Tcp::Type::Response:
+            {
+                if (!this->IsAuth(address))
+                {
+                    this->StartClose(address);
+                    CONSOLE_LOG_ERROR("request message error close : " << address);
+                }
+                this->OnResponse(address, message);
+            }
                 break;
             default:
             {
@@ -53,6 +104,29 @@ namespace Sentry
                 LOG_ERROR("call " << func << " type error");
             }
         }
+    }
+
+    bool InnerNetComponent::OnAuth(const std::string & address, std::shared_ptr<Rpc::Data> message)
+    {
+        InnerServerNode serverNode;
+        const Rpc::Head &head = message->GetHead();
+        LOG_CHECK_RET_FALSE(head.Get("user", serverNode.UserName));
+        LOG_CHECK_RET_FALSE(head.Get("passwd", serverNode.PassWord));
+        LOG_CHECK_RET_FALSE(head.Get("location", serverNode.Location));
+        auto iter = this->mUserMaps.find(serverNode.UserName);
+        if (iter == this->mUserMaps.end() || iter->second != serverNode.PassWord)
+        {
+            CONSOLE_LOG_ERROR(address << " auth failure");
+            return false;
+        }
+        this->mLocationMaps.emplace(address, serverNode);
+        return true;
+    }
+
+    bool InnerNetComponent::IsAuth(const std::string &address)
+    {
+        auto iter = this->mRpcClientMap.find(address);
+        return iter != this->mRpcClientMap.end();
     }
 
 	bool InnerNetComponent::OnRequest(const std::string& address, std::shared_ptr<Rpc::Data> message)

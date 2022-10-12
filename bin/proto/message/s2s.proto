@@ -39,6 +39,21 @@ message broadcast
     }
 }
 
+message location
+{
+    message sync
+    {
+        string name = 1;
+        int64 user_id = 2;
+    }
+    message push
+    {
+        string name = 1;
+        int64 user_id = 2;
+        string address = 3;
+    }
+}
+
 message client
 {
     message call

@@ -88,16 +88,24 @@ namespace Lua
         return netMessageComponent->AddTask(luaRpcTaskSource)->Await();
     }
 
-	int Service::GetLocation(lua_State *lua)
+	int Service::AllotLocation(lua_State *lua)
 	{
 		std::string address;
 		Sentry::Service* service = UserDataParameter::Read<Sentry::Service*>(lua, 1);
-		if(service->GetLocation(address))
+        if(lua_isinteger(lua, 2))
+        {
+            long long userId = lua_tointeger(lua, 2);
+            if(!service->AllotLocation(userId, address))
+            {
+                return 0;
+            }
+        }
+		else if(!service->AllotLocation(address))
 		{
-			lua_pushlstring(lua, address.c_str(), address.size());
-			return 1;
+			return 0;
 		}
-		return 0;
+        lua_pushstring(lua, address.c_str());
+        return 1;
 	}
 
     int Service::AddLocation(lua_State *lua)

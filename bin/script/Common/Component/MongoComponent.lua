@@ -8,7 +8,7 @@ function MongoComponent.InsertOnce(tab, data, flag)
     if type(data) == "table" then
         data = Json.Encode(data)
     end
-    local address = self:GetLocation()
+    local address = self:AllotLocation()
     return self:Call(address, "Insert", {
         tab = tab,
         json = data,
@@ -21,7 +21,7 @@ function MongoComponent.Delete(tab, data, limit, flag)
         data = Json.Encode(data)
     end
     assert(type(data) == "string")
-    local address = self:GetLocation()
+    local address = self:AllotLocation()
     return self:Call(address, "Delete", {
         tab = tab,
         json = data,
@@ -35,7 +35,7 @@ function MongoComponent.QueryOnce(tab, data)
         data = Json.Encode(data)
     end
     assert(type(data) == "string")
-    local address = self:GetLocation()
+    local address = self:AllotLocation()
     local code, response = self:Call(address, "Query", {
         tab = tab,
         json = data,
@@ -56,7 +56,7 @@ function MongoComponent.Query(tab, data, limit)
     end
     print("query json ", data)
     assert(type(data) == "string")
-    local address = self:GetLocation()
+    local address = self:AllotLocation()
     local code, response = self:Call(address, "Query", {
         tab = tab,
         json = data,
@@ -83,7 +83,7 @@ function MongoComponent.QueryDatas(tab, querys)
             ["$in"] = querys
         }
     }
-    local address = self:GetLocation()
+    local address = self:AllotLocation()
     local code, response = self:Call(address, "Query", {
         tab = tab,
         limit = #querys,
@@ -104,7 +104,7 @@ end
 function MongoComponent.SetIndex(tab, name)
     assert(type(tab) == "string")
     assert(type(name) == "string")
-    local address = self:GetHost()
+    local address = self:AllotLocation()
     return self:Call(address, "SetIndex", {
         tab = tab,
         name = name
@@ -121,7 +121,7 @@ function MongoComponent.Update(tab, select, update, tag, flag)
     assert(type(select) == "string")
     assert(type(update) == "string")
 
-    local address = self:GetHost()
+    local address = self:AllotLocation()
     return self:Call(address, "Update", {
         tab = tab,
         select = select,

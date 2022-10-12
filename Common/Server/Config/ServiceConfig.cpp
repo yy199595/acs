@@ -7,12 +7,11 @@ namespace Sentry
 {
 	bool RpcServiceConfig::OnLoadConfig(const rapidjson::Value & json)
 	{
-		if(!json.IsObject() || !json.HasMember("Server"))
+		if(!json.IsObject())
 		{
 			return false;
 		}
 		this->mConfigs.clear();
-        this->mServer = json["Server"].GetString();
 		auto iter = json.MemberBegin();
 		for(; iter != json.MemberEnd(); iter++)
 		{
@@ -40,17 +39,6 @@ namespace Sentry
 		}
 		return true;
 	}
-	bool RpcServiceConfig::ParseFunName(const std::string& func, std::string& service, std::string& method)
-	{
-		size_t pos = func.find('.');
-		if(pos == std::string::npos)
-		{
-			return false;
-		}
-		service = func.substr(0, pos);
-		method = func.substr(pos + 1);
-		return true;
-	}
 }
 
 namespace Sentry
@@ -61,7 +49,6 @@ namespace Sentry
 		{
 			return false;
 		}
-        this->mServer = json["Server"].GetString();
         auto iter = json.MemberBegin();
 		for(; iter != json.MemberEnd(); iter++)
 		{

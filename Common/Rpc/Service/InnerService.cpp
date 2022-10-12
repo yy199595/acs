@@ -38,7 +38,10 @@ namespace Sentry
     bool InnerService::OnStart()
     {
         BIND_COMMON_RPC_METHOD(InnerService::Ping);
+        BIND_COMMON_RPC_METHOD(InnerService::Push);
         BIND_COMMON_RPC_METHOD(InnerService::Hotfix);
+        BIND_COMMON_RPC_METHOD(InnerService::OnUserJoin);
+        BIND_COMMON_RPC_METHOD(InnerService::OnUserExit);
         BIND_COMMON_RPC_METHOD(InnerService::StartService);
         BIND_COMMON_RPC_METHOD(InnerService::CloseService);
         RedisSubComponent *subComponent = this->GetComponent<RedisSubComponent>();
@@ -55,9 +58,36 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode InnerService::OnUserJoin(long long userId)
+    XCode InnerService::Push(const s2s::location::push &request)
+    {
+        const std::string & service = request.name();
+        Service * localService = this->GetApp()->GetService(service);
+        if(localService == nullptr)
+        {
+            CONSOLE_LOG_ERROR("not find service : " << service);
+            return XCode::Failure;
+        }
+        const std::string & address = request.address();
+        localService->AddLocation(address, request.user_id());
+        return XCode::Successful;
+    }
+
+    XCode InnerService::OnUserJoin(const s2s::location::sync & request)
+    {
+        const std::string & service = request.name();
+        IServiceUnitSystem * unitSystem = this->GetComponent<IServiceUnitSystem>(service);
+        if(unitSystem != nullptr)
+        {
+            unitSystem->OnJoin(request.user_id());
+        }
+        CONSOLE_LOG_INFO(request.user_id() << " join service " << service);
+        return XCode::Successful;
+    }
+
+    XCode InnerService::OnUserExit(const s2s::location::sync &request)
     {
 
+        return XCode::Successful;
     }
 
     XCode InnerService::Hotfix()

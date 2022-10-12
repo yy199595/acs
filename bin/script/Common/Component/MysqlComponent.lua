@@ -4,7 +4,7 @@ local self = App.GetComponent("MysqlService")
 local message = App.GetComponent("ProtoComponent")
 
 function MysqlComponent.Create(tabName, keys, data)
-    local address = self:GetLocation()
+    local address = self:AllotLocation()
     local request = message:New(tabName, data)
     return self:Call(address, "Create", {
         keys = keys,
@@ -16,7 +16,7 @@ function MysqlComponent.Add(tabName, data, flag)
     assert(type(data) == "table")
     assert(type(tabName) == "string")
 
-    local address = self:GetLocation()
+    local address = self:AllotLocation()
     return self:Call(address, "Add",  {
         table = tabName,
         flag = flag or 0,
@@ -28,7 +28,7 @@ function MysqlComponent.Delete(tabName, where, flag)
     assert(type(where) == "table")
     assert(type(tabName) == "string")
 
-    local address = self:GetLocation()
+    local address = self:AllotLocation()
     return mysqlService:Call(address, "Delete", {
         table = tabName,
         flag = flag or 0,
@@ -40,7 +40,7 @@ function MysqlComponent.QueryOnce(tabName, where, flag)
     assert(type(where) == "table")
     assert(type(tabName) == "string")
 
-    local address = self:GetLocation()
+    local address = self:AllotLocation()
     local code, response = self:Call(address, "Query", {
         limit = 1,
         table = tabName,
@@ -56,8 +56,8 @@ function MysqlComponent.QueryAll(tabName, where, limit)
     assert(type(where) == "table")
     assert(type(tabName) == "string")
 
-    local address = self:GetLocation()
     print(tabName, where, address)
+    local address = self:AllotLocation()
     local code, response = self:Call(address, "Query", {
         table = tabName,
         limit = limit or 0,
@@ -78,7 +78,7 @@ function MysqlComponent.QueryFields(tabName, fields, where, limit)
     assert(type(where) == "table")
     assert(type(tabName) == "string")
 
-    local address = self:GetLocation()
+    local address = self:AllotLocation()
     local code, response = self:Call(address, "Query", {
         table = tabName,
         limit = limit or 0,
@@ -100,7 +100,7 @@ function MysqlComponent.Update(tabName, where, update, flag)
     assert(type(update) == "table")
     assert(type(tabName) == "string")
 
-    local address = self:GetLocation()
+    local address = self:AllotLocation()
     return self:Call(address, "Update", {
         table = tabName,
         flag = flag or 0,

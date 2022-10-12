@@ -16,7 +16,6 @@
 #endif
 #include"Md5/MD5.h"
 #include"Component/UnitMgrComponent.h"
-#include"Component/UnitLocationComponent.h"
 namespace Sentry
 {
 	void OuterNetComponent::Awake()
@@ -24,13 +23,11 @@ namespace Sentry
         this->mNetComponent = nullptr;
         this->mTimerComponent = nullptr;
         this->mOuterMessageComponent = nullptr;
-        this->GetApp()->GetOrAddComponent<UnitMgrComponent>();
     }
 
 	bool OuterNetComponent::LateAwake()
 	{
         this->mTimerComponent = this->GetApp()->GetTimerComponent();
-        this->mUnitComponent = this->GetComponent<UnitMgrComponent>();
         this->mNetComponent = this->GetComponent<NetThreadComponent>();
         LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisDataComponent>());
 		LOG_CHECK_RET_FALSE(this->mOuterMessageComponent = this->GetComponent<OuterNetMessageComponent>());
@@ -93,19 +90,7 @@ namespace Sentry
 
     void OuterNetComponent::OnAuthSuccessful(long long userId, const std::string &address)
     {
-        std::shared_ptr<Unit> player;
-        player = this->mUnitComponent->Find(userId);
-        if(player == nullptr)
-        {
-            player = std::make_shared<Unit>(userId);
-            player->AddComponent<UnitLocationComponent>();
-            this->mUnitComponent->Add(player);
-        }
-        UnitLocationComponent * locationComponent = player->GetComponent<UnitLocationComponent>();
-        if(locationComponent != nullptr)
-        {
-            locationComponent->Add(address);
-        }
+
         this->mUserAddressMap.emplace(address, userId);
         this->mClientAddressMap.emplace(userId, address);
     }

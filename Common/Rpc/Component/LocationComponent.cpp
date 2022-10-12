@@ -17,14 +17,28 @@ namespace Sentry
         }
     }
 
-    bool LocationComponent::AddLocation(long long userId, const std::string &address)
+    bool LocationComponent::DelLocation(long long useId)
+    {
+        auto iter = this->mUnitLocations.find(useId);
+        if(iter == this->mUnitLocations.end())
+        {
+            return false;
+        }
+        this->mUnitLocations.erase(iter);
+        const std::string & name = this->GetServiceName();
+        CONSOLE_LOG_ERROR(name << " remove user : " << useId);
+        return true;
+    }
+
+    void LocationComponent::AddLocation(const std::string &address, long long userId)
     {
         if(!this->HasLocation(address))
         {
-            this->mUnitLocations[userId] = address;
-            return true;
+            return;
         }
-        return false;
+        this->mUnitLocations[userId] = address;
+        const std::string & name = this->GetServiceName();
+        CONSOLE_LOG_INFO(name << " add new user : " << userId);
     }
 
     bool LocationComponent::GetLocation(long long userId, std::string &address)
@@ -55,7 +69,7 @@ namespace Sentry
         return false;
     }
 
-    bool LocationComponent::GetLocation(std::string &address, int max)
+    bool LocationComponent::AllotLocation(std::string &address)
     {
         if(this->mHosts.empty())
         {
@@ -64,7 +78,7 @@ namespace Sentry
         HostCounter * hostCounter = this->mHosts.front();
         for(HostCounter * counter : this->mHosts)
         {
-            if(counter->Count < max)
+            if(counter->Count < 100)
             {
                 counter->Count++;
                 address = counter->Address;
@@ -76,6 +90,16 @@ namespace Sentry
             }
         }
         address = hostCounter->Address;
+        return true;
+    }
+
+    bool LocationComponent::AllotLocation(long long userId, std::string &address)
+    {
+        if(!this->AllotLocation(address))
+        {
+            return false;
+        }
+        this->mUnitLocations[userId] = address;
         return true;
     }
 

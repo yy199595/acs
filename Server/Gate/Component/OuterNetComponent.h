@@ -39,7 +39,6 @@ namespace Sentry
         bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Data> message);
     private:
 		class TimerComponent* mTimerComponent;
-        class UnitMgrComponent * mUnitComponent;
         class NetThreadComponent * mNetComponent;
         class RedisDataComponent * mRedisComponent;
         std::unordered_map<std::string, long long> mTokens;
