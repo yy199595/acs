@@ -107,19 +107,25 @@ namespace Sentry
 
     bool InnerNetComponent::OnAuth(const std::string & address, std::shared_ptr<Rpc::Data> message)
     {
-        InnerServerNode serverNode;
+        std::unique_ptr<InnerServerNode> serverNode(new InnerServerNode());
         const Rpc::Head &head = message->GetHead();
-        LOG_CHECK_RET_FALSE(head.Get("user", serverNode.UserName));
-        LOG_CHECK_RET_FALSE(head.Get("passwd", serverNode.PassWord));
-        LOG_CHECK_RET_FALSE(head.Get("location", serverNode.Location));
-        auto iter = this->mUserMaps.find(serverNode.UserName);
-        if (iter == this->mUserMaps.end() || iter->second != serverNode.PassWord)
+        LOG_CHECK_RET_FALSE(head.Get("user", serverNode->UserName));
+        LOG_CHECK_RET_FALSE(head.Get("passwd", serverNode->PassWord));
+        LOG_CHECK_RET_FALSE(head.Get("location", serverNode->Location));
+        auto iter = this->mUserMaps.find(serverNode->UserName);
+        if (iter == this->mUserMaps.end() || iter->second != serverNode->PassWord)
         {
             CONSOLE_LOG_ERROR(address << " auth failure");
             return false;
         }
-        this->mLocationMaps.emplace(address, serverNode);
+        this->mLocationMaps.emplace(address, std::move(serverNode));
         return true;
+    }
+
+    const InnerServerNode *InnerNetComponent::GetSeverInfo(const std::string &address)
+    {
+        auto iter = this->mLocationMaps.find(address);
+        return iter != this->mLocationMaps.end() ? iter->second.get() : nullptr;
     }
 
     bool InnerNetComponent::IsAuth(const std::string &address)
@@ -236,9 +242,9 @@ namespace Sentry
 		}
 	}
 
-	std::shared_ptr<InnerNetClient> InnerNetComponent::GetOrCreateSession(const std::string& address)
+	InnerNetClient * InnerNetComponent::GetOrCreateSession(const std::string& address)
 	{
-		std::shared_ptr<InnerNetClient> localSession = this->GetSession(address);
+		InnerNetClient * localSession = this->GetSession(address);
 		if (localSession != nullptr)
 		{
 			return localSession;
@@ -256,20 +262,21 @@ namespace Sentry
             return nullptr;
         }
         socketProxy->Init(ip, port);
-		localSession = std::make_shared<InnerNetClient>(this, socketProxy);
+		std::shared_ptr<InnerNetClient> newClient =
+            std::make_shared<InnerNetClient>(this, socketProxy);
 
-		this->mRpcClientMap.emplace(socketProxy->GetAddress(), localSession);
-		return localSession;
+		this->mRpcClientMap.emplace(socketProxy->GetAddress(), newClient);
+		return newClient.get();
 	}
 
-	std::shared_ptr<InnerNetClient> InnerNetComponent::GetSession(const std::string& address)
+	InnerNetClient * InnerNetComponent::GetSession(const std::string& address)
 	{
 		auto iter = this->mRpcClientMap.find(address);
 		if (iter == this->mRpcClientMap.end())
 		{
 			return nullptr;
 		}
-		return iter->second;
+		return iter->second.get();
 	}
 
 
@@ -277,7 +284,7 @@ namespace Sentry
 	{
         assert(message->GetType() == (int)Tcp::Type::Request
             || message->GetType() == (int)Tcp::Type::Response);
-        std::shared_ptr<InnerNetClient> clientSession = this->GetOrCreateSession(address);
+        InnerNetClient * clientSession = this->GetOrCreateSession(address);
 		if (message == nullptr || clientSession == nullptr)
 		{
 			return false;

@@ -38,6 +38,12 @@ namespace Sentry
     {
         switch ((Tcp::Type) message->GetType())
         {
+            case Tcp::Type::Auth:
+                if(!this->OnAuth(address, message))
+                {
+                    this->StartClose(address);
+                }
+                break;
             case Tcp::Type::Request:
                 if (!this->OnRequest(address, message))
                 {
@@ -50,30 +56,37 @@ namespace Sentry
         }
     }
 
+    bool OuterNetComponent::OnAuth(const std::string &address, std::shared_ptr<Rpc::Data> message)
+    {
+        long long userId = 0;
+        if (this->GetUserId(address, userId)) //已经验证过了
+        {
+            return true;
+        }
+        std::string token;
+        const Rpc::Head & head = message->GetHead();
+        LOG_CHECK_RET_FALSE(head.Get("token", token));
+
+        auto iter = this->mTokens.find(token);
+        if (iter == this->mTokens.end())
+        {
+            LOG_ERROR(address << " auth failure not find token");
+            return false;
+        }
+        this->mTokens.erase(iter);
+        message->GetHead().Remove("token");
+        this->OnAuthSuccessful(iter->second, address);
+        message->GetHead().Add("code", XCode::Successful);
+        this->mOuterMessageComponent->OnResponse(address, message);
+        return true;
+    }
+
     bool OuterNetComponent::OnRequest(const std::string &address, std::shared_ptr<Rpc::Data> message)
     {
         long long userId = 0;
         if (!this->GetUserId(address, userId)) //没有验证
         {
-            std::string token;
-            if (!message->GetHead().Get("token", token))
-            {
-                LOG_ERROR(address << " auth failure not find token");
-                return false;
-            }
-            message->GetHead().Remove("token");
-            auto iter = this->mTokens.find(token);
-            if (iter == this->mTokens.end())
-            {
-                LOG_ERROR(address << " auth failure not find token");
-                return false;
-            }
-            userId = iter->second;
-            this->mTokens.erase(iter);
-            this->OnAuthSuccessful(userId, address);
-            message->GetHead().Add("code", XCode::Successful);
-            this->mOuterMessageComponent->OnResponse(address, message);
-            return true;
+            return false;
         }
         message->GetHead().Add("client", address);
         XCode code = this->mOuterMessageComponent->OnRequest(userId, message);
@@ -202,7 +215,7 @@ namespace Sentry
 	bool OuterNetComponent::SendData(const std::string &address, std::shared_ptr<Rpc::Data> message)
 	{
         message->GetHead().Remove("address");
-		std::shared_ptr<OuterNetClient> outerNetClient = this->GetGateClient(address);
+		OuterNetClient * outerNetClient = this->GetGateClient(address);
 		if(outerNetClient != nullptr)
 		{
             outerNetClient->SendData(message);
@@ -212,15 +225,15 @@ namespace Sentry
 		return false;
 	}
 
-	std::shared_ptr<OuterNetClient> OuterNetComponent::GetGateClient(const std::string & address)
+	OuterNetClient * OuterNetComponent::GetGateClient(const std::string & address)
 	{
 		auto iter = this->mGateClientMap.find(address);
-		return iter != this->mGateClientMap.end() ? iter->second : nullptr;
+		return iter != this->mGateClientMap.end() ? iter->second.get() : nullptr;
 	}
 
 	void OuterNetComponent::StartClose(const std::string & address)
 	{
-		std::shared_ptr<OuterNetClient> proxyClient = this->GetGateClient(address);
+		OuterNetClient * proxyClient = this->GetGateClient(address);
 		if (proxyClient != nullptr)
 		{
 			proxyClient->StartClose();

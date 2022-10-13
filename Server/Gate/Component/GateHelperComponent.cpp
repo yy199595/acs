@@ -2,24 +2,24 @@
 // Created by yjz on 2022/4/23.
 //
 
-#include"GateAgentComponent.h"
+#include"GateHelperComponent.h"
 #include"Service/OuterService.h"
 #include"Lua/LuaParameter.h"
 #include"Component/InnerNetComponent.h"
 namespace Sentry
 {
-	bool GateAgentComponent::LateAwake()
+	bool GateHelperComponent::LateAwake()
 	{
-		this->mGateService = this->GetComponent<OuterService>();
         this->mInnerComponent = this->GetComponent<InnerNetComponent>();
+        LOG_CHECK_RET_FALSE(this->mGateService = this->GetComponent<OuterService>());
 		return true;
 	}
 
 
-	XCode GateAgentComponent::Call(long long userId, const std::string& func)
+	XCode GateHelperComponent::Call(long long userId, const std::string& func)
 	{
         std::string address;
-        if(!this->GetUserAddress(userId, address))
+        if(!this->mGateService->GetLocation(userId, address))
         {
             return XCode::NotFindUser;
         }
@@ -34,44 +34,10 @@ namespace Sentry
         return XCode::Successful;
 	}
 
-    bool GateAgentComponent::RemoveUserAddress(long long userId)
-    {
-        auto iter = this->mUserHosts.find(userId);
-        if(iter == this->mUserHosts.end())
-        {
-            return false;
-        }
-        this->mUserHosts.erase(iter);
-        return true;
-    }
-
-    bool GateAgentComponent::AddUserAddress(long long userId, std::string &address)
-    {
-        auto iter = this->mUserHosts.find(userId);
-        if(iter != this->mUserHosts.end())
-        {
-            return false;
-        }
-        this->mUserHosts.emplace(userId, address);
-        return true;
-    }
-
-
-    bool GateAgentComponent::GetUserAddress(long long userId, std::string &address)
-    {
-        auto iter = this->mUserHosts.find(userId);
-        if(iter == this->mUserHosts.end())
-        {
-            return false;
-        }
-        address = iter->second;
-        return true;
-    }
-
-	XCode GateAgentComponent::Call(long long userId, const std::string& func, const Message& message)
+	XCode GateHelperComponent::Call(long long userId, const std::string& func, const Message& message)
 	{
         std::string address;
-        if(!this->GetUserAddress(userId, address))
+        if(!this->mGateService->GetLocation(userId, address))
         {
             return XCode::NotFindUser;
         }
@@ -88,10 +54,10 @@ namespace Sentry
         return XCode::Successful;
 	}
 
-	XCode GateAgentComponent::LuaCall(long long userId, const std::string func, std::shared_ptr<Message> message)
+	XCode GateHelperComponent::LuaCall(long long userId, const std::string func, std::shared_ptr<Message> message)
 	{
         std::string address;
-        if(!this->GetUserAddress(userId, address))
+        if(!this->mGateService->GetLocation(userId, address))
         {
             return XCode::NotFindUser;
         }
@@ -108,7 +74,7 @@ namespace Sentry
         return XCode::Successful;
 	}
 
-	XCode GateAgentComponent::BroadCast(const std::string& func)
+	XCode GateHelperComponent::BroadCast(const std::string& func)
 	{
         std::vector<std::string> hosts;
         if(!this->mGateService->GetHosts(hosts))
@@ -125,7 +91,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode GateAgentComponent::BroadCast(const std::string& func, const Message& message)
+	XCode GateHelperComponent::BroadCast(const std::string& func, const Message& message)
 	{
         std::vector<std::string> hosts;
         if(!this->mGateService->GetHosts(hosts))
@@ -146,7 +112,7 @@ namespace Sentry
         return XCode::Successful;
 	}
 
-	XCode GateAgentComponent::LuaBroadCast(const char * func, std::shared_ptr<Message> message)
+	XCode GateHelperComponent::LuaBroadCast(const char * func, std::shared_ptr<Message> message)
 	{
         std::vector<std::string> hosts;
         if(!this->mGateService->GetHosts(hosts))
@@ -167,10 +133,10 @@ namespace Sentry
         return XCode::Successful;
 	}
 
-	void GateAgentComponent::OnLuaRegister(Lua::ClassProxyHelper & luaRegister)
+	void GateHelperComponent::OnLuaRegister(Lua::ClassProxyHelper & luaRegister)
 	{
-		luaRegister.BeginRegister<GateAgentComponent>();
-		luaRegister.PushMemberFunction("Call", &GateAgentComponent::LuaCall);
-		luaRegister.PushMemberFunction("BroadCast", &GateAgentComponent::LuaBroadCast);
+		luaRegister.BeginRegister<GateHelperComponent>();
+		luaRegister.PushMemberFunction("Call", &GateHelperComponent::LuaCall);
+		luaRegister.PushMemberFunction("BroadCast", &GateHelperComponent::LuaBroadCast);
 	}
 }

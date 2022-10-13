@@ -21,7 +21,7 @@ namespace Sentry
     private:
         class ProtoComponent * mProtoComponent;
         class RedisDataComponent * mRedisComponent;
-        class MongoAgentComponent * mMongoComponent;
+        class MongoHelperComponent * mMongoComponent;
     };
 }
 

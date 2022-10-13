@@ -58,7 +58,7 @@ namespace Sentry
     {
         if(tick % 10 == 0)
         {
-           SharedRedisClient redisClient = this->mRedisComponent->GetClient("main");
+           TcpRedisClient * redisClient = this->mRedisComponent->GetClient("main");
            if(redisClient != nullptr)
            {
                Json::Writer json;

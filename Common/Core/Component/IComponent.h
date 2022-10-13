@@ -77,8 +77,8 @@ namespace Sentry
     class IServiceUnitSystem
     {
     public:
-        virtual void OnJoin(long long userId) = 0;
-        virtual void OnExit(long long userId) = 0;
+        virtual void OnLogin(long long userId) = 0;
+        virtual void OnLogout(long long userId) = 0;
     };
 
 	class IServiceBase

@@ -4,10 +4,10 @@
 
 #include"MongoDataComponent.h"
 #include"Proto/ProtoHelper.h"
-#include"Component/MysqlDataComponent.h"
+#include"Component/MysqlHelperComponent.h"
 #include"Component/RedisDataComponent.h"
 
-#include"Component/MongoAgentComponent.h"
+#include"Component/MongoHelperComponent.h"
 #include"Component/ProtoComponent.h"
 namespace Sentry
 {
@@ -15,7 +15,7 @@ namespace Sentry
 	{
 		this->mProtoComponent = this->GetComponent<ProtoComponent>();
 		this->mRedisComponent = this->GetComponent<RedisDataComponent>();
-		this->mMongoComponent = this->GetComponent<MongoAgentComponent>();
+		this->mMongoComponent = this->GetComponent<MongoHelperComponent>();
 		return this->mRedisComponent != nullptr && this->mMongoComponent != nullptr;
 	}
 

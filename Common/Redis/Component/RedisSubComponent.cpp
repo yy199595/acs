@@ -18,7 +18,7 @@ namespace Sentry
             {
                 config.Channels.emplace_back(this->mLocalHost);
             }
-            SharedRedisClient redisClient = this->MakeRedisClient(config);
+            TcpRedisClient * redisClient = this->MakeRedisClient(config);
             if(redisClient == nullptr || !this->Ping(redisClient))
             {
                 return false;
@@ -102,7 +102,7 @@ namespace Sentry
 
     long long RedisSubComponent::Publish(const std::string & name, const std::string& channel, const std::string& message)
     {
-        SharedRedisClient redisClient = this->GetClient(name);
+        TcpRedisClient * redisClient = this->GetClient(name);
         if(redisClient == nullptr)
         {
             LOG_FATAL("not find redis client : " << name);
@@ -115,7 +115,7 @@ namespace Sentry
 
     bool RedisSubComponent::SubscribeChannel(const std::string & name, const std::string& channel)
     {
-        SharedRedisClient redisClient = this->GetClient(name);
+        TcpRedisClient * redisClient = this->GetClient(name);
         if(redisClient == nullptr)
         {
             LOG_FATAL("not find redis client : " << name);

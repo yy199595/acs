@@ -69,11 +69,11 @@ namespace Sentry
             if(localService != nullptr)
             {
                 localService->AddLocation(location);
-                CONSOLE_LOG_ERROR("start rpc service " << name << " successful");
+                CONSOLE_LOG_ERROR("start rpc service [" << name << "] successful");
             }
             else if(localHttpService != nullptr)
             {
-                CONSOLE_LOG_ERROR("start http service " << name << " successful");
+                CONSOLE_LOG_ERROR("start http service [" << name << "] successful");
             }
         }
         return true;

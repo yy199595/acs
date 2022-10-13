@@ -32,6 +32,6 @@ namespace Sentry
 	};
     extern std::string GET_FUNC_NAME(std::string fullName);
 #define BIND_COMMON_RPC_METHOD(func) this->GetMethodRegistry().Bind(GET_FUNC_NAME(#func), &func);
-#define BIND_ADDRESS_RPC_METHOD(func) this->GetMethodRegistry().BindAddress(GET_FUNC_NAME(#func), &func);
+#define BIND_HEAD_RPC_METHOD(func) this->GetMethodRegistry().BindHead(GET_FUNC_NAME(#func), &func);
 }
 #endif //SERVER_LOCALSERVICECOMPONENT_H

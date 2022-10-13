@@ -35,9 +35,10 @@ namespace Sentry
 	 public:
         const std::string & GetUser() const { return this->mUserName; };
         const std::string & GetPassword() const { return this->mPassword; }
-		std::shared_ptr<InnerNetClient> GetSession(const std::string& address);
-		std::shared_ptr<InnerNetClient> GetOrCreateSession(const std::string& address);
+        const InnerServerNode * GetSeverInfo(const std::string & address);
 	 public:
+        InnerNetClient * GetSession(const std::string& address);
+        InnerNetClient * GetOrCreateSession(const std::string& address);
 		bool Send(const std::string & address, std::shared_ptr<Rpc::Data> message);
 	private:
         bool IsAuth(const std::string & address);
@@ -53,7 +54,7 @@ namespace Sentry
         class OuterNetComponent * mOuterComponent;
         class InnerNetMessageComponent* mMessageComponent;
         std::unordered_map<std::string, std::string> mUserMaps;
-        std::unordered_map<std::string, InnerServerNode> mLocationMaps;
         std::unordered_map<std::string, std::shared_ptr<InnerNetClient>> mRpcClientMap;
-	};
+        std::unordered_map<std::string, std::unique_ptr<InnerServerNode>> mLocationMaps;
+    };
 }

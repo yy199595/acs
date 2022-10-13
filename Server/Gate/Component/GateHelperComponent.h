@@ -7,17 +7,12 @@
 #include"Component/RedisChannelComponent.h"
 namespace Sentry
 {
-	class GateAgentComponent final : public Component, public ILuaRegister
+	class GateHelperComponent final : public Component, public ILuaRegister
 	{
 	 public:
-		GateAgentComponent() = default;
-		~GateAgentComponent() = default;
-	 public:
-        bool RemoveUserAddress(long long userId);
-        bool GetUserAddress(long long userId, std::string & address);
-        bool AddUserAddress(long long userId, std::string & address);
+		GateHelperComponent() = default;
+		~GateHelperComponent() = default;
     public:
-
 		XCode Call(long long userId, const std::string & func);
         XCode Call(long long UserId, const std::string & func, const Message & message);
 	 public:
@@ -32,7 +27,6 @@ namespace Sentry
 	 private:
 		class OuterService * mGateService;
         class InnerNetComponent * mInnerComponent;
-        std::unordered_map<long long, std::string> mUserHosts;
 	};
 }
 

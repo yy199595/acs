@@ -42,6 +42,5 @@ namespace Sentry
         std::shared_ptr<RedisResponse> mCurResponse;
         std::shared_ptr<asio::steady_timer> mCloseTimer;
     };
-    typedef std::shared_ptr<TcpRedisClient> SharedRedisClient;
 }
 #endif //GAMEKEEPER_REDISCLIENT_H

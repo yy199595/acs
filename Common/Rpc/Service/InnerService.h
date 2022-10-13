@@ -17,14 +17,19 @@ namespace Sentry
         XCode Ping();
         XCode Hotfix();
         XCode Push(const s2s::location::push & request);
-        XCode OnUserJoin(const s2s::location::sync & request);
-        XCode OnUserExit(const s2s::location::sync & request);
+        XCode Login(const Rpc::Head & head, const s2s::location::sync & request);
+        XCode Logout(const Rpc::Head & head, const s2s::location::sync & request);
+
+    private:
         XCode StartService(const com::type::string & request);
         XCode CloseService(const com::type::string & request);
     private:
         void Awake();
         bool OnStart() final;
         bool OnClose() final { return false; }
+
+    private:
+        class InnerNetComponent * mInnerNetComponent;
     };
 }
 

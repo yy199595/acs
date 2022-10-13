@@ -102,7 +102,6 @@
         "NetThreadComponent",
         "LuaScriptComponent",
         "UnitMgrComponent",
-        "GateAgentComponent",
         "UserSyncComponent",
         "DataSyncComponent",
         "ServiceLaunchComponent"

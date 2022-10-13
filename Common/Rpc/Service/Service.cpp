@@ -69,7 +69,7 @@ namespace Sentry
         const RpcMethodConfig * methodConfig = this->mConfig->GetConfig(func);
         if(methodConfig == nullptr)
         {
-            CONSOLE_LOG_ERROR("call " << func << " not find config");
+            CONSOLE_LOG_ERROR("call [" << func << "] not find config");
             return false;
         }
         std::shared_ptr<Rpc::Data> request

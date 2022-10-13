@@ -1,16 +1,16 @@
-#include "MysqlDataComponent.h"
+#include "MysqlHelperComponent.h"
 
 #include"String/StringHelper.h"
 #include"Service/MysqlService.h"
 
 namespace Sentry
 {
-	bool MysqlDataComponent::LateAwake()
+	bool MysqlHelperComponent::LateAwake()
 	{
 		this->mMysqlService = this->GetComponent<MysqlService>();
 		return this->mMysqlService != nullptr;
 	}
-	XCode MysqlDataComponent::Add(const Message& message, int flag)
+	XCode MysqlHelperComponent::Add(const Message& message, int flag)
 	{
 		db::mysql::add request;
 		request.set_flag(flag);
@@ -19,7 +19,7 @@ namespace Sentry
 		return this->Call("Add", request);
 	}
 
-	XCode MysqlDataComponent::Save(const Message & data, int flag)
+	XCode MysqlHelperComponent::Save(const Message & data, int flag)
 	{
 		db::mysql::save request;
 		request.set_flag(flag);
@@ -28,7 +28,7 @@ namespace Sentry
 		return  this->Call("Save", request);
 	}
 
-    XCode MysqlDataComponent::Delete(const std::string &table, const std::string &deleteJson, int flag)
+    XCode MysqlHelperComponent::Delete(const std::string &table, const std::string &deleteJson, int flag)
     {
         db::mysql::remove request;
         request.set_table(table);
@@ -36,8 +36,8 @@ namespace Sentry
         return this->Call("Delete", request);
     }
 
-    XCode MysqlDataComponent::Update(const std::string &table, const std::string &updateJson,
-                                     const std::string &whereJson, int flag)
+    XCode MysqlHelperComponent::Update(const std::string &table, const std::string &updateJson,
+                                       const std::string &whereJson, int flag)
     {
         db::mysql::update request;
 
@@ -49,7 +49,7 @@ namespace Sentry
     }
 
 
-	XCode MysqlDataComponent::Call(const std::string& func, const Message& data, std::shared_ptr<db::mysql::response> response)
+	XCode MysqlHelperComponent::Call(const std::string& func, const Message& data, std::shared_ptr<db::mysql::response> response)
 	{
 		std::string address;
 		if(!this->mMysqlService->AllotLocation(address))
@@ -63,7 +63,7 @@ namespace Sentry
 		return this->mMysqlService->Call(address, func, data, response);
 	}
 
-	XCode MysqlDataComponent::QueryOnce(const std::string& json, std::shared_ptr<Message> response)
+	XCode MysqlHelperComponent::QueryOnce(const std::string& json, std::shared_ptr<Message> response)
 	{
 		db::mysql::query request;
 		request.set_where_json(json);

@@ -30,21 +30,21 @@ namespace Sentry
 		RedisComponent() = default;
 	 protected:
         bool LoadConfig();
-        SharedRedisClient MakeRedisClient(const RedisConfig & config);
+        TcpRedisClient * MakeRedisClient(const RedisConfig & config);
         bool ParseConfig(const char * name, const rapidjson::Value & json);
     public:
         bool StartConnectRedis();
-        bool Ping(SharedRedisClient redisClient);
-		virtual SharedRedisClient GetClient(const std::string & name);
+        bool Ping(TcpRedisClient * redisClient);
+		virtual TcpRedisClient * GetClient(const std::string & name);
         virtual void OnLoadScript(const std::string & name, const std::string & md5) { }
         std::shared_ptr<RedisResponse> Run(const std::string & name, std::shared_ptr<RedisRequest> request);
     protected:
         virtual bool OnInitRedisClient(RedisConfig config) = 0;
-        std::shared_ptr<RedisResponse> Run(SharedRedisClient redisClientContext, std::shared_ptr<RedisRequest> request);
+        std::shared_ptr<RedisResponse> Run(TcpRedisClient * redisClientContext, std::shared_ptr<RedisRequest> request);
     private:
         class NetThreadComponent * mNetComponent;
         std::unordered_map<std::string, RedisConfig> mConfigs;
-        std::unordered_map<std::string, std::vector<SharedRedisClient>> mRedisClients;
+        std::unordered_map<std::string, std::vector<std::shared_ptr<TcpRedisClient>>> mRedisClients;
 	};
 }
 

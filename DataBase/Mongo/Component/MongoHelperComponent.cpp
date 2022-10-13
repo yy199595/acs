@@ -2,23 +2,23 @@
 // Created by yjz on 2022/8/28.
 //
 
-#include"MongoAgentComponent.h"
+#include"MongoHelperComponent.h"
 #include"Service/MongoService.h"
 namespace Sentry
 {
-	bool MongoAgentComponent::LateAwake()
+	bool MongoHelperComponent::LateAwake()
 	{
 		this->mMongoService = this->GetComponent<MongoService>();
 		return this->mMongoService != nullptr;
 	}
 
-	XCode MongoAgentComponent::Insert(const Message& message, int index)
+	XCode MongoHelperComponent::Insert(const Message& message, int index)
 	{
 		const std::string tab = message.GetTypeName();
 		return this->Insert(tab.c_str(), message, index);
 	}
 
-	XCode MongoAgentComponent::Insert(const char* tab, const Message& message, int index)
+	XCode MongoHelperComponent::Insert(const char* tab, const Message& message, int index)
 	{
 		std::string address;
 		if(!this->mMongoService->AllotLocation(address))
@@ -35,7 +35,7 @@ namespace Sentry
 		return this->mMongoService->Call(address, "Insert", request);
 	}
 
-    XCode MongoAgentComponent::Update(const char *tab, const std::string &select, const std::string &data, int index)
+    XCode MongoHelperComponent::Update(const char *tab, const std::string &select, const std::string &data, int index)
     {
         std::string address;
         if(!this->mMongoService->AllotLocation(address))
@@ -49,7 +49,7 @@ namespace Sentry
         return this->mMongoService->Call(address, "Update", request);
     }
 
-	XCode MongoAgentComponent::Insert(const char* tab, const std::string& json, int index)
+	XCode MongoHelperComponent::Insert(const char* tab, const std::string& json, int index)
 	{
 		std::string address;
 		if(!this->mMongoService->AllotLocation(address))
@@ -62,7 +62,7 @@ namespace Sentry
         return this->mMongoService->Call(address, "Insert", this->mInsertRequest);
 	}
 
-	XCode MongoAgentComponent::Remove(const char* tab, const std::string& select, int limit, int index)
+	XCode MongoHelperComponent::Remove(const char* tab, const std::string& select, int limit, int index)
 	{
 		std::string address;
 		if(!this->mMongoService->AllotLocation(address))
@@ -76,8 +76,8 @@ namespace Sentry
         return this->mMongoService->Call(address, "Remove", this->mRemoveRequest);
 	}
 
-	XCode MongoAgentComponent::Query(const char* tab,
-		const std::string& select, std::shared_ptr<Message> response)
+	XCode MongoHelperComponent::Query(const char* tab,
+                                      const std::string& select, std::shared_ptr<Message> response)
 	{
 		std::string address;
 		if(!this->mMongoService->AllotLocation(address))
@@ -100,7 +100,7 @@ namespace Sentry
 		return code;
 	}
 
-    XCode MongoAgentComponent::Save(const Message &message)
+    XCode MongoHelperComponent::Save(const Message &message)
     {
         const Reflection * reflection = message.GetReflection();
         const Descriptor * descriptor = message.GetDescriptor();
@@ -145,7 +145,7 @@ namespace Sentry
         return this->mMongoService->Call(address, "Update", this->mUpdateRequest);
     }
 
-    XCode MongoAgentComponent::Save(const char *tab, long long id, const std::string &data)
+    XCode MongoHelperComponent::Save(const char *tab, long long id, const std::string &data)
     {
         Json::Writer select;
         select << "_id" << id;
@@ -153,7 +153,7 @@ namespace Sentry
         return this->Update(tab, select.JsonString(), data, index);
     }
 
-    XCode MongoAgentComponent::Save(const char *tab, const std::string &id, const std::string &data)
+    XCode MongoHelperComponent::Save(const char *tab, const std::string &id, const std::string &data)
     {
         Json::Writer select;
         select << "_id" << id;

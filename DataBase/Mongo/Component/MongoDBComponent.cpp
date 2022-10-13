@@ -64,12 +64,12 @@ namespace Sentry
         return this->Ping(0);
     }
 
-    std::shared_ptr<TcpMongoClient> MongoDBComponent::GetClient(int index)
+    TcpMongoClient * MongoDBComponent::GetClient(int index)
     {
         if(index > 0)
         {
             index = index % this->mMongoClients.size();
-            return this->mMongoClients[index];
+            return this->mMongoClients[index].get();
         }
         std::shared_ptr<TcpMongoClient> returnClient = this->mMongoClients.front();
         for(size_t i = 0; i < this->mMongoClients.size(); i++)
@@ -77,14 +77,14 @@ namespace Sentry
             std::shared_ptr<TcpMongoClient> mongoClient = this->mMongoClients[i];
             if(mongoClient->WaitSendCount() <= 5)
             {
-                return mongoClient;
+                return mongoClient.get();
             }
             if(mongoClient->WaitSendCount() < returnClient->WaitSendCount())
             {
                 returnClient = mongoClient;
             }
         }
-        return returnClient;
+        return returnClient.get();
     }
 
 	void MongoDBComponent::OnDelTask(long long taskId, RpcTask task)
@@ -98,13 +98,13 @@ namespace Sentry
 
 	}
 
-    void MongoDBComponent::Send(std::shared_ptr<TcpMongoClient> mongoClient, std::shared_ptr<CommandRequest> request)
+    void MongoDBComponent::Send(TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request)
     {
 
     }
 
 	std::shared_ptr<Mongo::CommandResponse> MongoDBComponent::Run(
-            std::shared_ptr<TcpMongoClient> mongoClient, std::shared_ptr<CommandRequest> request)
+        TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request)
 	{
 		if(request->collectionName.empty())
 		{
@@ -169,8 +169,7 @@ namespace Sentry
         mongoRequest->dataBase = tab.substr(0, pos);
         mongoRequest->document.Add("createIndexes", tab1);
         mongoRequest->document.Add("indexes", documentArray1);
-        std::shared_ptr<TcpMongoClient> mongoClient = this->GetClient();
-        return this->Run(mongoClient, mongoRequest) != nullptr;
+        return this->Run(this->GetClient(), mongoRequest) != nullptr;
     }
 
 	bool MongoDBComponent::Ping(int index)
@@ -180,8 +179,7 @@ namespace Sentry
 
         mongoRequest->dataBase = this->mConfig.mDb;
         mongoRequest->document.Add("ping", 1);
-        std::shared_ptr<TcpMongoClient> mongoClient = this->GetClient(index);
-        return this->Run(mongoClient, mongoRequest) != nullptr;
+        return this->Run(this->GetClient(index), mongoRequest) != nullptr;
     }
 
 	void MongoDBComponent::OnClientError(int index, XCode code)

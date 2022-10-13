@@ -76,8 +76,7 @@ namespace Lua
         }
         std::shared_ptr<Rpc::Data> request(new Rpc::Data());
 
-        request->SetType(Tcp::Type::Request);
-        request->SetProto(Tcp::Porto::Protobuf);
+        request->SetType(Tcp::Type::Auth);
         std::string token(luaL_checkstring(lua, 2));
         request->GetHead().Add("token", token);
         std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));

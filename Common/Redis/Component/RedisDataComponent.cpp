@@ -15,7 +15,7 @@ namespace Sentry
         config.Channels.clear();
         for (int index = 0; index < config.Count; index++)
         {
-            SharedRedisClient redisClient = this->MakeRedisClient(config);
+            TcpRedisClient * redisClient = this->MakeRedisClient(config);
             if(redisClient == nullptr)
             {
                 return false;
@@ -30,7 +30,7 @@ namespace Sentry
 
     long long RedisDataComponent::AddCounter(const std::string &id)
     {
-        SharedRedisClient redisClientContext = this->GetClient("main");
+        TcpRedisClient * redisClientContext = this->GetClient("main");
         std::shared_ptr<RedisResponse> redisResponse =
                 this->RunCommand(redisClientContext, "INCR", id);
         if (redisResponse == nullptr || redisResponse->HasError())
@@ -42,7 +42,7 @@ namespace Sentry
 
     long long RedisDataComponent::SubCounter(const std::string &id)
     {
-        SharedRedisClient redisClientContext = this->GetClient("main");
+        TcpRedisClient * redisClientContext = this->GetClient("main");
         std::shared_ptr<RedisResponse> redisResponse =
                 this->RunCommand(redisClientContext, "DECR", id);
         if (redisResponse == nullptr || redisResponse->HasError())
@@ -56,7 +56,7 @@ namespace Sentry
     bool RedisDataComponent::Call(const std::string &name, const std::string &func, Json::Writer &request,
                                   std::shared_ptr<Json::Reader> response)
     {
-        SharedRedisClient redisClientContext = this->GetClient(name);
+        TcpRedisClient * redisClientContext = this->GetClient(name);
         std::shared_ptr<RedisRequest> redisRequets = this->MakeLuaRequest(func, request.JsonString());
         if(redisRequets == nullptr)
         {

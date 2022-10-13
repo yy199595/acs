@@ -27,8 +27,7 @@ namespace Sentry
 
 	void DataSyncComponent::Set(const std::string& _id, const std::string & db, const std::string& tab, const std::string& json)
     {
-        std::shared_ptr<TcpRedisClient> redisClient =
-            this->mRedisComponent->GetClient(db);
+        TcpRedisClient * redisClient = this->mRedisComponent->GetClient(db);
         if (redisClient == nullptr)
         {
             return;
@@ -56,8 +55,7 @@ namespace Sentry
 
     void DataSyncComponent::Del(const std::string &_id, const std::string & db, const std::string &tab)
     {
-        std::shared_ptr<TcpRedisClient> redisClient =
-            this->mRedisComponent->GetClient(db);
+        TcpRedisClient * redisClient = this->mRedisComponent->GetClient(db);
         if (redisClient == nullptr)
         {
             return;

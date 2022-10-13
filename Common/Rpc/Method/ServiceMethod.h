@@ -31,11 +31,15 @@ namespace Sentry
 	template<typename T, typename T1>
 	using ServiceMethodType44 = XCode(T::*)(long long, T1 &);
 
-	template<typename T, typename T1>
-	using ServiceMethodType5 = XCode(T::*)(const std::string & address, const T1 &);
-
 	template<typename T>
-	using ServiceMethodType6 = XCode(T::*)(const std::string & address);
+	using ServiceMethodType6 = XCode(T::*)(const Rpc::Head & head);
+
+    template<typename T, typename T1>
+    using ServiceMethodType5 = XCode(T::*)(const Rpc::Head & head, const T1 &);
+
+
+    template<typename T>
+    using ServiceMethodType7 = XCode(T::*)(const Rpc::Head & head, Rpc::Head &);
 
 
 //	template<typename T, typename T1, typename T2>
@@ -273,17 +277,12 @@ namespace Sentry
 		XCode Invoke(Rpc::Data & message) override
 		{
 			std::shared_ptr<T1> request(new T1());
-            if(!message.ParseMessage(request))
+            if(!message.ParseMessage(request.get()))
             {
                 return XCode::CallArgsError;
             }
             message.Clear();
-            std::string address;
-            if(!message.GetHead().Get("address", address))
-            {
-                return XCode::CallArgsError;
-            }
-			return (_o->*_func)(address, *request);
+			return (_o->*_func)(message.GetHead(), *request);
 		}
 
 	private:
@@ -305,12 +304,7 @@ namespace Sentry
 		bool IsLuaMethod() override { return false; };
 		XCode Invoke(Rpc::Data & message) override
 		{
-            std::string address;
-            if(!message.GetHead().Get("address", address))
-            {
-                return XCode::CallArgsError;
-            }
-			return (_o->*_func)(address);
+			return (_o->*_func)(message.GetHead());
 		}
 	 private:
 		T* _o;

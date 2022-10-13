@@ -111,12 +111,12 @@
             "Async": false,
             "Type": "Server"
         },
-        "OnUserJoin": {
+        "Login": {
             "Async": false,
             "Type": "Server",
             "Request": "s2s.location.sync"
         },
-        "OnUserExit": {
+        "Logout": {
             "Async": false,
             "Type": "Server",
             "Request": "s2s.location.sync"

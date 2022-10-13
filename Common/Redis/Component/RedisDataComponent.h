@@ -22,7 +22,7 @@ namespace Sentry
         template<typename ... Args>
         std::shared_ptr<RedisResponse> RunCommand(const std::string & name, const std::string & cmd, Args&& ... args);
         template<typename ... Args>
-        std::shared_ptr<RedisResponse> RunCommand(SharedRedisClient redisClientContext, const std::string & cmd, Args&& ... args);
+        std::shared_ptr<RedisResponse> RunCommand(TcpRedisClient * redisClientContext, const std::string & cmd, Args&& ... args);
     public:
         long long AddCounter(const std::string & id);
         long long SubCounter(const std::string & id);
@@ -47,7 +47,7 @@ namespace Sentry
         return this->Run(name, request);
     }
     template<typename ... Args>
-    std::shared_ptr<RedisResponse> RedisDataComponent::RunCommand(SharedRedisClient redisClientContext, const std::string &cmd, Args &&...args)
+    std::shared_ptr<RedisResponse> RedisDataComponent::RunCommand(TcpRedisClient * redisClientContext, const std::string &cmd, Args &&...args)
     {
         std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>(cmd);
         RedisRequest::InitParameter(request, std::forward<Args>(args)...);
@@ -56,7 +56,7 @@ namespace Sentry
     template<typename ... Args>
     bool RedisDataComponent::SenCommond(const std::string &name, const std::string &cmd, Args &&...args)
     {
-        SharedRedisClient redisClient = this->GetClient(name);
+        TcpRedisClient * redisClient = this->GetClient(name);
         if(redisClient == nullptr)
         {
             return false;

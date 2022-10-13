@@ -7,11 +7,11 @@
 #include"Component/Component.h"
 namespace Sentry
 {
-	class MongoAgentComponent : public Component
+	class MongoHelperComponent : public Component
 	{
 	 public:
-		MongoAgentComponent() = default;
-		~MongoAgentComponent() = default;
+		MongoHelperComponent() = default;
+		~MongoHelperComponent() = default;
 	 public:
 		XCode Insert(const Message & message, int index);
 		XCode Insert(const char * tab, const Message & message, int index = 0);

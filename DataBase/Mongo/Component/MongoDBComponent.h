@@ -51,10 +51,10 @@ namespace Sentry
         bool SetIndex(const std::string & tab, const std::string & name);
     public:
         void OnClientError(int index, XCode code);
-        std::shared_ptr<TcpMongoClient> GetClient(int index = -1);
+        TcpMongoClient * GetClient(int index = -1);
         const Mongo::Config & GetConfig() const { return this->mConfig;}
-        void Send(std::shared_ptr<TcpMongoClient> mongoClient, std::shared_ptr<CommandRequest> request);
-		std::shared_ptr<Mongo::CommandResponse> Run(std::shared_ptr<TcpMongoClient> mongoClient, std::shared_ptr<CommandRequest> request);
+        void Send(TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request);
+		std::shared_ptr<Mongo::CommandResponse> Run(TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request);
 	 private:
 		Mongo::Config mConfig;
 		TimerComponent * mTimerComponent;

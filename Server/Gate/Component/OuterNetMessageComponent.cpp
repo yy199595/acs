@@ -55,7 +55,7 @@ namespace Sentry
             request.set_name(service);
             request.set_user_id(userId);
             InnerService * service = this->GetComponent<InnerService>();
-            if(service->Send(address, "OnUserJoin", request) != XCode::Successful)
+            if(service->Send(address, "Login", request) != XCode::Successful)
             {
                 return XCode::NetWorkError;
             }

@@ -116,7 +116,7 @@ namespace Sentry
         return true;
     }
 
-    SharedRedisClient RedisComponent::MakeRedisClient(const RedisConfig & config)
+    TcpRedisClient * RedisComponent::MakeRedisClient(const RedisConfig & config)
 	{
         std::shared_ptr<SocketProxy> socketProxy = this->mNetComponent->CreateSocket();
         if(socketProxy == nullptr)
@@ -124,42 +124,43 @@ namespace Sentry
             return nullptr;
         }
         socketProxy->Init(config.Ip, config.Port);
-        SharedRedisClient redisClient = std::make_shared<TcpRedisClient>(socketProxy, config, this);
+        std::shared_ptr<TcpRedisClient> redisClient =
+            std::make_shared<TcpRedisClient>(socketProxy, config, this);
         this->mRedisClients[config.Name].emplace_back(redisClient);
-        return redisClient;
+        return redisClient.get();
 	}
 
-    bool RedisComponent::Ping(SharedRedisClient redisClient)
+    bool RedisComponent::Ping(TcpRedisClient * redisClient)
     {
         std::shared_ptr<RedisRequest> request = RedisRequest::Make("PING");
         std::shared_ptr<RedisResponse> response = this->Run(redisClient, request);
         return response != nullptr && !response->HasError();
     }
 
-    SharedRedisClient RedisComponent::GetClient(const std::string& name)
+    TcpRedisClient * RedisComponent::GetClient(const std::string& name)
     {
         auto iter = this->mRedisClients.find(name);
         if (iter == this->mRedisClients.end() || iter->second.empty())
         {
             return nullptr;
         }
-        SharedRedisClient tempRedisClint = iter->second.front();
-        for (SharedRedisClient redisClient: iter->second)
+        std::shared_ptr<TcpRedisClient> tempRedisClint = iter->second.front();
+        for (std::shared_ptr<TcpRedisClient> redisClient: iter->second)
         {
             if(redisClient->WaitSendCount() <= 5)
             {
-                return redisClient;
+                return redisClient.get();
             }
             if(tempRedisClint->WaitSendCount() < redisClient->WaitSendCount())
             {
                 tempRedisClint = redisClient;
             }
         }
-        return tempRedisClint;
+        return tempRedisClint.get();
     }
 
     std::shared_ptr<RedisResponse> RedisComponent::Run(
-            SharedRedisClient redisClientContext, std::shared_ptr<RedisRequest> request)
+        TcpRedisClient * redisClientContext, std::shared_ptr<RedisRequest> request)
     {
 #ifdef __DEBUG__
         ElapsedTimer elapsedTimer;
@@ -174,13 +175,12 @@ namespace Sentry
             LOG_ERROR(request->ToJson());
             LOG_ERROR(redisResponse->GetString());
         }
-
         return redisResponse;
     }
 
     std::shared_ptr<RedisResponse> RedisComponent::Run(const std::string &name, std::shared_ptr<RedisRequest> request)
     {
-        SharedRedisClient redisClientContext = this->GetClient(name);
+        TcpRedisClient * redisClientContext = this->GetClient(name);
         if(redisClientContext == nullptr)
         {
             CONSOLE_LOG_ERROR("not find redis client : " << name);

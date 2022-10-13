@@ -81,14 +81,14 @@ namespace Sentry
 		}
 
 		template<typename T, typename T1>
-		bool BindAddress(std::string name, ServiceMethodType5<T, T1> func)
+		bool Bind(std::string name, ServiceMethodType5<T, T1> func)
 		{
 			T * component = this->mComponent->Cast<T>();
 			return this->AddMethod(std::make_shared<ServiceMethod5<T, T1>>(name, component, func));
 		}
 
 		template<typename T>
-		bool BindAddress(std::string name, ServiceMethodType6<T> func)
+		bool Bind(std::string name, ServiceMethodType6<T> func)
 		{
 			T * component = this->mComponent->Cast<T>();
 			return this->AddMethod(std::make_shared<ServiceMethod6<T>>(name, component, func));

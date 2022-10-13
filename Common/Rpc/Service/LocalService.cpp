@@ -88,6 +88,7 @@ namespace Sentry
                 }
                 else if (this->mMethodRegister->GetMethod(methodConfig->Method) == nullptr)
                 {
+                    CONSOLE_LOG_ERROR(this->GetName() << " not register method [" << methodConfig->Method << "]");
                     return false;
                 }
             }

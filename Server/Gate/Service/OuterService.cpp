@@ -9,7 +9,7 @@
 #include"Component/RedisDataComponent.h"
 #include"Component/OuterNetMessageComponent.h"
 #include"Component/OuterNetComponent.h"
-#include"Component/GateAgentComponent.h"
+#include"Component/GateHelperComponent.h"
 #include"Component/UserSyncComponent.h"
 namespace Sentry
 {
