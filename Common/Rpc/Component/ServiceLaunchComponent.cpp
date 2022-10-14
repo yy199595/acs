@@ -5,10 +5,9 @@
 #include"ServiceLaunchComponent.h"
 #include"App/App.h"
 #include"File/FileHelper.h"
+#include"Config/ServiceConfig.h"
 #include"Service/LocalService.h"
 #include"Service/LocalHttpService.h"
-#include"Config/ServiceConfig.h"
-#include"Component/TextConfigComponent.h"
 namespace Sentry
 {
     bool ServiceLaunchComponent::Awake()
@@ -20,14 +19,12 @@ namespace Sentry
         LOG_CHECK_RET_FALSE(config->GetServices(services) > 0);
         LOG_CHECK_RET_FALSE(config->GetConfigPath("service", path));
         LOG_CHECK_RET_FALSE(Helper::File::ReadJsonFile(path, jsonDocument));
-        TextConfigComponent * textComponent = this->GetComponent<TextConfigComponent>();
-        const ServiceConfig * localServiceConfig = textComponent->GetTextConfig<ServiceConfig>();
 
         for(const std::string & name : services)
         {
             Component *component = ComponentFactory::CreateComponent(name);
-            const RpcServiceConfig * rpcServiceConfig = localServiceConfig->GetRpcConfig(name);
-            const HttpServiceConfig * httpServiceConfig = localServiceConfig->GetHttpConfig(name);
+            const RpcServiceConfig * rpcServiceConfig = ServiceConfig::Inst()->GetRpcConfig(name);
+            const HttpServiceConfig * httpServiceConfig = ServiceConfig::Inst()->GetHttpConfig(name);
             if(component == nullptr)
             {
                 if(rpcServiceConfig != nullptr)

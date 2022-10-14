@@ -234,7 +234,7 @@ namespace Sentry
         }
         for(auto & value : this->mHttpMethodConfig)
         {
-            if(value.second->Path.find(path) == 0)
+            if(path.find(value.second->Path) == 0)
             {
                 return value.second;
             }

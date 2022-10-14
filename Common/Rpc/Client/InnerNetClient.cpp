@@ -1,23 +1,17 @@
 ﻿#include"InnerNetClient.h"
 #include"App/App.h"
 #include"Client/Rpc.h"
-#include"Client/Message.h"
-#include"Component/InnerNetComponent.h"
-
-#ifdef __DEBUG__
-#include"google/protobuf/util/json_util.h"
-#endif
 
 namespace Sentry
 {
-	InnerNetClient::InnerNetClient(InnerNetComponent* component,
+	InnerNetClient::InnerNetClient(IRpc<Rpc::Data> * component,
                                    std::shared_ptr<SocketProxy> socket)
-		: TcpContext(socket, 1024 * 1024), mTcpComponent(component)
+		: TcpContext(socket, 1024 * 1024), mComponent(component)
 	{
         this->mState = Tcp::DecodeState::Head;
-        this->mUserName = component->GetUser();
-        this->mPassword = component->GetPassword();
         ServerConfig::Inst()->GetLocation("rpc", this->mLocation);
+        ServerConfig::Inst()->GetMember("user", "name", this->mUserName);
+        ServerConfig::Inst()->GetMember("user", "passwd", this->mPassword);
 	}
 
 	void InnerNetClient::StartClose()
@@ -65,7 +59,7 @@ namespace Sentry
 		this->mTcpComponent->OnCloseSocket(address, code);
 #else
 		asio::io_service & taskScheduler = App::Inst()->GetThread();
-		taskScheduler.post(std::bind(&InnerNetComponent::OnCloseSocket, this->mTcpComponent, address, code));
+		taskScheduler.post(std::bind(&IRpc<Rpc::Data>::OnCloseSocket, this->mComponent, address, code));
 #endif
 	}
 
@@ -109,8 +103,7 @@ namespace Sentry
                 this->mTcpComponent->OnMessage(address, std::move(this->mMessage));
 #else
                 asio::io_service & io = App::Inst()->GetThread();
-                io.post(std::bind(&InnerNetComponent::OnMessage,
-                                  this->mTcpComponent, address, std::move(this->mMessage)));
+                io.post(std::bind(&IRpc<Rpc::Data>::OnMessage, this->mComponent, address, std::move(this->mMessage)));
 #endif
             }
                 break;

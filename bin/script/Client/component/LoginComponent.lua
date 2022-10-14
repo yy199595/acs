@@ -1,7 +1,7 @@
 
 LoginComponent = {}
 local httpComponent
-local host = "http://127.0.0.1:8080/app/web/logic/%s"
+local host = "http://127.0.0.1:8080/app/web/%s"
 function LoginComponent.Awake()
     httpComponent = App.GetComponent("HttpComponent")
     return httpComponent ~= nil

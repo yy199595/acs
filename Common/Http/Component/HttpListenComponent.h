@@ -4,8 +4,7 @@
 
 #ifndef APP_HTTPLISTENCOMPONENT_H
 #define APP_HTTPLISTENCOMPONENT_H
-#include"Component/Component.h"
-#include"Listener/TcpListenerComponent.h"
+#include"Component/TcpListenerComponent.h"
 namespace Sentry
 {
     class HttpHandlerClient;

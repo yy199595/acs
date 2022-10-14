@@ -36,7 +36,7 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-        const InnerServerNode * serverInfo = this->mInnerNetComponent->GetSeverInfo(address);
+        const InnerClienData * serverInfo = this->mInnerNetComponent->GetSeverInfo(address);
         if(serverInfo == nullptr)
         {
             return XCode::Failure;

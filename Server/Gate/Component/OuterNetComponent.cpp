@@ -89,7 +89,7 @@ namespace Sentry
         {
             return false;
         }
-        message->GetHead().Add("client", address);
+        message->GetHead().Add("resp", address);
         XCode code = this->mOuterMessageComponent->OnRequest(userId, message);
         if (code != XCode::Successful)
         {

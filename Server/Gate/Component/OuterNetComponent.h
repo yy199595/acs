@@ -6,7 +6,7 @@
 #define GAMEKEEPER_GATECLIENTCOMPONENT_H
 #include"Component/Component.h"
 #include"Client/Message.h"
-#include"Listener/TcpListenerComponent.h"
+#include"Component/TcpListenerComponent.h"
 namespace Sentry
 {
 	class OuterNetClient;

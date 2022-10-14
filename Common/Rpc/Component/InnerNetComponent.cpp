@@ -103,7 +103,7 @@ namespace Sentry
 
     bool InnerNetComponent::OnAuth(const std::string & address, std::shared_ptr<Rpc::Data> message)
     {
-        std::unique_ptr<InnerServerNode> serverNode(new InnerServerNode());
+        std::unique_ptr<InnerClienData> serverNode(new InnerClienData());
         const Rpc::Head &head = message->GetHead();
         LOG_CHECK_RET_FALSE(head.Get("user", serverNode->UserName));
         LOG_CHECK_RET_FALSE(head.Get("passwd", serverNode->PassWord));
@@ -118,7 +118,7 @@ namespace Sentry
         return true;
     }
 
-    const InnerServerNode *InnerNetComponent::GetSeverInfo(const std::string &address)
+    const InnerClienData *InnerNetComponent::GetSeverInfo(const std::string &address)
     {
         auto iter = this->mLocationMaps.find(address);
         return iter != this->mLocationMaps.end() ? iter->second.get() : nullptr;
@@ -172,9 +172,9 @@ namespace Sentry
         if(this->mOuterComponent != nullptr)
         {
             std::string address;
-            if (head.Get("client", address)) //address
+            if (head.Get("resp", address)) //address
             {
-                message->GetHead().Remove("client");
+                message->GetHead().Remove("resp");
                 this->mOuterComponent->SendData(address, message);
                 return true;
             }

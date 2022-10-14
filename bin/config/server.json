@@ -20,6 +20,9 @@
         "name": "root",
         "passwd": "199595yjz."
     },
+    "forward": [
+        "127.0.0.1:7789"
+    ],
     "server": {
         "rpc": "127.0.0.1:7788",
         "gate": "127.0.0.1:1995",
@@ -37,6 +40,10 @@
         },
         "gate": {
             "port": 1995,
+            "ip": "0.0.0.0"
+        },
+        "forward": {
+            "port": 7789,
             "ip": "0.0.0.0"
         },
         "console": {
@@ -111,6 +118,7 @@
         "ServiceLaunchComponent"
     ],
     "services": {
+        "UserBehavior": true,
         "ChatService": true,
         "MysqlService": true,
         "MongoService": true,

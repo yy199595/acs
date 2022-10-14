@@ -12,7 +12,7 @@
 #include"Service/InnerService.h"
 #include"Component/RedisDataComponent.h"
 #include"Component/ProtoComponent.h"
-
+#include"Service/UserBehavior.h"
 namespace Sentry
 {
 
@@ -53,7 +53,7 @@ namespace Sentry
             s2s::location::sync request;
             request.set_user_id(userId);
             request.set_name(methodConfig->Service);
-            InnerService * service = this->GetComponent<InnerService>();
+            UserBehavior * service = this->GetComponent<UserBehavior>();
             if(service->Send(address, "Login", request) != XCode::Successful)
             {
                 return XCode::NetWorkError;

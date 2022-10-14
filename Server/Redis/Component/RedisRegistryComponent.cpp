@@ -1,7 +1,6 @@
 ﻿#include"RedisRegistryComponent.h"
 #include"App/App.h"
 #include"Service/LocalService.h"
-#include"Listener/TcpListenerComponent.h"
 #include"Component/RedisDataComponent.h"
 #include"Component/RedisSubComponent.h"
 

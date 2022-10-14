@@ -6,6 +6,7 @@
 #define APP_LOCATIONCOMPONENT_H
 #include<vector>
 #include<string>
+#include"Unit/LocationUnit.h"
 #include"Component/Component.h"
 namespace Sentry
 {
@@ -25,24 +26,22 @@ namespace Sentry
     class LocationComponent : public Component
     {
     public:
-        bool DelLocation(long long useId);
+        LocationComponent() = default;
+        ~LocationComponent() = default;
+    public:
         bool DelLocation(const std::string & address);
-        void AddLocation(const std::string & address);
-        void AddLocation(const std::string & address, long long userId);
+        LocationUnit * GetLocationUnit(long long id) const;
+        bool DelLocation(const std::string & service, const std::string & address);
+        void AddLocation(const std::string & service, const std::string & address);
     public:
-        bool HasLocation(const std::string & address);
-        bool GetHosts(std::vector<std::string> & hosts);
-        bool GetLocation(long long userId, std::string & address);
-        size_t GetHostSize() const { return this->mHosts.size(); }
+        size_t GetHostSize(const std::string & service) const;
+        bool HasLocation(const std::string & service, const std::string & address);
+        bool GetLocationss(const std::string & service, std::vector<std::string> & hosts);
     public:
-        virtual bool AllotLocation(std::string & address);
-        virtual bool AllotLocation(long long userId, std::string & address);
-    protected:
-        virtual void OnAddHost(const std::string & address) { }
-        virtual void OnDelHost(const std::string & address) { }
+        virtual bool AllotLocation(const std::string & service, std::string & address);
     private:
-        std::vector<HostCounter *> mHosts;
-        std::unordered_map<long long, std::string> mUnitLocations;
+        std::unordered_map<std::string, std::vector<HostCounter>> mServiceLocations;
+        std::unordered_map<long long, std::unique_ptr<LocationUnit>> mUnitLocations;
     };
 }
 

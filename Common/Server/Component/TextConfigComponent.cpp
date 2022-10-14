@@ -16,8 +16,10 @@ namespace Sentry
         }
         std::string path;
         const ServerConfig * config = ServerConfig::Inst();
-        LOG_CHECK_RET_FALSE(config->GetConfigPath("service", path));
-        LOG_CHECK_RET_FALSE(this->LoadTextConfig<ServiceConfig>(path));
+        if(config->GetConfigPath("service", path))
+        {
+            LOG_CHECK_RET_FALSE(this->LoadTextConfig<ServiceConfig>(path));
+        }
         return true;
     }
 

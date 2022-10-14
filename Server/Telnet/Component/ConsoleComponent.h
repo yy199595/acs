@@ -1,7 +1,6 @@
 #pragma once
-#include"Component/Component.h"
-#include"Listener/TcpListenerComponent.h"
 #include"Client/TelnetClientContext.h"
+#include"Component/TcpListenerComponent.h"
 
 namespace Sentry
 {

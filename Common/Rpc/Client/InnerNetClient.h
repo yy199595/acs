@@ -3,19 +3,18 @@
 #include"Tcp/TcpContext.h"
 #include"Client/Message.h"
 #include"Source/TaskSource.h"
+#include"Component/IComponent.h"
 #include"Coroutine/CoroutineLock.h"
 #include<google/protobuf/message.h>
-
 using namespace Tcp;
 using namespace google::protobuf;
 
 namespace Sentry
 {
-	class InnerNetComponent;
 	class InnerNetClient : public Tcp::TcpContext
 	{
 	 public:
-		explicit InnerNetClient(InnerNetComponent* component, std::shared_ptr<SocketProxy> socket);
+		explicit InnerNetClient(IRpc<Rpc::Data> * component, std::shared_ptr<SocketProxy> socket);
 		~InnerNetClient() override = default;
 	 public:
 		void StartClose();
@@ -31,7 +30,7 @@ namespace Sentry
         std::string mPassword;
         std::string mLocation;
         Tcp::DecodeState mState;
-		InnerNetComponent* mTcpComponent;
+        IRpc<Rpc::Data> * mComponent;
         std::shared_ptr<Rpc::Data> mMessage;
         std::shared_ptr<asio::steady_timer> mTimer;
 	};
