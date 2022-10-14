@@ -34,7 +34,6 @@ namespace Sentry
 	public:
         bool IsStartComplete() final{return this->GetHostSize() > 0; };
         const RpcServiceConfig & GetServiceConfig() { return *this->mConfig; }
-        const RpcMethodConfig * GetMethodConfig(const std::string & method) const;
         const std::string & GetServiceName() final { return this->GetName(); }
     public:
         bool StartSend(const std::string & address, const std::string & func, long long userId, const Message * message);

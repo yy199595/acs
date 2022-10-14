@@ -18,7 +18,7 @@ namespace Sentry
 			return false;
 		}
 		const RpcServiceConfig & rpcServiceConfig = serviceComponent->GetServiceConfig();
-		if(!rpcServiceConfig.GetConfig(method->GetName()))
+		if(rpcServiceConfig.GetMethodConfig(method->GetName()) == nullptr)
 		{
 			return false;
 		}

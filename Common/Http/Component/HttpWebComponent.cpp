@@ -19,7 +19,7 @@ namespace Sentry
         for(const LocalHttpService * httpService : httpServices)
         {
             std::vector<const HttpMethodConfig *> httpMethodConfigs;
-            httpService->GetServiceConfig().GetConfigs(httpMethodConfigs);
+            httpService->GetServiceConfig().GetMethodConfigs(httpMethodConfigs);
             for(const HttpMethodConfig * methodConfig : httpMethodConfigs)
             {
                 this->mHttpConfigs.emplace(methodConfig->Path, methodConfig);

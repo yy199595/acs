@@ -77,7 +77,7 @@ namespace Sentry
             throw std::logic_error("calling service does not exist or is not started");           
         }
         const RpcServiceConfig & config = targetService->GetServiceConfig();
-        const RpcMethodConfig* methodConfig =  config.GetConfig(method);
+        const RpcMethodConfig* methodConfig =  config.GetMethodConfig(method);
         if(methodConfig == nullptr)
         {
             throw std::logic_error("calling method does not exist");

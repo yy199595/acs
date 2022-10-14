@@ -11,7 +11,7 @@ namespace Sentry
 		{
 			return false;
 		}
-		this->mConfigs.clear();
+		this->mMethodConfigs.clear();
 		auto iter = json.MemberBegin();
 		for(; iter != json.MemberEnd(); iter++)
 		{
@@ -34,7 +34,7 @@ namespace Sentry
 					serviceConfog.Response = jsonValue["Response"].GetString();
 				}
 				serviceConfog.FullName = fmt::format("{0}.{1}", this->mName, name);
-				this->mConfigs.emplace(name, serviceConfog);
+				this->mMethodConfigs.emplace(name, serviceConfog);
 			}
 		}
 		return true;
@@ -67,7 +67,7 @@ namespace Sentry
 				{
 					serviceConfog.Content = jsonValue["Content"].GetString();
 				}
-				this->mConfigs.emplace(serviceConfog.Method, serviceConfog);
+				this->mMethodConfigs.emplace(serviceConfog.Method, serviceConfog);
 			}
 		}
 		return true;

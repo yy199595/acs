@@ -49,7 +49,7 @@ namespace Lua
         }
         std::string method = lua_tostring(lua, 3);
         const RpcServiceConfig &rpcServiceConfig = service->GetServiceConfig();
-        const RpcMethodConfig *methodConfig = rpcServiceConfig.GetConfig(method);
+        const RpcMethodConfig *methodConfig = rpcServiceConfig.GetMethodConfig(method);
         if (methodConfig == nullptr)
         {
             luaL_error(lua, "call [%s] not found", method.c_str());

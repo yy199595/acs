@@ -44,7 +44,7 @@ namespace Sentry
 			return XCode::CallServiceNotFound;
 		}
 		const RpcServiceConfig & rpcServiceConfig = logicService->GetServiceConfig();
-		const RpcMethodConfig* methodConfig = rpcServiceConfig.GetConfig(method);
+		const RpcMethodConfig* methodConfig = rpcServiceConfig.GetMethodConfig(method);
 		if (methodConfig == nullptr)
 		{
             return XCode::NotFoundRpcConfig;

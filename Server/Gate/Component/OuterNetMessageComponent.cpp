@@ -30,13 +30,14 @@ namespace Sentry
         std::string method, service;
         LOG_RPC_CHECK_ARGS(message->GetMethod(service, method));
         Service *targetService = this->GetApp()->GetService(service);
+        const RpcServiceConfig & seviceConfig = targetService->GetServiceConfig();
         if (targetService == nullptr)
         {
             CONSOLE_LOG_ERROR("userid=" << userId <<
                 " call [" << service << "] not find");
             return XCode::CallServiceNotFound;
         }
-        const RpcMethodConfig *config = targetService->GetMethodConfig(method);
+        const RpcMethodConfig *config = seviceConfig.GetMethodConfig(method);
         if (config == nullptr || config->Type != "Client")
         {
             CONSOLE_LOG_ERROR("userid=" << userId <<

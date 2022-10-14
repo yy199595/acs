@@ -30,19 +30,13 @@ namespace Sentry
 		luaRegister.PushExtensionFunction("Call", Lua::Service::Call);
         luaRegister.PushExtensionFunction("AllotLocation", Lua::Service::AllotLocation);
 	}
-
-    const RpcMethodConfig *Service::GetMethodConfig(const std::string &method) const
-    {
-        return this->mConfig->GetConfig(method);
-    }
-
 }
 
 namespace Sentry
 {
 	XCode Service::Send(const std::string& func, const Message& message)
 	{
-        const RpcMethodConfig * methodConfig = this->mConfig->GetConfig(func);
+        const RpcMethodConfig * methodConfig = this->mConfig->GetMethodConfig(func);
         if(methodConfig == nullptr)
         {
             return XCode::CallFunctionNotExist;
@@ -66,7 +60,7 @@ namespace Sentry
     bool Service::StartSend(const std::string &address,
                             const std::string &func, long long userId, const Message *message)
     {
-        const RpcMethodConfig * methodConfig = this->mConfig->GetConfig(func);
+        const RpcMethodConfig * methodConfig = this->mConfig->GetMethodConfig(func);
         if(methodConfig == nullptr)
         {
             CONSOLE_LOG_ERROR("call [" << func << "] not find config");
@@ -89,7 +83,7 @@ namespace Sentry
     std::shared_ptr<Rpc::Data> Service::StartCall(
         const std::string &address, const std::string &func, long long userId, const Message *message)
     {
-        const RpcMethodConfig * methodConfig  = this->mConfig->GetConfig(func);
+        const RpcMethodConfig * methodConfig  = this->mConfig->GetMethodConfig(func);
         if(methodConfig == nullptr)
         {
             return nullptr;

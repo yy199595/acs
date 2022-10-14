@@ -28,7 +28,7 @@ namespace Sentry
 
 		std::vector<const RpcMethodConfig *> rpcInterConfigs;
 		const RpcServiceConfig & rpcServiceConfig = this->GetServiceConfig();
-		rpcServiceConfig.GetConfigs(rpcInterConfigs);
+        LOG_CHECK_RET_FALSE(rpcServiceConfig.GetMethodConfigs(rpcInterConfigs) > 0);
 
 		for(const RpcMethodConfig * rpcInterfaceConfig : rpcInterConfigs)
 		{

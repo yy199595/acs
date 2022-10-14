@@ -26,15 +26,15 @@ namespace Sentry
 	bool LocalHttpService::Start()
     {
         this->mServiceRegister = std::make_shared<HttpServiceRegister>(this);
+        LuaScriptComponent * luaComponent = this->GetComponent<LuaScriptComponent>();
         if (!this->OnStartService(*this->mServiceRegister))
         {
             return false;
         }
 
-        std::vector<const HttpMethodConfig *> configs;
-        this->GetServiceConfig().GetConfigs(configs);
-        LuaScriptComponent * luaComponent = this->GetComponent<LuaScriptComponent>();
-        for(const HttpMethodConfig * config : configs)
+        std::vector<const HttpMethodConfig *> methodConfigs;
+        this->GetServiceConfig().GetMethodConfigs(methodConfigs);
+        for(const HttpMethodConfig * config : methodConfigs)
         {
             const char * tab = config->Service.c_str();
             const char * method = config->Method.c_str();
@@ -50,11 +50,11 @@ namespace Sentry
             }
         }
 
-        for(const HttpMethodConfig * config : configs)
+        for(const HttpMethodConfig * methodConfig : methodConfigs)
         {
-            if(this->mServiceRegister->GetMethod(config->Method) == nullptr)
+            if(this->mServiceRegister->GetMethod(methodConfig->Method) == nullptr)
             {
-                LOG_ERROR("not register method " << config->Service << "." << config->Method);
+                LOG_ERROR("not register method " << methodConfig->Service << "." << methodConfig->Method);
                 return false;
             }
         }
