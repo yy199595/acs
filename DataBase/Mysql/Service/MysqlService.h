@@ -26,7 +26,7 @@ namespace Sentry
         XCode Query(const db::mysql::query& request, db::mysql::response& response);
 
 	 private:
-        void Awake();
+        bool Awake();
 		bool OnStart() final;
         bool OnClose() final;
 	 private:

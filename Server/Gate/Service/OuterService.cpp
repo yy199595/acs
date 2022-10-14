@@ -14,20 +14,23 @@
 namespace Sentry
 {
 
-    void OuterService::Awake()
+    bool OuterService::Awake()
     {
         this->mTimerComponent = nullptr;
         this->mOuterNetComponent = nullptr;
         this->GetApp()->AddComponent<OuterNetComponent>();
         this->GetApp()->AddComponent<OuterNetMessageComponent>();
+        return true;
     }
 
 	bool OuterService::OnStart()
 	{
+        const ServerConfig * config = ServerConfig::Get();
         BIND_COMMON_RPC_METHOD(OuterService::Ping);
         BIND_COMMON_RPC_METHOD(OuterService::AllotUser);
         BIND_COMMON_RPC_METHOD(OuterService::SaveAddress);
         BIND_COMMON_RPC_METHOD(OuterService::QueryAddress);
+        LOG_CHECK_RET_FALSE(config->GetLocation("gate", this->mAddress));
         this->mOuterNetComponent = this->GetComponent<OuterNetComponent>();
 		return this->mOuterNetComponent->StartListen("gate");
 	}
@@ -46,16 +49,11 @@ namespace Sentry
 
 	XCode OuterService::AllotUser(const com::type::int64 &request, s2s::allot::response &response)
     {
-        std::string address;
         long long userId = request.value();
-        if (this->GetConfig().GetListener("gate", address))
-        {
-            std::string token = this->mOuterNetComponent->CreateToken(userId);
-            response.set_token(token);
-            response.set_address(address);
-            return XCode::Successful;
-        }
-        return XCode::Failure;
+        std::string token = this->mOuterNetComponent->CreateToken(userId);
+        response.set_token(token);
+        response.set_address(this->mAddress);
+        return XCode::Successful;
     }
 
 	XCode OuterService::QueryAddress(long long userId, const com::type::string& request, com::type::string& response)

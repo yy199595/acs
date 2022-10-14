@@ -4,12 +4,12 @@
 #include"Tcp/SocketProxy.h"
 namespace Sentry
 {
-	void NetThreadComponent::Awake()
+	bool NetThreadComponent::Awake()
 	{
 		this->mIndex = 0;
 		int taskCount = 0;
-		const ServerConfig& config = App::Get()->GetConfig();
-		config.GetMember("thread", "task", taskCount);
+		const ServerConfig * config = ServerConfig::Get();
+		config->GetMember("thread", "task", taskCount);
 #ifdef __ENABLE_OPEN_SSL__
 		std::string sslFile;
 		config.GetPath("ssl", sslFile);
@@ -31,7 +31,7 @@ namespace Sentry
 #endif
 #ifndef ONLY_MAIN_THREAD
 		int networkCount = 1;
-		LOG_CHECK_RET(config.GetMember("thread", "network", networkCount));
+		config->GetMember("thread", "network", networkCount);
 		for (int index = 0; index < networkCount; index++)
 		{
             Asio::Context * io = new Asio::Context();
@@ -43,6 +43,7 @@ namespace Sentry
 #endif
 		}
 #endif
+        return true;
 	}
 
 	bool NetThreadComponent::LateAwake()

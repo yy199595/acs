@@ -19,9 +19,8 @@
 #include"Component/RedisRegistryComponent.h"
 namespace Sentry
 {
-    void InnerService::Awake()
+    bool InnerService::Awake()
     {
-        this->mInnerNetComponent = nullptr;
 #ifdef __ENABLE_MYSQL__
         this->GetApp()->AddComponent<MysqlHelperComponent>();
 #endif
@@ -36,18 +35,16 @@ namespace Sentry
         this->GetApp()->AddComponent<GateHelperComponent>();
         this->GetApp()->AddComponent<RedisRegistryComponent>();
         this->GetApp()->AddComponent<InnerNetMessageComponent>();
+        return true;
     }
 
     bool InnerService::OnStart()
     {
         BIND_COMMON_RPC_METHOD(InnerService::Ping);
-        BIND_COMMON_RPC_METHOD(InnerService::Push);
         BIND_COMMON_RPC_METHOD(InnerService::Hotfix);
-        BIND_COMMON_RPC_METHOD(InnerService::Login);
-        BIND_COMMON_RPC_METHOD(InnerService::Logout);
+
         BIND_COMMON_RPC_METHOD(InnerService::StartService);
         BIND_COMMON_RPC_METHOD(InnerService::CloseService);
-        this->mInnerNetComponent = this->GetComponent<InnerNetComponent>();
         RedisSubComponent *subComponent = this->GetComponent<RedisSubComponent>();
         RedisDataComponent *dataComponent = this->GetComponent<RedisDataComponent>();
         InnerNetComponent *listenComponent = this->GetComponent<InnerNetComponent>();
@@ -60,49 +57,6 @@ namespace Sentry
 
     XCode InnerService::Ping()
     {
-        return XCode::Successful;
-    }
-
-    XCode InnerService::Push(const s2s::location::push &request)
-    {
-        const std::string & service = request.name();
-        Service * localService = this->GetApp()->GetService(service);
-        if(localService == nullptr)
-        {
-            CONSOLE_LOG_ERROR("not find service : " << service);
-            return XCode::Failure;
-        }
-        const std::string & address = request.address();
-        localService->AddLocation(address, request.user_id());
-        return XCode::Successful;
-    }
-
-    XCode InnerService::Login(const Rpc::Head & head, const s2s::location::sync & request)
-    {
-        std::string address;
-        if(!head.Get("address", address))
-        {
-            return XCode::CallArgsError;
-        }
-        const InnerServerNode * serverInfo = this->mInnerNetComponent->GetSeverInfo(address);
-        if(serverInfo == nullptr)
-        {
-            return XCode::Failure;
-        }
-
-        const std::string & service = request.name();
-        IServiceUnitSystem * unitSystem = this->GetComponent<IServiceUnitSystem>(service);
-        if(unitSystem != nullptr)
-        {
-            unitSystem->OnLogin(request.user_id());
-        }
-        CONSOLE_LOG_INFO(request.user_id() << " join service " << service);
-        return XCode::Successful;
-    }
-
-    XCode InnerService::Logout(const Rpc::Head & head, const s2s::location::sync &request)
-    {
-        std::string client, address;
         return XCode::Successful;
     }
 

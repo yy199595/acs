@@ -15,9 +15,9 @@ namespace Sentry
         this->mSyncRedisComponent = nullptr;
     }
 
-    void MongoService::Awake()
+    bool MongoService::Awake()
     {
-        this->GetApp()->AddComponent<MongoDBComponent>();
+        return this->GetApp()->AddComponent<MongoDBComponent>();
     }
 
 	bool MongoService::OnStart()

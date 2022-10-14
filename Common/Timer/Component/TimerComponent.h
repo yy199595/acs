@@ -28,7 +28,7 @@ namespace Sentry
 		long long AddTimer(unsigned int ms, StaticMethod* func);
 
 	 protected:
-		void Awake() final;
+		bool Awake() final;
 
 		bool LateAwake() final
 		{

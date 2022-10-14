@@ -3,29 +3,29 @@
 //
 #include<fstream>
 #include"HttpWebService.h"
-#include"File/FileHelper.h"
 #include"Json/Lua/Json.h"
+#include"App/System/System.h"
 #include"Component/HttpWebComponent.h"
 #include"Component/LuaScriptComponent.h"
 namespace Sentry
 {
-    void HttpWebService::Awake()
+    bool HttpWebService::Awake()
     {
-        this->GetApp()->AddComponent<HttpWebComponent>();
+        return this->GetApp()->AddComponent<HttpWebComponent>();
     }
 
     bool HttpWebService::OnStartService(HttpServiceRegister &serviceRegister)
     {
-        const ServerConfig & config = this->GetApp()->GetConfig();
+        const ServerConfig * localServerConfig = ServerConfig::Get();
         this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
         serviceRegister.Bind("Sync", &HttpWebService::Sync);
         serviceRegister.Bind("Async", &HttpWebService::Async);
         serviceRegister.Bind("DownLoad", &HttpWebService::DownLoad);
-        LOG_CHECK_RET_FALSE(config.GetMember("web", "lua", this->mLuaPath));
-        LOG_CHECK_RET_FALSE(config.GetMember("web", "download", this->mDownloadPath));
+        LOG_CHECK_RET_FALSE(localServerConfig->GetMember("web", "lua", this->mLuaPath));
+        LOG_CHECK_RET_FALSE(localServerConfig->GetMember("web", "download", this->mDownloadPath));
 
-        this->mLuaPath = config.GetWorkPath() + this->mLuaPath;
-        this->mDownloadPath = config.GetWorkPath() + this->mDownloadPath;
+        this->mLuaPath = System::GetWorkPath() + this->mLuaPath;
+        this->mDownloadPath = System::GetWorkPath() + this->mDownloadPath;
         return this->GetComponent<HttpWebComponent>()->StartListen("web");
     }
 

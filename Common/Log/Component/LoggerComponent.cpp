@@ -4,19 +4,19 @@
 #ifdef __DEBUG__
 #include"Log/Debug.h"
 #endif
+#include"App/System/System.h"
 #include"spdlog/sinks/rotating_file_sink.h"
 
 namespace Sentry
 {
 	// 单线程  st  多线程  mt
-	void LoggerComponent::Awake()
+	bool LoggerComponent::Awake()
 	{
-		const ServerConfig& config = App::Get()->GetConfig();
-
 		this->mLogSaveTime = 3;
-		config.GetPath("log", this->mLogSavePath);
-		config.GetMember("node_name", this->mServerName);
+        this->mServerName = System::GetName();
+        this->mLogSavePath = fmt::format("{0}logs/", System::GetWorkPath());
 		this->CreateLogFile();
+        return true;
 	}
 
 	void LoggerComponent::OnZeroRefresh()

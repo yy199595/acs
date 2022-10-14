@@ -24,10 +24,4 @@ namespace Sentry
 	{
 		return this->mEntity->GetComponentByName(name);
 	}
-
-	const ServerConfig& Component::GetConfig()
-	{
-		return this->mApp->GetConfig();
-	}
-
 }

@@ -4,7 +4,7 @@
 #include"Lua/Timer.h"
 namespace Sentry
 {
-	void TimerComponent::Awake()
+	bool TimerComponent::Awake()
 	{
 		this->mNextUpdateTime = 0;
 		for (int index = 0; index < this->LayerCount; index++)
@@ -17,6 +17,7 @@ namespace Sentry
 						FirstLayerCount * std::pow(OtherLayerCount, index - 1);
 			this->mTimerLayers.push_back(new TimeWheelLayer(index, count, start, end));
 		}
+        return true;
 	}
 
 	long long TimerComponent::AddTimer(std::shared_ptr<TimerBase> timer)

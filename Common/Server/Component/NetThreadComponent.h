@@ -11,7 +11,7 @@ namespace Sentry
 		~NetThreadComponent() final = default;
 
 	 public:
-		void Awake() final;
+		bool Awake() final;
 		bool LateAwake() final;
 		void OnDestory() final;
     public:

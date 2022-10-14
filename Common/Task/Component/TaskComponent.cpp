@@ -34,7 +34,7 @@ namespace Sentry
 		tb_context_jump(this->mMainContext, nullptr);
 	}
 
-	void TaskComponent::Awake()
+	bool TaskComponent::Awake()
 	{
 		this->mRunContext = nullptr;
 		for (Stack& stack : this->mSharedStack)
@@ -44,6 +44,7 @@ namespace Sentry
 			stack.p = new char[STACK_SIZE];
 			stack.top = (char*)stack.p + STACK_SIZE;
 		}
+        return true;
 	}
 
 #ifdef __DEBUG__

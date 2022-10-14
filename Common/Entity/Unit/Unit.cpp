@@ -33,7 +33,10 @@ namespace Sentry
 		component->mEntityId = mUnitId;
 		component->mEntity = this->shared_from_this();
 
-		component->Awake();
+		if(!component->Awake())
+        {
+            return false;
+        }
 		this->OnAddComponent(component);
 		this->mSortComponents.emplace_back(name);
 		this->mComponentMap.emplace(name, component);

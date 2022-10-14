@@ -107,6 +107,19 @@
             "Async": false,
             "Type": "Server"
         },
+        "StartService": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "com.type.string"
+        },
+        "CloseService": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "com.type.string"
+        }
+    },
+    "UserBehavior": {
+        "Type": "rpc",
         "Push": {
             "Async": false,
             "Type": "Server"
@@ -120,16 +133,6 @@
             "Async": false,
             "Type": "Server",
             "Request": "s2s.location.sync"
-        },
-        "StartService": {
-            "Async": true,
-            "Type": "Server",
-            "Request": "com.type.string"
-        },
-        "CloseService": {
-            "Async": true,
-            "Type": "Server",
-            "Request": "com.type.string"
         }
     },
     "MongoService": {

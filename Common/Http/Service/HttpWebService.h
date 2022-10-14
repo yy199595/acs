@@ -14,7 +14,7 @@ namespace Sentry
         ~HttpWebService() = default;
 
     private:
-        void Awake();
+        bool Awake();
     private:
         bool OnStartService(HttpServiceRegister &serviceRegister) final;
         XCode Ping(const HttpHandlerRequest& request, HttpHandlerResponse& response);

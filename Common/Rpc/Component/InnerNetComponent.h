@@ -29,7 +29,7 @@ namespace Sentry
 		void OnCloseSocket(const std::string & address, XCode code) final;
         void OnMessage(const std::string & address, std::shared_ptr<Rpc::Data> message) final;
 	 protected:
-        void Awake() final;
+        bool Awake() final;
         bool LateAwake() final;
 		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 public:

@@ -16,17 +16,17 @@ namespace Sentry
 	class App final : public Unit
 	{
 	 public:
-		explicit App(ServerConfig* config);
+		explicit App();
 		~App() final = default;
 	 public:
 		static std::shared_ptr<App> Get() { return mApp; }
-		const ServerConfig& GetConfig() { return *mConfig; }
+        const std::string & GetConfigPath() const { return this->mConfigPath; }
 		inline LoggerComponent* GetLogger() { return this->mLogComponent; }
 		inline Asio::Context & GetThread() { return *this->mMainThread; }
 		inline TaskComponent* GetTaskComponent() { return this->mTaskComponent; }
 		inline TimerComponent* GetTimerComponent() { return this->mTimerComponent; }
 		inline ProtoComponent * GetMsgComponent() { return this->mMessageComponent; }
-	 private:
+    private:
 		bool LoadComponent();
 		void StartAllComponent();
 		bool InitComponent(Component* component);
@@ -49,12 +49,11 @@ namespace Sentry
 	 private:
 		float mLogicFps;
 		long long mStartTime;
-		ServerConfig* mConfig;
-		std::string mServerName;
 		long long mLogicRunCount;
 		long long mLastUpdateTime;
 	 private:
         int mTickCount;
+        std::string mConfigPath;
         std::thread::id mThreadId;
         Asio::Context * mMainThread;
         TaskComponent* mTaskComponent;

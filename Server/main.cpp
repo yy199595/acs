@@ -27,7 +27,7 @@
 
 #include"Component/HttpComponent.h"
 #include"Component/HttpWebComponent.h"
-
+#include "Component/TextConfigComponent.h"
 
 #include"Service/LuaService.h"
 #include"Service/OuterService.h"
@@ -35,8 +35,8 @@
 #include"Service/ServiceAgent.h"
 #include"Service/HttpWebService.h"
 #include"Service/HttpRpcService.h"
+#include"Service/UserBehavior.h"
 #include"Service/LocalLuaHttpService.h"
-
 #ifdef __ENABLE_MONGODB__
 #include"Service/MongoService.h"
 #include"Component/MongoDBComponent.h"
@@ -50,6 +50,8 @@
 #include"Component/MysqlDBComponent.h"
 #include"Component/MysqlHelperComponent.h"
 #endif
+
+#include"App/System/System.h"
 using namespace Sentry;
 void RegisterComponent()
 {
@@ -68,6 +70,7 @@ void RegisterComponent()
     ComponentFactory::Add<ProtoComponent>("ProtoComponent");
 
 //server
+    ComponentFactory::Add<TextConfigComponent>("TextConfigComponent");
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
     ComponentFactory::Add<InnerNetComponent>("InnerNetComponent");
 
@@ -108,6 +111,7 @@ void RegisterServiceComponent()
     ComponentFactory::Add<LuaService>("rpc");
     ComponentFactory::Add<ServiceAgent>("agent");
     ComponentFactory::Add<LocalLuaHttpService>("http");
+    ComponentFactory::Add<UserBehavior>("UserBehavior");
     ComponentFactory::Add<OuterService>("OuterService");
     ComponentFactory::Add<InnerService>("InnerService");
 #ifdef __ENABLE_MONGODB__
@@ -120,7 +124,13 @@ void RegisterServiceComponent()
 }
 int main(int argc, char **argv)
 {
+    if(argc != 3)
+    {
+        CONSOLE_LOG_ERROR("start argc error");
+        return 1;
+    }
+    System::Init(argv);
 	RegisterComponent();
 	RegisterServiceComponent();
-	return std::make_shared<App>(new ServerConfig(argc, argv))->Run();
+	return std::make_shared<App>()->Run();
 }

@@ -5,20 +5,21 @@
 #include"RedisSubComponent.h"
 #include"Lua/Function.h"
 #include"Json/Lua/Json.h"
+#include"Config/ServerConfig.h"
 #include"Component/LuaScriptComponent.h"
+#include"Component/TextConfigComponent.h"
 #include"Component/RedisChannelComponent.h"
 namespace Sentry
 {
     bool RedisSubComponent::OnInitRedisClient(RedisConfig config)
     {
+        TextConfigComponent * textConfigComponent = this->GetComponent<TextConfigComponent>();
+        const ServerConfig * localServerConfig = textConfigComponent->GetTextConfig<ServerConfig>();
         if(!config.Channels.empty())
         {
             config.LuaFiles.clear();
-            if(this->GetConfig().GetListener("rpc", this->mLocalHost))
-            {
-                config.Channels.emplace_back(this->mLocalHost);
-            }
             TcpRedisClient * redisClient = this->MakeRedisClient(config);
+            localServerConfig->GetLocation("rpc", this->mLocalHost);
             if(redisClient == nullptr || !this->Ping(redisClient))
             {
                 return false;

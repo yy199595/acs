@@ -24,15 +24,15 @@ namespace Sentry
 {
 	bool MongoDBComponent::LoadConfig()
 	{
-		const ServerConfig & config = this->GetApp()->GetConfig();
+		const ServerConfig * config = ServerConfig::Get();
 		this->mTimerComponent = this->GetApp()->GetTimerComponent();
         this->mNetComponent = this->GetComponent<NetThreadComponent>();
-        LOG_CHECK_RET_FALSE(config.GetMember("mongo", "ip", this->mConfig.mIp));
-		LOG_CHECK_RET_FALSE(config.GetMember("mongo", "db", this->mConfig.mDb));
-		LOG_CHECK_RET_FALSE(config.GetMember("mongo", "port", this->mConfig.mPort));
-		LOG_CHECK_RET_FALSE(config.GetMember("mongo", "user", this->mConfig.mUser));
-		LOG_CHECK_RET_FALSE(config.GetMember("mongo", "passwd", this->mConfig.mPasswd));
-		LOG_CHECK_RET_FALSE(config.GetMember("mongo", "count", this->mConfig.mMaxCount));
+        LOG_CHECK_RET_FALSE(config->GetMember("mongo", "ip", this->mConfig.mIp));
+		LOG_CHECK_RET_FALSE(config->GetMember("mongo", "db", this->mConfig.mDb));
+		LOG_CHECK_RET_FALSE(config->GetMember("mongo", "port", this->mConfig.mPort));
+		LOG_CHECK_RET_FALSE(config->GetMember("mongo", "user", this->mConfig.mUser));
+		LOG_CHECK_RET_FALSE(config->GetMember("mongo", "passwd", this->mConfig.mPasswd));
+		LOG_CHECK_RET_FALSE(config->GetMember("mongo", "count", this->mConfig.mMaxCount));
 		return true;
 	}
 

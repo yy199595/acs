@@ -49,7 +49,7 @@ namespace Sentry
 		void Resume(unsigned int id);
 
     private:
-		void Awake() final;
+		bool Awake() final;
 
 		void OnSystemUpdate() final;
 

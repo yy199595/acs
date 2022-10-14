@@ -1,52 +1,44 @@
 {
-	"AllServer":
-	{
+	"AllServer": {
 		"AutoAllot": true,
-		"Start":
-		[
-			"InnerService",
-			"OuterService",
-			"MysqlService",
-			"MongoService",
-			"ChatService",
-			"AccountService"
-		]
+		"Service": {
+			"InnerService": true,
+			"OuterService": true,
+			"MysqlService": true,
+			"MongoService": true,
+			"ChatService": true,
+			"AccountService": true
+		}
 	},
-	"ChatServer":
-	{
+	"ChatServer": {
 		"AutoAllot": true,
-		"Start":
-		[
-			"InnerService",
-			"ChatService"
-		]
+		"Service": {
+			"InnerService": true,
+			"ChatService": true
+		}
 	},
-	"HttpServer":
-	{
-		"AutoAllot": true,
-		"Start":
-		[
-			"AccountService",
-			"HttpWebService"
-		]
-	},
-	"GateServer":
-	{
+	"HttpServer": {
 		"AutoAllot": false,
-		"Start":
-		[
-			"OuterService",
-			"InnerService"
-		]
+		"Service": {
+			"AccountService": true,
+			"HttpWebService": true,
+			"OuterService": false
+		}
 	},
-	"DataServer":
-	{
-		"AutoAllot":false,
-		"Start":
-		[
-			"InnerService",
-			"MysqlService",
-			"MongoService"
-		]
+	"GateServer": {
+		"AutoAllot": false,
+		"Service": {
+			"OuterService": true,
+			"InnerService": true,
+			"ChatService": false
+		}
+	},
+	"DataServer": {
+		"AutoAllot": false,
+		"Start": {
+			"InnerService": true,
+			"MysqlService": true,
+			"MongoService": true
+		}
 	}
 }

@@ -30,7 +30,7 @@ namespace Sentry
         bool SendData(long long userId, std::shared_ptr<Rpc::Data> message);
         bool SendData(const std::string & address, std::shared_ptr<Rpc::Data> message);
 	 public:
-		void Awake() final;
+		bool Awake() final;
 		bool LateAwake() final;
 	 private:
         void OnStopListen() final;

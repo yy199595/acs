@@ -14,13 +14,15 @@
 #include"Service/Service.h"
 #include"Json/Lua/Encoder.h"
 #include"Md5/LuaMd5.h"
+#include"App/System/System.h"
 using namespace Lua;
 namespace Sentry
 {
-	void LuaScriptComponent::Awake()
+	bool LuaScriptComponent::Awake()
 	{
 		this->mLuaEnv = luaL_newstate();
 		luaL_openlibs(mLuaEnv);
+        return true;
 	}
 
 	bool LuaScriptComponent::LateAwake()
@@ -36,7 +38,8 @@ namespace Sentry
 				luaRegisterComponent->OnLuaRegister(luaRegister);
 			}
 		}
-		const std::string & json = this->GetConfig().GetContent();
+        const ServerConfig * config = ServerConfig::Get();
+		const std::string & json = config->GetContent();
 		values::pushDecoded(this->mLuaEnv, json.c_str(), json.size());
 		lua_setglobal(this->mLuaEnv, "ServerConfig");
 
@@ -157,22 +160,22 @@ namespace Sentry
         std::string mainFilePath;
 		std::vector<std::string> luaPaths;
 		std::vector<std::string> luaFiles;
-		const ServerConfig& config = App::Get()->GetConfig();
-        LOG_CHECK_RET_FALSE(config.GetMember("lua", "require", luaPaths));
-        LOG_CHECK_RET_FALSE(config.GetMember("lua", "main", mainFilePath));
+		const ServerConfig * config = ServerConfig::Get();
+        LOG_CHECK_RET_FALSE(config->GetMember("lua", "require", luaPaths));
+        LOG_CHECK_RET_FALSE(config->GetMember("lua", "main", mainFilePath));
         this->mMainTable = std::make_shared<Lua::LocalTable>(this->mLuaEnv);
-        if(!this->mMainTable->Load(config.GetWorkPath() + mainFilePath))
+        if(!this->mMainTable->Load(System::GetWorkPath() + mainFilePath))
         {
             return false;
         }
         std::string index;
-        if(config.GetMember("lua", "http", index))
+        if(config->GetMember("lua", "http", index))
         {
-            this->AddRequire(config.GetWorkPath() + index);
+            this->AddRequire(System::GetWorkPath() + index);
         }
 		for (const std::string& path : luaPaths)
 		{
-			const std::string fullPath = config.GetWorkPath() + path;
+			const std::string fullPath = System::GetWorkPath() + path;
 			if (!Helper::Directory::GetFilePaths(fullPath, "*.lua", luaFiles))
 			{
 				LOG_ERROR("load" << path << " lua file failure");

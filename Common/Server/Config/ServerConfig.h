@@ -5,7 +5,7 @@
 #include<string>
 #include<unordered_map>
 #include"Json/JsonReader.h"
-
+#include"Config/TextConfig.h"
 namespace Sentry
 {
 	struct RedisConfig
@@ -34,31 +34,28 @@ namespace Sentry
     };
 
 	struct ListenConfig;
-    class ServerConfig : public Json::Reader
+    class ServerConfig : public Json::Reader, public TextConfig
     {
     public:
-        explicit ServerConfig(int argc, char ** argv);
+        explicit ServerConfig();
     public:
-        bool LoadConfig();
+        static const ServerConfig * Get() { return mConfig; }
         const ListenConfig * GetListenConfig(const char * name) const;
-		bool GetListener(const std::string & name, std::string & address) const;
+        bool GetLocation(const char * name, std::string & location) const;
+    protected:
+        bool OnLoadText(const std::string &content) final;
+        bool OnReloadText(const std::string &content) final;
 	 public:
         int GetNodeId() const { return this->mNodeId; }
         const std::string& GetNodeName() const { return this->mNodeName; }
 		const std::string & GetContent() const { return this->mContent;}
-		bool GetPath(const std::string & name, std::string & path) const;
-		const std::string & GetExename() const { return this->mExePath;}
-		const std::string & GetWorkPath() const { return this->mWrokDir; }
-        const std::string & GetLocalHost() const { return this->mLocalHost; }
+		bool GetConfigPath(const std::string & name, std::string & path) const;
         size_t GetServices(std::vector<std::string> & services, bool start = false) const;
     private:
         int mNodeId;
 		std::string mContent;
-		std::string mExePath;
-		std::string mWrokDir;
         std::string mNodeName;
-		std::string mConfigPath;
-        std::string mLocalHost;
+        static ServerConfig * mConfig;
         std::unordered_map<std::string, std::string> mPaths;
 		std::unordered_map<std::string, ListenConfig> mListens;
         std::unordered_map<std::string , bool> mServiceConfigs;

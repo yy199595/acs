@@ -17,7 +17,7 @@ namespace Sentry
 		void SaveAllLog();
 		void AddLog(spdlog::level::level_enum type, const std::string& log);
 	 protected:
-		void Awake() final;
+		bool Awake() final;
 		void OnDestory() final;
 		void OnZeroRefresh() final;
 	public:

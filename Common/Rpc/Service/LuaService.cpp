@@ -21,6 +21,9 @@ namespace Sentry
 
 	bool LuaService::Start()
 	{
+        std::string location;
+        const ServerConfig * config = ServerConfig::Get();
+        LOG_CHECK_RET_FALSE(config->GetLocation("rpc", location));
 		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
 
 		std::vector<const RpcMethodConfig *> rpcInterConfigs;
@@ -57,7 +60,7 @@ namespace Sentry
             }
         }
         this->mIsHandlerMessage = true;
-        this->AddLocation(this->GetConfig().GetLocalHost());
+        this->AddLocation(location);
         return true;
 	}
 

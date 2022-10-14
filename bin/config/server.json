@@ -2,13 +2,12 @@
     "area_id": 1,
     "node_id": 1,
     "fps": 30,
-    "node_name": "Server",
+    "node_name": "AllServer",
     "thread": {
         "task": 1,
         "network": 4
     },
     "path": {
-        "log": "log",
         "proto": "proto",
         "source": "source",
         "user": "config/user.json",
@@ -21,19 +20,24 @@
         "name": "root",
         "passwd": "199595yjz."
     },
+    "server": {
+        "rpc": "127.0.0.1:7788",
+        "gate": "127.0.0.1:1995",
+        "http": "http://127.0.0.1:8080/app/web"
+    },
     "listener": {
         "rpc": {
             "port": 7788,
-            "ip": "127.0.0.1"
+            "ip": "0.0.0.0"
         },
         "web": {
             "port": 8080,
-            "ip": "127.0.0.1",
+            "ip": "0.0.0.0",
             "route": "/app/web"
         },
         "gate": {
             "port": 1995,
-            "ip": "127.0.0.1"
+            "ip": "0.0.0.0"
         },
         "console": {
             "port": 1122,

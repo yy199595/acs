@@ -7,9 +7,9 @@
 namespace Sentry
 {
 
-    void MysqlService::Awake()
+    bool MysqlService::Awake()
     {
-        this->GetApp()->AddComponent<MysqlDBComponent>();
+        return this->GetApp()->AddComponent<MysqlDBComponent>();
     }
 
 	bool MysqlService::OnStart()

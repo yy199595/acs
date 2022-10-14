@@ -1,9 +1,11 @@
 ﻿
 #include"App.h"
+#include"App/System/System.h"
 #include"Timer/ElapsedTimer.h"
 #include"File/DirectoryHelper.h"
 #include"Service/LuaService.h"
 #include"Component/ProtoComponent.h"
+#include"Component/TextConfigComponent.h"
 #include"Component/RedisChannelComponent.h"
 
 using namespace Sentry;
@@ -13,10 +15,11 @@ namespace Sentry
 {
 	std::shared_ptr<App> App::mApp = nullptr;
 
-	App::App(ServerConfig* config)
+	App::App()
 			: Unit(0),
-              mStartTime(Helper::Time::GetNowMilTime()), mConfig(config)
+              mStartTime(Helper::Time::GetNowMilTime())
 	{
+        this->mFps = 15;
         this->mTickCount = 0;
 		this->mLogicRunCount = 0;
 		this->mTimerComponent = nullptr;
@@ -30,27 +33,22 @@ namespace Sentry
 		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
 		this->mMessageComponent = this->GetOrAddComponent<ProtoComponent>();
 
+        LOG_CHECK_RET_FALSE(this->AddComponent<TextConfigComponent>());
+
         std::vector<std::string> components;
-		if (this->mConfig->GetMember("component", components)) //添加组件
-		{
-			for (const std::string& name: components)
-			{
-                try
+        ServerConfig::Get()->GetMember("fps", this->mFps);
+        if (ServerConfig::Get()->GetMember("component", components)) //添加组件
+        {
+            for (const std::string &name: components)
+            {
+                Component *component = ComponentFactory::CreateComponent(name);
+                if (component == nullptr || !this->AddComponent(name, component))
                 {
-                    Component * component = ComponentFactory::CreateComponent(name);
-                    if(component == nullptr || !this->AddComponent(name, component))
-                    {
-                        CONSOLE_LOG_ERROR("add " << name << " failure");
-                        return false;
-                    }
-                }
-                catch (std::exception & e)
-                {
-                    CONSOLE_LOG_ERROR("Init" + name + "error:" + e.what());
+                    CONSOLE_LOG_ERROR("add " << name << " failure");
                     return false;
                 }
-			}
-		}
+            }
+        }
         this->GetComponents(components);
 		for (const std::string& name: components)
 		{
@@ -92,16 +90,12 @@ namespace Sentry
 	int App::Run()
 	{
 		App::mApp = this->Cast<App>();
-		IF_THROW_ERROR(this->mConfig->LoadConfig());
-		this->mServerName = this->mConfig->GetNodeName();
 
 		if(!this->LoadComponent())
 		{
 			this->GetLogger()->SaveAllLog();
 			return -1;
 		}
-		this->mFps = 15;
-		mConfig->GetMember("fps", this->mFps);
 		this->mLogicUpdateInterval = 1000 / this->mFps;
 		this->mStartTime = Helper::Time::GetNowMilTime();
 		this->mSecondTimer = Helper::Time::GetNowMilTime();
@@ -181,24 +175,22 @@ namespace Sentry
         for (const std::string &name: components)
         {
             ElapsedTimer timer;
-            Component *component = this->GetComponentByName(name);
-            long long timeId = this->mTimerComponent->DelayCall(10.0f, [component]() {
-                LOG_FATAL(component->GetName() << " start time out");
-            });
-            if (component->Cast<IStart>() != nullptr)
+            IStart * component = this->GetComponent<IStart>(name);
+            if(component != nullptr)
             {
-                if (!component->Cast<IStart>()->Start())
+                long long timeId = this->mTimerComponent->DelayCall(10.0f, [name]()
                 {
-					LOG_FATAL("start " << component->GetName() << " failure");
+                    LOG_FATAL(name << " start time out");
+                });
+                if(!component->Start())
+                {
+                    LOG_FATAL("start [" << name << "] failure");
                     this->Stop();
-					return;
+                    return;
                 }
+                this->mTimerComponent->CancelTimer(timeId);
+                LOG_DEBUG("start " << name << " successful use time = [" << timer.GetSecond() << "s]");
             }
-            if(timer.GetSecond() > 0)
-            {
-                LOG_DEBUG("start " << name << " successful use time = [" << timer.GetSecond() << "s]")
-            }
-            this->mTimerComponent->CancelTimer(timeId);
         }
 
         CONSOLE_LOG_DEBUG("start all component complete");
@@ -215,30 +207,25 @@ namespace Sentry
 
 	void App::WaitAllServiceStart()
 	{
-        std::vector<std::string> components;
-        this->mConfig->GetServices(components);
-		for (const std::string name: components)
-		{
-			int count = 0;
-			IServiceBase* serviceBase = this->GetComponent<IServiceBase>(name);
-			while (serviceBase != nullptr && !serviceBase->IsStartComplete())
-			{
-				this->mTaskComponent->Sleep(2000);
-				LOG_WARN("wait " << name << " start count = " << ++count);
-			}
-		}
-        std::vector<Component *> componentList;
-        this->GetComponents(componentList);
-        for (Component * component: componentList)
+        std::vector<IServiceBase *> components;
+        this->GetComponents<IServiceBase>(components);
+		for (IServiceBase * component: components)
         {
-            IComplete* complete = component->Cast<IComplete>();
-            if (complete != nullptr)
+            int count = 0;
+            while (!component->IsStartComplete())
             {
-                complete->OnAllServiceStart();
+                this->mTaskComponent->Sleep(2000);
+                LOG_WARN("wait " << dynamic_cast<Component*>(component)->GetName() << " start count = " << ++count);
             }
         }
+        std::vector<IComplete *> completeComponents;
+        this->GetComponents<IComplete>(completeComponents);
+        for (IComplete* complete: completeComponents)
+        {
+            complete->OnAllServiceStart();
+        }
 		long long t = Helper::Time::GetNowMilTime() - this->mStartTime;
-		LOG_INFO("===== start " << this->mServerName << " successful [" << t / 1000.0f << "]s ===========");
+		LOG_INFO("===== start " << System::GetName() << " successful [" << t / 1000.0f << "]s ===========");
 	}
 
 	void App::UpdateConsoleTitle()

@@ -30,7 +30,6 @@ namespace Sentry
 namespace Sentry
 {
 	class Unit;
-	class ServerConfig;
 	class Component : public Object
 	{
 	 public:
@@ -73,7 +72,7 @@ namespace Sentry
 
 	 public:
 
-		virtual void Awake() { }; //组件创建的时候调用
+		virtual bool Awake() { return true; }; //组件创建的时候调用
 
 		virtual bool LateAwake() { return true;}; // 所有组件加载完成之后调用
 
@@ -87,8 +86,6 @@ namespace Sentry
 		Component* GetByName(const std::string& name);
 
 		std::shared_ptr<App> GetApp() { return mApp;}
-
-		const ServerConfig & GetConfig();
 
 	 private:
 		Component* GetByHash(size_t hash);

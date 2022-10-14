@@ -18,11 +18,12 @@
 #include"Component/UnitMgrComponent.h"
 namespace Sentry
 {
-	void OuterNetComponent::Awake()
+	bool OuterNetComponent::Awake()
 	{
         this->mNetComponent = nullptr;
         this->mTimerComponent = nullptr;
         this->mOuterMessageComponent = nullptr;
+        return true;
     }
 
 	bool OuterNetComponent::LateAwake()

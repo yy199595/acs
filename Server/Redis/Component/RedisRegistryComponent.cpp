@@ -23,12 +23,12 @@ namespace Sentry
 {
 	bool RedisRegistryComponent::LateAwake()
 	{
+        const ServerConfig * config = ServerConfig::Get();
         this->mTaskComponent = this->GetComponent<TaskComponent>();
         this->mRedisComponent = this->GetComponent<RedisDataComponent>();
-		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("area_id", this->mAreaId));
-		LOG_CHECK_RET_FALSE(this->GetConfig().GetListener("rpc", this->mRpcAddress));
-		LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("node_name", this->mNodeName));
-		return true;
+		LOG_CHECK_RET_FALSE(config->GetMember("area_id", this->mAreaId));
+        LOG_CHECK_RET_FALSE(config->GetLocation("rpc", this->mRpcAddress));
+        return true;
 	}
 
 	bool RedisRegistryComponent::OnRegisterEvent(NetEventRegistry& eventRegister)

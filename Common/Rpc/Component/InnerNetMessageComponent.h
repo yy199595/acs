@@ -24,7 +24,7 @@ namespace Sentry
 		InnerNetMessageComponent() = default;
 		~InnerNetMessageComponent() final = default;
 	 protected:
-		void Awake() final;
+		bool Awake() final;
 		bool LateAwake() final;
         void OnTaskTimeout(long long rpcId);
     public:

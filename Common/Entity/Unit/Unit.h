@@ -128,7 +128,10 @@ namespace Sentry
 		T* component = this->GetComponent<T>();
 		if (component == nullptr)
 		{
-			this->AddComponent<T>();
+			if(!this->AddComponent<T>())
+            {
+                return nullptr;
+            }
 			return this->GetComponent<T>();
 		}
 		return component;

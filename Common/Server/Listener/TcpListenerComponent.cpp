@@ -36,7 +36,8 @@ namespace Sentry
 
 	bool TcpListenerComponent::StartListen(const char * name)
     {
-        this->mConfig = this->GetConfig().GetListenConfig(name);
+        const ServerConfig * config = ServerConfig::Get();
+        LOG_CHECK_RET_FALSE(this->mConfig = config->GetListenConfig(name));
         try
         {
             if(this->mConfig == nullptr)

@@ -18,10 +18,10 @@ namespace Sentry
 	}
 	bool Service::LateAwake()
 	{
-		assert(this->mConfig);
-		this->mClientComponent = this->GetComponent<InnerNetComponent>();
+        this->mClientComponent = this->GetComponent<InnerNetComponent>();
+        ServerConfig::Get()->GetLocation("rpc", this->mLocalAddress);
         this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>();
-        return this->GetConfig().GetListener("rpc", this->mLocalAddress);
+        return true;
 	}
 
 	void Service::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)

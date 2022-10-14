@@ -28,12 +28,12 @@ namespace Sentry
 {
     bool MysqlDBComponent::LoadConfig()
 	{
-		const ServerConfig& config = this->GetConfig();
-		config.GetMember("mysql", "ip", this->mConfig.mIp);
-		config.GetMember("mysql", "port", this->mConfig.mPort);
-		config.GetMember("mysql", "user", this->mConfig.mUser);
-		config.GetMember("mysql", "count", this->mConfig.mMaxCount);
-		config.GetMember("mysql", "passwd", this->mConfig.mPassword);
+		const ServerConfig * config = ServerConfig::Get();
+        LOG_CHECK_RET_FALSE(config->GetMember("mysql", "ip", this->mConfig.mIp));
+        LOG_CHECK_RET_FALSE(config->GetMember("mysql", "port", this->mConfig.mPort));
+        LOG_CHECK_RET_FALSE(config->GetMember("mysql", "user", this->mConfig.mUser));
+        LOG_CHECK_RET_FALSE(config->GetMember("mysql", "count", this->mConfig.mMaxCount));
+        LOG_CHECK_RET_FALSE(config->GetMember("mysql", "passwd", this->mConfig.mPassword));
 		this->mConfig.mAddress = fmt::format("{0}:{1}", this->mConfig.mIp, this->mConfig.mPort);
 		return true;
 	}

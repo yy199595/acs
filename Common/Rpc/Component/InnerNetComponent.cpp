@@ -10,23 +10,19 @@
 #include"google/protobuf/util/json_util.h"
 namespace Sentry
 {
-	void InnerNetComponent::Awake()
+	bool InnerNetComponent::Awake()
 	{
         this->mNetComponent = nullptr;
         this->mMessageComponent = nullptr;
+        return true;
     }
 	bool InnerNetComponent::LateAwake()
 	{
         std::string path;
-        if(!this->GetConfig().GetPath("user", path))
-        {
-            return false;
-        }
         rapidjson::Document document;
-        if(!Helper::File::ReadJsonFile(path, document))
-        {
-            return false;
-        }
+        const ServerConfig * config = ServerConfig::Get();
+        LOG_CHECK_RET_FALSE(config->GetConfigPath("user", path));
+        LOG_CHECK_RET_FALSE(Helper::File::ReadJsonFile(path, document));
         auto iter = document.MemberBegin();
         for(; iter != document.MemberEnd(); iter++)
         {
@@ -36,9 +32,9 @@ namespace Sentry
         }
 
         this->mOuterComponent = this->GetComponent<OuterNetComponent>();
+        LOG_CHECK_RET_FALSE(config->GetMember("user", "name", this->mUserName));
+        LOG_CHECK_RET_FALSE(config->GetMember("user", "passwd", this->mPassword));
         LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<NetThreadComponent>());
-        LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("user", "name", this->mUserName));
-        LOG_CHECK_RET_FALSE(this->GetConfig().GetMember("user", "passwd", this->mPassword));
         LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>());
 		return true;
 	}

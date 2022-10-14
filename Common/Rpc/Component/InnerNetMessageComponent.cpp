@@ -9,11 +9,12 @@
 #include"Async/RpcTaskSource.h"
 namespace Sentry
 {
-	void InnerNetMessageComponent::Awake()
+	bool InnerNetMessageComponent::Awake()
 	{
 		this->mTaskComponent = nullptr;
 		this->mTimerComponent = nullptr;
 		this->mRpcClientComponent = nullptr;
+        return true;
 	}
 
 	bool InnerNetMessageComponent::LateAwake()

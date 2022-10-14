@@ -57,7 +57,6 @@ namespace Sentry
         bool OnRegisterEvent(NetEventRegistry &eventRegister) final;
 	 private:
 		int mAreaId;
-		std::string mNodeName;
 		std::string mRpcAddress;
 		std::vector<std::string> mServices;
         class TaskComponent * mTaskComponent;

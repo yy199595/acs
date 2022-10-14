@@ -17,7 +17,7 @@ namespace Sentry
         this->mState = Tcp::DecodeState::Head;
         this->mUserName = component->GetUser();
         this->mPassword = component->GetPassword();
-        this->mLocation = App::Get()->GetConfig().GetLocalHost();
+        ServerConfig::Get()->GetLocation("rpc", this->mLocation);
 	}
 
 	void InnerNetClient::StartClose()

@@ -13,7 +13,7 @@ namespace Sentry
         ServiceLaunchComponent() = default;
         ~ServiceLaunchComponent() = default;
     private:
-        void Awake() final;
+        bool Awake() final;
         bool Start() final;
     };
 }

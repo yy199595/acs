@@ -1,32 +1,31 @@
 ﻿#include<utility>
+#include <unistd.h>
 #include"ServerConfig.h"
 #include"Log/CommonLogDef.h"
 #include"File/FileHelper.h"
 #include"spdlog/fmt/fmt.h"
 #include"File/DirectoryHelper.h"
-#include"Listener/TcpListenerComponent.h"
 namespace Sentry
 {
-    ServerConfig::ServerConfig(int argc, char ** argv)
-        : mExePath(argv[0]), mWrokDir(getcwd(NULL, 0))
+    ServerConfig * ServerConfig::mConfig = nullptr;
+
+    ServerConfig::ServerConfig()
+        : TextConfig("ServerConfig")
     {
         this->mNodeId = 0;
-        this->mWrokDir += "/";
-        this->mConfigPath = argv[1];
-        std::cout << "Exe Path : " << this->mExePath << std::endl;
-        std::cout << "Work Path : " << this->mWrokDir << std::endl;
+        this->mConfig = this;
     }
 
-    bool ServerConfig::LoadConfig()
+    bool ServerConfig::OnReloadText(const std::string &content)
+    {
+        return true;
+    }
+
+    bool ServerConfig::OnLoadText(const std::string &content)
 	{
-		if (!Helper::File::ReadTxtFile(this->mConfigPath, this->mContent))
+		if (!this->ParseJson(content))
 		{
-            CONSOLE_LOG_ERROR("not find config " << this->mConfigPath);
-            return false;
-		}
-		if (!this->ParseJson(this->mContent))
-		{
-            CONSOLE_LOG_ERROR("parse " << this->mConfigPath << " failure");
+            CONSOLE_LOG_ERROR("parse " << this->GetPath() << " failure");
             return false;
 		}
         this->GetMember("area_id",this->mNodeId);
@@ -53,7 +52,6 @@ namespace Sentry
                     this->mListens.emplace(listenConfig.Name, listenConfig);
                 }
             }
-            this->GetListener("rpc", this->mLocalHost);
         }
         const rapidjson::Value  * value1 = this->GetJsonValue("services");
         if(value1 != nullptr && value1->IsObject())
@@ -67,7 +65,8 @@ namespace Sentry
             }
         }
 
-		if (this->HasMember("path") && (*this)["path"].IsObject())
+        const std::string workDir(getcwd(NULL, NULL));
+        if (this->HasMember("path") && (*this)["path"].IsObject())
 		{
 			const rapidjson::Value & jsonObject = (*this)["path"];
 			auto iter1 = jsonObject.MemberBegin();
@@ -75,11 +74,21 @@ namespace Sentry
 			{
 				const std::string key(iter1->name.GetString());
 				const std::string value(iter1->value.GetString());
-				this->mPaths.emplace(key, this->mWrokDir + value);
+				this->mPaths.emplace(key, fmt::format("{0}/{1}", workDir, value));
 			}
 		}
 		return true;
 	}
+
+    bool ServerConfig::GetLocation(const char *name, std::string &location) const
+    {
+        if(!this->GetMember("server", name, location))
+        {
+            CONSOLE_LOG_FATAL("not find location : " << name);
+            return false;
+        }
+        return true;
+    }
 
     size_t ServerConfig::GetServices(std::vector<std::string> &services, bool start) const
     {
@@ -100,18 +109,7 @@ namespace Sentry
         return iter != this->mListens.end() ? &iter->second : nullptr;
     }
 
-	bool ServerConfig::GetListener(const std::string& name, std::string& address) const
-	{
-		auto iter = this->mListens.find(name);
-		if(iter != this->mListens.end())
-		{
-			address = iter->second.Address;
-			return true;
-		}
-		return false;
-	}
-
-	bool ServerConfig::GetPath(const string& name, string& path) const
+	bool ServerConfig::GetConfigPath(const std::string& name, std::string& path) const
 	{
 		auto iter = this->mPaths.find(name);
 		if(iter != this->mPaths.end())

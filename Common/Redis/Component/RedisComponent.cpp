@@ -5,7 +5,6 @@
 #include"RedisComponent.h"
 #include"File/FileHelper.h"
 #include"Timer/ElapsedTimer.h"
-#include"File/DirectoryHelper.h"
 #include"Component/NetThreadComponent.h"
 
 namespace Sentry
@@ -30,8 +29,9 @@ namespace Sentry
 {
 	bool RedisComponent::LoadConfig()
 	{
-        const ServerConfig & config = this->GetApp()->GetConfig();
-        const rapidjson::Value * jsonValue = config.GetJsonValue("redis");
+        const ServerConfig * localServerConfig = ServerConfig::Get();
+        const rapidjson::Value * jsonValue = localServerConfig->GetJsonValue("redis");
+
         if(jsonValue == nullptr || !jsonValue->IsObject())
         {
             return false;

@@ -5,6 +5,9 @@
 #include "ClusterComponent.h"
 #include"App/App.h"
 #include"File/FileHelper.h"
+#include"App/System/System.h"
+#include"Service/LocalService.h"
+#include"Service/LocalHttpService.h"
 namespace Cluster
 {
     Server::Server(const std::string &name)
@@ -13,17 +16,31 @@ namespace Cluster
     bool Server::LoadService(const rapidjson::Value &value)
     {
         LOG_CHECK_RET_FALSE(value.IsObject());
-        LOG_CHECK_RET_FALSE(value.HasMember("Start"));
+        LOG_CHECK_RET_FALSE(value.HasMember("Service"));
         LOG_CHECK_RET_FALSE(value.HasMember("AutoAllot"));
 
         this->mServices.clear();
-        const rapidjson::Value &starts = value["Start"];
         this->mIsAuthAllot = value["AutoAllot"].GetBool();
-        for (size_t index = 0; index < starts.Size(); index++)
+        const rapidjson::Value &services = value["Service"];
+        for(auto iter = services.MemberBegin(); iter != services.MemberEnd(); iter++)
         {
-            this->mServices.emplace_back(std::string(starts[index].GetString()));
+            const std::string service(iter->name.GetString());
+            this->mServices.emplace(service, iter->value.GetBool());
         }
         return true;
+    }
+
+    size_t Server::GetServices(std::vector<std::string> &services, bool start) const
+    {
+        for(auto & value : this->mServices)
+        {
+            if(start && !value.second)
+            {
+                continue;
+            }
+            services.emplace_back(value.first);
+        }
+        return services.size();
     }
 
     bool Server::LoadLocation(const rapidjson::Value &value)
@@ -40,35 +57,105 @@ namespace Cluster
 
 namespace Sentry
 {
-    void ClusterComponent::Awake()
+    bool ClusterComponent::Awake()
     {
         std::string path;
-        const ServerConfig & config = this->GetConfig();
-        if(!config.GetPath("cluster", path))
-        {
-            THROW_LOGIC_ERROR("not find path 'cluster'");
-        }
         rapidjson::Document document;
-        if(!Helper::File::ReadJsonFile(path, document))
-        {
-            THROW_LOGIC_ERROR("read json file " + path + " error");
-        }
+        const ServerConfig * serverConfig = ServerConfig::Get();
+        LOG_CHECK_RET_FALSE(serverConfig->GetConfigPath("cluster", path));
+        LOG_CHECK_RET_FALSE(Helper::File::ReadJsonFile(path, document));
         auto iter = document.MemberBegin();
         for(; iter != document.MemberEnd(); iter++)
         {
             const std::string name(iter->name.GetString());
-            Cluster::Server * server = new Cluster::Server(name);
+            std::unique_ptr<Cluster::Server> server(new Cluster::Server(name));
             if(!server->LoadService(iter->value))
             {
-                THROW_LOGIC_ERROR("load service json : " << name);
+                CONSOLE_LOG_ERROR("load service json : " << name);
+                return false;
             }
-            this->mServers.emplace(name, server);
+            this->mServers.emplace(name, std::move(server));
         }
-        const std::string & name = config.GetNodeName();
-        Cluster::Server * server = this->mServers[name];
-        for(const std::string & service : server->GetServices())
+        std::vector<std::string> services;
+        const std::string & name = System::GetName();
+        if(this->GetServer(name)->GetServices(services) > 0)
         {
-
+            return this->CreateServices(services);
         }
+        return true;
+    }
+
+    bool ClusterComponent::CreateServices(const std::vector<std::string> &services)
+    {
+        std::string path;
+        rapidjson::Document jsonDocument;
+        const ServerConfig * serverConfig = ServerConfig::Get();
+        LOG_CHECK_RET_FALSE(serverConfig->GetConfigPath("service", path));
+        LOG_CHECK_RET_FALSE(Helper::File::ReadJsonFile(path, jsonDocument));
+
+        auto iter = jsonDocument.MemberBegin();
+        for (; iter != jsonDocument.MemberEnd(); iter++)
+        {
+            const rapidjson::Value &value = iter->value;
+            const std::string name(iter->name.GetString());
+            if (std::find(services.begin(), services.end(), name) != services.end())
+            {
+                Component *component = ComponentFactory::CreateComponent(name);
+                if (component == nullptr)
+                {
+                    std::string type(value["Type"].GetString());
+                    component = ComponentFactory::CreateComponent(type);
+                }
+                if (component == nullptr || !this->GetApp()->AddComponent(name, component))
+                {
+                    CONSOLE_LOG_ERROR("add " + name + " failure");
+                    return false;
+                }
+                IServiceBase *serviceBase = component->Cast<IServiceBase>();
+                if (serviceBase == nullptr || (!serviceBase->LoadConfig(value)))
+                {
+                    CONSOLE_LOG_ERROR("load service config error : " + name);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    bool ClusterComponent::Start()
+    {
+        std::vector<std::string> startServices;
+        const std::string & name = System::GetName();
+        const Cluster::Server * node = this->GetServer(name);
+        if(node->GetServices(startServices, true) <= 0)
+        {
+            return false;
+        }
+        for(const std::string & name : startServices)
+        {
+            IServiceBase * component = this->GetComponent<IServiceBase>(name);
+            LocalService * localService = dynamic_cast<LocalService*>(component);
+            LocalHttpService * localHttpService = dynamic_cast<LocalHttpService*>(component);
+            if(component != nullptr && !component->Start())
+            {
+                LOG_ERROR("start service [" << name << "] faillure");
+                return false;
+            }
+            if(localService != nullptr)
+            {
+                CONSOLE_LOG_ERROR("start rpc service [" << name << "] successful");
+            }
+            else if(localHttpService != nullptr)
+            {
+                CONSOLE_LOG_ERROR("start http service [" << name << "] successful");
+            }
+        }
+        return true;
+    }
+
+    Cluster::Server *ClusterComponent::GetServer(const std::string &name)
+    {
+        auto iter = this->mServers.find(name);
+        return iter != this->mServers.end() ? iter->second.get() : nullptr;
     }
 }

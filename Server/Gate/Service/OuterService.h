@@ -18,7 +18,7 @@ namespace Sentry
         XCode AllotUser(const com::type::int64 & userId, s2s::allot::response & response);
 		XCode QueryAddress(long long userId, const com::type::string &request, com::type::string & response); //查询玩家服务地址
 	private:
-		void Awake() final;
+		bool Awake() final;
 		bool OnStart() final;
         bool OnClose() final;
 	 private:
