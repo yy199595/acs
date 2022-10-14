@@ -95,7 +95,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
                 this->mGateComponent->OnMessage(address, std::move(this->mMessage));
 #else
-                Asio::Context &io = App::Get()->GetThread();
+                Asio::Context &io = App::Inst()->GetThread();
                 io.post(std::bind(&OuterNetComponent::OnMessage,
                                   this->mGateComponent, address, std::move(this->mMessage)));
 #endif
@@ -111,7 +111,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mGateComponent->OnCloseSocket(address, code);
 #else
-		Asio::Context &mainTaskScheduler = App::Get()->GetThread();
+		Asio::Context &mainTaskScheduler = App::Inst()->GetThread();
 		mainTaskScheduler.post(std::bind(&OuterNetComponent::OnCloseSocket, this->mGateComponent, address, code));
 #endif
 	}

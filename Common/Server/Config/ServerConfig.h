@@ -6,6 +6,7 @@
 #include<unordered_map>
 #include"Json/JsonReader.h"
 #include"Config/TextConfig.h"
+#include"Singleton/Singleton.h"
 namespace Sentry
 {
 	struct RedisConfig
@@ -34,12 +35,11 @@ namespace Sentry
     };
 
 	struct ListenConfig;
-    class ServerConfig : public Json::Reader, public TextConfig
+    class ServerConfig : public Json::Reader, public TextConfig, public ConstSingleton<ServerConfig>
     {
     public:
         explicit ServerConfig();
     public:
-        static const ServerConfig * Get() { return mConfig; }
         const ListenConfig * GetListenConfig(const char * name) const;
         bool GetLocation(const char * name, std::string & location) const;
     protected:
@@ -55,7 +55,6 @@ namespace Sentry
         int mNodeId;
 		std::string mContent;
         std::string mNodeName;
-        static ServerConfig * mConfig;
         std::unordered_map<std::string, std::string> mPaths;
 		std::unordered_map<std::string, ListenConfig> mListens;
         std::unordered_map<std::string , bool> mServiceConfigs;

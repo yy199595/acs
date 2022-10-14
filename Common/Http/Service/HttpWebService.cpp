@@ -11,12 +11,12 @@ namespace Sentry
 {
     bool HttpWebService::Awake()
     {
-        return this->GetApp()->AddComponent<HttpWebComponent>();
+        return this->mApp->AddComponent<HttpWebComponent>();
     }
 
     bool HttpWebService::OnStartService(HttpServiceRegister &serviceRegister)
     {
-        const ServerConfig * localServerConfig = ServerConfig::Get();
+        const ServerConfig * localServerConfig = ServerConfig::Inst();
         this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
         serviceRegister.Bind("Sync", &HttpWebService::Sync);
         serviceRegister.Bind("Async", &HttpWebService::Async);

@@ -11,9 +11,7 @@ namespace Sentry
         if(!this->HasLocation(address))
         {
             this->OnAddHost(address);
-            const std::string & name = this->GetServiceName();
             this->mHosts.emplace_back(new HostCounter(address));
-            CONSOLE_LOG_DEBUG(name << " add host [" << address <<"]");
         }
     }
 
@@ -25,8 +23,6 @@ namespace Sentry
             return false;
         }
         this->mUnitLocations.erase(iter);
-        const std::string & name = this->GetServiceName();
-        CONSOLE_LOG_ERROR(name << " remove user : " << useId);
         return true;
     }
 
@@ -37,8 +33,6 @@ namespace Sentry
             return;
         }
         this->mUnitLocations[userId] = address;
-        const std::string & name = this->GetServiceName();
-        CONSOLE_LOG_INFO(name << " add new user : " << userId);
     }
 
     bool LocationComponent::GetLocation(long long userId, std::string &address)

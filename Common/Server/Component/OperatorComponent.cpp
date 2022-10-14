@@ -8,9 +8,8 @@ namespace Sentry
 {
 	bool OperatorComponent::LateAwake()
 	{
-		this->mTimerComponent = this->GetComponent<TimerComponent>();
 		std::vector<std::string> components;
-		this->GetApp()->GetComponents(components);
+		this->mApp->GetComponents(components);
 		for(const std::string & name : components)
 		{
 			Component * component = this->GetComponent<Component>(name);
@@ -22,7 +21,7 @@ namespace Sentry
 	void OperatorComponent::StartHotfix()
 	{
 		std::vector<std::string> components;
-		this->GetApp()->GetComponents(components);
+		this->mApp->GetComponents(components);
 		for(const std::string & name : components)
 		{
 			IHotfix* hotfixComponent = this->GetComponent<IHotfix>(name);
@@ -36,7 +35,7 @@ namespace Sentry
 	bool OperatorComponent::StartLoadConfig()
 	{
 		std::vector<std::string> components;
-		this->GetApp()->GetComponents(components);
+		this->mApp->GetComponents(components);
 		for(const std::string & name : components)
 		{
 			ILoadConfig* loadComponent = this->GetComponent<ILoadConfig>(name);
@@ -68,7 +67,8 @@ namespace Sentry
 			nextTime = Helper::Time::GetNewTime(1, hour, minute);
 		}
 		long long ms = nextTime - Helper::Time::GetNowSecTime();
-		this->mTimerComponent->DelayCall(ms * 1000, &OperatorComponent::StartRefreshDay,
+        TimerComponent * timerComponent = this->mApp->GetTimerComponent();
+        timerComponent->DelayCall(ms * 1000, &OperatorComponent::StartRefreshDay,
 				this, component->GetName());
 	}
 

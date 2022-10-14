@@ -51,7 +51,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
         this->mHttpComponent->OnRequest(httpHandlerClient);
 #else
-        Asio::Context &mainThread = App::Get()->GetThread();
+        Asio::Context &mainThread = App::Inst()->GetThread();
         mainThread.post(std::bind(&HttpListenComponent::OnRequest, this->mHttpComponent, httpHandlerClient));
 #endif
     }
@@ -119,7 +119,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mHttpComponent->ClosetHttpClient(address);
 #else
-		Asio::Context & mainThread = App::Get()->GetThread();
+		Asio::Context & mainThread = App::Inst()->GetThread();
 		mainThread.post(std::bind(&HttpListenComponent::ClosetHttpClient, this->mHttpComponent, address));
 #endif
 	}

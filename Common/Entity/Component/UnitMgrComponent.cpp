@@ -5,7 +5,7 @@ namespace Sentry
 {
 	bool UnitMgrComponent::LateAwake()
 	{
-		this->mCorComponent = App::Get()->GetTaskComponent();
+		this->mCorComponent = this->mApp->GetTaskComponent();
 		return true;
 	}
 

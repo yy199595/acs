@@ -90,7 +90,6 @@ namespace Sentry
 		virtual bool IsStartComplete() = 0;
         virtual void WaitAllMessageComplete() { };
         virtual int GetWaitMessageCount() const { return 0; }
-        virtual bool LoadConfig(const rapidjson::Value& json) = 0;
 	};
 
 	template<typename T1, typename T2>

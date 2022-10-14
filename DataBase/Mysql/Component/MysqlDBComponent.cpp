@@ -28,7 +28,7 @@ namespace Sentry
 {
     bool MysqlDBComponent::LoadConfig()
 	{
-		const ServerConfig * config = ServerConfig::Get();
+		const ServerConfig * config = ServerConfig::Inst();
         LOG_CHECK_RET_FALSE(config->GetMember("mysql", "ip", this->mConfig.mIp));
         LOG_CHECK_RET_FALSE(config->GetMember("mysql", "port", this->mConfig.mPort));
         LOG_CHECK_RET_FALSE(config->GetMember("mysql", "user", this->mConfig.mUser));

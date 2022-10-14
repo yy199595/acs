@@ -18,14 +18,14 @@ namespace Sentry
     {
         this->mTimerComponent = nullptr;
         this->mOuterNetComponent = nullptr;
-        this->GetApp()->AddComponent<OuterNetComponent>();
-        this->GetApp()->AddComponent<OuterNetMessageComponent>();
+        this->mApp->AddComponent<OuterNetComponent>();
+        this->mApp->AddComponent<OuterNetMessageComponent>();
         return true;
     }
 
 	bool OuterService::OnStart()
 	{
-        const ServerConfig * config = ServerConfig::Get();
+        const ServerConfig * config = ServerConfig::Inst();
         BIND_COMMON_RPC_METHOD(OuterService::Ping);
         BIND_COMMON_RPC_METHOD(OuterService::AllotUser);
         BIND_COMMON_RPC_METHOD(OuterService::SaveAddress);

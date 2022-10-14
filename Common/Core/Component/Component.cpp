@@ -3,11 +3,11 @@
 namespace Sentry
 {
 	Component::Component()
-		: mEntity(nullptr)
+		: mUnit(nullptr)
 	{
 		this->mEntityId = 0;
 		this->mType = nullptr;
-		this->mApp = App::Get();
+		this->mApp = App::Inst();
 	}
 
 	Component* Component::GetByHash(size_t hash)
@@ -17,11 +17,11 @@ namespace Sentry
 		{
 			return nullptr;
 		}
-		return this->mEntity->GetComponentByName(type->Name);
+		return this->mUnit->GetComponentByName(type->Name);
 	}
 
 	Component* Component::GetByName(const std::string& name)
 	{
-		return this->mEntity->GetComponentByName(name);
+		return this->mUnit->GetComponentByName(name);
 	}
 }

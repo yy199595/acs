@@ -94,7 +94,7 @@ namespace Sentry
             return false;
         }
         std::vector<Component *> components;
-        this->GetApp()->GetComponents(components);
+        this->mApp->GetComponents(components);
         for(Component * component : components)
         {
            IHotfix *hotfix = component->Cast<IHotfix>();
@@ -130,14 +130,14 @@ namespace Sentry
 
 	bool ConsoleComponent::Close(const std::string& parameter, std::vector<std::string>& response)
 	{
-		App::Get()->Stop();
+        this->mApp->Stop();
 		return true;
 	}
 
 	bool ConsoleComponent::Services(const std::string& parameter, std::vector<std::string>& response)
 	{
 		std::vector<std::string> components;
-		this->GetApp()->GetComponents(components);
+		this->mApp->GetComponents(components);
 		for(const std::string & name : components)
 		{
 			if(this->GetComponent<LocalService>(name) != nullptr)

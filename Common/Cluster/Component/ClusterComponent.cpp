@@ -61,8 +61,8 @@ namespace Sentry
     {
         std::string path;
         rapidjson::Document document;
-        const ServerConfig * serverConfig = ServerConfig::Get();
-        LOG_CHECK_RET_FALSE(serverConfig->GetConfigPath("cluster", path));
+        const ServerConfig * config = ServerConfig::Inst();
+        LOG_CHECK_RET_FALSE(config->GetConfigPath("cluster", path));
         LOG_CHECK_RET_FALSE(Helper::File::ReadJsonFile(path, document));
         auto iter = document.MemberBegin();
         for(; iter != document.MemberEnd(); iter++)
@@ -89,8 +89,8 @@ namespace Sentry
     {
         std::string path;
         rapidjson::Document jsonDocument;
-        const ServerConfig * serverConfig = ServerConfig::Get();
-        LOG_CHECK_RET_FALSE(serverConfig->GetConfigPath("service", path));
+        const ServerConfig * config = ServerConfig::Inst();
+        LOG_CHECK_RET_FALSE(config->GetConfigPath("service", path));
         LOG_CHECK_RET_FALSE(Helper::File::ReadJsonFile(path, jsonDocument));
 
         auto iter = jsonDocument.MemberBegin();
@@ -106,15 +106,9 @@ namespace Sentry
                     std::string type(value["Type"].GetString());
                     component = ComponentFactory::CreateComponent(type);
                 }
-                if (component == nullptr || !this->GetApp()->AddComponent(name, component))
+                if (component == nullptr || !this->mApp->AddComponent(name, component))
                 {
                     CONSOLE_LOG_ERROR("add " + name + " failure");
-                    return false;
-                }
-                IServiceBase *serviceBase = component->Cast<IServiceBase>();
-                if (serviceBase == nullptr || (!serviceBase->LoadConfig(value)))
-                {
-                    CONSOLE_LOG_ERROR("load service config error : " + name);
                     return false;
                 }
             }

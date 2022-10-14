@@ -77,7 +77,7 @@ namespace Client
 #ifdef ONLY_MAIN_THREAD
                 this->mClientComponent->OnMessage(address, std::move(this->mMessage));
 #else
-                Asio::Context & io = App::Get()->GetThread();
+                Asio::Context & io = App::Inst()->GetThread();
                 io.post(std::bind(&ClientComponent::OnMessage,
                                   this->mClientComponent, address, std::move(this->mMessage)));
 #endif

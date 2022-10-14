@@ -13,16 +13,15 @@ namespace Sentry
 	bool ServiceMethodRegister::AddMethod(std::shared_ptr<ServiceMethod> method)
 	{
 		Service * serviceComponent = this->mComponent->Cast<Service>();
-		if(serviceComponent == nullptr)
-		{
-			return false;
-		}
-		const RpcServiceConfig & rpcServiceConfig = serviceComponent->GetServiceConfig();
-		if(rpcServiceConfig.GetMethodConfig(method->GetName()) == nullptr)
-		{
-			return false;
-		}
-		const std::string & name = method->GetName();
+        LOG_CHECK_RET_FALSE(serviceComponent);
+
+        const std::string & name = method->GetName();
+        const std::string & service = serviceComponent->GetName();
+        std::string fullName = fmt::format("{0}.{1}", service, name);
+        if(ServiceConfig::Inst()->GetRpcMethodConfig(fullName) == nullptr)
+        {
+            return false;
+        }
 		if (method->IsLuaMethod())
 		{
 			auto iter = this->mLuaMethodMap.find(name);

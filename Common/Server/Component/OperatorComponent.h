@@ -25,7 +25,6 @@ namespace Sentry
 
 	 private:
 		unsigned int mRefreshTimerId;
-		class TimerComponent* mTimerComponent;
 	};
 }
 #endif //GAMEKEEPER_OPERATORCOMPONENT_H

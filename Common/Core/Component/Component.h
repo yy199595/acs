@@ -40,35 +40,15 @@ namespace Sentry
 	public:
 		friend class Unit;
 		friend class ComponentFactory;
-		inline long long GetEntityId() const
-		{
-			return this->mEntityId;
-		}
-
-		inline std::shared_ptr<Unit> GetUnit()
-		{
-			return this->mEntity;
-		}
-		inline Type* GetType()
-		{
-			return this->mType;
-		}
-
-		inline const std::string& GetName()
-		{
-			return this->mName;
-		}
-		template<typename T>
-		inline T* Cast()
-		{
-			return dynamic_cast<T*>(this);
-		}
+		inline Unit * GetUnit() { return this->mUnit; }
+		inline Type* GetType() { return this->mType; }
+		inline const std::string& GetName() { return this->mName; }
+        inline long long GetUnitId() const { return this->mEntityId; }
+        template<typename T>
+		inline T* Cast() { return dynamic_cast<T*>(this); }
 
 		template<typename T>
-		inline bool Is()
-		{
-			return this->mType->Hash == typeid(T).hash_code();
-		}
+		inline bool Is() { return this->mType->Hash == typeid(T).hash_code(); }
 
 	 public:
 
@@ -85,17 +65,16 @@ namespace Sentry
 
 		Component* GetByName(const std::string& name);
 
-		std::shared_ptr<App> GetApp() { return mApp;}
-
 	 private:
 		Component* GetByHash(size_t hash);
 	private:
 		Type* mType;
-		std::string mName;
+        std::string mName;
 		long long mEntityId;
-		std::shared_ptr<App> mApp;
-		std::shared_ptr<Unit> mEntity;
-	};
+    protected:
+        App * mApp;
+        Unit * mUnit;
+    };
 	template<typename T>
 	inline T* Component::GetComponent()
 	{

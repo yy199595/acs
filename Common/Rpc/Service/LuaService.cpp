@@ -22,13 +22,13 @@ namespace Sentry
 	bool LuaService::Start()
 	{
         std::string location;
-        const ServerConfig * config = ServerConfig::Get();
+        const ServerConfig * config = ServerConfig::Inst();
         LOG_CHECK_RET_FALSE(config->GetLocation("rpc", location));
 		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
+        const RpcServiceConfig * rpcServiceConfig = ServiceConfig::Inst()->GetRpcConfig(this->GetName());
 
 		std::vector<const RpcMethodConfig *> rpcInterConfigs;
-		const RpcServiceConfig & rpcServiceConfig = this->GetServiceConfig();
-        LOG_CHECK_RET_FALSE(rpcServiceConfig.GetMethodConfigs(rpcInterConfigs) > 0);
+        LOG_CHECK_RET_FALSE(rpcServiceConfig->GetMethodConfigs(rpcInterConfigs) > 0);
 
 		for(const RpcMethodConfig * rpcInterfaceConfig : rpcInterConfigs)
 		{
@@ -89,7 +89,7 @@ namespace Sentry
     void LuaService::WaitAllMessageComplete()
     {
         this->mIsHandlerMessage = false;
-        TaskComponent *taskComponent = this->GetApp()->GetTaskComponent();
+        TaskComponent *taskComponent = this->mApp->GetTaskComponent();
         while (this->mWaitCount > 0)
         {
             taskComponent->Sleep(100);

@@ -45,9 +45,11 @@ namespace Sentry
 
     bool LocalLuaHttpService::OnStartService(HttpServiceRegister &serviceRegister)
     {
-        LuaScriptComponent * luaComponent = this->GetComponent<LuaScriptComponent>();
         std::vector<const HttpMethodConfig *> httpMethodConfigs;
-        this->GetServiceConfig().GetMethodConfigs(httpMethodConfigs);
+        LuaScriptComponent * luaComponent = this->GetComponent<LuaScriptComponent>();
+        const HttpServiceConfig * httpServiceConfig = ServiceConfig::Inst()->GetHttpConfig(this->GetName());
+
+        httpServiceConfig->GetMethodConfigs(httpMethodConfigs);
         for(const HttpMethodConfig * methodConfig : httpMethodConfigs)
         {
             const char * tab = methodConfig->Service.c_str();

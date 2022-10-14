@@ -28,17 +28,17 @@ namespace Sentry
 	bool LuaScriptComponent::LateAwake()
 	{
 		std::vector<std::string> components;
-		this->GetApp()->GetComponents(components);
+		this->mApp->GetComponents(components);
 		for (const std::string& name: components)
 		{
-			ILuaRegister* luaRegisterComponent = this->GetApp()->GetComponent<ILuaRegister>(name);
+			ILuaRegister* luaRegisterComponent = this->GetComponent<ILuaRegister>(name);
 			if (luaRegisterComponent != nullptr)
 			{
 				Lua::ClassProxyHelper luaRegister(this->mLuaEnv, name);
 				luaRegisterComponent->OnLuaRegister(luaRegister);
 			}
 		}
-        const ServerConfig * config = ServerConfig::Get();
+        const ServerConfig * config = ServerConfig::Inst();
 		const std::string & json = config->GetContent();
 		values::pushDecoded(this->mLuaEnv, json.c_str(), json.size());
 		lua_setglobal(this->mLuaEnv, "ServerConfig");
@@ -160,7 +160,7 @@ namespace Sentry
         std::string mainFilePath;
 		std::vector<std::string> luaPaths;
 		std::vector<std::string> luaFiles;
-		const ServerConfig * config = ServerConfig::Get();
+		const ServerConfig * config = ServerConfig::Inst();
         LOG_CHECK_RET_FALSE(config->GetMember("lua", "require", luaPaths));
         LOG_CHECK_RET_FALSE(config->GetMember("lua", "main", mainFilePath));
         this->mMainTable = std::make_shared<Lua::LocalTable>(this->mLuaEnv);

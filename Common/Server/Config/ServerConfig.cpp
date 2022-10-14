@@ -7,13 +7,10 @@
 #include"File/DirectoryHelper.h"
 namespace Sentry
 {
-    ServerConfig * ServerConfig::mConfig = nullptr;
-
     ServerConfig::ServerConfig()
         : TextConfig("ServerConfig")
     {
         this->mNodeId = 0;
-        this->mConfig = this;
     }
 
     bool ServerConfig::OnReloadText(const std::string &content)

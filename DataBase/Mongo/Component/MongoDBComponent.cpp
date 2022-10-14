@@ -24,8 +24,8 @@ namespace Sentry
 {
 	bool MongoDBComponent::LoadConfig()
 	{
-		const ServerConfig * config = ServerConfig::Get();
-		this->mTimerComponent = this->GetApp()->GetTimerComponent();
+		const ServerConfig * config = ServerConfig::Inst();
+		this->mTimerComponent = this->mApp->GetTimerComponent();
         this->mNetComponent = this->GetComponent<NetThreadComponent>();
         LOG_CHECK_RET_FALSE(config->GetMember("mongo", "ip", this->mConfig.mIp));
 		LOG_CHECK_RET_FALSE(config->GetMember("mongo", "db", this->mConfig.mDb));
@@ -89,7 +89,7 @@ namespace Sentry
 
 	void MongoDBComponent::OnDelTask(long long taskId, RpcTask task)
 	{
-        assert(this->GetApp()->IsMainThread());
+        assert(this->mApp->IsMainThread());
         this->mRequestId.Push((int)taskId);
 	}
 

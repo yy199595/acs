@@ -18,8 +18,8 @@ namespace Sentry
 
 	bool OuterNetMessageComponent::LateAwake()
 	{
-		this->mTaskComponent = this->GetApp()->GetTaskComponent();
-		this->mTimerComponent = this->GetApp()->GetTimerComponent();
+		this->mTaskComponent = this->mApp->GetTaskComponent();
+		this->mTimerComponent = this->mApp->GetTimerComponent();
         this->mInnerMessageComponent = this->GetComponent<InnerNetMessageComponent>();
 		LOG_CHECK_RET_FALSE(this->mOutNetComponent = this->GetComponent<OuterNetComponent>());
 		return true;
@@ -27,22 +27,20 @@ namespace Sentry
 
 	XCode OuterNetMessageComponent::OnRequest(long long userId, std::shared_ptr<Rpc::Data> message)
     {
-        std::string method, service;
-        LOG_RPC_CHECK_ARGS(message->GetMethod(service, method));
-        Service *targetService = this->GetApp()->GetService(service);
-        const RpcServiceConfig & seviceConfig = targetService->GetServiceConfig();
+        std::string fullName;
+        const Rpc::Head & head = message->GetHead();
+        LOG_RPC_CHECK_ARGS(head.Get("func", fullName));
+        const RpcMethodConfig * methodConfig = ServiceConfig::Inst()->GetRpcMethodConfig(fullName);
+        if(methodConfig == nullptr || methodConfig->Type != "Client")
+        {
+            return XCode::CallFunctionNotExist;
+        }
+        Service *targetService = this->mApp->GetService(methodConfig->Service);
         if (targetService == nullptr)
         {
             CONSOLE_LOG_ERROR("userid=" << userId <<
-                " call [" << service << "] not find");
+                " call [" << methodConfig->Service << "] not find");
             return XCode::CallServiceNotFound;
-        }
-        const RpcMethodConfig *config = seviceConfig.GetMethodConfig(method);
-        if (config == nullptr || config->Type != "Client")
-        {
-            CONSOLE_LOG_ERROR("userid=" << userId <<
-                " call [" << service << "." << method << "] not permissions");
-            return XCode::NotFoundRpcConfig;
         }
 
         std::string address;
@@ -53,8 +51,8 @@ namespace Sentry
                 return XCode::Failure;
             }
             s2s::location::sync request;
-            request.set_name(service);
             request.set_user_id(userId);
+            request.set_name(methodConfig->Service);
             InnerService * service = this->GetComponent<InnerService>();
             if(service->Send(address, "Login", request) != XCode::Successful)
             {

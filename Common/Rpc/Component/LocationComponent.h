@@ -34,7 +34,6 @@ namespace Sentry
         bool GetHosts(std::vector<std::string> & hosts);
         bool GetLocation(long long userId, std::string & address);
         size_t GetHostSize() const { return this->mHosts.size(); }
-        virtual const std::string & GetServiceName() = 0;
     public:
         virtual bool AllotLocation(std::string & address);
         virtual bool AllotLocation(long long userId, std::string & address);

@@ -8,10 +8,6 @@
 #include"Method/LuaHttpServiceMethod.h"
 namespace Sentry
 {
-	LocalHttpService::LocalHttpService()
-	{
-		this->mConfig = nullptr;
-	}
 
 	XCode LocalHttpService::Invoke(const std::string& name,
 		std::shared_ptr<HttpHandlerRequest> request, std::shared_ptr<HttpHandlerResponse> response)
@@ -27,13 +23,14 @@ namespace Sentry
     {
         this->mServiceRegister = std::make_shared<HttpServiceRegister>(this);
         LuaScriptComponent * luaComponent = this->GetComponent<LuaScriptComponent>();
+        const HttpServiceConfig * httpServiceConfig = ServiceConfig::Inst()->GetHttpConfig(this->GetName());
         if (!this->OnStartService(*this->mServiceRegister))
         {
             return false;
         }
 
         std::vector<const HttpMethodConfig *> methodConfigs;
-        this->GetServiceConfig().GetMethodConfigs(methodConfigs);
+        httpServiceConfig->GetMethodConfigs(methodConfigs);
         for(const HttpMethodConfig * config : methodConfigs)
         {
             const char * tab = config->Service.c_str();
@@ -66,13 +63,5 @@ namespace Sentry
         this->mServiceRegister->Clear();
         std::move(this->mServiceRegister);
 		return this->OnCloseService();
-	}
-	bool LocalHttpService::LoadConfig(const rapidjson::Value& json)
-	{
-		if(this->mConfig == nullptr)
-		{
-			this->mConfig = new HttpServiceConfig(this->GetName());
-		}
-		return this->mConfig->OnLoadConfig(json);
 	}
 }

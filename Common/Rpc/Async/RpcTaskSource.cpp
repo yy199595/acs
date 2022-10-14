@@ -66,7 +66,7 @@ namespace Sentry
         response->GetHead().Get("code", code);
         if(code == (int)XCode::Successful && !this->mResp.empty())
         {
-            ProtoComponent * messageComponent = App::Get()->GetMsgComponent();
+            ProtoComponent * messageComponent = App::Inst()->GetMsgComponent();
             std::shared_ptr<Message> message = messageComponent->New(this->mResp);
             if(message != nullptr && response->ParseMessage(message.get()))
             {

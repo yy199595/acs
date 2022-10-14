@@ -5,6 +5,7 @@
 #include"TextConfigComponent.h"
 #include"App/System/System.h"
 #include"Config/ServerConfig.h"
+#include"Config/ServiceConfig.h"
 namespace Sentry
 {
     bool TextConfigComponent::Awake()
@@ -13,6 +14,28 @@ namespace Sentry
         {
             return false;
         }
+        std::string path;
+        const ServerConfig * config = ServerConfig::Inst();
+        LOG_CHECK_RET_FALSE(config->GetConfigPath("service", path));
+        LOG_CHECK_RET_FALSE(this->LoadTextConfig<ServiceConfig>(path));
+        return true;
+    }
+
+    bool TextConfigComponent::LoadTextConfig(std::unique_ptr<TextConfig> config, const std::string &path)
+    {
+        const std::string & name = config->GetName();
+        if(this->mConfigs.find(name) != this->mConfigs.end())
+        {
+            LOG_ERROR("multiple load [" << config->GetName() << "]");
+            return false;
+        }
+        if(!config->LoadConfig(path))
+        {
+            LOG_ERROR("load [" << name << "] path:" << path << " error");
+            return false;
+        }
+        this->mConfigs.emplace(name, std::move(config));
+        CONSOLE_LOG_INFO("load [" << name << "] sucessful path = " << path);
         return true;
     }
 
@@ -22,7 +45,7 @@ namespace Sentry
         {
             if(!value.second->ReloadConfig())
             {
-                CONSOLE_LOG_ERROR("reload [" << value.second->GetName() << "] failure");
+                LOG_ERROR("reload [" << value.second->GetName() << "] failure");
             }
         }
     }

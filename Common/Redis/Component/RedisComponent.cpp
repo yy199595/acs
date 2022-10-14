@@ -29,7 +29,7 @@ namespace Sentry
 {
 	bool RedisComponent::LoadConfig()
 	{
-        const ServerConfig * localServerConfig = ServerConfig::Get();
+        const ServerConfig * localServerConfig = ServerConfig::Inst();
         const rapidjson::Value * jsonValue = localServerConfig->GetJsonValue("redis");
 
         if(jsonValue == nullptr || !jsonValue->IsObject())

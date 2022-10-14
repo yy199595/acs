@@ -101,7 +101,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mRedisComponent->OnResponse(taskId, response);
 #else
-		asio::io_service & taskThread = App::Get()->GetThread();
+		asio::io_service & taskThread = App::Inst()->GetThread();
 		taskThread.post(std::bind(&RedisComponent::OnResponse, this->mRedisComponent, taskId, response));
 #endif
         if(!this->SendFromMessageQueue())
@@ -203,7 +203,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
             this->mRedisComponent->OnLoadScript(path, md5);
 #else
-            asio::io_service& io = App::Get()->GetThread();
+            asio::io_service& io = App::Inst()->GetThread();
             io.post(std::bind(&RedisComponent::OnLoadScript, this->mRedisComponent, path, md5));
 #endif
         }

@@ -12,14 +12,10 @@
 #endif
 namespace Sentry
 {
-	Service::Service()
-	{
-		this->mConfig = nullptr;
-	}
 	bool Service::LateAwake()
 	{
         this->mClientComponent = this->GetComponent<InnerNetComponent>();
-        ServerConfig::Get()->GetLocation("rpc", this->mLocalAddress);
+        ServerConfig::Inst()->GetLocation("rpc", this->mLocalAddress);
         this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>();
         return true;
 	}
@@ -36,11 +32,6 @@ namespace Sentry
 {
 	XCode Service::Send(const std::string& func, const Message& message)
 	{
-        const RpcMethodConfig * methodConfig = this->mConfig->GetMethodConfig(func);
-        if(methodConfig == nullptr)
-        {
-            return XCode::CallFunctionNotExist;
-        }
         this->mServiceHosts.clear();
         if(!this->GetHosts(this->mServiceHosts))
         {
@@ -57,14 +48,27 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-    bool Service::StartSend(const std::string &address,
-                            const std::string &func, long long userId, const Message *message)
+    bool Service::StartSend(const std::string &address, const std::string &func, long long userId, const Message *message)
     {
-        const RpcMethodConfig * methodConfig = this->mConfig->GetMethodConfig(func);
+        const std::string fullName = fmt::format("{0}.{1}", this->GetName(), func);
+        const RpcMethodConfig * methodConfig = ServiceConfig::Inst()->GetRpcMethodConfig(fullName);
         if(methodConfig == nullptr)
         {
-            CONSOLE_LOG_ERROR("call [" << func << "] not find config");
+            LOG_ERROR("not find [" << fullName << "] config");
             return false;
+        }
+        if(!methodConfig->Request.empty())
+        {
+            if(message == nullptr)
+            {
+                LOG_ERROR("call [" << fullName << "] request is empty");
+                return false;
+            }
+            if(message->GetTypeName() != methodConfig->Request)
+            {
+                LOG_ERROR("call [" << fullName << "] request type error");
+                return false;
+            }
         }
         std::shared_ptr<Rpc::Data> request
             = std::make_shared<Rpc::Data>();
@@ -80,14 +84,31 @@ namespace Sentry
         return this->mMessageComponent->Send(address, request);
     }
 
-    std::shared_ptr<Rpc::Data> Service::StartCall(
+    std::shared_ptr<Rpc::Data> Service::CallAwait(
         const std::string &address, const std::string &func, long long userId, const Message *message)
     {
-        const RpcMethodConfig * methodConfig  = this->mConfig->GetMethodConfig(func);
+        const std::string fullName = fmt::format("{0}.{1}", this->GetName(), func);
+        const RpcMethodConfig * methodConfig = ServiceConfig::Inst()->GetRpcMethodConfig(fullName);
         if(methodConfig == nullptr)
         {
+            LOG_ERROR("not find [" << fullName << "] config");
             return nullptr;
         }
+
+        if(!methodConfig->Request.empty())
+        {
+            if(message == nullptr)
+            {
+                LOG_ERROR("call [" << fullName << "] request is empty");
+                return nullptr;
+            }
+            if(message->GetTypeName() != methodConfig->Request)
+            {
+                LOG_ERROR("call [" << fullName << "] request type error");
+                return nullptr;
+            }
+        }
+
         std::shared_ptr<Rpc::Data> request =
             Rpc::Data::New(Tcp::Type::Request, Tcp::Porto::Protobuf);
         request->GetHead().Add("func", func);
@@ -120,7 +141,7 @@ namespace Sentry
 
 	XCode Service::Call(const std::string & address, const string& func)
     {
-        std::shared_ptr<Rpc::Data> response = this->StartCall(address, func, 0, nullptr);
+        std::shared_ptr<Rpc::Data> response = this->CallAwait(address, func, 0, nullptr);
         if (response == nullptr)
         {
             return XCode::NetWorkError;
@@ -130,7 +151,7 @@ namespace Sentry
 
 	XCode Service::Call(const std::string & address, const string& func, const Message& message)
 	{
-        std::shared_ptr<Rpc::Data> response = this->StartCall(address, func, 0, &message);
+        std::shared_ptr<Rpc::Data> response = this->CallAwait(address, func, 0, &message);
 		if(response == nullptr)
 		{
 			return XCode::NetWorkError;
@@ -141,7 +162,7 @@ namespace Sentry
 	XCode Service::Call(const std::string & address, const string& func, std::shared_ptr<Message> response)
 	{
 		assert(response != nullptr);
-        std::shared_ptr<Rpc::Data> data = this->StartCall(address, func, 0, nullptr);
+        std::shared_ptr<Rpc::Data> data = this->CallAwait(address, func, 0, nullptr);
         if(data == nullptr)
         {
             return XCode::Failure;
@@ -163,7 +184,7 @@ namespace Sentry
 	{
 		assert(response != nullptr);
         std::shared_ptr<Rpc::Data> data =
-            this->StartCall(address, func, 0, &message);
+            this->CallAwait(address, func, 0, &message);
         if(data == nullptr)
         {
             return XCode::Failure;
@@ -203,14 +224,5 @@ namespace Sentry
 	{
 
         return XCode::Successful;
-	}
-
-	bool Service::LoadConfig(const rapidjson::Value& json)
-	{
-		if(this->mConfig == nullptr)
-		{
-			this->mConfig = new RpcServiceConfig(this->GetName());
-		}
-		return this->mConfig->OnLoadConfig(json);
 	}
 }

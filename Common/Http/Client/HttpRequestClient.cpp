@@ -74,7 +74,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
         this->mHttpComponent->OnTimeout(taskId);
 #else
-        Asio::Context &io = App::Get()->GetThread();
+        Asio::Context &io = App::Inst()->GetThread();
         io.post(std::bind(&HttpComponent::OnTimeout, this->mHttpComponent, taskId));
 #endif
     }
@@ -101,7 +101,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
         this->mHttpComponent->OnResponse(taskId, std::move(this->mResponse));
 #else
-        Asio::Context &io = App::Get()->GetThread();
+        Asio::Context &io = App::Inst()->GetThread();
         io.post(std::bind(&HttpComponent::OnResponse,
                           this->mHttpComponent, taskId, std::move(this->mResponse)));
 #endif

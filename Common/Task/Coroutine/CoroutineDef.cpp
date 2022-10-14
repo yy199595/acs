@@ -75,7 +75,7 @@ namespace Sentry
 
     void CoroutineGroup::WaitAll()
     {
-        this->mCorComponent = App::Get()->GetTaskComponent();
+        this->mCorComponent = App::Inst()->GetTaskComponent();
         this->mCorComponent->YieldCoroutine(this->mCoroutineId);
     }
 
@@ -83,7 +83,7 @@ namespace Sentry
     {
         if(!taskContexts.empty())
         {
-            this->mCorComponent = App::Get()->GetTaskComponent();
+            this->mCorComponent = App::Inst()->GetTaskComponent();
             for(TaskContext * taskContext : taskContexts)
             {
                 assert(taskContext->mGroup == nullptr);

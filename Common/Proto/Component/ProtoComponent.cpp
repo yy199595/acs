@@ -41,7 +41,7 @@ namespace Sentry
     bool ProtoComponent::LateAwake()
     {
         std::string path;
-        const ServerConfig * config = ServerConfig::Get();
+        const ServerConfig * config = ServerConfig::Inst();
         if(config->GetConfigPath("proto", path))
         {
             return this->Load(path.c_str());
@@ -81,7 +81,7 @@ namespace Sentry
             return false;
         }
         std::string path;
-        ServerConfig::Get()->GetConfigPath("proto", path);
+        ServerConfig::Inst()->GetConfigPath("proto", path);
         const std::string fullPath(fmt::format("{0}/{1}", path, fileName));
 
 

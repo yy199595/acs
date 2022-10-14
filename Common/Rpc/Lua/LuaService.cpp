@@ -22,7 +22,7 @@ namespace Lua
         std::string address;
         long long userId = 0;
         Sentry::Service *service = UserDataParameter::Read<Sentry::Service *>(lua, 1);
-        InnerNetMessageComponent *netMessageComponent = App::Get()->GetComponent<InnerNetMessageComponent>();
+        InnerNetMessageComponent *netMessageComponent = App::Inst()->GetComponent<InnerNetMessageComponent>();
         if (netMessageComponent == nullptr)
         {
             luaL_error(lua, "not find InnerNetMessageComponent");
@@ -48,8 +48,8 @@ namespace Lua
             return 1;
         }
         std::string method = lua_tostring(lua, 3);
-        const RpcServiceConfig &rpcServiceConfig = service->GetServiceConfig();
-        const RpcMethodConfig *methodConfig = rpcServiceConfig.GetMethodConfig(method);
+        std::string fullName = fmt::format("{0}.{1}", service->GetName(), method);
+        const RpcMethodConfig *methodConfig = ServiceConfig::Inst()->GetRpcMethodConfig(fullName);
         if (methodConfig == nullptr)
         {
             luaL_error(lua, "call [%s] not found", method.c_str());
@@ -63,11 +63,16 @@ namespace Lua
         if (!methodConfig->Request.empty())
         {
             const std::string &pb = methodConfig->Request;
-            ProtoComponent *messageComponent = App::Get()->GetMsgComponent();
+            ProtoComponent *messageComponent = App::Inst()->GetMsgComponent();
             std::shared_ptr<Message> message = messageComponent->Read(lua, pb, 4);
             if (message == nullptr)
             {
-                luaL_error(lua, "read request paremeter error");
+                luaL_error(lua, "lua call %s request is empty", fullName.c_str());
+                return 0;
+            }
+            if(message->GetTypeName() != methodConfig->Request)
+            {
+                luaL_error(lua, "lua call %s request type error", fullName.c_str());
                 return 0;
             }
             request->WriteMessage(message.get());

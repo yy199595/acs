@@ -19,7 +19,7 @@ namespace Sentry
 		}
 		component->OnDestory();
 		component->mEntityId = 0;
-		component->mEntity = nullptr;
+		component->mUnit = nullptr;
 		component->SetActive(false);
 		delete component;
 		return true;

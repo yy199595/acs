@@ -42,7 +42,7 @@ namespace Lua
 		{
 			std::string log;
 			GetLuaString(luaEnv, log);
-			App::Get()->GetLogger()->AddLog(spdlog::level::debug, log);
+			App::Inst()->GetLogger()->AddLog(spdlog::level::debug, log);
 			return 0;
 		}
 
@@ -50,7 +50,7 @@ namespace Lua
 		{
 			std::string log;
 			GetLuaString(luaEnv, log);
-			App::Get()->GetLogger()->AddLog(spdlog::level::info, log);
+			App::Inst()->GetLogger()->AddLog(spdlog::level::info, log);
 			return 0;
 		}
 
@@ -58,7 +58,7 @@ namespace Lua
 		{
 			std::string log;
 			GetLuaString(luaEnv, log);
-			App::Get()->GetLogger()->AddLog(spdlog::level::err, log);
+			App::Inst()->GetLogger()->AddLog(spdlog::level::err, log);
 			return 0;
 		}
 
@@ -66,7 +66,7 @@ namespace Lua
 		{
 			std::string log;
 			GetLuaString(luaEnv, log);
-			App::Get()->GetLogger()->AddLog(spdlog::level::warn, log);
+			App::Inst()->GetLogger()->AddLog(spdlog::level::warn, log);
 			return 0;
 		}
 	}

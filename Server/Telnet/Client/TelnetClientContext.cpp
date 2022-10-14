@@ -35,7 +35,7 @@ namespace Tcp
 #ifdef ONLY_MAIN_THREAD
 		this->mConsoleComponent->OnReceive(address, lineMessage);
 #else
-		Asio::Context & netWorkThread = App::Get()->GetThread();
+		Asio::Context & netWorkThread = App::Inst()->GetThread();
 		netWorkThread.post(std::bind(&ConsoleComponent::OnReceive, this->mConsoleComponent,address , lineMessage));
 #endif
 	}
@@ -67,7 +67,7 @@ namespace Tcp
 #ifdef ONLY_MAIN_THREAD
 		this->mConsoleComponent->OnClientError(address);
 #else
-		asio::io_service & netWorkThread = App::Get()->GetThread();
+		asio::io_service & netWorkThread = App::Inst()->GetThread();
 		netWorkThread.post(std::bind(&ConsoleComponent::OnClientError, this->mConsoleComponent, address));
 #endif
 	}

@@ -28,7 +28,7 @@ namespace Sentry
     void LocalService::WaitAllMessageComplete()
     {
         this->mIsHandlerMessage = false;
-        TaskComponent *taskComponent = this->GetApp()->GetTaskComponent();
+        TaskComponent *taskComponent = this->mApp->GetTaskComponent();
         while (this->mWaitCount > 0)
         {
             taskComponent->Sleep(100);
@@ -65,12 +65,13 @@ namespace Sentry
 	bool LocalService::Start()
 	{
 		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
+        const RpcServiceConfig * rpcServiceConfig = ServiceConfig::Inst()->GetRpcConfig(this->GetName());
 		if (!this->OnStart())
 		{
 			return false;
 		}
         std::vector<const RpcMethodConfig *> methodConfigs;
-        this->GetServiceConfig().GetMethodConfigs(methodConfigs);
+        rpcServiceConfig->GetMethodConfigs(methodConfigs);
 		LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();
 
 		if (luaScriptComponent != nullptr)

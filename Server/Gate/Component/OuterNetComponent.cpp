@@ -28,7 +28,7 @@ namespace Sentry
 
 	bool OuterNetComponent::LateAwake()
 	{
-        this->mTimerComponent = this->GetApp()->GetTimerComponent();
+        this->mTimerComponent = this->mApp->GetTimerComponent();
         this->mNetComponent = this->GetComponent<NetThreadComponent>();
         LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisDataComponent>());
 		LOG_CHECK_RET_FALSE(this->mOuterMessageComponent = this->GetComponent<OuterNetMessageComponent>());

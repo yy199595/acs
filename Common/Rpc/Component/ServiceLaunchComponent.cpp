@@ -7,6 +7,8 @@
 #include"File/FileHelper.h"
 #include"Service/LocalService.h"
 #include"Service/LocalHttpService.h"
+#include"Config/ServiceConfig.h"
+#include"Component/TextConfigComponent.h"
 namespace Sentry
 {
     bool ServiceLaunchComponent::Awake()
@@ -14,35 +16,35 @@ namespace Sentry
         std::string path;
         rapidjson::Document jsonDocument;
         std::vector<std::string> services;
-        const ServerConfig * config = ServerConfig::Get();
+        const ServerConfig * config = ServerConfig::Inst();
         LOG_CHECK_RET_FALSE(config->GetServices(services) > 0);
         LOG_CHECK_RET_FALSE(config->GetConfigPath("service", path));
         LOG_CHECK_RET_FALSE(Helper::File::ReadJsonFile(path, jsonDocument));
+        TextConfigComponent * textComponent = this->GetComponent<TextConfigComponent>();
+        const ServiceConfig * localServiceConfig = textComponent->GetTextConfig<ServiceConfig>();
 
-        auto iter = jsonDocument.MemberBegin();
-        for(; iter != jsonDocument.MemberEnd(); iter++)
+        for(const std::string & name : services)
         {
-            const rapidjson::Value &value = iter->value;
-            const std::string name(iter->name.GetString());
-            if(std::find(services.begin(), services.end(), name) != services.end())
+            Component *component = ComponentFactory::CreateComponent(name);
+            const RpcServiceConfig * rpcServiceConfig = localServiceConfig->GetRpcConfig(name);
+            const HttpServiceConfig * httpServiceConfig = localServiceConfig->GetHttpConfig(name);
+            if(component == nullptr)
             {
-                Component *component = ComponentFactory::CreateComponent(name);
-                if (component == nullptr)
+                if(rpcServiceConfig != nullptr)
                 {
-                    std::string type(value["Type"].GetString());
+                    const std::string & type = rpcServiceConfig->GetType();
                     component = ComponentFactory::CreateComponent(type);
                 }
-                if (component == nullptr || !this->GetApp()->AddComponent(name, component))
+                else if(httpServiceConfig != nullptr)
                 {
-                    CONSOLE_LOG_ERROR("add " << name << " failure");
-                    return false;
+                    const std::string & type = httpServiceConfig->GetType();
+                    component = ComponentFactory::CreateComponent(type);
                 }
-                IServiceBase *serviceBase = component->Cast<IServiceBase>();
-                if (serviceBase == nullptr || (!serviceBase->LoadConfig(value)))
-                {
-                    CONSOLE_LOG_ERROR("load service config error : " << name);
-                    return false;
-                }
+            }
+            if (component == nullptr || !this->mApp->AddComponent(name, component))
+            {
+                CONSOLE_LOG_ERROR("add " << name << " failure");
+                return false;
             }
         }
         return true;
@@ -52,7 +54,7 @@ namespace Sentry
     {
         std::string location;
         std::vector<std::string> startServices;
-        const ServerConfig * config = ServerConfig::Get();
+        const ServerConfig * config = ServerConfig::Inst();
         LOG_CHECK_RET_FALSE(config->GetLocation("rpc", location));
         LOG_CHECK_RET_FALSE(config->GetServices(startServices, true) > 0);
         for(const std::string & name : startServices)

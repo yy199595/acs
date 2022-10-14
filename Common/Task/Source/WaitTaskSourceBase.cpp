@@ -11,7 +11,7 @@ namespace Sentry
         this->mState = TaskState::TaskReady;
         this->mTaskId = Helper::Guid::Create();
         this->mCreateTime = Helper::Time::GetNowMilTime();
-        this->mTaskComponent = App::Get()->GetTaskComponent();
+        this->mTaskComponent = App::Inst()->GetTaskComponent();
     }
 
 	void WaitTaskSourceBase::Clear()

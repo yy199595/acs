@@ -69,7 +69,7 @@ namespace Sentry
 
 	void TaskComponent::Sleep(long long ms)
 	{
-        TimerComponent * timerComponent = this->GetApp()->GetTimerComponent();
+        TimerComponent * timerComponent = this->mApp->GetTimerComponent();
 
         if(timerComponent != nullptr)
         {
@@ -123,7 +123,7 @@ namespace Sentry
 
 	void TaskComponent::Resume(unsigned int id)
 	{
-        assert(this->GetApp()->IsMainThread());
+        assert(this->mApp->IsMainThread());
         if(this->mCorPool.Get(id) == nullptr)
         {
             LOG_FATAL("try resume context id : " << id);

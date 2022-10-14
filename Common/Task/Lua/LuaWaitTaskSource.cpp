@@ -42,7 +42,7 @@ namespace Sentry
 		lua_pushinteger(this->mLua, (int)code);
 		if (code == XCode::Successful && response != nullptr)
 		{
-			ProtoComponent * messageComponent = App::Get()->GetMsgComponent();
+			ProtoComponent * messageComponent = App::Inst()->GetMsgComponent();
 			messageComponent->Write(this->mLua, *response);
             Lua::Coroutine::Resume(coroutine, this->mLua, 2);
 			return;
@@ -58,7 +58,7 @@ namespace Sentry
 	{
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
 		lua_State* coroutine = lua_tothread(this->mLua, -1);
-		App::Get()->GetMsgComponent()->Write(this->mLua, message);
+		App::Inst()->GetMsgComponent()->Write(this->mLua, message);
         Lua::Coroutine::Resume(coroutine, this->mLua, 1);
 	}
 }

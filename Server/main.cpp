@@ -1,6 +1,4 @@
 ﻿#include"App/App.h"
-#include"Config/ServiceConfig.h"
-
 #include"Component/TimerComponent.h"
 #include"Component/TaskComponent.h"
 #include"Component/LuaScriptComponent.h"
@@ -51,7 +49,6 @@
 #include"Component/MysqlHelperComponent.h"
 #endif
 
-#include"App/System/System.h"
 using namespace Sentry;
 void RegisterComponent()
 {
@@ -129,8 +126,7 @@ int main(int argc, char **argv)
         CONSOLE_LOG_ERROR("start argc error");
         return 1;
     }
-    System::Init(argv);
 	RegisterComponent();
 	RegisterServiceComponent();
-	return std::make_shared<App>()->Run();
+	return (new App())->Run(argc, argv);
 }

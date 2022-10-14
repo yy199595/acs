@@ -13,11 +13,9 @@ using namespace std::chrono;
 
 namespace Sentry
 {
-	std::shared_ptr<App> App::mApp = nullptr;
 
-	App::App()
-			: Unit(0),
-              mStartTime(Helper::Time::GetNowMilTime())
+	App::App() : Unit(0),
+        mStartTime(Helper::Time::GetNowMilTime())
 	{
         this->mFps = 15;
         this->mTickCount = 0;
@@ -36,8 +34,8 @@ namespace Sentry
         LOG_CHECK_RET_FALSE(this->AddComponent<TextConfigComponent>());
 
         std::vector<std::string> components;
-        ServerConfig::Get()->GetMember("fps", this->mFps);
-        if (ServerConfig::Get()->GetMember("component", components)) //添加组件
+        ServerConfig::Inst()->GetMember("fps", this->mFps);
+        if (ServerConfig::Inst()->GetMember("component", components)) //添加组件
         {
             for (const std::string &name: components)
             {
@@ -87,10 +85,13 @@ namespace Sentry
 		return true;
 	}
 
-	int App::Run()
+	int App::Run(int argc, char ** argv)
 	{
-		App::mApp = this->Cast<App>();
-
+        if(argc != 3)
+        {
+            return -1;
+        }
+        System::Init(argv);
 		if(!this->LoadComponent())
 		{
 			this->GetLogger()->SaveAllLog();

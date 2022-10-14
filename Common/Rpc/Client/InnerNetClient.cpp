@@ -17,7 +17,7 @@ namespace Sentry
         this->mState = Tcp::DecodeState::Head;
         this->mUserName = component->GetUser();
         this->mPassword = component->GetPassword();
-        ServerConfig::Get()->GetLocation("rpc", this->mLocation);
+        ServerConfig::Inst()->GetLocation("rpc", this->mLocation);
 	}
 
 	void InnerNetClient::StartClose()
@@ -64,7 +64,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mTcpComponent->OnCloseSocket(address, code);
 #else
-		asio::io_service & taskScheduler = App::Get()->GetThread();
+		asio::io_service & taskScheduler = App::Inst()->GetThread();
 		taskScheduler.post(std::bind(&InnerNetComponent::OnCloseSocket, this->mTcpComponent, address, code));
 #endif
 	}
@@ -108,7 +108,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
                 this->mTcpComponent->OnMessage(address, std::move(this->mMessage));
 #else
-                asio::io_service & io = App::Get()->GetThread();
+                asio::io_service & io = App::Inst()->GetThread();
                 io.post(std::bind(&InnerNetComponent::OnMessage,
                                   this->mTcpComponent, address, std::move(this->mMessage)));
 #endif

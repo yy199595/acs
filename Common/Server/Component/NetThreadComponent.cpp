@@ -8,7 +8,7 @@ namespace Sentry
 	{
 		this->mIndex = 0;
 		int taskCount = 0;
-		const ServerConfig * config = ServerConfig::Get();
+		const ServerConfig * config = ServerConfig::Inst();
 		config->GetMember("thread", "task", taskCount);
 #ifdef __ENABLE_OPEN_SSL__
 		std::string sslFile;

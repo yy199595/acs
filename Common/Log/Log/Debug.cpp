@@ -11,7 +11,7 @@ using namespace Sentry;
 
 void Debug::Log(Debug::Level color, const std::string &log)
 {
-    LoggerComponent *logComponent = App::Get()->GetLogger();
+    LoggerComponent *logComponent = App::Inst()->GetLogger();
     if (logComponent != nullptr)
     {
         logComponent->AddLog(color, log);

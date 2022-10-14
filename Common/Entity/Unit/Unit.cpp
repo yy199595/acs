@@ -30,8 +30,8 @@ namespace Sentry
 			return false;
 		}
 		component->mName = name;
-		component->mEntityId = mUnitId;
-		component->mEntity = this->shared_from_this();
+        component->mUnit = this;
+        component->mEntityId = mUnitId;
 
 		if(!component->Awake())
         {

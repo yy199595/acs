@@ -12,8 +12,8 @@ namespace Sentry
 		std::string Method;
         std::string Service;
 	public:
-		virtual bool IsRpcInterface() = 0;
-		virtual bool IsHttpInterface() = 0;
+		virtual bool IsRpcInterface() const = 0;
+		virtual bool IsHttpInterface() const = 0;
 	};
 
 	class RpcMethodConfig final : public MethodConfig
@@ -25,8 +25,8 @@ namespace Sentry
 		std::string Response;
 		std::string FullName;
 	public:
-		bool IsRpcInterface() final { return true;}
-		bool IsHttpInterface() final { return false;}
+		bool IsRpcInterface() const final { return true;}
+		bool IsHttpInterface() const final { return false;}
 	};
 
 	class HttpMethodConfig final : public MethodConfig
@@ -36,8 +36,8 @@ namespace Sentry
 		std::string Type;
 		std::string Content;
 	public:
-		bool IsRpcInterface() final { return false;}
-		bool IsHttpInterface() final { return true;}
+		bool IsRpcInterface() const final { return false;}
+		bool IsHttpInterface() const final { return true;}
 	};
 
 }// namespace Sentry

@@ -22,19 +22,19 @@ namespace Sentry
     bool InnerService::Awake()
     {
 #ifdef __ENABLE_MYSQL__
-        this->GetApp()->AddComponent<MysqlHelperComponent>();
+        this->mApp->AddComponent<MysqlHelperComponent>();
 #endif
 
 #ifdef __ENABLE_MONGODB__
-        this->GetApp()->AddComponent<MongoHelperComponent>();
+        this->mApp->AddComponent<MongoHelperComponent>();
 #endif
-        this->GetApp()->AddComponent<HttpComponent>();
-        this->GetApp()->AddComponent<InnerNetComponent>();
-        this->GetApp()->AddComponent<RedisSubComponent>();
-        this->GetApp()->AddComponent<RedisDataComponent>();
-        this->GetApp()->AddComponent<GateHelperComponent>();
-        this->GetApp()->AddComponent<RedisRegistryComponent>();
-        this->GetApp()->AddComponent<InnerNetMessageComponent>();
+        this->mApp->AddComponent<HttpComponent>();
+        this->mApp->AddComponent<InnerNetComponent>();
+        this->mApp->AddComponent<RedisSubComponent>();
+        this->mApp->AddComponent<RedisDataComponent>();
+        this->mApp->AddComponent<GateHelperComponent>();
+        this->mApp->AddComponent<RedisRegistryComponent>();
+        this->mApp->AddComponent<InnerNetMessageComponent>();
         return true;
     }
 
@@ -63,7 +63,7 @@ namespace Sentry
     XCode InnerService::Hotfix()
     {
         std::vector<Component *> components;
-        this->GetApp()->GetComponents(components);
+        this->mApp->GetComponents(components);
         for(Component * component : components)
         {
             IHotfix * hotfix = component->Cast<IHotfix>();
@@ -92,7 +92,7 @@ namespace Sentry
             return XCode::Failure;
         }
         std::vector<IServiceChange *> components;
-        this->GetApp()->GetComponents(components);
+        this->mApp->GetComponents(components);
         for(IServiceChange * component : components)
         {
             component->OnAddService(name);
@@ -117,7 +117,7 @@ namespace Sentry
             return XCode::Failure;
         }
         std::vector<IServiceChange *> components;
-        this->GetApp()->GetComponents(components);
+        this->mApp->GetComponents(components);
         for (IServiceChange *component: components)
         {
             component->OnDelService(name);

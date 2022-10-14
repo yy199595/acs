@@ -9,7 +9,7 @@ namespace Sentry
 
     bool MysqlService::Awake()
     {
-        return this->GetApp()->AddComponent<MysqlDBComponent>();
+        return this->mApp->AddComponent<MysqlDBComponent>();
     }
 
 	bool MysqlService::OnStart()

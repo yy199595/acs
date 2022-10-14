@@ -4,6 +4,7 @@
 #include"Config/ServerConfig.h"
 #include"Time/TimeHelper.h"
 #include"Config/ServerPath.h"
+#include"Singleton/Singleton.h"
 #include"Config/ServiceConfig.h"
 #include"Component/TaskComponent.h"
 #include"Component/TimerComponent.h"
@@ -13,13 +14,12 @@ namespace Sentry
 {
 	class Service;
 	class ProtoComponent;
-	class App final : public Unit
+    class App final : public Unit, public Singleton<App>
 	{
 	 public:
 		explicit App();
 		~App() final = default;
 	 public:
-		static std::shared_ptr<App> Get() { return mApp; }
         const std::string & GetConfigPath() const { return this->mConfigPath; }
 		inline LoggerComponent* GetLogger() { return this->mLogComponent; }
 		inline Asio::Context & GetThread() { return *this->mMainThread; }
@@ -31,9 +31,9 @@ namespace Sentry
 		void StartAllComponent();
 		bool InitComponent(Component* component);
 	 public:
-		int Run();
 		void Stop();
-		Service * GetService(const std::string & name);
+        int Run(int argc, char ** argv);
+        Service * GetService(const std::string & name);
 		bool GetServices(std::vector<Service *> & services);
         inline bool IsMainThread() const { return this->mThreadId == std::this_thread::get_id();}
     private:
@@ -59,7 +59,6 @@ namespace Sentry
         TaskComponent* mTaskComponent;
 		LoggerComponent* mLogComponent;
 		TimerComponent* mTimerComponent;
-		static std::shared_ptr<App> mApp;
 		ProtoComponent * mMessageComponent;
 		std::vector<IFrameUpdate*> mFrameUpdateManagers;
 		std::vector<ISystemUpdate*> mSystemUpdateManagers;

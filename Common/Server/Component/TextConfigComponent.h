@@ -18,8 +18,11 @@ namespace Sentry
         const T * GetTextConfig();
 
         template<typename T>
-        bool LoadTextConfig(const std::string & path);
+        const T * GetTextConfig(const std::string & name);
 
+        template<typename T>
+        bool LoadTextConfig(const std::string & path);
+        bool LoadTextConfig(std::unique_ptr<TextConfig> config, const std::string & path);
     private:
         bool Awake() final;
         void OnHotFix() final;
@@ -33,22 +36,13 @@ namespace Sentry
     {
         std::unique_ptr<T> config(new T());
         size_t key = typeid(T).hash_code();
-        auto iter = this->mKeys.find(key);
-        if(iter != this->mKeys.end())
+        if(this->mKeys.find(key) != this->mKeys.end())
         {
             LOG_ERROR("multiple load [" << config->GetName() << "] type = " << typeid(T).name());
             return false;
         }
-        if(!config->LoadConfig(path))
-        {
-            LOG_ERROR("load [" << config->GetName() << "] path:" << path << " error");
-            return false;
-        }
         this->mKeys[key] = config->GetName();
-        const std::string name = config->GetName();
-        this->mConfigs.emplace(name, std::move(config));
-        CONSOLE_LOG_INFO("load [" << name << "] sucessful path : 《" << path << "》");
-        return true;
+        return this->LoadTextConfig(std::move(config), path);
     }
     template<typename T>
     const T * TextConfigComponent::GetTextConfig()
@@ -60,6 +54,13 @@ namespace Sentry
             return nullptr;
         }
         auto iter1 = this->mConfigs.find(iter->second);
+        return iter1 != this->mConfigs.end() ?  static_cast<T*>(iter1->second.get()) : nullptr;
+    }
+
+    template<typename T>
+    const T *TextConfigComponent::GetTextConfig(const std::string &name)
+    {
+        auto iter1 = this->mConfigs.find(name);
         return iter1 != this->mConfigs.end() ?  static_cast<T*>(iter1->second.get()) : nullptr;
     }
 }

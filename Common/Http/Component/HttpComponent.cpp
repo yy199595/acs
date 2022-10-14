@@ -13,8 +13,8 @@ namespace Sentry
 {
 	bool HttpComponent::LateAwake()
 	{
-		this->mTaskComponent = this->GetApp()->GetTaskComponent();
-		this->mTimeComponent = this->GetApp()->GetTimerComponent();
+		this->mTaskComponent = this->mApp->GetTaskComponent();
+		this->mTimeComponent = this->mApp->GetTimerComponent();
         this->mNetComponent = this->GetComponent<NetThreadComponent>();
 		return true;
 	}

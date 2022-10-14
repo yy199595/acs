@@ -9,7 +9,7 @@ namespace Sentry
 	CoroutineLock::CoroutineLock()
 	{
 		this->mIsLock = false;
-		this->mTaskComponent = App::Get()->GetTaskComponent();
+		this->mTaskComponent = App::Inst()->GetTaskComponent();
 	}
 
 	void CoroutineLock::Lock()

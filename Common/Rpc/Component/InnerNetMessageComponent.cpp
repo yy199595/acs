@@ -19,7 +19,7 @@ namespace Sentry
 
 	bool InnerNetMessageComponent::LateAwake()
 	{
-		this->mTaskComponent = App::Get()->GetTaskComponent();
+		this->mTaskComponent = this->mApp->GetTaskComponent();
 		this->mTimerComponent = this->GetComponent<TimerComponent>();
 		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<TaskComponent>());
 		LOG_CHECK_RET_FALSE(this->mRpcClientComponent = this->GetComponent<InnerNetComponent>());
@@ -28,32 +28,26 @@ namespace Sentry
 
 	XCode InnerNetMessageComponent::OnRequest(std::shared_ptr<Rpc::Data> message)
 	{
-        std::string address, service, method;
+        std::string address, fullName;
         const Rpc::Head & head = message->GetHead();
+        LOG_RPC_CHECK_ARGS(head.Get("func", fullName));
         LOG_RPC_CHECK_ARGS(head.Get("address", address));
-        if(!message->GetMethod(service, method))
+        const RpcMethodConfig * methodConfig = ServiceConfig::Inst()->GetRpcMethodConfig(fullName);
+        if(methodConfig == nullptr)
         {
-            CONSOLE_LOG_ERROR("call func field error");
+            return XCode::CallFunctionNotExist;
+        }
+        if(!methodConfig->Request.empty() && message->GetSize() == 0)
+        {
             return XCode::CallArgsError;
         }
 
-		Service * logicService = this->GetApp()->GetService(service);
+		Service * logicService = this->mApp->GetService(methodConfig->Service);
 		if (logicService == nullptr || !logicService->IsStartService())
 		{
-            LOG_ERROR("call service not exist : [" << service << "]");
+            LOG_ERROR("call service not exist : [" << methodConfig->Service << "]");
 			return XCode::CallServiceNotFound;
 		}
-		const RpcServiceConfig & rpcServiceConfig = logicService->GetServiceConfig();
-		const RpcMethodConfig* methodConfig = rpcServiceConfig.GetMethodConfig(method);
-		if (methodConfig == nullptr)
-		{
-            return XCode::NotFoundRpcConfig;
-		}
-		if(!methodConfig->Request.empty() && message->GetSize() == 0)
-        {
-            return XCode::CallArgsError;
-        }
-
 		if (!methodConfig->IsAsync)
         {
             this->Invoke(methodConfig, message);
@@ -66,7 +60,7 @@ namespace Sentry
     void InnerNetMessageComponent::Invoke(const RpcMethodConfig *config, std::shared_ptr<Rpc::Data> message)
     {
         XCode code = XCode::Failure;
-        Service * logicService = this->GetApp()->GetService(config->Service);
+        Service * logicService = this->mApp->GetService(config->Service);
         try
         {
             code = logicService->Invoke(config->Method, message);

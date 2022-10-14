@@ -4,57 +4,30 @@
 
 #include"HttpWebComponent.h"
 #include"File/FileHelper.h"
+#include"Config/ServiceConfig.h"
 #include"Client/HttpHandlerClient.h"
-#include"Component/NetThreadComponent.h"
 #include"Service/LocalHttpService.h"
+#include"Component/NetThreadComponent.h"
 namespace Sentry
 {
     bool HttpWebComponent::LateAwake()
     {
         std::vector<LocalHttpService *> httpServices;
-        if (this->GetApp()->GetComponents(httpServices) <= 0)
+        if (this->mApp->GetComponents(httpServices) <= 0)
         {
             return false;
         }
-        for(const LocalHttpService * httpService : httpServices)
-        {
-            std::vector<const HttpMethodConfig *> httpMethodConfigs;
-            httpService->GetServiceConfig().GetMethodConfigs(httpMethodConfigs);
-            for(const HttpMethodConfig * methodConfig : httpMethodConfigs)
-            {
-                this->mHttpConfigs.emplace(methodConfig->Path, methodConfig);
-            }
-        }
-        this->mTaskComponent = this->GetApp()->GetTaskComponent();
+        this->mTaskComponent = this->mApp->GetTaskComponent();
         return true;
-    }
-
-    const HttpMethodConfig *HttpWebComponent::GetConfig(const std::string &path)
-    {
-        auto iter = this->mHttpConfigs.find(path);
-        if(iter != this->mHttpConfigs.end())
-        {
-            return iter->second;
-        }
-        iter = this->mHttpConfigs.begin();
-        for(; iter != this->mHttpConfigs.end(); iter++)
-        {
-            size_t pos = path.find(iter->first);
-            if(pos != std::string::npos)
-            {
-                return iter->second;
-            }
-        }
-        return nullptr;
     }
 
     void HttpWebComponent::OnRequest(std::shared_ptr<HttpHandlerClient> httpClient)
     {
-        assert(this->GetApp()->IsMainThread());
+        assert(this->mApp->IsMainThread());
         std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
 
         const HttpData & httpData = request->GetData();
-        const HttpMethodConfig *httpConfig = this->GetConfig(httpData.mPath);
+        const HttpMethodConfig *httpConfig = ServiceConfig::Inst()->GetHttpMethodConfig(httpData.mPath);
         if (httpConfig == nullptr)
         {
             httpClient->StartWriter(HttpStatus::NOT_FOUND);

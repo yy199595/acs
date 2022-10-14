@@ -18,7 +18,7 @@ namespace Sentry
 #ifdef __DEBUG__
         //LOG_DEBUG("handler http socket count = " << count++);
 #endif
-        assert(this->GetApp()->IsMainThread());
+        assert(this->mApp->IsMainThread());
         if(this->mHttpClients.size() >= 1000)
         {
             return false;
@@ -44,7 +44,7 @@ namespace Sentry
 
     void HttpListenComponent::ClosetHttpClient(const std::string &address)
     {
-        assert(this->GetApp()->IsMainThread());
+        assert(this->mApp->IsMainThread());
         auto iter = this->mHttpClients.find(address);
         if(iter != this->mHttpClients.end())
         {

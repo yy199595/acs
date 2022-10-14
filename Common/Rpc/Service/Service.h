@@ -15,7 +15,7 @@ namespace Sentry
     class Service : public LocationComponent, public ILuaRegister, public IServiceBase
 	{
 	 public:
-		Service();
+		Service() = default;
 		virtual ~Service() override = default;
 	 public:
 		XCode Send(const std::string& func, const Message & message);
@@ -33,19 +33,15 @@ namespace Sentry
         XCode Call(long long userId, const std::string& func, const Message& message, std::shared_ptr<Message> response);
 	public:
         bool IsStartComplete() final{return this->GetHostSize() > 0; };
-        const RpcServiceConfig & GetServiceConfig() { return *this->mConfig; }
-        const std::string & GetServiceName() final { return this->GetName(); }
     public:
         bool StartSend(const std::string & address, const std::string & func, long long userId, const Message * message);
-        std::shared_ptr<Rpc::Data> StartCall(const std::string & address, const std::string & func, long long userId, const Message * message);
+        std::shared_ptr<Rpc::Data> CallAwait(const std::string & address, const std::string & func, long long userId, const Message * message);
 	 protected:
 		bool LateAwake() override;
-		bool LoadConfig(const rapidjson::Value & json) final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) override;
     public:
         virtual XCode Invoke(const std::string & method, std::shared_ptr<Rpc::Data> message) = 0;
 	private:
-        RpcServiceConfig * mConfig;
         std::string mLocalAddress;
         std::vector<std::string> mServiceHosts;
         class InnerNetComponent* mClientComponent;

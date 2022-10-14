@@ -11,7 +11,7 @@ namespace Sentry
 	LuaServiceMethod::LuaServiceMethod(const RpcMethodConfig * config, lua_State* lua)
 		: ServiceMethod(config->Method), mLuaEnv(lua), mConfig(config)
 	{
-		this->mMsgComponent = App::Get()->GetComponent<ProtoComponent>();
+		this->mMsgComponent = App::Inst()->GetComponent<ProtoComponent>();
 	}
 
 	XCode LuaServiceMethod::Call(int count, Rpc::Data & message)

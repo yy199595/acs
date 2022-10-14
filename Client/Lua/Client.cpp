@@ -28,7 +28,7 @@ namespace Lua
 
         request->SetType(Tcp::Type::Request);
         request->SetProto(Tcp::Porto::Protobuf);
-        ProtoComponent * messageComponent = App::Get()->GetMsgComponent();
+        ProtoComponent * messageComponent = App::Inst()->GetMsgComponent();
         const std::string func = CommonParameter::Read<std::string>(lua, 2);
 		std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
         if(lua_isstring(lua, 3) && lua_istable(lua, 4))
@@ -43,7 +43,7 @@ namespace Lua
             request->WriteMessage(message.get());
         }
         request->GetHead().Add("func", func);
-		TaskComponent * taskComponent = App::Get()->GetTaskComponent();
+		TaskComponent * taskComponent = App::Inst()->GetTaskComponent();
 		taskComponent->Start([request, func, clientComponent, luaWaitTaskSource]()
 		{
 			ElapsedTimer elapsedTimer;
@@ -81,7 +81,7 @@ namespace Lua
         request->GetHead().Add("token", token);
         std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
 
-        TaskComponent *taskComponent = App::Get()->GetTaskComponent();
+        TaskComponent *taskComponent = App::Inst()->GetTaskComponent();
         taskComponent->Start([request, clientComponent, luaWaitTaskSource]() {
             XCode code = XCode::Failure;
             std::shared_ptr<Rpc::Data> response = clientComponent->Call(request);

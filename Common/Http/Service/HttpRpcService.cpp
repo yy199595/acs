@@ -65,28 +65,29 @@ namespace Sentry
 
     XCode HttpRpcService::Invoke(std::shared_ptr<Rpc::Data> data, std::shared_ptr<Json::Document> document)
     {
-        std::string service, method;
-        if(!data->GetMethod(service, method))
+        std::string fullName;
+        if(!data->GetHead().Get("func", fullName))
         {
             throw std::logic_error("parse func error");
         }
-
-        Service * targetService = this->GetApp()->GetService(service);
-        if(targetService == nullptr || !targetService->IsStartService())
-        {
-            throw std::logic_error("calling service does not exist or is not started");           
-        }
-        const RpcServiceConfig & config = targetService->GetServiceConfig();
-        const RpcMethodConfig* methodConfig =  config.GetMethodConfig(method);
+        const RpcMethodConfig* methodConfig =  ServiceConfig::Inst()->GetRpcMethodConfig(fullName);
         if(methodConfig == nullptr)
         {
             throw std::logic_error("calling method does not exist");
         }
+
         if(!methodConfig->Request.empty() && data->GetBody().empty())
         {
             throw std::logic_error("request parameter cannot be empty");
         }
-        XCode code = targetService->Invoke(method, data);
+
+        Service * targetService = this->mApp->GetService(methodConfig->Service);
+        if(targetService == nullptr || !targetService->IsStartService())
+        {
+            throw std::logic_error("calling service does not exist or is not started");           
+        }
+
+        XCode code = targetService->Invoke(methodConfig->Method, data);
         if(code == XCode::Successful && !methodConfig->Response.empty())
         {
             rapidjson::Document json;
