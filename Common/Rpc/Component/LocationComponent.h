@@ -8,22 +8,10 @@
 #include<string>
 #include"Unit/LocationUnit.h"
 #include"Component/Component.h"
-namespace Sentry
-{
-    class HostCounter
-    {
-    public:
-        HostCounter(const std::string & address)
-            : Count(0), Address(address) { }
-    public:
-        unsigned int Count;
-        const std::string Address;
-    };
-}
 
 namespace Sentry
 {
-	class LocationComponent : public Component, public ILuaRegister
+	class LocationComponent : public Component
     {
     public:
         LocationComponent() = default;
@@ -43,8 +31,6 @@ namespace Sentry
         size_t GetHostSize(const std::string & service) const;
         bool HasLocation(const std::string & service, const std::string & address);
         bool GetLocationss(const std::string & service, std::vector<std::string> & hosts);
-	 private:
-		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 	 private:
 		std::unordered_map<std::string, int> mAllotCount;
         std::unordered_map<std::string, std::vector<std::string>> mServiceLocations;

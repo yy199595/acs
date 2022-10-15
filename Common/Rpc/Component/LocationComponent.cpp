@@ -5,16 +5,6 @@
 #include"LocationComponent.h"
 #include"Log/CommonLogDef.h"
 
-
-namespace Sentry
-{
-	void LocationComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
-	{
-		luaRegister.BeginRegister<LocationComponent>();
-
-	}
-}
-
 namespace Sentry
 {
     void LocationComponent::AddLocation(const std::string& service, const std::string& address)
@@ -59,10 +49,7 @@ namespace Sentry
 		{
 			return false;
 		}
-		for(const HostCounter & hostCounter : iter->second)
-		{
-			hosts.emplace_back(hostCounter.Address);
-		}
+		hosts = iter->second;
 		return true;
 	}
 
@@ -81,18 +68,13 @@ namespace Sentry
 	bool LocationComponent::HasLocation(const string& service, const string& address)
 	{
 		auto iter = this->mServiceLocations.find(service);
-		if(iter == this->mServiceLocations.end())
+		if(iter == this->mServiceLocations.end() || iter->second.empty())
 		{
 			return false;
 		}
-		for(const HostCounter & hostCounter : iter->second)
-		{
-			if(hostCounter.Address == address)
-			{
-				return true;
-			}
-		}
-		return false;
+		auto iter1 = std::find(
+			iter->second.begin(), iter->second.end(), address);
+		return iter1 != iter->second.end();
 	}
 
 	int LocationComponent::GetAllotCount(const std::string& address) const
