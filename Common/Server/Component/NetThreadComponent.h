@@ -16,7 +16,8 @@ namespace Sentry
 		void OnDestory() final;
     public:
         std::shared_ptr<SocketProxy> CreateSocket();
-        std::shared_ptr<SocketProxy> CreateSocket(const std::string & ip, unsigned short port);
+		std::shared_ptr<SocketProxy> CreateSocket(const std::string & address);
+		std::shared_ptr<SocketProxy> CreateSocket(const std::string & ip, unsigned short port);
     private:
 		size_t mIndex;
 		std::thread* mMonitorThread;

@@ -22,11 +22,11 @@ namespace Sentry
 		auto iter = this->mServiceLocations.find(service);
 		if(iter == this->mServiceLocations.end())
 		{
-			std::vector<HostCounter> item;
+			std::vector<std::string> item;
 			this->mServiceLocations.emplace(service, item);
 		}
-		HostCounter hostCounter(address);
-		this->mServiceLocations[service].emplace_back(hostCounter);
+		this->mAllotCount.emplace(address, 0);
+		this->mServiceLocations[service].emplace_back(address);
     }
 
     bool LocationComponent::DelLocation(const std::string& address)
@@ -37,6 +37,18 @@ namespace Sentry
 
 	bool LocationComponent::DelLocation(const std::string& service, const std::string& address)
 	{
+		auto iter = this->mServiceLocations.find(service);
+		if(iter == this->mServiceLocations.end())
+		{
+			return false;
+		}
+		auto iter1 = std::find(
+			iter->second.begin(), iter->second.end(), address);
+		if(iter1 != iter->second.end())
+		{
+			iter->second.erase(iter1);
+			return true;
+		}
 		return false;
 	}
 
@@ -83,29 +95,36 @@ namespace Sentry
 		return false;
 	}
 
+	int LocationComponent::GetAllotCount(const std::string& address) const
+	{
+		auto iter = this->mAllotCount.find(address);
+		return iter != this->mAllotCount.end() ? iter->second : 0;
+	}
+
 	bool LocationComponent::AllotLocation(const string& service, string& address)
 	{
 		auto iter = this->mServiceLocations.find(service);
-		if(iter == this->mServiceLocations.end())
+		if(iter == this->mServiceLocations.end() || iter->second.empty())
 		{
 			return false;
 		}
-		HostCounter * returnHost = &iter->second.at(0);
-		for(HostCounter & hostCounter : iter->second)
+		address = iter->second.at(0);
+		int count = this->GetAllotCount(address);
+		for(const std::string & location : iter->second)
 		{
-			if(hostCounter.Count <= 100)
+			int num = this->GetAllotCount(location);
+			if(num <= 100)
 			{
-				hostCounter.Count++;
-				address = hostCounter.Address;
+				address = location;
+				this->mAllotCount[address]++;
 				return true;
 			}
-			if(hostCounter.Count < returnHost->Count)
+			if(num < count)
 			{
-				returnHost = &hostCounter;
+				address = location;
 			}
 		}
-		returnHost->Count++;
-		address = returnHost->Address;
+		this->mAllotCount[address]++;
 		return true;
 	}
 	bool LocationComponent::DelLocationUnit(long long int id)

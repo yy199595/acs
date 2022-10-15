@@ -22,10 +22,14 @@ namespace Sentry
         void OnCloseSocket(const std::string &address, XCode code) final;
         void OnMessage(const std::string &address, std::shared_ptr<Rpc::Data> message) final;
     private:
-        XCode OnRequest(const std::string & address, std::shared_ptr<Rpc::Data> message);
-    private:
+        XCode OnRequest(std::shared_ptr<Rpc::Data> message);
+		XCode OnResponse(std::shared_ptr<Rpc::Data> message);
+		XCode OnBroadcast(std::shared_ptr<Rpc::Data> message);
+		bool OnAuth(const std::string & address, std::shared_ptr<Rpc::Data> message);
+	 private:
         bool IsAuth(const std::string & address) const;
         InnerNetClient * GetClient(const std::string & address);
+		InnerNetClient * GetOrCreateClient(const std::string & address);
     private:
         std::unordered_set<std::string> mAuthClients;
         std::unordered_map<std::string, std::shared_ptr<InnerNetClient>> mInnerClients;

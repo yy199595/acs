@@ -35,18 +35,19 @@ namespace Sentry
         void AddLocation(const std::string & service, const std::string & address);
 	 public:
 		bool DelLocationUnit(long long id);
-		LocationUnit * GetLocationUnit(long long id) const;
 		LocationUnit * AddLocationUnit(long long id);
+		LocationUnit * GetLocationUnit(long long id) const;
 		LocationUnit * AddLocationUnit(long long id, const std::string & address);
 	 public:
+		int GetAllotCount(const std::string & address) const;
         size_t GetHostSize(const std::string & service) const;
         bool HasLocation(const std::string & service, const std::string & address);
         bool GetLocationss(const std::string & service, std::vector<std::string> & hosts);
 	 private:
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
-		void LuaAddLocation(const char * service, const char * address);
 	 private:
-        std::unordered_map<std::string, std::vector<HostCounter>> mServiceLocations;
+		std::unordered_map<std::string, int> mAllotCount;
+        std::unordered_map<std::string, std::vector<std::string>> mServiceLocations;
         std::unordered_map<long long, std::unique_ptr<LocationUnit>> mUnitLocations;
     };
 }
