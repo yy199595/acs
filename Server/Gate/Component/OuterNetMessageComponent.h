@@ -25,6 +25,7 @@ namespace Sentry
 		class TaskComponent * mTaskComponent;
 		class TimerComponent * mTimerComponent;
         class OuterNetComponent* mOutNetComponent;
+		class LocationComponent * mLocationComponent;
         class InnerNetMessageComponent * mInnerMessageComponent;
     };
 }

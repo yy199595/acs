@@ -65,6 +65,13 @@ namespace Sentry
 			auto iter = mTypeInfoMap1.find(hash);
 			return iter != mTypeInfoMap1.end() ? iter->second : nullptr;
 		}
+		template<typename T>
+		static const std::string GetName()
+		{
+			size_t hash = typeid(T).hash_code();
+			auto iter = mTypeInfoMap1.find(hash);
+			return iter != mTypeInfoMap1.end() ? iter->second->Name : std::string();
+		}
 
 		static Type* GetType(size_t hash)
 		{

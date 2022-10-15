@@ -60,7 +60,6 @@ namespace Sentry
             }
         }
         this->mIsHandlerMessage = true;
-        this->AddLocation(location);
         return true;
 	}
 

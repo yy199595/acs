@@ -8,6 +8,7 @@
 #include"Config/ServiceConfig.h"
 #include"Service/LocalService.h"
 #include"Service/LocalHttpService.h"
+#include"Component/LocationComponent.h"
 namespace Sentry
 {
     bool ServiceLaunchComponent::Awake()
@@ -54,6 +55,7 @@ namespace Sentry
         const ServerConfig * config = ServerConfig::Inst();
         LOG_CHECK_RET_FALSE(config->GetLocation("rpc", location));
         LOG_CHECK_RET_FALSE(config->GetServices(startServices, true) > 0);
+		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
         for(const std::string & name : startServices)
         {
             IServiceBase * component = this->GetComponent<IServiceBase>(name);
@@ -66,7 +68,7 @@ namespace Sentry
             }
             if(localService != nullptr)
             {
-                localService->AddLocation(location);
+				locationComponent->AddLocation(name, location);
                 CONSOLE_LOG_ERROR("start rpc service [" << name << "] successful");
             }
             else if(localHttpService != nullptr)

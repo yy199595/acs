@@ -4,12 +4,14 @@
 
 #include"MongoHelperComponent.h"
 #include"Service/MongoService.h"
+#include"Component/LocationComponent.h"
 namespace Sentry
 {
 	bool MongoHelperComponent::LateAwake()
 	{
 		this->mMongoService = this->GetComponent<MongoService>();
-		return this->mMongoService != nullptr;
+		this->mLocationComponent = this->GetComponent<LocationComponent>();
+		return true;
 	}
 
 	XCode MongoHelperComponent::Insert(const Message& message, int index)
@@ -21,10 +23,12 @@ namespace Sentry
 	XCode MongoHelperComponent::Insert(const char* tab, const Message& message, int index)
 	{
 		std::string address;
-		if(!this->mMongoService->AllotLocation(address))
+		const std::string & name = this->mMongoService->GetName();
+		if(!this->mLocationComponent->AllotLocation(name, address))
 		{
-			return XCode::CallServiceNotFound;
+			return XCode::AddressAllotFailure;
 		}
+
 		db::mongo::insert request;
 		request.set_tab(tab);
 		request.set_flag(index);
@@ -37,11 +41,12 @@ namespace Sentry
 
     XCode MongoHelperComponent::Update(const char *tab, const std::string &select, const std::string &data, int index)
     {
-        std::string address;
-        if(!this->mMongoService->AllotLocation(address))
-        {
-            return XCode::CallServiceNotFound;
-        }
+		std::string address;
+		const std::string & name = this->mMongoService->GetName();
+		if(!this->mLocationComponent->AllotLocation(name, address))
+		{
+			return XCode::AddressAllotFailure;
+		}
         db::mongo::update request;
         request.set_tab(tab);
         request.set_update(std::move(data));
@@ -52,9 +57,10 @@ namespace Sentry
 	XCode MongoHelperComponent::Insert(const char* tab, const std::string& json, int index)
 	{
 		std::string address;
-		if(!this->mMongoService->AllotLocation(address))
+		const std::string & name = this->mMongoService->GetName();
+		if(!this->mLocationComponent->AllotLocation(name, address))
 		{
-			return XCode::CallServiceNotFound;
+			return XCode::AddressAllotFailure;
 		}
 		this->mInsertRequest.set_tab(tab);
         this->mInsertRequest.set_flag(index);
@@ -65,9 +71,10 @@ namespace Sentry
 	XCode MongoHelperComponent::Remove(const char* tab, const std::string& select, int limit, int index)
 	{
 		std::string address;
-		if(!this->mMongoService->AllotLocation(address))
+		const std::string & name = this->mMongoService->GetName();
+		if(!this->mLocationComponent->AllotLocation(name, address))
 		{
-			return XCode::CallServiceNotFound;
+			return XCode::AddressAllotFailure;
 		}
 		this->mRemoveRequest.set_tab(tab);
         this->mRemoveRequest.set_flag(index);
@@ -80,9 +87,10 @@ namespace Sentry
                                       const std::string& select, std::shared_ptr<Message> response)
 	{
 		std::string address;
-		if(!this->mMongoService->AllotLocation(address))
+		const std::string & name = this->mMongoService->GetName();
+		if(!this->mLocationComponent->AllotLocation(name, address))
 		{
-			return XCode::CallServiceNotFound;
+			return XCode::AddressAllotFailure;
 		}
 		this->mQueryRequest.set_tab(tab);
         this->mQueryRequest.set_limit(1);
@@ -130,11 +138,12 @@ namespace Sentry
             default:
                 return XCode::CallArgsError;
         }
-        std::string address;
-        if(!this->mMongoService->AllotLocation(address))
-        {
-            return XCode::CallServiceNotFound;
-        }
+		std::string address;
+		const std::string & name = this->mMongoService->GetName();
+		if(!this->mLocationComponent->AllotLocation(name, address))
+		{
+			return XCode::AddressAllotFailure;
+		}
         this->mUpdateRequest.Clear();
         if(!util::MessageToJsonString(message, this->mUpdateRequest.mutable_update()).ok())
         {

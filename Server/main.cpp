@@ -25,7 +25,8 @@
 
 #include"Component/HttpComponent.h"
 #include"Component/HttpWebComponent.h"
-#include "Component/TextConfigComponent.h"
+#include"Component/LocationComponent.h"
+#include"Component/TextConfigComponent.h"
 
 #include"Service/LuaService.h"
 #include"Service/OuterService.h"
@@ -70,6 +71,7 @@ void RegisterComponent()
     ComponentFactory::Add<TextConfigComponent>("TextConfigComponent");
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
     ComponentFactory::Add<InnerNetComponent>("InnerNetComponent");
+	ComponentFactory::Add<LocationComponent>("LocationComponent");
 
 // gate
 	ComponentFactory::Add<GateHelperComponent>("GateHelperComponent");

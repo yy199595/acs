@@ -19,14 +19,15 @@ namespace Sentry
 		XCode BroadCast(const std::string & func);
 		XCode BroadCast(const std::string & func, const Message & message);
 	 private:
+		bool GetLocation(long long userId, std::string & address);
 		XCode LuaBroadCast(const char * func, std::shared_ptr<Message> message);
 		XCode LuaCall(long long userId, const std::string func, std::shared_ptr<Message> message);
 	 protected:
 		bool LateAwake() final;
 		void OnLuaRegister(Lua::ClassProxyHelper & luaRegister) final;
 	 private:
-		class OuterService * mGateService;
         class InnerNetComponent * mInnerComponent;
+		class LocationComponent * mLocationComponent;
 	};
 }
 

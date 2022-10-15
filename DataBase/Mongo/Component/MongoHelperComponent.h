@@ -30,8 +30,9 @@ namespace Sentry
         db::mongo::update mUpdateRequest;
         db::mongo::insert mInsertRequest;
         db::mongo::remove mRemoveRequest;
-        db::mongo::query::request mQueryRequest;
-        class MongoService * mMongoService;
+		class MongoService * mMongoService;
+		db::mongo::query::request mQueryRequest;
+		class LocationComponent * mLocationComponent;
 	};
 }
 

@@ -5,6 +5,7 @@
 #include"File/DirectoryHelper.h"
 #include"Service/LuaService.h"
 #include"Component/ProtoComponent.h"
+#include"Component/LocationComponent.h"
 #include"Component/TextConfigComponent.h"
 #include"Component/RedisChannelComponent.h"
 
@@ -31,6 +32,7 @@ namespace Sentry
 		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
 		this->mMessageComponent = this->GetOrAddComponent<ProtoComponent>();
 
+		this->AddComponent<LocationComponent>();
         LOG_CHECK_RET_FALSE(this->AddComponent<TextConfigComponent>());
 
         std::vector<std::string> components;

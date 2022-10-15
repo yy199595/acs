@@ -1,6 +1,7 @@
 ﻿#include"RedisRegistryComponent.h"
 #include"App/App.h"
 #include"Service/LocalService.h"
+#include"Component/LocationComponent.h"
 #include"Component/RedisDataComponent.h"
 #include"Component/RedisSubComponent.h"
 
@@ -25,6 +26,7 @@ namespace Sentry
         const ServerConfig * config = ServerConfig::Inst();
         this->mTaskComponent = this->GetComponent<TaskComponent>();
         this->mRedisComponent = this->GetComponent<RedisDataComponent>();
+		this->mLocationComponent = this->GetComponent<LocationComponent>();
 		LOG_CHECK_RET_FALSE(config->GetMember("area_id", this->mAreaId));
         LOG_CHECK_RET_FALSE(config->GetLocation("rpc", this->mRpcAddress));
         return true;
@@ -43,13 +45,6 @@ namespace Sentry
     {
         std::string address;
         LOG_CHECK_RET_FALSE(json.GetMember("address", address));
-        auto iter = this->mNodes.find(address);
-        if(iter == this->mNodes.end())
-        {
-            LOG_ERROR("not find node address = " << address);
-            return false;
-        }
-        iter->second->UpdateTime();
         return true;
     }
 
@@ -65,19 +60,6 @@ namespace Sentry
                std::shared_ptr<RedisRequest> request = RedisRequest::Make(
                        "PUBLISH", "RedisRegistryComponent.Ping", json.JsonString());
                redisClient->SendCommand(request);
-           }
-           auto iter = this->mNodes.begin();
-           long long nowTime = Helper::Time::GetNowSecTime();
-           for(; iter != this->mNodes.end(); iter++)
-           {
-               ServiceNode * node = iter->second;
-			   if(node->GetHost() != this->mRpcAddress)
-			   {
-				   if (nowTime - node->GetLastTime() >= 20)
-				   {
-					   LOG_ERROR(node->GetHost() << " time out");
-				   }
-			   }
            }
         }
     }
@@ -110,17 +92,7 @@ namespace Sentry
         std::string address, service;
         LOG_CHECK_RET_FALSE(json.GetMember("address", address));
         LOG_CHECK_RET_FALSE(json.GetMember("service", service));
-        Service * component = this->mApp->GetService(service);
-        if(component != nullptr)
-        {
-            component->DelLocation(address);
-        }
-        auto iter = this->mNodes.find(address);
-        if(iter != this->mNodes.end())
-        {
-            iter->second->RemoveService(service);
-        }
-        return true;
+		return this->mLocationComponent->DelLocation(service, address);
     }
 
 	void RedisRegistryComponent::OnComplete()//通知其他服务器 我加入了
@@ -191,14 +163,13 @@ namespace Sentry
             for (size_t x = 0; x < response1->GetArraySize(); x++)
             {
                 const RedisString *redisString2 = response1->Get(x)->Cast<RedisString>();
-                Service *service = this->mApp->GetService(redisString2->GetValue());
-                if (service != nullptr)
-                {
-                    service->AddLocation(redisString->GetValue());
-                    serviceNode->AddService(redisString2->GetValue());
-                }
+				if(redisString2 != nullptr)
+				{
+					const std::string& address = redisString->GetValue();
+					const std::string& service = redisString2->GetValue();
+					this->mLocationComponent->AddLocation(service, address);
+				}
             }
-            this->mNodes.emplace(serviceNode->GetHost(), serviceNode);
         }
     }
 
@@ -208,21 +179,10 @@ namespace Sentry
 		std::vector<std::string> services;
         LOG_CHECK_RET_FALSE(json.GetMember("address", address));
         LOG_CHECK_RET_FALSE(json.GetMember("services", services));
-        auto iter = this->mNodes.find(address);
-        if(iter == this->mNodes.end())
-        {
-            ServiceNode * node = new ServiceNode(address);
-            this->mNodes.emplace(address, node);
-        }
-        ServiceNode * node = this->mNodes[address];
+
 		for(const std::string & service : services)
 		{
-			Service * localRpcService = this->mApp->GetService(service);
-			if(localRpcService != nullptr)
-			{
-                localRpcService->AddLocation(address);
-			}
-            node->AddService(service);
+			this->mLocationComponent->AddLocation(service, address);
 		}
 		return true;
 	}
@@ -232,17 +192,8 @@ namespace Sentry
 		std::string address, service;
 		LOG_CHECK_RET_FALSE(json.GetMember("address", address));
 		LOG_CHECK_RET_FALSE(json.GetMember("service", service));
-        auto iter = this->mNodes.find(address);
-        assert(iter != this->mNodes.end());
-        ServiceNode * node = iter->second;
-		Service * localRpcService = this->mApp->GetService(service);
-		if(localRpcService != nullptr)
-		{
-            node->AddService(service);
-            localRpcService->AddLocation(address);
-			return true;
-		}
-		return false;
+		this->mLocationComponent->AddLocation(service, address);
+		return true;
 	}
 
 	void RedisRegistryComponent::OnDestory()

@@ -1,13 +1,14 @@
-#include "MysqlHelperComponent.h"
-
+#include"MysqlHelperComponent.h"
 #include"String/StringHelper.h"
 #include"Service/MysqlService.h"
+#include"Component/LocationComponent.h"
 
 namespace Sentry
 {
 	bool MysqlHelperComponent::LateAwake()
 	{
 		this->mMysqlService = this->GetComponent<MysqlService>();
+		this->mLocationComponent = this->GetComponent<LocationComponent>();
 		return this->mMysqlService != nullptr;
 	}
 	XCode MysqlHelperComponent::Add(const Message& message, int flag)
@@ -52,7 +53,8 @@ namespace Sentry
 	XCode MysqlHelperComponent::Call(const std::string& func, const Message& data, std::shared_ptr<db::mysql::response> response)
 	{
 		std::string address;
-		if(!this->mMysqlService->AllotLocation(address))
+		const std::string & name = this->mMysqlService->GetName();
+		if(!this->mLocationComponent->AllotLocation(name, address))
 		{
 			return XCode::CallServiceNotFound;
 		}

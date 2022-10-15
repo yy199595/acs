@@ -23,23 +23,29 @@ namespace Sentry
 
 namespace Sentry
 {
-    class LocationComponent : public Component
+	class LocationComponent : public Component, public ILuaRegister
     {
     public:
         LocationComponent() = default;
         ~LocationComponent() = default;
     public:
         bool DelLocation(const std::string & address);
-        LocationUnit * GetLocationUnit(long long id) const;
+		bool AllotLocation(const std::string & service, std::string & address);
         bool DelLocation(const std::string & service, const std::string & address);
         void AddLocation(const std::string & service, const std::string & address);
-    public:
+	 public:
+		bool DelLocationUnit(long long id);
+		LocationUnit * GetLocationUnit(long long id) const;
+		LocationUnit * AddLocationUnit(long long id);
+		LocationUnit * AddLocationUnit(long long id, const std::string & address);
+	 public:
         size_t GetHostSize(const std::string & service) const;
         bool HasLocation(const std::string & service, const std::string & address);
         bool GetLocationss(const std::string & service, std::vector<std::string> & hosts);
-    public:
-        virtual bool AllotLocation(const std::string & service, std::string & address);
-    private:
+	 private:
+		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
+		void LuaAddLocation(const char * service, const char * address);
+	 private:
         std::unordered_map<std::string, std::vector<HostCounter>> mServiceLocations;
         std::unordered_map<long long, std::unique_ptr<LocationUnit>> mUnitLocations;
     };

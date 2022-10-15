@@ -8,6 +8,7 @@
 #include"String/StringHelper.h"
 #include"Async/RpcTaskSource.h"
 #include"Component/ProtoComponent.h"
+#include"Component/LocationComponent.h"
 #include"Component/InnerNetMessageComponent.h"
 using namespace Sentry;
 namespace Lua
@@ -95,39 +96,30 @@ namespace Lua
 
 	int Service::AllotLocation(lua_State *lua)
 	{
-		std::string address;
 		Sentry::Service* service = UserDataParameter::Read<Sentry::Service*>(lua, 1);
-        if(lua_isinteger(lua, 2))
-        {
-            long long userId = lua_tointeger(lua, 2);
-            if(!service->AllotLocation(userId, address))
-            {
-                return 0;
-            }
-        }
-		else if(!service->AllotLocation(address))
+		LocationComponent * locationComponent = App::Inst()->GetComponent<LocationComponent>();
+		if(lua_isinteger(lua, 2))
 		{
-			return 0;
+			std::string address;
+			long long userId = lua_tointeger(lua, 2);
+			LocationUnit * locationUnit = locationComponent->GetLocationUnit(userId);
+			if(locationUnit != nullptr && locationUnit->Get(service->GetName(), address))
+			{
+				lua_pushlstring(lua, address.c_str(), address.size());
+				return 1;
+			}
 		}
-        lua_pushstring(lua, address.c_str());
-        return 1;
+		std::string address;
+		if(locationComponent->AllotLocation(service->GetName(), address))
+		{
+			lua_pushlstring(lua, address.c_str(), address.size());
+			return 1;
+		}
+		return 0;
 	}
 
     int Service::AddLocation(lua_State *lua)
     {
-        long long unitId = 0;
-        Sentry::Service* service = UserDataParameter::Read<Sentry::Service*>(lua, 1);
-        const char * address = luaL_checkstring(lua, 2);
-        if(lua_isinteger(lua, 3) && service != nullptr)
-        {
-            unitId = lua_tointeger(lua, 2);
-            //TODO
-            return 0;
-        }
-        if(service != nullptr)
-        {
-            service->AddLocation(address);
-        }
         return 0;
     }
 }

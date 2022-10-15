@@ -4,6 +4,7 @@
 
 #include"UserBehavior.h"
 #include"Component/InnerNetComponent.h"
+#include"Component/LocationComponent.h"
 namespace Sentry
 {
     bool UserBehavior::OnStart()
@@ -11,6 +12,7 @@ namespace Sentry
         BIND_COMMON_RPC_METHOD(UserBehavior::Push);
         BIND_COMMON_RPC_METHOD(UserBehavior::Login);
         BIND_COMMON_RPC_METHOD(UserBehavior::Logout);
+		this->mLocationComponent = this->GetComponent<LocationComponent>();
         this->mInnerNetComponent = this->GetComponent<InnerNetComponent>();
         return true;
     }
@@ -25,7 +27,7 @@ namespace Sentry
             return XCode::Failure;
         }
         const std::string & address = request.address();
-        localService->AddLocation(address, request.user_id());
+		this->mLocationComponent->AddLocation(service, address);
         return XCode::Successful;
     }
 
@@ -41,6 +43,11 @@ namespace Sentry
         {
             return XCode::Failure;
         }
+		LocationUnit * locationUnit = this->mLocationComponent->AddLocationUnit(request.user_id());
+		if(locationUnit != nullptr)
+		{
+			
+		}
 
         const std::string & service = request.name();
         IServiceUnitSystem * unitSystem = this->GetComponent<IServiceUnitSystem>(service);

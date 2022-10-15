@@ -3,9 +3,9 @@
 #include"Lua/LuaServiceMethod.h"
 #include"Config/ServiceConfig.h"
 #include"String/StringHelper.h"
-#include"Async/RpcTaskSource.h"
 #include"Lua/LuaService.h"
 #include"Component/InnerNetComponent.h"
+#include"Component/LocationComponent.h"
 #include"Component/InnerNetMessageComponent.h"
 #ifdef __RPC_DEBUG_LOG__
 #include<google/protobuf/util/json_util.h>
@@ -15,7 +15,8 @@ namespace Sentry
 	bool Service::LateAwake()
 	{
         this->mClientComponent = this->GetComponent<InnerNetComponent>();
-        ServerConfig::Inst()->GetLocation("rpc", this->mLocalAddress);
+		this->mLocationComponent = this->GetComponent<LocationComponent>();
+		ServerConfig::Inst()->GetLocation("rpc", this->mLocalAddress);
         this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>();
         return true;
 	}
@@ -26,19 +27,27 @@ namespace Sentry
 		luaRegister.PushExtensionFunction("Call", Lua::Service::Call);
         luaRegister.PushExtensionFunction("AllotLocation", Lua::Service::AllotLocation);
 	}
+
+	bool Service::IsStartComplete()
+	{
+		const std::string & service = this->GetName();
+		return this->mLocationComponent->GetHostSize(service) > 0;
+	}
 }
 
 namespace Sentry
 {
 	XCode Service::Send(const std::string& func, const Message& message)
 	{
-        this->mServiceHosts.clear();
-        if(!this->GetHosts(this->mServiceHosts))
-        {
-            LOG_ERROR("service address list empty");
-            return XCode::CallServiceNotFound;
-        }
-		for(const std::string & address : this->mServiceHosts)
+		std::vector<std::string> locations;
+		const std::string & service = this->GetName();
+		if(!this->mLocationComponent->GetLocationss(service, locations))
+		{
+			LOG_ERROR(service <<  " address list empty");
+			return XCode::Failure;
+		}
+
+		for(const std::string & address : locations)
 		{
             if(!this->StartSend(address, func, 0, &message))
             {
