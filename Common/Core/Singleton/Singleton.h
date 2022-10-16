@@ -4,7 +4,7 @@
 
 #ifndef APP_SINGLETON_H
 #define APP_SINGLETON_H
-
+#include<assert.h>
 
 namespace Sentry
 {
