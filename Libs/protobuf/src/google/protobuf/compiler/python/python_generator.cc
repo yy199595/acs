@@ -680,7 +680,7 @@ void Generator::PrintDescriptorKeyAndModuleName(
 void Generator::PrintServiceClass(const ServiceDescriptor& descriptor) const {
   // Print the service.
   printer_->Print("$class_name$ = service_reflection.GeneratedServiceType("
-                  "'$class_name$', (_service.Service,), dict(\n",
+                  "'$class_name$', (_service.RpcService,), dict(\n",
                   "class_name", descriptor.name());
   printer_->Indent();
   Generator::PrintDescriptorKeyAndModuleName(descriptor);

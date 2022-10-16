@@ -4,7 +4,7 @@
 
 #include "Method/MethodRegister.h"
 
-#include"LocalService.h"
+#include"LocalRpcService.h"
 #include"App/App.h"
 #include"Config/ServiceConfig.h"
 #include"Lua/LuaServiceMethod.h"
@@ -19,13 +19,13 @@ namespace Sentry
         return fullName.substr(pos + 2);
     }
 
-    LocalService::LocalService()
+    LocalRpcService::LocalRpcService()
     {
         this->mWaitCount = 0;
         this->mIsHandlerMessage = false;
     }
 
-    void LocalService::WaitAllMessageComplete()
+    void LocalRpcService::WaitAllMessageComplete()
     {
         this->mIsHandlerMessage = false;
         TaskComponent *taskComponent = this->mApp->GetTaskComponent();
@@ -36,7 +36,7 @@ namespace Sentry
         CONSOLE_LOG_ERROR(this->GetName() << " handler all message complete");
     }
 
-    XCode LocalService::Invoke(const std::string &func, std::shared_ptr<Rpc::Data> message)
+    XCode LocalRpcService::Invoke(const std::string &func, std::shared_ptr<Rpc::Data> message)
     {
         if (!this->IsStartService())
         {
@@ -62,7 +62,7 @@ namespace Sentry
         return code;
     }
 
-	bool LocalService::Start()
+	bool LocalRpcService::Start()
 	{
 		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
         const RpcServiceConfig * rpcServiceConfig = ServiceConfig::Inst()->GetRpcConfig(this->GetName());
@@ -107,7 +107,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool LocalService::Close()
+	bool LocalRpcService::Close()
     {
         if (!this->IsStartService() || !this->OnClose())
         {

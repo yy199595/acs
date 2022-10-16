@@ -4,10 +4,10 @@
 
 #ifndef GAMEKEEPER_GATESERVICE_H
 #define GAMEKEEPER_GATESERVICE_H
-#include"Service/LocalService.h"
+#include"Service/LocalRpcService.h"
 namespace Sentry
 {
-	class OuterService final : public LocalService
+	class OuterService final : public LocalRpcService
 	{
 	 public:
 		OuterService() = default;

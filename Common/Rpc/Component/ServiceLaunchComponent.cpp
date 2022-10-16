@@ -6,7 +6,7 @@
 #include"App/App.h"
 #include"File/FileHelper.h"
 #include"Config/ServiceConfig.h"
-#include"Service/LocalService.h"
+#include"Service/LocalRpcService.h"
 #include"Service/LocalHttpService.h"
 #include"Component/LocationComponent.h"
 namespace Sentry
@@ -59,7 +59,7 @@ namespace Sentry
         for(const std::string & name : startServices)
         {
             IServiceBase * component = this->GetComponent<IServiceBase>(name);
-            LocalService * localService = dynamic_cast<LocalService*>(component);
+            LocalRpcService * localService = dynamic_cast<LocalRpcService*>(component);
             LocalHttpService * localHttpService = dynamic_cast<LocalHttpService*>(component);
             if(component != nullptr && !component->Start())
             {

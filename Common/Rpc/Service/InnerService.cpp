@@ -78,7 +78,7 @@ namespace Sentry
     XCode InnerService::StartService(const com::type_string &request)
     {
         const std::string &name = request.str();
-        Service *service = this->GetComponent<Service>(name);
+        RpcService *service = this->GetComponent<RpcService>(name);
         if (service == nullptr)
         {
             throw std::logic_error(fmt::format("not find service : {0}", name));
@@ -103,7 +103,7 @@ namespace Sentry
     XCode InnerService::CloseService(const com::type_string &request)
     {
         const std::string &name = request.str();
-        Service *service = this->GetComponent<Service>(name);
+        RpcService *service = this->GetComponent<RpcService>(name);
         if (service == nullptr)
         {
             throw std::logic_error(fmt::format("not find service : {0}", name));

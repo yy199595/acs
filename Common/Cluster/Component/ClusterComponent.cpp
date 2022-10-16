@@ -6,7 +6,7 @@
 #include"App/App.h"
 #include"File/FileHelper.h"
 #include"App/System/System.h"
-#include"Service/LocalService.h"
+#include"Service/LocalRpcService.h"
 #include"Service/LocalHttpService.h"
 namespace Cluster
 {
@@ -16,12 +16,12 @@ namespace Cluster
     bool Server::LoadService(const rapidjson::Value &value)
     {
         LOG_CHECK_RET_FALSE(value.IsObject());
-        LOG_CHECK_RET_FALSE(value.HasMember("Service"));
+        LOG_CHECK_RET_FALSE(value.HasMember("RpcService"));
         LOG_CHECK_RET_FALSE(value.HasMember("AutoAllot"));
 
         this->mServices.clear();
         this->mIsAuthAllot = value["AutoAllot"].GetBool();
-        const rapidjson::Value &services = value["Service"];
+        const rapidjson::Value &services = value["RpcService"];
         for(auto iter = services.MemberBegin(); iter != services.MemberEnd(); iter++)
         {
             const std::string service(iter->name.GetString());
@@ -128,7 +128,7 @@ namespace Sentry
         for(const std::string & name : startServices)
         {
             IServiceBase * component = this->GetComponent<IServiceBase>(name);
-            LocalService * localService = dynamic_cast<LocalService*>(component);
+            LocalRpcService * localService = dynamic_cast<LocalRpcService*>(component);
             LocalHttpService * localHttpService = dynamic_cast<LocalHttpService*>(component);
             if(component != nullptr && !component->Start())
             {

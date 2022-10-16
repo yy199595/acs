@@ -87,8 +87,15 @@ namespace Sentry
         socket->Init(ip, port);
         return socket;
     }
-	std::shared_ptr<SocketProxy> NetThreadComponent::CreateSocket(const string& ip)
+	std::shared_ptr<SocketProxy> NetThreadComponent::CreateSocket(const string& address)
 	{
-		return std::shared_ptr<SocketProxy>();
+		size_t pos = address.find(':');
+		if(pos == std::string::npos)
+		{
+			return nullptr;
+		}
+		const std::string ip = address.substr(0, pos);
+		const std::string port = address.substr(pos + 1);
+		return this->CreateSocket(ip, (unsigned short)std::stoi(port));
 	}
 }

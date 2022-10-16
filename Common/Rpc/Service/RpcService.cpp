@@ -1,4 +1,4 @@
-﻿#include"Service.h"
+﻿#include"RpcService.h"
 #include"App/App.h"
 #include"Lua/LuaServiceMethod.h"
 #include"Config/ServiceConfig.h"
@@ -12,7 +12,7 @@
 #endif
 namespace Sentry
 {
-	bool Service::LateAwake()
+	bool RpcService::LateAwake()
 	{
         this->mClientComponent = this->GetComponent<InnerNetComponent>();
 		this->mLocationComponent = this->GetComponent<LocationComponent>();
@@ -21,14 +21,14 @@ namespace Sentry
         return true;
 	}
 
-	void Service::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
+	void RpcService::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
 	{
-		luaRegister.BeginRegister<Service>();
+		luaRegister.BeginRegister<RpcService>();
 		luaRegister.PushExtensionFunction("Call", Lua::Service::Call);
         luaRegister.PushExtensionFunction("AllotLocation", Lua::Service::AllotLocation);
 	}
 
-	bool Service::IsStartComplete()
+	bool RpcService::IsStartComplete()
 	{
 		const std::string & service = this->GetName();
 		return this->mLocationComponent->GetHostSize(service) > 0;
@@ -37,7 +37,7 @@ namespace Sentry
 
 namespace Sentry
 {
-	XCode Service::Send(const std::string& func, const Message& message)
+	XCode RpcService::Send(const std::string& func, const Message& message)
 	{
 		std::vector<std::string> locations;
 		const std::string & service = this->GetName();
@@ -57,7 +57,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-    bool Service::StartSend(const std::string &address, const std::string &func, long long userId, const Message *message)
+    bool RpcService::StartSend(const std::string &address, const std::string &func, long long userId, const Message *message)
     {
         const std::string fullName = fmt::format("{0}.{1}", this->GetName(), func);
         const RpcMethodConfig * methodConfig = ServiceConfig::Inst()->GetRpcMethodConfig(fullName);
@@ -93,7 +93,7 @@ namespace Sentry
         return this->mMessageComponent->Send(address, request);
     }
 
-    std::shared_ptr<Rpc::Data> Service::CallAwait(
+    std::shared_ptr<Rpc::Data> RpcService::CallAwait(
         const std::string &address, const std::string &func, long long userId, const Message *message)
     {
         const std::string fullName = fmt::format("{0}.{1}", this->GetName(), func);
@@ -134,12 +134,12 @@ namespace Sentry
         return this->mMessageComponent->Call(address, request);
     }
 
-	XCode Service::Send(long long int userId, const string& func, const Message& message)
+	XCode RpcService::Send(long long int userId, const string& func, const Message& message)
 	{
         return XCode::Successful;
 	}
 
-	XCode Service::Send(const std::string& address, const std::string& func, const Message& message)
+	XCode RpcService::Send(const std::string& address, const std::string& func, const Message& message)
     {
         if(!this->StartSend(address, func, 0, &message))
         {
@@ -148,7 +148,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-	XCode Service::Call(const std::string & address, const string& func)
+	XCode RpcService::Call(const std::string & address, const string& func)
     {
         std::shared_ptr<Rpc::Data> response = this->CallAwait(address, func, 0, nullptr);
         if (response == nullptr)
@@ -158,7 +158,7 @@ namespace Sentry
         return response->GetCode(XCode::Failure);
     }
 
-	XCode Service::Call(const std::string & address, const string& func, const Message& message)
+	XCode RpcService::Call(const std::string & address, const string& func, const Message& message)
 	{
         std::shared_ptr<Rpc::Data> response = this->CallAwait(address, func, 0, &message);
 		if(response == nullptr)
@@ -168,7 +168,7 @@ namespace Sentry
         return response->GetCode(XCode::Failure);
     }
 
-	XCode Service::Call(const std::string & address, const string& func, std::shared_ptr<Message> response)
+	XCode RpcService::Call(const std::string & address, const string& func, std::shared_ptr<Message> response)
 	{
 		assert(response != nullptr);
         std::shared_ptr<Rpc::Data> data = this->CallAwait(address, func, 0, nullptr);
@@ -188,7 +188,7 @@ namespace Sentry
 	}
 
 
-	XCode Service::Call(const std::string & address, const string& func, const Message& message,
+	XCode RpcService::Call(const std::string & address, const string& func, const Message& message,
 			std::shared_ptr<Message> response)
 	{
 		assert(response != nullptr);
@@ -213,23 +213,23 @@ namespace Sentry
 
 namespace Sentry
 {
-	XCode Service::Call(long long userId, const std::string& func)
+	XCode RpcService::Call(long long userId, const std::string& func)
 	{
         return XCode::Successful;
 	}
 
-	XCode Service::Call(long long userId, const std::string& func, const Message& message)
+	XCode RpcService::Call(long long userId, const std::string& func, const Message& message)
 	{
 
         return XCode::Successful;
 	}
 
-	XCode Service::Call(long long userId, const std::string& func, std::shared_ptr<Message> response)
+	XCode RpcService::Call(long long userId, const std::string& func, std::shared_ptr<Message> response)
 	{
         return XCode::Successful;
 	}
 
-	XCode Service::Call(long long userId, const std::string& func, const Message& message, std::shared_ptr<Message> response)
+	XCode RpcService::Call(long long userId, const std::string& func, const Message& message, std::shared_ptr<Message> response)
 	{
 
         return XCode::Successful;

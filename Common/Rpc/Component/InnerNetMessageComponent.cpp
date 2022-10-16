@@ -5,7 +5,7 @@
 #include"Config/ServiceConfig.h"
 #include"InnerNetComponent.h"
 #include"Timer/ElapsedTimer.h"
-#include"Service/LocalService.h"
+#include"Service/LocalRpcService.h"
 #include"Async/RpcTaskSource.h"
 namespace Sentry
 {
@@ -42,7 +42,7 @@ namespace Sentry
             return XCode::CallArgsError;
         }
 
-		Service * logicService = this->mApp->GetService(methodConfig->Service);
+		RpcService * logicService = this->mApp->GetService(methodConfig->Service);
 		if (logicService == nullptr || !logicService->IsStartService())
 		{
             LOG_ERROR("call service not exist : [" << methodConfig->Service << "]");
@@ -60,7 +60,7 @@ namespace Sentry
     void InnerNetMessageComponent::Invoke(const RpcMethodConfig *config, std::shared_ptr<Rpc::Data> message)
     {
         XCode code = XCode::Failure;
-        Service * logicService = this->mApp->GetService(config->Service);
+        RpcService * logicService = this->mApp->GetService(config->Service);
         try
         {
             code = logicService->Invoke(config->Method, message);

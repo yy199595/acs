@@ -3,7 +3,7 @@
 //
 
 #include"UserSyncComponent.h"
-#include"Service/LocalService.h"
+#include"Service/LocalRpcService.h"
 #include"Component/RedisDataComponent.h"
 namespace Sentry
 {
@@ -27,7 +27,7 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(json.GetMember("user_id", userId));
 		LOG_CHECK_RET_FALSE(json.GetMember("address", address));
 		LOG_CHECK_RET_FALSE(json.GetMember("service", service));
-		//Service * component = this->GetComponent<Service>(service);
+		//RpcService * component = this->GetComponent<RpcService>(service);
         return true;
 	}
 

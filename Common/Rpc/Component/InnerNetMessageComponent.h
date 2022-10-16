@@ -5,9 +5,9 @@
 
 namespace Sentry
 {
-	class Service;
+	class RpcService;
 
-	class LuaService;
+	class LuaRpcService;
 
 	class ServiceMethod;
 

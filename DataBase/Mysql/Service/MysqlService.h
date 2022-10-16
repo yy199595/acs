@@ -2,11 +2,11 @@
 
 #include"Client/MysqlClient.h"
 #include"Client/MysqlHelper.h"
-#include"Service/LocalService.h"
+#include"Service/LocalRpcService.h"
 
 namespace Sentry
 {
-	class MysqlService : public LocalService
+	class MysqlService : public LocalRpcService
 	{
 	 public:
 		MysqlService() = default;

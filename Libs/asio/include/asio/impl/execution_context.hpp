@@ -28,7 +28,7 @@ namespace asio {
 template <typename Service>
 inline Service& use_service(execution_context& e)
 {
-  // Check that Service meets the necessary type requirements.
+  // Check that RpcService meets the necessary type requirements.
   (void)static_cast<execution_context::service*>(static_cast<Service*>(0));
 
   return e.service_registry_->template use_service<Service>();
@@ -36,13 +36,13 @@ inline Service& use_service(execution_context& e)
 
 #if defined(ASIO_HAS_VARIADIC_TEMPLATES)
 
-template <typename Service, typename... Args>
-Service& make_service(execution_context& e, ASIO_MOVE_ARG(Args)... args)
+template <typename RpcService, typename... Args>
+RpcService& make_service(execution_context& e, ASIO_MOVE_ARG(Args)... args)
 {
-  detail::scoped_ptr<Service> svc(
-      new Service(e, ASIO_MOVE_CAST(Args)(args)...));
-  e.service_registry_->template add_service<Service>(svc.get());
-  Service& result = *svc;
+  detail::scoped_ptr<RpcService> svc(
+      new RpcService(e, ASIO_MOVE_CAST(Args)(args)...));
+  e.service_registry_->template add_service<RpcService>(svc.get());
+  RpcService& result = *svc;
   svc.release();
   return result;
 }
@@ -80,7 +80,7 @@ Service& make_service(execution_context& e)
 template <typename Service>
 inline void add_service(execution_context& e, Service* svc)
 {
-  // Check that Service meets the necessary type requirements.
+  // Check that RpcService meets the necessary type requirements.
   (void)static_cast<execution_context::service*>(static_cast<Service*>(0));
 
   e.service_registry_->template add_service<Service>(svc);
@@ -89,7 +89,7 @@ inline void add_service(execution_context& e, Service* svc)
 template <typename Service>
 inline bool has_service(execution_context& e)
 {
-  // Check that Service meets the necessary type requirements.
+  // Check that RpcService meets the necessary type requirements.
   (void)static_cast<execution_context::service*>(static_cast<Service*>(0));
 
   return e.service_registry_->template has_service<Service>();

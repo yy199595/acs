@@ -4,7 +4,7 @@
 
 #include"HttpRpcService.h"
 #include"Client/Message.h"
-#include"Service/Service.h"
+#include"Service/RpcService.h"
 #include"Json/JsonWriter.h"
 #include"String/StringHelper.h"
 #include"Client/HttpHandlerClient.h"
@@ -81,7 +81,7 @@ namespace Sentry
             throw std::logic_error("request parameter cannot be empty");
         }
 
-        Service * targetService = this->mApp->GetService(methodConfig->Service);
+        RpcService * targetService = this->mApp->GetService(methodConfig->Service);
         if(targetService == nullptr || !targetService->IsStartService())
         {
             throw std::logic_error("calling service does not exist or is not started");           

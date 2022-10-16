@@ -4,10 +4,10 @@
 
 #ifndef _SERVICEAGENT_H_
 #define _SERVICEAGENT_H_
-#include"Service.h"
+#include"RpcService.h"
 namespace Sentry
 {
-	class ServiceAgent : public Service
+	class ServiceAgent : public RpcService
 	{
 	 public:
 		ServiceAgent() = default;
@@ -15,8 +15,8 @@ namespace Sentry
 	 private:
 		bool Start() final { return false;}
 		bool Close() final { return false;}
+		void WaitAllMessageComplete() final { };
 		bool IsStartService() final { return false; }
-        void WaitAllMessageComplete() { };
     private:
 		XCode Invoke(const std::string& name, std::shared_ptr<Rpc::Data> message) final;
 	};

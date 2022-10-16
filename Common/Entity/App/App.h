@@ -12,7 +12,7 @@
 
 namespace Sentry
 {
-	class Service;
+	class RpcService;
 	class ProtoComponent;
     class App final : public Unit, public Singleton<App>
 	{
@@ -33,8 +33,8 @@ namespace Sentry
 	 public:
 		void Stop();
         int Run(int argc, char ** argv);
-        Service * GetService(const std::string & name);
-		bool GetServices(std::vector<Service *> & services);
+        RpcService * GetService(const std::string & name);
+		bool GetServices(std::vector<RpcService *> & services);
         inline bool IsMainThread() const { return this->mThreadId == std::this_thread::get_id();}
     private:
 		void LogicMainLoop();
@@ -63,7 +63,7 @@ namespace Sentry
 		std::vector<IFrameUpdate*> mFrameUpdateManagers;
 		std::vector<ISystemUpdate*> mSystemUpdateManagers;
 		std::vector<ISecondUpdate*> mSecondUpdateManagers;
-        std::unordered_map<std::string, Service*> mSeviceMap;
+        std::unordered_map<std::string, RpcService*> mSeviceMap;
         std::vector<ILastFrameUpdate*> mLastFrameUpdateManager;
 	};
 }// namespace Sentry

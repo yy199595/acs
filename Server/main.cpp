@@ -28,7 +28,7 @@
 #include"Component/LocationComponent.h"
 #include"Component/TextConfigComponent.h"
 
-#include"Service/LuaService.h"
+#include"Service/LuaRpcService.h"
 #include"Service/OuterService.h"
 #include"Service/InnerService.h"
 #include"Service/ServiceAgent.h"
@@ -107,7 +107,7 @@ void RegisterComponent()
 
 void RegisterServiceComponent()
 {
-    ComponentFactory::Add<LuaService>("rpc");
+    ComponentFactory::Add<LuaRpcService>("rpc");
     ComponentFactory::Add<ServiceAgent>("agent");
     ComponentFactory::Add<LocalLuaHttpService>("http");
     ComponentFactory::Add<UserBehavior>("UserBehavior");

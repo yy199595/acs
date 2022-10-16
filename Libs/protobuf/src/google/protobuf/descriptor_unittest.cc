@@ -7334,7 +7334,7 @@ TEST_F(SourceLocationTest, InterpretedOptionSourceLocation) {
     EXPECT_FALSE(file_desc->GetSourceLocation(vunint, &loc));
   }
 
-  // Service option, repeated options
+  // RpcService option, repeated options
   {
     int path[] = {FileDescriptorProto::kServiceFieldNumber, 0,
                   ServiceDescriptorProto::kOptionsFieldNumber,

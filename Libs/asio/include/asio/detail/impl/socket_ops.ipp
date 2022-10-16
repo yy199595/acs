@@ -3282,7 +3282,7 @@ inline int gai_serv(addrinfo_type* aihead,
     }
     else
     {
-      // Service not supported for socket type.
+      // RpcService not supported for socket type.
       return EAI_SERVICE;
     }
   }

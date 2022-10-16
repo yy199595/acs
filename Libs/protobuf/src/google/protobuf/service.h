@@ -127,7 +127,7 @@ class Message;               // message.h
 // Abstract base interface for protocol-buffer-based RPC services.  Services
 // themselves are abstract interfaces (implemented either by servers or as
 // stubs), but they subclass this base interface.  The methods of this
-// interface can be used to call the methods of the Service without knowing
+// interface can be used to call the methods of the RpcService without knowing
 // its exact type at compile time (analogous to Reflection).
 class PROTOBUF_EXPORT Service {
  public:
@@ -157,8 +157,8 @@ class PROTOBUF_EXPORT Service {
   // * After the call has started, the request must not be modified and the
   //   response must not be accessed at all until "done" is called.
   // * "controller" is of the correct type for the RPC implementation being
-  //   used by this Service.  For stubs, the "correct type" depends on the
-  //   RpcChannel which the stub is using.  Server-side Service
+  //   used by this RpcService.  For stubs, the "correct type" depends on the
+  //   RpcChannel which the stub is using.  Server-side RpcService
   //   implementations are expected to accept whatever type of RpcController
   //   the server-side RPC implementation uses.
   //
@@ -265,9 +265,9 @@ class PROTOBUF_EXPORT RpcController {
 };
 
 // Abstract interface for an RPC channel.  An RpcChannel represents a
-// communication line to a Service which can be used to call that Service's
-// methods.  The Service may be running on another machine.  Normally, you
-// should not call an RpcChannel directly, but instead construct a stub Service
+// communication line to a RpcService which can be used to call that RpcService's
+// methods.  The RpcService may be running on another machine.  Normally, you
+// should not call an RpcChannel directly, but instead construct a stub RpcService
 // wrapping it.  Example:
 //   RpcChannel* channel = new MyRpcChannel("remotehost.example.com:1234");
 //   MyService* service = new MyService::Stub(channel);
@@ -278,7 +278,7 @@ class PROTOBUF_EXPORT RpcChannel {
   virtual ~RpcChannel();
 
   // Call the given method of the remote service.  The signature of this
-  // procedure looks the same as Service::CallMethod(), but the requirements
+  // procedure looks the same as RpcService::CallMethod(), but the requirements
   // are less strict in one important way:  the request and response objects
   // need not be of any specific class as long as their descriptors are
   // method->input_type() and method->output_type().

@@ -632,7 +632,7 @@ java_EXTRA_DIST = \
   java/core/src/main/java/com/google/protobuf/RpcChannel.java                      \
   java/core/src/main/java/com/google/protobuf/RpcController.java                   \
   java/core/src/main/java/com/google/protobuf/RpcUtil.java                         \
-  java/core/src/main/java/com/google/protobuf/Service.java                         \
+  java/core/src/main/java/com/google/protobuf/RpcService.java                         \
   java/core/src/main/java/com/google/protobuf/ServiceException.java                \
   java/core/src/main/java/com/google/protobuf/SingleFieldBuilder.java              \
   java/core/src/main/java/com/google/protobuf/SingleFieldBuilderV3.java            \

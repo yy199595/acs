@@ -3,7 +3,7 @@
 #include"App/System/System.h"
 #include"Timer/ElapsedTimer.h"
 #include"File/DirectoryHelper.h"
-#include"Service/LuaService.h"
+#include"Service/LuaRpcService.h"
 #include"Component/ProtoComponent.h"
 #include"Component/LocationComponent.h"
 #include"Component/TextConfigComponent.h"
@@ -71,7 +71,7 @@ namespace Sentry
 			return false;
 		}
 
-        Service * serviceComponent = component->Cast<Service>();
+        RpcService * serviceComponent = component->Cast<RpcService>();
         IFrameUpdate* manager1 = component->Cast<IFrameUpdate>();
 		ISystemUpdate* manager2 = component->Cast<ISystemUpdate>();
 		ISecondUpdate* manager3 = component->Cast<ISecondUpdate>();
@@ -246,13 +246,13 @@ namespace Sentry
 		this->mLogicRunCount = 0;
 	}
 
-	Service* App::GetService(const std::string& name)
+	RpcService* App::GetService(const std::string& name)
 	{
 		auto iter = this->mSeviceMap.find(name);
 		return iter != this->mSeviceMap.end() ? iter->second : nullptr;
 	}
 
-	bool App::GetServices(std::vector<Service*>& services)
+	bool App::GetServices(std::vector<RpcService*>& services)
 	{
 		services.clear();
 		auto iter = this->mSeviceMap.begin();

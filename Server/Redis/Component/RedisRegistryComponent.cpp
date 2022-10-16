@@ -1,6 +1,6 @@
 ﻿#include"RedisRegistryComponent.h"
 #include"App/App.h"
-#include"Service/LocalService.h"
+#include"Service/LocalRpcService.h"
 #include"Component/LocationComponent.h"
 #include"Component/RedisDataComponent.h"
 #include"Component/RedisSubComponent.h"
@@ -120,9 +120,9 @@ namespace Sentry
 
         Json::Writer json;
         json.BeginArray("services");
-        std::vector<Service *> components;
+        std::vector<RpcService *> components;
         this->mApp->GetServices(components);
-        for (Service *component: components)
+        for (RpcService *component: components)
         {
             if (component->IsStartService())
             {
@@ -198,9 +198,9 @@ namespace Sentry
 
 	void RedisRegistryComponent::OnDestory()
 	{
-		std::vector<Service*> compontns;
+		std::vector<RpcService*> compontns;
 		this->mApp->GetServices(compontns);
-		for(Service * component : compontns)
+		for(RpcService * component : compontns)
 		{
 			if(component->IsStartService())
 			{

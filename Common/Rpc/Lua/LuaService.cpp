@@ -22,7 +22,7 @@ namespace Lua
         }
         std::string address;
         long long userId = 0;
-        Sentry::Service *service = UserDataParameter::Read<Sentry::Service *>(lua, 1);
+        Sentry::RpcService *service = UserDataParameter::Read<Sentry::RpcService *>(lua, 1);
         InnerNetMessageComponent *netMessageComponent = App::Inst()->GetComponent<InnerNetMessageComponent>();
         if (netMessageComponent == nullptr)
         {
@@ -96,7 +96,7 @@ namespace Lua
 
 	int Service::AllotLocation(lua_State *lua)
 	{
-		Sentry::Service* service = UserDataParameter::Read<Sentry::Service*>(lua, 1);
+		Sentry::RpcService* service = UserDataParameter::Read<Sentry::RpcService*>(lua, 1);
 		LocationComponent * locationComponent = App::Inst()->GetComponent<LocationComponent>();
 		if(lua_isinteger(lua, 2))
 		{

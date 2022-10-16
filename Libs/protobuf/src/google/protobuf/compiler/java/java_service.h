@@ -99,13 +99,13 @@ class ImmutableServiceGenerator : public ServiceGenerator {
   // Generate abstract method declarations for all methods.
   void GenerateAbstractMethods(io::Printer* printer);
 
-  // Generate the implementation of Service.callMethod().
+  // Generate the implementation of RpcService.callMethod().
   void GenerateCallMethod(io::Printer* printer);
 
   // Generate the implementation of BlockingService.callBlockingMethod().
   void GenerateCallBlockingMethod(io::Printer* printer);
 
-  // Generate the implementations of Service.get{Request,Response}Prototype().
+  // Generate the implementations of RpcService.get{Request,Response}Prototype().
   void GenerateGetPrototype(RequestOrResponse which, io::Printer* printer);
 
   // Generate a stub implementation of the service.

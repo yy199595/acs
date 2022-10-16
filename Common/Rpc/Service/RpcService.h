@@ -12,11 +12,11 @@ namespace Sentry
 {
 	class ServiceMethod;
 	class InnerNetClient;
-    class Service : public Component, public ILuaRegister, public IServiceBase
+    class RpcService : public Component, public ILuaRegister, public IServiceBase
 	{
 	 public:
-		Service() = default;
-		virtual ~Service() override = default;
+		RpcService() = default;
+		virtual ~RpcService() override = default;
 	 public:
 		XCode Send(const std::string& func, const Message & message);
 		XCode Send(long long userId, const std::string& func, const Message & message);

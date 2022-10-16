@@ -1613,7 +1613,7 @@ TEST_F(ParseErrorTest, ReservedNumberOutOfRange) {
 
 
 // -------------------------------------------------------------------
-// Service errors
+// RpcService errors
 
 TEST_F(ParseErrorTest, EofInService) {
   ExpectHasErrors(
@@ -2114,7 +2114,7 @@ TEST_F(ParseDescriptorDebugTest, TestCommentsInDebugString) {
       "\n"
       "// Detached comment before MyService.\n"
       "\n"
-      "// Service comment.\n"
+      "// RpcService comment.\n"
       "service MyService {\n"
       "\n"
       "  // Detached comment before MyRPCCall.\n"
@@ -2157,7 +2157,7 @@ TEST_F(ParseDescriptorDebugTest, TestCommentsInDebugString) {
     "Detached comment before ASDF.",
     "Enum-value comment",
     "Detached comment before MyService.",
-    "Service comment",
+    "RpcService comment",
     "Detached comment before MyRPCCall.",
     "RPC comment",
   };

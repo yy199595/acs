@@ -67,7 +67,7 @@ void ImmutableServiceGenerator::Generate(io::Printer* printer) {
                                 /* immutable = */ true);
   printer->Print(
     "public $static$ abstract class $classname$\n"
-    "    implements com.google.protobuf.Service {\n",
+    "    implements com.google.protobuf.RpcService {\n",
     "static", is_own_file ? "" : "static",
     "classname", descriptor_->name());
   printer->Indent();
@@ -131,7 +131,7 @@ void ImmutableServiceGenerator::GenerateInterface(io::Printer* printer) {
 void ImmutableServiceGenerator::GenerateNewReflectiveServiceMethod(
     io::Printer* printer) {
   printer->Print(
-    "public static com.google.protobuf.Service newReflectiveService(\n"
+    "public static com.google.protobuf.RpcService newReflectiveService(\n"
     "    final Interface impl) {\n"
     "  return new $classname$() {\n",
     "classname", descriptor_->name());
@@ -200,7 +200,7 @@ void ImmutableServiceGenerator::GenerateCallMethod(io::Printer* printer) {
     "      com.google.protobuf.Message> done) {\n"
     "  if (method.getService() != getDescriptor()) {\n"
     "    throw new java.lang.IllegalArgumentException(\n"
-    "      \"Service.callMethod() given method descriptor for wrong \" +\n"
+    "      \"RpcService.callMethod() given method descriptor for wrong \" +\n"
     "      \"service type.\");\n"
     "  }\n"
     "  switch(method.getIndex()) {\n");
@@ -247,7 +247,7 @@ void ImmutableServiceGenerator::GenerateCallBlockingMethod(
     "    throws com.google.protobuf.ServiceException {\n"
     "  if (method.getService() != getDescriptor()) {\n"
     "    throw new java.lang.IllegalArgumentException(\n"
-    "      \"Service.callBlockingMethod() given method descriptor for \" +\n"
+    "      \"RpcService.callBlockingMethod() given method descriptor for \" +\n"
     "      \"wrong service type.\");\n"
     "  }\n"
     "  switch(method.getIndex()) {\n");
@@ -283,7 +283,7 @@ void ImmutableServiceGenerator::GenerateCallBlockingMethod(
 void ImmutableServiceGenerator::GenerateGetPrototype(RequestOrResponse which,
                                             io::Printer* printer) {
   /*
-   * TODO(cpovirk): The exception message says "Service.foo" when it may be
+   * TODO(cpovirk): The exception message says "RpcService.foo" when it may be
    * "BlockingService.foo."  Consider fixing.
    */
   printer->Print(
@@ -292,7 +292,7 @@ void ImmutableServiceGenerator::GenerateGetPrototype(RequestOrResponse which,
     "    com.google.protobuf.Descriptors.MethodDescriptor method) {\n"
     "  if (method.getService() != getDescriptor()) {\n"
     "    throw new java.lang.IllegalArgumentException(\n"
-    "      \"Service.get$request_or_response$Prototype() given method \" +\n"
+    "      \"RpcService.get$request_or_response$Prototype() given method \" +\n"
     "      \"descriptor for wrong service type.\");\n"
     "  }\n"
     "  switch(method.getIndex()) {\n",

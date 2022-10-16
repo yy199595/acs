@@ -4,10 +4,10 @@
 
 #ifndef APP_INNERSERVICE_H
 #define APP_INNERSERVICE_H
-#include"LocalService.h"
+#include"LocalRpcService.h"
 namespace Sentry
 {
-    class InnerService : public LocalService
+    class InnerService : public LocalRpcService
     {
     public:
         InnerService() = default;

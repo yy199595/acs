@@ -1,18 +1,18 @@
 ﻿#pragma once
 
 
-#include"Service.h"
+#include"RpcService.h"
 #include"Lua/LuaInclude.h"
 
 namespace Sentry
 {
 	class LuaScriptComponent;
 	class ServiceMethodRegister;
-	class LuaService : public Service
+	class LuaRpcService : public RpcService
 	{
 	 public:
-		LuaService();
-		~LuaService() override;
+		LuaRpcService();
+		~LuaRpcService() override;
 	 protected:
 		bool LateAwake() final;
 	 public:

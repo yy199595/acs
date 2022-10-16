@@ -20,7 +20,7 @@ namespace Sentry
     XCode UserBehavior::Push(const s2s::location::push &request)
     {
         const std::string & service = request.name();
-        Service * localService = this->mApp->GetService(service);
+        RpcService * localService = this->mApp->GetService(service);
         if(localService == nullptr)
         {
             CONSOLE_LOG_ERROR("not find service : " << service);

@@ -55,15 +55,15 @@ namespace detail { class service_registry; }
  * Access to the services of an execution_context is via three function
  * templates, use_service(), add_service() and has_service().
  *
- * In a call to @c use_service<Service>(), the type argument chooses a service,
- * making available all members of the named type. If @c Service is not present
- * in an execution_context, an object of type @c Service is created and added
+ * In a call to @c use_service<RpcService>(), the type argument chooses a service,
+ * making available all members of the named type. If @c RpcService is not present
+ * in an execution_context, an object of type @c RpcService is created and added
  * to the execution_context. A C++ program can check if an execution_context
  * implements a particular service with the function template @c
- * has_service<Service>().
+ * has_service<RpcService>().
  *
- * Service objects may be explicitly added to an execution_context using the
- * function template @c add_service<Service>(). If the @c Service is already
+ * RpcService objects may be explicitly added to an execution_context using the
+ * function template @c add_service<RpcService>(). If the @c RpcService is already
  * present, the service_already_exists exception is thrown. If the owner of the
  * service is not the same object as the execution_context parameter, the
  * invalid_service_owner exception is thrown.
@@ -238,13 +238,13 @@ public:
    * @throws asio::service_already_exists Thrown if a service of the
    * given type is already present in the execution_context.
    */
-  template <typename Service, typename... Args>
-  friend Service& make_service(execution_context& e, Args&&... args);
+  template <typename RpcService, typename... Args>
+  friend RpcService& make_service(execution_context& e, Args&&... args);
 
 #elif defined(ASIO_HAS_VARIADIC_TEMPLATES)
 
-  template <typename Service, typename... Args>
-  friend Service& make_service(execution_context& e,
+  template <typename RpcService, typename... Args>
+  friend RpcService& make_service(execution_context& e,
       ASIO_MOVE_ARG(Args)... args);
 
 #else // defined(ASIO_HAS_VARIADIC_TEMPLATES)

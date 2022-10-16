@@ -1,4 +1,4 @@
-﻿#include"LuaService.h"
+﻿#include"LuaRpcService.h"
 #include"Lua/Table.h"
 #include"Lua/Function.h"
 #include"Lua/LuaServiceMethod.h"
@@ -7,19 +7,19 @@
 #include"Method/MethodRegister.h"
 namespace Sentry
 {
-	LuaService::LuaService()
+	LuaRpcService::LuaRpcService()
 		: mLuaEnv(nullptr)
 	{
         this->mWaitCount = 0;
         this->mIsHandlerMessage = false;
 	}
 
-	LuaService::~LuaService()
+	LuaRpcService::~LuaRpcService()
 	{
 		//luaL_unref(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
 	}
 
-	bool LuaService::Start()
+	bool LuaRpcService::Start()
 	{
         std::string location;
         const ServerConfig * config = ServerConfig::Inst();
@@ -63,7 +63,7 @@ namespace Sentry
         return true;
 	}
 
-	XCode LuaService::Invoke(const std::string &name, std::shared_ptr<Rpc::Data> message)
+	XCode LuaRpcService::Invoke(const std::string &name, std::shared_ptr<Rpc::Data> message)
 	{
 		if(!this->IsStartService())
 		{
@@ -85,7 +85,7 @@ namespace Sentry
         return code;
 	}
 
-    void LuaService::WaitAllMessageComplete()
+    void LuaRpcService::WaitAllMessageComplete()
     {
         this->mIsHandlerMessage = false;
         TaskComponent *taskComponent = this->mApp->GetTaskComponent();
@@ -96,9 +96,9 @@ namespace Sentry
         CONSOLE_LOG_ERROR(this->GetName() << " handler all message complete");
     }
 
-	bool LuaService::LateAwake()
+	bool LuaRpcService::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(Service::LateAwake());
+		LOG_CHECK_RET_FALSE(RpcService::LateAwake());
 		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
 		LOG_CHECK_RET_FALSE(this->mLuaEnv = this->mLuaComponent->GetLuaEnv());
 
@@ -112,7 +112,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool LuaService::Close()
+	bool LuaRpcService::Close()
 	{
         const char * tab = this->GetName().c_str();
         if(Lua::lua_getfunction(this->mLuaEnv, tab, "OnStop"))

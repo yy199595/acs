@@ -8,7 +8,7 @@
 #include"Component/InnerNetMessageComponent.h"
 #include"OuterNetComponent.h"
 #include"Component/InnerNetComponent.h"
-#include"Service/LocalService.h"
+#include"Service/LocalRpcService.h"
 #include"Service/InnerService.h"
 #include"Component/RedisDataComponent.h"
 #include"Component/ProtoComponent.h"
@@ -37,7 +37,7 @@ namespace Sentry
 		{
 			return XCode::CallFunctionNotExist;
 		}
-		Service* targetService = this->mApp->GetService(methodConfig->Service);
+		RpcService* targetService = this->mApp->GetService(methodConfig->Service);
 		if (targetService == nullptr)
 		{
 			CONSOLE_LOG_ERROR("userid=" << userId <<

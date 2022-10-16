@@ -4,16 +4,16 @@
 
 #ifndef SERVER_LOCALSERVICECOMPONENT_H
 #define SERVER_LOCALSERVICECOMPONENT_H
-#include"Service.h"
+#include"RpcService.h"
 #include"Method/MethodRegister.h"
 #include"Component/LuaScriptComponent.h"
 
 namespace Sentry
 {
-	class LocalService : public Service
+	class LocalRpcService : public RpcService
 	{
 	public:
-		LocalService();
+		LocalRpcService();
 	public:
 		bool Start() final;
 		bool Close() final;

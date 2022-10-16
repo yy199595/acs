@@ -76,7 +76,7 @@ void ServiceGenerator::GenerateDeclarations(io::Printer* printer) {
 void ServiceGenerator::GenerateInterface(io::Printer* printer) {
   Formatter format(printer, vars_);
   format(
-      "class $dllexport_decl $$classname$ : public ::$proto_ns$::Service {\n"
+      "class $dllexport_decl $$classname$ : public ::$proto_ns$::RpcService {\n"
       " protected:\n"
       "  // This class should be treated as an abstract interface.\n"
       "  inline $classname$() {};\n"
@@ -95,7 +95,7 @@ void ServiceGenerator::GenerateInterface(io::Printer* printer) {
 
   format(
       "\n"
-      "// implements Service ----------------------------------------------\n"
+      "// implements RpcService ----------------------------------------------\n"
       "\n"
       "const ::$proto_ns$::ServiceDescriptor* GetDescriptor();\n"
       "void CallMethod(const ::$proto_ns$::MethodDescriptor* method,\n"
@@ -128,7 +128,7 @@ void ServiceGenerator::GenerateStubDefinition(io::Printer* printer) {
   format(
       "$classname$_Stub(::$proto_ns$::RpcChannel* channel);\n"
       "$classname$_Stub(::$proto_ns$::RpcChannel* channel,\n"
-      "                 ::$proto_ns$::Service::ChannelOwnership ownership);\n"
+      "                 ::$proto_ns$::RpcService::ChannelOwnership ownership);\n"
       "~$classname$_Stub();\n"
       "\n"
       "inline ::$proto_ns$::RpcChannel* channel() { return channel_; }\n"
@@ -202,10 +202,10 @@ void ServiceGenerator::GenerateImplementation(io::Printer* printer) {
       "  : channel_(channel), owns_channel_(false) {}\n"
       "$classname$_Stub::$classname$_Stub(\n"
       "    ::$proto_ns$::RpcChannel* channel,\n"
-      "    ::$proto_ns$::Service::ChannelOwnership ownership)\n"
+      "    ::$proto_ns$::RpcService::ChannelOwnership ownership)\n"
       "  : channel_(channel),\n"
       "    owns_channel_(ownership == "
-      "::$proto_ns$::Service::STUB_OWNS_CHANNEL) "
+      "::$proto_ns$::RpcService::STUB_OWNS_CHANNEL) "
       "{}\n"
       "$classname$_Stub::~$classname$_Stub() {\n"
       "  if (owns_channel_) delete channel_;\n"

@@ -1,6 +1,6 @@
 #include"ConsoleComponent.h"
 
-#include"Service/LocalService.h"
+#include"Service/LocalRpcService.h"
 #include"Component/TaskComponent.h"
 #include"Component/OperatorComponent.h"
 #define BIND_FUNC(name, func) this->mFunctionMap.emplace(name, std::bind(&func, this, args1, args2));
@@ -140,7 +140,7 @@ namespace Sentry
 		this->mApp->GetComponents(components);
 		for(const std::string & name : components)
 		{
-			if(this->GetComponent<LocalService>(name) != nullptr)
+			if(this->GetComponent<LocalRpcService>(name) != nullptr)
 			{
 				response.emplace_back(name);
 			}

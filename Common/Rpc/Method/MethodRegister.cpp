@@ -7,12 +7,12 @@
 #include"App/App.h"
 #include"Lua/Function.h"
 #include"Lua/LuaServiceMethod.h"
-#include"Service/LocalService.h"
+#include"Service/LocalRpcService.h"
 namespace Sentry
 {
 	bool ServiceMethodRegister::AddMethod(std::shared_ptr<ServiceMethod> method)
 	{
-		Service * serviceComponent = this->mComponent->Cast<Service>();
+		RpcService * serviceComponent = this->mComponent->Cast<RpcService>();
         LOG_CHECK_RET_FALSE(serviceComponent);
 
         const std::string & name = method->GetName();
