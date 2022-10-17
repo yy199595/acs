@@ -1349,7 +1349,7 @@ class mongo_command_response :
 
   // accessors -------------------------------------------------------
 
-  // repeated string jsons = 1;
+  // repeated bytes jsons = 1;
   int jsons_size() const;
   void clear_jsons();
   static const int kJsonsFieldNumber = 1;
@@ -1360,14 +1360,14 @@ class mongo_command_response :
   void set_jsons(int index, ::std::string&& value);
   #endif
   void set_jsons(int index, const char* value);
-  void set_jsons(int index, const char* value, size_t size);
+  void set_jsons(int index, const void* value, size_t size);
   ::std::string* add_jsons();
   void add_jsons(const ::std::string& value);
   #if LANG_CXX11
   void add_jsons(::std::string&& value);
   #endif
   void add_jsons(const char* value);
-  void add_jsons(const char* value, size_t size);
+  void add_jsons(const void* value, size_t size);
   const ::google::protobuf::RepeatedPtrField<::std::string>& jsons() const;
   ::google::protobuf::RepeatedPtrField<::std::string>* mutable_jsons();
 
@@ -3672,7 +3672,7 @@ inline void mongo_command_request::set_allocated_json(::std::string* json) {
 
 // mongo_command_response
 
-// repeated string jsons = 1;
+// repeated bytes jsons = 1;
 inline int mongo_command_response::jsons_size() const {
   return jsons_.size();
 }
@@ -3702,7 +3702,7 @@ inline void mongo_command_response::set_jsons(int index, const char* value) {
   jsons_.Mutable(index)->assign(value);
   // @@protoc_insertion_point(field_set_char:db.mongo.command.response.jsons)
 }
-inline void mongo_command_response::set_jsons(int index, const char* value, size_t size) {
+inline void mongo_command_response::set_jsons(int index, const void* value, size_t size) {
   jsons_.Mutable(index)->assign(
     reinterpret_cast<const char*>(value), size);
   // @@protoc_insertion_point(field_set_pointer:db.mongo.command.response.jsons)
@@ -3726,7 +3726,7 @@ inline void mongo_command_response::add_jsons(const char* value) {
   jsons_.Add()->assign(value);
   // @@protoc_insertion_point(field_add_char:db.mongo.command.response.jsons)
 }
-inline void mongo_command_response::add_jsons(const char* value, size_t size) {
+inline void mongo_command_response::add_jsons(const void* value, size_t size) {
   jsons_.Add()->assign(reinterpret_cast<const char*>(value), size);
   // @@protoc_insertion_point(field_add_pointer:db.mongo.command.response.jsons)
 }

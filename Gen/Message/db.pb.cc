@@ -591,7 +591,7 @@ const char descriptor_table_protodef_db_2eproto[] =
   "\013\n\003tab\030\001 \001(\t\022\016\n\006select\030\002 \001(\t\022\016\n\006update\030\003"
   " \001(\t\022\013\n\003tag\030\004 \001(\t\022\014\n\004flag\030\005 \001(\005\032=\n\007comma"
   "nd\032\027\n\007request\022\014\n\004json\030\001 \001(\t\032\031\n\010response\022"
-  "\r\n\005jsons\030\001 \003(\t\"\324\003\n\005mysql\032:\n\006create\022\014\n\004ke"
+  "\r\n\005jsons\030\001 \003(\014\"\324\003\n\005mysql\032:\n\006create\022\014\n\004ke"
   "ys\030\001 \003(\t\022\"\n\004data\030\002 \001(\0132\024.google.protobuf"
   ".Any\032F\n\003add\022\014\n\004flag\030\001 \001(\005\022\r\n\005table\030\002 \001(\t"
   "\022\"\n\004data\030\003 \001(\0132\024.google.protobuf.Any\032G\n\004"
@@ -3783,19 +3783,18 @@ const char* mongo_command_response::_InternalParse(const char* begin, const char
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // repeated string jsons = 1;
+      // repeated bytes jsons = 1;
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         do {
           ptr = ::google::protobuf::io::ReadSize(ptr, &size);
           GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          ctx->extra_parse_data().SetFieldName("db.mongo.command.response.jsons");
           object = msg->add_jsons();
           if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+            parser_till_end = ::google::protobuf::internal::GreedyStringParser;
             goto string_till_end;
           }
-          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheck(ptr, size, ctx));
           ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
           ptr += size;
           if (ptr >= end) break;
@@ -3836,16 +3835,11 @@ bool mongo_command_response::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // repeated string jsons = 1;
+      // repeated bytes jsons = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+          DO_(::google::protobuf::internal::WireFormatLite::ReadBytes(
                 input, this->add_jsons()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->jsons(this->jsons_size() - 1).data(),
-            static_cast<int>(this->jsons(this->jsons_size() - 1).length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "db.mongo.command.response.jsons"));
         } else {
           goto handle_unusual;
         }
@@ -3879,13 +3873,9 @@ void mongo_command_response::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated string jsons = 1;
+  // repeated bytes jsons = 1;
   for (int i = 0, n = this->jsons_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->jsons(i).data(), static_cast<int>(this->jsons(i).length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "db.mongo.command.response.jsons");
-    ::google::protobuf::internal::WireFormatLite::WriteString(
+    ::google::protobuf::internal::WireFormatLite::WriteBytes(
       1, this->jsons(i), output);
   }
 
@@ -3902,14 +3892,10 @@ void mongo_command_response::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated string jsons = 1;
+  // repeated bytes jsons = 1;
   for (int i = 0, n = this->jsons_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->jsons(i).data(), static_cast<int>(this->jsons(i).length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "db.mongo.command.response.jsons");
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteStringToArray(1, this->jsons(i), target);
+      WriteBytesToArray(1, this->jsons(i), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -3933,11 +3919,11 @@ size_t mongo_command_response::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated string jsons = 1;
+  // repeated bytes jsons = 1;
   total_size += 1 *
       ::google::protobuf::internal::FromIntSize(this->jsons_size());
   for (int i = 0, n = this->jsons_size(); i < n; i++) {
-    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+    total_size += ::google::protobuf::internal::WireFormatLite::BytesSize(
       this->jsons(i));
   }
 
