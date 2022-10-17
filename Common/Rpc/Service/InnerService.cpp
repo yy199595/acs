@@ -4,35 +4,18 @@
 
 #include "InnerService.h"
 #include"Component/InnerNetComponent.h"
-#include"Component/InnerNetMessageComponent.h"
-#ifdef __ENABLE_MYSQL__
-#include"Component/MysqlHelperComponent.h"
-#endif
-
-#ifdef __ENABLE_MONGODB__
-#include"Component/MongoHelperComponent.h"
-#endif
-#include"Component/HttpComponent.h"
 #include"Component/RedisSubComponent.h"
 #include"Component/RedisDataComponent.h"
-#include"Component/GateHelperComponent.h"
 #include"Component/RedisRegistryComponent.h"
+#include"Component/InnerNetMessageComponent.h"
+
 namespace Sentry
 {
     bool InnerService::Awake()
     {
-#ifdef __ENABLE_MYSQL__
-        this->mApp->AddComponent<MysqlHelperComponent>();
-#endif
-
-#ifdef __ENABLE_MONGODB__
-        this->mApp->AddComponent<MongoHelperComponent>();
-#endif
-        this->mApp->AddComponent<HttpComponent>();
         this->mApp->AddComponent<InnerNetComponent>();
         this->mApp->AddComponent<RedisSubComponent>();
         this->mApp->AddComponent<RedisDataComponent>();
-        this->mApp->AddComponent<GateHelperComponent>();
         this->mApp->AddComponent<RedisRegistryComponent>();
         this->mApp->AddComponent<InnerNetMessageComponent>();
         return true;

@@ -23,7 +23,7 @@ namespace Sentry
 		template<typename T>
 		inline T* GetComponent(const std::string& name) const;
 
-		Component* GetComponentByName(const std::string& name);
+		Component* GetComponentByName(const std::string& name) const;
 
 		template<typename T>
 		inline bool RemoveComponent();
@@ -60,10 +60,9 @@ namespace Sentry
     template<typename T>
     size_t Unit::GetComponents(std::vector<T *> &components) const
     {
-        auto iter = this->mComponentMap.begin();
-        for(; iter != this->mComponentMap.end(); iter++)
+        for(const std::string & name : this->mSortComponents)
         {
-            T * component = iter->second->Cast<T>();
+            T * component = this->GetComponent<T>(name);
             if(component != nullptr)
             {
                 components.emplace_back(component);

@@ -7,7 +7,8 @@ namespace Sentry
 {
 	bool MysqlHelperComponent::LateAwake()
 	{
-		this->mMysqlService = this->GetComponent<MysqlService>();
+        std::string name = ComponentFactory::GetName<MysqlService>();
+		this->mMysqlService = this->GetComponent<RpcService>(name);
 		this->mLocationComponent = this->GetComponent<LocationComponent>();
 		return this->mMysqlService != nullptr;
 	}

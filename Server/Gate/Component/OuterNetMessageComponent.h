@@ -16,17 +16,25 @@ namespace Sentry
 	 public:
 		OuterNetMessageComponent() = default;
 		~OuterNetMessageComponent() final = default;
-	 public:
-        XCode OnRequest(long long userId, std::shared_ptr<Rpc::Data> message);
+    public:
+        bool GetAddress(long long id, std::string & address);
+        bool CreateToken(long long userId, std::string & token);
+    public:
+        void OnClose(const std::string & address);
+        XCode OnAuth(const std::string & address, std::shared_ptr<Rpc::Data> message);
+        XCode OnRequest(const std::string & address, std::shared_ptr<Rpc::Data> message);
         XCode OnResponse(const std::string & address, std::shared_ptr<Rpc::Data> message);
     private:
 		bool LateAwake() final;
 	 private:
-		class TaskComponent * mTaskComponent;
+        class TaskComponent * mTaskComponent;
 		class TimerComponent * mTimerComponent;
         class OuterNetComponent* mOutNetComponent;
 		class LocationComponent * mLocationComponent;
+        std::unordered_map<std::string, long long> mTokens;
         class InnerNetMessageComponent * mInnerMessageComponent;
+        std::unordered_map<std::string, long long> mUserAddressMap;
+        std::unordered_map<long long, std::string> mClientAddressMap;
     };
 }
 

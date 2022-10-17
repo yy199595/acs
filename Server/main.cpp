@@ -27,11 +27,12 @@
 #include"Component/HttpWebComponent.h"
 #include"Component/LocationComponent.h"
 #include"Component/TextConfigComponent.h"
+#include"Component/ClusterComponent.h"
 
 #include"Service/LuaRpcService.h"
 #include"Service/OuterService.h"
 #include"Service/InnerService.h"
-#include"Service/ServiceAgent.h"
+#include"Service/ServiceWrapper.h"
 #include"Service/HttpWebService.h"
 #include"Service/HttpRpcService.h"
 #include"Service/UserBehavior.h"
@@ -68,6 +69,7 @@ void RegisterComponent()
     ComponentFactory::Add<ProtoComponent>("ProtoComponent");
 
 //server
+    ComponentFactory::Add<ClusterComponent>("ClusterComponent");
     ComponentFactory::Add<TextConfigComponent>("TextConfigComponent");
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
     ComponentFactory::Add<InnerNetComponent>("InnerNetComponent");
@@ -108,7 +110,7 @@ void RegisterComponent()
 void RegisterServiceComponent()
 {
     ComponentFactory::Add<LuaRpcService>("rpc");
-    ComponentFactory::Add<ServiceAgent>("agent");
+    ComponentFactory::Add<ServiceWrapper>("agent");
     ComponentFactory::Add<LocalLuaHttpService>("http");
     ComponentFactory::Add<UserBehavior>("UserBehavior");
     ComponentFactory::Add<OuterService>("OuterService");

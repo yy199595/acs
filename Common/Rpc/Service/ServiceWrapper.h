@@ -7,11 +7,11 @@
 #include"RpcService.h"
 namespace Sentry
 {
-	class ServiceAgent : public RpcService
+	class ServiceWrapper : public RpcService
 	{
 	 public:
-		ServiceAgent() = default;
-		~ServiceAgent() = default;
+		ServiceWrapper() = default;
+		~ServiceWrapper() = default;
 	 private:
 		bool Start() final { return false;}
 		bool Close() final { return false;}

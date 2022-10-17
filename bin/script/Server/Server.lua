@@ -128,7 +128,7 @@ function Server.OnLoadModule(moduleName)
         end
     end
     package[moduleName] = oldModule
-    Log.Info("load " .. moduleName .. " Successful")
+    --Log.Info("load " .. moduleName .. " Successful")
     return oldModule
 end
 

@@ -7,17 +7,17 @@
 #include"Md5/MD5.h"
 #include"Client/OuterNetClient.h"
 #include"Component/RedisDataComponent.h"
-#include"Component/OuterNetMessageComponent.h"
-#include"Component/OuterNetComponent.h"
 #include"Component/GateHelperComponent.h"
 #include"Component/UserSyncComponent.h"
+#include"Component/OuterNetComponent.h"
+#include"Component/OuterNetMessageComponent.h"
 namespace Sentry
 {
 
     bool OuterService::Awake()
     {
         this->mTimerComponent = nullptr;
-        this->mOuterNetComponent = nullptr;
+        this->mOuterComponent = nullptr;
         this->mApp->AddComponent<OuterNetComponent>();
         this->mApp->AddComponent<OuterNetMessageComponent>();
         return true;
@@ -31,13 +31,13 @@ namespace Sentry
         BIND_COMMON_RPC_METHOD(OuterService::SaveAddress);
         BIND_COMMON_RPC_METHOD(OuterService::QueryAddress);
         LOG_CHECK_RET_FALSE(config->GetLocation("gate", this->mAddress));
-        this->mOuterNetComponent = this->GetComponent<OuterNetComponent>();
-		return this->mOuterNetComponent->StartListen("gate");
+        this->mOuterComponent = this->GetComponent<OuterNetMessageComponent>();
+		return this->GetComponent<OuterNetComponent>()->StartListen("gate");
 	}
 
     bool OuterService::OnClose()
     {
-        this->mOuterNetComponent->StopListen();
+        this->GetComponent<OuterNetComponent>()->StopListen();
 		return true;
     }
 
@@ -50,8 +50,10 @@ namespace Sentry
 	XCode OuterService::AllotUser(const com::type::int64 &request, s2s::allot::response &response)
     {
         long long userId = request.value();
-        std::string token = this->mOuterNetComponent->CreateToken(userId);
-        response.set_token(token);
+        if(!this->mOuterComponent->CreateToken(userId, *response.mutable_token()))
+        {
+            return XCode::Failure;
+        }
         response.set_address(this->mAddress);
         return XCode::Successful;
     }

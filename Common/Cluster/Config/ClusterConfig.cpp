@@ -6,6 +6,12 @@
 #include"App/System/System.h"
 namespace Sentry
 {
+    bool NodeConfig::IsStart(const std::string &service) const
+    {
+        auto iter = this->mServices.find(service);
+        return iter != this->mServices.end() && iter->second;
+    }
+
     bool NodeConfig::OnLoadConfig(const rapidjson::Value &value)
     {
         if(value.HasMember("Service"))
@@ -37,6 +43,10 @@ namespace Sentry
         {
             this->mIsAutoAllot = value["AutoAllot"].GetBool();
         }
+        if(value.HasMember("lua"))
+        {
+            this->mLua = value["lua"].GetString();
+        }
         return true;
     }
 
@@ -53,8 +63,12 @@ namespace Sentry
     {
         for(auto & value : this->mServices)
         {
-            if(start && !value.second)
+            if(start)
             {
+                if(value.second)
+                {
+                    services.emplace_back(value.first);
+                }
                 continue;
             }
             services.emplace_back(value.first);
@@ -106,5 +120,15 @@ namespace Sentry
     {
         auto iter = this->mNodeConfigs.find(name);
         return iter != this->mNodeConfigs.end() ? iter->second.get() : nullptr;
+    }
+
+    size_t ClusterConfig::GetNodeConfigs(std::vector<const NodeConfig *> &nodes) const
+    {
+        auto iter = this->mNodeConfigs.begin();
+        for(; iter != this->mNodeConfigs.end(); iter++)
+        {
+            nodes.emplace_back(iter->second.get());
+        }
+        return nodes.size();
     }
 }

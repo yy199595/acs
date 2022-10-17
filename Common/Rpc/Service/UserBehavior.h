@@ -17,6 +17,7 @@ namespace Sentry
         XCode Login(const Rpc::Head & head, const s2s::location::sync & request);
         XCode Logout(const Rpc::Head & head, const s2s::location::sync & request);
     private:
+        bool Awake() final;
         bool OnStart() final;
         bool OnClose() final { return false; }
     private:

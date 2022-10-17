@@ -5,8 +5,15 @@
 #include"UserBehavior.h"
 #include"Component/InnerNetComponent.h"
 #include"Component/LocationComponent.h"
+#include"Component/GateHelperComponent.h"
 namespace Sentry
 {
+
+    bool UserBehavior::Awake()
+    {
+        this->mApp->AddComponent<GateHelperComponent>();
+        return true;
+    }
     bool UserBehavior::OnStart()
     {
         BIND_COMMON_RPC_METHOD(UserBehavior::Push);

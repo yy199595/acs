@@ -24,8 +24,7 @@ namespace Sentry
 	 private:
 		std::string mAddress;
 		class TimerComponent* mTimerComponent;
-		class UserSyncComponent * mSyncComponent;
-		class OuterNetComponent* mOuterNetComponent;
+		class OuterNetMessageComponent* mOuterComponent;
 	};
 
 }

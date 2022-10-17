@@ -30,7 +30,6 @@ namespace Sentry
 	{
         this->mTimerComponent = this->mApp->GetTimerComponent();
         this->mNetComponent = this->GetComponent<NetThreadComponent>();
-        LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisDataComponent>());
 		LOG_CHECK_RET_FALSE(this->mOuterMessageComponent = this->GetComponent<OuterNetMessageComponent>());
 		return true;
 	}
@@ -59,24 +58,12 @@ namespace Sentry
 
     bool OuterNetComponent::OnAuth(const std::string &address, std::shared_ptr<Rpc::Data> message)
     {
-        long long userId = 0;
-        if (this->GetUserId(address, userId)) //已经验证过了
+        XCode code = this->mOuterMessageComponent->OnAuth(address, message);
+        if(code != XCode::Successful)
         {
-            return true;
-        }
-        std::string token;
-        const Rpc::Head & head = message->GetHead();
-        LOG_CHECK_RET_FALSE(head.Get("token", token));
-
-        auto iter = this->mTokens.find(token);
-        if (iter == this->mTokens.end())
-        {
-            LOG_ERROR(address << " auth failure not find token");
             return false;
         }
-        this->mTokens.erase(iter);
         message->GetHead().Remove("token");
-        this->OnAuthSuccessful(iter->second, address);
         message->GetHead().Add("code", XCode::Successful);
         this->mOuterMessageComponent->OnResponse(address, message);
         return true;
@@ -84,13 +71,8 @@ namespace Sentry
 
     bool OuterNetComponent::OnRequest(const std::string &address, std::shared_ptr<Rpc::Data> message)
     {
-        long long userId = 0;
-        if (!this->GetUserId(address, userId)) //没有验证
-        {
-            return false;
-        }
         message->GetHead().Add("resp", address);
-        XCode code = this->mOuterMessageComponent->OnRequest(userId, message);
+        XCode code = this->mOuterMessageComponent->OnRequest(address, message);
         if (code != XCode::Successful)
         {
             message->Clear();
@@ -100,24 +82,6 @@ namespace Sentry
             return false;
         }
         return true;
-    }
-
-    void OuterNetComponent::OnAuthSuccessful(long long userId, const std::string &address)
-    {
-        // 分配服务器
-
-        this->mUserAddressMap.emplace(address, userId);
-        this->mClientAddressMap.emplace(userId, address);
-        CONSOLE_LOG_INFO(userId << " auth successful ......");
-    }
-
-    std::string OuterNetComponent::CreateToken(long long userId, float second)
-    {
-        long long nowTime = Helper::Time::GetNowSecTime();
-        std::string rand = fmt::format("{0}:{1}", userId, nowTime);
-        const std::string token = Helper::Md5::GetMd5(rand);
-        this->mTokens.emplace(token, userId);
-        return token;
     }
 
 	bool OuterNetComponent::OnListen(std::shared_ptr<SocketProxy> socket)
@@ -161,17 +125,7 @@ namespace Sentry
             }
             this->mGateClientMap.erase(iter);
         }
-        auto iter1 = this->mUserAddressMap.find(address);
-        if (iter1 != this->mUserAddressMap.end())
-        {
-            long long userId = iter1->second;
-            auto iter2 = this->mClientAddressMap.find(userId);
-            if (iter2 != this->mClientAddressMap.end())
-            {
-                this->mClientAddressMap.erase(iter2);
-            }
-            this->mUserAddressMap.erase(iter1);
-        }
+        this->mOuterMessageComponent->OnClose(address);
     }
 
     void OuterNetComponent::OnStopListen()
@@ -181,9 +135,7 @@ namespace Sentry
         {
             iter->second->StartClose();
         }
-        this->mTokens.clear();
         this->mGateClientMap.clear();
-        this->mUserAddressMap.clear();
     }
 
     bool OuterNetComponent::SendData(std::shared_ptr<Rpc::Data> message)
@@ -204,12 +156,12 @@ namespace Sentry
     bool OuterNetComponent::SendData(long long userId, std::shared_ptr<Rpc::Data> message)
     {
         std::string address;
-        message->SetType(Tcp::Type::Request);
-        if(!this->GetUserAddress(userId, address))
+        if(!this->mOuterMessageComponent->GetAddress(userId, address))
         {
             CONSOLE_LOG_ERROR("send message to user:" << userId << " failure");
             return false;
         }
+        message->SetType(Tcp::Type::Request);
         return this->SendData(address, message);
     }
 
@@ -239,27 +191,5 @@ namespace Sentry
 		{
 			proxyClient->StartClose();
 		}
-	}
-
-	bool OuterNetComponent::GetUserId(const std::string& address, long long& userId)
-	{
-		auto iter = this->mUserAddressMap.find(address);
-		if(iter != this->mUserAddressMap.end())
-		{
-			userId = iter->second;
-			return true;
-		}
-		return false;
-	}
-
-	bool OuterNetComponent::GetUserAddress(long long userId, std::string& address)
-	{
-		auto iter = this->mClientAddressMap.find(userId);
-		if(iter != this->mClientAddressMap.end())
-		{
-			address = iter->second;
-			return true;
-		}
-		return false;
 	}
 }

@@ -15,6 +15,8 @@
 #include"Json/Lua/Encoder.h"
 #include"Md5/LuaMd5.h"
 #include"App/System/System.h"
+#include"Config/ClusterConfig.h"
+#include"Component/TextConfigComponent.h"
 using namespace Lua;
 namespace Sentry
 {
@@ -26,87 +28,77 @@ namespace Sentry
 	}
 
 	bool LuaScriptComponent::LateAwake()
-	{
-		std::vector<std::string> components;
-		this->mApp->GetComponents(components);
-		for (const std::string& name: components)
-		{
-			ILuaRegister* luaRegisterComponent = this->GetComponent<ILuaRegister>(name);
-			if (luaRegisterComponent != nullptr)
-			{
-				Lua::ClassProxyHelper luaRegister(this->mLuaEnv, name);
-				luaRegisterComponent->OnLuaRegister(luaRegister);
-			}
-		}
-        const ServerConfig * config = ServerConfig::Inst();
-		const std::string & json = config->GetContent();
-		values::pushDecoded(this->mLuaEnv, json.c_str(), json.size());
-		lua_setglobal(this->mLuaEnv, "ServerConfig");
+    {
+        std::vector<std::string> components;
+        this->mApp->GetComponents(components);
+        for (const std::string &name: components)
+        {
+            ILuaRegister *luaRegisterComponent = this->GetComponent<ILuaRegister>(name);
+            if (luaRegisterComponent != nullptr)
+            {
+                Lua::ClassProxyHelper luaRegister(this->mLuaEnv, name);
+                luaRegisterComponent->OnLuaRegister(luaRegister);
+            }
+        }
+        const ServerConfig *config = ServerConfig::Inst();
+        const std::string &json = config->GetContent();
+        values::pushDecoded(this->mLuaEnv, json.c_str(), json.size());
+        lua_setglobal(this->mLuaEnv, "ServerConfig");
 
-		Lua::ClassProxyHelper luaRegister(this->mLuaEnv, "ServerConfig");
-		luaRegister.BeginNewTable();
-		lua_getglobal(this->mLuaEnv, "ServerConfig");
+        Lua::ClassProxyHelper luaRegister(this->mLuaEnv, "ServerConfig");
+        luaRegister.BeginNewTable();
+        lua_getglobal(this->mLuaEnv, "ServerConfig");
 
-		Lua::ClassProxyHelper luaRegister0(this->mLuaEnv, "App");
-		luaRegister0.BeginRegister<App>();
-		luaRegister0.PushExtensionFunction("GetService", Lua::LuaApp::GetService);
-		luaRegister0.PushExtensionFunction("GetComponent", Lua::LuaApp::GetComponent);
+        Lua::ClassProxyHelper luaRegister0(this->mLuaEnv, "App");
+        luaRegister0.BeginRegister<App>();
+        luaRegister0.PushExtensionFunction("GetService", Lua::LuaApp::GetService);
+        luaRegister0.PushExtensionFunction("GetComponent", Lua::LuaApp::GetComponent);
 
-		Lua::ClassProxyHelper luaRegister1(this->mLuaEnv, "WaitLuaTaskSource");
-		luaRegister1.BeginRegister<WaitLuaTaskSource>();
-		luaRegister1.PushCtor<WaitLuaTaskSource>();
-		luaRegister1.PushStaticExtensionFunction("SetResult", WaitLuaTaskSource::SetResult);
+        Lua::ClassProxyHelper luaRegister1(this->mLuaEnv, "WaitLuaTaskSource");
+        luaRegister1.BeginRegister<WaitLuaTaskSource>();
+        luaRegister1.PushCtor<WaitLuaTaskSource>();
+        luaRegister1.PushStaticExtensionFunction("SetResult", WaitLuaTaskSource::SetResult);
 
-		Lua::ClassProxyHelper luaRegister2(this->mLuaEnv, "LuaServiceTaskSource");
-		luaRegister2.BeginRegister<LuaServiceTaskSource>();
-		luaRegister2.PushExtensionFunction("SetResult", LuaServiceTaskSource::SetResult);
+        Lua::ClassProxyHelper luaRegister2(this->mLuaEnv, "LuaServiceTaskSource");
+        luaRegister2.BeginRegister<LuaServiceTaskSource>();
+        luaRegister2.PushExtensionFunction("SetResult", LuaServiceTaskSource::SetResult);
 
-		Lua::ClassProxyHelper luaRegister3(this->mLuaEnv, "Time");
-		luaRegister3.BeginNewTable();
-		luaRegister3.PushStaticFunction("GetDateStr", Helper::Time::GetDateStr);
-		luaRegister3.PushStaticFunction("GetDateString", Helper::Time::GetDateString);
-		luaRegister3.PushStaticFunction("GetNowSecTime", Helper::Time::GetNowSecTime);
-		luaRegister3.PushStaticFunction("GetNowMilTime", Helper::Time::GetNowMilTime);
-		luaRegister3.PushStaticFunction("GetYearMonthDayString", Helper::Time::GetYearMonthDayString);
+        Lua::ClassProxyHelper luaRegister3(this->mLuaEnv, "Time");
+        luaRegister3.BeginNewTable();
+        luaRegister3.PushStaticFunction("GetDateStr", Helper::Time::GetDateStr);
+        luaRegister3.PushStaticFunction("GetDateString", Helper::Time::GetDateString);
+        luaRegister3.PushStaticFunction("GetNowSecTime", Helper::Time::GetNowSecTime);
+        luaRegister3.PushStaticFunction("GetNowMilTime", Helper::Time::GetNowMilTime);
+        luaRegister3.PushStaticFunction("GetYearMonthDayString", Helper::Time::GetYearMonthDayString);
 
-		Lua::ClassProxyHelper luaRegister4(this->mLuaEnv, "coroutine");
-		luaRegister4.PushExtensionFunction("start", Lua::Coroutine::Start);
-		luaRegister4.PushExtensionFunction("sleep", Lua::Coroutine::Sleep);
+        Lua::ClassProxyHelper luaRegister4(this->mLuaEnv, "coroutine");
+        luaRegister4.PushExtensionFunction("start", Lua::Coroutine::Start);
+        luaRegister4.PushExtensionFunction("sleep", Lua::Coroutine::Sleep);
 
-		Lua::ClassProxyHelper luaRegister5(this->mLuaEnv, "Log");
-		luaRegister5.BeginNewTable();
-		luaRegister5.PushExtensionFunction("Info", Lua::Log::DebugInfo);
-		luaRegister5.PushExtensionFunction("Debug", Lua::Log::DebugLog);
-		luaRegister5.PushExtensionFunction("Error", Lua::Log::DebugError);
-		luaRegister5.PushExtensionFunction("Warning", Lua::Log::DebugWarning);
+        Lua::ClassProxyHelper luaRegister5(this->mLuaEnv, "Log");
+        luaRegister5.BeginNewTable();
+        luaRegister5.PushExtensionFunction("Info", Lua::Log::DebugInfo);
+        luaRegister5.PushExtensionFunction("Debug", Lua::Log::DebugLog);
+        luaRegister5.PushExtensionFunction("Error", Lua::Log::DebugError);
+        luaRegister5.PushExtensionFunction("Warning", Lua::Log::DebugWarning);
 
-		Lua::ClassProxyHelper luaRegister6(this->mLuaEnv, "Guid");
-		luaRegister6.BeginNewTable();
-		luaRegister6.PushStaticFunction("Create", Helper::Guid::Create);
+        Lua::ClassProxyHelper luaRegister6(this->mLuaEnv, "Guid");
+        luaRegister6.BeginNewTable();
+        luaRegister6.PushStaticFunction("Create", Helper::Guid::Create);
 
-		Lua::ClassProxyHelper luaRegister7(this->mLuaEnv, "Json");
-		luaRegister7.BeginNewTable();
-		luaRegister7.PushExtensionFunction("Encode", Lua::Json::Encode);
-		luaRegister7.PushExtensionFunction("Decode", Lua::Json::Decode);
+        Lua::ClassProxyHelper luaRegister7(this->mLuaEnv, "Json");
+        luaRegister7.BeginNewTable();
+        luaRegister7.PushExtensionFunction("Encode", Lua::Json::Encode);
+        luaRegister7.PushExtensionFunction("Decode", Lua::Json::Decode);
 
         Lua::ClassProxyHelper luaRegister8(this->mLuaEnv, "Md5");
         luaRegister8.BeginNewTable();
         luaRegister8.PushExtensionFunction("ToString", Lua::Md5::ToString);
 
-        if(this->LoadAllFile())
+        LOG_CHECK_RET_FALSE(this->LoadAllFile());
+        for (const std::string &module: this->mModules)
         {
-            for(const std::string & module : this->mModules)
-            {
-                if(lua_getfunction(this->mLuaEnv, module.c_str(), "Awake"))
-                {
-                    if (lua_pcall(this->mLuaEnv, 0, 0, 0) != LUA_OK)
-                    {
-                        LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
-                        return false;
-                    }
-                }
-            }
-            if(this->mMainTable->GetFunction("Awake"))
+            if (lua_getfunction(this->mLuaEnv, module.c_str(), "Awake"))
             {
                 if (lua_pcall(this->mLuaEnv, 0, 0, 0) != LUA_OK)
                 {
@@ -115,12 +107,20 @@ namespace Sentry
                 }
             }
         }
-		return true;
-	}
+        if (this->mMainTable && this->mMainTable->GetFunction("Awake"))
+        {
+            if (lua_pcall(this->mLuaEnv, 0, 0, 0) != LUA_OK)
+            {
+                LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+                return false;
+            }
+        }
+        return true;
+    }
 
 	bool LuaScriptComponent::Start()
 	{
-        if(this->mMainTable->GetFunction("Start"))
+        if(this->mMainTable && this->mMainTable->GetFunction("Start"))
         {
             WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv);
             if(luaTaskSource != nullptr)
@@ -133,7 +133,7 @@ namespace Sentry
 
 	void LuaScriptComponent::OnComplete()
 	{
-        if(this->mMainTable->GetFunction("Complete"))
+        if(this->mMainTable && this->mMainTable->GetFunction("Complete"))
         {
             WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv);
             if(luaTaskSource != nullptr)
@@ -145,7 +145,7 @@ namespace Sentry
 
 	void LuaScriptComponent::OnAllServiceStart()
 	{
-        if(this->mMainTable->GetFunction("AllServiceStart"))
+        if(this->mMainTable && this->mMainTable->GetFunction("AllServiceStart"))
         {
             WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv);
             if(luaTaskSource != nullptr)
@@ -157,16 +157,22 @@ namespace Sentry
 
 	bool LuaScriptComponent::LoadAllFile()
 	{
-        std::string mainFilePath;
 		std::vector<std::string> luaPaths;
 		std::vector<std::string> luaFiles;
 		const ServerConfig * config = ServerConfig::Inst();
         LOG_CHECK_RET_FALSE(config->GetMember("lua", "require", luaPaths));
-        LOG_CHECK_RET_FALSE(config->GetMember("lua", "main", mainFilePath));
-        this->mMainTable = std::make_shared<Lua::LocalTable>(this->mLuaEnv);
-        if(!this->mMainTable->Load(System::GetWorkPath() + mainFilePath))
+        TextConfigComponent * textComponent = this->GetComponent<TextConfigComponent>();
+        const ClusterConfig * clusterConfig = textComponent->GetTextConfig<ClusterConfig>();
+
+        const std::string & lua = clusterConfig->GetConfig()->GetMainLua();
+        if(!lua.empty())
         {
-            return false;
+            this->mMainTable = std::make_shared<Lua::LocalTable>(this->mLuaEnv);
+            if (!this->mMainTable->Load(System::GetWorkPath() + lua))
+            {
+                LOG_ERROR("load main lua : " << System::GetWorkPath() << lua);
+                return false;
+            }
         }
         std::string index;
         if(config->GetMember("lua", "http", index))
@@ -228,7 +234,7 @@ namespace Sentry
                     }
                 }
             }
-            if(this->mMainTable->GetFunction("Hotfix"))
+            if(this->mMainTable && this->mMainTable->GetFunction("Hotfix"))
             {
                 if (lua_pcall(this->mLuaEnv, 0, 0, 0) != LUA_OK)
                 {
@@ -272,7 +278,7 @@ namespace Sentry
         }
         this->AddRequire(directory);
         moduleName = moduleName.substr(0, moduleName.find('.'));
-        if (this->mMainTable->GetFunction("OnLoadModule"))
+        if (this->mMainTable && this->mMainTable->GetFunction("OnLoadModule"))
         {
             lua_pushstring(this->mLuaEnv, moduleName.c_str());
             if (lua_pcall(this->mLuaEnv, 1, 0, 0) != LUA_OK)
@@ -288,7 +294,6 @@ namespace Sentry
                 LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
                 return false;
             }
-            LOG_WARN("[" << this->mMainTable->GetName() << ".OnLoadModule] not found");
         }
         this->mModules.insert(moduleName);
         return true;

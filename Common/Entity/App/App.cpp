@@ -7,8 +7,9 @@
 #include"Component/ProtoComponent.h"
 #include"Component/LocationComponent.h"
 #include"Component/TextConfigComponent.h"
+#include"Component/NetThreadComponent.h"
+#include"Component/ClusterComponent.h"
 #include"Component/RedisChannelComponent.h"
-
 using namespace Sentry;
 using namespace std::chrono;
 
@@ -32,33 +33,24 @@ namespace Sentry
 		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
 		this->mMessageComponent = this->GetOrAddComponent<ProtoComponent>();
 
-		this->AddComponent<LocationComponent>();
         LOG_CHECK_RET_FALSE(this->AddComponent<TextConfigComponent>());
+        LOG_CHECK_RET_FALSE(this->AddComponent<LocationComponent>());
+        LOG_CHECK_RET_FALSE(this->AddComponent<NetThreadComponent>());
+        LOG_CHECK_RET_FALSE(this->AddComponent<ClusterComponent>());
 
-        std::vector<std::string> components;
-        ServerConfig::Inst()->GetMember("fps", this->mFps);
-        if (ServerConfig::Inst()->GetMember("component", components)) //添加组件
+        std::vector<Component *> components;
+        if(this->GetComponents(components) > 0)
         {
-            for (const std::string &name: components)
+            for (Component *component: components)
             {
-                Component *component = ComponentFactory::CreateComponent(name);
-                if (component == nullptr || !this->AddComponent(name, component))
+                if (!this->InitComponent(component))
                 {
-                    CONSOLE_LOG_ERROR("add " << name << " failure");
+                    CONSOLE_LOG_ERROR("Init " << component->GetName() << " failure");
                     return false;
                 }
             }
         }
-        this->GetComponents(components);
-		for (const std::string& name: components)
-		{
-			Component* component = this->GetComponentByName(name);
-			if (!this->InitComponent(component))
-			{
-				CONSOLE_LOG_ERROR("Init " << name << " failure");
-				return false;
-			}
-		}
+        ServerConfig::Inst()->GetMember("fps", this->mFps);
         this->mTaskComponent->Start(&App::StartAllComponent, this);
         return true;
 	}
@@ -168,7 +160,7 @@ namespace Sentry
 
 	void App::StartAllComponent()
     {
-        std::vector<std::string> components;
+        std::vector<std::string > components;
         this->GetComponents(components);
         for (const std::string &name: components)
         {
@@ -182,7 +174,7 @@ namespace Sentry
                 });
                 if(!component->Start())
                 {
-                    LOG_FATAL("start [" << name << "] failure");
+                    LOG_ERROR("start [" << name << "] failure");
                     this->Stop();
                     return;
                 }

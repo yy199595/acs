@@ -1,23 +1,38 @@
 {
+	"Client": {
+		"Component": [
+			"HttpComponent",
+			"ClientComponent",
+			"LuaScriptComponent"
+		],
+		"lua": "script/Client/Client.lua"
+	},
 	"AllServer": {
 		"AutoAllot": true,
 		"Service": {
+			"UserBehavior": true,
 			"InnerService": true,
 			"OuterService": true,
 			"MysqlService": true,
 			"MongoService": true,
 			"ChatService": true,
+			"HttpWebService": true,
 			"AccountService": true
 		},
 		"Component": [
-			""
-		]
+			"HttpComponent",
+			"ConsoleComponent",
+			"LuaScriptComponent"
+		],
+		"lua": "script/Server/Server.lua"
 	},
 	"ChatServer": {
 		"AutoAllot": true,
 		"Service": {
+			"UserBehavior": true,
 			"InnerService": true,
-			"ChatService": true
+			"ChatService": true,
+			"OuterService": false
 		}
 	},
 	"HttpServer": {
@@ -26,7 +41,11 @@
 			"AccountService": true,
 			"HttpWebService": true,
 			"OuterService": false
-		}
+		},
+		"Component": [
+			"HttpComponent",
+			"LuaScriptComponent"
+		]
 	},
 	"GateServer": {
 		"AutoAllot": false,
@@ -38,7 +57,7 @@
 	},
 	"DataServer": {
 		"AutoAllot": false,
-		"Start": {
+		"Service": {
 			"InnerService": true,
 			"MysqlService": true,
 			"MongoService": true
@@ -47,7 +66,7 @@
 	"ForwardServer": {
 		"AutoAllot": false,
 		"Component": [
-
+			"ForwardComponent"
 		]
 	}
 }

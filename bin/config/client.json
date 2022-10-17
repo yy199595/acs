@@ -10,7 +10,8 @@
     "path": {
         "log": "log",
         "source": "source",
-        "proto": "proto"
+        "proto": "proto",
+        "cluster": "config/cluster/cluster.json"
     },
     "lua": {
         "require": [
@@ -18,11 +19,5 @@
             "script/Client/component"
         ],
         "main": "script/Client/Client.lua"
-    },
-    "component": [
-        "HttpComponent",
-        "NetThreadComponent",
-        "LuaScriptComponent",
-        "ClientComponent"
-    ]
+    }
 }

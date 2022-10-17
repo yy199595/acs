@@ -9,7 +9,8 @@ namespace Sentry
 {
 	bool MongoHelperComponent::LateAwake()
 	{
-		this->mMongoService = this->GetComponent<MongoService>();
+        std::string name = ComponentFactory::GetName<MongoService>();
+		this->mMongoService = this->GetComponent<RpcService>(name);
 		this->mLocationComponent = this->GetComponent<LocationComponent>();
 		return true;
 	}

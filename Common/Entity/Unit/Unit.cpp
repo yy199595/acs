@@ -45,11 +45,14 @@ namespace Sentry
 
 	size_t Unit::GetComponents(std::vector<Component*>& components) const
 	{
-		auto iter = this->mComponentMap.begin();
-		for(;iter != this->mComponentMap.end(); iter++)
-		{
-			components.emplace_back(iter->second);
-		}
+        for(const std::string & name : this->mSortComponents)
+        {
+            Component * component = this->GetComponentByName(name);
+            if(component != nullptr)
+            {
+                components.emplace_back(component);
+            }
+        }
         return components.size();
 	}
 
@@ -83,7 +86,7 @@ namespace Sentry
 		this->mComponentMap.clear();
 	}
 
-	Component* Unit::GetComponentByName(const std::string& name)
+	Component* Unit::GetComponentByName(const std::string& name) const
 	{
 		auto iter = this->mComponentMap.find(name);
 		return iter != this->mComponentMap.end() ? iter->second : nullptr;

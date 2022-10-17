@@ -33,7 +33,7 @@ namespace Sentry
 		bool LateAwake() final;
 		XCode Call(const std::string& func, const Message& data, std::shared_ptr<db::mysql::response> response = nullptr);
 	private:
-		class MysqlService * mMysqlService;
+		class RpcService * mMysqlService;
 		class LocationComponent * mLocationComponent;
 	};
 
