@@ -147,7 +147,7 @@ namespace Sentry
             std::shared_ptr<OuterNetClient> proxyClient = iter->second;
             if (proxyClient != nullptr)
             {
-                proxyClient->SendData(message);
+                proxyClient->SendData(message->Clone());
             }
         }
         return true;

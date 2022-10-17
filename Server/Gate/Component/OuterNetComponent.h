@@ -4,8 +4,9 @@
 
 #ifndef GAMEKEEPER_GATECLIENTCOMPONENT_H
 #define GAMEKEEPER_GATECLIENTCOMPONENT_H
-#include"Component/Component.h"
+
 #include"Client/Message.h"
+#include"Component/Component.h"
 #include"Component/TcpListenerComponent.h"
 namespace Sentry
 {
@@ -21,10 +22,8 @@ namespace Sentry
 		void OnCloseSocket(const std::string & address, XCode code) final;
         void OnMessage(const std::string &address, std::shared_ptr<Rpc::Data> message) final;
     public:
-        OuterNetClient * GetGateClient(const std::string & address);
-	 public:
-    public:
         bool SendData(std::shared_ptr<Rpc::Data> message);
+		OuterNetClient* GetGateClient(const std::string& address);
         bool SendData(long long userId, std::shared_ptr<Rpc::Data> message);
         bool SendData(const std::string & address, std::shared_ptr<Rpc::Data> message);
 	 public:

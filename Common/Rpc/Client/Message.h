@@ -73,6 +73,8 @@ namespace Rpc
         const std::string & GetBody() const { return this->mBody;}
         void Append(const std::string & data) { this->mBody.append(data); }
         bool GetMethod(std::string &service, std::string &method) const;
+    public:
+        std::shared_ptr<Data> Clone();
 
     public:
         template<typename T>
