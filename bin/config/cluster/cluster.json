@@ -8,7 +8,10 @@
 			"MongoService": true,
 			"ChatService": true,
 			"AccountService": true
-		}
+		},
+		"component": [
+			""
+		]
 	},
 	"ChatServer": {
 		"AutoAllot": true,
@@ -40,5 +43,11 @@
 			"MysqlService": true,
 			"MongoService": true
 		}
+	},
+	"ForwardServer": {
+		"AutoAllot": false,
+		"Component": [
+
+		]
 	}
 }

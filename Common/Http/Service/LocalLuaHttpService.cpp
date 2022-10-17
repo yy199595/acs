@@ -47,7 +47,7 @@ namespace Sentry
     {
         std::vector<const HttpMethodConfig *> httpMethodConfigs;
         LuaScriptComponent * luaComponent = this->GetComponent<LuaScriptComponent>();
-        const HttpServiceConfig * httpServiceConfig = ServiceConfig::Inst()->GetHttpConfig(this->GetName());
+        const HttpServiceConfig * httpServiceConfig = HttpConfig::Inst()->GetConfig(this->GetName());
 
         httpServiceConfig->GetMethodConfigs(httpMethodConfigs);
         for(const HttpMethodConfig * methodConfig : httpMethodConfigs)

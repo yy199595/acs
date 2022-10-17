@@ -28,11 +28,9 @@ namespace Sentry
 
 	XCode InnerNetMessageComponent::OnRequest(std::shared_ptr<Rpc::Data> message)
 	{
-        std::string address, fullName;
         const Rpc::Head & head = message->GetHead();
-        LOG_RPC_CHECK_ARGS(head.Get("func", fullName));
-        LOG_RPC_CHECK_ARGS(head.Get("address", address));
-        const RpcMethodConfig * methodConfig = ServiceConfig::Inst()->GetRpcMethodConfig(fullName);
+        LOG_RPC_CHECK_ARGS(head.Get("func", this->mFullName));
+        const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(this->mFullName);
         if(methodConfig == nullptr)
         {
             return XCode::CallFunctionNotExist;
@@ -48,43 +46,65 @@ namespace Sentry
             LOG_ERROR("call service not exist : [" << methodConfig->Service << "]");
 			return XCode::CallServiceNotFound;
 		}
-		if (!methodConfig->IsAsync)
-        {
-            this->Invoke(methodConfig, message);
-            return XCode::Successful;
-        }
-        this->mTaskComponent->Start(&InnerNetMessageComponent::Invoke, this, methodConfig, message);
+        this->mWaitMessages.push(std::move(message));
 		return XCode::Successful;
 	}
+
+    void InnerNetMessageComponent::OnSystemUpdate()
+    {
+        size_t count = 0;
+        while(!this->mWaitMessages.empty() && count <= MAX_HANDLER_MSG_COUNT)
+        {
+            count++;
+            std::shared_ptr<Rpc::Data> message = this->mWaitMessages.front();
+            if(message->GetHead().Get("func", this->mFullName))
+            {
+               const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(this->mFullName);
+               if(methodConfig != nullptr)
+               {
+                   if (!methodConfig->IsAsync)
+                   {
+                       this->Invoke(methodConfig, message);
+                   }
+                   this->mTaskComponent->Start(&InnerNetMessageComponent::Invoke, this, methodConfig, message);
+               }
+            }
+            this->mWaitMessages.pop();
+        }
+    }
 
     void InnerNetMessageComponent::Invoke(const RpcMethodConfig *config, std::shared_ptr<Rpc::Data> message)
     {
         XCode code = XCode::Failure;
-        RpcService * logicService = this->mApp->GetService(config->Service);
+        RpcService *logicService = this->mApp->GetService(config->Service);
         try
         {
             code = logicService->Invoke(config->Method, message);
         }
-        catch (std::exception & e)
+        catch (std::exception &e)
         {
             code = XCode::ThrowError;
             message->GetHead().Add("error", e.what());
         }
+        long long rpcId = 0;
+        if (!message->GetHead().Get("rpc", rpcId))
+        {
+            return; //不需要返回
+        }
         std::string address;
         message->GetHead().Add("code", code);
-        if(message->GetHead().Get("address", address))
+        if (message->GetHead().Get("address", address))
         {
             message->GetHead().Remove("id");
             message->GetHead().Remove("address");
 #ifndef __DEBUG__
             message->GetHead().Remove("func");
 #endif
-            if(message->GetHead().Has("rpc"))
-            {
-                message->SetType(Tcp::Type::Response);
-                this->mRpcClientComponent->Send(address, message);
-            }
+            message->SetType(Tcp::Type::Response);
+            this->mRpcClientComponent->Send(address, message);
+            return;
         }
+        this->OnResponse(rpcId, message); //本地调用
     }
 
     std::shared_ptr<Rpc::Data> InnerNetMessageComponent::Call(

@@ -24,8 +24,8 @@ namespace Sentry
         for(const std::string & name : services)
         {
             Component *component = ComponentFactory::CreateComponent(name);
-            const RpcServiceConfig * rpcServiceConfig = ServiceConfig::Inst()->GetRpcConfig(name);
-            const HttpServiceConfig * httpServiceConfig = ServiceConfig::Inst()->GetHttpConfig(name);
+            const RpcServiceConfig * rpcServiceConfig = RpcConfig::Inst()->GetConfig(name);
+            const HttpServiceConfig * httpServiceConfig = HttpConfig::Inst()->GetConfig(name);
             if(component == nullptr)
             {
                 if(rpcServiceConfig != nullptr)

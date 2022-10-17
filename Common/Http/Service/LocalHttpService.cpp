@@ -23,7 +23,7 @@ namespace Sentry
     {
         this->mServiceRegister = std::make_shared<HttpServiceRegister>(this);
         LuaScriptComponent * luaComponent = this->GetComponent<LuaScriptComponent>();
-        const HttpServiceConfig * httpServiceConfig = ServiceConfig::Inst()->GetHttpConfig(this->GetName());
+        const HttpServiceConfig * httpServiceConfig = HttpConfig::Inst()->GetConfig(this->GetName());
         if (!this->OnStartService(*this->mServiceRegister))
         {
             return false;

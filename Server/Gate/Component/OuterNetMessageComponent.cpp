@@ -32,7 +32,7 @@ namespace Sentry
 		std::string fullName;
 		const Rpc::Head& head = message->GetHead();
 		LOG_RPC_CHECK_ARGS(head.Get("func", fullName));
-		const RpcMethodConfig* methodConfig = ServiceConfig::Inst()->GetRpcMethodConfig(fullName);
+		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
 		if (methodConfig == nullptr || methodConfig->Type != "Client")
 		{
 			return XCode::CallFunctionNotExist;
@@ -54,15 +54,6 @@ namespace Sentry
 		if (!locationUnit->Get(methodConfig->Service, address))
 		{
 			return XCode::CallServiceNotFound;
-		}
-
-		s2s::location::sync request;
-		request.set_user_id(userId);
-		request.set_name(methodConfig->Service);
-		UserBehavior* service = this->GetComponent<UserBehavior>();
-		if (service->Send(address, "Login", request) != XCode::Successful)
-		{
-			return XCode::NetWorkError;
 		}
 		message->GetHead().Add("id", userId);
 		if(!this->mInnerMessageComponent->Send(address, message))

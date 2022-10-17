@@ -70,7 +70,7 @@ namespace Sentry
         {
             throw std::logic_error("parse func error");
         }
-        const RpcMethodConfig* methodConfig =  ServiceConfig::Inst()->GetRpcMethodConfig(fullName);
+        const RpcMethodConfig* methodConfig =  RpcConfig::Inst()->GetMethodConfig(fullName);
         if(methodConfig == nullptr)
         {
             throw std::logic_error("calling method does not exist");

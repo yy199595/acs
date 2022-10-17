@@ -11,7 +11,8 @@
         "proto": "proto",
         "source": "source",
         "user": "config/user.json",
-        "http": "script/Server/web",
+        "rpc": "config/service/rpc.json",
+        "http": "config/service/http.json",
         "service": "config/service.json",
         "cluster": "config/cluster/cluster.json",
         "location": "config/cluster/location.json"

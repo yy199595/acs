@@ -31,6 +31,7 @@ namespace Sentry
         InnerNetClient * GetClient(const std::string & address);
 		InnerNetClient * GetOrCreateClient(const std::string & address);
     private:
+        class LocationComponent * mLocationComponent;
         std::unordered_set<std::string> mAuthClients;
         std::unordered_map<std::string, std::shared_ptr<InnerNetClient>> mInnerClients;
     };

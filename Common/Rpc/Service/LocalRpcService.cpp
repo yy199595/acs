@@ -65,7 +65,7 @@ namespace Sentry
 	bool LocalRpcService::Start()
 	{
 		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
-        const RpcServiceConfig * rpcServiceConfig = ServiceConfig::Inst()->GetRpcConfig(this->GetName());
+        const RpcServiceConfig * rpcServiceConfig = RpcConfig::Inst()->GetConfig(this->GetName());
 		if (!this->OnStart())
 		{
 			return false;

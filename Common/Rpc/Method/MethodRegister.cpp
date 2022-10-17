@@ -18,7 +18,7 @@ namespace Sentry
         const std::string & name = method->GetName();
         const std::string & service = serviceComponent->GetName();
         std::string fullName = fmt::format("{0}.{1}", service, name);
-        if(ServiceConfig::Inst()->GetRpcMethodConfig(fullName) == nullptr)
+        if(RpcConfig::Inst()->GetMethodConfig(fullName) == nullptr)
         {
             return false;
         }

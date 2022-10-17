@@ -1,0 +1,40 @@
+{
+	"AccountService": {
+		"Type": "http",
+		"Login": {
+			"Type": "POST",
+			"Async": true,
+			"Content": "application/json",
+			"Path": "/user/login"
+		},
+		"Register": {
+			"Type": "POST",
+			"Async": true,
+			"Content": "application/json",
+			"Path": "/user/register"
+		}
+	},
+	"HttpWebService": {
+		"Type": "http",
+		"Async": {
+			"Async": true,
+			"Path": "/index/async"
+		},
+		"Sync": {
+			"Async": false,
+			"Path": "/index/sync"
+		},
+		"DownLoad": {
+			"Type": "GET",
+			"Async": false,
+			"Path": "/download"
+		}
+	},
+	"HttpRpcService": {
+		"Type": "http",
+		"Call": {
+			"Async": true,
+			"Path": "/rpc/call"
+		}
+	}
+}

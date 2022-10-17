@@ -95,24 +95,34 @@ namespace Sentry
         std::string mType;
 	};
 
-    class ServiceConfig : public TextConfig, public ConstSingleton<ServiceConfig>
+    class RpcConfig : public TextConfig, public ConstSingleton<RpcConfig>
     {
     public:
-        ServiceConfig() : TextConfig("ServiceConfig") { }
+        RpcConfig() : TextConfig("RpcConfig") { }
+
     public:
+        const RpcServiceConfig * GetConfig(const std::string & name) const;
+        const RpcMethodConfig * GetMethodConfig(const std::string & fullName) const;
+    private:
         bool OnLoadText(const std::string &content) final;
         bool OnReloadText(const std::string &content) final;
-    public:
-        const RpcServiceConfig * GetRpcConfig(const std::string & name) const;
-        const HttpServiceConfig * GetHttpConfig(const std::string & name) const;
-        size_t GetServiceConfigs(std::vector<const RpcServiceConfig *> & configs) const;
-        size_t GetServiceConfigs(std::vector<const HttpServiceConfig *> & configs) const;
-        const RpcMethodConfig * GetRpcMethodConfig(const std::string & fullName) const;
-        const HttpMethodConfig * GetHttpMethodConfig(const std::string & path) const;
     private:
         std::unordered_map<std::string, const RpcMethodConfig *> mRpcMethodConfig;
-        std::unordered_map<std::string, const HttpMethodConfig *> mHttpMethodConfig;
-        std::unordered_map<std::string, std::unique_ptr<IServiceConfigBase>> mServiceConfigs;
+        std::unordered_map<std::string, std::unique_ptr<RpcServiceConfig>> mConfigs;
     };
 
+    class HttpConfig : public TextConfig , public ConstSingleton<HttpConfig>
+    {
+    public:
+        HttpConfig() : TextConfig("HttpConfig") { }
+    public:
+        const HttpServiceConfig * GetConfig(const std::string & name) const;
+        const HttpMethodConfig * GetMethodConfig(const std::string & fullName) const;
+    private:
+        bool OnLoadText(const std::string &content) final;
+        bool OnReloadText(const std::string &content) final;
+    private:
+        std::unordered_map<std::string, const HttpMethodConfig *> mMethodConfigs;
+        std::unordered_map<std::string, std::unique_ptr<HttpServiceConfig>> mConfigs;
+    };
 }// namespace Sentry

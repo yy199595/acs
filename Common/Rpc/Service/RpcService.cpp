@@ -60,7 +60,7 @@ namespace Sentry
     bool RpcService::StartSend(const std::string &address, const std::string &func, long long userId, const Message *message)
     {
         const std::string fullName = fmt::format("{0}.{1}", this->GetName(), func);
-        const RpcMethodConfig * methodConfig = ServiceConfig::Inst()->GetRpcMethodConfig(fullName);
+        const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
         if(methodConfig == nullptr)
         {
             LOG_ERROR("not find [" << fullName << "] config");
@@ -97,7 +97,7 @@ namespace Sentry
         const std::string &address, const std::string &func, long long userId, const Message *message)
     {
         const std::string fullName = fmt::format("{0}.{1}", this->GetName(), func);
-        const RpcMethodConfig * methodConfig = ServiceConfig::Inst()->GetRpcMethodConfig(fullName);
+        const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
         if(methodConfig == nullptr)
         {
             LOG_ERROR("not find [" << fullName << "] config");

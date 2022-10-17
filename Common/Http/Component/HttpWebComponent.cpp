@@ -27,7 +27,7 @@ namespace Sentry
         std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
 
         const HttpData & httpData = request->GetData();
-        const HttpMethodConfig *httpConfig = ServiceConfig::Inst()->GetHttpMethodConfig(httpData.mPath);
+        const HttpMethodConfig *httpConfig = HttpConfig::Inst()->GetMethodConfig(httpData.mPath);
         if (httpConfig == nullptr)
         {
             httpClient->StartWriter(HttpStatus::NOT_FOUND);

@@ -25,7 +25,7 @@ namespace Sentry
         const ServerConfig * config = ServerConfig::Inst();
         LOG_CHECK_RET_FALSE(config->GetLocation("rpc", location));
 		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
-        const RpcServiceConfig * rpcServiceConfig = ServiceConfig::Inst()->GetRpcConfig(this->GetName());
+        const RpcServiceConfig * rpcServiceConfig = RpcConfig::Inst()->GetConfig(this->GetName());
 
 		std::vector<const RpcMethodConfig *> rpcInterConfigs;
         LOG_CHECK_RET_FALSE(rpcServiceConfig->GetMethodConfigs(rpcInterConfigs) > 0);

@@ -66,7 +66,10 @@ namespace Sentry
                 std::unique_ptr<HttpMethodConfig> serviceConfog(new HttpMethodConfig());
                 serviceConfog->Method = name;
                 serviceConfog->Service = this->GetName();
-                serviceConfog->Type = jsonValue["Type"].GetString();
+                if(jsonValue.HasMember("Type"))
+                {
+                    serviceConfog->Type = jsonValue["Type"].GetString();
+                }
                 serviceConfog->Path = jsonValue["Path"].GetString();
                 serviceConfog->IsAsync = jsonValue["Async"].GetBool();
                 if (jsonValue.HasMember("Content"))
@@ -87,7 +90,7 @@ namespace Sentry
 
 namespace Sentry
 {
-    bool ServiceConfig::OnLoadText(const std::string &content)
+    bool RpcConfig::OnLoadText(const std::string &content)
     {
         rapidjson::Document document;
         const char * str = content.c_str();
@@ -96,143 +99,100 @@ namespace Sentry
         {
             return false;
         }
+        std::vector<const RpcMethodConfig *> methodConfigs;
         auto iter = document.MemberBegin();
         for(; iter != document.MemberEnd(); iter++)
         {
             const rapidjson::Value & jsonValue = iter->value;
             const std::string service(iter->name.GetString());
-            if(!jsonValue.HasMember("Type"))
+            std::unique_ptr<RpcServiceConfig> config(new RpcServiceConfig(service));
+            if(!config->OnLoadConfig(jsonValue))
             {
-                LOG_ERROR(service << " not find 'Type' field");
+                LOG_ERROR("load rpc config " << service << " error");
                 return false;
             }
-            if(this->mServiceConfigs.find(service) != this->mServiceConfigs.end())
+            methodConfigs.clear();
+            config->GetMethodConfigs(methodConfigs);
+            for(const RpcMethodConfig * methodConfig : methodConfigs)
             {
-                LOG_ERROR(service << " config existing");
-                return false;
+                this->mRpcMethodConfig.emplace(methodConfig->FullName, methodConfig);
             }
-
-            const std::string type(jsonValue["Type"].GetString());
-            if(type == "rpc")
-            {
-                std::unique_ptr<RpcServiceConfig> config(new RpcServiceConfig(service));
-                if(!config->OnLoadConfig(jsonValue))
-                {
-                    LOG_ERROR("load rpc config " << service << " error");
-                    return false;
-                }
-                this->mServiceConfigs.emplace(service, std::move(config));
-            }
-            else if(type == "http")
-            {
-                std::unique_ptr<HttpServiceConfig> config(new HttpServiceConfig(service));
-                if(!config->OnLoadConfig(jsonValue))
-                {
-                    LOG_ERROR("load http config " << service << " error");
-                    return false;
-                }
-                this->mServiceConfigs.emplace(service, std::move(config));
-            }
-            else
-            {
-                LOG_ERROR(service << " unknow type : " << type);
-                return false;
-            }
-        }
-
-        for(auto & value : this->mServiceConfigs)
-        {
-            if(value.second->IsRpcConfig())
-            {
-                std::vector<const RpcMethodConfig *> methodConfigs;
-                const RpcServiceConfig *config = value.second->Cast<RpcServiceConfig>();
-                if (config->GetMethodConfigs(methodConfigs) > 0)
-                {
-                    for(const RpcMethodConfig * methodConfig : methodConfigs)
-                    {
-                        this->mRpcMethodConfig.emplace(methodConfig->FullName, methodConfig);
-                    }
-                }
-            }
-            else if(value.second->IsHttpConfig())
-            {
-                std::vector<const HttpMethodConfig *> methodConfigs;
-                const HttpServiceConfig * config = value.second->Cast<HttpServiceConfig>();
-                if(config->GetMethodConfigs(methodConfigs) > 0)
-                {
-                    for(const HttpMethodConfig * methodConfig : methodConfigs)
-                    {
-                        this->mHttpMethodConfig.emplace(methodConfig->Path, methodConfig);
-                    }
-                }
-            }
+            this->mConfigs.emplace(service, std::move(config));
         }
         return true;
     }
 
-    bool ServiceConfig::OnReloadText(const std::string &content)
+    bool RpcConfig::OnReloadText(const std::string &content)
     {
         return true;
     }
 
-    const RpcServiceConfig *ServiceConfig::GetRpcConfig(const std::string &name) const
+    const RpcServiceConfig *RpcConfig::GetConfig(const std::string &name) const
     {
-        auto iter = this->mServiceConfigs.find(name);
-        if(iter != this->mServiceConfigs.end() && iter->second->IsRpcConfig())
-        {
-            return iter->second->Cast<RpcServiceConfig>();
-        }
-        return nullptr;
+        auto iter = this->mConfigs.find(name);
+        return iter != this->mConfigs.end() ? iter->second.get() : nullptr;
     }
 
-    const HttpServiceConfig *ServiceConfig::GetHttpConfig(const std::string &name) const
-    {
-        auto iter = this->mServiceConfigs.find(name);
-        if(iter != this->mServiceConfigs.end() && iter->second->IsHttpConfig())
-        {
-            return iter->second->Cast<HttpServiceConfig>();
-        }
-        return nullptr;
-    }
-
-    size_t ServiceConfig::GetServiceConfigs(std::vector<const RpcServiceConfig *> &configs) const
-    {
-        for(auto & value : this->mServiceConfigs)
-        {
-            if(value.second->IsRpcConfig())
-            {
-                configs.emplace_back(value.second->Cast<RpcServiceConfig>());
-            }
-        }
-        return configs.size();
-    }
-
-    size_t ServiceConfig::GetServiceConfigs(std::vector<const HttpServiceConfig *> &configs) const
-    {
-        for(auto & value : this->mServiceConfigs)
-        {
-            if(value.second->IsRpcConfig())
-            {
-                configs.emplace_back(value.second->Cast<HttpServiceConfig>());
-            }
-        }
-        return configs.size();
-    }
-
-    const RpcMethodConfig *ServiceConfig::GetRpcMethodConfig(const std::string &fullName) const
+    const RpcMethodConfig *RpcConfig::GetMethodConfig(const std::string &fullName) const
     {
         auto iter = this->mRpcMethodConfig.find(fullName);
         return iter != this->mRpcMethodConfig.end() ? iter->second : nullptr;
     }
+}
 
-    const HttpMethodConfig *ServiceConfig::GetHttpMethodConfig(const std::string &path) const
+namespace Sentry
+{
+    bool HttpConfig::OnLoadText(const std::string &content)
     {
-        auto iter = this->mHttpMethodConfig.find(path);
-        if(iter != this->mHttpMethodConfig.end())
+        rapidjson::Document document;
+        const char * str = content.c_str();
+        const size_t length = content.size();
+        if(document.Parse(str, length).HasParseError())
+        {
+            return false;
+        }
+        std::vector<const HttpMethodConfig *> methodConfigs;
+        auto iter = document.MemberBegin();
+        for(; iter != document.MemberEnd(); iter++)
+        {
+            std::string service(iter->name.GetString());
+            const rapidjson::Value & jsonValue = iter->value;
+            std::unique_ptr<HttpServiceConfig> config(new HttpServiceConfig(service));
+            if(!config->OnLoadConfig(jsonValue))
+            {
+                LOG_ERROR("load http config " << service << " error");
+                return false;
+            }
+            methodConfigs.clear();
+            config->GetMethodConfigs(methodConfigs);
+            for(const HttpMethodConfig * methodConfig : methodConfigs)
+            {
+                this->mMethodConfigs.emplace(methodConfig->Path, methodConfig);
+            }
+            this->mConfigs.emplace(service, std::move(config));
+        }
+        return true;
+    }
+
+    bool HttpConfig::OnReloadText(const std::string &content)
+    {
+        return true;
+    }
+
+    const HttpServiceConfig *HttpConfig::GetConfig(const std::string &name) const
+    {
+        auto iter = this->mConfigs.find(name);
+        return iter != this->mConfigs.end() ? iter->second.get() : nullptr;
+    }
+
+    const HttpMethodConfig *HttpConfig::GetMethodConfig(const std::string & path) const
+    {
+        auto iter = this->mMethodConfigs.find(path);
+        if(iter != this->mMethodConfigs.end())
         {
             return iter->second;
         }
-        for(auto & value : this->mHttpMethodConfig)
+        for(auto & value : this->mMethodConfigs)
         {
             if(path.find(value.second->Path) == 0)
             {

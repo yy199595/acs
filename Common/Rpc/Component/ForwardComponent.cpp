@@ -3,11 +3,13 @@
 //
 
 #include"ForwardComponent.h"
+#include"Component/LocationComponent.h"
 #include"Component/NetThreadComponent.h"
 namespace Sentry
 {
     bool ForwardComponent::LateAwake()
     {
+        this->mLocationComponent = this->GetComponent<LocationComponent>();
         return this->StartListen("forward");
     }
 
@@ -98,19 +100,31 @@ namespace Sentry
 		{
 			return true;
 		}
-		std::string user, passwd;
+		std::string user, passwd, location;
 		const Rpc::Head & head = message->GetHead();
 		LOG_CHECK_RET_FALSE(head.Get("user", user));
 		LOG_CHECK_RET_FALSE(head.Get("passwd", passwd));
-		this->mAuthClients.insert(address);
+        LOG_CHECK_RET_FALSE(head.Get("location", location));
+        this->mAuthClients.insert(address);
 		return true;
 	}
 
     XCode ForwardComponent::OnRequest(std::shared_ptr<Rpc::Data> message)
     {
         std::string target;
-		Rpc::Head & head = message->GetHead();
-        if(!head.Get("to", target))
+        long long userId = 0;
+        const Rpc::Head & head = message->GetHead();
+        if(message->GetHead().Get("id", userId))
+        {
+            std::string service, method;
+            LOG_RPC_CHECK_ARGS(message->GetMethod(service, method));
+            LocationUnit * locationUnit = this->mLocationComponent->GetLocationUnit(userId);
+            if(locationUnit == nullptr || !locationUnit->Get(service, target))
+            {
+                return XCode::NotFindUser;
+            }
+        }
+        else if(!head.Get("to", target))
         {
             return XCode::CallArgsError;
         }
@@ -170,7 +184,10 @@ namespace Sentry
 		for(; iter != this->mInnerClients.end(); iter++)
 		{
 			InnerNetClient * netClient = iter->second.get();
-			netClient->SendData(message);
+            if(netClient != nullptr)
+            {
+                netClient->SendData(message);
+            }
 		}
 		return XCode::Successful;
 	}

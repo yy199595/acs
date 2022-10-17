@@ -16,9 +16,13 @@ namespace Sentry
         }
         std::string path;
         const ServerConfig * config = ServerConfig::Inst();
-        if(config->GetConfigPath("service", path))
+        if(config->GetConfigPath("rpc", path))
         {
-            LOG_CHECK_RET_FALSE(this->LoadTextConfig<ServiceConfig>(path));
+            LOG_CHECK_RET_FALSE(this->LoadTextConfig<RpcConfig>(path));
+        }
+        if(config->GetConfigPath("http", path))
+        {
+            LOG_CHECK_RET_FALSE(this->LoadTextConfig<HttpConfig>(path));
         }
         return true;
     }
