@@ -5,15 +5,13 @@
 #include"OuterNetMessageComponent.h"
 #include"Client/OuterNetClient.h"
 #include"Config/ServiceConfig.h"
-#include"Component/InnerNetMessageComponent.h"
 #include"OuterNetComponent.h"
 #include"Component/InnerNetComponent.h"
 #include"Service/LocalRpcService.h"
-#include"Service/InnerService.h"
 #include"Component/RedisDataComponent.h"
 #include"Component/ProtoComponent.h"
-#include"Service/UserBehavior.h"
 #include"Component/LocationComponent.h"
+#include"Component/InnerNetMessageComponent.h"
 namespace Sentry
 {
 

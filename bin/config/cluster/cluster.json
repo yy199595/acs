@@ -9,7 +9,7 @@
 			"ChatService": true,
 			"AccountService": true
 		},
-		"component": [
+		"Component": [
 			""
 		]
 	},

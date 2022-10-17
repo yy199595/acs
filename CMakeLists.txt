@@ -77,6 +77,7 @@ include_directories(${PROJECT_SOURCE_DIR}/Common/Entity)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Server)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Script)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Network)
+include_directories(${PROJECT_SOURCE_DIR}/Common/Cluster)
 
 
 

@@ -126,13 +126,8 @@ namespace Sentry
 	{
 		if (this->mTaskComponent != nullptr)
 		{
-			std::shared_ptr<ElapsedTimer> timer(new ElapsedTimer());
-			this->mTaskComponent->Start([this, timer]()
-			{
-				this->OnDestory();
-                this->mMainThread->stop();
-				LOG_WARN("close server successful " << timer->GetMs() << " ms");
-			});
+            this->mMainThread->stop();
+            LOG_WARN("close server successful ");
 		}
 	}
 
