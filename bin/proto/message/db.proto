@@ -52,7 +52,7 @@ message mongo
         }
         message response
         {
-            repeated string jsons = 1;
+            repeated bytes jsons = 1;
         }
     }
 }

@@ -3,7 +3,11 @@
 //
 
 #include"System.h"
+#ifdef __OS_WIN__
+#include<direct.h>
+#else
 #include<unistd.h>
+#endif // 
 #include"Log/CommonLogDef.h"
 namespace Sentry
 {

@@ -225,7 +225,8 @@ namespace Sentry
 		this->mLogicFps = (float)this->mLogicRunCount / seconds;
 #ifdef _WIN32
 		char buffer[100] = {0};
-		sprintf_s(buffer, "%s fps:%f", this->mServerName.c_str(), this->mLogicFps);
+		const std::string& name = System::GetName();
+		sprintf_s(buffer, "%s fps:%f", name.c_str(), this->mLogicFps);
 		SetConsoleTitle(buffer);
 #else
 		//LOG_INFO("fps = " << this->mLogicFps);
