@@ -143,7 +143,7 @@ namespace Sentry
 			return XCode::CallServiceNotFound;
 		}
 		message->GetHead().Add("id", userId);
-		if(!this->mInnerMessageComponent->Send(address, message))
+		if(!this->mInnerMessageComponent->Send(target, message))
 		{
 			return XCode::NetWorkError;
 		}
