@@ -8,6 +8,20 @@
 #include"Method/MethodRegister.h"
 #include"Component/LuaScriptComponent.h"
 
+
+namespace Sentry
+{
+    class ServiceRunInfo
+    {
+    public:
+        void OnCall(const std::string & func);
+        void OnInvokeCompete(const std::string & func, int ms);
+    public:
+        std::unordered_map<std::string, int> mCallCount; //调用次数
+        std::unordered_map<std::string, int> mInvokeCostCount; //耗时
+    };
+}
+
 namespace Sentry
 {
 	class LocalRpcService : public RpcService
@@ -26,7 +40,9 @@ namespace Sentry
         void WaitAllMessageComplete() final;
         ServiceMethodRegister & GetMethodRegistry() { return *this->mMethodRegister; }
 	private:
+        int mMaxCount;
         int mWaitCount;
+        int mMaxDelay;
         bool mIsHandlerMessage;
 		std::shared_ptr<ServiceMethodRegister> mMethodRegister;
 	};

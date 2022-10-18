@@ -13,6 +13,19 @@
 
 namespace Sentry
 {
+    void ServiceRunInfo::OnCall(const std::string &func)
+    {
+
+    }
+
+    void ServiceRunInfo::OnInvokeCompete(const std::string &func, int ms)
+    {
+
+    }
+}
+
+namespace Sentry
+{
     extern std::string GET_FUNC_NAME(std::string fullName)
     {
         size_t pos = fullName.find("::");

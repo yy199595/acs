@@ -103,15 +103,28 @@ namespace Sentry
         }
 
         XCode code = targetService->Invoke(methodConfig->Method, data);
-        if(code == XCode::Successful && !methodConfig->Response.empty())
+        if(code == XCode::Successful)
         {
-            rapidjson::Document json;
-            const std::string & str = data->GetBody();
-            if(json.Parse(str.c_str(), str.size()).HasParseError())
+            if(!methodConfig->Response.empty())
             {
-                throw std::logic_error("failed to parse the returned data");
+                rapidjson::Document json;
+                const std::string &str = data->GetBody();
+                if (json.Parse(str.c_str(), str.size()).HasParseError())
+                {
+                    throw std::logic_error("failed to parse the returned data");
+                }
+                document->Add("message", json);
             }
-            document->Add("message", json);
+            else if(data->GetBody().empty())
+            {
+                rapidjson::Document json;
+                const char * str = data->GetBody().c_str();
+                const size_t length = data->GetBody().size();
+                if(!json.Parse(str, length).HasParseError())
+                {
+                    document->Add("data", json);
+                }
+            }
         }
         return code;
     }

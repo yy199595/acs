@@ -25,6 +25,7 @@ namespace Sentry
 		bool DelLocationUnit(long long id);
 		LocationUnit * AddLocationUnit(long long id);
 		LocationUnit * GetLocationUnit(long long id) const;
+        size_t GetLocationCount() const { return this->mUnitLocations.size(); }
 		LocationUnit * AddLocationUnit(long long id, const std::string & address);
 	 public:
 		int GetAllotCount(const std::string & address) const;
