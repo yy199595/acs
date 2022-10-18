@@ -69,6 +69,7 @@ namespace Rpc
         int GetProto() const { return this->mProto; }
 
         void Clear() { this->mBody.clear();}
+        void SetContent(const std::string & content);
         size_t GetSize() const { return this->mBody.size(); }
         const std::string & GetBody() const { return this->mBody;}
         void Append(const std::string & data) { this->mBody.append(data); }

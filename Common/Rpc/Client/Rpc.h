@@ -13,6 +13,7 @@ namespace Tcp
     {
         None,
         Auth,
+        Ping,
         Request,
         Response,
         Forward,
@@ -22,6 +23,7 @@ namespace Tcp
     {
         None,
         Json,
+        String,
         Protobuf
     };
 }

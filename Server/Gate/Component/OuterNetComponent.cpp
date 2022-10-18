@@ -44,6 +44,8 @@ namespace Sentry
                     this->StartClose(address);
                 }
                 break;
+            case Tcp::Type::Ping:
+                break;
             case Tcp::Type::Request:
                 if (!this->OnRequest(address, message))
                 {

@@ -18,10 +18,19 @@ namespace Sentry
         return nodeConfig->GetLocations(this->mLocations);
     }
 
+    bool ForwardHelperComponent::SendData(std::shared_ptr<Rpc::Data> message)
+    {
+        LOG_CHECK_RET_FALSE(!this->mLocations.empty());
+        for(const std::string & address : this->mLocations)
+        {
+            this->mInnerComponent->Send(address, message);
+        }
+        return true;
+    }
+
     bool ForwardHelperComponent::SendData(long long userId, std::shared_ptr<Rpc::Data> message)
     {
         LOG_CHECK_RET_FALSE(!this->mLocations.empty());
-        LOG_CHECK_RET_FALSE(message->GetType() == (int)Tcp::Type::Request);
 
         message->GetHead().Add("id", userId);
         size_t index = userId % this->mLocations.size();
@@ -34,7 +43,6 @@ namespace Sentry
         std::string address;
         LOG_CHECK_RET_FALSE(!this->mLocations.empty());
         LOG_CHECK_RET_FALSE(this->AllotLocation(address));
-        LOG_CHECK_RET_FALSE(message->GetType() == (int)Tcp::Type::Request);
 
         message->GetHead().Add("to", target);
         return this->mInnerComponent->Send(address, message);

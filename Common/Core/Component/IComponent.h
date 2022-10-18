@@ -119,6 +119,7 @@ namespace Sentry
     class InnerClienData
     {
     public:
+        std::string SrvName;
         std::string UserName;
         std::string PassWord;
         std::string Location;

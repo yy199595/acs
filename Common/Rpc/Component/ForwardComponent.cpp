@@ -100,10 +100,11 @@ namespace Sentry
 		{
 			return true;
 		}
-		std::string user, passwd, location;
+		std::string user, passwd, location, name;
 		const Rpc::Head & head = message->GetHead();
 		LOG_CHECK_RET_FALSE(head.Get("user", user));
-		LOG_CHECK_RET_FALSE(head.Get("passwd", passwd));
+        LOG_CHECK_RET_FALSE(head.Get("name", name));
+        LOG_CHECK_RET_FALSE(head.Get("passwd", passwd));
         LOG_CHECK_RET_FALSE(head.Get("location", location));
         this->mAuthClients.insert(address);
 		return true;

@@ -248,6 +248,13 @@ namespace Rpc
         return 0;
     }
 
+    void Data::SetContent(const std::string & content)
+    {
+        this->mBody = content;
+        this->mProto = (int)Tcp::Porto::String;
+    }
+
+
     std::shared_ptr<Data> Data::Clone()
     {
         std::shared_ptr<Data> message = std::make_shared<Data>();

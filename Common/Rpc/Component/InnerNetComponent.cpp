@@ -52,12 +52,23 @@ namespace Sentry
                 }
             }
                 break;
+            case Tcp::Type::Ping:
+            {
+                if (!this->IsAuth(address))
+                {
+                    this->StartClose(address);
+                    CONSOLE_LOG_ERROR("request message error close : " << address);
+                    return;
+                }
+                break;
+            }
             case Tcp::Type::Request:
             {
                 if (!this->IsAuth(address))
                 {
                     this->StartClose(address);
                     CONSOLE_LOG_ERROR("request message error close : " << address);
+                    return;
                 }
                 this->OnRequest(address, message);
             }
@@ -68,6 +79,7 @@ namespace Sentry
                 {
                     this->StartClose(address);
                     CONSOLE_LOG_ERROR("request message error close : " << address);
+                    return;
                 }
                 this->OnForward(message);
             }
@@ -78,6 +90,7 @@ namespace Sentry
                 {
                     this->StartClose(address);
                     CONSOLE_LOG_ERROR("request message error close : " << address);
+                    return;
                 }
                 this->OnBroadcast(message);
             }
@@ -88,6 +101,7 @@ namespace Sentry
                 {
                     this->StartClose(address);
                     CONSOLE_LOG_ERROR("request message error close : " << address);
+                    return;
                 }
                 this->OnResponse(address, message);
             }
@@ -103,8 +117,9 @@ namespace Sentry
 
     bool InnerNetComponent::OnAuth(const std::string & address, std::shared_ptr<Rpc::Data> message)
     {
-        std::unique_ptr<InnerClienData> serverNode(new InnerClienData());
         const Rpc::Head &head = message->GetHead();
+        std::unique_ptr<InnerClienData> serverNode(new InnerClienData());
+        LOG_CHECK_RET_FALSE(head.Get("name", serverNode->SrvName));
         LOG_CHECK_RET_FALSE(head.Get("user", serverNode->UserName));
         LOG_CHECK_RET_FALSE(head.Get("passwd", serverNode->PassWord));
         LOG_CHECK_RET_FALSE(head.Get("location", serverNode->Location));
