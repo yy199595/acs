@@ -7,7 +7,7 @@
 #include"File/FileHelper.h"
 #include"App/System/System.h"
 #include"Config/ClusterConfig.h"
-#include"Service/ServiceWrapper.h"
+#include"Service/ServiceRpcComponent.h"
 #include"Service/LuaRpcService.h"
 #include"Service/LocalRpcService.h"
 #include"Service/LocalHttpService.h"
@@ -45,8 +45,8 @@ namespace Sentry
                     {
                         if(nodeConfig->IsStart(name)) //使用lua启动
                         {
-                            Component * component = new LuaRpcService();
-                            if(!this->mApp->AddComponent(name, component))
+                            std::unique_ptr<Component> component(new LuaRpcService());
+                            if(!this->mApp->AddComponent(name, std::move(component)))
                             {
                                 LOG_ERROR("add start rpc service [" << name << "] error");
                                 return false;
@@ -54,8 +54,8 @@ namespace Sentry
                         }
                         else
                         {
-                            Component * component = new ServiceWrapper();
-                            if(!this->mApp->AddComponent(name, component))
+                            std::unique_ptr<Component> component(new ServiceRpcComponent());
+                            if(!this->mApp->AddComponent(name, std::move(component)))
                             {
                                 LOG_ERROR("add not start rpc service [" << name << "] error");
                                 return false;
@@ -64,8 +64,8 @@ namespace Sentry
                     }
                     else if(httpServiceConfig != nullptr && nodeConfig->IsStart(name))
                     {
-                        Component * component = new LocalLuaHttpService();
-                        if(!this->mApp->AddComponent(name, component))
+                        std::unique_ptr<Component> component(new LocalLuaHttpService());
+                        if(!this->mApp->AddComponent(name, std::move(component)))
                         {
                             LOG_ERROR("add http service [" << name << "] error");
                             return false;

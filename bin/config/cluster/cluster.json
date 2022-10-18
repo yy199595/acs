@@ -24,6 +24,9 @@
 			"ConsoleComponent",
 			"LuaScriptComponent"
 		],
+		"Location": [
+			"127.0.0.1:7788"
+		],
 		"lua": "script/Server/Server.lua"
 	},
 	"ChatServer": {
@@ -67,6 +70,9 @@
 		"AutoAllot": false,
 		"Component": [
 			"ForwardComponent"
+		],
+		"Location": [
+			"127.0.0.1:7789"
 		]
 	}
 }

@@ -138,6 +138,12 @@ namespace Sentry
         this->mGateClientMap.clear();
     }
 
+    bool OuterNetComponent::IsAuth(const std::string &address)
+    {
+        auto iter = this->mAuthClients.find(address);
+        return iter != this->mAuthClients.end();
+    }
+
     bool OuterNetComponent::SendData(std::shared_ptr<Rpc::Data> message)
     {
         message->SetType(Tcp::Type::Request);
@@ -145,7 +151,7 @@ namespace Sentry
         for(;iter != this->mGateClientMap.end(); iter++)
         {
             std::shared_ptr<OuterNetClient> proxyClient = iter->second;
-            if (proxyClient != nullptr)
+            if (proxyClient != nullptr && this->IsAuth(proxyClient->GetAddress()))
             {
                 proxyClient->SendData(message->Clone());
             }

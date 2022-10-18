@@ -20,7 +20,7 @@ namespace Sentry
 		Type(size_t hash, std::string name) :
 			Hash(hash), Name(std::move(name)) { }
 	public:
-		virtual Component * New() = 0;
+		virtual std::unique_ptr<Component> New() = 0;
 	public:
 		const size_t Hash;
 		const std::string Name;

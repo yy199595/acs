@@ -17,14 +17,13 @@ namespace Sentry
 		return this->AddComponent(name, ComponentFactory::CreateComponent(name));
 	}
 
-	bool Unit::AddComponent(const std::string& name, Component* component)
+	bool Unit::AddComponent(const std::string& name, std::unique_ptr<Component> component)
 	{
 		if (component == nullptr)
 		{
 			return false;
 		}
-		auto iter = this->mComponentMap.find(name);
-		if (iter != this->mComponentMap.end())
+		if (this->mComponentMap.find(name) != this->mComponentMap.end())
 		{
 			LOG_ERROR("add " << name << " failure");
 			return false;
@@ -37,9 +36,9 @@ namespace Sentry
         {
             return false;
         }
-		this->OnAddComponent(component);
-		this->mSortComponents.emplace_back(name);
-		this->mComponentMap.emplace(name, component);
+        this->mSortComponents.emplace_back(name);
+        this->OnAddComponent(component.get());
+		this->mComponentMap.emplace(name, std::move(component));
 		return true;
 	}
 
@@ -75,12 +74,11 @@ namespace Sentry
 		auto iter = this->mComponentMap.begin();
 		for (; iter != this->mComponentMap.end(); iter++)
 		{
-			Component* component = iter->second;
+			Component* component = iter->second.get();
 			if (component != nullptr)
 			{
 				component->OnDestory();
 				component->SetActive(false);
-				ComponentFactory::DestoryComponent(component);
 			}
 		}
 		this->mComponentMap.clear();
@@ -89,7 +87,7 @@ namespace Sentry
 	Component* Unit::GetComponentByName(const std::string& name) const
 	{
 		auto iter = this->mComponentMap.find(name);
-		return iter != this->mComponentMap.end() ? iter->second : nullptr;
+		return iter != this->mComponentMap.end() ? iter->second.get() : nullptr;
 	}
 
 	bool Unit::RemoveComponent(const std::string& name)
@@ -97,14 +95,13 @@ namespace Sentry
 		auto iter = this->mComponentMap.find(name);
 		if (iter != this->mComponentMap.end())
 		{
-			Component* component = iter->second;
+			std::unique_ptr<Component> component = std::move(iter->second);
 			this->mComponentMap.erase(iter);
 			if (component != nullptr)
 			{
 				component->OnDestory();
 				component->SetActive(false);
-				this->OnDelComponent(component);
-				ComponentFactory::DestoryComponent(component);
+				this->OnDelComponent(component.get());
 				return true;
 			}
 		}

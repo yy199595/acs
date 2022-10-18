@@ -25,7 +25,7 @@ namespace Sentry
 		return true;
 	}
 
-	Component* ComponentFactory::CreateComponent(const std::string& name, bool fromPool /*= true*/)
+	std::unique_ptr<Component> ComponentFactory::CreateComponent(const std::string& name, bool fromPool /*= true*/)
 	{
 		auto iter = mTypeInfoMap.find(name);
 		if (iter == mTypeInfoMap.end())
@@ -33,12 +33,12 @@ namespace Sentry
 			return nullptr;
 		}
 		Type* type = iter->second;
-		Component* component = type->New();
+		std::unique_ptr<Component> component = type->New();
 		if (component != nullptr)
 		{
 			component->Init();
 			component->mType = type;
 		}
-		return component;
+		return std::move(component);
 	}
 }

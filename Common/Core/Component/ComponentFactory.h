@@ -1,5 +1,6 @@
 #pragma once
 #include<queue>
+#include<memory>
 #include<unordered_map>
 #include"Component.h"
 namespace Sentry
@@ -11,7 +12,11 @@ namespace Sentry
         explicit TypeProxy(std::string name) : Type(typeid(T).hash_code(), name) {}
 
     public:
-        Component *New() final { return new T(); }
+        std::unique_ptr<Component> New() final
+        {
+            std::unique_ptr<Component> component(new T());
+            return std::move(component);
+        }
     };
 }
 
@@ -81,8 +86,8 @@ namespace Sentry
 
 		static bool DestoryComponent(Component* component);
 		template<typename T>
-		static Component* CreateComponent(bool fromPool = true);
-		static Component* CreateComponent(const std::string& name, bool fromPool = true);
+		static std::unique_ptr<Component> CreateComponent(bool fromPool = true);
+		static std::unique_ptr<Component> CreateComponent(const std::string& name, bool fromPool = true);
 
 		static Type* GetType(const std::string& name);
 	 private:
@@ -91,7 +96,7 @@ namespace Sentry
 	};
 
 	template<typename T>
-	Component* Sentry::ComponentFactory::CreateComponent(bool fromPool /*= true*/)
+	std::unique_ptr<Component> Sentry::ComponentFactory::CreateComponent(bool fromPool /*= true*/)
 	{
 		size_t key = typeid(T).hash_code();
 		auto iter = mTypeInfoMap1.find(key);

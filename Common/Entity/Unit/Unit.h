@@ -15,7 +15,7 @@ namespace Sentry
 		template<typename T>
 		inline bool AddComponent();
 		bool AddComponent(const std::string& name);
-		bool AddComponent(const std::string& name, Component* component);
+		bool AddComponent(const std::string& name, std::unique_ptr<Component> component);
 
 		template<typename T>
 		inline T* GetComponent() const;
@@ -54,7 +54,7 @@ namespace Sentry
 	 private:
 		long long mUnitId;
 		std::vector<std::string> mSortComponents;
-		std::unordered_map<std::string, Component*> mComponentMap;
+		std::unordered_map<std::string, std::unique_ptr<Component>> mComponentMap;
 	};
 
     template<typename T>
@@ -93,7 +93,7 @@ namespace Sentry
 		auto iter = this->mComponentMap.find(name);
 		if (iter != this->mComponentMap.end())
 		{
-			Component* component = iter->second;
+			Component* component = iter->second.get();
 			return dynamic_cast<T*>(component);
 		}
 		return nullptr;
@@ -104,8 +104,8 @@ namespace Sentry
 	{
 		if (this->GetComponent<T>() == nullptr)
 		{
-			Component* component = ComponentFactory::CreateComponent<T>();
-			return this->AddComponent(component->GetType()->Name, component);
+			std::unique_ptr<Component> component = ComponentFactory::CreateComponent<T>();
+			return this->AddComponent(component->GetType()->Name, std::move(component));
 		}
 		return false;
 	}

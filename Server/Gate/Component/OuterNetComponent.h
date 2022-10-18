@@ -22,6 +22,7 @@ namespace Sentry
 		void OnCloseSocket(const std::string & address, XCode code) final;
         void OnMessage(const std::string &address, std::shared_ptr<Rpc::Data> message) final;
     public:
+        bool IsAuth(const std::string & address);
         bool SendData(std::shared_ptr<Rpc::Data> message);
 		OuterNetClient* GetGateClient(const std::string& address);
         bool SendData(long long userId, std::shared_ptr<Rpc::Data> message);
@@ -38,6 +39,7 @@ namespace Sentry
 		class TimerComponent* mTimerComponent;
         class NetThreadComponent * mNetComponent;
         class LocationComponent * mLocationComponent;
+        std::unordered_set<std::string> mAuthClients; //已经验证过的客户端
         class OuterNetMessageComponent* mOuterMessageComponent;
         std::queue<std::shared_ptr<OuterNetClient>> mClientPools;
 		std::unordered_map<std::string, std::shared_ptr<OuterNetClient>> mGateClientMap;

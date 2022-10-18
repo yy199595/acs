@@ -10,7 +10,6 @@
 #include"Component/OperatorComponent.h"
 #include"Component/LoggerComponent.h"
 #include"Component/ProtoComponent.h"
-#include"Component/ServiceLaunchComponent.h"
 
 #include"Component/InnerNetComponent.h"
 #include"Component/OuterNetComponent.h"
@@ -28,11 +27,13 @@
 #include"Component/LocationComponent.h"
 #include"Component/TextConfigComponent.h"
 #include"Component/ClusterComponent.h"
+#include"Component/ForwardComponent.h"
+#include"Component/ForwardHelperComponent.h"
 
 #include"Service/LuaRpcService.h"
 #include"Service/OuterService.h"
 #include"Service/InnerService.h"
-#include"Service/ServiceWrapper.h"
+#include"Service/ServiceRpcComponent.h"
 #include"Service/HttpWebService.h"
 #include"Service/HttpRpcService.h"
 #include"Service/UserBehavior.h"
@@ -56,7 +57,6 @@ void RegisterComponent()
 {
 // rpc
     ComponentFactory::Add<RedisRegistryComponent>("RedisRegistryComponent");
-    ComponentFactory::Add<ServiceLaunchComponent>("ServiceLaunchComponent");
     ComponentFactory::Add<InnerNetMessageComponent>("InnerNetMessageComponent");
 // common
     ComponentFactory::Add<TaskComponent>("TaskComponent");
@@ -74,6 +74,9 @@ void RegisterComponent()
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
     ComponentFactory::Add<InnerNetComponent>("InnerNetComponent");
 	ComponentFactory::Add<LocationComponent>("LocationComponent");
+
+    ComponentFactory::Add<ForwardComponent>("ForwardComponent");
+    ComponentFactory::Add<ForwardHelperComponent>("ForwardHelperComponent");
 
 // gate
 	ComponentFactory::Add<GateHelperComponent>("GateHelperComponent");
@@ -110,7 +113,7 @@ void RegisterComponent()
 void RegisterServiceComponent()
 {
     ComponentFactory::Add<LuaRpcService>("rpc");
-    ComponentFactory::Add<ServiceWrapper>("agent");
+    ComponentFactory::Add<ServiceRpcComponent>("agent");
     ComponentFactory::Add<LocalLuaHttpService>("http");
     ComponentFactory::Add<UserBehavior>("UserBehavior");
     ComponentFactory::Add<OuterService>("OuterService");
