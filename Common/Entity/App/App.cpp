@@ -115,13 +115,10 @@ namespace Sentry
 	}
 
 	void App::Stop()
-	{
-		if (this->mTaskComponent != nullptr)
-		{
-            this->mMainThread->stop();
-            LOG_WARN("close server successful ");
-		}
-	}
+    {
+        this->mMainThread->stop();
+        LOG_WARN("close server successful ");
+    }
 
 	void App::LogicMainLoop()
 	{

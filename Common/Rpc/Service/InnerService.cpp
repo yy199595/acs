@@ -56,7 +56,16 @@ namespace Sentry
                 }
             }
         }
-        this->mApp->Stop();
+        TaskComponent * taskComponent = this->mApp->GetTaskComponent();
+        taskComponent->Start([taskComponent, this]()
+        {
+            for(size_t index = 10; index > 0; index--)
+            {
+                taskComponent->Sleep(1000);
+                CONSOLE_LOG_INFO("服务器将在" << index << "秒后关闭");
+            }
+            this->mApp->Stop();
+        });
         return XCode::Successful;
     }
 
