@@ -158,9 +158,9 @@ namespace Sentry
 		return false;
 	}
 
-	long long TimerComponent::DelayCall(float second, std::function<void()>&& callback)
+	long long TimerComponent::DelayCall(int ms, std::function<void()>&& callback)
 	{
 		LambdaMethod * lambdaMethod = new LambdaMethod(std::move(callback));
-		return this->AddTimer(second * 1000, lambdaMethod);
+		return this->AddTimer(ms, lambdaMethod);
 	}
 }// namespace Sentry

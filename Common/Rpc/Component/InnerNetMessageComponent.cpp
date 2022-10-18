@@ -114,16 +114,18 @@ namespace Sentry
         {
             return nullptr;
         }
-        std::shared_ptr<RpcTaskSource> taskSource =
-            std::make_shared<RpcTaskSource>(0);
+        std::shared_ptr<RpcTaskSource> taskSource = std::make_shared<RpcTaskSource>(0);
         return this->AddTask(taskSource)->Await();
     }
 
     bool InnerNetMessageComponent::Send(const std::string &address, std::shared_ptr<Rpc::Data> message)
     {
         message->GetHead().Remove("address");
-        assert(message->GetType() != (int)Tcp::Type::None);
-        assert(message->GetProto() != (int)Tcp::Porto::None);
+        assert(message->GetType() > (int)Tcp::Type::None);
+        assert(message->GetProto() > (int)Tcp::Porto::None);
+
+        assert(message->GetType() < (int)Tcp::Type::Max);
+        assert(message->GetProto() < (int)Tcp::Porto::Max);
         return this->mRpcClientComponent->Send(address, message);
     }
 }// namespace Sentry

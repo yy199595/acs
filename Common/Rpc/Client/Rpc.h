@@ -18,13 +18,15 @@ namespace Tcp
         Response,
         Forward,
         Broadcast,
+        Max
     };
     enum class Porto
     {
         None,
         Json,
         String,
-        Protobuf
+        Protobuf,
+        Max
     };
 }
 

@@ -65,6 +65,7 @@ namespace Sentry
         {
             return false;
         }
+        this->mAuthClients.insert(address);
         message->GetHead().Remove("token");
         message->GetHead().Add("code", XCode::Successful);
         this->mOuterMessageComponent->OnResponse(address, message);
@@ -126,6 +127,11 @@ namespace Sentry
                 this->mClientPools.push(gateClient);
             }
             this->mGateClientMap.erase(iter);
+        }
+        auto iter1 = this->mAuthClients.find(address);
+        if(iter1 != this->mAuthClients.end())
+        {
+            this->mAuthClients.erase(iter1);
         }
         this->mOuterMessageComponent->OnClose(address);
     }
