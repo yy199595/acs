@@ -27,16 +27,20 @@ namespace Sentry
 
     void LocalRpcService::WaitAllMessageComplete()
     {
+        int time = 0;
         this->mIsHandlerMessage = false;
         TaskComponent *taskComponent = this->mApp->GetTaskComponent();
         while (this->mWaitCount > 0)
         {
-            taskComponent->Sleep(100);
+            time++;
+            taskComponent->Sleep(1000);
+            CONSOLE_LOG_DEBUG(this->GetName() <<
+                " wait handler message count [" << this->mWaitCount << "] time = [" << time << "s]");
         }
         CONSOLE_LOG_ERROR(this->GetName() << " handler all message complete");
     }
 
-    XCode LocalRpcService::Invoke(const std::string &func, std::shared_ptr<Rpc::Data> message)
+    XCode LocalRpcService::Invoke(const std::string &func, std::shared_ptr<Rpc::Packet> message)
     {
         if (!this->IsStartService())
         {

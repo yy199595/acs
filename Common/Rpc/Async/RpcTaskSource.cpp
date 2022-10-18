@@ -4,13 +4,13 @@
 namespace Sentry
 {
     RpcTaskSource::RpcTaskSource(int ms)
-        : IRpcTask<Rpc::Data>(ms)
+        : IRpcTask<Rpc::Packet>(ms)
     {
 #ifdef __DEBUG__
         this->t1 = Helper::Time::GetNowMilTime();
 #endif
     }
-    void RpcTaskSource::OnResponse(std::shared_ptr<Rpc::Data> response)
+    void RpcTaskSource::OnResponse(std::shared_ptr<Rpc::Packet> response)
     {
 #ifdef __DEBUG__
         std::string func;
@@ -29,7 +29,7 @@ namespace Sentry
         this->mTaskSource.SetResult(nullptr);
     }
 
-	std::shared_ptr<Rpc::Data> RpcTaskSource::Await()
+	std::shared_ptr<Rpc::Packet> RpcTaskSource::Await()
 	{
 		return this->mTaskSource.Await();
 	}
@@ -38,7 +38,7 @@ namespace Sentry
 namespace Sentry
 {
 	LuaRpcTaskSource::LuaRpcTaskSource(lua_State* lua, int ms, const std::string & resp)
-		: IRpcTask<Rpc::Data>(ms), mTask(lua), mResp(resp)
+		: IRpcTask<Rpc::Packet>(ms), mTask(lua), mResp(resp)
 	{
 		this->mTaskId = Guid::Create();
 #ifdef __DEBUG__
@@ -51,7 +51,7 @@ namespace Sentry
         this->mTask.SetResult(XCode::CallTimeout, nullptr);
     }
 
-	void LuaRpcTaskSource::OnResponse(std::shared_ptr<Rpc::Data> response)
+	void LuaRpcTaskSource::OnResponse(std::shared_ptr<Rpc::Packet> response)
 	{
 #ifdef __DEBUG__
         std::string func;

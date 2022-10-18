@@ -47,26 +47,6 @@ namespace Sentry
         return true;
 	}
 
-#ifdef __DEBUG__
-    void TaskComponent::OnSecondUpdate(const int tick)
-    {
-        if(tick % 10 == 0)
-        {
-            auto iter = this->mCorPool.Begin();
-            long long nowTime = Helper::Time::GetNowSecTime();
-
-            for(; iter != this->mCorPool.End(); iter++)
-            {
-                TaskContext * taskContext = iter->second;
-                if(nowTime - taskContext->mSwitchTime >= 20)
-                {
-                    LOG_ERROR(taskContext->mCoroutineId << " long time not switch");
-                }
-            }
-        }
-    }
-#endif
-
 	void TaskComponent::Sleep(long long ms)
 	{
         TimerComponent * timerComponent = this->mApp->GetTimerComponent();

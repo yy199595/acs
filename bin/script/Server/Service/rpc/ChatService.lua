@@ -14,7 +14,7 @@ function ChatService.OnServiceStart()
 end
 
 ChatService.Chat = function(id, request)
-
+    coroutine.sleep(30000)
     local chatMessage = messageComponent:New("c2s.chat.notice", {
         msg_type = request.msg_type,
         message = request.message

@@ -58,7 +58,7 @@ namespace Sentry
 			: mName(std::move(name)) {}
 	 public:
 		virtual bool IsLuaMethod() = 0;
-		virtual XCode Invoke(Rpc::Data & message) = 0;
+		virtual XCode Invoke(Rpc::Packet & message) = 0;
 		const std::string& GetName()
 		{
 			return this->mName;
@@ -82,7 +82,7 @@ namespace Sentry
 		}
 	 public:
 
-		XCode Invoke(Rpc::Data & message) final
+		XCode Invoke(Rpc::Packet & message) final
 		{
 			if (!this->mHasUserId)
 			{
@@ -120,7 +120,7 @@ namespace Sentry
 		{
 		}
 	 public:
-		XCode Invoke(Rpc::Data & message) override
+		XCode Invoke(Rpc::Packet & message) override
 		{
             std::shared_ptr<T1> request(new T1());
             if(!message.ParseMessage(request.get()))
@@ -165,7 +165,7 @@ namespace Sentry
 		{
 		}
 	 public:
-		XCode Invoke(Rpc::Data & message) override
+		XCode Invoke(Rpc::Packet & message) override
 		{
             std::shared_ptr<T1> request(new T1());
             std::shared_ptr<T2> response(new T2());
@@ -228,7 +228,7 @@ namespace Sentry
 		{
 		}
 	 public:
-		XCode Invoke(Rpc::Data & message) override
+		XCode Invoke(Rpc::Packet & message) override
 		{
 			std::unique_ptr<T1> request(new T1());
             if(!message.ParseMessage(request.get()))
@@ -274,7 +274,7 @@ namespace Sentry
 		{
 			return false;
 		};
-		XCode Invoke(Rpc::Data & message) override
+		XCode Invoke(Rpc::Packet & message) override
 		{
 			std::shared_ptr<T1> request(new T1());
             if(!message.ParseMessage(request.get()))
@@ -302,7 +302,7 @@ namespace Sentry
 
 	 public:
 		bool IsLuaMethod() override { return false; };
-		XCode Invoke(Rpc::Data & message) override
+		XCode Invoke(Rpc::Packet & message) override
 		{
 			return (_o->*_func)(message.GetHead());
 		}

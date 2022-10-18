@@ -16,13 +16,13 @@ namespace Client
 	public:
 		TcpRpcClientContext(std::shared_ptr<SocketProxy> socket, ClientComponent * component);
 	public:
-		void SendToServer(std::shared_ptr<Rpc::Data> request);
+		void SendToServer(std::shared_ptr<Rpc::Packet> request);
 	protected:
         void OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
     private:
         Tcp::DecodeState mState;
         ClientComponent * mClientComponent;
-        std::shared_ptr<Rpc::Data> mMessage;
+        std::shared_ptr<Rpc::Packet> mMessage;
     };
 }

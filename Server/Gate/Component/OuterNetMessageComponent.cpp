@@ -62,7 +62,7 @@ namespace Sentry
         }
     }
 
-    XCode OuterNetMessageComponent::OnAuth(const std::string &address, std::shared_ptr<Rpc::Data> message)
+    XCode OuterNetMessageComponent::OnAuth(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
         std::string token;
         LOG_RPC_CHECK_ARGS(message->GetHead().Get("token", token));
@@ -113,7 +113,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-	XCode OuterNetMessageComponent::OnRequest(const std::string & address, std::shared_ptr<Rpc::Data> message)
+	XCode OuterNetMessageComponent::OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message)
 	{
         auto iter = this->mUserAddressMap.find(address);
         if(iter == this->mUserAddressMap.end() || iter->second == 0)
@@ -150,7 +150,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode OuterNetMessageComponent::OnResponse(const std::string & address, std::shared_ptr<Rpc::Data> message)
+	XCode OuterNetMessageComponent::OnResponse(const std::string & address, std::shared_ptr<Rpc::Packet> message)
 	{
         LOG_RPC_CHECK_ARGS(message->GetHead().Has("rpc"));
         if(message->GetCode(XCode::Failure) == XCode::NetActiveShutdown)

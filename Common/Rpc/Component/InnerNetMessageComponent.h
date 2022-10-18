@@ -18,7 +18,7 @@ namespace Sentry
 		long long Time;
 	};
 #endif
-    class InnerNetMessageComponent : public RpcTaskComponent<Rpc::Data>, public ISystemUpdate
+    class InnerNetMessageComponent : public RpcTaskComponent<Rpc::Packet>, public ISystemUpdate
 	{
 	 public:
 		InnerNetMessageComponent() = default;
@@ -29,17 +29,18 @@ namespace Sentry
         void OnSystemUpdate() final;
         void OnTaskTimeout(long long rpcId);
     public:
-		XCode OnRequest(std::shared_ptr<Rpc::Data> request);
+		XCode OnRequest(std::shared_ptr<Rpc::Packet> request);
     public:
-        bool Send(const std::string & address, std::shared_ptr<Rpc::Data> message);
-        std::shared_ptr<Rpc::Data> Call(const std::string & address, std::shared_ptr<Rpc::Data> message);
+        bool Ping(const std::string & address);
+        bool Send(const std::string & address, std::shared_ptr<Rpc::Packet> message);
+        std::shared_ptr<Rpc::Packet> Call(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
-        void Invoke(const RpcMethodConfig * config, std::shared_ptr<Rpc::Data> message);
+        void Invoke(const RpcMethodConfig * config, std::shared_ptr<Rpc::Packet> message);
     private:
 		std::string mFullName;
 		class TaskComponent* mTaskComponent;
 		class TimerComponent* mTimerComponent;
 		class InnerNetComponent* mRpcClientComponent;
-        std::queue<std::shared_ptr<Rpc::Data>> mWaitMessages;
+        std::queue<std::shared_ptr<Rpc::Packet>> mWaitMessages;
 	};
 }

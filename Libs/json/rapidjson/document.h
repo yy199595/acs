@@ -2122,14 +2122,14 @@ private:
 
     struct MapTraits {
         struct Less {
-            bool operator()(const Data& s1, const Data& s2) const {
+            bool operator()(const Packet& s1, const Packet& s2) const {
                 SizeType n1 = DataStringLength(s1), n2 = DataStringLength(s2);
                 int cmp = std::memcmp(DataString(s1), DataString(s2), sizeof(Ch) * (n1 < n2 ? n1 : n2));
                 return cmp < 0 || (cmp == 0 && n1 < n2);
             }
         };
-        typedef std::pair<const Data, SizeType> Pair;
-        typedef std::multimap<Data, SizeType, Less, StdAllocator<Pair, Allocator> > Map;
+        typedef std::pair<const Packet, SizeType> Pair;
+        typedef std::multimap<Packet, SizeType, Less, StdAllocator<Pair, Allocator> > Map;
         typedef typename Map::iterator Iterator;
     };
     typedef typename MapTraits::Map         Map;
@@ -2229,7 +2229,7 @@ private:
     MemberIterator DoFindMember(const GenericValue<Encoding, SourceAllocator>& name) {
         if (Member* members = GetMembersPointer()) {
             Map* &map = GetMap(members);
-            MapIterator mit = map->find(reinterpret_cast<const Data&>(name.data_));
+            MapIterator mit = map->find(reinterpret_cast<const Packet&>(name.data_));
             if (mit != map->end()) {
                 return MemberIterator(&members[mit->second]);
             }

@@ -10,7 +10,7 @@
 
 namespace Sentry
 {
-    class ForwardComponent : public TcpListenerComponent, public IRpc<Rpc::Data>
+    class ForwardComponent : public TcpListenerComponent, public IRpc<Rpc::Packet>
     {
     public:
         ForwardComponent() = default;
@@ -20,16 +20,17 @@ namespace Sentry
         void StartClose(const std::string &address) final;
         bool OnListen(std::shared_ptr<SocketProxy> socket) final;
         void OnCloseSocket(const std::string &address, XCode code) final;
-        void OnMessage(const std::string &address, std::shared_ptr<Rpc::Data> message) final;
+        void OnMessage(const std::string &address, std::shared_ptr<Rpc::Packet> message) final;
     private:
-        XCode OnRequest(std::shared_ptr<Rpc::Data> message);
-		XCode OnResponse(std::shared_ptr<Rpc::Data> message);
-		XCode OnBroadcast(std::shared_ptr<Rpc::Data> message);
-		bool OnAuth(const std::string & address, std::shared_ptr<Rpc::Data> message);
+        XCode OnRequest(std::shared_ptr<Rpc::Packet> message);
+		XCode OnResponse(std::shared_ptr<Rpc::Packet> message);
+		XCode OnBroadcast(std::shared_ptr<Rpc::Packet> message);
+		bool OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message);
 	 private:
         bool IsAuth(const std::string & address) const;
         InnerNetClient * GetClient(const std::string & address);
 		InnerNetClient * GetOrCreateClient(const std::string & address);
+        bool SendData(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
         class LocationComponent * mLocationComponent;
         std::unordered_set<std::string> mAuthClients;

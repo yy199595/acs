@@ -39,7 +39,7 @@ namespace Sentry
 		return true;
 	}
 
-    void InnerNetComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Data> message)
+    void InnerNetComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
         switch ((Tcp::Type) message->GetType())
         {
@@ -115,7 +115,7 @@ namespace Sentry
         }
     }
 
-    bool InnerNetComponent::OnAuth(const std::string & address, std::shared_ptr<Rpc::Data> message)
+    bool InnerNetComponent::OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message)
     {
         const Rpc::Head &head = message->GetHead();
         std::unique_ptr<ServiceNodeInfo> serverNode(new ServiceNodeInfo());
@@ -154,7 +154,7 @@ namespace Sentry
         return iter != this->mRpcClientMap.end();
     }
 
-	bool InnerNetComponent::OnRequest(const std::string& address, std::shared_ptr<Rpc::Data> message)
+	bool InnerNetComponent::OnRequest(const std::string& address, std::shared_ptr<Rpc::Packet> message)
 	{
         message->GetHead().Add("address", address);
         LOG_CHECK_RET_FALSE(message->GetHead().Has("func"));
@@ -169,7 +169,7 @@ namespace Sentry
         return true;
 	}
 
-    bool InnerNetComponent::OnForward(std::shared_ptr<Rpc::Data> message)
+    bool InnerNetComponent::OnForward(std::shared_ptr<Rpc::Packet> message)
     {
         long long userId = 0;
         LOG_CHECK_RET_FALSE(this->mOuterComponent != nullptr);
@@ -181,7 +181,7 @@ namespace Sentry
         return this->mOuterComponent->SendData(userId, message);
     }
 
-    bool InnerNetComponent::OnBroadcast(std::shared_ptr<Rpc::Data> message)
+    bool InnerNetComponent::OnBroadcast(std::shared_ptr<Rpc::Packet> message)
     {
         LOG_CHECK_RET_FALSE(this->mOuterComponent != nullptr);
         LOG_CHECK_RET_FALSE(message->GetHead().Has("func"));
@@ -190,7 +190,7 @@ namespace Sentry
         return this->mOuterComponent->SendData(message);
     }
 
-	bool InnerNetComponent::OnResponse(const std::string& address, std::shared_ptr<Rpc::Data> message)
+	bool InnerNetComponent::OnResponse(const std::string& address, std::shared_ptr<Rpc::Packet> message)
 	{
         std::string targer;
         const Rpc::Head &head = message->GetHead();
@@ -297,7 +297,7 @@ namespace Sentry
 	}
 
 
-	bool InnerNetComponent::Send(const std::string & address, std::shared_ptr<Rpc::Data> message)
+	bool InnerNetComponent::Send(const std::string & address, std::shared_ptr<Rpc::Packet> message)
 	{
         InnerNetClient * clientSession = this->GetOrCreateSession(address);
 		if (message == nullptr || clientSession == nullptr)

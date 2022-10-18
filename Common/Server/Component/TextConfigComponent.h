@@ -14,6 +14,8 @@ namespace Sentry
         TextConfigComponent() = default;
         ~TextConfigComponent() = default;
     public:
+        void OnHotFix() final;
+
         template<typename T>
         const T * GetTextConfig();
 
@@ -25,7 +27,6 @@ namespace Sentry
         bool LoadTextConfig(std::unique_ptr<TextConfig> config, const std::string & path);
     private:
         bool Awake() final;
-        void OnHotFix() final;
     private:
         std::unordered_map<size_t, std::string> mKeys;
         std::unordered_map<std::string, std::unique_ptr<TextConfig>> mConfigs;

@@ -44,7 +44,7 @@ namespace Rpc
         bool Add(const std::string &key, const std::string &value);
     };
 
-    class Data : public Tcp::ProtoMessage
+    class Packet : public Tcp::ProtoMessage
     {
     public:
         bool ParseLen(std::istream &os, int & len);
@@ -53,7 +53,7 @@ namespace Rpc
 
         bool Parse(std::istream &os, size_t size);
 
-        static std::shared_ptr<Data> New(Tcp::Type type, Tcp::Porto proto);
+        static std::shared_ptr<Packet> New(Tcp::Type type, Tcp::Porto proto);
 
     public:
         XCode GetCode(XCode code) const;
@@ -75,7 +75,7 @@ namespace Rpc
         void Append(const std::string & data) { this->mBody.append(data); }
         bool GetMethod(std::string &service, std::string &method) const;
     public:
-        std::shared_ptr<Data> Clone();
+        std::shared_ptr<Packet> Clone();
 
     public:
         template<typename T>
@@ -93,7 +93,7 @@ namespace Rpc
     };
 
     template<typename T>
-    bool Data::ParseMessage(T * message)
+    bool Packet::ParseMessage(T * message)
     {
         switch (this->mProto)
         {
@@ -117,7 +117,7 @@ namespace Rpc
     }
 
     template<typename T>
-    bool Data::WriteMessage(const T * message)
+    bool Packet::WriteMessage(const T * message)
     {
         this->mBody.clear();
         if(message == nullptr)

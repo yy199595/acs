@@ -4,7 +4,7 @@
 #include"App/System/System.h"
 namespace Sentry
 {
-	InnerNetClient::InnerNetClient(IRpc<Rpc::Data> * component,
+	InnerNetClient::InnerNetClient(IRpc<Rpc::Packet> * component,
                                    std::shared_ptr<SocketProxy> socket)
 		: TcpContext(socket, 1024 * 1024), mComponent(component)
     {
@@ -26,7 +26,7 @@ namespace Sentry
 #endif
 	}
 
-    void InnerNetClient::SendData(std::shared_ptr<Rpc::Data> message)
+    void InnerNetClient::SendData(std::shared_ptr<Rpc::Packet> message)
     {
 #ifdef ONLY_MAIN_THREAD
         this->Send(message);
@@ -61,7 +61,7 @@ namespace Sentry
 		this->mTcpComponent->OnCloseSocket(address, code);
 #else
 		asio::io_service & taskScheduler = App::Inst()->GetThread();
-		taskScheduler.post(std::bind(&IRpc<Rpc::Data>::OnCloseSocket, this->mComponent, address, code));
+		taskScheduler.post(std::bind(&IRpc<Rpc::Packet>::OnCloseSocket, this->mComponent, address, code));
 #endif
 	}
 
@@ -80,7 +80,7 @@ namespace Sentry
                 int len = 0;
                 Asio::Code code;
                 this->mState = Tcp::DecodeState::Body;
-                this->mMessage = std::make_shared<Rpc::Data>();
+                this->mMessage = std::make_shared<Rpc::Packet>();
                 if(!this->mMessage->ParseLen(readStream, len))
                 {
                     this->CloseSocket(XCode::UnKnowPacket);
@@ -105,7 +105,7 @@ namespace Sentry
                 this->mTcpComponent->OnMessage(address, std::move(this->mMessage));
 #else
                 asio::io_service & io = App::Inst()->GetThread();
-                io.post(std::bind(&IRpc<Rpc::Data>::OnMessage, this->mComponent, address, std::move(this->mMessage)));
+                io.post(std::bind(&IRpc<Rpc::Packet>::OnMessage, this->mComponent, address, std::move(this->mMessage)));
 #endif
             }
                 break;
@@ -135,8 +135,8 @@ namespace Sentry
 			return;
 		}
 
-        std::shared_ptr<Rpc::Data> authMessage =
-            Rpc::Data::New(Tcp::Type::Auth, Tcp::Porto::Protobuf);
+        std::shared_ptr<Rpc::Packet> authMessage =
+            Rpc::Packet::New(Tcp::Type::Auth, Tcp::Porto::Protobuf);
         {
             authMessage->GetHead().Add("name", this->mSrvName);
             authMessage->GetHead().Add("user", this->mUserName);

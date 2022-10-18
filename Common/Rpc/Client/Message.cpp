@@ -145,15 +145,15 @@ namespace Rpc
         return true;
     }
 
-    std::shared_ptr<Data> Data::New(Tcp::Type type, Tcp::Porto proto)
+    std::shared_ptr<Packet> Packet::New(Tcp::Type type, Tcp::Porto proto)
     {
-        std::shared_ptr<Data> message = std::make_shared<Data>();
+        std::shared_ptr<Packet> message = std::make_shared<Packet>();
         message->SetType(type);
         message->SetProto(proto);
         return message;
     }
 
-    bool Data::ParseLen(std::istream &is, int & len)
+    bool Packet::ParseLen(std::istream &is, int & len)
     {
         union
         {
@@ -172,7 +172,7 @@ namespace Rpc
         return true;
     }
 
-    bool Data::Parse(std::istream &os, size_t size)
+    bool Packet::Parse(std::istream &os, size_t size)
     {
         if (size != this->mLen)
         {
@@ -204,7 +204,7 @@ namespace Rpc
         return true;
     }
 
-    XCode Data::GetCode(XCode code) const
+    XCode Packet::GetCode(XCode code) const
     {
         int value = (int)code;
         if(this->mHead.Get("code", value))
@@ -214,7 +214,7 @@ namespace Rpc
         return code;
     }
 
-    bool Data::GetMethod(std::string &service, std::string &method) const
+    bool Packet::GetMethod(std::string &service, std::string &method) const
     {
         std::string value;
         if(!this->mHead.Get("func", value))
@@ -231,7 +231,7 @@ namespace Rpc
         return true;
     }
 
-    int Data::Serailize(std::ostream &os)
+    int Packet::Serailize(std::ostream &os)
     {
         union
         {
@@ -248,16 +248,16 @@ namespace Rpc
         return 0;
     }
 
-    void Data::SetContent(const std::string & content)
+    void Packet::SetContent(const std::string & content)
     {
         this->mBody = content;
         this->mProto = (int)Tcp::Porto::String;
     }
 
 
-    std::shared_ptr<Data> Data::Clone()
+    std::shared_ptr<Packet> Packet::Clone()
     {
-        std::shared_ptr<Data> message = std::make_shared<Data>();
+        std::shared_ptr<Packet> message = std::make_shared<Packet>();
         {
             message->SetType((Tcp::Type) this->mType);
             message->SetProto((Tcp::Porto) this->mProto);

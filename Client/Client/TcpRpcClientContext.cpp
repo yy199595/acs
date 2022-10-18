@@ -10,7 +10,7 @@ namespace Client
         this->mState = Tcp::DecodeState::Head;
     }
 
-	void TcpRpcClientContext::SendToServer(std::shared_ptr<Rpc::Data> message)
+	void TcpRpcClientContext::SendToServer(std::shared_ptr<Rpc::Packet> message)
 	{
 #ifdef ONLY_MAIN_THREAD
         this->Send(message);
@@ -54,7 +54,7 @@ namespace Client
             {
                 int len = 0;
                 this->mState = Tcp::DecodeState::Body;
-                this->mMessage = std::make_shared<Rpc::Data>();
+                this->mMessage = std::make_shared<Rpc::Packet>();
                 if(!this->mMessage->ParseLen(readStream, len))
                 {
                     CONSOLE_LOG_ERROR("unknow message type = "

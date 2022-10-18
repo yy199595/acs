@@ -17,7 +17,8 @@
 			"MongoService": true,
 			"ChatService": true,
 			"HttpWebService": true,
-			"AccountService": true
+			"AccountService": true,
+			"HttpRpcService": true
 		},
 		"Component": [
 			"HttpComponent",

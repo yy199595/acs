@@ -14,10 +14,10 @@ namespace Sentry
 		LuaServiceMethod(const RpcMethodConfig * config, lua_State* lua);
 	 public:
 		bool IsLuaMethod() final { return true; }
-		XCode Invoke(Rpc::Data & message) final;
+		XCode Invoke(Rpc::Packet & message) final;
 	 private:
-		XCode Call(int count, Rpc::Data & message);
-		XCode CallAsync(int count, Rpc::Data & message);
+		XCode Call(int count, Rpc::Packet & message);
+		XCode CallAsync(int count, Rpc::Packet & message);
 	 private:
 		lua_State* mLuaEnv;
         const RpcMethodConfig * mConfig;

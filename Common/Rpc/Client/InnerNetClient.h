@@ -14,12 +14,12 @@ namespace Sentry
 	class InnerNetClient : public Tcp::TcpContext
 	{
 	 public:
-		explicit InnerNetClient(IRpc<Rpc::Data> * component, std::shared_ptr<SocketProxy> socket);
+		explicit InnerNetClient(IRpc<Rpc::Packet> * component, std::shared_ptr<SocketProxy> socket);
 		~InnerNetClient() override = default;
 	 public:
 		void StartClose();
 		void StartReceive();
-        void SendData(std::shared_ptr<Rpc::Data> message);
+        void SendData(std::shared_ptr<Rpc::Packet> message);
     private:
         void CloseSocket(XCode code);
         void OnConnect(const asio::error_code &error, int count) final;
@@ -32,8 +32,8 @@ namespace Sentry
         Tcp::DecodeState mState;
         std::string mRpcLocation;
         std::string mHttpLocation;
-        IRpc<Rpc::Data> * mComponent;
-        std::shared_ptr<Rpc::Data> mMessage;
+        IRpc<Rpc::Packet> * mComponent;
+        std::shared_ptr<Rpc::Packet> mMessage;
         std::shared_ptr<asio::steady_timer> mTimer;
 	};
 }// namespace Sentry

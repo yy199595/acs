@@ -11,19 +11,19 @@
 namespace Client
 {
 	ClientTask::ClientTask(int ms)
-        : Sentry::IRpcTask<Rpc::Data>(ms)
+        : Sentry::IRpcTask<Rpc::Packet>(ms)
 	{
 		this->mTaskId = Guid::Create();
 	}
 
-	void ClientTask::OnResponse(std::shared_ptr<Rpc::Data> response)
+	void ClientTask::OnResponse(std::shared_ptr<Rpc::Packet> response)
 	{
 		this->mTask.SetResult(response);
 	}
 
     void ClientTask::OnTimeout()
     {
-        std::shared_ptr<Rpc::Data> response(new Rpc::Data());
+        std::shared_ptr<Rpc::Packet> response(new Rpc::Packet());
 
         response->GetHead().Add("code", (int)XCode::CallTimeout);
         this->mTask.SetResult(response);
@@ -45,7 +45,7 @@ namespace Client
         LOG_INFO("call client func = " << t1->func());
 	}
 
-    void ClientComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Data> message)
+    void ClientComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
         int type = message->GetType();
         //int proto = message->GetProto();
@@ -104,7 +104,7 @@ namespace Client
 		return true;
     }
 
-	std::shared_ptr<Rpc::Data> ClientComponent::Call(std::shared_ptr<Rpc::Data> request)
+	std::shared_ptr<Rpc::Packet> ClientComponent::Call(std::shared_ptr<Rpc::Packet> request)
     {
         std::shared_ptr<ClientTask> clienRpcTask(new ClientTask(0));
 

@@ -22,7 +22,7 @@ namespace Sentry
 		void StartClose();
 		void StartReceive(int second = 0);
 		unsigned int GetQps() const { return this->mQps; }
-		void SendData(std::shared_ptr<Rpc::Data> message);
+		void SendData(std::shared_ptr<Rpc::Packet> message);
 		unsigned int GetCallCount() const { return this->mCallCount; }
 	 protected:
 		void OnConnect(const asio::error_code &error) {}
@@ -37,7 +37,7 @@ namespace Sentry
         unsigned int mCallCount;
         Tcp::DecodeState mState;
         OuterNetComponent* mGateComponent;
-        std::shared_ptr<Rpc::Data> mMessage;
+        std::shared_ptr<Rpc::Packet> mMessage;
         std::shared_ptr<asio::steady_timer> mTimer;
 	};
 }

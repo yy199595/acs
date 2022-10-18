@@ -56,7 +56,7 @@ namespace Lua
             luaL_error(lua, "call [%s] not found", method.c_str());
             return 0;
         }
-        std::shared_ptr<Rpc::Data> request(new Rpc::Data());
+        std::shared_ptr<Rpc::Packet> request(new Rpc::Packet());
 
         request->SetType(Tcp::Type::Request);
         request->SetProto(Tcp::Porto::Protobuf);

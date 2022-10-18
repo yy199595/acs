@@ -5,7 +5,7 @@
 #include "ServiceRpcComponent.h"
 namespace Sentry
 {
-	XCode ServiceRpcComponent::Invoke(const std::string &name, std::shared_ptr<Rpc::Data> message)
+	XCode ServiceRpcComponent::Invoke(const std::string &name, std::shared_ptr<Rpc::Packet> message)
 	{
 		return XCode::CallServiceNotFound;
 	}

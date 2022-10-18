@@ -38,8 +38,8 @@ namespace Sentry
 			return XCode::NotFindUser;
 		}
 
-        std::shared_ptr<Rpc::Data> data
-            = Rpc::Data::New(Tcp::Type::Forward, Tcp::Porto::Protobuf);
+        std::shared_ptr<Rpc::Packet> data
+            = Rpc::Packet::New(Tcp::Type::Forward, Tcp::Porto::Protobuf);
         data->GetHead().Add("id", userId);
         data->GetHead().Add("func", func);
         if(!this->mInnerComponent->Send(address, data))
@@ -56,8 +56,8 @@ namespace Sentry
 		{
 			return XCode::NotFindUser;
 		}
-        std::shared_ptr<Rpc::Data> data
-            = Rpc::Data::New(Tcp::Type::Forward, Tcp::Porto::Protobuf);
+        std::shared_ptr<Rpc::Packet> data
+            = Rpc::Packet::New(Tcp::Type::Forward, Tcp::Porto::Protobuf);
 
         data->GetHead().Add("func", func);
         data->GetHead().Add("id", userId);
@@ -77,8 +77,8 @@ namespace Sentry
 			return XCode::NotFindUser;
 		}
 
-        std::shared_ptr<Rpc::Data> data
-            = Rpc::Data::New(Tcp::Type::Forward, Tcp::Porto::Protobuf);
+        std::shared_ptr<Rpc::Packet> data
+            = Rpc::Packet::New(Tcp::Type::Forward, Tcp::Porto::Protobuf);
 
         data->GetHead().Add("func", func);
         data->GetHead().Add("id", userId);
@@ -99,8 +99,8 @@ namespace Sentry
 			return XCode::Failure;
 		}
 
-        std::shared_ptr<Rpc::Data> data =
-            Rpc::Data::New(Tcp::Type::Broadcast, Tcp::Porto::Protobuf);
+        std::shared_ptr<Rpc::Packet> data =
+            Rpc::Packet::New(Tcp::Type::Broadcast, Tcp::Porto::Protobuf);
         data->GetHead().Add("func", func);
         for(const std::string & address : locations)
         {
@@ -118,8 +118,8 @@ namespace Sentry
 			return XCode::Failure;
 		}
 
-        std::shared_ptr<Rpc::Data> data =
-            Rpc::Data::New(Tcp::Type::Broadcast, Tcp::Porto::Protobuf);
+        std::shared_ptr<Rpc::Packet> data =
+            Rpc::Packet::New(Tcp::Type::Broadcast, Tcp::Porto::Protobuf);
         data->GetHead().Add("func", func);
         if(!data->WriteMessage(&message))
         {
@@ -141,8 +141,8 @@ namespace Sentry
 			return XCode::Failure;
 		}
 
-        std::shared_ptr<Rpc::Data> data =
-            Rpc::Data::New(Tcp::Type::Broadcast, Tcp::Porto::Protobuf);
+        std::shared_ptr<Rpc::Packet> data =
+            Rpc::Packet::New(Tcp::Type::Broadcast, Tcp::Porto::Protobuf);
         data->GetHead().Add("func", func);
         if(!data->WriteMessage(message.get()))
         {

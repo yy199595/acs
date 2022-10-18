@@ -8,7 +8,7 @@
 #include"Component/RedisDataComponent.h"
 #include"Component/RedisRegistryComponent.h"
 #include"Component/InnerNetMessageComponent.h"
-
+#include"Component/TextConfigComponent.h"
 namespace Sentry
 {
     bool InnerService::Awake()
@@ -24,10 +24,9 @@ namespace Sentry
     bool InnerService::OnStart()
     {
         BIND_COMMON_RPC_METHOD(InnerService::Ping);
+        BIND_COMMON_RPC_METHOD(InnerService::Stop);
         BIND_COMMON_RPC_METHOD(InnerService::Hotfix);
-
-        BIND_COMMON_RPC_METHOD(InnerService::StartService);
-        BIND_COMMON_RPC_METHOD(InnerService::CloseService);
+        BIND_COMMON_RPC_METHOD(InnerService::LoadConfig);
         RedisSubComponent *subComponent = this->GetComponent<RedisSubComponent>();
         RedisDataComponent *dataComponent = this->GetComponent<RedisDataComponent>();
         InnerNetComponent *listenComponent = this->GetComponent<InnerNetComponent>();
@@ -43,67 +42,40 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode InnerService::Hotfix()
+    XCode InnerService::Stop()
     {
-        std::vector<Component *> components;
-        this->mApp->GetComponents(components);
-        for(Component * component : components)
+        std::vector<RpcService *> components;
+        if(this->mApp->GetServices(components))
         {
-            IHotfix * hotfix = component->Cast<IHotfix>();
-            if(hotfix != nullptr)
+            for (RpcService *component: components)
             {
-                hotfix->OnHotFix();
+                if(component != this && component->IsStartService())
+                {
+                    component->WaitAllMessageComplete();
+                    component->Close();
+                }
             }
         }
+        this->mApp->Stop();
         return XCode::Successful;
     }
 
-    XCode InnerService::StartService(const com::type_string &request)
+    XCode InnerService::LoadConfig()
     {
-        const std::string &name = request.str();
-        RpcService *service = this->GetComponent<RpcService>(name);
-        if (service == nullptr)
+        TextConfigComponent * textComponent = this->GetComponent<TextConfigComponent>();
+        if(textComponent != nullptr)
         {
-            throw std::logic_error(fmt::format("not find service : {0}", name));
-        }
-        if (service->IsStartService())
-        {
-            throw std::logic_error(fmt::format("{0} already started", name));
-        }
-        if(!service->Start())
-        {
-            return XCode::Failure;
-        }
-        std::vector<IServiceChange *> components;
-        this->mApp->GetComponents(components);
-        for(IServiceChange * component : components)
-        {
-            component->OnAddService(name);
+            textComponent->OnHotFix();
         }
         return XCode::Successful;
     }
 
-    XCode InnerService::CloseService(const com::type_string &request)
+    XCode InnerService::Hotfix()
     {
-        const std::string &name = request.str();
-        RpcService *service = this->GetComponent<RpcService>(name);
-        if (service == nullptr)
+        std::vector<IHotfix *> components;
+        for(IHotfix * component : components)
         {
-            throw std::logic_error(fmt::format("not find service : {0}", name));
-        }
-        if (!service->IsStartService())
-        {
-            throw std::logic_error(fmt::format("{0} not started", name));
-        }
-        if (!service->Close())
-        {
-            return XCode::Failure;
-        }
-        std::vector<IServiceChange *> components;
-        this->mApp->GetComponents(components);
-        for (IServiceChange *component: components)
-        {
-            component->OnDelService(name);
+            component->OnHotFix();
         }
         return XCode::Successful;
     }

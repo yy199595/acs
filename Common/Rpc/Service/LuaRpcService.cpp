@@ -63,7 +63,7 @@ namespace Sentry
         return true;
 	}
 
-	XCode LuaRpcService::Invoke(const std::string &name, std::shared_ptr<Rpc::Data> message)
+	XCode LuaRpcService::Invoke(const std::string &name, std::shared_ptr<Rpc::Packet> message)
 	{
 		if(!this->IsStartService())
 		{

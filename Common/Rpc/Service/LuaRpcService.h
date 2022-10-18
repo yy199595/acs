@@ -21,7 +21,7 @@ namespace Sentry
         void WaitAllMessageComplete() final;
         int GetWaitMessageCount() const final { return this->mWaitCount; };
         bool IsStartService() final { return this->mMethodRegister != nullptr; }
-		XCode Invoke(const std::string& name, std::shared_ptr<Rpc::Data> message) final;
+		XCode Invoke(const std::string& name, std::shared_ptr<Rpc::Packet> message) final;
 	 private:
         int mWaitCount;
 		lua_State* mLuaEnv;

@@ -12,13 +12,11 @@ namespace Sentry
     public:
         InnerService() = default;
         ~InnerService() = default;
-
     private:
         XCode Ping();
+        XCode Stop();
         XCode Hotfix();
-    private:
-        XCode StartService(const com::type::string & request);
-        XCode CloseService(const com::type::string & request);
+        XCode LoadConfig();
     private:
         bool Awake();
         bool OnStart() final;

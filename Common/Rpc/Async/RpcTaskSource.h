@@ -26,24 +26,24 @@ namespace Sentry
         int mTimeout;
     };
 
-    class RpcTaskSource : public IRpcTask<Rpc::Data>
+    class RpcTaskSource : public IRpcTask<Rpc::Packet>
     {
     public:
         RpcTaskSource(int ms);
         long long GetRpcId() final { return mTaskSource.GetTaskId(); }
     protected:
         void OnTimeout() final;
-        void OnResponse(std::shared_ptr<Rpc::Data> response) final;
+        void OnResponse(std::shared_ptr<Rpc::Packet> response) final;
     public:
-		std::shared_ptr<Rpc::Data> Await();
+		std::shared_ptr<Rpc::Packet> Await();
     private:
 #ifdef __DEBUG__
         long long t1;
 #endif
-        TaskSource<std::shared_ptr<Rpc::Data>> mTaskSource;
+        TaskSource<std::shared_ptr<Rpc::Packet>> mTaskSource;
     };
 
-	class LuaRpcTaskSource :  public IRpcTask<Rpc::Data>
+	class LuaRpcTaskSource :  public IRpcTask<Rpc::Packet>
 	{
 	 public:
 		LuaRpcTaskSource(lua_State * lua, int ms, const std::string & response);
@@ -52,7 +52,7 @@ namespace Sentry
 		long long GetRpcId() final { return this->mTaskId; }
 	 private:
         void OnTimeout() final;
-		void OnResponse(std::shared_ptr<Rpc::Data> response) final;
+		void OnResponse(std::shared_ptr<Rpc::Packet> response) final;
 	 private:
 		long long mTaskId;
 		LuaWaitTaskSource mTask;

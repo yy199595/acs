@@ -18,7 +18,7 @@ namespace Sentry
         return nodeConfig->GetLocations(this->mLocations);
     }
 
-    bool ForwardHelperComponent::SendData(std::shared_ptr<Rpc::Data> message)
+    bool ForwardHelperComponent::SendData(std::shared_ptr<Rpc::Packet> message)
     {
         LOG_CHECK_RET_FALSE(!this->mLocations.empty());
         for(const std::string & address : this->mLocations)
@@ -28,7 +28,7 @@ namespace Sentry
         return true;
     }
 
-    bool ForwardHelperComponent::SendData(long long userId, std::shared_ptr<Rpc::Data> message)
+    bool ForwardHelperComponent::SendData(long long userId, std::shared_ptr<Rpc::Packet> message)
     {
         LOG_CHECK_RET_FALSE(!this->mLocations.empty());
 
@@ -38,7 +38,7 @@ namespace Sentry
         return this->mInnerComponent->Send(address, message);
     }
 
-    bool ForwardHelperComponent::SendData(const std::string &target, std::shared_ptr<Rpc::Data> message)
+    bool ForwardHelperComponent::SendData(const std::string &target, std::shared_ptr<Rpc::Packet> message)
     {
         std::string address;
         LOG_CHECK_RET_FALSE(!this->mLocations.empty());

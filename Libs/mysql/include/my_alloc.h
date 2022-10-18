@@ -14,7 +14,7 @@
    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
 
 /* 
-   Data structures for mysys/my_alloc.c (root memory allocator)
+   Packet structures for mysys/my_alloc.c (root memory allocator)
 */
 
 #ifndef _my_alloc_h

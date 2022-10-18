@@ -20,50 +20,65 @@ namespace Sentry
     XCode HttpRpcService::Call(const HttpHandlerRequest &request, HttpHandlerResponse &response)
     {
         std::string value, func;
-        const HttpData & httpData = request.GetData();
-        std::shared_ptr<Rpc::Data> message(new Rpc::Data());
-        const size_t pos = httpData.mPath.find_last_of('/');
-
-        std::shared_ptr<Json::Document> document
-            = std::make_shared<Json::Document>();
-        if(pos == std::string::npos)
+        std::vector<std::string> splits;
+        const HttpData &httpData = request.GetData();
+        std::shared_ptr<Json::Document> document = std::make_shared<Json::Document>();
+        if (Helper::String::Split(httpData.mPath, "/", splits) < 2)
         {
             document->Add("error", "调用方法错误");
             document->Add("code", (int) XCode::CallServiceNotFound);
-
+            document->Serialize(response.Content());
+            return XCode::CallArgsError;
+        }
+        const std::string &method = splits[splits.size() - 1];
+        const std::string &service = splits[splits.size() - 2];
+        const RpcServiceConfig *rpcServiceConfig = RpcConfig::Inst()->GetConfig(service);
+        if (rpcServiceConfig == nullptr)
+        {
+            document->Add("error", "调用服务不存在");
+            document->Add("code", (int) XCode::CallServiceNotFound);
             document->Serialize(response.Content());
             return XCode::CallServiceNotFound;
         }
-        func = httpData.mPath.substr(pos + 1);
-        message->GetHead().Add("func", func);
-
-        if(httpData.Get("id", value))
+        const RpcMethodConfig *methodConfig = rpcServiceConfig->GetMethodConfig(method);
+        if (methodConfig == nullptr)
         {
-            Helper::String::ClearBlank(value);
-            message->GetHead().Add("id", value);
+            document->Add("error", "调用方法不存在");
+            document->Add("code", (int) XCode::CallFunctionNotExist);
+            document->Serialize(response.Content());
+            return XCode::CallServiceNotFound;
         }
 
-        message->SetProto(Tcp::Porto::Json);
-        message->SetType(Tcp::Type::Request);
-        message->Append(request.GetContent());
+        std::shared_ptr<Rpc::Packet> message(new Rpc::Packet());
+        {
+            message->GetHead().Add("func", methodConfig->FullName);
 
+            if (httpData.Get("id", value))
+            {
+                Helper::String::ClearBlank(value);
+                message->GetHead().Add("id", value);
+            }
+            message->SetProto(Tcp::Porto::Json);
+            message->SetType(Tcp::Type::Request);
+            message->Append(request.GetContent());
+        }
         XCode code = XCode::Failure;
         try
         {
             code = this->Invoke(message, document);
         }
-        catch (std::exception & e)
+        catch (std::exception &e)
         {
             code = XCode::ThrowError;
             document->Add("error", e.what());
         }
         std::string json;
-        document->Add("code", (int)code);
+        document->Add("code", (int) code);
         document->Serialize(response.Content());
         return XCode::Successful;
     }
 
-    XCode HttpRpcService::Invoke(std::shared_ptr<Rpc::Data> data, std::shared_ptr<Json::Document> document)
+    XCode HttpRpcService::Invoke(std::shared_ptr<Rpc::Packet> data, std::shared_ptr<Json::Document> document)
     {
         std::string fullName;
         if(!data->GetHead().Get("func", fullName))

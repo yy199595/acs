@@ -24,7 +24,7 @@ namespace Lua
             luaL_error(lua, "not find ClientComponent");
             return 0;
         }
-		std::shared_ptr<Rpc::Data> request(new Rpc::Data());
+		std::shared_ptr<Rpc::Packet> request(new Rpc::Packet());
 
         request->SetType(Tcp::Type::Request);
         request->SetProto(Tcp::Porto::Protobuf);
@@ -47,7 +47,7 @@ namespace Lua
 		taskComponent->Start([request, func, clientComponent, luaWaitTaskSource]()
 		{
 			ElapsedTimer elapsedTimer;
-			std::shared_ptr<Rpc::Data> response = clientComponent->Call(request);
+			std::shared_ptr<Rpc::Packet> response = clientComponent->Call(request);
 			if(response == nullptr)
 			{
 				luaWaitTaskSource->SetResult(XCode::CallTimeout, nullptr);
@@ -74,7 +74,7 @@ namespace Lua
             luaL_error(lua, "not find ClientComponent");
             return 0;
         }
-        std::shared_ptr<Rpc::Data> request(new Rpc::Data());
+        std::shared_ptr<Rpc::Packet> request(new Rpc::Packet());
 
         request->SetType(Tcp::Type::Auth);
         std::string token(luaL_checkstring(lua, 2));
@@ -84,7 +84,7 @@ namespace Lua
         TaskComponent *taskComponent = App::Inst()->GetTaskComponent();
         taskComponent->Start([request, clientComponent, luaWaitTaskSource]() {
             XCode code = XCode::Failure;
-            std::shared_ptr<Rpc::Data> response = clientComponent->Call(request);
+            std::shared_ptr<Rpc::Packet> response = clientComponent->Call(request);
             if(response != nullptr)
             {
                 code = response->GetCode(XCode::Failure);

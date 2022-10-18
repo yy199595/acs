@@ -34,7 +34,7 @@ namespace Sentry
 		return true;
 	}
 
-	void OuterNetComponent::OnMessage(const std::string& address, std::shared_ptr<Rpc::Data> message)
+	void OuterNetComponent::OnMessage(const std::string& address, std::shared_ptr<Rpc::Packet> message)
     {
         switch ((Tcp::Type) message->GetType())
         {
@@ -58,7 +58,7 @@ namespace Sentry
         }
     }
 
-    bool OuterNetComponent::OnAuth(const std::string &address, std::shared_ptr<Rpc::Data> message)
+    bool OuterNetComponent::OnAuth(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
         XCode code = this->mOuterMessageComponent->OnAuth(address, message);
         if(code != XCode::Successful)
@@ -72,7 +72,7 @@ namespace Sentry
         return true;
     }
 
-    bool OuterNetComponent::OnRequest(const std::string &address, std::shared_ptr<Rpc::Data> message)
+    bool OuterNetComponent::OnRequest(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
         message->GetHead().Add("resp", address);
         XCode code = this->mOuterMessageComponent->OnRequest(address, message);
@@ -152,7 +152,7 @@ namespace Sentry
         return iter != this->mAuthClients.end();
     }
 
-    bool OuterNetComponent::SendData(std::shared_ptr<Rpc::Data> message)
+    bool OuterNetComponent::SendData(std::shared_ptr<Rpc::Packet> message)
     {
         message->SetType(Tcp::Type::Request);
         auto iter = this->mGateClientMap.begin();
@@ -167,7 +167,7 @@ namespace Sentry
         return true;
     }
 
-    bool OuterNetComponent::SendData(long long userId, std::shared_ptr<Rpc::Data> message)
+    bool OuterNetComponent::SendData(long long userId, std::shared_ptr<Rpc::Packet> message)
     {
         std::string address;
         if(!this->mOuterMessageComponent->GetAddress(userId, address))
@@ -179,7 +179,7 @@ namespace Sentry
         return this->SendData(address, message);
     }
 
-	bool OuterNetComponent::SendData(const std::string &address, std::shared_ptr<Rpc::Data> message)
+	bool OuterNetComponent::SendData(const std::string &address, std::shared_ptr<Rpc::Packet> message)
 	{
         message->GetHead().Remove("address");
 		OuterNetClient * outerNetClient = this->GetGateClient(address);

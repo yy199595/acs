@@ -33,13 +33,13 @@ namespace Sentry
         XCode Call(long long userId, const std::string& func, const Message& message, std::shared_ptr<Message> response);
     public:
         bool StartSend(const std::string & address, const std::string & func, long long userId, const Message * message);
-        std::shared_ptr<Rpc::Data> CallAwait(const std::string & address, const std::string & func, long long userId, const Message * message);
+        std::shared_ptr<Rpc::Packet> CallAwait(const std::string & address, const std::string & func, long long userId, const Message * message);
 	 protected:
 		bool LateAwake() override;
 		bool IsStartComplete() final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) override;
     public:
-        virtual XCode Invoke(const std::string & method, std::shared_ptr<Rpc::Data> message) = 0;
+        virtual XCode Invoke(const std::string & method, std::shared_ptr<Rpc::Packet> message) = 0;
 	private:
         std::string mLocalAddress;
         std::vector<std::string> mServiceHosts;

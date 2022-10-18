@@ -60,6 +60,11 @@ namespace Sentry
                 const std::string & name = iter->first;
                 LOG_ERROR("reload [" << name << "] failure");
             }
+            else
+            {
+                const std::string & name = iter->first;
+                LOG_INFO("reload [" << name << "] successful");
+            }
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Sentry
 		return true;
 	}
 
-	XCode InnerNetMessageComponent::OnRequest(std::shared_ptr<Rpc::Data> message)
+	XCode InnerNetMessageComponent::OnRequest(std::shared_ptr<Rpc::Packet> message)
 	{
         const Rpc::Head & head = message->GetHead();
         LOG_RPC_CHECK_ARGS(head.Get("func", this->mFullName));
@@ -56,7 +56,7 @@ namespace Sentry
         while(!this->mWaitMessages.empty() && count <= MAX_HANDLER_MSG_COUNT)
         {
             count++;
-            std::shared_ptr<Rpc::Data> message = this->mWaitMessages.front();
+            std::shared_ptr<Rpc::Packet> message = this->mWaitMessages.front();
             if(message->GetHead().Get("func", this->mFullName))
             {
                const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(this->mFullName);
@@ -73,7 +73,7 @@ namespace Sentry
         }
     }
 
-    void InnerNetMessageComponent::Invoke(const RpcMethodConfig *config, std::shared_ptr<Rpc::Data> message)
+    void InnerNetMessageComponent::Invoke(const RpcMethodConfig *config, std::shared_ptr<Rpc::Packet> message)
     {
         XCode code = XCode::Failure;
         RpcService *logicService = this->mApp->GetService(config->Service);
@@ -106,10 +106,22 @@ namespace Sentry
         }
     }
 
-    std::shared_ptr<Rpc::Data> InnerNetMessageComponent::Call(
-        const std::string &address, std::shared_ptr<Rpc::Data> message)
+    bool InnerNetMessageComponent::Ping(const std::string &address)
+    {
+        std::shared_ptr<Rpc::Packet> message = std::make_shared<Rpc::Packet>();
+        {
+            message->SetType(Tcp::Type::Ping);
+        }
+        std::shared_ptr<Rpc::Packet> response = this->Call(address, message);
+        return response->GetCode(XCode::Failure) == XCode::Successful;
+    }
+
+    std::shared_ptr<Rpc::Packet> InnerNetMessageComponent::Call(
+        const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
         message->GetHead().Remove("address");
+        assert(message->GetType() < (int)Tcp::Type::Max);
+        assert(message->GetType() > (int)Tcp::Type::None);
         if (!this->mRpcClientComponent->Send(address, message))
         {
             return nullptr;
@@ -118,14 +130,11 @@ namespace Sentry
         return this->AddTask(taskSource)->Await();
     }
 
-    bool InnerNetMessageComponent::Send(const std::string &address, std::shared_ptr<Rpc::Data> message)
+    bool InnerNetMessageComponent::Send(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
         message->GetHead().Remove("address");
-        assert(message->GetType() > (int)Tcp::Type::None);
-        assert(message->GetProto() > (int)Tcp::Porto::None);
-
         assert(message->GetType() < (int)Tcp::Type::Max);
-        assert(message->GetProto() < (int)Tcp::Porto::Max);
+        assert(message->GetType() > (int)Tcp::Type::None);
         return this->mRpcClientComponent->Send(address, message);
     }
 }// namespace Sentry

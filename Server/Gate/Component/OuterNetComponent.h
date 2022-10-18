@@ -12,7 +12,7 @@ namespace Sentry
 {
 
 	class OuterNetClient;
-	class OuterNetComponent : public TcpListenerComponent, public IRpc<Rpc::Data>
+	class OuterNetComponent : public TcpListenerComponent, public IRpc<Rpc::Packet>
 	{
 	 public:
 		OuterNetComponent() = default;
@@ -20,21 +20,21 @@ namespace Sentry
 	 public:
 		void StartClose(const std::string & address) final;
 		void OnCloseSocket(const std::string & address, XCode code) final;
-        void OnMessage(const std::string &address, std::shared_ptr<Rpc::Data> message) final;
+        void OnMessage(const std::string &address, std::shared_ptr<Rpc::Packet> message) final;
     public:
         bool IsAuth(const std::string & address);
-        bool SendData(std::shared_ptr<Rpc::Data> message);
+        bool SendData(std::shared_ptr<Rpc::Packet> message);
 		OuterNetClient* GetGateClient(const std::string& address);
-        bool SendData(long long userId, std::shared_ptr<Rpc::Data> message);
-        bool SendData(const std::string & address, std::shared_ptr<Rpc::Data> message);
+        bool SendData(long long userId, std::shared_ptr<Rpc::Packet> message);
+        bool SendData(const std::string & address, std::shared_ptr<Rpc::Packet> message);
 	 public:
 		bool Awake() final;
 		bool LateAwake() final;
 	 private:
         void OnStopListen() final;
         bool OnListen(std::shared_ptr<SocketProxy> socket) final;
-        bool OnAuth(const std::string & address, std::shared_ptr<Rpc::Data> message);
-        bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Data> message);
+        bool OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message);
+        bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
 		class TimerComponent* mTimerComponent;
         class NetThreadComponent * mNetComponent;

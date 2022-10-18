@@ -296,7 +296,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_ALIGN
 
-//! Data alignment of the machine.
+//! Packet alignment of the machine.
 /*! \ingroup RAPIDJSON_CONFIG
     \param x pointer to align
 

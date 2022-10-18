@@ -73,7 +73,7 @@ namespace Sentry
             {
                 int len = 0;
                 this->mState = Tcp::DecodeState::Body;
-                this->mMessage = std::make_shared<Rpc::Data>();
+                this->mMessage = std::make_shared<Rpc::Packet>();
                 if(!this->mMessage->ParseLen(readStream, len))
                 {
                     this->CloseSocket(XCode::UnKnowPacket);
@@ -142,7 +142,7 @@ namespace Sentry
 #endif
 	}
 
-	void OuterNetClient::SendData(std::shared_ptr<Rpc::Data> message)
+	void OuterNetClient::SendData(std::shared_ptr<Rpc::Packet> message)
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->Send(message);

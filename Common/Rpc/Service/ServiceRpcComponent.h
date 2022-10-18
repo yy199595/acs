@@ -18,7 +18,7 @@ namespace Sentry
 		void WaitAllMessageComplete() final { };
 		bool IsStartService() final { return false; }
     private:
-		XCode Invoke(const std::string& name, std::shared_ptr<Rpc::Data> message) final;
+		XCode Invoke(const std::string& name, std::shared_ptr<Rpc::Packet> message) final;
 	};
 }
 

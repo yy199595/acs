@@ -8,7 +8,7 @@
 namespace Sentry
 {
 	// 管理内网rpc的session
-	class InnerNetComponent : public TcpListenerComponent, public IRpc<Rpc::Data>
+	class InnerNetComponent : public TcpListenerComponent, public IRpc<Rpc::Packet>
 	{
 	 public:
 		InnerNetComponent() = default;
@@ -16,7 +16,7 @@ namespace Sentry
 	 public:
 		void StartClose(const std::string & address) final;
 		void OnCloseSocket(const std::string & address, XCode code) final;
-        void OnMessage(const std::string & address, std::shared_ptr<Rpc::Data> message) final;
+        void OnMessage(const std::string & address, std::shared_ptr<Rpc::Packet> message) final;
 	 protected:
         bool Awake() final;
         bool LateAwake() final;
@@ -28,14 +28,14 @@ namespace Sentry
 	 public:
         InnerNetClient * GetSession(const std::string& address);
         InnerNetClient * GetOrCreateSession(const std::string& address);
-		bool Send(const std::string & address, std::shared_ptr<Rpc::Data> message);
+		bool Send(const std::string & address, std::shared_ptr<Rpc::Packet> message);
 	private:
         bool IsAuth(const std::string & address);
-        bool OnForward(std::shared_ptr<Rpc::Data> message);
-        bool OnBroadcast(std::shared_ptr<Rpc::Data> message);
-        bool OnAuth(const std::string & address, std::shared_ptr<Rpc::Data> message);
-        bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Data> message);
-		bool OnResponse(const std::string& address, std::shared_ptr<Rpc::Data> message);
+        bool OnForward(std::shared_ptr<Rpc::Packet> message);
+        bool OnBroadcast(std::shared_ptr<Rpc::Packet> message);
+        bool OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message);
+        bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message);
+		bool OnResponse(const std::string& address, std::shared_ptr<Rpc::Packet> message);
 	 private:
         std::string mUserName;
         std::string mPassword;

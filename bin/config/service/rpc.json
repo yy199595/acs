@@ -1,6 +1,5 @@
 {
 	"OuterService": {
-		"Type": "rpc",
 		"AllotUser": {
 			"Async": false,
 			"Type": "Server",
@@ -9,7 +8,6 @@
 		}
 	},
 	"MysqlService": {
-		"Type": "rpc",
 		"Add": {
 			"Async": true,
 			"Type": "Server",
@@ -43,24 +41,24 @@
 		}
 	},
 	"InnerService": {
-		"Type": "rpc",
 		"Ping": {
 			"Async": false,
 			"Type": "Server"
 		},
-		"StartService": {
+		"Stop": {
 			"Async": true,
-			"Type": "Server",
-			"Request": "com.type.string"
+			"Type": "Server"
 		},
-		"CloseService": {
-			"Async": true,
-			"Type": "Server",
-			"Request": "com.type.string"
+		"Hotfix": {
+			"Async": false,
+			"Type": "Server"
+		},
+		"LoadConfig": {
+			"Async": false,
+			"Type": "Server"
 		}
 	},
 	"UserBehavior": {
-		"Type": "rpc",
 		"Push": {
 			"Async": false,
 			"Type": "Server"
@@ -77,7 +75,6 @@
 		}
 	},
 	"MongoService": {
-		"Type": "rpc",
 		"Insert": {
 			"Async": true,
 			"Type": "Server",
@@ -112,9 +109,8 @@
 		}
 	},
 	"ChatService": {
-		"Type": "rpc",
 		"Chat": {
-			"Async": false,
+			"Async": true,
 			"Type": "Client",
 			"CallWay": "Net",
 			"Request": "c2s.chat.request"

@@ -19,7 +19,7 @@ namespace Sentry
 		bool Close() final;
         int GetWaitMessageCount() const final { return this->mWaitCount; }
 		bool IsStartService() { return this->mMethodRegister != nullptr; }
-		XCode Invoke(const std::string &func, std::shared_ptr<Rpc::Data> message) final;
+		XCode Invoke(const std::string &func, std::shared_ptr<Rpc::Packet> message) final;
     protected:
         virtual bool OnClose() = 0;
         virtual bool OnStart() = 0;
