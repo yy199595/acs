@@ -35,6 +35,7 @@ namespace Sentry
         int Run(int argc, char ** argv);
         RpcService * GetService(const std::string & name);
 		bool GetServices(std::vector<RpcService *> & services);
+        bool OnDelComponent(Component *component) final { return false; }
         inline bool IsMainThread() const { return this->mThreadId == std::this_thread::get_id();}
     private:
 		void LogicMainLoop();

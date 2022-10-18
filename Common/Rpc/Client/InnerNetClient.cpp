@@ -1,13 +1,14 @@
 ﻿#include"InnerNetClient.h"
 #include"App/App.h"
 #include"Client/Rpc.h"
-
+#include"App/System/System.h"
 namespace Sentry
 {
 	InnerNetClient::InnerNetClient(IRpc<Rpc::Data> * component,
                                    std::shared_ptr<SocketProxy> socket)
 		: TcpContext(socket, 1024 * 1024), mComponent(component)
 	{
+        this->mSrvName = System::GetName();
         this->mState = Tcp::DecodeState::Head;
         ServerConfig::Inst()->GetLocation("rpc", this->mLocation);
         ServerConfig::Inst()->GetMember("user", "name", this->mUserName);
@@ -136,6 +137,7 @@ namespace Sentry
         std::shared_ptr<Rpc::Data> authMessage =
             Rpc::Data::New(Tcp::Type::Auth, Tcp::Porto::Protobuf);
         {
+            authMessage->GetHead().Add("name", this->mSrvName);
             authMessage->GetHead().Add("user", this->mUserName);
             authMessage->GetHead().Add("passwd", this->mPassword);
             authMessage->GetHead().Add("location", this->mLocation);

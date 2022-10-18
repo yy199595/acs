@@ -250,13 +250,14 @@ namespace Rpc
 
     std::shared_ptr<Data> Data::Clone()
     {
-        std::shared_ptr<Data> message =
-            std::make_shared<Data>();
-        message->SetType((Tcp::Type)this->mType);
-        message->SetProto((Tcp::Porto)this->mProto);
+        std::shared_ptr<Data> message = std::make_shared<Data>();
+        {
+            message->SetType((Tcp::Type) this->mType);
+            message->SetProto((Tcp::Porto) this->mProto);
 
-        message->mBody = this->mBody;
-        message->mHead = this->mHead;
+            message->mBody = this->mBody;
+            message->mHead = this->mHead;
+        }
         return message;
     }
 }

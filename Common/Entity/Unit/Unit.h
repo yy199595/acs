@@ -45,7 +45,7 @@ namespace Sentry
         size_t GetComponents(std::vector<T *> & components) const;
 	 protected:
 		virtual void OnAddComponent(Component * component) {}
-		virtual void OnDelComponent(Component * component) {}
+		virtual bool OnDelComponent(Component * component) { return true; }
 	 public:
 		inline long long GetUnitId() const
 		{

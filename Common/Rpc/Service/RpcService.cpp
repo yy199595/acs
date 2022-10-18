@@ -79,17 +79,17 @@ namespace Sentry
                 return false;
             }
         }
-        std::shared_ptr<Rpc::Data> request
-            = std::make_shared<Rpc::Data>();
-
-        request->SetType(Tcp::Type::Request);
-        request->SetProto(Tcp::Porto::Protobuf);
-        request->GetHead().Add("func", methodConfig->FullName);
-        if(userId != 0)
+        std::shared_ptr<Rpc::Data> request = std::make_shared<Rpc::Data>();
         {
-            request->GetHead().Add("id", userId);
+            request->SetType(Tcp::Type::Request);
+            request->SetProto(Tcp::Porto::Protobuf);
+            request->GetHead().Add("func", methodConfig->FullName);
+            if (userId != 0)
+            {
+                request->GetHead().Add("id", userId);
+            }
+            request->WriteMessage(message);
         }
-        request->WriteMessage(message);
         return this->mMessageComponent->Send(address, request);
     }
 
@@ -118,19 +118,20 @@ namespace Sentry
             }
         }
 
-        std::shared_ptr<Rpc::Data> request =
-            Rpc::Data::New(Tcp::Type::Request, Tcp::Porto::Protobuf);
-        request->GetHead().Add("func", func);
-        if(userId != 0)
+        std::shared_ptr<Rpc::Data> request = Rpc::Data::New(Tcp::Type::Request, Tcp::Porto::Protobuf);
         {
-            request->GetHead().Add("id", userId);
+            request->GetHead().Add("func", func);
+            if (userId != 0)
+            {
+                request->GetHead().Add("id", userId);
+            }
+            if (!methodConfig->Request.empty() && message == nullptr)
+            {
+                CONSOLE_LOG_ERROR("call " << func << " request error");
+                return nullptr;
+            }
+            request->WriteMessage(message);
         }
-        if(!methodConfig->Request.empty() && message == nullptr)
-        {
-            CONSOLE_LOG_ERROR("call " << func << " request error");
-            return nullptr;
-        }
-        request->WriteMessage(message);
         return this->mMessageComponent->Call(address, request);
     }
 
@@ -192,8 +193,7 @@ namespace Sentry
 			std::shared_ptr<Message> response)
 	{
 		assert(response != nullptr);
-        std::shared_ptr<Rpc::Data> data =
-            this->CallAwait(address, func, 0, &message);
+        std::shared_ptr<Rpc::Data> data = this->CallAwait(address, func, 0, &message);
         if(data == nullptr)
         {
             return XCode::Failure;

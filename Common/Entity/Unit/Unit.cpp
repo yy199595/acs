@@ -96,6 +96,10 @@ namespace Sentry
 		if (iter != this->mComponentMap.end())
 		{
 			std::unique_ptr<Component> component = std::move(iter->second);
+            if(!this->OnDelComponent(component.get()))
+            {
+                return false;
+            }
 			this->mComponentMap.erase(iter);
 			if (component != nullptr)
 			{
