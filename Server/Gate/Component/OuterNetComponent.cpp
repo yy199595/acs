@@ -136,15 +136,11 @@ namespace Sentry
         this->mOuterMessageComponent->OnClose(address);
     }
 
-    void OuterNetComponent::OnStopListen()
+    void OuterNetComponent::OnDestory()
     {
-        auto iter = this->mGateClientMap.begin();
-        for(; iter != this->mGateClientMap.end(); iter++)
-        {
-            iter->second->StartClose();
-        }
-        this->mGateClientMap.clear();
+
     }
+
 
     bool OuterNetComponent::IsAuth(const std::string &address)
     {

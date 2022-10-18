@@ -21,7 +21,6 @@ namespace Sentry
         bool Awake();
         bool OnStart() final;
         bool OnClose() final { return false; }
-
     private:
     };
 }

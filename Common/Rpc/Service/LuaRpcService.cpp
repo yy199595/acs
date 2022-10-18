@@ -92,6 +92,8 @@ namespace Sentry
         while (this->mWaitCount > 0)
         {
             taskComponent->Sleep(100);
+            CONSOLE_LOG_INFO(this->GetName() <<
+                " wait handler message count [" << this->mWaitCount << "]");
         }
         CONSOLE_LOG_ERROR(this->GetName() << " handler all message complete");
     }

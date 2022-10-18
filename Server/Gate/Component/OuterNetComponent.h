@@ -30,8 +30,8 @@ namespace Sentry
 	 public:
 		bool Awake() final;
 		bool LateAwake() final;
+        void OnDestory() final;
 	 private:
-        void OnStopListen() final;
         bool OnListen(std::shared_ptr<SocketProxy> socket) final;
         bool OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message);
         bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message);
