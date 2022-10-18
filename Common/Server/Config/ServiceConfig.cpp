@@ -13,7 +13,6 @@ namespace Sentry
 		}
         this->mIsClient = false;
 		this->mMethodConfigs.clear();
-        this->mType = json["Type"].GetString();
 		auto iter = json.MemberBegin();
 		for(; iter != json.MemberEnd(); iter++)
         {
@@ -60,7 +59,6 @@ namespace Sentry
 		{
 			return false;
 		}
-        this->mType = json["Type"].GetString();
         auto iter = json.MemberBegin();
 		for(; iter != json.MemberEnd(); iter++)
         {

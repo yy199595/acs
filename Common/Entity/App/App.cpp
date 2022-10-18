@@ -168,7 +168,7 @@ namespace Sentry
             IStart * component = this->GetComponent<IStart>(name);
             if(component != nullptr)
             {
-                long long timeId = this->mTimerComponent->DelayCall(10.0f, [name]()
+                long long timeId = this->mTimerComponent->DelayCall(10 * 1000, [name]()
                 {
                     LOG_FATAL(name << " start time out");
                 });

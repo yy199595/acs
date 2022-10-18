@@ -15,14 +15,15 @@
 		}
 	},
 	"HttpWebService": {
-		"Type": "http",
-		"Async": {
-			"Async": true,
-			"Path": "/index/async"
-		},
-		"Sync": {
+		"Ping": {
+			"Type": "GET",
 			"Async": false,
-			"Path": "/index/sync"
+			"Path": "/ping"
+		},
+		"Hello": {
+			"Type": "GET",
+			"Async": false,
+			"Path": "/"
 		},
 		"DownLoad": {
 			"Type": "GET",

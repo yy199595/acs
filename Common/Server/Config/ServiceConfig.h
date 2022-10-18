@@ -24,7 +24,6 @@ namespace Sentry
         IServiceConfigBase(const std::string & name) : mName(name) { }
         const std::string & GetName() const { return this->mName; }
     public:
-        virtual const std::string & GetType() const = 0;
         virtual bool OnLoadConfig(const rapidjson::Value & json) = 0;
         virtual bool OnReLoadConfig(const rapidjson::Value & json) = 0;
 
@@ -73,10 +72,8 @@ namespace Sentry
         bool IsClient() const { return this->mIsClient; }
         bool OnLoadConfig(const rapidjson::Value &json) final;
         bool OnReLoadConfig(const rapidjson::Value & json) final;
-        const std::string & GetType() const { return this->mType; }
     private:
         bool mIsClient;
-        std::string mType;
     };
 
 	class HttpServiceConfig : public IServiceConfig<HttpMethodConfig>
@@ -88,9 +85,6 @@ namespace Sentry
         bool IsHttpConfig() const{ return true;}
         bool OnLoadConfig(const rapidjson::Value &json) final;
         bool OnReLoadConfig(const rapidjson::Value & json) final;
-        const std::string & GetType() const { return this->mType; }
-    private:
-        std::string mType;
 	};
 
     class RpcConfig : public TextConfig, public ConstSingleton<RpcConfig>
