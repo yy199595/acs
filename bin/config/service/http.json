@@ -1,6 +1,5 @@
 {
 	"AccountService": {
-		"Type": "http",
 		"Login": {
 			"Type": "POST",
 			"Async": true,

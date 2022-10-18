@@ -13,13 +13,13 @@ namespace Sentry
 		this->mHttpComponent = httpComponent;
 	}
 
-	void HttpHandlerClient::StartReceive(const std::string & route)
+	void HttpHandlerClient::StartReceive()
 	{
         assert(this->mRecvBuffer.size() == 0);
         assert(this->mSendBuffer.size() == 0);
         const std::string & address = this->mSocket->GetAddress();
         this->mHttpResponse = std::make_shared<HttpHandlerResponse>();
-        this->mHttpRequest = std::make_shared<HttpHandlerRequest>(address, route);
+        this->mHttpRequest = std::make_shared<HttpHandlerRequest>(address);
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLine();
 #else

@@ -23,7 +23,6 @@ namespace Sentry
         {
             return false;
         }
-        const std::string & route = this->GetListenConfig().Route;
         std::shared_ptr<HttpHandlerClient> handlerClient;
         if(!this->mClientPools.empty())
         {
@@ -36,7 +35,7 @@ namespace Sentry
             handlerClient = std::make_shared<HttpHandlerClient>(this, socket);
         }
 
-        handlerClient->StartReceive(route);
+        handlerClient->StartReceive();
         const std::string &address = socket->GetAddress();
         this->mHttpClients.emplace(address, handlerClient);
         return true;

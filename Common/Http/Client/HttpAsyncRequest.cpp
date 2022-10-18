@@ -396,9 +396,8 @@ namespace Sentry
 
 namespace Sentry
 {
-    HttpHandlerRequest::HttpHandlerRequest(const std::string & address, const std::string & route)
+    HttpHandlerRequest::HttpHandlerRequest(const std::string & address)
     {
-        this->mRoute = route;
         this->mHttpData.mStatus = 0;
 		this->mHttpData.mAddress = address;
         this->mState = HttpDecodeState::FirstLine;
@@ -443,11 +442,8 @@ namespace Sentry
         if(this->mState == HttpDecodeState::FirstLine)
         {
             this->mState = HttpDecodeState::HeadLine;
-			streamBuffer >> this->mHttpData.mMethod >> this->mUrl >> this->mHttpData.mVersion;
-            if(this->mUrl.find(this->mRoute) == std::string::npos) //路由不匹配
-            {
-                return 2;
-            }
+			streamBuffer >> this->mHttpData.mMethod >>
+                    this->mUrl >> this->mHttpData.mVersion;
 			streamBuffer.ignore(2); //去掉\r\n
         }
         if(this->mState == HttpDecodeState::HeadLine)
@@ -472,27 +468,23 @@ namespace Sentry
 			}
 			if (this->mState == HttpDecodeState::Content)
 			{
-                size_t len = this->mRoute.size();
 				if (this->mHttpData.mMethod == "GET")
 				{
 					size_t pos = this->mUrl.find("?");
 					if (pos != std::string::npos)
 					{
                         this->mHttpData.mData = this->mUrl.substr(pos + 1);
-                        this->mHttpData.mPath = this->mUrl.substr(len, pos - len);
+                        this->mHttpData.mPath = this->mUrl.substr(0, pos);
                         return 0;
 					}
-                    else
-                    {
-                        this->mHttpData.mPath = this->mUrl.substr(len);
-                    }
-					return 0;
+                    this->mHttpData.mPath = this->mUrl;
+                    return 0;
 				}
 				else if (this->mHttpData.mMethod != "POST")
 				{
 					return -2;
 				}
-                this->mHttpData.mPath = this->mUrl.substr(len);
+                this->mHttpData.mPath = this->mUrl;
                 return 1; //读一部分
 			}
 		}
