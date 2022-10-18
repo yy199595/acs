@@ -53,12 +53,30 @@ namespace Client
         {
             case (int)Tcp::Type::Request:
             {
-
+                std::string func;
+                if(message->GetHead().Get("func", func))
+                {
+                    LOG_ERROR("server request client func : [" << func << "]");
+                }
+            }
+                return;
+            case (int)Tcp::Type::Broadcast:
+            {
+                std::string func;
+                if(message->GetHead().Get("func", func))
+                {
+                    LOG_ERROR("server broadcast client func : [" << func << "]");
+                }
             }
                 return;
             case (int)Tcp::Type::Response:
             {
                 long long rpcId = 0;
+                std::string func;
+                if(message->GetHead().Get("func", func))
+                {
+                    LOG_ERROR("call func : [" << func << "] response");
+                }
                 if (message->GetHead().Get("rpc", rpcId))
                 {
                     this->OnResponse(rpcId, message);

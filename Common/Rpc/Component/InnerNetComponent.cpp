@@ -192,16 +192,13 @@ namespace Sentry
 
 	bool InnerNetComponent::OnResponse(const std::string& address, std::shared_ptr<Rpc::Data> message)
 	{
+        std::string targer;
         const Rpc::Head &head = message->GetHead();
-        if(this->mOuterComponent != nullptr)
+        if(this->mOuterComponent != nullptr && head.Get("resp", targer))
         {
-            std::string address;
-            if (head.Get("resp", address)) //address
-            {
-                message->GetHead().Remove("resp");
-                this->mOuterComponent->SendData(address, message);
-                return true;
-            }
+            message->GetHead().Remove("resp");
+            this->mOuterComponent->SendData(targer, message);
+            return true;
         }
 #ifdef __DEBUG__
         int code = 0;

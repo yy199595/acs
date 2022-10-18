@@ -104,7 +104,6 @@ namespace Sentry
             this->mRpcClientComponent->Send(address, message);
             return;
         }
-        this->OnResponse(rpcId, message); //本地调用
     }
 
     std::shared_ptr<Rpc::Data> InnerNetMessageComponent::Call(

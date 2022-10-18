@@ -51,6 +51,7 @@ function AccountService.Login(request)
     if code ~= XCode.Successful then
         return XCode.AllotUser
     end
+    table.print(response)
     local ip, _ = StringUtil.ParseAddress(request.address)
     MongoComponent.Update("user.account", { _id = loginInfo.account },
                 {  last_login_time = os.time(), last_login_ip = ip,  token = response.token })
