@@ -11,6 +11,7 @@ namespace Sentry
 		{
 			return false;
 		}
+        this->mIsClient = false;
 		this->mMethodConfigs.clear();
         this->mType = json["Type"].GetString();
 		auto iter = json.MemberBegin();
@@ -33,6 +34,10 @@ namespace Sentry
                 if (jsonValue.HasMember("Response"))
                 {
                     serviceConfog->Response = jsonValue["Response"].GetString();
+                }
+                if(!this->mIsClient && serviceConfog->Type == "Client")
+                {
+                    this->mIsClient = true;
                 }
                 serviceConfog->FullName = fmt::format("{0}.{1}", this->GetName(), name);
                 this->mMethodConfigs.emplace(name, std::move(serviceConfog));

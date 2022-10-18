@@ -28,8 +28,6 @@ namespace Sentry
         const ServerConfig * config = ServerConfig::Inst();
         BIND_COMMON_RPC_METHOD(OuterService::Ping);
         BIND_COMMON_RPC_METHOD(OuterService::AllotUser);
-        BIND_COMMON_RPC_METHOD(OuterService::SaveAddress);
-        BIND_COMMON_RPC_METHOD(OuterService::QueryAddress);
         LOG_CHECK_RET_FALSE(config->GetLocation("gate", this->mAddress));
         this->mOuterComponent = this->GetComponent<OuterNetMessageComponent>();
 		return this->GetComponent<OuterNetComponent>()->StartListen("gate");
@@ -57,14 +55,4 @@ namespace Sentry
         response.set_address(this->mAddress);
         return XCode::Successful;
     }
-
-	XCode OuterService::QueryAddress(long long userId, const com::type::string& request, com::type::string& response)
-	{
-		return XCode::Successful;
-	}
-
-	XCode OuterService::SaveAddress(long long userId, const s2s::allot::save& request)
-	{
-		return XCode::Successful;
-	}
 }

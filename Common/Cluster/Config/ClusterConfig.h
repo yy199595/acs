@@ -21,6 +21,7 @@ namespace Sentry
         bool OnLoadConfig(const rapidjson::Value & value);
     public:
         bool IsStart(const std::string & service) const;
+        bool HasService(const std::string & service) const;
         bool IsAuthAllot() const { return this->mIsAutoAllot; }
         const std::string & GetName() const { return this->mName;}
         const std::string & GetMainLua() const { return this->mLua ;}

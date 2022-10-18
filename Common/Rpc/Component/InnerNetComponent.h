@@ -24,7 +24,7 @@ namespace Sentry
 	 public:
         const std::string & GetUser() const { return this->mUserName; };
         const std::string & GetPassword() const { return this->mPassword; }
-        const InnerClienData * GetSeverInfo(const std::string & address);
+        const ServiceNodeInfo * GetSeverInfo(const std::string & address);
 	 public:
         InnerNetClient * GetSession(const std::string& address);
         InnerNetClient * GetOrCreateSession(const std::string& address);
@@ -44,6 +44,6 @@ namespace Sentry
         class InnerNetMessageComponent* mMessageComponent;
         std::unordered_map<std::string, std::string> mUserMaps;
         std::unordered_map<std::string, std::shared_ptr<InnerNetClient>> mRpcClientMap;
-        std::unordered_map<std::string, std::unique_ptr<InnerClienData>> mLocationMaps;
+        std::unordered_map<std::string, std::unique_ptr<ServiceNodeInfo>> mLocationMaps;
     };
 }

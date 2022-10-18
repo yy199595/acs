@@ -14,9 +14,7 @@ namespace Sentry
 		~OuterService() final = default;
 	 private:
 		XCode Ping(long long userId);
-		XCode SaveAddress(long long userId, const s2s::allot::save &request);
         XCode AllotUser(const com::type::int64 & userId, s2s::allot::response & response);
-		XCode QueryAddress(long long userId, const com::type::string &request, com::type::string & response); //查询玩家服务地址
 	private:
 		bool Awake() final;
 		bool OnStart() final;

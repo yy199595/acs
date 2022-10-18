@@ -116,13 +116,14 @@ namespace Sentry
         virtual void OnMessage(const std::string & address, std::shared_ptr<T> message) = 0;
     };
 
-    class InnerClienData
+    class ServiceNodeInfo
     {
     public:
         std::string SrvName;
         std::string UserName;
         std::string PassWord;
-        std::string Location;
+        std::string LocationRpc;
+        std::string LocationHttp;
     };
 
 	template<typename T1, typename T2>

@@ -1,14 +1,19 @@
 
 ChatService = {}
-local messageComponent = App.GetComponent("MessageComponent")
-local gateComponent = App.GetComponent("GateAgentComponent")
+local messageComponent = App.GetComponent("ProtoComponent")
+local gateComponent = App.GetComponent("GateHelperComponent")
+
+function ChatService.Awake()
+    assert(gateComponent)
+    assert(messageComponent)
+    return true
+end
 
 function ChatService.OnServiceStart()
     print("启动聊天服务")
 end
 
 ChatService.Chat = function(id, request)
-    coroutine.sleep(0.1)
 
     local chatMessage = messageComponent:New("c2s.chat.notice", {
         msg_type = request.msg_type,

@@ -29,8 +29,9 @@ namespace Sentry
         std::string mSrvName;
         std::string mUserName;
         std::string mPassword;
-        std::string mLocation;
         Tcp::DecodeState mState;
+        std::string mRpcLocation;
+        std::string mHttpLocation;
         IRpc<Rpc::Data> * mComponent;
         std::shared_ptr<Rpc::Data> mMessage;
         std::shared_ptr<asio::steady_timer> mTimer;

@@ -118,22 +118,31 @@ namespace Sentry
     bool InnerNetComponent::OnAuth(const std::string & address, std::shared_ptr<Rpc::Data> message)
     {
         const Rpc::Head &head = message->GetHead();
-        std::unique_ptr<InnerClienData> serverNode(new InnerClienData());
+        std::unique_ptr<ServiceNodeInfo> serverNode(new ServiceNodeInfo());
+
+        head.Get("rpc", serverNode->LocationRpc);
+        head.Get("http", serverNode->LocationHttp);
         LOG_CHECK_RET_FALSE(head.Get("name", serverNode->SrvName));
         LOG_CHECK_RET_FALSE(head.Get("user", serverNode->UserName));
         LOG_CHECK_RET_FALSE(head.Get("passwd", serverNode->PassWord));
-        LOG_CHECK_RET_FALSE(head.Get("location", serverNode->Location));
-        auto iter = this->mUserMaps.find(serverNode->UserName);
-        if (iter == this->mUserMaps.end() || iter->second != serverNode->PassWord)
+        if(serverNode->LocationRpc.empty() && serverNode->LocationHttp.empty())
         {
-            CONSOLE_LOG_ERROR(address << " auth failure");
             return false;
+        }
+        if(!this->mUserMaps.empty())
+        {
+            auto iter = this->mUserMaps.find(serverNode->UserName);
+            if (iter == this->mUserMaps.end() || iter->second != serverNode->PassWord)
+            {
+                CONSOLE_LOG_ERROR(address << " auth failure");
+                return false;
+            }
         }
         this->mLocationMaps.emplace(address, std::move(serverNode));
         return true;
     }
 
-    const InnerClienData *InnerNetComponent::GetSeverInfo(const std::string &address)
+    const ServiceNodeInfo *InnerNetComponent::GetSeverInfo(const std::string &address)
     {
         auto iter = this->mLocationMaps.find(address);
         return iter != this->mLocationMaps.end() ? iter->second.get() : nullptr;
@@ -176,7 +185,7 @@ namespace Sentry
     {
         LOG_CHECK_RET_FALSE(this->mOuterComponent != nullptr);
         LOG_CHECK_RET_FALSE(message->GetHead().Has("func"));
-        message->SetType(Tcp::Type::Request);
+        message->SetType(Tcp::Type::Broadcast);
         message->GetHead().Remove("address");
         return this->mOuterComponent->SendData(message);
     }
@@ -293,8 +302,6 @@ namespace Sentry
 
 	bool InnerNetComponent::Send(const std::string & address, std::shared_ptr<Rpc::Data> message)
 	{
-        assert(message->GetType() == (int)Tcp::Type::Request
-            || message->GetType() == (int)Tcp::Type::Response);
         InnerNetClient * clientSession = this->GetOrCreateSession(address);
 		if (message == nullptr || clientSession == nullptr)
 		{

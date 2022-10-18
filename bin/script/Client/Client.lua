@@ -36,18 +36,11 @@ function Client.Start()
         Log.Error("user auth failure")
         return false
     end
-    coroutine.start(LoopPing)
+    coroutine.start(LoopCall)
     return true
 end
 local callCount = 0
 
-function LoopPing()
-    while true do
-        local t1 = Time.GetNowMilTime()
-        local code = clientComponent:Call("OuterService.Ping")
-        Log.Info("ping use time ", Time.GetNowMilTime() - t1)
-    end
-end
 
 function LoopCall()
     while true do

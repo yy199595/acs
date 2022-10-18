@@ -1,28 +1,11 @@
 {
 	"OuterService": {
 		"Type": "rpc",
-		"Ping": {
-			"Async": true,
-			"Type": "Client",
-			"CallWay": "Net"
-		},
 		"AllotUser": {
 			"Async": false,
 			"Type": "Server",
-			"CallWay": "Net",
 			"Request": "com.type.int64",
 			"Response": "s2s.allot.response"
-		},
-		"SaveAddress": {
-			"Async": false,
-			"Type": "Server",
-			"Request": "s2s.allot.save"
-		},
-		"QueryAddress": {
-			"Async": false,
-			"Type": "Server",
-			"Request": "com.type.string",
-			"Response": "com.type.string"
 		}
 	},
 	"MysqlService": {
@@ -131,7 +114,7 @@
 	"ChatService": {
 		"Type": "rpc",
 		"Chat": {
-			"Async": true,
+			"Async": false,
 			"Type": "Client",
 			"CallWay": "Net",
 			"Request": "c2s.chat.request"

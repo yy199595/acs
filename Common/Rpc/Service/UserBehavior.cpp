@@ -45,12 +45,13 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-        const InnerClienData * serverInfo = this->mInnerNetComponent->GetSeverInfo(address);
+        const ServiceNodeInfo * serverInfo = this->mInnerNetComponent->GetSeverInfo(address);
         if(serverInfo == nullptr)
         {
             return XCode::Failure;
         }
-		LocationUnit * locationUnit = this->mLocationComponent->AddLocationUnit(request.user_id());
+        long long userId = 0;
+		LocationUnit * locationUnit = this->mLocationComponent->AddLocationUnit(userId, address);
 		if(locationUnit != nullptr)
 		{
 			

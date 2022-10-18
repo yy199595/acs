@@ -80,6 +80,12 @@ namespace Sentry
         return components.size();
     }
 
+    bool NodeConfig::HasService(const std::string &service) const
+    {
+        auto iter = this->mServices.find(service);
+        return iter != this->mServices.end() && iter->second;
+    }
+
     size_t NodeConfig::GetServices(std::vector<std::string> &services, bool start) const
     {
         for(auto & value : this->mServices)

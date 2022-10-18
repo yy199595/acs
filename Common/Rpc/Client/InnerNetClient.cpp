@@ -7,13 +7,14 @@ namespace Sentry
 	InnerNetClient::InnerNetClient(IRpc<Rpc::Data> * component,
                                    std::shared_ptr<SocketProxy> socket)
 		: TcpContext(socket, 1024 * 1024), mComponent(component)
-	{
+    {
         this->mSrvName = System::GetName();
         this->mState = Tcp::DecodeState::Head;
-        ServerConfig::Inst()->GetLocation("rpc", this->mLocation);
+        ServerConfig::Inst()->GetLocation("rpc", this->mRpcLocation);
+        ServerConfig::Inst()->GetLocation("http", this->mHttpLocation);
         ServerConfig::Inst()->GetMember("user", "name", this->mUserName);
         ServerConfig::Inst()->GetMember("user", "passwd", this->mPassword);
-	}
+    }
 
 	void InnerNetClient::StartClose()
 	{
@@ -140,7 +141,14 @@ namespace Sentry
             authMessage->GetHead().Add("name", this->mSrvName);
             authMessage->GetHead().Add("user", this->mUserName);
             authMessage->GetHead().Add("passwd", this->mPassword);
-            authMessage->GetHead().Add("location", this->mLocation);
+            if(!this->mRpcLocation.empty())
+            {
+                authMessage->GetHead().Add("rpc", this->mRpcLocation);
+            }
+            if(!this->mHttpLocation.empty())
+            {
+                authMessage->GetHead().Add("http", this->mHttpLocation);
+            }
         }
         if(this->SendSync(authMessage) > 0)
         {

@@ -89,25 +89,25 @@ namespace Sentry
         ClusterConfig::Inst()->GetNodeConfigs(nodeConfigs);
         for(const NodeConfig * nodeConfig : nodeConfigs)
         {
-            if (!nodeConfig->IsAuthAllot())
+            services.clear();
+            if (!nodeConfig->IsAuthAllot() || nodeConfig->GetServices(services) <= 0)
             {
                 continue;
             }
-            if (nodeConfig->GetServices(services) > 0)
+
+            std::string location;
+            for (const std::string &service: services)
             {
-                std::string location;
-                for (const std::string &service: services)
+                const RpcServiceConfig *rpcServiceConfig = RpcConfig::Inst()->GetConfig(service);
+                if (rpcServiceConfig == nullptr || !rpcServiceConfig->IsClient())
                 {
-                    if (RpcConfig::Inst()->GetConfig(service) == nullptr)
-                    {
-                        continue;
-                    }
-                    if (location.empty() && !this->mLocationComponent->AllotLocation(service, location))
-                    {
-                        return XCode::NetWorkError;
-                    }
-                    locationUnit->Add(service, location);
+                    continue;
                 }
+                if (location.empty() && !this->mLocationComponent->AllotLocation(service, location))
+                {
+                    return XCode::NetWorkError;
+                }
+                locationUnit->Add(service, location);
             }
         }
         return XCode::Successful;
