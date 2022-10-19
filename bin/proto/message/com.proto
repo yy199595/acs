@@ -25,6 +25,10 @@ message array
      {
           repeated double array = 1;
      }
+    message any
+    {
+        repeated google.protobuf.Any array = 2;
+    }
 }
 
 message type

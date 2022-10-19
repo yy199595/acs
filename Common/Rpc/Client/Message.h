@@ -6,6 +6,7 @@
 #define APP_MESSAGE_H
 #include"Rpc.h"
 #include<string>
+#include<vector>
 #include"XCode/XCode.h"
 #include<unordered_map>
 #include"Log/CommonLogDef.h"
@@ -24,6 +25,8 @@ namespace Rpc
         bool Get(const std::string &key, long long &value) const;
 
         bool Get(const std::string &key, std::string &value) const;
+
+        bool Get(std::vector<std::string> & keys) const;
 
     public:
         size_t GetLength() const;

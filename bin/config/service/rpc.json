@@ -59,19 +59,15 @@
 		}
 	},
 	"UserBehavior": {
-		"Push": {
-			"Async": false,
-			"Type": "Server"
-		},
 		"Login": {
 			"Async": false,
 			"Type": "Server",
-			"Request": "s2s.location.sync"
+			"Request": "s2s.user.login"
 		},
 		"Logout": {
 			"Async": false,
 			"Type": "Server",
-			"Request": "s2s.location.sync"
+			"Request": "s2s.user.logout"
 		}
 	},
 	"MongoService": {

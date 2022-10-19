@@ -36,7 +36,7 @@ namespace Sentry
         LOG_CHECK_RET_FALSE(config->GetMember("user", "passwd", this->mPassword));
         LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<NetThreadComponent>());
         LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>());
-		return true;
+		return this->StartListen("rpc");
 	}
 
     void InnerNetComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Packet> message)

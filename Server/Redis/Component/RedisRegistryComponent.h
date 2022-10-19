@@ -43,7 +43,7 @@ namespace Sentry
 	 public:
 		bool LateAwake() final;
 		void OnDestory() final;
-		void OnComplete() final;
+		void OnLocalComplete() final;
         void OnSecondUpdate(const int tick) final;
 	 private:
 		void OnAddService(const std::string & name) final;

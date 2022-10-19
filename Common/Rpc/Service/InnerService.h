@@ -17,6 +17,8 @@ namespace Sentry
         XCode Stop();
         XCode Hotfix();
         XCode LoadConfig();
+        XCode Join(const s2s::cluster::join & request); //新服务器加入
+        XCode Exit(const s2s::cluster::exit & response); //新服务器加入
     private:
         bool Awake();
         bool OnStart() final;

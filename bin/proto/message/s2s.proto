@@ -1,9 +1,32 @@
 syntax = "proto3";
 package s2s;
-import "google/protobuf/any.proto";
+message cluster
+{
+    message join
+    {
+        string name = 1;
+        string rpc = 2;
+        string http = 3;
+    }
+    message exit
+    {
+        string name = 1;
+        string rpc = 2;
+        string http = 3;
+    }
+}
 
-
-//网关
+message user
+{
+    message login
+    {
+        int64 user_id = 1;
+    }
+    message logout
+    {
+        int64 user_id = 1;
+    }
+}
 
 message allot
 {
@@ -17,48 +40,5 @@ message allot
     {
         string service = 1;
         string address = 2;
-    }
-}
-
-message node_info
-{
-    string address = 1;
-    repeated string services = 2;
-}
-
-message broadcast
-{
-    message request
-    {
-        string func = 1;
-        google.protobuf.Any data = 2;
-    }
-    message response
-    {
-        int32 count = 1;
-    }
-}
-
-message location
-{
-    message sync
-    {
-        string name = 1;
-        int64 user_id = 2;
-    }
-    message push
-    {
-        string name = 1;
-        int64 user_id = 2;
-        string address = 3;
-    }
-}
-
-message client
-{
-    message call
-    {
-        string func = 1;
-        google.protobuf.Any data = 2;
     }
 }

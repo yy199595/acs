@@ -24,20 +24,27 @@ namespace Sentry
     bool InnerService::OnStart()
     {
         BIND_COMMON_RPC_METHOD(InnerService::Ping);
+        BIND_COMMON_RPC_METHOD(InnerService::Join);
+        BIND_COMMON_RPC_METHOD(InnerService::Exit);
         BIND_COMMON_RPC_METHOD(InnerService::Stop);
         BIND_COMMON_RPC_METHOD(InnerService::Hotfix);
         BIND_COMMON_RPC_METHOD(InnerService::LoadConfig);
-        RedisSubComponent *subComponent = this->GetComponent<RedisSubComponent>();
-        RedisDataComponent *dataComponent = this->GetComponent<RedisDataComponent>();
-        InnerNetComponent *listenComponent = this->GetComponent<InnerNetComponent>();
-
-        LOG_CHECK_RET_FALSE(subComponent && subComponent->StartConnectRedis());
-        LOG_CHECK_RET_FALSE(dataComponent && dataComponent->StartConnectRedis());
-        LOG_CHECK_RET_FALSE(listenComponent && listenComponent->StartListen("rpc"));
+        LOG_CHECK_RET_FALSE(this->GetComponent<RedisSubComponent>()->StartConnectRedis());
+        LOG_CHECK_RET_FALSE(this->GetComponent<RedisDataComponent>()->StartConnectRedis());
         return true;
     }
 
     XCode InnerService::Ping()
+    {
+        return XCode::Successful;
+    }
+
+    XCode InnerService::Join(const s2s::cluster::join &request)
+    {
+        return XCode::Successful;
+    }
+
+    XCode InnerService::Exit(const s2s::cluster::exit &response)
     {
         return XCode::Successful;
     }

@@ -23,6 +23,16 @@ namespace Rpc
         return this->Add(key, (int)value);
     }
 
+    bool Head::Get(std::vector<std::string> &keys) const
+    {
+        auto iter = this->begin();
+        for(; iter != this->end(); iter++)
+        {
+            keys.emplace_back(iter->first);
+        }
+        return !keys.empty();
+    }
+
 
     bool Head::Get(const std::string &key, int &value) const
     {

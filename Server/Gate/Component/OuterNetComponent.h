@@ -12,7 +12,7 @@ namespace Sentry
 {
 
 	class OuterNetClient;
-	class OuterNetComponent : public TcpListenerComponent, public IRpc<Rpc::Packet>
+    class OuterNetComponent : public TcpListenerComponent, public IRpc<Rpc::Packet>, public IComplete
 	{
 	 public:
 		OuterNetComponent() = default;
@@ -31,6 +31,7 @@ namespace Sentry
 		bool Awake() final;
 		bool LateAwake() final;
         void OnDestory() final;
+        void OnClusterComplete() final;
 	 private:
         bool OnListen(std::shared_ptr<SocketProxy> socket) final;
         bool OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message);

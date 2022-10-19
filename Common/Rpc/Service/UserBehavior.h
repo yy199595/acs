@@ -13,9 +13,8 @@ namespace Sentry
         UserBehavior() = default;
         ~UserBehavior() = default;
     private:
-        XCode Push(const s2s::location::push & request);
-        XCode Login(const Rpc::Head & head, const s2s::location::sync & request);
-        XCode Logout(const Rpc::Head & head, const s2s::location::sync & request);
+        XCode Login(const Rpc::Head & head, const s2s::user::login & request);
+        XCode Logout(const Rpc::Head & head, const s2s::user::logout & request);
     private:
         bool Awake() final;
         bool OnStart() final;

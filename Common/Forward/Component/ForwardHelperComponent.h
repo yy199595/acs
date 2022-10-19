@@ -8,12 +8,13 @@
 #include"Component/Component.h"
 namespace Sentry
 {
-    class ForwardHelperComponent final : public Component
+    class ForwardHelperComponent final : public Component, public IStart
     {
     public:
         ForwardHelperComponent() = default;
         ~ForwardHelperComponent() = default;
     private:
+        bool Start() final;
         bool LateAwake() final;
     public:
         bool AllotLocation(std::string & address);

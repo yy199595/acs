@@ -95,7 +95,7 @@ namespace Sentry
 		return this->mLocationComponent->DelLocation(service, address);
     }
 
-	void RedisRegistryComponent::OnComplete()//通知其他服务器 我加入了
+	void RedisRegistryComponent::OnLocalComplete()//通知其他服务器 我加入了
     {
         std::shared_ptr<RedisResponse> response1 =
                 this->mRedisComponent->RunCommand("main", "SMEMBERS", this->mRpcAddress);

@@ -5,11 +5,13 @@
 #include"ForwardComponent.h"
 #include"Component/LocationComponent.h"
 #include"Component/NetThreadComponent.h"
+#include"Component/ForwarMessageComponent.h"
 namespace Sentry
 {
     bool ForwardComponent::LateAwake()
     {
         this->mLocationComponent = this->GetComponent<LocationComponent>();
+        this->mMessageComponent = this->GetComponent<ForwarMessageComponent>();
         return this->StartListen("forward");
     }
 
@@ -45,12 +47,14 @@ namespace Sentry
         {
             case Tcp::Type::Auth:
 			{
-				if(!this->OnAuth(address, message))
-				{
-					this->StartClose(address);
-					LOG_ERROR(address << " auth failure");
-				}
-			}
+                if(this->mMessageComponent->OnAuth(message) != XCode::Successful)
+                {
+                    this->StartClose(address);
+                    LOG_ERROR(address << " auth failure");
+                    return;
+                }
+                this->mAuthClients.insert(address);
+            }
                 break;
             case Tcp::Type::Request:
             {
@@ -94,22 +98,6 @@ namespace Sentry
         }
     }
 
-	bool ForwardComponent::OnAuth(const std::string& address, std::shared_ptr<Rpc::Packet> message)
-	{
-		if(this->mAuthClients.find(address) != this->mAuthClients.end())
-		{
-			return true;
-		}
-		std::string user, passwd, location, name;
-		const Rpc::Head & head = message->GetHead();
-		LOG_CHECK_RET_FALSE(head.Get("user", user));
-        LOG_CHECK_RET_FALSE(head.Get("name", name));
-        LOG_CHECK_RET_FALSE(head.Get("passwd", passwd));
-        LOG_CHECK_RET_FALSE(head.Get("location", location));
-        this->mAuthClients.insert(address);
-		return true;
-	}
-
     XCode ForwardComponent::OnRequest(std::shared_ptr<Rpc::Packet> message)
     {
         std::string target;
@@ -132,8 +120,33 @@ namespace Sentry
             return this->SendData(target, message)
                    ? XCode::Successful : XCode::NetWorkError;
         }
-
+        else
+        {
+            XCode code = this->mMessageComponent->OnMessage(message);
+            {
+                if (message->GetHead().Has("rpc"))
+                {
+                    message->GetHead().Add("code", code);
+                    this->OnResponse(message);
+                }
+            }
+        }
         return XCode::Successful;
+    }
+
+    int ForwardComponent::Broadcast(std::shared_ptr<Rpc::Packet> message)
+    {
+        int count = 0;
+        for(const std::string & address : this->mAuthClients)
+        {
+            InnerNetClient * netClient = this->GetClient(address);
+            if(netClient != nullptr)
+            {
+                count++;
+                netClient->SendData(message);
+            }
+        }
+        return count;
     }
 
     bool ForwardComponent::SendData(const std::string &address, std::shared_ptr<Rpc::Packet> message)

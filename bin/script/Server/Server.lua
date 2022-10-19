@@ -38,7 +38,7 @@ function Server.StartInsert()
     end
 end
 
-function Server.AllServiceStart()
+function Server.OnClusterComplete()
 
     MysqlComponent.Create("user.account_info", {"account"})
 

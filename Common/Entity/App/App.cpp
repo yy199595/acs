@@ -22,6 +22,7 @@ namespace Sentry
         this->mFps = 15;
         this->mTickCount = 0;
 		this->mLogicRunCount = 0;
+        this->mStartTimer = 0;
 		this->mTimerComponent = nullptr;
         this->mThreadId = std::this_thread::get_id();
 	}
@@ -86,19 +87,20 @@ namespace Sentry
             return -1;
         }
         System::Init(argv);
-		if(!this->LoadComponent())
+        this->mMainThread = new Asio::Context();
+        std::unique_ptr<Asio::ContextWork> work(new Asio::ContextWork (*mMainThread));
+
+        if(!this->LoadComponent())
 		{
 			this->GetLogger()->SaveAllLog();
 			return -1;
 		}
-		this->mLogicUpdateInterval = 1000 / this->mFps;
+        const std::chrono::milliseconds sleepTime(1);
+        this->mLogicUpdateInterval = 1000 / this->mFps;
 		this->mStartTime = Helper::Time::GetNowMilTime();
 		this->mSecondTimer = Helper::Time::GetNowMilTime();
 		this->mLastUpdateTime = Helper::Time::GetNowMilTime();
 
-        std::chrono::milliseconds time(1);
-        this->mMainThread = new Asio::Context ();
-        Asio::ContextWork * work = new Asio::ContextWork (*mMainThread);
         while(!this->mMainThread->stopped())
         {
             Asio::Code err;
@@ -108,9 +110,8 @@ namespace Sentry
                 CONSOLE_LOG_ERROR(err.message());
             }
             this->LogicMainLoop();
-            std::this_thread::sleep_for(time);
+            std::this_thread::sleep_for(sleepTime);
         }
-        delete work;
 		return 0;
 	}
 
@@ -122,12 +123,15 @@ namespace Sentry
 
 	void App::LogicMainLoop()
 	{
-		this->mStartTimer = Helper::Time::GetNowMilTime();
 		for (ISystemUpdate* component: this->mSystemUpdateManagers)
 		{
 			component->OnSystemUpdate();
 		}
-
+        if(this->mStartTimer == 0)
+        {
+            return;
+        }
+        this->mStartTimer = Helper::Time::GetNowMilTime();
 		if (this->mStartTimer - mLastUpdateTime >= this->mLogicUpdateInterval)
 		{
 			this->mLogicRunCount++;
@@ -186,9 +190,10 @@ namespace Sentry
             IComplete *complete = this->GetComponent<IComplete>(name);
             if(complete != nullptr)
             {
-                complete->OnComplete();
+                complete->OnLocalComplete();
             }
         }
+        this->mStartTimer = Helper::Time::GetNowMilTime();
         this->WaitAllServiceStart();
     }
 
@@ -209,7 +214,7 @@ namespace Sentry
         this->GetComponents<IComplete>(completeComponents);
         for (IComplete* complete: completeComponents)
         {
-            complete->OnAllServiceStart();
+            complete->OnClusterComplete();
         }
 		long long t = Helper::Time::GetNowMilTime() - this->mStartTime;
 		LOG_INFO("===== start " << System::GetName() << " successful [" << t / 1000.0f << "]s ===========");

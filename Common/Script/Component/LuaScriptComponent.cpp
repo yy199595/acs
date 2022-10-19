@@ -131,7 +131,7 @@ namespace Sentry
 		return true;
 	}
 
-	void LuaScriptComponent::OnComplete()
+	void LuaScriptComponent::OnLocalComplete()
 	{
         if(this->mMainTable && this->mMainTable->GetFunction("Complete"))
         {
@@ -143,9 +143,9 @@ namespace Sentry
         }
 	}
 
-	void LuaScriptComponent::OnAllServiceStart()
+	void LuaScriptComponent::OnClusterComplete()
 	{
-        if(this->mMainTable && this->mMainTable->GetFunction("AllServiceStart"))
+        if(this->mMainTable && this->mMainTable->GetFunction("OnClusterComplete"))
         {
             WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv);
             if(luaTaskSource != nullptr)

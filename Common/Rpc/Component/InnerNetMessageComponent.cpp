@@ -11,6 +11,7 @@ namespace Sentry
 {
 	bool InnerNetMessageComponent::Awake()
 	{
+        this->mIsComplete = false;
 		this->mTaskComponent = nullptr;
 		this->mTimerComponent = nullptr;
 		this->mRpcClientComponent = nullptr;
@@ -39,18 +40,16 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-
-		RpcService * logicService = this->mApp->GetService(methodConfig->Service);
-		if (logicService == nullptr || !logicService->IsStartService())
-		{
+        if(this->mApp->GetService(methodConfig->Service) == nullptr)
+        {
             LOG_ERROR("call service not exist : [" << methodConfig->Service << "]");
-			return XCode::CallServiceNotFound;
-		}
+            return XCode::CallServiceNotFound;
+        }
         this->mWaitMessages.push(std::move(message));
 		return XCode::Successful;
 	}
 
-    void InnerNetMessageComponent::OnSystemUpdate()
+    void InnerNetMessageComponent::OnFrameUpdate(float t)
     {
         size_t count = 0;
         while(!this->mWaitMessages.empty() && count <= MAX_HANDLER_MSG_COUNT)

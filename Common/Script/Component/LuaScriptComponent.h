@@ -21,8 +21,8 @@ namespace Sentry
         void OnHotFix() final;
 		bool LateAwake() final;
 		void OnDestory() final;
-		void OnComplete() final;
-		void OnAllServiceStart() final;
+		void OnLocalComplete() final;
+		void OnClusterComplete() final;
 	 private:
 		bool LoadAllFile();
         void AddRequire(const std::string & path);

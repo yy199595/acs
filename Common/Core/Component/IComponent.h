@@ -17,8 +17,8 @@ namespace Sentry
 	class IComplete
 	{
 	public:
-		virtual void OnComplete() { };
-		virtual void OnAllServiceStart() { }
+		virtual void OnLocalComplete() { }; //本机所有服务启动完毕
+		virtual void OnClusterComplete() { } //集群内所有服务启动完毕
 	};
 
 	class IFrameUpdate

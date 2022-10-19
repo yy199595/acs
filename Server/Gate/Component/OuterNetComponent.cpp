@@ -34,6 +34,16 @@ namespace Sentry
 		return true;
 	}
 
+    void OuterNetComponent::OnClusterComplete()
+    {
+        if(!this->StartListen("gate"))
+        {
+            LOG_FATAL("listen gate failure");
+            return;
+        }
+        LOG_INFO("wait client connect to gate ....");
+    }
+
 	void OuterNetComponent::OnMessage(const std::string& address, std::shared_ptr<Rpc::Packet> message)
     {
         switch ((Tcp::Type) message->GetType())

@@ -45,7 +45,7 @@ struct TableStruct_com_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[16]
+  static const ::google::protobuf::internal::ParseTable schema[17]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -56,6 +56,9 @@ namespace com {
 class array;
 class arrayDefaultTypeInternal;
 extern arrayDefaultTypeInternal _array_default_instance_;
+class array_any;
+class array_anyDefaultTypeInternal;
+extern array_anyDefaultTypeInternal _array_any_default_instance_;
 class array_float32;
 class array_float32DefaultTypeInternal;
 extern array_float32DefaultTypeInternal _array_float32_default_instance_;
@@ -105,6 +108,7 @@ extern type_stringDefaultTypeInternal _type_string_default_instance_;
 namespace google {
 namespace protobuf {
 template<> ::com::array* Arena::CreateMaybeMessage<::com::array>(Arena*);
+template<> ::com::array_any* Arena::CreateMaybeMessage<::com::array_any>(Arena*);
 template<> ::com::array_float32* Arena::CreateMaybeMessage<::com::array_float32>(Arena*);
 template<> ::com::array_float64* Arena::CreateMaybeMessage<::com::array_float64>(Arena*);
 template<> ::com::array_int32* Arena::CreateMaybeMessage<::com::array_int32>(Arena*);
@@ -730,6 +734,124 @@ class array_float64 :
 };
 // -------------------------------------------------------------------
 
+class array_any :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.array.any) */ {
+ public:
+  array_any();
+  virtual ~array_any();
+
+  array_any(const array_any& from);
+
+  inline array_any& operator=(const array_any& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  array_any(array_any&& from) noexcept
+    : array_any() {
+    *this = ::std::move(from);
+  }
+
+  inline array_any& operator=(array_any&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const array_any& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const array_any* internal_default_instance() {
+    return reinterpret_cast<const array_any*>(
+               &_array_any_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    5;
+
+  void Swap(array_any* other);
+  friend void swap(array_any& a, array_any& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline array_any* New() const final {
+    return CreateMaybeMessage<array_any>(nullptr);
+  }
+
+  array_any* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<array_any>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const array_any& from);
+  void MergeFrom(const array_any& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(array_any* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated .google.protobuf.Any array = 2;
+  int array_size() const;
+  void clear_array();
+  static const int kArrayFieldNumber = 2;
+  ::google::protobuf::Any* mutable_array(int index);
+  ::google::protobuf::RepeatedPtrField< ::google::protobuf::Any >*
+      mutable_array();
+  const ::google::protobuf::Any& array(int index) const;
+  ::google::protobuf::Any* add_array();
+  const ::google::protobuf::RepeatedPtrField< ::google::protobuf::Any >&
+      array() const;
+
+  // @@protoc_insertion_point(class_scope:com.array.any)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::google::protobuf::Any > array_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_com_2eproto;
+};
+// -------------------------------------------------------------------
+
 class array :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:com.array) */ {
  public:
@@ -768,7 +890,7 @@ class array :
                &_array_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   void Swap(array* other);
   friend void swap(array& a, array& b) {
@@ -828,6 +950,7 @@ class array :
   typedef array_string string;
   typedef array_float32 float32;
   typedef array_float64 float64;
+  typedef array_any any;
 
   // accessors -------------------------------------------------------
 
@@ -879,7 +1002,7 @@ class type_int32 :
                &_type_int32_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   void Swap(type_int32* other);
   friend void swap(type_int32& a, type_int32& b) {
@@ -991,7 +1114,7 @@ class type_int64 :
                &_type_int64_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   void Swap(type_int64* other);
   friend void swap(type_int64& a, type_int64& b) {
@@ -1103,7 +1226,7 @@ class type_float32 :
                &_type_float32_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   void Swap(type_float32* other);
   friend void swap(type_float32& a, type_float32& b) {
@@ -1215,7 +1338,7 @@ class type_float64 :
                &_type_float64_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   void Swap(type_float64* other);
   friend void swap(type_float64& a, type_float64& b) {
@@ -1327,7 +1450,7 @@ class type_json :
                &_type_json_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    11;
 
   void Swap(type_json* other);
   friend void swap(type_json& a, type_json& b) {
@@ -1447,7 +1570,7 @@ class type_string :
                &_type_string_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    12;
 
   void Swap(type_string* other);
   friend void swap(type_string& a, type_string& b) {
@@ -1567,7 +1690,7 @@ class type :
                &_type_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    13;
 
   void Swap(type* other);
   friend void swap(type& a, type& b) {
@@ -1703,7 +1826,7 @@ class http_data :
                &_http_data_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    15;
 
   void Swap(http_data* other);
   friend void swap(http_data& a, http_data& b) {
@@ -1899,7 +2022,7 @@ class http :
                &_http_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    16;
 
   void Swap(http* other);
   friend void swap(http& a, http& b) {
@@ -2180,6 +2303,37 @@ inline ::google::protobuf::RepeatedField< double >*
 array_float64::mutable_array() {
   // @@protoc_insertion_point(field_mutable_list:com.array.float64.array)
   return &array_;
+}
+
+// -------------------------------------------------------------------
+
+// array_any
+
+// repeated .google.protobuf.Any array = 2;
+inline int array_any::array_size() const {
+  return array_.size();
+}
+inline ::google::protobuf::Any* array_any::mutable_array(int index) {
+  // @@protoc_insertion_point(field_mutable:com.array.any.array)
+  return array_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::google::protobuf::Any >*
+array_any::mutable_array() {
+  // @@protoc_insertion_point(field_mutable_list:com.array.any.array)
+  return &array_;
+}
+inline const ::google::protobuf::Any& array_any::array(int index) const {
+  // @@protoc_insertion_point(field_get:com.array.any.array)
+  return array_.Get(index);
+}
+inline ::google::protobuf::Any* array_any::add_array() {
+  // @@protoc_insertion_point(field_add:com.array.any.array)
+  return array_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::google::protobuf::Any >&
+array_any::array() const {
+  // @@protoc_insertion_point(field_list:com.array.any.array)
+  return array_;
 }
 
 // -------------------------------------------------------------------
@@ -2672,6 +2826,8 @@ http_data::mutable_head() {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

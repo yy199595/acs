@@ -25,15 +25,18 @@ namespace Sentry
         XCode OnRequest(std::shared_ptr<Rpc::Packet> message);
 		XCode OnResponse(std::shared_ptr<Rpc::Packet> message);
 		XCode OnBroadcast(std::shared_ptr<Rpc::Packet> message);
-		bool OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message);
 	 private:
         bool IsAuth(const std::string & address) const;
         InnerNetClient * GetClient(const std::string & address);
 		InnerNetClient * GetOrCreateClient(const std::string & address);
+
+    public:
+        int Broadcast(std::shared_ptr<Rpc::Packet> message);
         bool SendData(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
         class LocationComponent * mLocationComponent;
         std::unordered_set<std::string> mAuthClients;
+        class ForwarMessageComponent * mMessageComponent;
         std::unordered_map<std::string, std::shared_ptr<InnerNetClient>> mInnerClients;
     };
 }

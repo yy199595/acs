@@ -30,7 +30,7 @@ namespace Sentry
         BIND_COMMON_RPC_METHOD(OuterService::AllotUser);
         LOG_CHECK_RET_FALSE(config->GetLocation("gate", this->mAddress));
         this->mOuterComponent = this->GetComponent<OuterNetMessageComponent>();
-		return this->GetComponent<OuterNetComponent>()->StartListen("gate");
+        return true;
 	}
 
     bool OuterService::OnClose()

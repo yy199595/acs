@@ -8,14 +8,20 @@ namespace Sentry
 {
     bool ForwardHelperComponent::LateAwake()
     {
+        const char * name = "ForwardServer";
         this->mInnerComponent = this->GetComponent<InnerNetComponent>();
-        const NodeConfig *nodeConfig = ClusterConfig::Inst()->GetConfig("ForwardServer");
+        const NodeConfig *nodeConfig = ClusterConfig::Inst()->GetConfig(name);
         if (nodeConfig == nullptr)
         {
             LOG_ERROR("not config cluster ForwardServer");
             return false;
         }
         return nodeConfig->GetLocations(this->mLocations);
+    }
+
+    bool ForwardHelperComponent::Start()
+    {
+        return true;
     }
 
     bool ForwardHelperComponent::SendData(std::shared_ptr<Rpc::Packet> message)
