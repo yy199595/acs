@@ -40,7 +40,7 @@ namespace Sentry
     private:
 		void LogicMainLoop();
 		void UpdateConsoleTitle();
-		void WaitAllServiceStart();
+		void WaitDepentServiceStart();
 	 private:
 		int mFps;
 		float mDeltaTime;

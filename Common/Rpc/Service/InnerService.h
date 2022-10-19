@@ -24,6 +24,7 @@ namespace Sentry
         bool OnStart() final;
         bool OnClose() final { return false; }
     private:
+        class LocationComponent * mLocationComponent;
     };
 }
 

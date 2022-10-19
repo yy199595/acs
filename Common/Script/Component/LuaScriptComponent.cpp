@@ -133,7 +133,7 @@ namespace Sentry
 
 	void LuaScriptComponent::OnLocalComplete()
 	{
-        if(this->mMainTable && this->mMainTable->GetFunction("Complete"))
+        if(this->mMainTable && this->mMainTable->GetFunction("OnLocalComplete"))
         {
             WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv);
             if(luaTaskSource != nullptr)

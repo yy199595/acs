@@ -19,9 +19,11 @@ namespace Sentry
         return nodeConfig->GetLocations(this->mLocations);
     }
 
-    bool ForwardHelperComponent::Start()
+    void ForwardHelperComponent::OnLocalComplete()
     {
-        return true;
+        std::string rpc, http;
+        ServerConfig::Inst()->GetLocation("rpc", rpc);
+        ServerConfig::Inst()->GetLocation("http", http);
     }
 
     bool ForwardHelperComponent::SendData(std::shared_ptr<Rpc::Packet> message)

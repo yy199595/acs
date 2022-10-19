@@ -161,43 +161,37 @@ namespace Sentry
 
 	void App::StartAllComponent()
     {
-        std::vector<std::string > components;
-        this->GetComponents(components);
-        for (const std::string &name: components)
+        std::vector<IStart*> startComponents;
+        this->GetComponents(startComponents);
+        for(IStart * component : startComponents)
         {
             ElapsedTimer timer;
-            IStart * component = this->GetComponent<IStart>(name);
-            if(component != nullptr)
+            const std::string & name = dynamic_cast<Component*>(component)->GetName();
+            long long timeId = this->mTimerComponent->DelayCall(10 * 1000, [name]()
             {
-                long long timeId = this->mTimerComponent->DelayCall(10 * 1000, [name]()
-                {
-                    LOG_FATAL(name << " start time out");
-                });
-                if(!component->Start())
-                {
-                    LOG_ERROR("start [" << name << "] failure");
-                    this->Stop();
-                    return;
-                }
-                this->mTimerComponent->CancelTimer(timeId);
-                LOG_DEBUG("start " << name << " successful use time = [" << timer.GetSecond() << "s]");
+                LOG_FATAL(name << " start time out");
+            });
+            if(!component->Start())
+            {
+                LOG_ERROR("start [" << name << "] failure");
+                this->Stop();
+                return;
             }
+            this->mTimerComponent->CancelTimer(timeId);
+            LOG_DEBUG("start " << name << " successful use time = [" << timer.GetSecond() << "s]");
         }
-
-        CONSOLE_LOG_DEBUG("start all component complete");
-        for (const std::string &name: components)
+        std::vector<IComplete *> completeComponents;
+        this->GetComponents(completeComponents);
+        for(IComplete * complete : completeComponents)
         {
-            IComplete *complete = this->GetComponent<IComplete>(name);
-            if(complete != nullptr)
-            {
-                complete->OnLocalComplete();
-            }
+            complete->OnLocalComplete();
         }
-        this->mStartTimer = Helper::Time::GetNowMilTime();
-        this->WaitAllServiceStart();
+        CONSOLE_LOG_DEBUG("start all component complete");
+        this->mStartTimer = 1; //开始帧循环
+        this->WaitDepentServiceStart();
     }
 
-	void App::WaitAllServiceStart()
+	void App::WaitDepentServiceStart() //等待依赖的服务启动完成
 	{
         std::vector<IServiceBase *> components;
         this->GetComponents<IServiceBase>(components);

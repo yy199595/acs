@@ -8,14 +8,14 @@
 #include"Component/Component.h"
 namespace Sentry
 {
-    class ForwardHelperComponent final : public Component, public IStart
+    class ForwardHelperComponent final : public Component, public IComplete
     {
     public:
         ForwardHelperComponent() = default;
         ~ForwardHelperComponent() = default;
     private:
-        bool Start() final;
         bool LateAwake() final;
+        void OnLocalComplete() final;
     public:
         bool AllotLocation(std::string & address);
         bool SendData(std::shared_ptr<Rpc::Packet> message);
