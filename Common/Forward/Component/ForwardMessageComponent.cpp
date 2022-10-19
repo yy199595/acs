@@ -1,22 +1,22 @@
 //
 // Created by zmhy0073 on 2022/10/19.
 //
-
-#include"ForwarMessageComponent.h"
+#include"Config/ClusterConfig.h"
+#include"ForwardMessageComponent.h"
 #include"Component/ForwardComponent.h"
 #include"Component/LocationComponent.h"
 namespace Sentry
 {
-    bool ForwarMessageComponent::LateAwake()
+    bool ForwardMessageComponent::LateAwake()
     {
-        this->Add("Allot", &ForwarMessageComponent::Allot);
-        this->Add("Remove", &ForwarMessageComponent::Remove);
+        this->Add("Allot", &ForwardMessageComponent::Allot);
+        this->Add("Remove", &ForwardMessageComponent::Remove);
         this->mForwardComponent = this->GetComponent<ForwardComponent>();
         this->mLocationComponent = this->GetComponent<LocationComponent>();
         return true;
     }
 
-    bool ForwarMessageComponent::Add(const std::string &name, MessageCallback &&func)
+    bool ForwardMessageComponent::Add(const std::string &name, MessageCallback &&func)
     {
         if(this->mHandlers.find(name) == this->mHandlers.end())
         {
@@ -26,7 +26,7 @@ namespace Sentry
         return true;
     }
 
-    XCode ForwarMessageComponent::OnMessage(std::shared_ptr<Rpc::Packet> message)
+    XCode ForwardMessageComponent::OnMessage(std::shared_ptr<Rpc::Packet> message)
     {
         std::string func;
         if(!message->GetHead().Get("func", func))
@@ -41,8 +41,10 @@ namespace Sentry
         return (this->*iter->second)(message);
     }
 
-    XCode ForwarMessageComponent::OnAuth(std::shared_ptr<Rpc::Packet> message)
+    XCode ForwardMessageComponent::OnAuth(std::shared_ptr<Rpc::Packet> message)
     {
+        std::string address;
+        message->GetHead().Get("address", address);
         std::unique_ptr<ServiceNodeInfo> serverNode(new ServiceNodeInfo());
         {
             const Rpc::Head &head = message->GetHead();
@@ -55,26 +57,33 @@ namespace Sentry
             {
                 return XCode::CallArgsError;
             }
+            if(ClusterConfig::Inst()->GetConfig(serverNode->SrvName) == nullptr)
+            {
+                LOG_ERROR("not find cluster config : " << serverNode->SrvName);
+                return XCode::Failure;
+            }
         }
 
-        std::shared_ptr<Rpc::Packet> brocast =
-            Rpc::Packet::New(Tcp::Type::Request, Tcp::Porto::Protobuf);
+        s2s::cluster::join request;
+        request.set_name(serverNode->SrvName);
+        request.set_rpc(serverNode->LocationRpc);
+        request.set_http(serverNode->LocationHttp);
+        this->mForwardComponent->Send("InnerService.Join", &request);
+
+        auto iter = this->mNodeInfos.begin();
+        for (; iter != this->mNodeInfos.end(); iter++)
         {
-            s2s::cluster::join request;
-            request.set_name(serverNode->SrvName);
-            request.set_rpc(serverNode->LocationRpc);
-            request.set_http(serverNode->LocationHttp);
-
-            brocast->WriteMessage(&request);
-            brocast->GetHead().Add("func", "InnerService.Join");
-            int count = this->mForwardComponent->Broadcast(brocast);
-            CONSOLE_LOG_INFO(serverNode->SrvName << " join message broadcast " << count);
+            request.Clear();
+            request.set_name(iter->second->SrvName);
+            request.set_rpc(iter->second->LocationRpc);
+            request.set_http(iter->second->LocationHttp);
+            this->mForwardComponent->Send(address, "InnerService.Join", &request);
         }
-
+        this->mNodeInfos.emplace(address, std::move(serverNode));
         return XCode::Successful;
     }
 
-    XCode ForwarMessageComponent::Allot(std::shared_ptr<Rpc::Packet> message)
+    XCode ForwardMessageComponent::Allot(std::shared_ptr<Rpc::Packet> message)
     {
         long long userId = 0;
         std::vector<std::string> services;
@@ -98,7 +107,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode ForwarMessageComponent::Remove(std::shared_ptr<Rpc::Packet> message)
+    XCode ForwardMessageComponent::Remove(std::shared_ptr<Rpc::Packet> message)
     {
         long long userId = 0;
         if(!message->GetHead().Get("id", userId))

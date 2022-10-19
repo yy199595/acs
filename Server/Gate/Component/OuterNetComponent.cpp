@@ -15,6 +15,7 @@
 #include"Config/ServiceConfig.h"
 #endif
 #include"Md5/MD5.h"
+#include"Config/CodeConfig.h"
 #include"Component/UnitMgrComponent.h"
 namespace Sentry
 {
@@ -84,7 +85,7 @@ namespace Sentry
 
     bool OuterNetComponent::OnRequest(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
-        message->GetHead().Add("resp", address);
+        message->GetHead().Add("client", address);
         XCode code = this->mOuterMessageComponent->OnRequest(address, message);
         if (code != XCode::Successful)
         {
@@ -129,7 +130,7 @@ namespace Sentry
         if (iter != this->mGateClientMap.end())
         {
 #ifdef __DEBUG__
-            LOG_WARN("remove client " << address << " code = " << (int) code);
+            LOG_WARN("remove client [" << address << "]" << CodeConfig::Inst()->GetDesc(code));
 #endif
             std::shared_ptr<OuterNetClient> gateClient = iter->second;
             if (this->mClientPools.size() < 100)

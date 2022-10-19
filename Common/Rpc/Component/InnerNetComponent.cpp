@@ -5,6 +5,7 @@
 #include"InnerNetMessageComponent.h"
 #include"Config/ServiceConfig.h"
 #include"File/FileHelper.h"
+#include"Config/CodeConfig.h"
 #include"Component/OuterNetComponent.h"
 #include"Component/NetThreadComponent.h"
 #include"google/protobuf/util/json_util.h"
@@ -163,7 +164,7 @@ namespace Sentry
         {
             std::string func;
             message->GetHead().Get("func", func);
-            CONSOLE_LOG_ERROR("call " << func << " code = " << (int)code);
+            CONSOLE_LOG_ERROR("call " << func << " code = " << CodeConfig::Inst()->GetDesc(code));
             return false;
         }
         return true;
@@ -175,9 +176,11 @@ namespace Sentry
         LOG_CHECK_RET_FALSE(this->mOuterComponent != nullptr);
         LOG_CHECK_RET_FALSE(message->GetHead().Has("func"));
         LOG_CHECK_RET_FALSE(message->GetHead().Get("id", userId));
-        message->GetHead().Remove("id");
-        message->SetType(Tcp::Type::Request);
-        message->GetHead().Remove("address");
+        {
+            message->GetHead().Remove("id");
+            message->SetType(Tcp::Type::Request);
+            message->GetHead().Remove("address");
+        }
         return this->mOuterComponent->SendData(userId, message);
     }
 
@@ -185,8 +188,10 @@ namespace Sentry
     {
         LOG_CHECK_RET_FALSE(this->mOuterComponent != nullptr);
         LOG_CHECK_RET_FALSE(message->GetHead().Has("func"));
-        message->SetType(Tcp::Type::Broadcast);
-        message->GetHead().Remove("address");
+        {
+            message->SetType(Tcp::Type::Broadcast);
+            message->GetHead().Remove("address");
+        }
         return this->mOuterComponent->SendData(message);
     }
 
@@ -194,9 +199,9 @@ namespace Sentry
 	{
         std::string targer;
         const Rpc::Head &head = message->GetHead();
-        if(this->mOuterComponent != nullptr && head.Get("resp", targer))
+        if(this->mOuterComponent != nullptr && head.Get("client", targer))
         {
-            message->GetHead().Remove("resp");
+            message->GetHead().Remove("client");
             this->mOuterComponent->SendData(targer, message);
             return true;
         }
@@ -208,7 +213,7 @@ namespace Sentry
             std::string error, func;
             if(head.Get("func", func) && head.Get("error", error))
             {
-                CONSOLE_LOG_ERROR("func = " << func << "  error = " << error);
+                CONSOLE_LOG_ERROR("call [" << address << "] func = {" << func << "}  code = " << error);
             }
         }
 #endif

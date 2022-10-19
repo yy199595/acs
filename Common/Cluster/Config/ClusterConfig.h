@@ -25,14 +25,12 @@ namespace Sentry
         bool IsAuthAllot() const { return this->mIsAutoAllot; }
         const std::string & GetName() const { return this->mName;}
         const std::string & GetMainLua() const { return this->mLua ;}
-        size_t GetLocations(std::vector<std::string> & components) const;
         size_t GetComponents(std::vector<std::string> & components) const;
         size_t GetServices(std::vector<std::string> & services, bool start = false) const;
     private:
         bool mIsAutoAllot;
         std::string mLua;
         const std::string & mName;
-        std::unordered_set<std::string> mLocations;
         std::unordered_set<std::string> mComponents;
         std::unordered_map<std::string, bool> mServices;
     };

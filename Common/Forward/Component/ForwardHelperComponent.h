@@ -23,7 +23,7 @@ namespace Sentry
         bool SendData(const std::string & target, std::shared_ptr<Rpc::Packet> message);
     private:
         std::vector<std::string> mLocations;
-        class InnerNetComponent * mInnerComponent;
+        class InnerNetMessageComponent * mInnerComponent;
         std::unordered_map<std::string, int> mLocationWeights;
     };
 }

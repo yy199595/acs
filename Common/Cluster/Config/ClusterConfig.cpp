@@ -39,18 +39,6 @@ namespace Sentry
                 this->mComponents.emplace(std::string(data.GetString()));
             }
         }
-        if(value.HasMember("Location"))
-        {
-            if(!value["Location"].IsArray())
-            {
-                return false;
-            }
-            for(size_t index = 0; index < value["Location"].Size(); index++)
-            {
-                const rapidjson::Value & data = value["Component"][index];
-                this->mLocations.emplace(std::string(data.GetString()));
-            }
-        }
         if(value.HasMember("AutoAllot"))
         {
             this->mIsAutoAllot = value["AutoAllot"].GetBool();
@@ -60,15 +48,6 @@ namespace Sentry
             this->mLua = value["lua"].GetString();
         }
         return true;
-    }
-
-    size_t NodeConfig::GetLocations(std::vector<std::string> &components) const
-    {
-        for(const std::string & name : this->mLocations)
-        {
-            components.emplace_back(name);
-        }
-        return components.size();
     }
 
     size_t NodeConfig::GetComponents(std::vector<std::string> &components) const

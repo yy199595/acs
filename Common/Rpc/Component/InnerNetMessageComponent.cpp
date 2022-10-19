@@ -7,6 +7,7 @@
 #include"Timer/ElapsedTimer.h"
 #include"Service/LocalRpcService.h"
 #include"Async/RpcTaskSource.h"
+#include"Config/CodeConfig.h"
 namespace Sentry
 {
 	bool InnerNetMessageComponent::Awake()
@@ -65,7 +66,10 @@ namespace Sentry
                    {
                        this->Invoke(methodConfig, message);
                    }
-                   this->mTaskComponent->Start(&InnerNetMessageComponent::Invoke, this, methodConfig, message);
+                   else
+                   {
+                       this->mTaskComponent->Start(&InnerNetMessageComponent::Invoke, this, methodConfig, message);
+                   }
                }
             }
             this->mWaitMessages.pop();
@@ -79,12 +83,37 @@ namespace Sentry
         try
         {
             code = logicService->Invoke(config->Method, message);
+            if (code != XCode::Successful)
+            {
+                message->GetHead().Add("error", CodeConfig::Inst()->GetDesc(code));
+            }
         }
         catch (std::exception &e)
         {
             code = XCode::ThrowError;
             message->GetHead().Add("error", e.what());
         }
+#ifdef __DEBUG__
+        std::string from;
+        if (message->GetHead().Get("address", from))
+        {
+            const ServiceNodeInfo *nodeInfo = this->mRpcClientComponent->GetSeverInfo(from);
+            if(nodeInfo != nullptr)
+            {
+                from = nodeInfo->LocationRpc;
+            }
+            if(code != XCode::Successful)
+            {
+                CONSOLE_LOG_ERROR("[" << from << "] call ["
+                    << config->FullName << "] code = " << CodeConfig::Inst()->GetDesc(code));
+            }
+            else
+            {
+                CONSOLE_LOG_INFO("[" << from << "] call ["
+                    << config->FullName << "] code = " << CodeConfig::Inst()->GetDesc(code));
+            }
+        }
+#endif
         long long rpcId = 0;
         if (!message->GetHead().Get("rpc", rpcId))
         {
@@ -121,11 +150,14 @@ namespace Sentry
         message->GetHead().Remove("address");
         assert(message->GetType() < (int)Tcp::Type::Max);
         assert(message->GetType() > (int)Tcp::Type::None);
+        std::shared_ptr<RpcTaskSource> taskSource = std::make_shared<RpcTaskSource>(0);
+        {
+            message->GetHead().Add("rpc", taskSource->GetRpcId());
+        }
         if (!this->mRpcClientComponent->Send(address, message))
         {
             return nullptr;
         }
-        std::shared_ptr<RpcTaskSource> taskSource = std::make_shared<RpcTaskSource>(0);
         return this->AddTask(taskSource)->Await();
     }
 

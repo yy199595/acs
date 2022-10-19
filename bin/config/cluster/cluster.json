@@ -23,10 +23,10 @@
 		"Component": [
 			"HttpComponent",
 			"ConsoleComponent",
-			"LuaScriptComponent"
-		],
-		"Location": [
-			"127.0.0.1:7788"
+			"LuaScriptComponent",
+			"ForwardComponent",
+			"ForwardHelperComponent",
+			"ForwardMessageComponent"
 		],
 		"lua": "script/Server/Server.lua"
 	},
@@ -71,9 +71,6 @@
 		"AutoAllot": false,
 		"Component": [
 			"ForwardComponent"
-		],
-		"Location": [
-			"127.0.0.1:7789"
 		]
 	}
 }

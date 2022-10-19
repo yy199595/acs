@@ -2,23 +2,18 @@
 // Created by zmhy0073 on 2022/10/8.
 //
 
-#include "InnerService.h"
-#include"Component/InnerNetComponent.h"
-#include"Component/RedisSubComponent.h"
-#include"Component/RedisDataComponent.h"
-#include"Component/RedisRegistryComponent.h"
-#include"Component/InnerNetMessageComponent.h"
-#include"Component/TextConfigComponent.h"
-#include"Component/LocationComponent.h"
+#include"InnerService.h"
 #include"Config/ClusterConfig.h"
+#include"Component/InnerNetComponent.h"
+#include"Component/LocationComponent.h"
+#include"Component/TextConfigComponent.h"
+#include"Component/InnerNetMessageComponent.h"
+
 namespace Sentry
 {
     bool InnerService::Awake()
     {
         this->mApp->AddComponent<InnerNetComponent>();
-        this->mApp->AddComponent<RedisSubComponent>();
-        this->mApp->AddComponent<RedisDataComponent>();
-        this->mApp->AddComponent<RedisRegistryComponent>();
         this->mApp->AddComponent<InnerNetMessageComponent>();
         return true;
     }
@@ -32,8 +27,6 @@ namespace Sentry
         BIND_COMMON_RPC_METHOD(InnerService::Hotfix);
         BIND_COMMON_RPC_METHOD(InnerService::LoadConfig);
         this->mLocationComponent = this->GetComponent<LocationComponent>();
-        LOG_CHECK_RET_FALSE(this->GetComponent<RedisSubComponent>()->StartConnectRedis());
-        LOG_CHECK_RET_FALSE(this->GetComponent<RedisDataComponent>()->StartConnectRedis());
         return true;
     }
 

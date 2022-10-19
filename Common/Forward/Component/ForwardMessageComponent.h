@@ -2,18 +2,18 @@
 // Created by zmhy0073 on 2022/10/19.
 //
 
-#ifndef APP_FORWARMESSAGECOMPONENT_H
-#define APP_FORWARMESSAGECOMPONENT_H
+#ifndef APP_FORWARDMESSAGECOMPONENT_H
+#define APP_FORWARDMESSAGECOMPONENT_H
 #include"Client/Message.h"
 #include"Component/Component.h"
 namespace Sentry
 {
-    class ForwarMessageComponent final : public Component
+    class ForwardMessageComponent final : public Component
     {
     public:
-        typedef XCode (ForwarMessageComponent::*MessageCallback)(std::shared_ptr<Rpc::Packet>);
-        ForwarMessageComponent() = default;
-        ~ForwarMessageComponent() = default;
+        typedef XCode (ForwardMessageComponent::*MessageCallback)(std::shared_ptr<Rpc::Packet>);
+        ForwardMessageComponent() = default;
+        ~ForwardMessageComponent() = default;
     public:
         XCode OnAuth(std::shared_ptr<Rpc::Packet> message);
         XCode OnMessage(std::shared_ptr<Rpc::Packet> message);
@@ -27,7 +27,8 @@ namespace Sentry
         class ForwardComponent * mForwardComponent;
         class LocationComponent * mLocationComponent;
         std::unordered_map<std::string, MessageCallback> mHandlers;
+        std::unordered_map<std::string, std::unique_ptr<ServiceNodeInfo>> mNodeInfos;
     };
 }
 
-#endif //APP_FORWARMESSAGECOMPONENT_H
+#endif //APP_FORWARDMESSAGECOMPONENT_H

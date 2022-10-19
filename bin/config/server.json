@@ -10,6 +10,7 @@
     "path": {
         "proto": "proto",
         "source": "source",
+        "code": "XCode/XCode.csv",
         "user": "config/user.json",
         "rpc": "config/service/rpc.json",
         "http": "config/service/http.json",
@@ -21,13 +22,13 @@
         "name": "root",
         "passwd": "199595yjz."
     },
-    "forward": [
-        "127.0.0.1:7789"
-    ],
     "server": {
         "rpc": "127.0.0.1:7788",
         "gate": "10.10.14.104:1995",
-        "http": "http://127.0.0.1:8080/app/web"
+        "http": "http://127.0.0.1:8080/",
+        "forward": [
+            "127.0.0.1:7789"
+        ]
     },
     "listener": {
         "rpc": {

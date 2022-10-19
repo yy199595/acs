@@ -9,6 +9,10 @@ namespace Sentry
 {
     void LocationComponent::AddLocation(const std::string& service, const std::string& address)
     {
+        if(address.empty())
+        {
+            return;
+        }
 		auto iter = this->mServiceLocations.find(service);
 		if(iter == this->mServiceLocations.end())
 		{
@@ -16,7 +20,12 @@ namespace Sentry
 			this->mServiceLocations.emplace(service, item);
 		}
 		this->mAllotCount.emplace(address, 0);
-		this->mServiceLocations[service].emplace_back(address);
+        std::vector<std::string> & locations = this->mServiceLocations[service];
+        if(std::find(locations.begin(), locations.end(), address) == locations.end())
+        {
+            locations.emplace_back(address);
+            LOG_WARN(service << " add new address [" << address << "]");
+        }
     }
 
     bool LocationComponent::DelLocation(const std::string& address)

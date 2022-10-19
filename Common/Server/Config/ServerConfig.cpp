@@ -75,11 +75,12 @@ namespace Sentry
 				this->mPaths.emplace(key, fmt::format("{0}/{1}", workDir, value));
 			}
 		}
-		return true;
+        return true;
 	}
 
     bool ServerConfig::GetLocation(const char *name, std::string &location) const
     {
+        location.clear();
         if(!this->GetMember("server", name, location))
         {
             CONSOLE_LOG_FATAL("not find location : " << name);

@@ -24,7 +24,10 @@ namespace Sentry
 
                 serviceConfog->Method = name;
                 serviceConfog->Service = this->GetName();
-                serviceConfog->Type = jsonValue["Type"].GetString();
+                if(jsonValue.HasMember("Type"))
+                {
+                    serviceConfog->Type = jsonValue["Type"].GetString();
+                }
                 serviceConfog->IsAsync = jsonValue["Async"].GetBool();
                 if (jsonValue.HasMember("Request"))
                 {

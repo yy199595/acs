@@ -3,27 +3,30 @@
 //
 #include"Config/ClusterConfig.h"
 #include"ForwardHelperComponent.h"
-#include"Component/InnerNetComponent.h"
+#include"Component/InnerNetMessageComponent.h"
 namespace Sentry
 {
     bool ForwardHelperComponent::LateAwake()
     {
-        const char * name = "ForwardServer";
-        this->mInnerComponent = this->GetComponent<InnerNetComponent>();
-        const NodeConfig *nodeConfig = ClusterConfig::Inst()->GetConfig(name);
-        if (nodeConfig == nullptr)
-        {
-            LOG_ERROR("not config cluster ForwardServer");
-            return false;
-        }
-        return nodeConfig->GetLocations(this->mLocations);
+        const ServerConfig * config = ServerConfig::Inst();
+        LOG_CHECK_RET_FALSE(config->GetMember("server", "forward", this->mLocations));
+        LOG_CHECK_RET_FALSE(this->mInnerComponent = this->GetComponent<InnerNetMessageComponent>());
+        return true;
     }
 
     void ForwardHelperComponent::OnLocalComplete()
     {
-        std::string rpc, http;
-        ServerConfig::Inst()->GetLocation("rpc", rpc);
-        ServerConfig::Inst()->GetLocation("http", http);
+        for(const std::string & address : this->mLocations)
+        {
+            if(!this->mInnerComponent->Ping(address))
+            {
+                LOG_ERROR("ping forward server [" << address << "] error");
+            }
+            else
+            {
+                CONSOLE_LOG_INFO("ping forward server [" << address << "] successful")
+            }
+        }
     }
 
     bool ForwardHelperComponent::SendData(std::shared_ptr<Rpc::Packet> message)

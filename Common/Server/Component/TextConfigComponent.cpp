@@ -7,6 +7,7 @@
 #include"Config/ServerConfig.h"
 #include"Config/ServiceConfig.h"
 #include"Config/ClusterConfig.h"
+#include"Config/CodeConfig.h"
 namespace Sentry
 {
     bool TextConfigComponent::Awake()
@@ -28,6 +29,10 @@ namespace Sentry
         if(config->GetConfigPath("cluster", path))
         {
             LOG_CHECK_RET_FALSE(this->LoadTextConfig<ClusterConfig>(path));
+        }
+        if(config->GetConfigPath("code", path))
+        {
+            LOG_CHECK_RET_FALSE(this->LoadTextConfig<CodeConfig>(path));
         }
         return true;
     }

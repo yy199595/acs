@@ -29,6 +29,7 @@
 #include"Component/ClusterComponent.h"
 #include"Component/ForwardComponent.h"
 #include"Component/ForwardHelperComponent.h"
+#include"Component/ForwardMessageComponent.h"
 
 #include"Service/LuaRpcService.h"
 #include"Service/OuterService.h"
@@ -77,6 +78,7 @@ void RegisterComponent()
 
     ComponentFactory::Add<ForwardComponent>("ForwardComponent");
     ComponentFactory::Add<ForwardHelperComponent>("ForwardHelperComponent");
+    ComponentFactory::Add<ForwardMessageComponent>("ForwardMessageComponent");
 
 // gate
 	ComponentFactory::Add<GateHelperComponent>("GateHelperComponent");

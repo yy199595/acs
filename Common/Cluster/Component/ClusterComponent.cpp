@@ -88,24 +88,30 @@ namespace Sentry
         if(clusterConfig->GetConfig()->GetServices(components, true) > 0)
         {
             std::string location, httpLocation;
-            LOG_CHECK_RET_FALSE(config->GetLocation("rpc", location));
             for(const std::string & name : components)
             {
-                IServiceBase * component = this->GetComponent<IServiceBase>(name);
-                LocalRpcService * localService = dynamic_cast<LocalRpcService*>(component);
-                LocalHttpService * localHttpService = dynamic_cast<LocalHttpService*>(component);
-                if(component != nullptr && !component->Start())
+                if(!this->GetComponent<IServiceBase>(name)->Start())
                 {
                     LOG_ERROR("start service [" << name << "] faillure");
                     return false;
                 }
-                if(localService != nullptr)
+                if(RpcConfig::Inst()->GetConfig(name) != nullptr)
                 {
+                    if(!config->GetLocation("rpc", location))
+                    {
+                        LOG_ERROR("not find http location config");
+                        return false;
+                    }
                     locationComponent->AddLocation(name, location);
                     LOG_INFO("start rpc service [" << name << "] successful");
                 }
-                else if(localHttpService != nullptr)
+                else if(HttpConfig::Inst()->GetConfig(name) != nullptr)
                 {
+                    if(!config->GetLocation("http", httpLocation))
+                    {
+                        LOG_ERROR("not find http location config");
+                        return false;
+                    }
                     LOG_INFO("start http service [" << name << "] successful");
                 }
             }

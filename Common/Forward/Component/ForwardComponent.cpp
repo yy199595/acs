@@ -5,13 +5,13 @@
 #include"ForwardComponent.h"
 #include"Component/LocationComponent.h"
 #include"Component/NetThreadComponent.h"
-#include"Component/ForwarMessageComponent.h"
+#include"Component/ForwardMessageComponent.h"
 namespace Sentry
 {
     bool ForwardComponent::LateAwake()
     {
         this->mLocationComponent = this->GetComponent<LocationComponent>();
-        this->mMessageComponent = this->GetComponent<ForwarMessageComponent>();
+        this->mMessageComponent = this->GetComponent<ForwardMessageComponent>();
         return this->StartListen("forward");
     }
 
@@ -42,12 +42,13 @@ namespace Sentry
 
     void ForwardComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
-		Rpc::Head & head = message->GetHead();
+        Rpc::Head &head = message->GetHead();
         switch ((Tcp::Type) message->GetType())
         {
             case Tcp::Type::Auth:
-			{
-                if(this->mMessageComponent->OnAuth(message) != XCode::Successful)
+            {
+                head.Add("address", address);
+                if (this->mMessageComponent->OnAuth(message) != XCode::Successful)
                 {
                     this->StartClose(address);
                     LOG_ERROR(address << " auth failure");
@@ -56,12 +57,25 @@ namespace Sentry
                 this->mAuthClients.insert(address);
             }
                 break;
+            case Tcp::Type::Ping:
+            {
+                if (!this->IsAuth(address))
+                {
+                    this->StartClose(address);
+                    return;
+                }
+                head.Add("resp", address);
+                message->SetType(Tcp::Type::Response);
+                head.Add("code", XCode::Successful);
+                this->OnResponse(message);
+            }
+                break;
             case Tcp::Type::Request:
             {
-				if(head.Has("rpc"))
-				{
-					head.Add("resp", address);
-				}
+                if (head.Has("rpc"))
+                {
+                    head.Add("resp", address);
+                }
                 XCode code = this->OnRequest(message);
                 if (code != XCode::Successful)
                 {
@@ -76,24 +90,21 @@ namespace Sentry
             }
                 break;
             case Tcp::Type::Broadcast:
-            {
-				if(this->OnBroadcast(message) != XCode::Successful)
-				{
-					std::string func;
-					if(head.Get("func", func))
-					{
-						LOG_ERROR("broadcast message error : " << func);
-					}
-				}
-            }
+                for (const std::string &address: this->mAuthClients)
+                {
+                    InnerNetClient *netClient = this->GetClient(address);
+                    if (netClient != nullptr)
+                    {
+                        netClient->SendData(message->Clone());
+                    }
+                }
                 break;
             case Tcp::Type::Response:
-			{
-				if(this->OnResponse(message) != XCode::Successful)
-				{
-
-				}
-			}
+                this->OnResponse(message);
+                break;
+            default:
+                this->StartClose(address);
+                CONSOLE_LOG_FATAL(address << " unknow message type");
                 break;
         }
     }
@@ -112,13 +123,23 @@ namespace Sentry
             {
                 return XCode::NotFindUser;
             }
-            return this->SendData(target, message)
-                   ? XCode::Successful : XCode::NetWorkError;
+            InnerNetClient * netClient = this->GetOrCreateClient(target);
+            if(netClient == nullptr)
+            {
+                return XCode::NetWorkError;
+            }
+            netClient->SendData(message);
+            return XCode::Successful;
         }
         else if (head.Get("to", target))
         {
-            return this->SendData(target, message)
-                   ? XCode::Successful : XCode::NetWorkError;
+            InnerNetClient * netClient = this->GetOrCreateClient(target);
+            if(netClient == nullptr)
+            {
+                return XCode::NetWorkError;
+            }
+            netClient->SendData(message);
+            return XCode::Successful;
         }
         else
         {
@@ -134,30 +155,38 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    int ForwardComponent::Broadcast(std::shared_ptr<Rpc::Packet> message)
+    void ForwardComponent::Send(const std::string &func, const Message *message)
     {
-        int count = 0;
         for(const std::string & address : this->mAuthClients)
         {
             InnerNetClient * netClient = this->GetClient(address);
             if(netClient != nullptr)
             {
-                count++;
-                netClient->SendData(message);
+                std::shared_ptr<Rpc::Packet> request =
+                    Rpc::Packet::New(Tcp::Type::Request, Tcp::Porto::Protobuf);
+                {
+                    request->WriteMessage(message);
+                    request->GetHead().Add("func", func);
+                }
+                netClient->SendData(request);
             }
         }
-        return count;
     }
 
-    bool ForwardComponent::SendData(const std::string &address, std::shared_ptr<Rpc::Packet> message)
+    void ForwardComponent::Send(const std::string &address, const std::string &func, const Message *message)
     {
-        InnerNetClient * netClient = this->GetOrCreateClient(address);
+        InnerNetClient * netClient = this->GetClient(address);
         if(netClient == nullptr)
         {
-            return false;
+            return;
         }
-        netClient->SendData(message);
-        return true;
+        std::shared_ptr<Rpc::Packet> request =
+            Rpc::Packet::New(Tcp::Type::Request, Tcp::Porto::Protobuf);
+        {
+            request->WriteMessage(message);
+            request->GetHead().Add("func", func);
+        }
+        netClient->SendData(request);
     }
 
     bool ForwardComponent::IsAuth(const std::string &address) const
@@ -197,24 +226,6 @@ namespace Sentry
 		return this->GetClient(address);
 	}
 
-	XCode ForwardComponent::OnBroadcast(std::shared_ptr<Rpc::Packet> message)
-	{
-		if(this->mInnerClients.empty())
-		{
-			return XCode::NetWorkError;
-		}
-		auto iter = this->mInnerClients.begin();
-		for(; iter != this->mInnerClients.end(); iter++)
-		{
-			InnerNetClient * netClient = iter->second.get();
-            if(netClient != nullptr)
-            {
-                netClient->SendData(message);
-            }
-		}
-		return XCode::Successful;
-	}
-
 	XCode ForwardComponent::OnResponse(std::shared_ptr<Rpc::Packet> message)
 	{
 		std::string address;
@@ -222,6 +233,7 @@ namespace Sentry
 		{
 			return XCode::Failure;
 		}
+        message->GetHead().Remove("resp");
 		InnerNetClient * netClient = this->GetClient(address);
 		if(netClient == nullptr)
 		{

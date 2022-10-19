@@ -10,14 +10,6 @@
 #include"rapidjson/document.h"
 namespace Sentry
 {
-	struct CodeConfig
-	{
-	 public:
-		int Code;
-		std::string Name;
-		std::string Desc;
-	};
-
     class IServiceConfigBase
     {
     public:

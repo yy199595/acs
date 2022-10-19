@@ -42,20 +42,24 @@
 	},
 	"InnerService": {
 		"Ping": {
-			"Async": false,
-			"Type": "Server"
+			"Async": false
 		},
 		"Stop": {
-			"Async": true,
-			"Type": "Server"
+			"Async": true
 		},
 		"Hotfix": {
-			"Async": false,
-			"Type": "Server"
+			"Async": false
 		},
 		"LoadConfig": {
+			"Async": false
+		},
+		"Join": {
 			"Async": false,
-			"Type": "Server"
+			"Request": "s2s.cluster.join"
+		},
+		"Exit": {
+			"Async": false,
+			"Request": "s2s.cluster.exit"
 		}
 	},
 	"UserBehavior": {
