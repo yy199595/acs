@@ -105,12 +105,7 @@ namespace Sentry
 			return nullptr;
 		}
 		Type* type = iter->second;
-		std::unique_ptr<Component> component = CreateComponent(type->Name);
-		if (component == nullptr)
-		{
-			return nullptr;
-		}
-		return std::move(component);
+		return CreateComponent(type->Name);		
 	}
 #define REGISTER_COMPONENT(type) ComponentFactory::Add<type>(#type)
 }// namespace Sentry
