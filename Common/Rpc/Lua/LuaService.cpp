@@ -10,6 +10,7 @@
 #include"Component/ProtoComponent.h"
 #include"Component/LocationComponent.h"
 #include"Component/InnerNetMessageComponent.h"
+#include"Component/ForwardHelperComponent.h"
 using namespace Sentry;
 namespace Lua
 {
@@ -21,7 +22,6 @@ namespace Lua
             return 0;
         }
         std::string address;
-        long long userId = 0;
         Sentry::RpcService *service = UserDataParameter::Read<Sentry::RpcService *>(lua, 1);
         InnerNetMessageComponent *netMessageComponent = App::Inst()->GetComponent<InnerNetMessageComponent>();
         if (netMessageComponent == nullptr)
@@ -29,10 +29,22 @@ namespace Lua
             luaL_error(lua, "not find InnerNetMessageComponent");
             return 0;
         }
+        std::shared_ptr<Rpc::Packet> request(new Rpc::Packet());
+        {
+            request->SetType(Tcp::Type::Request);
+            request->SetProto(Tcp::Porto::Protobuf);
+        }
         if (lua_isinteger(lua, 2)) //userId
         {
-            userId = lua_tointeger(lua, 2);
-            //TODO
+            long long userId = lua_tointeger(lua, 2);
+            request->GetHead().Add("id", userId);
+            LocationComponent * locationComponent = App::Inst()->GetComponent<LocationComponent>();
+            const LocationUnit * locationUnit = locationComponent->GetLocationUnit(userId);
+            if(locationUnit == nullptr || (!locationUnit->Get(service->GetName(), address)))
+            {
+                ForwardHelperComponent * forwardComponent = App::Inst()->GetComponent<ForwardHelperComponent>();
+                forwardComponent->GetLocation(userId, address);
+            }
         }
         else if (lua_isstring(lua, 2)) //address
         {
@@ -56,10 +68,7 @@ namespace Lua
             luaL_error(lua, "call [%s] not found", method.c_str());
             return 0;
         }
-        std::shared_ptr<Rpc::Packet> request(new Rpc::Packet());
 
-        request->SetType(Tcp::Type::Request);
-        request->SetProto(Tcp::Porto::Protobuf);
         const std::string &func = methodConfig->FullName;
         if (!methodConfig->Request.empty())
         {

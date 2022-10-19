@@ -11,6 +11,7 @@
 #include"Service/LocalRpcService.h"
 #include"Component/ProtoComponent.h"
 #include"Component/LocationComponent.h"
+#include"Component/ForwardHelperComponent.h"
 #include"Component/InnerNetMessageComponent.h"
 
 #include"Config/ClusterConfig.h"
@@ -22,6 +23,7 @@ namespace Sentry
 		this->mTaskComponent = this->mApp->GetTaskComponent();
 		this->mTimerComponent = this->mApp->GetTimerComponent();
 		this->mLocationComponent = this->GetComponent<LocationComponent>();
+        this->mForwardComponent = this->GetComponent<ForwardHelperComponent>();
         this->mInnerMessageComponent = this->GetComponent<InnerNetMessageComponent>();
 		LOG_CHECK_RET_FALSE(this->mOutNetComponent = this->GetComponent<OuterNetComponent>());
 		return true;
@@ -87,6 +89,7 @@ namespace Sentry
         std::vector<std::string> services;
         std::vector<const NodeConfig *> nodeConfigs;
         ClusterConfig::Inst()->GetNodeConfigs(nodeConfigs);
+        std::unordered_map<std::string, std::string> locations;
         for(const NodeConfig * nodeConfig : nodeConfigs)
         {
             services.clear();
@@ -107,8 +110,13 @@ namespace Sentry
                 {
                     return XCode::NetWorkError;
                 }
+                locations.emplace(service, location);
                 locationUnit->Add(service, location);
             }
+        }
+        if(!this->mForwardComponent->OnAllot(userId, locations))
+        {
+            return XCode::NetWorkError;
         }
         return XCode::Successful;
     }

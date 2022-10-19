@@ -19,7 +19,7 @@ namespace Sentry
         const std::string & GetLocation() const { return this->mAddress; }
     public:
         bool Del(const std::string & service);
-        bool Get(const std::string & service, std::string & address);
+        bool Get(const std::string & service, std::string & address) const;
         void Add(const std::string & service, const std::string & address);
     private:
         long long mUnitId;

@@ -18,6 +18,8 @@ namespace Sentry
         void OnLocalComplete() final;
     public:
         void GetLocation(long long userId, std::string & address);
+        bool OnAllot(long long userId, const std::string & service, const std::string & address);
+        bool OnAllot(long long userId, const std::unordered_map<std::string, std::string> & infos);
     private:
         std::vector<std::string> mLocations;
         class InnerNetMessageComponent * mInnerComponent;

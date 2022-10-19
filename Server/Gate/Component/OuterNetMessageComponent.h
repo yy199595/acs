@@ -31,6 +31,7 @@ namespace Sentry
 		class TimerComponent * mTimerComponent;
         class OuterNetComponent* mOutNetComponent;
 		class LocationComponent * mLocationComponent;
+        class ForwardHelperComponent * mForwardComponent;
         std::unordered_map<std::string, long long> mTokens;
         class InnerNetMessageComponent * mInnerMessageComponent;
         std::unordered_map<std::string, long long> mUserAddressMap;

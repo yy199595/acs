@@ -2,6 +2,7 @@
 // Created by zmhy0073 on 2022/10/19.
 //
 #include"Config/ClusterConfig.h"
+#include"Config/ServiceConfig.h"
 #include"ForwardMessageComponent.h"
 #include"Component/ForwardComponent.h"
 #include"Component/LocationComponent.h"
@@ -18,7 +19,7 @@ namespace Sentry
 
     bool ForwardMessageComponent::Add(const std::string &name, MessageCallback &&func)
     {
-        if(this->mHandlers.find(name) == this->mHandlers.end())
+        if(this->mHandlers.find(name) != this->mHandlers.end())
         {
             return false;
         }
@@ -88,9 +89,10 @@ namespace Sentry
         long long userId = 0;
         std::vector<std::string> services;
         const Rpc::Head & head = message->GetHead();
-
-        LOG_RPC_CHECK_ARGS(head.Get(services));
-        LOG_RPC_CHECK_ARGS(head.Get("id", userId));
+        {
+            LOG_RPC_CHECK_ARGS(head.Get(services));
+            LOG_RPC_CHECK_ARGS(head.Get("user_id", userId));
+        }
         LocationUnit * locationUnit = this->mLocationComponent->AddLocationUnit(userId);
         if(locationUnit == nullptr)
         {
@@ -99,7 +101,8 @@ namespace Sentry
         for(const std::string & service : services)
         {
             std::string address;
-            if(head.Get(service, address))
+            if(head.Get(service, address) &&
+                RpcConfig::Inst()->GetConfig(service) != nullptr)
             {
                 locationUnit->Add(service, address);
             }
@@ -110,7 +113,7 @@ namespace Sentry
     XCode ForwardMessageComponent::Remove(std::shared_ptr<Rpc::Packet> message)
     {
         long long userId = 0;
-        if(!message->GetHead().Get("id", userId))
+        if(!message->GetHead().Get("user_id", userId))
         {
             return XCode::CallArgsError;
         }

@@ -2,8 +2,7 @@
 // Created by zmhy0073 on 2022/10/14.
 //
 
-#include "LocationUnit.h"
-
+#include"LocationUnit.h"
 namespace Sentry
 {
     LocationUnit::LocationUnit(long long id)
@@ -24,10 +23,11 @@ namespace Sentry
     }
     void LocationUnit::Add(const std::string &service, const std::string &address)
     {
+
         this->mLocations[service] = address;
     }
 
-    bool LocationUnit::Get(const std::string &service, std::string &address)
+    bool LocationUnit::Get(const std::string &service, std::string &address) const
     {
         auto iter = this->mLocations.find(service);
         if(iter == this->mLocations.end())

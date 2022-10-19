@@ -11,7 +11,7 @@ namespace Sentry
         const ServerConfig * config = ServerConfig::Inst();
         LOG_CHECK_RET_FALSE(config->GetMember("server", "forward", this->mLocations));
         LOG_CHECK_RET_FALSE(this->mInnerComponent = this->GetComponent<InnerNetMessageComponent>());
-        return true;
+        return this->mLocations.size() > 0;
     }
 
     void ForwardHelperComponent::OnLocalComplete()
@@ -33,5 +33,41 @@ namespace Sentry
     {
         size_t index = userId % this->mLocations.size();
         address = this->mLocations[index];
+    }
+
+    bool ForwardHelperComponent::OnAllot(long long userId, const std::string &service, const std::string &address)
+    {
+        const std::string func("Allot");
+        std::shared_ptr<Rpc::Packet> message = std::make_shared<Rpc::Packet>();
+        {
+            message->SetType(Tcp::Type::Request);
+            message->GetHead().Add("func", func);
+            message->GetHead().Add("user_id", userId);
+            message->GetHead().Add(service, address);
+        }
+        std::string location;
+        this->GetLocation(userId, location);
+        return this->mInnerComponent->Send(location, message);
+    }
+
+    bool ForwardHelperComponent::OnAllot(long long userId, const std::unordered_map<std::string, std::string> &infos)
+    {
+        const std::string func("Allot");
+        std::shared_ptr<Rpc::Packet> message = std::make_shared<Rpc::Packet>();
+        {
+            message->SetType(Tcp::Type::Request);
+            auto iter = infos.begin();
+            for (; iter != infos.end(); iter++)
+            {
+                const std::string & service = iter->first;
+                const std::string & location = iter->second;
+                message->GetHead().Add(service, location);
+            }
+            message->GetHead().Add("func", func);
+            message->GetHead().Add("user_id", userId);
+        }
+        std::string address;
+        this->GetLocation(userId, address);
+        return this->mInnerComponent->Send(address, message);
     }
 }
