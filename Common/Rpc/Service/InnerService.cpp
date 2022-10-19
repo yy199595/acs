@@ -88,7 +88,7 @@ namespace Sentry
             this->mApp->OnDestory();
             this->mApp->Stop();
         });
-        CONSOLE_LOG_INFO("服务器将在" << 10 << "秒后关闭");
+        CONSOLE_LOG_INFO("shutdown server int 10s after");
         return XCode::Successful;
     }
 

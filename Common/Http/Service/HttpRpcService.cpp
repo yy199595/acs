@@ -6,6 +6,7 @@
 #include"Client/Message.h"
 #include"Service/RpcService.h"
 #include"Json/JsonWriter.h"
+#include"Config/CodeConfig.h"
 #include"String/StringHelper.h"
 #include"Client/HttpHandlerClient.h"
 #include"Component/ProtoComponent.h"
@@ -24,9 +25,9 @@ namespace Sentry
         const HttpData &httpData = request.GetData();
         std::shared_ptr<Json::Document> document = std::make_shared<Json::Document>();
         if (Helper::String::Split(httpData.mPath, "/", splits) < 2)
-        {
-            document->Add("error", "调用方法错误");
-            document->Add("code", (int) XCode::CallServiceNotFound);
+        {            
+            document->Add("code", (int) XCode::CallArgsError);
+            document->Add("error", CodeConfig::Inst()->GetDesc(XCode::CallArgsError));
             document->Serialize(response.Content());
             return XCode::CallArgsError;
         }
@@ -34,17 +35,17 @@ namespace Sentry
         const std::string &service = splits[splits.size() - 2];
         const RpcServiceConfig *rpcServiceConfig = RpcConfig::Inst()->GetConfig(service);
         if (rpcServiceConfig == nullptr)
-        {
-            document->Add("error", "调用服务不存在");
+        {          
             document->Add("code", (int) XCode::CallServiceNotFound);
+            document->Add("error", CodeConfig::Inst()->GetDesc(XCode::CallServiceNotFound));
             document->Serialize(response.Content());
             return XCode::CallServiceNotFound;
         }
         const RpcMethodConfig *methodConfig = rpcServiceConfig->GetMethodConfig(method);
         if (methodConfig == nullptr)
-        {
-            document->Add("error", "调用方法不存在");
+        {           
             document->Add("code", (int) XCode::CallFunctionNotExist);
+            document->Add("error", CodeConfig::Inst()->GetDesc(XCode::CallFunctionNotExist));
             document->Serialize(response.Content());
             return XCode::CallServiceNotFound;
         }

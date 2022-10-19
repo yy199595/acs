@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include<memory>
 #include<unordered_map>
 #include"XCode/XCode.h"
 #include"Config/TextConfig.h"

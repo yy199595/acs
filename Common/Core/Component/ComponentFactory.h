@@ -86,8 +86,8 @@ namespace Sentry
 
 		static bool DestoryComponent(Component* component);
 		template<typename T>
-		static std::unique_ptr<Component> CreateComponent(bool fromPool = true);
-		static std::unique_ptr<Component> CreateComponent(const std::string& name, bool fromPool = true);
+		static std::unique_ptr<Component> CreateComponent();
+		static std::unique_ptr<Component> CreateComponent(const std::string& name);
 
 		static Type* GetType(const std::string& name);
 	 private:
@@ -96,7 +96,7 @@ namespace Sentry
 	};
 
 	template<typename T>
-	std::unique_ptr<Component> Sentry::ComponentFactory::CreateComponent(bool fromPool /*= true*/)
+	std::unique_ptr<Component> Sentry::ComponentFactory::CreateComponent()
 	{
 		size_t key = typeid(T).hash_code();
 		auto iter = mTypeInfoMap1.find(key);
@@ -105,7 +105,12 @@ namespace Sentry
 			return nullptr;
 		}
 		Type* type = iter->second;
-		return CreateComponent(type->Name);
+		std::unique_ptr<Component> component = CreateComponent(type->Name);
+		if (component == nullptr)
+		{
+			return nullptr;
+		}
+		return std::move(component);
 	}
 #define REGISTER_COMPONENT(type) ComponentFactory::Add<type>(#type)
 }// namespace Sentry

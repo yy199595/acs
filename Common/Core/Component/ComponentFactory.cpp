@@ -25,7 +25,7 @@ namespace Sentry
 		return true;
 	}
 
-	std::unique_ptr<Component> ComponentFactory::CreateComponent(const std::string& name, bool fromPool /*= true*/)
+	std::unique_ptr<Component> ComponentFactory::CreateComponent(const std::string& name)
 	{
 		auto iter = mTypeInfoMap.find(name);
 		if (iter == mTypeInfoMap.end())
