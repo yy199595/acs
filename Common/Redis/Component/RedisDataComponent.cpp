@@ -10,6 +10,10 @@
 
 namespace Sentry
 {
+    bool RedisDataComponent::LateAwake()
+    {
+        return this->LateAwake();
+    }
     bool RedisDataComponent::OnInitRedisClient(RedisConfig config)
     {
         config.Channels.clear();

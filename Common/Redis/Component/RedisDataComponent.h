@@ -29,6 +29,7 @@ namespace Sentry
         std::shared_ptr<RedisRequest> MakeLuaRequest(const std::string & fullName, const std::string & json);
         bool Call(const std::string & name, const std::string & func, Json::Writer & request, std::shared_ptr<Json::Reader> response);
 	 private:
+        bool LateAwake() final;
         bool OnInitRedisClient(RedisConfig config) final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
         void OnLoadScript(const std::string & name, const std::string & md5) final;

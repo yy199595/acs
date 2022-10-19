@@ -17,10 +17,7 @@ namespace Sentry
         bool LateAwake() final;
         void OnLocalComplete() final;
     public:
-        bool AllotLocation(std::string & address);
-        bool SendData(std::shared_ptr<Rpc::Packet> message);
-        bool SendData(long long userId, std::shared_ptr<Rpc::Packet> message);
-        bool SendData(const std::string & target, std::shared_ptr<Rpc::Packet> message);
+        void GetLocation(long long userId, std::string & address);
     private:
         std::vector<std::string> mLocations;
         class InnerNetMessageComponent * mInnerComponent;

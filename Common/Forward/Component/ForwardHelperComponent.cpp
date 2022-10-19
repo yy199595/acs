@@ -29,38 +29,9 @@ namespace Sentry
         }
     }
 
-    bool ForwardHelperComponent::SendData(std::shared_ptr<Rpc::Packet> message)
+    void ForwardHelperComponent::GetLocation(long long userId, std::string &address)
     {
-        LOG_CHECK_RET_FALSE(!this->mLocations.empty());
-        for(const std::string & address : this->mLocations)
-        {
-            this->mInnerComponent->Send(address, message);
-        }
-        return true;
-    }
-
-    bool ForwardHelperComponent::SendData(long long userId, std::shared_ptr<Rpc::Packet> message)
-    {
-        LOG_CHECK_RET_FALSE(!this->mLocations.empty());
-
-        message->GetHead().Add("id", userId);
         size_t index = userId % this->mLocations.size();
-        const std::string & address = this->mLocations[index];
-        return this->mInnerComponent->Send(address, message);
-    }
-
-    bool ForwardHelperComponent::SendData(const std::string &target, std::shared_ptr<Rpc::Packet> message)
-    {
-        std::string address;
-        LOG_CHECK_RET_FALSE(!this->mLocations.empty());
-        LOG_CHECK_RET_FALSE(this->AllotLocation(address));
-
-        message->GetHead().Add("to", target);
-        return this->mInnerComponent->Send(address, message);
-    }
-
-    bool ForwardHelperComponent::AllotLocation(std::string &address)
-    {
-        return true;
+        address = this->mLocations[index];
     }
 }

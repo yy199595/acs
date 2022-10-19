@@ -6,7 +6,6 @@
 #include"Component/UnitMgrComponent.h"
 #include"Component/ConsoleComponent.h"
 #include"Component/NetThreadComponent.h"
-#include"Component/RedisRegistryComponent.h"
 #include"Component/OperatorComponent.h"
 #include"Component/LoggerComponent.h"
 #include"Component/ProtoComponent.h"
@@ -57,7 +56,6 @@ using namespace Sentry;
 void RegisterComponent()
 {
 // rpc
-    ComponentFactory::Add<RedisRegistryComponent>("RedisRegistryComponent");
     ComponentFactory::Add<InnerNetMessageComponent>("InnerNetMessageComponent");
 // common
     ComponentFactory::Add<TaskComponent>("TaskComponent");

@@ -19,9 +19,11 @@ namespace Sentry
 		virtual ~RpcService() override = default;
 	 public:
 		XCode Send(const std::string& func, const Message & message);
-		XCode Send(long long userId, const std::string& func, const Message & message);
 		XCode Send(const std::string & address, const std::string& func, const Message & message);
-	 public:
+    public:
+        XCode Send(long long userId, const std::string& func);
+        XCode Send(long long userId, const std::string& func, const Message & message);
+    public:
 		XCode Call(const std::string& address, const std::string& func);
 		XCode Call(const std::string& address, const std::string& func, const Message& message);
 		XCode Call(const std::string& address, const std::string& func, std::shared_ptr<Message> response);
@@ -32,8 +34,10 @@ namespace Sentry
 		XCode Call(long long userId, const std::string& func, std::shared_ptr<Message> response);
         XCode Call(long long userId, const std::string& func, const Message& message, std::shared_ptr<Message> response);
     public:
-        bool StartSend(const std::string & address, const std::string & func, long long userId, const Message * message);
-        std::shared_ptr<Rpc::Packet> CallAwait(const std::string & address, const std::string & func, long long userId, const Message * message);
+        bool StartSend(long long userId, const std::string & func, const Message * message = nullptr);
+        bool StartSend(const std::string & address, const std::string & func, const Message * message = nullptr);
+        std::shared_ptr<Rpc::Packet> CallAwait(long long userId, const std::string & func, const Message * message = nullptr);
+        std::shared_ptr<Rpc::Packet> CallAwait(const std::string & address, const std::string & func, const Message * message = nullptr);
 	 protected:
 		bool LateAwake() override;
 		bool IsStartComplete() final;
@@ -41,10 +45,10 @@ namespace Sentry
     public:
         virtual XCode Invoke(const std::string & method, std::shared_ptr<Rpc::Packet> message) = 0;
 	private:
-        std::string mLocalAddress;
         std::vector<std::string> mServiceHosts;
         class InnerNetComponent* mClientComponent;
 		class LocationComponent * mLocationComponent;
-		class InnerNetMessageComponent* mMessageComponent;
+        class ForwardHelperComponent * mForwardComponent;
+        class InnerNetMessageComponent* mMessageComponent;
     };
 }
