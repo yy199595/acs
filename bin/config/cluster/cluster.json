@@ -7,7 +7,7 @@
 		],
 		"lua": "script/Client/Client.lua"
 	},
-	"AllServer": {
+	"Server": {
 		"AutoAllot": true,
 		"Service": {
 			"UserBehavior": true,

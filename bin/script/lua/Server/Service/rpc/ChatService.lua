@@ -1,11 +1,8 @@
 
-ChatService = {}
 local messageComponent = App.GetComponent("ProtoComponent")
 local gateComponent = App.GetComponent("GateHelperComponent")
 
 function ChatService.Awake()
-    assert(gateComponent)
-    assert(messageComponent)
     return true
 end
 

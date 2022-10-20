@@ -11,9 +11,9 @@ namespace Sentry
 	{
 	 public:
 		LuaScriptComponent() = default;
-
 		virtual ~LuaScriptComponent() = default;
-
+    public:
+        bool LoadModule(const std::string & name);
 		struct lua_State* GetLuaEnv() { return this->mLuaEnv; }
 	 protected:
 		bool Awake() final;
@@ -25,13 +25,13 @@ namespace Sentry
 		void OnClusterComplete() final;
 	 private:
 		bool LoadAllFile();
-        void AddRequire(const std::string & path);
+        void AddRequire(const std::string & direct);
 		bool LoadLuaScript(const std::string filePath);
 	 private:
 		struct lua_State* mLuaEnv;
         std::set<std::string> mModules;
         std::set<std::string> mDirectorys;
         std::shared_ptr<Lua::LocalTable> mMainTable;
-		std::unordered_map<std::string, std::string> mLuaFileMd5s;
+		std::unordered_map<std::string, std::string> mModulePaths;
 	};
 }

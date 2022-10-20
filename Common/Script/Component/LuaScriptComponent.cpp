@@ -11,11 +11,10 @@
 #include"Lua/LuaLogger.h"
 #include"Json/Lua/Json.h"
 #include"Lua/LuaCoroutine.h"
-#include"Service/RpcService.h"
+#include"Service/LuaRpcService.h"
 #include"Json/Lua/Encoder.h"
 #include"Md5/LuaMd5.h"
 #include"App/System/System.h"
-#include"Config/ClusterConfig.h"
 #include"Component/TextConfigComponent.h"
 using namespace Lua;
 namespace Sentry
@@ -29,17 +28,6 @@ namespace Sentry
 
 	bool LuaScriptComponent::LateAwake()
     {
-        std::vector<std::string> components;
-        this->mApp->GetComponents(components);
-        for (const std::string &name: components)
-        {
-            ILuaRegister *luaRegisterComponent = this->GetComponent<ILuaRegister>(name);
-            if (luaRegisterComponent != nullptr)
-            {
-                Lua::ClassProxyHelper luaRegister(this->mLuaEnv, name);
-                luaRegisterComponent->OnLuaRegister(luaRegister);
-            }
-        }
         const ServerConfig *config = ServerConfig::Inst();
         const std::string &json = config->GetContent();
         values::pushDecoded(this->mLuaEnv, json.c_str(), json.size());
@@ -95,7 +83,26 @@ namespace Sentry
         luaRegister8.BeginNewTable();
         luaRegister8.PushExtensionFunction("ToString", Lua::Md5::ToString);
 
+
+        std::vector<std::string> components;
+        this->mApp->GetComponents(components);
+        for (const std::string &name: components)
+        {
+            ILuaRegister *luaRegisterComponent = this->GetComponent<ILuaRegister>(name);
+            if (luaRegisterComponent != nullptr)
+            {
+                if(this->GetComponent<LuaRpcService>() != nullptr)
+                {
+                    this->LoadModule(name);
+                }
+
+                Lua::ClassProxyHelper luaRegister(this->mLuaEnv, name);
+                luaRegisterComponent->OnLuaRegister(luaRegister);
+            }
+        }
+
         LOG_CHECK_RET_FALSE(this->LoadAllFile());
+        LOG_CHECK_RET_FALSE(this->LoadModule(System::GetName()));
         for (const std::string &module: this->mModules)
         {
             if (lua_getfunction(this->mLuaEnv, module.c_str(), "Awake"))
@@ -115,6 +122,23 @@ namespace Sentry
                 return false;
             }
         }
+        return true;
+    }
+
+    bool LuaScriptComponent::LoadModule(const std::string &name)
+    {
+        auto iter = this->mModulePaths.find(name);
+        if(iter == this->mModulePaths.end())
+        {
+            return false;
+        }
+        const std::string & path = iter->second;
+        if(luaL_dofile(this->mLuaEnv, path.c_str()) != LUA_OK)
+        {
+            LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+            return false;
+        }
+        this->mModules.insert(name);
         return true;
     }
 
@@ -156,67 +180,28 @@ namespace Sentry
 	}
 
 	bool LuaScriptComponent::LoadAllFile()
-	{
-		std::vector<std::string> luaPaths;
-		std::vector<std::string> luaFiles;
-		const ServerConfig * config = ServerConfig::Inst();
-        LOG_CHECK_RET_FALSE(config->GetMember("lua", "require", luaPaths));
-        TextConfigComponent * textComponent = this->GetComponent<TextConfigComponent>();
-        const ClusterConfig * clusterConfig = textComponent->GetTextConfig<ClusterConfig>();
-
-        const std::string & lua = clusterConfig->GetConfig()->GetMainLua();
-        if(!lua.empty())
+    {
+        std::string path;
+        std::vector<std::string> luaFiles;
+        const ServerConfig *config = ServerConfig::Inst();
+        LOG_CHECK_RET_FALSE(config->GetConfigPath("script", path));
+        if (!Helper::Directory::GetFilePaths(path, "*.lua", luaFiles))
         {
-            this->mMainTable = std::make_shared<Lua::LocalTable>(this->mLuaEnv);
-            if (!this->mMainTable->Load(System::GetWorkPath() + lua))
+            LOG_ERROR("load" << path << " lua file failure");
+            return false;
+        }
+        std::string direct, name, luaFile;
+        for (const std::string &path: luaFiles)
+        {
+            Helper::Directory::GetDirAndFileName(path, direct, name);
+            std::string moduleName = name.substr(0, name.find('.'));
             {
-                LOG_ERROR("load main lua : " << System::GetWorkPath() << lua);
-                return false;
+               // this->AddRequire(direct);
+                this->mModulePaths.emplace(moduleName, path);
             }
         }
-        std::string index;
-        if(config->GetMember("lua", "http", index))
-        {
-            this->AddRequire(System::GetWorkPath() + index);
-        }
-		for (const std::string& path : luaPaths)
-		{
-			const std::string fullPath = System::GetWorkPath() + path;
-			if (!Helper::Directory::GetFilePaths(fullPath, "*.lua", luaFiles))
-			{
-				LOG_ERROR("load" << path << " lua file failure");
-				return false;
-			}
-		}
-        std::string dir, name, luaFile;
-        Lua::Function::Clear(this->mLuaEnv);
-		for (const std::string& path : luaFiles)
-		{
-            std::ifstream is(path);
-            if(!is.is_open())
-            {
-                LOG_ERROR("read lua file error : " << path);
-                return false;
-            }
-            MD5 fileMd5(is);
-			if (Helper::Directory::GetDirAndFileName(path, dir, name))
-			{
-				const std::string md5 = fileMd5.toString();
-				auto iter = this->mLuaFileMd5s.find(name);
-				if (iter == this->mLuaFileMd5s.end())
-				{
-					mLuaFileMd5s.emplace(name, md5);
-					LOG_CHECK_RET_FALSE(this->LoadLuaScript(path));
-				}
-				else if (iter->second != md5)
-				{
-					mLuaFileMd5s[name] = md5;
-					LOG_CHECK_RET_FALSE(this->LoadLuaScript(path));
-				}
-			}
-		}
-		return true;
-	}
+        return true;
+    }
 
     void LuaScriptComponent::OnHotFix()
     {

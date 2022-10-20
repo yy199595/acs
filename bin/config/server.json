@@ -10,6 +10,7 @@
     "path": {
         "proto": "proto",
         "source": "source",
+        "script": "script/lua",
         "code": "XCode/XCode.csv",
         "user": "config/user.json",
         "rpc": "config/service/rpc.json",
@@ -100,14 +101,6 @@
             "free": 30,
             "passwd": "199595yjz."
         }
-    },
-    "lua": {
-        "require": [
-            "script/Common",
-            "script/Server/Service"
-        ],
-        "http": "script/Server/web",
-        "main": "script/Server/Server.lua"
     },
     "white_list": [
         "127.0.0.1"
