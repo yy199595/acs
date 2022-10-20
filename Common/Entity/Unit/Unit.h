@@ -103,9 +103,15 @@ namespace Sentry
 	inline bool Unit::AddComponent()
 	{
 		if (this->GetComponent<T>() == nullptr)
-		{
+		{			
 			std::unique_ptr<Component> component = ComponentFactory::CreateComponent<T>();
-			return this->AddComponent(component->GetType()->Name, std::move(component));
+			if (component == nullptr)
+			{
+				const char * name = typeid(T).name();
+				return false;
+			}
+			const std::string& name = component->GetType()->Name;
+			return this->AddComponent(name, std::move(component));
 		}
 		return false;
 	}
