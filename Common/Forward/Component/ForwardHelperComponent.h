@@ -17,9 +17,14 @@ namespace Sentry
         bool LateAwake() final;
         void OnLocalComplete() final;
     public:
+        void GetLocation(std::string & address);
         void GetLocation(long long userId, std::string & address);
         bool OnAllot(long long userId, const std::string & service, const std::string & address);
         bool OnAllot(long long userId, const std::unordered_map<std::string, std::string> & infos);
+    public:
+        int Subscribe(const std::string & channel);
+        int UnSubscribe(const std::string & channel);
+        int Publish(const std::string & channel, const std::string & content);
     private:
         std::vector<std::string> mLocations;
         class InnerNetMessageComponent * mInnerComponent;

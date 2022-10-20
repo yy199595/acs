@@ -19,6 +19,7 @@ ChatService.Chat = function(id, request)
         msg_type = request.msg_type,
         message = request.message
     })
+
     gateComponent:BroadCast("ChatComponent.Chat", chatMessage)
     return XCode.Successful
 end

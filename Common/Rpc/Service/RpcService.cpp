@@ -84,10 +84,19 @@ namespace Sentry
         {
             request->SetType(Tcp::Type::Request);
             request->SetProto(Tcp::Porto::Protobuf);
+#ifdef __INNER_MSG_FORWARD__
+            request->GetHead().Add("to", address);
+#endif
             request->GetHead().Add("func", methodConfig->FullName);
             request->WriteMessage(message);
         }
+#ifdef __INNER_MSG_FORWARD__
+        std::string target;
+        this->mForwardComponent->GetLocation(target);
+        return this->mMessageComponent->Send(target, request);
+#else
         return this->mMessageComponent->Send(address, request);
+#endif
     }
 
     std::shared_ptr<Rpc::Packet> RpcService::CallAwait(
@@ -115,9 +124,14 @@ namespace Sentry
             }
         }
 
-        std::shared_ptr<Rpc::Packet> request = Rpc::Packet::New(Tcp::Type::Request, Tcp::Porto::Protobuf);
+        std::shared_ptr<Rpc::Packet> request = std::make_shared<Rpc::Packet>();
         {
+            request->SetType(Tcp::Type::Request);
+            request->SetProto(Tcp::Porto::Protobuf);
             request->GetHead().Add("func", func);
+#ifdef __INNER_MSG_FORWARD__
+            request->GetHead().Add("to", address);
+#endif
             if (!methodConfig->Request.empty() && message == nullptr)
             {
                 CONSOLE_LOG_ERROR("call " << func << " request error");
@@ -125,7 +139,13 @@ namespace Sentry
             }
             request->WriteMessage(message);
         }
+#ifdef __INNER_MSG_FORWARD__
+        std::string target;
+        this->mForwardComponent->GetLocation(target);
+        return this->mMessageComponent->Call(target, request);
+#else
         return this->mMessageComponent->Call(address, request);
+#endif
     }
 
 	XCode RpcService::Send(const std::string& address, const std::string& func, const Message& message)
@@ -302,11 +322,13 @@ namespace Sentry
             request->GetHead().Add("func", methodConfig->FullName);
         }
         std::string address;
+#ifdef __INNER_MSG_FORWARD__
         LocationUnit * locationUnit = this->mLocationComponent->GetLocationUnit(userId);
         if(locationUnit != nullptr && locationUnit->Get(methodConfig->Service, address))
         {
             return this->mMessageComponent->Send(address, request);
         }
+#endif
         this->mForwardComponent->GetLocation(userId, address);
         return this->mMessageComponent->Send(address, request);
     }
@@ -345,11 +367,13 @@ namespace Sentry
             request->GetHead().Add("func", func);
         }
         std::string address;
+#ifdef __INNER_MSG_FORWARD__
         LocationUnit * locationUnit = this->mLocationComponent->GetLocationUnit(userId);
         if(locationUnit != nullptr && locationUnit->Get(methodConfig->Service, address))
         {
             return this->mMessageComponent->Call(address, request);
         }
+#endif
         this->mForwardComponent->GetLocation(userId, address);
         return this->mMessageComponent->Call(address, request);
     }

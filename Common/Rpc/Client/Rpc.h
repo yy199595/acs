@@ -12,12 +12,13 @@ namespace Tcp
     enum class Type
     {
         None,
-        Auth,
-        Ping,
-        Request,
-        Response,
-        Forward,
-        Broadcast,
+        Auth,       //验证身份消息
+        Ping,       //
+        Request,    //请求消息
+        Response,   //请求的返回
+        Forward,    //网关转发给客户端消息
+        Broadcast,  //广播消息
+        SubPublish, //发布订阅消息
         Max
     };
     enum class Porto

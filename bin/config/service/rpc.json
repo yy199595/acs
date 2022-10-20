@@ -118,7 +118,6 @@
 		"Test": {
 			"Async": false,
 			"Type": "Client",
-			"CallWay": "Net",
 			"Request": "lua.Test",
 			"Response": "lua.Test"
 		}

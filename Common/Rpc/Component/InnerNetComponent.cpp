@@ -3,7 +3,6 @@
 #include"String/StringHelper.h"
 #include"Tcp/SocketProxy.h"
 #include"InnerNetMessageComponent.h"
-#include"Config/ServiceConfig.h"
 #include"File/FileHelper.h"
 #include"Config/CodeConfig.h"
 #include"Component/OuterNetComponent.h"
@@ -17,6 +16,7 @@ namespace Sentry
         this->mMessageComponent = nullptr;
         return true;
     }
+
 	bool InnerNetComponent::LateAwake()
 	{
         std::string path;
@@ -42,76 +42,40 @@ namespace Sentry
 
     void InnerNetComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
+        if(message->GetType() != (int)Tcp::Type::Auth && !this->IsAuth(address))
+        {
+            this->StartClose(address);
+            CONSOLE_LOG_ERROR("close " << address << " not auth");
+            return;
+        }
         switch ((Tcp::Type) message->GetType())
         {
             case Tcp::Type::Auth:
-            {
                 if (!this->OnAuth(address, message))
                 {
                     this->StartClose(address);
                     CONSOLE_LOG_ERROR("auth error " << address);
                 }
-            }
                 break;
             case Tcp::Type::Ping:
-            {
-                if (!this->IsAuth(address))
-                {
-                    this->StartClose(address);
-                    CONSOLE_LOG_ERROR("request message error close : " << address);
-                    return;
-                }
                 break;
-            }
             case Tcp::Type::Request:
-            {
-                if (!this->IsAuth(address))
-                {
-                    this->StartClose(address);
-                    CONSOLE_LOG_ERROR("request message error close : " << address);
-                    return;
-                }
                 this->OnRequest(address, message);
-            }
                 break;
             case Tcp::Type::Forward:
-            {
-                if (!this->IsAuth(address))
-                {
-                    this->StartClose(address);
-                    CONSOLE_LOG_ERROR("request message error close : " << address);
-                    return;
-                }
                 this->OnForward(message);
-            }
                 break;
             case Tcp::Type::Broadcast:
-            {
-                if (!this->IsAuth(address))
-                {
-                    this->StartClose(address);
-                    CONSOLE_LOG_ERROR("request message error close : " << address);
-                    return;
-                }
                 this->OnBroadcast(message);
-            }
                 break;
             case Tcp::Type::Response:
-            {
-                if (!this->IsAuth(address))
-                {
-                    this->StartClose(address);
-                    CONSOLE_LOG_ERROR("request message error close : " << address);
-                    return;
-                }
                 this->OnResponse(address, message);
-            }
+                break;
+            case Tcp::Type::SubPublish: //发布订阅消息
                 break;
             default:
             {
-                std::string func;
-                message->GetHead().Get("func", func);
-                LOG_ERROR("call " << func << " type error");
+                LOG_ERROR(address << " unknow message type : " << message->GetType());
             }
         }
     }

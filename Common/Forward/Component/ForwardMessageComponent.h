@@ -15,11 +15,14 @@ namespace Sentry
         ForwardMessageComponent() = default;
         ~ForwardMessageComponent() = default;
     public:
-        XCode OnAuth(std::shared_ptr<Rpc::Packet> message);
         XCode OnMessage(std::shared_ptr<Rpc::Packet> message);
+        const ServiceNodeInfo * OnAuth(std::shared_ptr<Rpc::Packet> message);
     private:
         XCode Allot(std::shared_ptr<Rpc::Packet> message);
         XCode Remove(std::shared_ptr<Rpc::Packet> message);
+        XCode Publish(std::shared_ptr<Rpc::Packet> message); //发布
+        XCode Subscribe(std::shared_ptr<Rpc::Packet> message); //订阅
+        XCode UnSubscribe(std::shared_ptr<Rpc::Packet> message); //取消订阅
     private:
         bool LateAwake() final;
         bool Add(const std::string & name, MessageCallback && func);
@@ -27,6 +30,7 @@ namespace Sentry
         class ForwardComponent * mForwardComponent;
         class LocationComponent * mLocationComponent;
         std::unordered_map<std::string, MessageCallback> mHandlers;
+        std::unordered_map<std::string, std::set<std::string>> mSubMessages;
         std::unordered_map<std::string, std::unique_ptr<ServiceNodeInfo>> mNodeInfos;
     };
 }

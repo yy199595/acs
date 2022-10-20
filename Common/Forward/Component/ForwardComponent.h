@@ -24,18 +24,23 @@ namespace Sentry
     private:
         XCode OnRequest(std::shared_ptr<Rpc::Packet> message);
 		XCode OnResponse(std::shared_ptr<Rpc::Packet> message);
-	 private:
+        bool OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message);
+    private:
         bool IsAuth(const std::string & address) const;
         InnerNetClient * GetClient(const std::string & address);
-		InnerNetClient * GetOrCreateClient(const std::string & address);
+    private:
+        XCode Forward(long long userId, std::shared_ptr<Rpc::Packet> message);
+        XCode Forward(const std::string & adress, std::shared_ptr<Rpc::Packet> message);
     public:
         void Send(const std::string & func, const Message * message);
+        void Send(const std::string & address, std::shared_ptr<Rpc::Packet> message);
         void Send(const std::string & address, const std::string & func, const Message * message);
     private:
         class LocationComponent * mLocationComponent;
         std::unordered_set<std::string> mAuthClients;
         class ForwardMessageComponent * mMessageComponent;
-        std::unordered_map<std::string, std::shared_ptr<InnerNetClient>> mInnerClients;
+        std::unordered_map<std::string, std::string> mLocationMap;
+        std::unordered_map<std::string, std::shared_ptr<InnerNetClient>> mClients;
     };
 }
 

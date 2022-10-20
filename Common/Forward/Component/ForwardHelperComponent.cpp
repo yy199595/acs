@@ -29,10 +29,73 @@ namespace Sentry
         }
     }
 
+    void ForwardHelperComponent::GetLocation(std::string &address)
+    {
+        address = this->mLocations[0];
+    }
+
     void ForwardHelperComponent::GetLocation(long long userId, std::string &address)
     {
         size_t index = userId % this->mLocations.size();
         address = this->mLocations[index];
+    }
+
+    int ForwardHelperComponent::Subscribe(const std::string &channel)
+    {
+        std::shared_ptr<Rpc::Packet> message = std::make_shared<Rpc::Packet>();
+        {
+            message->SetContent(channel);
+            message->SetType(Tcp::Type::Request);
+            message->SetProto(Tcp::Porto::String);
+            message->GetHead().Add("func", "Subscribe");
+        }
+        int count = 0;
+        const std::string &address = this->mLocations[0];
+        std::shared_ptr<Rpc::Packet> response = this->mInnerComponent->Call(address, message);
+        if (response != nullptr && response->GetHead().Get("count", count))
+        {
+            return count;
+        }
+        return 0;
+    }
+
+    int ForwardHelperComponent::UnSubscribe(const std::string &channel)
+    {
+        std::shared_ptr<Rpc::Packet> message = std::make_shared<Rpc::Packet>();
+        {
+            message->SetContent(channel);
+            message->SetType(Tcp::Type::Request);
+            message->SetProto(Tcp::Porto::String);
+            message->GetHead().Add("func", "UnSubscribe");
+        }
+        int count = 0;
+        const std::string &address = this->mLocations[0];
+        std::shared_ptr<Rpc::Packet> response = this->mInnerComponent->Call(address, message);
+        if (response != nullptr && response->GetHead().Get("count", count))
+        {
+            return count;
+        }
+        return 0;
+    }
+
+    int ForwardHelperComponent::Publish(const std::string &channel, const std::string &content)
+    {
+        std::shared_ptr<Rpc::Packet> message = std::make_shared<Rpc::Packet>();
+        {
+            message->SetContent(content);
+            message->SetType(Tcp::Type::Request);
+            message->SetProto(Tcp::Porto::String);
+            message->GetHead().Add("func", "Publish");
+            message->GetHead().Add("channel", channel);
+        }
+        int count = 0;
+        const std::string &address = this->mLocations[0];
+        std::shared_ptr<Rpc::Packet> response = this->mInnerComponent->Call(address, message);
+        if (response != nullptr && response->GetHead().Get("count", count))
+        {
+            return count;
+        }
+        return 0;
     }
 
     bool ForwardHelperComponent::OnAllot(long long userId, const std::string &service, const std::string &address)

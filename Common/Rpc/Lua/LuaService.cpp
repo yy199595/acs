@@ -38,6 +38,10 @@ namespace Lua
         {
             long long userId = lua_tointeger(lua, 2);
             request->GetHead().Add("id", userId);
+#ifdef __INNER_MSG_FORWARD__
+            ForwardHelperComponent * forwardComponent = App::Inst()->GetComponent<ForwardHelperComponent>();
+            forwardComponent->GetLocation(userId, address);
+#else
             LocationComponent * locationComponent = App::Inst()->GetComponent<LocationComponent>();
             const LocationUnit * locationUnit = locationComponent->GetLocationUnit(userId);
             if(locationUnit == nullptr || (!locationUnit->Get(service->GetName(), address)))
@@ -45,10 +49,18 @@ namespace Lua
                 ForwardHelperComponent * forwardComponent = App::Inst()->GetComponent<ForwardHelperComponent>();
                 forwardComponent->GetLocation(userId, address);
             }
+#endif
         }
         else if (lua_isstring(lua, 2)) //address
         {
+#ifdef __INNER_MSG_FORWARD__
+            const char * to = lua_tostring(lua, 2);
+            request->GetHead().Add("to", std::string(to));
+            ForwardHelperComponent * forwardComponent = App::Inst()->GetComponent<ForwardHelperComponent>();
+            forwardComponent->GetLocation(address);
+#else
             address.append(lua_tostring(lua, 2));
+#endif
         }
         if (address.empty())
         {
