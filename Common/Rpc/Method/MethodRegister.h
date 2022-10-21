@@ -96,7 +96,8 @@ namespace Sentry
 
 	public:
 		bool AddMethod(std::shared_ptr<ServiceMethod> method);
-		std::shared_ptr<ServiceMethod> GetMethod(const std::string& name);
+        void ClearLuaMethods() { this->mLuaMethodMap.clear(); }
+        std::shared_ptr<ServiceMethod> GetMethod(const std::string& name);
 	private:
 		Component * mComponent;
 		std::unordered_map<std::string, std::shared_ptr<ServiceMethod>> mMethodMap;

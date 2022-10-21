@@ -87,30 +87,9 @@ namespace Sentry
 		{
 			return false;
 		}
+        this->LoadFromLua();
         std::vector<const RpcMethodConfig *> methodConfigs;
         rpcServiceConfig->GetMethodConfigs(methodConfigs);
-		LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();
-		if (luaScriptComponent != nullptr && luaScriptComponent->LoadModule(this->GetName()))
-		{
-            lua_State * lua = luaScriptComponent->GetLuaEnv();
-            for(const RpcMethodConfig * methodConfig : methodConfigs)
-            {
-                const char* tab = methodConfig->Service.c_str();
-                const char * func = methodConfig->Method.c_str();
-                if (Lua::Function::Get(lua, tab, func))
-                {
-                    std::shared_ptr<LuaServiceMethod> luaServiceMethod
-                            = std::make_shared<LuaServiceMethod>(methodConfig, lua);
-                    this->mMethodRegister->AddMethod(luaServiceMethod);
-                }
-                else if (this->mMethodRegister->GetMethod(methodConfig->Method) == nullptr)
-                {
-                    CONSOLE_LOG_ERROR(this->GetName() << " not register method [" << methodConfig->Method << "]");
-                    return false;
-                }
-            }
-		}
-
         for(const RpcMethodConfig * config : methodConfigs)
         {
             if(this->mMethodRegister->GetMethod(config->Method) == nullptr)
@@ -122,6 +101,36 @@ namespace Sentry
         this->mIsHandlerMessage = true;
 		return true;
 	}
+
+    void LocalRpcService::OnHotFix()
+    {
+        this->mMethodRegister->ClearLuaMethods();
+        this->LoadFromLua();
+    }
+
+    void LocalRpcService::LoadFromLua()
+    {
+        std::vector<const RpcMethodConfig *> methodConfigs;
+        LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();
+        const RpcServiceConfig * rpcServiceConfig = RpcConfig::Inst()->GetConfig(this->GetName());
+        if(luaScriptComponent != nullptr && luaScriptComponent->LoadModule(this->GetName()))
+        {
+            lua_State *lua = luaScriptComponent->GetLuaEnv();
+            rpcServiceConfig->GetMethodConfigs(methodConfigs);
+            for (const RpcMethodConfig *methodConfig: methodConfigs)
+            {
+                const std::string & tab = methodConfig->Service;
+                const std::string & func = methodConfig->Method;
+                if (luaScriptComponent->GetFunction(tab, func))
+                {
+                    std::shared_ptr<LuaServiceMethod> luaServiceMethod
+                        = std::make_shared<LuaServiceMethod>(methodConfig, lua);
+                    this->mMethodRegister->AddMethod(luaServiceMethod);
+                    LOG_WARN(methodConfig->FullName << " use lua method");
+                }
+            }
+        }
+    }
 
 	bool LocalRpcService::Close()
     {
