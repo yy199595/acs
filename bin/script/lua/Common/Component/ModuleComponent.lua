@@ -1,6 +1,7 @@
 ModuleComponent = {}
 
 function ModuleComponent.LoadModuleByName(moduleName)
+    print("load module ", moduleName)
     local oldModule = package.loaded[moduleName] or {}
     package.loaded[moduleName] = nil
     local newModule = require(moduleName)

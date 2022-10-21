@@ -24,7 +24,6 @@ namespace Sentry
 		XCode Invoke(const std::string& name, std::shared_ptr<Rpc::Packet> message) final;
 	 private:
         int mWaitCount;
-		lua_State* mLuaEnv;
         bool mIsHandlerMessage;
         class LuaScriptComponent* mLuaComponent;
 		std::shared_ptr<ServiceMethodRegister> mMethodRegister;

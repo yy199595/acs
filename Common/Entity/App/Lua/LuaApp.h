@@ -9,7 +9,6 @@ namespace Lua
 {
 	namespace LuaApp
 	{
-		extern int GetService(lua_State * lua);
 		extern int GetComponent(lua_State * lua);
 	};
 }

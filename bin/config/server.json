@@ -23,6 +23,10 @@
         "name": "root",
         "passwd": "199595yjz."
     },
+    "lua": {
+        "common": "script/lua/Common",
+        "module": "script/lua/Server"
+    },
     "server": {
         "rpc": "127.0.0.1:7788",
         "gate": "10.10.14.104:1995",

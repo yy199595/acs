@@ -8,7 +8,6 @@
 namespace Sentry
 {
 	LuaRpcService::LuaRpcService()
-		: mLuaEnv(nullptr)
 	{
         this->mWaitCount = 0;
         this->mIsHandlerMessage = false;
@@ -32,31 +31,27 @@ namespace Sentry
 
 		for(const RpcMethodConfig * rpcInterfaceConfig : rpcInterConfigs)
 		{
-			const char* func = rpcInterfaceConfig->Method.c_str();
-			const char * tab = rpcInterfaceConfig->Service.c_str();
-			if (!Lua::Function::Get(this->mLuaEnv, tab, func))
-			{
-				LOG_ERROR("not find rpc method = [" << tab << '.' << func << ']');
-				return false;
-			}
+            const std::string & tab = rpcInterfaceConfig->Service;
+            const std::string & func = rpcInterfaceConfig->Method;
+            if(!this->mLuaComponent->GetFunction(tab, func))
+            {
+                LOG_ERROR("not find rpc method = [" << tab << '.' << func << ']');
+            }
 			if (!this->mMethodRegister->AddMethod(std::make_shared<LuaServiceMethod>
-			        (rpcInterfaceConfig, this->mLuaEnv)))
+			        (rpcInterfaceConfig, this->mLuaComponent->GetLuaEnv())))
 			{
 				return false;
 			}
 		}
-        if(Lua::Table::Get(this->mLuaEnv, this->GetName()))
+        std::vector<IServiceChange *> components;
+        this->mApp->GetComponents<IServiceChange>(components);
         {
-            lua_pushboolean(this->mLuaEnv, true);
-            lua_setfield(this->mLuaEnv, -2, "IsStartService");
-        }
-        const char * t = this->GetName().c_str();
-        if(Lua::lua_getfunction(this->mLuaEnv, t, "OnStart"))
-        {
-            if(lua_pcall(this->mLuaEnv, 0, 0, 0) != LUA_OK)
+            for (IServiceChange *component: components)
             {
-                LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
-                return false;
+                if(!component->OnStartService(this->GetName()))
+                {
+                    return false;
+                }
             }
         }
         this->mIsHandlerMessage = true;
@@ -102,29 +97,26 @@ namespace Sentry
 	{
 		LOG_CHECK_RET_FALSE(RpcService::LateAwake());
 		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
-		LOG_CHECK_RET_FALSE(this->mLuaEnv = this->mLuaComponent->GetLuaEnv());
-
-        if(!Lua::Table::Get(this->mLuaEnv, this->GetName()))
+        if(!this->mLuaComponent->LoadModule(this->GetName()))
         {
-            LOG_ERROR(this->GetName() << " is not lua table");
+            LOG_ERROR("load lua rpc module error : " << this->GetName());
             return false;
         }
-        lua_pushboolean(this->mLuaEnv, false);
-        lua_setfield(this->mLuaEnv, -2, "IsStartService");
 		return true;
 	}
 
 	bool LuaRpcService::Close()
 	{
-        const char * tab = this->GetName().c_str();
-        if(Lua::lua_getfunction(this->mLuaEnv, tab, "OnStop"))
+        std::vector<IServiceChange *> components;
+        this->mApp->GetComponents<IServiceChange>(components);
         {
-            if(lua_pcall(this->mLuaEnv, 0, 0, 0) != LUA_OK)
+            for (IServiceChange *component: components)
             {
-                LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
-                return false;
+                if(!component->OnCloseService(this->GetName()))
+                {
+                    return false;
+                }
             }
-            return (bool)lua_toboolean(this->mLuaEnv, -1);
         }
         return true;
 	}

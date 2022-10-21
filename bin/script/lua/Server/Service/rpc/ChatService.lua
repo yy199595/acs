@@ -1,10 +1,7 @@
 
+ChatService = { }
 local messageComponent = App.GetComponent("ProtoComponent")
 local gateComponent = App.GetComponent("GateHelperComponent")
-
-function ChatService.Awake()
-    return true
-end
 
 function ChatService.OnServiceStart()
     print("启动聊天服务")

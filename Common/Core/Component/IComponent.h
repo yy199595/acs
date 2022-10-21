@@ -103,8 +103,8 @@ namespace Sentry
 	class IServiceChange
 	{
 	public:
-		virtual void OnAddService(const std::string & name) = 0;
-		virtual void OnDelService(const std::string & name) = 0;
+		virtual bool OnStartService(const std::string & name) = 0;
+		virtual bool OnCloseService(const std::string & name) = 0;
 	};
 
 	template<typename T>

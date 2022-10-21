@@ -2,7 +2,6 @@
 
 Server = {}
 Server.Modules = { }
-
 function GetModules()
     local modules = { }
     for _, module in pairs(package.loaded) do

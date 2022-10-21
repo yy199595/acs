@@ -11,7 +11,7 @@
 #include"Service/LuaRpcService.h"
 #include"Service/LocalRpcService.h"
 #include"Service/LocalHttpService.h"
-#include"Service/LocalLuaHttpService.h"
+#include"Service/LuaHttpService.h"
 #include"Component/LocationComponent.h"
 namespace Sentry
 {
@@ -64,7 +64,7 @@ namespace Sentry
                     }
                     else if(httpServiceConfig != nullptr && nodeConfig->IsStart(name))
                     {
-                        std::unique_ptr<Component> component(new LocalLuaHttpService());
+                        std::unique_ptr<Component> component(new LuaHttpService());
                         if(!this->mApp->AddComponent(name, std::move(component)))
                         {
                             LOG_ERROR("add http service [" << name << "] error");

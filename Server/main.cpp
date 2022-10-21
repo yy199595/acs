@@ -37,7 +37,7 @@
 #include"Service/HttpWebService.h"
 #include"Service/HttpRpcService.h"
 #include"Service/UserBehavior.h"
-#include"Service/LocalLuaHttpService.h"
+#include"Service/LuaHttpService.h"
 #ifdef __ENABLE_MONGODB__
 #include"Service/MongoService.h"
 #include"Component/MongoDBComponent.h"
@@ -114,7 +114,7 @@ void RegisterServiceComponent()
 {
     ComponentFactory::Add<LuaRpcService>("rpc");
     ComponentFactory::Add<ServiceRpcComponent>("agent");
-    ComponentFactory::Add<LocalLuaHttpService>("http");
+    ComponentFactory::Add<LuaHttpService>("http");
     ComponentFactory::Add<UserBehavior>("UserBehavior");
     ComponentFactory::Add<OuterService>("OuterService");
     ComponentFactory::Add<InnerService>("InnerService");

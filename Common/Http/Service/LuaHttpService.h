@@ -7,11 +7,11 @@
 #include"LocalHttpService.h"
 namespace Sentry
 {
-    class LocalLuaHttpService : public LocalHttpService
+    class LuaHttpService : public LocalHttpService
     {
     public:
-        LocalLuaHttpService() = default;
-        ~LocalLuaHttpService() = default;
+        LuaHttpService() = default;
+        ~LuaHttpService() = default;
     private:
         bool LateAwake() final;
         bool OnCloseService() final;

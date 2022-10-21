@@ -90,8 +90,7 @@ namespace Sentry
         std::vector<const RpcMethodConfig *> methodConfigs;
         rpcServiceConfig->GetMethodConfigs(methodConfigs);
 		LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();
-
-		if (luaScriptComponent != nullptr)
+		if (luaScriptComponent != nullptr && luaScriptComponent->LoadModule(this->GetName()))
 		{
             lua_State * lua = luaScriptComponent->GetLuaEnv();
             for(const RpcMethodConfig * methodConfig : methodConfigs)
