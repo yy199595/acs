@@ -78,10 +78,11 @@ message mysql //mysql操作
     }
     message query
     {
-        string table = 1;
-        string where_json = 2;
-        int32 limit = 3;
-        repeated string fields = 4;
+        string sql = 1;
+        string table = 2;
+        string where_json = 3;
+        int32 limit = 4;
+        repeated string fields = 5;
     }
     message remove
     {
@@ -99,7 +100,7 @@ message mysql //mysql操作
     message response
     {
         string error = 1;
-        repeated string jsons = 2;
+        repeated bytes jsons = 2;
     }
 }
 

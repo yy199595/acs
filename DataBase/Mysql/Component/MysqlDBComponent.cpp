@@ -78,12 +78,10 @@ namespace Sentry
     {
         std::shared_ptr<Mysql::PingCommand> command
             = std::make_shared<Mysql::PingCommand>();
-        std::shared_ptr<MysqlClient> mysqlCLient = this->GetClient(index);
-        return this->Run(mysqlCLient, command);
+        return this->Run(this->GetClient(index), command);
     }
 
-    bool MysqlDBComponent::Run(
-        std::shared_ptr<MysqlClient> client, std::shared_ptr<Mysql::ICommand> command)
+    bool MysqlDBComponent::Run(MysqlClient * client, std::shared_ptr<Mysql::ICommand> command)
     {
         std::shared_ptr<MysqlTask> mysqlTask
             = std::make_shared<MysqlTask>(command->GetRpcId(), 0);
@@ -103,25 +101,25 @@ namespace Sentry
         return response != nullptr && response->IsOk();
     }
 
-    std::shared_ptr<MysqlClient> MysqlDBComponent::GetClient(int index)
+    MysqlClient * MysqlDBComponent::GetClient(int index)
     {
         if(index > 0)
         {
             int idx = index % this->mMysqlClients.size();
-            return this->mMysqlClients[idx];
+            return this->mMysqlClients[idx].get();
         }
         std::shared_ptr<MysqlClient> mysqlClient = this->mMysqlClients[0];
         for(size_t x = 0; x < this->mMysqlClients.size(); x++)
         {
             if(this->mMysqlClients[x]->GetTaskCount() <= 5)
             {
-                return this->mMysqlClients[x];
+                return this->mMysqlClients[x].get();
             }
             if(this->mMysqlClients[x]->GetTaskCount() < mysqlClient->GetTaskCount())
             {
                 mysqlClient = this->mMysqlClients[x];
             }
         }
-        return mysqlClient;
+        return mysqlClient.get();
     }
 }

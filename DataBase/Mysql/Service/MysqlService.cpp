@@ -72,10 +72,8 @@ namespace Sentry
             this->mMainKeys[typeName] = keys[0];
         }
 
-        std::shared_ptr<Mysql::CreateTabCommand> command
-            = std::make_shared<Mysql::CreateTabCommand>(message, keys);
-        std::shared_ptr<MysqlClient> mysqlClient =
-            this->mMysqlComponent->GetClient(0);
+		MysqlClient * mysqlClient = this->mMysqlComponent->GetClient(0);
+        std::shared_ptr<Mysql::CreateTabCommand> command = std::make_shared<Mysql::CreateTabCommand>(message, keys);
 
         if (!this->mMysqlComponent->Run(mysqlClient, command))
         {
@@ -92,12 +90,10 @@ namespace Sentry
             return XCode::CallArgsError;
         }
         std::shared_ptr<Message> message = this->mMysqlHelper->GetData();
-        std::shared_ptr<Mysql::SqlCommand> command
-            = std::make_shared<Mysql::SqlCommand>(sql);
-        std::shared_ptr<MysqlClient> mysqlClient =
-            this->mMysqlComponent->GetClient(request.flag());
+        MysqlClient * mysqlClient = this->mMysqlComponent->GetClient(request.flag());
+		std::shared_ptr<Mysql::SqlCommand> command = std::make_shared<Mysql::SqlCommand>(sql);
 
-        if (!this->mMysqlComponent->Run(mysqlClient, command))
+		if (!this->mMysqlComponent->Run(mysqlClient, command))
         {
             return XCode::Failure;
         }
@@ -129,10 +125,8 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-        std::shared_ptr<Mysql::SqlCommand> command
-            = std::make_shared<Mysql::SqlCommand>(sql);
-        std::shared_ptr<MysqlClient> mysqlClient =
-            this->mMysqlComponent->GetClient(request.flag());
+		MysqlClient * mysqlClient = this->mMysqlComponent->GetClient(request.flag());
+		std::shared_ptr<Mysql::SqlCommand> command = std::make_shared<Mysql::SqlCommand>(sql);
         std::shared_ptr<Message> message = this->mMysqlHelper->GetData();
         if (this->mSyncComponent != nullptr && message != nullptr)
         {
@@ -173,11 +167,9 @@ namespace Sentry
             }
         }
 
-        std::shared_ptr<Mysql::SqlCommand> command
-            = std::make_shared<Mysql::SqlCommand>(sql);
+        MysqlClient * mysqlClient = this->mMysqlComponent->GetClient(request.flag());
+		std::shared_ptr<Mysql::SqlCommand> command = std::make_shared<Mysql::SqlCommand>(sql);
 
-        std::shared_ptr<MysqlClient> mysqlClient =
-            this->mMysqlComponent->GetClient(request.flag());
         if(!this->mMysqlComponent->Run(mysqlClient, command))
         {
             return XCode::Failure;
@@ -201,10 +193,9 @@ namespace Sentry
                 this->mSyncComponent->Del(value, request.table());
             }
         }
-        std::shared_ptr<Mysql::SqlCommand> command
-            = std::make_shared<Mysql::SqlCommand>(sql);
-        std::shared_ptr<MysqlClient> mysqlClient =
-            this->mMysqlComponent->GetClient(request.flag());
+
+        MysqlClient * mysqlClient = this->mMysqlComponent->GetClient(request.flag());
+		std::shared_ptr<Mysql::SqlCommand> command = std::make_shared<Mysql::SqlCommand>(sql);
 
         if(!this->mMysqlComponent->Run(mysqlClient, command))
         {
@@ -215,19 +206,25 @@ namespace Sentry
 
 	XCode MysqlService::Query(const db::mysql::query& request, db::mysql::response& response)
     {
-        std::string sql, key;
-        const std::string & fullName = request.table();
-        if (!this->mMysqlHelper->ToSqlCommand(request, sql))
-        {
-            return XCode::CallArgsError;
-        }
-        std::shared_ptr<MysqlClient> mysqlClient
-            = this->mMysqlComponent->GetClient();
-
-        std::shared_ptr<Mysql::QueryCommand> command
-            = std::make_shared<Mysql::QueryCommand>(sql);
-
-        if (!this->mMysqlComponent->Run(mysqlClient, command))
+		std::shared_ptr<Mysql::QueryCommand> command;
+		const std::string & fullName = request.table();
+		if(request.sql().empty())
+		{
+			std::string sql;
+			const std::string& fullName = request.table();
+			if (!this->mMysqlHelper->ToSqlCommand(request, sql))
+			{
+				return XCode::CallArgsError;
+			}
+			command = std::make_shared<Mysql::QueryCommand>(sql);
+		}
+		else
+		{
+			const std::string & sql = request.sql();
+			command = std::make_shared<Mysql::QueryCommand>(sql);
+		}
+		MysqlClient * mysqlClient = this->mMysqlComponent->GetClient();
+		if (!this->mMysqlComponent->Run(mysqlClient, command))
         {
             return XCode::Failure;
         }

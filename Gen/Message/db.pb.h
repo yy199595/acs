@@ -2109,10 +2109,10 @@ class mysql_query :
 
   // accessors -------------------------------------------------------
 
-  // repeated string fields = 4;
+  // repeated string fields = 5;
   int fields_size() const;
   void clear_fields();
-  static const int kFieldsFieldNumber = 4;
+  static const int kFieldsFieldNumber = 5;
   const ::std::string& fields(int index) const;
   ::std::string* mutable_fields(int index);
   void set_fields(int index, const ::std::string& value);
@@ -2131,9 +2131,23 @@ class mysql_query :
   const ::google::protobuf::RepeatedPtrField<::std::string>& fields() const;
   ::google::protobuf::RepeatedPtrField<::std::string>* mutable_fields();
 
-  // string table = 1;
+  // string sql = 1;
+  void clear_sql();
+  static const int kSqlFieldNumber = 1;
+  const ::std::string& sql() const;
+  void set_sql(const ::std::string& value);
+  #if LANG_CXX11
+  void set_sql(::std::string&& value);
+  #endif
+  void set_sql(const char* value);
+  void set_sql(const char* value, size_t size);
+  ::std::string* mutable_sql();
+  ::std::string* release_sql();
+  void set_allocated_sql(::std::string* sql);
+
+  // string table = 2;
   void clear_table();
-  static const int kTableFieldNumber = 1;
+  static const int kTableFieldNumber = 2;
   const ::std::string& table() const;
   void set_table(const ::std::string& value);
   #if LANG_CXX11
@@ -2145,9 +2159,9 @@ class mysql_query :
   ::std::string* release_table();
   void set_allocated_table(::std::string* table);
 
-  // string where_json = 2;
+  // string where_json = 3;
   void clear_where_json();
-  static const int kWhereJsonFieldNumber = 2;
+  static const int kWhereJsonFieldNumber = 3;
   const ::std::string& where_json() const;
   void set_where_json(const ::std::string& value);
   #if LANG_CXX11
@@ -2159,9 +2173,9 @@ class mysql_query :
   ::std::string* release_where_json();
   void set_allocated_where_json(::std::string* where_json);
 
-  // int32 limit = 3;
+  // int32 limit = 4;
   void clear_limit();
-  static const int kLimitFieldNumber = 3;
+  static const int kLimitFieldNumber = 4;
   ::google::protobuf::int32 limit() const;
   void set_limit(::google::protobuf::int32 value);
 
@@ -2171,6 +2185,7 @@ class mysql_query :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField<::std::string> fields_;
+  ::google::protobuf::internal::ArenaStringPtr sql_;
   ::google::protobuf::internal::ArenaStringPtr table_;
   ::google::protobuf::internal::ArenaStringPtr where_json_;
   ::google::protobuf::int32 limit_;
@@ -2573,7 +2588,7 @@ class mysql_response :
 
   // accessors -------------------------------------------------------
 
-  // repeated string jsons = 2;
+  // repeated bytes jsons = 2;
   int jsons_size() const;
   void clear_jsons();
   static const int kJsonsFieldNumber = 2;
@@ -2584,14 +2599,14 @@ class mysql_response :
   void set_jsons(int index, ::std::string&& value);
   #endif
   void set_jsons(int index, const char* value);
-  void set_jsons(int index, const char* value, size_t size);
+  void set_jsons(int index, const void* value, size_t size);
   ::std::string* add_jsons();
   void add_jsons(const ::std::string& value);
   #if LANG_CXX11
   void add_jsons(::std::string&& value);
   #endif
   void add_jsons(const char* value);
-  void add_jsons(const char* value, size_t size);
+  void add_jsons(const void* value, size_t size);
   const ::google::protobuf::RepeatedPtrField<::std::string>& jsons() const;
   ::google::protobuf::RepeatedPtrField<::std::string>* mutable_jsons();
 
@@ -4103,7 +4118,60 @@ inline void mysql_save::set_allocated_data(::google::protobuf::Any* data) {
 
 // mysql_query
 
-// string table = 1;
+// string sql = 1;
+inline void mysql_query::clear_sql() {
+  sql_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& mysql_query::sql() const {
+  // @@protoc_insertion_point(field_get:db.mysql.query.sql)
+  return sql_.GetNoArena();
+}
+inline void mysql_query::set_sql(const ::std::string& value) {
+  
+  sql_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:db.mysql.query.sql)
+}
+#if LANG_CXX11
+inline void mysql_query::set_sql(::std::string&& value) {
+  
+  sql_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:db.mysql.query.sql)
+}
+#endif
+inline void mysql_query::set_sql(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  sql_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:db.mysql.query.sql)
+}
+inline void mysql_query::set_sql(const char* value, size_t size) {
+  
+  sql_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:db.mysql.query.sql)
+}
+inline ::std::string* mysql_query::mutable_sql() {
+  
+  // @@protoc_insertion_point(field_mutable:db.mysql.query.sql)
+  return sql_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* mysql_query::release_sql() {
+  // @@protoc_insertion_point(field_release:db.mysql.query.sql)
+  
+  return sql_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void mysql_query::set_allocated_sql(::std::string* sql) {
+  if (sql != nullptr) {
+    
+  } else {
+    
+  }
+  sql_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), sql);
+  // @@protoc_insertion_point(field_set_allocated:db.mysql.query.sql)
+}
+
+// string table = 2;
 inline void mysql_query::clear_table() {
   table_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -4156,7 +4224,7 @@ inline void mysql_query::set_allocated_table(::std::string* table) {
   // @@protoc_insertion_point(field_set_allocated:db.mysql.query.table)
 }
 
-// string where_json = 2;
+// string where_json = 3;
 inline void mysql_query::clear_where_json() {
   where_json_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -4209,7 +4277,7 @@ inline void mysql_query::set_allocated_where_json(::std::string* where_json) {
   // @@protoc_insertion_point(field_set_allocated:db.mysql.query.where_json)
 }
 
-// int32 limit = 3;
+// int32 limit = 4;
 inline void mysql_query::clear_limit() {
   limit_ = 0;
 }
@@ -4223,7 +4291,7 @@ inline void mysql_query::set_limit(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:db.mysql.query.limit)
 }
 
-// repeated string fields = 4;
+// repeated string fields = 5;
 inline int mysql_query::fields_size() const {
   return fields_.size();
 }
@@ -4650,7 +4718,7 @@ inline void mysql_response::set_allocated_error(::std::string* error) {
   // @@protoc_insertion_point(field_set_allocated:db.mysql.response.error)
 }
 
-// repeated string jsons = 2;
+// repeated bytes jsons = 2;
 inline int mysql_response::jsons_size() const {
   return jsons_.size();
 }
@@ -4680,7 +4748,7 @@ inline void mysql_response::set_jsons(int index, const char* value) {
   jsons_.Mutable(index)->assign(value);
   // @@protoc_insertion_point(field_set_char:db.mysql.response.jsons)
 }
-inline void mysql_response::set_jsons(int index, const char* value, size_t size) {
+inline void mysql_response::set_jsons(int index, const void* value, size_t size) {
   jsons_.Mutable(index)->assign(
     reinterpret_cast<const char*>(value), size);
   // @@protoc_insertion_point(field_set_pointer:db.mysql.response.jsons)
@@ -4704,7 +4772,7 @@ inline void mysql_response::add_jsons(const char* value) {
   jsons_.Add()->assign(value);
   // @@protoc_insertion_point(field_add_char:db.mysql.response.jsons)
 }
-inline void mysql_response::add_jsons(const char* value, size_t size) {
+inline void mysql_response::add_jsons(const void* value, size_t size) {
   jsons_.Add()->assign(reinterpret_cast<const char*>(value), size);
   // @@protoc_insertion_point(field_add_pointer:db.mysql.response.jsons)
 }

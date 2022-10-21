@@ -43,9 +43,6 @@ function Server.OnClusterComplete()
         keys = { "account"},
         data = messageComponent:New("user.account_info")
     })
-    table.print(res1)
-    assert(false)
-
     MysqlComponent.Create("user.account_info", {"account"})
 
     MysqlComponent.Add("user.account_info", {
