@@ -13,21 +13,17 @@ namespace Sentry
 	 public:
 		bool LateAwake() final;
 	 public:
-		std::shared_ptr<Unit> Find(long long userId);
+
 	 public:
-		bool Del(long long gameObjectId);
-		bool Add(std::shared_ptr<Unit> gameObject);
-		bool Del(std::shared_ptr<Unit> gameObject);
-		size_t GetEntityCount()
-		{
-			return this->mGameObjects.size();
-		}
-		void GetGameObjects(std::vector<std::shared_ptr<Unit>>& gameObjects);
+		bool Del(long long unitId);
+		Unit * Find(long long userId);
+		bool Add(std::unique_ptr<Unit> gameObject);
+		void GetUnits(std::vector<Unit *>& gameObjects);
+		size_t GetUnitCount() const { return this->mGameObjects.size(); }
 	 private:
 		void StartComponents(long long objectId);
 	 private:
 		class TaskComponent* mCorComponent;
-		std::unordered_map<long long, std::shared_ptr<Unit>> mGameObjects;
-		std::unordered_map<std::string, std::shared_ptr<Unit>> mAddressGameObjects;
+		std::unordered_map<long long, std::unique_ptr<Unit>> mGameObjects;
 	};
 }

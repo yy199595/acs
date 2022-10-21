@@ -104,9 +104,10 @@ namespace Lua
         const std::string &response = methodConfig->Response;
         std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource
             = std::make_shared<LuaRpcTaskSource>(lua, 0, response);
-
-        request->GetHead().Add("func", func);
-        request->GetHead().Add("rpc", luaRpcTaskSource->GetRpcId());
+		{
+			request->GetHead().Add("func", func);
+			request->GetHead().Add("rpc", luaRpcTaskSource->GetRpcId());
+		}
         if (!netMessageComponent->Send(address, request))
         {
             luaL_error(lua, "send request message error");

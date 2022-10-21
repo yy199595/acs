@@ -12,7 +12,6 @@ namespace Sentry
 	{
 	 public:
 		LoggerComponent() = default;
-		~LoggerComponent() final = default;
 	 public:
 		void SaveAllLog();
 		void AddLog(spdlog::level::level_enum type, const std::string& log);

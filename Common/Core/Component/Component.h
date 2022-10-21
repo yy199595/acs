@@ -3,11 +3,11 @@
 #include"IComponent.h"
 
 #include"XCode/XCode.h"
-#include"Unit/Object.h"
 #include"Message/db.pb.h"
 #include"Message/c2s.pb.h"
 #include"Message/com.pb.h"
 #include"Message/s2s.pb.h"
+#include"Log/CommonLogDef.h"
 #include"Method/EventMethod.h"
 using namespace google::protobuf;
 namespace Sentry
@@ -30,25 +30,19 @@ namespace Sentry
 namespace Sentry
 {
 	class Unit;
-	class Component : public Object
+	class Component
 	{
 	 public:
 		Component();
-		~Component() override = default;
 		Component(const Component &) = delete;
-
 	public:
 		friend class Unit;
 		friend class ComponentFactory;
 		inline Unit * GetUnit() { return this->mUnit; }
-		inline Type* GetType() { return this->mType; }
 		inline const std::string& GetName() { return this->mName; }
         inline long long GetUnitId() const { return this->mEntityId; }
         template<typename T>
 		inline T* Cast() { return dynamic_cast<T*>(this); }
-
-		template<typename T>
-		inline bool Is() { return this->mType->Hash == typeid(T).hash_code(); }
 
 	 public:
 
@@ -56,6 +50,7 @@ namespace Sentry
 
 		virtual bool LateAwake() { return true;}; // 所有组件加载完成之后调用
 
+		virtual void OnDestory() { }
 	protected:
 		template<typename T>
 		T* GetComponent();
@@ -68,7 +63,6 @@ namespace Sentry
 	 private:
 		Component* GetByHash(size_t hash);
 	private:
-		Type* mType;
         std::string mName;
 		long long mEntityId;
     protected:

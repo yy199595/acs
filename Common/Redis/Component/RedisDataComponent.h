@@ -15,7 +15,6 @@ namespace Sentry
 	{
 	 public:
 		RedisDataComponent() = default;
-		~RedisDataComponent() final = default;
     public:
         template<typename ... Args>
         bool SenCommond(const std::string & name, const std::string & cmd, Args&& ... args);

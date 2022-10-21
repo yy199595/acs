@@ -8,8 +8,6 @@ namespace Sentry
 	{
 	 public:
 		NetThreadComponent() = default;
-		~NetThreadComponent() final = default;
-
 	 public:
 		bool Awake() final;
 		bool LateAwake() final;

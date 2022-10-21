@@ -84,7 +84,6 @@ namespace Sentry
 			return iter != mTypeInfoMap1.end() ? iter->second : nullptr;
 		}
 
-		static bool DestoryComponent(Component* component);
 		template<typename T>
 		static std::unique_ptr<Component> CreateComponent();
 		static std::unique_ptr<Component> CreateComponent(const std::string& name);

@@ -38,6 +38,13 @@ function Server.StartInsert()
 end
 
 function Server.OnClusterComplete()
+    local messageComponent = App.GetComponent("ProtoComponent")
+    local code, res1 = App.Call("MysqlService.Create", {
+        keys = { "account"},
+        data = messageComponent:New("user.account_info")
+    })
+    table.print(res1)
+    assert(false)
 
     MysqlComponent.Create("user.account_info", {"account"})
 

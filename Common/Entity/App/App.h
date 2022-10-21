@@ -18,9 +18,7 @@ namespace Sentry
 	{
 	 public:
 		explicit App();
-		~App() final = default;
 	 public:
-        const std::string & GetConfigPath() const { return this->mConfigPath; }
 		inline LoggerComponent* GetLogger() { return this->mLogComponent; }
 		inline Asio::Context & GetThread() { return *this->mMainThread; }
 		inline TaskComponent* GetTaskComponent() { return this->mTaskComponent; }
@@ -54,7 +52,6 @@ namespace Sentry
 		long long mLastUpdateTime;
 	 private:
         int mTickCount;
-        std::string mConfigPath;
         std::thread::id mThreadId;
         Asio::Context * mMainThread;
         TaskComponent* mTaskComponent;

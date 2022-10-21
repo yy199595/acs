@@ -1,16 +1,15 @@
 #pragma once
-#include"Unit/Object.h"
+#include"Log/CommonLogDef.h"
 #include"Component/ComponentFactory.h"
 namespace Sentry
 {
 	class Component;
     typedef std::unordered_map<std::string, Component*>::iterator ComponentIter;
-    class Unit : public Object, public std::enable_shared_from_this<Unit>
+    class Unit
 	{
 	 public:
 		explicit Unit(long long id);
 		Unit(const Unit &) = delete;
-		virtual ~Unit() override = default;
 	 public:
 		template<typename T>
 		inline bool AddComponent();
@@ -37,7 +36,6 @@ namespace Sentry
 		inline std::shared_ptr<T> Cast();
 
 	 public:
-		void OnDestory() override;
 		size_t GetComponents(std::vector<Component*>& components) const;
 		size_t GetComponents(std::vector<std::string>& components) const;
 
@@ -110,7 +108,7 @@ namespace Sentry
 				const char * name = typeid(T).name();
 				return false;
 			}
-			const std::string& name = component->GetType()->Name;
+			const std::string& name = ComponentFactory::GetName<T>();
 			return this->AddComponent(name, std::move(component));
 		}
 		return false;
@@ -145,6 +143,6 @@ namespace Sentry
 	template<typename T>
 	inline std::shared_ptr<T> Unit::Cast()
 	{
-		return std::dynamic_pointer_cast<T>(this->shared_from_this());
+		return dynamic_cast<T>(this);
 	}
 }

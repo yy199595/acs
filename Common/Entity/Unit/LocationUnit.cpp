@@ -6,10 +6,10 @@
 namespace Sentry
 {
     LocationUnit::LocationUnit(long long id)
-        : mUnitId(id) { }
+        : Unit(id) { }
 
     LocationUnit::LocationUnit(long long id, const std::string &address)
-        : mUnitId(id), mAddress(address) { }
+        : Unit(id), mAddress(address) { }
 
     bool LocationUnit::Del(const std::string &service)
     {

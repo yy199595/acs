@@ -9,10 +9,10 @@ namespace Sentry
 		return true;
 	}
 
-	bool UnitMgrComponent::Add(std::shared_ptr<Unit> gameObject)
+	bool UnitMgrComponent::Add(std::unique_ptr<Unit> unit)
 	{
-		LOG_CHECK_RET_FALSE(gameObject);
-		long long id = gameObject->GetUnitId();
+		LOG_CHECK_RET_FALSE(unit);
+		long long id = unit->GetUnitId();
 		auto iter = this->mGameObjects.find(id);
 		if(iter != this->mGameObjects.end())
         {
@@ -21,7 +21,7 @@ namespace Sentry
         }
 
 		std::vector<Component *> components;
-		gameObject->GetComponents(components);
+		unit->GetComponents(components);
 		for (Component * component : components)
 		{
 			if (!component->LateAwake())
@@ -30,16 +30,11 @@ namespace Sentry
 				return false;
 			}
 		}
-		this->mGameObjects.emplace(id, gameObject);
+		this->mGameObjects.emplace(id, std::move(unit));
 		this->mCorComponent->Start(&UnitMgrComponent::StartComponents, this, id);
 		return true;
 	}
 
-	bool UnitMgrComponent::Del(std::shared_ptr<Unit> gameObject)
-	{
-		long long id = gameObject->GetUnitId();
-		return this->Del(id);
-	}
 	bool UnitMgrComponent::Del(long long id)
 	{
 		auto iter = this->mGameObjects.find(id);
@@ -47,57 +42,38 @@ namespace Sentry
 		{
 			return false;
 		}
-		std::shared_ptr<Unit> gameObject = iter->second;
-		if (gameObject != nullptr)
-		{
-			gameObject->OnDestory();
-			this->mGameObjects.erase(iter);
-		}
+		this->mGameObjects.erase(iter);
 		return true;
 	}
 
-	std::shared_ptr<Unit> UnitMgrComponent::Find(long long id)
+	Unit * UnitMgrComponent::Find(long long id)
 	{
 		auto iter = this->mGameObjects.find(id);
 		if (iter == this->mGameObjects.end())
 		{
 			return nullptr;
 		}
-        return iter->second;
+        return iter->second.get();
 	}
 
-	void UnitMgrComponent::GetGameObjects(std::vector<std::shared_ptr<Unit>>& gameObjects)
+	void UnitMgrComponent::GetUnits(std::vector<Unit*>& gameObjects)
 	{
 		auto iter = this->mGameObjects.begin();
 		for (; iter != this->mGameObjects.end(); iter++)
 		{
-			auto gameObject = iter->second;
-			if (!gameObject->IsActive())
-			{
-				gameObject->OnDestory();
-				this->mGameObjects.erase(iter);
-				continue;
-			}
-			gameObjects.push_back(gameObject);
+			gameObjects.push_back(iter->second.get());
 		}
 	}
 
 	void UnitMgrComponent::StartComponents(long long objectId)
 	{
-		auto gameObject = this->Find(objectId);
-		LOG_CHECK_RET(gameObject);
-		std::vector<std::string> components;
-		gameObject->GetComponents(components);
-		for (const std::string & name : components)
+		std::vector<IStart*> components;
+		Unit* unit = this->Find(objectId);
+		if (unit != nullptr && unit->GetComponents(components) > 0)
 		{
-			Component * component = gameObject->GetComponent<Component>(name);
-			if(component != nullptr)
+			for (IStart* component : components)
 			{
-				IStart * start = component->Cast<IStart>();
-				if(start != nullptr)
-				{
-                    start->Start();
-				}
+				component->Start();
 			}
 		}
 	}

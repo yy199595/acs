@@ -82,13 +82,9 @@ namespace Sentry
             }
         }
 
-        TimerComponent * timerComponent = this->mApp->GetTimerComponent();
-        timerComponent->DelayCall(10 * 1000, [this]()
-        {
-            this->mApp->OnDestory();
-            this->mApp->Stop();
-        });
-        CONSOLE_LOG_INFO("shutdown server int 10s after");
+		CONSOLE_LOG_INFO("shutdown server int 10s after");
+		TimerComponent * timerComponent = this->mApp->GetTimerComponent();
+		timerComponent->DelayCall(10 * 1000, &App::Stop, this->mApp);
         return XCode::Successful;
     }
 

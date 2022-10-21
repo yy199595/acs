@@ -9,7 +9,6 @@
 #include"Component/TextConfigComponent.h"
 #include"Component/NetThreadComponent.h"
 #include"Component/ClusterComponent.h"
-#include"Component/RedisChannelComponent.h"
 using namespace Sentry;
 using namespace std::chrono;
 
@@ -69,9 +68,7 @@ namespace Sentry
 		ISystemUpdate* manager2 = component->Cast<ISystemUpdate>();
 		ISecondUpdate* manager3 = component->Cast<ISecondUpdate>();
 		ILastFrameUpdate* manager4 = component->Cast<ILastFrameUpdate>();
-        RedisChannelComponent * eveComponent = component->Cast<RedisChannelComponent>();
 
-        TryInvoke(eveComponent, eveComponent->StartRegisterEvent());
         TryInvoke(manager1, this->mFrameUpdateManagers.emplace_back(manager1));
 		TryInvoke(manager2, this->mSystemUpdateManagers.emplace_back(manager2));
 		TryInvoke(manager3, this->mSecondUpdateManagers.emplace_back(manager3));
@@ -88,14 +85,13 @@ namespace Sentry
         }
         System::Init(argv);
         this->mMainThread = new Asio::Context();
-        std::unique_ptr<Asio::ContextWork> work(new Asio::ContextWork (*mMainThread));
-
         if(!this->LoadComponent())
 		{
 			this->GetLogger()->SaveAllLog();
 			return -1;
 		}
-        const std::chrono::milliseconds sleepTime(1);
+		Asio::ContextWork work(*this->mMainThread);
+		const std::chrono::milliseconds sleepTime(1);
         this->mLogicUpdateInterval = 1000 / this->mFps;
 		this->mStartTime = Helper::Time::GetNowMilTime();
 		this->mSecondTimer = Helper::Time::GetNowMilTime();

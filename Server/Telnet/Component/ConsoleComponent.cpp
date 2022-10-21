@@ -2,7 +2,6 @@
 
 #include"Service/LocalRpcService.h"
 #include"Component/TaskComponent.h"
-#include"Component/OperatorComponent.h"
 #define BIND_FUNC(name, func) this->mFunctionMap.emplace(name, std::bind(&func, this, args1, args2));
 
 namespace Sentry
@@ -145,13 +144,6 @@ namespace Sentry
 				response.emplace_back(name);
 			}
 		}
-		return true;
-	}
-
-	bool ConsoleComponent::Hotfix(const std::string& parameter, std::vector<std::string>& response)
-	{
-		auto operComponent = this->GetComponent<OperatorComponent>();
-		operComponent->StartHotfix();
 		return true;
 	}
 

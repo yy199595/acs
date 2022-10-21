@@ -69,21 +69,6 @@ namespace Sentry
         return components.size();
 	}
 
-	void Unit::OnDestory()
-	{
-		auto iter = this->mComponentMap.begin();
-		for (; iter != this->mComponentMap.end(); iter++)
-		{
-			Component* component = iter->second.get();
-			if (component != nullptr)
-			{
-				component->OnDestory();
-				component->SetActive(false);
-			}
-		}
-		this->mComponentMap.clear();
-	}
-
 	Component* Unit::GetComponentByName(const std::string& name) const
 	{
 		auto iter = this->mComponentMap.find(name);
@@ -95,19 +80,13 @@ namespace Sentry
 		auto iter = this->mComponentMap.find(name);
 		if (iter != this->mComponentMap.end())
 		{
-			std::unique_ptr<Component> component = std::move(iter->second);
-            if(!this->OnDelComponent(component.get()))
+			Component * component = iter->second.get();
+            if(!this->OnDelComponent(component))
             {
                 return false;
             }
 			this->mComponentMap.erase(iter);
-			if (component != nullptr)
-			{
-				component->OnDestory();
-				component->SetActive(false);
-				this->OnDelComponent(component.get());
-				return true;
-			}
+			return true;
 		}
 		return false;
 	}

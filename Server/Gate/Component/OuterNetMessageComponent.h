@@ -15,7 +15,6 @@ namespace Sentry
 	{
 	 public:
 		OuterNetMessageComponent() = default;
-		~OuterNetMessageComponent() final = default;
     public:
         bool GetAddress(long long id, std::string & address);
         bool CreateToken(long long userId, std::string & token);

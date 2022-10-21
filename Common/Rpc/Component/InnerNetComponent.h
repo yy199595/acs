@@ -39,6 +39,7 @@ namespace Sentry
 	 private:
         std::string mUserName;
         std::string mPassword;
+		std::string mLocation;
         class NetThreadComponent * mNetComponent;
         class OuterNetComponent * mOuterComponent;
         class InnerNetMessageComponent* mMessageComponent;

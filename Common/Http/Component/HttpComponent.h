@@ -15,7 +15,6 @@ namespace Sentry
 	{
 	 public:
 		HttpComponent() = default;
-		~HttpComponent() final = default;
 	 public:
 		std::shared_ptr<HttpRequestClient> CreateClient();
 		XCode Download(const std::string & url, const std::string & path);

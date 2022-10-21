@@ -30,7 +30,6 @@ namespace Sentry
 	{
 	 public:
 		ConsoleComponent() = default;
-		~ConsoleComponent() final = default;
 	 public:
         bool Start() final;
         bool LateAwake() final;
@@ -45,7 +44,6 @@ namespace Sentry
 		bool Help(const std::string& parameter, std::vector<std::string>& response);
 		bool Start(const std::string& parameter, std::vector<std::string>& response);
 		bool Close(const std::string& parameter, std::vector<std::string>& response);
-		bool Hotfix(const std::string& parameter, std::vector<std::string>& response);
 		bool Services(const std::string& parameter, std::vector<std::string>& response);
 
 	private:

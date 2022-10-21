@@ -9,9 +9,6 @@ namespace Sentry
 	{
 	 public:
 		TimerComponent() = default;
-
-		~TimerComponent() override = default;
-
 	 public:
 		bool CancelTimer(long long id);
 

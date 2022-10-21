@@ -16,7 +16,6 @@ namespace Sentry
 	{
 	 public:
 		RpcService() = default;
-		virtual ~RpcService() override = default;
 	 public:
 		XCode Send(const std::string& func, const Message & message);
 		XCode Send(const std::string & address, const std::string& func, const Message & message);

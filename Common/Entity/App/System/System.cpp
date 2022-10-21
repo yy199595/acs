@@ -13,15 +13,10 @@ namespace Sentry
 {
     void System::Init(char **argv)
     {
-        System::mExePath.append(argv[0]);
-        System::mConfigPath.append(argv[1]);
-        System::mName.append(argv[2]);
-        System::mWorkPath.append(getcwd(NULL, NULL));
-        System::mWorkPath += "/";
-        CONSOLE_LOG_ERROR("exe path = " << argv[0]);
-        CONSOLE_LOG_ERROR("config path = " << argv[1]);
-        CONSOLE_LOG_ERROR("server name = " << argv[2]);
-        CONSOLE_LOG_ERROR("work path = " << getcwd(NULL, NULL));
+		System::mName = argv[2];
+		System::mExePath = argv[0];
+        System::mConfigPath = argv[1];
+        System::mWorkPath = fmt::format("{0}/", getcwd(NULL, NULL));
     }
 
     std::string System::mName;

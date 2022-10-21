@@ -22,7 +22,6 @@ namespace Sentry
 	{
 	 public:
 		InnerNetMessageComponent() = default;
-		~InnerNetMessageComponent() final = default;
 	 protected:
 		bool Awake() final;
 		bool LateAwake() final;

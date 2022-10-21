@@ -12,7 +12,6 @@ namespace Sentry
 	{
 	 public:
 		LuaRpcService();
-		~LuaRpcService() override;
 	 protected:
 		bool LateAwake() final;
 	 public:

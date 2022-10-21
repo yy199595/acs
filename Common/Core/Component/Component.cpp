@@ -6,7 +6,6 @@ namespace Sentry
 		: mUnit(nullptr)
 	{
 		this->mEntityId = 0;
-		this->mType = nullptr;
 		this->mApp = App::Inst();
 	}
 

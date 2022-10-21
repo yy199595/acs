@@ -18,7 +18,7 @@ namespace Sentry
     bool ClusterComponent::Awake()
     {
         const NodeConfig * nodeConfig = ClusterConfig::Inst()->GetConfig();
-
+		LOG_CHECK_RET_FALSE(nodeConfig);
         std::vector<std::string> components;
         if(nodeConfig->GetComponents(components))
         {

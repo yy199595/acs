@@ -10,7 +10,6 @@ namespace Sentry
 	{
 	 public:
 		MysqlService() = default;
-		~MysqlService() final = default;
 	private:
 
         XCode Add(const db::mysql::add& request);

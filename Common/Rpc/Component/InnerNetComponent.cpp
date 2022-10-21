@@ -31,9 +31,9 @@ namespace Sentry
             const std::string passwd(iter->value.GetString());
             this->mUserMaps.emplace(user, passwd);
         }
-
         this->mOuterComponent = this->GetComponent<OuterNetComponent>();
-        LOG_CHECK_RET_FALSE(config->GetMember("user", "name", this->mUserName));
+		LOG_CHECK_RET_FALSE(config->GetLocation("rpc", this->mLocation));
+		LOG_CHECK_RET_FALSE(config->GetMember("user", "name", this->mUserName));
         LOG_CHECK_RET_FALSE(config->GetMember("user", "passwd", this->mPassword));
         LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<NetThreadComponent>());
         LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>());
@@ -42,12 +42,15 @@ namespace Sentry
 
     void InnerNetComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
-        if(message->GetType() != (int)Tcp::Type::Auth && !this->IsAuth(address))
-        {
-            this->StartClose(address);
-            CONSOLE_LOG_ERROR("close " << address << " not auth");
-            return;
-        }
+		if(address != this->mLocation)
+		{
+			if (message->GetType() != (int)Tcp::Type::Auth && !this->IsAuth(address))
+			{
+				this->StartClose(address);
+				CONSOLE_LOG_ERROR("close " << address << " not auth");
+				return;
+			}
+		}
         switch ((Tcp::Type) message->GetType())
         {
             case Tcp::Type::Auth:
@@ -268,6 +271,11 @@ namespace Sentry
 
 	bool InnerNetComponent::Send(const std::string & address, std::shared_ptr<Rpc::Packet> message)
 	{
+		if(address == this->mLocation) //发送到本级
+		{
+			this->OnMessage(address, message);
+			return true;
+		}
         InnerNetClient * clientSession = this->GetOrCreateSession(address);
 		if (message == nullptr || clientSession == nullptr)
 		{

@@ -6,7 +6,6 @@
 #include"Component/UnitMgrComponent.h"
 #include"Component/ConsoleComponent.h"
 #include"Component/NetThreadComponent.h"
-#include"Component/OperatorComponent.h"
 #include"Component/LoggerComponent.h"
 #include"Component/ProtoComponent.h"
 
@@ -62,7 +61,6 @@ void RegisterComponent()
     ComponentFactory::Add<TimerComponent>("TimerComponent");
     ComponentFactory::Add<LoggerComponent>("LoggerComponent");
 	ComponentFactory::Add<UserSyncComponent>("UserSyncComponent");
-	ComponentFactory::Add<OperatorComponent>("OperatorComponent");
     ComponentFactory::Add<UnitMgrComponent>("UnitMgrComponent");
     ComponentFactory::Add<NetThreadComponent>("NetThreadComponent");
     ComponentFactory::Add<ProtoComponent>("ProtoComponent");

@@ -6,9 +6,6 @@ namespace Sentry
 	{
 	 public:
 		MysqlHelperComponent() = default;
-		~MysqlHelperComponent() final = default;
-		MysqlHelperComponent(const MysqlHelperComponent &) = delete;
-
 	public:
 		XCode Add(const Message & data, int flag);
 

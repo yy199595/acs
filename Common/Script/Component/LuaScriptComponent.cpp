@@ -14,6 +14,7 @@
 #include"Service/LuaRpcService.h"
 #include"Json/Lua/Encoder.h"
 #include"Md5/LuaMd5.h"
+#include"Guid/Guid.h"
 #include"App/System/System.h"
 #include"Config/ServiceConfig.h"
 #include"Component/TextConfigComponent.h"
@@ -40,6 +41,8 @@ namespace Sentry
 
         Lua::ClassProxyHelper luaRegister0(this->mLuaEnv, "App");
         luaRegister0.BeginRegister<App>();
+		luaRegister0.PushExtensionFunction("Call", Lua::LuaApp::Send);
+		luaRegister0.PushExtensionFunction("Call", Lua::LuaApp::Call);
         luaRegister0.PushExtensionFunction("GetComponent", Lua::LuaApp::GetComponent);
 
         Lua::ClassProxyHelper luaRegister1(this->mLuaEnv, "WaitLuaTaskSource");
@@ -151,6 +154,7 @@ namespace Sentry
             }
         }
         this->mModules.insert(name);
+		CONSOLE_LOG_INFO("load lua module [" << name << "] successful");
         return true;
     }
 

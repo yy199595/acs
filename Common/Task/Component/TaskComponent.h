@@ -15,7 +15,6 @@ namespace Sentry
 	{
 	 public:
 		TaskComponent() = default;
-		~TaskComponent() final = default;
 	 public:
 		template<typename F, typename T, typename ... Args>
 		TaskContext* Start(F&& f, T* o, Args&& ... args)

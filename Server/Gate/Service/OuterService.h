@@ -11,7 +11,6 @@ namespace Sentry
 	{
 	 public:
 		OuterService() = default;
-		~OuterService() final = default;
 	 private:
 		XCode Ping(long long userId);
         XCode AllotUser(const com::type::int64 & userId, s2s::allot::response & response);

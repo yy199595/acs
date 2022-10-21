@@ -13,11 +13,6 @@ namespace Sentry
         this->mIsHandlerMessage = false;
 	}
 
-	LuaRpcService::~LuaRpcService()
-	{
-		//luaL_unref(this->mLuaEnv, LUA_REGISTRYINDEX, this->mIdx);
-	}
-
 	bool LuaRpcService::Start()
 	{
         std::string location;
