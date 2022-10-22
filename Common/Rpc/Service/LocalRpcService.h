@@ -41,6 +41,7 @@ namespace Sentry
         virtual bool OnClose() = 0;
         virtual bool OnStart() = 0;
         void WaitAllMessageComplete() final;
+		void GetSubEventIds(std::unordered_set<std::string> &evendIds) final;
 		NetEventRegistry & GetEventRegistry() { return *this->mEventRegister; }
 		ServiceMethodRegister & GetMethodRegistry() { return *this->mMethodRegister; }
 
@@ -49,7 +50,6 @@ namespace Sentry
 	private:
         int mMaxCount;
         int mWaitCount;
-        int mMaxDelay;
         bool mIsHandlerMessage;
 		std::shared_ptr<NetEventRegistry> mEventRegister;
 		std::shared_ptr<ServiceMethodRegister> mMethodRegister;

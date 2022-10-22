@@ -40,6 +40,11 @@ namespace Sentry
 		return this->StartListen("rpc");
 	}
 
+	void InnerNetComponent::OnConnectSuccessful(const std::string& address)
+	{
+
+	}
+
     void InnerNetComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
 		if(address != this->mLocation)

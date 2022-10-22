@@ -15,6 +15,7 @@ namespace Sentry
 		~InnerNetComponent() override = default;
 	 public:
 		void StartClose(const std::string & address) final;
+		void OnConnectSuccessful(const std::string &address) final;
 		void OnCloseSocket(const std::string & address, XCode code) final;
         void OnMessage(const std::string & address, std::shared_ptr<Rpc::Packet> message) final;
 	 protected:

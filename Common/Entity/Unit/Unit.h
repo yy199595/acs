@@ -39,6 +39,9 @@ namespace Sentry
 		size_t GetComponents(std::vector<Component*>& components) const;
 		size_t GetComponents(std::vector<std::string>& components) const;
 
+		template<typename T>
+		size_t GetComponentNames(std::vector<std::string>& componentNames) const;
+
         template<typename T>
         size_t GetComponents(std::vector<T *> & components) const;
 	 protected:
@@ -68,6 +71,20 @@ namespace Sentry
         }
         return components.size();
     }
+
+	template<typename T>
+	size_t Unit::GetComponentNames(std::vector<std::string>& componentNames) const
+	{
+		auto iter = this->mComponentMap.begin();
+		for(; iter != this->mComponentMap.end(); iter++)
+		{
+			if(dynamic_cast<T*>(iter->second.get()) != nullptr)
+			{
+				componentNames.emplace_back(iter->first);
+			}
+		}
+		return componentNames.size();
+	}
 
 	template<typename T>
 	inline T* Unit::GetComponent() const

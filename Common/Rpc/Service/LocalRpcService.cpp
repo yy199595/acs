@@ -162,5 +162,17 @@ namespace Sentry
         std::move(this->mMethodRegister);
         return true;
     }
+	void LocalRpcService::GetSubEventIds(std::unordered_set<std::string>& evendIds)
+	{
+		if(this->mMethodRegister != nullptr)
+		{
+			std::vector<std::string> rets;
+			this->mEventRegister->GetEvents(rets);
+			for(const std::string & eventId : rets)
+			{
+				evendIds.insert(eventId);
+			}
+		}
+	}
 
 }

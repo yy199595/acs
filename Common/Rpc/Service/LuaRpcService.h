@@ -14,6 +14,7 @@ namespace Sentry
 		LuaRpcService();
 	 protected:
 		bool LateAwake() final;
+		void GetSubEventIds(std::unordered_set<std::string> &evendIds) final;
 	 public:
         bool Close() final;
         bool Start() final;

@@ -134,6 +134,9 @@ namespace Sentry
 			this->mTimer->async_wait(std::bind(std::bind(&InnerNetClient::Connect, this->shared_from_this())));
 			return;
 		}
+		asio::io_service & io = App::Inst()->GetThread();
+		const std::string & address = this->mSocket->GetAddress();
+		io.post(std::bind(&IRpc<Rpc::Packet>::OnConnectSuccessful, this->mComponent, address));
 
         std::shared_ptr<Rpc::Packet> authMessage =
             Rpc::Packet::New(Tcp::Type::Auth, Tcp::Porto::Protobuf);
