@@ -129,28 +129,20 @@ namespace Sentry
 		return true;
 	}
 
-	LocationUnit* LocationComponent::AddLocationUnit(long long id)
+	bool LocationComponent::AddLocationUnit(std::unique_ptr<LocationUnit> locationUnit)
 	{
+		if(locationUnit == nullptr)
+		{
+			return false;
+		}
+		long long id = locationUnit->GetUnitId();
 		auto iter = this->mUnitLocations.find(id);
 		if(iter != this->mUnitLocations.end())
 		{
 			return iter->second.get();
 		}
-		std::unique_ptr<LocationUnit> locationUnit(new LocationUnit(id));
 		this->mUnitLocations.emplace(id, std::move(locationUnit));
-		return this->GetLocationUnit(id);
-	}
-
-	LocationUnit* LocationComponent::AddLocationUnit(long long id, const std::string& address)
-	{
-		auto iter = this->mUnitLocations.find(id);
-		if(iter != this->mUnitLocations.end())
-		{
-			return iter->second.get();
-		}
-		std::unique_ptr<LocationUnit> locationUnit(new LocationUnit(id, address));
-		this->mUnitLocations.emplace(id, std::move(locationUnit));
-		return this->GetLocationUnit(id);
+		return true;
 	}
 
 }

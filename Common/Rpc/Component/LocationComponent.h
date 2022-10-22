@@ -23,10 +23,9 @@ namespace Sentry
         void AddLocation(const std::string & service, const std::string & address);
 	 public:
 		bool DelLocationUnit(long long id);
-		LocationUnit * AddLocationUnit(long long id);
 		LocationUnit * GetLocationUnit(long long id) const;
+		bool AddLocationUnit(std::unique_ptr<LocationUnit> locationUnit);
         size_t GetLocationCount() const { return this->mUnitLocations.size(); }
-		LocationUnit * AddLocationUnit(long long id, const std::string & address);
 	 public:
 		int GetAllotCount(const std::string & address) const;
         size_t GetHostSize(const std::string & service) const;

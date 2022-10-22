@@ -8,7 +8,6 @@
 #include"Config/ServerConfig.h"
 #include"Component/LuaScriptComponent.h"
 #include"Component/TextConfigComponent.h"
-#include"Component/RedisChannelComponent.h"
 namespace Sentry
 {
     bool RedisSubComponent::OnInitRedisClient(RedisConfig config)
@@ -86,17 +85,6 @@ namespace Sentry
                 }
                 return true;
             }
-        }
-
-        RedisChannelComponent* localServiceComponent = this->GetComponent<RedisChannelComponent>(component);
-        if(localServiceComponent != nullptr)
-        {
-            std::shared_ptr<Json::Reader> jsonReader(new Json::Reader());
-            if((!jsonReader->ParseJson(message)) || (!localServiceComponent->Invoke(method, jsonReader)))
-            {
-                return false;
-            }
-            return true;
         }
         return false;
     }

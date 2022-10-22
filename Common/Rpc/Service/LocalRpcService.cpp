@@ -53,6 +53,26 @@ namespace Sentry
         CONSOLE_LOG_ERROR(this->GetName() << " handler all message complete");
     }
 
+	XCode LocalRpcService::Invoke(const string& id, const string& message)
+	{
+		if (!this->IsStartService())
+		{
+			LOG_ERROR(this->GetName() << " is not start");
+			return XCode::CallServiceNotFound;
+		}
+		if(!this->mIsHandlerMessage)
+		{
+			return XCode::CallServiceNotFound;
+		}
+		std::shared_ptr<EventMethod> method = this->mEventRegister->GetEvent(id);
+		if(method != nullptr)
+		{
+			method->Run(message);
+			return XCode::Successful;
+		}
+		return XCode::CallFunctionNotExist;
+	}
+
     XCode LocalRpcService::Invoke(const std::string &func, std::shared_ptr<Rpc::Packet> message)
     {
         if (!this->IsStartService())
@@ -81,6 +101,7 @@ namespace Sentry
 
 	bool LocalRpcService::Start()
 	{
+		this->mEventRegister = std::make_shared<NetEventRegistry>(this);
 		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
         const RpcServiceConfig * rpcServiceConfig = RpcConfig::Inst()->GetConfig(this->GetName());
 		if (!this->OnStart())
@@ -141,4 +162,5 @@ namespace Sentry
         std::move(this->mMethodRegister);
         return true;
     }
+
 }

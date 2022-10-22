@@ -5,6 +5,7 @@
 #ifndef SERVER_LOCALSERVICECOMPONENT_H
 #define SERVER_LOCALSERVICECOMPONENT_H
 #include"RpcService.h"
+#include"Method/EventMethod.h"
 #include"Method/MethodRegister.h"
 #include"Component/LuaScriptComponent.h"
 
@@ -33,13 +34,15 @@ namespace Sentry
 		bool Close() final;
         int GetWaitMessageCount() const final { return this->mWaitCount; }
 		bool IsStartService() { return this->mMethodRegister != nullptr; }
+		XCode Invoke(const std::string &id, const std::string &message) final;
 		XCode Invoke(const std::string &func, std::shared_ptr<Rpc::Packet> message) final;
     protected:
         void OnHotFix() final;
         virtual bool OnClose() = 0;
         virtual bool OnStart() = 0;
         void WaitAllMessageComplete() final;
-        ServiceMethodRegister & GetMethodRegistry() { return *this->mMethodRegister; }
+		NetEventRegistry & GetEventRegistry() { return *this->mEventRegister; }
+		ServiceMethodRegister & GetMethodRegistry() { return *this->mMethodRegister; }
 
     private:
         void LoadFromLua();
@@ -48,10 +51,11 @@ namespace Sentry
         int mWaitCount;
         int mMaxDelay;
         bool mIsHandlerMessage;
+		std::shared_ptr<NetEventRegistry> mEventRegister;
 		std::shared_ptr<ServiceMethodRegister> mMethodRegister;
 	};
     extern std::string GET_FUNC_NAME(std::string fullName);
+#define SUB_EVENT_MESSAGE(id, func) this->GetEventRegistry().Sub(id, &func);
 #define BIND_COMMON_RPC_METHOD(func) this->GetMethodRegistry().Bind(GET_FUNC_NAME(#func), &func);
-#define BIND_HEAD_RPC_METHOD(func) this->GetMethodRegistry().BindHead(GET_FUNC_NAME(#func), &func);
 }
 #endif //SERVER_LOCALSERVICECOMPONENT_H

@@ -26,9 +26,15 @@ namespace Sentry
         BIND_COMMON_RPC_METHOD(InnerService::Stop);
         BIND_COMMON_RPC_METHOD(InnerService::Hotfix);
         BIND_COMMON_RPC_METHOD(InnerService::LoadConfig);
+		SUB_EVENT_MESSAGE("", InnerService::OnInvoke);
         this->mLocationComponent = this->GetComponent<LocationComponent>();
         return true;
     }
+
+	void InnerService::OnInvoke(const std::string& message)
+	{
+
+	}
 
     XCode InnerService::Ping()
     {

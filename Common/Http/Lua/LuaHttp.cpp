@@ -78,10 +78,9 @@ namespace Lua
         }
 
         lua_pushthread(lua);
-        const char * url = luaL_checkstring(lua, 2);
-        const char * path = luaL_checkstring(lua, 3);
-
 		std::string dir, fileName;
+		const char * url = luaL_checkstring(lua, 2);
+        const char * path = luaL_checkstring(lua, 3);
 		if(Helper::Directory::GetDirAndFileName(path, dir, fileName))
 		{
 			if(!Helper::Directory::MakeDir(dir))

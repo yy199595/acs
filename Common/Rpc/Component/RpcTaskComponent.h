@@ -18,7 +18,7 @@ namespace Sentry
     public:
         void OnTimeout(long long taskId);
         template<typename T1>
-        std::shared_ptr<T1> AddTask(std::shared_ptr<T1> task)
+        T1 * AddTask(std::shared_ptr<T1> task)
         {
             long long taskId = task->GetRpcId();
             auto iter = this->mTasks.find(taskId);
@@ -27,7 +27,7 @@ namespace Sentry
                 this->OnAddTask(task);
                 this->mTasks.emplace(taskId, task);
             }
-            return task;
+            return task.get();
         }
         bool OnResponse(long long taskId, std::shared_ptr<T> message);
 	protected:

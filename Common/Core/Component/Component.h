@@ -8,7 +8,6 @@
 #include"Message/com.pb.h"
 #include"Message/s2s.pb.h"
 #include"Log/CommonLogDef.h"
-#include"Method/EventMethod.h"
 using namespace google::protobuf;
 namespace Sentry
 {

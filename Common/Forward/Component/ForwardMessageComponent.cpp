@@ -97,20 +97,17 @@ namespace Sentry
             LOG_RPC_CHECK_ARGS(head.Get(services));
             LOG_RPC_CHECK_ARGS(head.Get("user_id", userId));
         }
-        LocationUnit * locationUnit = this->mLocationComponent->AddLocationUnit(userId);
-        if(locationUnit == nullptr)
-        {
-            return XCode::Failure;
-        }
+		std::string address;
+		std::unique_ptr<LocationUnit> locationUnit(new LocationUnit(userId));
         for(const std::string & service : services)
         {
-            std::string address;
             if(head.Get(service, address) &&
                 RpcConfig::Inst()->GetConfig(service) != nullptr)
             {
                 locationUnit->Add(service, address);
             }
         }
+		this->mLocationComponent->AddLocationUnit(std::move(locationUnit));
         return XCode::Successful;
     }
 

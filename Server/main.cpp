@@ -15,7 +15,6 @@
 #include"Component/InnerNetMessageComponent.h"
 
 #include"Component/GateHelperComponent.h"
-#include"Component/UserSyncComponent.h"
 #include"Component/ClientComponent.h"
 #include"Component/RedisSubComponent.h"
 
@@ -60,7 +59,6 @@ void RegisterComponent()
     ComponentFactory::Add<TaskComponent>("TaskComponent");
     ComponentFactory::Add<TimerComponent>("TimerComponent");
     ComponentFactory::Add<LoggerComponent>("LoggerComponent");
-	ComponentFactory::Add<UserSyncComponent>("UserSyncComponent");
     ComponentFactory::Add<UnitMgrComponent>("UnitMgrComponent");
     ComponentFactory::Add<NetThreadComponent>("NetThreadComponent");
     ComponentFactory::Add<ProtoComponent>("ProtoComponent");

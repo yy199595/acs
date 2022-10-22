@@ -6,10 +6,8 @@
 #include"App/App.h"
 #include"Md5/MD5.h"
 #include"Client/OuterNetClient.h"
-#include"Component/RedisDataComponent.h"
-#include"Component/GateHelperComponent.h"
-#include"Component/UserSyncComponent.h"
 #include"Component/OuterNetComponent.h"
+#include"Component/GateHelperComponent.h"
 #include"Component/OuterNetMessageComponent.h"
 namespace Sentry
 {

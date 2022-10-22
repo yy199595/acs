@@ -80,11 +80,7 @@ namespace Sentry
         long long userId = iter->second;
         this->mUserAddressMap.emplace(address, userId);
         this->mClientAddressMap.emplace(userId, address);
-        LocationUnit * locationUnit = this->mLocationComponent->AddLocationUnit(userId, address);
-        if(locationUnit == nullptr)
-        {
-            return XCode::NotFindUser;
-        }
+        std::unique_ptr<LocationUnit> locationUnit(new LocationUnit(userId, address));
 
         std::vector<std::string> services;
         std::vector<const NodeConfig *> nodeConfigs;
@@ -118,6 +114,7 @@ namespace Sentry
         {
             return XCode::NetWorkError;
         }
+		this->mLocationComponent->AddLocationUnit(std::move(locationUnit));
         return XCode::Successful;
     }
 

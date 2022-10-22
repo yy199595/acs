@@ -5,24 +5,20 @@
 #ifndef SERVER_EVENTMETHOD_H
 #define SERVER_EVENTMETHOD_H
 #include<memory>
-#include"Json/JsonReader.h"
-
+#include<string>
+#include"Component/Component.h"
 namespace Sentry
 {
 	template<typename T>
-	using EventMethodType1 = bool(T::*)();
-	template<typename T>
-	using EventMethodType2 = bool(T::*)(const Json::Reader & content);
+	using EventMethodType = void(T::*)(const std::string & content);
 
 	class EventMethod
 	{
 	public:
 		explicit EventMethod(const std::string & id)
 				: mEveId(id) {}
-
 	public:
-		virtual bool Run(std::shared_ptr<Json::Reader> json) = 0;
-		const std::string & GetEveId() { return this->mEveId;}
+		virtual void Run(const std::string & content) = 0;
 	private:
 		const std::string mEveId;
 	};
@@ -31,34 +27,17 @@ namespace Sentry
 	class EventMethod1 final : public EventMethod
 	{
 	public:
-		explicit EventMethod1(const std::string & id, T * o, EventMethodType1<T> methodType1)
+		explicit EventMethod1(const std::string & id, T * o, EventMethodType<T> methodType1)
 				: EventMethod(id), mObj(o), mFunc(methodType1) {}
 
 	public:
-		bool Run(std::shared_ptr<Json::Reader> json)
+		void Run(const std::string & content)
 		{
-			return (this->mObj->*this->mFunc)();
+			(this->mObj->*this->mFunc)(content);
 		}
 	private:
 		T * mObj;
-		EventMethodType1<T> mFunc;
-	};
-
-	template<typename T>
-	class EventMethod2 final : public EventMethod
-	{
-	public:
-		explicit EventMethod2(const std::string & id, T * o, EventMethodType2<T> methodType)
-				: EventMethod(id), mObj(o), mFunc(methodType) {}
-
-	public:
-		bool Run(std::shared_ptr<Json::Reader> json)
-		{
-			return json != nullptr &&  (this->mObj->*this->mFunc)(*json);
-		}
-	private:
-		T * mObj;
-		EventMethodType2<T> mFunc;
+		EventMethodType<T> mFunc;
 	};
 }
 
@@ -67,31 +46,22 @@ namespace Sentry
 	class NetEventRegistry
 	{
 	public:
-		NetEventRegistry() = default;
+		NetEventRegistry(Component * component) : mComponent(component) { };
 	public:
 		template<typename T>
-		bool Sub(const std::string & id, EventMethodType1<T> func, T * obj)
+		bool Sub(const std::string & id, EventMethodType<T> func)
 		{
 			auto iter = this->mEventMethodMap.find(id);
 			if(iter != this->mEventMethodMap.end())
 			{
 				return false;
 			}
-			this->mEventMethodMap.emplace(id, std::make_shared<EventMethod1<T>>(id, obj, func));
+			T * obj = this->mComponent->Cast<T>();
+			std::shared_ptr<EventMethod1<T>> method(new EventMethod1<T>(id, obj, func));
+			this->mEventMethodMap.emplace(id, std::move(method));
 			return true;
 		}
 
-		template<typename T>
-		bool Sub(const std::string & id, EventMethodType2<T> func, T * obj)
-		{
-			auto iter = this->mEventMethodMap.find(id);
-			if(iter != this->mEventMethodMap.end())
-			{
-				return false;
-			}
-			this->mEventMethodMap.emplace(id, std::make_shared<EventMethod2<T>>(id, obj, func));
-			return true;
-		}
         void GetEvents(std::vector<std::string> & funcs)
         {
             auto iter = this->mEventMethodMap.begin();
@@ -101,9 +71,11 @@ namespace Sentry
             }
         }
 
-        const size_t GetEventSize() { return this->mEventMethodMap.size();}
-        inline std::shared_ptr<EventMethod> GetEvent(const std::string & eveId);
-	private:
+		const size_t GetEventSize() { return this->mEventMethodMap.size();}
+		inline std::shared_ptr<EventMethod> GetEvent(const std::string & eveId);
+
+	 private:
+		Component * mComponent;
 		std::unordered_map<std::string, std::shared_ptr<EventMethod>> mEventMethodMap;
 	};
 
