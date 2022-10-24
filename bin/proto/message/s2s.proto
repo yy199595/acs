@@ -42,3 +42,19 @@ message allot
         string address = 2;
     }
 }
+message forward
+{
+    message sub
+    {
+        repeated string channels = 1;
+    }
+    message unsub
+    {
+        repeated string channels = 1;
+    }
+    message publish
+    {
+        repeated string channel = 1;
+        string message = 2;
+    }
+}

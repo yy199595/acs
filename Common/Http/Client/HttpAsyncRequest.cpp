@@ -561,31 +561,43 @@ namespace Sentry
 		return true;
 	}
 
-	void HttpHandlerResponse::SetCode(HttpStatus code)
+	void HttpHandlerResponse::Str(HttpStatus code, const std::string& str)
 	{
 		this->mCode = code;
+		this->mContent = str;
 	}
 
-	void HttpHandlerResponse::WriteString(const std::string& content)
-    {
-        this->mContentSize += content.size();
-        this->mContent.append(content);
-    }
+	void HttpHandlerResponse::Json(HttpStatus code, Json::Document* document)
+	{
+		this->mCode = code;
+		if(document != nullptr)
+		{
+			document->Serialize(&this->mContent);
+			this->mHeadMap.emplace("content-type", "application/json");
+		}
+	}
 
-    Json::Writer &HttpHandlerResponse::GetJson()
-    {
-        if(this->mJson == nullptr)
-        {
-            this->mJson = std::make_shared<Json::Writer>();
-        }
-        return *this->mJson;
-    }
+	void HttpHandlerResponse::Json(HttpStatus code, const char* json, size_t size)
+	{
+		this->mCode = code;
+		if(json != nullptr && size > 0)
+		{
+			this->mContent.assign(json, size);
+			this->mHeadMap.emplace("content-type", "application/json");
+		}
+	}
 
-    void HttpHandlerResponse::WriteString(const char *content, size_t size)
-    {
-        this->mContentSize += size;
-        this->mContent.append(content, size);
-    }
+//	void HttpHandlerResponse::WriteString(const std::string& content)
+//    {
+//        this->mContentSize += content.size();
+//        this->mContent.append(content);
+//    }
+//
+//    void HttpHandlerResponse::WriteString(const char *content, size_t size)
+//    {
+//        this->mContentSize += size;
+//        this->mContent.append(content, size);
+//    }
 
 	void HttpHandlerResponse::WriteFile(std::fstream * ofstream)
 	{

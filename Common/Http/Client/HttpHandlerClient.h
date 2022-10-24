@@ -17,8 +17,8 @@ namespace Sentry
 	 public:
 		HttpHandlerClient(HttpListenComponent * httpComponent, std::shared_ptr<SocketProxy> socketProxy);
 	 public:
-        void StartReceive();
-        void StartWriter(HttpStatus code);
+		void StartWriter();
+		void StartReceive();
         std::shared_ptr<HttpHandlerRequest> Request() { return this->mHttpRequest;}
 		std::shared_ptr<HttpHandlerResponse> Response() { return this->mHttpResponse;}
 	 private:

@@ -31,6 +31,7 @@ namespace Sentry
     private:
         XCode Forward(long long userId, std::shared_ptr<Rpc::Packet> message);
         XCode Forward(const std::string & adress, std::shared_ptr<Rpc::Packet> message);
+		XCode CallService(std::shared_ptr<Rpc::Packet> message);
     public:
         void Send(const std::string & func, const Message * message);
         void Send(const std::string & address, std::shared_ptr<Rpc::Packet> message);

@@ -25,6 +25,7 @@
 			"ConsoleComponent",
 			"LuaScriptComponent",
 			"ForwardComponent",
+			"SubPublishComponent",
 			"ForwardHelperComponent",
 			"ForwardMessageComponent"
 		],

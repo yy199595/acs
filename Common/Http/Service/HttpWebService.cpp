@@ -3,7 +3,7 @@
 //
 #include<fstream>
 #include"HttpWebService.h"
-#include"Json/Lua/Json.h"
+#include"Math/MathHelper.h"
 #include"App/System/System.h"
 #include"Component/HttpWebComponent.h"
 #include"Component/LuaScriptComponent.h"
@@ -20,7 +20,8 @@ namespace Sentry
         this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
         serviceRegister.Bind("Ping", &HttpWebService::Ping);
         serviceRegister.Bind("Hello", &HttpWebService::Hello);
-        serviceRegister.Bind("DownLoad", &HttpWebService::DownLoad);
+		serviceRegister.Bind("Sleep", &HttpWebService::Sleep);
+		serviceRegister.Bind("DownLoad", &HttpWebService::DownLoad);
         LOG_CHECK_RET_FALSE(localServerConfig->GetMember("web", "lua", this->mLuaPath));
         LOG_CHECK_RET_FALSE(localServerConfig->GetMember("web", "download", this->mDownloadPath));
 
@@ -31,14 +32,22 @@ namespace Sentry
 
     XCode HttpWebService::Ping(const HttpHandlerRequest &request, HttpHandlerResponse &response)
     {
-        response.WriteString("pong");
+        response.Str(HttpStatus::OK,"pong");
         return XCode::Successful;
     }
 
+	XCode HttpWebService::Sleep(const HttpHandlerRequest& request, HttpHandlerResponse& response)
+	{
+		int time = Helper::Math::Random<int>(500, 3000);
+		this->mApp->GetTaskComponent()->Sleep(time);
+		response.Str(HttpStatus::OK,fmt::format("sleep {0}ms", time));
+		return XCode::Successful;
+	}
+
     XCode HttpWebService::Hello(const HttpHandlerRequest &request, HttpHandlerResponse &response)
     {
-        response.WriteString("hello");
-        return XCode::Successful;
+		response.Str(HttpStatus::OK,"hello");
+		return XCode::Successful;
     }
 
     XCode HttpWebService::DownLoad(const HttpHandlerRequest &request, HttpHandlerResponse &response)

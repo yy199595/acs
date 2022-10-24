@@ -128,23 +128,23 @@ namespace Sentry
         std::string channel;
         const Rpc::Head & head = message->GetHead();
         LOG_RPC_CHECK_ARGS(head.Get("channel", channel));
-        auto iter = this->mSubMessages.begin();
-        for(; iter != this->mSubMessages.end(); iter++)
-        {
-            const std::string & address = iter->first;
-            if(iter->second.find(channel) != iter->second.end())
-            {
-                count++;
-                std::shared_ptr<Rpc::Packet> publish = std::make_shared<Rpc::Packet>();
-                {
-                    publish->SetProto(Tcp::Porto::String);
-                    publish->SetType(Tcp::Type::SubPublish);
-                    publish->SetContent(message->GetBody());
-                    publish->GetHead().Add("channel", channel);
-                }
-                this->mForwardComponent->Send(address, publish);
-            }
-        }
+        auto iter = this->mSubMessages.find(channel);
+		if(iter == this->mSubMessages.end())
+		{
+			return XCode::Failure;
+		}
+		for(const std::string & address : iter->second)
+		{
+			count++;
+			std::shared_ptr<Rpc::Packet> publish = std::make_shared<Rpc::Packet>();
+			{
+				publish->SetProto(Tcp::Porto::String);
+				publish->SetType(Tcp::Type::SubPublish);
+				publish->SetContent(message->GetBody());
+				publish->GetHead().Add("channel", channel);
+			}
+			this->mForwardComponent->Send(address, publish);
+		}
         message->GetHead().Add("count", count);
         return XCode::Successful;
     }
@@ -155,25 +155,22 @@ namespace Sentry
         std::vector<std::string> channels;
         Rpc::Head & head = message->GetHead();
         LOG_RPC_CHECK_ARGS(head.Get("resp", address));
-        if(Helper::String::Split(message->GetBody(), "/n", channels) <= 0)
+        if(Helper::String::Split(message->GetBody(), "\n", channels) <= 0)
         {
             return XCode::CallArgsError;
         }
-        auto iter = this->mSubMessages.find(address);
-        if(iter == this->mSubMessages.end())
-        {
-            std::set<std::string> subchannels;
-            this->mSubMessages.emplace(address, subchannels);
-        }
+
         int count = 0;
-        std::set<std::string> & subchannels = this->mSubMessages[address];
         for(const std::string & channel : channels)
         {
-            if(!channel.empty())
-            {
-                count++;
-                subchannels.insert(channel);
-            }
+			auto iter = this->mSubMessages.find(channel);
+			if(iter == this->mSubMessages.end())
+			{
+				std::set<std::string> subchannels;
+				this->mSubMessages.emplace(channel, subchannels);
+			}
+			count++;
+			this->mSubMessages[channel].insert(address);
         }
         message->Clear();
         head.Add("count", count);
@@ -186,7 +183,7 @@ namespace Sentry
         std::vector<std::string> channels;
         Rpc::Head & head = message->GetHead();
         LOG_RPC_CHECK_ARGS(head.Get("resp", address));
-        if(Helper::String::Split(message->GetBody(), "/n", channels) <= 0)
+        if(Helper::String::Split(message->GetBody(), "\n", channels) <= 0)
         {
             return XCode::CallArgsError;
         }

@@ -25,13 +25,13 @@ namespace Sentry
         const char * tab = this->mConfig->Service.c_str();
         const char * method = this->mConfig->Method.c_str();
         if(!Lua::Function::Get(this->mLua, tab, method))
-        {
-            Json::Writer & data = response.GetJson();
-            data << "code " << (int)XCode::CallFunctionNotExist;
-            data << "error" << "call lua function not existe";
-            response.WriteString(data.JsonString());
-            return XCode::CallFunctionNotExist;
-        }
+		{
+			Json::Document document;
+			document.Add("error", "call lua function not existe");
+			document.Add("code", (int)XCode::CallFunctionNotExist);
+			response.Json(HttpStatus::OK, &document);
+			return XCode::CallFunctionNotExist;
+		}
         request.GetData().Writer(this->mLua);
         return this->mConfig->IsAsync ? this->CallAsync(response) : this->Call(response);
     }
@@ -40,25 +40,24 @@ namespace Sentry
     {
         if (lua_pcall(this->mLua, 1, 2, 0) != LUA_OK)
         {
-            response.GetJson() << "error" << lua_tostring(this->mLua, -1);
-            response.GetJson() << "code" << (int)XCode::CallLuaFunctionFail;
-            return XCode::CallLuaFunctionFail;
+			Json::Document document;
+			document.Add("error", lua_tostring(this->mLua, -1));
+			document.Add("code", (int)XCode::CallLuaFunctionFail);
+			response.Json(HttpStatus::OK, &document);
+			return XCode::CallLuaFunctionFail;
         }
         if (lua_isstring(this->mLua, -1))
         {
             size_t size = 0;
             const char *json = lua_tolstring(this->mLua, -1, &size);
-            if(json != nullptr && size > 0)
-            {
-                response.WriteString(json, size);
-            }
+			response.Json(HttpStatus::OK, json, size);
             return XCode::Successful;
         }
         else if (lua_istable(this->mLua, -1))
         {
             this->mData.clear();
             Lua::Json::Read(this->mLua, -1, &this->mData);
-            response.WriteString(this->mData);
+			response.Json(HttpStatus::OK, this->mData.c_str(), this->mData.size());
             return XCode::Successful;
         }
         return (XCode) lua_tointeger(this->mLua, -2);
@@ -71,8 +70,10 @@ namespace Sentry
         if (lua_pcall(this->mLua, 3, 1, 0) != LUA_OK)
         {
             delete luaTaskSource;
-            response.GetJson() << "error" << lua_tostring(this->mLua, -1);
-            response.GetJson() << "code" << (int)XCode::CallLuaFunctionFail;
+			Json::Document document;
+			document.Add("error", lua_tostring(this->mLua, -1));
+			document.Add("code", (int)XCode::CallLuaFunctionFail);
+			response.Json(HttpStatus::OK, &document);
             return XCode::CallLuaFunctionFail;
         }
         XCode code = luaTaskSource->Await();
@@ -83,17 +84,14 @@ namespace Sentry
             {
                 size_t size = 0;
                 const char *json = lua_tolstring(this->mLua, -1, &size);
-                if(json != nullptr && size > 0)
-                {
-                    response.WriteString(json, size);
-                }
+				response.Json(HttpStatus::OK, json, size);
                 return XCode::Successful;
             }
             if (lua_istable(this->mLua, -1))
             {
                 this->mData.clear();
                 Lua::Json::Read(this->mLua, -1, &this->mData);
-                response.WriteString(this->mData);
+				response.Json(HttpStatus::OK, this->mData.c_str(), this->mData.size());
                 return XCode::Successful;
             }
         }

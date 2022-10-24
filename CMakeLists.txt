@@ -79,6 +79,7 @@ include_directories(${PROJECT_SOURCE_DIR}/Common/Script)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Network)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Cluster)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Forward)
+include_directories(${PROJECT_SOURCE_DIR}/Common/SubPublish)
 
 
 

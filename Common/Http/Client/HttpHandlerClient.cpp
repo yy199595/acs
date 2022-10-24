@@ -28,14 +28,8 @@ namespace Sentry
 #endif
 	}
 
-    void HttpHandlerClient::StartWriter(HttpStatus code)
+    void HttpHandlerClient::StartWriter()
     {
-        this->mHttpResponse->SetCode(code);
-        if(code != HttpStatus::OK)
-        {
-            const HttpData & httpData = this->mHttpRequest->GetData();
-            CONSOLE_LOG_ERROR("[" << httpData.mPath << "] " << HttpStatusToString(code));
-        }
 #ifdef ONLY_MAIN_THREAD
         this->Send(this->mHttpResponse);
 #else

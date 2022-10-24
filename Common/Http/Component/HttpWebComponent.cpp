@@ -4,6 +4,7 @@
 
 #include"HttpWebComponent.h"
 #include"File/FileHelper.h"
+#include"Defer/Defer.h"
 #include"Config/ServiceConfig.h"
 #include"Client/HttpHandlerClient.h"
 #include"Service/LocalHttpService.h"
@@ -25,19 +26,21 @@ namespace Sentry
     {
         assert(this->mApp->IsMainThread());
         std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
+		std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
+		Defer defer(std::bind(&HttpHandlerClient::StartWriter, httpClient));
 
-        const HttpData & httpData = request->GetData();
+		const HttpData & httpData = request->GetData();
         const HttpMethodConfig *httpConfig = HttpConfig::Inst()->GetMethodConfig(httpData.mPath);
         if (httpConfig == nullptr)
         {
-            httpClient->StartWriter(HttpStatus::NOT_FOUND);
+			response->Str(HttpStatus::NOT_FOUND, "not find route");
             CONSOLE_LOG_ERROR("[" << request->GetUrl() << "] " << HttpStatusToString(HttpStatus::NOT_FOUND));
             return;
         }
 
         if (!httpConfig->Type.empty() && httpConfig->Type != httpData.mMethod)
         {
-            httpClient->StartWriter(HttpStatus::METHOD_NOT_ALLOWED);
+			response->Str(HttpStatus::METHOD_NOT_ALLOWED, "method error");
             CONSOLE_LOG_ERROR("[" << request->GetUrl() << "] " << HttpStatusToString(HttpStatus::METHOD_NOT_ALLOWED));
             return;
         }
@@ -45,8 +48,8 @@ namespace Sentry
         LocalHttpService *httpService = this->GetComponent<LocalHttpService>(httpConfig->Service);
         if (httpService == nullptr || !httpService->IsStartService())
         {
-            httpClient->StartWriter(HttpStatus::NOT_FOUND);
-            CONSOLE_LOG_ERROR("[" << httpData.mPath << "] " << HttpStatusToString(HttpStatus::NOT_FOUND));
+			response->Str(HttpStatus::NOT_FOUND, "not find service");
+			CONSOLE_LOG_ERROR("[" << httpData.mPath << "] " << HttpStatusToString(HttpStatus::NOT_FOUND));
             return;
         }
         if (!httpConfig->IsAsync)
@@ -55,11 +58,11 @@ namespace Sentry
             XCode code = httpService->Invoke(httpConfig->Method, request, response);
             {
                 response->AddHead("code", (int) code);
-                httpClient->StartWriter(HttpStatus::OK);
             }
         }
         else
         {
+			defer.Cancle();
             this->mTaskComponent->Start([httpService, httpClient, httpConfig]() {
 
                 std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
@@ -67,7 +70,7 @@ namespace Sentry
                 XCode code = httpService->Invoke(httpConfig->Method, request, response);
                 {
                     response->AddHead("code", (int) code);
-                    httpClient->StartWriter(HttpStatus::OK);
+                    httpClient->StartWriter();
                 }
             });
         }

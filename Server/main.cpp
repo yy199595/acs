@@ -25,6 +25,7 @@
 #include"Component/TextConfigComponent.h"
 #include"Component/ClusterComponent.h"
 #include"Component/ForwardComponent.h"
+#include"Component/SubPublishComponent.h"
 #include"Component/ForwardHelperComponent.h"
 #include"Component/ForwardMessageComponent.h"
 
@@ -81,6 +82,7 @@ void RegisterComponent()
 // db
     ComponentFactory::Add<RedisDataComponent>("RedisDataComponent");
     ComponentFactory::Add<RedisSubComponent>("RedisSubComponent");
+	ComponentFactory::Add<SubPublishComponent>("SubPublishComponent");
 
 #ifdef __ENABLE_MONGODB__
     ComponentFactory::Add<MongoDBComponent>("MongoDBComponent");

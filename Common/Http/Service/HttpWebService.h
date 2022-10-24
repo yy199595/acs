@@ -17,7 +17,8 @@ namespace Sentry
         bool Awake();
     private:
         bool OnStartService(HttpServiceRegister &serviceRegister) final;
-        XCode Ping(const HttpHandlerRequest& request, HttpHandlerResponse& response);
+		XCode Ping(const HttpHandlerRequest& request, HttpHandlerResponse& response);
+		XCode Sleep(const HttpHandlerRequest& request, HttpHandlerResponse& response);
         XCode Hello(const HttpHandlerRequest& request, HttpHandlerResponse& response);
         XCode DownLoad(const HttpHandlerRequest& request, HttpHandlerResponse& response);
     private:

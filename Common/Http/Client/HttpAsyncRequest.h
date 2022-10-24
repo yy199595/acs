@@ -252,11 +252,13 @@ namespace Sentry
 		HttpHandlerResponse();
 		~HttpHandlerResponse();
 	 public:
-        Json::Writer & GetJson();
-        void SetCode(HttpStatus code);
+		void Str(HttpStatus code, const std::string & str);
+		void Json(HttpStatus code, Json::Document * document);
+		void Json(HttpStatus code, const char * json, size_t size);
+	 public:
 		void WriteFile(std::fstream* fs);
-        void WriteString(const std::string& content);
-		void WriteString(const char* content, size_t size);
+        //void WriteString(const std::string& content);
+		//void WriteString(const char* content, size_t size);
         std::string * Content() { return &mContent;}
     public:
 		bool AddHead(const char* key, int value);
@@ -269,7 +271,6 @@ namespace Sentry
 		size_t mContentSize;
 		std::string mContent;
 		std::fstream* mFstream;
-        std::shared_ptr<Json::Writer> mJson;
 		std::unordered_map<std::string, std::string> mHeadMap;
 	};
 }

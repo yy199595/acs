@@ -41,7 +41,7 @@ struct TableStruct_s2s_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[9]
+  static const ::google::protobuf::internal::ParseTable schema[13]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -67,6 +67,18 @@ extern cluster_exitDefaultTypeInternal _cluster_exit_default_instance_;
 class cluster_join;
 class cluster_joinDefaultTypeInternal;
 extern cluster_joinDefaultTypeInternal _cluster_join_default_instance_;
+class forward;
+class forwardDefaultTypeInternal;
+extern forwardDefaultTypeInternal _forward_default_instance_;
+class forward_publish;
+class forward_publishDefaultTypeInternal;
+extern forward_publishDefaultTypeInternal _forward_publish_default_instance_;
+class forward_sub;
+class forward_subDefaultTypeInternal;
+extern forward_subDefaultTypeInternal _forward_sub_default_instance_;
+class forward_unsub;
+class forward_unsubDefaultTypeInternal;
+extern forward_unsubDefaultTypeInternal _forward_unsub_default_instance_;
 class user;
 class userDefaultTypeInternal;
 extern userDefaultTypeInternal _user_default_instance_;
@@ -85,6 +97,10 @@ template<> ::s2s::allot_save* Arena::CreateMaybeMessage<::s2s::allot_save>(Arena
 template<> ::s2s::cluster* Arena::CreateMaybeMessage<::s2s::cluster>(Arena*);
 template<> ::s2s::cluster_exit* Arena::CreateMaybeMessage<::s2s::cluster_exit>(Arena*);
 template<> ::s2s::cluster_join* Arena::CreateMaybeMessage<::s2s::cluster_join>(Arena*);
+template<> ::s2s::forward* Arena::CreateMaybeMessage<::s2s::forward>(Arena*);
+template<> ::s2s::forward_publish* Arena::CreateMaybeMessage<::s2s::forward_publish>(Arena*);
+template<> ::s2s::forward_sub* Arena::CreateMaybeMessage<::s2s::forward_sub>(Arena*);
+template<> ::s2s::forward_unsub* Arena::CreateMaybeMessage<::s2s::forward_unsub>(Arena*);
 template<> ::s2s::user* Arena::CreateMaybeMessage<::s2s::user>(Arena*);
 template<> ::s2s::user_login* Arena::CreateMaybeMessage<::s2s::user_login>(Arena*);
 template<> ::s2s::user_logout* Arena::CreateMaybeMessage<::s2s::user_logout>(Arena*);
@@ -1210,6 +1226,514 @@ class allot :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2eproto;
 };
+// -------------------------------------------------------------------
+
+class forward_sub :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.forward.sub) */ {
+ public:
+  forward_sub();
+  virtual ~forward_sub();
+
+  forward_sub(const forward_sub& from);
+
+  inline forward_sub& operator=(const forward_sub& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  forward_sub(forward_sub&& from) noexcept
+    : forward_sub() {
+    *this = ::std::move(from);
+  }
+
+  inline forward_sub& operator=(forward_sub&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const forward_sub& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const forward_sub* internal_default_instance() {
+    return reinterpret_cast<const forward_sub*>(
+               &_forward_sub_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    9;
+
+  void Swap(forward_sub* other);
+  friend void swap(forward_sub& a, forward_sub& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline forward_sub* New() const final {
+    return CreateMaybeMessage<forward_sub>(nullptr);
+  }
+
+  forward_sub* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<forward_sub>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const forward_sub& from);
+  void MergeFrom(const forward_sub& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(forward_sub* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated string channels = 1;
+  int channels_size() const;
+  void clear_channels();
+  static const int kChannelsFieldNumber = 1;
+  const ::std::string& channels(int index) const;
+  ::std::string* mutable_channels(int index);
+  void set_channels(int index, const ::std::string& value);
+  #if LANG_CXX11
+  void set_channels(int index, ::std::string&& value);
+  #endif
+  void set_channels(int index, const char* value);
+  void set_channels(int index, const char* value, size_t size);
+  ::std::string* add_channels();
+  void add_channels(const ::std::string& value);
+  #if LANG_CXX11
+  void add_channels(::std::string&& value);
+  #endif
+  void add_channels(const char* value);
+  void add_channels(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField<::std::string>& channels() const;
+  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_channels();
+
+  // @@protoc_insertion_point(class_scope:s2s.forward.sub)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField<::std::string> channels_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
+// -------------------------------------------------------------------
+
+class forward_unsub :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.forward.unsub) */ {
+ public:
+  forward_unsub();
+  virtual ~forward_unsub();
+
+  forward_unsub(const forward_unsub& from);
+
+  inline forward_unsub& operator=(const forward_unsub& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  forward_unsub(forward_unsub&& from) noexcept
+    : forward_unsub() {
+    *this = ::std::move(from);
+  }
+
+  inline forward_unsub& operator=(forward_unsub&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const forward_unsub& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const forward_unsub* internal_default_instance() {
+    return reinterpret_cast<const forward_unsub*>(
+               &_forward_unsub_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    10;
+
+  void Swap(forward_unsub* other);
+  friend void swap(forward_unsub& a, forward_unsub& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline forward_unsub* New() const final {
+    return CreateMaybeMessage<forward_unsub>(nullptr);
+  }
+
+  forward_unsub* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<forward_unsub>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const forward_unsub& from);
+  void MergeFrom(const forward_unsub& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(forward_unsub* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated string channels = 1;
+  int channels_size() const;
+  void clear_channels();
+  static const int kChannelsFieldNumber = 1;
+  const ::std::string& channels(int index) const;
+  ::std::string* mutable_channels(int index);
+  void set_channels(int index, const ::std::string& value);
+  #if LANG_CXX11
+  void set_channels(int index, ::std::string&& value);
+  #endif
+  void set_channels(int index, const char* value);
+  void set_channels(int index, const char* value, size_t size);
+  ::std::string* add_channels();
+  void add_channels(const ::std::string& value);
+  #if LANG_CXX11
+  void add_channels(::std::string&& value);
+  #endif
+  void add_channels(const char* value);
+  void add_channels(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField<::std::string>& channels() const;
+  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_channels();
+
+  // @@protoc_insertion_point(class_scope:s2s.forward.unsub)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField<::std::string> channels_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
+// -------------------------------------------------------------------
+
+class forward_publish :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.forward.publish) */ {
+ public:
+  forward_publish();
+  virtual ~forward_publish();
+
+  forward_publish(const forward_publish& from);
+
+  inline forward_publish& operator=(const forward_publish& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  forward_publish(forward_publish&& from) noexcept
+    : forward_publish() {
+    *this = ::std::move(from);
+  }
+
+  inline forward_publish& operator=(forward_publish&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const forward_publish& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const forward_publish* internal_default_instance() {
+    return reinterpret_cast<const forward_publish*>(
+               &_forward_publish_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    11;
+
+  void Swap(forward_publish* other);
+  friend void swap(forward_publish& a, forward_publish& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline forward_publish* New() const final {
+    return CreateMaybeMessage<forward_publish>(nullptr);
+  }
+
+  forward_publish* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<forward_publish>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const forward_publish& from);
+  void MergeFrom(const forward_publish& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(forward_publish* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated string channel = 1;
+  int channel_size() const;
+  void clear_channel();
+  static const int kChannelFieldNumber = 1;
+  const ::std::string& channel(int index) const;
+  ::std::string* mutable_channel(int index);
+  void set_channel(int index, const ::std::string& value);
+  #if LANG_CXX11
+  void set_channel(int index, ::std::string&& value);
+  #endif
+  void set_channel(int index, const char* value);
+  void set_channel(int index, const char* value, size_t size);
+  ::std::string* add_channel();
+  void add_channel(const ::std::string& value);
+  #if LANG_CXX11
+  void add_channel(::std::string&& value);
+  #endif
+  void add_channel(const char* value);
+  void add_channel(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField<::std::string>& channel() const;
+  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_channel();
+
+  // string message = 2;
+  void clear_message();
+  static const int kMessageFieldNumber = 2;
+  const ::std::string& message() const;
+  void set_message(const ::std::string& value);
+  #if LANG_CXX11
+  void set_message(::std::string&& value);
+  #endif
+  void set_message(const char* value);
+  void set_message(const char* value, size_t size);
+  ::std::string* mutable_message();
+  ::std::string* release_message();
+  void set_allocated_message(::std::string* message);
+
+  // @@protoc_insertion_point(class_scope:s2s.forward.publish)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField<::std::string> channel_;
+  ::google::protobuf::internal::ArenaStringPtr message_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
+// -------------------------------------------------------------------
+
+class forward :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.forward) */ {
+ public:
+  forward();
+  virtual ~forward();
+
+  forward(const forward& from);
+
+  inline forward& operator=(const forward& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  forward(forward&& from) noexcept
+    : forward() {
+    *this = ::std::move(from);
+  }
+
+  inline forward& operator=(forward&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const forward& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const forward* internal_default_instance() {
+    return reinterpret_cast<const forward*>(
+               &_forward_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    12;
+
+  void Swap(forward* other);
+  friend void swap(forward& a, forward& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline forward* New() const final {
+    return CreateMaybeMessage<forward>(nullptr);
+  }
+
+  forward* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<forward>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const forward& from);
+  void MergeFrom(const forward& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(forward* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef forward_sub sub;
+  typedef forward_unsub unsub;
+  typedef forward_publish publish;
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:s2s.forward)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
 // ===================================================================
 
 
@@ -1811,9 +2335,293 @@ inline void allot_save::set_allocated_address(::std::string* address) {
 
 // allot
 
+// -------------------------------------------------------------------
+
+// forward_sub
+
+// repeated string channels = 1;
+inline int forward_sub::channels_size() const {
+  return channels_.size();
+}
+inline void forward_sub::clear_channels() {
+  channels_.Clear();
+}
+inline const ::std::string& forward_sub::channels(int index) const {
+  // @@protoc_insertion_point(field_get:s2s.forward.sub.channels)
+  return channels_.Get(index);
+}
+inline ::std::string* forward_sub::mutable_channels(int index) {
+  // @@protoc_insertion_point(field_mutable:s2s.forward.sub.channels)
+  return channels_.Mutable(index);
+}
+inline void forward_sub::set_channels(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:s2s.forward.sub.channels)
+  channels_.Mutable(index)->assign(value);
+}
+#if LANG_CXX11
+inline void forward_sub::set_channels(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:s2s.forward.sub.channels)
+  channels_.Mutable(index)->assign(std::move(value));
+}
+#endif
+inline void forward_sub::set_channels(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  channels_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:s2s.forward.sub.channels)
+}
+inline void forward_sub::set_channels(int index, const char* value, size_t size) {
+  channels_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:s2s.forward.sub.channels)
+}
+inline ::std::string* forward_sub::add_channels() {
+  // @@protoc_insertion_point(field_add_mutable:s2s.forward.sub.channels)
+  return channels_.Add();
+}
+inline void forward_sub::add_channels(const ::std::string& value) {
+  channels_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:s2s.forward.sub.channels)
+}
+#if LANG_CXX11
+inline void forward_sub::add_channels(::std::string&& value) {
+  channels_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:s2s.forward.sub.channels)
+}
+#endif
+inline void forward_sub::add_channels(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  channels_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:s2s.forward.sub.channels)
+}
+inline void forward_sub::add_channels(const char* value, size_t size) {
+  channels_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:s2s.forward.sub.channels)
+}
+inline const ::google::protobuf::RepeatedPtrField<::std::string>&
+forward_sub::channels() const {
+  // @@protoc_insertion_point(field_list:s2s.forward.sub.channels)
+  return channels_;
+}
+inline ::google::protobuf::RepeatedPtrField<::std::string>*
+forward_sub::mutable_channels() {
+  // @@protoc_insertion_point(field_mutable_list:s2s.forward.sub.channels)
+  return &channels_;
+}
+
+// -------------------------------------------------------------------
+
+// forward_unsub
+
+// repeated string channels = 1;
+inline int forward_unsub::channels_size() const {
+  return channels_.size();
+}
+inline void forward_unsub::clear_channels() {
+  channels_.Clear();
+}
+inline const ::std::string& forward_unsub::channels(int index) const {
+  // @@protoc_insertion_point(field_get:s2s.forward.unsub.channels)
+  return channels_.Get(index);
+}
+inline ::std::string* forward_unsub::mutable_channels(int index) {
+  // @@protoc_insertion_point(field_mutable:s2s.forward.unsub.channels)
+  return channels_.Mutable(index);
+}
+inline void forward_unsub::set_channels(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:s2s.forward.unsub.channels)
+  channels_.Mutable(index)->assign(value);
+}
+#if LANG_CXX11
+inline void forward_unsub::set_channels(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:s2s.forward.unsub.channels)
+  channels_.Mutable(index)->assign(std::move(value));
+}
+#endif
+inline void forward_unsub::set_channels(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  channels_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:s2s.forward.unsub.channels)
+}
+inline void forward_unsub::set_channels(int index, const char* value, size_t size) {
+  channels_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:s2s.forward.unsub.channels)
+}
+inline ::std::string* forward_unsub::add_channels() {
+  // @@protoc_insertion_point(field_add_mutable:s2s.forward.unsub.channels)
+  return channels_.Add();
+}
+inline void forward_unsub::add_channels(const ::std::string& value) {
+  channels_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:s2s.forward.unsub.channels)
+}
+#if LANG_CXX11
+inline void forward_unsub::add_channels(::std::string&& value) {
+  channels_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:s2s.forward.unsub.channels)
+}
+#endif
+inline void forward_unsub::add_channels(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  channels_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:s2s.forward.unsub.channels)
+}
+inline void forward_unsub::add_channels(const char* value, size_t size) {
+  channels_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:s2s.forward.unsub.channels)
+}
+inline const ::google::protobuf::RepeatedPtrField<::std::string>&
+forward_unsub::channels() const {
+  // @@protoc_insertion_point(field_list:s2s.forward.unsub.channels)
+  return channels_;
+}
+inline ::google::protobuf::RepeatedPtrField<::std::string>*
+forward_unsub::mutable_channels() {
+  // @@protoc_insertion_point(field_mutable_list:s2s.forward.unsub.channels)
+  return &channels_;
+}
+
+// -------------------------------------------------------------------
+
+// forward_publish
+
+// repeated string channel = 1;
+inline int forward_publish::channel_size() const {
+  return channel_.size();
+}
+inline void forward_publish::clear_channel() {
+  channel_.Clear();
+}
+inline const ::std::string& forward_publish::channel(int index) const {
+  // @@protoc_insertion_point(field_get:s2s.forward.publish.channel)
+  return channel_.Get(index);
+}
+inline ::std::string* forward_publish::mutable_channel(int index) {
+  // @@protoc_insertion_point(field_mutable:s2s.forward.publish.channel)
+  return channel_.Mutable(index);
+}
+inline void forward_publish::set_channel(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:s2s.forward.publish.channel)
+  channel_.Mutable(index)->assign(value);
+}
+#if LANG_CXX11
+inline void forward_publish::set_channel(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:s2s.forward.publish.channel)
+  channel_.Mutable(index)->assign(std::move(value));
+}
+#endif
+inline void forward_publish::set_channel(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  channel_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:s2s.forward.publish.channel)
+}
+inline void forward_publish::set_channel(int index, const char* value, size_t size) {
+  channel_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:s2s.forward.publish.channel)
+}
+inline ::std::string* forward_publish::add_channel() {
+  // @@protoc_insertion_point(field_add_mutable:s2s.forward.publish.channel)
+  return channel_.Add();
+}
+inline void forward_publish::add_channel(const ::std::string& value) {
+  channel_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:s2s.forward.publish.channel)
+}
+#if LANG_CXX11
+inline void forward_publish::add_channel(::std::string&& value) {
+  channel_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:s2s.forward.publish.channel)
+}
+#endif
+inline void forward_publish::add_channel(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  channel_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:s2s.forward.publish.channel)
+}
+inline void forward_publish::add_channel(const char* value, size_t size) {
+  channel_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:s2s.forward.publish.channel)
+}
+inline const ::google::protobuf::RepeatedPtrField<::std::string>&
+forward_publish::channel() const {
+  // @@protoc_insertion_point(field_list:s2s.forward.publish.channel)
+  return channel_;
+}
+inline ::google::protobuf::RepeatedPtrField<::std::string>*
+forward_publish::mutable_channel() {
+  // @@protoc_insertion_point(field_mutable_list:s2s.forward.publish.channel)
+  return &channel_;
+}
+
+// string message = 2;
+inline void forward_publish::clear_message() {
+  message_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& forward_publish::message() const {
+  // @@protoc_insertion_point(field_get:s2s.forward.publish.message)
+  return message_.GetNoArena();
+}
+inline void forward_publish::set_message(const ::std::string& value) {
+  
+  message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:s2s.forward.publish.message)
+}
+#if LANG_CXX11
+inline void forward_publish::set_message(::std::string&& value) {
+  
+  message_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:s2s.forward.publish.message)
+}
+#endif
+inline void forward_publish::set_message(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:s2s.forward.publish.message)
+}
+inline void forward_publish::set_message(const char* value, size_t size) {
+  
+  message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:s2s.forward.publish.message)
+}
+inline ::std::string* forward_publish::mutable_message() {
+  
+  // @@protoc_insertion_point(field_mutable:s2s.forward.publish.message)
+  return message_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* forward_publish::release_message() {
+  // @@protoc_insertion_point(field_release:s2s.forward.publish.message)
+  
+  return message_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void forward_publish::set_allocated_message(::std::string* message) {
+  if (message != nullptr) {
+    
+  } else {
+    
+  }
+  message_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), message);
+  // @@protoc_insertion_point(field_set_allocated:s2s.forward.publish.message)
+}
+
+// -------------------------------------------------------------------
+
+// forward
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

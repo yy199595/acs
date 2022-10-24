@@ -24,6 +24,11 @@
 			"Async": false,
 			"Path": "/"
 		},
+		"Sleep": {
+			"Type": "GET",
+			"Async": true,
+			"Path": "/sleep"
+		},
 		"DownLoad": {
 			"Type": "GET",
 			"Async": false,

@@ -4,6 +4,7 @@
 
 #ifndef APP_SUBPUBLISHCOMPONENT_H
 #define APP_SUBPUBLISHCOMPONENT_H
+#include"Client/Message.h"
 #include"Component/Component.h"
 namespace Sentry
 {
@@ -14,6 +15,8 @@ namespace Sentry
 	 public:
 		int Subscribe(const std::string & channel);
 		int UnSubscribe(const std::string & channel);
+		bool OnMessage(std::shared_ptr<Rpc::Packet> message);
+		int Subscribe(std::unordered_set<std::string> & channels);
 		int Publish(const std::string & channel, const std::string & content);
 	 protected:
 		bool LateAwake() final;
@@ -21,6 +24,7 @@ namespace Sentry
 	 private:
 		std::vector<std::string> mLocations;
 		class InnerNetMessageComponent * mInnerComponent;
+		std::unordered_map<std::string, std::unordered_set<std::string>> mChannels;
 	};
 }
 

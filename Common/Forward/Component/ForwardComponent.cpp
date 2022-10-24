@@ -3,6 +3,7 @@
 //
 
 #include"ForwardComponent.h"
+#include"Service/RpcService.h"
 #include"Component/LocationComponent.h"
 #include"Component/NetThreadComponent.h"
 #include"Component/ForwardMessageComponent.h"
@@ -50,7 +51,7 @@ namespace Sentry
             this->mClients.erase(iter);
         }
         auto iter1 = this->mAuthClients.find(address);
-        if(iter1 != this->mAuthClients.end()) //通知其他验证过的客户端
+        if(iter1 != this->mAuthClients.end()) //TODO 通知其他验证过的客户端
         {
             this->mAuthClients.erase(iter1);
         }
@@ -133,7 +134,7 @@ namespace Sentry
         std::string target;
         long long userId = 0;
         Rpc::Head &head = message->GetHead();
-        if (message->GetHead().Get("id", userId))
+        if (head.Get("id", userId))
         {
             return this->Forward(userId, message);
         }
@@ -144,17 +145,37 @@ namespace Sentry
         }
         else
         {
-            XCode code = this->mMessageComponent->OnMessage(message);
-            {
-                if (message->GetHead().Has("rpc"))
-                {
-                    message->GetHead().Add("code", code);
-                    this->OnResponse(message);
-                }
-            }
+			XCode code = this->CallService(message);
+			{
+				if (message->GetHead().Has("rpc"))
+				{
+#ifdef __DEBUG__
+					head.Remove("func");
+#endif
+					head.Add("code", code);
+					return this->OnResponse(message);
+				}
+			}
         }
         return XCode::Successful;
     }
+
+	XCode ForwardComponent::CallService(std::shared_ptr<Rpc::Packet> message)
+	{
+		std::string fullName;
+		LOG_RPC_CHECK_ARGS(message->GetHead().Get("func", fullName));
+		const RpcMethodConfig * rpcMethodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
+		if(rpcMethodConfig == nullptr)
+		{
+			return XCode::CallArgsError;
+		}
+		RpcService * rpcService = this->mApp->GetService(rpcMethodConfig->Service);
+		if(rpcService == nullptr)
+		{
+			return XCode::CallServiceNotFound;
+		}
+		return rpcService->Invoke(rpcMethodConfig->Method, message);
+	}
 
     XCode ForwardComponent::Forward(long long userId, std::shared_ptr<Rpc::Packet> message)
     {
@@ -242,6 +263,7 @@ namespace Sentry
 		{
 			return XCode::Failure;
 		}
+		message->SetType(Tcp::Type::Response);
         message->GetHead().Remove("resp");
 		InnerNetClient * netClient = this->GetClient(address);
 		if(netClient == nullptr)

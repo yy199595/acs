@@ -73,8 +73,6 @@ namespace Sentry
 	 public:
 		using IServiceConfig::IServiceConfig;
 	 public:
-        bool IsRpcConfig() const{ return false;}
-        bool IsHttpConfig() const{ return true;}
         bool OnLoadConfig(const rapidjson::Value &json) final;
         bool OnReLoadConfig(const rapidjson::Value & json) final;
 	};
