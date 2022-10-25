@@ -6,7 +6,7 @@ namespace Sentry
 	{
 	 public:
 		MysqlHelperComponent() = default;
-	public:
+     public:
 		XCode Add(const Message & data, int flag);
 
 		XCode Save(const Message & data, int flag);
@@ -30,7 +30,7 @@ namespace Sentry
 		bool LateAwake() final;
 		XCode Call(const std::string& func, const Message& data, std::shared_ptr<db::mysql::response> response = nullptr);
 	private:
-		class RpcService * mMysqlService;
+        std::string mBindName;
 		class LocationComponent * mLocationComponent;
 	};
 

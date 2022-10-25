@@ -1,5 +1,5 @@
 ﻿#include"RpcService.h"
-#include"App/App.h"
+#include"Helper/Helper.h"
 #include"Lua/LuaServiceMethod.h"
 #include"Config/ServiceConfig.h"
 #include"String/StringHelper.h"
@@ -60,34 +60,13 @@ namespace Sentry
 
     bool RpcService::StartSend(const std::string &address, const std::string &func, const Message *message)
     {
-        const std::string fullName = fmt::format("{0}.{1}", this->GetName(), func);
-        const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
-        if(methodConfig == nullptr)
-        {
-            LOG_ERROR("not find [" << fullName << "] config");
-            return false;
-        }
-        if(!methodConfig->Request.empty())
-        {
-            if(message == nullptr)
-            {
-                LOG_ERROR("call [" << fullName << "] request is empty");
-                return false;
-            }
-            if(message->GetTypeName() != methodConfig->Request)
-            {
-                LOG_ERROR("call [" << fullName << "] request type error");
-                return false;
-            }
-        }
-        std::shared_ptr<Rpc::Packet> request = std::make_shared<Rpc::Packet>();
+        RpcPacket request = Helper::MakeRpcPacket(this->GetName(), func);
         {
             request->SetType(Tcp::Type::Request);
             request->SetProto(Tcp::Porto::Protobuf);
 #ifdef __INNER_MSG_FORWARD__
             request->GetHead().Add("to", address);
 #endif
-            request->GetHead().Add("func", methodConfig->FullName);
             request->WriteMessage(message);
         }
 #ifdef __INNER_MSG_FORWARD__
@@ -102,41 +81,13 @@ namespace Sentry
     std::shared_ptr<Rpc::Packet> RpcService::CallAwait(
         const std::string &address, const std::string &func, const Message *message)
     {
-        const std::string fullName = fmt::format("{0}.{1}", this->GetName(), func);
-        const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
-        if(methodConfig == nullptr)
-        {
-            LOG_ERROR("not find [" << fullName << "] config");
-            return nullptr;
-        }
-
-        if(!methodConfig->Request.empty())
-        {
-            if(message == nullptr)
-            {
-                LOG_ERROR("call [" << fullName << "] request is empty");
-                return nullptr;
-            }
-            if(message->GetTypeName() != methodConfig->Request)
-            {
-                LOG_ERROR("call [" << fullName << "] request type error");
-                return nullptr;
-            }
-        }
-
-        std::shared_ptr<Rpc::Packet> request = std::make_shared<Rpc::Packet>();
+        RpcPacket request = Helper::MakeRpcPacket(this->GetName(), func);
         {
             request->SetType(Tcp::Type::Request);
             request->SetProto(Tcp::Porto::Protobuf);
-            request->GetHead().Add("func", func);
 #ifdef __INNER_MSG_FORWARD__
             request->GetHead().Add("to", address);
 #endif
-            if (!methodConfig->Request.empty() && message == nullptr)
-            {
-                CONSOLE_LOG_ERROR("call " << func << " request error");
-                return nullptr;
-            }
             request->WriteMessage(message);
         }
 #ifdef __INNER_MSG_FORWARD__

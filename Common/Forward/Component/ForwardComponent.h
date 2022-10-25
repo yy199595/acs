@@ -31,17 +31,17 @@ namespace Sentry
     private:
         XCode Forward(long long userId, std::shared_ptr<Rpc::Packet> message);
         XCode Forward(const std::string & adress, std::shared_ptr<Rpc::Packet> message);
-		XCode CallService(std::shared_ptr<Rpc::Packet> message);
     public:
-        void Send(const std::string & func, const Message * message);
-        void Send(const std::string & address, std::shared_ptr<Rpc::Packet> message);
-        void Send(const std::string & address, const std::string & func, const Message * message);
+        bool Send(std::shared_ptr<Rpc::Packet> message);
+        const ServiceNodeInfo * GetServerInfo(const std::string & address) const;
+        bool Send(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
+        std::string mLocalHost;
         class LocationComponent * mLocationComponent;
         std::unordered_set<std::string> mAuthClients;
-        class ForwardMessageComponent * mMessageComponent;
         std::unordered_map<std::string, std::string> mLocationMap;
         std::unordered_map<std::string, std::shared_ptr<InnerNetClient>> mClients;
+        std::unordered_map<std::string, std::unique_ptr<ServiceNodeInfo>> mNodeInfos;
     };
 }
 

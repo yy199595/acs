@@ -27,10 +27,10 @@ namespace Sentry
     private:
 		bool LateAwake() final;
 	 private:
+        std::string mBindName;
         db::mongo::update mUpdateRequest;
         db::mongo::insert mInsertRequest;
         db::mongo::remove mRemoveRequest;
-		class RpcService * mMongoService;
 		db::mongo::query::request mQueryRequest;
 		class LocationComponent * mLocationComponent;
 	};

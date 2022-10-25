@@ -7,6 +7,16 @@
 			"Response": "s2s.allot.response"
 		}
 	},
+	"LocationService": {
+		"Add": {
+			"Async": false,
+			"Request": "s2s.location.add"
+		},
+		"Del": {
+			"Async": false,
+			"Request": "s2s.location.del"
+		}
+	},
 	"MysqlService": {
 		"Add": {
 			"Async": true,

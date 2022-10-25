@@ -27,6 +27,16 @@ namespace Sentry
         this->mLocations[service] = address;
     }
 
+    bool LocationUnit::Get(std::vector<std::string> &services)
+    {
+        auto iter = this->mLocations.begin();
+        for (; iter != this->mLocations.end(); iter++)
+        {
+            services.emplace_back(iter->first);
+        }
+        return services.size() > 0;
+    }
+
     bool LocationUnit::Get(const std::string &service, std::string &address) const
     {
         auto iter = this->mLocations.find(service);

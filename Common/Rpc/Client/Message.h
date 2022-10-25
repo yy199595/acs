@@ -138,6 +138,7 @@ namespace Rpc
         return false;
     }
 }
+typedef std::shared_ptr<Rpc::Packet> RpcPacket;
 
 
 #endif //APP_MESSAGE_H

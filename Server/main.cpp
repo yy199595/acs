@@ -23,20 +23,18 @@
 #include"Component/HttpWebComponent.h"
 #include"Component/LocationComponent.h"
 #include"Component/TextConfigComponent.h"
-#include"Component/ClusterComponent.h"
+#include"Component/LaunchComponent.h"
 #include"Component/ForwardComponent.h"
 #include"Component/SubPublishComponent.h"
 #include"Component/ForwardHelperComponent.h"
-#include"Component/ForwardMessageComponent.h"
 
-#include"Service/LuaRpcService.h"
+#include"Service/SubPublish.h"
 #include"Service/OuterService.h"
 #include"Service/InnerService.h"
-#include"Service/ServiceRpcComponent.h"
 #include"Service/HttpWebService.h"
+#include"Service/LocationService.h"
 #include"Service/HttpRpcService.h"
 #include"Service/UserBehavior.h"
-#include"Service/LuaHttpService.h"
 #ifdef __ENABLE_MONGODB__
 #include"Service/MongoService.h"
 #include"Component/MongoDBComponent.h"
@@ -65,7 +63,7 @@ void RegisterComponent()
     ComponentFactory::Add<ProtoComponent>("ProtoComponent");
 
 //server
-    ComponentFactory::Add<ClusterComponent>("ClusterComponent");
+    ComponentFactory::Add<LaunchComponent>("LaunchComponent");
     ComponentFactory::Add<TextConfigComponent>("TextConfigComponent");
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
     ComponentFactory::Add<InnerNetComponent>("InnerNetComponent");
@@ -73,7 +71,6 @@ void RegisterComponent()
 
     ComponentFactory::Add<ForwardComponent>("ForwardComponent");
     ComponentFactory::Add<ForwardHelperComponent>("ForwardHelperComponent");
-    ComponentFactory::Add<ForwardMessageComponent>("ForwardMessageComponent");
 
 // gate
 	ComponentFactory::Add<GateHelperComponent>("GateHelperComponent");
@@ -110,14 +107,13 @@ void RegisterComponent()
 
 void RegisterServiceComponent()
 {
-    ComponentFactory::Add<LuaRpcService>("rpc");
-    ComponentFactory::Add<ServiceRpcComponent>("agent");
-    ComponentFactory::Add<LuaHttpService>("http");
+    ComponentFactory::Add<SubPublish>("SubPublish");
     ComponentFactory::Add<UserBehavior>("UserBehavior");
     ComponentFactory::Add<OuterService>("OuterService");
     ComponentFactory::Add<InnerService>("InnerService");
+    ComponentFactory::Add<LocationService>("LocationService");
 #ifdef __ENABLE_MONGODB__
-	ComponentFactory::Add<MongoService>("MongoService");
+    ComponentFactory::Add<MongoService>("MongoService");
 #endif
 
 #ifdef __ENABLE_MYSQL__

@@ -85,7 +85,6 @@ namespace Sentry
         std::vector<std::string> services;
         std::vector<const NodeConfig *> nodeConfigs;
         ClusterConfig::Inst()->GetNodeConfigs(nodeConfigs);
-        std::unordered_map<std::string, std::string> locations;
         for(const NodeConfig * nodeConfig : nodeConfigs)
         {
             services.clear();
@@ -106,11 +105,10 @@ namespace Sentry
                 {
                     return XCode::NetWorkError;
                 }
-                locations.emplace(service, location);
                 locationUnit->Add(service, location);
             }
         }
-        if(!this->mForwardComponent->OnAllot(userId, locations))
+        if(!this->mForwardComponent->OnAllot(locationUnit.get()))
         {
             return XCode::NetWorkError;
         }

@@ -8,12 +8,12 @@
 namespace Sentry
 {
 	bool MongoHelperComponent::LateAwake()
-	{
-        std::string name = ComponentFactory::GetName<MongoService>();
-		this->mMongoService = this->GetComponent<RpcService>(name);
-		this->mLocationComponent = this->GetComponent<LocationComponent>();
-		return true;
-	}
+    {
+        this->mBindName = ComponentFactory::GetName<MongoService>();
+        LOG_CHECK_RET_FALSE(this->mApp->GetService(this->mBindName));
+        this->mLocationComponent = this->GetComponent<LocationComponent>();
+        return true;
+    }
 
 	XCode MongoHelperComponent::Insert(const Message& message, int index)
 	{
@@ -24,8 +24,8 @@ namespace Sentry
 	XCode MongoHelperComponent::Insert(const char* tab, const Message& message, int index)
 	{
 		std::string address;
-		const std::string & name = this->mMongoService->GetName();
-		if(!this->mLocationComponent->AllotLocation(name, address))
+        RpcService * rpcService = this->mApp->GetService(this->mBindName);
+		if(!this->mLocationComponent->AllotLocation(this->mBindName, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
@@ -37,14 +37,14 @@ namespace Sentry
 		{
 			return XCode::CallServiceNotFound;
 		}
-		return this->mMongoService->Call(address, "Insert", request);
+		return rpcService->Call(address, "Insert", request);
 	}
 
     XCode MongoHelperComponent::Update(const char *tab, const std::string &select, const std::string &data, int index)
     {
 		std::string address;
-		const std::string & name = this->mMongoService->GetName();
-		if(!this->mLocationComponent->AllotLocation(name, address))
+        RpcService * rpcService = this->mApp->GetService(this->mBindName);
+        if(!this->mLocationComponent->AllotLocation(this->mBindName, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
@@ -52,28 +52,28 @@ namespace Sentry
         request.set_tab(tab);
         request.set_update(std::move(data));
         request.set_select(std::move(select));
-        return this->mMongoService->Call(address, "Update", request);
+        return rpcService->Call(address, "Update", request);
     }
 
 	XCode MongoHelperComponent::Insert(const char* tab, const std::string& json, int index)
 	{
 		std::string address;
-		const std::string & name = this->mMongoService->GetName();
-		if(!this->mLocationComponent->AllotLocation(name, address))
+        RpcService * rpcService = this->mApp->GetService(this->mBindName);
+        if(!this->mLocationComponent->AllotLocation(this->mBindName, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
 		this->mInsertRequest.set_tab(tab);
         this->mInsertRequest.set_flag(index);
         this->mInsertRequest.set_json(std::move(json));
-        return this->mMongoService->Call(address, "Insert", this->mInsertRequest);
+        return rpcService->Call(address, "Insert", this->mInsertRequest);
 	}
 
 	XCode MongoHelperComponent::Remove(const char* tab, const std::string& select, int limit, int index)
 	{
 		std::string address;
-		const std::string & name = this->mMongoService->GetName();
-		if(!this->mLocationComponent->AllotLocation(name, address))
+        RpcService * rpcService = this->mApp->GetService(this->mBindName);
+        if(!this->mLocationComponent->AllotLocation(this->mBindName, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
@@ -81,23 +81,23 @@ namespace Sentry
         this->mRemoveRequest.set_flag(index);
         this->mRemoveRequest.set_limit(limit);
         this->mRemoveRequest.set_json(std::move(select));
-        return this->mMongoService->Call(address, "Remove", this->mRemoveRequest);
+        return rpcService->Call(address, "Remove", this->mRemoveRequest);
 	}
 
 	XCode MongoHelperComponent::Query(const char* tab,
                                       const std::string& select, std::shared_ptr<Message> response)
 	{
 		std::string address;
-		const std::string & name = this->mMongoService->GetName();
-		if(!this->mLocationComponent->AllotLocation(name, address))
+        RpcService * rpcService = this->mApp->GetService(this->mBindName);
+        if(!this->mLocationComponent->AllotLocation(this->mBindName, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
 		this->mQueryRequest.set_tab(tab);
         this->mQueryRequest.set_limit(1);
         this->mQueryRequest.set_json(std::move(select));
-		std::shared_ptr<db::mongo::query::response> result(new db::mongo::query::response());
-		XCode code = this->mMongoService->Call(address, "Query", this->mQueryRequest, result);
+		std::shared_ptr<db::mysql::response> result(new db::mysql::response());
+		XCode code = rpcService->Call(address, "Query", this->mQueryRequest, result);
 		if(code == XCode::Successful && result->jsons_size() > 0)
 		{
 			const std::string & json = result->jsons(0);
@@ -140,8 +140,8 @@ namespace Sentry
                 return XCode::CallArgsError;
         }
 		std::string address;
-		const std::string & name = this->mMongoService->GetName();
-		if(!this->mLocationComponent->AllotLocation(name, address))
+        RpcService * rpcService = this->mApp->GetService(this->mBindName);
+        if(!this->mLocationComponent->AllotLocation(this->mBindName, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
@@ -152,7 +152,7 @@ namespace Sentry
         }
         this->mUpdateRequest.set_tab(std::move(message.GetTypeName()));
         this->mUpdateRequest.set_select(std::move(select.JsonString()));
-        return this->mMongoService->Call(address, "Update", this->mUpdateRequest);
+        return rpcService->Call(address, "Update", this->mUpdateRequest);
     }
 
     XCode MongoHelperComponent::Save(const char *tab, long long id, const std::string &data)

@@ -8,7 +8,7 @@
 #include"Component/LocationComponent.h"
 #include"Component/TextConfigComponent.h"
 #include"Component/NetThreadComponent.h"
-#include"Component/ClusterComponent.h"
+#include"Component/LaunchComponent.h"
 using namespace Sentry;
 using namespace std::chrono;
 
@@ -36,7 +36,7 @@ namespace Sentry
         LOG_CHECK_RET_FALSE(this->AddComponent<TextConfigComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<LocationComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<NetThreadComponent>());
-        LOG_CHECK_RET_FALSE(this->AddComponent<ClusterComponent>());
+        LOG_CHECK_RET_FALSE(this->AddComponent<LaunchComponent>());
 
         std::vector<Component *> components;
         if(this->GetComponents(components) > 0)
@@ -176,6 +176,7 @@ namespace Sentry
             this->mTimerComponent->CancelTimer(timeId);
             LOG_DEBUG("start " << name << " successful use time = [" << timer.GetSecond() << "s]");
         }
+        this->mStartTimer = 1; //开始帧循环
         std::vector<IComplete *> completeComponents;
         this->GetComponents(completeComponents);
         for(IComplete * complete : completeComponents)
@@ -183,7 +184,6 @@ namespace Sentry
             complete->OnLocalComplete();
         }
         CONSOLE_LOG_DEBUG("start all component complete");
-        this->mStartTimer = 1; //开始帧循环
         this->WaitDepentServiceStart();
     }
 
@@ -230,17 +230,5 @@ namespace Sentry
 	{
 		auto iter = this->mSeviceMap.find(name);
 		return iter != this->mSeviceMap.end() ? iter->second : nullptr;
-	}
-
-	bool App::GetServices(std::vector<RpcService*>& services)
-	{
-		services.clear();
-		auto iter = this->mSeviceMap.begin();
-		services.reserve(this->mSeviceMap.size());
-		for(; iter != this->mSeviceMap.end(); iter++)
-		{
-			services.emplace_back(iter->second);
-		}
-		return !services.empty();
 	}
 }

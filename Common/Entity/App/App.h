@@ -32,7 +32,6 @@ namespace Sentry
 		void Stop();
         int Run(int argc, char ** argv);
         RpcService * GetService(const std::string & name);
-		bool GetServices(std::vector<RpcService *> & services);
         bool OnDelComponent(Component *component) final { return false; }
         inline bool IsMainThread() const { return this->mThreadId == std::this_thread::get_id();}
     private:
@@ -61,7 +60,7 @@ namespace Sentry
 		std::vector<IFrameUpdate*> mFrameUpdateManagers;
 		std::vector<ISystemUpdate*> mSystemUpdateManagers;
 		std::vector<ISecondUpdate*> mSecondUpdateManagers;
-        std::unordered_map<std::string, RpcService*> mSeviceMap;
         std::vector<ILastFrameUpdate*> mLastFrameUpdateManager;
-	};
+        std::unordered_map<std::string, RpcService*> mSeviceMap;
+    };
 }// namespace Sentry

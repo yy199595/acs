@@ -82,11 +82,11 @@ namespace Sentry
     XCode InnerService::Stop()
     {
         std::vector<RpcService *> components;
-        if(this->mApp->GetServices(components))
+        if(this->mApp->GetComponents(components))
         {
             for (RpcService *component: components)
             {
-                if(component != this && component->IsStartService())
+                if(component->IsStartService())
                 {
                     component->WaitAllMessageComplete();
                     component->Close();

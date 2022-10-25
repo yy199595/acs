@@ -7,10 +7,10 @@ namespace Sentry
 {
 	bool MysqlHelperComponent::LateAwake()
 	{
-        std::string name = ComponentFactory::GetName<MysqlService>();
-		this->mMysqlService = this->GetComponent<RpcService>(name);
-		this->mLocationComponent = this->GetComponent<LocationComponent>();
-		return this->mMysqlService != nullptr;
+        this->mBindName = ComponentFactory::GetName<MysqlService>();
+        LOG_CHECK_RET_FALSE(this->mApp->GetService(this->mBindName));
+        this->mLocationComponent = this->GetComponent<LocationComponent>();
+		return true;
 	}
 	XCode MysqlHelperComponent::Add(const Message& message, int flag)
 	{
@@ -54,16 +54,16 @@ namespace Sentry
 	XCode MysqlHelperComponent::Call(const std::string& func, const Message& data, std::shared_ptr<db::mysql::response> response)
 	{
 		std::string address;
-		const std::string & name = this->mMysqlService->GetName();
-		if(!this->mLocationComponent->AllotLocation(name, address))
+        RpcService * rpcService = this->mApp->GetService(this->mBindName);
+		if(!this->mLocationComponent->AllotLocation(this->mBindName, address))
 		{
 			return XCode::CallServiceNotFound;
 		}
 		if(response == nullptr)
 		{
-			return this->mMysqlService->Call(address, func, data);
+			return rpcService->Call(address, func, data);
 		}
-		return this->mMysqlService->Call(address, func, data, response);
+		return rpcService->Call(address, func, data, response);
 	}
 
 	XCode MysqlHelperComponent::QueryOnce(const std::string& json, std::shared_ptr<Message> response)

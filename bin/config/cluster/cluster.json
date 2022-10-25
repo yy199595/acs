@@ -4,8 +4,7 @@
 			"HttpComponent",
 			"ClientComponent",
 			"LuaScriptComponent"
-		],
-		"lua": "script/Client/Client.lua"
+		]
 	},
 	"Server": {
 		"AutoAllot": true,
@@ -26,10 +25,8 @@
 			"LuaScriptComponent",
 			"ForwardComponent",
 			"SubPublishComponent",
-			"ForwardHelperComponent",
-			"ForwardMessageComponent"
-		],
-		"lua": "script/Server/Server.lua"
+			"ForwardHelperComponent"
+		]
 	},
 	"ChatServer": {
 		"AutoAllot": true,

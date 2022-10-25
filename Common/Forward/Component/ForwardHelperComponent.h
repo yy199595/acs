@@ -8,6 +8,7 @@
 #include"Component/Component.h"
 namespace Sentry
 {
+    class LocationUnit;
 	class ForwardHelperComponent final : public Component, public IComplete
     {
     public:
@@ -19,9 +20,11 @@ namespace Sentry
     public:
         void GetLocation(std::string & address);
         void GetLocation(long long userId, std::string & address);
-        bool OnAllot(long long userId, const std::string & service, const std::string & address);
-        bool OnAllot(long long userId, const std::unordered_map<std::string, std::string> & infos);
+    public:
+        bool OnAllot(LocationUnit * locationUnit);
+        bool OnAllot(const std::string & service, LocationUnit * locationUnit);
     private:
+        std::string mBindName;
         std::vector<std::string> mLocations;
         class InnerNetMessageComponent * mInnerComponent;
         std::unordered_map<std::string, int> mLocationWeights;

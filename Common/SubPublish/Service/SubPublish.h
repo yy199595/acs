@@ -15,10 +15,13 @@ namespace Sentry
 	 private:
 		XCode Sub(const Rpc::Head & head, const s2s::forward::sub & request);
 		XCode UnSub(const Rpc::Head & head, const s2s::forward::unsub & request);
-		XCode Publish(const Rpc::Head & head, const s2s::forward::unsub & request);
+		XCode Publish(const Rpc::Head & head, const s2s::forward::publish & request);
 	 private:
 		bool OnStart() final;
 		bool OnClose() final;
+    private:
+        class ForwardComponent * mFrowardComponent;
+        std::unordered_map<std::string, std::set<std::string>> mChannels;
 	};
 }
 

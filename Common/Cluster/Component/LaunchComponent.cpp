@@ -2,7 +2,7 @@
 // Created by zmhy0073 on 2022/10/12.
 //
 
-#include"ClusterComponent.h"
+#include"LaunchComponent.h"
 #include"App/App.h"
 #include"File/FileHelper.h"
 #include"App/System/System.h"
@@ -15,7 +15,7 @@
 #include"Component/LocationComponent.h"
 namespace Sentry
 {
-    bool ClusterComponent::Awake()
+    bool LaunchComponent::Awake()
     {
         const NodeConfig * nodeConfig = ClusterConfig::Inst()->GetConfig();
 		LOG_CHECK_RET_FALSE(nodeConfig);
@@ -39,6 +39,11 @@ namespace Sentry
             {
                 const RpcServiceConfig * rpcServiceConfig = RpcConfig::Inst()->GetConfig(name);
                 const HttpServiceConfig * httpServiceConfig = HttpConfig::Inst()->GetConfig(name);
+                if(rpcServiceConfig == nullptr && httpServiceConfig == nullptr)
+                {
+                    LOG_ERROR("not find service config : " << name);
+                    return false;
+                }
                 if(!this->mApp->AddComponent(name))
                 {
                     if(rpcServiceConfig != nullptr)
@@ -78,7 +83,7 @@ namespace Sentry
         return true;
     }
 
-    bool ClusterComponent::Start()
+    bool LaunchComponent::Start()
     {
         const ServerConfig * config = ServerConfig::Inst();
         const ClusterConfig * clusterConfig  = ClusterConfig::Inst();
@@ -102,8 +107,8 @@ namespace Sentry
                         LOG_ERROR("not find http location config");
                         return false;
                     }
-                    locationComponent->AddLocation(name, location);
                     LOG_INFO("start rpc service [" << name << "] successful");
+                    locationComponent->AddLocation(name, location);
                 }
                 else if(HttpConfig::Inst()->GetConfig(name) != nullptr)
                 {

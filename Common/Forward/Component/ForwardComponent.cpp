@@ -3,19 +3,19 @@
 //
 
 #include"ForwardComponent.h"
+#include"Helper/Helper.h"
 #include"Service/RpcService.h"
+#include"Config/ClusterConfig.h"
 #include"Component/LocationComponent.h"
 #include"Component/NetThreadComponent.h"
-#include"Component/ForwardMessageComponent.h"
 namespace Sentry
 {
     bool ForwardComponent::LateAwake()
     {
+        LOG_CHECK_RET_FALSE(this->StartListen("forward"));
         this->mLocationComponent = this->GetComponent<LocationComponent>();
-        this->mMessageComponent = this->GetComponent<ForwardMessageComponent>();
-        return this->StartListen("forward");
+        return true;
     }
-
 
     void ForwardComponent::StartClose(const std::string &address)
     {
@@ -90,8 +90,8 @@ namespace Sentry
                 XCode code = this->OnRequest(message);
                 if (code != XCode::Successful)
                 {
+                    head.Add("code", code);
                     message->SetType(Tcp::Type::Response);
-                    message->GetHead().Add("code", code);
                     this->Send(address, message);
                 }
             }
@@ -114,19 +114,54 @@ namespace Sentry
 
     bool ForwardComponent::OnAuth(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
-        if(this->mAuthClients.find(address) != this->mAuthClients.end())
+        if (this->mAuthClients.find(address) != this->mAuthClients.end())
         {
             return true;
         }
-        message->GetHead().Add("address", address);
-        const ServiceNodeInfo * nodeInfo = this->mMessageComponent->OnAuth(message);
-        if(nodeInfo == nullptr)
+        std::unique_ptr<ServiceNodeInfo> serverNode(new ServiceNodeInfo());
         {
-            return false;
+            const Rpc::Head &head = message->GetHead();
+            head.Get("rpc", serverNode->LocationRpc);
+            head.Get("http", serverNode->LocationHttp);
+            LOG_CHECK_RET_FALSE(head.Get("name", serverNode->SrvName));
+            LOG_CHECK_RET_FALSE(head.Get("user", serverNode->UserName));
+            LOG_CHECK_RET_FALSE(head.Get("passwd", serverNode->PassWord));
+            if (serverNode->LocationRpc.empty() && serverNode->LocationHttp.empty())
+            {
+                return false;
+            }
+            if (ClusterConfig::Inst()->GetConfig(serverNode->SrvName) == nullptr)
+            {
+                LOG_ERROR("not find cluster config : " << serverNode->SrvName);
+                return false;
+            }
         }
+        s2s::cluster::join data;
+        data.set_name(serverNode->SrvName);
+        data.set_rpc(serverNode->LocationRpc);
+        data.set_http(serverNode->LocationHttp);
+        const std::string fullName("InnerService.Join");
+        for (const std::string &location: this->mAuthClients)
+        {
+            RpcPacket request = Helper::MakeRpcPacket(fullName);
+            {
+                request->SetType(Tcp::Type::Request);
+                request->SetProto(Tcp::Porto::Protobuf);
+                request->WriteMessage(&data);
+            }
+            this->Send(location, request);
+        }
+
         this->mAuthClients.insert(address);
-        this->mLocationMap.emplace(nodeInfo->LocationRpc, address);
+        this->mLocationMap.emplace(serverNode->LocationRpc, address);
+        this->mNodeInfos.emplace(address, std::move(serverNode));
         return true;
+    }
+
+    const ServiceNodeInfo *ForwardComponent::GetServerInfo(const std::string &address) const
+    {
+        auto iter = this->mNodeInfos.find(address);
+        return iter != this->mNodeInfos.end() ? iter->second.get() : nullptr;
     }
 
     XCode ForwardComponent::OnRequest(std::shared_ptr<Rpc::Packet> message)
@@ -134,53 +169,47 @@ namespace Sentry
         std::string target;
         long long userId = 0;
         Rpc::Head &head = message->GetHead();
-        if (head.Get("id", userId))
+        if (head.Get("id", userId)) //根据玩家id中转
         {
             return this->Forward(userId, message);
         }
-        else if (head.Get("to", target))
+        else if (head.Get("to", target)) //根据地址中转
         {
             head.Remove("to");
             return this->Forward(target, message);
         }
         else
         {
-			XCode code = this->CallService(message);
-			{
-				if (message->GetHead().Has("rpc"))
-				{
-#ifdef __DEBUG__
-					head.Remove("func");
-#endif
-					head.Add("code", code);
-					return this->OnResponse(message);
-				}
-			}
+            std::string fullName;
+            LOG_RPC_CHECK_ARGS(head.Get("func", fullName));
+            const MethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
+            if(methodConfig == nullptr)
+            {
+                return XCode::CallArgsError;
+            }
+            RpcService * rpcService = this->mApp->GetService(methodConfig->Service);
+            if(rpcService == nullptr || not rpcService->IsStartService())
+            {
+                return XCode::CallServiceNotFound;
+            }
+            XCode code = rpcService->Invoke(methodConfig->Method, message);
+            {
+                head.Add("code", code);
+                message->SetType(Tcp::Type::Response);
+                this->OnResponse(message);
+            }
         }
         return XCode::Successful;
     }
-
-	XCode ForwardComponent::CallService(std::shared_ptr<Rpc::Packet> message)
-	{
-		std::string fullName;
-		LOG_RPC_CHECK_ARGS(message->GetHead().Get("func", fullName));
-		const RpcMethodConfig * rpcMethodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
-		if(rpcMethodConfig == nullptr)
-		{
-			return XCode::CallArgsError;
-		}
-		RpcService * rpcService = this->mApp->GetService(rpcMethodConfig->Service);
-		if(rpcService == nullptr)
-		{
-			return XCode::CallServiceNotFound;
-		}
-		return rpcService->Invoke(rpcMethodConfig->Method, message);
-	}
 
     XCode ForwardComponent::Forward(long long userId, std::shared_ptr<Rpc::Packet> message)
     {
         std::string service, method, address;
         LOG_RPC_CHECK_ARGS(message->GetMethod(service, method));
+#ifdef __DEBUG__
+        CONSOLE_LOG_DEBUG("forward message user id = "
+            << userId << " func = " << service << "." << method);
+#endif
         LocationUnit *locationUnit = this->mLocationComponent->GetLocationUnit(userId);
         if(locationUnit == nullptr)
         {
@@ -195,6 +224,11 @@ namespace Sentry
 
     XCode ForwardComponent::Forward(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
+#ifdef __DEBUG__
+        std::string func;
+        message->GetHead().Get("func", func);
+        CONSOLE_LOG_DEBUG("forward message address = " << address << " func = " << func);
+#endif
         auto iter = this->mLocationMap.find(address);
         if(iter == this->mLocationMap.end())
         {
@@ -209,45 +243,42 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    void ForwardComponent::Send(const std::string &address, std::shared_ptr<Rpc::Packet> message)
+    bool ForwardComponent::Send(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
         InnerNetClient * innerNetClient = this->GetClient(address);
         if(innerNetClient == nullptr)
         {
-            LOG_ERROR("send message to" << address << " error");
-            return;
+            auto iter = this->mLocationMap.find(address);
+            if(iter == this->mLocationMap.end())
+            {
+                return false;
+            }
+            innerNetClient = this->GetClient(iter->second);
+            if(innerNetClient == nullptr)
+            {
+                return false;
+            }
         }
         innerNetClient->SendData(message);
+        return true;
     }
 
-    void ForwardComponent::Send(const std::string &func, const Message *message)
+    bool ForwardComponent::Send(std::shared_ptr<Rpc::Packet> message)
     {
-        for(const std::string & addeess : this->mAuthClients)
+        if(this->mAuthClients.empty())
         {
-            std::shared_ptr<Rpc::Packet> request =
-                Rpc::Packet::New(Tcp::Type::Request, Tcp::Porto::Protobuf);
+            return false;
+        }
+        for(const std::string & address : this->mAuthClients)
+        {
+            if(this->mAuthClients.size() == 1)
             {
-                request->WriteMessage(message);
-                request->GetHead().Add("func", func);
+                this->Send(address,  message);
+                return true;
             }
-            this->Send(addeess, request);
+            this->Send(address,  message->Clone());
         }
-    }
-
-    void ForwardComponent::Send(const std::string &address, const std::string &func, const Message *message)
-    {
-        InnerNetClient * netClient = this->GetClient(address);
-        if(netClient == nullptr)
-        {
-            return;
-        }
-        std::shared_ptr<Rpc::Packet> request =
-            Rpc::Packet::New(Tcp::Type::Request, Tcp::Porto::Protobuf);
-        {
-            request->WriteMessage(message);
-            request->GetHead().Add("func", func);
-        }
-        netClient->SendData(request);
+        return false;
     }
 
     bool ForwardComponent::IsAuth(const std::string &address) const
@@ -261,6 +292,7 @@ namespace Sentry
 		std::string address;
 		if(!message->GetHead().Get("resp", address))
 		{
+            LOG_ERROR("not find head field : resp");
 			return XCode::Failure;
 		}
 		message->SetType(Tcp::Type::Response);
