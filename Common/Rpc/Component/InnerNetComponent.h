@@ -34,7 +34,6 @@ namespace Sentry
         bool IsAuth(const std::string & address);
         bool OnForward(std::shared_ptr<Rpc::Packet> message);
         bool OnBroadcast(std::shared_ptr<Rpc::Packet> message);
-		bool OnSubPublish(std::shared_ptr<Rpc::Packet> message);
         bool OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message);
         bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message);
 		bool OnResponse(const std::string& address, std::shared_ptr<Rpc::Packet> message);
@@ -44,7 +43,6 @@ namespace Sentry
 		std::string mLocation;
         class NetThreadComponent * mNetComponent;
         class OuterNetComponent * mOuterComponent;
-		class SubPublishComponent * mPublishComponent;
         class InnerNetMessageComponent* mMessageComponent;
         std::unordered_map<std::string, std::string> mUserMaps;
         std::unordered_map<std::string, std::shared_ptr<InnerNetClient>> mRpcClientMap;

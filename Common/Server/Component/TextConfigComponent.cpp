@@ -8,6 +8,7 @@
 #include"Config/ServiceConfig.h"
 #include"Config/ClusterConfig.h"
 #include"Config/CodeConfig.h"
+#include"Config/RedisConfig.h"
 namespace Sentry
 {
     bool TextConfigComponent::Awake()
@@ -33,6 +34,10 @@ namespace Sentry
         if(config->GetConfigPath("code", path))
         {
             LOG_CHECK_RET_FALSE(this->LoadTextConfig<CodeConfig>(path));
+        }
+        if(config->GetConfigPath("redis", path))
+        {
+            LOG_CHECK_RET_FALSE(this->LoadTextConfig<RedisConfig>(path));
         }
         return true;
     }

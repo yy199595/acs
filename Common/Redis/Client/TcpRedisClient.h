@@ -8,20 +8,20 @@
 #include"Tcp/SocketProxy.h"
 #include"Tcp/TcpContext.h"
 #include"Source/TaskSource.h"
+#include"Config/RedisConfig.h"
 #include"Coroutine/CoroutineLock.h"
 
 using namespace Tcp;
 namespace Sentry
 {
-	struct RedisConfig;
     class RedisComponent;
     class TcpRedisClient final : public Tcp::TcpContext
     {
     public:
-        TcpRedisClient(std::shared_ptr<SocketProxy> socket, const RedisConfig & config, RedisComponent * component);
+        TcpRedisClient(std::shared_ptr<SocketProxy> socket, const RedisClientConfig & config, RedisComponent * component);
 		~TcpRedisClient();
     public:
-        const RedisConfig & GetConfig() { return mConfig;}
+        const RedisClientConfig & GetConfig() { return mConfig;}
         void SendCommand(std::shared_ptr<RedisRequest> command);
         const std::string & GetName() const { return this->mConfig.Name; }
     private:
@@ -36,7 +36,7 @@ namespace Sentry
         std::shared_ptr<RedisResponse> SyncCommand(std::shared_ptr<RedisRequest> command);
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
     private:
-        RedisConfig mConfig;
+        RedisClientConfig mConfig;
         RedisComponent * mRedisComponent;
 		std::shared_ptr<asio::steady_timer> mTimer;
         std::shared_ptr<RedisResponse> mCurResponse;

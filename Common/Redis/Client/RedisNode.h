@@ -12,16 +12,16 @@ namespace Sentry
 	class RedisNode
 	{
 	public:
-		RedisNode(const RedisConfig * config);
+		RedisNode(const RedisClientConfig * config);
 	public:
 		std::shared_ptr<TcpRedisClient> GetFreeClient();
 		void AddClient(std::shared_ptr<TcpRedisClient> client);
-		const RedisConfig * GetConfig() const { return this->mConfig;}
+		const RedisClientConfig * GetConfig() const { return this->mConfig;}
 	public:
 		void CheckAllClient(long long nowTime);
 	private:
 		size_t mIndex;
-		const RedisConfig * mConfig;
+		const RedisClientConfig * mConfig;
 		std::vector<std::shared_ptr<TcpRedisClient>> mClients;
 	};
 }

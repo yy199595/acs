@@ -11,7 +11,7 @@ namespace Sentry
 {
 	class NetThreadComponent;
 
-    class RedisDataComponent final : public RedisComponent, public ILuaRegister
+    class RedisDataComponent final : public RedisComponent, public ILuaRegister, public IStart
 	{
 	 public:
 		RedisDataComponent() = default;
@@ -25,16 +25,15 @@ namespace Sentry
     public:
         long long AddCounter(const std::string & id);
         long long SubCounter(const std::string & id);
+        const std::string Call(const std::string & name, const std::string & func, const std::string & json);
         std::shared_ptr<RedisRequest> MakeLuaRequest(const std::string & fullName, const std::string & json);
-        bool Call(const std::string & name, const std::string & func, Json::Writer & request, std::shared_ptr<Json::Reader> response);
 	 private:
-        bool LateAwake() final;
-        bool OnInitRedisClient(RedisConfig config) final;
+        bool Awake() final;
+        bool Start() final;
+        bool IsRunCommand() final { return true; }
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
         void OnLoadScript(const std::string & name, const std::string & md5) final;
     private:
-		TaskComponent* mTaskComponent;
-		const struct RedisConfig* mConfig;
         std::unordered_map<std::string, std::string> mLuaMap;
 
     };

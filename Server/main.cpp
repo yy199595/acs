@@ -25,10 +25,8 @@
 #include"Component/TextConfigComponent.h"
 #include"Component/LaunchComponent.h"
 #include"Component/ForwardComponent.h"
-#include"Component/SubPublishComponent.h"
 #include"Component/ForwardHelperComponent.h"
 
-#include"Service/SubPublish.h"
 #include"Service/OuterService.h"
 #include"Service/InnerService.h"
 #include"Service/HttpWebService.h"
@@ -79,7 +77,6 @@ void RegisterComponent()
 // db
     ComponentFactory::Add<RedisDataComponent>("RedisDataComponent");
     ComponentFactory::Add<RedisSubComponent>("RedisSubComponent");
-	ComponentFactory::Add<SubPublishComponent>("SubPublishComponent");
 
 #ifdef __ENABLE_MONGODB__
     ComponentFactory::Add<MongoDBComponent>("MongoDBComponent");
@@ -107,7 +104,6 @@ void RegisterComponent()
 
 void RegisterServiceComponent()
 {
-    ComponentFactory::Add<SubPublish>("SubPublish");
     ComponentFactory::Add<UserBehavior>("UserBehavior");
     ComponentFactory::Add<OuterService>("OuterService");
     ComponentFactory::Add<InnerService>("InnerService");

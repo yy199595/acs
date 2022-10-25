@@ -6,7 +6,7 @@
 
 namespace Sentry
 {
-	RedisNode::RedisNode(const RedisConfig* config)
+	RedisNode::RedisNode(const RedisClientConfig* config)
 		: mConfig(config)
 	{
 		this->mIndex = 0;

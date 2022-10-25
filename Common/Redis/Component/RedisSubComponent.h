@@ -12,6 +12,7 @@ namespace Sentry
     public:
         RedisSubComponent() = default;
     public:
+        bool IsRunCommand() final { return false; }
         bool SubscribeChannel(const std::string & name, const std::string& channel);
         long long Publish(const std::string & name, const std::string& channel, const std::string& message);
 
@@ -19,10 +20,9 @@ namespace Sentry
         bool Invoke(const std::string & message);
         bool Invoke(const std::string & channel, const std::string & message);
     protected:
-        bool OnInitRedisClient(RedisConfig config) final;
         void OnNotFindResponse(long long taskId, std::shared_ptr<RedisResponse> message) final;
     private:
-        RedisConfig mConfig;
+        RedisClientConfig mConfig;
         std::string mData;
         std::string mLocalHost;
         class LuaScriptComponent * mLuaComponent;

@@ -9,21 +9,6 @@
 #include"Singleton/Singleton.h"
 namespace Sentry
 {
-	struct RedisConfig
-	{
-	public:
-		int Count;
-        int Index;
-		int FreeClient;
-		std::string Ip;
-		std::string Name;
-		unsigned short Port;
-		std::string Address;
-		std::string Password;
-        std::vector<std::string> Channels;
-        std::vector<std::string> LuaFiles;
-	};
-
     struct ListenConfig
     {
     public:

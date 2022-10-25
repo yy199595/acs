@@ -13,6 +13,7 @@
         "script": "script/lua",
         "code": "XCode/XCode.csv",
         "user": "config/user.json",
+        "redis": "config/redis.json",
         "rpc": "config/service/rpc.json",
         "http": "config/service/http.json",
         "service": "config/service.json",

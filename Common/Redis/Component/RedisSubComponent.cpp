@@ -10,22 +10,6 @@
 #include"Component/TextConfigComponent.h"
 namespace Sentry
 {
-    bool RedisSubComponent::OnInitRedisClient(RedisConfig config)
-    {
-        TextConfigComponent * textConfigComponent = this->GetComponent<TextConfigComponent>();
-        const ServerConfig * localServerConfig = textConfigComponent->GetTextConfig<ServerConfig>();
-        if(!config.Channels.empty())
-        {
-            config.LuaFiles.clear();
-            TcpRedisClient * redisClient = this->MakeRedisClient(config);
-            localServerConfig->GetLocation("rpc", this->mLocalHost);
-            if(redisClient == nullptr || !this->Ping(redisClient))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
 
     void RedisSubComponent::OnNotFindResponse(long long taskId, std::shared_ptr<RedisResponse> response)
     {

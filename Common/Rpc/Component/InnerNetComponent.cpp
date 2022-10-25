@@ -7,7 +7,6 @@
 #include"Config/CodeConfig.h"
 #include"Component/OuterNetComponent.h"
 #include"Component/NetThreadComponent.h"
-#include"Component/SubPublishComponent.h"
 #include"google/protobuf/util/json_util.h"
 namespace Sentry
 {
@@ -37,7 +36,6 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(config->GetMember("user", "name", this->mUserName));
         LOG_CHECK_RET_FALSE(config->GetMember("user", "passwd", this->mPassword));
         LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<NetThreadComponent>());
-		LOG_CHECK_RET_FALSE(this->mPublishComponent = this->GetComponent<SubPublishComponent>());
         LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>());
 		return this->StartListen("rpc");
 	}
@@ -80,9 +78,6 @@ namespace Sentry
                 break;
             case Tcp::Type::Response:
                 this->OnResponse(address, message);
-                break;
-            case Tcp::Type::SubPublish: //发布订阅消息
-				this->OnSubPublish(message);
                 break;
             default:
             {
@@ -196,15 +191,6 @@ namespace Sentry
         LOG_CHECK_RET_FALSE(head.Get("rpc", rpcId));
 		this->mMessageComponent->OnResponse(rpcId, message);
 		return true;
-	}
-
-	bool InnerNetComponent::OnSubPublish(std::shared_ptr<Rpc::Packet> message)
-	{
-		if(this->mPublishComponent == nullptr)
-		{
-			return false;
-		}
-		return this->mPublishComponent->OnMessage(message);
 	}
 
 	void InnerNetComponent::OnCloseSocket(const std::string & address, XCode code)

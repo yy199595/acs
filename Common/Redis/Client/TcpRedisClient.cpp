@@ -8,7 +8,7 @@
 
 namespace Sentry
 {
-	TcpRedisClient::TcpRedisClient(std::shared_ptr<SocketProxy> socket, const RedisConfig& config, RedisComponent * component)
+	TcpRedisClient::TcpRedisClient(std::shared_ptr<SocketProxy> socket, const RedisClientConfig& config, RedisComponent * component)
 		: Tcp::TcpContext(socket, 1024 * 1024), mConfig(config), mRedisComponent(component)
 	{
 		this->mSocket = socket;
@@ -123,7 +123,7 @@ namespace Sentry
 				return;
             }
             this->SendFromMessageQueue();
-            CONSOLE_LOG_DEBUG(this->mConfig.Address << " redis client auth successful");
+            CONSOLE_LOG_DEBUG(this->mConfig.Address << this->mConfig.Name << " redis client auth successful");
             return;
         }
         this->ReceiveLine();

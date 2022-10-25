@@ -25,6 +25,7 @@
 			"LuaScriptComponent",
 			"ForwardComponent",
 			"SubPublishComponent",
+			"RedisDataComponent",
 			"ForwardHelperComponent"
 		]
 	},

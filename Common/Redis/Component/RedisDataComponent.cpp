@@ -1,6 +1,4 @@
 ﻿#include"RedisDataComponent.h"
-
-#include"App/App.h"
 #include"Lua/LuaRedis.h"
 #include"String/StringHelper.h"
 #include"File/DirectoryHelper.h"
@@ -10,28 +8,12 @@
 
 namespace Sentry
 {
-    bool RedisDataComponent::LateAwake()
+    bool RedisDataComponent::Awake()
     {
-        return this->LateAwake();
-    }
-    bool RedisDataComponent::OnInitRedisClient(RedisConfig config)
-    {
-        config.Channels.clear();
-        for (int index = 0; index < config.Count; index++)
-        {
-            TcpRedisClient * redisClient = this->MakeRedisClient(config);
-            if(redisClient == nullptr)
-            {
-                return false;
-            }
-            if(index == 0 && !this->Ping(redisClient))
-            {
-                return false;
-            }
-        }
+        LOG_CHECK_RET_FALSE(RedisConfig::Inst());
+        LOG_CHECK_RET_FALSE(RedisConfig::Inst()->Has("main"));
         return true;
     }
-
     long long RedisDataComponent::AddCounter(const std::string &id)
     {
         TcpRedisClient * redisClientContext = this->GetClient("main");
@@ -56,25 +38,45 @@ namespace Sentry
         return redisResponse->GetNumber();
     }
 
+    bool RedisDataComponent::Start()
+    {
+        std::vector<RedisClientConfig> configs;
+        LOG_CHECK_RET_FALSE(RedisConfig::Inst()->Get(configs));
+        for(const RedisClientConfig & config : configs)
+        {
+            for(int index = 0; index < config.Count; index++)
+            {
+                TcpRedisClient * redisClient = this->MakeRedisClient(config);
+                if(redisClient != nullptr && index == 0)
+                {
+                    if(!this->Ping(redisClient))
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 
-    bool RedisDataComponent::Call(const std::string &name, const std::string &func, Json::Writer &request,
-                                  std::shared_ptr<Json::Reader> response)
+
+    const std::string RedisDataComponent::Call(const std::string &name, const std::string &func, const std::string &json)
     {
         TcpRedisClient * redisClientContext = this->GetClient(name);
-        std::shared_ptr<RedisRequest> redisRequets = this->MakeLuaRequest(func, request.JsonString());
+        std::shared_ptr<RedisRequest> redisRequets = this->MakeLuaRequest(func, json);
         if(redisRequets == nullptr)
         {
-            return false;
+            return std::string();
         }
         std::shared_ptr<RedisResponse> redisResponse = this->Run(redisClientContext, redisRequets);
         if (redisResponse == nullptr || redisResponse->HasError())
         {
-            return false;
+            return std::string();
         }
 #ifdef __DEBUG__
         LOG_DEBUG("call lua " << func << " response json = " << redisResponse->GetString());
 #endif
-        return response->ParseJson(redisResponse->GetString());
+        return redisResponse->GetString();
     }
 
 	void RedisDataComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)

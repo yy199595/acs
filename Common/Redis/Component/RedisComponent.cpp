@@ -9,116 +9,10 @@
 
 namespace Sentry
 {
-    bool RedisLuaResponse::ParseJson(const std::string &json)
-    {
-        if(this->mJson.ParseJson(json))
-        {
-            return true;
-        }
-        return false;
-    }
-
-    bool RedisLuaResponse::GetResult()
-    {
-        bool res = false;
-        return this->mJson.GetMember("res", res) && res;
-    }
-}
-
-namespace Sentry
-{
-	bool RedisComponent::LoadConfig()
+    TcpRedisClient * RedisComponent::MakeRedisClient(const RedisClientConfig & config)
 	{
-        const ServerConfig * localServerConfig = ServerConfig::Inst();
-        const rapidjson::Value * jsonValue = localServerConfig->GetJsonValue("redis");
-
-        if(jsonValue == nullptr || !jsonValue->IsObject())
-        {
-            return false;
-        }
-        auto iter = jsonValue->MemberBegin();
-        for(; iter != jsonValue->MemberEnd(); iter++)
-        {
-            const char * name = iter->name.GetString();
-            if(!this->ParseConfig(name, iter->value))
-            {
-                return false;
-            }
-        }
-        this->mNetComponent = this->GetComponent<NetThreadComponent>();
-        return true;
-	}
-
-    bool RedisComponent::StartConnectRedis()
-    {
-        if(!this->LoadConfig())
-        {
-            return false;
-        }
-        auto iter = this->mConfigs.begin();
-        for(; iter != this->mConfigs.end(); iter++)
-        {
-            if(!this->OnInitRedisClient(iter->second))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    bool RedisComponent::ParseConfig(const char *name, const rapidjson::Value &jsonData)
-    {
-        auto iter = this->mConfigs.find(name);
-        if (iter != this->mConfigs.end())
-        {
-            return true;
-        }
-
-        LOG_CHECK_RET_FALSE(jsonData.HasMember("ip"));
-        LOG_CHECK_RET_FALSE(jsonData.HasMember("port"));
-        LOG_CHECK_RET_FALSE(jsonData.HasMember("index"));
-        LOG_CHECK_RET_FALSE(jsonData.HasMember("count"));
-
-        RedisConfig redisConfig;
-        redisConfig.Name = name;
-        redisConfig.FreeClient = 30;
-        redisConfig.Ip = jsonData["ip"].GetString();
-        redisConfig.Port = jsonData["port"].GetInt();
-        redisConfig.Index = jsonData["index"].GetInt();
-        redisConfig.Count = jsonData["count"].GetInt();
-        if (jsonData.HasMember("free"))
-        {
-            redisConfig.FreeClient = jsonData["free"].GetInt();
-        }
-        if (jsonData.HasMember("passwd"))
-        {
-            redisConfig.Password = jsonData["passwd"].GetString();
-        }
-        if (jsonData.HasMember("scripts") && jsonData["scripts"].IsArray())
-        {
-            for (int index = 0; index < jsonData["scripts"].Size(); index++)
-            {
-                std::string lua(jsonData["scripts"][index].GetString());
-                redisConfig.LuaFiles.emplace_back(lua);
-            }
-        }
-
-        if (jsonData.HasMember("channels") && jsonData["channels"].IsArray())
-        {
-            for (int index = 0; index < jsonData["channels"].Size(); index++)
-            {
-                std::string lua(jsonData["channels"][index].GetString());
-                redisConfig.Channels.emplace_back(lua);
-            }
-        }
-        redisConfig.Address = fmt::format("{0}:{1}", redisConfig.Ip, redisConfig.Port);
-        this->mConfigs.emplace(name, redisConfig);
-        return true;
-    }
-
-    TcpRedisClient * RedisComponent::MakeRedisClient(const RedisConfig & config)
-	{
-        std::shared_ptr<SocketProxy> socketProxy = this->mNetComponent->CreateSocket();
+        NetThreadComponent * component = this->GetComponent<NetThreadComponent>();
+        std::shared_ptr<SocketProxy> socketProxy = component->CreateSocket();
         if(socketProxy == nullptr)
         {
             return nullptr;
@@ -162,6 +56,11 @@ namespace Sentry
     std::shared_ptr<RedisResponse> RedisComponent::Run(
         TcpRedisClient * redisClientContext, std::shared_ptr<RedisRequest> request)
     {
+        if(!this->IsRunCommand())
+        {
+            LOG_ERROR(this->GetName() << " not run command");
+            return nullptr;
+        }
 #ifdef __DEBUG__
         ElapsedTimer elapsedTimer;
 #endif
