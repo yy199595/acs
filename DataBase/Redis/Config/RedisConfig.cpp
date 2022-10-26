@@ -46,15 +46,6 @@ namespace Sentry
                     redisConfig.LuaFiles.insert(lua);
                 }
             }
-
-            if (jsonData.HasMember("channels") && jsonData["channels"].IsArray())
-            {
-                for (int index = 0; index < jsonData["channels"].Size(); index++)
-                {
-                    std::string lua(jsonData["channels"][index].GetString());
-                    redisConfig.Channels.insert(lua);
-                }
-            }
             redisConfig.Address = fmt::format("{0}:{1}", redisConfig.Ip, redisConfig.Port);
             this->mConfigs.emplace(name, redisConfig);
         }

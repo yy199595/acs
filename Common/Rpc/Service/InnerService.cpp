@@ -26,8 +26,6 @@ namespace Sentry
         BIND_COMMON_RPC_METHOD(InnerService::Stop);
         BIND_COMMON_RPC_METHOD(InnerService::Hotfix);
         BIND_COMMON_RPC_METHOD(InnerService::LoadConfig);
-		SUB_EVENT_MESSAGE("Test1", InnerService::OnInvoke);
-		SUB_EVENT_MESSAGE("Test2", InnerService::OnInvoke2);
 		this->mLocationComponent = this->GetComponent<LocationComponent>();
         return true;
     }

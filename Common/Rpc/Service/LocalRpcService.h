@@ -40,11 +40,6 @@ namespace Sentry
         virtual bool OnClose() = 0;
         virtual bool OnStart() = 0;
         void WaitAllMessageComplete() final;
-#ifdef __ENABLE_REDIS__
-        XCode Invoke(const std::string &id, const std::string &message) final;
-        void GetSubEventIds(std::unordered_set<std::string> &evendIds) final;
-		NetEventRegistry & GetEventRegistry() { return *this->mEventRegister; }
-#endif
 		ServiceMethodRegister & GetMethodRegistry() { return *this->mMethodRegister; }
 
     private:
@@ -53,11 +48,9 @@ namespace Sentry
         int mMaxCount;
         int mWaitCount;
         bool mIsHandlerMessage;
-		std::shared_ptr<NetEventRegistry> mEventRegister;
 		std::shared_ptr<ServiceMethodRegister> mMethodRegister;
 	};
     extern std::string GET_FUNC_NAME(std::string fullName);
-#define SUB_EVENT_MESSAGE(id, func) this->GetEventRegistry().Sub(id, &func);
 #define BIND_COMMON_RPC_METHOD(func) this->GetMethodRegistry().Bind(GET_FUNC_NAME(#func), &func);
 }
 #endif //SERVER_LOCALSERVICECOMPONENT_H

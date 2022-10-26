@@ -45,7 +45,6 @@
 #endif
 
 #ifdef __ENABLE_REDIS__
-#include"Component/RedisSubComponent.h"
 #include"Component/RedisDataComponent.h"
 #endif
 
@@ -79,7 +78,6 @@ void RegisterComponent()
 // db
 #ifdef __ENABLE_REDIS__
     ComponentFactory::Add<RedisDataComponent>("RedisDataComponent");
-    ComponentFactory::Add<RedisSubComponent>("RedisSubComponent");
 #endif
 
 #ifdef __ENABLE_MONGODB__

@@ -55,11 +55,6 @@ namespace Sentry
     std::shared_ptr<RedisResponse> RedisComponent::Run(
         TcpRedisClient * redisClientContext, std::shared_ptr<RedisRequest> request)
     {
-        if(!this->IsRunCommand())
-        {
-            LOG_ERROR(this->GetName() << " not run command");
-            return nullptr;
-        }
 #ifdef __DEBUG__
         ElapsedTimer elapsedTimer;
 #endif

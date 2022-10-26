@@ -30,7 +30,6 @@ namespace Sentry
 	 private:
         bool Awake() final;
         bool Start() final;
-        bool IsRunCommand() final { return true; }
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
         void OnLoadScript(const std::string & name, const std::string & md5) final;
     private:

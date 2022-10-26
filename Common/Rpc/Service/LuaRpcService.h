@@ -23,17 +23,10 @@ namespace Sentry
 		XCode Invoke(const std::string& name, std::shared_ptr<Rpc::Packet> message) final;
 
     private:
-#ifdef __ENABLE_REDIS__
-        void GetSubEventIds(std::unordered_set<std::string> &evendIds) final;
-        XCode Invoke(const std::string &id, const std::string &message) final;
-#endif
     private:
         int mWaitCount;
         bool mIsHandlerMessage;
         class LuaScriptComponent* mLuaComponent;
-#ifdef __ENABLE_REDIS__
-		std::shared_ptr<NetEventRegistry> mEventRegister;
-#endif
 		std::shared_ptr<ServiceMethodRegister> mMethodRegister;
 	};
 }// namespace Sentry

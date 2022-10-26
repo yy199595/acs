@@ -1,5 +1,4 @@
 ﻿#include"LuaRpcService.h"
-#include"Lua/Table.h"
 #include"Lua/Function.h"
 #include"Lua/LuaServiceMethod.h"
 #include"Component/LuaScriptComponent.h"
@@ -18,7 +17,6 @@ namespace Sentry
         std::string location;
         const ServerConfig * config = ServerConfig::Inst();
         LOG_CHECK_RET_FALSE(config->GetLocation("rpc", location));
-		this->mEventRegister = std::make_shared<NetEventRegistry>(this);
 		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
         const RpcServiceConfig * rpcServiceConfig = RpcConfig::Inst()->GetConfig(this->GetName());
 
@@ -53,13 +51,6 @@ namespace Sentry
         this->mIsHandlerMessage = true;
         return true;
 	}
-#ifdef __ENABLE_REDIS__
-	XCode LuaRpcService::Invoke(const std::string& id, const std::string& message)
-	{
-		return XCode::Successful;
-	}
-#endif
-
 	XCode LuaRpcService::Invoke(const std::string &name, std::shared_ptr<Rpc::Packet> message)
 	{
 		if(!this->IsStartService())
@@ -122,18 +113,4 @@ namespace Sentry
         }
         return true;
 	}
-#ifdef __ENABLE_REDIS__
-	void LuaRpcService::GetSubEventIds(std::unordered_set<std::string>& evendIds)
-	{
-		if(this->mMethodRegister != nullptr)
-		{
-			std::vector<std::string> rets;
-			this->mEventRegister->GetEvents(rets);
-			for(const std::string & eventId : rets)
-			{
-				evendIds.insert(eventId);
-			}
-		}
-	}
-#endif
 }

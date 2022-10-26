@@ -15,7 +15,6 @@ namespace Sentry
 	public:
 		RedisComponent() = default;
 	 protected:
-        virtual bool IsRunCommand() = 0;
         TcpRedisClient * MakeRedisClient(const RedisClientConfig & config);
     public:
         bool Ping(TcpRedisClient * redisClient);
