@@ -20,7 +20,9 @@ namespace Sentry
 		bool LateAwake() final;
     private:
         class ProtoComponent * mProtoComponent;
+#ifdef __ENABLE_REDIS__
         class RedisDataComponent * mRedisComponent;
+#endif
         class MongoHelperComponent * mMongoComponent;
     };
 }

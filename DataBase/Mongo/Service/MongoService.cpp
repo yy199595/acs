@@ -4,15 +4,18 @@
 
 #include"MongoService.h"
 #include"Component/MongoDBComponent.h"
+#ifdef __ENABLE_REDIS__
 #include"Component/DataSyncComponent.h"
-
+#endif
 namespace Sentry
 {
     MongoService::MongoService()
         : mMongoComponent(nullptr)
     {
         this->mMongoComponent = nullptr;
+#ifdef __ENABLE_REDIS__
         this->mSyncRedisComponent = nullptr;
+#endif
     }
 
     bool MongoService::Awake()
@@ -29,7 +32,9 @@ namespace Sentry
         BIND_COMMON_RPC_METHOD(MongoService::SetIndex);
         BIND_COMMON_RPC_METHOD(MongoService::RunCommand);
         this->mMongoComponent = this->GetComponent<MongoDBComponent>();
+#ifdef __ENABLE_REDIS__
         this->mSyncRedisComponent = this->GetComponent<DataSyncComponent>();
+#endif
         return true;
     }
 
@@ -100,11 +105,13 @@ namespace Sentry
         Bson::Reader::Document & result = response->Get();
         if(result.Get("n", res) && res > 0)
         {
+#ifdef __ENABLE_REDIS__
             if(this->mSyncRedisComponent != nullptr && !id.empty())
             {
                 const std::string & db = mongoRequest->dataBase;
                 this->mSyncRedisComponent->Set(id, db,  tab, request.json());
             }
+#endif
             return XCode::Successful;
         }
         return XCode::Failure;
@@ -130,13 +137,13 @@ namespace Sentry
             = std::make_shared<CommandRequest>();
         const std::string tab = request.tab().substr(pos + 1);
         mongoRequest->dataBase = request.tab().substr(0, pos);
-
+#ifdef __ENABLE_REDIS__
         if(!id.empty() && this->mSyncRedisComponent != nullptr)
         {
             const std::string &db = mongoRequest->dataBase;
             this->mSyncRedisComponent->Del(id, db, request.tab());
         }
-
+#endif
         Bson::Writer::Document delDocument;
         delDocument.Add("q", document);
         delDocument.Add("limit", request.limit());
@@ -183,13 +190,13 @@ namespace Sentry
 
         const std::string tab = request.tab().substr(pos + 1);
         mongoRequest->dataBase = request.tab().substr(0, pos);
-
+#ifdef __ENABLE_REDIS__
         if (!id.empty() && this->mSyncRedisComponent != nullptr)
         {
             const std::string & db = mongoRequest->dataBase;
             this->mSyncRedisComponent->Del(id, db, request.tab());
         }
-
+#endif
         Bson::Writer::Document updateDocument;
         updateDocument.Add(request.tag().c_str(), dataDocument);
 
@@ -254,6 +261,7 @@ namespace Sentry
         {
             std::string * json = response.add_jsons();
             document->WriterToJson(*json);
+#ifdef __ENABLE_REDIS__
             if(this->mSyncRedisComponent != nullptr)
             {
                 long long numberId = 0;
@@ -270,6 +278,7 @@ namespace Sentry
                     this->mSyncRedisComponent->Set(stringId, db, tab, *json);
                 }
             }
+#endif
         }
         return XCode::Successful;
     }

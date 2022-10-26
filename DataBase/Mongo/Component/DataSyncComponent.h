@@ -4,6 +4,7 @@
 
 #ifndef _MONGOSYNCCOMPONENT_H_
 #define _MONGOSYNCCOMPONENT_H_
+#ifdef __ENABLE_REDIS__
 #include"Message/db.pb.h"
 #include"Component/Component.h"
 namespace Sentry
@@ -24,5 +25,6 @@ namespace Sentry
 		class RedisDataComponent * mRedisComponent;
 	};
 }
+#endif
 
 #endif //_MONGOSYNCCOMPONENT_H_

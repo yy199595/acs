@@ -31,7 +31,9 @@ namespace Sentry
 	 private:
         class ProtoComponent * mProtoComponent;
         class MysqlDBComponent * mMysqlComponent;
+#ifdef __ENABLE_REDIS__
         class DataSyncComponent * mSyncComponent;
+#endif
         std::shared_ptr<MysqlHelper> mMysqlHelper;
         std::unordered_map<std::string, std::string> mMainKeys;
     };

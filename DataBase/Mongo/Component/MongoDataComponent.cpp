@@ -5,18 +5,21 @@
 #include"MongoDataComponent.h"
 #include"Proto/ProtoHelper.h"
 #include"Component/MysqlHelperComponent.h"
+#ifdef __ENABLE_REDIS__
 #include"Component/RedisDataComponent.h"
-
+#endif
 #include"Component/MongoHelperComponent.h"
 #include"Component/ProtoComponent.h"
 namespace Sentry
 {
 	bool MongoDataComponent::LateAwake()
 	{
-		this->mProtoComponent = this->GetComponent<ProtoComponent>();
-		this->mRedisComponent = this->GetComponent<RedisDataComponent>();
-		this->mMongoComponent = this->GetComponent<MongoHelperComponent>();
-		return this->mRedisComponent != nullptr && this->mMongoComponent != nullptr;
+        LOG_CHECK_RET_FALSE(this->mProtoComponent = this->GetComponent<ProtoComponent>());
+#ifdef __ENABLE_REDIS__
+        LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisDataComponent>());
+#endif
+        LOG_CHECK_RET_FALSE(this->mMongoComponent = this->GetComponent<MongoHelperComponent>());
+		return true;
 	}
 
 	XCode MongoDataComponent::Set(long long id, std::shared_ptr<Message> message, bool insert)
@@ -44,6 +47,7 @@ namespace Sentry
 
 	std::shared_ptr<Message> MongoDataComponent::Get(long long id, const std::string& name)
 	{
+#ifdef __ENABLE_REDIS__
 		size_t pos = name.find('_');
 		if (pos != std::string::npos)
 		{
@@ -71,6 +75,7 @@ namespace Sentry
 				}
 			}
 		}
+#endif
 		char buffer[100] = { 0 };
 		size_t size = sprintf(buffer, "{_id:%lld}", id);
 		const std::string select(buffer, size);
@@ -81,6 +86,7 @@ namespace Sentry
 
 	std::shared_ptr<Message> MongoDataComponent::Get(const std::string& id, const std::string& name)
 	{
+#ifdef __ENABLE_REDIS__
 		size_t pos = name.find('_');
 		if (pos != std::string::npos)
 		{
@@ -109,6 +115,7 @@ namespace Sentry
 				}
 			}
 		}
+#endif
 		char buffer[100] = { 0 };
 		size_t size = sprintf(buffer, "{_id:%s}", id.c_str());
 		const std::string select(buffer, size);

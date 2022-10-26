@@ -15,8 +15,6 @@
 
 #include"Component/GateHelperComponent.h"
 #include"Component/ClientComponent.h"
-#include"Component/RedisSubComponent.h"
-
 
 #include"Component/HttpComponent.h"
 #include"Component/HttpWebComponent.h"
@@ -86,7 +84,9 @@ void RegisterComponent()
 
 #ifdef __ENABLE_MONGODB__
     ComponentFactory::Add<MongoDBComponent>("MongoDBComponent");
+#ifdef __ENABLE_REDIS__
     ComponentFactory::Add<DataSyncComponent>("DataSyncComponent");
+#endif
     ComponentFactory::Add<MongoDataComponent>("MongoDataComponent");
     ComponentFactory::Add<MongoHelperComponent>("MongoHelperComponent");
 #endif

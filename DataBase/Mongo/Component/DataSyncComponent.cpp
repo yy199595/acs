@@ -1,7 +1,7 @@
 //
 // Created by yjz on 2022/8/28.
 //
-
+#ifdef __ENABLE_REDIS__
 #include"DataSyncComponent.h"
 #include"String/StringHelper.h"
 #include"Component/RedisDataComponent.h"
@@ -69,3 +69,4 @@ namespace Sentry
         }
     }
 }
+#endif

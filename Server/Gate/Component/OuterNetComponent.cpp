@@ -6,7 +6,6 @@
 #include"App/App.h"
 #include"Client/OuterNetClient.h"
 #include"OuterNetMessageComponent.h"
-#include"Component/RedisDataComponent.h"
 #include"Component/NetThreadComponent.h"
 #include"Component/InnerNetMessageComponent.h"
 
