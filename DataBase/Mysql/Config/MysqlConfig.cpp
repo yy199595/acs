@@ -9,7 +9,7 @@ namespace Sentry
     bool MysqlConfig::OnLoadText(const char *str, size_t length)
     {
         rapidjson::Document document;
-        if(document.Parse(str, length).HasParseError())
+        if (document.Parse(str, length).HasParseError())
         {
             return false;
         }
@@ -18,6 +18,7 @@ namespace Sentry
         this->User = document["user"].GetString();
         this->MaxCount = document["count"].GetInt();
         this->Password = document["passwd"].GetString();
+        this->Address = this->Ip + ":" + std::to_string(this->Port);
         return true;
     }
 

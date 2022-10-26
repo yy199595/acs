@@ -19,6 +19,7 @@ namespace Sentry
         this->User = document["user"].GetString();
         this->MaxCount = document["count"].GetInt();
         this->Password = document["passwd"].GetString();
+        this->Address = this->Address + ":" + std::to_string(this->Port);
         return true;
     }
 
