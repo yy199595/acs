@@ -1,0 +1,22 @@
+{
+	"main": {
+		"ip": "43.143.76.75",
+		"port": 6379,
+		"timeout": 3,
+		"count": 2,
+		"free": 30,
+		"index": 0,
+		"scripts": [
+		],
+		"passwd": "199595yjz."
+	},
+	"data": {
+		"ip": "43.143.76.75",
+		"port": 6379,
+		"timeout": 3,
+		"count": 5,
+		"index": 1,
+		"free": 30,
+		"passwd": "199595yjz."
+	}
+}

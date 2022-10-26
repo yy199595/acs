@@ -3,12 +3,12 @@
 //
 
 #include"MongoClient.h"
-
 #include<regex>
 #include"Md5/MD5.h"
 #include"Sha1/sha1.h"
 #include"Bson/base64.h"
 #include"String/StringHelper.h"
+#include"Config/MongoConfig.h"
 #include"Component/MongoDBComponent.h"
 
 namespace Mongo
@@ -31,8 +31,8 @@ namespace Mongo
         //TODO
     }
 
-    TcpMongoClient::TcpMongoClient(std::shared_ptr<SocketProxy> socket, const Mongo::Config& config)
-		: Tcp::TcpContext(socket, 1024 * 1024), mConfig(config), mMongoComponent(nullptr)
+    TcpMongoClient::TcpMongoClient(std::shared_ptr<SocketProxy> socket)
+		: Tcp::TcpContext(socket, 1024 * 1024), mMongoComponent(nullptr)
 	{
         LOG_CHECK_FATAL(this->mMongoComponent = App::Inst()->GetComponent<MongoDBComponent>());
 	}
@@ -47,8 +47,7 @@ namespace Mongo
 				return;
 			}
             this->SendFromMessageQueue();
-            std::string address = fmt::format(
-                    "{0}:{1}",this->mConfig.mIp, this->mConfig.mPort);
+            std::string address = MongoConfig::Inst()->Address;
             CONSOLE_LOG_INFO( "["<< address << "] mongo user auth successful");
             return;
 		}
@@ -66,7 +65,7 @@ namespace Mongo
         }
         std::string nonce = _bson::base64::encode(Helper::String::RandomString(8));
         std::shared_ptr<Mongo::CommandRequest> request1(new CommandRequest());
-        std::string firstBare = fmt::format("n={0},r={1}", this->mConfig.mUser, nonce);
+        std::string firstBare = fmt::format("n={0},r={1}", MongoConfig::Inst()->User, nonce);
 
         std::string payload = _bson::base64::encode(fmt::format("n,,{0}", firstBare));
 
@@ -173,8 +172,7 @@ namespace Mongo
                 return;
             }
             this->SendFromMessageQueue();
-            std::string address = fmt::format(
-                    "{0}:{1}",this->mConfig.mIp, this->mConfig.mPort);
+            std::string address = MongoConfig::Inst()->Address;
             CONSOLE_LOG_INFO( "["<< address << "] mongo user auth successful");
             return;
 		}
@@ -249,9 +247,9 @@ namespace Mongo
 			CONSOLE_LOG_ERROR("connect mongo error");
 			return false;
 		}
-        const std::string & user = this->mConfig.mUser;
-        const std::string & pwd = this->mConfig.mPasswd;
-        return this->Auth(this->mConfig.mUser, "admin", pwd);
+        const std::string & user = MongoConfig::Inst()->User;
+        const std::string & pwd = MongoConfig::Inst()->Password;
+        return this->Auth(user, "admin", pwd);
 	}
 
 }

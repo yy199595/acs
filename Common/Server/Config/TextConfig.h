@@ -14,11 +14,11 @@ namespace Sentry
     public:
         bool ReloadConfig();
         bool LoadConfig(const std::string & path);
-        const std::string & GetPath() const { return this->mPath; }
+        const std::string & Path() const { return this->mPath; }
         const std::string & GetName() const { return this->mName; }
     protected:
-        virtual bool OnLoadText(const std::string & content) = 0;
-        virtual bool OnReloadText(const std::string & content) = 0;
+        virtual bool OnLoadText(const char * str, size_t length) = 0;
+        virtual bool OnReloadText(const char * str, size_t length) = 0;
     private:
         std::string mMd5;
         std::string mPath;

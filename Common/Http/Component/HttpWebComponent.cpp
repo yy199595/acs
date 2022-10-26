@@ -19,7 +19,7 @@ namespace Sentry
             return false;
         }
         this->mTaskComponent = this->mApp->GetTaskComponent();
-        return true;
+        return this->StartListen("web");
     }
 
     void HttpWebComponent::OnRequest(std::shared_ptr<HttpHandlerClient> httpClient)

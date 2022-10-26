@@ -25,8 +25,8 @@ namespace Sentry
     public:
         std::string GetDesc(XCode code) const;
     private:
-        bool OnLoadText(const std::string &content) final;
-        bool OnReloadText(const std::string &content) final;
+        bool OnLoadText(const char *str, size_t length) final;
+        bool OnReloadText(const char *str, size_t length) final;
     private:
         std::unordered_map<int, std::unique_ptr<CodeLineConfig>> mConfigs;
     };

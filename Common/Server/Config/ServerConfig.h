@@ -27,13 +27,13 @@ namespace Sentry
         const ListenConfig * GetListenConfig(const char * name) const;
         bool GetLocation(const char * name, std::string & location) const;
     protected:
-        bool OnLoadText(const std::string &content) final;
-        bool OnReloadText(const std::string &content) final;
+        bool OnLoadText(const char *str, size_t length) final;
+        bool OnReloadText(const char *str, size_t length) final;
 	 public:
         int GetNodeId() const { return this->mNodeId; }
         const std::string& GetNodeName() const { return this->mNodeName; }
 		const std::string & GetContent() const { return this->mContent;}
-		bool GetConfigPath(const std::string & name, std::string & path) const;
+		bool GetPath(const std::string & name, std::string & path) const;
         size_t GetServices(std::vector<std::string> & services, bool start = false) const;
     private:
         int mNodeId;

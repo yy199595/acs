@@ -35,31 +35,27 @@ namespace Sentry
 
 namespace Sentry
 {
-	class MongoDBComponent : public RpcTaskComponent<Mongo::CommandResponse>
+    class MongoDBComponent : public RpcTaskComponent<Mongo::CommandResponse>, public IStart
 	{
 	public:
 		MongoDBComponent() = default;
 		~MongoDBComponent() = default;
 	private:
-        bool LoadConfig();
 		void OnAddTask(RpcTask task) final;
 		void OnDelTask(long long taskId, RpcTask task) final;
 	public:
+        bool Start();
         void CloseClients();
         bool Ping(int index);
-        bool StartConnectMongo();
         bool SetIndex(const std::string & tab, const std::string & name);
     public:
         void OnClientError(int index, XCode code);
         TcpMongoClient * GetClient(int index = -1);
-        const Mongo::Config & GetConfig() const { return this->mConfig;}
         void Send(TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request);
 		std::shared_ptr<Mongo::CommandResponse> Run(TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request);
 	 private:
-		Mongo::Config mConfig;
 		TimerComponent * mTimerComponent;
 		Util::NumberBuilder<int, 10> mRequestId;
-        class NetThreadComponent * mNetComponent;
         std::vector<std::shared_ptr<TcpMongoClient>> mMongoClients;
     };
 }

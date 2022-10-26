@@ -7,10 +7,10 @@
 #include"rapidjson/document.h"
 namespace Sentry
 {
-    bool RedisConfig::OnLoadText(const std::string &content)
+    bool RedisConfig::OnLoadText(const char *str, size_t length)
     {
         rapidjson::Document document;
-        if(!document.Parse(content.c_str(), content.size()).HasParseError())
+        if(document.Parse(str, length).HasParseError())
         {
             return false;
         }

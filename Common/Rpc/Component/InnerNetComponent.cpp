@@ -22,7 +22,7 @@ namespace Sentry
         std::string path;
         rapidjson::Document document;
         const ServerConfig * config = ServerConfig::Inst();
-        LOG_CHECK_RET_FALSE(config->GetConfigPath("user", path));
+        LOG_CHECK_RET_FALSE(config->GetPath("user", path));
         LOG_CHECK_RET_FALSE(Helper::File::ReadJsonFile(path, document));
         auto iter = document.MemberBegin();
         for(; iter != document.MemberEnd(); iter++)

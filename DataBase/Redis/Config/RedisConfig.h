@@ -33,8 +33,8 @@ namespace Sentry
     public:
         RedisConfig() : TextConfig("RedisConfig") { }
     public:
-        bool OnLoadText(const std::string &content) final;
-        bool OnReloadText(const std::string &content) final { return true; }
+        bool OnLoadText(const char *str, size_t length) final;
+        bool OnReloadText(const char *str, size_t length) final { return true; }
     public:
         bool Has(const std::string & name) const;
         bool Get(std::vector<RedisClientConfig> & configs) const;

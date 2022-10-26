@@ -3,6 +3,7 @@
 //
 
 #include"MongoDBComponent.h"
+#include"Config/MongoConfig.h"
 #include"Component/NetThreadComponent.h"
 namespace Sentry
 {
@@ -22,20 +23,6 @@ namespace Sentry
 
 namespace Sentry
 {
-	bool MongoDBComponent::LoadConfig()
-	{
-		const ServerConfig * config = ServerConfig::Inst();
-		this->mTimerComponent = this->mApp->GetTimerComponent();
-        this->mNetComponent = this->GetComponent<NetThreadComponent>();
-        LOG_CHECK_RET_FALSE(config->GetMember("mongo", "ip", this->mConfig.mIp));
-		LOG_CHECK_RET_FALSE(config->GetMember("mongo", "db", this->mConfig.mDb));
-		LOG_CHECK_RET_FALSE(config->GetMember("mongo", "port", this->mConfig.mPort));
-		LOG_CHECK_RET_FALSE(config->GetMember("mongo", "user", this->mConfig.mUser));
-		LOG_CHECK_RET_FALSE(config->GetMember("mongo", "passwd", this->mConfig.mPasswd));
-		LOG_CHECK_RET_FALSE(config->GetMember("mongo", "count", this->mConfig.mMaxCount));
-		return true;
-	}
-
     void MongoDBComponent::CloseClients()
     {
         for(std::shared_ptr<TcpMongoClient> client : this->mMongoClients)
@@ -45,19 +32,17 @@ namespace Sentry
         this->mMongoClients.clear();
     }
 
-	bool MongoDBComponent::StartConnectMongo()
+	bool MongoDBComponent::Start()
     {
-        if(!this->LoadConfig())
+        LOG_CHECK_RET_FALSE(MongoConfig::Inst());
+        const MongoConfig * config = MongoConfig::Inst();
+        NetThreadComponent * threadComponent = this->GetComponent<NetThreadComponent>();
+        for (int index = 0; index < config->MaxCount; index++)
         {
-            return false;
-        }
-        for (int index = 0; index < this->mConfig.mMaxCount; index++)
-        {
-            const std::string & ip = this->mConfig.mIp;
-            const unsigned short port = this->mConfig.mPort;
-            std::shared_ptr<SocketProxy> socketProxy = this->mNetComponent->CreateSocket(ip, port);
-            std::shared_ptr<TcpMongoClient> mongoClientContext =
-                    std::make_shared<TcpMongoClient>(socketProxy, this->mConfig);
+            const std::string & ip = config->Ip;
+            const unsigned short port = config->Port;
+            std::shared_ptr<SocketProxy> socketProxy = threadComponent->CreateSocket(ip, port);
+            std::shared_ptr<TcpMongoClient> mongoClientContext = std::make_shared<TcpMongoClient>(socketProxy);
 
             this->mMongoClients.emplace_back(mongoClientContext);
         }
@@ -177,7 +162,7 @@ namespace Sentry
         std::shared_ptr<CommandRequest> mongoRequest
                 = std::make_shared<CommandRequest>();
 
-        mongoRequest->dataBase = this->mConfig.mDb;
+        mongoRequest->dataBase = MongoConfig::Inst()->DB;
         mongoRequest->document.Add("ping", 1);
         return this->Run(this->GetClient(index), mongoRequest) != nullptr;
     }

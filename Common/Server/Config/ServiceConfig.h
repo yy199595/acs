@@ -86,8 +86,8 @@ namespace Sentry
         const RpcServiceConfig * GetConfig(const std::string & name) const;
         const RpcMethodConfig * GetMethodConfig(const std::string & fullName) const;
     private:
-        bool OnLoadText(const std::string &content) final;
-        bool OnReloadText(const std::string &content) final;
+        bool OnLoadText(const char *str, size_t length) final;
+        bool OnReloadText(const char *str, size_t length) final;
     private:
         std::unordered_map<std::string, const RpcMethodConfig *> mRpcMethodConfig;
         std::unordered_map<std::string, std::unique_ptr<RpcServiceConfig>> mConfigs;
@@ -101,8 +101,8 @@ namespace Sentry
         const HttpServiceConfig * GetConfig(const std::string & name) const;
         const HttpMethodConfig * GetMethodConfig(const std::string & fullName) const;
     private:
-        bool OnLoadText(const std::string &content) final;
-        bool OnReloadText(const std::string &content) final;
+        bool OnLoadText(const char *str, size_t length) final;
+        bool OnReloadText(const char *str, size_t length) final;
     private:
         std::unordered_map<std::string, const HttpMethodConfig *> mMethodConfigs;
         std::unordered_map<std::string, std::unique_ptr<HttpServiceConfig>> mConfigs;

@@ -44,8 +44,8 @@ namespace Sentry
         ClusterConfig() : TextConfig("ClusterConfig") { }
 
     private:
-        bool OnLoadText(const std::string &content) final;
-        bool OnReloadText(const std::string &content) final;
+        bool OnLoadText(const char *str, size_t length) final;
+        bool OnReloadText(const char *str, size_t length) final;
     public:
         const NodeConfig * GetConfig() const;
         const NodeConfig * GetConfig(const std::string & name) const;

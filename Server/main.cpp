@@ -2,7 +2,6 @@
 #include"Component/TimerComponent.h"
 #include"Component/TaskComponent.h"
 #include"Component/LuaScriptComponent.h"
-#include"Component/RedisDataComponent.h"
 #include"Component/UnitMgrComponent.h"
 #include"Component/ConsoleComponent.h"
 #include"Component/NetThreadComponent.h"
@@ -47,6 +46,11 @@
 #include"Component/MysqlHelperComponent.h"
 #endif
 
+#ifdef __ENABLE_REDIS__
+#include"Component/RedisSubComponent.h"
+#include"Component/RedisDataComponent.h"
+#endif
+
 using namespace Sentry;
 void RegisterComponent()
 {
@@ -75,8 +79,10 @@ void RegisterComponent()
 	ComponentFactory::Add<OuterNetComponent>("OuterNetComponent");
 	ComponentFactory::Add<OuterNetMessageComponent>("OuterNetMessageComponent");
 // db
+#ifdef __ENABLE_REDIS__
     ComponentFactory::Add<RedisDataComponent>("RedisDataComponent");
     ComponentFactory::Add<RedisSubComponent>("RedisSubComponent");
+#endif
 
 #ifdef __ENABLE_MONGODB__
     ComponentFactory::Add<MongoDBComponent>("MongoDBComponent");

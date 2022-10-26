@@ -86,11 +86,9 @@ namespace Sentry
 
 namespace Sentry
 {
-    bool ClusterConfig::OnLoadText(const std::string &content)
+    bool ClusterConfig::OnLoadText(const char *str, size_t length)
     {
         rapidjson::Document document;
-        const char * str = content.c_str();
-        const size_t length = content.size();
         if(document.Parse(str, length).HasParseError())
         {
             return false;
@@ -110,7 +108,7 @@ namespace Sentry
         return true;
     }
 
-    bool ClusterConfig::OnReloadText(const std::string &content)
+    bool ClusterConfig::OnReloadText(const char *str, size_t length)
     {
         return true;
     }

@@ -8,7 +8,7 @@ include(CMake/function.cmake)
 if(WIN32)
 
 else()
-    include(CMake/proto.cmake)
+    #include(CMake/proto.cmake)
 endif()
 message(${CMAKE_BINARY_DIR})
 
@@ -89,21 +89,33 @@ include_directories(${PROJECT_SOURCE_DIR}/Server/Redis)
 include_directories(${PROJECT_SOURCE_DIR}/Server/Telnet)
 
 
-if(__ENABLE_MONGODB__)
-    include_directories(${PROJECT_SOURCE_DIR}/DataBase/Mongo)
-    file(GLOB_RECURSE MongoFiles "DataBase/Mongo/*.h" "DataBase/Mongo/*.cpp")
-endif()
 
-if(__ENABLE_MYSQL__)
-    include_directories(${PROJECT_SOURCE_DIR}/DataBase/Mysql)
-    file(GLOB_RECURSE MysqlFiles "DataBase/Mysql/*.h" "DataBase/Mysql/*.cpp")
-endif()
 
 file(GLOB_RECURSE CommonSrc "Common/*.h" "Common/*.cpp")
 file(GLOB_RECURSE ProtocolSrc "Gen/*.h" "Gen/*.cpp" "Gen/*.hpp" "Gen/*.cc")
 
 file(GLOB_RECURSE ServerSource "Server/*.h" "Server/*.cpp")
 file(GLOB_RECURSE ClientSource "Client/*.h" "Client/*.cpp")
+
+list(APPEND CommonFiles ${CommonSrc} ${ProtocolSrc})
+
+if(__ENABLE_MONGODB__)
+    include_directories(${PROJECT_SOURCE_DIR}/DataBase/Mongo)
+    file(GLOB_RECURSE MongoFiles "DataBase/Mongo/*.h" "DataBase/Mongo/*.cpp")
+    list(APPEND CommonFiles ${MongoFiles})
+endif()
+
+if(__ENABLE_MYSQL__)
+    include_directories(${PROJECT_SOURCE_DIR}/DataBase/Mysql)
+    file(GLOB_RECURSE MysqlFiles "DataBase/Mysql/*.h" "DataBase/Mysql/*.cpp")
+    list(APPEND CommonFiles ${MysqlFiles})
+endif()
+
+if(__ENABLE_REDIS__)
+    include_directories(${PROJECT_SOURCE_DIR}/DataBase/Redis)
+    file(GLOB_RECURSE RedislFiles "DataBase/Redis/*.h" "DataBase/Redis/*.cpp")
+    list(APPEND CommonFiles ${RedislFiles})
+endif()
 
 #LINK_DIRECTORIES(Libs/lib)
 
@@ -113,8 +125,7 @@ else()
     SET(CMAKE_BUILD_TYPE "Release")
 endif()
 
-list(APPEND CommonFiles ${CommonSrc} ${ProtocolSrc} ${MongoFiles} ${MysqlFiles})
-list(APPEND ServerFiles ${MainSource} ${LogicSource} ${ServerSource})
+list(APPEND ServerFiles ${MainSource} ${ServerSource})
 
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)

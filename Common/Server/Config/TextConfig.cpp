@@ -16,7 +16,7 @@ namespace Sentry
             CONSOLE_LOG_ERROR("read file [" << path << "] error");
             return false;
         }
-        if(this->OnLoadText(content))
+        if(this->OnLoadText(content.c_str(), content.size()))
         {
             this->mMd5 = Helper::Md5::GetMd5(content);
             return true;
@@ -38,7 +38,7 @@ namespace Sentry
         {
             return true;
         }
-        if(this->OnReloadText(content))
+        if(this->OnReloadText(content.c_str(), content.size()))
         {
             this->mMd5 = md5;
             return true;

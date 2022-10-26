@@ -79,6 +79,7 @@ function Server.OnClusterComplete()
     local res = MysqlComponent.QueryOnce("user.account_info", {
         account = "646585122@qq.com"
     })
+    print("======== text query from mysql ========")
     table.print(res)
 
 
@@ -113,6 +114,7 @@ function Server.OnClusterComplete()
     --        }
     --    }
     --})
+    print("======== text query from mongo ========")
     table.print(response)
 end
 

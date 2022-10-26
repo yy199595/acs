@@ -24,8 +24,8 @@
 			"ConsoleComponent",
 			"LuaScriptComponent",
 			"ForwardComponent",
-			"SubPublishComponent",
 			"RedisDataComponent",
+			"HttpWebComponent",
 			"ForwardHelperComponent"
 		]
 	},

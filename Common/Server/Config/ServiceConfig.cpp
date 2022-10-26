@@ -96,11 +96,9 @@ namespace Sentry
 
 namespace Sentry
 {
-    bool RpcConfig::OnLoadText(const std::string &content)
+    bool RpcConfig::OnLoadText(const char *str, size_t length)
     {
         rapidjson::Document document;
-        const char * str = content.c_str();
-        const size_t length = content.size();
         if(document.Parse(str, length).HasParseError())
         {
             return false;
@@ -128,7 +126,7 @@ namespace Sentry
         return true;
     }
 
-    bool RpcConfig::OnReloadText(const std::string &content)
+    bool RpcConfig::OnReloadText(const char *str, size_t length)
     {
         return true;
     }
@@ -148,11 +146,9 @@ namespace Sentry
 
 namespace Sentry
 {
-    bool HttpConfig::OnLoadText(const std::string &content)
+    bool HttpConfig::OnLoadText(const char *str, size_t length)
     {
         rapidjson::Document document;
-        const char * str = content.c_str();
-        const size_t length = content.size();
         if(document.Parse(str, length).HasParseError())
         {
             return false;
@@ -180,10 +176,11 @@ namespace Sentry
         return true;
     }
 
-    bool HttpConfig::OnReloadText(const std::string &content)
+    bool HttpConfig::OnReloadText(const char *str, size_t length)
     {
         return true;
     }
+
 
     const HttpServiceConfig *HttpConfig::GetConfig(const std::string &name) const
     {

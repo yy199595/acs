@@ -5,6 +5,7 @@
 #include"MysqlDBComponent.h"
 #include"Client/MysqlClient.h"
 #include"Message/user.pb.h"
+#include"Config/MysqlConfig.h"
 namespace Sentry
 {
     MysqlTask::MysqlTask(long long taskId, int ms)
@@ -26,18 +27,6 @@ namespace Sentry
 
 namespace Sentry
 {
-    bool MysqlDBComponent::LoadConfig()
-	{
-		const ServerConfig * config = ServerConfig::Inst();
-        LOG_CHECK_RET_FALSE(config->GetMember("mysql", "ip", this->mConfig.mIp));
-        LOG_CHECK_RET_FALSE(config->GetMember("mysql", "port", this->mConfig.mPort));
-        LOG_CHECK_RET_FALSE(config->GetMember("mysql", "user", this->mConfig.mUser));
-        LOG_CHECK_RET_FALSE(config->GetMember("mysql", "count", this->mConfig.mMaxCount));
-        LOG_CHECK_RET_FALSE(config->GetMember("mysql", "passwd", this->mConfig.mPassword));
-		this->mConfig.mAddress = fmt::format("{0}:{1}", this->mConfig.mIp, this->mConfig.mPort);
-		return true;
-	}
-
     void MysqlDBComponent::CloseClients()
     {
         for(std::shared_ptr<MysqlClient> mysqlClient : this->mMysqlClients)
@@ -49,14 +38,12 @@ namespace Sentry
 
     bool MysqlDBComponent::StartConnectMysql()
 	{
-        if(!this->LoadConfig())
-        {
-            return false;
-        }
-		for (int index = 0; index < this->mConfig.mMaxCount; index++)
+        LOG_CHECK_RET_FALSE(MysqlConfig::Inst());
+        const MysqlConfig * config = MysqlConfig::Inst();
+		for (int index = 0; index < config->MaxCount; index++)
 		{
 			std::shared_ptr<MysqlClient> mysqlClient
-				= std::make_shared<MysqlClient>(this->mConfig, this);
+				= std::make_shared<MysqlClient>(this);
 
 			mysqlClient->Start();
 			this->mMysqlClients.emplace_back(std::move(mysqlClient));

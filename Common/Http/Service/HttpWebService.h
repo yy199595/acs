@@ -12,19 +12,12 @@ namespace Sentry
     public:
         HttpWebService() = default;
         ~HttpWebService() = default;
-
-    private:
-        bool Awake();
     private:
         bool OnStartService(HttpServiceRegister &serviceRegister) final;
 		XCode Ping(const HttpHandlerRequest& request, HttpHandlerResponse& response);
 		XCode Sleep(const HttpHandlerRequest& request, HttpHandlerResponse& response);
         XCode Hello(const HttpHandlerRequest& request, HttpHandlerResponse& response);
         XCode DownLoad(const HttpHandlerRequest& request, HttpHandlerResponse& response);
-    private:
-        std::string mLuaPath;
-        std::string mDownloadPath;
-        class LuaScriptComponent * mLuaComponent;
     };
 }
 

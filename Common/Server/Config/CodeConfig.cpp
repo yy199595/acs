@@ -6,12 +6,17 @@
 #include"String/StringHelper.h"
 namespace Sentry
 {
-    bool CodeConfig::OnLoadText(const std::string &content)
+    bool CodeConfig::OnLoadText(const char *str, size_t length)
     {
+        size_t start = 0;
         std::vector<std::string> lines;
-        if(Helper::String::Split(content, "\n", lines) <= 0)
+        for(size_t index = 0; index < length; index++)
         {
-            return false;
+            if(str[index] == '\n')
+            {
+                lines.emplace_back(str + start, index - start);
+                start = index;
+            }
         }
         std::vector<std::string> rets;
         for(size_t index = 0; index < lines.size() -1; index++)
@@ -42,7 +47,7 @@ namespace Sentry
         return std::string();
     }
 
-    bool CodeConfig::OnReloadText(const std::string &content)
+    bool CodeConfig::OnReloadText(const char *str, size_t length)
     {
         return true;
     }

@@ -18,16 +18,16 @@ namespace Sentry
         this->mNodeId = 0;
     }
 
-    bool ServerConfig::OnReloadText(const std::string &content)
+    bool ServerConfig::OnReloadText(const char *str, size_t length)
     {
         return true;
     }
 
-    bool ServerConfig::OnLoadText(const std::string &content)
+    bool ServerConfig::OnLoadText(const char *str, size_t length)
 	{
-		if (!this->ParseJson(content))
+		if (!this->ParseJson(str, length))
 		{
-            CONSOLE_LOG_ERROR("parse " << this->GetPath() << " failure");
+            CONSOLE_LOG_ERROR("parse " << this->Path() << " failure");
             return false;
 		}
         this->GetMember("area_id",this->mNodeId);
@@ -108,7 +108,7 @@ namespace Sentry
         return iter != this->mListens.end() ? &iter->second : nullptr;
     }
 
-	bool ServerConfig::GetConfigPath(const std::string& name, std::string& path) const
+	bool ServerConfig::GetPath(const std::string& name, std::string& path) const
 	{
 		auto iter = this->mPaths.find(name);
 		if(iter != this->mPaths.end())

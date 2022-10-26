@@ -12,20 +12,6 @@
 using namespace Tcp;
 using namespace Sentry;
 
-namespace Mongo
-{
-	struct Config
-	{
-		int mMaxCount;
-		std::string mDb;
-		std::string mIp;
-		std::string mUser;
-		std::string mPasswd;
-		unsigned short mPort;
-		std::string mFullName;
-	};
-}
-
 namespace Sentry
 {
 	class MongoDBComponent;
@@ -36,7 +22,7 @@ namespace Mongo
 	class TcpMongoClient : public Tcp::TcpContext
 	{
 	 public:
-		TcpMongoClient(std::shared_ptr<SocketProxy> scoket, const Mongo::Config & config);
+		TcpMongoClient(std::shared_ptr<SocketProxy> scoket);
 	public:
         void Stop();
 		void SendMongoCommand(std::shared_ptr<CommandRequest> request);
@@ -47,7 +33,6 @@ namespace Mongo
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 		std::shared_ptr<CommandResponse> SyncSendMongoCommand(std::shared_ptr<CommandRequest> request);
 	private:
-		const Mongo::Config & mConfig;
 		asio::streambuf streamBuffer;
 		MongoDBComponent * mMongoComponent;
         std::shared_ptr<CommandResponse> mMongoResponse;

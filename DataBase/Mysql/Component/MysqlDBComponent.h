@@ -44,9 +44,6 @@ namespace Sentry
         MysqlClient * GetClient(int index = -1);
         bool Run(MysqlClient * client, std::shared_ptr<Mysql::ICommand> command);
     private:
-        bool LoadConfig();
-    private:
-		MysqlConfig mConfig;
 		std::vector<std::shared_ptr<MysqlClient>> mMysqlClients;
     };
 }

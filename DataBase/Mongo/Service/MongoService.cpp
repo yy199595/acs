@@ -30,7 +30,7 @@ namespace Sentry
         BIND_COMMON_RPC_METHOD(MongoService::RunCommand);
         this->mMongoComponent = this->GetComponent<MongoDBComponent>();
         this->mSyncRedisComponent = this->GetComponent<DataSyncComponent>();
-        return this->mMongoComponent->StartConnectMongo();
+        return true;
     }
 
     bool MongoService::OnClose()

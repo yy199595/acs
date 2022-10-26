@@ -4,12 +4,13 @@
 
 #include"MysqlClient.h"
 #include"MysqlMessage.h"
+#include"Config/MysqlConfig.h"
 #include"Component/MysqlDBComponent.h"
 namespace Sentry
 {
-	MysqlClient::MysqlClient(const MysqlConfig &config, MysqlDBComponent *component)
+	MysqlClient::MysqlClient(MysqlDBComponent *component)
 							 : std::thread(std::bind(&MysqlClient::Update, this)),
-                             mConfig(config), mComponent(component)
+                              mComponent(component)
     {
         this->mLastTime = 0;
         this->mIsClose = true;
@@ -73,18 +74,18 @@ namespace Sentry
 	bool MysqlClient::StartConnect()
 	{
 		MYSQL * mysql = mysql_init(NULL);
-		unsigned short port = this->mConfig.mPort;
-		const char* ip = this->mConfig.mIp.c_str();
-		const char* user = this->mConfig.mUser.c_str();
-		const char* pwd = this->mConfig.mPassword.c_str();
+		unsigned short port = MysqlConfig::Inst()->Port;
+		const char* ip = MysqlConfig::Inst()->Ip.c_str();
+		const char* user = MysqlConfig::Inst()->User.c_str();
+		const char* pwd = MysqlConfig::Inst()->Password.c_str();
 		if (!mysql_real_connect(mysql, ip, user, pwd, "", port, NULL, CLIENT_FOUND_ROWS))
 		{
-			CONSOLE_LOG_ERROR("connect mysql [" << this->mConfig.mAddress << "] failure");
+			CONSOLE_LOG_ERROR("connect mysql [" << MysqlConfig::Inst()->Address << "] failure");
 			return false;
 		}
 		this->mIsClose = false;
 		this->mMysqlClient = mysql;
-		CONSOLE_LOG_INFO("connect mysql [" << this->mConfig.mAddress << "] successful");
+		CONSOLE_LOG_INFO("connect mysql [" << MysqlConfig::Inst()->Address << "] successful");
 		return true;
 	}
 }
