@@ -15,9 +15,7 @@ namespace Sentry
         bool IsRunCommand() final { return false; }
         bool SubscribeChannel(const std::string & name, const std::string& channel);
         long long Publish(const std::string & name, const std::string& channel, const std::string& message);
-
     private:
-        bool Invoke(const std::string & message);
         bool Invoke(const std::string & channel, const std::string & message);
     protected:
         void OnNotFindResponse(long long taskId, std::shared_ptr<RedisResponse> message) final;

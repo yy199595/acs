@@ -34,15 +34,17 @@ namespace Sentry
 		bool Close() final;
         int GetWaitMessageCount() const final { return this->mWaitCount; }
 		bool IsStartService() { return this->mMethodRegister != nullptr; }
-		XCode Invoke(const std::string &id, const std::string &message) final;
 		XCode Invoke(const std::string &func, std::shared_ptr<Rpc::Packet> message) final;
     protected:
         void OnHotFix() final;
         virtual bool OnClose() = 0;
         virtual bool OnStart() = 0;
         void WaitAllMessageComplete() final;
-		void GetSubEventIds(std::unordered_set<std::string> &evendIds) final;
+#ifdef __ENABLE_REDIS__
+        XCode Invoke(const std::string &id, const std::string &message) final;
+        void GetSubEventIds(std::unordered_set<std::string> &evendIds) final;
 		NetEventRegistry & GetEventRegistry() { return *this->mEventRegister; }
+#endif
 		ServiceMethodRegister & GetMethodRegistry() { return *this->mMethodRegister; }
 
     private:

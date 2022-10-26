@@ -42,8 +42,10 @@ namespace Sentry
 		bool IsStartComplete() final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) override;
     public:
+#ifdef __ENABLE_REDIS__
 		virtual void GetSubEventIds(std::unordered_set<std::string> & evendIds) = 0;
 		virtual XCode Invoke(const std::string & id, const std::string & message) = 0;
+#endif
         virtual XCode Invoke(const std::string & method, std::shared_ptr<Rpc::Packet> message) = 0;
 	private:
         std::vector<std::string> mServiceHosts;

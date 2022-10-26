@@ -10,7 +10,6 @@
 #include"Component/TextConfigComponent.h"
 namespace Sentry
 {
-
     void RedisSubComponent::OnNotFindResponse(long long taskId, std::shared_ptr<RedisResponse> response)
     {
         if (response->GetType() != RedisRespType::REDIS_ARRAY || response->GetArraySize() != 3)
@@ -26,12 +25,6 @@ namespace Sentry
             {
                 const std::string &channel = redisAny2->Cast<RedisString>()->GetValue();
                 const std::string &message = redisAny3->Cast<RedisString>()->GetValue();
-                if (channel == this->mLocalHost && !this->Invoke(message))
-                {
-                    LOG_ERROR("handler redis sub event error channel = "
-                                  << channel << " message = " << message);
-                    return;
-                }
                 if (!this->Invoke(channel, message))
                 {
                     LOG_ERROR("handler redis sub event error channel = "
@@ -39,11 +32,6 @@ namespace Sentry
                 }
             }
         }
-    }
-
-    bool RedisSubComponent::Invoke(const std::string &message)
-    {
-        return false;
     }
 
     bool RedisSubComponent::Invoke(const std::string &channel, const std::string &message)

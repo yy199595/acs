@@ -53,12 +53,12 @@ namespace Sentry
         this->mIsHandlerMessage = true;
         return true;
 	}
-
+#ifdef __ENABLE_REDIS__
 	XCode LuaRpcService::Invoke(const std::string& id, const std::string& message)
 	{
 		return XCode::Successful;
 	}
-
+#endif
 
 	XCode LuaRpcService::Invoke(const std::string &name, std::shared_ptr<Rpc::Packet> message)
 	{
@@ -122,6 +122,7 @@ namespace Sentry
         }
         return true;
 	}
+#ifdef __ENABLE_REDIS__
 	void LuaRpcService::GetSubEventIds(std::unordered_set<std::string>& evendIds)
 	{
 		if(this->mMethodRegister != nullptr)
@@ -134,5 +135,5 @@ namespace Sentry
 			}
 		}
 	}
-
+#endif
 }
