@@ -158,7 +158,7 @@ namespace Sentry
         {
             return nullptr;
         }
-        return this->AddTask(taskSource)->Await();
+        return this->AddTask(taskSource->GetRpcId(), taskSource)->Await();
     }
 
     bool InnerNetMessageComponent::Send(const std::string &address, std::shared_ptr<Rpc::Packet> message)

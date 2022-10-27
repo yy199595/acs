@@ -103,7 +103,8 @@ namespace Lua
 			luaL_error(lua, "send request message error");
 			return 0;
 		}
-		return netMessageComponent->AddTask(luaRpcTaskSource)->Await();
+        long long id = luaRpcTaskSource->GetRpcId();
+		return netMessageComponent->AddTask(id, luaRpcTaskSource)->Await();
 	}
 
 	int LuaApp::GetComponent(lua_State* lua)

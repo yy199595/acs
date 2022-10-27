@@ -24,7 +24,7 @@ if(WIN32)
         set(AsmFiles ${ContextPath}/context.S)
     endif()
 else()
-    SET(AsmFiles ${ContextPath}/context.S)
+    SET(AsmFiles ${ContextPath}/context.S Common/Http/Http/HttpRequest.cpp Common/Http/Http/HttpRequest.h Common/Http/Http/HttpResponse.cpp Common/Http/Http/HttpResponse.h Common/Http/Http/Content.cpp Common/Http/Http/Content.h Common/Http/Http/Comman.h Common/Http/Http/Common.cpp)
 endif()
 MESSAGE(${AsmFiles})
 

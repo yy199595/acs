@@ -43,8 +43,9 @@ namespace Sentry
         std::shared_ptr<HttpTask> httpRpcTask = httpGetRequest->MakeTask(second);
         std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
 
+        long long taskId = httpRpcTask->GetRpcId();
         httpAsyncClient->Request(httpGetRequest);
-        std::shared_ptr<HttpAsyncResponse> response = this->AddTask(httpRpcTask)->Await();
+        std::shared_ptr<HttpAsyncResponse> response = this->AddTask(taskId, httpRpcTask)->Await();
         if (response->GetData().GetStatus() != HttpStatus::OK)
         {
             LOG_ERROR("[GET] " << url << " error = "
@@ -87,8 +88,9 @@ namespace Sentry
         std::shared_ptr<HttpTask> httpTask = httpRequest->MakeTask(0);
         std::shared_ptr<HttpRequestClient> requestClient = this->CreateClient();
 
+        long long taskId = httpTask->GetRpcId();
         requestClient->Request(httpRequest, fs);
-        std::shared_ptr<HttpAsyncResponse> response = this->AddTask(httpTask)->Await();
+        std::shared_ptr<HttpAsyncResponse> response = this->AddTask(taskId, httpTask)->Await();
         if (this->mClientPools.size() < 100)
         {
             this->mClientPools.push(requestClient);
@@ -108,8 +110,9 @@ namespace Sentry
         std::shared_ptr<HttpTask> httpTask = postRequest->MakeTask(second);
         std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
 
+        long long taskId = httpTask->GetRpcId();
         httpAsyncClient->Request(postRequest);
-        std::shared_ptr<HttpAsyncResponse> response = this->AddTask(httpTask)->Await();
+        std::shared_ptr<HttpAsyncResponse> response = this->AddTask(taskId, httpTask)->Await();
 
         if (response->GetData().GetStatus() != HttpStatus::OK)
         {

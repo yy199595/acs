@@ -8,7 +8,7 @@
 #include"Async/RpcTaskSource.h"
 namespace Sentry
 {
-    template<typename T>
+    template<typename K,typename T>
     class RpcTaskComponent : public Component
     {
     public:
@@ -16,61 +16,60 @@ namespace Sentry
         ~RpcTaskComponent() = default;
         typedef std::shared_ptr<IRpcTask<T>> RpcTask;
     public:
-        void OnTimeout(long long taskId);
+        void OnTimeout(K k);
         template<typename T1>
-        T1 * AddTask(std::shared_ptr<T1> task)
+        T1 * AddTask(K k, std::shared_ptr<T1> task)
         {
-            long long taskId = task->GetRpcId();
-            auto iter = this->mTasks.find(taskId);
+            auto iter = this->mTasks.find(k);
             if(iter == this->mTasks.end())
             {
                 this->OnAddTask(task);
-                this->mTasks.emplace(taskId, task);
+                this->mTasks.emplace(k, task);
             }
             return task.get();
         }
-        bool OnResponse(long long taskId, std::shared_ptr<T> message);
+        bool OnResponse(K key, std::shared_ptr<T> message);
 	protected:
 		virtual void OnAddTask(RpcTask task) { }
-		virtual void OnDelTask(long long taskId, RpcTask task) { }
-        virtual void OnNotFindResponse(long long taskId, std::shared_ptr<T> message);
+		virtual void OnDelTask(K key, RpcTask task) { }
+        virtual void OnNotFindResponse(K key, std::shared_ptr<T> message);
     private:
-        std::unordered_map<long long, RpcTask> mTasks;
+        std::unordered_map<K, RpcTask> mTasks;
     };
 
-    template<typename T>
-    void RpcTaskComponent<T>::OnTimeout(long long taskId)
+    template<typename K,typename T>
+    void RpcTaskComponent<K, T>::OnTimeout(K key)
     {
-        auto iter = this->mTasks.find(taskId);
+        auto iter = this->mTasks.find(key);
         if(iter != this->mTasks.end())
         {
             RpcTask rpcTask = iter->second;
             rpcTask->OnTimeout();
             this->mTasks.erase(iter);
-            LOG_ERROR(this->GetName() << " rpc task time out id " << taskId);
+            LOG_ERROR(this->GetName() << " rpc task time out id " << key);
         }
     }
 
-    template<typename T>
-    bool RpcTaskComponent<T>::OnResponse(long long taskId, std::shared_ptr<T> message)
+    template<typename K,typename T>
+    bool RpcTaskComponent<K, T>::OnResponse(K key, std::shared_ptr<T> message)
     {
-        auto iter = this->mTasks.find(taskId);
+        auto iter = this->mTasks.find(key);
         if(iter == this->mTasks.end())
         {
-            this->OnNotFindResponse(taskId, message);
+            this->OnNotFindResponse(key, message);
             return false;
         }
         RpcTask rpcTask = iter->second;
         this->mTasks.erase(iter);
         rpcTask->OnResponse(message);
-		this->OnDelTask(taskId, rpcTask);
+		this->OnDelTask(key, rpcTask);
         return true;
     }
 
-    template<typename T>
-    void RpcTaskComponent<T>::OnNotFindResponse(long long taskId, std::shared_ptr<T> message)
+    template<typename K,typename T>
+    void RpcTaskComponent<K, T>::OnNotFindResponse(K k, std::shared_ptr<T> message)
     {
-        LOG_ERROR(this->GetName() << " not find rpc task id " << taskId);
+        LOG_ERROR(this->GetName() << " not find rpc task id " << k);
     }
 }
 

@@ -50,8 +50,9 @@ namespace Lua
         }
 
         std::shared_ptr<LuaRedisTask> luaRedisTask = request->MakeLuaTask(lua);
+        long long id = luaRedisTask->GetRpcId();
         redisClientContext->SendCommand(request);
-        return redisComponent->AddTask(luaRedisTask)->Await();
+        return redisComponent->AddTask(id, luaRedisTask)->Await();
     }
 
 	int Redis::Call(lua_State* lua)
@@ -71,7 +72,8 @@ namespace Lua
         std::shared_ptr<RedisRequest> request = redisComponent->MakeLuaRequest(fullName, json);
 
         redisClientContext->SendCommand(request);
-        return redisComponent->AddTask(request->MakeLuaTask(lua))->Await();
+        std::shared_ptr<LuaRedisTask> luaRedisTask = request->MakeLuaTask(lua);
+        return redisComponent->AddTask(luaRedisTask->GetRpcId(), luaRedisTask)->Await();
     }
 
     int Redis::Send(lua_State *lua)

@@ -74,7 +74,8 @@ namespace Sentry
             = std::make_shared<MysqlTask>(command->GetRpcId(), 0);
 
         client->SendCommand(command);
-        std::shared_ptr<Mysql::Response> response = this->AddTask(mysqlTask)->Await();
+        long long key = mysqlTask->GetRpcId();
+        std::shared_ptr<Mysql::Response> response = this->AddTask(key, mysqlTask)->Await();
 #ifdef __DEBUG__
         long long t1 = Helper::Time::GetNowMilTime();
         if (response != nullptr && !response->IsOk())

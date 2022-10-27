@@ -72,13 +72,13 @@ namespace Sentry
         return returnClient.get();
     }
 
-	void MongoDBComponent::OnDelTask(long long taskId, RpcTask task)
+	void MongoDBComponent::OnDelTask(int taskId, RpcTask task)
 	{
         assert(this->mApp->IsMainThread());
-        this->mRequestId.Push((int)taskId);
+        this->mRequestId.Push(taskId);
 	}
 
-	void MongoDBComponent::OnAddTask(RpcTaskComponent<Mongo::CommandResponse>::RpcTask task)
+	void MongoDBComponent::OnAddTask(RpcTaskComponent<int, Mongo::CommandResponse>::RpcTask task)
 	{
 
 	}
@@ -102,7 +102,8 @@ namespace Sentry
 
 #ifdef __DEBUG__
 		long long t1 = Time::GetNowMilTime();
-        std::shared_ptr<Mongo::CommandResponse> mongoResponse = this->AddTask(mongoTask)->Await();
+        int taskId = (int)mongoTask->GetRpcId();
+        std::shared_ptr<Mongo::CommandResponse> mongoResponse = this->AddTask(taskId, mongoTask)->Await();
 		if(mongoResponse != nullptr && mongoResponse->GetDocumentSize() > 0)
 		{
             LOG_DEBUG( "[" << Time::GetNowMilTime() - t1 << "ms] document size = [" << mongoResponse->GetDocumentSize() << "]");

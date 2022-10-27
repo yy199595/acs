@@ -10,7 +10,7 @@
 
 namespace Sentry
 {
-    class RedisComponent : public RpcTaskComponent<RedisResponse>
+    class RedisComponent : public RpcTaskComponent<long long,RedisResponse>
 	{
 	public:
 		RedisComponent() = default;

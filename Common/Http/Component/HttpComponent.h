@@ -11,7 +11,7 @@ namespace Sentry
 	class HttpHandlerRequest;
 	class HttpRequestClient;
     class HttpHandlerResponse;
-	class HttpComponent : public RpcTaskComponent<HttpAsyncResponse>, public ILuaRegister
+	class HttpComponent : public RpcTaskComponent<long long, HttpAsyncResponse>, public ILuaRegister
 	{
 	 public:
 		HttpComponent() = default;

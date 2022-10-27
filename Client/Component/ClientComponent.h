@@ -36,7 +36,7 @@ namespace Client
 {
     class TcpRpcClientContext;
 
-    class ClientComponent : public RpcTaskComponent<Rpc::Packet>,
+    class ClientComponent : public RpcTaskComponent<long long, Rpc::Packet>,
             public ILuaRegister,  public IRpc<Rpc::Packet>
     {
     public:

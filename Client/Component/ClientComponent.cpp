@@ -111,7 +111,7 @@ namespace Client
         request->GetHead().Add("rpc", clienRpcTask->GetRpcId());
 
         this->mTcpClient->SendToServer(request);
-        return this->AddTask(clienRpcTask)->Await();
+        return this->AddTask(clienRpcTask->GetRpcId(), clienRpcTask)->Await();
     }
 
 	void ClientComponent::OnTimeout(long long rpcId)

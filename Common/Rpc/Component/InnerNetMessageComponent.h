@@ -18,7 +18,7 @@ namespace Sentry
 		long long Time;
 	};
 #endif
-    class InnerNetMessageComponent : public RpcTaskComponent<Rpc::Packet>, public IFrameUpdate
+    class InnerNetMessageComponent : public RpcTaskComponent<long long, Rpc::Packet>, public IFrameUpdate
 	{
 	 public:
 		InnerNetMessageComponent() = default;

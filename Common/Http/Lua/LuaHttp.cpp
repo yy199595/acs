@@ -41,7 +41,8 @@ namespace Lua
         std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
 
         requestClient->Request(getRequest);
-        return httpComponent->AddTask(luaHttpTask)->Await(requestClient);
+        long long id = luaHttpTask->GetRpcId();
+        return httpComponent->AddTask(id, luaHttpTask)->Await(requestClient);
     }
 
 	int Http::Post(lua_State* lua)
@@ -64,9 +65,9 @@ namespace Lua
 #ifdef __DEBUG__
         //LOG_DEBUG("[http post] url = " << std::string(str, size) << " data = " << postRequest->GetBody());
 #endif
-
+        long long id = luaHttpTask->GetRpcId();
         requestClient->Request(postRequest);
-        return httpComponent->AddTask(luaHttpTask)->Await(requestClient);
+        return httpComponent->AddTask(id, luaHttpTask)->Await(requestClient);
     }
 
 	int Http::Download(lua_State* lua)

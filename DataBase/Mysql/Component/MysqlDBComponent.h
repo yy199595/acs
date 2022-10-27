@@ -32,7 +32,7 @@ namespace Sentry
 namespace Sentry
 {
     class MysqlClient;
-    class MysqlDBComponent : public RpcTaskComponent<Mysql::Response>
+    class MysqlDBComponent : public RpcTaskComponent<long long, Mysql::Response>
     {
     public:
         MysqlDBComponent() = default;
