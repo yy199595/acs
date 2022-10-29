@@ -4,11 +4,11 @@
 
 #include"MysqlClient.h"
 #include"MysqlMessage.h"
+#include"App/App.h"
 #include"Config/MysqlConfig.h"
-#include"Component/MysqlDBComponent.h"
 namespace Sentry
 {
-	MysqlClient::MysqlClient(MysqlDBComponent *component)
+	MysqlClient::MysqlClient(IRpc<Mysql::Response> *component)
 							 : std::thread(std::bind(&MysqlClient::Update, this)),
                               mComponent(component)
     {
@@ -19,30 +19,28 @@ namespace Sentry
     }
 
 	void MysqlClient::Update()
-    {
-        std::string error;
-        this->mIsClose = !this->StartConnect();
-        std::shared_ptr<Mysql::ICommand> command;
-        Asio::Context &io = App::Inst()->GetThread();
-        this->mLastTime = Helper::Time::GetNowSecTime();
-        while (!this->mIsClose)
-        {
-            while (this->GetCommand(command))
-            {
-                std::shared_ptr<Mysql::Response> response;
-                bool res = command->Invoke(this->mMysqlClient, error);
-                response = std::make_shared<Mysql::Response>(res, error);
-                if (command->GetRpcId() != 0)
-                {
-                    long long rpcId = command->GetRpcId();
-                    io.post(std::bind(&MysqlDBComponent::OnResponse, this->mComponent, rpcId, response));
-                }
-                this->mLastTime = Helper::Time::GetNowSecTime();
-            }
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
-        mysql_close(this->mMysqlClient);
-    }
+	{
+		std::string error;
+		this->mIsClose = !this->StartConnect();
+		std::shared_ptr<Mysql::ICommand> command;
+		Asio::Context& io = App::Inst()->MainThread();
+		this->mLastTime = Helper::Time::GetNowSecTime();
+		const std::string & address = MysqlConfig::Inst()->Address;
+		while (!this->mIsClose)
+		{
+			while (this->GetCommand(command))
+			{
+				long long rpcId = command->GetRpcId();
+				bool res = command->Invoke(this->mMysqlClient, error);
+				std::shared_ptr<Mysql::Response> response =
+					std::make_shared<Mysql::Response>(res, error, rpcId);
+				io.post(std::bind(&IRpc<Mysql::Response>::OnMessage, this->mComponent, address, response));
+				this->mLastTime = Helper::Time::GetNowSecTime();
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
+		mysql_close(this->mMysqlClient);
+	}
 
 	void MysqlClient::Stop()
 	{
@@ -78,6 +76,7 @@ namespace Sentry
 		const char* ip = MysqlConfig::Inst()->Ip.c_str();
 		const char* user = MysqlConfig::Inst()->User.c_str();
 		const char* pwd = MysqlConfig::Inst()->Password.c_str();
+		const std::string & address = MysqlConfig::Inst()->Address;
 		if (!mysql_real_connect(mysql, ip, user, pwd, "", port, NULL, CLIENT_FOUND_ROWS))
 		{
 			CONSOLE_LOG_ERROR("connect mysql [" << MysqlConfig::Inst()->Address << "] failure");
@@ -85,7 +84,8 @@ namespace Sentry
 		}
 		this->mIsClose = false;
 		this->mMysqlClient = mysql;
-		CONSOLE_LOG_INFO("connect mysql [" << MysqlConfig::Inst()->Address << "] successful");
+		Asio::Context& io = App::Inst()->MainThread();
+		io.post(std::bind(&IRpc<Mysql::Response>::OnConnectSuccessful, this->mComponent, address));
 		return true;
 	}
 }

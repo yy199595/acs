@@ -1,6 +1,7 @@
 ﻿#include"InnerNetClient.h"
 #include"App/App.h"
 #include"Client/Rpc.h"
+#include"Guid/Guid.h"
 #include"App/System/System.h"
 namespace Sentry
 {
@@ -26,15 +27,28 @@ namespace Sentry
 #endif
 	}
 
-    void InnerNetClient::SendData(std::shared_ptr<Rpc::Packet> message)
+    void InnerNetClient::Send(std::shared_ptr<Rpc::Packet> message)
     {
 #ifdef ONLY_MAIN_THREAD
         this->Send(message);
 #else
         asio::io_service &t = this->mSocket->GetThread();
-        t.post(std::bind(&InnerNetClient::Send, this, message));
+        t.post(std::bind(&InnerNetClient::Write, this, message));
 #endif
     }
+
+	long long InnerNetClient::Call(std::shared_ptr<Rpc::Packet> message)
+	{
+		long long taskId = Guid::Create();
+		message->GetHead().Add("rpc", taskId);
+#ifdef ONLY_MAIN_THREAD
+		this->Send(message);
+#else
+		asio::io_service &t = this->mSocket->GetThread();
+		t.post(std::bind(&InnerNetClient::Write, this, message));
+#endif
+		return taskId;
+	}
 
 	void InnerNetClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{
@@ -60,7 +74,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
 		this->mTcpComponent->OnCloseSocket(address, code);
 #else
-		asio::io_service & taskScheduler = App::Inst()->GetThread();
+		asio::io_service & taskScheduler = App::Inst()->MainThread();
 		taskScheduler.post(std::bind(&IRpc<Rpc::Packet>::OnCloseSocket, this->mComponent, address, code));
 #endif
 	}
@@ -104,7 +118,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
                 this->mTcpComponent->OnMessage(address, std::move(this->mMessage));
 #else
-                asio::io_service & io = App::Inst()->GetThread();
+                asio::io_service & io = App::Inst()->MainThread();
                 io.post(std::bind(&IRpc<Rpc::Packet>::OnMessage, this->mComponent, address, std::move(this->mMessage)));
 #endif
             }
@@ -134,23 +148,24 @@ namespace Sentry
 			this->mTimer->async_wait(std::bind(std::bind(&InnerNetClient::Connect, this->shared_from_this())));
 			return;
 		}
-		asio::io_service & io = App::Inst()->GetThread();
+		asio::io_service & io = App::Inst()->MainThread();
 		const std::string & address = this->mSocket->GetAddress();
 		io.post(std::bind(&IRpc<Rpc::Packet>::OnConnectSuccessful, this->mComponent, address));
 
         std::shared_ptr<Rpc::Packet> authMessage =
             Rpc::Packet::New(Tcp::Type::Auth, Tcp::Porto::Protobuf);
         {
-            authMessage->GetHead().Add("name", this->mSrvName);
-            authMessage->GetHead().Add("user", this->mUserName);
-            authMessage->GetHead().Add("passwd", this->mPassword);
+			Rpc::Head & head = authMessage->GetHead();
+			head.Add("name", this->mSrvName);
+			head.Add("user", this->mUserName);
+			head.Add("passwd", this->mPassword);
             if(!this->mRpcLocation.empty())
             {
-                authMessage->GetHead().Add("rpc", this->mRpcLocation);
+				head.Add("rpc", this->mRpcLocation);
             }
             if(!this->mHttpLocation.empty())
             {
-                authMessage->GetHead().Add("http", this->mHttpLocation);
+				head.Add("http", this->mHttpLocation);
             }
         }
         if(this->SendSync(authMessage) > 0)

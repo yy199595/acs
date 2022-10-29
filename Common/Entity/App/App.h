@@ -20,7 +20,7 @@ namespace Sentry
 		explicit App();
 	 public:
 		inline LoggerComponent* GetLogger() { return this->mLogComponent; }
-		inline Asio::Context & GetThread() { return *this->mMainThread; }
+		inline Asio::Context & MainThread() { return *this->mMainThread; }
 		inline TaskComponent* GetTaskComponent() { return this->mTaskComponent; }
 		inline TimerComponent* GetTimerComponent() { return this->mTimerComponent; }
 		inline ProtoComponent * GetMsgComponent() { return this->mMessageComponent; }

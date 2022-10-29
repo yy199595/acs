@@ -22,7 +22,7 @@ namespace Mongo
 	class TcpMongoClient : public Tcp::TcpContext
 	{
 	 public:
-		TcpMongoClient(std::shared_ptr<SocketProxy> scoket);
+		TcpMongoClient(std::shared_ptr<SocketProxy> scoket, IRpc<CommandResponse> * component);
 	public:
         void Stop();
 		void SendMongoCommand(std::shared_ptr<CommandRequest> request);
@@ -34,7 +34,7 @@ namespace Mongo
 		std::shared_ptr<CommandResponse> SyncSendMongoCommand(std::shared_ptr<CommandRequest> request);
 	private:
 		asio::streambuf streamBuffer;
-		MongoDBComponent * mMongoComponent;
+		IRpc<CommandResponse> * mComponent;
         std::shared_ptr<CommandResponse> mMongoResponse;
 	};
 }

@@ -18,12 +18,13 @@ namespace Sentry
     class TcpRedisClient final : public Tcp::TcpContext
     {
     public:
-        TcpRedisClient(std::shared_ptr<SocketProxy> socket, const RedisClientConfig & config);
+        TcpRedisClient(std::shared_ptr<SocketProxy> socket, const RedisClientConfig & config, IRpc<RedisResponse> * component);
 		~TcpRedisClient();
     public:
-        const RedisClientConfig & GetConfig() { return mConfig;}
-        void SendCommand(std::shared_ptr<RedisRequest> command);
-        const std::string & GetName() const { return this->mConfig.Name; }
+        void Send(std::shared_ptr<RedisRequest> command);
+		long long Call(std::shared_ptr<RedisRequest> command);
+		const RedisClientConfig & GetConfig() { return mConfig;}
+		const std::string & GetName() const { return this->mConfig.Name; }
     private:
 		bool AuthUser();
 		void OnReadComplete();
@@ -34,8 +35,9 @@ namespace Sentry
         std::shared_ptr<RedisResponse> SyncCommand(std::shared_ptr<RedisRequest> command);
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
     private:
+		std::string mAddress;
         RedisClientConfig mConfig;
-        RedisComponent * mRedisComponent;
+		IRpc<RedisResponse> * mComponent;
 		std::shared_ptr<asio::steady_timer> mTimer;
         std::shared_ptr<RedisResponse> mCurResponse;
         std::shared_ptr<asio::steady_timer> mCloseTimer;

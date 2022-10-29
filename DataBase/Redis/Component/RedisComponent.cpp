@@ -31,6 +31,21 @@ namespace Sentry
         return true;
     }
 
+	void RedisComponent::OnConnectSuccessful(const std::string& address)
+	{
+		LOG_INFO("redis client [" << address << "] auth successful");
+	}
+
+	void RedisComponent::OnMessage(const std::string& address, std::shared_ptr<RedisResponse> message)
+	{
+		if(message->HasError())
+		{
+			LOG_ERROR(message->GetString());
+		}
+		long long id = message->TaskId();
+		this->OnResponse(id, message);
+	}
+
     bool RedisComponent::Start()
     {
         std::vector<RedisClientConfig> configs;
@@ -56,7 +71,7 @@ namespace Sentry
         }
         socketProxy->Init(config.Ip, config.Port);
         std::shared_ptr<TcpRedisClient> redisClient =
-            std::make_shared<TcpRedisClient>(socketProxy, config);
+            std::make_shared<TcpRedisClient>(socketProxy, config, this);
         this->mRedisClients[config.Name].emplace_back(redisClient);
         return redisClient.get();
     }
@@ -96,7 +111,7 @@ namespace Sentry
 #ifdef __DEBUG__
         ElapsedTimer elapsedTimer;
 #endif
-        redisClientContext->SendCommand(request);
+		redisClientContext->Send(request);
         std::shared_ptr<RedisTask> redisTask = request->MakeTask();
         std::shared_ptr<RedisResponse> redisResponse = this->AddTask(redisTask->GetRpcId(), redisTask)->Await();
 #ifdef __DEBUG__
@@ -126,7 +141,7 @@ namespace Sentry
 		luaRegister.BeginRegister<RedisComponent>();
 		luaRegister.PushExtensionFunction("Run", Lua::Redis::Run);
 		luaRegister.PushExtensionFunction("Call", Lua::Redis::Call);
-        luaRegister.PushExtensionFunction("Send", Lua::Redis::Send);
+        luaRegister.PushExtensionFunction("Write", Lua::Redis::Send);
     }
 }
 

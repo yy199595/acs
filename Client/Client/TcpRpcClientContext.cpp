@@ -16,7 +16,7 @@ namespace Client
         this->Send(message);
 #else
         Asio::Context & io = this->mSocket->GetThread();
-        io.post(std::bind(&TcpRpcClientContext::Send, this, message));
+        io.post(std::bind(&TcpRpcClientContext::Write, this, message));
 #endif
 	}
 
@@ -77,7 +77,7 @@ namespace Client
 #ifdef ONLY_MAIN_THREAD
                 this->mClientComponent->OnMessage(address, std::move(this->mMessage));
 #else
-                Asio::Context & io = App::Inst()->GetThread();
+                Asio::Context & io = App::Inst()->MainThread();
                 io.post(std::bind(&ClientComponent::OnMessage,
                                   this->mClientComponent, address, std::move(this->mMessage)));
 #endif

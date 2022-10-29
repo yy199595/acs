@@ -31,10 +31,10 @@ namespace Mongo
         //TODO
     }
 
-    TcpMongoClient::TcpMongoClient(std::shared_ptr<SocketProxy> socket)
-		: Tcp::TcpContext(socket, 1024 * 1024), mMongoComponent(nullptr)
+    TcpMongoClient::TcpMongoClient(std::shared_ptr<SocketProxy> socket, IRpc<CommandResponse>* component)
+		: Tcp::TcpContext(socket, 1024 * 1024), mComponent(component)
 	{
-        LOG_CHECK_FATAL(this->mMongoComponent = App::Inst()->GetComponent<MongoDBComponent>());
+
 	}
 
 	void TcpMongoClient::OnSendMessage(const Asio::Code & code, std::shared_ptr<ProtoMessage> message)
@@ -157,7 +157,18 @@ namespace Mongo
             return false;
         }
         Bson::Reader::Document & document3 = response3->Get();
-        return document3.IsOk() && document3.Get("done", done) && done;
+        if(document3.IsOk() && document3.Get("done", done) && done)
+		{
+			const std::string & address = this->mSocket->GetAddress();
+#ifdef ONLY_MAIN_THREAD
+			this->mComponent->OnConnectSuccessful(address);
+#else
+			asio::io_service& io = App::Inst()->MainThread();
+			io.post(std::bind(&IRpc<CommandResponse>::OnConnectSuccessful, this->mComponent, address));
+#endif
+			return true;
+		}
+		return false;
     }
 
     void TcpMongoClient::OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t size)
@@ -191,14 +202,13 @@ namespace Mongo
                     std::static_pointer_cast<CommandRequest>(this->PopMessage());
             assert(request->header.requestID == this->mMongoResponse->GetHead().responseTo);
 #endif
-			long long responseId = this->mMongoResponse->GetHead().responseTo;
+			const std::string & address = this->mSocket->GetAddress();
 			std::shared_ptr<CommandResponse> response = std::move(this->mMongoResponse);
 #ifdef ONLY_MAIN_THREAD
-			this->mMongoComponent->OnResponse(responseId, response);
+			this->mComponent->OnMessage(address, response);
 #else
-			asio::io_service& io = App::Inst()->GetThread();
-			io.post(std::bind(&MongoDBComponent::OnResponse,
-				this->mMongoComponent, responseId, response));
+			asio::io_service& io = App::Inst()->MainThread();
+			io.post(std::bind(&IRpc<CommandResponse>::OnMessage, this->mComponent, address, response));
 #endif
 			//CONSOLE_LOG_INFO("成功次数 = " << SuccessfulCount);
             this->PopMessage();
@@ -213,7 +223,7 @@ namespace Mongo
 		this->Send(request);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-		t.post(std::bind(&TcpMongoClient::Send, this, request));
+		t.post(std::bind(&TcpMongoClient::Write, this, request));
 #endif
 	}
 

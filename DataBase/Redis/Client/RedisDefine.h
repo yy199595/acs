@@ -100,7 +100,7 @@ namespace Sentry
     class RedisResponse
     {
 	public:
-		RedisResponse();
+		RedisResponse(long long taskId);
 		~RedisResponse();
     public:
         bool IsOk();
@@ -111,6 +111,7 @@ namespace Sentry
     public:
         int OnRecvLine(std::istream & os);
         int OnRecvMessage(std::istream & os);
+		long long TaskId() const { return this->mTaskId; }
     public:
 		bool HasError();
 		template<typename T>
@@ -126,6 +127,7 @@ namespace Sentry
         int mLineCount;
         int mDataCount;
         long long mNumber;
+		long long mTaskId;
         std::string mString;
         RedisRespType mType;
         std::vector<RedisAny *> mArray;

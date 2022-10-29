@@ -284,7 +284,7 @@ namespace Sentry
 		{
 			return false;
 		}
-		clientSession->SendData(message);
+		clientSession->Send(message);
 		return true;
 	}
 }// namespace Sentry

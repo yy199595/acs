@@ -36,6 +36,21 @@ namespace Sentry
         this->mMysqlClients.clear();
     }
 
+	void MysqlDBComponent::OnConnectSuccessful(const std::string& address)
+	{
+		LOG_INFO("mysql client [" << address << "] auth successful");
+	}
+
+	void MysqlDBComponent::OnMessage(const std::string& address, std::shared_ptr<Mysql::Response> message)
+	{
+		if(!message->IsOk())
+		{
+			LOG_ERROR("mysql error : " << message->GetError());
+		}
+		long long taskId = message->TaskId();
+		this->OnResponse(taskId, message);
+	}
+
     bool MysqlDBComponent::StartConnectMysql()
 	{
         LOG_CHECK_RET_FALSE(MysqlConfig::Inst());

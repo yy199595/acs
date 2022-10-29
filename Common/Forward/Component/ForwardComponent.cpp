@@ -239,7 +239,7 @@ namespace Sentry
         {
             return XCode::NetWorkError;
         }
-        netClient->SendData(message);
+		netClient->Send(message);
         return XCode::Successful;
     }
 
@@ -259,7 +259,7 @@ namespace Sentry
                 return false;
             }
         }
-        innerNetClient->SendData(message);
+		innerNetClient->Send(message);
         return true;
     }
 
@@ -302,7 +302,7 @@ namespace Sentry
 		{
 			return XCode::NetWorkError;
 		}
-		netClient->SendData(message);
+		netClient->Send(message);
 		return XCode::Successful;
 	}
 }

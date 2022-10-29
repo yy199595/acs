@@ -112,9 +112,9 @@ namespace Sentry
 	{
 	public:
         virtual ~IRpc() { }
-		virtual void StartClose(const std::string& address) = 0;
+		virtual void StartClose(const std::string& address) { };
 		virtual void OnConnectSuccessful(const std::string & address) { }
-		virtual void OnCloseSocket(const std::string& address, XCode code) = 0;
+		virtual void OnCloseSocket(const std::string& address, XCode code) { };
         virtual void OnMessage(const std::string & address, std::shared_ptr<T> message) = 0;
     };
 

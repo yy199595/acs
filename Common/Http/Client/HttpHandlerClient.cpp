@@ -34,7 +34,7 @@ namespace Sentry
         this->Send(this->mHttpResponse);
 #else
         Asio::Context & netWorkThread = this->mSocket->GetThread();
-        netWorkThread.post(std::bind(&HttpHandlerClient::Send, this, this->mHttpResponse));
+        netWorkThread.post(std::bind(&HttpHandlerClient::Write, this, this->mHttpResponse));
 #endif
     }
 
@@ -51,7 +51,7 @@ namespace Sentry
             if (this->mHttpRequest == nullptr)
             {
                 this->mHttpResponse->Str(HttpStatus::METHOD_NOT_ALLOWED, "unknow method");
-                this->Send(std::move(this->mHttpResponse));
+				this->Write(std::move(this->mHttpResponse));
                 return;
             }
             this->ReceiveSomeMessage();
@@ -72,7 +72,7 @@ END_RECEIVE:
 #ifdef ONLY_MAIN_THREAD
             this->mHttpComponent->OnRequest(httpHandlerClient);
 #else
-            Asio::Context &mainThread = App::Inst()->GetThread();
+            Asio::Context &mainThread = App::Inst()->MainThread();
             mainThread.post(std::bind(&HttpListenComponent::OnRequest, this->mHttpComponent, httpHandlerClient));
 #endif
         }
@@ -109,7 +109,7 @@ END_RECEIVE:
 #ifdef ONLY_MAIN_THREAD
 		this->mHttpComponent->ClosetHttpClient(address);
 #else
-		Asio::Context & mainThread = App::Inst()->GetThread();
+		Asio::Context & mainThread = App::Inst()->MainThread();
 		mainThread.post(std::bind(&HttpListenComponent::ClosetHttpClient, this->mHttpComponent, address));
 #endif
 	}

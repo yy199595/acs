@@ -144,7 +144,7 @@ namespace Tcp
 			});
 	}
 
-	void TcpContext::Send(std::shared_ptr<ProtoMessage> message)
+	void TcpContext::Write(std::shared_ptr<ProtoMessage> message)
 	{
         if(this->mMessagqQueue.empty())
         {

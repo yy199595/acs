@@ -38,7 +38,7 @@ namespace Sentry
 			this->OnComplete(HttpStatus::INTERNAL_SERVER_ERROR);
 			return;
         }
-        this->Send(this->mRequest);
+		this->Write(this->mRequest);
     }
 
     void HttpRequestClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<Tcp::ProtoMessage> message)
@@ -78,7 +78,7 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
         this->mHttpComponent->OnResponse(taskId, std::move(this->mResponse));
 #else
-        Asio::Context &io = App::Inst()->GetThread();
+        Asio::Context &io = App::Inst()->MainThread();
         io.post(std::bind(&HttpComponent::OnResponse,
                           this->mHttpComponent, this->mTaskId, std::move(this->mResponse)));
 #endif

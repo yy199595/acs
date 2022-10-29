@@ -9,6 +9,8 @@
 #include"MysqlMessage.h"
 #include"Tcp/TcpContext.h"
 #include"Config/MysqlConfig.h"
+#include"Component/IComponent.h"
+
 namespace Sentry
 {
     class MysqlDBComponent;
@@ -16,7 +18,7 @@ namespace Sentry
     class MysqlClient : protected std::thread
     {
     public:
-        MysqlClient(MysqlDBComponent *component);
+        MysqlClient(IRpc<Mysql::Response> *component);
     public:
         void Stop();
         bool StartConnect();
@@ -33,7 +35,7 @@ namespace Sentry
         size_t mTaskCount;
         MYSQL *mMysqlClient;
         long long mLastTime;
-        MysqlDBComponent *mComponent;
+		IRpc<Mysql::Response> *mComponent;
         std::queue<std::shared_ptr<Mysql::ICommand>> mCommands;
     };
 }

@@ -19,8 +19,9 @@ namespace Sentry
 	 public:
 		void StartClose();
 		void StartReceive();
-        void SendData(std::shared_ptr<Rpc::Packet> message);
-    private:
+        void Send(std::shared_ptr<Rpc::Packet> message);
+		long long Call(std::shared_ptr<Rpc::Packet> message);
+	 private:
         void CloseSocket(XCode code);
         void OnConnect(const asio::error_code &error, int count) final;
         void OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t) final;

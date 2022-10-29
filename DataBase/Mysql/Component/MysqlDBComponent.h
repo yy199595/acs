@@ -32,7 +32,7 @@ namespace Sentry
 namespace Sentry
 {
     class MysqlClient;
-    class MysqlDBComponent : public RpcTaskComponent<long long, Mysql::Response>
+	class MysqlDBComponent : public RpcTaskComponent<long long, Mysql::Response>, public IRpc<Mysql::Response>
     {
     public:
         MysqlDBComponent() = default;
@@ -43,6 +43,9 @@ namespace Sentry
         bool StartConnectMysql();
         MysqlClient * GetClient(int index = -1);
         bool Run(MysqlClient * client, std::shared_ptr<Mysql::ICommand> command);
+	 private:
+		void OnConnectSuccessful(const std::string &address) final;
+		void OnMessage(const std::string &address, std::shared_ptr<Mysql::Response> message) final;
     private:
 		std::vector<std::shared_ptr<MysqlClient>> mMysqlClients;
     };

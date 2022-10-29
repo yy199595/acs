@@ -21,13 +21,15 @@ namespace Mysql
 	class Response
 	{
     public:
-        Response(bool res, const std::string & error)
-            : mIsOk(res), mError(error) { }
+        Response(bool res, const std::string & error, long long taskId)
+            : mIsOk(res), mError(error), mTaskId(taskId) { }
     public:
         bool IsOk() const { return this->mIsOk;}
+		long long TaskId() const { return this->mTaskId; }
         const std::string & GetError() const { return this->mError;}
     private:
         bool mIsOk;
+		long long mTaskId;
         std::string mError;
 	};
     class ICommand

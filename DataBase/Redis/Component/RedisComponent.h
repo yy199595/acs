@@ -10,7 +10,8 @@ namespace Sentry
 {
 	class NetThreadComponent;
 
-    class RedisComponent final : public RpcTaskComponent<long long, RedisResponse>, public ILuaRegister, public IStart
+    class RedisComponent final : public RpcTaskComponent<long long, RedisResponse>,
+								 public ILuaRegister, public IStart, public IRpc<RedisResponse>
 	{
 	 public:
 		RedisComponent() = default;
@@ -28,7 +29,9 @@ namespace Sentry
         std::shared_ptr<RedisResponse> Run(const std::string & db, std::shared_ptr<RedisRequest> request);
         std::shared_ptr<RedisResponse> Run(TcpRedisClient * c, std::shared_ptr<RedisRequest> request);
     private:
-        TcpRedisClient * MakeRedisClient(const RedisClientConfig & config);
+		void OnConnectSuccessful(const std::string &address) final;
+		TcpRedisClient * MakeRedisClient(const RedisClientConfig & config);
+		void OnMessage(const std::string &address, std::shared_ptr<RedisResponse> message) final;
     private:
         bool Awake() final;
         bool Start() final;
@@ -62,7 +65,7 @@ namespace Sentry
         }
         std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>(cmd);
         RedisRequest::InitParameter(request, std::forward<Args>(args)...);
-        redisClient->SendCommand(request);
+		redisClient->Send(request);
         return true;
     }
 }

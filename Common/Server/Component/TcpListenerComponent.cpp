@@ -45,7 +45,7 @@ namespace Sentry
                 return false;
             }
             unsigned short port = this->mConfig->Port;
-            Asio::Context & io = this->mApp->GetThread();
+            Asio::Context & io = this->mApp->MainThread();
             this->mBindAcceptor = new Asio::Acceptor (io, 
                 Asio::EndPoint(asio::ip::make_address(this->mConfig->Ip), port));
             this->mNetComponent = this->GetComponent<NetThreadComponent>();
@@ -94,7 +94,7 @@ namespace Sentry
                 }
                 CONSOLE_LOG_DEBUG(socketProxy->GetAddress() << " connect to " << this->mConfig->Name);
             }
-            Asio::Context& io = this->mApp->GetThread();
+            Asio::Context& io = this->mApp->MainThread();
             io.post(std::bind(&TcpListenerComponent::ListenConnect, this));
 		});
 	}

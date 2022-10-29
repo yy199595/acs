@@ -42,12 +42,23 @@ namespace Sentry
             const std::string & ip = config->Ip;
             const unsigned short port = config->Port;
             std::shared_ptr<SocketProxy> socketProxy = threadComponent->CreateSocket(ip, port);
-            std::shared_ptr<TcpMongoClient> mongoClientContext = std::make_shared<TcpMongoClient>(socketProxy);
+            std::shared_ptr<TcpMongoClient> mongoClientContext = std::make_shared<TcpMongoClient>(socketProxy, this);
 
             this->mMongoClients.emplace_back(mongoClientContext);
         }
         return this->Ping(0);
     }
+
+	void MongoDBComponent::OnConnectSuccessful(const std::string& address)
+	{
+		LOG_INFO("mongo client [" << address << "] auth successful");
+	}
+
+	void MongoDBComponent::OnMessage(const std::string& address, std::shared_ptr<CommandResponse> message)
+	{
+		int taskId = message->GetHead().responseTo;
+		this->OnResponse(taskId, message);
+	}
 
     TcpMongoClient * MongoDBComponent::GetClient(int index)
     {

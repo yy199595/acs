@@ -35,7 +35,7 @@ namespace Tcp
 		void ReceiveLine();
 		void ReceiveSomeMessage();
 		void ReceiveMessage(int size);
-        void Send(std::shared_ptr<ProtoMessage> message);
+        void Write(std::shared_ptr<ProtoMessage> message);
 		template<typename T>
 		std::shared_ptr<T> Cast() { return std::dynamic_pointer_cast<T>(this->shared_from_this());}
 	 protected:

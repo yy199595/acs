@@ -35,7 +35,8 @@ namespace Sentry
 
 namespace Sentry
 {
-    class MongoDBComponent : public RpcTaskComponent<int,Mongo::CommandResponse>, public IStart
+    class MongoDBComponent : public RpcTaskComponent<int,Mongo::CommandResponse>,
+							 public IStart, public IRpc<Mongo::CommandResponse>
 	{
 	public:
 		MongoDBComponent() = default;
@@ -53,6 +54,9 @@ namespace Sentry
         TcpMongoClient * GetClient(int index = -1);
         void Send(TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request);
 		std::shared_ptr<Mongo::CommandResponse> Run(TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request);
+	 private:
+		void OnConnectSuccessful(const std::string &address) final;
+		void OnMessage(const std::string &address, std::shared_ptr<CommandResponse> message) final;
 	 private:
 		TimerComponent * mTimerComponent;
 		Util::NumberBuilder<int, 10> mRequestId;
