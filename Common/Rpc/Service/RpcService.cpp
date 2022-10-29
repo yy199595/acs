@@ -60,7 +60,7 @@ namespace Sentry
 
     bool RpcService::StartSend(const std::string &address, const std::string &func, const Message *message)
     {
-        RpcPacket request = Helper::MakeRpcPacket(this->GetName(), func);
+        RpcPacket request = PacketHelper::MakeRpcPacket(this->GetName(), func);
         {
             request->SetType(Tcp::Type::Request);
             request->SetProto(Tcp::Porto::Protobuf);
@@ -81,7 +81,7 @@ namespace Sentry
     std::shared_ptr<Rpc::Packet> RpcService::CallAwait(
         const std::string &address, const std::string &func, const Message *message)
     {
-        RpcPacket request = Helper::MakeRpcPacket(this->GetName(), func);
+        RpcPacket request = PacketHelper::MakeRpcPacket(this->GetName(), func);
         {
             request->SetType(Tcp::Type::Request);
             request->SetProto(Tcp::Porto::Protobuf);

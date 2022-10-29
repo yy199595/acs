@@ -143,7 +143,7 @@ namespace Sentry
         const std::string fullName("InnerService.Join");
         for (const std::string &location: this->mAuthClients)
         {
-            RpcPacket request = Helper::MakeRpcPacket(fullName);
+            RpcPacket request = PacketHelper::MakeRpcPacket(fullName);
             {
                 request->SetType(Tcp::Type::Request);
                 request->SetProto(Tcp::Porto::Protobuf);
@@ -188,7 +188,7 @@ namespace Sentry
                 return XCode::CallArgsError;
             }
             RpcService * rpcService = this->mApp->GetService(methodConfig->Service);
-            if(rpcService == nullptr || not rpcService->IsStartService())
+            if(rpcService == nullptr || (!rpcService->IsStartService()))
             {
                 return XCode::CallServiceNotFound;
             }
