@@ -65,5 +65,6 @@ namespace Http
             const std::string & value = iter->second;
             buffer << key << ':' << value << "\r\n";
         }
+        return 0;
     }
 }

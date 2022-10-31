@@ -7,7 +7,7 @@
 #include"Client/Message.h"
 namespace Sentry
 {
-    namespace Helper
+    namespace PacketHelper
     {
         std::shared_ptr<Rpc::Packet> MakeRpcPacket(const std::string & fullName);
         std::shared_ptr<Rpc::Packet> MakeRpcPacket(const std::string & service, const std::string & func);
