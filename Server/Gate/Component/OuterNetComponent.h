@@ -37,6 +37,7 @@ namespace Sentry
         bool OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message);
         bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
+        std::string mBindAddress;
 		class TimerComponent* mTimerComponent;
         class NetThreadComponent * mNetComponent;
         class LocationComponent * mLocationComponent;

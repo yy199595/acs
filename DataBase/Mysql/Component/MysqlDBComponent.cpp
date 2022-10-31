@@ -92,13 +92,13 @@ namespace Sentry
         long long key = mysqlTask->GetRpcId();
         std::shared_ptr<Mysql::Response> response = this->AddTask(key, mysqlTask)->Await();
 #ifdef __DEBUG__
-        long long t1 = Helper::Time::GetNowMilTime();
+        long long t1 = Helper::Time::NowMilTime();
         if (response != nullptr && !response->IsOk())
         {
             CONSOLE_LOG_ERROR(response->GetError());
             throw std::logic_error(response->GetError());
         }
-        long long t2 = Helper::Time::GetNowMilTime();
+        long long t2 = Helper::Time::NowMilTime();
         CONSOLE_LOG_INFO("sql use time = [" << t2 - t1 << "ms]");
 #endif
         return response != nullptr && response->IsOk();

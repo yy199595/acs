@@ -24,7 +24,7 @@ namespace Sentry
 		this->mIsClose = !this->StartConnect();
 		std::shared_ptr<Mysql::ICommand> command;
 		Asio::Context& io = App::Inst()->MainThread();
-		this->mLastTime = Helper::Time::GetNowSecTime();
+		this->mLastTime = Helper::Time::NowSecTime();
 		const std::string & address = MysqlConfig::Inst()->Address;
 		while (!this->mIsClose)
 		{
@@ -35,7 +35,7 @@ namespace Sentry
 				std::shared_ptr<Mysql::Response> response =
 					std::make_shared<Mysql::Response>(res, error, rpcId);
 				io.post(std::bind(&IRpc<Mysql::Response>::OnMessage, this->mComponent, address, response));
-				this->mLastTime = Helper::Time::GetNowSecTime();
+				this->mLastTime = Helper::Time::NowSecTime();
 			}
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}

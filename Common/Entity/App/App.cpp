@@ -16,7 +16,7 @@ namespace Sentry
 {
 
 	App::App() : Unit(0),
-        mStartTime(Helper::Time::GetNowMilTime())
+        mStartTime(Helper::Time::NowMilTime())
 	{
         this->mFps = 15;
         this->mTickCount = 0;
@@ -93,9 +93,9 @@ namespace Sentry
 		Asio::ContextWork work(*this->mMainThread);
 		const std::chrono::milliseconds sleepTime(1);
         this->mLogicUpdateInterval = 1000 / this->mFps;
-		this->mStartTime = Helper::Time::GetNowMilTime();
-		this->mSecondTimer = Helper::Time::GetNowMilTime();
-		this->mLastUpdateTime = Helper::Time::GetNowMilTime();
+		this->mStartTime = Helper::Time::NowMilTime();
+		this->mSecondTimer = Helper::Time::NowMilTime();
+		this->mLastUpdateTime = Helper::Time::NowMilTime();
 
         while(!this->mMainThread->stopped())
         {
@@ -127,7 +127,7 @@ namespace Sentry
         {
             return;
         }
-        this->mStartTimer = Helper::Time::GetNowMilTime();
+        this->mStartTimer = Helper::Time::NowMilTime();
 		if (this->mStartTimer - mLastUpdateTime >= this->mLogicUpdateInterval)
 		{
 			this->mLogicRunCount++;
@@ -144,14 +144,14 @@ namespace Sentry
 				{
 					component->OnSecondUpdate(this->mTickCount);
 				}
-				this->mSecondTimer = Helper::Time::GetNowMilTime();
+				this->mSecondTimer = Helper::Time::NowMilTime();
 			}
 
 			for (ILastFrameUpdate* component: this->mLastFrameUpdateManager)
 			{
 				component->OnLastFrameUpdate();
 			}
-			this->mLastUpdateTime = Helper::Time::GetNowMilTime();
+			this->mLastUpdateTime = Helper::Time::NowMilTime();
 		}
 	}
 
@@ -206,13 +206,13 @@ namespace Sentry
         {
             complete->OnClusterComplete();
         }
-		long long t = Helper::Time::GetNowMilTime() - this->mStartTime;
+		long long t = Helper::Time::NowMilTime() - this->mStartTime;
 		LOG_INFO("===== start " << System::GetName() << " successful [" << t / 1000.0f << "]s ===========");
 	}
 
 	void App::UpdateConsoleTitle()
 	{
-		long long nowTime = Helper::Time::GetNowMilTime();
+		long long nowTime = Helper::Time::NowMilTime();
 		float seconds = (nowTime - this->mSecondTimer) / 1000.0f;
 		this->mLogicFps = (float)this->mLogicRunCount / seconds;
 #ifdef _WIN32

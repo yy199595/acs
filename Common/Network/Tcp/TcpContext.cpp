@@ -64,12 +64,12 @@ namespace Tcp
 			}
 			this->OnConnect(code, this->mConnectCount);
 		});
-		this->mLastOperTime = Helper::Time::GetNowSecTime();
+		this->mLastOperTime = Helper::Time::NowSecTime();
 	}
 
     void TcpContext::ReceiveLine()
 	{
-        this->mLastOperTime = Helper::Time::GetNowSecTime();
+        this->mLastOperTime = Helper::Time::NowSecTime();
         Asio::Socket & tcpSocket = this->mSocket->GetSocket();
 		std::shared_ptr<TcpContext> self = this->shared_from_this();
 		asio::async_read_until(tcpSocket, this->mRecvBuffer, "\r\n",
@@ -91,7 +91,7 @@ namespace Tcp
             return;
         }
         Asio::Code code;
-		this->mLastOperTime = Helper::Time::GetNowSecTime();
+		this->mLastOperTime = Helper::Time::NowSecTime();
 		Asio::Socket & tcpSocket = this->mSocket->GetSocket();
         if(tcpSocket.available(code) <= 0)
         {
@@ -132,7 +132,7 @@ namespace Tcp
 			return;
 		}
 		length -= this->mRecvBuffer.size();
-		this->mLastOperTime = Helper::Time::GetNowSecTime();
+		this->mLastOperTime = Helper::Time::NowSecTime();
         Asio::Socket & tcpSocket = this->mSocket->GetSocket();
 		std::shared_ptr<TcpContext> self = this->shared_from_this();
 		asio::async_read(tcpSocket, this->mRecvBuffer,
@@ -201,7 +201,7 @@ namespace Tcp
                 this->ClearSendStream();
                 this->OnSendMessage(code, this->mMessagqQueue.front());
             });
-            this->mLastOperTime = Helper::Time::GetNowSecTime();
+            this->mLastOperTime = Helper::Time::NowSecTime();
             return true;
         }
         return false;

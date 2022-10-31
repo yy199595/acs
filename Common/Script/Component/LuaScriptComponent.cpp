@@ -58,8 +58,8 @@ namespace Sentry
         luaRegister3.BeginNewTable();
         luaRegister3.PushStaticFunction("GetDateStr", Helper::Time::GetDateStr);
         luaRegister3.PushStaticFunction("GetDateString", Helper::Time::GetDateString);
-        luaRegister3.PushStaticFunction("GetNowSecTime", Helper::Time::GetNowSecTime);
-        luaRegister3.PushStaticFunction("GetNowMilTime", Helper::Time::GetNowMilTime);
+        luaRegister3.PushStaticFunction("NowSecTime", Helper::Time::NowSecTime);
+        luaRegister3.PushStaticFunction("NowMilTime", Helper::Time::NowMilTime);
         luaRegister3.PushStaticFunction("GetYearMonthDayString", Helper::Time::GetYearMonthDayString);
 
         Lua::ClassProxyHelper luaRegister4(this->mLuaEnv, "coroutine");

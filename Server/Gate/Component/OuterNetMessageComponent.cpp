@@ -31,7 +31,7 @@ namespace Sentry
 
     bool OuterNetMessageComponent::CreateToken(long long userId, std::string & token)
     {
-        long long nowTime = Helper::Time::GetNowSecTime();
+        long long nowTime = Helper::Time::NowSecTime();
         std::string rand = fmt::format("{0}:{1}", userId, nowTime);
         token = Helper::Md5::GetMd5(rand);
         this->mTokens.emplace(token, userId);

@@ -21,25 +21,25 @@ namespace Helper
     {
         char str[100] = {0};
         time_t t = (time_t) (time == 0
-							 ? Time::GetNowSecTime() : time);
+                             ? Time::NowSecTime() : time);
         struct tm *pt = gmtime(&t);
         size_t size = strftime(str, sizeof(str), "%Y%m%d%H%M%S", pt);
         return std::string(str, size);
     }
 
-    long long Time::GetNowMilTime()
+    long long Time::NowMilTime()
     {
         auto tmp = system_clock::now().time_since_epoch();
         return duration_cast<milliseconds>(tmp).count() + Time::ScaleTotalTime * 1000;
     }
 
-    long long Time::GetNowSecTime()
+    long long Time::NowSecTime()
     {
         auto tmp = system_clock::now().time_since_epoch();
         return duration_cast<seconds>(tmp).count() + Time::ScaleTotalTime;
     }
 
-    long long Time::GetMicTimeStamp()
+    long long Time::NowMicTime()
     {
         auto tmp = system_clock::now().time_since_epoch();
         return duration_cast<microseconds>(tmp).count();
@@ -47,7 +47,7 @@ namespace Helper
 
     long long Time::GetNewTime(int day, int hour, int minute, int second)
     {
-        time_t now = GetNowSecTime();
+        time_t now = NowSecTime();
         struct tm *t = localtime(&now);
         t->tm_hour = hour;
         t->tm_min = minute;
@@ -65,7 +65,7 @@ namespace Helper
     std::string Time::GetDateString(long long time)
     {
         char str[100];
-        time_t t = GetNowSecTime();
+        time_t t = NowSecTime();
         struct tm *pt = localtime(&t);
         size_t size = strftime(str, sizeof(str), "%Y-%m-%d %H:%M:%S", pt);
         return {str, size};
@@ -74,7 +74,7 @@ namespace Helper
     std::string Time::GetYearMonthDayString()
     {
         char str[100];
-        time_t t = GetNowSecTime();
+        time_t t = NowSecTime();
         struct tm *pt = localtime(&t);
         size_t size = strftime(str, sizeof(str), "%Y-%m-%d", pt);
         return {str, size};

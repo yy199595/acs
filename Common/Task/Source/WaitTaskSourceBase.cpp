@@ -10,7 +10,7 @@ namespace Sentry
         this->mCorId = 0;
         this->mState = TaskState::TaskReady;
         this->mTaskId = Helper::Guid::Create();
-        this->mCreateTime = Helper::Time::GetNowMilTime();
+        this->mCreateTime = Helper::Time::NowMilTime();
         this->mTaskComponent = App::Inst()->GetTaskComponent();
     }
 
@@ -19,7 +19,7 @@ namespace Sentry
 		this->mCorId = 0;
 		this->mState = TaskState::TaskReady;
 		this->mTaskId = Helper::Guid::Create();
-		this->mCreateTime = Helper::Time::GetNowMilTime();
+		this->mCreateTime = Helper::Time::NowMilTime();
 	}
 
     bool WaitTaskSourceBase::ResumeTask(TaskState state)

@@ -15,7 +15,7 @@ namespace Sentry
     ServerConfig::ServerConfig()
         : TextConfig("ServerConfig")
     {
-        this->mNodeId = 0;
+
     }
 
     bool ServerConfig::OnReloadText(const char *str, size_t length)
@@ -30,27 +30,6 @@ namespace Sentry
             CONSOLE_LOG_ERROR("parse " << this->Path() << " failure");
             return false;
 		}
-        this->GetMember("area_id",this->mNodeId);
-        this->GetMember("node_name",this->mNodeName);
-
-        if(this->GetJsonValue("listener") != nullptr)
-        {
-            IF_THROW_ERROR(this->GetJsonValue("listener","rpc"));
-            const rapidjson::Value * json = this->GetJsonValue("listener");
-            for (auto iter = json->MemberBegin(); iter != json->MemberEnd(); iter++)
-            {
-                const rapidjson::Value& jsonObject = iter->value;
-                if (jsonObject.IsObject())
-                {
-                    ListenConfig listenConfig;
-                    listenConfig.Name = iter->name.GetString();
-                    listenConfig.Ip = jsonObject["ip"].GetString();
-                    listenConfig.Port = jsonObject["port"].GetUint();
-                    listenConfig.Address = fmt::format("{0}:{1}",listenConfig.Ip,listenConfig.Port);
-                    this->mListens.emplace(listenConfig.Name, listenConfig);
-                }
-            }
-        }
         const rapidjson::Value  * value1 = this->GetJsonValue("services");
         if(value1 != nullptr && value1->IsObject())
         {
@@ -99,12 +78,6 @@ namespace Sentry
             services.emplace_back(value.first);
         }
         return services.size();
-    }
-
-    const ListenConfig *ServerConfig::GetListenConfig(const char *name) const
-    {
-        auto iter = this->mListens.find(name);
-        return iter != this->mListens.end() ? &iter->second : nullptr;
     }
 
 	bool ServerConfig::GetPath(const std::string& name, std::string& path) const

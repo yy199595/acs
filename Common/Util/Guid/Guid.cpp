@@ -17,7 +17,7 @@ namespace Helper
 {
     long long Guid::Create()
     {
-        long long nowTime = Time::GetNowSecTime();
+        long long nowTime = Time::NowSecTime();
         if (nowTime != mLastTime)
         {
             mIndex1 = 0;
@@ -28,7 +28,7 @@ namespace Helper
 
     long long Guid::Create(short type)
     {
-        long long nowTime = Time::GetNowSecTime();
+        long long nowTime = Time::NowSecTime();
         if (nowTime != mLastTime)
         {
             mIndex2 = 0;
@@ -42,7 +42,7 @@ namespace Helper
 {
     long long ThreadGuid::Create()
     {
-        long long nowTime = Time::GetNowSecTime();
+        long long nowTime = Time::NowSecTime();
         if (nowTime != mLastTime)
         {
             mIndex1 = 0;
@@ -53,7 +53,7 @@ namespace Helper
 
     long long ThreadGuid::Create(short type)
     {
-        long long nowTime = Time::GetNowSecTime();
+        long long nowTime = Time::NowSecTime();
         if (nowTime != mLastTime)
         {
             mIndex2 = 0;

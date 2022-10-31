@@ -15,6 +15,7 @@
 #endif
 #include"Md5/MD5.h"
 #include"Config/CodeConfig.h"
+#include"Config/ServerConfig.h"
 #include"Component/UnitMgrComponent.h"
 namespace Sentry
 {

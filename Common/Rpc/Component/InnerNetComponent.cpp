@@ -32,8 +32,7 @@ namespace Sentry
             this->mUserMaps.emplace(user, passwd);
         }
         this->mOuterComponent = this->GetComponent<OuterNetComponent>();
-		LOG_CHECK_RET_FALSE(config->GetLocation("rpc", this->mLocation));
-		LOG_CHECK_RET_FALSE(config->GetMember("user", "name", this->mUserName));
+        LOG_CHECK_RET_FALSE(config->GetMember("user", "name", this->mUserName));
         LOG_CHECK_RET_FALSE(config->GetMember("user", "passwd", this->mPassword));
         LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<NetThreadComponent>());
         LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>());

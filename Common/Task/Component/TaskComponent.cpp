@@ -94,7 +94,7 @@ namespace Sentry
 		this->mRunContext->mSwitchCount++;
 		this->mRunContext->mState = CorState::Suspend;
 #ifdef __DEBUG__
-      this->mRunContext->mSwitchTime = Helper::Time::GetNowSecTime();
+      this->mRunContext->mSwitchTime = Helper::Time::NowSecTime();
 #endif
 		tb_context_jump(this->mMainContext, this->mRunContext);
 		return true;
@@ -120,7 +120,7 @@ namespace Sentry
 			coroutine->mState = CorState::Ready;
 		}
 #ifdef __DEBUG__
-        coroutine->mSwitchTime = Helper::Time::GetNowSecTime();
+        coroutine->mSwitchTime = Helper::Time::NowSecTime();
 #endif
 		return coroutine;
 	}

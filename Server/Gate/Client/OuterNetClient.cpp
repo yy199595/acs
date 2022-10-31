@@ -47,7 +47,7 @@ namespace Sentry
 
     void OuterNetClient::OnTimerEnd(int timeout)
     {
-        long long nowTime = Helper::Time::GetNowSecTime();
+        long long nowTime = Helper::Time::NowSecTime();
         if (nowTime - this->GetLastOperTime() < timeout) //超时
         {
             this->StartTimer(timeout);

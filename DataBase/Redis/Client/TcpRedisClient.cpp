@@ -184,7 +184,7 @@ namespace Sentry
 
     void TcpRedisClient::StartPingServer()
     {
-        long long nowTime = Helper::Time::GetNowSecTime();
+        long long nowTime = Helper::Time::NowSecTime();
         if(nowTime - this->GetLastOperTime() >= 10) //十秒没进行操作 ping一下
         {
 			this->Write(RedisRequest::Make("PING"));
@@ -197,7 +197,7 @@ namespace Sentry
     void TcpRedisClient::CloseFreeClient()
     {
         int second = this->mConfig.FreeClient;
-        long long nowTime = Helper::Time::GetNowSecTime();
+        long long nowTime = Helper::Time::NowSecTime();
         if(nowTime - this->GetLastOperTime() >= second)
         {
             this->mSocket->Close();

@@ -14,8 +14,7 @@ namespace Sentry
 	 public:
         bool StopListen();
         bool StartListen(const char * name);
-        const ListenConfig & GetListenConfig() const { return *this->mConfig; }
-        const std::string & GetListenAddress() const { return this->mConfig->Address; }
+        const std::string & GetListenAddress() const { return this->mAddress; }
     protected:
         void ListenConnect();
         virtual void OnStopListen() { };
@@ -24,7 +23,7 @@ namespace Sentry
 		int mCount;
         bool mIsClose;
         int mErrorCount;
-		const ListenConfig * mConfig;
+        std::string mAddress;
         NetThreadComponent * mNetComponent;
         asio::ip::tcp::acceptor * mBindAcceptor;
     };

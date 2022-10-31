@@ -1,15 +1,14 @@
 #include"TcpListenerComponent.h"
-#include"App/App.h"
 #include"Tcp/SocketProxy.h"
 #include"Method/MethodProxy.h"
 #include"Log/CommonLogDef.h"
+#include"Config/ServerConfig.h"
 #include"Component/NetThreadComponent.h"
 namespace Sentry
 {
 	TcpListenerComponent::TcpListenerComponent()
     {
 		this->mCount = 0;
-        this->mConfig = nullptr;
         this->mErrorCount = 0;
         this->mBindAcceptor = nullptr;
         this->mNetComponent = nullptr;
@@ -36,30 +35,35 @@ namespace Sentry
 
 	bool TcpListenerComponent::StartListen(const char * name)
     {
-        const ServerConfig * config = ServerConfig::Inst();
-        LOG_CHECK_RET_FALSE(this->mConfig = config->GetListenConfig(name));
+        std::string address;
+        if(!ServerConfig::Inst()->GetMember("listener", name, address))
+        {
+            return false;
+        }
+        size_t pos = address.find(":");
+        if(pos == std::string::npos)
+        {
+            return false;
+        }
+        const std::string ip = address.substr(0, pos);
+        const std::string port = address.substr(pos + 1);
         try
         {
-            if(this->mConfig == nullptr)
-            {
-                return false;
-            }
-            unsigned short port = this->mConfig->Port;
             Asio::Context & io = this->mApp->MainThread();
             this->mBindAcceptor = new Asio::Acceptor (io, 
-                Asio::EndPoint(asio::ip::make_address(this->mConfig->Ip), port));
+                Asio::EndPoint(asio::ip::make_address(ip), std::stoi(port)));
             this->mNetComponent = this->GetComponent<NetThreadComponent>();
 
             this->mIsClose = false;
+            this->mAddress = address;
             this->mBindAcceptor->listen();
             io.post(std::bind(&TcpListenerComponent::ListenConnect, this));
-            LOG_INFO(this->mConfig->Name << " listen [" << this->mConfig->Address << "] successful");           
+            LOG_INFO(this->GetName() << " listen [" << this->mAddress << "] successful");
             return true;
         }
         catch (std::system_error & err)
         {
-            LOG_ERROR(fmt::format("listen {0}:{1} failure {2}",
-                                  this->mConfig->Ip, this->mConfig->Port, err.what()));
+            LOG_ERROR(fmt::format("listen {0} failure {2}", this->mAddress, err.what()));
             return false;
         }
     }
@@ -73,7 +77,7 @@ namespace Sentry
             {
                 delete this->mBindAcceptor;
                 this->mBindAcceptor = nullptr;
-                CONSOLE_LOG_ERROR("close listen " << this->mConfig->Name);
+                CONSOLE_LOG_ERROR("close listen " << this->GetName());
                 this->OnStopListen();
                 return;
             }
@@ -81,7 +85,7 @@ namespace Sentry
 			{
 				this->mErrorCount++;
                 socketProxy->Close();
-				CONSOLE_LOG_FATAL(this->mConfig->Name << " " << code.message() << " count = " << this->mErrorCount);
+				CONSOLE_LOG_FATAL(this->GetName() << " " << code.message() << " count = " << this->mErrorCount);
 			}
 			else
 			{
@@ -89,10 +93,10 @@ namespace Sentry
                 socketProxy->Init();
                 if(!this->OnListen(socketProxy))
                 {
-                    CONSOLE_LOG_ERROR("stop listen " << this->mConfig->Address);
+                    CONSOLE_LOG_ERROR("stop listen " << this->mAddress);
                     return ;
                 }
-                CONSOLE_LOG_DEBUG(socketProxy->GetAddress() << " connect to " << this->mConfig->Name);
+                CONSOLE_LOG_DEBUG(socketProxy->GetAddress() << " connect to " << this->GetName());
             }
             Asio::Context& io = this->mApp->MainThread();
             io.post(std::bind(&TcpListenerComponent::ListenConnect, this));

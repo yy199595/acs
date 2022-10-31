@@ -7,14 +7,14 @@ namespace Sentry
         : IRpcTask<Rpc::Packet>(ms)
     {
 #ifdef __DEBUG__
-        this->t1 = Helper::Time::GetNowMilTime();
+        this->t1 = Helper::Time::NowMilTime();
 #endif
     }
     void RpcTaskSource::OnResponse(std::shared_ptr<Rpc::Packet> response)
     {
 #ifdef __DEBUG__
         std::string func;
-        long long t2 = Helper::Time::GetNowMilTime();
+        long long t2 = Helper::Time::NowMilTime();
         if(response->GetHead().Get("func", func))
         {
             long long ms = t2 - this->t1;
@@ -42,7 +42,7 @@ namespace Sentry
 	{
 		this->mTaskId = Guid::Create();
 #ifdef __DEBUG__
-      this->t1 = Helper::Time::GetNowMilTime();
+      this->t1 = Helper::Time::NowMilTime();
 #endif
 	}
 
@@ -55,7 +55,7 @@ namespace Sentry
 	{
 #ifdef __DEBUG__
         std::string func;
-        long long t2 = Helper::Time::GetNowMilTime();
+        long long t2 = Helper::Time::NowMilTime();
         if(response->GetHead().Get("func", func))
         {
             long long ms = t2 - this->t1;
