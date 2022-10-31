@@ -4,7 +4,7 @@
 #ifdef __DEBUG__
 #include"Log/Debug.h"
 #endif
-#include"App/System/System.h"
+#include"System/System.h"
 #include"spdlog/sinks/rotating_file_sink.h"
 
 namespace Sentry
@@ -13,8 +13,8 @@ namespace Sentry
 	bool LoggerComponent::Awake()
 	{
 		this->mLogSaveTime = 3;
-        this->mServerName = System::GetName();
-        this->mLogSavePath = fmt::format("{0}logs/", System::GetWorkPath());
+        this->mServerName = System::Name();
+        this->mLogSavePath = fmt::format("{0}log/", System::WorkPath());
 		this->CreateLogFile();
         return true;
 	}

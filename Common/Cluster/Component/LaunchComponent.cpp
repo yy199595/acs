@@ -5,7 +5,7 @@
 #include"LaunchComponent.h"
 #include"App/App.h"
 #include"File/FileHelper.h"
-#include"App/System/System.h"
+#include"System/System.h"
 #include"Config/ClusterConfig.h"
 #include"Service/ServiceRpcComponent.h"
 #include"Service/LuaRpcService.h"
@@ -29,7 +29,7 @@ namespace Sentry
                     LOG_ERROR("add " << name << " error");
                     return false;
                 }
-                CONSOLE_LOG_INFO(System::GetName() << " add component [" << name << "]");
+                CONSOLE_LOG_INFO(System::Name() << " add component [" << name << "]");
             }
         }
         components.clear();
@@ -77,7 +77,7 @@ namespace Sentry
                         }
                     }
                 }
-                CONSOLE_LOG_INFO(System::GetName() << " add service [" << name << "]");
+                CONSOLE_LOG_INFO(System::Name() << " add service [" << name << "]");
             }
         }
         return true;
@@ -95,6 +95,9 @@ namespace Sentry
             std::string location, httpLocation;
             for(const std::string & name : components)
             {
+#ifdef __DEBUG__
+                long long t1 = Helper::Time::NowMilTime();
+#endif
                 if(!this->GetComponent<IServiceBase>(name)->Start())
                 {
                     LOG_ERROR("start service [" << name << "] faillure");
@@ -107,7 +110,12 @@ namespace Sentry
                         LOG_ERROR("not find http location config");
                         return false;
                     }
+#ifdef __DEBUG__
+                    long long t2 = Helper::Time::NowMilTime();
+                    LOG_INFO("start rpc service [" << name << "] successful use time [" << t2 - t1 << "ms]");
+#else
                     LOG_INFO("start rpc service [" << name << "] successful");
+#endif
                     locationComponent->AddLocation(name, location);
                 }
                 else if(HttpConfig::Inst()->GetConfig(name) != nullptr)

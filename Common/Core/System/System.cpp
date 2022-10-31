@@ -19,6 +19,11 @@ namespace Sentry
         System::mWorkPath = fmt::format("{0}/", getcwd(NULL, NULL));
     }
 
+    const std::string System::FormatPath(const std::string &path)
+    {
+        return System::mWorkPath + path;
+    }
+
     std::string System::mName;
     std::string System::mExePath;
     std::string System::mWorkPath;

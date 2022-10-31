@@ -7,7 +7,7 @@
 #include"File/DirectoryHelper.h"
 #include"Lua/WaitLuaTaskSource.h"
 #include"Lua/LuaServiceTaskSource.h"
-#include"App/Lua/LuaApp.h"
+#include"Lua/LuaApp.h"
 #include"Lua/LuaLogger.h"
 #include"Json/Lua/Json.h"
 #include"Lua/LuaCoroutine.h"
@@ -15,7 +15,7 @@
 #include"Json/Lua/Encoder.h"
 #include"Md5/LuaMd5.h"
 #include"Guid/Guid.h"
-#include"App/System/System.h"
+#include"System/System.h"
 #include"Config/ServiceConfig.h"
 #include"Component/TextConfigComponent.h"
 using namespace Lua;
@@ -160,7 +160,7 @@ namespace Sentry
 
 	bool LuaScriptComponent::Start()
 	{
-        const std::string & name = System::GetName();
+        const std::string & name = System::Name();
         if(lua_getfunction(this->mLuaEnv, name.c_str(), "Start"))
         {
             WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv);
@@ -209,8 +209,9 @@ namespace Sentry
         const ServerConfig *config = ServerConfig::Inst();
         LOG_CHECK_RET_FALSE(config->GetMember("lua", "common", common));
         LOG_CHECK_RET_FALSE(config->GetMember("lua", "module", module));
-        common = fmt::format("{0}{1}", System::GetWorkPath(), common);
-        module = fmt::format("{0}{1}", System::GetWorkPath(), module);
+
+        common = System::FormatPath(common);
+        module = System::FormatPath(module);
         if(!Helper::Directory::GetFilePaths(common, "*.lua", luaFiles))
         {
             return false;
@@ -242,7 +243,7 @@ namespace Sentry
         }
         this->AddRequire(common);
         this->AddRequire(module);
-        return this->LoadModule(System::GetName());
+        return this->LoadModule(System::Name());
     }
 
     void LuaScriptComponent::OnHotFix()

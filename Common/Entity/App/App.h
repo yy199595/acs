@@ -35,32 +35,22 @@ namespace Sentry
         bool OnDelComponent(Component *component) final { return false; }
         inline bool IsMainThread() const { return this->mThreadId == std::this_thread::get_id();}
     private:
-		void LogicMainLoop();
+#ifdef __OS_WIN__
 		void UpdateConsoleTitle();
+#endif
 		void WaitDepentServiceStart();
 	 private:
-		int mFps;
-		float mDeltaTime;
-		long long mStartTimer;
-		long long mSecondTimer;
-		long long mLogicUpdateInterval;
-	 private:
-		float mLogicFps;
-		long long mStartTime;
-		long long mLogicRunCount;
-		long long mLastUpdateTime;
+        float mLogicFps;
 	 private:
         int mTickCount;
+        bool mIsStartDone;
         std::thread::id mThreadId;
-        Asio::Context * mMainThread;
+        const long long mStartTime;
         TaskComponent* mTaskComponent;
 		LoggerComponent* mLogComponent;
 		TimerComponent* mTimerComponent;
 		ProtoComponent * mMessageComponent;
-		std::vector<IFrameUpdate*> mFrameUpdateManagers;
-		std::vector<ISystemUpdate*> mSystemUpdateManagers;
-		std::vector<ISecondUpdate*> mSecondUpdateManagers;
-        std::vector<ILastFrameUpdate*> mLastFrameUpdateManager;
+        std::unique_ptr<Asio::Context> mMainThread;
         std::unordered_map<std::string, RpcService*> mSeviceMap;
     };
 }// namespace Sentry

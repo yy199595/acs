@@ -4,13 +4,13 @@
 #include"TextConfig.h"
 #include"File/FileHelper.h"
 #include"Md5/MD5.h"
+#include"System/System.h"
 #include"Log/CommonLogDef.h"
-#include"App/System/System.h"
 namespace Sentry
 {
     const std::string &TextConfig::WorkPath() const
     {
-        return System::GetWorkPath();
+        return System::WorkPath();
     }
     bool TextConfig::LoadConfig(const std::string &path)
     {

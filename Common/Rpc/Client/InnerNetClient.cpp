@@ -2,14 +2,14 @@
 #include"App/App.h"
 #include"Client/Rpc.h"
 #include"Guid/Guid.h"
-#include"App/System/System.h"
+#include"System/System.h"
 namespace Sentry
 {
 	InnerNetClient::InnerNetClient(IRpc<Rpc::Packet> * component,
                                    std::shared_ptr<SocketProxy> socket)
 		: TcpContext(socket, 1024 * 1024), mComponent(component)
     {
-        this->mSrvName = System::GetName();
+        this->mSrvName = System::Name();
         this->mState = Tcp::DecodeState::Head;
         ServerConfig::Inst()->GetLocation("rpc", this->mRpcLocation);
         ServerConfig::Inst()->GetLocation("http", this->mHttpLocation);

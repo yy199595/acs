@@ -6,7 +6,7 @@
 #include"String/StringHelper.h"
 #include"RedisComponent.h"
 #include"File/FileHelper.h"
-#include"App/System/System.h"
+#include"System/System.h"
 namespace Sentry
 {
     bool RedisScriptComponent::LateAwake()

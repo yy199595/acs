@@ -3,7 +3,7 @@
 //
 
 #include"ClusterConfig.h"
-#include"App/System/System.h"
+#include"System/System.h"
 namespace Sentry
 {
     bool NodeConfig::IsStart(const std::string &service) const
@@ -115,7 +115,7 @@ namespace Sentry
 
     const NodeConfig *ClusterConfig::GetConfig() const
     {
-        const std::string & name = System::GetName();
+        const std::string & name = System::Name();
         auto iter = this->mNodeConfigs.find(name);
         return iter != this->mNodeConfigs.end() ? iter->second.get() : nullptr;
     }

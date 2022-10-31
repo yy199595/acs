@@ -1,6 +1,6 @@
 ﻿
 #include"App.h"
-#include"App/System/System.h"
+#include"System/System.h"
 #include"Timer/ElapsedTimer.h"
 #include"File/DirectoryHelper.h"
 #include"Service/LuaRpcService.h"
@@ -18,11 +18,9 @@ namespace Sentry
 	App::App() : Unit(0),
         mStartTime(Helper::Time::NowMilTime())
 	{
-        this->mFps = 15;
         this->mTickCount = 0;
-		this->mLogicRunCount = 0;
-        this->mStartTimer = 0;
-		this->mTimerComponent = nullptr;
+        this->mIsStartDone = false;
+        this->mTimerComponent = nullptr;
         this->mThreadId = std::this_thread::get_id();
 	}
 
@@ -50,7 +48,6 @@ namespace Sentry
                 }
             }
         }
-        ServerConfig::Inst()->GetMember("fps", this->mFps);
         this->mTaskComponent->Start(&App::StartAllComponent, this);
         return true;
 	}
@@ -63,97 +60,103 @@ namespace Sentry
 			return false;
 		}
 
-        RpcService * serviceComponent = component->Cast<RpcService>();
-        IFrameUpdate* manager1 = component->Cast<IFrameUpdate>();
-		ISystemUpdate* manager2 = component->Cast<ISystemUpdate>();
-		ISecondUpdate* manager3 = component->Cast<ISecondUpdate>();
-		ILastFrameUpdate* manager4 = component->Cast<ILastFrameUpdate>();
-
-        TryInvoke(manager1, this->mFrameUpdateManagers.emplace_back(manager1));
-		TryInvoke(manager2, this->mSystemUpdateManagers.emplace_back(manager2));
-		TryInvoke(manager3, this->mSecondUpdateManagers.emplace_back(manager3));
-		TryInvoke(manager4, this->mLastFrameUpdateManager.emplace_back(manager4));
-		TryInvoke(serviceComponent, this->mSeviceMap.emplace(component->GetName(), serviceComponent));
+        RpcService * rpcService = component->Cast<RpcService>();
+        if(rpcService != nullptr)
+        {
+            const std::string & name = component->GetName();
+            this->mSeviceMap.emplace(name, rpcService);
+        }
 		return true;
 	}
 
 	int App::Run(int argc, char ** argv)
-	{
-        if(argc != 3)
+    {
+        if (argc != 3)
         {
             return -1;
         }
         System::Init(argv);
-        this->mMainThread = new Asio::Context();
-        if(!this->LoadComponent())
-		{
-			this->GetLogger()->SaveAllLog();
-			return -1;
-		}
-		Asio::ContextWork work(*this->mMainThread);
-		const std::chrono::milliseconds sleepTime(1);
-        this->mLogicUpdateInterval = 1000 / this->mFps;
-		this->mStartTime = Helper::Time::NowMilTime();
-		this->mSecondTimer = Helper::Time::NowMilTime();
-		this->mLastUpdateTime = Helper::Time::NowMilTime();
-
-        while(!this->mMainThread->stopped())
+        this->mMainThread = std::make_unique<Asio::Context>();
+        if (!this->LoadComponent())
         {
-            Asio::Code err;
-            this->mMainThread->poll(err);
-            if(err)
+            this->GetLogger()->SaveAllLog();
+            return -1;
+        }
+        Asio::ContextWork work(*this->mMainThread);
+        const std::chrono::milliseconds sleepTime(1);
+        long long logicStartTime = Helper::Time::NowMilTime();
+        long long logicSecondTime = Helper::Time::NowMilTime();
+        long long logicLastUpdateTime = Helper::Time::NowMilTime();
+
+        std::vector<IFrameUpdate *> frameUpdateComponents;
+        std::vector<ISystemUpdate *> systemUpdateComponents;
+        std::vector<ISecondUpdate *> secondUpdateComponents;
+        std::vector<ILastFrameUpdate *> lastFrameUpdateComponents;
+        this->GetComponents<IFrameUpdate>(frameUpdateComponents);
+        this->GetComponents<ISystemUpdate>(systemUpdateComponents);
+        this->GetComponents<ISecondUpdate>(secondUpdateComponents);
+        this->GetComponents<ILastFrameUpdate>(lastFrameUpdateComponents);
+
+
+        float fps = 15;
+        Asio::Code code;
+        float deltaTime = 0;
+        long long logicRunCount = 0;
+        ServerConfig::Inst()->GetMember("fps", fps);
+        long long logicUpdateInterval = 1000 / fps;
+        while (!this->mMainThread->stopped())
+        {
+            this->mMainThread->poll(code);
+            for (ISystemUpdate *component: systemUpdateComponents)
             {
-                CONSOLE_LOG_ERROR(err.message());
+                component->OnSystemUpdate();
             }
-            this->LogicMainLoop();
+            if (!this->mIsStartDone)
+            {
+                continue;
+            }
+            logicStartTime = Helper::Time::NowMilTime();
+            if (logicStartTime - logicLastUpdateTime >= logicUpdateInterval)
+            {
+                logicRunCount++;
+                for (IFrameUpdate *component: frameUpdateComponents)
+                {
+                    component->OnFrameUpdate(deltaTime);
+                }
+
+                if (logicStartTime - logicSecondTime >= 1000)
+                {
+                    this->mTickCount++;
+#ifdef __OS_WIN__
+                    this->UpdateConsoleTitle();
+#endif
+                    long long nowTime = Helper::Time::NowMilTime();
+                    float seconds = (nowTime - logicSecondTime) / 1000.0f;
+                    this->mLogicFps = (float)logicRunCount / seconds;
+                    for (ISecondUpdate *component: secondUpdateComponents)
+                    {
+                        component->OnSecondUpdate(this->mTickCount);
+                    }
+                    logicRunCount = 0;
+                    logicSecondTime = Helper::Time::NowMilTime();
+                }
+
+                for (ILastFrameUpdate *component: lastFrameUpdateComponents)
+                {
+                    component->OnLastFrameUpdate();
+                }
+                logicLastUpdateTime = Helper::Time::NowMilTime();
+            }
             std::this_thread::sleep_for(sleepTime);
         }
-		return 0;
-	}
+        return 0;
+    }
 
 	void App::Stop()
     {
         this->mMainThread->stop();
         LOG_WARN("close server successful ");
     }
-
-	void App::LogicMainLoop()
-	{
-		for (ISystemUpdate* component: this->mSystemUpdateManagers)
-		{
-			component->OnSystemUpdate();
-		}
-        if(this->mStartTimer == 0)
-        {
-            return;
-        }
-        this->mStartTimer = Helper::Time::NowMilTime();
-		if (this->mStartTimer - mLastUpdateTime >= this->mLogicUpdateInterval)
-		{
-			this->mLogicRunCount++;
-			for (IFrameUpdate* component: this->mFrameUpdateManagers)
-			{
-				component->OnFrameUpdate(this->mDeltaTime);
-			}
-
-			if (this->mStartTimer - this->mSecondTimer >= 1000)
-			{
-                this->mTickCount++;
-				this->UpdateConsoleTitle();
-				for (ISecondUpdate* component: this->mSecondUpdateManagers)
-				{
-					component->OnSecondUpdate(this->mTickCount);
-				}
-				this->mSecondTimer = Helper::Time::NowMilTime();
-			}
-
-			for (ILastFrameUpdate* component: this->mLastFrameUpdateManager)
-			{
-				component->OnLastFrameUpdate();
-			}
-			this->mLastUpdateTime = Helper::Time::NowMilTime();
-		}
-	}
 
 	void App::StartAllComponent()
     {
@@ -176,7 +179,7 @@ namespace Sentry
             this->mTimerComponent->CancelTimer(timeId);
             LOG_DEBUG("start " << name << " successful use time = [" << timer.GetSecond() << "s]");
         }
-        this->mStartTimer = 1; //开始帧循环
+        this->mIsStartDone = true; //开始帧循环
         std::vector<IComplete *> completeComponents;
         this->GetComponents(completeComponents);
         for(IComplete * complete : completeComponents)
@@ -207,24 +210,17 @@ namespace Sentry
             complete->OnClusterComplete();
         }
 		long long t = Helper::Time::NowMilTime() - this->mStartTime;
-		LOG_INFO("===== start " << System::GetName() << " successful [" << t / 1000.0f << "]s ===========");
+		LOG_INFO("===== start " << System::Name() << " successful [" << t / 1000.0f << "]s ===========");
 	}
-
+#ifdef __OS_WIN__
 	void App::UpdateConsoleTitle()
 	{
-		long long nowTime = Helper::Time::NowMilTime();
-		float seconds = (nowTime - this->mSecondTimer) / 1000.0f;
-		this->mLogicFps = (float)this->mLogicRunCount / seconds;
-#ifdef _WIN32
 		char buffer[100] = {0};
 		const std::string& name = System::GetName();
 		sprintf_s(buffer, "%s fps:%f", name.c_str(), this->mLogicFps);
 		SetConsoleTitle(buffer);
-#else
-		//LOG_INFO("fps = " << this->mLogicFps);
-#endif
-		this->mLogicRunCount = 0;
 	}
+#endif
 
 	RpcService* App::GetService(const std::string& name)
 	{

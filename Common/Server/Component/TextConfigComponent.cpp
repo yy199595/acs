@@ -3,7 +3,7 @@
 //
 
 #include"TextConfigComponent.h"
-#include"App/System/System.h"
+#include"System/System.h"
 #include"Config/ServerConfig.h"
 #include"Config/ServiceConfig.h"
 #include"Config/ClusterConfig.h"
@@ -21,7 +21,7 @@ namespace Sentry
 {
     bool TextConfigComponent::Awake()
     {
-        std::string path = System::GetConfigPath();
+        std::string path = System::ConfigPath();
         if (!this->LoadTextConfig<ServerConfig>(path))
         {
             return false;

@@ -13,10 +13,11 @@ namespace Sentry
     {
     public:
         static void Init(char **argv);
-        static const std::string & GetName() { return System::mName; }
-        static const std::string & GetExePath() { return System::mExePath; }
-        static const std::string & GetWorkPath() { return System::mWorkPath; }
-        static const std::string & GetConfigPath() { return System::mConfigPath;}
+        static const std::string FormatPath(const std::string & path);
+        static const std::string & Name() { return System::mName; }
+        static const std::string & ExePath() { return System::mExePath; }
+        static const std::string & WorkPath() { return System::mWorkPath; }
+        static const std::string & ConfigPath() { return System::mConfigPath;}
     private:
         static std::string mName;
         static std::string mExePath;
