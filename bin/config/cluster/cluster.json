@@ -12,7 +12,6 @@
 			"UserBehavior": true,
 			"InnerService": true,
 			"OuterService": true,
-			"MysqlService": true,
 			"MongoService": true,
 			"ChatService": true,
 			"HttpWebService": true,

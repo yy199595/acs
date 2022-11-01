@@ -4,12 +4,12 @@
 
 #include"MongoDataComponent.h"
 #include"Proto/ProtoHelper.h"
-#include"Component/MysqlHelperComponent.h"
 #ifdef __ENABLE_REDIS__
 #include"Component/RedisComponent.h"
 #endif
 #include"Component/MongoHelperComponent.h"
 #include"Component/ProtoComponent.h"
+#include"google/protobuf/util/json_util.h"
 namespace Sentry
 {
 	bool MongoDataComponent::LateAwake()

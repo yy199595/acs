@@ -41,26 +41,21 @@ function Server.OnClusterComplete()
     local httpComponent = App.GetComponent("HttpComponent")
     local code, data = httpComponent:Get("http://www.kuaidi100.com/query?type=%E5%BF%AB%E9%80%92%E5%85%AC%E5%8F%B8%E4%BB%A3%E5%8F%B7&postid=%E5%BF%AB%E9%80%92%E5%8D%95%E5%8F%B7")
     print(code, data)
-    local messageComponent = App.GetComponent("ProtoComponent")
-    local code, res1 = App.Call("MysqlService.Create", {
-        keys = { "account"},
-        data = messageComponent:New("user.account_info")
-    })
-    MysqlComponent.Create("user.account_info", {"account"})
+    --MysqlComponent.Create("user.account_info", {"account"})
+    --
+    --MysqlComponent.Add("user.account_info", {
+    --    account = "646585122@qq.com",
+    --    user_id = 199595,
+    --    phone_num = 13716061995,
+    --    pass_word = "199595yjz.",
+    --    register_time = os.time(),
+    --    last_login_ip = "127.0.0.1",
+    --})
 
-    MysqlComponent.Add("user.account_info", {
-        account = "646585122@qq.com",
-        user_id = 199595,
-        phone_num = 13716061995,
-        pass_word = "199595yjz.",
-        register_time = os.time(),
-        last_login_ip = "127.0.0.1",
-    })
-
-    local res = MysqlComponent.QueryFields("user.account_info", {"user_id", "phone_num"}, {
-        account = "646585122@qq.com"
-    }, 1)
-    table.print(res)
+    --local res = MysqlComponent.QueryFields("user.account_info", {"user_id", "phone_num"}, {
+    --    account = "646585122@qq.com"
+    --}, 1)
+    --table.print(res)
 
     local r1 = MongoComponent.InsertOnce("user.data_account", {
         _id = "646585122@qq.com",
@@ -71,19 +66,19 @@ function Server.OnClusterComplete()
         token = "0x00ssdjsaklj"
     })
 
-    MysqlComponent.Update("user.account_info", {
-        account = "646585122@qq.com"
-    }, {
-        user_area_list = {
-            list = { 10, 11, 12, 13, 14}
-        }
-    })
-
-    local res = MysqlComponent.QueryOnce("user.account_info", {
-        account = "646585122@qq.com"
-    })
-    print("======== text query from mysql ========")
-    table.print(res)
+    --MysqlComponent.Update("user.account_info", {
+    --    account = "646585122@qq.com"
+    --}, {
+    --    user_area_list = {
+    --        list = { 10, 11, 12, 13, 14}
+    --    }
+    --})
+    --
+    --local res = MysqlComponent.QueryOnce("user.account_info", {
+    --    account = "646585122@qq.com"
+    --})
+    --print("======== text query from mysql ========")
+    --table.print(res)
 
 
     local r3 = MongoComponent.InsertOnce("user2.data_account", {
