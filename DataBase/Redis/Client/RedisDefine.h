@@ -24,6 +24,19 @@ namespace Sentry
 	};
 }
 
+namespace RedisCommand
+{
+    namespace Str
+    {
+        static const char * Get = "GET";
+        static const char * Set = "SET";
+        static const char * Append = "APPEND";
+        static const char * AddOne = "INCR";
+        static const char * SubOne = "DECR";
+
+    }
+}
+
 namespace Sentry
 {
     class RedisTask;

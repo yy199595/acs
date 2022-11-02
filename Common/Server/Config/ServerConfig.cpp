@@ -63,7 +63,6 @@ namespace Sentry
             }
         }
 
-        const std::string workDir(getcwd(NULL, NULL));
         if (this->HasMember("path") && (*this)["path"].IsObject())
 		{
 			const rapidjson::Value & jsonObject = (*this)["path"];
@@ -72,7 +71,7 @@ namespace Sentry
 			{
 				const std::string key(iter1->name.GetString());
 				const std::string value(iter1->value.GetString());
-				this->mPaths.emplace(key, fmt::format("{0}/{1}", workDir, value));
+				this->mPaths.emplace(key, this->WorkPath() + value);
 			}
 		}
         return true;

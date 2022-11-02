@@ -5,6 +5,8 @@
 #include"RedisScriptComponent.h"
 #include"String/StringHelper.h"
 #include"RedisComponent.h"
+#include"File/FileHelper.h"
+#include"App/System/System.h"
 namespace Sentry
 {
     bool RedisScriptComponent::LateAwake()
@@ -15,38 +17,60 @@ namespace Sentry
 
     bool RedisScriptComponent::Start()
     {
+        std::vector<RedisClientConfig> configs;
+        if (RedisConfig::Inst()->Get(configs))
+        {
+            for (const RedisClientConfig &config: configs)
+            {
+                if (config.LuaFiles.empty())
+                {
+                    continue;
+                }
+                TcpRedisClient *redisClient = this->mComponent->GetClient(config.Name);
+                for (auto iter = config.LuaFiles.begin(); iter != config.LuaFiles.end(); iter++)
+                {
+                    std::string content;
+                    const std::string & name = iter->first;
+                    const std::string & path = iter->second;
+                    if(!Helper::File::ReadTxtFile(path, content))
+                    {
+                        LOG_ERROR("load lua [" << path << "] error");
+                        return false;
+                    }
+                    std::shared_ptr<RedisResponse> response =
+                        this->mComponent->Run(redisClient, "SCRIPT", "LOAD", content);
+                    if(response == nullptr || response->HasError())
+                    {
+                        return false;
+                    }
+                    LOG_CHECK_RET_FALSE(this->OnLoadScript(name, response->GetString()));
+                }
+            }
+        }
         return true;
     }
 
-    void RedisScriptComponent::OnLoadScript(const std::string &path, const std::string &md5)
+    bool RedisScriptComponent::OnLoadScript(const std::string &name, const std::string &md5)
     {
-        std::string fileName;
-        std::vector<std::string> tempArray;
-        Helper::String::GetFileName(path, fileName);
-        if(Helper::String::Split(fileName, ".",tempArray) != 2)
-        {
-            LOG_ERROR("add lua script error");
-            return;
-        }
-        const std::string & name = tempArray[0];
         auto iter = this->mLuaMap.find(name);
         if(iter != this->mLuaMap.end())
         {
-            this->mLuaMap.erase(iter);
+            return false;
         }
-        this->mLuaMap[name] = md5;
+        this->mLuaMap.emplace(name, md5);
+        CONSOLE_LOG_INFO("add lua file " << name << ":" << md5);
+        return true;
     }
 
     std::shared_ptr<RedisRequest> RedisScriptComponent::MakeLuaRequest(const std::string &fullName, const std::string &json)
     {
-        std::vector<std::string> tempArray;
-        if(Helper::String::Split(fullName, ".",tempArray) != 2)
+        size_t pos = fullName.find('.');
+        if(pos == std::string::npos)
         {
-            LOG_ERROR("call lua file error");
             return nullptr;
         }
-        const std::string & tab = tempArray[0];
-        const std::string & func = tempArray[1];
+        const std::string tab = fullName.substr(0, pos);
+        const std::string func = fullName.substr(pos + 1);
         auto iter = this->mLuaMap.find(tab);
         if(iter == this->mLuaMap.end())
         {

@@ -46,6 +46,8 @@
 
 #ifdef __ENABLE_REDIS__
 #include"Component/RedisComponent.h"
+#include"Component/RedisStringComponent.h"
+#include"Component/RedisScriptComponent.h"
 #endif
 
 using namespace Sentry;
@@ -77,7 +79,9 @@ void RegisterComponent()
 	ComponentFactory::Add<OuterNetMessageComponent>("OuterNetMessageComponent");
 // db
 #ifdef __ENABLE_REDIS__
-    ComponentFactory::Add<RedisComponent>("RedisDataComponent");
+    ComponentFactory::Add<RedisComponent>("RedisComponent");
+    ComponentFactory::Add<RedisStringComponent>("RedisStringComponent");
+    ComponentFactory::Add<RedisScriptComponent>("RedisScriptComponent");
 #endif
 
 #ifdef __ENABLE_MONGODB__

@@ -1,17 +1,33 @@
 ﻿#include"RedisComponent.h"
 #include"Lua/LuaRedis.h"
-#include"String/StringHelper.h"
 #include"File/DirectoryHelper.h"
 #include"Lua/ClassProxyHelper.h"
 #include"Client/TcpRedisClient.h"
 #include"Component/NetThreadComponent.h"
-
+#include"Component/RedisScriptComponent.h"
+#include"Component/RedisStringComponent.h"
 namespace Sentry
 {
     bool RedisComponent::Awake()
     {
         LOG_CHECK_RET_FALSE(RedisConfig::Inst());
         LOG_CHECK_RET_FALSE(RedisConfig::Inst()->Has("main"));
+        LOG_CHECK_RET_FALSE(this->mApp->AddComponent<RedisScriptComponent>());
+        LOG_CHECK_RET_FALSE(this->mApp->AddComponent<RedisStringComponent>());
+        return true;
+    }
+
+    bool RedisComponent::LateAwake()
+    {
+        std::vector<RedisClientConfig> configs;
+        LOG_CHECK_RET_FALSE(RedisConfig::Inst()->Get(configs));
+        for(const RedisClientConfig & config : configs)
+        {
+            for (int index = 0; index < config.Count; index++)
+            {
+                LOG_CHECK_RET_FALSE(this->MakeRedisClient(config));
+            }
+        }
         return true;
     }
 
@@ -21,16 +37,10 @@ namespace Sentry
         LOG_CHECK_RET_FALSE(RedisConfig::Inst()->Get(configs));
         for(const RedisClientConfig & config : configs)
         {
-            for(int index = 0; index < config.Count; index++)
+            if(!this->Ping(this->GetClient(config.Name)))
             {
-                TcpRedisClient * redisClient = this->MakeRedisClient(config);
-                if(redisClient != nullptr && index == 0)
-                {
-                    if(!this->Ping(redisClient))
-                    {
-                        return false;
-                    }
-                }
+                CONSOLE_LOG_ERROR("start " << config.Name << " redis client error");
+                return false;
             }
         }
         return true;

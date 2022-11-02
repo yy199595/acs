@@ -79,17 +79,9 @@ namespace Sentry
         std::shared_ptr<Tcp::ProtoMessage> message = this->PopMessage();
         if(message != nullptr)
         {
-            std::shared_ptr<RedisRequest> request = std::dynamic_pointer_cast<RedisRequest>(message);
+            std::shared_ptr<RedisRequest> request = std::static_pointer_cast<RedisRequest>(message);
             if(request != nullptr && request->GetTaskId() == 0)
             {
-                std::move(this->mCurResponse);
-                if(!this->SendFromMessageQueue())
-                {
-                    if(!this->mConfig.Channels.empty())
-                    {
-                        this->ReceiveLine();
-                    }
-                }
                 return;
             }
             taskId = request->GetTaskId();
@@ -105,13 +97,6 @@ namespace Sentry
 		asio::io_service & taskThread = App::Inst()->GetThread();
 		taskThread.post(std::bind(&RedisComponent::OnResponse, this->mRedisComponent, taskId, response));
 #endif
-        if(!this->SendFromMessageQueue())
-        {
-            if(!this->mConfig.Channels.empty())
-            {
-                this->ReceiveLine();
-            }
-        }
 	}
 
     void TcpRedisClient::OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message)
@@ -159,7 +144,7 @@ namespace Sentry
             return false;
         }
 
-        if(this->mConfig.FreeClient > 0 && this->mConfig.Channels.empty())
+        if(this->mConfig.FreeClient > 0)
         {
             int s = this->mConfig.FreeClient;
             asio::io_service & io = this->mSocket->GetThread();

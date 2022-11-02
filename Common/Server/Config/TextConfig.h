@@ -14,6 +14,7 @@ namespace Sentry
     public:
         bool ReloadConfig();
         bool LoadConfig(const std::string & path);
+        const std::string & WorkPath() const;
         const std::string & Path() const { return this->mPath; }
         const std::string & GetName() const { return this->mName; }
     protected:

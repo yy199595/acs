@@ -18,7 +18,7 @@ namespace Sentry
     private:
         bool Start() final;
         bool LateAwake() final;
-        void OnLoadScript(const std::string &path, const std::string &md5);
+        bool OnLoadScript(const std::string & name, const std::string &md5);
     private:
         class RedisComponent * mComponent;
         std::unordered_map<std::string, std::string> mLuaMap;

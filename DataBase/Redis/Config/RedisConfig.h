@@ -23,8 +23,7 @@ namespace Sentry
         unsigned short Port;
         std::string Address;
         std::string Password;
-        std::set<std::string> Channels;
-        std::set<std::string> LuaFiles;
+        std::unordered_map<std::string, std::string> LuaFiles;
     };
 
 

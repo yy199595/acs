@@ -38,12 +38,14 @@ namespace Sentry
             {
                 redisConfig.Password = jsonData["passwd"].GetString();
             }
-            if (jsonData.HasMember("scripts") && jsonData["scripts"].IsArray())
+            if (jsonData.HasMember("scripts") && jsonData["scripts"].IsObject())
             {
-                for (int index = 0; index < jsonData["scripts"].Size(); index++)
+                const rapidjson::Value & value = jsonData["scripts"];
+                for(auto iter = value.MemberBegin(); iter != value.MemberEnd(); iter++)
                 {
-                    std::string lua(jsonData["scripts"][index].GetString());
-                    redisConfig.LuaFiles.insert(lua);
+                    const std::string key(iter->name.GetString());
+                    const std::string value(iter->value.GetString());
+                    redisConfig.LuaFiles.emplace(key, this->WorkPath() + value);
                 }
             }
             redisConfig.Address = fmt::format("{0}:{1}", redisConfig.Ip, redisConfig.Port);
