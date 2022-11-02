@@ -7,7 +7,7 @@
 #include"Lua/LuaInclude.h"
 namespace Lua
 {
-	namespace Http
+	namespace HttpClient
 	{
 		extern int Get(lua_State* lua);
 		extern int Post(lua_State* lua);

@@ -5,8 +5,9 @@
 #ifndef APP_HTTPREQUEST_H
 #define APP_HTTPREQUEST_H
 #include<string>
-#include"Comman.h"
+#include"httpHead.h"
 #include<unordered_map>
+#include"Json/JsonReader.h"
 #include"Message/ProtoMessage.h"
 namespace Http
 {
@@ -15,46 +16,52 @@ namespace Http
     public:
         Request(const char * method);
     public:
-        Head & GetHead() { return this->mHead; }
+        const Head & Header() const { return this->mHead; }
         const std::string & Method() const { return this->mMethod; }
+        virtual bool WriteDocument(rapidjson::Document * document) const = 0;
     public:
         bool SetUrl(const std::string & url);
-        const std::string & GetHost() const { return this->mHost; }
-        const std::string & GetPort() const { return this->mPath; }
-    protected:
-        int OnRead(std::istream &buffer) final;
+        const std::string & Url() const { return this->mUrl; }
+        const std::string & Host() const { return this->mHost; }
+        const std::string & Port() const { return this->mPort; }
+        const std::string & Path() const { return this->mPath; }
+    public:
+        bool OnRead(std::istream &buffer) final;
         int OnWrite(std::ostream &buffer) final;
         int Serailize(std::ostream &os) final;
     protected:
-        virtual int OnReadContent(std::istream & buffer) = 0;
+        virtual bool OnReadContent(std::istream & buffer) = 0;
         virtual int OnWriteContent(std::ostream & buffer) = 0;
     protected:
         Head mHead;
-        State mState;
+        std::string mUrl;
         std::string mHost;
         std::string mPath;
-        std::string mUrl;
         std::string mPort;
+        DecodeState mState;
         std::string mVersion;
         std::string mProtocol;
         const std::string mMethod;
     };
 }
 
+
 namespace Http
 {
     class GetRequest : public Request
     {
     public:
-        GetRequest(const std::string & url) :Request("GET") { }
-    public:
-        int OnReadContent(std::istream &buffer) final;
+        GetRequest() :Request("GET") { }
+    protected:
+        bool OnReadContent(std::istream &buffer) final;
         int OnWriteContent(std::ostream &buffer) final;
+        bool WriteDocument(rapidjson::Document * document) const final;
     public:
         bool GetParameter(const std::string & key, std::string & value);
     private:
         std::unordered_map<std::string, std::string> mParameters;
     };
+
 }
 
 namespace Http
@@ -64,13 +71,23 @@ namespace Http
     public:
         PostRequest() : Request("POST") { }
     public:
-        int OnReadContent(std::istream &buffer) final;
+        void Str(const std::string & str);
+        void Json(const std::string & json);
+        void Json(const char * str, size_t size);
+    public:
+        bool OnReadContent(std::istream &buffer) final;
         int OnWriteContent(std::ostream &buffer) final;
+        bool WriteDocument(rapidjson::Document * document) const final;
     public:
         const std::string & Content() const { return this->mContent;}
     private:
         std::string mContent;
     };
+}
+
+namespace Http
+{
+    extern std::shared_ptr<Request> New(const std::string & method);
 }
 
 

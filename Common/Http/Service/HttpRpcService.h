@@ -18,7 +18,7 @@ namespace Sentry
     public:
         bool OnStartService(HttpServiceRegister &serviceRegister) final;
     private:
-        XCode Call(const HttpHandlerRequest& request, HttpHandlerResponse& response);
+        XCode Call(const Http::Request& request, Http::Response& response);
         XCode Invoke(std::shared_ptr<Rpc::Packet> data, std::shared_ptr<Json::Document> document);
 
     };

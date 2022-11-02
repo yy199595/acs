@@ -5,6 +5,7 @@
 #include"LuaHttpServiceMethod.h"
 #include"Lua/Function.h"
 #include"Json/Lua/Json.h"
+#include"Json/Lua/values.hpp"
 #include"Lua/LuaServiceTaskSource.h"
 #include"Component/ProtoComponent.h"
 namespace Sentry
@@ -16,9 +17,9 @@ namespace Sentry
         this->mConfig = config;
     }
 
-    XCode LuaHttpServiceMethod::Invoke(const HttpHandlerRequest &request, HttpHandlerResponse &response)
+    XCode LuaHttpServiceMethod::Invoke(const Http::Request &request, Http::Response &response)
     {
-        if(this->mConfig->IsAsync && !Lua::Function::Get(this->mLua, "HttpCall"))
+        if(this->mConfig->IsAsync && !Lua::Function::Get(this->mLua, "coroutine", "http"))
         {
             return XCode::CallLuaFunctionFail;
         }
@@ -29,21 +30,23 @@ namespace Sentry
 			Json::Document document;
 			document.Add("error", "call lua function not existe");
 			document.Add("code", (int)XCode::CallFunctionNotExist);
-			response.Json(HttpStatus::OK, &document);
+			response.Json(HttpStatus::OK, document);
 			return XCode::CallFunctionNotExist;
 		}
-        request.GetData().Writer(this->mLua);
+        rapidjson::Document document;
+        request.WriteDocument(&document);
+        values::pushValue(this->mLua, document);
         return this->mConfig->IsAsync ? this->CallAsync(response) : this->Call(response);
     }
 
-    XCode LuaHttpServiceMethod::Call(HttpHandlerResponse &response)
+    XCode LuaHttpServiceMethod::Call(Http::Response &response)
     {
         if (lua_pcall(this->mLua, 1, 2, 0) != LUA_OK)
         {
 			Json::Document document;
 			document.Add("error", lua_tostring(this->mLua, -1));
 			document.Add("code", (int)XCode::CallLuaFunctionFail);
-			response.Json(HttpStatus::OK, &document);
+			response.Json(HttpStatus::OK, document);
 			return XCode::CallLuaFunctionFail;
         }
         if (lua_isstring(this->mLua, -1))
@@ -63,7 +66,7 @@ namespace Sentry
         return (XCode) lua_tointeger(this->mLua, -2);
     }
 
-    XCode LuaHttpServiceMethod::CallAsync(HttpHandlerResponse &response)
+    XCode LuaHttpServiceMethod::CallAsync(Http::Response &response)
     {
         LuaServiceTaskSource * luaTaskSource = new LuaServiceTaskSource(this->mLua);
         Lua::UserDataParameter::Write(this->mLua, luaTaskSource);
@@ -73,7 +76,7 @@ namespace Sentry
 			Json::Document document;
 			document.Add("error", lua_tostring(this->mLua, -1));
 			document.Add("code", (int)XCode::CallLuaFunctionFail);
-			response.Json(HttpStatus::OK, &document);
+			response.Json(HttpStatus::OK, document);
             return XCode::CallLuaFunctionFail;
         }
         XCode code = luaTaskSource->Await();

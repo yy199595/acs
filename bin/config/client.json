@@ -14,10 +14,7 @@
         "cluster": "config/cluster/cluster.json"
     },
     "lua": {
-        "require": [
-            "script/Common",
-            "script/Client/component"
-        ],
-        "main": "script/Client/Client.lua"
+        "common": "script/lua/Common",
+        "module": "script/lua/Client"
     }
 }

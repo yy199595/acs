@@ -11,7 +11,7 @@
 #include"rapidjson/document.h"
 namespace Json
 {
-	class Reader : protected rapidjson::Document
+	class Reader : public rapidjson::Document
 	{
 	 public:
 		Reader();

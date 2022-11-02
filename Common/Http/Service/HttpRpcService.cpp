@@ -18,17 +18,16 @@ namespace Sentry
         return true;
     }
 
-    XCode HttpRpcService::Call(const HttpHandlerRequest &request, HttpHandlerResponse &response)
+    XCode HttpRpcService::Call(const Http::Request &request, Http::Response &response)
     {
         std::string value, func;
         std::vector<std::string> splits;
-        const HttpData &httpData = request.GetData();
         std::shared_ptr<Json::Document> document = std::make_shared<Json::Document>();
-        if (Helper::String::Split(httpData.mPath, "/", splits) < 2)
+        if (Helper::String::Split(request.Path(), "/", splits) < 2)
         {            
             document->Add("code", (int) XCode::CallArgsError);
             document->Add("error", CodeConfig::Inst()->GetDesc(XCode::CallArgsError));
-            document->Serialize(response.Content());
+            response.Json(HttpStatus::OK, *document);
             return XCode::CallArgsError;
         }
         const std::string &method = splits[splits.size() - 1];
@@ -38,7 +37,7 @@ namespace Sentry
         {          
             document->Add("code", (int) XCode::CallServiceNotFound);
             document->Add("error", CodeConfig::Inst()->GetDesc(XCode::CallServiceNotFound));
-            document->Serialize(response.Content());
+            response.Json(HttpStatus::OK, *document);
             return XCode::CallServiceNotFound;
         }
         const RpcMethodConfig *methodConfig = rpcServiceConfig->GetMethodConfig(method);
@@ -46,7 +45,7 @@ namespace Sentry
         {           
             document->Add("code", (int) XCode::CallFunctionNotExist);
             document->Add("error", CodeConfig::Inst()->GetDesc(XCode::CallFunctionNotExist));
-            document->Serialize(response.Content());
+            response.Json(HttpStatus::OK, *document);
             return XCode::CallServiceNotFound;
         }
 
@@ -54,14 +53,18 @@ namespace Sentry
         {
             message->GetHead().Add("func", methodConfig->FullName);
 
-            if (httpData.Get("id", value))
+            if (request.Header().Get("id", value))
             {
                 Helper::String::ClearBlank(value);
                 message->GetHead().Add("id", value);
             }
             message->SetProto(Tcp::Porto::Json);
             message->SetType(Tcp::Type::Request);
-            message->Append(request.GetContent());
+            const Http::PostRequest * postRequest = dynamic_cast<const Http::PostRequest*>(&request);
+            if(postRequest != nullptr)
+            {
+                message->Append(postRequest->Content());
+            }
         }
         XCode code = XCode::Failure;
         try
@@ -75,7 +78,7 @@ namespace Sentry
         }
         std::string json;
         document->Add("code", (int) code);
-        document->Serialize(response.Content());
+        response.Json(HttpStatus::OK, *document);
         return XCode::Successful;
     }
 

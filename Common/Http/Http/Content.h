@@ -4,7 +4,7 @@
 
 #ifndef APP_CONTENT_H
 #define APP_CONTENT_H
-#include"Comman.h"
+#include"httpHead.h"
 namespace Http
 {
     class IContent : public IStream
@@ -28,7 +28,7 @@ namespace Http
         JsonContent(const std::string & json);
         JsonContent(const char * json, size_t len);
     public:
-        int OnRead(std::istream & buffer) final;
+        bool OnRead(std::istream & buffer) final;
         int OnWrite(std::ostream & buffer) final;
         const char * Type() const { return Http::ContentTypeJson; }
         const std::string & GetContent() const { return this->mJson; }

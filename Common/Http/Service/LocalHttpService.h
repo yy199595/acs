@@ -8,10 +8,11 @@
 #include"Component/Component.h"
 #include"Method/MethodRegister.h"
 #include"Config/ServiceConfig.h"
-#include"Client/HttpAsyncRequest.h"
+#include"Http/HttpRequest.h"
+#include"Http/HttpResponse.h"
 namespace Sentry
 {
-	class LocalHttpService : public Component, public IService<HttpHandlerRequest, HttpHandlerResponse>
+    class LocalHttpService : public Component, public IService<Http::Request, Http::Response>
 	{
 	 public:
 		LocalHttpService() = default;
@@ -24,7 +25,7 @@ namespace Sentry
         bool Start() final;
         bool Close() final;
 		bool IsStartService() final { return this->mServiceRegister != nullptr;}
-		XCode Invoke(const std::string & name, std::shared_ptr<HttpHandlerRequest>, std::shared_ptr<HttpHandlerResponse>) final;
+		XCode Invoke(const std::string & name, std::shared_ptr<Http::Request>, std::shared_ptr<Http::Response>) final;
 	 private:
 		std::shared_ptr<HttpServiceRegister> mServiceRegister;
 	};

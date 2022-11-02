@@ -3,17 +3,20 @@
 //
 
 #include"LuaHttp.h"
+#include"Json/Lua/Json.h"
 #include"File/DirectoryHelper.h"
 #include"Lua/UserDataParameter.h"
 #include"Lua/LuaWaitTaskSource.h"
-#include"Client/HttpAsyncRequest.h"
 #include"Component/HttpComponent.h"
 #include"Client/HttpRequestClient.h"
 #include"Component/ProtoComponent.h"
+
+#include"Http/HttpRequest.h"
+#include"Task/HttpTask.h"
 using namespace Sentry;
 namespace Lua
 {
-	int Http::Get(lua_State* lua)
+	int HttpClient::Get(lua_State* lua)
     {
         lua_pushthread(lua);
         if (!lua_isuserdata(lua, 1))
@@ -28,8 +31,8 @@ namespace Lua
         size_t size = 0;
         const char *str = luaL_checklstring(lua, 2, &size);
         HttpComponent *httpComponent = UserDataParameter::Read<HttpComponent *>(lua, 1);
-        std::shared_ptr<HttpGetRequest> getRequest = HttpGetRequest::Create(std::string(str, size));
-        if (getRequest == nullptr)
+        std::shared_ptr<Http::GetRequest> getRequest(new Http::GetRequest());
+        if (!getRequest->SetUrl(std::string(str, size)))
         {
             luaL_error(lua, "parse get url : [%s] failure", str);
             return 0;
@@ -37,79 +40,55 @@ namespace Lua
 #ifdef __DEBUG__
         LOG_DEBUG("[http get] url = " << std::string(str, size));
 #endif
-        std::shared_ptr<LuaHttpTask> luaHttpTask = getRequest->MakeLuaTask(lua, 0);
+        std::shared_ptr<LuaHttpRequestTask> luaHttpTask(new LuaHttpRequestTask(lua));
         std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
 
-        requestClient->Request(getRequest);
-        long long id = luaHttpTask->GetRpcId();
+        long long id = requestClient->Do(getRequest);
         return httpComponent->AddTask(id, luaHttpTask)->Await(requestClient);
     }
 
-	int Http::Post(lua_State* lua)
+	int HttpClient::Post(lua_State* lua)
     {
         size_t size = 0;
+        lua_pushthread(lua);
         const char *str = luaL_checklstring(lua, 2, &size);
-        std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
+       // std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
         HttpComponent *httpComponent = UserDataParameter::Read<HttpComponent *>(lua, 1);
-        std::shared_ptr<HttpPostRequest> postRequest = HttpPostRequest::Create(std::string(str, size));
-        if (postRequest == nullptr)
+        std::shared_ptr<Http::PostRequest> postRequest(new Http::PostRequest());
+        if (!postRequest->SetUrl(std::string(str, size)))
         {
             luaL_error(lua, "parse post url : [%s] failure", str);
             return 0;
         }
-        const char *data = luaL_checklstring(lua, 3, &size);
-        postRequest->AddBody(data, size);
+        if(lua_isstring(lua, 3))
+        {
+            const char *data = luaL_checklstring(lua, 3, &size);
+            postRequest->Json(data, size);
+        }
+        else if(lua_istable(lua, 3))
+        {
+            std::string json;
+            Lua::Json::Read(lua, 3, &json);
+            postRequest->Json(json.c_str(), json.size());
+        }
+        else
+        {
+            luaL_error(lua, "post parameter error");
+            return 0;
+        }
+
+        std::shared_ptr<LuaHttpRequestTask> luaHttpTask(new LuaHttpRequestTask(lua));
         std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
-        std::shared_ptr<LuaHttpTask> luaHttpTask = postRequest->MakeLuaTask(lua, 0);
 
 #ifdef __DEBUG__
         //LOG_DEBUG("[http post] url = " << std::string(str, size) << " data = " << postRequest->GetBody());
 #endif
-        long long id = luaHttpTask->GetRpcId();
-        requestClient->Request(postRequest);
+        long long id = requestClient->Do(postRequest);
         return httpComponent->AddTask(id, luaHttpTask)->Await(requestClient);
     }
 
-	int Http::Download(lua_State* lua)
+	int HttpClient::Download(lua_State* lua)
 	{
-        HttpComponent* httpComponent = UserDataParameter::Read<HttpComponent*>(lua, 1);
-        if(httpComponent == nullptr)
-        {
-            return 0;
-        }
-
-        lua_pushthread(lua);
-		std::string dir, fileName;
-		const char * url = luaL_checkstring(lua, 2);
-        const char * path = luaL_checkstring(lua, 3);
-		if(Helper::Directory::GetDirAndFileName(path, dir, fileName))
-		{
-			if(!Helper::Directory::MakeDir(dir))
-			{
-				luaL_error(lua, "make dir error : %s", dir.c_str());
-				return 0;
-			}
-		}
-
-		std::shared_ptr<HttpGetRequest> getRequest = HttpGetRequest::Create(url);
-		if(getRequest == nullptr)
-		{
-			luaL_error(lua, "parse get url : [%s] failure", url);
-			return 0;
-		}
-
-		std::fstream * fs = new std::fstream ();
-		fs->open(path,  std::ios::out);
-		if(!fs->is_open())
-		{
-			delete fs;
-			luaL_error(lua, "open %s error", path);
-			return 0;
-		}
-        std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
-        std::shared_ptr<LuaHttpTask> luaHttptask = getRequest->MakeLuaTask(lua, 0);
-        requestClient->Request(getRequest, fs);
-
-        return luaHttptask->Await(requestClient);
+        return 0;
 	}
 }

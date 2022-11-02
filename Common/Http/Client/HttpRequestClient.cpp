@@ -3,51 +3,39 @@
 //
 #include<regex>
 #include"HttpRequestClient.h"
+#include"Guid/Guid.h"
 #include"Component/HttpComponent.h"
 namespace Sentry
 {
     HttpRequestClient::HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy, HttpComponent * httpComponent)
 		: Tcp::TcpContext(socketProxy)
     {
-        this->mTimeout = 10;
+        this->mTimeout = 15; //默认十五秒
 		this->mHttpComponent = httpComponent;
     }
 
-	void HttpRequestClient::Request(std::shared_ptr<HttpAsyncRequest> httpRequest, int time)
+	long long HttpRequestClient::Do(std::shared_ptr<Http::Request> httpRequest, int timeout)
 	{
-        this->mTimeout = time;
 		this->mRequest = httpRequest;
-        constexpr HttpStatus defaultStatus = HttpStatus::INTERNAL_SERVER_ERROR;
-		this->mResponse = std::make_shared<HttpDataResponse>(defaultStatus);
+        this->mTaskId = Guid::Create();
+		this->mResponse = std::make_shared<Http::Response>();
 #ifdef ONLY_MAIN_THREAD
 		this->ConnectHost();
 #else
 		Asio::Context & netWorkThread = this->mSocket->GetThread();
 		netWorkThread.post(std::bind(&HttpRequestClient::ConnectHost, this));
 #endif
+        return this->mTaskId;
 	}
 
-    void HttpRequestClient::Request(std::shared_ptr<HttpAsyncRequest> httpRequest, std::fstream * fs, int time)
-    {
-        this->mTimeout = time;
-        this->mRequest = httpRequest;
-        constexpr HttpStatus defaultStatus = HttpStatus::INTERNAL_SERVER_ERROR;
-        this->mResponse = std::make_shared<HttpFileResponse>(fs, defaultStatus);
-#ifdef ONLY_MAIN_THREAD
-		this->ConnectHost();
-#else
-        Asio::Context & netWorkThread = this->mSocket->GetThread();
-        netWorkThread.post(std::bind(&HttpRequestClient::ConnectHost, this));
-#endif
-    }
 
     void HttpRequestClient::OnConnect(const asio::error_code &error, int count)
     {
         if(error)
         {
-            CONSOLE_LOG_ERROR("connect ]" << this->mRequest->GetHost()
-                 << ":" << this->mRequest->GetPort() << "] failure :" << error.message());
-			this->OnComplete(error);
+            CONSOLE_LOG_ERROR("connect ]" << this->mRequest->Host()
+                 << ":" << this->mRequest->Port() << "] failure :" << error.message());
+			this->OnComplete(HttpStatus::INTERNAL_SERVER_ERROR);
 			return;
         }
         this->Send(this->mRequest);
@@ -61,96 +49,78 @@ namespace Sentry
 #ifdef __NET_ERROR_LOG__
             CONSOLE_LOG_ERROR(code.message());
 #endif
-            this->OnComplete(code);
+            this->OnComplete(HttpStatus::INTERNAL_SERVER_ERROR);
             return;
         }
         this->ReceiveLine();
     }
 
-    void HttpRequestClient::OnTimeout()
+    void HttpRequestClient::OnTimeout(Asio::Code code)
     {
-        this->mSocket->Close();
-        long long taskId = this->mRequest->GetTaskId();
-#ifdef ONLY_MAIN_THREAD
-        this->mHttpComponent->OnTimeout(taskId);
-#else
-        Asio::Context &io = App::Inst()->GetThread();
-        io.post(std::bind(&HttpComponent::OnTimeout, this->mHttpComponent, taskId));
-#endif
+        if(code == asio::error::timed_out)
+        {
+            this->OnComplete(HttpStatus::REQUEST_TIMEOUT);
+        }
     }
 
-    void HttpRequestClient::OnComplete(const asio::error_code & code)
+    void HttpRequestClient::OnComplete(HttpStatus status)
     {
-        if (code)
+        if(status != HttpStatus::OK)
         {
-            if(code == asio::error::operation_aborted)
-            {
-                return;
-            }
-            CONSOLE_LOG_ERROR(code.message());
-            this->mResponse->SetError(code);
+            this->mResponse->SetCode(status);
         }
-
         this->mSocket->Close();
         if (this->mTimer != nullptr)
         {
             asio::error_code err;
-            this->mTimer->cancel(err);
+            this->mTimer->cancel_one(err);
         }
-        long long taskId = this->mRequest->GetTaskId();
 #ifdef ONLY_MAIN_THREAD
         this->mHttpComponent->OnResponse(taskId, std::move(this->mResponse));
 #else
         Asio::Context &io = App::Inst()->GetThread();
         io.post(std::bind(&HttpComponent::OnResponse,
-                          this->mHttpComponent, taskId, std::move(this->mResponse)));
+                          this->mHttpComponent, this->mTaskId, std::move(this->mResponse)));
 #endif
-        std::move(this->mRequest);
-        std::move(this->mResponse);
     }
 
-    void HttpRequestClient::OnReceiveLine(const asio::error_code &code, std::istream & is, size_t)
+    void HttpRequestClient::OnReceiveLine(const Asio::Code &code, std::istream &is, size_t size)
     {
-        if(code)
+        if(this->mTimer != nullptr)
         {
-#ifdef __NET_ERROR_LOG__
-            CONSOLE_LOG_ERROR(code.message());
-#endif
-            this->OnComplete(code);
+            Asio::Code err;
+            this->mTimer->cancel(err);
+            std::move(this->mTimer);
+        }
+        if(code && code != asio::error::eof)
+        {
+            this->OnComplete(HttpStatus::INTERNAL_SERVER_ERROR);
             return;
         }
-        switch(this->mResponse->OnReceiveLine(is))
+        else
         {
-            case -1: //读一行
-                this->ReceiveLine();
-                break;
-            case 1: //继续读
-                this->ReceiveSomeMessage();
-                break;
-            case 0: //完成
-                asio::error_code err;
-                this->OnComplete(err);
-                break;
+            this->mResponse->OnRead(is);
+            this->ReceiveSomeMessage();
         }
     }
 
-    void HttpRequestClient::OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t)
+    void HttpRequestClient::OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t size)
     {
-        if(code == asio::error::eof)
+        if(code && code != asio::error::eof)
         {
-            asio::error_code err;
-            this->OnComplete(err);
-            return;
+            this->OnComplete(HttpStatus::INTERNAL_SERVER_ERROR);
         }
-        switch(this->mResponse->OnReceiveSome(is))
+        else
         {
-            case 1: //继续读
+            if (code == asio::error::eof || size == 0)
+            {
+                this->OnComplete(HttpStatus::OK);
+                return;
+            }
+            this->mResponse->OnRead(is);
+            {
                 this->ReceiveSomeMessage();
-                break;
-            case 0: //完成
-                asio::error_code err;
-                this->OnComplete(err);
-                break;
+            }
         }
     }
 
@@ -158,8 +128,8 @@ namespace Sentry
     {
         assert(this->mSendBuffer.size() == 0);
         assert(this->mRecvBuffer.size() == 0);
-        const std::string & host = this->mRequest->GetHost();
-        const std::string & port = this->mRequest->GetPort();
+        const std::string & host = this->mRequest->Host();
+        const std::string & port = this->mRequest->Port();
         Asio::Context & context = this->mSocket->GetThread();
 
         if(this->mTimeout > 0)
@@ -167,7 +137,7 @@ namespace Sentry
             Asio::Code code{asio::error::timed_out};
             std::chrono::seconds timeout{this->mTimeout};
             this->mTimer = std::make_shared<asio::steady_timer>(context, timeout);
-            this->mTimer->async_wait(std::bind(&HttpRequestClient::OnTimeout, this));
+            this->mTimer->async_wait(std::bind(&HttpRequestClient::OnTimeout, this, args1));
         }
         std::shared_ptr<Asio::Resolver> resolver(new Asio::Resolver (context));
         std::shared_ptr<Asio::ResolverQuery> query(new Asio::ResolverQuery(host, port));

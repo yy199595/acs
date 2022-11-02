@@ -71,7 +71,7 @@ namespace Sentry
 
 	XCode LuaServiceMethod::Invoke(Rpc::Packet & message)
     {
-        if (this->mConfig->IsAsync && !Lua::Function::Get(this->mLuaEnv, "RpcCall"))
+        if (this->mConfig->IsAsync && !Lua::Function::Get(this->mLuaEnv, "coroutine", "rpc"))
         {
             return XCode::CallLuaFunctionFail;
         }

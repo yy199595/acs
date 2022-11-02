@@ -13,7 +13,7 @@ namespace Http
     JsonContent::JsonContent(const char *json, size_t len)
         : mJson(json, len) { }
 
-    int JsonContent::OnRead(std::istream &buffer)
+    bool JsonContent::OnRead(std::istream &buffer)
     {
         char buff[128] = { 0};
         size_t size = buffer.readsome(buff, sizeof(buff));
@@ -21,7 +21,7 @@ namespace Http
         {
             this->mJson.append(buff, size);
         }
-        return -1;
+        return true;
     }
 
     int JsonContent::OnWrite(std::ostream &buffer)

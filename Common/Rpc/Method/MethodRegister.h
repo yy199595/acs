@@ -114,7 +114,7 @@ namespace Sentry
 		HttpServiceRegister(Component * o) : mComponent(o) { }
 	 public:
 		template<typename T>
-		bool Bind(const std::string& name, HttpJsonMethod<T> func)
+		bool Bind(const std::string& name, HttpMethod<T> func)
 		{
 			auto iter = this->mHttpMethodMap.find(name);
 			if (iter != this->mHttpMethodMap.end())
@@ -126,6 +126,50 @@ namespace Sentry
                     std::make_shared<CppHttpServiceMethod<T>>(name, component, std::move(func));
 			return this->AddMethod(httpServiceMethod);
 		}
+
+        template<typename T>
+        bool Bind(const std::string& name, HttpJsonMethod1<T> func)
+        {
+            auto iter = this->mHttpMethodMap.find(name);
+            if (iter != this->mHttpMethodMap.end())
+            {
+                return false;
+            }
+            T * component = this->mComponent->Cast<T>();
+            std::shared_ptr<HttpServiceMethod> httpServiceMethod =
+                std::make_shared<JsonHttpServiceMethod1<T>>(name, component, std::move(func));
+            return this->AddMethod(httpServiceMethod);
+        }
+
+
+        template<typename T>
+        bool Bind(const std::string& name, HttpJsonMethod2<T> func)
+        {
+            auto iter = this->mHttpMethodMap.find(name);
+            if (iter != this->mHttpMethodMap.end())
+            {
+                return false;
+            }
+            T * component = this->mComponent->Cast<T>();
+            std::shared_ptr<HttpServiceMethod> httpServiceMethod =
+                std::make_shared<JsonHttpServiceMethod2<T>>(name, component, std::move(func));
+            return this->AddMethod(httpServiceMethod);
+        }
+
+        template<typename T>
+        bool Bind(const std::string& name, HttpJsonMethod3<T> func)
+        {
+            auto iter = this->mHttpMethodMap.find(name);
+            if (iter != this->mHttpMethodMap.end())
+            {
+                return false;
+            }
+            T * component = this->mComponent->Cast<T>();
+            std::shared_ptr<HttpServiceMethod> httpServiceMethod =
+                std::make_shared<JsonHttpServiceMethod3<T>>(name, component, std::move(func));
+            return this->AddMethod(httpServiceMethod);
+        }
+
 
     public:
         bool AddMethod(std::shared_ptr<HttpServiceMethod> method);

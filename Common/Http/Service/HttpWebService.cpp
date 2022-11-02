@@ -16,27 +16,28 @@ namespace Sentry
         return true;
     }
 
-    XCode HttpWebService::Ping(const HttpHandlerRequest &request, HttpHandlerResponse &response)
+    XCode HttpWebService::Ping(const Http::Request &request, Http::Response &response)
     {
         response.Str(HttpStatus::OK,"pong");
         return XCode::Successful;
     }
 
-	XCode HttpWebService::Sleep(const HttpHandlerRequest& request, HttpHandlerResponse& response)
-	{
-		int time = Helper::Math::Random<int>(500, 3000);
-		this->mApp->GetTaskComponent()->Sleep(time);
-		response.Str(HttpStatus::OK,fmt::format("sleep {0}ms", time));
-		return XCode::Successful;
-	}
+	XCode HttpWebService::Sleep(const Json::Reader &request, Json::Document &response)
+    {
+        std::string time;
+        request.GetMember("time", time);
+        this->mApp->GetTaskComponent()->Sleep(std::stoi(time));
+        response.Add("time", std::stoi(time));
+        return XCode::Successful;
+    }
 
-    XCode HttpWebService::Hello(const HttpHandlerRequest &request, HttpHandlerResponse &response)
+    XCode HttpWebService::Hello(const Http::Request &request, Http::Response &response)
     {
 		response.Str(HttpStatus::OK,"hello");
 		return XCode::Successful;
     }
 
-    XCode HttpWebService::DownLoad(const HttpHandlerRequest &request, HttpHandlerResponse &response)
+    XCode HttpWebService::DownLoad(const Http::Request &request, Http::Response &response)
     {
         return XCode::Successful;
     }

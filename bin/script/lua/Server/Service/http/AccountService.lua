@@ -7,8 +7,7 @@ function AccountService.OnServiceStart()
     print("启动账号服务")
 end
 
-function AccountService.Register(request)
-    local requestInfo = Json.Decode(request.data)
+function AccountService.Register(requestInfo)
     assert(requestInfo.account, "register account is nil")
     assert(requestInfo.password, "register password is nil")
     assert(requestInfo.phone_num, "register phone number is nil")
@@ -34,18 +33,17 @@ end
 
 function AccountService.Login(request)
 
-    local loginInfo = Json.Decode(request.data)
-    assert(loginInfo, "request data error")
-    assert(type(loginInfo.account) == "string", "user account is not string")
-    assert(type(loginInfo.password) == "string", "user password is not string")
+    table.print(request)
+    assert(type(request.account) == "string", "user account is not string")
+    assert(type(request.password) == "string", "user password is not string")
 
-    local userInfo = DataMgrComponent.Get("user.account",loginInfo.account)
+    local userInfo = DataMgrComponent.Get("user.account",request.account)
 
-    if userInfo == nil or loginInfo.password ~= userInfo.password then
+    if userInfo == nil or request.password ~= userInfo.password then
         return XCode.Failure
     end
     local address = outerService:AllotLocation()
-    local code, response = outerService:Call(address, "AllotUser", {
+    local code, response = outerService:Call(address, "Allot", {
         value = userInfo.user_id
     })
     if code ~= XCode.Successful then
@@ -53,7 +51,7 @@ function AccountService.Login(request)
     end
     table.print(response)
     local ip, _ = StringUtil.ParseAddress(request.address)
-    MongoComponent.Update("user.account", { _id = loginInfo.account },
+    MongoComponent.Update("user.account", { _id = request.account },
                 {  last_login_time = os.time(), last_login_ip = ip,  token = response.token })
     return XCode.Successful, response
 end

@@ -9,26 +9,33 @@ namespace Http
     Response::Response()
     {
         this->mVersion = HttpVersion;
-        this->mParseState = State::None;
+        this->mParseState = DecodeState::None;
     }
-    int Response::OnRead(std::istream &buffer)
+
+    int Response::Serailize(std::ostream &buffer)
     {
-        if(this->mParseState == State::None)
+        return this->OnWrite(buffer);
+    }
+
+    bool Response::OnRead(std::istream &buffer)
+    {
+        if(this->mParseState == DecodeState::None)
         {
             buffer >> this->mVersion;
             buffer >> this->mCode;
             buffer >> this->mError;
-            this->mParseState = State::Head;
+            buffer.ignore(2); //放弃\r\n
+            this->mParseState = DecodeState::Head;
         }
-        if(this->mParseState == State::Head)
+        if(this->mParseState == DecodeState::Head)
         {
-            if(this->mHead.OnRead(buffer) != 0)
+            if(!this->mHead.OnRead(buffer))
             {
-                return -1;
+                return false;
             }
-            this->mParseState = State::Body;
+            this->mParseState = DecodeState::Body;
         }
-        if(this->mParseState == State::Body)
+        if(this->mParseState == DecodeState::Body)
         {
             char buff[128] = {0};
             size_t size = buffer.readsome(buff, sizeof(buff));
@@ -37,9 +44,8 @@ namespace Http
                 this->mContent.append(buff, size);
                 size = buffer.readsome(buff, sizeof(buff));
             }
-            return -1;
         }
-        return -1;
+        return false;
     }
 
     int Response::OnWrite(std::ostream &buffer)
@@ -51,6 +57,19 @@ namespace Http
         buffer << "\r\n";
         buffer.write(this->mContent.c_str(), this->mContent.size());
         return 0;
+    }
+
+    void Response::Str(HttpStatus code, const std::string &str)
+    {
+        this->mCode = (int)code;
+        this->mContent.append(str.c_str(), str.size());
+    }
+
+    void Response::Json(HttpStatus code, Json::Document &doc)
+    {
+        this->mCode = (int)code;
+        doc.Serialize(&this->mContent);
+        this->mHead.Add("content-type", "application/json");
     }
 
     void Response::Json(HttpStatus code, const std::string &json)

@@ -4,9 +4,10 @@
 
 #ifndef GAMEKEEPER_HTTPREQUESTCLIENT_H
 #define GAMEKEEPER_HTTPREQUESTCLIENT_H
-#include"Source/TaskSource.h"
-#include"HttpAsyncRequest.h"
+#include"Http.h"
 #include"Tcp/TcpContext.h"
+#include"Http/HttpRequest.h"
+#include"Http/HttpResponse.h"
 namespace Sentry
 {
 	class HttpComponent;
@@ -15,22 +16,22 @@ namespace Sentry
 	 public:
 		HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy, HttpComponent * component);
 	 public:
-		void Request(std::shared_ptr<HttpAsyncRequest> request, int time = 15);
-		void Request(std::shared_ptr<HttpAsyncRequest> request, std::fstream * fs, int time = 15);
+		long long Do(std::shared_ptr<Http::Request> request, int timeout = 15);
 	 private:
-        void OnTimeout();
         void ConnectHost();
-        void OnComplete(const asio::error_code & code);
+        void OnTimeout(Asio::Code code);
+        void OnComplete(HttpStatus code);
         void OnConnect(const asio::error_code &error, int count) final;
-        void OnReceiveLine(const asio::error_code &code, std::istream & is, size_t) final;
+        void OnReceiveLine(const Asio::Code &code, std::istream &is, size_t size) final;
         void OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
 	 private:
         int mTimeout;
+        long long mTaskId;
 		HttpComponent * mHttpComponent;
+        std::shared_ptr<Http::Request> mRequest;
+		std::shared_ptr<Http::Response> mResponse;
         std::shared_ptr<asio::steady_timer> mTimer;
-        std::shared_ptr<HttpAsyncRequest> mRequest;
-		std::shared_ptr<HttpAsyncResponse> mResponse;
-	};
+    };
 }
 #endif //GAMEKEEPER_HTTPREQUESTCLIENT_H

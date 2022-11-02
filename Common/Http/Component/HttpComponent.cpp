@@ -2,12 +2,11 @@
 // Created by 64658 on 2021/8/5.
 //
 #include"HttpComponent.h"
-#include"Method/HttpServiceMethod.h"
 #include"Config/MethodConfig.h"
-#include"File/DirectoryHelper.h"
 #include"Component/LoggerComponent.h"
 #include"Component/NetThreadComponent.h"
 #include"Client/HttpRequestClient.h"
+#include"Task/HttpTask.h"
 #include"Lua/LuaHttp.h"
 namespace Sentry
 {
@@ -32,24 +31,24 @@ namespace Sentry
 		return std::make_shared<HttpRequestClient>(socketProxy, this);
 	}
 
-	std::shared_ptr<HttpAsyncResponse> HttpComponent::Get(const std::string& url, float second)
+	std::shared_ptr<Http::Response> HttpComponent::Get(const std::string& url, float second)
     {
-        std::shared_ptr<HttpGetRequest> httpGetRequest = HttpGetRequest::Create(url);
-        if (httpGetRequest == nullptr)
+        std::shared_ptr<Http::GetRequest> httpGetRequest(new Http::GetRequest());
+        if (!httpGetRequest->SetUrl(url))
         {
-            LOG_FATAL("parse [" << url << "] error");
+            LOG_ERROR("parse " << url << " error");
             return nullptr;
         }
-        std::shared_ptr<HttpTask> httpRpcTask = httpGetRequest->MakeTask(second);
+
+        std::shared_ptr<HttpRequestTask> httpRpcTask(new HttpRequestTask());
         std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
 
-        long long taskId = httpRpcTask->GetRpcId();
-        httpAsyncClient->Request(httpGetRequest);
-        std::shared_ptr<HttpAsyncResponse> response = this->AddTask(taskId, httpRpcTask)->Await();
-        if (response->GetData().GetStatus() != HttpStatus::OK)
+        long long taskId = httpAsyncClient->Do(httpGetRequest);
+        std::shared_ptr<Http::Response> response = this->AddTask(taskId, httpRpcTask)->Await();
+        if (response->Code() != HttpStatus::OK)
         {
             LOG_ERROR("[GET] " << url << " error = "
-                               << HttpStatusToString(response->GetData().GetStatus()));
+                               << HttpStatusToString(response->Code()));
         }
         if (this->mClientPools.size() < 100)
         {
@@ -61,63 +60,33 @@ namespace Sentry
 	void HttpComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
 	{
 		luaRegister.BeginRegister<HttpComponent>();
-		luaRegister.PushExtensionFunction("Get", Lua::Http::Get);
-		luaRegister.PushExtensionFunction("Post", Lua::Http::Post);
-		luaRegister.PushExtensionFunction("Download", Lua::Http::Download);
+		luaRegister.PushExtensionFunction("Get", Lua::HttpClient::Get);
+		luaRegister.PushExtensionFunction("Post", Lua::HttpClient::Post);
+		luaRegister.PushExtensionFunction("Download", Lua::HttpClient::Download);
 	}
 
 	XCode HttpComponent::Download(const string& url, const string& path)
     {
-        if (!Helper::Directory::MakeDir(path))
-        {
-            return XCode::Failure;
-        }
-
-        std::fstream *fs = new std::fstream();
-        fs->open(path, std::ios::binary | std::ios::in | std::ios::out);
-        if (!fs->is_open())
-        {
-            delete fs;
-            return XCode::Failure;
-        }
-        std::shared_ptr<HttpGetRequest> httpRequest = HttpGetRequest::Create(url);
-        if (httpRequest == nullptr)
-        {
-            return XCode::HttpUrlParseError;
-        }
-        std::shared_ptr<HttpTask> httpTask = httpRequest->MakeTask(0);
-        std::shared_ptr<HttpRequestClient> requestClient = this->CreateClient();
-
-        long long taskId = httpTask->GetRpcId();
-        requestClient->Request(httpRequest, fs);
-        std::shared_ptr<HttpAsyncResponse> response = this->AddTask(taskId, httpTask)->Await();
-        if (this->mClientPools.size() < 100)
-        {
-            this->mClientPools.push(requestClient);
-        }
-
-        return response->GetCode() ? XCode::Failure : XCode::Successful;
+        return XCode::Successful;
     }
 
-	std::shared_ptr<HttpAsyncResponse> HttpComponent::Post(const std::string& url, const std::string& data, float second)
+	std::shared_ptr<Http::Response> HttpComponent::Post(const std::string& url, const std::string& data, float second)
     {
-        std::shared_ptr<HttpPostRequest> postRequest = HttpPostRequest::Create(url);
-        if (postRequest == nullptr)
+        std::shared_ptr<Http::PostRequest> postRequest(new Http::PostRequest());
+        if (postRequest->SetUrl(url))
         {
             return nullptr;
         }
-        postRequest->AddBody(data);
-        std::shared_ptr<HttpTask> httpTask = postRequest->MakeTask(second);
+        postRequest->Json(data);
+        std::shared_ptr<HttpRequestTask> httpTask(new HttpRequestTask());
         std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
 
-        long long taskId = httpTask->GetRpcId();
-        httpAsyncClient->Request(postRequest);
-        std::shared_ptr<HttpAsyncResponse> response = this->AddTask(taskId, httpTask)->Await();
-
-        if (response->GetData().GetStatus() != HttpStatus::OK)
+        long long taskId = httpAsyncClient->Do(postRequest);
+        std::shared_ptr<Http::Response> response = this->AddTask(taskId, httpTask)->Await();
+        if (response->Code() != HttpStatus::OK)
         {
             LOG_ERROR("[POST] " << url << " error = "
-                               << HttpStatusToString(response->GetData().GetStatus()));
+                               << HttpStatusToString(response->Code()));
         }
         if (this->mClientPools.size() < 100)
         {

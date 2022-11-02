@@ -50,8 +50,7 @@ namespace Sentry
 	void TaskComponent::Sleep(long long ms)
 	{
         TimerComponent * timerComponent = this->mApp->GetTimerComponent();
-
-        if(timerComponent != nullptr)
+        if(timerComponent != nullptr && ms > 0)
         {
             unsigned int id = this->mRunContext->mCoroutineId;
             StaticMethod *sleepMethod = NewMethodProxy(

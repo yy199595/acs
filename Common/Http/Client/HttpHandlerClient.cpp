@@ -11,15 +11,15 @@ namespace Sentry
 		: Tcp::TcpContext(socketProxy)
 	{
 		this->mHttpComponent = httpComponent;
-	}
+        this->mDecodeState = Http::DecodeState::None;
+    }
 
 	void HttpHandlerClient::StartReceive()
 	{
         assert(this->mRecvBuffer.size() == 0);
         assert(this->mSendBuffer.size() == 0);
-        const std::string & address = this->mSocket->GetAddress();
-        this->mHttpResponse = std::make_shared<HttpHandlerResponse>();
-        this->mHttpRequest = std::make_shared<HttpHandlerRequest>(address);
+        this->mDecodeState = Http::DecodeState::None;
+        this->mHttpResponse = std::make_shared<Http::Response>();
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLine();
 #else
@@ -38,60 +38,56 @@ namespace Sentry
 #endif
     }
 
-	void HttpHandlerClient::OnComplete()
+    void HttpHandlerClient::OnReceiveLine(const Asio::Code &code, std::istream &is, size_t size)
     {
-        std::shared_ptr<HttpHandlerClient> httpHandlerClient =
+        if(code && code != asio::error::eof)
+        {
+            this->ClosetClient();
+        }
+        else
+        {
+            is >> this->mMethod;
+            this->mHttpRequest = Http::New(this->mMethod);
+            if (this->mHttpRequest == nullptr)
+            {
+                this->mHttpResponse->Str(HttpStatus::METHOD_NOT_ALLOWED, "unknow method");
+                this->Send(std::move(this->mHttpResponse));
+                return;
+            }
+            this->ReceiveSomeMessage();
+        }
+    }
+
+    void HttpHandlerClient::OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t size)
+    {
+        if(code && code != asio::error::eof)
+        {
+            this->ClosetClient();
+        }
+        else if(code == asio::error::eof)
+        {
+END_RECEIVE:
+            std::shared_ptr<HttpHandlerClient> httpHandlerClient =
                 std::dynamic_pointer_cast<HttpHandlerClient>(this->shared_from_this());
 #ifdef ONLY_MAIN_THREAD
-        this->mHttpComponent->OnRequest(httpHandlerClient);
+            this->mHttpComponent->OnRequest(httpHandlerClient);
 #else
-        Asio::Context &mainThread = App::Inst()->GetThread();
-        mainThread.post(std::bind(&HttpListenComponent::OnRequest, this->mHttpComponent, httpHandlerClient));
+            Asio::Context &mainThread = App::Inst()->GetThread();
+            mainThread.post(std::bind(&HttpListenComponent::OnRequest, this->mHttpComponent, httpHandlerClient));
 #endif
-    }
-
-    void HttpHandlerClient::OnReceiveLine(const Asio::Code &code, std::istream &is, size_t)
-    {
-        if(code == asio::error::eof)
-        {
-            this->OnComplete();
-            return;
         }
-        switch(this->mHttpRequest->OnReceiveLine(is))
+        else
         {
-            case 0:
-                this->OnComplete();
-                break;
-            case -1:
-                this->ReceiveLine();
-                break;
-            case 1:
+            if(!this->mHttpRequest->OnRead(is))
+            {
                 this->ReceiveSomeMessage();
-                break;
-            default:
-                this->ClosetClient();
-                break;
-        }
-    }
-
-    void HttpHandlerClient::OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t)
-    {
-        if(code == asio::error::eof)
-        {
-            this->OnComplete();
-            return;
-        }
-        switch(this->mHttpRequest->OnReceiveSome(is))
-        {
-            case 0:
-                this->OnComplete();
-                break;
-            case 1:
-                this->ReceiveSomeMessage();
-                break;
-            default:
-                this->ClosetClient();
-                break;
+                return;
+            }
+            else
+            {
+                this->ClearRecvStream();
+                goto END_RECEIVE;
+            }
         }
     }
 

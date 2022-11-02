@@ -22,9 +22,10 @@ namespace Lua
 
 	int Json::Encode(lua_State* lua)
 	{
-		try{
-			Encoder encode(lua, 2);
-			StringBuffer s;
+		try
+        {
+            StringBuffer s;
+            Encoder encode(lua, 2);
 			encode.encode(lua, &s, 1);
 			lua_pushlstring(lua, s.GetString(), s.GetSize());
 			return 1;

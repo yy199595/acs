@@ -25,23 +25,22 @@ namespace Sentry
     void HttpWebComponent::OnRequest(std::shared_ptr<HttpHandlerClient> httpClient)
     {
         assert(this->mApp->IsMainThread());
-        std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
-		std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
+        std::shared_ptr<Http::Request> request = httpClient->Request();
+		std::shared_ptr<Http::Response> response = httpClient->Response();
 		Defer defer(std::bind(&HttpHandlerClient::StartWriter, httpClient));
 
-		const HttpData & httpData = request->GetData();
-        const HttpMethodConfig *httpConfig = HttpConfig::Inst()->GetMethodConfig(httpData.mPath);
+        const HttpMethodConfig *httpConfig = HttpConfig::Inst()->GetMethodConfig(request->Path());
         if (httpConfig == nullptr)
         {
 			response->Str(HttpStatus::NOT_FOUND, "not find route");
-            CONSOLE_LOG_ERROR("[" << request->GetUrl() << "] " << HttpStatusToString(HttpStatus::NOT_FOUND));
+            CONSOLE_LOG_ERROR("[" << request->Url() << "] " << HttpStatusToString(HttpStatus::NOT_FOUND));
             return;
         }
 
-        if (!httpConfig->Type.empty() && httpConfig->Type != httpData.mMethod)
+        if (!httpConfig->Type.empty() && httpConfig->Type != request->Method())
         {
 			response->Str(HttpStatus::METHOD_NOT_ALLOWED, "method error");
-            CONSOLE_LOG_ERROR("[" << request->GetUrl() << "] " << HttpStatusToString(HttpStatus::METHOD_NOT_ALLOWED));
+            CONSOLE_LOG_ERROR("[" << request->Url() << "] " << HttpStatusToString(HttpStatus::METHOD_NOT_ALLOWED));
             return;
         }
 
@@ -49,15 +48,14 @@ namespace Sentry
         if (httpService == nullptr || !httpService->IsStartService())
         {
 			response->Str(HttpStatus::NOT_FOUND, "not find service");
-			CONSOLE_LOG_ERROR("[" << httpData.mPath << "] " << HttpStatusToString(HttpStatus::NOT_FOUND));
+			CONSOLE_LOG_ERROR("[" << request->Path() << "] " << HttpStatusToString(HttpStatus::NOT_FOUND));
             return;
         }
         if (!httpConfig->IsAsync)
         {
-            std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
             XCode code = httpService->Invoke(httpConfig->Method, request, response);
             {
-                response->AddHead("code", (int) code);
+                response->Header().Add("code", (int) code);
             }
         }
         else
@@ -65,11 +63,11 @@ namespace Sentry
 			defer.Cancle();
             this->mTaskComponent->Start([httpService, httpClient, httpConfig]() {
 
-                std::shared_ptr<HttpHandlerRequest> request = httpClient->Request();
-                std::shared_ptr<HttpHandlerResponse> response = httpClient->Response();
+                std::shared_ptr<Http::Request> request = httpClient->Request();
+                std::shared_ptr<Http::Response> response = httpClient->Response();
                 XCode code = httpService->Invoke(httpConfig->Method, request, response);
                 {
-                    response->AddHead("code", (int) code);
+                    response->Header().Add("code", (int) code);
                     httpClient->StartWriter();
                 }
             });

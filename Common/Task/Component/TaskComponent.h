@@ -66,6 +66,6 @@ namespace Sentry
 		TaskContext* mRunContext;
 		Stack mSharedStack[SHARED_STACK_NUM];
 		std::queue<unsigned int> mLastQueues;
-		std::queue<unsigned int> mResumeContexts;
+        std::queue<unsigned int> mResumeContexts;
 	};
 }

@@ -12,8 +12,8 @@ namespace Http
     Request::Request(const char *method)
         : mMethod(method)
     {
-        this->mState = State::None;
         this->mVersion = HttpVersion;
+        this->mState = DecodeState::None;
     }
 
     bool Request::SetUrl(const std::string &url)
@@ -35,21 +35,22 @@ namespace Http
         }
         return false;
     }
-    int Request::OnRead(std::istream &buffer)
+    bool Request::OnRead(std::istream &buffer)
     {
-        if(this->mState == State::None)
+        if(this->mState == DecodeState::None)
         {
             buffer >> this->mUrl;
             buffer >> this->mVersion;
-            this->mState = State::Head;
+            buffer.ignore(2); //忽略\r\n
+            this->mState = DecodeState::Head;
         }
-        if(this->mState == State::Head)
+        if(this->mState == DecodeState::Head)
         {
-            if(this->mHead.OnRead(buffer) != 0)
+            if(!this->mHead.OnRead(buffer))
             {
-                return -1;
+                return false;
             }
-            this->mState = State::Body;
+            this->mState = DecodeState::Body;
         }
         return this->OnReadContent(buffer);
     }
@@ -71,32 +72,50 @@ namespace Http
 
 namespace Http
 {
-    int GetRequest::OnReadContent(std::istream &buffer)
+    bool GetRequest::OnReadContent(std::istream &buffer)
     {
         size_t pos = this->mUrl.find("?");
         if (pos != std::string::npos)
         {
             std::vector<std::string> result;
-            std::vector<std::string> content;
             this->mPath = this->mUrl.substr(0, pos);
             std::string parameter = this->mUrl.substr(pos + 1);
             if(Helper::String::Split(parameter, "&", result) > 0)
             {
                 for (const std::string &filed: result)
                 {
-                    content.clear();
-                    if(Helper::String::Split(filed, "=", content) == 2)
+                    size_t pos1 = filed.find('=');
+                    if(pos1 != std::string::npos)
                     {
-                        const std::string & key = content[0];
-                        const std::string & val = content[1];
+                        std::string key = filed.substr(0, pos1);
+                        std::string val = filed.substr(pos1 + 1);
                         this->mParameters.emplace(key, val);
                     }
                 }
             }
-            return 0;
         }
-        this->mPath = this->mUrl;
-        return 0;
+        else
+        {
+            this->mPath = this->mUrl;
+        }
+        return true;
+    }
+
+    bool GetRequest::WriteDocument(rapidjson::Document *document) const
+    {
+        if(document == nullptr)
+        {
+            return false;
+        }
+        document->SetObject();
+        auto iter = this->mParameters.begin();
+        for(; iter != this->mParameters.end(); iter++)
+        {
+            const char * key = iter->first.c_str();
+            const char * value = iter->second.c_str();
+            document->AddMember(rapidjson::StringRef(key), rapidjson::StringRef(value), document->GetAllocator());
+        }
+        return true;
     }
 
     bool GetRequest::GetParameter(const std::string & key, std::string & value)
@@ -118,21 +137,65 @@ namespace Http
 
 namespace Http
 {
-    int PostRequest::OnReadContent(std::istream &buffer)
+    bool PostRequest::OnReadContent(std::istream &buffer)
     {
         char buff[128] = {0};
+        this->mPath = this->mUrl;
         size_t size = buffer.readsome(buff, sizeof(buff));
         while(size > 0)
         {
             this->mContent.append(buff, size);
             size = buffer.readsome(buff, sizeof(buff));
         }
-        return -1;
+        return false;
+    }
+
+    bool PostRequest::WriteDocument(rapidjson::Document *document) const
+    {
+        if(document == nullptr)
+        {
+            return false;
+        }
+        const char * str = this->mContent.c_str();
+        const size_t length = this->mContent.size();
+        return !document->Parse(str, length).HasParseError();
+    }
+
+    void PostRequest::Str(const std::string &str)
+    {
+        this->mContent = str;
+    }
+
+    void PostRequest::Json(const std::string &json)
+    {
+        this->Json(json.c_str(),json.size());
+    }
+
+    void PostRequest::Json(const char *str, size_t size)
+    {
+        this->mContent.append(str, size);
+        this->mHead.Add("content-type", "applocation/json");
     }
 
     int PostRequest::OnWriteContent(std::ostream &buffer)
     {
         buffer.write(this->mContent.c_str(), this->mContent.size());
         return 0;
+    }
+}
+
+namespace Http
+{
+    std::shared_ptr<Request> Http::New(const std::string &method)
+    {
+        if(method == "GET")
+        {
+            return std::make_shared<GetRequest>();
+        }
+        if(method == "POST")
+        {
+            return std::make_shared<PostRequest>();
+        }
+        return nullptr;
     }
 }

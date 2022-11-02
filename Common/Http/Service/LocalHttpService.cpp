@@ -2,15 +2,13 @@
 // Created by yjz on 2022/1/23.
 //
 #include"LocalHttpService.h"
-#include"App/App.h"
-#include"Client/HttpAsyncRequest.h"
 #include"Component/LuaScriptComponent.h"
 #include"Method/LuaHttpServiceMethod.h"
 namespace Sentry
 {
 
 	XCode LocalHttpService::Invoke(const std::string& name,
-		std::shared_ptr<HttpHandlerRequest> request, std::shared_ptr<HttpHandlerResponse> response)
+		std::shared_ptr<Http::Request> request, std::shared_ptr<Http::Response> response)
 	{
 		std::shared_ptr<HttpServiceMethod> method = this->mServiceRegister->GetMethod(name);
 		if(method == nullptr)

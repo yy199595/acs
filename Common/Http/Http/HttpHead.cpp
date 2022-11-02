@@ -1,7 +1,7 @@
 //
 // Created by yjz on 2022/10/27.
 //
-#include"Comman.h"
+#include"httpHead.h"
 namespace Http
 {
     bool Head::Add(const std::string &k, int v)
@@ -26,17 +26,6 @@ namespace Http
         return true;
     }
 
-    bool Head::Get(const std::string &k, int &v) const
-    {
-        auto iter = this->mHeads.find(k);
-        if(iter == this->mHeads.end())
-        {
-            return false;
-        }
-        v = std::stoi(iter->second);
-        return true;
-    }
-
     bool Head::Get(const std::string &k, std::string &v) const
     {
         auto iter = this->mHeads.find(k);
@@ -48,14 +37,14 @@ namespace Http
         return true;
     }
 
-    int Head::OnRead(std::istream &buffer)
+    bool Head::OnRead(std::istream &buffer)
     {
         std::string lineData;
         while(std::getline(buffer, lineData))
         {
             if(lineData == "\r")
             {
-                return 0;
+                return true;
             }
             size_t pos = lineData.find(":");
             if (pos != std::string::npos)
@@ -65,7 +54,7 @@ namespace Http
                 this->mHeads.emplace(key, lineData.substr(pos + 1, length));
             }
         }
-        return -1;
+        return false;
     }
 
     int Head::OnWrite(std::ostream &buffer)

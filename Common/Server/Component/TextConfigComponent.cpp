@@ -21,33 +21,48 @@ namespace Sentry
 {
     bool TextConfigComponent::Awake()
     {
-        if (!this->LoadTextConfig<ServerConfig>(System::GetConfigPath()))
+        std::string path = System::GetConfigPath();
+        if (!this->LoadTextConfig<ServerConfig>(path))
         {
             return false;
         }
-        std::string path;
+
         const ServerConfig *config = this->GetTextConfig<ServerConfig>();
-        LOG_CHECK_RET_FALSE(config->GetPath("rpc", path));
-        LOG_CHECK_RET_FALSE(this->LoadTextConfig<RpcConfig>(path));
-        LOG_CHECK_RET_FALSE(config->GetPath("http", path));
-        LOG_CHECK_RET_FALSE(this->LoadTextConfig<HttpConfig>(path));
-        LOG_CHECK_RET_FALSE(config->GetPath("cluster", path));
-        LOG_CHECK_RET_FALSE(this->LoadTextConfig<ClusterConfig>(path));
-        LOG_CHECK_RET_FALSE(config->GetPath("code", path));
-        LOG_CHECK_RET_FALSE(this->LoadTextConfig<CodeConfig>(path));
+        if(config->GetPath("rpc", path))
+        {
+            LOG_CHECK_RET_FALSE(this->LoadTextConfig<RpcConfig>(path));
+        }
+        if(config->GetPath("http", path))
+        {
+            LOG_CHECK_RET_FALSE(this->LoadTextConfig<HttpConfig>(path));
+        }
+        if(config->GetPath("cluster", path))
+        {
+            LOG_CHECK_RET_FALSE(this->LoadTextConfig<ClusterConfig>(path));
+        }
+        if(config->GetPath("code", path))
+        {
+            LOG_CHECK_RET_FALSE(this->LoadTextConfig<CodeConfig>(path));
+        }
 #ifdef __ENABLE_REDIS__
-        LOG_CHECK_RET_FALSE(config->GetPath("redis", path));
-        LOG_CHECK_RET_FALSE(this->LoadTextConfig<RedisConfig>(path));
+        if(config->GetPath("redis", path))
+        {
+            LOG_CHECK_RET_FALSE(this->LoadTextConfig<RedisConfig>(path));
+        }
 #endif
 
 #ifdef __ENABLE_MYSQL__
-        LOG_CHECK_RET_FALSE(config->GetPath("mysql", path));
-        LOG_CHECK_RET_FALSE(this->LoadTextConfig<MysqlConfig>(path));
+        if(config->GetPath("mysql", path))
+        {
+            LOG_CHECK_RET_FALSE(this->LoadTextConfig<MysqlConfig>(path));
+        }
 #endif
 
 #ifdef __ENABLE_MONGODB__
-        LOG_CHECK_RET_FALSE(config->GetPath("mongo", path));
-        LOG_CHECK_RET_FALSE(this->LoadTextConfig<MongoConfig>(path));
+        if(config->GetPath("mongo", path))
+        {
+            LOG_CHECK_RET_FALSE(this->LoadTextConfig<MongoConfig>(path));
+        }
 #endif
         return true;
     }

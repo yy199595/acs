@@ -12,10 +12,11 @@ local clientComponent = App.GetComponent("ClientComponent")
 
 function Client.Start()
 
-    LoginComponent.Awake()
-    LoginComponent.Register(account, password, phoneNum)
+    local loginComponent = require("Component.LoginComponent")
+    loginComponent.Awake()
+    loginComponent.Register(account, password, phoneNum)
 
-    local loginInfo = LoginComponent.Login(account, password)
+    local loginInfo = loginComponent.Login(account, password)
     if loginInfo == nil or loginInfo.code ~= XCode.Successful then
         Log.Error("使用http登陆失败")
         return false

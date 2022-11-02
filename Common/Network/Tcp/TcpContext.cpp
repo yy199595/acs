@@ -93,7 +93,6 @@ namespace Tcp
         Asio::Code code;
 		this->mLastOperTime = Helper::Time::GetNowSecTime();
 		Asio::Socket & tcpSocket = this->mSocket->GetSocket();
-
         if(tcpSocket.available(code) <= 0)
         {
             code = asio::error::eof;
@@ -216,8 +215,10 @@ namespace Tcp
         if(this->mRecvBuffer.size() > 0)
 		{
 			std::iostream os(&this->mRecvBuffer);
+            size_t size = this->mRecvBuffer.size();
 			os.ignore(this->mRecvBuffer.size());
-		}
+            CONSOLE_LOG_INFO("ignore message count : " << size);
+        }
 	}
 
 	void TcpContext::ClearSendStream()
