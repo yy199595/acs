@@ -13,7 +13,7 @@ namespace Sentry
 		OuterService() = default;
 	 private:
 		XCode Ping(long long userId);
-        XCode AllotUser(const com::type::int64 & userId, s2s::allot::response & response);
+        XCode Allot(const com::type::int64 & userId, s2s::allot::response & response);
 	private:
 		bool Awake() final;
 		bool OnStart() final;

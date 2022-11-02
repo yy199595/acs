@@ -31,6 +31,7 @@ function LoginComponent.Login(account, passwd) -- 获取gate地址
         Log.Error(url, code)
         return nil
     end
+    print(response)
     return Json.Decode(response)
 end
 return LoginComponent
