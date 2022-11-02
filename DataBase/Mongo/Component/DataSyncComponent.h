@@ -22,7 +22,7 @@ namespace Sentry
     private:
 		bool LateAwake() final;
 	 private:
-		class RedisDataComponent * mRedisComponent;
+		class RedisComponent * mRedisComponent;
 	};
 }
 #endif

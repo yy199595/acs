@@ -21,7 +21,7 @@ namespace Sentry
     private:
         class ProtoComponent * mProtoComponent;
 #ifdef __ENABLE_REDIS__
-        class RedisDataComponent * mRedisComponent;
+        class RedisComponent * mRedisComponent;
 #endif
         class MongoHelperComponent * mMongoComponent;
     };

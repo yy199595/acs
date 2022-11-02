@@ -4,12 +4,12 @@
 #ifdef __ENABLE_REDIS__
 #include"DataSyncComponent.h"
 #include"String/StringHelper.h"
-#include"Component/RedisDataComponent.h"
+#include"Component/RedisComponent.h"
 namespace Sentry
 {
 	bool DataSyncComponent::LateAwake()
 	{
-		this->mRedisComponent = this->GetComponent<RedisDataComponent>();
+		this->mRedisComponent = this->GetComponent<RedisComponent>();
 		return this->mRedisComponent != nullptr;
 	}
 
@@ -33,7 +33,7 @@ namespace Sentry
             return;
         }
         std::shared_ptr<RedisResponse> response =
-            this->mRedisComponent->RunCommand(db, "HSET", tab, _id, json);
+            this->mRedisComponent->Run(db, "HSET", tab, _id, json);
         CONSOLE_LOG_INFO("sync data to redis tab = " << tab << " json = " << json);
         if (response != nullptr && response->HasError())
         {
@@ -61,7 +61,7 @@ namespace Sentry
             return;
         }
         std::shared_ptr<RedisResponse> response =
-                this->mRedisComponent->RunCommand(redisClient, "HDEL", tab, _id);
+            this->mRedisComponent->Run(redisClient, "HDEL", tab, _id);
         CONSOLE_LOG_INFO("remove data to redis tab = " << tab << " id = " << _id);
         if(response != nullptr && response->HasError())
         {

@@ -14,8 +14,7 @@ namespace Sentry
     public:
         std::unique_ptr<Component> New() final
         {
-            std::unique_ptr<Component> component(new T());
-            return std::move(component);
+            return std::make_unique<T>();
         }
     };
 }

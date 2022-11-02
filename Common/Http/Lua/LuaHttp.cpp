@@ -6,7 +6,6 @@
 #include"Json/Lua/Json.h"
 #include"File/DirectoryHelper.h"
 #include"Lua/UserDataParameter.h"
-#include"Lua/LuaWaitTaskSource.h"
 #include"Component/HttpComponent.h"
 #include"Client/HttpRequestClient.h"
 #include"Component/ProtoComponent.h"
@@ -38,7 +37,7 @@ namespace Lua
             return 0;
         }
 #ifdef __DEBUG__
-        LOG_DEBUG("[http get] url = " << std::string(str, size));
+        LOG_DEBUG("[http GET] url = " << std::string(str, size));
 #endif
         std::shared_ptr<LuaHttpRequestTask> luaHttpTask(new LuaHttpRequestTask(lua));
         std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
@@ -52,7 +51,6 @@ namespace Lua
         size_t size = 0;
         lua_pushthread(lua);
         const char *str = luaL_checklstring(lua, 2, &size);
-       // std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
         HttpComponent *httpComponent = UserDataParameter::Read<HttpComponent *>(lua, 1);
         std::shared_ptr<Http::PostRequest> postRequest(new Http::PostRequest());
         if (!postRequest->SetUrl(std::string(str, size)))
@@ -60,12 +58,12 @@ namespace Lua
             luaL_error(lua, "parse post url : [%s] failure", str);
             return 0;
         }
-        if(lua_isstring(lua, 3))
+        if (lua_isstring(lua, 3))
         {
             const char *data = luaL_checklstring(lua, 3, &size);
             postRequest->Json(data, size);
         }
-        else if(lua_istable(lua, 3))
+        else if (lua_istable(lua, 3))
         {
             std::string json;
             Lua::Json::Read(lua, 3, &json);
@@ -81,7 +79,7 @@ namespace Lua
         std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
 
 #ifdef __DEBUG__
-        //LOG_DEBUG("[http post] url = " << std::string(str, size) << " data = " << postRequest->GetBody());
+        LOG_DEBUG("[http POST] url = " << std::string(str, size) << " data = " << postRequest->Content());
 #endif
         long long id = requestClient->Do(postRequest);
         return httpComponent->AddTask(id, luaHttpTask)->Await(requestClient);

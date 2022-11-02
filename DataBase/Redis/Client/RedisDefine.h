@@ -116,7 +116,6 @@ namespace Sentry
         std::string mString;
         RedisRespType mType;
         std::vector<RedisAny *> mArray;
-        //std::vector<RedisAny *> mArray;
     };
 
     template<typename T>

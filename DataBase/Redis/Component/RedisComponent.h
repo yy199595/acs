@@ -1,32 +1,67 @@
-//
-// Created by mac on 2022/5/18.
-//
+﻿#pragma once
 
-#ifndef SERVER_REDISBASECOMPONENT_H
-#define SERVER_REDISBASECOMPONENT_H
-#include"Config/RedisConfig.h"
+#include"Guid/Guid.h"
+#include"Json/JsonWriter.h"
+#include"Timer/ElapsedTimer.h"
 #include"Client/TcpRedisClient.h"
 #include"Component/RpcTaskComponent.h"
 
 namespace Sentry
 {
-    class RedisComponent : public RpcTaskComponent<long long,RedisResponse>
+	class NetThreadComponent;
+
+    class RedisComponent final : public RpcTaskComponent<long long, RedisResponse>, public ILuaRegister, public IStart
 	{
-	public:
+	 public:
 		RedisComponent() = default;
-	 protected:
-        TcpRedisClient * MakeRedisClient(const RedisClientConfig & config);
     public:
         bool Ping(TcpRedisClient * redisClient);
-		virtual TcpRedisClient * GetClient(const std::string & name);
-        virtual void OnLoadScript(const std::string & name, const std::string & md5) { }
-        std::shared_ptr<RedisResponse> Run(const std::string & name, std::shared_ptr<RedisRequest> request);
-    protected:
+        TcpRedisClient * GetClient(const std::string & db);
+    public:
+        template<typename ... Args>
+        bool Send(const std::string & name, const std::string & cmd, Args&& ... args);
+        template<typename ... Args>
+        std::shared_ptr<RedisResponse> Run(const std::string & name, const std::string & cmd, Args&& ... args);
+        template<typename ... Args>
+        std::shared_ptr<RedisResponse> Run(TcpRedisClient * redisClientContext, const std::string & cmd, Args&& ... args);
+    public:
+        std::shared_ptr<RedisResponse> Run(const std::string & db, std::shared_ptr<RedisRequest> request);
         std::shared_ptr<RedisResponse> Run(TcpRedisClient * redisClientContext, std::shared_ptr<RedisRequest> request);
     private:
+        TcpRedisClient * MakeRedisClient(const RedisClientConfig & config);
+    private:
+        bool Awake() final;
+        bool Start() final;
+		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
+    private:
         std::unordered_map<std::string, std::vector<std::shared_ptr<TcpRedisClient>>> mRedisClients;
-	};
+    };
+
+    template<typename ... Args>
+    std::shared_ptr<RedisResponse> RedisComponent::Run(const std::string &name, const std::string & cmd, Args &&...args)
+    {
+        std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>(cmd);
+        RedisRequest::InitParameter(request, std::forward<Args>(args)...);
+        return this->Run(name, request);
+    }
+    template<typename ... Args>
+    std::shared_ptr<RedisResponse> RedisComponent::Run(TcpRedisClient * redisClientContext, const std::string &cmd, Args &&...args)
+    {
+        std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>(cmd);
+        RedisRequest::InitParameter(request, std::forward<Args>(args)...);
+        return this->Run(redisClientContext, request);
+    }
+    template<typename ... Args>
+    bool RedisComponent::Send(const std::string &name, const std::string &cmd, Args &&...args)
+    {
+        TcpRedisClient * redisClient = this->GetClient(name);
+        if(redisClient == nullptr)
+        {
+            return false;
+        }
+        std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>(cmd);
+        RedisRequest::InitParameter(request, std::forward<Args>(args)...);
+        redisClient->SendCommand(request);
+        return true;
+    }
 }
-
-
-#endif //SERVER_REDISBASECOMPONENT_H

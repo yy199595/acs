@@ -6,7 +6,8 @@
 #include"Json/Lua/Json.h"
 #include"Client/RedisDefine.h"
 #include"Component/ProtoComponent.h"
-#include"Component/RedisDataComponent.h"
+#include"Component/RedisScriptComponent.h"
+#include"Component/RedisComponent.h"
 
 using namespace Sentry;
 namespace Lua
@@ -16,7 +17,7 @@ namespace Lua
         lua_pushthread(lua);
         const char *name = lua_tostring(lua, 2);
         const char *command = lua_tostring(lua, 3);
-        RedisDataComponent *redisComponent = UserDataParameter::Read<RedisDataComponent *>(lua, 1);
+        RedisComponent *redisComponent = UserDataParameter::Read<RedisComponent *>(lua, 1);
         TcpRedisClient * redisClientContext = redisComponent->GetClient(name);
         if (redisClientContext == nullptr)
         {
@@ -62,14 +63,15 @@ namespace Lua
         const char *name = lua_tostring(lua, 2);
         const char *fullName = lua_tostring(lua, 3);
         Lua::Json::Read(lua, 4, &json);
-        RedisDataComponent *redisComponent = UserDataParameter::Read<RedisDataComponent *>(lua, 1);
+        RedisScriptComponent * redisScriptComponent = App::Inst()->GetComponent<RedisScriptComponent>();
+        RedisComponent *redisComponent = UserDataParameter::Read<RedisComponent *>(lua, 1);
         TcpRedisClient * redisClientContext = redisComponent->GetClient(name);
         if (redisClientContext == nullptr)
         {
             luaL_error(lua, "not find redis client %s\n", name);
             return 0;
         }
-        std::shared_ptr<RedisRequest> request = redisComponent->MakeLuaRequest(fullName, json);
+        std::shared_ptr<RedisRequest> request = redisScriptComponent->MakeLuaRequest(fullName, json);
 
         redisClientContext->SendCommand(request);
         std::shared_ptr<LuaRedisTask> luaRedisTask = request->MakeLuaTask(lua);
@@ -78,21 +80,6 @@ namespace Lua
 
     int Redis::Send(lua_State *lua)
     {
-        std::string json;
-        lua_pushthread(lua);
-        const char* name = lua_tostring(lua, 2);
-        const char* fullName = lua_tostring(lua, 3);
-        Lua::Json::Read(lua, 4, &json);
-        RedisDataComponent* redisComponent = UserDataParameter::Read<RedisDataComponent*>(lua, 1);
-        TcpRedisClient * redisClientContext = redisComponent->GetClient(name);
-        if (redisClientContext == nullptr)
-        {
-            luaL_error(lua, "not find redis client %s\n", name);
-            lua_pushboolean(lua, false);
-            return 1;
-        }
-        lua_pushboolean(lua, true);
-        redisClientContext->SendCommand(redisComponent->MakeLuaRequest(fullName, json));
         return 1;
     }
 }

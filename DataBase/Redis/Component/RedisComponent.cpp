@@ -1,15 +1,43 @@
-//
-// Created by mac on 2022/5/18.
-//
-
-#include"RedisComponent.h"
-#include"Timer/ElapsedTimer.h"
+﻿#include"RedisComponent.h"
+#include"Lua/LuaRedis.h"
+#include"String/StringHelper.h"
+#include"File/DirectoryHelper.h"
+#include"Lua/ClassProxyHelper.h"
+#include"Client/TcpRedisClient.h"
 #include"Component/NetThreadComponent.h"
 
 namespace Sentry
 {
+    bool RedisComponent::Awake()
+    {
+        LOG_CHECK_RET_FALSE(RedisConfig::Inst());
+        LOG_CHECK_RET_FALSE(RedisConfig::Inst()->Has("main"));
+        return true;
+    }
+
+    bool RedisComponent::Start()
+    {
+        std::vector<RedisClientConfig> configs;
+        LOG_CHECK_RET_FALSE(RedisConfig::Inst()->Get(configs));
+        for(const RedisClientConfig & config : configs)
+        {
+            for(int index = 0; index < config.Count; index++)
+            {
+                TcpRedisClient * redisClient = this->MakeRedisClient(config);
+                if(redisClient != nullptr && index == 0)
+                {
+                    if(!this->Ping(redisClient))
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     TcpRedisClient * RedisComponent::MakeRedisClient(const RedisClientConfig & config)
-	{
+    {
         NetThreadComponent * component = this->GetComponent<NetThreadComponent>();
         std::shared_ptr<SocketProxy> socketProxy = component->CreateSocket();
         if(socketProxy == nullptr)
@@ -18,10 +46,10 @@ namespace Sentry
         }
         socketProxy->Init(config.Ip, config.Port);
         std::shared_ptr<TcpRedisClient> redisClient =
-            std::make_shared<TcpRedisClient>(socketProxy, config, this);
+            std::make_shared<TcpRedisClient>(socketProxy, config);
         this->mRedisClients[config.Name].emplace_back(redisClient);
         return redisClient.get();
-	}
+    }
 
     bool RedisComponent::Ping(TcpRedisClient * redisClient)
     {
@@ -58,7 +86,7 @@ namespace Sentry
 #ifdef __DEBUG__
         ElapsedTimer elapsedTimer;
 #endif
-		redisClientContext->SendCommand(request);
+        redisClientContext->SendCommand(request);
         std::shared_ptr<RedisTask> redisTask = request->MakeTask();
         std::shared_ptr<RedisResponse> redisResponse = this->AddTask(redisTask->GetRpcId(), redisTask)->Await();
 #ifdef __DEBUG__
@@ -82,4 +110,18 @@ namespace Sentry
         }
         return this->Run(redisClientContext, request);
     }
+
+	void RedisComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
+	{
+		luaRegister.BeginRegister<RedisComponent>();
+		luaRegister.PushExtensionFunction("Run", Lua::Redis::Run);
+		luaRegister.PushExtensionFunction("Call", Lua::Redis::Call);
+        luaRegister.PushExtensionFunction("Send", Lua::Redis::Send);
+    }
+}
+
+namespace Sentry
+{
+
+
 }

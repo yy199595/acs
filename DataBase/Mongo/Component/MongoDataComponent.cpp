@@ -6,7 +6,7 @@
 #include"Proto/ProtoHelper.h"
 #include"Component/MysqlHelperComponent.h"
 #ifdef __ENABLE_REDIS__
-#include"Component/RedisDataComponent.h"
+#include"Component/RedisComponent.h"
 #endif
 #include"Component/MongoHelperComponent.h"
 #include"Component/ProtoComponent.h"
@@ -16,7 +16,7 @@ namespace Sentry
 	{
         LOG_CHECK_RET_FALSE(this->mProtoComponent = this->GetComponent<ProtoComponent>());
 #ifdef __ENABLE_REDIS__
-        LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisDataComponent>());
+        LOG_CHECK_RET_FALSE(this->mRedisComponent = this->GetComponent<RedisComponent>());
 #endif
         LOG_CHECK_RET_FALSE(this->mMongoComponent = this->GetComponent<MongoHelperComponent>());
 		return true;
@@ -54,7 +54,7 @@ namespace Sentry
 			const std::string db = name.substr(0, pos);
 			const std::string key = name.substr(pos + 1);
 			std::shared_ptr<RedisResponse> response =
-				this->mRedisComponent->RunCommand(db, "HGET", key, id);
+                this->mRedisComponent->Run(db, "HGET", key, id);
 			if (response != nullptr)
 			{
 				switch (response->GetType())
@@ -93,7 +93,7 @@ namespace Sentry
 			const std::string db = name.substr(0, pos);
 			const std::string key = name.substr(pos + 1);
 			std::shared_ptr<RedisResponse> response =
-				this->mRedisComponent->RunCommand(db, "HGET", key, id);
+                this->mRedisComponent->Run(db, "HGET", key, id);
 			if (response != nullptr && (response->GetType() == RedisRespType::REDIS_STRING
 										|| response->GetType() == RedisRespType::REDIS_BIN_STRING))
 			{

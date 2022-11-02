@@ -3,15 +3,16 @@
 //
 #include"TcpRedisClient.h"
 #include"File/FileHelper.h"
-#include"Component/RedisComponent.h"
 #include"Component/LoggerComponent.h"
+#include"Component/RedisComponent.h"
 
 namespace Sentry
 {
-	TcpRedisClient::TcpRedisClient(std::shared_ptr<SocketProxy> socket, const RedisClientConfig& config, RedisComponent * component)
-		: Tcp::TcpContext(socket, 1024 * 1024), mConfig(config), mRedisComponent(component)
+	TcpRedisClient::TcpRedisClient(std::shared_ptr<SocketProxy> socket, const RedisClientConfig& config)
+		: Tcp::TcpContext(socket, 1024 * 1024), mConfig(config)
 	{
 		this->mSocket = socket;
+        this->mRedisComponent = App::Inst()->GetComponent<RedisComponent>();
 	}
 
 	TcpRedisClient::~TcpRedisClient() noexcept
@@ -158,16 +159,6 @@ namespace Sentry
             return false;
         }
 
-        if(!this->LoadScript())
-        {
-            CONSOLE_LOG_ERROR("load lua script error");
-            return false;
-        }
-        if(!this->SubChannel())
-        {
-            CONSOLE_LOG_ERROR("sub redis channel error");
-            return false;
-        }
         if(this->mConfig.FreeClient > 0 && this->mConfig.Channels.empty())
         {
             int s = this->mConfig.FreeClient;
@@ -177,38 +168,6 @@ namespace Sentry
         }
 		return true;
 	}
-
-    bool TcpRedisClient::LoadScript()
-    {
-        for (const std::string& path : this->mConfig.LuaFiles)
-        {
-            std::string content;
-            if (!Helper::File::ReadTxtFile(path, content))
-            {
-                CONSOLE_LOG_ERROR("load lua script error");
-                return false;
-            }
-            std::shared_ptr<RedisRequest> loadRequest = RedisRequest::Make("SCRIPT", "LOAD", content);
-            std::shared_ptr<RedisResponse> response = this->SyncCommand(loadRequest);
-            if(response == nullptr || response->GetType() != RedisRespType::REDIS_BIN_STRING)
-            {
-                return false;
-            }
-            if (response->HasError())
-            {
-                CONSOLE_LOG_ERROR(response->GetString());
-                return false;
-            }
-            const std::string& md5 = response->GetString();
-#ifdef ONLY_MAIN_THREAD
-            this->mRedisComponent->OnLoadScript(path, md5);
-#else
-            asio::io_service& io = App::Inst()->GetThread();
-            io.post(std::bind(&RedisComponent::OnLoadScript, this->mRedisComponent, path, md5));
-#endif
-        }
-        return true;
-    }
 
     std::shared_ptr<RedisResponse> TcpRedisClient::SyncCommand(std::shared_ptr<RedisRequest> request)
     {
@@ -242,38 +201,6 @@ namespace Sentry
             }
         }
         return redisResponse;
-    }
-
-    bool TcpRedisClient::SubChannel()
-    {
-        if(this->mConfig.Channels.empty())
-        {
-            return true;
-        }
-        for (const std::string &channel: this->mConfig.Channels)
-        {
-            std::shared_ptr<RedisRequest> request = RedisRequest::Make("SUBSCRIBE", channel);
-            std::shared_ptr<RedisResponse> redisResponse = this->SyncCommand(request);
-            if (redisResponse == nullptr || redisResponse->GetArraySize() != 3)
-            {
-                CONSOLE_LOG_INFO("sub " << channel << " failure");
-                return false;
-            }
-            if (!redisResponse->Get(2)->IsNumber())
-            {
-                CONSOLE_LOG_INFO("sub " << channel << " failure");
-                return false;
-            }
-            if (redisResponse->Get(2)->Cast<RedisNumber>()->GetValue() <= 0)
-            {
-                return false;
-            }
-            CONSOLE_LOG_INFO("sub " << channel << " successful");
-        }
-        asio::io_service &io = this->mSocket->GetThread();
-        this->mTimer = std::make_shared<asio::steady_timer>(io, std::chrono::seconds(10));
-        this->mTimer->async_wait(std::bind(&TcpRedisClient::StartPingServer, this));
-        return true;
     }
 
     void TcpRedisClient::StartPingServer()

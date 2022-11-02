@@ -18,7 +18,7 @@ namespace Sentry
     class TcpRedisClient final : public Tcp::TcpContext
     {
     public:
-        TcpRedisClient(std::shared_ptr<SocketProxy> socket, const RedisClientConfig & config, RedisComponent * component);
+        TcpRedisClient(std::shared_ptr<SocketProxy> socket, const RedisClientConfig & config);
 		~TcpRedisClient();
     public:
         const RedisClientConfig & GetConfig() { return mConfig;}
@@ -26,8 +26,6 @@ namespace Sentry
         const std::string & GetName() const { return this->mConfig.Name; }
     private:
 		bool AuthUser();
-        bool LoadScript();
-        bool SubChannel();
 		void OnReadComplete();
         void StartPingServer();
         void CloseFreeClient();
