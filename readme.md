@@ -46,16 +46,6 @@
     ```
 
 ##  lua服务
-    打开bin/config/service/rpc.json 把这个服务和配置进去
-    {
-	"XXXService": {
-		"xxx_func": {
-			"Async": false, //是否需要启动一个协程去执行
-			"Type": "Server", //server 只能被服务器调用
-			"Request": "com.type.int64", //请求参数(可以为空)
-			"Response": "s2s.allot.response" //返回参数(可以为空)
-		}
-	},
     在bin/script/Server/Service/rpc 下新建XXXService.lua
     XXXService = {}
     XXXService.xxx_func = function(request)

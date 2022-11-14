@@ -1,6 +1,6 @@
 {
 	"OuterService": {
-		"AllotUser": {
+		"Allot": {
 			"Async": false,
 			"Type": "Server",
 			"Request": "com.type.int64",
