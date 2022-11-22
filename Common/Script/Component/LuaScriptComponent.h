@@ -4,6 +4,7 @@
 #include"Component/Component.h"
 #include"Lua/Table.h"
 #include"Lua/LocalTable.h"
+#include"Module/LuaModule.h"
 #include"Lua/ClassProxyHelper.h"
 namespace Sentry
 {
@@ -13,8 +14,9 @@ namespace Sentry
 		LuaScriptComponent() = default;
 		virtual ~LuaScriptComponent() = default;
     public:
-        bool LoadModule(const std::string & name);
-        struct lua_State* GetLuaEnv() { return this->mLuaEnv; }
+		Lua::LuaModule * GetModule(const std::string & name);
+		Lua::LuaModule * LoadModule(const std::string & name);
+		struct lua_State* GetLuaEnv() { return this->mLuaEnv; }
         bool GetFunction(const std::string & tab, const std::string & func);
 	 protected:
 		bool Awake() final;
@@ -31,8 +33,9 @@ namespace Sentry
         void AddRequire(const std::string & direct);
 	 private:
 		struct lua_State* mLuaEnv;
-        std::set<std::string> mModules;
         std::set<std::string> mDirectorys;
+		std::unordered_map<std::string, int> mFuncs;
 		std::unordered_map<std::string, std::string> mModulePaths;
+		std::unordered_map<std::string, std::unique_ptr<Lua::LuaModule>> mModules;
 	};
 }

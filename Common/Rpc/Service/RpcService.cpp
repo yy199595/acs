@@ -22,13 +22,6 @@ namespace Sentry
         return true;
 	}
 
-	void RpcService::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
-	{
-		luaRegister.BeginRegister<RpcService>();
-		luaRegister.PushExtensionFunction("Call", Lua::Service::Call);
-        luaRegister.PushExtensionFunction("AllotLocation", Lua::Service::AllotLocation);
-	}
-
 	bool RpcService::IsStartComplete()
 	{
 		const std::string & service = this->GetName();

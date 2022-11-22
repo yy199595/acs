@@ -1,5 +1,5 @@
 
-ChatService = { }
+local ChatService = { }
 local messageComponent = App.GetComponent("ProtoComponent")
 local gateComponent = App.GetComponent("GateHelperComponent")
 

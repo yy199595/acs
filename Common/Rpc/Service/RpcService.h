@@ -12,7 +12,7 @@ namespace Sentry
 {
 	class ServiceMethod;
 	class InnerNetClient;
-    class RpcService : public Component, public ILuaRegister, public IServiceBase
+    class RpcService : public Component, public IServiceBase
 	{
 	 public:
 		RpcService() = default;
@@ -40,7 +40,6 @@ namespace Sentry
 	 protected:
 		bool LateAwake() override;
 		bool IsStartComplete() final;
-		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) override;
     public:
         virtual XCode Invoke(const std::string & method, std::shared_ptr<Rpc::Packet> message) = 0;
 	private:

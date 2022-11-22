@@ -11,7 +11,7 @@ namespace Sentry
 	class LuaServiceMethod : public ServiceMethod
 	{
 	 public:
-		LuaServiceMethod(const RpcMethodConfig * config, lua_State* lua);
+		LuaServiceMethod(const RpcMethodConfig * config);
 	 public:
 		bool IsLuaMethod() final { return true; }
 		XCode Invoke(Rpc::Packet & message) final;
@@ -22,5 +22,6 @@ namespace Sentry
 		lua_State* mLuaEnv;
         const RpcMethodConfig * mConfig;
 		class ProtoComponent * mMsgComponent;
+		class LuaScriptComponent * mLuaComponent;
 	};
 }

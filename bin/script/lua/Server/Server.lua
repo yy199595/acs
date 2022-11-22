@@ -1,6 +1,6 @@
 
 
-Server = {}
+local Server = {}
 Server.Modules = { }
 function GetModules()
     local modules = { }
@@ -39,7 +39,7 @@ end
 
 function Server.OnClusterComplete()
     local httpComponent = App.GetComponent("HttpComponent")
-    local code, data = httpComponent:Get("http://www.kuaidi100.com/query?type=%E5%BF%AB%E9%80%92%E5%85%AC%E5%8F%B8%E4%BB%A3%E5%8F%B7&postid=%E5%BF%AB%E9%80%92%E5%8D%95%E5%8F%B7")
+    local code, data = httpComponent:Get("http://www.kuaidi100.com/query?type=1122&postid=qwer")
     print(code, data)
     --MysqlComponent.Create("user.account_info", {"account"})
     --

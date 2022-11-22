@@ -16,42 +16,38 @@ namespace Lua
 {
 	int Service::Call(lua_State* lua)
     {
-        if (!lua_isuserdata(lua, 1))
-        {
-            luaL_error(lua, "call paremeter first is service");
-            return 0;
-        }
-        std::string address;
-        Sentry::RpcService *service = UserDataParameter::Read<Sentry::RpcService *>(lua, 1);
-        InnerNetMessageComponent *netMessageComponent = App::Inst()->GetComponent<InnerNetMessageComponent>();
-        if (netMessageComponent == nullptr)
-        {
-            luaL_error(lua, "not find InnerNetMessageComponent");
-            return 0;
-        }
-        std::shared_ptr<Rpc::Packet> request(new Rpc::Packet());
+		std::shared_ptr<Rpc::Packet> request(new Rpc::Packet());
         {
             request->SetType(Tcp::Type::Request);
             request->SetProto(Tcp::Porto::Protobuf);
         }
-        if (lua_isinteger(lua, 2)) //userId
+		std::string address;
+		const RpcMethodConfig * methodConfig = nullptr;
+		if (lua_isinteger(lua, 1)) //userId
         {
-            long long userId = lua_tointeger(lua, 2);
+            long long userId = lua_tointeger(lua, 1);
             request->GetHead().Add("id", userId);
 #ifdef __INNER_MSG_FORWARD__
             ForwardHelperComponent * forwardComponent = App::Inst()->GetComponent<ForwardHelperComponent>();
             forwardComponent->GetLocation(userId, address);
 #else
-            LocationComponent * locationComponent = App::Inst()->GetComponent<LocationComponent>();
+			std::string fullName = luaL_checkstring(lua, 2);
+			methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
+			if(methodConfig == nullptr)
+			{
+				luaL_error(lua, "not find config %s", fullName.c_str());
+				return 0;
+			}
+			LocationComponent * locationComponent = App::Inst()->GetComponent<LocationComponent>();
             const LocationUnit * locationUnit = locationComponent->GetLocationUnit(userId);
-            if(locationUnit == nullptr || (!locationUnit->Get(service->GetName(), address)))
+            if(locationUnit == nullptr || (!locationUnit->Get(methodConfig->Service, address)))
             {
                 ForwardHelperComponent * forwardComponent = App::Inst()->GetComponent<ForwardHelperComponent>();
                 forwardComponent->GetLocation(userId, address);
             }
 #endif
         }
-        else if (lua_isstring(lua, 2)) //address
+        else if (lua_isstring(lua, 1)) //address
         {
 #ifdef __INNER_MSG_FORWARD__
             const char * to = lua_tostring(lua, 2);
@@ -59,42 +55,35 @@ namespace Lua
             ForwardHelperComponent * forwardComponent = App::Inst()->GetComponent<ForwardHelperComponent>();
             forwardComponent->GetLocation(address);
 #else
-            address.append(lua_tostring(lua, 2));
+            address.append(lua_tostring(lua, 1));
 #endif
+			std::string fullName = luaL_checkstring(lua, 2);
+			methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
+			if(methodConfig == nullptr)
+			{
+				luaL_error(lua, "not find config %s", fullName.c_str());
+				return 0;
+			}
         }
-        if (address.empty())
+        if (address.empty() || methodConfig == nullptr)
         {
-            luaL_error(lua, "call service address is empty");
+            luaL_error(lua, "call service parameter error");
             return 0;
         }
-        if (!lua_isstring(lua, 3))
-        {
-            luaL_error(lua, "not find service function");
-            return 1;
-        }
-        std::string method = lua_tostring(lua, 3);
-        std::string fullName = fmt::format("{0}.{1}", service->GetName(), method);
-        const RpcMethodConfig *methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
-        if (methodConfig == nullptr)
-        {
-            luaL_error(lua, "call [%s] not found", method.c_str());
-            return 0;
-        }
-
-        const std::string &func = methodConfig->FullName;
         if (!methodConfig->Request.empty())
         {
+			int t1 = lua_type(lua, 3);
             const std::string &pb = methodConfig->Request;
             ProtoComponent *messageComponent = App::Inst()->GetMsgComponent();
-            std::shared_ptr<Message> message = messageComponent->Read(lua, pb, 4);
+            std::shared_ptr<Message> message = messageComponent->Read(lua, pb, 3);
             if (message == nullptr)
             {
-                luaL_error(lua, "lua call %s request is empty", fullName.c_str());
+                luaL_error(lua, "lua call %s request is empty", methodConfig->FullName.c_str());
                 return 0;
             }
             if(message->GetTypeName() != methodConfig->Request)
             {
-                luaL_error(lua, "lua call %s request type error", fullName.c_str());
+                luaL_error(lua, "lua call %s request type error", methodConfig->FullName.c_str());
                 return 0;
             }
             request->WriteMessage(message.get());
@@ -105,8 +94,14 @@ namespace Lua
         std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource
             = std::make_shared<LuaRpcTaskSource>(lua, 0, response);
 		{
-			request->GetHead().Add("func", func);
+			request->GetHead().Add("func", methodConfig->FullName);
 			request->GetHead().Add("rpc", luaRpcTaskSource->GetRpcId());
+		}
+		InnerNetMessageComponent *netMessageComponent = App::Inst()->GetComponent<InnerNetMessageComponent>();
+		if (netMessageComponent == nullptr)
+		{
+			luaL_error(lua, "not find InnerNetMessageComponent");
+			return 0;
 		}
         if (!netMessageComponent->Send(address, request))
         {
@@ -119,21 +114,21 @@ namespace Lua
 
 	int Service::AllotLocation(lua_State *lua)
 	{
-		Sentry::RpcService* service = UserDataParameter::Read<Sentry::RpcService*>(lua, 1);
+		const std::string service = luaL_checkstring(lua, 1);
 		LocationComponent * locationComponent = App::Inst()->GetComponent<LocationComponent>();
 		if(lua_isinteger(lua, 2))
 		{
 			std::string address;
 			long long userId = lua_tointeger(lua, 2);
 			LocationUnit * locationUnit = locationComponent->GetLocationUnit(userId);
-			if(locationUnit != nullptr && locationUnit->Get(service->GetName(), address))
+			if(locationUnit != nullptr && locationUnit->Get(service, address))
 			{
 				lua_pushlstring(lua, address.c_str(), address.size());
 				return 1;
 			}
 		}
 		std::string address;
-		if(locationComponent->AllotLocation(service->GetName(), address))
+		if(locationComponent->AllotLocation(service, address))
 		{
 			lua_pushlstring(lua, address.c_str(), address.size());
 			return 1;

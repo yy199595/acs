@@ -7,6 +7,7 @@
 #include<fstream>
 #include"Md5/MD5.h"
 #include"File/DirectoryHelper.h"
+#include"Component/LuaScriptComponent.h"
 #include"google/protobuf/util/json_util.h"
 #include"google/protobuf/dynamic_message.h"
 #include"Lua/Message.h"
@@ -42,7 +43,7 @@ namespace Sentry
     {
         std::string path;
         const ServerConfig * config = ServerConfig::Inst();
-        if(config->GetPath("proto", path))
+		if(config->GetPath("proto", path))
         {
             return this->Load(path.c_str());
         }
@@ -215,12 +216,12 @@ namespace Sentry
 		luaRegister.PushExtensionFunction("NewJson", &Lua::MessageEx::NewJson);
 	}
 
-	bool ProtoComponent::Write(lua_State* lua, const Message& message)
+	bool ProtoComponent::Write(lua_State * lua, const Message& message)
 	{
 		MessageDecoder messageDecoder(lua, this);
 		return messageDecoder.Decode(message);
 	}
-	std::shared_ptr<Message> ProtoComponent::Read(lua_State* lua, const std::string& name, int index)
+	std::shared_ptr<Message> ProtoComponent::Read(lua_State * lua, const std::string& name, int index)
 	{
 		MessageEncoder messageEncoder(lua, this);
 		return messageEncoder.Encode(name, index);

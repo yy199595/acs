@@ -22,17 +22,19 @@ namespace Sentry
 
 		std::vector<const RpcMethodConfig *> rpcInterConfigs;
         LOG_CHECK_RET_FALSE(rpcServiceConfig->GetMethodConfigs(rpcInterConfigs) > 0);
+		Lua::LuaModule * luaModule = this->mLuaComponent->GetModule(this->GetName());
+		if(luaModule == nullptr)
+		{
+			return false;
+		}
 
 		for(const RpcMethodConfig * rpcInterfaceConfig : rpcInterConfigs)
 		{
-            const std::string & tab = rpcInterfaceConfig->Service;
-            const std::string & func = rpcInterfaceConfig->Method;
-            if(!this->mLuaComponent->GetFunction(tab, func))
-            {
-                LOG_ERROR("not find rpc method = [" << tab << '.' << func << ']');
-            }
-			if (!this->mMethodRegister->AddMethod(std::make_shared<LuaServiceMethod>
-			        (rpcInterfaceConfig, this->mLuaComponent->GetLuaEnv())))
+			if(!luaModule->GetFunction(rpcInterfaceConfig->Method))
+			{
+				return false;
+			}
+			if (!this->mMethodRegister->AddMethod(std::make_shared<LuaServiceMethod>(rpcInterfaceConfig)))
 			{
 				return false;
 			}

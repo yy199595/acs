@@ -109,28 +109,27 @@ namespace Sentry
     }
 
     void LocalRpcService::LoadFromLua()
-    {
-        std::vector<const RpcMethodConfig *> methodConfigs;
-        LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();
-        const RpcServiceConfig * rpcServiceConfig = RpcConfig::Inst()->GetConfig(this->GetName());
-        if(luaScriptComponent != nullptr && luaScriptComponent->LoadModule(this->GetName()))
-        {
-            lua_State *lua = luaScriptComponent->GetLuaEnv();
-            rpcServiceConfig->GetMethodConfigs(methodConfigs);
-            for (const RpcMethodConfig *methodConfig: methodConfigs)
-            {
-                const std::string & tab = methodConfig->Service;
-                const std::string & func = methodConfig->Method;
-                if (luaScriptComponent->GetFunction(tab, func))
-                {
-                    std::shared_ptr<LuaServiceMethod> luaServiceMethod
-                        = std::make_shared<LuaServiceMethod>(methodConfig, lua);
-                    this->mMethodRegister->AddMethod(luaServiceMethod);
-                    LOG_WARN(methodConfig->FullName << " use lua method");
-                }
-            }
-        }
-    }
+	{
+		std::vector<const RpcMethodConfig*> methodConfigs;
+		LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();
+		Lua::LuaModule* luaModule = luaScriptComponent->LoadModule(this->GetName());
+		if (luaModule == nullptr)
+		{
+			return;
+		}
+		const RpcServiceConfig* rpcServiceConfig = RpcConfig::Inst()->GetConfig(this->GetName());
+		rpcServiceConfig->GetMethodConfigs(methodConfigs);
+		for (const RpcMethodConfig* methodConfig : methodConfigs)
+		{
+			if(luaModule->GetFunction(methodConfig->Method))
+			{
+				std::shared_ptr<LuaServiceMethod> luaServiceMethod
+					= std::make_shared<LuaServiceMethod>(methodConfig);
+				this->mMethodRegister->AddMethod(luaServiceMethod);
+				LOG_WARN(methodConfig->FullName << " use lua method");
+			}
+		}
+	}
 
 	bool LocalRpcService::Close()
     {

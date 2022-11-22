@@ -116,7 +116,6 @@ namespace Lua
             lua_pushnil(lua);
             return 1;
         }
-        const std::string fullName = fmt::format("App{0}", name);
-		return UserDataParameter::UserDataStruct<Component*>::WriteObj(lua, component, fullName.c_str());
+		return UserDataParameter::UserDataStruct<Component*>::WriteObj(lua, component, name);
 	}
 }

@@ -1,11 +1,10 @@
 MysqlComponent = {}
-local mysqlService = App.GetComponent("MysqlService")
 local messageComponent = App.GetComponent("ProtoComponent")
 
 function MysqlComponent.Create(tabName, keys, data)
-    local address = mysqlService:AllotLocation()
+    local address = Service.AllotLocation("MysqlService")
     local request = messageComponent:New(tabName, data)
-    return mysqlService:Call(address, "Create", {
+    return Service.Call(address, "MysqlService.Create", {
         keys = keys,
         data = request
     })
@@ -15,8 +14,8 @@ function MysqlComponent.Add(tabName, data, flag)
     assert(type(data) == "table")
     assert(type(tabName) == "string")
 
-    local address = mysqlService:AllotLocation()
-    return mysqlService:Call(address, "Add",  {
+    local address = Service.AllotLocation()
+    return Service.Call(address, "MysqlService.Add",  {
         table = tabName,
         flag = flag or 0,
         data = messageComponent:New(tabName, data)
@@ -27,8 +26,8 @@ function MysqlComponent.Delete(tabName, where, flag)
     assert(type(where) == "table")
     assert(type(tabName) == "string")
 
-    local address = mysqlService:AllotLocation()
-    return mysqlService:Call(address, "Delete", {
+    local address = Service.AllotLocation("MysqlService")
+    return Service.Call(address, "MysqlService.Delete", {
         table = tabName,
         flag = flag or 0,
         where_json = Json.Encode(where)
@@ -39,8 +38,8 @@ function MysqlComponent.QueryOnce(tabName, where, flag)
     assert(type(where) == "table")
     assert(type(tabName) == "string")
 
-    local address = mysqlService:AllotLocation()
-    local code, response = mysqlService:Call(address, "Query", {
+    local address = Service.AllotLocation("MysqlService")
+    local code, response = Service.Call(address, "MysqlService.Query", {
         limit = 1,
         table = tabName,
         where_json = Json.Encode(where)
@@ -56,8 +55,8 @@ function MysqlComponent.QueryAll(tabName, where, limit)
     assert(type(tabName) == "string")
 
     print(tabName, where, address)
-    local address = mysqlService:AllotLocation()
-    local code, response = mysqlService:Call(address, "Query", {
+    local address = Service.AllotLocation("MysqlService")
+    local code, response = Service.Call(address, "MysqlService.Query", {
         table = tabName,
         limit = limit or 0,
         where_json = Json.Encode(where)
@@ -77,8 +76,8 @@ function MysqlComponent.QueryFields(tabName, fields, where, limit)
     assert(type(where) == "table")
     assert(type(tabName) == "string")
 
-    local address = mysqlService:AllotLocation()
-    local code, response = mysqlService:Call(address, "Query", {
+    local address = Service.AllotLocation("MysqlService")
+    local code, response = Service.Call(address, "MysqlService.Query", {
         table = tabName,
         limit = limit or 0,
         fields = fields,
@@ -99,8 +98,8 @@ function MysqlComponent.Update(tabName, where, update, flag)
     assert(type(update) == "table")
     assert(type(tabName) == "string")
 
-    local address = mysqlService:AllotLocation()
-    return mysqlService:Call(address, "Update", {
+    local address = Service.AllotLocation("MysqlService")
+    return Service.Call(address, "MysqlService.Update", {
         table = tabName,
         flag = flag or 0,
         where_json = Json.Encode(where),

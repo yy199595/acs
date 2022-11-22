@@ -39,11 +39,7 @@ namespace Sentry
             {
                 const RpcServiceConfig * rpcServiceConfig = RpcConfig::Inst()->GetConfig(name);
                 const HttpServiceConfig * httpServiceConfig = HttpConfig::Inst()->GetConfig(name);
-                if(rpcServiceConfig == nullptr && httpServiceConfig == nullptr)
-                {
-                    LOG_ERROR("not find service config : " << name);
-                    return false;
-                }
+				LOG_CHECK_RET_FALSE(rpcServiceConfig != nullptr || httpServiceConfig != nullptr);
                 if(!this->mApp->AddComponent(name))
                 {
                     if(rpcServiceConfig != nullptr)

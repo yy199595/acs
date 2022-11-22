@@ -3,13 +3,12 @@ MongoComponent = {}
 MongoComponent.Counters = { }
 
 local this = MongoComponent
-local self = App.GetComponent("MongoService")
 function MongoComponent.InsertOnce(tab, data, flag)
     if type(data) == "table" then
         data = Json.Encode(data)
     end
-    local address = self:AllotLocation()
-    return self:Call(address, "Insert", {
+    local address = Service.AllotLocation("MongoService")
+    return Service.Call(address, "MongoService.Insert", {
         tab = tab,
         json = data,
         flag = flag or 0
@@ -21,8 +20,8 @@ function MongoComponent.Delete(tab, data, limit, flag)
         data = Json.Encode(data)
     end
     assert(type(data) == "string")
-    local address = self:AllotLocation()
-    return self:Call(address, "Delete", {
+    local address = Service.AllotLocation("MongoService")
+    return Service.Call(address, "MongoService.Delete", {
         tab = tab,
         json = data,
         limit = limit or 1,
@@ -35,8 +34,8 @@ function MongoComponent.QueryOnce(tab, data)
         data = Json.Encode(data)
     end
     assert(type(data) == "string")
-    local address = self:AllotLocation()
-    local code, response = self:Call(address, "Query", {
+    local address = Service.AllotLocation("MongoService")
+    local code, response = Service.Call(address, "MongoService.Query", {
         tab = tab,
         json = data,
         limit = 1
@@ -56,8 +55,8 @@ function MongoComponent.Query(tab, data, limit)
     end
     print("query json ", data)
     assert(type(data) == "string")
-    local address = self:AllotLocation()
-    local code, response = self:Call(address, "Query", {
+    local address = Service.AllotLocation("MongoService")
+    local code, response = Service.Call(address, "MongoService.Query", {
         tab = tab,
         json = data,
         limit = limit or 0
@@ -83,8 +82,8 @@ function MongoComponent.QueryDatas(tab, querys)
             ["$in"] = querys
         }
     }
-    local address = self:AllotLocation()
-    local code, response = self:Call(address, "Query", {
+    local address = Service.AllotLocation("MongoService")
+    local code, response = Service.Call(address, "MongoService.Query", {
         tab = tab,
         limit = #querys,
         json = Json.Encode(requset)
@@ -104,8 +103,8 @@ end
 function MongoComponent.SetIndex(tab, name)
     assert(type(tab) == "string")
     assert(type(name) == "string")
-    local address = self:AllotLocation()
-    return self:Call(address, "SetIndex", {
+    local address = Service.AllotLocation("MongoService")
+    return Service.Call(address, "MongoService.SetIndex", {
         tab = tab,
         name = name
     })
@@ -120,9 +119,8 @@ function MongoComponent.Update(tab, select, update, tag, flag)
     end
     assert(type(select) == "string")
     assert(type(update) == "string")
-
-    local address = self:AllotLocation()
-    return self:Call(address, "Update", {
+    local address = Service.AllotLocation("MongoService")
+    return Service.Call(address, "MongoService.Update", {
         tab = tab,
         select = select,
         update = update,
@@ -133,48 +131,6 @@ end
 
 function MongoComponent.Push(tab, select, update)
     return this.Update(tab, select, update, "$push")
-end
-
-function MongoComponent.GetCount(tab, query)
-    local requset = { }
-    requset.count = tab
-    if type(query) == "table" then
-        requset.query = query
-    end
-    local response = this.RunCommand(requset)
-    return response.n
-end
-
-function MongoComponent.RunCommand(parameter)
-    local address = self:GetHost()
-    local json = Json.Encode(parameter)
-    local code, response = self:Call(address, "RunCommand", {
-        tab = tab,
-        cmd = cmd,
-        json = json
-    })
-    if code ~= XCode.Successful or response == nil then
-        return nil
-    end
-    if #response.jsons == 1 then
-        return Json.Decode(response.jsons[1])
-    else
-        local res = {}
-        for _, str in ipairs(response.jsons) do
-            local result = json.Decode(str)
-            table.insert(res, result)
-        end
-        return res
-    end
-end
-
-function MongoComponent.RumTableCommand(tab, cmd, parameter)
-
-    assert(type(tab) == "string")
-    assert(type(cmd) == "string")
-    assert(type(parameter) == "table")
-    parameter[cmd] = tab
-    return this.RunCommand(parameter)
 end
 
 return MongoComponent

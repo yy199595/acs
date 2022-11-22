@@ -4,14 +4,17 @@
 #include"Config/ServiceConfig.h"
 #include"Lua/LuaServiceTaskSource.h"
 #include"Component/ProtoComponent.h"
+#include"Component/LuaScriptComponent.h"
 #include"google/protobuf/util/json_util.h"
 namespace Sentry
 {
 
-	LuaServiceMethod::LuaServiceMethod(const RpcMethodConfig * config, lua_State* lua)
-		: ServiceMethod(config->Method), mLuaEnv(lua), mConfig(config)
+	LuaServiceMethod::LuaServiceMethod(const RpcMethodConfig * config)
+		: ServiceMethod(config->Method), mLuaEnv(nullptr), mConfig(config)
 	{
 		this->mMsgComponent = App::Inst()->GetComponent<ProtoComponent>();
+		this->mLuaComponent = App::Inst()->GetComponent<LuaScriptComponent>();
+		this->mLuaEnv = this->mLuaComponent->GetLuaEnv();
 	}
 
 	XCode LuaServiceMethod::Call(int count, Rpc::Packet & message)
@@ -38,25 +41,24 @@ namespace Sentry
 
 	XCode LuaServiceMethod::CallAsync(int count, Rpc::Packet & message)
     {
-        LuaServiceTaskSource *luaTaskSource = new LuaServiceTaskSource(this->mLuaEnv);
-        Lua::UserDataParameter::Write(this->mLuaEnv, luaTaskSource);
+        std::unique_ptr<LuaServiceTaskSource> luaTaskSource
+			= std::make_unique<LuaServiceTaskSource>(this->mLuaEnv);
+        Lua::UserDataParameter::Write(this->mLuaEnv, luaTaskSource.get());
         if (lua_pcall(this->mLuaEnv, count + 2, 1, 0) != 0)
         {
-            delete luaTaskSource;
             message.GetHead().Add("error", lua_tostring(this->mLuaEnv, -1));
             return XCode::CallLuaFunctionFail;
         }
         XCode code = luaTaskSource->Await();
 
-        delete luaTaskSource;
         if (code != XCode::Successful)
         {
-            return code;
+			return code;
         }
         if (!this->mConfig->Response.empty() && luaTaskSource->GetRef())
         {
             std::shared_ptr<Message> response = this->mMsgComponent->Read(
-                this->mLuaEnv, this->mConfig->Response, -1);
+				this->mLuaEnv, this->mConfig->Response, -1);
             if (response == nullptr)
             {
                 return XCode::JsonCastProtoFailure;
@@ -75,12 +77,17 @@ namespace Sentry
         {
             return XCode::CallLuaFunctionFail;
         }
-        const char *tab = this->mConfig->Service.c_str();
-        const char *method = this->mConfig->Method.c_str();
-        if (!Lua::Function::Get(this->mLuaEnv, tab, method))
-        {
-            return XCode::NotFoundRpcConfig;
-        }
+		const std::string & method = this->mConfig->Method;
+		const std::string & module = this->mConfig->Service;
+		Lua::LuaModule * luaModule = this->mLuaComponent->GetModule(module);
+		if(luaModule == nullptr)
+		{
+			return XCode::CallServiceNotFound;
+		}
+		if(!luaModule->GetFunction(method))
+		{
+			return XCode::CallServiceNotFound;
+		}
         std::shared_ptr<Message> request;
         if (!this->mConfig->Request.empty())
         {
