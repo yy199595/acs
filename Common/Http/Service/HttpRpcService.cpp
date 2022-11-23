@@ -78,7 +78,8 @@ namespace Sentry
         }
         std::string json;
         document->Add("code", (int) code);
-        response.Json(HttpStatus::OK, *document);
+		document->Add("error", CodeConfig::Inst()->GetDesc(code));
+		response.Json(HttpStatus::OK, *document);
         return XCode::Successful;
     }
 

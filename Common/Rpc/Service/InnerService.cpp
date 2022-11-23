@@ -111,6 +111,7 @@ namespace Sentry
     XCode InnerService::Hotfix()
     {
         std::vector<IHotfix *> components;
+		this->mApp->GetComponents(components);
         for(IHotfix * component : components)
         {
             component->OnHotFix();

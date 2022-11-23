@@ -4,6 +4,9 @@
 
 #include"LuaModule.h"
 #include"Lua/Function.h"
+#include"Md5/MD5.h"
+#include<fstream>
+#include"File/FileHelper.h"
 #include"Log/CommonLogDef.h"
 namespace Lua
 {
@@ -23,7 +26,7 @@ namespace Lua
 
 	bool LuaModule::Awake()
 	{
-		if(this->mRef != 0)
+		if(!this->mMd5.empty())
 		{
 			return true;
 		}
@@ -36,6 +39,9 @@ namespace Lua
 		{
 			return false;
 		}
+		std::ifstream fs(this->mPath, std::ios::in);
+		MD5 md5(fs);
+		this->mMd5 = md5.toString();
 		this->mRef = luaL_ref(mLua, LUA_REGISTRYINDEX);
 		if(this->GetFunction("Awake", false))
 		{
@@ -44,6 +50,43 @@ namespace Lua
 				LOG_ERROR(lua_tostring(this->mLua, -1));
 				return false;
 			}
+		}
+		return true;
+	}
+
+	bool LuaModule::Hotfix()
+	{
+		std::ifstream fs(this->mPath, std::ios::in);
+		MD5 md5(fs);
+		if(this->mMd5 == md5.toString()) //文件没有改变
+		{
+			return true;
+		}
+		if(luaL_dofile(this->mLua, this->mPath.c_str()) != LUA_OK)
+		{
+			LOG_ERROR(lua_tostring(this->mLua, -1));
+			return false;
+		}
+		if(!lua_istable(this->mLua, -1))
+		{
+			return false;
+		}
+		int ref = this->mRef;
+		std::set<std::string> functions;
+		this->mRef = luaL_ref(mLua, LUA_REGISTRYINDEX);
+		luaL_unref(this->mLua, LUA_REGISTRYINDEX, ref);
+		auto iter = this->mFunctions.begin();
+		for(; iter != this->mFunctions.end(); iter++)
+		{
+			ref = iter->second;
+			functions.insert(iter->first);
+			luaL_unref(this->mLua, LUA_REGISTRYINDEX, ref);
+		}
+		this->mFunctions.clear();
+		this->mMd5 = md5.toString();
+		for(const std::string & func : functions)
+		{
+			this->GetFunction(func);
 		}
 		return true;
 	}

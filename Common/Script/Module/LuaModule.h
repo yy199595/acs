@@ -16,11 +16,13 @@ namespace Lua
 		bool Awake();
 		bool Start();
 		bool Close();
+		bool Hotfix();
 		void OnLocalComplete();
 		void OnClusterComplete();
 	 	bool GetFunction(const std::string & name, bool cache = true);
 	 private:
 		int mRef;
+		std::string mMd5;
 		lua_State * mLua;
 	 	const std::string mName;
 	 	const std::string mPath;

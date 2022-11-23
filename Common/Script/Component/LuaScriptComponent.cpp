@@ -237,6 +237,16 @@ namespace Sentry
 
     void LuaScriptComponent::OnHotFix()
     {
+		auto iter = this->mModules.begin();
+		for(; iter != this->mModules.end(); iter++)
+		{
+			const std::string & name = iter->first;
+			Lua::LuaModule * luaModule = iter->second.get();
+			if(luaModule->Hotfix())
+			{
+				LOG_INFO(name << " hotfix successful");
+			}
+		}
     }
 
 	void LuaScriptComponent::OnDestory()
