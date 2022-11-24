@@ -18,9 +18,13 @@ namespace Sentry
 	App::App() : Unit(0),
         mStartTime(Helper::Time::NowMilTime())
 	{
+        this->mLogicFps = 0;
         this->mTickCount = 0;
         this->mIsStartDone = false;
+        this->mLogComponent = nullptr;
+        this->mTaskComponent = nullptr;
         this->mTimerComponent = nullptr;
+        this->mMessageComponent = nullptr;
         this->mThreadId = std::this_thread::get_id();
 	}
 
@@ -216,7 +220,7 @@ namespace Sentry
 	void App::UpdateConsoleTitle()
 	{
 		char buffer[100] = {0};
-		const std::string& name = System::GetName();
+		const std::string& name = System::Name();
 		sprintf_s(buffer, "%s fps:%f", name.c_str(), this->mLogicFps);
 		SetConsoleTitle(buffer);
 	}
