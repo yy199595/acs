@@ -186,7 +186,7 @@ namespace Http
 
 namespace Http
 {
-    std::shared_ptr<Http::Request> Http::New(const std::string &method)
+    std::shared_ptr<Http::Request> New(const std::string &method)
     {
         if(method == "GET")
         {
