@@ -320,7 +320,7 @@
 
 // Windows declares several inconvenient macro names.  We #undef them and then
 // restore them in port_undef.inc.
-#ifdef _MSC_VER
+#ifdef __OS_WIN__
 #pragma push_macro("GetMessage")
 #undef GetMessage
 #endif
