@@ -5,10 +5,6 @@ function AccountService.Start111()
     return true
 end
 
-function AccountService.Update(tick)
-    Log.Info("tick = ", tick)
-end
-
 function AccountService.Register(requestInfo)
     assert(requestInfo.account, "register account is nil")
     assert(requestInfo.password, "register password is nil")
