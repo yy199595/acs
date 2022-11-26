@@ -3,8 +3,6 @@
 //
 #include"Debug.h"
 #include"Time/TimeHelper.h"
-#include"Debug/backward.hpp"
-
 #include"App/App.h"
 #include"Component/LoggerComponent.h"
 using namespace Sentry;
@@ -87,11 +85,11 @@ void Debug::Console(Debug::Level color, const std::string &log)
             std::string time = Helper::Time::GetDateString();
             printf("%s%s [Fatal  ] %s\e[0m\n", "\e[35m", time.c_str(), log.c_str());
 #endif
-            backward::StackTrace st;
-            st.load_here(64);
-            backward::Printer p;
-            p.color_mode = backward::ColorMode::always;
-            p.print(st, stderr);
+//            backward::StackTrace st;
+//            st.load_here(64);
+//            backward::Printer p;
+//            p.color_mode = backward::ColorMode::always;
+//            p.print(st, stderr);
         }
             break;
     }
