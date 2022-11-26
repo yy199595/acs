@@ -34,3 +34,5 @@ rpc通信基于自己实现的二进制协议
 1. 安装CMake,g++
 2. 执行根目录下build.sh
 3. cd到bin目录 ./app ./config/server.json Server
+
+# [[教程]](https://www.baidu.com)
