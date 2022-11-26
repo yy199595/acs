@@ -9,12 +9,11 @@
 
 inline std::string FormatFileLine(const char * file, const int line)
 {
+    const char * fileName = nullptr;
 	const size_t length = strlen(file);
-	const char * fileName = nullptr;
-
-	for (size_t index = length - 1; index >= 0; index--)
+	for (size_t index = length - 1; index > 0; index--)
 	{
-#ifdef _WIN32
+#ifdef _MSC_VER
 		if (file[index] == '\\')
 #else
 		if(file[index] == '/')

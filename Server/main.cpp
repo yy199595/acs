@@ -51,6 +51,7 @@
 #endif
 
 using namespace Sentry;
+
 void RegisterComponent()
 {
 // rpc
