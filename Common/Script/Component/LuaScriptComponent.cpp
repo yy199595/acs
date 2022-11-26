@@ -106,26 +106,6 @@ namespace Sentry
         return this->LoadAllFile();
     }
 
-    bool LuaScriptComponent::OnStartService(const std::string &name)
-    {
-		auto iter = this->mModules.find(name);
-		if(iter == this->mModules.end())
-		{
-			return false;
-		}
-		return iter->second->Start();
-    }
-
-    bool LuaScriptComponent::OnCloseService(const std::string &name)
-    {
-		auto iter = this->mModules.find(name);
-		if(iter == this->mModules.end())
-		{
-			return false;
-		}
-		return iter->second->Close();
-    }
-
     bool LuaScriptComponent::GetFunction(const std::string &tab, const std::string &func)
     {
         return Lua::Function::Get(this->mLuaEnv, tab.c_str(), func.c_str());
@@ -159,18 +139,20 @@ namespace Sentry
 		return iter1 == this->mModules.end() ? nullptr : iter1->second.get();
 	}
 
+    void LuaScriptComponent::OnSecondUpdate(const int tick)
+    {
+        auto iter = this->mModules.begin();
+        for (; iter != this->mModules.end(); iter++)
+        {
+            iter->second->Update(tick);
+        }
+    }
+
 	bool LuaScriptComponent::Start()
 	{
-        const std::string & name = System::Name();
-        if(lua_getfunction(this->mLuaEnv, name.c_str(), "Start"))
-        {
-            WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLuaEnv);
-            if(luaTaskSource != nullptr)
-            {
-                return luaTaskSource->Await<bool>();
-            }
-        }
-		return true;
+        const std::string& name = System::Name();
+        Lua::LuaModule * luaModule = this->GetModule(name);
+        return luaModule != nullptr&& luaModule->Start();
 	}
 
 	void LuaScriptComponent::OnLocalComplete()

@@ -17,6 +17,14 @@ namespace Sentry
 		}
 		return method->Invoke(*request, *response);
 	}
+
+    bool LocalHttpService::LateAwake()
+    {
+        LuaScriptComponent* luaComponent = this->GetComponent<LuaScriptComponent>();
+        Lua::LuaModule * luaModule = luaComponent->LoadModule(this->GetName());
+        return luaModule == nullptr || luaModule->Awake();
+    }
+
 	bool LocalHttpService::Start()
     {
         this->mServiceRegister = std::make_shared<HttpServiceRegister>(this);
@@ -26,22 +34,20 @@ namespace Sentry
         {
             return false;
         }
-
-        std::vector<const HttpMethodConfig *> methodConfigs;
+        std::vector<const HttpMethodConfig*> methodConfigs;
         httpServiceConfig->GetMethodConfigs(methodConfigs);
-        for(const HttpMethodConfig * config : methodConfigs)
+        Lua::LuaModule* luaModule = luaComponent->GetModule(this->GetName());
+        if (luaModule != nullptr)
         {
-            const char * tab = config->Service.c_str();
-            const char * method = config->Method.c_str();
-            lua_State * luaEnv = luaComponent->GetLuaEnv();
-            if(Lua::Function::Get(luaEnv,tab, method))
+            for (const HttpMethodConfig* config : methodConfigs)
             {
-                std::shared_ptr<LuaHttpServiceMethod> luaHttpServiceMethod =
-                        std::make_shared<LuaHttpServiceMethod>(config, luaEnv);
-                if(!this->mServiceRegister->AddMethod(luaHttpServiceMethod))
-                {
-                    return false;
-                }
+                if (luaModule->GetFunction(config->Method))
+                {                   
+                    if (!this->mServiceRegister->AddMethod(std::make_shared<LuaHttpServiceMethod>(config)))
+                    {
+                        return false;
+                    }
+                }             
             }
         }
 
@@ -53,13 +59,19 @@ namespace Sentry
                 return false;
             }
         }
-        return true;
+        return luaModule == nullptr || luaModule->Start();
     }
 
 	bool LocalHttpService::Close()
 	{
         this->mServiceRegister->Clear();
         std::move(this->mServiceRegister);
-		return this->OnCloseService();
+        if (!this->OnCloseService())
+        {
+            return false;
+        }
+        LuaScriptComponent* luaComponent = this->GetComponent<LuaScriptComponent>();
+        Lua::LuaModule* luaModule = luaComponent->GetModule(this->GetName());
+        return (luaModule == nullptr || luaModule->Close());
 	}
 }

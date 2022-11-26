@@ -8,7 +8,8 @@
 #include"Lua/ClassProxyHelper.h"
 namespace Sentry
 {
-    class LuaScriptComponent : public Component, public IStart, public IComplete, public IHotfix, public IServiceChange
+    class LuaScriptComponent : public Component, public IStart, 
+		public IComplete, public IHotfix, public ISecondUpdate
 	{
 	 public:
 		LuaScriptComponent() = default;
@@ -26,8 +27,7 @@ namespace Sentry
 		void OnDestory() final;
 		void OnLocalComplete() final;
 		void OnClusterComplete() final;
-        bool OnStartService(const std::string &name) final;
-        bool OnCloseService(const std::string &name) final;
+		void OnSecondUpdate(const int tick) final;      
     private:
 		bool LoadAllFile();
         void AddRequire(const std::string & direct);

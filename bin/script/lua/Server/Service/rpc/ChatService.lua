@@ -7,6 +7,10 @@ function ChatService.OnServiceStart()
     print("启动聊天服务")
 end
 
+ChatService.Update = function(tick)
+    print("update tick = ", tick)
+end
+
 ChatService.Chat = function(id, request)
     coroutine.sleep(1000)
     print("更新完成&&&&&&112233")

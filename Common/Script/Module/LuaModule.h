@@ -17,6 +17,7 @@ namespace Lua
 		bool Start();
 		bool Close();
 		bool Hotfix();
+		void Update(int tick);
 		void OnLocalComplete();
 		void OnClusterComplete();
 	 	bool GetFunction(const std::string & name, bool cache = true);

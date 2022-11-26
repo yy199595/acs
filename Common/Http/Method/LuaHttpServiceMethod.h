@@ -13,7 +13,7 @@ namespace Sentry
     class LuaHttpServiceMethod : public HttpServiceMethod
     {
     public:
-        LuaHttpServiceMethod(const HttpMethodConfig * config, lua_State * lua);
+        LuaHttpServiceMethod(const HttpMethodConfig * config);
     public:
         bool IsLuaMethod() const { return true; }
         XCode Invoke(const Http::Request &request, Http::Response &response) final;
@@ -25,6 +25,7 @@ namespace Sentry
         lua_State * mLua;
         std::string mData;
         const HttpMethodConfig * mConfig;
+        class LuaScriptComponent* mLuaComponent;
     };
 }
 

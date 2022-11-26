@@ -51,7 +51,20 @@ namespace Lua
 				return false;
 			}
 		}
+		this->GetFunction("Update");
 		return true;
+	}
+
+	void LuaModule::Update(int tick)
+	{
+		if (this->GetFunction("Update"))
+		{
+			lua_pushinteger(this->mLua, tick);
+			if (lua_pcall(this->mLua, 1, 0, 0) != LUA_OK)
+			{
+				LOG_ERROR(lua_tostring(this->mLua, -1));
+			}
+		}
 	}
 
 	bool LuaModule::Hotfix()

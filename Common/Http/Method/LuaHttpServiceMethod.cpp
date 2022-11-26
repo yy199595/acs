@@ -8,13 +8,15 @@
 #include"Json/Lua/values.hpp"
 #include"Lua/LuaServiceTaskSource.h"
 #include"Component/ProtoComponent.h"
+#include"Component/LuaScriptComponent.h"
+
 namespace Sentry
 {
-    LuaHttpServiceMethod::LuaHttpServiceMethod(const HttpMethodConfig *config, lua_State *lua)
-        : HttpServiceMethod(config->Method)
-    {
-        this->mLua = lua;
+    LuaHttpServiceMethod::LuaHttpServiceMethod(const HttpMethodConfig *config)
+        : HttpServiceMethod(config->Method), mLua(nullptr)
+    {      
         this->mConfig = config;
+        this->mLuaComponent = App::Inst()->GetComponent<LuaScriptComponent>();
     }
 
     XCode LuaHttpServiceMethod::Invoke(const Http::Request &request, Http::Response &response)
@@ -23,16 +25,17 @@ namespace Sentry
         {
             return XCode::CallLuaFunctionFail;
         }
-        const char * tab = this->mConfig->Service.c_str();
-        const char * method = this->mConfig->Method.c_str();
-        if(!Lua::Function::Get(this->mLua, tab, method))
-		{
-			Json::Document document;
-			document.Add("error", "call lua function not existe");
-			document.Add("code", (int)XCode::CallFunctionNotExist);
-			response.Json(HttpStatus::OK, document);
-			return XCode::CallFunctionNotExist;
-		}
+        const std::string& service = this->mConfig->Service;
+        Lua::LuaModule * luaModule = this->mLuaComponent->GetModule(service);
+        if (luaModule == nullptr || !luaModule->GetFunction(this->mConfig->Method))
+        {
+            Json::Document document;
+            document.Add("error", "call lua function not existe");
+            document.Add("code", (int)XCode::CallFunctionNotExist);
+            response.Json(HttpStatus::OK, document);
+            return XCode::CallFunctionNotExist;
+            return XCode::CallServiceNotFound;
+        }       
         rapidjson::Document document;
         request.WriteDocument(&document);
         values::pushValue(this->mLua, document);

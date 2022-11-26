@@ -1,10 +1,12 @@
 
-AccountService = {}
-
-local outerService = App.GetComponent("OuterService")
-
-function AccountService.OnServiceStart()
+local AccountService = {}
+function AccountService.Start111()
     print("启动账号服务")
+    return true
+end
+
+function AccountService.Update(tick)
+    Log.Info("tick = ", tick)
 end
 
 function AccountService.Register(requestInfo)
@@ -42,8 +44,8 @@ function AccountService.Login(request)
     if userInfo == nil or request.password ~= userInfo.password then
         return XCode.Failure
     end
-    local address = outerService:AllotLocation()
-    local code, response = outerService:Call(address, "Allot", {
+    local address = Service.AllotLocation("OuterService")
+    local code, response = Service.Call(address, "OuterService.Allot", {
         value = userInfo.user_id
     })
     if code ~= XCode.Successful then

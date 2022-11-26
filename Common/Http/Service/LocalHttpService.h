@@ -24,6 +24,7 @@ namespace Sentry
 	 public:
         bool Start() final;
         bool Close() final;
+		bool LateAwake() override; //子类必须调用
 		bool IsStartService() final { return this->mServiceRegister != nullptr;}
 		XCode Invoke(const std::string & name, std::shared_ptr<Http::Request>, std::shared_ptr<Http::Response>) final;
 	 private:

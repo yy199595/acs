@@ -100,13 +100,6 @@ namespace Sentry
 		virtual XCode Invoke(const std::string&, std::shared_ptr<T1>, std::shared_ptr<T2>) = 0;
 	};
 
-	class IServiceChange
-	{
-	public:
-		virtual bool OnStartService(const std::string & name) = 0;
-		virtual bool OnCloseService(const std::string & name) = 0;
-	};
-
 	template<typename T>
 	class IRpc
 	{

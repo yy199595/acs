@@ -19,6 +19,7 @@ namespace Sentry
 
     private:
         struct lua_State * mLuaEnv;
+        class LuaScriptComponent* mLuaComponent;
     };
 }
 

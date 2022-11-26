@@ -1,5 +1,6 @@
 ﻿#include"LuaRpcService.h"
 #include"Lua/Function.h"
+#include"Module/LuaModule.h"
 #include"Lua/LuaServiceMethod.h"
 #include"Component/LuaScriptComponent.h"
 #include"Config/ServiceConfig.h"
@@ -9,6 +10,7 @@ namespace Sentry
 	LuaRpcService::LuaRpcService()
 	{
         this->mWaitCount = 0;
+        this->mLuaComponent = nullptr;
         this->mIsHandlerMessage = false;
 	}
 
@@ -39,17 +41,10 @@ namespace Sentry
 				return false;
 			}
 		}
-        std::vector<IServiceChange *> components;
-        this->mApp->GetComponents<IServiceChange>(components);
+        if (!luaModule->Start())
         {
-            for (IServiceChange *component: components)
-            {
-                if(!component->OnStartService(this->GetName()))
-                {
-                    return false;
-                }
-            }
-        }
+            return false;
+        }        
         this->mIsHandlerMessage = true;
         return true;
 	}
@@ -92,27 +87,22 @@ namespace Sentry
 	{
 		LOG_CHECK_RET_FALSE(RpcService::LateAwake());
 		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
-        if(!this->mLuaComponent->LoadModule(this->GetName()))
+        Lua::LuaModule* luaModule = this->mLuaComponent->LoadModule(this->GetName());
+        if(luaModule == nullptr)
         {
             LOG_ERROR("load lua rpc module error : " << this->GetName());
             return false;
         }
-		return true;
+		return luaModule->Awake();
 	}
 
 	bool LuaRpcService::Close()
 	{
-        std::vector<IServiceChange *> components;
-        this->mApp->GetComponents<IServiceChange>(components);
+        Lua::LuaModule* luaModule = this->mLuaComponent->GetModule(this->GetName());
+        if (luaModule == nullptr)
         {
-            for (IServiceChange *component: components)
-            {
-                if(!component->OnCloseService(this->GetName()))
-                {
-                    return false;
-                }
-            }
-        }
-        return true;
+            return false;
+        }        
+        return luaModule->Close();
 	}
 }
