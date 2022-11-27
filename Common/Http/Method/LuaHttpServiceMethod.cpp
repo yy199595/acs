@@ -73,15 +73,16 @@ namespace Sentry
     XCode LuaHttpServiceMethod::CallAsync(Http::Response &response)
     {
         lua_State* lua = this->mLuaComponent->GetLuaEnv();
-        std::unique_ptr<LuaServiceTaskSource> luaTaskSource = 
-            std::make_unique<LuaServiceTaskSource>(lua);
-        Lua::UserDataParameter::Write(lua, luaTaskSource.get());
+        auto * luaTaskSource = new LuaServiceTaskSource(lua);
+        Lua::UserDataParameter::Write(lua, luaTaskSource);
         if (lua_pcall(lua, 3, 1, 0) != LUA_OK)
         {           
 			Json::Document document;
 			document.Add("error", lua_tostring(lua, -1));
 			document.Add("code", (int)XCode::CallLuaFunctionFail);
 			response.Json(HttpStatus::OK, document);
+
+            delete luaTaskSource;
             return XCode::CallLuaFunctionFail;
         }
         XCode code = luaTaskSource->Await();
@@ -89,9 +90,12 @@ namespace Sentry
         {           
             if (lua_isstring(lua, -1))
             {
+
                 size_t size = 0;
                 const char *json = lua_tolstring(lua, -1, &size);
 				response.Json(HttpStatus::OK, json, size);
+
+                delete luaTaskSource;
                 return XCode::Successful;
             }
             if (lua_istable(lua, -1))
@@ -99,9 +103,11 @@ namespace Sentry
                 this->mData.clear();
                 Lua::Json::Read(lua, -1, &this->mData);
 				response.Json(HttpStatus::OK, this->mData.c_str(), this->mData.size());
+                delete luaTaskSource;
                 return XCode::Successful;
             }
         }
+        delete luaTaskSource;
         return code;
     }
 }

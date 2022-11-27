@@ -51,17 +51,22 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-    bool RpcService::StartSend(const std::string &address, const std::string &func, const Message *message)
+    bool RpcService::StartSend(const std::string& address, const std::string& func, const Message* message)
     {
         RpcPacket request = PacketHelper::MakeRpcPacket(this->GetName(), func);
+        if (request == nullptr)
         {
-            request->SetType(Tcp::Type::Request);
-            request->SetProto(Tcp::Porto::Protobuf);
-#ifdef __INNER_MSG_FORWARD__
-            request->GetHead().Add("to", address);
-#endif
-            request->WriteMessage(message);
+            LOG_ERROR("send message error  " << this->GetName() << "." << func);
+            return false;
         }
+
+        request->SetType(Tcp::Type::Request);
+        request->SetProto(Tcp::Porto::Protobuf);
+#ifdef __INNER_MSG_FORWARD__
+        request->GetHead().Add("to", address);
+#endif
+        request->WriteMessage(message);
+
 #ifdef __INNER_MSG_FORWARD__
         std::string target;
         this->mForwardComponent->GetLocation(target);

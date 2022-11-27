@@ -67,7 +67,7 @@ namespace Sentry
             LOG_ERROR("not find rpc service : " << this->mBindName);
             return false;
         }
-        return locationService->Send(address, message) == XCode::Successful;
+        return locationService->Send(address, "Add", message) == XCode::Successful;
     }
 
     bool ForwardHelperComponent::OnAllot(const std::string &service, LocationUnit *locationUnit)
