@@ -7,7 +7,6 @@
 #include<fstream>
 #include"Md5/MD5.h"
 #include"File/DirectoryHelper.h"
-#include"Component/LuaScriptComponent.h"
 #include"google/protobuf/util/json_util.h"
 #include"google/protobuf/dynamic_message.h"
 #include"Lua/Message.h"

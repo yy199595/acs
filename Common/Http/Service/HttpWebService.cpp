@@ -2,7 +2,6 @@
 // Created by zmhy0073 on 2022/8/29.
 //
 #include"HttpWebService.h"
-#include"Math/MathHelper.h"
 #include"System/System.h"
 #include"Component/LuaScriptComponent.h"
 namespace Sentry
