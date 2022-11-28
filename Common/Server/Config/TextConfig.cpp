@@ -31,15 +31,13 @@ namespace Sentry
 
     bool TextConfig::ReloadConfig()
     {
-        std::string content;
-        if(!Helper::File::ReadTxtFile(this->mPath, content))
+        std::string content, md5;
+        if(!Helper::File::ReadTxtFile(this->mPath, content, md5))
         {
             CONSOLE_LOG_ERROR("read file [" << this->mPath << "] error");
             return false;
         }
-
-        std::string md5 = Helper::Md5::GetMd5(content);
-        if(md5 == this->mMd5)
+        if(md5 == this->mMd5) //文件无变更
         {
             return true;
         }

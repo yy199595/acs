@@ -10,6 +10,8 @@ namespace Helper
 
         extern bool ReadTxtFile(const std::string &path, std::string &outFile);
 
+        extern bool ReadTxtFile(const std::string &path, std::string &outFile, std::string & md5);
+
         extern bool ReadJsonFile(const std::string &path, rapidjson::Document &document);
 
         extern bool ReadJsonFile(const std::string &path, rapidjson::Document &document, std::string &md5);

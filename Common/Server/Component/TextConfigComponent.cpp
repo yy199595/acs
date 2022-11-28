@@ -81,7 +81,7 @@ namespace Sentry
             return false;
         }
         this->mConfigs.emplace(name, std::move(config));
-        CONSOLE_LOG_INFO("load [" << name << "] sucessful path = " << path);
+        CONSOLE_LOG_INFO("load [" << name << "] successful path = " << path);
         return true;
     }
 

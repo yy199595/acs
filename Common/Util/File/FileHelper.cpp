@@ -22,29 +22,52 @@ namespace Helper
 
         bool ReadTxtFile(const std::string &path, std::string &outFile)
         {
-            std::fstream fs;
+            std::ifstream fs;
             fs.open(path, std::ios::in);
-            if (fs.is_open())
+            if (!fs.is_open())
             {
-                std::string line;
-                while (std::getline(fs, line)) {
-                    outFile.append(line);
-                    outFile += "\n";
-                }
-                fs.close();
-                return true;
+                return false;
             }
-            return false;
+            std::string line;
+            while (std::getline(fs, line))
+            {
+                outFile.append(line);
+                outFile += "\n";
+            }
+            fs.close();
+            return true;
+        }
+
+        bool ReadTxtFile(const std::string &path, std::string &outFile, std::string & md5)
+        {
+            std::ifstream fs;
+            fs.open(path, std::ios::in);
+            if (!fs.is_open())
+            {
+                return false;
+            }
+            std::string line;
+            MD5 fileMd5(fs);
+            md5 = fileMd5.toString();
+            while (std::getline(fs, line))
+            {
+                outFile.append(line);
+                outFile += "\n";
+            }
+            fs.close();
+            return true;
         }
 
         bool ReadJsonFile(const std::string &path, rapidjson::Document &document)
         {
             std::string outString;
-            if (File::ReadTxtFile(path, outString)) {
-                document.Parse(outString.c_str(), outString.size());
-                return !document.HasParseError();
+            if (!File::ReadTxtFile(path, outString))
+            {
+                return false;
             }
-            return false;
+            const char * str = outString.c_str();
+            const size_t length = outString.size();
+            return !document.Parse(str, length).HasParseError();
         }
 
         bool ReadJsonFile(const std::string &path, rapidjson::Document &document, std::string &md5)

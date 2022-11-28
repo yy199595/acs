@@ -5,6 +5,7 @@ if(MSVC)
 else()
     enable_language(C CXX ASM)
 endif()
+
 add_definitions(-w)
 add_definitions(-D ASIO_STANDALONE)
 

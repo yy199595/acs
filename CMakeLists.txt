@@ -19,7 +19,7 @@ if(WIN32)
         if(CMAKE_SIZEOF_VOID_P EQUAL 4)
             set(AsmFiles ${ContextPath}/context_x86.asm)
         endif()
-            set_property(SOURCE ${AsmFiles} PROPERTY LANGUAGE ASM_MASM)
+        set_property(SOURCE ${AsmFiles} PROPERTY LANGUAGE ASM_MASM)
     else()
         set(AsmFiles ${ContextPath}/context.S)
     endif()
@@ -27,6 +27,8 @@ else()
     SET(AsmFiles ${ContextPath}/context.S)
 endif()
 MESSAGE(${AsmFiles})
+
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fexec-charset=GBK")
 
 #第三方库包含
 #include_directories(Libs/include/lua)
