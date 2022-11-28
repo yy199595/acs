@@ -1,6 +1,6 @@
 {
-    "fps": 30,
-    "node_name": "AllServer",
+    "fps": 15,
+    "name": "DataServer",
     "thread": {
         "task": 1,
         "network": 4
@@ -12,11 +12,9 @@
         "code": "XCode/XCode.csv",
         "user": "config/user.json",
         "redis": "config/db/redis.json",
-        "mysql": "config/db/mysql.json",
         "mongo": "config/db/mongo.json",
         "rpc": "config/service/rpc.json",
         "http": "config/service/http.json",
-        "service": "config/service.json",
         "cluster": "config/cluster/cluster.json",
         "location": "config/cluster/location.json"
     },
@@ -30,18 +28,12 @@
     },
     "server": {
         "rpc": "127.0.0.1:7788",
-        "gate": "192.168.1.9:1995",
-        "http": "http://127.0.0.1:8080/",
         "forward": [
             "127.0.0.1:7789"
         ]
     },
     "listener": {
-        "rpc": "0.0.0.0:7788",
-        "web": "0.0.0.0:8080",
-        "gate": "0.0.0.0:1995",
-        "forward": "0.0.0.0:7789",
-        "console": "127.0.0.1:8888"
+        "rpc": "0.0.0.0:7788"
     },
     "white_list": [
         "127.0.0.1"

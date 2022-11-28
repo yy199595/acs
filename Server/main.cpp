@@ -128,14 +128,8 @@ void RegisterServiceComponent()
 int main(int argc, char **argv)
 {
 #ifdef __OS_WIN__
-    //system("chcp 65001");
+    system("chcp 65001 > nul"); 
 #endif
-
-    if(argc != 3)
-    {
-        CONSOLE_LOG_ERROR("start argc error");
-        return 1;
-    }
 	RegisterComponent();
 	RegisterServiceComponent();
 	return (new App())->Run(argc, argv);

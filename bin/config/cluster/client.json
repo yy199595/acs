@@ -1,0 +1,9 @@
+{
+	"Client": {
+		"Component": [
+			"HttpComponent",
+			"ClientComponent",
+			"LuaScriptComponent"
+		]
+	}
+}

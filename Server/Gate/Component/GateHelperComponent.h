@@ -26,6 +26,7 @@ namespace Sentry
 		bool LateAwake() final;
 		void OnLuaRegister(Lua::ClassProxyHelper & luaRegister) final;
 	 private:
+		 std::string mGateServerName;
         class InnerNetComponent * mInnerComponent;
 		class LocationComponent * mLocationComponent;
 	};

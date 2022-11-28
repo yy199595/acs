@@ -7,6 +7,7 @@
 #include<string>
 #include"httpHead.h"
 #include<unordered_map>
+#include"Lua/LuaInclude.h"
 #include"Json/JsonReader.h"
 #include"Message/ProtoMessage.h"
 namespace Http
@@ -18,6 +19,8 @@ namespace Http
     public:
         const Head & Header() const { return this->mHead; }
         const std::string & Method() const { return this->mMethod; }
+    public:
+        virtual bool WriteLua(lua_State * lua) const = 0;       
         virtual bool WriteDocument(rapidjson::Document * document) const = 0;
     public:
         bool SetUrl(const std::string & url);
@@ -55,7 +58,9 @@ namespace Http
     protected:
         bool OnReadContent(std::istream &buffer) final;
         int OnWriteContent(std::ostream &buffer) final;
-        bool WriteDocument(rapidjson::Document * document) const final;
+    protected:
+        bool WriteLua(lua_State* lua) const final;
+        bool WriteDocument(rapidjson::Document* document) const final;
     public:
         bool GetParameter(const std::string & key, std::string & value);
     private:
@@ -77,7 +82,9 @@ namespace Http
     public:
         bool OnReadContent(std::istream &buffer) final;
         int OnWriteContent(std::ostream &buffer) final;
-        bool WriteDocument(rapidjson::Document * document) const final;
+    protected:
+        bool WriteLua(lua_State* lua) const final;
+        bool WriteDocument(rapidjson::Document* document) const final;
     public:
         const std::string & Content() const { return this->mContent;}
     private:

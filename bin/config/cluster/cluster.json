@@ -1,34 +1,4 @@
 {
-	"Client": {
-		"Component": [
-			"HttpComponent",
-			"ClientComponent",
-			"LuaScriptComponent"
-		]
-	},
-	"Server": {
-		"AutoAllot": true,
-		"Service": {
-			"UserBehavior": true,
-			"InnerService": true,
-			"OuterService": true,
-			"MongoService": true,
-			"ChatService": true,
-			"LocationService": true,
-			"HttpWebService": true,
-			"AccountService": true,
-			"HttpRpcService": true
-		},
-		"Component": [
-			"HttpComponent",
-			"ConsoleComponent",
-			"LuaScriptComponent",
-			"ForwardComponent",
-			"RedisComponent",
-			"HttpWebComponent",
-			"ForwardHelperComponent"
-		]
-	},
 	"ChatServer": {
 		"AutoAllot": true,
 		"Service": {
@@ -36,7 +6,10 @@
 			"InnerService": true,
 			"ChatService": true,
 			"OuterService": false
-		}
+		},
+		"Component" : [
+			"ForwardHelperComponent"
+		]
 	},
 	"HttpServer": {
 		"AutoAllot": false,
@@ -47,7 +20,8 @@
 		},
 		"Component": [
 			"HttpComponent",
-			"LuaScriptComponent"
+			"LuaScriptComponent",
+			"ForwardHelperComponent"
 		]
 	},
 	"GateServer": {
@@ -56,15 +30,20 @@
 			"OuterService": true,
 			"InnerService": true,
 			"ChatService": false
-		}
+		},
+		"Component" : [
+			"ForwardHelperComponent"
+		]
 	},
 	"DataServer": {
 		"AutoAllot": false,
 		"Service": {
 			"InnerService": true,
-			"MysqlService": true,
 			"MongoService": true
-		}
+		},
+		"Component" : [
+			"ForwardHelperComponent"
+		]
 	},
 	"ForwardServer": {
 		"AutoAllot": false,

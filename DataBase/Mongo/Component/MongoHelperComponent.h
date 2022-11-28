@@ -27,7 +27,8 @@ namespace Sentry
     private:
 		bool LateAwake() final;
 	 private:
-        std::string mBindName;
+        std::string mServerName;
+		std::string mServiceName;
         db::mongo::update mUpdateRequest;
         db::mongo::insert mInsertRequest;
         db::mongo::remove mRemoveRequest;

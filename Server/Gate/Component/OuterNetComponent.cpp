@@ -53,14 +53,18 @@ namespace Sentry
                 if(!this->OnAuth(address, message))
                 {
                     this->StartClose(address);
+                    CONSOLE_LOG_ERROR("[" << address << "] auth failure");
                 }
                 break;
             case Tcp::Type::Ping:
+                message->SetContent("hello");
+                this->SendData(address, message);
                 break;
             case Tcp::Type::Request:
                 if (!this->OnRequest(address, message))
                 {
                     this->StartClose(address);
+                    CONSOLE_LOG_ERROR("[" << address << "] request failure");
                 }
                 break;
             default:
@@ -119,7 +123,7 @@ namespace Sentry
             outerNetClient = std::make_shared<OuterNetClient>(socket, this);
         }
 
-        outerNetClient->StartReceive();
+        outerNetClient->StartReceive(10);
         this->mGateClientMap.emplace(address, outerNetClient);
         return true;
     }

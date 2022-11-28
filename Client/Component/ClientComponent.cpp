@@ -47,10 +47,14 @@ namespace Client
 
     void ClientComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
-        int type = message->GetType();
-        //int proto = message->GetProto();
+        int type = message->GetType();       
         switch (type)
         {
+            case (int)Tcp::Type::Ping:
+            {
+                LOG_INFO("[" << address << " ping message = " << message->GetBody());
+            }
+                return;
             case (int)Tcp::Type::Request:
             {
                 std::string func;

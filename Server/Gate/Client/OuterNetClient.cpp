@@ -19,8 +19,9 @@ namespace Sentry
 		: TcpContext(socket), mGateComponent(component)
 	{
 		this->mQps = 0;
+        this->mTimeout = 0;
 		this->mCallCount = 0;
-        this->mState = Tcp::DecodeState::Head;
+        this->mState = Tcp::DecodeState::Head;        
 	}
 
 	void OuterNetClient::StartReceive(int second)
@@ -32,28 +33,38 @@ namespace Sentry
         t.post(std::bind(&OuterNetClient::ReceiveMessage, this, RPC_PACK_HEAD_LEN));
         if(second != 0)
         {
-            t.post(std::bind(&OuterNetClient::StartTimer, this, second));
+            this->mTimeout = second;
+            t.post(std::bind(&OuterNetClient::StartTimer, this));
         }
-#endif
+#endif 
 	}
 
-    void OuterNetClient::StartTimer(int second)
+    void OuterNetClient::StartTimer()
     {
-        auto timeout = std::chrono::seconds(second);
-        Asio::Context & io = this->mSocket->GetThread();
-        this->mTimer = std::make_shared<asio::steady_timer>(io, timeout);
-        this->mTimer->async_wait(std::bind(&OuterNetClient::OnTimerEnd, this, second));
+        if (this->mTimeout > 0)
+        {
+            Asio::Context& io = this->mSocket->GetThread();
+            auto timeout = std::chrono::seconds(this->mTimeout);        
+            this->mTimer = std::make_shared<asio::steady_timer>(io, timeout);
+            this->mTimer->async_wait(std::bind(&OuterNetClient::OnTimerEnd, this, args1));
+        }
     }
 
-    void OuterNetClient::OnTimerEnd(int timeout)
-    {
-        long long nowTime = Helper::Time::NowSecTime();
-        if (nowTime - this->GetLastOperTime() < timeout) //超时
-        {
-            this->StartTimer(timeout);
-            return;
+    void OuterNetClient::OnTimerEnd(Asio::Code code)
+    {      
+        if (code != asio::error::operation_aborted)
+        {           
+            long long nowTime = Helper::Time::NowSecTime();
+            const std::string& address = this->mSocket->GetAddress();
+            CONSOLE_LOG_INFO("start ping client : [" << address << "]");          
+            if (nowTime - this->GetLastOperTime() < this->mTimeout) //超时
+            {
+                this->StartTimer();
+                return;
+            }
+            this->CloseSocket(XCode::NetTimeout);
         }
-        this->CloseSocket(XCode::NetTimeout);
+
     }
 
     void OuterNetClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t size)
@@ -104,17 +115,22 @@ namespace Sentry
         }
     }
 
-	void OuterNetClient::CloseSocket(XCode code)
-	{
+    void OuterNetClient::CloseSocket(XCode code)
+    {
         this->mSocket->Close();
-        const std::string & address = this->GetAddress();
+        const std::string& address = this->GetAddress();
+        if (this->mTimer != nullptr)
+        {
+            Asio::Code error;
+            this->mTimer->cancel(error);
+        }
 #ifdef ONLY_MAIN_THREAD
-		this->mGateComponent->OnCloseSocket(address, code);
+        this->mGateComponent->OnCloseSocket(address, code);
 #else
-		Asio::Context &mainTaskScheduler = App::Inst()->MainThread();
-		mainTaskScheduler.post(std::bind(&OuterNetComponent::OnCloseSocket, this->mGateComponent, address, code));
+        Asio::Context& mainTaskScheduler = App::Inst()->MainThread();
+        mainTaskScheduler.post(std::bind(&OuterNetComponent::OnCloseSocket, this->mGateComponent, address, code));
 #endif
-	}
+        }
 
 	void OuterNetClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{

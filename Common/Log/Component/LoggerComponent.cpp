@@ -13,7 +13,7 @@ namespace Sentry
 	bool LoggerComponent::Awake()
 	{
 		this->mLogSaveTime = 3;
-        this->mServerName = System::Name();
+        this->mServerName = ServerConfig::Inst()->Name();
         this->mLogSavePath = fmt::format("{0}log/", System::WorkPath());
 		this->CreateLogFile();
         return true;

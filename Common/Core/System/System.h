@@ -12,14 +12,13 @@ namespace Sentry
     class System
     {
     public:
-        static void Init(char **argv);
-        static const std::string FormatPath(const std::string & path);
-        static const std::string & Name() { return System::mName; }
+        static bool Init(int argc, char **argv);
+        static const std::string FormatPath(const std::string & path);     
         static const std::string & ExePath() { return System::mExePath; }
         static const std::string & WorkPath() { return System::mWorkPath; }
         static const std::string & ConfigPath() { return System::mConfigPath;}
     private:
-        static std::string mName;
+        static bool IsInit;       
         static std::string mExePath;
         static std::string mWorkPath;
         static std::string mConfigPath;

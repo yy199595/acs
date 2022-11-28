@@ -28,9 +28,9 @@ namespace Sentry
         size_t GetComponents(std::vector<std::string> & components) const;
         size_t GetServices(std::vector<std::string> & services, bool start = false) const;
     private:
-        bool mIsAutoAllot;
         std::string mLua;
-        const std::string & mName;
+        bool mIsAutoAllot;
+        const std::string mName;
         std::unordered_set<std::string> mComponents;
         std::unordered_map<std::string, bool> mServices;
     };
@@ -50,7 +50,9 @@ namespace Sentry
         const NodeConfig * GetConfig() const;
         const NodeConfig * GetConfig(const std::string & name) const;
         size_t GetNodeConfigs(std::vector<const NodeConfig *> & nodes) const;
+        bool GetServerName(const std::string& service, std::string& node) const;
     private:
+        std::unordered_map<std::string, std::string> mServiceNodes;
         std::unordered_map<std::string, std::unique_ptr<NodeConfig>> mNodeConfigs;
     };
 }

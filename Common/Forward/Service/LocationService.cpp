@@ -27,14 +27,14 @@ namespace Sentry
         {
             locationUnit->Add(value.first, value.second);
         }
-        this->mLocationComponent->AddLocationUnit(std::move(locationUnit));
+        this->mLocationComponent->AddUnit(std::move(locationUnit));
         return XCode::Successful;
     }
 
     XCode LocationService::Del(const s2s::location::del &request)
     {
         long long userId = request.user_id();
-        LocationUnit *locationUnit = this->mLocationComponent->GetLocationUnit(userId);
+        LocationUnit *locationUnit = this->mLocationComponent->GetUnit(userId);
         if (locationUnit == nullptr)
         {
             return XCode::NotFindUser;
@@ -42,7 +42,7 @@ namespace Sentry
 
         if (request.services_size() == 0)
         {
-            this->mLocationComponent->DelLocationUnit(userId);
+            this->mLocationComponent->DelUnit(userId);
             return XCode::Successful;
         }
 

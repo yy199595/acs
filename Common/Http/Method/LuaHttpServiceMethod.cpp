@@ -5,7 +5,7 @@
 #include"LuaHttpServiceMethod.h"
 #include"Lua/Function.h"
 #include"Json/Lua/Json.h"
-#include"Json/Lua/values.hpp"
+
 #include"Lua/LuaServiceTaskSource.h"
 #include"Component/ProtoComponent.h"
 #include"Component/LuaScriptComponent.h"
@@ -35,10 +35,11 @@ namespace Sentry
             document.Add("code", (int)XCode::CallFunctionNotExist);
             response.Json(HttpStatus::OK, document);
             return XCode::CallFunctionNotExist;          
-        }       
-        rapidjson::Document document;
-        request.WriteDocument(&document);
-        values::pushValue(lua, document);
+        }
+        if (!request.WriteLua(lua))
+        {
+            lua_pushnil(lua);
+        }
         return this->mConfig->IsAsync ? this->CallAsync(response) : this->Call(response);
     }
 
@@ -72,17 +73,15 @@ namespace Sentry
 
     XCode LuaHttpServiceMethod::CallAsync(Http::Response &response)
     {
-        lua_State* lua = this->mLuaComponent->GetLuaEnv();
-        auto * luaTaskSource = new LuaServiceTaskSource(lua);
-        Lua::UserDataParameter::Write(lua, luaTaskSource);
+        lua_State* lua = this->mLuaComponent->GetLuaEnv();       
+        std::unique_ptr<LuaServiceTaskSource> luaTaskSource = std::make_unique<LuaServiceTaskSource>(lua);
+        Lua::UserDataParameter::Write(lua, luaTaskSource.get());
         if (lua_pcall(lua, 3, 1, 0) != LUA_OK)
         {           
 			Json::Document document;
 			document.Add("error", lua_tostring(lua, -1));
 			document.Add("code", (int)XCode::CallLuaFunctionFail);
 			response.Json(HttpStatus::OK, document);
-
-            delete luaTaskSource;
             return XCode::CallLuaFunctionFail;
         }
         XCode code = luaTaskSource->Await();
@@ -94,20 +93,16 @@ namespace Sentry
                 size_t size = 0;
                 const char *json = lua_tolstring(lua, -1, &size);
 				response.Json(HttpStatus::OK, json, size);
-
-                delete luaTaskSource;
                 return XCode::Successful;
             }
             if (lua_istable(lua, -1))
             {
                 this->mData.clear();
                 Lua::Json::Read(lua, -1, &this->mData);
-				response.Json(HttpStatus::OK, this->mData.c_str(), this->mData.size());
-                delete luaTaskSource;
+				response.Json(HttpStatus::OK, this->mData.c_str(), this->mData.size());      
                 return XCode::Successful;
             }
         }
-        delete luaTaskSource;
         return code;
     }
 }

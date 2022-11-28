@@ -11,12 +11,24 @@
 #include"Log/CommonLogDef.h"
 namespace Sentry
 {
-    void System::Init(char **argv)
+    bool System::Init(int argc, char **argv)
     {
-		System::mName = argv[2];
+        if (System::IsInit)
+        {
+            return false;
+        }
+#ifdef __DEBUG__
+        if (argc != 2)
+        {          
+            System::mExePath = argv[0];
+            System::mConfigPath = "./config/start/server.json";
+            return true;
+        }
+#endif
 		System::mExePath = argv[0];
         System::mConfigPath = argv[1];
         System::mWorkPath = fmt::format("{0}/", getcwd(NULL, NULL));
+        return true;
     }
 
     const std::string System::FormatPath(const std::string &path)
@@ -24,7 +36,7 @@ namespace Sentry
         return System::mWorkPath + path;
     }
 
-    std::string System::mName;
+    bool System::IsInit = false;
     std::string System::mExePath;
     std::string System::mWorkPath;
     std::string System::mConfigPath;

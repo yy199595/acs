@@ -22,12 +22,7 @@ namespace Sentry
     bool TextConfigComponent::Awake()
     {
         std::string path = System::ConfigPath();
-        if (!this->LoadTextConfig<ServerConfig>(path))
-        {
-            return false;
-        }
-
-        const ServerConfig *config = this->GetTextConfig<ServerConfig>();
+        const ServerConfig* config = ServerConfig::Inst();
         if(config->GetPath("rpc", path))
         {
             LOG_CHECK_RET_FALSE(this->LoadTextConfig<RpcConfig>(path));

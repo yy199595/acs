@@ -12,7 +12,7 @@ namespace Lua
 	{
 		int Call(lua_State * lua);
         int AddLocation(lua_State * lua);
-        int AllotLocation(lua_State * lua);
+        int AllotServer(lua_State * lua);
     }
 }
 

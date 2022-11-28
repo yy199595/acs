@@ -30,6 +30,10 @@ namespace Sentry
             CONSOLE_LOG_ERROR("parse " << this->Path() << " failure");
             return false;
 		}
+        if (!this->GetMember("name", this->mName))
+        {
+            return false;
+        }
         const rapidjson::Value  * value1 = this->GetJsonValue("services");
         if(value1 != nullptr && value1->IsObject())
         {

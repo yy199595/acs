@@ -1,0 +1,25 @@
+{
+	"Server": {
+		"AutoAllot": true,
+		"Service": {
+			"UserBehavior": true,
+			"InnerService": true,
+			"OuterService": true,
+			"MongoService": true,
+			"ChatService": true,
+			"LocationService": true,
+			"HttpWebService": true,
+			"AccountService": true,
+			"HttpRpcService": true
+		},
+		"Component": [
+			"HttpComponent",
+			"ConsoleComponent",
+			"LuaScriptComponent",
+			"ForwardComponent",
+			"RedisComponent",
+			"HttpWebComponent",
+			"ForwardHelperComponent"
+		]
+	}
+}

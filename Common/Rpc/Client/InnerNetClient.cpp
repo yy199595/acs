@@ -9,8 +9,8 @@ namespace Sentry
                                    std::shared_ptr<SocketProxy> socket)
 		: TcpContext(socket, 1024 * 1024), mComponent(component)
     {
-        this->mSrvName = System::Name();
         this->mState = Tcp::DecodeState::Head;
+        this->mSrvName = ServerConfig::Inst()->Name();
         ServerConfig::Inst()->GetLocation("rpc", this->mRpcLocation);
         ServerConfig::Inst()->GetLocation("http", this->mHttpLocation);
         ServerConfig::Inst()->GetMember("user", "name", this->mUserName);

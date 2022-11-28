@@ -110,13 +110,18 @@ namespace Sentry
 
     void LocalRpcService::LoadFromLua()
 	{
-		std::vector<const RpcMethodConfig*> methodConfigs;
+		
 		LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();
+        if (luaScriptComponent == nullptr)
+        {
+            return;
+        }
 		Lua::LuaModule* luaModule = luaScriptComponent->LoadModule(this->GetName());
 		if (luaModule == nullptr)
 		{
 			return;
 		}
+        std::vector<const RpcMethodConfig*> methodConfigs;
 		const RpcServiceConfig* rpcServiceConfig = RpcConfig::Inst()->GetConfig(this->GetName());
 		rpcServiceConfig->GetMethodConfigs(methodConfigs);
 		for (const RpcMethodConfig* methodConfig : methodConfigs)

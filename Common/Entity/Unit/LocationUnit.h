@@ -17,10 +17,10 @@ namespace Sentry
     public:
         const std::string & GetLocation() const { return this->mAddress; }
     public:
-        bool Del(const std::string & service);
-        bool Get(std::vector<std::string> & services);
-        bool Get(const std::string & service, std::string & address) const;
-        void Add(const std::string & service, const std::string & address);
+        bool Del(const std::string & server);
+        bool Get(std::vector<std::string> & servers);
+        bool Get(const std::string & server, std::string & address) const;
+        void Add(const std::string & server, const std::string & address);
     private:
         std::string mAddress;
         std::unordered_map<std::string, std::string> mLocations;

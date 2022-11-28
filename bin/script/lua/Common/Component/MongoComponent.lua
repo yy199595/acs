@@ -7,7 +7,7 @@ function MongoComponent.InsertOnce(tab, data, flag)
     if type(data) == "table" then
         data = Json.Encode(data)
     end
-    local address = Service.AllotLocation("MongoService")
+    local address = Service.AllotServer("MongoService")
     return Service.Call(address, "MongoService.Insert", {
         tab = tab,
         json = data,
@@ -20,7 +20,7 @@ function MongoComponent.Delete(tab, data, limit, flag)
         data = Json.Encode(data)
     end
     assert(type(data) == "string")
-    local address = Service.AllotLocation("MongoService")
+    local address = Service.AllotServer("MongoService")
     return Service.Call(address, "MongoService.Delete", {
         tab = tab,
         json = data,
@@ -34,7 +34,7 @@ function MongoComponent.QueryOnce(tab, data)
         data = Json.Encode(data)
     end
     assert(type(data) == "string")
-    local address = Service.AllotLocation("MongoService")
+    local address = Service.AllotServer("MongoService")
     local code, response = Service.Call(address, "MongoService.Query", {
         tab = tab,
         json = data,
@@ -55,7 +55,7 @@ function MongoComponent.Query(tab, data, limit)
     end
     print("query json ", data)
     assert(type(data) == "string")
-    local address = Service.AllotLocation("MongoService")
+    local address = Service.AllotServer("MongoService")
     local code, response = Service.Call(address, "MongoService.Query", {
         tab = tab,
         json = data,
@@ -82,7 +82,7 @@ function MongoComponent.QueryDatas(tab, querys)
             ["$in"] = querys
         }
     }
-    local address = Service.AllotLocation("MongoService")
+    local address = Service.AllotServer("MongoService")
     local code, response = Service.Call(address, "MongoService.Query", {
         tab = tab,
         limit = #querys,
@@ -103,7 +103,7 @@ end
 function MongoComponent.SetIndex(tab, name)
     assert(type(tab) == "string")
     assert(type(name) == "string")
-    local address = Service.AllotLocation("MongoService")
+    local address = Service.AllotServer("MongoService")
     return Service.Call(address, "MongoService.SetIndex", {
         tab = tab,
         name = name
@@ -119,7 +119,7 @@ function MongoComponent.Update(tab, select, update, tag, flag)
     end
     assert(type(select) == "string")
     assert(type(update) == "string")
-    local address = Service.AllotLocation("MongoService")
+    local address = Service.AllotServer("MongoService")
     return Service.Call(address, "MongoService.Update", {
         tab = tab,
         select = select,

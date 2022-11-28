@@ -17,23 +17,23 @@ namespace Sentry
         LocationComponent() = default;
         ~LocationComponent() = default;
     public:
-        bool DelLocation(const std::string & address);
-		bool AllotLocation(const std::string & service, std::string & address);
-        bool DelLocation(const std::string & service, const std::string & address);
-        void AddLocation(const std::string & service, const std::string & address);
+        bool DelServer(const std::string& address);
+        size_t GetServerCount(const std::string& name);
+        bool AllotServer(const std::string& server, std::string& address);
+        void AddRpcServer(const std::string & server, const std::string & address);
+        void AddHttpServer(const std::string& server, const std::string& address);
 	 public:
-		bool DelLocationUnit(long long id);
-		LocationUnit * GetLocationUnit(long long id) const;
-		bool AddLocationUnit(std::unique_ptr<LocationUnit> locationUnit);
-        size_t GetLocationCount() const { return this->mUnitLocations.size(); }
+		bool DelUnit(long long id);
+		LocationUnit * GetUnit(long long id) const;
+		bool AddUnit(std::unique_ptr<LocationUnit> locationUnit);
+        size_t GetUnitCount() const { return this->mUnitLocations.size(); }
 	 public:
-		int GetAllotCount(const std::string & address) const;
-        size_t GetHostSize(const std::string & service) const;
-        bool HasLocation(const std::string & service, const std::string & address);
-        bool GetLocationss(const std::string & service, std::vector<std::string> & hosts);
+		int GetAllotCount(const std::string & address) const;       
+        bool GetServers(const std::string & server, std::vector<std::string> & hosts);
 	 private:
 		std::unordered_map<std::string, int> mAllotCount;
-        std::unordered_map<std::string, std::vector<std::string>> mServiceLocations;
+        std::unordered_map<std::string, std::vector<std::string>> mRpcServers;
+        std::unordered_map<std::string, std::vector<std::string>> mHttpServers;
         std::unordered_map<long long, std::unique_ptr<LocationUnit>> mUnitLocations;
     };
 }

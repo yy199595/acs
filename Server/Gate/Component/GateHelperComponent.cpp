@@ -5,6 +5,7 @@
 #include"GateHelperComponent.h"
 #include"Service/OuterService.h"
 #include"Lua/LuaParameter.h"
+#include"Config/ClusterConfig.h"
 #include"Component/LocationComponent.h"
 #include"Component/InnerNetComponent.h"
 #include"Component/ComponentFactory.h"
@@ -15,18 +16,18 @@ namespace Sentry
 		LOG_CHECK_FATAL(this->GetComponent<OuterService>());
         this->mInnerComponent = this->GetComponent<InnerNetComponent>();
 		this->mLocationComponent = this->GetComponent<LocationComponent>();
-		return true;
+		const std::string name = ComponentFactory::GetName<OuterService>();
+		return ClusterConfig::Inst()->GetServerName(name, this->mGateServerName);
 	}
 
 	bool GateHelperComponent::GetLocation(long long userId, std::string& address)
-	{
-		const std::string name = ComponentFactory::GetName<OuterService>();
-		LocationUnit * locationUnit = this->mLocationComponent->GetLocationUnit(userId);
+	{		
+		LocationUnit * locationUnit = this->mLocationComponent->GetUnit(userId);
 		if(locationUnit == nullptr)
 		{
 			return false;
 		}
-		return locationUnit->Get(name, address);
+		return locationUnit->Get(this->mGateServerName, address);
 	}
 
 
@@ -94,7 +95,7 @@ namespace Sentry
 	{
         std::vector<std::string> locations;
 		const std::string name = ComponentFactory::GetName<OuterService>();
-		if(!this->mLocationComponent->GetLocationss(name, locations))
+		if(!this->mLocationComponent->GetServers(name, locations))
 		{
 			return XCode::Failure;
 		}
@@ -111,9 +112,8 @@ namespace Sentry
 
 	XCode GateHelperComponent::BroadCast(const std::string& func, const Message& message)
 	{
-		std::vector<std::string> locations;
-		const std::string name = ComponentFactory::GetName<OuterService>();
-		if(!this->mLocationComponent->GetLocationss(name, locations))
+		std::vector<std::string> locations;		
+		if(!this->mLocationComponent->GetServers(this->mGateServerName, locations))
 		{
 			return XCode::Failure;
 		}
@@ -134,9 +134,8 @@ namespace Sentry
 
 	XCode GateHelperComponent::LuaBroadCast(const char * func, std::shared_ptr<Message> message)
 	{
-		std::vector<std::string> locations;
-		const std::string name = ComponentFactory::GetName<OuterService>();
-		if(!this->mLocationComponent->GetLocationss(name, locations))
+		std::vector<std::string> locations;		
+		if(!this->mLocationComponent->GetServers(this->mGateServerName, locations))
 		{
 			return XCode::Failure;
 		}

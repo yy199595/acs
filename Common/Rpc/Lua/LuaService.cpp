@@ -5,6 +5,7 @@
 #include"LuaService.h"
 #include"App/App.h"
 #include"Json/Lua/Json.h"
+#include"Config/ClusterConfig.h"
 #include"String/StringHelper.h"
 #include"Async/RpcTaskSource.h"
 #include"Component/ProtoComponent.h"
@@ -39,7 +40,7 @@ namespace Lua
 				return 0;
 			}
 			LocationComponent * locationComponent = App::Inst()->GetComponent<LocationComponent>();
-            const LocationUnit * locationUnit = locationComponent->GetLocationUnit(userId);
+            const LocationUnit * locationUnit = locationComponent->GetUnit(userId);
             if(locationUnit == nullptr || (!locationUnit->Get(methodConfig->Service, address)))
             {
                 ForwardHelperComponent * forwardComponent = App::Inst()->GetComponent<ForwardHelperComponent>();
@@ -112,7 +113,7 @@ namespace Lua
         return netMessageComponent->AddTask(id, luaRpcTaskSource)->Await();
     }
 
-	int Service::AllotLocation(lua_State *lua)
+	int Service::AllotServer(lua_State *lua)
 	{
 		const std::string service = luaL_checkstring(lua, 1);
 		LocationComponent * locationComponent = App::Inst()->GetComponent<LocationComponent>();
@@ -120,15 +121,21 @@ namespace Lua
 		{
 			std::string address;
 			long long userId = lua_tointeger(lua, 2);
-			LocationUnit * locationUnit = locationComponent->GetLocationUnit(userId);
+			LocationUnit * locationUnit = locationComponent->GetUnit(userId);
 			if(locationUnit != nullptr && locationUnit->Get(service, address))
 			{
 				lua_pushlstring(lua, address.c_str(), address.size());
 				return 1;
 			}
 		}
+        std::string server;
+        if (!ClusterConfig::Inst()->GetServerName(service, server))
+        {
+            luaL_error(lua, "not find server : service = %s ", service.c_str());
+            return 0;
+        }
 		std::string address;
-		if(locationComponent->AllotLocation(service, address))
+		if(locationComponent->AllotServer(server, address))
 		{
 			lua_pushlstring(lua, address.c_str(), address.size());
 			return 1;

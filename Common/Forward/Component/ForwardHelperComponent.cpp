@@ -28,8 +28,7 @@ namespace Sentry
             {
                 LOG_ERROR("ping forward server [" << address << "] error");
                 return;
-            }
-            locationComponent->AddLocation(this->mBindName, address);
+            }           
             CONSOLE_LOG_INFO("ping forward server [" << address << "] successful")
         }
     }

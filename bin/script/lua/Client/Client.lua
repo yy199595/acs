@@ -37,7 +37,7 @@ function Client.Start()
         Log.Error("user auth failure")
         return false
     end
-    coroutine.start(LoopCall)
+    --coroutine.start(LoopCall)
     return true
 end
 local callCount = 0
@@ -45,12 +45,12 @@ local callCount = 0
 
 function LoopCall()
     while true do
-        local t1 = Time.GetNowMilTime()
+        local t1 = Time.NowMilTime()
         local res, response = clientComponent:Call("ChatService.Chat", "c2s.chat.request", {
             user_id = 1122, msg_type = 1, message = "hello"
         })
         callCount = callCount + 1
-        local t = Time.GetNowMilTime() - t1
+        local t = Time.NowMilTime() - t1
         Log.Error(string.format("call use time = [%dms] count = %d", t, callCount))
     end
 end

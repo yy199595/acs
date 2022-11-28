@@ -4,15 +4,16 @@
 
 #include"MongoHelperComponent.h"
 #include"Service/MongoService.h"
+#include"Config/ClusterConfig.h"
 #include"Component/LocationComponent.h"
 namespace Sentry
 {
 	bool MongoHelperComponent::LateAwake()
     {
-        this->mBindName = ComponentFactory::GetName<MongoService>();
-        LOG_CHECK_RET_FALSE(this->mApp->GetService(this->mBindName));
+        this->mServiceName = ComponentFactory::GetName<MongoService>();
+        LOG_CHECK_RET_FALSE(this->GetComponent<MongoService>() != nullptr);
         this->mLocationComponent = this->GetComponent<LocationComponent>();
-        return true;
+        return ClusterConfig::Inst()->GetServerName(this->mServiceName, this->mServerName);
     }
 
 	XCode MongoHelperComponent::Insert(const Message& message, int index)
@@ -24,8 +25,8 @@ namespace Sentry
 	XCode MongoHelperComponent::Insert(const char* tab, const Message& message, int index)
 	{
 		std::string address;
-        RpcService * rpcService = this->mApp->GetService(this->mBindName);
-		if(!this->mLocationComponent->AllotLocation(this->mBindName, address))
+        RpcService * rpcService = this->mApp->GetService(this->mServerName);
+		if(!this->mLocationComponent->AllotServer(this->mServerName, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
@@ -43,8 +44,8 @@ namespace Sentry
     XCode MongoHelperComponent::Update(const char *tab, const std::string &select, const std::string &data, int index)
     {
 		std::string address;
-        RpcService * rpcService = this->mApp->GetService(this->mBindName);
-        if(!this->mLocationComponent->AllotLocation(this->mBindName, address))
+        RpcService * rpcService = this->mApp->GetService(this->mServiceName);
+        if(!this->mLocationComponent->AllotServer(this->mServerName, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
@@ -58,8 +59,8 @@ namespace Sentry
 	XCode MongoHelperComponent::Insert(const char* tab, const std::string& json, int index)
 	{
 		std::string address;
-        RpcService * rpcService = this->mApp->GetService(this->mBindName);
-        if(!this->mLocationComponent->AllotLocation(this->mBindName, address))
+        RpcService * rpcService = this->mApp->GetService(this->mServiceName);
+        if(!this->mLocationComponent->AllotServer(this->mServerName, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
@@ -72,8 +73,8 @@ namespace Sentry
 	XCode MongoHelperComponent::Remove(const char* tab, const std::string& select, int limit, int index)
 	{
 		std::string address;
-        RpcService * rpcService = this->mApp->GetService(this->mBindName);
-        if(!this->mLocationComponent->AllotLocation(this->mBindName, address))
+        RpcService * rpcService = this->mApp->GetService(this->mServiceName);
+        if (!this->mLocationComponent->AllotServer(this->mServerName, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
@@ -88,8 +89,8 @@ namespace Sentry
                                       const std::string& select, std::shared_ptr<Message> response)
 	{
 		std::string address;
-        RpcService * rpcService = this->mApp->GetService(this->mBindName);
-        if(!this->mLocationComponent->AllotLocation(this->mBindName, address))
+        RpcService * rpcService = this->mApp->GetService(this->mServiceName);
+        if (!this->mLocationComponent->AllotServer(this->mServerName, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
@@ -140,8 +141,8 @@ namespace Sentry
                 return XCode::CallArgsError;
         }
 		std::string address;
-        RpcService * rpcService = this->mApp->GetService(this->mBindName);
-        if(!this->mLocationComponent->AllotLocation(this->mBindName, address))
+        RpcService * rpcService = this->mApp->GetService(this->mServiceName);
+        if (!this->mLocationComponent->AllotServer(this->mServerName, address))
 		{
 			return XCode::AddressAllotFailure;
 		}

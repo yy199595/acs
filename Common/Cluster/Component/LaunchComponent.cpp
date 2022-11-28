@@ -29,7 +29,7 @@ namespace Sentry
                     LOG_ERROR("add " << name << " error");
                     return false;
                 }
-                CONSOLE_LOG_INFO(System::Name() << " add component [" << name << "]");
+                CONSOLE_LOG_INFO(ServerConfig::Inst()->Name() << " add component [" << name << "]");
             }
         }
         components.clear();
@@ -73,7 +73,7 @@ namespace Sentry
                         }
                     }
                 }
-                CONSOLE_LOG_INFO(System::Name() << " add service [" << name << "]");
+                CONSOLE_LOG_INFO(ServerConfig::Inst()->Name() << " add service [" << name << "]");
             }
         }
         return true;
@@ -112,7 +112,6 @@ namespace Sentry
 #else
                     LOG_INFO("start rpc service [" << name << "] successful");
 #endif
-                    locationComponent->AddLocation(name, location);
                 }
                 else if(HttpConfig::Inst()->GetConfig(name) != nullptr)
                 {
@@ -124,6 +123,8 @@ namespace Sentry
                     LOG_INFO("start http service [" << name << "] successful");
                 }
             }
+            locationComponent->AddRpcServer(ServerConfig::Inst()->Name(), location);
+            locationComponent->AddHttpServer(ServerConfig::Inst()->Name(), httpLocation);
         }
         return true;
     }

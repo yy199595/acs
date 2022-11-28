@@ -28,16 +28,17 @@ namespace Sentry
 		void OnConnect(const asio::error_code &error) {}
         void OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
-	private:
-        void OnTimerEnd(int timeout);
-        void StartTimer(int second);
+	private:		
+		void StartTimer();
         void CloseSocket(XCode code);
+		void OnTimerEnd(Asio::Code code);
 	 private:
+		 int mTimeout;
 		unsigned int mQps;
         unsigned int mCallCount;
-        Tcp::DecodeState mState;
+        Tcp::DecodeState mState;		
         OuterNetComponent* mGateComponent;
-        std::shared_ptr<Rpc::Packet> mMessage;
+        std::shared_ptr<Rpc::Packet> mMessage;		
         std::shared_ptr<asio::steady_timer> mTimer;
 	};
 }

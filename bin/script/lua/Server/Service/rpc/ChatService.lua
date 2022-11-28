@@ -8,7 +8,6 @@ function ChatService.OnServiceStart()
 end
 
 ChatService.Chat = function(id, request)
-    coroutine.sleep(1000)
     print("更新完成&&&&&&112233")
     local chatMessage = messageComponent:New("c2s.chat.notice", {
         msg_type = request.msg_type,

@@ -57,18 +57,9 @@ namespace Sentry
         if (nodeConfig->GetServices(services) <= 0)
         {
             return XCode::Failure;
-        }
-        for (const std::string &service: services)
-        {
-            if (RpcConfig::Inst()->GetConfig(service) != nullptr)
-            {
-                this->mLocationComponent->AddLocation(service, request.rpc());
-            }
-            else if (HttpConfig::Inst()->GetConfig(service) != nullptr)
-            {
-                this->mLocationComponent->AddLocation(service, request.http());
-            }
-        }
+        }   
+        this->mLocationComponent->AddRpcServer(request.name(), request.rpc());
+        this->mLocationComponent->AddHttpServer(request.name(), request.http());      
         return XCode::Successful;
     }
 

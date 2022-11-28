@@ -4,6 +4,7 @@
 #include"Config/ServiceConfig.h"
 #include"String/StringHelper.h"
 #include"Lua/LuaService.h"
+#include"Config/ClusterConfig.h"
 #include"Component/InnerNetComponent.h"
 #include"Component/LocationComponent.h"
 #include"Component/ForwardHelperComponent.h"
@@ -19,13 +20,12 @@ namespace Sentry
 		this->mLocationComponent = this->GetComponent<LocationComponent>();
         LOG_CHECK_RET_FALSE(this->mForwardComponent = this->GetComponent<ForwardHelperComponent>());
         LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>());
-        return true;
+        return ClusterConfig::Inst()->GetServerName(this->GetName(), this->mServerName);
 	}
 
 	bool RpcService::IsStartComplete()
-	{
-		const std::string & service = this->GetName();
-		return this->mLocationComponent->GetHostSize(service) > 0;
+	{		
+		return this->mLocationComponent->GetServerCount(this->mServerName) > 0;
 	}
 }
 
@@ -33,11 +33,10 @@ namespace Sentry
 {
 	XCode RpcService::Send(const std::string& func, const Message& message)
 	{
-		std::vector<std::string> locations;
-		const std::string & service = this->GetName();
-		if(!this->mLocationComponent->GetLocationss(service, locations))
+		std::vector<std::string> locations;		
+		if(!this->mLocationComponent->GetServers(this->mServerName, locations))
 		{
-			LOG_ERROR(service <<  " address list empty");
+			LOG_ERROR(this->mServerName <<  " address list empty");
 			return XCode::Failure;
 		}
 

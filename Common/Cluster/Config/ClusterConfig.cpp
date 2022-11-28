@@ -4,6 +4,7 @@
 
 #include"ClusterConfig.h"
 #include"System/System.h"
+#include"Config/ServerConfig.h"
 namespace Sentry
 {
     bool NodeConfig::IsStart(const std::string &service) const
@@ -103,8 +104,25 @@ namespace Sentry
             {
                 return false;
             }
+            std::vector<std::string> services;
+            nodeConfig->GetServices(services);
+            for (const std::string& service : services)
+            {
+                this->mServiceNodes.emplace(service, name);
+            }
             this->mNodeConfigs.emplace(name, std::move(nodeConfig));
         }
+        return true;
+    }
+
+    bool ClusterConfig::GetServerName(const std::string& service, std::string& node) const
+    {
+        auto iter = this->mServiceNodes.find(service);
+        if (iter == this->mServiceNodes.end())
+        {
+            return false;
+        }
+        node = iter->second;
         return true;
     }
 
@@ -114,9 +132,8 @@ namespace Sentry
     }
 
     const NodeConfig *ClusterConfig::GetConfig() const
-    {
-        const std::string & name = System::Name();
-        auto iter = this->mNodeConfigs.find(name);
+    {        
+        auto iter = this->mNodeConfigs.find(ServerConfig::Inst()->Name());
         return iter != this->mNodeConfigs.end() ? iter->second.get() : nullptr;
     }
 

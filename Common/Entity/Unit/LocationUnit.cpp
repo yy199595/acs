@@ -37,14 +37,15 @@ namespace Sentry
         return services.size() > 0;
     }
 
-    bool LocationUnit::Get(const std::string &service, std::string &address) const
+    bool LocationUnit::Get(const std::string &server, std::string &address) const
     {
-        auto iter = this->mLocations.find(service);
+        auto iter = this->mLocations.find(server);
         if(iter == this->mLocations.end())
         {
             return false;
         }
         address = iter->second;
+        CONSOLE_LOG_DEBUG(this->GetUnitId() << " add to " << server << " [" << address << "]");
         return true;
     }
 }

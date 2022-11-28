@@ -88,31 +88,24 @@ namespace Sentry
         for(const NodeConfig * nodeConfig : nodeConfigs)
         {
             services.clear();
+            const std::string& server = nodeConfig->GetName();
             if (!nodeConfig->IsAuthAllot() || nodeConfig->GetServices(services) <= 0)
             {
                 continue;
             }
-
-            std::string location;
-            for (const std::string &service: services)
+            // ·ÖÅä·þÎñÆ÷
+            std::string location; 
+            if (!this->mLocationComponent->AllotServer(server, location))
             {
-                const RpcServiceConfig *rpcServiceConfig = RpcConfig::Inst()->GetConfig(service);
-                if (rpcServiceConfig == nullptr || !rpcServiceConfig->IsClient())
-                {
-                    continue;
-                }
-                if (location.empty() && !this->mLocationComponent->AllotLocation(service, location))
-                {
-                    return XCode::NetWorkError;
-                }
-                locationUnit->Add(service, location);
+                return XCode::NetWorkError;
             }
+            locationUnit->Add(server, location);           
         }
         if(!this->mForwardComponent->OnAllot(locationUnit.get()))
         {
             return XCode::NetWorkError;
         }
-		this->mLocationComponent->AddLocationUnit(std::move(locationUnit));
+		this->mLocationComponent->AddUnit(std::move(locationUnit));
         return XCode::Successful;
     }
 
@@ -131,20 +124,17 @@ namespace Sentry
 		{
 			return XCode::CallFunctionNotExist;
 		}
-        std::string target;
+        std::string target, server;
         long long userId = iter->second;
-        LocationUnit* locationUnit = this->mLocationComponent->GetLocationUnit(userId);
-        if (locationUnit == nullptr || !locationUnit->Get(methodConfig->Service, target))
+        if (!ClusterConfig::Inst()->GetServerName(methodConfig->Service, server))
+        {
+            return XCode::CallServiceNotFound;
+        }
+        LocationUnit* locationUnit = this->mLocationComponent->GetUnit(userId);
+        if (locationUnit == nullptr || !locationUnit->Get(server, target))
         {
             return XCode::NotFindUser;
-        }
-        RpcService * targetService = this->mApp->GetService(methodConfig->Service);
-		if (targetService == nullptr)
-		{
-			CONSOLE_LOG_ERROR("userid=" << userId <<
-										" call [" << methodConfig->Service << "] not find");
-			return XCode::CallServiceNotFound;
-		}
+        }        
 		message->GetHead().Add("id", userId);
 		if(!this->mInnerMessageComponent->Send(target, message))
 		{

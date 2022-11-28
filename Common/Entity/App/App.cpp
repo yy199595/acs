@@ -75,11 +75,17 @@ namespace Sentry
 
 	int App::Run(int argc, char ** argv)
     {
-        if (argc != 3)
+        if (!System::Init(argc, argv))
         {
+            CONSOLE_LOG_FATAL("start failure");
             return -1;
         }
-        System::Init(argv);
+
+        ServerConfig serverConfig;
+        if (!serverConfig.LoadConfig(System::ConfigPath()))
+        {
+            return false;
+        }
         this->mMainThread = std::make_unique<Asio::Context>();
         if (!this->LoadComponent())
         {
@@ -214,13 +220,13 @@ namespace Sentry
             complete->OnClusterComplete();
         }
 		long long t = Helper::Time::NowMilTime() - this->mStartTime;
-		LOG_INFO("===== start " << System::Name() << " successful [" << t / 1000.0f << "]s ===========");
+		LOG_INFO("===== start " << ServerConfig::Inst()->Name() << " successful [" << t / 1000.0f << "]s ===========");
 	}
 #ifdef __OS_WIN__
 	void App::UpdateConsoleTitle()
 	{
 		char buffer[100] = {0};
-		const std::string& name = System::Name();
+		const std::string& name = ServerConfig::Inst()->Name();
 		sprintf_s(buffer, "%s fps:%f", name.c_str(), this->mLogicFps);
 		SetConsoleTitle(buffer);
 	}

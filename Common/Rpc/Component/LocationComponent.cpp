@@ -7,54 +7,62 @@
 
 namespace Sentry
 {
-    void LocationComponent::AddLocation(const std::string& service, const std::string& address)
+    void LocationComponent::AddRpcServer(const std::string& name, const std::string& address)
     {
         if(address.empty())
         {
             return;
         }
-		auto iter = this->mServiceLocations.find(service);
-		if(iter == this->mServiceLocations.end())
+		auto iter = this->mRpcServers.find(name);
+		if(iter == this->mRpcServers.end())
 		{
 			std::vector<std::string> item;
-			this->mServiceLocations.emplace(service, item);
+			this->mRpcServers.emplace(name, item);
 		}
 		this->mAllotCount.emplace(address, 0);
-        std::vector<std::string> & locations = this->mServiceLocations[service];
+        std::vector<std::string> & locations = this->mRpcServers[name];
         if(std::find(locations.begin(), locations.end(), address) == locations.end())
         {
             locations.emplace_back(address);
-            LOG_WARN(service << " add new address [" << address << "]");
+            LOG_WARN(name << " add rpc server address [" << address << "]");
         }
     }
 
-    bool LocationComponent::DelLocation(const std::string& address)
-    {
-
-        return true;
-    }
-
-	bool LocationComponent::DelLocation(const std::string& service, const std::string& address)
+	void LocationComponent::AddHttpServer(const std::string& name, const std::string& address)
 	{
-		auto iter = this->mServiceLocations.find(service);
-		if(iter == this->mServiceLocations.end())
+		LOG_WARN(name << " add http server address [" << address << "]");
+	}
+
+	size_t LocationComponent::GetServerCount(const std::string & name)
+	{
+		auto iter = this->mRpcServers.find(name);
+		if (iter == this->mRpcServers.end())
 		{
-			return false;
+			return 0;
 		}
-		auto iter1 = std::find(
-			iter->second.begin(), iter->second.end(), address);
-		if(iter1 != iter->second.end())
+		return iter->second.size();
+
+	}
+
+	bool LocationComponent::DelServer(const std::string& address)
+	{
+		auto iter = this->mRpcServers.begin();
+		for (; iter != this->mRpcServers.end(); iter++)
 		{
-			iter->second.erase(iter1);
-			return true;
-		}
+			auto iter1 = std::find(iter->second.begin(), iter->second.end(), address);
+			if (iter1 != iter->second.end())
+			{
+				iter->second.erase(iter1);
+				return true;
+			}
+		}		
 		return false;
 	}
 
-	bool LocationComponent::GetLocationss(const std::string& service, std::vector<std::string>& hosts)
+	bool LocationComponent::GetServers(const std::string& server, std::vector<std::string>& hosts)
 	{
-		auto iter = this->mServiceLocations.find(service);
-		if(iter == this->mServiceLocations.end())
+		auto iter = this->mRpcServers.find(server);
+		if(iter == this->mRpcServers.end())
 		{
 			return false;
 		}
@@ -62,28 +70,10 @@ namespace Sentry
 		return true;
 	}
 
-	size_t LocationComponent::GetHostSize(const std::string& service) const
-	{
-		auto iter = this->mServiceLocations.find(service);
-		return iter != this->mServiceLocations.end() ? iter->second.size() : 0;
-	}
-
-	LocationUnit* LocationComponent::GetLocationUnit(long long id) const
+	LocationUnit* LocationComponent::GetUnit(long long id) const
 	{
 		auto iter = this->mUnitLocations.find(id);
 		return iter != this->mUnitLocations.end() ? iter->second.get() : nullptr;
-	}
-
-	bool LocationComponent::HasLocation(const string& service, const string& address)
-	{
-		auto iter = this->mServiceLocations.find(service);
-		if(iter == this->mServiceLocations.end() || iter->second.empty())
-		{
-			return false;
-		}
-		auto iter1 = std::find(
-			iter->second.begin(), iter->second.end(), address);
-		return iter1 != iter->second.end();
 	}
 
 	int LocationComponent::GetAllotCount(const std::string& address) const
@@ -92,10 +82,10 @@ namespace Sentry
 		return iter != this->mAllotCount.end() ? iter->second : 0;
 	}
 
-	bool LocationComponent::AllotLocation(const string& service, string& address)
+	bool LocationComponent::AllotServer(const string& server, string& address)
 	{
-		auto iter = this->mServiceLocations.find(service);
-		if(iter == this->mServiceLocations.end() || iter->second.empty())
+		auto iter = this->mRpcServers.find(server);
+		if(iter == this->mRpcServers.end() || iter->second.empty())
 		{
 			return false;
 		}
@@ -118,7 +108,8 @@ namespace Sentry
 		this->mAllotCount[address]++;
 		return true;
 	}
-	bool LocationComponent::DelLocationUnit(long long int id)
+
+	bool LocationComponent::DelUnit(long long id)
 	{
 		auto iter = this->mUnitLocations.find(id);
 		if(iter == this->mUnitLocations.end())
@@ -129,7 +120,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool LocationComponent::AddLocationUnit(std::unique_ptr<LocationUnit> locationUnit)
+	bool LocationComponent::AddUnit(std::unique_ptr<LocationUnit> locationUnit)
 	{
 		if(locationUnit == nullptr)
 		{

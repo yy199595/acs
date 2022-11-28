@@ -89,7 +89,7 @@ namespace Sentry
 		Lua::ClassProxyHelper luaRegister9(this->mLuaEnv, "Service");
 		luaRegister9.BeginNewTable();
 		luaRegister9.PushExtensionFunction("Call", Lua::Service::Call);
-		luaRegister9.PushExtensionFunction("AllotLocation", Lua::Service::AllotLocation);
+		luaRegister9.PushExtensionFunction("AllotServer", Lua::Service::AllotServer);
 
 		std::vector<Component *> components;
         this->mApp->GetComponents(components);
@@ -150,7 +150,7 @@ namespace Sentry
 
 	bool LuaScriptComponent::Start()
 	{
-        const std::string& name = System::Name();
+        const std::string& name = ServerConfig::Inst()->Name();
         Lua::LuaModule * luaModule = this->GetModule(name);
         return luaModule != nullptr&& luaModule->Start();
 	}
@@ -214,7 +214,7 @@ namespace Sentry
         }
         this->AddRequire(common);
         this->AddRequire(module);
-        return this->LoadModule(System::Name());
+        return this->LoadModule(ServerConfig::Inst()->Name());
     }
 
     void LuaScriptComponent::OnHotFix()

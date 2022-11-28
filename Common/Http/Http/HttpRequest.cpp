@@ -4,6 +4,7 @@
 
 #include"HttpRequest.h"
 #include<regex>
+#include"Json/Lua/values.hpp"
 #include"String/StringHelper.h"
 
 
@@ -101,20 +102,36 @@ namespace Http
         return true;
     }
 
-    bool GetRequest::WriteDocument(rapidjson::Document *document) const
+    bool GetRequest::WriteLua(lua_State* lua) const
     {
-        if(document == nullptr)
+        if (this->mParameters.empty())
         {
             return false;
         }
+        rapidjson::Document document;
+        if (this->WriteDocument(&document))
+        {
+            values::pushValue(lua, document);
+            return true;
+        }
+        return false;         
+    }
+
+    bool GetRequest::WriteDocument(rapidjson::Document* document) const
+    {
+        if (this->mParameters.empty())
+        {
+            return false;
+        }       
         document->SetObject();
         auto iter = this->mParameters.begin();
-        for(; iter != this->mParameters.end(); iter++)
+        for (; iter != this->mParameters.end(); iter++)
         {
-            const char * key = iter->first.c_str();
-            const char * value = iter->second.c_str();
+            const char* key = iter->first.c_str();
+            const char* value = iter->second.c_str();
             document->AddMember(rapidjson::StringRef(key), rapidjson::StringRef(value), document->GetAllocator());
         }
+        document->EndObject(this->mParameters.size());
         return true;
     }
 
@@ -150,14 +167,27 @@ namespace Http
         return false;
     }
 
-    bool PostRequest::WriteDocument(rapidjson::Document *document) const
+    bool PostRequest::WriteLua(lua_State* lua) const
     {
-        if(document == nullptr)
+        const char * str = this->mContent.c_str();
+        const size_t length = this->mContent.size();
+        if (str != nullptr && length > 0)
+        {
+            rapidjson::extend::StringStream s(str, length);
+            values::pushDecoded(lua, s);
+            return true;
+        }
+        return false;
+    }
+
+    bool PostRequest::WriteDocument(rapidjson::Document* document) const
+    {
+        const char* str = this->mContent.c_str();
+        const size_t length = this->mContent.size();
+        if (str == nullptr || length == 0)
         {
             return false;
         }
-        const char * str = this->mContent.c_str();
-        const size_t length = this->mContent.size();
         return !document->Parse(str, length).HasParseError();
     }
 

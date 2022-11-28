@@ -12,7 +12,7 @@ using namespace Sentry;
 
 namespace Tcp
 {
-    enum DecodeState
+    enum class DecodeState
     {
         Head,
         Body

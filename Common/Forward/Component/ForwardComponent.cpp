@@ -204,18 +204,22 @@ namespace Sentry
 
     XCode ForwardComponent::Forward(long long userId, std::shared_ptr<Rpc::Packet> message)
     {
-        std::string service, method, address;
+        std::string service, method, address, server;
         LOG_RPC_CHECK_ARGS(message->GetMethod(service, method));
 #ifdef __DEBUG__
         CONSOLE_LOG_DEBUG("forward message user id = "
             << userId << " func = " << service << "." << method);
 #endif
-        LocationUnit *locationUnit = this->mLocationComponent->GetLocationUnit(userId);
+        if (!ClusterConfig::Inst()->GetServerName(service, server))
+        {
+            return XCode::CallServiceNotFound;
+        }
+        LocationUnit *locationUnit = this->mLocationComponent->GetUnit(userId);
         if(locationUnit == nullptr)
         {
             return XCode::NotFindUser;
         }
-        if (!locationUnit->Get(service, address))
+        if (!locationUnit->Get(server, address))
         {
             return XCode::Failure;
         }

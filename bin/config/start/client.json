@@ -2,7 +2,7 @@
     "area_id": 1,
     "node_id": 1,
     "fps": 30,
-    "node_name": "Client",
+    "name": "Client",
     "thread": {
         "task": 1,
         "network": 4
@@ -11,7 +11,7 @@
         "log": "log",
         "source": "source",
         "proto": "proto",
-        "cluster": "config/cluster/cluster.json"
+        "cluster": "config/cluster/client.json"
     },
     "lua": {
         "common": "script/lua/Common",
