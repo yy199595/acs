@@ -88,7 +88,6 @@ namespace Sentry
 		virtual bool Close() = 0;
         virtual void OnCloseComplete() { }
 		virtual bool IsStartService() = 0;
-		virtual bool IsStartComplete() = 0;
         virtual void WaitAllMessageComplete() { };
         virtual int GetWaitMessageCount() const { return 0; }
 	};

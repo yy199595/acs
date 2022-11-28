@@ -21,14 +21,16 @@ namespace Sentry
 
     void ForwardHelperComponent::OnLocalComplete()
     {
-        LocationComponent *locationComponent = this->GetComponent<LocationComponent>();
+		TaskComponent * taskComponent = this->GetComponent<TaskComponent>();
         for (const std::string &address: this->mLocations)
         {
-            if (!this->mInnerComponent->Ping(address))
-            {
-                LOG_ERROR("ping forward server [" << address << "] error");
-                return;
-            }           
+			int count = 0;
+			while(!this->mInnerComponent->Ping(address))
+			{
+				count++;
+				taskComponent->Sleep(2000);
+				LOG_ERROR("try connect forward server count = " << count);
+			}
             CONSOLE_LOG_INFO("ping forward server [" << address << "] successful")
         }
     }

@@ -18,13 +18,12 @@ namespace Sentry
 		LocalHttpService() = default;
 		virtual ~LocalHttpService() = default;
 	 protected:
-		bool IsStartComplete() final { return true; }
         virtual bool OnCloseService() { return true; };
 		virtual bool OnStartService(HttpServiceRegister & serviceRegister) = 0;
 	 public:
         bool Start() final;
         bool Close() final;
-		bool LateAwake() override; //×ÓÀà±ØÐëµ÷ÓÃ
+		bool LateAwake() override; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		bool IsStartService() final { return this->mServiceRegister != nullptr;}
 		XCode Invoke(const std::string & name, std::shared_ptr<Http::Request>, std::shared_ptr<Http::Response>) final;
 	 private:

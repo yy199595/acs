@@ -30,16 +30,6 @@ namespace Sentry
         return true;
     }
 
-	void InnerService::OnInvoke(const std::string& message)
-	{
-
-	}
-
-	void InnerService::OnInvoke2(const std::string & message)
-	{
-
-	}
-
 	XCode InnerService::Ping()
     {
         return XCode::Successful;
@@ -47,19 +37,16 @@ namespace Sentry
 
     XCode InnerService::Join(const s2s::cluster::join &request)
     {
-        const NodeConfig *nodeConfig = ClusterConfig::Inst()->GetConfig(request.name());
-        if (nodeConfig == nullptr)
-        {
-            LOG_ERROR("not find cluster config : " << request.name());
-            return XCode::Failure;
-        }
-        std::vector<std::string> services;
-        if (nodeConfig->GetServices(services) <= 0)
-        {
-            return XCode::Failure;
-        }   
-        this->mLocationComponent->AddRpcServer(request.name(), request.rpc());
-        this->mLocationComponent->AddHttpServer(request.name(), request.http());      
+		for(int index = 0; index < request.list_size(); index++)
+		{
+			const s2s::cluster::server & server = request.list(index);
+			if(!ClusterConfig::Inst()->GetConfig(server.name()))
+			{
+				LOG_ERROR("not find cluster config : " << server.name());
+			}
+			this->mLocationComponent->AddRpcServer(server.name(), server.rpc());
+			this->mLocationComponent->AddHttpServer(server.name(), server.http());
+		}
         return XCode::Successful;
     }
 

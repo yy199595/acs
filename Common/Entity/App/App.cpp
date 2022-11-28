@@ -2,6 +2,7 @@
 #include"App.h"
 #include"System/System.h"
 #include"Timer/ElapsedTimer.h"
+#include"Config/ClusterConfig.h"
 #include"File/DirectoryHelper.h"
 #include"Service/LuaRpcService.h"
 #include"Component/ProtoComponent.h"
@@ -197,22 +198,24 @@ namespace Sentry
             complete->OnLocalComplete();
         }
         CONSOLE_LOG_DEBUG("start all component complete");
-        this->WaitDepentServiceStart();
+        this->WaitServerStart();
     }
 
-	void App::WaitDepentServiceStart() //等待依赖的服务启动完成
+	void App::WaitServerStart() //等待依赖的服务启动完成
 	{
-        std::vector<IServiceBase *> components;
-        this->GetComponents<IServiceBase>(components);
-		for (IServiceBase * component: components)
-        {
-            int count = 0;
-            while (!component->IsStartComplete())
-            {
-                this->mTaskComponent->Sleep(2000);
-                LOG_WARN("wait " << dynamic_cast<Component*>(component)->GetName() << " start count = " << ++count);
-            }
-        }
+		std::vector<const NodeConfig *> configs;
+		ClusterConfig::Inst()->GetNodeConfigs(configs);
+		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
+		for(const NodeConfig * nodeConfig : configs)
+		{
+			int count = 0;
+			while(!locationComponent->GetServerCount(nodeConfig->GetName()))
+			{
+				count++;
+				this->mTaskComponent->Sleep(2000);
+				LOG_WARN("wait " << nodeConfig->GetName() << " start count = count");
+			}
+		}
         std::vector<IComplete *> completeComponents;
         this->GetComponents<IComplete>(completeComponents);
         for (IComplete* complete: completeComponents)

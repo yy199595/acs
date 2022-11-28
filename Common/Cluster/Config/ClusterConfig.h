@@ -28,7 +28,7 @@ namespace Sentry
         size_t GetComponents(std::vector<std::string> & components) const;
         size_t GetServices(std::vector<std::string> & services, bool start = false) const;
     private:
-        std::string mLua;
+		std::string mLua;
         bool mIsAutoAllot;
         const std::string mName;
         std::unordered_set<std::string> mComponents;

@@ -1,6 +1,7 @@
 #include"MysqlHelperComponent.h"
 #include"String/StringHelper.h"
 #include"Service/MysqlService.h"
+#include"Config/ClusterConfig.h"
 #include"Component/LocationComponent.h"
 
 namespace Sentry
@@ -10,7 +11,7 @@ namespace Sentry
         this->mBindName = ComponentFactory::GetName<MysqlService>();
         LOG_CHECK_RET_FALSE(this->mApp->GetService(this->mBindName));
         this->mLocationComponent = this->GetComponent<LocationComponent>();
-		return true;
+		return ClusterConfig::Inst()->GetServerName(this->mBindName, this->mServerName);
 	}
 	XCode MysqlHelperComponent::Add(const Message& message, int flag)
 	{
@@ -55,7 +56,7 @@ namespace Sentry
 	{
 		std::string address;
         RpcService * rpcService = this->mApp->GetService(this->mBindName);
-		if(!this->mLocationComponent->AllotLocation(this->mBindName, address))
+		if(!this->mLocationComponent->AllotServer(this->mServerName, address))
 		{
 			return XCode::CallServiceNotFound;
 		}

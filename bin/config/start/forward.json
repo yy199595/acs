@@ -1,0 +1,41 @@
+{
+    "fps": 15,
+    "name": "ForwardServer",
+    "thread": {
+        "task": 1,
+        "network": 4
+    },
+    "path": {
+        "proto": "proto",
+        "source": "source",
+        "script": "script/lua",
+        "code": "XCode/XCode.csv",
+        "user": "config/user.json",
+        "redis": "config/db/redis.json",
+        "mongo": "config/db/mongo.json",
+        "rpc": "config/service/rpc.json",
+        "http": "config/service/http.json",
+        "cluster": "config/cluster/cluster.json",
+        "location": "config/cluster/location.json"
+    },
+    "user": {
+        "name": "root",
+        "passwd": "199595yjz."
+    },
+    "lua": {
+        "common": "script/lua/Common",
+        "module": "script/lua/Server"
+    },
+    "server": {
+        "rpc": "127.0.0.1:7789",
+        "forward": [
+            "127.0.0.1:7789"
+        ]
+    },
+    "listener": {
+        "forward": "127.0.0.1:7789"
+    },
+    "white_list": [
+        "127.0.0.1"
+    ]
+}

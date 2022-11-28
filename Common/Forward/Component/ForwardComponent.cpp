@@ -14,6 +14,7 @@ namespace Sentry
     {
         LOG_CHECK_RET_FALSE(this->StartListen("forward"));
         this->mLocationComponent = this->GetComponent<LocationComponent>();
+		this->mLocalHost = this->GetListenAddress();
         return true;
     }
 
@@ -136,13 +137,18 @@ namespace Sentry
                 return false;
             }
         }
-        s2s::cluster::join data;
-        data.set_name(serverNode->SrvName);
-        data.set_rpc(serverNode->LocationRpc);
-        data.set_http(serverNode->LocationHttp);
-        const std::string fullName("InnerService.Join");
+		this->mLocationComponent->AddRpcServer(serverNode->SrvName, serverNode->LocationRpc);
+		this->mLocationComponent->AddHttpServer(serverNode->SrvName, serverNode->LocationHttp);
+
+		s2s::cluster::join registerInfo;
+		const std::string fullName("InnerService.Join");
         for (const std::string &location: this->mAuthClients)
         {
+			s2s::cluster::join data;
+			s2s::cluster::server * server = data.add_list();
+			server->set_name(serverNode->SrvName);
+			server->set_rpc(serverNode->LocationRpc);
+			server->set_http(serverNode->LocationHttp);
             RpcPacket request = PacketHelper::MakeRpcPacket(fullName);
             {
                 request->SetType(Tcp::Type::Request);
@@ -150,9 +156,28 @@ namespace Sentry
                 request->WriteMessage(&data);
             }
             this->Send(location, request);
+			s2s::cluster::server * registerServer = registerInfo.add_list();
+			const ServiceNodeInfo * nodeInfo = this->GetServerInfo(location);
+			{
+				registerServer->set_name(nodeInfo->SrvName);
+				registerServer->set_rpc(nodeInfo->LocationRpc);
+				registerServer->set_http(nodeInfo->LocationHttp);
+			}
         }
+		s2s::cluster::server * registerServer = registerInfo.add_list();
+		{
+			registerServer->set_rpc(this->mLocalHost);
+			registerServer->set_name(ServerConfig::Inst()->Name());
+		}
+		RpcPacket request = PacketHelper::MakeRpcPacket(fullName);
+		{
+			request->SetType(Tcp::Type::Request);
+			request->SetProto(Tcp::Porto::Protobuf);
+			request->WriteMessage(&registerInfo);
+			this->Send(address, request);
+		}
 
-        this->mAuthClients.insert(address);
+		this->mAuthClients.insert(address);
         this->mLocationMap.emplace(serverNode->LocationRpc, address);
         this->mNodeInfos.emplace(address, std::move(serverNode));
         return true;

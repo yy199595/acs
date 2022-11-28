@@ -31,6 +31,7 @@ namespace Sentry
 		XCode Call(const std::string& func, const Message& data, std::shared_ptr<db::mysql::response> response = nullptr);
 	private:
         std::string mBindName;
+		std::string mServerName;
 		class LocationComponent * mLocationComponent;
 	};
 

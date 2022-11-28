@@ -2,11 +2,15 @@ syntax = "proto3";
 package s2s;
 message cluster
 {
-    message join
+    message server
     {
         string name = 1;
         string rpc = 2;
         string http = 3;
+    }
+    message join
+    {
+        repeated server list = 1;
     }
     message exit
     {

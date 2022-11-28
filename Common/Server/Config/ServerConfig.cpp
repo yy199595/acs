@@ -65,7 +65,7 @@ namespace Sentry
         location.clear();
         if(!this->GetMember("server", name, location))
         {
-            CONSOLE_LOG_FATAL("not find location : " << name);
+            CONSOLE_LOG_DEBUG("not find location : " << name);
             return false;
         }
         return true;

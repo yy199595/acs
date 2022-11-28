@@ -18,14 +18,9 @@ namespace Sentry
 	{
         this->mClientComponent = this->GetComponent<InnerNetComponent>();
 		this->mLocationComponent = this->GetComponent<LocationComponent>();
-        LOG_CHECK_RET_FALSE(this->mForwardComponent = this->GetComponent<ForwardHelperComponent>());
-        LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>());
+        this->mForwardComponent = this->GetComponent<ForwardHelperComponent>();
+        this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>();
         return ClusterConfig::Inst()->GetServerName(this->GetName(), this->mServerName);
-	}
-
-	bool RpcService::IsStartComplete()
-	{		
-		return this->mLocationComponent->GetServerCount(this->mServerName) > 0;
 	}
 }
 

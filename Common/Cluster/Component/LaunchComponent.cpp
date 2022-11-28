@@ -39,7 +39,6 @@ namespace Sentry
             {
                 const RpcServiceConfig * rpcServiceConfig = RpcConfig::Inst()->GetConfig(name);
                 const HttpServiceConfig * httpServiceConfig = HttpConfig::Inst()->GetConfig(name);
-				LOG_CHECK_RET_FALSE(rpcServiceConfig != nullptr || httpServiceConfig != nullptr);
                 if(!this->mApp->AddComponent(name))
                 {
                     if(rpcServiceConfig != nullptr)
@@ -72,6 +71,10 @@ namespace Sentry
                             return false;
                         }
                     }
+					else
+					{
+						return false;
+					}
                 }
                 CONSOLE_LOG_INFO(ServerConfig::Inst()->Name() << " add service [" << name << "]");
             }
@@ -85,10 +88,12 @@ namespace Sentry
         const ClusterConfig * clusterConfig  = ClusterConfig::Inst();
         LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
 
-        std::vector<std::string> components;
+		std::string location, httpLocation;
+		std::vector<std::string> components;
+		config->GetLocation("rpc", location);
+		config->GetLocation("http", httpLocation);
         if(clusterConfig->GetConfig()->GetServices(components, true) > 0)
         {
-            std::string location, httpLocation;
             for(const std::string & name : components)
             {
 #ifdef __DEBUG__
@@ -101,11 +106,7 @@ namespace Sentry
                 }
                 if(RpcConfig::Inst()->GetConfig(name) != nullptr)
                 {
-                    if(!config->GetLocation("rpc", location))
-                    {
-                        LOG_ERROR("not find http location config");
-                        return false;
-                    }
+					LOG_CHECK_RET_FALSE(!location.empty());
 #ifdef __DEBUG__
                     long long t2 = Helper::Time::NowMilTime();
                     LOG_INFO("start rpc service [" << name << "] successful use time [" << t2 - t1 << "ms]");
@@ -115,17 +116,13 @@ namespace Sentry
                 }
                 else if(HttpConfig::Inst()->GetConfig(name) != nullptr)
                 {
-                    if(!config->GetLocation("http", httpLocation))
-                    {
-                        LOG_ERROR("not find http location config");
-                        return false;
-                    }
+					LOG_CHECK_RET_FALSE(!httpLocation.empty());
                     LOG_INFO("start http service [" << name << "] successful");
                 }
             }
-            locationComponent->AddRpcServer(ServerConfig::Inst()->Name(), location);
-            locationComponent->AddHttpServer(ServerConfig::Inst()->Name(), httpLocation);
         }
+		locationComponent->AddRpcServer(ServerConfig::Inst()->Name(), location);
+		locationComponent->AddHttpServer(ServerConfig::Inst()->Name(), httpLocation);
         return true;
     }
 }

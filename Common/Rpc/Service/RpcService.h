@@ -39,7 +39,6 @@ namespace Sentry
         std::shared_ptr<Rpc::Packet> CallAwait(const std::string & address, const std::string & func, const Message * message = nullptr);
 	 protected:
 		bool LateAwake() override;
-		bool IsStartComplete() override;
     public:
         virtual XCode Invoke(const std::string & method, std::shared_ptr<Rpc::Packet> message) = 0;
 	private:

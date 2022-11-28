@@ -30,6 +30,10 @@ namespace Sentry
 
 	void LocationComponent::AddHttpServer(const std::string& name, const std::string& address)
 	{
+		if(address.empty())
+		{
+			return;
+		}
 		LOG_WARN(name << " add http server address [" << address << "]");
 	}
 

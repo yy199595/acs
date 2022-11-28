@@ -38,7 +38,7 @@ namespace Sentry
 #ifdef __OS_WIN__
 		void UpdateConsoleTitle();
 #endif
-		void WaitDepentServiceStart();
+		void WaitServerStart();
 	 private:
         float mLogicFps;
 	 private:
