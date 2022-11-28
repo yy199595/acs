@@ -4,7 +4,7 @@
 
 #include"LocationComponent.h"
 #include"Log/CommonLogDef.h"
-
+#include"Component/TaskComponent.h"
 namespace Sentry
 {
     void LocationComponent::AddRpcServer(const std::string& name, const std::string& address)
@@ -28,6 +28,20 @@ namespace Sentry
         }
     }
 
+	void LocationComponent::WaitServerStart(const std::string& server)
+	{
+		int count = 0;
+		TaskComponent * taskComponent = this->GetComponent<TaskComponent>();
+		auto iter = this->mRpcServers.find(server);
+		while(iter == this->mRpcServers.end() || iter->second.empty())
+		{
+			count++;
+			taskComponent->Sleep(2000);
+			iter = this->mRpcServers.find(server);
+			LOG_WARN("wait " << server << " start count = " << count);
+		}
+	}
+
 	void LocationComponent::AddHttpServer(const std::string& name, const std::string& address)
 	{
 		if(address.empty())
@@ -35,17 +49,6 @@ namespace Sentry
 			return;
 		}
 		LOG_WARN(name << " add http server address [" << address << "]");
-	}
-
-	size_t LocationComponent::GetServerCount(const std::string & name)
-	{
-		auto iter = this->mRpcServers.find(name);
-		if (iter == this->mRpcServers.end())
-		{
-			return 0;
-		}
-		return iter->second.size();
-
 	}
 
 	bool LocationComponent::DelServer(const std::string& address)

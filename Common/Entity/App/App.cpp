@@ -208,13 +208,8 @@ namespace Sentry
 		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
 		for(const NodeConfig * nodeConfig : configs)
 		{
-			int count = 0;
-			while(!locationComponent->GetServerCount(nodeConfig->GetName()))
-			{
-				count++;
-				this->mTaskComponent->Sleep(2000);
-				LOG_WARN("wait " << nodeConfig->GetName() << " start count = count");
-			}
+			locationComponent->WaitServerStart(nodeConfig->GetName());
+			CONSOLE_LOG_INFO(nodeConfig->GetName() << " start successful ...");
 		}
         std::vector<IComplete *> completeComponents;
         this->GetComponents<IComplete>(completeComponents);

@@ -18,7 +18,8 @@ namespace Sentry
         ~LocationComponent() = default;
     public:
         bool DelServer(const std::string& address);
-        size_t GetServerCount(const std::string& name);
+		// 等待某个服务器启动
+		void WaitServerStart(const std::string & server);
         bool AllotServer(const std::string& server, std::string& address);
         void AddRpcServer(const std::string & server, const std::string & address);
         void AddHttpServer(const std::string& server, const std::string& address);
