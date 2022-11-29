@@ -170,17 +170,15 @@ namespace Sentry
 				registerServer->set_http(nodeInfo->LocationHttp);
 			}
         }
-//		s2s::cluster::server * registerServer = registerInfo.add_list();
-//		{
-//			registerServer->set_rpc(this->mLocalHost);
-//			registerServer->set_name(ServerConfig::Inst()->Name());
-//		}
-		RpcPacket request = PacketHelper::MakeRpcPacket(fullName);
+		if(registerInfo.list_size() > 0)
 		{
-			request->SetType(Tcp::Type::Request);
-			request->SetProto(Tcp::Porto::Protobuf);
-			request->WriteMessage(&registerInfo);
-			this->Send(address, request);
+			RpcPacket request = PacketHelper::MakeRpcPacket(fullName);
+			{
+				request->SetType(Tcp::Type::Request);
+				request->SetProto(Tcp::Porto::Protobuf);
+				request->WriteMessage(&registerInfo);
+				this->Send(address, request);
+			}
 		}
 
 		this->mAuthClients.insert(address);

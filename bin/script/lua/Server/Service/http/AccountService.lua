@@ -16,15 +16,14 @@ function AccountService.Register(requestInfo)
         return XCode.AccountAlreadyExists
     end
     local nowTime = os.time()
-    local user_id = RedisComponent.AddCounter("user_id")
-    local str = string.format("%s%d%d", request.address, nowTime, user_id)
+    local user_id = LuaRedisComponent.AddCounter("user_id")
+    local str = string.format("%s%d%d", requestInfo.address, nowTime, user_id)
 
     requestInfo.login_time = 0
     requestInfo.user_id = user_id
     requestInfo.create_time = nowTime
     requestInfo._id = requestInfo.account
     requestInfo.token = Md5.ToString(str)
-    requestInfo.address = StringUtil.ParseAddress(request.address)
     DataMgrComponent.Set("user.account", requestInfo.account, requestInfo, true)
     return XCode.Successful
 end
