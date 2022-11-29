@@ -1,1 +1,5 @@
-screen -dms 'app.forward' "./app ./config/server.json"
+screen -dms 'app.forward' "./app ./config/server.json ForwardServer"
+screen -dms 'app.data' "./app ./config/server.json DataServer"
+screen -dms 'app.http' "./app ./config/server.json HttpServer"
+screen -dms 'app.chat' "./app ./config/server.json ChatServer"
+screen -dms 'app.gate' "./app ./config/server.json GateServer"
