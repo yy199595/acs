@@ -16,6 +16,7 @@ namespace Sentry
         ForwardComponent() = default;
         ~ForwardComponent() = default;
     private:
+		bool Awake() final;
         bool LateAwake() final;
         void StartClose(const std::string &address) final;
         bool OnListen(std::shared_ptr<SocketProxy> socket) final;
@@ -36,7 +37,6 @@ namespace Sentry
         const ServiceNodeInfo * GetServerInfo(const std::string & address) const;
         bool Send(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
-        std::string mLocalHost;
         class LocationComponent * mLocationComponent;
         std::unordered_set<std::string> mAuthClients;
         std::unordered_map<std::string, std::string> mLocationMap;

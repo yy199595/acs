@@ -34,11 +34,6 @@
 			"InnerService": true,
 			"ChatService": false
 		},
-		"WaitServer": [
-			"ChatServer",
-			"HttpServer",
-			"ForwardServer"
-		],
 		"Component" : [
 			"ForwardHelperComponent"
 		]
@@ -57,9 +52,6 @@
 		"AutoAllot": false,
 		"Component": [
 			"ForwardComponent"
-		],
-		"Service": {
-			"LocationService": true
-		}
+		]
 	}
 }

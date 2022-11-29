@@ -24,7 +24,7 @@ if(WIN32)
         set(AsmFiles ${ContextPath}/context.S)
     endif()
 else()
-    SET(AsmFiles ${ContextPath}/context.S Common/Rpc/Component/ServiceComponent.cpp Common/Rpc/Component/ServiceComponent.h)
+    SET(AsmFiles ${ContextPath}/context.S)
 endif()
 MESSAGE(${AsmFiles})
 

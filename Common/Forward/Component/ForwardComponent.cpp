@@ -6,15 +6,22 @@
 #include"Helper/Helper.h"
 #include"Service/RpcService.h"
 #include"Config/ClusterConfig.h"
+#include"Service/LocationService.h"
 #include"Component/LocationComponent.h"
 #include"Component/NetThreadComponent.h"
 namespace Sentry
 {
+	bool ForwardComponent::Awake()
+	{
+		this->mApp->AddComponent<LocationService>();
+		return true;
+	}
+
     bool ForwardComponent::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->StartListen("forward"));
         this->mLocationComponent = this->GetComponent<LocationComponent>();
-        return ServerConfig::Inst()->GetLocation("forward", this->mLocalHost);
+        return true;
     }
 
     void ForwardComponent::StartClose(const std::string &address)
@@ -163,11 +170,11 @@ namespace Sentry
 				registerServer->set_http(nodeInfo->LocationHttp);
 			}
         }
-		s2s::cluster::server * registerServer = registerInfo.add_list();
-		{
-			registerServer->set_rpc(this->mLocalHost);
-			registerServer->set_name(ServerConfig::Inst()->Name());
-		}
+//		s2s::cluster::server * registerServer = registerInfo.add_list();
+//		{
+//			registerServer->set_rpc(this->mLocalHost);
+//			registerServer->set_name(ServerConfig::Inst()->Name());
+//		}
 		RpcPacket request = PacketHelper::MakeRpcPacket(fullName);
 		{
 			request->SetType(Tcp::Type::Request);

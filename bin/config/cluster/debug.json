@@ -7,7 +7,6 @@
 			"OuterService": true,
 			"MongoService": true,
 			"ChatService": true,
-			"LocationService": true,
 			"HttpWebService": true,
 			"AccountService": true,
 			"HttpRpcService": true

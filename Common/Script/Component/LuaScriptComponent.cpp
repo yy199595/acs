@@ -91,18 +91,14 @@ namespace Sentry
 		luaRegister9.PushExtensionFunction("Call", Lua::Service::Call);
 		luaRegister9.PushExtensionFunction("AllotServer", Lua::Service::AllotServer);
 
-		std::vector<Component *> components;
+		std::vector<ILuaRegister *> components;
         this->mApp->GetComponents(components);
-        for (Component * component: components)
-        {
-            ILuaRegister *luaRegisterComponent = component->Cast<ILuaRegister>();
-            if (luaRegisterComponent != nullptr)
-            {
-                const std::string & name = component->GetName();
-                Lua::ClassProxyHelper luaRegister(this->mLuaEnv, name);
-                luaRegisterComponent->OnLuaRegister(luaRegister);
-            }
-        }
+        for (ILuaRegister * component: components)
+		{
+			const std::string& name = dynamic_cast<Component*>(component)->GetName();
+			Lua::ClassProxyHelper luaRegister(this->mLuaEnv, name);
+			component->OnLuaRegister(luaRegister);
+		}
         return this->LoadAllFile();
     }
 

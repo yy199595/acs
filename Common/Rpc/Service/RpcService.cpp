@@ -3,7 +3,6 @@
 #include"Lua/LuaServiceMethod.h"
 #include"Config/ServiceConfig.h"
 #include"String/StringHelper.h"
-#include"Lua/LuaService.h"
 #include"Config/ClusterConfig.h"
 #include"Component/InnerNetComponent.h"
 #include"Component/LocationComponent.h"
@@ -20,7 +19,8 @@ namespace Sentry
 		this->mLocationComponent = this->GetComponent<LocationComponent>();
         this->mForwardComponent = this->GetComponent<ForwardHelperComponent>();
         this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>();
-        return ClusterConfig::Inst()->GetServerName(this->GetName(), this->mServerName);
+		ClusterConfig::Inst()->GetServerName(this->GetName(), this->mServerName);
+		return true;
 	}
 }
 
