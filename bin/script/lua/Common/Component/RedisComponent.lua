@@ -1,7 +1,10 @@
 
 RedisComponent = {}
 local this = RedisComponent
-local self = App.GetComponent("RedisDataComponent")
+local self = App.GetComponent("RedisComponent")
+if self == nil then
+    Log.Error("not find RedisComponent")
+end
 function RedisComponent.Run(name, cmd, ...)
     assert(type(cmd) == "string")
     assert(type(name) == "string")

@@ -17,7 +17,7 @@ namespace Sentry
         virtual void OnRequest(std::shared_ptr<HttpHandlerClient> httpClient) = 0;
     private:
         class NetThreadComponent * mNetComponent;
-        std::queue<std::shared_ptr<HttpHandlerClient>> mClientPools;
+        //std::queue<std::shared_ptr<HttpHandlerClient>> mClientPools;
         std::unordered_map<std::string, std::shared_ptr<HttpHandlerClient>> mHttpClients;
     };
 }

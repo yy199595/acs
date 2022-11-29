@@ -96,7 +96,6 @@ namespace Sentry
 
     bool ServerConfig::GetLocation(const char *name, std::string &location) const
     {
-        location.clear();   
         auto iter = this->mLocations.find(name);
         if (iter == this->mLocations.end())
         {

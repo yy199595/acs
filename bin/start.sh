@@ -1,1 +1,1 @@
-screen -dms 'yjz.sentry' "./Sentry ./Config/server/json"
+screen -dms 'app.forward' "./app ./config/server.json"

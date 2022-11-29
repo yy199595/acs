@@ -25,6 +25,7 @@ namespace Sentry
         bool IsAuthAllot() const { return this->mIsAutoAllot; }
         const std::string & GetName() const { return this->mName;}
         const std::string & GetMainLua() const { return this->mLua ;}
+        size_t ServiceCount() const { return this->mServices.size(); }
         size_t GetComponents(std::vector<std::string> & components) const;
         size_t GetServices(std::vector<std::string> & services, bool start = false) const;
     private:

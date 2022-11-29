@@ -141,7 +141,7 @@ namespace Sentry
 		luaRegister.BeginRegister<RedisComponent>();
 		luaRegister.PushExtensionFunction("Run", Lua::Redis::Run);
 		luaRegister.PushExtensionFunction("Call", Lua::Redis::Call);
-        luaRegister.PushExtensionFunction("Write", Lua::Redis::Send);
+        luaRegister.PushExtensionFunction("Send", Lua::Redis::Send);
     }
 }
 

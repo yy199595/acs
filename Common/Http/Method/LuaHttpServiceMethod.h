@@ -21,8 +21,7 @@ namespace Sentry
     private:
         XCode Call(Http::Response & response);
         XCode CallAsync(Http::Response & response);
-    private:      
-        std::string mData;
+    private:           
         const HttpMethodConfig * mConfig;
         class LuaScriptComponent* mLuaComponent;
     };

@@ -62,10 +62,10 @@ namespace Sentry
             return XCode::Successful;
         }
         else if (lua_istable(lua, -1))
-        {
-            this->mData.clear();
-            Lua::Json::Read(lua, -1, &this->mData);
-			response.Json(HttpStatus::OK, this->mData.c_str(), this->mData.size());
+        {          
+            std::string data;
+            Lua::Json::Read(lua, -1, &data);
+			response.Json(HttpStatus::OK, data.c_str(), data.size());
             return XCode::Successful;
         }
         return (XCode) lua_tointeger(lua, -2);
@@ -89,7 +89,6 @@ namespace Sentry
         {           
             if (lua_isstring(lua, -1))
             {
-
                 size_t size = 0;
                 const char *json = lua_tolstring(lua, -1, &size);
 				response.Json(HttpStatus::OK, json, size);
@@ -97,9 +96,9 @@ namespace Sentry
             }
             if (lua_istable(lua, -1))
             {
-                this->mData.clear();
-                Lua::Json::Read(lua, -1, &this->mData);
-				response.Json(HttpStatus::OK, this->mData.c_str(), this->mData.size());      
+                std::string data;
+                Lua::Json::Read(lua, -1, &data);
+				response.Json(HttpStatus::OK, data.c_str(), data.size());
                 return XCode::Successful;
             }
         }

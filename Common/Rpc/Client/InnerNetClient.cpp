@@ -145,9 +145,15 @@ namespace Sentry
 #endif
 			Asio::Context & context = this->mSocket->GetThread();
 			this->mTimer = std::make_shared<asio::steady_timer>(context, std::chrono::seconds(5));
-			this->mTimer->async_wait(std::bind(std::bind(&InnerNetClient::Connect, this->shared_from_this())));
+			this->mTimer->async_wait(std::bind(&InnerNetClient::Connect, this->shared_from_this()));
 			return;
 		}
+        if (this->mTimer != nullptr)
+        {
+            asio::error_code code;
+            this->mTimer->cancel(code);
+            std::move(this->mTimer);
+        }
 		asio::io_service & io = App::Inst()->MainThread();
 		const std::string & address = this->mSocket->GetAddress();
 		io.post(std::bind(&IRpc<Rpc::Packet>::OnConnectSuccessful, this->mComponent, address));

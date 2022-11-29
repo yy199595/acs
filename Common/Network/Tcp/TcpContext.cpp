@@ -184,6 +184,7 @@ namespace Tcp
     bool TcpContext::SendFromMessageQueue()
     {
         assert(this->mSendBuffer.size() == 0);
+		assert(this->mMessagqQueue.size() <= 100);
         if(!this->mMessagqQueue.empty())
         {
             std::ostream os(&this->mSendBuffer);

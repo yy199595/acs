@@ -14,8 +14,7 @@ namespace Sentry
     {
         LOG_CHECK_RET_FALSE(this->StartListen("forward"));
         this->mLocationComponent = this->GetComponent<LocationComponent>();
-		this->mLocalHost = this->GetListenAddress();
-        return true;
+        return ServerConfig::Inst()->GetLocation("forward", this->mLocalHost);
     }
 
     void ForwardComponent::StartClose(const std::string &address)

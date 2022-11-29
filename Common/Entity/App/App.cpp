@@ -209,8 +209,11 @@ namespace Sentry
 		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
 		for(const NodeConfig * nodeConfig : configs)
 		{
-			locationComponent->WaitServerStart(nodeConfig->GetName());
-			CONSOLE_LOG_INFO(nodeConfig->GetName() << " start successful ...");
+            if (nodeConfig->ServiceCount() > 0)
+            {
+                locationComponent->WaitServerStart(nodeConfig->GetName());
+                CONSOLE_LOG_INFO(nodeConfig->GetName() << " start successful ...");
+            }
 		}
         std::vector<IComplete *> completeComponents;
         this->GetComponents<IComplete>(completeComponents);
