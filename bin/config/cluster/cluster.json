@@ -8,18 +8,21 @@
 			"OuterService": false
 		},
 		"Component" : [
+			"LuaScriptComponent",
 			"ForwardHelperComponent"
 		]
 	},
 	"HttpServer": {
 		"AutoAllot": false,
 		"Service": {
+			"InnerService": true,
 			"AccountService": true,
 			"HttpWebService": true,
 			"OuterService": false
 		},
 		"Component": [
 			"HttpComponent",
+			"HttpWebComponent",
 			"LuaScriptComponent",
 			"ForwardHelperComponent"
 		]

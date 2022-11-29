@@ -152,7 +152,7 @@ namespace Sentry
 	{
         const std::string& name = ServerConfig::Inst()->Name();
         Lua::LuaModule * luaModule = this->GetModule(name);
-        return luaModule != nullptr&& luaModule->Start();
+        return luaModule == nullptr || luaModule->Start();
 	}
 
 	void LuaScriptComponent::OnLocalComplete()
@@ -214,7 +214,8 @@ namespace Sentry
         }
         this->AddRequire(common);
         this->AddRequire(module);
-        return this->LoadModule(ServerConfig::Inst()->Name());
+        this->LoadModule(ServerConfig::Inst()->Name());
+        return true;
     }
 
     void LuaScriptComponent::OnHotFix()

@@ -3,6 +3,7 @@
 //
 #include"HttpWebService.h"
 #include"System/System.h"
+#include"Component/HttpWebComponent.h"
 #include"Component/LuaScriptComponent.h"
 namespace Sentry
 {

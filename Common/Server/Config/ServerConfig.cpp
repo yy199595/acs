@@ -12,8 +12,8 @@
 #include"File/DirectoryHelper.h"
 namespace Sentry
 {
-    ServerConfig::ServerConfig()
-        : TextConfig("ServerConfig")
+    ServerConfig::ServerConfig(const std::string & server)
+        : TextConfig("ServerConfig"), mName(server)
     {
 
     }
@@ -30,19 +30,42 @@ namespace Sentry
             CONSOLE_LOG_ERROR("parse " << this->Path() << " failure");
             return false;
 		}
-        if (!this->GetMember("name", this->mName))
+        if (!this->HasMember(this->mName.c_str()))
         {
             return false;
         }
-        const rapidjson::Value  * value1 = this->GetJsonValue("services");
-        if(value1 != nullptr && value1->IsObject())
+        
+        auto iter = this->FindMember(this->mName.c_str());
+        if(iter->value.HasMember("listen"))
         {
-            auto iter = value1->MemberBegin();
-            for(; iter != value1->MemberEnd(); iter++)
+            const rapidjson::Value& document = iter->value["listen"];
+            for (auto iter1 = document.MemberBegin(); iter1 != document.MemberEnd(); iter1++)
             {
-                bool start = iter->value.GetBool();
-                const std::string name(iter->name.GetString());
-                this->mServiceConfigs.emplace(name, start);
+                const std::string key(iter1->name.GetString());
+                const std::string value(iter1->value.GetString());
+                this->mListens.emplace(key, value);
+            }
+        }
+
+        if (iter->value.HasMember("server"))
+        {
+            const rapidjson::Value& document = iter->value["server"];
+            for (auto iter1 = document.MemberBegin(); iter1 != document.MemberEnd(); iter1++)
+            {
+                const std::string key(iter1->name.GetString());
+                const std::string value(iter1->value.GetString());
+                this->mLocations.emplace(key, value);
+            }
+        }
+
+        if (iter->value.HasMember("path"))
+        {
+            const rapidjson::Value& document = iter->value["path"];
+            for (auto iter1 = document.MemberBegin(); iter1 != document.MemberEnd(); iter1++)
+            {
+                const std::string key(iter1->name.GetString());
+                const std::string value(iter1->value.GetString());
+                this->mPaths.emplace(key, this->WorkPath() + value);
             }
         }
 
@@ -60,28 +83,27 @@ namespace Sentry
         return true;
 	}
 
-    bool ServerConfig::GetLocation(const char *name, std::string &location) const
+    bool ServerConfig::GetListen(const std::string& name, std::string& listen) const
     {
-        location.clear();
-        if(!this->GetMember("server", name, location))
+        auto iter = this->mListens.find(name);
+        if (iter == this->mListens.end())
         {
-            CONSOLE_LOG_DEBUG("not find location : " << name);
             return false;
         }
+        listen = iter->second;
         return true;
     }
 
-    size_t ServerConfig::GetServices(std::vector<std::string> &services, bool start) const
+    bool ServerConfig::GetLocation(const char *name, std::string &location) const
     {
-        for(auto & value : this->mServiceConfigs)
+        location.clear();   
+        auto iter = this->mLocations.find(name);
+        if (iter == this->mLocations.end())
         {
-            if(start && !value.second)
-            {
-                continue;
-            }
-            services.emplace_back(value.first);
+            return false;
         }
-        return services.size();
+        location = iter->second;
+        return true;
     }
 
 	bool ServerConfig::GetPath(const std::string& name, std::string& path) const

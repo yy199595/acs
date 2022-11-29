@@ -18,9 +18,9 @@ namespace Sentry
 #endif
     }
 
-    bool MongoService::Awake()
+    void MongoService::Init()
     {
-        return this->mApp->AddComponent<MongoDBComponent>();
+        this->mApp->AddComponent<MongoDBComponent>();
     }
 
 	bool MongoService::OnStart()

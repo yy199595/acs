@@ -10,17 +10,16 @@ namespace Sentry
 	class OuterService final : public LocalRpcService
 	{
 	 public:
-		OuterService() = default;
+		OuterService();
 	 private:
 		XCode Ping(long long userId);
         XCode Allot(const com::type::int64 & userId, s2s::allot::response & response);
 	private:
-		bool Awake() final;
+        void Init() final;
 		bool OnStart() final;
         bool OnClose() final;
 	 private:
 		std::string mAddress;
-		class TimerComponent* mTimerComponent;
 		class OuterNetMessageComponent* mOuterComponent;
 	};
 

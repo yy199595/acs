@@ -81,9 +81,10 @@ namespace Sentry
             CONSOLE_LOG_FATAL("start failure");
             return -1;
         }
+        std::string name = argc >= 3 ? argv[2] : "Server";
+        std::unique_ptr<ServerConfig> serverConfig(new ServerConfig(name));
 
-        ServerConfig serverConfig;
-        if (!serverConfig.LoadConfig(System::ConfigPath()))
+        if (!serverConfig->LoadConfig(System::ConfigPath()))
         {
             return false;
         }

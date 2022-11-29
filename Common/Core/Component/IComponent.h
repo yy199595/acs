@@ -84,6 +84,7 @@ namespace Sentry
 	class IServiceBase
 	{
 	public:
+        virtual void Init() { }
 		virtual bool Start() = 0;
 		virtual bool Close() = 0;
         virtual void OnCloseComplete() { }

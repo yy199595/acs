@@ -18,10 +18,10 @@ namespace Sentry
             return false;
         }
 #ifdef __DEBUG__
-        if (argc != 2)
+        if (argc < 2)
         {          
             System::mExePath = argv[0];
-            System::mConfigPath = "./config/start/server.json";
+            System::mConfigPath = "./config/server.json";
             return true;
         }
 #endif

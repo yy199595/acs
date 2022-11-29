@@ -21,8 +21,9 @@ namespace Sentry
     class ServerConfig : public Json::Reader, public TextConfig, public ConstSingleton<ServerConfig>
     {
     public:
-        explicit ServerConfig();
+        explicit ServerConfig(const std::string & name);
     public:
+        bool GetListen(const std::string & name, std::string& listen) const;
         bool GetLocation(const char * name, std::string & location) const;
     protected:
         bool OnLoadText(const char *str, size_t length) final;
@@ -30,12 +31,12 @@ namespace Sentry
 	 public:
         const std::string& Name() const { return this->mName; }
 		const std::string & GetContent() const { return this->mContent;}
-		bool GetPath(const std::string & name, std::string & path) const;
-        size_t GetServices(std::vector<std::string> & services, bool start = false) const;
+		bool GetPath(const std::string & name, std::string & path) const;      
     private:
-        std::string mName;
 		std::string mContent;
+        const std::string mName;
         std::unordered_map<std::string, std::string> mPaths;
-        std::unordered_map<std::string , bool> mServiceConfigs;
+        std::unordered_map<std::string, std::string> mListens;
+        std::unordered_map<std::string, std::string> mLocations;
     };
 }

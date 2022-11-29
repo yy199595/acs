@@ -12,7 +12,7 @@ namespace Sentry
     public:
         HttpWebService() = default;
         ~HttpWebService() = default;
-    private:
+    private:     
         bool OnStartService(HttpServiceRegister &serviceRegister) final;
 		XCode Ping(const Http::Request& request, Http::Response& response);
         XCode Hello(const Http::Request& request, Http::Response& response);

@@ -1,2 +1,2 @@
-start cmake ./CMakeLists.txt
+cmake ./CMakeLists.txt
 pause

@@ -2,7 +2,6 @@
     "area_id": 1,
     "node_id": 1,
     "fps": 30,
-    "name": "Client",
     "thread": {
         "task": 1,
         "network": 4
@@ -16,5 +15,8 @@
     "lua": {
         "common": "script/lua/Common",
         "module": "script/lua/Client"
+    },
+    "Client":{
+        
     }
 }

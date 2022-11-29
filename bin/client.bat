@@ -1,1 +1,1 @@
-start ./Debug/app.exe ./config/start/client.json
+start ./Debug/app.exe ./config/client.json Client

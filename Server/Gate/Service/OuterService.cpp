@@ -11,14 +11,14 @@
 #include"Component/OuterNetMessageComponent.h"
 namespace Sentry
 {
-
-    bool OuterService::Awake()
+    OuterService::OuterService()
     {
-        this->mTimerComponent = nullptr;
         this->mOuterComponent = nullptr;
+    }
+    void OuterService::Init()
+    {
         this->mApp->AddComponent<OuterNetComponent>();
         this->mApp->AddComponent<OuterNetMessageComponent>();
-        return true;
     }
 
 	bool OuterService::OnStart()

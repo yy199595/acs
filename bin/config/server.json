@@ -1,0 +1,117 @@
+{
+    "fps": 15,
+    "thread": {
+        "task": 1,
+        "network": 4
+    },
+    "path": {
+        "proto": "proto",
+        "source": "source",
+        "script": "script/lua",
+        "code": "XCode/XCode.csv",
+        "user": "config/user.json",
+        "redis": "config/db/redis.json",
+        "mongo": "config/db/mongo.json",
+        "rpc": "config/service/rpc.json",
+        "http": "config/service/http.json"
+    },
+    "user": {
+        "name": "root",
+        "passwd": "199595yjz."
+    },
+    "lua": {
+        "common": "script/lua/Common",
+        "module": "script/lua/Server"
+    },
+    "forward":[
+        "127.0.0.1:7794"
+    ],
+    "Client":{
+        "path":{
+            "cluster":"config/cluster/client.json"
+        }
+    },
+    "Server":{
+        "listen":{
+            "rpc":"0.0.0.0:7788",
+            "http":"0.0.0.0:8080",
+            "gate":"0.0.0.0:1995",
+            "forward":"0.0.0.0:7794",
+            "console": "127.0.0.1:8888"
+        },
+        "server":{
+            "rpc": "127.0.0.1:7788",
+            "gate": "127.0.0.1:1995",
+            "http": "http://127.0.0.1:8080/"        
+        },
+        "path":{
+            "mongo": "config/db/mongo.json",
+            "cluster":"config/cluster/debug.json"
+        }     
+    },
+    "HttpServer":{
+        "listen":{
+            "rpc":"127.0.0.1:7790",
+            "http":"0.0.0.0:8080"
+        },
+        "server":{
+            "rpc":"127.0.0.1:7790",
+            "http":"127.0.0.1:8080"
+        },
+        "path":{
+            "cluster":"config/cluster/cluster.json"
+        }
+    },
+    "ChatServer":{
+        "listen":{
+            "rpc":"127.0.0.1:7791"
+        },
+        "server":{
+            "rpc":"127.0.0.1:7791"
+        },
+        "path":{
+            "cluster":"config/cluster/cluster.json"
+        }
+    },
+    "GateServer":{
+        "listen":{
+            "rpc":"127.0.0.1:7792",
+            "gate":"0.0.0.0:1995"
+        },
+        "server":{
+            "rpc":"127.0.0.1:7792",
+            "gate":"127.0.0.1:1995"
+        },
+        "path":{
+            "cluster":"config/cluster/cluster.json"
+        }
+    },
+    "DataServer":{
+        "listen":{
+            "rpc":"127.0.0.1:7793"
+        },
+        "server":{
+            "rpc":"127.0.0.1:7793"
+        },
+        "path":{
+            "mongo": "config/db/mongo.json",
+            "cluster":"config/cluster/cluster.json"
+        }
+    },
+    "ForwardServer":{
+        "listen":{
+            "rpc":"0.0.0.0:7795",
+            "forward":"127.0.0.1:7794"
+        },
+        "server":{
+            "rpc":"0.0.0.0:7795",
+            "forward":"127.0.0.1:7794"
+        },
+        "path":{
+            "cluster":"config/cluster/cluster.json"
+        }
+    },
+    "white_list": [
+        "127.0.0.1"
+    ]
+}

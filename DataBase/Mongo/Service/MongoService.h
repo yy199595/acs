@@ -14,7 +14,7 @@ namespace Sentry
 	public:
 		MongoService();
 	private:
-        bool Awake() final;
+        void Init() final;
 		bool OnStart() final;
         bool OnClose() final;
     private:

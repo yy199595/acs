@@ -11,11 +11,10 @@
 
 namespace Sentry
 {
-    bool InnerService::Awake()
+    void InnerService::Init()
     {
         this->mApp->AddComponent<InnerNetComponent>();
         this->mApp->AddComponent<InnerNetMessageComponent>();
-        return true;
     }
 
     bool InnerService::OnStart()

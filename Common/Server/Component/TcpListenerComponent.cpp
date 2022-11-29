@@ -36,8 +36,9 @@ namespace Sentry
 	bool TcpListenerComponent::StartListen(const char * name)
     {
         std::string address;
-        if(!ServerConfig::Inst()->GetMember("listener", name, address))
+        if(!ServerConfig::Inst()->GetListen(name, address))
         {
+            LOG_ERROR("not find listen config " << name);
             return false;
         }
         size_t pos = address.find(":");

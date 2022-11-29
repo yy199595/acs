@@ -76,7 +76,11 @@ namespace Sentry
 						return false;
 					}
                 }
-                CONSOLE_LOG_INFO(ServerConfig::Inst()->Name() << " add service [" << name << "]");
+                if (nodeConfig->IsStart(name))
+                {                  
+                    this->GetComponent<IServiceBase>(name)->Init(); 
+                    CONSOLE_LOG_INFO(ServerConfig::Inst()->Name() << " start service [" << name << "]");
+                }              
             }
         }
         return true;
