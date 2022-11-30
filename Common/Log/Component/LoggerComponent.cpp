@@ -14,7 +14,7 @@ namespace Sentry
 	{
 		this->mLogSaveTime = 3;
         this->mServerName = ServerConfig::Inst()->Name();
-        this->mLogSavePath = fmt::format("{0}log/", System::WorkPath());
+        this->mLogSavePath = fmt::format("{0}/log", System::WorkPath());
 		this->CreateLogFile();
         return true;
 	}
@@ -91,7 +91,8 @@ namespace Sentry
 	{
 		spdlog::shutdown();
 		spdlog::flush_every(std::chrono::seconds(this->mLogSaveTime));
-		std::string logPath = fmt::format("{0}/{1}", this->mLogSavePath, Helper::Time::GetYearMonthDayString());
+		std::string logPath = fmt::format("{0}/{1}/{2}", this->mLogSavePath,
+			Helper::Time::GetYearMonthDayString(), this->mServerName);
 #ifndef ONLY_MAIN_THREAD
 #ifdef __DEBUG__
 		spdlog::set_level(spdlog::level::level_enum::debug);
