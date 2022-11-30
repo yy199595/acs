@@ -46,7 +46,7 @@ local CallChat = function()
 end
 
 local TestHttp = function()
-    local loginComponent = require("Component.LoginComponent")
+    local loginComponent = require("component.LoginComponent")
     local count = 5000
     local phoneNum = 100
     local passwd = "yjz199595"
