@@ -9,6 +9,8 @@ local account = "yjz1995"
 local password = "123456"
 local phoneNum = 13716061995
 local clientComponent = App.GetComponent("ClientComponent")
+local loginComponent = require("component.LoginComponent")
+
 local callCount = 0
 local CallMongo = function()
     
@@ -46,7 +48,6 @@ local CallChat = function()
 end
 
 local TestHttp = function()
-    local loginComponent = require("component.LoginComponent")
     local count = 5000
     local phoneNum = 100
     local passwd = "yjz199595"
@@ -62,7 +63,6 @@ end
 
 function Client.Start()
 
-    local loginComponent = require("Component.LoginComponent")
     loginComponent.Awake()
     loginComponent.Register(account, password, phoneNum)
 
