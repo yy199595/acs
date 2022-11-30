@@ -68,9 +68,12 @@ namespace Sentry
 
 	XCode LuaServiceMethod::Invoke(Rpc::Packet & message)
     {
-        if (this->mConfig->IsAsync && !Lua::Function::Get(this->mLuaEnv, "coroutine", "rpc"))
+        if (this->mConfig->IsAsync)
         {
-            return XCode::CallLuaFunctionFail;
+            if (!Lua::Function::Get(this->mLuaEnv, "coroutine", "rpc"))
+            {
+                return XCode::CallLuaFunctionFail;
+            }
         }
 		const std::string & method = this->mConfig->Method;
 		const std::string & module = this->mConfig->Service;
