@@ -5,24 +5,26 @@
 #ifndef GAMEKEEPER_LUATASKSOURCE_H
 #define GAMEKEEPER_LUATASKSOURCE_H
 #include"Source/TaskSource.h"
-
+#include"Http/HttpResponse.h"
 namespace Sentry
 {
     class LuaServiceTaskSource final
     {
     public:
-        LuaServiceTaskSource(lua_State * lua);
-        ~LuaServiceTaskSource();
+        LuaServiceTaskSource();
+        ~LuaServiceTaskSource() = default;
     public:
-		static int SetResult(lua_State * lua);
+		static int SetRpc(lua_State * lua);
+        static int SetHttp(lua_State* lua);
     public:
-        XCode Await();
-		bool GetRef();
-    private:
-		int mRef;
+        XCode Await(Http::Response* message);
+        XCode Await(std::shared_ptr<Message> message);
+    private:		
         XCode mCode;
-		lua_State * mLua;
-        TaskSource<XCode> mTaskSource;
+        Http::Response* mHttpData;
+        TaskSource<void> mTaskSource;
+        std::shared_ptr<Message> mRpcData;
     };
 }
+
 #endif //GAMEKEEPER_LUATASKSOURCE_H

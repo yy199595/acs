@@ -5,7 +5,8 @@
 			"UserBehavior": true,
 			"InnerService": true,
 			"ChatService": true,
-			"OuterService": false
+			"OuterService": false,
+			"LocationService" : false
 		},
 		"Component" : [
 			"LuaScriptComponent",
@@ -18,7 +19,8 @@
 			"InnerService": true,
 			"AccountService": true,
 			"HttpWebService": true,
-			"OuterService": false
+			"OuterService": false,
+			"LocationService" : false
 		},
 		"Component": [
 			"HttpComponent",
@@ -32,17 +34,19 @@
 		"Service": {
 			"OuterService": true,
 			"InnerService": true,
-			"ChatService": false
+			"ChatService": false,
+			"LocationService" : false
 		},
 		"Component" : [
 			"ForwardHelperComponent"
 		]
 	},
 	"DataServer": {
-		"AutoAllot": false,
+		"AutoAllot": true,
 		"Service": {
 			"InnerService": true,
-			"MongoService": true
+			"MongoService": true,
+			"LocationService" : false
 		},
 		"Component" : [
 			"ForwardHelperComponent"

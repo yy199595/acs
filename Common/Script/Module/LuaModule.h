@@ -23,6 +23,7 @@ namespace Lua
 	 	bool GetFunction(const std::string & name, bool cache = true);
 	 private:
 		int mRef;
+		bool mIsUpdate;
 		std::string mMd5;
 		lua_State * mLua;
 	 	const std::string mName;

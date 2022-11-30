@@ -97,7 +97,7 @@
 		},
 		"Query": {
 			"Async": true,
-			"Type": "Server",
+			"Type": "Client",
 			"Request": "db.mongo.query.request",
 			"Response": "db.mongo.query.response"
 		},

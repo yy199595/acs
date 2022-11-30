@@ -105,9 +105,9 @@ namespace Sentry
                 return false;
             }
             std::vector<std::string> services;
-            nodeConfig->GetServices(services);
+            nodeConfig->GetServices(services, true);
             for (const std::string& service : services)
-            {
+            {               
                 this->mServiceNodes.emplace(service, name);
             }
             this->mNodeConfigs.emplace(name, std::move(nodeConfig));

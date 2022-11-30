@@ -9,17 +9,39 @@ local account = "yjz1995"
 local password = "123456"
 local phoneNum = 13716061995
 local clientComponent = App.GetComponent("ClientComponent")
-
-local LoopCall = function()
-    local callCount = 0
+local callCount = 0
+local CallMongo = function()
+    
     while true do
         local t1 = Time.NowMilTime()
-        local res, response = clientComponent:Call("ChatService.Chat", "c2s.chat.request", {
+        -- local res, response = clientComponent:Call("ChatService.Chat", "c2s.chat.request", {
+        --     user_id = 1122, msg_type = 1, message = "hello"
+        -- })
+        callCount = callCount + 1  
+        -- Log.Error(string.format("call use time = [%dms] count = %d", t, callCount))
+        local res, response = clientComponent:Call("MongoService.Query", {
+            tab = "user.account",
+            json = Json.Encode({
+                _id = "646585122@qq.com"
+            }),
+            limit = 1
+        })
+        print("========= ".. callCount .. "============")
+        --table.print(response)
+        --local t = Time.NowMilTime() - t1
+        --Log.Error(string.format("call use time = [%dms] count = %d", t, callCount))
+    end
+end
+
+local CallChat = function()
+    
+    while true do
+        local t1 = Time.NowMilTime()
+        local res, response = clientComponent:Call("ChatService.Chat", {
             user_id = 1122, msg_type = 1, message = "hello"
         })
-        callCount = callCount + 1
-        local t = Time.NowMilTime() - t1
-        Log.Error(string.format("call use time = [%dms] count = %d", t, callCount))
+        callCount = callCount + 1  
+        print("--------- ".. callCount .. "--------")
     end
 end
 
@@ -63,9 +85,15 @@ function Client.Start()
         Log.Error("user auth failure")
         return false
     end
-    coroutine.start(LoopCall)
-    coroutine.start(TestHttp)
-    coroutine.start(TestHttp)
+    coroutine.start(CallChat)
+    coroutine.start(CallChat)
+    coroutine.start(CallChat)
+
+    coroutine.start(CallMongo)
+    coroutine.start(CallMongo)
+    coroutine.start(CallMongo)
+    --coroutine.start(TestHttp)
+    --coroutine.start(TestHttp)
     return true
 end
 

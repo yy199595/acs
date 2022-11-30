@@ -24,16 +24,17 @@ function coroutine.rpc(func, id, request, taskSource)
         if not state then
             Log.Error("rpc error : ", error)
             Log.Error(debug.traceback())
-            luaTaskSource:SetResult(XCode.CallLuaFunctionFail, error)
+            luaTaskSource:SetRpc(XCode.CallLuaFunctionFail, error)
         else
-            luaTaskSource:SetResult(error, response)
+            luaTaskSource:SetRpc(error, response)
         end
     end
     coroutine.start(context, taskSource)
 end
 
 function coroutine.http(func, request, taskSource)
-    --table.print(request)
+    table.print(request)
+    table.print(taskSource)
     local context = function(luaTaskSource)
         local tab = {}
         local state, error, response = pcall(func, request)
@@ -46,7 +47,7 @@ function coroutine.http(func, request, taskSource)
             tab.code = error
             tab.data = response
         end
-        luaTaskSource:SetResult(tab.code, tab)
+        luaTaskSource:SetHttp(tab.code, tab)
     end
     coroutine.start(context, taskSource)
 end

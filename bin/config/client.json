@@ -10,6 +10,7 @@
         "log": "log",
         "source": "source",
         "proto": "proto",
+        "rpc": "config/service/rpc.json",
         "cluster": "config/cluster/client.json"
     },
     "lua": {

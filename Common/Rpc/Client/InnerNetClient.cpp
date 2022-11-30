@@ -50,18 +50,42 @@ namespace Sentry
 		return taskId;
 	}
 
-	void InnerNetClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
-	{
-		if(code && this->mSocket->IsRemote())
-		{
-			this->Connect();
-		}
+    void InnerNetClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
+    {
+#ifdef __DEBUG__
+        if (code && this->mConnectCount > 0)
+        {
+            const std::string& address = this->mSocket->GetAddress();
+            CONSOLE_LOG_ERROR("send inner message error : [" << address << "]");
+        }
+#endif
+        if (code && this->mSocket->IsRemote())
+        {
+//            if (this->mConnectCount >= 10) //重新连接十次了
+//            {
+//                const std::string& address = this->mSocket->GetAddress();
+//                while (std::shared_ptr<ProtoMessage> data = this->PopMessage())
+//                {
+//                    std::shared_ptr<Rpc::Packet> packet = std::static_pointer_cast<Rpc::Packet>(data);
+//                    {
+//                        packet->SetType(Tcp::Type::Response);
+//                    }
+//#ifdef ONLY_MAIN_THREAD
+//                    this->mTcpComponent->OnMessage(address, std::move(packet));
+//#else
+//                    asio::io_service& io = App::Inst()->MainThread();
+//                    io.post(std::bind(&IRpc<Rpc::Packet>::OnMessage, this->mComponent, address, std::move(packet)));
+//#endif
+//                }
+//            }
+            this->Connect();
+        }
         else
         {
             this->PopMessage();
             this->SendFromMessageQueue();
         }
-	}
+    }
 
 	void InnerNetClient::CloseSocket(XCode code)
 	{
@@ -83,7 +107,11 @@ namespace Sentry
     {
         if (code)
         {
-            CONSOLE_LOG_ERROR(code.message());
+            //CONSOLE_LOG_ERROR(code.message());
+#ifdef __DEBUG__
+            const std::string& address = this->mSocket->GetAddress();
+            CONSOLE_LOG_ERROR("receive inner message error : [" << address << "]");
+#endif // 
             this->CloseSocket(XCode::NetWorkError);
             return;
         }
@@ -141,8 +169,9 @@ namespace Sentry
 		if(error)
 		{
 #ifdef __DEBUG__
-			CONSOLE_LOG_ERROR(error.message());
-#endif
+            const std::string& address = this->mSocket->GetAddress();
+            CONSOLE_LOG_ERROR("connect inner error : [" << address << "]");
+#endif // 
 			Asio::Context & context = this->mSocket->GetThread();
 			this->mTimer = std::make_shared<asio::steady_timer>(context, std::chrono::seconds(5));
 			this->mTimer->async_wait(std::bind(&InnerNetClient::Connect, this->shared_from_this()));

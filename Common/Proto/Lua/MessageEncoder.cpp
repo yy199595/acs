@@ -5,30 +5,21 @@
 
 namespace Sentry
 {
-	MessageEncoder::MessageEncoder(lua_State* lua, ProtoComponent* component)
+	MessageEncoder::MessageEncoder(lua_State* lua)
 	{
 		this->mLua = lua;
-		this->mMsgComponent = component;
 	}
 
-	std::shared_ptr<Message> MessageEncoder::Encode(const std::string& proto, int index)
+	bool MessageEncoder::Encode(std::shared_ptr<Message> message, int index)
 	{
 		if(!lua_istable(this->mLua, index))
 		{
-			return nullptr;
+			return false;
 		}
-		std::shared_ptr<Message> message = this->mMsgComponent->New(proto);
-		if(message == nullptr)
-		{
-			return nullptr;
-		}
+		
 		index = lua_absindex(this->mLua, index);
 		const Descriptor* descriptor = message->GetDescriptor();
-		if(!this->EncoddeMessage(*message, descriptor, index))
-		{
-			return nullptr;
-		}
-		return message;
+		return this->EncoddeMessage(*message, descriptor, index);
 	}
 
 	bool MessageEncoder::EncoddeMessage(Message& message, const Descriptor* descriptor, int index)

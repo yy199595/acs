@@ -50,9 +50,11 @@ namespace Sentry
         luaRegister1.PushCtor<WaitLuaTaskSource>();
         luaRegister1.PushStaticExtensionFunction("SetResult", WaitLuaTaskSource::SetResult);
 
+
         Lua::ClassProxyHelper luaRegister2(this->mLuaEnv, "LuaServiceTaskSource");
         luaRegister2.BeginRegister<LuaServiceTaskSource>();
-        luaRegister2.PushExtensionFunction("SetResult", LuaServiceTaskSource::SetResult);
+        luaRegister2.PushExtensionFunction("SetRpc", LuaServiceTaskSource::SetRpc);
+        luaRegister2.PushExtensionFunction("SetHttp", LuaServiceTaskSource::SetHttp);
 
         Lua::ClassProxyHelper luaRegister3(this->mLuaEnv, "Time");
         luaRegister3.BeginNewTable();

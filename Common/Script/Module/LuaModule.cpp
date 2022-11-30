@@ -14,6 +14,7 @@ namespace Lua
 		: mLua(lua), mName(name), mPath(path)
 	{
 		this->mRef = 0;
+		this->mIsUpdate = false;
 	}
 
 	LuaModule::~LuaModule()
@@ -51,13 +52,14 @@ namespace Lua
 				return false;
 			}
 		}
-		this->GetFunction("Update");
+		this->mIsUpdate = this->GetFunction("Update");
 		return true;
 	}
 
 	void LuaModule::Update(int tick)
 	{
-		if (this->GetFunction("Update"))
+		const static std::string name("Update");
+		if (this->mIsUpdate && this->GetFunction(name))
 		{
 			lua_pushinteger(this->mLua, tick);
 			if (lua_pcall(this->mLua, 1, 0, 0) != LUA_OK)

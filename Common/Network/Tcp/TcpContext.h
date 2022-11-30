@@ -55,12 +55,12 @@ namespace Tcp
         virtual void OnReceiveMessage(const Asio::Code & code, std::istream & readStream, size_t size) {}
 		virtual void OnSendMessage(const Asio::Code & code, std::shared_ptr<ProtoMessage> message) {  };
 	 protected:
+		int mConnectCount;
         asio::streambuf mSendBuffer;
         asio::streambuf mRecvBuffer;
 		std::shared_ptr<SocketProxy> mSocket;
 	 private:
-        size_t mSendCount;
-        int mConnectCount;
+        size_t mSendCount;   
 		const size_t mMaxCount;
 		long long mLastOperTime;
         std::list<std::shared_ptr<ProtoMessage>> mMessagqQueue;

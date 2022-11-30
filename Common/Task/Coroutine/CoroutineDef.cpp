@@ -5,12 +5,12 @@ namespace Sentry
 {
 	TaskContextPool::~TaskContextPool()
 	{
-        auto iter = this->begin();
-        for(;iter != this->end(); iter++)
+        auto iter = this->mCoroutines.begin();
+        for(;iter != this->mCoroutines.end(); iter++)
         {
             delete iter->second;
         }
-        this->clear();
+        this->mCoroutines.clear();
 	}
 	TaskContext * TaskContextPool::Pop()
     {
@@ -29,18 +29,18 @@ namespace Sentry
         }
         coroutine->mCoroutineId = this->mNumPool.Pop();
         coroutine->sid = coroutine->mCoroutineId & (SHARED_STACK_NUM - 1);
-        this->emplace(coroutine->mCoroutineId, coroutine);
+        this->mCoroutines.emplace(coroutine->mCoroutineId, coroutine);
         return coroutine;
     }
 
 	void TaskContextPool::Push(TaskContext * coroutine)
 	{
         unsigned int id = coroutine->mCoroutineId;
-        auto iter = this->find(id);
-        if(iter != this->end())
+        auto iter = this->mCoroutines.find(id);
+        if(iter != this->mCoroutines.end())
         {
             this->mNumPool.Push(id);
-            this->erase(iter);
+            this->mCoroutines.erase(iter);
         }
         if(this->mCorPool.size() >=COR_POOL_COUNT)
         {
@@ -51,8 +51,8 @@ namespace Sentry
 	}
 	TaskContext * TaskContextPool::Get(unsigned int id)
 	{
-        auto iter = this->find(id);
-        return iter != this->end() ? iter->second : nullptr;
+        auto iter = this->mCoroutines.find(id);
+        return iter != this->mCoroutines.end() ? iter->second : nullptr;
 	}
 }
 
@@ -61,8 +61,7 @@ namespace Sentry
 	CoroutineGroup::CoroutineGroup()
 	{
         this->mCoroutineId = 0;
-        this->mCorComponent = nullptr;
-		this->mCoroutineId = this->mCorComponent->GetContextId();
+        this->mCorComponent = App::Inst()->GetTaskComponent();
 	}
 
     CoroutineGroup::~CoroutineGroup()

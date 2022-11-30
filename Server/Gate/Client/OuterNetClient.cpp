@@ -72,7 +72,9 @@ namespace Sentry
         if (code)
         {
 #ifdef __NET_ERROR_LOG__
-            CONSOLE_LOG_ERROR(code.message());
+            //CONSOLE_LOG_ERROR(code.message());
+            const std::string& address = this->mSocket->GetAddress();
+            CONSOLE_LOG_ERROR("receive outer message error : [" << address << "]");
 #endif
             this->CloseSocket(XCode::NetReceiveFailure);
             return;
@@ -137,7 +139,9 @@ namespace Sentry
 		if(code)
 		{
 #ifdef __NET_ERROR_LOG__
-			CONSOLE_LOG_ERROR(code.message());
+			//CONSOLE_LOG_ERROR(code.message());
+            const std::string& address = this->mSocket->GetAddress();
+            CONSOLE_LOG_ERROR("send outer message error : [" << address << "]");
 #endif
             this->PopAllMessage();
 			this->CloseSocket(XCode::SendMessageFail);

@@ -118,10 +118,10 @@ namespace Sentry
 		{
 			coroutine->mFunction = func;
 			coroutine->mState = CorState::Ready;
-		}
 #ifdef __DEBUG__
-        coroutine->mSwitchTime = Helper::Time::NowSecTime();
+			coroutine->mSwitchTime = Helper::Time::NowSecTime();
 #endif
+		}
 		return coroutine;
 	}
 

@@ -11,7 +11,6 @@ namespace Sentry
         this->mState = TaskState::TaskReady;
         this->mTaskId = Helper::Guid::Create();
         this->mCreateTime = Helper::Time::NowMilTime();
-        this->mTaskComponent = App::Inst()->GetTaskComponent();
     }
 
 	void WaitTaskSourceBase::Clear()
@@ -31,7 +30,7 @@ namespace Sentry
 			return true;
 		case TaskState::TaskAwait:
 			this->mState = state;
-			this->mTaskComponent->Resume(this->mCorId);
+			App::Inst()->GetTaskComponent()->Resume(this->mCorId);
 			return true;
 		case TaskState::TaskFinish:
 			break;
@@ -44,7 +43,7 @@ namespace Sentry
         if(this->mState == TaskState::TaskReady)
         {
             this->mState = TaskState::TaskAwait;
-			assert(this->mTaskComponent->YieldCoroutine(this->mCorId));
+			assert(App::Inst()->GetTaskComponent()->YieldCoroutine(this->mCorId));
             return true;
         }
         return false;

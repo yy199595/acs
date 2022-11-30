@@ -96,7 +96,8 @@ END_RECEIVE:
 		if(code)
 		{
 #ifdef __DEBUG__
-			CONSOLE_LOG_ERROR(code.message());
+            const std::string& address = this->mSocket->GetAddress();
+			CONSOLE_LOG_ERROR("send http message error : [" << address << "]");
 #endif
 		}
         this->PopMessage();

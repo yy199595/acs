@@ -222,8 +222,13 @@ namespace Sentry
 	}
 	std::shared_ptr<Message> ProtoComponent::Read(lua_State * lua, const std::string& name, int index)
 	{
-		MessageEncoder messageEncoder(lua, this);
-		return messageEncoder.Encode(name, index);
+        std::shared_ptr<Message> message = this->New(name);
+        if (message == nullptr)
+        {
+            return nullptr;
+        }
+		MessageEncoder messageEncoder(lua);
+        return messageEncoder.Encode(message, index) ? message : nullptr;
 	}
 
 }

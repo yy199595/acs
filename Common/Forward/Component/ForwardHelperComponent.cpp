@@ -82,7 +82,7 @@ namespace Sentry
         message.mutable_services()->insert(
             {
                 service, address
-            });
+            });     
         this->GetLocation(locationUnit->GetUnitId(), address);
         RpcService *locationService = this->mApp->GetService(this->mBindName);
         if(locationService == nullptr)

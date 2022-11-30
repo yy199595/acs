@@ -5,6 +5,7 @@
 #include"Client.h"
 #include"App/App.h"
 #include"Json/Lua/Json.h"
+#include"Config/ServiceConfig.h"
 #include"String/StringHelper.h"
 #include"Timer/ElapsedTimer.h"
 #include"Lua/LuaParameter.h"
@@ -30,21 +31,26 @@ namespace Lua
         request->SetProto(Tcp::Porto::Protobuf);
         ProtoComponent * messageComponent = App::Inst()->GetMsgComponent();
         const std::string func = CommonParameter::Read<std::string>(lua, 2);
-		std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
-        if(lua_isstring(lua, 3) && lua_istable(lua, 4))
+        const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
+        if (methodConfig == nullptr)
         {
-            const char * type = luaL_checkstring(lua, 3);
-            std::shared_ptr<Message> message = messageComponent->Read(lua, type, 4);
-            if(message == nullptr)
+            LOG_ERROR("call [" << func << "] not exist");
+            return 0;
+        }
+		std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
+        if (lua_istable(lua, 3) && !methodConfig->Request.empty())
+        {
+            const std::string& name = methodConfig->Request;
+            std::shared_ptr<Message> message = messageComponent->Read(lua, name, 3);
+            if (message == nullptr || !request->WriteMessage(message.get()))
             {
-                LOG_ERROR("new proto message " << type << " error");
+                LOG_ERROR("write request message error : [" << func << "]");
                 return 0;
             }
-            request->WriteMessage(message.get());
         }
         request->GetHead().Add("func", func);
 		TaskComponent * taskComponent = App::Inst()->GetTaskComponent();
-		taskComponent->Start([request, func, clientComponent, luaWaitTaskSource]()
+		taskComponent->Start([request, methodConfig, clientComponent, luaWaitTaskSource, messageComponent]()
 		{
 			ElapsedTimer elapsedTimer;
 			std::shared_ptr<Rpc::Packet> response = clientComponent->Call(request);
@@ -53,14 +59,20 @@ namespace Lua
 				luaWaitTaskSource->SetResult(XCode::CallTimeout, nullptr);
 				return;
 			}
-			std::shared_ptr<Message> message; //TODO
+            std::shared_ptr<Message> message;
+            
             XCode code = response->GetCode(XCode::Failure);
             if(code == XCode::Successful)
             {
-
+                if (!methodConfig->Response.empty())
+                {
+                    const std::string& name = methodConfig->Response;
+                    message = messageComponent->New(name);
+                    response->ParseMessage(message.get());
+                }                  
             }
 			luaWaitTaskSource->SetResult(code, message);
-			LOG_DEBUG("client call " << func << " user time = [" << elapsedTimer.GetMs() << "ms]");
+			LOG_DEBUG("client call " << methodConfig->FullName << " user time = [" << elapsedTimer.GetMs() << "ms]");
 		});
 		return luaWaitTaskSource->Await();
 	}

@@ -41,33 +41,29 @@ namespace Sentry
 
 	XCode LuaServiceMethod::CallAsync(int count, Rpc::Packet & message)
     {
-        std::unique_ptr<LuaServiceTaskSource> luaTaskSource = std::make_unique<LuaServiceTaskSource>(this->mLuaEnv);
-        Lua::UserDataParameter::Write(this->mLuaEnv, luaTaskSource.get());
+        LuaServiceTaskSource* luaTaskSource = new LuaServiceTaskSource();
+        Lua::UserDataParameter::Write(this->mLuaEnv, luaTaskSource);
         if (lua_pcall(this->mLuaEnv, count + 2, 1, 0) != 0)
         {           
+            delete luaTaskSource;
             message.GetHead().Add("error", lua_tostring(this->mLuaEnv, -1));
             return XCode::CallLuaFunctionFail;
         }
-        XCode code = luaTaskSource->Await();
-
-        if (code != XCode::Successful)
+        std::shared_ptr<Message> response;
+        if (!this->mConfig->Response.empty())
         {
-			return code;
+            response = this->mMsgComponent->New(this->mConfig->Response);
         }
-        if (!this->mConfig->Response.empty() && luaTaskSource->GetRef())
+        XCode code = luaTaskSource->Await(response);
+        std::unique_ptr<LuaServiceTaskSource> local(luaTaskSource);
+        if (code == XCode::Successful && response != nullptr)
         {
-            std::shared_ptr<Message> response = this->mMsgComponent->Read(
-				this->mLuaEnv, this->mConfig->Response, -1);
-            if (response == nullptr)
-            {
-                return XCode::JsonCastProtoFailure;
-            }
             if (message.WriteMessage(response.get()))
             {
                 return XCode::SerializationFailure;
             }
-        }
-        return XCode::Successful;
+        }     
+        return code;
     }
 
 	XCode LuaServiceMethod::Invoke(Rpc::Packet & message)

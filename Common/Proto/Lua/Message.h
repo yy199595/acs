@@ -32,9 +32,9 @@ namespace Sentry
 	class MessageEncoder
 	{
 	 public:
-		MessageEncoder(lua_State * lua, ProtoComponent * component);
+		MessageEncoder(lua_State * lua);
 	 public:
-		std::shared_ptr<Message> Encode(const std::string & proto, int index);
+		bool Encode(std::shared_ptr<Message> proto, int index);
 	 private:
 		bool EncodeField(Message & message, const FieldDescriptor * field, int index);
 		bool EncodeSingle(Message & message, const FieldDescriptor * field, int index);
@@ -46,7 +46,6 @@ namespace Sentry
 		bool EncoddeMessage(Message & message, const Descriptor * descriptor, int index);
 	 private:
 		lua_State * mLua;
-		ProtoComponent * mMsgComponent;
 	};
 }
 
