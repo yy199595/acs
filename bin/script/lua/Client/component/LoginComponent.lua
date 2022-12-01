@@ -18,7 +18,14 @@ function LoginComponent.Register(account, passwd, phoneNum)
         Log.Error(url, code)
         return nil
     end
-    return Json.Decode(response)
+    local registerInfo = Json.Decode(response)
+    if registerInfo == nil then
+        return nil
+    end
+    if registerInfo.code ~= XCode.Successful then
+        Log.Error(response)
+    end
+    return registerInfo
 end
 
 function LoginComponent.Login(account, passwd) -- 获取gate地址
@@ -31,7 +38,13 @@ function LoginComponent.Login(account, passwd) -- 获取gate地址
         Log.Error(url, code)
         return nil
     end
-    print(response)
-    return Json.Decode(response)
+    local loginInfo = Json.Decode(response)
+    if loginInfo == nil then
+        return nil
+    end
+    if loginInfo.code ~= XCode.Successful then
+        Log.Error(response)
+    end
+    return loginInfo
 end
 return LoginComponent

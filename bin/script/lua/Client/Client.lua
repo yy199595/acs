@@ -56,8 +56,9 @@ local TestHttp = function()
         local data1 = string.format(account, count)
         local data2 = passwd .. tostring(count)
         local data3 = phoneNum + count
-        loginComponent.Register(data1,data2, data3)
-        loginComponent.Login(data1, data2)
+        local res = loginComponent.Register(data1,data2, data3)
+        table.print(res)
+        --loginComponent.Login(data1, data2)
     end
 end
 
@@ -92,8 +93,8 @@ function Client.Start()
     coroutine.start(CallMongo)
     coroutine.start(CallMongo)
     coroutine.start(CallMongo)
-    --coroutine.start(TestHttp)
-    --coroutine.start(TestHttp)
+    coroutine.start(TestHttp)
+    coroutine.start(TestHttp)
     return true
 end
 

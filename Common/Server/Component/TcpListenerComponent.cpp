@@ -51,8 +51,8 @@ namespace Sentry
         try
         {
             Asio::Context & io = this->mApp->MainThread();
-            this->mBindAcceptor = new Asio::Acceptor (io, 
-                Asio::EndPoint(asio::ip::make_address(ip), std::stoi(port)));
+            this->mBindAcceptor = new Asio::Acceptor (io,
+				Asio::EndPoint(asio::ip::address_v4(), std::stoi(port)));
             this->mNetComponent = this->GetComponent<NetThreadComponent>();
 
             this->mIsClose = false;
