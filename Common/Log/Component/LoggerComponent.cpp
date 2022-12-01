@@ -95,6 +95,7 @@ namespace Sentry
 	void LoggerComponent::CreateLogFile()
 	{
 		spdlog::shutdown();
+		spdlog::set_level(spdlog::level::debug);
 		spdlog::flush_every(std::chrono::seconds(this->mLogSaveTime));
 		std::string logPath = fmt::format("{0}/{1}/{2}", this->mLogSavePath,
 			Helper::Time::GetYearMonthDayString(), this->mServerName);

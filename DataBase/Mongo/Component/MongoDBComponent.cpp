@@ -117,7 +117,7 @@ namespace Sentry
         std::shared_ptr<Mongo::CommandResponse> mongoResponse = this->AddTask(taskId, mongoTask)->Await();
 		if(mongoResponse != nullptr && mongoResponse->GetDocumentSize() > 0)
 		{
-            LOG_DEBUG( "[" << Time::NowMilTime() - t1 << "ms] document size = [" << mongoResponse->GetDocumentSize() << "]");
+            //LOG_DEBUG( "[" << Time::NowMilTime() - t1 << "ms] document size = [" << mongoResponse->GetDocumentSize() << "]");
             for(size_t i = 0; i < mongoResponse->GetDocumentSize(); i++)
             {
                 std::string json;
