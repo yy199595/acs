@@ -8,7 +8,7 @@ include(CMake/function.cmake)
 if(WIN32)
    
 else()
-    include(CMake/proto.cmake)
+    #include(CMake/proto.cmake)
 endif()
 message(${CMAKE_BINARY_DIR})
 
