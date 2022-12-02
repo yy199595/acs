@@ -23,7 +23,7 @@ namespace Sentry
     public:
         explicit ServerConfig(const std::string & name);
     public:
-        bool GetListen(const std::string & name, std::string& listen) const;
+        bool GetListen(const std::string & name, unsigned short & port) const;
         bool GetLocation(const char * name, std::string & location) const;
     protected:
         bool OnLoadText(const char *str, size_t length) final;
@@ -35,8 +35,8 @@ namespace Sentry
     private:
 		std::string mContent;
         const std::string mName;
+        std::unordered_map<std::string, unsigned int> mListens;
         std::unordered_map<std::string, std::string> mPaths;
-        std::unordered_map<std::string, std::string> mListens;
         std::unordered_map<std::string, std::string> mLocations;
     };
 }

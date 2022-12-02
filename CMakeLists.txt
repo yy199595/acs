@@ -80,6 +80,7 @@ include_directories(${PROJECT_SOURCE_DIR}/Common/Script)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Network)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Cluster)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Forward)
+include_directories(${PROJECT_SOURCE_DIR}/Common/Sqlite)
 include_directories(${PROJECT_SOURCE_DIR}/Common/SubPublish)
 
 
@@ -92,7 +93,7 @@ include_directories(${PROJECT_SOURCE_DIR}/Server/Telnet)
 
 
 
-file(GLOB_RECURSE CommonSrc "Common/*.h" "Common/*.cpp")
+file(GLOB_RECURSE CommonSrc "Common/*.h" "Common/*.cpp" "Common/*.c")
 file(GLOB_RECURSE ProtocolSrc "Gen/*.h" "Gen/*.cpp" "Gen/*.hpp" "Gen/*.cc")
 
 file(GLOB_RECURSE ServerSource "Server/*.h" "Server/*.cpp")

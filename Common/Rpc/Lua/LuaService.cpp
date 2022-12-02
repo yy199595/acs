@@ -147,4 +147,32 @@ namespace Lua
     {
         return 0;
     }
+
+    int Service::GetServerList(lua_State* lua)
+    {
+        std::string server;
+        std::vector<std::string> servers;
+        const std::string service = luaL_checkstring(lua, 1);
+        if (!ClusterConfig::Inst()->GetServerName(service, server))
+        {
+            return 0;
+        }
+        LocationComponent* locationComponent = App::Inst()->GetComponent<LocationComponent>();
+        if (locationComponent != nullptr && locationComponent->GetServers(server, servers))
+        {
+            lua_newtable(lua);
+            int top = lua_gettop(lua);
+          
+            for (size_t index = 0; index < servers.size(); index++)
+            {
+                lua_pushinteger(lua, index);
+                const std::string& data = servers[index];
+                lua_pushlstring(lua, data.c_str(), data.size());
+                lua_settable(lua, -3);
+            }
+            lua_settop(lua, top);
+            return 1;
+        }
+        return 0;
+    }
 }

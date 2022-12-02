@@ -8,6 +8,7 @@
         "proto": "proto",
         "source": "source",
         "script": "script/lua",
+        "sqlite":"data/sqlite/",
         "code": "XCode/XCode.csv",
         "user": "config/user.json",
         "redis": "config/db/redis.json",
@@ -33,11 +34,11 @@
     },
     "Server":{
         "listen":{
-            "rpc":"127.0.0.1:7788",
-            "http":"127.0.0.1:80",
-            "gate":"127.0.0.1:1995",
-            "forward":"127.0.0.1:7794",
-            "console": "127.0.0.1:8888"
+            "rpc": 7788,
+            "http": 80,
+            "gate": 1995,
+            "forward":7794,
+            "console": 8888
         },
         "server":{
             "rpc": "127.0.0.1:7788",
@@ -52,8 +53,8 @@
     },
     "HttpServer":{
         "listen":{
-            "rpc":"127.0.0.1:7790",
-            "http":"0.0.0.0:80"
+            "rpc":7790,
+            "http":80
         },
         "server":{
             "rpc":"127.0.0.1:7790",
@@ -65,7 +66,7 @@
     },
     "ChatServer":{
         "listen":{
-            "rpc":"127.0.0.1:7791"
+            "rpc":7791
         },
         "server":{
             "rpc":"127.0.0.1:7791"
@@ -76,8 +77,8 @@
     },
     "GateServer":{
         "listen":{
-            "rpc":"127.0.0.1:7792",
-            "gate":"0.0.0.0:1995"
+            "rpc":7792,
+            "gate":1995
         },
         "server":{
             "rpc":"127.0.0.1:7792",
@@ -89,7 +90,7 @@
     },
     "DataServer":{
         "listen":{
-            "rpc":"127.0.0.1:7793"
+            "rpc":7793
         },
         "server":{
             "rpc":"127.0.0.1:7793"
@@ -101,11 +102,11 @@
     },
     "ForwardServer":{
         "listen":{
-            "rpc":"127.0.0.1:7795",
-            "forward":"127.0.0.1:7794"
+            "rpc":7795,
+            "forward":7794
         },
         "server":{
-            "rpc":"0.0.0.0:7795",
+            "rpc":"127.0.0.1:7795",
             "forward":"127.0.0.1:7794"
         },
         "path":{

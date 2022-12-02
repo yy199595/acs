@@ -5,7 +5,7 @@ function Client.Test(tab)
     print(Json.Encode(tab))
 end
 
-local account = "yjz1995"
+local account = "yjz0995"
 local password = "123456"
 local phoneNum = 13716061995
 local clientComponent = App.GetComponent("ClientComponent")

@@ -49,6 +49,7 @@
 #include"Component/RedisStringComponent.h"
 #include"Component/RedisScriptComponent.h"
 #endif
+#include"Component/SqliteComponent.h"
 
 using namespace Sentry;
 
@@ -78,6 +79,7 @@ void RegisterComponent()
 	ComponentFactory::Add<GateHelperComponent>("GateHelperComponent");
 	ComponentFactory::Add<OuterNetComponent>("OuterNetComponent");
 	ComponentFactory::Add<OuterNetMessageComponent>("OuterNetMessageComponent");
+    ComponentFactory::Add<SqliteComponent>("SqliteComponent");
 // db
 #ifdef __ENABLE_REDIS__
     ComponentFactory::Add<RedisComponent>("RedisComponent");

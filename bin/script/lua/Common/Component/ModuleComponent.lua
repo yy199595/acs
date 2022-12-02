@@ -1,6 +1,5 @@
-ModuleComponent = {}
 
-function ModuleComponent.LoadModuleByName(moduleName)
+function LuaRequire(moduleName)
     print("load module ", moduleName)
     local oldModule = package.loaded[moduleName] or {}
     package.loaded[moduleName] = nil
@@ -17,4 +16,3 @@ function ModuleComponent.LoadModuleByName(moduleName)
     package[moduleName] = oldModule
     return oldModule
 end
-return ModuleComponent

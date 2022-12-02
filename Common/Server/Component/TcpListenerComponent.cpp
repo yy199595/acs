@@ -35,28 +35,20 @@ namespace Sentry
 
 	bool TcpListenerComponent::StartListen(const char * name)
     {
-        std::string address;
-        if(!ServerConfig::Inst()->GetListen(name, address))
+        unsigned short port = 0;
+        if(!ServerConfig::Inst()->GetListen(name, port))
         {
             LOG_ERROR("not find listen config " << name);
             return false;
         }
-        size_t pos = address.find(":");
-        if(pos == std::string::npos)
-        {
-            return false;
-        }
-        const std::string ip = address.substr(0, pos);
-        const std::string port = address.substr(pos + 1);
         try
         {
             Asio::Context & io = this->mApp->MainThread();
             this->mBindAcceptor = new Asio::Acceptor (io,
-				Asio::EndPoint(asio::ip::address_v4(), std::stoi(port)));
+				Asio::EndPoint(asio::ip::address_v4(), port));
             this->mNetComponent = this->GetComponent<NetThreadComponent>();
 
             this->mIsClose = false;
-            this->mAddress = address;
             this->mBindAcceptor->listen();
             io.post(std::bind(&TcpListenerComponent::ListenConnect, this));
             LOG_INFO(this->GetName() << " listen [" << this->mAddress << "] successful");

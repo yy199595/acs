@@ -1,5 +1,4 @@
 
-
 local Server = {}
 Server.Modules = { }
 function GetModules()
@@ -13,7 +12,9 @@ function GetModules()
 end
 
 function Server.Awake()
-    print("***************")
+    local luaPanda = require("Debug.LuaPanda")
+    local res = luaPanda.start("localhost", 8818)
+    print("***************", res)
 end
 
 function Server.StartInsert()

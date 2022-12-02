@@ -42,7 +42,7 @@ namespace Sentry
             for (auto iter1 = document.MemberBegin(); iter1 != document.MemberEnd(); iter1++)
             {
                 const std::string key(iter1->name.GetString());
-                const std::string value(iter1->value.GetString());
+                const unsigned int value = iter1->value.GetUint();
                 this->mListens.emplace(key, value);
             }
         }
@@ -83,14 +83,14 @@ namespace Sentry
         return true;
 	}
 
-    bool ServerConfig::GetListen(const std::string& name, std::string& listen) const
+    bool ServerConfig::GetListen(const std::string& name, unsigned short & listen) const
     {
         auto iter = this->mListens.find(name);
         if (iter == this->mListens.end())
         {
             return false;
         }
-        listen = iter->second;
+        listen = (unsigned short)iter->second;
         return true;
     }
 

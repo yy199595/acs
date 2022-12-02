@@ -21,20 +21,19 @@ namespace Sentry
         this->mLocations.erase(iter);
         return true;
     }
-    void LocationUnit::Add(const std::string &service, const std::string &address)
+    void LocationUnit::Add(const std::string &server, const std::string &address)
     {
-
-        this->mLocations[service] = address;
+        this->mLocations[server] = address;
     }
 
-    bool LocationUnit::Get(std::vector<std::string> &services)
+    bool LocationUnit::Get(std::vector<std::string> &servers)
     {
         auto iter = this->mLocations.begin();
         for (; iter != this->mLocations.end(); iter++)
         {
-            services.emplace_back(iter->first);
+            servers.emplace_back(iter->first);
         }
-        return services.size() > 0;
+        return servers.size() > 0;
     }
 
     bool LocationUnit::Get(const std::string &server, std::string &address) const
@@ -44,8 +43,7 @@ namespace Sentry
         {
             return false;
         }
-        address = iter->second;
-        CONSOLE_LOG_DEBUG(this->GetUnitId() << " add to " << server << " [" << address << "]");
+        address = iter->second;       
         return true;
     }
 }

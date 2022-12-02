@@ -7,6 +7,8 @@ function MongoComponent.InsertOnce(tab, data, flag)
     if type(data) == "table" then
         data = Json.Encode(data)
     end
+    local list = Service.GetServerList("MongoService")
+    table.print(list)
     local address = Service.AllotServer("MongoService")
     return Service.Call(address, "MongoService.Insert", {
         tab = tab,
