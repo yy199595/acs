@@ -128,8 +128,8 @@ namespace Sentry
                     this->CloseSocket(XCode::UnKnowPacket);
                     return;
                 }
-                size_t count = this->mSocket->GetSocket().available(code);
-                assert(count >= len);
+                //size_t count = this->mSocket->GetSocket().available(code);
+                //assert(count >= len);
                 this->ReceiveMessage(len);
             }
                 break;
