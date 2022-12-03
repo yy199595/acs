@@ -61,6 +61,8 @@ namespace Sentry
         if(code != asio::error::operation_aborted)
         {
             this->OnComplete(HttpStatus::REQUEST_TIMEOUT);
+			CONSOLE_LOG_ERROR("[" << this->mRequest->Method() << "] "
+				<< this->mRequest->Path() << " request time out");
         }
     }
 
@@ -91,7 +93,7 @@ namespace Sentry
         {
             Asio::Code err;
             this->mTimer->cancel(err);
-            std::move(this->mTimer);
+            this->mTimer = nullptr;
         }
         if(code && code != asio::error::eof)
         {
