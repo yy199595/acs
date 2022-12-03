@@ -91,7 +91,7 @@ namespace Sentry
         {
             Asio::Code err;
             this->mTimer->cancel(err);
-            std::move(this->mTimer);
+            this->mTimer = nullptr;
         }
         if(code && code != asio::error::eof)
         {

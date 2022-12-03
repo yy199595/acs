@@ -54,9 +54,7 @@ namespace Lua
 	namespace MessageEx
 	{
 		extern int New(lua_State * lua);
-		extern int NewJson(lua_State * lua);
-		extern int Decode(lua_State * lua);
-		extern int Encode(lua_State * lua);
+		extern int Import(lua_State* lua);
 	};
 }
 

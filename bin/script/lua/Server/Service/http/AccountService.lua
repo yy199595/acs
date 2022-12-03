@@ -1,6 +1,9 @@
 
 local AccountService = {}
-function AccountService.Start111()
+local Mongo = require("Component.MongoComponent")
+local DataMgr = require("Component.DataMgrComponent")
+
+function AccountService.Start()
     print("启动账号服务")
     return true
 end
@@ -10,7 +13,7 @@ function AccountService.Register(requestInfo)
     assert(requestInfo.password, "register password is nil")
     assert(requestInfo.phone_num, "register phone number is nil")
 
-    local userInfo = DataMgrComponent.Get("user.account", requestInfo.account)
+    local userInfo = DataMgr.Get("user.account", requestInfo.account)
 
     if userInfo ~= nil then
         return XCode.AccountAlreadyExists
@@ -24,18 +27,17 @@ function AccountService.Register(requestInfo)
     requestInfo.create_time = nowTime
     requestInfo._id = requestInfo.account
     requestInfo.token = Md5.ToString(str)
-    DataMgrComponent.Set("user.account", requestInfo.account, requestInfo, true)
+    DataMgr.Set("user.account", requestInfo.account, requestInfo, true)
     return XCode.Successful
 end
 
 function AccountService.Login(request)
 
-    table.print(request)
+    --table.print(request)
     assert(type(request.account) == "string", "user account is not string")
     assert(type(request.password) == "string", "user password is not string")
 
-    local userInfo = DataMgrComponent.Get("user.account",request.account)
-
+    local userInfo = DataMgr.Get("user.account",request.account)
     if userInfo == nil or request.password ~= userInfo.password then
         return XCode.Failure
     end
@@ -47,7 +49,7 @@ function AccountService.Login(request)
         return XCode.AllotUser
     end
     table.print(response)
-    MongoComponent.Update("user.account", { _id = request.account },
+    Mongo.Update("user.account", { _id = request.account },
                 {  last_login_time = os.time(),  token = response.token })
     return XCode.Successful, response
 end

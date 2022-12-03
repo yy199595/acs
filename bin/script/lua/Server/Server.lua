@@ -1,6 +1,8 @@
 
 local Server = {}
 Server.Modules = { }
+local Mongo = require("Component.MongoComponent")
+
 function GetModules()
     local modules = { }
     for _, module in pairs(package.loaded) do
@@ -12,9 +14,7 @@ function GetModules()
 end
 
 function Server.Awake()
-    --local luaPanda = require("Debug.LuaPanda")
-    --local res = luaPanda.start("localhost", 8818)
-    --print("***************", res)
+    table.print(Http)
     return true
 end
 
@@ -40,8 +40,7 @@ function Server.StartInsert()
 end
 
 function Server.OnClusterComplete()
-    local httpComponent = App.GetComponent("HttpComponent")
-    local code, data = httpComponent:Get("http://www.kuaidi100.com/query?type=1122&postid=qwer")
+    local code, data = Http.Get("http://www.kuaidi100.com/query?type=1122&postid=qwer")
     print(code, data)
     --MysqlComponent.Create("user.account_info", {"account"})
     --
@@ -58,8 +57,8 @@ function Server.OnClusterComplete()
     --    account = "646585122@qq.com"
     --}, 1)
     --table.print(res)
-
-    local r1 = MongoComponent.InsertOnce("user.data_account", {
+    
+    local r1 = Mongo.InsertOnce("user.data_account", {
         _id = "646585122@qq.com",
         login_ip = "127.0.0.1",
         user_id = 1122,
@@ -83,7 +82,7 @@ function Server.OnClusterComplete()
     --table.print(res)
 
 
-    local r3 = MongoComponent.InsertOnce("user2.data_account", {
+    local r3 = Mongo.InsertOnce("user2.data_account", {
         _id = "646585123@qq.com",
         login_ip = "127.0.0.1",
         user_id = 1122,
@@ -92,20 +91,20 @@ function Server.OnClusterComplete()
         token = "0x00ssdjsaklj"
     })
 
-    local r2 = MongoComponent.Update("user1.data_account", {
+    local r2 = Mongo.Update("user1.data_account", {
         _id = "646585122@qq.com"
     }, {
         login_time_1 = 199595
     })
 
-    MongoComponent.Delete("user2.data_account", {
+    Mongo.Delete("user2.data_account", {
         _id = "646585122@qq.com"
     })
 
     local tab = { }
     table.insert(tab, "646585123@qq.com")
     table.insert(tab, "646585122@qq.com")
-    local response = MongoComponent.QueryDatas("user1.data_account", tab)
+    local response = Mongo.QueryDatas("user1.data_account", tab)
     --local response = MongoComponent.Query("data_account", {
     --    _id = {
     --        ["$in"] = {
@@ -116,25 +115,6 @@ function Server.OnClusterComplete()
     --})
     print("======== text query from mongo ========")
     table.print(response)
-end
-
-function Server.OnLoadModule(moduleName)
-
-    local oldModule = package.loaded[moduleName] or {}
-    package.loaded[moduleName] = nil
-    local newModule = require(moduleName)
-    if type(newModule) == "table" then
-        for k, member in pairs(newModule) do
-            if type(member) == "function" then
-                oldModule[k] = member
-            elseif oldModule[k] == nil then
-                oldModule[k] = member
-            end
-        end
-    end
-    package[moduleName] = oldModule
-    --Log.Info("load " .. moduleName .. " Successful")
-    return oldModule
 end
 
 function Server.Hotfix()

@@ -1,9 +1,8 @@
-MysqlComponent = {}
-local messageComponent = App.GetComponent("ProtoComponent")
+local MysqlComponent = {}
 
 function MysqlComponent.Create(tabName, keys, data)
+    local request = Proto.New(tabName, data)
     local address = Service.AllotLocation("MysqlService")
-    local request = messageComponent:New(tabName, data)
     return Service.Call(address, "MysqlService.Create", {
         keys = keys,
         data = request
@@ -18,7 +17,7 @@ function MysqlComponent.Add(tabName, data, flag)
     return Service.Call(address, "MysqlService.Add",  {
         table = tabName,
         flag = flag or 0,
-        data = messageComponent:New(tabName, data)
+        data = Proto.New(tabName, data)
     })
 end
 

@@ -1,4 +1,4 @@
-DataMgrComponent = { }
+local DataMgrComponent = { }
 
 function DataMgrComponent.Set(tab, id, value, insert)
 
@@ -34,3 +34,5 @@ function DataMgrComponent.Get(tab, id)
     })
     return response
 end
+
+return DataMgrComponent

@@ -207,12 +207,9 @@ namespace Sentry
 
     void ProtoComponent::OnLuaRegister(Lua::ClassProxyHelper &luaRegister)
     {
-        luaRegister.BeginRegister<ProtoComponent>();
-        //luaRegister.PushMemberFunction("Load", &ProtoComponent::Load);
+        luaRegister.BeginNewTable("Proto");
 		luaRegister.PushExtensionFunction("New", Lua::MessageEx::New);
-		luaRegister.PushMemberFunction("Import", &ProtoComponent::Import);
-		luaRegister.PushExtensionFunction("Decode", &Lua::MessageEx::Decode);
-		luaRegister.PushExtensionFunction("NewJson", &Lua::MessageEx::NewJson);
+		luaRegister.PushExtensionFunction("Import", Lua::MessageEx::Import);
 	}
 
 	bool ProtoComponent::Write(lua_State * lua, const Message& message)

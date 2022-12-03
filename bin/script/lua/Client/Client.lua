@@ -13,17 +13,21 @@ local loginComponent = require("component.LoginComponent")
 
 local callCount = 0
 local waitCount = 0
+local succCount = 0
 local CallMongo = function()
     
     while true do
         waitCount = waitCount + 1
-        clientComponent:Call("MongoService.Query", {
+        local code = clientComponent:Call("MongoService.Query", {
             tab = "user.account",
             json = Json.Encode({
                 _id = "646585122@qq.com"
             }),
             limit = 1
         })
+        if code == XCode.Successful then
+            succCount = succCount + 1
+        end
         waitCount = waitCount - 1
         callCount = callCount + 1
     end
@@ -33,9 +37,12 @@ local CallChat = function()
     
     while true do
         waitCount = waitCount + 1
-        clientComponent:Call("ChatService.Ping", {
+        local code = clientComponent:Call("ChatService.Ping", {
             user_id = 1122, msg_type = 1, message = "hello"
         })
+        if code == XCode.Successful then
+            succCount = succCount + 1
+        end
         waitCount = waitCount - 1
         callCount = callCount + 1
     end
@@ -96,7 +103,7 @@ function Client.Start()
 end
 
 Client.Update = function(tick)
-    Log.Warning(string.format("count = %d   wait = %d", callCount, waitCount))
+    Log.Warning(string.format("count = %d   wait = %d successful = %d", callCount, waitCount, succCount))
 end
 
 return Client

@@ -29,6 +29,12 @@ namespace Lua
 		}
 	}
 
+	void ClassProxyHelper::BeginNewTable(const std::string & name)
+	{
+		this->mName = name;
+		this->BeginNewTable();		
+	}
+
 	void ClassProxyHelper::PushStaticExtensionFunction(const char* name, lua_CFunction func)
 	{
 		lua_getglobal(this->mLua, this->mName.c_str());

@@ -16,7 +16,7 @@ namespace Sentry
 	 public:
 		HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy, HttpComponent * component);
 	 public:
-		long long Do(std::shared_ptr<Http::Request> request, int timeout = 15);
+		long long Do(std::shared_ptr<Http::Request> request, int timeout = 0);
 	 private:
         void ConnectHost();
         void OnTimeout(Asio::Code code);

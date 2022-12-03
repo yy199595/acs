@@ -1,5 +1,5 @@
 
-MongoComponent = {}
+local MongoComponent = {}
 MongoComponent.Counters = { }
 
 local this = MongoComponent

@@ -17,7 +17,7 @@ namespace Sentry
 		this->mPath = fmt::format("{0}/{1}.db", this->mPath, name);
 		return sqlite3_open(this->mPath.c_str(), &mDb) == 0;		
 	}
-	bool SqliteComponent::ExecSql(const std::string& sql)
+	bool SqliteComponent::Exec(const std::string& sql)
 	{
 		char* errMessage = 0;
 		int code = sqlite3_exec(this->mDb, sql.c_str(), SqlCallback, 0, &errMessage);

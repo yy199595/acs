@@ -13,54 +13,39 @@ namespace Lua
 {
 	int MessageEx::New(lua_State* lua)
 	{
-        ProtoComponent * messageComponent = UserDataParameter::Read<ProtoComponent*>(lua, 1);
-		if (!lua_isstring(lua, 2))
+		const char* name = luaL_checkstring(lua, 1);
+		ProtoComponent* messageComponent = App::Inst()->GetComponent<ProtoComponent>();
+		if (messageComponent == nullptr)
 		{
-			luaL_error(lua, "first parameter must string");
+			luaL_error(lua, "ProtoComponent Is Null");
 			return 0;
 		}
-		const char* name = lua_tostring(lua, 2);
-		if (lua_istable(lua, 3))
+		if (lua_istable(lua, 2))
 		{
-			UserDataParameter::Write(lua,  messageComponent->Read(lua, name, 3));
+			UserDataParameter::Write(lua,  messageComponent->Read(lua, name, 2));
+			return 1;
+		}
+		else if (lua_isstring(lua, 2))
+		{
+			size_t size = 0;
+			const char * json = luaL_checklstring(lua, 2, &size);
+			UserDataParameter::Write(lua, messageComponent->New(name, json, size));
 			return 1;
 		}
 		UserDataParameter::Write(lua,  messageComponent->New(name));
 		return 1;
 	}
 
-	int MessageEx::NewJson(lua_State* lua)
+	int MessageEx::Import(lua_State* lua)
 	{
-		ProtoComponent* messageComponent = UserDataParameter::Read<ProtoComponent*>(lua, 1);
-		if (!lua_isstring(lua, 2))
+		const char* name = luaL_checkstring(lua, 1);
+		ProtoComponent* messageComponent = App::Inst()->GetComponent<ProtoComponent>();
+		if (messageComponent == nullptr)
 		{
-			luaL_error(lua, "first parameter must string");
+			luaL_error(lua, "ProtoComponent Is Null");
 			return 0;
 		}
-		const char* name = lua_tostring(lua, 2);
-		if (!lua_istable(lua, 3))
-		{
-			luaL_error(lua, "second parameter must table");
-			return 0;
-		}
-		StringBuffer s;
-		Encoder encode(lua, 3);
-		encode.encode(lua, &s, 3);
-		const char* json = s.GetString();
-		const size_t size = s.GetLength();
-		UserDataParameter::Write(lua, messageComponent->New(name, std::string(json, size)));
+		lua_pushboolean(lua, messageComponent->Import(name));
 		return 1;
-	}
-
-	int MessageEx::Encode(lua_State* lua)
-	{
-		return 0;
-	}
-
-	int MessageEx::Decode(lua_State* lua)
-	{
-		ProtoComponent* messageComponent = UserDataParameter::Read<ProtoComponent*>(lua, 1);
-		std::shared_ptr<Message> message = UserDataParameter::Read<std::shared_ptr<Message>>(lua, 2);
-		return messageComponent->Write(lua, *message) ? 1 : 0;
 	}
 }

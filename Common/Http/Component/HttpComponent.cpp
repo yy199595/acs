@@ -59,7 +59,7 @@ namespace Sentry
 
 	void HttpComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
 	{
-		luaRegister.BeginRegister<HttpComponent>();
+        luaRegister.BeginNewTable("Http");
 		luaRegister.PushExtensionFunction("Get", Lua::HttpClient::Get);
 		luaRegister.PushExtensionFunction("Post", Lua::HttpClient::Post);
 		luaRegister.PushExtensionFunction("Download", Lua::HttpClient::Download);

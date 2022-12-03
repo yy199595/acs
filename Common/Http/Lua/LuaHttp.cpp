@@ -17,20 +17,16 @@ namespace Lua
 {
 	int HttpClient::Get(lua_State* lua)
     {
-        lua_pushthread(lua);
-        if (!lua_isuserdata(lua, 1))
+        lua_pushthread(lua);        
+        HttpComponent* httpComponent = App::Inst()->GetComponent<HttpComponent>();
+        if (httpComponent == nullptr)
         {
-            luaL_error(lua, "first parameter must httpComponent point");
+            luaL_error(lua, "HttpComponent Null");
             return 0;
         }
-        if (!lua_isstring(lua, 2))
-        {
-            luaL_error(lua, "url must string point");
-        }
         size_t size = 0;
-        const char *str = luaL_checklstring(lua, 2, &size);
-        HttpComponent *httpComponent = UserDataParameter::Read<HttpComponent *>(lua, 1);
-        std::shared_ptr<Http::GetRequest> getRequest(new Http::GetRequest());
+        const char* str = luaL_checklstring(lua, 1, &size);
+        std::shared_ptr<Http::GetRequest> getRequest = std::make_shared<Http::GetRequest>();
         if (!getRequest->SetUrl(std::string(str, size)))
         {
             luaL_error(lua, "parse get url : [%s] failure", str);
@@ -48,25 +44,30 @@ namespace Lua
 
 	int HttpClient::Post(lua_State* lua)
     {
-        size_t size = 0;
         lua_pushthread(lua);
-        const char *str = luaL_checklstring(lua, 2, &size);
-        HttpComponent *httpComponent = UserDataParameter::Read<HttpComponent *>(lua, 1);
-        std::shared_ptr<Http::PostRequest> postRequest(new Http::PostRequest());
+        HttpComponent *httpComponent = App::Inst()->GetComponent<HttpComponent>();
+        if (httpComponent == nullptr)
+        {
+            luaL_error(lua, "HttpComponent Null");
+            return 0;
+        }
+        size_t size = 0;
+        const char* str = luaL_checklstring(lua, 1, &size);
+        std::shared_ptr<Http::PostRequest> postRequest = std::make_shared<Http::PostRequest>();
         if (!postRequest->SetUrl(std::string(str, size)))
         {
             luaL_error(lua, "parse post url : [%s] failure", str);
             return 0;
         }
-        if (lua_isstring(lua, 3))
+        if (lua_isstring(lua, 2))
         {
-            const char *data = luaL_checklstring(lua, 3, &size);
+            const char *data = luaL_checklstring(lua, 2, &size);
             postRequest->Json(data, size);
         }
-        else if (lua_istable(lua, 3))
+        else if (lua_istable(lua, 2))
         {
             std::string json;
-            Lua::Json::Read(lua, 3, &json);
+            Lua::Json::Read(lua, 2, &json);
             postRequest->Json(json.c_str(), json.size());
         }
         else

@@ -138,7 +138,7 @@ namespace Sentry
 
 	void RedisComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
 	{
-		luaRegister.BeginRegister<RedisComponent>();
+		luaRegister.BeginNewTable("Redis");
 		luaRegister.PushExtensionFunction("Run", Lua::Redis::Run);
 		luaRegister.PushExtensionFunction("Call", Lua::Redis::Call);
         luaRegister.PushExtensionFunction("Send", Lua::Redis::Send);

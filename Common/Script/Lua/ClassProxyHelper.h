@@ -45,6 +45,8 @@ namespace Lua
 
 		void BeginNewTable();
 
+		void BeginNewTable(const std::string & name);
+
 		ClassProxyHelper Clone(const std::string & name);
 
 		void PushStaticExtensionFunction(const char* name, lua_CFunction func);
@@ -54,7 +56,7 @@ namespace Lua
 
 	 private:
 		lua_State * mLua;
-		const std::string mName;
+		std::string mName;
 	};
 
 	template<typename T, typename ... Args>
