@@ -10,11 +10,11 @@
 
 namespace Sentry
 {
-    class ForwardComponent : public TcpListenerComponent, public IRpc<Rpc::Packet>
+    class TranComponent : public TcpListenerComponent, public IRpc<Rpc::Packet>
     {
     public:
-        ForwardComponent() = default;
-        ~ForwardComponent() = default;
+        TranComponent() = default;
+        ~TranComponent() = default;
     private:
 		bool Awake() final;
         bool LateAwake() final;

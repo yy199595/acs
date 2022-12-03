@@ -21,8 +21,8 @@
 #include"Component/LocationComponent.h"
 #include"Component/TextConfigComponent.h"
 #include"Component/LaunchComponent.h"
-#include"Component/ForwardComponent.h"
-#include"Component/ForwardHelperComponent.h"
+#include"Component/TranComponent.h"
+#include"Component/TranHelperComponent.h"
 
 #include"Service/OuterService.h"
 #include"Service/InnerService.h"
@@ -72,8 +72,8 @@ void RegisterComponent()
     ComponentFactory::Add<InnerNetComponent>("InnerNetComponent");
 	ComponentFactory::Add<LocationComponent>("LocationComponent");
 
-    ComponentFactory::Add<ForwardComponent>("ForwardComponent");
-    ComponentFactory::Add<ForwardHelperComponent>("ForwardHelperComponent");
+    ComponentFactory::Add<TranComponent>("ForwardComponent");
+    ComponentFactory::Add<TranHelperComponent>("ForwardHelperComponent");
 
 // gate
 	ComponentFactory::Add<GateHelperComponent>("GateHelperComponent");

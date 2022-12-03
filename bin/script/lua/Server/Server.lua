@@ -12,9 +12,10 @@ function GetModules()
 end
 
 function Server.Awake()
-    local luaPanda = require("Debug.LuaPanda")
-    local res = luaPanda.start("localhost", 8818)
-    print("***************", res)
+    --local luaPanda = require("Debug.LuaPanda")
+    --local res = luaPanda.start("localhost", 8818)
+    --print("***************", res)
+    return true
 end
 
 function Server.StartInsert()

@@ -2,7 +2,7 @@
 // Created by zmhy0073 on 2022/10/14.
 //
 
-#include"ForwardComponent.h"
+#include"TranComponent.h"
 #include"Helper/Helper.h"
 #include"Service/RpcService.h"
 #include"Config/ClusterConfig.h"
@@ -11,20 +11,20 @@
 #include"Component/NetThreadComponent.h"
 namespace Sentry
 {
-	bool ForwardComponent::Awake()
+	bool TranComponent::Awake()
 	{
 		this->mApp->AddComponent<LocationService>();
 		return true;
 	}
 
-    bool ForwardComponent::LateAwake()
+    bool TranComponent::LateAwake()
     {
         LOG_CHECK_RET_FALSE(this->StartListen("forward"));
         this->mLocationComponent = this->GetComponent<LocationComponent>();
         return true;
     }
 
-    void ForwardComponent::StartClose(const std::string &address)
+    void TranComponent::StartClose(const std::string &address)
     {
         InnerNetClient * netClient = this->GetClient(address);
         if(netClient != nullptr)
@@ -33,7 +33,7 @@ namespace Sentry
         }
     }
 
-    bool ForwardComponent::OnListen(std::shared_ptr<SocketProxy> socket)
+    bool TranComponent::OnListen(std::shared_ptr<SocketProxy> socket)
     {
         std::shared_ptr<InnerNetClient> netClient = std::make_shared<InnerNetClient>(this, socket);
         {
@@ -43,14 +43,14 @@ namespace Sentry
         return true;
     }
 
-    InnerNetClient *ForwardComponent::GetClient(const std::string &address)
+    InnerNetClient *TranComponent::GetClient(const std::string &address)
     {
         auto iter = this->mClients.find(address);
         return iter != this->mClients.end() ? iter->second.get() : nullptr;
     }
 
 
-    void ForwardComponent::OnCloseSocket(const std::string &address, XCode code)
+    void TranComponent::OnCloseSocket(const std::string &address, XCode code)
     {
         auto iter = this->mClients.find(address);
         if(iter != this->mClients.end())
@@ -64,7 +64,7 @@ namespace Sentry
         }
     }
 
-    void ForwardComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Packet> message)
+    void TranComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
         if(message->GetType() != (int)Tcp::Type::Auth && !this->IsAuth(address))
         {
@@ -119,7 +119,7 @@ namespace Sentry
         }
     }
 
-    bool ForwardComponent::OnAuth(const std::string &address, std::shared_ptr<Rpc::Packet> message)
+    bool TranComponent::OnAuth(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
         if (this->mAuthClients.find(address) != this->mAuthClients.end())
         {
@@ -187,13 +187,13 @@ namespace Sentry
         return true;
     }
 
-    const ServiceNodeInfo *ForwardComponent::GetServerInfo(const std::string &address) const
+    const ServiceNodeInfo *TranComponent::GetServerInfo(const std::string &address) const
     {
         auto iter = this->mNodeInfos.find(address);
         return iter != this->mNodeInfos.end() ? iter->second.get() : nullptr;
     }
 
-    XCode ForwardComponent::OnRequest(std::shared_ptr<Rpc::Packet> message)
+    XCode TranComponent::OnRequest(std::shared_ptr<Rpc::Packet> message)
     {
         std::string target;
         long long userId = 0;
@@ -231,7 +231,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode ForwardComponent::Forward(long long userId, std::shared_ptr<Rpc::Packet> message)
+    XCode TranComponent::Forward(long long userId, std::shared_ptr<Rpc::Packet> message)
     {
         std::string service, method, address, server;
         LOG_RPC_CHECK_ARGS(message->GetMethod(service, method));
@@ -255,7 +255,7 @@ namespace Sentry
         return this->Forward(address, message);
     }
 
-    XCode ForwardComponent::Forward(const std::string &address, std::shared_ptr<Rpc::Packet> message)
+    XCode TranComponent::Forward(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
 #ifdef __DEBUG__
         std::string func;
@@ -276,7 +276,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    bool ForwardComponent::Send(const std::string &address, std::shared_ptr<Rpc::Packet> message)
+    bool TranComponent::Send(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
         InnerNetClient * innerNetClient = this->GetClient(address);
         if(innerNetClient == nullptr)
@@ -296,7 +296,7 @@ namespace Sentry
         return true;
     }
 
-    bool ForwardComponent::Send(std::shared_ptr<Rpc::Packet> message)
+    bool TranComponent::Send(std::shared_ptr<Rpc::Packet> message)
     {
         if(this->mAuthClients.empty())
         {
@@ -314,13 +314,13 @@ namespace Sentry
         return false;
     }
 
-    bool ForwardComponent::IsAuth(const std::string &address) const
+    bool TranComponent::IsAuth(const std::string &address) const
     {
         auto iter = this->mAuthClients.find(address);
         return iter != this->mAuthClients.end();
     }
 
-	XCode ForwardComponent::OnResponse(std::shared_ptr<Rpc::Packet> message)
+	XCode TranComponent::OnResponse(std::shared_ptr<Rpc::Packet> message)
 	{
 		std::string address;
 		if(!message->GetHead().Get("resp", address))

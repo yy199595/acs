@@ -11,7 +11,7 @@
 #include"Component/ProtoComponent.h"
 #include"Component/LocationComponent.h"
 #include"Component/InnerNetMessageComponent.h"
-#include"Component/ForwardHelperComponent.h"
+#include"Component/TranHelperComponent.h"
 using namespace Sentry;
 namespace Lua
 {
@@ -43,7 +43,7 @@ namespace Lua
             const LocationUnit * locationUnit = locationComponent->GetUnit(userId);
             if(locationUnit == nullptr || (!locationUnit->Get(methodConfig->Service, address)))
             {
-                ForwardHelperComponent * forwardComponent = App::Inst()->GetComponent<ForwardHelperComponent>();
+                TranHelperComponent * forwardComponent = App::Inst()->GetComponent<TranHelperComponent>();
                 forwardComponent->GetLocation(userId, address);
             }
 #endif

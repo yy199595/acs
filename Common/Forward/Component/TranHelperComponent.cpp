@@ -4,13 +4,13 @@
 #include"Service/RpcService.h"
 #include"Config/ClusterConfig.h"
 #include"Unit/LocationUnit.h"
-#include"ForwardHelperComponent.h"
+#include"TranHelperComponent.h"
 #include"Service/LocationService.h"
 #include"Component/LocationComponent.h"
 #include"Component/InnerNetMessageComponent.h"
 namespace Sentry
 {
-    bool ForwardHelperComponent::LateAwake()
+    bool TranHelperComponent::LateAwake()
     {
         const ServerConfig * config = ServerConfig::Inst();
         this->mBindName = ComponentFactory::GetName<LocationService>();
@@ -19,7 +19,7 @@ namespace Sentry
         return this->mLocations.size() > 0;
     }
 
-    void ForwardHelperComponent::OnLocalComplete()
+    void TranHelperComponent::OnLocalComplete()
     {
 		TaskComponent * taskComponent = this->GetComponent<TaskComponent>();
         for (const std::string &address: this->mLocations)
@@ -35,18 +35,18 @@ namespace Sentry
         }
     }
 
-    void ForwardHelperComponent::GetLocation(std::string &address)
+    void TranHelperComponent::GetLocation(std::string &address)
     {
         address = this->mLocations[0];
     }
 
-    void ForwardHelperComponent::GetLocation(long long userId, std::string &address)
+    void TranHelperComponent::GetLocation(long long userId, std::string &address)
     {
         size_t index = userId % this->mLocations.size();
         address = this->mLocations[index];
     }
 
-    bool ForwardHelperComponent::OnAllot(LocationUnit *locationUnit)
+    bool TranHelperComponent::OnAllot(LocationUnit *locationUnit)
     {
         std::vector<std::string> services;
         if(!locationUnit->Get(services))
@@ -71,7 +71,7 @@ namespace Sentry
         return locationService->Send(address, "Add", message) == XCode::Successful;
     }
 
-    bool ForwardHelperComponent::OnAllot(const std::string &service, LocationUnit *locationUnit)
+    bool TranHelperComponent::OnAllot(const std::string &service, LocationUnit *locationUnit)
     {
         std::string address;
         if (!locationUnit->Get(service, address))

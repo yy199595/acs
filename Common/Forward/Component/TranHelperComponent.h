@@ -9,11 +9,11 @@
 namespace Sentry
 {
     class LocationUnit;
-	class ForwardHelperComponent final : public Component, public IComplete
+	class TranHelperComponent final : public Component, public IComplete
     {
     public:
-        ForwardHelperComponent() = default;
-        ~ForwardHelperComponent() = default;
+        TranHelperComponent() = default;
+        ~TranHelperComponent() = default;
     private:
         bool LateAwake() final;
         void OnLocalComplete() final;

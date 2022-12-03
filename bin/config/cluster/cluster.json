@@ -53,7 +53,7 @@
 			"ForwardHelperComponent"
 		]
 	},
-	"ForwardServer": {
+	"TranServer": {
 		"AutoAllot": false,
 		"Component": [
 			"ForwardComponent"

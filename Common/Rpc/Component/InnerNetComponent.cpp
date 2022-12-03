@@ -5,6 +5,7 @@
 #include"InnerNetMessageComponent.h"
 #include"File/FileHelper.h"
 #include"Config/CodeConfig.h"
+#include"Service/InnerService.h"
 #include"Component/OuterNetComponent.h"
 #include"Component/NetThreadComponent.h"
 #include"google/protobuf/util/json_util.h"
@@ -12,10 +13,10 @@ namespace Sentry
 {
 	bool InnerNetComponent::Awake()
 	{
-        this->mNetComponent = nullptr;
-        this->mMessageComponent = nullptr;
-        return true;
-    }
+		this->mNetComponent = nullptr;
+		this->mMessageComponent = nullptr;
+		return true;
+	}
 
 	bool InnerNetComponent::LateAwake()
 	{

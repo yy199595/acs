@@ -100,7 +100,7 @@
             "cluster":"config/cluster/cluster.json"
         }
     },
-    "ForwardServer":{
+    "TranServer":{
         "listen":{
             "rpc":7795,
             "forward":7794

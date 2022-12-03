@@ -11,7 +11,7 @@
 #include"Service/LocalRpcService.h"
 #include"Component/ProtoComponent.h"
 #include"Component/LocationComponent.h"
-#include"Component/ForwardHelperComponent.h"
+#include"Component/TranHelperComponent.h"
 #include"Component/InnerNetMessageComponent.h"
 
 #include"Config/ClusterConfig.h"
@@ -23,7 +23,7 @@ namespace Sentry
 		this->mTaskComponent = this->mApp->GetTaskComponent();
 		this->mTimerComponent = this->mApp->GetTimerComponent();
 		this->mLocationComponent = this->GetComponent<LocationComponent>();
-        this->mForwardComponent = this->GetComponent<ForwardHelperComponent>();
+        this->mTranComponent = this->GetComponent<TranHelperComponent>();
         this->mInnerMessageComponent = this->GetComponent<InnerNetMessageComponent>();
 		LOG_CHECK_RET_FALSE(this->mOutNetComponent = this->GetComponent<OuterNetComponent>());
 		return true;
@@ -93,7 +93,7 @@ namespace Sentry
             {
                 continue;
             }
-            // ·ÖÅä·þÎñÆ÷
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             std::string location; 
             if (!this->mLocationComponent->AllotServer(server, location))
             {
@@ -101,7 +101,7 @@ namespace Sentry
             }
             locationUnit->Add(server, location);           
         }
-        if(!this->mForwardComponent->OnAllot(locationUnit.get()))
+        if(!this->mTranComponent->OnAllot(locationUnit.get()))
         {
             return XCode::NetWorkError;
         }
