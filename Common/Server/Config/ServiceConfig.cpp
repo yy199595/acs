@@ -107,6 +107,7 @@ namespace Sentry
         auto iter = document.MemberBegin();
         for(; iter != document.MemberEnd(); iter++)
         {
+			//RpcServiceConfig * config = nullptr;
             const rapidjson::Value & jsonValue = iter->value;
             const std::string service(iter->name.GetString());
             std::unique_ptr<RpcServiceConfig> config(new RpcServiceConfig(service));

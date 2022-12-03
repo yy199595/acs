@@ -15,35 +15,24 @@ local callCount = 0
 local CallMongo = function()
     
     while true do
-        local t1 = Time.NowMilTime()
-        -- local res, response = clientComponent:Call("ChatService.Chat", "c2s.chat.request", {
-        --     user_id = 1122, msg_type = 1, message = "hello"
-        -- })
-        callCount = callCount + 1  
-        -- Log.Error(string.format("call use time = [%dms] count = %d", t, callCount))
-        local res, response = clientComponent:Call("MongoService.Query", {
+        clientComponent:Call("MongoService.Query", {
             tab = "user.account",
             json = Json.Encode({
                 _id = "646585122@qq.com"
             }),
             limit = 1
         })
-        print("========= ".. callCount .. "============")
-        --table.print(response)
-        --local t = Time.NowMilTime() - t1
-        --Log.Error(string.format("call use time = [%dms] count = %d", t, callCount))
+        callCount = callCount + 1
     end
 end
 
 local CallChat = function()
     
     while true do
-        local t1 = Time.NowMilTime()
-        local res, response = clientComponent:Call("ChatService.Chat", {
+        clientComponent:Call("ChatService.Ping", {
             user_id = 1122, msg_type = 1, message = "hello"
         })
-        callCount = callCount + 1  
-        print("--------- ".. callCount .. "--------")
+        callCount = callCount + 1
     end
 end
 
@@ -93,9 +82,15 @@ function Client.Start()
     coroutine.start(CallMongo)
     coroutine.start(CallMongo)
     coroutine.start(CallMongo)
-    coroutine.start(TestHttp)
-    coroutine.start(TestHttp)
+    --coroutine.start(TestHttp)
+    --coroutine.start(TestHttp)
     return true
+end
+
+Client.Update = function(tick)
+    if tick % 5 == 0 then
+        Log.Warning("======== " .. callCount .. " =====")
+    end
 end
 
 return Client

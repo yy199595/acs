@@ -18,10 +18,8 @@ ChatService.Chat = function(id, request)
     return XCode.Successful
 end
 
-ChatService.Test = function(id, request)
-    --coroutine.sleep(0.5)
-    Log.Error(id, Json.Encode(request))
-    return XCode.Successful, request
+ChatService.Ping = function()
+    return XCode.Successful
 end
 
 return ChatService

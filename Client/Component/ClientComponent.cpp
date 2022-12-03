@@ -79,7 +79,7 @@ namespace Client
                 std::string func;
                 if(message->GetHead().Get("func", func))
                 {
-                    LOG_ERROR("call func : [" << func << "] response");
+                    LOG_DEBUG("call func : [" << func << "] response");
                 }
                 if (message->GetHead().Get("rpc", rpcId))
                 {
