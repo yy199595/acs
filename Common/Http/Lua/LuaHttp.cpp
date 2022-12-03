@@ -21,7 +21,7 @@ namespace Lua
         HttpComponent* httpComponent = App::Inst()->GetComponent<HttpComponent>();
         if (httpComponent == nullptr)
         {
-            luaL_error(lua, "HttpComponent Null");
+            luaL_error(lua, "HttpComponent Is Null");
             return 0;
         }
         size_t size = 0;
@@ -48,7 +48,7 @@ namespace Lua
         HttpComponent *httpComponent = App::Inst()->GetComponent<HttpComponent>();
         if (httpComponent == nullptr)
         {
-            luaL_error(lua, "HttpComponent Null");
+            luaL_error(lua, "HttpComponent Is Null");
             return 0;
         }
         size_t size = 0;

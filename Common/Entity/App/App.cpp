@@ -88,13 +88,13 @@ namespace Sentry
         {
             return false;
         }
-        this->mMainThread = std::make_unique<Asio::Context>();
+        this->mMainContext = std::make_unique<Asio::Context>();
         if (!this->LoadComponent())
         {
             this->GetLogger()->SaveAllLog();
             return -1;
         }
-        Asio::ContextWork work(*this->mMainThread);
+        Asio::ContextWork work(*this->mMainContext);
         const std::chrono::milliseconds sleepTime(1);
         long long logicStartTime = Helper::Time::NowMilTime();
         long long logicSecondTime = Helper::Time::NowMilTime();
@@ -110,15 +110,15 @@ namespace Sentry
         this->GetComponents<ILastFrameUpdate>(lastFrameUpdateComponents);
 
 
-        float fps = 15;
+        int fps = 15;
         Asio::Code code;
         float deltaTime = 0;
         long long logicRunCount = 0;
         ServerConfig::Inst()->GetMember("fps", fps);
         long long logicUpdateInterval = 1000 / fps;
-        while (!this->mMainThread->stopped())
+        while (!this->mMainContext->stopped())
         {
-            this->mMainThread->poll(code);
+            this->mMainContext->poll(code);
             for (ISystemUpdate *component: systemUpdateComponents)
             {
                 component->OnSystemUpdate();
@@ -166,7 +166,7 @@ namespace Sentry
 
 	void App::Stop()
     {
-        this->mMainThread->stop();
+        this->mMainContext->stop();
         LOG_WARN("close server successful ");
     }
 
@@ -193,7 +193,7 @@ namespace Sentry
         }
         this->mIsStartDone = true; //开始帧循环
         std::vector<IComplete *> completeComponents;
-        this->GetComponents(completeComponents);
+        this->GetComponents<IComplete>(completeComponents);
         for(IComplete * complete : completeComponents)
         {
             complete->OnLocalComplete();

@@ -11,6 +11,7 @@ namespace Lua
 	namespace Service
 	{
 		int Call(lua_State * lua);
+		int Send(lua_State* lua);
         int AddLocation(lua_State * lua);
         int AllotServer(lua_State * lua);
         int GetServerList(lua_State* lua);

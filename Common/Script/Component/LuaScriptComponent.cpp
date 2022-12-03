@@ -40,9 +40,7 @@ namespace Sentry
         lua_getglobal(this->mLuaEnv, "ServerConfig");
 
         Lua::ClassProxyHelper luaRegister0(this->mLuaEnv, "App");
-        luaRegister0.BeginRegister<App>();
-		luaRegister0.PushExtensionFunction("Send", Lua::LuaApp::Send);
-		luaRegister0.PushExtensionFunction("Call", Lua::LuaApp::Call);
+        luaRegister0.BeginRegister<App>();		
         luaRegister0.PushExtensionFunction("GetComponent", Lua::LuaApp::GetComponent);
 
         Lua::ClassProxyHelper luaRegister1(this->mLuaEnv, "WaitLuaTaskSource");
@@ -91,6 +89,7 @@ namespace Sentry
 		Lua::ClassProxyHelper luaRegister9(this->mLuaEnv, "Service");
 		luaRegister9.BeginNewTable();
 		luaRegister9.PushExtensionFunction("Call", Lua::Service::Call);
+        luaRegister9.PushExtensionFunction("Send", Lua::Service::Send);
 		luaRegister9.PushExtensionFunction("AllotServer", Lua::Service::AllotServer);
         luaRegister9.PushExtensionFunction("GetServerList", Lua::Service::GetServerList);
 
@@ -209,11 +208,11 @@ namespace Sentry
             {
                 LOG_ERROR(moduleName << " error");
                 return false;
-            }
+            }         
             this->mModulePaths.emplace(moduleName, path);
         }
         this->AddRequire(common);
-        this->AddRequire(module);
+        this->AddRequire(module);       
         this->LoadModule(ServerConfig::Inst()->Name());
         return true;
     }

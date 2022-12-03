@@ -158,6 +158,10 @@ namespace Sentry
 
     bool InnerNetMessageComponent::Send(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
+        if (this->mRpcClientComponent == nullptr)
+        {
+            return false;
+        }
         message->GetHead().Remove("address");
         assert(message->GetType() < (int)Tcp::Type::Max);
         assert(message->GetType() > (int)Tcp::Type::None);

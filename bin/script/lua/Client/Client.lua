@@ -13,11 +13,14 @@ local loginComponent = require("component.LoginComponent")
 
 local callCount = 0
 local waitCount = 0
-local succCount = 0
+local failureCount = 0
+local successCount = 0
+local sumTime = 0
 local CallMongo = function()
     
     while true do
         waitCount = waitCount + 1
+        local t1 = Time.NowMilTime()
         local code = clientComponent:Call("MongoService.Query", {
             tab = "user.account",
             json = Json.Encode({
@@ -26,10 +29,13 @@ local CallMongo = function()
             limit = 1
         })
         if code == XCode.Successful then
-            succCount = succCount + 1
+            successCount = successCount + 1
+        else
+            failureCount = failureCount + 1
         end
         waitCount = waitCount - 1
         callCount = callCount + 1
+        sumTime = sumTime + (Time.NowMilTime() - t1)
     end
 end
 
@@ -37,14 +43,16 @@ local CallChat = function()
     
     while true do
         waitCount = waitCount + 1
+        local t1 = Time.NowMilTime()
         local code = clientComponent:Call("ChatService.Ping", {
             user_id = 1122, msg_type = 1, message = "hello"
         })
         if code == XCode.Successful then
-            succCount = succCount + 1
+            successCount = successCount + 1
         end
         waitCount = waitCount - 1
         callCount = callCount + 1
+        sumTime = sumTime + (Time.NowMilTime() - t1)
     end
 end
 
@@ -68,7 +76,6 @@ end
 
 function Client.Start()
 
-    loginComponent.Awake()
     loginComponent.Register(account, password, phoneNum)
 
     local loginInfo = loginComponent.Login(account, password)
@@ -97,13 +104,24 @@ function Client.Start()
     coroutine.start(CallMongo)
     coroutine.start(CallMongo)
     coroutine.start(CallMongo)
-    coroutine.start(TestHttp)
-    coroutine.start(TestHttp)
+
+
+    coroutine.start(CallChat)
+    coroutine.start(CallChat)
+    coroutine.start(CallChat)
+
+    coroutine.start(CallMongo)
+    coroutine.start(CallMongo)
+    coroutine.start(CallMongo)
+    --coroutine.start(TestHttp)
+    --coroutine.start(TestHttp)
     return true
 end
 
 Client.Update = function(tick)
-    Log.Warning(string.format("count = %d   wait = %d successful = %d", callCount, waitCount, succCount))
+    local time = sumTime / callCount
+    local value = "[%" .. ((successCount / callCount) * 100) .. "] time = [" .. time .. "ms]"
+    Log.Warning(string.format("count = %d successful = %d failure = %d %s", callCount, successCount, failureCount, value))
 end
 
 return Client

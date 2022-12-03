@@ -20,14 +20,10 @@ namespace Sentry
 		explicit App();
 	 public:
 		inline LoggerComponent* GetLogger() { return this->mLogComponent; }
-		inline Asio::Context & MainThread() { return *this->mMainThread; }
+		inline Asio::Context & MainThread() { return *this->mMainContext; }
 		inline TaskComponent* GetTaskComponent() { return this->mTaskComponent; }
 		inline TimerComponent* GetTimerComponent() { return this->mTimerComponent; }
 		inline ProtoComponent * GetMsgComponent() { return this->mMessageComponent; }
-    private:
-		bool LoadComponent();
-		void StartAllComponent();
-		bool InitComponent(Component* component);
 	 public:
 		void Stop();
         int Run(int argc, char ** argv);
@@ -38,11 +34,13 @@ namespace Sentry
 #ifdef __OS_WIN__
 		void UpdateConsoleTitle();
 #endif
+		bool LoadComponent();
 		void WaitServerStart();
-	 private:
-        float mLogicFps;
+		void StartAllComponent();
+		bool InitComponent(Component* component);
 	 private:
         int mTickCount;
+		float mLogicFps;
         bool mIsStartDone;
         std::thread::id mThreadId;
         const long long mStartTime;
@@ -50,7 +48,7 @@ namespace Sentry
 		LoggerComponent* mLogComponent;
 		TimerComponent* mTimerComponent;
 		ProtoComponent * mMessageComponent;
-        std::unique_ptr<Asio::Context> mMainThread;
+        std::unique_ptr<Asio::Context> mMainContext;
         std::unordered_map<std::string, RpcService*> mSeviceMap;
     };
 }// namespace Sentry

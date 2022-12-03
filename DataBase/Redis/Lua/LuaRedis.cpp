@@ -14,10 +14,15 @@ namespace Lua
 {
 	int Redis::Run(lua_State* lua)
     {
-        lua_pushthread(lua);
-        const char *name = lua_tostring(lua, 2);
-        const char *command = lua_tostring(lua, 3);
-        RedisComponent *redisComponent = UserDataParameter::Read<RedisComponent *>(lua, 1);
+        lua_pushthread(lua);     
+        RedisComponent* redisComponent = App::Inst()->GetComponent<RedisComponent>();
+        if (redisComponent == nullptr)
+        {
+            luaL_error(lua, "RedisComponent Is Null");
+            return 0;
+        }
+        const char* name = luaL_checkstring(lua, 1);
+        const char* command = luaL_checkstring(lua, 2);
         TcpRedisClient * redisClientContext = redisComponent->GetClient(name);
         if (redisClientContext == nullptr)
         {
@@ -58,13 +63,37 @@ namespace Lua
 
 	int Redis::Call(lua_State* lua)
     {
+        RedisComponent* redisComponent = App::Inst()->GetComponent<RedisComponent>();
+        if (redisComponent == nullptr)
+        {
+            luaL_error(lua, "RedisComponent Is Null");
+            return 0;
+        }
+        RedisScriptComponent* redisScriptComponent = App::Inst()->GetComponent<RedisScriptComponent>();
+        if (redisScriptComponent == nullptr)
+        {
+            luaL_error(lua, "RedisScriptComponent Is Null");
+            return 0;
+        }
         std::string json;
         lua_pushthread(lua);
-        const char *name = lua_tostring(lua, 2);
-        const char *fullName = lua_tostring(lua, 3);
-        Lua::Json::Read(lua, 4, &json);
-        RedisScriptComponent * redisScriptComponent = App::Inst()->GetComponent<RedisScriptComponent>();
-        RedisComponent *redisComponent = UserDataParameter::Read<RedisComponent *>(lua, 1);
+        const char *name = luaL_checkstring(lua, 1);
+        const char *fullName = luaL_checkstring(lua, 2);
+        if (lua_isstring(lua, 3))
+        {
+            size_t size = 0;
+            const char * str = lua_tolstring(lua, 3, &size);
+            json.append(str, size);
+        }
+        else if (lua_istable(lua, 3))
+        {
+            Lua::Json::Read(lua, 3, &json);
+        }
+        else
+        {
+            luaL_error(lua, "parameter muset table or string");
+            return 0;
+        }
         TcpRedisClient * redisClientContext = redisComponent->GetClient(name);
         if (redisClientContext == nullptr)
         {
@@ -80,6 +109,46 @@ namespace Lua
 
     int Redis::Send(lua_State *lua)
     {
-        return 1;
+        RedisComponent* redisComponent = App::Inst()->GetComponent<RedisComponent>();
+        if (redisComponent == nullptr)
+        {
+            luaL_error(lua, "RedisComponent Is Null");
+            return 0;
+        }
+        const char* name = luaL_checkstring(lua, 1);
+        const char* command = luaL_checkstring(lua, 2);
+        TcpRedisClient* redisClientContext = redisComponent->GetClient(name);
+        if (redisClientContext == nullptr)
+        {
+            luaL_error(lua, "not find redis client %s\n", name);
+            return 0;
+        }
+        std::shared_ptr<RedisRequest> request(new RedisRequest(command));
+        int count = (int)luaL_len(lua, 4);
+        for (int i = 0; i < count; i++)
+        {
+            lua_geti(lua, 4, i + 1);
+            int index = lua_absindex(lua, -1);
+            if (lua_isstring(lua, index))
+            {
+                size_t size = 0;
+                const char* str = lua_tolstring(lua, index, &size);
+                request->AddString(str, size);
+            }
+            else if (lua_isinteger(lua, index))
+            {
+                long long num = lua_tointeger(lua, index);
+                request->AddParameter(num);
+            }
+            else if (lua_istable(lua, index))
+            {
+                std::string json;
+                Lua::Json::Read(lua, index, &json);
+                request->AddParameter(json);
+            }
+            lua_pop(lua, 1);
+        }
+        redisClientContext->Send(request);
+        return 0;
     }
 }

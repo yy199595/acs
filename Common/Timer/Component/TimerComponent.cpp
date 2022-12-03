@@ -42,9 +42,9 @@ namespace Sentry
 
     void TimerComponent::OnLuaRegister(Lua::ClassProxyHelper &luaRegister)
     {
-        luaRegister.BeginRegister<TimerComponent>();
-        luaRegister.PushExtensionFunction("AddTimer", Lua::Timer::AddTimer);
-        luaRegister.PushExtensionFunction("CancelTimer", Lua::Timer::CancelTimer);
+        luaRegister.BeginNewTable("Timer");
+        luaRegister.PushExtensionFunction("Add", Lua::Timer::Add);
+        luaRegister.PushExtensionFunction("Remove", Lua::Timer::Remove);
     }
 
 	bool TimerComponent::CancelTimer(long long id)

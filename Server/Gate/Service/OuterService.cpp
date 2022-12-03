@@ -26,7 +26,7 @@ namespace Sentry
         BIND_COMMON_RPC_METHOD(OuterService::Ping);
         BIND_COMMON_RPC_METHOD(OuterService::Allot);
         const ServerConfig * config = ServerConfig::Inst();
-        config->GetLocation("gate", this->mAddress);
+        ServerConfig::Inst()->GetLocation("gate", this->mAddress);
         LOG_CHECK_RET_FALSE(config->GetLocation("gate", this->mAddress));
         this->mOuterComponent = this->GetComponent<OuterNetMessageComponent>();
         return true;

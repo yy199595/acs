@@ -274,7 +274,7 @@ namespace Sentry
 
 	bool InnerNetComponent::Send(const std::string & address, std::shared_ptr<Rpc::Packet> message)
 	{
-		if(address == this->mLocation) //发送到本级
+		if(address == this->mLocation) //发送到本机
 		{
 			this->OnMessage(address, message);
 			return true;

@@ -12,11 +12,16 @@ using namespace Sentry;
 
 namespace Lua
 {
-	int Timer::AddTimer(lua_State* lua)
+	int Timer::Add(lua_State* lua)
     {
-        TimerComponent *timerComponent = Lua::UserDataParameter::Read<TimerComponent *>(lua, 1);
-        unsigned int ms = (unsigned int)luaL_checkinteger(lua, 2); //Lua::Parameter::Read<unsigned int>(lua, 2);
-        lua_pushvalue(lua, 3);
+        TimerComponent* timerComponent = App::Inst()->GetTimerComponent();
+        if (timerComponent == nullptr)
+        {
+            luaL_error(lua, "TimerComponent Is Null");
+            return 0;
+        }
+        unsigned int ms = (unsigned int)luaL_checkinteger(lua, 1);
+        lua_pushvalue(lua, 2);
         if (!lua_isfunction(lua, -1))
         {
             luaL_error(lua, "add timer type = [%s]", luaL_typename(lua, -1));
@@ -29,10 +34,15 @@ namespace Lua
         return 1;
     }
 
-	int Timer::CancelTimer(lua_State* lua)
+	int Timer::Remove(lua_State* lua)
 	{
-        TimerComponent *timerComponent = Lua::UserDataParameter::Read<TimerComponent *>(lua, 1);
-        unsigned int timerId = (unsigned int) luaL_checkinteger(lua, 2);//Lua::Parameter::Read<unsigned int>(lua, 2);
+        TimerComponent* timerComponent = App::Inst()->GetTimerComponent();
+        if (timerComponent == nullptr)
+        {
+            luaL_error(lua, "TimerComponent Is Null");
+            return 0;
+        }
+        unsigned int timerId = (unsigned int) luaL_checkinteger(lua, 1);//Lua::Parameter::Read<unsigned int>(lua, 2);
 		Lua::Parameter::Write<bool>(lua, timerComponent->CancelTimer(timerId));
 		return 1;
 	}

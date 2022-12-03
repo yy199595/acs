@@ -82,7 +82,7 @@
         },
         "server":{
             "rpc":"127.0.0.1:7792",
-            "gate":"192.168.1.9:1995"
+            "gate":"127.0.0.1:1995"
         },
         "path":{
             "cluster":"config/cluster/cluster.json"

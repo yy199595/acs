@@ -17,6 +17,16 @@
 #include"Config/ClusterConfig.h"
 namespace Sentry
 {
+    OuterNetMessageComponent::OuterNetMessageComponent()
+    {
+        this->mTaskComponent = nullptr;
+        this->mTranComponent = nullptr;
+        this->mTimerComponent = nullptr;
+        this->mOutNetComponent = nullptr;
+        this->mLocationComponent = nullptr;
+        this->mInnerMessageComponent = nullptr;
+    }
+
 
 	bool OuterNetMessageComponent::LateAwake()
 	{
@@ -80,7 +90,7 @@ namespace Sentry
         long long userId = iter->second;
         this->mUserAddressMap.emplace(address, userId);
         this->mClientAddressMap.emplace(userId, address);
-        std::unique_ptr<LocationUnit> locationUnit(new LocationUnit(userId, address));
+        std::unique_ptr<LocationUnit> locationUnit = std::make_unique<LocationUnit>(userId, address);
 
         std::vector<std::string> services;
         std::vector<const NodeConfig *> nodeConfigs;

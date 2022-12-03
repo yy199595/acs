@@ -23,7 +23,7 @@ inline std::string FormatFileLine(const char * file, const int line)
 			break;
 		}
 	}
-	char buffer[100] = {};
+	static char buffer[100] = {};
 	fileName = fileName == nullptr ? file : fileName;
 #ifdef _MSC_VER
 	size_t size = sprintf_s(buffer, "%s:%d  ", fileName, line);

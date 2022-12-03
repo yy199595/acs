@@ -9,8 +9,8 @@ namespace Lua
 {
 	namespace Timer
 	{
-		extern int AddTimer(lua_State * lua);
-		extern int CancelTimer(lua_State * lua);
+		extern int Add(lua_State * lua);
+		extern int Remove(lua_State * lua);
 	}
 }
 

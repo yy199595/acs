@@ -14,7 +14,10 @@ function GetModules()
 end
 
 function Server.Awake()
-    table.print(Http)
+    table.print(Service)
+
+    --table.print(package.loaded)
+
     return true
 end
 
@@ -40,6 +43,10 @@ function Server.StartInsert()
 end
 
 function Server.OnClusterComplete()
+
+    local code = Service.Call(nil, "ChatService.Ping")
+    print("code = " .. code)
+
     local code, data = Http.Get("http://www.kuaidi100.com/query?type=1122&postid=qwer")
     print(code, data)
     --MysqlComponent.Create("user.account_info", {"account"})

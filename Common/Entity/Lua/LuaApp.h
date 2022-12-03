@@ -8,9 +8,7 @@
 namespace Lua
 {
 	namespace LuaApp
-	{
-		extern int Send(lua_State * lua);
-		extern int Call(lua_State * lua);
+	{		
 		extern int GetComponent(lua_State * lua);
 	};
 }
