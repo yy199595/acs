@@ -35,8 +35,6 @@ namespace Client
 {
 	ClientComponent::ClientComponent()
 	{
-		this->mPort = 0;
-		this->mLuaComponent = nullptr;
         this->mTimerComponent = nullptr;
 	}
 
@@ -76,11 +74,6 @@ namespace Client
             case (int)Tcp::Type::Response:
             {
                 long long rpcId = 0;
-                std::string func;
-                if(message->GetHead().Get("func", func))
-                {
-                    LOG_DEBUG("call func : [" << func << "] response");
-                }
                 if (message->GetHead().Get("rpc", rpcId))
                 {
                     this->OnResponse(rpcId, message);
@@ -104,28 +97,41 @@ namespace Client
     bool ClientComponent::LateAwake()
     {
         this->mTimerComponent = this->GetComponent<TimerComponent>();
-		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
 		return true;
     }
 
 	std::shared_ptr<Rpc::Packet> ClientComponent::Call(std::shared_ptr<Rpc::Packet> request)
-    {
-        std::shared_ptr<ClientTask> clienRpcTask(new ClientTask(0));
-
-        request->GetHead().Add("rpc", clienRpcTask->GetRpcId());
-
-        this->mTcpClient->SendToServer(request);
-        return this->AddTask(clienRpcTask->GetRpcId(), clienRpcTask)->Await();
-    }
-
-	void ClientComponent::OnTimeout(long long rpcId)
 	{
-		this->OnResponse(rpcId, nullptr);
+		std::shared_ptr<ClientTask> clienRpcTask(new ClientTask(0));
+		{
+			long long taskId = clienRpcTask->GetRpcId();
+			request->GetHead().Add("rpc", taskId);
+			long long timeId = this->mTimerComponent->DelayCall(20 * 1000,
+				[request, taskId, this]()
+				{
+					std::string func;
+					request->GetHead().Get("func", func);
+					CONSOLE_LOG_ERROR("call " << func << " time out");
+					this->OnResponse(taskId, nullptr);
+				});
+			this->mTimers.emplace(taskId, timeId);
+		}
+		this->mTcpClient->SendToServer(request);
+		return this->AddTask(clienRpcTask->GetRpcId(), clienRpcTask)->Await();
 	}
 
 	void ClientComponent::OnAddTask(RpcTask rpctask)
 	{
 		//LOG_WARN(this->GetName() << " add new task " << rpctask->GetRpcId());
+	}
+
+	void ClientComponent::OnDelTask(long long key, RpcTask task)
+	{
+		auto iter = this->mTimers.find(key);
+		if(iter != this->mTimers.end())
+		{
+			this->mTimers.erase(iter);
+		}
 	}
 
 	bool ClientComponent::StartConnect(const std::string& ip, unsigned short port)

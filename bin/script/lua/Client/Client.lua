@@ -12,9 +12,11 @@ local clientComponent = App.GetComponent("ClientComponent")
 local loginComponent = require("component.LoginComponent")
 
 local callCount = 0
+local waitCount = 0
 local CallMongo = function()
     
     while true do
+        waitCount = waitCount + 1
         clientComponent:Call("MongoService.Query", {
             tab = "user.account",
             json = Json.Encode({
@@ -22,6 +24,7 @@ local CallMongo = function()
             }),
             limit = 1
         })
+        waitCount = waitCount - 1
         callCount = callCount + 1
     end
 end
@@ -29,9 +32,11 @@ end
 local CallChat = function()
     
     while true do
+        waitCount = waitCount + 1
         clientComponent:Call("ChatService.Ping", {
             user_id = 1122, msg_type = 1, message = "hello"
         })
+        waitCount = waitCount - 1
         callCount = callCount + 1
     end
 end
@@ -42,11 +47,14 @@ local TestHttp = function()
     local passwd = "yjz199595"
     local account = "%d@qq.com"
     while true do
+        waitCount = waitCount + 1
         local data1 = string.format(account, count)
         local data2 = passwd .. tostring(count)
         local data3 = phoneNum + count
         local res = loginComponent.Register(data1,data2, data3)
-        table.print(res)
+        --table.print(res)
+        waitCount = waitCount - 1
+        callCount = callCount + 1
         --loginComponent.Login(data1, data2)
     end
 end
@@ -82,15 +90,13 @@ function Client.Start()
     coroutine.start(CallMongo)
     coroutine.start(CallMongo)
     coroutine.start(CallMongo)
-    --coroutine.start(TestHttp)
-    --coroutine.start(TestHttp)
+    coroutine.start(TestHttp)
+    coroutine.start(TestHttp)
     return true
 end
 
 Client.Update = function(tick)
-    if tick % 5 == 0 then
-        Log.Warning("======== " .. callCount .. " =====")
-    end
+    Log.Warning(string.format("count = %d   wait = %d", callCount, waitCount))
 end
 
 return Client

@@ -43,7 +43,6 @@ namespace Client
         ClientComponent();
 
         ~ClientComponent() final = default;
-
     public:
         void OnRequest(std::shared_ptr<c2s::rpc::call> t1);
 		bool StartConnect(const std::string & ip, unsigned short port);
@@ -52,15 +51,14 @@ namespace Client
     protected:
 
         bool LateAwake() final;
-		void OnTimeout(long long rpcId);
         void OnAddTask(RpcTask task) final;
+		void OnDelTask(long long key, RpcTask task) final;
         void StartClose(const std::string &address) final;
         void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
         void OnCloseSocket(const std::string &address, XCode code) final;
     private:
-        unsigned short mPort;
         TimerComponent *mTimerComponent;
-		LuaScriptComponent * mLuaComponent;
         std::shared_ptr<TcpRpcClientContext> mTcpClient;
+		std::unordered_map<long long, long long> mTimers;
     };
 }

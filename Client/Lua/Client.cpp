@@ -72,7 +72,11 @@ namespace Lua
                 }                  
             }
 			luaWaitTaskSource->SetResult(code, message);
-			LOG_DEBUG("client call " << methodConfig->FullName << " user time = [" << elapsedTimer.GetMs() << "ms]");
+			if(elapsedTimer.GetSecond() >= 10)
+			{
+				LOG_ERROR("client call " << methodConfig->FullName <<
+					" user time = [" << elapsedTimer.GetSecond() << "s]");
+			}
 		});
 		return luaWaitTaskSource->Await();
 	}
