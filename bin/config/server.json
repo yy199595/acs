@@ -54,7 +54,7 @@
     "HttpServer":{
         "listen":{
             "rpc":7790,
-            "http":80
+            "http":8080
         },
         "server":{
             "rpc":"127.0.0.1:7790",
