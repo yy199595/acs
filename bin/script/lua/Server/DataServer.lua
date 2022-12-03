@@ -1,10 +1,9 @@
 
 DataServer = { }
-local messageComponent = App.GetComponent("ProtoComponent")
 local function CreateTable(tabName, keys)
     local code = App.Call("MysqlService.Create", {
         keys = keys,
-        data = messageComponent:New(tabName)
+        data = Proto.New(tabName)
     })
     return code == XCode.Successful
 end
