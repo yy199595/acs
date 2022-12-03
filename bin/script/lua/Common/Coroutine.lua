@@ -33,8 +33,6 @@ function coroutine.rpc(func, id, request, taskSource)
 end
 
 function coroutine.http(func, request, taskSource)
-    table.print(request)
-    table.print(taskSource)
     local context = function(luaTaskSource)
         local tab = {}
         local state, error, response = pcall(func, request)
@@ -47,6 +45,7 @@ function coroutine.http(func, request, taskSource)
             tab.code = error
             tab.data = response
         end
+        print("--------------")
         luaTaskSource:SetHttp(tab.code, tab)
     end
     coroutine.start(context, taskSource)

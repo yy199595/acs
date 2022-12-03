@@ -113,8 +113,8 @@ function Client.Start()
     coroutine.start(CallMongo)
     coroutine.start(CallMongo)
     coroutine.start(CallMongo)
-    --coroutine.start(TestHttp)
-    --coroutine.start(TestHttp)
+    coroutine.start(TestHttp)
+    coroutine.start(TestHttp)
     return true
 end
 

@@ -69,7 +69,7 @@ namespace Sentry
 				Lua::Json::Read(lua, -1, &data);
 				luaServiceTaskSource->mHttpData->Json(HttpStatus::OK, data);
 			}
-			if (lua_isstring(lua, -1))
+			else if (lua_isstring(lua, -1))
 			{
 				size_t size = 0;
 				const char * json = luaL_checklstring(lua, -1, &size);
