@@ -130,6 +130,8 @@ namespace Client
 		auto iter = this->mTimers.find(key);
 		if(iter != this->mTimers.end())
 		{
+            long long timerId = iter->second;
+            this->mTimerComponent->CancelTimer(timerId);
 			this->mTimers.erase(iter);
 		}
 	}

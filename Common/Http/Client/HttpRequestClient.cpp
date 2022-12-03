@@ -16,6 +16,7 @@ namespace Sentry
 
 	long long HttpRequestClient::Do(std::shared_ptr<Http::Request> httpRequest, int timeout)
 	{
+        this->mTimeout = timeout;
 		this->mRequest = httpRequest;
         this->mTaskId = Guid::Create();
 		this->mResponse = std::make_shared<Http::Response>();
@@ -57,7 +58,7 @@ namespace Sentry
 
     void HttpRequestClient::OnTimeout(Asio::Code code)
     {
-        if(code == asio::error::timed_out)
+        if(code != asio::error::operation_aborted)
         {
             this->OnComplete(HttpStatus::REQUEST_TIMEOUT);
         }
@@ -134,7 +135,6 @@ namespace Sentry
 
         if(this->mTimeout > 0)
         {
-            Asio::Code code{asio::error::timed_out};
             std::chrono::seconds timeout{this->mTimeout};
             this->mTimer = std::make_shared<asio::steady_timer>(context, timeout);
             this->mTimer->async_wait(std::bind(&HttpRequestClient::OnTimeout, this, args1));

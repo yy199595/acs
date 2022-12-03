@@ -10,6 +10,7 @@ namespace Sentry
 		~SqliteComponent() = default;
 	public:
 		bool OpenDataBase(const std::string& name);
+		bool ExecSql(const std::string& sql);
 	public:
 		bool LateAwake() final;
 	private:
