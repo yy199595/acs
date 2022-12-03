@@ -107,11 +107,6 @@ namespace Sentry
                 CONSOLE_LOG_ERROR("[" << from << "] call ["
                     << config->FullName << "] code = " << CodeConfig::Inst()->GetDesc(code));
             }
-            else
-            {
-                CONSOLE_LOG_INFO("[" << from << "] call ["
-                    << config->FullName << "] code = " << CodeConfig::Inst()->GetDesc(code));
-            }
         }
 #endif
         long long rpcId = 0;
