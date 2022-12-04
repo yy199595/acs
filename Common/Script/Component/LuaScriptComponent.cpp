@@ -71,9 +71,10 @@ namespace Sentry
         luaRegister5.PushExtensionFunction("Info", Lua::Log::DebugInfo);
         luaRegister5.PushExtensionFunction("Debug", Lua::Log::DebugLog);
         luaRegister5.PushExtensionFunction("Error", Lua::Log::DebugError);
-        luaRegister5.PushExtensionFunction("Warning", Lua::Log::DebugWarning);
+		luaRegister5.PushExtensionFunction("Warning", Lua::Log::DebugWarning);
+		luaRegister5.PushExtensionFunction("SystemError", Lua::Log::SystemError);
 
-        Lua::ClassProxyHelper luaRegister6(this->mLuaEnv, "Guid");
+		Lua::ClassProxyHelper luaRegister6(this->mLuaEnv, "Guid");
         luaRegister6.BeginNewTable();
         luaRegister6.PushStaticFunction("Create", Helper::Guid::Create);
 

@@ -41,7 +41,12 @@ namespace Sentry
 
 	XCode LuaServiceMethod::CallAsync(int count, Rpc::Packet & message)
     {
-        LuaServiceTaskSource* luaTaskSource = new LuaServiceTaskSource();
+		std::shared_ptr<Message> response;
+		if (!this->mConfig->Response.empty())
+		{
+			response = this->mMsgComponent->New(this->mConfig->Response);
+		}
+        LuaServiceTaskSource* luaTaskSource = new LuaServiceTaskSource(response);
         Lua::UserDataParameter::Write(this->mLuaEnv, luaTaskSource);
         if (lua_pcall(this->mLuaEnv, count + 2, 1, 0) != 0)
         {           
@@ -49,12 +54,7 @@ namespace Sentry
             message.GetHead().Add("error", lua_tostring(this->mLuaEnv, -1));
             return XCode::CallLuaFunctionFail;
         }
-        std::shared_ptr<Message> response;
-        if (!this->mConfig->Response.empty())
-        {
-            response = this->mMsgComponent->New(this->mConfig->Response);
-        }
-        XCode code = luaTaskSource->Await(response);
+        XCode code = luaTaskSource->Await();
         std::unique_ptr<LuaServiceTaskSource> local(luaTaskSource);
         if (code == XCode::Successful && response != nullptr)
         {

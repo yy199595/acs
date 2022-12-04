@@ -8,14 +8,20 @@
 #include"Json/Lua/Json.h"
 namespace Sentry
 {
-	LuaServiceTaskSource::LuaServiceTaskSource()
+	LuaServiceTaskSource::LuaServiceTaskSource(Http::Response* message)
+		: mHttpData(message)
     {		
         this->mCode = XCode::LuaCoroutineWait;
     }
 
-    XCode LuaServiceTaskSource::Await(std::shared_ptr<Message> message)
+	LuaServiceTaskSource::LuaServiceTaskSource(std::shared_ptr<Message> message)
+		: mRpcData(message), mHttpData(nullptr)
+	{
+
+	}
+
+    XCode LuaServiceTaskSource::Await()
     {
-		this->mRpcData = message;
         if(this->mCode == XCode::LuaCoroutineWait) 
 		{
             this->mTaskSource.Await();
@@ -46,16 +52,6 @@ namespace Sentry
 
 namespace Sentry
 {
-	XCode LuaServiceTaskSource::Await(Http::Response* message)
-	{
-		this->mHttpData = message;
-		if (this->mCode == XCode::LuaCoroutineWait) 
-		{
-			this->mTaskSource.Await();
-		}
-		return this->mCode;
-	}
-
 	int LuaServiceTaskSource::SetHttp(lua_State* lua)
 	{
 		LuaServiceTaskSource* luaServiceTaskSource =

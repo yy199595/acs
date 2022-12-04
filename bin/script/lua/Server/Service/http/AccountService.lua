@@ -13,7 +13,7 @@ function AccountService.Register(requestInfo)
     assert(requestInfo.password, "register password is nil")
     assert(requestInfo.phone_num, "register phone number is nil")
 
-    local userInfo = DataMgr.Get("user.account", requestInfo.account)
+    local userInfo = DataMgr11.Get("user.account", requestInfo.account)
 
     if userInfo ~= nil then
         return XCode.AccountAlreadyExists

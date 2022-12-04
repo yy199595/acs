@@ -74,7 +74,7 @@ namespace Sentry
     XCode LuaHttpServiceMethod::CallAsync(Http::Response &response)
     {
         lua_State* lua = this->mLuaComponent->GetLuaEnv();       
-        LuaServiceTaskSource* luaTaskSource = new LuaServiceTaskSource();
+        LuaServiceTaskSource* luaTaskSource = new LuaServiceTaskSource(&response);
         Lua::UserDataParameter::Write(lua, luaTaskSource);
         if (lua_pcall(lua, 3, 1, 0) != LUA_OK)
         {           
@@ -85,7 +85,7 @@ namespace Sentry
 			response.Json(HttpStatus::OK, document);
             return XCode::CallLuaFunctionFail;
         }
-        XCode code = luaTaskSource->Await(&response);
+        XCode code = luaTaskSource->Await();
         delete luaTaskSource;
         return code;
     }

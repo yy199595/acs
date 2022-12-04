@@ -11,15 +11,14 @@ namespace Sentry
     class LuaServiceTaskSource final
     {
     public:
-        LuaServiceTaskSource();
-        ~LuaServiceTaskSource() = default;
+        LuaServiceTaskSource(Http::Response* message);
+        LuaServiceTaskSource(std::shared_ptr<Message> message);
     public:
 		static int SetRpc(lua_State * lua);
         static int SetHttp(lua_State* lua);
     public:
-        XCode Await(Http::Response* message);
-        XCode Await(std::shared_ptr<Message> message);
-    private:		
+        XCode Await();
+    private:
         XCode mCode;
         Http::Response* mHttpData;
         TaskSource<void> mTaskSource;
