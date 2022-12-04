@@ -74,11 +74,10 @@ namespace Sentry
     XCode LuaHttpServiceMethod::CallAsync(Http::Response &response)
     {
         lua_State* lua = this->mLuaComponent->GetLuaEnv();       
-        LuaServiceTaskSource* luaTaskSource = new LuaServiceTaskSource(&response);
-        Lua::UserDataParameter::Write(lua, luaTaskSource);
+		std::unique_ptr<LuaServiceTaskSource> luaTaskSource = std::make_unique<LuaServiceTaskSource>(&response);
+        Lua::UserDataParameter::Write(lua, luaTaskSource.get());
         if (lua_pcall(lua, 3, 1, 0) != LUA_OK)
         {           
-            delete luaTaskSource;
 			Json::Document document;
 			document.Add("error", lua_tostring(lua, -1));
 			document.Add("code", (int)XCode::CallLuaFunctionFail);
@@ -86,7 +85,6 @@ namespace Sentry
             return XCode::CallLuaFunctionFail;
         }
         XCode code = luaTaskSource->Await();
-        delete luaTaskSource;
         return code;
     }
 }

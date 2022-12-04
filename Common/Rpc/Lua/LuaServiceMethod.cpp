@@ -50,16 +50,14 @@ namespace Sentry
                 return XCode::CreateProtoFailure;
             }
 		}
-        LuaServiceTaskSource* luaTaskSource = new LuaServiceTaskSource(response);
-        Lua::UserDataParameter::Write(this->mLuaEnv, luaTaskSource);
+		std::unique_ptr<LuaServiceTaskSource> luaTaskSource = std::make_unique<LuaServiceTaskSource>(response);
+        Lua::UserDataParameter::Write(this->mLuaEnv, luaTaskSource.get());
         if (lua_pcall(this->mLuaEnv, count + 2, 1, 0) != 0)
         {           
-            delete luaTaskSource;
             message.GetHead().Add("error", lua_tostring(this->mLuaEnv, -1));
             return XCode::CallLuaFunctionFail;
         }
         XCode code = luaTaskSource->Await();
-        std::unique_ptr<LuaServiceTaskSource> local(luaTaskSource);
         if (code == XCode::Successful && response != nullptr)
         {
             if (message.WriteMessage(response.get()))
