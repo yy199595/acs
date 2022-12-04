@@ -80,7 +80,7 @@ namespace Lua
         std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
 
 #ifdef __DEBUG__
-        LOG_DEBUG("[http POST] url = " << std::string(str, size) << " data = " << postRequest->Content());
+        //LOG_DEBUG("[http POST] url = " << std::string(str, size) << " data = " << postRequest->Content());
 #endif
         long long id = requestClient->Do(postRequest);
         return httpComponent->AddTask(id, luaHttpTask)->Await(requestClient);

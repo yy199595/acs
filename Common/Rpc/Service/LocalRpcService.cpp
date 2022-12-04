@@ -102,32 +102,33 @@ namespace Sentry
 		return true;
 	}
 
-    void LocalRpcService::OnHotFix()
-    {
-		if(this->mIsHandlerMessage)
-		{
-			this->mMethodRegister->ClearLuaMethods();
-			this->LoadFromLua();
-		}
-    }
-
-    void LocalRpcService::LoadFromLua()
+    bool LocalRpcService::LoadFromLua()
 	{
-		LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();
+		LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();       
         if (luaScriptComponent == nullptr)
         {
-            return;
+            return false;
         }
 		Lua::LuaModule* luaModule = luaScriptComponent->LoadModule(this->GetName());
 		if (luaModule == nullptr)
 		{
-			return;
+			return false;
 		}
         std::vector<const RpcMethodConfig*> methodConfigs;
 		const RpcServiceConfig* rpcServiceConfig = RpcConfig::Inst()->GetConfig(this->GetName());
+        if (rpcServiceConfig == nullptr)
+        {
+            return false;
+        }
 		rpcServiceConfig->GetMethodConfigs(methodConfigs);
 		for (const RpcMethodConfig* methodConfig : methodConfigs)
 		{
+            std::shared_ptr<ServiceMethod> serviceMethod =  
+                this->mMethodRegister->GetMethod(methodConfig->Method);
+            if (serviceMethod != nullptr && serviceMethod->IsLuaMethod())
+            {
+                continue;
+            }
 			if(luaModule->GetFunction(methodConfig->Method))
 			{
 				std::shared_ptr<LuaServiceMethod> luaServiceMethod
@@ -144,7 +145,7 @@ namespace Sentry
         {
             return false;
         }
-        std::move(this->mMethodRegister);
+        this->mMethodRegister = nullptr;
         return true;
     }
 }

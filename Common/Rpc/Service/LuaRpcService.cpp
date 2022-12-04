@@ -96,6 +96,11 @@ namespace Sentry
 		return luaModule->Awake();
 	}
 
+	bool LuaRpcService::LoadFromLua()
+	{
+		return true;
+	}
+
 	bool LuaRpcService::Close()
 	{
         Lua::LuaModule* luaModule = this->mLuaComponent->GetModule(this->GetName());

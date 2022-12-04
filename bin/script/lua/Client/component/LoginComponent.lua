@@ -18,7 +18,7 @@ function LoginComponent.Register(account, passwd, phoneNum)
         return nil
     end
     if registerInfo.code ~= XCode.Successful then
-        Log.Error(response)
+        --Log.Error(response)
     end
     return registerInfo
 end

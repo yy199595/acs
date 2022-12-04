@@ -17,6 +17,7 @@ namespace Sentry
 	 public:
         bool Close() final;
         bool Start() final;
+		bool LoadFromLua() final;
         void WaitAllMessageComplete() final;
         int GetWaitMessageCount() const final { return this->mWaitCount; };
         bool IsStartService() final { return this->mMethodRegister != nullptr; }

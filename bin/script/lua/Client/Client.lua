@@ -12,14 +12,14 @@ local clientComponent = App.GetComponent("ClientComponent")
 local loginComponent = require("component.LoginComponent")
 
 local callCount = 0
-local waitCount = 0
+local rpcWaitCount = 0
+local httpWaitCount = 0
 local failureCount = 0
 local successCount = 0
 local sumTime = 0
 local CallMongo = function()
     
-    while true do
-        waitCount = waitCount + 1
+        rpcWaitCount = rpcWaitCount + 1
         local t1 = Time.NowMilTime()
         local code = clientComponent:Call("MongoService.Query", {
             tab = "user.account",
@@ -33,16 +33,14 @@ local CallMongo = function()
         else
             failureCount = failureCount + 1
         end
-        waitCount = waitCount - 1
+        rpcWaitCount = rpcWaitCount - 1
         callCount = callCount + 1
         sumTime = sumTime + (Time.NowMilTime() - t1)
-    end
 end
 
 local CallChat = function()
     
-    while true do
-        waitCount = waitCount + 1
+        rpcWaitCount = rpcWaitCount + 1
         local t1 = Time.NowMilTime()
         local code = clientComponent:Call("ChatService.Ping", {
             user_id = 1122, msg_type = 1, message = "hello"
@@ -50,10 +48,9 @@ local CallChat = function()
         if code == XCode.Successful then
             successCount = successCount + 1
         end
-        waitCount = waitCount - 1
         callCount = callCount + 1
+        rpcWaitCount = rpcWaitCount - 1
         sumTime = sumTime + (Time.NowMilTime() - t1)
-    end
 end
 
 local TestHttp = function()
@@ -62,17 +59,18 @@ local TestHttp = function()
     local passwd = "yjz199595"
     local account = "%d@qq.com"
     while true do
-        waitCount = waitCount + 1
+        httpWaitCount = httpWaitCount + 1
         local data1 = string.format(account, count)
         local data2 = passwd .. tostring(count)
         local data3 = phoneNum + count
         local res = loginComponent.Register(data1,data2, data3)
         --table.print(res)
-        waitCount = waitCount - 1
+        httpWaitCount = httpWaitCount - 1
         callCount = callCount + 1
         --loginComponent.Login(data1, data2)
     end
 end
+
 
 function Client.Start()
 
@@ -97,31 +95,22 @@ function Client.Start()
         Log.Error("user auth failure")
         return false
     end
-    coroutine.start(CallChat)
-    coroutine.start(CallChat)
-    coroutine.start(CallChat)
-
-    coroutine.start(CallMongo)
-    coroutine.start(CallMongo)
-    coroutine.start(CallMongo)
-
-
-    coroutine.start(CallChat)
-    coroutine.start(CallChat)
-    coroutine.start(CallChat)
-
-    coroutine.start(CallMongo)
-    coroutine.start(CallMongo)
-    coroutine.start(CallMongo)
-    coroutine.start(TestHttp)
-    coroutine.start(TestHttp)
     return true
 end
 
 Client.Update = function(tick)
-    local time = sumTime / callCount
-    local value = "[%" .. ((successCount / callCount) * 100) .. "] time = [" .. time .. "ms]"
-    Log.Warning(string.format("count = %d successful = %d failure = %d %s", callCount, successCount, failureCount, value))
+
+    for i = 1, 10 do
+        coroutine.start(CallChat)   
+    end
+    for i = 1, 10 do
+        coroutine.start(CallMongo)      
+    end
+
+    for i = 1, 10 do
+        coroutine.start(TestHttp)     
+    end
+    Log.Warning(string.format("count = %d rpc = %d http = %d successful = %d failure = %d", callCount, rpcWaitCount, httpWaitCount, successCount, failureCount))
 end
 
 return Client

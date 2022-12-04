@@ -25,6 +25,33 @@ namespace Sentry
         return luaModule == nullptr || luaModule->Awake();
     }
 
+    bool LocalHttpService::LoadFromLua()
+    {
+        LuaScriptComponent* luaComponent = this->GetComponent<LuaScriptComponent>();
+        const HttpServiceConfig* httpServiceConfig = HttpConfig::Inst()->GetConfig(this->GetName());
+        LOG_CHECK_RET_FALSE(luaComponent != nullptr && httpServiceConfig != nullptr);
+        std::vector<const HttpMethodConfig*> methodConfigs;
+        httpServiceConfig->GetMethodConfigs(methodConfigs);
+        Lua::LuaModule* luaModule = luaComponent->GetModule(this->GetName());
+        if (luaModule != nullptr)
+        {
+            for (const HttpMethodConfig* config : methodConfigs)
+            {
+                std::shared_ptr<HttpServiceMethod> serviceMethod = 
+                    this->mServiceRegister->GetMethod(config->Method);
+                if (serviceMethod != nullptr && serviceMethod->IsLuaMethod())
+                {
+                    continue;
+                }
+                if (luaModule->GetFunction(config->Method))
+                {
+                    this->mServiceRegister->AddMethod(std::make_shared<LuaHttpServiceMethod>(config));                  
+                }
+            }
+        }
+        return true;
+    }
+
 	bool LocalHttpService::Start()
     {
         this->mServiceRegister = std::make_shared<HttpServiceRegister>(this);
@@ -34,20 +61,21 @@ namespace Sentry
         {
             return false;
         }
+        Lua::LuaModule* luaModule = nullptr;
         std::vector<const HttpMethodConfig*> methodConfigs;
         httpServiceConfig->GetMethodConfigs(methodConfigs);
-        Lua::LuaModule* luaModule = luaComponent->GetModule(this->GetName());
-        if (luaModule != nullptr)
+        if (luaComponent != nullptr)
         {
-            for (const HttpMethodConfig* config : methodConfigs)
+            luaModule = luaComponent->GetModule(this->GetName());
+            if (luaModule != nullptr)
             {
-                if (luaModule->GetFunction(config->Method))
-                {                   
-                    if (!this->mServiceRegister->AddMethod(std::make_shared<LuaHttpServiceMethod>(config)))
+                for (const HttpMethodConfig* config : methodConfigs)
+                {
+                    if (luaModule->GetFunction(config->Method))
                     {
-                        return false;
+                        this->mServiceRegister->AddMethod(std::make_shared<LuaHttpServiceMethod>(config));                      
                     }
-                }             
+                }
             }
         }
 
@@ -61,34 +89,6 @@ namespace Sentry
         }
         return luaModule == nullptr || luaModule->Start();
     }
-
-	void LocalHttpService::OnHotFix()
-	{
-		if (this->mServiceRegister != nullptr)
-		{
-			this->mServiceRegister->ClearLuaMethod();
-			LuaScriptComponent* luaComponent = this->GetComponent<LuaScriptComponent>();
-			const HttpServiceConfig* httpServiceConfig = HttpConfig::Inst()->GetConfig(this->GetName());
-			if (luaComponent == nullptr || httpServiceConfig == nullptr)
-			{
-				return;
-			}
-			Lua::LuaModule* luaModule = luaComponent->GetModule(this->GetName());
-			if(luaModule != nullptr)
-			{
-				std::vector<const HttpMethodConfig*> methodConfigs;
-				httpServiceConfig->GetMethodConfigs(methodConfigs);
-				for (const HttpMethodConfig* config : methodConfigs)
-				{
-					if (luaModule->GetFunction(config->Method))
-					{
-						continue;
-					}
-					this->mServiceRegister->AddMethod(std::make_shared<LuaHttpServiceMethod>(config));
-				}
-			}
-		}
-	}
 
 	bool LocalHttpService::Close()
 	{

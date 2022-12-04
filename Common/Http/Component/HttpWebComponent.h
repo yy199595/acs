@@ -19,8 +19,10 @@ namespace Sentry
         void OnRequest(std::shared_ptr<HttpHandlerClient> httpClient);
     private:
         bool LateAwake() final;
+        bool OnDelClient(const std::string& address);
     private:
         TaskComponent * mTaskComponent;
+        std::unordered_map<std::string, unsigned int> mTasks;
     };
 }
 

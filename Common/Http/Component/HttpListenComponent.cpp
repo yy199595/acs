@@ -19,21 +19,17 @@ namespace Sentry
         //LOG_DEBUG("handler http socket count = " << count++);
 #endif
         assert(this->mApp->IsMainThread());
-        if(this->mHttpClients.size() >= 1000)
-        {
-            return false;
-        }
         std::shared_ptr<HttpHandlerClient> handlerClient;
-        /*if(!this->mClientPools.empty())
+        if(!this->mClientPools.empty())
         {
             handlerClient = this->mClientPools.front();
             handlerClient->Reset(socket);
             this->mClientPools.pop();
         }
         else
-        {*/
+        {
             handlerClient = std::make_shared<HttpHandlerClient>(this, socket);
-        //}
+        }
 
         handlerClient->StartReceive();
         const std::string &address = socket->GetAddress();
@@ -47,12 +43,15 @@ namespace Sentry
         auto iter = this->mHttpClients.find(address);
         if(iter != this->mHttpClients.end())
         {
-           /* std::shared_ptr<HttpHandlerClient> handlerClient = iter->second;
-            if(this->mClientPools.size() <= 100)
+            if (this->OnDelClient(address))
             {
-                this->mClientPools.push(handlerClient);
-            }*/
-            this->mHttpClients.erase(iter);
+                std::shared_ptr<HttpHandlerClient> handlerClient = iter->second;
+                if (this->mClientPools.size() <= 100)
+                {
+                    this->mClientPools.push(handlerClient);
+                }
+                this->mHttpClients.erase(iter);
+            }
         }
     }
 }

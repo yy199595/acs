@@ -30,8 +30,10 @@ namespace Sentry
 		void OnSecondUpdate(const int tick) final;      
     private:
 		bool LoadAllFile();
+		bool LoadAllFilePath(const std::string & dir);
         void AddRequire(const std::string & direct);
 	 private:
+		 std::string mModulePath;
 		struct lua_State* mLuaEnv;
         std::set<std::string> mDirectorys;
 		std::unordered_map<std::string, int> mFuncs;

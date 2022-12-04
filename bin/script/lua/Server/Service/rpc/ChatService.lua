@@ -17,8 +17,11 @@ ChatService.Chat = function(id, request)
     gateComponent:BroadCast("ChatComponent.Chat", chatMessage)
     return XCode.Successful
 end
+local count = 0
 
-ChatService.Ping = function()
+ChatService.Ping = function(id)
+    count = count + 1
+    print(os.time(), "count = " .. count)
     return XCode.Successful
 end
 

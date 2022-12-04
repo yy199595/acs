@@ -82,23 +82,17 @@ namespace Sentry
 
     bool HttpServiceRegister::AddMethod(std::shared_ptr<HttpServiceMethod> method)
     {
+		if (method == nullptr)
+		{
+			return false;
+		}
         const std::string & name = method->GetName();
         if(method->IsLuaMethod())
-        {
-            auto iter = this->mLuaHttpMethodMap.find(name);
-            if(iter != this->mLuaHttpMethodMap.end())
-            {
-                return false;
-            }
-            this->mLuaHttpMethodMap.emplace(name, method);
+        {          
+            this->mLuaHttpMethodMap[name] = method;
             return true;
-        }
-        auto iter1 = this->mHttpMethodMap.find(name);
-        if(iter1 != this->mHttpMethodMap.end())
-        {
-            return false;
-        }
-        this->mHttpMethodMap.emplace(name, method);
+        }       
+        this->mHttpMethodMap[name] = method;
         return true;
     }
 }

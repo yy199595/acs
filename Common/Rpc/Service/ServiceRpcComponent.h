@@ -15,6 +15,7 @@ namespace Sentry
 	 private:
 		bool Start() final { return false;}
 		bool Close() final { return false;}
+		bool LoadFromLua() final { return false; }
 		void WaitAllMessageComplete() final { };
 		bool IsStartService() final { return false; }
     private:

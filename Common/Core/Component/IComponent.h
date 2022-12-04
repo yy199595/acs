@@ -87,6 +87,7 @@ namespace Sentry
         virtual void Init() { }
 		virtual bool Start() = 0;
 		virtual bool Close() = 0;
+		virtual bool LoadFromLua() = 0; //在热更新的时候调用
         virtual void OnCloseComplete() { }
 		virtual bool IsStartService() = 0;
         virtual void WaitAllMessageComplete() { };

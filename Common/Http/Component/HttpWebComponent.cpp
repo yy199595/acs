@@ -61,8 +61,10 @@ namespace Sentry
         else
         {
 			defer.Cancle();
-            this->mTaskComponent->Start([httpService, httpClient, httpConfig]() {
-
+            TaskContext * taskContext = this->mTaskComponent->Start(
+                [httpService, httpClient, httpConfig, this]() 
+            {
+                const std::string& address = httpClient->GetAddress();
                 std::shared_ptr<Http::Request> request = httpClient->Request();
                 std::shared_ptr<Http::Response> response = httpClient->Response();
                 XCode code = httpService->Invoke(httpConfig->Method, request, response);
@@ -70,7 +72,25 @@ namespace Sentry
                     response->Header().Add("code", (int) code);
                     httpClient->StartWriter();
                 }
+                auto iter = this->mTasks.find(address);
+                if (iter != this->mTasks.end())
+                {
+                    this->mTasks.erase(iter);
+                }
             });
+            const std::string& address = httpClient->GetAddress();
+            this->mTasks.emplace(address, taskContext->mCoroutineId);
         }
+    }
+
+    bool HttpWebComponent::OnDelClient(const std::string& address)
+    {
+        auto iter = this->mTasks.find(address);
+        if (iter != this->mTasks.end())
+        {
+            this->mTaskComponent->Resume(iter->second);
+            this->mTasks.erase(iter);
+        }
+        return true;
     }
 }

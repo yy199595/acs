@@ -182,7 +182,7 @@ namespace Sentry
         LOG_CHECK_RET_FALSE(config->GetMember("lua", "module", module));
 
         common = System::FormatPath(common);
-        module = System::FormatPath(module);
+        this->mModulePath = System::FormatPath(module);
         if(!Helper::Directory::GetFilePaths(common, "*.lua", luaFiles))
         {
             return false;
@@ -195,39 +195,62 @@ namespace Sentry
                 return false;
             }
         }
-        luaFiles.clear();
+        this->LoadAllFilePath(this->mModulePath);
+        
+       
+        this->AddRequire(common);
+        this->AddRequire(this->mModulePath);       
+        this->LoadModule(ServerConfig::Inst()->Name());
+        return true;
+    }
+
+    bool LuaScriptComponent::LoadAllFilePath(const std::string & dir)
+    {
+        std::vector<std::string> luaFiles;
         std::string direct, name, luaFile;
-        if(!Helper::Directory::GetFilePaths(module, "*.lua", luaFiles))
+        if (!Helper::Directory::GetFilePaths(dir, "*.lua", luaFiles))
         {
             return false;
         }
-        for (const std::string &path: luaFiles)
+        for (const std::string& path : luaFiles)
         {
             Helper::Directory::GetDirAndFileName(path, direct, name);
             const std::string moduleName = name.substr(0, name.find('.'));
-            if(this->mModulePaths.find(moduleName) != this->mModulePaths.end())
             {
-                LOG_ERROR(moduleName << " error");
-                return false;
-            }         
-            this->mModulePaths.emplace(moduleName, path);
+                this->mModulePaths[moduleName] = path;
+                LOG_INFO("[" << moduleName << "] = " << path);
+            }          
         }
-        this->AddRequire(common);
-        this->AddRequire(module);       
-        this->LoadModule(ServerConfig::Inst()->Name());
         return true;
     }
 
     void LuaScriptComponent::OnHotFix()
     {
+        this->LoadAllFilePath(this->mModulePath);
+        std::vector<Component *> components;
+        this->mApp->GetComponents(components);
+        for (Component* component : components)
+        {
+            IServiceBase * service = component->Cast<IServiceBase>();
+            if (service != nullptr && !this->GetModule(component->GetName()))
+            {
+                this->LoadModule(component->GetName());
+            }
+        }
+        
 		auto iter = this->mModules.begin();
 		for(; iter != this->mModules.end(); iter++)
 		{
 			const std::string & name = iter->first;
 			Lua::LuaModule * luaModule = iter->second.get();
-			if(luaModule->Hotfix())
+			if(luaModule != nullptr && luaModule->Hotfix())
 			{
 				LOG_INFO(name << " hotfix successful");
+                IServiceBase * service = this->GetComponent<IServiceBase>(name);
+                if (service != nullptr && service->IsStartService())
+                {
+                    service->LoadFromLua();
+                }
 			}
 		}
     }

@@ -13,7 +13,6 @@
 namespace Sentry
 {
     class LocalHttpService : public Component, public IService<Http::Request, Http::Response>
-		, public IHotfix
 	{
 	 public:
 		LocalHttpService() = default;
@@ -24,7 +23,7 @@ namespace Sentry
 	 public:
         bool Start() final;
         bool Close() final;
-		void OnHotFix() final;
+		bool LoadFromLua() final;
 		bool LateAwake() override;
 		bool IsStartService() final { return this->mServiceRegister != nullptr;}
 		XCode Invoke(const std::string & name, std::shared_ptr<Http::Request>, std::shared_ptr<Http::Response>) final;

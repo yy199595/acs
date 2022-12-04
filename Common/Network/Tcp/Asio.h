@@ -19,4 +19,5 @@ namespace Asio
     typedef asio::ip::tcp::resolver::query ResolverQuery;
     typedef asio::ip::address Address;
     typedef asio::streambuf StreamBuffer;
+    typedef asio::steady_timer Timer;
 }

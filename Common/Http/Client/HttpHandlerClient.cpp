@@ -10,12 +10,14 @@ namespace Sentry
 	HttpHandlerClient::HttpHandlerClient(HttpListenComponent * httpComponent, std::shared_ptr<SocketProxy> socketProxy)
 		: Tcp::TcpContext(socketProxy)
 	{
+        this->mTimeout = 15;
 		this->mHttpComponent = httpComponent;
         this->mDecodeState = Http::DecodeState::None;
     }
 
-	void HttpHandlerClient::StartReceive()
+	void HttpHandlerClient::StartReceive(int timeout)
 	{
+        this->mTimeout = timeout;
         assert(this->mRecvBuffer.size() == 0);
         assert(this->mSendBuffer.size() == 0);
         this->mDecodeState = Http::DecodeState::None;
@@ -38,6 +40,15 @@ namespace Sentry
 #endif
     }
 
+    void HttpHandlerClient::OnTimeout(Asio::Code & code)
+    {
+        if (code != asio::error::operation_aborted)
+        {
+            this->ClosetClient();
+            this->mSocket->Close();
+        }
+    }
+
     void HttpHandlerClient::OnReceiveLine(const Asio::Code &code, std::istream &is, size_t size)
     {
         if(code && code != asio::error::eof)
@@ -46,6 +57,14 @@ namespace Sentry
         }
         else
         {
+            if (this->mTimer == nullptr && this->mTimeout > 0)
+            {
+                std::chrono::seconds timeout{ this->mTimeout };
+                Asio::Context& context = this->mSocket->GetThread();
+                this->mTimer = std::make_shared<Asio::Timer>(context, timeout);
+                this->mTimer->async_wait(std::bind(&HttpHandlerClient::OnTimeout, this, args1));
+            }
+
             is >> this->mMethod;
             this->mHttpRequest = Http::New(this->mMethod);
             if (this->mHttpRequest == nullptr)

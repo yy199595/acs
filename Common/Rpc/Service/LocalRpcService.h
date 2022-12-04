@@ -25,7 +25,7 @@ namespace Sentry
 
 namespace Sentry
 {
-    class LocalRpcService : public RpcService, public IHotfix
+    class LocalRpcService : public RpcService
 	{
 	public:
 		LocalRpcService();
@@ -36,14 +36,13 @@ namespace Sentry
 		bool IsStartService() { return this->mMethodRegister != nullptr; }
 		XCode Invoke(const std::string &func, std::shared_ptr<Rpc::Packet> message) final;
     protected:
-        void OnHotFix() final;
+        bool LoadFromLua() final;
         virtual bool OnClose() = 0;
         virtual bool OnStart() = 0;
         void WaitAllMessageComplete() final;
 		ServiceMethodRegister & GetMethodRegistry() { return *this->mMethodRegister; }
 
     private:
-        void LoadFromLua();
 	private:
         int mMaxCount;
         int mWaitCount;

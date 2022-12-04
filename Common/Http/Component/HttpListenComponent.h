@@ -14,10 +14,11 @@ namespace Sentry
         bool LateAwake() override;
         void ClosetHttpClient(const std::string & address);
         bool OnListen(std::shared_ptr<SocketProxy> socket) final;
+        virtual bool OnDelClient(const std::string& address) = 0;
         virtual void OnRequest(std::shared_ptr<HttpHandlerClient> httpClient) = 0;
     private:
         class NetThreadComponent * mNetComponent;
-        //std::queue<std::shared_ptr<HttpHandlerClient>> mClientPools;
+        std::queue<std::shared_ptr<HttpHandlerClient>> mClientPools;
         std::unordered_map<std::string, std::shared_ptr<HttpHandlerClient>> mHttpClients;
     };
 }

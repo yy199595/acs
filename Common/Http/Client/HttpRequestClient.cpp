@@ -10,6 +10,7 @@ namespace Sentry
     HttpRequestClient::HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy, HttpComponent * httpComponent)
 		: Tcp::TcpContext(socketProxy)
     {
+        this->mTaskId = 0;
         this->mTimeout = 15; //默认十五秒
 		this->mHttpComponent = httpComponent;
     }
@@ -60,7 +61,7 @@ namespace Sentry
     {
         if(code != asio::error::operation_aborted)
         {
-            this->OnComplete(HttpStatus::REQUEST_TIMEOUT);
+            this->mSocket->Close();         
 			CONSOLE_LOG_ERROR("[" << this->mRequest->Method() << "] "
 				<< this->mRequest->Path() << " request time out");
         }
