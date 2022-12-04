@@ -62,10 +62,38 @@ namespace Sentry
         return luaModule == nullptr || luaModule->Start();
     }
 
+	void LocalHttpService::OnHotFix()
+	{
+		if (this->mServiceRegister != nullptr)
+		{
+			this->mServiceRegister->ClearLuaMethod();
+			LuaScriptComponent* luaComponent = this->GetComponent<LuaScriptComponent>();
+			const HttpServiceConfig* httpServiceConfig = HttpConfig::Inst()->GetConfig(this->GetName());
+			if (luaComponent == nullptr || httpServiceConfig == nullptr)
+			{
+				return;
+			}
+			Lua::LuaModule* luaModule = luaComponent->GetModule(this->GetName());
+			if(luaModule != nullptr)
+			{
+				std::vector<const HttpMethodConfig*> methodConfigs;
+				httpServiceConfig->GetMethodConfigs(methodConfigs);
+				for (const HttpMethodConfig* config : methodConfigs)
+				{
+					if (luaModule->GetFunction(config->Method))
+					{
+						continue;
+					}
+					this->mServiceRegister->AddMethod(std::make_shared<LuaHttpServiceMethod>(config));
+				}
+			}
+		}
+	}
+
 	bool LocalHttpService::Close()
 	{
         this->mServiceRegister->Clear();
-        std::move(this->mServiceRegister);
+		this->mServiceRegister = nullptr;
         if (!this->OnCloseService())
         {
             return false;

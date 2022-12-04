@@ -172,6 +172,7 @@ namespace Sentry
 
 
     public:
+		void ClearLuaMethod() { this->mLuaHttpMethodMap.clear(); }
         bool AddMethod(std::shared_ptr<HttpServiceMethod> method);
         std::shared_ptr<HttpServiceMethod> GetMethod(const std::string & name);
         void Clear() { this->mHttpMethodMap.clear(); this->mLuaHttpMethodMap.clear(); }

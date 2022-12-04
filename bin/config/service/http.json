@@ -33,6 +33,11 @@
 			"Type": "GET",
 			"Async": false,
 			"Path": "/download"
+		},
+		"Hotfix": {
+			"Type": "GET",
+			"Async": true,
+			"Path": "/hotfix"
 		}
 	},
 	"HttpRpcService": {

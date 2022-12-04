@@ -104,13 +104,15 @@ namespace Sentry
 
     void LocalRpcService::OnHotFix()
     {
-        this->mMethodRegister->ClearLuaMethods();
-        this->LoadFromLua();
+		if(this->mIsHandlerMessage)
+		{
+			this->mMethodRegister->ClearLuaMethods();
+			this->LoadFromLua();
+		}
     }
 
     void LocalRpcService::LoadFromLua()
 	{
-		
 		LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();
         if (luaScriptComponent == nullptr)
         {

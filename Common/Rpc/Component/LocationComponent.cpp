@@ -66,6 +66,19 @@ namespace Sentry
 		return false;
 	}
 
+	bool LocationComponent::GetServers(std::vector<std::string>& hosts)
+	{
+		auto iter = this->mRpcServers.begin();
+		for(; iter != this->mRpcServers.end(); iter++)
+		{
+			for(const std::string & address : iter->second)
+			{
+				hosts.emplace_back(address);
+			}
+		}
+		return !hosts.empty();
+	}
+
 	bool LocationComponent::GetServers(const std::string& server, std::vector<std::string>& hosts)
 	{
 		auto iter = this->mRpcServers.find(server);
