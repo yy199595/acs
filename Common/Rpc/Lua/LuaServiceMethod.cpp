@@ -45,6 +45,10 @@ namespace Sentry
 		if (!this->mConfig->Response.empty())
 		{
 			response = this->mMsgComponent->New(this->mConfig->Response);
+            if (response == nullptr)
+            {
+                return XCode::CreateProtoFailure;
+            }
 		}
         LuaServiceTaskSource* luaTaskSource = new LuaServiceTaskSource(response);
         Lua::UserDataParameter::Write(this->mLuaEnv, luaTaskSource);

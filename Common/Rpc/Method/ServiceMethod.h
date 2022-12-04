@@ -122,7 +122,7 @@ namespace Sentry
 	 public:
 		XCode Invoke(Rpc::Packet & message) override
 		{
-            std::shared_ptr<T1> request(new T1());
+            std::unique_ptr<T1> request(new T1());
             if(!message.ParseMessage(request.get()))
             {
                 return XCode::CallArgsError;
@@ -167,8 +167,8 @@ namespace Sentry
 	 public:
 		XCode Invoke(Rpc::Packet & message) override
 		{
-            std::shared_ptr<T1> request(new T1());
-            std::shared_ptr<T2> response(new T2());
+            std::unique_ptr<T1> request(new T1());
+            std::unique_ptr<T2> response(new T2());
             if(!message.ParseMessage(request.get()))
             {
                 return XCode::CallArgsError;
@@ -276,7 +276,7 @@ namespace Sentry
 		};
 		XCode Invoke(Rpc::Packet & message) override
 		{
-			std::shared_ptr<T1> request(new T1());
+			std::unique_ptr<T1> request(new T1());
             if(!message.ParseMessage(request.get()))
             {
                 return XCode::CallArgsError;
