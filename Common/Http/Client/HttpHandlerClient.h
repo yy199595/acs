@@ -24,8 +24,8 @@ namespace Sentry
 		std::shared_ptr<Http::Response> Response() { return this->mHttpResponse;}
 	 private:
 		void ClosetClient();
-		void OnTimeout(Asio::Code& code);
-        void OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t) final;
+		void OnTimeout(const Asio::Code& code);
+        void OnReceiveMessage(const Asio::Code &code, std::istream & is, size_t) final;
         void OnReceiveLine(const Asio::Code &code, std::istream &readStream, size_t size) final;
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
 	 private:

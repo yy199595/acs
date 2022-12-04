@@ -40,7 +40,7 @@ namespace Sentry
 #endif
     }
 
-    void HttpHandlerClient::OnTimeout(Asio::Code & code)
+    void HttpHandlerClient::OnTimeout(const Asio::Code & code)
     {
         if (code != asio::error::operation_aborted)
         {
