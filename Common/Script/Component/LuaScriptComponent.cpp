@@ -78,10 +78,10 @@ namespace Sentry
         luaRegister6.BeginNewTable();
         luaRegister6.PushStaticFunction("Create", Helper::Guid::Create);
 
-        Lua::ClassProxyHelper luaRegister7(this->mLuaEnv, "Json");
+        Lua::ClassProxyHelper luaRegister7(this->mLuaEnv, "rapidjson");
         luaRegister7.BeginNewTable();
-        luaRegister7.PushExtensionFunction("Encode", Lua::Json::Encode);
-        luaRegister7.PushExtensionFunction("Decode", Lua::Json::Decode);
+        luaRegister7.PushExtensionFunction("encode", Lua::Json::Encode);
+        luaRegister7.PushExtensionFunction("decode", Lua::Json::Decode);
 
         Lua::ClassProxyHelper luaRegister8(this->mLuaEnv, "Md5");
         luaRegister8.BeginNewTable();

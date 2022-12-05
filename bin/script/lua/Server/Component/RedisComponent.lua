@@ -35,7 +35,7 @@ function RedisComponent.Call(name, lua, tab)
     if response == nil then
         return nil
     end
-    return Json.Decode(response)
+    return rapidjson.decode(response)
 end
 
 function RedisComponent.Lock(key, time)
@@ -45,14 +45,14 @@ function RedisComponent.Lock(key, time)
                 key = key, time = time
             })
     table.print(response)
-    return Json.Decode(response).res
+    return rapidjson.decode(response).res
 end
 
 function RedisComponent.Set(name, key, value, second)
 
     assert(type(key) == "string")
     if type(value) == "table" then
-        value = Json.Encode(value)
+        value = rapidjson.encode(value)
     end
     if type(second) == "number" and second > 0 then
         this.Run(name, "SETEX", key, second, value)
@@ -66,7 +66,7 @@ function RedisComponent.Get(name, key, tab)
     local response = this.Run(name, "GET", key)
     if type(response) == "string" then
         if tab then
-            return Json.Decode(response)
+            return rapidjson.decode(response)
         end
         return response
     end

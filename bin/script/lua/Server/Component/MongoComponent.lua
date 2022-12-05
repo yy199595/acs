@@ -5,7 +5,7 @@ MongoComponent.Counters = { }
 local this = MongoComponent
 function MongoComponent.InsertOnce(tab, data, flag)
     if type(data) == "table" then
-        data = Json.Encode(data)
+        data = rapidjson.encode(data)
     end
     local address = Service.AllotServer("MongoService")
     return Service.Call(address, "MongoService.Insert", {
@@ -17,7 +17,7 @@ end
 
 function MongoComponent.Delete(tab, data, limit, flag)
     if type(data) == "table" then
-        data = Json.Encode(data)
+        data = rapidjson.encode(data)
     end
     assert(type(data) == "string")
     local address = Service.AllotServer("MongoService")
@@ -31,7 +31,7 @@ end
 
 function MongoComponent.QueryOnce(tab, data)
     if type(data) == "table" then
-        data = Json.Encode(data)
+        data = rapidjson.encode(data)
     end
     assert(type(data) == "string")
     local address = Service.AllotServer("MongoService")
@@ -44,14 +44,14 @@ function MongoComponent.QueryOnce(tab, data)
         return nil
     end
     if #response.jsons > 0 then
-        return Json.Decode(response.jsons[1])
+        return rapidjson.decode(response.jsons[1])
     end
     return nil
 end
 
 function MongoComponent.Query(tab, data, limit)
     if type(data) == "table" then
-        data = Json.Encode(data)
+        data = rapidjson.encode(data)
     end
     print("query json ", data)
     assert(type(data) == "string")
@@ -67,7 +67,7 @@ function MongoComponent.Query(tab, data, limit)
     local responses = {}
     if #response.jsons > 0 then
         for _, json in ipairs(response.jsons) do
-            table.insert(responses, Json.Decode(json))
+            table.insert(responses, rapidjson.decode(json))
         end
     end
     return responses
@@ -86,7 +86,7 @@ function MongoComponent.QueryDatas(tab, list)
     local code, response = Service.Call(address, "MongoService.Query", {
         tab = tab,
         limit = #list,
-        json = Json.Encode(request)
+        json = rapidjson.encode(request)
     })
     if code ~= XCode.Successful or response == nil then
         return nil
@@ -94,7 +94,7 @@ function MongoComponent.QueryDatas(tab, list)
     local responses = {}
     if #response.jsons > 0 then
         for _, json in ipairs(response.jsons) do
-            table.insert(responses, Json.Decode(json))
+            table.insert(responses, rapidjson.decode(json))
         end
     end
     return responses
@@ -112,10 +112,10 @@ end
 
 function MongoComponent.Update(tab, select, update, tag, flag)
     if type(select) == "table" then
-        select = Json.Encode(select)
+        select = rapidjson.encode(select)
     end
     if type(update) == "table" then
-        update = Json.Encode(update)
+        update = rapidjson.encode(update)
     end
     assert(type(select) == "string")
     assert(type(update) == "string")

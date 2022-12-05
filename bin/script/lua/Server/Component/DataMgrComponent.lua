@@ -27,7 +27,7 @@ function DataMgrComponent.Get(tab, id)
         local key = string.sub(tab, pos)
         local json = redis.Run(db, "HGET", key)
         if type(json) == "string" then
-            return Json.Decode(json)
+            return rapidjson.decode(json)
         end
     end
     local response = mongo.QueryOnce(tab, {

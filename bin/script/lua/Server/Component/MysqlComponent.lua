@@ -29,7 +29,7 @@ function MysqlComponent.Delete(tabName, where, flag)
     return Service.Call(address, "MysqlService.Delete", {
         table = tabName,
         flag = flag or 0,
-        where_json = Json.Encode(where)
+        where_json = rapidjson.encode(where)
     })
 end
 
@@ -41,12 +41,12 @@ function MysqlComponent.QueryOnce(tabName, where, flag)
     local code, response = Service.Call(address, "MysqlService.Query", {
         limit = 1,
         table = tabName,
-        where_json = Json.Encode(where)
+        where_json = rapidjson.encode(where)
     })
     if code ~= XCode.Successful then
         return nil
     end
-    return Json.Decode(response.jsons[1])
+    return rapidjson.decode(response.jsons[1])
 end
 
 function MysqlComponent.QueryAll(tabName, where, limit)
@@ -58,14 +58,14 @@ function MysqlComponent.QueryAll(tabName, where, limit)
     local code, response = Service.Call(address, "MysqlService.Query", {
         table = tabName,
         limit = limit or 0,
-        where_json = Json.Encode(where)
+        where_json = rapidjson.encode(where)
     })
     if code ~= XCode.Successful then
         return nil
     end
     local res = { }
     for _, json in ipairs(response.jsons) do
-        table.insert(res, Json.Decode(json))
+        table.insert(res, rapidjson.decode(json))
     end
     return res
 end
@@ -80,14 +80,14 @@ function MysqlComponent.QueryFields(tabName, fields, where, limit)
         table = tabName,
         limit = limit or 0,
         fields = fields,
-        where_json = Json.Encode(where)
+        where_json = rapidjson.encode(where)
     })
     if code ~= XCode.Successful then
         return nil
     end
     local res = { }
     for _, json in ipairs(response.jsons) do
-        table.insert(res, Json.Decode(json))
+        table.insert(res, rapidjson.encode(json))
     end
     return res
 end
@@ -101,7 +101,7 @@ function MysqlComponent.Update(tabName, where, update, flag)
     return Service.Call(address, "MysqlService.Update", {
         table = tabName,
         flag = flag or 0,
-        where_json = Json.Encode(where),
-        update_json = Json.Encode(update)
+        where_json = rapidjson.encode(where),
+        update_json = rapidjson.encode(update)
     })
 end

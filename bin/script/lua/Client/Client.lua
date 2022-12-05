@@ -19,7 +19,7 @@ local CallMongo = function()
         local t1 = Time.NowMilTime()
         local code = Client.Call("MongoService.Query", {
             tab = "user.account",
-            json = Json.Encode({
+            json = rapidjson.encode({
                 _id = "646585122@qq.com"
             }),
             limit = 1

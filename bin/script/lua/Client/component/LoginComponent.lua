@@ -13,7 +13,7 @@ function LoginComponent.Register(account, passwd, phoneNum)
         Log.Error(url, code)
         return nil
     end
-    local registerInfo = Json.Decode(response)
+    local registerInfo = rapidjson.decode(response)
     if registerInfo == nil then
         return nil
     end
@@ -33,7 +33,7 @@ function LoginComponent.Login(account, passwd) -- 获取gate地址
         Log.Error(url, code)
         return nil
     end
-    local loginInfo = Json.Decode(response)
+    local loginInfo = rapidjson.decode(response)
     if loginInfo == nil then
         return nil
     end
