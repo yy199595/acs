@@ -20,8 +20,7 @@ namespace Sentry
         this->mTimeout = timeout;
         assert(this->mRecvBuffer.size() == 0);
         assert(this->mSendBuffer.size() == 0);
-        this->mDecodeState = Http::DecodeState::None;
-        this->mHttpResponse = std::make_shared<Http::Response>();
+        this->mDecodeState = Http::DecodeState::None;       
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLine();
 #else
@@ -30,14 +29,28 @@ namespace Sentry
 #endif
 	}
 
-    void HttpHandlerClient::StartWriter()
+    void HttpHandlerClient::StartWriter(std::shared_ptr<Http::Response> message)
     {
 #ifdef ONLY_MAIN_THREAD
-        this->Send(this->mHttpResponse);
+        this->Send(message);
 #else
         Asio::Context & netWorkThread = this->mSocket->GetThread();
-        netWorkThread.post(std::bind(&HttpHandlerClient::Write, this, this->mHttpResponse));
+        netWorkThread.post(std::bind(&HttpHandlerClient::Write, this, message));
 #endif
+    }
+
+    void HttpHandlerClient::StartWriter(HttpStatus code)
+    {
+        std::shared_ptr<Http::Response> message = std::make_shared<Http::Response>();
+        {
+            message->SetCode(code);
+#ifdef ONLY_MAIN_THREAD
+            this->Send(message);
+#else
+            Asio::Context& netWorkThread = this->mSocket->GetThread();
+            netWorkThread.post(std::bind(&HttpHandlerClient::Write, this, message));
+#endif
+        }
     }
 
     void HttpHandlerClient::OnTimeout(const Asio::Code & code)
@@ -69,8 +82,11 @@ namespace Sentry
             this->mHttpRequest = Http::New(this->mMethod);
             if (this->mHttpRequest == nullptr)
             {
-                this->mHttpResponse->Str(HttpStatus::METHOD_NOT_ALLOWED, "unknow method");
-				this->Write(std::move(this->mHttpResponse));
+                std::shared_ptr<Http::Response> response
+                    = std::make_shared<Http::Response>();
+
+                response->Str(HttpStatus::METHOD_NOT_ALLOWED, "unknow method");
+				this->Write(response);
                 return;
             }
             this->ReceiveSomeMessage();

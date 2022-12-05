@@ -27,9 +27,9 @@ namespace Sentry
 		bool LateAwake() final;
         void OnFrameUpdate(float t) final;
     public:
-		XCode OnRequest(std::shared_ptr<Rpc::Packet> request);
-    public:
         bool Ping(const std::string & address);
+		XCode OnRequest(std::shared_ptr<Rpc::Packet> request);
+		unsigned int GetWaitCount() const { return this->mWaitCount;  }
         bool Send(const std::string & address, std::shared_ptr<Rpc::Packet> message);
         std::shared_ptr<Rpc::Packet> Call(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
@@ -37,6 +37,7 @@ namespace Sentry
     private:
         bool mIsComplete;
         std::string mFullName;
+		unsigned int mWaitCount;
 		class TaskComponent* mTaskComponent;
 		class TimerComponent* mTimerComponent;
 		class InnerNetComponent* mRpcClientComponent;

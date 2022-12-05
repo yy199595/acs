@@ -23,6 +23,11 @@ namespace Sentry
 
 namespace Sentry
 {
+    MongoDBComponent::MongoDBComponent()
+    {
+        this->mWaitCount = 0;     
+    }
+
     void MongoDBComponent::CloseClients()
     {
         for(std::shared_ptr<TcpMongoClient> client : this->mMongoClients)
@@ -61,7 +66,7 @@ namespace Sentry
 	}
 
     TcpMongoClient * MongoDBComponent::GetClient(int index)
-    {
+    {       
         if(index > 0)
         {
             index = index % this->mMongoClients.size();
@@ -102,6 +107,7 @@ namespace Sentry
 	std::shared_ptr<Mongo::CommandResponse> MongoDBComponent::Run(
         TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request)
 	{
+        this->mWaitCount++;
 		if(request->collectionName.empty())
 		{
 			request->collectionName = request->dataBase + ".$cmd";
@@ -115,6 +121,9 @@ namespace Sentry
 		long long t1 = Time::NowMilTime();
         int taskId = (int)mongoTask->GetRpcId();
         std::shared_ptr<Mongo::CommandResponse> mongoResponse = this->AddTask(taskId, mongoTask)->Await();
+        {
+            this->mWaitCount--;
+        }
 		if(mongoResponse != nullptr && mongoResponse->GetDocumentSize() > 0)
 		{
             //LOG_DEBUG( "[" << Time::NowMilTime() - t1 << "ms] document size = [" << mongoResponse->GetDocumentSize() << "]");

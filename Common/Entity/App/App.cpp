@@ -12,6 +12,11 @@
 #include"Component/LaunchComponent.h"
 using namespace Sentry;
 using namespace std::chrono;
+#ifdef __OS_WIN__
+#include"Component/HttpWebComponent.h"
+#include"Component/MongoDBComponent.h"
+#include"Component/InnerNetMessageComponent.h"
+#endif
 
 namespace Sentry
 {
@@ -226,11 +231,25 @@ namespace Sentry
 	}
 #ifdef __OS_WIN__
 	void App::UpdateConsoleTitle()
-	{
-		char buffer[100] = {0};
-		const std::string& name = ServerConfig::Inst()->Name();
-		sprintf_s(buffer, "%s fps:%f", name.c_str(), this->mLogicFps);
-		SetConsoleTitle(buffer);
+	{       
+        std::string title = ServerConfig::Inst()->Name();
+        HttpWebComponent * httpComponent = this->GetComponent<HttpWebComponent>();
+        MongoDBComponent* mongoComponent = this->GetComponent<MongoDBComponent>();
+        InnerNetMessageComponent * innerComponent = this->GetComponent<InnerNetMessageComponent>();
+        title.append(fmt::format("   fps:{0}  ", this->mLogicFps));
+        if (innerComponent != nullptr)
+        {
+            title.append(fmt::format("rpc:{0}  ", innerComponent->GetWaitCount()));
+        }
+        if (httpComponent != nullptr)
+        {
+            title.append(fmt::format("http:{0}  ", httpComponent->GetWaitCount()));
+        }
+        if (mongoComponent != nullptr)
+        {
+            title.append(fmt::format("mogo:{0}  ", mongoComponent->GetWaitCount()));
+        }
+		SetConsoleTitle(title.c_str());
 	}
 #endif
 

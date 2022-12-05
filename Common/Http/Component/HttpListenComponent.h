@@ -16,6 +16,8 @@ namespace Sentry
         bool OnListen(std::shared_ptr<SocketProxy> socket) final;
         virtual bool OnDelClient(const std::string& address) = 0;
         virtual void OnRequest(std::shared_ptr<HttpHandlerClient> httpClient) = 0;
+    protected:
+        HttpHandlerClient* GetClient(const std::string& address);
     private:
         class NetThreadComponent * mNetComponent;
         std::queue<std::shared_ptr<HttpHandlerClient>> mClientPools;

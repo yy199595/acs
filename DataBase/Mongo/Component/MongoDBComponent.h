@@ -39,7 +39,7 @@ namespace Sentry
 							 public IStart, public IRpc<Mongo::CommandResponse>
 	{
 	public:
-		MongoDBComponent() = default;
+		MongoDBComponent();
 		~MongoDBComponent() = default;
 	private:
 		void OnAddTask(RpcTask task) final;
@@ -52,13 +52,14 @@ namespace Sentry
     public:
         void OnClientError(int index, XCode code);
         TcpMongoClient * GetClient(int index = -1);
+		unsigned int GetWaitCount() const { return this->mWaitCount; }
         void Send(TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request);
 		std::shared_ptr<Mongo::CommandResponse> Run(TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request);
 	 private:
 		void OnConnectSuccessful(const std::string &address) final;
 		void OnMessage(const std::string &address, std::shared_ptr<CommandResponse> message) final;
 	 private:
-		TimerComponent * mTimerComponent;
+		 unsigned int mWaitCount;
 		Util::NumberBuilder<int, 10> mRequestId;
         std::vector<std::shared_ptr<TcpMongoClient>> mMongoClients;
     };

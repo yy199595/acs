@@ -18,10 +18,10 @@ namespace Sentry
 	 public:
 		HttpHandlerClient(HttpListenComponent * httpComponent, std::shared_ptr<SocketProxy> socketProxy);
 	 public:
-		void StartWriter();
 		void StartReceive(int timeout = 15);
+		void StartWriter(HttpStatus code);
+		void StartWriter(std::shared_ptr<Http::Response> message);
         std::shared_ptr<Http::Request> Request() { return this->mHttpRequest;}
-		std::shared_ptr<Http::Response> Response() { return this->mHttpResponse;}
 	 private:
 		void ClosetClient();
 		void OnTimeout(const Asio::Code& code);
@@ -34,8 +34,7 @@ namespace Sentry
         Http::DecodeState mDecodeState;
 		std::shared_ptr<Asio::Timer> mTimer;
         HttpListenComponent * mHttpComponent;
-        std::shared_ptr<Http::Request> mHttpRequest;
-		std::shared_ptr<Http::Response> mHttpResponse;
+        std::shared_ptr<Http::Request> mHttpRequest;		
 	};
 }
 #endif //GAMEKEEPER_HTTPHANDLERCLIENT_H

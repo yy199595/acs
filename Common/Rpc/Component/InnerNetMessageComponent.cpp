@@ -12,6 +12,7 @@ namespace Sentry
 {
 	bool InnerNetMessageComponent::Awake()
 	{
+        this->mWaitCount = 0;
         this->mIsComplete = false;
 		this->mTaskComponent = nullptr;
 		this->mTimerComponent = nullptr;
@@ -78,6 +79,7 @@ namespace Sentry
 
     void InnerNetMessageComponent::Invoke(const RpcMethodConfig *config, std::shared_ptr<Rpc::Packet> message)
     {
+        this->mWaitCount++;
         XCode code = XCode::Failure;
         RpcService *logicService = this->mApp->GetService(config->Service);
         try
@@ -109,8 +111,8 @@ namespace Sentry
             }
         }
 #endif
-        long long rpcId = 0;
-        if (!message->GetHead().Get("rpc", rpcId))
+        this->mWaitCount--;
+        if (!message->GetHead().Has("rpc"))
         {
             return; //不需要返回
         }
@@ -125,7 +127,6 @@ namespace Sentry
 #endif
             message->SetType(Tcp::Type::Response);
             this->mRpcClientComponent->Send(address, message);
-            return;
         }
     }
 

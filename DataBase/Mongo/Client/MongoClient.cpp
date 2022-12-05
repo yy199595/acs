@@ -192,16 +192,13 @@ namespace Mongo
 		{
 			assert(this->mRecvBuffer.size() >= sizeof(MongoHead));
 			this->mMongoResponse = std::make_shared<CommandResponse>();
-			this->ReceiveMessage(this->mMongoResponse->OnReceiveHead(is));
+
+            int len = this->mMongoResponse->OnReceiveHead(is);
+			this->ReceiveMessage(len);
 		}
 		else
 		{
 			this->mMongoResponse->OnReceiveBody(is);
-#ifdef __DEBUG__
-            std::shared_ptr<CommandRequest> request =
-                    std::static_pointer_cast<CommandRequest>(this->PopMessage());
-            assert(request->header.requestID == this->mMongoResponse->GetHead().responseTo);
-#endif
 			const std::string & address = this->mSocket->GetAddress();
 			std::shared_ptr<CommandResponse> response = std::move(this->mMongoResponse);
 #ifdef ONLY_MAIN_THREAD

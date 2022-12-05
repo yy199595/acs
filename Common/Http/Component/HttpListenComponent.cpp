@@ -54,4 +54,10 @@ namespace Sentry
             }
         }
     }
+
+    HttpHandlerClient * HttpListenComponent::GetClient(const std::string& address)
+    {
+        auto iter = this->mHttpClients.find(address);
+        return iter != this->mHttpClients.end() ? iter->second.get() : nullptr;
+    }
 }
