@@ -19,7 +19,7 @@ namespace Lua
 	int ClientEx::Call(lua_State* lua)
 	{
 		lua_pushthread(lua);
-		ClientComponent * clientComponent = UserDataParameter::Read<ClientComponent*>(lua, 1);
+        ClientComponent* clientComponent = App::Inst()->GetComponent<ClientComponent>();
         if(clientComponent == nullptr)
         {
             luaL_error(lua, "not find ClientComponent");
@@ -30,7 +30,7 @@ namespace Lua
         request->SetType(Tcp::Type::Request);
         request->SetProto(Tcp::Porto::Protobuf);
         ProtoComponent * messageComponent = App::Inst()->GetMsgComponent();
-        const std::string func = CommonParameter::Read<std::string>(lua, 2);
+        const std::string func = CommonParameter::Read<std::string>(lua, 1);
         const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
         if (methodConfig == nullptr)
         {
@@ -38,7 +38,7 @@ namespace Lua
             return 0;
         }
 		std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
-        if (lua_istable(lua, 3) && !methodConfig->Request.empty())
+        if (lua_istable(lua, 2) && !methodConfig->Request.empty())
         {
             const std::string& name = methodConfig->Request;
             std::shared_ptr<Message> message = messageComponent->Read(lua, name, 3);
@@ -84,7 +84,7 @@ namespace Lua
     int ClientEx::Auth(lua_State *lua)
     {
         lua_pushthread(lua);
-        ClientComponent *clientComponent = UserDataParameter::Read<ClientComponent *>(lua, 1);
+        ClientComponent* clientComponent = App::Inst()->GetComponent<ClientComponent>();
         if (clientComponent == nullptr)
         {
             luaL_error(lua, "not find ClientComponent");
@@ -93,7 +93,7 @@ namespace Lua
         std::shared_ptr<Rpc::Packet> request(new Rpc::Packet());
 
         request->SetType(Tcp::Type::Auth);
-        std::string token(luaL_checkstring(lua, 2));
+        std::string token(luaL_checkstring(lua, 1));
         request->GetHead().Add("token", token);
         std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
 
@@ -115,8 +115,8 @@ namespace Lua
 		std::string ip;
 		unsigned short port;
 		lua_pushthread(lua);
-		ClientComponent * clientComponent = UserDataParameter::Read<ClientComponent*>(lua, 1);
-		const std::string address = CommonParameter::Read<std::string>(lua, 2);
+        ClientComponent* clientComponent = App::Inst()->GetComponent<ClientComponent>();
+		const std::string address = CommonParameter::Read<std::string>(lua, 1);
 		if(!Helper::String::ParseIpAddress(address, ip, port))
 		{
 			luaL_error(lua, "parse ip address [%s] error", address.c_str());

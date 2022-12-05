@@ -1,6 +1,6 @@
 
-local Server = {}
-Server.Modules = { }
+local Mian = {}
+local Data = require("DataServer")
 local Mongo = require("Component.MongoComponent")
 
 function GetModules()
@@ -13,15 +13,14 @@ function GetModules()
     return modules
 end
 
-function Server.Awake()
+function Mian.Awake()
     table.print(Service)
 
     --table.print(package.loaded)
-
     return true
 end
 
-function Server.StartInsert()
+function Mian.StartInsert()
     while true do
         MysqlComponent.Add("user.account_info", {
         account = "646585122@qq.com",
@@ -42,28 +41,10 @@ function Server.StartInsert()
     end
 end
 
-function Server.OnClusterComplete()
-
-
+function Mian.OnClusterComplete()
 
     local code, data = Http.Get("http://www.kuaidi100.com/query?type=1122&postid=qwer")
     print(code, data)
-    --MysqlComponent.Create("user.account_info", {"account"})
-    --
-    --MysqlComponent.Add("user.account_info", {
-    --    account = "646585122@qq.com",
-    --    user_id = 199595,
-    --    phone_num = 13716061995,
-    --    pass_word = "199595yjz.",
-    --    register_time = os.time(),
-    --    last_login_ip = "127.0.0.1",
-    --})
-
-    --local res = MysqlComponent.QueryFields("user.account_info", {"user_id", "phone_num"}, {
-    --    account = "646585122@qq.com"
-    --}, 1)
-    --table.print(res)
-    
     local r1 = Mongo.InsertOnce("user.data_account", {
         _id = "646585122@qq.com",
         login_ip = "127.0.0.1",
@@ -122,18 +103,4 @@ function Server.OnClusterComplete()
     print("======== text query from mongo ========")
     table.print(response)
 end
-
-function Server.Hotfix()
-    local modules = GetModules()
-    for _, module in pairs(modules) do
-        local method = module["Hotfix"]
-        if type(method) == "function" then
-            local state, err = pcall(method)
-            if not state then
-                Log.Error(err)
-            end
-        end
-    end
-end
-
-return Server
+return Mian

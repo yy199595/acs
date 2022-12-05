@@ -147,9 +147,9 @@ namespace Client
 
 	void ClientComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
 	{
-		luaRegister.BeginRegister<ClientComponent>();
+		luaRegister.BeginNewTable("Client");
 		luaRegister.PushExtensionFunction("Call", Lua::ClientEx::Call);
         luaRegister.PushExtensionFunction("Auth", Lua::ClientEx::Auth);
-        luaRegister.PushExtensionFunction("StartConnectAsync", Lua::ClientEx::StartConnect);
+        luaRegister.PushExtensionFunction("Connect", Lua::ClientEx::StartConnect);
 	}
 }

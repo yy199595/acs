@@ -30,10 +30,10 @@ namespace Lua
             return 0;
         }
         std::shared_ptr<RedisRequest> request(new RedisRequest(command));
-        int count = (int) luaL_len(lua, 4);
+        int count = (int) luaL_len(lua, 3);
         for (int i = 0; i < count; i++)
         {
-            lua_geti(lua, 4, i + 1);
+            lua_geti(lua, 3, i + 1);
             int index = lua_absindex(lua, -1);
             if (lua_isstring(lua, index))
             {
@@ -124,10 +124,10 @@ namespace Lua
             return 0;
         }
         std::shared_ptr<RedisRequest> request(new RedisRequest(command));
-        int count = (int)luaL_len(lua, 4);
+        int count = (int)luaL_len(lua, 3);
         for (int i = 0; i < count; i++)
         {
-            lua_geti(lua, 4, i + 1);
+            lua_geti(lua, 3, i + 1);
             int index = lua_absindex(lua, -1);
             if (lua_isstring(lua, index))
             {
