@@ -26,7 +26,7 @@
 
 #include"Service/OuterService.h"
 #include"Service/InnerService.h"
-#include"Service/HttpWebService.h"
+#include"Service/HttpBackGround.h"
 #include"Service/LocationService.h"
 #include"Service/HttpRpcService.h"
 #include"Service/UserBehavior.h"
@@ -105,7 +105,7 @@ void RegisterComponent()
     ComponentFactory::Add<HttpWebComponent>("HttpWebComponent");
 
     ComponentFactory::Add<HttpRpcService>("HttpRpcService");
-    ComponentFactory::Add<HttpWebService>("HttpWebService");
+    ComponentFactory::Add<HttpBackGround>("HttpBackGround");
 
 // lua
     ComponentFactory::Add<LuaScriptComponent>("LuaScriptComponent");

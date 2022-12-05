@@ -42,7 +42,6 @@ namespace Sentry
 		MongoDBComponent();
 		~MongoDBComponent() = default;
 	private:
-		void OnAddTask(RpcTask task) final;
 		void OnDelTask(int taskId, RpcTask task) final;
 	public:
         bool Start();

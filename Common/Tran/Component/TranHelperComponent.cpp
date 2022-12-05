@@ -14,7 +14,7 @@ namespace Sentry
     {
         const ServerConfig * config = ServerConfig::Inst();
         this->mBindName = ComponentFactory::GetName<LocationService>();
-        LOG_CHECK_RET_FALSE(config->GetMember("forward", this->mLocations));
+        LOG_CHECK_RET_FALSE(config->GetMember("tran", this->mLocations));
         LOG_CHECK_RET_FALSE(this->mInnerComponent = this->GetComponent<InnerNetMessageComponent>());
         return this->mLocations.size() > 0;
     }

@@ -94,14 +94,15 @@ namespace Sentry
         this->mRequestId.Push(taskId);
 	}
 
-	void MongoDBComponent::OnAddTask(RpcTaskComponent<int, Mongo::CommandResponse>::RpcTask task)
-	{
-
-	}
-
     void MongoDBComponent::Send(TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request)
     {
-
+        this->mWaitCount++;
+        if(request->collectionName.empty())
+        {
+            request->collectionName = request->dataBase + ".$cmd";
+        }
+        request->header.requestID = this->mRequestId.Pop();
+        mongoClient->SendMongoCommand(request);
     }
 
 	std::shared_ptr<Mongo::CommandResponse> MongoDBComponent::Run(

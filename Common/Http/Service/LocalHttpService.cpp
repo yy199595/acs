@@ -75,6 +75,11 @@ namespace Sentry
         this->mServiceRegister = std::make_shared<HttpServiceRegister>(this);
         LuaScriptComponent * luaComponent = this->GetComponent<LuaScriptComponent>();
         const HttpServiceConfig * httpServiceConfig = HttpConfig::Inst()->GetConfig(this->GetName());
+        if(httpServiceConfig == nullptr)
+        {
+            LOG_ERROR("not find http service : " << this->GetName());
+            return false;
+        }
         if (!this->OnStartService(*this->mServiceRegister))
         {
             return false;

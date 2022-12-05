@@ -24,7 +24,7 @@
         "common": "script/lua/Common",
         "module": "script/lua/Server"
     },
-    "forward":[
+    "tran":[
         "127.0.0.1:7794"
     ],
     "Client":{
@@ -35,7 +35,7 @@
     "Server":{
         "listen":{
             "rpc": 7788,
-            "http": 80,
+            "http": 8080,
             "gate": 1995,
             "forward":7794,
             "console": 8888

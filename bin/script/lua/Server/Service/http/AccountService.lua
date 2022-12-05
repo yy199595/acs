@@ -1,7 +1,8 @@
 
 local AccountService = {}
-local Mongo = require("Component.MongoComponent")
-local RedisClient = require("Component.RedisComponent")
+local tabName = "user.account_info"
+local Mongo = LuaRequire("Component.MongoComponent")
+local RedisClient = LuaRequire("Component.RedisComponent")
 
 
 function AccountService.Start()
@@ -13,7 +14,7 @@ function AccountService.Register(requestInfo)
     assert(requestInfo.account, "register account is nil")
     assert(requestInfo.password, "register password is nil")
     assert(requestInfo.phone_num, "register phone number is nil")
-    local userInfo = Mongo.QueryOnce("user.account_info", {
+    local userInfo = Mongo.QueryOnce(tabName, {
         _id = requestInfo.account
     })
     if userInfo ~= nil then
@@ -28,23 +29,23 @@ function AccountService.Register(requestInfo)
     requestInfo.create_time = nowTime
     requestInfo._id = requestInfo.account
     requestInfo.token = Md5.ToString(str)
-    return Mongo.Update("user.account", {
+    Log.Info("register account : ", Json.Encode(requestInfo))
+    return Mongo.Update(tabName, {
         _id = requestInfo.account
     }, requestInfo)
 end
 
 function AccountService.Login(request)
 
-    table.print(request)
     assert(type(request.account) == "string", "user account is not string")
     assert(type(request.password) == "string", "user password is not string")
 
-    local userInfo = Mongo.QueryOnce("user.account_info", {
+    local userInfo = Mongo.QueryOnce(tabName, {
         _id = request.account
     })
     table.print(userInfo)
     if userInfo == nil or request.password ~= userInfo.password then
-        assert(false, "账号不存在或者密码错误")
+        assert(false, request.account .. " : 账号不存在或者密码错误")
         return XCode.Failure
     end
     local address = Service.AllotServer("OuterService")
@@ -54,7 +55,7 @@ function AccountService.Login(request)
     if code ~= XCode.Successful then
         return XCode.AllotUser
     end
-    Mongo.Update("user.account", { _id = request.account },
+    Mongo.Update(tabName, { _id = request.account },
                 {  last_login_time = os.time(),  token = response.token })
     return XCode.Successful, response
 end

@@ -1,26 +1,12 @@
 
-local Mian = {}
-local Data = require("DataServer")
+local Main = {}
 local Mongo = require("Component.MongoComponent")
 
-function GetModules()
-    local modules = { }
-    for _, module in pairs(package.loaded) do
-        if type(module) == "table" then
-            table.insert(modules, module)
-        end
-    end
-    return modules
-end
-
-function Mian.Awake()
-    table.print(Service)
-
-    --table.print(package.loaded)
+function Main.Awake()
     return true
 end
 
-function Mian.StartInsert()
+function Main.StartInsert()
     while true do
         MysqlComponent.Add("user.account_info", {
         account = "646585122@qq.com",
@@ -41,66 +27,8 @@ function Mian.StartInsert()
     end
 end
 
-function Mian.OnClusterComplete()
-
-    local code, data = Http.Get("http://www.kuaidi100.com/query?type=1122&postid=qwer")
-    print(code, data)
-    local r1 = Mongo.InsertOnce("user.data_account", {
-        _id = "646585122@qq.com",
-        login_ip = "127.0.0.1",
-        user_id = 1122,
-        login_time = os.time(),
-        register_time = os.time(),
-        token = "0x00ssdjsaklj"
-    })
-
-    --MysqlComponent.Update("user.account_info", {
-    --    account = "646585122@qq.com"
-    --}, {
-    --    user_area_list = {
-    --        list = { 10, 11, 12, 13, 14}
-    --    }
-    --})
-    --
-    --local res = MysqlComponent.QueryOnce("user.account_info", {
-    --    account = "646585122@qq.com"
-    --})
-    --print("======== text query from mysql ========")
-    --table.print(res)
-
-
-    local r3 = Mongo.InsertOnce("user2.data_account", {
-        _id = "646585123@qq.com",
-        login_ip = "127.0.0.1",
-        user_id = 1122,
-        login_time = os.time(),
-        register_time = os.time(),
-        token = "0x00ssdjsaklj"
-    })
-
-    local r2 = Mongo.Update("user1.data_account", {
-        _id = "646585122@qq.com"
-    }, {
-        login_time_1 = 199595
-    })
-
-    Mongo.Delete("user2.data_account", {
-        _id = "646585122@qq.com"
-    })
-
-    local tab = { }
-    table.insert(tab, "646585123@qq.com")
-    table.insert(tab, "646585122@qq.com")
-    local response = Mongo.QueryDatas("user1.data_account", tab)
-    --local response = MongoComponent.Query("data_account", {
-    --    _id = {
-    --        ["$in"] = {
-    --            "646585123@qq.com",
-    --            "646585122@qq.com"
-    --        }
-    --    }
-    --})
-    print("======== text query from mongo ========")
-    table.print(response)
+function Main.OnClusterComplete()
+    local code = Mongo.Delete("user.account_info", {}, 100)
+    print("remove code = " .. code)
 end
-return Mian
+return Main

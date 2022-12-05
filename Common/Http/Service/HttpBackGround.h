@@ -2,26 +2,27 @@
 // Created by zmhy0073 on 2022/8/29.
 //
 
-#ifndef APP_HTTPWEBSERVICE_H
-#define APP_HTTPWEBSERVICE_H
+#ifndef APP_HTTPBACKGROUND_H
+#define APP_HTTPBACKGROUND_H
 #include"LocalHttpService.h"
 namespace Sentry
 {
-    class HttpWebService : public LocalHttpService
+    class HttpBackGround : public LocalHttpService
     {
     public:
-        HttpWebService() = default;
-        ~HttpWebService() = default;
+        HttpBackGround() = default;
+        ~HttpBackGround() = default;
     private:     
         bool OnStartService(HttpServiceRegister &serviceRegister) final;
-        XCode Info(const Http::Request& request, Http::Response& response);
-		XCode Ping(const Http::Request& request, Http::Response& response);
+    private:
+        XCode Info(Json::Document & response);
+        XCode Hotfix(Json::Document & response);
+        XCode Ping(const Http::Request& request, Http::Response& response);
         XCode Hello(const Http::Request& request, Http::Response& response);
-		XCode Hotfix(const Http::Request& request, Http::Response& response);
 		XCode DownLoad(const Http::Request& request, Http::Response& response);
         XCode Sleep(const Json::Reader & request, Json::Document & response);
     };
 }
 
 
-#endif //APP_HTTPWEBSERVICE_H
+#endif //APP_HTTPBACKGROUND_H

@@ -7,8 +7,6 @@ function MongoComponent.InsertOnce(tab, data, flag)
     if type(data) == "table" then
         data = Json.Encode(data)
     end
-    local list = Service.GetServerList("MongoService")
-    table.print(list)
     local address = Service.AllotServer("MongoService")
     return Service.Call(address, "MongoService.Insert", {
         tab = tab,
@@ -75,20 +73,20 @@ function MongoComponent.Query(tab, data, limit)
     return responses
 end
 
-function MongoComponent.QueryDatas(tab, querys)
+function MongoComponent.QueryDatas(tab, list)
     assert(type(tab) == "string")
-    assert(type(querys) == "table" and #querys > 0)
+    assert(type(list) == "table" and #list > 0)
 
-    local requset = {
+    local request = {
         _id = {
-            ["$in"] = querys
+            ["$in"] = list
         }
     }
     local address = Service.AllotServer("MongoService")
     local code, response = Service.Call(address, "MongoService.Query", {
         tab = tab,
-        limit = #querys,
-        json = Json.Encode(requset)
+        limit = #list,
+        json = Json.Encode(request)
     })
     if code ~= XCode.Successful or response == nil then
         return nil

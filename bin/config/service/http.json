@@ -13,7 +13,7 @@
 			"Path": "/user/register"
 		}
 	},
-	"HttpWebService": {
+	"HttpBackGround": {
 		"Info": {
 			"Type": "GET",
 			"Async": false,
@@ -22,17 +22,12 @@
 		"Ping": {
 			"Type": "GET",
 			"Async": false,
-			"Path": "/ping"
+			"Path": "/server/ping"
 		},
 		"Hello": {
 			"Type": "GET",
 			"Async": false,
 			"Path": "/"
-		},
-		"Sleep": {
-			"Type": "GET",
-			"Async": true,
-			"Path": "/sleep"
 		},
 		"DownLoad": {
 			"Type": "GET",
@@ -42,7 +37,7 @@
 		"Hotfix": {
 			"Type": "GET",
 			"Async": true,
-			"Path": "/hotfix"
+			"Path": "/server/hotfix"
 		}
 	},
 	"HttpRpcService": {

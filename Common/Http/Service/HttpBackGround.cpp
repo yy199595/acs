@@ -1,52 +1,50 @@
 //
 // Created by zmhy0073 on 2022/8/29.
 //
-#include"HttpWebService.h"
+#include"HttpBackGround.h"
 #include"System/System.h"
 #include"Config/CodeConfig.h"
 #include"Service/InnerService.h"
 #include"Component/LocationComponent.h"
 namespace Sentry
 {
-    bool HttpWebService::OnStartService(HttpServiceRegister &serviceRegister)
+    bool HttpBackGround::OnStartService(HttpServiceRegister &serviceRegister)
     {
-        serviceRegister.Bind("Info", &HttpWebService::Info);
-        serviceRegister.Bind("Ping", &HttpWebService::Ping);
-        serviceRegister.Bind("Hello", &HttpWebService::Hello);
-		serviceRegister.Bind("Sleep", &HttpWebService::Sleep);
-		serviceRegister.Bind("Hotfix", &HttpWebService::Hotfix);
-		serviceRegister.Bind("DownLoad", &HttpWebService::DownLoad);
+        serviceRegister.Bind("Info", &HttpBackGround::Info);
+        serviceRegister.Bind("Ping", &HttpBackGround::Ping);
+        serviceRegister.Bind("Hello", &HttpBackGround::Hello);
+		serviceRegister.Bind("Sleep", &HttpBackGround::Sleep);
+		serviceRegister.Bind("Hotfix", &HttpBackGround::Hotfix);
+		serviceRegister.Bind("DownLoad", &HttpBackGround::DownLoad);
         return true;
     }
 
-    XCode HttpWebService::Ping(const Http::Request &request, Http::Response &response)
+    XCode HttpBackGround::Ping(const Http::Request &request, Http::Response &response)
     {
         response.Str(HttpStatus::OK,"pong");
         return XCode::Successful;
     }
 
-	XCode HttpWebService::Hotfix(const Http::Request& request, Http::Response& response)
+	XCode HttpBackGround::Hotfix(Json::Document &response)
 	{
 		InnerService * innerService = this->GetComponent<InnerService>();
 		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
 		if(locationComponent == nullptr || innerService == nullptr)
 		{
-			response.Str(HttpStatus::OK, "LocationComponent or InnerService Is Null");
+			response.Add("error", "LocationComponent or InnerService Is Null");
 			return XCode::Failure;
 		}
-		Json::Document jsonDocuemnt;
 		std::vector<std::string> locations;
 		locationComponent->GetServers(locations);
 		for(const std::string & location : locations)
 		{
 			XCode code = innerService->Call(location, "Hotfix");
-			jsonDocuemnt.Add(location.c_str(), CodeConfig::Inst()->GetDesc(code));
+            response.Add(location.c_str(), CodeConfig::Inst()->GetDesc(code));
 		}
-		response.Json(HttpStatus::OK, jsonDocuemnt);
 		return XCode::Successful;
 	}
 
-	XCode HttpWebService::Sleep(const Json::Reader &request, Json::Document &response)
+	XCode HttpBackGround::Sleep(const Json::Reader &request, Json::Document &response)
     {
         std::string time;
         request.GetMember("time", time);
@@ -55,20 +53,19 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode HttpWebService::Hello(const Http::Request &request, Http::Response &response)
+    XCode HttpBackGround::Hello(const Http::Request &request, Http::Response &response)
     {
 		response.Str(HttpStatus::OK,"hello");
 		return XCode::Successful;
     }
 
-    XCode HttpWebService::DownLoad(const Http::Request &request, Http::Response &response)
+    XCode HttpBackGround::DownLoad(const Http::Request &request, Http::Response &response)
     {
         return XCode::Successful;
     }
 
-    XCode HttpWebService::Info(const Http::Request &request, Http::Response &response)
+    XCode HttpBackGround::Info(Json::Document &response)
     {
-        Json::Document document;
         std::vector<Component *> components;
         this->mApp->GetComponents(components);
         for(Component * component : components)
@@ -83,10 +80,9 @@ namespace Sentry
                 }
                 Json::Document document1;
                 serverRecord->OnRecord(document1);
-                document.Add(component->GetName().c_str(), document1);
+                response.Add(component->GetName().c_str(), document1);
             }
         }
-        response.Json(HttpStatus::OK, document);
         return XCode::Successful;
     }
 
