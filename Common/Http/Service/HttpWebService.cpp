@@ -10,6 +10,7 @@ namespace Sentry
 {
     bool HttpWebService::OnStartService(HttpServiceRegister &serviceRegister)
     {
+        serviceRegister.Bind("Info", &HttpWebService::Info);
         serviceRegister.Bind("Ping", &HttpWebService::Ping);
         serviceRegister.Bind("Hello", &HttpWebService::Hello);
 		serviceRegister.Bind("Sleep", &HttpWebService::Sleep);
@@ -62,6 +63,30 @@ namespace Sentry
 
     XCode HttpWebService::DownLoad(const Http::Request &request, Http::Response &response)
     {
+        return XCode::Successful;
+    }
+
+    XCode HttpWebService::Info(const Http::Request &request, Http::Response &response)
+    {
+        Json::Document document;
+        std::vector<Component *> components;
+        this->mApp->GetComponents(components);
+        for(Component * component : components)
+        {
+            IServerRecord * serverRecord = component->Cast<IServerRecord>();
+            if(serverRecord != nullptr)
+            {
+                IServiceBase * serviceBase = component->Cast<IServiceBase>();
+                if(serviceBase != nullptr && !serviceBase->IsStartService())
+                {
+                    continue;
+                }
+                Json::Document document1;
+                serverRecord->OnRecord(document1);
+                document.Add(component->GetName().c_str(), document1);
+            }
+        }
+        response.Json(HttpStatus::OK, document);
         return XCode::Successful;
     }
 

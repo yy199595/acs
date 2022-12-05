@@ -131,5 +131,11 @@ namespace Sentry
 		virtual XCode OnResponse(const std::string&, const std::shared_ptr<T2> response) = 0;
 	};
 
+    class IServerRecord
+    {
+    public:
+        virtual void OnRecord(Json::Document & document) = 0;
+    };
+
 	class SocketProxy;
 }

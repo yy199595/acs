@@ -12,10 +12,11 @@
 #include"Http/HttpResponse.h"
 namespace Sentry
 {
-    class LocalHttpService : public Component, public IService<Http::Request, Http::Response>
+    class LocalHttpService : public Component,
+                             public IService<Http::Request, Http::Response>, public IServerRecord
 	{
 	 public:
-		LocalHttpService() = default;
+		LocalHttpService();
 		virtual ~LocalHttpService() = default;
 	 protected:
         virtual bool OnCloseService() { return true; };
@@ -25,9 +26,12 @@ namespace Sentry
         bool Close() final;
 		bool LoadFromLua() final;
 		bool LateAwake() override;
+        void OnRecord(Json::Document &document) final;
 		bool IsStartService() final { return this->mServiceRegister != nullptr;}
 		XCode Invoke(const std::string & name, std::shared_ptr<Http::Request>, std::shared_ptr<Http::Response>) final;
 	 private:
+        unsigned int mSumCount;
+        unsigned int mWaitCount;
 		std::shared_ptr<HttpServiceRegister> mServiceRegister;
 	};
 }

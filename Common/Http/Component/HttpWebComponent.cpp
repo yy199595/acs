@@ -80,6 +80,12 @@ namespace Sentry
         this->mWaitCount--;
     }
 
+    void HttpWebComponent::OnRecord(Json::Document &document)
+    {
+        document.Add("sum", this->mSumCount);
+        document.Add("wait", this->mWaitCount);
+    }
+
     bool HttpWebComponent::OnDelClient(const std::string& address)
     {
         auto iter = this->mTasks.find(address);

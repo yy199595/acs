@@ -34,6 +34,7 @@ namespace Sentry
 
     LocalRpcService::LocalRpcService()
     {
+        this->mSumCount = 0;
         this->mWaitCount = 0;
         this->mIsHandlerMessage = false;
     }
@@ -72,9 +73,12 @@ namespace Sentry
 #ifndef __DEBUG__
         message->GetHead().Remove("func");
 #endif
+        this->mSumCount++;
         this->mWaitCount++;
         XCode code = serviceMethod->Invoke(*message);
-        this->mWaitCount--;
+        {
+            this->mWaitCount--;
+        }
         return code;
     }
 
@@ -101,6 +105,12 @@ namespace Sentry
         this->mIsHandlerMessage = true;
 		return true;
 	}
+
+    void LocalRpcService::OnRecord(Json::Document &document)
+    {
+        document.Add("sum", this->mSumCount);
+        document.Add("wait", this->mWaitCount);
+    }
 
     bool LocalRpcService::LoadFromLua()
 	{

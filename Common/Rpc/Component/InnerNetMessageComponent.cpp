@@ -13,6 +13,7 @@ namespace Sentry
 	bool InnerNetMessageComponent::Awake()
 	{
         this->mWaitCount = 0;
+        this->mSumCount = 0;
         this->mIsComplete = false;
 		this->mTaskComponent = nullptr;
 		this->mTimerComponent = nullptr;
@@ -28,6 +29,12 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(this->mRpcClientComponent = this->GetComponent<InnerNetComponent>());
 		return true;
 	}
+
+    void InnerNetMessageComponent::OnRecord(Json::Document &document)
+    {
+        document.Add("sum", this->mSumCount);
+        document.Add("wait", this->mWaitCount);
+    }
 
 	XCode InnerNetMessageComponent::OnRequest(std::shared_ptr<Rpc::Packet> message)
 	{
@@ -79,6 +86,7 @@ namespace Sentry
 
     void InnerNetMessageComponent::Invoke(const RpcMethodConfig *config, std::shared_ptr<Rpc::Packet> message)
     {
+        this->mSumCount++;
         this->mWaitCount++;
         XCode code = XCode::Failure;
         RpcService *logicService = this->mApp->GetService(config->Service);

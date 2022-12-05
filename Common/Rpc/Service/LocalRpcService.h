@@ -25,7 +25,7 @@ namespace Sentry
 
 namespace Sentry
 {
-    class LocalRpcService : public RpcService
+    class LocalRpcService : public RpcService, public IServerRecord
 	{
 	public:
 		LocalRpcService();
@@ -40,12 +40,11 @@ namespace Sentry
         virtual bool OnClose() = 0;
         virtual bool OnStart() = 0;
         void WaitAllMessageComplete() final;
+        void OnRecord(Json::Document &document) final;
 		ServiceMethodRegister & GetMethodRegistry() { return *this->mMethodRegister; }
-
-    private:
 	private:
-        int mMaxCount;
-        int mWaitCount;
+        unsigned int mSumCount;
+        unsigned int mWaitCount;
         bool mIsHandlerMessage;
 		std::shared_ptr<ServiceMethodRegister> mMethodRegister;
 	};

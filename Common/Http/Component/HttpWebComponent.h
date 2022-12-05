@@ -16,7 +16,7 @@ namespace Sentry
     class HttpMethodConfig;
     class HttpAsyncResponse;
     class HttpHandlerClient;
-    class HttpWebComponent : public HttpListenComponent
+    class HttpWebComponent : public HttpListenComponent, public IServerRecord
     {
     public:
         HttpWebComponent() = default;
@@ -26,9 +26,11 @@ namespace Sentry
         unsigned int GetWaitCount() const { return this->mWaitCount; }
     private:
         bool LateAwake() final;
+        void OnRecord(Json::Document &document) final;
         bool OnDelClient(const std::string& address);
         void Invoke(const std::string& address, const HttpMethodConfig* config, std::shared_ptr<Http::Request> request);
     private:
+        unsigned int mSumCount;
         unsigned int mWaitCount;
         TaskComponent * mTaskComponent;
         std::unordered_map<std::string, unsigned int> mTasks;

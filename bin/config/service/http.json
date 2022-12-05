@@ -14,6 +14,11 @@
 		}
 	},
 	"HttpWebService": {
+		"Info": {
+			"Type": "GET",
+			"Async": false,
+			"Path": "/server/info"
+		},
 		"Ping": {
 			"Type": "GET",
 			"Async": false,

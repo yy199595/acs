@@ -7,6 +7,12 @@
 namespace Sentry
 {
 
+    LocalHttpService::LocalHttpService()
+    {
+        this->mSumCount = 0;
+        this->mWaitCount = 0;
+    }
+
 	XCode LocalHttpService::Invoke(const std::string& name,
 		std::shared_ptr<Http::Request> request, std::shared_ptr<Http::Response> response)
 	{
@@ -15,7 +21,13 @@ namespace Sentry
 		{
 			return XCode::CallServiceNotFound;
 		}
-		return method->Invoke(*request, *response);
+        this->mSumCount++;
+        this->mWaitCount++;
+		XCode code = method->Invoke(*request, *response);
+        {
+            this->mWaitCount--;
+        }
+        return code;
 	}
 
     bool LocalHttpService::LateAwake()
@@ -50,6 +62,12 @@ namespace Sentry
             }
         }
         return true;
+    }
+
+    void LocalHttpService::OnRecord(Json::Document &document)
+    {
+        document.Add("sum", this->mSumCount);
+        document.Add("wait", this->mWaitCount);
     }
 
 	bool LocalHttpService::Start()
