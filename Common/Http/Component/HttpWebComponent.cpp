@@ -48,12 +48,13 @@ namespace Sentry
         {
             this->Invoke(address, httpConfig, request);
             return;
-        }       
+        }
         this->mTaskComponent->Start(&HttpWebComponent::Invoke, this, address, httpConfig, request);
     }
     void HttpWebComponent::Invoke(const std::string& address, 
         const HttpMethodConfig* config, std::shared_ptr<Http::Request> request)
     {
+		this->mSumCount++;
         this->mWaitCount++;
         std::shared_ptr<Http::Response> response(new Http::Response());
         LocalHttpService* httpService = this->GetComponent<LocalHttpService>(config->Service);

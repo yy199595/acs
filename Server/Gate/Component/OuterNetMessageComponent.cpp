@@ -19,6 +19,8 @@ namespace Sentry
 {
     OuterNetMessageComponent::OuterNetMessageComponent()
     {
+		this->mSumCount = 0;
+		this->mWaitCount = 0;
         this->mTaskComponent = nullptr;
         this->mTranComponent = nullptr;
         this->mTimerComponent = nullptr;
@@ -121,6 +123,11 @@ namespace Sentry
 
 	XCode OuterNetMessageComponent::OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message)
 	{
+		this->mSumCount++;
+		if(message->GetHead().Has("rpc"))
+		{
+			this->mWaitCount++;
+		}
         auto iter = this->mUserAddressMap.find(address);
         if(iter == this->mUserAddressMap.end() || iter->second == 0)
         {
@@ -155,6 +162,7 @@ namespace Sentry
 
 	XCode OuterNetMessageComponent::OnResponse(const std::string & address, std::shared_ptr<Rpc::Packet> message)
 	{
+		this->mWaitCount--;
         LOG_RPC_CHECK_ARGS(message->GetHead().Has("rpc"));
         if(message->GetCode(XCode::Failure) == XCode::NetActiveShutdown)
         {
@@ -170,5 +178,11 @@ namespace Sentry
 		}
         CONSOLE_LOG_DEBUG("send message to client " << address << " successful");
 		return XCode::Successful;
+	}
+
+	void OuterNetMessageComponent::OnRecord(Json::Document& document)
+	{
+		document.Add("sum", this->mSumCount);
+		document.Add("wait", this->mWaitCount);
 	}
 }

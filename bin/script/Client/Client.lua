@@ -57,7 +57,7 @@ end
 
 
 function Main.Start()
-    print(Http.Get("http://127.0.0.1:80/server/hotfix"))
+    --print(Http.Get("http://127.0.0.1:80/server/hotfix"))
     loginComponent.Register(account, password, phoneNum)
 
     local loginInfo = loginComponent.Login(account, password)
