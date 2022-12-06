@@ -35,7 +35,7 @@
     "Server":{
         "listen":{
             "rpc": 7788,
-            "http": 8080,
+            "http": 80,
             "gate": 1995,
             "tran":7794,
             "console": 8888

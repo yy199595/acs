@@ -51,7 +51,6 @@ namespace Mongo
             CONSOLE_LOG_INFO( "["<< address << "] mongo user auth successful");
             return;
 		}
-        this->PopMessage();
         assert(this->mRecvBuffer.size() == 0);
         assert(this->mSendBuffer.size() == 0);
         assert(this->mMongoResponse == nullptr);
@@ -208,6 +207,8 @@ namespace Mongo
 			asio::io_service& io = App::Inst()->MainThread();
 			io.post(std::bind(&IRpc<CommandResponse>::OnMessage, this->mComponent, address, response));
 #endif
+			this->PopMessage();
+			this->mMongoResponse = nullptr;
 			this->SendFromMessageQueue();
 		}
 

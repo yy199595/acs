@@ -75,13 +75,15 @@ namespace Sentry
 
 	void TcpRedisClient::OnReadComplete()
 	{
-        std::shared_ptr<RedisResponse> response = std::move(this->mCurResponse);
+        std::shared_ptr<RedisResponse> response = this->mCurResponse;
 #ifdef ONLY_MAIN_THREAD
 		this->mRedisComponent->OnMessage(id, response);
 #else
 		asio::io_service & io = App::Inst()->MainThread();
 		io.post(std::bind(&IRpc<RedisResponse>::OnMessage, this->mComponent, this->mAddress, response));
 #endif
+		this->PopMessage();
+		this->mCurResponse = nullptr;
 		this->SendFromMessageQueue();
 	}
 
@@ -97,7 +99,6 @@ namespace Sentry
             this->SendFromMessageQueue();
             return;
         }
-		assert(this->PopMessage() == message);
 		std::shared_ptr<RedisRequest> request = std::static_pointer_cast<RedisRequest>(message);
 		this->mCurResponse = std::make_shared<RedisResponse>(request->GetTaskId());
         this->ReceiveLine();

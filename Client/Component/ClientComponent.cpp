@@ -139,7 +139,7 @@ namespace Client
 
 	bool ClientComponent::New(const std::string& ip, unsigned short port)
 	{
-        if (this->mTcpClient == nullptr)
+        if (this->mTcpClient != nullptr)
         {
             return false;
         }
