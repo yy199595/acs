@@ -67,18 +67,13 @@ function Main.Start()
     end
 
     table.print(loginInfo)
+    local token = loginInfo.data.token
     local address = loginInfo.data.address
-    if not Client.Connect(address) then
+    if not Client.New(address, token) then
         Log.Error("连接网关服务器 [" , address, "] 失败")
         return false
     end
     Log.Debug("连接网关服务器[" , address, "]成功")
-
-    local code, _ = Client.Auth(loginInfo.data.token)
-    if code ~= XCode.Successful then
-        Log.Error("user auth failure")
-        return false
-    end
     return true
 end
 

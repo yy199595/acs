@@ -69,22 +69,23 @@ namespace Sentry
 
     public:
         bool IsLuaMethod() const { return false; }
-        XCode Invoke(const Http::Request & request, Http::Response & response)
+        XCode Invoke(const Http::Request& request, Http::Response& response)
         {
+            XCode code = XCode::Failure;
             std::unique_ptr<Json::Reader> document1(new Json::Reader());
             std::unique_ptr<Json::Document> document(new Json::Document());
-            if(!request.WriteDocument(document1.get()))
+            if (!request.WriteDocument(document1.get()))
             {
                 document->Add("error", "parse json error");
                 document->Add("code", (int)XCode::ParseJsonFailure);
+                response.Json(HttpStatus::OK, *document);
                 return XCode::ParseJsonFailure;
             }
-            XCode code = XCode::Failure;
             try
             {
                 code = (this->mObj->*mFunction)(*document1);
             }
-            catch (std::exception & e)
+            catch (std::exception& e)
             {
                 code = XCode::ThrowError;
                 document->Add("error", e.what());
@@ -112,22 +113,23 @@ namespace Sentry
         bool IsLuaMethod() const { return false; }
         XCode Invoke(const Http::Request & request, Http::Response & response)
         {
+            XCode code = XCode::Failure;
             std::unique_ptr<Json::Reader> document1(new Json::Reader());
             std::unique_ptr<Json::Document> document(new Json::Document());
             if(!request.WriteDocument(document1.get()))
             {
                 document->Add("error", "parse json error");
                 document->Add("code", (int)XCode::ParseJsonFailure);
+                response.Json(HttpStatus::OK, *document);
                 return XCode::ParseJsonFailure;
             }
-            XCode code = XCode::Failure;
+            std::unique_ptr<Json::Document> document2(new Json::Document());
             try
             {
-                std::unique_ptr<Json::Document> document2(new Json::Document());
                 code = (this->mObj->*mFunction)(*document1, *document2);
                 if(code == XCode::Successful)
                 {
-                    document->Add("data", *document2);
+                    document->Add("data", std::move(document2));
                 }
             }
             catch(std::exception & e)
@@ -159,23 +161,23 @@ namespace Sentry
         XCode Invoke(const Http::Request & request, Http::Response & response)
         {
             XCode code = XCode::Failure;
-            std::unique_ptr<Json::Document> document(new Json::Document());
+            std::unique_ptr<Json::Document> document1(new Json::Document());
+            std::unique_ptr<Json::Document> document2(new Json::Document());
             try
             {
-                std::unique_ptr<Json::Document> document2(new Json::Document());
                 code = (this->mObj->*mFunction)(*document2);
                 if(code == XCode::Successful)
                 {
-                    document->Add("data", *document2);
+                    document1->Add("data", std::move(document2));
                 }
             }
             catch(std::exception & e)
             {
                 code = XCode::ThrowError;
-                document->Add("error", e.what());
+                document1->Add("error", e.what());
             }
-            document->Add("code", (int)code);
-            response.Json(HttpStatus::OK, *document);
+            document1->Add("code", (int)code);
+            response.Json(HttpStatus::OK, *document1);
             return code;
         }
 

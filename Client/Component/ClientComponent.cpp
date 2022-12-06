@@ -35,6 +35,7 @@ namespace Client
 {
 	ClientComponent::ClientComponent()
 	{
+        this->mIndex = 0;
         this->mTimerComponent = nullptr;
 	}
 
@@ -136,20 +137,22 @@ namespace Client
 		}
 	}
 
-	bool ClientComponent::StartConnect(const std::string& ip, unsigned short port)
+	bool ClientComponent::New(const std::string& ip, unsigned short port)
 	{
+        if (this->mTcpClient == nullptr)
+        {
+            return false;
+        }
         NetThreadComponent * netComponent = this->GetComponent<NetThreadComponent>();
 		std::shared_ptr<SocketProxy> socketProxy = netComponent->CreateSocket(ip, port);
 		this->mTcpClient = std::make_shared<TcpRpcClientContext>(socketProxy, this);
-
-		return true;
+        return true;
 	}
 
 	void ClientComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
 	{
 		luaRegister.BeginNewTable("Client");
-		luaRegister.PushExtensionFunction("Call", Lua::ClientEx::Call);
-        luaRegister.PushExtensionFunction("Auth", Lua::ClientEx::Auth);
-        luaRegister.PushExtensionFunction("Connect", Lua::ClientEx::StartConnect);
+        luaRegister.PushExtensionFunction("New", Lua::ClientEx::New);
+		luaRegister.PushExtensionFunction("Call", Lua::ClientEx::Call);      
 	}
 }

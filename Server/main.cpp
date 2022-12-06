@@ -129,6 +129,7 @@ void RegisterServiceComponent()
 }
 int main(int argc, char **argv)
 {
+
 #ifdef __OS_WIN__
     system("chcp 65001 > nul"); 
 #endif

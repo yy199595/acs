@@ -28,7 +28,6 @@ function Main.StartInsert()
 end
 
 function Main.OnClusterComplete()
-    local code = Mongo.Delete("user.account_info", {}, 100)
-    print("remove code = " .. code)
+    Mongo.ClearTable("user.account_info")
 end
 return Main

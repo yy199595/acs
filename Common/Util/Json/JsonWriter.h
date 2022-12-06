@@ -7,6 +7,7 @@
 #include<list>
 #include<string>
 #include<vector>
+#include<memory>
 #include<ostream>
 #include"XCode/XCode.h"
 #include"rapidjson/writer.h"
@@ -72,13 +73,13 @@ namespace Json
         Document & Add(const char * key, float value);
         Document & Add(const char * key, double value);
         Document & Add(const char * key, long long value);
-        Document & Add(const char * key, Document & value);
         Document & Add(const char * key, const char * value);
         Document & Add(const char * key, unsigned int value);
         Document & Add(const char * key, unsigned long long value);
         Document & Add(const char * key, const std::string & value);
-        Document & Add(const char * key, rapidjson::Document & value);
+		Document& Add(const char* key, std::unique_ptr<Document> value);
         Document & Add(const char * key, const char * value, size_t len);
+		Document& Add(const char* key, std::unique_ptr<rapidjson::Document> value);
 
     public:
         const rapidjson::Value * Get(const char * key) const;
@@ -88,6 +89,9 @@ namespace Json
 
     public:
         std::string * Serialize(std::string * json);
+	private:
+		std::list<std::unique_ptr<Document>> mChaches1;
+		std::list<std::unique_ptr<rapidjson::Document>> mChaches2;
     };
 }
 #endif //_JSONWRITER_H_

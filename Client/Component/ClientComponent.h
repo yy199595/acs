@@ -45,7 +45,7 @@ namespace Client
         ~ClientComponent() final = default;
     public:
         void OnRequest(std::shared_ptr<c2s::rpc::call> t1);
-		bool StartConnect(const std::string & ip, unsigned short port);
+		bool New(const std::string & ip, unsigned short port);
 		std::shared_ptr<Rpc::Packet> Call(std::shared_ptr<Rpc::Packet> request);
         void OnMessage(const std::string &address, std::shared_ptr<Rpc::Packet> message) final;
     protected:
@@ -57,8 +57,9 @@ namespace Client
         void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
         void OnCloseSocket(const std::string &address, XCode code) final;
     private:
+        unsigned int mIndex;
         TimerComponent *mTimerComponent;
         std::shared_ptr<TcpRpcClientContext> mTcpClient;
-		std::unordered_map<long long, long long> mTimers;
+		std::unordered_map<long long, long long> mTimers;      
     };
 }

@@ -112,22 +112,24 @@ namespace Sentry
         {
             if(!methodConfig->Response.empty())
             {
-                rapidjson::Document json;
+                std::unique_ptr<rapidjson::Document> json
+                    = std::make_unique<rapidjson::Document>();
                 const std::string &str = data->GetBody();
-                if (json.Parse(str.c_str(), str.size()).HasParseError())
+                if (json->Parse(str.c_str(), str.size()).HasParseError())
                 {
                     throw std::logic_error("failed to parse the returned data");
                 }
-                document->Add("message", json);
+                document->Add("message", std::move(json));
             }
             else if(data->GetBody().empty())
             {
-                rapidjson::Document json;
+                std::unique_ptr<rapidjson::Document> json
+                    = std::make_unique<rapidjson::Document>();
                 const char * str = data->GetBody().c_str();
                 const size_t length = data->GetBody().size();
-                if(!json.Parse(str, length).HasParseError())
+                if(!json->Parse(str, length).HasParseError())
                 {
-                    document->Add("data", json);
+                    document->Add("data", std::move(json));
                 }
             }
         }

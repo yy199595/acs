@@ -84,6 +84,9 @@ namespace Sentry
         if (!System::Init(argc, argv))
         {
             CONSOLE_LOG_FATAL("start failure");
+#ifdef __OS_WIN__
+            return getchar();
+#endif
             return -1;
         }
         std::string name = argc >= 3 ? argv[2] : "Server";
@@ -91,12 +94,20 @@ namespace Sentry
 
         if (!serverConfig->LoadConfig(System::ConfigPath()))
         {
-            return false;
+            CONSOLE_LOG_FATAL("load server config error");
+#ifdef __OS_WIN__
+            return getchar();
+#endif
+            return -2;
         }
         this->mMainContext = std::make_unique<Asio::Context>();
         if (!this->LoadComponent())
         {
             this->GetLogger()->SaveAllLog();
+            CONSOLE_LOG_FATAL("load component error");
+#ifdef __OS_WIN__
+            return getchar();
+#endif
             return -1;
         }
         Asio::ContextWork work(*this->mMainContext);
@@ -166,7 +177,11 @@ namespace Sentry
             }
             std::this_thread::sleep_for(sleepTime);
         }
+#ifdef __OS_WIN__
+        return std::getchar();
+#else
         return 0;
+#endif // 
     }
 
 	void App::Stop()

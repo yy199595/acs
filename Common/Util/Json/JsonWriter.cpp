@@ -269,16 +269,19 @@ namespace Json
     Document &Document::Add(const char *key, const char *value, size_t size)
     {
         rapidjson::GenericStringRef<char> name(key);
-        this->AddMember(name, rapidjson::StringRef(value, size),
-                                  this->GetAllocator());
+		rapidjson::Value jsonString(value, size);
+        this->AddMember(name, jsonString, this->GetAllocator());
         return *this;
     }
 
     Document &Document::Add(const char *key, const std::string &value)
     {
         rapidjson::GenericStringRef<char> name(key);
-        this->AddMember(name, rapidjson::StringRef(
-            value.c_str(), value.size()),this->GetAllocator());
+		rapidjson::Value jsonString(rapidjson::Type::kStringType);	
+		jsonString.SetString(value.c_str(), value.size(), this->GetAllocator());
+
+
+        this->AddMember(name, jsonString.Move(), this->GetAllocator());
         return *this;
     }
 
@@ -314,17 +317,19 @@ namespace Json
         return *this;
     }
 
-    Document &Document::Add(const char *key, Document &value)
+    Document &Document::Add(const char *key, std::unique_ptr<Document> value)
     {
-        rapidjson::GenericStringRef<char> name(key);
-        this->AddMember(name, (rapidjson::Document&)value, this->GetAllocator());
+        rapidjson::GenericStringRef<char> name(key);		
+        this->AddMember(name, (rapidjson::Document&)*value, this->GetAllocator());
+		this->mChaches1.push_back(std::move(value));
         return *this;
     }
 
-    Document &Document::Add(const char *key, rapidjson::Document &value)
+    Document &Document::Add(const char *key, std::unique_ptr<rapidjson::Document> value)
     {
         rapidjson::GenericStringRef<char> name(key);
-        this->AddMember(name, value, this->GetAllocator());
+        this->AddMember(name, *value, this->GetAllocator());
+		this->mChaches2.push_back(std::move(value));
         return *this;
     }
 
@@ -333,7 +338,7 @@ namespace Json
         rapidjson::StringBuffer buffer;
         rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
         this->Accept(writer);
-        json->append(buffer.GetString(), buffer.GetLength());
+        json->assign(buffer.GetString(), buffer.GetLength());
         return json;
     }
 

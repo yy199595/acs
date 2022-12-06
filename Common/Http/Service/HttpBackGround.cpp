@@ -78,9 +78,10 @@ namespace Sentry
                 {
                     continue;
                 }
-                Json::Document document1;
-                serverRecord->OnRecord(document1);
-                response.Add(component->GetName().c_str(), document1);
+                std::unique_ptr<Json::Document> document1(new Json::Document());
+                serverRecord->OnRecord(*document1);
+                const char* key = component->GetName().c_str();
+                response.Add(key, std::move(document1));
             }
         }
         return XCode::Successful;

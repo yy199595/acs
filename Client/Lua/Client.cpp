@@ -41,7 +41,7 @@ namespace Lua
         if (lua_istable(lua, 2) && !methodConfig->Request.empty())
         {
             const std::string& name = methodConfig->Request;
-            std::shared_ptr<Message> message = messageComponent->Read(lua, name, 3);
+            std::shared_ptr<Message> message = messageComponent->Read(lua, name, 2);
             if (message == nullptr || !request->WriteMessage(message.get()))
             {
                 LOG_ERROR("write request message error : [" << func << "]");
@@ -81,47 +81,35 @@ namespace Lua
 		return luaWaitTaskSource->Await();
 	}
 
-    int ClientEx::Auth(lua_State *lua)
+    int ClientEx::New(lua_State* lua)
     {
+        std::string ip;
+        unsigned short port;
         lua_pushthread(lua);
         ClientComponent* clientComponent = App::Inst()->GetComponent<ClientComponent>();
-        if (clientComponent == nullptr)
+        const std::string address = CommonParameter::Read<std::string>(lua, 1);
+        if (!Helper::String::ParseIpAddress(address, ip, port))
         {
-            luaL_error(lua, "not find ClientComponent");
+            luaL_error(lua, "parse ip address [%s] error", address.c_str());
             return 0;
         }
+        std::string token(luaL_checkstring(lua, 2));
         std::shared_ptr<Rpc::Packet> request(new Rpc::Packet());
-
-        request->SetType(Tcp::Type::Auth);
-        std::string token(luaL_checkstring(lua, 1));
-        request->GetHead().Add("token", token);
+        {
+            request->SetType(Tcp::Type::Auth);
+            request->GetHead().Add("token", token);
+        }
+        clientComponent->New(ip, port);
+        TaskComponent* taskComponent = App::Inst()->GetTaskComponent();
         std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
 
-        TaskComponent *taskComponent = App::Inst()->GetTaskComponent();
-        taskComponent->Start([request, clientComponent, luaWaitTaskSource]() {
-            XCode code = XCode::Failure;
-            std::shared_ptr<Rpc::Packet> response = clientComponent->Call(request);
-            if(response != nullptr)
-            {
-                code = response->GetCode(XCode::Failure);
-            }
-            luaWaitTaskSource->SetResult(code, nullptr);
-        });
+        taskComponent->Start([request, clientComponent, luaWaitTaskSource]()
+            {              
+                std::shared_ptr<Rpc::Packet> response = clientComponent->Call(request);
+                XCode code = response != nullptr ? response->GetCode(XCode::Failure) : XCode::Failure;
+                
+                luaWaitTaskSource->SetResult<bool>(code == XCode::Successful);
+            });
         return luaWaitTaskSource->Await();
     }
-
-	int ClientEx::StartConnect(lua_State* lua)
-	{
-		std::string ip;
-		unsigned short port;
-		lua_pushthread(lua);
-        ClientComponent* clientComponent = App::Inst()->GetComponent<ClientComponent>();
-		const std::string address = CommonParameter::Read<std::string>(lua, 1);
-		if(!Helper::String::ParseIpAddress(address, ip, port))
-		{
-			luaL_error(lua, "parse ip address [%s] error", address.c_str());
-			return 0;
-		}
-		return clientComponent->StartConnect(ip, port);
-	}
 }

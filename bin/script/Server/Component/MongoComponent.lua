@@ -1,7 +1,5 @@
 
 local MongoComponent = {}
-MongoComponent.Counters = { }
-
 local this = MongoComponent
 function MongoComponent.InsertOnce(tab, data, flag)
     if type(data) == "table" then
@@ -27,6 +25,11 @@ function MongoComponent.Delete(tab, data, limit, flag)
         limit = limit or 1,
         flag = flag or 0
     })
+end
+
+function MongoComponent.ClearTable(tab)
+    assert(type(tab) == "string")
+    return this.Delete(tab, {}, 0) == XCode.Successful
 end
 
 function MongoComponent.QueryOnce(tab, data)
