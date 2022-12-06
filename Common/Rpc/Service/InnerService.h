@@ -5,6 +5,7 @@
 #ifndef APP_INNERSERVICE_H
 #define APP_INNERSERVICE_H
 #include"LocalRpcService.h"
+#include"google/protobuf/wrappers.pb.h"
 namespace Sentry
 {
     class InnerService : public LocalRpcService
@@ -19,6 +20,7 @@ namespace Sentry
         XCode LoadConfig();
         XCode Join(const s2s::cluster::join & request); //新服务器加入
         XCode Exit(const s2s::cluster::exit & response); //新服务器加入
+		XCode RunInfo(google::protobuf::StringValue & response); // 获取运行信息
 	 private:
         void Init() final;
         bool OnStart() final;

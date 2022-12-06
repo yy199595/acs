@@ -230,12 +230,7 @@ namespace Sentry
 	 public:
 		XCode Invoke(Rpc::Packet & message) override
 		{
-			std::unique_ptr<T1> request(new T1());
-            if(!message.ParseMessage(request.get()))
-            {
-                return XCode::CallArgsError;
-            }
-            message.Clear();
+			std::unique_ptr<T1> response(new T1());
             if (this->mHasUserId)
 			{
                 long long userId = 0;
@@ -243,9 +238,21 @@ namespace Sentry
                 {
                     return XCode::CallArgsError;
                 }
-				return (_o->*_objfunc)(userId, *request);
+				XCode code = (_o->*_objfunc)(userId, *response);
+				if(code == XCode::Successful)
+				{
+					message.WriteMessage(response.get());
+					return XCode::Successful;
+				}
+				return code;
 			}
-			return (_o->*_func)(*request);
+			XCode code = (_o->*_func)(*response);
+			if(code == XCode::Successful)
+			{
+				message.WriteMessage(response.get());
+				return XCode::Successful;
+			}
+			return code;
 		}
 		bool IsLuaMethod() override
 		{

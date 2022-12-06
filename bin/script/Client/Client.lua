@@ -88,7 +88,7 @@ Main.Update = function(tick)
             coroutine.start(CallMongo)      
         end
         for i = 1, 10 do
-            coroutine.start(TestHttp)     
+            --coroutine.start(TestHttp)
         end
     end)
 

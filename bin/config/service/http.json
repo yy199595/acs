@@ -16,7 +16,7 @@
 	"HttpBackGround": {
 		"Info": {
 			"Type": "GET",
-			"Async": false,
+			"Async": true,
 			"Path": "/server/info"
 		},
 		"Ping": {
@@ -27,7 +27,7 @@
 		"Hello": {
 			"Type": "GET",
 			"Async": false,
-			"Path": "/"
+			"Path": "/server/hello"
 		},
 		"DownLoad": {
 			"Type": "GET",

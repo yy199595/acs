@@ -24,7 +24,8 @@ namespace Sentry
         BIND_COMMON_RPC_METHOD(InnerService::Exit);
         BIND_COMMON_RPC_METHOD(InnerService::Stop);
         BIND_COMMON_RPC_METHOD(InnerService::Hotfix);
-        BIND_COMMON_RPC_METHOD(InnerService::LoadConfig);
+		BIND_COMMON_RPC_METHOD(InnerService::RunInfo);
+		BIND_COMMON_RPC_METHOD(InnerService::LoadConfig);
 		this->mLocationComponent = this->GetComponent<LocationComponent>();
         return true;
     }
@@ -84,6 +85,35 @@ namespace Sentry
         }
         return XCode::Successful;
     }
+
+	XCode InnerService::RunInfo(google::protobuf::StringValue& response)
+	{
+		Json::Document document;
+		std::vector<Component *> components;
+		this->mApp->GetComponents(components);
+		for(Component * component : components)
+		{
+			IServerRecord * serverRecord = component->Cast<IServerRecord>();
+			if(serverRecord != nullptr)
+			{
+				IServiceBase * serviceBase = component->Cast<IServiceBase>();
+				if(serviceBase != nullptr && !serviceBase->IsStartService())
+				{
+					continue;
+				}
+				std::unique_ptr<Json::Document> document1(new Json::Document());
+				{
+					serverRecord->OnRecord(*document1);
+					const char* key = component->GetName().c_str();
+					document.Add(key, std::move(document1));
+				}
+			}
+		}
+		std::string json;
+		document.Serialize(&json);
+		response.set_value(json);
+		return XCode::Successful;
+	}
 
     XCode InnerService::Hotfix()
     {

@@ -123,20 +123,20 @@ namespace Sentry
 	XCode RpcService::Call(const std::string & address, const string& func, std::shared_ptr<Message> response)
 	{
 		assert(response != nullptr);
-        std::shared_ptr<Rpc::Packet> data = this->CallAwait(address, func, nullptr);
-        if(data == nullptr)
-        {
-            return XCode::Failure;
-        }
-        if(data->GetCode(XCode::Failure) == XCode::Successful)
-        {
-            if (!data->ParseMessage(response.get()))
-            {
-                return XCode::ParseMessageError;
-            }
-            return XCode::Successful;
-        }
-        return data->GetCode(XCode::Failure);
+		std::shared_ptr<Rpc::Packet> data = this->CallAwait(address, func, nullptr);
+		if (data == nullptr)
+		{
+			return XCode::Failure;
+		}
+		if (data->GetCode() != XCode::Successful)
+		{
+			return data->GetCode();
+		}
+		if (!data->ParseMessage(response.get()))
+		{
+			return XCode::ParseMessageError;
+		}
+		return XCode::Successful;
 	}
 
 

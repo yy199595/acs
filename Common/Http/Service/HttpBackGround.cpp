@@ -5,6 +5,7 @@
 #include"System/System.h"
 #include"Config/CodeConfig.h"
 #include"Service/InnerService.h"
+#include"google/protobuf/wrappers.pb.h"
 #include"Component/LocationComponent.h"
 namespace Sentry
 {
@@ -66,25 +67,36 @@ namespace Sentry
 
     XCode HttpBackGround::Info(Json::Document &response)
     {
-        std::vector<Component *> components;
-        this->mApp->GetComponents(components);
-        for(Component * component : components)
-        {
-            IServerRecord * serverRecord = component->Cast<IServerRecord>();
-            if(serverRecord != nullptr)
-            {
-                IServiceBase * serviceBase = component->Cast<IServiceBase>();
-                if(serviceBase != nullptr && !serviceBase->IsStartService())
-                {
-                    continue;
-                }
-                std::unique_ptr<Json::Document> document1(new Json::Document());
-                serverRecord->OnRecord(*document1);
-                const char* key = component->GetName().c_str();
-                response.Add(key, std::move(document1));
-            }
-        }
-        return XCode::Successful;
+		InnerService * innerService = this->GetComponent<InnerService>();
+		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
+		if(locationComponent == nullptr)
+		{
+			response.Add("error", "LocationComponent or InnerService Is Null");
+			return XCode::Failure;
+		}
+		std::vector<std::string> locations;
+		locationComponent->GetServers(locations);
+		for(const std::string & location : locations)
+		{
+			std::shared_ptr<google::protobuf::StringValue> resp
+				= std::make_shared<google::protobuf::StringValue>();
+			XCode code = innerService->Call(location, "RunInfo", resp);
+			if(code == XCode::Successful)
+			{
+				const std::string & json = resp->value();
+				std::unique_ptr<rapidjson::Document> document
+					= std::make_unique<rapidjson::Document>();
+				if(!document->Parse(json.c_str(), json.size()).HasParseError())
+				{
+					response.Add(location.c_str(), std::move(document));
+				}
+			}
+			else
+			{
+				response.Add(location.c_str(), CodeConfig::Inst()->GetDesc(code));
+			}
+		}
+		return XCode::Successful;
     }
 
 }

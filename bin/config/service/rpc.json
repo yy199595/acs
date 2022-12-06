@@ -70,6 +70,10 @@
 		"Exit": {
 			"Async": false,
 			"Request": "s2s.cluster.exit"
+		},
+		"RunInfo": {
+			"Async": false,
+			"Response": "google.protobuf.StringValue"
 		}
 	},
 	"UserBehavior": {

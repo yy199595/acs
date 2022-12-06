@@ -59,7 +59,7 @@ namespace Rpc
         static std::shared_ptr<Packet> New(Tcp::Type type, Tcp::Porto proto);
 
     public:
-        XCode GetCode(XCode code) const;
+        XCode GetCode(XCode code = XCode::Failure) const;
 
         Head &GetHead() { return this->mHead; }
 
