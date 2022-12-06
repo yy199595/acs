@@ -1,8 +1,8 @@
 
 local AccountService = {}
 local tabName = "user.account_info"
-local Mongo = LuaRequire("Component.MongoComponent")
-local RedisClient = LuaRequire("Component.RedisComponent")
+local Mongo = require("Component.MongoComponent")
+local RedisClient = require("Component.RedisComponent")
 
 
 function AccountService.Start()
@@ -30,9 +30,7 @@ function AccountService.Register(requestInfo)
     requestInfo._id = requestInfo.account
     requestInfo.token = Md5.ToString(str)
     Log.Info("register account : ", rapidjson.encode(requestInfo))
-    return Mongo.Update(tabName, {
-        _id = requestInfo.account
-    }, requestInfo)
+    return Mongo.InsertOne(tabName, requestInfo)
 end
 
 function AccountService.Login(request)

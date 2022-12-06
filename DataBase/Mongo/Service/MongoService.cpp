@@ -101,7 +101,7 @@ namespace Sentry
 #endif
 			return XCode::Failure;
 		}
-        double res = 0;
+        int res = 0;
         Bson::Reader::Document & result = response->Get();
         if(result.Get("n", res) && res > 0)
         {
