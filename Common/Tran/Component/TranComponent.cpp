@@ -19,7 +19,7 @@ namespace Sentry
 
     bool TranComponent::LateAwake()
     {
-        LOG_CHECK_RET_FALSE(this->StartListen("forward"));
+        LOG_CHECK_RET_FALSE(this->StartListen("tran"));
         this->mLocationComponent = this->GetComponent<LocationComponent>();
         return true;
     }

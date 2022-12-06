@@ -51,12 +51,12 @@ namespace Sentry
             this->mIsClose = false;
             this->mBindAcceptor->listen();
             io.post(std::bind(&TcpListenerComponent::ListenConnect, this));
-            LOG_INFO(this->GetName() << " listen [" << this->mAddress << "] successful");
+            LOG_INFO(this->GetName() << " listen [" << port << "] successful");
             return true;
         }
         catch (std::system_error & err)
         {
-            LOG_ERROR(fmt::format("listen {0} failure {2}", this->mAddress, err.what()));
+            LOG_ERROR(fmt::format("{0}  listen [{1}] failure {2}", this->GetName(), port, err.what()));
             return false;
         }
     }
@@ -86,7 +86,7 @@ namespace Sentry
                 socketProxy->Init();
                 if(!this->OnListen(socketProxy))
                 {
-                    CONSOLE_LOG_ERROR("stop listen " << this->mAddress);
+                    CONSOLE_LOG_ERROR(this->GetName() << " stop listen ...");
                     return ;
                 }
                 CONSOLE_LOG_DEBUG(socketProxy->GetAddress() << " connect to " << this->GetName());

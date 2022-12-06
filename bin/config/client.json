@@ -14,8 +14,8 @@
         "cluster": "config/cluster/client.json"
     },
     "lua": {
-        "common": "script/lua/Common",
-        "module": "script/lua/Client"
+        "common": "script/Common",
+        "module": "script/Client"
     },
     "Client":{
         
