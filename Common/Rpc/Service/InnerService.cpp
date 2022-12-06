@@ -91,6 +91,7 @@ namespace Sentry
 		Json::Document document;
 		std::vector<Component *> components;
 		this->mApp->GetComponents(components);
+		document.Add("server", ServerConfig::Inst()->Name());
 		for(Component * component : components)
 		{
 			IServerRecord * serverRecord = component->Cast<IServerRecord>();
@@ -109,9 +110,7 @@ namespace Sentry
 				}
 			}
 		}
-		std::string json;
-		document.Serialize(&json);
-		response.set_value(json);
+		document.Serialize(response.mutable_value());
 		return XCode::Successful;
 	}
 
