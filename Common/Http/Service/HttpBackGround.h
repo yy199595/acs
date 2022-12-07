@@ -15,12 +15,12 @@ namespace Sentry
     private:     
         bool OnStartService(HttpServiceRegister &serviceRegister) final;
     private:
-        XCode Info(Json::Document & response);
-        XCode Hotfix(Json::Document & response);
+        XCode Info(Json::Writer & response);
+        XCode Hotfix(Json::Writer& response);
         XCode Ping(const Http::Request& request, Http::Response& response);
         XCode Hello(const Http::Request& request, Http::Response& response);
 		XCode DownLoad(const Http::Request& request, Http::Response& response);
-        XCode Sleep(const Json::Reader & request, Json::Document & response);
+        XCode Sleep(const Json::Reader & request, Json::Writer& response);
     };
 }
 

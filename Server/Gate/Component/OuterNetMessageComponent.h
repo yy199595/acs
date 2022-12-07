@@ -25,7 +25,7 @@ namespace Sentry
         XCode OnResponse(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
 		bool LateAwake() final;
-		void OnRecord(Json::Document &document) final;
+		void OnRecord(Json::Writer&document) final;
 	 private:
 		unsigned int mSumCount;
 		unsigned int mWaitCount;

@@ -30,9 +30,9 @@ namespace Sentry
         Lua::LuaModule * luaModule = this->mLuaComponent->GetModule(service);
         if (luaModule == nullptr || !luaModule->GetFunction(this->mConfig->Method))
         {
-            Json::Document document;
-            document.Add("error", "call lua function not existe");
-            document.Add("code", (int)XCode::CallFunctionNotExist);
+            Json::Writer document;
+            document.Add("error").Add("call lua function not existe");
+            document.Add("code").Add((int)XCode::CallFunctionNotExist);
             response.Json(HttpStatus::OK, document);
             return XCode::CallFunctionNotExist;          
         }
@@ -48,9 +48,9 @@ namespace Sentry
         lua_State* lua = this->mLuaComponent->GetLuaEnv();
         if (lua_pcall(lua, 1, 2, 0) != LUA_OK)
         {
-			Json::Document document;
-			document.Add("error", lua_tostring(lua, -1));
-			document.Add("code", (int)XCode::CallLuaFunctionFail);
+			Json::Writer document;
+			document.Add("error").Add(lua_tostring(lua, -1));
+			document.Add("code").Add((int)XCode::CallLuaFunctionFail);
 			response.Json(HttpStatus::OK, document);
 			return XCode::CallLuaFunctionFail;
         }
@@ -78,9 +78,9 @@ namespace Sentry
         Lua::UserDataParameter::Write(lua, luaTaskSource.get());
         if (lua_pcall(lua, 3, 1, 0) != LUA_OK)
         {           
-			Json::Document document;
-			document.Add("error", lua_tostring(lua, -1));
-			document.Add("code", (int)XCode::CallLuaFunctionFail);
+			Json::Writer document;
+			document.Add("error").Add(lua_tostring(lua, -1));
+			document.Add("code").Add((int)XCode::CallLuaFunctionFail);
 			response.Json(HttpStatus::OK, document);
             return XCode::CallLuaFunctionFail;
         }

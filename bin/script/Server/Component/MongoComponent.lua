@@ -5,11 +5,14 @@ function MongoComponent.InsertOnce(tab, data, flag)
     if type(data) == "table" then
         data = rapidjson.encode(data)
     end
+    if flag == nil then
+        flag = type(tab._id) == "number" and tab._id or 0
+    end
     local address = Service.AllotServer("MongoService")
     return Service.Call(address, "MongoService.Insert", {
         tab = tab,
         json = data,
-        flag = flag or 0
+        flag = flag
     })
 end
 
@@ -18,12 +21,15 @@ function MongoComponent.Delete(tab, data, limit, flag)
         data = rapidjson.encode(data)
     end
     assert(type(data) == "string")
+    if flag == nil then
+        flag = type(tab._id) == "number" and tab._id or 0
+    end
     local address = Service.AllotServer("MongoService")
     return Service.Call(address, "MongoService.Delete", {
         tab = tab,
         json = data,
         limit = limit or 1,
-        flag = flag or 0
+        flag = flag
     })
 end
 
@@ -122,13 +128,16 @@ function MongoComponent.Update(tab, select, update, tag, flag)
     end
     assert(type(select) == "string")
     assert(type(update) == "string")
+    if flag == nil then
+        flag = type(tab._id) == "number" and tab._id or 0
+    end
     local address = Service.AllotServer("MongoService")
     return Service.Call(address, "MongoService.Update", {
         tab = tab,
         select = select,
         update = update,
         tag = tag or "$set",
-        flag = flag or 0
+        flag = flag
     })
 end
 

@@ -88,12 +88,13 @@ namespace Sentry
 
 	XCode InnerService::RunInfo(google::protobuf::StringValue& response)
 	{
-		Json::Document document;
+		Json::Writer document;
 		std::vector<Component *> components;
 		this->mApp->GetComponents(components);
-		document.Add("server", ServerConfig::Inst()->Name());
+		document.Add("server").Add(ServerConfig::Inst()->Name());
 		for(Component * component : components)
 		{
+            const char* key = component->GetName().c_str();
 			IServerRecord * serverRecord = component->Cast<IServerRecord>();
 			if(serverRecord != nullptr)
 			{
@@ -102,15 +103,12 @@ namespace Sentry
 				{
 					continue;
 				}
-				std::unique_ptr<Json::Document> document1(new Json::Document());
-				{
-					serverRecord->OnRecord(*document1);
-					const char* key = component->GetName().c_str();
-					document.Add(key, std::move(document1));
-				}
+                document.BeginObject(key);
+                serverRecord->OnRecord(document);
+                document.Add(Json::End::EndObject);				
 			}
 		}
-		document.Serialize(response.mutable_value());
+		document.WriterStream(*response.mutable_value());
 		return XCode::Successful;
 	}
 

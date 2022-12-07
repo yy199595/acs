@@ -26,13 +26,13 @@ namespace Sentry
         return XCode::Successful;
     }
 
-	XCode HttpBackGround::Hotfix(Json::Document &response)
+	XCode HttpBackGround::Hotfix(Json::Writer&response)
 	{
 		InnerService * innerService = this->GetComponent<InnerService>();
 		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
 		if(locationComponent == nullptr || innerService == nullptr)
 		{
-			response.Add("error", "LocationComponent or InnerService Is Null");
+			response.Add("error").Add("LocationComponent or InnerService Is Null");
 			return XCode::Failure;
 		}
 		std::vector<std::string> locations;
@@ -40,17 +40,17 @@ namespace Sentry
 		for(const std::string & location : locations)
 		{
 			XCode code = innerService->Call(location, "Hotfix");
-            response.Add(location.c_str(), CodeConfig::Inst()->GetDesc(code));
+            response.Add(location.c_str()).Add(CodeConfig::Inst()->GetDesc(code));
 		}
 		return XCode::Successful;
 	}
 
-	XCode HttpBackGround::Sleep(const Json::Reader &request, Json::Document &response)
+	XCode HttpBackGround::Sleep(const Json::Reader &request, Json::Writer&response)
     {
         std::string time;
         request.GetMember("time", time);
         this->mApp->GetTaskComponent()->Sleep(std::stoi(time));
-        response.Add("time", std::stoi(time));
+        response.Add("time").Add(std::stoi(time));
         return XCode::Successful;
     }
 
@@ -65,13 +65,13 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode HttpBackGround::Info(Json::Document &response)
+    XCode HttpBackGround::Info(Json::Writer&response)
     {
 		InnerService * innerService = this->GetComponent<InnerService>();
 		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
 		if(locationComponent == nullptr)
 		{
-			response.Add("error", "LocationComponent or InnerService Is Null");
+			response.Add("error").Add("LocationComponent or InnerService Is Null");
 			return XCode::Failure;
 		}
 		std::vector<std::string> locations;
@@ -83,17 +83,17 @@ namespace Sentry
 			XCode code = innerService->Call(location, "RunInfo", resp);
 			if(code == XCode::Successful)
 			{
-				const std::string & json = resp->value();
-				std::unique_ptr<rapidjson::Document> document
-					= std::make_unique<rapidjson::Document>();
-				if(!document->Parse(json.c_str(), json.size()).HasParseError())
+				rapidjson::Document document;
+				const std::string & json = resp->value();				
+				if(!document.Parse(json.c_str(), json.size()).HasParseError())
 				{
-					response.Add(location.c_str(), std::move(document));
+					response.Add(location.c_str()).Add(document);
 				}
 			}
 			else
 			{
-				response.Add(location.c_str(), CodeConfig::Inst()->GetDesc(code));
+				std::string desc = CodeConfig::Inst()->GetDesc(code);
+				response.Add(location.c_str()).Add(desc);
 			}
 		}
 		return XCode::Successful;

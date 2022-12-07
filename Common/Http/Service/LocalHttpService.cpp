@@ -64,10 +64,10 @@ namespace Sentry
         return true;
     }
 
-    void LocalHttpService::OnRecord(Json::Document &document)
+    void LocalHttpService::OnRecord(Json::Writer&document)
     {
-        document.Add("sum", this->mSumCount);
-        document.Add("wait", this->mWaitCount);
+        document.Add("sum").Add(this->mSumCount);
+        document.Add("wait").Add(this->mWaitCount);
     }
 
 	bool LocalHttpService::Start()

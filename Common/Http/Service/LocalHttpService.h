@@ -26,7 +26,7 @@ namespace Sentry
         bool Close() final;
 		bool LoadFromLua() final;
 		bool LateAwake() override;
-        void OnRecord(Json::Document &document) final;
+        void OnRecord(Json::Writer&document) final;
 		bool IsStartService() final { return this->mServiceRegister != nullptr;}
 		XCode Invoke(const std::string & name, std::shared_ptr<Http::Request>, std::shared_ptr<Http::Response>) final;
 	 private:

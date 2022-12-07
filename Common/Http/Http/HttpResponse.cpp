@@ -65,10 +65,10 @@ namespace Http
         this->mContent.append(str.c_str(), str.size());
     }
 
-    void Response::Json(HttpStatus code, Json::Document &doc)
+    void Response::Json(HttpStatus code, Json::Writer& doc)
     {
         this->mCode = (int)code;
-        doc.Serialize(&this->mContent);
+        doc.WriterStream(this->mContent);
         this->mHead.Add("content-type", "application/json");
     }
 

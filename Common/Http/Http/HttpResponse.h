@@ -20,7 +20,7 @@ namespace Http
     public:
         void SetCode(HttpStatus code) { this->mCode = (int)code;}
         void Str(HttpStatus code, const std::string & str);
-        void Json(HttpStatus code, Json::Document & doc);
+        void Json(HttpStatus code, Json::Writer & doc);
         void Json(HttpStatus code, const std::string & json);
         void Json(HttpStatus code, const char * str, size_t len);
     public:

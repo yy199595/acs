@@ -106,10 +106,10 @@ namespace Sentry
 		return true;
 	}
 
-    void LocalRpcService::OnRecord(Json::Document &document)
-    {
-        document.Add("sum", this->mSumCount);
-        document.Add("wait", this->mWaitCount);
+    void LocalRpcService::OnRecord(Json::Writer&document)
+    {    
+        document.Add("sum").Add(this->mSumCount);
+        document.Add("wait").Add(this->mWaitCount);
     }
 
     bool LocalRpcService::LoadFromLua()

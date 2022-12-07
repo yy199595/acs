@@ -32,17 +32,16 @@ end
 
 function coroutine.http(func, request, taskSource)
     local context = function()
-        local tab = {}
-        local state, error, response = pcall(func, request)
+        local response = {}
+        local state, error = pcall(func, request, response)
         if not state then
-            tab.error = error
+            response.error = error
             Log.SystemError(error);
-            tab.code = XCode.CallLuaFunctionFail
+            response.code = XCode.CallLuaFunctionFail
         else
-            tab.code = error
-            tab.data = response
+            response.code = error
         end
-        taskSource:SetHttp(tab.code, tab)
+        taskSource:SetHttp(response.code, response)
     end
     coroutine.start(context)
 end

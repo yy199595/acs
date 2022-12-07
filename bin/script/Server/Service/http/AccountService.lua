@@ -10,7 +10,7 @@ function AccountService.Start()
     return true
 end
 
-function AccountService.Register(requestInfo)
+function AccountService.Register(requestInfo, response)
     assert(requestInfo.account, "register account is nil")
     assert(requestInfo.password, "register password is nil")
     assert(requestInfo.phone_num, "register phone number is nil")
@@ -18,6 +18,7 @@ function AccountService.Register(requestInfo)
         _id = requestInfo.account
     })
     if userInfo ~= nil then
+        response.error = "账号已经存在"
         return XCode.AccountAlreadyExists
     end
     local nowTime = os.time()
@@ -30,10 +31,10 @@ function AccountService.Register(requestInfo)
     requestInfo._id = requestInfo.account
     requestInfo.token = Md5.ToString(str)
     Log.Info("register account : ", rapidjson.encode(requestInfo))
-    return Mongo.InsertOnce(tabName, requestInfo)
+    return Mongo.InsertOnce(tabName, requestInfo, requestInfo.user_id)
 end
 
-function AccountService.Login(request)
+function AccountService.Login(request, response)
 
     assert(type(request.account) == "string", "user account is not string")
     assert(type(request.password) == "string", "user password is not string")
@@ -43,19 +44,21 @@ function AccountService.Login(request)
     })
     table.print(userInfo)
     if userInfo == nil or request.password ~= userInfo.password then
-        assert(false, request.account .. " : 账号不存在或者密码错误")
+        response.error = "账号不存在或者密码错误"
         return XCode.Failure
     end
     local address = Service.AllotServer("OuterService")
-    local code, response = Service.Call(address, "OuterService.Allot", {
+    local code, data = Service.Call(address, "OuterService.Allot", {
         value = userInfo.user_id
     })
-    if code ~= XCode.Successful then
+    if code ~= XCode.Successful or data == nil then
+        response.error = "分配网关失败"
         return XCode.AllotUser
     end
     Mongo.Update(tabName, { _id = request.account },
-                {  last_login_time = os.time(),  token = response.token })
-    return XCode.Successful, response
+                {  last_login_time = os.time(),  token = response.token }, userInfo.user_id)
+    response.data = data
+    return XCode.Successful
 end
 
 return AccountService

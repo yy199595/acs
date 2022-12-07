@@ -11,29 +11,30 @@ end
 
 function MysqlComponent.Add(tabName, data, flag)
     assert(type(data) == "table")
+    assert(type(flag) == "number")
     assert(type(tabName) == "string")
-
     local address = Service.AllotLocation()
     return Service.Call(address, "MysqlService.Add",  {
         table = tabName,
-        flag = flag or 0,
+        flag = flag,
         data = Proto.New(tabName, data)
     })
 end
 
 function MysqlComponent.Delete(tabName, where, flag)
     assert(type(where) == "table")
+    assert(type(flag) == "number")
     assert(type(tabName) == "string")
 
     local address = Service.AllotLocation("MysqlService")
     return Service.Call(address, "MysqlService.Delete", {
         table = tabName,
-        flag = flag or 0,
+        flag = flag,
         where_json = rapidjson.encode(where)
     })
 end
 
-function MysqlComponent.QueryOnce(tabName, where, flag)
+function MysqlComponent.QueryOnce(tabName, where)
     assert(type(where) == "table")
     assert(type(tabName) == "string")
 
@@ -94,13 +95,14 @@ end
 
 function MysqlComponent.Update(tabName, where, update, flag)
     assert(type(where) == "table")
+    assert(type(flag) == "number")
     assert(type(update) == "table")
     assert(type(tabName) == "string")
 
     local address = Service.AllotLocation("MysqlService")
     return Service.Call(address, "MysqlService.Update", {
+        flag = flag,
         table = tabName,
-        flag = flag or 0,
         where_json = rapidjson.encode(where),
         update_json = rapidjson.encode(update)
     })

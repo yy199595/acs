@@ -22,11 +22,11 @@ namespace Sentry
     {
         std::string value, func;
         std::vector<std::string> splits;
-        std::shared_ptr<Json::Document> document = std::make_shared<Json::Document>();
+        std::shared_ptr<Json::Writer> document = std::make_shared<Json::Writer>();
         if (Helper::String::Split(request.Path(), "/", splits) < 2)
         {            
-            document->Add("code", (int) XCode::CallArgsError);
-            document->Add("error", CodeConfig::Inst()->GetDesc(XCode::CallArgsError));
+            document->Add("code").Add((int)XCode::CallArgsError);
+            document->Add("error").Add(CodeConfig::Inst()->GetDesc(XCode::CallArgsError));
             response.Json(HttpStatus::OK, *document);
             return XCode::CallArgsError;
         }
@@ -35,16 +35,16 @@ namespace Sentry
         const RpcServiceConfig *rpcServiceConfig = RpcConfig::Inst()->GetConfig(service);
         if (rpcServiceConfig == nullptr)
         {          
-            document->Add("code", (int) XCode::CallServiceNotFound);
-            document->Add("error", CodeConfig::Inst()->GetDesc(XCode::CallServiceNotFound));
+            document->Add("code").Add((int) XCode::CallServiceNotFound);
+            document->Add("error").Add(CodeConfig::Inst()->GetDesc(XCode::CallServiceNotFound));
             response.Json(HttpStatus::OK, *document);
             return XCode::CallServiceNotFound;
         }
         const RpcMethodConfig *methodConfig = rpcServiceConfig->GetMethodConfig(method);
         if (methodConfig == nullptr)
         {           
-            document->Add("code", (int) XCode::CallFunctionNotExist);
-            document->Add("error", CodeConfig::Inst()->GetDesc(XCode::CallFunctionNotExist));
+            document->Add("code").Add((int) XCode::CallFunctionNotExist);
+            document->Add("error").Add(CodeConfig::Inst()->GetDesc(XCode::CallFunctionNotExist));
             response.Json(HttpStatus::OK, *document);
             return XCode::CallServiceNotFound;
         }
@@ -74,16 +74,16 @@ namespace Sentry
         catch (std::exception &e)
         {
             code = XCode::ThrowError;
-            document->Add("error", e.what());
+            document->Add("error").Add(e.what());
         }
         std::string json;
-        document->Add("code", (int) code);
-		document->Add("error", CodeConfig::Inst()->GetDesc(code));
+        document->Add("code").Add((int) code);
+		document->Add("error").Add(CodeConfig::Inst()->GetDesc(code));
 		response.Json(HttpStatus::OK, *document);
         return XCode::Successful;
     }
 
-    XCode HttpRpcService::Invoke(std::shared_ptr<Rpc::Packet> data, std::shared_ptr<Json::Document> document)
+    XCode HttpRpcService::Invoke(std::shared_ptr<Rpc::Packet> data, std::shared_ptr<Json::Writer> document)
     {
         std::string fullName;
         if(!data->GetHead().Get("func", fullName))
@@ -119,7 +119,7 @@ namespace Sentry
                 {
                     throw std::logic_error("failed to parse the returned data");
                 }
-                document->Add("message", std::move(json));
+                document->Add("message").Add(*json);
             }
             else if(data->GetBody().empty())
             {
@@ -129,7 +129,7 @@ namespace Sentry
                 const size_t length = data->GetBody().size();
                 if(!json->Parse(str, length).HasParseError())
                 {
-                    document->Add("data", std::move(json));
+                    document->Add("data").Add(*json);
                 }
             }
         }

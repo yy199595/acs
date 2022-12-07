@@ -32,6 +32,7 @@ namespace Mongo
 		: MongoRequest(OP_QUERY)
 	{
 		this->flag = 0;
+		this->mTaskId = 0;
 		this->numberToSkip  = 0;
 		this->numberToReturn = 1;
 	}

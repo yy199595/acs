@@ -134,7 +134,7 @@ namespace Sentry
     class IServerRecord
     {
     public:
-        virtual void OnRecord(Json::Document & document) = 0;
+        virtual void OnRecord(Json::Writer & document) = 0;
     };
 
 	class SocketProxy;

@@ -436,7 +436,7 @@ namespace Bson
 			this->getFieldNames(elements);
 			for (const std::string &key : elements)
 			{
-				jsonWriter << key;
+				jsonWriter.Add(key);
 				this->WriterToJson(this->getField(key), jsonWriter);
 			}
 			jsonWriter.WriterStream(json);
@@ -447,24 +447,25 @@ namespace Bson
 			switch (bsonelement.type())
 			{
 			case _bson::BSONType::Bool:
-				json << bsonelement.Bool();
+				json.Add(bsonelement.Bool());
 				break;
 			case _bson::BSONType::String:
-				json << bsonelement.String();
+				json.Add(bsonelement.String());
 				break;
 			case _bson::BSONType::NumberInt:
-				json << bsonelement.Int();
+				json.Add(bsonelement.Int());
 				break;
 			case _bson::BSONType::NumberLong:
-				json << bsonelement.Long();
+				json.Add(bsonelement.Long());
 				break;
 			case _bson::BSONType::NumberDouble:
-				json << bsonelement.Double();
+				json.Add(bsonelement.Double());
 				break;
 			case _bson::BSONType::BinData:
 			{
 				int len = 0;
-				json.AddBinString(bsonelement.binData(len), len);
+				const char * str = bsonelement.binData(len);
+				json.Add(str, len);
 			}
 			break;
 			case _bson::BSONType::Object:
@@ -475,10 +476,10 @@ namespace Bson
 				obj.getFieldNames(elements);
 				for (const std::string &key : elements)
 				{
-					json << key;
+					json.Add(key);
 					this->WriterToJson(obj.getField(key), json);
 				}
-				json << Json::End::EndObject;
+				json.Add(Json::End::EndObject);
 			}
 			break;
 			case _bson::BSONType::Array:
@@ -491,17 +492,17 @@ namespace Bson
 				{
 					this->WriterToJson(obj.getField(key), json);
 				}
-				json << Json::End::EndArray;
+				json.Add(Json::End::EndArray);
 			}
 			break;
 			case _bson::BSONType::Timestamp:
-				json << bsonelement.timestampValue();
+				json.Add(bsonelement.timestampValue());
 				break;
 			case _bson::BSONType::Date:
-				json << (long long)bsonelement.date().asInt64();
+				json.Add((long long)bsonelement.date().asInt64());
 				break;
 			default:
-				json << bsonelement.toString();
+				json.Add(bsonelement.toString());
 				break;
 			}
 		}

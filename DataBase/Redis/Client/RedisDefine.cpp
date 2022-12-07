@@ -72,7 +72,7 @@ namespace Sentry
 	const std::string RedisRequest::ToJson()
 	{
 		Json::Writer jsonWriter;
-		jsonWriter.BeginArray(this->mCommand.c_str()) << this->mParameters << Json::End::EndArray;
+		jsonWriter.Add(this->mParameters);
 		return jsonWriter.JsonString();
 	}
 

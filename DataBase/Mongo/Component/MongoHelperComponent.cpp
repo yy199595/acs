@@ -123,19 +123,19 @@ namespace Sentry
         switch(fileDesc->type())
         {
             case FieldDescriptor::TYPE_INT32:
-                select << "_id" << reflection->GetInt32(message, fileDesc);
+                select.Add("_id").Add(reflection->GetInt32(message, fileDesc));
                 break;
             case FieldDescriptor::TYPE_UINT32:
-                select << "_id" << reflection->GetUInt32(message, fileDesc);
+                select.Add("_id").Add(reflection->GetUInt32(message, fileDesc));
                 break;
             case FieldDescriptor::TYPE_INT64:
-                select << "_id" << (long long)reflection->GetInt64(message, fileDesc);
+                select.Add("_id").Add((long long)reflection->GetInt64(message, fileDesc));
                 break;
             case FieldDescriptor::CPPTYPE_UINT64:
-                select << "_id" << (unsigned long long)reflection->GetUInt64(message, fileDesc);
+                select.Add("_id").Add((unsigned long long)reflection->GetUInt64(message, fileDesc));
                 break;
             case FieldDescriptor::TYPE_STRING:
-                select << "_id" << reflection->GetString(message, fileDesc);
+                select.Add("_id").Add(reflection->GetString(message, fileDesc));
                 break;
             default:
                 return XCode::CallArgsError;
@@ -159,15 +159,14 @@ namespace Sentry
     XCode MongoHelperComponent::Save(const char *tab, long long id, const std::string &data)
     {
         Json::Writer select;
-        select << "_id" << id;
-        int index = id % 10000;
-        return this->Update(tab, select.JsonString(), data, index);
+        select.Add("_id").Add(id);
+        return this->Update(tab, select.JsonString(), data, id % 10000);
     }
 
     XCode MongoHelperComponent::Save(const char *tab, const std::string &id, const std::string &data)
     {
         Json::Writer select;
-        select << "_id" << id;
+        select.Add("_id").Add(id);
         return this->Update(tab, select.JsonString(), data, 0);
     }
 }

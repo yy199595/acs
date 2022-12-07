@@ -17,11 +17,7 @@ namespace Sentry
         this->mWaitCount = 0;
         std::vector<LocalHttpService *> httpServices;
         this->mTaskComponent = this->mApp->GetTaskComponent();
-        if (this->mApp->GetComponents(httpServices) <= 0)
-        {
-            return false;
-        }
-        return this->StartListen("http");
+        return this->mApp->GetComponents(httpServices) && this->StartListen("http");
     }
 
     void HttpWebComponent::OnRequest(std::shared_ptr<HttpHandlerClient> httpClient)
@@ -81,10 +77,10 @@ namespace Sentry
         this->mWaitCount--;
     }
 
-    void HttpWebComponent::OnRecord(Json::Document &document)
+    void HttpWebComponent::OnRecord(Json::Writer&document)
     {
-        document.Add("sum", this->mSumCount);
-        document.Add("wait", this->mWaitCount);
+        document.Add("sum").Add(this->mSumCount);
+        document.Add("wait").Add(this->mWaitCount);
     }
 
     bool HttpWebComponent::OnDelClient(const std::string& address)

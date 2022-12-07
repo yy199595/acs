@@ -40,7 +40,7 @@ namespace Sentry
         virtual bool OnClose() = 0;
         virtual bool OnStart() = 0;
         void WaitAllMessageComplete() final;
-        void OnRecord(Json::Document &document) final;
+        void OnRecord(Json::Writer&document) final;
 		ServiceMethodRegister & GetMethodRegistry() { return *this->mMethodRegister; }
 	private:
         unsigned int mSumCount;

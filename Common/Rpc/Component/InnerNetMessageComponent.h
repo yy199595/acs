@@ -34,7 +34,7 @@ namespace Sentry
         bool Send(const std::string & address, std::shared_ptr<Rpc::Packet> message);
         std::shared_ptr<Rpc::Packet> Call(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
-        void OnRecord(Json::Document &document) final;
+        void OnRecord(Json::Writer&document) final;
         void Invoke(const RpcMethodConfig * config, std::shared_ptr<Rpc::Packet> message);
     private:
         bool mIsComplete;

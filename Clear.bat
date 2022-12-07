@@ -12,6 +12,8 @@ del /F /S /Q *.pch
 del /F /S /Q *.res
 del /F /S /Q server\output_lib\*.lib
 del /F /S /Q output.txt
+del /F /S /Q cmake_install.cmake
+del /F /S /Q CMakeCache.txt
 del /F /S /Q BuildLog.htm
 del /F /S /Q ReadMe.txt
 del /F /S /Q *.old
@@ -26,10 +28,13 @@ rmdir /s/q .vs
 rmdir /s/q CMakeFiles
 rmdir /s/q Debug
 rmdir /s/q Win32
+rmdir /s/q X64
 cd Server
 rmdir /s/q CMakeFiles
 rmdir /s/q Server.dir
+rmdir /s/q app.dir
+rmdir /s/q .vs
 cd bin
 rmdir /s/q Debug
-rmdir /s/q Logs
+rmdir /s/q log
 rm
