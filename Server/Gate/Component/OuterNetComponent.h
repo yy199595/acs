@@ -39,7 +39,6 @@ namespace Sentry
         bool OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message);
         bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
-        std::string mBindAddress;
         class LocationComponent * mLocationComponent;
         std::unordered_set<std::string> mAuthClients; //已经验证过的客户端
         class OuterNetMessageComponent* mOuterMessageComponent;

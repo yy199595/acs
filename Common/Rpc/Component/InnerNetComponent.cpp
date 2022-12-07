@@ -290,7 +290,7 @@ namespace Sentry
 
     void InnerNetComponent::OnRecord(Json::Writer &document)
     {
-        document.Add("auth").Add( this->mLocationMaps.size());
-        document.Add("client").Add(this->mRpcClientMap.size());
+        //document.Add("auth").Add( this->mLocationMaps.size());
+        //document.Add("client").Add(this->mRpcClientMap.size());
     }
 }// namespace Sentry
