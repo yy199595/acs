@@ -7,27 +7,27 @@ namespace Json
 {
 	Writer& Writer::BeginArray(const char* key)
 	{
-		this->mWriter->String(key);
-		this->mWriter->StartArray();
+		this->mWriter.String(key);
+		this->mWriter.StartArray();
 		return *this;
 	}
 
 	Writer& Writer::BeginArray()
 	{
-		this->mWriter->StartArray();
+		this->mWriter.StartArray();
 		return *this;
 	}
 
 	Writer& Writer::BeginObject()
 	{
-		this->mWriter->StartObject();
+		this->mWriter.StartObject();
 		return *this;
 	}
 
 	Writer& Writer::BeginObject(const char* key)
 	{
-		this->mWriter->String(key);
-		this->mWriter->StartObject();
+		this->mWriter.String(key);
+		this->mWriter.StartObject();
 		return *this;
 	}
 
@@ -36,10 +36,10 @@ namespace Json
 		switch(type)
 		{
 		case End::EndObject:
-			this->mWriter->EndObject();
+			this->mWriter.EndObject();
 			break;
 		case End::EndArray:
-			this->mWriter->EndArray();
+			this->mWriter.EndArray();
 			break;
 		}
 		return *this;
@@ -47,32 +47,32 @@ namespace Json
 
 	Writer& Writer::Add(std::vector<int>& value)
 	{
-		this->mWriter->StartArray();
+		this->mWriter.StartArray();
 		for(const int val : value)
 		{
-			this->mWriter->Int(val);
+			this->mWriter.Int(val);
 		}
-		this->mWriter->EndArray();
+		this->mWriter.EndArray();
 		return *this;
 	}
 
 	Writer& Writer::Add(std::vector<std::string>& value)
 	{
-		this->mWriter->StartArray();
+		this->mWriter.StartArray();
 		for(const std::string & val : value)
 		{
-			this->mWriter->String(val.c_str(), val.size());
+			this->mWriter.String(val.c_str(), val.size());
 		}
-		this->mWriter->EndArray();
+		this->mWriter.EndArray();
 		return *this;
 	}
 
 	Writer& Writer::Add(std::list<std::string>& value)
 	{
-		this->mWriter->StartArray();
+		this->mWriter.StartArray();
 		for(const std::string & val : value)
 		{
-			this->mWriter->String(val.c_str(), val.size());
+			this->mWriter.String(val.c_str(), val.size());
 		}
 		this->Add(Json::End::EndArray);
 		return *this;
@@ -82,45 +82,44 @@ namespace Json
 namespace Json
 {
 	Writer::Writer(bool isObj)
-		: mIsObject(isObj)
+		: mIsObject(isObj), mWriter(mStringBuf)
 	{
-        this->mStringBuf = new rapidjson::StringBuffer();
-        this->mWriter = new  rapidjson::Writer<rapidjson::StringBuffer>(*this->mStringBuf);
+        //this->mStringBuf = new rapidjson::StringBuffer();
+        //this->mWriter = new  rapidjson::Writer<rapidjson::StringBuffer>(*this->mStringBuf);
         //this->mDocument.Accept(this->mWriter);
 		if (this->mIsObject)
 		{
-			this->mWriter->StartObject();
+			this->mWriter.StartObject();
 			return;
 		}
-		this->mWriter->StartArray();
+		this->mWriter.StartArray();
 	}
 
     Writer::~Writer()
     {
-        delete this->mWriter;
-        delete this->mStringBuf;
+        
     }
 
 
 
 	const std::string Writer::JsonString()
 	{
-		if (this->mWriter->IsComplete())
+		if (this->mWriter.IsComplete())
 		{
-			const char* str = this->mStringBuf->GetString();
-			const size_t size = this->mStringBuf->GetSize();
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
 			return std::string(str, size);
 		}
-		if (this->mIsObject && this->mWriter->EndObject())
+		if (this->mIsObject && this->mWriter.EndObject())
 		{
-			const char* str = this->mStringBuf->GetString();
-			const size_t size = this->mStringBuf->GetSize();
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
 			return std::string(str, size);
 		}
-		else if (this->mWriter->EndArray())
+		else if (this->mWriter.EndArray())
 		{
-			const char* str = this->mStringBuf->GetString();
-			const size_t size = this->mStringBuf->GetSize();
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
 			return std::string(str, size);
 		}
 		return std::string();
@@ -128,31 +127,31 @@ namespace Json
 
 	size_t Writer::WriterStream(std::string& os)
 	{
-		if (this->mWriter->IsComplete())
+		if (this->mWriter.IsComplete())
 		{
-			const char* str = this->mStringBuf->GetString();
-			const size_t size = this->mStringBuf->GetSize();
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
 			os.append(str, size);
 			return size;
 		}
-		if (this->mIsObject && this->mWriter->EndObject())
+		if (this->mIsObject && this->mWriter.EndObject())
 		{
-			const char* str = this->mStringBuf->GetString();
-			const size_t size = this->mStringBuf->GetSize();
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
 			os.append(str, size);
 			return size;
 		}
-		else if (this->mWriter->EndArray())
+		else if (this->mWriter.EndArray())
 		{
-			const char* str = this->mStringBuf->GetString();
-			const size_t size = this->mStringBuf->GetSize();
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
 			os.append(str, size);
 			return size;
 		}
 		return 0;
 	}
 
-	void Writer::Add(rapidjson::Value& value)
+	Writer & Writer::Add(rapidjson::Value& value)
 	{
 		if (value.IsInt())
 		{
@@ -186,50 +185,51 @@ namespace Json
 		}
 		else if (value.IsObject())
 		{
-			this->mWriter->StartObject();
+			this->mWriter.StartObject();
 			auto iter = value.MemberBegin();
 			for (; iter != value.MemberEnd(); iter++)
 			{
 				this->Add(iter->name.GetString());
 				this->Add(iter->value);
 			}
-			this->mWriter->EndObject();
+			this->mWriter.EndObject();
 		}
 		else if (value.IsArray())
 		{
-			this->mWriter->StartArray();
+			this->mWriter.StartArray();
 			for (size_t index = 0; index < value.Size(); index++)
 			{
 				this->Add(value[index]);
 			}
-			this->mWriter->EndArray();
+			this->mWriter.EndArray();
 		}
 		else
 		{
 			assert(false);
 		}
+		return *this;
 	}
 
 	size_t Writer::WriterStream(std::ostream& os)
 	{
-		if (this->mWriter->IsComplete())
+		if (this->mWriter.IsComplete())
 		{
-			const char* str = this->mStringBuf->GetString();
-			const size_t size = this->mStringBuf->GetSize();
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
 			os.write(str, size);
 			return size;
 		}
-		if (this->mIsObject && this->mWriter->EndObject())
+		if (this->mIsObject && this->mWriter.EndObject())
 		{
-			const char* str = this->mStringBuf->GetString();
-			const size_t size = this->mStringBuf->GetSize();
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
 			os.write(str, size);
 			return size;
 		}
-		else if (this->mWriter->EndArray())
+		else if (this->mWriter.EndArray())
 		{
-			const char* str = this->mStringBuf->GetString();
-			const size_t size = this->mStringBuf->GetSize();
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
 			os.write(str, size);
 			return size;
 		}
@@ -237,39 +237,39 @@ namespace Json
 	}
 	size_t Writer::GetJsonSize()
 	{
-		if (this->mWriter->IsComplete())
+		if (this->mWriter.IsComplete())
 		{
-			return this->mStringBuf->GetSize();
+			return this->mStringBuf.GetSize();
 		}
-		if (this->mIsObject && this->mWriter->EndObject())
+		if (this->mIsObject && this->mWriter.EndObject())
 		{
-			return this->mStringBuf->GetSize();
+			return this->mStringBuf.GetSize();
 		}
-		else if (this->mWriter->EndArray())
+		else if (this->mWriter.EndArray())
 		{
-			return this->mStringBuf->GetSize();
+			return this->mStringBuf.GetSize();
 		}
 		return 0;
 	}
 
 	bool Writer::GetDocument(rapidjson::Document& jsonDocument)
 	{
-		if (this->mWriter->IsComplete())
+		if (this->mWriter.IsComplete())
 		{
-			const char* str = this->mStringBuf->GetString();
-			const size_t size = this->mStringBuf->GetSize();
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
 			return !jsonDocument.Parse(str, size).HasParseError();
 		}
-		if (this->mIsObject && this->mWriter->EndObject())
+		if (this->mIsObject && this->mWriter.EndObject())
 		{
-			const char* str = this->mStringBuf->GetString();
-			const size_t size = this->mStringBuf->GetSize();
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
 			return !jsonDocument.Parse(str, size).HasParseError();
 		}
-		else if (this->mWriter->EndArray())
+		else if (this->mWriter.EndArray())
 		{
-			const char* str = this->mStringBuf->GetString();
-			const size_t size = this->mStringBuf->GetSize();
+			const char* str = this->mStringBuf.GetString();
+			const size_t size = this->mStringBuf.GetSize();
 			return !jsonDocument.Parse(str, size).HasParseError();
 		}
 		return false;
