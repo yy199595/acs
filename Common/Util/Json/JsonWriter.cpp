@@ -83,10 +83,7 @@ namespace Json
 {
 	Writer::Writer(bool isObj)
 		: mIsObject(isObj), mWriter(mStringBuf)
-	{
-        //this->mStringBuf = new rapidjson::StringBuffer();
-        //this->mWriter = new  rapidjson::Writer<rapidjson::StringBuffer>(*this->mStringBuf);
-        //this->mDocument.Accept(this->mWriter);
+	{       
 		if (this->mIsObject)
 		{
 			this->mWriter.StartObject();
@@ -94,13 +91,6 @@ namespace Json
 		}
 		this->mWriter.StartArray();
 	}
-
-    Writer::~Writer()
-    {
-        
-    }
-
-
 
 	const std::string Writer::JsonString()
 	{

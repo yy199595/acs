@@ -25,7 +25,7 @@ namespace Json
 	{
 	 public:
 		Writer(bool isObj = true);
-        ~Writer();
+		~Writer() = default;
 	public:
 		Writer & BeginArray();
 		Writer & BeginObject();
