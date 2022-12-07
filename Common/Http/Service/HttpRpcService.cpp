@@ -66,7 +66,7 @@ namespace Sentry
                 message->Append(postRequest->Content());
             }
         }
-        XCode code = XCode::Failure;
+        XCode code;
         try
         {
             code = this->Invoke(message, document);

@@ -7,7 +7,7 @@
 #include<direct.h>
 #else
 #include<unistd.h>
-#endif // 
+#endif // __OS_WIN__
 #include"Log/CommonLogDef.h"
 namespace Sentry
 {
@@ -19,19 +19,22 @@ namespace Sentry
         }
 #ifdef __DEBUG__
         if (argc < 2)
-        {          
+        {
+            System::IsInit = true;
             System::mExePath = argv[0];
             System::mConfigPath = "./config/server.json";
+            System::mWorkPath = fmt::format("{0}/", getcwd(nullptr, 0));
             return true;
         }
 #endif
-		System::mExePath = argv[0];
+        System::IsInit = true;
+        System::mExePath = argv[0];
         System::mConfigPath = argv[1];
-        System::mWorkPath = fmt::format("{0}/", getcwd(NULL, NULL));
+        System::mWorkPath = fmt::format("{0}/", getcwd(nullptr, 0));
         return true;
     }
 
-    const std::string System::FormatPath(const std::string &path)
+    std::string System::FormatPath(const std::string &path)
     {
         return System::mWorkPath + path;
     }

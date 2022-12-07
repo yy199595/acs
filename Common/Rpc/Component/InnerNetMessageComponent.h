@@ -37,12 +37,10 @@ namespace Sentry
         void OnRecord(Json::Writer&document) final;
         void Invoke(const RpcMethodConfig * config, std::shared_ptr<Rpc::Packet> message);
     private:
-        bool mIsComplete;
         std::string mFullName;
         unsigned int mSumCount;
 		unsigned int mWaitCount;
 		class TaskComponent* mTaskComponent;
-		class TimerComponent* mTimerComponent;
 		class InnerNetComponent* mRpcClientComponent;
         std::queue<std::shared_ptr<Rpc::Packet>> mWaitMessages;
 	};

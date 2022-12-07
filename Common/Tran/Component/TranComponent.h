@@ -23,6 +23,7 @@ namespace Sentry
         void OnCloseSocket(const std::string &address, XCode code) final;
         void OnMessage(const std::string &address, std::shared_ptr<Rpc::Packet> message) final;
     private:
+        XCode OnLogout(const std::string & address);
         XCode OnRequest(std::shared_ptr<Rpc::Packet> message);
 		XCode OnResponse(std::shared_ptr<Rpc::Packet> message);
         bool OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message);

@@ -12,7 +12,8 @@ namespace Sentry
 {
 
 	class OuterNetClient;
-    class OuterNetComponent : public TcpListenerComponent, public IRpc<Rpc::Packet>, public IComplete
+    class OuterNetComponent : public TcpListenerComponent, public IRpc<Rpc::Packet>,
+                              public IComplete, public IServerRecord
 	{
 	 public:
 		OuterNetComponent() = default;
@@ -33,13 +34,12 @@ namespace Sentry
         void OnDestory() final;
         void OnClusterComplete() final;
 	 private:
+        void OnRecord(Json::Writer & document) final;
         bool OnListen(std::shared_ptr<SocketProxy> socket) final;
         bool OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message);
         bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
         std::string mBindAddress;
-		class TimerComponent* mTimerComponent;
-        class NetThreadComponent * mNetComponent;
         class LocationComponent * mLocationComponent;
         std::unordered_set<std::string> mAuthClients; //已经验证过的客户端
         class OuterNetMessageComponent* mOuterMessageComponent;

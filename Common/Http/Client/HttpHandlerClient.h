@@ -29,9 +29,8 @@ namespace Sentry
         void OnReceiveLine(const Asio::Code &code, std::istream &readStream, size_t size) final;
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
 	 private:
-		 int mTimeout;
+        int mTimeout;
         std::string mMethod;
-        Http::DecodeState mDecodeState;
 		std::shared_ptr<Asio::Timer> mTimer;
         HttpListenComponent * mHttpComponent;
         std::shared_ptr<Http::Request> mHttpRequest;		

@@ -1,6 +1,5 @@
 ﻿#include"InnerNetMessageComponent.h"
 #include"Component/TaskComponent.h"
-#include"App/App.h"
 #include"Lua/LuaServiceMethod.h"
 #include"Config/ServiceConfig.h"
 #include"InnerNetComponent.h"
@@ -14,9 +13,7 @@ namespace Sentry
 	{
         this->mWaitCount = 0;
         this->mSumCount = 0;
-        this->mIsComplete = false;
 		this->mTaskComponent = nullptr;
-		this->mTimerComponent = nullptr;
 		this->mRpcClientComponent = nullptr;
         return true;
 	}
@@ -24,7 +21,6 @@ namespace Sentry
 	bool InnerNetMessageComponent::LateAwake()
 	{
 		this->mTaskComponent = this->mApp->GetTaskComponent();
-		this->mTimerComponent = this->GetComponent<TimerComponent>();
 		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<TaskComponent>());
 		LOG_CHECK_RET_FALSE(this->mRpcClientComponent = this->GetComponent<InnerNetComponent>());
 		return true;

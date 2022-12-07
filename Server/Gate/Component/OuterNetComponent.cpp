@@ -21,16 +21,12 @@ namespace Sentry
 {
 	bool OuterNetComponent::Awake()
 	{
-        this->mNetComponent = nullptr;
-        this->mTimerComponent = nullptr;
         this->mOuterMessageComponent = nullptr;
         return true;
     }
 
 	bool OuterNetComponent::LateAwake()
 	{
-        this->mTimerComponent = this->mApp->GetTimerComponent();
-        this->mNetComponent = this->GetComponent<NetThreadComponent>();
 		LOG_CHECK_RET_FALSE(this->mOuterMessageComponent = this->GetComponent<OuterNetMessageComponent>());
 		return true;
 	}
@@ -217,4 +213,10 @@ namespace Sentry
 			proxyClient->StartClose();
 		}
 	}
+
+    void OuterNetComponent::OnRecord(Json::Writer &document)
+    {
+        document.Add("auth").Add(this->mAuthClients.size());
+        document.Add("client").Add(this->mGateClientMap.size());
+    }
 }

@@ -12,7 +12,6 @@ namespace Sentry
 	{
         this->mTimeout = 15;
 		this->mHttpComponent = httpComponent;
-        this->mDecodeState = Http::DecodeState::None;
     }
 
 	void HttpHandlerClient::StartReceive(int timeout)
@@ -20,7 +19,6 @@ namespace Sentry
         this->mTimeout = timeout;
         assert(this->mRecvBuffer.size() == 0);
         assert(this->mSendBuffer.size() == 0);
-        this->mDecodeState = Http::DecodeState::None;       
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveLine();
 #else

@@ -174,7 +174,7 @@ namespace Json
 		}
 		else if (value.IsInt64())
 		{
-			this->Add(value.GetInt64());
+			this->Add((long long)value.GetInt64());
 		}
 		else if (value.IsUint())
 		{

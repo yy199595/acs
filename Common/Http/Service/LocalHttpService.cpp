@@ -33,6 +33,10 @@ namespace Sentry
     bool LocalHttpService::LateAwake()
     {
         LuaScriptComponent* luaComponent = this->GetComponent<LuaScriptComponent>();
+        if(luaComponent == nullptr)
+        {
+            return true;
+        }
         Lua::LuaModule * luaModule = luaComponent->LoadModule(this->GetName());
         return luaModule == nullptr || luaModule->Awake();
     }

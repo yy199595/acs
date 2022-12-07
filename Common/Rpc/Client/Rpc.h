@@ -19,6 +19,7 @@ namespace Tcp
         Forward,    //网关转发给客户端消息
         Broadcast,  //广播消息
         SubPublish, //发布订阅消息
+        Logout,     //退出消息
         Max
     };
     enum class Porto

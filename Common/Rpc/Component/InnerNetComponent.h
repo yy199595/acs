@@ -8,7 +8,8 @@
 namespace Sentry
 {
 	// 管理内网rpc的session
-	class InnerNetComponent : public TcpListenerComponent, public IRpc<Rpc::Packet>
+	class InnerNetComponent : public TcpListenerComponent,
+                              public IRpc<Rpc::Packet>, public IServerRecord
 	{
 	 public:
 		InnerNetComponent() = default;
@@ -21,6 +22,7 @@ namespace Sentry
 	 protected:
         bool Awake() final;
         bool LateAwake() final;
+        void OnRecord(Json::Writer & document) final;
 		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 public:
         const std::string & GetUser() const { return this->mUserName; };

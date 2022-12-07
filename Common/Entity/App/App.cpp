@@ -181,7 +181,7 @@ namespace Sentry
         return std::getchar();
 #else
         return 0;
-#endif // 
+#endif // __OS_WIN__
     }
 
 	void App::Stop()

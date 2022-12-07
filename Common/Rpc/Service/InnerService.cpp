@@ -89,9 +89,15 @@ namespace Sentry
 	XCode InnerService::RunInfo(google::protobuf::StringValue& response)
 	{
 		Json::Writer document;
-		std::vector<Component *> components;
-		this->mApp->GetComponents(components);
-		document.Add("server").Add(ServerConfig::Inst()->Name());
+        {
+            document.BeginObject("server");
+            document.Add("name").Add(ServerConfig::Inst()->Name());
+            document.Add("fps").Add((int)this->mApp->GetFps());
+            document.Add("cpu").Add(std::thread::hardware_concurrency());
+            document.Add(Json::End::EndObject);
+        }
+        std::vector<Component *> components;
+        this->mApp->GetComponents(components);
 		for(Component * component : components)
 		{
             const char* key = component->GetName().c_str();

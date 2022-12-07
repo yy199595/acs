@@ -19,6 +19,7 @@ namespace Sentry
 	 public:
 		explicit App();
 	 public:
+        inline float GetFps() const { return this->mLogicFps; }
 		inline LoggerComponent* GetLogger() { return this->mLogComponent; }
 		inline Asio::Context & MainThread() { return *this->mMainContext; }
 		inline TaskComponent* GetTaskComponent() { return this->mTaskComponent; }

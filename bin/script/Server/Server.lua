@@ -28,6 +28,6 @@ function Main.StartInsert()
 end
 
 function Main.OnClusterComplete()
-    Mongo.ClearTable("user.account_info")
+    --Mongo.ClearTable("user.account_info")
 end
 return Main

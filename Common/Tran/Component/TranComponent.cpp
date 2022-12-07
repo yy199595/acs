@@ -112,11 +112,45 @@ namespace Sentry
             case Tcp::Type::Response:
                 this->OnResponse(message);
                 break;
+            case Tcp::Type::Logout:
+                this->OnLogout(address);
+                break;
             default:
                 this->StartClose(address);
                 CONSOLE_LOG_FATAL(address << " unknow message type");
                 break;
         }
+    }
+
+    XCode TranComponent::OnLogout(const std::string &address)
+    {
+        this->StartClose(address);
+        const ServiceNodeInfo * nodeInfo = this->GetServerInfo(address);
+        if(nodeInfo == nullptr)
+        {
+            return XCode::Failure;
+        }
+        for(const std::string & location : this->mAuthClients)
+        {
+            if(location == address)
+            {
+                continue;
+            }
+            std::shared_ptr<Rpc::Packet> message = std::make_shared<Rpc::Packet>();
+            {
+                message->SetType(Tcp::Type::Request);
+                message->SetProto(Tcp::Porto::Protobuf);
+            }
+            s2s::cluster::exit exitInfo;
+            exitInfo.set_name(nodeInfo->SrvName);
+            exitInfo.set_rpc(nodeInfo->LocationRpc);
+            exitInfo.set_http(nodeInfo->LocationHttp);
+            if(message->WriteMessage(&exitInfo))
+            {
+                this->Send(location, message);
+            }
+        }
+        return XCode::Successful;
     }
 
     bool TranComponent::OnAuth(const std::string &address, std::shared_ptr<Rpc::Packet> message)

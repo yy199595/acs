@@ -287,4 +287,10 @@ namespace Sentry
 		clientSession->Send(message);
 		return true;
 	}
+
+    void InnerNetComponent::OnRecord(Json::Writer &document)
+    {
+        document.Add("auth").Add( this->mLocationMaps.size());
+        document.Add("client").Add(this->mRpcClientMap.size());
+    }
 }// namespace Sentry

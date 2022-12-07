@@ -13,7 +13,7 @@ namespace Sentry
     {
     public:
         static bool Init(int argc, char **argv);
-        static const std::string FormatPath(const std::string & path);     
+        static std::string FormatPath(const std::string & path);
         static const std::string & ExePath() { return System::mExePath; }
         static const std::string & WorkPath() { return System::mWorkPath; }
         static const std::string & ConfigPath() { return System::mConfigPath;}

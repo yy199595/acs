@@ -44,6 +44,7 @@ namespace Json
 		inline Writer& Add(long long value) { this->mWriter->Int64(value); return *this;}
 		inline Writer& Add(const char * value) { this->mWriter->String(value); return *this;}
 		inline Writer& Add(unsigned long long value) { this->mWriter->Uint64(value); return *this;}
+		inline Writer& Add(size_t value) { this->mWriter->Uint((unsigned int)value); return *this;}
 		inline Writer& Add(const char * str, size_t size) { this->mWriter->String(str, size); return *this; }
 		inline Writer& Add(const std::string & value) { this->mWriter->String(value.c_str(), value.size()); return *this;}
 	public:

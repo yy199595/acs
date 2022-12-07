@@ -4,6 +4,8 @@
 
 #ifndef GAMEKEEPER_HTTPSERVICEMETHOD_H
 #define GAMEKEEPER_HTTPSERVICEMETHOD_H
+#include <utility>
+
 #include"Json/JsonWriter.h"
 #include"Json/JsonReader.h"
 #include"Time/TimeHelper.h"
@@ -27,7 +29,7 @@ namespace Sentry
 	class HttpServiceMethod
 	{
     public:
-        HttpServiceMethod(const std::string & name) : mName(name) { }
+        explicit HttpServiceMethod(std::string  name)  : mName(std::move(name)) { }
 	 public:
         virtual bool IsLuaMethod() const = 0;
         const std::string & GetName() const { return this->mName; }
@@ -71,9 +73,9 @@ namespace Sentry
         bool IsLuaMethod() const { return false; }
         XCode Invoke(const Http::Request& request, Http::Response& response)
         {
-            XCode code = XCode::Failure;
+            XCode code;
+            std::unique_ptr<Json::Writer> document(new Json::Writer());
             std::unique_ptr<Json::Reader> document1(new Json::Reader());
-            std::unique_ptr<Json::Writer> document(new Json::Document());
             if (!request.WriteDocument(document1.get()))
             {
                 document->Add("error").Add("parse json error");
@@ -83,14 +85,15 @@ namespace Sentry
             }
             try
             {
-                code = (this->mObj->*mFunction)(*document1);
+                XCode code = (this->mObj->*mFunction)(*document1);
+                document->Add("code").Add((int)code);
             }
             catch (std::exception& e)
             {
                 code = XCode::ThrowError;
-                document->Add("error", e.what());
+                document->Add("error").Add(e.what());
             }
-            document->Add("code").Add((int)code);           
+            document->Add("code").Add((int)code);
             response.Json(HttpStatus::OK, *document);
             return code;
         }
@@ -110,10 +113,10 @@ namespace Sentry
         }
 
     public:
-        bool IsLuaMethod() const { return false; }
-        XCode Invoke(const Http::Request& request, Http::Response& response)
+        bool IsLuaMethod() const final { return false; }
+        XCode Invoke(const Http::Request& request, Http::Response& response) final
         {
-            XCode code = XCode::Failure;
+            XCode code;
             std::unique_ptr<Json::Reader> document1(new Json::Reader());
             std::unique_ptr<Json::Writer> document2(new Json::Writer());
             if (!request.WriteDocument(document1.get()))
