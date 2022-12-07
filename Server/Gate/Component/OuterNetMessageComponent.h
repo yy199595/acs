@@ -29,8 +29,6 @@ namespace Sentry
 	 private:
 		unsigned int mSumCount;
 		unsigned int mWaitCount;
-        class TaskComponent * mTaskComponent;
-		class TimerComponent * mTimerComponent;
         class OuterNetComponent* mOutNetComponent;
 		class TranHelperComponent * mTranComponent;
 		class LocationComponent * mLocationComponent;

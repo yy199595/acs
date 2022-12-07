@@ -21,9 +21,7 @@ namespace Sentry
     {
 		this->mSumCount = 0;
 		this->mWaitCount = 0;
-        this->mTaskComponent = nullptr;
         this->mTranComponent = nullptr;
-        this->mTimerComponent = nullptr;
         this->mOutNetComponent = nullptr;
         this->mLocationComponent = nullptr;
         this->mInnerMessageComponent = nullptr;
@@ -32,8 +30,6 @@ namespace Sentry
 
 	bool OuterNetMessageComponent::LateAwake()
 	{
-		this->mTaskComponent = this->mApp->GetTaskComponent();
-		this->mTimerComponent = this->mApp->GetTimerComponent();
 		this->mLocationComponent = this->GetComponent<LocationComponent>();
         this->mTranComponent = this->GetComponent<TranHelperComponent>();
         this->mInnerMessageComponent = this->GetComponent<InnerNetMessageComponent>();
@@ -124,10 +120,6 @@ namespace Sentry
 	XCode OuterNetMessageComponent::OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message)
 	{
 		this->mSumCount++;
-		if(message->GetHead().Has("rpc"))
-		{
-			this->mWaitCount++;
-		}
         auto iter = this->mUserAddressMap.find(address);
         if(iter == this->mUserAddressMap.end() || iter->second == 0)
         {

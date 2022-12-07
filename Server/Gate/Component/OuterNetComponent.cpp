@@ -3,19 +3,12 @@
 //
 
 #include"OuterNetComponent.h"
-#include"App/App.h"
 #include"Client/OuterNetClient.h"
 #include"OuterNetMessageComponent.h"
 #include"Component/NetThreadComponent.h"
 #include"Component/InnerNetMessageComponent.h"
-
-#ifdef __DEBUG__
-#include"String/StringHelper.h"
-#include"Config/ServiceConfig.h"
-#endif
 #include"Md5/MD5.h"
 #include"Config/CodeConfig.h"
-#include"Config/ServerConfig.h"
 #include"Component/UnitMgrComponent.h"
 namespace Sentry
 {
