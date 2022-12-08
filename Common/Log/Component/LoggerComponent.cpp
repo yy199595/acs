@@ -136,7 +136,7 @@ namespace Sentry
 #ifdef __ENABLE_START_LOG__
         std::string logName = fmt::format("{0}{1}", "Start", name);
         this->mStartLog = spdlog::rotating_logger_mt<spdlog::async_factory>(
-                logName,logPath + "/start.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
+                logName, "./config/start.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 #endif
 	}
 }
