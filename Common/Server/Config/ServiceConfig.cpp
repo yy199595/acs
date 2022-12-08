@@ -20,7 +20,14 @@ namespace Sentry
             if(jsonValue.IsObject())
             {
                 const char *name = iter->name.GetString();
-                std::unique_ptr<RpcMethodConfig> serviceConfog(new RpcMethodConfig());
+                if(this->mMethodConfigs.find(name) == this->mMethodConfigs.end())
+                {
+                    std::unique_ptr<RpcMethodConfig> config =
+                            std::make_unique<RpcMethodConfig>();
+                    this->mMethodConfigs.emplace(name, std::move(config));
+                }
+                RpcMethodConfig * serviceConfog = this->mMethodConfigs[name].get();
+                std::string fullName = fmt::format("{0}.{1}", this->GetName(), name);
 
                 serviceConfog->Method = name;
                 serviceConfog->Service = this->GetName();
@@ -41,7 +48,7 @@ namespace Sentry
                 {
                     this->mIsClient = true;
                 }
-                serviceConfog->FullName = fmt::format("{0}.{1}", this->GetName(), name);
+                serviceConfog->FullName = fullName;
                 this->mMethodConfigs.emplace(name, std::move(serviceConfog));
             }
         }
@@ -50,6 +57,10 @@ namespace Sentry
 
     bool RpcServiceConfig::OnReLoadConfig(const rapidjson::Value &json)
     {
+        if(!json.IsObject())
+        {
+            return false;
+        }
         return true;
     }
 }
@@ -107,10 +118,15 @@ namespace Sentry
         auto iter = document.MemberBegin();
         for(; iter != document.MemberEnd(); iter++)
         {
-			//RpcServiceConfig * config = nullptr;
             const rapidjson::Value & jsonValue = iter->value;
             const std::string service(iter->name.GetString());
-            std::unique_ptr<RpcServiceConfig> config(new RpcServiceConfig(service));
+            if(this->mConfigs.find(service) == this->mConfigs.end())
+            {
+                std::unique_ptr<RpcServiceConfig> serviceConfig
+                        = std::make_unique<RpcServiceConfig>(service);
+                this->mConfigs.emplace(service, std::move(serviceConfig));
+            }
+            RpcServiceConfig * config = this->mConfigs[service].get();
             if(!config->OnLoadConfig(jsonValue))
             {
                 LOG_ERROR("load rpc config " << service << " error");
@@ -122,14 +138,13 @@ namespace Sentry
             {
                 this->mRpcMethodConfig.emplace(methodConfig->FullName, methodConfig);
             }
-            this->mConfigs.emplace(service, std::move(config));
         }
         return true;
     }
 
     bool RpcConfig::OnReloadText(const char *str, size_t length)
     {
-        return true;
+        return this->OnLoadText(str, length);
     }
 
     const RpcServiceConfig *RpcConfig::GetConfig(const std::string &name) const
