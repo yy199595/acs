@@ -80,7 +80,7 @@ namespace Sentry
             this->mTimer->cancel_one(err);
         }
 #ifdef ONLY_MAIN_THREAD
-        this->mHttpComponent->OnResponse(taskId, std::move(this->mResponse));
+        this->mHttpComponent->OnResponse(this->mTaskId, std::move(this->mResponse));
 #else
         Asio::Context &io = App::Inst()->MainThread();
         io.post(std::bind(&HttpComponent::OnResponse,

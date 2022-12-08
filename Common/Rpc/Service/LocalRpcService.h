@@ -9,20 +9,6 @@
 #include"Method/MethodRegister.h"
 #include"Component/LuaScriptComponent.h"
 
-
-namespace Sentry
-{
-    class ServiceRunInfo
-    {
-    public:
-        void OnCall(const std::string & func);
-        void OnInvokeCompete(const std::string & func, int ms);
-    public:
-        std::unordered_map<std::string, int> mCallCount; //调用次数
-        std::unordered_map<std::string, int> mInvokeCostCount; //耗时
-    };
-}
-
 namespace Sentry
 {
     class LocalRpcService : public RpcService, public IServerRecord
@@ -49,6 +35,6 @@ namespace Sentry
 		std::shared_ptr<ServiceMethodRegister> mMethodRegister;
 	};
     extern std::string GET_FUNC_NAME(std::string fullName);
-#define BIND_COMMON_RPC_METHOD(func) this->GetMethodRegistry().Bind(GET_FUNC_NAME(#func), &func);
+#define BIND_COMMON_RPC_METHOD(func) LOG_CHECK_RET_FALSE(this->GetMethodRegistry().Bind(GET_FUNC_NAME(#func), &func));
 }
 #endif //SERVER_LOCALSERVICECOMPONENT_H

@@ -30,7 +30,7 @@ namespace Sentry
     void HttpHandlerClient::StartWriter(std::shared_ptr<Http::Response> message)
     {
 #ifdef ONLY_MAIN_THREAD
-        this->Send(message);
+        this->Write(message);
 #else
         Asio::Context & netWorkThread = this->mSocket->GetThread();
         netWorkThread.post(std::bind(&HttpHandlerClient::Write, this, message));
@@ -43,7 +43,7 @@ namespace Sentry
         {
             message->SetCode(code);
 #ifdef ONLY_MAIN_THREAD
-            this->Send(message);
+            this->Write(message);
 #else
             Asio::Context& netWorkThread = this->mSocket->GetThread();
             netWorkThread.post(std::bind(&HttpHandlerClient::Write, this, message));

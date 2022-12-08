@@ -75,7 +75,10 @@ namespace Sentry
     XCode OuterNetMessageComponent::OnAuth(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
         std::string token;
-        LOG_RPC_CHECK_ARGS(message->GetHead().Get("token", token));
+        if(!message->GetHead().Get("token", token))
+        {
+            return XCode::CallArgsError;
+        }
         if(this->mUserAddressMap.find(address) != this->mUserAddressMap.end())
         {
             return XCode::Successful;
@@ -120,19 +123,26 @@ namespace Sentry
 	XCode OuterNetMessageComponent::OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message)
 	{
 		this->mSumCount++;
+        const Rpc::Head& head = message->GetHead();
         auto iter = this->mUserAddressMap.find(address);
         if(iter == this->mUserAddressMap.end() || iter->second == 0)
         {
             return XCode::NotFindUser;
         }
 		std::string fullName;
-		const Rpc::Head& head = message->GetHead();
-		LOG_RPC_CHECK_ARGS(head.Get("func", fullName));
+		if(!head.Get("func", fullName))
+        {
+            return XCode::CallArgsError;
+        }
 		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
 		if (methodConfig == nullptr || methodConfig->Type != "Client")
 		{
 			return XCode::CallFunctionNotExist;
 		}
+        if(!methodConfig->Request.empty() &&  message->GetSize() == 0)
+        {
+            return XCode::CallArgsError;
+        }
         std::string target, server;
         long long userId = iter->second;
         if (!ClusterConfig::Inst()->GetServerName(methodConfig->Service, server))
@@ -155,7 +165,10 @@ namespace Sentry
 	XCode OuterNetMessageComponent::OnResponse(const std::string & address, std::shared_ptr<Rpc::Packet> message)
 	{
 		this->mWaitCount--;
-        LOG_RPC_CHECK_ARGS(message->GetHead().Has("rpc"));
+        if(!message->GetHead().Has("rpc"))
+        {
+            return XCode::CallArgsError;
+        }
         if(message->GetCode(XCode::Failure) == XCode::NetActiveShutdown)
         {
             this->mOutNetComponent->StartClose(address);

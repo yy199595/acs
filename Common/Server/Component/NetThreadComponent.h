@@ -2,6 +2,22 @@
 #include<vector>
 #include"Tcp/Asio.h"
 #include"Component/Component.h"
+
+namespace Sentry
+{
+    class AsioThread
+    {
+    public:
+        bool Run();
+        Asio::Context & Context() const { return *mContext; }
+    private:
+        void Update();
+    private:
+        std::unique_ptr<std::thread> mThread;
+        std::unique_ptr<Asio::Context> mContext;
+    };
+}
+
 namespace Sentry
 {
 	class NetThreadComponent : public Component
@@ -20,9 +36,7 @@ namespace Sentry
 		size_t mIndex;
 		std::thread* mMonitorThread;
 #ifndef ONLY_MAIN_THREAD
-        std::vector<std::thread *> mThreads;
-        std::vector<Asio::Context *> mNetThreads;
-        std::vector<Asio::ContextWork *> mNetThreadWorks;
+        std::vector<std::unique_ptr<AsioThread>> mNetThreads;
 #endif
 	};
 }

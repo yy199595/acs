@@ -20,6 +20,7 @@ namespace Sentry
             if(jsonValue.IsObject())
             {
                 const char *name = iter->name.GetString();
+                std::string fullName = fmt::format("{0}.{1}", this->GetName(), name);
                 if(this->mMethodConfigs.find(name) == this->mMethodConfigs.end())
                 {
                     std::unique_ptr<RpcMethodConfig> config =
@@ -27,15 +28,21 @@ namespace Sentry
                     this->mMethodConfigs.emplace(name, std::move(config));
                 }
                 RpcMethodConfig * serviceConfog = this->mMethodConfigs[name].get();
-                std::string fullName = fmt::format("{0}.{1}", this->GetName(), name);
-
-                serviceConfog->Method = name;
-                serviceConfog->Service = this->GetName();
+                {
+                    serviceConfog->Method = name;
+                    serviceConfog->IsAsync = false;
+                    serviceConfog->Type = "Server";
+                    serviceConfog->FullName = fullName;
+                    serviceConfog->Service = this->GetName();
+                }
                 if(jsonValue.HasMember("Type"))
                 {
                     serviceConfog->Type = jsonValue["Type"].GetString();
                 }
-                serviceConfog->IsAsync = jsonValue["Async"].GetBool();
+                if(jsonValue.HasMember("Async"))
+                {
+                    serviceConfog->IsAsync = jsonValue["Async"].GetBool();
+                }
                 if (jsonValue.HasMember("Request"))
                 {
                     serviceConfog->Request = jsonValue["Request"].GetString();
@@ -48,8 +55,7 @@ namespace Sentry
                 {
                     this->mIsClient = true;
                 }
-                serviceConfog->FullName = fullName;
-                this->mMethodConfigs.emplace(name, std::move(serviceConfog));
+                //this->mMethodConfigs.emplace(name, std::move(serviceConfog));
             }
         }
 		return true;

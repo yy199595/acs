@@ -165,7 +165,7 @@ namespace Sentry
 	void OuterNetClient::SendData(std::shared_ptr<Rpc::Packet> message)
 	{
 #ifdef ONLY_MAIN_THREAD
-		this->Send(message);
+		this->Write(message);
 #else
         Asio::Context & t = this->mSocket->GetThread();
         t.post(std::bind(&OuterNetClient::Write, this, message));

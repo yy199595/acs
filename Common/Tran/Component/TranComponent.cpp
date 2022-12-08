@@ -244,7 +244,10 @@ namespace Sentry
         else
         {
             std::string fullName;
-            LOG_RPC_CHECK_ARGS(head.Get("func", fullName));
+            if(!head.Get("func", fullName))
+            {
+                return XCode::CallArgsError;
+            }
             const MethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
             if(methodConfig == nullptr)
             {
@@ -268,7 +271,10 @@ namespace Sentry
     XCode TranComponent::Forward(long long userId, std::shared_ptr<Rpc::Packet> message)
     {
         std::string service, method, address, server;
-        LOG_RPC_CHECK_ARGS(message->GetMethod(service, method));
+        if(!message->GetMethod(service, method))
+        {
+            return XCode::CallArgsError;
+        }
 #ifdef __DEBUG__
         CONSOLE_LOG_DEBUG("forward message user id = "
             << userId << " func = " << service << "." << method);

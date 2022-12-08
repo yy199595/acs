@@ -33,6 +33,9 @@ inline std::string FormatFileLine(const char * file, const int line)
 	return std::string(buffer, size);
 }
 
+#define LUA_LOG_ERROR(log) \
+    Debug::Lua(log); \
+
 
 #define GK_LOG(type, f, content)						\
 {                                     \
@@ -86,6 +89,8 @@ inline std::string FormatFileLine(const char * file, const int line)
     if(!(obj)) { LOG_ERROR(#obj); return; }    \
 }
 
+
+
 #define LOG_CHECK_RET_FALSE(obj) \
 {                                \
     if(!(obj)) { LOG_ERROR(#obj); return false; }    \
@@ -102,8 +107,6 @@ inline std::string FormatFileLine(const char * file, const int line)
 #define LOG_ERROR_RETURN_CODE(obj, code) \
     if(!(obj)) { LOG_ERROR(#obj); return code; }    \
 
-#define LOG_RPC_CHECK_ARGS(obj) \
-           if(!(obj)) { LOG_ERROR(#obj); return XCode::CallArgsError; }    \
 
 #define IF_THROW_ERROR(obj){ \
     if(!(obj))                \

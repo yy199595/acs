@@ -62,7 +62,8 @@ namespace Sentry
 		this->mDynamicMessageFactory = nullptr;
 		this->mSourceTree = std::make_shared<compiler::DiskSourceTree>();
         this->mSourceTree->MapPath("", path);
-        this->mImporter = std::make_shared<compiler::Importer>(this->mSourceTree.get(), &importError);
+        this->mImporter = std::make_shared<compiler::Importer>(
+                this->mSourceTree.get(), &importError);
         if (importError.HasError())
         {
             LOG_ERROR("load proto message [" << path << "] error");
@@ -203,6 +204,11 @@ namespace Sentry
             return nullptr;
         }
         return nullptr;
+    }
+
+    bool ProtoComponent::HasMessage(const std::string &name)
+    {
+        return this->FindMessage(name) != nullptr;
     }
 
     void ProtoComponent::OnLuaRegister(Lua::ClassProxyHelper &luaRegister)

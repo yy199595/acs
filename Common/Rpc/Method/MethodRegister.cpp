@@ -3,24 +3,40 @@
 //
 
 #include"MethodRegister.h"
-
 #include"App/App.h"
-#include"Lua/Function.h"
 #include"Lua/LuaServiceMethod.h"
 #include"Service/LocalRpcService.h"
+#include"Component/ProtoComponent.h"
 namespace Sentry
 {
 	bool ServiceMethodRegister::AddMethod(std::shared_ptr<ServiceMethod> method)
 	{
-		RpcService * serviceComponent = this->mComponent->Cast<RpcService>();
-        LOG_CHECK_RET_FALSE(serviceComponent);
+        ProtoComponent * protoComponent = App::Inst()->GetMsgComponent();
+        RpcService * serviceComponent = this->mComponent->Cast<RpcService>();
+        LOG_CHECK_RET_FALSE(serviceComponent != nullptr);
 
         const std::string & name = method->GetName();
         const std::string & service = serviceComponent->GetName();
         std::string fullName = fmt::format("{0}.{1}", service, name);
-        if(RpcConfig::Inst()->GetMethodConfig(fullName) == nullptr)
+        const RpcMethodConfig * config = RpcConfig::Inst()->GetMethodConfig(fullName);
         {
-            return false;
+            if(config == nullptr)
+            {
+                LOG_ERROR("not find rpc config : [" << fullName << "]");
+                return false;
+            }
+            const std::string & request = config->Request;
+            const std::string & response = config->Response;
+            if(!request.empty() && !protoComponent->HasMessage(request))
+            {
+                LOG_ERROR("rpc config error [" << config->FullName << "] request message");
+                return false;
+            }
+            if(!response.empty() && !protoComponent->HasMessage(response))
+            {
+                LOG_ERROR("rpc config error [" << config->FullName << "] response message");
+                return false;
+            }
         }
 		if (method->IsLuaMethod())
 		{

@@ -9,7 +9,7 @@ function coroutine.call(func)
     coroutine.start(function(taskSource)
         local state, ret = pcall(func)
         if not state then
-            Log.Error(ret)
+            Log.LuaError(ret)
         end
         taskSource:SetResult(ret)
     end, luaTaskSource)
@@ -21,7 +21,7 @@ function coroutine.rpc(func, id, request, taskSource)
     local context = function()
         local state, error, response = pcall(func, id, request)
         if not state then
-            Log.SystemError(error);
+            Log.LuaError(error);
             taskSource:SetRpc(XCode.CallLuaFunctionFail, error)
         else
             taskSource:SetRpc(error, response)

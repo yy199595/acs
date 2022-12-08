@@ -27,6 +27,10 @@ function Main.StartInsert()
     end
 end
 
+function Main.Update()
+    print("memory = ", collectgarbage("count"), " kb")
+end
+
 function Main.OnClusterComplete()
     --Mongo.ClearTable("user.account_info")
 end

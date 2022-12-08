@@ -37,6 +37,7 @@ namespace Sentry
         std::shared_ptr<Message> New(const std::string & name, const std::string & json);
 		std::shared_ptr<Message> New(const std::string & name, const char * json, size_t size);
 	 public:
+        bool HasMessage(const std::string & name);
 		bool Write(lua_State * lua, const Message & message);
 		std::shared_ptr<Message> Read(lua_State * lua, const std::string & name, int index);
 	 private:

@@ -2,6 +2,32 @@
 #include"App/App.h"
 #include"Method/MethodProxy.h"
 #include"Tcp/SocketProxy.h"
+
+namespace Sentry
+{
+    bool AsioThread::Run()
+    {
+        if(this->mContext || this->mThread)
+        {
+            return false;
+        }
+        this->mContext = std::make_unique<Asio::Context>();
+        this->mThread = std::make_unique<std::thread>(std::bind(&AsioThread::Update, this));
+        this->mThread->detach();
+        return true;
+    }
+
+    void AsioThread::Update()
+    {
+        asio::error_code code;
+        Asio::ContextWork work(*this->mContext);
+        while (!this->mContext->stopped())
+        {
+            this->mContext->run(code);
+        }
+    }
+}
+
 namespace Sentry
 {
 	bool NetThreadComponent::Awake()
@@ -34,10 +60,11 @@ namespace Sentry
 		config->GetMember("thread", "network", networkCount);
 		for (int index = 0; index < networkCount; index++)
 		{
-            Asio::Context * io = new Asio::Context();
-            Asio::ContextWork * work = new Asio::ContextWork(*io);
-            this->mNetThreads.emplace_back(io);
-            this->mNetThreadWorks.emplace_back(work);
+            std::unique_ptr<AsioThread> asioThread
+                = std::make_unique<AsioThread>();
+            {
+                this->mNetThreads.emplace_back(std::move(asioThread));
+            }
 #ifdef __ENABLE_OPEN_SSL__
 			this->mNetThreads[index]->LoadVeriftFile(sslFile);
 #endif
@@ -47,20 +74,19 @@ namespace Sentry
 	}
 
 	bool NetThreadComponent::LateAwake()
-	{
+    {
 #ifndef ONLY_MAIN_THREAD
-		for (Asio::Context * io: this->mNetThreads)
+        for (size_t index = 0; index < this->mNetThreads.size(); index++)
         {
-            std::thread *t = new std::thread([io](){
-                asio::error_code code;
-                io->run(code);
-            });
-            t->detach();
-            this->mThreads.emplace_back(t);
+            if(!this->mNetThreads[index]->Run())
+            {
+                return false;
+            }
+            CONSOLE_LOG_INFO("start net thread [" << index << "] successful");
         }
 #endif
-		return true;
-	}
+        return true;
+    }
 
 	void NetThreadComponent::OnDestory()
 	{
@@ -70,13 +96,13 @@ namespace Sentry
     std::shared_ptr<SocketProxy> NetThreadComponent::CreateSocket()
     {
 #ifdef ONLY_MAIN_THREAD
-        asio::io_service & io = this->GetApp()->GetThread();
+        asio::io_service & io = this->mApp->MainThread();
 #else
         if (this->mIndex >= mNetThreads.size())
         {
             this->mIndex = 0;
         }
-        asio::io_service &io = *(mNetThreads[this->mIndex++]);
+        asio::io_service &io = mNetThreads[this->mIndex++]->Context();
 #endif
         return std::make_shared<SocketProxy>(io);
     }

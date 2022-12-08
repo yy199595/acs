@@ -43,7 +43,7 @@ namespace Tcp
 	void TelnetClientContext::SendProtoMessage(std::shared_ptr<TelnetProto> message)
 	{
 #ifdef ONLY_MAIN_THREAD
-		this->Send(message);
+		this->Write(message);
 #else
 		Asio::Context &netWorkThread = this->mSocket->GetThread();
 		netWorkThread.post(std::bind(&TelnetClientContext::Write, this, message));

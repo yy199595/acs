@@ -22,12 +22,12 @@ namespace Sentry
 	 protected:
 		bool Awake() final;
 		bool Start() final;
-        void OnHotFix() final;
 		bool LateAwake() final;
 		void OnDestory() final;
 		void OnLocalComplete() final;
 		void OnClusterComplete() final;
-		void OnSecondUpdate(const int tick) final;      
+        void OnSecondUpdate(const int tick) final;
+        void OnHotFix() final;
     private:
 		bool LoadAllFile();
 		bool LoadAllFilePath(const std::string & dir);

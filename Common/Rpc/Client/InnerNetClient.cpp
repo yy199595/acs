@@ -30,7 +30,7 @@ namespace Sentry
     void InnerNetClient::Send(std::shared_ptr<Rpc::Packet> message)
     {
 #ifdef ONLY_MAIN_THREAD
-        this->Send(message);
+        this->Write(message);
 #else
         asio::io_service &t = this->mSocket->GetThread();
         t.post(std::bind(&InnerNetClient::Write, this, message));
@@ -96,7 +96,7 @@ namespace Sentry
 		}
 		const std::string & address = this->GetAddress();
 #ifdef ONLY_MAIN_THREAD
-		this->mTcpComponent->OnCloseSocket(address, code);
+		this->mComponent->OnCloseSocket(address, code);
 #else
 		asio::io_service & taskScheduler = App::Inst()->MainThread();
 		taskScheduler.post(std::bind(&IRpc<Rpc::Packet>::OnCloseSocket, this->mComponent, address, code));
@@ -144,7 +144,7 @@ namespace Sentry
                 this->ReceiveMessage(RPC_PACK_HEAD_LEN);
                 const std::string & address = this->mSocket->GetAddress();
 #ifdef ONLY_MAIN_THREAD
-                this->mTcpComponent->OnMessage(address, std::move(this->mMessage));
+                this->mComponent->OnMessage(address, std::move(this->mMessage));
 #else
                 asio::io_service & io = App::Inst()->MainThread();
                 io.post(std::bind(&IRpc<Rpc::Packet>::OnMessage, this->mComponent, address, std::move(this->mMessage)));
@@ -157,7 +157,7 @@ namespace Sentry
 	void InnerNetClient::StartReceive()
 	{
 #ifdef ONLY_MAIN_THREAD
-		this->ReceiveMessage(PackeHeadtLength);
+		this->ReceiveMessage(RPC_PACK_HEAD_LEN);
 #else
         Asio::Context & t = this->mSocket->GetThread();
         t.post(std::bind(&InnerNetClient::ReceiveMessage, this, RPC_PACK_HEAD_LEN));

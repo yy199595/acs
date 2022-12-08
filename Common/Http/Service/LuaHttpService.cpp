@@ -22,7 +22,7 @@ namespace Sentry
 
     bool LuaHttpService::OnCloseService()
     {
-        Lua::LuaModule* luaModule = this->mLuaComponent->LoadModule(this->GetName());
+        Lua::LuaModule* luaModule = this->mLuaComponent->GetModule(this->GetName());
         return luaModule != nullptr && luaModule->Close();
     }
 

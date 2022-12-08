@@ -23,19 +23,17 @@ namespace Sentry
 
 	bool OuterService::OnStart()
 	{
-        BIND_COMMON_RPC_METHOD(OuterService::Ping);
         BIND_COMMON_RPC_METHOD(OuterService::Allot);
         const ServerConfig * config = ServerConfig::Inst();
         ServerConfig::Inst()->GetLocation("gate", this->mAddress);
-        LOG_CHECK_RET_FALSE(config->GetLocation("gate", this->mAddress));
         this->mOuterComponent = this->GetComponent<OuterNetMessageComponent>();
+        LOG_CHECK_RET_FALSE(config->GetLocation("gate", this->mAddress));
         return true;
 	}
 
     bool OuterService::OnClose()
     {
-        this->GetComponent<OuterNetComponent>()->StopListen();
-		return true;
+		return this->GetComponent<OuterNetComponent>()->StopListen();
     }
 
 	XCode OuterService::Ping(long long userId)
@@ -46,11 +44,13 @@ namespace Sentry
 
 	XCode OuterService::Allot(const com::type::int64 &request, s2s::allot::response &response)
     {
+        std::string token;
         long long userId = request.value();
-        if(!this->mOuterComponent->CreateToken(userId, *response.mutable_token()))
+        if(!this->mOuterComponent->CreateToken(userId, token))
         {
             return XCode::Failure;
         }
+        response.set_token(token);
         response.set_address(this->mAddress);
         return XCode::Successful;
     }

@@ -16,14 +16,10 @@ namespace Sentry
 
 	bool LuaRpcService::Start()
 	{
-        std::string location;
-        const ServerConfig * config = ServerConfig::Inst();
-        LOG_CHECK_RET_FALSE(config->GetLocation("rpc", location));
-		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
+        std::vector<const RpcMethodConfig *> rpcInterConfigs;
+        this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
         const RpcServiceConfig * rpcServiceConfig = RpcConfig::Inst()->GetConfig(this->GetName());
-
-		std::vector<const RpcMethodConfig *> rpcInterConfigs;
-        LOG_CHECK_RET_FALSE(rpcServiceConfig->GetMethodConfigs(rpcInterConfigs) > 0);
+        LOG_CHECK_RET_FALSE(rpcServiceConfig && rpcServiceConfig->GetMethodConfigs(rpcInterConfigs) > 0);
 		Lua::LuaModule * luaModule = this->mLuaComponent->GetModule(this->GetName());
 		if(luaModule == nullptr)
 		{
@@ -34,12 +30,11 @@ namespace Sentry
 		{
 			if(!luaModule->GetFunction(rpcInterfaceConfig->Method))
 			{
+                LOG_ERROR("not find lua rpc method [" << rpcInterfaceConfig->FullName << "]");
 				return false;
 			}
-			if (!this->mMethodRegister->AddMethod(std::make_shared<LuaServiceMethod>(rpcInterfaceConfig)))
-			{
-				return false;
-			}
+			this->mMethodRegister->AddMethod(
+                    std::make_shared<LuaServiceMethod>(rpcInterfaceConfig));
 		}
         if (!luaModule->Start())
         {
@@ -104,10 +99,6 @@ namespace Sentry
 	bool LuaRpcService::Close()
 	{
         Lua::LuaModule* luaModule = this->mLuaComponent->GetModule(this->GetName());
-        if (luaModule == nullptr)
-        {
-            return false;
-        }        
-        return luaModule->Close();
+        return luaModule == nullptr || luaModule->Close();
 	}
 }

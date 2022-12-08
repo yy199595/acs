@@ -33,7 +33,7 @@ namespace Lua
 		}
 		if(luaL_dofile(this->mLua, this->mPath.c_str()) != LUA_OK)
 		{
-			LOG_ERROR(lua_tostring(this->mLua, -1));
+            LUA_LOG_ERROR(lua_tostring(this->mLua, -1));
 			return false;
 		}
 		if(!lua_istable(this->mLua, -1))
@@ -48,7 +48,7 @@ namespace Lua
 		{
 			if(lua_pcall(this->mLua, 0, 1, 0) != LUA_OK)
 			{
-				LOG_ERROR(lua_tostring(this->mLua, -1));
+                LUA_LOG_ERROR(lua_tostring(this->mLua, -1));
 				return false;
 			}
 		}
@@ -64,7 +64,7 @@ namespace Lua
 			lua_pushinteger(this->mLua, tick);
 			if (lua_pcall(this->mLua, 1, 0, 0) != LUA_OK)
 			{
-				LOG_ERROR(lua_tostring(this->mLua, -1));
+                LUA_LOG_ERROR(lua_tostring(this->mLua, -1));
 			}
 		}
 	}
@@ -79,7 +79,7 @@ namespace Lua
 		}
 		if(luaL_dofile(this->mLua, this->mPath.c_str()) != LUA_OK)
 		{
-			LOG_ERROR(lua_tostring(this->mLua, -1));
+            LUA_LOG_ERROR(lua_tostring(this->mLua, -1));
 			return false;
 		}
 		if(!lua_istable(this->mLua, -1))

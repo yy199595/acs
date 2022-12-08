@@ -10,20 +10,6 @@
 #include"Lua/LuaServiceMethod.h"
 #include"Component/InnerNetComponent.h"
 #include"Component/LuaScriptComponent.h"
-
-namespace Sentry
-{
-    void ServiceRunInfo::OnCall(const std::string &func)
-    {
-
-    }
-
-    void ServiceRunInfo::OnInvokeCompete(const std::string &func, int ms)
-    {
-
-    }
-}
-
 namespace Sentry
 {
     extern std::string GET_FUNC_NAME(std::string fullName)
@@ -84,11 +70,11 @@ namespace Sentry
 
 	bool LocalRpcService::Start()
 	{
-		this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
-
+        this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
         const RpcServiceConfig * rpcServiceConfig = RpcConfig::Inst()->GetConfig(this->GetName());
-		if (!this->OnStart())
+		if (rpcServiceConfig == nullptr || !this->OnStart())
 		{
+            this->mMethodRegister = nullptr;
 			return false;
 		}
         this->LoadFromLua();
@@ -119,10 +105,14 @@ namespace Sentry
         {
             return false;
         }
-		Lua::LuaModule* luaModule = luaScriptComponent->LoadModule(this->GetName());
+		Lua::LuaModule* luaModule = luaScriptComponent->GetModule(this->GetName());
 		if (luaModule == nullptr)
 		{
-			return false;
+            luaModule = luaScriptComponent->LoadModule(this->GetName());
+            if(luaModule == nullptr || !luaModule->Awake())
+            {
+                return false;
+            }
 		}
         std::vector<const RpcMethodConfig*> methodConfigs;
 		const RpcServiceConfig* rpcServiceConfig = RpcConfig::Inst()->GetConfig(this->GetName());

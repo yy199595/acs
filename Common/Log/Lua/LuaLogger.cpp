@@ -54,26 +54,14 @@ namespace Lua
 			return 0;
 		}
 
-		int SystemError(lua_State* luaEnv)
+		int LuaError(lua_State* luaEnv)
 		{
-			size_t size = 0;
-			const char* str = luaL_checklstring(luaEnv, 1, &size);
-			if(str != nullptr && size > 0)
-			{
-				std::string log(str, size);
-				size_t pos = log.find_last_of('/');
-				if(pos != std::string::npos)
-				{
-					log = log.substr(pos + 1);
-					lua_pushlstring(luaEnv, log.c_str(), log.size());
-					App::Inst()->GetLogger()->AddLog(spdlog::level::err, log);
-					return 1;
-				}
-			}
+			const char* log = luaL_checkstring(luaEnv, 1);
+            LUA_LOG_ERROR(log);
 			return 0;
 		}
 
-		int DebugError(lua_State* luaEnv)
+        int DebugError(lua_State* luaEnv)
 		{
 			std::string log;
 			GetLuaString(luaEnv, log);

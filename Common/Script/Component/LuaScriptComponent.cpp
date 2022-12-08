@@ -72,7 +72,7 @@ namespace Sentry
         luaRegister5.PushExtensionFunction("Debug", Lua::Log::DebugLog);
         luaRegister5.PushExtensionFunction("Error", Lua::Log::DebugError);
 		luaRegister5.PushExtensionFunction("Warning", Lua::Log::DebugWarning);
-		luaRegister5.PushExtensionFunction("SystemError", Lua::Log::SystemError);
+		luaRegister5.PushExtensionFunction("LuaError", Lua::Log::LuaError);
 
 		Lua::ClassProxyHelper luaRegister6(this->mLuaEnv, "Guid");
         luaRegister6.BeginNewTable();
@@ -126,7 +126,6 @@ namespace Sentry
         const std::string & path = iter->second;
 		std::unique_ptr<Lua::LuaModule> luaModule =
 			std::make_unique<Lua::LuaModule>(this->mLuaEnv, name, path);
-		LOG_CHECK_RET_NULL(luaModule->Awake());
 		Lua::LuaModule * result = luaModule.get();
 		this->mModules.emplace(name, std::move(luaModule));
 		CONSOLE_LOG_INFO("load lua module [" << name << "] successful");
@@ -200,8 +199,8 @@ namespace Sentry
        
         this->AddRequire(common);
         this->AddRequire(this->mModulePath);       
-        this->LoadModule(ServerConfig::Inst()->Name());
-        return true;
+        LuaModule * luaModule = this->LoadModule(ServerConfig::Inst()->Name());
+        return luaModule == nullptr || luaModule->Awake();
     }
 
     bool LuaScriptComponent::LoadAllFilePath(const std::string & dir)
@@ -231,10 +230,15 @@ namespace Sentry
         this->mApp->GetComponents(components);
         for (Component* component : components)
         {
+            const std::string & name = component->GetName();
             IServiceBase * service = component->Cast<IServiceBase>();
-            if (service != nullptr && !this->GetModule(component->GetName()))
+            if (service != nullptr && this->GetModule(name) == nullptr)
             {
-                this->LoadModule(component->GetName());
+                Lua::LuaModule * luaModule = this->LoadModule(component->GetName());
+                if(luaModule != nullptr && !luaModule->Awake())
+                {
+                    LOG_ERROR("load lua module [" << name << "failure");
+                }
             }
         }
         

@@ -35,7 +35,10 @@ namespace Sentry
 	XCode InnerNetMessageComponent::OnRequest(std::shared_ptr<Rpc::Packet> message)
 	{
         const Rpc::Head & head = message->GetHead();
-        LOG_RPC_CHECK_ARGS(head.Get("func", this->mFullName));
+        if(!head.Get("func", this->mFullName))
+        {
+            return XCode::CallArgsError;
+        }
         const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(this->mFullName);
         if(methodConfig == nullptr)
         {
@@ -63,18 +66,17 @@ namespace Sentry
             std::shared_ptr<Rpc::Packet> message = this->mWaitMessages.front();
             if(message->GetHead().Get("func", this->mFullName))
             {
-               const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(this->mFullName);
-               if(methodConfig != nullptr)
-               {
-                   if (!methodConfig->IsAsync)
-                   {
-                       this->Invoke(methodConfig, message);
-                   }
-                   else
-                   {
-                       this->mTaskComponent->Start(&InnerNetMessageComponent::Invoke, this, methodConfig, message);
-                   }
-               }
+                const RpcMethodConfig *methodConfig = RpcConfig::Inst()->GetMethodConfig(this->mFullName);
+                if (methodConfig != nullptr)
+                {
+                    if (!methodConfig->IsAsync)
+                    {
+                        this->Invoke(methodConfig, message);
+                        continue;
+                    }
+                    this->mTaskComponent->Start(&InnerNetMessageComponent::Invoke,
+                                                this, methodConfig, message);
+                }
             }
             this->mWaitMessages.pop();
         }
@@ -84,48 +86,41 @@ namespace Sentry
     {
         this->mSumCount++;
         this->mWaitCount++;
-        XCode code = XCode::Failure;
+        Rpc::Head & head = message->GetHead();
         RpcService *logicService = this->mApp->GetService(config->Service);
-        try
+        LOG_CHECK_RET(logicService != nullptr);
+        XCode code = logicService->Invoke(config->Method, message);
+        if (code != XCode::Successful)
         {
-            code = logicService->Invoke(config->Method, message);
-            if (code != XCode::Successful)
-            {
-                message->GetHead().Add("error", CodeConfig::Inst()->GetDesc(code));
-            }
-        }
-        catch (std::exception &e)
-        {
-            code = XCode::ThrowError;
-            message->GetHead().Add("error", e.what());
+            head.Add("error", CodeConfig::Inst()->GetDesc(code));
         }
 #ifdef __DEBUG__
         std::string from;
-        if (message->GetHead().Get("address", from))
+        if (head.Get("address", from))
         {
             const ServiceNodeInfo *nodeInfo = this->mRpcClientComponent->GetSeverInfo(from);
-            if(nodeInfo != nullptr)
+            if (nodeInfo != nullptr)
             {
                 from = nodeInfo->LocationRpc;
             }
-            if(code != XCode::Successful)
+            if (code != XCode::Successful)
             {
                 CONSOLE_LOG_ERROR("[" << from << "] call ["
-                    << config->FullName << "] code = " << CodeConfig::Inst()->GetDesc(code));
+                                      << config->FullName << "] code = " << CodeConfig::Inst()->GetDesc(code));
             }
         }
 #endif
         this->mWaitCount--;
-        if (!message->GetHead().Has("rpc"))
+        if (!head.Has("rpc"))
         {
             return; //不需要返回
         }
         std::string address;
-        message->GetHead().Add("code", code);
-        if (message->GetHead().Get("address", address))
+        head.Add("code", code);
+        if (head.Get("address", address))
         {
-            message->GetHead().Remove("id");
-            message->GetHead().Remove("address");
+            head.Remove("id");
+            head.Remove("address");
 #ifndef __DEBUG__
             message->GetHead().Remove("func");
 #endif

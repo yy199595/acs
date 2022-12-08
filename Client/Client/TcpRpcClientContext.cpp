@@ -13,7 +13,7 @@ namespace Client
 	void TcpRpcClientContext::SendToServer(std::shared_ptr<Rpc::Packet> message)
 	{
 #ifdef ONLY_MAIN_THREAD
-        this->Send(message);
+        this->Write(message);
 #else
         Asio::Context & io = this->mSocket->GetThread();
         io.post(std::bind(&TcpRpcClientContext::Write, this, message));

@@ -217,7 +217,7 @@ namespace Mongo
 	void TcpMongoClient::SendMongoCommand(std::shared_ptr<CommandRequest> request)
 	{
 #ifdef ONLY_MAIN_THREAD
-		this->Send(request);
+		this->Write(request);
 #else
         asio::io_service & t = this->mSocket->GetThread();
 		t.post(std::bind(&TcpMongoClient::Write, this, request));

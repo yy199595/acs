@@ -7,6 +7,17 @@
 #include"Component/LoggerComponent.h"
 using namespace Sentry;
 
+void Debug::Lua(const char *log)
+{
+    std::string logMessage(log);
+    size_t pos = logMessage.find_last_of('/');
+    if (pos != std::string::npos)
+    {
+        logMessage = logMessage.substr(pos + 1);
+    }
+    Debug::Log(Debug::Level::err, logMessage);
+}
+
 void Debug::Log(Debug::Level color, const std::string &log)
 {
     LoggerComponent *logComponent = App::Inst()->GetLogger();

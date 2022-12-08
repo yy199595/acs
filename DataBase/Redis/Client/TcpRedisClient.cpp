@@ -22,7 +22,7 @@ namespace Sentry
 	void TcpRedisClient::Send(std::shared_ptr<RedisRequest> command)
 	{
 #ifdef ONLY_MAIN_THREAD
-		this->Send(command);
+		this->Write(command);
 #else
         Asio::Context & t = this->mSocket->GetThread();
 		t.post(std::bind(&TcpRedisClient::Write, this, command));
@@ -77,7 +77,7 @@ namespace Sentry
 	{
         std::shared_ptr<RedisResponse> response = this->mCurResponse;
 #ifdef ONLY_MAIN_THREAD
-		this->mRedisComponent->OnMessage(id, response);
+		this->mComponent->OnMessage(this->mAddress, response);
 #else
 		asio::io_service & io = App::Inst()->MainThread();
 		io.post(std::bind(&IRpc<RedisResponse>::OnMessage, this->mComponent, this->mAddress, response));
@@ -141,7 +141,7 @@ namespace Sentry
             this->mCloseTimer->async_wait(std::bind(&TcpRedisClient::CloseFreeClient, this));
         }
 #ifdef ONLY_MAIN_THREAD
-		this->mRedisComponent->OnConnectSuccessful(this->mAddress);
+		this->mComponent->OnConnectSuccessful(this->mAddress);
 #else
 		asio::io_service & taskThread = App::Inst()->MainThread();
 		taskThread.post(std::bind(&IRpc<RedisResponse>::OnConnectSuccessful, this->mComponent, this->mAddress));
