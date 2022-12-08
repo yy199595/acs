@@ -29,6 +29,13 @@ void Debug::Log(Debug::Level color, const std::string &log)
 
 void Debug::Console(Debug::Level color, const std::string &log)
 {
+#ifdef __ENABLE_START_LOG__
+    LoggerComponent *logComponent = App::Inst()->GetLogger();
+    if(logComponent != nullptr)
+    {
+        logComponent->AddStartLog(color, log);
+    }
+#endif
     switch (color)
     {
         case Debug::Level::info:

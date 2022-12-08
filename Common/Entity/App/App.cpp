@@ -223,27 +223,30 @@ namespace Sentry
     }
 
 	void App::WaitServerStart() //等待依赖的服务启动完成
-	{
-		std::vector<const NodeConfig *> configs;
-		ClusterConfig::Inst()->GetNodeConfigs(configs);
-		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
-		for(const NodeConfig * nodeConfig : configs)
-		{
+    {
+        std::vector<const NodeConfig *> configs;
+        ClusterConfig::Inst()->GetNodeConfigs(configs);
+        LocationComponent *locationComponent = this->GetComponent<LocationComponent>();
+        for (const NodeConfig *nodeConfig: configs)
+        {
             if (nodeConfig->ServiceCount() > 0)
             {
                 locationComponent->WaitServerStart(nodeConfig->GetName());
                 CONSOLE_LOG_INFO(nodeConfig->GetName() << " start successful ...");
             }
-		}
+        }
         std::vector<IComplete *> completeComponents;
         this->GetComponents<IComplete>(completeComponents);
-        for (IComplete* complete: completeComponents)
+        for (IComplete *complete: completeComponents)
         {
             complete->OnClusterComplete();
         }
-		long long t = Helper::Time::NowMilTime() - this->mStartTime;
-		LOG_INFO("===== start " << ServerConfig::Inst()->Name() << " successful [" << t / 1000.0f << "]s ===========");
-	}
+        long long t = Helper::Time::NowMilTime() - this->mStartTime;
+        LOG_INFO("===== start " << ServerConfig::Inst()->Name() << " successful [" << t / 1000.0f << "]s ===========");
+#ifdef __ENABLE_START_LOG__
+        this->mLogComponent->CloseStartLog();
+#endif
+    }
 #ifdef __OS_WIN__
 	void App::UpdateConsoleTitle()
 	{       

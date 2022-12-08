@@ -47,43 +47,32 @@ namespace Sentry
     {
 #ifdef __DEBUG__
         Debug::Console(type, log);
+        this->mAllLog->log(type, log);
 #endif
         switch (type)
         {
 			case spdlog::level::level_enum::debug:
-#ifdef __DEBUG__
-				this->mAllLog->debug(log);
-#else
-				this->mDebugLog->debug(log);
+#ifndef __DEBUG__
+                this->mDebugLog->debug(log);
 #endif
 			break;
             case spdlog::level::level_enum::info:
-#ifdef __DEBUG__
-                this->mAllLog->info(log);
-#else
+#ifndef __DEBUG__
                 this->mInfoLog->info(log);
 #endif
                 break;
             case spdlog::level::level_enum::warn:
-#ifdef __DEBUG__
-                this->mAllLog->warn(log);
-#else
+#ifndef __DEBUG__
                 this->mWarningLog->warn(log);
-
 #endif
                 break;
             case spdlog::level::level_enum::err:
-#ifdef __DEBUG__
-                this->mAllLog->error(log);
-#else
+#ifndef __DEBUG__
                 this->mErrorLog->error(log);
-
 #endif
                 break;
             case spdlog::level::level_enum::critical:
-#ifdef __DEBUG__
-                this->mAllLog->critical(log);
-#else
+#ifndef __DEBUG__
                 this->mFatalLog->critical(log);
 #endif
                 break;
@@ -91,12 +80,31 @@ namespace Sentry
                 break;
         }
     }
+#ifdef __ENABLE_START_LOG__
+    void LoggerComponent::AddStartLog(spdlog::level::level_enum type, const std::string &log)
+    {
+        if(this->mStartLog != nullptr)
+        {
+            this->mStartLog->log(type, log);
+            this->mStartLog->flush();
+        }
+    }
 
+    void LoggerComponent::CloseStartLog()
+    {
+        if(this->mStartLog != nullptr)
+        {
+            this->mStartLog->flush();
+            this->mStartLog = nullptr;
+        }
+    }
+#endif
 	void LoggerComponent::CreateLogFile()
 	{
 		spdlog::shutdown();
-		spdlog::set_level(spdlog::level::debug);
-		spdlog::flush_every(std::chrono::seconds(this->mLogSaveTime));
+        spdlog::set_level(spdlog::level::debug);
+        const std::string & name = ServerConfig::Inst()->Name();
+        spdlog::flush_every(std::chrono::seconds(this->mLogSaveTime));
 		std::string logPath = fmt::format("{0}/{1}/{2}", this->mLogSavePath,
 			Helper::Time::GetYearMonthDayString(), this->mServerName);
 #ifndef ONLY_MAIN_THREAD
@@ -113,7 +121,7 @@ namespace Sentry
 #else
 #ifdef __DEBUG__
 		spdlog::set_level(spdlog::level::level_enum::debug);
-		this->mAllLog = spdlog::rotating_logger_st<spdlog::async_factory>("All",
+		this->mAllLog = spdlog::rotating_logger_st<spdlog::async_factory>(name,
 			logPath + "/all.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 #else
 		this->mInfoLog = spdlog::rotating_logger_st<spdlog::async_factory>("Info", logPath + "/info.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
@@ -124,6 +132,12 @@ namespace Sentry
 		this->mWarningLog = spdlog::rotating_logger_st<spdlog::async_factory>("Warning", logPath + "/warning.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 #endif
 
+#endif
+
+#ifdef __ENABLE_START_LOG__
+        std::string logName = fmt::format("{0}{1}", "Start", name);
+        this->mStartLog = spdlog::rotating_logger_mt<spdlog::async_factory>(
+                logName,logPath + "/start.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 #endif
 	}
 }
