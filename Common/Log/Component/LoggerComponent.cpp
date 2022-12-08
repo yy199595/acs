@@ -46,7 +46,6 @@ namespace Sentry
 	void LoggerComponent::AddLog(spdlog::level::level_enum type, const std::string& log)
     {
 #ifdef __DEBUG__
-        Debug::Console(type, log);
         this->mAllLog->log(type, log);
 #endif
         switch (type)

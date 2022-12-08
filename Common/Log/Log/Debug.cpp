@@ -5,6 +5,8 @@
 #include"Time/TimeHelper.h"
 #include"App/App.h"
 #include"Component/LoggerComponent.h"
+#include<execinfo.h>
+#include<cxxabi.h>
 using namespace Sentry;
 
 void Debug::Lua(const char *log)
@@ -23,8 +25,66 @@ void Debug::Log(Debug::Level color, const std::string &log)
     LoggerComponent *logComponent = App::Inst()->GetLogger();
     if (logComponent != nullptr)
     {
-        logComponent->AddLog(color, log);
+
+        switch (color)
+        {
+            case spdlog::level::err:
+            case spdlog::level::critical:
+            {
+                std::string trace;
+                Debug::Backtrace(trace, 15, 2);
+                Debug::Console(color, log + trace);
+                logComponent->AddLog(color, log + trace);
+            }
+                break;
+            default:
+            {
+                Debug::Console(color, log);
+                logComponent->AddLog(color, log);
+            }
+                break;
+        }
     }
+
+}
+
+static std::string demangle(const char* str) {
+    size_t size = 0;
+    int status = 0;
+    std::string rt;
+    rt.resize(256);
+    if(1 == sscanf(str, "%*[^(]%*[^_]%255[^)+]", &rt[0])) {
+        char* v = abi::__cxa_demangle(&rt[0], nullptr, &size, &status);
+        if(v) {
+            std::string result(v);
+            free(v);
+            return result;
+        }
+    }
+    if(1 == sscanf(str, "%255s", &rt[0])) {
+        return rt;
+    }
+    return str;
+}
+
+void Debug::Backtrace(std::string &trace, int size, int skip)
+{
+    void** array = (void**)malloc((sizeof(void*) * size));
+    size_t s = ::backtrace(array, size);
+
+    char** strings = backtrace_symbols(array, s);
+    if(strings == NULL) {
+        return;
+    }
+    int index = 0;
+    std::stringstream ss;
+    ss << "\n";
+    for(size_t i = skip; i < s; ++i) {
+        ss << "   [" << index++ << "]" << demangle(strings[i]) << "\n";
+    }
+    trace.append(ss.str());
+    free(strings);
+    free(array);
 }
 
 void Debug::Console(Debug::Level color, const std::string &log)
@@ -111,4 +171,5 @@ void Debug::Console(Debug::Level color, const std::string &log)
         }
             break;
     }
+
 }
