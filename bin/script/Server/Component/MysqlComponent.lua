@@ -1,5 +1,7 @@
 local MysqlComponent = {}
-
+if not Service.FindService("MysqlService") then
+    Log.Error("not find MysqlService")
+end
 function MysqlComponent.Create(tabName, keys, data)
     local request = Proto.New(tabName, data)
     local address = Service.AllotLocation("MysqlService")
@@ -107,3 +109,4 @@ function MysqlComponent.Update(tabName, where, update, flag)
         update_json = rapidjson.encode(update)
     })
 end
+return MysqlComponent

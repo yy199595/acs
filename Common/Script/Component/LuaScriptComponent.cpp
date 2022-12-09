@@ -91,7 +91,8 @@ namespace Sentry
 		luaRegister9.BeginNewTable();
 		luaRegister9.PushExtensionFunction("Call", Lua::Service::Call);
         luaRegister9.PushExtensionFunction("Send", Lua::Service::Send);
-		luaRegister9.PushExtensionFunction("AllotServer", Lua::Service::AllotServer);
+        luaRegister9.PushExtensionFunction("FindService", Lua::Service::FindService);
+        luaRegister9.PushExtensionFunction("AllotServer", Lua::Service::AllotServer);
         luaRegister9.PushExtensionFunction("GetServerList", Lua::Service::GetServerList);
 
 

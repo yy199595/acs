@@ -248,6 +248,14 @@ namespace Lua
         return 1;
     }
 
+    int Service::FindService(lua_State *lua)
+    {
+        std::string service = luaL_checkstring(lua, 1);
+        RpcService * rpcService = App::Inst()->GetService(service);
+        lua_pushboolean(lua, rpcService != nullptr);
+        return 1;
+    }
+
     int Service::AddLocation(lua_State *lua)
     {
         return 0;

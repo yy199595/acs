@@ -1,4 +1,4 @@
-rm -rf ./start.log
+rm -rf ./log/start.log
 screen -dms yjz.tran ./app ./config/server.json TranServer
 screen -dms yjz.data ./app ./config/server.json DataServer
 screen -dms yjz.http ./app ./config/server.json HttpServer

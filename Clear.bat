@@ -30,11 +30,10 @@ rmdir /s/q cmake-build-debug
 rmdir /s/q Debug
 rmdir /s/q Win32
 rmdir /s/q X64
-cd Server
 rmdir /s/q CMakeFiles
-rmdir /s/q Server.dir
 rmdir /s/q app.dir
 rmdir /s/q .vs
+rmdir /s/q .idea
 cd bin
 rmdir /s/q Debug
 rmdir /s/q log

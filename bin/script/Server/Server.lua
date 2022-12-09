@@ -1,7 +1,7 @@
 
 local Main = {}
 local Mongo = require("Component.MongoComponent")
-
+local Mysql = require("Component.MysqlComponent")
 function Main.Awake()
     return true
 end
@@ -25,10 +25,6 @@ function Main.StartInsert()
         })
         table.print(res)
     end
-end
-
-function Main.Update()
-    print("memory = ", collectgarbage("count"), " kb")
 end
 
 function Main.OnClusterComplete()
