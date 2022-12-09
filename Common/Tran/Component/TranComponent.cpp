@@ -196,6 +196,8 @@ namespace Sentry
                 request->WriteMessage(&data);
             }
             this->Send(location, request);
+
+
 			s2s::cluster::server * registerServer = registerInfo.add_list();
 			const ServiceNodeInfo * nodeInfo = this->GetServerInfo(location);
 			{
@@ -203,6 +205,9 @@ namespace Sentry
 				registerServer->set_rpc(nodeInfo->LocationRpc);
 				registerServer->set_http(nodeInfo->LocationHttp);
 			}
+#ifdef __DEBUG__
+            LOG_INFO("send to [" << location << "] " << nodeInfo->SrvName);
+#endif // 
         }
 		if(registerInfo.list_size() > 0)
 		{
@@ -217,6 +222,7 @@ namespace Sentry
 
 		this->mAuthClients.insert(address);
         this->mLocationMap.emplace(serverNode->LocationRpc, address);
+        LOG_ERROR("auth new client [" << address << "] " << serverNode->SrvName);
         this->mNodeInfos.emplace(address, std::move(serverNode));
         return true;
     }

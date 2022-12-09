@@ -4,9 +4,8 @@
 #include"Debug.h"
 #include"Time/TimeHelper.h"
 #include"App/App.h"
+#include"backward.hpp"
 #include"Component/LoggerComponent.h"
-#include<execinfo.h>
-#include<cxxabi.h>
 using namespace Sentry;
 
 void Debug::Lua(const char *log)
@@ -48,54 +47,13 @@ void Debug::Log(Debug::Level color, const std::string &log)
 
 }
 
-static std::string demangle(const char* str) {
-    size_t size = 0;
-    int status = 0;
-    std::string rt;
-    rt.resize(256);
-    if(1 == sscanf(str, "%*[^(]%*[^_]%255[^)+]", &rt[0])) {
-        char* v = abi::__cxa_demangle(&rt[0], nullptr, &size, &status);
-        if(v) {
-            std::string result(v);
-            free(v);
-            return result;
-        }
-    }
-    if(1 == sscanf(str, "%255s", &rt[0])) {
-        return rt;
-    }
-    return str;
-}
-
 void Debug::Backtrace(std::string &trace, int size, int skip)
 {
-    void** array = (void**)malloc((sizeof(void*) * size));
-    size_t s = ::backtrace(array, size);
-
-    char** strings = backtrace_symbols(array, s);
-    if(strings == NULL) {
-        return;
-    }
-    int index = 0;
-    std::stringstream ss;
-    ss << "\n";
-    for(size_t i = skip; i < s; ++i) {
-        ss << "   [" << index++ << "]" << demangle(strings[i]) << "\n";
-    }
-    trace.append(ss.str());
-    free(strings);
-    free(array);
+    
 }
 
 void Debug::Console(Debug::Level color, const std::string &log)
 {
-#ifdef __ENABLE_START_LOG__
-    LoggerComponent *logComponent = App::Inst()->GetLogger();
-    if(logComponent != nullptr)
-    {
-        logComponent->AddStartLog(color, log);
-    }
-#endif
     switch (color)
     {
         case Debug::Level::info:
@@ -163,11 +121,11 @@ void Debug::Console(Debug::Level color, const std::string &log)
             std::string time = Helper::Time::GetDateString();
             printf("%s%s [Fatal  ] %s\e[0m\n", "\e[35m", time.c_str(), log.c_str());
 #endif
-//            backward::StackTrace st;
-//            st.load_here(64);
-//            backward::Printer p;
-//            p.color_mode = backward::ColorMode::always;
-//            p.print(st, stderr);
+            backward::StackTrace st;
+            st.load_here(64);
+            backward::Printer p;
+            p.color_mode = backward::ColorMode::always;
+            p.print(st, stderr);
         }
             break;
     }

@@ -79,25 +79,7 @@ namespace Sentry
                 break;
         }
     }
-#ifdef __ENABLE_START_LOG__
-    void LoggerComponent::AddStartLog(spdlog::level::level_enum type, const std::string &log)
-    {
-        if(this->mStartLog != nullptr)
-        {
-            this->mStartLog->log(type, log);
-            this->mStartLog->flush();
-        }
-    }
 
-    void LoggerComponent::CloseStartLog()
-    {
-        if(this->mStartLog != nullptr)
-        {
-            this->mStartLog->flush();
-            this->mStartLog = nullptr;
-        }
-    }
-#endif
 	void LoggerComponent::CreateLogFile()
 	{
 		spdlog::shutdown();
@@ -131,12 +113,6 @@ namespace Sentry
 		this->mWarningLog = spdlog::rotating_logger_st<spdlog::async_factory>("Warning", logPath + "/warning.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 #endif
 
-#endif
-
-#ifdef __ENABLE_START_LOG__
-        std::string logger_name = fmt::format("Start:{0}", name);
-        this->mStartLog = spdlog::rotating_logger_mt<spdlog::async_factory>(
-                logger_name, "./log/start.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 #endif
 	}
 }

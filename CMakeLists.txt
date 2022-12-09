@@ -93,7 +93,7 @@ include_directories(${PROJECT_SOURCE_DIR}/Server/Telnet)
 
 
 
-file(GLOB_RECURSE CommonSrc "Common/*.h" "Common/*.cpp" "Common/*.c")
+file(GLOB_RECURSE CommonSrc "Common/*.h" "Common/*.hpp" "Common/*.cpp" "Common/*.c")
 file(GLOB_RECURSE ProtocolSrc "Gen/*.h" "Gen/*.cpp" "Gen/*.hpp" "Gen/*.cc")
 
 file(GLOB_RECURSE ServerSource "Server/*.h" "Server/*.cpp")

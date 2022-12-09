@@ -15,10 +15,6 @@ namespace Sentry
 	 public:
 		void SaveAllLog();
 		void AddLog(spdlog::level::level_enum type, const std::string& log);
-#ifdef __ENABLE_START_LOG__
-        void CloseStartLog();
-        void AddStartLog(spdlog::level::level_enum type, const std::string& log);
-#endif
     protected:
 		bool Awake() final;
 		void OnDestory() final;
@@ -29,9 +25,6 @@ namespace Sentry
 		int mLogSaveTime;
 		std::string mServerName;
 		std::string mLogSavePath;
-#ifdef __ENABLE_START_LOG__
-        std::shared_ptr<spdlog::logger> mStartLog;
-#endif
 #ifdef __DEBUG__
 		std::shared_ptr<spdlog::logger> mAllLog;
 #else

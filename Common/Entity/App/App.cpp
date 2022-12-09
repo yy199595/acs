@@ -243,9 +243,6 @@ namespace Sentry
         }
         long long t = Helper::Time::NowMilTime() - this->mStartTime;
         LOG_INFO("===== start " << ServerConfig::Inst()->Name() << " successful [" << t / 1000.0f << "]s ===========");
-#ifdef __ENABLE_START_LOG__
-        this->mLogComponent->CloseStartLog();
-#endif
     }
 #ifdef __OS_WIN__
 	void App::UpdateConsoleTitle()
