@@ -16,10 +16,10 @@
 			"HttpWebComponent",
 			"ConsoleComponent",
 			"LuaScriptComponent",
-			"ForwardComponent",
+			"TranComponent",
 			"RedisComponent",
 			"HttpWebComponent",
-			"ForwardHelperComponent"
+			"TranHelperComponent"
 		]
 	}
 }

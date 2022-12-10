@@ -8,9 +8,9 @@
 			"OuterService": false,
 			"LocationService" : false
 		},
-		"Component" : [
+		"Component": [
 			"LuaScriptComponent",
-			"ForwardHelperComponent"
+			"TranHelperComponent"
 		]
 	},
 	"HttpServer": {
@@ -27,7 +27,7 @@
 			"RedisComponent",
 			"HttpWebComponent",
 			"LuaScriptComponent",
-			"ForwardHelperComponent"
+			"TranHelperComponent"
 		]
 	},
 	"GateServer": {
@@ -38,8 +38,8 @@
 			"ChatService": false,
 			"LocationService" : false
 		},
-		"Component" : [
-			"ForwardHelperComponent"
+		"Component": [
+			"TranHelperComponent"
 		]
 	},
 	"DataServer": {
@@ -49,14 +49,14 @@
 			"MongoService": true,
 			"LocationService" : false
 		},
-		"Component" : [
-			"ForwardHelperComponent"
+		"Component": [
+			"TranHelperComponent"
 		]
 	},
 	"TranServer": {
 		"AutoAllot": false,
 		"Component": [
-			"ForwardComponent"
-		]
+				"TranComponent"
+			]
+		}
 	}
-}

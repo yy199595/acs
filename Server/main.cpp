@@ -72,8 +72,8 @@ void RegisterComponent()
     ComponentFactory::Add<InnerNetComponent>("InnerNetComponent");
 	ComponentFactory::Add<LocationComponent>("LocationComponent");
 
-    ComponentFactory::Add<TranComponent>("ForwardComponent");
-    ComponentFactory::Add<TranHelperComponent>("ForwardHelperComponent");
+    ComponentFactory::Add<TranComponent>("TranComponent");
+    ComponentFactory::Add<TranHelperComponent>("TranHelperComponent");
 
 // gate
 	ComponentFactory::Add<GateHelperComponent>("GateHelperComponent");
