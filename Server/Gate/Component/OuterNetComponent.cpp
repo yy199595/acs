@@ -78,13 +78,14 @@ namespace Sentry
 
     bool OuterNetComponent::OnRequest(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
-        message->GetHead().Add("client", address);
+		Rpc::Head & head = message->GetHead();
+        head.Add("client", address);
         XCode code = this->mOuterMessageComponent->OnRequest(address, message);
         if (code != XCode::Successful)
         {
             message->Clear();
-            message->GetHead().Remove("address");
-            message->GetHead().Add("code", code);
+            head.Remove("address");
+            head.Add("code", code);
             this->mOuterMessageComponent->OnResponse(address, message);
             return false;
         }
