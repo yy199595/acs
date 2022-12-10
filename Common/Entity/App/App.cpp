@@ -42,7 +42,7 @@ namespace Sentry
 		this->mMessageComponent = this->GetOrAddComponent<ProtoComponent>();
 
         LOG_CHECK_RET_FALSE(this->AddComponent<TextConfigComponent>());
-        LOG_CHECK_RET_FALSE(this->AddComponent<LocationComponent>());
+        //LOG_CHECK_RET_FALSE(this->AddComponent<LocationComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<NetThreadComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<LaunchComponent>());
 
@@ -227,20 +227,23 @@ namespace Sentry
         std::vector<const NodeConfig *> configs;
         ClusterConfig::Inst()->GetNodeConfigs(configs);
         LocationComponent *locationComponent = this->GetComponent<LocationComponent>();
-        for (const NodeConfig *nodeConfig: configs)
-        {
-            if (nodeConfig->ServiceCount() > 0)
-            {
-                locationComponent->WaitServerStart(nodeConfig->GetName());
-                CONSOLE_LOG_INFO(nodeConfig->GetName() << " start successful ...");
-            }
-        }
-        std::vector<IComplete *> completeComponents;
-        this->GetComponents<IComplete>(completeComponents);
-        for (IComplete *complete: completeComponents)
-        {
-            complete->OnClusterComplete();
-        }
+		if(locationComponent != nullptr)
+		{
+			for (const NodeConfig* nodeConfig : configs)
+			{
+				if (nodeConfig->ServiceCount() > 0)
+				{
+					locationComponent->WaitServerStart(nodeConfig->GetName());
+					CONSOLE_LOG_INFO(nodeConfig->GetName() << " start successful ...");
+				}
+			}
+			std::vector<IComplete*> completeComponents;
+			this->GetComponents<IComplete>(completeComponents);
+			for (IComplete* complete : completeComponents)
+			{
+				complete->OnClusterComplete();
+			}
+		}
         long long t = Helper::Time::NowMilTime() - this->mStartTime;
         LOG_INFO("===== start " << ServerConfig::Inst()->Name() << " successful [" << t / 1000.0f << "]s ===========");
     }

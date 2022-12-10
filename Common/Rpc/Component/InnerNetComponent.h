@@ -46,6 +46,8 @@ namespace Sentry
         std::string mUserName;
         std::string mPassword;
 		std::string mLocation;
+		unsigned int mSumCount;
+		unsigned int mWaitCount;
         class TranComponent* mTranComponent;
         class NetThreadComponent * mNetComponent;
         class OuterNetComponent * mOuterComponent;

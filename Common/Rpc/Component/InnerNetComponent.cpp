@@ -14,6 +14,8 @@ namespace Sentry
 {
 	bool InnerNetComponent::Awake()
 	{
+		this->mSumCount = 0;
+		this->mWaitCount = 0;
 		this->mNetComponent = nullptr;
         this->mTranComponent = nullptr;
 		this->mMessageComponent = nullptr;
@@ -185,7 +187,7 @@ namespace Sentry
         if(this->mOuterComponent != nullptr && head.Get("client", targer))
         {
             head.Remove("client");
-            this->mOuterComponent->SendData(targer, message);
+			this->mOuterComponent->OnMessage(targer, message);
             return true;
         }
         else if (this->mTranComponent != nullptr && head.Get("from", targer))

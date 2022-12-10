@@ -14,6 +14,8 @@ namespace Sentry
 {
 	bool OuterNetComponent::Awake()
 	{
+		this->mSumCount = 0;
+		this->mWaitCount = 0;
         this->mOuterMessageComponent = nullptr;
         return true;
     }
@@ -35,58 +37,78 @@ namespace Sentry
     }
 
 	void OuterNetComponent::OnMessage(const std::string& address, std::shared_ptr<Rpc::Packet> message)
-    {
-        switch ((Tcp::Type) message->GetType())
-        {
-            case Tcp::Type::Auth:
-                if(!this->OnAuth(address, message))
-                {
-                    this->StartClose(address);
-                    CONSOLE_LOG_ERROR("[" << address << "] auth failure");
-                }
-                break;
-            case Tcp::Type::Ping:
-                message->SetContent("hello");
-                this->SendData(address, message);
-                break;
-            case Tcp::Type::Request:
-                if (!this->OnRequest(address, message))
-                {
-                    this->StartClose(address);
-                    CONSOLE_LOG_ERROR("[" << address << "] request failure");
-                }
-                break;
-            default:
-                this->StartClose(address);
-                break;
-        }
-    }
+	{
+		switch ((Tcp::Type)message->GetType())
+		{
+		case Tcp::Type::Auth:
+			if (!this->OnAuth(address, message))
+			{
+				this->StartClose(address);
+				CONSOLE_LOG_ERROR("[" << address << "] auth failure");
+			}
+			break;
+		case Tcp::Type::Ping:
+			message->SetContent("hello");
+			this->SendData(address, message);
+			break;
+		case Tcp::Type::Request:
+			if (!this->OnRequest(address, message))
+			{
+				this->StartClose(address);
+				CONSOLE_LOG_ERROR("[" << address << "] request failure");
+			}
+			break;
+		case Tcp::Type::Response:
+			this->OnResponse(address, message);
+			break;
+		default:
+			this->StartClose(address);
+			break;
+		}
+	}
+
+	bool OuterNetComponent::OnResponse(const std::string& address, std::shared_ptr<Rpc::Packet> message)
+	{
+		this->mWaitCount--;
+		OuterNetClient * outerNetClient = this->GetGateClient(address);
+		if(outerNetClient == nullptr)
+		{
+			LOG_ERROR("send to client [" << address << "] failure");
+			return false;
+		}
+		outerNetClient->SendData(message);
+		return true;
+	}
 
     bool OuterNetComponent::OnAuth(const std::string &address, std::shared_ptr<Rpc::Packet> message)
-    {
-        XCode code = this->mOuterMessageComponent->OnAuth(address, message);
-        if(code != XCode::Successful)
-        {
-            return false;
-        }
-        this->mAuthClients.insert(address);
-        message->GetHead().Remove("token");
-        message->GetHead().Add("code", XCode::Successful);
-        this->mOuterMessageComponent->OnResponse(address, message);
-        return true;
-    }
+	{
+		Rpc::Head& head = message->GetHead();
+		XCode code = this->mOuterMessageComponent->OnAuth(address, message);
+		if (code != XCode::Successful)
+		{
+			return false;
+		}
+		this->mAuthClients.insert(address);
+
+		head.Remove("token");
+		message->SetType(Tcp::Type::Response);
+		head.Add("code", XCode::Successful);
+		return this->SendData(address, message);
+	}
 
     bool OuterNetComponent::OnRequest(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
+		this->mSumCount++;
 		Rpc::Head & head = message->GetHead();
+		if(head.Has("rpc"))
+		{
+			this->mWaitCount++;
+		}
         head.Add("client", address);
         XCode code = this->mOuterMessageComponent->OnRequest(address, message);
         if (code != XCode::Successful)
         {
-            message->Clear();
-            head.Remove("address");
-            head.Add("code", code);
-            this->mOuterMessageComponent->OnResponse(address, message);
+            this->StartClose(address);
             return false;
         }
         return true;
@@ -210,6 +232,8 @@ namespace Sentry
 
     void OuterNetComponent::OnRecord(Json::Writer &document)
     {
+		document.Add("sum").Add(this->mSumCount);
+		document.Add("wait").Add(this->mWaitCount);
         document.Add("auth").Add(this->mAuthClients.size());
         document.Add("client").Add(this->mGateClientMap.size());
     }

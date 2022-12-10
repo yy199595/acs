@@ -19,8 +19,6 @@ namespace Sentry
 {
     OuterNetMessageComponent::OuterNetMessageComponent()
     {
-		this->mSumCount = 0;
-		this->mWaitCount = 0;
         this->mTranComponent = nullptr;
         this->mOutNetComponent = nullptr;
         this->mLocationComponent = nullptr;
@@ -122,7 +120,6 @@ namespace Sentry
 
 	XCode OuterNetMessageComponent::OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message)
 	{
-		this->mSumCount++;
         const Rpc::Head& head = message->GetHead();
         auto iter = this->mUserAddressMap.find(address);
         if(iter == this->mUserAddressMap.end() || iter->second == 0)
@@ -160,34 +157,5 @@ namespace Sentry
 			return XCode::NetWorkError;
 		}
 		return XCode::Successful;
-	}
-
-	XCode OuterNetMessageComponent::OnResponse(const std::string & address, std::shared_ptr<Rpc::Packet> message)
-	{
-		this->mWaitCount--;
-        if(!message->GetHead().Has("rpc"))
-        {
-            return XCode::CallArgsError;
-        }
-        if(message->GetCode(XCode::Failure) == XCode::NetActiveShutdown)
-        {
-            this->mOutNetComponent->StartClose(address);
-            return XCode::NetActiveShutdown;
-        }
-
-        message->SetType(Tcp::Type::Response);
-		if (!this->mOutNetComponent->SendData(address, message))
-		{
-            CONSOLE_LOG_ERROR("send message to client " << address << " error");
-			return XCode::NetWorkError;
-		}
-        CONSOLE_LOG_DEBUG("send message to client " << address << " successful");
-		return XCode::Successful;
-	}
-
-	void OuterNetMessageComponent::OnRecord(Json::Writer& document)
-	{
-		document.Add("sum").Add(this->mSumCount);
-		document.Add("wait").Add(this->mWaitCount);
 	}
 }

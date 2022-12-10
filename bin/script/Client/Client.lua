@@ -6,12 +6,6 @@ local account = tostring(os.time()) .. "@qq.com"
 local password = tostring(os.time()) .. "#123456"
 local loginComponent = require("component.LoginComponent")
 
-local record = {
-    mongo = 0,
-    chat = 0,
-    ping = 0,
-    register = 0
-}
 local CallMongo = function()
     local t1 = Time.NowMilTime()
     local code = Client.Call("MongoService.Query", {
@@ -22,7 +16,7 @@ local CallMongo = function()
         limit = 1
     })
     local t = Time.NowMilTime() - t1
-    Log.Warning("cal MongoService.Query [", t, "]ms");
+    Console.Warn("cal MongoService.Query [", t, "]ms");
 end
 
 local CallChat = function()
@@ -34,7 +28,7 @@ local CallChat = function()
 
     end
     local t = Time.NowMilTime() - t1
-    Log.Warning("cal ChatService.Ping [", t, "]ms");
+    Console.Error("cal ChatService.Ping [" .. t .. "]ms");
 end
 
 local TestHttp = function()
@@ -42,12 +36,27 @@ local TestHttp = function()
     local phoneNum1 = 100
     local passwd = "yjz199595"
     local account1 = "%d@qq.com"
-    record.register = record.register + 1
     local data1 = string.format(account1, count)
     local data2 = passwd .. tostring(count)
     local data3 = phoneNum1 + count
     local res = loginComponent.Register(data1,data2, data3)
-    record.register = record.register  - 1
+end
+
+local Update = function()
+    while true do
+        coroutine.start(function ()
+            for i = 1, 20 do
+                coroutine.start(CallChat)
+            end
+            for i = 1, 20 do
+                coroutine.start(CallMongo)
+            end
+            for i = 1, 20 do
+                coroutine.start(TestHttp)
+            end
+        end)
+        coroutine.sleep(100)
+    end
 end
 
 
@@ -69,24 +78,9 @@ function Main.Start()
         return false
     end
     Log.Debug("连接网关服务器[" , address, "]成功")
+    coroutine.start(Update)
     return true
 end
 
-Main.Update = function(tick)
-
-    coroutine.start(function ()
-        for i = 1, 20 do
-            coroutine.start(CallChat)   
-        end
-        for i = 1, 20 do
-            coroutine.start(CallMongo)      
-        end
-        for i = 1, 20 do
-            coroutine.start(TestHttp)
-        end
-    end)
-
-    table.print(record)
-end
 
 return Main

@@ -68,11 +68,18 @@ namespace Sentry
 
         Lua::ClassProxyHelper luaRegister5(this->mLuaEnv, "Log");
         luaRegister5.BeginNewTable();
-        luaRegister5.PushExtensionFunction("Info", Lua::Log::DebugInfo);
-        luaRegister5.PushExtensionFunction("Debug", Lua::Log::DebugLog);
-        luaRegister5.PushExtensionFunction("Error", Lua::Log::DebugError);
-		luaRegister5.PushExtensionFunction("Warning", Lua::Log::DebugWarning);
+        luaRegister5.PushExtensionFunction("Info", Lua::Log::Info);
+        luaRegister5.PushExtensionFunction("Debug", Lua::Log::Debug);
+		luaRegister5.PushExtensionFunction("Error", Lua::Log::Error);
+		luaRegister5.PushExtensionFunction("Warn", Lua::Log::Warning);
 		luaRegister5.PushExtensionFunction("LuaError", Lua::Log::LuaError);
+
+		Lua::ClassProxyHelper luaRegister55(this->mLuaEnv, "Console");
+		luaRegister55.BeginNewTable();
+		luaRegister55.PushExtensionFunction("Info", Lua::Console::Info);
+		luaRegister55.PushExtensionFunction("Debug", Lua::Console::Debug);
+		luaRegister55.PushExtensionFunction("Warn", Lua::Console::Warning);
+		luaRegister55.PushExtensionFunction("Error", Lua::Console::Error);
 
 		Lua::ClassProxyHelper luaRegister6(this->mLuaEnv, "Guid");
         luaRegister6.BeginNewTable();

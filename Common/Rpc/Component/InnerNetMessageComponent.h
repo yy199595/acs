@@ -18,28 +18,22 @@ namespace Sentry
 		long long Time;
 	};
 #endif
-    class InnerNetMessageComponent : public RpcTaskComponent<long long, Rpc::Packet>,
-                                     public IFrameUpdate, public IServerRecord
+    class InnerNetMessageComponent : public RpcTaskComponent<long long, Rpc::Packet>, public IFrameUpdate
 	{
 	 public:
 		InnerNetMessageComponent() = default;
-	 protected:
-		bool Awake() final;
-		bool LateAwake() final;
-        void OnFrameUpdate(float t) final;
     public:
         bool Ping(const std::string & address);
 		XCode OnRequest(std::shared_ptr<Rpc::Packet> request);
-		unsigned int GetWaitCount() const { return this->mWaitCount;  }
         bool Send(const std::string & address, std::shared_ptr<Rpc::Packet> message);
         std::shared_ptr<Rpc::Packet> Call(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
-        void OnRecord(Json::Writer&document) final;
+		bool Awake() final;
+		bool LateAwake() final;
+		void OnFrameUpdate(float t) final;
         void Invoke(const RpcMethodConfig * config, std::shared_ptr<Rpc::Packet> message);
     private:
         std::string mFullName;
-        unsigned int mSumCount;
-		unsigned int mWaitCount;
 		class TaskComponent* mTaskComponent;
 		class InnerNetComponent* mRpcClientComponent;
         std::queue<std::shared_ptr<Rpc::Packet>> mWaitMessages;

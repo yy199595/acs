@@ -60,8 +60,7 @@ namespace Lua
 				return;
 			}
             std::shared_ptr<Message> message;
-            
-            XCode code = response->GetCode(XCode::Failure);
+            XCode code = response->GetCode();
             if(code == XCode::Successful)
             {
                 if (!methodConfig->Response.empty())

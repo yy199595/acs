@@ -11,8 +11,6 @@ namespace Sentry
 {
 	bool InnerNetMessageComponent::Awake()
 	{
-        this->mSumCount = 0;
-		this->mWaitCount = 0;
 		this->mTaskComponent = nullptr;
 		this->mRpcClientComponent = nullptr;
         return true;
@@ -25,12 +23,6 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(this->mRpcClientComponent = this->GetComponent<InnerNetComponent>());
 		return true;
 	}
-
-    void InnerNetMessageComponent::OnRecord(Json::Writer&document)
-    {
-        document.Add("sum").Add(this->mSumCount);
-        document.Add("wait").Add(this->mWaitCount);
-    }
 
 	XCode InnerNetMessageComponent::OnRequest(std::shared_ptr<Rpc::Packet> message)
 	{
@@ -84,8 +76,6 @@ namespace Sentry
 
     void InnerNetMessageComponent::Invoke(const RpcMethodConfig *config, std::shared_ptr<Rpc::Packet> message)
     {
-        this->mSumCount++;
-        this->mWaitCount++;
         Rpc::Head & head = message->GetHead();
         RpcService *logicService = this->mApp->GetService(config->Service);
         LOG_CHECK_RET(logicService != nullptr);
@@ -110,7 +100,6 @@ namespace Sentry
             }
         }
 #endif
-        this->mWaitCount--;
         if (!head.Has("rpc"))
         {
             return; //不需要返回

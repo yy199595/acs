@@ -9,6 +9,7 @@
 			"LocationService" : false
 		},
 		"Component": [
+			"LocationComponent",
 			"LuaScriptComponent",
 			"TranHelperComponent"
 		]
@@ -25,6 +26,7 @@
 		"Component": [
 			"HttpComponent",
 			"RedisComponent",
+			"LocationComponent",
 			"HttpWebComponent",
 			"LuaScriptComponent",
 			"TranHelperComponent"
@@ -39,6 +41,7 @@
 			"LocationService" : false
 		},
 		"Component": [
+			"LocationComponent",
 			"TranHelperComponent"
 		]
 	},
@@ -50,6 +53,7 @@
 			"LocationService" : false
 		},
 		"Component": [
+			"LocationComponent",
 			"TranHelperComponent"
 		]
 	},
@@ -60,7 +64,8 @@
 			"LocationService" : true
 		},
 		"Component": [
-				"TranComponent"
+				"TranComponent",
+				"LocationComponent"
 			]
 		}
 	}

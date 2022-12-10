@@ -11,7 +11,7 @@
 
 namespace Sentry
 {
-	class OuterNetMessageComponent final : public Component, public IServerRecord
+	class OuterNetMessageComponent final : public Component
 	{
 	 public:
 		OuterNetMessageComponent();
@@ -22,13 +22,9 @@ namespace Sentry
         void OnClose(const std::string & address);
         XCode OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message);
         XCode OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message);
-        XCode OnResponse(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
 		bool LateAwake() final;
-		void OnRecord(Json::Writer&document) final;
 	 private:
-		unsigned int mSumCount;
-		unsigned int mWaitCount;
         class OuterNetComponent* mOutNetComponent;
 		class TranHelperComponent * mTranComponent;
 		class LocationComponent * mLocationComponent;

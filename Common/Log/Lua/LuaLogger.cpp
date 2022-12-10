@@ -38,18 +38,20 @@ namespace Lua
 			}
 		}
 
-		int DebugLog(lua_State* luaEnv)
+		int Debug(lua_State* luaEnv)
 		{
 			std::string log;
 			GetLuaString(luaEnv, log);
+			Debug::Log(Debug::Level::debug, log);
 			App::Inst()->GetLogger()->AddLog(spdlog::level::debug, log);
 			return 0;
 		}
 
-		int DebugInfo(lua_State* luaEnv)
+		int Info(lua_State* luaEnv)
 		{
 			std::string log;
 			GetLuaString(luaEnv, log);
+			Debug::Log(Debug::Level::info, log);
 			App::Inst()->GetLogger()->AddLog(spdlog::level::info, log);
 			return 0;
 		}
@@ -61,21 +63,55 @@ namespace Lua
 			return 0;
 		}
 
-        int DebugError(lua_State* luaEnv)
+        int Error(lua_State* luaEnv)
 		{
 			std::string log;
 			GetLuaString(luaEnv, log);
+			Debug::Log(Debug::Level::err, log);
 			App::Inst()->GetLogger()->AddLog(spdlog::level::err, log);
 			return 0;
 		}
 
-		int DebugWarning(lua_State* luaEnv)
+		int Warning(lua_State* luaEnv)
 		{
 			std::string log;
 			GetLuaString(luaEnv, log);
+			Debug::Log(Debug::Level::warn, log);
 			App::Inst()->GetLogger()->AddLog(spdlog::level::warn, log);
 			return 0;
 		}
+	}
+
+	int Console::Debug(lua_State* luaEnv)
+	{
+		std::string log;
+		Log::GetLuaString(luaEnv, log);
+		Debug::Log(Debug::Level::debug, log);
+		return 0;
+	}
+
+	int Console::Info(lua_State* luaEnv)
+	{
+		std::string log;
+		Log::GetLuaString(luaEnv, log);
+		Debug::Log(Debug::Level::info, log);
+		return 0;
+	}
+
+	int Console::Error(lua_State* luaEnv)
+	{
+		std::string log;
+		Log::GetLuaString(luaEnv, log);
+		Debug::Log(Debug::Level::err, log);
+		return 0;
+	}
+
+	int Console::Warning(lua_State* luaEnv)
+	{
+		std::string log;
+		Log::GetLuaString(luaEnv, log);
+		Debug::Log(Debug::Level::warn, log);
+		return 0;
 	}
 
 }
