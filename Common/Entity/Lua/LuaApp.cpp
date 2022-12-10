@@ -20,6 +20,7 @@ namespace Lua
         {
             return 0;
         }
-		return UserDataParameter::UserDataStruct<Component*>::WriteObj(lua, component, name);
+		typedef UserDataParameter::UserDataStruct<Component*> ComponentType;
+		return ComponentType::WriteObj(lua, component, name);
 	}
 }
