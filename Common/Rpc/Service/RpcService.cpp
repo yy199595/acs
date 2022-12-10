@@ -72,24 +72,28 @@ namespace Sentry
 
     std::shared_ptr<Rpc::Packet> RpcService::CallAwait(
         const std::string &address, const std::string &func, const Message *message)
-    {
-        RpcPacket request = PacketHelper::MakeRpcPacket(this->GetName(), func);
-        {
-            request->SetType(Tcp::Type::Request);
-            request->SetProto(Tcp::Porto::Protobuf);
+	{
+		RpcPacket request = PacketHelper::MakeRpcPacket(this->GetName(), func);
+		if (request == nullptr)
+		{
+			LOG_ERROR("create rpc packet [" <<
+											this->GetName() << "." << func << "]");
+			return nullptr;
+		}
+		request->SetType(Tcp::Type::Request);
+		request->SetProto(Tcp::Porto::Protobuf);
 #ifdef __INNER_MSG_FORWARD__
-            request->GetHead().Add("to", address);
+		request->GetHead().Add("to", address);
 #endif
-            request->WriteMessage(message);
-        }
+		request->WriteMessage(message);
 #ifdef __INNER_MSG_FORWARD__
-        std::string target;
-        this->mForwardComponent->GetLocation(target);
-        return this->mMessageComponent->Call(target, request);
+		std::string target;
+		this->mForwardComponent->GetLocation(target);
+		return this->mMessageComponent->Call(target, request);
 #else
-        return this->mMessageComponent->Call(address, request);
+		return this->mMessageComponent->Call(address, request);
 #endif
-    }
+	}
 
 	XCode RpcService::Send(const std::string& address, const std::string& func, const Message& message)
     {

@@ -44,7 +44,7 @@ struct TableStruct_s2s_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[18]
+  static const ::google::protobuf::internal::ParseTable schema[17]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -64,12 +64,9 @@ extern allot_saveDefaultTypeInternal _allot_save_default_instance_;
 class cluster;
 class clusterDefaultTypeInternal;
 extern clusterDefaultTypeInternal _cluster_default_instance_;
-class cluster_exit;
-class cluster_exitDefaultTypeInternal;
-extern cluster_exitDefaultTypeInternal _cluster_exit_default_instance_;
-class cluster_join;
-class cluster_joinDefaultTypeInternal;
-extern cluster_joinDefaultTypeInternal _cluster_join_default_instance_;
+class cluster_list;
+class cluster_listDefaultTypeInternal;
+extern cluster_listDefaultTypeInternal _cluster_list_default_instance_;
 class cluster_server;
 class cluster_serverDefaultTypeInternal;
 extern cluster_serverDefaultTypeInternal _cluster_server_default_instance_;
@@ -113,8 +110,7 @@ template<> ::s2s::allot* Arena::CreateMaybeMessage<::s2s::allot>(Arena*);
 template<> ::s2s::allot_response* Arena::CreateMaybeMessage<::s2s::allot_response>(Arena*);
 template<> ::s2s::allot_save* Arena::CreateMaybeMessage<::s2s::allot_save>(Arena*);
 template<> ::s2s::cluster* Arena::CreateMaybeMessage<::s2s::cluster>(Arena*);
-template<> ::s2s::cluster_exit* Arena::CreateMaybeMessage<::s2s::cluster_exit>(Arena*);
-template<> ::s2s::cluster_join* Arena::CreateMaybeMessage<::s2s::cluster_join>(Arena*);
+template<> ::s2s::cluster_list* Arena::CreateMaybeMessage<::s2s::cluster_list>(Arena*);
 template<> ::s2s::cluster_server* Arena::CreateMaybeMessage<::s2s::cluster_server>(Arena*);
 template<> ::s2s::forward* Arena::CreateMaybeMessage<::s2s::forward>(Arena*);
 template<> ::s2s::forward_publish* Arena::CreateMaybeMessage<::s2s::forward_publish>(Arena*);
@@ -283,25 +279,25 @@ class cluster_server :
 };
 // -------------------------------------------------------------------
 
-class cluster_join :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.cluster.join) */ {
+class cluster_list :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.cluster.list) */ {
  public:
-  cluster_join();
-  virtual ~cluster_join();
+  cluster_list();
+  virtual ~cluster_list();
 
-  cluster_join(const cluster_join& from);
+  cluster_list(const cluster_list& from);
 
-  inline cluster_join& operator=(const cluster_join& from) {
+  inline cluster_list& operator=(const cluster_list& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  cluster_join(cluster_join&& from) noexcept
-    : cluster_join() {
+  cluster_list(cluster_list&& from) noexcept
+    : cluster_list() {
     *this = ::std::move(from);
   }
 
-  inline cluster_join& operator=(cluster_join&& from) noexcept {
+  inline cluster_list& operator=(cluster_list&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -313,34 +309,34 @@ class cluster_join :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const cluster_join& default_instance();
+  static const cluster_list& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const cluster_join* internal_default_instance() {
-    return reinterpret_cast<const cluster_join*>(
-               &_cluster_join_default_instance_);
+  static inline const cluster_list* internal_default_instance() {
+    return reinterpret_cast<const cluster_list*>(
+               &_cluster_list_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     1;
 
-  void Swap(cluster_join* other);
-  friend void swap(cluster_join& a, cluster_join& b) {
+  void Swap(cluster_list* other);
+  friend void swap(cluster_list& a, cluster_list& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline cluster_join* New() const final {
-    return CreateMaybeMessage<cluster_join>(nullptr);
+  inline cluster_list* New() const final {
+    return CreateMaybeMessage<cluster_list>(nullptr);
   }
 
-  cluster_join* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<cluster_join>(arena);
+  cluster_list* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<cluster_list>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const cluster_join& from);
-  void MergeFrom(const cluster_join& from);
+  void CopyFrom(const cluster_list& from);
+  void MergeFrom(const cluster_list& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -362,7 +358,7 @@ class cluster_join :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(cluster_join* other);
+  void InternalSwap(cluster_list* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -390,162 +386,12 @@ class cluster_join :
   const ::google::protobuf::RepeatedPtrField< ::s2s::cluster_server >&
       list() const;
 
-  // @@protoc_insertion_point(class_scope:s2s.cluster.join)
+  // @@protoc_insertion_point(class_scope:s2s.cluster.list)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField< ::s2s::cluster_server > list_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_s2s_2eproto;
-};
-// -------------------------------------------------------------------
-
-class cluster_exit :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.cluster.exit) */ {
- public:
-  cluster_exit();
-  virtual ~cluster_exit();
-
-  cluster_exit(const cluster_exit& from);
-
-  inline cluster_exit& operator=(const cluster_exit& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  cluster_exit(cluster_exit&& from) noexcept
-    : cluster_exit() {
-    *this = ::std::move(from);
-  }
-
-  inline cluster_exit& operator=(cluster_exit&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const cluster_exit& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const cluster_exit* internal_default_instance() {
-    return reinterpret_cast<const cluster_exit*>(
-               &_cluster_exit_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    2;
-
-  void Swap(cluster_exit* other);
-  friend void swap(cluster_exit& a, cluster_exit& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline cluster_exit* New() const final {
-    return CreateMaybeMessage<cluster_exit>(nullptr);
-  }
-
-  cluster_exit* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<cluster_exit>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const cluster_exit& from);
-  void MergeFrom(const cluster_exit& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(cluster_exit* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // string name = 1;
-  void clear_name();
-  static const int kNameFieldNumber = 1;
-  const ::std::string& name() const;
-  void set_name(const ::std::string& value);
-  #if LANG_CXX11
-  void set_name(::std::string&& value);
-  #endif
-  void set_name(const char* value);
-  void set_name(const char* value, size_t size);
-  ::std::string* mutable_name();
-  ::std::string* release_name();
-  void set_allocated_name(::std::string* name);
-
-  // string rpc = 2;
-  void clear_rpc();
-  static const int kRpcFieldNumber = 2;
-  const ::std::string& rpc() const;
-  void set_rpc(const ::std::string& value);
-  #if LANG_CXX11
-  void set_rpc(::std::string&& value);
-  #endif
-  void set_rpc(const char* value);
-  void set_rpc(const char* value, size_t size);
-  ::std::string* mutable_rpc();
-  ::std::string* release_rpc();
-  void set_allocated_rpc(::std::string* rpc);
-
-  // string http = 3;
-  void clear_http();
-  static const int kHttpFieldNumber = 3;
-  const ::std::string& http() const;
-  void set_http(const ::std::string& value);
-  #if LANG_CXX11
-  void set_http(::std::string&& value);
-  #endif
-  void set_http(const char* value);
-  void set_http(const char* value, size_t size);
-  ::std::string* mutable_http();
-  ::std::string* release_http();
-  void set_allocated_http(::std::string* http);
-
-  // @@protoc_insertion_point(class_scope:s2s.cluster.exit)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr name_;
-  ::google::protobuf::internal::ArenaStringPtr rpc_;
-  ::google::protobuf::internal::ArenaStringPtr http_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2eproto;
 };
@@ -589,7 +435,7 @@ class cluster :
                &_cluster_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    2;
 
   void Swap(cluster* other);
   friend void swap(cluster& a, cluster& b) {
@@ -645,8 +491,7 @@ class cluster :
   // nested types ----------------------------------------------------
 
   typedef cluster_server server;
-  typedef cluster_join join;
-  typedef cluster_exit exit;
+  typedef cluster_list list;
 
   // accessors -------------------------------------------------------
 
@@ -698,7 +543,7 @@ class user_login :
                &_user_login_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    3;
 
   void Swap(user_login* other);
   friend void swap(user_login& a, user_login& b) {
@@ -810,7 +655,7 @@ class user_logout :
                &_user_logout_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    4;
 
   void Swap(user_logout* other);
   friend void swap(user_logout& a, user_logout& b) {
@@ -922,7 +767,7 @@ class user :
                &_user_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    5;
 
   void Swap(user* other);
   friend void swap(user& a, user& b) {
@@ -1030,7 +875,7 @@ class allot_response :
                &_allot_response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    6;
 
   void Swap(allot_response* other);
   friend void swap(allot_response& a, allot_response& b) {
@@ -1165,7 +1010,7 @@ class allot_save :
                &_allot_save_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    7;
 
   void Swap(allot_save* other);
   friend void swap(allot_save& a, allot_save& b) {
@@ -1300,7 +1145,7 @@ class allot :
                &_allot_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    8;
 
   void Swap(allot* other);
   friend void swap(allot& a, allot& b) {
@@ -1432,7 +1277,7 @@ class location_add :
                &_location_add_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    10;
 
   void Swap(location_add* other);
   friend void swap(location_add& a, location_add& b) {
@@ -1560,7 +1405,7 @@ class location_del :
                &_location_del_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    11;
 
   void Swap(location_del* other);
   friend void swap(location_del& a, location_del& b) {
@@ -1695,7 +1540,7 @@ class location :
                &_location_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    12;
 
   void Swap(location* other);
   friend void swap(location& a, location& b) {
@@ -1803,7 +1648,7 @@ class forward_sub :
                &_forward_sub_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    13;
 
   void Swap(forward_sub* other);
   friend void swap(forward_sub& a, forward_sub& b) {
@@ -1931,7 +1776,7 @@ class forward_unsub :
                &_forward_unsub_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    14;
 
   void Swap(forward_unsub* other);
   friend void swap(forward_unsub& a, forward_unsub& b) {
@@ -2059,7 +1904,7 @@ class forward_publish :
                &_forward_publish_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    15;
 
   void Swap(forward_publish* other);
   friend void swap(forward_publish& a, forward_publish& b) {
@@ -2194,7 +2039,7 @@ class forward :
                &_forward_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    16;
 
   void Swap(forward* other);
   friend void swap(forward& a, forward& b) {
@@ -2435,199 +2280,36 @@ inline void cluster_server::set_allocated_http(::std::string* http) {
 
 // -------------------------------------------------------------------
 
-// cluster_join
+// cluster_list
 
 // repeated .s2s.cluster.server list = 1;
-inline int cluster_join::list_size() const {
+inline int cluster_list::list_size() const {
   return list_.size();
 }
-inline void cluster_join::clear_list() {
+inline void cluster_list::clear_list() {
   list_.Clear();
 }
-inline ::s2s::cluster_server* cluster_join::mutable_list(int index) {
-  // @@protoc_insertion_point(field_mutable:s2s.cluster.join.list)
+inline ::s2s::cluster_server* cluster_list::mutable_list(int index) {
+  // @@protoc_insertion_point(field_mutable:s2s.cluster.list.list)
   return list_.Mutable(index);
 }
 inline ::google::protobuf::RepeatedPtrField< ::s2s::cluster_server >*
-cluster_join::mutable_list() {
-  // @@protoc_insertion_point(field_mutable_list:s2s.cluster.join.list)
+cluster_list::mutable_list() {
+  // @@protoc_insertion_point(field_mutable_list:s2s.cluster.list.list)
   return &list_;
 }
-inline const ::s2s::cluster_server& cluster_join::list(int index) const {
-  // @@protoc_insertion_point(field_get:s2s.cluster.join.list)
+inline const ::s2s::cluster_server& cluster_list::list(int index) const {
+  // @@protoc_insertion_point(field_get:s2s.cluster.list.list)
   return list_.Get(index);
 }
-inline ::s2s::cluster_server* cluster_join::add_list() {
-  // @@protoc_insertion_point(field_add:s2s.cluster.join.list)
+inline ::s2s::cluster_server* cluster_list::add_list() {
+  // @@protoc_insertion_point(field_add:s2s.cluster.list.list)
   return list_.Add();
 }
 inline const ::google::protobuf::RepeatedPtrField< ::s2s::cluster_server >&
-cluster_join::list() const {
-  // @@protoc_insertion_point(field_list:s2s.cluster.join.list)
+cluster_list::list() const {
+  // @@protoc_insertion_point(field_list:s2s.cluster.list.list)
   return list_;
-}
-
-// -------------------------------------------------------------------
-
-// cluster_exit
-
-// string name = 1;
-inline void cluster_exit::clear_name() {
-  name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& cluster_exit::name() const {
-  // @@protoc_insertion_point(field_get:s2s.cluster.exit.name)
-  return name_.GetNoArena();
-}
-inline void cluster_exit::set_name(const ::std::string& value) {
-  
-  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:s2s.cluster.exit.name)
-}
-#if LANG_CXX11
-inline void cluster_exit::set_name(::std::string&& value) {
-  
-  name_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:s2s.cluster.exit.name)
-}
-#endif
-inline void cluster_exit::set_name(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:s2s.cluster.exit.name)
-}
-inline void cluster_exit::set_name(const char* value, size_t size) {
-  
-  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:s2s.cluster.exit.name)
-}
-inline ::std::string* cluster_exit::mutable_name() {
-  
-  // @@protoc_insertion_point(field_mutable:s2s.cluster.exit.name)
-  return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* cluster_exit::release_name() {
-  // @@protoc_insertion_point(field_release:s2s.cluster.exit.name)
-  
-  return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void cluster_exit::set_allocated_name(::std::string* name) {
-  if (name != nullptr) {
-    
-  } else {
-    
-  }
-  name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
-  // @@protoc_insertion_point(field_set_allocated:s2s.cluster.exit.name)
-}
-
-// string rpc = 2;
-inline void cluster_exit::clear_rpc() {
-  rpc_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& cluster_exit::rpc() const {
-  // @@protoc_insertion_point(field_get:s2s.cluster.exit.rpc)
-  return rpc_.GetNoArena();
-}
-inline void cluster_exit::set_rpc(const ::std::string& value) {
-  
-  rpc_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:s2s.cluster.exit.rpc)
-}
-#if LANG_CXX11
-inline void cluster_exit::set_rpc(::std::string&& value) {
-  
-  rpc_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:s2s.cluster.exit.rpc)
-}
-#endif
-inline void cluster_exit::set_rpc(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  rpc_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:s2s.cluster.exit.rpc)
-}
-inline void cluster_exit::set_rpc(const char* value, size_t size) {
-  
-  rpc_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:s2s.cluster.exit.rpc)
-}
-inline ::std::string* cluster_exit::mutable_rpc() {
-  
-  // @@protoc_insertion_point(field_mutable:s2s.cluster.exit.rpc)
-  return rpc_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* cluster_exit::release_rpc() {
-  // @@protoc_insertion_point(field_release:s2s.cluster.exit.rpc)
-  
-  return rpc_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void cluster_exit::set_allocated_rpc(::std::string* rpc) {
-  if (rpc != nullptr) {
-    
-  } else {
-    
-  }
-  rpc_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), rpc);
-  // @@protoc_insertion_point(field_set_allocated:s2s.cluster.exit.rpc)
-}
-
-// string http = 3;
-inline void cluster_exit::clear_http() {
-  http_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& cluster_exit::http() const {
-  // @@protoc_insertion_point(field_get:s2s.cluster.exit.http)
-  return http_.GetNoArena();
-}
-inline void cluster_exit::set_http(const ::std::string& value) {
-  
-  http_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:s2s.cluster.exit.http)
-}
-#if LANG_CXX11
-inline void cluster_exit::set_http(::std::string&& value) {
-  
-  http_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:s2s.cluster.exit.http)
-}
-#endif
-inline void cluster_exit::set_http(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  http_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:s2s.cluster.exit.http)
-}
-inline void cluster_exit::set_http(const char* value, size_t size) {
-  
-  http_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:s2s.cluster.exit.http)
-}
-inline ::std::string* cluster_exit::mutable_http() {
-  
-  // @@protoc_insertion_point(field_mutable:s2s.cluster.exit.http)
-  return http_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* cluster_exit::release_http() {
-  // @@protoc_insertion_point(field_release:s2s.cluster.exit.http)
-  
-  return http_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void cluster_exit::set_allocated_http(::std::string* http) {
-  if (http != nullptr) {
-    
-  } else {
-    
-  }
-  http_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), http);
-  // @@protoc_insertion_point(field_set_allocated:s2s.cluster.exit.http)
 }
 
 // -------------------------------------------------------------------
@@ -3290,8 +2972,6 @@ inline void forward_publish::set_allocated_message(::std::string* message) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

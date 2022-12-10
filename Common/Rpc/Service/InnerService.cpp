@@ -35,22 +35,22 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode InnerService::Join(const s2s::cluster::join &request)
-    {
-		for(int index = 0; index < request.list_size(); index++)
+    XCode InnerService::Join(const s2s::cluster::server &request)
+	{
+		const std::string & rpc = request.rpc();
+		const std::string & http = request.http();
+		const std::string & name = request.name();
+		if (!ClusterConfig::Inst()->GetConfig(name))
 		{
-			const s2s::cluster::server & server = request.list(index);
-			if(!ClusterConfig::Inst()->GetConfig(server.name()))
-			{
-				LOG_ERROR("not find cluster config : " << server.name());
-			}
-			this->mLocationComponent->AddRpcServer(server.name(), server.rpc());
-			this->mLocationComponent->AddHttpServer(server.name(), server.http());
+			LOG_ERROR("not find cluster config : " << name);
+			return XCode::Failure;
 		}
-        return XCode::Successful;
-    }
+		this->mLocationComponent->AddRpcServer(name, rpc);
+		this->mLocationComponent->AddHttpServer(name, http);
+		return XCode::Successful;
+	}
 
-    XCode InnerService::Exit(const s2s::cluster::exit &response)
+    XCode InnerService::Exit(const s2s::cluster::server &response)
     {
         return XCode::Successful;
     }

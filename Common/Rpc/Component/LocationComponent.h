@@ -11,7 +11,7 @@
 
 namespace Sentry
 {
-	class LocationComponent : public Component
+	class LocationComponent : public Component, public IComplete
     {
     public:
         LocationComponent() = default;
@@ -29,10 +29,13 @@ namespace Sentry
 		bool AddUnit(std::unique_ptr<LocationUnit> locationUnit);
         size_t GetUnitCount() const { return this->mUnitLocations.size(); }
 	 public:
+		bool LateAwake() final;
+		void OnLocalComplete() final;
 		int GetAllotCount(const std::string & address) const;
 		bool GetServers(std::vector<std::string> & hosts);
 		bool GetServers(const std::string & server, std::vector<std::string> & hosts);
 	 private:
+		std::vector<std::string> mLocations;
 		std::unordered_map<std::string, int> mAllotCount;
         std::unordered_map<std::string, std::vector<std::string>> mRpcServers;
         std::unordered_map<std::string, std::vector<std::string>> mHttpServers;

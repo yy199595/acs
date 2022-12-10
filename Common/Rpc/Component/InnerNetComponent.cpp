@@ -94,7 +94,8 @@ namespace Sentry
     {
         message->SetContent("pong");
         message->SetType(Tcp::Type::Response);
-        return this->Send(address, message);
+		message->GetHead().Add("code", XCode::Successful);
+		return this->Send(address, message);
     }
 
     bool InnerNetComponent::OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message)
@@ -122,12 +123,6 @@ namespace Sentry
         }
         this->mLocationMaps.emplace(address, std::move(serverNode));
         return true;
-    }
-
-    const ServiceNodeInfo *InnerNetComponent::GetSeverInfo(const std::string &address)
-    {
-        auto iter = this->mLocationMaps.find(address);
-        return iter != this->mLocationMaps.end() ? iter->second.get() : nullptr;
     }
 
     bool InnerNetComponent::IsAuth(const std::string &address)
@@ -317,4 +312,19 @@ namespace Sentry
         //document.Add("auth").Add( this->mLocationMaps.size());
         //document.Add("client").Add(this->mRpcClientMap.size());
     }
+
+	const ServiceNodeInfo *InnerNetComponent::GetSeverInfo(const std::string &address) const
+	{
+		auto iter = this->mLocationMaps.find(address);
+		return iter != this->mLocationMaps.end() ? iter->second.get() : nullptr;
+	}
+
+	void InnerNetComponent::GetServiceList(std::vector<const ServiceNodeInfo *> &list) const
+	{
+		auto iter = this->mLocationMaps.begin();
+		for(; iter != this->mLocationMaps.end(); iter++)
+		{
+			list.push_back(iter->second.get());
+		}
+	}
 }// namespace Sentry

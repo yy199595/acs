@@ -27,7 +27,9 @@ namespace Sentry
 	 public:
         const std::string & GetUser() const { return this->mUserName; };
         const std::string & GetPassword() const { return this->mPassword; }
-        const ServiceNodeInfo * GetSeverInfo(const std::string & address);
+	 public:
+		void GetServiceList(std::vector<const ServiceNodeInfo *> &list) const;
+        const ServiceNodeInfo * GetSeverInfo(const std::string & address) const;
 	 public:
         InnerNetClient * GetSession(const std::string& address);
         InnerNetClient * GetOrCreateSession(const std::string& address);

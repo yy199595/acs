@@ -17,6 +17,7 @@ namespace Sentry
     private:
         XCode Add(const s2s::location::add & request);
         XCode Del(const s2s::location::del & request);
+		XCode Register(const s2s::cluster::server & request, s2s::cluster::list & response);
     private:
         class LocationComponent * mLocationComponent;
     };

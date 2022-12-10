@@ -18,8 +18,8 @@ namespace Sentry
         XCode Stop();
         XCode Hotfix();
         XCode LoadConfig();
-        XCode Join(const s2s::cluster::join & request); //新服务器加入
-        XCode Exit(const s2s::cluster::exit & response); //新服务器加入
+        XCode Join(const s2s::cluster::server & request); //新服务器加入
+        XCode Exit(const s2s::cluster::server & response); //新服务器加入
 		XCode RunInfo(google::protobuf::StringValue & response); // 获取运行信息
 	 private:
         void Init() final;

@@ -15,6 +15,11 @@
 		"Del": {
 			"Async": false,
 			"Request": "s2s.location.del"
+		},
+		"Register": {
+			"Async": true,
+			"Request": "s2s.cluster.server",
+			"Response": "s2s.cluster.list"
 		}
 	},
 	"MysqlService": {
@@ -65,11 +70,11 @@
 		},
 		"Join": {
 			"Async": false,
-			"Request": "s2s.cluster.join"
+			"Request": "s2s.cluster.server"
 		},
 		"Exit": {
 			"Async": false,
-			"Request": "s2s.cluster.exit"
+			"Request": "s2s.cluster.server"
 		},
 		"RunInfo": {
 			"Async": false,

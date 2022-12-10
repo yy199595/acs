@@ -11,8 +11,8 @@ namespace Sentry
 {
 	bool InnerNetMessageComponent::Awake()
 	{
-        this->mWaitCount = 0;
         this->mSumCount = 0;
+		this->mWaitCount = 0;
 		this->mTaskComponent = nullptr;
 		this->mRpcClientComponent = nullptr;
         return true;
@@ -64,6 +64,7 @@ namespace Sentry
         {
             count++;
             std::shared_ptr<Rpc::Packet> message = this->mWaitMessages.front();
+			this->mWaitMessages.pop();
             if(message->GetHead().Get("func", this->mFullName))
             {
                 const RpcMethodConfig *methodConfig = RpcConfig::Inst()->GetMethodConfig(this->mFullName);
@@ -78,7 +79,6 @@ namespace Sentry
                                                 this, methodConfig, message);
                 }
             }
-            this->mWaitMessages.pop();
         }
     }
 
@@ -122,7 +122,7 @@ namespace Sentry
             head.Remove("id");
             head.Remove("address");
 #ifndef __DEBUG__
-            message->GetHead().Remove("func");
+            head.Remove("func");
 #endif
             message->SetType(Tcp::Type::Response);
             this->mRpcClientComponent->Send(address, message);

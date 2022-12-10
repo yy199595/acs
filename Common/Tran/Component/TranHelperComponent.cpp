@@ -21,6 +21,7 @@ namespace Sentry
 
     void TranHelperComponent::OnLocalComplete()
     {
+		LocationService * rpcService = this->GetComponent<LocationService>();
 		TaskComponent * taskComponent = this->GetComponent<TaskComponent>();
         for (const std::string &address: this->mLocations)
         {

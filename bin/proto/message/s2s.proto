@@ -8,15 +8,9 @@ message cluster
         string rpc = 2;
         string http = 3;
     }
-    message join
+    message list
     {
         repeated server list = 1;
-    }
-    message exit
-    {
-        string name = 1;
-        string rpc = 2;
-        string http = 3;
     }
 }
 

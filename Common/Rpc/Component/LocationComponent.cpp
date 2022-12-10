@@ -4,6 +4,8 @@
 
 #include"LocationComponent.h"
 #include"Log/CommonLogDef.h"
+#include"Config/ServerConfig.h"
+#include"Service/LocationService.h"
 #include"Component/TaskComponent.h"
 namespace Sentry
 {
@@ -156,4 +158,39 @@ namespace Sentry
 		return true;
 	}
 
+	bool LocationComponent::LateAwake()
+	{
+		const ServerConfig * config = ServerConfig::Inst();
+		LOG_CHECK_RET_FALSE(config->GetMember("tran", this->mLocations));
+		return true;
+	}
+
+	void LocationComponent::OnLocalComplete()
+	{
+		const ServerConfig * config = ServerConfig::Inst();
+		LocationService * rpcService = this->GetComponent<LocationService>();
+		for(const std::string & address : this->mLocations)
+		{
+			s2s::cluster::server message;
+			message.set_name(config->Name());
+			config->GetLocation("rpc", *message.mutable_rpc());
+			config->GetLocation("http", *message.mutable_http());
+
+			std::shared_ptr<s2s::cluster::list> response
+				= std::make_shared<s2s::cluster::list>();
+			if(rpcService->Call(address,"Register", message, response) != XCode::Successful)
+			{
+				LOG_ERROR("register to [" << address << "] error");
+				continue;
+			}
+			for(int index = 0; index < response->list_size(); index++)
+			{
+				const s2s::cluster::server & info = response->list(index);
+				{
+					this->AddRpcServer(info.name(), info.rpc());
+					this->AddHttpServer(info.name(), info.http());
+				}
+			}
+		}
+	}
 }
