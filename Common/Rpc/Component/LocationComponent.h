@@ -24,6 +24,9 @@ namespace Sentry
         void AddRpcServer(const std::string & server, const std::string & address);
         void AddHttpServer(const std::string& server, const std::string& address);
 	 public:
+		bool GetTranLocation(std::string & address);
+		bool GetTranLocation(long long userId, std::string & address);
+	 public:
 		bool DelUnit(long long id);
 		LocationUnit * GetUnit(long long id) const;
 		bool AddUnit(std::unique_ptr<LocationUnit> locationUnit);

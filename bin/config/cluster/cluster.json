@@ -10,8 +10,7 @@
 		},
 		"Component": [
 			"LocationComponent",
-			"LuaScriptComponent",
-			"TranHelperComponent"
+			"LuaScriptComponent"
 		]
 	},
 	"HttpServer": {
@@ -28,8 +27,7 @@
 			"RedisComponent",
 			"LocationComponent",
 			"HttpWebComponent",
-			"LuaScriptComponent",
-			"TranHelperComponent"
+			"LuaScriptComponent"
 		]
 	},
 	"GateServer": {
@@ -41,8 +39,7 @@
 			"LocationService" : false
 		},
 		"Component": [
-			"LocationComponent",
-			"TranHelperComponent"
+			"LocationComponent"
 		]
 	},
 	"DataServer": {
@@ -53,8 +50,7 @@
 			"LocationService" : false
 		},
 		"Component": [
-			"LocationComponent",
-			"TranHelperComponent"
+			"LocationComponent"
 		]
 	},
 	"TranServer": {

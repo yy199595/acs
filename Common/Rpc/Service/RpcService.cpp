@@ -6,7 +6,6 @@
 #include"Config/ClusterConfig.h"
 #include"Component/InnerNetComponent.h"
 #include"Component/LocationComponent.h"
-#include"Component/TranHelperComponent.h"
 #include"Component/InnerNetMessageComponent.h"
 #ifdef __RPC_DEBUG_LOG__
 #include<google/protobuf/util/json_util.h>
@@ -15,9 +14,7 @@ namespace Sentry
 {
 	bool RpcService::LateAwake()
 	{
-        this->mClientComponent = this->GetComponent<InnerNetComponent>();
 		this->mLocationComponent = this->GetComponent<LocationComponent>();
-        this->mTranComponent = this->GetComponent<TranHelperComponent>();
         this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>();
 		ClusterConfig::Inst()->GetServerName(this->GetName(), this->mServerName);
 		return true;
@@ -276,7 +273,7 @@ namespace Sentry
             return this->mMessageComponent->Send(address, request);
         }
 #endif
-        this->mTranComponent->GetLocation(userId, address);
+		this->mLocationComponent->GetTranLocation(userId, address);
         return this->mMessageComponent->Send(address, request);
     }
 
@@ -321,7 +318,7 @@ namespace Sentry
             return this->mMessageComponent->Call(address, request);
         }
 #endif
-        this->mTranComponent->GetLocation(userId, address);
+		this->mLocationComponent->GetTranLocation(userId, address);
         return this->mMessageComponent->Call(address, request);
     }
 }

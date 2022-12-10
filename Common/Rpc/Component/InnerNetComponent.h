@@ -25,16 +25,13 @@ namespace Sentry
         void OnRecord(Json::Writer & document) final;
 		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 public:
-        const std::string & GetUser() const { return this->mUserName; };
-        const std::string & GetPassword() const { return this->mPassword; }
-	 public:
 		void GetServiceList(std::vector<const ServiceNodeInfo *> &list) const;
         const ServiceNodeInfo * GetSeverInfo(const std::string & address) const;
 	 public:
         InnerNetClient * GetSession(const std::string& address);
         InnerNetClient * GetOrCreateSession(const std::string& address);
 		bool Send(const std::string & address, std::shared_ptr<Rpc::Packet> message);
-	private:
+	 private:
         bool IsAuth(const std::string & address);
         bool OnForward(std::shared_ptr<Rpc::Packet> message);
         bool OnBroadcast(std::shared_ptr<Rpc::Packet> message);
@@ -43,8 +40,6 @@ namespace Sentry
         bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message);
 		bool OnResponse(const std::string& address, std::shared_ptr<Rpc::Packet> message);
 	 private:
-        std::string mUserName;
-        std::string mPassword;
 		std::string mLocation;
 		unsigned int mSumCount;
 		unsigned int mWaitCount;

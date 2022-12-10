@@ -22,7 +22,6 @@
 #include"Component/TextConfigComponent.h"
 #include"Component/LaunchComponent.h"
 #include"Component/TranComponent.h"
-#include"Component/TranHelperComponent.h"
 
 #include"Service/OuterService.h"
 #include"Service/InnerService.h"
@@ -73,7 +72,6 @@ void RegisterComponent()
 	ComponentFactory::Add<LocationComponent>("LocationComponent");
 
     ComponentFactory::Add<TranComponent>("TranComponent");
-    ComponentFactory::Add<TranHelperComponent>("TranHelperComponent");
 
 // gate
 	ComponentFactory::Add<GateHelperComponent>("GateHelperComponent");

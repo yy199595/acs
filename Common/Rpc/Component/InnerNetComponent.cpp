@@ -38,8 +38,6 @@ namespace Sentry
         }
         this->mTranComponent = this->GetComponent<TranComponent>();
         this->mOuterComponent = this->GetComponent<OuterNetComponent>();
-        LOG_CHECK_RET_FALSE(config->GetMember("user", "name", this->mUserName));
-        LOG_CHECK_RET_FALSE(config->GetMember("user", "passwd", this->mPassword));
         LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<NetThreadComponent>());
         LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>());
 		return this->StartListen("rpc");

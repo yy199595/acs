@@ -165,6 +165,28 @@ namespace Sentry
 		return true;
 	}
 
+	bool LocationComponent::GetTranLocation(std::string& address)
+	{
+		if(this->mLocations.empty())
+		{
+			return false;
+		}
+		address = this->mLocations.front();
+		return true;
+	}
+
+	bool LocationComponent::GetTranLocation(long long userId, std::string& address)
+	{
+		if(this->mLocations.empty())
+		{
+			return false;
+		}
+		size_t size = this->mLocations.size();
+		const size_t index = userId % size;
+		address = this->mLocations[index];
+		return true;
+	}
+
 	void LocationComponent::OnLocalComplete()
 	{
 		const ServerConfig * config = ServerConfig::Inst();
