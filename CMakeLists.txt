@@ -5,9 +5,7 @@ set(CMAKE_CXX_STANDARD 14)
 include(CMake/define.cmake)
 include(CMake/function.cmake)
 
-if(WIN32)
-   
-else()
+if(APPLE)
     include(CMake/proto.cmake)
 endif()
 message(${CMAKE_BINARY_DIR})
