@@ -6,6 +6,7 @@
 #include"File/FileHelper.h"
 #include"Config/CodeConfig.h"
 #include"Service/InnerService.h"
+#include"Component/TranComponent.h"
 #include"Component/OuterNetComponent.h"
 #include"Component/NetThreadComponent.h"
 #include"google/protobuf/util/json_util.h"
@@ -14,6 +15,7 @@ namespace Sentry
 	bool InnerNetComponent::Awake()
 	{
 		this->mNetComponent = nullptr;
+        this->mTranComponent = nullptr;
 		this->mMessageComponent = nullptr;
 		return true;
 	}
@@ -32,6 +34,7 @@ namespace Sentry
             const std::string passwd(iter->value.GetString());
             this->mUserMaps.emplace(user, passwd);
         }
+        this->mTranComponent = this->GetComponent<TranComponent>();
         this->mOuterComponent = this->GetComponent<OuterNetComponent>();
         LOG_CHECK_RET_FALSE(config->GetMember("user", "name", this->mUserName));
         LOG_CHECK_RET_FALSE(config->GetMember("user", "passwd", this->mPassword));
@@ -66,6 +69,7 @@ namespace Sentry
                 }
                 break;
             case Tcp::Type::Ping:
+                this->OnPing(address, message);
                 break;
             case Tcp::Type::Request:
                 this->OnRequest(address, message);
@@ -84,6 +88,13 @@ namespace Sentry
                 LOG_ERROR(address << " unknow message type : " << message->GetType());
             }
         }
+    }
+
+    bool InnerNetComponent::OnPing(const std::string& address, std::shared_ptr<Rpc::Packet> message)
+    {
+        message->SetContent("pong");
+        message->SetType(Tcp::Type::Response);
+        return this->Send(address, message);
     }
 
     bool InnerNetComponent::OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message)
@@ -127,13 +138,20 @@ namespace Sentry
 
 	bool InnerNetComponent::OnRequest(const std::string& address, std::shared_ptr<Rpc::Packet> message)
 	{
-        message->GetHead().Add("address", address);
-        LOG_CHECK_RET_FALSE(message->GetHead().Has("func"));
+        Rpc::Head& head = message->GetHead();
+        LOG_CHECK_RET_FALSE(head.Has("func"));
+        if (this->mTranComponent != nullptr && head.Has("tran"))
+        {
+            head.Add("from", address);
+            this->mTranComponent->OnRequest(message);
+            return true;
+        }
+        LOG_CHECK_RET_FALSE(head.Add("address", address));
         XCode code = this->mMessageComponent->OnRequest(message);
         if(code != XCode::Successful)
         {
             std::string func;
-            message->GetHead().Get("func", func);
+            head.Get("func", func);
             CONSOLE_LOG_ERROR("call " << func << " code = " << CodeConfig::Inst()->GetDesc(code));
             return false;
         }
@@ -168,11 +186,17 @@ namespace Sentry
 	bool InnerNetComponent::OnResponse(const std::string& address, std::shared_ptr<Rpc::Packet> message)
 	{
         std::string targer;
-        const Rpc::Head &head = message->GetHead();
+        Rpc::Head &head = message->GetHead();
         if(this->mOuterComponent != nullptr && head.Get("client", targer))
         {
-            message->GetHead().Remove("client");
+            head.Remove("client");
             this->mOuterComponent->SendData(targer, message);
+            return true;
+        }
+        else if (this->mTranComponent != nullptr && head.Get("from", targer))
+        {
+            head.Remove("from");
+            this->Send(targer, message);
             return true;
         }
 #ifdef __DEBUG__

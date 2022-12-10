@@ -41,8 +41,13 @@ namespace Rpc
         {
             return false;
         }
-        value = std::stoi(iter->second);
-        return true;
+        const std::string& str = iter->second;
+        if (!str.empty() && std::all_of(str.begin(), str.end(), ::isdigit))
+        {
+            value = std::stoi(str);
+            return true;
+        }
+        return false;
     }
 
     bool Head::Get(const std::string &key, long long &value) const
@@ -52,8 +57,13 @@ namespace Rpc
         {
             return false;
         }
-        value = std::stoll(iter->second);
-        return true;
+        const std::string& str = iter->second;
+        if (!str.empty() && std::all_of(str.begin(), str.end(), ::isdigit))
+        {
+            value = std::stoll(str);
+            return true;
+        }
+        return false;
     }
 
     bool Head::Has(const std::string &key) const

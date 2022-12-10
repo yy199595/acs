@@ -25,7 +25,7 @@
         "module": "script/Server"
     },
     "tran":[
-        "127.0.0.1:7794"
+        "127.0.0.1:7788"
     ],
     "Client":{
         "path":{
@@ -43,7 +43,6 @@
         "server":{
             "rpc": "127.0.0.1:7788",
             "gate": "127.0.0.1:1995",
-            "tran":"127.0.0.1:7794",
             "http": "http://127.0.0.1:80/"
         },
         "path":{
@@ -102,12 +101,10 @@
     },
     "TranServer":{
         "listen":{
-            "rpc":7795,
-            "tran":7794
+            "rpc":7788
         },
         "server":{
-            "rpc":"127.0.0.1:7795",
-            "forward":"127.0.0.1:7794"
+            "rpc":"127.0.0.1:7788"
         },
         "path":{
             "cluster":"config/cluster/cluster.json"

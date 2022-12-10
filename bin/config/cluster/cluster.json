@@ -55,6 +55,9 @@
 	},
 	"TranServer": {
 		"AutoAllot": false,
+		"Service": {
+			"InnerService": true
+		},
 		"Component": [
 				"TranComponent"
 			]
