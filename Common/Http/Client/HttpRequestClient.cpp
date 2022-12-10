@@ -35,7 +35,7 @@ namespace Sentry
     {
         if(error)
         {
-            CONSOLE_LOG_ERROR("connect ]" << this->mRequest->Host()
+            CONSOLE_LOG_ERROR("connect [" << this->mRequest->Host()
                  << ":" << this->mRequest->Port() << "] failure :" << error.message());
 			this->OnComplete(HttpStatus::INTERNAL_SERVER_ERROR);
 			return;
