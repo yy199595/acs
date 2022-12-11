@@ -45,13 +45,13 @@ end
 local Update = function()
     while true do
         coroutine.start(function ()
-            for i = 1, 20 do
+            for i = 1, 10 do
                 coroutine.start(CallChat)
             end
-            for i = 1, 20 do
+            for i = 1, 10 do
                 coroutine.start(CallMongo)
             end
-            for i = 1, 20 do
+            for i = 1, 5 do
                 coroutine.start(TestHttp)
             end
         end)

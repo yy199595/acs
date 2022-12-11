@@ -56,7 +56,7 @@ namespace Sentry
         if (code != asio::error::operation_aborted)
         {
             this->ClosetClient();
-            this->mSocket->Close();
+            //this->mSocket->Close();
         }
     }
 
