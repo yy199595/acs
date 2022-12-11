@@ -97,7 +97,6 @@ namespace Sentry
             {
                 continue;
             }
-            // ���������
             std::string location; 
             if (!this->mLocationComponent->AllotServer(server, location))
             {

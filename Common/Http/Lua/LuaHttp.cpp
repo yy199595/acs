@@ -67,7 +67,7 @@ namespace Lua
         else if (lua_istable(lua, 2))
         {
             std::string json;
-            Lua::Json::Read(lua, 2, &json);
+            Lua::RapidJson::Read(lua, 2, &json);
             postRequest->Json(json.c_str(), json.size());
         }
         else

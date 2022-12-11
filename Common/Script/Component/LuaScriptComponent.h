@@ -9,12 +9,13 @@
 namespace Sentry
 {
     class LuaScriptComponent : public Component, public IStart, 
-		public IComplete, public IHotfix, public ISecondUpdate
+							   public IComplete, public IHotfix, public ISecondUpdate, public IServerRecord
 	{
 	 public:
 		LuaScriptComponent() = default;
 		virtual ~LuaScriptComponent() = default;
     public:
+		double GetMemorySize();
 		Lua::LuaModule * GetModule(const std::string & name);
 		Lua::LuaModule * LoadModule(const std::string & name);
 		struct lua_State* GetLuaEnv() { return this->mLuaEnv; }
@@ -28,6 +29,7 @@ namespace Sentry
 		void OnClusterComplete() final;
         void OnSecondUpdate(const int tick) final;
         void OnHotFix() final;
+		void OnRecord(Json::Writer &document) final;
     private:
 		bool LoadAllFile();
 		bool LoadAllFilePath(const std::string & dir);

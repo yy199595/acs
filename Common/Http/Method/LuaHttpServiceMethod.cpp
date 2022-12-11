@@ -64,7 +64,7 @@ namespace Sentry
         else if (lua_istable(lua, -1))
         {          
             std::string data;
-            Lua::Json::Read(lua, -1, &data);
+            Lua::RapidJson::Read(lua, -1, &data);
 			response.Json(HttpStatus::OK, data.c_str(), data.size());
             return XCode::Successful;
         }

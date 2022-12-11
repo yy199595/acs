@@ -22,7 +22,7 @@ namespace Sentry
         bool Get(const std::string & server, std::string & address) const;
         void Add(const std::string & server, const std::string & address);
     private:
-        std::string mAddress;
+		std::string mAddress;
         std::unordered_map<std::string, std::string> mLocations;
     };
 }

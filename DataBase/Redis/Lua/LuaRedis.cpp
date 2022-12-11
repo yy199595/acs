@@ -49,7 +49,7 @@ namespace Lua
             else if (lua_istable(lua, index))
             {
                 std::string json;
-                Lua::Json::Read(lua, index, &json);
+                Lua::RapidJson::Read(lua, index, &json);
                 request->AddParameter(json);
             }
             lua_pop(lua, 1);
@@ -87,7 +87,7 @@ namespace Lua
         }
         else if (lua_istable(lua, 3))
         {
-            Lua::Json::Read(lua, 3, &json);
+            Lua::RapidJson::Read(lua, 3, &json);
         }
         else
         {
@@ -143,7 +143,7 @@ namespace Lua
             else if (lua_istable(lua, index))
             {
                 std::string json;
-                Lua::Json::Read(lua, index, &json);
+                Lua::RapidJson::Read(lua, index, &json);
                 request->AddParameter(json);
             }
             lua_pop(lua, 1);

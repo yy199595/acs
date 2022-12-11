@@ -7,7 +7,7 @@
 #include"Lua/LuaInclude.h"
 namespace Lua
 {
-	namespace Json
+	namespace RapidJson
 	{
 		extern int Encode(lua_State * lua);
 		extern int Decode(lua_State * lua);

@@ -18,9 +18,8 @@ namespace Sentry
         ~LocationComponent() = default;
     public:
         bool DelServer(const std::string& address);
-		// 等待某个服务器启动
-		void WaitServerStart(const std::string & server);
-        bool AllotServer(const std::string& server, std::string& address);
+		void WaitServerStart(const std::string & server);//等待某个服务器启动
+		bool AllotServer(const std::string& server, std::string& address);
         void AddRpcServer(const std::string & server, const std::string & address);
         void AddHttpServer(const std::string& server, const std::string& address);
 	 public:
@@ -30,7 +29,6 @@ namespace Sentry
 		bool DelUnit(long long id);
 		LocationUnit * GetUnit(long long id) const;
 		bool AddUnit(std::unique_ptr<LocationUnit> locationUnit);
-        size_t GetUnitCount() const { return this->mUnitLocations.size(); }
 	 public:
 		bool LateAwake() final;
 		void OnLocalComplete() final;

@@ -62,7 +62,7 @@ namespace Sentry
 			if (lua_istable(lua, -1))
 			{
 				std::string data;
-				Lua::Json::Read(lua, -1, &data);
+				Lua::RapidJson::Read(lua, -1, &data);
 				luaServiceTaskSource->mHttpData->Json(HttpStatus::OK, data);
 			}
 			else if (lua_isstring(lua, -1))

@@ -87,8 +87,8 @@ namespace Sentry
 
         Lua::ClassProxyHelper luaRegister7(this->mLuaEnv, "rapidjson");
         luaRegister7.BeginNewTable();
-        luaRegister7.PushExtensionFunction("encode", Lua::Json::Encode);
-        luaRegister7.PushExtensionFunction("decode", Lua::Json::Decode);
+        luaRegister7.PushExtensionFunction("encode", Lua::RapidJson::Encode);
+        luaRegister7.PushExtensionFunction("decode", Lua::RapidJson::Decode);
 
         Lua::ClassProxyHelper luaRegister8(this->mLuaEnv, "Md5");
         luaRegister8.BeginNewTable();
@@ -289,4 +289,25 @@ namespace Sentry
             lua_setfield(this->mLuaEnv, -3, "path");
         }
     }
+
+	double LuaScriptComponent::GetMemorySize()
+	{
+		if(Lua::Function::Get(this->mLuaEnv, "collectgarbage"))
+		{
+			lua_pushstring(this->mLuaEnv, "count");
+			if(lua_pcall(this->mLuaEnv, 1, 1, 0) != LUA_OK)
+			{
+				LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+				return 0;
+			}
+			return lua_tonumber(this->mLuaEnv, -1);
+		}
+		return 0;
+	}
+
+	void LuaScriptComponent::OnRecord(Json::Writer& document)
+	{
+		double size = this->GetMemorySize();
+		document.Add("memory").Add(fmt::format("{0}mb", size / 1024));
+	}
 }
