@@ -1,9 +1,6 @@
 
 local MongoComponent = {}
 local this = MongoComponent
-if not Service.FindService("MongoService") then
-    Log.Error("not find MongoService")
-end
 function MongoComponent.InsertOnce(tab, data, flag)
     if type(data) == "table" then
         data = rapidjson.encode(data)

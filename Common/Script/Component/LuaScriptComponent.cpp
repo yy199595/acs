@@ -136,7 +136,7 @@ namespace Sentry
 			std::make_unique<Lua::LuaModule>(this->mLuaEnv, name, path);
 		Lua::LuaModule * result = luaModule.get();
 		this->mModules.emplace(name, std::move(luaModule));
-		CONSOLE_LOG_INFO("load lua module [" << name << "] successful");
+		//CONSOLE_LOG_INFO("load lua module [" << name << "] successful");
         return result;
     }
 

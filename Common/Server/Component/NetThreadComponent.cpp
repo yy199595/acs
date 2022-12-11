@@ -82,7 +82,7 @@ namespace Sentry
             {
                 return false;
             }
-            CONSOLE_LOG_INFO("start net thread [" << index << "] successful");
+           // CONSOLE_LOG_INFO("start net thread [" << index << "] successful");
         }
 #endif
         return true;

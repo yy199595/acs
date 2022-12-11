@@ -58,7 +58,7 @@ namespace Sentry
             return false;
         }
         this->mLuaMap.emplace(name, md5);
-        CONSOLE_LOG_INFO("add lua file " << name << ":" << md5);
+        //CONSOLE_LOG_INFO("add lua file " << name << ":" << md5);
         return true;
     }
 

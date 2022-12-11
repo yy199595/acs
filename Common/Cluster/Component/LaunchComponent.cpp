@@ -29,7 +29,7 @@ namespace Sentry
                     LOG_ERROR("add " << name << " error");
                     return false;
                 }
-                CONSOLE_LOG_INFO(ServerConfig::Inst()->Name() << " add component [" << name << "]");
+                //CONSOLE_LOG_INFO(ServerConfig::Inst()->Name() << " add component [" << name << "]");
             }
         }
         components.clear();
@@ -79,7 +79,7 @@ namespace Sentry
                 if (nodeConfig->IsStart(name))
                 {                  
                     this->GetComponent<IServiceBase>(name)->Init(); 
-                    CONSOLE_LOG_INFO(ServerConfig::Inst()->Name() << " start service [" << name << "]");
+                    //CONSOLE_LOG_INFO(ServerConfig::Inst()->Name() << " start service [" << name << "]");
                 }              
             }
         }
@@ -120,8 +120,9 @@ namespace Sentry
                 }
                 else if(HttpConfig::Inst()->GetConfig(name) != nullptr)
                 {
+					long long t2 = Helper::Time::NowMilTime();
 					LOG_CHECK_RET_FALSE(!httpLocation.empty());
-                    LOG_INFO("start http service [" << name << "] successful");
+					LOG_INFO("start http service [" << name << "] successful use time [" << t2 - t1 << "ms]");
                 }
             }
         }
