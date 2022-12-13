@@ -96,6 +96,11 @@ namespace Sentry
             document.Add("cpu").Add(std::thread::hardware_concurrency());
             document.Add(Json::End::EndObject);
         }
+		LuaScriptComponent * luaComponent = this->GetComponent<LuaScriptComponent>();
+		if(luaComponent != nullptr)
+		{
+			document.Add("lua").Add(luaComponent->CollectGarbage());
+		}
         std::vector<Component *> components;
         this->mApp->GetComponents(components);
 		for(Component * component : components)

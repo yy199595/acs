@@ -11,7 +11,6 @@
 #include"Lua/LuaLogger.h"
 #include"Json/Lua/Json.h"
 #include"Lua/LuaCoroutine.h"
-#include"Service/LuaRpcService.h"
 #include"Json/Lua/Encoder.h"
 #include"Md5/LuaMd5.h"
 #include"System/System.h"
@@ -289,6 +288,21 @@ namespace Sentry
             lua_setfield(this->mLuaEnv, -3, "path");
         }
     }
+
+	double LuaScriptComponent::CollectGarbage()
+	{
+		double start = this->GetMemorySize();
+		if(Lua::Function::Get(this->mLuaEnv, "collectgarbage"))
+		{
+			lua_pushstring(this->mLuaEnv, "collect");
+			if(lua_pcall(this->mLuaEnv, 1, 1, 0) != LUA_OK)
+			{
+				LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+				return 0;
+			}
+		}
+		return start - this->GetMemorySize();
+	}
 
 	double LuaScriptComponent::GetMemorySize()
 	{

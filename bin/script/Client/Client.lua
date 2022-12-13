@@ -49,10 +49,10 @@ local Update = function()
                 coroutine.start(CallChat)
             end
             for i = 1, 10 do
-                coroutine.start(CallMongo)
+                --coroutine.start(CallMongo)
             end
-            for i = 1, 5 do
-                coroutine.start(TestHttp)
+            for i = 1, 10 do
+                --coroutine.start(TestHttp)
             end
         end)
         coroutine.sleep(100)

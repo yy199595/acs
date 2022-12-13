@@ -16,6 +16,7 @@ namespace Sentry
 		virtual ~LuaScriptComponent() = default;
     public:
 		double GetMemorySize();
+		double CollectGarbage();
 		Lua::LuaModule * GetModule(const std::string & name);
 		Lua::LuaModule * LoadModule(const std::string & name);
 		struct lua_State* GetLuaEnv() { return this->mLuaEnv; }
