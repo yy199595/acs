@@ -26,7 +26,8 @@ namespace Client
         {
             if(!this->ConnectSync())
             {
-                CONSOLE_LOG_FATAL("connect server error");
+                CONSOLE_LOG_FATAL("connect " <<
+					this->mSocket->GetAddress() << "] failure");
                 return;
             }
             this->SendFromMessageQueue();
