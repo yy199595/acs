@@ -45,21 +45,7 @@ namespace Sentry
             LOG_ERROR("call service not exist : [" << methodConfig->Service << "]");
             return XCode::CallServiceNotFound;
         }
-		if(message->GetHead().Get("func", this->mFullName))
-		{
-			const RpcMethodConfig *methodConfig = RpcConfig::Inst()->GetMethodConfig(this->mFullName);
-			if (methodConfig != nullptr)
-			{
-				if (!methodConfig->IsAsync)
-				{
-					this->Invoke(methodConfig, message);
-				}
-				this->mTaskComponent->Start(&InnerNetMessageComponent::Invoke,
-					this, methodConfig, message);
-			}
-		}
-
-        //this->mWaitMessages.push(std::move(message));
+        this->mWaitMessages.push(std::move(message));
 		return XCode::Successful;
 	}
 

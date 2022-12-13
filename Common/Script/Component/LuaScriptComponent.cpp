@@ -322,6 +322,8 @@ namespace Sentry
 	void LuaScriptComponent::OnRecord(Json::Writer& document)
 	{
 		double size = this->GetMemorySize();
+		double free = this->CollectGarbage();
+		document.Add("free").Add(fmt::format("{0}mb", free / 1024));
 		document.Add("memory").Add(fmt::format("{0}mb", size / 1024));
 	}
 }

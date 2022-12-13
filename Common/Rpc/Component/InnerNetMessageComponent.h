@@ -2,7 +2,7 @@
 #include"RpcTaskComponent.h"
 #include"Client/Message.h"
 #include"Async/RpcTaskSource.h"
-#define MAX_HANDLER_MSG_COUNT 100 //每次循环最大处理数量
+#define MAX_HANDLER_MSG_COUNT 500 //每次循环最大处理数量
 namespace Sentry
 {
 	class RpcService;

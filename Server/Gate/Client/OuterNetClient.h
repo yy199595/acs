@@ -21,9 +21,7 @@ namespace Sentry
 	 public:
 		void StartClose();
 		void StartReceive(int second = 0);
-		unsigned int GetQps() const { return this->mQps; }
 		void SendData(std::shared_ptr<Rpc::Packet> message);
-		unsigned int GetCallCount() const { return this->mCallCount; }
 	 protected:
 		void OnConnect(const asio::error_code &error) {}
         void OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t) final;
@@ -33,10 +31,9 @@ namespace Sentry
         void CloseSocket(XCode code);
 		void OnTimerEnd(Asio::Code code);
 	 private:
-		 int mTimeout;
+		int mTimeout;
 		unsigned int mQps;
-        unsigned int mCallCount;
-        Tcp::DecodeState mState;		
+        Tcp::DecodeState mState;
         OuterNetComponent* mGateComponent;
         std::shared_ptr<Rpc::Packet> mMessage;		
         std::shared_ptr<asio::steady_timer> mTimer;

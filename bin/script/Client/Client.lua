@@ -45,15 +45,9 @@ end
 local Update = function()
     while true do
         coroutine.start(function ()
-            for i = 1, 10 do
-                coroutine.start(CallChat)
-            end
-            for i = 1, 10 do
-                --coroutine.start(CallMongo)
-            end
-            for i = 1, 10 do
-                --coroutine.start(TestHttp)
-            end
+            coroutine.start(CallChat)
+            coroutine.start(CallMongo)
+            coroutine.start(TestHttp)
         end)
         coroutine.sleep(100)
     end

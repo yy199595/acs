@@ -20,8 +20,7 @@ namespace Sentry
 	{
 		this->mQps = 0;
         this->mTimeout = 0;
-		this->mCallCount = 0;
-        this->mState = Tcp::DecodeState::Head;        
+        this->mState = Tcp::DecodeState::Head;
 	}
 
 	void OuterNetClient::StartReceive(int second)

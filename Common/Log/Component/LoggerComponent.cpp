@@ -68,11 +68,15 @@ namespace Sentry
             case spdlog::level::level_enum::err:
 #ifndef __DEBUG__
                 this->mErrorLog->error(log);
+#else
+				this->mAllLog->flush();
 #endif
                 break;
             case spdlog::level::level_enum::critical:
 #ifndef __DEBUG__
                 this->mFatalLog->critical(log);
+#else
+				this->mAllLog->flush();
 #endif
                 break;
             default:
