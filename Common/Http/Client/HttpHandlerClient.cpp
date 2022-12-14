@@ -104,7 +104,7 @@ namespace Sentry
 			std::shared_ptr<HttpHandlerClient> httpHandlerClient =
 				std::dynamic_pointer_cast<HttpHandlerClient>(this->shared_from_this());
 #ifdef ONLY_MAIN_THREAD
-			this->mHttpComponent->OnRequest(address, httpHandlerClient);
+			this->mHttpComponent->OnRequest(address, this->mHttpRequest);
 #else
 			Asio::Context& mainThread = App::Inst()->MainThread();
 			mainThread.post(std::bind(&HttpListenComponent::OnRequest,
