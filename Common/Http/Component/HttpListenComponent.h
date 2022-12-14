@@ -5,6 +5,11 @@
 #ifndef APP_HTTPLISTENCOMPONENT_H
 #define APP_HTTPLISTENCOMPONENT_H
 #include"Component/TcpListenerComponent.h"
+namespace Http
+{
+	class Request;
+	class Response;
+}
 namespace Sentry
 {
     class HttpHandlerClient;
@@ -15,7 +20,7 @@ namespace Sentry
         void ClosetHttpClient(const std::string & address);
         bool OnListen(std::shared_ptr<SocketProxy> socket) final;
         virtual bool OnDelClient(const std::string& address) = 0;
-        virtual void OnRequest(std::shared_ptr<HttpHandlerClient> httpClient) = 0;
+        virtual void OnRequest(const std::string & address, std::shared_ptr<Http::Request> request) = 0;
     protected:
         HttpHandlerClient* GetClient(const std::string& address);
     private:

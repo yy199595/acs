@@ -20,22 +20,19 @@ namespace Sentry
         return this->mApp->GetComponents(httpServices) && this->StartListen("http");
     }
 
-    void HttpWebComponent::OnRequest(std::shared_ptr<HttpHandlerClient> httpClient)
+    void HttpWebComponent::OnRequest(const std::string& address, std::shared_ptr<Http::Request> request)
     {
-        assert(this->mApp->IsMainThread());
-        const std::string& address = httpClient->GetAddress();
-        std::shared_ptr<Http::Request> request = httpClient->Request();		
         const HttpMethodConfig *httpConfig = HttpConfig::Inst()->GetMethodConfig(request->Path());
         if (httpConfig == nullptr)
         {
-            httpClient->StartWriter(HttpStatus::NOT_FOUND);
+			this->ClosetHttpClient(address);
             LOG_ERROR("[" << address << "] <<" << request->Url() << ">>" << HttpStatusToString(HttpStatus::NOT_FOUND));
             return;
         }
 
         if (!httpConfig->Type.empty() && httpConfig->Type != request->Method())
         {			
-            httpClient->StartWriter(HttpStatus::METHOD_NOT_ALLOWED);
+			this->ClosetHttpClient(address);
             LOG_ERROR("[" << address << "] <<" << request->Url() << ">>" << HttpStatusToString(HttpStatus::METHOD_NOT_ALLOWED));
             return;
         }

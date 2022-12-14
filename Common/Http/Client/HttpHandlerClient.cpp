@@ -98,17 +98,19 @@ namespace Sentry
             this->ClosetClient();
         }
         else if(code == asio::error::eof)
-        {
-END_RECEIVE:
-            std::shared_ptr<HttpHandlerClient> httpHandlerClient =
-                std::dynamic_pointer_cast<HttpHandlerClient>(this->shared_from_this());
+		{
+		END_RECEIVE:
+			const std::string& address = this->mSocket->GetAddress();
+			std::shared_ptr<HttpHandlerClient> httpHandlerClient =
+				std::dynamic_pointer_cast<HttpHandlerClient>(this->shared_from_this());
 #ifdef ONLY_MAIN_THREAD
-            this->mHttpComponent->OnRequest(httpHandlerClient);
+			this->mHttpComponent->OnRequest(address, httpHandlerClient);
 #else
-            Asio::Context &mainThread = App::Inst()->MainThread();
-            mainThread.post(std::bind(&HttpListenComponent::OnRequest, this->mHttpComponent, httpHandlerClient));
+			Asio::Context& mainThread = App::Inst()->MainThread();
+			mainThread.post(std::bind(&HttpListenComponent::OnRequest,
+				this->mHttpComponent, address, this->mHttpRequest));
 #endif
-        }
+		}
         else
         {
             if(!this->mHttpRequest->OnRead(is))
