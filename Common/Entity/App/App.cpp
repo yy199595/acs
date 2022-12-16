@@ -139,42 +139,41 @@ namespace Sentry
             {
                 component->OnSystemUpdate();
             }
-            if (!this->mIsStartDone)
-            {
-                continue;
-            }
-            logicStartTime = Helper::Time::NowMilTime();
-            if (logicStartTime - logicLastUpdateTime >= logicUpdateInterval)
-            {
-                logicRunCount++;
-                for (IFrameUpdate *component: frameUpdateComponents)
-                {
-                    component->OnFrameUpdate(deltaTime);
-                }
+            if (this->mIsStartDone)
+			{
+				logicStartTime = Helper::Time::NowMilTime();
+				if (logicStartTime - logicLastUpdateTime >= logicUpdateInterval)
+				{
+					logicRunCount++;
+					for (IFrameUpdate* component : frameUpdateComponents)
+					{
+						component->OnFrameUpdate(deltaTime);
+					}
 
-                if (logicStartTime - logicSecondTime >= 1000)
-                {
-                    this->mTickCount++;
+					if (logicStartTime - logicSecondTime >= 1000)
+					{
+						this->mTickCount++;
 #ifdef __OS_WIN__
-                    this->UpdateConsoleTitle();
+						this->UpdateConsoleTitle();
 #endif
-                    long long nowTime = Helper::Time::NowMilTime();
-                    float seconds = (nowTime - logicSecondTime) / 1000.0f;
-                    this->mLogicFps = (float)logicRunCount / seconds;
-                    for (ISecondUpdate *component: secondUpdateComponents)
-                    {
-                        component->OnSecondUpdate(this->mTickCount);
-                    }
-                    logicRunCount = 0;
-                    logicSecondTime = Helper::Time::NowMilTime();
-                }
+						long long nowTime = Helper::Time::NowMilTime();
+						float seconds = (nowTime - logicSecondTime) / 1000.0f;
+						this->mLogicFps = (float)logicRunCount / seconds;
+						for (ISecondUpdate* component : secondUpdateComponents)
+						{
+							component->OnSecondUpdate(this->mTickCount);
+						}
+						logicRunCount = 0;
+						logicSecondTime = Helper::Time::NowMilTime();
+					}
 
-                for (ILastFrameUpdate *component: lastFrameUpdateComponents)
-                {
-                    component->OnLastFrameUpdate();
-                }
-                logicLastUpdateTime = Helper::Time::NowMilTime();
-            }
+					for (ILastFrameUpdate* component : lastFrameUpdateComponents)
+					{
+						component->OnLastFrameUpdate();
+					}
+					logicLastUpdateTime = Helper::Time::NowMilTime();
+				}
+			}
             std::this_thread::sleep_for(sleepTime);
         }
 #ifdef __OS_WIN__
