@@ -49,7 +49,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-    void InnerNetMessageComponent::OnFrameUpdate(float t)
+    void InnerNetMessageComponent::OnSystemUpdate()
     {
         size_t count = 0;
         while(!this->mWaitMessages.empty() && count <= MAX_HANDLER_MSG_COUNT)

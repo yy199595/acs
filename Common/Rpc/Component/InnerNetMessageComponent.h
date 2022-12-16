@@ -18,7 +18,7 @@ namespace Sentry
 		long long Time;
 	};
 #endif
-    class InnerNetMessageComponent : public RpcTaskComponent<long long, Rpc::Packet>, public IFrameUpdate
+    class InnerNetMessageComponent : public RpcTaskComponent<long long, Rpc::Packet>, public ISystemUpdate
 	{
 	 public:
 		InnerNetMessageComponent() = default;
@@ -30,7 +30,7 @@ namespace Sentry
     private:
 		bool Awake() final;
 		bool LateAwake() final;
-		void OnFrameUpdate(float t) final;
+		void OnSystemUpdate() final;
         void Invoke(const RpcMethodConfig * config, std::shared_ptr<Rpc::Packet> message);
     private:
         std::string mFullName;
