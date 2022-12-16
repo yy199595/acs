@@ -56,7 +56,7 @@ namespace Json
 	 public:
 		size_t GetJsonSize();
 		const std::string JsonString();
-		size_t WriterStream(std::string& os);
+		size_t WriterStream(std::string * os);
 		size_t WriterStream(std::ostream& os);
 		bool GetDocument(rapidjson::Document & jsonDocument);
 	 private:

@@ -247,25 +247,26 @@ namespace Sentry
 
         auto iter = this->mMainKeys.find(fullName);
         for (size_t index = 0; index < command->size(); index++)
-        {
-            Json::Document * document = command->at(index);
-            if(document != nullptr)
-            {
-                rapidjson::Document & doc = (rapidjson::Document&)(*document);
-                std::string * json = document->Serialize(response.add_jsons());
+		{
+			Json::Writer* document = command->at(index);
+			std::string* json = response.add_jsons();
+			document->WriterStream(response.add_jsons());
 #ifdef __ENABLE_REDIS__
-                if (request.fields_size() == 0 && this->mSyncComponent != nullptr && iter != this->mMainKeys.end())
-                {
-                    std::string value;
-                    const std::string &field = iter->second;
-                    if (this->mMysqlHelper->GetValue(doc, field, value))
-                    {
-                        this->mSyncComponent->Set(value, fullName, *json);
-                    }
-                }
+			if (request.fields_size() == 0 && this->mSyncComponent != nullptr && iter != this->mMainKeys.end())
+			{
+				std::string value;
+				rapidjson::Document doc;
+				const std::string& field = iter->second;
+				if(doc.Parse(json->c_str(), json->size()).HasParseError())
+				{
+					if (this->mMysqlHelper->GetValue(doc, field, value))
+					{
+						this->mSyncComponent->Set(value, fullName, *json);
+					}
+				}
+			}
 #endif
-            }
-        }
+		}
 
         return XCode::Successful;
     }

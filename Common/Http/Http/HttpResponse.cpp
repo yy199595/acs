@@ -68,7 +68,7 @@ namespace Http
     void Response::Json(HttpStatus code, Json::Writer& doc)
     {
         this->mCode = (int)code;
-        doc.WriterStream(this->mContent);
+        doc.WriterStream(&mContent);
         this->mHead.Add("content-type", "application/json");
     }
 

@@ -439,7 +439,7 @@ namespace Bson
 				jsonWriter.Add(key);
 				this->WriterToJson(this->getField(key), jsonWriter);
 			}
-			jsonWriter.WriterStream(json);
+			jsonWriter.WriterStream(&json);
 		}
 
 		void Document::WriterToJson(const _bson::bsonelement &bsonelement, Json::Writer &json)

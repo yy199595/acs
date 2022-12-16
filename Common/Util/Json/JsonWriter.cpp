@@ -115,27 +115,27 @@ namespace Json
 		return std::string();
 	}
 
-	size_t Writer::WriterStream(std::string& os)
+	size_t Writer::WriterStream(std::string * os)
 	{
 		if (this->mWriter.IsComplete())
 		{
 			const char* str = this->mStringBuf.GetString();
 			const size_t size = this->mStringBuf.GetSize();
-			os.append(str, size);
+			os->append(str, size);
 			return size;
 		}
 		if (this->mIsObject && this->mWriter.EndObject())
 		{
 			const char* str = this->mStringBuf.GetString();
 			const size_t size = this->mStringBuf.GetSize();
-			os.append(str, size);
+			os->append(str, size);
 			return size;
 		}
 		else if (this->mWriter.EndArray())
 		{
 			const char* str = this->mStringBuf.GetString();
 			const size_t size = this->mStringBuf.GetSize();
-			os.append(str, size);
+			os->append(str, size);
 			return size;
 		}
 		return 0;

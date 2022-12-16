@@ -80,7 +80,7 @@ namespace Mysql
         while(MYSQL_ROW row = mysql_fetch_row(result1))
         {
             std::string json;
-            Json::Document * jsonDocument = new Json::Document();
+            Json::Writer * jsonDocument = new Json::Writer();
             unsigned int fieldCount = mysql_field_count(sock);
             unsigned long* lengths = mysql_fetch_lengths(result1);
             for (unsigned int index = 0; index < fieldCount; index++)
@@ -94,7 +94,7 @@ namespace Mysql
         return true;
     }
 
-    bool QueryCommand::Write(Json::Document &document, st_mysql_field *filed, const char *str, int len)
+    bool QueryCommand::Write(Json::Writer &document, st_mysql_field *filed, const char *str, int len)
     {
         if(str == nullptr || len == 0)
         {
@@ -128,7 +128,7 @@ namespace Mysql
             case enum_field_types::MYSQL_TYPE_VAR_STRING:
             {
                 rapidjson::Value value(str, len);
-                document.Add(filed->name, str, len);
+                document.Add(filed->name).Add(str, len);
                 return true;
             }
             case enum_field_types::MYSQL_TYPE_JSON:
@@ -138,7 +138,7 @@ namespace Mysql
                 {
                     return false;
                 }
-                document.Add(filed->name, doc);
+                document.Add(filed->name).Add(doc);
                 return true;
             }
         }

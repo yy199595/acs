@@ -114,7 +114,7 @@ namespace Sentry
                 document.Add(Json::End::EndObject);				
 			}
 		}
-		document.WriterStream(*response.mutable_value());
+		document.WriterStream(response.mutable_value());
 		return XCode::Successful;
 	}
 

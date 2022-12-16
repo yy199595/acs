@@ -58,13 +58,13 @@ namespace Mysql
         const std::string mSql;
 	};
 
-    class QueryCommand : public ICommand, public std::vector<Json::Document *>
+ 	class QueryCommand : public ICommand, public std::vector<Json::Writer *>
     {
     public:
         QueryCommand(const std::string & sql);
         bool Invoke(MYSQL *, std::string &error) final;
     private:
-        bool Write(Json::Document & document, st_mysql_field * filed, const char * str, int len);
+        bool Write(Json::Writer & document, st_mysql_field * filed, const char * str, int len);
     private:
         const std::string mSql;
     };
