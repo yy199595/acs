@@ -26,7 +26,7 @@ namespace Sentry
         if (httpConfig == nullptr)
         {
 			this->ClosetHttpClient(address);
-            LOG_ERROR("[" << address << "] <<" << request->Url() << ">>" << HttpStatusToString(HttpStatus::NOT_FOUND));
+            LOG_ERROR("[" << address << "] <<" << request->Path() << ">>" << HttpStatusToString(HttpStatus::NOT_FOUND));
             return;
         }
 
@@ -62,8 +62,10 @@ namespace Sentry
             XCode code = httpService->Invoke(method, request, response);
             if (code != XCode::Successful)
             {
+#ifdef __DEBUG__
                 LOG_ERROR("[" << config->Type << "] " << config->Path 
                     << " : " << CodeConfig::Inst()->GetDesc(code));
+#endif
             }
         }
         HttpHandlerClient* httpHandlerClient = this->GetClient(address);

@@ -39,10 +39,8 @@ namespace Sentry
                     }
                     std::shared_ptr<RedisResponse> response =
                         this->mComponent->Run(redisClient, "SCRIPT", "LOAD", content);
-                    if(response == nullptr || response->HasError())
-                    {
-                        return false;
-                    }
+
+					LOG_CHECK_RET_FALSE(response != nullptr && !response->HasError());
                     LOG_CHECK_RET_FALSE(this->OnLoadScript(name, response->GetString()));
                 }
             }

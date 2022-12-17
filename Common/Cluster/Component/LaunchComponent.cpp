@@ -122,7 +122,11 @@ namespace Sentry
                 {
 					long long t2 = Helper::Time::NowMilTime();
 					LOG_CHECK_RET_FALSE(!httpLocation.empty());
+#ifdef __DEBUG__
 					LOG_INFO("start http service [" << name << "] successful use time [" << t2 - t1 << "ms]");
+#else
+					LOG_INFO("start http service [" << name << "] successful");
+#endif
                 }
             }
         }

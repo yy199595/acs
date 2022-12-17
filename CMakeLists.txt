@@ -118,12 +118,12 @@ if(__ENABLE_REDIS__)
 endif()
 
 #LINK_DIRECTORIES(Libs/lib)
-
-if(__DEBUG__)
-    SET(CMAKE_BUILD_TYPE "Debug")
-else()
-    SET(CMAKE_BUILD_TYPE "Release")
-endif()
+SET(CMAKE_BUILD_TYPE "Debug")
+#if(__DEBUG__)
+#    SET(CMAKE_BUILD_TYPE "Debug")
+#else()
+#    #SET(CMAKE_BUILD_TYPE "Release")
+#endif()
 
 list(APPEND ServerFiles ${MainSource} ${ServerSource})
 
