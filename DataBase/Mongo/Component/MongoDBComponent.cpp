@@ -73,9 +73,8 @@ namespace Sentry
             return this->mMongoClients[index].get();
         }
         std::shared_ptr<TcpMongoClient> returnClient = this->mMongoClients.front();
-        for(size_t i = 0; i < this->mMongoClients.size(); i++)
+        for(std::shared_ptr<TcpMongoClient> & mongoClient : this->mMongoClients)
         {
-            std::shared_ptr<TcpMongoClient> mongoClient = this->mMongoClients[i];
             if(mongoClient->WaitSendCount() <= 5)
             {
                 return mongoClient.get();

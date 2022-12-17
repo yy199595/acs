@@ -9,7 +9,7 @@ endif()
 add_definitions(-w)
 add_definitions(-D ASIO_STANDALONE)
 
-option(__DEBUG__ "debug模式" ON)
+option(__DEBUG__ "debug模式" OFF)
 
 option(__ENABLE_CLIENT__ "开启客户端" ON)
 option(__ENABLE_OPEN_SSL__ "开启SSL" OFF)

@@ -40,11 +40,11 @@ namespace Sentry
 	{
 	public:
 		MongoDBComponent();
-		~MongoDBComponent() = default;
+		~MongoDBComponent() final = default;
 	private:
 		void OnDelTask(int taskId, RpcTask task) final;
 	public:
-        bool Start();
+        bool Start() final;
         void CloseClients();
         bool Ping(int index);
         bool SetIndex(const std::string & tab, const std::string & name);

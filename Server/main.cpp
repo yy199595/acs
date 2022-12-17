@@ -32,7 +32,6 @@
 #ifdef __ENABLE_MONGODB__
 #include"Service/MongoService.h"
 #include"Component/MongoDBComponent.h"
-#include"Component/DataSyncComponent.h"
 #include"Component/MongoHelperComponent.h"
 #include"Component/MongoDataComponent.h"
 #endif
@@ -87,9 +86,6 @@ void RegisterComponent()
 
 #ifdef __ENABLE_MONGODB__
     ComponentFactory::Add<MongoDBComponent>("MongoDBComponent");
-#ifdef __ENABLE_REDIS__
-    ComponentFactory::Add<DataSyncComponent>("DataSyncComponent");
-#endif
     ComponentFactory::Add<MongoDataComponent>("MongoDataComponent");
     ComponentFactory::Add<MongoHelperComponent>("MongoHelperComponent");
 #endif

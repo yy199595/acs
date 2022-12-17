@@ -11,7 +11,6 @@ namespace Sentry
     bool RedisComponent::Awake()
     {
         LOG_CHECK_RET_FALSE(RedisConfig::Inst());
-        LOG_CHECK_RET_FALSE(RedisConfig::Inst()->Has("main"));
         LOG_CHECK_RET_FALSE(this->mApp->AddComponent<RedisScriptComponent>());
         LOG_CHECK_RET_FALSE(this->mApp->AddComponent<RedisStringComponent>());
         return true;
@@ -19,16 +18,9 @@ namespace Sentry
 
     bool RedisComponent::LateAwake()
     {
-        std::vector<RedisClientConfig> configs;
-        LOG_CHECK_RET_FALSE(RedisConfig::Inst()->Get(configs));
-        for(const RedisClientConfig & config : configs)
-        {
-            for (int index = 0; index < config.Count; index++)
-            {
-                LOG_CHECK_RET_FALSE(this->MakeRedisClient(config));
-            }
-        }
-        return true;
+		const RedisClientConfig & config
+			= RedisConfig::Inst()->Config();
+        return this->MakeRedisClient(config);
     }
 
 	void RedisComponent::OnConnectSuccessful(const std::string& address)
@@ -47,19 +39,14 @@ namespace Sentry
 	}
 
     bool RedisComponent::Start()
-    {
-        std::vector<RedisClientConfig> configs;
-        LOG_CHECK_RET_FALSE(RedisConfig::Inst()->Get(configs));
-        for(const RedisClientConfig & config : configs)
-        {
-            if(!this->Ping(this->GetClient(config.Name)))
-            {
-                CONSOLE_LOG_ERROR("start " << config.Name << " redis client error");
-                return false;
-            }
-        }
-        return true;
-    }
+	{
+		if (!this->Ping(this->GetClient()))
+		{
+			CONSOLE_LOG_ERROR("start  redis client error");
+			return false;
+		}
+		return true;
+	}
 
     TcpRedisClient * RedisComponent::MakeRedisClient(const RedisClientConfig & config)
     {
@@ -72,7 +59,7 @@ namespace Sentry
         socketProxy->Init(config.Ip, config.Port);
         std::shared_ptr<TcpRedisClient> redisClient =
             std::make_shared<TcpRedisClient>(socketProxy, config, this);
-        this->mRedisClients[config.Name].emplace_back(redisClient);
+        this->mRedisClients.emplace_back(redisClient);
         return redisClient.get();
     }
 
@@ -83,15 +70,10 @@ namespace Sentry
         return response != nullptr && !response->HasError();
     }
 
-    TcpRedisClient * RedisComponent::GetClient(const std::string& name)
+    TcpRedisClient * RedisComponent::GetClient()
     {
-        auto iter = this->mRedisClients.find(name);
-        if (iter == this->mRedisClients.end() || iter->second.empty())
-        {
-            return nullptr;
-        }
-        std::shared_ptr<TcpRedisClient> tempRedisClint = iter->second.front();
-        for (std::shared_ptr<TcpRedisClient> redisClient: iter->second)
+        std::shared_ptr<TcpRedisClient> tempRedisClint = this->mRedisClients.front();
+        for (std::shared_ptr<TcpRedisClient> & redisClient: this->mRedisClients)
         {
             if(redisClient->WaitSendCount() <= 5)
             {
@@ -126,12 +108,11 @@ namespace Sentry
         return redisResponse;
     }
 
-    std::shared_ptr<RedisResponse> RedisComponent::Run(const std::string &name, std::shared_ptr<RedisRequest> request)
+    std::shared_ptr<RedisResponse> RedisComponent::Run(std::shared_ptr<RedisRequest> request)
     {
-        TcpRedisClient * redisClientContext = this->GetClient(name);
+        TcpRedisClient * redisClientContext = this->GetClient();
         if(redisClientContext == nullptr)
         {
-            CONSOLE_LOG_ERROR("not find redis client : " << name);
             return nullptr;
         }
         return this->Run(redisClientContext, request);
@@ -144,10 +125,4 @@ namespace Sentry
 		luaRegister.PushExtensionFunction("Call", Lua::Redis::Call);
         luaRegister.PushExtensionFunction("Send", Lua::Redis::Send);
     }
-}
-
-namespace Sentry
-{
-
-
 }

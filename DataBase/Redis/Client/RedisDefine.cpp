@@ -194,6 +194,11 @@ namespace Sentry
 		case '$': //二进制字符串
 			this->mType = RedisRespType::REDIS_BIN_STRING;
 			this->mDataSize = std::stoi(this->mString);
+			if(this->mDataSize == -1)
+			{
+				this->mString.clear();
+				return 0;
+			}
 			break;
 		case '*': //数组
 			this->mDataSize = -1;
@@ -333,6 +338,7 @@ namespace Sentry
 			}
 				break;
                 case RedisRespType::REDIS_NONE:
+					lua_pushnil(this->mLua);
                     break;
             }
 		}

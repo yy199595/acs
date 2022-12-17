@@ -3,35 +3,32 @@ local RedisComponent = {}
 
 local redis = Redis
 local this = RedisComponent
-function RedisComponent.Run(name, cmd, ...)
+function RedisComponent.Run(cmd, ...)
     assert(type(cmd) == "string")
-    assert(type(name) == "string")
-    return redis.Run(name, cmd, table.pack(...))
+    return redis.Run(cmd, table.pack(...))
 end
 
-function RedisComponent.Send(name, cmd, ...)
+function RedisComponent.Send(cmd, ...)
     assert(type(cmd) == "string")
-    assert(type(name) == "string")
-    return redis.Send(name, cmd, table.pack(...))
+    return redis.Send(cmd, table.pack(...))
 end
 
 function RedisComponent.AddCounter(key)
     assert(type(key) == "string")
-    local response = this.Run("main", "INCR", key)
+    local response = this.Run("INCR", key)
     return type(response) == "number" and response or 0
 end
 
 function RedisComponent.SubCounter(key)
     assert(type(key) == "string")
-    local response = this.Run("main", "DECR", key)
+    local response = this.Run( "DECR", key)
     return type(response) == "number" and response or 0
 end
 
-function RedisComponent.Call(name, lua, tab)
+function RedisComponent.Call(lua, tab)
     assert(type(tab) == "table")
     assert(type(lua) == "string")
-    assert(type(name) == "string")
-    local response = redis.Call(name, lua, tab)
+    local response = redis.Call(lua, tab)
     if response == nil then
         return nil
     end
@@ -41,29 +38,29 @@ end
 function RedisComponent.Lock(key, time)
     assert(type(key) == "string")
     assert(type(time) == "number")
-    local response = redis.Call("main", "lock.lock", {
+    local response = redis.Call("lock.lock", {
                 key = key, time = time
             })
     table.print(response)
     return rapidjson.decode(response).res
 end
 
-function RedisComponent.Set(name, key, value, second)
+function RedisComponent.Set(key, value, second)
 
     assert(type(key) == "string")
     if type(value) == "table" then
         value = rapidjson.encode(value)
     end
     if type(second) == "number" and second > 0 then
-        this.Run(name, "SETEX", key, second, value)
+        this.Run("SETEX", key, second, value)
     else
-        this.Run(name, "SET", key, value)
+        this.Run("SET", key, value)
     end
 end
 
-function RedisComponent.Get(name, key, tab)
+function RedisComponent.Get(key, tab)
     assert(type(key) == "string")
-    local response = this.Run(name, "GET", key)
+    local response = this.Run("GET", key)
     if type(response) == "string" then
         if tab then
             return rapidjson.decode(response)
@@ -72,4 +69,5 @@ function RedisComponent.Get(name, key, tab)
     end
     return nil
 end
+
 return RedisComponent

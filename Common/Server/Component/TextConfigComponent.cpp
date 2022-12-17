@@ -40,21 +40,21 @@ namespace Sentry
             LOG_CHECK_RET_FALSE(this->LoadTextConfig<CodeConfig>(path));
         }
 #ifdef __ENABLE_REDIS__
-        if(config->GetPath("redis", path))
+        if(config->GetPath("db", path))
         {
             LOG_CHECK_RET_FALSE(this->LoadTextConfig<RedisConfig>(path));
         }
 #endif
 
 #ifdef __ENABLE_MYSQL__
-        if(config->GetPath("mysql", path))
+        if(config->GetPath("db", path))
         {
             LOG_CHECK_RET_FALSE(this->LoadTextConfig<MysqlConfig>(path));
         }
 #endif
 
 #ifdef __ENABLE_MONGODB__
-        if(config->GetPath("mongo", path))
+        if(config->GetPath("db", path))
         {
             LOG_CHECK_RET_FALSE(this->LoadTextConfig<MongoConfig>(path));
         }

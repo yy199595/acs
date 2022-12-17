@@ -27,9 +27,6 @@ namespace Sentry
     private:
         std::string mBuffer;
         class MongoDBComponent * mMongoComponent;
-#ifdef __ENABLE_REDIS__
-        class DataSyncComponent * mSyncRedisComponent;
-#endif
     };
 }
 

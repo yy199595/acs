@@ -9,10 +9,9 @@
         "source": "source",
         "script": "script/lua",
         "sqlite":"data/sqlite/",
+        "db": "config/db/db.json",
         "code": "XCode/XCode.csv",
         "user": "config/user.json",
-        "redis": "config/db/redis.json",
-        "mongo": "config/db/mongo.json",
         "rpc": "config/service/rpc.json",
         "http": "config/service/http.json"
     },

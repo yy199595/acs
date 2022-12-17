@@ -16,17 +16,16 @@ function AccountService.Register(requestInfo, response)
     assert(requestInfo.phone_num, "register phone number is nil")
 
     local account = requestInfo.account
-    local userInfo = RedisClient.Run("main", "HGET", "user", account)
-    if userInfo ~= nil then
+    if RedisClient.Run( "HEXISTS", "user", account) == 1 then
         response.error = "账号已经存在"
         return XCode.AccountAlreadyExists
     end
-    userInfo = Mongo.QueryOnce(tabName, {
+    local userInfo = Mongo.QueryOnce(tabName, {
         _id = requestInfo.account
     })
     if userInfo ~= nil then
         response.error = "账号已经存在"
-        RedisClient.Run("main", "HSET", "user", account, response)
+        RedisClient.Run("HSET", "user", account, response)
         return XCode.AccountAlreadyExists
     end
     local nowTime = os.time()
@@ -38,7 +37,7 @@ function AccountService.Register(requestInfo, response)
     requestInfo.create_time = nowTime
     requestInfo._id = requestInfo.account
     requestInfo.token = Md5.ToString(str)
-    RedisClient.Run("main", "HSET", "user", account, requestInfo)
+    RedisClient.Run("HSET", "user", account, requestInfo)
     Log.Info("register account : ", rapidjson.encode(requestInfo))
     return Mongo.InsertOnce(tabName, requestInfo, requestInfo.user_id)
 end

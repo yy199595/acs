@@ -21,19 +21,18 @@ namespace Lua
             luaL_error(lua, "RedisComponent Is Null");
             return 0;
         }
-        const char* name = luaL_checkstring(lua, 1);
-        const char* command = luaL_checkstring(lua, 2);
-        TcpRedisClient * redisClientContext = redisComponent->GetClient(name);
+        const char* command = luaL_checkstring(lua, 1);
+        TcpRedisClient * redisClientContext = redisComponent->GetClient();
         if (redisClientContext == nullptr)
         {
-            luaL_error(lua, "not find redis client %s\n", name);
+            luaL_error(lua, "allot redis client error");
             return 0;
         }
         std::shared_ptr<RedisRequest> request(new RedisRequest(command));
-        int count = (int) luaL_len(lua, 3);
+        int count = (int) luaL_len(lua, 2);
         for (int i = 0; i < count; i++)
         {
-            lua_geti(lua, 3, i + 1);
+            lua_geti(lua, 2, i + 1);
             int index = lua_absindex(lua, -1);
             if (lua_isstring(lua, index))
             {
@@ -77,27 +76,26 @@ namespace Lua
         }
         std::string json;
         lua_pushthread(lua);
-        const char *name = luaL_checkstring(lua, 1);
-        const char *fullName = luaL_checkstring(lua, 2);
-        if (lua_isstring(lua, 3))
+        const char *fullName = luaL_checkstring(lua, 1);
+        if (lua_isstring(lua, 2))
         {
             size_t size = 0;
-            const char * str = lua_tolstring(lua, 3, &size);
+            const char * str = lua_tolstring(lua, 2, &size);
             json.append(str, size);
         }
-        else if (lua_istable(lua, 3))
+        else if (lua_istable(lua, 2))
         {
-            Lua::RapidJson::Read(lua, 3, &json);
+            Lua::RapidJson::Read(lua, 2, &json);
         }
         else
         {
             luaL_error(lua, "parameter muset table or string");
             return 0;
         }
-        TcpRedisClient * redisClientContext = redisComponent->GetClient(name);
+        TcpRedisClient * redisClientContext = redisComponent->GetClient();
         if (redisClientContext == nullptr)
         {
-            luaL_error(lua, "not find redis client %s\n", name);
+            luaL_error(lua, "allot redis client error");
             return 0;
         }
         std::shared_ptr<RedisRequest> request = redisScriptComponent->MakeLuaRequest(fullName, json);
@@ -115,19 +113,18 @@ namespace Lua
             luaL_error(lua, "RedisComponent Is Null");
             return 0;
         }
-        const char* name = luaL_checkstring(lua, 1);
-        const char* command = luaL_checkstring(lua, 2);
-        TcpRedisClient* redisClientContext = redisComponent->GetClient(name);
+        const char* command = luaL_checkstring(lua, 1);
+        TcpRedisClient* redisClientContext = redisComponent->GetClient();
         if (redisClientContext == nullptr)
         {
-            luaL_error(lua, "not find redis client %s\n", name);
+            luaL_error(lua, "allot redis client error");
             return 0;
         }
         std::shared_ptr<RedisRequest> request(new RedisRequest(command));
-        int count = (int)luaL_len(lua, 3);
+        int count = (int)luaL_len(lua, 2);
         for (int i = 0; i < count; i++)
         {
-            lua_geti(lua, 3, i + 1);
+            lua_geti(lua, 2, i + 1);
             int index = lua_absindex(lua, -1);
             if (lua_isstring(lua, index))
             {

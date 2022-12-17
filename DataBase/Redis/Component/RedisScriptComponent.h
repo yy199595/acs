@@ -14,7 +14,7 @@ namespace Sentry
         RedisScriptComponent() = default;
     public:
         std::shared_ptr<RedisRequest> MakeLuaRequest(const std::string & fullName, const std::string & json);
-        std::unique_ptr<std::string> Call(const std::string & name, const std::string & func, const std::string & json);
+        std::unique_ptr<std::string> Call(const std::string & func, const std::string & json);
     private:
         bool Start() final;
         bool LateAwake() final;

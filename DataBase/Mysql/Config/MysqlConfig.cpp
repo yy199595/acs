@@ -13,11 +13,15 @@ namespace Sentry
         {
             return false;
         }
-        this->Ip = document["ip"].GetString();
-        this->Port = document["port"].GetInt();
-        this->User = document["user"].GetString();
-        this->MaxCount = document["count"].GetInt();
-        this->Password = document["passwd"].GetString();
+		if(!document.HasMember("mysql"))
+		{
+			return false;
+		}
+        this->Ip = document["mysql"]["ip"].GetString();
+        this->Port = document["mysql"]["port"].GetInt();
+        this->User = document["mysql"]["user"].GetString();
+        this->MaxCount = document["mysql"]["count"].GetInt();
+        this->Password = document["mysql"]["passwd"].GetString();
         this->Address = this->Ip + ":" + std::to_string(this->Port);
         return true;
     }

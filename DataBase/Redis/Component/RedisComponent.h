@@ -16,17 +16,17 @@ namespace Sentry
 	 public:
 		RedisComponent() = default;
     public:
-        bool Ping(TcpRedisClient * redisClient);
-        TcpRedisClient * GetClient(const std::string & db);
+		TcpRedisClient * GetClient();
+		bool Ping(TcpRedisClient * redisClient);
     public:
         template<typename ... Args>
-        bool Send(const std::string & name, const std::string & cmd, Args&& ... args);
+        bool Send(const std::string & cmd, Args&& ... args);
         template<typename ... Args>
-        std::shared_ptr<RedisResponse> Run(const std::string & name, const std::string & cmd, Args&& ... args);
+        std::shared_ptr<RedisResponse> Run(const std::string & cmd, Args&& ... args);
         template<typename ... Args>
         std::shared_ptr<RedisResponse> Run(TcpRedisClient * c, const std::string & cmd, Args&& ... args);
     public:
-        std::shared_ptr<RedisResponse> Run(const std::string & db, std::shared_ptr<RedisRequest> request);
+        std::shared_ptr<RedisResponse> Run(std::shared_ptr<RedisRequest> request);
         std::shared_ptr<RedisResponse> Run(TcpRedisClient * c, std::shared_ptr<RedisRequest> request);
     private:
 		void OnConnectSuccessful(const std::string &address) final;
@@ -38,15 +38,15 @@ namespace Sentry
         bool LateAwake() final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
     private:
-        std::unordered_map<std::string, std::vector<std::shared_ptr<TcpRedisClient>>> mRedisClients;
+        std::vector<std::shared_ptr<TcpRedisClient>> mRedisClients;
     };
 
     template<typename ... Args>
-    std::shared_ptr<RedisResponse> RedisComponent::Run(const std::string &name, const std::string & cmd, Args &&...args)
+    std::shared_ptr<RedisResponse> RedisComponent::Run(const std::string & cmd, Args &&...args)
     {
         std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>(cmd);
         RedisRequest::InitParameter(request, std::forward<Args>(args)...);
-        return this->Run(name, request);
+        return this->Run(request);
     }
     template<typename ... Args>
     std::shared_ptr<RedisResponse> RedisComponent::Run(TcpRedisClient * c, const std::string &cmd, Args &&...args)
@@ -56,9 +56,9 @@ namespace Sentry
         return this->Run(c, request);
     }
     template<typename ... Args>
-    bool RedisComponent::Send(const std::string &name, const std::string &cmd, Args &&...args)
+    bool RedisComponent::Send(const std::string &cmd, Args &&...args)
     {
-        TcpRedisClient * redisClient = this->GetClient(name);
+        TcpRedisClient * redisClient = this->GetClient();
         if(redisClient == nullptr)
         {
             return false;

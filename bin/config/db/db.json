@@ -1,0 +1,30 @@
+{
+    "redis": {
+        "ip": "43.143.76.75",
+        "port": 6379,
+        "timeout": 3,
+        "count": 2,
+        "free": 30,
+        "index": 0,
+        "scripts":{
+            "lock": "config/db/redis/lock.lua",
+            "user": "config/db/redis/user.lua"
+        },
+        "passwd": "199595yjz."
+    },
+    "mysql": {
+        "count": 1,
+        "ip": "43.143.76.75",
+        "port": 3306,
+        "user": "yjz",
+        "passwd": "199595yjz."
+    },
+    "mongo": {
+        "count" : 10,
+        "db": "yjz",
+        "ip": "43.143.76.75",
+        "port" : 27017,
+        "user" : "admin",
+        "passwd" : "199595yjz."
+    }
+}

@@ -32,14 +32,11 @@ namespace Sentry
     public:
         RedisConfig() : TextConfig("RedisConfig") { }
     public:
-        bool OnLoadText(const char *str, size_t length) final;
-        bool OnReloadText(const char *str, size_t length) final { return true; }
-    public:
-        bool Has(const std::string & name) const;
-        bool Get(std::vector<RedisClientConfig> & configs) const;
-        bool Get(const std::string & name, RedisClientConfig & config) const;
+		bool OnLoadText(const char *str, size_t length) final;
+		const RedisClientConfig & Config() const { return this->mConfig; }
+		bool OnReloadText(const char *str, size_t length) final { return true; }
     private:
-        std::unordered_map<std::string, RedisClientConfig> mConfigs;
+		RedisClientConfig mConfig;
     };
 }
 
