@@ -1,0 +1,29 @@
+{
+    "redis": {
+        "ip": "127.0.0.1",
+        "port": 6379,
+        "timeout": 3,
+        "count": 2,
+        "free": 30,
+        "index": 0,
+        "scripts":{
+            "lock": "config/db/redis/lock.lua",
+            "user": "config/db/redis/user.lua"
+        }
+    },
+    "mysql": {
+        "count": 1,
+        "ip": "127.0.0.1",
+        "port": 3306,
+        "user": "root",
+        "passwd": ""
+    },
+    "mongo": {
+        "count" : 10,
+        "db": "yjz",
+        "ip": "127.0.0.1",
+        "port" : 27017,
+        "user" : "admin",
+        "passwd" : ""
+    }
+}

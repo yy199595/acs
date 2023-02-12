@@ -8,13 +8,14 @@ local loginComponent = require("component.LoginComponent")
 
 local CallMongo = function()
     local t1 = Time.NowMilTime()
-    local code = Client.Call("MongoService.Query", {
+    local code, res = Client.Call("MongoService.Query", {
         tab = "user.account",
         json = rapidjson.encode({
             _id = "646585122@qq.com"
         }),
         limit = 1
     })
+    table.print(res)
     local t = Time.NowMilTime() - t1
     Console.Warn("cal MongoService.Query [", t, "]ms");
 end

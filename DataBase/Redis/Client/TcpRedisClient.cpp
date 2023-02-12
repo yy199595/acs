@@ -201,7 +201,7 @@ namespace Sentry
         if(nowTime - this->GetLastOperTime() >= second)
         {
             this->mSocket->Close();
-            CONSOLE_LOG_INFO("[" << this->mConfig.Name << "] close free client");
+            CONSOLE_LOG_INFO("[" << this->mConfig.Address << "] close free client");
         }
         else
         {
