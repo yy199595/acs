@@ -74,7 +74,7 @@ namespace Sentry
         if(rpcService != nullptr)
         {
             const std::string & name = component->GetName();
-            this->mSeviceMap.emplace(name, rpcService);
+            this->mServiceMap.emplace(name, rpcService);
         }
 		return true;
 	}
@@ -272,7 +272,7 @@ namespace Sentry
 
 	RpcService* App::GetService(const std::string& name)
 	{
-		auto iter = this->mSeviceMap.find(name);
-		return iter != this->mSeviceMap.end() ? iter->second : nullptr;
+		auto iter = this->mServiceMap.find(name);
+		return iter != this->mServiceMap.end() ? iter->second : nullptr;
 	}
 }

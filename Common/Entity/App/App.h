@@ -50,6 +50,6 @@ namespace Sentry
 		TimerComponent* mTimerComponent;
 		ProtoComponent * mMessageComponent;
         std::unique_ptr<Asio::Context> mMainContext;
-        std::unordered_map<std::string, RpcService*> mSeviceMap;
+        std::unordered_map<std::string, RpcService*> mServiceMap;
     };
 }// namespace Sentry

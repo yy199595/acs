@@ -1,3 +1,5 @@
+
+
 function coroutine.wakeup(cor, ...)
     local res, ret = coroutine.resume(cor, ...)
     assert(res, ret)
@@ -35,8 +37,8 @@ function coroutine.http(func, request, taskSource)
         local response = {}
         local state, error = pcall(func, request, response)
         if not state then
+            Log.LuaError(error);
             response.error = error
-            Log.SystemError(error);
             response.code = XCode.CallLuaFunctionFail
         else
             response.code = error
