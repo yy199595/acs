@@ -2,7 +2,7 @@
 // Created by zmhy0073 on 2022/8/11.
 //
 
-#include"HttpRpcService.h"
+#include"HttpDebug.h"
 #include"Client/Message.h"
 #include"Service/RpcService.h"
 #include"Json/JsonWriter.h"
@@ -12,13 +12,13 @@
 #include"Component/ProtoComponent.h"
 namespace Sentry
 {
-    bool HttpRpcService::OnStartService(HttpServiceRegister &serviceRegister)
+    bool HttpDebug::OnStartService(HttpServiceRegister &serviceRegister)
     {
-        serviceRegister.Bind("Call", &HttpRpcService::Call);
+        serviceRegister.Bind("Call", &HttpDebug::Call);
         return true;
     }
 
-    XCode HttpRpcService::Call(const Http::Request &request, Http::Response &response)
+    XCode HttpDebug::Call(const Http::Request &request, Http::Response &response)
     {
         std::string value, func;
         std::vector<std::string> splits;
@@ -83,7 +83,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode HttpRpcService::Invoke(std::shared_ptr<Rpc::Packet> data, std::shared_ptr<Json::Writer> document)
+    XCode HttpDebug::Invoke(std::shared_ptr<Rpc::Packet> data, std::shared_ptr<Json::Writer> document)
     {
         std::string fullName;
         if(!data->GetHead().Get("func", fullName))

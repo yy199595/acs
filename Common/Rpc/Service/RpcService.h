@@ -43,6 +43,7 @@ namespace Sentry
         virtual XCode Invoke(const std::string & method, std::shared_ptr<Rpc::Packet> message) = 0;
 	private:
 		std::string mServerName;
+		std::string mLocationAddress;
         std::vector<std::string> mServiceHosts;
 		class LocationComponent * mLocationComponent;
         class InnerNetMessageComponent* mMessageComponent;

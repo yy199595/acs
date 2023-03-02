@@ -15,9 +15,9 @@ namespace Sentry
 	bool RpcService::LateAwake()
 	{
 		this->mLocationComponent = this->GetComponent<LocationComponent>();
-        this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>();
+		this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>();
 		ClusterConfig::Inst()->GetServerName(this->GetName(), this->mServerName);
-		return true;
+		return ServerConfig::Inst()->GetLocation("rpc", this->mLocationAddress);
 	}
 }
 
@@ -34,7 +34,8 @@ namespace Sentry
 
 		for(const std::string & address : locations)
 		{
-            if(!this->StartSend(address, func, &message))
+            if(address != this->mLocationAddress &&
+				!this->StartSend(address, func, &message))
             {
                 LOG_ERROR("send to " << address << "failure");
             }

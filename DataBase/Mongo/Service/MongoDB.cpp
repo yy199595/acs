@@ -2,41 +2,41 @@
 // Created by mac on 2022/5/19.
 //
 
-#include"MongoService.h"
+#include"MongoDB.h"
 #include"Component/MongoDBComponent.h"
 namespace Sentry
 {
-    MongoService::MongoService()
+    MongoDB::MongoDB()
         : mMongoComponent(nullptr)
     {
         this->mMongoComponent = nullptr;
     }
 
-    void MongoService::Init()
+    void MongoDB::Init()
     {
         this->mApp->AddComponent<MongoDBComponent>();
     }
 
-	bool MongoService::OnStart()
+	bool MongoDB::OnStart()
     {
-        BIND_COMMON_RPC_METHOD(MongoService::Query);
-        BIND_COMMON_RPC_METHOD(MongoService::Insert);
-        BIND_COMMON_RPC_METHOD(MongoService::Delete);
-        BIND_COMMON_RPC_METHOD(MongoService::Update);
-        BIND_COMMON_RPC_METHOD(MongoService::SetIndex);
-        BIND_COMMON_RPC_METHOD(MongoService::RunCommand);
+        BIND_COMMON_RPC_METHOD(MongoDB::Query);
+        BIND_COMMON_RPC_METHOD(MongoDB::Insert);
+        BIND_COMMON_RPC_METHOD(MongoDB::Delete);
+        BIND_COMMON_RPC_METHOD(MongoDB::Update);
+        BIND_COMMON_RPC_METHOD(MongoDB::SetIndex);
+        BIND_COMMON_RPC_METHOD(MongoDB::RunCommand);
         this->mMongoComponent = this->GetComponent<MongoDBComponent>();
         return true;
     }
 
-    bool MongoService::OnClose()
+    bool MongoDB::OnClose()
     {
         this->WaitAllMessageComplete(); //等待所有任务完成
         this->mMongoComponent->CloseClients();
         return true;
     }
 
-    XCode MongoService::RunCommand(const db::mongo::command::request &request, db::mongo::command::response &response)
+    XCode MongoDB::RunCommand(const db::mongo::command::request &request, db::mongo::command::response &response)
     {
         std::shared_ptr<CommandRequest> mongoRequest
                 = std::make_shared<CommandRequest>();
@@ -58,7 +58,7 @@ namespace Sentry
         return XCode::Failure;
     }
 
-    XCode MongoService::Insert(const db::mongo::insert &request)
+    XCode MongoDB::Insert(const db::mongo::insert &request)
 	{
         const size_t pos = request.tab().find('.');
         if(pos == std::string::npos)
@@ -101,7 +101,7 @@ namespace Sentry
         return XCode::Failure;
 	}
 
-    XCode MongoService::Delete(const db::mongo::remove &request)
+    XCode MongoDB::Delete(const db::mongo::remove &request)
     {
         const size_t pos = request.tab().find('.');
         if(pos == std::string::npos)
@@ -144,7 +144,7 @@ namespace Sentry
     }
 
     // $gt:大于   $lt:小于  $gte:大于或等于  $lte:小于或等于 $ne:不等于
-    XCode MongoService::Update(const db::mongo::update &request)
+    XCode MongoDB::Update(const db::mongo::update &request)
     {
         const size_t pos = request.tab().find('.');
         if (pos == std::string::npos)
@@ -193,7 +193,7 @@ namespace Sentry
         return (result.Get("n", count) && count > 0) ? XCode::Successful : XCode::Failure;
     }
 
-    XCode MongoService::SetIndex(const db::mongo::index &request)
+    XCode MongoDB::SetIndex(const db::mongo::index &request)
     {
         const size_t pos = request.tab().find('.');
         if (pos == std::string::npos)
@@ -206,7 +206,7 @@ namespace Sentry
         return this->mMongoComponent->SetIndex(tab, name) ? XCode::Successful : XCode::Failure;
     }
 
-    XCode MongoService::Query(const db::mongo::query::request &request, db::mongo::query::response &response)
+    XCode MongoDB::Query(const db::mongo::query::request &request, db::mongo::query::response &response)
     {
         const size_t pos = request.tab().find('.');
         if(pos == std::string::npos)

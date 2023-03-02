@@ -50,15 +50,10 @@ namespace Sentry
 			if (iter != mTypeInfoMap.end())
 			{
 				throw std::logic_error("add " + name + " failure");
-				return false;
 			}
 			auto type = new TypeProxy<T>(name);
-			if (type != nullptr)
-			{
-				std::queue<Component*> components;
-				mTypeInfoMap.insert(std::make_pair(type->Name, type));
-				mTypeInfoMap1.insert(std::make_pair(typeid(T).hash_code(), type));
-			}
+			mTypeInfoMap.insert(std::make_pair(type->Name, type));
+			mTypeInfoMap1.insert(std::make_pair(typeid(T).hash_code(), type));
 			return true;
 		}
 

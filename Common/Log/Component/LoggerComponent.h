@@ -25,14 +25,6 @@ namespace Sentry
 		int mLogSaveTime;
 		std::string mServerName;
 		std::string mLogSavePath;
-#ifdef __DEBUG__
 		std::shared_ptr<spdlog::logger> mAllLog;
-#else
-		std::shared_ptr<spdlog::logger> mInfoLog;
-		std::shared_ptr<spdlog::logger> mDebugLog;
-		std::shared_ptr<spdlog::logger> mErrorLog;
-		std::shared_ptr<spdlog::logger> mFatalLog;
-		std::shared_ptr<spdlog::logger> mWarningLog;
-#endif
 	};
 }

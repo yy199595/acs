@@ -23,14 +23,15 @@
 #include"Component/LaunchComponent.h"
 #include"Component/TranComponent.h"
 
-#include"Service/OuterService.h"
+#include"Service/Log.h"
+#include"Service/Gate.h"
 #include"Service/InnerService.h"
 #include"Service/HttpBackGround.h"
 #include"Service/LocationService.h"
-#include"Service/HttpRpcService.h"
+#include"Service/HttpDebug.h"
 #include"Service/UserBehavior.h"
 #ifdef __ENABLE_MONGODB__
-#include"Service/MongoService.h"
+#include"Service/MongoDB.h"
 #include"Component/MongoDBComponent.h"
 #include"Component/MongoHelperComponent.h"
 #include"Component/MongoDataComponent.h"
@@ -98,7 +99,7 @@ void RegisterComponent()
     ComponentFactory::Add<HttpComponent>("HttpComponent");
     ComponentFactory::Add<HttpWebComponent>("HttpWebComponent");
 
-    ComponentFactory::Add<HttpRpcService>("HttpRpcService");
+    ComponentFactory::Add<HttpDebug>("HttpDebug");
     ComponentFactory::Add<HttpBackGround>("HttpBackGround");
 
 // lua
@@ -109,12 +110,13 @@ void RegisterComponent()
 
 void RegisterServiceComponent()
 {
-    ComponentFactory::Add<UserBehavior>("UserBehavior");
-    ComponentFactory::Add<OuterService>("OuterService");
+	ComponentFactory::Add<Log>("Log");
+	ComponentFactory::Add<Gate>("Gate");
+	ComponentFactory::Add<UserBehavior>("UserBehavior");
     ComponentFactory::Add<InnerService>("InnerService");
     ComponentFactory::Add<LocationService>("LocationService");
 #ifdef __ENABLE_MONGODB__
-    ComponentFactory::Add<MongoService>("MongoService");
+    ComponentFactory::Add<MongoDB>("MongoDB");
 #endif
 
 #ifdef __ENABLE_MYSQL__

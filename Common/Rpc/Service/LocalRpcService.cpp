@@ -72,11 +72,8 @@ namespace Sentry
 	{
         this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
         const RpcServiceConfig * rpcServiceConfig = RpcConfig::Inst()->GetConfig(this->GetName());
-		if (rpcServiceConfig == nullptr || !this->OnStart())
-		{
-            this->mMethodRegister = nullptr;
-			return false;
-		}
+		LOG_CHECK_RET_FALSE(rpcServiceConfig != nullptr && this->OnStart());
+
         this->LoadFromLua();
         std::vector<const RpcMethodConfig *> methodConfigs;
         rpcServiceConfig->GetMethodConfigs(methodConfigs);

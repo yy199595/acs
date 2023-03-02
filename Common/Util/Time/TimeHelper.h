@@ -12,6 +12,8 @@ namespace Helper
 
         extern long long ScaleTotalTime;
 
+		extern bool IsSameDay(time_t t1, time_t t2);
+
         extern void SetScaleTotalTime(int second);
 
         extern std::string GetDateStr(long long time = 0);
@@ -35,7 +37,8 @@ namespace Helper
         extern long long GetNewTime(int day = 0, int hour = 0, int minute = 0, int second = 0);
 
         // 获取十分秒
-        extern void GetHourMinSecond(long long sec, int &hour, int &min, int &second);
+		extern void GetHourMinSecond(long long sec, int * time);
+		extern void GetHourMinSecond(long long sec, int &hour, int &min, int &second);
     }
 // namespace Helper::Time
 }

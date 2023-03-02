@@ -105,7 +105,7 @@ namespace Sentry
 #endif
                 if(!this->GetComponent<IServiceBase>(name)->Start())
                 {
-                    LOG_ERROR("start service [" << name << "] faillure");
+                    LOG_ERROR("start service [" << name << "] failure");
                     return false;
                 }
                 if(RpcConfig::Inst()->GetConfig(name) != nullptr)

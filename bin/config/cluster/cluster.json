@@ -5,7 +5,7 @@
 			"UserBehavior": true,
 			"InnerService": true,
 			"ChatService": true,
-			"OuterService": false,
+			"Gate": false,
 			"LocationService" : false
 		},
 		"Component": [
@@ -19,7 +19,7 @@
 			"InnerService": true,
 			"AccountService": true,
 			"HttpBackGround": true,
-			"OuterService": false,
+			"Gate": false,
 			"LocationService" : false
 		},
 		"Component": [
@@ -33,7 +33,7 @@
 	"GateServer": {
 		"AutoAllot": false,
 		"Service": {
-			"OuterService": true,
+			"Gate": true,
 			"InnerService": true,
 			"ChatService": false,
 			"LocationService" : false
@@ -45,8 +45,8 @@
 	"DataServer": {
 		"AutoAllot": true,
 		"Service": {
+			"MongoDB": true,
 			"InnerService": true,
-			"MongoService": true,
 			"LocationService" : false
 		},
 		"Component": [

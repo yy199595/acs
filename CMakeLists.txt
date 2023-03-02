@@ -82,7 +82,7 @@ include_directories(${PROJECT_SOURCE_DIR}/Common/Sqlite)
 include_directories(${PROJECT_SOURCE_DIR}/Common/SubPublish)
 
 
-
+include_directories(${PROJECT_SOURCE_DIR}/Server/Log)
 include_directories(${PROJECT_SOURCE_DIR}/Server/Gate)
 include_directories(${PROJECT_SOURCE_DIR}/Server/User)
 include_directories(${PROJECT_SOURCE_DIR}/Server/Redis)

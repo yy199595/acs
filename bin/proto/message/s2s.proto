@@ -26,6 +26,18 @@ message user
     }
 }
 
+message log
+{
+    message push
+    {
+        string name = 1;
+        int64 time = 2;
+        int32 level = 3;
+        string content = 4;
+        string address = 5;
+    }
+}
+
 message allot
 {
     message response

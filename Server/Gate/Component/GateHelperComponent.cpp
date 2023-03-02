@@ -3,7 +3,7 @@
 //
 
 #include"GateHelperComponent.h"
-#include"Service/OuterService.h"
+#include"Service/Gate.h"
 #include"Lua/LuaParameter.h"
 #include"Config/ClusterConfig.h"
 #include"Component/LocationComponent.h"
@@ -13,10 +13,10 @@ namespace Sentry
 {
 	bool GateHelperComponent::LateAwake()
 	{
-		LOG_CHECK_FATAL(this->GetComponent<OuterService>());
+		LOG_CHECK_FATAL(this->GetComponent<Gate>());
         this->mInnerComponent = this->GetComponent<InnerNetComponent>();
 		this->mLocationComponent = this->GetComponent<LocationComponent>();
-		const std::string name = ComponentFactory::GetName<OuterService>();
+		const std::string name = ComponentFactory::GetName<Gate>();
 		return ClusterConfig::Inst()->GetServerName(name, this->mGateServerName);
 	}
 
@@ -94,7 +94,7 @@ namespace Sentry
 	XCode GateHelperComponent::BroadCast(const std::string& func)
 	{
         std::vector<std::string> locations;
-		const std::string name = ComponentFactory::GetName<OuterService>();
+		const std::string name = ComponentFactory::GetName<Gate>();
 		if(!this->mLocationComponent->GetServers(name, locations))
 		{
 			return XCode::Failure;

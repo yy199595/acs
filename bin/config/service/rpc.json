@@ -1,5 +1,12 @@
 {
-	"OuterService": {
+	"Log": {
+		"Push": {
+			"Async": false,
+			"Type": "Server",
+			"Request": "s2s.log.push"
+		}
+	},
+	"Gate": {
 		"Allot": {
 			"Async": false,
 			"Type": "Server",
@@ -93,7 +100,7 @@
 			"Request": "s2s.user.logout"
 		}
 	},
-	"MongoService": {
+	"MongoDB": {
 		"Insert": {
 			"Async": true,
 			"Type": "Server",

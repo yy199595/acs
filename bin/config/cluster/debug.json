@@ -4,13 +4,14 @@
 		"Service": {
 			"UserBehavior": true,
 			"InnerService": true,
-			"OuterService": true,
-			"MongoService": true,
+			"Log": true,
+			"Gate": true,
+			"MongoDB": true,
 			"ChatService": true,
 			"LocationService":true,
 			"HttpBackGround": true,
 			"AccountService": true,
-			"HttpRpcService": true
+			"HttpDebug": true
 		},
 		"Component": [
 			"HttpComponent",

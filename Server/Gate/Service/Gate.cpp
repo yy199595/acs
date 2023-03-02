@@ -2,7 +2,7 @@
 // Created by zmhy0073 on 2021/12/1.
 //
 
-#include"OuterService.h"
+#include"Gate.h"
 #include"App/App.h"
 #include"Md5/MD5.h"
 #include"Client/OuterNetClient.h"
@@ -11,19 +11,19 @@
 #include"Component/OuterNetMessageComponent.h"
 namespace Sentry
 {
-    OuterService::OuterService()
+    Gate::Gate()
     {
         this->mOuterComponent = nullptr;
     }
-    void OuterService::Init()
+    void Gate::Init()
     {
         this->mApp->AddComponent<OuterNetComponent>();
         this->mApp->AddComponent<OuterNetMessageComponent>();
     }
 
-	bool OuterService::OnStart()
+	bool Gate::OnStart()
 	{
-        BIND_COMMON_RPC_METHOD(OuterService::Allot);
+        BIND_COMMON_RPC_METHOD(Gate::Allot);
         const ServerConfig * config = ServerConfig::Inst();
         ServerConfig::Inst()->GetLocation("gate", this->mAddress);
         this->mOuterComponent = this->GetComponent<OuterNetMessageComponent>();
@@ -31,18 +31,18 @@ namespace Sentry
         return true;
 	}
 
-    bool OuterService::OnClose()
+    bool Gate::OnClose()
     {
 		return this->GetComponent<OuterNetComponent>()->StopListen();
     }
 
-	XCode OuterService::Ping(long long userId)
+	XCode Gate::Ping(long long userId)
 	{
 		LOG_ERROR(userId << " ping gate server");
 		return XCode::Failure;
 	}
 
-	XCode OuterService::Allot(const com::type::int64 &request, s2s::allot::response &response)
+	XCode Gate::Allot(const com::type::int64 &request, s2s::allot::response &response)
     {
         std::string token;
         long long userId = request.value();

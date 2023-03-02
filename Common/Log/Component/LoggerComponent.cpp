@@ -31,53 +31,24 @@ namespace Sentry
 
 	void LoggerComponent::SaveAllLog()
 	{
-#ifdef __DEBUG__
 		this->mAllLog->flush();
-#else
-		this->mInfoLog->flush();
-		this->mDebugLog->flush();
-		this->mErrorLog->flush();
-		this->mFatalLog->flush();
-		this->mWarningLog->flush();
-#endif
 		spdlog::drop_all();
 	}
 
 	void LoggerComponent::AddLog(spdlog::level::level_enum type, const std::string& log)
     {
-#ifdef __DEBUG__
         this->mAllLog->log(type, log);
-#endif
         switch (type)
         {
-			case spdlog::level::level_enum::debug:
-#ifndef __DEBUG__
-                this->mDebugLog->debug(log);
-#endif
-			break;
-            case spdlog::level::level_enum::info:
-#ifndef __DEBUG__
-                this->mInfoLog->info(log);
-#endif
-                break;
-            case spdlog::level::level_enum::warn:
-#ifndef __DEBUG__
-                this->mWarningLog->warn(log);
-#endif
+		case spdlog::level::level_enum::debug:
+		case spdlog::level::level_enum::info:
+		case spdlog::level::level_enum::warn:
                 break;
             case spdlog::level::level_enum::err:
-#ifndef __DEBUG__
-                this->mErrorLog->error(log);
-#else
 				this->mAllLog->flush();
-#endif
                 break;
             case spdlog::level::level_enum::critical:
-#ifndef __DEBUG__
-                this->mFatalLog->critical(log);
-#else
 				this->mAllLog->flush();
-#endif
                 break;
             default:
                 break;
@@ -92,31 +63,9 @@ namespace Sentry
         spdlog::flush_every(std::chrono::seconds(this->mLogSaveTime));
 		std::string logPath = fmt::format("{0}/{1}/{2}", this->mLogSavePath,
 			Helper::Time::GetYearMonthDayString(), this->mServerName);
-#ifndef ONLY_MAIN_THREAD
-#ifdef __DEBUG__
-		spdlog::set_level(spdlog::level::level_enum::debug);
-		this->mAllLog = spdlog::rotating_logger_st<spdlog::async_factory>("All", logPath + "/all.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
-#else
-		this->mInfoLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Info", logPath + "/info.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
-		this->mDebugLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Debug", logPath + "/debug.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
-		this->mFatalLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Fatal", logPath + "/fatal.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
-		this->mErrorLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Error", logPath + "/error.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
-		this->mWarningLog = spdlog::rotating_logger_mt<spdlog::async_factory>("Warning", logPath + "/warning.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
-#endif
-#else
-#ifdef __DEBUG__
+
 		spdlog::set_level(spdlog::level::level_enum::debug);
 		this->mAllLog = spdlog::rotating_logger_st<spdlog::async_factory>(name,
 			logPath + "/all.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
-#else
-		this->mInfoLog = spdlog::rotating_logger_st<spdlog::async_factory>("Info", logPath + "/info.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
-		this->mDebugLog = spdlog::rotating_logger_st<spdlog::async_factory>("Debug", logPath + "/debug.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
-		this->mFatalLog = spdlog::rotating_logger_st<spdlog::async_factory>("Fatal", logPath + "/fatal.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
-		this->mErrorLog = spdlog::rotating_logger_st<spdlog::async_factory>("Error", logPath + "/error.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
-		//this->mRecordLog = spdlog::rotating_logger_st<spdlog::async_factory>("Record", logPath + "/record.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
-		this->mWarningLog = spdlog::rotating_logger_st<spdlog::async_factory>("Warning", logPath + "/warning.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
-#endif
-
-#endif
 	}
 }

@@ -8,6 +8,22 @@ namespace Helper
 {
     long long Time::ScaleTotalTime = 0;
 
+	bool Time::IsSameDay(time_t t1, time_t t2)
+	{
+		int time1[3] = { 0 };
+		int time2[3] = { 0 };
+		GetHourMinSecond(t1, time1);
+		GetHourMinSecond(t2, time2);
+		for (size_t index = 0; index < 3; index++)
+		{
+			if (time1[index] != time2[index])
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
     void Time::SetScaleTotalTime(int second)
     {
         if (second == 0)
@@ -61,6 +77,13 @@ namespace Helper
         min = (sec - hour * Time::HourSecond) / Time::MinSecond;
         second = sec % 60;
     }
+
+	void Time::GetHourMinSecond(long long sec, int* time)
+	{
+		time[0] = sec / Time::HourSecond;
+		time[1] = (sec - time[0] * Time::HourSecond) / Time::MinSecond;
+		time[2] = sec % 60;
+	}
 
     std::string Time::GetDateString(long long time)
     {

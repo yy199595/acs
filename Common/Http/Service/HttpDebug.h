@@ -11,10 +11,10 @@
 namespace Sentry
 {
     class HttpHandlerClient;
-    class HttpRpcService: public LocalHttpService
+    class HttpDebug: public LocalHttpService
     {
     public:
-        HttpRpcService() = default;
+        HttpDebug() = default;
     public:
         bool OnStartService(HttpServiceRegister &serviceRegister) final;
     private:

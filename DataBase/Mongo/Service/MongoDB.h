@@ -9,10 +9,10 @@
 #include"Service/LocalRpcService.h"
 namespace Sentry
 {
-    class MongoService final : public LocalRpcService
+    class MongoDB final : public LocalRpcService
 	{
 	public:
-		MongoService();
+		MongoDB();
 	private:
         void Init() final;
 		bool OnStart() final;

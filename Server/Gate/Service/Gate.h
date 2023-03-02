@@ -7,10 +7,10 @@
 #include"Service/LocalRpcService.h"
 namespace Sentry
 {
-	class OuterService final : public LocalRpcService
+	class Gate final : public LocalRpcService
 	{
 	 public:
-		OuterService();
+		Gate();
 	 private:
 		XCode Ping(long long userId);
         XCode Allot(const com::type::int64 & userId, s2s::allot::response & response);

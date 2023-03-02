@@ -40,7 +40,7 @@
 			"Path": "/server/hotfix"
 		}
 	},
-	"HttpRpcService": {
+	"HttpDebug": {
 		"Type": "http",
 		"Call": {
 			"Async": true,
