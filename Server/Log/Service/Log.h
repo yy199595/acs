@@ -12,7 +12,7 @@ namespace Sentry
 	 public:
 		Log() = default;
 	 private:
-		XCode Push(const s2s::log::push & request);
+		int Push(const s2s::log::push & request);
 	 protected:
 		void Init() final;
 		bool OnStart() final;

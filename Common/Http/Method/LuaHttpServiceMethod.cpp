@@ -19,7 +19,7 @@ namespace Sentry
         this->mLuaComponent = App::Inst()->GetComponent<LuaScriptComponent>();
     }
 
-    XCode LuaHttpServiceMethod::Invoke(const Http::Request &request, Http::Response &response)
+    int LuaHttpServiceMethod::Invoke(const Http::Request &request, Http::Response &response)
     {
         lua_State* lua = this->mLuaComponent->GetLuaEnv();
         if(this->mConfig->IsAsync && !Lua::Function::Get(lua, "coroutine", "http"))
@@ -43,7 +43,7 @@ namespace Sentry
         return this->mConfig->IsAsync ? this->CallAsync(response) : this->Call(response);
     }
 
-    XCode LuaHttpServiceMethod::Call(Http::Response &response)
+    int LuaHttpServiceMethod::Call(Http::Response &response)
     {
         lua_State* lua = this->mLuaComponent->GetLuaEnv();
         if (lua_pcall(lua, 1, 2, 0) != LUA_OK)
@@ -68,10 +68,10 @@ namespace Sentry
 			response.Json(HttpStatus::OK, data.c_str(), data.size());
             return XCode::Successful;
         }
-        return (XCode) lua_tointeger(lua, -2);
+        return lua_tointeger(lua, -2);
     }
 
-    XCode LuaHttpServiceMethod::CallAsync(Http::Response &response)
+    int LuaHttpServiceMethod::CallAsync(Http::Response &response)
     {
         lua_State* lua = this->mLuaComponent->GetLuaEnv();       
 		std::unique_ptr<LuaServiceTaskSource> luaTaskSource = std::make_unique<LuaServiceTaskSource>(&response);
@@ -84,7 +84,6 @@ namespace Sentry
 			response.Json(HttpStatus::OK, document);
             return XCode::CallLuaFunctionFail;
         }
-        XCode code = luaTaskSource->Await();
-        return code;
+        return luaTaskSource->Await();
     }
 }

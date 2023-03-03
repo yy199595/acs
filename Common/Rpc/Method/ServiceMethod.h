@@ -8,38 +8,38 @@ using namespace google::protobuf;
 namespace Sentry
 {
 	template<typename T>
-	using ServiceMethodType1 = XCode(T::*)();
+	using ServiceMethodType1 = int(T::*)();
 
 	template<typename T>
-	using ServiceMethodType11 = XCode(T::*)(long long);
+	using ServiceMethodType11 = int(T::*)(long long);
 
 	template<typename T, typename T1>
-	using ServiceMethodType2 = XCode(T::*)(const T1 &);
+	using ServiceMethodType2 = int(T::*)(const T1 &);
 
 	template<typename T, typename T1>
-	using ServiceMethodType22 = XCode(T::*)(long long, const T1 &);
+	using ServiceMethodType22 = int(T::*)(long long, const T1 &);
 
 	template<typename T, typename T1, typename T2>
-	using ServiceMethodType3 = XCode(T::*)(const T1 &, T2 &);
+	using ServiceMethodType3 = int(T::*)(const T1 &, T2 &);
 
 	template<typename T, typename T1, typename T2>
-	using ServiceMethodType33 = XCode(T::*)(long long, const T1 &, T2 &);
+	using ServiceMethodType33 = int(T::*)(long long, const T1 &, T2 &);
 
 	template<typename T, typename T1>
-	using ServiceMethodType4 = XCode(T::*)(T1 &);
+	using ServiceMethodType4 = int(T::*)(T1 &);
 
 	template<typename T, typename T1>
-	using ServiceMethodType44 = XCode(T::*)(long long, T1 &);
+	using ServiceMethodType44 = int(T::*)(long long, T1 &);
 
 	template<typename T>
-	using ServiceMethodType6 = XCode(T::*)(const Rpc::Head & head);
+	using ServiceMethodType6 = int(T::*)(const Rpc::Head & head);
 
     template<typename T, typename T1>
-    using ServiceMethodType5 = XCode(T::*)(const Rpc::Head & head, const T1 &);
+    using ServiceMethodType5 = int(T::*)(const Rpc::Head & head, const T1 &);
 
 
     template<typename T>
-    using ServiceMethodType7 = XCode(T::*)(const Rpc::Head & head, Rpc::Head &);
+    using ServiceMethodType7 = int(T::*)(const Rpc::Head & head, Rpc::Head &);
 
 
 //	template<typename T, typename T1, typename T2>
@@ -58,7 +58,7 @@ namespace Sentry
 			: mName(std::move(name)) {}
 	 public:
 		virtual bool IsLuaMethod() = 0;
-		virtual XCode Invoke(Rpc::Packet & message) = 0;
+		virtual int Invoke(Rpc::Packet & message) = 0;
 		const std::string& GetName()
 		{
 			return this->mName;
@@ -82,7 +82,7 @@ namespace Sentry
 		}
 	 public:
 
-		XCode Invoke(Rpc::Packet & message) final
+		int Invoke(Rpc::Packet & message) final
 		{
 			if (!this->mHasUserId)
 			{
@@ -120,7 +120,7 @@ namespace Sentry
 		{
 		}
 	 public:
-		XCode Invoke(Rpc::Packet & message) override
+		int Invoke(Rpc::Packet & message) override
 		{
             std::unique_ptr<T1> request(new T1());
             if(!message.ParseMessage(request.get()))
@@ -154,7 +154,7 @@ namespace Sentry
 	class ServiceMethod3 : public ServiceMethod
 	{
 	 public:
-		typedef XCode(T::*ServerFunc)(long long, const T1&, T2&);
+		typedef int(T::*ServerFunc)(long long, const T1&, T2&);
 		ServiceMethod3(const std::string name, T* o, ServiceMethodType3<T, T1, T2> func)
 			: ServiceMethod(name), _o(o), _func(func), mHasUserId(false)
 		{
@@ -165,7 +165,7 @@ namespace Sentry
 		{
 		}
 	 public:
-		XCode Invoke(Rpc::Packet & message) override
+		int Invoke(Rpc::Packet & message) override
 		{
             std::unique_ptr<T1> request(new T1());
             std::unique_ptr<T2> response(new T2());
@@ -181,7 +181,7 @@ namespace Sentry
                 {
                     return XCode::CallArgsError;
                 }
-                XCode code = (_o->*_objfunc)(userId, *request, *response);
+                int code = (_o->*_objfunc)(userId, *request, *response);
                 if (code == XCode::Successful)
                 {
                     if (!message.WriteMessage(response.get()))
@@ -192,7 +192,7 @@ namespace Sentry
                 }
                 return code;
             }
-			XCode code = (_o->*_func)(*request, *response);
+			int code = (_o->*_func)(*request, *response);
 			if (code == XCode::Successful)
 			{
                 if(!message.WriteMessage(response.get()))
@@ -228,7 +228,7 @@ namespace Sentry
 		{
 		}
 	 public:
-		XCode Invoke(Rpc::Packet & message) override
+		int Invoke(Rpc::Packet & message) override
 		{
 			std::unique_ptr<T1> response(new T1());
             if (this->mHasUserId)
@@ -238,7 +238,7 @@ namespace Sentry
                 {
                     return XCode::CallArgsError;
                 }
-				XCode code = (_o->*_objfunc)(userId, *response);
+				int code = (_o->*_objfunc)(userId, *response);
 				if(code == XCode::Successful)
 				{
 					message.WriteMessage(response.get());
@@ -246,7 +246,7 @@ namespace Sentry
 				}
 				return code;
 			}
-			XCode code = (_o->*_func)(*response);
+			int code = (_o->*_func)(*response);
 			if(code == XCode::Successful)
 			{
 				message.WriteMessage(response.get());
@@ -281,7 +281,7 @@ namespace Sentry
 		{
 			return false;
 		};
-		XCode Invoke(Rpc::Packet & message) override
+		int Invoke(Rpc::Packet & message) override
 		{
 			std::unique_ptr<T1> request(new T1());
             if(!message.ParseMessage(request.get()))
@@ -309,7 +309,7 @@ namespace Sentry
 
 	 public:
 		bool IsLuaMethod() override { return false; };
-		XCode Invoke(Rpc::Packet & message) override
+		int Invoke(Rpc::Packet & message) override
 		{
 			return (_o->*_func)(message.GetHead());
 		}

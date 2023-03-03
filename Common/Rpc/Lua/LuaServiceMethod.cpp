@@ -17,15 +17,15 @@ namespace Sentry
 		this->mLuaEnv = this->mLuaComponent->GetLuaEnv();
 	}
 
-	XCode LuaServiceMethod::Call(int count, Rpc::Packet & message)
+	int LuaServiceMethod::Call(int count, Rpc::Packet & message)
 	{
 		if (lua_pcall(this->mLuaEnv, count, 2, 0) != 0)
 		{
             message.GetHead().Add("error", lua_tostring(this->mLuaEnv, -1));
 			return XCode::CallLuaFunctionFail;
 		}
+		int code = lua_tointeger(this->mLuaEnv, -2);
 		const std::string & res = this->mConfig->Response;
-		XCode code = (XCode)lua_tointeger(this->mLuaEnv, -2);
 		if (code != XCode::Successful || res.empty())
 		{
 			return code;
@@ -39,7 +39,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode LuaServiceMethod::CallAsync(int count, Rpc::Packet & message)
+	int LuaServiceMethod::CallAsync(int count, Rpc::Packet & message)
     {
 		std::shared_ptr<Message> response;
 		if (!this->mConfig->Response.empty())
@@ -58,7 +58,7 @@ namespace Sentry
             message.GetHead().Add("error", lua_tostring(this->mLuaEnv, -1));
             return XCode::CallLuaFunctionFail;
         }
-        XCode code = luaTaskSource->Await();
+        int code = luaTaskSource->Await();
         if (code == XCode::Successful && response != nullptr)
         {
             if (message.WriteMessage(response.get()))
@@ -69,7 +69,7 @@ namespace Sentry
         return code;
     }
 
-	XCode LuaServiceMethod::Invoke(Rpc::Packet & message)
+	int LuaServiceMethod::Invoke(Rpc::Packet & message)
     {
         if (this->mConfig->IsAsync)
         {

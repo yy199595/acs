@@ -18,11 +18,11 @@ namespace Sentry
     private:		
         bool LateAwake() final;
     public:
-        XCode OnRequest(std::shared_ptr<Rpc::Packet> message);
-		XCode OnResponse(std::shared_ptr<Rpc::Packet> message);
+        int OnRequest(std::shared_ptr<Rpc::Packet> message);
+		int OnResponse(std::shared_ptr<Rpc::Packet> message);
     private:
-        XCode Forward(long long userId, std::shared_ptr<Rpc::Packet> message);
-        XCode Forward(const std::string & adress, std::shared_ptr<Rpc::Packet> message);
+        int Forward(long long userId, std::shared_ptr<Rpc::Packet> message);
+        int Forward(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
         class InnerNetComponent* mInnerComponent;
         class LocationComponent * mLocationComponent;

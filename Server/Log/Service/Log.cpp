@@ -22,7 +22,7 @@ namespace Sentry
 		return true;
 	}
 
-	XCode Log::Push(const s2s::log::push& request)
+	int Log::Push(const s2s::log::push& request)
 	{
 		return XCode::Successful;
 	}

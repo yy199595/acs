@@ -74,6 +74,6 @@ namespace Sentry
             }
             return;
         }
-		this->mTask.SetResult((XCode)code, nullptr);
+		this->mTask.SetResult(code, nullptr);
 	}
 }

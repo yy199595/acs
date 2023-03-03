@@ -142,7 +142,7 @@ namespace Sentry
             return true;
         }
         LOG_CHECK_RET_FALSE(head.Add("address", address));
-        XCode code = this->mMessageComponent->OnRequest(message);
+        int code = this->mMessageComponent->OnRequest(message);
         if(code != XCode::Successful)
         {
             std::string func;
@@ -212,7 +212,7 @@ namespace Sentry
 		return true;
 	}
 
-	void InnerNetComponent::OnCloseSocket(const std::string & address, XCode code)
+	void InnerNetComponent::OnCloseSocket(const std::string & address, int code)
 	{
 		auto iter = this->mRpcClientMap.find(address);
 		if (iter != this->mRpcClientMap.end())

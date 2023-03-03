@@ -11,8 +11,8 @@ namespace Sentry
     class MongoDataComponent final : public Component
 	{
     public:
-		XCode Set(long long key, std::shared_ptr<Message> message, bool insert = true);
-        XCode Set(const std::string & key, std::shared_ptr<Message> message, bool insert = true);
+		int Set(long long key, std::shared_ptr<Message> message, bool insert = true);
+        int Set(const std::string & key, std::shared_ptr<Message> message, bool insert = true);
     public:
 		std::shared_ptr<Message> Get(long long key, const std::string & tab);
         std::shared_ptr<Message> Get(const std::string & key, const std::string & tab);

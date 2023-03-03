@@ -49,7 +49,7 @@ namespace Sentry
         bool Ping(int index);
         bool SetIndex(const std::string & tab, const std::string & name);
     public:
-        void OnClientError(int index, XCode code);
+        void OnClientError(int index, int code);
         TcpMongoClient * GetClient(int index = -1);
 		unsigned int GetWaitCount() const { return this->mWaitCount; }
         void Send(TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request);

@@ -13,7 +13,7 @@ namespace Sentry
         this->mWaitCount = 0;
     }
 
-	XCode LocalHttpService::Invoke(const std::string& name,
+	int LocalHttpService::Invoke(const std::string& name,
 		std::shared_ptr<Http::Request> request, std::shared_ptr<Http::Response> response)
 	{
 		std::shared_ptr<HttpServiceMethod> method = this->mServiceRegister->GetMethod(name);
@@ -23,7 +23,7 @@ namespace Sentry
 		}
         this->mSumCount++;
         this->mWaitCount++;
-		XCode code = method->Invoke(*request, *response);
+		int code = method->Invoke(*request, *response);
         {
             this->mWaitCount--;
         }

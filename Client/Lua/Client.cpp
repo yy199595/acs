@@ -60,7 +60,7 @@ namespace Lua
 				return;
 			}
             std::shared_ptr<Message> message;
-            XCode code = response->GetCode();
+            int code = response->GetCode();
             if(code == XCode::Successful)
             {
                 if (!methodConfig->Response.empty())
@@ -105,7 +105,7 @@ namespace Lua
         taskComponent->Start([request, clientComponent, luaWaitTaskSource]()
             {              
                 std::shared_ptr<Rpc::Packet> response = clientComponent->Call(request);
-                XCode code = response != nullptr ? response->GetCode(XCode::Failure) : XCode::Failure;
+                int code = response != nullptr ? response->GetCode(XCode::Failure) : XCode::Failure;
                 
                 luaWaitTaskSource->SetResult<bool>(code == XCode::Successful);
             });

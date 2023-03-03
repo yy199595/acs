@@ -83,7 +83,7 @@ namespace Sentry
     bool OuterNetComponent::OnAuth(const std::string &address, std::shared_ptr<Rpc::Packet> message)
 	{
 		Rpc::Head& head = message->GetHead();
-		XCode code = this->mOuterMessageComponent->OnAuth(address, message);
+		int code = this->mOuterMessageComponent->OnAuth(address, message);
 		if (code != XCode::Successful)
 		{
 			return false;
@@ -105,7 +105,7 @@ namespace Sentry
 			this->mWaitCount++;
 		}
         head.Add("client", address);
-        XCode code = this->mOuterMessageComponent->OnRequest(address, message);
+        int code = this->mOuterMessageComponent->OnRequest(address, message);
         if (code != XCode::Successful)
         {
             this->StartClose(address);
@@ -140,7 +140,7 @@ namespace Sentry
         return true;
     }
 
-	void OuterNetComponent::OnCloseSocket(const std::string & address, XCode code)
+	void OuterNetComponent::OnCloseSocket(const std::string & address, int code)
     {
         auto iter = this->mGateClientMap.find(address);
         if (iter != this->mGateClientMap.end())

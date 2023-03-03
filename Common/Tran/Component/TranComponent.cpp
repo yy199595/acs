@@ -19,7 +19,7 @@ namespace Sentry
         return true;
     }
 
-    XCode TranComponent::OnRequest(std::shared_ptr<Rpc::Packet> message)
+    int TranComponent::OnRequest(std::shared_ptr<Rpc::Packet> message)
     {
         std::string target;
         long long userId = 0;
@@ -37,7 +37,7 @@ namespace Sentry
         return XCode::CallArgsError;
     }
 
-    XCode TranComponent::Forward(long long userId, std::shared_ptr<Rpc::Packet> message)
+    int TranComponent::Forward(long long userId, std::shared_ptr<Rpc::Packet> message)
     {
         std::string service, method, address, server;
         if(!message->GetMethod(service, method))
@@ -64,7 +64,7 @@ namespace Sentry
         return this->Forward(address, message);
     }
 
-    XCode TranComponent::Forward(const std::string &address, std::shared_ptr<Rpc::Packet> message)
+    int TranComponent::Forward(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
 #ifdef __DEBUG__
         std::string func;
@@ -78,7 +78,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-	XCode TranComponent::OnResponse(std::shared_ptr<Rpc::Packet> message)
+	int TranComponent::OnResponse(std::shared_ptr<Rpc::Packet> message)
 	{
 		std::string address;
 		if(!message->GetHead().Get("resp", address))

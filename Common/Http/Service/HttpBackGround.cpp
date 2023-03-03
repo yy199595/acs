@@ -20,13 +20,13 @@ namespace Sentry
         return true;
     }
 
-    XCode HttpBackGround::Ping(const Http::Request &request, Http::Response &response)
+	int HttpBackGround::Ping(const Http::Request &request, Http::Response &response)
     {
         response.Str(HttpStatus::OK,"pong");
         return XCode::Successful;
     }
 
-	XCode HttpBackGround::Hotfix(Json::Writer&response)
+	int HttpBackGround::Hotfix(Json::Writer&response)
 	{
 		Node * innerService = this->GetComponent<Node>();
 		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
@@ -39,13 +39,13 @@ namespace Sentry
 		locationComponent->GetServers(locations);
 		for(const std::string & location : locations)
 		{
-			XCode code = innerService->Call(location, "Hotfix");
+			int code = innerService->Call(location, "Hotfix");
             response.Add(location.c_str()).Add(CodeConfig::Inst()->GetDesc(code));
 		}
 		return XCode::Successful;
 	}
 
-	XCode HttpBackGround::Sleep(const Json::Reader &request, Json::Writer&response)
+	int HttpBackGround::Sleep(const Json::Reader &request, Json::Writer&response)
     {
         std::string time;
         request.GetMember("time", time);
@@ -54,18 +54,18 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode HttpBackGround::Hello(const Http::Request &request, Http::Response &response)
+	int HttpBackGround::Hello(const Http::Request &request, Http::Response &response)
     {
 		response.Str(HttpStatus::OK,"hello");
 		return XCode::Successful;
     }
 
-    XCode HttpBackGround::DownLoad(const Http::Request &request, Http::Response &response)
+	int HttpBackGround::DownLoad(const Http::Request &request, Http::Response &response)
     {
         return XCode::Successful;
     }
 
-    XCode HttpBackGround::Info(Json::Writer&response)
+	int HttpBackGround::Info(Json::Writer&response)
     {
 		Node * innerService = this->GetComponent<Node>();
 		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
@@ -80,7 +80,7 @@ namespace Sentry
 		{
 			std::shared_ptr<google::protobuf::StringValue> resp
 				= std::make_shared<google::protobuf::StringValue>();
-			XCode code = innerService->Call(location, "RunInfo", resp);
+			int code = innerService->Call(location, "RunInfo", resp);
 			if(code == XCode::Successful)
 			{
 				rapidjson::Document document;

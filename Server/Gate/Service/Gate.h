@@ -12,8 +12,8 @@ namespace Sentry
 	 public:
 		Gate();
 	 private:
-		XCode Ping(long long userId);
-        XCode Allot(const com::type::int64 & userId, s2s::allot::response & response);
+		int Ping(long long userId);
+        int Allot(const com::type::int64 & userId, s2s::allot::response & response);
 	private:
         void Init() final;
 		bool OnStart() final;

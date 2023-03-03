@@ -23,7 +23,7 @@ namespace Sentry
         return true;
     }
 
-    XCode User::Login(const Rpc::Head & head, const s2s::user::login & request)
+    int User::Login(const Rpc::Head & head, const s2s::user::login & request)
     {
         std::string address;
         if(!head.Get("address", address))
@@ -44,7 +44,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode User::Logout(const Rpc::Head & head, const s2s::user::logout &request)
+    int User::Logout(const Rpc::Head & head, const s2s::user::logout &request)
     {
         std::string client, address;
         return XCode::Successful;

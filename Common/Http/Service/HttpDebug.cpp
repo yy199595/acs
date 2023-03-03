@@ -18,14 +18,14 @@ namespace Sentry
         return true;
     }
 
-    XCode HttpDebug::Call(const Http::Request &request, Http::Response &response)
+    int HttpDebug::Call(const Http::Request &request, Http::Response &response)
     {
         std::string value, func;
         std::vector<std::string> splits;
         std::shared_ptr<Json::Writer> document = std::make_shared<Json::Writer>();
         if (Helper::String::Split(request.Path(), "/", splits) < 2)
         {            
-            document->Add("code").Add((int)XCode::CallArgsError);
+            document->Add("code").Add(XCode::CallArgsError);
             document->Add("error").Add(CodeConfig::Inst()->GetDesc(XCode::CallArgsError));
             response.Json(HttpStatus::OK, *document);
             return XCode::CallArgsError;
@@ -66,7 +66,7 @@ namespace Sentry
                 message->Append(postRequest->Content());
             }
         }
-        XCode code;
+        int code;
         try
         {
             code = this->Invoke(message, document);
@@ -83,7 +83,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode HttpDebug::Invoke(std::shared_ptr<Rpc::Packet> data, std::shared_ptr<Json::Writer> document)
+    int HttpDebug::Invoke(std::shared_ptr<Rpc::Packet> data, std::shared_ptr<Json::Writer> document)
     {
         std::string fullName;
         if(!data->GetHead().Get("func", fullName))
@@ -107,7 +107,7 @@ namespace Sentry
             throw std::logic_error("calling service does not exist or is not started");           
         }
 
-        XCode code = targetService->Invoke(methodConfig->Method, data);
+        int code = targetService->Invoke(methodConfig->Method, data);
         if(code == XCode::Successful)
         {
             if(!methodConfig->Response.empty())

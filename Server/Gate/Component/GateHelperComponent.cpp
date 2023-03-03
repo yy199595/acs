@@ -31,7 +31,7 @@ namespace Sentry
 	}
 
 
-	XCode GateHelperComponent::Call(long long userId, const std::string& func)
+	int GateHelperComponent::Call(long long userId, const std::string& func)
 	{
         std::string address;
 		if(!this->GetLocation(userId, address))
@@ -50,7 +50,7 @@ namespace Sentry
         return XCode::Successful;
 	}
 
-	XCode GateHelperComponent::Call(long long userId, const std::string& func, const Message& message)
+	int GateHelperComponent::Call(long long userId, const std::string& func, const Message& message)
 	{
         std::string address;
         if(!this->GetLocation(userId, address))
@@ -70,7 +70,7 @@ namespace Sentry
         return XCode::Successful;
 	}
 
-	XCode GateHelperComponent::LuaCall(long long userId, const std::string func, std::shared_ptr<Message> message)
+	int GateHelperComponent::LuaCall(long long userId, const std::string func, std::shared_ptr<Message> message)
 	{
         std::string address;
 		if(!this->GetLocation(userId, address))
@@ -91,7 +91,7 @@ namespace Sentry
         return XCode::Successful;
 	}
 
-	XCode GateHelperComponent::BroadCast(const std::string& func)
+	int GateHelperComponent::BroadCast(const std::string& func)
 	{
         std::vector<std::string> locations;
 		const std::string name = ComponentFactory::GetName<Gate>();
@@ -110,7 +110,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	XCode GateHelperComponent::BroadCast(const std::string& func, const Message& message)
+	int GateHelperComponent::BroadCast(const std::string& func, const Message& message)
 	{
 		std::vector<std::string> locations;		
 		if(!this->mLocationComponent->GetServers(this->mGateServerName, locations))
@@ -132,7 +132,7 @@ namespace Sentry
         return XCode::Successful;
 	}
 
-	XCode GateHelperComponent::LuaBroadCast(const char * func, std::shared_ptr<Message> message)
+	int GateHelperComponent::LuaBroadCast(const char * func, std::shared_ptr<Message> message)
 	{
 		std::vector<std::string> locations;		
 		if(!this->mLocationComponent->GetServers(this->mGateServerName, locations))

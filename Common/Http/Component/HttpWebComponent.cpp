@@ -59,7 +59,7 @@ namespace Sentry
         else
         {
             const std::string& method = config->Method;
-            XCode code = httpService->Invoke(method, request, response);
+            int code = httpService->Invoke(method, request, response);
             if (code != XCode::Successful)
             {
 #ifdef __DEBUG__

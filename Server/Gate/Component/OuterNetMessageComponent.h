@@ -20,8 +20,8 @@ namespace Sentry
         bool CreateToken(long long userId, std::string & token);
     public:
         void OnClose(const std::string & address);
-        XCode OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message);
-        XCode OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message);
+        int OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message);
+        int OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
 		bool LateAwake() final;
 	 private:

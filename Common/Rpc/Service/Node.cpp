@@ -30,12 +30,12 @@ namespace Sentry
         return true;
     }
 
-	XCode Node::Ping()
+	int Node::Ping()
     {
         return XCode::Successful;
     }
 
-    XCode Node::Join(const s2s::cluster::server &request)
+    int Node::Join(const s2s::cluster::server &request)
 	{
 		const std::string & rpc = request.rpc();
 		const std::string & http = request.http();
@@ -50,12 +50,12 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-    XCode Node::Exit(const s2s::cluster::server &response)
+    int Node::Exit(const s2s::cluster::server &response)
     {
         return XCode::Successful;
     }
 
-    XCode Node::Stop()
+    int Node::Stop()
     {
         std::vector<RpcService *> components;
         if(this->mApp->GetComponents(components))
@@ -76,7 +76,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode Node::LoadConfig()
+    int Node::LoadConfig()
     {
         TextConfigComponent * textComponent = this->GetComponent<TextConfigComponent>();
         if(textComponent != nullptr)
@@ -86,7 +86,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-	XCode Node::RunInfo(google::protobuf::StringValue& response)
+	int Node::RunInfo(google::protobuf::StringValue& response)
 	{
 		Json::Writer document;
         {
@@ -118,7 +118,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-    XCode Node::Hotfix()
+    int Node::Hotfix()
     {
         std::vector<IHotfix *> components;
 		this->mApp->GetComponents(components);

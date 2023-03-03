@@ -24,7 +24,7 @@ namespace Sentry
 		return true;
 	}
 
-	XCode InnerNetMessageComponent::OnRequest(std::shared_ptr<Rpc::Packet> message)
+	int InnerNetMessageComponent::OnRequest(std::shared_ptr<Rpc::Packet> message)
 	{
         const Rpc::Head & head = message->GetHead();
         if(!head.Get("func", this->mFullName))
@@ -79,7 +79,7 @@ namespace Sentry
         Rpc::Head & head = message->GetHead();
         RpcService *logicService = this->mApp->GetService(config->Service);
         LOG_CHECK_RET(logicService != nullptr);
-        XCode code = logicService->Invoke(config->Method, message);
+        int code = logicService->Invoke(config->Method, message);
         if (code != XCode::Successful)
         {
             head.Add("error", CodeConfig::Inst()->GetDesc(code));

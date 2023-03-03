@@ -116,7 +116,7 @@ namespace Sentry
         }
     }
 
-    void OuterNetClient::CloseSocket(XCode code)
+    void OuterNetClient::CloseSocket(int code)
     {
         this->mSocket->Close();
         const std::string& address = this->GetAddress();
@@ -152,7 +152,7 @@ namespace Sentry
 
 	void OuterNetClient::StartClose()
 	{
-		XCode code = XCode::NetActiveShutdown;
+		int code = XCode::NetActiveShutdown;
 #ifdef ONLY_MAIN_THREAD
 		this->CloseSocket(code);
 #else

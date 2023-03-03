@@ -43,7 +43,7 @@ namespace Sentry
         this->mIsHandlerMessage = true;
         return true;
 	}
-	XCode LuaPhysicalService::Invoke(const std::string &name, std::shared_ptr<Rpc::Packet> message)
+	int LuaPhysicalService::Invoke(const std::string &name, std::shared_ptr<Rpc::Packet> message)
 	{
 		if(!this->IsStartService())
 		{
@@ -60,7 +60,7 @@ namespace Sentry
 			return XCode::CallServiceNotFound;
 		}
         this->mWaitCount++;
-		XCode code = serviceMethod->Invoke(*message);
+		int code = serviceMethod->Invoke(*message);
         this->mWaitCount--;
         return code;
 	}

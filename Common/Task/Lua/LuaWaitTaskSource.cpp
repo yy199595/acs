@@ -35,7 +35,7 @@ namespace Sentry
 		return lua_yield(this->mLua, 0);
 	}
 
-	void LuaWaitTaskSource::SetResult(XCode code, std::shared_ptr<Message> response)
+	void LuaWaitTaskSource::SetResult(int code, std::shared_ptr<Message> response)
 	{
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
 		lua_State* coroutine = lua_tothread(this->mLua, -1);

@@ -187,7 +187,7 @@ namespace Sentry
         return this->Run(this->GetClient(index), mongoRequest) != nullptr;
     }
 
-	void MongoDBComponent::OnClientError(int index, XCode code)
+	void MongoDBComponent::OnClientError(int index, int code)
 	{
 
 	}

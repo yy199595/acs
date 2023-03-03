@@ -16,13 +16,13 @@ namespace Sentry
         return ClusterConfig::Inst()->GetServerName(this->mServiceName, this->mServerName);
     }
 
-	XCode MongoHelperComponent::Insert(const Message& message, int index)
+	int MongoHelperComponent::Insert(const Message& message, int index)
 	{
 		const std::string tab = message.GetTypeName();
 		return this->Insert(tab.c_str(), message, index);
 	}
 
-	XCode MongoHelperComponent::Insert(const char* tab, const Message& message, int index)
+	int MongoHelperComponent::Insert(const char* tab, const Message& message, int index)
 	{
 		std::string address;
         RpcService * rpcService = this->mApp->GetService(this->mServerName);
@@ -41,7 +41,7 @@ namespace Sentry
 		return rpcService->Call(address, "Insert", request);
 	}
 
-    XCode MongoHelperComponent::Update(const char *tab, const std::string &select, const std::string &data, int index)
+	int MongoHelperComponent::Update(const char *tab, const std::string &select, const std::string &data, int index)
     {
 		std::string address;
         RpcService * rpcService = this->mApp->GetService(this->mServiceName);
@@ -56,7 +56,7 @@ namespace Sentry
         return rpcService->Call(address, "Update", request);
     }
 
-	XCode MongoHelperComponent::Insert(const char* tab, const std::string& json, int index)
+	int MongoHelperComponent::Insert(const char* tab, const std::string& json, int index)
 	{
 		std::string address;
         RpcService * rpcService = this->mApp->GetService(this->mServiceName);
@@ -70,7 +70,7 @@ namespace Sentry
         return rpcService->Call(address, "Insert", this->mInsertRequest);
 	}
 
-	XCode MongoHelperComponent::Remove(const char* tab, const std::string& select, int limit, int index)
+	int MongoHelperComponent::Remove(const char* tab, const std::string& select, int limit, int index)
 	{
 		std::string address;
         RpcService * rpcService = this->mApp->GetService(this->mServiceName);
@@ -85,7 +85,7 @@ namespace Sentry
         return rpcService->Call(address, "Remove", this->mRemoveRequest);
 	}
 
-	XCode MongoHelperComponent::Query(const char* tab,
+	int MongoHelperComponent::Query(const char* tab,
                                       const std::string& select, std::shared_ptr<Message> response)
 	{
 		std::string address;
@@ -98,7 +98,7 @@ namespace Sentry
         this->mQueryRequest.set_limit(1);
         this->mQueryRequest.set_json(std::move(select));
 		std::shared_ptr<db::mysql::response> result(new db::mysql::response());
-		XCode code = rpcService->Call(address, "Query", this->mQueryRequest, result);
+		int code = rpcService->Call(address, "Query", this->mQueryRequest, result);
 		if(code == XCode::Successful && result->jsons_size() > 0)
 		{
 			const std::string & json = result->jsons(0);
@@ -110,7 +110,7 @@ namespace Sentry
 		return code;
 	}
 
-    XCode MongoHelperComponent::Save(const Message &message)
+	int MongoHelperComponent::Save(const Message &message)
     {
         const Reflection * reflection = message.GetReflection();
         const Descriptor * descriptor = message.GetDescriptor();
@@ -156,14 +156,14 @@ namespace Sentry
         return rpcService->Call(address, "Update", this->mUpdateRequest);
     }
 
-    XCode MongoHelperComponent::Save(const char *tab, long long id, const std::string &data)
+	int MongoHelperComponent::Save(const char *tab, long long id, const std::string &data)
     {
         Json::Writer select;
         select.Add("_id").Add(id);
         return this->Update(tab, select.JsonString(), data, id % 10000);
     }
 
-    XCode MongoHelperComponent::Save(const char *tab, const std::string &id, const std::string &data)
+	int MongoHelperComponent::Save(const char *tab, const std::string &id, const std::string &data)
     {
         Json::Writer select;
         select.Add("_id").Add(id);

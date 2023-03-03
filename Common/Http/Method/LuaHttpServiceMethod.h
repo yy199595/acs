@@ -16,11 +16,11 @@ namespace Sentry
         LuaHttpServiceMethod(const HttpMethodConfig * config);
     public:
         bool IsLuaMethod() const { return true; }
-        XCode Invoke(const Http::Request &request, Http::Response &response) final;
+        int Invoke(const Http::Request &request, Http::Response &response) final;
 
     private:
-        XCode Call(Http::Response & response);
-        XCode CallAsync(Http::Response & response);
+        int Call(Http::Response & response);
+        int CallAsync(Http::Response & response);
     private:           
         const HttpMethodConfig * mConfig;
         class LuaScriptComponent* mLuaComponent;

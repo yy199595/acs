@@ -28,7 +28,7 @@ namespace Sentry
 		bool LateAwake() override;
         void OnRecord(Json::Writer&document) final;
 		bool IsStartService() final { return this->mServiceRegister != nullptr;}
-		XCode Invoke(const std::string & name, std::shared_ptr<Http::Request>, std::shared_ptr<Http::Response>) final;
+		int Invoke(const std::string & name, std::shared_ptr<Http::Request>, std::shared_ptr<Http::Response>) final;
 	 private:
         unsigned int mSumCount;
         unsigned int mWaitCount;

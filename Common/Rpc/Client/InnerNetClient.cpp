@@ -87,7 +87,7 @@ namespace Sentry
         }
     }
 
-	void InnerNetClient::CloseSocket(XCode code)
+	void InnerNetClient::CloseSocket(int code)
 	{
 		if (code == XCode::NetActiveShutdown) //主动关闭不需要通知回主线
 		{

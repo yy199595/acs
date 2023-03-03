@@ -17,9 +17,9 @@ namespace Sentry
 		static int SetRpc(lua_State * lua);
         static int SetHttp(lua_State* lua);
     public:
-        XCode Await();
+        int Await();
     private:
-        XCode mCode;
+        int mCode;
         Http::Response* mHttpData;
         TaskSource<void> mTaskSource;
         std::shared_ptr<Message> mRpcData;

@@ -22,7 +22,7 @@ namespace Sentry
         return true;
     }
 
-    XCode LocationService::Add(const s2s::location::add &request)
+    int LocationService::Add(const s2s::location::add &request)
     {
         long long userId = request.user_id();
         std::unique_ptr<LocationUnit> locationUnit(new LocationUnit(userId));
@@ -34,7 +34,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode LocationService::Del(const s2s::location::del &request)
+    int LocationService::Del(const s2s::location::del &request)
     {
         long long userId = request.user_id();
         LocationUnit *locationUnit = this->mLocationComponent->GetUnit(userId);
@@ -55,7 +55,7 @@ namespace Sentry
         }
         return XCode::Successful;
     }
-	XCode LocationService::Register(const s2s::cluster::server& request, s2s::cluster::list& response)
+	int LocationService::Register(const s2s::cluster::server& request, s2s::cluster::list& response)
 	{
 		const std::string & rpc = request.rpc();
 		const std::string & http = request.http();

@@ -65,7 +65,7 @@ namespace Sentry
 		luaRegister.PushExtensionFunction("Download", Lua::HttpClient::Download);
 	}
 
-	XCode HttpComponent::Download(const string& url, const string& path)
+	int HttpComponent::Download(const string& url, const string& path)
     {
         return XCode::Successful;
     }

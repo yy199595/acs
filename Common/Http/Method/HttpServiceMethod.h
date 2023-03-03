@@ -15,16 +15,16 @@
 namespace Sentry
 {
 	template<typename T>
-	using HttpMethod = XCode(T::*)(const Http::Request& request, Http::Response& response);
+	using HttpMethod = int(T::*)(const Http::Request& request, Http::Response& response);
 
     template<typename T>
-    using HttpJsonMethod1 = XCode(T::*)(const Json::Reader & request);
+    using HttpJsonMethod1 = int(T::*)(const Json::Reader & request);
 
     template<typename T>
-    using HttpJsonMethod2 = XCode(T::*)(const Json::Reader & request, Json::Writer & response);
+    using HttpJsonMethod2 = int(T::*)(const Json::Reader & request, Json::Writer & response);
 
     template<typename T>
-    using HttpJsonMethod3 = XCode(T::*)(Json::Writer & response);
+    using HttpJsonMethod3 = int(T::*)(Json::Writer & response);
 
 	class HttpServiceMethod
 	{
@@ -33,7 +33,7 @@ namespace Sentry
 	 public:
         virtual bool IsLuaMethod() const = 0;
         const std::string & GetName() const { return this->mName; }
-		virtual XCode Invoke(const Http::Request & request, Http::Response & response) = 0;
+		virtual int Invoke(const Http::Request & request, Http::Response & response) = 0;
 
     private:
         const std::string mName;
@@ -50,7 +50,7 @@ namespace Sentry
 
 	 public:
         bool IsLuaMethod() const { return false; }
-		XCode Invoke(const Http::Request & request, Http::Response & response)
+		int Invoke(const Http::Request & request, Http::Response & response)
 		{
 			return (this->mObj->*mFunction)(request, response);
 		}
@@ -71,9 +71,9 @@ namespace Sentry
 
     public:
         bool IsLuaMethod() const { return false; }
-        XCode Invoke(const Http::Request& request, Http::Response& response)
+        int Invoke(const Http::Request& request, Http::Response& response)
         {
-            XCode code;
+            int code;
             std::unique_ptr<Json::Writer> document(new Json::Writer());
             std::unique_ptr<Json::Reader> document1(new Json::Reader());
             if (!request.WriteDocument(document1.get()))
@@ -85,7 +85,7 @@ namespace Sentry
             }
             try
             {
-                XCode code = (this->mObj->*mFunction)(*document1);
+				code = (this->mObj->*mFunction)(*document1);
                 document->Add("code").Add((int)code);
             }
             catch (std::exception& e)
@@ -114,9 +114,9 @@ namespace Sentry
 
     public:
         bool IsLuaMethod() const final { return false; }
-        XCode Invoke(const Http::Request& request, Http::Response& response) final
+        int Invoke(const Http::Request& request, Http::Response& response) final
         {
-            XCode code;
+            int code = XCode::Failure;
             std::unique_ptr<Json::Reader> document1(new Json::Reader());
             std::unique_ptr<Json::Writer> document2(new Json::Writer());
             if (!request.WriteDocument(document1.get()))
@@ -156,9 +156,9 @@ namespace Sentry
 
     public:
         bool IsLuaMethod() const { return false; }
-        XCode Invoke(const Http::Request & request, Http::Response & response)
+        int Invoke(const Http::Request & request, Http::Response & response)
         {
-            XCode code = XCode::Failure;
+            int code = XCode::Failure;
             std::unique_ptr<Json::Writer> document2(new Json::Writer());
             try
             {

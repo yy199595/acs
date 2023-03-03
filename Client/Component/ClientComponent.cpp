@@ -25,7 +25,7 @@ namespace Client
     {
         std::shared_ptr<Rpc::Packet> response(new Rpc::Packet());
 
-        response->GetHead().Add("code", (int)XCode::CallTimeout);
+        response->GetHead().Add("code", XCode::CallTimeout);
         this->mTask.SetResult(response);
     }
 
@@ -90,7 +90,7 @@ namespace Client
 
     }
 
-    void ClientComponent::OnCloseSocket(const std::string &address, XCode code)
+    void ClientComponent::OnCloseSocket(const std::string &address, int code)
     {
 
     }
@@ -103,9 +103,9 @@ namespace Client
 
 	std::shared_ptr<Rpc::Packet> ClientComponent::Call(std::shared_ptr<Rpc::Packet> request)
 	{
-		std::shared_ptr<ClientTask> clienRpcTask(new ClientTask(0));
+		std::shared_ptr<ClientTask> clientRpcTask(new ClientTask(0));
 		{
-			long long taskId = clienRpcTask->GetRpcId();
+			long long taskId = clientRpcTask->GetRpcId();
 			request->GetHead().Add("rpc", taskId);
 			long long timeId = this->mTimerComponent->DelayCall(20 * 1000,
 				[request, taskId, this]()
@@ -118,7 +118,7 @@ namespace Client
 			this->mTimers.emplace(taskId, timeId);
 		}
 		this->mTcpClient->SendToServer(request);
-		return this->AddTask(clienRpcTask->GetRpcId(), clienRpcTask)->Await();
+		return this->AddTask(clientRpcTask->GetRpcId(), clientRpcTask)->Await();
 	}
 
 	void ClientComponent::OnAddTask(RpcTask rpctask)

@@ -22,7 +22,7 @@ namespace Sentry
 		return true;
 	}
 
-	XCode MongoDataComponent::Set(long long id, std::shared_ptr<Message> message, bool insert)
+	int MongoDataComponent::Set(long long id, std::shared_ptr<Message> message, bool insert)
 	{
 		std::string json;
 		if (Helper::Protocol::GetJson(*message, &json))
@@ -31,7 +31,7 @@ namespace Sentry
 			size_t size = sprintf(buffer, "{_id:%lld}", id);
 			const std::string select(buffer, size);
 			const std::string name = message->GetTypeName();
-			XCode code = this->mMongoComponent->Update(name.c_str(), select, json, (int)id);
+			int code = this->mMongoComponent->Update(name.c_str(), select, json, (int)id);
 			if (code != XCode::Successful)
 			{
 
@@ -40,7 +40,7 @@ namespace Sentry
 		return XCode::Failure;
 	}
 
-	XCode MongoDataComponent::Set(const std::string& id, std::shared_ptr<Message> message, bool insert)
+	int MongoDataComponent::Set(const std::string& id, std::shared_ptr<Message> message, bool insert)
 	{
 		return XCode::Successful;
 	}
@@ -80,7 +80,7 @@ namespace Sentry
 		size_t size = sprintf(buffer, "{_id:%lld}", id);
 		const std::string select(buffer, size);
 		std::shared_ptr<Message> result = this->mProtoComponent->New(name);
-		XCode code = this->mMongoComponent->Query(name.c_str(), select, result);
+		int code = this->mMongoComponent->Query(name.c_str(), select, result);
 		return code == XCode::Successful ? result : nullptr;
 	}
 
@@ -120,7 +120,7 @@ namespace Sentry
 		size_t size = sprintf(buffer, "{_id:%s}", id.c_str());
 		const std::string select(buffer, size);
 		std::shared_ptr<Message> result = this->mProtoComponent->New(name);
-		XCode code = this->mMongoComponent->Query(name.c_str(), select, result);
+		int code = this->mMongoComponent->Query(name.c_str(), select, result);
 		return code == XCode::Successful ? result : nullptr;
 	}
 }

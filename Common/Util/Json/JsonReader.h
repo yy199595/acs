@@ -27,7 +27,6 @@ namespace Json
 
 	 public:
 		bool HasMember(const char * key);
-		bool GetMember(const char* key, XCode& code) const;
 		bool GetMember(const char* key, int& value) const;
 		bool GetMember(const char* key, bool& value) const;
 		bool GetMember(const char* key, short& value) const;

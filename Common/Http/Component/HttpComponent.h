@@ -13,7 +13,7 @@ namespace Sentry
 		HttpComponent() = default;
 	 public:
 		std::shared_ptr<HttpRequestClient> CreateClient();
-		XCode Download(const std::string & url, const std::string & path);
+		int Download(const std::string & url, const std::string & path);
 		std::shared_ptr<Http::Response> Get(const std::string& url, float second = 15.0f);
 		std::shared_ptr<Http::Response> Post(const std::string& url, const std::string& data, float second = 15.0f);
     private:

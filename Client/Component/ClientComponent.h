@@ -55,7 +55,7 @@ namespace Client
 		void OnDelTask(long long key, RpcTask task) final;
         void StartClose(const std::string &address) final;
         void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
-        void OnCloseSocket(const std::string &address, XCode code) final;
+        void OnCloseSocket(const std::string &address, int code) final;
     private:
         unsigned int mIndex;
         TimerComponent *mTimerComponent;

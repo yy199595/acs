@@ -18,11 +18,6 @@ namespace Rpc
         return true;
     }
 
-    bool Head::Add(const std::string &key, XCode value)
-    {
-        return this->Add(key, (int)value);
-    }
-
     bool Head::Get(std::vector<std::string> &keys) const
     {
         auto iter = this->begin();
@@ -224,12 +219,12 @@ namespace Rpc
         return true;
     }
 
-    XCode Packet::GetCode(XCode code) const
+    int Packet::GetCode(int code) const
     {
         int value = (int)code;
         if(this->mHead.Get("code", value))
         {
-            return (XCode)value;
+            return value;
         }
         return code;
     }

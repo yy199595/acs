@@ -17,21 +17,21 @@ namespace Sentry
 	 public:
 		RpcService() = default;
 	 public:
-		XCode Send(const std::string& func, const Message & message);
-		XCode Send(const std::string & address, const std::string& func, const Message & message);
+		int Send(const std::string& func, const Message & message);
+		int Send(const std::string & address, const std::string& func, const Message & message);
     public:
-        XCode Send(long long userId, const std::string& func);
-        XCode Send(long long userId, const std::string& func, const Message & message);
+        int Send(long long userId, const std::string& func);
+        int Send(long long userId, const std::string& func, const Message & message);
     public:
-		XCode Call(const std::string& address, const std::string& func);
-		XCode Call(const std::string& address, const std::string& func, const Message& message);
-		XCode Call(const std::string& address, const std::string& func, std::shared_ptr<Message> response);
-		XCode Call(const std::string& address, const std::string& func, const Message& message, std::shared_ptr<Message> response);
+		int Call(const std::string& address, const std::string& func);
+		int Call(const std::string& address, const std::string& func, const Message& message);
+		int Call(const std::string& address, const std::string& func, std::shared_ptr<Message> response);
+		int Call(const std::string& address, const std::string& func, const Message& message, std::shared_ptr<Message> response);
 	 public:
-		XCode Call(long long userId, const std::string& func);
-		XCode Call(long long userId, const std::string& func, const Message& message);
-		XCode Call(long long userId, const std::string& func, std::shared_ptr<Message> response);
-        XCode Call(long long userId, const std::string& func, const Message& message, std::shared_ptr<Message> response);
+		int Call(long long userId, const std::string& func);
+		int Call(long long userId, const std::string& func, const Message& message);
+		int Call(long long userId, const std::string& func, std::shared_ptr<Message> response);
+        int Call(long long userId, const std::string& func, const Message& message, std::shared_ptr<Message> response);
     public:
         bool StartSend(long long userId, const std::string & func, const Message * message = nullptr);
         bool StartSend(const std::string & address, const std::string & func, const Message * message = nullptr);
@@ -40,7 +40,7 @@ namespace Sentry
 	 protected:
 		bool LateAwake() override;
     public:
-        virtual XCode Invoke(const std::string & method, std::shared_ptr<Rpc::Packet> message) = 0;
+        virtual int Invoke(const std::string & method, std::shared_ptr<Rpc::Packet> message) = 0;
 	private:
 		std::string mServerName;
 		std::string mLocationAddress;

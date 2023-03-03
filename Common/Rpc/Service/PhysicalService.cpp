@@ -39,7 +39,7 @@ namespace Sentry
         }
         CONSOLE_LOG_ERROR(this->GetName() << " handler all message complete");
     }
-    XCode PhysicalService::Invoke(const std::string &func, std::shared_ptr<Rpc::Packet> message)
+    int PhysicalService::Invoke(const std::string &func, std::shared_ptr<Rpc::Packet> message)
     {
         if (!this->IsStartService())
         {
@@ -61,7 +61,7 @@ namespace Sentry
 #endif
         this->mSumCount++;
         this->mWaitCount++;
-        XCode code = serviceMethod->Invoke(*message);
+        int code = serviceMethod->Invoke(*message);
         {
             this->mWaitCount--;
         }

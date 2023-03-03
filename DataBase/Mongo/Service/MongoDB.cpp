@@ -36,7 +36,7 @@ namespace Sentry
         return true;
     }
 
-    XCode MongoDB::RunCommand(const db::mongo::command::request &request, db::mongo::command::response &response)
+    int MongoDB::RunCommand(const db::mongo::command::request &request, db::mongo::command::response &response)
     {
         std::shared_ptr<CommandRequest> mongoRequest
                 = std::make_shared<CommandRequest>();
@@ -58,7 +58,7 @@ namespace Sentry
         return XCode::Failure;
     }
 
-    XCode MongoDB::Insert(const db::mongo::insert &request)
+    int MongoDB::Insert(const db::mongo::insert &request)
 	{
         const size_t pos = request.tab().find('.');
         if(pos == std::string::npos)
@@ -101,7 +101,7 @@ namespace Sentry
         return XCode::Failure;
 	}
 
-    XCode MongoDB::Delete(const db::mongo::remove &request)
+    int MongoDB::Delete(const db::mongo::remove &request)
     {
         const size_t pos = request.tab().find('.');
         if(pos == std::string::npos)
@@ -144,7 +144,7 @@ namespace Sentry
     }
 
     // $gt:大于   $lt:小于  $gte:大于或等于  $lte:小于或等于 $ne:不等于
-    XCode MongoDB::Update(const db::mongo::update &request)
+    int MongoDB::Update(const db::mongo::update &request)
     {
         const size_t pos = request.tab().find('.');
         if (pos == std::string::npos)
@@ -193,7 +193,7 @@ namespace Sentry
         return (result.Get("n", count) && count > 0) ? XCode::Successful : XCode::Failure;
     }
 
-    XCode MongoDB::SetIndex(const db::mongo::index &request)
+    int MongoDB::SetIndex(const db::mongo::index &request)
     {
         const size_t pos = request.tab().find('.');
         if (pos == std::string::npos)
@@ -206,7 +206,7 @@ namespace Sentry
         return this->mMongoComponent->SetIndex(tab, name) ? XCode::Successful : XCode::Failure;
     }
 
-    XCode MongoDB::Query(const db::mongo::query::request &request, db::mongo::query::response &response)
+    int MongoDB::Query(const db::mongo::query::request &request, db::mongo::query::response &response)
     {
         const size_t pos = request.tab().find('.');
         if(pos == std::string::npos)

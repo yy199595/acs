@@ -20,7 +20,7 @@ namespace Sentry
 		bool Close() final;
 		bool IsStartService() final { return true; }
 		int GetWaitMessageCount() const final { return this->mWaitCount; }
-		XCode Invoke(const std::string &func, std::shared_ptr<Rpc::Packet> message) final;
+		int Invoke(const std::string &func, std::shared_ptr<Rpc::Packet> message) final;
     protected:
         bool LoadFromLua() final;
         virtual bool OnClose() = 0;

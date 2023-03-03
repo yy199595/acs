@@ -31,7 +31,7 @@ namespace Sentry
 
 		void SetMessage(const Message & message);
 
-		void SetResult(XCode code, std::shared_ptr <Message> response);
+		void SetResult(int code, std::shared_ptr <Message> response);
 
 	private:
 		int mRef;

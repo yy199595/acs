@@ -36,13 +36,13 @@ namespace Sentry
 		return this->GetComponent<OuterNetComponent>()->StopListen();
     }
 
-	XCode Gate::Ping(long long userId)
+	int Gate::Ping(long long userId)
 	{
 		LOG_ERROR(userId << " ping gate server");
 		return XCode::Failure;
 	}
 
-	XCode Gate::Allot(const com::type::int64 &request, s2s::allot::response &response)
+	int Gate::Allot(const com::type::int64 &request, s2s::allot::response &response)
     {
         std::string token;
         long long userId = request.value();

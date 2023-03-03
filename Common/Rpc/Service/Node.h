@@ -14,13 +14,13 @@ namespace Sentry
         Node() = default;
         ~Node() = default;
     private:
-        XCode Ping();
-        XCode Stop();
-        XCode Hotfix();
-        XCode LoadConfig();
-        XCode Join(const s2s::cluster::server & request); //新服务器加入
-        XCode Exit(const s2s::cluster::server & response); //新服务器加入
-		XCode RunInfo(google::protobuf::StringValue & response); // 获取运行信息
+		int Ping();
+		int Stop();
+		int Hotfix();
+		int LoadConfig();
+		int Join(const s2s::cluster::server & request); //新服务器加入
+		int Exit(const s2s::cluster::server & response); //新服务器加入
+		int RunInfo(google::protobuf::StringValue & response); // 获取运行信息
 	 private:
         void Init() final;
         bool OnStart() final;

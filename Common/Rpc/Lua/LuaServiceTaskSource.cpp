@@ -20,7 +20,7 @@ namespace Sentry
 
 	}
 
-    XCode LuaServiceTaskSource::Await()
+    int LuaServiceTaskSource::Await()
     {
         if(this->mCode == XCode::LuaCoroutineWait) 
 		{
@@ -33,7 +33,7 @@ namespace Sentry
 	{
 		LuaServiceTaskSource* luaServiceTaskSource =
 			Lua::UserDataParameter::Read<LuaServiceTaskSource*>(lua, 1);
-		luaServiceTaskSource->mCode = (XCode)luaL_checkinteger(lua, 2);
+		luaServiceTaskSource->mCode = luaL_checkinteger(lua, 2);
 		if (luaServiceTaskSource->mCode == XCode::Successful)
 		{
 			if (lua_istable(lua, 3) && luaServiceTaskSource->mRpcData != nullptr)
@@ -56,7 +56,7 @@ namespace Sentry
 	{
 		LuaServiceTaskSource* luaServiceTaskSource =
 			Lua::UserDataParameter::Read<LuaServiceTaskSource*>(lua, 1);
-		luaServiceTaskSource->mCode = (XCode)luaL_checkinteger(lua, 2);
+		luaServiceTaskSource->mCode = luaL_checkinteger(lua, 2);
 		if (luaServiceTaskSource->mHttpData != nullptr)
 		{
 			if (lua_istable(lua, -1))

@@ -40,8 +40,6 @@ namespace Rpc
 
         bool Add(const std::string &key, int value);
 
-        bool Add(const std::string &key, XCode value);
-
         bool Add(const std::string &key, long long value);
 
         bool Add(const std::string &key, const std::string &value);
@@ -59,7 +57,7 @@ namespace Rpc
         static std::shared_ptr<Packet> New(Tcp::Type type, Tcp::Porto proto);
 
     public:
-        XCode GetCode(XCode code = XCode::Failure) const;
+        int GetCode(int code = XCode::Failure) const;
 
         Head &GetHead() { return this->mHead; }
 

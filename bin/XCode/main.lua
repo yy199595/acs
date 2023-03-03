@@ -39,12 +39,12 @@ end
 for index, content in ipairs(file_content) do
     if index == file_count then
         lua_string = string.format("%s\n\t%s = %s--%s", lua_string, content.name, content.value, content.desc)
-        cpp_string = string.format("%s\n\t%s = %s//%s", cpp_string, content.name, content.value, content.desc)
-        csharp_string = string.format("%s\n\t%s = %s//%s", csharp_string, content.name, content.value, content.desc)
+        cpp_string = string.format("%s\n\tconstexpr int %s = %s;//%s", cpp_string, content.name, content.value, content.desc)
+        csharp_string = string.format("%s\n\tconst int %s = %s;//%s", csharp_string, content.name, content.value, content.desc)
     else
-        lua_string = string.format("%s\n\t%s = %s,--%s", lua_string, content.name, content.value, content.desc)
-        cpp_string = string.format("%s\n\t%s = %s,//%s", cpp_string, content.name, content.value, content.desc)
-        csharp_string = string.format("%s\n\t%s = %s,//%s", csharp_string, content.name, content.value, content.desc)
+        lua_string = string.format("%s\n\t%s = %s;--%s", lua_string, content.name, content.value, content.desc)
+        cpp_string = string.format("%s\n\tconstexpr int %s = %s;//%s", cpp_string, content.name, content.value, content.desc)
+        csharp_string = string.format("%s\n\tconst int %s = %s;//%s", csharp_string, content.name, content.value, content.desc)
     end
 end
 
@@ -53,8 +53,8 @@ local cpp_write = io.output("../../Gen/XCode/XCode.h")
 local csharp_write = io.output("./XCode.cs")
 
 lua_write:write(string.format("%s%s%s", "XCode =\n{", lua_string, "\n}\nreturn XCode"))
-csharp_write:write(string.format("%s%s%s", "public enum XCode\n{", cpp_string, "\n};"))
-cpp_write:write(string.format("%s%s%s", "#pragma once\nenum class XCode\n{", csharp_string, "\n};"))
+csharp_write:write(string.format("%s%s%s", "public class XCode\n{", csharp_string, "\n};"))
+cpp_write:write(string.format("%s%s%s", "#pragma once\nnamespace XCode\n{", cpp_string, ";\n};"))
 lua_write:close()
 cpp_write:close()
 csharp_write:close()

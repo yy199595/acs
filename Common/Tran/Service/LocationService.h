@@ -15,9 +15,9 @@ namespace Sentry
         bool OnStart() final;
         bool OnClose() final;
     private:
-        XCode Add(const s2s::location::add & request);
-        XCode Del(const s2s::location::del & request);
-		XCode Register(const s2s::cluster::server & request, s2s::cluster::list & response);
+        int Add(const s2s::location::add & request);
+        int Del(const s2s::location::del & request);
+		int Register(const s2s::cluster::server & request, s2s::cluster::list & response);
     private:
         class LocationComponent * mLocationComponent;
     };

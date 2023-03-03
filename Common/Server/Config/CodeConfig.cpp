@@ -30,14 +30,14 @@ namespace Sentry
             {
                 lineConfig->Name = rets[0];
                 lineConfig->Desc = rets[1];
-                lineConfig->Code = (XCode)index;
+                lineConfig->Code = index;
             }
-            this->mConfigs.emplace((int)lineConfig->Code, std::move(lineConfig));
+            this->mConfigs.emplace(lineConfig->Code, std::move(lineConfig));
         }
         return true;
     }
 
-    std::string CodeConfig::GetDesc(XCode code) const
+    std::string CodeConfig::GetDesc(int code) const
     {
         auto iter = this->mConfigs.find((int)code);
         if(iter != this->mConfigs.end())

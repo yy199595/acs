@@ -13,15 +13,15 @@ namespace Sentry
 		GateHelperComponent() = default;
 		~GateHelperComponent() = default;
     public:
-		XCode Call(long long userId, const std::string & func);
-        XCode Call(long long UserId, const std::string & func, const Message & message);
+		int Call(long long userId, const std::string & func);
+        int Call(long long UserId, const std::string & func, const Message & message);
 	 public:
-		XCode BroadCast(const std::string & func);
-		XCode BroadCast(const std::string & func, const Message & message);
+		int BroadCast(const std::string & func);
+		int BroadCast(const std::string & func, const Message & message);
 	 private:
 		bool GetLocation(long long userId, std::string & address);
-		XCode LuaBroadCast(const char * func, std::shared_ptr<Message> message);
-		XCode LuaCall(long long userId, const std::string func, std::shared_ptr<Message> message);
+		int LuaBroadCast(const char * func, std::shared_ptr<Message> message);
+		int LuaCall(long long userId, const std::string func, std::shared_ptr<Message> message);
 	 protected:
 		bool LateAwake() final;
 		void OnLuaRegister(Lua::ClassProxyHelper & luaRegister) final;

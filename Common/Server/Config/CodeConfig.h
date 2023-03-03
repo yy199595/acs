@@ -13,7 +13,7 @@ namespace Sentry
     class CodeLineConfig
     {
     public:
-        XCode Code;
+        int Code;
         std::string Name;
         std::string Desc;
     };
@@ -23,7 +23,7 @@ namespace Sentry
     public:
         CodeConfig() : TextConfig("CodeConfig") { }
     public:
-        std::string GetDesc(XCode code) const;
+        std::string GetDesc(int code) const;
     private:
         bool OnLoadText(const char *str, size_t length) final;
         bool OnReloadText(const char *str, size_t length) final;

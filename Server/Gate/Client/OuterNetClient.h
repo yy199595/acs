@@ -28,7 +28,7 @@ namespace Sentry
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	private:		
 		void StartTimer();
-        void CloseSocket(XCode code);
+        void CloseSocket(int code);
 		void OnTimerEnd(Asio::Code code);
 	 private:
 		int mTimeout;

@@ -98,7 +98,7 @@ namespace Sentry
 	class IService : public IServiceBase
 	{
 	public:
-		virtual XCode Invoke(const std::string&, std::shared_ptr<T1>, std::shared_ptr<T2>) = 0;
+		virtual int Invoke(const std::string&, std::shared_ptr<T1>, std::shared_ptr<T2>) = 0;
 	};
 
 	template<typename T>
@@ -108,7 +108,7 @@ namespace Sentry
         virtual ~IRpc() { }
 		virtual void StartClose(const std::string& address) { };
 		virtual void OnConnectSuccessful(const std::string & address) { }
-		virtual void OnCloseSocket(const std::string& address, XCode code) { };
+		virtual void OnCloseSocket(const std::string& address, int code) { };
         virtual void OnMessage(const std::string & address, std::shared_ptr<T> message) = 0;
     };
 
@@ -127,8 +127,8 @@ namespace Sentry
 	{
 	public:
 		virtual void OnConnect(const std::string& address) { }
-		virtual XCode OnRequest(std::shared_ptr<T1> request) = 0;
-		virtual XCode OnResponse(const std::string&, const std::shared_ptr<T2> response) = 0;
+		virtual int OnRequest(std::shared_ptr<T1> request) = 0;
+		virtual int OnResponse(const std::string&, const std::shared_ptr<T2> response) = 0;
 	};
 
     class IServerRecord

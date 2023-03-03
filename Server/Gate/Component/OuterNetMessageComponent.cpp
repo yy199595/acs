@@ -65,7 +65,7 @@ namespace Sentry
         }
     }
 
-    XCode OuterNetMessageComponent::OnAuth(const std::string &address, std::shared_ptr<Rpc::Packet> message)
+    int OuterNetMessageComponent::OnAuth(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
         std::string token;
         if(!message->GetHead().Get("token", token))
@@ -108,7 +108,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-	XCode OuterNetMessageComponent::OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message)
+	int OuterNetMessageComponent::OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message)
 	{
         const Rpc::Head& head = message->GetHead();
         auto iter = this->mUserAddressMap.find(address);

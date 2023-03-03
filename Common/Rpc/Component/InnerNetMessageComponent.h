@@ -24,7 +24,7 @@ namespace Sentry
 		InnerNetMessageComponent() = default;
     public:
         bool Ping(const std::string & address);
-		XCode OnRequest(std::shared_ptr<Rpc::Packet> request);
+		int OnRequest(std::shared_ptr<Rpc::Packet> request);
         bool Send(const std::string & address, std::shared_ptr<Rpc::Packet> message);
         std::shared_ptr<Rpc::Packet> Call(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
