@@ -2,28 +2,28 @@
 // Created by zmhy0073 on 2022/10/13.
 //
 
-#include"UserBehavior.h"
+#include"User.h"
 #include"Component/InnerNetComponent.h"
 #include"Component/LocationComponent.h"
 #include"Component/GateHelperComponent.h"
 namespace Sentry
 {
 
-    bool UserBehavior::Awake()
+    bool User::Awake()
     {
         this->mApp->AddComponent<GateHelperComponent>();
         return true;
     }
-    bool UserBehavior::OnStart()
+    bool User::OnStart()
     {
-        BIND_COMMON_RPC_METHOD(UserBehavior::Login);
-        BIND_COMMON_RPC_METHOD(UserBehavior::Logout);
+        BIND_COMMON_RPC_METHOD(User::Login);
+        BIND_COMMON_RPC_METHOD(User::Logout);
 		this->mLocationComponent = this->GetComponent<LocationComponent>();
         this->mInnerNetComponent = this->GetComponent<InnerNetComponent>();
         return true;
     }
 
-    XCode UserBehavior::Login(const Rpc::Head & head, const s2s::user::login & request)
+    XCode User::Login(const Rpc::Head & head, const s2s::user::login & request)
     {
         std::string address;
         if(!head.Get("address", address))
@@ -44,7 +44,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode UserBehavior::Logout(const Rpc::Head & head, const s2s::user::logout &request)
+    XCode User::Logout(const Rpc::Head & head, const s2s::user::logout &request)
     {
         std::string client, address;
         return XCode::Successful;

@@ -7,11 +7,11 @@
 #include"PhysicalService.h"
 namespace Sentry
 {
-    class UserBehavior : public PhysicalService
+    class User : public PhysicalService
     {
     public:
-        UserBehavior() = default;
-        ~UserBehavior() = default;
+        User() = default;
+        ~User() = default;
     private:
         XCode Login(const Rpc::Head & head, const s2s::user::login & request);
         XCode Logout(const Rpc::Head & head, const s2s::user::logout & request);

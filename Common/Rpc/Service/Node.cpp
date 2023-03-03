@@ -2,7 +2,7 @@
 // Created by zmhy0073 on 2022/10/8.
 //
 
-#include"InnerService.h"
+#include"Node.h"
 #include"Config/ClusterConfig.h"
 #include"Component/InnerNetComponent.h"
 #include"Component/LocationComponent.h"
@@ -11,31 +11,31 @@
 
 namespace Sentry
 {
-    void InnerService::Init()
+    void Node::Init()
     {
         this->mApp->AddComponent<InnerNetComponent>();
         this->mApp->AddComponent<InnerNetMessageComponent>();
     }
 
-    bool InnerService::OnStart()
+    bool Node::OnStart()
     {
-        BIND_COMMON_RPC_METHOD(InnerService::Ping);
-        BIND_COMMON_RPC_METHOD(InnerService::Join);
-        BIND_COMMON_RPC_METHOD(InnerService::Exit);
-        BIND_COMMON_RPC_METHOD(InnerService::Stop);
-        BIND_COMMON_RPC_METHOD(InnerService::Hotfix);
-		BIND_COMMON_RPC_METHOD(InnerService::RunInfo);
-		BIND_COMMON_RPC_METHOD(InnerService::LoadConfig);
+        BIND_COMMON_RPC_METHOD(Node::Ping);
+        BIND_COMMON_RPC_METHOD(Node::Join);
+        BIND_COMMON_RPC_METHOD(Node::Exit);
+        BIND_COMMON_RPC_METHOD(Node::Stop);
+        BIND_COMMON_RPC_METHOD(Node::Hotfix);
+		BIND_COMMON_RPC_METHOD(Node::RunInfo);
+		BIND_COMMON_RPC_METHOD(Node::LoadConfig);
 		this->mLocationComponent = this->GetComponent<LocationComponent>();
         return true;
     }
 
-	XCode InnerService::Ping()
+	XCode Node::Ping()
     {
         return XCode::Successful;
     }
 
-    XCode InnerService::Join(const s2s::cluster::server &request)
+    XCode Node::Join(const s2s::cluster::server &request)
 	{
 		const std::string & rpc = request.rpc();
 		const std::string & http = request.http();
@@ -50,12 +50,12 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-    XCode InnerService::Exit(const s2s::cluster::server &response)
+    XCode Node::Exit(const s2s::cluster::server &response)
     {
         return XCode::Successful;
     }
 
-    XCode InnerService::Stop()
+    XCode Node::Stop()
     {
         std::vector<RpcService *> components;
         if(this->mApp->GetComponents(components))
@@ -76,7 +76,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    XCode InnerService::LoadConfig()
+    XCode Node::LoadConfig()
     {
         TextConfigComponent * textComponent = this->GetComponent<TextConfigComponent>();
         if(textComponent != nullptr)
@@ -86,7 +86,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-	XCode InnerService::RunInfo(google::protobuf::StringValue& response)
+	XCode Node::RunInfo(google::protobuf::StringValue& response)
 	{
 		Json::Writer document;
         {
@@ -118,7 +118,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-    XCode InnerService::Hotfix()
+    XCode Node::Hotfix()
     {
         std::vector<IHotfix *> components;
 		this->mApp->GetComponents(components);

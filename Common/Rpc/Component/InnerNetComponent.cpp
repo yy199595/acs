@@ -5,7 +5,7 @@
 #include"InnerNetMessageComponent.h"
 #include"File/FileHelper.h"
 #include"Config/CodeConfig.h"
-#include"Service/InnerService.h"
+#include"Service/Node.h"
 #include"Component/TranComponent.h"
 #include"Component/OuterNetComponent.h"
 #include"Component/NetThreadComponent.h"

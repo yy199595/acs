@@ -25,11 +25,11 @@
 
 #include"Service/Log.h"
 #include"Service/Gate.h"
-#include"Service/InnerService.h"
+#include"Service/Node.h"
 #include"Service/HttpBackGround.h"
 #include"Service/LocationService.h"
 #include"Service/HttpDebug.h"
-#include"Service/UserBehavior.h"
+#include"Service/User.h"
 #ifdef __ENABLE_MONGODB__
 #include"Service/MongoDB.h"
 #include"Component/MongoDBComponent.h"
@@ -112,8 +112,8 @@ void RegisterServiceComponent()
 {
 	ComponentFactory::Add<Log>("Log");
 	ComponentFactory::Add<Gate>("Gate");
-	ComponentFactory::Add<UserBehavior>("UserBehavior");
-    ComponentFactory::Add<InnerService>("InnerService");
+	ComponentFactory::Add<User>("User");
+    ComponentFactory::Add<Node>("Node");
     ComponentFactory::Add<LocationService>("LocationService");
 #ifdef __ENABLE_MONGODB__
     ComponentFactory::Add<MongoDB>("MongoDB");

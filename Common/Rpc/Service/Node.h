@@ -8,11 +8,11 @@
 #include"google/protobuf/wrappers.pb.h"
 namespace Sentry
 {
-    class InnerService : public PhysicalService
+    class Node : public PhysicalService
     {
     public:
-        InnerService() = default;
-        ~InnerService() = default;
+        Node() = default;
+        ~Node() = default;
     private:
         XCode Ping();
         XCode Stop();

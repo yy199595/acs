@@ -9,7 +9,7 @@
 #include"Service/LocationService.h"
 #include"Component/LocationComponent.h"
 #include"Component/NetThreadComponent.h"
-#include"Service/InnerService.h"
+#include"Service/Node.h"
 #include"Component/InnerNetComponent.h"
 namespace Sentry
 {

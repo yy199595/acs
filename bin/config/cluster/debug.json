@@ -2,8 +2,8 @@
 	"Server": {
 		"AutoAllot": true,
 		"Service": {
-			"UserBehavior": true,
-			"InnerService": true,
+			"User": true,
+			"Node": true,
 			"Log": true,
 			"Gate": true,
 			"MongoDB": true,

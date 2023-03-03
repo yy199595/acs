@@ -3,7 +3,7 @@
 //
 
 #include"LocationService.h"
-#include"Service/InnerService.h"
+#include"Service/Node.h"
 #include"Component/InnerNetComponent.h"
 #include"Component/LocationComponent.h"
 namespace Sentry
@@ -62,7 +62,7 @@ namespace Sentry
 		const std::string & name = request.name();
 		this->mLocationComponent->AddRpcServer(name, rpc);
 		this->mLocationComponent->AddHttpServer(name, http);
-		InnerService * innerService = this->GetComponent<InnerService>();
+		Node * innerService = this->GetComponent<Node>();
 		InnerNetComponent * innerNetComponent = this->GetComponent<InnerNetComponent>();
 		if(innerNetComponent != nullptr)
 		{

@@ -2,8 +2,8 @@
 	"ChatServer": {
 		"AutoAllot": true,
 		"Service": {
-			"UserBehavior": true,
-			"InnerService": true,
+			"User": true,
+			"Node": true,
 			"ChatService": true,
 			"Gate": false,
 			"LocationService" : false
@@ -16,7 +16,7 @@
 	"HttpServer": {
 		"AutoAllot": false,
 		"Service": {
-			"InnerService": true,
+			"Node": true,
 			"AccountService": true,
 			"HttpBackGround": true,
 			"Gate": false,
@@ -34,7 +34,7 @@
 		"AutoAllot": false,
 		"Service": {
 			"Gate": true,
-			"InnerService": true,
+			"Node": true,
 			"ChatService": false,
 			"LocationService" : false
 		},
@@ -46,7 +46,7 @@
 		"AutoAllot": true,
 		"Service": {
 			"MongoDB": true,
-			"InnerService": true,
+			"Node": true,
 			"LocationService" : false
 		},
 		"Component": [
@@ -56,7 +56,7 @@
 	"TranServer": {
 		"AutoAllot": false,
 		"Service": {
-			"InnerService": true,
+			"Node": true,
 			"LocationService" : true
 		},
 		"Component": [

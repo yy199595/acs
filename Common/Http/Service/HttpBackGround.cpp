@@ -4,7 +4,7 @@
 #include"HttpBackGround.h"
 #include"System/System.h"
 #include"Config/CodeConfig.h"
-#include"Service/InnerService.h"
+#include"Service/Node.h"
 #include"google/protobuf/wrappers.pb.h"
 #include"Component/LocationComponent.h"
 namespace Sentry
@@ -28,7 +28,7 @@ namespace Sentry
 
 	XCode HttpBackGround::Hotfix(Json::Writer&response)
 	{
-		InnerService * innerService = this->GetComponent<InnerService>();
+		Node * innerService = this->GetComponent<Node>();
 		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
 		if(locationComponent == nullptr || innerService == nullptr)
 		{
@@ -67,7 +67,7 @@ namespace Sentry
 
     XCode HttpBackGround::Info(Json::Writer&response)
     {
-		InnerService * innerService = this->GetComponent<InnerService>();
+		Node * innerService = this->GetComponent<Node>();
 		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
 		if(locationComponent == nullptr)
 		{
