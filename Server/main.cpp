@@ -18,7 +18,7 @@
 
 #include"Component/HttpComponent.h"
 #include"Component/HttpWebComponent.h"
-#include"Component/LocationComponent.h"
+#include"Component/NodeMgrComponent.h"
 #include"Component/TextConfigComponent.h"
 #include"Component/LaunchComponent.h"
 #include"Component/TranComponent.h"
@@ -27,7 +27,7 @@
 #include"Service/Gate.h"
 #include"Service/Node.h"
 #include"Service/HttpBackGround.h"
-#include"Service/LocationService.h"
+#include"Service/Registry.h"
 #include"Service/HttpDebug.h"
 #include"Service/User.h"
 #ifdef __ENABLE_MONGODB__
@@ -69,7 +69,7 @@ void RegisterComponent()
     ComponentFactory::Add<TextConfigComponent>("TextConfigComponent");
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
     ComponentFactory::Add<InnerNetComponent>("InnerNetComponent");
-	ComponentFactory::Add<LocationComponent>("LocationComponent");
+	ComponentFactory::Add<NodeMgrComponent>("LocationComponent");
 
     ComponentFactory::Add<TranComponent>("TranComponent");
 
@@ -114,7 +114,7 @@ void RegisterServiceComponent()
 	ComponentFactory::Add<Gate>("Gate");
 	ComponentFactory::Add<User>("User");
     ComponentFactory::Add<Node>("Node");
-    ComponentFactory::Add<LocationService>("LocationService");
+    ComponentFactory::Add<Registry>("Registry");
 #ifdef __ENABLE_MONGODB__
     ComponentFactory::Add<MongoDB>("MongoDB");
 #endif

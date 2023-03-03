@@ -2,14 +2,15 @@
 // Created by zmhy0073 on 2022/8/12.
 //
 
-#include"LocationComponent.h"
+#include"NodeMgrComponent.h"
 #include"Log/CommonLogDef.h"
 #include"Config/ServerConfig.h"
-#include"Service/LocationService.h"
+#include"Service/Registry.h"
+#include"Math/MathHelper.h"
 #include"Component/TaskComponent.h"
 namespace Sentry
 {
-    void LocationComponent::AddRpcServer(const std::string& name, const std::string& address)
+    void NodeMgrComponent::AddRpcServer(const std::string& name, const std::string& address)
     {
         if(address.empty())
         {
@@ -21,7 +22,6 @@ namespace Sentry
 			std::vector<std::string> item;
 			this->mRpcServers.emplace(name, item);
 		}
-		this->mAllotCount.emplace(address, 0);
         std::vector<std::string> & locations = this->mRpcServers[name];
         if(std::find(locations.begin(), locations.end(), address) == locations.end())
         {
@@ -30,7 +30,7 @@ namespace Sentry
         }
     }
 
-	void LocationComponent::WaitServerStart(const std::string& server)
+	void NodeMgrComponent::WaitServerStart(const std::string& server)
 	{
 		int count = 0;
 		TaskComponent * taskComponent = this->GetComponent<TaskComponent>();
@@ -44,7 +44,7 @@ namespace Sentry
 		}
 	}
 
-	void LocationComponent::AddHttpServer(const std::string& name, const std::string& address)
+	void NodeMgrComponent::AddHttpServer(const std::string& name, const std::string& address)
 	{
 		if(address.empty())
 		{
@@ -53,22 +53,23 @@ namespace Sentry
 		LOG_WARN(name << " add http server address [" << address << "]");
 	}
 
-	bool LocationComponent::DelServer(const std::string& address)
+	bool NodeMgrComponent::DelServer(const std::string& address)
 	{
 		auto iter = this->mRpcServers.begin();
 		for (; iter != this->mRpcServers.end(); iter++)
 		{
-			auto iter1 = std::find(iter->second.begin(), iter->second.end(), address);
+			auto iter1 = std::find(
+				iter->second.begin(), iter->second.end(), address);
 			if (iter1 != iter->second.end())
 			{
 				iter->second.erase(iter1);
 				return true;
 			}
-		}		
+		}
 		return false;
 	}
 
-	bool LocationComponent::GetServers(std::vector<std::string>& hosts)
+	bool NodeMgrComponent::GetServers(std::vector<std::string>& hosts)
 	{
 		auto iter = this->mRpcServers.begin();
 		for(; iter != this->mRpcServers.end(); iter++)
@@ -81,7 +82,7 @@ namespace Sentry
 		return !hosts.empty();
 	}
 
-	bool LocationComponent::GetServers(const std::string& server, std::vector<std::string>& hosts)
+	bool NodeMgrComponent::GetServers(const std::string& server, std::vector<std::string>& hosts)
 	{
 		auto iter = this->mRpcServers.find(server);
 		if(iter == this->mRpcServers.end())
@@ -92,46 +93,25 @@ namespace Sentry
 		return true;
 	}
 
-	LocationUnit* LocationComponent::GetUnit(long long id) const
+	LocationUnit* NodeMgrComponent::GetUnit(long long id) const
 	{
 		auto iter = this->mUnitLocations.find(id);
 		return iter != this->mUnitLocations.end() ? iter->second.get() : nullptr;
 	}
 
-	int LocationComponent::GetAllotCount(const std::string& address) const
-	{
-		auto iter = this->mAllotCount.find(address);
-		return iter != this->mAllotCount.end() ? iter->second : 0;
-	}
-
-	bool LocationComponent::AllotServer(const string& server, string& address)
+	bool NodeMgrComponent::AllotServer(const string& server, string& address)
 	{
 		auto iter = this->mRpcServers.find(server);
 		if(iter == this->mRpcServers.end() || iter->second.empty())
 		{
 			return false;
 		}
-		address = iter->second.at(0);
-		int count = this->GetAllotCount(address);
-		for(const std::string & location : iter->second)
-		{
-			int num = this->GetAllotCount(location);
-			if(num <= 100)
-			{
-				address = location;
-				this->mAllotCount[address]++;
-				return true;
-			}
-			if(num < count)
-			{
-				address = location;
-			}
-		}
-		this->mAllotCount[address]++;
+		size_t index = Helper::Math::Random<size_t>(0, iter->second.size());
+		address = iter->second.at(index);
 		return true;
 	}
 
-	bool LocationComponent::DelUnit(long long id)
+	bool NodeMgrComponent::DelUnit(long long id)
 	{
 		auto iter = this->mUnitLocations.find(id);
 		if(iter == this->mUnitLocations.end())
@@ -142,7 +122,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool LocationComponent::AddUnit(std::unique_ptr<LocationUnit> locationUnit)
+	bool NodeMgrComponent::AddUnit(std::unique_ptr<LocationUnit> locationUnit)
 	{
 		if(locationUnit == nullptr)
 		{
@@ -158,14 +138,14 @@ namespace Sentry
 		return true;
 	}
 
-	bool LocationComponent::LateAwake()
+	bool NodeMgrComponent::LateAwake()
 	{
 		const ServerConfig * config = ServerConfig::Inst();
 		LOG_CHECK_RET_FALSE(config->GetMember("tran", this->mLocations));
 		return true;
 	}
 
-	bool LocationComponent::GetTranLocation(std::string& address)
+	bool NodeMgrComponent::GetTranLocation(std::string& address)
 	{
 		if(this->mLocations.empty())
 		{
@@ -175,7 +155,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool LocationComponent::GetTranLocation(long long userId, std::string& address)
+	bool NodeMgrComponent::GetTranLocation(long long userId, std::string& address)
 	{
 		if(this->mLocations.empty())
 		{
@@ -187,19 +167,19 @@ namespace Sentry
 		return true;
 	}
 
-	void LocationComponent::OnLocalComplete()
+	void NodeMgrComponent::OnLocalComplete()
 	{
 		const ServerConfig * config = ServerConfig::Inst();
-		LocationService * rpcService = this->GetComponent<LocationService>();
+		RpcService * rpcService = this->mApp->GetService<Registry>();
 		for(const std::string & address : this->mLocations)
 		{
-			s2s::cluster::server message;
+			s2s::server::info message;
 			message.set_name(config->Name());
 			config->GetLocation("rpc", *message.mutable_rpc());
 			config->GetLocation("http", *message.mutable_http());
 
-			std::shared_ptr<s2s::cluster::list> response
-				= std::make_shared<s2s::cluster::list>();
+			std::shared_ptr<s2s::server::list> response
+				= std::make_shared<s2s::server::list>();
 			if(rpcService->Call(address,"Register", message, response) != XCode::Successful)
 			{
 				LOG_ERROR("register to [" << address << "] error");
@@ -207,7 +187,7 @@ namespace Sentry
 			}
 			for(int index = 0; index < response->list_size(); index++)
 			{
-				const s2s::cluster::server & info = response->list(index);
+				const s2s::server::info & info = response->list(index);
 				{
 					this->AddRpcServer(info.name(), info.rpc());
 					this->AddHttpServer(info.name(), info.http());

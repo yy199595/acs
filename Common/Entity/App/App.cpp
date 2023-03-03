@@ -6,7 +6,7 @@
 #include"File/DirectoryHelper.h"
 #include"Service/LuaPhysicalService.h"
 #include"Component/ProtoComponent.h"
-#include"Component/LocationComponent.h"
+#include"Component/NodeMgrComponent.h"
 #include"Component/TextConfigComponent.h"
 #include"Component/NetThreadComponent.h"
 #include"Component/LaunchComponent.h"
@@ -225,7 +225,7 @@ namespace Sentry
     {
         std::vector<const NodeConfig *> configs;
         ClusterConfig::Inst()->GetNodeConfigs(configs);
-        LocationComponent *locationComponent = this->GetComponent<LocationComponent>();
+        NodeMgrComponent *locationComponent = this->GetComponent<NodeMgrComponent>();
 		if(locationComponent != nullptr)
 		{
 			for (const NodeConfig* nodeConfig : configs)
@@ -269,10 +269,4 @@ namespace Sentry
 		SetConsoleTitle(title.c_str());
 	}
 #endif
-
-	RpcService* App::GetService(const std::string& name)
-	{
-		auto iter = this->mServiceMap.find(name);
-		return iter != this->mServiceMap.end() ? iter->second : nullptr;
-	}
 }

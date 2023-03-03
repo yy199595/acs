@@ -45,7 +45,7 @@ namespace Sentry
 		std::string mServerName;
 		std::string mLocationAddress;
         std::vector<std::string> mServiceHosts;
-		class LocationComponent * mLocationComponent;
+		class NodeMgrComponent * mLocationComponent;
         class InnerNetMessageComponent* mMessageComponent;
     };
 }

@@ -42,6 +42,9 @@ if(__ENABLE_OPEN_SSL__)
 endif()
 if(__ENABLE_MYSQL__)
     include_directories(Libs/mysql/include)
+    LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/Libs/mysql/lib)
+    # http://cdn.tarsyun.com/src/mysql-connector-c-6.1.11-src.fixed.zip
+    #add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/mysql ${PROJECT_SOURCE_DIR}/Libs/bin/mysql)
 endif()
 #公共组件
 add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/lua ${PROJECT_SOURCE_DIR}/Libs/bin/lua)
@@ -52,9 +55,6 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/protobuf/cmake ${PROJECT_SOURCE_DIR}
 
 #LINK_DIRECTORIES(Libs/lib)
 LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/Libs/bin/lua)
-if(__ENABLE_MYSQL__)
-    LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/Libs/mysql/lib)
-endif()
 LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/Libs/bin/spdlog)
 LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/Libs/bin/protobuf)
 

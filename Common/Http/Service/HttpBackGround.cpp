@@ -6,7 +6,7 @@
 #include"Config/CodeConfig.h"
 #include"Service/Node.h"
 #include"google/protobuf/wrappers.pb.h"
-#include"Component/LocationComponent.h"
+#include"Component/NodeMgrComponent.h"
 namespace Sentry
 {
     bool HttpBackGround::OnStartService(HttpServiceRegister &serviceRegister)
@@ -28,9 +28,9 @@ namespace Sentry
 
 	int HttpBackGround::Hotfix(Json::Writer&response)
 	{
-		Node * innerService = this->GetComponent<Node>();
-		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
-		if(locationComponent == nullptr || innerService == nullptr)
+		RpcService * rpcService = this->mApp->GetService<Node>();
+		NodeMgrComponent * locationComponent = this->GetComponent<NodeMgrComponent>();
+		if(locationComponent == nullptr || rpcService == nullptr)
 		{
 			response.Add("error").Add("LocationComponent or InnerService Is Null");
 			return XCode::Failure;
@@ -39,7 +39,7 @@ namespace Sentry
 		locationComponent->GetServers(locations);
 		for(const std::string & location : locations)
 		{
-			int code = innerService->Call(location, "Hotfix");
+			int code = rpcService->Call(location, "Hotfix");
             response.Add(location.c_str()).Add(CodeConfig::Inst()->GetDesc(code));
 		}
 		return XCode::Successful;
@@ -68,7 +68,7 @@ namespace Sentry
 	int HttpBackGround::Info(Json::Writer&response)
     {
 		Node * innerService = this->GetComponent<Node>();
-		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
+		NodeMgrComponent * locationComponent = this->GetComponent<NodeMgrComponent>();
 		if(locationComponent == nullptr)
 		{
 			response.Add("error").Add("LocationComponent or InnerService Is Null");

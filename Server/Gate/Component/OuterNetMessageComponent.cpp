@@ -10,7 +10,7 @@
 #include"Component/InnerNetComponent.h"
 #include"Service/PhysicalService.h"
 #include"Component/ProtoComponent.h"
-#include"Component/LocationComponent.h"
+#include"Component/NodeMgrComponent.h"
 #include"Component/InnerNetMessageComponent.h"
 
 #include"Config/ClusterConfig.h"
@@ -25,7 +25,7 @@ namespace Sentry
 
 	bool OuterNetMessageComponent::LateAwake()
 	{
-		this->mLocationComponent = this->GetComponent<LocationComponent>();
+		this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
         this->mInnerMessageComponent = this->GetComponent<InnerNetMessageComponent>();
 		return true;
 	}

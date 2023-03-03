@@ -25,7 +25,7 @@ namespace Sentry
         int Forward(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
         class InnerNetComponent* mInnerComponent;
-        class LocationComponent * mLocationComponent;
+        class NodeMgrComponent * mLocationComponent;
     };
 }
 

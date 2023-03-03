@@ -3,7 +3,7 @@
 //
 
 #include "Log.h"
-
+#include "Component/LoggerComponent.h"
 namespace Sentry
 {
 	void Log::Init()
@@ -13,7 +13,7 @@ namespace Sentry
 
 	bool Log::OnStart()
 	{
-		BIND_COMMON_RPC_METHOD(Log::Push);
+		BIND_COMMON_RPC_METHOD(Log::Login);
 		return true;
 	}
 
@@ -22,7 +22,7 @@ namespace Sentry
 		return true;
 	}
 
-	int Log::Push(const s2s::log::push& request)
+	int Log::Login(const s2s::log::login& request)
 	{
 		return XCode::Successful;
 	}

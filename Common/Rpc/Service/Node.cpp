@@ -5,7 +5,7 @@
 #include"Node.h"
 #include"Config/ClusterConfig.h"
 #include"Component/InnerNetComponent.h"
-#include"Component/LocationComponent.h"
+#include"Component/NodeMgrComponent.h"
 #include"Component/TextConfigComponent.h"
 #include"Component/InnerNetMessageComponent.h"
 
@@ -26,7 +26,7 @@ namespace Sentry
         BIND_COMMON_RPC_METHOD(Node::Hotfix);
 		BIND_COMMON_RPC_METHOD(Node::RunInfo);
 		BIND_COMMON_RPC_METHOD(Node::LoadConfig);
-		this->mLocationComponent = this->GetComponent<LocationComponent>();
+		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
         return true;
     }
 
@@ -35,7 +35,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    int Node::Join(const s2s::cluster::server &request)
+    int Node::Join(const s2s::server::info &request)
 	{
 		const std::string & rpc = request.rpc();
 		const std::string & http = request.http();
@@ -45,12 +45,12 @@ namespace Sentry
 			LOG_ERROR("not find cluster config : " << name);
 			return XCode::Failure;
 		}
-		this->mLocationComponent->AddRpcServer(name, rpc);
-		this->mLocationComponent->AddHttpServer(name, http);
+		this->mNodeComponent->AddRpcServer(name, rpc);
+		this->mNodeComponent->AddHttpServer(name, http);
 		return XCode::Successful;
 	}
 
-    int Node::Exit(const s2s::cluster::server &response)
+    int Node::Exit(const s2s::server::info &response)
     {
         return XCode::Successful;
     }

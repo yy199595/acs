@@ -25,7 +25,7 @@ namespace Sentry
     private:
 		bool LateAwake() final;
 	 private:
-		class LocationComponent * mLocationComponent;
+		class NodeMgrComponent * mLocationComponent;
         std::unordered_map<std::string, long long> mTokens;
         class InnerNetMessageComponent * mInnerMessageComponent;
         std::unordered_map<std::string, long long> mUserAddressMap;

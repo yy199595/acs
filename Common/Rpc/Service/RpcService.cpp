@@ -5,7 +5,7 @@
 #include"String/StringHelper.h"
 #include"Config/ClusterConfig.h"
 #include"Component/InnerNetComponent.h"
-#include"Component/LocationComponent.h"
+#include"Component/NodeMgrComponent.h"
 #include"Component/InnerNetMessageComponent.h"
 #ifdef __RPC_DEBUG_LOG__
 #include<google/protobuf/util/json_util.h>
@@ -14,7 +14,7 @@ namespace Sentry
 {
 	bool RpcService::LateAwake()
 	{
-		this->mLocationComponent = this->GetComponent<LocationComponent>();
+		this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
 		this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>();
 		ClusterConfig::Inst()->GetServerName(this->GetName(), this->mServerName);
 		return ServerConfig::Inst()->GetLocation("rpc", this->mLocationAddress);

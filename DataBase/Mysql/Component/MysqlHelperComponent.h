@@ -7,28 +7,28 @@ namespace Sentry
 	 public:
 		MysqlHelperComponent() = default;
      public:
-		XCode Add(const Message & data, int flag);
+		int Add(const Message & data, int flag);
 
-		XCode Save(const Message & data, int flag);
+		int Save(const Message & data, int flag);
 
-		XCode QueryOnce(const std::string & json, std::shared_ptr<Message> response);
+		int QueryOnce(const std::string & json, std::shared_ptr<Message> response);
 
         template<typename T>
 		std::vector<std::shared_ptr<T>> QueryAll(const std::string& queryJson);
 
 		template<typename T>
-		XCode Delete(const std::string& deleteJson, int flag);
+		int Delete(const std::string& deleteJson, int flag);
 
-        XCode Delete(const std::string & table, const std::string& deleteJson, int flag);
+        int Delete(const std::string & table, const std::string& deleteJson, int flag);
 
         template<typename T>
-		XCode Update(const std::string& updateJson, const std::string& whereJson, int flag);
+		int Update(const std::string& updateJson, const std::string& whereJson, int flag);
 
-        XCode Update(const std::string & table, const std::string& updateJson, const std::string& whereJson, int flag);
+        int Update(const std::string & table, const std::string& updateJson, const std::string& whereJson, int flag);
 
     private:
 		bool LateAwake() final;
-		XCode Call(const std::string& func, const Message& data, std::shared_ptr<db::mysql::response> response = nullptr);
+		int Call(const std::string& func, const Message& data, std::shared_ptr<db::mysql::response> response = nullptr);
 	private:
         std::string mBindName;
 		std::string mServerName;
@@ -64,14 +64,14 @@ namespace Sentry
 	}
 
 	template<typename T>
-	XCode MysqlHelperComponent::Delete(const std::string& deleteJson, int flag)
+	int MysqlHelperComponent::Delete(const std::string& deleteJson, int flag)
 	{
         T data;
         return this->Delete(data.GetTypeName(), deleteJson, flag);
 	}
 
 	template<typename T>
-	XCode MysqlHelperComponent::Update(const std::string& updateJson, const std::string& whereJson, int flag)
+	int MysqlHelperComponent::Update(const std::string& updateJson, const std::string& whereJson, int flag)
 	{
         T data;
         return this->Update(data.GetTypeName(), whereJson, updateJson, flag);

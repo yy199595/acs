@@ -28,7 +28,9 @@ namespace Sentry
 	 public:
 		void Stop();
         int Run(int argc, char ** argv);
-        RpcService * GetService(const std::string & name);
+		template<typename T>
+		inline RpcService * GetService();
+		inline RpcService * GetService(const std::string & name);
         bool OnDelComponent(Component *component) final { return false; }
         inline bool IsMainThread() const { return this->mThreadId == std::this_thread::get_id();}
     private:
@@ -52,4 +54,17 @@ namespace Sentry
         std::unique_ptr<Asio::Context> mMainContext;
         std::unordered_map<std::string, RpcService*> mServiceMap;
     };
+
+	inline RpcService* App::GetService(const std::string& name)
+	{
+		auto iter = this->mServiceMap.find(name);
+		return iter != this->mServiceMap.end() ? iter->second : nullptr;
+	}
+	template<typename T>
+	inline RpcService* App::GetService()
+	{
+		const std::string name = ComponentFactory::GetName<T>();
+		auto iter = this->mServiceMap.find(name);
+		return iter != this->mServiceMap.end() ? iter->second : nullptr;
+	}
 }// namespace Sentry

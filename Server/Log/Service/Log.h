@@ -7,12 +7,12 @@
 #include"Service/PhysicalService.h"
 namespace Sentry
 {
-	class Log : public PhysicalService
+	class Log final : public PhysicalService
 	{
 	 public:
 		Log() = default;
 	 private:
-		int Push(const s2s::log::push & request);
+		int Login(const s2s::log::login & request);
 	 protected:
 		void Init() final;
 		bool OnStart() final;

@@ -6,7 +6,7 @@
 			"Node": true,
 			"ChatService": true,
 			"Gate": false,
-			"LocationService" : false
+			"Registry" : false
 		},
 		"Component": [
 			"LocationComponent",
@@ -20,7 +20,7 @@
 			"AccountService": true,
 			"HttpBackGround": true,
 			"Gate": false,
-			"LocationService" : false
+			"Registry" : false
 		},
 		"Component": [
 			"HttpComponent",
@@ -36,7 +36,7 @@
 			"Gate": true,
 			"Node": true,
 			"ChatService": false,
-			"LocationService" : false
+			"Registry" : false
 		},
 		"Component": [
 			"LocationComponent"
@@ -47,7 +47,7 @@
 		"Service": {
 			"MongoDB": true,
 			"Node": true,
-			"LocationService" : false
+			"Registry" : false
 		},
 		"Component": [
 			"LocationComponent"
@@ -57,7 +57,7 @@
 		"AutoAllot": false,
 		"Service": {
 			"Node": true,
-			"LocationService" : true
+			"Registry" : true
 		},
 		"Component": [
 				"TranComponent",

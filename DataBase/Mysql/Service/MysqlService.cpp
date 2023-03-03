@@ -3,9 +3,6 @@
 #include"Client/MysqlMessage.h"
 #include"Component/MysqlDBComponent.h"
 #include"Component/ProtoComponent.h"
-#ifdef __ENABLE_REDIS__
-#include"Component/DataSyncComponent.h"
-#endif
 namespace Sentry
 {
 
@@ -23,9 +20,6 @@ namespace Sentry
         BIND_COMMON_RPC_METHOD(MysqlService::Delete);
         BIND_COMMON_RPC_METHOD(MysqlService::Create);
         this->mMysqlComponent = this->GetComponent<MysqlDBComponent>();
-#ifdef __ENABLE_REDIS__
-        this->mSyncComponent = this->GetComponent<DataSyncComponent>();
-#endif
         LOG_CHECK_RET_FALSE(this->mProtoComponent = this->GetComponent<ProtoComponent>());
         this->mMysqlHelper = std::make_shared<MysqlHelper>(this->mProtoComponent);
         return this->mMysqlComponent->StartConnectMysql();
@@ -37,7 +31,7 @@ namespace Sentry
         return true;
     }
 
-    XCode MysqlService::Create(const db::mysql::create &request)
+    int MysqlService::Create(const db::mysql::create &request)
     {
         std::shared_ptr<Message> message = this->mProtoComponent->New(request.data());
         if (message == nullptr)
@@ -86,7 +80,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-	XCode MysqlService::Add(const db::mysql::add& request)
+	int MysqlService::Add(const db::mysql::add& request)
     {
         std::string sql;
         if (!this->mMysqlHelper->ToSqlCommand(request, sql))
@@ -101,30 +95,10 @@ namespace Sentry
         {
             return XCode::Failure;
         }
-#ifdef __ENABLE_REDIS__
-        if (this->mSyncComponent != nullptr && message != nullptr)
-        {
-            std::string fullName = message->GetTypeName();
-            auto iter = this->mMainKeys.find(fullName);
-            if(iter != this->mMainKeys.end())
-            {
-                std::string key, value;
-                const std::string & field = iter->second;
-                if (Helper::Protocol::GetMember(field, *message, key))
-                {
-                    std::string json;
-                    if (Helper::Protocol::GetJson(*message, &json))
-                    {
-                        this->mSyncComponent->Set(key, fullName, json);
-                    }
-                }
-            }
-        }
-#endif
         return XCode::Successful;
     }
 
-	XCode MysqlService::Save(const db::mysql::save& request)
+	int MysqlService::Save(const db::mysql::save& request)
     {
         std::string sql;
         if (!this->mMysqlHelper->ToSqlCommand(request, sql))
@@ -133,23 +107,7 @@ namespace Sentry
         }
 		MysqlClient * mysqlClient = this->mMysqlComponent->GetClient(request.flag());
 		std::shared_ptr<Mysql::SqlCommand> command = std::make_shared<Mysql::SqlCommand>(sql);
-#ifdef __ENABLE_REDIS__
-        std::shared_ptr<Message> message = this->mMysqlHelper->GetData();
-        if (this->mSyncComponent != nullptr && message != nullptr)
-        {
-            std::string fullName = message->GetTypeName();
-            auto iter = this->mMainKeys.find(fullName);
-            if(iter != this->mMainKeys.end())
-            {
-                std::string key;
-                const std::string & field = iter->second;
-                if (Helper::Protocol::GetMember(field, *message, key))
-                {
-                    this->mSyncComponent->Del(key, fullName);
-                }
-            }
-        }
-#endif
+
         if (!this->mMysqlComponent->Run(mysqlClient, command))
         {
             return XCode::Failure;
@@ -157,7 +115,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-	XCode MysqlService::Update(const db::mysql::update& request)
+	int MysqlService::Update(const db::mysql::update& request)
     {
         std::string sql;
         if (!this->mMysqlHelper->ToSqlCommand(request, sql))
@@ -165,17 +123,6 @@ namespace Sentry
             return XCode::CallArgsError;
         }
         const std::string & fullName = request.table();
-#ifdef __ENABLE_REDIS__
-        auto iter = this->mMainKeys.find(fullName);
-        if(this->mSyncComponent != nullptr && iter != this->mMainKeys.end())
-        {
-            std::string value;
-            if (this->mMysqlHelper->GetValue(iter->second, value))
-            {
-                this->mSyncComponent->Del(value, fullName);
-            }
-        }
-#endif
         MysqlClient * mysqlClient = this->mMysqlComponent->GetClient(request.flag());
 		std::shared_ptr<Mysql::SqlCommand> command = std::make_shared<Mysql::SqlCommand>(sql);
 
@@ -186,24 +133,13 @@ namespace Sentry
         return XCode::Successful;
     }
 
-	XCode MysqlService::Delete(const db::mysql::remove& request)
+	int MysqlService::Delete(const db::mysql::remove& request)
     {
         std::string sql;
         if (!this->mMysqlHelper->ToSqlCommand(request, sql))
         {
             return XCode::CallArgsError;
         }
-#ifdef __ENABLE_REDIS__
-        auto iter = this->mMainKeys.find(request.table());
-        if(this->mSyncComponent != nullptr && iter != this->mMainKeys.end())
-        {
-            std::string value;
-            if (this->mMysqlHelper->GetValue(iter->second, value))
-            {
-                this->mSyncComponent->Del(value, request.table());
-            }
-        }
-#endif
 
         MysqlClient * mysqlClient = this->mMysqlComponent->GetClient(request.flag());
 		std::shared_ptr<Mysql::SqlCommand> command = std::make_shared<Mysql::SqlCommand>(sql);
@@ -215,7 +151,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-	XCode MysqlService::Query(const db::mysql::query& request, db::mysql::response& response)
+	int MysqlService::Query(const db::mysql::query& request, db::mysql::response& response)
     {
 		std::shared_ptr<Mysql::QueryCommand> command;
 		const std::string & fullName = request.table();
@@ -249,23 +185,7 @@ namespace Sentry
         for (size_t index = 0; index < command->size(); index++)
 		{
 			Json::Writer* document = command->at(index);
-			std::string* json = response.add_jsons();
 			document->WriterStream(response.add_jsons());
-#ifdef __ENABLE_REDIS__
-			if (request.fields_size() == 0 && this->mSyncComponent != nullptr && iter != this->mMainKeys.end())
-			{
-				std::string value;
-				rapidjson::Document doc;
-				const std::string& field = iter->second;
-				if(doc.Parse(json->c_str(), json->size()).HasParseError())
-				{
-					if (this->mMysqlHelper->GetValue(doc, field, value))
-					{
-						this->mSyncComponent->Set(value, fullName, *json);
-					}
-				}
-			}
-#endif
 		}
 
         return XCode::Successful;

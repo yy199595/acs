@@ -18,15 +18,15 @@ namespace Sentry
 		int Stop();
 		int Hotfix();
 		int LoadConfig();
-		int Join(const s2s::cluster::server & request); //新服务器加入
-		int Exit(const s2s::cluster::server & response); //新服务器加入
+		int Join(const s2s::server::info & request); //新服务器加入
+		int Exit(const s2s::server::info & response); //新服务器加入
 		int RunInfo(google::protobuf::StringValue & response); // 获取运行信息
 	 private:
         void Init() final;
         bool OnStart() final;
         bool OnClose() final { return false; }
     private:
-        class LocationComponent * mLocationComponent;
+        class NodeMgrComponent * mNodeComponent;
     };
 }
 

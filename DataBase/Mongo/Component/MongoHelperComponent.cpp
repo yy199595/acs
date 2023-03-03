@@ -5,14 +5,14 @@
 #include"MongoHelperComponent.h"
 #include"Service/MongoDB.h"
 #include"Config/ClusterConfig.h"
-#include"Component/LocationComponent.h"
+#include"Component/NodeMgrComponent.h"
 namespace Sentry
 {
 	bool MongoHelperComponent::LateAwake()
     {
         this->mServiceName = ComponentFactory::GetName<MongoDB>();
         LOG_CHECK_RET_FALSE(this->GetComponent<MongoDB>() != nullptr);
-        this->mLocationComponent = this->GetComponent<LocationComponent>();
+        this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
         return ClusterConfig::Inst()->GetServerName(this->mServiceName, this->mServerName);
     }
 

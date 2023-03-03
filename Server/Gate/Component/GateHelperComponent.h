@@ -28,7 +28,7 @@ namespace Sentry
 	 private:
 		 std::string mGateServerName;
         class InnerNetComponent * mInnerComponent;
-		class LocationComponent * mLocationComponent;
+		class NodeMgrComponent * mLocationComponent;
 	};
 }
 

@@ -11,11 +11,11 @@
 
 namespace Sentry
 {
-	class LocationComponent : public Component, public IComplete
+	class NodeMgrComponent final : public Component, public IComplete
     {
     public:
-        LocationComponent() = default;
-        ~LocationComponent() = default;
+        NodeMgrComponent() = default;
+        ~NodeMgrComponent() = default;
     public:
         bool DelServer(const std::string& address);
 		void WaitServerStart(const std::string & server);//等待某个服务器启动
@@ -32,14 +32,12 @@ namespace Sentry
 	 public:
 		bool LateAwake() final;
 		void OnLocalComplete() final;
-		int GetAllotCount(const std::string & address) const;
 		bool GetServers(std::vector<std::string> & hosts);
 		bool GetServers(const std::string & server, std::vector<std::string> & hosts);
 	 private:
 		std::vector<std::string> mLocations;
-		std::unordered_map<std::string, int> mAllotCount;
         std::unordered_map<std::string, std::vector<std::string>> mRpcServers;
-        std::unordered_map<std::string, std::vector<std::string>> mHttpServers;
+        //std::unordered_map<std::string, std::vector<std::string>> mHttpServers;
         std::unordered_map<long long, std::unique_ptr<LocationUnit>> mUnitLocations;
     };
 }

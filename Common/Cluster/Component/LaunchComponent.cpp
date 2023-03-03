@@ -12,7 +12,7 @@
 #include"Service/PhysicalService.h"
 #include"Service/LocalHttpService.h"
 #include"Service/LuaHttpService.h"
-#include"Component/LocationComponent.h"
+#include"Component/NodeMgrComponent.h"
 namespace Sentry
 {
     bool LaunchComponent::Awake()
@@ -91,7 +91,7 @@ namespace Sentry
     {
         const ServerConfig * config = ServerConfig::Inst();
         const ClusterConfig * clusterConfig  = ClusterConfig::Inst();
-        LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
+        NodeMgrComponent * locationComponent = this->GetComponent<NodeMgrComponent>();
 
 		std::string location, httpLocation;
 		std::vector<std::string> components;

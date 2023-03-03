@@ -1,9 +1,9 @@
 {
 	"Log": {
-		"Push": {
+		"Login": {
 			"Async": false,
 			"Type": "Server",
-			"Request": "s2s.log.push"
+			"Request": "s2s.log.login"
 		}
 	},
 	"Gate": {
@@ -14,19 +14,11 @@
 			"Response": "s2s.allot.response"
 		}
 	},
-	"LocationService": {
-		"Add": {
-			"Async": false,
-			"Request": "s2s.location.add"
-		},
-		"Del": {
-			"Async": false,
-			"Request": "s2s.location.del"
-		},
+	"Registry": {
 		"Register": {
 			"Async": true,
-			"Request": "s2s.cluster.server",
-			"Response": "s2s.cluster.list"
+			"Request": "s2s.server.info",
+			"Response": "s2s.server.list"
 		}
 	},
 	"MysqlService": {
@@ -77,11 +69,11 @@
 		},
 		"Join": {
 			"Async": false,
-			"Request": "s2s.cluster.server"
+			"Request": "s2s.server.info"
 		},
 		"Exit": {
 			"Async": false,
-			"Request": "s2s.cluster.server"
+			"Request": "s2s.server.info"
 		},
 		"RunInfo": {
 			"Async": false,

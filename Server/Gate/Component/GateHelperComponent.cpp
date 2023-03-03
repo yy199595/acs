@@ -6,7 +6,7 @@
 #include"Service/Gate.h"
 #include"Lua/LuaParameter.h"
 #include"Config/ClusterConfig.h"
-#include"Component/LocationComponent.h"
+#include"Component/NodeMgrComponent.h"
 #include"Component/InnerNetComponent.h"
 #include"Component/ComponentFactory.h"
 namespace Sentry
@@ -15,7 +15,7 @@ namespace Sentry
 	{
 		LOG_CHECK_FATAL(this->GetComponent<Gate>());
         this->mInnerComponent = this->GetComponent<InnerNetComponent>();
-		this->mLocationComponent = this->GetComponent<LocationComponent>();
+		this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
 		const std::string name = ComponentFactory::GetName<Gate>();
 		return ClusterConfig::Inst()->GetServerName(name, this->mGateServerName);
 	}

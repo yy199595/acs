@@ -8,7 +8,7 @@
 			"Gate": true,
 			"MongoDB": true,
 			"ChatService": true,
-			"LocationService":true,
+			"Registry":true,
 			"HttpBackGround": true,
 			"AccountService": true,
 			"HttpDebug": true

@@ -1,8 +1,8 @@
 syntax = "proto3";
 package s2s;
-message cluster
+message server
 {
-    message server
+    message info
     {
         string name = 1;
         string rpc = 2;
@@ -10,7 +10,7 @@ message cluster
     }
     message list
     {
-        repeated server list = 1;
+        repeated info list = 1;
     }
 }
 
@@ -28,13 +28,18 @@ message user
 
 message log
 {
-    message push
+    message login
     {
-        string name = 1;
-        int64 time = 2;
-        int32 level = 3;
-        string content = 4;
-        string address = 5;
+        int64 user_id = 1;
+        string user_ip = 2;
+        int64 login_time = 3;
+        string server_ip = 4;
+    }
+    message behavior
+    {
+        int64 user_id = 1;
+        int32 type = 2;
+        string address = 3;
     }
 }
 

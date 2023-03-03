@@ -20,7 +20,7 @@ namespace Sentry
         bool OnStart() final;
         bool OnClose() final { return false; }
     private:
-		class LocationComponent * mLocationComponent;
+		class NodeMgrComponent * mLocationComponent;
         class InnerNetComponent * mInnerNetComponent;
     };
 }

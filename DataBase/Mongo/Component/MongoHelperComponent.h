@@ -33,7 +33,7 @@ namespace Sentry
         db::mongo::insert mInsertRequest;
         db::mongo::remove mRemoveRequest;
 		db::mongo::query::request mQueryRequest;
-		class LocationComponent * mLocationComponent;
+		class NodeMgrComponent * mLocationComponent;
 	};
 }
 

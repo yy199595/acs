@@ -9,7 +9,7 @@
 #include"String/StringHelper.h"
 #include"Async/RpcTaskSource.h"
 #include"Component/ProtoComponent.h"
-#include"Component/LocationComponent.h"
+#include"Component/NodeMgrComponent.h"
 #include"Component/InnerNetMessageComponent.h"
 using namespace Sentry;
 namespace Lua
@@ -44,7 +44,7 @@ namespace Lua
 				luaL_error(lua, "not find config %s", fullName.c_str());
 				return 0;
 			}
-			LocationComponent * locationComponent = App::Inst()->GetComponent<LocationComponent>();
+			NodeMgrComponent * locationComponent = App::Inst()->GetComponent<NodeMgrComponent>();
             const LocationUnit * locationUnit = locationComponent->GetUnit(userId);
             if(locationUnit == nullptr || (!locationUnit->Get(methodConfig->Service, address)))
             {
@@ -120,7 +120,7 @@ namespace Lua
 	int Service::AllotServer(lua_State *lua)
 	{
 		const std::string service = luaL_checkstring(lua, 1);
-		LocationComponent * locationComponent = App::Inst()->GetComponent<LocationComponent>();
+		NodeMgrComponent * locationComponent = App::Inst()->GetComponent<NodeMgrComponent>();
 		if(lua_isinteger(lua, 2))
 		{
 			std::string address;
@@ -177,7 +177,7 @@ namespace Lua
                 luaL_error(lua, "not find config %s", fullName.c_str());
                 return 0;
             }
-            LocationComponent* locationComponent = App::Inst()->GetComponent<LocationComponent>();
+            NodeMgrComponent* locationComponent = App::Inst()->GetComponent<NodeMgrComponent>();
             const LocationUnit* locationUnit = locationComponent->GetUnit(userId);
             if (locationUnit == nullptr || (!locationUnit->Get(methodConfig->Service, address)))
             {
@@ -267,7 +267,7 @@ namespace Lua
         {
             return 0;
         }
-        LocationComponent* locationComponent = App::Inst()->GetComponent<LocationComponent>();
+        NodeMgrComponent* locationComponent = App::Inst()->GetComponent<NodeMgrComponent>();
         if (locationComponent != nullptr && locationComponent->GetServers(server, servers))
         {
             lua_newtable(lua);

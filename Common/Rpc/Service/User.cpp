@@ -4,7 +4,7 @@
 
 #include"User.h"
 #include"Component/InnerNetComponent.h"
-#include"Component/LocationComponent.h"
+#include"Component/NodeMgrComponent.h"
 #include"Component/GateHelperComponent.h"
 namespace Sentry
 {
@@ -18,7 +18,7 @@ namespace Sentry
     {
         BIND_COMMON_RPC_METHOD(User::Login);
         BIND_COMMON_RPC_METHOD(User::Logout);
-		this->mLocationComponent = this->GetComponent<LocationComponent>();
+		this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
         this->mInnerNetComponent = this->GetComponent<InnerNetComponent>();
         return true;
     }
