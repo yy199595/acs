@@ -4,11 +4,11 @@
 
 #ifndef APP_INNERSERVICE_H
 #define APP_INNERSERVICE_H
-#include"LocalRpcService.h"
+#include"PhysicalService.h"
 #include"google/protobuf/wrappers.pb.h"
 namespace Sentry
 {
-    class InnerService : public LocalRpcService
+    class InnerService : public PhysicalService
     {
     public:
         InnerService() = default;

@@ -4,7 +4,7 @@
 #include"Timer/ElapsedTimer.h"
 #include"Config/ClusterConfig.h"
 #include"File/DirectoryHelper.h"
-#include"Service/LuaRpcService.h"
+#include"Service/LuaPhysicalService.h"
 #include"Component/ProtoComponent.h"
 #include"Component/LocationComponent.h"
 #include"Component/TextConfigComponent.h"

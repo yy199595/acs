@@ -8,23 +8,25 @@
 using namespace Helper;
 namespace Sentry
 {
-    class LoggerComponent final : public Component, public IZeroRefresh
+    class LoggerComponent final : public Component, public ISecondUpdate
 	{
 	 public:
 		LoggerComponent() = default;
 	 public:
 		void SaveAllLog();
-		void AddLog(spdlog::level::level_enum type, const std::string& log);
-    protected:
+		void PushLog(spdlog::level::level_enum type, const std::string& log);
+		void PushLog(const std::string & name, spdlog::level::level_enum type, const std::string& log);
+	 protected:
 		bool Awake() final;
-		void OnDestory() final;
-		void OnZeroRefresh() final;
-	public:
-		void CreateLogFile();
+		void OnDestroy() final;
+		void OnSecondUpdate(const int tick) final;
+	 private:
+		std::shared_ptr<spdlog::logger> GetLogger(const std::string & name);
 	 private:
 		int mLogSaveTime;
+		time_t mLastTime;
 		std::string mServerName;
 		std::string mLogSavePath;
-		std::shared_ptr<spdlog::logger> mAllLog;
+		std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> mLoggers;
 	};
 }

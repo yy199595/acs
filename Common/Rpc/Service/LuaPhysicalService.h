@@ -8,10 +8,10 @@ namespace Sentry
 {
 	class LuaScriptComponent;
 	class ServiceMethodRegister;
-	class LuaRpcService : public RpcService
+	class LuaPhysicalService : public RpcService
 	{
 	 public:
-		LuaRpcService();
+		LuaPhysicalService();
 	 protected:
 		bool LateAwake() final;
 	 public:
@@ -19,8 +19,8 @@ namespace Sentry
         bool Start() final;
 		bool LoadFromLua() final;
         void WaitAllMessageComplete() final;
-        int GetWaitMessageCount() const final { return this->mWaitCount; };
-        bool IsStartService() final { return this->mMethodRegister != nullptr; }
+		bool IsStartService() final { return true; }
+		int GetWaitMessageCount() const final { return this->mWaitCount; };
 		XCode Invoke(const std::string& name, std::shared_ptr<Rpc::Packet> message) final;
 
     private:
@@ -28,6 +28,6 @@ namespace Sentry
         int mWaitCount;
         bool mIsHandlerMessage;
         class LuaScriptComponent* mLuaComponent;
-		std::shared_ptr<ServiceMethodRegister> mMethodRegister;
+		std::unique_ptr<ServiceMethodRegister> mMethodRegister;
 	};
 }// namespace Sentry

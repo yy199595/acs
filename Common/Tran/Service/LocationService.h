@@ -4,10 +4,10 @@
 
 #ifndef APP_LOCATIONSERVICE_H
 #define APP_LOCATIONSERVICE_H
-#include"Service/LocalRpcService.h"
+#include"Service/PhysicalService.h"
 namespace Sentry
 {
-    class LocationService : public LocalRpcService
+    class LocationService : public PhysicalService
     {
     public:
         LocationService() = default;

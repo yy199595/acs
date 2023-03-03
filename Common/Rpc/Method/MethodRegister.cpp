@@ -5,7 +5,7 @@
 #include"MethodRegister.h"
 #include"App/App.h"
 #include"Lua/LuaServiceMethod.h"
-#include"Service/LocalRpcService.h"
+#include"Service/PhysicalService.h"
 #include"Component/ProtoComponent.h"
 namespace Sentry
 {

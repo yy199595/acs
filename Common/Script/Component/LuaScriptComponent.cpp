@@ -266,7 +266,7 @@ namespace Sentry
 		}
     }
 
-	void LuaScriptComponent::OnDestory()
+	void LuaScriptComponent::OnDestroy()
 	{
 		if (this->mLuaEnv != nullptr)
 		{

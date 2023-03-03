@@ -49,7 +49,7 @@ namespace Sentry
 
 		virtual bool LateAwake() { return true;}; // 所有组件加载完成之后调用
 
-		virtual void OnDestory() { }
+		virtual void OnDestroy() { }
 	protected:
 		template<typename T>
 		T* GetComponent();

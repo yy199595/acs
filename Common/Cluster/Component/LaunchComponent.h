@@ -8,7 +8,7 @@
 
 namespace Sentry
 {
-    class LaunchComponent : public Component, public IStart
+    class LaunchComponent final : public Component, public IStart
     {
     public:
         LaunchComponent() = default;

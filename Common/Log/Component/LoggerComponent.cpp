@@ -12,60 +12,104 @@ namespace Sentry
 	// 单线程  st  多线程  mt
 	bool LoggerComponent::Awake()
 	{
+		this->mLastTime = 0;
 		this->mLogSaveTime = 3;
         this->mServerName = ServerConfig::Inst()->Name();
         this->mLogSavePath = fmt::format("{0}/log", System::WorkPath());
-		this->CreateLogFile();
         return true;
 	}
 
-	void LoggerComponent::OnZeroRefresh()
+	void LoggerComponent::OnSecondUpdate(const int tick)
 	{
-		this->CreateLogFile();
+		long long now = Helper::Time::NowSecTime();
+		if(!Helper::Time::IsSameDay(now, this->mLastTime))
+		{
+			auto iter = this->mLoggers.begin();
+			for(;iter != this->mLoggers.end(); iter++)
+			{
+				iter->second->flush();
+				spdlog::drop(iter->first);
+			}
+			this->mLoggers.clear();
+		}
+		this->mLastTime = now;
 	}
 
-	void LoggerComponent::OnDestory()
+	void LoggerComponent::OnDestroy()
 	{
 		this->SaveAllLog();
 	}
 
 	void LoggerComponent::SaveAllLog()
 	{
-		this->mAllLog->flush();
+		auto iter = this->mLoggers.begin();
+		for(; iter != this->mLoggers.end(); iter++)
+		{
+			iter->second->flush();
+		}
 		spdlog::drop_all();
 	}
 
-	void LoggerComponent::AddLog(spdlog::level::level_enum type, const std::string& log)
+	void LoggerComponent::PushLog(spdlog::level::level_enum type, const std::string& log)
     {
-        this->mAllLog->log(type, log);
-        switch (type)
-        {
-		case spdlog::level::level_enum::debug:
-		case spdlog::level::level_enum::info:
-		case spdlog::level::level_enum::warn:
-                break;
-            case spdlog::level::level_enum::err:
-				this->mAllLog->flush();
-                break;
-            case spdlog::level::level_enum::critical:
-				this->mAllLog->flush();
-                break;
-            default:
-                break;
-        }
+		const std::string & name = ServerConfig::Inst()->Name();
+		std::shared_ptr<spdlog::logger> logger = this->GetLogger(name);
+		if(logger != nullptr)
+		{
+			logger->log(type, log);
+			switch (type)
+			{
+			case spdlog::level::level_enum::debug:
+			case spdlog::level::level_enum::info:
+			case spdlog::level::level_enum::warn:
+				break;
+			case spdlog::level::level_enum::err:
+				logger->flush();
+				break;
+			case spdlog::level::level_enum::critical:
+				logger->flush();
+				break;
+			default:
+				break;
+			}
+		}
     }
 
-	void LoggerComponent::CreateLogFile()
+	void LoggerComponent::PushLog(const std::string& name,
+		spdlog::level::level_enum type, const std::string& log)
 	{
-		spdlog::shutdown();
-        spdlog::set_level(spdlog::level::debug);
-        const std::string & name = ServerConfig::Inst()->Name();
-        spdlog::flush_every(std::chrono::seconds(this->mLogSaveTime));
-		std::string logPath = fmt::format("{0}/{1}/{2}", this->mLogSavePath,
-			Helper::Time::GetYearMonthDayString(), this->mServerName);
+		std::shared_ptr<spdlog::logger> logger = this->GetLogger(name);
+		if(logger == nullptr)
+		{
+			return;
+		}
+		logger->log(type, log);
+	}
 
-		spdlog::set_level(spdlog::level::level_enum::debug);
-		this->mAllLog = spdlog::rotating_logger_st<spdlog::async_factory>(name,
-			logPath + "/all.log", LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
+	std::shared_ptr<spdlog::logger> LoggerComponent::GetLogger(const std::string& name)
+	{
+		auto iter = this->mLoggers.find(name);
+		if(iter == this->mLoggers.end())
+		{
+			try
+			{
+				spdlog::flush_every(std::chrono::seconds(this->mLogSaveTime));
+				std::string logPath = fmt::format("{0}/{1}/{2}", this->mLogSavePath,
+					Helper::Time::GetYearMonthDayString(), this->mServerName);
+
+				const std::string path = fmt::format("{0}/{1}.log", logPath, name);
+
+				std::shared_ptr<spdlog::logger> logger =
+					spdlog::rotating_logger_st<spdlog::async_factory>(name,
+						path, LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
+				this->mLoggers.emplace(name, logger);
+				return logger;
+			}
+			catch(spdlog::spdlog_ex & ex)
+			{
+				return nullptr;
+			}
+		}
+		return iter->second;
 	}
 }

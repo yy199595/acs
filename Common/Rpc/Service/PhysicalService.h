@@ -11,15 +11,15 @@
 
 namespace Sentry
 {
-    class LocalRpcService : public RpcService, public IServerRecord
+    class PhysicalService : public RpcService, public IServerRecord
 	{
 	public:
-		LocalRpcService();
+		PhysicalService();
 	public:
 		bool Start() final;
 		bool Close() final;
-        int GetWaitMessageCount() const final { return this->mWaitCount; }
-		bool IsStartService() { return this->mMethodRegister != nullptr; }
+		bool IsStartService() final { return true; }
+		int GetWaitMessageCount() const final { return this->mWaitCount; }
 		XCode Invoke(const std::string &func, std::shared_ptr<Rpc::Packet> message) final;
     protected:
         bool LoadFromLua() final;
@@ -32,7 +32,7 @@ namespace Sentry
         unsigned int mSumCount;
         unsigned int mWaitCount;
         bool mIsHandlerMessage;
-		std::shared_ptr<ServiceMethodRegister> mMethodRegister;
+		std::unique_ptr<ServiceMethodRegister> mMethodRegister;
 	};
     extern std::string GET_FUNC_NAME(std::string fullName);
 #define BIND_COMMON_RPC_METHOD(func) LOG_CHECK_RET_FALSE(this->GetMethodRegistry().Bind(GET_FUNC_NAME(#func), &func));

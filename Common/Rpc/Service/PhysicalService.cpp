@@ -4,7 +4,7 @@
 
 #include "Method/MethodRegister.h"
 
-#include"LocalRpcService.h"
+#include"PhysicalService.h"
 #include"App/App.h"
 #include"Config/ServiceConfig.h"
 #include"Lua/LuaServiceMethod.h"
@@ -18,14 +18,14 @@ namespace Sentry
         return fullName.substr(pos + 2);
     }
 
-    LocalRpcService::LocalRpcService()
+    PhysicalService::PhysicalService()
     {
         this->mSumCount = 0;
         this->mWaitCount = 0;
         this->mIsHandlerMessage = false;
     }
 
-    void LocalRpcService::WaitAllMessageComplete()
+    void PhysicalService::WaitAllMessageComplete()
     {
         int time = 0;
         this->mIsHandlerMessage = false;
@@ -39,7 +39,7 @@ namespace Sentry
         }
         CONSOLE_LOG_ERROR(this->GetName() << " handler all message complete");
     }
-    XCode LocalRpcService::Invoke(const std::string &func, std::shared_ptr<Rpc::Packet> message)
+    XCode PhysicalService::Invoke(const std::string &func, std::shared_ptr<Rpc::Packet> message)
     {
         if (!this->IsStartService())
         {
@@ -68,9 +68,9 @@ namespace Sentry
         return code;
     }
 
-	bool LocalRpcService::Start()
+	bool PhysicalService::Start()
 	{
-        this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
+        this->mMethodRegister = std::make_unique<ServiceMethodRegister>(this);
         const RpcServiceConfig * rpcServiceConfig = RpcConfig::Inst()->GetConfig(this->GetName());
 		LOG_CHECK_RET_FALSE(rpcServiceConfig != nullptr && this->OnStart());
 
@@ -89,13 +89,13 @@ namespace Sentry
 		return true;
 	}
 
-    void LocalRpcService::OnRecord(Json::Writer&document)
+    void PhysicalService::OnRecord(Json::Writer&document)
     {    
         document.Add("sum").Add(this->mSumCount);
         document.Add("wait").Add(this->mWaitCount);
     }
 
-    bool LocalRpcService::LoadFromLua()
+    bool PhysicalService::LoadFromLua()
 	{
 		LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();       
         if (luaScriptComponent == nullptr)
@@ -136,7 +136,7 @@ namespace Sentry
 		}
 	}
 
-	bool LocalRpcService::Close()
+	bool PhysicalService::Close()
     {
         if (!this->IsStartService() || !this->OnClose())
         {

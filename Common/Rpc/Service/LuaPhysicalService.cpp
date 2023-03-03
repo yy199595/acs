@@ -1,4 +1,4 @@
-﻿#include"LuaRpcService.h"
+﻿#include"LuaPhysicalService.h"
 #include"Lua/Function.h"
 #include"Module/LuaModule.h"
 #include"Lua/LuaServiceMethod.h"
@@ -7,17 +7,17 @@
 #include"Method/MethodRegister.h"
 namespace Sentry
 {
-	LuaRpcService::LuaRpcService()
+	LuaPhysicalService::LuaPhysicalService()
 	{
         this->mWaitCount = 0;
         this->mLuaComponent = nullptr;
         this->mIsHandlerMessage = false;
 	}
 
-	bool LuaRpcService::Start()
+	bool LuaPhysicalService::Start()
 	{
         std::vector<const RpcMethodConfig *> rpcInterConfigs;
-        this->mMethodRegister = std::make_shared<ServiceMethodRegister>(this);
+        this->mMethodRegister = std::make_unique<ServiceMethodRegister>(this);
         const RpcServiceConfig * rpcServiceConfig = RpcConfig::Inst()->GetConfig(this->GetName());
         LOG_CHECK_RET_FALSE(rpcServiceConfig && rpcServiceConfig->GetMethodConfigs(rpcInterConfigs) > 0);
 		Lua::LuaModule * luaModule = this->mLuaComponent->GetModule(this->GetName());
@@ -43,7 +43,7 @@ namespace Sentry
         this->mIsHandlerMessage = true;
         return true;
 	}
-	XCode LuaRpcService::Invoke(const std::string &name, std::shared_ptr<Rpc::Packet> message)
+	XCode LuaPhysicalService::Invoke(const std::string &name, std::shared_ptr<Rpc::Packet> message)
 	{
 		if(!this->IsStartService())
 		{
@@ -65,7 +65,7 @@ namespace Sentry
         return code;
 	}
 
-    void LuaRpcService::WaitAllMessageComplete()
+    void LuaPhysicalService::WaitAllMessageComplete()
     {
         this->mIsHandlerMessage = false;
         TaskComponent *taskComponent = this->mApp->GetTaskComponent();
@@ -78,7 +78,7 @@ namespace Sentry
         CONSOLE_LOG_ERROR(this->GetName() << " handler all message complete");
     }
 
-	bool LuaRpcService::LateAwake()
+	bool LuaPhysicalService::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(RpcService::LateAwake());
 		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
@@ -91,12 +91,12 @@ namespace Sentry
 		return luaModule->Awake();
 	}
 
-	bool LuaRpcService::LoadFromLua()
+	bool LuaPhysicalService::LoadFromLua()
 	{
 		return true;
 	}
 
-	bool LuaRpcService::Close()
+	bool LuaPhysicalService::Close()
 	{
         Lua::LuaModule* luaModule = this->mLuaComponent->GetModule(this->GetName());
         return luaModule == nullptr || luaModule->Close();

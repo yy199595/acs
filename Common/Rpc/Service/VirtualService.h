@@ -7,11 +7,11 @@
 #include"RpcService.h"
 namespace Sentry
 {
-	class ServiceRpcComponent : public RpcService
+	class VirtualService final : public RpcService
 	{
 	 public:
-		ServiceRpcComponent() = default;
-		~ServiceRpcComponent() = default;
+		VirtualService() = default;
+		~VirtualService() = default;
 	 private:
 		bool Start() final { return false;}
 		bool Close() final { return false;}

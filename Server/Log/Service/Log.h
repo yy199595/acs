@@ -4,10 +4,10 @@
 
 #ifndef _LOG_H_
 #define _LOG_H_
-#include"Service/LocalRpcService.h"
+#include"Service/PhysicalService.h"
 namespace Sentry
 {
-	class Log : public LocalRpcService
+	class Log : public PhysicalService
 	{
 	 public:
 		Log() = default;

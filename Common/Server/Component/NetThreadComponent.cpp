@@ -88,7 +88,7 @@ namespace Sentry
         return true;
     }
 
-	void NetThreadComponent::OnDestory()
+	void NetThreadComponent::OnDestroy()
 	{
 
 	}

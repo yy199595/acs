@@ -33,13 +33,13 @@ void Debug::Log(Debug::Level color, const std::string &log)
                 std::string trace;
                 Debug::Backtrace(trace, 15, 2);
                 Debug::Console(color, log + trace);
-                logComponent->AddLog(color, log + trace);
+				logComponent->PushLog(color, log + trace);
             }
                 break;
             default:
             {
                 Debug::Console(color, log);
-                logComponent->AddLog(color, log);
+				logComponent->PushLog(color, log);
             }
                 break;
         }

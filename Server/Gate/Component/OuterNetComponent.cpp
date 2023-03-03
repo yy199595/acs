@@ -163,7 +163,7 @@ namespace Sentry
         this->mOuterMessageComponent->OnClose(address);
     }
 
-    void OuterNetComponent::OnDestory()
+    void OuterNetComponent::OnDestroy()
     {
 
     }

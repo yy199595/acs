@@ -30,7 +30,7 @@ namespace Sentry
 	 public:
 		bool Awake() final;
 		bool LateAwake() final;
-        void OnDestory() final;
+        void OnDestroy() final;
         void OnClusterComplete() final;
 	 private:
         void OnRecord(Json::Writer & document) final;

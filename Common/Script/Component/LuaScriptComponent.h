@@ -25,7 +25,7 @@ namespace Sentry
 		bool Awake() final;
 		bool Start() final;
 		bool LateAwake() final;
-		void OnDestory() final;
+		void OnDestroy() final;
 		void OnLocalComplete() final;
 		void OnClusterComplete() final;
         void OnSecondUpdate(const int tick) final;

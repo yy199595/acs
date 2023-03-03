@@ -27,7 +27,7 @@ namespace Sentry
 	 public:
 		bool Awake() final;
 		bool LateAwake() final;
-		void OnDestory() final;
+		void OnDestroy() final;
     public:
         std::shared_ptr<SocketProxy> CreateSocket();
 		std::shared_ptr<SocketProxy> CreateSocket(const std::string & address);

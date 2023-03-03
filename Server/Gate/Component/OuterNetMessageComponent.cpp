@@ -8,7 +8,7 @@
 #include"OuterNetComponent.h"
 #include"Md5/MD5.h"
 #include"Component/InnerNetComponent.h"
-#include"Service/LocalRpcService.h"
+#include"Service/PhysicalService.h"
 #include"Component/ProtoComponent.h"
 #include"Component/LocationComponent.h"
 #include"Component/InnerNetMessageComponent.h"

@@ -4,10 +4,10 @@
 
 #ifndef APP_USERBEHAVIOR_H
 #define APP_USERBEHAVIOR_H
-#include"LocalRpcService.h"
+#include"PhysicalService.h"
 namespace Sentry
 {
-    class UserBehavior : public LocalRpcService
+    class UserBehavior : public PhysicalService
     {
     public:
         UserBehavior() = default;

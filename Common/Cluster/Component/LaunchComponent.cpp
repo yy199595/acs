@@ -7,9 +7,9 @@
 #include"File/FileHelper.h"
 #include"System/System.h"
 #include"Config/ClusterConfig.h"
-#include"Service/ServiceRpcComponent.h"
-#include"Service/LuaRpcService.h"
-#include"Service/LocalRpcService.h"
+#include"Service/VirtualService.h"
+#include"Service/LuaPhysicalService.h"
+#include"Service/PhysicalService.h"
 #include"Service/LocalHttpService.h"
 #include"Service/LuaHttpService.h"
 #include"Component/LocationComponent.h"
@@ -39,43 +39,44 @@ namespace Sentry
             {
                 const RpcServiceConfig * rpcServiceConfig = RpcConfig::Inst()->GetConfig(name);
                 const HttpServiceConfig * httpServiceConfig = HttpConfig::Inst()->GetConfig(name);
-                if(!this->mApp->AddComponent(name))
-                {
-                    if(rpcServiceConfig != nullptr)
-                    {
-                        if(nodeConfig->IsStart(name)) //使用lua启动
-                        {
-                            std::unique_ptr<Component> component(new LuaRpcService());
-                            if(!this->mApp->AddComponent(name, std::move(component)))
-                            {
-                                LOG_ERROR("add start rpc service [" << name << "] error");
-                                return false;
-                            }
-                        }
-                        else
-                        {
-                            std::unique_ptr<Component> component(new ServiceRpcComponent());
-                            if(!this->mApp->AddComponent(name, std::move(component)))
-                            {
-                                LOG_ERROR("add not start rpc service [" << name << "] error");
-                                return false;
-                            }
-                        }
-                    }
-                    else if(httpServiceConfig != nullptr && nodeConfig->IsStart(name))
-                    {
-                        std::unique_ptr<Component> component(new LuaHttpService());
-                        if(!this->mApp->AddComponent(name, std::move(component)))
-                        {
-                            LOG_ERROR("add http service [" << name << "] error");
-                            return false;
-                        }
-                    }
-					else
+				LOG_CHECK_RET_FALSE(rpcServiceConfig != nullptr || httpServiceConfig != nullptr);
+				if(rpcServiceConfig != nullptr)
+				{
+					//创建实体服务
+					if(nodeConfig->IsStart(name))
 					{
-						return false;
+						if(!this->mApp->AddComponent(name))
+						{
+							std::unique_ptr<Component> component(new LuaPhysicalService());
+							if (!this->mApp->AddComponent(name, std::move(component)))
+							{
+								LOG_ERROR("add physical service [" << name << "] error");
+								return false;
+							}
+						}
 					}
-                }
+					else //创建虚拟服务
+					{
+						std::unique_ptr<Component> component(new VirtualService());
+						if(!this->mApp->AddComponent(name, std::move(component)))
+						{
+							LOG_ERROR("add virtual service [" << name << "] error");
+							return false;
+						}
+					}
+				}
+				else
+				{
+					if(!this->mApp->AddComponent(name))
+					{
+						std::unique_ptr<Component> component(new LuaHttpService());
+						if (!this->mApp->AddComponent(name, std::move(component)))
+						{
+							LOG_ERROR("add http service [" << name << "] error");
+							return false;
+						}
+					}
+				}
                 if (nodeConfig->IsStart(name))
                 {                  
                     this->GetComponent<IServiceBase>(name)->Init(); 
