@@ -6,10 +6,10 @@
 
 namespace Sentry
 {
-	class MysqlService : public PhysicalService
+	class MysqlDB : public PhysicalService
 	{
 	 public:
-		MysqlService() = default;
+		MysqlDB() = default;
 	private:
 
         int Add(const db::mysql::add& request);

@@ -4,6 +4,7 @@
 
 #ifndef APP_MYSQLCONFIG_H
 #define APP_MYSQLCONFIG_H
+#include<vector>
 #include"Config/TextConfig.h"
 #include"Singleton/Singleton.h"
 namespace Sentry
@@ -17,11 +18,9 @@ namespace Sentry
         bool OnReloadText(const char *str, size_t length) final;
     public:
         int MaxCount;
-        std::string Ip;
-        unsigned int Port;
         std::string User;
-        std::string Address;
         std::string Password;
+        std::vector<Net::Address> Address;
     };
 }
 

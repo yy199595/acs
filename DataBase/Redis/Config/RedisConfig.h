@@ -18,11 +18,9 @@ namespace Sentry
         int Count;
         int Index;
         int FreeClient;
-        std::string Ip;
         std::string Name;
-        unsigned short Port;
-        std::string Address;
         std::string Password;
+        std::vector<Net::Address> Address;
         std::unordered_map<std::string, std::string> LuaFiles;
     };
 

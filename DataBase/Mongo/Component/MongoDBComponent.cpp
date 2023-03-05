@@ -44,8 +44,8 @@ namespace Sentry
         NetThreadComponent * threadComponent = this->GetComponent<NetThreadComponent>();
         for (int index = 0; index < config->MaxCount; index++)
         {
-            const std::string & ip = config->Ip;
-            const unsigned short port = config->Port;
+            const std::string & ip = config->Address[0].Ip;
+            const unsigned int port = config->Address[0].Port;
             std::shared_ptr<SocketProxy> socketProxy = threadComponent->CreateSocket(ip, port);
             std::shared_ptr<TcpMongoClient> mongoClientContext = std::make_shared<TcpMongoClient>(socketProxy, this);
 

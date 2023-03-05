@@ -50,13 +50,15 @@ namespace Sentry
 
     TcpRedisClient * RedisComponent::MakeRedisClient(const RedisClientConfig & config)
     {
+        const std::string & ip = config.Address[0].Ip;
+        const unsigned int port = config.Address[0].Port;
         NetThreadComponent * component = this->GetComponent<NetThreadComponent>();
         std::shared_ptr<SocketProxy> socketProxy = component->CreateSocket();
         if(socketProxy == nullptr)
         {
             return nullptr;
         }
-        socketProxy->Init(config.Ip, config.Port);
+        socketProxy->Init(ip, port);
         std::shared_ptr<TcpRedisClient> redisClient =
             std::make_shared<TcpRedisClient>(socketProxy, config, this);
         this->mRedisClients.emplace_back(redisClient);

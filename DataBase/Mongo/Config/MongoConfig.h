@@ -4,6 +4,7 @@
 
 #ifndef APP_MONGOCONFIG_H
 #define APP_MONGOCONFIG_H
+#include<vector>
 #include"Config/TextConfig.h"
 #include"Singleton/Singleton.h"
 namespace Sentry
@@ -18,12 +19,10 @@ namespace Sentry
         bool OnReloadText(const char *str, size_t length) final;
     public:
         int MaxCount;
-        std::string Ip;
         std::string DB;
-        unsigned int Port;
         std::string User;
-        std::string Address;
         std::string Password;
+        std::vector<Net::Address> Address;
     };
 }
 

@@ -3,6 +3,7 @@
 //
 
 #include"MysqlConfig.h"
+#include"String/StringHelper.h"
 #include"rapidjson/document.h"
 namespace Sentry
 {
@@ -13,16 +14,24 @@ namespace Sentry
         {
             return false;
         }
-		if(!document.HasMember("mysql"))
-		{
-			return false;
-		}
-        this->Ip = document["mysql"]["ip"].GetString();
-        this->Port = document["mysql"]["port"].GetInt();
-        this->User = document["mysql"]["user"].GetString();
-        this->MaxCount = document["mysql"]["count"].GetInt();
-        this->Password = document["mysql"]["passwd"].GetString();
-        this->Address = this->Ip + ":" + std::to_string(this->Port);
+        if (!document.HasMember("mysql"))
+        {
+            return false;
+        }
+        rapidjson::Value &json = document["mysql"];
+        this->User = json["user"].GetString();
+        this->MaxCount = json["count"].GetInt();
+        this->Password = json["passwd"].GetString();
+        for (unsigned int index = 0; index < json["address"].Size(); index++)
+        {
+            Net::Address addressInfo;
+            std::string address(json["address"][index].GetString());
+            if(!Helper::String::ParseIpAddress(address, addressInfo.Ip, addressInfo.Port))
+            {
+                return false;
+            }
+            this->Address.emplace_back(addressInfo);
+        }
         return true;
     }
 

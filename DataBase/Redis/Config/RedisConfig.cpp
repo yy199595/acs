@@ -4,6 +4,7 @@
 
 #include"RedisConfig.h"
 #include"Log/CommonLogDef.h"
+#include"String/StringHelper.h"
 #include"rapidjson/document.h"
 namespace Sentry
 {
@@ -21,11 +22,23 @@ namespace Sentry
 		const rapidjson::Value& jsonData = document["redis"];
 		{
 			this->mConfig.FreeClient = 30;
-			this->mConfig.Ip = jsonData["ip"].GetString();
-			this->mConfig.Port = jsonData["port"].GetInt();
 			this->mConfig.Index = jsonData["index"].GetInt();
 			this->mConfig.Count = jsonData["count"].GetInt();
 		}
+        if(!jsonData.HasMember("address"))
+        {
+            return false;
+        }
+        for(unsigned int index = 0;index < jsonData["address"].Size();index++)
+        {
+            Net::Address addressInfo;
+            std::string address(jsonData["address"].GetString());
+            if(!Helper::String::ParseIpAddress(address, addressInfo.Ip, addressInfo.Port))
+            {
+                return false;
+            }
+            this->mConfig.Address.emplace_back(addressInfo);
+        }
 		if (jsonData.HasMember("free"))
 		{
 			this->mConfig.FreeClient = jsonData["free"].GetInt();
@@ -44,7 +57,6 @@ namespace Sentry
 				this->mConfig.LuaFiles.emplace(key, this->WorkPath() + value);
 			}
 		}
-		this->mConfig.Address = fmt::format("{0}:{1}", this->mConfig.Ip, this->mConfig.Port);
 		return true;
 	}
 }

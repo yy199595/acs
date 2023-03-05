@@ -1,6 +1,6 @@
 #include"MysqlHelperComponent.h"
 #include"String/StringHelper.h"
-#include"Service/MysqlService.h"
+#include"Service/MysqlDB.h"
 #include"Config/ClusterConfig.h"
 #include"Component/NodeMgrComponent.h"
 
@@ -8,10 +8,9 @@ namespace Sentry
 {
 	bool MysqlHelperComponent::LateAwake()
 	{
-        this->mBindName = ComponentFactory::GetName<MysqlService>();
-        LOG_CHECK_RET_FALSE(this->mApp->GetService(this->mBindName));
-        this->mLocationComponent = this->GetComponent<LocationComponent>();
-		return ClusterConfig::Inst()->GetServerName(this->mBindName, this->mServerName);
+        LOG_CHECK_RET_FALSE(this->mApp->GetService<MysqlDB>());
+        this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
+		return true;
 	}
 
 	int MysqlHelperComponent::Add(const Message& message, int flag)
@@ -55,7 +54,7 @@ namespace Sentry
 	int MysqlHelperComponent::Call(const std::string& func, const Message& data, std::shared_ptr<db::mysql::response> response)
 	{
 		std::string address;
-        RpcService * rpcService = this->mApp->GetService(this->mBindName);
+        RpcService * rpcService = this->mApp->GetService<MysqlDB>();
 		if(!this->mLocationComponent->AllotServer(this->mServerName, address))
 		{
 			return XCode::CallServiceNotFound;

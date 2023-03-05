@@ -38,7 +38,7 @@
 #endif
 
 #ifdef __ENABLE_MYSQL__
-#include"Service/MysqlService.h"
+#include"Service/MysqlDB.h"
 #include"Component/MysqlDBComponent.h"
 #include"Component/MysqlHelperComponent.h"
 #endif
@@ -120,7 +120,7 @@ void RegisterServiceComponent()
 #endif
 
 #ifdef __ENABLE_MYSQL__
-    ComponentFactory::Add<MysqlService>("MysqlService");
+    ComponentFactory::Add<MysqlDB>("MysqlDB");
 #endif
 }
 int main(int argc, char **argv)

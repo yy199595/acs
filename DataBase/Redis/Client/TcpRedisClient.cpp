@@ -3,6 +3,7 @@
 //
 #include"TcpRedisClient.h"
 #include"File/FileHelper.h"
+#include"String/StringHelper.h"
 #include"Component/LoggerComponent.h"
 
 namespace Sentry
@@ -11,12 +12,13 @@ namespace Sentry
 		const RedisClientConfig& config, IRpc<RedisResponse>* component)
 		: Tcp::TcpContext(socket, 1024 * 1024), mConfig(config), mComponent(component)
 	{
-		this->mAddress = fmt::format("{0}:{1}", this->mConfig.Name, this->mConfig.Address);
+        this->mIndex = 0;
+        this->mAddress = this->mConfig.Address[0].FullAddress;
 	}
 
 	TcpRedisClient::~TcpRedisClient() noexcept
 	{
-		LOG_WARN("remove redis client " << this->mConfig.Name << "[" << this->mConfig.Address << "]");
+
 	}
 
 	void TcpRedisClient::Send(std::shared_ptr<RedisRequest> command)
@@ -104,31 +106,44 @@ namespace Sentry
     }
 
 	bool TcpRedisClient::AuthUser()
-	{
-		if (!this->ConnectSync())
-		{
-			CONSOLE_LOG_ERROR("connect redis [" << this->mConfig.Address << "] failure");
-			return false;
-		}
-		assert(this->mSendBuffer.size() == 0);
-		assert(this->mRecvBuffer.size() == 0);
-		if (!this->mConfig.Password.empty())  //验证密码
-		{
-			std::shared_ptr<RedisRequest> authCommand = RedisRequest::Make("AUTH", this->mConfig.Password);
-			std::shared_ptr<RedisResponse> response = this->SyncCommand(authCommand);
+    {
+        if (this->mIndex >= this->mConfig.Address.size())
+        {
+            return false;
+        }
+        const Net::Address &address =
+                this->mConfig.Address[this->mIndex];
+        this->mSocket->Init(address.Ip, address.Port);
+        if (this->ConnectSync())
+        {
+            this->mIndex = 0;
+            return this->InitRedisClient();
+        }
+        this->mIndex++;
+        return this->AuthUser();
+    }
+
+    bool TcpRedisClient::InitRedisClient()
+    {
+        assert(this->mSendBuffer.size() == 0);
+        assert(this->mRecvBuffer.size() == 0);
+        if (!this->mConfig.Password.empty())  //验证密码
+        {
+            std::shared_ptr<RedisRequest> authCommand = RedisRequest::Make("AUTH", this->mConfig.Password);
+            std::shared_ptr<RedisResponse> response = this->SyncCommand(authCommand);
             if(response == nullptr || !response->IsOk())
             {
                 CONSOLE_LOG_ERROR("auth redis user faliure");
                 return false;
             }
-		}
+        }
 
-		//切换数据库
-		std::shared_ptr<RedisRequest> selectCommand = RedisRequest::Make("SELECT", this->mConfig.Index);
+        //切换数据库
+        std::shared_ptr<RedisRequest> selectCommand = RedisRequest::Make("SELECT", this->mConfig.Index);
         std::shared_ptr<RedisResponse> response2 = this->SyncCommand(selectCommand);
         if(response2 == nullptr || !response2->IsOk())
         {
-            CONSOLE_LOG_ERROR("auth redis user faliure");
+            CONSOLE_LOG_ERROR("auth redis user failure");
             return false;
         }
 
@@ -140,13 +155,13 @@ namespace Sentry
             this->mCloseTimer->async_wait(std::bind(&TcpRedisClient::CloseFreeClient, this));
         }
 #ifdef ONLY_MAIN_THREAD
-		this->mComponent->OnConnectSuccessful(this->mAddress);
+        this->mComponent->OnConnectSuccessful(this->mAddress);
 #else
-		asio::io_service & taskThread = App::Inst()->MainThread();
-		taskThread.post(std::bind(&IRpc<RedisResponse>::OnConnectSuccessful, this->mComponent, this->mAddress));
+        asio::io_service & taskThread = App::Inst()->MainThread();
+        taskThread.post(std::bind(&IRpc<RedisResponse>::OnConnectSuccessful, this->mComponent, this->mAddress));
 #endif
-		return true;
-	}
+        return true;
+    }
 
     std::shared_ptr<RedisResponse> TcpRedisClient::SyncCommand(std::shared_ptr<RedisRequest> request)
     {
@@ -201,7 +216,7 @@ namespace Sentry
         if(nowTime - this->GetLastOperTime() >= second)
         {
             this->mSocket->Close();
-            CONSOLE_LOG_INFO("[" << this->mConfig.Address << "] close free client");
+            CONSOLE_LOG_INFO("[" << this->mAddress << "] close free client");
         }
         else
         {

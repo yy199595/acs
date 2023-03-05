@@ -1,4 +1,4 @@
-﻿#include"MysqlService.h"
+﻿#include"MysqlDB.h"
 #include"Proto/ProtoHelper.h"
 #include"Client/MysqlMessage.h"
 #include"Component/MysqlDBComponent.h"
@@ -6,32 +6,32 @@
 namespace Sentry
 {
 
-    bool MysqlService::Awake()
+    bool MysqlDB::Awake()
     {
         return this->mApp->AddComponent<MysqlDBComponent>();
     }
 
-	bool MysqlService::OnStart()
+	bool MysqlDB::OnStart()
 	{
-        BIND_COMMON_RPC_METHOD(MysqlService::Add);
-        BIND_COMMON_RPC_METHOD(MysqlService::Save);
-        BIND_COMMON_RPC_METHOD(MysqlService::Query);
-        BIND_COMMON_RPC_METHOD(MysqlService::Update);
-        BIND_COMMON_RPC_METHOD(MysqlService::Delete);
-        BIND_COMMON_RPC_METHOD(MysqlService::Create);
+        BIND_COMMON_RPC_METHOD(MysqlDB::Add);
+        BIND_COMMON_RPC_METHOD(MysqlDB::Save);
+        BIND_COMMON_RPC_METHOD(MysqlDB::Query);
+        BIND_COMMON_RPC_METHOD(MysqlDB::Update);
+        BIND_COMMON_RPC_METHOD(MysqlDB::Delete);
+        BIND_COMMON_RPC_METHOD(MysqlDB::Create);
         this->mMysqlComponent = this->GetComponent<MysqlDBComponent>();
         LOG_CHECK_RET_FALSE(this->mProtoComponent = this->GetComponent<ProtoComponent>());
         this->mMysqlHelper = std::make_shared<MysqlHelper>(this->mProtoComponent);
         return this->mMysqlComponent->StartConnectMysql();
 	}
 
-    bool MysqlService::OnClose()
+    bool MysqlDB::OnClose()
     {
         this->WaitAllMessageComplete();
         return true;
     }
 
-    int MysqlService::Create(const db::mysql::create &request)
+    int MysqlDB::Create(const db::mysql::create &request)
     {
         std::shared_ptr<Message> message = this->mProtoComponent->New(request.data());
         if (message == nullptr)
@@ -80,7 +80,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-	int MysqlService::Add(const db::mysql::add& request)
+	int MysqlDB::Add(const db::mysql::add& request)
     {
         std::string sql;
         if (!this->mMysqlHelper->ToSqlCommand(request, sql))
@@ -98,7 +98,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-	int MysqlService::Save(const db::mysql::save& request)
+	int MysqlDB::Save(const db::mysql::save& request)
     {
         std::string sql;
         if (!this->mMysqlHelper->ToSqlCommand(request, sql))
@@ -115,7 +115,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-	int MysqlService::Update(const db::mysql::update& request)
+	int MysqlDB::Update(const db::mysql::update& request)
     {
         std::string sql;
         if (!this->mMysqlHelper->ToSqlCommand(request, sql))
@@ -133,7 +133,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-	int MysqlService::Delete(const db::mysql::remove& request)
+	int MysqlDB::Delete(const db::mysql::remove& request)
     {
         std::string sql;
         if (!this->mMysqlHelper->ToSqlCommand(request, sql))
@@ -151,7 +151,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-	int MysqlService::Query(const db::mysql::query& request, db::mysql::response& response)
+	int MysqlDB::Query(const db::mysql::query& request, db::mysql::response& response)
     {
 		std::shared_ptr<Mysql::QueryCommand> command;
 		const std::string & fullName = request.table();

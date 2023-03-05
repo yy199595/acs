@@ -3,13 +3,13 @@
 //
 
 #include"MongoClient.h"
-#include<regex>
+
 #include"Md5/MD5.h"
 #include"Sha1/sha1.h"
 #include"Bson/base64.h"
 #include"String/StringHelper.h"
 #include"Config/MongoConfig.h"
-#include"Component/MongoDBComponent.h"
+
 
 namespace Mongo
 {
@@ -34,7 +34,8 @@ namespace Mongo
     TcpMongoClient::TcpMongoClient(std::shared_ptr<SocketProxy> socket, IRpc<CommandResponse>* component)
 		: Tcp::TcpContext(socket, 1024 * 1024), mComponent(component)
 	{
-
+        this->mIndex = 0;
+        this->mAddress = MongoConfig::Inst()->Address[0].FullAddress;
 	}
 
 	void TcpMongoClient::OnSendMessage(const Asio::Code & code, std::shared_ptr<ProtoMessage> message)
@@ -47,8 +48,7 @@ namespace Mongo
 				return;
 			}
             this->SendFromMessageQueue();
-            std::string address = MongoConfig::Inst()->Address;
-            CONSOLE_LOG_INFO( "["<< address << "] mongo user auth successful");
+            CONSOLE_LOG_INFO( "["<< this->mAddress << "] mongo user auth successful");
             return;
 		}
         assert(this->mRecvBuffer.size() == 0);
@@ -183,8 +183,7 @@ namespace Mongo
                 return;
             }
             this->SendFromMessageQueue();
-            std::string address = MongoConfig::Inst()->Address;
-            CONSOLE_LOG_INFO( "["<< address << "] mongo user auth successful");
+            CONSOLE_LOG_INFO( "["<< this->mAddress << "] mongo user auth successful");
             return;
 		}
 
@@ -249,14 +248,21 @@ namespace Mongo
 
 	bool TcpMongoClient::StartAuthBySha1()
 	{
+        const MongoConfig * config = MongoConfig::Inst();
+        if(this->mIndex >= config->Address.size())
+        {
+            return false;
+        }
+        const Net::Address & address
+            = config->Address[this->mIndex];
+        this->mSocket->Init(address.Ip, address.Port);
 		if(!this->ConnectSync())
 		{
-			CONSOLE_LOG_ERROR("connect mongo error");
-			return false;
+            this->mIndex++;
+			return this->StartAuthBySha1();
 		}
-        const std::string & user = MongoConfig::Inst()->User;
-        const std::string & pwd = MongoConfig::Inst()->Password;
-        return this->Auth(user, "admin", pwd);
+        this->mIndex = 0;
+        return this->Auth(config->User, "admin", config->Password);
 	}
 
 }

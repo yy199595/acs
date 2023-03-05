@@ -12,6 +12,7 @@ namespace Sentry
 							 : std::thread(std::bind(&MysqlClient::Update, this)),
                               mComponent(component)
     {
+        this->mIndex = 0;
         this->mLastTime = 0;
         this->mIsClose = true;
         this->mTaskCount = 0;
@@ -25,7 +26,8 @@ namespace Sentry
 		std::shared_ptr<Mysql::ICommand> command;
 		Asio::Context& io = App::Inst()->MainThread();
 		this->mLastTime = Helper::Time::NowSecTime();
-		const std::string & address = MysqlConfig::Inst()->Address;
+        const MysqlConfig * config = MysqlConfig::Inst();
+		const std::string & address = config->Address[this->mIndex].FullAddress;
 		while (!this->mIsClose)
 		{
 			while (this->GetCommand(command))
@@ -71,17 +73,24 @@ namespace Sentry
 
 	bool MysqlClient::StartConnect()
 	{
+        const MysqlConfig * config = MysqlConfig::Inst();
+        if(this->mIndex >= config->Address.size())
+        {
+            CONSOLE_LOG_ERROR("connect mysql failure");
+            return false;
+        }
 		MYSQL * mysql = mysql_init(NULL);
-		unsigned short port = MysqlConfig::Inst()->Port;
-		const char* ip = MysqlConfig::Inst()->Ip.c_str();
 		const char* user = MysqlConfig::Inst()->User.c_str();
 		const char* pwd = MysqlConfig::Inst()->Password.c_str();
-		const std::string & address = MysqlConfig::Inst()->Address;
-		if (!mysql_real_connect(mysql, ip, user, pwd, "", port, NULL, CLIENT_FOUND_ROWS))
+        const std::string & ip =config->Address[this->mIndex].Ip;
+        unsigned short port = config->Address[this->mIndex].Port;
+		const std::string & address = config->Address[0].FullAddress;
+		if (!mysql_real_connect(mysql, ip.c_str(), user, pwd, "", port, NULL, CLIENT_FOUND_ROWS))
 		{
-			CONSOLE_LOG_ERROR("connect mysql [" << MysqlConfig::Inst()->Address << "] failure");
-			return false;
+            this->mIndex++;
+			return this->StartConnect();
 		}
+        this->mIndex = 0;
 		this->mIsClose = false;
 		this->mMysqlClient = mysql;
 		Asio::Context& io = App::Inst()->MainThread();

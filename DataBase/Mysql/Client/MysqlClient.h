@@ -31,6 +31,7 @@ namespace Sentry
         bool GetCommand(std::shared_ptr<Mysql::ICommand> &command);
     private:
         bool mIsClose;
+        size_t mIndex;
         std::mutex mLock;
         size_t mTaskCount;
         MYSQL *mMysqlClient;

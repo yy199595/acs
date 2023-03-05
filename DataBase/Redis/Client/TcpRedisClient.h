@@ -27,6 +27,7 @@ namespace Sentry
 		const std::string & GetName() const { return this->mConfig.Name; }
     private:
 		bool AuthUser();
+        bool InitRedisClient();
 		void OnReadComplete();
         void StartPingServer();
         void CloseFreeClient();
@@ -35,6 +36,7 @@ namespace Sentry
         std::shared_ptr<RedisResponse> SyncCommand(std::shared_ptr<RedisRequest> command);
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
     private:
+        size_t mIndex;
 		std::string mAddress;
         RedisClientConfig mConfig;
 		IRpc<RedisResponse> * mComponent;

@@ -26,4 +26,15 @@ namespace Sentry
         std::string mName;
     };
 }
+
+namespace Net
+{
+    struct Address
+    {
+    public:
+        std::string Ip;
+        unsigned short Port;
+        std::string FullAddress;
+    };
+}
 #endif //APP_CONFIG_H
