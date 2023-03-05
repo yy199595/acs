@@ -42,7 +42,7 @@ namespace Sentry
     public:
         virtual int Invoke(const std::string & method, std::shared_ptr<Rpc::Packet> message) = 0;
 	private:
-		std::string mServerName;
+		std::string mCluster;
 		std::string mLocationAddress;
         std::vector<std::string> mServiceHosts;
 		class NodeMgrComponent * mLocationComponent;

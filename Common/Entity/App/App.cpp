@@ -256,7 +256,7 @@ namespace Sentry
         title.append(fmt::format("   fps:{0}  ", this->mLogicFps));
         if (innerComponent != nullptr)
         {
-            title.append(fmt::format("rpc:{0}  ", innerComponent->GetWaitCount()));
+            //title.append(fmt::format("rpc:{0}  ", innerComponent->GetWaitCount()));
         }
         if (httpComponent != nullptr)
         {

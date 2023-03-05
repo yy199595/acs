@@ -93,6 +93,31 @@ namespace Sentry
 		return true;
 	}
 
+    bool NodeMgrComponent::GetServer(const std::string & name, std::string & address)
+    {
+        auto iter = this->mRpcServers.find(name);
+        if(iter == this->mRpcServers.end())
+        {
+            return false;
+        }
+        int size = (int)iter->second.size();
+        int index = Helper::Math::Random<int>(0, size);
+        address = iter->second[index];
+        return true;
+    }
+
+    bool NodeMgrComponent::GetServer(const std::string & name, long long index, std::string & address)
+    {
+        auto iter = this->mRpcServers.find(name);
+        if(iter == this->mRpcServers.end())
+        {
+            return false;
+        }
+        int size = (int)iter->second.size();
+        address = iter->second[index % size];
+        return true;
+    }
+
 	LocationUnit* NodeMgrComponent::GetUnit(long long id) const
 	{
 		auto iter = this->mUnitLocations.find(id);
@@ -106,7 +131,7 @@ namespace Sentry
 		{
 			return false;
 		}
-		size_t index = Helper::Math::Random<size_t>(0, iter->second.size());
+		int index = Helper::Math::Random<int>(0, iter->second.size());
 		address = iter->second.at(index);
 		return true;
 	}
@@ -141,29 +166,7 @@ namespace Sentry
 	bool NodeMgrComponent::LateAwake()
 	{
 		const ServerConfig * config = ServerConfig::Inst();
-		LOG_CHECK_RET_FALSE(config->GetMember("tran", this->mLocations));
-		return true;
-	}
-
-	bool NodeMgrComponent::GetTranLocation(std::string& address)
-	{
-		if(this->mLocations.empty())
-		{
-			return false;
-		}
-		address = this->mLocations.front();
-		return true;
-	}
-
-	bool NodeMgrComponent::GetTranLocation(long long userId, std::string& address)
-	{
-		if(this->mLocations.empty())
-		{
-			return false;
-		}
-		size_t size = this->mLocations.size();
-		const size_t index = userId % size;
-		address = this->mLocations[index];
+		LOG_CHECK_RET_FALSE(config->GetMember("registry", this->mRegistryAddress));
 		return true;
 	}
 
@@ -171,15 +174,13 @@ namespace Sentry
 	{
 		const ServerConfig * config = ServerConfig::Inst();
 		RpcService * rpcService = this->mApp->GetService<Registry>();
-		for(const std::string & address : this->mLocations)
+		for(const std::string & address : this->mRegistryAddress)
 		{
 			s2s::server::info message;
 			message.set_name(config->Name());
 			config->GetLocation("rpc", *message.mutable_rpc());
 			config->GetLocation("http", *message.mutable_http());
-
-			std::shared_ptr<s2s::server::list> response
-				= std::make_shared<s2s::server::list>();
+			std::shared_ptr<s2s::server::list> response = std::make_shared<s2s::server::list>();
 			if(rpcService->Call(address,"Register", message, response) != XCode::Successful)
 			{
 				LOG_ERROR("register to [" << address << "] error");

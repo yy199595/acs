@@ -48,7 +48,13 @@ namespace Lua
             const LocationUnit * locationUnit = locationComponent->GetUnit(userId);
             if(locationUnit == nullptr || (!locationUnit->Get(methodConfig->Service, address)))
             {
-				locationComponent->GetTranLocation(userId, address);
+                std::string server;
+                if(!ClusterConfig::Inst()->GetServerName(methodConfig->Service, server))
+                {
+                    luaL_error(lua, "not cluster config %s", methodConfig->Service.c_str());
+                    return 0;
+                }
+				locationComponent->GetServer(server, userId, address);
             }
 #endif
         }
@@ -181,7 +187,13 @@ namespace Lua
             const LocationUnit* locationUnit = locationComponent->GetUnit(userId);
             if (locationUnit == nullptr || (!locationUnit->Get(methodConfig->Service, address)))
             {
-				locationComponent->GetTranLocation(userId, address);
+                std::string server;
+                if(!ClusterConfig::Inst()->GetServerName(methodConfig->Service, server))
+                {
+                    luaL_error(lua, "not cluster config %s", methodConfig->Service.c_str());
+                    return 0;
+                }
+                locationComponent->GetServer(server, userId, address);
             }
 #endif
         }

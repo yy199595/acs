@@ -16,7 +16,7 @@ namespace Sentry
 	{
 		this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
 		this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>();
-		ClusterConfig::Inst()->GetServerName(this->GetName(), this->mServerName);
+		ClusterConfig::Inst()->GetServerName(this->GetName(), this->mCluster);
 		return ServerConfig::Inst()->GetLocation("rpc", this->mLocationAddress);
 	}
 }
@@ -26,9 +26,9 @@ namespace Sentry
 	int RpcService::Send(const std::string& func, const Message& message)
 	{
 		std::vector<std::string> locations;		
-		if(!this->mLocationComponent->GetServers(this->mServerName, locations))
+		if(!this->mLocationComponent->GetServers(this->mCluster, locations))
 		{
-			LOG_ERROR(this->mServerName <<  " address list empty");
+			LOG_ERROR(this->mCluster <<  " address list empty");
 			return XCode::Failure;
 		}
 
@@ -54,18 +54,8 @@ namespace Sentry
 
         request->SetType(Tcp::Type::Request);
         request->SetProto(Tcp::Porto::Protobuf);
-#ifdef __INNER_MSG_FORWARD__
-        request->GetHead().Add("to", address);
-#endif
         request->WriteMessage(message);
-
-#ifdef __INNER_MSG_FORWARD__
-        std::string target;
-        this->mForwardComponent->GetLocation(target);
-        return this->mMessageComponent->Send(target, request);
-#else
         return this->mMessageComponent->Send(address, request);
-#endif
     }
 
     std::shared_ptr<Rpc::Packet> RpcService::CallAwait(
@@ -80,17 +70,8 @@ namespace Sentry
 		}
 		request->SetType(Tcp::Type::Request);
 		request->SetProto(Tcp::Porto::Protobuf);
-#ifdef __INNER_MSG_FORWARD__
-		request->GetHead().Add("to", address);
-#endif
 		request->WriteMessage(message);
-#ifdef __INNER_MSG_FORWARD__
-		std::string target;
-		this->mForwardComponent->GetLocation(target);
-		return this->mMessageComponent->Call(target, request);
-#else
 		return this->mMessageComponent->Call(address, request);
-#endif
 	}
 
 	int RpcService::Send(const std::string& address, const std::string& func, const Message& message)
@@ -258,6 +239,12 @@ namespace Sentry
                 return false;
             }
         }
+
+        std::string address;
+		if(!this->mLocationComponent->GetServer(this->mCluster, userId, address))
+        {
+            return XCode::Failure;
+        }
         std::shared_ptr<Rpc::Packet> request = std::make_shared<Rpc::Packet>();
         {
             request->WriteMessage(message);
@@ -266,15 +253,6 @@ namespace Sentry
             request->GetHead().Add("id", userId);
             request->GetHead().Add("func", methodConfig->FullName);
         }
-        std::string address;
-#ifdef __INNER_MSG_FORWARD__
-        LocationUnit * locationUnit = this->mLocationComponent->GetLocationUnit(userId);
-        if(locationUnit != nullptr && locationUnit->Get(methodConfig->Service, address))
-        {
-            return this->mMessageComponent->Send(address, request);
-        }
-#endif
-		this->mLocationComponent->GetTranLocation(userId, address);
         return this->mMessageComponent->Send(address, request);
     }
 
@@ -304,6 +282,11 @@ namespace Sentry
             }
         }
 
+        std::string address;
+        if(!this->mLocationComponent->GetServer(this->mCluster, userId, address))
+        {
+            return nullptr;
+        }
         std::shared_ptr<Rpc::Packet> request = std::make_shared<Rpc::Packet>();
         {
             request->WriteMessage(message);
@@ -311,15 +294,6 @@ namespace Sentry
             request->SetProto(Tcp::Porto::Protobuf);
             request->GetHead().Add("func", func);
         }
-        std::string address;
-#ifdef __INNER_MSG_FORWARD__
-        LocationUnit * locationUnit = this->mLocationComponent->GetLocationUnit(userId);
-        if(locationUnit != nullptr && locationUnit->Get(methodConfig->Service, address))
-        {
-            return this->mMessageComponent->Call(address, request);
-        }
-#endif
-		this->mLocationComponent->GetTranLocation(userId, address);
         return this->mMessageComponent->Call(address, request);
     }
 }

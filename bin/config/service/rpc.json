@@ -19,6 +19,10 @@
 			"Async": true,
 			"Request": "s2s.server.info",
 			"Response": "s2s.server.list"
+		},
+		"UnRegister": {
+			"Async": true,
+			"Response": "com.type.string"
 		}
 	},
 	"MysqlService": {

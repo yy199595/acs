@@ -23,19 +23,19 @@ namespace Sentry
         void AddRpcServer(const std::string & server, const std::string & address);
         void AddHttpServer(const std::string& server, const std::string& address);
 	 public:
-		bool GetTranLocation(std::string & address);
-		bool GetTranLocation(long long userId, std::string & address);
-	 public:
 		bool DelUnit(long long id);
 		LocationUnit * GetUnit(long long id) const;
 		bool AddUnit(std::unique_ptr<LocationUnit> locationUnit);
 	 public:
 		bool LateAwake() final;
 		void OnLocalComplete() final;
+    public:
 		bool GetServers(std::vector<std::string> & hosts);
-		bool GetServers(const std::string & server, std::vector<std::string> & hosts);
+        bool GetServer(const std::string & name, std::string & address);
+		bool GetServers(const std::string & name, std::vector<std::string> & hosts);
+        bool GetServer(const std::string & name, long long index, std::string & address);
 	 private:
-		std::vector<std::string> mLocations;
+		std::vector<std::string> mRegistryAddress;
         std::unordered_map<std::string, std::vector<std::string>> mRpcServers;
         //std::unordered_map<std::string, std::vector<std::string>> mHttpServers;
         std::unordered_map<long long, std::unique_ptr<LocationUnit>> mUnitLocations;

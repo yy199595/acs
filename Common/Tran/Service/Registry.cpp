@@ -11,6 +11,7 @@ namespace Sentry
     bool Registry::OnStart()
     {
 		BIND_COMMON_RPC_METHOD(Registry::Register);
+        BIND_COMMON_RPC_METHOD(Registry::UnRegister);
 		this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
         return true;
     }
@@ -31,20 +32,20 @@ namespace Sentry
 		InnerNetComponent * innerNetComponent = this->GetComponent<InnerNetComponent>();
 		if(innerNetComponent != nullptr)
 		{
-			std::vector<const ServiceNodeInfo *> services;
+            const std::string func("Join");
+            std::vector<const ServiceNodeInfo *> services;
 			innerNetComponent->GetServiceList(services);
 			for(const ServiceNodeInfo * nodeInfo : services)
 			{
-				s2s::server::info * server = response.add_list();
-				{
-					server->set_name(nodeInfo->SrvName);
-					server->set_rpc(nodeInfo->LocationRpc);
-					server->set_http(nodeInfo->LocationHttp);
-				}
 				const std::string & address = nodeInfo->LocationRpc;
-				if(rpcService->Call(address, "Join", request) == XCode::Successful)
+				if(rpcService->Call(address, func, request) == XCode::Successful)
 				{
-
+                    s2s::server::info * server = response.add_list();
+                    {
+                        server->set_name(nodeInfo->SrvName);
+                        server->set_rpc(nodeInfo->LocationRpc);
+                        server->set_http(nodeInfo->LocationHttp);
+                    }
 				}
 			}
 			const ServerConfig * config = ServerConfig::Inst();

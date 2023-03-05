@@ -27,34 +27,31 @@ namespace Sentry
                             std::make_unique<RpcMethodConfig>();
                     this->mMethodConfigs.emplace(name, std::move(config));
                 }
-                RpcMethodConfig * serviceConfog = this->mMethodConfigs[name].get();
+                RpcMethodConfig * serviceConfig = this->mMethodConfigs[name].get();
                 {
-                    serviceConfog->Method = name;
-                    serviceConfog->IsAsync = false;
-                    serviceConfog->Type = "Server";
-                    serviceConfog->FullName = fullName;
-                    serviceConfog->Service = this->GetName();
+                    serviceConfig->Method = name;
+                    serviceConfig->IsAsync = false;
+                    serviceConfig->Type = "Server";
+                    serviceConfig->FullName = fullName;
+                    serviceConfig->Service = this->GetName();
                 }
                 if(jsonValue.HasMember("Type"))
                 {
-                    serviceConfog->Type = jsonValue["Type"].GetString();
+                    serviceConfig->Type = jsonValue["Type"].GetString();
                 }
                 if(jsonValue.HasMember("Async"))
                 {
-                    serviceConfog->IsAsync = jsonValue["Async"].GetBool();
+                    serviceConfig->IsAsync = jsonValue["Async"].GetBool();
                 }
                 if (jsonValue.HasMember("Request"))
                 {
-                    serviceConfog->Request = jsonValue["Request"].GetString();
+                    serviceConfig->Request = jsonValue["Request"].GetString();
                 }
                 if (jsonValue.HasMember("Response"))
                 {
-                    serviceConfog->Response = jsonValue["Response"].GetString();
+                    serviceConfig->Response = jsonValue["Response"].GetString();
                 }
-                if(!this->mIsClient && serviceConfog->Type == "Client")
-                {
-                    this->mIsClient = true;
-                }
+                this->mIsClient = serviceConfig->Type ==std::string("Client");
                 //this->mMethodConfigs.emplace(name, std::move(serviceConfog));
             }
         }

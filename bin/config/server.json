@@ -23,7 +23,7 @@
         "common": "script/Common",
         "module": "script/Server"
     },
-    "tran":[
+    "registry":[
         "127.0.0.1:7788"
     ],
     "Client":{
@@ -34,7 +34,7 @@
     "Server":{
         "listen":{
             "rpc": 7788,
-            "http": 80,
+            "http": 8080,
             "gate": 1995,
             "tran":7794,
             "console": 8888
@@ -98,7 +98,7 @@
             "cluster":"config/cluster/cluster.json"
         }
     },
-    "TranServer":{
+    "RegistryServer":{
         "listen":{
             "rpc":7788
         },

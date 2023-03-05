@@ -23,6 +23,10 @@ namespace Sentry
     {
         std::string path = System::ConfigPath();
         const ServerConfig* config = ServerConfig::Inst();
+        if(config->GetPath("cluster", path))
+        {
+            LOG_CHECK_RET_FALSE(this->LoadTextConfig<ClusterConfig>(path));
+        }
         if(config->GetPath("rpc", path))
         {
             LOG_CHECK_RET_FALSE(this->LoadTextConfig<RpcConfig>(path));
@@ -31,10 +35,7 @@ namespace Sentry
         {
             LOG_CHECK_RET_FALSE(this->LoadTextConfig<HttpConfig>(path));
         }
-        if(config->GetPath("cluster", path))
-        {
-            LOG_CHECK_RET_FALSE(this->LoadTextConfig<ClusterConfig>(path));
-        }
+
         if(config->GetPath("code", path))
         {
             LOG_CHECK_RET_FALSE(this->LoadTextConfig<CodeConfig>(path));

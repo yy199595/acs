@@ -9,7 +9,7 @@
 			"Registry" : false
 		},
 		"Component": [
-			"LocationComponent",
+			"NodeMgrComponent",
 			"LuaScriptComponent"
 		]
 	},
@@ -25,7 +25,7 @@
 		"Component": [
 			"HttpComponent",
 			"RedisComponent",
-			"LocationComponent",
+			"NodeMgrComponent",
 			"HttpWebComponent",
 			"LuaScriptComponent"
 		]
@@ -39,7 +39,7 @@
 			"Registry" : false
 		},
 		"Component": [
-			"LocationComponent"
+			"NodeMgrComponent"
 		]
 	},
 	"DataServer": {
@@ -50,10 +50,16 @@
 			"Registry" : false
 		},
 		"Component": [
-			"LocationComponent"
+			"NodeMgrComponent"
 		]
 	},
-	"TranServer": {
+	"LogServer": {
+		"AutoAllot": false,
+		"Service": {
+			"Log": true
+		}
+	},
+	"RegistryServer": {
 		"AutoAllot": false,
 		"Service": {
 			"Node": true,
@@ -61,7 +67,7 @@
 		},
 		"Component": [
 				"TranComponent",
-				"LocationComponent"
+				"NodeMgrComponent"
 			]
 		}
 	}
