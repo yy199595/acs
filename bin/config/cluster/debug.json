@@ -7,10 +7,10 @@
 			"Log": true,
 			"Gate": true,
 			"MongoDB": true,
-			"ChatService": true,
+			"Chat": true,
 			"Registry":true,
 			"HttpBackGround": true,
-			"AccountService": true,
+			"Account": true,
 			"HttpDebug": true
 		},
 		"Component": [

@@ -7,34 +7,37 @@
 #include"rapidjson/document.h"
 namespace Sentry
 {
-    bool MongoConfig::OnLoadText(const char *str, size_t length) {
-        rapidjson::Document document;
-        if (document.Parse(str, length).HasParseError()) {
-            return false;
-        }
-        if (!document.HasMember("mongo")) {
-            return false;
-        }
-        const rapidjson::Value& jsonData = document["mongo"];
-        {
-            this->DB = jsonData["db"].GetString();
-            this->User = jsonData["user"].GetString();
-            this->MaxCount = jsonData["count"].GetInt();
-            this->Password = jsonData["passwd"].GetString();
-        }
-        auto iter = jsonData.FindMember("address");
-        if (iter == jsonData.MemberEnd() || !iter->value.IsArray())
-        {
-            for(unsigned int index = 0; iter->value.Size(); index++)
-            {
-                Net::Address addressInfo;
-                std::string address(iter->value[index].GetString());
-                Helper::String::ParseIpAddress(address, addressInfo.Ip, addressInfo.Port);
-                this->Address.emplace_back(addressInfo);
-            }
-        }
-        return true;
-    }
+    bool MongoConfig::OnLoadText(const char *str, size_t length)
+	{
+		rapidjson::Document document;
+		if (document.Parse(str, length).HasParseError())
+		{
+			return false;
+		}
+		if (!document.HasMember("mongo"))
+		{
+			return false;
+		}
+		const rapidjson::Value& jsonData = document["mongo"];
+		{
+			this->DB = jsonData["db"].GetString();
+			this->User = jsonData["user"].GetString();
+			this->MaxCount = jsonData["count"].GetInt();
+			this->Password = jsonData["passwd"].GetString();
+		}
+		const rapidjson::Value& jsonArray = jsonData["address"];
+		for (unsigned int index = 0; index < jsonArray.Size(); index++)
+		{
+			Net::Address addressInfo;
+			std::string address(jsonArray[index].GetString());
+			if(!Helper::String::ParseIpAddress(address, addressInfo.Ip, addressInfo.Port))
+			{
+				return false;
+			}
+			this->Address.emplace_back(addressInfo);
+		}
+		return this->Address.size() > 0;
+	}
 
     bool MongoConfig::OnReloadText(const char *str, size_t length)
     {

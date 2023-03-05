@@ -29,10 +29,11 @@ namespace Sentry
         {
             return false;
         }
-        for(unsigned int index = 0;index < jsonData["address"].Size();index++)
+		const rapidjson::Value & json = jsonData["address"];
+        for(unsigned int index = 0;index < json.Size();index++)
         {
             Net::Address addressInfo;
-            std::string address(jsonData["address"].GetString());
+            std::string address(json[index].GetString());
             if(!Helper::String::ParseIpAddress(address, addressInfo.Ip, addressInfo.Port))
             {
                 return false;

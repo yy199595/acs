@@ -25,7 +25,7 @@
 			"Response": "com.type.string"
 		}
 	},
-	"MysqlService": {
+	"MysqlDB": {
 		"Add": {
 			"Async": true,
 			"Type": "Server",
@@ -130,7 +130,7 @@
 			"Response": "db.mongo.command.response"
 		}
 	},
-	"ChatService": {
+	"Chat": {
 		"Chat": {
 			"Async": true,
 			"Type": "Client",

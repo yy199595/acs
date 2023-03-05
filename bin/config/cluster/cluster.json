@@ -4,7 +4,7 @@
 		"Service": {
 			"User": true,
 			"Node": true,
-			"ChatService": true,
+			"Chat": true,
 			"Gate": false,
 			"Registry" : false
 		},
@@ -17,7 +17,7 @@
 		"AutoAllot": false,
 		"Service": {
 			"Node": true,
-			"AccountService": true,
+			"Account": true,
 			"HttpBackGround": true,
 			"Gate": false,
 			"Registry" : false
@@ -35,7 +35,7 @@
 		"Service": {
 			"Gate": true,
 			"Node": true,
-			"ChatService": false,
+			"Chat": false,
 			"Registry" : false
 		},
 		"Component": [
