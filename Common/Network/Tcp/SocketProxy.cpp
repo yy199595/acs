@@ -24,14 +24,14 @@ namespace Sentry
 
     void SocketProxy::Init(const std::string &ip, unsigned short port)
     {
-        this->mIp = ip;
-        this->mPort = port;
-        this->mIsRemote = true;
-        if(this->mIp.empty() || this->mPort == 0)
+        if(ip.empty() || port == 0)
         {
             CONSOLE_LOG_ERROR("Inti Socket Error Address Error");
             return;
         }
+		this->mIp = ip;
+		this->mPort = port;
+		this->mIsRemote = true;
         this->mAddress = fmt::format("{0}:{1}", ip, port);
     }
 

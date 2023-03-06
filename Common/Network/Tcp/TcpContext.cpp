@@ -239,6 +239,7 @@ namespace Tcp
 		tcpSocket.connect(endPoint, code);
 		if(code)
 		{
+			tcpSocket.close(code);
 			//printf("sync connect [%s] failure", this->mSocket->GetAddress().c_str());
 			return false;
 		}

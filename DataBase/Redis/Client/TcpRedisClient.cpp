@@ -94,6 +94,7 @@ namespace Sentry
         {
             if (!this->AuthUser())
             {
+				this->mIndex = 0;
 				CONSOLE_LOG_FATAL("redis auth failure");
 				return;
             }
