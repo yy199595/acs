@@ -77,7 +77,7 @@ include_directories(${PROJECT_SOURCE_DIR}/Common/Server)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Script)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Network)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Cluster)
-include_directories(${PROJECT_SOURCE_DIR}/Common/Tran)
+include_directories(${PROJECT_SOURCE_DIR}/Common/Registry)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Sqlite)
 include_directories(${PROJECT_SOURCE_DIR}/Common/SubPublish)
 

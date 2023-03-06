@@ -3,7 +3,7 @@
 //
 #include"HttpComponent.h"
 #include"Config/MethodConfig.h"
-#include"Component/LoggerComponent.h"
+#include"Component/LogComponent.h"
 #include"Component/NetThreadComponent.h"
 #include"Client/HttpRequestClient.h"
 #include"Task/HttpTask.h"

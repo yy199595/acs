@@ -6,10 +6,8 @@
 #include"Helper/Helper.h"
 #include"Service/RpcService.h"
 #include"Config/ClusterConfig.h"
-#include"Service/Registry.h"
 #include"Component/NodeMgrComponent.h"
 #include"Component/NetThreadComponent.h"
-#include"Service/Node.h"
 #include"Component/InnerNetComponent.h"
 namespace Sentry
 {

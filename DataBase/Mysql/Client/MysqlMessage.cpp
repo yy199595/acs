@@ -8,7 +8,7 @@
 #include"sstream"
 #include"Guid/Guid.h"
 #include"Log/CommonLogDef.h"
-#include"Component/LoggerComponent.h"
+#include"Component/LogComponent.h"
 #include"google/protobuf/util/json_util.h"
 using namespace Sentry;
 namespace Mysql

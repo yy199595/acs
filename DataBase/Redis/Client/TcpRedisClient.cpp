@@ -4,7 +4,7 @@
 #include"TcpRedisClient.h"
 #include"File/FileHelper.h"
 #include"String/StringHelper.h"
-#include"Component/LoggerComponent.h"
+#include"Component/LogComponent.h"
 
 namespace Sentry
 {

@@ -38,7 +38,7 @@ namespace Sentry
 	{
         
 		this->mTaskComponent = this->GetOrAddComponent<TaskComponent>();
-		this->mLogComponent = this->GetOrAddComponent<LoggerComponent>();
+		this->mLogComponent = this->GetOrAddComponent<LogComponent>();
 		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
 		this->mMessageComponent = this->GetOrAddComponent<ProtoComponent>();
 

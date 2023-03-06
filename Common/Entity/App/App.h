@@ -8,7 +8,7 @@
 #include"Config/ServiceConfig.h"
 #include"Component/TaskComponent.h"
 #include"Component/TimerComponent.h"
-#include"Component/LoggerComponent.h"
+#include"Component/LogComponent.h"
 
 namespace Sentry
 {
@@ -20,7 +20,7 @@ namespace Sentry
 		explicit App();
 	 public:
         inline float GetFps() const { return this->mLogicFps; }
-		inline LoggerComponent* GetLogger() { return this->mLogComponent; }
+		inline LogComponent* GetLogger() { return this->mLogComponent; }
 		inline Asio::Context & MainThread() { return *this->mMainContext; }
 		inline TaskComponent* GetTaskComponent() { return this->mTaskComponent; }
 		inline TimerComponent* GetTimerComponent() { return this->mTimerComponent; }
@@ -48,7 +48,7 @@ namespace Sentry
         std::thread::id mThreadId;
         const long long mStartTime;
         TaskComponent* mTaskComponent;
-		LoggerComponent* mLogComponent;
+		LogComponent* mLogComponent;
 		TimerComponent* mTimerComponent;
 		ProtoComponent * mMessageComponent;
         std::unique_ptr<Asio::Context> mMainContext;

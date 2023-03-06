@@ -1,4 +1,4 @@
-#include"LoggerComponent.h"
+#include"LogComponent.h"
 #include"App/App.h"
 #include"spdlog/async.h"
 #ifdef __DEBUG__
@@ -10,7 +10,7 @@
 namespace Sentry
 {
 	// 单线程  st  多线程  mt
-	bool LoggerComponent::Awake()
+	bool LogComponent::Awake()
 	{
 		this->mLastTime = 0;
 		this->mLogSaveTime = 3;
@@ -19,7 +19,7 @@ namespace Sentry
         return true;
 	}
 
-	void LoggerComponent::OnSecondUpdate(const int tick)
+	void LogComponent::OnSecondUpdate(const int tick)
 	{
 		long long now = Helper::Time::NowSecTime();
 		if(!Helper::Time::IsSameDay(now, this->mLastTime))
@@ -35,12 +35,12 @@ namespace Sentry
 		this->mLastTime = now;
 	}
 
-	void LoggerComponent::OnDestroy()
+	void LogComponent::OnDestroy()
 	{
 		this->SaveAllLog();
 	}
 
-	void LoggerComponent::SaveAllLog()
+	void LogComponent::SaveAllLog()
 	{
 		auto iter = this->mLoggers.begin();
 		for(; iter != this->mLoggers.end(); iter++)
@@ -50,7 +50,7 @@ namespace Sentry
 		spdlog::drop_all();
 	}
 
-	void LoggerComponent::PushLog(spdlog::level::level_enum type, const std::string& log)
+	void LogComponent::SaveLog(spdlog::level::level_enum type, const std::string& log)
     {
 		const std::string & name = ServerConfig::Inst()->Name();
 		std::shared_ptr<spdlog::logger> logger = this->GetLogger(name);
@@ -75,7 +75,7 @@ namespace Sentry
 		}
     }
 
-	void LoggerComponent::PushLog(const std::string& name,
+	void LogComponent::SaveLog(const std::string& name,
 		spdlog::level::level_enum type, const std::string& log)
 	{
 		std::shared_ptr<spdlog::logger> logger = this->GetLogger(name);
@@ -86,7 +86,7 @@ namespace Sentry
 		logger->log(type, log);
 	}
 
-	std::shared_ptr<spdlog::logger> LoggerComponent::GetLogger(const std::string& name)
+	std::shared_ptr<spdlog::logger> LogComponent::GetLogger(const std::string& name)
 	{
 		auto iter = this->mLoggers.find(name);
 		if(iter == this->mLoggers.end())

@@ -3,7 +3,7 @@
 //
 
 #include "Log.h"
-#include "Component/LoggerComponent.h"
+#include "Component/LogComponent.h"
 namespace Sentry
 {
 	void Log::Init()

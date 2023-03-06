@@ -5,7 +5,7 @@
 #include"LuaLogger.h"
 #include"App/App.h"
 #include"String/StringHelper.h"
-#include"Component/LoggerComponent.h"
+#include"Component/LogComponent.h"
 using namespace Sentry;
 namespace Lua
 {
@@ -43,7 +43,7 @@ namespace Lua
 			std::string log;
 			GetLuaString(luaEnv, log);
 			Debug::Log(Debug::Level::debug, log);
-			App::Inst()->GetLogger()->PushLog(spdlog::level::debug, log);
+			App::Inst()->GetLogger()->SaveLog(spdlog::level::debug, log);
 			return 0;
 		}
 
@@ -52,7 +52,7 @@ namespace Lua
 			std::string log;
 			GetLuaString(luaEnv, log);
 			Debug::Log(Debug::Level::info, log);
-			App::Inst()->GetLogger()->PushLog(spdlog::level::info, log);
+			App::Inst()->GetLogger()->SaveLog(spdlog::level::info, log);
 			return 0;
 		}
 
@@ -68,7 +68,7 @@ namespace Lua
 			std::string log;
 			GetLuaString(luaEnv, log);
 			Debug::Log(Debug::Level::err, log);
-			App::Inst()->GetLogger()->PushLog(spdlog::level::err, log);
+			App::Inst()->GetLogger()->SaveLog(spdlog::level::err, log);
 			return 0;
 		}
 
@@ -77,7 +77,7 @@ namespace Lua
 			std::string log;
 			GetLuaString(luaEnv, log);
 			Debug::Log(Debug::Level::warn, log);
-			App::Inst()->GetLogger()->PushLog(spdlog::level::warn, log);
+			App::Inst()->GetLogger()->SaveLog(spdlog::level::warn, log);
 			return 0;
 		}
 	}

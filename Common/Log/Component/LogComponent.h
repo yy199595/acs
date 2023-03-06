@@ -8,14 +8,14 @@
 using namespace Helper;
 namespace Sentry
 {
-    class LoggerComponent final : public Component, public ISecondUpdate
+    class LogComponent final : public Component, public ISecondUpdate
 	{
 	 public:
-		LoggerComponent() = default;
+		LogComponent() = default;
 	 public:
 		void SaveAllLog();
-		void PushLog(spdlog::level::level_enum type, const std::string& log);
-		void PushLog(const std::string & name, spdlog::level::level_enum type, const std::string& log);
+		void SaveLog(spdlog::level::level_enum type, const std::string& log);
+		void SaveLog(const std::string & name, spdlog::level::level_enum type, const std::string& log);
 	 protected:
 		bool Awake() final;
 		void OnDestroy() final;

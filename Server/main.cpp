@@ -5,7 +5,7 @@
 #include"Component/UnitMgrComponent.h"
 #include"Component/ConsoleComponent.h"
 #include"Component/NetThreadComponent.h"
-#include"Component/LoggerComponent.h"
+#include"Component/LogComponent.h"
 #include"Component/ProtoComponent.h"
 
 #include"Component/InnerNetComponent.h"
@@ -21,7 +21,6 @@
 #include"Component/NodeMgrComponent.h"
 #include"Component/TextConfigComponent.h"
 #include"Component/LaunchComponent.h"
-#include"Component/RemoteLogComponent.h"
 #include"Service/Log.h"
 #include"Service/Gate.h"
 #include"Service/Node.h"
@@ -58,8 +57,7 @@ void RegisterComponent()
 // common
     ComponentFactory::Add<TaskComponent>("TaskComponent");
     ComponentFactory::Add<TimerComponent>("TimerComponent");
-    ComponentFactory::Add<LoggerComponent>("LoggerComponent");
-    ComponentFactory::Add<RemoteLogComponent>("RemoteLogComponent");
+    ComponentFactory::Add<LogComponent>("LogComponent");
     ComponentFactory::Add<UnitMgrComponent>("UnitMgrComponent");
     ComponentFactory::Add<NetThreadComponent>("NetThreadComponent");
     ComponentFactory::Add<ProtoComponent>("ProtoComponent");
