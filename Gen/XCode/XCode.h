@@ -40,8 +40,8 @@ namespace XCode
 	constexpr int NoCoroutineContext = 36;//没有协程上下文
 	constexpr int ParseJsonFailure = 37;//解析json失败
 	constexpr int CacheMessageNextSend = 38;//缓存消息下次发送
-	constexpr int MysqlNotInCoroutine = 39;//Mysql没有协程上下文
-	constexpr int MysqlStartTaskFail = 40;//Mysql任务启动失败
+	constexpr int MysqlResultIsNull = 39;//Mysql结果返回空
+	constexpr int MysqlTableNameError = 40;//Mysql表名不符合规则
 	constexpr int MysqlInitTaskFail = 41;//Mysql初始化失败
 	constexpr int MysqlSocketIsNull = 42;//Mysql连接是空
 	constexpr int MysqlSelectDbFailure = 43;//Mysql选择数据库失败

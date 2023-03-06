@@ -14,7 +14,7 @@ namespace Sentry
         Node() = default;
         ~Node() = default;
     private:
-		int Ping();
+		int Ping(const Rpc::Head & head);
 		int Stop();
 		int Hotfix();
 		int LoadConfig();

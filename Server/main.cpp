@@ -21,8 +21,7 @@
 #include"Component/NodeMgrComponent.h"
 #include"Component/TextConfigComponent.h"
 #include"Component/LaunchComponent.h"
-#include"Component/TranComponent.h"
-
+#include"Component/RemoteLogComponent.h"
 #include"Service/Log.h"
 #include"Service/Gate.h"
 #include"Service/Node.h"
@@ -60,6 +59,7 @@ void RegisterComponent()
     ComponentFactory::Add<TaskComponent>("TaskComponent");
     ComponentFactory::Add<TimerComponent>("TimerComponent");
     ComponentFactory::Add<LoggerComponent>("LoggerComponent");
+    ComponentFactory::Add<RemoteLogComponent>("RemoteLogComponent");
     ComponentFactory::Add<UnitMgrComponent>("UnitMgrComponent");
     ComponentFactory::Add<NetThreadComponent>("NetThreadComponent");
     ComponentFactory::Add<ProtoComponent>("ProtoComponent");
@@ -69,9 +69,7 @@ void RegisterComponent()
     ComponentFactory::Add<TextConfigComponent>("TextConfigComponent");
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
     ComponentFactory::Add<InnerNetComponent>("InnerNetComponent");
-	ComponentFactory::Add<NodeMgrComponent>("LocationComponent");
-
-    ComponentFactory::Add<TranComponent>("TranComponent");
+	ComponentFactory::Add<NodeMgrComponent>("NodeMgrComponent");
 
 // gate
 	ComponentFactory::Add<GateHelperComponent>("GateHelperComponent");
@@ -125,6 +123,7 @@ void RegisterServiceComponent()
 }
 int main(int argc, char **argv)
 {
+
 #ifdef __OS_WIN__
     system("chcp 65001 > nul"); 
 #endif

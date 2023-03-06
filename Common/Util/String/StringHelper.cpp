@@ -5,30 +5,30 @@
 #include"google/protobuf/message.h"
 namespace Helper
 {
-    std::string String::EmptyStr = "";
+    std::string Str::EmptyStr = "";
 
-    const std::string & String::Empty()
+    const std::string & Str::Empty()
     {
         return EmptyStr;
     }
 
-    void String::Tolower(std::string &str)
+    void Str::Tolower(std::string &str)
     {
         std::transform(str.begin(), str.end(), str.begin(), ::tolower);
     }
 
-    void String::Toupper(std::string &str)
+    void Str::Toupper(std::string &str)
     {
         std::transform(str.begin(), str.end(), str.begin(), ::toupper);
     }
 
-    size_t String::Split(const std::string &targetString, const char * cc, std::vector<std::string>& ret)
+    size_t Str::Split(const std::string &targetString, const char * cc, std::vector<std::string>& ret)
     {
         google::protobuf::SplitStringUsing(targetString, cc, &ret);
         return ret.size();
     }
 
-    void String::ReplaceString(std::string &outstring, const std::string str1, const std::string str2)
+    void Str::ReplaceString(std::string &outstring, const std::string str1, const std::string str2)
     {
         size_t pos = outstring.find(str1);
         while (pos != std::string::npos)
@@ -38,12 +38,12 @@ namespace Helper
         }
     }
 
-    extern void String::ClearBlank(std::string &input)
+    extern void Str::ClearBlank(std::string &input)
     {
         input.erase(std::remove(input.begin(), input.end(), ' '), input.end());
     }
 
-    bool String::GetFileName(const std::string &path, std::string & name)
+    bool Str::GetFileName(const std::string &path, std::string & name)
     {
         size_t pos = path.find_last_of('\\');
         if (pos != std::string::npos)
@@ -60,7 +60,7 @@ namespace Helper
 		return false;
     }
 
-    void String::FormatJson(const std::string &json, std::string & format)
+    void Str::FormatJson(const std::string &json, std::string & format)
     {
         auto getLevelStr = [](int level, std::string &str) {
             for (int i = 0; i < level; i++)
@@ -105,7 +105,7 @@ namespace Helper
         }
     }
 
-    std::string String::RandomString(size_t size)
+    std::string Str::RandomString(size_t size)
     {
 		char x = 0;
 		std::unique_ptr<char[]> buffer(new char[size]);
@@ -126,13 +126,16 @@ namespace Helper
 		return std::string(buffer.get(), size);
     }
 
-    std::string String::CreateNewToken()
+    std::string Str::CreateNewToken()
     {
         const int size = Math::Random<int>(30, 100);
         return Md5::GetMd5(RandomString(size));
     }
+}// namespace StringHelper
 
-    bool String::ParseIpAddress(const std::string &address, std::string &ip, unsigned short &port)
+namespace Helper
+{
+    bool Str::SplitAddress(const std::string& address, std::string& ip, unsigned short& port)
     {
         size_t pos = address.find(":");
         if (pos == std::string::npos)
@@ -140,7 +143,7 @@ namespace Helper
             return false;
         }
         ip = address.substr(0, pos);
-        port = (unsigned short) std::stoul(address.substr(pos + 1));
+        port = (unsigned short)std::stoul(address.substr(pos + 1));
         return true;
     }
-}// namespace StringHelper
+}

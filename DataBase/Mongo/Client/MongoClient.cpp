@@ -63,7 +63,7 @@ namespace Mongo
         {
             return true;
         }
-        std::string nonce = _bson::base64::encode(Helper::String::RandomString(8));
+        std::string nonce = _bson::base64::encode(Helper::Str::RandomString(8));
         std::shared_ptr<Mongo::CommandRequest> request1(new CommandRequest());
         std::string firstBare = fmt::format("n={0},r={1}", MongoConfig::Inst()->User, nonce);
 
@@ -94,7 +94,7 @@ namespace Mongo
         std::string parsedSource = _bson::base64::decode(server_first);
 
         std::vector<std::string> ret;
-        Helper::String::Split(parsedSource, ",", ret);
+        Helper::Str::Split(parsedSource, ",", ret);
 
         std::string salt(ret[1].c_str() + 2, ret[1].size() - 2);
         std::string rnonce(ret[0].c_str() + 2, ret[0].size() - 2);
@@ -256,12 +256,22 @@ namespace Mongo
         const Net::Address & address
             = config->Address[this->mIndex];
         this->mSocket->Init(address.Ip, address.Port);
+#ifdef __DEBUG__
+        CONSOLE_LOG_DEBUG("start connect mongo server [" << address.FullAddress << "]");
+#endif // __DEBUG__
+
 		if(!this->ConnectSync())
 		{
             this->mIndex++;
+#ifdef __DEBUG__
+            CONSOLE_LOG_ERROR("connect mongo server [" << address.FullAddress << "] failure");
+#endif // __DEBUG__
 			return this->StartAuthBySha1();
 		}
         this->mIndex = 0;
+#ifdef __DEBUG__
+        CONSOLE_LOG_DEBUG("connect mongo server [" << address.FullAddress << "]successful");
+#endif
         return this->Auth(config->User, "admin", config->Password);
 	}
 

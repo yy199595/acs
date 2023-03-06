@@ -60,7 +60,7 @@ namespace Mysql
     }
 
     QueryCommand::QueryCommand(const std::string &sql)
-        : mSql(std::move(sql))
+        : mSql(sql)
     {
 
     }

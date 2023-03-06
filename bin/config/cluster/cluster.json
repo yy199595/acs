@@ -9,7 +9,6 @@
 			"Registry" : false
 		},
 		"Component": [
-			"NodeMgrComponent",
 			"LuaScriptComponent"
 		]
 	},
@@ -20,12 +19,12 @@
 			"Account": true,
 			"HttpBackGround": true,
 			"Gate": false,
+			"HttpDebug":true,
 			"Registry" : false
 		},
 		"Component": [
 			"HttpComponent",
 			"RedisComponent",
-			"NodeMgrComponent",
 			"HttpWebComponent",
 			"LuaScriptComponent"
 		]
@@ -37,10 +36,7 @@
 			"Node": true,
 			"Chat": false,
 			"Registry" : false
-		},
-		"Component": [
-			"NodeMgrComponent"
-		]
+		}
 	},
 	"DataServer": {
 		"AutoAllot": true,
@@ -48,15 +44,14 @@
 			"MongoDB": true,
 			"Node": true,
 			"Registry" : false
-		},
-		"Component": [
-			"NodeMgrComponent"
-		]
+		}
 	},
 	"LogServer": {
 		"AutoAllot": false,
 		"Service": {
-			"Log": true
+			"Log": true,
+			"Node": true,
+			"Registry" : false
 		}
 	},
 	"RegistryServer": {
@@ -64,10 +59,6 @@
 		"Service": {
 			"Node": true,
 			"Registry" : true
-		},
-		"Component": [
-				"TranComponent",
-				"NodeMgrComponent"
-			]
 		}
 	}
+}

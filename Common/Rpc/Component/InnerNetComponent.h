@@ -25,7 +25,9 @@ namespace Sentry
         void OnRecord(Json::Writer & document) final;
 		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 public:
+		void GetServiceList(std::vector<std::string>& list) const;
 		void GetServiceList(std::vector<const ServiceNodeInfo *> &list) const;
+		void GetServiceList(const std::string & name, std::vector<const ServiceNodeInfo*>& list) const;
         const ServiceNodeInfo * GetSeverInfo(const std::string & address) const;
 	 public:
         InnerNetClient * GetSession(const std::string& address);

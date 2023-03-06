@@ -34,12 +34,13 @@ namespace Sentry
         int Call(long long userId, const std::string& func, const Message& message, std::shared_ptr<Message> response);
     public:
         bool StartSend(long long userId, const std::string & func, const Message * message = nullptr);
-        bool StartSend(const std::string & address, const std::string & func, const Message * message = nullptr);
+        bool StartSend(const std::string & address, const std::string & func, const Message * message = nullptr);		
         std::shared_ptr<Rpc::Packet> CallAwait(long long userId, const std::string & func, const Message * message = nullptr);
         std::shared_ptr<Rpc::Packet> CallAwait(const std::string & address, const std::string & func, const Message * message = nullptr);
 	 protected:
 		bool LateAwake() override;
     public:
+		bool RandomAddress(std::string& address);
         virtual int Invoke(const std::string & method, std::shared_ptr<Rpc::Packet> message) = 0;
 	private:
 		std::string mCluster;

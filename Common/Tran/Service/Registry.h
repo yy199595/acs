@@ -15,10 +15,16 @@ namespace Sentry
         bool OnStart() final;
         bool OnClose() final;
     private:
+        int Ping(const Rpc::Head & head);
+        int UnRegister(const com::type::string& request);
+        int Query(const com::type::string& request, s2s::server::list& response);
 		int Register(const s2s::server::info & request, s2s::server::list & response);
-		int UnRegister(const com::type::string & request);
+    private:
+        void PingNodeServer();
+        void OnNodeServerError(const std::string& address);
 	 private:
-        class NodeMgrComponent * mLocationComponent;
+        class NodeMgrComponent * mNodeComponent;
+        class InnerNetComponent* mInnerComponent;
     };
 }
 

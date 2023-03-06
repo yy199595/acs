@@ -22,7 +22,7 @@ namespace Lua
 				std::stringstream stringBuffer;
 
 				std::string fillName;
-				Helper::String::GetFileName(ar.short_src, fillName);
+				Helper::Str::GetFileName(ar.short_src, fillName);
 				stringBuffer << fillName << ":" << ar.currentline << "  ";
 				for (int i = 1; i <= n; i++)
 				{

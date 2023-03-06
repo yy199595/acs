@@ -87,7 +87,7 @@ namespace Lua
         lua_pushthread(lua);
         ClientComponent* clientComponent = App::Inst()->GetComponent<ClientComponent>();
         const std::string address = CommonParameter::Read<std::string>(lua, 1);
-        if (!Helper::String::ParseIpAddress(address, ip, port))
+        if (!Helper::Str::SplitAddress(address, ip, port))
         {
             luaL_error(lua, "parse ip address [%s] error", address.c_str());
             return 0;

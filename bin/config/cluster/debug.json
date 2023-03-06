@@ -18,10 +18,8 @@
 			"HttpWebComponent",
 			"ConsoleComponent",
 			"LuaScriptComponent",
-			"TranComponent",
 			"RedisComponent",
-			"HttpWebComponent",
-			"LocationComponent"
+			"HttpWebComponent"
 		]
 	}
 }

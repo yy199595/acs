@@ -118,8 +118,9 @@ namespace Sentry
         std::string SrvName;
         std::string UserName;
         std::string PassWord;
-        std::string LocationRpc;
-        std::string LocationHttp;
+        std::string RpcAddress;
+        std::string HttpAddress;
+		std::string LocalAddress;
     };
 
 	template<typename T1, typename T2>

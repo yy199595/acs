@@ -1,5 +1,6 @@
-start ./Debug/app.exe ./config/server.json TranServer
+start ./Debug/app.exe ./config/server.json RegistryServer
 start ./Debug/app.exe ./config/server.json DataServer
 start ./Debug/app.exe ./config/server.json GateServer
 start ./Debug/app.exe ./config/server.json ChatServer
 start ./Debug/app.exe ./config/server.json HttpServer
+start ./Debug/app.exe ./config/server.json LogServer

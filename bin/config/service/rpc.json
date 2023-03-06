@@ -15,6 +15,14 @@
 		}
 	},
 	"Registry": {
+		"Ping":{
+			"Async":false
+		},
+		"Query":{
+			"Async":false,
+			"Request":"com.type.string",
+			"Response":"s2s.server.list"
+		},
 		"Register": {
 			"Async": true,
 			"Request": "s2s.server.info",

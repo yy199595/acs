@@ -36,6 +36,7 @@ namespace Sentry
 
 	bool App::LoadComponent()
 	{
+        
 		this->mTaskComponent = this->GetOrAddComponent<TaskComponent>();
 		this->mLogComponent = this->GetOrAddComponent<LoggerComponent>();
 		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
@@ -45,7 +46,7 @@ namespace Sentry
         //LOG_CHECK_RET_FALSE(this->AddComponent<LocationComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<NetThreadComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<LaunchComponent>());
-
+        LOG_CHECK_RET_FALSE(this->AddComponent<NodeMgrComponent>());
         std::vector<Component *> components;
         if(this->GetComponents(components) > 0)
         {

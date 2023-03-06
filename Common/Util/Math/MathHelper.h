@@ -94,6 +94,10 @@ namespace Math {
     template<typename T>
     inline const typename std::enable_if<IsIntegerType<T>::value, T>::type Random(const T min, const T max)
     {
+        if (min == max)
+        {
+            return min;
+        }
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<T> dis(min, max);

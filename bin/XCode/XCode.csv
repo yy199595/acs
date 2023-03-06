@@ -38,8 +38,8 @@ NetWorkError	网络错误
 NoCoroutineContext	没有协程上下文
 ParseJsonFailure	解析json失败
 CacheMessageNextSend	缓存消息下次发送
-MysqlNotInCoroutine	Mysql没有协程上下文
-MysqlStartTaskFail	Mysql任务启动失败
+MysqlResultIsNull	Mysql结果返回空
+MysqlTableNameError	Mysql表名不符合规则
 MysqlInitTaskFail	Mysql初始化失败
 MysqlSocketIsNull	Mysql连接是空
 MysqlSelectDbFailure	Mysql选择数据库失败

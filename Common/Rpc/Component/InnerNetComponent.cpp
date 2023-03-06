@@ -103,12 +103,12 @@ namespace Sentry
         const Rpc::Head &head = message->GetHead();
         std::unique_ptr<ServiceNodeInfo> serverNode(new ServiceNodeInfo());
 
-        head.Get("rpc", serverNode->LocationRpc);
-        head.Get("http", serverNode->LocationHttp);
+        head.Get("rpc", serverNode->RpcAddress);
+        head.Get("http", serverNode->HttpAddress);
         LOG_CHECK_RET_FALSE(head.Get("name", serverNode->SrvName));
         LOG_CHECK_RET_FALSE(head.Get("user", serverNode->UserName));
         LOG_CHECK_RET_FALSE(head.Get("passwd", serverNode->PassWord));
-        if(serverNode->LocationRpc.empty() && serverNode->LocationHttp.empty())
+        if(serverNode->RpcAddress.empty() && serverNode->HttpAddress.empty())
         {
             return false;
         }
@@ -121,6 +121,7 @@ namespace Sentry
                 return false;
             }
         }
+        serverNode->LocalAddress = address;
         this->mLocationMaps.emplace(address, std::move(serverNode));
         return true;
     }
@@ -147,7 +148,23 @@ namespace Sentry
         {
             std::string func;
             head.Get("func", func);
-            CONSOLE_LOG_ERROR("call " << func << " code = " << CodeConfig::Inst()->GetDesc(code));
+            CONSOLE_LOG_ERROR("call " << func << 
+                " code = " << CodeConfig::Inst()->GetDesc(code));
+            if (!head.Has("rpc"))
+            {
+                return false;
+            }
+            head.Add("code", code);
+            if (head.Has("address"))
+            {
+                head.Remove("id");
+                head.Remove("address");
+#ifndef __DEBUG__
+                head.Remove("func");
+#endif
+                message->SetType(Tcp::Type::Response);
+            }
+            this->Send(address, message);
             return false;
         }
         return true;
@@ -262,7 +279,7 @@ namespace Sentry
 		}
 		std::string ip;
 		unsigned short port = 0;
-        if(!Helper::String::ParseIpAddress(address, ip, port))
+        if(!Helper::Str::SplitAddress(address, ip, port))
         {
             CONSOLE_LOG_ERROR("parse address error : [" << address << "]");
             return nullptr;
@@ -319,6 +336,15 @@ namespace Sentry
 		return iter != this->mLocationMaps.end() ? iter->second.get() : nullptr;
 	}
 
+    void InnerNetComponent::GetServiceList(std::vector<std::string>& list) const
+    {
+        auto iter = this->mLocationMaps.begin();
+        for (; iter != this->mLocationMaps.end(); iter++)
+        {
+            list.push_back(iter->second->LocalAddress);
+        }
+    }
+
 	void InnerNetComponent::GetServiceList(std::vector<const ServiceNodeInfo *> &list) const
 	{
 		auto iter = this->mLocationMaps.begin();
@@ -327,4 +353,20 @@ namespace Sentry
 			list.push_back(iter->second.get());
 		}
 	}
+    void InnerNetComponent::GetServiceList(const std::string& name, std::vector<const ServiceNodeInfo*>& list) const
+    {
+        if (name.empty())
+        {
+            this->GetServiceList(list);
+            return;
+        }
+        auto iter = this->mLocationMaps.begin();
+        for (; iter != this->mLocationMaps.end(); iter++)
+        {
+            if (iter->second->SrvName == name)
+            {
+                list.push_back(iter->second.get());
+            }
+        }
+    }
 }// namespace Sentry

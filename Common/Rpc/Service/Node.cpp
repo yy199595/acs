@@ -30,8 +30,11 @@ namespace Sentry
         return true;
     }
 
-	int Node::Ping()
+	int Node::Ping(const Rpc::Head& head)
     {
+        std::string address;
+        head.Get("address", address);
+        CONSOLE_LOG_FATAL("[" << address << "] ping server");
         return XCode::Successful;
     }
 

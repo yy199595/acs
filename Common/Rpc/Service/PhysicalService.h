@@ -11,6 +11,7 @@
 
 namespace Sentry
 {
+	//实体服务 能处理逻辑
     class PhysicalService : public RpcService, public IServerRecord
 	{
 	public:

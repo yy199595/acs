@@ -29,6 +29,8 @@ namespace Sentry
 	 public:
 		bool LateAwake() final;
 		void OnLocalComplete() final;
+    private:
+        void PingRegistryServer();
     public:
 		bool GetServers(std::vector<std::string> & hosts);
         bool GetServer(const std::string & name, std::string & address);

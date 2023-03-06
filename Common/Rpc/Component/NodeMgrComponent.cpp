@@ -7,12 +7,14 @@
 #include"Config/ServerConfig.h"
 #include"Service/Registry.h"
 #include"Math/MathHelper.h"
+#include"Config/ClusterConfig.h"
 #include"Component/TaskComponent.h"
 namespace Sentry
 {
     void NodeMgrComponent::AddRpcServer(const std::string& name, const std::string& address)
     {
-        if(address.empty())
+		const NodeConfig* config = ClusterConfig::Inst()->GetConfig(name);
+        if(address.empty() || config == nullptr)
         {
             return;
         }
@@ -28,6 +30,14 @@ namespace Sentry
             locations.emplace_back(address);
             LOG_WARN(name << " add rpc server address [" << address << "]");
         }
+		if (config->HasService(ComponentFactory::GetName<Registry>()))
+		{
+			if (std::find(this->mRegistryAddress.begin(),
+				this->mRegistryAddress.end(), address) == this->mRegistryAddress.end())
+			{
+				this->mRegistryAddress.push_back(address);
+			}
+		}
     }
 
 	void NodeMgrComponent::WaitServerStart(const std::string& server)
@@ -101,7 +111,7 @@ namespace Sentry
             return false;
         }
         int size = (int)iter->second.size();
-        int index = Helper::Math::Random<int>(0, size);
+        int index = Helper::Math::Random<int>(0, size - 1);
         address = iter->second[index];
         return true;
     }
@@ -192,6 +202,23 @@ namespace Sentry
 				{
 					this->AddRpcServer(info.name(), info.rpc());
 					this->AddHttpServer(info.name(), info.http());
+				}
+			}
+		}		
+	}
+	void NodeMgrComponent::PingRegistryServer()
+	{
+		const std::string func("Ping");
+		RpcService* rpcService = this->mApp->GetService<Registry>();
+		TaskComponent* taskComponent = this->GetComponent<TaskComponent>();
+		while (!this->mRegistryAddress.empty())
+		{
+			taskComponent->Sleep(15 * 1000);
+			for (const std::string& address : this->mRegistryAddress)
+			{
+				if (rpcService->Call(address, func) == XCode::Successful)
+				{
+					CONSOLE_LOG_INFO("ping registry server [" << address << "] successful");
 				}
 			}
 		}

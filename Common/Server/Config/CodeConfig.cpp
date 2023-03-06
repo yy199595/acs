@@ -22,7 +22,7 @@ namespace Sentry
         for(size_t index = 0; index < lines.size() -1; index++)
         {
             rets.clear();
-            if(Helper::String::Split(lines[index + 1], "\t", rets) != 2)
+            if(Helper::Str::Split(lines[index + 1], "\t", rets) != 2)
             {
                 return false;
             }

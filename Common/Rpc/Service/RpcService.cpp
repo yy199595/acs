@@ -19,6 +19,10 @@ namespace Sentry
 		ClusterConfig::Inst()->GetServerName(this->GetName(), this->mCluster);
 		return ServerConfig::Inst()->GetLocation("rpc", this->mLocationAddress);
 	}
+    bool RpcService::RandomAddress(std::string& address)
+    {
+        return this->mLocationComponent->GetServer(this->mCluster, address);
+    }
 }
 
 namespace Sentry

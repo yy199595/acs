@@ -25,14 +25,14 @@ namespace Sentry
         for (unsigned int index = 0; index < json["address"].Size(); index++)
         {
             Net::Address addressInfo;
-            std::string address(json["address"][index].GetString());
-            if(!Helper::String::ParseIpAddress(address, addressInfo.Ip, addressInfo.Port))
+            addressInfo.FullAddress.assign(json["address"][index].GetString());
+            if(!Helper::Str::SplitAddress(addressInfo.FullAddress, addressInfo.Ip, addressInfo.Port))
             {
                 return false;
             }
             this->Address.emplace_back(addressInfo);
         }
-        return true;
+        return this->Address.size() > 0;
     }
 
     bool MysqlConfig::OnReloadText(const char *str, size_t length)

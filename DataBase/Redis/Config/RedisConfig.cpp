@@ -33,8 +33,8 @@ namespace Sentry
         for(unsigned int index = 0;index < json.Size();index++)
         {
             Net::Address addressInfo;
-            std::string address(json[index].GetString());
-            if(!Helper::String::ParseIpAddress(address, addressInfo.Ip, addressInfo.Port))
+			addressInfo.FullAddress.assign(json[index].GetString());
+            if(!Helper::Str::SplitAddress(addressInfo.FullAddress, addressInfo.Ip, addressInfo.Port))
             {
                 return false;
             }

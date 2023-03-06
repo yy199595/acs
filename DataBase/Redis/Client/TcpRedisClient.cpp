@@ -113,21 +113,31 @@ namespace Sentry
         }
         const Net::Address &address =
                 this->mConfig.Address[this->mIndex];
-        this->mSocket->Init(address.Ip, address.Port);
-        if (this->ConnectSync())
+        this->mAddress = address.FullAddress;
+        this->mSocket->Init(address.Ip, address.Port); 
+#ifdef __DEBUG__
+        CONSOLE_LOG_DEBUG("start connect redis server [" << address.FullAddress << "]");
+#endif
+        if (!this->ConnectSync())
         {
-            this->mIndex = 0;
-            return this->InitRedisClient();
+            this->mIndex++;
+#ifdef __DEBUG__
+            CONSOLE_LOG_ERROR("connect redis server [" << address.FullAddress << "] failure");
+#endif // __DEBUG__
+            return this->AuthUser();
         }
-        this->mIndex++;
-        return this->AuthUser();
+        this->mIndex = 0;
+#ifdef __DEBUG__
+        CONSOLE_LOG_DEBUG("connect redis server [" << address.FullAddress << "]successful");
+#endif
+        return this->InitRedisClient(this->mConfig.Password);
     }
 
-    bool TcpRedisClient::InitRedisClient()
+    bool TcpRedisClient::InitRedisClient(const std::string & pwd)
     {
         assert(this->mSendBuffer.size() == 0);
         assert(this->mRecvBuffer.size() == 0);
-        if (!this->mConfig.Password.empty())  //验证密码
+        if (!pwd.empty())  //验证密码
         {
             std::shared_ptr<RedisRequest> authCommand = RedisRequest::Make("AUTH", this->mConfig.Password);
             std::shared_ptr<RedisResponse> response = this->SyncCommand(authCommand);

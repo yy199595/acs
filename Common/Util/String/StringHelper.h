@@ -5,7 +5,7 @@
 #include <vector>
 namespace Helper
 {
-    namespace String
+    namespace Str
     {
         extern std::string EmptyStr;
 
@@ -27,10 +27,13 @@ namespace Helper
 
         extern void FormatJson(const std::string &json, std::string & format);
 
-        extern bool ParseIpAddress(const std::string &address, std::string &ip, unsigned short &port);
-
         extern void ReplaceString(std::string &outstring, const std::string str1, const std::string str2);
 
         extern size_t Split(const std::string &targetString, const char * cc, std::vector<std::string> &ret);
+    }
+
+    namespace Str
+    {
+        extern bool SplitAddress(const std::string& address, std::string& ip, unsigned short& port);
     }
 }// namespace StringHelper

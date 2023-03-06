@@ -91,7 +91,7 @@ namespace Sentry
             const ServiceNodeInfo *nodeInfo = this->mRpcClientComponent->GetSeverInfo(from);
             if (nodeInfo != nullptr)
             {
-                from = nodeInfo->LocationRpc;
+                from = nodeInfo->RpcAddress;
             }
             if (code != XCode::Successful)
             {

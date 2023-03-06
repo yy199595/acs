@@ -81,7 +81,7 @@ namespace Http
             std::vector<std::string> result;
             this->mPath = this->mUrl.substr(0, pos);
             std::string parameter = this->mUrl.substr(pos + 1);
-            if(Helper::String::Split(parameter, "&", result) > 0)
+            if(Helper::Str::Split(parameter, "&", result) > 0)
             {
                 for (const std::string &filed: result)
                 {
