@@ -110,6 +110,7 @@ namespace Sentry
 		virtual void OnConnectSuccessful(const std::string & address) { }
 		virtual void OnCloseSocket(const std::string& address, int code) { };
         virtual void OnMessage(const std::string & address, std::shared_ptr<T> message) = 0;
+		virtual void OnSendFailure(const std::string& address, std::shared_ptr<T> message) { }
     };
 
     class ServiceNodeInfo

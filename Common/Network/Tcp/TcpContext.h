@@ -47,7 +47,7 @@ namespace Tcp
         bool SendFromMessageQueue();
         int SendSync(std::shared_ptr<ProtoMessage> message); //同步发送
     protected:
-        size_t PopAllMessage();
+        size_t PopAllMessage();		
         std::shared_ptr<ProtoMessage> PopMessage();
 	 protected:
         virtual void OnConnect(const Asio::Code & error, int count) { throw std::logic_error("");}
@@ -63,6 +63,7 @@ namespace Tcp
         size_t mSendCount;   
 		const size_t mMaxCount;
 		long long mLastOperTime;
+		//std::unique_ptr<asio::steady_timer> mTimer;
         std::list<std::shared_ptr<ProtoMessage>> mMessagqQueue;
 	};
 }

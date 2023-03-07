@@ -35,7 +35,7 @@ namespace Sentry
     private:
         std::string mFullName;
 		class TaskComponent* mTaskComponent;
-		class InnerNetComponent* mRpcClientComponent;
+		class InnerNetComponent* mInnerComponent;
         std::queue<std::shared_ptr<Rpc::Packet>> mWaitMessages;
 	};
 }

@@ -13,7 +13,7 @@ namespace Sentry
 		Gate();
 	 private:
 		int Ping(long long userId);
-        int Allot(const com::type::int64 & userId, s2s::allot::response & response);
+        int AddUser(const com::type::int64 & userId, s2s::allot::response & response);
 	private:
         void Init() final;
 		bool OnStart() final;

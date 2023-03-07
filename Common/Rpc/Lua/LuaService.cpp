@@ -29,33 +29,30 @@ namespace Lua
             const std::string fullName = luaL_checkstring(lua, 2);
             methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
         }
-		else if (lua_isinteger(lua, 1)) //userId
+        else if (lua_isinteger(lua, 1)) //userId
         {
             long long userId = lua_tointeger(lua, 1);
             request->GetHead().Add("id", userId);
 #ifdef __INNER_MSG_FORWARD__
-            ForwardHelperComponent * forwardComponent = App::Inst()->GetComponent<ForwardHelperComponent>();
+            ForwardHelperComponent* forwardComponent = App::Inst()->GetComponent<ForwardHelperComponent>();
             forwardComponent->GetLocation(userId, address);
 #else
-			std::string fullName = luaL_checkstring(lua, 2);
-			methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
-			if(methodConfig == nullptr)
-			{
-				luaL_error(lua, "not find config %s", fullName.c_str());
-				return 0;
-			}
-			NodeMgrComponent * locationComponent = App::Inst()->GetComponent<NodeMgrComponent>();
-            const LocationUnit * locationUnit = locationComponent->GetUnit(userId);
-            if(locationUnit == nullptr || (!locationUnit->Get(methodConfig->Service, address)))
+            std::string fullName = luaL_checkstring(lua, 2);
+            methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
+            if (methodConfig == nullptr)
             {
-                std::string server;
-                if(!ClusterConfig::Inst()->GetServerName(methodConfig->Service, server))
-                {
-                    luaL_error(lua, "not cluster config %s", methodConfig->Service.c_str());
-                    return 0;
-                }
-				locationComponent->GetServer(server, userId, address);
+                luaL_error(lua, "not find config %s", fullName.c_str());
+                return 0;
             }
+            std::string server;
+            NodeMgrComponent* locationComponent = 
+                App::Inst()->GetComponent<NodeMgrComponent>();
+            if (!ClusterConfig::Inst()->GetServerName(methodConfig->Service, server))
+            {
+                luaL_error(lua, "not cluster config %s", methodConfig->Service.c_str());
+                return 0;
+            }
+            locationComponent->GetServer(server, userId, address);
 #endif
         }
         else if (lua_isstring(lua, 1)) //address
@@ -125,27 +122,27 @@ namespace Lua
 
 	int Service::AllotServer(lua_State *lua)
 	{
-		const std::string service = luaL_checkstring(lua, 1);
-		NodeMgrComponent * locationComponent = App::Inst()->GetComponent<NodeMgrComponent>();
-		if(lua_isinteger(lua, 2))
-		{
-			std::string address;
-			long long userId = lua_tointeger(lua, 2);
-			LocationUnit * locationUnit = locationComponent->GetUnit(userId);
-			if(locationUnit != nullptr && locationUnit->Get(service, address))
-			{
-				lua_pushlstring(lua, address.c_str(), address.size());
-				return 1;
-			}
-		}
         std::string server;
+		const std::string service = luaL_checkstring(lua, 1);
         if (!ClusterConfig::Inst()->GetServerName(service, server))
         {
             luaL_error(lua, "not find server : service = %s ", service.c_str());
             return 0;
         }
+		NodeMgrComponent * locationComponent = App::Inst()->GetComponent<NodeMgrComponent>();
+		if(lua_isinteger(lua, 2))
+		{
+			std::string address;
+			long long userId = lua_tointeger(lua, 2);
+            if (locationComponent->GetServer(server, userId, address))
+            {
+                lua_pushlstring(lua, address.c_str(), address.size());
+                return 1;
+            }
+		}
+       
 		std::string address;
-		if(locationComponent->AllotServer(server, address))
+		if(locationComponent->GetServer(server, address))
 		{
 			lua_pushlstring(lua, address.c_str(), address.size());
 			return 1;
@@ -183,18 +180,13 @@ namespace Lua
                 luaL_error(lua, "not find config %s", fullName.c_str());
                 return 0;
             }
-            NodeMgrComponent* locationComponent = App::Inst()->GetComponent<NodeMgrComponent>();
-            const LocationUnit* locationUnit = locationComponent->GetUnit(userId);
-            if (locationUnit == nullptr || (!locationUnit->Get(methodConfig->Service, address)))
+            
+            NodeMgrComponent* locationComponent = 
+                App::Inst()->GetComponent<NodeMgrComponent>();
+            if (locationComponent->GetServer(methodConfig->Service, address))
             {
-                std::string server;
-                if(!ClusterConfig::Inst()->GetServerName(methodConfig->Service, server))
-                {
-                    luaL_error(lua, "not cluster config %s", methodConfig->Service.c_str());
-                    return 0;
-                }
-                locationComponent->GetServer(server, userId, address);
-            }
+                return 0;
+            }          
 #endif
         }
         else if (lua_isstring(lua, 1)) //address

@@ -68,11 +68,7 @@ namespace Sentry
 #endif
             }
         }
-        HttpHandlerClient* httpHandlerClient = this->GetClient(address);
-        if (httpHandlerClient != nullptr)
-        {
-            httpHandlerClient->StartWriter(response);
-        }
+        this->Send(address, response);       
         this->mWaitCount--;
     }
 

@@ -19,13 +19,12 @@ namespace Sentry
     public:
         bool DelServer(const std::string& address);
 		void WaitServerStart(const std::string & server);//等待某个服务器启动
-		bool AllotServer(const std::string& server, std::string& address);
         void AddRpcServer(const std::string & server, const std::string & address);
         void AddHttpServer(const std::string& server, const std::string& address);
 	 public:
 		bool DelUnit(long long id);
-		LocationUnit * GetUnit(long long id) const;
-		bool AddUnit(std::unique_ptr<LocationUnit> locationUnit);
+        bool DelServer(const std::string& server, long long id);
+        bool AddRpcServer(const std::string& server, long long id, const std::string& address);		
 	 public:
 		bool LateAwake() final;
 		void OnLocalComplete() final;
@@ -37,6 +36,7 @@ namespace Sentry
 		bool GetServers(const std::string & name, std::vector<std::string> & hosts);
         bool GetServer(const std::string & name, long long index, std::string & address);
 	 private:
+        size_t mIndex;
 		std::vector<std::string> mRegistryAddress;
         std::unordered_map<std::string, std::vector<std::string>> mRpcServers;
         //std::unordered_map<std::string, std::vector<std::string>> mHttpServers;

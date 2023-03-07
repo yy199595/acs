@@ -1,3 +1,4 @@
+call ./stop.bat
 start ./Debug/app.exe ./config/server.json RegistryServer
 start ./Debug/app.exe ./config/server.json DataServer
 start ./Debug/app.exe ./config/server.json GateServer

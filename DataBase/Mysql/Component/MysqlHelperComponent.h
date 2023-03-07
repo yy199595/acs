@@ -31,6 +31,7 @@ namespace Sentry
 		int Call(const std::string& func, const Message& data, std::shared_ptr<db::mysql::response> response = nullptr);
 	private:
 		std::string mServerName;
+		class RpcService* mMysqlDB;
 		class NodeMgrComponent * mLocationComponent;
 	};
 

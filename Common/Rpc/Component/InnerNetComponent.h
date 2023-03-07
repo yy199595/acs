@@ -19,6 +19,7 @@ namespace Sentry
 		void OnConnectSuccessful(const std::string &address) final;
 		void OnCloseSocket(const std::string & address, int code) final;
         void OnMessage(const std::string & address, std::shared_ptr<Rpc::Packet> message) final;
+		void OnSendFailure(const std::string& address, std::shared_ptr<Rpc::Packet> message) final;
 	 protected:
         bool Awake() final;
         bool LateAwake() final;

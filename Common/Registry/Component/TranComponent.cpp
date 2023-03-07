@@ -13,7 +13,7 @@ namespace Sentry
 {
     bool TranComponent::LateAwake()
     {
-    
+        this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
         return true;
     }
 
@@ -50,14 +50,9 @@ namespace Sentry
         {
             return XCode::CallServiceNotFound;
         }
-        LocationUnit *locationUnit = this->mLocationComponent->GetUnit(userId);
-        if(locationUnit == nullptr)
+        if (!this->mNodeComponent->GetServer(server, userId, address))
         {
             return XCode::NotFindUser;
-        }
-        if (!locationUnit->Get(server, address))
-        {
-            return XCode::Failure;
         }
         return this->Forward(address, message);
     }

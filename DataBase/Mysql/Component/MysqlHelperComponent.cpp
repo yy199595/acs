@@ -8,8 +8,8 @@ namespace Sentry
 {
 	bool MysqlHelperComponent::LateAwake()
 	{
-        LOG_CHECK_RET_FALSE(this->mApp->GetService<MysqlDB>());
         this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
+		LOG_CHECK_RET_FALSE(this->mMysqlDB = this->mApp->GetService<MysqlDB>());
 		return true;
 	}
 
@@ -54,16 +54,15 @@ namespace Sentry
 	int MysqlHelperComponent::Call(const std::string& func, const Message& data, std::shared_ptr<db::mysql::response> response)
 	{
 		std::string address;
-        RpcService * rpcService = this->mApp->GetService<MysqlDB>();
-		if(!this->mLocationComponent->AllotServer(this->mServerName, address))
+		if(!this->mLocationComponent->GetServer(this->mServerName, address))
 		{
 			return XCode::CallServiceNotFound;
 		}
 		if(response == nullptr)
 		{
-			return rpcService->Call(address, func, data);
+			return this->mMysqlDB->Call(address, func, data);
 		}
-		return rpcService->Call(address, func, data, response);
+		return this->mMysqlDB->Call(address, func, data, response);
 	}
 
 	int MysqlHelperComponent::QueryOnce(const std::string& json, std::shared_ptr<Message> response)

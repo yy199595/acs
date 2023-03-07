@@ -12,7 +12,7 @@ namespace Sentry
 	bool InnerNetMessageComponent::Awake()
 	{
 		this->mTaskComponent = nullptr;
-		this->mRpcClientComponent = nullptr;
+		this->mInnerComponent = nullptr;
         return true;
 	}
 
@@ -20,7 +20,7 @@ namespace Sentry
 	{
 		this->mTaskComponent = this->mApp->GetTaskComponent();
 		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<TaskComponent>());
-		LOG_CHECK_RET_FALSE(this->mRpcClientComponent = this->GetComponent<InnerNetComponent>());
+		LOG_CHECK_RET_FALSE(this->mInnerComponent = this->GetComponent<InnerNetComponent>());
 		return true;
 	}
 
@@ -88,7 +88,7 @@ namespace Sentry
         std::string from;
         if (head.Get("address", from))
         {
-            const ServiceNodeInfo *nodeInfo = this->mRpcClientComponent->GetSeverInfo(from);
+            const ServiceNodeInfo *nodeInfo = this->mInnerComponent->GetSeverInfo(from);
             if (nodeInfo != nullptr)
             {
                 from = nodeInfo->RpcAddress;
@@ -114,7 +114,7 @@ namespace Sentry
             head.Remove("func");
 #endif
             message->SetType(Tcp::Type::Response);
-            this->mRpcClientComponent->Send(address, message);
+            this->mInnerComponent->Send(address, message);
         }
     }
 
@@ -138,7 +138,7 @@ namespace Sentry
         {
             message->GetHead().Add("rpc", taskSource->GetRpcId());
         }
-        if (!this->mRpcClientComponent->Send(address, message))
+        if (!this->mInnerComponent->Send(address, message))
         {
             return nullptr;
         }
@@ -147,13 +147,13 @@ namespace Sentry
 
     bool InnerNetMessageComponent::Send(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
-        if (this->mRpcClientComponent == nullptr)
+        if (this->mInnerComponent == nullptr)
         {
             return false;
         }
         message->GetHead().Remove("address");
         assert(message->GetType() < (int)Tcp::Type::Max);
         assert(message->GetType() > (int)Tcp::Type::None);
-        return this->mRpcClientComponent->Send(address, message);
+        return this->mInnerComponent->Send(address, message);
     }
 }// namespace Sentry

@@ -18,17 +18,16 @@ namespace Sentry
 	 public:
 		int BroadCast(const std::string & func);
 		int BroadCast(const std::string & func, const Message & message);
-	 private:
-		bool GetLocation(long long userId, std::string & address);
+	 private:		
 		int LuaBroadCast(const char * func, std::shared_ptr<Message> message);
 		int LuaCall(long long userId, const std::string func, std::shared_ptr<Message> message);
 	 protected:
 		bool LateAwake() final;
 		void OnLuaRegister(Lua::ClassProxyHelper & luaRegister) final;
 	 private:
-		 std::string mGateServerName;
+		std::string mGateName;
+		class NodeMgrComponent* mNodeComponent;
         class InnerNetComponent * mInnerComponent;
-		class NodeMgrComponent * mLocationComponent;
 	};
 }
 

@@ -10,16 +10,17 @@
 			"Chat": true,
 			"Registry":true,
 			"HttpBackGround": true,
-			"Account": true,
-			"HttpDebug": true
+			"Account": true
 		},
 		"Component": [
 			"HttpComponent",
 			"HttpWebComponent",
 			"ConsoleComponent",
+			"NodeMgrComponent",
 			"LuaScriptComponent",
 			"RedisComponent",
-			"HttpWebComponent"
+			"HttpWebComponent",
+			"HttpDebugComponent"
 		]
 	}
 }

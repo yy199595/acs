@@ -44,7 +44,7 @@ namespace Sentry
         {
             return iter->second->Desc;
         }
-        return std::string();
+        return std::string("unknow error");
     }
 
     bool CodeConfig::OnReloadText(const char *str, size_t length)

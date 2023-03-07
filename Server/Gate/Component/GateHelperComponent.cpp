@@ -14,30 +14,20 @@ namespace Sentry
 	bool GateHelperComponent::LateAwake()
 	{
 		LOG_CHECK_FATAL(this->GetComponent<Gate>());
+		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
         this->mInnerComponent = this->GetComponent<InnerNetComponent>();
-		this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
 		const std::string name = ComponentFactory::GetName<Gate>();
-		return ClusterConfig::Inst()->GetServerName(name, this->mGateServerName);
-	}
-
-	bool GateHelperComponent::GetLocation(long long userId, std::string& address)
-	{		
-		LocationUnit * locationUnit = this->mLocationComponent->GetUnit(userId);
-		if(locationUnit == nullptr)
-		{
-			return false;
-		}
-		return locationUnit->Get(this->mGateServerName, address);
+		return ClusterConfig::Inst()->GetServerName(name, this->mGateName);
 	}
 
 
 	int GateHelperComponent::Call(long long userId, const std::string& func)
 	{
         std::string address;
-		if(!this->GetLocation(userId, address))
-		{
-			return XCode::NotFindUser;
-		}
+        if (!this->mNodeComponent->GetServer(this->mGateName, userId, address))
+        {
+            return XCode::NotFindUser;
+        }		
 
         std::shared_ptr<Rpc::Packet> data
             = Rpc::Packet::New(Tcp::Type::Forward, Tcp::Porto::Protobuf);
@@ -53,7 +43,7 @@ namespace Sentry
 	int GateHelperComponent::Call(long long userId, const std::string& func, const Message& message)
 	{
         std::string address;
-        if(!this->GetLocation(userId, address))
+        if (!this->mNodeComponent->GetServer(this->mGateName, userId, address))
 		{
 			return XCode::NotFindUser;
 		}
@@ -73,7 +63,7 @@ namespace Sentry
 	int GateHelperComponent::LuaCall(long long userId, const std::string func, std::shared_ptr<Message> message)
 	{
         std::string address;
-		if(!this->GetLocation(userId, address))
+        if (!this->mNodeComponent->GetServer(this->mGateName, userId, address))
 		{
 			return XCode::NotFindUser;
 		}
@@ -95,7 +85,7 @@ namespace Sentry
 	{
         std::vector<std::string> locations;
 		const std::string name = ComponentFactory::GetName<Gate>();
-		if(!this->mLocationComponent->GetServers(name, locations))
+		if(!this->mNodeComponent->GetServers(name, locations))
 		{
 			return XCode::Failure;
 		}
@@ -113,7 +103,7 @@ namespace Sentry
 	int GateHelperComponent::BroadCast(const std::string& func, const Message& message)
 	{
 		std::vector<std::string> locations;		
-		if(!this->mLocationComponent->GetServers(this->mGateServerName, locations))
+		if(!this->mNodeComponent->GetServers(this->mGateName, locations))
 		{
 			return XCode::Failure;
 		}
@@ -135,7 +125,7 @@ namespace Sentry
 	int GateHelperComponent::LuaBroadCast(const char * func, std::shared_ptr<Message> message)
 	{
 		std::vector<std::string> locations;		
-		if(!this->mLocationComponent->GetServers(this->mGateServerName, locations))
+		if(!this->mNodeComponent->GetServers(this->mGateName, locations))
 		{
 			return XCode::Failure;
 		}

@@ -18,14 +18,14 @@ namespace Sentry
 {
     OuterNetMessageComponent::OuterNetMessageComponent()
     {
-        this->mLocationComponent = nullptr;
+        this->mNodeComponent = nullptr;
         this->mInnerMessageComponent = nullptr;
     }
 
 
 	bool OuterNetMessageComponent::LateAwake()
 	{
-		this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
+		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
         this->mInnerMessageComponent = this->GetComponent<InnerNetMessageComponent>();
 		return true;
 	}
@@ -84,27 +84,7 @@ namespace Sentry
         long long userId = iter->second;
         this->mUserAddressMap.emplace(address, userId);
         this->mClientAddressMap.emplace(userId, address);
-        std::unique_ptr<LocationUnit> locationUnit = std::make_unique<LocationUnit>(userId, address);
-
-        std::vector<std::string> services;
-        std::vector<const NodeConfig *> nodeConfigs;
-        ClusterConfig::Inst()->GetNodeConfigs(nodeConfigs);
-        for(const NodeConfig * nodeConfig : nodeConfigs)
-        {
-            services.clear();
-            const std::string& server = nodeConfig->GetName();
-            if (!nodeConfig->IsAuthAllot() || nodeConfig->GetServices(services) <= 0)
-            {
-                continue;
-            }
-            std::string location; 
-            if (!this->mLocationComponent->AllotServer(server, location))
-            {
-                return XCode::NetWorkError;
-            }
-            locationUnit->Add(server, location);           
-        }
-		this->mLocationComponent->AddUnit(std::move(locationUnit));
+        // TODO 网关验证客户端成功
         return XCode::Successful;
     }
 
@@ -136,11 +116,11 @@ namespace Sentry
         {
             return XCode::CallServiceNotFound;
         }
-        LocationUnit* locationUnit = this->mLocationComponent->GetUnit(userId);
-        if (locationUnit == nullptr || !locationUnit->Get(server, target))
+        if (!this->mNodeComponent->GetServer(server, userId, target))
         {
             return XCode::NotFindUser;
-        }        
+        }
+        
 		message->GetHead().Add("id", userId);
 		if(!this->mInnerMessageComponent->Send(target, message))
 		{

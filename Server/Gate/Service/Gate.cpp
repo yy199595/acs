@@ -23,7 +23,8 @@ namespace Sentry
 
 	bool Gate::OnStart()
 	{
-        BIND_COMMON_RPC_METHOD(Gate::Allot);
+        BIND_COMMON_RPC_METHOD(Gate::Ping);
+        BIND_COMMON_RPC_METHOD(Gate::AddUser);
         const ServerConfig * config = ServerConfig::Inst();
         ServerConfig::Inst()->GetLocation("gate", this->mAddress);
         this->mOuterComponent = this->GetComponent<OuterNetMessageComponent>();
@@ -42,7 +43,7 @@ namespace Sentry
 		return XCode::Failure;
 	}
 
-	int Gate::Allot(const com::type::int64 &request, s2s::allot::response &response)
+	int Gate::AddUser(const com::type::int64 &request, s2s::allot::response &response)
     {
         std::string token;
         long long userId = request.value();

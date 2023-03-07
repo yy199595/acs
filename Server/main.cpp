@@ -18,6 +18,7 @@
 
 #include"Component/HttpComponent.h"
 #include"Component/HttpWebComponent.h"
+#include"Component/HttpDebugComponent.h"
 #include"Component/NodeMgrComponent.h"
 #include"Component/TextConfigComponent.h"
 #include"Component/LaunchComponent.h"
@@ -26,7 +27,6 @@
 #include"Service/Node.h"
 #include"Service/HttpBackGround.h"
 #include"Service/Registry.h"
-#include"Service/HttpDebug.h"
 #include"Service/User.h"
 #ifdef __ENABLE_MONGODB__
 #include"Service/MongoDB.h"
@@ -94,8 +94,8 @@ void RegisterComponent()
 //http
     ComponentFactory::Add<HttpComponent>("HttpComponent");
     ComponentFactory::Add<HttpWebComponent>("HttpWebComponent");
-
-    ComponentFactory::Add<HttpDebug>("HttpDebug");
+    ComponentFactory::Add<HttpDebugComponent>("HttpDebugComponent");
+  
     ComponentFactory::Add<HttpBackGround>("HttpBackGround");
 
 // lua

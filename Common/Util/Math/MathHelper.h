@@ -90,7 +90,7 @@ namespace Math {
         std::uniform_int_distribution<T> dis;
         return dis(gen);
     }
-
+    // 包含最大数
     template<typename T>
     inline const typename std::enable_if<IsIntegerType<T>::value, T>::type Random(const T min, const T max)
     {

@@ -46,7 +46,7 @@ namespace Sentry
         //LOG_CHECK_RET_FALSE(this->AddComponent<LocationComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<NetThreadComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<LaunchComponent>());
-        LOG_CHECK_RET_FALSE(this->AddComponent<NodeMgrComponent>());
+        //LOG_CHECK_RET_FALSE(this->AddComponent<NodeMgrComponent>());
         std::vector<Component *> components;
         if(this->GetComponents(components) > 0)
         {

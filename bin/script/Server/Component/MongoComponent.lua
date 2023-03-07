@@ -8,8 +8,8 @@ function MongoComponent.InsertOnce(tab, data, flag)
     if flag == nil then
         flag = type(tab._id) == "number" and tab._id or 0
     end
-    local address = Service.AllotServer("MongoService")
-    return Service.Call(address, "MongoService.Insert", {
+    local address = Service.AllotServer("MongoDB")
+    return Service.Call(address, "MongoDB.Insert", {
         tab = tab,
         json = data,
         flag = flag
@@ -24,8 +24,8 @@ function MongoComponent.Delete(tab, data, limit, flag)
     if flag == nil then
         flag = type(tab._id) == "number" and tab._id or 0
     end
-    local address = Service.AllotServer("MongoService")
-    return Service.Call(address, "MongoService.Delete", {
+    local address = Service.AllotServer("MongoDB")
+    return Service.Call(address, "MongoDB.Delete", {
         tab = tab,
         json = data,
         limit = limit or 1,
@@ -43,8 +43,8 @@ function MongoComponent.QueryOnce(tab, data)
         data = rapidjson.encode(data)
     end
     assert(type(data) == "string")
-    local address = Service.AllotServer("MongoService")
-    local code, response = Service.Call(address, "MongoService.Query", {
+    local address = Service.AllotServer("MongoDB")
+    local code, response = Service.Call(address, "MongoDB.Query", {
         tab = tab,
         json = data,
         limit = 1
@@ -64,8 +64,8 @@ function MongoComponent.Query(tab, data, limit)
     end
     print("query json ", data)
     assert(type(data) == "string")
-    local address = Service.AllotServer("MongoService")
-    local code, response = Service.Call(address, "MongoService.Query", {
+    local address = Service.AllotServer("MongoDB")
+    local code, response = Service.Call(address, "MongoDB.Query", {
         tab = tab,
         json = data,
         limit = limit or 0
@@ -91,8 +91,8 @@ function MongoComponent.QueryDatas(tab, list)
             ["$in"] = list
         }
     }
-    local address = Service.AllotServer("MongoService")
-    local code, response = Service.Call(address, "MongoService.Query", {
+    local address = Service.AllotServer("MongoDB")
+    local code, response = Service.Call(address, "MongoDB.Query", {
         tab = tab,
         limit = #list,
         json = rapidjson.encode(request)
@@ -112,8 +112,8 @@ end
 function MongoComponent.SetIndex(tab, name)
     assert(type(tab) == "string")
     assert(type(name) == "string")
-    local address = Service.AllotServer("MongoService")
-    return Service.Call(address, "MongoService.SetIndex", {
+    local address = Service.AllotServer("MongoDB")
+    return Service.Call(address, "MongoDB.SetIndex", {
         tab = tab,
         name = name
     })
@@ -131,8 +131,8 @@ function MongoComponent.Update(tab, select, update, tag, flag)
     if flag == nil then
         flag = type(tab._id) == "number" and tab._id or 0
     end
-    local address = Service.AllotServer("MongoService")
-    return Service.Call(address, "MongoService.Update", {
+    local address = Service.AllotServer("MongoDB")
+    return Service.Call(address, "MongoDB.Update", {
         tab = tab,
         select = select,
         update = update,

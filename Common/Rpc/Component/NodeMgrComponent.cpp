@@ -104,11 +104,20 @@ namespace Sentry
 	}
 
     bool NodeMgrComponent::GetServer(const std::string & name, std::string & address)
-    {
+    {	
         auto iter = this->mRpcServers.find(name);
         if(iter == this->mRpcServers.end())
         {
-            return false;
+			std::string server;
+			if (!ClusterConfig::Inst()->GetServerName(name, server))
+			{
+				return false;
+			}
+			iter = this->mRpcServers.find(server);
+			if (iter == this->mRpcServers.end())
+			{
+				return false;
+			}
         }
         int size = (int)iter->second.size();
         int index = Helper::Math::Random<int>(0, size - 1);
@@ -118,6 +127,15 @@ namespace Sentry
 
     bool NodeMgrComponent::GetServer(const std::string & name, long long index, std::string & address)
     {
+		auto iter1 = this->mUnitLocations.find(index);
+		if (iter1 != this->mUnitLocations.end())
+		{
+			if (iter1->second->Get(name, address))
+			{
+				return true;
+			}
+		}
+
         auto iter = this->mRpcServers.find(name);
         if(iter == this->mRpcServers.end())
         {
@@ -127,24 +145,6 @@ namespace Sentry
         address = iter->second[index % size];
         return true;
     }
-
-	LocationUnit* NodeMgrComponent::GetUnit(long long id) const
-	{
-		auto iter = this->mUnitLocations.find(id);
-		return iter != this->mUnitLocations.end() ? iter->second.get() : nullptr;
-	}
-
-	bool NodeMgrComponent::AllotServer(const string& server, string& address)
-	{
-		auto iter = this->mRpcServers.find(server);
-		if(iter == this->mRpcServers.end() || iter->second.empty())
-		{
-			return false;
-		}
-		int index = Helper::Math::Random<int>(0, iter->second.size());
-		address = iter->second.at(index);
-		return true;
-	}
 
 	bool NodeMgrComponent::DelUnit(long long id)
 	{
@@ -157,24 +157,39 @@ namespace Sentry
 		return true;
 	}
 
-	bool NodeMgrComponent::AddUnit(std::unique_ptr<LocationUnit> locationUnit)
+	bool NodeMgrComponent::DelServer(const std::string& server, long long id)
 	{
-		if(locationUnit == nullptr)
+		auto iter = this->mUnitLocations.find(id);
+		if (iter == this->mUnitLocations.end())
 		{
 			return false;
 		}
-		long long id = locationUnit->GetUnitId();
+		return iter->second->Del(server);
+	}
+
+	bool NodeMgrComponent::AddRpcServer(const std::string& server, long long id, const std::string& address)
+	{
+		LocationUnit* localUnit = nullptr;
 		auto iter = this->mUnitLocations.find(id);
-		if(iter != this->mUnitLocations.end())
+		if (iter == this->mUnitLocations.end())
 		{
-			return iter->second.get();
+			std::unique_ptr<LocationUnit> tmp = std::make_unique<LocationUnit>(id);
+			{
+				localUnit = tmp.get();
+				this->mUnitLocations.emplace(id, std::move(tmp));
+			}
 		}
-		this->mUnitLocations.emplace(id, std::move(locationUnit));
+		else
+		{
+			localUnit = iter->second.get();
+		}		
+		localUnit->Add(server, address);
 		return true;
 	}
 
 	bool NodeMgrComponent::LateAwake()
 	{
+		this->mIndex = 0;
 		const ServerConfig * config = ServerConfig::Inst();
 		LOG_CHECK_RET_FALSE(config->GetMember("registry", this->mRegistryAddress));
 		return true;
@@ -184,7 +199,13 @@ namespace Sentry
 	{
 		const ServerConfig * config = ServerConfig::Inst();
 		RpcService * rpcService = this->mApp->GetService<Registry>();
-		for(const std::string & address : this->mRegistryAddress)
+		NEXT_REGISTER:
+		if (this->mIndex >= this->mRegistryAddress.size())
+		{
+			LOG_FATAL("registry server failure");
+			return;
+		}
+		const std::string& address = this->mRegistryAddress[this->mIndex];		
 		{
 			s2s::server::info message;
 			message.set_name(config->Name());
@@ -193,8 +214,9 @@ namespace Sentry
 			std::shared_ptr<s2s::server::list> response = std::make_shared<s2s::server::list>();
 			if(rpcService->Call(address,"Register", message, response) != XCode::Successful)
 			{
-				LOG_ERROR("register to [" << address << "] error");
-				continue;
+				this->mIndex++;
+				LOG_ERROR("register to [" << address << "] failure");
+				goto NEXT_REGISTER;
 			}
 			for(int index = 0; index < response->list_size(); index++)
 			{
@@ -204,23 +226,28 @@ namespace Sentry
 					this->AddHttpServer(info.name(), info.http());
 				}
 			}
-		}		
+			LOG_INFO("register to [" << address << "] successful");
+		}
+		TaskComponent* taskComponent = this->GetComponent<TaskComponent>();
+		taskComponent->Start(&NodeMgrComponent::PingRegistryServer, this);
 	}
 	void NodeMgrComponent::PingRegistryServer()
 	{
 		const std::string func("Ping");
 		RpcService* rpcService = this->mApp->GetService<Registry>();
 		TaskComponent* taskComponent = this->GetComponent<TaskComponent>();
-		while (!this->mRegistryAddress.empty())
+		while (this->mIndex < this->mRegistryAddress.size())
 		{
-			taskComponent->Sleep(15 * 1000);
-			for (const std::string& address : this->mRegistryAddress)
+			taskComponent->Sleep(10 * 1000);
+			const std::string& address = this->mRegistryAddress[this->mIndex];
+			if (rpcService->Call(address, func) == XCode::Successful)
 			{
-				if (rpcService->Call(address, func) == XCode::Successful)
-				{
-					CONSOLE_LOG_INFO("ping registry server [" << address << "] successful");
-				}
+				CONSOLE_LOG_INFO("ping registry server [" << address << "] successful");
 			}
-		}
+			else
+			{
+				this->mIndex = 0;
+			}
+		}			
 	}
 }

@@ -19,8 +19,7 @@ namespace Sentry
         int UnRegister(const com::type::string& request);
         int Query(const com::type::string& request, s2s::server::list& response);
 		int Register(const s2s::server::info & request, s2s::server::list & response);
-    private:
-        void PingNodeServer();
+    private:      
         void OnNodeServerError(const std::string& address);
 	 private:
         class NodeMgrComponent * mNodeComponent;

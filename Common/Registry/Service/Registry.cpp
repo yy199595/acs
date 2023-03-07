@@ -15,8 +15,7 @@ namespace Sentry
 		BIND_COMMON_RPC_METHOD(Registry::Register);
         BIND_COMMON_RPC_METHOD(Registry::UnRegister);
 		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
-		this->mInnerComponent = this->GetComponent<InnerNetComponent>();
-		this->GetComponent<TaskComponent>()->Start(&Registry::PingNodeServer, this);
+		this->mInnerComponent = this->GetComponent<InnerNetComponent>();		
         return true;
     }
 
@@ -75,32 +74,6 @@ namespace Sentry
 			config->GetLocation("http", *localServer->mutable_http());
 		}
 		return XCode::Successful;
-	}
-
-	void Registry::PingNodeServer()
-	{		
-		const std::string func("Ping");
-		std::vector<std::string> services;
-		RpcService* rpcService = this->mApp->GetService<Node>();
-		TaskComponent* taskComponent = this->GetComponent<TaskComponent>();
-		while (rpcService != nullptr)
-		{
-			services.clear();
-			taskComponent->Sleep(5 * 1000);
-			this->mInnerComponent->GetServiceList(services);
-			for (const std::string& address : services)
-			{
-				if (rpcService->Call(address, func) != XCode::Successful)
-				{
-					const ServiceNodeInfo* nodeInfo = this->mInnerComponent->GetSeverInfo(address);
-					if (nodeInfo != nullptr)
-					{
-						this->OnNodeServerError(nodeInfo->RpcAddress);
-						LOG_ERROR("[" << nodeInfo->RpcAddress << "] ping error");
-					}
-				}
-			}
-		}
 	}
 
 	void Registry::OnNodeServerError(const std::string& address)

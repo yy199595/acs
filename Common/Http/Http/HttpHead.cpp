@@ -26,6 +26,17 @@ namespace Http
         return true;
     }
 
+    bool Head::Get(const std::string& k, long long& v) const
+    {
+        auto iter = this->mHeads.find(k);
+        if (iter == this->mHeads.end())
+        {
+            return false;
+        }
+        v = std::stoll(iter->second);
+        return true;
+    }
+
     bool Head::Get(const std::string &k, std::string &v) const
     {
         auto iter = this->mHeads.find(k);

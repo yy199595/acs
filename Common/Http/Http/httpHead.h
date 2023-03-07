@@ -34,6 +34,7 @@ namespace Http
         bool Add(const std::string & k, int v);
         bool Add(const std::string & k, const std::string & v);
     public:
+        bool Get(const std::string& k, long long& v) const;
         bool Get(const std::string & k, std::string & v) const;
     public:
         bool OnRead(std::istream & buffer) final;

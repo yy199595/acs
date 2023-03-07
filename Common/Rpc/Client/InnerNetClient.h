@@ -22,6 +22,7 @@ namespace Sentry
         void Send(std::shared_ptr<Rpc::Packet> message);
 		long long Call(std::shared_ptr<Rpc::Packet> message);
 	 private:
+        void Update();
         void CloseSocket(int code);
         void OnConnect(const asio::error_code &error, int count) final;
         void OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t) final;
@@ -35,6 +36,6 @@ namespace Sentry
         std::string mHttpLocation;
         IRpc<Rpc::Packet> * mComponent;
         std::shared_ptr<Rpc::Packet> mMessage;
-        std::shared_ptr<asio::steady_timer> mTimer;
+        std::unique_ptr<asio::steady_timer> mTimer;
 	};
 }// namespace Sentry

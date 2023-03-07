@@ -28,6 +28,7 @@ namespace Sentry
         rapidjson::Document document;
         const ServerConfig * config = ServerConfig::Inst();
         LOG_CHECK_RET_FALSE(config->GetPath("user", path));
+        LOG_CHECK_RET_FALSE(config->GetLocation("rpc", this->mLocation));
         LOG_CHECK_RET_FALSE(Helper::File::ReadJsonFile(path, document));
         auto iter = document.MemberBegin();
         for(; iter != document.MemberEnd(); iter++)
@@ -90,6 +91,20 @@ namespace Sentry
         }
     }
 
+    void InnerNetComponent::OnSendFailure(const std::string& address, std::shared_ptr<Rpc::Packet> message)
+    {
+        if (message->GetType() == (int)Tcp::Type::Request)
+        {
+            if (message->GetHead().Has("rpc"))
+            {
+                message->SetType(Tcp::Type::Request);
+                message->GetHead().Add("code", XCode::NetWorkError);
+                this->OnResponse(address, message);
+                return;
+            }
+        }
+    }
+
     bool InnerNetComponent::OnPing(const std::string& address, std::shared_ptr<Rpc::Packet> message)
     {
         message->SetContent("pong");
@@ -102,26 +117,27 @@ namespace Sentry
     {
         const Rpc::Head &head = message->GetHead();
         std::unique_ptr<ServiceNodeInfo> serverNode(new ServiceNodeInfo());
-
-        head.Get("rpc", serverNode->RpcAddress);
-        head.Get("http", serverNode->HttpAddress);
-        LOG_CHECK_RET_FALSE(head.Get("name", serverNode->SrvName));
-        LOG_CHECK_RET_FALSE(head.Get("user", serverNode->UserName));
-        LOG_CHECK_RET_FALSE(head.Get("passwd", serverNode->PassWord));
-        if(serverNode->RpcAddress.empty() && serverNode->HttpAddress.empty())
         {
-            return false;
-        }
-        if(!this->mUserMaps.empty())
-        {
-            auto iter = this->mUserMaps.find(serverNode->UserName);
-            if (iter == this->mUserMaps.end() || iter->second != serverNode->PassWord)
+            head.Get("rpc", serverNode->RpcAddress);
+            head.Get("http", serverNode->HttpAddress);
+            LOG_CHECK_RET_FALSE(head.Get("name", serverNode->SrvName));
+            LOG_CHECK_RET_FALSE(head.Get("user", serverNode->UserName));
+            LOG_CHECK_RET_FALSE(head.Get("passwd", serverNode->PassWord));
+            if (serverNode->RpcAddress.empty() && serverNode->HttpAddress.empty())
             {
-                CONSOLE_LOG_ERROR(address << " auth failure");
                 return false;
             }
+            if (!this->mUserMaps.empty())
+            {
+                auto iter = this->mUserMaps.find(serverNode->UserName);
+                if (iter == this->mUserMaps.end() || iter->second != serverNode->PassWord)
+                {
+                    CONSOLE_LOG_ERROR(address << " auth failure");
+                    return false;
+                }
+            }
+            serverNode->LocalAddress = address;
         }
-        serverNode->LocalAddress = address;
         this->mLocationMaps.emplace(address, std::move(serverNode));
         return true;
     }
@@ -148,8 +164,10 @@ namespace Sentry
         {
             std::string func;
             head.Get("func", func);
+#ifndef __DEBUG__
             CONSOLE_LOG_ERROR("call " << func << 
                 " code = " << CodeConfig::Inst()->GetDesc(code));
+#endif
             if (!head.Has("rpc"))
             {
                 return false;
@@ -199,6 +217,7 @@ namespace Sentry
 	{
         std::string targer;
         Rpc::Head &head = message->GetHead();
+        // 网关转发过来的消息 必须带client字段
         if(this->mOuterComponent != nullptr && head.Get("client", targer))
         {
             head.Remove("client");
