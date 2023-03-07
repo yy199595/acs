@@ -8,21 +8,23 @@ local loginComponent = require("component.LoginComponent")
 
 local CallMongo = function()
     local t1 = Time.NowMilTime()
-    local code, res = Client.Call("MongoService.Query", {
-        tab = "user.account",
+    local code, res = Client.Call("MongoDB.Query", {
+        tab = "user.account_info",
         json = rapidjson.encode({
             _id = "646585122@qq.com"
         }),
         limit = 1
     })
-    table.print(res)
+    if code == XCode.Successful then
+        table.print(res)
+    end
     local t = Time.NowMilTime() - t1
-    Console.Warn("cal MongoService.Query [", t, "]ms");
+    Console.Warn("cal MongoDB.Query [", t, "]ms");
 end
 
 local CallChat = function()
     local t1 = Time.NowMilTime()
-    local code = Client.Call("ChatService.Ping", {
+    local code = Client.Call("Chat.Ping", {
         user_id = 1122, msg_type = 1, message = "hello"
     })
     if code == XCode.Successful then
@@ -48,9 +50,9 @@ local Update = function()
         coroutine.start(function ()
             coroutine.start(CallChat)
             coroutine.start(CallMongo)
-            coroutine.start(TestHttp)
+            --coroutine.start(TestHttp)
         end)
-        coroutine.sleep(100)
+        coroutine.sleep(50)
     end
 end
 
