@@ -9,7 +9,7 @@
 ### 3. 服务
 支持rpc服务和http服务  
 使用c++或者lua实现服务，可以使用lua替换c++服务方法实现  
-服务通过配置方式加载，可以运行在任意进程  
+服务通过配置方式加载，自由组合，服务可使用http协议进行调试
 开发时候可以所有服务可以运行在一个进程，发布的时候可以部署在多个进程
 ### 3. http
 asio实现异步http客户端，在c++和lua层都可以  
@@ -30,9 +30,8 @@ rpc通信基于自己实现的二进制协议
 2. 执行根目录下build.bat
 3. 使用vs打开项目,编译lua和protobuf,最后编译app
 4. 设置工作目录./bin,启动参数./config/server.json Server
+5. 单进程启动设置app为启动项目运行，多进程启动./start.bat
 ### Mac or Linux
-1. 安装CMake,g++
-2. 执行根目录下build.sh
-3. cd到bin目录 ./app ./config/server.json Server
-
-# [[教程]](https://www.baidu.com)
+1. 安装CMake,g++,screen
+2. 执行根目录下build.sh,进入到bin目录
+3. 单进程启动执行运行app，多线程启动执行./start.bat

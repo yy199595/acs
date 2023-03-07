@@ -24,7 +24,7 @@
     "module": "script/Server"
   },
   "registry": [
-    "127.0.0.1:7786"
+    "127.0.0.1:7788"
   ],
   "Client": {
     "path": {
