@@ -47,7 +47,7 @@ namespace Sentry
 		unsigned int mSumCount;
 		unsigned int mWaitCount;
         class TranComponent* mTranComponent;
-        class NetThreadComponent * mNetComponent;
+        class ThreadComponent * mNetComponent;
         class OuterNetComponent * mOuterComponent;
         class InnerNetMessageComponent* mMessageComponent;
         std::unordered_map<std::string, std::string> mUserMaps;

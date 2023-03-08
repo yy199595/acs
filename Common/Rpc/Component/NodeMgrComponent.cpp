@@ -92,6 +92,16 @@ namespace Sentry
 		return !hosts.empty();
 	}
 
+	bool NodeMgrComponent::GetRegistryAddress(std::string& address) const
+	{
+		if (this->mIndex >= this->mRegistryAddress.size())
+		{
+			return false;
+		}
+		address = this->mRegistryAddress[this->mIndex];
+		return true;
+	}
+
 	bool NodeMgrComponent::GetServers(const std::string& server, std::vector<std::string>& hosts)
 	{
 		auto iter = this->mRpcServers.find(server);

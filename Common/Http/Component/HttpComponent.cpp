@@ -4,7 +4,7 @@
 #include"HttpComponent.h"
 #include"Config/MethodConfig.h"
 #include"Component/LogComponent.h"
-#include"Component/NetThreadComponent.h"
+#include"Component/ThreadComponent.h"
 #include"Client/HttpRequestClient.h"
 #include"Task/HttpTask.h"
 #include"Lua/LuaHttp.h"
@@ -13,7 +13,7 @@ namespace Sentry
 	bool HttpComponent::LateAwake()
 	{
 		this->mTaskComponent = this->mApp->GetTaskComponent();
-        this->mNetComponent = this->GetComponent<NetThreadComponent>();
+        this->mNetComponent = this->GetComponent<ThreadComponent>();
 		return true;
 	}
 

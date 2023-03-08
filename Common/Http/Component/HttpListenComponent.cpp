@@ -4,7 +4,7 @@
 
 #include"HttpListenComponent.h"
 #include"Client/HttpHandlerClient.h"
-#include"Component/NetThreadComponent.h"
+#include"Component/ThreadComponent.h"
 
 namespace Sentry
 {

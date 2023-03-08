@@ -21,7 +21,7 @@ namespace Sentry
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 	 private:
 		class TaskComponent* mTaskComponent;
-        class NetThreadComponent * mNetComponent;
+        class ThreadComponent * mNetComponent;
         std::queue<std::shared_ptr<HttpRequestClient>> mClientPools;
 	};
 }

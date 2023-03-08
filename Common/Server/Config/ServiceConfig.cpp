@@ -213,14 +213,7 @@ namespace Sentry
         if(iter != this->mMethodConfigs.end())
         {
             return iter->second;
-        }
-        for(auto & value : this->mMethodConfigs)
-        {
-            if(path.find(value.second->Path) == 0)
-            {
-                return value.second;
-            }
-        }
+        }        
         return nullptr;
     }
 }

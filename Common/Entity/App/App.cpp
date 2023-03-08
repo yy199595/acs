@@ -8,7 +8,7 @@
 #include"Component/ProtoComponent.h"
 #include"Component/NodeMgrComponent.h"
 #include"Component/TextConfigComponent.h"
-#include"Component/NetThreadComponent.h"
+#include"Component/ThreadComponent.h"
 #include"Component/LaunchComponent.h"
 using namespace Sentry;
 using namespace std::chrono;
@@ -44,7 +44,7 @@ namespace Sentry
 
         LOG_CHECK_RET_FALSE(this->AddComponent<TextConfigComponent>());
         //LOG_CHECK_RET_FALSE(this->AddComponent<LocationComponent>());
-        LOG_CHECK_RET_FALSE(this->AddComponent<NetThreadComponent>());
+        LOG_CHECK_RET_FALSE(this->AddComponent<ThreadComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<LaunchComponent>());
         //LOG_CHECK_RET_FALSE(this->AddComponent<NodeMgrComponent>());
         std::vector<Component *> components;

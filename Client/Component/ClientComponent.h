@@ -12,7 +12,7 @@ namespace Sentry
     class TimerComponent;
     class HttpComponent;
 	class LuaScriptComponent;
-	class NetThreadComponent;
+	class ThreadComponent;
 }
 
 namespace Client

@@ -11,7 +11,7 @@ namespace Sentry
     {
     public:
         HttpBackGround() = default;
-        ~HttpBackGround() = default;
+        ~HttpBackGround() final = default;
     private:     
         bool OnStartService(HttpServiceRegister &serviceRegister) final;
     private:

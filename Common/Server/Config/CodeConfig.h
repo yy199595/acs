@@ -23,7 +23,7 @@ namespace Sentry
     public:
         CodeConfig() : TextConfig("CodeConfig") { }
     public:
-        std::string GetDesc(int code) const;
+        const std::string & GetDesc(int code) const;
     private:
         bool OnLoadText(const char *str, size_t length) final;
         bool OnReloadText(const char *str, size_t length) final;

@@ -7,7 +7,7 @@
 #include"Service/RpcService.h"
 #include"Config/ClusterConfig.h"
 #include"Component/NodeMgrComponent.h"
-#include"Component/NetThreadComponent.h"
+#include"Component/ThreadComponent.h"
 #include"Component/InnerNetComponent.h"
 namespace Sentry
 {

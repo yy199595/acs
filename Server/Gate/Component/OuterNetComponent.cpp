@@ -5,7 +5,7 @@
 #include"OuterNetComponent.h"
 #include"Client/OuterNetClient.h"
 #include"OuterNetMessageComponent.h"
-#include"Component/NetThreadComponent.h"
+#include"Component/ThreadComponent.h"
 #include"Component/InnerNetMessageComponent.h"
 #include"Md5/MD5.h"
 #include"Config/CodeConfig.h"

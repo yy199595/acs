@@ -9,7 +9,7 @@
 #include"Config/ServiceConfig.h"
 #include"Client/HttpHandlerClient.h"
 #include"Service/LocalHttpService.h"
-#include"Component/NetThreadComponent.h"
+#include"Component/ThreadComponent.h"
 namespace Sentry
 {
     bool HttpWebComponent::LateAwake()
@@ -25,14 +25,16 @@ namespace Sentry
         const HttpMethodConfig *httpConfig = HttpConfig::Inst()->GetMethodConfig(request->Path());
         if (httpConfig == nullptr)
         {
-			this->ClosetHttpClient(address);
+			//this->ClosetHttpClient(address);
+            this->Send(address, HttpStatus::NOT_FOUND);
             LOG_ERROR("[" << address << "] <<" << request->Path() << ">>" << HttpStatusToString(HttpStatus::NOT_FOUND));
             return;
         }
 
         if (!httpConfig->Type.empty() && httpConfig->Type != request->Method())
         {			
-			this->ClosetHttpClient(address);
+			//this->ClosetHttpClient(address);
+            this->Send(address, HttpStatus::METHOD_NOT_ALLOWED);
             LOG_ERROR("[" << address << "] <<" << request->Url() << ">>" << HttpStatusToString(HttpStatus::METHOD_NOT_ALLOWED));
             return;
         }
@@ -49,16 +51,16 @@ namespace Sentry
     {
 		this->mSumCount++;
         this->mWaitCount++;
-        std::shared_ptr<Http::Response> response(new Http::Response());
         LocalHttpService* httpService = this->GetComponent<LocalHttpService>(config->Service);
         if (httpService == nullptr || !httpService->IsStartService())
-        {
-            response->SetCode(HttpStatus::NOT_FOUND);
+        {           
+            this->Send(address, HttpStatus::NOT_FOUND);
             LOG_ERROR("[" << address << "] <<" << request->Url() << ">>" << HttpStatusToString(HttpStatus::NOT_FOUND));         
         }
         else
         {
             const std::string& method = config->Method;
+            std::shared_ptr<Http::Response> response(new Http::Response());
             int code = httpService->Invoke(method, request, response);
             if (code != XCode::Successful)
             {
@@ -67,8 +69,8 @@ namespace Sentry
                     << " : " << CodeConfig::Inst()->GetDesc(code));
 #endif
             }
-        }
-        this->Send(address, response);       
+            this->Send(address, response);
+        }            
         this->mWaitCount--;
     }
 

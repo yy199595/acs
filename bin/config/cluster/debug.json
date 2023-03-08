@@ -6,6 +6,7 @@
 			"Node": true,
 			"Log": true,
 			"Gate": true,
+			"MysqlDB": true,
 			"MongoDB": true,
 			"Chat": true,
 			"Registry":true,

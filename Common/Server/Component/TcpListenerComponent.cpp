@@ -3,7 +3,7 @@
 #include"Method/MethodProxy.h"
 #include"Log/CommonLogDef.h"
 #include"Config/ServerConfig.h"
-#include"Component/NetThreadComponent.h"
+#include"Component/ThreadComponent.h"
 namespace Sentry
 {
 	TcpListenerComponent::TcpListenerComponent()
@@ -36,6 +36,7 @@ namespace Sentry
 	bool TcpListenerComponent::StartListen(const char * name)
     {
         unsigned short port = 0;
+        this->mNetComponent = this->GetComponent<ThreadComponent>();
         if(!ServerConfig::Inst()->GetListen(name, port))
         {
             LOG_ERROR("not find listen config " << name);
@@ -43,10 +44,9 @@ namespace Sentry
         }
         try
         {
-            Asio::Context & io = this->mApp->MainThread();
+            Asio::Context& io = this->mNetComponent->GetContext();
             this->mBindAcceptor = new Asio::Acceptor (io,
 				Asio::EndPoint(asio::ip::address_v4(), port));
-            this->mNetComponent = this->GetComponent<NetThreadComponent>();
 
             this->mIsClose = false;
             this->mBindAcceptor->listen();
@@ -62,7 +62,8 @@ namespace Sentry
     }
 	void TcpListenerComponent::ListenConnect()
 	{
-        std::shared_ptr<SocketProxy> socketProxy = this->mNetComponent->CreateSocket();
+        std::shared_ptr<SocketProxy> socketProxy 
+            = this->mNetComponent->CreateSocket();
 		this->mBindAcceptor->async_accept(socketProxy->GetSocket(),
 			[this, socketProxy](const asio::error_code & code)
 		{

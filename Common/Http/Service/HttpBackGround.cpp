@@ -5,6 +5,7 @@
 #include"System/System.h"
 #include"Config/CodeConfig.h"
 #include"Service/Node.h"
+#include"Service/Registry.h"
 #include"google/protobuf/wrappers.pb.h"
 #include"Component/NodeMgrComponent.h"
 namespace Sentry
@@ -67,33 +68,40 @@ namespace Sentry
 
 	int HttpBackGround::Info(Json::Writer&response)
     {
+		std::string address;
 		Node * innerService = this->GetComponent<Node>();
 		NodeMgrComponent * locationComponent = this->GetComponent<NodeMgrComponent>();
-		if(locationComponent == nullptr)
+		if (!locationComponent->GetRegistryAddress(address))
 		{
-			response.Add("error").Add("LocationComponent or InnerService Is Null");
+			response.Add("error").Add("not find registry server address");
+			return XCode::NetWorkError;
+		}
+		std::shared_ptr<s2s::server::list> list
+			= std::make_shared<s2s::server::list>();
+		RpcService* rpcService = this->mApp->GetService<Registry>();		
+		if (rpcService->Call(address, std::string("Query"), list) != XCode::Successful)
+		{
 			return XCode::Failure;
 		}
-		std::vector<std::string> locations;
-		locationComponent->GetServers(locations);
-		for(const std::string & location : locations)
+		for (int index = 0; index < list->list_size(); index++)
 		{
+			const s2s::server::info& info = list->list(index);
 			std::shared_ptr<google::protobuf::StringValue> resp
 				= std::make_shared<google::protobuf::StringValue>();
-			int code = innerService->Call(location, "RunInfo", resp);
-			if(code == XCode::Successful)
+			int code = innerService->Call(info.rpc(), "RunInfo", resp);
+			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
+			if (code == XCode::Successful)
 			{
 				rapidjson::Document document;
-				const std::string & json = resp->value();				
-				if(!document.Parse(json.c_str(), json.size()).HasParseError())
-				{
-					response.Add(location.c_str()).Add(document);
+				const std::string& json = resp->value();
+				if (!document.Parse(json.c_str(), json.size()).HasParseError())
+				{					
+					response.Add(info.rpc()).Add(document);
 				}
 			}
 			else
 			{
-				std::string desc = CodeConfig::Inst()->GetDesc(code);
-				response.Add(location.c_str()).Add(desc);
+				response.Add(info.rpc()).Add(desc);
 			}
 		}
 		return XCode::Successful;

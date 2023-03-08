@@ -8,7 +8,7 @@
 
 namespace Sentry
 {
-	class NetThreadComponent;
+	class ThreadComponent;
 
     class RedisComponent final : public RpcTaskComponent<long long, RedisResponse>,
 								 public ILuaRegister, public IStart, public IRpc<RedisResponse>

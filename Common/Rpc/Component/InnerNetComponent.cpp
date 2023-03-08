@@ -8,7 +8,7 @@
 #include"Service/Node.h"
 #include"Component/TranComponent.h"
 #include"Component/OuterNetComponent.h"
-#include"Component/NetThreadComponent.h"
+#include"Component/ThreadComponent.h"
 #include"google/protobuf/util/json_util.h"
 namespace Sentry
 {
@@ -39,7 +39,7 @@ namespace Sentry
         }
         this->mTranComponent = this->GetComponent<TranComponent>();
         this->mOuterComponent = this->GetComponent<OuterNetComponent>();
-        LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<NetThreadComponent>());
+        LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<ThreadComponent>());
         LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>());
 		return this->StartListen("rpc");
 	}

@@ -17,17 +17,17 @@ namespace Http
     public:
         Request(const char * method);
     public:
-        const Head & Header() const { return this->mHead; }
-        const std::string & Method() const { return this->mMethod; }
+        inline const Head & Header() const { return this->mHead; }
+        inline const std::string & Method() const { return this->mMethod; }
     public:
         virtual bool WriteLua(lua_State * lua) const = 0;       
         virtual bool WriteDocument(rapidjson::Document * document) const = 0;
     public:
         bool SetUrl(const std::string & url);
-        const std::string & Url() const { return this->mUrl; }
-        const std::string & Host() const { return this->mHost; }
-        const std::string & Port() const { return this->mPort; }
-        const std::string & Path() const { return this->mPath; }
+        inline const std::string & Url() const { return this->mUrl; }
+        inline const std::string & Host() const { return this->mHost; }
+        inline const std::string & Port() const { return this->mPort; }
+        inline const std::string & Path() const { return this->mPath; }
     public:
         bool OnRead(std::istream &buffer) final;
         int OnWrite(std::ostream &buffer) final;

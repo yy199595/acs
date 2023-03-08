@@ -4,7 +4,7 @@
 #include"Component/LuaScriptComponent.h"
 #include"Component/UnitMgrComponent.h"
 #include"Component/ConsoleComponent.h"
-#include"Component/NetThreadComponent.h"
+#include"Component/ThreadComponent.h"
 #include"Component/LogComponent.h"
 #include"Component/ProtoComponent.h"
 
@@ -59,7 +59,7 @@ void RegisterComponent()
     ComponentFactory::Add<TimerComponent>("TimerComponent");
     ComponentFactory::Add<LogComponent>("LogComponent");
     ComponentFactory::Add<UnitMgrComponent>("UnitMgrComponent");
-    ComponentFactory::Add<NetThreadComponent>("NetThreadComponent");
+    ComponentFactory::Add<ThreadComponent>("ThreadComponent");
     ComponentFactory::Add<ProtoComponent>("ProtoComponent");
 
 //server

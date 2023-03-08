@@ -29,7 +29,7 @@ namespace Sentry
 {
     void MysqlDBComponent::CloseClients()
     {
-        for(std::shared_ptr<MysqlClient> mysqlClient : this->mMysqlClients)
+        for(std::unique_ptr<MysqlClient> & mysqlClient : this->mMysqlClients)
         {
             mysqlClient->Stop();
         }
@@ -57,13 +57,15 @@ namespace Sentry
         const MysqlConfig * config = MysqlConfig::Inst();
 		for (int index = 0; index < config->MaxCount; index++)
 		{
-			std::shared_ptr<MysqlClient> mysqlClient
-				= std::make_shared<MysqlClient>(this);
-
-			mysqlClient->Start();
+			std::unique_ptr<MysqlClient> mysqlClient
+				= std::make_unique<MysqlClient>(this);
 			this->mMysqlClients.emplace_back(std::move(mysqlClient));
 		}
-		try
+        for (std::unique_ptr<MysqlClient>& client : this->mMysqlClients)
+        {
+            client->Start();
+        }
+		/*try
 		{
 			std::shared_ptr<Mysql::SqlCommand> command
 				= std::make_shared<Mysql::SqlCommand>("DROP TABLE user.account_info");
@@ -72,7 +74,7 @@ namespace Sentry
 		catch (std::exception& e)
 		{
 			CONSOLE_LOG_ERROR(e.what());
-		}
+		}*/
 		return this->Ping(0);
 	}
 
@@ -111,7 +113,7 @@ namespace Sentry
             int idx = index % this->mMysqlClients.size();
             return this->mMysqlClients[idx].get();
         }
-        std::shared_ptr<MysqlClient> mysqlClient = this->mMysqlClients[0];
+        MysqlClient* mysqlClient = this->mMysqlClients[0].get();
         for(size_t x = 0; x < this->mMysqlClients.size(); x++)
         {
             if(this->mMysqlClients[x]->GetTaskCount() <= 5)
@@ -120,9 +122,9 @@ namespace Sentry
             }
             if(this->mMysqlClients[x]->GetTaskCount() < mysqlClient->GetTaskCount())
             {
-                mysqlClient = this->mMysqlClients[x];
+                mysqlClient = this->mMysqlClients[x].get();
             }
         }
-        return mysqlClient.get();
+        return mysqlClient;
     }
 }

@@ -3,7 +3,7 @@
 #include"File/DirectoryHelper.h"
 #include"Lua/ClassProxyHelper.h"
 #include"Client/TcpRedisClient.h"
-#include"Component/NetThreadComponent.h"
+#include"Component/ThreadComponent.h"
 #include"Component/RedisScriptComponent.h"
 #include"Component/RedisStringComponent.h"
 namespace Sentry
@@ -52,7 +52,7 @@ namespace Sentry
     {
         const std::string & ip = config.Address[0].Ip;
         const unsigned int port = config.Address[0].Port;
-        NetThreadComponent * component = this->GetComponent<NetThreadComponent>();
+        ThreadComponent * component = this->GetComponent<ThreadComponent>();
         std::shared_ptr<SocketProxy> socketProxy = component->CreateSocket();
         if(socketProxy == nullptr)
         {

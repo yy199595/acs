@@ -7,7 +7,7 @@
 #include"Lua/Message.h"
 #include"google/protobuf/util/json_util.h"
 #include"Component/LuaScriptComponent.h"
-#include"Component/NetThreadComponent.h"
+#include"Component/ThreadComponent.h"
 namespace Client
 {
 	ClientTask::ClientTask(int ms)
@@ -143,7 +143,7 @@ namespace Client
         {
             return false;
         }
-        NetThreadComponent * netComponent = this->GetComponent<NetThreadComponent>();
+        ThreadComponent * netComponent = this->GetComponent<ThreadComponent>();
 		std::shared_ptr<SocketProxy> socketProxy = netComponent->CreateSocket(ip, port);
 		this->mTcpClient = std::make_shared<TcpRpcClientContext>(socketProxy, this);
         return true;

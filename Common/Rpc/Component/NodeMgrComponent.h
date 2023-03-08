@@ -32,6 +32,7 @@ namespace Sentry
         void PingRegistryServer();
     public:
 		bool GetServers(std::vector<std::string> & hosts);
+        bool GetRegistryAddress(std::string& address) const;
         bool GetServer(const std::string & name, std::string & address);
 		bool GetServers(const std::string & name, std::vector<std::string> & hosts);
         bool GetServer(const std::string & name, long long index, std::string & address);
@@ -39,7 +40,6 @@ namespace Sentry
         size_t mIndex;
 		std::vector<std::string> mRegistryAddress;
         std::unordered_map<std::string, std::vector<std::string>> mRpcServers;
-        //std::unordered_map<std::string, std::vector<std::string>> mHttpServers;
         std::unordered_map<long long, std::unique_ptr<LocationUnit>> mUnitLocations;
     };
 }

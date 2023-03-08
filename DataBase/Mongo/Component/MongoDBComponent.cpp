@@ -4,7 +4,7 @@
 
 #include"MongoDBComponent.h"
 #include"Config/MongoConfig.h"
-#include"Component/NetThreadComponent.h"
+#include"Component/ThreadComponent.h"
 namespace Sentry
 {
 	MongoTask::MongoTask(int id, int ms)
@@ -41,7 +41,7 @@ namespace Sentry
     {
         LOG_CHECK_RET_FALSE(MongoConfig::Inst());
         const MongoConfig * config = MongoConfig::Inst();
-        NetThreadComponent * threadComponent = this->GetComponent<NetThreadComponent>();
+        ThreadComponent * threadComponent = this->GetComponent<ThreadComponent>();
         for (int index = 0; index < config->MaxCount; index++)
         {
             const std::string & ip = config->Address[0].Ip;

@@ -37,14 +37,15 @@ namespace Sentry
         return true;
     }
 
-    std::string CodeConfig::GetDesc(int code) const
+    const std::string & CodeConfig::GetDesc(int code) const
     {
+        static const std::string unknow("unknow error");
         auto iter = this->mConfigs.find((int)code);
         if(iter != this->mConfigs.end())
         {
             return iter->second->Desc;
         }
-        return std::string("unknow error");
+        return unknow;
     }
 
     bool CodeConfig::OnReloadText(const char *str, size_t length)

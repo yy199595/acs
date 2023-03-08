@@ -4,7 +4,7 @@
 #include"Component/Component.h"
 namespace Sentry
 {
-    class NetThreadComponent;
+    class ThreadComponent;
 
     class TcpListenerComponent : public Component
 	{
@@ -22,7 +22,7 @@ namespace Sentry
 		int mCount;
         bool mIsClose;
         int mErrorCount;     
-        NetThreadComponent * mNetComponent;
+        ThreadComponent * mNetComponent;
         asio::ip::tcp::acceptor * mBindAcceptor;
     };
 }
