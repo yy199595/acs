@@ -44,9 +44,10 @@ namespace Client
         LOG_INFO("call client func = " << t1->func());
 	}
 
-    void ClientComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Packet> message)
+    void ClientComponent::OnMessage(std::shared_ptr<Rpc::Packet> message)
     {
-        int type = message->GetType();       
+        int type = message->GetType();
+        const std::string& address = message->From();
         switch (type)
         {
             case (int)Tcp::Type::Ping:

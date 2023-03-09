@@ -97,19 +97,19 @@ namespace Sentry
             case Tcp::DecodeState::Body:
             {
                 this->mState = Tcp::DecodeState::Head;
-                if (!this->mMessage->Parse(readStream, size))
+                const std::string& address = this->mSocket->GetAddress();
+                if (!this->mMessage->Parse(address, readStream, size))
                 {
                     this->CloseSocket(XCode::UnKnowPacket);
                     return;
                 }
                 this->ReceiveMessage(RPC_PACK_HEAD_LEN);
-                const std::string &address = this->mSocket->GetAddress();
 #ifdef ONLY_MAIN_THREAD
-                this->mGateComponent->OnMessage(address, std::move(this->mMessage));
+                this->mGateComponent->OnMessage(std::move(this->mMessage));
 #else
                 Asio::Context &io = App::Inst()->MainThread();
                 io.post(std::bind(&OuterNetComponent::OnMessage,
-                                  this->mGateComponent, address, std::move(this->mMessage)));
+                                  this->mGateComponent, this->mMessage));
 #endif
             }
                 break;

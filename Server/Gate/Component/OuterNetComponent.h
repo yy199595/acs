@@ -20,8 +20,8 @@ namespace Sentry
 		~OuterNetComponent() final = default;
 	 public:
 		void StartClose(const std::string & address) final;
+		void OnMessage(std::shared_ptr<Rpc::Packet> message) final;
 		void OnCloseSocket(const std::string & address, int code) final;
-        void OnMessage(const std::string &address, std::shared_ptr<Rpc::Packet> message) final;
     public:
         bool IsAuth(const std::string & address);
         bool SendData(std::shared_ptr<Rpc::Packet> message);

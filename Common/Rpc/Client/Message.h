@@ -52,7 +52,7 @@ namespace Rpc
 
         int Serailize(std::ostream &os) final;
 
-        bool Parse(std::istream &os, size_t size);
+        bool Parse(const std::string & address, std::istream &os, size_t size);
 
         static std::shared_ptr<Packet> New(Tcp::Type type, Tcp::Porto proto);
 
@@ -71,8 +71,10 @@ namespace Rpc
 
         inline void Clear() { this->mBody.clear();}
         void SetContent(const std::string & content);
+        inline const std::string& From() const { return this->mFrom; }
         inline size_t GetSize() const { return this->mBody.size(); }
         inline const std::string & GetBody() const { return this->mBody;}
+        inline void SetFrom(const std::string& address) { this->mFrom = address; }
         inline void Append(const std::string & data) { this->mBody.append(data); }
         bool GetMethod(std::string &service, std::string &method) const;
     public:
@@ -89,6 +91,7 @@ namespace Rpc
         Head mHead;
         int mType;
         int mProto;
+        std::string mFrom;
         std::string mBody;
     };
 

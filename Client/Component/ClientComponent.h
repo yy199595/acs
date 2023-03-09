@@ -47,7 +47,7 @@ namespace Client
         void OnRequest(std::shared_ptr<c2s::rpc::call> t1);
 		bool New(const std::string & ip, unsigned short port);
 		std::shared_ptr<Rpc::Packet> Call(std::shared_ptr<Rpc::Packet> request);
-        void OnMessage(const std::string &address, std::shared_ptr<Rpc::Packet> message) final;
+        void OnMessage(std::shared_ptr<Rpc::Packet> message) final;
     protected:
 
         bool LateAwake() final;

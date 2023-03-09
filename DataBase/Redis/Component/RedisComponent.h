@@ -30,8 +30,8 @@ namespace Sentry
         std::shared_ptr<RedisResponse> Run(TcpRedisClient * c, std::shared_ptr<RedisRequest> request);
     private:
 		void OnConnectSuccessful(const std::string &address) final;
+        void OnMessage(std::shared_ptr<RedisResponse> message) final;
 		TcpRedisClient * MakeRedisClient(const RedisClientConfig & config);
-		void OnMessage(const std::string &address, std::shared_ptr<RedisResponse> message) final;
     private:
         bool Awake() final;
         bool Start() final;

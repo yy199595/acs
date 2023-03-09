@@ -198,13 +198,12 @@ namespace Mongo
 		else
 		{
 			this->mMongoResponse->OnReceiveBody(is);
-			const std::string & address = this->mSocket->GetAddress();
 			std::shared_ptr<CommandResponse> response = std::move(this->mMongoResponse);
 #ifdef ONLY_MAIN_THREAD
-			this->mComponent->OnMessage(address, response);
+			this->mComponent->OnMessage(response);
 #else
 			asio::io_service& io = App::Inst()->MainThread();
-			io.post(std::bind(&IRpc<CommandResponse>::OnMessage, this->mComponent, address, response));
+			io.post(std::bind(&IRpc<CommandResponse>::OnMessage, this->mComponent, response));
 #endif
 			this->PopMessage();
 			this->mMongoResponse = nullptr;

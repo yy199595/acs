@@ -56,7 +56,7 @@ namespace Sentry
 		std::shared_ptr<Mongo::CommandResponse> Run(TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request);
 	 private:
 		void OnConnectSuccessful(const std::string &address) final;
-		void OnMessage(const std::string &address, std::shared_ptr<CommandResponse> message) final;
+		void OnMessage(std::shared_ptr<CommandResponse> message) final;
 	 private:
 		 unsigned int mWaitCount;
 		Util::NumberBuilder<int, 10> mRequestId;

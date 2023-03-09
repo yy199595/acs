@@ -36,8 +36,9 @@ namespace Sentry
         LOG_INFO("wait client connect to gate ....");
     }
 
-	void OuterNetComponent::OnMessage(const std::string& address, std::shared_ptr<Rpc::Packet> message)
+	void OuterNetComponent::OnMessage(std::shared_ptr<Rpc::Packet> message)
 	{
+        const std::string& address = message->From();
 		switch ((Tcp::Type)message->GetType())
 		{
 		case Tcp::Type::Auth:

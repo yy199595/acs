@@ -68,19 +68,19 @@ namespace Client
             case Tcp::DecodeState::Body:
             {
                 this->mState = Tcp::DecodeState::Head;
-                if(!this->mMessage->Parse(readStream, size))
+                const std::string& address = this->mSocket->GetAddress();
+                if(!this->mMessage->Parse(address, readStream, size))
                 {
                     CONSOLE_LOG_ERROR("parse server message error");
                     return;
                 }
                 this->ReceiveMessage(RPC_PACK_HEAD_LEN);
-                const std::string & address = this->mSocket->GetAddress();
 #ifdef ONLY_MAIN_THREAD
-                this->mClientComponent->OnMessage(address, std::move(this->mMessage));
+                this->mClientComponent->OnMessage(std::move(this->mMessage));
 #else
                 Asio::Context & io = App::Inst()->MainThread();
                 io.post(std::bind(&ClientComponent::OnMessage,
-                                  this->mClientComponent, address, std::move(this->mMessage)));
+                                  this->mClientComponent, std::move(this->mMessage)));
 #endif
             }
                 break;

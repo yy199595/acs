@@ -59,7 +59,7 @@ namespace Sentry
 		LOG_INFO("mongo client [" << address << "] auth successful");
 	}
 
-	void MongoDBComponent::OnMessage(const std::string& address, std::shared_ptr<CommandResponse> message)
+	void MongoDBComponent::OnMessage(std::shared_ptr<CommandResponse> message)
 	{
 		int taskId = message->GetHead().responseTo;
 		this->OnResponse(taskId, message);

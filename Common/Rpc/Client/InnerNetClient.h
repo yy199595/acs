@@ -33,7 +33,6 @@ namespace Sentry
         std::string mPassword;
         Tcp::DecodeState mState;
         std::string mRpcLocation;
-        std::string mHttpLocation;
         IRpc<Rpc::Packet> * mComponent;
         std::shared_ptr<Rpc::Packet> mMessage;
         std::unique_ptr<asio::steady_timer> mTimer;

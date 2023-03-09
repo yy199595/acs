@@ -81,7 +81,7 @@ namespace Sentry
 		this->mComponent->OnMessage(this->mAddress, this->mCurResponse);
 #else
 		asio::io_service & io = App::Inst()->MainThread();
-		io.post(std::bind(&IRpc<RedisResponse>::OnMessage, this->mComponent, this->mAddress, this->mCurResponse));
+		io.post(std::bind(&IRpc<RedisResponse>::OnMessage, this->mComponent, this->mCurResponse));
 #endif
 		this->PopMessage();
 		this->mCurResponse = nullptr;

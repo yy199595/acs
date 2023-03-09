@@ -12,7 +12,6 @@ namespace Sentry
         this->mState = Tcp::DecodeState::Head;
         this->mSrvName = ServerConfig::Inst()->Name();
         ServerConfig::Inst()->GetLocation("rpc", this->mRpcLocation);
-        ServerConfig::Inst()->GetLocation("http", this->mHttpLocation);
         ServerConfig::Inst()->GetMember("user", "name", this->mUserName);
         ServerConfig::Inst()->GetMember("user", "passwd", this->mPassword);
     }
@@ -139,18 +138,18 @@ namespace Sentry
             case Tcp::DecodeState::Body:
             {
                 this->mState = Tcp::DecodeState::Head;
-                if (!this->mMessage->Parse(readStream, size))
+                const std::string& address = this->mSocket->GetAddress();
+                if (!this->mMessage->Parse(address,readStream, size))
                 {
                     this->CloseSocket(XCode::UnKnowPacket);
                     return;
                 }
                 this->ReceiveMessage(RPC_PACK_HEAD_LEN);
-                const std::string & address = this->mSocket->GetAddress();
 #ifdef ONLY_MAIN_THREAD
-                this->mComponent->OnMessage(address, std::move(this->mMessage));
+                this->mComponent->OnMessage(std::move(this->mMessage));
 #else
                 asio::io_service & io = App::Inst()->MainThread();
-                io.post(std::bind(&IRpc<Rpc::Packet>::OnMessage, this->mComponent, address, std::move(this->mMessage)));
+                io.post(std::bind(&IRpc<Rpc::Packet>::OnMessage, this->mComponent, std::move(this->mMessage)));
 #endif
             }
                 break;
@@ -200,16 +199,11 @@ namespace Sentry
             Rpc::Packet::New(Tcp::Type::Auth, Tcp::Porto::Protobuf);
         {
 			Rpc::Head & head = authMessage->GetHead();
-			head.Add("name", this->mSrvName);
-			head.Add("user", this->mUserName);
-			head.Add("passwd", this->mPassword);
-            if(!this->mRpcLocation.empty())
             {
-				head.Add("rpc", this->mRpcLocation);
-            }
-            if(!this->mHttpLocation.empty())
-            {
-				head.Add("http", this->mHttpLocation);
+                head.Add("name", this->mSrvName);
+                head.Add("user", this->mUserName);
+                head.Add("passwd", this->mPassword);
+                head.Add("rpc", this->mRpcLocation);                          
             }
         }
         if(this->SendSync(authMessage) > 0)

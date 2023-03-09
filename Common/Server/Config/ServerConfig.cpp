@@ -47,9 +47,9 @@ namespace Sentry
             }
         }
 
-        if (iter->value.HasMember("server"))
+        if (iter->value.HasMember("address"))
         {
-            const rapidjson::Value& document = iter->value["server"];
+            const rapidjson::Value& document = iter->value["address"];
             for (auto iter1 = document.MemberBegin(); iter1 != document.MemberEnd(); iter1++)
             {
                 const std::string key(iter1->name.GetString());

@@ -41,7 +41,7 @@ namespace Sentry
 		LOG_INFO("mysql client [" << address << "] auth successful");
 	}
 
-	void MysqlDBComponent::OnMessage(const std::string& address, std::shared_ptr<Mysql::Response> message)
+	void MysqlDBComponent::OnMessage(std::shared_ptr<Mysql::Response> message)
 	{
 		if(!message->IsOk())
 		{

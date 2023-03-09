@@ -187,7 +187,7 @@ namespace Rpc
         return true;
     }
 
-    bool Packet::Parse(std::istream &os, size_t size)
+    bool Packet::Parse(const std::string& address, std::istream &os, size_t size)
     {
         if (size != this->mLen)
         {
@@ -195,6 +195,7 @@ namespace Rpc
         }
         this->mBody.clear();
         char buffer[128] = {0};
+        this->mFrom = address;
         size_t len = this->mHead.Parse(os);
         if (len == -1)
         {

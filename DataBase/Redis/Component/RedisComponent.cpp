@@ -28,7 +28,7 @@ namespace Sentry
 		LOG_INFO("redis client [" << address << "] auth successful");
 	}
 
-	void RedisComponent::OnMessage(const std::string& address, std::shared_ptr<RedisResponse> message)
+	void RedisComponent::OnMessage(std::shared_ptr<RedisResponse> message)
 	{
 		if(message->HasError())
 		{

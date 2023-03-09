@@ -49,8 +49,9 @@ namespace Sentry
 
 	}
 
-    void InnerNetComponent::OnMessage(const std::string &address, std::shared_ptr<Rpc::Packet> message)
+    void InnerNetComponent::OnMessage(std::shared_ptr<Rpc::Packet> message)
     {
+        const std::string& address = message->From();
 		if(address != this->mLocation)
 		{
 			if (message->GetType() != (int)Tcp::Type::Auth && !this->IsAuth(address))
@@ -118,12 +119,11 @@ namespace Sentry
         const Rpc::Head &head = message->GetHead();
         std::unique_ptr<ServiceNodeInfo> serverNode(new ServiceNodeInfo());
         {
-            head.Get("rpc", serverNode->RpcAddress);
-            head.Get("http", serverNode->HttpAddress);
             LOG_CHECK_RET_FALSE(head.Get("name", serverNode->SrvName));
             LOG_CHECK_RET_FALSE(head.Get("user", serverNode->UserName));
+            LOG_CHECK_RET_FALSE(head.Get("rpc", serverNode->RpcAddress));
             LOG_CHECK_RET_FALSE(head.Get("passwd", serverNode->PassWord));
-            if (serverNode->RpcAddress.empty() && serverNode->HttpAddress.empty())
+            if (serverNode->RpcAddress.empty())
             {
                 return false;
             }
@@ -221,7 +221,8 @@ namespace Sentry
         if(this->mOuterComponent != nullptr && head.Get("client", targer))
         {
             head.Remove("client");
-			this->mOuterComponent->OnMessage(targer, message);
+            message->SetFrom(targer);
+			this->mOuterComponent->OnMessage(message);
             return true;
         }
         else if (this->mTranComponent != nullptr && head.Get("from", targer))
@@ -331,7 +332,8 @@ namespace Sentry
 	{
 		if(address == this->mLocation) //发送到本机
 		{
-			this->OnMessage(address, message);
+            message->SetFrom(address);
+			this->OnMessage(message);
 			return true;
 		}
         InnerNetClient * clientSession = this->GetOrCreateSession(address);

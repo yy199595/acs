@@ -45,7 +45,7 @@ namespace Sentry
         bool Run(MysqlClient * client, std::shared_ptr<Mysql::ICommand> command);
 	 private:
 		void OnConnectSuccessful(const std::string &address) final;
-		void OnMessage(const std::string &address, std::shared_ptr<Mysql::Response> message) final;
+		void OnMessage(std::shared_ptr<Mysql::Response> message) final;
     private:
 		std::vector<std::unique_ptr<MysqlClient>> mMysqlClients;
     };

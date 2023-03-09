@@ -109,7 +109,7 @@ namespace Sentry
 		virtual void StartClose(const std::string& address) { };
 		virtual void OnConnectSuccessful(const std::string & address) { }
 		virtual void OnCloseSocket(const std::string& address, int code) { };
-        virtual void OnMessage(const std::string & address, std::shared_ptr<T> message) = 0;
+        virtual void OnMessage(std::shared_ptr<T> message) = 0;
 		virtual void OnSendFailure(const std::string& address, std::shared_ptr<T> message) { }
     };
 
