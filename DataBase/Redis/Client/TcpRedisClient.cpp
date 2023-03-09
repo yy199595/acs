@@ -49,7 +49,6 @@ namespace Sentry
 		if (length == 0)
 		{
 			this->OnReadComplete();
-			this->mCurResponse = nullptr;
 		}
 		else if (length == -1)
 		{

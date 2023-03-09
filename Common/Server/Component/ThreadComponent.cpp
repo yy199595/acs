@@ -8,17 +8,21 @@ namespace Sentry
     AsioThread::AsioThread()
         : std::thread(std::bind(&AsioThread::Update, this))
     {
-        this->mContext = std::make_unique<Asio::Context>();
+
     }
 
     void AsioThread::Update()
     {
         asio::error_code code;
-        Asio::ContextWork work(*this->mContext);
+        this->mContext = new Asio::Context();
+        this->mWork = new Asio::ContextWork(*this->mContext);
+
         while (!this->mContext->stopped())
         {
             this->mContext->run(code);
         }
+        delete this->mWork;
+        delete this->mContext;
     }
 }
 

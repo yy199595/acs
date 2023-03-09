@@ -214,37 +214,37 @@ namespace Sentry
 	{
 		const ServerConfig * config = ServerConfig::Inst();
 		RpcService * rpcService = this->mApp->GetService<Registry>();
-		NEXT_REGISTER:
-		if (this->mIndex >= this->mRegistryAddress.size())
-		{
-			LOG_FATAL("registry server failure");
-			return;
-		}
-		const std::string& address = this->mRegistryAddress[this->mIndex];		
-		{
-			s2s::server::info message;
-			message.set_name(config->Name());
-			config->GetLocation("rpc", *message.mutable_rpc());
-			config->GetLocation("http", *message.mutable_http());
-			std::shared_ptr<s2s::server::list> response = std::make_shared<s2s::server::list>();
-			if(rpcService->Call(address,"Register", message, response) != XCode::Successful)
-			{
-				this->mIndex++;
-				LOG_ERROR("register to [" << address << "] failure");
-				goto NEXT_REGISTER;
-			}
-			for(int index = 0; index < response->list_size(); index++)
-			{
-				const s2s::server::info & info = response->list(index);
-				{
-					this->AddRpcServer(info.name(), info.rpc());
-					this->AddHttpServer(info.name(), info.http());
-				}
-			}
-			LOG_INFO("register to [" << address << "] successful");
-		}
-		TaskComponent* taskComponent = this->GetComponent<TaskComponent>();
-		taskComponent->Start(&NodeMgrComponent::PingRegistryServer, this);
+        TaskComponent* taskComponent = this->GetComponent<TaskComponent>();
+        while(true)
+        {
+            for (size_t index = 0; index < this->mRegistryAddress.size(); index++)
+            {
+                const std::string & address = this->mRegistryAddress[index];
+                s2s::server::info message;
+                message.set_name(config->Name());
+                config->GetLocation("rpc", *message.mutable_rpc());
+                config->GetLocation("http", *message.mutable_http());
+                std::shared_ptr<s2s::server::list> response = std::make_shared<s2s::server::list>();
+                if(rpcService->Call(address,"Register", message, response) != XCode::Successful)
+                {
+                    this->mIndex++;
+                    LOG_ERROR("register to [" << address << "] failure");
+                    continue;
+                }
+                for(int index = 0; index < response->list_size(); index++)
+                {
+                    const s2s::server::info & info = response->list(index);
+                    {
+                        this->AddRpcServer(info.name(), info.rpc());
+                        this->AddHttpServer(info.name(), info.http());
+                    }
+                }
+                LOG_INFO("register to [" << address << "] successful");
+                taskComponent->Start(&NodeMgrComponent::PingRegistryServer, this);
+                return;
+            }
+            taskComponent->Sleep(5 * 1000);
+        }
 	}
 	void NodeMgrComponent::PingRegistryServer()
 	{

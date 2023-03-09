@@ -37,10 +37,10 @@ namespace Sentry
         {
             return XCode::CallFunctionNotExist;
         }
-        if(!methodConfig->Request.empty() && message->GetSize() == 0)
-        {
-            return XCode::CallArgsError;
-        }
+//        if(!methodConfig->Request.empty() && message->GetSize() == 0)
+//        {
+//            return XCode::CallArgsError;
+//        }
         if(this->mApp->GetService(methodConfig->Service) == nullptr)
         {
             LOG_ERROR("call service not exist : [" << methodConfig->Service << "]");

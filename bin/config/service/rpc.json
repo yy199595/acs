@@ -29,7 +29,7 @@
 		},
 		"Register": {
 			"Async": true,
-			"Request": "s2s.server.info",
+			"Request": "com.array.string",
 			"Response": "s2s.server.list"
 		},
 		"UnRegister": {

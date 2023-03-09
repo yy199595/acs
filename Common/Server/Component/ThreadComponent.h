@@ -12,11 +12,12 @@ namespace Sentry
         AsioThread();
     public:
         void Run() { this->detach(); }
-        Asio::Context & Context() const { return *mContext; }
+        Asio::Context & Context() { return *mContext; }
     private:
         void Update();
     private:
-        std::unique_ptr<Asio::Context> mContext;
+        Asio::Context * mContext;
+        Asio::ContextWork * mWork;
     };
 }
 
