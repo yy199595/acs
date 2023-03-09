@@ -76,11 +76,14 @@ namespace Sentry
 			response.Add("error").Add("not find registry server address");
 			return XCode::NetWorkError;
 		}
+		com::type::string request;
 		std::shared_ptr<s2s::server::list> list
 			= std::make_shared<s2s::server::list>();
 		RpcService* rpcService = this->mApp->GetService<Registry>();		
-		if (rpcService->Call(address, std::string("Query"), list) != XCode::Successful)
+		int code = rpcService->Call(address, std::string("Query"), request, list);
+		if(code != XCode::Successful)
 		{
+			response.Add("error").Add(CodeConfig::Inst()->GetDesc(code));
 			return XCode::Failure;
 		}
 		for (int index = 0; index < list->list_size(); index++)
