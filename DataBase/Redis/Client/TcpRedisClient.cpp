@@ -79,8 +79,9 @@ namespace Sentry
 
 	void TcpRedisClient::OnReadComplete()
 	{
+        assert(this->mCurResponse->TaskId() != 0);
 #ifdef ONLY_MAIN_THREAD
-		this->mComponent->OnMessage(this->mAddress, this->mCurResponse);
+		this->mComponent->OnMessage(this->mCurResponse);
 #else
 		asio::io_service & io = App::Inst()->MainThread();
 		io.post(std::bind(&IRpc<RedisResponse>::OnMessage, this->mComponent, this->mCurResponse));
