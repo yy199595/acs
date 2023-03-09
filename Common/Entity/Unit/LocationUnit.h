@@ -21,6 +21,7 @@ namespace Sentry
         bool Get(std::vector<std::string> & servers);
         bool Get(const std::string & server, std::string & address) const;
         void Add(const std::string & server, const std::string & address);
+        inline size_t GetLocationSize() const { return this->mLocations.size(); }
     private:
 		std::string mAddress;
         std::unordered_map<std::string, std::string> mLocations;

@@ -174,7 +174,12 @@ namespace Sentry
 		{
 			return false;
 		}
-		return iter->second->Del(server);
+		if (iter->second->Del(server) 
+			&& iter->second->GetLocationSize() == 0)
+		{
+			this->mUnitLocations.erase(iter);
+		}		
+		return true;
 	}
 
 	bool NodeMgrComponent::AddRpcServer(const std::string& server, long long id, const std::string& address)

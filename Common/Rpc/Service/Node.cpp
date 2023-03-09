@@ -26,6 +26,8 @@ namespace Sentry
         BIND_COMMON_RPC_METHOD(Node::Hotfix);
 		BIND_COMMON_RPC_METHOD(Node::RunInfo);
 		BIND_COMMON_RPC_METHOD(Node::LoadConfig);
+        BIND_COMMON_RPC_METHOD(Node::AddAddress);
+        BIND_COMMON_RPC_METHOD(Node::DelAddress);
 		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
         return true;
     }
@@ -120,6 +122,29 @@ namespace Sentry
 		document.WriterStream(response.mutable_value());
 		return XCode::Successful;
 	}
+
+    int Node::AddAddress(long long userId, const s2s::server::list& request)
+    {
+        for (int index = 0; index < request.list_size(); index++)
+        {
+            const s2s::server::info& info = request.list(index);
+            this->mNodeComponent->AddRpcServer(info.name(), userId, info.rpc());
+#ifdef __DEBUG__
+            CONSOLE_LOG_DEBUG("user " << userId << " add server [" << info.rpc() << "]");
+#endif
+        }
+        return XCode::Successful;
+    }
+
+    int Node::DelAddress(long long userId, const com::array::string& request)
+    {
+        for (int index = 0; index < request.array_size(); index++)
+        {
+            const std::string & name = request.array(index);
+            this->mNodeComponent->DelServer(name, userId);
+        }
+        return XCode::Successful;
+    }
 
     int Node::Hotfix()
     {

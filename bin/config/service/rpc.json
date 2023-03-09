@@ -7,11 +7,11 @@
 		}
 	},
 	"Gate": {
-		"Ping":{
-			"Async":false,
-			"Type":"Client"
+		"Ping": {
+			"Async": false,
+			"Type": "Client"
 		},
-		"AddUser": {
+		"Allocation": {
 			"Async": false,
 			"Type": "Server",
 			"Request": "com.type.int64",
@@ -94,6 +94,14 @@
 		"RunInfo": {
 			"Async": false,
 			"Response": "google.protobuf.StringValue"
+		},
+		"AddAddress": {
+			"Async": false,
+			"Request": "s2s.server.list"
+		},
+		"DelAddress": {
+			"Async": false,
+			"Response": "com.array.string"
 		}
 	},
 	"User": {

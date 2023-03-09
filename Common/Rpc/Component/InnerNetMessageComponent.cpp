@@ -19,6 +19,7 @@ namespace Sentry
 	bool InnerNetMessageComponent::LateAwake()
 	{
 		this->mTaskComponent = this->mApp->GetTaskComponent();
+        this->mTimerComponent = this->mApp->GetTimerComponent();
 		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<TaskComponent>());
 		LOG_CHECK_RET_FALSE(this->mInnerComponent = this->GetComponent<InnerNetComponent>());
 		return true;
@@ -78,12 +79,24 @@ namespace Sentry
     {
         Rpc::Head & head = message->GetHead();
         RpcService *logicService = this->mApp->GetService(config->Service);
-        LOG_CHECK_RET(logicService != nullptr);
-        int code = logicService->Invoke(config->Method, message);
-        if (code != XCode::Successful)
+        if (logicService == nullptr || !logicService->IsStartService())
         {
-            head.Add("error", CodeConfig::Inst()->GetDesc(code));
+            LOG_ERROR("call [" << config->FullName << "] server not found");
+            return;
         }
+        long long timerId = 0;
+        if (config->Timeout > 0)
+        {
+            timerId = this->mTimerComponent->DelayCall(config->Timeout,
+                &InnerNetMessageComponent::OnTimeout, this, config, message);
+        }
+        int code = logicService->Invoke(config->Method, message);     
+        if (timerId > 0 && !this->mTimerComponent->CancelTimer(timerId))
+        {
+            LOG_ERROR("call [" << config->FullName << "] time out not return");
+            return;
+        }
+        
 #ifdef __DEBUG__
         std::string from;
         if (head.Get("address", from))
@@ -104,6 +117,11 @@ namespace Sentry
         {
             return; //不需要返回
         }
+        if (code != XCode::Successful)
+        {
+            head.Add("error", CodeConfig::Inst()->GetDesc(code));
+        }
+
         std::string address;
         head.Add("code", code);
         if (head.Get("address", address))
@@ -116,6 +134,19 @@ namespace Sentry
             message->SetType(Tcp::Type::Response);
             this->mInnerComponent->Send(address, message);
         }
+    }
+
+    void InnerNetMessageComponent::OnTimeout(const RpcMethodConfig* config, std::shared_ptr<Rpc::Packet> message)
+    {
+        std::string address;
+        if(message->GetHead().Get("address", address))
+        {
+            message->Clear();
+            message->GetHead().Add("code", XCode::CallTimeout);
+            message->GetHead().Add("error", CodeConfig::Inst()->GetDesc(XCode::CallTimeout));
+            this->Send(address, message);
+        }
+        LOG_ERROR("call [" << config->FullName << "] time out");
     }
 
     bool InnerNetMessageComponent::Ping(const std::string &address)

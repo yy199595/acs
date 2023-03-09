@@ -59,25 +59,24 @@ namespace Rpc
     public:
         int GetCode(int code = XCode::Failure) const;
 
-        Head &GetHead() { return this->mHead; }
+        inline Head &GetHead() { return this->mHead; }
 
-        void SetType(Tcp::Type type) { this->mType = (int)type; }
+        inline void SetType(Tcp::Type type) { this->mType = (int)type; }
 
-        void SetProto(Tcp::Porto proto) { this->mProto = (int)proto; }
+        inline void SetProto(Tcp::Porto proto) { this->mProto = (int)proto; }
 
-        int GetType() const { return this->mType; }
+        inline int GetType() const { return this->mType; }
 
-        int GetProto() const { return this->mProto; }
+        inline int GetProto() const { return this->mProto; }
 
-        void Clear() { this->mBody.clear();}
+        inline void Clear() { this->mBody.clear();}
         void SetContent(const std::string & content);
-        size_t GetSize() const { return this->mBody.size(); }
-        const std::string & GetBody() const { return this->mBody;}
-        void Append(const std::string & data) { this->mBody.append(data); }
+        inline size_t GetSize() const { return this->mBody.size(); }
+        inline const std::string & GetBody() const { return this->mBody;}
+        inline void Append(const std::string & data) { this->mBody.append(data); }
         bool GetMethod(std::string &service, std::string &method) const;
     public:
         std::shared_ptr<Packet> Clone();
-
     public:
         template<typename T>
         bool ParseMessage(T * message);

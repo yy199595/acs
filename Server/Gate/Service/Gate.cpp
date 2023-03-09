@@ -5,8 +5,10 @@
 #include"Gate.h"
 #include"App/App.h"
 #include"Md5/MD5.h"
+#include"Config/ClusterConfig.h"
 #include"Client/OuterNetClient.h"
 #include"Component/OuterNetComponent.h"
+#include"Component/NodeMgrComponent.h"
 #include"Component/GateHelperComponent.h"
 #include"Component/OuterNetMessageComponent.h"
 namespace Sentry
@@ -24,9 +26,11 @@ namespace Sentry
 	bool Gate::OnStart()
 	{
         BIND_COMMON_RPC_METHOD(Gate::Ping);
-        BIND_COMMON_RPC_METHOD(Gate::AddUser);
+        BIND_COMMON_RPC_METHOD(Gate::Allocation);
         const ServerConfig * config = ServerConfig::Inst();
         ServerConfig::Inst()->GetLocation("gate", this->mAddress);
+
+        this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
         this->mOuterComponent = this->GetComponent<OuterNetMessageComponent>();
         LOG_CHECK_RET_FALSE(config->GetLocation("gate", this->mAddress));
         return true;
@@ -43,10 +47,9 @@ namespace Sentry
 		return XCode::Failure;
 	}
 
-	int Gate::AddUser(const com::type::int64 &request, s2s::allot::response &response)
+	int Gate::Allocation(long long userId, s2s::allot::response &response)
     {
         std::string token;
-        long long userId = request.value();
         if(!this->mOuterComponent->CreateToken(userId, token))
         {
             return XCode::Failure;

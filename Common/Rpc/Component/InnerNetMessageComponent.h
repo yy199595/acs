@@ -32,9 +32,11 @@ namespace Sentry
 		bool LateAwake() final;
 		void OnSystemUpdate() final;
         void Invoke(const RpcMethodConfig * config, std::shared_ptr<Rpc::Packet> message);
+		void OnTimeout(const RpcMethodConfig* config, std::shared_ptr<Rpc::Packet> message);
     private:
         std::string mFullName;
 		class TaskComponent* mTaskComponent;
+		class TimerComponent* mTimerComponent;
 		class InnerNetComponent* mInnerComponent;
         std::queue<std::shared_ptr<Rpc::Packet>> mWaitMessages;
 	};

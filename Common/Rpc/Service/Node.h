@@ -14,19 +14,22 @@ namespace Sentry
         Node() = default;
         ~Node() = default;
     private:
-		int Ping(const Rpc::Head & head);
-		int Stop();
-		int Hotfix();
-		int LoadConfig();
-		int Join(const s2s::server::info & request); //新服务器加入
-		int Exit(const s2s::server::info & response); //新服务器加入
-		int RunInfo(google::protobuf::StringValue & response); // 获取运行信息
-	 private:
+        int Ping(const Rpc::Head& head);
+        int Stop();
+        int Hotfix();
+        int LoadConfig();
+        int Join(const s2s::server::info& request); //新服务器加入
+        int Exit(const s2s::server::info& response); //新服务器加入
+        int RunInfo(google::protobuf::StringValue& response); // 获取运行信息
+    private:
+        int AddAddress(long long userId, const s2s::server::list& request);
+        int DelAddress(long long userId, const com::array::string& request);
+    private:
         void Init() final;
         bool OnStart() final;
         bool OnClose() final { return false; }
     private:
-        class NodeMgrComponent * mNodeComponent;
+        class NodeMgrComponent* mNodeComponent;
     };
 }
 

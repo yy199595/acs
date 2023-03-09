@@ -29,6 +29,7 @@ namespace Sentry
                 }
                 RpcMethodConfig * serviceConfig = this->mMethodConfigs[name].get();
                 {
+                    serviceConfig->Timeout = 0;
                     serviceConfig->Method = name;
                     serviceConfig->IsAsync = false;
                     serviceConfig->Type = "Server";
@@ -50,6 +51,10 @@ namespace Sentry
                 if (jsonValue.HasMember("Response"))
                 {
                     serviceConfig->Response = jsonValue["Response"].GetString();
+                }
+                if (jsonValue.HasMember("Timeout"))
+                {
+                    serviceConfig->Timeout = jsonValue["Timeout"].GetInt();
                 }
                 this->mIsClient = serviceConfig->Type ==std::string("Client");
                 //this->mMethodConfigs.emplace(name, std::move(serviceConfog));

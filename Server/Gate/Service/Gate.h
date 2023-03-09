@@ -12,14 +12,15 @@ namespace Sentry
 	 public:
 		Gate();
 	 private:
-		int Ping(long long userId);
-        int AddUser(const com::type::int64 & userId, s2s::allot::response & response);
+		int Ping(long long userId);		
+        int Allocation(long long userId, s2s::allot::response & response);		
 	private:
         void Init() final;
 		bool OnStart() final;
         bool OnClose() final;
 	 private:
 		std::string mAddress;
+		class NodeMgrComponent* mNodeComponent;
 		class OuterNetMessageComponent* mOuterComponent;
 	};
 
