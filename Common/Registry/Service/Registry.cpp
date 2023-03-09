@@ -24,11 +24,22 @@ namespace Sentry
         return true;
     }
 
-	int Registry::Query(const com::type::string& request, s2s::server::list& response)
+	int Registry::Query(const com::array::string& request, s2s::server::list& response)
 	{		
-		const std::string& name = request.str();
-		std::vector<const ServiceNodeInfo*> services;		
-		this->mInnerComponent->GetServiceList(name, services);
+		std::vector<const ServiceNodeInfo*> services;
+		if (request.array_size() == 0)
+		{
+			this->mInnerComponent->GetServiceList(services);
+		}
+		else
+		{
+			for (int index = 0; index < request.array_size(); index++)
+			{
+				const std::string& name = request.array(index);
+				this->mInnerComponent->GetServiceList(name, services);
+			}
+		}
+		
 		for (const ServiceNodeInfo* nodeInfo : services)
 		{
 			s2s::server::info * info = response.add_list();

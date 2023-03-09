@@ -17,7 +17,7 @@ namespace Sentry
     private:
         int Ping(const Rpc::Head & head);
         int UnRegister(const com::type::string& request);
-        int Query(const com::type::string& request, s2s::server::list& response);
+        int Query(const com::array::string& request, s2s::server::list& response);
 		int Register(const s2s::server::info & request, s2s::server::list & response);
     private:      
         void OnNodeServerError(const std::string& address);
