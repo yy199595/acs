@@ -90,9 +90,9 @@ namespace Sentry
 
 namespace Sentry
 {
-    RedisResponse::RedisResponse(long long id)
+    RedisResponse::RedisResponse()
         : mDataSize(0), mLineCount(0),
-        mDataCount(0), mNumber(-1), mTaskId(id)
+        mDataCount(0), mNumber(-1), mTaskId(0)
     {
         this->mType = RedisRespType::REDIS_NONE;
     }

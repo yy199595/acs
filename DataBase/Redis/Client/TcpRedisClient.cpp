@@ -14,6 +14,7 @@ namespace Sentry
 	{
         this->mIndex = 0;
         this->mAddress = this->mConfig.Address[0].FullAddress;
+        this->mCurResponse = std::make_shared<RedisResponse>();
 	}
 
 	TcpRedisClient::~TcpRedisClient() noexcept
@@ -62,11 +63,12 @@ namespace Sentry
 
 	void TcpRedisClient::OnReceiveMessage(const asio::error_code& code, std::istream & is, size_t size)
 	{
-        if(this->mCurResponse == nullptr)
+        /*if(this->mCurResponse == nullptr)
         {
             this->ClearRecvStream();
             return;
-        }
+        }*/
+        
 		if (this->mCurResponse->OnRecvMessage(is) == 0)
 		{
 			this->OnReadComplete();
@@ -83,8 +85,7 @@ namespace Sentry
 		asio::io_service & io = App::Inst()->MainThread();
 		io.post(std::bind(&IRpc<RedisResponse>::OnMessage, this->mComponent, this->mCurResponse));
 #endif
-		this->PopMessage();
-		this->mCurResponse = nullptr;
+		this->mCurResponse = std::make_shared<RedisResponse>();
 		this->SendFromMessageQueue();
 	}
 
@@ -101,8 +102,12 @@ namespace Sentry
             this->SendFromMessageQueue();
             return;
         }
-		std::shared_ptr<RedisRequest> request = std::static_pointer_cast<RedisRequest>(message);
-		this->mCurResponse = std::make_shared<RedisResponse>(request->GetTaskId());
+        this->PopMessage();
+        {
+            std::shared_ptr<RedisRequest> request =
+                std::static_pointer_cast<RedisRequest>(message);
+            this->mCurResponse->SetTaskId(request->GetTaskId());
+        }
         this->ReceiveLine();
     }
 
@@ -183,7 +188,7 @@ namespace Sentry
             return nullptr;
         }
         std::istream is(&this->mRecvBuffer);
-        std::shared_ptr<RedisResponse> redisResponse(new RedisResponse(0));
+        std::shared_ptr<RedisResponse> redisResponse(new RedisResponse());
         READ_LINE:
         if(this->RecvLineSync() <= 0)
         {
