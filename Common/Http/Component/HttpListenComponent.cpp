@@ -8,7 +8,7 @@
 
 namespace Sentry
 {
-    bool HttpListenComponent::OnListen(std::shared_ptr<SocketProxy> socket)
+    void HttpListenComponent::OnListen(std::shared_ptr<SocketProxy> socket)
     {
 #ifdef __DEBUG__
         //LOG_DEBUG("handler http socket count = " << count++);
@@ -28,8 +28,7 @@ namespace Sentry
 
         handlerClient->StartReceive();
         const std::string &address = socket->GetAddress();
-        this->mHttpClients.emplace(address, handlerClient);
-        return true;
+        this->mHttpClients.emplace(address, handlerClient);     
     }
 
     void HttpListenComponent::ClosetHttpClient(const std::string &address)

@@ -115,14 +115,14 @@ namespace Sentry
         return true;
     }
 
-	bool OuterNetComponent::OnListen(std::shared_ptr<SocketProxy> socket)
+    void OuterNetComponent::OnListen(std::shared_ptr<SocketProxy> socket)
     {
         const std::string &address = socket->GetAddress();
         auto iter = this->mGateClientMap.find(address);
         if (iter != this->mGateClientMap.end())
         {
             LOG_FATAL("handler socket error " << socket->GetAddress());
-            return false;
+            return;
         }
         std::shared_ptr<OuterNetClient> outerNetClient;
         if (!this->mClientPools.empty())
@@ -138,7 +138,6 @@ namespace Sentry
 
         outerNetClient->StartReceive(10);
         this->mGateClientMap.emplace(address, outerNetClient);
-        return true;
     }
 
 	void OuterNetComponent::OnCloseSocket(const std::string & address, int code)

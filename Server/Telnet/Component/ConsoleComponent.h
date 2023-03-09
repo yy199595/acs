@@ -34,7 +34,7 @@ namespace Sentry
         bool Start() final;
         bool LateAwake() final;
 		void OnClientError(const std::string & address);
-		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
+		void OnListen(std::shared_ptr<SocketProxy> socket) final;
 		void OnReceive(const std::string & address, const std::string & message);
 
     private:

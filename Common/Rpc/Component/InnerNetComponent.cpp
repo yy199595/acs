@@ -259,7 +259,7 @@ namespace Sentry
 		}
 	}
 
-	bool InnerNetComponent::OnListen(std::shared_ptr<SocketProxy> socket)
+    void InnerNetComponent::OnListen(std::shared_ptr<SocketProxy> socket)
 	{
 		const std::string& address = socket->GetAddress();
 		auto iter = this->mRpcClientMap.find(address);
@@ -271,9 +271,7 @@ namespace Sentry
 
 			tcpSession->StartReceive();
 			this->mRpcClientMap.emplace(address, tcpSession);
-            return true;
 		}
-        return false;
 	}
 
 	void InnerNetComponent::StartClose(const std::string & address)

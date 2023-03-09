@@ -17,7 +17,7 @@ namespace Sentry
     protected:
         void ListenConnect();
         virtual void OnStopListen() { };
-        virtual bool OnListen(std::shared_ptr<SocketProxy> socket) = 0;
+        virtual void OnListen(std::shared_ptr<SocketProxy> socket) = 0;
     private:
 		int mCount;
         bool mIsClose;

@@ -24,7 +24,7 @@ namespace Sentry
         bool Awake() final;
         bool LateAwake() final;
         void OnRecord(Json::Writer & document) final;
-		bool OnListen(std::shared_ptr<SocketProxy> socket) final;
+		void OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 public:
 		void GetServiceList(std::vector<std::string>& list) const;
 		void GetServiceList(std::vector<const ServiceNodeInfo *> &list) const;

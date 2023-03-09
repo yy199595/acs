@@ -34,7 +34,7 @@ namespace Sentry
         void OnClusterComplete() final;
 	 private:
         void OnRecord(Json::Writer & document) final;
-        bool OnListen(std::shared_ptr<SocketProxy> socket) final;
+        void OnListen(std::shared_ptr<SocketProxy> socket) final;
         bool OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message);
         bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message);
 		bool OnResponse(const std::string & address, std::shared_ptr<Rpc::Packet> message);

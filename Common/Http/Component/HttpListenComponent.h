@@ -18,7 +18,7 @@ namespace Sentry
     {
     public:
         void ClosetHttpClient(const std::string & address);
-        bool OnListen(std::shared_ptr<SocketProxy> socket) final;
+        void OnListen(std::shared_ptr<SocketProxy> socket) final;
         virtual bool OnDelClient(const std::string& address) = 0;
         virtual void OnRequest(const std::string & address, std::shared_ptr<Http::Request> request) = 0;
     protected:
