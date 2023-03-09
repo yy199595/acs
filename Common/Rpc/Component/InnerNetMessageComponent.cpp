@@ -77,7 +77,7 @@ namespace Sentry
 
     void InnerNetMessageComponent::Invoke(const RpcMethodConfig *config, std::shared_ptr<Rpc::Packet> message)
     {
-        Rpc::Head & head = message->GetHead();
+        Rpc::Head &head = message->GetHead();
         RpcService *logicService = this->mApp->GetService(config->Service);
         if (logicService == nullptr || !logicService->IsStartService())
         {
@@ -88,31 +88,14 @@ namespace Sentry
         if (config->Timeout > 0)
         {
             timerId = this->mTimerComponent->DelayCall(config->Timeout,
-                &InnerNetMessageComponent::OnTimeout, this, config, message);
+                                                       &InnerNetMessageComponent::OnTimeout, this, config, message);
         }
-        int code = logicService->Invoke(config->Method, message);     
+        int code = logicService->Invoke(config->Method, message);
         if (timerId > 0 && !this->mTimerComponent->CancelTimer(timerId))
         {
             LOG_ERROR("call [" << config->FullName << "] time out not return");
             return;
         }
-        
-#ifdef __DEBUG__
-        std::string from;
-        if (head.Get("address", from))
-        {
-            const ServiceNodeInfo *nodeInfo = this->mInnerComponent->GetSeverInfo(from);
-            if (nodeInfo != nullptr)
-            {
-                from = nodeInfo->RpcAddress;
-            }
-            if (code != XCode::Successful)
-            {
-                CONSOLE_LOG_ERROR("[" << from << "] call ["
-                                      << config->FullName << "] code = " << CodeConfig::Inst()->GetDesc(code));
-            }
-        }
-#endif
         if (!head.Has("rpc"))
         {
             return; //不需要返回
@@ -123,17 +106,13 @@ namespace Sentry
         }
 
         std::string address;
+        head.Remove("id");
         head.Add("code", code);
-        if (head.Get("address", address))
-        {
-            head.Remove("id");
-            head.Remove("address");
 #ifndef __DEBUG__
-            head.Remove("func");
+        head.Remove("func");
 #endif
-            message->SetType(Tcp::Type::Response);
-            this->mInnerComponent->Send(address, message);
-        }
+        message->SetType(Tcp::Type::Response);
+        this->mInnerComponent->Send(message->From(), message);
     }
 
     void InnerNetMessageComponent::OnTimeout(const RpcMethodConfig* config, std::shared_ptr<Rpc::Packet> message)
