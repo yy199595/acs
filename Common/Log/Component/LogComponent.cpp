@@ -6,7 +6,7 @@
 #endif
 #include"System/System.h"
 #include"spdlog/sinks/rotating_file_sink.h"
-
+#include"Component/WatchDogComponent.h"
 namespace Sentry
 {
 	// 单线程  st  多线程  mt
@@ -54,13 +54,6 @@ namespace Sentry
 		}
 		spdlog::drop_all();
 	}
-#ifdef __DEBUG__
-	void LogComponent::Output(spdlog::level::level_enum type, const std::string& log)
-	{
-		this->mAllLog->log(type, log);
-		this->mAllLog->flush();
-	}
-#endif // __DEBUG__
 
 	void LogComponent::SaveLog(spdlog::level::level_enum type, const std::string& log)
     {

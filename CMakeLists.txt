@@ -79,7 +79,7 @@ include_directories(${PROJECT_SOURCE_DIR}/Common/Network)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Cluster)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Registry)
 include_directories(${PROJECT_SOURCE_DIR}/Common/Sqlite)
-include_directories(${PROJECT_SOURCE_DIR}/Common/SubPublish)
+include_directories(${PROJECT_SOURCE_DIR}/Common/WatchDog)
 
 
 include_directories(${PROJECT_SOURCE_DIR}/Server/Log)

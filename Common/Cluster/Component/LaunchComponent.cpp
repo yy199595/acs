@@ -137,8 +137,11 @@ namespace Sentry
                 }
             }
         }
-        locationComponent->AddRpcServer(ServerConfig::Inst()->Name(), location);
-        locationComponent->AddHttpServer(ServerConfig::Inst()->Name(), httpLocation);
+        if (locationComponent != nullptr)
+        {
+            locationComponent->AddRpcServer(ServerConfig::Inst()->Name(), location);
+            locationComponent->AddHttpServer(ServerConfig::Inst()->Name(), httpLocation);
+        }
         return true;
     }
 }

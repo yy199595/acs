@@ -14,9 +14,6 @@ namespace Sentry
 		LogComponent() = default;
 	 public:
 		void SaveAllLog();
-#ifdef __DEBUG__
-		void Output(spdlog::level::level_enum type, const std::string& log);
-#endif
 		void SaveLog(spdlog::level::level_enum type, const std::string& log);
 		void SaveLog(const std::string & name, spdlog::level::level_enum type, const std::string& log);
 	 protected:
@@ -30,9 +27,6 @@ namespace Sentry
 		time_t mLastTime;
 		std::string mServerName;
 		std::string mLogSavePath;
-#ifdef __DEBUG__
-		std::shared_ptr<spdlog::logger> mAllLog;
-#endif
 		std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> mLoggers;
 	};
 }

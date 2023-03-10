@@ -28,6 +28,12 @@ message user
 
 message log
 {
+    message show
+    {
+        string name = 1;
+        int32 level = 2;
+        string content = 3;
+    }
     message login
     {
         int64 user_id = 1;

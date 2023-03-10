@@ -17,7 +17,11 @@ namespace Sentry
 		this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
 		this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>();
 		ClusterConfig::Inst()->GetServerName(this->GetName(), this->mCluster);
-		return ServerConfig::Inst()->GetLocation("rpc", this->mLocationAddress);
+        if (!ServerConfig::Inst()->GetLocation("rpc", this->mLocationAddress))
+        {
+            LOG_WARN("not config rpc address");
+        }
+        return true;
 	}
     bool RpcService::RandomAddress(std::string& address)
     {

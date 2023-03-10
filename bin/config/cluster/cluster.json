@@ -6,11 +6,13 @@
 			"Node": true,
 			"Chat": true,
 			"Gate": false,
-			"Registry" : false
+			"WatchDog": false,
+			"Registry": false
 		},
 		"Component": [
 			"NodeMgrComponent",
-			"LuaScriptComponent"
+			"LuaScriptComponent",
+			"WatchDogComponent"
 		]
 	},
 	"HttpServer": {
@@ -18,15 +20,17 @@
 		"Service": {
 			"Node": true,
 			"Account": true,
-			"HttpBackGround": true,
 			"Gate": false,
-			"Registry" : false
+			"WatchDog": false,
+			"Registry": false,
+			"HttpBackGround": true
 		},
 		"Component": [
 			"HttpComponent",
 			"RedisComponent",
 			"HttpWebComponent",
 			"NodeMgrComponent",
+			"WatchDogComponent",
 			"HttpDebugComponent",
 			"LuaScriptComponent"
 		]
@@ -37,10 +41,12 @@
 			"Gate": true,
 			"Node": true,
 			"Chat": false,
-			"Registry" : false
+			"WatchDog": false,
+			"Registry": false
 		},
-		"Component":[
-			"NodeMgrComponent"
+		"Component": [
+			"NodeMgrComponent",
+			"WatchDogComponent"
 		]
 	},
 	"DataServer": {
@@ -48,10 +54,12 @@
 		"Service": {
 			"MongoDB": true,
 			"Node": true,
-			"Registry" : false
+			"WatchDog": false,
+			"Registry": false
 		},
-		"Component":[
-			"NodeMgrComponent"
+		"Component": [
+			"NodeMgrComponent",
+			"WatchDogComponent"
 		]
 	},
 	"LogServer": {
@@ -59,20 +67,31 @@
 		"Service": {
 			"Log": true,
 			"Node": true,
-			"Registry" : false
+			"WatchDog": false,
+			"Registry": false
 		},
-		"Component":[
-			"NodeMgrComponent"
+		"Component": [
+			"NodeMgrComponent",
+			"WatchDogComponent"
 		]
 	},
 	"RegistryServer": {
 		"AutoAllot": false,
 		"Service": {
 			"Node": true,
-			"Registry" : true
+			"Registry": true,
+			"WatchDog": false
 		},
-		"Component":[
-			"NodeMgrComponent"
+		"Component": [
+			"NodeMgrComponent",
+			"WatchDogComponent"
 		]
+	},
+	"WatchDogServer": {
+		"AutoAllot": false,
+		"Service": {
+			"Node": true,
+			"WatchDog": true
+		}
 	}
 }

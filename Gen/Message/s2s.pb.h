@@ -44,7 +44,7 @@ struct TableStruct_s2s_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[20]
+  static const ::google::protobuf::internal::ParseTable schema[21]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -94,6 +94,9 @@ extern log_behaviorDefaultTypeInternal _log_behavior_default_instance_;
 class log_login;
 class log_loginDefaultTypeInternal;
 extern log_loginDefaultTypeInternal _log_login_default_instance_;
+class log_show;
+class log_showDefaultTypeInternal;
+extern log_showDefaultTypeInternal _log_show_default_instance_;
 class server;
 class serverDefaultTypeInternal;
 extern serverDefaultTypeInternal _server_default_instance_;
@@ -129,6 +132,7 @@ template<> ::s2s::location_del* Arena::CreateMaybeMessage<::s2s::location_del>(A
 template<> ::s2s::log* Arena::CreateMaybeMessage<::s2s::log>(Arena*);
 template<> ::s2s::log_behavior* Arena::CreateMaybeMessage<::s2s::log_behavior>(Arena*);
 template<> ::s2s::log_login* Arena::CreateMaybeMessage<::s2s::log_login>(Arena*);
+template<> ::s2s::log_show* Arena::CreateMaybeMessage<::s2s::log_show>(Arena*);
 template<> ::s2s::server* Arena::CreateMaybeMessage<::s2s::server>(Arena*);
 template<> ::s2s::server_info* Arena::CreateMaybeMessage<::s2s::server_info>(Arena*);
 template<> ::s2s::server_list* Arena::CreateMaybeMessage<::s2s::server_list>(Arena*);
@@ -849,6 +853,148 @@ class user :
 };
 // -------------------------------------------------------------------
 
+class log_show :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.log.show) */ {
+ public:
+  log_show();
+  virtual ~log_show();
+
+  log_show(const log_show& from);
+
+  inline log_show& operator=(const log_show& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  log_show(log_show&& from) noexcept
+    : log_show() {
+    *this = ::std::move(from);
+  }
+
+  inline log_show& operator=(log_show&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const log_show& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const log_show* internal_default_instance() {
+    return reinterpret_cast<const log_show*>(
+               &_log_show_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    6;
+
+  void Swap(log_show* other);
+  friend void swap(log_show& a, log_show& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline log_show* New() const final {
+    return CreateMaybeMessage<log_show>(nullptr);
+  }
+
+  log_show* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<log_show>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const log_show& from);
+  void MergeFrom(const log_show& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(log_show* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string name = 1;
+  void clear_name();
+  static const int kNameFieldNumber = 1;
+  const ::std::string& name() const;
+  void set_name(const ::std::string& value);
+  #if LANG_CXX11
+  void set_name(::std::string&& value);
+  #endif
+  void set_name(const char* value);
+  void set_name(const char* value, size_t size);
+  ::std::string* mutable_name();
+  ::std::string* release_name();
+  void set_allocated_name(::std::string* name);
+
+  // string content = 3;
+  void clear_content();
+  static const int kContentFieldNumber = 3;
+  const ::std::string& content() const;
+  void set_content(const ::std::string& value);
+  #if LANG_CXX11
+  void set_content(::std::string&& value);
+  #endif
+  void set_content(const char* value);
+  void set_content(const char* value, size_t size);
+  ::std::string* mutable_content();
+  ::std::string* release_content();
+  void set_allocated_content(::std::string* content);
+
+  // int32 level = 2;
+  void clear_level();
+  static const int kLevelFieldNumber = 2;
+  ::google::protobuf::int32 level() const;
+  void set_level(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:s2s.log.show)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr name_;
+  ::google::protobuf::internal::ArenaStringPtr content_;
+  ::google::protobuf::int32 level_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2eproto;
+};
+// -------------------------------------------------------------------
+
 class log_login :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:s2s.log.login) */ {
  public:
@@ -887,7 +1033,7 @@ class log_login :
                &_log_login_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   void Swap(log_login* other);
   friend void swap(log_login& a, log_login& b) {
@@ -1036,7 +1182,7 @@ class log_behavior :
                &_log_behavior_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   void Swap(log_behavior* other);
   friend void swap(log_behavior& a, log_behavior& b) {
@@ -1170,7 +1316,7 @@ class log :
                &_log_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   void Swap(log* other);
   friend void swap(log& a, log& b) {
@@ -1225,6 +1371,7 @@ class log :
 
   // nested types ----------------------------------------------------
 
+  typedef log_show show;
   typedef log_login login;
   typedef log_behavior behavior;
 
@@ -1278,7 +1425,7 @@ class allot_response :
                &_allot_response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   void Swap(allot_response* other);
   friend void swap(allot_response& a, allot_response& b) {
@@ -1413,7 +1560,7 @@ class allot_save :
                &_allot_save_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    11;
 
   void Swap(allot_save* other);
   friend void swap(allot_save& a, allot_save& b) {
@@ -1548,7 +1695,7 @@ class allot :
                &_allot_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    12;
 
   void Swap(allot* other);
   friend void swap(allot& a, allot& b) {
@@ -1680,7 +1827,7 @@ class location_add :
                &_location_add_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    14;
 
   void Swap(location_add* other);
   friend void swap(location_add& a, location_add& b) {
@@ -1808,7 +1955,7 @@ class location_del :
                &_location_del_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    15;
 
   void Swap(location_del* other);
   friend void swap(location_del& a, location_del& b) {
@@ -1943,7 +2090,7 @@ class location :
                &_location_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    16;
 
   void Swap(location* other);
   friend void swap(location& a, location& b) {
@@ -2051,7 +2198,7 @@ class forward_sub :
                &_forward_sub_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    17;
 
   void Swap(forward_sub* other);
   friend void swap(forward_sub& a, forward_sub& b) {
@@ -2179,7 +2326,7 @@ class forward_unsub :
                &_forward_unsub_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    18;
 
   void Swap(forward_unsub* other);
   friend void swap(forward_unsub& a, forward_unsub& b) {
@@ -2307,7 +2454,7 @@ class forward_publish :
                &_forward_publish_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    19;
 
   void Swap(forward_publish* other);
   friend void swap(forward_publish& a, forward_publish& b) {
@@ -2442,7 +2589,7 @@ class forward :
                &_forward_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    19;
+    20;
 
   void Swap(forward* other);
   friend void swap(forward& a, forward& b) {
@@ -2758,6 +2905,130 @@ inline void user_logout::set_user_id(::google::protobuf::int64 value) {
 // -------------------------------------------------------------------
 
 // user
+
+// -------------------------------------------------------------------
+
+// log_show
+
+// string name = 1;
+inline void log_show::clear_name() {
+  name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& log_show::name() const {
+  // @@protoc_insertion_point(field_get:s2s.log.show.name)
+  return name_.GetNoArena();
+}
+inline void log_show::set_name(const ::std::string& value) {
+  
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:s2s.log.show.name)
+}
+#if LANG_CXX11
+inline void log_show::set_name(::std::string&& value) {
+  
+  name_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:s2s.log.show.name)
+}
+#endif
+inline void log_show::set_name(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:s2s.log.show.name)
+}
+inline void log_show::set_name(const char* value, size_t size) {
+  
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:s2s.log.show.name)
+}
+inline ::std::string* log_show::mutable_name() {
+  
+  // @@protoc_insertion_point(field_mutable:s2s.log.show.name)
+  return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* log_show::release_name() {
+  // @@protoc_insertion_point(field_release:s2s.log.show.name)
+  
+  return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void log_show::set_allocated_name(::std::string* name) {
+  if (name != nullptr) {
+    
+  } else {
+    
+  }
+  name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
+  // @@protoc_insertion_point(field_set_allocated:s2s.log.show.name)
+}
+
+// int32 level = 2;
+inline void log_show::clear_level() {
+  level_ = 0;
+}
+inline ::google::protobuf::int32 log_show::level() const {
+  // @@protoc_insertion_point(field_get:s2s.log.show.level)
+  return level_;
+}
+inline void log_show::set_level(::google::protobuf::int32 value) {
+  
+  level_ = value;
+  // @@protoc_insertion_point(field_set:s2s.log.show.level)
+}
+
+// string content = 3;
+inline void log_show::clear_content() {
+  content_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& log_show::content() const {
+  // @@protoc_insertion_point(field_get:s2s.log.show.content)
+  return content_.GetNoArena();
+}
+inline void log_show::set_content(const ::std::string& value) {
+  
+  content_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:s2s.log.show.content)
+}
+#if LANG_CXX11
+inline void log_show::set_content(::std::string&& value) {
+  
+  content_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:s2s.log.show.content)
+}
+#endif
+inline void log_show::set_content(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  content_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:s2s.log.show.content)
+}
+inline void log_show::set_content(const char* value, size_t size) {
+  
+  content_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:s2s.log.show.content)
+}
+inline ::std::string* log_show::mutable_content() {
+  
+  // @@protoc_insertion_point(field_mutable:s2s.log.show.content)
+  return content_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* log_show::release_content() {
+  // @@protoc_insertion_point(field_release:s2s.log.show.content)
+  
+  return content_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void log_show::set_allocated_content(::std::string* content) {
+  if (content != nullptr) {
+    
+  } else {
+    
+  }
+  content_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), content);
+  // @@protoc_insertion_point(field_set_allocated:s2s.log.show.content)
+}
 
 // -------------------------------------------------------------------
 
@@ -3602,6 +3873,8 @@ inline void forward_publish::set_allocated_message(::std::string* message) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

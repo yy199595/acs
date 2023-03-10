@@ -9,6 +9,7 @@
 #endif
 
 #include"Component/LogComponent.h"
+
 using namespace Sentry;
 
 void Debug::Lua(const char *log)
@@ -56,14 +57,6 @@ void Debug::Backtrace(std::string &trace, int size, int skip)
 
 void Debug::Console(Debug::Level color, const std::string &log)
 {
-#ifdef __DEBUG__
-    LogComponent* logComponent = App::Inst()->GetLogger();
-    if(logComponent != nullptr)
-    {
-        logComponent->Output(color, log);
-    }
-#endif // __DEBUG__
-
     switch (color)
     {
         case Debug::Level::info:

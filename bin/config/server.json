@@ -121,7 +121,18 @@
       "cluster": "config/cluster/cluster.json"
     }
   },
-  "white_list": [
-    "127.0.0.1"
-  ]
-}
+  "WatchDogServer": {
+    "listen": {
+      "rpc": 3344
+    },
+    "address": {
+      "rpc": "127.0.0.1:3344"
+    },
+    "path": {
+        "cluster": "config/cluster/cluster.json"
+      }
+    },
+    "white_list": [
+      "127.0.0.1"
+    ]
+  }

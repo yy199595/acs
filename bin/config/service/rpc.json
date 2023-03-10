@@ -4,6 +4,17 @@
 			"Async": false,
 			"Type": "Server",
 			"Request": "s2s.log.login"
+		}	
+	},
+	"WatchDog": {
+		"Ping": {
+			"Async": false,
+			"Type": "Server"
+		},
+		"ShowLog": {
+			"Async": false,
+			"Type": "Server",
+			"Request": "s2s.log.show"
 		}
 	},
 	"Gate": {

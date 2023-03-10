@@ -48,6 +48,8 @@
 #endif
 #include"Component/SqliteComponent.h"
 
+#include"Service/WatchDog.h"
+#include"Component/WatchDogComponent.h"
 using namespace Sentry;
 
 void RegisterComponent()
@@ -98,9 +100,12 @@ void RegisterComponent()
   
     ComponentFactory::Add<HttpBackGround>("HttpBackGround");
 
+    ComponentFactory::Add<WatchDogComponent>("WatchDogComponent");
+
 // lua
     ComponentFactory::Add<LuaScriptComponent>("LuaScriptComponent");
     ComponentFactory::Add<Client::ClientComponent>("ClientComponent");
+
 
 }
 
@@ -111,6 +116,7 @@ void RegisterServiceComponent()
 	ComponentFactory::Add<User>("User");
     ComponentFactory::Add<Node>("Node");
     ComponentFactory::Add<Registry>("Registry");
+    ComponentFactory::Add<WatchDog>("WatchDog");
 #ifdef __ENABLE_MONGODB__
     ComponentFactory::Add<MongoDB>("MongoDB");
 #endif

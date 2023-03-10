@@ -8,7 +8,8 @@
 			"Gate": true,
 			"MongoDB": true,
 			"Chat": true,
-			"Registry":true,
+			"Registry": true,
+			"WatchDog": true,
 			"HttpBackGround": true,
 			"Account": true
 		},
@@ -19,6 +20,7 @@
 			"NodeMgrComponent",
 			"LuaScriptComponent",
 			"RedisComponent",
+			"WatchDogComponent",
 			"HttpWebComponent",
 			"HttpDebugComponent"
 		]
