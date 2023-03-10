@@ -13,6 +13,7 @@ namespace Debug
 {
     typedef spdlog::level::level_enum Level;
     extern void Lua(const char * log);
+	extern void LuaError(const char * str);
     extern void Log(Debug::Level color, const std::string & log);
     extern void Backtrace(std::string & trace, int size, int skip);
     extern void Console(Debug::Level color, const std::string & log);

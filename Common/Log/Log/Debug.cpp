@@ -23,6 +23,12 @@ void Debug::Lua(const char *log)
     Debug::Log(Debug::Level::err, logMessage);
 }
 
+void Debug::LuaError(const char* str)
+{
+	//const char * log = strstr(str, ".lua");
+	Debug::Log(Debug::Level::err, str);
+}
+
 void Debug::Log(Debug::Level color, const std::string &log)
 {
     LogComponent *logComponent = App::Inst()->GetLogger();

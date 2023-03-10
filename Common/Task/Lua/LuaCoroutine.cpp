@@ -1,6 +1,7 @@
 #include"LuaCoroutine.h"
 #include"App/App.h"
 #include"Lua/luadebug.h"
+#include"Log/Debug.h"
 #include"Lua/LuaWaitTaskSource.h"
 #include"Component/TimerComponent.h"
 using namespace Sentry;
@@ -48,11 +49,7 @@ namespace Lua
         int code = lua_resume(cor, lua, args);
         if(code != LUA_OK && code != LUA_YIELD)
         {
-            LuaDebug::onError(cor);
-//            const char * err = lua_tostring(cor, -1);
-//            lua_pushcfunction(lua, Lua::Log::DebugError);
-//            lua_pushstring(lua, err);
-//            lua_pcall(lua, 1, 0, 0);
+			Debug::LuaError(lua_tostring(cor, -1));
         }
     }
 }

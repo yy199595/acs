@@ -56,7 +56,7 @@ function AccountService.Login(request, response)
         return XCode.Failure
     end
     local address = Service.AllotServer("Gate")
-    local code, data = Service.Call(address, "Gate.AddUser", {
+    local code, data = Service.Call(address, "Gate.Allocation", {
         value = userInfo.user_id
     })
     if code ~= XCode.Successful or data == nil then
