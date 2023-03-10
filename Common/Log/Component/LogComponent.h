@@ -27,6 +27,9 @@ namespace Sentry
 		time_t mLastTime;
 		std::string mServerName;
 		std::string mLogSavePath;
+#ifdef __DEBUG__
+		std::shared_ptr<spdlog::logger> mAllLog;
+#endif
 		std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> mLoggers;
 	};
 }

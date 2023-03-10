@@ -16,6 +16,11 @@ namespace Sentry
 		this->mLogSaveTime = 3;
         this->mServerName = ServerConfig::Inst()->Name();
         this->mLogSavePath = fmt::format("{0}/log", System::WorkPath());
+#ifdef __DEBUG__
+		const std::string path("./log.out");
+		this->mAllLog = spdlog::rotating_logger_st<spdlog::async_factory>(this->mServerName,
+			path, LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
+#endif
         return true;
 	}
 
@@ -73,6 +78,11 @@ namespace Sentry
 				break;
 			}
 		}
+#ifdef __DEBUG__
+		this->mAllLog->log(type, log);
+		this->mAllLog->flush();
+#endif // __DEBUG__
+
     }
 
 	void LogComponent::SaveLog(const std::string& name,
