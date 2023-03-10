@@ -44,7 +44,7 @@ namespace Sentry
         }
         try
         {
-            Asio::Context& io = this->mNetComponent->GetContext();
+            Asio::Context& io = this->mApp->MainThread();
             this->mBindAcceptor = new Asio::Acceptor (io,
 				Asio::EndPoint(asio::ip::address_v4(), port));
 
