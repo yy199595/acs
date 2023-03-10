@@ -6,7 +6,6 @@
 			"Node": true,
 			"Chat": true,
 			"Gate": false,
-			"WatchDog": false,
 			"Registry": false
 		},
 		"Component": [
@@ -21,7 +20,6 @@
 			"Node": true,
 			"Account": true,
 			"Gate": false,
-			"WatchDog": false,
 			"Registry": false,
 			"HttpBackGround": true
 		},
@@ -41,7 +39,6 @@
 			"Gate": true,
 			"Node": true,
 			"Chat": false,
-			"WatchDog": false,
 			"Registry": false
 		},
 		"Component": [
@@ -54,7 +51,6 @@
 		"Service": {
 			"MongoDB": true,
 			"Node": true,
-			"WatchDog": false,
 			"Registry": false
 		},
 		"Component": [
@@ -67,7 +63,6 @@
 		"Service": {
 			"Log": true,
 			"Node": true,
-			"WatchDog": false,
 			"Registry": false
 		},
 		"Component": [
@@ -79,8 +74,7 @@
 		"AutoAllot": false,
 		"Service": {
 			"Node": true,
-			"Registry": true,
-			"WatchDog": false
+			"Registry": true
 		},
 		"Component": [
 			"NodeMgrComponent",

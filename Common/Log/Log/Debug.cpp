@@ -9,7 +9,7 @@
 #endif
 
 #include"Component/LogComponent.h"
-
+#include"Component/WatchDogComponent.h"
 using namespace Sentry;
 
 void Debug::Lua(const char *log)
@@ -26,6 +26,11 @@ void Debug::Lua(const char *log)
 void Debug::Log(Debug::Level color, const std::string &log)
 {
     LogComponent *logComponent = App::Inst()->GetLogger();
+    WatchDogComponent* watchComponent = App::Inst()->GetComponent<WatchDogComponent>();
+    if (watchComponent != nullptr)
+    {
+        watchComponent->ShowLog(color, log);
+    }
     if (logComponent != nullptr)
     {
         switch (color)

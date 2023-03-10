@@ -5,19 +5,19 @@
 typedef std::unique_ptr<s2s::log::show> LogPtr;
 namespace Sentry
 {
-	class WatchDogComponent : public Component, public IFrameUpdate
+	class WatchDogComponent final : public Component
 	{
 	public:
-		WatchDogComponent() = default;
+		WatchDogComponent();
 	public:
 		void ShowLog(spdlog::level::level_enum lv, const std::string& log);
 	private:
 		bool LateAwake() final;
-		void OnFrameUpdate(float t) final;
+		void ShowLogInWatchDog(s2s::log::show * log);
 	private:
 		std::mutex mMutex;
 		std::string mAddress;
-		std::queue<LogPtr> mLogs;
+		std::queue<s2s::log::show *> mLogs;
 		class InnerNetComponent* mInnerComponent;
 	};
 }

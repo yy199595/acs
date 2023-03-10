@@ -1,19 +1,24 @@
 #include"WatchDogComponent.h"
 #include"Config/ServerConfig.h"
+#include"Component/NodeMgrComponent.h"
 #include"Component/InnerNetComponent.h"
 namespace Sentry
 {
+	WatchDogComponent::WatchDogComponent()
+	{
+		this->mInnerComponent = nullptr;
+	}
+
 	void WatchDogComponent::ShowLog(spdlog::level::level_enum lv, const std::string& log)
 	{		
-		LogPtr request = std::make_unique<s2s::log::show>();
+		s2s::log::show * request = new s2s::log::show();
 		{
 			request->set_content(log);
 			request->set_level((int)lv);
 			request->set_name(ServerConfig::Inst()->Name());
 		}
-		this->mMutex.lock();
-		this->mLogs.push(std::move(request));
-		this->mMutex.unlock();
+		Asio::Context& io = this->mApp->MainThread();
+		io.post(std::bind(&WatchDogComponent::ShowLogInWatchDog, this, request));		
 	}
 
 	bool WatchDogComponent::LateAwake()
@@ -22,21 +27,26 @@ namespace Sentry
 		this->mInnerComponent = this->GetComponent<InnerNetComponent>();
 		return true;
 	}
-	void WatchDogComponent::OnFrameUpdate(float t)
-	{		
-		const std::string func("WatchDog.ShowLog");
-		std::lock_guard<std::mutex> lock(this->mMutex);
-		while (!this->mLogs.empty())
+	
+	void WatchDogComponent::ShowLogInWatchDog(s2s::log::show* log)
+	{
+		this->mLogs.push(log);
+		if (this->mInnerComponent != nullptr)
 		{
-			s2s::log::show* log = this->mLogs.front().get();
-			std::shared_ptr<Rpc::Packet> request = 
-				Rpc::Packet::New(Tcp::Type::Request, Tcp::Porto::Protobuf);
+			const std::string func("WatchDog.ShowLog");
+			while (!this->mLogs.empty())
 			{
-				request->WriteMessage(log);
-				request->GetHead().Add("func", func);
+				s2s::log::show* message = this->mLogs.front();
+				std::shared_ptr<Rpc::Packet> request =
+					Rpc::Packet::New(Tcp::Type::Request, Tcp::Porto::Protobuf);
+				{
+					request->WriteMessage(message);
+					request->GetHead().Add("func", func);
+				}
+				delete message;
+				this->mLogs.pop();
+				this->mInnerComponent->Send(this->mAddress, request);
 			}
-			this->mInnerComponent->Send(this->mAddress, request);
-			this->mLogs.pop();
 		}
 	}
 }

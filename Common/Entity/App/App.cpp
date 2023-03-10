@@ -224,19 +224,16 @@ namespace Sentry
 
 	void App::WaitServerStart() //等待依赖的服务启动完成
     {
-        std::vector<const NodeConfig *> configs;
-        ClusterConfig::Inst()->GetNodeConfigs(configs);
+        std::unordered_set<std::string> waitServers;;
+        ClusterConfig::Inst()->GetConfig()->GetWaitServer(waitServers);
         NodeMgrComponent *locationComponent = this->GetComponent<NodeMgrComponent>();
 		if(locationComponent != nullptr)
 		{
-			for (const NodeConfig* nodeConfig : configs)
-			{
-				if (nodeConfig->ServiceCount() > 0)
-				{
-					locationComponent->WaitServerStart(nodeConfig->GetName());
-					CONSOLE_LOG_INFO(nodeConfig->GetName() << " start successful ...");
-				}
-			}
+            for (const std::string& name : waitServers)
+            {
+                locationComponent->WaitServerStart(name);
+                CONSOLE_LOG_INFO(name << " start successful ...");
+            }
 			std::vector<IComplete*> completeComponents;
 			this->GetComponents<IComplete>(completeComponents);
 			for (IComplete* complete : completeComponents)
