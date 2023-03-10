@@ -27,7 +27,6 @@ void Debug::Log(Debug::Level color, const std::string &log)
     LogComponent *logComponent = App::Inst()->GetLogger();
     if (logComponent != nullptr)
     {
-
         switch (color)
         {
             case spdlog::level::err:
@@ -57,6 +56,14 @@ void Debug::Backtrace(std::string &trace, int size, int skip)
 
 void Debug::Console(Debug::Level color, const std::string &log)
 {
+#ifdef __DEBUG__
+    LogComponent* logComponent = App::Inst()->GetLogger();
+    if(logComponent != nullptr)
+    {
+        logComponent->Output(color, log);
+    }
+#endif // __DEBUG__
+
     switch (color)
     {
         case Debug::Level::info:
