@@ -91,7 +91,6 @@ namespace Sentry
 #ifdef ONLY_MAIN_THREAD
         return this->mApp->MainThread();
 #else
-        std::lock_guard<std::mutex> lock(this->mMutex);
         AsioThread* t = this->mNetThreads.front();
         {
             this->mNetThreads.pop_front();
@@ -126,7 +125,7 @@ namespace Sentry
         }
         return socket;
     }
-	std::shared_ptr<SocketProxy> ThreadComponent::CreateSocket(const string& address)
+	std::shared_ptr<SocketProxy> ThreadComponent::CreateSocket(const std::string& address)
 	{
 		size_t pos = address.find(':');
 		if(pos == std::string::npos)

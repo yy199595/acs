@@ -4,7 +4,9 @@
 
 #ifndef _MONGOAGENTCOMPONENT_H_
 #define _MONGOAGENTCOMPONENT_H_
+#include"Message/db.pb.h"
 #include"Component/Component.h"
+using namespace google::protobuf;
 namespace Sentry
 {
 	class MongoHelperComponent : public Component

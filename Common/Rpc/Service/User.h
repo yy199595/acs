@@ -5,6 +5,7 @@
 #ifndef APP_USERBEHAVIOR_H
 #define APP_USERBEHAVIOR_H
 #include"PhysicalService.h"
+#include"Message/s2s.pb.h"
 namespace Sentry
 {
     class User : public PhysicalService

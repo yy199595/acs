@@ -5,8 +5,11 @@
 #ifndef SERVER_MESSAGECOMPONENT_H
 #define SERVER_MESSAGECOMPONENT_H
 #include"Component/Component.h"
+#include"google/protobuf/any.pb.h"
 #include"google/protobuf/dynamic_message.h"
 #include"google/protobuf/compiler/importer.h"
+using namespace google::protobuf;
+struct lua_State;
 namespace Sentry
 {
 

@@ -10,6 +10,7 @@
 #include"google/protobuf/util/json_util.h"
 #include"google/protobuf/dynamic_message.h"
 #include"Lua/Message.h"
+#include"Lua/ClassProxyHelper.h"
 namespace Sentry
 {
     ImportError::ImportError()

@@ -1,14 +1,7 @@
 #pragma once
 
 #include"IComponent.h"
-
-#include"XCode/XCode.h"
-#include"Message/db.pb.h"
-#include"Message/c2s.pb.h"
-#include"Message/com.pb.h"
-#include"Message/s2s.pb.h"
 #include"Log/CommonLogDef.h"
-using namespace google::protobuf;
 namespace Sentry
 {
 	class App;

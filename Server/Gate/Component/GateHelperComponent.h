@@ -5,6 +5,8 @@
 #ifndef _GATEAGENTCOMPONENT_H_
 #define _GATEAGENTCOMPONENT_H_
 #include"Component/Component.h"
+#include"google/protobuf/message.h"
+using namespace google::protobuf;
 namespace Sentry
 {
 	class GateHelperComponent final : public Component, public ILuaRegister

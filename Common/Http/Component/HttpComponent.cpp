@@ -8,6 +8,7 @@
 #include"Client/HttpRequestClient.h"
 #include"Task/HttpTask.h"
 #include"Lua/LuaHttp.h"
+#include"Lua/ClassProxyHelper.h"
 namespace Sentry
 {
 	bool HttpComponent::LateAwake()

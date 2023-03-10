@@ -6,6 +6,9 @@
 #define GAMEKEEPER_LUATASKSOURCE_H
 #include"Source/TaskSource.h"
 #include"Http/HttpResponse.h"
+#include"Lua/LuaInclude.h"
+#include"google/protobuf/message.h"
+using namespace google::protobuf;
 namespace Sentry
 {
     class LuaServiceTaskSource final

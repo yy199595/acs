@@ -91,7 +91,7 @@ namespace Sentry
         return XCode::Successful;
     }
 
-	int Node::RunInfo(google::protobuf::StringValue& response)
+	int Node::RunInfo(com::type::string& response)
 	{
 		Json::Writer document;
         {
@@ -119,7 +119,7 @@ namespace Sentry
                 document.Add(Json::End::EndObject);				
 			}
 		}
-		document.WriterStream(response.mutable_value());
+		document.WriterStream(response.mutable_str());
 		return XCode::Successful;
 	}
 

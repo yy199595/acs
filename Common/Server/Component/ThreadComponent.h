@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include<list>
-#include<mutex>
+#include<string>
 #include"Tcp/Asio.h"
 #include"Component/Component.h"
 
@@ -37,7 +37,6 @@ namespace Sentry
 		std::shared_ptr<SocketProxy> CreateSocket(const std::string & address);
 		std::shared_ptr<SocketProxy> CreateSocket(const std::string & ip, unsigned short port);
     private:
-        std::mutex mMutex;
 #ifndef ONLY_MAIN_THREAD
         std::list<AsioThread *> mNetThreads;
 #endif

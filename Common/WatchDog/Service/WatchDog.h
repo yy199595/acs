@@ -1,3 +1,4 @@
+#include"Message/s2s.pb.h"
 #include"Service/PhysicalService.h"
 namespace Sentry
 {

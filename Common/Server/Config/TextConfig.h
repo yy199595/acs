@@ -5,6 +5,7 @@
 #ifndef APP_CONFIG_H
 #define APP_CONFIG_H
 #include<string>
+#include<unordered_map>
 namespace Sentry
 {
     class TextConfig

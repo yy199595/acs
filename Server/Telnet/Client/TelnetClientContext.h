@@ -7,17 +7,6 @@
 
 namespace Sentry
 {
-    class TelnetContent
-    {
-    public:
-        bool IsOk;
-        string Command;
-        std::string Parameter;
-    };
-}
-
-namespace Sentry
-{
 	class TelnetProto;
 	class ConsoleComponent;
 }

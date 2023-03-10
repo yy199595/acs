@@ -6,6 +6,8 @@
 #define _DATAMGRCOMPONENT_H_
 #include"Component/Component.h"
 #include"Coroutine/CoroutineLock.h"
+#include"google/protobuf/message.h"
+using namespace google::protobuf;
 namespace Sentry
 {
     class MongoDataComponent final : public Component

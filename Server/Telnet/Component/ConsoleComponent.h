@@ -40,7 +40,7 @@ namespace Sentry
     private:
         bool Invoke(std::vector<std::string> & request, std::shared_ptr<TelnetProto> response);
 	 private:
-		bool Offset(const std::string& parameter, std::vector<string>& response);
+		bool Offset(const std::string& parameter, std::vector<std::string>& response);
 		bool Help(const std::string& parameter, std::vector<std::string>& response);
 		bool Start(const std::string& parameter, std::vector<std::string>& response);
 		bool Close(const std::string& parameter, std::vector<std::string>& response);

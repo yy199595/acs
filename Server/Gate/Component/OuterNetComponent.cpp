@@ -9,6 +9,7 @@
 #include"Component/InnerNetMessageComponent.h"
 #include"Md5/MD5.h"
 #include"Config/CodeConfig.h"
+#include"Json/JsonWriter.h"
 #include"Component/UnitMgrComponent.h"
 namespace Sentry
 {

@@ -1,10 +1,15 @@
 ﻿#pragma once
-#include"Message/com.pb.h"
-#include"Message/c2s.pb.h"
-#include"XCode/XCode.h"
-#include"Json/JsonReader.h"
-#include"Json/JsonWriter.h"
-#include"Lua/ClassProxyHelper.h"
+#include<string>
+#include<memory>
+namespace Lua
+{
+    class ClassProxyHelper;
+}
+namespace Json
+{
+    class Writer;
+}
+
 namespace Sentry
 {
 	class Component;

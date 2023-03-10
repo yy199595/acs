@@ -4,6 +4,7 @@
 
 #ifndef APP_LOCATIONSERVICE_H
 #define APP_LOCATIONSERVICE_H
+#include"Message/s2s.pb.h"
 #include"Service/PhysicalService.h"
 namespace Sentry
 {

@@ -1,8 +1,7 @@
 #include<queue>
-#include<mutex>
+#include"Message/s2s.pb.h"
 #include"Component/Component.h"
 
-typedef std::unique_ptr<s2s::log::show> LogPtr;
 namespace Sentry
 {
 	class WatchDogComponent final : public Component
@@ -15,7 +14,6 @@ namespace Sentry
 		bool LateAwake() final;
 		void ShowLogInWatchDog(s2s::log::show * log);
 	private:
-		std::mutex mMutex;
 		std::string mAddress;
 		std::queue<s2s::log::show *> mLogs;
 		class InnerNetComponent* mInnerComponent;

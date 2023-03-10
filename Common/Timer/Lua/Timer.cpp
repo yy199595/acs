@@ -6,7 +6,6 @@
 #include"App/App.h"
 #include<memory>
 #include"Timer/DelayTimer.h"
-#include"Lua/UserDataParameter.h"
 #include"Component/TimerComponent.h"
 using namespace Sentry;
 
@@ -30,7 +29,7 @@ namespace Lua
         int ref = luaL_ref(lua, LUA_REGISTRYINDEX);
         std::shared_ptr<LuaTimer> luaTimer(new LuaTimer(ms, ref, lua));
         unsigned int timerId = timerComponent->AddTimer(luaTimer);
-        Lua::Parameter::Write<unsigned int>(lua, timerId);
+        lua_pushinteger(lua, timerId);
         return 1;
     }
 
@@ -43,7 +42,7 @@ namespace Lua
             return 0;
         }
         unsigned int timerId = (unsigned int) luaL_checkinteger(lua, 1);//Lua::Parameter::Read<unsigned int>(lua, 2);
-		Lua::Parameter::Write<bool>(lua, timerComponent->CancelTimer(timerId));
+        lua_pushboolean(lua, timerComponent->CancelTimer(timerId));
 		return 1;
 	}
 }
