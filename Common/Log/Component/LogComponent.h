@@ -1,11 +1,10 @@
 #pragma once
 #include<unordered_map>
 #include"spdlog/spdlog.h"
-#include"Time/TimeHelper.h"
 #include"Component/Component.h"
 #define LOG_FILE_MAX_SUM 10
 #define LOG_FILE_MAX_SIZE 1024 * 1024 * 100
-using namespace Helper;
+
 namespace Sentry
 {
     class LogComponent final : public Component, public ISecondUpdate

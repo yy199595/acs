@@ -1,13 +1,14 @@
 ﻿#pragma once
 
 #include<memory>
-#include"Client/Message.h"
-#include"Message/c2s.pb.h"
-#include"Json/JsonWriter.h"
-#include"Config/ServiceConfig.h"
+#include<vector>
 #include"Component/Component.h"
-using namespace std;
-
+#include<google/protobuf/message.h>
+using namespace google::protobuf;
+namespace Rpc
+{
+    class Packet;
+};
 namespace Sentry
 {
 	class ServiceMethod;

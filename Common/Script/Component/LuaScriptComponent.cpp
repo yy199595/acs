@@ -16,7 +16,12 @@
 #include"System/System.h"
 #include"Config/ServiceConfig.h"
 #include"Lua/LuaService.h"
+#include"Json/JsonWriter.h"
+#include"Lua/Function.h"
+#include"Module/LuaModule.h"
+#include"Lua/ClassProxyHelper.h"
 #include"Component/TextConfigComponent.h"
+
 using namespace Lua;
 namespace Sentry
 {

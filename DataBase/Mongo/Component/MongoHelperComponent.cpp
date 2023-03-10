@@ -4,6 +4,7 @@
 
 #include"MongoHelperComponent.h"
 #include"Service/MongoDB.h"
+#include"App/App.h"
 #include"Config/ClusterConfig.h"
 #include"Component/NodeMgrComponent.h"
 namespace Sentry

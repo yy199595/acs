@@ -6,6 +6,7 @@
 #include"Service/Gate.h"
 #include"Lua/LuaParameter.h"
 #include"Config/ClusterConfig.h"
+#include"Lua/ClassProxyHelper.h"
 #include"Component/NodeMgrComponent.h"
 #include"Component/InnerNetComponent.h"
 #include"Component/ComponentFactory.h"

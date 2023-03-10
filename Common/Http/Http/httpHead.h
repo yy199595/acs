@@ -9,7 +9,6 @@
 #include<ostream>
 #include<unordered_map>
 #include"Client/Http.h"
-#include"Message/ProtoMessage.h"
 namespace Http
 {
     enum class DecodeState

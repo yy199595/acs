@@ -4,7 +4,7 @@
 
 #include"LuaHttpService.h"
 #include"Lua/Function.h"
-#include"Method/LuaHttpServiceMethod.h"
+#include"Module/LuaModule.h"
 #include"Component/LuaScriptComponent.h"
 namespace Sentry
 {

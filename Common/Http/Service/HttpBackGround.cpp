@@ -3,10 +3,10 @@
 //
 #include"HttpBackGround.h"
 #include"System/System.h"
+#include"App/App.h"
 #include"Config/CodeConfig.h"
 #include"Service/Node.h"
 #include"Service/Registry.h"
-#include"google/protobuf/wrappers.pb.h"
 #include"Component/NodeMgrComponent.h"
 namespace Sentry
 {
@@ -89,14 +89,14 @@ namespace Sentry
 		for (int index = 0; index < list->list_size(); index++)
 		{
 			const s2s::server::info& info = list->list(index);
-			std::shared_ptr<google::protobuf::StringValue> resp
-				= std::make_shared<google::protobuf::StringValue>();
+			std::shared_ptr<com::type::string> resp
+				= std::make_shared<com::type::string>();
 			int code = innerService->Call(info.rpc(), "RunInfo", resp);
 			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
 			if (code == XCode::Successful)
 			{
 				rapidjson::Document document;
-				const std::string& json = resp->value();
+				const std::string& json = resp->str();
 				if (!document.Parse(json.c_str(), json.size()).HasParseError())
 				{					
 					response.Add(info.rpc()).Add(document);

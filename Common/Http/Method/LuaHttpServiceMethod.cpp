@@ -5,7 +5,7 @@
 #include"LuaHttpServiceMethod.h"
 #include"Lua/Function.h"
 #include"Json/Lua/Json.h"
-
+#include"Module/LuaModule.h"
 #include"Lua/LuaServiceTaskSource.h"
 #include"Component/ProtoComponent.h"
 #include"Component/LuaScriptComponent.h"

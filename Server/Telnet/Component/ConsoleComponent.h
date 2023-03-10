@@ -1,4 +1,5 @@
 #pragma once
+#include<vector>
 #include"Client/TelnetClientContext.h"
 #include"Component/TcpListenerComponent.h"
 

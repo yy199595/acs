@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include<memory>
 #include"Client/Message.h"
 #include"Message/c2s.pb.h"
 #include"Lua/LocalTable.h"

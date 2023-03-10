@@ -5,6 +5,7 @@
 #include"Client/TcpRpcClientContext.h"
 #include"Lua/Client.h"
 #include"Lua/Message.h"
+#include"Lua/ClassProxyHelper.h"
 #include"google/protobuf/util/json_util.h"
 #include"Component/LuaScriptComponent.h"
 #include"Component/ThreadComponent.h"
@@ -13,7 +14,7 @@ namespace Client
 	ClientTask::ClientTask(int ms)
         : Sentry::IRpcTask<Rpc::Packet>(ms)
 	{
-		this->mTaskId = Guid::Create();
+		this->mTaskId = Helper::Guid::Create();
 	}
 
 	void ClientTask::OnResponse(std::shared_ptr<Rpc::Packet> response)
@@ -83,7 +84,7 @@ namespace Client
             }
                 return;
         }
-        CONSOLE_LOG_ERROR("unknow message type = " << type);
+        CONSOLE_LOG_ERROR("unknown message type = " << type);
     }
 
     void ClientComponent::StartClose(const std::string &address)

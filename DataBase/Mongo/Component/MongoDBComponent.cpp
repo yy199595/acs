@@ -118,7 +118,7 @@ namespace Sentry
         std::shared_ptr<MongoTask> mongoTask(new MongoTask(request->header.requestID, 0));
 		int taskId = (int)mongoTask->GetRpcId();
 #ifdef __DEBUG__
-		long long t1 = Time::NowMilTime();
+		long long t1 = Helper::Time::NowMilTime();
         std::shared_ptr<Mongo::CommandResponse> mongoResponse = this->AddTask(taskId, mongoTask)->Await();
         {
             this->mWaitCount--;
@@ -143,7 +143,7 @@ namespace Sentry
             return mongoResponse;
 		}
 
-		CONSOLE_LOG_DEBUG(request->collectionName << "[" << Time::NowMilTime() - t1 << "ms] response = null");
+		CONSOLE_LOG_DEBUG(request->collectionName << "[" << Helper::Time::NowMilTime() - t1 << "ms] response = null");
 		return nullptr;
 #else
         return  this->AddTask(taskId, mongoTask)->Await();

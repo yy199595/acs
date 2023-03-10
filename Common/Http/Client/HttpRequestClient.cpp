@@ -19,7 +19,7 @@ namespace Sentry
 	{
         this->mTimeout = timeout;
 		this->mRequest = httpRequest;
-        this->mTaskId = Guid::Create();
+        this->mTaskId = Helper::Guid::Create();
 		this->mResponse = std::make_shared<Http::Response>();
 #ifdef ONLY_MAIN_THREAD
 		this->ConnectHost();

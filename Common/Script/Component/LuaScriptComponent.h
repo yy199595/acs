@@ -1,11 +1,13 @@
 #pragma once
-
-#include"Lua/WaitLuaTaskSource.h"
+#include<set>
+#include<memory>
+#include<unordered_map>
 #include"Component/Component.h"
-#include"Lua/Table.h"
-#include"Lua/LocalTable.h"
-#include"Module/LuaModule.h"
-#include"Lua/ClassProxyHelper.h"
+namespace Lua
+{
+    class LuaModule;
+}
+struct lua_State;
 namespace Sentry
 {
     class LuaScriptComponent : public Component, public IStart, 
@@ -36,8 +38,8 @@ namespace Sentry
 		bool LoadAllFilePath(const std::string & dir);
         void AddRequire(const std::string & direct);
 	 private:
-		 std::string mModulePath;
-		struct lua_State* mLuaEnv;
+        lua_State* mLuaEnv;
+        std::string mModulePath;
         std::set<std::string> mDirectorys;
 		std::unordered_map<std::string, int> mFuncs;
 		std::unordered_map<std::string, std::string> mModulePaths;

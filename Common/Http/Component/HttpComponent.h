@@ -1,9 +1,11 @@
 
 #pragma once
-#include"Json/JsonWriter.h"
-#include"Json/JsonReader.h"
-#include"Http/HttpResponse.h"
+
 #include"Component/RpcTaskComponent.h"
+namespace Http
+{
+    class Response;
+}
 namespace Sentry
 {
     class HttpRequestClient;

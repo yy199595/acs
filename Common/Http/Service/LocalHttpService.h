@@ -4,12 +4,18 @@
 
 #ifndef SENTRY_HTTPSERVICE_H
 #define SENTRY_HTTPSERVICE_H
-#include"Json/JsonReader.h"
 #include"Component/Component.h"
 #include"Method/MethodRegister.h"
 #include"Config/ServiceConfig.h"
-#include"Http/HttpRequest.h"
-#include"Http/HttpResponse.h"
+namespace Json
+{
+    class Writer;
+}
+namespace Http
+{
+    class Request;
+    class Response;
+}
 namespace Sentry
 {
     class LocalHttpService : public Component,

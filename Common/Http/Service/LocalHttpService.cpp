@@ -2,6 +2,7 @@
 // Created by yjz on 2022/1/23.
 //
 #include"LocalHttpService.h"
+#include"Module/LuaModule.h"
 #include"Component/LuaScriptComponent.h"
 #include"Method/LuaHttpServiceMethod.h"
 namespace Sentry

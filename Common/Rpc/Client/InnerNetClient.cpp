@@ -38,7 +38,7 @@ namespace Sentry
 
 	long long InnerNetClient::Call(std::shared_ptr<Rpc::Packet> message)
 	{
-		long long taskId = Guid::Create();
+		long long taskId = Helper::Guid::Create();
 		message->GetHead().Add("rpc", taskId);
 #ifdef ONLY_MAIN_THREAD
 		this->Send(message);
@@ -71,7 +71,7 @@ namespace Sentry
 
     void InnerNetClient::Update()
     {
-        if (Time::NowSecTime() - this->GetLastOperTime() >= 30) // 30s没动静
+        if (Helper::Time::NowSecTime() - this->GetLastOperTime() >= 30) // 30s没动静
         {
 
         }

@@ -1,6 +1,7 @@
 #include"LuaServiceMethod.h"
 #include"Lua/Function.h"
 #include"App/App.h"
+#include"Module/LuaModule.h"
 #include"Config/ServiceConfig.h"
 #include"Lua/LuaServiceTaskSource.h"
 #include"Component/ProtoComponent.h"

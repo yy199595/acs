@@ -5,6 +5,7 @@
 
 #include"Config/ClusterConfig.h"
 #include"Config/CodeConfig.h"
+#include"Json/JsonWriter.h"
 #include"Component/NodeMgrComponent.h"
 #include"Component/InnerNetMessageComponent.h"
 namespace Sentry
@@ -81,7 +82,7 @@ namespace Sentry
 		std::shared_ptr<Json::Writer> document = std::make_shared<Json::Writer>();
 		if (response == nullptr)
 		{
-			document->Add("error").Add("unknow error");
+			document->Add("error").Add("unknown error");
 		}
 		else
 		{

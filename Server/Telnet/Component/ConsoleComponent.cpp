@@ -146,7 +146,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool ConsoleComponent::Offset(const string& parameter, vector<string>& response)
+	bool ConsoleComponent::Offset(const string& parameter, std::vector<string>& response)
 	{
 		long long value = std::stoll(parameter);
 		Helper::Time::SetScaleTotalTime(value);

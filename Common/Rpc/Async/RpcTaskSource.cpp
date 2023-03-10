@@ -40,7 +40,7 @@ namespace Sentry
 	LuaRpcTaskSource::LuaRpcTaskSource(lua_State* lua, int ms, const std::string & resp)
 		: IRpcTask<Rpc::Packet>(ms), mTask(lua), mResp(resp)
 	{
-		this->mTaskId = Guid::Create();
+		this->mTaskId = Helper::Guid::Create();
 #ifdef __DEBUG__
       this->t1 = Helper::Time::NowMilTime();
 #endif

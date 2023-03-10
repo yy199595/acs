@@ -5,10 +5,7 @@
 #ifndef SERVER_LOCALSERVICECOMPONENT_H
 #define SERVER_LOCALSERVICECOMPONENT_H
 #include"RpcService.h"
-#include"Method/EventMethod.h"
 #include"Method/MethodRegister.h"
-#include"Component/LuaScriptComponent.h"
-
 namespace Sentry
 {
 	//实体服务 能处理逻辑

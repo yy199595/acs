@@ -6,9 +6,9 @@
 
 #include"PhysicalService.h"
 #include"App/App.h"
+#include"Module/LuaModule.h"
 #include"Config/ServiceConfig.h"
 #include"Lua/LuaServiceMethod.h"
-#include"Component/InnerNetComponent.h"
 #include"Component/LuaScriptComponent.h"
 namespace Sentry
 {

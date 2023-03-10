@@ -5,8 +5,11 @@
 #ifndef APP_HTTPRESPONSE_H
 #define APP_HTTPRESPONSE_H
 #include"httpHead.h"
-#include"Json/JsonWriter.h"
 #include"Message/ProtoMessage.h"
+namespace Json
+{
+    class Writer;
+}
 namespace Http
 {
     class Response : public IStream, public Tcp::ProtoMessage
@@ -29,8 +32,8 @@ namespace Http
         const std::string & GetError() const { return this->mError; }
         const std::string & Content() const { return this->mContent; }
     private:
-        Head mHead;
         int mCode;
+        Head mHead;
         std::string mError;
         std::string mVersion;
         std::string mContent;
