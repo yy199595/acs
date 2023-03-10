@@ -239,7 +239,7 @@ namespace Sentry
                         this->AddHttpServer(info.name(), info.http());
                     }
                 }
-                LOG_INFO("register to [" << address << "] successful");
+				LOG_INFO("register to [" << address << "] successful");
                 taskComponent->Start(&NodeMgrComponent::PingRegistryServer, this);
                 return;
             }
@@ -257,7 +257,7 @@ namespace Sentry
 			const std::string& address = this->mRegistryAddress[this->mIndex];
 			if (rpcService->Call(address, func) == XCode::Successful)
 			{
-				CONSOLE_LOG_INFO("ping registry server [" << address << "] successful");
+				//CONSOLE_LOG_INFO("ping registry server [" << address << "] successful");
 			}
 			else
 			{
