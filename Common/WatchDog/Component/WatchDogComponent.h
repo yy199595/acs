@@ -1,4 +1,5 @@
 #include<queue>
+#include<mutex>
 #include"Component/Component.h"
 
 typedef std::unique_ptr<s2s::log::show> LogPtr;
@@ -14,6 +15,7 @@ namespace Sentry
 		bool LateAwake() final;
 		void OnFrameUpdate(float t) final;
 	private:
+		std::mutex mMutex;
 		std::string mAddress;
 		std::queue<LogPtr> mLogs;
 	};

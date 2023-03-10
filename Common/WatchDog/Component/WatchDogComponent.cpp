@@ -11,7 +11,9 @@ namespace Sentry
 			request->set_level((int)lv);
 			request->set_name(ServerConfig::Inst()->Name());
 		}
+		this->mMutex.lock();
 		this->mLogs.push(std::move(request));
+		this->mMutex.unlock();
 	}
 
 	bool WatchDogComponent::LateAwake()
@@ -20,12 +22,9 @@ namespace Sentry
 		return true;
 	}
 	void WatchDogComponent::OnFrameUpdate(float t)
-	{
-		if (this->mLogs.empty())
-		{
-			return;
-		}
-		const std::string func("ShowLog");
+	{		
+		const std::string func("WatchDog.ShowLog");
+		std::lock_guard<std::mutex> lock(this->mMutex);
 		InnerNetComponent* component = this->GetComponent<InnerNetComponent>();
 		while (!this->mLogs.empty())
 		{
@@ -34,7 +33,7 @@ namespace Sentry
 				Rpc::Packet::New(Tcp::Type::Request, Tcp::Porto::Protobuf);
 			{
 				request->WriteMessage(log);
-				request->GetHead().Add("func", "WatchDog.ShowLog");
+				request->GetHead().Add("func", func);
 			}
 			component->Send(this->mAddress, request);			
 			this->mLogs.pop();
