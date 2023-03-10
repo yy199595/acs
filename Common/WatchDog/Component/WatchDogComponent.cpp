@@ -19,13 +19,13 @@ namespace Sentry
 	bool WatchDogComponent::LateAwake()
 	{
 		this->mAddress = fmt::format("127.0.0.1:{0}", 3344);
+		this->mInnerComponent = this->GetComponent<InnerNetComponent>();
 		return true;
 	}
 	void WatchDogComponent::OnFrameUpdate(float t)
 	{		
 		const std::string func("WatchDog.ShowLog");
 		std::lock_guard<std::mutex> lock(this->mMutex);
-		InnerNetComponent* component = this->GetComponent<InnerNetComponent>();
 		while (!this->mLogs.empty())
 		{
 			s2s::log::show* log = this->mLogs.front().get();
@@ -35,7 +35,7 @@ namespace Sentry
 				request->WriteMessage(log);
 				request->GetHead().Add("func", func);
 			}
-			component->Send(this->mAddress, request);			
+			this->mInnerComponent->Send(this->mAddress, request);
 			this->mLogs.pop();
 		}
 	}

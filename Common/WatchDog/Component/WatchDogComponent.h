@@ -18,5 +18,6 @@ namespace Sentry
 		std::mutex mMutex;
 		std::string mAddress;
 		std::queue<LogPtr> mLogs;
+		class InnerNetComponent* mInnerComponent;
 	};
 }

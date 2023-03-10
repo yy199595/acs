@@ -75,7 +75,6 @@ namespace Sentry
                 this->OnStopListen();
                 return;
             }
-            Asio::Context& io = this->mApp->MainThread();
 			if (code)
 			{
 				this->mErrorCount++;
@@ -85,10 +84,11 @@ namespace Sentry
 			else
 			{
 				this->mCount++;
-                socketProxy->Init();               
-                io.post(std::bind(&TcpListenerComponent::OnListen, this, socketProxy));
+                socketProxy->Init();
+                this->OnListen(socketProxy);
                 CONSOLE_LOG_DEBUG(socketProxy->GetAddress() << " connect to " << this->GetName());
             }
+            Asio::Context& io = this->mApp->MainThread();
             io.post(std::bind(&TcpListenerComponent::ListenConnect, this));
 		});
 	}

@@ -108,7 +108,6 @@ namespace Sentry
         asio::io_service & io = this->mApp->MainThread();
         socket = std::make_shared<SocketProxy>(io);
 #else
-        std::lock_guard<std::mutex> lock(this->mMutex);
         AsioThread* t = this->mNetThreads.front();
         {
             socket = std::make_shared<SocketProxy>(t->Context());
