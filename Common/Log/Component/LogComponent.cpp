@@ -17,7 +17,7 @@ namespace Sentry
         this->mServerName = ServerConfig::Inst()->Name();
         this->mLogSavePath = fmt::format("{0}/log", System::WorkPath());
 #ifdef __DEBUG__
-		const std::string path("./log.out");
+		const std::string path("./out.log");
 		this->mAllLog = spdlog::rotating_logger_st<spdlog::async_factory>(this->mServerName,
 			path, LOG_FILE_MAX_SIZE, LOG_FILE_MAX_SUM);
 #endif
