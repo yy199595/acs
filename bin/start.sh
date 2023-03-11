@@ -4,4 +4,3 @@ screen -dms yjz.http ./app ./config/server.json HttpServer
 screen -dms yjz.chat ./app ./config/server.json ChatServer
 screen -dms yjz.gate ./app ./config/server.json GateServer
 screen -dms yjz.log ./app ./config/server.json LogServer
-./app ./config/server.json WatchDogServer
