@@ -18,7 +18,7 @@ namespace Sentry
 	 protected:
 		bool Awake() final;
 		void OnDestroy() final;
-		void OnSecondUpdate(const int tick) final;
+		void OnSecondUpdate(int tick) final;
 	 private:
 		std::shared_ptr<spdlog::logger> GetLogger(const std::string & name);
 	 private:

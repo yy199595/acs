@@ -1,91 +1,78 @@
 {
-	"ChatServer": {
-		"AutoAllot": true,
-		"Service": {
-			"User": true,
-			"Node": true,
-			"Chat": true,
-			"Gate": false,
-			"Registry": false
-		},
-		"Component": [
-			"NodeMgrComponent",
-			"LuaScriptComponent",
-			"WatchDogComponent"
-		]
-	},
-	"HttpServer": {
-		"AutoAllot": false,
-		"Service": {
-			"Node": true,
-			"Account": true,
-			"Gate": false,
-			"Registry": false,
-			"HttpBackGround": true
-		},
-		"Component": [
-			"HttpComponent",
-			"RedisComponent",
-			"HttpWebComponent",
-			"NodeMgrComponent",
-			"WatchDogComponent",
-			"HttpDebugComponent",
-			"LuaScriptComponent"
-		]
-	},
-	"GateServer": {
-		"AutoAllot": false,
-		"Service": {
-			"Gate": true,
-			"Node": true,
-			"Chat": false,
-			"Registry": false
-		},
-		"Component": [
-			"NodeMgrComponent",
-			"WatchDogComponent"
-		]
-	},
-	"DataServer": {
-		"AutoAllot": true,
-		"Service": {
-			"MongoDB": true,
-			"Node": true,
-			"Registry": false
-		},
-		"Component": [
-			"NodeMgrComponent",
-			"WatchDogComponent"
-		]
-	},
-	"LogServer": {
-		"AutoAllot": false,
-		"Service": {
-			"Log": true,
-			"Node": true,
-			"Registry": false
-		},
-		"Component": [
-			"NodeMgrComponent",
-			"WatchDogComponent"
-		]
-	},
-	"RegistryServer": {
-		"AutoAllot": false,
-		"Service": {
-			"Node": true,
-			"Registry": true
-		},
-		"Component": [
-			"NodeMgrComponent",
-			"WatchDogComponent"
-		]
-	},
-	"WatchDogServer": {
-		"AutoAllot": false,
-		"Service": {
-			"Node": true,
-			"WatchDog": true
-		}
-	}
+    "ChatServer": {
+        "AutoAllot": true,
+        "Service": {
+            "User": true,
+            "Node": true,
+            "Chat": true,
+            "Gate": false,
+            "Registry": false
+        },
+        "Component": [
+            "NodeMgrComponent",
+            "LuaScriptComponent"
+        ]
+    },
+    "HttpServer": {
+        "AutoAllot": false,
+        "Service": {
+            "Node": true,
+            "Account": true,
+            "Gate": false,
+            "Registry": false,
+            "HttpBackGround": true
+        },
+        "Component": [
+            "HttpComponent",
+            "RedisComponent",
+            "HttpWebComponent",
+            "NodeMgrComponent",
+            "HttpDebugComponent",
+            "LuaScriptComponent"
+        ]
+    },
+    "GateServer": {
+        "AutoAllot": false,
+        "Service": {
+            "Gate": true,
+            "Node": true,
+            "Chat": false,
+            "Registry": false
+        },
+        "Component": [
+            "NodeMgrComponent"
+        ]
+    },
+    "DataServer": {
+        "AutoAllot": true,
+        "Service": {
+            "MongoDB": true,
+            "Node": true,
+            "Registry": false
+        },
+        "Component": [
+            "NodeMgrComponent"
+        ]
+    },
+    "LogServer": {
+        "AutoAllot": false,
+        "Service": {
+            "Log": true,
+            "Node": true,
+            "Registry": false
+        },
+        "Component": [
+            "NodeMgrComponent"
+        ]
+    },
+    "RegistryServer": {
+        "AutoAllot": false,
+        "Service": {
+            "Node": true,
+            "Registry": true
+        },
+        "Component": [
+            "NodeMgrComponent"
+        ]
+    }
 }

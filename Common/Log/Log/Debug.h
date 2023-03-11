@@ -17,4 +17,5 @@ namespace Debug
     extern void Log(Debug::Level color, const std::string & log);
     extern void Backtrace(std::string & trace, int size, int skip);
     extern void Console(Debug::Level color, const std::string & log);
+    extern void ShowInWatchDog(Debug::Level color, const std::string & log);
 }

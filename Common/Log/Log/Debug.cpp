@@ -32,11 +32,6 @@ void Debug::LuaError(const char* str)
 void Debug::Log(Debug::Level color, const std::string &log)
 {
     LogComponent *logComponent = App::Inst()->GetLogger();
-    WatchDogComponent* watchComponent = App::Inst()->GetComponent<WatchDogComponent>();
-    if (watchComponent != nullptr)
-    {
-        watchComponent->ShowLog(color, log);
-    }
     if (logComponent != nullptr)
     {
         switch (color)
@@ -66,8 +61,21 @@ void Debug::Backtrace(std::string &trace, int size, int skip)
     
 }
 
+void Debug::ShowInWatchDog(Debug::Level color, const std::string & log)
+{
+    Asio::Context & io = App::Inst()->MainThread();
+    io.post([color, log](){
+        WatchDogComponent * component = App::Inst()->GetComponent<WatchDogComponent>();
+        if(component != nullptr)
+        {
+            component->ShowLog(color, log);
+        }
+    });
+}
+
 void Debug::Console(Debug::Level color, const std::string &log)
 {
+    Debug::ShowInWatchDog(color, log);
     switch (color)
     {
         case Debug::Level::info:
