@@ -6,21 +6,10 @@ namespace Sentry
     RpcTaskSource::RpcTaskSource(int ms)
         : IRpcTask<Rpc::Packet>(ms)
     {
-#ifdef __DEBUG__
-        this->t1 = Helper::Time::NowMilTime();
-#endif
+
     }
     void RpcTaskSource::OnResponse(std::shared_ptr<Rpc::Packet> response)
     {
-#ifdef __DEBUG__
-        std::string func;
-        long long t2 = Helper::Time::NowMilTime();
-        if(response->GetHead().Get("func", func))
-        {
-            long long ms = t2 - this->t1;
-            CONSOLE_LOG_INFO("call " << func << " use time [" << ms << "ms]");
-        }
-#endif
         this->mTaskSource.SetResult(response);
     }
 

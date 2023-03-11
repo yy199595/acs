@@ -55,8 +55,8 @@ function AccountService.Login(request, response)
         response.error = "账号不存在或者密码错误"
         return XCode.Failure
     end
-    local address = Service.AllotServer("Gate")
-    local code, data = Service.Call(address, "Gate.Allocation", {
+
+    local code, data = Service.Call(userInfo.user_id, "Gate.Allocation", {
         value = userInfo.user_id
     })
     if code ~= XCode.Successful or data == nil then

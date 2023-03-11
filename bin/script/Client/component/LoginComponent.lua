@@ -4,6 +4,7 @@ local host = "http://127.0.0.1:8080/%s"
 
 function LoginComponent.Register(account, passwd, phoneNum)
     local url = string.format(host, "user/register")
+    Log.Info(url)
     local code, response = Http.Post(url, {
         account = account,
         password = passwd,

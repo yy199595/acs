@@ -37,9 +37,6 @@ namespace Sentry
     public:
 		std::shared_ptr<Rpc::Packet> Await();
     private:
-#ifdef __DEBUG__
-        long long t1;
-#endif
         TaskSource<std::shared_ptr<Rpc::Packet>> mTaskSource;
     };
 
