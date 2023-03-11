@@ -2,9 +2,8 @@
 #include"App.h"
 #include"System/System.h"
 #include"Timer/ElapsedTimer.h"
-#include"Config/ClusterConfig.h"
 #include"File/DirectoryHelper.h"
-#include"Service/LuaPhysicalService.h"
+#include"Service/VirtualService.h"
 #include"Component/ProtoComponent.h"
 #include"Component/NodeMgrComponent.h"
 #include"Component/TextConfigComponent.h"
@@ -224,16 +223,22 @@ namespace Sentry
 
 	void App::WaitServerStart() //等待依赖的服务启动完成
     {
-        std::unordered_set<std::string> waitServers;;
-        ClusterConfig::Inst()->GetConfig()->GetWaitServer(waitServers);
-        NodeMgrComponent *locationComponent = this->GetComponent<NodeMgrComponent>();
+		NodeMgrComponent *locationComponent = this->GetComponent<NodeMgrComponent>();
 		if(locationComponent != nullptr)
 		{
-            for (const std::string& name : waitServers)
-            {
-                locationComponent->WaitServerStart(name);
-                CONSOLE_LOG_INFO(name << " start successful ...");
-            }
+			std::unordered_set<std::string> services;
+			std::vector<VirtualService *> allVirtualServices;
+			this->GetComponents<VirtualService>(allVirtualServices);
+			for(const VirtualService * service : allVirtualServices)
+			{
+				const std::string & server = service->GetServer();
+				if(services.find(server) == services.end())
+				{
+					services.insert(server);
+					locationComponent->WaitServerStart(server);
+					CONSOLE_LOG_INFO(server << " start successful ...");
+				}
+			}
 			std::vector<IComplete*> completeComponents;
 			this->GetComponents<IComplete>(completeComponents);
 			for (IComplete* complete : completeComponents)

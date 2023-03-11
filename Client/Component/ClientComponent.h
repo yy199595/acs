@@ -50,7 +50,6 @@ namespace Client
 		std::shared_ptr<Rpc::Packet> Call(std::shared_ptr<Rpc::Packet> request);
         void OnMessage(std::shared_ptr<Rpc::Packet> message) final;
     protected:
-
         bool LateAwake() final;
         void OnAddTask(RpcTask task) final;
 		void OnDelTask(long long key, RpcTask task) final;
@@ -61,6 +60,7 @@ namespace Client
         unsigned int mIndex;
         TimerComponent *mTimerComponent;
         std::shared_ptr<TcpRpcClientContext> mTcpClient;
-		std::unordered_map<long long, long long> mTimers;      
+		std::unordered_map<long long, long long> mTimers;
+		std::unordered_map<size_t, std::shared_ptr<TcpRpcClientContext>> mClients;
     };
 }
