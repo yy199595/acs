@@ -4,12 +4,14 @@
 
 #ifndef GAMEKEEPER_HTTPHANDLERCLIENT_H
 #define GAMEKEEPER_HTTPHANDLERCLIENT_H
-#include"Http/HttpRequest.h"
-#include"Http/HttpResponse.h"
-#include"Source/TaskSource.h"
-#include"Tcp/SocketProxy.h"
-#include"Json/JsonWriter.h"
 #include"Tcp/TcpContext.h"
+#include "Http.h"
+
+namespace Http
+{
+    class Request;
+    class Response;
+}
 namespace Sentry
 {
 	class HttpListenComponent;

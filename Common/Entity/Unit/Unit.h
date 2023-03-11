@@ -3,8 +3,6 @@
 #include"Component/ComponentFactory.h"
 namespace Sentry
 {
-	class Component;
-    typedef std::unordered_map<std::string, Component*>::iterator ComponentIter;
     class Unit
 	{
 	 public:

@@ -3,8 +3,7 @@
 //
 
 #include"HttpWebComponent.h"
-#include"File/FileHelper.h"
-#include"Defer/Defer.h"
+#include"App/App.h"
 #include"Config/CodeConfig.h"
 #include"Config/ServiceConfig.h"
 #include"Client/HttpHandlerClient.h"
@@ -12,6 +11,12 @@
 #include"Component/ThreadComponent.h"
 namespace Sentry
 {
+    HttpWebComponent::HttpWebComponent()
+        : mSumCount(0), mWaitCount(0),
+          mTaskComponent(nullptr)
+    {
+
+    }
     bool HttpWebComponent::LateAwake()
     {
         this->mWaitCount = 0;
@@ -89,4 +94,6 @@ namespace Sentry
         }
         return true;
     }
+
+
 }

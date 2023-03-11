@@ -5,7 +5,8 @@
 #include"HttpListenComponent.h"
 #include"Client/HttpHandlerClient.h"
 #include"Component/ThreadComponent.h"
-
+#include"Http/HttpResponse.h"
+#include"App/App.h"
 namespace Sentry
 {
     void HttpListenComponent::OnListen(std::shared_ptr<SocketProxy> socket)
@@ -49,11 +50,6 @@ namespace Sentry
         }
     }
 
-    HttpHandlerClient * HttpListenComponent::GetClient(const std::string& address) const
-    {
-        auto iter = this->mHttpClients.find(address);
-        return iter != this->mHttpClients.end() ? iter->second.get() : nullptr;
-    }
     bool HttpListenComponent::Send(const std::string& address, HttpStatus code)
     {
         auto iter = this->mHttpClients.find(address);

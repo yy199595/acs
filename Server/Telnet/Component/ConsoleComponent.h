@@ -1,5 +1,6 @@
 #pragma once
 #include<vector>
+#include"Message/ProtoMessage.h"
 #include"Client/TelnetClientContext.h"
 #include"Component/TcpListenerComponent.h"
 
@@ -11,7 +12,7 @@ namespace Sentry
 		TelnetProto() = default;
 		~TelnetProto() = default;
 	 public:
-		void Add(const std::string & conetnt);
+		void Add(const std::string & content);
 		void Add(const char * str, size_t size);
 		int Serailize(std::ostream & os) final; //返回剩余要发送的字节数
 	 private:

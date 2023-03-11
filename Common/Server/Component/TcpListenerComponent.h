@@ -1,11 +1,8 @@
 #pragma once
-#include"Source/TaskSource.h"
-#include"Config/ServerConfig.h"
+#include"asio/ip/tcp.hpp"
 #include"Component/Component.h"
 namespace Sentry
 {
-    class ThreadComponent;
-
     class TcpListenerComponent : public Component
 	{
 	 public:
@@ -19,10 +16,8 @@ namespace Sentry
         virtual void OnStopListen() { };
         virtual void OnListen(std::shared_ptr<SocketProxy> socket) = 0;
     private:
-		int mCount;
-        bool mIsClose;
-        int mErrorCount;     
-        ThreadComponent * mNetComponent;
+        size_t mListenCount;
         asio::ip::tcp::acceptor * mBindAcceptor;
+        class ThreadComponent * mThreadComponent;
     };
 }

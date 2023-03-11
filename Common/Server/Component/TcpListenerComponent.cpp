@@ -4,14 +4,15 @@
 #include"Log/CommonLogDef.h"
 #include"Config/ServerConfig.h"
 #include"Component/ThreadComponent.h"
+#include"App/App.h"
+#include"Tcp/Asio.h"
 namespace Sentry
 {
 	TcpListenerComponent::TcpListenerComponent()
     {
-		this->mCount = 0;
-        this->mErrorCount = 0;
+        this->mListenCount = 0;
         this->mBindAcceptor = nullptr;
-        this->mNetComponent = nullptr;
+        this->mThreadComponent = nullptr;
     }
 
 	TcpListenerComponent::~TcpListenerComponent()
@@ -36,7 +37,7 @@ namespace Sentry
 	bool TcpListenerComponent::StartListen(const char * name)
     {
         unsigned short port = 0;
-        this->mNetComponent = this->GetComponent<ThreadComponent>();
+        this->mThreadComponent = this->GetComponent<ThreadComponent>();
         if(!ServerConfig::Inst()->GetListen(name, port))
         {
             LOG_ERROR("not find listen config " << name);
@@ -48,7 +49,6 @@ namespace Sentry
             this->mBindAcceptor = new Asio::Acceptor (io,
 				Asio::EndPoint(asio::ip::address_v4(), port));
 
-            this->mIsClose = false;
             this->mBindAcceptor->listen();
             io.post(std::bind(&TcpListenerComponent::ListenConnect, this));
             LOG_INFO(this->GetName() << " listen [" << port << "] successful");
@@ -63,7 +63,7 @@ namespace Sentry
 	void TcpListenerComponent::ListenConnect()
 	{
         std::shared_ptr<SocketProxy> socketProxy 
-            = this->mNetComponent->CreateSocket();
+            = this->mThreadComponent->CreateSocket();
 		this->mBindAcceptor->async_accept(socketProxy->GetSocket(),
 			[this, socketProxy](const asio::error_code & code)
 		{
@@ -77,14 +77,13 @@ namespace Sentry
             }
 			if (code)
 			{
-				this->mErrorCount++;
                 socketProxy->Close();
-				CONSOLE_LOG_FATAL(this->GetName() << " " << code.message() << " count = " << this->mErrorCount);
+				CONSOLE_LOG_FATAL(this->GetName() << " " << code.message());
 			}
 			else
 			{
-				this->mCount++;
                 socketProxy->Init();
+                this->mListenCount++;
                 this->OnListen(socketProxy);
                 CONSOLE_LOG_DEBUG(socketProxy->GetAddress() << " connect to " << this->GetName());
             }

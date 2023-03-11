@@ -5,7 +5,6 @@
 #ifndef SERVER_HTTPSERVICECOMPONENT_H
 #define SERVER_HTTPSERVICECOMPONENT_H
 #include"HttpListenComponent.h"
-#include"Component/RpcTaskComponent.h"
 namespace Http
 {
     class Request;
@@ -18,20 +17,20 @@ namespace Sentry
     class HttpWebComponent : public HttpListenComponent, public IServerRecord
     {
     public:
-        HttpWebComponent() = default;
+        HttpWebComponent();
         ~HttpWebComponent() = default;
     public:
         unsigned int GetWaitCount() const { return this->mWaitCount; }
     private:
         bool LateAwake() final;
         void OnRecord(Json::Writer &document) final;
-        bool OnDelClient(const std::string& address);
+        bool OnDelClient(const std::string& address) final;
 		void OnRequest(const std::string &address, std::shared_ptr<Http::Request> request) final;
 		void Invoke(const std::string& address, const HttpMethodConfig* config, std::shared_ptr<Http::Request> request);
     private:
         unsigned int mSumCount;
         unsigned int mWaitCount;
-        TaskComponent * mTaskComponent;
+        class TaskComponent * mTaskComponent;
         std::unordered_map<std::string, unsigned int> mTasks;
     };
 }

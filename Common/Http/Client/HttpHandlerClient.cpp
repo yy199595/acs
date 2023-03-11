@@ -3,12 +3,16 @@
 //
 
 #include"HttpHandlerClient.h"
+
+#include"App/App.h"
+#include"Http/HttpRequest.h"
+#include"Http/HttpResponse.h"
 #include"Component/HttpListenComponent.h"
 
 namespace Sentry
 {
 	HttpHandlerClient::HttpHandlerClient(HttpListenComponent * httpComponent, std::shared_ptr<SocketProxy> socketProxy)
-		: Tcp::TcpContext(socketProxy)
+		: Tcp::TcpContext(std::move(socketProxy))
 	{
         this->mTimeout = 15;
 		this->mHttpComponent = httpComponent;
@@ -83,7 +87,7 @@ namespace Sentry
                 std::shared_ptr<Http::Response> response
                     = std::make_shared<Http::Response>();
 
-                response->Str(HttpStatus::METHOD_NOT_ALLOWED, "unknow method");
+                response->Str(HttpStatus::METHOD_NOT_ALLOWED, "unknown method");
 				this->Write(response);
                 return;
             }

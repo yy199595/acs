@@ -4,10 +4,15 @@
 
 #ifndef GAMEKEEPER_GATECLIENTCOMPONENT_H
 #define GAMEKEEPER_GATECLIENTCOMPONENT_H
-
-#include"Client/Message.h"
-#include"Component/Component.h"
+#include<queue>
+#include<unordered_map>
+#include<unordered_set>
 #include"Component/TcpListenerComponent.h"
+
+namespace Rpc
+{
+    class Packet;
+}
 namespace Sentry
 {
 

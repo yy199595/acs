@@ -4,16 +4,17 @@
 #include"TcpContext.h"
 #include"Time/TimeHelper.h"
 #include"String/StringHelper.h"
+#include"Message/ProtoMessage.h"
 namespace Tcp
 {
 	TcpContext::TcpContext(std::shared_ptr<SocketProxy> socket, size_t count)
 		: mMaxCount(count), mRecvBuffer(count)
 	{
         this->mSendCount = 0;
-		this->mSocket = socket;
 		this->mLastOperTime = 0;
 		this->mConnectCount = 0;
-	}
+        this->mSocket = std::move(socket);
+    }
 
     bool TcpContext::Reset(std::shared_ptr<SocketProxy> socket)
     {
@@ -21,18 +22,13 @@ namespace Tcp
         {
             return false;
         }
-        this->mSocket = socket;
         this->mLastOperTime = 0;
         this->mConnectCount = 0;
         this->ClearSendStream();
         this->ClearRecvStream();
+        this->mSocket = std::move(socket);
         return true;
     }
-
-	TcpContext::~TcpContext()
-	{
-
-	}
 
 
 	void TcpContext::Connect()
@@ -246,7 +242,7 @@ namespace Tcp
 		return true;
 	}
 
-	int TcpContext::RecvSync(int length)
+    size_t TcpContext::RecvSync(int length)
 	{
 		Asio::Code code;
         if(this->mRecvBuffer.size() >= length)
@@ -254,21 +250,21 @@ namespace Tcp
 			return length;
 		}
         Asio::Socket & tcpSocket = this->mSocket->GetSocket();
-		int size = asio::read(tcpSocket, this->mRecvBuffer,
+		size_t size = asio::read(tcpSocket, this->mRecvBuffer,
 			asio::transfer_exactly(length), code);
 		return code ? 0 : size;
 	}
 
-	int TcpContext::RecvLineSync()
+	size_t TcpContext::RecvLineSync()
 	{
 		Asio::Code code;
         Asio::Socket & tcpSocket = this->mSocket->GetSocket();
 		return asio::read_until(tcpSocket, this->mRecvBuffer, "\r\n", code);
 	}
 
-	int TcpContext::SendSync(std::shared_ptr<ProtoMessage> message)
+	size_t TcpContext::SendSync(const std::shared_ptr<ProtoMessage>& message)
 	{
-		int sum = 0;
+		size_t sum = 0;
 		Asio::Code code;
         std::ostream os(&this->mSendBuffer);
 		int length = message->Serailize(os);
