@@ -188,7 +188,7 @@ namespace Sentry
 		auto iter = this->mUnitLocations.find(id);
 		if (iter == this->mUnitLocations.end())
 		{
-			std::unique_ptr<LocationUnit> tmp = std::make_unique<LocationUnit>(id);
+			std::unique_ptr<LocationUnit> tmp = std::make_unique<LocationUnit>();
 			{
 				localUnit = tmp.get();
 				this->mUnitLocations.emplace(id, std::move(tmp));
@@ -265,4 +265,14 @@ namespace Sentry
 			}
 		}			
 	}
+
+    bool NodeMgrComponent::GetServer(long long int userId, std::unordered_map<std::string, std::string> &servers)
+    {
+        auto iter = this->mUnitLocations.find(userId);
+        if(iter == this->mUnitLocations.end())
+        {
+            return false;
+        }
+
+    }
 }

@@ -9,11 +9,6 @@ namespace Sentry
         return true;
     }
 
-    bool WatchDog::OnClose()
-    {
-        return false;
-    }
-
     int WatchDog::Ping(const Rpc::Head& message)
     {
         return 0;

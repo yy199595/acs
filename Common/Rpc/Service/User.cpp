@@ -35,12 +35,6 @@ namespace Sentry
         {
             return XCode::Failure;
         }
-        long long userId = request.user_id();
-		std::unique_ptr<LocationUnit> locationUnit(new LocationUnit(userId, address));
-		if(locationUnit != nullptr)
-		{
-			
-		}
         return XCode::Successful;
     }
 

@@ -11,12 +11,14 @@ namespace Sentry
 	 public:
         bool StopListen();
         bool StartListen(const char * name);
+        unsigned short GetListenPort() const { return this->mListenPort;}
     protected:
         void ListenConnect();
         virtual void OnStopListen() { };
         virtual void OnListen(std::shared_ptr<SocketProxy> socket) = 0;
     private:
         size_t mListenCount;
+        unsigned short mListenPort;
         asio::ip::tcp::acceptor * mBindAcceptor;
         class ThreadComponent * mThreadComponent;
     };

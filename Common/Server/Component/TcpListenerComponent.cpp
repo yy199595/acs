@@ -49,6 +49,7 @@ namespace Sentry
             this->mBindAcceptor = new Asio::Acceptor (io,
 				Asio::EndPoint(asio::ip::address_v4(), port));
 
+            this->mListenPort = port;
             this->mBindAcceptor->listen();
             io.post(std::bind(&TcpListenerComponent::ListenConnect, this));
             LOG_INFO(this->GetName() << " listen [" << port << "] successful");

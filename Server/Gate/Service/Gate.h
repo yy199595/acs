@@ -18,7 +18,7 @@ namespace Sentry
 	private:
         void Init() final;
 		bool OnStart() final;
-        bool OnClose() final;
+        void OnClose() final;
 	 private:
 		std::string mAddress;
 		class NodeMgrComponent* mNodeComponent;

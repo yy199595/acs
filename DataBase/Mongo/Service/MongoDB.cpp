@@ -29,11 +29,10 @@ namespace Sentry
         return true;
     }
 
-    bool MongoDB::OnClose()
+    void MongoDB::OnClose()
     {
         this->WaitAllMessageComplete(); //等待所有任务完成
         this->mMongoComponent->CloseClients();
-        return true;
     }
 
     int MongoDB::RunCommand(const db::mongo::command::request &request, db::mongo::command::response &response)

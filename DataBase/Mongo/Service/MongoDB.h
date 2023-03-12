@@ -16,7 +16,7 @@ namespace Sentry
 	private:
         void Init() final;
 		bool OnStart() final;
-        bool OnClose() final;
+        void OnClose() final;
     private:
 		int Insert(const db::mongo::insert & request);
 		int Delete(const db::mongo::remove & request);

@@ -5,11 +5,6 @@
 #include"LocationUnit.h"
 namespace Sentry
 {
-    LocationUnit::LocationUnit(long long id)
-        : Unit(id) { }
-
-    LocationUnit::LocationUnit(long long id, const std::string &address)
-        : Unit(id), mAddress(address) { }
 
     bool LocationUnit::Del(const std::string &service)
     {
@@ -33,7 +28,7 @@ namespace Sentry
         {
             servers.emplace_back(iter->first);
         }
-        return servers.size() > 0;
+        return !servers.empty();
     }
 
     bool LocationUnit::Get(const std::string &server, std::string &address) const
@@ -44,6 +39,20 @@ namespace Sentry
             return false;
         }
         address = iter->second;       
+        return true;
+    }
+
+    bool LocationUnit::Get(std::unordered_map<std::string, std::string> &servers) const
+    {
+        if(this->mLocations.empty())
+        {
+            return false;
+        }
+        auto iter = this->mLocations.begin();
+        for(; iter != this->mLocations.end(); iter++)
+        {
+            servers.emplace(iter->first, iter->second);
+        }
         return true;
     }
 }

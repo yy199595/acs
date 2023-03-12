@@ -9,7 +9,7 @@
 #include"Message/com.pb.h"
 namespace Sentry
 {
-    class Node : public PhysicalService
+    class Node final : public PhysicalService
     {
     public:
         Node() = default;
@@ -28,7 +28,6 @@ namespace Sentry
     private:
         void Init() final;
         bool OnStart() final;
-        bool OnClose() final { return false; }
     private:
         class NodeMgrComponent* mNodeComponent;
     };

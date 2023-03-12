@@ -17,7 +17,6 @@ namespace Sentry
 	 protected:
 		void Init() final;
 		bool OnStart() final;
-		bool OnClose() final;
 	};
 }
 

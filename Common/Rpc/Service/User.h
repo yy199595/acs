@@ -19,7 +19,6 @@ namespace Sentry
     private:
         bool Awake() final;
         bool OnStart() final;
-        bool OnClose() final { return false; }
     private:
 		class NodeMgrComponent * mLocationComponent;
         class InnerNetComponent * mInnerNetComponent;

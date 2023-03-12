@@ -17,11 +17,6 @@ namespace Sentry
 		return true;
 	}
 
-	bool Log::OnClose()
-	{
-		return true;
-	}
-
 	int Log::Login(const s2s::log::login& request)
 	{
 		return XCode::Successful;

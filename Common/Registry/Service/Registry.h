@@ -14,7 +14,6 @@ namespace Sentry
         Registry() = default;
     public:
         bool OnStart() final;
-        bool OnClose() final;
     private:
         int Ping(const Rpc::Head & head);
         int UnRegister(const com::type::string& request);

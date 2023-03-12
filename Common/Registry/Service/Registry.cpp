@@ -19,11 +19,6 @@ namespace Sentry
         return true;
     }
 
-    bool Registry::OnClose()
-    {
-        return true;
-    }
-
 	int Registry::Query(const com::array::string& request, s2s::server::list& response)
 	{		
 		std::vector<const ServiceNodeInfo*> services;

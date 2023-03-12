@@ -21,3 +21,8 @@ namespace Asio
     typedef asio::streambuf StreamBuffer;
     typedef asio::steady_timer Timer;
 }
+
+namespace Asio
+{
+    extern void GetNetCardAddressList(std::vector<std::string> & list);
+}

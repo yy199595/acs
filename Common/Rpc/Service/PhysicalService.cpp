@@ -12,7 +12,7 @@
 #include"Component/LuaScriptComponent.h"
 namespace Sentry
 {
-    extern std::string GET_FUNC_NAME(std::string fullName)
+    extern std::string GET_FUNC_NAME(const std::string& fullName)
     {
         size_t pos = fullName.find("::");
         return fullName.substr(pos + 2);
@@ -72,7 +72,16 @@ namespace Sentry
 	{
         this->mMethodRegister = std::make_unique<ServiceMethodRegister>(this);
         const RpcServiceConfig * rpcServiceConfig = RpcConfig::Inst()->GetConfig(this->GetName());
-		LOG_CHECK_RET_FALSE(rpcServiceConfig != nullptr && this->OnStart());
+		if(rpcServiceConfig == nullptr)
+        {
+            LOG_ERROR("not find rpc service config " << this->GetName())
+            return false;
+        }
+        if(!this->OnStart())
+        {
+            LOG_ERROR("rpc service [" << this->GetName() << "] start error");
+            return false;
+        }
 
         this->LoadFromLua();
         std::vector<const RpcMethodConfig *> methodConfigs;
@@ -138,11 +147,11 @@ namespace Sentry
 
 	bool PhysicalService::Close()
     {
-        if (!this->IsStartService() || !this->OnClose())
+        if (!this->IsStartService())
         {
             return false;
         }
-        this->mMethodRegister = nullptr;
+        this->OnClose();
         return true;
     }
 }

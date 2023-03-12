@@ -8,7 +8,6 @@ namespace Sentry
 		WatchDog() = default;
 	private:
 		bool OnStart() final;
-		bool OnClose() final;
 	private:
 		int Ping(const Rpc::Head& message);
 		int ShowLog(const s2s::log::show& request);
