@@ -1,8 +1,8 @@
 ﻿#include "ServiceConfig.h"
 
-#include "App/App.h"
-#include "rapidjson/document.h"
-
+#include"App/App.h"
+#include"rapidjson/document.h"
+#include"Config/ClusterConfig.h"
 namespace Sentry
 {
 	bool RpcServiceConfig::OnLoadConfig(const rapidjson::Value & json)
@@ -27,6 +27,8 @@ namespace Sentry
                             std::make_unique<RpcMethodConfig>();
                     this->mMethodConfigs.emplace(name, std::move(config));
                 }
+				std::string server;
+				const std::string & service = this->GetName();
                 RpcMethodConfig * serviceConfig = this->mMethodConfigs[name].get();
                 {
                     serviceConfig->Timeout = 0;
@@ -36,7 +38,11 @@ namespace Sentry
                     serviceConfig->FullName = fullName;
                     serviceConfig->Service = this->GetName();
                 }
-                if(jsonValue.HasMember("Type"))
+				if(ClusterConfig::Inst()->GetServerName(service,server))
+				{
+					serviceConfig->Server = server;
+				}
+				if(jsonValue.HasMember("Type"))
                 {
                     serviceConfig->Type = jsonValue["Type"].GetString();
                 }
@@ -88,20 +94,25 @@ namespace Sentry
             if(jsonValue.IsObject())
             {
                 const char *name = iter->name.GetString();
-                std::unique_ptr<HttpMethodConfig> serviceConfog(new HttpMethodConfig());
-                serviceConfog->Method = name;
-                serviceConfog->Service = this->GetName();
+                std::unique_ptr<HttpMethodConfig> serviceConfig(new HttpMethodConfig());
+				serviceConfig->Method = name;
+				serviceConfig->Service = this->GetName();
                 if(jsonValue.HasMember("Type"))
                 {
-                    serviceConfog->Type = jsonValue["Type"].GetString();
+					serviceConfig->Type = jsonValue["Type"].GetString();
                 }
-                serviceConfog->Path = jsonValue["Path"].GetString();
-                serviceConfog->IsAsync = jsonValue["Async"].GetBool();
+				std::string server;
+				serviceConfig->Path = jsonValue["Path"].GetString();
+				serviceConfig->IsAsync = jsonValue["Async"].GetBool();
+				if(ClusterConfig::Inst()->GetServerName(this->GetName(), server))
+				{
+					serviceConfig->Server = server;
+				}
                 if (jsonValue.HasMember("Content"))
                 {
-                    serviceConfog->Content = jsonValue["Content"].GetString();
+					serviceConfig->Content = jsonValue["Content"].GetString();
                 }
-                this->mMethodConfigs.emplace(serviceConfog->Method, std::move(serviceConfog));
+                this->mMethodConfigs.emplace(serviceConfig->Method, std::move(serviceConfig));
             }
         }
 		return true;

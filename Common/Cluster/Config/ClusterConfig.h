@@ -28,7 +28,6 @@ namespace Sentry
         size_t ServiceCount() const { return this->mServices.size(); }
         size_t GetComponents(std::vector<std::string> & components) const;
         size_t GetServices(std::vector<std::string> & services, bool start = false) const;
-        void GetWaitServer(std::unordered_set<std::string>& list) const;
     private:
 		std::string mLua;
         bool mIsAutoAllot;

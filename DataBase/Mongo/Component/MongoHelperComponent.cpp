@@ -14,7 +14,7 @@ namespace Sentry
         this->mMongoDB = this->mApp->GetService<MongoDB>();
         std::string name = ComponentFactory::GetName<MongoDB>();
         this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
-        return ClusterConfig::Inst()->GetServerName(name, this->mServerName);
+        return true;
     }
 
 	int MongoHelperComponent::Insert(const Message& message, int index)
@@ -26,7 +26,8 @@ namespace Sentry
 	int MongoHelperComponent::Insert(const char* tab, const Message& message, int index)
 	{
 		std::string address;
-		if(!this->mLocationComponent->GetServer(this->mServerName, address))
+		const std::string & name = this->mMongoDB->GetServer();
+		if(!this->mLocationComponent->GetServer(name, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
@@ -44,7 +45,8 @@ namespace Sentry
 	int MongoHelperComponent::Update(const char *tab, const std::string &select, const std::string &data, int index)
     {
 		std::string address;
-        if(!this->mLocationComponent->GetServer(this->mServerName, address))
+		const std::string & name = this->mMongoDB->GetServer();
+		if(!this->mLocationComponent->GetServer(name, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
@@ -58,7 +60,8 @@ namespace Sentry
 	int MongoHelperComponent::Insert(const char* tab, const std::string& json, int index)
 	{
 		std::string address;
-        if(!this->mLocationComponent->GetServer(this->mServerName, address))
+		const std::string & name = this->mMongoDB->GetServer();
+		if(!this->mLocationComponent->GetServer(name, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
@@ -71,7 +74,8 @@ namespace Sentry
 	int MongoHelperComponent::Remove(const char* tab, const std::string& select, int limit, int index)
 	{
 		std::string address;
-        if (!this->mLocationComponent->GetServer(this->mServerName, address))
+		const std::string & name = this->mMongoDB->GetServer();
+		if (!this->mLocationComponent->GetServer(name, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
@@ -86,7 +90,8 @@ namespace Sentry
                                       const std::string& select, std::shared_ptr<Message> response)
 	{
 		std::string address;
-        if (!this->mLocationComponent->GetServer(this->mServerName, address))
+		const std::string & name = this->mMongoDB->GetServer();
+		if (!this->mLocationComponent->GetServer(name, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
@@ -137,7 +142,8 @@ namespace Sentry
                 return XCode::CallArgsError;
         }
 		std::string address;
-        if (!this->mLocationComponent->GetServer(this->mServerName, address))
+		const std::string & name = this->mMongoDB->GetServer();
+		if (!this->mLocationComponent->GetServer(name, address))
 		{
 			return XCode::AddressAllotFailure;
 		}

@@ -83,23 +83,6 @@ namespace Sentry
         return services.size();
     }
 
-    void NodeConfig::GetWaitServer(std::unordered_set<std::string>& list) const
-    {
-        auto iter = this->mServices.begin();
-        for (; iter != this->mServices.end(); iter++)
-        {
-            if (!iter->second)
-            {
-                std::string server;
-                const std::string& name = iter->first;
-                ClusterConfig::Inst()->GetServerName(name, server);
-                {
-                    list.insert(server);
-                }
-            }
-        }
-    }
-
 }
 
 namespace Sentry

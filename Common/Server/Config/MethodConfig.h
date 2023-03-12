@@ -10,7 +10,8 @@ namespace Sentry
 		int Timeout;
 		bool IsAsync;
 		std::string Method;
-        std::string Service;
+		std::string Server; //所在服务器
+		std::string Service; //服务名
 	};
 
 	class RpcMethodConfig final : public MethodConfig

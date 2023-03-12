@@ -84,7 +84,7 @@ namespace Sentry
         long long userId = iter->second;
         this->mUserAddressMap.emplace(address, userId);
         this->mClientAddressMap.emplace(userId, address);
-        // TODO Íø¹ØÑéÖ¤¿Í»§¶Ë³É¹¦
+        // TODO ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¤ï¿½Í»ï¿½ï¿½Ë³É¹ï¿½
         return XCode::Successful;
     }
 
@@ -110,12 +110,9 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-        std::string target, server;
+        std::string target;
         long long userId = iter->second;
-        if (!ClusterConfig::Inst()->GetServerName(methodConfig->Service, server))
-        {
-            return XCode::CallServiceNotFound;
-        }
+		const std::string & server = methodConfig->Server;
         if (!this->mNodeComponent->GetServer(server, userId, target))
         {
             return XCode::NotFindUser;
