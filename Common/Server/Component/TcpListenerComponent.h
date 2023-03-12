@@ -19,7 +19,7 @@ namespace Sentry
     private:
         size_t mListenCount;
         unsigned short mListenPort;
-        asio::ip::tcp::acceptor * mBindAcceptor;
         class ThreadComponent * mThreadComponent;
+        std::unique_ptr<asio::ip::tcp::acceptor> mBindAcceptor;
     };
 }

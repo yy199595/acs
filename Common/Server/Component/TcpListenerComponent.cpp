@@ -19,7 +19,6 @@ namespace Sentry
 	{
 		Asio::Code err;
 		this->mBindAcceptor->close(err);
-		delete this->mBindAcceptor;
 	}
 
     bool TcpListenerComponent::StopListen()
@@ -46,7 +45,7 @@ namespace Sentry
         try
         {
             Asio::Context& io = this->mApp->MainThread();
-            this->mBindAcceptor = new Asio::Acceptor (io,
+            this->mBindAcceptor = std::make_unique<Asio::Acceptor>(io,
 				Asio::EndPoint(asio::ip::address_v4(), port));
 
             this->mListenPort = port;
@@ -70,7 +69,6 @@ namespace Sentry
 		{
             if(code == asio::error::operation_aborted) //强制取消
             {
-                delete this->mBindAcceptor;
                 this->mBindAcceptor = nullptr;
                 CONSOLE_LOG_ERROR("close listen " << this->GetName());
                 this->OnStopListen();

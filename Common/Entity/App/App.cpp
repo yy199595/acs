@@ -53,7 +53,6 @@ namespace Sentry
             {
                 if (!this->InitComponent(component))
                 {
-                    CONSOLE_LOG_ERROR("Init " << component->GetName() << " failure");
                     return false;
                 }
             }
@@ -104,7 +103,6 @@ namespace Sentry
         if (!this->LoadComponent())
         {
             this->GetLogger()->SaveAllLog();
-            CONSOLE_LOG_FATAL("load component error");
 #ifdef __OS_WIN__
             return getchar();
 #endif
