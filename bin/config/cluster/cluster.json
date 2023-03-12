@@ -20,6 +20,7 @@
             "Account": true,
             "Gate": false,
             "Registry": false,
+            "MongoDB": false,
             "HttpBackGround": true
         },
         "Component": [
@@ -46,8 +47,8 @@
     "DataServer": {
         "AutoAllot": true,
         "Service": {
-            "MongoDB": true,
             "Node": true,
+            "MongoDB": true,
             "Registry": false
         },
         "Component": [
