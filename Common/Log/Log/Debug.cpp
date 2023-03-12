@@ -11,7 +11,6 @@
 #include"Component/LogComponent.h"
 #include"Component/WatchDogComponent.h"
 using namespace Sentry;
-
 void Debug::Lua(const char *log)
 {
     std::string logMessage(log);
@@ -53,7 +52,6 @@ void Debug::Log(Debug::Level color, const std::string &log)
                 break;
         }
     }
-
 }
 
 void Debug::Backtrace(std::string &trace, int size, int skip)
@@ -64,6 +62,13 @@ void Debug::Backtrace(std::string &trace, int size, int skip)
 void Debug::Console(Debug::Level color, const std::string &log)
 {
     //Debug::ShowInWatchDog(color, log);
+#ifdef __ALL_OUTPUT_LOG__
+    LogComponent *logComponent = App::Inst()->GetLogger();
+    if (logComponent != nullptr)
+    {
+        logComponent->OutputLog(color, log);
+    }
+#endif
     switch (color)
     {
         case Debug::Level::info:
