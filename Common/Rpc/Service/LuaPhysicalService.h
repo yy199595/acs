@@ -8,7 +8,7 @@ namespace Sentry
 {
 	class LuaScriptComponent;
 	class ServiceMethodRegister;
-	class LuaPhysicalService : public RpcService
+	class LuaPhysicalService : public RpcService, public IClient
 	{
 	 public:
 		LuaPhysicalService();
@@ -22,6 +22,9 @@ namespace Sentry
 		bool IsStartService() final { return true; }
 		int GetWaitMessageCount() const final { return this->mWaitCount; };
 		int Invoke(const std::string& name, std::shared_ptr<Rpc::Packet> message) final;
+	 private:
+		void OnLogin(long long userId) final;
+		void OnLogout(long long userId) final;
     private:
         int mWaitCount;
         bool mIsHandlerMessage;

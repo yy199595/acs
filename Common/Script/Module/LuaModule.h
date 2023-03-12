@@ -5,6 +5,7 @@
 #ifndef _LUAMODULE_H_
 #define _LUAMODULE_H_
 #include"Lua/LuaInclude.h"
+#include"Component/IComponent.h"
 namespace Lua
 {
 	class LuaModule
@@ -20,6 +21,8 @@ namespace Lua
 		void Update(int tick);
 		void OnLocalComplete();
 		void OnClusterComplete();
+		void OnLogin(long long userId);
+		void OnLogout(long long userId);
 	 	bool GetFunction(const std::string & name, bool cache = true);
 	 private:
 		int mRef;

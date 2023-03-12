@@ -96,6 +96,24 @@ namespace Sentry
 		return true;
 	}
 
+	void LuaPhysicalService::OnLogin(long long userId)
+	{
+		Lua::LuaModule * luaModule = this->mLuaComponent->GetModule(this->GetName());
+		if(luaModule != nullptr)
+		{
+			luaModule->OnLogin(userId);
+		}
+	}
+
+	void LuaPhysicalService::OnLogout(long long userId)
+	{
+		Lua::LuaModule * luaModule = this->mLuaComponent->GetModule(this->GetName());
+		if(luaModule != nullptr)
+		{
+			luaModule->OnLogout(userId);
+		}
+	}
+
 	bool LuaPhysicalService::Close()
 	{
         Lua::LuaModule* luaModule = this->mLuaComponent->GetModule(this->GetName());

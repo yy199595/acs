@@ -144,5 +144,12 @@ namespace Sentry
         virtual void OnRecord(Json::Writer & document) = 0;
     };
 
+	class IClient
+	{
+	 public:
+		virtual void OnLogin(long long userId) = 0;
+		virtual void OnLogout(long long userId) = 0;
+	};
+
 	class SocketProxy;
 }

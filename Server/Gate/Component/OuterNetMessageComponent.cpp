@@ -58,6 +58,7 @@ namespace Sentry
         if(iter != this->mUserAddressMap.end())
         {
             long long userId = iter->second;
+			this->OnClientLogout(userId);
             auto iter1 = this->mClientAddressMap.find(userId);
             if(iter1 != this->mClientAddressMap.end())
             {
@@ -86,7 +87,7 @@ namespace Sentry
         long long userId = iter->second;
         this->mUserAddressMap.emplace(address, userId);
         this->mClientAddressMap.emplace(userId, address);
-		return this->OnLoginSuccessful(address, userId);
+		return this->OnClientLogin(userId);
     }
 
 	int OuterNetMessageComponent::OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message)
@@ -126,7 +127,8 @@ namespace Sentry
 		}
 		return XCode::Successful;
 	}
-	int OuterNetMessageComponent::OnLoginSuccessful(const string& address, long long int userId)
+
+	int OuterNetMessageComponent::OnClientLogin(long long int userId)
 	{
 		static std::string func("Login");
 		std::vector<const NodeConfig *> configs;
@@ -149,5 +151,28 @@ namespace Sentry
 			}
 		}
 		return XCode::Successful;
+	}
+
+	int OuterNetMessageComponent::OnClientLogout(long long int userId)
+	{
+		static std::string func("Logout");
+		std::unordered_map<std::string, std::string> servers;
+		if(!this->mNodeComponent->GetServer(userId, servers))
+		{
+			return XCode::Failure;
+		}
+		RpcService * rpcService = this->mApp->GetService<User>();
+		if(rpcService == nullptr)
+		{
+			return XCode::CallServiceNotFound;
+		}
+		s2s::user::logout message;
+		message.set_user_id(userId);
+		for(const auto & info : servers)
+		{
+			const std::string & address = info.second;
+			rpcService->Send(address, func, message);
+		}
+		return 0;
 	}
 }
