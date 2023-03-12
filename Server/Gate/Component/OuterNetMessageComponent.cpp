@@ -7,10 +7,12 @@
 #include"Config/ServiceConfig.h"
 #include"OuterNetComponent.h"
 #include"Md5/MD5.h"
+#include"Service/User.h"
 #include"Component/InnerNetComponent.h"
 #include"Service/PhysicalService.h"
 #include"Component/ProtoComponent.h"
 #include"Component/NodeMgrComponent.h"
+
 #include"Component/InnerNetMessageComponent.h"
 
 #include"Config/ClusterConfig.h"
@@ -84,8 +86,7 @@ namespace Sentry
         long long userId = iter->second;
         this->mUserAddressMap.emplace(address, userId);
         this->mClientAddressMap.emplace(userId, address);
-        // TODO ������֤�ͻ��˳ɹ�
-        return XCode::Successful;
+		return this->OnLoginSuccessful(address, userId);
     }
 
 	int OuterNetMessageComponent::OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message)
@@ -122,6 +123,30 @@ namespace Sentry
 		if(!this->mInnerMessageComponent->Send(target, message))
 		{
 			return XCode::NetWorkError;
+		}
+		return XCode::Successful;
+	}
+	int OuterNetMessageComponent::OnLoginSuccessful(const string& address, long long int userId)
+	{
+		static std::string func("Login");
+		std::vector<const NodeConfig *> configs;
+		ClusterConfig::Inst()->GetNodeConfigs(configs);
+		RpcService * rpcService = this->mApp->GetService<User>();
+		for(const NodeConfig * nodeConfig : configs)
+		{
+			if(nodeConfig->IsAuthAllot())
+			{
+				std::string address;
+				s2s::user::login message;
+				const std::string & server = nodeConfig->GetName();
+				if(!this->mNodeComponent->GetServer(server, address))
+				{
+					return XCode::AddressAllotFailure;
+				}
+				message.set_user_id(userId);
+				rpcService->Send(address, func, message);
+				this->mNodeComponent->AddRpcServer(server, userId, address);
+			}
 		}
 		return XCode::Successful;
 	}

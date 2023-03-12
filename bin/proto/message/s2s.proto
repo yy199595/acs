@@ -19,6 +19,7 @@ message user
     message login
     {
         int64 user_id = 1;
+        repeated server.info list = 2;
     }
     message logout
     {

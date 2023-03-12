@@ -23,24 +23,13 @@ namespace Sentry
         return true;
     }
 
-    int User::Login(const Rpc::Head & head, const s2s::user::login & request)
+    int User::Login(const s2s::user::login & request)
     {
-        std::string address;
-        if(!head.Get("address", address))
-        {
-            return XCode::CallArgsError;
-        }
-        const ServiceNodeInfo * serverInfo = this->mInnerNetComponent->GetSeverInfo(address);
-        if(serverInfo == nullptr)
-        {
-            return XCode::Failure;
-        }
         return XCode::Successful;
     }
 
-    int User::Logout(const Rpc::Head & head, const s2s::user::logout &request)
+    int User::Logout(const s2s::user::logout &request)
     {
-        std::string client, address;
         return XCode::Successful;
     }
 

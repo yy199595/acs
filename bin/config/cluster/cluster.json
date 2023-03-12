@@ -38,6 +38,7 @@
             "Gate": true,
             "Node": true,
             "Chat": false,
+            "User": false,
             "Registry": false
         },
         "Component": [

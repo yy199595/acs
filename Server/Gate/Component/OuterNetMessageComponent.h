@@ -24,6 +24,7 @@ namespace Sentry
         int OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
 		bool LateAwake() final;
+		int OnLoginSuccessful(const std::string & address, long long userId);
 	 private:
 		class NodeMgrComponent * mNodeComponent;
         std::unordered_map<std::string, long long> mTokens;

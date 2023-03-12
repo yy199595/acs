@@ -22,8 +22,6 @@ namespace Sentry
 		bool IsStartService() final { return true; }
 		int GetWaitMessageCount() const final { return this->mWaitCount; };
 		int Invoke(const std::string& name, std::shared_ptr<Rpc::Packet> message) final;
-
-    private:
     private:
         int mWaitCount;
         bool mIsHandlerMessage;

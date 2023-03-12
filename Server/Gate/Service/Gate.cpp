@@ -38,11 +38,7 @@ namespace Sentry
 
     void Gate::OnClose()
     {
-        OuterNetComponent * component = this->GetComponent<OuterNetComponent>();
-        if(component != nullptr)
-        {
-            component->StopListen();
-        }
+		this->GetComponent<OuterNetComponent>()->StopListen();
     }
 
 	int Gate::Ping(long long userId)

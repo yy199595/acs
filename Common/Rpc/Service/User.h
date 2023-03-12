@@ -14,8 +14,8 @@ namespace Sentry
         User() = default;
         ~User() = default;
     private:
-        int Login(const Rpc::Head & head, const s2s::user::login & request);
-        int Logout(const Rpc::Head & head, const s2s::user::logout & request);
+        int Login(const s2s::user::login & request);
+        int Logout(const s2s::user::logout & request);
     private:
         bool Awake() final;
         bool OnStart() final;
