@@ -45,10 +45,12 @@ namespace Sentry
         try
         {
             Asio::Context& io = this->mApp->MainThread();
-            this->mBindAcceptor = std::make_unique<Asio::Acceptor>(io,
-				Asio::EndPoint(asio::ip::address_v4(), port));
+            this->mBindAcceptor = std::make_unique<Asio::Acceptor>(io);
+            Asio::EndPoint ep(asio::ip::address_v4(), port);
 
             this->mListenPort = port;
+            this->mBindAcceptor->open(ep.protocol());
+            this->mBindAcceptor->bind(ep);
             this->mBindAcceptor->listen();
             io.post(std::bind(&TcpListenerComponent::ListenConnect, this));
             LOG_INFO(this->GetName() << " listen [" << port << "] successful");
