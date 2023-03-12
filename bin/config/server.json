@@ -52,7 +52,7 @@
     "HttpServer": {
         "listen": {
             "rpc": 7790,
-            "http": 8080,
+            "http": 80,
             "debug": 8088
         },
         "address": {

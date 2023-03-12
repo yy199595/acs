@@ -211,9 +211,7 @@ namespace Tcp
         if(this->mRecvBuffer.size() > 0)
 		{
 			std::iostream os(&this->mRecvBuffer);
-            size_t size = this->mRecvBuffer.size();
 			os.ignore(this->mRecvBuffer.size());
-            CONSOLE_LOG_INFO("ignore message count : " << size);
         }
 	}
 

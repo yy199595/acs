@@ -1,3 +1,4 @@
+rm -rf ./out.log
 screen -dms yjz.registry ./app ./config/server.json RegistryServer
 screen -dms yjz.data ./app ./config/server.json DataServer
 screen -dms yjz.http ./app ./config/server.json HttpServer
