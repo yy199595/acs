@@ -616,6 +616,18 @@ class user_login :
 
   // accessors -------------------------------------------------------
 
+  // repeated .s2s.server.info list = 2;
+  int list_size() const;
+  void clear_list();
+  static const int kListFieldNumber = 2;
+  ::s2s::server_info* mutable_list(int index);
+  ::google::protobuf::RepeatedPtrField< ::s2s::server_info >*
+      mutable_list();
+  const ::s2s::server_info& list(int index) const;
+  ::s2s::server_info* add_list();
+  const ::google::protobuf::RepeatedPtrField< ::s2s::server_info >&
+      list() const;
+
   // int64 user_id = 1;
   void clear_user_id();
   static const int kUserIdFieldNumber = 1;
@@ -627,6 +639,7 @@ class user_login :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::s2s::server_info > list_;
   ::google::protobuf::int64 user_id_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2eproto;
@@ -2882,6 +2895,36 @@ inline void user_login::set_user_id(::google::protobuf::int64 value) {
   
   user_id_ = value;
   // @@protoc_insertion_point(field_set:s2s.user.login.user_id)
+}
+
+// repeated .s2s.server.info list = 2;
+inline int user_login::list_size() const {
+  return list_.size();
+}
+inline void user_login::clear_list() {
+  list_.Clear();
+}
+inline ::s2s::server_info* user_login::mutable_list(int index) {
+  // @@protoc_insertion_point(field_mutable:s2s.user.login.list)
+  return list_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::s2s::server_info >*
+user_login::mutable_list() {
+  // @@protoc_insertion_point(field_mutable_list:s2s.user.login.list)
+  return &list_;
+}
+inline const ::s2s::server_info& user_login::list(int index) const {
+  // @@protoc_insertion_point(field_get:s2s.user.login.list)
+  return list_.Get(index);
+}
+inline ::s2s::server_info* user_login::add_list() {
+  // @@protoc_insertion_point(field_add:s2s.user.login.list)
+  return list_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::s2s::server_info >&
+user_login::list() const {
+  // @@protoc_insertion_point(field_list:s2s.user.login.list)
+  return list_;
 }
 
 // -------------------------------------------------------------------

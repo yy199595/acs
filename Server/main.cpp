@@ -127,12 +127,6 @@ void RegisterServiceComponent()
 }
 int main(int argc, char **argv)
 {
-    std::vector<std::string> list;
-    Asio::GetNetCardAddressList(list);
-    for(const std::string & address : list)
-    {
-        printf("%s\n", address.c_str());
-    }
 #ifdef __OS_WIN__
     system("chcp 65001 > nul"); 
 #endif

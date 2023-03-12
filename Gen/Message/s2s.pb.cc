@@ -158,8 +158,9 @@ static void InitDefaultsuser_login_s2s_2eproto() {
   ::s2s::user_login::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<0> scc_info_user_login_s2s_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsuser_login_s2s_2eproto}, {}};
+::google::protobuf::internal::SCCInfo<1> scc_info_user_login_s2s_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsuser_login_s2s_2eproto}, {
+      &scc_info_server_info_s2s_2eproto.base,}};
 
 static void InitDefaultsuser_logout_s2s_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -453,6 +454,7 @@ const ::google::protobuf::uint32 TableStruct_s2s_2eproto::offsets[] PROTOBUF_SEC
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::s2s::user_login, user_id_),
+  PROTOBUF_FIELD_OFFSET(::s2s::user_login, list_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::s2s::user_logout, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -571,23 +573,23 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 8, -1, sizeof(::s2s::server_list)},
   { 14, -1, sizeof(::s2s::server)},
   { 19, -1, sizeof(::s2s::user_login)},
-  { 25, -1, sizeof(::s2s::user_logout)},
-  { 31, -1, sizeof(::s2s::user)},
-  { 36, -1, sizeof(::s2s::log_show)},
-  { 44, -1, sizeof(::s2s::log_login)},
-  { 53, -1, sizeof(::s2s::log_behavior)},
-  { 61, -1, sizeof(::s2s::log)},
-  { 66, -1, sizeof(::s2s::allot_response)},
-  { 73, -1, sizeof(::s2s::allot_save)},
-  { 80, -1, sizeof(::s2s::allot)},
-  { 85, 92, sizeof(::s2s::location_add_ServicesEntry_DoNotUse)},
-  { 94, -1, sizeof(::s2s::location_add)},
-  { 101, -1, sizeof(::s2s::location_del)},
-  { 108, -1, sizeof(::s2s::location)},
-  { 113, -1, sizeof(::s2s::forward_sub)},
-  { 119, -1, sizeof(::s2s::forward_unsub)},
-  { 125, -1, sizeof(::s2s::forward_publish)},
-  { 132, -1, sizeof(::s2s::forward)},
+  { 26, -1, sizeof(::s2s::user_logout)},
+  { 32, -1, sizeof(::s2s::user)},
+  { 37, -1, sizeof(::s2s::log_show)},
+  { 45, -1, sizeof(::s2s::log_login)},
+  { 54, -1, sizeof(::s2s::log_behavior)},
+  { 62, -1, sizeof(::s2s::log)},
+  { 67, -1, sizeof(::s2s::allot_response)},
+  { 74, -1, sizeof(::s2s::allot_save)},
+  { 81, -1, sizeof(::s2s::allot)},
+  { 86, 93, sizeof(::s2s::location_add_ServicesEntry_DoNotUse)},
+  { 95, -1, sizeof(::s2s::location_add)},
+  { 102, -1, sizeof(::s2s::location_del)},
+  { 109, -1, sizeof(::s2s::location)},
+  { 114, -1, sizeof(::s2s::forward_sub)},
+  { 120, -1, sizeof(::s2s::forward_unsub)},
+  { 126, -1, sizeof(::s2s::forward_publish)},
+  { 133, -1, sizeof(::s2s::forward)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -623,29 +625,30 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 const char descriptor_table_protodef_s2s_2eproto[] =
   "\n\ts2s.proto\022\003s2s\"a\n\006server\032/\n\004info\022\014\n\004na"
   "me\030\001 \001(\t\022\013\n\003rpc\030\002 \001(\t\022\014\n\004http\030\003 \001(\t\032&\n\004l"
-  "ist\022\036\n\004list\030\001 \003(\0132\020.s2s.server.info\";\n\004u"
-  "ser\032\030\n\005login\022\017\n\007user_id\030\001 \001(\003\032\031\n\006logout\022"
-  "\017\n\007user_id\030\001 \001(\003\"\311\001\n\003log\0324\n\004show\022\014\n\004name"
-  "\030\001 \001(\t\022\r\n\005level\030\002 \001(\005\022\017\n\007content\030\003 \001(\t\032P"
-  "\n\005login\022\017\n\007user_id\030\001 \001(\003\022\017\n\007user_ip\030\002 \001("
-  "\t\022\022\n\nlogin_time\030\003 \001(\003\022\021\n\tserver_ip\030\004 \001(\t"
-  "\032:\n\010behavior\022\017\n\007user_id\030\001 \001(\003\022\014\n\004type\030\002 "
-  "\001(\005\022\017\n\007address\030\003 \001(\t\"]\n\005allot\032*\n\010respons"
-  "e\022\r\n\005token\030\001 \001(\t\022\017\n\007address\030\002 \001(\t\032(\n\004sav"
-  "e\022\017\n\007service\030\001 \001(\t\022\017\n\007address\030\002 \001(\t\"\260\001\n\010"
-  "location\032z\n\003add\022\017\n\007user_id\030\001 \001(\003\0221\n\010serv"
-  "ices\030\002 \003(\0132\037.s2s.location.add.ServicesEn"
-  "try\032/\n\rServicesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005val"
-  "ue\030\002 \001(\t:\0028\001\032(\n\003del\022\017\n\007user_id\030\001 \001(\003\022\020\n\010"
-  "services\030\002 \003(\t\"j\n\007forward\032\027\n\003sub\022\020\n\010chan"
-  "nels\030\001 \003(\t\032\031\n\005unsub\022\020\n\010channels\030\001 \003(\t\032+\n"
-  "\007publish\022\017\n\007channel\030\001 \001(\t\022\017\n\007message\030\002 \001"
-  "(\tb\006proto3"
+  "ist\022\036\n\004list\030\001 \003(\0132\020.s2s.server.info\"[\n\004u"
+  "ser\0328\n\005login\022\017\n\007user_id\030\001 \001(\003\022\036\n\004list\030\002 "
+  "\003(\0132\020.s2s.server.info\032\031\n\006logout\022\017\n\007user_"
+  "id\030\001 \001(\003\"\311\001\n\003log\0324\n\004show\022\014\n\004name\030\001 \001(\t\022\r"
+  "\n\005level\030\002 \001(\005\022\017\n\007content\030\003 \001(\t\032P\n\005login\022"
+  "\017\n\007user_id\030\001 \001(\003\022\017\n\007user_ip\030\002 \001(\t\022\022\n\nlog"
+  "in_time\030\003 \001(\003\022\021\n\tserver_ip\030\004 \001(\t\032:\n\010beha"
+  "vior\022\017\n\007user_id\030\001 \001(\003\022\014\n\004type\030\002 \001(\005\022\017\n\007a"
+  "ddress\030\003 \001(\t\"]\n\005allot\032*\n\010response\022\r\n\005tok"
+  "en\030\001 \001(\t\022\017\n\007address\030\002 \001(\t\032(\n\004save\022\017\n\007ser"
+  "vice\030\001 \001(\t\022\017\n\007address\030\002 \001(\t\"\260\001\n\010location"
+  "\032z\n\003add\022\017\n\007user_id\030\001 \001(\003\0221\n\010services\030\002 \003"
+  "(\0132\037.s2s.location.add.ServicesEntry\032/\n\rS"
+  "ervicesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t"
+  ":\0028\001\032(\n\003del\022\017\n\007user_id\030\001 \001(\003\022\020\n\010services"
+  "\030\002 \003(\t\"j\n\007forward\032\027\n\003sub\022\020\n\010channels\030\001 \003"
+  "(\t\032\031\n\005unsub\022\020\n\010channels\030\001 \003(\t\032+\n\007publish"
+  "\022\017\n\007channel\030\001 \001(\t\022\017\n\007message\030\002 \001(\tb\006prot"
+  "o3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_s2s_2eproto = {
   false, InitDefaults_s2s_2eproto, 
   descriptor_table_protodef_s2s_2eproto,
-  "s2s.proto", &assign_descriptors_table_s2s_2eproto, 770,
+  "s2s.proto", &assign_descriptors_table_s2s_2eproto, 802,
 };
 
 void AddDescriptors_s2s_2eproto() {
@@ -1601,6 +1604,7 @@ class user_login::HasBitSetters {
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int user_login::kUserIdFieldNumber;
+const int user_login::kListFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 user_login::user_login()
@@ -1610,13 +1614,16 @@ user_login::user_login()
 }
 user_login::user_login(const user_login& from)
   : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr) {
+      _internal_metadata_(nullptr),
+      list_(from.list_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   user_id_ = from.user_id_;
   // @@protoc_insertion_point(copy_constructor:s2s.user.login)
 }
 
 void user_login::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_user_login_s2s_2eproto.base);
   user_id_ = PROTOBUF_LONGLONG(0);
 }
 
@@ -1643,6 +1650,7 @@ void user_login::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  list_.Clear();
   user_id_ = PROTOBUF_LONGLONG(0);
   _internal_metadata_.Clear();
 }
@@ -1667,6 +1675,22 @@ const char* user_login::_InternalParse(const char* begin, const char* end, void*
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
+      // repeated .s2s.server.info list = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          parser_till_end = ::s2s::server_info::_InternalParse;
+          object = msg->add_list();
+          if (size > end - ptr) goto len_delim_till_end;
+          ptr += size;
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+              {parser_till_end, object}, ptr - size, ptr));
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 18 && (ptr += 1));
+        break;
+      }
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
@@ -1682,6 +1706,9 @@ const char* user_login::_InternalParse(const char* begin, const char* end, void*
     }  // switch
   }  // while
   return ptr;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
 }
 #else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 bool user_login::MergePartialFromCodedStream(
@@ -1701,6 +1728,17 @@ bool user_login::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
                  input, &user_id_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // repeated .s2s.server.info list = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+                input, add_list()));
         } else {
           goto handle_unusual;
         }
@@ -1739,6 +1777,15 @@ void user_login::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt64(1, this->user_id(), output);
   }
 
+  // repeated .s2s.server.info list = 2;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->list_size()); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      2,
+      this->list(static_cast<int>(i)),
+      output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1755,6 +1802,14 @@ void user_login::SerializeWithCachedSizes(
   // int64 user_id = 1;
   if (this->user_id() != 0) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(1, this->user_id(), target);
+  }
+
+  // repeated .s2s.server.info list = 2;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->list_size()); i < n; i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        2, this->list(static_cast<int>(i)), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1777,6 +1832,17 @@ size_t user_login::ByteSizeLong() const {
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // repeated .s2s.server.info list = 2;
+  {
+    unsigned int count = static_cast<unsigned int>(this->list_size());
+    total_size += 1UL * count;
+    for (unsigned int i = 0; i < count; i++) {
+      total_size +=
+        ::google::protobuf::internal::WireFormatLite::MessageSize(
+          this->list(static_cast<int>(i)));
+    }
+  }
 
   // int64 user_id = 1;
   if (this->user_id() != 0) {
@@ -1812,6 +1878,7 @@ void user_login::MergeFrom(const user_login& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  list_.MergeFrom(from.list_);
   if (from.user_id() != 0) {
     set_user_id(from.user_id());
   }
@@ -1842,6 +1909,7 @@ void user_login::Swap(user_login* other) {
 void user_login::InternalSwap(user_login* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  CastToBase(&list_)->InternalSwap(CastToBase(&other->list_));
   swap(user_id_, other->user_id_);
 }
 
