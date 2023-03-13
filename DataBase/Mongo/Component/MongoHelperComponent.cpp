@@ -10,11 +10,10 @@
 namespace Sentry
 {
 	bool MongoHelperComponent::LateAwake()
-    {      
-        this->mMongoDB = this->mApp->GetService<MongoDB>();
-        std::string name = ComponentFactory::GetName<MongoDB>();
+    {
         this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
-        return true;
+		LOG_CHECK_RET_FALSE(this->mMongoDB = this->mApp->GetService<MongoDB>());
+		return true;
     }
 
 	int MongoHelperComponent::Insert(const Message& message, int index)

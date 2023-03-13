@@ -23,6 +23,7 @@ namespace Sentry
     public:
         explicit ServerConfig(const std::string & name);
     public:
+		bool UseLua() const { return this->mUseLua;}
 		bool GetLuaConfig(const std::string & name, std::string & value) const;
         bool GetListen(const std::string & name, unsigned short & port) const;
         bool GetLocation(const char * name, std::string & location) const;
@@ -36,6 +37,7 @@ namespace Sentry
 	private:
 		bool ParseHttpAddress(const std::string & address, unsigned short & port) const;
     private:
+		bool mUseLua;
 		std::string mContent;
         const std::string mName;
         std::unordered_map<std::string, unsigned int> mListens;

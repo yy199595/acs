@@ -13,13 +13,23 @@
 #include"Service/LocalHttpService.h"
 #include"Service/LuaHttpService.h"
 #include"Component/NodeMgrComponent.h"
+#include"Component/LuaScriptComponent.h"
 namespace Sentry
 {
     bool LaunchComponent::Awake()
     {
-        const NodeConfig* nodeConfig = ClusterConfig::Inst()->GetConfig();
-        LOG_CHECK_RET_FALSE(nodeConfig);
+		if(ServerConfig::Inst()->UseLua())
+		{
+			this->mApp->AddComponent<LuaScriptComponent>();
+		}
+		unsigned short port = 0;
+		if(ServerConfig::Inst()->GetListen("rpc", port))
+		{
+			LOG_CHECK_RET_FALSE(this->mApp->AddComponent<NodeMgrComponent>());
+		}
+
         std::vector<std::string> components;
+		const NodeConfig* nodeConfig = ClusterConfig::Inst()->GetConfig();
         if (nodeConfig->GetComponents(components))
         {
             for (const std::string& name : components)

@@ -29,9 +29,9 @@ namespace Sentry
 		void OnCloseSocket(const std::string & address, int code) final;
     public:
         bool IsAuth(const std::string & address);
-        bool SendData(std::shared_ptr<Rpc::Packet> message);
+        bool SendData(const std::shared_ptr<Rpc::Packet>& message);
 		OuterNetClient* GetGateClient(const std::string& address);
-        bool SendData(long long userId, std::shared_ptr<Rpc::Packet> message);
+        bool SendData(long long userId, const std::shared_ptr<Rpc::Packet>& message);
 	 public:
 		bool Awake() final;
 		bool LateAwake() final;
@@ -43,7 +43,7 @@ namespace Sentry
         bool OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message);
         bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message);
 		bool OnResponse(const std::string & address, std::shared_ptr<Rpc::Packet> message);
-		bool SendData(const std::string & address, std::shared_ptr<Rpc::Packet> message);
+		bool SendData(const std::string & address, const std::shared_ptr<Rpc::Packet>& message);
 	 private:
 		unsigned int mSumCount;
 		unsigned int mWaitCount;

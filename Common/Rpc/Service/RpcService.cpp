@@ -32,6 +32,16 @@ namespace Sentry
 
 namespace Sentry
 {
+
+	int RpcService::Send(const string& address, const string& func)
+	{
+		if(!this->StartSend(address, func, nullptr))
+		{
+			return XCode::Failure;
+		}
+		return XCode::Successful;
+	}
+
 	int RpcService::Send(const std::string& func, const Message& message)
 	{
 		std::vector<std::string> locations;		
@@ -80,19 +90,19 @@ namespace Sentry
 		request->SetType(Tcp::Type::Request);
 		request->SetProto(Tcp::Porto::Protobuf);
 		request->WriteMessage(message);
-		std::shared_ptr<Rpc::Packet> response = this->mMessageComponent->Call(address, request);
-		if(response == nullptr)
-		{
-			LOG_ERROR("call [" << address << "] func [" << func << "] response null");
-			return nullptr;
-		}
-		int code = response->GetCode();
-		if(code != XCode::Successful)
-		{
-			const std::string & desc = CodeConfig::Inst()->GetDesc(code);
-			LOG_INFO("call [" << address << "] func [" << func << "] " << desc);
-		}
-		return response;
+		return this->mMessageComponent->Call(address, request);
+//		if(response == nullptr)
+//		{
+//			LOG_ERROR("call [" << address << "] func [" << func << "] response null");
+//			return nullptr;
+//		}
+//		int code = response->GetCode();
+//		if(code != XCode::Successful)
+//		{
+//			const std::string & desc = CodeConfig::Inst()->GetDesc(code);
+//			LOG_INFO("call [" << address << "] func [" << func << "] " << desc);
+//		}
+//		return response;
 	}
 
 	int RpcService::Send(const std::string& address, const std::string& func, const Message& message)
@@ -317,4 +327,5 @@ namespace Sentry
         }
         return this->mMessageComponent->Call(address, request);
     }
+
 }

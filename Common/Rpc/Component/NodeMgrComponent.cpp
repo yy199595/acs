@@ -228,10 +228,12 @@ namespace Sentry
 					config->GetLocation("http", *message.mutable_http());
 				}
 				const std::string &address = this->mRegistryAddress[index];
+#ifdef __DEBUG__
+				LOG_INFO("start register to [" << address << "]");
+#endif
 				std::shared_ptr<s2s::server::list> response = std::make_shared<s2s::server::list>();
 
-				LOG_INFO("start register to [" << address << "]");
-				int code = rpcService->Call(address, func, response);
+				int code = rpcService->Call(address, func, message, response);
 				if (code != XCode::Successful)
 				{
 					this->mIndex++;

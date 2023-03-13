@@ -21,6 +21,7 @@ namespace Sentry
 		const std::string& GetServer() const { return this->mCluster; }
 	public:
 		int Send(const std::string& func, const Message& message);
+		int Send(const std::string& address, const std::string& func);
 		int Send(const std::string& address, const std::string& func, const Message& message);
 	public:
 		int Send(long long userId, const std::string& func);

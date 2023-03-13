@@ -14,7 +14,7 @@ namespace Sentry
 	class ServiceMethodRegister
 	{
 	public:
-		ServiceMethodRegister(Component * component);
+		explicit ServiceMethodRegister(Component * component);
 	public:
 		template<typename T>
 		bool Bind(std::string name, ServiceMethodType1<T> func)
@@ -80,12 +80,12 @@ namespace Sentry
 			return this->AddMethod(std::make_shared<ServiceMethod4<T, T1>>(name, component, func));
 		}
 
-		template<typename T, typename T1>
-		bool Bind(std::string name, ServiceMethodType5<T, T1> func)
-		{
-			T * component = this->mComponent->Cast<T>();
-			return this->AddMethod(std::make_shared<ServiceMethod5<T, T1>>(name, component, func));
-		}
+//		template<typename T, typename T1>
+//		bool Bind(std::string name, ServiceMethodType5<T, T1> func)
+//		{
+//			T * component = this->mComponent->Cast<T>();
+//			return this->AddMethod(std::make_shared<ServiceMethod5<T, T1>>(name, component, func));
+//		}
 
 		template<typename T>
 		bool Bind(std::string name, ServiceMethodType6<T> func)
@@ -111,7 +111,7 @@ namespace Sentry
 	class HttpServiceRegister
 	{
 	 public:
-		HttpServiceRegister(Component * o) : mComponent(o) { }
+		explicit HttpServiceRegister(Component * o) : mComponent(o) { }
 	 public:
 		template<typename T>
 		bool Bind(const std::string& name, HttpMethod<T> func)

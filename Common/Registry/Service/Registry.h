@@ -8,22 +8,24 @@
 #include"Service/PhysicalService.h"
 namespace Sentry
 {
-    class Registry : public PhysicalService
+	class Registry final : public PhysicalService, public ISecondUpdate
     {
     public:
         Registry() = default;
     public:
         bool OnStart() final;
     private:
-        int Ping(const Rpc::Head & head);
+        int Ping(const Rpc::Packet & head);
         int UnRegister(const com::type::string& request);
         int Query(const com::array::string& request, s2s::server::list& response);
 		int Register(const s2s::server::info & request, s2s::server::list & response);
-    private:      
+    private:
+		void OnSecondUpdate(int tick) final;
         void OnNodeServerError(const std::string& address);
 	 private:
         class NodeMgrComponent * mNodeComponent;
         class InnerNetComponent* mInnerComponent;
+		std::unordered_map<std::string, long long> mPingInfos;
     };
 }
 

@@ -15,12 +15,12 @@ namespace Sentry
         Node() = default;
         ~Node() = default;
     private:
-        int Ping(const Rpc::Head& head);
         int Stop();
         int Hotfix();
         int LoadConfig();
-        int Join(const s2s::server::info& request); //新服务器加入
-        int Exit(const s2s::server::info& response); //新服务器加入
+		int Ping(const Rpc::Packet& packet);
+		int Join(const s2s::server::info& request); //新服务器加入
+        int Exit(const com::type::string& request); //服务器退出
         int RunInfo(com::type::string& response); // 获取运行信息
     private:
         int AddAddress(long long userId, const s2s::server::list& request);

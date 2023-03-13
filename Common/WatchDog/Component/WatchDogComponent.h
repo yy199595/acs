@@ -4,18 +4,14 @@
 
 namespace Sentry
 {
-	class WatchDogComponent final : public Component
+	class WatchDogComponent final : public Component, public ISecondUpdate
 	{
 	public:
-		WatchDogComponent();
-	public:
-		void ShowLog(spdlog::level::level_enum lv, const std::string& log);
+		WatchDogComponent() = default;
 	private:
 		bool LateAwake() final;
-		void ShowLogInWatchDog(s2s::log::show * log);
+		void OnSecondUpdate(int tick) final;
 	private:
 		std::string mAddress;
-		std::queue<s2s::log::show *> mLogs;
-		class InnerNetComponent* mInnerComponent;
 	};
 }

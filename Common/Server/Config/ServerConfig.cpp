@@ -15,7 +15,7 @@ namespace Sentry
 	ServerConfig::ServerConfig(const std::string& server)
 		: TextConfig("ServerConfig"), mName(server)
 	{
-
+		this->mUseLua = false;
 	}
 
 	bool ServerConfig::OnReloadText(const char* str, size_t length)
@@ -48,6 +48,7 @@ namespace Sentry
 				const std::string value = iter->value.GetString();
 				this->mLuaConfigs.emplace(key, value);
 			}
+			this->mUseLua = true;
 		}
 		if (iter->value.HasMember("address"))
 		{

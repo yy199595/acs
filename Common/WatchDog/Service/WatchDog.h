@@ -9,7 +9,7 @@ namespace Sentry
 	private:
 		bool OnStart() final;
 	private:
-		int Ping(const Rpc::Head& message);
+		int Ping(const Rpc::Packet& packet);
 		int ShowLog(const s2s::log::show& request);
 	};
 }

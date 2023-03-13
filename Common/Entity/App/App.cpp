@@ -41,47 +41,33 @@ namespace Sentry
 		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
 		this->mMessageComponent = this->GetOrAddComponent<ProtoComponent>();
 
-		unsigned short port = 0;
-		if(ServerConfig::Inst()->GetListen("rpc", port))
-		{
-			LOG_CHECK_RET_FALSE(this->AddComponent<NodeMgrComponent>());
-		}
-
         LOG_CHECK_RET_FALSE(this->AddComponent<TextConfigComponent>());
         //LOG_CHECK_RET_FALSE(this->AddComponent<LocationComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<ThreadComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<LaunchComponent>());
-
         std::vector<Component *> components;
         if(this->GetComponents(components) > 0)
         {
             for (Component *component: components)
             {
-                if (!this->InitComponent(component))
-                {
-                    return false;
-                }
+				RpcService * rpcService = component->Cast<RpcService>();
+				if(rpcService != nullptr)
+				{
+					const std::string & name = component->GetName();
+					this->mServiceMap.emplace(name, rpcService);
+				}
             }
+			for (Component *component: components)
+			{
+				if(!component->LateAwake())
+				{
+					LOG_ERROR(component->GetName() << " LateAwake");
+					return false;
+				}
+			}
         }
         this->mTaskComponent->Start(&App::StartAllComponent, this);
         return true;
-	}
-
-	bool App::InitComponent(Component* component)
-	{
-		if (!component->LateAwake())
-		{
-			LOG_ERROR(component->GetName() << " late awake ");
-			return false;
-		}
-
-        RpcService * rpcService = component->Cast<RpcService>();
-        if(rpcService != nullptr)
-        {
-            const std::string & name = component->GetName();
-            this->mServiceMap.emplace(name, rpcService);
-        }
-		return true;
 	}
 
 	int App::Run(int argc, char ** argv)

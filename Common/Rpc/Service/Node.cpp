@@ -32,11 +32,9 @@ namespace Sentry
         return true;
     }
 
-	int Node::Ping(const Rpc::Head& head)
+	int Node::Ping(const Rpc::Packet& packet)
     {
-        std::string address;
-        head.Get("address", address);
-        CONSOLE_LOG_FATAL("[" << address << "] ping server");
+        CONSOLE_LOG_FATAL("[" << packet.From() << "] ping server");
         return XCode::Successful;
     }
 
@@ -55,7 +53,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-    int Node::Exit(const s2s::server::info &response)
+    int Node::Exit(const com::type::string &request)
     {
         return XCode::Successful;
     }

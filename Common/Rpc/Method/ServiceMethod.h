@@ -32,14 +32,14 @@ namespace Sentry
 	using ServiceMethodType44 = int(T::*)(long long, T1 &);
 
 	template<typename T>
-	using ServiceMethodType6 = int(T::*)(const Rpc::Head & head);
+	using ServiceMethodType6 = int(T::*)(const Rpc::Packet & packet);
 
-    template<typename T, typename T1>
-    using ServiceMethodType5 = int(T::*)(const Rpc::Head & head, const T1 &);
-
-
-    template<typename T>
-    using ServiceMethodType7 = int(T::*)(const Rpc::Head & head, Rpc::Head &);
+//    template<typename T, typename T1>
+//    using ServiceMethodType5 = int(T::*)(const Rpc::Head & head, const T1 &);
+//
+//
+//    template<typename T>
+//    using ServiceMethodType7 = int(T::*)(const Rpc::Head & head, Rpc::Head &);
 
 
 //	template<typename T, typename T1, typename T2>
@@ -266,36 +266,36 @@ namespace Sentry
 	};
 
 
-	template<typename T, typename T1>
-	class ServiceMethod5 : public ServiceMethod
-	{
-	public:
-		ServiceMethod5(const std::string name, T* o, ServiceMethodType5<T, T1> func)
-				: ServiceMethod(name), _o(o), _func(func)
-		{
-
-		}
-
-	public:
-		bool IsLuaMethod() override
-		{
-			return false;
-		};
-		int Invoke(Rpc::Packet & message) override
-		{
-			std::unique_ptr<T1> request(new T1());
-            if(!message.ParseMessage(request.get()))
-            {
-                return XCode::CallArgsError;
-            }
-            message.Clear();
-			return (_o->*_func)(message.GetHead(), *request);
-		}
-
-	private:
-		T* _o;
-		ServiceMethodType5<T, T1> _func;
-	};
+//	template<typename T, typename T1>
+//	class ServiceMethod5 : public ServiceMethod
+//	{
+//	public:
+//		ServiceMethod5(const std::string name, T* o, ServiceMethodType5<T, T1> func)
+//				: ServiceMethod(name), _o(o), _func(func)
+//		{
+//
+//		}
+//
+//	public:
+//		bool IsLuaMethod() override
+//		{
+//			return false;
+//		};
+//		int Invoke(Rpc::Packet & message) override
+//		{
+//			std::unique_ptr<T1> request(new T1());
+//            if(!message.ParseMessage(request.get()))
+//            {
+//                return XCode::CallArgsError;
+//            }
+//            message.Clear();
+//			return (_o->*_func)(message.GetHead(), *request);
+//		}
+//
+//	private:
+//		T* _o;
+//		ServiceMethodType5<T, T1> _func;
+//	};
 
 	template<typename T>
 	class ServiceMethod6 : public ServiceMethod
@@ -311,7 +311,7 @@ namespace Sentry
 		bool IsLuaMethod() override { return false; };
 		int Invoke(Rpc::Packet & message) override
 		{
-			return (_o->*_func)(message.GetHead());
+			return (_o->*_func)(message);
 		}
 	 private:
 		T* _o;

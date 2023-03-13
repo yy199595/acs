@@ -9,7 +9,7 @@ namespace Sentry
         return true;
     }
 
-    int WatchDog::Ping(const Rpc::Head& message)
+    int WatchDog::Ping(const Rpc::Packet& message)
     {
         return 0;
     }

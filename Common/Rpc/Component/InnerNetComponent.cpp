@@ -215,22 +215,22 @@ namespace Sentry
 
 	bool InnerNetComponent::OnResponse(const std::string& address, std::shared_ptr<Rpc::Packet> message)
 	{
-        std::string targer;
+        std::string target;
         Rpc::Head &head = message->GetHead();
         // 网关转发过来的消息 必须带client字段
-        if(this->mOuterComponent != nullptr && head.Get("client", targer))
+        if(this->mOuterComponent != nullptr && head.Get("client", target))
         {
             head.Remove("client");
-            message->SetFrom(targer);
+            message->SetFrom(target);
 			this->mOuterComponent->OnMessage(message);
             return true;
         }
-        else if (this->mTranComponent != nullptr && head.Get("from", targer))
-        {
-            head.Remove("from");
-            this->Send(targer, message);
-            return true;
-        }
+		if(head.Get("resp", target))
+		{
+			head.Remove("resp");
+			this->Send(target, message);
+			return true;
+		}
 #ifdef __DEBUG__
         int code = 0;
         LOG_CHECK_RET_FALSE(head.Get("code", code));
@@ -239,7 +239,7 @@ namespace Sentry
             std::string error, func;
             if(head.Get("func", func) && head.Get("error", error))
             {
-                CONSOLE_LOG_ERROR("call [" << address << "] func = {" << func << "}  code = " << error);
+                CONSOLE_LOG_ERROR("call " << func << " [" << address << "]" << "code = " << error);
             }
         }
 #endif

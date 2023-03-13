@@ -176,7 +176,7 @@ namespace Sentry
         return iter != this->mAuthClients.end();
     }
 
-    bool OuterNetComponent::SendData(std::shared_ptr<Rpc::Packet> message)
+    bool OuterNetComponent::SendData(const std::shared_ptr<Rpc::Packet>& message)
     {
         message->SetType(Tcp::Type::Request);
         auto iter = this->mGateClientMap.begin();
@@ -191,7 +191,7 @@ namespace Sentry
         return true;
     }
 
-    bool OuterNetComponent::SendData(long long userId, std::shared_ptr<Rpc::Packet> message)
+    bool OuterNetComponent::SendData(long long userId, const std::shared_ptr<Rpc::Packet>& message)
     {
         std::string address;
         if(!this->mOuterMessageComponent->GetAddress(userId, address))
@@ -203,7 +203,7 @@ namespace Sentry
         return this->SendData(address, message);
     }
 
-	bool OuterNetComponent::SendData(const std::string &address, std::shared_ptr<Rpc::Packet> message)
+	bool OuterNetComponent::SendData(const std::string &address, const std::shared_ptr<Rpc::Packet>& message)
 	{
         message->GetHead().Remove("address");
 		OuterNetClient * outerNetClient = this->GetGateClient(address);

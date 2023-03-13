@@ -40,7 +40,6 @@ namespace Sentry
 		bool LoadComponent();
 		void WaitServerStart();
 		void StartAllComponent();
-		bool InitComponent(Component* component);
 	 private:
         int mTickCount;
 		float mLogicFps;
@@ -63,7 +62,7 @@ namespace Sentry
 	template<typename T>
 	inline RpcService* App::GetService()
 	{
-		const std::string name = ComponentFactory::GetName<T>();
+		const std::string & name = ComponentFactory::GetName<T>();
 		auto iter = this->mServiceMap.find(name);
 		return iter != this->mServiceMap.end() ? iter->second : nullptr;
 	}

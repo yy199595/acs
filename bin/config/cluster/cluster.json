@@ -16,8 +16,6 @@
             "HttpComponent",
             "RedisComponent",
             "HttpWebComponent",
-            "ConsoleComponent",
-            "LuaScriptComponent",
             "HttpWebComponent",
             "HttpDebugComponent"
         ]
@@ -25,8 +23,7 @@
     "Client": {
         "Component": [
             "HttpComponent",
-            "ClientComponent",
-            "LuaScriptComponent"
+            "ClientComponent"
         ]
     },
     "ChatServer": {
@@ -37,10 +34,7 @@
             "Chat": true,
             "Gate": false,
             "Registry": false
-        },
-        "Component": [
-            "LuaScriptComponent"
-        ]
+        }
     },
     "HttpServer": {
         "AutoAllot": false,
@@ -56,8 +50,7 @@
             "HttpComponent",
             "RedisComponent",
             "HttpWebComponent",
-            "HttpDebugComponent",
-            "LuaScriptComponent"
+            "HttpDebugComponent"
         ]
     },
     "GateServer": {

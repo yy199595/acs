@@ -1,7 +1,7 @@
 #include "ComponentFactory.h"
 namespace Sentry
 {
-
+	std::string ComponentFactory::mEmpty;
 	std::unordered_map<size_t, Type*> ComponentFactory::mTypeInfoMap1;
 	std::unordered_map<std::string, Type*> ComponentFactory::mTypeInfoMap;
 

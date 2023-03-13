@@ -13,7 +13,7 @@ namespace Sentry
 	 public:
 		Gate();
 	 private:
-		int Ping(long long userId);		
+		int Ping(long long userId);
         int Allocation(long long userId, s2s::allot::response & response);		
 	private:
         void Init() final;
