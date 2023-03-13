@@ -62,8 +62,7 @@
         },
         "lua": {
             "common": "script/Common",
-            "module": "script/Server/ChatServer",
-            "main": "script/Server/Server.lua"
+            "module": "script/Server/ChatServer"
         }
     },
     "GateServer": {
