@@ -35,16 +35,13 @@ namespace Sentry
     public:
         LuaHttpRequestTask(lua_State * lua);
         ~LuaHttpRequestTask();
-    public:
-        long long GetRpcId() final { return this->mTaskId; }
+    public:     
         int Await(std::shared_ptr<HttpRequestClient> client);
-    public:
-        void OnTimeout() final { }
+    public:    
         void OnResponse(std::shared_ptr<Http::Response> response) final;
     private:
         int mRef;
         lua_State * mLua;
-        long long mTaskId;
         std::shared_ptr<HttpRequestClient> mRequestClient;
     };
 }

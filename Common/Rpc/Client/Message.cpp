@@ -89,6 +89,13 @@ namespace Rpc
         return true;
     }
 
+    const std::string& Head::GetStr(const std::string& key) const
+    {
+        static std::string empty;
+        auto iter = this->find(key);
+        return iter != this->end() ? iter->second : empty;
+    }
+
     size_t Head::Parse(std::istream& os)
     {
         this->clear();

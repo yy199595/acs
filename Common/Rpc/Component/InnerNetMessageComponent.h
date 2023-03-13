@@ -18,26 +18,27 @@ namespace Sentry
 		long long Time;
 	};
 #endif
-    class InnerNetMessageComponent : public RpcTaskComponent<long long, Rpc::Packet>, public ISystemUpdate
+    class InnerNetMessageComponent : public RpcTaskComponent<long long, Rpc::Packet>
 	{
 	 public:
 		InnerNetMessageComponent() = default;
     public:
         bool Ping(const std::string & address);
-		int OnRequest(std::shared_ptr<Rpc::Packet> request);
+		void OnMessage(std::shared_ptr<Rpc::Packet> message);
         bool Send(const std::string & address, std::shared_ptr<Rpc::Packet> message);
         std::shared_ptr<Rpc::Packet> Call(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
 		bool Awake() final;
 		bool LateAwake() final;
-		void OnSystemUpdate() final;
+		int OnRequest(std::shared_ptr<Rpc::Packet> request);
+		void Send(const std::string& address, int code, std::shared_ptr<Rpc::Packet> pack);
         void Invoke(const RpcMethodConfig * config, std::shared_ptr<Rpc::Packet> message);
-		void OnTimeout(const RpcMethodConfig* config, std::shared_ptr<Rpc::Packet> message);
     private:
         std::string mFullName;
 		class TaskComponent* mTaskComponent;
 		class TimerComponent* mTimerComponent;
+		Util::NumberBuilder<int, 1> mNuberPool;
+		class OuterNetComponent* mOuterComponent;
 		class InnerNetComponent* mInnerComponent;
-        std::queue<std::shared_ptr<Rpc::Packet>> mWaitMessages;
 	};
 }

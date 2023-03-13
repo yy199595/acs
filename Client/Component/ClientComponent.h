@@ -23,7 +23,6 @@ namespace Client
     public:
         ClientTask(int ms);
     public:
-        void OnTimeout() final;
         long long GetRpcId() { return this->mTaskId; }
         void OnResponse(std::shared_ptr<Rpc::Packet> response);
         std::shared_ptr<Rpc::Packet> Await() { return this->mTask.Await(); }

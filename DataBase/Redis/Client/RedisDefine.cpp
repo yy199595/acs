@@ -55,16 +55,16 @@ namespace Sentry
 		return 0;
     }
 
-    std::shared_ptr<RedisTask> RedisRequest::MakeTask(int ms)
+    std::shared_ptr<RedisTask> RedisRequest::MakeTask(int id)
     {
-        std::shared_ptr<RedisTask> redisTask(new RedisTask(this->shared_from_this(), ms));
+        std::shared_ptr<RedisTask> redisTask(new RedisTask(this->shared_from_this(), id));
         this->mTaskId = redisTask->GetRpcId();
         return redisTask;
     }
 
-    std::shared_ptr<LuaRedisTask> RedisRequest::MakeLuaTask(lua_State *lua, int ms)
+    std::shared_ptr<LuaRedisTask> RedisRequest::MakeLuaTask(lua_State *lua, int id)
     {
-        std::shared_ptr<LuaRedisTask> redisTask(new LuaRedisTask(lua, this->shared_from_this(), ms));
+        std::shared_ptr<LuaRedisTask> redisTask(new LuaRedisTask(lua, this->shared_from_this(), id));
         this->mTaskId = redisTask->GetRpcId();
         return redisTask;
     }
@@ -261,7 +261,6 @@ namespace Sentry
         : IRpcTask<RedisResponse>(ms)
     {
 		this->mRequest = request;
-		this->mTaskId = Helper::Guid::Create();
     }
 
     void RedisTask::OnResponse(std::shared_ptr<RedisResponse> response)
@@ -269,8 +268,8 @@ namespace Sentry
         this->mTask.SetResult(response);
     }
 
-    LuaRedisTask::LuaRedisTask(lua_State *lua, std::shared_ptr<RedisRequest> request, int ms)
-        : IRpcTask<RedisResponse>(ms), mLua(lua)
+    LuaRedisTask::LuaRedisTask(lua_State *lua, std::shared_ptr<RedisRequest> request, int id)
+        : IRpcTask<RedisResponse>(id), mLua(lua)
     {
         this->mRef = 0;
         if(lua_isthread(this->mLua, -1))
@@ -278,7 +277,6 @@ namespace Sentry
             this->mRef = luaL_ref(lua, LUA_REGISTRYINDEX);
         }
 		this->mRequest = request;
-		this->mTaskId = Helper::Guid::Create();
     }
     LuaRedisTask::~LuaRedisTask()
     {

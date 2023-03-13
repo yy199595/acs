@@ -21,15 +21,6 @@ namespace Client
 	{
 		this->mTask.SetResult(response);
 	}
-
-    void ClientTask::OnTimeout()
-    {
-        std::shared_ptr<Rpc::Packet> response(new Rpc::Packet());
-
-        response->GetHead().Add("code", XCode::CallTimeout);
-        this->mTask.SetResult(response);
-    }
-
 }
 
 namespace Client

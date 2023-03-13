@@ -38,6 +38,7 @@ namespace Sentry
         bool LateAwake() final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
     private:
+        Util::NumberBuilder<int, 1> mNumberPool;
         std::vector<std::shared_ptr<TcpRedisClient>> mRedisClients;
     };
 

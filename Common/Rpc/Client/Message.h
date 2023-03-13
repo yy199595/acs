@@ -28,6 +28,7 @@ namespace Rpc
 
         bool Get(std::vector<std::string> & keys) const;
 
+        const std::string& GetStr(const std::string& key) const;
     public:
         size_t GetLength() const;
 

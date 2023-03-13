@@ -33,22 +33,17 @@ namespace Sentry
 	 public:
         InnerNetClient * GetSession(const std::string& address);
         InnerNetClient * GetOrCreateSession(const std::string& address);
+	public:
+		bool Send(std::shared_ptr<Rpc::Packet> message);
 		bool Send(const std::string & address, std::shared_ptr<Rpc::Packet> message);
 	 private:
-        bool IsAuth(const std::string & address);
-        bool OnForward(std::shared_ptr<Rpc::Packet> message);
-        bool OnBroadcast(std::shared_ptr<Rpc::Packet> message);
-        bool OnPing(const std::string& address, std::shared_ptr<Rpc::Packet> message);
-        bool OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message);
-        bool OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message);
-		bool OnResponse(const std::string& address, std::shared_ptr<Rpc::Packet> message);
+        bool IsAuth(const std::string & address);          
+        bool OnAuth(std::shared_ptr<Rpc::Packet> message);
 	 private:
 		std::string mLocation;
 		unsigned int mSumCount;
 		unsigned int mWaitCount;
-        class TranComponent* mTranComponent;
         class ThreadComponent * mNetComponent;
-        class OuterNetComponent * mOuterComponent;
         class InnerNetMessageComponent* mMessageComponent;
         std::unordered_map<std::string, std::string> mUserMaps;
         std::unordered_map<std::string, std::shared_ptr<InnerNetClient>> mRpcClientMap;

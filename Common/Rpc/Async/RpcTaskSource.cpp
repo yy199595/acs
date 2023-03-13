@@ -13,11 +13,6 @@ namespace Sentry
         this->mTaskSource.SetResult(response);
     }
 
-    void RpcTaskSource::OnTimeout()
-    {
-        this->mTaskSource.SetResult(nullptr);
-    }
-
 	std::shared_ptr<Rpc::Packet> RpcTaskSource::Await()
 	{
 		return this->mTaskSource.Await();
@@ -26,19 +21,13 @@ namespace Sentry
 
 namespace Sentry
 {
-	LuaRpcTaskSource::LuaRpcTaskSource(lua_State* lua, int ms, const std::string & resp)
-		: IRpcTask<Rpc::Packet>(ms), mTask(lua), mResp(resp)
+	LuaRpcTaskSource::LuaRpcTaskSource(lua_State* lua, int id, const std::string & resp)
+		: IRpcTask<Rpc::Packet>(id), mTask(lua), mResp(resp)
 	{
-		this->mTaskId = Helper::Guid::Create();
 #ifdef __DEBUG__
       this->t1 = Helper::Time::NowMilTime();
 #endif
 	}
-
-    void LuaRpcTaskSource::OnTimeout()
-    {
-        this->mTask.SetResult(XCode::CallTimeout, nullptr);
-    }
 
 	void LuaRpcTaskSource::OnResponse(std::shared_ptr<Rpc::Packet> response)
 	{

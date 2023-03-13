@@ -96,12 +96,13 @@ namespace Sentry
         ElapsedTimer elapsedTimer;
 #endif
 		redisClientContext->Send(request);
-		std::shared_ptr<RedisTask> redisTask = request->MakeTask();
-		std::shared_ptr<RedisResponse> redisResponse =
-			this->AddTask(redisTask->GetRpcId(), redisTask)->Await();
+        int taksId = this->mNumberPool.Pop();
+		std::shared_ptr<RedisTask> redisTask = request->MakeTask(taksId);
+		std::shared_ptr<RedisResponse> redisResponse = this->AddTask(taksId, redisTask)->Await();
 #ifdef __DEBUG__
         LOG_INFO(request->GetCommand() << " use time = [" << elapsedTimer.GetMs() << "ms]");
 #endif
+        this->mNumberPool.Push(taksId);
         if (redisResponse != nullptr && redisResponse->HasError())
         {
             LOG_ERROR(request->ToJson());

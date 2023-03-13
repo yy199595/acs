@@ -144,14 +144,12 @@ namespace Sentry
     class RedisTask : public IRpcTask<RedisResponse>
     {
     public:
-        RedisTask(std::shared_ptr<RedisRequest> request, int ms);
+        RedisTask(std::shared_ptr<RedisRequest> request, int id);
         ~RedisTask() = default;
-    public:
-        long long GetRpcId() final { return this->mTaskId; }
+    public:       
         void OnResponse(std::shared_ptr<RedisResponse> response) final;
         std::shared_ptr<RedisResponse> Await() { return this->mTask.Await(); }
     private:
-        long long mTaskId;
 		std::shared_ptr<RedisRequest> mRequest;
 		TaskSource<std::shared_ptr<RedisResponse>> mTask;
     };
@@ -159,16 +157,14 @@ namespace Sentry
     class LuaRedisTask : public IRpcTask<RedisResponse>
     {
     public:
-        LuaRedisTask(lua_State * lua, std::shared_ptr<RedisRequest> request, int ms);
+        LuaRedisTask(lua_State * lua, std::shared_ptr<RedisRequest> request, int id);
         ~LuaRedisTask();
     public:
         int Await();
-        long long GetRpcId() final { return this->mTaskId;}
         void OnResponse(std::shared_ptr<RedisResponse> response) final;
     private:
         int mRef;
         lua_State * mLua;
-        long long mTaskId;
 		std::shared_ptr<RedisRequest> mRequest;
     };
 }

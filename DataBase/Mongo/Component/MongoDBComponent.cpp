@@ -7,18 +7,13 @@
 #include"Component/ThreadComponent.h"
 namespace Sentry
 {
-	MongoTask::MongoTask(int id, int ms)
-        : IRpcTask<Mongo::CommandResponse>(ms), mTaskId(id) { }
+	MongoTask::MongoTask(int id)
+        : IRpcTask<Mongo::CommandResponse>(id) { }
 
 	void MongoTask::OnResponse(std::shared_ptr<Mongo::CommandResponse> response)
 	{
 		this->mTask.SetResult(response);
 	}
-
-    void MongoTask::OnTimeout()
-    {
-        this->mTask.SetResult(nullptr);
-    }
 }
 
 namespace Sentry
@@ -115,7 +110,7 @@ namespace Sentry
         request->header.requestID = this->mRequestId.Pop();
 
         mongoClient->SendMongoCommand(request);
-        std::shared_ptr<MongoTask> mongoTask(new MongoTask(request->header.requestID, 0));
+        std::shared_ptr<MongoTask> mongoTask(new MongoTask(request->header.requestID));
 		int taskId = (int)mongoTask->GetRpcId();
 #ifdef __DEBUG__
 		long long t1 = Helper::Time::NowMilTime();
