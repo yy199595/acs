@@ -215,8 +215,10 @@ namespace Sentry
 	{
 		if(address == this->mLocation) //发送到本机
 		{
-            message->SetFrom(address);	
-            this->mMessageComponent->OnMessage(message);
+            message->SetFrom(address);
+            //this->mMessageComponent->OnMessage(message);
+			Asio::Context & io = this->mApp->MainThread();
+			io.post(std::bind(&InnerNetComponent::OnMessage, this, message));
 			return true;
 		}
         InnerNetClient * clientSession = this->GetOrCreateSession(address);

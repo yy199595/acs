@@ -116,7 +116,7 @@ namespace Sentry
             //CONSOLE_LOG_ERROR(code.message());
 #ifdef __DEBUG__
             const std::string& address = this->mSocket->GetAddress();
-            CONSOLE_LOG_ERROR("receive inner message error : [" << address << "]");
+            CONSOLE_LOG_ERROR("receive inner message error : [" << address << "] " << code.message());
 #endif // 
             this->CloseSocket(XCode::NetWorkError);
             return;

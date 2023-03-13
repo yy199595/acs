@@ -120,6 +120,7 @@ namespace Sentry
         }
         if (!this->mInnerComponent->Send(address, message))
         {
+			this->mNuberPool.Push(rpcId);
             return nullptr;
         }
         std::shared_ptr<Rpc::Packet> response = this->AddTask(rpcId, taskSource)->Await();
