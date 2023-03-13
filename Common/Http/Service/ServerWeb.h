@@ -2,16 +2,16 @@
 // Created by zmhy0073 on 2022/8/29.
 //
 
-#ifndef APP_HTTPBACKGROUND_H
-#define APP_HTTPBACKGROUND_H
+#ifndef APP_SERVERWEB_H
+#define APP_SERVERWEB_H
 #include"LocalHttpService.h"
 namespace Sentry
 {
-    class HttpBackGround : public LocalHttpService
+    class ServerWeb : public LocalHttpService
     {
     public:
-        HttpBackGround() = default;
-        ~HttpBackGround() final = default;
+        ServerWeb() = default;
+        ~ServerWeb() final = default;
     private:     
         bool OnStartService(HttpServiceRegister &serviceRegister) final;
     private:
@@ -25,4 +25,4 @@ namespace Sentry
 }
 
 
-#endif //APP_HTTPBACKGROUND_H
+#endif //APP_SERVERWEB_H

@@ -87,7 +87,7 @@ namespace Sentry
                 break;
             default:
             {
-                LOG_ERROR(address << " unknow message type : " << message->GetType());
+                LOG_ERROR(address << " unknown message type : " << message->GetType());
             }
         }
     }
@@ -307,9 +307,18 @@ namespace Sentry
         {
             return nullptr;
         }
+		AuthInfo authInfo;
+		const ServerConfig * config = ServerConfig::Inst();
+		{
+			authInfo.ServerName = config->Name();
+			config->GetLocation("rpc", authInfo.RpcAddress);
+			config->GetMember("user", "name", authInfo.UserName);
+			config->GetMember("user", "passwd", authInfo.PassWord);
+		}
+
         socketProxy->Init(ip, port);
 		std::shared_ptr<InnerNetClient> newClient =
-            std::make_shared<InnerNetClient>(this, socketProxy);
+            std::make_shared<InnerNetClient>(this, socketProxy, authInfo);
 
 		this->mRpcClientMap.emplace(socketProxy->GetAddress(), newClient);
 		return newClient.get();

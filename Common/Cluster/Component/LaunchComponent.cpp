@@ -39,7 +39,6 @@ namespace Sentry
             {
                 const RpcServiceConfig* rpcServiceConfig = RpcConfig::Inst()->GetConfig(name);
                 const HttpServiceConfig* httpServiceConfig = HttpConfig::Inst()->GetConfig(name);
-                LOG_CHECK_RET_FALSE(rpcServiceConfig != nullptr || httpServiceConfig != nullptr);
                 if (rpcServiceConfig != nullptr)
                 {
                     //创建实体服务
@@ -65,7 +64,7 @@ namespace Sentry
                         }
                     }
                 }
-                else
+                else if(httpServiceConfig != nullptr)
                 {
                     if (!this->mApp->AddComponent(name))
                     {
@@ -76,6 +75,11 @@ namespace Sentry
                             return false;
                         }
                     }
+                }
+                else
+                {
+                    LOG_ERROR("not find service config [" << name << "]");
+                    return false;
                 }
                 if (nodeConfig->IsStart(name))
                 {

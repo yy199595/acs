@@ -7,14 +7,26 @@
 #include"Coroutine/CoroutineLock.h"
 #include<google/protobuf/message.h>
 using namespace Tcp;
-using namespace google::protobuf;
-
+namespace Sentry
+{
+	struct AuthInfo
+	{
+	public:
+		std::string UserName;
+		std::string PassWord;
+		std::string ServerName;
+		std::string RpcAddress;
+	};
+}
 namespace Sentry
 {
 	class InnerNetClient : public Tcp::TcpContext
 	{
 	 public:
-		explicit InnerNetClient(IRpc<Rpc::Packet> * component, std::shared_ptr<SocketProxy> socket);
+		explicit InnerNetClient(IRpc<Rpc::Packet> * component,
+			std::shared_ptr<SocketProxy> socket);
+		explicit InnerNetClient(IRpc<Rpc::Packet> * component,
+			std::shared_ptr<SocketProxy> socket, const AuthInfo & info);
 		~InnerNetClient() override = default;
 	 public:
 		void StartClose();
@@ -28,11 +40,8 @@ namespace Sentry
         void OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t) final;
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	private:
-        std::string mSrvName;
-        std::string mUserName;
-        std::string mPassword;
+		AuthInfo mAuthInfo;
         Tcp::DecodeState mState;
-        std::string mRpcLocation;
         IRpc<Rpc::Packet> * mComponent;
         std::shared_ptr<Rpc::Packet> mMessage;
         std::unique_ptr<asio::steady_timer> mTimer;

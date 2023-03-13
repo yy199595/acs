@@ -3,17 +3,17 @@
 		"Login": {
 			"Type": "POST",
 			"Async": true,
-			"Content": "application/json",
-			"Path": "/user/login"
+			"Path": "/user/login",
+			"Content": "application/json"
 		},
 		"Register": {
 			"Type": "POST",
 			"Async": true,
-			"Content": "application/json",
-			"Path": "/user/register"
+			"Path": "/user/register",
+			"Content": "application/json"
 		}
 	},
-	"HttpBackGround": {
+	"ServerWeb": {
 		"Info": {
 			"Type": "GET",
 			"Async": true,
@@ -38,13 +38,6 @@
 			"Type": "GET",
 			"Async": true,
 			"Path": "/server/hotfix"
-		}
-	},
-	"HttpDebug": {
-		"Type": "http",
-		"Call": {
-			"Async": true,
-			"Path": "/rpc/call"
 		}
 	}
 }

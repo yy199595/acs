@@ -25,7 +25,7 @@
 #include"Service/Log.h"
 #include"Service/Gate.h"
 #include"Service/Node.h"
-#include"Service/HttpBackGround.h"
+#include"Service/ServerWeb.h"
 #include"Service/Registry.h"
 #include"Service/User.h"
 #ifdef __ENABLE_MONGODB__
@@ -98,7 +98,7 @@ void RegisterComponent()
     ComponentFactory::Add<HttpWebComponent>("HttpWebComponent");
     ComponentFactory::Add<HttpDebugComponent>("HttpDebugComponent");
   
-    ComponentFactory::Add<HttpBackGround>("HttpBackGround");
+    ComponentFactory::Add<ServerWeb>("ServerWeb");
 
     ComponentFactory::Add<WatchDogComponent>("WatchDogComponent");
 

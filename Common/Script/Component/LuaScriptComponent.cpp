@@ -135,14 +135,20 @@ namespace Sentry
         {
             return nullptr;
         };
-        const std::string & path = iter->second;
+		return this->LoadModuleByPath(iter->second);
+    }
+
+	Lua::LuaModule * LuaScriptComponent::LoadModuleByPath(const std::string & path)
+	{
+		std::string name;
+		Helper::Directory::GetFileName(path, name);
 		std::unique_ptr<Lua::LuaModule> luaModule =
 			std::make_unique<Lua::LuaModule>(this->mLuaEnv, name, path);
 		Lua::LuaModule * result = luaModule.get();
-		this->mModules.emplace(name, std::move(luaModule));
-		//CONSOLE_LOG_INFO("load lua module [" << name << "] successful");
-        return result;
-    }
+		const std::string moduleName = name.substr(0, name.find('.'));
+		this->mModules.emplace(moduleName, std::move(luaModule));
+		return result;
+	}
 
 	Lua::LuaModule* LuaScriptComponent::GetModule(const std::string& name)
 	{
@@ -185,35 +191,39 @@ namespace Sentry
 	}
 
 	bool LuaScriptComponent::LoadAllFile()
-    {
-        std::string common, module;
-        std::vector<std::string> luaFiles;
-        const ServerConfig *config = ServerConfig::Inst();
-        LOG_CHECK_RET_FALSE(config->GetMember("lua", "common", common));
-        LOG_CHECK_RET_FALSE(config->GetMember("lua", "module", module));
+	{
+		std::string common, module, main;
+		std::vector<std::string> luaFiles;
+		const ServerConfig* config = ServerConfig::Inst();
+		LOG_CHECK_RET_FALSE(config->GetLuaConfig("common", common));
+		LOG_CHECK_RET_FALSE(config->GetLuaConfig("module", module));
 
-        common = System::FormatPath(common);
-        this->mModulePath = System::FormatPath(module);
-        if(!Helper::Directory::GetFilePaths(common, "*.lua", luaFiles))
-        {
-            return false;
-        }
-        for (const std::string &path: luaFiles)
-        {
-            if(luaL_dofile(this->mLuaEnv, path.c_str()) != LUA_OK)
-            {
-                LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
-                return false;
-            }
-        }
-        this->LoadAllFilePath(this->mModulePath);
-        
-       
-        this->AddRequire(common);
-        this->AddRequire(this->mModulePath);       
-        LuaModule * luaModule = this->LoadModule(ServerConfig::Inst()->Name());
-        return luaModule == nullptr || luaModule->Awake();
-    }
+		common = System::FormatPath(common);
+		this->mModulePath = System::FormatPath(module);
+		if (!Helper::Directory::GetFilePaths(common, "*.lua", luaFiles))
+		{
+			return false;
+		}
+		for (const std::string& path : luaFiles)
+		{
+			if (luaL_dofile(this->mLuaEnv, path.c_str()) != LUA_OK)
+			{
+				LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+				return false;
+			}
+		}
+		this->LoadAllFilePath(this->mModulePath);
+
+		this->AddRequire(common);
+		this->AddRequire(this->mModulePath);
+		if (config->GetLuaConfig("main", main))
+		{
+			main = System::FormatPath(main);
+			LuaModule* luaModule = this->LoadModuleByPath(main);
+			return luaModule != nullptr && luaModule->Awake();
+		}
+		return true;
+	}
 
     bool LuaScriptComponent::LoadAllFilePath(const std::string & dir)
     {

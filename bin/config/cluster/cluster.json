@@ -1,4 +1,34 @@
 {
+    "Server": {
+        "AutoAllot": true,
+        "Service": {
+            "User": true,
+            "Node": true,
+            "Log": true,
+            "Gate": true,
+            "MongoDB": true,
+            "Chat": true,
+            "Registry": true,
+            "ServerWeb": true,
+            "Account": true
+        },
+        "Component": [
+            "HttpComponent",
+            "RedisComponent",
+            "HttpWebComponent",
+            "ConsoleComponent",
+            "LuaScriptComponent",
+            "HttpWebComponent",
+            "HttpDebugComponent"
+        ]
+    },
+    "Client": {
+        "Component": [
+            "HttpComponent",
+            "ClientComponent",
+            "LuaScriptComponent"
+        ]
+    },
     "ChatServer": {
         "AutoAllot": true,
         "Service": {
@@ -9,7 +39,6 @@
             "Registry": false
         },
         "Component": [
-            "NodeMgrComponent",
             "LuaScriptComponent"
         ]
     },
@@ -21,13 +50,12 @@
             "Gate": false,
             "Registry": false,
             "MongoDB": false,
-            "HttpBackGround": true
+            "ServerWeb": true
         },
         "Component": [
             "HttpComponent",
             "RedisComponent",
             "HttpWebComponent",
-            "NodeMgrComponent",
             "HttpDebugComponent",
             "LuaScriptComponent"
         ]
@@ -40,10 +68,7 @@
             "Chat": false,
             "User": false,
             "Registry": false
-        },
-        "Component": [
-            "NodeMgrComponent"
-        ]
+        }
     },
     "DataServer": {
         "AutoAllot": true,
@@ -51,10 +76,7 @@
             "Node": true,
             "MongoDB": true,
             "Registry": false
-        },
-        "Component": [
-            "NodeMgrComponent"
-        ]
+        }
     },
     "LogServer": {
         "AutoAllot": false,
@@ -62,19 +84,13 @@
             "Log": true,
             "Node": true,
             "Registry": false
-        },
-        "Component": [
-            "NodeMgrComponent"
-        ]
+        }
     },
     "RegistryServer": {
         "AutoAllot": false,
         "Service": {
             "Node": true,
             "Registry": true
-        },
-        "Component": [
-            "NodeMgrComponent"
-        ]
+        }
     }
 }

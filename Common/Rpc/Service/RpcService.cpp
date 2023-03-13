@@ -4,6 +4,7 @@
 #include"Config/ServiceConfig.h"
 #include"String/StringHelper.h"
 #include"Config/ClusterConfig.h"
+#include"Config/CodeConfig.h"
 #include"Component/InnerNetComponent.h"
 #include"Component/NodeMgrComponent.h"
 #include"Component/InnerNetMessageComponent.h"
@@ -79,7 +80,19 @@ namespace Sentry
 		request->SetType(Tcp::Type::Request);
 		request->SetProto(Tcp::Porto::Protobuf);
 		request->WriteMessage(message);
-		return this->mMessageComponent->Call(address, request);
+		std::shared_ptr<Rpc::Packet> response = this->mMessageComponent->Call(address, request);
+		if(response == nullptr)
+		{
+			LOG_ERROR("call [" << address << "] func [" << func << "] response null");
+			return nullptr;
+		}
+		int code = response->GetCode();
+		if(code != XCode::Successful)
+		{
+			const std::string & desc = CodeConfig::Inst()->GetDesc(code);
+			LOG_INFO("call [" << address << "] func [" << func << "] " << desc);
+		}
+		return response;
 	}
 
 	int RpcService::Send(const std::string& address, const std::string& func, const Message& message)

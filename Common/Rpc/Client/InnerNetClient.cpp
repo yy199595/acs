@@ -1,19 +1,23 @@
-﻿#include"InnerNetClient.h"
+﻿
+#include"InnerNetClient.h"
 #include"App/App.h"
 #include"Client/Rpc.h"
 #include"Guid/Guid.h"
 #include"System/System.h"
 namespace Sentry
 {
-	InnerNetClient::InnerNetClient(IRpc<Rpc::Packet> * component,
-                                   std::shared_ptr<SocketProxy> socket)
+
+	InnerNetClient::InnerNetClient(IRpc<Rpc::Packet>* component, std::shared_ptr<SocketProxy> socket)
 		: TcpContext(socket, 1024 * 1024), mComponent(component)
+	{
+
+	}
+
+	InnerNetClient::InnerNetClient(IRpc<Rpc::Packet> * component,
+                                   std::shared_ptr<SocketProxy> socket, const AuthInfo & info)
+		: TcpContext(socket, 1024 * 1024), mComponent(component), mAuthInfo(info)
     {
         this->mState = Tcp::DecodeState::Head;
-        this->mSrvName = ServerConfig::Inst()->Name();
-        ServerConfig::Inst()->GetLocation("rpc", this->mRpcLocation);
-        ServerConfig::Inst()->GetMember("user", "name", this->mUserName);
-        ServerConfig::Inst()->GetMember("user", "passwd", this->mPassword);
     }
 
 	void InnerNetClient::StartClose()
@@ -200,10 +204,10 @@ namespace Sentry
         {
 			Rpc::Head & head = authMessage->GetHead();
             {
-                head.Add("name", this->mSrvName);
-                head.Add("user", this->mUserName);
-                head.Add("passwd", this->mPassword);
-                head.Add("rpc", this->mRpcLocation);                          
+                head.Add("name", this->mAuthInfo.ServerName);
+                head.Add("user", this->mAuthInfo.UserName);
+                head.Add("passwd", this->mAuthInfo.PassWord);
+                head.Add("rpc", this->mAuthInfo.RpcAddress);
             }
         }
         if(this->SendSync(authMessage) > 0)
@@ -216,4 +220,5 @@ namespace Sentry
             this->CloseSocket(XCode::NetWorkError);
         }
     }
+
 }

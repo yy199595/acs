@@ -21,7 +21,8 @@ namespace Sentry
 {
 
 	App::App() : Unit(0),
-        mStartTime(Helper::Time::NowMilTime())
+        mStartTime(Helper::Time::NowMilTime()),
+				 mThreadId(std::this_thread::get_id())
 	{
         this->mLogicFps = 0;
         this->mTickCount = 0;
@@ -30,7 +31,6 @@ namespace Sentry
         this->mTaskComponent = nullptr;
         this->mTimerComponent = nullptr;
         this->mMessageComponent = nullptr;
-        this->mThreadId = std::this_thread::get_id();
 	}
 
 	bool App::LoadComponent()
@@ -41,11 +41,17 @@ namespace Sentry
 		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
 		this->mMessageComponent = this->GetOrAddComponent<ProtoComponent>();
 
+		unsigned short port = 0;
+		if(ServerConfig::Inst()->GetListen("rpc", port))
+		{
+			LOG_CHECK_RET_FALSE(this->AddComponent<NodeMgrComponent>());
+		}
+
         LOG_CHECK_RET_FALSE(this->AddComponent<TextConfigComponent>());
         //LOG_CHECK_RET_FALSE(this->AddComponent<LocationComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<ThreadComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<LaunchComponent>());
-        //LOG_CHECK_RET_FALSE(this->AddComponent<NodeMgrComponent>());
+
         std::vector<Component *> components;
         if(this->GetComponents(components) > 0)
         {
@@ -102,7 +108,7 @@ namespace Sentry
         this->mMainContext = std::make_unique<Asio::Context>();
         if (!this->LoadComponent())
         {
-            this->GetLogger()->SaveAllLog();
+            this->mLogComponent->SaveAllLog();
 #ifdef __OS_WIN__
             return getchar();
 #endif
@@ -185,6 +191,7 @@ namespace Sentry
     {
         this->mMainContext->stop();
         LOG_WARN("close server successful ");
+        this->mLogComponent->SaveAllLog();
     }
 
 	void App::StartAllComponent()

@@ -9,6 +9,7 @@
 #include"Config/ClusterConfig.h"
 #include"Component/TaskComponent.h"
 #include"App/App.h"
+#include"Config/CodeConfig.h"
 namespace Sentry
 {
     void NodeMgrComponent::AddRpcServer(const std::string& name, const std::string& address)
@@ -212,39 +213,44 @@ namespace Sentry
 
 	void NodeMgrComponent::OnLocalComplete()
 	{
-		const ServerConfig * config = ServerConfig::Inst();
-		RpcService * rpcService = this->mApp->GetService<Registry>();
-        TaskComponent* taskComponent = this->GetComponent<TaskComponent>();
-        while(true)
-        {
-            for (size_t index = 0; index < this->mRegistryAddress.size(); index++)
-            {
-                const std::string & address = this->mRegistryAddress[index];
-                s2s::server::info message;
-                message.set_name(config->Name());
-                config->GetLocation("rpc", *message.mutable_rpc());
-                config->GetLocation("http", *message.mutable_http());
-                std::shared_ptr<s2s::server::list> response = std::make_shared<s2s::server::list>();
-                if(rpcService->Call(address,"Register", message, response) != XCode::Successful)
-                {
-                    this->mIndex++;
-                    LOG_ERROR("register to [" << address << "] failure");
-                    continue;
-                }
-                for(int index = 0; index < response->list_size(); index++)
-                {
-                    const s2s::server::info & info = response->list(index);
-                    {
-                        this->AddRpcServer(info.name(), info.rpc());
-                        this->AddHttpServer(info.name(), info.http());
-                    }
-                }
+		const std::string func("Register");
+		const ServerConfig *config = ServerConfig::Inst();
+		RpcService *rpcService = this->mApp->GetService<Registry>();
+		TaskComponent *taskComponent = this->GetComponent<TaskComponent>();
+		while (true)
+		{
+			for (size_t index = 0; index < this->mRegistryAddress.size(); index++)
+			{
+				s2s::server::info message;
+				{
+					message.set_name(config->Name());
+					config->GetLocation("rpc", *message.mutable_rpc());
+					config->GetLocation("http", *message.mutable_http());
+				}
+				const std::string &address = this->mRegistryAddress[index];
+				std::shared_ptr<s2s::server::list> response = std::make_shared<s2s::server::list>();
+
+				LOG_INFO("start register to [" << address << "]");
+				int code = rpcService->Call(address, func, response);
+				if (code != XCode::Successful)
+				{
+					this->mIndex++;
+					LOG_ERROR("register to [" << address << "] " << CodeConfig::Inst()->GetDesc(code));
+					continue;
+				}
+				for (int index = 0; index < response->list_size(); index++)
+				{
+					const s2s::server::info &info = response->list(index);
+					{
+						this->AddRpcServer(info.name(), info.rpc());
+						this->AddHttpServer(info.name(), info.http());
+					}
+				}
 				LOG_INFO("register to [" << address << "] successful");
-                taskComponent->Start(&NodeMgrComponent::PingRegistryServer, this);
-                return;
-            }
-            taskComponent->Sleep(5 * 1000);
-        }
+				taskComponent->Start(&NodeMgrComponent::PingRegistryServer, this);
+				return;
+			}
+		}
 	}
 	void NodeMgrComponent::PingRegistryServer()
 	{

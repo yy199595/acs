@@ -1,176 +1,146 @@
 {
-	"Log": {
-		"Login": {
-			"Async": false,
-			"Type": "Server",
-			"Request": "s2s.log.login"
-		}	
-	},
-	"WatchDog": {
-		"Ping": {
-			"Async": false,
-			"Type": "Server"
-		},
-		"ShowLog": {
-			"Async": false,
-			"Type": "Server",
-			"Request": "s2s.log.show"
-		}
-	},
-	"Gate": {
-		"Ping": {
-			"Async": false,
-			"Type": "Client"
-		},
-		"Allocation": {
-			"Async": false,
-			"Type": "Server",
-			"Request": "com.type.int64",
-			"Response": "s2s.allot.response"
-		}
-	},
-	"Registry": {
-		"Ping":{
-			"Async":false
-		},
-		"Query":{
-			"Async":false,
-			"Request":"com.type.string",
-			"Response":"s2s.server.list"
-		},
-		"Register": {
-			"Async": true,
-			"Request": "com.array.string",
-			"Response": "s2s.server.list"
-		},
-		"UnRegister": {
-			"Async": true,
-			"Response": "com.type.string"
-		}
-	},
-	"MysqlDB": {
-		"Add": {
-			"Async": true,
-			"Type": "Server",
-			"Request": "db.mysql.add"
-		},
-		"Save": {
-			"Async": true,
-			"Type": "Server",
-			"Request": "db.mysql.save"
-		},
-		"Query": {
-			"Async": true,
-			"Type": "Server",
-			"Request": "db.mysql.query",
-			"Response": "db.mysql.response"
-		},
-		"Update": {
-			"Async": true,
-			"Type": "Server",
-			"Request": "db.mysql.update"
-		},
-		"Create": {
-			"Async": true,
-			"Type": "Server",
-			"Request": "db.mysql.create"
-		},
-		"Delete": {
-			"Async": true,
-			"Type": "Server",
-			"Request": "db.mysql.remove"
-		}
-	},
-	"Node": {
-		"Ping": {
-			"Async": false
-		},
-		"Stop": {
-			"Async": true
-		},
-		"Hotfix": {
-			"Async": false
-		},
-		"LoadConfig": {
-			"Async": false
-		},
-		"Join": {
-			"Async": false,
-			"Request": "s2s.server.info"
-		},
-		"Exit": {
-			"Async": false,
-			"Request": "s2s.server.info"
-		},
-		"RunInfo": {
-			"Async": false,
-			"Response": "google.protobuf.StringValue"
-		},
-		"AddAddress": {
-			"Async": false,
-			"Request": "s2s.server.list"
-		},
-		"DelAddress": {
-			"Async": false,
-			"Response": "com.array.string"
-		}
-	},
-	"User": {
-		"Login": {
-			"Async": false,
-			"Type": "Server",
-			"Request": "s2s.user.login"
-		},
-		"Logout": {
-			"Async": false,
-			"Type": "Server",
-			"Request": "s2s.user.logout"
-		}
-	},
-	"MongoDB": {
-		"Insert": {
-			"Async": true,
-			"Type": "Server",
-			"Request": "db.mongo.insert"
-		},
-		"Delete": {
-			"Async": true,
-			"Type": "Server",
-			"Request": "db.mongo.remove"
-		},
-		"Query": {
-			"Async": true,
-			"Type": "Client",
-			"Request": "db.mongo.query.request",
-			"Response": "db.mongo.query.response"
-		},
-		"Update": {
-			"Async": true,
-			"Type": "Server",
-			"Request": "db.mongo.update"
-		},
-		"SetIndex": {
-			"Async": true,
-			"Type": "Server",
-			"Request": "db.mongo.index"
-		},
-		"RunCommand": {
-			"Async": true,
-			"Type": "Server",
-			"Request": "db.mongo.command.request",
-			"Response": "db.mongo.command.response"
-		}
-	},
-	"Chat": {
-		"Chat": {
-			"Async": true,
-			"Type": "Client",
-			"CallWay": "Net",
-			"Request": "c2s.chat.request"
-		},
-		"Ping": {
-			"Async": false,
-			"Type": "Client"
-		}
-	}
+    "Log": {
+        "Login": {
+            "Request": "s2s.log.login"
+        }
+    },
+    "WatchDog": {
+        "Ping": {},
+        "ShowLog": {
+            "Request": "s2s.log.show"
+        }
+    },
+    "Gate": {
+        "Ping": {
+            "Async": false,
+            "Type": "Client"
+        },
+        "Allocation": {
+            "Request": "com.type.int64",
+            "Response": "s2s.allot.response"
+        }
+    },
+    "Registry": {
+        "Ping": {
+            "Async": false
+        },
+        "Query": {
+            "Async": false,
+            "Request": "com.type.string",
+            "Response": "s2s.server.list"
+        },
+        "Register": {
+            "Async": true,
+            "Request": "com.array.string",
+            "Response": "s2s.server.list"
+        },
+        "UnRegister": {
+            "Async": true,
+            "Response": "com.type.string"
+        }
+    },
+    "MysqlDB": {
+        "Add": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "db.mysql.add"
+        },
+        "Save": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "db.mysql.save"
+        },
+        "Query": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "db.mysql.query",
+            "Response": "db.mysql.response"
+        },
+        "Update": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "db.mysql.update"
+        },
+        "Create": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "db.mysql.create"
+        },
+        "Delete": {
+            "Async": true,
+            "Type": "Server",
+            "Request": "db.mysql.remove"
+        }
+    },
+    "Node": {
+        "Ping": {},
+        "Stop": {},
+        "Hotfix": {},
+        "LoadConfig": {},
+        "Join": {
+            "Request": "s2s.server.info"
+        },
+        "Exit": {
+            "Request": "s2s.server.info"
+        },
+        "RunInfo": {
+            "Response": "google.protobuf.StringValue"
+        },
+        "AddAddress": {
+            "Request": "s2s.server.list"
+        },
+        "DelAddress": {
+            "Response": "com.array.string"
+        }
+    },
+    "User": {
+        "Login": {
+            "Type": "Server",
+            "Request": "s2s.user.login"
+        },
+        "Logout": {
+            "Type": "Server",
+            "Request": "s2s.user.logout"
+        }
+    },
+    "MongoDB": {
+        "Insert": {
+            "Async": true,
+            "Request": "db.mongo.insert"
+        },
+        "Delete": {
+            "Async": true,
+            "Request": "db.mongo.remove"
+        },
+        "Query": {
+            "Async": true,
+            "Type": "Client",
+            "Request": "db.mongo.query.request",
+            "Response": "db.mongo.query.response"
+        },
+        "Update": {
+            "Async": true,
+            "Request": "db.mongo.update"
+        },
+        "SetIndex": {
+            "Async": true,
+            "Request": "db.mongo.index"
+        },
+        "RunCommand": {
+            "Async": true,
+            "Request": "db.mongo.command.request",
+            "Response": "db.mongo.command.response"
+        }
+    },
+    "Chat": {
+        "Chat": {
+            "Async": true,
+            "Type": "Client",
+            "Request": "c2s.chat.request"
+        },
+        "Ping": {
+            "Async": false,
+            "Type": "Client"
+        }
+    }
 }

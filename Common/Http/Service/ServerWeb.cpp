@@ -1,7 +1,7 @@
 //
 // Created by zmhy0073 on 2022/8/29.
 //
-#include"HttpBackGround.h"
+#include"ServerWeb.h"
 #include"System/System.h"
 #include"App/App.h"
 #include"Config/CodeConfig.h"
@@ -10,24 +10,24 @@
 #include"Component/NodeMgrComponent.h"
 namespace Sentry
 {
-    bool HttpBackGround::OnStartService(HttpServiceRegister &serviceRegister)
+    bool ServerWeb::OnStartService(HttpServiceRegister &serviceRegister)
     {
-        serviceRegister.Bind("Info", &HttpBackGround::Info);
-        serviceRegister.Bind("Ping", &HttpBackGround::Ping);
-        serviceRegister.Bind("Hello", &HttpBackGround::Hello);
-		serviceRegister.Bind("Sleep", &HttpBackGround::Sleep);
-		serviceRegister.Bind("Hotfix", &HttpBackGround::Hotfix);
-		serviceRegister.Bind("DownLoad", &HttpBackGround::DownLoad);
+        serviceRegister.Bind("Info", &ServerWeb::Info);
+        serviceRegister.Bind("Ping", &ServerWeb::Ping);
+        serviceRegister.Bind("Hello", &ServerWeb::Hello);
+		serviceRegister.Bind("Sleep", &ServerWeb::Sleep);
+		serviceRegister.Bind("Hotfix", &ServerWeb::Hotfix);
+		serviceRegister.Bind("DownLoad", &ServerWeb::DownLoad);
         return true;
     }
 
-	int HttpBackGround::Ping(const Http::Request &request, Http::Response &response)
+	int ServerWeb::Ping(const Http::Request &request, Http::Response &response)
     {
         response.Str(HttpStatus::OK,"pong");
         return XCode::Successful;
     }
 
-	int HttpBackGround::Hotfix(Json::Writer&response)
+	int ServerWeb::Hotfix(Json::Writer&response)
 	{
 		RpcService * rpcService = this->mApp->GetService<Node>();
 		NodeMgrComponent * locationComponent = this->GetComponent<NodeMgrComponent>();
@@ -46,7 +46,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	int HttpBackGround::Sleep(const Json::Reader &request, Json::Writer&response)
+	int ServerWeb::Sleep(const Json::Reader &request, Json::Writer&response)
     {
         std::string time;
         request.GetMember("time", time);
@@ -55,18 +55,18 @@ namespace Sentry
         return XCode::Successful;
     }
 
-	int HttpBackGround::Hello(const Http::Request &request, Http::Response &response)
+	int ServerWeb::Hello(const Http::Request &request, Http::Response &response)
     {
 		response.Str(HttpStatus::OK,"hello");
 		return XCode::Successful;
     }
 
-	int HttpBackGround::DownLoad(const Http::Request &request, Http::Response &response)
+	int ServerWeb::DownLoad(const Http::Request &request, Http::Response &response)
     {
         return XCode::Successful;
     }
 
-	int HttpBackGround::Info(Json::Writer&response)
+	int ServerWeb::Info(Json::Writer&response)
     {
 		std::string address;
 		Node * innerService = this->GetComponent<Node>();

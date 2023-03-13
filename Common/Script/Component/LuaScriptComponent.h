@@ -18,6 +18,7 @@ namespace Sentry
 		double CollectGarbage();
 		Lua::LuaModule * GetModule(const std::string & name);
 		Lua::LuaModule * LoadModule(const std::string & name);
+		Lua::LuaModule * LoadModuleByPath(const std::string & name);
 		struct lua_State* GetLuaEnv() { return this->mLuaEnv; }
         bool GetFunction(const std::string & tab, const std::string & func);
 	 protected:
