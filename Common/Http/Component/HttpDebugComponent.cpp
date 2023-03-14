@@ -31,15 +31,14 @@ namespace Sentry
 		}
 		else if (Helper::Str::Split(path, "/", splitPath) != 2)
 		{
-			this->Send(address, "request path error");			
+			this->Send(address, "request path error");
 		}
 		else
 		{
 			const std::string& service = splitPath[0];
 			const std::string& method = splitPath[1];
 			std::string fullName = fmt::format("{0}.{1}", service, method);
-			const RpcMethodConfig * config = RpcConfig::Inst()->GetMethodConfig(fullName);
-			const RpcServiceConfig* rpcServiceConfig = RpcConfig::Inst()->GetConfig(service);
+			const RpcMethodConfig* config = RpcConfig::Inst()->GetMethodConfig(fullName);
 			if (config == nullptr)
 			{
 				this->Send(address, "call rpc method not find");
@@ -47,7 +46,7 @@ namespace Sentry
 			}
 			long long value = 0;
 			std::shared_ptr<Rpc::Packet> message(new Rpc::Packet());
-			{				
+			{
 				Rpc::Head& head = message->GetHead();
 				if (request->Header().Get("id", value))
 				{
@@ -57,7 +56,7 @@ namespace Sentry
 				head.Add("func", fullName);
 				message->SetProto(Tcp::Porto::Json);
 				message->SetType(Tcp::Type::Request);
-				std::shared_ptr<Http::PostRequest> postRequest = 
+				std::shared_ptr<Http::PostRequest> postRequest =
 					std::dynamic_pointer_cast<Http::PostRequest>(request);
 				if (postRequest != nullptr)
 				{
