@@ -40,6 +40,7 @@ namespace Sentry
         void OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t) final;
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	private:
+		bool mIsClient;
 		AuthInfo mAuthInfo;
         Tcp::DecodeState mState;
         IRpc<Rpc::Packet> * mComponent;

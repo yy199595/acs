@@ -5,4 +5,3 @@ start ./Debug/app.exe ./config/server.json GateServer
 start ./Debug/app.exe ./config/server.json ChatServer
 start ./Debug/app.exe ./config/server.json HttpServer
 start ./Debug/app.exe ./config/server.json LogServer
-start ./Debug/app.exe ./config/server.json WatchDogServer

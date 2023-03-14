@@ -8,14 +8,14 @@ namespace Sentry
 {
 
 	InnerNetClient::InnerNetClient(IRpc<Rpc::Packet>* component, std::shared_ptr<SocketProxy> socket)
-		: TcpContext(socket, 1024 * 1024), mComponent(component)
+		: TcpContext(socket, 1024 * 1024), mComponent(component), mIsClient(false)
 	{
-
+        this->mState = Tcp::DecodeState::Head;
 	}
 
 	InnerNetClient::InnerNetClient(IRpc<Rpc::Packet> * component,
                                    std::shared_ptr<SocketProxy> socket, const AuthInfo & info)
-		: TcpContext(socket, 1024 * 1024), mComponent(component), mAuthInfo(info)
+		: TcpContext(socket, 1024 * 1024), mComponent(component), mAuthInfo(info), mIsClient(true)
     {
         this->mState = Tcp::DecodeState::Head;
     }
@@ -62,9 +62,11 @@ namespace Sentry
             CONSOLE_LOG_ERROR("send inner message error : [" << address << "]");
         }
 #endif
-        if (code && this->mSocket->IsRemote())
+        if (code && this->mIsClient)
         {
-            this->Connect();            
+            this->Connect();
+            const std::string& address = this->mSocket->GetAddress();
+            CONSOLE_LOG_INFO("start connect server [" << address << "]");
         }
         else
         {
@@ -168,6 +170,11 @@ namespace Sentry
         Asio::Context & t = this->mSocket->GetThread();
         t.post(std::bind(&InnerNetClient::ReceiveMessage, this, RPC_PACK_HEAD_LEN));
 #endif
+#ifdef __DEBUG__
+        const std::string& address = this->mSocket->GetAddress();
+        CONSOLE_LOG_INFO("start receive message from [" << address << "]");
+#endif // __DEBUG__
+
 	}
 
 	void InnerNetClient::OnConnect(const asio::error_code& error, int count)
@@ -194,9 +201,12 @@ namespace Sentry
 			this->mTimer->async_wait(std::bind(&InnerNetClient::Connect, this->shared_from_this()));
 			return;
 		}
-        
+    
 		asio::io_service & io = App::Inst()->MainThread();
 		const std::string & address = this->mSocket->GetAddress();
+#ifdef __DEBUG__     
+        CONSOLE_LOG_INFO("connect server [" << address << "] successful");
+#endif
 		io.post(std::bind(&IRpc<Rpc::Packet>::OnConnectSuccessful, this->mComponent, address));
 
         std::shared_ptr<Rpc::Packet> authMessage =

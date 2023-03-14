@@ -5,14 +5,12 @@ namespace Sentry
 	SocketProxy::SocketProxy(asio::io_service& thread)
 		: mNetThread(thread)
 	{
-		this->mIsRemote = true;
 		this->mSocket = new Asio::Socket(this->mNetThread);
 	}
 
     void SocketProxy::Init()
     {
         asio::error_code code;
-        this->mIsRemote = false;
         Asio::EndPoint endPoint = this->mSocket->remote_endpoint(code);
         if (this->mSocket->is_open() && !code)
         {
