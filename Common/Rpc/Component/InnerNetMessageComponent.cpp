@@ -112,7 +112,7 @@ namespace Sentry
     std::shared_ptr<Rpc::Packet> InnerNetMessageComponent::Call(
         const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
-        int rpcId = this->mNuberPool.Pop();
+        int rpcId = this->mNumberPool.Pop();
         message->GetHead().Remove("address");
         std::shared_ptr<RpcTaskSource> taskSource = std::make_shared<RpcTaskSource>(rpcId);
         {
@@ -120,7 +120,7 @@ namespace Sentry
         }
         if (!this->mInnerComponent->Send(address, message))
         {
-			this->mNuberPool.Push(rpcId);
+			this->mNumberPool.Push(rpcId);
             return nullptr;
         }
         return this->AddTask(rpcId, taskSource)->Await();

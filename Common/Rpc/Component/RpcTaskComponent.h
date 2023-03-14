@@ -21,16 +21,17 @@ namespace Sentry
         T1 * AddTask(K k, std::shared_ptr<T1> task)
         {
             auto iter = this->mTasks.find(k);
-            if(iter == this->mTasks.end())
+            if(iter != this->mTasks.end())
             {
-                this->mTasks.emplace(k, task);
-				LOG_ERROR("add task already exist");
+                LOG_ERROR("add task already exist");
+                return nullptr;
             }
+            this->mTasks.emplace(k, task);
             return task.get();
         }
         bool OnResponse(K key, std::shared_ptr<T> message);
 	protected:
-		virtual void OnTaskComplate(K key) { }
+		virtual void OnTaskComplete(K key) { }
         virtual void OnNotFindResponse(K key, std::shared_ptr<T> message);
     private:
         std::unordered_map<K, RpcTask> mTasks;
@@ -61,7 +62,7 @@ namespace Sentry
         RpcTask rpcTask = iter->second;
         rpcTask->OnResponse(message);
 		this->mTasks.erase(iter);
-		this->OnTaskComplate(key);
+		this->OnTaskComplete(key);
 		return true;
     }
 

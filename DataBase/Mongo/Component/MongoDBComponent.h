@@ -50,7 +50,7 @@ namespace Sentry
 	 private:
 		void OnConnectSuccessful(const std::string &address) final;
 		void OnMessage(std::shared_ptr<CommandResponse> message) final;
-		void OnTaskComplate(int key) final { this->mRequestId.Push(key); }
+		void OnTaskComplete(int key) final { this->mRequestId.Push(key); }
 	private:
 		 unsigned int mWaitCount;
 		Util::NumberBuilder<int, 10> mRequestId;

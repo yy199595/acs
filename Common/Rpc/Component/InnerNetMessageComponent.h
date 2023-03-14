@@ -31,14 +31,14 @@ namespace Sentry
 		bool Awake() final;
 		bool LateAwake() final;
 		int OnRequest(std::shared_ptr<Rpc::Packet> request);
-		void OnTaskComplate(int key) final { this->mNuberPool.Push(key); }
+		void OnTaskComplete(int key) final { this->mNumberPool.Push(key); }
 		void Send(const std::string& address, int code, std::shared_ptr<Rpc::Packet> pack);
         void Invoke(const RpcMethodConfig * config, std::shared_ptr<Rpc::Packet> message);
     private:
         std::string mFullName;
 		class TaskComponent* mTaskComponent;
 		class TimerComponent* mTimerComponent;
-		Util::NumberBuilder<int, 1> mNuberPool;
+		Util::NumberBuilder<int, 1> mNumberPool;
 		class OuterNetComponent* mOuterComponent;
 		class InnerNetComponent* mInnerComponent;
 	};
