@@ -50,8 +50,8 @@ namespace Client
         void OnMessage(std::shared_ptr<Rpc::Packet> message) final;
     protected:
         bool LateAwake() final;
-        void OnAddTask(RpcTask task) final;
-		void OnDelTask(long long key, RpcTask task) final;
+        //void OnAddTask(RpcTask task) final;
+		//void OnDelTask(long long key, RpcTask task) final;
         void StartClose(const std::string &address) final;
         void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
         void OnCloseSocket(const std::string &address, int code) final;

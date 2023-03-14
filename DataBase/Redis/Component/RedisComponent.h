@@ -10,7 +10,7 @@ namespace Sentry
 {
 	class ThreadComponent;
 
-    class RedisComponent final : public RpcTaskComponent<long long, RedisResponse>,
+    class RedisComponent final : public RpcTaskComponent<int, RedisResponse>,
 								 public ILuaRegister, public IStart, public IRpc<RedisResponse>
 	{
 	 public:
@@ -36,7 +36,8 @@ namespace Sentry
         bool Start() final;
         bool LateAwake() final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
-    private:
+		void OnTaskComplate(int key) final { this->mNumberPool.Push(key);}
+	private:
         Util::NumberBuilder<int, 1> mNumberPool;
         std::vector<std::shared_ptr<TcpRedisClient>> mRedisClients;
     };

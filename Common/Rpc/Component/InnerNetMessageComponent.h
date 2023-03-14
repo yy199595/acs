@@ -18,7 +18,7 @@ namespace Sentry
 		long long Time;
 	};
 #endif
-    class InnerNetMessageComponent : public RpcTaskComponent<long long, Rpc::Packet>
+    class InnerNetMessageComponent : public RpcTaskComponent<int, Rpc::Packet>
 	{
 	 public:
 		InnerNetMessageComponent() = default;
@@ -31,6 +31,7 @@ namespace Sentry
 		bool Awake() final;
 		bool LateAwake() final;
 		int OnRequest(std::shared_ptr<Rpc::Packet> request);
+		void OnTaskComplate(int key) final { this->mNuberPool.Push(key); }
 		void Send(const std::string& address, int code, std::shared_ptr<Rpc::Packet> pack);
         void Invoke(const RpcMethodConfig * config, std::shared_ptr<Rpc::Packet> message);
     private:

@@ -123,11 +123,7 @@ namespace Sentry
 			this->mNuberPool.Push(rpcId);
             return nullptr;
         }
-        std::shared_ptr<Rpc::Packet> response = this->AddTask(rpcId, taskSource)->Await();
-        {
-            this->mNuberPool.Push(rpcId);
-        }
-        return response;
+        return this->AddTask(rpcId, taskSource)->Await();
     }
 
     void InnerNetMessageComponent::OnMessage(std::shared_ptr<Rpc::Packet> message)

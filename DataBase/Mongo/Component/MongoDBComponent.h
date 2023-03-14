@@ -36,8 +36,6 @@ namespace Sentry
 	public:
 		MongoDBComponent();
 		~MongoDBComponent() final = default;
-	private:
-		void OnDelTask(int taskId, RpcTask task) final;
 	public:
         bool Start() final;
         void CloseClients();
@@ -52,7 +50,8 @@ namespace Sentry
 	 private:
 		void OnConnectSuccessful(const std::string &address) final;
 		void OnMessage(std::shared_ptr<CommandResponse> message) final;
-	 private:
+		void OnTaskComplate(int key) final { this->mRequestId.Push(key); }
+	private:
 		 unsigned int mWaitCount;
 		Util::NumberBuilder<int, 10> mRequestId;
         std::vector<std::shared_ptr<TcpMongoClient>> mMongoClients;

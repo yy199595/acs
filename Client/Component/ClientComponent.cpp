@@ -114,21 +114,21 @@ namespace Client
 		return this->AddTask(clientRpcTask->GetRpcId(), clientRpcTask)->Await();
 	}
 
-	void ClientComponent::OnAddTask(RpcTask rpctask)
-	{
-		//LOG_WARN(this->GetName() << " add new task " << rpctask->GetRpcId());
-	}
-
-	void ClientComponent::OnDelTask(long long key, RpcTask task)
-	{
-		auto iter = this->mTimers.find(key);
-		if(iter != this->mTimers.end())
-		{
-            long long timerId = iter->second;
-            this->mTimerComponent->CancelTimer(timerId);
-			this->mTimers.erase(iter);
-		}
-	}
+//	void ClientComponent::OnAddTask(RpcTask rpctask)
+//	{
+//		//LOG_WARN(this->GetName() << " add new task " << rpctask->GetRpcId());
+//	}
+//
+//	void ClientComponent::OnDelTask(long long key, RpcTask task)
+//	{
+//		auto iter = this->mTimers.find(key);
+//		if(iter != this->mTimers.end())
+//		{
+//            long long timerId = iter->second;
+//            this->mTimerComponent->CancelTimer(timerId);
+//			this->mTimers.erase(iter);
+//		}
+//	}
 
 	bool ClientComponent::New(const std::string& ip, unsigned short port)
 	{

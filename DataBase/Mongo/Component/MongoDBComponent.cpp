@@ -82,12 +82,6 @@ namespace Sentry
         return returnClient.get();
     }
 
-	void MongoDBComponent::OnDelTask(int taskId, RpcTask task)
-	{
-        assert(this->mApp->IsMainThread());
-        this->mRequestId.Push(taskId);
-	}
-
     void MongoDBComponent::Send(TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request)
     {
         this->mWaitCount++;
