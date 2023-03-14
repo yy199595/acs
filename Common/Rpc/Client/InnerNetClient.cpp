@@ -195,7 +195,8 @@ namespace Sentry
 #ifdef __DEBUG__
             const std::string& address = this->mSocket->GetAddress();
             CONSOLE_LOG_ERROR("connect inner error : [" << address << "]");
-#endif // 
+#endif //
+			this->mSocket->Close();
 			Asio::Context & context = this->mSocket->GetThread();
 			this->mTimer = std::make_unique<asio::steady_timer>(context, std::chrono::seconds(5));
 			this->mTimer->async_wait(std::bind(&InnerNetClient::Connect, this->shared_from_this()));

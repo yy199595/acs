@@ -56,7 +56,6 @@ namespace Sentry
 		const std::string& rpc = request.rpc();
 		const std::string& http = request.http();
 		const std::string& name = request.name();
-		request.PrintDebugString();
 		this->mNodeComponent->AddRpcServer(name, rpc);
 		this->mNodeComponent->AddHttpServer(name, http);
 		RpcService* rpcService = this->mApp->GetService<Node>();

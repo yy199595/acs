@@ -35,7 +35,6 @@ namespace Tcp
 	{
         Asio::Code code;
         this->mConnectCount++;
-		assert(this->mSocket->IsRemote());
 		unsigned short port = this->mSocket->GetPort();
 		const std::string& ip = this->mSocket->GetIp();
         Asio::Socket & tcpSocket = this->mSocket->GetSocket();

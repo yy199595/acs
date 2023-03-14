@@ -29,7 +29,6 @@ namespace Sentry
         }
 		this->mIp = ip;
 		this->mPort = port;
-		this->mIsRemote = true;
         this->mAddress = fmt::format("{0}:{1}", ip, port);
     }
 
