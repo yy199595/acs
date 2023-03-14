@@ -149,9 +149,11 @@ namespace Sentry
             std::shared_ptr<RedisResponse> response = this->SyncCommand(authCommand);
             if(response == nullptr || !response->IsOk())
             {
-                CONSOLE_LOG_ERROR("auth redis user faliure");
-                return false;
-            }
+				this->mIndex++;
+				this->mSocket->Close();
+                CONSOLE_LOG_ERROR("auth redis user failure");
+				return this->AuthUser();
+			}
         }
 
         //切换数据库

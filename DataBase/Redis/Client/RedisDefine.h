@@ -49,8 +49,8 @@ namespace Sentry
     public:
 		const std::string ToJson();
 		int Serailize(std::ostream &os) final;
-		std::shared_ptr<RedisTask> MakeTask(int ms = 0);
-        std::shared_ptr<LuaRedisTask> MakeLuaTask(lua_State * lua, int ms = 0);
+		std::shared_ptr<RedisTask> MakeTask(int id);
+        std::shared_ptr<LuaRedisTask> MakeLuaTask(lua_State * lua, int id);
     public:
 		template<typename ... Args>
 		static std::shared_ptr<RedisRequest> Make(const std::string & cmd, Args &&... args);
@@ -66,8 +66,7 @@ namespace Sentry
 		void AddParameter(const Message & message);
 		void AddParameter(const std::string & value);
 		void AddString(const char * str, size_t size);
-
-        long long GetTaskId() const { return this->mTaskId;}
+        int GetTaskId() const { return this->mTaskId;}
         const std::string & GetCommand() const { return this->mCommand;}
 	private:
         static void Encode(std::shared_ptr<RedisRequest> self) {}
@@ -78,7 +77,7 @@ namespace Sentry
 			RedisRequest::Encode(self, std::forward<Args>(args)...);
         }
     private:
-        long long mTaskId;
+        int mTaskId;
         std::string mCommand;
         std::list<std::string> mParameters;
     };
@@ -111,8 +110,8 @@ namespace Sentry
     public:
         int OnRecvLine(std::istream & os);
         int OnRecvMessage(std::istream & os);
-		long long TaskId() const { return this->mTaskId; }
-        inline void SetTaskId(long long id) { this->mTaskId = id; }
+		int TaskId() const { return this->mTaskId; }
+        inline void SetTaskId(int id) { this->mTaskId = id; }
     public:
 		bool HasError();
 		template<typename T>
@@ -124,11 +123,11 @@ namespace Sentry
         const std::string & GetString() const { return this->mString;}
         const std::vector<RedisAny *> & GetArray() const { return this->mArray; }
     private:
-        int mDataSize;
+		int mTaskId;
+		int mDataSize;
         int mLineCount;
         int mDataCount;
         long long mNumber;
-		long long mTaskId;
         std::string mString;
         RedisRespType mType;
         std::vector<RedisAny *> mArray;

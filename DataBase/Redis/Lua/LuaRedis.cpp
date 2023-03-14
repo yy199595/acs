@@ -22,12 +22,6 @@ namespace Lua
             return 0;
         }
         const char* command = luaL_checkstring(lua, 1);
-        TcpRedisClient * redisClientContext = redisComponent->GetClient();
-        if (redisClientContext == nullptr)
-        {
-            luaL_error(lua, "allot redis client error");
-            return 0;
-        }
         std::shared_ptr<RedisRequest> request(new RedisRequest(command));
         int count = (int) luaL_len(lua, 2);
         for (int i = 0; i < count; i++)
@@ -53,10 +47,9 @@ namespace Lua
             }
             lua_pop(lua, 1);
         }
-
-        std::shared_ptr<LuaRedisTask> luaRedisTask = request->MakeLuaTask(lua);
-        long long id = luaRedisTask->GetRpcId();
-		redisClientContext->Send(request);
+		int id = 0;
+		redisComponent->Send(request, id);
+        std::shared_ptr<LuaRedisTask> luaRedisTask = request->MakeLuaTask(lua, id);
         return redisComponent->AddTask(id, luaRedisTask)->Await();
     }
 
@@ -92,16 +85,16 @@ namespace Lua
             luaL_error(lua, "parameter muset table or string");
             return 0;
         }
-        TcpRedisClient * redisClientContext = redisComponent->GetClient();
-        if (redisClientContext == nullptr)
-        {
-            luaL_error(lua, "allot redis client error");
-            return 0;
-        }
-        std::shared_ptr<RedisRequest> request = redisScriptComponent->MakeLuaRequest(fullName, json);
 
-		redisClientContext->Send(request);
-        std::shared_ptr<LuaRedisTask> luaRedisTask = request->MakeLuaTask(lua);
+		int id = 0;
+		std::shared_ptr<RedisRequest> request =
+			redisScriptComponent->MakeLuaRequest(fullName, json);
+		if(!redisComponent->Send(request, id))
+		{
+			luaL_error(lua, "send redis cmd error");
+			return 0;
+		}
+        std::shared_ptr<LuaRedisTask> luaRedisTask = request->MakeLuaTask(lua, id);
         return redisComponent->AddTask(luaRedisTask->GetRpcId(), luaRedisTask)->Await();
     }
 
@@ -114,13 +107,8 @@ namespace Lua
             return 0;
         }
         const char* command = luaL_checkstring(lua, 1);
-        TcpRedisClient* redisClientContext = redisComponent->GetClient();
-        if (redisClientContext == nullptr)
-        {
-            luaL_error(lua, "allot redis client error");
-            return 0;
-        }
-        std::shared_ptr<RedisRequest> request(new RedisRequest(command));
+        std::shared_ptr<RedisRequest> request =
+			std::make_shared<RedisRequest>(command);
         int count = (int)luaL_len(lua, 2);
         for (int i = 0; i < count; i++)
         {
@@ -145,7 +133,10 @@ namespace Lua
             }
             lua_pop(lua, 1);
         }
-        redisClientContext->Send(request);
+		if(!redisComponent->Send(request))
+		{
+			luaL_error(lua, "send redis cmd error");
+		}
         return 0;
     }
 }

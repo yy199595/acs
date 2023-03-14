@@ -40,7 +40,7 @@ namespace Sentry
 
     bool RedisComponent::Start()
 	{
-		if (!this->Ping(this->GetClient()))
+		if (!this->Ping(0))
 		{
 			CONSOLE_LOG_ERROR("start  redis client error");
 			return false;
@@ -65,15 +65,25 @@ namespace Sentry
         return redisClient.get();
     }
 
-    bool RedisComponent::Ping(TcpRedisClient * redisClient)
+    bool RedisComponent::Ping(size_t index)
     {
-        std::shared_ptr<RedisRequest> request = RedisRequest::Make("PING");
-        std::shared_ptr<RedisResponse> response = this->Run(redisClient, request);
+        std::shared_ptr<RedisRequest> request =
+			RedisRequest::Make("PING");
+        std::shared_ptr<RedisResponse> response = this->Run(request);
         return response != nullptr && !response->HasError();
     }
 
-    TcpRedisClient * RedisComponent::GetClient()
+    TcpRedisClient * RedisComponent::GetClient(size_t index)
     {
+		if(this->mRedisClients.empty())
+		{
+			return nullptr;
+		}
+		if(index > 0)
+		{
+			index = index % this->mRedisClients.size();
+			return this->mRedisClients[index].get();
+		}
         std::shared_ptr<TcpRedisClient> tempRedisClint = this->mRedisClients.front();
         for (std::shared_ptr<TcpRedisClient> & redisClient: this->mRedisClients)
         {
@@ -89,36 +99,27 @@ namespace Sentry
         return tempRedisClint.get();
     }
 
-    std::shared_ptr<RedisResponse> RedisComponent::Run(
-        TcpRedisClient * redisClientContext, std::shared_ptr<RedisRequest> request)
+    std::shared_ptr<RedisResponse> RedisComponent::Run(std::shared_ptr<RedisRequest> request)
     {
 #ifdef __DEBUG__
         ElapsedTimer elapsedTimer;
 #endif
-		redisClientContext->Send(request);
-        int taksId = this->mNumberPool.Pop();
-		std::shared_ptr<RedisTask> redisTask = request->MakeTask(taksId);
-		std::shared_ptr<RedisResponse> redisResponse = this->AddTask(taksId, redisTask)->Await();
+		int taskId = 0;
+		if(!this->Send(request, taskId))
+		{
+			return nullptr;
+		}
+		std::shared_ptr<RedisTask> redisTask = request->MakeTask(taskId);
+		std::shared_ptr<RedisResponse> redisResponse = this->AddTask(taskId, redisTask)->Await();
 #ifdef __DEBUG__
         LOG_INFO(request->GetCommand() << " use time = [" << elapsedTimer.GetMs() << "ms]");
 #endif
-        this->mNumberPool.Push(taksId);
         if (redisResponse != nullptr && redisResponse->HasError())
         {
             LOG_ERROR(request->ToJson());
             LOG_ERROR(redisResponse->GetString());
         }
         return redisResponse;
-    }
-
-    std::shared_ptr<RedisResponse> RedisComponent::Run(std::shared_ptr<RedisRequest> request)
-    {
-        TcpRedisClient * redisClientContext = this->GetClient();
-        if(redisClientContext == nullptr)
-        {
-            return nullptr;
-        }
-        return this->Run(redisClientContext, request);
     }
 
 	void RedisComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
@@ -128,4 +129,25 @@ namespace Sentry
 		luaRegister.PushExtensionFunction("Call", Lua::Redis::Call);
         luaRegister.PushExtensionFunction("Send", Lua::Redis::Send);
     }
+	bool RedisComponent::Send(std::shared_ptr<RedisRequest> request)
+	{
+		TcpRedisClient * redisClientContext = this->GetClient();
+		if(redisClientContext == nullptr)
+		{
+			return false;
+		}
+		redisClientContext->Send(request);
+		return true;
+	}
+	bool RedisComponent::Send(std::shared_ptr<RedisRequest> request, int& id)
+	{
+		TcpRedisClient * redisClientContext = this->GetClient();
+		if(redisClientContext == nullptr)
+		{
+			return false;
+		}
+		id = this->mNumberPool.Pop();
+		redisClientContext->Send(request);
+		return true;
+	}
 }

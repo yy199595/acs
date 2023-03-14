@@ -14,34 +14,28 @@ namespace Sentry
     long long RedisStringComponent::AddCounter(const std::string &key)
     {
         const char * cmd = RedisCommand::Str::AddOne;
-        TcpRedisClient *redisClientContext = this->mComponent->GetClient();
-        std::shared_ptr<RedisResponse> redisResponse = this->mComponent->Run(redisClientContext, cmd, key);
+        std::shared_ptr<RedisResponse> redisResponse = this->mComponent->Run(cmd, key);
         return (redisResponse != nullptr && !redisResponse->HasError()) ? redisResponse->GetNumber() : -1;
     }
 
     long long RedisStringComponent::SubCounter(const std::string &key)
     {
         const char * cmd = RedisCommand::Str::SubOne;
-        TcpRedisClient * redisClient = this->mComponent->GetClient();
-        std::shared_ptr<RedisResponse> redisResponse = this->mComponent->Run(redisClient, cmd, key);
+        std::shared_ptr<RedisResponse> redisResponse = this->mComponent->Run(cmd, key);
         return (redisResponse != nullptr && !redisResponse->HasError()) ? redisResponse->GetNumber() : -1;
     }
 
     bool RedisStringComponent::Set(const std::string &key, const std::string &value)
     {
-        TcpRedisClient *redisClient = this->mComponent->GetClient();
-		LOG_CHECK_RET_FALSE(redisClient);
         const char * cmd = RedisCommand::Str::Set;
-        std::shared_ptr<RedisResponse> redisResponse = this->mComponent->Run(redisClient, cmd, key, value);
+        std::shared_ptr<RedisResponse> redisResponse = this->mComponent->Run(cmd, key, value);
         return redisResponse != nullptr && !redisResponse->HasError();
     }
 
     std::unique_ptr<std::string> RedisStringComponent::Get(const std::string &key)
     {
-        TcpRedisClient *redisClientContext = this->mComponent->GetClient();
-		LOG_CHECK_RET_NULL(redisClientContext);
         const char * cmd = RedisCommand::Str::Get;
-        std::shared_ptr<RedisResponse> redisResponse = this->mComponent->Run(redisClientContext, cmd, key);
+        std::shared_ptr<RedisResponse> redisResponse = this->mComponent->Run(cmd, key);
         if(redisResponse == nullptr || redisResponse->HasError())
         {
             return nullptr;
@@ -52,10 +46,8 @@ namespace Sentry
 
     std::unique_ptr<std::string> RedisStringComponent::Append(const std::string &key, const std::string &value)
     {
-        TcpRedisClient *redisClientContext = this->mComponent->GetClient();
-		LOG_CHECK_RET_NULL(redisClientContext);
         const char * cmd = RedisCommand::Str::Append;
-        std::shared_ptr<RedisResponse> redisResponse = this->mComponent->Run(redisClientContext, cmd, key, value);
+        std::shared_ptr<RedisResponse> redisResponse = this->mComponent->Run(cmd, key, value);
         if(redisResponse == nullptr || redisResponse->HasError())
         {
             return nullptr;

@@ -57,7 +57,7 @@ namespace Sentry
 
     std::shared_ptr<RedisTask> RedisRequest::MakeTask(int id)
     {
-        std::shared_ptr<RedisTask> redisTask(new RedisTask(this->shared_from_this(), id));
+        std::shared_ptr<RedisTask> redisTask = std::make_shared<RedisTask>(this->shared_from_this(), id);
         this->mTaskId = redisTask->GetRpcId();
         return redisTask;
     }

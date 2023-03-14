@@ -17,7 +17,6 @@ namespace Sentry
 
     bool RedisScriptComponent::Start()
 	{
-		TcpRedisClient* redisClient = this->mComponent->GetClient();
 		const RedisClientConfig& config = RedisConfig::Inst()->Config();
 		for (auto iter = config.LuaFiles.begin(); iter != config.LuaFiles.end(); iter++)
 		{
@@ -30,8 +29,7 @@ namespace Sentry
 				return false;
 			}
 			std::shared_ptr<RedisResponse> response =
-				this->mComponent->Run(redisClient, "SCRIPT", "LOAD", content);
-
+				this->mComponent->Run("SCRIPT", "LOAD", content);
 			LOG_CHECK_RET_FALSE(response != nullptr && !response->HasError());
 			LOG_CHECK_RET_FALSE(this->OnLoadScript(name, response->GetString()));
 		}
@@ -71,13 +69,12 @@ namespace Sentry
 
     std::unique_ptr<std::string> RedisScriptComponent::Call(const std::string &func, const std::string &json)
     {
-        TcpRedisClient * redisClientContext = this->mComponent->GetClient();
         std::shared_ptr<RedisRequest> redisRequest = this->MakeLuaRequest(func, json);
         if(redisRequest == nullptr)
         {
             return nullptr;
         }
-        std::shared_ptr<RedisResponse> redisResponse = this->mComponent->Run(redisClientContext, redisRequest);
+        std::shared_ptr<RedisResponse> redisResponse = this->mComponent->Run(redisRequest);
         if (redisResponse == nullptr || redisResponse->HasError())
         {
             return nullptr;

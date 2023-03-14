@@ -16,19 +16,18 @@ namespace Sentry
 	 public:
 		RedisComponent() = default;
     public:
-		TcpRedisClient * GetClient();
-		bool Ping(TcpRedisClient * redisClient);
+		bool Ping(size_t index);
+		bool Send(std::shared_ptr<RedisRequest> request);
+		bool Send(std::shared_ptr<RedisRequest> request, int & id);
     public:
         template<typename ... Args>
         bool Send(const std::string & cmd, Args&& ... args);
         template<typename ... Args>
         std::shared_ptr<RedisResponse> Run(const std::string & cmd, Args&& ... args);
-        template<typename ... Args>
-        std::shared_ptr<RedisResponse> Run(TcpRedisClient * c, const std::string & cmd, Args&& ... args);
     public:
         std::shared_ptr<RedisResponse> Run(std::shared_ptr<RedisRequest> request);
-        std::shared_ptr<RedisResponse> Run(TcpRedisClient * c, std::shared_ptr<RedisRequest> request);
     private:
+		TcpRedisClient * GetClient(size_t index = -1);
 		void OnConnectSuccessful(const std::string &address) final;
         void OnMessage(std::shared_ptr<RedisResponse> message) final;
 		TcpRedisClient * MakeRedisClient(const RedisClientConfig & config);
@@ -49,13 +48,7 @@ namespace Sentry
         RedisRequest::InitParameter(request, std::forward<Args>(args)...);
         return this->Run(request);
     }
-    template<typename ... Args>
-    std::shared_ptr<RedisResponse> RedisComponent::Run(TcpRedisClient * c, const std::string &cmd, Args &&...args)
-    {
-        std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>(cmd);
-        RedisRequest::InitParameter(request, std::forward<Args>(args)...);
-        return this->Run(c, request);
-    }
+
     template<typename ... Args>
     bool RedisComponent::Send(const std::string &cmd, Args &&...args)
     {
