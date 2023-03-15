@@ -1,9 +1,8 @@
 #include"MysqlHelperComponent.h"
 #include"String/StringHelper.h"
 #include"Service/MysqlDB.h"
-#include"Config/ClusterConfig.h"
 #include"Component/NodeMgrComponent.h"
-
+#include"App/App.h"
 namespace Sentry
 {
 	bool MysqlHelperComponent::LateAwake()

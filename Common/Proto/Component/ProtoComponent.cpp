@@ -57,15 +57,15 @@ namespace Sentry
             LOG_ERROR("director [" << path << "] not exist");
             return false;
         }
-        ImportError importError;
 		this->mDynamicMessageMap.clear();
 		this->mDynamicMessageFactorys.clear();
 		this->mDynamicMessageFactory = nullptr;
-		this->mSourceTree = std::make_shared<compiler::DiskSourceTree>();
+		this->mImportError = std::make_unique<ImportError>();
+		this->mSourceTree = std::make_unique<compiler::DiskSourceTree>();
         this->mSourceTree->MapPath("", path);
-        this->mImporter = std::make_shared<compiler::Importer>(
-                this->mSourceTree.get(), &importError);
-        if (importError.HasError())
+        this->mImporter = std::make_unique<compiler::Importer>(
+                this->mSourceTree.get(), this->mImportError.get());
+        if (this->mImportError->HasError())
         {
             LOG_ERROR("load proto message [" << path << "] error");
             return false;
@@ -105,7 +105,7 @@ namespace Sentry
 			return false;
 		}
 		LOG_INFO("import [" << fileName << "] successful");
-		this->mDynamicMessageFactory = std::make_shared<DynamicMessageFactory>(fileDescriptor->pool());
+		this->mDynamicMessageFactory = std::make_unique<DynamicMessageFactory>(fileDescriptor->pool());
 		for(int x = 0; x < fileDescriptor->message_type_count(); x++)
 		{
 			const Descriptor * descriptor = fileDescriptor->message_type(x);
@@ -117,7 +117,7 @@ namespace Sentry
                 this->mDynamicMessageMap.emplace(message->GetTypeName(), message);
 			}
 		}
-		this->mDynamicMessageFactorys.emplace_back(mDynamicMessageFactory);
+		this->mDynamicMessageFactorys.emplace_back(std::move(mDynamicMessageFactory));
 		return true;
 	}
 

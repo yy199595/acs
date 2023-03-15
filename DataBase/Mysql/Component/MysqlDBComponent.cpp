@@ -8,15 +8,10 @@
 #include"Config/MysqlConfig.h"
 namespace Sentry
 {
-    MysqlTask::MysqlTask(long long taskId, int ms)
-        : IRpcTask<Mysql::Response>(ms)
+    MysqlTask::MysqlTask(int taskId)
+        : IRpcTask<Mysql::Response>(taskId)
     {
-        this->mTaskId = taskId;
-    }
 
-    void MysqlTask::OnTimeout()
-    {
-        this->mTask.SetResult(nullptr);
     }
 
     void MysqlTask::OnResponse(std::shared_ptr<Mysql::Response> response)
@@ -51,11 +46,11 @@ namespace Sentry
 		this->OnResponse(taskId, message);
 	}
 
-    bool MysqlDBComponent::StartConnectMysql()
+    bool MysqlDBComponent::StartConnectMysql(int count)
 	{
+		assert(count > 0);
         LOG_CHECK_RET_FALSE(MysqlConfig::Inst());
-        const MysqlConfig * config = MysqlConfig::Inst();
-		for (int index = 0; index < config->MaxCount; index++)
+		for (int index = 0; index < count; index++)
 		{
 			std::unique_ptr<MysqlClient> mysqlClient
 				= std::make_unique<MysqlClient>(this);
@@ -64,17 +59,8 @@ namespace Sentry
         for (std::unique_ptr<MysqlClient>& client : this->mMysqlClients)
         {
             client->Start();
+			this->mClients.push(client.get());
         }
-		/*try
-		{
-			std::shared_ptr<Mysql::SqlCommand> command
-				= std::make_shared<Mysql::SqlCommand>("DROP TABLE user.account_info");
-			this->Run(this->GetClient(), command);
-		}
-		catch (std::exception& e)
-		{
-			CONSOLE_LOG_ERROR(e.what());
-		}*/
 		return this->Ping(0);
 	}
 
@@ -82,49 +68,67 @@ namespace Sentry
     {
         std::shared_ptr<Mysql::PingCommand> command
             = std::make_shared<Mysql::PingCommand>();
-        return this->Run(this->GetClient(index), command);
+		return this->Run(index, command)->IsOk();
     }
 
-    bool MysqlDBComponent::Run(MysqlClient * client, std::shared_ptr<Mysql::ICommand> command)
+	std::shared_ptr<Mysql::Response> MysqlDBComponent::Run(std::shared_ptr<Mysql::ICommand> command)
+	{
+		int id = this->mNumerPool.Pop();
+		{
+			command->SetRpcId(id);
+			this->Send(std::move(command));
+		}
+		std::shared_ptr<MysqlTask> mysqlTask = std::make_shared<MysqlTask>(id);
+		std::shared_ptr<Mysql::Response> response = this->AddTask(id, mysqlTask)->Await();
+		if (response != nullptr && !response->IsOk())
+		{
+			LOG_ERROR(response->GetError());
+		}
+		return response;
+	}
+
+	std::shared_ptr<Mysql::Response> MysqlDBComponent::Run(int index, std::shared_ptr<Mysql::ICommand> command)
     {
-        std::shared_ptr<MysqlTask> mysqlTask
-            = std::make_shared<MysqlTask>(command->GetRpcId(), 0);
-
-        client->SendCommand(command);
-        long long key = mysqlTask->GetRpcId();
-        std::shared_ptr<Mysql::Response> response = this->AddTask(key, mysqlTask)->Await();
-#ifdef __DEBUG__
-        long long t1 = Helper::Time::NowMilTime();
-        if (response != nullptr && !response->IsOk())
-        {
-            CONSOLE_LOG_ERROR(response->GetError());
-            throw std::logic_error(response->GetError());
-        }
-        long long t2 = Helper::Time::NowMilTime();
-        CONSOLE_LOG_INFO("sql use time = [" << t2 - t1 << "ms]");
-#endif
-        return response != nullptr && response->IsOk();
+		int id = this->mNumerPool.Pop();
+		{
+			command->SetRpcId(id);
+			this->Send(index, std::move(command));
+		}
+		std::shared_ptr<MysqlTask> mysqlTask = std::make_shared<MysqlTask>(id);
+		std::shared_ptr<Mysql::Response> response = this->AddTask(id, mysqlTask)->Await();
+		if (response != nullptr && !response->IsOk())
+		{
+			LOG_ERROR(response->GetError());
+		}
+        return response;
     }
 
-    MysqlClient * MysqlDBComponent::GetClient(int index)
-    {
-        if(index > 0)
-        {
-            int idx = index % this->mMysqlClients.size();
-            return this->mMysqlClients[idx].get();
-        }
-        MysqlClient* mysqlClient = this->mMysqlClients[0].get();
-        for(size_t x = 0; x < this->mMysqlClients.size(); x++)
-        {
-            if(this->mMysqlClients[x]->GetTaskCount() <= 5)
-            {
-                return this->mMysqlClients[x].get();
-            }
-            if(this->mMysqlClients[x]->GetTaskCount() < mysqlClient->GetTaskCount())
-            {
-                mysqlClient = this->mMysqlClients[x].get();
-            }
-        }
-        return mysqlClient;
-    }
+	bool MysqlDBComponent::Send(int index, std::shared_ptr<Mysql::ICommand> command)
+	{
+		if(this->mMysqlClients.empty())
+		{
+			return false;
+		}
+		int idx = index % this->mMysqlClients.size();
+		MysqlClient* mysqlClient = this->mMysqlClients[idx].get();;
+		{
+			mysqlClient->SendCommand(command);
+		}
+		return true;
+	}
+	bool MysqlDBComponent::Send(std::shared_ptr<Mysql::ICommand> command)
+	{
+		if(this->mMysqlClients.empty())
+		{
+			return false;
+		}
+		MysqlClient* mysqlClient = this->mClients.front();
+		{
+			this->mClients.pop();
+			this->mClients.push(mysqlClient);
+		}
+		mysqlClient->SendCommand(command);
+		return true;
+	}
+
 }

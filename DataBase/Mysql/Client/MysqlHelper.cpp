@@ -2,6 +2,8 @@
 #include"App/App.h"
 #include"Component/ProtoComponent.h"
 #include"google/protobuf/util/json_util.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 namespace Sentry
 {
     MysqlHelper::MysqlHelper(ProtoComponent *component)

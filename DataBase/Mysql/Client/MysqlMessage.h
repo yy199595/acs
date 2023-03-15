@@ -18,52 +18,56 @@
 using namespace google::protobuf;
 namespace Mysql
 {
-	class Response
+	class Response : public std::vector<Json::Writer *>
 	{
     public:
-        Response(bool res, const std::string & error, long long taskId)
-            : mIsOk(res), mError(error), mTaskId(taskId) { }
+        Response(int taskId)
+            : mTaskId(taskId) ,mIsOk(true) { }
     public:
-        bool IsOk() const { return this->mIsOk;}
-		long long TaskId() const { return this->mTaskId; }
+		void SetError(const char * str);
+		bool IsOk() const { return this->mIsOk;}
+		int TaskId() const { return this->mTaskId; }
         const std::string & GetError() const { return this->mError;}
     private:
         bool mIsOk;
-		long long mTaskId;
+		int mTaskId;
         std::string mError;
 	};
     class ICommand
 	{
 	 public:
-        ICommand();
-        long long GetRpcId() const{ return this->mRpcId;}
-        virtual bool Invoke(MYSQL *, std::string & error) = 0;
-    private:
-        long long mRpcId;
+        ICommand() : mTaskId(0) { }
+		virtual ~ICommand() { }
+        virtual bool Invoke(MYSQL *, std::shared_ptr<Response> & response) = 0;
+	public:
+		int GetRpcId() const { return this->mTaskId; }
+		void SetRpcId(int id) { this->mTaskId = id;}
+	private:
+		int mTaskId;
 	};
 
     class PingCommand : public ICommand
     {
     public:
         using ICommand::ICommand;
-        bool Invoke(MYSQL *, std::string &error) final;
+        bool Invoke(MYSQL *, std::shared_ptr<Response> & response) final;
     };
 
 	class SqlCommand : public ICommand
 	{
 	 public:
         SqlCommand(const std::string & sql);
-        bool Invoke(MYSQL *, std::string & error) final;
-    private:
+		bool Invoke(MYSQL *, std::shared_ptr<Response> & response) final;
+	private:
         const std::string mSql;
 	};
 
- 	class QueryCommand : public ICommand, public std::vector<Json::Writer *>
+ 	class QueryCommand : public ICommand
     {
     public:
         QueryCommand(const std::string & sql);
-        bool Invoke(MYSQL *, std::string &error) final;
-    private:
+		bool Invoke(MYSQL *, std::shared_ptr<Response> & response) final;
+	private:
         bool Write(Json::Writer & document, st_mysql_field * filed, const char * str, int len);
     private:
         const std::string mSql;
@@ -77,8 +81,8 @@ namespace Mysql
     public:
         CreateTabCommand(std::shared_ptr<Message> message, std::vector<std::string> & keys);
     public:
-        bool Invoke(MYSQL *, std::string &error) final;
-    private:
+		bool Invoke(MYSQL *, std::shared_ptr<Response> & response) final;
+	private:
         void ClearBuffer();
         bool ForeachMessage(const FieldDescriptor * field);
         bool CreateTable(MYSQL * sock, const std::string & tab, std::string & eror);
@@ -98,8 +102,8 @@ namespace Mysql
     public:
         SetMainKeyCommand(const std::string & tab, std::vector<std::string> & keys);
     public:
-        bool Invoke(MYSQL *, std::string &error) final;
-    private:
+		bool Invoke(MYSQL *, std::shared_ptr<Response> & response) final;
+	private:
         std::string mTable;
         std::vector<std::string> mKeys;
     };

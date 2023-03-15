@@ -11,33 +11,36 @@
 #include"Component/LogComponent.h"
 #include"google/protobuf/util/json_util.h"
 using namespace Sentry;
+
 namespace Mysql
 {
-    ICommand::ICommand()
-    {
-        this->mRpcId = Helper::Guid::Create();
-    }
+	void Response::SetError(const char* str)
+	{
+		this->mError = str;
+		this->mIsOk = false;
+	}
 }
 
 namespace Mysql
 {
-    bool PingCommand::Invoke(MYSQL * sock, std::string &error)
-    {
-        switch(mysql_ping(sock))
-        {
-            case 0: return true;
-            case CR_UNKNOWN_ERROR:
-                error = "CR_UNKNOWN_ERROR";
-                break;
-            case CR_SERVER_GONE_ERROR:
-                error = "CR_SERVER_GONE_ERROR";
-                break;
-            case CR_COMMANDS_OUT_OF_SYNC:
-                error = "CR_COMMANDS_OUT_OF_SYNC";
-                break;
-        }
-        return false;
-    }
+    bool PingCommand::Invoke(MYSQL* mysql, std::shared_ptr<Response> & response)
+	{
+		switch (mysql_ping(mysql))
+		{
+		case 0:
+			return true;
+		case CR_UNKNOWN_ERROR:
+			response->SetError("CR_UNKNOWN_ERROR");
+			return false;
+		case CR_SERVER_GONE_ERROR:
+			response->SetError("CR_SERVER_GONE_ERROR");
+			return false;
+		case CR_COMMANDS_OUT_OF_SYNC:
+			response->SetError("CR_COMMANDS_OUT_OF_SYNC");
+			return false;
+		}
+		return true;
+	}
 
 }
 
@@ -49,11 +52,13 @@ namespace Mysql
 
     }
 
-    bool SqlCommand::Invoke(MYSQL * sock, std::string &error)
+    bool SqlCommand::Invoke(MYSQL* mysql, std::shared_ptr<Response> & response)
     {
-        if (mysql_real_query(sock, this->mSql.c_str(), this->mSql.size()) != 0)
+		const char * sql = this->mSql.c_str();
+		const size_t length = this->mSql.size();
+        if (mysql_real_query(mysql, sql, length) != 0)
         {
-            error = mysql_error(sock);
+			response->SetError(mysql_error(mysql));
             return false;
         }
         return true;
@@ -65,16 +70,19 @@ namespace Mysql
 
     }
 
-    bool QueryCommand::Invoke(MYSQL * sock, std::string &error)
+    bool QueryCommand::Invoke(MYSQL * sock, std::shared_ptr<Response> & response)
     {
-        if (mysql_real_query(sock, this->mSql.c_str(), this->mSql.size()) != 0)
+		const char * sql = this->mSql.c_str();
+		const size_t length = this->mSql.size();
+        if (mysql_real_query(sock, sql, length) != 0)
         {
-            error = mysql_error(sock);
+			response->SetError(mysql_error(sock));
             return false;
         }
         MYSQL_RES *result1 = mysql_store_result(sock);
         if(result1 == nullptr)
         {
+			response->SetError("query result is null");
             return false;
         }
         while(MYSQL_ROW row = mysql_fetch_row(result1))
@@ -88,7 +96,7 @@ namespace Mysql
                 st_mysql_field* field = mysql_fetch_field(result1);
                 this->Write(*jsonDocument, field, row[index], lengths[index]);
             }
-            this->emplace_back(std::move(jsonDocument));
+            response->emplace_back(jsonDocument);
         }
         mysql_free_result(result1);
         return true;
@@ -155,14 +163,13 @@ namespace Mysql
 
     }
 
-    bool CreateTabCommand::Invoke(MYSQL* sock, std::string& error)
+    bool CreateTabCommand::Invoke(MYSQL* sock, std::shared_ptr<Response> & response)
     {
         std::string name = this->mMessage->GetTypeName();
         const size_t pos = name.find('.');
         if (pos == std::string::npos)
         {
-            error = "proto name not xxx.xxx";
-            CONSOLE_LOG_ERROR(error);
+			response->SetError("proto name not xxx.xxx");
             return false;
         }
         std::string db = name.substr(0, pos);
@@ -175,22 +182,19 @@ namespace Mysql
             const std::string sql = mBuffer.str();
             if (mysql_real_query(sock, sql.c_str(), sql.length()) != 0)
             {
-                error = mysql_error(sock);
-                CONSOLE_LOG_ERROR(error);
+				response->SetError(mysql_error(sock));
                 return false;
             }
             if (mysql_select_db(sock, db.c_str()) != 0)
             {
-                error = mysql_error(sock);
-                CONSOLE_LOG_ERROR(error);
-                return false;
+				response->SetError(mysql_error(sock));
+				return false;
             }
         }
         if (mysql_query(sock, "SHOW TABLES") != 0)
         {
-            error = mysql_error(sock);
-            CONSOLE_LOG_ERROR(error);
-            return false;
+			response->SetError(mysql_error(sock));
+			return false;
         }
         std::set<std::string> tables;
         MYSQL_RES * result1 = mysql_store_result(sock);
@@ -207,13 +211,21 @@ namespace Mysql
         mysql_free_result(result1);
         if (tables.find(tab) == tables.end())
         {
+			std::string error;
             if (!this->CreateTable(sock, tab, error))
-            {              
+            {
+				response->SetError(error.c_str());
                 return false;
             }
             return true;
         }
-        return this->CheckTableField(sock, tab, error);
+		std::string error;
+		if(!this->CheckTableField(sock, tab, error))
+		{
+			response->SetError(error.c_str());
+			return false;
+		}
+		return true;
     }
 
     void CreateTabCommand::ClearBuffer()
@@ -398,7 +410,7 @@ namespace Mysql
 
     }
 
-    bool SetMainKeyCommand::Invoke(MYSQL * sock, std::string &error)
+    bool SetMainKeyCommand::Invoke(MYSQL*, std::shared_ptr<Response>& response)
     {
         return false;
     }

@@ -1,5 +1,8 @@
 ﻿#include"Component/Component.h"
+#include"XCode/XCode.h"
+#include"Message/db.pb.h"
 #include"google/protobuf/util/json_util.h"
+using namespace google::protobuf;
 namespace Sentry
 {
     class MysqlHelperComponent final : public Component

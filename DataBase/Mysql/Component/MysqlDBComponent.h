@@ -15,16 +15,11 @@ namespace Sentry
     class MysqlTask : public IRpcTask<Mysql::Response>
     {
     public:
-        MysqlTask(long long taskId, int ms);
+        MysqlTask(int taskId);
     public:
-        long long GetRpcId() final { return this->mTaskId; }
-
-    public:
-        void OnTimeout() final;
         void OnResponse(std::shared_ptr<Mysql::Response> response) final;
         std::shared_ptr<Mysql::Response> Await() { return mTask.Await(); }
     private:
-        long long mTaskId;
         TaskSource<std::shared_ptr<Mysql::Response>> mTask;
     };
 }
@@ -32,7 +27,7 @@ namespace Sentry
 namespace Sentry
 {
     class MysqlClient;
-	class MysqlDBComponent : public RpcTaskComponent<long long, Mysql::Response>, public IRpc<Mysql::Response>
+	class MysqlDBComponent : public RpcTaskComponent<int, Mysql::Response>, public IRpc<Mysql::Response>
     {
     public:
         MysqlDBComponent() = default;
@@ -40,13 +35,18 @@ namespace Sentry
     public:
         void CloseClients();
         bool Ping(int index = 0);
-        bool StartConnectMysql();
-        MysqlClient * GetClient(int index = -1);
-        bool Run(MysqlClient * client, std::shared_ptr<Mysql::ICommand> command);
+        bool StartConnectMysql(int count);
+		std::shared_ptr<Mysql::Response> Run(std::shared_ptr<Mysql::ICommand> command);
+		std::shared_ptr<Mysql::Response> Run(int index, std::shared_ptr<Mysql::ICommand> command);
 	 private:
+		bool Send(std::shared_ptr<Mysql::ICommand> command);
+		bool Send(int index, std::shared_ptr<Mysql::ICommand> command);
 		void OnConnectSuccessful(const std::string &address) final;
 		void OnMessage(std::shared_ptr<Mysql::Response> message) final;
-    private:
+		void OnTaskComplete(int key) final { this->mNumerPool.Push(key);}
+	private:
+		std::queue<MysqlClient*> mClients;
+		Util::NumberBuilder<int, 1> mNumerPool;
 		std::vector<std::unique_ptr<MysqlClient>> mMysqlClients;
     };
 }

@@ -1,0 +1,8 @@
+syntax = "proto3";
+package registry;
+message server
+{
+    string name = 1;
+    string rpc = 2;
+    string http = 3;
+}

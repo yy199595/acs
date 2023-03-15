@@ -25,6 +25,7 @@ namespace Sentry
 	 private:
         class NodeMgrComponent * mNodeComponent;
         class InnerNetComponent* mInnerComponent;
+		class MysqlDBComponent * mMysqlComponent;
 		std::unordered_map<std::string, long long> mPingInfos;
     };
 }

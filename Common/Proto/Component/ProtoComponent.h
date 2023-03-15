@@ -52,13 +52,14 @@ namespace Sentry
         bool Load(const char * path);
 		bool Import(const char * proto);
 	 private:
-		std::shared_ptr<compiler::Importer> mImporter;
+		std::unique_ptr<ImportError> mImportError;
+		std::unique_ptr<compiler::Importer> mImporter;
         std::unordered_map<std::string, std::string> mFiles;
-        std::shared_ptr<compiler::DiskSourceTree> mSourceTree;
-		std::shared_ptr<DynamicMessageFactory> mDynamicMessageFactory;
+        std::unique_ptr<compiler::DiskSourceTree> mSourceTree;
+		std::unique_ptr<DynamicMessageFactory> mDynamicMessageFactory;
 		std::unordered_map<std::string, const Message *> mStaticMessageMap;
 		std::unordered_map<std::string, const Message *> mDynamicMessageMap;
-		std::vector<std::shared_ptr<DynamicMessageFactory>> mDynamicMessageFactorys;
+		std::vector<std::unique_ptr<DynamicMessageFactory>> mDynamicMessageFactorys;
 	};
 }
 

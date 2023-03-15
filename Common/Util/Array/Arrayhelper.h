@@ -6,10 +6,35 @@
 #define SERVER_ARRAYHELPER_H
 #include<list>
 #include<vector>
+#include<string>
 namespace Helper
 {
 	namespace Array
 	{
+		std::string Concat(const std::vector<std::string> & list, const char c)
+		{
+			if(list.size() == 1)
+			{
+				return list[0];
+			}
+			else
+			{
+				std::string result;
+				for(size_t index = 0; index < list.size(); index++)
+				{
+					if(index == list.size() - 1)
+					{
+						result.append(list[index]);
+					}
+					else
+					{
+						result.append(list[index]);
+						result += c;
+					}
+				}
+				return result;
+			}
+		}
 		template<typename List, typename T>
 		inline bool HasElement(const List & elments, const T & value)
 		{

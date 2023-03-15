@@ -6,8 +6,6 @@
     },
     "path": {
         "proto": "proto",
-        "source": "source",
-        "script": "script/lua",
         "sqlite": "data/sqlite/",
         "db": "config/db/db.json",
         "code": "XCode/XCode.csv",

@@ -19,16 +19,15 @@ namespace Sentry
         BIND_COMMON_RPC_METHOD(MysqlDB::Update);
         BIND_COMMON_RPC_METHOD(MysqlDB::Delete);
         BIND_COMMON_RPC_METHOD(MysqlDB::Create);
-        this->mMysqlComponent = this->GetComponent<MysqlDBComponent>();
-        LOG_CHECK_RET_FALSE(this->mProtoComponent = this->GetComponent<ProtoComponent>());
+		this->mProtoComponent = this->GetComponent<ProtoComponent>();
+		this->mMysqlComponent = this->GetComponent<MysqlDBComponent>();
         this->mMysqlHelper = std::make_shared<MysqlHelper>(this->mProtoComponent);
-        return this->mMysqlComponent->StartConnectMysql();
+        return this->mMysqlComponent->StartConnectMysql(MysqlConfig::Inst()->MaxCount);
 	}
 
-    bool MysqlDB::OnClose()
+    void MysqlDB::OnClose()
     {
         this->WaitAllMessageComplete();
-        return true;
     }
 
     int MysqlDB::Create(const db::mysql::create &request)
@@ -69,11 +68,10 @@ namespace Sentry
         {
             this->mMainKeys[typeName] = keys[0];
         }
+        std::shared_ptr<Mysql::CreateTabCommand> command =
+			std::make_shared<Mysql::CreateTabCommand>(message, keys);
 
-		MysqlClient * mysqlClient = this->mMysqlComponent->GetClient(0);
-        std::shared_ptr<Mysql::CreateTabCommand> command = std::make_shared<Mysql::CreateTabCommand>(message, keys);
-
-        if (!this->mMysqlComponent->Run(mysqlClient, command))
+        if (!this->mMysqlComponent->Run(command))
         {
             return XCode::Failure;
         }
@@ -87,11 +85,10 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
+		int index = request.flag();
         std::shared_ptr<Message> message = this->mMysqlHelper->GetData();
-        MysqlClient * mysqlClient = this->mMysqlComponent->GetClient(request.flag());
 		std::shared_ptr<Mysql::SqlCommand> command = std::make_shared<Mysql::SqlCommand>(sql);
-
-		if (!this->mMysqlComponent->Run(mysqlClient, command))
+		if (!this->mMysqlComponent->Run(index, command))
         {
             return XCode::Failure;
         }
@@ -105,10 +102,9 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-		MysqlClient * mysqlClient = this->mMysqlComponent->GetClient(request.flag());
+		int index = request.flag();
 		std::shared_ptr<Mysql::SqlCommand> command = std::make_shared<Mysql::SqlCommand>(sql);
-
-        if (!this->mMysqlComponent->Run(mysqlClient, command))
+        if (!this->mMysqlComponent->Run(index, command))
         {
             return XCode::Failure;
         }
@@ -122,11 +118,11 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-        const std::string & fullName = request.table();
-        MysqlClient * mysqlClient = this->mMysqlComponent->GetClient(request.flag());
+		int index = request.flag();
+		const std::string & fullName = request.table();
 		std::shared_ptr<Mysql::SqlCommand> command = std::make_shared<Mysql::SqlCommand>(sql);
 
-        if(!this->mMysqlComponent->Run(mysqlClient, command))
+        if(!this->mMysqlComponent->Run(index, command))
         {
             return XCode::Failure;
         }
@@ -140,15 +136,10 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-
-        MysqlClient * mysqlClient = this->mMysqlComponent->GetClient(request.flag());
+		int index = request.flag();
 		std::shared_ptr<Mysql::SqlCommand> command = std::make_shared<Mysql::SqlCommand>(sql);
-
-        if(!this->mMysqlComponent->Run(mysqlClient, command))
-        {
-            return XCode::Failure;
-        }
-        return XCode::Successful;
+		std::shared_ptr<Mysql::Response> response = this->mMysqlComponent->Run(index, command);
+		return response && response->IsOk() ? XCode::Successful : XCode::Failure;
     }
 
 	int MysqlDB::Query(const db::mysql::query& request, db::mysql::response& response)
@@ -170,21 +161,16 @@ namespace Sentry
 			const std::string & sql = request.sql();
 			command = std::make_shared<Mysql::QueryCommand>(sql);
 		}
-		MysqlClient * mysqlClient = this->mMysqlComponent->GetClient();
-		if (!this->mMysqlComponent->Run(mysqlClient, command))
-        {
-            return XCode::Failure;
-        }
-
-        if(command->size() == 0)
-        {
-            throw std::logic_error("query data form " + fullName + " size = 0");
-        }
-
-        auto iter = this->mMainKeys.find(fullName);
-        for (size_t index = 0; index < command->size(); index++)
+		std::shared_ptr<Mysql::Response> result = this->mMysqlComponent->Run(command);
+		if(!result->IsOk())
 		{
-			Json::Writer* document = command->at(index);
+			response.set_error(result->GetError());
+			return XCode::MysqlInvokeFailure;
+		}
+        auto iter = this->mMainKeys.find(fullName);
+        for (size_t index = 0; index < result->size(); index++)
+		{
+			Json::Writer* document = result->at(index);
 			document->WriterStream(response.add_jsons());
 		}
 
