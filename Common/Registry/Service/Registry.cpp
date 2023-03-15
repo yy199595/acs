@@ -4,6 +4,7 @@
 
 #include"Registry.h"
 #include"Service/Node.h"
+#include"Message/db.pb.h"
 #include"Component/InnerNetComponent.h"
 #include"Component/NodeMgrComponent.h"
 #include"Component/MysqlDBComponent.h"
@@ -24,9 +25,11 @@ namespace Sentry
 		LOG_CHECK_RET_FALSE(component->Import("mysql/registry.proto"));
 		std::shared_ptr<Message> message = component->New("registry.server");
 
-		std::vector<std::string> keys{ "name" };
-		std::shared_ptr<Mysql::CreateTabCommand> command = std::make_shared<Mysql::CreateTabCommand>(message, keys);
-		return true;
+        this->mIndex = this->mMysqlComponent->MakeMysqlClient();
+		std::vector<std::string> keys{ "name", "rpc" };
+		std::shared_ptr<Mysql::CreateTabCommand> command =
+                std::make_shared<Mysql::CreateTabCommand>(message, keys);
+        return this->mMysqlComponent->Run(this->mIndex , command)->IsOk();
 	}
 
 	int Registry::Query(const com::array::string& request, s2s::server::list& response)
@@ -66,11 +69,20 @@ namespace Sentry
 		const std::string& http = request.http();
 		const std::string& name = request.name();
 
-		this->mNodeComponent->AddRpcServer(name, rpc);
-		this->mNodeComponent->AddHttpServer(name, http);
-		RpcService* rpcService = this->mApp->GetService<Node>();
-		
+        long long time = Helper::Time::NowSecTime();
+        const std::string sql = fmt::format("replace into registry.server "
+                                            "(name,rpc,http,time) values('{0}','{1}','{2}',{3});", name, rpc, http, time);
+
+        if(!this->mMysqlComponent->Run(this->mIndex, std::make_shared<Mysql::SqlCommand>(sql))->IsOk())
+        {
+            return XCode::SaveToMysqlFailure;
+        }
+
 		const std::string func("Join");
+        this->mNodeComponent->AddRpcServer(name, rpc);
+        this->mNodeComponent->AddHttpServer(name, http);
+        RpcService* rpcService = this->mApp->GetService<Node>();
+
 		std::vector<const ServiceNodeInfo*> services;
 		this->mInnerComponent->GetServiceList(services);
 		for (const ServiceNodeInfo* nodeInfo : services)
@@ -93,7 +105,6 @@ namespace Sentry
 			config->GetLocation("rpc", *localServer->mutable_rpc());
 			config->GetLocation("http", *localServer->mutable_http());
 		}
-		this->mPingInfos.emplace(rpc, Helper::Time::NowSecTime());
 		return XCode::Successful;
 	}
 
@@ -108,8 +119,13 @@ namespace Sentry
 		const ServiceNodeInfo * nodeInfo = this->mInnerComponent->GetSeverInfo(address);
 		if(nodeInfo != nullptr)
 		{
+            long long time = Helper::Time::NowSecTime();
 			const std::string & rpc = nodeInfo->RpcAddress;
-			this->mPingInfos.emplace(rpc, Helper::Time::NowSecTime());
+            const std::string sql = fmt::format("update registry.server set time={0} where rpc='{1}'", time, rpc);
+            if(!this->mMysqlComponent->Run(this->mIndex, std::make_shared<Mysql::SqlCommand>(sql))->IsOk())
+            {
+                return XCode::SaveToMysqlFailure;
+            }
 		}
 		return XCode::Successful;
 	}
@@ -124,6 +140,12 @@ namespace Sentry
 		std::vector<const ServiceNodeInfo*> services;
 		this->mInnerComponent->GetServiceList(services);
 		RpcService* rpcService = this->mApp->GetService<Node>();
+        const std::string sql = fmt::format("delete from registry.server where rpc='{0}'", address);
+        if(!this->mMysqlComponent->Run(this->mIndex, std::make_shared<Mysql::SqlCommand>(sql))->IsOk())
+        {
+            return XCode::SaveToMysqlFailure;
+        }
+
 		for (const ServiceNodeInfo* nodeInfo : services)
 		{
 			if(nodeInfo->RpcAddress != address)
@@ -139,14 +161,5 @@ namespace Sentry
 	{
 		if (tick % 10 != 0) return;
 		long long now = Helper::Time::NowSecTime();
-		auto iter = this->mPingInfos.begin();
-		for(; iter != this->mPingInfos.end(); iter++)
-		{
-			long long time = iter->second;
-			if(now - time >= 20) //20s没有ping了
-			{
-				const std::string & address = iter->first;
-			}
-		}
 	}
 }

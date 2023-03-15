@@ -1,31 +1,4 @@
 {
-    "Server": {
-        "AutoAllot": true,
-        "Service": {
-            "User": true,
-            "Node": true,
-            "Log": true,
-            "Gate": true,
-            "MongoDB": true,
-            "Chat": true,
-            "Registry": true,
-            "ServerWeb": true,
-            "Account": true
-        },
-        "Component": [
-            "HttpComponent",
-            "RedisComponent",
-            "HttpWebComponent",
-            "HttpWebComponent",
-            "HttpDebugComponent"
-        ]
-    },
-    "Client": {
-        "Component": [
-            "HttpComponent",
-            "ClientComponent"
-        ]
-    },
     "ChatServer": {
         "AutoAllot": true,
         "Service": {
@@ -84,6 +57,9 @@
         "Service": {
             "Node": true,
             "Registry": true
-        }
+        },
+        "Component":[
+            "MysqlDBComponent"
+        ]
     }
 }

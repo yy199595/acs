@@ -35,8 +35,8 @@ namespace Sentry
     public:
         void CloseClients();
         bool Ping(int index = 0);
-        bool StartConnectMysql(int count);
-		std::shared_ptr<Mysql::Response> Run(std::shared_ptr<Mysql::ICommand> command);
+        size_t MakeMysqlClient();
+        std::shared_ptr<Mysql::Response> Run(std::shared_ptr<Mysql::ICommand> command);
 		std::shared_ptr<Mysql::Response> Run(int index, std::shared_ptr<Mysql::ICommand> command);
 	 private:
 		bool Send(std::shared_ptr<Mysql::ICommand> command);

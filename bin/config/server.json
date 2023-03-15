@@ -26,6 +26,9 @@
             "common": "script/Common",
             "module": "script/Client",
             "main": "script/Client/Client.lua"
+        },
+        "path": {
+            "cluster": "config/cluster/debug.json"
         }
     },
     "Server": {
@@ -40,6 +43,9 @@
             "common": "script/Common",
             "module": "script/Server",
             "main": "script/Server/Server.lua"
+        },
+        "path": {
+            "cluster": "config/cluster/debug.json"
         }
     },
     "HttpServer": {

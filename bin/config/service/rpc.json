@@ -22,7 +22,7 @@
     },
     "Registry": {
         "Ping": {
-            "Async": false
+            "Async": true
         },
         "Query": {
             "Async": false,

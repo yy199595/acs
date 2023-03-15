@@ -2,7 +2,8 @@ syntax = "proto3";
 package registry;
 message server
 {
-    string name = 1;
-    string rpc = 2;
-    string http = 3;
+    string name = 1; //服务器名字
+    string rpc = 2; //rpc地址
+    string http = 3; //http地址
+    int64 time = 4; //上次ping时间
 }

@@ -12,18 +12,22 @@ namespace Sentry
     }
 
 	bool MysqlDB::OnStart()
-	{
+    {
         BIND_COMMON_RPC_METHOD(MysqlDB::Add);
         BIND_COMMON_RPC_METHOD(MysqlDB::Save);
         BIND_COMMON_RPC_METHOD(MysqlDB::Query);
         BIND_COMMON_RPC_METHOD(MysqlDB::Update);
         BIND_COMMON_RPC_METHOD(MysqlDB::Delete);
         BIND_COMMON_RPC_METHOD(MysqlDB::Create);
-		this->mProtoComponent = this->GetComponent<ProtoComponent>();
-		this->mMysqlComponent = this->GetComponent<MysqlDBComponent>();
+        this->mProtoComponent = this->GetComponent<ProtoComponent>();
+        this->mMysqlComponent = this->GetComponent<MysqlDBComponent>();
         this->mMysqlHelper = std::make_shared<MysqlHelper>(this->mProtoComponent);
-        return this->mMysqlComponent->StartConnectMysql(MysqlConfig::Inst()->MaxCount);
-	}
+        for (int index = 0; index < MysqlConfig::Inst()->MaxCount; index++)
+        {
+            this->mMysqlComponent->MakeMysqlClient();
+        }
+        return this->mMysqlComponent->Ping(0);
+    }
 
     void MysqlDB::OnClose()
     {

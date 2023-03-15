@@ -46,23 +46,16 @@ namespace Sentry
 		this->OnResponse(taskId, message);
 	}
 
-    bool MysqlDBComponent::StartConnectMysql(int count)
-	{
-		assert(count > 0);
-        LOG_CHECK_RET_FALSE(MysqlConfig::Inst());
-		for (int index = 0; index < count; index++)
-		{
-			std::unique_ptr<MysqlClient> mysqlClient
-				= std::make_unique<MysqlClient>(this);
-			this->mMysqlClients.emplace_back(std::move(mysqlClient));
-		}
-        for (std::unique_ptr<MysqlClient>& client : this->mMysqlClients)
-        {
-            client->Start();
-			this->mClients.push(client.get());
-        }
-		return this->Ping(0);
-	}
+    size_t MysqlDBComponent::MakeMysqlClient()
+    {
+        std::unique_ptr<MysqlClient> mysqlClient
+                = std::make_unique<MysqlClient>(this);
+
+        mysqlClient->Start();
+        this->mClients.push(mysqlClient.get());
+        this->mMysqlClients.emplace_back(std::move(mysqlClient));
+        return this->mMysqlClients.size() - 1;
+    }
 
     bool MysqlDBComponent::Ping(int index)
     {
@@ -130,5 +123,4 @@ namespace Sentry
 		mysqlClient->SendCommand(command);
 		return true;
 	}
-
 }

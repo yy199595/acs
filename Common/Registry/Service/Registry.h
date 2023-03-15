@@ -23,10 +23,10 @@ namespace Sentry
 		void OnSecondUpdate(int tick) final;
         void OnNodeServerError(const std::string& address);
 	 private:
+        size_t mIndex;
         class NodeMgrComponent * mNodeComponent;
         class InnerNetComponent* mInnerComponent;
 		class MysqlDBComponent * mMysqlComponent;
-		std::unordered_map<std::string, long long> mPingInfos;
     };
 }
 
