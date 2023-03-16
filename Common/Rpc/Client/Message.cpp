@@ -167,7 +167,7 @@ namespace Rpc
         return true;
     }
 
-    std::shared_ptr<Packet> Packet::New(Tcp::Type type, Tcp::Porto proto)
+    std::shared_ptr<Packet> Packet::New(int type, int proto)
     {
         std::shared_ptr<Packet> message = std::make_shared<Packet>();
         message->SetType(type);
@@ -277,13 +277,12 @@ namespace Rpc
         this->mProto = (int)Tcp::Porto::String;
     }
 
-
-    std::shared_ptr<Packet> Packet::Clone()
+    std::shared_ptr<Packet> Packet::Clone() const
     {
         std::shared_ptr<Packet> message = std::make_shared<Packet>();
         {
-            message->SetType((Tcp::Type) this->mType);
-            message->SetProto((Tcp::Porto) this->mProto);
+            message->SetType(this->mType);
+            message->SetProto(this->mProto);
 
             message->mBody = this->mBody;
             message->mHead = this->mHead;

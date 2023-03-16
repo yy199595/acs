@@ -27,7 +27,7 @@ namespace Sentry
 		return true;
 	}
 
-	int InnerNetMessageComponent::OnRequest(std::shared_ptr<Rpc::Packet> message)
+	int InnerNetMessageComponent::HandlerRequest(std::shared_ptr<Rpc::Packet> message)
 	{
         const Rpc::Head & head = message->GetHead();
         if(!head.Get("func", this->mFullName))
@@ -126,48 +126,71 @@ namespace Sentry
         return this->AddTask(rpcId, taskSource)->Await();
     }
 
-    void InnerNetMessageComponent::OnMessage(std::shared_ptr<Rpc::Packet> message)
+    int InnerNetMessageComponent::OnMessage(std::shared_ptr<Rpc::Packet> message)
     {
-        Tcp::Type type = (Tcp::Type)message->GetType();
-        switch (type)
+        switch (message->GetType())
         {
         case Tcp::Type::Request:
-        {
-            int code = this->OnRequest(message);
-            if (code != XCode::Successful)
-            {
-                message->Clear();
-                const std::string& address = message->From();
-                this->Send(address, code, std::move(message));
-            }
-            break;
-        } 
+            return this->HandlerRequest(message);
         case Tcp::Type::Response:
-        {
-            if (this->mOuterComponent != nullptr)
-            {
-                std::string target;
-                // 网关转发过来的消息 必须带client字段
-                if (message->GetHead().Get("client", target))
-                {
-                    message->SetFrom(target);
-                    message->GetHead().Remove("client");
-                    this->mOuterComponent->OnMessage(message);
-                    return;
-                }
-            }
-            long long rpcId = 0;
-            if (message->GetHead().Get("rpc", rpcId))
-            {
-                this->OnResponse(rpcId, message);
-                return;
-            }
-            break;
+			return this->HandlerResponse(message);
+		case Tcp::Type::Forward:
+			return this->HandlerForward(message);
+		case Tcp::Type::Broadcast:
+			return this->HandlerBroadcast(message);
         }
-        }
+		return XCode::Successful;
     }
 
-    bool InnerNetMessageComponent::Send(const std::string &address, std::shared_ptr<Rpc::Packet> message)
+	int InnerNetMessageComponent::HandlerForward(std::shared_ptr<Rpc::Packet> message)
+	{
+		if (this->mOuterComponent != nullptr)
+		{
+			return XCode::NetWorkError;
+		}
+		long long userId = 0;
+		if (!message->GetHead().Get("id", userId))
+		{
+			return XCode::CallArgsError;
+		}
+		message->GetHead().Remove("id");
+		message->SetType(Tcp::Type::Request);
+		if(!this->mOuterComponent->Send(userId, message))
+		{
+			return XCode::NotFindUser;
+		}
+		return XCode::Successful;
+	}
+
+	int InnerNetMessageComponent::HandlerResponse(std::shared_ptr<Rpc::Packet> message)
+	{
+		if (this->mOuterComponent != nullptr)
+		{
+			std::string address;
+			// 网关转发过来的消息 必须带client字段
+			if (message->GetHead().Get("client", address))
+			{
+				message->GetHead().Remove("client");
+				this->mOuterComponent->Send(address, message);
+				return XCode::Successful;
+			}
+		}
+		long long rpcId = 0;
+		if (message->GetHead().Get("rpc", rpcId))
+		{
+			this->OnResponse(rpcId, message);
+			return XCode::Successful;
+		}
+		return XCode::Successful;
+	}
+
+	int InnerNetMessageComponent::HandlerBroadcast(std::shared_ptr<Rpc::Packet> message)
+	{
+		return XCode::Successful;
+	}
+
+
+	bool InnerNetMessageComponent::Send(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
         if (this->mInnerComponent == nullptr)
         {

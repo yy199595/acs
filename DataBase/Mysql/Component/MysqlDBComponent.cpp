@@ -4,6 +4,7 @@
 
 #include"MysqlDBComponent.h"
 #include"Client/MysqlClient.h"
+#include"Client/MysqlHelper.h"
 #include"Message/user.pb.h"
 #include"Config/MysqlConfig.h"
 namespace Sentry
@@ -22,6 +23,13 @@ namespace Sentry
 
 namespace Sentry
 {
+	bool MysqlDBComponent::LateAwake()
+	{
+		this->mSqlHelper = std::make_unique<MysqlHelper>();
+		this->mProtoComponent = this->mApp->GetMsgComponent();
+		return true;
+	}
+
     void MysqlDBComponent::CloseClients()
     {
         for(std::unique_ptr<MysqlClient> & mysqlClient : this->mMysqlClients)
@@ -122,5 +130,10 @@ namespace Sentry
 		}
 		mysqlClient->SendCommand(command);
 		return true;
+	}
+	bool MysqlDBComponent::Execute(int index, std::shared_ptr<Mysql::ICommand> command)
+	{
+		std::shared_ptr<Mysql::Response> response = this->Run(index, command);
+		return response != nullptr && response->IsOk();
 	}
 }

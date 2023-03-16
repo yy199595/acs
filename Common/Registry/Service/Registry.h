@@ -17,13 +17,14 @@ namespace Sentry
     private:
         int Ping(const Rpc::Packet & head);
         int UnRegister(const com::type::string& request);
-        int Query(const com::array::string& request, s2s::server::list& response);
-		int Register(const s2s::server::info & request, s2s::server::list & response);
+		int Register(const s2s::server::info & request);
+		int Query(const com::array::string& request, s2s::server::list& response);
     private:
 		void OnSecondUpdate(int tick) final;
         void OnNodeServerError(const std::string& address);
 	 private:
         size_t mIndex;
+		std::string mTable;
         class NodeMgrComponent * mNodeComponent;
         class InnerNetComponent* mInnerComponent;
 		class MysqlDBComponent * mMysqlComponent;

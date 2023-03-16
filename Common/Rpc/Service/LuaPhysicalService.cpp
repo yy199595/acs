@@ -101,7 +101,7 @@ namespace Sentry
 		Lua::LuaModule * luaModule = this->mLuaComponent->GetModule(this->GetName());
 		if(luaModule != nullptr)
 		{
-			luaModule->OnLogin(userId);
+			luaModule->Invoke("OnLogin", userId);
 		}
 	}
 
@@ -110,7 +110,7 @@ namespace Sentry
 		Lua::LuaModule * luaModule = this->mLuaComponent->GetModule(this->GetName());
 		if(luaModule != nullptr)
 		{
-			luaModule->OnLogout(userId);
+			luaModule->Invoke("OnLogout", userId);
 		}
 	}
 

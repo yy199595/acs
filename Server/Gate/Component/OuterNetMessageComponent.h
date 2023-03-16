@@ -16,17 +16,14 @@ namespace Sentry
 	 public:
 		OuterNetMessageComponent();
     public:
-        bool GetAddress(long long id, std::string & address);
-        bool CreateToken(long long userId, std::string & token);
-    public:
-        void OnClose(const std::string & address);
-        int OnAuth(const std::string & address, std::shared_ptr<Rpc::Packet> message);
-        int OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message);
+		int OnMessage(long long userId, std::shared_ptr<Rpc::Packet> message);
+	public:
+		int OnLogin(long long userId);
+		int OnLogout(long long userId);
     private:
 		bool LateAwake() final;
-		int OnClientLogin(long long userId);
-		int OnClientLogout(long long userId);
-	 private:
+		int OnRequest(long long userId, std::shared_ptr<Rpc::Packet> message);
+	private:
 		class NodeMgrComponent * mNodeComponent;
         std::unordered_map<std::string, long long> mTokens;
         class InnerNetMessageComponent * mInnerMessageComponent;

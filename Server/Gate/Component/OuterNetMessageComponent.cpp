@@ -32,77 +32,21 @@ namespace Sentry
 		return true;
 	}
 
-    bool OuterNetMessageComponent::CreateToken(long long userId, std::string & token)
-    {
-        long long nowTime = Helper::Time::NowSecTime();
-        std::string rand = fmt::format("{0}:{1}", userId, nowTime);
-        token = Helper::Md5::GetMd5(rand);
-        this->mTokens.emplace(token, userId);
-        return true;
-    }
-
-    bool OuterNetMessageComponent::GetAddress(long long id, std::string & address)
-    {
-        auto iter = this->mClientAddressMap.find(id);
-        if(iter != this->mClientAddressMap.end())
-        {
-            address = iter->second;
-            return true;
-        }
-        return false;
-    }
-
-    void OuterNetMessageComponent::OnClose(const std::string &address)
-    {
-        auto iter = this->mUserAddressMap.find(address);
-        if(iter != this->mUserAddressMap.end())
-        {
-            long long userId = iter->second;
-			this->OnClientLogout(userId);
-            auto iter1 = this->mClientAddressMap.find(userId);
-            if(iter1 != this->mClientAddressMap.end())
-            {
-                this->mClientAddressMap.erase(iter1);
-            }
-            this->mUserAddressMap.erase(iter);
-        }
-    }
-
-    int OuterNetMessageComponent::OnAuth(const std::string &address, std::shared_ptr<Rpc::Packet> message)
-    {
-        std::string token;
-        if(!message->GetHead().Get("token", token))
-        {
-            return XCode::CallArgsError;
-        }
-        if(this->mUserAddressMap.find(address) != this->mUserAddressMap.end())
-        {
-            return XCode::Successful;
-        }
-        auto iter = this->mTokens.find(token);
-        if(iter == this->mTokens.end())
-        {
-            return XCode::Failure;
-        }
-        long long userId = iter->second;
-        this->mUserAddressMap.emplace(address, userId);
-        this->mClientAddressMap.emplace(userId, address);
-		return this->OnClientLogin(userId);
-    }
-
-	int OuterNetMessageComponent::OnRequest(const std::string & address, std::shared_ptr<Rpc::Packet> message)
+	int OuterNetMessageComponent::OnMessage(long long userId, std::shared_ptr<Rpc::Packet> message)
 	{
-        const Rpc::Head& head = message->GetHead();
-        auto iter = this->mUserAddressMap.find(address);
-        if(iter == this->mUserAddressMap.end() || iter->second == 0)
-        {
-            return XCode::NotFindUser;
-        }
-		std::string fullName;
-		if(!head.Get("func", fullName))
-        {
-            return XCode::CallArgsError;
-        }
+		switch (message->GetType())
+		{
+		case Tcp::Type::Ping:
+			break;
+		case Tcp::Type::Request:
+			return this->OnRequest(userId, std::move(message));
+		}
+		return XCode::UnKnowPacket;
+	}
+
+	int OuterNetMessageComponent::OnRequest(long long userId, std::shared_ptr<Rpc::Packet> message)
+	{
+		const std::string & fullName = message->GetHead().GetStr("func");
 		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
 		if (methodConfig == nullptr || methodConfig->Type != "Client")
 		{
@@ -113,13 +57,11 @@ namespace Sentry
             return XCode::CallArgsError;
         }
         std::string target;
-        long long userId = iter->second;
 		const std::string & server = methodConfig->Server;
         if (!this->mNodeComponent->GetServer(server, userId, target))
         {
             return XCode::NotFindUser;
         }
-        
 		message->GetHead().Add("id", userId);
 		if(!this->mInnerMessageComponent->Send(target, message))
 		{
@@ -128,7 +70,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	int OuterNetMessageComponent::OnClientLogin(long long int userId)
+	int OuterNetMessageComponent::OnLogin(long long userId)
 	{
 		static std::string func("Login");
 		std::vector<const NodeConfig *> configs;
@@ -153,7 +95,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	int OuterNetMessageComponent::OnClientLogout(long long int userId)
+	int OuterNetMessageComponent::OnLogout(long long userId)
 	{
 		static std::string func("Logout");
 		std::unordered_map<std::string, std::string> servers;

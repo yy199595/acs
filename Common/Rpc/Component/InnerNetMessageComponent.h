@@ -24,13 +24,16 @@ namespace Sentry
 		InnerNetMessageComponent() = default;
     public:
         bool Ping(const std::string & address);
-		void OnMessage(std::shared_ptr<Rpc::Packet> message);
+		int OnMessage(std::shared_ptr<Rpc::Packet> message);
         bool Send(const std::string & address, std::shared_ptr<Rpc::Packet> message);
         std::shared_ptr<Rpc::Packet> Call(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
 		bool Awake() final;
 		bool LateAwake() final;
-		int OnRequest(std::shared_ptr<Rpc::Packet> request);
+		int HandlerForward(std::shared_ptr<Rpc::Packet> message);
+		int HandlerRequest(std::shared_ptr<Rpc::Packet> message);
+		int HandlerResponse(std::shared_ptr<Rpc::Packet> message);
+		int HandlerBroadcast(std::shared_ptr<Rpc::Packet> message);
 		void OnTaskComplete(int key) final { this->mNumberPool.Push(key); }
 		void Send(const std::string& address, int code, std::shared_ptr<Rpc::Packet> pack);
         void Invoke(const RpcMethodConfig * config, std::shared_ptr<Rpc::Packet> message);

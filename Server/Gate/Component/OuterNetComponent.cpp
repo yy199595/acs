@@ -23,7 +23,9 @@ namespace Sentry
 
 	bool OuterNetComponent::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(this->mOuterMessageComponent = this->GetComponent<OuterNetMessageComponent>());
+		this->mMaxHandlerCount = 500;
+		this->mOuterMessageComponent = this->GetComponent<OuterNetMessageComponent>();
+		ServerConfig::Inst()->GetMember("message", "outer", this->mMaxHandlerCount);
 		return true;
 	}
 
@@ -39,82 +41,92 @@ namespace Sentry
 
 	void OuterNetComponent::OnMessage(std::shared_ptr<Rpc::Packet> message)
 	{
-        const std::string& address = message->From();
-		switch ((Tcp::Type)message->GetType())
+		const std::string& address = message->From();
+		switch (message->GetType())
 		{
 		case Tcp::Type::Auth:
-			if (!this->OnAuth(address, message))
+			if (!this->OnAuth(message))
 			{
 				this->StartClose(address);
 				CONSOLE_LOG_ERROR("[" << address << "] auth failure");
 			}
-			break;
+			return;
 		case Tcp::Type::Ping:
 			message->SetContent("hello");
-			this->SendData(address, message);
-			break;
-		case Tcp::Type::Request:
-			if (!this->OnRequest(address, message))
+			message->SetType(Tcp::Type::Response);
+			this->Send(address, message);
+			return;
+		}
+		long long userId = 0;
+		if (!this->GetUserId(address, userId))
+		{
+			LOG_ERROR("not auth client message : [" << address << "]");
+			return;
+		}
+		message->GetHead().Add("id", userId);
+		this->mMessages.push(std::move(message));
+	}
+
+	void OuterNetComponent::OnFrameUpdate(float t)
+	{
+		for (int index = 0; index < this->mMaxHandlerCount && !this->mMessages.empty(); index++)
+		{
+			std::shared_ptr<Rpc::Packet> message = this->mMessages.front();
 			{
-				this->StartClose(address);
-				CONSOLE_LOG_ERROR("[" << address << "] request failure");
+				long long userId = 0;
+				message->GetHead().Get("id", userId);
+				int code = this->mOuterMessageComponent->OnMessage(userId, message);
+				if(code != XCode::Successful && message->GetHead().Has("rpc"))
+				{
+					message->Clear();
+					message->GetHead().Add("code", code);
+					this->Send(message->From(), std::move(message));
+				}
 			}
-			break;
-		case Tcp::Type::Response:
-			this->OnResponse(address, message);
-			break;
-		default:
-			this->StartClose(address);
-			break;
+			this->mMessages.pop();
 		}
 	}
 
-	bool OuterNetComponent::OnResponse(const std::string& address, std::shared_ptr<Rpc::Packet> message)
+	bool OuterNetComponent::Send(const std::string& address, const std::shared_ptr<Rpc::Packet>& message)
 	{
-		this->mWaitCount--;
-		OuterNetClient * outerNetClient = this->GetGateClient(address);
-		if(outerNetClient == nullptr)
+		auto iter = this->mGateClientMap.find(address);
+		if(iter == this->mGateClientMap.end())
 		{
-			LOG_ERROR("send to client [" << address << "] failure");
 			return false;
 		}
-		outerNetClient->SendData(message);
+		iter->second->SendData(message);
 		return true;
 	}
 
-    bool OuterNetComponent::OnAuth(const std::string &address, std::shared_ptr<Rpc::Packet> message)
+    bool OuterNetComponent::OnAuth(std::shared_ptr<Rpc::Packet> message)
 	{
-		Rpc::Head& head = message->GetHead();
-		int code = this->mOuterMessageComponent->OnAuth(address, message);
-		if (code != XCode::Successful)
+		std::string token;
+		Rpc::Head & head = message->GetHead();
+		if(!head.Get("token", token))
 		{
 			return false;
 		}
-		this->mAuthClients.insert(address);
-
-		head.Remove("token");
-		message->SetType(Tcp::Type::Response);
-		head.Add("code", XCode::Successful);
-		return this->SendData(address, message);
-	}
-
-    bool OuterNetComponent::OnRequest(const std::string &address, std::shared_ptr<Rpc::Packet> message)
-    {
-		this->mSumCount++;
-		Rpc::Head & head = message->GetHead();
-		if(head.Has("rpc"))
+		auto iter = this->mClientTokens.find(token);
+		if(iter == this->mClientTokens.end())
 		{
-			this->mWaitCount++;
+			LOG_ERROR("not find client token:" << token);
+			return false;
 		}
-        head.Add("client", address);
-        int code = this->mOuterMessageComponent->OnRequest(address, message);
-        if (code != XCode::Successful)
-        {
-            this->StartClose(address);
-            return false;
-        }
-        return true;
-    }
+		long long userId = iter->second;
+		this->mClientTokens.erase(iter);
+		const std::string &address = message->From();
+		this->mAddressUserMap.emplace(address, userId);
+		this->mUserAddressMap.emplace(userId, address);
+		int code = this->mOuterMessageComponent->OnLogin(userId);
+		const std::string & error = CodeConfig::Inst()->GetDesc(code);
+		LOG_ERROR("user id : " << userId << "login result = " << error);
+		{
+			head.Remove(token);
+			head.Add("code", code);
+			head.Add("error", error);
+		}
+		return this->Send(address, message);
+	}
 
     void OuterNetComponent::OnListen(std::shared_ptr<SocketProxy> socket)
     {
@@ -156,12 +168,18 @@ namespace Sentry
             }
             this->mGateClientMap.erase(iter);
         }
-        auto iter1 = this->mAuthClients.find(address);
-        if(iter1 != this->mAuthClients.end())
+        auto iter1 = this->mAddressUserMap.find(address);
+        if(iter1 != this->mAddressUserMap.end())
         {
-            this->mAuthClients.erase(iter1);
-        }
-        this->mOuterMessageComponent->OnClose(address);
+			long long userId = iter1->second;
+            this->mAddressUserMap.erase(iter1);
+			auto iter2 = this->mUserAddressMap.find(userId);
+			if(iter2 != this->mUserAddressMap.end())
+			{
+				this->mUserAddressMap.erase(iter2);
+			}
+			this->mOuterMessageComponent->OnLogout(userId);
+		}
     }
 
     void OuterNetComponent::OnDestroy()
@@ -169,73 +187,67 @@ namespace Sentry
 
     }
 
-
-    bool OuterNetComponent::IsAuth(const std::string &address)
+    bool OuterNetComponent::Send(long long userId, const std::shared_ptr<Rpc::Packet>& message)
     {
-        auto iter = this->mAuthClients.find(address);
-        return iter != this->mAuthClients.end();
-    }
-
-    bool OuterNetComponent::SendData(const std::shared_ptr<Rpc::Packet>& message)
-    {
-        message->SetType(Tcp::Type::Request);
-        auto iter = this->mGateClientMap.begin();
-        for(;iter != this->mGateClientMap.end(); iter++)
-        {
-            std::shared_ptr<OuterNetClient> proxyClient = iter->second;
-            if (proxyClient != nullptr && this->IsAuth(proxyClient->GetAddress()))
-            {
-                proxyClient->SendData(message->Clone());
-            }
-        }
-        return true;
-    }
-
-    bool OuterNetComponent::SendData(long long userId, const std::shared_ptr<Rpc::Packet>& message)
-    {
-        std::string address;
-        if(!this->mOuterMessageComponent->GetAddress(userId, address))
-        {
-            CONSOLE_LOG_ERROR("send message to user:" << userId << " failure");
-            return false;
-        }
-        message->SetType(Tcp::Type::Request);
-        return this->SendData(address, message);
-    }
-
-	bool OuterNetComponent::SendData(const std::string &address, const std::shared_ptr<Rpc::Packet>& message)
-	{
-        message->GetHead().Remove("address");
-		OuterNetClient * outerNetClient = this->GetGateClient(address);
-		if(outerNetClient != nullptr)
+		auto iter = this->mUserAddressMap.find(userId);
+		if(iter == this->mUserAddressMap.end())
 		{
-            outerNetClient->SendData(message);
-			return true;
+			CONSOLE_LOG_ERROR("send message to user:" << userId << " failure");
+			return false;
 		}
-        CONSOLE_LOG_ERROR("send outer message to " << address << " error");
-		return false;
-	}
-
-	OuterNetClient * OuterNetComponent::GetGateClient(const std::string & address)
-	{
-		auto iter = this->mGateClientMap.find(address);
-		return iter != this->mGateClientMap.end() ? iter->second.get() : nullptr;
-	}
+		return this->Send(iter->second, message);
+    }
 
 	void OuterNetComponent::StartClose(const std::string & address)
 	{
-		OuterNetClient * proxyClient = this->GetGateClient(address);
-		if (proxyClient != nullptr)
+		auto iter = this->mGateClientMap.find(address);
+		if(iter == this->mGateClientMap.end())
 		{
-			proxyClient->StartClose();
+			return;
 		}
+		iter->second->StartClose();
 	}
 
     void OuterNetComponent::OnRecord(Json::Writer &document)
     {
 		document.Add("sum").Add(this->mSumCount);
 		document.Add("wait").Add(this->mWaitCount);
-        document.Add("auth").Add(this->mAuthClients.size());
+        document.Add("auth").Add(this->mAddressUserMap.size());
         document.Add("client").Add(this->mGateClientMap.size());
     }
+	bool OuterNetComponent::MakeToken(long long id, std::string& token)
+	{
+		long long now = Helper::Time::NowSecTime();
+		token = Helper::Md5::GetMd5(fmt::format("{0}:{1}", now, id));
+		if(this->mClientTokens.find(token) != this->mClientTokens.end())
+		{
+			return false;
+		}
+		this->mClientTokens.emplace(token, id);
+		return true;
+	}
+	bool OuterNetComponent::GetUserId(const std::string& address, long long & userId) const
+	{
+		auto iter = this->mAddressUserMap.find(address);
+		if(iter == this->mAddressUserMap.end())
+		{
+			return false;
+		}
+		userId = iter->second;
+		return true;
+	}
+	size_t OuterNetComponent::Broadcast(const std::shared_ptr<Rpc::Packet>& message)
+	{
+		size_t count = 0;
+		auto iter = this->mAddressUserMap.begin();
+		for(; iter != this->mAddressUserMap.end(); iter++)
+		{
+			const std::string & address = iter->first;
+			if(this->Send(address, message->Clone()))
+			{
+				count++;
+			}
+		}
+		return count;
+	}
 }

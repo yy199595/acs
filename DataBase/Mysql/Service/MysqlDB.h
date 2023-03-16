@@ -29,9 +29,9 @@ namespace Sentry
 		bool OnStart() final;
         void OnClose() final;
 	 private:
-        class ProtoComponent * mProtoComponent;
+		MysqlHelper mSqlHelper;
+		class ProtoComponent * mProtoComponent;
         class MysqlDBComponent * mMysqlComponent;
-        std::shared_ptr<MysqlHelper> mMysqlHelper;
         std::unordered_map<std::string, std::string> mMainKeys;
     };
 }// namespace Sentry

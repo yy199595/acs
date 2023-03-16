@@ -27,6 +27,7 @@ namespace Sentry
 namespace Sentry
 {
     class MysqlClient;
+	class MysqlHelper;
 	class MysqlDBComponent : public RpcTaskComponent<int, Mysql::Response>, public IRpc<Mysql::Response>
     {
     public:
@@ -36,9 +37,12 @@ namespace Sentry
         void CloseClients();
         bool Ping(int index = 0);
         size_t MakeMysqlClient();
+	public:
+		bool Execute(int index, std::shared_ptr<Mysql::ICommand> command);
         std::shared_ptr<Mysql::Response> Run(std::shared_ptr<Mysql::ICommand> command);
 		std::shared_ptr<Mysql::Response> Run(int index, std::shared_ptr<Mysql::ICommand> command);
 	 private:
+		bool LateAwake() final;
 		bool Send(std::shared_ptr<Mysql::ICommand> command);
 		bool Send(int index, std::shared_ptr<Mysql::ICommand> command);
 		void OnConnectSuccessful(const std::string &address) final;
@@ -46,7 +50,9 @@ namespace Sentry
 		void OnTaskComplete(int key) final { this->mNumerPool.Push(key);}
 	private:
 		std::queue<MysqlClient*> mClients;
+		ProtoComponent * mProtoComponent;
 		Util::NumberBuilder<int, 1> mNumerPool;
+		std::unique_ptr<MysqlHelper> mSqlHelper;
 		std::vector<std::unique_ptr<MysqlClient>> mMysqlClients;
     };
 }

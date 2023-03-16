@@ -9,7 +9,7 @@ namespace Sentry
 {
 	// 管理内网rpc的session
 	class InnerNetComponent : public TcpListenerComponent,
-                              public IRpc<Rpc::Packet>, public IServerRecord
+							  public IRpc<Rpc::Packet>, public IServerRecord, public IFrameUpdate
 	{
 	 public:
 		InnerNetComponent() = default;
@@ -23,6 +23,7 @@ namespace Sentry
 	 protected:
         bool Awake() final;
         bool LateAwake() final;
+		void OnFrameUpdate(float t) final;
         void OnRecord(Json::Writer & document) final;
 		void OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 public:
@@ -34,19 +35,24 @@ namespace Sentry
         InnerNetClient * GetSession(const std::string& address);
         InnerNetClient * GetOrCreateSession(const std::string& address);
 	public:
-		bool Send(std::shared_ptr<Rpc::Packet> message);
+		bool Send(std::shared_ptr<Rpc::Packet> message); //发送到本地
 		bool Send(const std::string & address, std::shared_ptr<Rpc::Packet> message);
-	 private:
+	public:
+		size_t GetConnectClients(std::vector<std::string> & list) const; //获取所有连接进来的客户端
+		size_t Broadcast(std::shared_ptr<Rpc::Packet> message) const; //广播给所有链接进来的客户端
+	private:
         bool IsAuth(const std::string & address);          
         bool OnAuth(std::shared_ptr<Rpc::Packet> message);
 	 private:
+		int mMaxHandlerCount;
 		std::string mLocation;
 		unsigned int mSumCount;
 		unsigned int mWaitCount;
         class ThreadComponent * mNetComponent;
         class InnerNetMessageComponent* mMessageComponent;
         std::unordered_map<std::string, std::string> mUserMaps;
-        std::unordered_map<std::string, std::shared_ptr<InnerNetClient>> mRpcClientMap;
+		std::queue<std::shared_ptr<Rpc::Packet>> mWaitMessages;
+		std::unordered_map<std::string, std::shared_ptr<InnerNetClient>> mRpcClientMap;
         std::unordered_map<std::string, std::unique_ptr<ServiceNodeInfo>> mLocationMaps;
     };
 }

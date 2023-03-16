@@ -4,6 +4,10 @@
         "task": 1,
         "network": 4
     },
+    "message": {
+        "inner": 100,
+        "outer": 500
+    },
     "path": {
         "proto": "proto",
         "sqlite": "data/sqlite/",

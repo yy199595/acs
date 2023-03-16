@@ -21,7 +21,6 @@ namespace Sentry
         BIND_COMMON_RPC_METHOD(MysqlDB::Create);
         this->mProtoComponent = this->GetComponent<ProtoComponent>();
         this->mMysqlComponent = this->GetComponent<MysqlDBComponent>();
-        this->mMysqlHelper = std::make_shared<MysqlHelper>(this->mProtoComponent);
         for (int index = 0; index < MysqlConfig::Inst()->MaxCount; index++)
         {
             this->mMysqlComponent->MakeMysqlClient();
@@ -84,77 +83,91 @@ namespace Sentry
 
 	int MysqlDB::Add(const db::mysql::add& request)
     {
-        std::string sql;
-        if (!this->mMysqlHelper->ToSqlCommand(request, sql))
-        {
-            return XCode::CallArgsError;
-        }
+		if(!request.has_data())
+		{
+			return XCode::CallArgsError;
+		}
+		const Any & data = request.data();
+		std::shared_ptr<Message> message = this->mProtoComponent->New(data);
+		if(message == nullptr)
+		{
+			return XCode::CreateProtoFailure;
+		}
+		std::string sql;
+		if(!this->mSqlHelper.Insert(*message, sql))
+		{
+			return XCode::Failure;
+		}
+
 		int index = request.flag();
-        std::shared_ptr<Message> message = this->mMysqlHelper->GetData();
 		std::shared_ptr<Mysql::SqlCommand> command = std::make_shared<Mysql::SqlCommand>(sql);
-		if (!this->mMysqlComponent->Run(index, command))
-        {
-            return XCode::Failure;
-        }
-        return XCode::Successful;
+		return this->mMysqlComponent->Execute(index, command) ? XCode::Successful : XCode::MysqlInvokeFailure;
     }
 
 	int MysqlDB::Save(const db::mysql::save& request)
     {
-        std::string sql;
-        if (!this->mMysqlHelper->ToSqlCommand(request, sql))
+		if(!request.has_data())
+		{
+			return XCode::CallArgsError;
+		}
+		const Any & data = request.data();
+		std::shared_ptr<Message> message = this->mProtoComponent->New(data);
+		if(message == nullptr)
+		{
+			return XCode::CreateProtoFailure;
+		}
+		std::string sql;
+		if (!this->mSqlHelper.Replace(*message, sql))
         {
             return XCode::CallArgsError;
         }
 		int index = request.flag();
 		std::shared_ptr<Mysql::SqlCommand> command = std::make_shared<Mysql::SqlCommand>(sql);
-        if (!this->mMysqlComponent->Run(index, command))
-        {
-            return XCode::Failure;
-        }
-        return XCode::Successful;
+		return this->mMysqlComponent->Execute(index, command) ? XCode::Successful : XCode::MysqlInvokeFailure;
     }
 
 	int MysqlDB::Update(const db::mysql::update& request)
     {
         std::string sql;
-        if (!this->mMysqlHelper->ToSqlCommand(request, sql))
+		const std::string & table = request.table();
+		const std::string & where = request.where_json();
+		const std::string & update = request.update_json();
+        if (!this->mSqlHelper.Update(table, where, update, sql))
         {
             return XCode::CallArgsError;
         }
 		int index = request.flag();
 		const std::string & fullName = request.table();
 		std::shared_ptr<Mysql::SqlCommand> command = std::make_shared<Mysql::SqlCommand>(sql);
-
-        if(!this->mMysqlComponent->Run(index, command))
-        {
-            return XCode::Failure;
-        }
-        return XCode::Successful;
+		return this->mMysqlComponent->Execute(index, command) ? XCode::Successful : XCode::MysqlInvokeFailure;
     }
 
 	int MysqlDB::Delete(const db::mysql::remove& request)
     {
         std::string sql;
-        if (!this->mMysqlHelper->ToSqlCommand(request, sql))
+		const std::string & table = request.table();
+		const std::string & where = request.where_json();
+		if (!this->mSqlHelper.Delete(table, where, sql))
         {
             return XCode::CallArgsError;
         }
 		int index = request.flag();
 		std::shared_ptr<Mysql::SqlCommand> command = std::make_shared<Mysql::SqlCommand>(sql);
 		std::shared_ptr<Mysql::Response> response = this->mMysqlComponent->Run(index, command);
-		return response && response->IsOk() ? XCode::Successful : XCode::Failure;
+		return this->mMysqlComponent->Execute(index, command)? XCode::Successful : XCode::MysqlInvokeFailure;
     }
 
 	int MysqlDB::Query(const db::mysql::query& request, db::mysql::response& response)
     {
 		std::shared_ptr<Mysql::QueryCommand> command;
-		const std::string & fullName = request.table();
 		if(request.sql().empty())
 		{
 			std::string sql;
-			const std::string& fullName = request.table();
-			if (!this->mMysqlHelper->ToSqlCommand(request, sql))
+			std::vector<std::string> fields;
+			const int limit = request.limit();
+			const std::string& table = request.table();
+			const std::string & where = request.where_json();
+			if (!this->mSqlHelper.Select(table, where, fields, limit, sql))
 			{
 				return XCode::CallArgsError;
 			}
@@ -171,13 +184,11 @@ namespace Sentry
 			response.set_error(result->GetError());
 			return XCode::MysqlInvokeFailure;
 		}
-        auto iter = this->mMainKeys.find(fullName);
         for (size_t index = 0; index < result->size(); index++)
 		{
 			Json::Writer* document = result->at(index);
 			document->WriterStream(response.add_jsons());
 		}
-
         return XCode::Successful;
     }
 }// namespace Sentry

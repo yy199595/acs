@@ -9,24 +9,26 @@
 using namespace google::protobuf;
 namespace Sentry
 {
-    class ProtoComponent;
 	class MysqlHelper
 	{
 	 public:
-		MysqlHelper(ProtoComponent * component);
+		MysqlHelper() = default;
 	 public:
 
-        bool ToSqlCommand(const db::mysql::add& messageData, std::string& sqlCommand);
+        bool Insert(const Message &, std::string& sqlCommand);
+		bool Replace(const Message &, std::string& sqlCommand);
 
-        bool ToSqlCommand(const db::mysql::save& messageData, std::string& sqlCommand);
+		bool Select(const Message & message, const std::string & where,
+			int limit, std::string & sqlCommand);
 
-        bool ToSqlCommand(const db::mysql::query& messageData, std::string& sqlCommand);
+        bool Select(const std::string & table, const std::string & where,
+			std::vector<std::string> & fields, int limit, std::string & sqlCommand);
 
-        bool ToSqlCommand(const db::mysql::remove& messageData, std::string& sqlCommand);
+        bool Delete(const std::string & table, const std::string & where, std::string& sqlCommand);
 
-        bool ToSqlCommand(const db::mysql::update& messageData, std::string& sqlCommand);
+        bool Update(const std::string & table, const std::string & where, const std::string & update, std::string& sqlCommand);
 
-        bool ToSqlCommand(const std::string& table, const std::string& cmd, Message& message, std::string& sql);
+        bool ToSqlCommand(const std::string& table, const std::string& cmd, const Message& message, std::string& sql);
 
     public:
         bool GetValue(const std::string & key, std::string & value);
@@ -40,7 +42,6 @@ namespace Sentry
     private:
         rapidjson::Document mDocument1;
         rapidjson::Document mDocument2;
-        ProtoComponent * mPorotComponent;
         std::shared_ptr<Message> mMessage;
         std::stringstream mSqlCommandStream;
 		std::stringstream mSqlCommandStream2;

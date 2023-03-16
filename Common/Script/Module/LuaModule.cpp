@@ -180,22 +180,10 @@ namespace Lua
 		}
 		return false;
 	}
-	void LuaModule::OnLogin(long long int userId)
+
+	void LuaModule::Invoke(const std::string& func, long long userId)
 	{
-		const static std::string name("OnLogin");
-		if (this->GetFunction(name))
-		{
-			lua_pushinteger(this->mLua, userId);
-			if (lua_pcall(this->mLua, 1, 0, 0) != LUA_OK)
-			{
-				LUA_LOG_ERROR(lua_tostring(this->mLua, -1));
-			}
-		}
-	}
-	void LuaModule::OnLogout(long long int userId)
-	{
-		const static std::string name("OnLogout");
-		if (this->GetFunction(name))
+		if(this->GetFunction(func))
 		{
 			lua_pushinteger(this->mLua, userId);
 			if (lua_pcall(this->mLua, 1, 0, 0) != LUA_OK)

@@ -10,10 +10,10 @@ namespace Lua
 {
 	class LuaModule
 	{
-	 public:
-		LuaModule(lua_State * lua, const std::string & name, const std::string & path);
+	public:
+		LuaModule(lua_State* lua, const std::string& name, const std::string& path);
 		~LuaModule();
-	 public:
+	public:
 		bool Awake();
 		bool Start();
 		bool Close();
@@ -21,17 +21,16 @@ namespace Lua
 		void Update(int tick);
 		void OnLocalComplete();
 		void OnClusterComplete();
-		void OnLogin(long long userId);
-		void OnLogout(long long userId);
-	 	bool GetFunction(const std::string & name, bool cache = true);
-	 private:
+		void Invoke(const std::string & func, long long user);
+		bool GetFunction(const std::string& name, bool cache = true);
+	private:
 		int mRef;
 		bool mIsUpdate;
 		std::string mMd5;
-		lua_State * mLua;
-	 	const std::string mName;
-	 	const std::string mPath;
-		 std::unordered_map<std::string, int> mFunctions;
+		lua_State* mLua;
+		const std::string mName;
+		const std::string mPath;
+		std::unordered_map<std::string, int> mFunctions;
 	};
 }
 

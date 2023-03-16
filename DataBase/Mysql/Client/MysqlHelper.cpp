@@ -1,16 +1,10 @@
 ﻿#include"MysqlHelper.h"
 #include"App/App.h"
-#include"Component/ProtoComponent.h"
 #include"google/protobuf/util/json_util.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 namespace Sentry
 {
-    MysqlHelper::MysqlHelper(ProtoComponent *component)
-    {
-        this->mPorotComponent = component;
-    }
-
     void MysqlHelper::GetFiles(const Message &message, std::stringstream &ss, char cc)
     {
         const Descriptor * descriptor = message.GetDescriptor();
@@ -27,13 +21,13 @@ namespace Sentry
     }
 
 	bool MysqlHelper::ToSqlCommand(const std::string& table, const std::string& cmd,
-		Message& message, std::string& sql)
+		const Message& message, std::string& sql)
     {
         this->mSqlCommandStream.str("");
         this->mSqlCommandStream << cmd << " into " << table << '(';
 
         this->GetFiles(message, this->mSqlCommandStream);
-        
+
         this->mSqlCommandStream << ")values(";
         const Reflection *pReflection = message.GetReflection();
         const Descriptor * descriptor = message.GetDescriptor();
@@ -97,19 +91,17 @@ namespace Sentry
         return true;
     }
 
-	bool MysqlHelper::ToSqlCommand(const db::mysql::update& messageData, std::string& sqlCommand)
+	bool MysqlHelper::Update(const std::string & table,
+		const std::string & where, const std::string & update, std::string& sqlCommand)
 	{
-        const std::string & json1 = messageData.where_json();
-        const std::string & json2 = messageData.update_json();
-        if(!this->Parse(this->mDocument1, json1)
-            || !this->Parse(this->mDocument2, json2))
+        if(!this->Parse(this->mDocument1, where)
+            || !this->Parse(this->mDocument2, update))
         {
             return false;
         }
 
 		size_t index = 0;
 		this->mSqlCommandStream.str("");
-		const std::string& table = messageData.table();
 		this->mSqlCommandStream << "update " << table << " set ";
 		auto iter1 = this->mDocument2.MemberBegin();
 		for (; iter1 != this->mDocument2.MemberEnd(); iter1++, index++)
@@ -237,17 +229,15 @@ namespace Sentry
 		return false;
 	}
 
-	bool MysqlHelper::ToSqlCommand(const db::mysql::remove& messageData, std::string& sqlCommand)
+	bool MysqlHelper::Delete(const std::string & table, const std::string & where, std::string& sqlCommand)
 	{
-		const std::string& json = messageData.where_json();
-        if(!this->Parse(this->mDocument1, json))
+        if(!this->Parse(this->mDocument1, where))
         {
             return false;
         }
 
 		size_t index = 0;
 		this->mSqlCommandStream.str("");
-		const std::string& table = messageData.table();
 		this->mSqlCommandStream << "delete from " << table << " where ";
 		auto iter = this->mDocument1.MemberBegin();
 		for (; iter != this->mDocument1.MemberEnd(); iter++, index++)
@@ -268,67 +258,58 @@ namespace Sentry
 		return true;
 	}
 
-	bool MysqlHelper::ToSqlCommand(const db::mysql::add& request, std::string& sqlCommand)
+	bool MysqlHelper::Insert(const Message & message, std::string& sqlCommand)
 	{
-        LOG_CHECK_RET_FALSE(this->mPorotComponent);
-		this->mMessage = this->mPorotComponent->New(request.data());
-		if (this->mMessage == nullptr)
+		const std::string  table = message.GetTypeName();
+		return this->ToSqlCommand(table, "insert", message, sqlCommand);
+	}
+
+	bool MysqlHelper::Replace(const Message & message, std::string& sqlCommand)
+	{
+		const std::string  table = message.GetTypeName();
+		return this->ToSqlCommand(table, "replace", message, sqlCommand);
+	}
+
+	bool MysqlHelper::Select(const google::protobuf::Message& message,
+		const std::string& where, int limit, std::string& sqlCommand)
+	{
+		std::vector<std::string> fields;
+		const Descriptor * descriptor = message.GetDescriptor();
+		for(int index = 0; index < descriptor->field_count(); index++)
+		{
+			const FieldDescriptor * fieldDescriptor = descriptor->field(index);
+			if(fieldDescriptor != nullptr)
+			{
+				fields.emplace_back(fieldDescriptor->name());
+			}
+		}
+		const std::string & table = message.GetTypeName();
+		return this->Select(table, where, fields, limit, sqlCommand);
+	}
+
+	bool MysqlHelper::Select(const std::string & name, const std::string & where,
+		std::vector<std::string> & fields, int limit, std::string & sqlCommand)
+	{
+		if (fields.empty())
 		{
 			return false;
 		}
-		const std::string& table = request.table();
-		return this->ToSqlCommand(table, "insert", *this->mMessage, sqlCommand);
-	}
-
-	bool MysqlHelper::ToSqlCommand(const db::mysql::save& request, std::string& sqlCommand)
-	{
-        LOG_CHECK_RET_FALSE(this->mPorotComponent);
-		this->mMessage = this->mPorotComponent->New(request.data());
-		if (this->mMessage == nullptr)
-		{
-			return false;
-		}
-		const std::string& table = request.table();
-		return this->ToSqlCommand(table, "replace", *this->mMessage, sqlCommand);
-	}
-
-	bool MysqlHelper::ToSqlCommand(const db::mysql::query& request, std::string& sqlCommand)
-	{
 		this->mSqlCommandStream.str("");
-		const std::string& json = request.where_json();
-        if(!this->Parse(this->mDocument1, json))
-        {
-            return false;
-        }
-        const std::string & name = request.table();
-        std::shared_ptr<Message> message = this->mPorotComponent->New(name);
-        if(message == nullptr)
-        {
-            return false;
-        }
-        const Descriptor * descriptor = message->GetDescriptor();
-        this->mSqlCommandStream << "SELECT ";
-        if(request.fields_size() > 0)
-        {
-            for (int index = 0; index < request.fields_size(); index++)
-            {
-                const std::string & field = request.fields(index);
-                if(descriptor->FindFieldByName(field) == nullptr)
-                {
-                    return false;
-                }
-                this->mSqlCommandStream << field;
-                if(index != request.fields_size() - 1)
-                {
-                    this->mSqlCommandStream << ",";
-                }
-            }
-        }
-        else
-        {
-            this->GetFiles(*message, this->mSqlCommandStream);
-        }
-		this->mSqlCommandStream << " from " << request.table();
+		if (!this->Parse(this->mDocument1, where))
+		{
+			return false;
+		}
+		this->mSqlCommandStream << "SELECT ";
+		for (int index = 0; index < fields.size(); index++)
+		{
+			const std::string& field = fields.at(index);
+			this->mSqlCommandStream << field;
+			if (index != fields.size() - 1)
+			{
+				this->mSqlCommandStream << ",";
+			}
+		}
+		this->mSqlCommandStream << " from " << name;
 		if (this->mDocument1.MemberCount() == 0)
 		{
 			sqlCommand = this->mSqlCommandStream.str();
@@ -341,7 +322,7 @@ namespace Sentry
 		{
 			const char* key = iter->name.GetString();
 			const rapidjson::Value& jsonValue = iter->value;
-			switch(key[0])
+			switch (key[0])
 			{
 			case '$': // >
 				this->mSqlCommandStream << key + 1 << ">";
@@ -368,10 +349,10 @@ namespace Sentry
 				this->mSqlCommandStream << " and ";
 			}
 		}
-        if(request.limit() != 0)
-        {
-            this->mSqlCommandStream << " limit " << request.limit();
-        }
+		if (limit != 0)
+		{
+			this->mSqlCommandStream << " limit " << limit;
+		}
 		sqlCommand = this->mSqlCommandStream.str();
 		return true;
 	}

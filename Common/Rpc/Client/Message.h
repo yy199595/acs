@@ -55,16 +55,18 @@ namespace Rpc
 
         bool Parse(const std::string & address, std::istream &os, size_t size);
 
-        static std::shared_ptr<Packet> New(Tcp::Type type, Tcp::Porto proto);
+        static std::shared_ptr<Packet> New(int type, int proto);
 
     public:
         int GetCode(int code = XCode::Failure) const;
 
-        inline Head &GetHead() { return this->mHead; }
+        inline Head & GetHead() { return this->mHead; }
 
-        inline void SetType(Tcp::Type type) { this->mType = (int)type; }
+		inline const Head & ConstHead() const { return this->mHead; }
 
-        inline void SetProto(Tcp::Porto proto) { this->mProto = (int)proto; }
+        inline void SetType(int type) { this->mType = (int)type; }
+
+        inline void SetProto(int proto) { this->mProto = (int)proto; }
 
         inline int GetType() const { return this->mType; }
 
@@ -79,7 +81,7 @@ namespace Rpc
         inline void Append(const std::string & data) { this->mBody.append(data); }
         bool GetMethod(std::string &service, std::string &method) const;
     public:
-        std::shared_ptr<Packet> Clone();
+        std::shared_ptr<Packet> Clone() const;
     public:
         template<typename T>
         bool ParseMessage(T * message);

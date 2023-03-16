@@ -22,9 +22,11 @@ namespace Sentry
 	{
         std::string path;
         rapidjson::Document document;
+		this->mMaxHandlerCount = 200;
         const ServerConfig * config = ServerConfig::Inst();
         LOG_CHECK_RET_FALSE(config->GetPath("user", path));
-        LOG_CHECK_RET_FALSE(config->GetLocation("rpc", this->mLocation));
+		config->GetMember("message", "inner", this->mMaxHandlerCount);
+		LOG_CHECK_RET_FALSE(config->GetLocation("rpc", this->mLocation));
         LOG_CHECK_RET_FALSE(Helper::File::ReadJsonFile(path, document));
         auto iter = document.MemberBegin();
         for(; iter != document.MemberEnd(); iter++)
@@ -45,8 +47,8 @@ namespace Sentry
 
     void InnerNetComponent::OnMessage(std::shared_ptr<Rpc::Packet> message)
     {
-        const std::string& address = message->From();
-        Tcp::Type type = (Tcp::Type)message->GetType();
+		int type = message->GetType();
+		const std::string& address = message->From();
         if (type != Tcp::Type::Auth && address != this->mLocation)
         {
             if (!this->IsAuth(address))
@@ -56,16 +58,22 @@ namespace Sentry
                 return;
             }
         }
-        if (type == Tcp::Type::Auth)
-        {
-            if (!this->OnAuth(message))
-            {
-                this->StartClose(address);
-                LOG_ERROR("[" << address << "] auth error");
-            }
-            return;
-        }
-        this->mMessageComponent->OnMessage(message);
+		switch(type)
+		{
+		case Tcp::Type::Auth:
+			if (!this->OnAuth(message))
+			{
+				this->StartClose(address);
+				LOG_ERROR("[" << address << "] auth error");
+			}
+			break;
+		case Tcp::Type::Logout:
+			this->StartClose(address);
+			break;
+		default:
+			this->mWaitMessages.push(std::move(message));
+			break;
+		}
     }
 
     void InnerNetComponent::OnSendFailure(const std::string& address, std::shared_ptr<Rpc::Packet> message)
@@ -275,4 +283,53 @@ namespace Sentry
             }
         }
     }
+
+	void InnerNetComponent::OnFrameUpdate(float t)
+	{
+		for(int index = 0; index < this->mMaxHandlerCount && !this->mWaitMessages.empty(); index++)
+		{
+			std::shared_ptr<Rpc::Packet> message = this->mWaitMessages.front();
+			{
+				int code = this->mMessageComponent->OnMessage(message);
+				if(code != XCode::Successful && message->GetHead().Has("rpc"))
+				{
+					message->Clear();
+					message->GetHead().Add("code", code);
+					this->Send(message->From(), message);
+				}
+			}
+			this->mWaitMessages.pop();
+		}
+	}
+
+	size_t InnerNetComponent::GetConnectClients(std::vector<std::string>& list) const
+	{
+		size_t count = 0;
+		auto iter = this->mRpcClientMap.begin();
+		for(; iter != this->mRpcClientMap.end(); iter++)
+		{
+			if(!iter->second->IsClient()) //连接进来的
+			{
+				count++;
+				list.emplace_back(iter->first);
+			}
+		}
+		return count;
+	}
+
+
+	size_t InnerNetComponent::Broadcast(std::shared_ptr<Rpc::Packet> message) const
+	{
+		size_t count = 0;
+		auto iter = this->mRpcClientMap.begin();
+		for(; iter != this->mRpcClientMap.end(); iter++)
+		{
+			if(!iter->second->IsClient()) //连接进来的
+			{
+				count++;
+				iter->second->Send(message->Clone());
+			}
+		}
+		return count;
+	}
 }// namespace Sentry

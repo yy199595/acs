@@ -9,31 +9,29 @@
 #include"Log/CommonLogDef.h"
 namespace Tcp
 {
-    enum class Type
+    namespace Type
     {
-        None,
-        Auth,       //验证身份消息
-        Ping,       //
-        Request,    //请求消息
-        Response,   //请求的返回
-        Forward,    //网关转发给客户端消息
-        Broadcast,  //广播消息
-        SubPublish, //发布订阅消息
-        Logout,     //退出消息
-        Max
+        constexpr int None = 0;
+		constexpr int Auth = 1;       //验证身份消息
+		constexpr int Ping = 2;       //
+		constexpr int Request = 3;    //请求消息
+		constexpr int Response = 4;   //请求的返回
+		constexpr int Forward = 5;    //网关转发给客户端消息
+		constexpr int Broadcast = 6;  //广播消息
+		constexpr int SubPublish = 7; //发布订阅消息
+		constexpr int Logout = 8;     //退出消息
+        constexpr int Max = 255;
     };
-    enum class Porto
+    namespace Porto
     {
-        None,
-        Json,
-        String,
-        Protobuf,
-        Max
+		constexpr int None = 0;
+		constexpr int Json = 1;
+		constexpr int String = 2;
+		constexpr int Protobuf = 3;
+		constexpr int Max = 255;
     };
 }
 
-
-typedef std::logic_error rpc_error;
 constexpr int RPC_PACK_HEAD_LEN = sizeof(int) + sizeof(char) + sizeof(char);
 
 #endif //GameKeeper_MESSAGESTREAM_H

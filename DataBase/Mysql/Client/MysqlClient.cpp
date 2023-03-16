@@ -34,8 +34,7 @@ namespace Sentry
 		std::shared_ptr<Mysql::ICommand> command;
 		Asio::Context& io = App::Inst()->MainThread();
 		this->mLastTime = Helper::Time::NowSecTime();
-		const MysqlConfig* config = MysqlConfig::Inst();
-		while (!this->mIsClose)
+		while (true)
 		{
 			while (this->GetCommand(command))
 			{
@@ -104,7 +103,7 @@ namespace Sentry
             this->mIndex++;
 #ifdef __DEBUG__
 			CONSOLE_LOG_ERROR(mysql_error(mysql));
-			CONSOLE_LOG_ERROR("connect mysql server [" << address << "] failure");
+			//CONSOLE_LOG_ERROR("connect mysql server [" << address << "] failure");
 #endif
 			return this->StartConnect();
 		}

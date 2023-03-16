@@ -31,6 +31,7 @@ namespace Sentry
 	 public:
 		void StartClose();
 		void StartReceive();
+		bool IsClient() const { return this->mIsClient; }
         void Send(std::shared_ptr<Rpc::Packet> message);
 		long long Call(std::shared_ptr<Rpc::Packet> message);
 	 private:
