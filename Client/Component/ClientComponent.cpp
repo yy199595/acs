@@ -11,8 +11,8 @@
 #include"Component/ThreadComponent.h"
 namespace Client
 {
-	ClientTask::ClientTask(int ms)
-        : Sentry::IRpcTask<Rpc::Packet>(ms)
+	ClientTask::ClientTask(int id)
+        : Sentry::IRpcTask<Rpc::Packet>(id)
 	{
 		this->mTaskId = Helper::Guid::Create();
 	}
@@ -94,52 +94,44 @@ namespace Client
 		return true;
     }
 
-	std::shared_ptr<Rpc::Packet> ClientComponent::Call(std::shared_ptr<Rpc::Packet> request)
+	std::shared_ptr<Rpc::Packet> ClientComponent::Call(int id, std::shared_ptr<Rpc::Packet> request)
 	{
-		std::shared_ptr<ClientTask> clientRpcTask(new ClientTask(0));
+		auto iter = this->mClients.find(id);
+		if(iter == this->mClients.end())
 		{
-			long long taskId = clientRpcTask->GetRpcId();
-			request->GetHead().Add("rpc", taskId);
-			long long timeId = this->mTimerComponent->DelayCall(20 * 1000,
-				[request, taskId, this]()
-				{
-					std::string func;
-					request->GetHead().Get("func", func);
-					CONSOLE_LOG_ERROR("call " << func << " time out");
-					this->OnResponse(taskId, nullptr);
-				});
-			this->mTimers.emplace(taskId, timeId);
+			return nullptr;
 		}
-		this->mTcpClient->SendToServer(request);
-		return this->AddTask(clientRpcTask->GetRpcId(), clientRpcTask)->Await();
+		int rpcId = this->mNumberPool.Pop();
+		std::shared_ptr<ClientTask> clientRpcTask(new ClientTask(id));
+		{
+			request->GetHead().Add("rpc", rpcId);
+//			long long timeId = this->mTimerComponent->DelayCall(20 * 1000,
+//				[request, rpcId, this]()
+//				{
+//					std::string func;
+//					request->GetHead().Get("func", func);
+//					CONSOLE_LOG_ERROR("call " << func << " time out");
+//					this->OnResponse(rpcId, nullptr);
+//				});
+//			this->mTimers.emplace(rpcId, timeId);
+		}
+		iter->second->SendToServer(request);
+		return this->AddTask(rpcId, clientRpcTask)->Await();
 	}
 
-//	void ClientComponent::OnAddTask(RpcTask rpctask)
-//	{
-//		//LOG_WARN(this->GetName() << " add new task " << rpctask->GetRpcId());
-//	}
-//
-//	void ClientComponent::OnDelTask(long long key, RpcTask task)
-//	{
-//		auto iter = this->mTimers.find(key);
-//		if(iter != this->mTimers.end())
-//		{
-//            long long timerId = iter->second;
-//            this->mTimerComponent->CancelTimer(timerId);
-//			this->mTimers.erase(iter);
-//		}
-//	}
-
-	bool ClientComponent::New(const std::string& ip, unsigned short port)
+	int ClientComponent::New(const std::string& ip, unsigned short port)
 	{
-        if (this->mTcpClient != nullptr)
-        {
-            return false;
-        }
-        ThreadComponent * netComponent = this->GetComponent<ThreadComponent>();
-		std::shared_ptr<SocketProxy> socketProxy = netComponent->CreateSocket(ip, port);
-		this->mTcpClient = std::make_shared<TcpRpcClientContext>(socketProxy, this);
-        return true;
+		int id = this->mNumberPool.Pop();
+        ThreadComponent * netComponent =
+			this->GetComponent<ThreadComponent>();
+
+		std::shared_ptr<SocketProxy> socketProxy =
+			netComponent->CreateSocket(ip, port);
+
+		std::shared_ptr<TcpRpcClientContext> client =
+			std::make_shared<TcpRpcClientContext>(socketProxy, this);
+		this->mClients.emplace(id, client);
+        return id;
 	}
 
 	void ClientComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)

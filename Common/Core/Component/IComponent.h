@@ -111,6 +111,7 @@ namespace Sentry
 	{
 	public:
         virtual ~IRpc() { }
+		virtual void OnTimeout(const std::string & address) { }
 		virtual void StartClose(const std::string& address) { };
 		virtual void OnConnectSuccessful(const std::string & address) { }
 		virtual void OnCloseSocket(const std::string& address, int code) { };

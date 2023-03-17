@@ -15,6 +15,7 @@ namespace Sentry
 
     bool NodeConfig::OnLoadConfig(const rapidjson::Value &value)
     {
+		this->mIsAutoAllot = false;
         if(value.HasMember("Service"))
         {
             if(!value["Service"].IsObject())

@@ -24,13 +24,15 @@ namespace Sentry
 		OuterNetComponent() = default;
 		~OuterNetComponent() final = default;
 	 public:
+		void OnTimeout(const std::string &address) final;
 		void StartClose(const std::string & address) final;
 		void OnMessage(std::shared_ptr<Rpc::Packet> message) final;
 		void OnCloseSocket(const std::string & address, int code) final;
     public:
-		bool MakeToken(long long id, std::string & token);
+		bool StopClient(long long userId);
+		bool BindClient(const std::string & address, long long userId);
 		size_t Broadcast(const std::shared_ptr<Rpc::Packet> & message);
-		bool GetUserId(const std::string & address, long long & userId) const;
+		int OnRequest(long long userId, std::shared_ptr<Rpc::Packet> & message);
 		bool Send(long long userId, const std::shared_ptr<Rpc::Packet> & message);
 		bool Send(const std::string & address, const std::shared_ptr<Rpc::Packet> & message);
 	private:
@@ -42,15 +44,16 @@ namespace Sentry
 	 private:
         void OnRecord(Json::Writer & document) final;
         void OnListen(std::shared_ptr<SocketProxy> socket) final;
-        bool OnAuth(std::shared_ptr<Rpc::Packet> message);
-	 private:
+		bool GetUserId(const std::string & address, long long & userId) const;
+	private:
 		int mMaxHandlerCount;
 		unsigned int mSumCount;
 		unsigned int mWaitCount;
+		class RpcService * mGateService;
+		class NodeMgrComponent * mNodeComponent;
 		std::queue<std::shared_ptr<Rpc::Packet>> mMessages;
-        class OuterNetMessageComponent* mOuterMessageComponent;
+		class InnerNetMessageComponent * mInnerMessageComponent;
         std::queue<std::shared_ptr<OuterNetClient>> mClientPools;
-		std::unordered_map<std::string, long long> mClientTokens;
 		std::unordered_map<std::string, long long> mAddressUserMap; //验证过的客户端
 		std::unordered_map<long long, std::string> mUserAddressMap; //验证过的客户端
 		std::unordered_map<std::string, std::shared_ptr<OuterNetClient>> mGateClientMap;

@@ -249,7 +249,7 @@ namespace Sentry
 					}
 				}
 				LOG_INFO("register to [" << address << "] successful");
-				taskComponent->Start(&NodeMgrComponent::PingRegistryServer, this);
+				//taskComponent->Start(&NodeMgrComponent::PingRegistryServer, this);
 				return;
 			}
 		}
@@ -281,6 +281,6 @@ namespace Sentry
         {
             return false;
         }
-
+		return iter->second->Get(servers);
     }
 }

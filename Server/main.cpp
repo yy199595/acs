@@ -10,7 +10,6 @@
 
 #include"Component/InnerNetComponent.h"
 #include"Component/OuterNetComponent.h"
-#include"Component/OuterNetMessageComponent.h"
 #include"Component/InnerNetMessageComponent.h"
 
 #include"Component/GateHelperComponent.h"
@@ -74,7 +73,6 @@ void RegisterComponent()
 // gate
 	ComponentFactory::Add<GateHelperComponent>("GateHelperComponent");
 	ComponentFactory::Add<OuterNetComponent>("OuterNetComponent");
-	ComponentFactory::Add<OuterNetMessageComponent>("OuterNetMessageComponent");
     ComponentFactory::Add<SqliteComponent>("SqliteComponent");
 // db
 #ifdef __ENABLE_REDIS__
@@ -105,8 +103,6 @@ void RegisterComponent()
 // lua
     ComponentFactory::Add<LuaScriptComponent>("LuaScriptComponent");
     ComponentFactory::Add<Client::ClientComponent>("ClientComponent");
-
-
 }
 
 void RegisterServiceComponent()

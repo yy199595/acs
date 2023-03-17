@@ -13,7 +13,16 @@
     "Gate": {
         "Ping": {
             "Async": false,
-            "Type": "Client"
+            "IsOpen": true,
+            "IsClient": true
+        },
+        "Login": {
+            "Async": true,
+            "IsClient": true
+        },
+        "Logout": {
+            "Async": true,
+            "IsClient": true
         },
         "Allocation": {
             "Request": "com.type.int64",
@@ -42,28 +51,23 @@
     "MysqlDB": {
         "Add": {
             "Async": true,
-            "Type": "Server",
             "Request": "db.mysql.add"
         },
         "Save": {
             "Async": true,
-            "Type": "Server",
             "Request": "db.mysql.save"
         },
         "Query": {
             "Async": true,
-            "Type": "Server",
             "Request": "db.mysql.query",
             "Response": "db.mysql.response"
         },
         "Update": {
             "Async": true,
-            "Type": "Server",
             "Request": "db.mysql.update"
         },
         "Create": {
             "Async": true,
-            "Type": "Server",
             "Request": "db.mysql.create"
         },
         "Delete": {
@@ -95,11 +99,9 @@
     },
     "User": {
         "Login": {
-            "Type": "Server",
             "Request": "s2s.user.login"
         },
         "Logout": {
-            "Type": "Server",
             "Request": "s2s.user.logout"
         }
     },
@@ -114,7 +116,6 @@
         },
         "Query": {
             "Async": true,
-            "Type": "Client",
             "Request": "db.mongo.query.request",
             "Response": "db.mongo.query.response"
         },
@@ -134,13 +135,13 @@
     },
     "Chat": {
         "Chat": {
-            "Async": true,
-            "Type": "Client",
+            "Async": false,
+            "IsClient": true,
             "Request": "c2s.chat.request"
         },
         "Ping": {
             "Async": false,
-            "Type": "Client"
+            "IsClient": true
         }
     }
 }

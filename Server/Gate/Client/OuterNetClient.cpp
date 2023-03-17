@@ -18,7 +18,6 @@ namespace Sentry
                                    OuterNetComponent* component)
 		: TcpContext(socket), mGateComponent(component)
 	{
-		this->mQps = 0;
         this->mTimeout = 0;
         this->mState = Tcp::DecodeState::Head;
 	}
@@ -33,38 +32,17 @@ namespace Sentry
         if(second != 0)
         {
             this->mTimeout = second;
-            t.post(std::bind(&OuterNetClient::StartTimer, this));
+            t.post(std::bind(&OuterNetClient::StartTimer, this, second));
         }
 #endif 
 	}
 
-    void OuterNetClient::StartTimer()
-    {
-        if (this->mTimeout > 0)
-        {
-            Asio::Context& io = this->mSocket->GetThread();
-            auto timeout = std::chrono::seconds(this->mTimeout);        
-            this->mTimer = std::make_shared<asio::steady_timer>(io, timeout);
-            this->mTimer->async_wait(std::bind(&OuterNetClient::OnTimerEnd, this, args1));
-        }
-    }
-
-    void OuterNetClient::OnTimerEnd(Asio::Code code)
-    {      
-        if (code != asio::error::operation_aborted)
-        {           
-            long long nowTime = Helper::Time::NowSecTime();
-            const std::string& address = this->mSocket->GetAddress();
-            CONSOLE_LOG_INFO("start ping client : [" << address << "]");          
-            if (nowTime - this->GetLastOperTime() < this->mTimeout) //超时
-            {
-                this->StartTimer();
-                return;
-            }
-            this->CloseSocket(XCode::NetTimeout);
-        }
-
-    }
+	void OuterNetClient::OnTimeOut()
+	{
+		Asio::Context & t = App::Inst()->MainThread();
+		const std::string& address = this->mSocket->GetAddress();
+		t.post(std::bind(&OuterNetComponent::OnTimeout, this->mGateComponent, address));
+	}
 
     void OuterNetClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t size)
     {
@@ -78,7 +56,6 @@ namespace Sentry
             this->CloseSocket(XCode::NetReceiveFailure);
             return;
         }
-        this->mQps += size;
         switch (this->mState)
         {
             case Tcp::DecodeState::Head:
@@ -118,13 +95,9 @@ namespace Sentry
 
     void OuterNetClient::CloseSocket(int code)
     {
-        this->mSocket->Close();
+		this->StopTimer();
+		this->mSocket->Close();
         const std::string& address = this->GetAddress();
-        if (this->mTimer != nullptr)
-        {
-            Asio::Code error;
-            this->mTimer->cancel(error);
-        }
 #ifdef ONLY_MAIN_THREAD
         this->mGateComponent->OnCloseSocket(address, code);
 #else

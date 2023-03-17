@@ -16,6 +16,13 @@ namespace Lua
 {
 	int Service::Call(lua_State* lua)
     {
+		InnerNetMessageComponent * innerMessageComponent = App::Inst()->GetComponent<InnerNetMessageComponent>();
+		if (innerMessageComponent == nullptr)
+		{
+			luaL_error(lua, "InnerNetMessageComponent Is Null");
+			return 0;
+		}
+
 		std::shared_ptr<Rpc::Packet> request(new Rpc::Packet());
         {
             request->SetType(Tcp::Type::Request);
@@ -96,28 +103,18 @@ namespace Lua
             }
             request->WriteMessage(message.get());
         }
-
+		int rpdId = 0;
         lua_pushthread(lua);
         const std::string &response = methodConfig->Response;
-        std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource
-            = std::make_shared<LuaRpcTaskSource>(lua, 0, response);
-		{
-			request->GetHead().Add("func", methodConfig->FullName);
-			request->GetHead().Add("rpc", luaRpcTaskSource->GetRpcId());
-		}
-		InnerNetMessageComponent *netMessageComponent = App::Inst()->GetComponent<InnerNetMessageComponent>();
-		if (netMessageComponent == nullptr)
-		{
-			luaL_error(lua, "InnerNetMessageComponent Is Null");
-			return 0;
-		}
-        if (!netMessageComponent->Send(address, request))
+		request->GetHead().Add("func", methodConfig->FullName);
+        if (!innerMessageComponent->Send(address, request, rpdId))
         {
             luaL_error(lua, "send request message error");
             return 0;
         }
-        long long id = luaRpcTaskSource->GetRpcId();
-        return netMessageComponent->AddTask(id, luaRpcTaskSource)->Await();
+		std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource
+			= std::make_shared<LuaRpcTaskSource>(lua, rpdId, response);
+        return innerMessageComponent->AddTask(rpdId, luaRpcTaskSource)->Await();
     }
 
 	int Service::AllotServer(lua_State *lua)

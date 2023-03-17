@@ -69,34 +69,44 @@ namespace Sentry
     }
 
     void InnerNetMessageComponent::Invoke(const RpcMethodConfig *config, std::shared_ptr<Rpc::Packet> message)
-    {
-        RpcService *logicService = this->mApp->GetService(config->Service);
-        if (logicService == nullptr || !logicService->IsStartService())
-        {
-            LOG_ERROR("call [" << config->FullName << "] server not found");
-            return;
-        }
-        long long timerId = 0;
-        if (config->Timeout > 0)
-        {
-            timerId = this->mTimerComponent->DelayCall(config->Timeout, []()
-                {
-
-                }
-            );
-        }
-        int code = logicService->Invoke(config->Method, message);
-        if (timerId > 0 && !this->mTimerComponent->CancelTimer(timerId))
-        {
-            LOG_ERROR("call [" << config->FullName << "] time out not return");
-            return;
-        }
-        if (code != XCode::Successful)
-        {
-            LOG_ERROR("call [" << config->FullName << "] time out not return");
-        }
-        this->Send(message->From(), code, message);
-    }
+	{
+		RpcService* logicService = this->mApp->GetService(config->Service);
+		if (logicService == nullptr || !logicService->IsStartService())
+		{
+			LOG_ERROR("call [" << config->FullName << "] server not found");
+			return;
+		}
+		long long timerId = 0;
+		if (config->Timeout > 0)
+		{
+			timerId = this->mTimerComponent->DelayCall(config->Timeout,
+				[message, config, this]()
+				{
+				  message->GetHead().Add("code", XCode::CallTimeout);
+				  LOG_ERROR("call [" << config->FullName << "] code = call time out");
+				  this->Send(message->From(), XCode::CallTimeout, message);
+				}
+			);
+		}
+#ifdef __DEBUG__
+	ElapsedTimer timer;
+#endif
+		int code = logicService->Invoke(config->Method, message);
+#ifdef __DEBUG__
+		LOG_INFO("call [" << config->FullName << "] use time = " << timer.GetMs() << "ms");
+#endif
+		if (timerId > 0 && !this->mTimerComponent->CancelTimer(timerId))
+		{
+			LOG_ERROR("call [" << config->FullName << "] time out not return");
+			return;
+		}
+		if(code != XCode::Successful)
+		{
+			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
+			CONSOLE_LOG_INFO("call [" << config->FullName << "] code = " << desc);
+		}
+		this->Send(message->From(), code, message);
+	}
 
 
     bool InnerNetMessageComponent::Ping(const std::string &address)
@@ -112,17 +122,13 @@ namespace Sentry
     std::shared_ptr<Rpc::Packet> InnerNetMessageComponent::Call(
         const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
-        int rpcId = this->mNumberPool.Pop();
-        message->GetHead().Remove("address");
-        std::shared_ptr<RpcTaskSource> taskSource = std::make_shared<RpcTaskSource>(rpcId);
-        {
-            message->GetHead().Add("rpc", rpcId);
-        }
-        if (!this->mInnerComponent->Send(address, message))
-        {
-			this->mNumberPool.Push(rpcId);
-            return nullptr;
-        }
+        int rpcId = 0;
+		if(!this->Send(address, message, rpcId))
+		{
+			return nullptr;
+		}
+        std::shared_ptr<RpcTaskSource> taskSource =
+			std::make_shared<RpcTaskSource>(rpcId);
         return this->AddTask(rpcId, taskSource)->Await();
     }
 
@@ -168,9 +174,9 @@ namespace Sentry
 		{
 			std::string address;
 			// 网关转发过来的消息 必须带client字段
-			if (message->GetHead().Get("client", address))
+			if (message->GetHead().Get("cli", address))
 			{
-				message->GetHead().Remove("client");
+				message->GetHead().Remove("cli");
 				this->mOuterComponent->Send(address, message);
 				return XCode::Successful;
 			}
@@ -201,4 +207,16 @@ namespace Sentry
         assert(message->GetType() > (int)Tcp::Type::None);
         return this->mInnerComponent->Send(address, message);
     }
+	bool InnerNetMessageComponent::Send(const string& address, std::shared_ptr<Rpc::Packet> message, int& id)
+	{
+		int rpcId = this->mNumberPool.Pop();
+		message->GetHead().Add("rpc", rpcId);
+		if(!this->Send(address, message))
+		{
+			this->mNumberPool.Push(rpcId);
+			return false;
+		}
+		id = rpcId;
+		return true;
+	}
 }// namespace Sentry

@@ -36,7 +36,7 @@ namespace Sentry
         bool GetServer(const std::string & name, std::string & address);
 		bool GetServers(const std::string & name, std::vector<std::string> & hosts);
         bool GetServer(const std::string & name, long long userId, std::string & address);
-        bool GetServer(long long userId, std::unordered_map<std::string, std::string> & servers);
+		bool GetServer(long long userId, std::unordered_map<std::string, std::string> & servers);
 	 private:
         size_t mIndex;
 		std::vector<std::string> mRegistryAddress;

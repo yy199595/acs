@@ -23,20 +23,18 @@ namespace Sentry
 		void StartReceive(int second = 0);
 		void SendData(std::shared_ptr<Rpc::Packet> message);
 	 protected:
+		void OnTimeOut() final;
 		void OnConnect(const asio::error_code &error) {}
         void OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
-	private:		
-		void StartTimer();
+	private:
         void CloseSocket(int code);
-		void OnTimerEnd(Asio::Code code);
 	 private:
 		int mTimeout;
-		unsigned int mQps;
+		unsigned int mMaxQps;
         Tcp::DecodeState mState;
         OuterNetComponent* mGateComponent;
-        std::shared_ptr<Rpc::Packet> mMessage;		
-        std::shared_ptr<asio::steady_timer> mTimer;
+        std::shared_ptr<Rpc::Packet> mMessage;
 	};
 }
 

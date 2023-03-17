@@ -7,11 +7,10 @@ function Chat.OnServiceStart()
 end
 
 Chat.OnLogin = function(userId)
-    print("玩家", userId , "登陆Chat服务")
+    print(string.format("玩家%d登录聊天服务",userId))
 end
 
 Chat.Chat = function(id, request)
-    print("更新完成&&&&&&112233", id)
     local chatMessage = Proto.New("c2s.chat.notice", {
         msg_type = request.msg_type,
         message = request.message

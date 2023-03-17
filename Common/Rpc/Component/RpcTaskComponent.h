@@ -60,9 +60,12 @@ namespace Sentry
             return false;
         }
         RpcTask rpcTask = iter->second;
-        rpcTask->OnResponse(message);
+		if(rpcTask != nullptr)
+		{
+			rpcTask->OnResponse(message);
+			this->OnTaskComplete(key);
+		}
 		this->mTasks.erase(iter);
-		this->OnTaskComplete(key);
 		return true;
     }
 

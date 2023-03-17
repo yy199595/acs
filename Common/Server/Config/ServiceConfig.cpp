@@ -34,7 +34,8 @@ namespace Sentry
                     serviceConfig->Timeout = 0;
                     serviceConfig->Method = name;
                     serviceConfig->IsAsync = false;
-                    serviceConfig->Type = "Server";
+                    serviceConfig->IsClient = false;
+					serviceConfig->IsOpen = true;
                     serviceConfig->FullName = fullName;
                     serviceConfig->Service = this->GetName();
                 }
@@ -42,10 +43,14 @@ namespace Sentry
 				{
 					serviceConfig->Server = server;
 				}
-				if(jsonValue.HasMember("Type"))
+				if(jsonValue.HasMember("IsOpen"))
                 {
-                    serviceConfig->Type = jsonValue["Type"].GetString();
+                    serviceConfig->IsOpen = jsonValue["IsOpen"].GetBool();
                 }
+				if(jsonValue.HasMember("IsClient"))
+				{
+					serviceConfig->IsClient = jsonValue["IsClient"].GetBool();
+				}
                 if(jsonValue.HasMember("Async"))
                 {
                     serviceConfig->IsAsync = jsonValue["Async"].GetBool();
@@ -62,8 +67,10 @@ namespace Sentry
                 {
                     serviceConfig->Timeout = jsonValue["Timeout"].GetInt();
                 }
-                this->mIsClient = serviceConfig->Type ==std::string("Client");
-                //this->mMethodConfigs.emplace(name, std::move(serviceConfog));
+				if(serviceConfig->IsClient)
+				{
+					this->mIsClient = true;
+				}
             }
         }
 		return true;

@@ -91,18 +91,6 @@ namespace Sentry
 		request->SetProto(Tcp::Porto::Protobuf);
 		request->WriteMessage(message);
 		return this->mMessageComponent->Call(address, request);
-//		if(response == nullptr)
-//		{
-//			LOG_ERROR("call [" << address << "] func [" << func << "] response null");
-//			return nullptr;
-//		}
-//		int code = response->GetCode();
-//		if(code != XCode::Successful)
-//		{
-//			const std::string & desc = CodeConfig::Inst()->GetDesc(code);
-//			LOG_INFO("call [" << address << "] func [" << func << "] " << desc);
-//		}
-//		return response;
 	}
 
 	int RpcService::Send(const std::string& address, const std::string& func, const Message& message)
@@ -299,13 +287,8 @@ namespace Sentry
             return nullptr;
         }
 
-        if(!methodConfig->Request.empty())
+        if(!methodConfig->Request.empty() && message != nullptr)
         {
-            if(message == nullptr)
-            {
-                LOG_ERROR("call [" << fullName << "] request is empty");
-                return nullptr;
-            }
             if(message->GetTypeName() != methodConfig->Request)
             {
                 LOG_ERROR("call [" << fullName << "] request type error");
@@ -323,9 +306,38 @@ namespace Sentry
             request->WriteMessage(message);
             request->SetType(Tcp::Type::Request);
             request->SetProto(Tcp::Porto::Protobuf);
-            request->GetHead().Add("func", func);
+            request->GetHead().Add("func", methodConfig->FullName);
         }
         return this->mMessageComponent->Call(address, request);
     }
 
+	int RpcService::Send(const std::string & address,
+		const std::string & func, long long userId, const Message * message)
+	{
+		const std::string fullName = fmt::format("{0}.{1}", this->GetName(), func);
+		const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
+		if(methodConfig == nullptr)
+		{
+			LOG_ERROR("not find [" << fullName << "] config");
+			return XCode::NotServerGroupConfig;
+		}
+
+		if(!methodConfig->Request.empty() && message != nullptr)
+		{
+			if(message->GetTypeName() != methodConfig->Request)
+			{
+				LOG_ERROR("call [" << fullName << "] request type error");
+				return XCode::CallArgsError;
+			}
+		}
+		std::shared_ptr<Rpc::Packet> request = std::make_shared<Rpc::Packet>();
+		{
+			request->WriteMessage(message);
+			request->SetType(Tcp::Type::Request);
+			request->SetProto(Tcp::Porto::Protobuf);
+			request->GetHead().Add("id", userId);
+			request->GetHead().Add("func", methodConfig->FullName);
+		}
+		return this->mMessageComponent->Send(address, request);
+	}
 }

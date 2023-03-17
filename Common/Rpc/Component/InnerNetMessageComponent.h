@@ -26,7 +26,8 @@ namespace Sentry
         bool Ping(const std::string & address);
 		int OnMessage(std::shared_ptr<Rpc::Packet> message);
         bool Send(const std::string & address, std::shared_ptr<Rpc::Packet> message);
-        std::shared_ptr<Rpc::Packet> Call(const std::string & address, std::shared_ptr<Rpc::Packet> message);
+		bool Send(const std::string & address, std::shared_ptr<Rpc::Packet> message, int & id);
+		std::shared_ptr<Rpc::Packet> Call(const std::string & address, std::shared_ptr<Rpc::Packet> message);
     private:
 		bool Awake() final;
 		bool LateAwake() final;

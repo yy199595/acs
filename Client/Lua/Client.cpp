@@ -19,6 +19,7 @@ namespace Lua
 	int ClientEx::Call(lua_State* lua)
 	{
 		lua_pushthread(lua);
+		int session = luaL_checkinteger(lua, 1);
         ClientComponent* clientComponent = App::Inst()->GetComponent<ClientComponent>();
         if(clientComponent == nullptr)
         {
@@ -26,11 +27,13 @@ namespace Lua
             return 0;
         }
 		std::shared_ptr<Rpc::Packet> request(new Rpc::Packet());
+		{
+			request->SetType(Tcp::Type::Request);
+			request->SetProto(Tcp::Porto::Protobuf);
+		}
 
-        request->SetType(Tcp::Type::Request);
-        request->SetProto(Tcp::Porto::Protobuf);
         ProtoComponent * messageComponent = App::Inst()->GetMsgComponent();
-        const std::string func = CommonParameter::Read<std::string>(lua, 1);
+        const std::string func = CommonParameter::Read<std::string>(lua,2);
         const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
         if (methodConfig == nullptr)
         {
@@ -38,22 +41,28 @@ namespace Lua
             return 0;
         }
 		std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
-        if (lua_istable(lua, 2) && !methodConfig->Request.empty())
+        if (lua_istable(lua, 3) && !methodConfig->Request.empty())
         {
             const std::string& name = methodConfig->Request;
-            std::shared_ptr<Message> message = messageComponent->Read(lua, name, 2);
+            std::shared_ptr<Message> message = messageComponent->Read(lua, name, 3);
             if (message == nullptr || !request->WriteMessage(message.get()))
             {
                 LOG_ERROR("write request message error : [" << func << "]");
                 return 0;
             }
         }
+		else if(lua_isstring(lua, 3))
+		{
+			request->SetProto(Tcp::Porto::String);
+			request->SetContent(lua_tostring(lua, 3));
+		}
         request->GetHead().Add("func", func);
 		TaskComponent * taskComponent = App::Inst()->GetTaskComponent();
-		taskComponent->Start([request, methodConfig, clientComponent, luaWaitTaskSource, messageComponent]()
+		taskComponent->Start([session, request, methodConfig, clientComponent,
+							  luaWaitTaskSource, messageComponent]()
 		{
 			ElapsedTimer elapsedTimer;
-			std::shared_ptr<Rpc::Packet> response = clientComponent->Call(request);
+			std::shared_ptr<Rpc::Packet> response = clientComponent->Call(session, request);
 			if(response == nullptr)
 			{
 				luaWaitTaskSource->SetResult(XCode::CallTimeout, nullptr);
@@ -84,31 +93,14 @@ namespace Lua
     {
         std::string ip;
         unsigned short port;
-        lua_pushthread(lua);
-        ClientComponent* clientComponent = App::Inst()->GetComponent<ClientComponent>();
-        const std::string address = CommonParameter::Read<std::string>(lua, 1);
+		const std::string address = CommonParameter::Read<std::string>(lua, 1);
+		ClientComponent* clientComponent = App::Inst()->GetComponent<ClientComponent>();
         if (!Helper::Str::SplitAddress(address, ip, port))
         {
             luaL_error(lua, "parse ip address [%s] error", address.c_str());
             return 0;
         }
-        std::string token(luaL_checkstring(lua, 2));
-        std::shared_ptr<Rpc::Packet> request(new Rpc::Packet());
-        {
-            request->SetType(Tcp::Type::Auth);
-            request->GetHead().Add("token", token);
-        }
-        clientComponent->New(ip, port);
-        TaskComponent* taskComponent = App::Inst()->GetTaskComponent();
-        std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
-
-        taskComponent->Start([request, clientComponent, luaWaitTaskSource]()
-            {              
-                std::shared_ptr<Rpc::Packet> response = clientComponent->Call(request);
-                int code = response != nullptr ? response->GetCode(XCode::Failure) : XCode::Failure;
-                
-                luaWaitTaskSource->SetResult<bool>(code == XCode::Successful);
-            });
-        return luaWaitTaskSource->Await();
+		lua_pushinteger(lua, clientComponent->New(ip, port));
+		return 1;
     }
 }

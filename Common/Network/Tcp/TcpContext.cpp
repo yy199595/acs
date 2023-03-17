@@ -282,4 +282,42 @@ namespace Tcp
 		}
 		return sum;
 	}
+
+	void TcpContext::StopTimer()
+	{
+		if(this->mTimer != nullptr)
+		{
+			asio::error_code code;
+			this->mTimer->cancel(code);
+			this->mTimer = nullptr;
+		}
+	}
+
+	void TcpContext::StartTimer(int timeout)
+	{
+		if(this->mTimer != nullptr)
+		{
+			return;
+		}
+		std::chrono::seconds seconds(timeout);
+		Asio::Context& io = this->mSocket->GetThread();
+		std::shared_ptr<TcpContext> self = this->shared_from_this();
+		this->mTimer = std::make_unique<asio::steady_timer>(io, timeout);
+		this->mTimer->async_wait([self, timeout](const asio::error_code & code)
+		{
+			if(code)
+			{
+				return;
+			}
+			long long now = Helper::Time::NowSecTime();
+			if(now - self->mLastOperTime >= timeout) //超时
+			{
+				self->OnTimeOut();
+				return;
+			}
+			self->mTimer = nullptr;
+		  	Asio::Context& io = self->mSocket->GetThread();
+			io.post(std::bind(&TcpContext::StartTimer, self, timeout));
+		});
+	};
 }

@@ -14,14 +14,21 @@ namespace Sentry
 		Gate();
 	 private:
 		int Ping(long long userId);
+		int Logout(long long userId);
+		int Login(const Rpc::Packet & packet);
 		int Allocation(long long userId, s2s::allot::response & response);
 	private:
         void Init() final;
 		bool OnStart() final;
         void OnClose() final;
+		int OnLogin(long long userId);
 	 private:
-		std::string mAddress;
+		std::string mInnerAddress;
+		std::string mOuterAddress;
+		class RpcService * mUserService;
+		class NodeMgrComponent * mNodeComponent;
 		class OuterNetComponent* mOuterComponent;
+		std::unordered_map<std::string, long long> mTokens;
 	};
 
 }

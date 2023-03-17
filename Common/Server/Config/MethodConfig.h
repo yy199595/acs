@@ -17,7 +17,8 @@ namespace Sentry
 	class RpcMethodConfig final : public MethodConfig
 	{
 	public:
-		std::string Type;
+		bool IsOpen;
+		bool IsClient;
 		std::string Request;
 		std::string Response;
 		std::string FullName;

@@ -78,7 +78,9 @@ namespace Sentry
 
 	void TcpRedisClient::OnReadComplete()
 	{
-        assert(this->mCurResponse->TaskId() != 0);
+		std::shared_ptr<RedisRequest> request =
+			std::static_pointer_cast<RedisRequest>(this->PopMessage());
+		this->mCurResponse->SetTaskId(request->GetTaskId());
 #ifdef ONLY_MAIN_THREAD
 		this->mComponent->OnMessage(this->mCurResponse);
 #else
@@ -90,26 +92,20 @@ namespace Sentry
 	}
 
     void TcpRedisClient::OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message)
-    {
-        if (code)
-        {
-            if (!this->AuthUser())
-            {
+	{
+		if (code)
+		{
+			if (!this->AuthUser())
+			{
 				this->mIndex = 0;
 				CONSOLE_LOG_FATAL("redis auth failure");
 				return;
-            }
-            this->SendFromMessageQueue();
-            return;
-        }
-        this->PopMessage();
-        {
-            std::shared_ptr<RedisRequest> request =
-                std::static_pointer_cast<RedisRequest>(message);
-            this->mCurResponse->SetTaskId(request->GetTaskId());
-        }
-        this->ReceiveLine();
-    }
+			}
+			this->SendFromMessageQueue();
+			return;
+		}
+		this->ReceiveLine();
+	}
 
 	bool TcpRedisClient::AuthUser()
     {

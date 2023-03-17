@@ -1,11 +1,7 @@
 
 local Main = {}
-
-local phoneNum = 13716061995
-local account = tostring(os.time()) .. "@qq.com"
-local password = tostring(os.time()) .. "#123456"
-local loginComponent = require("component.LoginComponent")
-
+require("Player.Player")
+require("component.LoginComponent")
 local CallMongo = function()
     local t1 = Time.NowMilTime()
     local code, res = Client.Call("MongoDB.Query", {
@@ -21,62 +17,17 @@ local CallMongo = function()
     local t = Time.NowMilTime() - t1
     Console.Warn("cal MongoDB.Query [", t, "]ms");
 end
-
-local CallChat = function()
-    local t1 = Time.NowMilTime()
-    local code = Client.Call("Chat.Ping", {
-        user_id = 1122, msg_type = 1, message = "hello"
-    })
-    if code == XCode.Successful then
-
-    end
-    local t = Time.NowMilTime() - t1
-    Console.Error("cal ChatService.Ping [" .. t .. "]ms");
-end
-
-local TestHttp = function()
-    local count = 5000
-    local phoneNum1 = 100
-    local passwd = "yjz199595"
-    local account1 = "%d@qq.com"
-    local data1 = string.format(account1, count)
-    local data2 = passwd .. tostring(count)
-    local data3 = phoneNum1 + count
-    local res = loginComponent.Register(data1,data2, data3)
-end
-
-local Update = function()
-    while true do
-        coroutine.start(function ()
-            coroutine.start(CallChat)
-            coroutine.start(CallMongo)
-            --coroutine.start(TestHttp)
-        end)
-        coroutine.sleep(50)
-    end
-end
-
-
+local players = {}
 function Main.Start()
-    loginComponent.Register(account, password, phoneNum)
-
-    local loginInfo = loginComponent.Login(account, password)
-    if loginInfo == nil or loginInfo.code ~= XCode.Successful then
-        Log.Error("使用http登陆失败")
-        return false
+    local accounts = require("Player.Account")
+    for _, account in ipairs(accounts) do
+        local player = Player.New(account.account, account.passwd, account.phoneNum)
+        table.insert(players, player)
     end
 
-    table.print(loginInfo)
-    local token = loginInfo.data.token
-    local address = loginInfo.data.address
-    if not Client.New(address, token) then
-        Log.Error("连接网关服务器 [" , address, "] 失败")
-        return false
+    for _, player in ipairs(players) do
+        player:Login()
     end
-    Log.Debug("连接网关服务器[" , address, "]成功")
-    coroutine.start(Update)
     return true
 end
-
-
 return Main

@@ -26,6 +26,7 @@ namespace Sentry
 	public:
 		int Send(long long userId, const std::string& func);
 		int Send(long long userId, const std::string& func, const Message& message);
+		int Send(const std::string & address, const std::string & func, long long userId, const Message * message = nullptr);
 	public:
 		int Call(const std::string& address, const std::string& func);
 		int Call(const std::string& address, const std::string& func, const Message& message);

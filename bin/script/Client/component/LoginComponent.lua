@@ -1,6 +1,6 @@
 
 LoginComponent = {}
-local host = "http://127.0.0.1:80/%s"
+local host = "http://127.0.0.1:8080/%s"
 
 function LoginComponent.Register(account, passwd, phoneNum)
     local url = string.format(host, "user/register")
@@ -19,7 +19,7 @@ function LoginComponent.Register(account, passwd, phoneNum)
         return nil
     end
     if registerInfo.code ~= XCode.Successful then
-        Log.Error(response)
+        --Log.Error(response)
     end
     return registerInfo
 end
