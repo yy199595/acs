@@ -119,7 +119,7 @@ namespace Sentry
                     return false;
                 }
             }
-            serverNode->LocalAddress = address;
+            serverNode->LocalAddress = address;			
         }
         this->mLocationMaps.emplace(address, std::move(serverNode));
         return true;
@@ -211,7 +211,7 @@ namespace Sentry
 	{
 		auto iter = this->mRpcClientMap.find(address);
 		if (iter == this->mRpcClientMap.end())
-		{
+		{		
 			return nullptr;
 		}
 		return iter->second.get();
@@ -235,9 +235,19 @@ namespace Sentry
 			io.post(std::bind(&InnerNetComponent::OnMessage, this, message));
 			return true;
 		}
-        InnerNetClient * clientSession = this->GetOrCreateSession(address);
-		if (message == nullptr || clientSession == nullptr)
+		InnerNetClient* clientSession = nullptr;
+		switch (message->GetType())
 		{
+		case Tcp::Type::Response:
+			clientSession = this->GetSession(address);
+			break;
+		default:
+			clientSession = this->GetOrCreateSession(address);
+			break;
+		}
+		if (clientSession == nullptr)
+		{
+			LOG_ERROR("not find rpc client : [" << address << "]");
 			return false;
 		}
 		clientSession->Send(message);
@@ -252,7 +262,7 @@ namespace Sentry
 
 	const ServiceNodeInfo *InnerNetComponent::GetSeverInfo(const std::string &address) const
 	{
-		auto iter = this->mLocationMaps.find(address);
+		auto iter = this->mLocationMaps.find(address);		
 		return iter != this->mLocationMaps.end() ? iter->second.get() : nullptr;
 	}
 
@@ -301,6 +311,7 @@ namespace Sentry
 				{
 					message->Clear();
 					message->GetHead().Add("code", code);
+					message->SetType(Tcp::Type::Response);
 					this->Send(message->From(), message);
 				}
 			}

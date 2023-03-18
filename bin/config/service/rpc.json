@@ -89,12 +89,6 @@
         },
         "RunInfo": {
             "Response": "google.protobuf.StringValue"
-        },
-        "AddAddress": {
-            "Request": "s2s.server.list"
-        },
-        "DelAddress": {
-            "Response": "com.array.string"
         }
     },
     "User": {

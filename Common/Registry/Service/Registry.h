@@ -16,9 +16,9 @@ namespace Sentry
         bool OnStart() final;
     private:
         int Ping(const Rpc::Packet & head);
-        int UnRegister(const com::type::string& request);
-		int Register(const s2s::server::info & request);
-		int Query(const com::array::string& request, s2s::server::list& response);
+        int Query(const com::type::string& request, s2s::server::list& response);
+		int Register(const std::string & address,const s2s::server::info & request);
+        int UnRegister(const std::string& address, const com::type::string& request);
     private:
 		void OnSecondUpdate(int tick) final;
         void OnNodeServerError(const std::string& address);
@@ -28,6 +28,7 @@ namespace Sentry
         class NodeMgrComponent * mNodeComponent;
         class InnerNetComponent* mInnerComponent;
 		class MysqlDBComponent * mMysqlComponent;
+        std::unordered_set<std::string> mRegitryServers;
     };
 }
 

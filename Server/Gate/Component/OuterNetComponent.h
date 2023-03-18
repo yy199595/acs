@@ -51,6 +51,9 @@ namespace Sentry
 		unsigned int mWaitCount;
 		class RpcService * mGateService;
 		class NodeMgrComponent * mNodeComponent;
+#ifdef __DEBUG__
+		std::unordered_map<int, long long> mRecords;
+#endif
 		std::queue<std::shared_ptr<Rpc::Packet>> mMessages;
 		class InnerNetMessageComponent * mInnerMessageComponent;
         std::queue<std::shared_ptr<OuterNetClient>> mClientPools;

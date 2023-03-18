@@ -9,25 +9,22 @@
 using namespace google::protobuf;
 namespace Sentry
 {
-	class GateHelperComponent final : public Component, public ILuaRegister
+	class GateComponent final : public Component, public ILuaRegister
 	{
 	 public:
-		GateHelperComponent() = default;
-		~GateHelperComponent() = default;
+		GateComponent() = default;
+		~GateComponent() = default;
     public:
-		int Call(long long userId, const std::string & func);
-        int Call(long long UserId, const std::string & func, const Message & message);
+		int Send(long long userId, const std::string & func);
+        int Send(long long UserId, const std::string & func, const Message & message);
 	 public:
 		int BroadCast(const std::string & func);
 		int BroadCast(const std::string & func, const Message & message);
-	 private:		
-		int LuaBroadCast(const char * func, std::shared_ptr<Message> message);
-		int LuaCall(long long userId, const std::string func, std::shared_ptr<Message> message);
 	 protected:
 		bool LateAwake() final;
 		void OnLuaRegister(Lua::ClassProxyHelper & luaRegister) final;
 	 private:
-		class RpcService * mGate;
+		class RpcService * mGate{};
 		class NodeMgrComponent* mNodeComponent{};
         class InnerNetComponent * mInnerComponent{};
 	};

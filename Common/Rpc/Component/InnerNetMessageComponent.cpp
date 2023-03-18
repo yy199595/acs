@@ -151,7 +151,7 @@ namespace Sentry
 
 	int InnerNetMessageComponent::HandlerForward(std::shared_ptr<Rpc::Packet> message)
 	{
-		if (this->mOuterComponent != nullptr)
+		if (this->mOuterComponent == nullptr)
 		{
 			return XCode::NetWorkError;
 		}
@@ -193,6 +193,12 @@ namespace Sentry
 
 	int InnerNetMessageComponent::HandlerBroadcast(std::shared_ptr<Rpc::Packet> message)
 	{
+        if(this->mOuterComponent == nullptr)
+        {
+            return XCode::Failure;
+        }
+        message->SetType(Tcp::Type::Request);
+        this->mOuterComponent->Broadcast(message);
 		return XCode::Successful;
 	}
 

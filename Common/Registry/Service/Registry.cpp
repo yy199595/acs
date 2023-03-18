@@ -5,6 +5,7 @@
 #include"Registry.h"
 #include"Service/Node.h"
 #include"Message/db.pb.h"
+#include"Config/ClusterConfig.h"
 #include"Component/InnerNetComponent.h"
 #include"Component/NodeMgrComponent.h"
 #include"Component/MysqlDBComponent.h"
@@ -16,8 +17,8 @@ namespace Sentry
 	{
 		BIND_COMMON_RPC_METHOD(Registry::Ping);
 		BIND_COMMON_RPC_METHOD(Registry::Query);
-		BIND_COMMON_RPC_METHOD(Registry::Register);
-		BIND_COMMON_RPC_METHOD(Registry::UnRegister);
+		BIND_ADDRESS_RPC_METHOD(Registry::Register);
+		BIND_ADDRESS_RPC_METHOD(Registry::UnRegister);
 		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
 		this->mInnerComponent = this->GetComponent<InnerNetComponent>();
 		this->mMysqlComponent = this->GetComponent<MysqlDBComponent>();
@@ -37,35 +38,12 @@ namespace Sentry
         return this->mMysqlComponent->Run(this->mIndex , command)->IsOk();
 	}
 
-	int Registry::Query(const com::array::string& request, s2s::server::list& response)
+	int Registry::Query(const com::type::string& request, s2s::server::list& response)
 	{
 		std::stringstream sqlStream;
-		sqlStream << "select server_name,rpc_address,http_address,last_ping_time from " << this->mTable << " where ";
-		if (request.array_size() == 0)
-		{
-			std::vector<std::string> servers;
-			this->mInnerComponent->GetServiceList(servers);
-			for (size_t index = 0; index < servers.size(); index++)
-			{
-				sqlStream << "server_name=" << servers[index];
-				if (index < servers.size() - 1)
-				{
-					sqlStream << " or ";
-				}
-			}
-		}
-		else
-		{
-			for (int index = 0; index < request.array_size(); index++)
-			{
-				sqlStream << "server_name='" << request.array(index) << "'";
-				if (index < request.array_size() - 1)
-				{
-					sqlStream << " or ";
-				}
-			}
-		}
-		sqlStream << ";";
+		sqlStream << "select server_name,rpc_address,http_address,last_ping_time from "
+			<< this->mTable << " where server_name='" << request.str() << "';";
+		
 		const std::string sql = sqlStream.str();
 		std::shared_ptr<Mysql::QueryCommand> command
 			= std::make_shared<Mysql::QueryCommand>(sql);
@@ -81,7 +59,7 @@ namespace Sentry
 				!document.Parse(input.c_str(), input.size()).HasParseError())
 			{
 				long long now = Helper::Time::NowSecTime();
-				long long time = document["last_ping_time"].GetInt64();
+				long long time = document["last_ping_time"].GetInt();
 				if (now - time <= 15)
 				{
 					s2s::server::info* message = response.add_list();
@@ -97,37 +75,34 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	int Registry::Register(const s2s::server::info& request)
+	int Registry::Register(const std::string& address, const s2s::server::info& request)
 	{
-		if(request.rpc().empty() || request.name().empty())
+		if (request.rpc().empty() || request.name().empty())
 		{
 			return XCode::CallArgsError;
 		}
 		const std::string& rpc = request.rpc();
 		const std::string& http = request.http();
 		const std::string& name = request.name();
-
-        long long time = Helper::Time::NowSecTime();
-        const std::string sql = fmt::format("replace into {0} (server_name,rpc_address,http_address,last_ping_time) values('{1}','{2}','{3}',{4});",
+		long long time = Helper::Time::NowSecTime();
+		const std::string sql = fmt::format("replace into {0} (server_name,rpc_address,http_address,last_ping_time) values('{1}','{2}','{3}',{4});",
 			this->mTable, name, rpc, http, time);
 
-        if(!this->mMysqlComponent->Execute(this->mIndex, std::make_shared<Mysql::SqlCommand>(sql)))
-        {
-            return XCode::SaveToMysqlFailure;
-        }
+		if (!this->mMysqlComponent->Execute(this->mIndex, std::make_shared<Mysql::SqlCommand>(sql)))
+		{
+			return XCode::SaveToMysqlFailure;
+		}
 
 		const std::string func("Join");
-        this->mNodeComponent->AddRpcServer(name, rpc);
-        this->mNodeComponent->AddHttpServer(name, http);
+		this->mRegitryServers.insert(address);
+		this->mNodeComponent->AddRpcServer(name, rpc);
+		this->mNodeComponent->AddHttpServer(name, http);
 
-		std::vector<std::string> clients;
 		RpcService* rpcService = this->mApp->GetService<Node>();
-		if(this->mInnerComponent->GetConnectClients(clients) > 0)
+		for (const std::string& address : this->mRegitryServers)
 		{
-			for (const std::string& address : clients)
-			{
-				rpcService->Send(address, func, request);
-			}
+			rpcService->Send(address, func, request);
+			LOG_INFO("send server join message to " << address);
 		}
 		return XCode::Successful;
 	}
@@ -155,27 +130,28 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	int Registry::UnRegister(const com::type::string& request)
+	int Registry::UnRegister(const std::string& address, const com::type::string& request)
 	{
-		const std::string & rpc = request.str();
-		if(!this->mNodeComponent->DelServer(rpc))
+		const std::string& rpc = request.str();
+		if (!this->mNodeComponent->DelServer(rpc))
 		{
 			return XCode::Failure;
 		}
 		RpcService* rpcService = this->mApp->GetService<Node>();
-        const std::string sql = fmt::format("delete from {0} where rpc_address='{1}'", this->mTable, rpc);
-        if(!this->mMysqlComponent->Run(this->mIndex, std::make_shared<Mysql::SqlCommand>(sql))->IsOk())
-        {
-            return XCode::SaveToMysqlFailure;
-        }
-		const std::string func("Exit");
-		std::vector<std::string> clients;
-		if(this->mInnerComponent->GetConnectClients(clients) > 0)
+		const std::string sql = fmt::format("delete from {0} where rpc_address='{1}'", this->mTable, rpc);
+		if (!this->mMysqlComponent->Run(this->mIndex, std::make_shared<Mysql::SqlCommand>(sql))->IsOk())
 		{
-			for(const std::string & address : clients)
-			{
-				rpcService->Send(address, func, request);
-			}
+			return XCode::SaveToMysqlFailure;
+		}
+		const std::string func("Exit");
+		auto iter = this->mRegitryServers.find(address);
+		if (iter != this->mRegitryServers.end())
+		{
+			this->mRegitryServers.erase(iter);
+		}
+		for (const std::string& address : this->mRegitryServers)
+		{
+			rpcService->Send(address, func, request);
 		}
 		return XCode::Successful;
 	}

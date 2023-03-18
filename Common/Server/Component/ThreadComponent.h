@@ -6,18 +6,16 @@
 
 namespace Sentry
 {
-    class AsioThread : protected std::thread
+    class AsioThread
     {
     public:
         AsioThread();
     public:
-        void Run() { this->detach(); }
+        void Run();
         Asio::Context & Context() { return *mContext; }
     private:
-        void Update();
-    private:
+        std::thread* mThread;
         Asio::Context * mContext;
-        Asio::ContextWork * mWork;
     };
 }
 

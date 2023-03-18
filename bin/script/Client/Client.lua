@@ -1,6 +1,7 @@
 
 local Main = {}
 require("Player.Player")
+require("component.ChatComponent")
 require("component.LoginComponent")
 local CallMongo = function()
     local t1 = Time.NowMilTime()
@@ -27,6 +28,9 @@ function Main.Start()
 
     for _, player in ipairs(players) do
         player:Login()
+    end
+    for _, player in ipairs(players) do
+        coroutine.start(player.Update, player)
     end
     return true
 end

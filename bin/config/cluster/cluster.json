@@ -37,18 +37,10 @@
         }
     },
     "DataServer": {
-        "AutoAllot": true,
+        "AutoAllot": false,
         "Service": {
             "Node": true,
             "MongoDB": true,
-            "Registry": false
-        }
-    },
-    "LogServer": {
-        "AutoAllot": false,
-        "Service": {
-            "Log": true,
-            "Node": true,
             "Registry": false
         }
     },

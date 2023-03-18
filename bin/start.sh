@@ -5,4 +5,3 @@ nohup ./app ./config/server.json HttpServer &
 nohup ./app ./config/server.json ChatServer &
 nohup ./app ./config/server.json GateServer &
 nohup ./app ./config/server.json LogServer &
-tail -f ./out.log

@@ -140,6 +140,7 @@ namespace Sentry
 			this->mUserService->Send(address, func, userId);
 		}
 		this->mNodeComponent->DelUnit(userId);
+		CONSOLE_LOG_ERROR("user:" << userId << " logout");
 		return XCode::Successful;
 	}
 }

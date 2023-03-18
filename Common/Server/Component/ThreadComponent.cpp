@@ -6,23 +6,23 @@
 namespace Sentry
 {
     AsioThread::AsioThread()
-        : std::thread(std::bind(&AsioThread::Update, this))
+        : mThread(nullptr),
+         mContext(nullptr)
     {
 
     }
 
-    void AsioThread::Update()
+    void AsioThread::Run()
     {
-        asio::error_code code;
         this->mContext = new Asio::Context();
-        this->mWork = new Asio::ContextWork(*this->mContext);
-
-        while (!this->mContext->stopped())
-        {
-            this->mContext->run(code);
-        }
-        delete this->mWork;
-        delete this->mContext;
+        std::shared_ptr<Asio::ContextWork> work
+            = std::make_shared<Asio::ContextWork>(*this->mContext);
+        this->mThread = new std::thread([this, work]()
+            {
+                asio::error_code code;
+                this->mContext->run(code);
+            });
+        this->mThread->detach();
     }
 }
 

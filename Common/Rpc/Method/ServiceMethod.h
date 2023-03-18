@@ -34,6 +34,12 @@ namespace Sentry
 	template<typename T>
 	using ServiceMethodType6 = int(T::*)(const Rpc::Packet & packet);
 
+	template<typename T>
+	using ServiceMethodType7 = int(T::*)(const Rpc::Packet& request, Rpc::Packet & response);
+
+	template<typename T, typename T1>
+	using ServiceMethodType8 = int(T::*)(const std::string & address, const T1&);
+
 //    template<typename T, typename T1>
 //    using ServiceMethodType5 = int(T::*)(const Rpc::Head & head, const T1 &);
 //
@@ -316,5 +322,53 @@ namespace Sentry
 	 private:
 		T* _o;
 		ServiceMethodType6<T> _func;
+	};
+
+	template<typename T>
+	class ServiceMethod7 : public ServiceMethod
+	{
+	public:
+		ServiceMethod7(const std::string name, T* o, ServiceMethodType7<T> func)
+			: ServiceMethod(name), _o(o), _func(func)
+		{
+
+		}
+
+	public:
+		bool IsLuaMethod() override { return false; };
+		int Invoke(Rpc::Packet& message) override
+		{
+			return (_o->*_func)(message, message);
+		}
+	private:
+		T* _o;
+		ServiceMethodType7<T> _func;
+	};
+
+	template<typename T, typename T1>
+	class ServiceMethod8 : public ServiceMethod
+	{
+	public:
+		ServiceMethod8(const std::string name, T* o, ServiceMethodType8<T,T1> func)
+			: ServiceMethod(name), _o(o), _func(func)
+		{
+
+		}
+
+	public:
+		bool IsLuaMethod() override { return false; };
+		int Invoke(Rpc::Packet& message) override
+		{
+			std::unique_ptr<T1> request(new T1());
+			const std::string& address = message.From();
+			if (!message.ParseMessage(request.get()))
+			{
+				return XCode::CallArgsError;
+			}
+			return (_o->*_func)(address, *request);
+		}
+	private:
+		T* _o;
+		ServiceMethodType8<T, T1> _func;
 	};
 }

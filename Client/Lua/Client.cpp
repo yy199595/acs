@@ -40,7 +40,9 @@ namespace Lua
             LOG_ERROR("call [" << func << "] not exist");
             return 0;
         }
-		std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
+       
+
+		//std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
         if (lua_istable(lua, 3) && !methodConfig->Request.empty())
         {
             const std::string& name = methodConfig->Request;
@@ -56,37 +58,17 @@ namespace Lua
 			request->SetProto(Tcp::Porto::String);
 			request->SetContent(lua_tostring(lua, 3));
 		}
+        int rpcId = 0;
         request->GetHead().Add("func", func);
-		TaskComponent * taskComponent = App::Inst()->GetTaskComponent();
-		taskComponent->Start([session, request, methodConfig, clientComponent,
-							  luaWaitTaskSource, messageComponent]()
-		{
-			ElapsedTimer elapsedTimer;
-			std::shared_ptr<Rpc::Packet> response = clientComponent->Call(session, request);
-			if(response == nullptr)
-			{
-				luaWaitTaskSource->SetResult(XCode::CallTimeout, nullptr);
-				return;
-			}
-            std::shared_ptr<Message> message;
-            int code = response->GetCode();
-            if(code == XCode::Successful)
-            {
-                if (!methodConfig->Response.empty())
-                {
-                    const std::string& name = methodConfig->Response;
-                    message = messageComponent->New(name);
-                    response->ParseMessage(message.get());
-                }                  
-            }
-			luaWaitTaskSource->SetResult(code, message);
-			if(elapsedTimer.GetSecond() >= 10)
-			{
-				LOG_ERROR("client call " << methodConfig->FullName <<
-					" user time = [" << elapsedTimer.GetSecond() << "s]");
-			}
-		});
-		return luaWaitTaskSource->Await();
+        if (!clientComponent->Send(session, request, rpcId))
+        {
+            lua_pushinteger(lua, XCode::NetWorkError);
+            return 1;
+        }
+        const std::string& response = methodConfig->Response;
+        std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource
+            = std::make_shared<LuaRpcTaskSource>(lua, rpcId, response);
+        return clientComponent->AddTask(rpcId, luaRpcTaskSource)->Await();	
 	}
 
     int ClientEx::New(lua_State* lua)

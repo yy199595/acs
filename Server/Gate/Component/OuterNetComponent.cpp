@@ -115,6 +115,15 @@ namespace Sentry
 		}
 		message->GetHead().Add("id", userId);
 		message->GetHead().Add("cli", message->From());
+#ifdef __DEBUG__
+		int rpcId = 0;
+		if (message->ConstHead().Get("rpc", rpcId))
+		{
+			long long now = Helper::Time::NowSecTime();
+			this->mRecords.emplace(rpcId, now);
+		}
+#endif // __DEBUG__
+
 		if(!this->mInnerMessageComponent->Send(target, message))
 		{
 			return XCode::NetWorkError;
@@ -124,6 +133,24 @@ namespace Sentry
 
 	bool OuterNetComponent::Send(const std::string& address, const std::shared_ptr<Rpc::Packet>& message)
 	{
+#ifdef __DEBUG__
+		int rpcId = 0;
+		const Rpc::Head& head = message->ConstHead();
+		if (message->GetType() == Tcp::Type::Response
+			&& head.Get("rpc", rpcId))
+		{
+			std::string func;
+			head.Get("func", func);
+			auto iter1 = this->mRecords.find(rpcId);
+			if (iter1 != this->mRecords.end())
+			{
+				long long time = iter1->second;
+				long long t = Helper::Time::NowSecTime() - time;
+				LOG_DEBUG("client call " << func << " use time [" << t << "ms]");
+				this->mRecords.erase(iter1);
+			}
+		}
+#endif
 		auto iter = this->mGateClientMap.find(address);
 		if(iter == this->mGateClientMap.end())
 		{

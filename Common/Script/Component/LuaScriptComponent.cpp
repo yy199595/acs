@@ -239,7 +239,7 @@ namespace Sentry
             const std::string moduleName = name.substr(0, name.find('.'));
             {
                 this->mModulePaths[moduleName] = path;
-                //LOG_INFO("[" << moduleName << "] = <<" << path << ">>");
+                LOG_INFO("load lua module [" << moduleName << "]");
             }          
         }
         return true;

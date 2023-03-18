@@ -23,9 +23,6 @@ namespace Sentry
         int Exit(const com::type::string& request); //服务器退出
         int RunInfo(com::type::string& response); // 获取运行信息
     private:
-        int AddAddress(long long userId, const s2s::server::list& request);
-        int DelAddress(long long userId, const com::array::string& request);
-    private:
         void Init() final;
         bool OnStart() final;
     private:

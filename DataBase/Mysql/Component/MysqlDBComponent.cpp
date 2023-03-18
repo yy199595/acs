@@ -46,10 +46,10 @@ namespace Sentry
 
 	void MysqlDBComponent::OnMessage(std::shared_ptr<Mysql::Response> message)
 	{
-		if(!message->IsOk())
+		/*if(!message->IsOk())
 		{
 			LOG_ERROR("mysql error : " << message->GetError());
-		}
+		}*/
 		long long taskId = message->TaskId();
 		this->OnResponse(taskId, message);
 	}
@@ -93,7 +93,7 @@ namespace Sentry
 		int id = this->mNumerPool.Pop();
 		{
 			command->SetRpcId(id);
-			this->Send(index, std::move(command));
+			this->Send(index, command);
 		}
 		std::shared_ptr<MysqlTask> mysqlTask = std::make_shared<MysqlTask>(id);
 		std::shared_ptr<Mysql::Response> response = this->AddTask(id, mysqlTask)->Await();

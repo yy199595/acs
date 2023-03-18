@@ -24,7 +24,7 @@ function Player:Login()
         return false
     end
     Log.Debug(account, " 登录网关服务器[", address, "]成功")
-    coroutine.start(self.Update, self)
+    --coroutine.start(self.Update, self)
 end
 
 function Player.New(account, passwd, phoneNum)
@@ -32,7 +32,7 @@ function Player.New(account, passwd, phoneNum)
         account = account,
         password = passwd,
         phone = phoneNum,
-        seseion = 0
+        session = 0
     }
     setmetatable(tab, {__index = Player})
     return tab
@@ -40,14 +40,12 @@ end
 
 function Player:Update()
     while true do
-        local t1 = Time.NowMilTime()
         local code = self:Call("Chat.Chat", {
             user_id = 1122, msg_type = 1, message = "hello"
         })
         if code == XCode.Successful then
 
         end
-        local t = Time.NowMilTime() - t1
-        Console.Info("cal ChatService.Ping [" .. t .. "]ms");
     end
 end
+return Player

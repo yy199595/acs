@@ -5,8 +5,8 @@
         "network": 4
     },
     "message": {
-        "inner": 100,
-        "outer": 500
+        "inner": 500,
+        "outer": 1000
     },
     "path": {
         "proto": "proto",

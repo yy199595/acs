@@ -44,15 +44,32 @@ namespace Sentry
 	void NodeMgrComponent::WaitServerStart(const std::string& server)
 	{
 		int count = 0;
-		TaskComponent * taskComponent = this->GetComponent<TaskComponent>();
-		auto iter = this->mRpcServers.find(server);
-		while(iter == this->mRpcServers.end() || iter->second.empty())
+		while (this->mRpcServers.count(server) == 0)
 		{
-			count++;
-			taskComponent->Sleep(2000);
-			iter = this->mRpcServers.find(server);
-			LOG_WARN("wait " << server << " start count = " << count);
-		}
+			std::string address;
+			RpcService* rpcService = this->mApp->GetService<Registry>();
+			if (!this->GetServer(rpcService->GetServer(), address))
+			{
+				this->mApp->GetTaskComponent()->Sleep(2000);
+				continue;
+			}
+			com::type::string request;
+			request.set_str(server);
+			std::shared_ptr<s2s::server::list> response
+				= std::make_shared<s2s::server::list>();
+			LOG_DEBUG("query " << server << " address count =" << count++);		
+			if(rpcService->Call(address, "Query", request, response) == XCode::Successful)
+			{
+				for (int index = 0; index < response->list_size(); index++)
+				{
+					const s2s::server::info& info = response->list(index);
+					{
+						this->AddRpcServer(info.name(), info.rpc());
+						this->AddHttpServer(info.name(), info.rpc());
+					}
+				}
+			}		
+		}		
 	}
 
 	void NodeMgrComponent::AddHttpServer(const std::string& name, const std::string& address)
@@ -237,35 +254,9 @@ namespace Sentry
 					this->mIndex++;
 					LOG_ERROR("register to [" << address << "] " << CodeConfig::Inst()->GetDesc(code));
 					continue;
-				}
-				com::array::string request;
-				std::vector<RpcService*> rpcServices;
-				std::unordered_set<std::string> hashSet;
-				this->mApp->GetComponents(rpcServices);
-				for (const RpcService* rpcService1 : rpcServices)
-				{
-					const std::string& server = rpcService1->GetServer();
-					if (hashSet.find(server) == hashSet.end())
-					{
-						hashSet.insert(server);
-						request.add_array(server);
-					}
-				}
-				std::shared_ptr<s2s::server::list> response
-					= std::make_shared<s2s::server::list>();
-				code = rpcService->Call(address, "Query", request, response);
-				if (code != XCode::Successful)
-				{
-					LOG_ERROR("query server address error");
-					return;
-				}
-				for (int index = 0; index < response->list_size(); index++)
-				{
-					const s2s::server::info & info = response->list(index);
-					this->AddRpcServer(info.name(), info.rpc());
-					this->AddHttpServer(info.name(), info.http());
-				}
+				}				
 				LOG_INFO("register to [" << address << "] successful");
+				this->AddRpcServer(rpcService->GetServer(), address);
 				return;
 			}
 		}

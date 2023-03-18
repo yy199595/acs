@@ -80,18 +80,25 @@ namespace Sentry
 			return this->AddMethod(std::make_shared<ServiceMethod4<T, T1>>(name, component, func));
 		}
 
-//		template<typename T, typename T1>
-//		bool Bind(std::string name, ServiceMethodType5<T, T1> func)
-//		{
-//			T * component = this->mComponent->Cast<T>();
-//			return this->AddMethod(std::make_shared<ServiceMethod5<T, T1>>(name, component, func));
-//		}
-
 		template<typename T>
 		bool Bind(std::string name, ServiceMethodType6<T> func)
 		{
 			T * component = this->mComponent->Cast<T>();
 			return this->AddMethod(std::make_shared<ServiceMethod6<T>>(name, component, func));
+		}
+
+		template<typename T>
+		bool Bind(std::string name, ServiceMethodType7<T> func)
+		{
+			T* component = this->mComponent->Cast<T>();
+			return this->AddMethod(std::make_shared<ServiceMethod7<T>>(name, component, func));
+		}
+
+		template<typename T, typename T1>
+		bool BindAddress(std::string name, ServiceMethodType8<T, T1> func)
+		{
+			T* component = this->mComponent->Cast<T>();
+			return this->AddMethod(std::make_shared<ServiceMethod8<T, T1>>(name, component, func));
 		}
 
 	public:

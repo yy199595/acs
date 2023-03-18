@@ -5,13 +5,13 @@
 #include"User.h"
 #include"Component/InnerNetComponent.h"
 #include"Component/NodeMgrComponent.h"
-#include"Component/GateHelperComponent.h"
+#include"Component/GateComponent.h"
 namespace Sentry
 {
 
     bool User::Awake()
     {
-        this->mApp->AddComponent<GateHelperComponent>();
+        this->mApp->AddComponent<GateComponent>();
         return true;
     }
     bool User::OnStart()

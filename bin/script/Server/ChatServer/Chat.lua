@@ -1,9 +1,9 @@
 
 local Chat = { }
-local gateComponent = App.GetComponent("GateHelperComponent")
-
-function Chat.OnServiceStart()
+table.print(gate)
+function Chat.Start()
     print("启动聊天服务")
+    return true
 end
 
 Chat.OnLogin = function(userId)
@@ -15,8 +15,8 @@ Chat.Chat = function(id, request)
         msg_type = request.msg_type,
         message = request.message
     })
-
-    gateComponent:BroadCast("ChatComponent.Chat", chatMessage)
+    Gate.Send(id, "ChatComponent.Private", chatMessage)
+    Gate.BroadCast("ChatComponent.Chat", chatMessage)
     return XCode.Successful
 end
 local count = 0

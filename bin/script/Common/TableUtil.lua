@@ -33,6 +33,10 @@ function table.print(t)
     print()
 end
 
+function table.string(t)
+
+end
+
 function table.find(tab, value)
     for i, v in pairs(tab) do
         if v == value then

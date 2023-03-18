@@ -12,7 +12,7 @@
 #include"Component/OuterNetComponent.h"
 #include"Component/InnerNetMessageComponent.h"
 
-#include"Component/GateHelperComponent.h"
+#include"Component/GateComponent.h"
 #include"Component/ClientComponent.h"
 
 #include"Component/HttpComponent.h"
@@ -71,7 +71,7 @@ void RegisterComponent()
 	ComponentFactory::Add<NodeMgrComponent>("NodeMgrComponent");
 
 // gate
-	ComponentFactory::Add<GateHelperComponent>("GateHelperComponent");
+	ComponentFactory::Add<GateComponent>("GateComponent");
 	ComponentFactory::Add<OuterNetComponent>("OuterNetComponent");
     ComponentFactory::Add<SqliteComponent>("SqliteComponent");
 // db
