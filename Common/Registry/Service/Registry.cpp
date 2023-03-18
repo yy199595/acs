@@ -40,7 +40,7 @@ namespace Sentry
 	int Registry::Query(const com::array::string& request, s2s::server::list& response)
 	{
 		std::stringstream sqlStream;
-		sqlStream << "select (name,rpc,http,time) from " << this->mTable << " where ";
+		sqlStream << "select name,rpc,http,time from " << this->mTable << " where ";
 		if (request.array_size() == 0)
 		{
 			std::vector<std::string> servers;
@@ -58,7 +58,7 @@ namespace Sentry
 		{
 			for (int index = 0; index < request.array_size(); index++)
 			{
-				sqlStream << "name=" << request.array(index);
+				sqlStream << "name='" << request.array(index) << "'";
 				if (index < request.array_size() - 1)
 				{
 					sqlStream << " or ";
@@ -66,6 +66,24 @@ namespace Sentry
 			}
 		}
 		const std::string sql = sqlStream.str();
+		std::shared_ptr<Mysql::SqlCommand> command
+			= std::make_shared<Mysql::SqlCommand>(sql);
+
+		std::shared_ptr<Mysql::Response> response1 =
+			this->mMysqlComponent->Run(this->mIndex, command);
+		for (size_t index = 0; index < response1->size(); index++)
+		{
+			std::string input;
+			Json::Writer* json = response1->at(index);
+			if(json->WriterStream(&input) > 0)
+			{
+				s2s::server::info * message = response.add_list();
+				if(util::JsonStringToMessage(input, message).ok())
+				{
+
+				}
+			}
+		}
 		return XCode::Successful;
 	}
 

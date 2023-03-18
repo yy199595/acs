@@ -82,7 +82,7 @@ namespace Sentry
 					break;
 				}
                 default:
-					CONSOLE_LOG_ERROR("unknow type [" << fieldDesc->type_name() << "]" << fieldDesc->full_name());
+					CONSOLE_LOG_ERROR("unknown type [" << fieldDesc->type_name() << "]" << fieldDesc->full_name());
                     return false;
             }
         }

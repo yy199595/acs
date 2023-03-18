@@ -34,7 +34,7 @@
             "Async": true
         },
         "Query": {
-            "Async": false,
+            "Async": true,
             "Request": "com.type.string",
             "Response": "s2s.server.list"
         },
