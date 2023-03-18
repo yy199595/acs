@@ -265,9 +265,7 @@ namespace Sentry
 					this->AddRpcServer(info.name(), info.rpc());
 					this->AddHttpServer(info.name(), info.http());
 				}
-
 				LOG_INFO("register to [" << address << "] successful");
-				//taskComponent->Start(&NodeMgrComponent::PingRegistryServer, this);
 				return;
 			}
 		}

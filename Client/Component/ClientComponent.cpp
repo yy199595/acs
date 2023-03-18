@@ -119,6 +119,11 @@ namespace Client
 		return this->AddTask(rpcId, clientRpcTask)->Await();
 	}
 
+    void ClientComponent::OnTaskComplete(int key)
+    {
+        this->mNumberPool.Push(key);
+    }
+
 	int ClientComponent::New(const std::string& ip, unsigned short port)
 	{
 		int id = this->mNumberPool.Pop();

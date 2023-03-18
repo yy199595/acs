@@ -35,7 +35,7 @@ namespace Client
 {
     class TcpRpcClientContext;
 
-    class ClientComponent : public RpcTaskComponent<long long, Rpc::Packet>,
+    class ClientComponent : public RpcTaskComponent<int, Rpc::Packet>,
             public ILuaRegister,  public IRpc<Rpc::Packet>
     {
     public:
@@ -49,6 +49,7 @@ namespace Client
         void OnMessage(std::shared_ptr<Rpc::Packet> message) final;
     protected:
         bool LateAwake() final;
+        void OnTaskComplete(int key) final;
         void StartClose(const std::string &address) final;
         void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
         void OnCloseSocket(const std::string &address, int code) final;

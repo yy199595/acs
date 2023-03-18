@@ -31,7 +31,7 @@ namespace Sentry
 		}
 		this->mTable = message->GetTypeName();
         this->mIndex = this->mMysqlComponent->MakeMysqlClient();
-		std::vector<std::string> keys{ "name", "rpc" };
+		std::vector<std::string> keys{ "rpc_address" };
 		std::shared_ptr<Mysql::CreateTabCommand> command =
                 std::make_shared<Mysql::CreateTabCommand>(message, keys);
         return this->mMysqlComponent->Run(this->mIndex , command)->IsOk();
@@ -40,14 +40,14 @@ namespace Sentry
 	int Registry::Query(const com::array::string& request, s2s::server::list& response)
 	{
 		std::stringstream sqlStream;
-		sqlStream << "select name,rpc,http,time from " << this->mTable << " where ";
+		sqlStream << "select server_name,rpc_address,http_address,last_ping_time from " << this->mTable << " where ";
 		if (request.array_size() == 0)
 		{
 			std::vector<std::string> servers;
 			this->mInnerComponent->GetServiceList(servers);
 			for (size_t index = 0; index < servers.size(); index++)
 			{
-				sqlStream << "name=" << servers[index];
+				sqlStream << "server_name=" << servers[index];
 				if (index < servers.size() - 1)
 				{
 					sqlStream << " or ";
@@ -58,29 +58,39 @@ namespace Sentry
 		{
 			for (int index = 0; index < request.array_size(); index++)
 			{
-				sqlStream << "name='" << request.array(index) << "'";
+				sqlStream << "server_name='" << request.array(index) << "'";
 				if (index < request.array_size() - 1)
 				{
 					sqlStream << " or ";
 				}
 			}
 		}
+		sqlStream << ";";
 		const std::string sql = sqlStream.str();
-		std::shared_ptr<Mysql::SqlCommand> command
-			= std::make_shared<Mysql::SqlCommand>(sql);
+		std::shared_ptr<Mysql::QueryCommand> command
+			= std::make_shared<Mysql::QueryCommand>(sql);
 
 		std::shared_ptr<Mysql::Response> response1 =
 			this->mMysqlComponent->Run(this->mIndex, command);
 		for (size_t index = 0; index < response1->size(); index++)
 		{
 			std::string input;
+			rapidjson::Document document;
 			Json::Writer* json = response1->at(index);
-			if(json->WriterStream(&input) > 0)
+			if(json->WriterStream(&input) > 0 && 
+				!document.Parse(input.c_str(), input.size()).HasParseError())
 			{
-				s2s::server::info * message = response.add_list();
-				if(util::JsonStringToMessage(input, message).ok())
+				long long now = Helper::Time::NowSecTime();
+				long long time = document["last_ping_time"].GetInt64();
+				if (now - time <= 15)
 				{
-
+					s2s::server::info* message = response.add_list();
+					message->set_name(document["server_name"].GetString());
+					message->set_rpc(document["rpc_address"].GetString());
+					if (document.HasMember("http_address"))
+					{
+						message->set_http(document["http_address"].GetString());
+					}
 				}
 			}
 		}
@@ -98,7 +108,7 @@ namespace Sentry
 		const std::string& name = request.name();
 
         long long time = Helper::Time::NowSecTime();
-        const std::string sql = fmt::format("replace into {0} (name,rpc,http,time) values('{1}','{2}','{3}',{4});",
+        const std::string sql = fmt::format("replace into {0} (server_name,rpc_address,http_address,last_ping_time) values('{1}','{2}','{3}',{4});",
 			this->mTable, name, rpc, http, time);
 
         if(!this->mMysqlComponent->Execute(this->mIndex, std::make_shared<Mysql::SqlCommand>(sql)))
@@ -136,7 +146,7 @@ namespace Sentry
             long long time = Helper::Time::NowSecTime();
 			const std::string table("server.registry");
 			const std::string & rpc = nodeInfo->RpcAddress;
-            const std::string sql = fmt::format("update {0} set time={1} where rpc='{2}'", this->mTable, time, rpc);
+            const std::string sql = fmt::format("update {0} set last_ping_time={1} where rpc_address='{2}'", this->mTable, time, rpc);
             if(!this->mMysqlComponent->Execute(this->mIndex, std::make_shared<Mysql::SqlCommand>(sql)))
             {
                 return XCode::SaveToMysqlFailure;
@@ -153,7 +163,7 @@ namespace Sentry
 			return XCode::Failure;
 		}
 		RpcService* rpcService = this->mApp->GetService<Node>();
-        const std::string sql = fmt::format("delete from {0} where rpc='{1}'", this->mTable, rpc);
+        const std::string sql = fmt::format("delete from {0} where rpc_address='{1}'", this->mTable, rpc);
         if(!this->mMysqlComponent->Run(this->mIndex, std::make_shared<Mysql::SqlCommand>(sql))->IsOk())
         {
             return XCode::SaveToMysqlFailure;

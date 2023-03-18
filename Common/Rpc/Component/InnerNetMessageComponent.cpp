@@ -105,6 +105,7 @@ namespace Sentry
 			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
 			CONSOLE_LOG_INFO("call [" << config->FullName << "] code = " << desc);
 		}
+		message->SetType(Tcp::Type::Response);
 		this->Send(message->From(), code, message);
 	}
 

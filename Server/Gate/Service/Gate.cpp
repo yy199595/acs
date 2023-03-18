@@ -8,12 +8,15 @@
 #include"Service/User.h"
 #include"Client/OuterNetClient.h"
 #include"Config/ClusterConfig.h"
+#include"Config/CodeConfig.h"
 #include"Component/OuterNetComponent.h"
 #include"Component/NodeMgrComponent.h"
 namespace Sentry
 {
     Gate::Gate()
     {
+		this->mUserService = nullptr;
+		this->mNodeComponent = nullptr;
         this->mOuterComponent = nullptr;
     }
     void Gate::Init()
@@ -103,17 +106,18 @@ namespace Sentry
 			}
 			std::string address;
 			s2s::user::login message;
+			message.set_user_id(userId);
 			const std::string& server = nodeConfig->GetName();
 			if (!this->mNodeComponent->GetServer(server, address))
 			{
 				LOG_ERROR("user:" << userId << " allot [" << server << "]" << "error");
 				return XCode::AddressAllotFailure;
 			}
-			message.set_user_id(userId);
 			int code = this->mUserService->Call(address, func, message);
 			if(code != XCode::Successful)
 			{
-
+				const std::string& desc = CodeConfig::Inst()->GetDesc(code);
+				LOG_ERROR("call " << server << " [" << address << "] code = " << desc);;
 			}
 			this->mNodeComponent->AddRpcServer(server, userId, address);
 		}

@@ -113,21 +113,21 @@ namespace Mysql
             case enum_field_types::MYSQL_TYPE_TINY:
             {
                 int value = std::atol(str);
-                document.Add(filed->name, value);
+                document.Add(filed->name).Add(value);
                 return true;
             }
             case enum_field_types::MYSQL_TYPE_LONG:
             case enum_field_types::MYSQL_TYPE_LONGLONG:
             {
                 long long value = std::atoll(str);
-                document.Add(filed->name, value);
+                document.Add(filed->name).Add(value);
                 return true;
             }
             case enum_field_types::MYSQL_TYPE_FLOAT:
             case enum_field_types::MYSQL_TYPE_DOUBLE:
             {
                 double value = std::atof(str);
-                document.Add(filed->name, value);
+                document.Add(filed->name).Add(value);
                 return true;
             }
             case enum_field_types::MYSQL_TYPE_BLOB:
@@ -135,7 +135,7 @@ namespace Mysql
             case enum_field_types::MYSQL_TYPE_VARCHAR:
             case enum_field_types::MYSQL_TYPE_VAR_STRING:
             {
-                rapidjson::Value value(str, len);
+                //rapidjson::Value value(str, len);
                 document.Add(filed->name).Add(str, len);
                 return true;
             }
