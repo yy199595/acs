@@ -180,16 +180,4 @@ namespace Lua
 		}
 		return false;
 	}
-
-	void LuaModule::Invoke(const std::string& func, long long userId)
-	{
-		if(this->GetFunction(func))
-		{
-			lua_pushinteger(this->mLua, userId);
-			if (lua_pcall(this->mLua, 1, 0, 0) != LUA_OK)
-			{
-				LUA_LOG_ERROR(lua_tostring(this->mLua, -1));
-			}
-		}
-	}
 }

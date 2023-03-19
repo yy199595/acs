@@ -87,16 +87,24 @@ namespace Mysql
         }
         while(MYSQL_ROW row = mysql_fetch_row(result1))
         {
-            std::string json;
+			size_t count = 0;
             Json::Writer * jsonDocument = new Json::Writer();
             unsigned int fieldCount = mysql_field_count(sock);
             unsigned long* lengths = mysql_fetch_lengths(result1);
             for (unsigned int index = 0; index < fieldCount; index++)
             {
-                st_mysql_field* field = mysql_fetch_field(result1);
-                this->Write(*jsonDocument, field, row[index], lengths[index]);
+                st_mysql_field* filed = mysql_fetch_field(result1);
+                if(this->Write(*jsonDocument, filed, row[index], lengths[index]))
+				{
+					count++;
+				}
             }
-            response->emplace_back(jsonDocument);
+			if(count > 0)
+			{
+				response->emplace_back(jsonDocument);
+				continue;
+			}
+			delete jsonDocument;
         }
         mysql_free_result(result1);
         return true;
@@ -104,9 +112,9 @@ namespace Mysql
 
     bool QueryCommand::Write(Json::Writer &document, st_mysql_field *filed, const char *str, int len)
     {
-        if(str == nullptr || len == 0)
+        if(str == nullptr || len == 0 || filed == nullptr)
         {
-            return true;
+            return false;
         }
         switch(filed->type)
         {

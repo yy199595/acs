@@ -52,6 +52,8 @@ namespace Lua
         static WaitLuaTaskSource * Call(lua_State * lua, int ref);
         static WaitLuaTaskSource * Call(lua_State * lua, int ref, const char * func);
         static WaitLuaTaskSource * Call(lua_State * lua, const char * tab, const char * func);
+		template<typename ... Args>
+		static WaitLuaTaskSource * Call(lua_State * lua, Args &&... args);
 	 public:
 		template<typename T>
 		static T Invoke(lua_State * lua);
@@ -92,6 +94,26 @@ namespace Lua
 			luaL_error(lua, lua_tostring(lua, -1));
 		}
 		return Parameter::Read<T>(lua, -1);
+	}
+	template<typename... Args>
+	WaitLuaTaskSource* Function::Call(lua_State* lua, Args&& ... args)
+	{
+		if(!lua_isfunction(lua, -1))
+		{
+			return nullptr;
+		}
+		if(!Lua::Function::Get(lua, "coroutine", "call"))
+		{
+			return nullptr;
+		}
+		lua_pushvalue(lua, -2);
+		Parameter::WriteArgs<Args...>(lua, std::forward<Args>(args)...);
+		if (lua_pcall(lua, 1, sizeof...(Args), 0) != 0)
+		{
+			LOG_ERROR(lua_tostring(lua, -1));
+			return nullptr;
+		}
+		return PtrProxy<WaitLuaTaskSource>::Read(lua, -1);
 	}
 }
 
