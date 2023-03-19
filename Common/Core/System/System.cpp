@@ -22,7 +22,7 @@ namespace Sentry
         {
             System::IsInit = true;
             System::mExePath = argv[0];
-            System::mConfigPath = "./config/server.json";
+            System::mConfigPath = "./config/config.json";
             System::mWorkPath = fmt::format("{0}/", getcwd(nullptr, 0));
             return true;
         }

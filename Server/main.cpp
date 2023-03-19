@@ -19,6 +19,7 @@
 #include"Component/HttpWebComponent.h"
 #include"Component/HttpDebugComponent.h"
 #include"Component/NodeMgrComponent.h"
+
 #include"Component/TextConfigComponent.h"
 #include"Component/LaunchComponent.h"
 #include"Service/Log.h"

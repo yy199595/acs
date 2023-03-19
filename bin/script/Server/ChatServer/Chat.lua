@@ -1,6 +1,5 @@
 
 local Chat = { }
-table.print(gate)
 require("Component.MongoComponent")
 function Chat.Start()
     print("启动聊天服务")

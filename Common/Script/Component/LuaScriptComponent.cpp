@@ -212,10 +212,11 @@ namespace Sentry
 				return false;
 			}
 		}
-		this->LoadAllFilePath(this->mModulePath);
 
+		std::string component;
 		this->AddRequire(common);
 		this->AddRequire(this->mModulePath);
+		this->LoadAllFilePath(this->mModulePath);
 		if (config->GetLuaConfig("main", main))
 		{
 			main = System::FormatPath(main);
@@ -289,20 +290,21 @@ namespace Sentry
 		}
 	}
 
-    void LuaScriptComponent::AddRequire(const std::string &path)
-    {
-        if(this->mDirectorys.find(path) == this->mDirectorys.end())
-        {
-            size_t size = 0;
-            this->mDirectorys.insert(path);
-            lua_getglobal(this->mLuaEnv, "package");
-            lua_getfield(this->mLuaEnv, -1, "path");
-            const char *str = lua_tolstring(this->mLuaEnv, -1, &size);
-            std::string fullPath = std::string(str, size) + ";" + path + "/?.lua";
-            lua_pushlstring(this->mLuaEnv, fullPath.c_str(), fullPath.size());
-            lua_setfield(this->mLuaEnv, -3, "path");
-        }
-    }
+	void LuaScriptComponent::AddRequire(const std::string& path)
+	{
+		if (path.empty()) return;
+		if (this->mDirectorys.find(path) == this->mDirectorys.end())
+		{
+			size_t size = 0;
+			this->mDirectorys.insert(path);
+			lua_getglobal(this->mLuaEnv, "package");
+			lua_getfield(this->mLuaEnv, -1, "path");
+			const char* str = lua_tolstring(this->mLuaEnv, -1, &size);
+			std::string fullPath = std::string(str, size) + ";" + path + "/?.lua";
+			lua_pushlstring(this->mLuaEnv, fullPath.c_str(), fullPath.size());
+			lua_setfield(this->mLuaEnv, -3, "path");
+		}
+	}
 
 	double LuaScriptComponent::CollectGarbage()
 	{

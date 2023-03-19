@@ -69,7 +69,7 @@ namespace Sentry
         return redisTask;
     }
 
-	const std::string RedisRequest::ToJson()
+	std::string RedisRequest::ToJson()
 	{
 		Json::Writer jsonWriter;
 		jsonWriter.Add(this->mParameters);
