@@ -38,6 +38,7 @@ namespace Sentry
 	 private:
         lua_State* mLuaEnv;
         std::string mModulePath;
+		std::string mComponentPath;
         std::set<std::string> mDirectorys;
 		std::unordered_map<std::string, int> mFuncs;
 		std::unordered_map<std::string, std::string> mModulePaths;

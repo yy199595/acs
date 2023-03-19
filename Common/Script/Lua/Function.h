@@ -107,8 +107,9 @@ namespace Lua
 			return nullptr;
 		}
 		lua_pushvalue(lua, -2);
+		int count = sizeof...(Args) + 1;
 		Parameter::WriteArgs<Args...>(lua, std::forward<Args>(args)...);
-		if (lua_pcall(lua, 1, sizeof...(Args), 0) != 0)
+		if (lua_pcall(lua, count, 1, 0) != LUA_OK)
 		{
 			LOG_ERROR(lua_tostring(lua, -1));
 			return nullptr;

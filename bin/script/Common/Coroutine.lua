@@ -6,15 +6,15 @@ function coroutine.wakeup(cor, ...)
     return ret
 end
 
-function coroutine.call(func)
+function coroutine.call(func, ...)
     local luaTaskSource = WaitLuaTaskSource.New()
-    coroutine.start(function(taskSource)
-        local state, ret = pcall(func)
+    coroutine.start(function(taskSource, ...)
+        local state, ret = pcall(func, ...)
         if not state then
             Log.LuaError(ret)
         end
         taskSource:SetResult(ret)
-    end, luaTaskSource)
+    end, luaTaskSource, ...)
     return luaTaskSource
 end
 

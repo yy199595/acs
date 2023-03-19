@@ -28,7 +28,7 @@
     "Client": {
         "lua": {
             "common": "script/Common",
-            "module": "script/Client",
+            "component": "script/Client",
             "main": "script/Client/Client.lua"
         },
         "path": {
@@ -45,7 +45,8 @@
         },
         "lua": {
             "common": "script/Common",
-            "module": "script/Server",
+            "service": "script/Server",
+            "component":"script/Server/component",
             "main": "script/Server/Server.lua"
         },
         "path": {
@@ -60,7 +61,7 @@
         },
         "lua": {
             "common": "script/Common",
-            "module": "script/Server/HttpServer",
+            "service": "script/Server/HttpServer",
             "component":"script/Server/Component"
         }
     },
@@ -70,7 +71,7 @@
         },
         "lua": {
             "common": "script/Common",
-            "module": "script/Server/ChatServer",
+            "service": "script/Server/ChatServer",
             "component":"script/Server/Component"
         }
     },
@@ -86,7 +87,8 @@
         },
         "lua": {
             "common": "script/Common",
-            "module": "script/Server/DataServer",
+            "service": "script/Server/DataServer",
+            "component": "script/Server/Component",
             "main": "script/Server/DataServer/Main.lua"
         }
     },

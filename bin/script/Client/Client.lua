@@ -1,5 +1,6 @@
 
 local Main = {}
+print(package.path)
 require("Player.Player")
 require("component.ChatComponent")
 require("component.LoginComponent")

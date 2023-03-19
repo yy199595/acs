@@ -93,9 +93,11 @@
     },
     "User": {
         "Login": {
+            "Async":true,
             "Request": "s2s.user.login"
         },
         "Logout": {
+            "Async":true,
             "Request": "s2s.user.logout"
         }
     },

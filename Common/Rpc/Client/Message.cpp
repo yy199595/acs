@@ -167,14 +167,6 @@ namespace Rpc
         return true;
     }
 
-    std::shared_ptr<Packet> Packet::New(int type, int proto)
-    {
-        std::shared_ptr<Packet> message = std::make_shared<Packet>();
-        message->SetType(type);
-        message->SetProto(proto);
-        return message;
-    }
-
     bool Packet::ParseLen(std::istream &is, int & len)
     {
         union
@@ -288,5 +280,47 @@ namespace Rpc
             message->mHead = this->mHead;
         }
         return message;
+    }
+
+    bool Packet::ParseMessage(Message* message)
+    {
+        switch (this->mProto)
+        {
+        case (int)Tcp::Porto::Protobuf:
+            if (message->ParseFromString(this->mBody))
+            {
+                this->mBody.clear();
+                return true;
+            }
+            return false;
+        case (int)Tcp::Porto::Json:
+            if (Helper::Protocol::FromJson(message, this->mBody))
+            {
+                this->mBody.clear();
+                return true;
+            }
+            return false;
+        }
+        CONSOLE_LOG_FATAL("proto error parse error");
+        return false;
+    }
+
+
+    bool Packet::WriteMessage(const Message* message)
+    {
+        this->mBody.clear();
+        if (message == nullptr)
+        {
+            return true;
+        }
+        switch (this->mProto)
+        {
+        case (int)Tcp::Porto::Protobuf:
+            return message->SerializeToString(&mBody);
+        case (int)Tcp::Porto::Json:
+            return Helper::Protocol::GetJson(*message, &mBody);
+        }
+        CONSOLE_LOG_FATAL("proto error write error");
+        return false;
     }
 }

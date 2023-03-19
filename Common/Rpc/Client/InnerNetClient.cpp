@@ -210,11 +210,12 @@ namespace Sentry
 #endif
 		io.post(std::bind(&IRpc<Rpc::Packet>::OnConnectSuccessful, this->mComponent, address));
 
-        std::shared_ptr<Rpc::Packet> authMessage =
-            Rpc::Packet::New(Tcp::Type::Auth, Tcp::Porto::Protobuf);
+        std::shared_ptr<Rpc::Packet> authMessage 
+            = std::make_shared<Rpc::Packet>();
         {
-			Rpc::Head & head = authMessage->GetHead();
+            Rpc::Head& head = authMessage->GetHead();
             {
+                authMessage->SetType(Tcp::Type::Auth);
                 head.Add("name", this->mAuthInfo.ServerName);
                 head.Add("user", this->mAuthInfo.UserName);
                 head.Add("passwd", this->mAuthInfo.PassWord);

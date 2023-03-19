@@ -31,8 +31,9 @@ namespace Sentry
         }		
 
         std::shared_ptr<Rpc::Packet> data =
-			Rpc::Packet::New(Tcp::Type::Forward, Tcp::Porto::Protobuf);
+            std::make_shared<Rpc::Packet>();
 		{
+            data->SetType(Tcp::Type::Forward);
 			data->GetHead().Add("id", userId);
 			data->GetHead().Add("func", func);
 		}

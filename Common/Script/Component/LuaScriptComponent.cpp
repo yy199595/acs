@@ -192,31 +192,43 @@ namespace Sentry
 
 	bool LuaScriptComponent::LoadAllFile()
 	{
-		std::string common, module, main;
 		std::vector<std::string> luaFiles;
+		std::string common, module, main, component;
 		const ServerConfig* config = ServerConfig::Inst();
-		LOG_CHECK_RET_FALSE(config->GetLuaConfig("common", common));
-		LOG_CHECK_RET_FALSE(config->GetLuaConfig("module", module));
-
-		common = System::FormatPath(common);
-		this->mModulePath = System::FormatPath(module);
-		if (!Helper::Directory::GetFilePaths(common, "*.lua", luaFiles))
+		if (config->GetLuaConfig("component", component))
 		{
-			return false;
+			this->mComponentPath = System::FormatPath(component);			
 		}
-		for (const std::string& path : luaFiles)
+
+		if (config->GetLuaConfig("common", common))
 		{
-			if (luaL_dofile(this->mLuaEnv, path.c_str()) != LUA_OK)
+			common = System::FormatPath(common);
+			if (!Helper::Directory::GetFilePaths(common, "*.lua", luaFiles))
 			{
-				LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+				return false;
+			}
+			for (const std::string& path : luaFiles)
+			{
+				if (luaL_dofile(this->mLuaEnv, path.c_str()) != LUA_OK)
+				{
+					LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+					return false;
+				}
+			}
+		}
+		
+		this->AddRequire(common);
+		this->AddRequire(this->mComponentPath);
+		if (config->GetLuaConfig("service", module))
+		{
+			this->mModulePath = System::FormatPath(module);
+			this->AddRequire(this->mModulePath);
+			if (!this->LoadAllFilePath(this->mModulePath))
+			{
 				return false;
 			}
 		}
 
-		std::string component;
-		this->AddRequire(common);
-		this->AddRequire(this->mModulePath);
-		this->LoadAllFilePath(this->mModulePath);
 		if (config->GetLuaConfig("main", main))
 		{
 			main = System::FormatPath(main);

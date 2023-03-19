@@ -3,7 +3,6 @@
 //
 
 #include"TranComponent.h"
-#include"Helper/Helper.h"
 #include"Service/RpcService.h"
 #include"Config/ClusterConfig.h"
 #include"Component/NodeMgrComponent.h"

@@ -1,5 +1,4 @@
 ﻿#include"RpcService.h"
-#include"Helper/Helper.h"
 #include"Lua/LuaServiceMethod.h"
 #include"Config/ServiceConfig.h"
 #include"String/StringHelper.h"
@@ -64,32 +63,42 @@ namespace Sentry
 
     bool RpcService::StartSend(const std::string& address, const std::string& func, const Message* message)
     {
-        RpcPacket request = PacketHelper::MakeRpcPacket(this->GetName(), func);
-        if (request == nullptr)
+        const std::string name = fmt::format("{0}.{1}", this->GetName(), func);
+        const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(name);
+        if (methodConfig == nullptr)
         {
-            LOG_ERROR("send message error  " << this->GetName() << "." << func);
-            return false;
+            LOG_ERROR("not find rpc method config " << name);
+            return nullptr;
         }
-
-        request->SetType(Tcp::Type::Request);
-        request->SetProto(Tcp::Porto::Protobuf);
-        request->WriteMessage(message);
+        std::shared_ptr<Rpc::Packet> request =
+            std::make_shared<Rpc::Packet>();
+        {
+            request->SetType(Tcp::Type::Request);
+            request->SetProto(Tcp::Porto::Protobuf);
+            request->WriteMessage(message);
+            request->GetHead().Add("func", name);
+        }
         return this->mMessageComponent->Send(address, request);
     }
 
     std::shared_ptr<Rpc::Packet> RpcService::CallAwait(
         const std::string &address, const std::string &func, const Message *message)
 	{
-		RpcPacket request = PacketHelper::MakeRpcPacket(this->GetName(), func);
-		if (request == nullptr)
-		{
-			LOG_ERROR("create rpc packet [" <<
-											this->GetName() << "." << func << "]");
-			return nullptr;
-		}
-		request->SetType(Tcp::Type::Request);
-		request->SetProto(Tcp::Porto::Protobuf);
-		request->WriteMessage(message);
+        const std::string name = fmt::format("{0}.{1}", this->GetName(), func);
+        const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(name);
+        if (methodConfig == nullptr)
+        {
+            LOG_ERROR("not find rpc method config " << name);
+            return nullptr;
+        }
+        std::shared_ptr<Rpc::Packet> request =
+            std::make_shared<Rpc::Packet>();
+        {
+            request->SetType(Tcp::Type::Request);
+            request->SetProto(Tcp::Porto::Protobuf);
+            request->WriteMessage(message);
+            request->GetHead().Add("func", name);
+        }
 		return this->mMessageComponent->Call(address, request);
 	}
 

@@ -55,8 +55,6 @@ namespace Rpc
 
         bool Parse(const std::string & address, std::istream &os, size_t size);
 
-        static std::shared_ptr<Packet> New(int type, int proto);
-
     public:
         int GetCode(int code = XCode::Failure) const;
 
@@ -64,9 +62,9 @@ namespace Rpc
 
 		inline const Head & ConstHead() const { return this->mHead; }
 
-        inline void SetType(int type) { this->mType = (int)type; }
+        inline void SetType(int type) { this->mType = type; }
 
-        inline void SetProto(int proto) { this->mProto = (int)proto; }
+        inline void SetProto(int proto) { this->mProto = proto; }
 
         inline int GetType() const { return this->mType; }
 
@@ -83,11 +81,10 @@ namespace Rpc
     public:
         std::shared_ptr<Packet> Clone() const;
     public:
-        template<typename T>
-        bool ParseMessage(T * message);
+       
+        bool ParseMessage(Message * message);
 
-        template<typename T>
-        bool WriteMessage(const T * message);
+        bool WriteMessage(const Message* message);
 
     private:
         int mLen;
@@ -97,49 +94,6 @@ namespace Rpc
         std::string mFrom;
         std::string mBody;
     };
-
-    template<typename T>
-    bool Packet::ParseMessage(T * message)
-    {
-        switch (this->mProto)
-        {
-            case (int)Tcp::Porto::Protobuf:
-                if(message->ParseFromString(this->mBody))
-                {
-                    this->mBody.clear();
-                    return true;
-                }
-                return false;
-            case (int)Tcp::Porto::Json:
-                if(Helper::Protocol::FromJson(message, this->mBody))
-                {
-                    this->mBody.clear();
-                    return true;
-                }
-                return false;
-        }
-        CONSOLE_LOG_FATAL("proto error parse error");
-        return false;
-    }
-
-    template<typename T>
-    bool Packet::WriteMessage(const T * message)
-    {
-        this->mBody.clear();
-        if(message == nullptr)
-        {
-            return true;
-        }
-        switch (this->mProto)
-        {
-            case (int)Tcp::Porto::Protobuf:
-                return message->SerializeToString(&mBody);
-            case (int)Tcp::Porto::Json:
-                return Helper::Protocol::GetJson(*message, &mBody);
-        }
-        CONSOLE_LOG_FATAL("proto error write error");
-        return false;
-    }
 }
 typedef std::shared_ptr<Rpc::Packet> RpcPacket;
 

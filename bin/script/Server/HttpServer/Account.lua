@@ -1,8 +1,8 @@
 
 local AccountService = {}
 local tabName = "user.account_info"
-local Mongo = require("Component.MongoComponent")
-local RedisClient = require("Component.RedisComponent")
+local Mongo = require "MongoComponent"
+local RedisClient = require "RedisComponent"
 
 
 function AccountService.Start()

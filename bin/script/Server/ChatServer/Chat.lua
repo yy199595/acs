@@ -1,17 +1,17 @@
 
 local Chat = { }
-require("Component.MongoComponent")
+
 function Chat.Start()
     print("启动聊天服务")
     return true
 end
 
-Chat.OnLogin = function(userId)
-    coroutine.sleep(10000)
+function Chat.OnLogin(userId)
+    coroutine.sleep(1000)
     print(string.format("玩家%d登录聊天服务",userId))
 end
 
-Chat.Chat = function(id, request)
+function Chat.Chat(id, request)
     local chatMessage = Proto.New("c2s.chat.notice", {
         msg_type = request.msg_type,
         message = request.message
@@ -22,7 +22,7 @@ Chat.Chat = function(id, request)
 end
 local count = 0
 
-Chat.Ping = function(id)
+function Chat.Ping(id)
     count = count + 1
     print(os.time(), "count = " .. count)
     return XCode.Successful
