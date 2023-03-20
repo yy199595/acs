@@ -22,7 +22,7 @@ namespace Sentry
         bool LateAwake() final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 	 private:
-		class TaskComponent* mTaskComponent;
+		class AsyncMgrComponent* mTaskComponent;
         class ThreadComponent * mNetComponent;
         std::queue<std::shared_ptr<HttpRequestClient>> mClientPools;
 	};

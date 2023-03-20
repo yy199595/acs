@@ -180,7 +180,7 @@ namespace Sentry
 		}
 		std::string ip;
 		unsigned short port = 0;
-        if(!Helper::Str::SplitAddress(address, ip, port))
+        if(!Helper::Str::SplitAddr(address, ip, port))
         {
             CONSOLE_LOG_ERROR("parse address error : [" << address << "]");
             return nullptr;

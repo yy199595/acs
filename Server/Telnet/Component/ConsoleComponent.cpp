@@ -1,7 +1,7 @@
 #include"ConsoleComponent.h"
 
 #include"Service/PhysicalService.h"
-#include"Component/TaskComponent.h"
+#include"Component/AsyncMgrComponent.h"
 #define BIND_FUNC(name, func) this->mFunctionMap.emplace(name, std::bind(&func, this, args1, args2));
 
 namespace Sentry
@@ -31,7 +31,7 @@ namespace Sentry
 {
 	bool ConsoleComponent::LateAwake()
 	{
-		this->mTaskComponent = this->GetComponent<TaskComponent>();
+		this->mTaskComponent = this->GetComponent<AsyncMgrComponent>();
 		return true;
 	}
 

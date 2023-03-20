@@ -5,7 +5,7 @@
 #include"google/protobuf/message.h"
 namespace Helper
 {
-    std::string Str::EmptyStr = "";
+    std::string Str::EmptyStr;
 
     const std::string & Str::Empty()
     {
@@ -135,15 +135,42 @@ namespace Helper
 
 namespace Helper
 {
-    bool Str::SplitAddress(const std::string& address, std::string& ip, unsigned short& port)
+    bool Str::SplitAddr(const std::string& address, std::string& ip, unsigned short& port)
     {
-        size_t pos = address.find(":");
-        if (pos == std::string::npos)
-        {
-            return false;
-        }
-        ip = address.substr(0, pos);
-        port = (unsigned short)std::stoul(address.substr(pos + 1));
-        return true;
+		if(Str::IsRpcAddr(address))
+		{
+			size_t pos = address.find(':');
+			if (pos == std::string::npos)
+			{
+				return false;
+			}
+			ip = address.substr(0, pos);
+			port = (unsigned short)std::stoul(address.substr(pos + 1));
+			return true;
+		}
+		else if(Str::IsHttpAddr(address))
+		{
+			std::regex pattern("(http://)?([^:/]+)(:\\d+)?");
+			std::smatch match;
+			if (std::regex_search(address, match, pattern))
+			{
+				ip = match[2];
+				port = std::stol(match[3].str().substr(1));
+				return true;
+			}
+		}
+		return false;
     }
+
+	bool Str::IsRpcAddr(const std::string& address)
+	{
+		std::regex pattern(R"(^\d{1,3}(\.\d{1,3}){3}:\d{1,5}$)");
+		return std::regex_match(address, pattern);
+	}
+
+	bool Str::IsHttpAddr(const std::string& address)
+	{
+		std::regex pattern(R"((http|https)://[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?)");
+		return std::regex_match(address, pattern);
+	}
 }

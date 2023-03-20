@@ -7,7 +7,7 @@
 #include"Service/Registry.h"
 #include"Math/MathHelper.h"
 #include"Config/ClusterConfig.h"
-#include"Component/TaskComponent.h"
+#include"Component/AsyncMgrComponent.h"
 #include"App/App.h"
 #include"Config/CodeConfig.h"
 namespace Sentry
@@ -233,7 +233,7 @@ namespace Sentry
 		const std::string func("Register");
 		const ServerConfig* config = ServerConfig::Inst();
 		RpcService* rpcService = this->mApp->GetService<Registry>();
-		TaskComponent* taskComponent = this->GetComponent<TaskComponent>();
+		AsyncMgrComponent* taskComponent = this->GetComponent<AsyncMgrComponent>();
 		while (true)
 		{
 			for (size_t index = 0; index < this->mRegistryAddress.size(); index++)
@@ -265,7 +265,7 @@ namespace Sentry
 	{
 		const std::string func("Ping");
 		RpcService* rpcService = this->mApp->GetService<Registry>();
-		TaskComponent* taskComponent = this->GetComponent<TaskComponent>();
+		AsyncMgrComponent* taskComponent = this->GetComponent<AsyncMgrComponent>();
 		while (this->mIndex < this->mRegistryAddress.size())
 		{
 			taskComponent->Sleep(10 * 1000);

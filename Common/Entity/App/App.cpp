@@ -36,7 +36,7 @@ namespace Sentry
 	bool App::LoadComponent()
 	{
         
-		this->mTaskComponent = this->GetOrAddComponent<TaskComponent>();
+		this->mTaskComponent = this->GetOrAddComponent<AsyncMgrComponent>();
 		this->mLogComponent = this->GetOrAddComponent<LogComponent>();
 		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
 		this->mMessageComponent = this->GetOrAddComponent<ProtoComponent>();

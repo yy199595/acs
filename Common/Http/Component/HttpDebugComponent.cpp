@@ -69,7 +69,7 @@ namespace Sentry
 				this->Send(address, "get target address error");
 				return;
 			}
-			TaskComponent* taskComponent = this->mApp->GetTaskComponent();
+			AsyncMgrComponent* taskComponent = this->mApp->GetTaskComponent();
 			taskComponent->Start(&HttpDebugComponent::Invoke, this, targetAddress, message);
 		}
 	}

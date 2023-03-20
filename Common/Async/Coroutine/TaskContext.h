@@ -51,7 +51,7 @@ namespace Sentry
 		Finish,
 	};
 
-	class TaskComponent;
+	class AsyncMgrComponent;
 
 	struct Stack
 	{

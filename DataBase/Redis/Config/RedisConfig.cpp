@@ -34,7 +34,7 @@ namespace Sentry
         {
             Net::Address addressInfo;
 			addressInfo.FullAddress.assign(json[index].GetString());
-            if(!Helper::Str::SplitAddress(addressInfo.FullAddress, addressInfo.Ip, addressInfo.Port))
+            if(!Helper::Str::SplitAddr(addressInfo.FullAddress, addressInfo.Ip, addressInfo.Port))
             {
                 return false;
             }

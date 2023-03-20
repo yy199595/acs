@@ -1,5 +1,5 @@
 ﻿#include"InnerNetMessageComponent.h"
-#include"Component/TaskComponent.h"
+#include"Component/AsyncMgrComponent.h"
 #include"Lua/LuaServiceMethod.h"
 #include"Config/ServiceConfig.h"
 #include"InnerNetComponent.h"
@@ -22,7 +22,7 @@ namespace Sentry
 		this->mTaskComponent = this->mApp->GetTaskComponent();
         this->mTimerComponent = this->mApp->GetTimerComponent();
         this->mOuterComponent = this->GetComponent<OuterNetComponent>();
-		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<TaskComponent>());
+		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<AsyncMgrComponent>());
 		LOG_CHECK_RET_FALSE(this->mInnerComponent = this->GetComponent<InnerNetComponent>());
 		return true;
 	}

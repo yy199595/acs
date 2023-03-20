@@ -40,7 +40,7 @@ namespace Sentry
         void Invoke(const RpcMethodConfig * config, std::shared_ptr<Rpc::Packet> message);
     private:
         std::string mFullName;
-		class TaskComponent* mTaskComponent;
+		class AsyncMgrComponent* mTaskComponent;
 		class TimerComponent* mTimerComponent;
 		Util::NumberBuilder<int, 1> mNumberPool;
 		class OuterNetComponent* mOuterComponent;

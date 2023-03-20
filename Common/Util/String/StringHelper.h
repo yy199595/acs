@@ -34,6 +34,8 @@ namespace Helper
 
     namespace Str
     {
-        extern bool SplitAddress(const std::string& address, std::string& ip, unsigned short& port);
+		extern bool IsRpcAddr(const std::string & address);
+		extern bool IsHttpAddr(const std::string & address);
+        extern bool SplitAddr(const std::string& address, std::string& ip, unsigned short& port);
     }
 }// namespace StringHelper

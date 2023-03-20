@@ -6,7 +6,7 @@
 #include"Config/ServerPath.h"
 #include"Singleton/Singleton.h"
 #include"Config/ServiceConfig.h"
-#include"Component/TaskComponent.h"
+#include"Component/AsyncMgrComponent.h"
 #include"Component/TimerComponent.h"
 #include"Component/LogComponent.h"
 
@@ -22,7 +22,7 @@ namespace Sentry
         inline float GetFps() const { return this->mLogicFps; }
 		inline LogComponent* GetLogger() { return this->mLogComponent; }
 		inline Asio::Context & MainThread() { return *this->mMainContext; }
-		inline TaskComponent* GetTaskComponent() { return this->mTaskComponent; }
+		inline AsyncMgrComponent* GetTaskComponent() { return this->mTaskComponent; }
 		inline TimerComponent* GetTimerComponent() { return this->mTimerComponent; }
 		inline ProtoComponent * GetMsgComponent() { return this->mMessageComponent; }
 	 public:
@@ -46,7 +46,7 @@ namespace Sentry
         bool mIsStartDone;
         std::thread::id mThreadId;
         const long long mStartTime;
-        TaskComponent* mTaskComponent;
+        AsyncMgrComponent* mTaskComponent;
 		LogComponent* mLogComponent;
 		TimerComponent* mTimerComponent;
 		ProtoComponent * mMessageComponent;

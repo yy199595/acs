@@ -11,10 +11,10 @@
 
 namespace Sentry
 {
-	class TaskComponent final : public Component, public ISystemUpdate, public ILastFrameUpdate
+	class AsyncMgrComponent final : public Component, public ISystemUpdate, public ILastFrameUpdate
 	{
 	 public:
-		TaskComponent() = default;
+		AsyncMgrComponent();
 	 public:
 		template<typename F, typename T, typename ... Args>
 		TaskContext* Start(F&& f, T* o, Args&& ... args)
@@ -62,8 +62,8 @@ namespace Sentry
 		void ResumeContext(TaskContext* co);
 	 private:
 		TaskContextPool mCorPool;
-		tb_context_t mMainContext;
 		TaskContext* mRunContext;
+		tb_context_t mMainContext;
 		Stack mSharedStack[SHARED_STACK_NUM];
 		std::queue<unsigned int> mLastQueues;
         std::queue<unsigned int> mResumeContexts;

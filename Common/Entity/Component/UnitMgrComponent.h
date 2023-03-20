@@ -25,7 +25,7 @@ namespace Sentry
 	 private:
 		void StartComponents(long long objectId);
 	 private:
-		class TaskComponent* mCorComponent;
+		class AsyncMgrComponent* mCorComponent;
 		std::unordered_map<long long, std::unique_ptr<Unit>> mGameObjects;
 	};
 	template<typename T>

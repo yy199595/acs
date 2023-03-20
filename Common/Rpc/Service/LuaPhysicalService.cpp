@@ -68,7 +68,7 @@ namespace Sentry
     void LuaPhysicalService::WaitAllMessageComplete()
     {
         this->mIsHandlerMessage = false;
-        TaskComponent *taskComponent = this->mApp->GetTaskComponent();
+        AsyncMgrComponent *taskComponent = this->mApp->GetTaskComponent();
         while (this->mWaitCount > 0)
         {
             taskComponent->Sleep(100);

@@ -1,5 +1,6 @@
 #include"SqliteComponent.h"
 #include"Config/ServerConfig.h"
+#include"File/DirectoryHelper.h"
 namespace Sentry
 {
 	static int SqlCallback(void *, int, char **, char **)
@@ -8,19 +9,38 @@ namespace Sentry
 	}
 	bool SqliteComponent::LateAwake()
 	{
-		this->mDb = nullptr;
 		if (!ServerConfig::Inst()->GetPath("sqlite", this->mPath))
 		{
 			return false;
 		}
-		const std::string& name = ServerConfig::Inst()->Name();
-		this->mPath = fmt::format("{0}/{1}.db", this->mPath, name);
-		return sqlite3_open(this->mPath.c_str(), &mDb) == 0;		
+		std::vector<std::string> paths;
+		Helper::Directory::GetFilePaths(this->mPath, "*.db",paths);
+		for(const std::string & path : paths)
+		{
+			std::string name;
+			if(!Helper::Directory::GetFileName(path, name))
+			{
+				return false;
+			}
+			sqlite3 * db = nullptr;
+			if(sqlite3_open(path.c_str(), &db) != 0)
+			{
+				return false;
+			}
+			this->mDbs.emplace(name, db);
+		}
+		return true;
 	}
-	bool SqliteComponent::Exec(const std::string& sql)
+
+	bool SqliteComponent::Exec(const std::string & db, const std::string& sql)
 	{
+		auto iter = this->mDbs.find(db);
+		if(iter == this->mDbs.end())
+		{
+			return false;
+		}
 		char* errMessage = 0;
-		int code = sqlite3_exec(this->mDb, sql.c_str(), SqlCallback, 0, &errMessage);
+		int code = sqlite3_exec(iter->second, sql.c_str(), SqlCallback, 0, &errMessage);
 		if (code != SQLITE_OK)
 		{
 			LOG_ERROR(errMessage);

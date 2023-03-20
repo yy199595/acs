@@ -58,17 +58,13 @@ namespace Sentry
 				std::string ip;
 				unsigned short port = 0;
 				const std::string key(iter1->name.GetString());
-				const std::string value(iter1->value.GetString());
-				if(!this->ParseHttpAddress(value, port))
+				const std::string address(iter1->value.GetString());
+				if(!Helper::Str::SplitAddr(address, ip, port))
 				{
-					if (!Helper::Str::SplitAddress(value, ip, port))
-					{
-						CONSOLE_LOG_ERROR("parse address error [" << key << "]");
-						return false;
-					}
+					return false;
 				}
 				this->mListens.emplace(key, port);
-				this->mLocations.emplace(key, value);
+				this->mLocations.emplace(key, address);
 			}
 		}
 

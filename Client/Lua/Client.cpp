@@ -77,7 +77,7 @@ namespace Lua
         unsigned short port;
 		const std::string address = CommonParameter::Read<std::string>(lua, 1);
 		ClientComponent* clientComponent = App::Inst()->GetComponent<ClientComponent>();
-        if (!Helper::Str::SplitAddress(address, ip, port))
+        if (!Helper::Str::SplitAddr(address, ip, port))
         {
             luaL_error(lua, "parse ip address [%s] error", address.c_str());
             return 0;

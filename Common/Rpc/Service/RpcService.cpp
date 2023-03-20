@@ -68,7 +68,7 @@ namespace Sentry
         if (methodConfig == nullptr)
         {
             LOG_ERROR("not find rpc method config " << name);
-            return nullptr;
+            return false;
         }
         std::shared_ptr<Rpc::Packet> request =
             std::make_shared<Rpc::Packet>();

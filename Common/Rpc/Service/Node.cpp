@@ -46,6 +46,12 @@ namespace Sentry
 			LOG_ERROR("not find cluster config : " << name);
 			return XCode::Failure;
 		}
+		std::vector<IServerChange *> components;
+		this->mApp->GetComponents(components);
+		for(IServerChange * listen : components)
+		{
+			listen->OnJoin(name, rpc, http);
+		}
 		this->mNodeComponent->AddRpcServer(name, rpc);
 		this->mNodeComponent->AddHttpServer(name, http);
 		return XCode::Successful;
@@ -54,6 +60,13 @@ namespace Sentry
     int Node::Exit(const com::type::string &request)
     {
         const std::string& rpc = request.str();
+		std::vector<IServerChange *> components;
+		this->mApp->GetComponents(components);
+
+		for(IServerChange * listen : components)
+		{
+			listen->OnExit(request.str());
+		}
         this->mNodeComponent->DelServer(rpc);
         return XCode::Successful;
     }

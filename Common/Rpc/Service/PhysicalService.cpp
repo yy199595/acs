@@ -29,7 +29,7 @@ namespace Sentry
     {
         int time = 0;
         this->mIsHandlerMessage = false;
-        TaskComponent *taskComponent = this->mApp->GetTaskComponent();
+        AsyncMgrComponent *taskComponent = this->mApp->GetTaskComponent();
         while (this->mWaitCount > 0)
         {
             time++;

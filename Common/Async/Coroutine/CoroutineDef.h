@@ -41,7 +41,7 @@ namespace Sentry
 
 namespace Sentry
 {
-	class TaskComponent;
+	class AsyncMgrComponent;
     class CoroutineGroup : public std::enable_shared_from_this<CoroutineGroup>
 	{
 	 public:
@@ -52,6 +52,6 @@ namespace Sentry
         void WaitAll(std::vector<TaskContext *> & taskContexts);
     private:
 		unsigned int mCoroutineId;
-		TaskComponent* mCorComponent;
+		AsyncMgrComponent* mCorComponent;
 	};
 }

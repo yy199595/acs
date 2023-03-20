@@ -3,6 +3,8 @@
 //
 
 #include"MysqlDBComponent.h"
+
+#include <utility>
 #include"Client/MysqlClient.h"
 #include"Client/MysqlHelper.h"
 #include"Message/user.pb.h"
@@ -113,7 +115,7 @@ namespace Sentry
 		int idx = index % this->mMysqlClients.size();
 		MysqlClient* mysqlClient = this->mMysqlClients[idx].get();;
 		{
-			mysqlClient->SendCommand(command);
+			mysqlClient->Push(std::move(command));
 		}
 		return true;
 	}
@@ -128,7 +130,7 @@ namespace Sentry
 			this->mClients.pop();
 			this->mClients.push(mysqlClient);
 		}
-		mysqlClient->SendCommand(command);
+		mysqlClient->Push(std::move(command));
 		return true;
 	}
 	bool MysqlDBComponent::Execute(int index, std::shared_ptr<Mysql::ICommand> command)

@@ -8,6 +8,7 @@
 #include"MysqlDefine.h"
 #include"MysqlMessage.h"
 #include"Tcp/TcpContext.h"
+#include"Queue/ThreadQueue.h"
 #include"Config/MysqlConfig.h"
 #include"Component/IComponent.h"
 
@@ -15,29 +16,24 @@ namespace Sentry
 {
     class MysqlDBComponent;
 
-    class MysqlClient : protected std::thread
+	class MysqlClient : public ThreadQueue<std::shared_ptr<Mysql::ICommand>>
     {
     public:
-        MysqlClient(IRpc<Mysql::Response> *component);
+        explicit MysqlClient(IRpc<Mysql::Response> *component);
     public:
         void Stop();
-        bool StartConnect();
-        void Start() { this->detach(); }
-        size_t GetTaskCount() const { return this->mTaskCount; }
-        void SendCommand(std::shared_ptr<Mysql::ICommand> command);
-
+		void Start();
+		bool StartConnect();
     private:
         void Update();
-        bool GetCommand(std::shared_ptr<Mysql::ICommand> &command);
     private:
         bool mIsClose;
         size_t mIndex;
-        std::mutex mLock;
         size_t mTaskCount;
         MYSQL *mMysqlClient;
         long long mLastTime;
+		std::thread * mThread;
 		IRpc<Mysql::Response> *mComponent;
-        std::queue<std::shared_ptr<Mysql::ICommand>> mCommands;
     };
 }
 #endif //SERVER_MYSQLCLIENT_H

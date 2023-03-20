@@ -51,7 +51,7 @@ namespace Sentry
 	private:
 		std::shared_ptr<Tcp::TelnetClientContext> GetClient(const std::string & address);
 	 private:
-		class TaskComponent* mTaskComponent;
+		class AsyncMgrComponent* mTaskComponent;
 		std::unordered_map<std::string, ConsoleFunction> mFunctionMap;
 		std::unordered_map<std::string, std::shared_ptr<Tcp::TelnetClientContext>> mTelnetClients;
 	};

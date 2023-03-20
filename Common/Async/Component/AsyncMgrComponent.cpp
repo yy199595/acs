@@ -1,4 +1,4 @@
-﻿#include"TaskComponent.h"
+﻿#include"AsyncMgrComponent.h"
 #include"App/App.h"
 #include"Coroutine/TaskContext.h"
 #include"Component/TimerComponent.h"
@@ -10,14 +10,21 @@ namespace Sentry
 {
 	void MainEntry(tb_context_from_t context)
 	{
-		TaskComponent * taskComponent = (TaskComponent*)context.priv;
+		AsyncMgrComponent * taskComponent = (AsyncMgrComponent*)context.priv;
 		if (taskComponent != nullptr)
 		{
 			taskComponent->RunTask(context.ctx);
 		}
 	}
 
-	void TaskComponent::RunTask(tb_context_t context)
+	AsyncMgrComponent::AsyncMgrComponent()
+		: mMainContext(nullptr),
+		  mRunContext(nullptr)
+	{
+
+	}
+
+	void AsyncMgrComponent::RunTask(tb_context_t context)
 	{
 		this->mMainContext = context;
 		if (this->mRunContext != nullptr)
@@ -34,7 +41,7 @@ namespace Sentry
 		tb_context_jump(this->mMainContext, nullptr);
 	}
 
-	bool TaskComponent::Awake()
+	bool AsyncMgrComponent::Awake()
 	{
 		this->mRunContext = nullptr;
 		for (Stack& stack : this->mSharedStack)
@@ -47,20 +54,20 @@ namespace Sentry
         return true;
 	}
 
-	void TaskComponent::Sleep(long long ms)
+	void AsyncMgrComponent::Sleep(long long ms)
 	{
         TimerComponent * timerComponent = this->mApp->GetTimerComponent();
         if(timerComponent != nullptr && ms > 0)
         {
             unsigned int id = this->mRunContext->mCoroutineId;
             StaticMethod *sleepMethod = NewMethodProxy(
-                &TaskComponent::Resume, this, id);
+                &AsyncMgrComponent::Resume, this, id);
             timerComponent->AddTimer(ms, sleepMethod);
             this->YieldCoroutine();
         }
 	}
 
-	void TaskComponent::ResumeContext(TaskContext* co)
+	void AsyncMgrComponent::ResumeContext(TaskContext* co)
 	{
 		co->mState = CorState::Running;
 		Stack& stack = mSharedStack[co->sid];
@@ -86,7 +93,7 @@ namespace Sentry
 		}
 	}
 
-	bool TaskComponent::YieldCoroutine()
+	bool AsyncMgrComponent::YieldCoroutine()
 	{
 		assert(this->mRunContext);
 		assert(this->mRunContext->mState == CorState::Running);
@@ -100,7 +107,7 @@ namespace Sentry
 		return true;
 	}
 
-	void TaskComponent::Resume(unsigned int id)
+	void AsyncMgrComponent::Resume(unsigned int id)
 	{
         assert(this->mApp->IsMainThread());
         if(this->mCorPool.Get(id) == nullptr)
@@ -111,7 +118,7 @@ namespace Sentry
         this->mResumeContexts.push(id);
 	}
 
-	TaskContext* TaskComponent::MakeContext(StaticMethod* func)
+	TaskContext* AsyncMgrComponent::MakeContext(StaticMethod* func)
 	{
 		TaskContext* coroutine = this->mCorPool.Pop();
 		if (coroutine != nullptr)
@@ -125,7 +132,7 @@ namespace Sentry
 		return coroutine;
 	}
 
-	bool TaskComponent::YieldCoroutine(unsigned int& mCorId)
+	bool AsyncMgrComponent::YieldCoroutine(unsigned int& mCorId)
 	{
 		if (this->mRunContext != nullptr)
 		{
@@ -136,7 +143,7 @@ namespace Sentry
 		return false;
 	}
 
-	void TaskComponent::SaveStack(unsigned int id)
+	void AsyncMgrComponent::SaveStack(unsigned int id)
 	{
 		if (id == 0) return;
 		TaskContext* coroutine = this->mCorPool.Get(id);
@@ -155,7 +162,7 @@ namespace Sentry
         memcpy(coroutine->mStack.p, coroutine->mContext, coroutine->mStack.size);
     }
 
-	void TaskComponent::OnSystemUpdate()
+	void AsyncMgrComponent::OnSystemUpdate()
 	{
 		unsigned int contextId = 0;
         while(!this->mResumeContexts.empty())
@@ -177,7 +184,7 @@ namespace Sentry
             this->mResumeContexts.pop();
         }
 	}
-	void TaskComponent::OnLastFrameUpdate()
+	void AsyncMgrComponent::OnLastFrameUpdate()
 	{
 		while (!this->mLastQueues.empty())
 		{

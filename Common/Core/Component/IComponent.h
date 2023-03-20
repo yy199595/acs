@@ -26,6 +26,13 @@ namespace Sentry
 		virtual void OnClusterComplete() { } //集群内所有服务启动完毕
 	};
 
+	class IServerChange
+	{
+	public:
+		virtual void OnExit(const std::string & rpc) = 0;
+		virtual void OnJoin(const std::string & name, const std::string & rpc, const std::string & http) = 0;
+	};
+
 	class IFrameUpdate
 	{
 	public:

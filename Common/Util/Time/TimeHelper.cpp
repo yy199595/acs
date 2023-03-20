@@ -71,18 +71,22 @@ namespace Helper
         return mktime(t) + Time::DaySecond * day;
     }
 
-    void Time::GetHourMinSecond(const long long sec, int &hour, int &min, int &second)
+    void Time::GetHourMinSecond(long long sec, int &hour, int &min, int &second)
     {
-        hour = sec / Time::HourSecond;
-        min = (sec - hour * Time::HourSecond) / Time::MinSecond;
-        second = sec % 60;
+		time_t t = (time_t)sec;
+		std::tm* time = std::localtime(&t);
+		hour = time->tm_hour;
+		min = time->tm_min;
+		second = time->tm_sec;
     }
 
 	void Time::GetHourMinSecond(long long sec, int* time)
 	{
-		time[0] = sec / Time::HourSecond;
-		time[1] = (sec - time[0] * Time::HourSecond) / Time::MinSecond;
-		time[2] = sec % 60;
+		time_t t = (time_t)sec;
+		std::tm* tm = std::localtime(&t);
+		time[0] = tm->tm_hour;
+		time[1] = tm->tm_sec;
+		time[2] = tm->tm_sec;
 	}
 
     std::string Time::GetDateString(long long time)

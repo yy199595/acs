@@ -30,7 +30,7 @@ namespace Sentry
     private:
         unsigned int mSumCount;
         unsigned int mWaitCount;
-        class TaskComponent * mTaskComponent;
+        class AsyncMgrComponent * mTaskComponent;
         std::unordered_map<std::string, unsigned int> mTasks;
     };
 }

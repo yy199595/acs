@@ -9,15 +9,21 @@
 namespace Sentry
 {
 	MysqlClient::MysqlClient(IRpc<Mysql::Response> *component)
-							 : std::thread(std::bind(&MysqlClient::Update, this)),
-                              mComponent(component)
+							 : mComponent(component)
     {
         this->mIndex = 0;
         this->mLastTime = 0;
         this->mIsClose = true;
         this->mTaskCount = 0;
+		this->mThread = nullptr;
         this->mMysqlClient = nullptr;
     }
+
+	void MysqlClient::Start()
+	{
+		this->mThread = new std::thread([this] { Update(); });
+		this->mThread->detach();
+	}
 
 	void MysqlClient::Update()
 	{
@@ -34,9 +40,9 @@ namespace Sentry
 		std::shared_ptr<Mysql::ICommand> command;
 		Asio::Context& io = App::Inst()->MainThread();
 		this->mLastTime = Helper::Time::NowSecTime();
-		while (true)
+		while (!this->mIsClose)
 		{
-			while (this->GetCommand(command))
+			this->WaitPop(command);
 			{
 				int rpcId = command->GetRpcId();
 				this->mLastTime = Helper::Time::NowSecTime();
@@ -48,37 +54,14 @@ namespace Sentry
 				}
 				io.post(std::bind(&IRpc<Mysql::Response>::OnMessage, this->mComponent, response));
 			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
 		mysql_close(this->mMysqlClient);
 	}
 
 	void MysqlClient::Stop()
 	{
-        std::lock_guard<std::mutex> lock(this->mLock);
         this->mIsClose = true;
     }
-
-	void MysqlClient::SendCommand(std::shared_ptr<Mysql::ICommand> command)
-	{
-		std::lock_guard<std::mutex> lock(this->mLock);
-
-        this->mTaskCount++;
-		this->mCommands.emplace(std::move(command));
-	}
-
-	bool MysqlClient::GetCommand(std::shared_ptr<Mysql::ICommand>& command)
-	{
-		std::lock_guard<std::mutex> lock(this->mLock);
-		if (this->mCommands.empty())
-		{
-			return false;
-		}
-        this->mTaskCount--;
-        command = this->mCommands.front();
-		this->mCommands.pop();
-		return true;
-	}
 
 	bool MysqlClient::StartConnect()
 	{

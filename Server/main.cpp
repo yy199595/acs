@@ -1,6 +1,6 @@
 ﻿#include"App/App.h"
 #include"Component/TimerComponent.h"
-#include"Component/TaskComponent.h"
+#include"Component/AsyncMgrComponent.h"
 #include"Component/LuaScriptComponent.h"
 #include"Component/UnitMgrComponent.h"
 #include"Component/ConsoleComponent.h"
@@ -57,7 +57,7 @@ void RegisterComponent()
 // rpc
     ComponentFactory::Add<InnerNetMessageComponent>("InnerNetMessageComponent");
 // common
-    ComponentFactory::Add<TaskComponent>("TaskComponent");
+    ComponentFactory::Add<AsyncMgrComponent>("AsyncMgrComponent");
     ComponentFactory::Add<TimerComponent>("TimerComponent");
     ComponentFactory::Add<LogComponent>("LogComponent");
     ComponentFactory::Add<UnitMgrComponent>("UnitMgrComponent");

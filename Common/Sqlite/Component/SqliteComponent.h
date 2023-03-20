@@ -1,4 +1,5 @@
 #include"sqlite3.h"
+#include<unordered_map>
 #include"Component/Component.h"
 
 namespace Sentry
@@ -9,13 +10,12 @@ namespace Sentry
 		SqliteComponent() = default;
 		~SqliteComponent() = default;
 	public:
-		bool Exec(const std::string& sql);
-		bool OpenDataBase(const std::string& name);
+		bool Exec(const std::string & db, const std::string& sql);
 	public:
 		bool LateAwake() final;
 	private:
-		sqlite3 * mDb;
 		std::string mName;
 		std::string mPath;
+		std::unordered_map<std::string, sqlite3 *> mDbs;
 	};
 }
