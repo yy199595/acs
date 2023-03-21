@@ -114,52 +114,52 @@ namespace Sentry
 		const Reflection* reflection = message.GetReflection();
 		switch (field->cpp_type())
 		{
-		case FieldDescriptor::CPPTYPE_DOUBLE:
-			lua_pushnumber(this->mLua, reflection->GetRepeatedDouble(message, field, index));
-			break;
-		case FieldDescriptor::CPPTYPE_FLOAT:
-			lua_pushnumber(this->mLua, reflection->GetRepeatedFloat(message, field, index));
-			break;
-		case FieldDescriptor::CPPTYPE_INT32:
-			lua_pushinteger(this->mLua, reflection->GetRepeatedInt32(message, field, index));
-			break;
-		case FieldDescriptor::CPPTYPE_UINT32:
-			lua_pushinteger(this->mLua, reflection->GetRepeatedUInt32(message, field, index));
-			break;
-		case FieldDescriptor::CPPTYPE_INT64:
-			lua_pushinteger(this->mLua, reflection->GetRepeatedInt64(message, field, index));
-			break;
-		case FieldDescriptor::CPPTYPE_UINT64:
-			lua_pushinteger(this->mLua, reflection->GetRepeatedUInt64(message, field, index));
-			break;
-		case FieldDescriptor::CPPTYPE_ENUM:
-			lua_pushinteger(this->mLua, reflection->GetRepeatedEnumValue(message, field, index));
-			break;
-		case FieldDescriptor::CPPTYPE_BOOL:
-			lua_pushboolean(this->mLua, reflection->GetRepeatedBool(message, field, index));
-			break;
-		case FieldDescriptor::CPPTYPE_MESSAGE:
-        {
-            const Message & msg = reflection->GetRepeatedMessage(message, field, index);
-            if(msg.GetTypeName() == "google.protobuf.Any")
-            {
-                const Any & any = static_cast<const Any&>(msg);
-                std::shared_ptr<Message> anyMessage = this->mMsgComponent->New(any);
-                this->Decode(*anyMessage);
-                return true;
-            }
-            this->Decode(msg);
-        }
-			break;
-		case FieldDescriptor::CPPTYPE_STRING:
-		{
-			string value = reflection->GetRepeatedString(message, field, index);
-			lua_pushlstring(this->mLua, value.c_str(), value.size());
-		}
-			break;
-		default:
-			luaL_error(this->mLua, "decode_multiple field unknow type, field=%s", field->full_name().c_str());
-			return false;
+			case FieldDescriptor::CPPTYPE_DOUBLE:
+				lua_pushnumber(this->mLua, reflection->GetRepeatedDouble(message, field, index));
+				break;
+			case FieldDescriptor::CPPTYPE_FLOAT:
+				lua_pushnumber(this->mLua, reflection->GetRepeatedFloat(message, field, index));
+				break;
+			case FieldDescriptor::CPPTYPE_INT32:
+				lua_pushinteger(this->mLua, reflection->GetRepeatedInt32(message, field, index));
+				break;
+			case FieldDescriptor::CPPTYPE_UINT32:
+				lua_pushinteger(this->mLua, reflection->GetRepeatedUInt32(message, field, index));
+				break;
+			case FieldDescriptor::CPPTYPE_INT64:
+				lua_pushinteger(this->mLua, reflection->GetRepeatedInt64(message, field, index));
+				break;
+			case FieldDescriptor::CPPTYPE_UINT64:
+				lua_pushinteger(this->mLua, reflection->GetRepeatedUInt64(message, field, index));
+				break;
+			case FieldDescriptor::CPPTYPE_ENUM:
+				lua_pushinteger(this->mLua, reflection->GetRepeatedEnumValue(message, field, index));
+				break;
+			case FieldDescriptor::CPPTYPE_BOOL:
+				lua_pushboolean(this->mLua, reflection->GetRepeatedBool(message, field, index));
+				break;
+			case FieldDescriptor::CPPTYPE_MESSAGE:
+			{
+				const Message& msg = reflection->GetRepeatedMessage(message, field, index);
+				if (msg.GetTypeName() == "google.protobuf.Any")
+				{
+					const Any& any = static_cast<const Any&>(msg);
+					std::shared_ptr<Message> anyMessage = this->mMsgComponent->New(any);
+					this->Decode(*anyMessage);
+					return true;
+				}
+				this->Decode(msg);
+			}
+				break;
+			case FieldDescriptor::CPPTYPE_STRING:
+			{
+				string value = reflection->GetRepeatedString(message, field, index);
+				lua_pushlstring(this->mLua, value.c_str(), value.size());
+			}
+				break;
+			default:
+				luaL_error(this->mLua, "decode_multiple field unknow type, field=%s", field->full_name().c_str());
+				return false;
 		}
 		return true;
 	}

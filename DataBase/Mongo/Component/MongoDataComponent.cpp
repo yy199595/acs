@@ -54,24 +54,24 @@ namespace Sentry
 			const std::string db = name.substr(0, pos);
 			const std::string key = name.substr(pos + 1);
 			std::shared_ptr<RedisResponse> response =
-                this->mRedisComponent->Run(db, "HGET", key, id);
+				this->mRedisComponent->Run(db, "HGET", key, id);
 			if (response != nullptr)
 			{
 				switch (response->GetType())
 				{
-				case RedisRespType::REDIS_STRING:
-				case RedisRespType::REDIS_BIN_STRING:
-				{
-					RedisString* redisString = (RedisString*)response->Get(0);
-					std::shared_ptr<Message> result = this->mProtoComponent->New(name);
-					if (util::JsonStringToMessage(redisString->GetValue(), result.get()).ok())
+					case RedisRespType::REDIS_STRING:
+					case RedisRespType::REDIS_BIN_STRING:
 					{
-						return result;
+						RedisString* redisString = (RedisString*)response->Get(0);
+						std::shared_ptr<Message> result = this->mProtoComponent->New(name);
+						if (util::JsonStringToMessage(redisString->GetValue(), result.get()).ok())
+						{
+							return result;
+						}
 					}
-				}
-					break;
-				default:
-					break;
+						break;
+					default:
+						break;
 				}
 			}
 		}

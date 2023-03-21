@@ -297,53 +297,53 @@ namespace Sentry
     }
 
     void LuaRedisTask::OnResponse(std::shared_ptr<RedisResponse> response)
-    {
-        lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
-        lua_State* coroutine = lua_tothread(this->mLua, -1);
-		if(response != nullptr)
+	{
+		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
+		lua_State* coroutine = lua_tothread(this->mLua, -1);
+		if (response != nullptr)
 		{
 			switch (response->GetType())
 			{
-			case RedisRespType::REDIS_NUMBER:
-				lua_pushinteger(this->mLua, response->GetNumber());
-				break;
-			case RedisRespType::REDIS_ERROR:
-			case RedisRespType::REDIS_STRING:
-			case RedisRespType::REDIS_BIN_STRING:
-			{
-				const std::string& str = response->GetString();
-				lua_pushlstring(this->mLua, str.c_str(), str.size());
-			}
-				break;
-			case RedisRespType::REDIS_ARRAY:
-			{
-				lua_createtable(this->mLua, 0, response->GetArraySize());
-				for (size_t index = 0; index < response->GetArraySize(); index++)
+				case RedisRespType::REDIS_NUMBER:
+					lua_pushinteger(this->mLua, response->GetNumber());
+					break;
+				case RedisRespType::REDIS_ERROR:
+				case RedisRespType::REDIS_STRING:
+				case RedisRespType::REDIS_BIN_STRING:
 				{
-					const RedisAny* redisAny = response->Get(index);
-					if (redisAny->IsString())
-					{
-						const std::string& str = ((const RedisString*)redisAny)->GetValue();
-						lua_pushlstring(this->mLua, str.c_str(), str.size());
-					}
-					else if (redisAny->IsNumber())
-					{
-						long long num = ((const RedisNumber*)redisAny)->GetValue();
-						lua_pushinteger(this->mLua, num);
-					}
-					lua_seti(this->mLua, -2, index + 1);
+					const std::string& str = response->GetString();
+					lua_pushlstring(this->mLua, str.c_str(), str.size());
 				}
-			}
-				break;
-                case RedisRespType::REDIS_NONE:
+					break;
+				case RedisRespType::REDIS_ARRAY:
+				{
+					lua_createtable(this->mLua, 0, response->GetArraySize());
+					for (size_t index = 0; index < response->GetArraySize(); index++)
+					{
+						const RedisAny* redisAny = response->Get(index);
+						if (redisAny->IsString())
+						{
+							const std::string& str = ((const RedisString*)redisAny)->GetValue();
+							lua_pushlstring(this->mLua, str.c_str(), str.size());
+						}
+						else if (redisAny->IsNumber())
+						{
+							long long num = ((const RedisNumber*)redisAny)->GetValue();
+							lua_pushinteger(this->mLua, num);
+						}
+						lua_seti(this->mLua, -2, index + 1);
+					}
+				}
+					break;
+				case RedisRespType::REDIS_NONE:
 					lua_pushnil(this->mLua);
-                    break;
-            }
+					break;
+			}
 		}
 		else
 		{
 			lua_pushnil(this->mLua);
 		}
-        Lua::Coroutine::Resume(coroutine, this->mLua, 1);
-    }
+		Lua::Coroutine::Resume(coroutine, this->mLua, 1);
+	}
 }

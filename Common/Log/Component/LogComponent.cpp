@@ -66,29 +66,29 @@ namespace Sentry
 	}
 
 	void LogComponent::SaveLog(spdlog::level::level_enum type, const std::string& log)
-    {
-		const std::string & name = ServerConfig::Inst()->Name();
+	{
+		const std::string& name = ServerConfig::Inst()->Name();
 		std::shared_ptr<spdlog::logger> logger = this->GetLogger(name);
-		if(logger != nullptr)
+		if (logger != nullptr)
 		{
 			logger->log(type, log);
 			switch (type)
 			{
-			case spdlog::level::level_enum::debug:
-			case spdlog::level::level_enum::info:
-			case spdlog::level::level_enum::warn:
-				break;
-			case spdlog::level::level_enum::err:
-				logger->flush();
-				break;
-			case spdlog::level::level_enum::critical:
-				logger->flush();
-				break;
-			default:
-				break;
+				case spdlog::level::level_enum::debug:
+				case spdlog::level::level_enum::info:
+				case spdlog::level::level_enum::warn:
+					break;
+				case spdlog::level::level_enum::err:
+					logger->flush();
+					break;
+				case spdlog::level::level_enum::critical:
+					logger->flush();
+					break;
+				default:
+					break;
 			}
 		}
-    }
+	}
 
 	void LogComponent::SaveLog(const std::string& name,
 		spdlog::level::level_enum type, const std::string& log)

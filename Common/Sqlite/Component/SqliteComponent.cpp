@@ -36,19 +36,19 @@ namespace Sentry
 			const google::protobuf::FieldDescriptor* fieldDescriptor = descriptor->field(index);
 			switch (fieldDescriptor->cpp_type())
 			{
-			case google::protobuf::FieldDescriptor::CPPTYPE_INT32:
-			case google::protobuf::FieldDescriptor::CPPTYPE_INT64:
-				stream << fieldDescriptor->name() << " INT(20) NOT NULL DEFAULT 0,";
-				break;
-			case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
-				stream << fieldDescriptor->name() << " VARCHAR(64) NOT NULL DEFAULT '',";
-				break;
-			case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT:
-			case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE:
-				stream << fieldDescriptor->name() << " DOUBLE(32) NOT NULL DEFAULT 0,";
-				break;
-			default:
-				return false;
+				case google::protobuf::FieldDescriptor::CPPTYPE_INT32:
+				case google::protobuf::FieldDescriptor::CPPTYPE_INT64:
+					stream << fieldDescriptor->name() << " INT(20) NOT NULL DEFAULT 0,";
+					break;
+				case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
+					stream << fieldDescriptor->name() << " VARCHAR(64) NOT NULL DEFAULT '',";
+					break;
+				case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT:
+				case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE:
+					stream << fieldDescriptor->name() << " DOUBLE(32) NOT NULL DEFAULT 0,";
+					break;
+				default:
+					return false;
 			}
 		}
 		stream << "PRIMARY KEY (`" << key << "`))";
@@ -132,28 +132,28 @@ namespace Sentry
 				std::string key(sqlite3_column_name(stmt, index));
 				switch (sqlite3_column_type(stmt, index))
 				{
-				case SQLITE_INTEGER:
-				{
-					long long value = sqlite3_column_int64(stmt, index);
-					document.Add(key).Add(value);
-				}
-					break;
-				case SQLITE_FLOAT:
-				{
-					double value = sqlite3_column_double(stmt, index);
-					document.Add(key).Add(value);
-				}
-					break;
-				case SQLITE_TEXT:
-				{
-					const unsigned char* value = sqlite3_column_text(stmt, index);
-					document.Add(key).Add(std::string((const char *)value));
-				}
-					break;
-				default:
-					sqlite3_finalize(stmt);
-					LOG_ERROR("unknown field type");
-					return false;
+					case SQLITE_INTEGER:
+					{
+						long long value = sqlite3_column_int64(stmt, index);
+						document.Add(key).Add(value);
+					}
+						break;
+					case SQLITE_FLOAT:
+					{
+						double value = sqlite3_column_double(stmt, index);
+						document.Add(key).Add(value);
+					}
+						break;
+					case SQLITE_TEXT:
+					{
+						const unsigned char* value = sqlite3_column_text(stmt, index);
+						document.Add(key).Add(std::string((const char*)value));
+					}
+						break;
+					default:
+						sqlite3_finalize(stmt);
+						LOG_ERROR("unknown field type");
+						return false;
 				}
 			}
 			std::string json;

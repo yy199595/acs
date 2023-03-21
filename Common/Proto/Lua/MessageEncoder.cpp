@@ -100,60 +100,60 @@ namespace Sentry
 		const Reflection* reflection = message.GetReflection();
 		switch (field->cpp_type())
 		{
-		case FieldDescriptor::CPPTYPE_DOUBLE:
-			reflection->SetDouble(&message, field, (double)lua_tonumber(this->mLua, index));
-			break;
-		case FieldDescriptor::CPPTYPE_FLOAT:
-			reflection->SetFloat(&message, field, (float)lua_tonumber(this->mLua, index));
-			break;
-		case FieldDescriptor::CPPTYPE_INT32:
-			reflection->SetInt32(&message, field, (int32)lua_tointeger(this->mLua, index));
-			break;
-		case FieldDescriptor::CPPTYPE_UINT32:
-			reflection->SetUInt32(&message, field, (uint32)lua_tointeger(this->mLua, index));
-			break;
-		case FieldDescriptor::CPPTYPE_INT64:
-			reflection->SetInt64(&message, field, (int64)lua_tointeger(this->mLua, index));
-			break;
-		case FieldDescriptor::CPPTYPE_UINT64:
-			reflection->SetUInt64(&message, field, (uint64)lua_tointeger(this->mLua, index));
-			break;
-		case FieldDescriptor::CPPTYPE_ENUM:
-			reflection->SetEnumValue(&message, field, (int)lua_tointeger(this->mLua, index));
-			break;
-		case FieldDescriptor::CPPTYPE_BOOL:
-			reflection->SetBool(&message, field, lua_toboolean(this->mLua, index) != 0);
-			break;
-		case FieldDescriptor::CPPTYPE_STRING:
-		{
-			size_t length = 0;
-			const char* bytes = lua_tolstring(this->mLua, index, &length);
-			reflection->SetString(&message, field, string(bytes, length));
-		}
-			break;
-		case FieldDescriptor::CPPTYPE_MESSAGE:
-		{
-			Message* submessage = reflection->MutableMessage(&message, field);
-			if(submessage->GetTypeName() == "google.protobuf.Any")
+			case FieldDescriptor::CPPTYPE_DOUBLE:
+				reflection->SetDouble(&message, field, (double)lua_tonumber(this->mLua, index));
+				break;
+			case FieldDescriptor::CPPTYPE_FLOAT:
+				reflection->SetFloat(&message, field, (float)lua_tonumber(this->mLua, index));
+				break;
+			case FieldDescriptor::CPPTYPE_INT32:
+				reflection->SetInt32(&message, field, (int32)lua_tointeger(this->mLua, index));
+				break;
+			case FieldDescriptor::CPPTYPE_UINT32:
+				reflection->SetUInt32(&message, field, (uint32)lua_tointeger(this->mLua, index));
+				break;
+			case FieldDescriptor::CPPTYPE_INT64:
+				reflection->SetInt64(&message, field, (int64)lua_tointeger(this->mLua, index));
+				break;
+			case FieldDescriptor::CPPTYPE_UINT64:
+				reflection->SetUInt64(&message, field, (uint64)lua_tointeger(this->mLua, index));
+				break;
+			case FieldDescriptor::CPPTYPE_ENUM:
+				reflection->SetEnumValue(&message, field, (int)lua_tointeger(this->mLua, index));
+				break;
+			case FieldDescriptor::CPPTYPE_BOOL:
+				reflection->SetBool(&message, field, lua_toboolean(this->mLua, index) != 0);
+				break;
+			case FieldDescriptor::CPPTYPE_STRING:
 			{
-				std::shared_ptr<Message> message = Lua::SharedPtrProxy<Message>::Read(this->mLua, index);
-				if(message == nullptr)
+				size_t length = 0;
+				const char* bytes = lua_tolstring(this->mLua, index, &length);
+				reflection->SetString(&message, field, string(bytes, length));
+			}
+				break;
+			case FieldDescriptor::CPPTYPE_MESSAGE:
+			{
+				Message* submessage = reflection->MutableMessage(&message, field);
+				if (submessage->GetTypeName() == "google.protobuf.Any")
+				{
+					std::shared_ptr<Message> message = Lua::SharedPtrProxy<Message>::Read(this->mLua, index);
+					if (message == nullptr)
+					{
+						return false;
+					}
+					static_cast<Any*>(submessage)->PackFrom(*message);
+					return true;
+				}
+
+				if (!this->EncoddeMessage(*submessage, field->message_type(), index))
 				{
 					return false;
 				}
-				static_cast<Any*>(submessage)->PackFrom(*message);
-				return true;
 			}
-
-			if(!this->EncoddeMessage(*submessage, field->message_type(), index))
-			{
+				break;
+			default:
+				luaL_error(this->mLua, "encode_single field unknow type, field=%s", field->full_name().c_str());
 				return false;
-			}
-		}
-			break;
-		default:
-			luaL_error(this->mLua, "encode_single field unknow type, field=%s", field->full_name().c_str());
-			return false;
 		}
 		return true;
 	}

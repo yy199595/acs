@@ -63,18 +63,24 @@ namespace Sentry
 		const std::string& address = message->From();
 		switch (message->GetType())
 		{
-		case Tcp::Type::Ping:
-			message->SetContent("hello");
-			message->SetType(Tcp::Type::Response);
-			this->Send(address, message);
-			return;
+			case Tcp::Type::Ping:
+			{
+				message->SetContent("hello");
+				message->SetType(Tcp::Type::Response);
+				this->Send(address, message);
+				break;
+			}
+			default:
+			{
+				long long userId = 0;
+				if (this->GetUserId(address, userId))
+				{
+					message->GetHead().Add("id", userId);
+				}
+				this->mMessages.push(std::move(message));
+				break;
+			}
 		}
-		long long userId = 0;
-		if (this->GetUserId(address, userId))
-		{
-			message->GetHead().Add("id", userId);
-		}
-		this->mMessages.push(std::move(message));
 	}
 
 	void OuterNetComponent::OnFrameUpdate(float t)

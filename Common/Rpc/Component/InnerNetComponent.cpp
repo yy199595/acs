@@ -60,23 +60,23 @@ namespace Sentry
 		}
 		switch (type)
 		{
-		case Tcp::Type::Auth:
-			this->OnAuth(message);
-			break;
-		case Tcp::Type::Logout:
-			this->StartClose(address);
-			break;
-		case Tcp::Type::Request:
-			this->mWaitMessages.push(message);
-			break;
-		case Tcp::Type::Forward:
-		case Tcp::Type::Response:
-		case Tcp::Type::Broadcast:
-			this->mMessageComponent->OnMessage(message);
-			break;
-		default:
-			LOG_FATAL("unknow message type : " << message->GetType());
-			break;
+			case Tcp::Type::Auth:
+				this->OnAuth(message);
+				break;
+			case Tcp::Type::Logout:
+				this->StartClose(address);
+				break;
+			case Tcp::Type::Request:
+				this->mWaitMessages.push(message);
+				break;
+			case Tcp::Type::Forward:
+			case Tcp::Type::Response:
+			case Tcp::Type::Broadcast:
+				this->mMessageComponent->OnMessage(message);
+				break;
+			default:
+			LOG_FATAL("unknown message type : " << message->GetType());
+				break;
 		}
 	}
 
