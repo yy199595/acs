@@ -5,11 +5,10 @@
 #include"Component/ProtoComponent.h"
 namespace Sentry
 {
-
-    bool MysqlDB::Awake()
-    {
-        return this->mApp->AddComponent<MysqlDBComponent>();
-    }
+	void MysqlDB::Init()
+	{
+		this->mApp->AddComponent<MysqlDBComponent>();
+	}
 
 	bool MysqlDB::OnStart()
     {

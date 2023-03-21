@@ -7,6 +7,12 @@ namespace Sentry
 	{
 	}
 
+	bool Unit::HasComponent(const std::string& name)
+	{
+		auto iter = this->mComponentMap.find(name);
+		return iter != this->mComponentMap.end();
+	}
+
 	bool Unit::AddComponent(const std::string& name)
 	{
 		auto iter = this->mComponentMap.find(name);

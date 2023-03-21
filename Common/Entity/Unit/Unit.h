@@ -11,6 +11,7 @@ namespace Sentry
 	 public:
 		template<typename T>
 		inline bool AddComponent();
+		bool HasComponent(const std::string& name);
 		bool AddComponent(const std::string& name);
 		bool AddComponent(const std::string& name, std::unique_ptr<Component> component);
 

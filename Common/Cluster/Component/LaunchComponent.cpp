@@ -31,17 +31,18 @@ namespace Sentry
         std::vector<std::string> components;
 		const NodeConfig* nodeConfig = ClusterConfig::Inst()->GetConfig();
         if (nodeConfig->GetComponents(components))
-        {
-            for (const std::string& name : components)
-            {
-                if (!this->mApp->AddComponent(name))
-                {
-                    LOG_ERROR("add " << name << " error");
-                    return false;
-                }
-                //CONSOLE_LOG_INFO(ServerConfig::Inst()->Name() << " add component [" << name << "]");
-            }
-        }
+		{
+			for (const std::string& name : components)
+			{
+				if (!this->mApp->HasComponent(name)
+					&& !this->mApp->AddComponent(name))
+				{
+					LOG_ERROR("add " << name << " error");
+					return false;
+				}
+				//CONSOLE_LOG_INFO(ServerConfig::Inst()->Name() << " add component [" << name << "]");
+			}
+		}
         components.clear();
         if (nodeConfig->GetServices(components) > 0)
         {

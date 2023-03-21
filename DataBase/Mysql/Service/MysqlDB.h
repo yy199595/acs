@@ -25,7 +25,7 @@ namespace Sentry
         int Query(const db::mysql::query& request, db::mysql::response& response);
 
 	 private:
-        bool Awake();
+		void Init() final;
 		bool OnStart() final;
         void OnClose() final;
 	 private:

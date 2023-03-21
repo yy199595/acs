@@ -68,7 +68,9 @@ namespace Sentry
 						this->AddHttpServer(info.name(), info.rpc());
 					}
 				}
-			}		
+				return;
+			}
+			this->mApp->GetTaskComponent()->Sleep(2000);
 		}		
 	}
 

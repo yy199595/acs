@@ -16,7 +16,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool SqliteComponent::MakeTable(int id, const google::protobuf::Message& message)
+	bool SqliteComponent::MakeTable(int id, const std::string & key, const google::protobuf::Message& message)
 	{
 		std::vector<std::string> result;
 		const std::string name = message.GetTypeName();
@@ -25,8 +25,12 @@ namespace Sentry
 			return false;
 		}
 		std::stringstream stream;
-		stream << "CREATE TABLE " << result[1] << " (";
+		stream << "CREATE TABLE IF NOT EXISTS  " << result[1] << "(";
 		const google::protobuf::Descriptor* descriptor = message.GetDescriptor();
+		if(descriptor->FindFieldByName(key) == nullptr)
+		{
+			return false;
+		}
 		for (int index = 0; index < descriptor->field_count(); index++)
 		{
 			const google::protobuf::FieldDescriptor* fieldDescriptor = descriptor->field(index);
@@ -47,8 +51,8 @@ namespace Sentry
 				return false;
 			}
 		}
+		stream << "PRIMARY KEY (`" << key << "`))";
 		std::string sql = stream.str();
-		sql[sql.size() - 1] = ')';
 		return this->Exec(id, sql);
 	}
 
@@ -96,6 +100,7 @@ namespace Sentry
 		sqlite3 * db = iter->second;
 		if (sqlite3_exec(db, sql.c_str(), 0, 0, &errMessage) != SQLITE_OK)
 		{
+			LOG_FATAL(sql);
 			LOG_ERROR(errMessage);
 			sqlite3_free(errMessage);
 			return false;
@@ -124,7 +129,7 @@ namespace Sentry
 			int count = sqlite3_column_count(stmt);
 			for (int index = 0; index < count; index++)
 			{
-				const unsigned char* key = sqlite3_column_text(stmt, index);
+				std::string key(sqlite3_column_name(stmt, index));
 				switch (sqlite3_column_type(stmt, index))
 				{
 				case SQLITE_INTEGER:
@@ -142,7 +147,7 @@ namespace Sentry
 				case SQLITE_TEXT:
 				{
 					const unsigned char* value = sqlite3_column_text(stmt, index);
-					document.Add(key).Add(value);
+					document.Add(key).Add(std::string((const char *)value));
 				}
 					break;
 				default:

@@ -23,12 +23,12 @@ namespace Sentry
 	Registry::Registry()
 	{
 		this->mIndex = 0;
-		this->mDatabaseIndex = 0;
 		this->mNodeComponent = nullptr;
 		this->mInnerComponent = nullptr;
 #ifdef __ENABLE_MYSQL__
 		this->mMysqlComponent = nullptr;
 #else
+		this->mDatabaseIndex = 0;
 		this->mSqliteComponent = nullptr;
 #endif
 
@@ -38,6 +38,8 @@ namespace Sentry
 	{
 #ifndef __ENABLE_MYSQL__
 		this->mApp->AddComponent<SqliteComponent>();
+#else
+		this->mApp->AddComponent<MysqlDBComponent>();
 #endif
 	}
 
@@ -72,19 +74,19 @@ namespace Sentry
 		std::string name = message->GetTypeName();
 		Helper::Str::Split(name, ".", ret);
 
-		this->mTable = std::move(ret[0]);
+		this->mTable = std::move(ret[1]);
+		const std::string key("rpc_address");
 		this->mSqliteComponent = this->GetComponent<SqliteComponent>();
-		this->mDatabaseIndex = this->mSqliteComponent->Open(ret[1]);
-		return this->mSqliteComponent->MakeTable(this->mDatabaseIndex, *message);
+		this->mDatabaseIndex = this->mSqliteComponent->Open(ret[0]);
+		return this->mSqliteComponent->MakeTable(this->mDatabaseIndex, key, *message);
 #endif
-		return true;
 	}
 
 	int Registry::Query(const com::type::string& request, s2s::server::list& response)
 	{
 		std::stringstream sqlStream;
 		const std::string& name = request.str();
-		LOG_ERROR_RETURN_CODE(name.empty(), XCode::CallArgsError);
+		LOG_ERROR_RETURN_CODE(!name.empty(), XCode::CallArgsError);
 		sqlStream << "select server_name,rpc_address,http_address,last_ping_time from "
 				  << this->mTable << " where server_name='" << name << "';";
 
@@ -126,8 +128,8 @@ namespace Sentry
 		const std::string& rpc = request.rpc();
 		const std::string& http = request.http();
 		const std::string& name = request.name();
-		LOG_ERROR_RETURN_CODE(rpc.empty(), XCode::CallArgsError);
-		LOG_ERROR_RETURN_CODE(name.empty(), XCode::CallArgsError);
+		LOG_ERROR_RETURN_CODE(!rpc.empty(), XCode::CallArgsError);
+		LOG_ERROR_RETURN_CODE(!name.empty(), XCode::CallArgsError);
 
 		long long time = Helper::Time::NowSecTime();
 		const std::string sql =
@@ -191,7 +193,7 @@ namespace Sentry
 	int Registry::UnRegister(const std::string& address, const com::type::string& request)
 	{
 		const std::string& rpc = request.str();
-		LOG_ERROR_RETURN_CODE(rpc.empty(), XCode::CallArgsError);
+		LOG_ERROR_RETURN_CODE(!rpc.empty(), XCode::CallArgsError);
 		if (!this->mNodeComponent->DelServer(rpc))
 		{
 			return XCode::Failure;

@@ -14,9 +14,9 @@ namespace Sentry
 		void Close(int id);
 		int Open(const std::string & name);
 		bool Exec(int id, const std::string& sql);
-		bool MakeTable(int id, const google::protobuf::Message & message);
 		bool Query(int id, const std::string & sql, std::vector<std::string> & result);
-	public:
+		bool MakeTable(int id, const std::string & key, const google::protobuf::Message & message);
+	 public:
 		bool LateAwake() final;
 		void OnDestroy() final;
 	private:
