@@ -20,7 +20,7 @@ namespace Sentry
 		bool LoadFromLua() final;
         void WaitAllMessageComplete() final;
 		bool IsStartService() final { return true; }
-		int GetWaitMessageCount() const final { return this->mWaitCount; };
+		unsigned int GetWaitMessageCount() const final { return this->mWaitCount; };
 		int Invoke(const std::string& name, std::shared_ptr<Rpc::Packet> message) final;
 	 private:
 		void OnLogin(long long userId) final;

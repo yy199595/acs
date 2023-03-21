@@ -35,14 +35,15 @@ namespace Sentry
         ~MysqlDBComponent() = default;
     public:
         void CloseClients();
-        bool Ping(int index = 0);
-        size_t MakeMysqlClient();
+		int MakeMysqlClient();
+		bool Ping(int index = 0);
 	public:
 		bool Execute(int index, std::shared_ptr<Mysql::ICommand> command);
         std::shared_ptr<Mysql::Response> Run(std::shared_ptr<Mysql::ICommand> command);
-		std::shared_ptr<Mysql::Response> Run(int index, std::shared_ptr<Mysql::ICommand> command);
+		std::shared_ptr<Mysql::Response> Run(int index, const std::shared_ptr<Mysql::ICommand>& command);
 	 private:
 		bool LateAwake() final;
+		void OnDestroy() final;
 		bool Send(std::shared_ptr<Mysql::ICommand> command);
 		bool Send(int index, std::shared_ptr<Mysql::ICommand> command);
 		void OnConnectSuccessful(const std::string &address) final;

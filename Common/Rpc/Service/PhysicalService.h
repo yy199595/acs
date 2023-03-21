@@ -16,14 +16,8 @@ namespace Sentry
 	public:
 		bool Start() final;
 		bool Close() final;
-		bool IsStartService() final
-		{
-			return true;
-		}
-		int GetWaitMessageCount() const final
-		{
-			return this->mWaitCount;
-		}
+		bool IsStartService() final{ return true; }
+		unsigned int GetWaitMessageCount() const final { return this->mWaitCount; }
 		int Invoke(const std::string& func, std::shared_ptr<Rpc::Packet> message) final;
 	protected:
 		bool LoadFromLua() final;

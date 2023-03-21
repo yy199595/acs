@@ -1,7 +1,8 @@
 #include"sqlite3.h"
 #include<unordered_map>
+#include"Guid/NumberBuilder.h"
 #include"Component/Component.h"
-
+#include"google/protobuf/message.h"
 namespace Sentry
 {
 	class SqliteComponent : public Component
@@ -10,12 +11,18 @@ namespace Sentry
 		SqliteComponent() = default;
 		~SqliteComponent() = default;
 	public:
-		bool Exec(const std::string & db, const std::string& sql);
+		void Close(int id);
+		int Open(const std::string & name);
+		bool Exec(int id, const std::string& sql);
+		bool MakeTable(int id, const google::protobuf::Message & message);
+		bool Query(int id, const std::string & sql, std::vector<std::string> & result);
 	public:
 		bool LateAwake() final;
+		void OnDestroy() final;
 	private:
 		std::string mName;
 		std::string mPath;
-		std::unordered_map<std::string, sqlite3 *> mDbs;
+		Util::NumberBuilder<int, 10> mNumbers;
+		std::unordered_map<int, sqlite3 *> mDatabases;
 	};
 }

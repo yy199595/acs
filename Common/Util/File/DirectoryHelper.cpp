@@ -22,7 +22,7 @@ namespace Helper
 {
     namespace Directory
     {
-        bool MakeDir(const std::string dir)
+        bool MakeDir(const std::string& dir)
         {
             if (Directory::DirectorIsExist(dir)) {
                 return true;
@@ -37,7 +37,7 @@ namespace Helper
             return MakeDirectory(dir) != -1;
         }
 
-    bool DeleteDir(const std::string dir)
+    bool DeleteDir(const std::string& dir)
     {
 #ifdef __OS_WIN__
         return _rmdir(dir.c_str()) != -1;
@@ -46,7 +46,7 @@ namespace Helper
 #endif
     }
 
-    bool DirectorIsExist(const std::string dir)
+    bool DirectorIsExist(const std::string& dir)
     {
 #ifdef __OS_WIN__
         return _access(dir.c_str(), 0) == 0;
@@ -55,7 +55,7 @@ namespace Helper
 #endif
     }
 
-    bool GetFilePaths(const std::string path, std::vector<std::string> &paths)
+    bool GetFilePaths(const std::string& path, std::vector<std::string> &paths)
     {
 #ifdef __OS_WIN__
         char newpath[PATH_MAX_LENGHT] = {0};
@@ -128,7 +128,7 @@ namespace Helper
         return closedir(dir) != -1;
 #endif
     }
-    bool GetFilePaths(const std::string path, std::string format, std::vector<std::string> &paths)
+    bool GetFilePaths(const std::string& path, std::string format, std::vector<std::string> &paths)
     {
         std::vector<std::string> allPaths;
         if (GetFilePaths(path, allPaths))
@@ -146,7 +146,7 @@ namespace Helper
         return false;
     }
 
-	bool GetDirByPath(const std::string path, std::string & director)
+	bool GetDirByPath(const std::string& path, std::string & director)
 	{
 		/*std::string pattern("^[a-zA-Z]:|([\\\\/]|[^\\s\\\\/:*?<>\"|][^\\\\/:*?<>\"|]*)+$");
 		std::regex nRegex(pattern);
@@ -174,7 +174,7 @@ namespace Helper
 		return true;
 	}
 
-        bool GetDirAndFileName(const std::string path, std::string &director, std::string &fileName)
+        bool GetDirAndFileName(const std::string& path, std::string &director, std::string &fileName)
 		{
 			/* std::string pattern("^[a-zA-Z]:|([\\\\/]|[^\\s\\\\/:*?<>\"|][^\\\\/:*?<>\"|]*)+$");
 			 std::regex nRegex(pattern);

@@ -103,7 +103,7 @@ namespace Sentry
         virtual void OnCloseComplete() { }
 		virtual bool IsStartService() = 0;
         virtual void WaitAllMessageComplete() { };
-        virtual int GetWaitMessageCount() const { return 0; }
+        virtual unsigned int GetWaitMessageCount() const { return 0; }
 	};
 
 	template<typename T1, typename T2>

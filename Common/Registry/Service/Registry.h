@@ -11,8 +11,9 @@ namespace Sentry
 	class Registry final : public PhysicalService, public ISecondUpdate
     {
     public:
-        Registry() = default;
+        Registry();
     public:
+		void Init() final;
         bool OnStart() final;
     private:
         int Ping(const Rpc::Packet & head);
@@ -23,12 +24,17 @@ namespace Sentry
 		void OnSecondUpdate(int tick) final;
         void OnNodeServerError(const std::string& address);
 	 private:
-        size_t mIndex;
+        int mIndex;
 		std::string mTable;
         class NodeMgrComponent * mNodeComponent;
         class InnerNetComponent* mInnerComponent;
+#ifdef __ENABLE_MYSQL__
 		class MysqlDBComponent * mMysqlComponent;
-        std::unordered_set<std::string> mRegitryServers;
+#else
+		int mDatabaseIndex;
+		class SqliteComponent * mSqliteComponent;
+#endif
+        std::unordered_set<std::string> mRegistryServers;
     };
 }
 

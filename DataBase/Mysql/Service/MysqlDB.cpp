@@ -184,10 +184,9 @@ namespace Sentry
 			response.set_error(result->GetError());
 			return XCode::MysqlInvokeFailure;
 		}
-        for (size_t index = 0; index < result->size(); index++)
+        for (size_t index = 0; index < result->ArraySize(); index++)
 		{
-			Json::Writer* document = result->at(index);
-			document->WriterStream(response.add_jsons());
+			response.add_jsons(result->Get(index));
 		}
         return XCode::Successful;
     }

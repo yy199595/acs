@@ -8,7 +8,6 @@
             "Gate": true,
             "MongoDB": true,
             "Chat": true,
-            "MysqlDB": true,
             "Registry": true,
             "ServerWeb": true,
             "Account": true

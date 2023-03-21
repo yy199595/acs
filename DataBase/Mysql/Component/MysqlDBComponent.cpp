@@ -52,11 +52,11 @@ namespace Sentry
 		{
 			LOG_ERROR("mysql error : " << message->GetError());
 		}*/
-		long long taskId = message->TaskId();
-		this->OnResponse(taskId, message);
+		int key = message->TaskId();
+		this->OnResponse(key, message);
 	}
 
-    size_t MysqlDBComponent::MakeMysqlClient()
+    int MysqlDBComponent::MakeMysqlClient()
     {
         std::unique_ptr<MysqlClient> mysqlClient
                 = std::make_unique<MysqlClient>(this);
@@ -64,8 +64,16 @@ namespace Sentry
         mysqlClient->Start();
         this->mClients.push(mysqlClient.get());
         this->mMysqlClients.emplace_back(std::move(mysqlClient));
-        return this->mMysqlClients.size() - 1;
+        return (int)this->mMysqlClients.size() - 1;
     }
+
+	void MysqlDBComponent::OnDestroy()
+	{
+		for(std::unique_ptr<MysqlClient> & mysqlClient : this->mMysqlClients)
+		{
+			mysqlClient->Stop();
+		}
+	}
 
     bool MysqlDBComponent::Ping(int index)
     {
@@ -90,7 +98,7 @@ namespace Sentry
 		return response;
 	}
 
-	std::shared_ptr<Mysql::Response> MysqlDBComponent::Run(int index, std::shared_ptr<Mysql::ICommand> command)
+	std::shared_ptr<Mysql::Response> MysqlDBComponent::Run(int index, const std::shared_ptr<Mysql::ICommand>& command)
     {
 		int id = this->mNumerPool.Pop();
 		{
@@ -112,7 +120,7 @@ namespace Sentry
 		{
 			return false;
 		}
-		int idx = index % this->mMysqlClients.size();
+		int idx = index % (int)this->mMysqlClients.size();
 		MysqlClient* mysqlClient = this->mMysqlClients[idx].get();;
 		{
 			mysqlClient->Push(std::move(command));
@@ -135,7 +143,8 @@ namespace Sentry
 	}
 	bool MysqlDBComponent::Execute(int index, std::shared_ptr<Mysql::ICommand> command)
 	{
-		std::shared_ptr<Mysql::Response> response = this->Run(index, command);
+		std::shared_ptr<Mysql::Response> response =
+			this->Run(index, std::move(command));
 		return response != nullptr && response->IsOk();
 	}
 }

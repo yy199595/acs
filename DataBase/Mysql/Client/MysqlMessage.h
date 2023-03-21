@@ -18,20 +18,27 @@
 using namespace google::protobuf;
 namespace Mysql
 {
-	class Response : public std::vector<Json::Writer *>
+	class Response
 	{
     public:
-        Response(int taskId)
+        explicit Response(int taskId)
             : mTaskId(taskId) ,mIsOk(true) { }
     public:
 		void SetError(const char * str);
 		bool IsOk() const { return this->mIsOk;}
 		int TaskId() const { return this->mTaskId; }
         const std::string & GetError() const { return this->mError;}
+	public:
+		void Add(const std::string & json);
+		void Add(const char * str, size_t len);
+		size_t ArraySize() const { return this->mResults.size();}
+		const std::string & Get(size_t index) const { return this->mResults[index]; }
+		const std::vector<std::string> & Array() const { return this->mResults; }
     private:
         bool mIsOk;
 		int mTaskId;
         std::string mError;
+		std::vector<std::string> mResults;
 	};
     class ICommand
 	{
@@ -56,7 +63,7 @@ namespace Mysql
 	class SqlCommand : public ICommand
 	{
 	 public:
-        SqlCommand(const std::string & sql);
+        explicit SqlCommand(const std::string & sql);
 		bool Invoke(MYSQL *, std::shared_ptr<Response> & response) final;
 	private:
         const std::string mSql;
@@ -65,10 +72,10 @@ namespace Mysql
  	class QueryCommand : public ICommand
     {
     public:
-        QueryCommand(const std::string & sql);
+        explicit QueryCommand(const std::string & sql);
 		bool Invoke(MYSQL *, std::shared_ptr<Response> & response) final;
 	private:
-        bool Write(Json::Writer & document, st_mysql_field * filed, const char * str, int len);
+        static bool Write(Json::Writer & document, st_mysql_field * filed, const char * str, int len);
     private:
         const std::string mSql;
     };

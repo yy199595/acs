@@ -19,6 +19,16 @@ namespace Mysql
 		this->mError = str;
 		this->mIsOk = false;
 	}
+
+	void Response::Add(const std::string& json)
+	{
+		this->mResults.emplace_back(json);
+	}
+
+	void Response::Add(const char* str, size_t len)
+	{
+		this->mResults.emplace_back(str, len);
+	}
 }
 
 namespace Mysql
@@ -85,26 +95,26 @@ namespace Mysql
 			response->SetError("query result is null");
             return false;
         }
+		std::string json;
         while(MYSQL_ROW row = mysql_fetch_row(result1))
         {
 			size_t count = 0;
-            Json::Writer * jsonDocument = new Json::Writer();
+
+            Json::Writer jsonDocument;
             unsigned int fieldCount = mysql_field_count(sock);
             unsigned long* lengths = mysql_fetch_lengths(result1);
             for (unsigned int index = 0; index < fieldCount; index++)
             {
                 st_mysql_field* filed = mysql_fetch_field(result1);
-                if(this->Write(*jsonDocument, filed, row[index], lengths[index]))
+                if(QueryCommand::Write(jsonDocument, filed, row[index], lengths[index]))
 				{
 					count++;
 				}
             }
-			if(count > 0)
+			if(count > 0 && jsonDocument.WriterStream(&json) > 0)
 			{
-				response->emplace_back(jsonDocument);
-				continue;
+				response->Add(json);
 			}
-			delete jsonDocument;
         }
         mysql_free_result(result1);
         return true;
@@ -120,7 +130,7 @@ namespace Mysql
         {
             case enum_field_types::MYSQL_TYPE_TINY:
             {
-                int value = std::atol(str);
+                int value = std::atoi(str);
                 document.Add(filed->name).Add(value);
                 return true;
             }
