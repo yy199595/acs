@@ -21,25 +21,25 @@ namespace Sentry
     class InnerNetMessageComponent : public RpcTaskComponent<int, Rpc::Packet>
 	{
 	 public:
-		InnerNetMessageComponent() = default;
+		InnerNetMessageComponent();
     public:
         bool Ping(const std::string & address);
-		int OnMessage(std::shared_ptr<Rpc::Packet> message);
-        bool Send(const std::string & address, std::shared_ptr<Rpc::Packet> message);
-		bool Send(const std::string & address, std::shared_ptr<Rpc::Packet> message, int & id);
-		std::shared_ptr<Rpc::Packet> Call(const std::string & address, std::shared_ptr<Rpc::Packet> message);
+		int OnMessage(const std::shared_ptr<Rpc::Packet>& message);
+		unsigned int WaitCount() const { return this->mWaitCount; }
+        bool Send(const std::string & address, const std::shared_ptr<Rpc::Packet>& message);
+		bool Send(const std::string & address, const std::shared_ptr<Rpc::Packet>& message, int & id);
+		std::shared_ptr<Rpc::Packet> Call(const std::string & address, const std::shared_ptr<Rpc::Packet>& message);
     private:
-		bool Awake() final;
 		bool LateAwake() final;
-		int HandlerForward(std::shared_ptr<Rpc::Packet> message);
+		int HandlerForward(const std::shared_ptr<Rpc::Packet>& message);
 		int HandlerRequest(std::shared_ptr<Rpc::Packet> message);
-		int HandlerResponse(std::shared_ptr<Rpc::Packet> message);
-		int HandlerBroadcast(std::shared_ptr<Rpc::Packet> message);
+		int HandlerResponse(const std::shared_ptr<Rpc::Packet>& message);
+		int HandlerBroadcast(const std::shared_ptr<Rpc::Packet>& message);
 		void OnTaskComplete(int key) final { this->mNumberPool.Push(key); }
-		void Send(const std::string& address, int code, std::shared_ptr<Rpc::Packet> pack);
-        void Invoke(const RpcMethodConfig * config, std::shared_ptr<Rpc::Packet> message);
+		void Send(const std::string& address, int code, const std::shared_ptr<Rpc::Packet>& pack);
+        void Invoke(const RpcMethodConfig * config, const std::shared_ptr<Rpc::Packet>& message);
     private:
-        std::string mFullName;
+		unsigned int mWaitCount;
 		class AsyncMgrComponent* mTaskComponent;
 		class TimerComponent* mTimerComponent;
 		Util::NumberBuilder<int, 1> mNumberPool;

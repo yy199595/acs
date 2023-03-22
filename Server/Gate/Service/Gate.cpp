@@ -19,9 +19,19 @@ namespace Sentry
 		this->mNodeComponent = nullptr;
         this->mOuterComponent = nullptr;
     }
-    void Gate::Init()
+	bool Gate::Awake()
+	{
+		this->mApp->AddComponent<OuterNetComponent>();
+		return true;
+	}
+
+    bool Gate::OnInit()
     {
-        this->mApp->AddComponent<OuterNetComponent>();
+		BIND_COMMON_RPC_METHOD(Gate::Ping);
+		BIND_COMMON_RPC_METHOD(Gate::Login);
+		BIND_COMMON_RPC_METHOD(Gate::Logout);
+		BIND_COMMON_RPC_METHOD(Gate::Allocation);
+		return true;
     }
 
 	int Gate::Ping(long long userId)
@@ -31,10 +41,6 @@ namespace Sentry
 
 	bool Gate::OnStart()
 	{
-        BIND_COMMON_RPC_METHOD(Gate::Ping);
-		BIND_COMMON_RPC_METHOD(Gate::Login);
-		BIND_COMMON_RPC_METHOD(Gate::Logout);
-		BIND_COMMON_RPC_METHOD(Gate::Allocation);
         const ServerConfig * config = ServerConfig::Inst();
 		this->mUserService = this->mApp->GetService<User>();
 		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();

@@ -9,20 +9,19 @@
 #include"google/protobuf/util/json_util.h"
 namespace Sentry
 {
-	bool InnerNetComponent::Awake()
+	InnerNetComponent::InnerNetComponent()
 	{
 		this->mSumCount = 0;
-		this->mWaitCount = 0;
+		this->mMaxHandlerCount = 0;
 		this->mNetComponent = nullptr;
 		this->mMessageComponent = nullptr;
-		return true;
 	}
 
 	bool InnerNetComponent::LateAwake()
 	{
         std::string path;
         rapidjson::Document document;
-		this->mMaxHandlerCount = 200;
+		this->mMaxHandlerCount = 2000;
         const ServerConfig * config = ServerConfig::Inst();
         LOG_CHECK_RET_FALSE(config->GetPath("user", path));
 		config->GetMember("message", "inner", this->mMaxHandlerCount);
@@ -47,6 +46,7 @@ namespace Sentry
 
     void InnerNetComponent::OnMessage(std::shared_ptr<Rpc::Packet> message)
 	{
+		this->mSumCount++;
 		int type = message->GetType();
 		const std::string& address = message->From();
 		if (type != Tcp::Type::Auth && address != this->mLocation)
@@ -88,13 +88,13 @@ namespace Sentry
             {
                 message->SetType(Tcp::Type::Response);
                 message->GetHead().Add("code", XCode::NetWorkError);
-                this->mMessageComponent->OnMessage(std::move(message));
+                this->mMessageComponent->OnMessage(message);
                 return;
             }
         }
     }
 
-    bool InnerNetComponent::OnAuth(std::shared_ptr<Rpc::Packet> message)
+    bool InnerNetComponent::OnAuth(const std::shared_ptr<Rpc::Packet>& message)
     {
         const Rpc::Head &head = message->GetHead();
         const std::string& address = message->From();
@@ -218,14 +218,14 @@ namespace Sentry
 	}
 
 
-    bool InnerNetComponent::Send(std::shared_ptr<Rpc::Packet> message)
+    bool InnerNetComponent::Send(const std::shared_ptr<Rpc::Packet>& message)
     {
         message->SetFrom(this->mLocation);
         this->mMessageComponent->OnMessage(message);
         return true;
     }
 
-    bool InnerNetComponent::Send(const std::string & address, std::shared_ptr<Rpc::Packet> message)
+    bool InnerNetComponent::Send(const std::string & address, const std::shared_ptr<Rpc::Packet>& message)
 	{
 		if(address == this->mLocation) //发送到本机
 		{
@@ -256,8 +256,10 @@ namespace Sentry
 
     void InnerNetComponent::OnRecord(Json::Writer &document)
     {
-        //document.Add("auth").Add( this->mLocationMaps.size());
-        //document.Add("client").Add(this->mRpcClientMap.size());
+		document.Add("sum").Add(this->mSumCount);
+		document.Add("wait").Add(this->mMessageComponent->WaitCount());
+        document.Add("auth").Add(this->mLocationMaps.size());
+        document.Add("client").Add(this->mRpcClientMap.size());
     }
 
 	const ServiceNodeInfo *InnerNetComponent::GetSeverInfo(const std::string &address) const
@@ -265,40 +267,6 @@ namespace Sentry
 		auto iter = this->mLocationMaps.find(address);		
 		return iter != this->mLocationMaps.end() ? iter->second.get() : nullptr;
 	}
-
-    void InnerNetComponent::GetServiceList(std::vector<std::string>& list) const
-    {
-        auto iter = this->mLocationMaps.begin();
-        for (; iter != this->mLocationMaps.end(); iter++)
-        {
-            list.push_back(iter->second->LocalAddress);
-        }
-    }
-
-	void InnerNetComponent::GetServiceList(std::vector<const ServiceNodeInfo *> &list) const
-	{
-		auto iter = this->mLocationMaps.begin();
-		for(; iter != this->mLocationMaps.end(); iter++)
-		{
-			list.push_back(iter->second.get());
-		}
-	}
-    void InnerNetComponent::GetServiceList(const std::string& name, std::vector<const ServiceNodeInfo*>& list) const
-    {
-        if (name.empty())
-        {
-            this->GetServiceList(list);
-            return;
-        }
-        auto iter = this->mLocationMaps.begin();
-        for (; iter != this->mLocationMaps.end(); iter++)
-        {
-            if (iter->second->SrvName == name)
-            {
-                list.push_back(iter->second.get());
-            }
-        }
-    }
 
 	void InnerNetComponent::OnFrameUpdate(float t)
 	{
@@ -335,7 +303,7 @@ namespace Sentry
 	}
 
 
-	size_t InnerNetComponent::Broadcast(std::shared_ptr<Rpc::Packet> message) const
+	size_t InnerNetComponent::Broadcast(const std::shared_ptr<Rpc::Packet>& message) const
 	{
 		size_t count = 0;
 		auto iter = this->mRpcClientMap.begin();

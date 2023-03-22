@@ -25,20 +25,24 @@ namespace Sentry
 		LocalHttpService();
 		virtual ~LocalHttpService() = default;
 	 protected:
-        virtual bool OnCloseService() { return true; };
-		virtual bool OnStartService(HttpServiceRegister & serviceRegister) = 0;
+		virtual bool OnInit() = 0;
+		virtual bool OnClose() { return true; }
+		virtual bool OnStart() { return true; }
 	 public:
+		bool Init() final;
         bool Start() final;
         bool Close() final;
 		bool LoadFromLua() final;
-		bool LateAwake() override;
+		bool LateAwake() final;
         void OnRecord(Json::Writer&document) final;
-		bool IsStartService() final { return this->mServiceRegister != nullptr;}
+		bool IsStartService() final { return true;}
 		int Invoke(const std::string & name, std::shared_ptr<Http::Request>, std::shared_ptr<Http::Response>) final;
+	protected:
+		HttpServiceRegister & GetRegister() { return this->mServiceRegister;}
 	 private:
         unsigned int mSumCount;
         unsigned int mWaitCount;
-		std::shared_ptr<HttpServiceRegister> mServiceRegister;
+		HttpServiceRegister mServiceRegister;
 	};
 }
 #endif //SENTRY_HTTPSERVICE_H

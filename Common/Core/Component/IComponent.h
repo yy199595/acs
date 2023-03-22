@@ -96,9 +96,9 @@ namespace Sentry
 	class IServiceBase
 	{
 	public:
-        virtual void Init() { }
-		virtual bool Start() = 0;
-		virtual bool Close() = 0;
+		virtual bool Init() = 0; // 注册rpc方法
+		virtual bool Start() = 0; //协程中调用
+		virtual bool Close() = 0; //协程中调用
 		virtual bool LoadFromLua() = 0; //在热更新的时候调用
         virtual void OnCloseComplete() { }
 		virtual bool IsStartService() = 0;
@@ -136,15 +136,6 @@ namespace Sentry
         std::string HttpAddress;
 		std::string LocalAddress;
     };
-
-	template<typename T1, typename T2>
-	class IClientRpc
-	{
-	public:
-		virtual void OnConnect(const std::string& address) { }
-		virtual int OnRequest(std::shared_ptr<T1> request) = 0;
-		virtual int OnResponse(const std::string&, const std::shared_ptr<T2> response) = 0;
-	};
 
     class IServerRecord
     {

@@ -25,29 +25,30 @@ namespace Sentry
 
     void MongoDBComponent::CloseClients()
     {
-        for(std::shared_ptr<TcpMongoClient> client : this->mMongoClients)
+        for(std::shared_ptr<TcpMongoClient> & client : this->mMongoClients)
         {
             client->Stop();
         }
         this->mMongoClients.clear();
     }
 
-	bool MongoDBComponent::Start()
-    {
-        LOG_CHECK_RET_FALSE(MongoConfig::Inst());
-        const MongoConfig * config = MongoConfig::Inst();
-        ThreadComponent * threadComponent = this->GetComponent<ThreadComponent>();
-        for (int index = 0; index < config->MaxCount; index++)
-        {
-            const std::string & ip = config->Address[0].Ip;
-            const unsigned int port = config->Address[0].Port;
-            std::shared_ptr<SocketProxy> socketProxy = threadComponent->CreateSocket(ip, port);
-            std::shared_ptr<TcpMongoClient> mongoClientContext = std::make_shared<TcpMongoClient>(socketProxy, this);
+	int MongoDBComponent::MakeMongoClient()
+	{
+		const MongoConfig * config = MongoConfig::Inst();
+		const std::string & ip = config->Address[0].Ip;
+		const unsigned int port = config->Address[0].Port;
+		ThreadComponent * threadComponent =
+			this->GetComponent<ThreadComponent>();
 
-            this->mMongoClients.emplace_back(mongoClientContext);
-        }
-        return this->Ping(0);
-    }
+		std::shared_ptr<SocketProxy> socketProxy =
+			threadComponent->CreateSocket(ip, port);
+
+		std::shared_ptr<TcpMongoClient> mongoClientContext =
+			std::make_shared<TcpMongoClient>(socketProxy, this);
+
+		this->mMongoClients.emplace_back(mongoClientContext);
+		return (int)this->mMongoClients.size() - 1;
+	}
 
 	void MongoDBComponent::OnConnectSuccessful(const std::string& address)
 	{

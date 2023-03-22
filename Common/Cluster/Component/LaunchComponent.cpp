@@ -92,11 +92,6 @@ namespace Sentry
                     LOG_ERROR("not find service config [" << name << "]");
                     return false;
                 }
-                if (nodeConfig->IsStart(name))
-                {
-                    this->GetComponent<IServiceBase>(name)->Init();
-                    //CONSOLE_LOG_INFO(ServerConfig::Inst()->Name() << " start service [" << name << "]");
-                }
             }
         }
         return true;
@@ -159,4 +154,17 @@ namespace Sentry
         }
         return true;
     }
+	bool LaunchComponent::LateAwake()
+	{
+		std::vector<RpcService *> rpcServices;
+		this->mApp->GetComponents(rpcServices);
+		for(RpcService * rpcService : rpcServices)
+		{
+			if(!rpcService->Init())
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 }

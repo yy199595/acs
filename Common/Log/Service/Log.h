@@ -15,8 +15,8 @@ namespace Sentry
 	 private:
 		int Login(const s2s::log::login & request);
 	 protected:
-		void Init() final;
-		bool OnStart() final;
+		bool OnInit() final;
+		bool OnStart() final { return true; }
 	};
 }
 

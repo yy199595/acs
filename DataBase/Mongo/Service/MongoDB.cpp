@@ -3,6 +3,7 @@
 //
 
 #include"MongoDB.h"
+#include"Config/MongoConfig.h"
 #include"Component/MongoDBComponent.h"
 namespace Sentry
 {
@@ -12,12 +13,13 @@ namespace Sentry
         this->mMongoComponent = nullptr;
     }
 
-    void MongoDB::Init()
+    bool MongoDB::Awake()
     {
         this->mApp->AddComponent<MongoDBComponent>();
+		return true;
     }
 
-	bool MongoDB::OnStart()
+	bool MongoDB::OnInit()
     {
         BIND_COMMON_RPC_METHOD(MongoDB::Query);
         BIND_COMMON_RPC_METHOD(MongoDB::Insert);
@@ -28,6 +30,15 @@ namespace Sentry
         this->mMongoComponent = this->GetComponent<MongoDBComponent>();
         return true;
     }
+
+	bool MongoDB::OnStart()
+	{
+		for(int index = 0; index < MongoConfig::Inst()->MaxCount; index++)
+		{
+			this->mMongoComponent->MakeMongoClient();
+		}
+		return this->mMongoComponent->Ping(0);
+	}
 
     void MongoDB::OnClose()
     {

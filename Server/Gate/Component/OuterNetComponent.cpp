@@ -60,6 +60,7 @@ namespace Sentry
 
 	void OuterNetComponent::OnMessage(std::shared_ptr<Rpc::Packet> message)
 	{
+		this->mSumCount++;
 		const std::string& address = message->From();
 		switch (message->GetType())
 		{
@@ -98,7 +99,7 @@ namespace Sentry
 					message->GetHead().Remove("func");
 					message->SetType(Tcp::Type::Response);
 					message->GetHead().Add("code", code);
-					this->Send(message->From(), std::move(message));
+					this->Send(message->From(), message);
 				}
 			}
 			this->mMessages.pop();
@@ -129,7 +130,7 @@ namespace Sentry
 			this->mRecords.emplace(rpcId, now);
 		}
 #endif // __DEBUG__
-
+		this->mWaitCount++;
 		if(!this->mInnerMessageComponent->Send(target, message))
 		{
 			return XCode::NetWorkError;
@@ -157,8 +158,12 @@ namespace Sentry
 			}
 		}
 #endif
+		if(message->GetType() == Tcp::Type::Response)
+		{
+			this->mWaitCount--;
+		}
 		auto iter = this->mGateClientMap.find(address);
-		if(iter == this->mGateClientMap.end())
+		if (iter == this->mGateClientMap.end())
 		{
 			return false;
 		}
@@ -221,7 +226,12 @@ namespace Sentry
 
     void OuterNetComponent::OnDestroy()
     {
-
+		this->StopListen();
+		auto iter = this->mGateClientMap.begin();
+		for(; iter != this->mGateClientMap.end(); iter++)
+		{
+			iter->second->StartClose();
+		}
     }
 
     bool OuterNetComponent::Send(long long userId, const std::shared_ptr<Rpc::Packet>& message)

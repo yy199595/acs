@@ -7,19 +7,21 @@
 #include"Config/CodeConfig.h"
 #include"Service/Node.h"
 #include"Service/Registry.h"
+#include"Config/ClusterConfig.h"
 #include"Component/NodeMgrComponent.h"
 namespace Sentry
 {
-    bool ServerWeb::OnStartService(HttpServiceRegister &serviceRegister)
-    {
-        serviceRegister.Bind("Info", &ServerWeb::Info);
-        serviceRegister.Bind("Ping", &ServerWeb::Ping);
-        serviceRegister.Bind("Hello", &ServerWeb::Hello);
-		serviceRegister.Bind("Sleep", &ServerWeb::Sleep);
-		serviceRegister.Bind("Hotfix", &ServerWeb::Hotfix);
-		serviceRegister.Bind("DownLoad", &ServerWeb::DownLoad);
-        return true;
-    }
+    bool ServerWeb::OnInit()
+	{
+		HttpServiceRegister& registry = this->GetRegister();
+		registry.Bind("Info", &ServerWeb::Info);
+		registry.Bind("Ping", &ServerWeb::Ping);
+		registry.Bind("Hello", &ServerWeb::Hello);
+		registry.Bind("Sleep", &ServerWeb::Sleep);
+		registry.Bind("Hotfix", &ServerWeb::Hotfix);
+		registry.Bind("DownLoad", &ServerWeb::DownLoad);
+		return true;
+	}
 
 	int ServerWeb::Ping(const Http::Request &request, Http::Response &response)
     {
@@ -76,22 +78,23 @@ namespace Sentry
 			response.Add("error").Add("not find registry server address");
 			return XCode::NetWorkError;
 		}
-		com::array::string request;
-		std::shared_ptr<s2s::server::list> list
-			= std::make_shared<s2s::server::list>();
-		RpcService* rpcService = this->mApp->GetService<Registry>();		
-		int code = rpcService->Call(address, std::string("Query"), request, list);
+
+		com::type::string message;
+		const std::string func("Query");
+		RpcService* rpcService = this->mApp->GetService<Registry>();
+		std::shared_ptr<s2s::server::list> list = std::make_shared<s2s::server::list>();
+		int code = rpcService->Call(address, func, message, list);
 		if(code != XCode::Successful)
 		{
 			response.Add("error").Add(CodeConfig::Inst()->GetDesc(code));
 			return XCode::Failure;
 		}
+		const std::string method("RunInfo");
 		for (int index = 0; index < list->list_size(); index++)
 		{
 			const s2s::server::info& info = list->list(index);
-			std::shared_ptr<com::type::string> resp
-				= std::make_shared<com::type::string>();
-			int code = innerService->Call(info.rpc(), "RunInfo", resp);
+			std::shared_ptr<com::type::string> resp = std::make_shared<com::type::string>();
+			int code = innerService->Call(info.rpc(), method, resp);
 			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
 			if (code == XCode::Successful)
 			{

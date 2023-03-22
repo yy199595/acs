@@ -1,7 +1,7 @@
 #pragma once
 
+#include"Helper/SqlHelper.h"
 #include"Client/MysqlClient.h"
-#include"Client/MysqlHelper.h"
 #include"Service/PhysicalService.h"
 
 namespace Sentry
@@ -9,7 +9,7 @@ namespace Sentry
 	class MysqlDB : public PhysicalService
 	{
 	 public:
-		MysqlDB() = default;
+		MysqlDB();
 	private:
 
         int Add(const db::mysql::add& request);
@@ -29,7 +29,7 @@ namespace Sentry
 		bool OnStart() final;
         void OnClose() final;
 	 private:
-		MysqlHelper mSqlHelper;
+		SqlHelper mSqlHelper;
 		class ProtoComponent * mProtoComponent;
         class MysqlDBComponent * mMysqlComponent;
         std::unordered_map<std::string, std::string> mMainKeys;

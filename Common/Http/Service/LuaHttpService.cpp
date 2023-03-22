@@ -8,7 +8,12 @@
 #include"Component/LuaScriptComponent.h"
 namespace Sentry
 {
-    bool LuaHttpService::LateAwake()
+	LuaHttpService::LuaHttpService()
+	{
+		this->mLuaComponent = nullptr;
+	}
+
+    bool LuaHttpService::OnInit()
     {
         this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
         Lua::LuaModule * luaModule = this->mLuaComponent->LoadModule(this->GetName());
@@ -18,16 +23,5 @@ namespace Sentry
             return false;
         }
         return luaModule->Awake();
-    }
-
-    bool LuaHttpService::OnCloseService()
-    {
-        Lua::LuaModule* luaModule = this->mLuaComponent->GetModule(this->GetName());
-        return luaModule != nullptr && luaModule->Close();
-    }
-
-    bool LuaHttpService::OnStartService(HttpServiceRegister &serviceRegister)
-    {
-        return true;
     }
 }

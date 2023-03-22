@@ -13,7 +13,7 @@ namespace Sentry
         ServerWeb() = default;
         ~ServerWeb() final = default;
     private:     
-        bool OnStartService(HttpServiceRegister &serviceRegister) final;
+        bool OnInit() final;
     private:
         int Info(Json::Writer & response);
 		int Hotfix(Json::Writer& response);

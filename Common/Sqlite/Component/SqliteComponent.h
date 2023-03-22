@@ -2,9 +2,10 @@
 #include<unordered_map>
 #include"Guid/NumberBuilder.h"
 #include"Component/Component.h"
-#include"google/protobuf/message.h"
+#include"Helper/SqlHelper.h"
 namespace Sentry
 {
+	class SqlHelper;
 	class SqliteComponent : public Component
 	{
 	public:

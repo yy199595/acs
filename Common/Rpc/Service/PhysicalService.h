@@ -14,6 +14,7 @@ namespace Sentry
 	public:
 		PhysicalService();
 	public:
+		bool Init() final;
 		bool Start() final;
 		bool Close() final;
 		bool IsStartService() final{ return true; }
@@ -21,21 +22,17 @@ namespace Sentry
 		int Invoke(const std::string& func, std::shared_ptr<Rpc::Packet> message) final;
 	protected:
 		bool LoadFromLua() final;
-		virtual void OnClose()
-		{
-		};
-		virtual bool OnStart() = 0;
+		virtual void OnClose(){ };
+		virtual bool OnInit() = 0;
+		virtual bool OnStart()  { return true; }
 		void WaitAllMessageComplete() final;
 		void OnRecord(Json::Writer& document) final;
-		ServiceMethodRegister& GetMethodRegistry()
-		{
-			return *this->mMethodRegister;
-		}
+		inline ServiceMethodRegister& GetMethodRegistry() { return this->mMethodRegister; }
 	private:
 		unsigned int mSumCount;
 		unsigned int mWaitCount;
 		bool mIsHandlerMessage;
-		std::unique_ptr<ServiceMethodRegister> mMethodRegister;
+		ServiceMethodRegister mMethodRegister;
 	};
 	extern std::string GET_FUNC_NAME(const std::string& fullName);
 #define BIND_COMMON_RPC_METHOD(func) LOG_CHECK_RET_FALSE(this->GetMethodRegistry().Bind(GET_FUNC_NAME(#func), &func));

@@ -3,6 +3,7 @@
 #include"File/DirectoryHelper.h"
 #include "Json/JsonWriter.h"
 #include"String/StringHelper.h"
+#include"Helper/SqlHelper.h"
 namespace Sentry
 {
 	bool SqliteComponent::LateAwake()
@@ -12,7 +13,6 @@ namespace Sentry
 			return false;
 		}
 		Helper::Directory::MakeDir(this->mPath);
-
 		return true;
 	}
 
@@ -24,35 +24,13 @@ namespace Sentry
 		{
 			return false;
 		}
-		std::stringstream stream;
-		stream << "CREATE TABLE IF NOT EXISTS  " << result[1] << "(";
-		const google::protobuf::Descriptor* descriptor = message.GetDescriptor();
-		if(descriptor->FindFieldByName(key) == nullptr)
+		std::string sql;
+		SqlHelper sqlHelper;
+		const std::string & tab = result[1];
+		if(!sqlHelper.Create(message, tab, {key}, sql))
 		{
 			return false;
 		}
-		for (int index = 0; index < descriptor->field_count(); index++)
-		{
-			const google::protobuf::FieldDescriptor* fieldDescriptor = descriptor->field(index);
-			switch (fieldDescriptor->cpp_type())
-			{
-				case google::protobuf::FieldDescriptor::CPPTYPE_INT32:
-				case google::protobuf::FieldDescriptor::CPPTYPE_INT64:
-					stream << fieldDescriptor->name() << " INT(20) NOT NULL DEFAULT 0,";
-					break;
-				case google::protobuf::FieldDescriptor::CPPTYPE_STRING:
-					stream << fieldDescriptor->name() << " VARCHAR(64) NOT NULL DEFAULT '',";
-					break;
-				case google::protobuf::FieldDescriptor::CPPTYPE_FLOAT:
-				case google::protobuf::FieldDescriptor::CPPTYPE_DOUBLE:
-					stream << fieldDescriptor->name() << " DOUBLE(32) NOT NULL DEFAULT 0,";
-					break;
-				default:
-					return false;
-			}
-		}
-		stream << "PRIMARY KEY (`" << key << "`))";
-		std::string sql = stream.str();
 		return this->Exec(id, sql);
 	}
 

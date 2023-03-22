@@ -30,18 +30,17 @@ namespace Sentry
 
 namespace Sentry
 {
-    class MongoDBComponent : public RpcTaskComponent<int,Mongo::CommandResponse>,
-							 public IStart, public IRpc<Mongo::CommandResponse>
+    class MongoDBComponent : public RpcTaskComponent<int,Mongo::CommandResponse>, public IRpc<Mongo::CommandResponse>
 	{
 	public:
 		MongoDBComponent();
 		~MongoDBComponent() final = default;
 	public:
-        bool Start() final;
         void CloseClients();
         bool Ping(int index);
         bool SetIndex(const std::string & tab, const std::string & name);
     public:
+		int MakeMongoClient();
         void OnClientError(int index, int code);
         TcpMongoClient * GetClient(int index = -1);
 		unsigned int GetWaitCount() const { return this->mWaitCount; }

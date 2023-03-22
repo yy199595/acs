@@ -9,6 +9,7 @@ namespace Sentry
 {
 
     LocalHttpService::LocalHttpService()
+		: mServiceRegister(this)
     {
         this->mSumCount = 0;
         this->mWaitCount = 0;
@@ -17,7 +18,7 @@ namespace Sentry
 	int LocalHttpService::Invoke(const std::string& name,
 		std::shared_ptr<Http::Request> request, std::shared_ptr<Http::Response> response)
 	{
-		std::shared_ptr<HttpServiceMethod> method = this->mServiceRegister->GetMethod(name);
+		std::shared_ptr<HttpServiceMethod> method = this->mServiceRegister.GetMethod(name);
 		if(method == nullptr)
 		{
 			return XCode::CallServiceNotFound;
@@ -55,14 +56,14 @@ namespace Sentry
             for (const HttpMethodConfig* config : methodConfigs)
             {
                 std::shared_ptr<HttpServiceMethod> serviceMethod = 
-                    this->mServiceRegister->GetMethod(config->Method);
+                    this->mServiceRegister.GetMethod(config->Method);
                 if (serviceMethod != nullptr && serviceMethod->IsLuaMethod())
                 {
                     continue;
                 }
                 if (luaModule->GetFunction(config->Method))
                 {
-                    this->mServiceRegister->AddMethod(std::make_shared<LuaHttpServiceMethod>(config));                  
+                    this->mServiceRegister.AddMethod(std::make_shared<LuaHttpServiceMethod>(config));
                 }
             }
         }
@@ -75,24 +76,23 @@ namespace Sentry
         document.Add("wait").Add(this->mWaitCount);
     }
 
-	bool LocalHttpService::Start()
+	bool LocalHttpService::Init()
     {
-        this->mServiceRegister = std::make_shared<HttpServiceRegister>(this);
-        LuaScriptComponent * luaComponent = this->GetComponent<LuaScriptComponent>();
         const HttpServiceConfig * httpServiceConfig = HttpConfig::Inst()->GetConfig(this->GetName());
         if(httpServiceConfig == nullptr)
         {
             LOG_ERROR("not find http service : " << this->GetName());
             return false;
         }
-        if (!this->OnStartService(*this->mServiceRegister))
-        {
-            return false;
-        }
+		if(!this->OnInit())
+		{
+			return false;
+		}
         Lua::LuaModule* luaModule = nullptr;
         std::vector<const HttpMethodConfig*> methodConfigs;
         httpServiceConfig->GetMethodConfigs(methodConfigs);
-        if (luaComponent != nullptr)
+		LuaScriptComponent * luaComponent = this->GetComponent<LuaScriptComponent>();
+		if (luaComponent != nullptr)
         {
             luaModule = luaComponent->GetModule(this->GetName());
             if (luaModule != nullptr)
@@ -101,7 +101,7 @@ namespace Sentry
                 {
                     if (luaModule->GetFunction(config->Method))
                     {
-                        this->mServiceRegister->AddMethod(std::make_shared<LuaHttpServiceMethod>(config));                      
+                        this->mServiceRegister.AddMethod(std::make_shared<LuaHttpServiceMethod>(config));
                     }
                 }
             }
@@ -109,20 +109,30 @@ namespace Sentry
 
         for(const HttpMethodConfig * methodConfig : methodConfigs)
         {
-            if(this->mServiceRegister->GetMethod(methodConfig->Method) == nullptr)
+            if(this->mServiceRegister.GetMethod(methodConfig->Method) == nullptr)
             {
                 LOG_ERROR("not register method " << methodConfig->Service << "." << methodConfig->Method);
                 return false;
             }
         }
-        return luaModule == nullptr || luaModule->Start();
+        return true;
     }
+
+	bool LocalHttpService::Start()
+	{
+		LuaScriptComponent * luaComponent = this->GetComponent<LuaScriptComponent>();
+		Lua::LuaModule* luaModule = luaComponent->GetModule(this->GetName());
+		if(luaModule != nullptr && !luaModule->Start())
+		{
+			return false;
+		}
+		return true;
+	}
 
 	bool LocalHttpService::Close()
 	{
-        this->mServiceRegister->Clear();
-		this->mServiceRegister = nullptr;
-        if (!this->OnCloseService())
+        this->mServiceRegister.Clear();
+        if (!this->OnClose())
         {
             return false;
         }

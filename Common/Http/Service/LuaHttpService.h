@@ -10,15 +10,13 @@ namespace Sentry
     class LuaHttpService : public LocalHttpService
     {
     public:
-        LuaHttpService() = default;
+        LuaHttpService();
         ~LuaHttpService() = default;
     private:
-        bool LateAwake() final;
-        bool OnCloseService() final;
-        bool OnStartService(HttpServiceRegister &serviceRegister) final;
-
+		bool OnInit() final;
+		bool OnStart() final { return true; }
+		bool OnClose() final { return true; }
     private:
-        struct lua_State * mLuaEnv;
         class LuaScriptComponent* mLuaComponent;
     };
 }

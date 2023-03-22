@@ -6,12 +6,7 @@
 #include "Component/LogComponent.h"
 namespace Sentry
 {
-	void Log::Init()
-	{
-
-	}
-
-	bool Log::OnStart()
+	bool Log::OnInit()
 	{
 		BIND_COMMON_RPC_METHOD(Log::Login);
 		return true;

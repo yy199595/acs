@@ -18,7 +18,8 @@ namespace Sentry
 		int Login(const Rpc::Packet & packet);
 		int Allocation(long long userId, s2s::allot::response & response);
 	private:
-        void Init() final;
+		bool Awake() final;
+		bool OnInit() final;
 		bool OnStart() final;
         void OnClose() final;
 		int OnLogin(long long userId);

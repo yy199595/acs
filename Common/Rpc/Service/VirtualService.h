@@ -13,6 +13,7 @@ namespace Sentry
 		VirtualService() = default;
 		~VirtualService() = default;
 	 private:
+		bool Init() final { return true; }
 		bool Start() final { return false;}
 		bool Close() final { return false;}
 		bool LoadFromLua() final { return false; }

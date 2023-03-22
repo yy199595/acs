@@ -14,7 +14,8 @@ namespace Sentry
 	public:
 		MongoDB();
 	private:
-        void Init() final;
+		bool Awake() final;
+        bool OnInit() final;
 		bool OnStart() final;
         void OnClose() final;
     private:

@@ -23,7 +23,8 @@ namespace Sentry
         int Exit(const com::type::string& request); //服务器退出
         int RunInfo(com::type::string& response); // 获取运行信息
     private:
-        void Init() final;
+        bool OnInit() final;
+		bool Awake() final;
         bool OnStart() final;
     private:
         class NodeMgrComponent* mNodeComponent;

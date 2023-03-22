@@ -5,6 +5,12 @@
 #include"Component/ProtoComponent.h"
 namespace Sentry
 {
+	MysqlDB::MysqlDB()
+	{
+		this->mMysqlComponent = nullptr;
+		this->mProtoComponent = nullptr;
+	}
+
 	void MysqlDB::Init()
 	{
 		this->mApp->AddComponent<MysqlDBComponent>();

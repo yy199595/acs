@@ -16,6 +16,7 @@ namespace Sentry
     private:
         bool Awake() final;
         bool Start() final;
+		bool LateAwake() final;
     };
 }
 

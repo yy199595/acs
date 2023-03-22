@@ -1,4 +1,6 @@
 ﻿#include"InnerNetMessageComponent.h"
+
+#include <utility>
 #include"Component/AsyncMgrComponent.h"
 #include"Lua/LuaServiceMethod.h"
 #include"Config/ServiceConfig.h"
@@ -10,16 +12,17 @@
 #include"Component/OuterNetComponent.h"
 namespace Sentry
 {
-	bool InnerNetMessageComponent::Awake()
+	InnerNetMessageComponent::InnerNetMessageComponent()
 	{
+		this->mWaitCount = 0;
 		this->mTaskComponent = nullptr;
 		this->mInnerComponent = nullptr;
-        return true;
+		this->mOuterComponent = nullptr;
+		this->mTimerComponent = nullptr;
 	}
 
 	bool InnerNetMessageComponent::LateAwake()
 	{
-		this->mTaskComponent = this->mApp->GetTaskComponent();
         this->mTimerComponent = this->mApp->GetTimerComponent();
         this->mOuterComponent = this->GetComponent<OuterNetComponent>();
 		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<AsyncMgrComponent>());
@@ -29,12 +32,9 @@ namespace Sentry
 
 	int InnerNetMessageComponent::HandlerRequest(std::shared_ptr<Rpc::Packet> message)
 	{
-        const Rpc::Head & head = message->GetHead();
-        if(!head.Get("func", this->mFullName))
-        {
-            return XCode::CallArgsError;
-        }
-        const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(this->mFullName);
+        const Rpc::Head & head = message->ConstHead();
+		const std::string & fullName = message->GetHead().GetStr("func");
+        const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
         if(methodConfig == nullptr)
         {
             return XCode::CallFunctionNotExist;
@@ -53,7 +53,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-    void InnerNetMessageComponent::Send(const std::string& address, int code, std::shared_ptr<Rpc::Packet> message)
+    void InnerNetMessageComponent::Send(const std::string& address, int code, const std::shared_ptr<Rpc::Packet>& message)
     { 
         if (!message->GetHead().Has("rpc"))
         {
@@ -68,7 +68,7 @@ namespace Sentry
         this->mInnerComponent->Send(message->From(), message);
     }
 
-    void InnerNetMessageComponent::Invoke(const RpcMethodConfig *config, std::shared_ptr<Rpc::Packet> message)
+    void InnerNetMessageComponent::Invoke(const RpcMethodConfig *config, const std::shared_ptr<Rpc::Packet>& message)
 	{
 		RpcService* logicService = this->mApp->GetService(config->Service);
 		if (logicService == nullptr || !logicService->IsStartService())
@@ -91,10 +91,12 @@ namespace Sentry
 #ifdef __DEBUG__
 	ElapsedTimer timer;
 #endif
+		this->mWaitCount++;
 		int code = logicService->Invoke(config->Method, message);
 #ifdef __DEBUG__
 		LOG_INFO("call [" << config->FullName << "] use time = " << timer.GetMs() << "ms");
 #endif
+		this->mWaitCount--;
 		if (timerId > 0 && !this->mTimerComponent->CancelTimer(timerId))
 		{
 			LOG_ERROR("call [" << config->FullName << "] time out not return");
@@ -121,7 +123,7 @@ namespace Sentry
     }
 
     std::shared_ptr<Rpc::Packet> InnerNetMessageComponent::Call(
-        const std::string &address, std::shared_ptr<Rpc::Packet> message)
+        const std::string &address, const std::shared_ptr<Rpc::Packet>& message)
     {
         int rpcId = 0;
 		if(!this->Send(address, message, rpcId))
@@ -133,7 +135,7 @@ namespace Sentry
         return this->AddTask(rpcId, taskSource)->Await();
     }
 
-    int InnerNetMessageComponent::OnMessage(std::shared_ptr<Rpc::Packet> message)
+    int InnerNetMessageComponent::OnMessage(const std::shared_ptr<Rpc::Packet>& message)
     {
         switch (message->GetType())
         {
@@ -149,7 +151,7 @@ namespace Sentry
 		return XCode::Successful;
     }
 
-	int InnerNetMessageComponent::HandlerForward(std::shared_ptr<Rpc::Packet> message)
+	int InnerNetMessageComponent::HandlerForward(const std::shared_ptr<Rpc::Packet>& message)
 	{
 		if (this->mOuterComponent == nullptr)
 		{
@@ -169,7 +171,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	int InnerNetMessageComponent::HandlerResponse(std::shared_ptr<Rpc::Packet> message)
+	int InnerNetMessageComponent::HandlerResponse(const std::shared_ptr<Rpc::Packet>& message)
 	{
 		if (this->mOuterComponent != nullptr)
 		{
@@ -182,7 +184,7 @@ namespace Sentry
 				return XCode::Successful;
 			}
 		}
-		long long rpcId = 0;
+		int rpcId = 0;
 		if (message->GetHead().Get("rpc", rpcId))
 		{
 			this->OnResponse(rpcId, message);
@@ -191,7 +193,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	int InnerNetMessageComponent::HandlerBroadcast(std::shared_ptr<Rpc::Packet> message)
+	int InnerNetMessageComponent::HandlerBroadcast(const std::shared_ptr<Rpc::Packet>& message)
 	{
         if(this->mOuterComponent == nullptr)
         {
@@ -203,7 +205,7 @@ namespace Sentry
 	}
 
 
-	bool InnerNetMessageComponent::Send(const std::string &address, std::shared_ptr<Rpc::Packet> message)
+	bool InnerNetMessageComponent::Send(const std::string &address, const std::shared_ptr<Rpc::Packet>& message)
     {
         if (this->mInnerComponent == nullptr)
         {
@@ -214,7 +216,7 @@ namespace Sentry
         assert(message->GetType() > (int)Tcp::Type::None);
         return this->mInnerComponent->Send(address, message);
     }
-	bool InnerNetMessageComponent::Send(const string& address, std::shared_ptr<Rpc::Packet> message, int& id)
+	bool InnerNetMessageComponent::Send(const string& address, const std::shared_ptr<Rpc::Packet>& message, int& id)
 	{
 		int rpcId = this->mNumberPool.Pop();
 		message->GetHead().Add("rpc", rpcId);

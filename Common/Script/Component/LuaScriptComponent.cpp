@@ -145,8 +145,10 @@ namespace Sentry
 		std::unique_ptr<Lua::LuaModule> luaModule =
 			std::make_unique<Lua::LuaModule>(this->mLuaEnv, name, path);
 		Lua::LuaModule * result = luaModule.get();
-		const std::string moduleName = name.substr(0, name.find('.'));
-		this->mModules.emplace(moduleName, std::move(luaModule));
+		{
+			const std::string moduleName = name.substr(0, name.find('.'));
+			this->mModules.emplace(moduleName, std::move(luaModule));
+		}
 		return result;
 	}
 
@@ -252,7 +254,7 @@ namespace Sentry
             const std::string moduleName = name.substr(0, name.find('.'));
             {
                 this->mModulePaths[moduleName] = path;
-                LOG_INFO("load lua module [" << moduleName << "]");
+                //LOG_INFO("load lua module [" << moduleName << "]");
             }          
         }
         return true;
@@ -354,5 +356,16 @@ namespace Sentry
 		double free = this->CollectGarbage();
 		document.Add("free").Add(fmt::format("{0}mb", free / 1024));
 		document.Add("memory").Add(fmt::format("{0}mb", size / 1024));
+	}
+	bool LuaScriptComponent::UnloadModule(const string& name)
+	{
+		auto iter = this->mModules.find(name);
+		if(iter != this->mModules.end())
+		{
+			iter->second->Close();
+			this->mModules.erase(iter);
+			return true;
+		}
+		return false;
 	}
 }

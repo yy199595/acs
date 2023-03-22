@@ -43,7 +43,7 @@ namespace Sentry
 		std::shared_ptr<Rpc::Packet> CallAwait(long long userId, const std::string& func, const Message* message = nullptr);
 		std::shared_ptr<Rpc::Packet> CallAwait(const std::string& address, const std::string& func, const Message* message = nullptr);
 	protected:
-		bool LateAwake() override;
+		bool LateAwake() final;
 	public:
 		bool RandomAddress(std::string& address);
 		virtual int Invoke(const std::string& method, std::shared_ptr<Rpc::Packet> message) = 0;

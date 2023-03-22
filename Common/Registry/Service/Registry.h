@@ -13,7 +13,8 @@ namespace Sentry
     public:
         Registry();
     public:
-		void Init() final;
+		bool Awake() final;
+		bool OnInit() final;
         bool OnStart() final;
     private:
         int Ping(const Rpc::Packet & head);
@@ -22,7 +23,6 @@ namespace Sentry
         int UnRegister(const std::string& address, const com::type::string& request);
     private:
 		void OnSecondUpdate(int tick) final;
-        void OnNodeServerError(const std::string& address);
 	 private:
         int mIndex;
 		std::string mTable;

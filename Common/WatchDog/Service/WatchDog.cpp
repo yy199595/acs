@@ -2,7 +2,7 @@
 #include"Log/Debug.h"
 namespace Sentry
 {
-    bool WatchDog::OnStart()
+    bool WatchDog::OnInit()
     {
         BIND_COMMON_RPC_METHOD(WatchDog::Ping);
         BIND_COMMON_RPC_METHOD(WatchDog::ShowLog);

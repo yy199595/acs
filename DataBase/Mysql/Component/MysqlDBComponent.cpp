@@ -5,8 +5,9 @@
 #include"MysqlDBComponent.h"
 
 #include <utility>
+#include"Helper/SqlHelper.h"
 #include"Client/MysqlClient.h"
-#include"Client/MysqlHelper.h"
+
 #include"Message/user.pb.h"
 #include"Config/MysqlConfig.h"
 namespace Sentry
@@ -27,7 +28,7 @@ namespace Sentry
 {
 	bool MysqlDBComponent::LateAwake()
 	{
-		this->mSqlHelper = std::make_unique<MysqlHelper>();
+		this->mSqlHelper = std::make_unique<SqlHelper>();
 		this->mProtoComponent = this->mApp->GetMsgComponent();
 		return true;
 	}

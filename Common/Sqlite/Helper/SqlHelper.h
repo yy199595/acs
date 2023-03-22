@@ -1,22 +1,24 @@
 #pragma once
 
-#include"XCode/XCode.h"
-#include"Guid/Guid.h"
+#include<sstream>
 #include"Message/db.pb.h"
 #include"rapidjson/document.h"
-#include"MysqlDefine.h"
+
 
 using namespace google::protobuf;
 namespace Sentry
 {
-	class MysqlHelper
+	class SqlHelper
 	{
 	 public:
-		MysqlHelper() = default;
+		SqlHelper() = default;
 	 public:
 
+
         bool Insert(const Message &, std::string& sqlCommand);
+
 		bool Replace(const Message &, std::string& sqlCommand);
+
 
 		bool Select(const Message & message, const std::string & where,
 			int limit, std::string & sqlCommand);
@@ -30,7 +32,9 @@ namespace Sentry
 
         bool ToSqlCommand(const std::string& table, const std::string& cmd, const Message& message, std::string& sql);
 
-    public:
+		bool Create(const Message & message, const std::string & tab, const std::vector<std::string> & keys, std::string & sql);
+
+	public:
         bool GetValue(const std::string & key, std::string & value);
         std::shared_ptr<Message> GetData() { return std::move(this->mMessage); }
         bool GetValue(rapidjson::Document & document, const std::string & key, std::string & value);

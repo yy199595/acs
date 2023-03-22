@@ -14,10 +14,16 @@ namespace Sentry
         this->mApp->AddComponent<GateComponent>();
         return true;
     }
+
+	bool User::OnInit()
+	{
+		BIND_COMMON_RPC_METHOD(User::Login);
+		BIND_COMMON_RPC_METHOD(User::Logout);
+		return true;
+	}
+
     bool User::OnStart()
     {
-        BIND_COMMON_RPC_METHOD(User::Login);
-        BIND_COMMON_RPC_METHOD(User::Logout);
 		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
         this->mInnerNetComponent = this->GetComponent<InnerNetComponent>();
         return true;

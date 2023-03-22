@@ -53,7 +53,7 @@ namespace Sentry
 		std::queue<MysqlClient*> mClients;
 		ProtoComponent * mProtoComponent;
 		Util::NumberBuilder<int, 1> mNumerPool;
-		std::unique_ptr<MysqlHelper> mSqlHelper;
+		std::unique_ptr<SqlHelper> mSqlHelper;
 		std::vector<std::unique_ptr<MysqlClient>> mMysqlClients;
     };
 }

@@ -34,21 +34,27 @@ namespace Sentry
 
 	}
 
-	void Registry::Init()
+	bool Registry::Awake()
 	{
 #ifndef __ENABLE_MYSQL__
 		this->mApp->AddComponent<SqliteComponent>();
 #else
 		this->mApp->AddComponent<MysqlDBComponent>();
 #endif
+		return true;
 	}
 
-    bool Registry::OnStart()
+	bool Registry::OnInit()
 	{
 		BIND_COMMON_RPC_METHOD(Registry::Ping);
 		BIND_COMMON_RPC_METHOD(Registry::Query);
 		BIND_ADDRESS_RPC_METHOD(Registry::Register);
 		BIND_ADDRESS_RPC_METHOD(Registry::UnRegister);
+		return true;
+	}
+
+    bool Registry::OnStart()
+	{
 		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
 		this->mInnerComponent = this->GetComponent<InnerNetComponent>();
 
@@ -86,10 +92,12 @@ namespace Sentry
 	{
 		std::stringstream sqlStream;
 		const std::string& name = request.str();
-		LOG_ERROR_RETURN_CODE(!name.empty(), XCode::CallArgsError);
-		sqlStream << "select server_name,rpc_address,http_address,last_ping_time from "
-				  << this->mTable << " where server_name='" << name << "';";
-
+		sqlStream << "select server_name,rpc_address,"
+					 "http_address,last_ping_time from " << this->mTable;
+		if (!name.empty())
+		{
+			sqlStream << " where server_name='" << name << "';";
+		}
 		const std::string sql = sqlStream.str();
 #ifdef __ENABLE_MYSQL__
 		std::shared_ptr<Mysql::QueryCommand> command
@@ -108,16 +116,17 @@ namespace Sentry
 			const std::string& json = result.at(index);
 			if (!document.ParseJson(result.at(index)))
 			{
-				long long time = 0;
-				long long now = Helper::Time::NowSecTime();
-				document.GetMember("last_ping_time", time);
-				if (now - time <= 15)
-				{
-					s2s::server::info* message = response.add_list();
-					document.GetMember("server_name", *message->mutable_name());
-					document.GetMember("rpc_address", *message->mutable_rpc());
-					document.GetMember("http_address", *message->mutable_http());
-				}
+				return XCode::ParseJsonFailure;
+			}
+			long long time = 0;
+			long long now = Helper::Time::NowSecTime();
+			document.GetMember("last_ping_time", time);
+			//if (now - time <= 15)
+			{
+				s2s::server::info* message = response.add_list();
+				document.GetMember("server_name", *message->mutable_name());
+				document.GetMember("rpc_address", *message->mutable_rpc());
+				document.GetMember("http_address", *message->mutable_http());
 			}
 		}
 		return XCode::Successful;
@@ -131,10 +140,9 @@ namespace Sentry
 		LOG_ERROR_RETURN_CODE(!rpc.empty(), XCode::CallArgsError);
 		LOG_ERROR_RETURN_CODE(!name.empty(), XCode::CallArgsError);
 
-		long long time = Helper::Time::NowSecTime();
 		const std::string sql =
 			fmt::format("replace into {0} (server_name,rpc_address,http_address,last_ping_time) values('{1}','{2}','{3}',{4});",
-				this->mTable, name, rpc, http, time);
+				this->mTable, name, rpc, http, Helper::Time::NowSecTime());
 #ifdef __ENABLE_MYSQL__
 		if (!this->mMysqlComponent->Execute(this->mIndex, std::make_shared<Mysql::SqlCommand>(sql)))
 		{
@@ -158,11 +166,6 @@ namespace Sentry
 			LOG_INFO("send server join message to " << address);
 		}
 		return XCode::Successful;
-	}
-
-	void Registry::OnNodeServerError(const std::string& address)
-	{
-
 	}
 
 	int Registry::Ping(const Rpc::Packet& packet)

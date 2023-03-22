@@ -11,21 +11,26 @@
 
 namespace Sentry
 {
-    void Node::Init()
+	bool Node::Awake()
+	{
+		this->mApp->AddComponent<InnerNetComponent>();
+		this->mApp->AddComponent<InnerNetMessageComponent>();
+	}
+
+    bool Node::OnInit()
     {
-        this->mApp->AddComponent<InnerNetComponent>();
-        this->mApp->AddComponent<InnerNetMessageComponent>();
+		BIND_COMMON_RPC_METHOD(Node::Ping);
+		BIND_COMMON_RPC_METHOD(Node::Join);
+		BIND_COMMON_RPC_METHOD(Node::Exit);
+		BIND_COMMON_RPC_METHOD(Node::Stop);
+		BIND_COMMON_RPC_METHOD(Node::Hotfix);
+		BIND_COMMON_RPC_METHOD(Node::RunInfo);
+		BIND_COMMON_RPC_METHOD(Node::LoadConfig);
+		return true;
     }
 
     bool Node::OnStart()
     {
-        BIND_COMMON_RPC_METHOD(Node::Ping);
-        BIND_COMMON_RPC_METHOD(Node::Join);
-        BIND_COMMON_RPC_METHOD(Node::Exit);
-        BIND_COMMON_RPC_METHOD(Node::Stop);
-        BIND_COMMON_RPC_METHOD(Node::Hotfix);
-		BIND_COMMON_RPC_METHOD(Node::RunInfo);
-		BIND_COMMON_RPC_METHOD(Node::LoadConfig);     
 		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
         return true;
     }

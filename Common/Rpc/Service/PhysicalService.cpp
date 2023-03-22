@@ -19,6 +19,7 @@ namespace Sentry
     }
 
     PhysicalService::PhysicalService()
+	 : mMethodRegister(this)
     {
         this->mSumCount = 0;
         this->mWaitCount = 0;
@@ -50,7 +51,7 @@ namespace Sentry
         {
             return XCode::CallServiceNotFound;
         }
-        std::shared_ptr<ServiceMethod> serviceMethod = this->mMethodRegister->GetMethod(func);
+        std::shared_ptr<ServiceMethod> serviceMethod = this->mMethodRegister.GetMethod(func);
         if (serviceMethod == nullptr)
         {
             LOG_ERROR("not find [" << this->GetName() << "." << func << "]");
@@ -70,25 +71,49 @@ namespace Sentry
 
 	bool PhysicalService::Start()
 	{
-        this->mMethodRegister = std::make_unique<ServiceMethodRegister>(this);
-        const RpcServiceConfig * rpcServiceConfig = RpcConfig::Inst()->GetConfig(this->GetName());
-		if(rpcServiceConfig == nullptr)
-        {
-            LOG_ERROR("not find rpc service config " << this->GetName())
-            return false;
-        }
-        if(!this->OnStart())
-        {
-            LOG_ERROR("rpc service [" << this->GetName() << "] start error");
-            return false;
-        }
+		if(!this->OnStart())
+		{
+			return false;
+		}
+		LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();
+		if(luaScriptComponent == nullptr)
+		{
+			return true;
+		}
+		const std::string & name = this->GetName();
+		Lua::LuaModule* luaModule = luaScriptComponent->LoadModule(name);
+		if (luaModule == nullptr)
+		{
+			return true;
+		}
+		return luaModule->Start();
+	}
 
-        this->LoadFromLua();
+	bool PhysicalService::Init()
+	{
+		if(!this->OnInit())
+		{
+			return false;
+		}
+		LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();
+		if (luaScriptComponent == nullptr)
+		{
+			return true;
+		}
+		const std::string & name = this->GetName();
+		Lua::LuaModule* luaModule = luaScriptComponent->LoadModule(name);
+		if (luaModule != nullptr && !luaModule->Awake() && this->LoadFromLua())
+		{
+			return false;
+		}
+
+        const RpcServiceConfig * rpcServiceConfig =
+			RpcConfig::Inst()->GetConfig(this->GetName());
         std::vector<const RpcMethodConfig *> methodConfigs;
         rpcServiceConfig->GetMethodConfigs(methodConfigs);
         for(const RpcMethodConfig * config : methodConfigs)
         {
-            if(this->mMethodRegister->GetMethod(config->Method) == nullptr)
+            if(this->mMethodRegister.GetMethod(config->Method) == nullptr)
             {
                 LOG_ERROR("not register " << config->FullName);
                 return false;
@@ -109,28 +134,26 @@ namespace Sentry
 		LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();       
         if (luaScriptComponent == nullptr)
         {
-            return false;
+            return true;
         }
-		Lua::LuaModule* luaModule = luaScriptComponent->GetModule(this->GetName());
+		const std::string & name = this->GetName();
+		Lua::LuaModule* luaModule = luaScriptComponent->GetModule(name);
 		if (luaModule == nullptr)
 		{
-            luaModule = luaScriptComponent->LoadModule(this->GetName());
-            if(luaModule == nullptr || !luaModule->Awake())
-            {
-                return false;
-            }
+			return true;
 		}
         std::vector<const RpcMethodConfig*> methodConfigs;
-		const RpcServiceConfig* rpcServiceConfig = RpcConfig::Inst()->GetConfig(this->GetName());
+		const RpcServiceConfig* rpcServiceConfig = RpcConfig::Inst()->GetConfig(name);
         if (rpcServiceConfig == nullptr)
         {
+			luaScriptComponent->UnloadModule(name);
             return false;
         }
 		rpcServiceConfig->GetMethodConfigs(methodConfigs);
 		for (const RpcMethodConfig* methodConfig : methodConfigs)
 		{
             std::shared_ptr<ServiceMethod> serviceMethod =  
-                this->mMethodRegister->GetMethod(methodConfig->Method);
+                this->mMethodRegister.GetMethod(methodConfig->Method);
             if (serviceMethod != nullptr && serviceMethod->IsLuaMethod())
             {
                 continue;
@@ -139,19 +162,21 @@ namespace Sentry
 			{
 				std::shared_ptr<LuaServiceMethod> luaServiceMethod
 					= std::make_shared<LuaServiceMethod>(methodConfig);
-				this->mMethodRegister->AddMethod(luaServiceMethod);
+				this->mMethodRegister.AddMethod(luaServiceMethod);
 				LOG_WARN(methodConfig->FullName << " use lua method");
 			}
 		}
+		return true;
 	}
 
 	bool PhysicalService::Close()
     {
-        if (!this->IsStartService())
+		if (!this->IsStartService())
         {
             return false;
         }
         this->OnClose();
-        return true;
+		this->mMethodRegister.ClearLuaMethods();
+		return true;
     }
 }

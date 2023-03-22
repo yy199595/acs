@@ -16,6 +16,7 @@ namespace Sentry
     public:
 		double GetMemorySize();
 		double CollectGarbage();
+		bool UnloadModule(const std::string & name);
 		Lua::LuaModule * GetModule(const std::string & name);
 		Lua::LuaModule * LoadModule(const std::string & name);
 		Lua::LuaModule * LoadModuleByPath(const std::string & name);

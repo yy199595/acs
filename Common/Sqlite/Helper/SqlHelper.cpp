@@ -1,11 +1,11 @@
-﻿#include"MysqlHelper.h"
+﻿#include"SqlHelper.h"
 #include"App/App.h"
 #include"google/protobuf/util/json_util.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 namespace Sentry
 {
-    void MysqlHelper::GetFiles(const Message &message, std::stringstream &ss, char cc)
+    void SqlHelper::GetFiles(const Message &message, std::stringstream &ss, char cc)
     {
         const Descriptor * descriptor = message.GetDescriptor();
         for(int index = 0; index < descriptor->field_count(); index++)
@@ -20,7 +20,7 @@ namespace Sentry
         }
     }
 
-	bool MysqlHelper::ToSqlCommand(const std::string& table, const std::string& cmd,
+	bool SqlHelper::ToSqlCommand(const std::string& table, const std::string& cmd,
 		const Message& message, std::string& sql)
     {
         this->mSqlCommandStream.str("");
@@ -91,7 +91,7 @@ namespace Sentry
         return true;
     }
 
-	bool MysqlHelper::Update(const std::string & table,
+	bool SqlHelper::Update(const std::string & table,
 		const std::string & where, const std::string & update, std::string& sqlCommand)
 	{
         if(!this->Parse(this->mDocument1, where)
@@ -137,7 +137,7 @@ namespace Sentry
 		return true;
 	}
 
-    bool MysqlHelper::GetValue(rapidjson::Document &document, const std::string &key, std::string &value)
+    bool SqlHelper::GetValue(rapidjson::Document &document, const std::string &key, std::string &value)
     {
         if(!key.empty() && document.HasMember(key.c_str()))
         {
@@ -161,19 +161,19 @@ namespace Sentry
         return false;
     }
 
-    bool MysqlHelper::Parse(rapidjson::Document &doc, const std::string &json)
+    bool SqlHelper::Parse(rapidjson::Document &doc, const std::string &json)
     {
         const char * str = json.c_str();
         const size_t size = json.size();
         return !doc.Parse(str, size).HasParseError() && doc.IsObject();
     }
 
-    bool MysqlHelper::GetValue(const std::string &key, std::string &value)
+    bool SqlHelper::GetValue(const std::string &key, std::string &value)
     {
         return this->GetValue(this->mDocument1, key, value);
     }
 
-	bool MysqlHelper::WriterToStream(std::stringstream& stream, const rapidjson::Value& jsonValue)
+	bool SqlHelper::WriterToStream(std::stringstream& stream, const rapidjson::Value& jsonValue)
 	{
 		if (jsonValue.IsString())
 		{
@@ -229,7 +229,7 @@ namespace Sentry
 		return false;
 	}
 
-	bool MysqlHelper::Delete(const std::string & table, const std::string & where, std::string& sqlCommand)
+	bool SqlHelper::Delete(const std::string & table, const std::string & where, std::string& sqlCommand)
 	{
         if(!this->Parse(this->mDocument1, where))
         {
@@ -258,19 +258,19 @@ namespace Sentry
 		return true;
 	}
 
-	bool MysqlHelper::Insert(const Message & message, std::string& sqlCommand)
+	bool SqlHelper::Insert(const Message & message, std::string& sqlCommand)
 	{
 		const std::string  table = message.GetTypeName();
 		return this->ToSqlCommand(table, "insert", message, sqlCommand);
 	}
 
-	bool MysqlHelper::Replace(const Message & message, std::string& sqlCommand)
+	bool SqlHelper::Replace(const Message & message, std::string& sqlCommand)
 	{
 		const std::string  table = message.GetTypeName();
 		return this->ToSqlCommand(table, "replace", message, sqlCommand);
 	}
 
-	bool MysqlHelper::Select(const google::protobuf::Message& message,
+	bool SqlHelper::Select(const google::protobuf::Message& message,
 		const std::string& where, int limit, std::string& sqlCommand)
 	{
 		std::vector<std::string> fields;
@@ -287,7 +287,7 @@ namespace Sentry
 		return this->Select(table, where, fields, limit, sqlCommand);
 	}
 
-	bool MysqlHelper::Select(const std::string & name, const std::string & where,
+	bool SqlHelper::Select(const std::string & name, const std::string & where,
 		std::vector<std::string> & fields, int limit, std::string & sqlCommand)
 	{
 		if (fields.empty())
@@ -354,6 +354,78 @@ namespace Sentry
 			this->mSqlCommandStream << " limit " << limit;
 		}
 		sqlCommand = this->mSqlCommandStream.str();
+		return true;
+	}
+
+	bool SqlHelper::Create(const google::protobuf::Message& message, const std::string& tab, const std::vector<std::string>& keys, std::string& sql)
+	{
+		const google::protobuf::Descriptor* descriptor = message.GetDescriptor();
+
+		this->mSqlCommandStream.str("");
+		this->mSqlCommandStream << "CREATE TABLE IF NOT EXISTS  " << tab << "(";
+		for (int index = 0; index < descriptor->field_count(); index++)
+		{
+			const google::protobuf::FieldDescriptor* fieldDescriptor = descriptor->field(index);
+			this->mSqlCommandStream << fieldDescriptor->name();
+			switch (fieldDescriptor->cpp_type())
+			{
+				case FieldDescriptor::Type::TYPE_INT32:
+				case FieldDescriptor::Type::TYPE_UINT32:
+					this->mSqlCommandStream << " INT(20) NOT NULL DEFAULT 0,";
+					break;
+				case FieldDescriptor::Type::TYPE_INT64:
+				case FieldDescriptor::Type::TYPE_UINT64:
+					this->mSqlCommandStream << " BIGINT(32) NOT NULL DEFAULT 0,";
+					break;
+				case FieldDescriptor::Type::TYPE_FLOAT:
+				case FieldDescriptor::Type::TYPE_DOUBLE:
+					this->mSqlCommandStream << " DOUBLE(32) NOT NULL DEFAULT 0";
+					break;
+				case FieldDescriptor::Type::TYPE_STRING:
+					this->mSqlCommandStream << " VARCHAR(64) NOT NULL DEFAULT ''";
+					break;
+				case FieldDescriptor::Type::TYPE_BYTES:
+					this->mSqlCommandStream << " BLOB(64) NOT NULL DEFAULT ''";
+					break;
+				case FieldDescriptor::Type::TYPE_BOOL:
+					this->mSqlCommandStream << " BOOLEAN NOT NULL DEFAULT 0";
+					break;
+				case FieldDescriptor::TYPE_MESSAGE:
+					this->mSqlCommandStream << " JSON";
+					break;
+				default:
+					return false;
+			}
+			if(index != descriptor->field_count() - 1)
+			{
+				this->mSqlCommandStream << ",";
+			}
+		}
+
+		if(!keys.empty())
+		{
+			this->mSqlCommandStream << ",PRIMARY KEY (";
+			for (size_t index = 0; index < keys.size(); index++)
+			{
+				const std::string& key = keys.at(index);
+				if (descriptor->FindFieldByName(key) == nullptr)
+				{
+					return false;
+				}
+				this->mSqlCommandStream << "`" << key << "`";
+				if(index < keys.size() - 1)
+				{
+					this->mSqlCommandStream << ",";
+				}
+			}
+			this->mSqlCommandStream << ")";
+		}
+		else
+		{
+			this->mSqlCommandStream << ")";
+		}
+		this->mSqlCommandStream << ")";
+		sql = this->mSqlCommandStream.str();
 		return true;
 	}
 }
