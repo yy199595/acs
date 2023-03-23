@@ -11,7 +11,7 @@ namespace Sentry
     class TextConfig
     {
     public:
-        TextConfig(const char * name) : mName(name) { }
+        explicit TextConfig(const char * name) : mName(name) { }
     public:
         bool ReloadConfig();
         bool LoadConfig(const std::string & path);

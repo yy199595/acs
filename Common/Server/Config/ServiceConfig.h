@@ -13,7 +13,7 @@ namespace Sentry
     class IServiceConfigBase
     {
     public:
-        IServiceConfigBase(const std::string & name) : mName(name) { }
+        explicit IServiceConfigBase(const std::string & name) : mName(name) { }
         const std::string & GetName() const { return this->mName; }
     public:
         virtual bool OnLoadConfig(const rapidjson::Value & json) = 0;
