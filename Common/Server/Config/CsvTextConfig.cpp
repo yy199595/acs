@@ -4,6 +4,65 @@
 #include<sstream>
 #include"CsvTextConfig.h"
 #include"String/StringHelper.h"
+
+namespace Sentry
+{
+	bool CsvLineData::Add(const std::string& key, const std::string& value)
+	{
+		auto iter = this->mDatas.find(key);
+		if(iter != this->mDatas.end())
+		{
+			return false;
+		}
+		this->mDatas.emplace(key, value);
+		return true;
+	}
+
+	bool CsvLineData::Get(const std::string& key, int& value) const
+	{
+		auto iter = this->mDatas.find(key);
+		if(iter == this->mDatas.end())
+		{
+			return false;
+		}
+		value = std::stoi(iter->second);
+		return true;
+	}
+
+	bool CsvLineData::Get(const std::string& key, bool& value) const
+	{
+		auto iter = this->mDatas.find(key);
+		if(iter == this->mDatas.end())
+		{
+			return false;
+		}
+		value = iter->second == "true";
+		return true;
+	}
+
+	bool CsvLineData::Get(const std::string& key, long long& value) const
+	{
+		auto iter = this->mDatas.find(key);
+		if(iter == this->mDatas.end())
+		{
+			return false;
+		}
+		value = std::stoll(iter->second);
+		return true;
+	}
+
+	bool CsvLineData::Get(const std::string& key, std::string& value) const
+	{
+		auto iter = this->mDatas.find(key);
+		if(iter == this->mDatas.end())
+		{
+			return false;
+		}
+		value = iter->second;
+		return true;
+	}
+}
+
 namespace Sentry
 {
 	CsvTextConfig::CsvTextConfig(const std::string& name)
@@ -23,7 +82,6 @@ namespace Sentry
 		}
 		std::vector<std::string> fields;
 		std::vector<std::string> values;
-		std::unordered_map<std::string, std::string> contents;
 		if(Helper::Str::Split(line, ",", fields) == 0)
 		{
 			return false;
@@ -32,7 +90,7 @@ namespace Sentry
 		while(std::getline(fileStream, line))
 		{
 			values.clear();
-			contents.clear();
+			CsvLineData lineData;
 			if(Helper::Str::Split(line, ",", values) != size)
 			{
 				return false;
@@ -41,9 +99,9 @@ namespace Sentry
 			{
 				const std::string & key = fields.at(index);
 				const std::string & value = values.at(index);
-				contents.emplace(key, value);
+				lineData.Add(key, value);
 			}
-			if(!this->OnReLoadLine(contents))
+			if(!this->OnReLoadLine(lineData))
 			{
 				return false;
 			}
