@@ -4,6 +4,10 @@ function Player:Call(func, message)
     return Client.Call(self.session, func, message)
 end
 
+function Player:Send(func, message)
+    Client.Send(self.session, func, message)
+end
+
 function Player:Login()
     local account = self.account
     local password = self.password
@@ -24,7 +28,7 @@ function Player:Login()
         return false
     end
     Log.Debug(account, " 登录网关服务器[", address, "]成功")
-    --coroutine.start(self.Update, self)
+   self:Update()
 end
 
 function Player.New(account, passwd, phoneNum)

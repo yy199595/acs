@@ -3,6 +3,8 @@
 //
 
 #include"Node.h"
+#include"Service/Registry.h"
+#include"Config/CodeConfig.h"
 #include"Config/ClusterConfig.h"
 #include"Component/InnerNetComponent.h"
 #include"Component/NodeMgrComponent.h"
@@ -11,10 +13,17 @@
 
 namespace Sentry
 {
+	Node::Node()
+	{
+		this->mNodeComponent = nullptr;
+	}
+
 	bool Node::Awake()
 	{
 		this->mApp->AddComponent<InnerNetComponent>();
 		this->mApp->AddComponent<InnerNetMessageComponent>();
+
+		return true;
 	}
 
     bool Node::OnInit()
@@ -26,13 +35,22 @@ namespace Sentry
 		BIND_COMMON_RPC_METHOD(Node::Hotfix);
 		BIND_COMMON_RPC_METHOD(Node::RunInfo);
 		BIND_COMMON_RPC_METHOD(Node::LoadConfig);
-		return true;
-    }
 
-    bool Node::OnStart()
-    {
+		std::vector<std::string> registryAddress;
+		const ServerConfig * config = ServerConfig::Inst();
+		RpcService* rpcService = this->mApp->GetService<Registry>();
 		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
-        return true;
+		if(!config->GetMember("registry", registryAddress))
+		{
+			LOG_ERROR("not find config registry address");
+			return false;
+		}
+		for(const std::string & address : registryAddress)
+		{
+			const std::string & server = rpcService->GetServer();
+			this->mNodeComponent->AddRpcServer(server, address);
+		}
+		return true;
     }
 
 	int Node::Ping(const Rpc::Packet& packet)
@@ -40,6 +58,40 @@ namespace Sentry
         CONSOLE_LOG_FATAL("[" << packet.From() << "] ping server");
         return XCode::Successful;
     }
+
+	void Node::OnLocalComplete()
+	{
+		std::string address;
+		const std::string func("Register");
+		const ServerConfig* config = ServerConfig::Inst();
+		RpcService* rpcService = this->mApp->GetService<Registry>();
+		const std::string & server = rpcService->GetServer();
+		while(this->mNodeComponent->GetServer(server, address))
+		{
+			s2s::server::info message;
+			{
+				message.set_name(config->Name());
+				config->GetLocation("rpc", *message.mutable_rpc());
+				config->GetLocation("http", *message.mutable_http());
+			}
+#ifdef __DEBUG__
+			LOG_INFO("start register to [" << address << "]");
+#endif
+			int code = rpcService->Call(address, func, message);
+			if (code != XCode::Successful)
+			{
+				LOG_ERROR("register to [" << address << "] "
+										  << CodeConfig::Inst()->GetDesc(code));
+				this->mApp->GetTaskComponent()->Sleep(1000 * 5);
+				continue;
+			}
+			const std::string & server = rpcService->GetServer();
+			this->mNodeComponent->AddRpcServer(server, address);
+			LOG_INFO("register to [" << address << "] successful");
+			return;
+		}
+		LOG_FATAL("registry to registry failure");
+	}
 
     int Node::Join(const s2s::server::info &request)
 	{

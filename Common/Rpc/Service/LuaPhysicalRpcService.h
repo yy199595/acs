@@ -9,16 +9,16 @@ namespace Sentry
 {
 	class LuaScriptComponent;
 	class ServiceMethodRegister;
-	class LuaPhysicalService : public RpcService, public IClient, public IServerRecord
+	class LuaPhysicalRpcService : public RpcService, public IClient, public IServerRecord
 	{
 	 public:
-		LuaPhysicalService();
+		LuaPhysicalRpcService();
 	 public:
 		bool Init() final;
 		bool Close() final;
 		bool Start() final;
-        void WaitAllMessageComplete() final;
-		bool LoadFromLua() final { return true; }
+		bool LoadFromLua() final;
+		void WaitAllMessageComplete() final;
 		bool IsStartService() final { return true; }
 		void OnRecord(Json::Writer &document) final;
 		unsigned int GetWaitMessageCount() const final { return this->mWaitCount; };

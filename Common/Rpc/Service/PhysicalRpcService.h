@@ -9,10 +9,10 @@
 namespace Sentry
 {
 	//实体服务 能处理逻辑
-	class PhysicalService : public RpcService, public IServerRecord
+	class PhysicalRpcService : public RpcService, public IServerRecord
 	{
 	public:
-		PhysicalService();
+		PhysicalRpcService();
 	public:
 		bool Init() final;
 		bool Start() final;
@@ -29,9 +29,9 @@ namespace Sentry
 		void OnRecord(Json::Writer& document) final;
 		inline ServiceMethodRegister& GetMethodRegistry() { return this->mMethodRegister; }
 	private:
+		bool mIsHandle;
 		unsigned int mSumCount;
 		unsigned int mWaitCount;
-		bool mIsHandlerMessage;
 		ServiceMethodRegister mMethodRegister;
 	};
 	extern std::string GET_FUNC_NAME(const std::string& fullName);

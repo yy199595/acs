@@ -4,15 +4,15 @@
 
 #ifndef APP_INNERSERVICE_H
 #define APP_INNERSERVICE_H
-#include"PhysicalService.h"
+#include"PhysicalRpcService.h"
 #include"Message/s2s.pb.h"
 #include"Message/com.pb.h"
 namespace Sentry
 {
-    class Node final : public PhysicalService
+	class Node final : public PhysicalRpcService, public IComplete
     {
     public:
-        Node() = default;
+        Node();
         ~Node() = default;
     private:
         int Stop();
@@ -25,7 +25,7 @@ namespace Sentry
     private:
         bool OnInit() final;
 		bool Awake() final;
-        bool OnStart() final;
+		void OnLocalComplete() final;
     private:
         class NodeMgrComponent* mNodeComponent;
     };

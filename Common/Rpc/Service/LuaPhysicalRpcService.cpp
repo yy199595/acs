@@ -1,4 +1,4 @@
-﻿#include"LuaPhysicalService.h"
+﻿#include"LuaPhysicalRpcService.h"
 #include"Lua/Function.h"
 #include"Module/LuaModule.h"
 #include"Lua/LuaServiceMethod.h"
@@ -7,7 +7,7 @@
 #include"Component/LuaScriptComponent.h"
 namespace Sentry
 {
-	LuaPhysicalService::LuaPhysicalService()
+	LuaPhysicalRpcService::LuaPhysicalRpcService()
 		: mMethodRegister(this)
 	{
 		this->mSumCount = 0;
@@ -17,7 +17,7 @@ namespace Sentry
         this->mIsHandlerMessage = false;
 	}
 
-	bool LuaPhysicalService::Init()
+	bool LuaPhysicalRpcService::Init()
 	{
 		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
 		if(this->mLuaComponent == nullptr)
@@ -48,7 +48,13 @@ namespace Sentry
         this->mIsHandlerMessage = true;
         return true;
 	}
-	int LuaPhysicalService::Invoke(const std::string &name, std::shared_ptr<Rpc::Packet> message)
+
+	bool LuaPhysicalRpcService::LoadFromLua()
+	{
+		return true;
+	}
+
+	int LuaPhysicalRpcService::Invoke(const std::string &name, std::shared_ptr<Rpc::Packet> message)
 	{
 		if(!this->mIsHandlerMessage || !this->IsStartService())
 		{
@@ -66,7 +72,7 @@ namespace Sentry
         return code;
 	}
 
-    void LuaPhysicalService::WaitAllMessageComplete()
+    void LuaPhysicalRpcService::WaitAllMessageComplete()
     {
         this->mIsHandlerMessage = false;
         AsyncMgrComponent *taskComponent = this->mApp->GetTaskComponent();
@@ -79,7 +85,7 @@ namespace Sentry
         CONSOLE_LOG_ERROR(this->GetName() << " handler all message complete");
     }
 
-	void LuaPhysicalService::OnLogin(long long userId)
+	void LuaPhysicalRpcService::OnLogin(long long userId)
 	{
 		const std::string & name = this->GetName();
 		Lua::LuaModule * luaModule = this->mLuaComponent->GetModule(name);
@@ -90,7 +96,7 @@ namespace Sentry
 		}
 	}
 
-	void LuaPhysicalService::OnLogout(long long userId)
+	void LuaPhysicalRpcService::OnLogout(long long userId)
 	{
 		const std::string & name = this->GetName();
 		Lua::LuaModule * luaModule = this->mLuaComponent->GetModule(name);
@@ -101,7 +107,7 @@ namespace Sentry
 		}
 	}
 
-	bool LuaPhysicalService::Close()
+	bool LuaPhysicalRpcService::Close()
 	{
 		if(this->mLuaComponent != nullptr)
 		{
@@ -111,13 +117,13 @@ namespace Sentry
 		return true;
 	}
 
-	void LuaPhysicalService::OnRecord(Json::Writer& document)
+	void LuaPhysicalRpcService::OnRecord(Json::Writer& document)
 	{
 		document.Add("sum").Add(this->mSumCount);
 		document.Add("wait").Add(this->mWaitCount);
 		document.Add("client").Add(this->mUserCount);
 	}
-	bool LuaPhysicalService::Start()
+	bool LuaPhysicalRpcService::Start()
 	{
 		const std::string & name = this->GetName();
 		Lua::LuaModule * luaModule = this->mLuaComponent->GetModule(name);

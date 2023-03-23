@@ -52,7 +52,7 @@ namespace Sentry
         this->mTaskComponent->Start(&HttpWebComponent::Invoke, this, address, httpConfig, request);
     }
     void HttpWebComponent::Invoke(const std::string& address, 
-        const HttpMethodConfig* config, std::shared_ptr<Http::Request> request)
+        const HttpMethodConfig* config, const std::shared_ptr<Http::Request>& request)
     {
 		this->mSumCount++;
         this->mWaitCount++;

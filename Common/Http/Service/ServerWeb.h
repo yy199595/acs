@@ -12,15 +12,19 @@ namespace Sentry
     public:
         ServerWeb() = default;
         ~ServerWeb() final = default;
-    private:     
+    private:
+		bool Awake();
         bool OnInit() final;
     private:
         int Info(Json::Writer & response);
 		int Hotfix(Json::Writer& response);
+		int Main(const Http::Request& request, Http::Response& response);
 		int Ping(const Http::Request& request, Http::Response& response);
 		int Hello(const Http::Request& request, Http::Response& response);
 		int DownLoad(const Http::Request& request, Http::Response& response);
 		int Sleep(const Json::Reader & request, Json::Writer& response);
+	private:
+		std::unordered_map<std::string, std::string> mHtmls;
     };
 }
 

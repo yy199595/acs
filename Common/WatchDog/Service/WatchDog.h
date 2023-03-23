@@ -1,8 +1,8 @@
 #include"Message/s2s.pb.h"
-#include"Service/PhysicalService.h"
+#include"Service/PhysicalRpcService.h"
 namespace Sentry
 {
-	class WatchDog : public PhysicalService
+	class WatchDog : public PhysicalRpcService
 	{
 	public:
 		WatchDog() = default;

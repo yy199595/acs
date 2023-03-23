@@ -4,7 +4,7 @@
 
 #include "Method/MethodRegister.h"
 
-#include"PhysicalService.h"
+#include"PhysicalRpcService.h"
 #include"App/App.h"
 #include"Module/LuaModule.h"
 #include"Config/ServiceConfig.h"
@@ -18,18 +18,18 @@ namespace Sentry
         return fullName.substr(pos + 2);
     }
 
-    PhysicalService::PhysicalService()
+    PhysicalRpcService::PhysicalRpcService()
 	 : mMethodRegister(this)
     {
         this->mSumCount = 0;
         this->mWaitCount = 0;
-        this->mIsHandlerMessage = false;
+        this->mIsHandle = false;
     }
 
-    void PhysicalService::WaitAllMessageComplete()
+    void PhysicalRpcService::WaitAllMessageComplete()
     {
         int time = 0;
-        this->mIsHandlerMessage = false;
+        this->mIsHandle = false;
         AsyncMgrComponent *taskComponent = this->mApp->GetTaskComponent();
         while (this->mWaitCount > 0)
         {
@@ -40,15 +40,11 @@ namespace Sentry
         }
         CONSOLE_LOG_ERROR(this->GetName() << " handler all message complete");
     }
-    int PhysicalService::Invoke(const std::string &func, std::shared_ptr<Rpc::Packet> message)
+    int PhysicalRpcService::Invoke(const std::string &func, std::shared_ptr<Rpc::Packet> message)
     {
-        if (!this->IsStartService())
+        if (!this->IsStartService() || !this->mIsHandle)
         {
             LOG_ERROR(this->GetName() << " is not start");
-            return XCode::CallServiceNotFound;
-        }
-        if(!this->mIsHandlerMessage)
-        {
             return XCode::CallServiceNotFound;
         }
         std::shared_ptr<ServiceMethod> serviceMethod = this->mMethodRegister.GetMethod(func);
@@ -69,7 +65,7 @@ namespace Sentry
         return code;
     }
 
-	bool PhysicalService::Start()
+	bool PhysicalRpcService::Start()
 	{
 		if(!this->OnStart())
 		{
@@ -89,47 +85,45 @@ namespace Sentry
 		return luaModule->Start();
 	}
 
-	bool PhysicalService::Init()
+	bool PhysicalRpcService::Init()
 	{
 		if(!this->OnInit())
 		{
 			return false;
 		}
+		this->mIsHandle = true;
 		LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();
-		if (luaScriptComponent == nullptr)
+		if (luaScriptComponent != nullptr)
 		{
-			return true;
+			const std::string& name = this->GetName();
+			Lua::LuaModule* luaModule = luaScriptComponent->LoadModule(name);
+			if (luaModule != nullptr && !luaModule->Awake() && this->LoadFromLua())
+			{
+				return false;
+			}
+			const RpcServiceConfig* rpcServiceConfig =
+				RpcConfig::Inst()->GetConfig(this->GetName());
+			std::vector<const RpcMethodConfig*> methodConfigs;
+			rpcServiceConfig->GetMethodConfigs(methodConfigs);
+			for (const RpcMethodConfig* config : methodConfigs)
+			{
+				if (this->mMethodRegister.GetMethod(config->Method) == nullptr)
+				{
+					LOG_ERROR("not register " << config->FullName);
+					return false;
+				}
+			}
 		}
-		const std::string & name = this->GetName();
-		Lua::LuaModule* luaModule = luaScriptComponent->LoadModule(name);
-		if (luaModule != nullptr && !luaModule->Awake() && this->LoadFromLua())
-		{
-			return false;
-		}
-
-        const RpcServiceConfig * rpcServiceConfig =
-			RpcConfig::Inst()->GetConfig(this->GetName());
-        std::vector<const RpcMethodConfig *> methodConfigs;
-        rpcServiceConfig->GetMethodConfigs(methodConfigs);
-        for(const RpcMethodConfig * config : methodConfigs)
-        {
-            if(this->mMethodRegister.GetMethod(config->Method) == nullptr)
-            {
-                LOG_ERROR("not register " << config->FullName);
-                return false;
-            }
-        }
-        this->mIsHandlerMessage = true;
 		return true;
 	}
 
-    void PhysicalService::OnRecord(Json::Writer&document)
+    void PhysicalRpcService::OnRecord(Json::Writer&document)
     {    
         document.Add("sum").Add(this->mSumCount);
         document.Add("wait").Add(this->mWaitCount);
     }
 
-    bool PhysicalService::LoadFromLua()
+    bool PhysicalRpcService::LoadFromLua()
 	{
 		LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();       
         if (luaScriptComponent == nullptr)
@@ -169,7 +163,7 @@ namespace Sentry
 		return true;
 	}
 
-	bool PhysicalService::Close()
+	bool PhysicalRpcService::Close()
     {
 		if (!this->IsStartService())
         {

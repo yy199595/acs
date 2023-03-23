@@ -94,6 +94,13 @@ enum HttpMethodType
     UNKNOW
 };
 
+namespace HttpContentType
+{
+	constexpr char * JSON = "application/json";
+	constexpr char * HTML = "text/html";
+	constexpr char * STRING = "text/plain";
+}
+
 #define HttpVersion "HTTP/1.0"
 
 #endif

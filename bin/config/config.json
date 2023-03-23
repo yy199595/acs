@@ -10,6 +10,7 @@
     },
     "path": {
         "proto": "proto",
+        "html": "www/html",
         "sqlite": "data/sqlite/",
         "db": "config/db/db.json",
         "code": "XCode/XCode.csv",

@@ -11,7 +11,7 @@
 
 namespace Sentry
 {
-	class NodeMgrComponent final : public Component, public IComplete
+	class NodeMgrComponent final : public Component
     {
     public:
         NodeMgrComponent() = default;
@@ -24,22 +24,14 @@ namespace Sentry
 	 public:
 		bool DelUnit(long long id);
         bool DelServer(const std::string& server, long long id);
-        bool AddRpcServer(const std::string& server, long long id, const std::string& address);		
-	 public:
-		bool LateAwake() final;
-		void OnLocalComplete() final;
-    private:
-        void PingRegistryServer();
+        bool AddRpcServer(const std::string& server, long long id, const std::string& address);
     public:
 		bool GetServers(std::vector<std::string> & hosts);
-        bool GetRegistryAddress(std::string& address) const;
         bool GetServer(const std::string & name, std::string & address);
 		bool GetServers(const std::string & name, std::vector<std::string> & hosts);
         bool GetServer(const std::string & name, long long userId, std::string & address);
 		bool GetServer(long long userId, std::unordered_map<std::string, std::string> & servers);
 	 private:
-        size_t mIndex;
-		std::vector<std::string> mRegistryAddress;
         std::unordered_map<std::string, std::vector<std::string>> mRpcServers;
         std::unordered_map<long long, std::unique_ptr<LocationUnit>> mUnitLocations;
     };

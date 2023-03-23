@@ -8,8 +8,8 @@
 #include"System/System.h"
 #include"Config/ClusterConfig.h"
 #include"Service/VirtualService.h"
-#include"Service/LuaPhysicalService.h"
-#include"Service/PhysicalService.h"
+#include"Service/LuaPhysicalRpcService.h"
+#include"Service/PhysicalRpcService.h"
 #include"Service/LocalHttpService.h"
 #include"Service/LuaHttpService.h"
 #include"Component/NodeMgrComponent.h"
@@ -57,7 +57,7 @@ namespace Sentry
                     {
                         if (!this->mApp->AddComponent(name))
                         {
-                            std::unique_ptr<Component> component(new LuaPhysicalService());
+                            std::unique_ptr<Component> component(new LuaPhysicalRpcService());
                             if (!this->mApp->AddComponent(name, std::move(component)))
                             {
                                 LOG_ERROR("add physical service [" << name << "] error");
@@ -156,11 +156,11 @@ namespace Sentry
     }
 	bool LaunchComponent::LateAwake()
 	{
-		std::vector<RpcService *> rpcServices;
-		this->mApp->GetComponents(rpcServices);
-		for(RpcService * rpcService : rpcServices)
+		std::vector<IServiceBase *> allServices;
+		this->mApp->GetComponents(allServices);
+		for(IServiceBase * service : allServices)
 		{
-			if(!rpcService->Init())
+			if(!service->Init())
 			{
 				return false;
 			}

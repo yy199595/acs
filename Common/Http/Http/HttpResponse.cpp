@@ -62,15 +62,26 @@ namespace Http
     void Response::Str(HttpStatus code, const std::string &str)
     {
         this->mCode = (int)code;
-        this->mContent.append(str.c_str(), str.size());
-    }
+        this->mContent.assign(str.c_str(), str.size());
+		this->mHead.Add("content-type", HttpContentType::STRING);
+		this->mHead.Add("content-length", (int)this->mContent.size());
+	}
 
     void Response::Json(HttpStatus code, Json::Writer& doc)
     {
         this->mCode = (int)code;
         doc.WriterStream(&mContent);
-        this->mHead.Add("content-type", "application/json");
-    }
+        this->mHead.Add("content-type", HttpContentType::JSON);
+		this->mHead.Add("content-length", (int)this->mContent.size());
+	}
+
+	void Response::Html(HttpStatus code, const std::string& html)
+	{
+		this->mCode = (int)code;
+		this->mContent.assign(html);
+		this->mHead.Add("content-type", HttpContentType::HTML);
+		this->mHead.Add("content-length", (int)this->mContent.size());
+	}
 
     void Response::Json(HttpStatus code, const std::string &json)
     {
@@ -80,7 +91,8 @@ namespace Http
     void Response::Json(HttpStatus code, const char *str, size_t len)
     {
         this->mCode = (int)code;
-        this->mContent.append(str, len);
-        this->mHead.Add("content-type", "application/json");
-    }
+        this->mContent.assign(str, len);
+        this->mHead.Add("content-type", HttpContentType::JSON);
+		this->mHead.Add("content-length", (int)this->mContent.size());
+	}
 }

@@ -6,10 +6,10 @@
 #define SERVER_MONGOSERVICE_H
 #include"Message/db.pb.h"
 #include"Client/MongoProto.h"
-#include"Service/PhysicalService.h"
+#include"Service/PhysicalRpcService.h"
 namespace Sentry
 {
-    class MongoDB final : public PhysicalService
+    class MongoDB final : public PhysicalRpcService
 	{
 	public:
 		MongoDB();

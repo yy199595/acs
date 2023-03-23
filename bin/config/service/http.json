@@ -14,6 +14,11 @@
 		}
 	},
 	"ServerWeb": {
+		"Main": {
+			"Type": "GET",
+			"Async": false,
+			"Path": "/"
+		},
 		"Info": {
 			"Type": "GET",
 			"Async": true,

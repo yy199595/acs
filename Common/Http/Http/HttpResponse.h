@@ -21,12 +21,13 @@ namespace Http
         int OnWrite(std::ostream &buffer) final;
         int Serailize(std::ostream & buffer) final;
     public:
-        void SetCode(HttpStatus code) { this->mCode = (int)code;}
-        void Str(HttpStatus code, const std::string & str);
+		void Str(HttpStatus code, const std::string & str);
         void Json(HttpStatus code, Json::Writer & doc);
-        void Json(HttpStatus code, const std::string & json);
+		void Html(HttpStatus code, const std::string & html);
+		void Json(HttpStatus code, const std::string & json);
         void Json(HttpStatus code, const char * str, size_t len);
-    public:
+		void SetCode(HttpStatus code) { this->mCode = (int)code;}
+	public:
         Head & Header() { return this->mHead; }
         HttpStatus Code() const { return (HttpStatus)this->mCode; }
         const std::string & GetError() const { return this->mError; }

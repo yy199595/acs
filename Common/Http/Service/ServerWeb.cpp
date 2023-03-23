@@ -8,12 +8,32 @@
 #include"Service/Node.h"
 #include"Service/Registry.h"
 #include"Config/ClusterConfig.h"
+#include"File/DirectoryHelper.h"
+#include"File/FileHelper.h"
 #include"Component/NodeMgrComponent.h"
 namespace Sentry
 {
+	bool ServerWeb::Awake()
+	{
+		std::string directory;
+		std::vector<std::string> files;
+		const ServerConfig * config = ServerConfig::Inst();
+		LOG_CHECK_RET_FALSE(config->GetPath("html", directory));
+		Helper::Directory::GetFilePaths(directory, "*.html", files);
+		for(const std::string & path : files)
+		{
+			std::string fileName, content;
+			Helper::File::ReadTxtFile(path, content);
+			Helper::Directory::GetFileName(path, fileName);
+			this->mHtmls.emplace(fileName, content);
+		}
+		return true;
+	}
+
     bool ServerWeb::OnInit()
 	{
 		HttpServiceRegister& registry = this->GetRegister();
+		registry.Bind("Main", &ServerWeb::Main);
 		registry.Bind("Info", &ServerWeb::Info);
 		registry.Bind("Ping", &ServerWeb::Ping);
 		registry.Bind("Hello", &ServerWeb::Hello);
@@ -21,6 +41,17 @@ namespace Sentry
 		registry.Bind("Hotfix", &ServerWeb::Hotfix);
 		registry.Bind("DownLoad", &ServerWeb::DownLoad);
 		return true;
+	}
+
+	int ServerWeb::Main(const Http::Request& request, Http::Response& response)
+	{
+		auto iter = this->mHtmls.find("index.html");
+		if(iter == this->mHtmls.end())
+		{
+			return XCode::Failure;
+		}
+		response.Html(HttpStatus::OK, iter->second);
+		return XCode::Successful;
 	}
 
 	int ServerWeb::Ping(const Http::Request &request, Http::Response &response)
@@ -71,17 +102,17 @@ namespace Sentry
 	int ServerWeb::Info(Json::Writer&response)
     {
 		std::string address;
-		Node * innerService = this->GetComponent<Node>();
+		Node * node = this->GetComponent<Node>();
+		RpcService* rpcService = this->mApp->GetService<Registry>();
 		NodeMgrComponent * locationComponent = this->GetComponent<NodeMgrComponent>();
-		if (!locationComponent->GetRegistryAddress(address))
+		if(!locationComponent->GetServer(rpcService->GetServer(), address))
 		{
 			response.Add("error").Add("not find registry server address");
-			return XCode::NetWorkError;
+			return XCode::AddressAllotFailure;
 		}
 
 		com::type::string message;
 		const std::string func("Query");
-		RpcService* rpcService = this->mApp->GetService<Registry>();
 		std::shared_ptr<s2s::server::list> list = std::make_shared<s2s::server::list>();
 		int code = rpcService->Call(address, func, message, list);
 		if(code != XCode::Successful)
@@ -93,8 +124,9 @@ namespace Sentry
 		for (int index = 0; index < list->list_size(); index++)
 		{
 			const s2s::server::info& info = list->list(index);
-			std::shared_ptr<com::type::string> resp = std::make_shared<com::type::string>();
-			int code = innerService->Call(info.rpc(), method, resp);
+			std::shared_ptr<com::type::string> resp =
+				std::make_shared<com::type::string>();
+			int code = node->Call(info.rpc(), method, resp);
 			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
 			if (code == XCode::Successful)
 			{

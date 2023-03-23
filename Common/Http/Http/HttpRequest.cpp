@@ -76,7 +76,8 @@ namespace Http
 {
     bool GetRequest::OnReadContent(std::istream &buffer)
     {
-        size_t pos = this->mUrl.find("?");
+		this->mPath = this->mUrl;
+        size_t pos = this->mUrl.find('?');
         if (pos != std::string::npos)
         {
             std::vector<std::string> result;
@@ -95,10 +96,6 @@ namespace Http
                     }
                 }
             }
-        }
-        else
-        {
-            this->mPath = this->mUrl;
         }
         return true;
     }

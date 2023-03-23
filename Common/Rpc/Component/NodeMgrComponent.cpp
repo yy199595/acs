@@ -3,9 +3,8 @@
 //
 
 #include"NodeMgrComponent.h"
-#include"Config/ServerConfig.h"
-#include"Service/Registry.h"
 #include"Math/MathHelper.h"
+#include"Service/Registry.h"
 #include"Config/ClusterConfig.h"
 #include"Component/AsyncMgrComponent.h"
 #include"App/App.h"
@@ -14,11 +13,10 @@ namespace Sentry
 {
     void NodeMgrComponent::AddRpcServer(const std::string& name, const std::string& address)
     {
+		LOG_CHECK_RET(!address.empty());
 		const NodeConfig* config = ClusterConfig::Inst()->GetConfig(name);
-        if(address.empty() || config == nullptr)
-        {
-            return;
-        }
+		LOG_CHECK_LOG_RET(config != nullptr, "not find cluster config " << name);
+
 		auto iter = this->mRpcServers.find(name);
 		if(iter == this->mRpcServers.end())
 		{
@@ -31,14 +29,6 @@ namespace Sentry
             locations.emplace_back(address);
             LOG_WARN(name << " add rpc server address [" << address << "]");
         }
-		if (config->HasService(ComponentFactory::GetName<Registry>()))
-		{
-			if (std::find(this->mRegistryAddress.begin(),
-				this->mRegistryAddress.end(), address) == this->mRegistryAddress.end())
-			{
-				this->mRegistryAddress.push_back(address);
-			}
-		}
     }
 
 	void NodeMgrComponent::WaitServerStart(const std::string& server)
@@ -110,16 +100,6 @@ namespace Sentry
 			}
 		}
 		return !hosts.empty();
-	}
-
-	bool NodeMgrComponent::GetRegistryAddress(std::string& address) const
-	{
-		if (this->mIndex >= this->mRegistryAddress.size())
-		{
-			return false;
-		}
-		address = this->mRegistryAddress[this->mIndex];
-		return true;
 	}
 
 	bool NodeMgrComponent::GetServers(const std::string& server, std::vector<std::string>& hosts)
@@ -220,67 +200,6 @@ namespace Sentry
 		}		
 		localUnit->Add(server, address);
 		return true;
-	}
-
-	bool NodeMgrComponent::LateAwake()
-	{
-		this->mIndex = 0;
-		const ServerConfig * config = ServerConfig::Inst();
-		LOG_CHECK_RET_FALSE(config->GetMember("registry", this->mRegistryAddress));
-		return true;
-	}
-
-	void NodeMgrComponent::OnLocalComplete()
-	{
-		const std::string func("Register");
-		const ServerConfig* config = ServerConfig::Inst();
-		RpcService* rpcService = this->mApp->GetService<Registry>();
-		AsyncMgrComponent* taskComponent = this->GetComponent<AsyncMgrComponent>();
-		while (true)
-		{
-			for (size_t index = 0; index < this->mRegistryAddress.size(); index++)
-			{
-				s2s::server::info message;
-				{
-					message.set_name(config->Name());
-					config->GetLocation("rpc", *message.mutable_rpc());
-					config->GetLocation("http", *message.mutable_http());
-				}
-				const std::string& address = this->mRegistryAddress[index];
-#ifdef __DEBUG__
-				LOG_INFO("start register to [" << address << "]");
-#endif
-				int code = rpcService->Call(address, func, message);
-				if (code != XCode::Successful)
-				{
-					this->mIndex++;
-					LOG_ERROR("register to [" << address << "] " << CodeConfig::Inst()->GetDesc(code));
-					continue;
-				}				
-				LOG_INFO("register to [" << address << "] successful");
-				this->AddRpcServer(rpcService->GetServer(), address);
-				return;
-			}
-		}
-	}
-	void NodeMgrComponent::PingRegistryServer()
-	{
-		const std::string func("Ping");
-		RpcService* rpcService = this->mApp->GetService<Registry>();
-		AsyncMgrComponent* taskComponent = this->GetComponent<AsyncMgrComponent>();
-		while (this->mIndex < this->mRegistryAddress.size())
-		{
-			taskComponent->Sleep(10 * 1000);
-			const std::string& address = this->mRegistryAddress[this->mIndex];
-			if (rpcService->Call(address, func) == XCode::Successful)
-			{
-				//CONSOLE_LOG_INFO("ping registry server [" << address << "] successful");
-			}
-			else
-			{
-				this->mIndex = 0;
-			}
-		}			
 	}
 
     bool NodeMgrComponent::GetServer(long long int userId, std::unordered_map<std::string, std::string> &servers)
