@@ -40,8 +40,7 @@
         },
         "Register": {
             "Async": true,
-            "Request": "com.array.string",
-            "Response": "s2s.server.list"
+            "Request": "s2s.server.info"
         },
         "UnRegister": {
             "Async": true,

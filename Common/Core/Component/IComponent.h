@@ -110,7 +110,7 @@ namespace Sentry
 	class IService : public IServiceBase
 	{
 	public:
-		virtual int Invoke(const std::string&, std::shared_ptr<T1>, std::shared_ptr<T2>) = 0;
+		virtual int Invoke(const std::string&, const std::shared_ptr<T1> &, std::shared_ptr<T2> &) = 0;
 	};
 
 	template<typename T>

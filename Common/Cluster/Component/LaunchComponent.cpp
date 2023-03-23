@@ -7,11 +7,11 @@
 #include"File/FileHelper.h"
 #include"System/System.h"
 #include"Config/ClusterConfig.h"
-#include"Service/VirtualService.h"
+#include"Service/VirtualRpcService.h"
 #include"Service/LuaPhysicalRpcService.h"
 #include"Service/PhysicalRpcService.h"
-#include"Service/LocalHttpService.h"
-#include"Service/LuaHttpService.h"
+#include"Service/HttpService.h"
+#include"Service/LuaPhysicalHttpService.h"
 #include"Component/NodeMgrComponent.h"
 #include"Component/LuaScriptComponent.h"
 namespace Sentry
@@ -67,7 +67,7 @@ namespace Sentry
                     }
                     else //创建虚拟服务
                     {
-                        std::unique_ptr<Component> component(new VirtualService());
+                        std::unique_ptr<Component> component(new VirtualRpcService());
                         if (!this->mApp->AddComponent(name, std::move(component)))
                         {
                             LOG_ERROR("add virtual service [" << name << "] error");
@@ -79,7 +79,7 @@ namespace Sentry
                 {
                     if (!this->mApp->AddComponent(name))
                     {
-                        std::unique_ptr<Component> component(new LuaHttpService());
+                        std::unique_ptr<Component> component(new LuaPhysicalHttpService());
                         if (!this->mApp->AddComponent(name, std::move(component)))
                         {
                             LOG_ERROR("add http service [" << name << "] error");

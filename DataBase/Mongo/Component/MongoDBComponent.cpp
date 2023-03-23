@@ -95,7 +95,7 @@ namespace Sentry
     }
 
 	std::shared_ptr<Mongo::CommandResponse> MongoDBComponent::Run(
-        TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request)
+        TcpMongoClient * mongoClient, const std::shared_ptr<CommandRequest>& request)
 	{
         this->mWaitCount++;
 		if(request->collectionName.empty())

@@ -97,9 +97,13 @@ namespace Sentry
 		{
 			const std::string& name = this->GetName();
 			Lua::LuaModule* luaModule = luaScriptComponent->LoadModule(name);
-			if (luaModule != nullptr && !luaModule->Awake() && this->LoadFromLua())
+			if (luaModule != nullptr)
 			{
-				return false;
+				if(!this->LoadFromLua())
+				{
+					LOG_ERROR("lua rpc module [" << name << "] LoadFromLua");
+					return false;
+				}
 			}
 			const RpcServiceConfig* rpcServiceConfig =
 				RpcConfig::Inst()->GetConfig(this->GetName());

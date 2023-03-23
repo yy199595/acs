@@ -28,6 +28,7 @@ namespace Tcp
 		constexpr int Json = 1;
 		constexpr int String = 2;
 		constexpr int Protobuf = 3;
+		constexpr int MemoryBind = 4;
 		constexpr int Max = 255;
     };
 }

@@ -1,5 +1,12 @@
 cmake_minimum_required(VERSION 3.1.3)
 
+find_program(CLANG_EXECUTABLE clang)
+#if(CLANG_EXECUTABLE)
+#    message("当前使用编译器为clang")
+#    set(CMAKE_C_COMPILER ${CLANG_EXECUTABLE})
+#    set(CMAKE_CXX_COMPILER ${CLANG_EXECUTABLE})
+#endif()
+
 PROJECT(app)
 set(CMAKE_CXX_STANDARD 14)
 include(CMake/define.cmake)
@@ -8,6 +15,7 @@ include(CMake/function.cmake)
 if(APPLE)
     include(CMake/proto.cmake)
 endif()
+
 message(${CMAKE_BINARY_DIR})
 
 set(ContextPath ${CMAKE_CURRENT_SOURCE_DIR}/Common/Async/Coroutine/Context)

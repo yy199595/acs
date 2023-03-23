@@ -45,7 +45,7 @@ namespace Sentry
         TcpMongoClient * GetClient(int index = -1);
 		unsigned int GetWaitCount() const { return this->mWaitCount; }
         void Send(TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request);
-		std::shared_ptr<Mongo::CommandResponse> Run(TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request);
+		std::shared_ptr<Mongo::CommandResponse> Run(TcpMongoClient * mongoClient, const std::shared_ptr<CommandRequest>& request);
 	 private:
 		void OnConnectSuccessful(const std::string &address) final;
 		void OnMessage(std::shared_ptr<CommandResponse> message) final;

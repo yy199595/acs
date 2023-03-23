@@ -21,14 +21,13 @@ local CallMongo = function()
 end
 local players = {}
 function Main.Start()
-    local accounts = require("Player.Account")
+    local accounts = require("Player.ClientAccount")
     for _, account in ipairs(accounts) do
         local player = Player.New(account.account, account.passwd, account.phoneNum)
         table.insert(players, player)
     end
 
     for _, player in ipairs(players) do
-        player:Login()
         coroutine.start(player.Login, player)
     end
     return true

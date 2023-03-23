@@ -144,9 +144,16 @@ namespace Sentry
 		Helper::Directory::GetFileName(path, name);
 		std::unique_ptr<Lua::LuaModule> luaModule =
 			std::make_unique<Lua::LuaModule>(this->mLuaEnv, name, path);
+		if(!luaModule->Awake())
+		{
+			LOG_ERROR("load lua module [" << name << "] error");
+			return nullptr;
+		}
 		Lua::LuaModule * result = luaModule.get();
 		{
 			const std::string moduleName = name.substr(0, name.find('.'));
+
+			LOG_INFO("start load lua module [" << moduleName << "]");
 			this->mModules.emplace(moduleName, std::move(luaModule));
 		}
 		return result;
@@ -234,8 +241,7 @@ namespace Sentry
 		if (config->GetLuaConfig("main", main))
 		{
 			main = System::FormatPath(main);
-			LuaModule* luaModule = this->LoadModuleByPath(main);
-			return luaModule != nullptr && luaModule->Awake();
+			return this->LoadModuleByPath(main) != nullptr;
 		}
 		return true;
 	}
@@ -271,11 +277,13 @@ namespace Sentry
             IServiceBase * service = component->Cast<IServiceBase>();
             if (service != nullptr && this->GetModule(name) == nullptr)
             {
-                Lua::LuaModule * luaModule = this->LoadModule(component->GetName());
-                if(luaModule != nullptr && !luaModule->Awake())
-                {
-                    LOG_ERROR("load lua module [" << name << "failure");
-                }
+				if(this->mModulePaths.count(name) != 0)
+				{
+					if(!this->LoadModule(component->GetName()))
+					{
+						LOG_ERROR("load lua module [" << name << "failure");
+					}
+				}
             }
         }
         

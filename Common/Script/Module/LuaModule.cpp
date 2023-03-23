@@ -38,6 +38,7 @@ namespace Lua
 		}
 		if(!lua_istable(this->mLua, -1))
 		{
+			LOG_ERROR(this->mName << " is not return lua table");
 			return false;
 		}
 		std::ifstream fs(this->mPath, std::ios::in);

@@ -16,10 +16,6 @@ function AccountService.Register(requestInfo, response)
     assert(requestInfo.phone_num, "register phone number is nil")
 
     local account = requestInfo.account
-    if RedisClient.Run( "HEXISTS", "user", account) == 1 then
-        response.error = "账号已经存在"
-        return XCode.AccountAlreadyExists
-    end
     local userInfo = Mongo.QueryOnce(tabName, {
         _id = requestInfo.account
     })
@@ -29,7 +25,8 @@ function AccountService.Register(requestInfo, response)
         return XCode.AccountAlreadyExists
     end
     local nowTime = os.time()
-    local user_id = RedisClient.AddCounter("user_id")
+    local user_id = Guid.Create()
+    Log.Info(string.format("start register account %s", account))
     local str = string.format("%s%d%d", requestInfo.address, nowTime, user_id)
 
     requestInfo.login_time = 0
@@ -39,7 +36,13 @@ function AccountService.Register(requestInfo, response)
     requestInfo.token = Md5.ToString(str)
     RedisClient.Run("HSET", "user", account, requestInfo)
     Log.Info("register account : ", rapidjson.encode(requestInfo))
-    return Mongo.InsertOnce(tabName, requestInfo, requestInfo.user_id)
+    if Mongo.InsertOnce(tabName, requestInfo, requestInfo.user_id) == XCode.Successful then
+        Log.Warn("注册账号", account, "成功, 玩家id=", user_id)
+        return XCode.Successful
+    end
+    response.error = "保存数据到mongodb失败"
+    Log.Error("保存数据到mongodb失败，注册失败")
+    return XCode.Failure
 end
 
 function AccountService.Login(request, response)
@@ -50,7 +53,6 @@ function AccountService.Login(request, response)
     local userInfo = Mongo.QueryOnce(tabName, {
         _id = request.account
     })
-    table.print(userInfo)
     if userInfo == nil or request.password ~= userInfo.password then
         response.error = "账号不存在或者密码错误"
         return XCode.Failure
@@ -63,9 +65,10 @@ function AccountService.Login(request, response)
         response.error = "分配网关失败"
         return XCode.AllotUser
     end
+    response.data = data
     Mongo.Update(tabName, { _id = request.account },
                 {  last_login_time = os.time(),  token = response.token }, userInfo.user_id)
-    response.data = data
+    Log.Warn(string.format("玩家%s登录成功,玩家id=%d", request.account, userInfo.user_id))
     return XCode.Successful
 end
 

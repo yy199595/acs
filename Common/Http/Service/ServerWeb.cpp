@@ -25,7 +25,7 @@ namespace Sentry
 			std::string fileName, content;
 			Helper::File::ReadTxtFile(path, content);
 			Helper::Directory::GetFileName(path, fileName);
-			this->mHtmls.emplace(fileName, content);
+			this->mHtmlFiles.emplace(fileName, content);
 		}
 		return true;
 	}
@@ -45,8 +45,8 @@ namespace Sentry
 
 	int ServerWeb::Main(const Http::Request& request, Http::Response& response)
 	{
-		auto iter = this->mHtmls.find("index.html");
-		if(iter == this->mHtmls.end())
+		auto iter = this->mHtmlFiles.find("index.html");
+		if(iter == this->mHtmlFiles.end())
 		{
 			return XCode::Failure;
 		}

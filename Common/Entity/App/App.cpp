@@ -3,7 +3,7 @@
 #include"System/System.h"
 #include"Timer/ElapsedTimer.h"
 #include"File/DirectoryHelper.h"
-#include"Service/VirtualService.h"
+#include"Service/VirtualRpcService.h"
 #include"Component/ProtoComponent.h"
 #include"Component/NodeMgrComponent.h"
 #include"Component/TextConfigComponent.h"
@@ -218,9 +218,9 @@ namespace Sentry
 		if(locationComponent != nullptr)
 		{
 			std::unordered_set<std::string> services;
-			std::vector<VirtualService *> allVirtualServices;
-			this->GetComponents<VirtualService>(allVirtualServices);
-			for(const VirtualService * service : allVirtualServices)
+			std::vector<VirtualRpcService *> allVirtualServices;
+			this->GetComponents<VirtualRpcService>(allVirtualServices);
+			for(const VirtualRpcService * service : allVirtualServices)
 			{
 				const std::string & server = service->GetServer();
 				if(services.find(server) == services.end())

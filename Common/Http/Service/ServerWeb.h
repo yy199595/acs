@@ -4,10 +4,10 @@
 
 #ifndef APP_SERVERWEB_H
 #define APP_SERVERWEB_H
-#include"LocalHttpService.h"
+#include"PhysicalHttpService.h"
 namespace Sentry
 {
-    class ServerWeb : public LocalHttpService
+    class ServerWeb : public PhysicalHttpService
     {
     public:
         ServerWeb() = default;
@@ -24,7 +24,7 @@ namespace Sentry
 		int DownLoad(const Http::Request& request, Http::Response& response);
 		int Sleep(const Json::Reader & request, Json::Writer& response);
 	private:
-		std::unordered_map<std::string, std::string> mHtmls;
+		std::unordered_map<std::string, std::string> mHtmlFiles;
     };
 }
 

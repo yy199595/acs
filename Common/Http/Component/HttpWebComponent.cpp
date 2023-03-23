@@ -7,7 +7,7 @@
 #include"Config/CodeConfig.h"
 #include"Config/ServiceConfig.h"
 #include"Client/HttpHandlerClient.h"
-#include"Service/LocalHttpService.h"
+#include"Service/HttpService.h"
 #include"Component/ThreadComponent.h"
 namespace Sentry
 {
@@ -20,7 +20,7 @@ namespace Sentry
     bool HttpWebComponent::LateAwake()
     {
         this->mWaitCount = 0;
-        std::vector<LocalHttpService *> httpServices;
+        std::vector<HttpService *> httpServices;
         this->mTaskComponent = this->mApp->GetTaskComponent();
         return this->mApp->GetComponents(httpServices) && this->StartListen("http");
     }
@@ -56,7 +56,7 @@ namespace Sentry
     {
 		this->mSumCount++;
         this->mWaitCount++;
-        LocalHttpService* httpService = this->GetComponent<LocalHttpService>(config->Service);
+        HttpService* httpService = this->GetComponent<HttpService>(config->Service);
         if (httpService == nullptr || !httpService->IsStartService())
         {           
             this->Send(address, HttpStatus::NOT_FOUND);

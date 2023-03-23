@@ -5,9 +5,7 @@ function MongoComponent.InsertOnce(tab, data, flag)
     if type(data) == "table" then
         data = rapidjson.encode(data)
     end
-    if flag == nil then
-        flag = type(tab._id) == "number" and tab._id or 0
-    end
+    assert(type(flag) == "number")
     local address = Service.AllotServer("MongoDB")
     return Service.Call(address, "MongoDB.Insert", {
         tab = tab,
@@ -21,9 +19,7 @@ function MongoComponent.Delete(tab, data, limit, flag)
         data = rapidjson.encode(data)
     end
     assert(type(data) == "string")
-    if flag == nil then
-        flag = type(tab._id) == "number" and tab._id or 0
-    end
+    assert(type(flag) == "number")
     local address = Service.AllotServer("MongoDB")
     return Service.Call(address, "MongoDB.Delete", {
         tab = tab,
@@ -35,7 +31,7 @@ end
 
 function MongoComponent.ClearTable(tab)
     assert(type(tab) == "string")
-    return this.Delete(tab, {}, 0) == XCode.Successful
+    return this.Delete(tab, {}, 0, 0) == XCode.Successful
 end
 
 function MongoComponent.QueryOnce(tab, data)
@@ -119,18 +115,17 @@ function MongoComponent.SetIndex(tab, name)
     })
 end
 
-function MongoComponent.Update(tab, select, update, tag, flag)
+function MongoComponent.Update(tab, select, update, flag, tag)
     if type(select) == "table" then
         select = rapidjson.encode(select)
     end
+
     if type(update) == "table" then
         update = rapidjson.encode(update)
     end
+    assert(type(flag) == "number")
     assert(type(select) == "string")
     assert(type(update) == "string")
-    if flag == nil then
-        flag = type(tab._id) == "number" and tab._id or 0
-    end
     local address = Service.AllotServer("MongoDB")
     return Service.Call(address, "MongoDB.Update", {
         tab = tab,
@@ -141,8 +136,8 @@ function MongoComponent.Update(tab, select, update, tag, flag)
     })
 end
 
-function MongoComponent.Push(tab, select, update)
-    return this.Update(tab, select, update, "$push")
+function MongoComponent.Push(tab, select, update, flag)
+    return this.Update(tab, select, update, flag,"$push")
 end
 
 return MongoComponent
