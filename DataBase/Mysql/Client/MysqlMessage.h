@@ -45,12 +45,20 @@ namespace Mysql
 	 public:
         ICommand() : mTaskId(0) { }
 		virtual ~ICommand() { }
+		virtual void GetSql(std::string & sql) { }
         virtual bool Invoke(MYSQL *, std::shared_ptr<Response> & response) = 0;
 	public:
 		int GetRpcId() const { return this->mTaskId; }
 		void SetRpcId(int id) { this->mTaskId = id;}
 	private:
 		int mTaskId;
+	};
+
+	class StopCommand : public ICommand
+	{
+	public:
+		using ICommand::ICommand;
+		bool Invoke(MYSQL *, std::shared_ptr<Response> & response) final { return false; }
 	};
 
     class PingCommand : public ICommand
@@ -64,6 +72,7 @@ namespace Mysql
 	{
 	 public:
         explicit SqlCommand(const std::string & sql);
+		void GetSql(std::string &sql) final { sql = this->mSql; }
 		bool Invoke(MYSQL *, std::shared_ptr<Response> & response) final;
 	private:
         const std::string mSql;
@@ -73,6 +82,7 @@ namespace Mysql
     {
     public:
         explicit QueryCommand(const std::string & sql);
+		void GetSql(std::string &sql) final { sql = this->mSql; }
 		bool Invoke(MYSQL *, std::shared_ptr<Response> & response) final;
 	private:
         static bool Write(Json::Writer & document, st_mysql_field * filed, const char * str, int len);

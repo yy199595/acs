@@ -35,7 +35,7 @@ namespace Mongo
         MongoRequest(int opcode);
 
     public:
-        int Serailize(std::ostream &os) final;
+        int Serialize(std::ostream &os) final;
     protected:
         virtual int GetLength() = 0;
 

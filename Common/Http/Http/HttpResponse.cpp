@@ -12,7 +12,7 @@ namespace Http
         this->mParseState = DecodeState::None;
     }
 
-    int Response::Serailize(std::ostream &buffer)
+    int Response::Serialize(std::ostream &buffer)
     {
         return this->OnWrite(buffer);
     }

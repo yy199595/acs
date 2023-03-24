@@ -51,7 +51,7 @@ namespace Rpc
     public:
         bool ParseLen(std::istream &os, int & len);
 
-        int Serailize(std::ostream &os) final;
+        int Serialize(std::ostream &os) final;
 
         bool Parse(const std::string & address, std::istream &os, size_t size);
 

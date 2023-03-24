@@ -14,7 +14,7 @@ namespace Mongo
 		this->header.messageLength = 0;
 	}
 
-	int MongoRequest::Serailize(std::ostream& os)
+	int MongoRequest::Serialize(std::ostream& os)
 	{
 		int len = this->GetLength() + sizeof(MongoHead);
 		this->Write(os, len);

@@ -15,10 +15,11 @@ namespace Http
     class Request : public IStream, public Tcp::ProtoMessage
     {
     public:
-        Request(const char * method);
+        explicit Request(const char * method, const std::string & from);
     public:
         inline const Head & Header() const { return this->mHead; }
-        inline const std::string & Method() const { return this->mMethod; }
+		inline const std::string & From() const { return this->mFrom; }
+		inline const std::string & Method() const { return this->mMethod; }
     public:
         virtual bool WriteLua(lua_State * lua) const = 0;       
         virtual bool WriteDocument(rapidjson::Document * document) const = 0;
@@ -31,7 +32,7 @@ namespace Http
     public:
         bool OnRead(std::istream &buffer) final;
         int OnWrite(std::ostream &buffer) final;
-        int Serailize(std::ostream &os) final;
+        int Serialize(std::ostream &os) final;
     protected:
         virtual bool OnReadContent(std::istream & buffer) = 0;
         virtual int OnWriteContent(std::ostream & buffer) = 0;
@@ -41,8 +42,9 @@ namespace Http
         std::string mHost;
         std::string mPath;
         std::string mPort;
-        DecodeState mState;
-        std::string mVersion;
+		std::string mFrom;
+		DecodeState mState;
+		std::string mVersion;
         std::string mProtocol;
         const std::string mMethod;
     };
@@ -54,7 +56,8 @@ namespace Http
     class GetRequest : public Request
     {
     public:
-        GetRequest() :Request("GET") { }
+		GetRequest(): Request("GET", "") { }
+		GetRequest(const std::string & from) :Request("GET", from) { }
     protected:
         bool OnReadContent(std::istream &buffer) final;
         int OnWriteContent(std::ostream &buffer) final;
@@ -74,7 +77,8 @@ namespace Http
     class PostRequest : public Request
     {
     public:
-        PostRequest() : Request("POST") { }
+		PostRequest() : Request("POST", "") { }
+		PostRequest(const std::string & from) : Request("POST", from) { }
     public:
         void Str(const std::string & str);
         void Json(const std::string & json);
@@ -94,7 +98,7 @@ namespace Http
 
 namespace Http
 {
-    extern std::shared_ptr<Request> New(const std::string & method);
+    extern std::shared_ptr<Request> New(const std::string & method, const std::string & from);
 }
 
 

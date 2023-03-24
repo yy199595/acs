@@ -7,9 +7,10 @@
 #include <utility>
 #include"Helper/SqlHelper.h"
 #include"Client/MysqlClient.h"
-
 #include"Message/user.pb.h"
 #include"Config/MysqlConfig.h"
+#include"Lua/LuaMysql.h"
+#include"Lua/ClassProxyHelper.h"
 namespace Sentry
 {
     MysqlTask::MysqlTask(int taskId)
@@ -26,20 +27,24 @@ namespace Sentry
 
 namespace Sentry
 {
-	bool MysqlDBComponent::LateAwake()
+
+}
+
+namespace Sentry
+{
+	MysqlDBComponent::MysqlDBComponent()
 	{
 		this->mSqlHelper = std::make_unique<SqlHelper>();
-		this->mProtoComponent = this->mApp->GetMsgComponent();
-		return true;
 	}
 
-    void MysqlDBComponent::CloseClients()
+    void MysqlDBComponent::CloseClient(int id)
     {
-        for(std::unique_ptr<MysqlClient> & mysqlClient : this->mMysqlClients)
-        {
-            mysqlClient->Stop();
-        }
-        this->mMysqlClients.clear();
+		auto iter = this->mMysqlClients.find(id);
+		if(iter != this->mMysqlClients.end())
+		{
+			iter->second->Stop();
+			this->mMysqlClients.erase(iter);
+		}
     }
 
 	void MysqlDBComponent::OnConnectSuccessful(const std::string& address)
@@ -49,32 +54,24 @@ namespace Sentry
 
 	void MysqlDBComponent::OnMessage(std::shared_ptr<Mysql::Response> message)
 	{
-		/*if(!message->IsOk())
+		if(!message->IsOk())
 		{
-			LOG_ERROR("mysql error : " << message->GetError());
-		}*/
+			//LOG_ERROR("mysql error : " << message->GetError());
+		}
 		int key = message->TaskId();
 		this->OnResponse(key, message);
 	}
 
     int MysqlDBComponent::MakeMysqlClient()
     {
-        std::unique_ptr<MysqlClient> mysqlClient
-                = std::make_unique<MysqlClient>(this);
+        std::shared_ptr<MysqlClient> mysqlClient
+                = std::make_shared<MysqlClient>(this);
 
         mysqlClient->Start();
-        this->mClients.push(mysqlClient.get());
-        this->mMysqlClients.emplace_back(std::move(mysqlClient));
-        return (int)this->mMysqlClients.size() - 1;
+		int id = this->mNumberPool.Pop();
+        this->mMysqlClients.emplace(id, std::move(mysqlClient));
+        return id;
     }
-
-	void MysqlDBComponent::OnDestroy()
-	{
-		for(std::unique_ptr<MysqlClient> & mysqlClient : this->mMysqlClients)
-		{
-			mysqlClient->Stop();
-		}
-	}
 
     bool MysqlDBComponent::Ping(int index)
     {
@@ -83,15 +80,24 @@ namespace Sentry
 		return this->Run(index, command)->IsOk();
     }
 
-	std::shared_ptr<Mysql::Response> MysqlDBComponent::Run(std::shared_ptr<Mysql::ICommand> command)
+	void MysqlDBComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
 	{
-		int id = this->mNumerPool.Pop();
+		luaRegister.BeginNewTable("Mysql");
+		luaRegister.PushExtensionFunction("Make", Lua::LuaMysql::Make);
+		luaRegister.PushExtensionFunction("Exec", Lua::LuaMysql::Exec);
+		luaRegister.PushExtensionFunction("Query", Lua::LuaMysql::Query);
+		luaRegister.PushExtensionFunction("QueryOnce", Lua::LuaMysql::QueryOnce);
+	}
+
+	std::shared_ptr<Mysql::Response> MysqlDBComponent::Run(int index, const std::shared_ptr<Mysql::ICommand>& command)
+	{
+		int rpcId = 0;
+		if (!this->Send(index, command, rpcId))
 		{
-			command->SetRpcId(id);
-			this->Send(std::move(command));
+			return nullptr;
 		}
-		std::shared_ptr<MysqlTask> mysqlTask = std::make_shared<MysqlTask>(id);
-		std::shared_ptr<Mysql::Response> response = this->AddTask(id, mysqlTask)->Await();
+		std::shared_ptr<MysqlTask> mysqlTask = std::make_shared<MysqlTask>(rpcId);
+		std::shared_ptr<Mysql::Response> response = this->AddTask(rpcId, mysqlTask)->Await();
 		if (response != nullptr && !response->IsOk())
 		{
 			LOG_ERROR(response->GetError());
@@ -99,53 +105,22 @@ namespace Sentry
 		return response;
 	}
 
-	std::shared_ptr<Mysql::Response> MysqlDBComponent::Run(int index, const std::shared_ptr<Mysql::ICommand>& command)
-    {
-		int id = this->mNumerPool.Pop();
+	bool MysqlDBComponent::Send(int id,  const std::shared_ptr<Mysql::ICommand> & command, int & rpcId)
+	{
+		auto iter = this->mMysqlClients.find(id);
+		if(iter == this->mMysqlClients.end())
 		{
-			command->SetRpcId(id);
-			this->Send(index, command);
+			return false;
 		}
-		std::shared_ptr<MysqlTask> mysqlTask = std::make_shared<MysqlTask>(id);
-		std::shared_ptr<Mysql::Response> response = this->AddTask(id, mysqlTask)->Await();
-		if (response != nullptr && !response->IsOk())
-		{
-			LOG_ERROR(response->GetError());
-		}
-        return response;
-    }
+		rpcId = this->mNumberPool.Pop();
+		command->SetRpcId(rpcId);
+		iter->second->Push(command);
+		return true;
+	}
 
-	bool MysqlDBComponent::Send(int index, std::shared_ptr<Mysql::ICommand> command)
+	bool MysqlDBComponent::Execute(int index, const std::shared_ptr<Mysql::ICommand>& command)
 	{
-		if(this->mMysqlClients.empty())
-		{
-			return false;
-		}
-		int idx = index % (int)this->mMysqlClients.size();
-		MysqlClient* mysqlClient = this->mMysqlClients[idx].get();;
-		{
-			mysqlClient->Push(std::move(command));
-		}
-		return true;
-	}
-	bool MysqlDBComponent::Send(std::shared_ptr<Mysql::ICommand> command)
-	{
-		if(this->mMysqlClients.empty())
-		{
-			return false;
-		}
-		MysqlClient* mysqlClient = this->mClients.front();
-		{
-			this->mClients.pop();
-			this->mClients.push(mysqlClient);
-		}
-		mysqlClient->Push(std::move(command));
-		return true;
-	}
-	bool MysqlDBComponent::Execute(int index, std::shared_ptr<Mysql::ICommand> command)
-	{
-		std::shared_ptr<Mysql::Response> response =
-			this->Run(index, std::move(command));
+		std::shared_ptr<Mysql::Response> response = this->Run(index, command);
 		return response != nullptr && response->IsOk();
 	}
 }

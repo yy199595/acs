@@ -14,7 +14,7 @@ namespace Sentry
 	 public:
 		void Add(const std::string & content);
 		void Add(const char * str, size_t size);
-		int Serailize(std::ostream & os) final; //返回剩余要发送的字节数
+		int Serialize(std::ostream & os) final; //返回剩余要发送的字节数
 	 private:
 		std::list<std::string> mContents;
 	};

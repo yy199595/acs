@@ -11,24 +11,29 @@ namespace Sentry
 		this->mProtoComponent = nullptr;
 	}
 
-	void MysqlDB::Init()
+	bool MysqlDB::OnInit()
 	{
+		BIND_COMMON_RPC_METHOD(MysqlDB::Add);
+		BIND_COMMON_RPC_METHOD(MysqlDB::Save);
+		BIND_COMMON_RPC_METHOD(MysqlDB::Query);
+		BIND_COMMON_RPC_METHOD(MysqlDB::Update);
+		BIND_COMMON_RPC_METHOD(MysqlDB::Delete);
+		BIND_COMMON_RPC_METHOD(MysqlDB::Create);
 		this->mApp->AddComponent<MysqlDBComponent>();
+		return true;
 	}
 
 	bool MysqlDB::OnStart()
     {
-        BIND_COMMON_RPC_METHOD(MysqlDB::Add);
-        BIND_COMMON_RPC_METHOD(MysqlDB::Save);
-        BIND_COMMON_RPC_METHOD(MysqlDB::Query);
-        BIND_COMMON_RPC_METHOD(MysqlDB::Update);
-        BIND_COMMON_RPC_METHOD(MysqlDB::Delete);
-        BIND_COMMON_RPC_METHOD(MysqlDB::Create);
         this->mProtoComponent = this->GetComponent<ProtoComponent>();
         this->mMysqlComponent = this->GetComponent<MysqlDBComponent>();
         for (int index = 0; index < MysqlConfig::Inst()->MaxCount; index++)
         {
-            this->mMysqlComponent->MakeMysqlClient();
+			int id = this->mMysqlComponent->MakeMysqlClient();
+			{
+				this->mClientIdQueue.emplace(id);
+				this->mClientIds.emplace_back(id);
+			}
         }
         return this->mMysqlComponent->Ping(0);
     }
@@ -36,6 +41,10 @@ namespace Sentry
     void MysqlDB::OnClose()
     {
         this->WaitAllMessageComplete();
+		for(int id : this->mClientIds)
+		{
+			this->mMysqlComponent->CloseClient(id);
+		}
     }
 
     int MysqlDB::Create(const db::mysql::create &request)
@@ -78,13 +87,25 @@ namespace Sentry
         }
         std::shared_ptr<Mysql::CreateTabCommand> command =
 			std::make_shared<Mysql::CreateTabCommand>(message, keys);
-
-        if (!this->mMysqlComponent->Run(command))
+		int id = this->mClientIds.front();
+        if (!this->mMysqlComponent->Run(id, command))
         {
             return XCode::Failure;
         }
         return XCode::Successful;
     }
+
+	int MysqlDB::GetClientId(int flag)
+	{
+		if(flag > 0)
+		{
+			int index = flag % (int)this->mClientIds.size();
+			return this->mClientIds.at(index);
+		}
+		int id = this->mClientIdQueue.front();
+		this->mClientIdQueue.push(id);
+		return id;
+	}
 
 	int MysqlDB::Add(const db::mysql::add& request)
     {
@@ -103,10 +124,9 @@ namespace Sentry
 		{
 			return XCode::Failure;
 		}
-
-		int index = request.flag();
+		int id = this->GetClientId(request.flag());
 		std::shared_ptr<Mysql::SqlCommand> command = std::make_shared<Mysql::SqlCommand>(sql);
-		return this->mMysqlComponent->Execute(index, command) ? XCode::Successful : XCode::MysqlInvokeFailure;
+		return this->mMysqlComponent->Execute(id, command) ? XCode::Successful : XCode::MysqlInvokeFailure;
     }
 
 	int MysqlDB::Save(const db::mysql::save& request)
@@ -126,9 +146,9 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-		int index = request.flag();
+		int id = this->GetClientId(request.flag());
 		std::shared_ptr<Mysql::SqlCommand> command = std::make_shared<Mysql::SqlCommand>(sql);
-		return this->mMysqlComponent->Execute(index, command) ? XCode::Successful : XCode::MysqlInvokeFailure;
+		return this->mMysqlComponent->Execute(id, command) ? XCode::Successful : XCode::MysqlInvokeFailure;
     }
 
 	int MysqlDB::Update(const db::mysql::update& request)
@@ -141,10 +161,10 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-		int index = request.flag();
+		int id = this->GetClientId(request.flag());
 		const std::string & fullName = request.table();
 		std::shared_ptr<Mysql::SqlCommand> command = std::make_shared<Mysql::SqlCommand>(sql);
-		return this->mMysqlComponent->Execute(index, command) ? XCode::Successful : XCode::MysqlInvokeFailure;
+		return this->mMysqlComponent->Execute(id, command) ? XCode::Successful : XCode::MysqlInvokeFailure;
     }
 
 	int MysqlDB::Delete(const db::mysql::remove& request)
@@ -156,10 +176,9 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-		int index = request.flag();
+		int id = this->GetClientId(request.flag());
 		std::shared_ptr<Mysql::SqlCommand> command = std::make_shared<Mysql::SqlCommand>(sql);
-		std::shared_ptr<Mysql::Response> response = this->mMysqlComponent->Run(index, command);
-		return this->mMysqlComponent->Execute(index, command)? XCode::Successful : XCode::MysqlInvokeFailure;
+		return this->mMysqlComponent->Execute(id, command)? XCode::Successful : XCode::MysqlInvokeFailure;
     }
 
 	int MysqlDB::Query(const db::mysql::query& request, db::mysql::response& response)
@@ -183,7 +202,8 @@ namespace Sentry
 			const std::string & sql = request.sql();
 			command = std::make_shared<Mysql::QueryCommand>(sql);
 		}
-		std::shared_ptr<Mysql::Response> result = this->mMysqlComponent->Run(command);
+		int id = this->GetClientId();
+		std::shared_ptr<Mysql::Response> result = this->mMysqlComponent->Run(id, command);
 		if(!result->IsOk())
 		{
 			response.set_error(result->GetError());

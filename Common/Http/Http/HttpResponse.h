@@ -19,7 +19,7 @@ namespace Http
     public:
         bool OnRead(std::istream &buffer) final;
         int OnWrite(std::ostream &buffer) final;
-        int Serailize(std::ostream & buffer) final;
+        int Serialize(std::ostream & buffer) final;
     public:
 		void Str(HttpStatus code, const std::string & str);
         void Json(HttpStatus code, Json::Writer & doc);

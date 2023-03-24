@@ -50,14 +50,13 @@ namespace Sentry
 		BIND_COMMON_RPC_METHOD(Registry::Query);
 		BIND_ADDRESS_RPC_METHOD(Registry::Register);
 		BIND_ADDRESS_RPC_METHOD(Registry::UnRegister);
+		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
+		this->mInnerComponent = this->GetComponent<InnerNetComponent>();
 		return true;
 	}
 
     bool Registry::OnStart()
 	{
-		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
-		this->mInnerComponent = this->GetComponent<InnerNetComponent>();
-
 		ProtoComponent* component = this->GetComponent<ProtoComponent>();
 		LOG_CHECK_RET_FALSE(component->Import("mysql/server.proto"));
 		std::shared_ptr<Message> message = component->New("server.registry");
@@ -108,7 +107,7 @@ namespace Sentry
 		const std::vector<std::string> & result = response1->Array();
 #else
 		std::vector<std::string> result;
-		this->mSqliteComponent->Query(this->mDatabaseIndex, sql, result);
+		this->mSqliteComponent->Query(this->mDatabaseIndex, sql.c_str(), result);
 #endif
 		for (size_t index = 0; index < result.size(); index++)
 		{
@@ -149,7 +148,7 @@ namespace Sentry
 			return XCode::SaveToMysqlFailure;
 		}
 #else
-		if (!this->mSqliteComponent->Exec(this->mDatabaseIndex, sql))
+		if (!this->mSqliteComponent->Exec(this->mDatabaseIndex, sql.c_str()))
 		{
 			return XCode::SaveToMysqlFailure;
 		}
@@ -184,7 +183,7 @@ namespace Sentry
                 return XCode::SaveToMysqlFailure;
             }
 #else
-			if(!this->mSqliteComponent->Exec(this->mDatabaseIndex, sql))
+			if(!this->mSqliteComponent->Exec(this->mDatabaseIndex, sql.c_str()))
 			{
 				return XCode::SaveToMysqlFailure;
 			}
@@ -209,7 +208,7 @@ namespace Sentry
 			return XCode::SaveToMysqlFailure;
 		}
 #else
-		if(!this->mSqliteComponent->Exec(this->mDatabaseIndex, sql))
+		if(!this->mSqliteComponent->Exec(this->mDatabaseIndex, sql.c_str()))
 		{
 			return XCode::SaveToMysqlFailure;
 		}

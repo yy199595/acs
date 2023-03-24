@@ -12,9 +12,6 @@ namespace Sentry
 							 : mComponent(component)
     {
         this->mIndex = 0;
-        this->mLastTime = 0;
-        this->mIsClose = true;
-        this->mTaskCount = 0;
 		this->mThread = nullptr;
         this->mMysqlClient = nullptr;
     }
@@ -36,23 +33,29 @@ namespace Sentry
 #endif
 		}
 		std::string error;
-		this->mIsClose = false;
 		std::shared_ptr<Mysql::ICommand> command;
 		Asio::Context& io = App::Inst()->MainThread();
-		this->mLastTime = Helper::Time::NowSecTime();
-		while (!this->mIsClose)
+		std::shared_ptr<MysqlClient> self = this->shared_from_this();
+		while (true)
 		{
 			this->WaitPop(command);
+			int rpcId = command->GetRpcId();
+			if (rpcId > 0)
 			{
-				int rpcId = command->GetRpcId();
-				this->mLastTime = Helper::Time::NowSecTime();
 				std::shared_ptr<Mysql::Response> response =
 					std::make_shared<Mysql::Response>(rpcId);
 				if (!command->Invoke(this->mMysqlClient, response))
 				{
-
+					std::string sql;
+					command->GetSql(sql);
+					CONSOLE_LOG_ERROR("sql : " << sql);
+					CONSOLE_LOG_ERROR("err : " << response->GetError());
 				}
 				io.post(std::bind(&IRpc<Mysql::Response>::OnMessage, this->mComponent, response));
+			}
+			else
+			{
+				break;
 			}
 		}
 		mysql_close(this->mMysqlClient);
@@ -60,7 +63,9 @@ namespace Sentry
 
 	void MysqlClient::Stop()
 	{
-        this->mIsClose = true;
+		std::shared_ptr<Mysql::ICommand>
+		    stopCommand = std::make_shared<Mysql::StopCommand>();
+		this->Push(stopCommand);
     }
 
 	bool MysqlClient::StartConnect()
@@ -91,7 +96,6 @@ namespace Sentry
 			return this->StartConnect();
 		}
         this->mIndex = 0;
-		this->mIsClose = false;
 		this->mMysqlClient = mysql;
 #ifdef __DEBUG__
 		CONSOLE_LOG_DEBUG("connect mysql server [" << address << "]successful");

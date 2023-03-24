@@ -16,7 +16,8 @@ namespace Sentry
 {
     class MysqlDBComponent;
 
-	class MysqlClient : public ThreadQueue<std::shared_ptr<Mysql::ICommand>>
+	class MysqlClient : public ThreadQueue<std::shared_ptr<Mysql::ICommand>>,
+			public std::enable_shared_from_this<MysqlClient>
     {
     public:
         explicit MysqlClient(IRpc<Mysql::Response> *component);
@@ -27,11 +28,8 @@ namespace Sentry
     private:
         void Update();
     private:
-        bool mIsClose;
         size_t mIndex;
-        size_t mTaskCount;
         MYSQL *mMysqlClient;
-        long long mLastTime;
 		std::thread * mThread;
 		IRpc<Mysql::Response> *mComponent;
     };

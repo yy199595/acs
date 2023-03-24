@@ -13,7 +13,7 @@ namespace Tcp
 	{
 	 public:
 		ProtoMessage() = default;
-		virtual int Serailize(std::ostream & os) = 0; //返回剩余要发送的字节数
+		virtual int Serialize(std::ostream & os) = 0; //返回剩余要发送的字节数
 	 protected:
 		void Write(std::ostream & os, char cc) const;
 		void Write(std::ostream & os, int value) const;

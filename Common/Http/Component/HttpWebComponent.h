@@ -25,8 +25,8 @@ namespace Sentry
         bool LateAwake() final;
         void OnRecord(Json::Writer &document) final;
         bool OnDelClient(const std::string& address) final;
-		void OnRequest(const std::string &address, std::shared_ptr<Http::Request> request) final;
-		void Invoke(const std::string& address, const HttpMethodConfig* config, const std::shared_ptr<Http::Request>& request);
+		void OnRequest(std::shared_ptr<Http::Request> request) final;
+		void Invoke(const HttpMethodConfig* config, const std::shared_ptr<Http::Request>& request);
     private:
         unsigned int mSumCount;
         unsigned int mWaitCount;

@@ -246,7 +246,7 @@ namespace Rpc
         return true;
     }
 
-    int Packet::Serailize(std::ostream &os)
+    int Packet::Serialize(std::ostream &os)
     {
         union
         {

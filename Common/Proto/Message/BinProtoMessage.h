@@ -15,7 +15,7 @@ namespace Tcp
 		BinProtoMessage(const char* str, size_t size);
 		~BinProtoMessage() { delete [] this->mBuffer;}
 	public:
-		int Serailize(std::ostream& os); //返回剩余要发送的字节数
+		int Serialize(std::ostream& os); //返回剩余要发送的字节数
 	private:
 		size_t mSize;
 		char* mBuffer;

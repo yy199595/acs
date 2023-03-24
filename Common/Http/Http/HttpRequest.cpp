@@ -10,10 +10,11 @@
 
 namespace Http
 {
-    Request::Request(const char *method)
+    Request::Request(const char *method, const std::string & from)
         : mMethod(method)
     {
-        this->mVersion = HttpVersion;
+		this->mFrom = from;
+		this->mVersion = HttpVersion;
         this->mState = DecodeState::None;
     }
 
@@ -57,7 +58,7 @@ namespace Http
         return this->OnReadContent(buffer);
     }
 
-    int Request::Serailize(std::ostream &os)
+    int Request::Serialize(std::ostream &os)
     {
         return this->OnWrite(os);
     }
@@ -214,15 +215,15 @@ namespace Http
 
 namespace Http
 {
-    std::shared_ptr<Http::Request> New(const std::string &method)
+    std::shared_ptr<Http::Request> New(const std::string &method, const std::string & from)
     {
         if(method == "GET")
         {
-            return std::make_shared<GetRequest>();
+            return std::make_shared<GetRequest>(from);
         }
         if(method == "POST")
         {
-            return std::make_shared<PostRequest>();
+            return std::make_shared<PostRequest>(from);
         }
         return nullptr;
     }

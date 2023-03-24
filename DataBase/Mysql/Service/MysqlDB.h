@@ -6,7 +6,7 @@
 
 namespace Sentry
 {
-	class MysqlDB : public PhysicalService
+	class MysqlDB : public PhysicalRpcService
 	{
 	 public:
 		MysqlDB();
@@ -25,11 +25,14 @@ namespace Sentry
         int Query(const db::mysql::query& request, db::mysql::response& response);
 
 	 private:
-		void Init() final;
+		bool OnInit() final;
 		bool OnStart() final;
         void OnClose() final;
-	 private:
+		int GetClientId(int flag = 0);
+	private:
 		SqlHelper mSqlHelper;
+		std::vector<int> mClientIds;
+		std::queue<int> mClientIdQueue;
 		class ProtoComponent * mProtoComponent;
         class MysqlDBComponent * mMysqlComponent;
         std::unordered_map<std::string, std::string> mMainKeys;

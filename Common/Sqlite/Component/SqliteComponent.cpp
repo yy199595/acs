@@ -4,9 +4,11 @@
 #include "Json/JsonWriter.h"
 #include"String/StringHelper.h"
 #include"Helper/SqlHelper.h"
+#include"Lua/LuaSqlite.h"
+#include"Lua/ClassProxyHelper.h"
 namespace Sentry
 {
-	bool SqliteComponent::LateAwake()
+	bool SqliteComponent::Awake()
 	{
 		if (!ServerConfig::Inst()->GetPath("sqlite", this->mPath))
 		{
@@ -14,6 +16,15 @@ namespace Sentry
 		}
 		Helper::Directory::MakeDir(this->mPath);
 		return true;
+	}
+
+	void SqliteComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
+	{
+		luaRegister.BeginNewTable("Sqlite");
+		luaRegister.PushExtensionFunction("Open", Lua::Sqlite::Open);
+		luaRegister.PushExtensionFunction("Exec", Lua::Sqlite::Exec);
+		luaRegister.PushExtensionFunction("Query", Lua::Sqlite::Query);
+		luaRegister.PushExtensionFunction("QueryOnce", Lua::Sqlite::QueryOnce);
 	}
 
 	bool SqliteComponent::MakeTable(int id, const std::string & key, const google::protobuf::Message& message)
@@ -31,7 +42,7 @@ namespace Sentry
 		{
 			return false;
 		}
-		return this->Exec(id, sql);
+		return this->Exec(id, sql.c_str());
 	}
 
 	int SqliteComponent::Open(const std::string& name)
@@ -40,7 +51,8 @@ namespace Sentry
 		std::string path = fmt::format("{0}/{1}.db", this->mPath, name);
 		if(sqlite3_open(path.c_str(), &db) != SQLITE_OK)
 		{
-			return false;
+			LOG_ERROR("open sqlite db [" << name << "] failure");
+			return -1;
 		}
 		int id = this->mNumbers.Pop();
 		this->mDatabases.emplace(id, db);
@@ -67,7 +79,7 @@ namespace Sentry
 		this->mDatabases.clear();
 	}
 
-	bool SqliteComponent::Exec(int id, const std::string& sql)
+	bool SqliteComponent::Exec(int id, const char* sql)
 	{
 		auto iter = this->mDatabases.find(id);
 		if(iter == this->mDatabases.end())
@@ -76,7 +88,7 @@ namespace Sentry
 		}
 		char* errMessage = 0;
 		sqlite3 * db = iter->second;
-		if (sqlite3_exec(db, sql.c_str(), 0, 0, &errMessage) != SQLITE_OK)
+		if (sqlite3_exec(db, sql, 0, 0, &errMessage) != SQLITE_OK)
 		{
 			LOG_FATAL(sql);
 			LOG_ERROR(errMessage);
@@ -86,7 +98,8 @@ namespace Sentry
 		return true;
 	}
 
-	bool SqliteComponent::Query(int id, const std::string& sql, std::vector<std::string>& result)
+
+	bool SqliteComponent::Query(int id, const char * sql, std::vector<std::string>& result)
 	{
 		auto iter = this->mDatabases.find(id);
 		if (iter == this->mDatabases.end())
@@ -95,7 +108,7 @@ namespace Sentry
 		}
 		sqlite3_stmt* stmt;
 		sqlite3* db = iter->second;
-		int code = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, 0);
+		int code = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
 		if (code != SQLITE_OK)
 		{
 			LOG_ERROR(sqlite3_errmsg(db));

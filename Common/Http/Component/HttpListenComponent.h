@@ -23,7 +23,7 @@ namespace Sentry
         void ClosetHttpClient(const std::string & address);
         void OnListen(std::shared_ptr<SocketProxy> socket) final;
         virtual bool OnDelClient(const std::string& address) = 0;
-        virtual void OnRequest(const std::string & address, std::shared_ptr<Http::Request> request) = 0;
+        virtual void OnRequest(std::shared_ptr<Http::Request> request) = 0;
     protected:
         bool Send(const std::string& address, HttpStatus code);
         bool Send(const std::string& address, const std::string & str);            

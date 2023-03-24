@@ -22,7 +22,7 @@ namespace Sentry
 	 public:
 		void StartReceive(int timeout = 15);
 		void StartWriter(HttpStatus code);
-		void StartWriter(std::shared_ptr<Http::Response> message);
+		void StartWriter(const std::shared_ptr<Http::Response>& message);
         std::shared_ptr<Http::Request> Request() { return this->mHttpRequest;}
 	 private:
 		void ClosetClient();

@@ -31,7 +31,7 @@ namespace Sentry
 #endif
 	}
 
-    void HttpHandlerClient::StartWriter(std::shared_ptr<Http::Response> message)
+    void HttpHandlerClient::StartWriter(const std::shared_ptr<Http::Response>& message)
     {
 #ifdef ONLY_MAIN_THREAD
         this->Write(message);
@@ -81,7 +81,8 @@ namespace Sentry
             }
 
             is >> this->mMethod;
-            this->mHttpRequest = Http::New(this->mMethod);
+			const std::string & from = this->mSocket->GetAddress();
+            this->mHttpRequest = Http::New(this->mMethod, from);
             if (this->mHttpRequest == nullptr)
             {
                 std::shared_ptr<Http::Response> response
@@ -104,15 +105,14 @@ namespace Sentry
         else if(code == asio::error::eof)
 		{
 		END_RECEIVE:
-			const std::string& address = this->mSocket->GetAddress();
 			std::shared_ptr<HttpHandlerClient> httpHandlerClient =
 				std::dynamic_pointer_cast<HttpHandlerClient>(this->shared_from_this());
 #ifdef ONLY_MAIN_THREAD
 			this->mHttpComponent->OnRequest(address, this->mHttpRequest);
 #else
-			Asio::Context& mainThread = App::Inst()->MainThread();
-			mainThread.post(std::bind(&HttpListenComponent::OnRequest,
-				this->mHttpComponent, address, this->mHttpRequest));
+			Asio::Context& io = App::Inst()->MainThread();
+			io.post(std::bind(&HttpListenComponent::OnRequest,
+				this->mHttpComponent, this->mHttpRequest));
 #endif
 		}
         else

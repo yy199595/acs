@@ -19,7 +19,7 @@ namespace Tcp
 		memcpy(this->mBuffer, str, this->mSize);
 	}
 
-	int BinProtoMessage::Serailize(std::ostream& os)
+	int BinProtoMessage::Serialize(std::ostream& os)
 	{
 		os.write(this->mBuffer, this->mSize);
 		return 0;

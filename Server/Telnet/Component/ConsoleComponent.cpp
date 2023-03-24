@@ -16,7 +16,7 @@ namespace Sentry
 		this->mContents.emplace_back(str, size);
 	}
 
-	int TelnetProto::Serailize(std::ostream& os)
+	int TelnetProto::Serialize(std::ostream& os)
 	{
 		for(const std::string & str : this->mContents)
 		{

@@ -48,7 +48,7 @@ namespace Sentry
 		~RedisRequest() { }
     public:
 		std::string ToJson();
-		int Serailize(std::ostream &os) final;
+		int Serialize(std::ostream &os) final;
 		std::shared_ptr<RedisTask> MakeTask(int id);
         std::shared_ptr<LuaRedisTask> MakeLuaTask(lua_State * lua, int id);
     public:
@@ -156,7 +156,7 @@ namespace Sentry
     class LuaRedisTask : public IRpcTask<RedisResponse>
     {
     public:
-        LuaRedisTask(lua_State * lua, std::shared_ptr<RedisRequest> request, int id);
+        LuaRedisTask(lua_State * lua, int id);
         ~LuaRedisTask();
     public:
         int Await();
@@ -164,7 +164,6 @@ namespace Sentry
     private:
         int mRef;
         lua_State * mLua;
-		std::shared_ptr<RedisRequest> mRequest;
     };
 }
 

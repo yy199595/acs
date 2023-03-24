@@ -65,14 +65,8 @@ namespace Sentry
 	size_t Unit::GetComponents(std::vector<std::string>& components) const
 	{
 		components.clear();
-		for (const std::string& name : this->mSortComponents)
-		{
-			Component* component = this->GetComponent<Component>(name);
-			if (component != nullptr)
-			{
-				components.emplace_back(component->GetName());
-			}
-		}
+		components.insert(components.end(),
+			this->mSortComponents.begin(), this->mSortComponents.end());
         return components.size();
 	}
 

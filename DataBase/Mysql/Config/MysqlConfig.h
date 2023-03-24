@@ -12,7 +12,7 @@ namespace Sentry
     class MysqlConfig : public TextConfig, public ConstSingleton<MysqlConfig>
     {
     public:
-        MysqlConfig() : TextConfig("MysqlConfig") { }
+        MysqlConfig() : TextConfig("MysqlConfig"), MaxCount(0) { }
     protected:
        bool OnLoadText(const char *str, size_t length) final;
         bool OnReloadText(const char *str, size_t length) final;

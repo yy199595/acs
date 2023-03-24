@@ -21,10 +21,11 @@ namespace Sentry
 		return true;
 	}
 
-	void HttpDebugComponent::OnRequest(const std::string& address, std::shared_ptr<Http::Request> request)
+	void HttpDebugComponent::OnRequest(std::shared_ptr<Http::Request> request)
 	{
 		std::vector<std::string> splitPath;
 		const std::string& path = request->Path();
+		const std::string& address = request->From();
 		if (request->Method() != "POST")
 		{
 			this->Send(address, "please use post call");
@@ -63,25 +64,25 @@ namespace Sentry
 					message->Append(postRequest->Content());
 				}
 			}
-			std::string targetAddress;
-			if (!this->GetAddress(service, value, targetAddress))
+			std::string target;
+			if (!this->GetAddress(service, value, target))
 			{
 				this->Send(address, "get target address error");
 				return;
 			}
 			AsyncMgrComponent* taskComponent = this->mApp->GetTaskComponent();
-			taskComponent->Start(&HttpDebugComponent::Invoke, this, targetAddress, message);
+			taskComponent->Start(&HttpDebugComponent::Call, this, target, message);
 		}
 	}
 
-	void HttpDebugComponent::Invoke(const std::string& address, std::shared_ptr<Rpc::Packet>& message)
+	void HttpDebugComponent::Call(const std::string& address, std::shared_ptr<Rpc::Packet>& message)
 	{
 		std::shared_ptr<Rpc::Packet> response =
 			this->mInnerComponent->Call(address, message);
-		std::shared_ptr<Json::Writer> document = std::make_shared<Json::Writer>();
+		Json::Writer document;
 		if (response == nullptr)
 		{
-			document->Add("error").Add("unknown error");
+			document.Add("error").Add("unknown error");
 		}
 		else
 		{
@@ -94,25 +95,24 @@ namespace Sentry
 				const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
 				if (!methodConfig->Response.empty())
 				{
-					std::unique_ptr<rapidjson::Document> json
-						= std::make_unique<rapidjson::Document>();
+					rapidjson::Document json;
 					const std::string& str = response->GetBody();
-					if (json->Parse(str.c_str(), str.size()).HasParseError())
+					if (json.Parse(str.c_str(), str.size()).HasParseError())
 					{
 						throw std::logic_error("failed to parse the returned data");
 					}
-					document->Add("data").Add(*json);
+					document.Add("data").Add(json);
 				}
 			}
 			else if (response->GetHead().Get("error", error))
 			{
-				document->Add("error").Add(error);
+				document.Add("error").Add(error);
 			}
-			document->Add("code").Add(CodeConfig::Inst()->GetDesc(code));
+			document.Add("code").Add(CodeConfig::Inst()->GetDesc(code));
 		}
-		std::string targetAddress;
-		message->GetHead().Get("http", targetAddress);
-		this->Send(targetAddress, document->JsonString());
+		std::string httpAddress;
+		message->GetHead().Get("http", httpAddress);
+		this->Send(httpAddress, document.JsonString());
 	}
 
 	bool HttpDebugComponent::GetAddress(const std::string& service, long long id, std::string& address)

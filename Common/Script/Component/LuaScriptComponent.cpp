@@ -34,14 +34,14 @@ namespace Sentry
 
 	bool LuaScriptComponent::LateAwake()
     {
-        const ServerConfig *config = ServerConfig::Inst();
-        const std::string &json = config->GetContent();
-        values::pushDecoded(this->mLuaEnv, json.c_str(), json.size());
-        lua_setglobal(this->mLuaEnv, "ServerConfig");
-
-        Lua::ClassProxyHelper luaRegister(this->mLuaEnv, "ServerConfig");
-        luaRegister.BeginNewTable();
-        lua_getglobal(this->mLuaEnv, "ServerConfig");
+//        const ServerConfig *config = ServerConfig::Inst();
+//        const std::string &json = config->GetContent();
+//		Lua::RapidJson::Write(this->mLuaEnv, json);
+//        lua_setglobal(this->mLuaEnv, "ServerConfig");
+//
+//        Lua::ClassProxyHelper luaRegister(this->mLuaEnv, "ServerConfig");
+//        luaRegister.BeginNewTable();
+//        lua_getglobal(this->mLuaEnv, "ServerConfig");
 
         Lua::ClassProxyHelper luaRegister0(this->mLuaEnv, "App");
         luaRegister0.BeginRegister<App>();		

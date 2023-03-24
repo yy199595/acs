@@ -25,8 +25,9 @@ namespace Sentry
         return this->mApp->GetComponents(httpServices) && this->StartListen("http");
     }
 
-    void HttpWebComponent::OnRequest(const std::string& address, std::shared_ptr<Http::Request> request)
+    void HttpWebComponent::OnRequest(std::shared_ptr<Http::Request> request)
     {
+		const std::string & address = request->From();
         const HttpMethodConfig *httpConfig = HttpConfig::Inst()->GetMethodConfig(request->Path());
         if (httpConfig == nullptr)
         {
@@ -46,16 +47,16 @@ namespace Sentry
 
         if (!httpConfig->IsAsync)
         {
-            this->Invoke(address, httpConfig, request);
+            this->Invoke(httpConfig, request);
             return;
         }
-        this->mTaskComponent->Start(&HttpWebComponent::Invoke, this, address, httpConfig, request);
+        this->mTaskComponent->Start(&HttpWebComponent::Invoke, this, httpConfig, request);
     }
-    void HttpWebComponent::Invoke(const std::string& address, 
-        const HttpMethodConfig* config, const std::shared_ptr<Http::Request>& request)
+    void HttpWebComponent::Invoke(const HttpMethodConfig* config, const std::shared_ptr<Http::Request>& request)
     {
 		this->mSumCount++;
         this->mWaitCount++;
+		const std::string & address = request->From();
         HttpService* httpService = this->GetComponent<HttpService>(config->Service);
         if (httpService == nullptr || !httpService->IsStartService())
         {           
