@@ -50,7 +50,7 @@ function Player:Update()
         if code == XCode.Successful then
 
         end
-        coroutine.sleep(1000)
+        --coroutine.sleep(1000)
     end
 end
 return Player

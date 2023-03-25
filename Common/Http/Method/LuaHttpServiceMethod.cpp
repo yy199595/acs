@@ -31,7 +31,7 @@ namespace Sentry
         if (luaModule == nullptr || !luaModule->GetFunction(this->mConfig->Method))
         {
             Json::Writer document;
-            document.Add("error").Add("call lua function not existe");
+            document.Add("error").Add("call lua function not exist");
             document.Add("code").Add((int)XCode::CallFunctionNotExist);
             response.Json(HttpStatus::OK, document);
             return XCode::CallFunctionNotExist;          
@@ -74,7 +74,8 @@ namespace Sentry
     int LuaHttpServiceMethod::CallAsync(Http::Response &response)
     {
         lua_State* lua = this->mLuaComponent->GetLuaEnv();       
-		std::unique_ptr<LuaServiceTaskSource> luaTaskSource = std::make_unique<LuaServiceTaskSource>(&response);
+		std::unique_ptr<LuaServiceTaskSource> luaTaskSource =
+                std::make_unique<LuaServiceTaskSource>(&response);
         Lua::UserDataParameter::Write(lua, luaTaskSource.get());
         if (lua_pcall(lua, 3, 1, 0) != LUA_OK)
         {           

@@ -39,16 +39,21 @@ end
 
 function coroutine.http(func, request, taskSource)
     local context = function()
-        local response = {}
-        local state, error = pcall(func, request, response)
+        local json = { }
+        local state, error, response = pcall(func, request)
         if not state then
-            Log.LuaError(error);
-            response.error = error
-            response.code = XCode.CallLuaFunctionFail
+            json.error = error
+            json.code = XCode.CallLuaFunctionFail
+        else if error ~= XCode.Successful then
+            json.code = error
+            json.error = response
         else
-            response.code = error
+            json.code =error
+            json.error = "OK"
+            json.data = response
         end
-        taskSource:SetHttp(response.code, response)
+        end
+        taskSource:SetHttp(json.code, json)
     end
     coroutine.start(context)
 end
