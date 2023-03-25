@@ -135,13 +135,14 @@ namespace Sentry
 	{
 		const std::string& rpc = request.rpc();
 		const std::string& http = request.http();
-		const std::string& name = request.name();
+		const std::string& server = request.name();
 		LOG_ERROR_RETURN_CODE(!rpc.empty(), XCode::CallArgsError);
-		LOG_ERROR_RETURN_CODE(!name.empty(), XCode::CallArgsError);
-
-		const std::string sql =
-			fmt::format("replace into {0} (server_name,rpc_address,http_address,last_ping_time) values('{1}','{2}','{3}',{4});",
-				this->mTable, name, rpc, http, Helper::Time::NowSecTime());
+		LOG_ERROR_RETURN_CODE(!server.empty(), XCode::CallArgsError);
+        std::stringstream st;
+        st << "replace into " << this->mTable << " (server_name,rpc_address,";
+        st << "http_address,last_ping_time,last_time_str) values('" << server <<"','" << rpc;
+        st << "','" << http << "'," << Helper::Time::NowSecTime() <<",'" << Helper::Time::GetDateString() << "');";
+		const std::string sql = st.str();
 #ifdef __ENABLE_MYSQL__
 		if (!this->mMysqlComponent->Execute(this->mIndex, std::make_shared<Mysql::SqlCommand>(sql)))
 		{
@@ -155,8 +156,8 @@ namespace Sentry
 #endif
 		const std::string func("Join");
 		this->mRegistryServers.insert(address);
-		this->mNodeComponent->AddRpcServer(name, rpc);
-		this->mNodeComponent->AddHttpServer(name, http);
+		this->mNodeComponent->AddRpcServer(server, rpc);
+		this->mNodeComponent->AddHttpServer(server, http);
 
 		RpcService* rpcService = this->mApp->GetService<Node>();
 		for (const std::string& address : this->mRegistryServers)
@@ -173,10 +174,13 @@ namespace Sentry
 		const ServiceNodeInfo * nodeInfo = this->mInnerComponent->GetSeverInfo(address);
 		if(nodeInfo != nullptr)
 		{
+            std::stringstream st;
             long long time = Helper::Time::NowSecTime();
 			const std::string table("server.registry");
 			const std::string & rpc = nodeInfo->RpcAddress;
-            const std::string sql = fmt::format("update {0} set last_ping_time={1} where rpc_address='{2}'", this->mTable, time, rpc);
+            st << "update " << this->mTable << "SET last_ping_time=" << time;
+            st << ",last_time_str='" << Helper::Time::GetDateString() << "' where rpc_address='" << rpc << "'";
+            const std::string sql = st.str();
 #ifdef __ENABLE_MYSQL__
 			if(!this->mMysqlComponent->Execute(this->mIndex, std::make_shared<Mysql::SqlCommand>(sql)))
             {

@@ -45,7 +45,7 @@ function AccountService.Register(requestInfo, response)
     return XCode.Failure
 end
 
-function AccountService.Login(request, response)
+function AccountService.Login(request)
 
     assert(type(request.account) == "string", "user account is not string")
     assert(type(request.password) == "string", "user password is not string")
@@ -54,22 +54,19 @@ function AccountService.Login(request, response)
         _id = request.account
     })
     if userInfo == nil or request.password ~= userInfo.password then
-        response.error = "账号不存在或者密码错误"
-        return XCode.Failure
+        return XCode.Failure, "账号不存在或者密码错误"
     end
 
     local code, data = Service.Call(userInfo.user_id, "Gate.Allocation", {
         value = userInfo.user_id
     })
     if code ~= XCode.Successful or data == nil then
-        response.error = "分配网关失败"
-        return XCode.AllotUser
+        return XCode.AllotUser, "分配网关失败"
     end
-    response.data = data
     Mongo.Update(tabName, { _id = request.account },
-                {  last_login_time = os.time(),  token = response.token }, userInfo.user_id)
+                {  last_login_time = os.time(),  token = data.token }, userInfo.user_id)
     Log.Warn(string.format("玩家%s登录成功,玩家id=%d", request.account, userInfo.user_id))
-    return XCode.Successful
+    return XCode.Successful, data
 end
 
 return AccountService

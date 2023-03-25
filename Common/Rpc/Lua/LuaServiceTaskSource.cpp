@@ -56,16 +56,16 @@ namespace Sentry
 	{
 		LuaServiceTaskSource* luaServiceTaskSource =
 			Lua::UserDataParameter::Read<LuaServiceTaskSource*>(lua, 1);
-		luaServiceTaskSource->mCode = luaL_checkinteger(lua, 2);
+		luaServiceTaskSource->mCode = (int)luaL_checkinteger(lua, 2);
 		if (luaServiceTaskSource->mHttpData != nullptr)
 		{
-			if (lua_istable(lua, -1))
+			if (lua_istable(lua, 3))
 			{
 				std::string data;
 				Lua::RapidJson::Read(lua, -1, &data);
 				luaServiceTaskSource->mHttpData->Json(HttpStatus::OK, data);
 			}
-			else if (lua_isstring(lua, -1))
+			else if (lua_isstring(lua, 3))
 			{
 				size_t size = 0;
 				const char * json = luaL_checklstring(lua, -1, &size);
