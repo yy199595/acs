@@ -9,6 +9,10 @@
 #include"Service/PhysicalRpcService.h"
 #include"Async/RpcTaskSource.h"
 #include"Config/CodeConfig.h"
+#ifdef __DEBUG__
+#include"String/StringHelper.h"
+#include"Component/ProtoComponent.h"
+#endif
 #include"Component/OuterNetComponent.h"
 namespace Sentry
 {
@@ -89,12 +93,40 @@ namespace Sentry
 			);
 		}
 #ifdef __DEBUG__
-	ElapsedTimer timer;
+        ElapsedTimer timer;
+        std::string json("{}");
+        ProtoComponent * component = this->GetComponent<ProtoComponent>();
+        if(!config->Request.empty())
+        {
+            std::shared_ptr<Message> request = component->New(config->Request);
+            if (request != nullptr && request->ParseFromString(message->GetBody()))
+            {
+                json.clear();
+                std::string str;
+                google::protobuf::util::MessageToJsonString(*request, &str);
+                Helper::Str::FormatJson(str, json);
+            }
+        }
+        CONSOLE_LOG_DEBUG("func = [" << config->FullName << "] request = " << json);
 #endif
 		this->mWaitCount++;
 		int code = logicService->Invoke(config->Method, message);
 #ifdef __DEBUG__
-		LOG_INFO("call [" << config->FullName << "] use time = " << timer.GetMs() << "ms");
+        json.assign("{}");
+        if(code == XCode::Successful && !config->Response.empty())
+        {
+            std::shared_ptr<Message> response = component->New(config->Response);
+            if (response != nullptr && response->ParseFromString(message->GetBody()))
+            {
+                json.clear();
+                std::string str;
+                google::protobuf::util::MessageToJsonString(*response, &str);
+                Helper::Str::FormatJson(str, json);
+            }
+        }
+        const std::string & desc = CodeConfig::Inst()->GetDesc(code);
+        CONSOLE_LOG_INFO("func = [" << config->FullName << "] code = " << desc << " response = " << json);
+		//LOG_INFO("call [" << config->FullName << "] use time = " << timer.GetMs() << "ms");
 #endif
 		this->mWaitCount--;
 		if (timerId > 0 && !this->mTimerComponent->CancelTimer(timerId))
