@@ -12,9 +12,14 @@ set(CMAKE_CXX_STANDARD 14)
 include(CMake/define.cmake)
 include(CMake/function.cmake)
 
-if(APPLE)
+find_program(PROTOC_EXECUTABLE protoc)
+if(NOT PROTOC_EXECUTABLE)
+    message("[warning]:请安装protoc来自动生成pb代码 sudo apt-get install protobuf-compiler")
+    message("[info   ]:使用命令 : sudo apt-get install protobuf-compiler")
+else()
     include(CMake/proto.cmake)
 endif()
+
 
 message(${CMAKE_BINARY_DIR})
 
@@ -139,6 +144,8 @@ find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
     message("使用 ccache 作为编译缓存")
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+else()
+    message("[warning]:请安装ccache来提高编译速度")
 endif()
 
 ADD_EXECUTABLE(app ${AsmFiles} ${CommonFiles} ${ServerFiles} ${ClientSource})
@@ -146,6 +153,13 @@ ADD_EXECUTABLE(app ${AsmFiles} ${CommonFiles} ${ServerFiles} ${ClientSource})
 list(APPEND StaticLibs lua)
 
 if(__ENABLE_JEMALLOC__)
+
+    find_package(Jemalloc)
+    if(NOT Jemalloc_FOUND)
+        message(ERROR "请安装jemalloc 命令:sudo apt-get install libjemalloc-dev")
+        #execute_process(COMMAND sudo apt-get install libjemalloc-dev)
+    endif()
+
     list(APPEND StaticLibs jemalloc)
 endif()
 

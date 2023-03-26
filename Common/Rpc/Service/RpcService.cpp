@@ -328,7 +328,7 @@ namespace Sentry
 		if(methodConfig == nullptr)
 		{
 			LOG_ERROR("not find [" << fullName << "] config");
-			return XCode::NotServerGroupConfig;
+			return XCode::NotFoundRpcConfig;
 		}
 
 		if(!methodConfig->Request.empty() && message != nullptr)

@@ -23,7 +23,10 @@ namespace Sentry
 		int Hello(const Http::Request& request, Http::Response& response);
 		int DownLoad(const Http::Request& request, Http::Response& response);
 		int Sleep(const Json::Reader & request, Json::Writer& response);
-	private:
+    private:
+        int Login(const Http::Request& request, Http::Response& response);
+        int Register(const Http::Request& request, Http::Response& response);
+    private:
 		std::unordered_map<std::string, std::string> mHtmlFiles;
     };
 }

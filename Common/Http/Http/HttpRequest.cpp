@@ -7,6 +7,52 @@
 #include"Json/Lua/values.hpp"
 #include"String/StringHelper.h"
 
+namespace Http
+{
+    Parameter::Parameter(const std::string & content)
+    {
+        std::vector<std::string> result;
+        if(Helper::Str::Split(content, "&", result) > 0)
+        {
+            for (const std::string &filed: result)
+            {
+                size_t pos1 = filed.find('=');
+                if(pos1 != std::string::npos)
+                {
+                    std::string key = filed.substr(0, pos1);
+                    std::string val = filed.substr(pos1 + 1);
+                    this->mParameters.emplace(key, val);
+                }
+            }
+        }
+    }
+
+    bool Parameter::Get(std::vector<std::string> &keys)
+    {
+        if(this->mParameters.empty())
+        {
+            return false;
+        }
+        keys.reserve(this->mParameters.size());
+        auto iter = this->mParameters.begin();
+        for(; iter != this->mParameters.end(); iter++)
+        {
+            keys.emplace_back(iter->first);
+        }
+        return true;
+    }
+
+    bool Parameter::Get(const std::string &key, std::string &value)
+    {
+        auto iter = this->mParameters.find(key);
+        if(iter == this->mParameters.end())
+        {
+            return false;
+        }
+        value = iter->second;
+        return true;
+    }
+}
 
 namespace Http
 {
@@ -81,32 +127,13 @@ namespace Http
         size_t pos = this->mUrl.find('?');
         if (pos != std::string::npos)
         {
-            std::vector<std::string> result;
-            this->mPath = this->mUrl.substr(0, pos);
-            std::string parameter = this->mUrl.substr(pos + 1);
-            if(Helper::Str::Split(parameter, "&", result) > 0)
-            {
-                for (const std::string &filed: result)
-                {
-                    size_t pos1 = filed.find('=');
-                    if(pos1 != std::string::npos)
-                    {
-                        std::string key = filed.substr(0, pos1);
-                        std::string val = filed.substr(pos1 + 1);
-                        this->mParameters.emplace(key, val);
-                    }
-                }
-            }
+            this->mContent = this->mUrl.substr(pos + 1);
         }
         return true;
     }
 
     bool GetRequest::WriteLua(lua_State* lua) const
     {
-        if (this->mParameters.empty())
-        {
-            return false;
-        }
         rapidjson::Document document;
         if (this->WriteDocument(&document))
         {
@@ -118,30 +145,23 @@ namespace Http
 
     bool GetRequest::WriteDocument(rapidjson::Document* document) const
     {
-        if (this->mParameters.empty())
+        std::vector<std::string> keys;
+        Http::Parameter parameter(this->mContent);
+        if(!parameter.Get(keys))
         {
             return false;
-        }       
+        }
+        std::string str;
+        for(const std::string & tmp : keys)
+        {
+            const char* key = tmp.c_str();
+            parameter.Get(tmp, str);
+            const char* value = str.c_str();
+            document->AddMember(rapidjson::StringRef(key),
+                                rapidjson::StringRef(value), document->GetAllocator());
+        }
         document->SetObject();
-        auto iter = this->mParameters.begin();
-        for (; iter != this->mParameters.end(); iter++)
-        {
-            const char* key = iter->first.c_str();
-            const char* value = iter->second.c_str();
-            document->AddMember(rapidjson::StringRef(key), rapidjson::StringRef(value), document->GetAllocator());
-        }
-        document->EndObject(this->mParameters.size());
-        return true;
-    }
-
-    bool GetRequest::GetParameter(const std::string & key, std::string & value)
-    {
-        auto iter = this->mParameters.find(key);
-        if(iter == this->mParameters.end())
-        {
-            return false;
-        }
-        value = iter->second;
+        document->EndObject(keys.size());
         return true;
     }
 

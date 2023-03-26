@@ -40,10 +40,27 @@ namespace Sentry
 		registry.Bind("Sleep", &ServerWeb::Sleep);
 		registry.Bind("Hotfix", &ServerWeb::Hotfix);
 		registry.Bind("DownLoad", &ServerWeb::DownLoad);
+
+        registry.Bind("Login", &ServerWeb::Login);
+        registry.Bind("Register", &ServerWeb::Register);
 		return true;
 	}
 
-	int ServerWeb::Main(const Http::Request& request, Http::Response& response)
+    int ServerWeb::Login(const Http::Request &request, Http::Response &response)
+    {
+        std::string account,password;
+        Http::Parameter parameter(request.Content());
+        LOG_ERROR_RETURN_CODE(parameter.Get("account,", account), XCode::CallArgsError);
+        LOG_ERROR_RETURN_CODE(parameter.Get("password", password), XCode::CallArgsError);
+        return XCode::Successful;
+    }
+
+    int ServerWeb::Register(const Http::Request& request, Http::Response& response)
+    {
+        return XCode::Successful;
+    }
+
+    int ServerWeb::Main(const Http::Request& request, Http::Response& response)
 	{
 		auto iter = this->mHtmlFiles.find("index.html");
 		if(iter == this->mHtmlFiles.end())

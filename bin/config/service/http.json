@@ -43,6 +43,16 @@
 			"Type": "GET",
 			"Async": true,
 			"Path": "/server/hotfix"
+		},
+		"Login": {
+			"Type": "POST",
+			"Async": false,
+			"Path": "/server/login"
+		},
+		"Register": {
+			"Type": "POST",
+			"Async": false,
+			"Path": "/server/register"
 		}
 	}
 }

@@ -12,6 +12,18 @@
 #include"Message/ProtoMessage.h"
 namespace Http
 {
+    class Parameter
+    {
+    public:
+        Parameter(const std::string & content);
+    public:
+        bool Get(std::vector<std::string> & keys);
+        bool Get(const std::string & key, std::string & value);
+    private:
+        std::unordered_map<std::string, std::string> mParameters;
+    };
+
+
     class Request : public IStream, public Tcp::ProtoMessage
     {
     public:
@@ -30,6 +42,9 @@ namespace Http
         inline const std::string & Port() const { return this->mPort; }
         inline const std::string & Path() const { return this->mPath; }
     public:
+        const std::string & Content() const { return this->mContent;}
+        bool GetParameter(const std::string & key, std::string & value) const;
+    public:
         bool OnRead(std::istream &buffer) final;
         int OnWrite(std::ostream &buffer) final;
         int Serialize(std::ostream &os) final;
@@ -47,6 +62,8 @@ namespace Http
 		std::string mVersion;
         std::string mProtocol;
         const std::string mMethod;
+    protected:
+        std::string mContent;
     };
 }
 
@@ -64,10 +81,6 @@ namespace Http
     protected:
         bool WriteLua(lua_State* lua) const final;
         bool WriteDocument(rapidjson::Document* document) const final;
-    public:
-        bool GetParameter(const std::string & key, std::string & value);
-    private:
-        std::unordered_map<std::string, std::string> mParameters;
     };
 
 }
@@ -89,10 +102,6 @@ namespace Http
     protected:
         bool WriteLua(lua_State* lua) const final;
         bool WriteDocument(rapidjson::Document* document) const final;
-    public:
-        const std::string & Content() const { return this->mContent;}
-    private:
-        std::string mContent;
     };
 }
 
