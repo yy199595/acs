@@ -14,7 +14,7 @@ include(CMake/function.cmake)
 
 find_program(PROTOC_EXECUTABLE protoc)
 if(NOT PROTOC_EXECUTABLE)
-    message("[warning]:请安装protoc来自动生成pb代码 sudo apt-get install protobuf-compiler")
+    message("[warning]:请安装protoc来自动生成pb代码")
     message("[info   ]:使用命令 : sudo apt-get install protobuf-compiler")
 else()
     include(CMake/proto.cmake)
@@ -205,7 +205,19 @@ elseif(APPLE)
 elseif(UNIX)
     message("当前为linux平台")
     add_definitions(-D __OS_LINUX__)
-    list(APPEND StaticLibs protobufd pthread dl)
+
+    execute_process(COMMAND uname -r
+            OUTPUT_VARIABLE kernel_release
+            OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+    if(kernel_release MATCHES ".*-microsoft*")
+        message("当前是wsl系统")
+        list(APPEND StaticLibs protobufd pthread dl)
+    else()
+        list(APPEND StaticLibs protobuf pthread dl)
+    endif()
+
+
 else()
     message(FATAL_ERROR "未知平台")
 endif()
