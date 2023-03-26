@@ -2,47 +2,41 @@
 local AccountService = {}
 local tabName = "user.account_info"
 local Mongo = require "MongoComponent"
-local RedisClient = require "RedisComponent"
 
-
-function AccountService.Start()
+function AccountService.Awake()
     print("启动账号服务")
     return true
 end
 
-function AccountService.Register(requestInfo, response)
-    assert(requestInfo.account, "register account is nil")
-    assert(requestInfo.password, "register password is nil")
-    assert(requestInfo.phone_num, "register phone number is nil")
+function AccountService.Register(request)
+    assert(request.account, "register account is nil")
+    assert(request.password, "register password is nil")
+    assert(request.phone_num, "register phone number is nil")
 
-    local account = requestInfo.account
+    local account = request.account
     local userInfo = Mongo.QueryOnce(tabName, {
-        _id = requestInfo.account
+        _id = request.account
     })
     if userInfo ~= nil then
-        response.error = "账号已经存在"
-        RedisClient.Run("HSET", "user", account, response)
-        return XCode.AccountAlreadyExists
+        return XCode.AccountAlreadyExists, "账号已经存在"
     end
     local nowTime = os.time()
     local user_id = Guid.Create()
     Log.Info(string.format("start register account %s", account))
-    local str = string.format("%s%d%d", requestInfo.address, nowTime, user_id)
+    local str = string.format("%s%d%d", request.address, nowTime, user_id)
 
-    requestInfo.login_time = 0
-    requestInfo.user_id = user_id
-    requestInfo.create_time = nowTime
-    requestInfo._id = requestInfo.account
-    requestInfo.token = Md5.ToString(str)
-    RedisClient.Run("HSET", "user", account, requestInfo)
-    Log.Info("register account : ", rapidjson.encode(requestInfo))
-    if Mongo.InsertOnce(tabName, requestInfo, requestInfo.user_id) == XCode.Successful then
+    request.user_id = user_id
+    request.login_time = nowTime
+    request.create_time = nowTime
+    request._id = requestInfo.account
+    request.token = Md5.ToString(str)
+    Log.Info("register account : ", rapidjson.encode(request))
+    if Mongo.InsertOnce(tabName, request, request.user_id) == XCode.Successful then
         Log.Warn("注册账号", account, "成功, 玩家id=", user_id)
         return XCode.Successful
     end
-    response.error = "保存数据到mongodb失败"
     Log.Error("保存数据到mongodb失败，注册失败")
-    return XCode.Failure
+    return XCode.Failure, "保存数据到mongodb失败"
 end
 
 function AccountService.Login(request)

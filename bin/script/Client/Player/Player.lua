@@ -28,7 +28,6 @@ function Player:Login()
         return false
     end
     Log.Debug(account, " 登录网关服务器[", address, "]成功")
-   self:Update()
 end
 
 function Player.New(account, passwd, phoneNum)

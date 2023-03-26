@@ -1,62 +1,42 @@
-Name	Desc
-Successful	成功
-Failure	失败
-NetTimeout	网络超时
-NetReceiveFailure	接收网络消息失败
-NetSendFailure	发送网络消息失败
-NetConnectFailure	连接服务器失败
-NetActiveShutdown	主动关闭连接
-NetBigDataShutdown	数据包过大
-ParseMessageError	解析protobuf失败
-UnKnowPacket	恶意数据包
-ParseRequestDataError	解析请求数据包失败
-ParseResponseDataError	解析响应数据包失败
-CallServiceNotFound	调用服务未发现
-NotFoundRpcConfig	没有rpc配置
-RpcTypeError	rpc类型错误
-InitMessageFail	初始化消息失败
-CallFunctionNotExist	调用方法不存在
-CallArgsError	调用参数错误
-NotFindUser	没有找到玩家对象
-CallTypeError	调用参数类型错误
-CallTimeout	超时自动调用
-ThrowError	抛出一个错误
-NotServerGroupConfig	没有服务器组配置
-InitNodeProxyFailure	初始化节点失败
-AddRpcCallbackFailure	添加rpc回调失败
-LuaCoroutineWait	等待lua协程返回
-CallLuaFunctionFail	调用lua方法错误
-NotResponseMessage	不返回数据
-JsonCastProtoFailure	json转protobuf失败
-ProtoCastJsonFailure	protobuf转json失败
-CreateProtoFailure	创建protobuf失败
-SerializationFailure	序列化失败
-CommandArgsError	GM命令参数错误
-SessionIsNull	Session是空
-SendMessageFail	发送消息错误
-NetWorkError	网络错误
-NoCoroutineContext	没有协程上下文
-ParseJsonFailure	解析json失败
-CacheMessageNextSend	缓存消息下次发送
-MysqlResultIsNull	Mysql结果返回空
-MysqlTableNameError	Mysql表名不符合规则
-MysqlInitTaskFail	Mysql初始化失败
-MysqlSocketIsNull	Mysql连接是空
-MysqlSelectDbFailure	Mysql选择数据库失败
-MysqlInvokeFailure	Mysql执行sql语句失败
-SaveToMysqlFailure	保存数据到Mysql失败
-SaveToRedisFailure	保存数据到Redis失败
-RedisAuthFailure	Redis用户验证失败
-RedisSocketError	Redis网络错误
-RedisReplyIsNull	Redis回复是空
-RedisInvokeError	Redis命令执行失败
-AccountAlreadyExists	账号已经存在
-AccountNotExists	账号不存在
-AddressAllotFailure	服务分配失败
-HttpTaskStarFail	Http任务启动失败
-HttpUrlParseError	HttpUrl解析失败
-HostResolverError	Host主机没发现
-HttpNetWorkError	Http网络错误
-HttpResponseError	Http服务器返回错误
-HttpMethodNotFound	Http方法没发现
-HttpHeadParseFailure	Http协议头解析失败
+Name,Desc
+Successful,成功
+Failure,失败
+NetTimeout,网络超时
+NetReceiveFailure,接收网络消息失败
+NetSendFailure,发送网络消息失败
+NetConnectFailure,连接服务器失败
+NetActiveShutdown,主动关闭连接
+NetBigDataShutdown,数据包过大
+ParseMessageError,解析protobuf失败
+UnKnowPacket,恶意数据包
+ParseRequestDataError,解析请求数据包失败
+ParseResponseDataError,解析响应数据包失败
+CallServiceNotFound,调用服务未发现
+NotFoundRpcConfig,没有rpc配置
+RpcTypeError,rpc类型错误
+InitMessageFail,初始化消息失败
+CallFunctionNotExist,调用方法不存在
+CallArgsError,调用参数错误
+NotFindUser,没有找到玩家对象
+CallTypeError,调用参数类型错误
+CallTimeout,超时自动调用
+ThrowError,抛出一个错误
+CallLuaFunctionFail,调用lua方法错误
+JsonCastProtoFailure,json转protobuf失败
+ProtoCastJsonFailure,protobuf转json失败
+CreateProtoFailure,创建protobuf失败
+SerializationFailure,序列化失败
+SendMessageFail,发送消息错误
+NetWorkError,网络错误
+ParseJsonFailure,解析json失败
+MysqlResultIsNull,Mysql结果返回空
+MysqlTableNameError,Mysql表名不符合规则
+MysqlInitTaskFail,Mysql初始化失败
+MysqlSocketIsNull,Mysql连接是空
+MysqlInvokeFailure,Mysql执行sql语句失败
+SaveToMysqlFailure,保存数据到Mysql失败
+SaveToRedisFailure,保存数据到Redis失败
+AccountAlreadyExists,账号已经存在
+AccountNotExists,账号不存在
+AddressAllotFailure,服务分配失败
+LuaCoroutineWait,等待lua协程完成

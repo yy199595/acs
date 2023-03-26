@@ -28,7 +28,11 @@ function Main.Start()
     end
 
     for _, player in ipairs(players) do
-        coroutine.start(player.Login, player)
+        player:Login()
+        --coroutine.start(player.Login, player)
+    end
+    for _, player in ipairs(players) do
+        coroutine.start(player.Update, player)
     end
     return true
 end
