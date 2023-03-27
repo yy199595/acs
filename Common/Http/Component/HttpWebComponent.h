@@ -4,6 +4,7 @@
 
 #ifndef SERVER_HTTPSERVICECOMPONENT_H
 #define SERVER_HTTPSERVICECOMPONENT_H
+#include<unordered_set>
 #include"HttpListenComponent.h"
 namespace Http
 {
@@ -20,7 +21,8 @@ namespace Sentry
         HttpWebComponent();
         ~HttpWebComponent() = default;
     public:
-        unsigned int GetWaitCount() const { return this->mWaitCount; }
+		void AddStaticDir(const std::string & dir);
+		unsigned int GetWaitCount() const { return this->mWaitCount; }
     private:
         bool LateAwake() final;
         void OnRecord(Json::Writer &document) final;
@@ -32,7 +34,8 @@ namespace Sentry
         unsigned int mWaitCount;
         class AsyncMgrComponent * mTaskComponent;
         std::unordered_map<std::string, unsigned int> mTasks;
-    };
+		std::unordered_map<std::string, std::string> mStaticSourceDir;
+	};
 }
 
 

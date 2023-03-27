@@ -16,23 +16,8 @@ namespace Sentry
         this->mLogSaveTime = 3;
         this->mServerName = ServerConfig::Inst()->Name();
         this->mLogSavePath = fmt::format("{0}/log", System::WorkPath());
-#ifdef __ALL_OUTPUT_LOG__
-        this->mAllLog = spdlog::rotating_logger_mt<spdlog::async_factory>(
-                this->mServerName,"./out.log", LOG_FILE_MAX_SIZE,LOG_FILE_MAX_SUM);
-#endif
         return true;
     }
-
-#ifdef __ALL_OUTPUT_LOG__
-    void LogComponent::OutputLog(spdlog::level::level_enum type, const std::string& log)
-    {
-        if (this->mAllLog != nullptr)
-        {
-            this->mAllLog->log(type, log);
-            this->mAllLog->flush();
-        }
-    }
-#endif
 
 	void LogComponent::OnSecondUpdate(const int tick)
 	{

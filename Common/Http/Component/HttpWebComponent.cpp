@@ -8,6 +8,8 @@
 #include"Config/ServiceConfig.h"
 #include"Client/HttpHandlerClient.h"
 #include"Service/HttpService.h"
+#include"File/DirectoryHelper.h"
+#include"File/FileHelper.h"
 #include"Component/ThreadComponent.h"
 namespace Sentry
 {
@@ -19,11 +21,28 @@ namespace Sentry
     }
     bool HttpWebComponent::LateAwake()
     {
-        this->mWaitCount = 0;
+		std::string dir;
+		this->mWaitCount = 0;
+		if(ServerConfig::Inst()->GetPath("html", dir))
+		{
+			this->AddStaticDir(dir);
+		}
         std::vector<HttpService *> httpServices;
         this->mTaskComponent = this->mApp->GetTaskComponent();
         return this->mApp->GetComponents(httpServices) && this->StartListen("http");
     }
+
+	void HttpWebComponent::AddStaticDir(const std::string& dir)
+	{
+		std::vector<std::string> files;
+		Helper::Directory::GetFilePaths(dir, files);
+		for(auto iter = files.begin(); iter != files.end(); iter++)
+		{
+			const std::string & fullPath = *iter;
+			const std::string path = fullPath.substr(dir.size());
+			this->mStaticSourceDir.emplace(path, fullPath);
+		}
+	}
 
     void HttpWebComponent::OnRequest(std::shared_ptr<Http::Request> request)
     {
@@ -31,6 +50,21 @@ namespace Sentry
         const HttpMethodConfig *httpConfig = HttpConfig::Inst()->GetMethodConfig(request->Path());
         if (httpConfig == nullptr)
         {
+			const std::string & path = request->Path();
+			auto iter = this->mStaticSourceDir.find(path);
+			if(iter != this->mStaticSourceDir.end())
+			{
+				std::string content;
+				const std::string & fullPath = iter->second;
+				if(Helper::File::ReadTxtFile(fullPath, content))
+				{
+					std::shared_ptr<Http::Response> response
+						= std::make_shared<Http::Response>();
+					response->Html(HttpStatus::OK, content);
+					this->Send(address, response);
+					return;
+				}
+			}
 			//this->ClosetHttpClient(address);
             this->Send(address, HttpStatus::NOT_FOUND);
             LOG_ERROR("[" << address << "] <<" << request->Path() << ">>" << HttpStatusToString(HttpStatus::NOT_FOUND));
