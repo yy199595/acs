@@ -95,4 +95,12 @@ namespace Http
         this->mHead.Add("content-type", HttpContentType::JSON);
 		this->mHead.Add("content-length", (int)this->mContent.size());
 	}
+
+    void Response::Content(HttpStatus code, const std::string& type, const std::string& str)
+    {
+        this->mCode = (int)code;
+        this->mContent.assign(str);
+        this->mHead.Add("content-type", type);
+        this->mHead.Add("content-length", (int)this->mContent.size());
+    }
 }

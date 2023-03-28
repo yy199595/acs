@@ -17,8 +17,18 @@ namespace Sentry
         : mSumCount(0), mWaitCount(0),
           mTaskComponent(nullptr)
     {
+        this->mTypeContent["js"] = HttpContentType::JS;
+        this->mTypeContent["css"] = HttpContentType::CSS;
+        this->mTypeContent["json"] = HttpContentType::JSON;
+        this->mTypeContent["html"] = HttpContentType::HTML;
+        this->mTypeContent["txt"] = HttpContentType::STRING;
 
+        this->mTypeContent["ico"] = HttpContentType::ICO;
+        this->mTypeContent["png"] = HttpContentType::PNG;
+        this->mTypeContent["gif"] = HttpContentType::GIF;
+        this->mTypeContent["jpeg"] = HttpContentType::JPEG;
     }
+
     bool HttpWebComponent::LateAwake()
     {
 		std::string dir;
@@ -38,9 +48,21 @@ namespace Sentry
 		Helper::Directory::GetFilePaths(dir, files);
 		for(auto iter = files.begin(); iter != files.end(); iter++)
 		{
+            std::string type;
 			const std::string & fullPath = *iter;
 			const std::string path = fullPath.substr(dir.size());
-			this->mStaticSourceDir.emplace(path, fullPath);
+            if (Helper::File::GetFileType(fullPath, type))
+            {
+                Http::StaticSource source;
+                auto iter1 = this->mTypeContent.find(type);
+                if (iter1 != this->mTypeContent.end())
+                {
+                    source.mPath = fullPath;
+                    source.mType = iter1->second;
+                    this->mStaticSourceDir.emplace(path, source);
+                }              
+            }
+			
 		}
 	}
 
@@ -55,12 +77,12 @@ namespace Sentry
 			if(iter != this->mStaticSourceDir.end())
 			{
 				std::string content;
-				const std::string & fullPath = iter->second;
-				if(Helper::File::ReadTxtFile(fullPath, content))
+                Http::StaticSource & staticSource = iter->second;
+				if(Helper::File::ReadTxtFile(staticSource.mPath, content))
 				{
 					std::shared_ptr<Http::Response> response
 						= std::make_shared<Http::Response>();
-					response->Html(HttpStatus::OK, content);
+					response->Content(HttpStatus::OK, staticSource.mType, content);
 					this->Send(address, response);
 					return;
 				}

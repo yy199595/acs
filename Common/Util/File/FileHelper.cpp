@@ -6,19 +6,32 @@
 #include <unistd.h>
 #endif
 #include"Md5/MD5.h"
+#include<regex>
 #include"DirectoryHelper.h"
 #pragma warning(disable : 4996)
 namespace Helper
 {
     namespace File {
         bool FileIsExist(const std::string &path)
-        {
+		{
 #ifdef _WIN32
             return _access(path.c_str(), 0) == 0;
 #else
             return access(path.c_str(), F_OK) == 0;
 #endif
         }
+
+        extern bool GetFileType(const std::string &path, std::string &type)
+		{
+			std::smatch match;
+			std::regex pattern("\\.([a-zA-Z0-9]+)$");
+			if (std::regex_search(path, match, pattern))
+			{
+				type = match[1];
+				return true;
+			}
+			return false;
+		}
 
         bool ReadTxtFile(const std::string &path, std::string &outFile)
         {

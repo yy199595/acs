@@ -27,6 +27,7 @@ namespace Http
 		void Json(HttpStatus code, const std::string & json);
         void Json(HttpStatus code, const char * str, size_t len);
 		void SetCode(HttpStatus code) { this->mCode = (int)code;}
+        void Content(HttpStatus code, const std::string& type, const std::string& str);
 	public:
         Head & Header() { return this->mHead; }
         HttpStatus Code() const { return (HttpStatus)this->mCode; }

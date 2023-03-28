@@ -96,9 +96,16 @@ enum HttpMethodType
 
 namespace HttpContentType
 {
-	constexpr char * JSON = "application/json";
-	constexpr char * HTML = "text/html";
+    constexpr char* CSS = "text/css";
+    constexpr char* HTML = "text/html";
 	constexpr char * STRING = "text/plain";
+    constexpr char* JSON = "application/json";
+    constexpr char* JS = "application/javascript";
+
+    constexpr char* JPEG = "image/jpeg";
+    constexpr char* PNG = "image/png";
+    constexpr char* GIF = "image/gif";
+    constexpr char* ICO = "image/x-icon";
 }
 
 #define HttpVersion "HTTP/1.0"

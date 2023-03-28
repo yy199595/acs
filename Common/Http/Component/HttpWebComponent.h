@@ -11,6 +11,17 @@ namespace Http
     class Request;
     class Response;
 }
+
+namespace Http
+{
+    class StaticSource
+    {
+    public:
+        std::string mPath;
+        std::string mType;
+    };
+}
+
 namespace Sentry
 {
     class HttpMethodConfig;
@@ -34,7 +45,8 @@ namespace Sentry
         unsigned int mWaitCount;
         class AsyncMgrComponent * mTaskComponent;
         std::unordered_map<std::string, unsigned int> mTasks;
-		std::unordered_map<std::string, std::string> mStaticSourceDir;
+        std::unordered_map<std::string, std::string> mTypeContent;
+		std::unordered_map<std::string, Http::StaticSource> mStaticSourceDir;
 	};
 }
 

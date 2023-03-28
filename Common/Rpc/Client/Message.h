@@ -56,7 +56,7 @@ namespace Rpc
         bool Parse(const std::string & address, std::istream &os, size_t size);
 
     public:
-        int GetCode(int code = XCode::Failure) const;
+        int GetCode(int code = 1) const;
 
         inline Head & GetHead() { return this->mHead; }
 

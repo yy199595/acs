@@ -5,8 +5,11 @@
 
 namespace Helper
 {
-    namespace File {
+    namespace File
+    {
         extern bool FileIsExist(const std::string &path);
+
+		extern bool GetFileType(const std::string & path, std::string & type);
 
         extern bool ReadTxtFile(const std::string &path, std::string &outFile);
 
