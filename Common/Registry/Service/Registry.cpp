@@ -223,9 +223,9 @@ namespace Sentry
 		{
 			this->mRegistryServers.erase(iter);
 		}
-		for (const std::string& address : this->mRegistryServers)
+		for (const std::string& target : this->mRegistryServers)
 		{
-			rpcService->Send(address, func, request);
+			rpcService->Send(target, func, request);
 		}
 		return XCode::Successful;
 	}
