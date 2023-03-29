@@ -6,7 +6,7 @@
 #include<regex>
 #include"Json/Lua/values.hpp"
 #include"String/StringHelper.h"
-
+#include"File/DirectoryHelper.h"
 namespace Http
 {
     Parameter::Parameter(const std::string & content)

@@ -12,7 +12,17 @@ namespace Json
 }
 namespace Http
 {
-    class Response : public IStream, public Tcp::ProtoMessage
+    class IResponse : public IStream, public Tcp::ProtoMessage
+    {
+    public:
+        void SetCode(HttpStatus code) { this->mCode = (int)code; }
+        HttpStatus Code() const { return (HttpStatus)this->mCode; }
+    private:
+        int mCode;
+    };
+
+
+    class Response : public IResponse
     {
     public:
         Response();
@@ -25,16 +35,13 @@ namespace Http
         void Json(HttpStatus code, Json::Writer & doc);
 		void Html(HttpStatus code, const std::string & html);
 		void Json(HttpStatus code, const std::string & json);
-        void Json(HttpStatus code, const char * str, size_t len);
-		void SetCode(HttpStatus code) { this->mCode = (int)code;}
+        void Json(HttpStatus code, const char * str, size_t len);	
         void Content(HttpStatus code, const std::string& type, const std::string& str);
 	public:
         Head & Header() { return this->mHead; }
-        HttpStatus Code() const { return (HttpStatus)this->mCode; }
         const std::string & GetError() const { return this->mError; }
-        const std::string & Content() const { return this->mContent; }
+        const std::string & GetContent() const { return this->mContent; }
     private:
-        int mCode;
         Head mHead;
         std::string mError;
         std::string mVersion;
@@ -43,5 +50,16 @@ namespace Http
     };
 }
 
+
+namespace Http
+{
+    class FileResponse : public IResponse
+    {
+    public:
+        bool OnRead(std::istream& buffer) final;
+        int OnWrite(std::ostream& buffer) final;
+        int Serialize(std::ostream& buffer) final;
+    };
+}
 
 #endif //APP_HTTPRESPONSE_H

@@ -5,6 +5,7 @@
 #ifndef APP_HTTPREQUEST_H
 #define APP_HTTPREQUEST_H
 #include<string>
+#include<fstream>
 #include"httpHead.h"
 #include<unordered_map>
 #include"Lua/LuaInclude.h"

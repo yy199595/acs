@@ -56,7 +56,7 @@ namespace Sentry
             // response->GetData().Writer(this->mLua);
             int code = (int)response->Code();
             lua_pushinteger(this->mLua, code);
-            const std::string & conetnt = response->Content();
+            const std::string & conetnt = response->GetContent();
             lua_pushlstring(this->mLua, conetnt.c_str(), conetnt.size());
             Lua::Coroutine::Resume(coroutine, this->mLua, 2);
             return;

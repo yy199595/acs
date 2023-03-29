@@ -87,26 +87,55 @@ inline const char* HttpStatusToString(const HttpStatus& s) {
     }
 }
 
-enum HttpMethodType
+namespace Http
 {
-    GET,
-    POST,
-    UNKNOW
+    enum class MethodType
+    {
+        GET,
+        POST,
+        UNKNOW
+    };
+
+    namespace MethodName
+    {
+        constexpr char* GET = "GET";
+        constexpr char* POST = "POST";
+    };
+
+    enum class ContentType
+    {
+        JS = 1,
+        CSS = 2,
+        HTML = 3,
+        JSON = 4,
+        STRING = 5,
+
+        PNN = 6,
+        GIT = 7,
+        ICO = 8,
+        JPEG = 9
+    };
+
+    namespace ConetntSuffix
+    {
+
+    }
+
+    namespace ContentName
+    {
+        constexpr char* CSS = "text/css";
+        constexpr char* HTML = "text/html";
+        constexpr char* STRING = "text/plain";
+        constexpr char* JSON = "application/json";
+        constexpr char* JS = "application/javascript";
+
+        constexpr char* JPEG = "image/jpeg";
+        constexpr char* PNG = "image/png";
+        constexpr char* GIF = "image/gif";
+        constexpr char* ICO = "image/x-icon";
+    };
 };
 
-namespace HttpContentType
-{
-    constexpr char* CSS = "text/css";
-    constexpr char* HTML = "text/html";
-	constexpr char * STRING = "text/plain";
-    constexpr char* JSON = "application/json";
-    constexpr char* JS = "application/javascript";
-
-    constexpr char* JPEG = "image/jpeg";
-    constexpr char* PNG = "image/png";
-    constexpr char* GIF = "image/gif";
-    constexpr char* ICO = "image/x-icon";
-}
 
 #define HttpVersion "HTTP/1.0"
 

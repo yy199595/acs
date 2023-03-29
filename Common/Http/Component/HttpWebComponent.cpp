@@ -17,16 +17,16 @@ namespace Sentry
         : mSumCount(0), mWaitCount(0),
           mTaskComponent(nullptr)
     {
-        this->mTypeContent["js"] = HttpContentType::JS;
-        this->mTypeContent["css"] = HttpContentType::CSS;
-        this->mTypeContent["json"] = HttpContentType::JSON;
-        this->mTypeContent["html"] = HttpContentType::HTML;
-        this->mTypeContent["txt"] = HttpContentType::STRING;
+        this->mTypeContent["js"] = Http::ContentName::JS;
+        this->mTypeContent["css"] = Http::ContentName::CSS;
+        this->mTypeContent["json"] = Http::ContentName::JSON;
+        this->mTypeContent["html"] = Http::ContentName::HTML;
+        this->mTypeContent["txt"] = Http::ContentName::STRING;
 
-        this->mTypeContent["ico"] = HttpContentType::ICO;
-        this->mTypeContent["png"] = HttpContentType::PNG;
-        this->mTypeContent["gif"] = HttpContentType::GIF;
-        this->mTypeContent["jpeg"] = HttpContentType::JPEG;
+        this->mTypeContent["ico"] = Http::ContentName::ICO;
+        this->mTypeContent["png"] = Http::ContentName::PNG;
+        this->mTypeContent["gif"] = Http::ContentName::GIF;
+        this->mTypeContent["jpeg"] = Http::ContentName::JPEG;
     }
 
     bool HttpWebComponent::LateAwake()
