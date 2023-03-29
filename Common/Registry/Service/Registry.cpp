@@ -160,10 +160,10 @@ namespace Sentry
 		this->mNodeComponent->AddHttpServer(server, http);
 
 		RpcService* rpcService = this->mApp->GetService<Node>();
-		for (const std::string& address : this->mRegistryServers)
+		for (const std::string& server : this->mRegistryServers)
 		{
-			rpcService->Send(address, func, request);
-			LOG_INFO("send server join message to " << address);
+			rpcService->Send(server, func, request);
+			LOG_INFO("send server join message to " << server);
 		}
 		return XCode::Successful;
 	}
