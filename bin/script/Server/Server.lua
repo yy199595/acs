@@ -1,6 +1,6 @@
 
 local Main = {}
-local Mongo = require("Component.MongoComponent")
+local Mongo = require("MongoComponent")
 
 function Main.Awake()
 

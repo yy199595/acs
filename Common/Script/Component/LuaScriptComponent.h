@@ -34,7 +34,6 @@ namespace Sentry
 		void OnRecord(Json::Writer &document) final;
     private:
 		bool LoadAllFile();
-		bool LoadAllFilePath(const std::string & dir);
         void AddRequire(const std::string & direct);
 	 private:
         lua_State* mLuaEnv;
@@ -42,7 +41,7 @@ namespace Sentry
 		std::string mComponentPath;
         std::set<std::string> mDirectorys;
 		std::unordered_map<std::string, int> mFuncs;
-		std::unordered_map<std::string, std::string> mModulePaths;
+		//std::unordered_map<std::string, std::string> mModulePaths;
 		std::unordered_map<std::string, std::unique_ptr<Lua::LuaModule>> mModules;
 	};
 }
