@@ -30,11 +30,11 @@ function Player:Login()
     Log.Debug(account, " 登录网关服务器[", address, "]成功")
 end
 
-function Player.New(account, passwd, phoneNum)
+function Player.New(info)
     local tab = {
-        account = account,
-        password = passwd,
-        phone = phoneNum,
+        account = info.account,
+        password = info.passwd,
+        phone = info.phoneNum,
         session = 0
     }
     setmetatable(tab, {__index = Player})

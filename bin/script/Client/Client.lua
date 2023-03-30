@@ -2,8 +2,8 @@
 local Main = {}
 print(package.path)
 require("Player.Player")
-require("component.ChatComponent")
-require("component.LoginComponent")
+require("Client.ChatComponent")
+require("Client.LoginComponent")
 local CallMongo = function()
     local t1 = Time.NowMilTime()
     local code, res = Client.Call("MongoDB.Query", {
@@ -23,7 +23,7 @@ local players = {}
 function Main.Start()
     local accounts = require("Player.ClientAccount")
     for _, account in ipairs(accounts) do
-        local player = Player.New(account.account, account.passwd, account.phoneNum)
+        local player = Player.New(account)
         table.insert(players, player)
     end
 

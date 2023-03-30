@@ -1,7 +1,7 @@
 
 local AccountService = {}
 local tabName = "user.account_info"
-local Mongo = require "MongoComponent"
+local Mongo = require"Server.MongoComponent"
 
 function AccountService.Awake()
     print("启动账号服务")
@@ -35,7 +35,7 @@ function AccountService.Register(request)
         Log.Warn("注册账号", account, "成功, 玩家id=", user_id)
         return XCode.Successful
     end
-    Log.Error("保存数据到mongodb失败，注册失败")
+    Log.Error("保存数据到mongodb失败,注册失败")
     return XCode.Failure, "保存数据到mongodb失败"
 end
 
