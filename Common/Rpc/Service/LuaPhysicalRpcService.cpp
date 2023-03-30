@@ -19,17 +19,13 @@ namespace Sentry
 
 	bool LuaPhysicalRpcService::Init()
 	{
-		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
-		if(this->mLuaComponent == nullptr)
-		{
-			return false;
-		}
 		const std::string & name = this->GetName();
+		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
 		if(this->mLuaComponent->LoadModule(name) == nullptr)
 		{
+			LOG_FATAL("load lua module [" << name << "] failure");
 			return false;
 		}
-
         this->mIsHandlerMessage = true;
         return this->LoadFromLua();
 	}

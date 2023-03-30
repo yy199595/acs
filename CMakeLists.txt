@@ -214,7 +214,7 @@ elseif(UNIX)
         message("当前是wsl系统")
         list(APPEND StaticLibs protobufd pthread dl)
     else()
-        list(APPEND StaticLibs protobuf pthread dl)
+        list(APPEND StaticLibs protobufd pthread dl)
     endif()
 
 

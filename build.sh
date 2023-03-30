@@ -9,6 +9,10 @@ cmake ./CMakeLists.txt
 make lua
 make spdlog
 make libprotobuf
+if ! command -v protoc &> /dev/null
+then
+    make protoc && install
+fi
 make app
 
 # shellcheck disable=SC2038

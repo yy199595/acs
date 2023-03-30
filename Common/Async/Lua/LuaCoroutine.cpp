@@ -1,7 +1,7 @@
 #include"LuaCoroutine.h"
 #include"App/App.h"
-#include"Lua/luadebug.h"
 #include"Log/Debug.h"
+#include"Timer/TimerBase.h"
 #include"Lua/LuaWaitTaskSource.h"
 #include"Component/TimerComponent.h"
 using namespace Sentry;
@@ -16,7 +16,7 @@ namespace Lua
 			return 0;
 		}
 		lua_pushthread(lua);
-		int ms = luaL_checkinteger(lua, 1);
+		int ms = (int)luaL_checkinteger(lua, 1);
 		TimerComponent * timerComponent = App::Inst()->GetTimerComponent();
 		std::shared_ptr<LuaWaitTaskSource> luaRpcTaskSource(new LuaWaitTaskSource(lua));
 		timerComponent->DelayCall(ms, [luaRpcTaskSource]()

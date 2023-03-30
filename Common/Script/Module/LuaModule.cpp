@@ -33,7 +33,7 @@ namespace Lua
 		}
 		if(luaL_dofile(this->mLua, this->mPath.c_str()) != LUA_OK)
 		{
-            LUA_LOG_ERROR(lua_tostring(this->mLua, -1));
+            LOG_FATAL(lua_tostring(this->mLua, -1));
 			return false;
 		}
 		if(!lua_istable(this->mLua, -1))

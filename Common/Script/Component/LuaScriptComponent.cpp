@@ -139,7 +139,6 @@ namespace Sentry
 				return this->LoadModuleByPath(path);
 			}
 		}
-		LOG_ERROR("load lua module [" << name << "] failure");
 		return nullptr;
 	}
 

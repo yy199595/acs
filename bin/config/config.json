@@ -48,7 +48,7 @@
         "lua": {
             "common": "script/Common",
             "module": "script/Server",
-            "component":"script/component",
+            "component":"script/Component",
             "main": "script/Server/Server.lua"
         },
         "path": {

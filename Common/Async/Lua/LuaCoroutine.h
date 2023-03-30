@@ -5,7 +5,7 @@
 #ifndef _LUACOROUTINE_H_
 #define _LUACOROUTINE_H_
 #include"Lua/LuaInclude.h"
-#include"Timer/TimerBase.h"
+
 
 namespace Lua
 {
