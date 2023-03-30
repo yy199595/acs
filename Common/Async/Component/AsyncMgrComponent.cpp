@@ -97,7 +97,6 @@ namespace Sentry
 	{
 		assert(this->mRunContext);
 		assert(this->mRunContext->mState == CorState::Running);
-
 		this->mRunContext->mSwitchCount++;
 		this->mRunContext->mState = CorState::Suspend;
 #ifdef __DEBUG__

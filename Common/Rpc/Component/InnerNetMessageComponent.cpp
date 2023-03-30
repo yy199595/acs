@@ -66,7 +66,7 @@ namespace Sentry
         message->GetHead().Remove("id");
         message->GetHead().Add("code", code);
 #ifndef __DEBUG__
-        head.Remove("func");
+		message->GetHead().Remove("func");
 #endif
         message->SetType(Tcp::Type::Response);
         this->mInnerComponent->Send(message->From(), message);
@@ -93,7 +93,6 @@ namespace Sentry
 			);
 		}
 #ifdef __DEBUG__
-        ElapsedTimer timer;
         std::string json("{}");
         ProtoComponent * component = this->GetComponent<ProtoComponent>();
         if(!config->Request.empty())

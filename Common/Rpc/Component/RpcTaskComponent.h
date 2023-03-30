@@ -26,7 +26,7 @@ namespace Sentry
                 LOG_ERROR("add task already exist");
                 return nullptr;
             }
-            this->mTasks.emplace(k, task);
+			this->mTasks.emplace(k, task);
             return task.get();
         }
         bool OnResponse(K key, std::shared_ptr<T> message);

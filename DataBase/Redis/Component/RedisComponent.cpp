@@ -107,6 +107,7 @@ namespace Sentry
 		int taskId = 0;
 		if(!this->Send(request, taskId))
 		{
+			LOG_ERROR("send redis cmd error : "  << request->ToJson());
 			return nullptr;
 		}
 		std::shared_ptr<RedisTask> redisTask = request->MakeTask(taskId);

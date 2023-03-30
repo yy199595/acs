@@ -143,13 +143,12 @@ namespace Sentry
     class RedisTask : public IRpcTask<RedisResponse>
     {
     public:
-        RedisTask(std::shared_ptr<RedisRequest> request, int id);
+        RedisTask(int id);
         ~RedisTask() = default;
     public:       
         void OnResponse(std::shared_ptr<RedisResponse> response) final;
         std::shared_ptr<RedisResponse> Await() { return this->mTask.Await(); }
     private:
-		std::shared_ptr<RedisRequest> mRequest;
 		TaskSource<std::shared_ptr<RedisResponse>> mTask;
     };
 

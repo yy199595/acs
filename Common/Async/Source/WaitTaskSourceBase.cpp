@@ -40,10 +40,10 @@ namespace Sentry
 
     bool WaitTaskSourceBase::YieldTask()
     {
-        if(this->mState == TaskState::TaskReady)
+		if(this->mState == TaskState::TaskReady)
         {
             this->mState = TaskState::TaskAwait;
-			assert(App::Inst()->GetTaskComponent()->YieldCoroutine(this->mCorId));
+			App::Inst()->GetTaskComponent()->YieldCoroutine(this->mCorId);
             return true;
         }
         return false;
