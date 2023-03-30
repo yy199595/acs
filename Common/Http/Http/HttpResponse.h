@@ -15,9 +15,9 @@ namespace Http
     class IResponse : public IStream, public Tcp::ProtoMessage
     {
     public:
-        HttpStatus Code() const { return (HttpStatus)this->mCode; }
         void SetCode(HttpStatus code) { this->mCode = (int)code; }
-    protected:
+        HttpStatus Code() const { return (HttpStatus)this->mCode; }
+    private:
         int mCode;
     };
 
