@@ -12,14 +12,18 @@ endif()
 set(MESSAGE_SRC "")
 set(MESSAGE_HDRS "")
 #设置protoc的搜索路径
-LIST(APPEND PROTO_FLAGS -I${CMAKE_SOURCE_DIR}/bin/proto/message)
+LIST(APPEND PROTO_FLAGS -I${CMAKE_SOURCE_DIR}/bin/proto/c2s)
+LIST(APPEND PROTO_FLAGS -I${CMAKE_SOURCE_DIR}/bin/proto/s2s)
+LIST(APPEND PROTO_FLAGS -I${CMAKE_SOURCE_DIR}/bin/proto/com)
 LIST(APPEND PROTO_FLAGS -I${CMAKE_SOURCE_DIR}/bin/proto/mysql)
 
 #获取需要编译的proto文件
-file(GLOB_RECURSE MSG_PROTOS ${CMAKE_SOURCE_DIR}/bin/proto/message/*.proto)
+file(GLOB_RECURSE C2S_PROTOS ${CMAKE_SOURCE_DIR}/bin/proto/c2s/*.proto)
+file(GLOB_RECURSE S2S_PROTOS ${CMAKE_SOURCE_DIR}/bin/proto/s2s/*.proto)
+file(GLOB_RECURSE COM_PROTOS ${CMAKE_SOURCE_DIR}/bin/proto/com/*.proto)
 file(GLOB_RECURSE MYSQL_PROTOS ${CMAKE_SOURCE_DIR}/bin/proto/mysql/*.proto)
 
-list(APPEND MSG_PROTOS ${MYSQL_PROTOS})
+list(APPEND MSG_PROTOS ${C2S_PROTOS} ${S2S_PROTOS} ${COM_PROTOS} ${MYSQL_PROTOS})
 foreach(msg ${MSG_PROTOS})
     message(${msg})
     get_filename_component(FIL_WE ${msg} NAME_WE)

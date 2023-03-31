@@ -1,4 +1,7 @@
-﻿#include"MysqlDB.h"
+﻿
+#ifdef __ENABLE_MYSQL__
+
+#include"MysqlDB.h"
 #include"Entity/App/App.h"
 #include"Util/Proto/ProtoHelper.h"
 #include"Mysql/Client/MysqlMessage.h"
@@ -17,6 +20,7 @@ namespace Sentry
 	{
 		BIND_COMMON_RPC_METHOD(MysqlDB::Add);
 		BIND_COMMON_RPC_METHOD(MysqlDB::Save);
+		BIND_COMMON_RPC_METHOD(MysqlDB::Exec);
 		BIND_COMMON_RPC_METHOD(MysqlDB::Query);
 		BIND_COMMON_RPC_METHOD(MysqlDB::Update);
 		BIND_COMMON_RPC_METHOD(MysqlDB::Delete);
@@ -57,8 +61,8 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-        const std::string typeName = message->GetTypeName();
-        if(typeName.find('.') == std::string::npos)
+		const std::string & table = request.table();
+        if(table.find('.') == std::string::npos)
         {
             return XCode::CallArgsError;
         }
@@ -82,14 +86,15 @@ namespace Sentry
                 default:
                     return XCode::CallArgsError;
             }
-            keys.emplace_back(std::move(key));
+            keys.emplace_back(key);
         }
         if(keys.size() == 1)
         {
-            this->mMainKeys[typeName] = keys[0];
+            this->mMainKeys[table] = keys[0];
         }
+
         std::shared_ptr<Mysql::CreateTabCommand> command =
-			std::make_shared<Mysql::CreateTabCommand>(message, keys);
+			std::make_shared<Mysql::CreateTabCommand>(table, message, keys);
 		int id = this->mClientIds.front();
         if (!this->mMysqlComponent->Run(id, command))
         {
@@ -184,38 +189,60 @@ namespace Sentry
 		return this->mMysqlComponent->Execute(id, command)? XCode::Successful : XCode::MysqlInvokeFailure;
     }
 
-	int MysqlDB::Query(const db::mysql::query& request, db::mysql::response& response)
-    {
-		std::shared_ptr<Mysql::QueryCommand> command;
-		if(request.sql().empty())
-		{
-			std::string sql;
-			std::vector<std::string> fields;
-			const int limit = request.limit();
-			const std::string& table = request.table();
-			const std::string & where = request.where_json();
-			if (!this->mSqlHelper.Select(table, where, fields, limit, sql))
-			{
-				return XCode::CallArgsError;
-			}
-			command = std::make_shared<Mysql::QueryCommand>(sql);
-		}
-		else
-		{
-			const std::string & sql = request.sql();
-			command = std::make_shared<Mysql::QueryCommand>(sql);
-		}
+	int MysqlDB::Exec(const db::mysql::exec& request, db::mysql::response& response)
+	{
 		int id = this->GetClientId();
+		const std::string & sql = request.sql();
+		if(!request.query())
+		{
+			std::shared_ptr<Mysql::ICommand> command = std::make_shared<Mysql::SqlCommand>(sql);
+			std::shared_ptr<Mysql::Response> result = this->mMysqlComponent->Run(id, command);
+			if (!result->IsOk())
+			{
+				response.set_error(result->GetError());
+				return XCode::MysqlInvokeFailure;
+			}
+			return XCode::Successful;
+		}
+		std::shared_ptr<Mysql::ICommand> command = std::make_shared<Mysql::QueryCommand>(sql);
 		std::shared_ptr<Mysql::Response> result = this->mMysqlComponent->Run(id, command);
-		if(!result->IsOk())
+		if (!result->IsOk())
 		{
 			response.set_error(result->GetError());
 			return XCode::MysqlInvokeFailure;
 		}
-        for (size_t index = 0; index < result->ArraySize(); index++)
+		for (size_t index = 0; index < result->ArraySize(); index++)
 		{
 			response.add_jsons(result->Get(index));
 		}
-        return XCode::Successful;
-    }
+		return XCode::Successful;
+	}
+
+	int MysqlDB::Query(const db::mysql::query& request, db::mysql::response& response)
+	{
+		std::string sql;
+		std::vector<std::string> fields;
+		const int limit = request.limit();
+		const std::string& table = request.table();
+		const std::string& where = request.where_json();
+		if (!this->mSqlHelper.Select(table, where, fields, limit, sql))
+		{
+			return XCode::CallArgsError;
+		}
+		int id = this->GetClientId();
+		std::shared_ptr<Mysql::QueryCommand> command = std::make_shared<Mysql::QueryCommand>(sql);
+		std::shared_ptr<Mysql::Response> result = this->mMysqlComponent->Run(id, command);
+		if (!result->IsOk())
+		{
+			response.set_error(result->GetError());
+			return XCode::MysqlInvokeFailure;
+		}
+		for (size_t index = 0; index < result->ArraySize(); index++)
+		{
+			response.add_jsons(result->Get(index));
+		}
+		return XCode::Successful;
+	}
 }// namespace Sentry
+
+#endif

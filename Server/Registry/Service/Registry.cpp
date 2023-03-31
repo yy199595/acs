@@ -16,8 +16,8 @@
 #include"Mysql/Client/MysqlMessage.h"
 #include"Mysql/Component/MysqlDBComponent.h"
 #else
-#include"String/StringHelper.h"
-#include"Component/SqliteComponent.h"
+#include"Util/String/StringHelper.h"
+#include"Sqlite/Component/SqliteComponent.h"
 #endif
 namespace Sentry
 {
@@ -73,7 +73,7 @@ namespace Sentry
         this->mIndex = this->mMysqlComponent->MakeMysqlClient();
 		std::vector<std::string> keys{ "rpc_address" };
 		std::shared_ptr<Mysql::CreateTabCommand> command =
-                std::make_shared<Mysql::CreateTabCommand>(message, keys);
+                std::make_shared<Mysql::CreateTabCommand>(this->mTable,message, keys);
         return this->mMysqlComponent->Run(this->mIndex , command)->IsOk();
 #else
 		std::vector<std::string> ret;

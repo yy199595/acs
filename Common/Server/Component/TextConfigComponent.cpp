@@ -34,7 +34,7 @@ namespace Sentry
         return true;
     }
 
-    bool TextConfigComponent::LoadTextConfig(std::unique_ptr<TextConfig> config, const std::string &path)
+    bool TextConfigComponent::LoadTextConfig(std::unique_ptr<ITextConfig> config, const std::string &path)
     {
         const std::string & name = config->GetName();
         if(this->mConfigs.find(name) != this->mConfigs.end())

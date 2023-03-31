@@ -2,6 +2,9 @@
 // Created by yjz on 2023/3/23.
 //
 #include<sstream>
+#include<fstream>
+#include <utility>
+#include"Util/Md5/MD5.h"
 #include"CsvTextConfig.h"
 #include"Util/String/StringHelper.h"
 
@@ -65,17 +68,26 @@ namespace Sentry
 
 namespace Sentry
 {
-	CsvTextConfig::CsvTextConfig(const std::string& name)
-		: TextConfig(name.c_str())
+	CsvTextConfig::CsvTextConfig(std::string  name)
+		: mName(std::move(name))
 	{
 
 	}
 
-	bool CsvTextConfig::OnLoadText(const char* str, size_t length)
+	bool CsvTextConfig::ReloadConfig()
 	{
+		std::ifstream fileStream(this->mPath, std::ios::out);
+		if(!fileStream.is_open())
+		{
+			return false;
+		}
+		std::string md5 = Helper::Md5::GetMd5(fileStream);
+		if(this->mMd5 == md5)
+		{
+			return true;
+		}
+
 		std::string line;
-		std::stringstream fileStream;
-		fileStream.write(str, length);
 		if(!std::getline(fileStream, line))
 		{
 			return false;
@@ -89,6 +101,10 @@ namespace Sentry
 		size_t size = fields.size();
 		while(std::getline(fileStream, line))
 		{
+			if(line[0] == '#') //忽略注释行
+			{
+				continue;
+			}
 			values.clear();
 			CsvLineData lineData;
 			if(Helper::Str::Split(line, ",", values) != size)
@@ -106,11 +122,61 @@ namespace Sentry
 				return false;
 			}
 		}
-		return true;
+		this->mMd5 = md5;
 	}
 
-	bool CsvTextConfig::OnReloadText(const char* str, size_t length)
+	bool CsvTextConfig::LoadConfig(const std::string& path)
 	{
+		std::ifstream fileStream(path, std::ios::out);
+		if(!fileStream.is_open())
+		{
+			return false;
+		}
+		std::string line;
+		if(!std::getline(fileStream, line))
+		{
+			return false;
+		}
+		if(line.back() == '\r')
+		{
+			line.pop_back();
+		}
+		std::vector<std::string> fields;
+		std::vector<std::string> values;
+		if(Helper::Str::Split(line, ",", fields) == 0)
+		{
+			return false;
+		}
+		size_t size = fields.size();
+		while(std::getline(fileStream, line))
+		{
+			if(line[0] == '#') //忽略注释行
+			{
+				continue;
+			}
+			values.clear();
+			if(line.back() == '\r')
+			{
+				line.pop_back();
+			}
+			CsvLineData lineData;
+			if(Helper::Str::Split(line, ",", values) != size)
+			{
+				return false;
+			}
+			for(size_t index = 0;index<values.size();index++)
+			{
+				const std::string & key = fields.at(index);
+				const std::string & value = values.at(index);
+				lineData.Add(key, value);
+			}
+			if(!this->OnLoadLine(lineData))
+			{
+				return false;
+			}
+		}
+		this->mPath = path;
+		this->mMd5 = Helper::Md5::GetMd5(fileStream);
 		return true;
 	}
 }

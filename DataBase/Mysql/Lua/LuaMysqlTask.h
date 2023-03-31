@@ -1,6 +1,7 @@
 //
 // Created by yjz on 2023/3/24.
 //
+#ifdef __ENABLE_MYSQL__
 
 #ifndef APP_DATABASE_MYSQL_LUA_LUAMYSQLTASK_H
 #define APP_DATABASE_MYSQL_LUA_LUAMYSQLTASK_H
@@ -32,3 +33,5 @@ namespace Sentry
 
 
 #endif //APP_DATABASE_MYSQL_LUA_LUAMYSQLTASK_H
+
+#endif

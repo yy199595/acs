@@ -1,6 +1,8 @@
 //
 // Created by yjz on 2023/3/24.
 //
+#ifdef __ENABLE_MYSQL__
+
 
 #include"LuaMysql.h"
 #include"Entity/App/App.h"
@@ -76,3 +78,5 @@ namespace Lua
 		return component->AddTask(rpcId, luaMysqlTask)->Await();
 	}
 }
+
+#endif

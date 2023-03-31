@@ -1,8 +1,10 @@
 //
 // Created by zmhy0073 on 2022/8/25.
 //
-
+#ifdef __ENABLE_MYSQL__
 #include"MysqlMessage.h"
+
+#include <utility>
 #include"errmsg.h"
 #include"spdlog/fmt/fmt.h"
 #include"sstream"
@@ -173,23 +175,23 @@ namespace Mysql
 
 namespace Mysql
 {
-    CreateTabCommand::CreateTabCommand(std::shared_ptr<google::protobuf::Message> message, std::vector<std::string> & keys)
-        : mMessage(message), mKeys(keys)
+    CreateTabCommand::CreateTabCommand(std::string  tab,
+			std::shared_ptr<google::protobuf::Message> message, std::vector<std::string> & keys)
+        : mMessage(std::move(message)), mKeys(keys), mTable(std::move(tab))
     {
 
     }
 
     bool CreateTabCommand::Invoke(MYSQL* sock, std::shared_ptr<Response> & response)
     {
-        std::string name = this->mMessage->GetTypeName();
-        const size_t pos = name.find('.');
+        const size_t pos = this->mTable.find('.');
         if (pos == std::string::npos)
         {
 			response->SetError("proto name not xxx.xxx");
             return false;
         }
-        std::string db = name.substr(0, pos);
-        std::string tab = name.substr(pos + 1);
+        std::string db = this->mTable.substr(0, pos);
+        std::string tab = this->mTable.substr(pos + 1);
         if (mysql_select_db(sock, db.c_str()) != 0)
         {
             this->mBuffer << "CREATE DATABASE IF NOT EXISTS " << db;
@@ -431,3 +433,4 @@ namespace Mysql
         return false;
     }
 }
+#endif

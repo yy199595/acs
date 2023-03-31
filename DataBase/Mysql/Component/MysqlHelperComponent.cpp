@@ -1,3 +1,5 @@
+#ifdef __ENABLE_MYSQL__
+
 #include"MysqlHelperComponent.h"
 #include"Util/String/StringHelper.h"
 #include"Mysql/Service/MysqlDB.h"
@@ -90,3 +92,5 @@ namespace Sentry
 		return XCode::Successful;
 	}
 }
+
+#endif

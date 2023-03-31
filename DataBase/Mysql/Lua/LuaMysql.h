@@ -1,6 +1,8 @@
 //
 // Created by yjz on 2023/3/24.
 //
+#ifdef __ENABLE_MYSQL__
+
 
 #ifndef APP_DATABASE_MYSQL_LUA_LUAMYSQL_H
 #define APP_DATABASE_MYSQL_LUA_LUAMYSQL_H
@@ -19,3 +21,5 @@ namespace Lua
 }
 
 #endif //APP_DATABASE_MYSQL_LUA_LUAMYSQL_H
+
+#endif

@@ -1,4 +1,6 @@
 ﻿
+#ifdef __ENABLE_MYSQL__
+
 #include"XCode/XCode.h"
 #include"Message/db.pb.h"
 #include"Core/Component/Component.h"
@@ -81,3 +83,5 @@ namespace Sentry
         return this->Update(data.GetTypeName(), whereJson, updateJson, flag);
 	}
 }
+
+#endif

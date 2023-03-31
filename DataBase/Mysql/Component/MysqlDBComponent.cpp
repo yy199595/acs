@@ -1,6 +1,8 @@
 //
 // Created by zmhy0073 on 2022/7/16.
 //
+#ifdef __ENABLE_MYSQL__
+
 
 #include"MysqlDBComponent.h"
 #include"Entity/App/App.h"
@@ -126,3 +128,5 @@ namespace Sentry
 		return response != nullptr && response->IsOk();
 	}
 }
+
+#endif

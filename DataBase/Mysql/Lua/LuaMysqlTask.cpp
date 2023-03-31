@@ -2,6 +2,8 @@
 // Created by yjz on 2023/3/24.
 //
 
+#ifdef __ENABLE_MYSQL__
+
 #include"LuaMysqlTask.h"
 #include"Script/Lua/LuaInclude.h"
 #include"Util/Json/Lua/Json.h"
@@ -82,3 +84,5 @@ namespace Sentry
 		Lua::Coroutine::Resume(coroutine, this->mLua, 1);
 	}
 }
+
+#endif

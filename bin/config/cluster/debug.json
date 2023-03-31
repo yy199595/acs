@@ -4,7 +4,6 @@
         "Service": {
             "User": true,
             "Node": true,
-            "Log": true,
             "Gate": true,
             "MongoDB": true,
             "Chat": true,

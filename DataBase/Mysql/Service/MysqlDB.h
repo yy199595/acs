@@ -1,5 +1,5 @@
 #pragma once
-
+#ifdef __ENABLE_MYSQL__
 #include"Common//SqlHelper.h"
 #include"Mysql/Client/MysqlClient.h"
 #include"Rpc/Service/PhysicalRpcService.h"
@@ -22,6 +22,8 @@ namespace Sentry
 
         int Create(const db::mysql::create& request);
 
+		int Exec(const db::mysql::exec& request, db::mysql::response& response);
+
         int Query(const db::mysql::query& request, db::mysql::response& response);
 
 	 private:
@@ -38,3 +40,5 @@ namespace Sentry
         std::unordered_map<std::string, std::string> mMainKeys;
     };
 }// namespace Sentry
+
+#endif

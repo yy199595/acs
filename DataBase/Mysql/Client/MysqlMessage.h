@@ -96,7 +96,8 @@ namespace Mysql
     class CreateTabCommand : public ICommand
     {
     public:
-        CreateTabCommand(std::shared_ptr<Message> message, std::vector<std::string> & keys);
+        CreateTabCommand(std::string  table,
+				std::shared_ptr<Message> message, std::vector<std::string> & keys);
     public:
 		bool Invoke(MYSQL *, std::shared_ptr<Response> & response) final;
 	private:
@@ -106,6 +107,7 @@ namespace Mysql
         bool CheckTableField(MYSQL * sock, const std::string & tab, std::string & error);
         bool AddNewField(MYSQL * sock, const std::string & tab, const std::string & field, std::string & error);
     private:
+		std::string mTable;
         std::stringstream mBuffer;
         std::vector<std::string> mKeys;
         std::shared_ptr<Message> mMessage;

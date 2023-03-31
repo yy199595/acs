@@ -52,6 +52,8 @@
 
 #include"WatchDog/Service/WatchDog.h"
 #include"WatchDog/Component/WatchDogComponent.h"
+#include "Server/Config/CsvTextConfig.h"
+
 using namespace Sentry;
 
 void RegisterComponent()
@@ -123,8 +125,30 @@ void RegisterServiceComponent()
     ComponentFactory::Add<MysqlDB>("MysqlDB");
 #endif
 }
+
+class RpcCsvConfig : public CsvTextConfig
+{
+public:
+	RpcCsvConfig() : CsvTextConfig("RpcCsvConfig") { }
+	bool OnLoadLine(const Sentry::CsvLineData &lineData) final
+	{
+		std::string service, method;
+		lineData.Get("Service", service);
+		lineData.Get("Method", method);
+
+		return true;
+	}
+
+	bool OnReLoadLine(const Sentry::CsvLineData &lineData) final
+	{
+		return true;
+	}
+};
+
 int main(int argc, char **argv)
 {
+	RpcCsvConfig config;
+	config.LoadConfig("./config/service/rpc.csv");
 #ifdef __OS_WIN__
     system("chcp 65001 > nul"); 
 #endif

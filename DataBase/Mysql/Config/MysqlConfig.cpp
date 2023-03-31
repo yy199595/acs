@@ -1,6 +1,8 @@
 //
 // Created by zmhy0073 on 2022/10/26.
 //
+#ifdef __ENABLE_MYSQL__
+
 
 #include"MysqlConfig.h"
 #include"Util/String/StringHelper.h"
@@ -40,3 +42,5 @@ namespace Sentry
         return true;
     }
 }
+
+#endif

@@ -1,15 +1,4 @@
 {
-    "Log": {
-        "Login": {
-            "Request": "s2s.log.login"
-        }
-    },
-    "WatchDog": {
-        "Ping": {},
-        "ShowLog": {
-            "Request": "s2s.log.show"
-        }
-    },
     "Gate": {
         "Ping": {
             "Async": false,
@@ -44,7 +33,7 @@
         },
         "UnRegister": {
             "Async": true,
-            "Response": "com.type.string"
+            "Request": "com.type.string"
         }
     },
     "MysqlDB": {
@@ -55,6 +44,11 @@
         "Save": {
             "Async": true,
             "Request": "db.mysql.save"
+        },
+        "Exec": {
+            "Async": true,
+            "Request": "db.mysql.exec",
+            "Response": "db.mysql.response"
         },
         "Query": {
             "Async": true,

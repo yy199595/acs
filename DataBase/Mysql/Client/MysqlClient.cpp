@@ -1,6 +1,8 @@
 //
 // Created by mac on 2022/4/14.
 //
+#ifdef __ENABLE_MYSQL__
+
 
 #include"MysqlClient.h"
 #include"MysqlMessage.h"
@@ -104,3 +106,5 @@ namespace Sentry
 		return true;
 	}
 }
+
+#endif

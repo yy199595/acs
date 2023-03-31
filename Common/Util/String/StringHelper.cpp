@@ -24,7 +24,7 @@ namespace Helper
 
     size_t Str::Split(const std::string &targetString, const char * cc, std::vector<std::string>& ret)
     {
-        google::protobuf::SplitStringUsing(targetString, cc, &ret);
+        google::protobuf::SplitStringAllowEmpty(targetString, cc, &ret);
         return ret.size();
     }
 

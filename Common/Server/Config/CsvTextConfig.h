@@ -25,16 +25,21 @@ namespace Sentry
 
 namespace Sentry
 {
-	class CsvTextConfig : public TextConfig
+	class CsvTextConfig : public ITextConfig
 	{
 	public:
-		explicit CsvTextConfig(const std::string & name);
-	private:
-		bool OnLoadText(const char *str, size_t length) final;
-		bool OnReloadText(const char *str, size_t length) final;
+		explicit CsvTextConfig(std::string  name);
+	public:
+		bool ReloadConfig() final;
+		bool LoadConfig(const std::string &path) final;
+		const std::string & GetName() const final { return this->mName; }
 	protected:
 		virtual bool OnLoadLine(const CsvLineData & lineData) = 0;
 		virtual bool OnReLoadLine(const CsvLineData & lineData) = 0;
+	private:
+		std::string mMd5;
+		std::string mName;
+		std::string mPath;
 	};
 }
 

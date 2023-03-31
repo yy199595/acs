@@ -1,7 +1,7 @@
 //
 // Created by zmhy0073 on 2022/7/16.
 //
-
+#ifdef __ENABLE_MYSQL__
 #ifndef SERVER_MYSQLRPCCOMPONENT_H
 #define SERVER_MYSQLRPCCOMPONENT_H
 
@@ -58,3 +58,4 @@ namespace Sentry
 
 
 #endif //SERVER_MYSQLRPCCOMPONENT_H
+#endif

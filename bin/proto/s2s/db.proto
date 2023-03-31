@@ -61,9 +61,17 @@ message mysql //mysql操作
 {
     message create
     {
-        repeated string keys = 1; //主键
-        google.protobuf.Any data = 2;
+        string table = 1; // xxx.xxx
+        repeated string keys = 2; //主键
+        google.protobuf.Any data = 3; //pb结构可以有默认值
     }
+
+    message exec
+    {
+        string sql = 1; //sql语句
+        bool query = 2; //是否是查询语句
+    }
+
     message add
     {
         int32 flag = 1;
@@ -78,11 +86,10 @@ message mysql //mysql操作
     }
     message query
     {
-        string sql = 1;
-        string table = 2;
+        string table = 1;
+        int32 limit = 2;
         string where_json = 3;
-        int32 limit = 4;
-        repeated string fields = 5;
+        repeated string fields = 4;
     }
     message remove
     {

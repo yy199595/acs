@@ -24,12 +24,12 @@ namespace Sentry
 
         template<typename T>
         bool LoadTextConfig(const std::string & path);
-        bool LoadTextConfig(std::unique_ptr<TextConfig> config, const std::string & path);
+        bool LoadTextConfig(std::unique_ptr<ITextConfig> config, const std::string & path);
     private:
         bool Awake() final;
     private:
         std::unordered_map<size_t, std::string> mKeys;
-        std::unordered_map<std::string, std::unique_ptr<TextConfig>> mConfigs;
+        std::unordered_map<std::string, std::unique_ptr<ITextConfig>> mConfigs;
     };
 
     template<typename T>
