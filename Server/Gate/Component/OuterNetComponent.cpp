@@ -3,15 +3,15 @@
 //
 
 #include"OuterNetComponent.h"
-#include"Client/OuterNetClient.h"
-#include"Component/ThreadComponent.h"
-#include"Component/NodeMgrComponent.h"
-#include"Component/InnerNetMessageComponent.h"
-#include"Md5/MD5.h"
-#include"Config/CodeConfig.h"
-#include"Json/JsonWriter.h"
-#include"Service/Gate.h"
-#include"Component/UnitMgrComponent.h"
+#include"Gate/Client/OuterNetClient.h"
+#include"Server/Component/ThreadComponent.h"
+#include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/InnerNetMessageComponent.h"
+#include"Util/Md5/MD5.h"
+#include"Server/Config/CodeConfig.h"
+#include"Util/Json/JsonWriter.h"
+#include"Gate/Service/Gate.h"
+#include"Entity/App/App.h"
 namespace Sentry
 {
 	bool OuterNetComponent::Awake()

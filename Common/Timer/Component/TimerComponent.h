@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include<unordered_map>
-#include"Timer/TimeWheelLayer.h"
-#include"Component/Component.h"
-#include"Method/MethodProxy.h"
+#include"Timer/Timer/TimeWheelLayer.h"
+#include"Core/Component/Component.h"
+#include"Rpc/Method/MethodProxy.h"
 namespace Sentry
 {
     class TimerComponent final : public Component, public ISystemUpdate, public ILuaRegister

@@ -1,11 +1,10 @@
 #include"TcpListenerComponent.h"
-#include"Tcp/SocketProxy.h"
-#include"Method/MethodProxy.h"
-#include"Log/CommonLogDef.h"
-#include"Config/ServerConfig.h"
-#include"Component/ThreadComponent.h"
-#include"App/App.h"
-#include"Tcp/Asio.h"
+#include"Network/Tcp/SocketProxy.h"
+#include"Rpc/Method/MethodProxy.h"
+#include"Server/Config/ServerConfig.h"
+#include"Server/Component/ThreadComponent.h"
+#include"Entity/App/App.h"
+#include"Network/Tcp/Asio.h"
 namespace Sentry
 {
 	TcpListenerComponent::TcpListenerComponent()

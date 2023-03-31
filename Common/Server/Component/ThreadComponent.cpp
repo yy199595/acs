@@ -1,7 +1,7 @@
 ﻿#include"ThreadComponent.h"
-#include"App/App.h"
-#include"Method/MethodProxy.h"
-#include"Tcp/SocketProxy.h"
+#include"Entity/App/App.h"
+#include"Rpc/Method/MethodProxy.h"
+#include"Network/Tcp/SocketProxy.h"
 
 namespace Sentry
 {

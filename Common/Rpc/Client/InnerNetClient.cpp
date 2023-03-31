@@ -1,21 +1,23 @@
 ﻿
 #include"InnerNetClient.h"
-#include"App/App.h"
-#include"Client/Rpc.h"
-#include"Guid/Guid.h"
-#include"System/System.h"
+
+#include <utility>
+#include"Entity/App/App.h"
+#include"Rpc/Client/Rpc.h"
+#include"Util/Guid/Guid.h"
+#include"Core/System/System.h"
 namespace Sentry
 {
 
 	InnerNetClient::InnerNetClient(IRpc<Rpc::Packet>* component, std::shared_ptr<SocketProxy> socket)
-		: TcpContext(socket, 1024 * 1024), mComponent(component), mIsClient(false)
+		: TcpContext(std::move(socket), 1024 * 1024), mComponent(component), mIsClient(false)
 	{
         this->mState = Tcp::DecodeState::Head;
 	}
 
 	InnerNetClient::InnerNetClient(IRpc<Rpc::Packet> * component,
-                                   std::shared_ptr<SocketProxy> socket, const AuthInfo & info)
-		: TcpContext(socket, 1024 * 1024), mComponent(component), mAuthInfo(info), mIsClient(true)
+                                   std::shared_ptr<SocketProxy> socket, AuthInfo info)
+		: TcpContext(std::move(socket), 1024 * 1024), mComponent(component), mAuthInfo(std::move(info)), mIsClient(true)
     {
         this->mState = Tcp::DecodeState::Head;
     }

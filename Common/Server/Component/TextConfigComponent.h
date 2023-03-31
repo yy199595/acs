@@ -4,8 +4,8 @@
 
 #ifndef APP_TEXTCONFIGCOMPONENT_H
 #define APP_TEXTCONFIGCOMPONENT_H
-#include"Config/TextConfig.h"
-#include"Component/Component.h"
+#include"Server/Config/TextConfig.h"
+#include"Core/Component/Component.h"
 namespace Sentry
 {
     class TextConfigComponent : public Component, public IHotfix

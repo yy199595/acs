@@ -1,6 +1,5 @@
 #include"UnitMgrComponent.h"
-#include"App/App.h"
-#include"Unit/Unit.h"
+#include"Entity/App/App.h"
 namespace Sentry
 {
 	bool UnitMgrComponent::LateAwake()

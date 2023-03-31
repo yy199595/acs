@@ -3,15 +3,15 @@
 //
 
 #include"LuaHttp.h"
-#include"Json/Lua/Json.h"
-#include"File/DirectoryHelper.h"
-#include"Lua/UserDataParameter.h"
-#include"Component/HttpComponent.h"
-#include"Client/HttpRequestClient.h"
-#include"Component/ProtoComponent.h"
+#include"Util/Json/Lua/Json.h"
+#include"Util/File/DirectoryHelper.h"
+#include"Http/Component/HttpComponent.h"
+#include"Http/Client/HttpRequestClient.h"
+#include"Proto/Component/ProtoComponent.h"
 
-#include"Http/HttpRequest.h"
-#include"Task/HttpTask.h"
+#include"Http/Common/HttpRequest.h"
+#include"Http/Task/HttpTask.h"
+#include"Entity/App/App.h"
 using namespace Sentry;
 namespace Lua
 {
@@ -32,14 +32,14 @@ namespace Lua
             luaL_error(lua, "parse get url : [%s] failure", str);
             return 0;
         }
+		std::shared_ptr<LuaHttpRequestTask> luaHttpTask
+				= std::make_shared<LuaHttpRequestTask>(lua);
 #ifdef __DEBUG__
         LOG_DEBUG("[http GET] url = " << std::string(str, size));
 #endif
-        std::shared_ptr<LuaHttpRequestTask> luaHttpTask(new LuaHttpRequestTask(lua));
-        std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
-
-        long long id = requestClient->Do(getRequest);
-        return httpComponent->AddTask(id, luaHttpTask)->Await(requestClient);
+		int taskId = 0;
+		httpComponent->Send(getRequest, taskId);
+        return httpComponent->AddTask(taskId, luaHttpTask)->Await();
     }
 
 	int HttpClient::Post(lua_State* lua)
@@ -75,15 +75,13 @@ namespace Lua
             luaL_error(lua, "post parameter error");
             return 0;
         }
-
         std::shared_ptr<LuaHttpRequestTask> luaHttpTask(new LuaHttpRequestTask(lua));
-        std::shared_ptr<HttpRequestClient> requestClient = httpComponent->CreateClient();
-
 #ifdef __DEBUG__
         //LOG_DEBUG("[http POST] url = " << std::string(str, size) << " data = " << postRequest->Content());
 #endif
-        long long id = requestClient->Do(postRequest);
-        return httpComponent->AddTask(id, luaHttpTask)->Await(requestClient);
+		int taskId = 0;
+		httpComponent->Send(postRequest, taskId);
+        return httpComponent->AddTask(taskId, luaHttpTask)->Await();
     }
 
 	int HttpClient::Download(lua_State* lua)

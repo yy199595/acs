@@ -1,8 +1,8 @@
 #pragma once
-#include "rapidjson/document.h"
+
 #include <string>
 #include <vector>
-
+#include "rapidjson/document.h"
 namespace Helper
 {
     namespace File

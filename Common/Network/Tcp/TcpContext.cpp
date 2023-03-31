@@ -2,9 +2,9 @@
 // Created by zmhy0073 on 2022/1/15.
 //
 #include"TcpContext.h"
-#include"Time/TimeHelper.h"
-#include"String/StringHelper.h"
-#include"Message/ProtoMessage.h"
+#include"Util/Time/TimeHelper.h"
+#include"Util/String/StringHelper.h"
+#include"Proto/Message/ProtoMessage.h"
 namespace Tcp
 {
 	TcpContext::TcpContext(std::shared_ptr<SocketProxy> socket, size_t count)

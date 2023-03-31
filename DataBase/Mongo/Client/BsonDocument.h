@@ -5,10 +5,10 @@
 #ifndef SERVER_BSONDOCUMENT_H
 #define SERVER_BSONDOCUMENT_H
 
-#include"Bson/bsonobj.h"
-#include"Json/JsonWriter.h"
+#include"Mongo/Bson/bsonobj.h"
 #include"rapidjson/document.h"
-#include"Bson/bsonobjbuilder.h"
+#include"Util/Json/JsonWriter.h"
+#include"Mongo/Bson/bsonobjbuilder.h"
 namespace Bson
 {
 

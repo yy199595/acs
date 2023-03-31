@@ -5,8 +5,8 @@
 #include<memory>
 #include<functional>
 #include<unordered_map>
-#include"Guid/NumberBuilder.h"
-#include"Method/MethodProxy.h"
+#include"Util/Guid/NumberBuilder.h"
+#include"Rpc/Method/MethodProxy.h"
 #include"Context/context.h"
 #define STACK_SIZE 1024 * 1024
 #ifdef __DEBUG__

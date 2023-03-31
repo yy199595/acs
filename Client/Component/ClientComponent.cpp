@@ -1,17 +1,16 @@
 ﻿
 #include"ClientComponent.h"
 
-#include <utility>
-#include"String/StringHelper.h"
+#include"Util/String/StringHelper.h"
 #include"Client/TcpRpcClientContext.h"
 #include"Lua/Client.h"
-#include"Lua/Message.h"
-#include"Lua/ClassProxyHelper.h"
+#include"Proto/Lua/Message.h"
+#include"Entity/App/App.h"
+#include"Script/Lua/ClassProxyHelper.h"
 #include"google/protobuf/util/json_util.h"
-#include"Component/LuaScriptComponent.h"
-#include"Component/ThreadComponent.h"
-#include"Component/ProtoComponent.h"
-
+#include"Script/Component/LuaScriptComponent.h"
+#include"Server/Component/ThreadComponent.h"
+#include"Proto/Component/ProtoComponent.h"
 namespace Client
 {
 	ClientTask::ClientTask(int id)
@@ -31,6 +30,8 @@ namespace Client
 	ClientComponent::ClientComponent()
 	{
         this->mIndex = 0;
+		this->mLuaComponent = nullptr;
+		this->mProtoComponent = nullptr;
 	}
 
     void ClientComponent::OnMessage(std::shared_ptr<Rpc::Packet> message)
@@ -80,7 +81,7 @@ namespace Client
 		return true;
     }
 
-    bool ClientComponent::Send(int id, std::shared_ptr<Rpc::Packet> request, int& rpcId)
+    bool ClientComponent::Send(int id, const std::shared_ptr<Rpc::Packet>& request, int& rpcId)
     {
         auto iter = this->mClients.find(id);
         if (iter == this->mClients.end())
@@ -90,7 +91,7 @@ namespace Client
 
         rpcId = this->mNumberPool.Pop();
         request->GetHead().Add("rpc", rpcId);
-        iter->second->SendToServer(std::move(request));
+        iter->second->SendToServer(request);
         return true;
     }
 

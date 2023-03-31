@@ -1,7 +1,7 @@
 #pragma once
 #include<vector>
 #include<unordered_map>
-#include"Component/Component.h"
+#include"Core/Component/Component.h"
 
 namespace Sentry
 {

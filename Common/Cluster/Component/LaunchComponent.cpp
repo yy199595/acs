@@ -3,17 +3,17 @@
 //
 
 #include"LaunchComponent.h"
-#include"App/App.h"
-#include"File/FileHelper.h"
-#include"System/System.h"
-#include"Config/ClusterConfig.h"
-#include"Service/VirtualRpcService.h"
-#include"Service/LuaPhysicalRpcService.h"
-#include"Service/PhysicalRpcService.h"
-#include"Service/HttpService.h"
-#include"Service/LuaPhysicalHttpService.h"
-#include"Component/NodeMgrComponent.h"
-#include"Component/LuaScriptComponent.h"
+#include"Entity/App/App.h"
+#include"Util/File/FileHelper.h"
+#include"Core/System/System.h"
+#include"Cluster//Config/ClusterConfig.h"
+#include"Rpc/Service/VirtualRpcService.h"
+#include"Rpc/Service/LuaPhysicalRpcService.h"
+#include"Rpc/Service/PhysicalRpcService.h"
+#include"Http/Service/HttpService.h"
+#include"Http//Service/LuaPhysicalHttpService.h"
+#include"Rpc/Component/NodeMgrComponent.h"
+#include"Script/Component/LuaScriptComponent.h"
 namespace Sentry
 {
     bool LaunchComponent::Awake()

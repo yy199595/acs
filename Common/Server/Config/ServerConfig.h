@@ -4,9 +4,9 @@
 #include<vector>
 #include<string>
 #include<unordered_map>
-#include"Json/JsonReader.h"
-#include"Config/TextConfig.h"
-#include"Singleton/Singleton.h"
+#include"Util/Json/JsonReader.h"
+#include"Server/Config/TextConfig.h"
+#include"Core/Singleton/Singleton.h"
 namespace Sentry
 {
     struct ListenConfig
@@ -21,7 +21,7 @@ namespace Sentry
     class ServerConfig : public Json::Reader, public TextConfig, public ConstSingleton<ServerConfig>
     {
     public:
-        explicit ServerConfig(const std::string & name);
+        explicit ServerConfig(std::string  name);
     public:
 		bool UseLua() const { return this->mUseLua;}
 		bool GetLuaConfig(const std::string & name, std::string & value) const;

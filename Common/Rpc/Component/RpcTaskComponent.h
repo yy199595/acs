@@ -4,8 +4,8 @@
 
 #ifndef SERVER_RPCTASKCOMPONENT_H
 #define SERVER_RPCTASKCOMPONENT_H
-#include"Component/Component.h"
-#include"Async/RpcTaskSource.h"
+#include"Core/Component/Component.h"
+#include"Rpc/Async/RpcTaskSource.h"
 namespace Sentry
 {
     template<typename K,typename T>

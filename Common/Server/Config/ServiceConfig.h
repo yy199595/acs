@@ -5,8 +5,8 @@
 #include<unordered_map>
 #include"XCode/XCode.h"
 #include"MethodConfig.h"
-#include"Config/TextConfig.h"
-#include"Singleton/Singleton.h"
+#include"Server/Config/TextConfig.h"
+#include"Core/Singleton/Singleton.h"
 #include"rapidjson/document.h"
 namespace Sentry
 {

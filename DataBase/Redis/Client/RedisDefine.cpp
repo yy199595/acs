@@ -3,8 +3,8 @@
 //
 
 #include"RedisDefine.h"
-#include"Json/JsonWriter.h"
-#include"Lua/LuaCoroutine.h"
+#include"Util/Json/JsonWriter.h"
+#include"Async/Lua/LuaCoroutine.h"
 #include"google/protobuf/util/json_util.h"
 namespace Sentry
 {

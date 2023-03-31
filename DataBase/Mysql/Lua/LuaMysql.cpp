@@ -3,10 +3,10 @@
 //
 
 #include"LuaMysql.h"
-#include"App/App.h"
-#include"Lua/LuaMysqlTask.h"
-#include"Client/MysqlMessage.h"
-#include"Component/MysqlDBComponent.h"
+#include"Entity/App/App.h"
+#include"Mysql/Lua/LuaMysqlTask.h"
+#include"Mysql/Client/MysqlMessage.h"
+#include"Mysql/Component/MysqlDBComponent.h"
 using namespace Sentry;
 namespace Lua
 {

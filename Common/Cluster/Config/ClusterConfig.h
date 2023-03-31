@@ -7,9 +7,9 @@
 #include<vector>
 #include<unordered_map>
 #include<unordered_set>
-#include"Config/TextConfig.h"
+#include"Server/Config/TextConfig.h"
 #include"rapidjson/document.h"
-#include"Singleton/Singleton.h"
+#include"Core/Singleton/Singleton.h"
 namespace Sentry
 {
     class NodeConfig

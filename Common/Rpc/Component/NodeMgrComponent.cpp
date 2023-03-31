@@ -3,12 +3,12 @@
 //
 
 #include"NodeMgrComponent.h"
-#include"Math/MathHelper.h"
-#include"Service/Registry.h"
-#include"Config/ClusterConfig.h"
-#include"Component/AsyncMgrComponent.h"
-#include"App/App.h"
-#include"Config/CodeConfig.h"
+#include"Util/Math/MathHelper.h"
+#include"Registry/Service/Registry.h"
+#include"Cluster/Config/ClusterConfig.h"
+#include"Async/Component/AsyncMgrComponent.h"
+#include"Entity/App/App.h"
+#include"Server/Config/CodeConfig.h"
 namespace Sentry
 {
     void NodeMgrComponent::AddRpcServer(const std::string& name, const std::string& address)

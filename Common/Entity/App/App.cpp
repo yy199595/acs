@@ -1,14 +1,14 @@
 ﻿
 #include"App.h"
-#include"System/System.h"
-#include"Timer/ElapsedTimer.h"
-#include"File/DirectoryHelper.h"
-#include"Service/VirtualRpcService.h"
-#include"Component/ProtoComponent.h"
-#include"Component/NodeMgrComponent.h"
-#include"Component/TextConfigComponent.h"
-#include"Component/ThreadComponent.h"
-#include"Component/LaunchComponent.h"
+#include"Core/System/System.h"
+#include"Timer/Timer/ElapsedTimer.h"
+#include"Util/File/DirectoryHelper.h"
+#include"Rpc/Service/VirtualRpcService.h"
+#include"Proto/Component/ProtoComponent.h"
+#include"Rpc/Component/NodeMgrComponent.h"
+#include"Server/Component/TextConfigComponent.h"
+#include"Server/Component/ThreadComponent.h"
+#include"Cluster/Component/LaunchComponent.h"
 using namespace Sentry;
 using namespace std::chrono;
 #ifdef __OS_WIN__

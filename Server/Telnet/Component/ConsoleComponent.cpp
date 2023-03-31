@@ -1,7 +1,7 @@
 #include"ConsoleComponent.h"
-
-#include"Service/PhysicalRpcService.h"
-#include"Component/AsyncMgrComponent.h"
+#include"Entity/App/App.h"
+#include"Rpc/Service/PhysicalRpcService.h"
+#include"Async/Component/AsyncMgrComponent.h"
 #define BIND_FUNC(name, func) this->mFunctionMap.emplace(name, std::bind(&func, this, args1, args2));
 
 namespace Sentry

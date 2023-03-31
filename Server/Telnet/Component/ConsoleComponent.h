@@ -1,8 +1,8 @@
 #pragma once
 #include<vector>
-#include"Message/ProtoMessage.h"
-#include"Client/TelnetClientContext.h"
-#include"Component/TcpListenerComponent.h"
+#include"Proto/Message/ProtoMessage.h"
+#include"Telnet/Client/TelnetClientContext.h"
+#include"Server/Component/TcpListenerComponent.h"
 
 namespace Sentry
 {

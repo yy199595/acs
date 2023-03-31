@@ -4,9 +4,9 @@
 
 #ifndef GAMEKEEPER_LUATASKSOURCE_H
 #define GAMEKEEPER_LUATASKSOURCE_H
-#include"Source/TaskSource.h"
-#include"Http/HttpResponse.h"
-#include"Lua/LuaInclude.h"
+#include"Async/Source/TaskSource.h"
+#include"Http/Common//HttpResponse.h"
+#include"Script/Lua/LuaInclude.h"
 #include"google/protobuf/message.h"
 using namespace google::protobuf;
 namespace Sentry
@@ -14,8 +14,8 @@ namespace Sentry
     class LuaServiceTaskSource final
     {
     public:
-        LuaServiceTaskSource(Http::Response* message);
-        LuaServiceTaskSource(std::shared_ptr<Message> message);
+        explicit LuaServiceTaskSource(Http::Response* message);
+        explicit LuaServiceTaskSource(std::shared_ptr<Message> message);
     public:
 		static int SetRpc(lua_State * lua);
         static int SetHttp(lua_State* lua);

@@ -1,7 +1,7 @@
 #pragma once
 
 #include"IComponent.h"
-#include"Log/CommonLogDef.h"
+#include"Log/Common/CommonLogDef.h"
 namespace Sentry
 {
 	class App;

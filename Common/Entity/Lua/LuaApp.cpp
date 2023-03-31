@@ -3,12 +3,12 @@
 //
 
 #include"LuaApp.h"
-#include"App/App.h"
-#include"Service/RpcService.h"
-#include"Async/RpcTaskSource.h"
-#include"Config/ServiceConfig.h"
-#include"Component/ProtoComponent.h"
-#include"Component/InnerNetMessageComponent.h"
+#include"Entity/App/App.h"
+#include"Rpc/Service/RpcService.h"
+#include"Rpc/Async/RpcTaskSource.h"
+#include"Server//Config/ServiceConfig.h"
+#include"Proto/Component/ProtoComponent.h"
+#include"Rpc/Component/InnerNetMessageComponent.h"
 using namespace Sentry;
 namespace Lua
 {

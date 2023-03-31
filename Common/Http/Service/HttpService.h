@@ -4,9 +4,9 @@
 
 #ifndef SENTRY_HTTPSERVICE_H
 #define SENTRY_HTTPSERVICE_H
-#include"Component/Component.h"
-#include"Method/MethodRegister.h"
-#include"Config/ServiceConfig.h"
+#include"Core/Component/Component.h"
+#include"Rpc/Method/MethodRegister.h"
+#include"Server//Config/ServiceConfig.h"
 namespace Json
 {
     class Writer;

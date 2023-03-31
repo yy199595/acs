@@ -4,14 +4,13 @@
 
 #ifndef GAMEKEEPER_HTTPSERVICEMETHOD_H
 #define GAMEKEEPER_HTTPSERVICEMETHOD_H
-#include <utility>
 
-#include"Json/JsonWriter.h"
-#include"Json/JsonReader.h"
-#include"Time/TimeHelper.h"
-#include"Client/Http.h"
-#include"Http/HttpRequest.h"
-#include"Http/HttpResponse.h"
+#include"XCode/XCode.h"
+#include"Util/Json/JsonWriter.h"
+#include"Util/Json/JsonReader.h"
+#include"Http/Client/Http.h"
+#include"Http/Common/HttpRequest.h"
+#include"Http/Common/HttpResponse.h"
 namespace Sentry
 {
 	template<typename T>
@@ -79,7 +78,7 @@ namespace Sentry
             if (!request.WriteDocument(document1.get()))
             {
                 document->Add("error").Add("parse json error");
-                document->Add("code").Add((int)XCode::ParseJsonFailure);
+                document->Add("code").Add(XCode::ParseJsonFailure);
                 response.Json(HttpStatus::OK, *document);
                 return XCode::ParseJsonFailure;
             }

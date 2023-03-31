@@ -2,15 +2,14 @@
 // Created by zmhy0073 on 2022/8/29.
 //
 #include"ServerWeb.h"
-#include"System/System.h"
-#include"App/App.h"
-#include"Config/CodeConfig.h"
-#include"Service/Node.h"
-#include"Service/Registry.h"
-#include"Config/ClusterConfig.h"
-#include"File/DirectoryHelper.h"
-#include"File/FileHelper.h"
-#include"Component/NodeMgrComponent.h"
+#include"Core/System/System.h"
+#include"Entity/App/App.h"
+#include"Server/Config/CodeConfig.h"
+#include"Common/Service/Node.h"
+#include"Registry/Service/Registry.h"
+#include"Util/File/DirectoryHelper.h"
+#include"Util/File/FileHelper.h"
+#include"Rpc/Component/NodeMgrComponent.h"
 namespace Sentry
 {
 	bool ServerWeb::Awake()

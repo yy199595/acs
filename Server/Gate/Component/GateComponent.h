@@ -4,8 +4,8 @@
 
 #ifndef _GATEAGENTCOMPONENT_H_
 #define _GATEAGENTCOMPONENT_H_
-#include"Component/Component.h"
 #include"google/protobuf/message.h"
+#include"Core/Component/Component.h"
 using namespace google::protobuf;
 namespace Sentry
 {

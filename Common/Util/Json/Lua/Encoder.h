@@ -8,7 +8,7 @@
 #include"luax.hpp"
 #include"values.hpp"
 #include"rapidjson/document.h"
-#include"Lua/LuaInclude.h"
+#include"Script/Lua/LuaInclude.h"
 
 
 #include"rapidjson/document.h"

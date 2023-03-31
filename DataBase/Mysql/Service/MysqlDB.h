@@ -1,8 +1,8 @@
 #pragma once
 
-#include"Helper/SqlHelper.h"
-#include"Client/MysqlClient.h"
-#include"Service/PhysicalRpcService.h"
+#include"Common//SqlHelper.h"
+#include"Mysql/Client/MysqlClient.h"
+#include"Rpc/Service/PhysicalRpcService.h"
 
 namespace Sentry
 {

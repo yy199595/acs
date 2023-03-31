@@ -1,15 +1,15 @@
 //
 // Created by mac on 2022/4/6.
 //
-
-#include "Method/MethodRegister.h"
-
 #include"PhysicalRpcService.h"
-#include"App/App.h"
-#include"Module/LuaModule.h"
-#include"Config/ServiceConfig.h"
-#include"Lua/LuaServiceMethod.h"
-#include"Component/LuaScriptComponent.h"
+#include "Rpc/Method/MethodRegister.h"
+
+
+#include"Entity/App/App.h"
+#include"Script/Module/LuaModule.h"
+#include"Server/Config/ServiceConfig.h"
+#include"Rpc/Lua/LuaServiceMethod.h"
+#include"Script/Component/LuaScriptComponent.h"
 namespace Sentry
 {
     extern std::string GET_FUNC_NAME(const std::string& fullName)

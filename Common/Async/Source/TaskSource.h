@@ -41,8 +41,6 @@ namespace Sentry
         }
         return false;
     }
-    template<typename T>
-    using TaskSourceShared = std::shared_ptr<TaskSource<std::shared_ptr<T>>>;
 }
 
 namespace Sentry

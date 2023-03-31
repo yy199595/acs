@@ -2,8 +2,8 @@
 // Created by yjz on 2023/3/2.
 //
 
-#include "Log.h"
-#include "Component/LogComponent.h"
+#include"Log.h"
+#include"Log/Component/LogComponent.h"
 namespace Sentry
 {
 	bool Log::OnInit()

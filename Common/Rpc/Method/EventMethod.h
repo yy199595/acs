@@ -6,7 +6,7 @@
 #define SERVER_EVENTMETHOD_H
 #include<memory>
 #include<string>
-#include"Component/Component.h"
+#include"Core/Component/Component.h"
 namespace Sentry
 {
 	template<typename T>

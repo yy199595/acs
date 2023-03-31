@@ -1,6 +1,6 @@
 #include<queue>
 #include"Message/s2s.pb.h"
-#include"Component/Component.h"
+#include"Core/Component/Component.h"
 
 namespace Sentry
 {

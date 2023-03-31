@@ -5,7 +5,7 @@
 #ifndef _LOG_H_
 #define _LOG_H_
 #include"Message/s2s.pb.h"
-#include"Service/PhysicalRpcService.h"
+#include"Rpc/Service/PhysicalRpcService.h"
 namespace Sentry
 {
 	class Log final : public PhysicalRpcService

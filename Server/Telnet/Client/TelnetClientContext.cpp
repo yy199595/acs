@@ -1,11 +1,11 @@
 
 #include"TelnetClientContext.h"
-#include"String/StringHelper.h"
-#include"Log/CommonLogDef.h"
-#include"Component/ConsoleComponent.h"
+#include"Util/String/StringHelper.h"
+#include"Entity/App/App.h"
+#include"Telnet/Component/ConsoleComponent.h"
 namespace Tcp
 {
-	TelnetClientContext::TelnetClientContext(std::shared_ptr<SocketProxy> socketProxy, ConsoleComponent * component)
+	TelnetClientContext::TelnetClientContext(const std::shared_ptr<SocketProxy>& socketProxy, ConsoleComponent * component)
 		: Tcp::TcpContext(socketProxy), mConsoleComponent(component)
 	{
 		this->mSocket = socketProxy;
@@ -40,7 +40,7 @@ namespace Tcp
 #endif
 	}
 
-	void TelnetClientContext::SendProtoMessage(std::shared_ptr<TelnetProto> message)
+	void TelnetClientContext::SendProtoMessage(const std::shared_ptr<TelnetProto>& message)
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->Write(message);

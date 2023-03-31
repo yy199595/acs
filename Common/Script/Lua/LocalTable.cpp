@@ -3,8 +3,8 @@
 //
 
 #include"LocalTable.h"
-#include"Md5/MD5.h"
-#include"File/DirectoryHelper.h"
+#include"Util/Md5/MD5.h"
+#include"Util/File/DirectoryHelper.h"
 
 namespace Lua
 {

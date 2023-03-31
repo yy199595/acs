@@ -1,9 +1,9 @@
 #pragma once
 
-#include"App/App.h"
-#include"Lua/LuaParameter.h"
-#include"Log/CommonLogDef.h"
-#include"Lua/WaitLuaTaskSource.h"
+#include"Entity/App/App.h"
+#include"Script/Lua/LuaParameter.h"
+#include"Log/Common/CommonLogDef.h"
+#include"Async/Lua/WaitLuaTaskSource.h"
 using namespace Sentry;
 
 namespace Lua

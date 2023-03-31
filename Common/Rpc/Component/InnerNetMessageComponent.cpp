@@ -1,19 +1,19 @@
 ﻿#include"InnerNetMessageComponent.h"
 
-#include <utility>
-#include"Component/AsyncMgrComponent.h"
-#include"Lua/LuaServiceMethod.h"
-#include"Config/ServiceConfig.h"
+#include"Async/Component/AsyncMgrComponent.h"
+#include"Rpc/Lua/LuaServiceMethod.h"
+#include"Server/Config/ServiceConfig.h"
 #include"InnerNetComponent.h"
-#include"Timer/ElapsedTimer.h"
-#include"Service/PhysicalRpcService.h"
-#include"Async/RpcTaskSource.h"
-#include"Config/CodeConfig.h"
+#include"Timer/Timer/ElapsedTimer.h"
+#include"Rpc/Service/PhysicalRpcService.h"
+#include"Rpc/Async/RpcTaskSource.h"
+#include"Server/Config/CodeConfig.h"
 #ifdef __DEBUG__
-#include"String/StringHelper.h"
-#include"Component/ProtoComponent.h"
+#include"Util/String/StringHelper.h"
+#include"Proto/Component/ProtoComponent.h"
 #endif
-#include"Component/OuterNetComponent.h"
+#include"Entity/App/App.h"
+#include"Gate/Component/OuterNetComponent.h"
 namespace Sentry
 {
 	InnerNetMessageComponent::InnerNetMessageComponent()

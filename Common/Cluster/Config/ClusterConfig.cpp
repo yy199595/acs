@@ -3,8 +3,8 @@
 //
 
 #include"ClusterConfig.h"
-#include"System/System.h"
-#include"Config/ServerConfig.h"
+#include"Core/System/System.h"
+#include"Server/Config/ServerConfig.h"
 namespace Sentry
 {
     bool NodeConfig::IsStart(const std::string &service) const

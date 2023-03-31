@@ -3,10 +3,10 @@
 //
 
 #include"MongoHelperComponent.h"
-#include"Service/MongoDB.h"
-#include"App/App.h"
-#include"Config/ClusterConfig.h"
-#include"Component/NodeMgrComponent.h"
+#include"Entity/App/App.h"
+#include"Mongo/Service/MongoDB.h"
+#include"Cluster/Config/ClusterConfig.h"
+#include"Rpc/Component/NodeMgrComponent.h"
 namespace Sentry
 {
 	bool MongoHelperComponent::LateAwake()

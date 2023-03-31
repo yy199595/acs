@@ -3,8 +3,10 @@
 //
 
 #include"MongoDBComponent.h"
-#include"Config/MongoConfig.h"
-#include"Component/ThreadComponent.h"
+#include"Server/Config/ServerConfig.h"
+#include"Server/Component/ThreadComponent.h"
+#include "Util/Time/TimeHelper.h"
+
 namespace Sentry
 {
 	MongoTask::MongoTask(int id)
@@ -23,6 +25,14 @@ namespace Sentry
         this->mWaitCount = 0;     
     }
 
+	bool MongoDBComponent::Awake()
+	{
+		std::string path;
+		const ServerConfig * config = ServerConfig::Inst();
+		LOG_CHECK_RET_FALSE(config->GetPath("db", path));
+		return this->mConfig.LoadConfig(path);
+	}
+
     void MongoDBComponent::CloseClients()
     {
         for(std::shared_ptr<TcpMongoClient> & client : this->mMongoClients)
@@ -34,9 +44,8 @@ namespace Sentry
 
 	int MongoDBComponent::MakeMongoClient()
 	{
-		const MongoConfig * config = MongoConfig::Inst();
-		const std::string & ip = config->Address[0].Ip;
-		const unsigned int port = config->Address[0].Port;
+		const std::string & ip = this->mConfig.Address[0].Ip;
+		const unsigned int port = this->mConfig.Address[0].Port;
 		ThreadComponent * threadComponent =
 			this->GetComponent<ThreadComponent>();
 
@@ -44,7 +53,7 @@ namespace Sentry
 			threadComponent->CreateSocket(ip, port);
 
 		std::shared_ptr<TcpMongoClient> mongoClientContext =
-			std::make_shared<TcpMongoClient>(socketProxy, this);
+			std::make_shared<TcpMongoClient>(socketProxy, this, this->mConfig);
 
 		this->mMongoClients.emplace_back(mongoClientContext);
 		return (int)this->mMongoClients.size() - 1;
@@ -172,7 +181,7 @@ namespace Sentry
         std::shared_ptr<CommandRequest> mongoRequest
                 = std::make_shared<CommandRequest>();
 
-        mongoRequest->dataBase = MongoConfig::Inst()->DB;
+        mongoRequest->dataBase = this->mConfig.DB;
         mongoRequest->document.Add("ping", 1);
         return this->Run(this->GetClient(index), mongoRequest) != nullptr;
     }

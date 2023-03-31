@@ -1,26 +1,30 @@
 ﻿#include"RedisComponent.h"
-#include"Lua/LuaRedis.h"
-#include"File/DirectoryHelper.h"
-#include"Lua/ClassProxyHelper.h"
-#include"Client/TcpRedisClient.h"
-#include"Component/ThreadComponent.h"
-#include"Component/RedisScriptComponent.h"
-#include"Component/RedisStringComponent.h"
+#include"Redis/Lua/LuaRedis.h"
+
+#include"Script/Lua/ClassProxyHelper.h"
+#include"Redis/Client/TcpRedisClient.h"
+#include"Server/Component/ThreadComponent.h"
+#include"Redis/Component/RedisScriptComponent.h"
+#include"Redis/Component/RedisStringComponent.h"
+#include"Entity/App/App.h"
+#include"Redis/Config/RedisConfig.h"
+#ifdef __DEBUG__
+#include "Timer/Timer/ElapsedTimer.h"
+#endif
 namespace Sentry
 {
     bool RedisComponent::Awake()
     {
-        LOG_CHECK_RET_FALSE(RedisConfig::Inst());
+		std::string path;
         LOG_CHECK_RET_FALSE(this->mApp->AddComponent<RedisScriptComponent>());
         LOG_CHECK_RET_FALSE(this->mApp->AddComponent<RedisStringComponent>());
-        return true;
+		LOG_CHECK_RET_FALSE(ServerConfig::Inst()->GetPath("db", path));
+		return this->mConfig.LoadConfig(path);
     }
 
     bool RedisComponent::LateAwake()
     {
-		const RedisClientConfig & config
-			= RedisConfig::Inst()->Config();
-        return this->MakeRedisClient(config);
+        return this->MakeRedisClient(this->Config());
     }
 
 	void RedisComponent::OnConnectSuccessful(const std::string& address)
@@ -99,7 +103,7 @@ namespace Sentry
         return tempRedisClint.get();
     }
 
-    std::shared_ptr<RedisResponse> RedisComponent::Run(std::shared_ptr<RedisRequest> request)
+    std::shared_ptr<RedisResponse> RedisComponent::Run(const std::shared_ptr<RedisRequest>& request)
     {
 #ifdef __DEBUG__
         ElapsedTimer elapsedTimer;

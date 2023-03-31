@@ -4,7 +4,7 @@
 
 #ifndef APP_REDISSTRINGCOMPONENT_H
 #define APP_REDISSTRINGCOMPONENT_H
-#include"Component/Component.h"
+#include"Core/Component/Component.h"
 
 namespace Sentry
 {

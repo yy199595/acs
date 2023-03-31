@@ -6,7 +6,7 @@
 #define GameKeeper_MESSAGESTREAM_H
 #include<stdexcept>
 #include<unordered_map>
-#include"Log/CommonLogDef.h"
+#include"Log/Common/CommonLogDef.h"
 namespace Tcp
 {
     namespace Type

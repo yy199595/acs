@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include<Message/com.pb.h>
 #include<XCode/XCode.h>
-#include"Client/Message.h"
-#include"Json/JsonReader.h"
+#include"Rpc/Client/Message.h"
+#include"Util/Json/JsonReader.h"
 #include"google/protobuf/util/json_util.h"
 using namespace google::protobuf;
 namespace Sentry

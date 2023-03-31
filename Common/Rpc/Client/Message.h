@@ -9,9 +9,8 @@
 #include<vector>
 #include"XCode/XCode.h"
 #include<unordered_map>
-#include"Log/CommonLogDef.h"
-#include"Proto/ProtoHelper.h"
-#include"Message/ProtoMessage.h"
+#include"Util/Proto/ProtoHelper.h"
+#include"Proto//Message/ProtoMessage.h"
 
 namespace Rpc
 {

@@ -6,14 +6,14 @@
 #endif // 
 #include<regex>
 #include"ServerConfig.h"
-#include"Log/CommonLogDef.h"
-#include"File/FileHelper.h"
-#include"String/StringHelper.h"
-#include"File/DirectoryHelper.h"
+#include"Log/Common/CommonLogDef.h"
+#include"Util/File/FileHelper.h"
+#include"Util/String/StringHelper.h"
+#include"Util/File/DirectoryHelper.h"
 namespace Sentry
 {
-	ServerConfig::ServerConfig(const std::string& server)
-		: TextConfig("ServerConfig"), mName(server)
+	ServerConfig::ServerConfig(std::string  server)
+		: TextConfig("ServerConfig"), mName(std::move(server))
 	{
 		this->mUseLua = false;
 	}

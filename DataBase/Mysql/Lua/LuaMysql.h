@@ -4,8 +4,8 @@
 
 #ifndef APP_DATABASE_MYSQL_LUA_LUAMYSQL_H
 #define APP_DATABASE_MYSQL_LUA_LUAMYSQL_H
-#include"Lua/LuaInclude.h"
-#include"Client/MysqlMessage.h"
+#include"Script/Lua/LuaInclude.h"
+#include"Mysql/Client/MysqlMessage.h"
 namespace Lua
 {
 	namespace LuaMysql

@@ -3,15 +3,13 @@
 //
 
 #include"Client.h"
-#include"App/App.h"
-#include"Json/Lua/Json.h"
-#include"Config/ServiceConfig.h"
-#include"String/StringHelper.h"
-#include"Timer/ElapsedTimer.h"
-#include"Lua/LuaParameter.h"
-#include"Lua/LuaWaitTaskSource.h"
+#include"Entity/App/App.h"
+#include"Server/Config/ServiceConfig.h"
+#include"Util/String/StringHelper.h"
+#include"Timer/Timer/ElapsedTimer.h"
+#include"Script/Lua/LuaParameter.h"
 #include"Component/ClientComponent.h"
-#include"Component/ProtoComponent.h"
+#include"Proto/Component/ProtoComponent.h"
 using namespace Client;
 using namespace Sentry;
 namespace Lua

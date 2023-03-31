@@ -3,14 +3,11 @@
 //
 
 #include"MysqlDBComponent.h"
-
-#include <utility>
-#include"Helper/SqlHelper.h"
-#include"Client/MysqlClient.h"
-#include"Message/user.pb.h"
-#include"Config/MysqlConfig.h"
-#include"Lua/LuaMysql.h"
-#include"Lua/ClassProxyHelper.h"
+#include"Entity/App/App.h"
+#include"Common/SqlHelper.h"
+#include"Mysql/Client/MysqlClient.h"
+#include"Mysql/Lua/LuaMysql.h"
+#include"Script/Lua/ClassProxyHelper.h"
 namespace Sentry
 {
     MysqlTask::MysqlTask(int taskId)
@@ -32,9 +29,14 @@ namespace Sentry
 
 namespace Sentry
 {
-	MysqlDBComponent::MysqlDBComponent()
+	bool MysqlDBComponent::Awake()
 	{
+		std::string path;
 		this->mSqlHelper = std::make_unique<SqlHelper>();
+		const ServerConfig * config = ServerConfig::Inst();
+		LOG_CHECK_RET_FALSE(config->GetPath("db", path));
+		LOG_CHECK_RET_FALSE(this->mConfig.LoadConfig(path));
+		return true;
 	}
 
     void MysqlDBComponent::CloseClient(int id)
@@ -65,7 +67,7 @@ namespace Sentry
     int MysqlDBComponent::MakeMysqlClient()
     {
         std::shared_ptr<MysqlClient> mysqlClient
-                = std::make_shared<MysqlClient>(this);
+                = std::make_shared<MysqlClient>(this, this->mConfig);
 
         mysqlClient->Start();
 		int id = this->mNumberPool.Pop();

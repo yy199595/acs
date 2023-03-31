@@ -1,10 +1,10 @@
 ﻿#include"LuaPhysicalRpcService.h"
-#include"Lua/Function.h"
-#include"Module/LuaModule.h"
-#include"Lua/LuaServiceMethod.h"
-#include"Config/ServiceConfig.h"
-#include"Method/MethodRegister.h"
-#include"Component/LuaScriptComponent.h"
+#include"Script/Lua/Function.h"
+#include"Script/Module/LuaModule.h"
+#include"Rpc/Lua/LuaServiceMethod.h"
+#include"Server/Config/ServiceConfig.h"
+#include"Rpc/Method/MethodRegister.h"
+#include"Script/Component/LuaScriptComponent.h"
 namespace Sentry
 {
 	LuaPhysicalRpcService::LuaPhysicalRpcService()

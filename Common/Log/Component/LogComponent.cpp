@@ -1,12 +1,12 @@
 #include"LogComponent.h"
-#include"App/App.h"
+#include"Entity/App/App.h"
 #include"spdlog/async.h"
 #ifdef __DEBUG__
-#include"Log/Debug.h"
+#include"Log/Common/Debug.h"
 #endif
-#include"System/System.h"
+#include"Core/System/System.h"
 #include"spdlog/sinks/rotating_file_sink.h"
-#include"Component/WatchDogComponent.h"
+#include"WatchDog/Component/WatchDogComponent.h"
 namespace Sentry
 {
 	// 单线程  st  多线程  mt

@@ -7,8 +7,8 @@
 
 #include<queue>
 #include<unordered_map>
-#include"Client/Http.h"
-#include"Component/TcpListenerComponent.h"
+#include"Http/Client/Http.h"
+#include"Server/Component/TcpListenerComponent.h"
 namespace Http
 {
 	class Request;

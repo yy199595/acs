@@ -1,8 +1,8 @@
 ﻿#include"TimerComponent.h"
-#include"Timer/DelayTimer.h"
-#include"App/App.h"
-#include"Lua/Timer.h"
-#include"Lua/ClassProxyHelper.h"
+#include"Timer/Timer/DelayTimer.h"
+#include"Entity/App/App.h"
+#include"Script/Lua/ClassProxyHelper.h"
+#include"Timer/Lua/Timer.h"
 namespace Sentry
 {
 	bool TimerComponent::Awake()

@@ -3,12 +3,12 @@
 //
 
 #include"MongoDB.h"
-#include"Config/MongoConfig.h"
-#include"Component/MongoDBComponent.h"
+#include"Entity/App/App.h"
+#include"Mongo/Config/MongoConfig.h"
+#include"Mongo/Component/MongoDBComponent.h"
 namespace Sentry
 {
     MongoDB::MongoDB()
-        : mMongoComponent(nullptr)
     {
         this->mMongoComponent = nullptr;
     }
@@ -33,7 +33,8 @@ namespace Sentry
 
 	bool MongoDB::OnStart()
 	{
-		for(int index = 0; index < MongoConfig::Inst()->MaxCount; index++)
+		const MongoConfig & config = this->mMongoComponent->Config();
+		for(int index = 0; index < config.MaxCount; index++)
 		{
 			this->mMongoComponent->MakeMongoClient();
 		}

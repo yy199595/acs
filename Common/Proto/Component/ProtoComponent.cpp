@@ -3,14 +3,14 @@
 //
 
 #include"ProtoComponent.h"
-#include"App/App.h"
+#include"Entity/App/App.h"
 #include<fstream>
-#include"Md5/MD5.h"
-#include"File/DirectoryHelper.h"
+#include"Util/Md5/MD5.h"
+#include"Util/File/DirectoryHelper.h"
 #include"google/protobuf/util/json_util.h"
 #include"google/protobuf/dynamic_message.h"
-#include"Lua/Message.h"
-#include"Lua/ClassProxyHelper.h"
+#include"Proto/Lua/Message.h"
+#include"Script/Lua/ClassProxyHelper.h"
 namespace Sentry
 {
     ImportError::ImportError()

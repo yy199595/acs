@@ -4,8 +4,8 @@
 
 #ifndef APP_REDISSCRIPTCOMPONENT_H
 #define APP_REDISSCRIPTCOMPONENT_H
-#include"Client/RedisDefine.h"
-#include"Component/Component.h"
+#include"Redis/Client/RedisDefine.h"
+#include"Core/Component/Component.h"
 namespace Sentry
 {
     class RedisScriptComponent : public Component, public IStart

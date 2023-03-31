@@ -5,9 +5,9 @@
 #ifndef GAMEKEEPER_HTTPREQUESTCLIENT_H
 #define GAMEKEEPER_HTTPREQUESTCLIENT_H
 #include"Http.h"
-#include"Tcp/TcpContext.h"
-#include"Http/HttpRequest.h"
-#include"Http/HttpResponse.h"
+#include"Network/Tcp/TcpContext.h"
+#include"Http/Common/HttpRequest.h"
+#include"Http/Common/HttpResponse.h"
 namespace Sentry
 {
 	class HttpComponent;
@@ -16,7 +16,7 @@ namespace Sentry
 	 public:
 		HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy, HttpComponent * component);
 	 public:
-		long long Do(std::shared_ptr<Http::Request> request, int timeout = 15);
+		void Do(std::shared_ptr<Http::Request> request, int taskId, int timeout = 15);
 	 private:
         void ConnectHost();
         void OnTimeout(Asio::Code code);
@@ -26,8 +26,8 @@ namespace Sentry
         void OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
 	 private:
-        int mTimeout;
-        long long mTaskId;
+		int mTaskId;
+		int mTimeout;
 		HttpComponent * mHttpComponent;
         std::shared_ptr<Http::Request> mRequest;
 		std::shared_ptr<Http::Response> mResponse;

@@ -4,10 +4,7 @@
 
 #ifndef GAMEKEEPER_TASKSOURCEBASE_H
 #define GAMEKEEPER_TASKSOURCEBASE_H
-#include"App/App.h"
-#include"Guid/Guid.h"
-#include"XCode/XCode.h"
-#include"Time/TimeHelper.h"
+#include<memory>
 namespace Sentry
 {
     enum class TaskState

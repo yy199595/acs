@@ -4,8 +4,8 @@
 
 #ifndef SERVER_MESSAGE_H
 #define SERVER_MESSAGE_H
-#include"Lua/LuaInclude.h"
-#include"Component/ProtoComponent.h"
+#include"Script/Lua/LuaInclude.h"
+#include"Proto/Component/ProtoComponent.h"
 namespace Sentry
 {
 	class MessageDecoder //转lua

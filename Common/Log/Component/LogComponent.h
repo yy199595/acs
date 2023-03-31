@@ -1,7 +1,7 @@
 #pragma once
 #include<unordered_map>
 #include"spdlog/spdlog.h"
-#include"Component/Component.h"
+#include"Core/Component/Component.h"
 #define LOG_FILE_MAX_SUM 10
 #define LOG_FILE_MAX_SIZE 1024 * 1024 * 100
 

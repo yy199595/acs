@@ -6,7 +6,6 @@
 #define _JSONREADER_H_
 #include<string>
 #include<vector>
-#include"XCode/XCode.h"
 #include<unordered_map>
 #include"rapidjson/document.h"
 namespace Json

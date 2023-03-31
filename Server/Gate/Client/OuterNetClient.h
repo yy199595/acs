@@ -4,11 +4,9 @@
 
 #ifndef GAMEKEEPER_RPCPROXYCLIENT_H
 #define GAMEKEEPER_RPCPROXYCLIENT_H
-#include"Client/Message.h"
-#include"Tcp/TcpContext.h"
-#include"Message/c2s.pb.h"
+#include"Rpc/Client/Message.h"
+#include"Network/Tcp/TcpContext.h"
 using namespace Tcp;
-using namespace google::protobuf;
 namespace Sentry
 {
     // 网关session

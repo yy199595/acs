@@ -4,7 +4,7 @@
 
 #ifndef _LUAREDIS_H_
 #define _LUAREDIS_H_
-#include"Lua/LuaInclude.h"
+#include"Script/Lua/LuaInclude.h"
 namespace Sentry
 {
 	class RedisRequest;

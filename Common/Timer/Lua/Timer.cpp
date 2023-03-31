@@ -3,10 +3,10 @@
 //
 
 #include"Timer.h"
-#include"App/App.h"
+#include"Entity/App/App.h"
 #include<memory>
-#include"Timer/DelayTimer.h"
-#include"Component/TimerComponent.h"
+#include"Timer/Timer/DelayTimer.h"
+#include"Timer/Component/TimerComponent.h"
 using namespace Sentry;
 
 namespace Lua

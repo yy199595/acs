@@ -2,7 +2,9 @@
 // Created by yjz on 2022/1/5.
 //
 #include"WaitTaskSourceBase.h"
-
+#include "Util/Guid/Guid.h"
+#include "Entity/App/App.h"
+#include "Util/Time/TimeHelper.h"
 namespace Sentry
 {
     WaitTaskSourceBase::WaitTaskSourceBase()

@@ -4,12 +4,12 @@
 
 #include"MysqlClient.h"
 #include"MysqlMessage.h"
-#include"App/App.h"
-#include"Config/MysqlConfig.h"
+#include"Entity/App/App.h"
+#include"Mysql/Config/MysqlConfig.h"
 namespace Sentry
 {
-	MysqlClient::MysqlClient(IRpc<Mysql::Response> *component)
-							 : mComponent(component)
+	MysqlClient::MysqlClient(IRpc<Mysql::Response> *component, const MysqlConfig & config)
+							 : mComponent(component), mConfig(config)
     {
         this->mIndex = 0;
 		this->mThread = nullptr;
@@ -70,32 +70,31 @@ namespace Sentry
 
 	bool MysqlClient::StartConnect()
 	{
-        const MysqlConfig * config = MysqlConfig::Inst();
-        if(this->mIndex >= config->Address.size())
-        {
-            CONSOLE_LOG_ERROR("connect mysql failure");
-            return false;
-        }
-		MYSQL * mysql = mysql_init(NULL);
-		const char* user = config->User.c_str();
-		const char* pwd = config->Password.c_str();
-        const std::string & ip =config->Address[this->mIndex].Ip;
-        unsigned short port = config->Address[this->mIndex].Port;
-		const std::string & address = config->Address[this->mIndex].FullAddress;
+		if (this->mIndex >= this->mConfig.Address.size())
+		{
+			CONSOLE_LOG_ERROR("connect mysql failure");
+			return false;
+		}
+		MYSQL* mysql = mysql_init(nullptr);
+		const char* user = this->mConfig.User.c_str();
+		const char* pwd = this->mConfig.Password.c_str();
+		const std::string& ip = this->mConfig.Address[this->mIndex].Ip;
+		unsigned short port = this->mConfig.Address[this->mIndex].Port;
+		const std::string& address = this->mConfig.Address[this->mIndex].FullAddress;
 #ifdef __DEBUG__
 		CONSOLE_LOG_DEBUG("start connect mysql server [" << address << "]");
 #endif // __DEBUG__
 
 		if (!mysql_real_connect(mysql, ip.c_str(), user, pwd, "", port, NULL, CLIENT_FOUND_ROWS))
 		{
-            this->mIndex++;
+			this->mIndex++;
 #ifdef __DEBUG__
 			CONSOLE_LOG_ERROR(mysql_error(mysql));
 			//CONSOLE_LOG_ERROR("connect mysql server [" << address << "] failure");
 #endif
 			return this->StartConnect();
 		}
-        this->mIndex = 0;
+		this->mIndex = 0;
 		this->mMysqlClient = mysql;
 #ifdef __DEBUG__
 		CONSOLE_LOG_DEBUG("connect mysql server [" << address << "]successful");

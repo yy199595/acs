@@ -3,14 +3,12 @@
 //
 
 #include"OuterNetClient.h"
-#include"Message/c2s.pb.h"
-#include"Time/TimeHelper.h"
-#include"App/App.h"
+#include"Util/Time/TimeHelper.h"
+#include"Entity/App/App.h"
 #ifdef __DEBUG__
 #include"google/protobuf/util/json_util.h"
 #endif
-#include"Client/Message.h"
-#include"Component/OuterNetComponent.h"
+#include"Gate/Component/OuterNetComponent.h"
 
 namespace Sentry
 {

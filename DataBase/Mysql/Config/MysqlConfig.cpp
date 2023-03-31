@@ -3,7 +3,7 @@
 //
 
 #include"MysqlConfig.h"
-#include"String/StringHelper.h"
+#include"Util/String/StringHelper.h"
 #include"rapidjson/document.h"
 namespace Sentry
 {

@@ -4,8 +4,8 @@
 
 #ifndef APP_DATABASE_MYSQL_LUA_LUAMYSQLTASK_H
 #define APP_DATABASE_MYSQL_LUA_LUAMYSQLTASK_H
-#include"Client/MysqlMessage.h"
-#include"Async/RpcTaskSource.h"
+#include"Mysql/Client/MysqlMessage.h"
+#include"Rpc/Async/RpcTaskSource.h"
 struct lua_State;
 
 constexpr int LUA_MYSQL_EXEC = 1;

@@ -1,55 +1,57 @@
-﻿#include"App/App.h"
-#include"Component/TimerComponent.h"
-#include"Component/AsyncMgrComponent.h"
-#include"Component/LuaScriptComponent.h"
-#include"Component/UnitMgrComponent.h"
-#include"Component/ConsoleComponent.h"
-#include"Component/ThreadComponent.h"
-#include"Component/LogComponent.h"
-#include"Component/ProtoComponent.h"
+﻿#include"Entity/App/App.h"
+#include"Timer/Component/TimerComponent.h"
+#include"Async/Component/AsyncMgrComponent.h"
+#include"Script/Component/LuaScriptComponent.h"
+#include"Entity/Component/UnitMgrComponent.h"
+#include"Telnet/Component/ConsoleComponent.h"
+#include"Server/Component/ThreadComponent.h"
+#include"Log/Component/LogComponent.h"
+#include"Proto/Component/ProtoComponent.h"
 
-#include"Component/InnerNetComponent.h"
-#include"Component/OuterNetComponent.h"
-#include"Component/InnerNetMessageComponent.h"
+#include"Rpc/Component/InnerNetComponent.h"
+#include"Gate/Component/OuterNetComponent.h"
+#include"Rpc/Component/InnerNetMessageComponent.h"
 
-#include"Component/GateComponent.h"
+#include"Gate/Component/GateComponent.h"
+
+
+#include"Http/Component/HttpComponent.h"
+#include"Http/Component/HttpWebComponent.h"
+#include"Http/Component/HttpDebugComponent.h"
+#include"Rpc/Component/NodeMgrComponent.h"
+
+#include"Server/Component/TextConfigComponent.h"
+#include"Cluster/Component/LaunchComponent.h"
+#include"Log/Service/Log.h"
+#include"Gate/Service/Gate.h"
+#include"Common/Service/Node.h"
+#include"Http/Service/ServerWeb.h"
+#include"Registry/Service/Registry.h"
+#include"Common/Service/User.h"
+
+
 #include"Component/ClientComponent.h"
-
-#include"Component/HttpComponent.h"
-#include"Component/HttpWebComponent.h"
-#include"Component/HttpDebugComponent.h"
-#include"Component/NodeMgrComponent.h"
-
-#include"Component/TextConfigComponent.h"
-#include"Component/LaunchComponent.h"
-#include"Service/Log.h"
-#include"Service/Gate.h"
-#include"Service/Node.h"
-#include"Service/ServerWeb.h"
-#include"Service/Registry.h"
-#include"Service/User.h"
 #ifdef __ENABLE_MONGODB__
-#include"Service/MongoDB.h"
-#include"Component/MongoDBComponent.h"
-#include"Component/MongoHelperComponent.h"
-#include"Component/MongoDataComponent.h"
+#include"Mongo/Service/MongoDB.h"
+#include"Mongo/Component/MongoDBComponent.h"
+#include"Mongo/Component/MongoHelperComponent.h"
 #endif
 
 #ifdef __ENABLE_MYSQL__
-#include"Service/MysqlDB.h"
-#include"Component/MysqlDBComponent.h"
-#include"Component/MysqlHelperComponent.h"
+#include"Mysql/Service/MysqlDB.h"
+#include"Mysql/Component/MysqlDBComponent.h"
+#include"Mysql/Component/MysqlHelperComponent.h"
 #endif
 
 #ifdef __ENABLE_REDIS__
-#include"Component/RedisComponent.h"
-#include"Component/RedisStringComponent.h"
-#include"Component/RedisScriptComponent.h"
+#include"Redis/Component/RedisComponent.h"
+#include"Redis/Component/RedisStringComponent.h"
+#include"Redis/Component/RedisScriptComponent.h"
 #endif
-#include"Component/SqliteComponent.h"
+#include"Sqlite/Component/SqliteComponent.h"
 
-#include"Service/WatchDog.h"
-#include"Component/WatchDogComponent.h"
+#include"WatchDog/Service/WatchDog.h"
+#include"WatchDog/Component/WatchDogComponent.h"
 using namespace Sentry;
 
 void RegisterComponent()
@@ -84,7 +86,6 @@ void RegisterComponent()
 
 #ifdef __ENABLE_MONGODB__
     ComponentFactory::Add<MongoDBComponent>("MongoDBComponent");
-    ComponentFactory::Add<MongoDataComponent>("MongoDataComponent");
     ComponentFactory::Add<MongoHelperComponent>("MongoHelperComponent");
 #endif
 

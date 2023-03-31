@@ -1,16 +1,18 @@
 #include"TcpRpcClientContext.h"
-#include"Client/Message.h"
+
+#include <utility>
+#include"Entity/App/App.h"
 #include"Component/ClientComponent.h"
 namespace Client
 {
 	TcpRpcClientContext::TcpRpcClientContext(std::shared_ptr<SocketProxy> socket, ClientComponent * component)
-        : Tcp::TcpContext(socket)
+        : Tcp::TcpContext(std::move(socket))
 	{
 		this->mClientComponent = component;
         this->mState = Tcp::DecodeState::Head;
     }
 
-	void TcpRpcClientContext::SendToServer(std::shared_ptr<Rpc::Packet> message)
+	void TcpRpcClientContext::SendToServer(const std::shared_ptr<Rpc::Packet>& message)
 	{
 #ifdef ONLY_MAIN_THREAD
         this->Write(message);

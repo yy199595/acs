@@ -6,8 +6,9 @@
 #define APP_LOCATIONCOMPONENT_H
 #include<vector>
 #include<string>
-#include"Unit/LocationUnit.h"
-#include"Component/Component.h"
+#include<unordered_map>
+#include"Entity/Unit/LocationUnit.h"
+#include"Core/Component/Component.h"
 
 namespace Sentry
 {

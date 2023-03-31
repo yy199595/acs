@@ -1,11 +1,10 @@
 ﻿#pragma once
-#include"Lua/LuaInclude.h"
-#include"XCode/XCode.h"
-#include"Client/Message.h"
-#include"Guid/NumberBuilder.h"
-#include"Coroutine/CoroutineDef.h"
-#include"Source/TaskSource.h"
-#include"Lua/LuaWaitTaskSource.h"
+#include"Script/Lua/LuaInclude.h"
+#include"Rpc/Client/Message.h"
+#include"Util/Guid/NumberBuilder.h"
+#include"Async/Coroutine/CoroutineDef.h"
+#include"Async/Source/TaskSource.h"
+#include"Async/Lua/LuaWaitTaskSource.h"
 using namespace com;
 using namespace google::protobuf;
 namespace Sentry

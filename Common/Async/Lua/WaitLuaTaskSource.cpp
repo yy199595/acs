@@ -2,8 +2,8 @@
 // Created by mac on 2022/3/31.
 //
 
-#include "WaitLuaTaskSource.h"
-#include"Lua/UserDataParameter.h"
+#include"WaitLuaTaskSource.h"
+#include"Script/Lua/UserDataParameter.h"
 namespace Sentry
 {
 	WaitLuaTaskSource::WaitLuaTaskSource()

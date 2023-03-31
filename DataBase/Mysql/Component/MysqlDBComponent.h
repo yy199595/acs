@@ -5,10 +5,12 @@
 #ifndef SERVER_MYSQLRPCCOMPONENT_H
 #define SERVER_MYSQLRPCCOMPONENT_H
 
-#include"Client/MysqlDefine.h"
-#include"Client/MysqlMessage.h"
-#include"Guid/NumberBuilder.h"
-#include"Component/RpcTaskComponent.h"
+#include"Mysql/Client/MysqlDefine.h"
+#include"Mysql/Client/MysqlMessage.h"
+#include"Util/Guid/NumberBuilder.h"
+#include"Rpc/Component/RpcTaskComponent.h"
+#include "Mysql/Config/MysqlConfig.h"
+
 struct lua_State;
 namespace Sentry
 {
@@ -31,22 +33,22 @@ namespace Sentry
 							 public IRpc<Mysql::Response>, public ILuaRegister
     {
     public:
-        MysqlDBComponent();
-        ~MysqlDBComponent() = default;
-    public:
         void CloseClient(int id);
 		int MakeMysqlClient();
 		bool Ping(int index = 0);
 	public:
+		const MysqlConfig & Config() const { return this->mConfig; }
 		bool Execute(int index, const std::shared_ptr<Mysql::ICommand>& command);
 		bool Send(int index, const std::shared_ptr<Mysql::ICommand> & command, int & rpcId);
 		std::shared_ptr<Mysql::Response> Run(int index, const std::shared_ptr<Mysql::ICommand>& command);
 	 private:
+		bool Awake() final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 		void OnConnectSuccessful(const std::string &address) final;
 		void OnMessage(std::shared_ptr<Mysql::Response> message) final;
 		void OnTaskComplete(int key) final { this->mNumberPool.Push(key);}
 	private:
+		MysqlConfig mConfig;
 		std::unique_ptr<SqlHelper> mSqlHelper;
 		Util::NumberBuilder<int, 1> mNumberPool;
 		//std::vector<std::unique_ptr<MysqlClient>> mMysqlClients;

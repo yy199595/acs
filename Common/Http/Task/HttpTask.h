@@ -4,21 +4,18 @@
 
 #ifndef APP_HTTPTASK_H
 #define APP_HTTPTASK_H
-#include"Http/HttpResponse.h"
-#include"Async/RpcTaskSource.h"
+#include"Http/Common/HttpResponse.h"
+#include"Rpc/Async/RpcTaskSource.h"
 
 namespace Sentry
 {
     class HttpRequestTask : public IRpcTask<Http::Response>
     {
     public:
-        HttpRequestTask(int time = 0);
-    public:
-        long long GetRpcId() { return this->mTaskId;}
-
+        explicit HttpRequestTask(int id);
     public:
         void OnTimeout();
-        void OnResponse(std::shared_ptr<Http::Response> response);
+        void OnResponse(std::shared_ptr<Http::Response> response) final;
         std::shared_ptr<Http::Response> Await() { return this->mTask.Await();}
     private:
         long long mTaskId;
@@ -33,16 +30,15 @@ namespace Sentry
     class LuaHttpRequestTask : public IRpcTask<Http::Response>
     {
     public:
-        LuaHttpRequestTask(lua_State * lua);
-        ~LuaHttpRequestTask();
+        explicit LuaHttpRequestTask(lua_State * lua);
+        ~LuaHttpRequestTask() final;
     public:     
-        int Await(std::shared_ptr<HttpRequestClient> client);
+        int Await();
     public:    
         void OnResponse(std::shared_ptr<Http::Response> response) final;
     private:
         int mRef;
         lua_State * mLua;
-        std::shared_ptr<HttpRequestClient> mRequestClient;
     };
 }
 

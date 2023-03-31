@@ -8,8 +8,7 @@
 #include<string>
 #include<vector>
 #include<unordered_map>
-#include"Config/TextConfig.h"
-#include<Singleton/Singleton.h>
+#include"Server/Config/TextConfig.h"
 namespace Sentry
 {
     struct RedisClientConfig
@@ -25,7 +24,7 @@ namespace Sentry
     };
 
 
-    class RedisConfig : public TextConfig, public ConstSingleton<RedisConfig>
+    class RedisConfig : public TextConfig
     {
     public:
         RedisConfig() : TextConfig("RedisConfig") { }

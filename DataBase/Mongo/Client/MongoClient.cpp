@@ -3,13 +3,12 @@
 //
 
 #include"MongoClient.h"
-
-#include"Md5/MD5.h"
-#include"Sha1/sha1.h"
-#include"Bson/base64.h"
-#include"String/StringHelper.h"
-#include"Config/MongoConfig.h"
-
+#include"Util/Md5/MD5.h"
+#include"Util/Sha1/sha1.h"
+#include"Entity/App/App.h"
+#include"Mongo/Bson/base64.h"
+#include"Util/String/StringHelper.h"
+#include"Mongo/Config/MongoConfig.h"
 
 namespace Mongo
 {
@@ -31,11 +30,12 @@ namespace Mongo
         //TODO
     }
 
-    TcpMongoClient::TcpMongoClient(std::shared_ptr<SocketProxy> socket, IRpc<CommandResponse>* component)
-		: Tcp::TcpContext(socket, 1024 * 1024), mComponent(component)
+    TcpMongoClient::TcpMongoClient(std::shared_ptr<SocketProxy> socket,
+			IRpc<CommandResponse>* component, const MongoConfig & config)
+		: Tcp::TcpContext(std::move(socket), 1024 * 1024), mComponent(component), mConfig(config)
 	{
         this->mIndex = 0;
-        this->mAddress = MongoConfig::Inst()->Address[0].FullAddress;
+        this->mAddress = config.Address[0].FullAddress;
 	}
 
 	void TcpMongoClient::OnSendMessage(const Asio::Code & code, std::shared_ptr<ProtoMessage> message)
@@ -65,7 +65,7 @@ namespace Mongo
         }
         std::string nonce = _bson::base64::encode(Helper::Str::RandomString(8));
         std::shared_ptr<Mongo::CommandRequest> request1(new CommandRequest());
-        std::string firstBare = fmt::format("n={0},r={1}", MongoConfig::Inst()->User, nonce);
+        std::string firstBare = fmt::format("n={0},r={1}", this->mConfig.User, nonce);
 
         std::string payload = _bson::base64::encode(fmt::format("n,,{0}", firstBare));
 
@@ -247,13 +247,12 @@ namespace Mongo
 
 	bool TcpMongoClient::StartAuthBySha1()
 	{
-        const MongoConfig * config = MongoConfig::Inst();
-        if(this->mIndex >= config->Address.size())
+        if(this->mIndex >= this->mConfig.Address.size())
         {
             return false;
         }
         const Net::Address & address
-            = config->Address[this->mIndex];
+            = this->mConfig.Address[this->mIndex];
         this->mSocket->Init(address.Ip, address.Port);
 #ifdef __DEBUG__
         CONSOLE_LOG_DEBUG("start connect mongo server [" << address.FullAddress << "]");
@@ -271,7 +270,7 @@ namespace Mongo
 #ifdef __DEBUG__
         CONSOLE_LOG_DEBUG("connect mongo server [" << address.FullAddress << "]successful");
 #endif
-        return this->Auth(config->User, "admin", config->Password);
+        return this->Auth(this->mConfig.User, "admin", this->mConfig.Password);
 	}
 
 }

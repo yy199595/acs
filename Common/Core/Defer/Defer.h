@@ -5,7 +5,7 @@
 #ifndef _DEFER_H_
 #define _DEFER_H_
 #include<functional>
-#include"Method/MethodProxy.h"
+#include"Rpc/Method/MethodProxy.h"
 namespace Sentry
 {
 	class Defer

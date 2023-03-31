@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include"TimerBase.h"
-#include"Lua/LuaInclude.h"
-#include"Method/MethodProxy.h"
+#include"Script/Lua/LuaInclude.h"
+#include"Rpc/Method/MethodProxy.h"
 namespace Sentry
 {
 	class DelayTimer : public TimerBase

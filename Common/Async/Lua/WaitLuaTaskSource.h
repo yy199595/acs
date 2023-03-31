@@ -4,9 +4,9 @@
 
 #ifndef SERVER_WAITLUATASKSOURCE_H
 #define SERVER_WAITLUATASKSOURCE_H
-#include"Lua/LuaInclude.h"
-#include"Lua/LuaParameter.h"
-#include"Source/TaskSource.h"
+#include"Script/Lua/LuaInclude.h"
+#include"Script/Lua/LuaParameter.h"
+#include"Async/Source/TaskSource.h"
 namespace Sentry
 {
 	// 在c++中等待lua完成

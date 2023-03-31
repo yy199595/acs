@@ -1,6 +1,6 @@
 #pragma once
 #include"asio/ip/tcp.hpp"
-#include"Component/Component.h"
+#include"Core/Component/Component.h"
 namespace Sentry
 {
     class TcpListenerComponent : public Component

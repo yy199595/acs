@@ -75,60 +75,19 @@ LINK_DIRECTORIES(${PROJECT_SOURCE_DIR}/Libs/bin/protobuf)
 include_directories(${PROJECT_SOURCE_DIR}/Gen)
 include_directories(${PROJECT_SOURCE_DIR}/Client)
 
-include_directories(${PROJECT_SOURCE_DIR}/Common/Rpc)
-include_directories(${PROJECT_SOURCE_DIR}/Common/Log)
-include_directories(${PROJECT_SOURCE_DIR}/Common/Core)
-include_directories(${PROJECT_SOURCE_DIR}/Common/Data)
-include_directories(${PROJECT_SOURCE_DIR}/Common/Util)
-include_directories(${PROJECT_SOURCE_DIR}/Common/Async)
-include_directories(${PROJECT_SOURCE_DIR}/Common/Http)
-include_directories(${PROJECT_SOURCE_DIR}/Common/Proto)
-include_directories(${PROJECT_SOURCE_DIR}/Common/Timer)
-include_directories(${PROJECT_SOURCE_DIR}/Common/Redis)
-include_directories(${PROJECT_SOURCE_DIR}/Common/Entity)
-include_directories(${PROJECT_SOURCE_DIR}/Common/Server)
-include_directories(${PROJECT_SOURCE_DIR}/Common/Script)
-include_directories(${PROJECT_SOURCE_DIR}/Common/Network)
-include_directories(${PROJECT_SOURCE_DIR}/Common/Cluster)
-include_directories(${PROJECT_SOURCE_DIR}/Common/Registry)
-include_directories(${PROJECT_SOURCE_DIR}/Common/Sqlite)
-include_directories(${PROJECT_SOURCE_DIR}/Common/WatchDog)
+include_directories(${PROJECT_SOURCE_DIR}/Common)
+include_directories(${PROJECT_SOURCE_DIR}/Server)
+include_directories(${PROJECT_SOURCE_DIR}/DataBase)
 
+file(GLOB_RECURSE ProtocolSrc "Gen/*.h" "Gen/*.cpp" "Gen/*.hpp" "Gen/*.c" "Gen/*.cc")
+file(GLOB_RECURSE CommonSrc "Common/*.h" "Common/*.cpp" "Common/*.hpp" "Common/*.c")
 
-include_directories(${PROJECT_SOURCE_DIR}/Server/Log)
-include_directories(${PROJECT_SOURCE_DIR}/Server/Gate)
-include_directories(${PROJECT_SOURCE_DIR}/Server/User)
-include_directories(${PROJECT_SOURCE_DIR}/Server/Redis)
-include_directories(${PROJECT_SOURCE_DIR}/Server/Telnet)
+file(GLOB_RECURSE ServerSource "Server/*.h" "Server/*.cpp" "Server/*.hpp" "Server/*.c")
+file(GLOB_RECURSE ClientSource "Client/*.h" "Client/*.cpp" "Client/*.hpp" "Client/*.c")
 
+file(GLOB_RECURSE DataBaseSource "DataBase/*.h" "DataBase/*.cpp" "DataBase/*.hpp" "DataBase/*.c")
 
-
-
-file(GLOB_RECURSE CommonSrc "Common/*.h" "Common/*.hpp" "Common/*.cpp" "Common/*.c")
-file(GLOB_RECURSE ProtocolSrc "Gen/*.h" "Gen/*.cpp" "Gen/*.hpp" "Gen/*.cc")
-
-file(GLOB_RECURSE ServerSource "Server/*.h" "Server/*.cpp")
-file(GLOB_RECURSE ClientSource "Client/*.h" "Client/*.cpp")
-
-list(APPEND CommonFiles ${CommonSrc} ${ProtocolSrc})
-
-if(__ENABLE_MONGODB__)
-    include_directories(${PROJECT_SOURCE_DIR}/DataBase/Mongo)
-    file(GLOB_RECURSE MongoFiles "DataBase/Mongo/*.h" "DataBase/Mongo/*.cpp")
-    list(APPEND CommonFiles ${MongoFiles})
-endif()
-
-if(__ENABLE_MYSQL__)
-    include_directories(${PROJECT_SOURCE_DIR}/DataBase/Mysql)
-    file(GLOB_RECURSE MysqlFiles "DataBase/Mysql/*.h" "DataBase/Mysql/*.cpp")
-    list(APPEND CommonFiles ${MysqlFiles})
-endif()
-
-if(__ENABLE_REDIS__)
-    include_directories(${PROJECT_SOURCE_DIR}/DataBase/Redis)
-    file(GLOB_RECURSE RedislFiles "DataBase/Redis/*.h" "DataBase/Redis/*.cpp")
-    list(APPEND CommonFiles ${RedislFiles})
-endif()
+list(APPEND CommonFiles ${CommonSrc} ${ProtocolSrc} ${DataBaseSource})
 
 #LINK_DIRECTORIES(Libs/lib)
 #SET(CMAKE_BUILD_TYPE "Debug")
@@ -216,11 +175,10 @@ elseif(UNIX)
     else()
         list(APPEND StaticLibs protobufd pthread dl)
     endif()
-
-
 else()
     message(FATAL_ERROR "未知平台")
 endif()
+
 TARGET_LINK_LIBRARIES(app ${StaticLibs})
 SET(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)

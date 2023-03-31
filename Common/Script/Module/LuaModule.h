@@ -4,15 +4,15 @@
 
 #ifndef _LUAMODULE_H_
 #define _LUAMODULE_H_
-#include"Lua/LuaInclude.h"
-#include"Lua/Function.h"
-#include"Component/IComponent.h"
+#include"Script/Lua/LuaInclude.h"
+#include"Script/Lua/Function.h"
+#include"Core/Component/IComponent.h"
 namespace Lua
 {
 	class LuaModule
 	{
 	public:
-		LuaModule(lua_State* lua, const std::string& name, const std::string& path);
+		LuaModule(lua_State* lua, std::string  name, std::string  path);
 		~LuaModule();
 	public:
 		bool Awake();

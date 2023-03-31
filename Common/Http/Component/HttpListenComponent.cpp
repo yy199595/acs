@@ -3,10 +3,10 @@
 //
 
 #include"HttpListenComponent.h"
-#include"Client/HttpHandlerClient.h"
-#include"Component/ThreadComponent.h"
-#include"Http/HttpResponse.h"
-#include"App/App.h"
+#include"Http/Client/HttpHandlerClient.h"
+#include"Server/Component/ThreadComponent.h"
+#include"Http/Common/HttpResponse.h"
+#include"Entity/App/App.h"
 namespace Sentry
 {
     void HttpListenComponent::OnListen(std::shared_ptr<SocketProxy> socket)

@@ -3,8 +3,8 @@
 //
 
 #include"LuaMysqlTask.h"
-#include"Lua/LuaInclude.h"
-#include "Json/Lua/Json.h"
+#include"Script/Lua/LuaInclude.h"
+#include"Util/Json/Lua/Json.h"
 
 namespace Sentry
 {

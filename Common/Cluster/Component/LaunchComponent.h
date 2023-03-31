@@ -4,7 +4,7 @@
 
 #ifndef APP_LAUNCHCOMPONENT_H
 #define APP_LAUNCHCOMPONENT_H
-#include"Component/Component.h"
+#include"Core/Component/Component.h"
 
 namespace Sentry
 {

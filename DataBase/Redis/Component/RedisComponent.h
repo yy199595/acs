@@ -1,10 +1,9 @@
 ﻿#pragma once
 
-#include"Guid/Guid.h"
-#include"Json/JsonWriter.h"
-#include"Timer/ElapsedTimer.h"
-#include"Client/TcpRedisClient.h"
-#include"Component/RpcTaskComponent.h"
+#include"Util/Guid/Guid.h"
+#include"Redis/Config/RedisConfig.h"
+#include"Redis/Client/TcpRedisClient.h"
+#include"Rpc/Component/RpcTaskComponent.h"
 
 namespace Sentry
 {
@@ -19,13 +18,14 @@ namespace Sentry
 		bool Ping(size_t index);
 		bool Send(std::shared_ptr<RedisRequest> request);
 		bool Send(std::shared_ptr<RedisRequest> request, int & id);
-    public:
+		inline const RedisClientConfig & Config() const { return this->mConfig.Config(); }
+	public:
         template<typename ... Args>
         bool Send(const std::string & cmd, Args&& ... args);
         template<typename ... Args>
         std::shared_ptr<RedisResponse> Run(const std::string & cmd, Args&& ... args);
     public:
-        std::shared_ptr<RedisResponse> Run(std::shared_ptr<RedisRequest> request);
+        std::shared_ptr<RedisResponse> Run(const std::shared_ptr<RedisRequest>& request);
     private:
 		TcpRedisClient * GetClient(size_t index = -1);
 		void OnConnectSuccessful(const std::string &address) final;
@@ -38,6 +38,7 @@ namespace Sentry
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 		void OnTaskComplete(int key) final { this->mNumberPool.Push(key);}
 	private:
+		RedisConfig mConfig;
         Util::NumberBuilder<int, 1> mNumberPool;
         std::vector<std::shared_ptr<TcpRedisClient>> mRedisClients;
     };

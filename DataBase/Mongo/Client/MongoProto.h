@@ -5,9 +5,10 @@
 #ifndef SERVER_MONGOPROTO_H
 #define SERVER_MONGOPROTO_H
 #include"asio/streambuf.hpp"
-#include"Json/JsonWriter.h"
+
 #include"BsonDocument.h"
-#include"Message/ProtoMessage.h"
+#include"Util/Json/JsonWriter.h"
+#include"Proto/Message/ProtoMessage.h"
 
 #define OP_REPLY 1
 #define OP_MSG    1000

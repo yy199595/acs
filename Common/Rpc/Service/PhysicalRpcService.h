@@ -5,10 +5,10 @@
 #ifndef SERVER_LOCALSERVICECOMPONENT_H
 #define SERVER_LOCALSERVICECOMPONENT_H
 #include"RpcService.h"
-#include"Method/MethodRegister.h"
+#include"Rpc/Method/MethodRegister.h"
 namespace Sentry
 {
-	//ÊµÌå·þÎñ ÄÜ´¦ÀíÂß¼­
+	//Êµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ü´ï¿½ï¿½ï¿½ï¿½ß¼ï¿½
 	class PhysicalRpcService : public RpcService, public IServerRecord
 	{
 	public:

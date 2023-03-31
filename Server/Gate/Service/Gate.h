@@ -5,7 +5,7 @@
 #ifndef GAMEKEEPER_GATESERVICE_H
 #define GAMEKEEPER_GATESERVICE_H
 #include"Message/s2s.pb.h"
-#include"Service/PhysicalRpcService.h"
+#include"Rpc/Service/PhysicalRpcService.h"
 namespace Sentry
 {
 	class Gate final : public PhysicalRpcService

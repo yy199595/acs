@@ -3,8 +3,7 @@
 //
 
 #include"RedisConfig.h"
-#include"Log/CommonLogDef.h"
-#include"String/StringHelper.h"
+#include"Util/String/StringHelper.h"
 #include"rapidjson/document.h"
 namespace Sentry
 {

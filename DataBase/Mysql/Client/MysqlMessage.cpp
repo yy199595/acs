@@ -6,11 +6,9 @@
 #include"errmsg.h"
 #include"spdlog/fmt/fmt.h"
 #include"sstream"
-#include"Guid/Guid.h"
-#include"Log/CommonLogDef.h"
-#include"Component/LogComponent.h"
+#include"Util/Guid/Guid.h"
+#include"Entity/App/App.h"
 #include"google/protobuf/util/json_util.h"
-using namespace Sentry;
 
 namespace Mysql
 {

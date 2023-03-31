@@ -4,7 +4,7 @@
 
 #ifndef _LUACOROUTINE_H_
 #define _LUACOROUTINE_H_
-#include"Lua/LuaInclude.h"
+#include"Script/Lua/LuaInclude.h"
 
 
 namespace Lua

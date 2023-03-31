@@ -7,10 +7,10 @@
 #include<queue>
 #include"MysqlDefine.h"
 #include"MysqlMessage.h"
-#include"Tcp/TcpContext.h"
-#include"Queue/ThreadQueue.h"
-#include"Config/MysqlConfig.h"
-#include"Component/IComponent.h"
+#include"Network/Tcp/TcpContext.h"
+#include"Core/Queue/ThreadQueue.h"
+#include"Mysql/Config/MysqlConfig.h"
+#include"Core/Component/IComponent.h"
 
 namespace Sentry
 {
@@ -20,7 +20,7 @@ namespace Sentry
 			public std::enable_shared_from_this<MysqlClient>
     {
     public:
-        explicit MysqlClient(IRpc<Mysql::Response> *component);
+        explicit MysqlClient(IRpc<Mysql::Response> *component, const MysqlConfig & config);
     public:
         void Stop();
 		void Start();
@@ -31,6 +31,7 @@ namespace Sentry
         size_t mIndex;
         MYSQL *mMysqlClient;
 		std::thread * mThread;
+		const MysqlConfig & mConfig;
 		IRpc<Mysql::Response> *mComponent;
     };
 }

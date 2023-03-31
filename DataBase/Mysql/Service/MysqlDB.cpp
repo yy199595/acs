@@ -1,8 +1,10 @@
 ﻿#include"MysqlDB.h"
-#include"Proto/ProtoHelper.h"
-#include"Client/MysqlMessage.h"
-#include"Component/MysqlDBComponent.h"
-#include"Component/ProtoComponent.h"
+#include"Entity/App/App.h"
+#include"Util/Proto/ProtoHelper.h"
+#include"Mysql/Client/MysqlMessage.h"
+#include"Proto/Component/ProtoComponent.h"
+#include"Mysql/Component/MysqlDBComponent.h"
+
 namespace Sentry
 {
 	MysqlDB::MysqlDB()
@@ -27,7 +29,8 @@ namespace Sentry
     {
         this->mProtoComponent = this->GetComponent<ProtoComponent>();
         this->mMysqlComponent = this->GetComponent<MysqlDBComponent>();
-        for (int index = 0; index < MysqlConfig::Inst()->MaxCount; index++)
+		const MysqlConfig & config = this->mMysqlComponent->Config();
+        for (int index = 0; index <config.MaxCount; index++)
         {
 			int id = this->mMysqlComponent->MakeMysqlClient();
 			{

@@ -1,9 +1,8 @@
 ﻿#include"AsyncMgrComponent.h"
-#include"App/App.h"
-#include"Coroutine/TaskContext.h"
-#include"Component/TimerComponent.h"
+#include"Entity/App/App.h"
+#include"Timer/Component/TimerComponent.h"
 #ifdef __DEBUG__
-#include"Time/TimeHelper.h"
+#include"Util/Time/TimeHelper.h"
 #endif
 using namespace std::chrono;
 namespace Sentry

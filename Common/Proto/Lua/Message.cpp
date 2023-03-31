@@ -3,9 +3,9 @@
 //
 
 #include"Message.h"
-#include"App/App.h"
-#include"Json/Lua/Encoder.h"
-#include"Lua/UserDataParameter.h"
+#include"Entity/App/App.h"
+#include"Util/Json/Lua/Encoder.h"
+#include"Script/Lua/UserDataParameter.h"
 #include"google/protobuf/util/json_util.h"
 using namespace Sentry;
 

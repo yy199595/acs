@@ -1,8 +1,8 @@
 ﻿#include "ServiceConfig.h"
 
-#include"App/App.h"
+#include"Entity/App/App.h"
 #include"rapidjson/document.h"
-#include"Config/ClusterConfig.h"
+#include"Cluster/Config/ClusterConfig.h"
 namespace Sentry
 {
 	bool RpcServiceConfig::OnLoadConfig(const rapidjson::Value & json)

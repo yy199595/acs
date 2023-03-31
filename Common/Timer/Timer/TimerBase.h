@@ -1,8 +1,7 @@
 ﻿#pragma once
 
-#include"Guid/Guid.h"
-#include<functional>
-#include"Time/TimeHelper.h"
+#include"Util/Guid/Guid.h"
+#include"Util/Time/TimeHelper.h"
 
 namespace Sentry
 {

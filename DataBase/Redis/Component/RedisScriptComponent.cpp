@@ -3,10 +3,10 @@
 //
 
 #include"RedisScriptComponent.h"
-#include"String/StringHelper.h"
+#include"Util/String/StringHelper.h"
 #include"RedisComponent.h"
-#include"File/FileHelper.h"
-#include"System/System.h"
+#include"Util/File/FileHelper.h"
+#include"Core/System/System.h"
 namespace Sentry
 {
     bool RedisScriptComponent::LateAwake()
@@ -17,12 +17,12 @@ namespace Sentry
 
     bool RedisScriptComponent::Start()
 	{
-		const RedisClientConfig& config = RedisConfig::Inst()->Config();
-		for (auto iter = config.LuaFiles.begin(); iter != config.LuaFiles.end(); iter++)
+		const RedisClientConfig& config = this->mComponent->Config();
+		for (const auto & LuaFile : config.LuaFiles)
 		{
 			std::string content;
-			const std::string& name = iter->first;
-			const std::string& path = iter->second;
+			const std::string& name = LuaFile.first;
+			const std::string& path = LuaFile.second;
 			if (!Helper::File::ReadTxtFile(path, content))
 			{
 				LOG_ERROR("load lua [" << path << "] error");

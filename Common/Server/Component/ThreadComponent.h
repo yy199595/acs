@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include<list>
 #include<string>
-#include"Tcp/Asio.h"
-#include"Component/Component.h"
+#include"Network/Tcp/Asio.h"
+#include"Core/Component/Component.h"
 
 namespace Sentry
 {

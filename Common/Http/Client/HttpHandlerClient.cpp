@@ -4,10 +4,10 @@
 
 #include"HttpHandlerClient.h"
 
-#include"App/App.h"
-#include"Http/HttpRequest.h"
-#include"Http/HttpResponse.h"
-#include"Component/HttpListenComponent.h"
+#include"Entity/App/App.h"
+#include"Http/Common/HttpRequest.h"
+#include"Http/Common/HttpResponse.h"
+#include"Http/Component/HttpListenComponent.h"
 
 namespace Sentry
 {

@@ -1,7 +1,7 @@
 ﻿#include"StringHelper.h"
-#include"Md5/MD5.h"
+#include"Util/Md5/MD5.h"
 #include<regex>
-#include"Math/MathHelper.h"
+#include"Util/Math/MathHelper.h"
 #include"google/protobuf/message.h"
 namespace Helper
 {
@@ -28,7 +28,7 @@ namespace Helper
         return ret.size();
     }
 
-    void Str::ReplaceString(std::string &outstring, const std::string str1, const std::string str2)
+    void Str::ReplaceString(std::string &outstring, const std::string& str1, const std::string& str2)
     {
         size_t pos = outstring.find(str1);
         while (pos != std::string::npos)

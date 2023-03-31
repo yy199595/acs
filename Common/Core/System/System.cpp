@@ -8,7 +8,7 @@
 #else
 #include<unistd.h>
 #endif // __OS_WIN__
-#include"Log/CommonLogDef.h"
+#include"Log/Common/CommonLogDef.h"
 namespace Sentry
 {
     bool System::Init(int argc, char **argv)

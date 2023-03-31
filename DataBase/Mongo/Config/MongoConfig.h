@@ -5,17 +5,17 @@
 #ifndef APP_MONGOCONFIG_H
 #define APP_MONGOCONFIG_H
 #include<vector>
-#include"Config/TextConfig.h"
-#include"Singleton/Singleton.h"
+#include"Server/Config/TextConfig.h"
+#include"Core/Singleton/Singleton.h"
 namespace Sentry
 {
-    class MongoConfig : public TextConfig, public ConstSingleton<MongoConfig>
+    class MongoConfig : public TextConfig
     {
     public:
         MongoConfig() : TextConfig("MongoConfig") { }
 
     public:
-       bool OnLoadText(const char *str, size_t length) final;
+       	bool OnLoadText(const char *str, size_t length) final;
         bool OnReloadText(const char *str, size_t length) final;
     public:
         int MaxCount;

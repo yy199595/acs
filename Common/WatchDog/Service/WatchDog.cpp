@@ -1,5 +1,4 @@
 #include"WatchDog.h"
-#include"Log/Debug.h"
 namespace Sentry
 {
     bool WatchDog::OnInit()

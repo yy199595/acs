@@ -4,7 +4,7 @@
 
 #ifndef SERVER_CLIENT_H
 #define SERVER_CLIENT_H
-#include"Lua/LuaInclude.h"
+#include"Script/Lua/LuaInclude.h"
 
 namespace Lua
 {

@@ -27,7 +27,7 @@ namespace Helper
 
         extern void FormatJson(const std::string &json, std::string & format);
 
-        extern void ReplaceString(std::string &outstring, const std::string str1, const std::string str2);
+        extern void ReplaceString(std::string &outstring, const std::string& str1, const std::string& str2);
 
         extern size_t Split(const std::string &targetString, const char * cc, std::vector<std::string> &ret);
     }

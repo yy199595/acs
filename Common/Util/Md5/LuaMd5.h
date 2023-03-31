@@ -4,7 +4,7 @@
 
 #ifndef APP_LUAMD5_H
 #define APP_LUAMD5_H
-#include"Lua/LuaInclude.h"
+#include"Script/Lua/LuaInclude.h"
 
 namespace Lua
 {

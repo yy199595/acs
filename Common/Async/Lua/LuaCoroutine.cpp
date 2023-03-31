@@ -1,9 +1,8 @@
 #include"LuaCoroutine.h"
-#include"App/App.h"
-#include"Log/Debug.h"
-#include"Timer/TimerBase.h"
-#include"Lua/LuaWaitTaskSource.h"
-#include"Component/TimerComponent.h"
+#include"Entity/App/App.h"
+#include"Timer/Timer/TimerBase.h"
+#include"Async/Lua/LuaWaitTaskSource.h"
+#include"Timer/Component/TimerComponent.h"
 using namespace Sentry;
 #define Await(task) task->Await()
 namespace Lua

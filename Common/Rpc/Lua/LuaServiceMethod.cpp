@@ -1,11 +1,11 @@
 #include"LuaServiceMethod.h"
-#include"Lua/Function.h"
-#include"App/App.h"
-#include"Module/LuaModule.h"
-#include"Config/ServiceConfig.h"
-#include"Lua/LuaServiceTaskSource.h"
-#include"Component/ProtoComponent.h"
-#include"Component/LuaScriptComponent.h"
+#include"Script/Lua/Function.h"
+#include"Entity/App/App.h"
+#include"Script/Module/LuaModule.h"
+#include"Server/Config/ServiceConfig.h"
+#include"Rpc/Lua/LuaServiceTaskSource.h"
+#include"Proto/Component/ProtoComponent.h"
+#include"Script/Component/LuaScriptComponent.h"
 #include"google/protobuf/util/json_util.h"
 namespace Sentry
 {

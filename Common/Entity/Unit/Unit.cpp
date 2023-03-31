@@ -1,6 +1,6 @@
 #include"Unit.h"
-#include"App/App.h"
-#include"Component/Component.h"
+#include"Entity/App/App.h"
+#include"Core/Component/Component.h"
 namespace Sentry
 {
 	Unit::Unit(long long id) : mUnitId(id)

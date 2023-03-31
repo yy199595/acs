@@ -2,10 +2,10 @@
 // Created by zmhy0073 on 2022/10/13.
 //
 #include"TextConfig.h"
-#include"File/FileHelper.h"
-#include"Md5/MD5.h"
-#include"System/System.h"
-#include"Log/CommonLogDef.h"
+#include"Util/File/FileHelper.h"
+#include"Util/Md5/MD5.h"
+#include"Core/System/System.h"
+#include"Log/Common/CommonLogDef.h"
 namespace Sentry
 {
     const std::string &TextConfig::WorkPath() const

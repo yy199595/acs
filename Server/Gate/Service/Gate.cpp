@@ -3,14 +3,14 @@
 //
 
 #include"Gate.h"
-#include"App/App.h"
-#include"Md5/MD5.h"
-#include"Service/User.h"
-#include"Client/OuterNetClient.h"
-#include"Config/ClusterConfig.h"
-#include"Config/CodeConfig.h"
-#include"Component/OuterNetComponent.h"
-#include"Component/NodeMgrComponent.h"
+#include"Entity/App/App.h"
+#include"Util/Md5/MD5.h"
+#include"Common/Service/User.h"
+#include"Gate/Client/OuterNetClient.h"
+#include"Cluster/Config/ClusterConfig.h"
+#include"Server/Config/CodeConfig.h"
+#include"Gate/Component/OuterNetComponent.h"
+#include"Rpc/Component/NodeMgrComponent.h"
 namespace Sentry
 {
     Gate::Gate()

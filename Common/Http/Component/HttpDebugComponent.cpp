@@ -1,13 +1,14 @@
 #include"HttpDebugComponent.h"
-#include"Http/HttpRequest.h"
-#include"Http/HttpResponse.h"
-#include"String/StringHelper.h"
+#include"Http/Common/HttpRequest.h"
+#include"Http/Common/HttpResponse.h"
+#include"Util/String/StringHelper.h"
+#include"Entity/App/App.h"
+#include"Cluster/Config/ClusterConfig.h"
+#include"Server/Config/CodeConfig.h"
+#include"Util//Json/JsonWriter.h"
+#include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/InnerNetMessageComponent.h"
 
-#include"Config/ClusterConfig.h"
-#include"Config/CodeConfig.h"
-#include"Json/JsonWriter.h"
-#include"Component/NodeMgrComponent.h"
-#include"Component/InnerNetMessageComponent.h"
 namespace Sentry
 {
 	bool HttpDebugComponent::LateAwake()

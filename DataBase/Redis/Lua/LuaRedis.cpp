@@ -3,11 +3,12 @@
 //
 
 #include"LuaRedis.h"
-#include"Json/Lua/Json.h"
-#include"Client/RedisDefine.h"
-#include"Component/ProtoComponent.h"
-#include"Component/RedisScriptComponent.h"
-#include"Component/RedisComponent.h"
+#include"Entity/App/App.h"
+#include"Util/Json/Lua/Json.h"
+#include"Redis/Client/RedisDefine.h"
+#include"Proto/Component/ProtoComponent.h"
+#include"Redis/Component/RedisComponent.h"
+#include"Redis/Component/RedisScriptComponent.h"
 
 using namespace Sentry;
 namespace Lua

@@ -4,9 +4,9 @@
 
 #ifndef GAMEKEEPER_HTTPHANDLERCLIENT_H
 #define GAMEKEEPER_HTTPHANDLERCLIENT_H
-#include"Tcp/TcpContext.h"
-#include "Http.h"
 
+#include"Http.h"
+#include"Network/Tcp/TcpContext.h"
 namespace Http
 {
     class Request;

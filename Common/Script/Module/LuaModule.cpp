@@ -3,15 +3,15 @@
 //
 
 #include"LuaModule.h"
-#include"Lua/Function.h"
-#include"Md5/MD5.h"
+#include"Script/Lua/Function.h"
+#include"Util/Md5/MD5.h"
 #include<fstream>
-#include"File/FileHelper.h"
-#include"Log/CommonLogDef.h"
+#include <utility>
+#include"Log/Common/CommonLogDef.h"
 namespace Lua
 {
-	LuaModule::LuaModule(lua_State* lua, const std::string& name, const std::string& path)
-		: mLua(lua), mName(name), mPath(path)
+	LuaModule::LuaModule(lua_State* lua, std::string  name, std::string  path)
+		: mLua(lua), mName(std::move(name)), mPath(std::move(path))
 	{
 		this->mRef = 0;
 		this->mIsUpdate = false;

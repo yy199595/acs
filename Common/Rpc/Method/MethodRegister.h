@@ -6,9 +6,9 @@
 #define SERVER_METHODREGISTER_H
 
 #include"ServiceMethod.h"
-#include"Lua/LuaInclude.h"
-#include"Method/HttpServiceMethod.h"
-#include"Component/Component.h"
+#include"Script/Lua/LuaInclude.h"
+#include"Http/Method/HttpServiceMethod.h"
+#include"Core/Component/Component.h"
 namespace Sentry
 {
 	class ServiceMethodRegister

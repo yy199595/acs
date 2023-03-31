@@ -2,9 +2,9 @@
 
 
 #include"RpcService.h"
-#include"Lua/LuaInclude.h"
-#include"Json/JsonWriter.h"
-#include"Method/MethodRegister.h"
+#include"Script/Lua/LuaInclude.h"
+#include"Util/Json/JsonWriter.h"
+#include"Rpc/Method/MethodRegister.h"
 namespace Sentry
 {
 	class LuaScriptComponent;

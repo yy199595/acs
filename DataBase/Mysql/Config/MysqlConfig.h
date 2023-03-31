@@ -5,11 +5,11 @@
 #ifndef APP_MYSQLCONFIG_H
 #define APP_MYSQLCONFIG_H
 #include<vector>
-#include"Config/TextConfig.h"
-#include"Singleton/Singleton.h"
+#include"Server/Config/TextConfig.h"
+#include"Core/Singleton/Singleton.h"
 namespace Sentry
 {
-    class MysqlConfig : public TextConfig, public ConstSingleton<MysqlConfig>
+    class MysqlConfig : public TextConfig
     {
     public:
         MysqlConfig() : TextConfig("MysqlConfig"), MaxCount(0) { }

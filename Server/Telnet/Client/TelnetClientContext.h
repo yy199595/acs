@@ -1,9 +1,9 @@
 #pragma once
 
 #include<istream>
-#include"Tcp/SocketProxy.h"
-#include"Tcp/TcpContext.h"
-#include"Source/TaskSource.h"
+
+#include"Network/Tcp/TcpContext.h"
+#include"Async/Source/TaskSource.h"
 
 namespace Sentry
 {
@@ -16,11 +16,11 @@ namespace Tcp
 	class TelnetClientContext : public Tcp::TcpContext
 	{
 	 public:
-		explicit TelnetClientContext(std::shared_ptr<SocketProxy> socketProxy, ConsoleComponent * component);
+		explicit TelnetClientContext(const std::shared_ptr<SocketProxy>& socketProxy, ConsoleComponent * component);
 		~TelnetClientContext() = default;
 	 public:
 		void StartRead();
-		void SendProtoMessage(std::shared_ptr<TelnetProto> message);
+		void SendProtoMessage(const std::shared_ptr<TelnetProto>& message);
 	 private:
 		void CloseContext();
 		void OnReceiveLine(const asio::error_code &code, std::istream & is, size_t) final;

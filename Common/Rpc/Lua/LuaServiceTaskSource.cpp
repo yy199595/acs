@@ -3,9 +3,12 @@
 //
 
 #include"LuaServiceTaskSource.h"
-#include"Lua/UserDataParameter.h"
-#include"Lua/Message.h"
-#include"Json/Lua/Json.h"
+
+#include <utility>
+#include"Script/Lua/UserDataParameter.h"
+#include"Proto/Lua/Message.h"
+#include"Util/Json/Lua/Json.h"
+#include"XCode/XCode.h"
 namespace Sentry
 {
 	LuaServiceTaskSource::LuaServiceTaskSource(Http::Response* message)
@@ -15,7 +18,7 @@ namespace Sentry
     }
 
 	LuaServiceTaskSource::LuaServiceTaskSource(std::shared_ptr<Message> message)
-		: mRpcData(message), mHttpData(nullptr)
+		: mRpcData(std::move(message)), mHttpData(nullptr)
 	{
 
 	}

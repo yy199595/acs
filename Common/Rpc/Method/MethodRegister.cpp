@@ -3,10 +3,10 @@
 //
 
 #include"MethodRegister.h"
-#include"App/App.h"
-#include"Lua/LuaServiceMethod.h"
-#include"Service/PhysicalRpcService.h"
-#include"Component/ProtoComponent.h"
+#include"Entity/App/App.h"
+#include"Rpc/Lua/LuaServiceMethod.h"
+#include"Rpc/Service/PhysicalRpcService.h"
+#include"Proto/Component/ProtoComponent.h"
 namespace Sentry
 {
 	bool ServiceMethodRegister::AddMethod(std::shared_ptr<ServiceMethod> method)

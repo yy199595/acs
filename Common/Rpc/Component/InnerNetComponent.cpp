@@ -1,12 +1,14 @@
 ﻿
 #include"InnerNetComponent.h"
-#include"String/StringHelper.h"
-#include"Tcp/SocketProxy.h"
+#include"Entity/App/App.h"
+#include"Util/String/StringHelper.h"
+#include"Network/Tcp/SocketProxy.h"
 #include"InnerNetMessageComponent.h"
-#include"File/FileHelper.h"
-#include"Config/CodeConfig.h"
-#include"Component/ThreadComponent.h"
+#include"Util/File/FileHelper.h"
+#include"Server/Component/ThreadComponent.h"
 #include"google/protobuf/util/json_util.h"
+#include"Core/Singleton/Singleton.h"
+
 namespace Sentry
 {
 	InnerNetComponent::InnerNetComponent()

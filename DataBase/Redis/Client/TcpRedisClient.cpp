@@ -2,27 +2,22 @@
 // Created by zmhy0073 on 2022/1/15.
 //
 #include"TcpRedisClient.h"
-#include"File/FileHelper.h"
-#include"String/StringHelper.h"
-#include"Component/LogComponent.h"
 
+#include"Util/File/FileHelper.h"
+#include"Util/String/StringHelper.h"
+#include"Entity/App/App.h"
 namespace Sentry
 {
 	TcpRedisClient::TcpRedisClient(std::shared_ptr<SocketProxy> socket,
 		const RedisClientConfig& config, IRpc<RedisResponse>* component)
-		: Tcp::TcpContext(socket, 1024 * 1024), mConfig(config), mComponent(component)
+		: Tcp::TcpContext(std::move(socket), 1024 * 1024), mConfig(config), mComponent(component)
 	{
         this->mIndex = 0;
         this->mAddress = this->mConfig.Address[0].FullAddress;
         this->mCurResponse = std::make_shared<RedisResponse>();
 	}
 
-	TcpRedisClient::~TcpRedisClient() noexcept
-	{
-
-	}
-
-	void TcpRedisClient::Send(std::shared_ptr<RedisRequest> command)
+	void TcpRedisClient::Send(const std::shared_ptr<RedisRequest>& command)
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->Write(command);
@@ -33,7 +28,7 @@ namespace Sentry
         //CONSOLE_LOG_INFO("async command = " << command->ToJson());
 	}
 
-	long long TcpRedisClient::Call(std::shared_ptr<RedisRequest> command)
+	long long TcpRedisClient::Call(const std::shared_ptr<RedisRequest>& command)
 	{
 		return 0;
 	}
@@ -177,7 +172,7 @@ namespace Sentry
         return true;
     }
 
-    std::shared_ptr<RedisResponse> TcpRedisClient::SyncCommand(std::shared_ptr<RedisRequest> request)
+    std::shared_ptr<RedisResponse> TcpRedisClient::SyncCommand(const std::shared_ptr<RedisRequest>& request)
     {
         assert(this->mRecvBuffer.size() == 0);
         //CONSOLE_LOG_DEBUG("sync command = " << request->ToJson());

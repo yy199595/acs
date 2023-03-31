@@ -3,13 +3,13 @@
 //
 
 #include"HttpTask.h"
-#include"Json/Lua/Json.h"
+#include"Util/Json/Lua/Json.h"
 namespace Sentry
 {
-    HttpRequestTask::HttpRequestTask(int timeout)
-        : IRpcTask<Http::Response>(timeout)
+    HttpRequestTask::HttpRequestTask(int id)
+        : IRpcTask<Http::Response>(id)
     {
-        this->mTaskId = Helper::Guid::Create();
+
     }
 
     void HttpRequestTask::OnTimeout()
@@ -64,14 +64,13 @@ namespace Sentry
         Lua::Coroutine::Resume(coroutine, this->mLua, 0);
     }
 
-    int LuaHttpRequestTask::Await(std::shared_ptr<HttpRequestClient> client)
+    int LuaHttpRequestTask::Await()
     {
         if(this->mRef == 0)
         {
             luaL_error(this->mLua, "not lua coroutine context yield failure");
             return 0;
         }
-        this->mRequestClient = client;
         return lua_yield(this->mLua, 0);
     }
 }

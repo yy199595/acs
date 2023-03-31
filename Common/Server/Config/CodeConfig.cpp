@@ -3,7 +3,7 @@
 //
 
 #include"CodeConfig.h"
-#include"String/StringHelper.h"
+#include"Util/String/StringHelper.h"
 namespace Sentry
 {
     bool CodeConfig::OnLoadText(const char *str, size_t length)

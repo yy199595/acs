@@ -5,8 +5,8 @@
 #ifndef SERVER_MONGOSERVICE_H
 #define SERVER_MONGOSERVICE_H
 #include"Message/db.pb.h"
-#include"Client/MongoProto.h"
-#include"Service/PhysicalRpcService.h"
+#include"Mongo/Client/MongoProto.h"
+#include"Rpc/Service/PhysicalRpcService.h"
 namespace Sentry
 {
     class MongoDB final : public PhysicalRpcService

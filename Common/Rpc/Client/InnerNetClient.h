@@ -1,11 +1,7 @@
 ﻿#pragma once
-#include"Client/Rpc.h"
-#include"Tcp/TcpContext.h"
-#include"Client/Message.h"
-#include"Source/TaskSource.h"
-#include"Component/IComponent.h"
-#include"Coroutine/CoroutineLock.h"
-#include<google/protobuf/message.h>
+#include"Rpc/Client/Message.h"
+#include"Network/Tcp/TcpContext.h"
+#include"Core/Component/IComponent.h"
 using namespace Tcp;
 namespace Sentry
 {
@@ -26,7 +22,7 @@ namespace Sentry
 		explicit InnerNetClient(IRpc<Rpc::Packet> * component,
 			std::shared_ptr<SocketProxy> socket);
 		explicit InnerNetClient(IRpc<Rpc::Packet> * component,
-			std::shared_ptr<SocketProxy> socket, const AuthInfo & info);
+			std::shared_ptr<SocketProxy> socket, AuthInfo  info);
 		~InnerNetClient() override = default;
 	 public:
 		void StartClose();

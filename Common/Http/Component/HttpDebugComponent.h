@@ -1,5 +1,5 @@
 #pragma once;
-#include"Client/Message.h"
+#include"Rpc/Client/Message.h"
 #include"HttpListenComponent.h"
 
 namespace Sentry

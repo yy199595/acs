@@ -6,9 +6,9 @@
 #define SERVER_LUAWAITTASKSOURCE_H
 
 #include"XCode/XCode.h"
-#include"Lua/LuaInclude.h"
-#include"Lua/LuaParameter.h"
-#include"Lua/LuaCoroutine.h"
+#include"Script/Lua/LuaInclude.h"
+#include"Script/Lua/LuaParameter.h"
+#include"Async/Lua/LuaCoroutine.h"
 #include"google/protobuf/message.h"
 using namespace google::protobuf;
 namespace Sentry

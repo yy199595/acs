@@ -3,13 +3,14 @@
 //
 
 #include"GateComponent.h"
-#include"Service/Gate.h"
-#include"Lua/LuaGate.h"
-#include"Config/ClusterConfig.h"
-#include"Lua/ClassProxyHelper.h"
-#include"Component/NodeMgrComponent.h"
-#include"Component/InnerNetComponent.h"
-#include"Component/ComponentFactory.h"
+#include"Entity/App/App.h"
+#include"Gate/Service/Gate.h"
+#include"Gate/Lua/LuaGate.h"
+#include"Cluster/Config/ClusterConfig.h"
+#include"Script/Lua/ClassProxyHelper.h"
+#include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/InnerNetComponent.h"
+#include"Core/Component/ComponentFactory.h"
 namespace Sentry
 {
 	bool GateComponent::LateAwake()

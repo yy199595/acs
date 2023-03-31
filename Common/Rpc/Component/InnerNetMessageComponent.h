@@ -1,8 +1,9 @@
 ﻿#pragma once
 #include"RpcTaskComponent.h"
-#include"Client/Message.h"
-#include"Async/RpcTaskSource.h"
-#define MAX_HANDLER_MSG_COUNT 500 //每次循环最大处理数量
+#include"Rpc/Client/Message.h"
+#include"Rpc/Async/RpcTaskSource.h"
+#include"Server/Config/MethodConfig.h"
+
 namespace Sentry
 {
 	class RpcService;

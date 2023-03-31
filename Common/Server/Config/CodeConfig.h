@@ -6,8 +6,8 @@
 #include<memory>
 #include<unordered_map>
 #include"XCode/XCode.h"
-#include"Config/TextConfig.h"
-#include"Singleton/Singleton.h"
+#include"Server/Config/TextConfig.h"
+#include"Core/Singleton/Singleton.h"
 namespace Sentry
 {
     class CodeLineConfig

@@ -1,5 +1,5 @@
 #include"Component.h"
-#include"App/App.h"
+#include"Entity/App/App.h"
 namespace Sentry
 {
 	Component::Component()

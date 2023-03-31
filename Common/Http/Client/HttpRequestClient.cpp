@@ -2,24 +2,26 @@
 // Created by yjz on 2022/1/19.
 //
 #include<regex>
+#include <utility>
 #include"HttpRequestClient.h"
-#include"Guid/Guid.h"
-#include"Component/HttpComponent.h"
+#include"Util/Guid/Guid.h"
+#include"Entity/App/App.h"
+#include"Http/Component/HttpComponent.h"
 namespace Sentry
 {
     HttpRequestClient::HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy, HttpComponent * httpComponent)
-		: Tcp::TcpContext(socketProxy)
+		: Tcp::TcpContext(std::move(socketProxy))
     {
         this->mTaskId = 0;
         this->mTimeout = 15; //默认十五秒
 		this->mHttpComponent = httpComponent;
     }
 
-	long long HttpRequestClient::Do(std::shared_ptr<Http::Request> httpRequest, int timeout)
+	void HttpRequestClient::Do(std::shared_ptr<Http::Request> httpRequest, int taskId, int timeout)
 	{
-        this->mTimeout = timeout;
-		this->mRequest = httpRequest;
-        this->mTaskId = Helper::Guid::Create();
+		this->mTaskId = taskId;
+		this->mTimeout = timeout;
+		this->mRequest = std::move(httpRequest);
 		this->mResponse = std::make_shared<Http::Response>();
 #ifdef ONLY_MAIN_THREAD
 		this->ConnectHost();
@@ -27,7 +29,6 @@ namespace Sentry
 		Asio::Context & netWorkThread = this->mSocket->GetThread();
 		netWorkThread.post(std::bind(&HttpRequestClient::ConnectHost, this));
 #endif
-        return this->mTaskId;
 	}
 
 

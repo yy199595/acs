@@ -1,9 +1,8 @@
 #pragma once
 #include"XCode/XCode.h"
-#include"Client/Message.h"
-#include"Tcp/TcpContext.h"
-#include"Message/c2s.pb.h"
-#include"Source/TaskSource.h"
+#include"Rpc/Client/Message.h"
+#include"Network/Tcp/TcpContext.h"
+#include"Async/Source/TaskSource.h"
 
 
 using namespace Sentry;
@@ -16,7 +15,7 @@ namespace Client
 	public:
 		TcpRpcClientContext(std::shared_ptr<SocketProxy> socket, ClientComponent * component);
 	public:
-		void SendToServer(std::shared_ptr<Rpc::Packet> request);
+		void SendToServer(const std::shared_ptr<Rpc::Packet>& request);
 	protected:
         void OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;

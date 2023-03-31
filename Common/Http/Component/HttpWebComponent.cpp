@@ -3,14 +3,14 @@
 //
 
 #include"HttpWebComponent.h"
-#include"App/App.h"
-#include"Config/CodeConfig.h"
-#include"Config/ServiceConfig.h"
-#include"Client/HttpHandlerClient.h"
-#include"Service/HttpService.h"
-#include"File/DirectoryHelper.h"
-#include"File/FileHelper.h"
-#include"Component/ThreadComponent.h"
+#include"Entity/App/App.h"
+#include"Server/Config/CodeConfig.h"
+#include"Server/Config/ServiceConfig.h"
+#include"Http/Client/HttpHandlerClient.h"
+#include"Http/Service/HttpService.h"
+#include"Util/File/DirectoryHelper.h"
+#include"Util/File/FileHelper.h"
+#include"Server/Component/ThreadComponent.h"
 namespace Sentry
 {
     HttpWebComponent::HttpWebComponent()

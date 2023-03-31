@@ -2,8 +2,8 @@
 #include<set>
 #include<memory>
 #include<unordered_map>
-#include"Module/LuaModule.h"
-#include"Component/Component.h"
+#include"Script/Module/LuaModule.h"
+#include"Core/Component/Component.h"
 struct lua_State;
 namespace Sentry
 {

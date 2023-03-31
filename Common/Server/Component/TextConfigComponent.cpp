@@ -3,20 +3,11 @@
 //
 
 #include"TextConfigComponent.h"
-#include"System/System.h"
-#include"Config/ServerConfig.h"
-#include"Config/ServiceConfig.h"
-#include"Config/ClusterConfig.h"
-#include"Config/CodeConfig.h"
-#ifdef __ENABLE_REDIS__
-#include"Config/RedisConfig.h"
-#endif
-#ifdef __ENABLE_MYSQL__
-#include"Config/MysqlConfig.h"
-#endif
-#ifdef __ENABLE_MONGODB__
-#include"Config/MongoConfig.h"
-#endif
+#include"Core/System/System.h"
+#include"Server/Config/ServerConfig.h"
+#include"Server/Config/ServiceConfig.h"
+#include"Cluster/Config/ClusterConfig.h"
+#include"Server/Config/CodeConfig.h"
 namespace Sentry
 {
     bool TextConfigComponent::Awake()
@@ -40,26 +31,6 @@ namespace Sentry
         {
             LOG_CHECK_RET_FALSE(this->LoadTextConfig<CodeConfig>(path));
         }
-#ifdef __ENABLE_REDIS__
-        if(config->GetPath("db", path))
-        {
-            LOG_CHECK_RET_FALSE(this->LoadTextConfig<RedisConfig>(path));
-        }
-#endif
-
-#ifdef __ENABLE_MYSQL__
-        if(config->GetPath("db", path))
-        {
-            LOG_CHECK_RET_FALSE(this->LoadTextConfig<MysqlConfig>(path));
-        }
-#endif
-
-#ifdef __ENABLE_MONGODB__
-        if(config->GetPath("db", path))
-        {
-            LOG_CHECK_RET_FALSE(this->LoadTextConfig<MongoConfig>(path));
-        }
-#endif
         return true;
     }
 

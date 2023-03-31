@@ -1,6 +1,5 @@
 #pragma once
-#include"Log/CommonLogDef.h"
-#include"Component/ComponentFactory.h"
+#include"Core/Component/ComponentFactory.h"
 namespace Sentry
 {
     class Unit

@@ -5,12 +5,12 @@
 #ifndef GAMEKEEPER_REDISCLIENT_H
 #define GAMEKEEPER_REDISCLIENT_H
 #include"RedisDefine.h"
-#include"Tcp/SocketProxy.h"
-#include"Tcp/TcpContext.h"
-#include"Source/TaskSource.h"
-#include"Config/RedisConfig.h"
-#include"Coroutine/CoroutineLock.h"
-
+#include"Network/Tcp/SocketProxy.h"
+#include"Network/Tcp/TcpContext.h"
+#include"Async/Source/TaskSource.h"
+#include"Redis/Config/RedisConfig.h"
+#include"Async/Coroutine/CoroutineLock.h"
+#include"Core/Component/IComponent.h"
 using namespace Tcp;
 namespace Sentry
 {
@@ -18,11 +18,11 @@ namespace Sentry
     class TcpRedisClient final : public Tcp::TcpContext
     {
     public:
-        TcpRedisClient(std::shared_ptr<SocketProxy> socket, const RedisClientConfig & config, IRpc<RedisResponse> * component);
-		~TcpRedisClient();
+        TcpRedisClient(std::shared_ptr<SocketProxy> socket,
+				const RedisClientConfig & config, IRpc<RedisResponse> * component);
     public:
-        void Send(std::shared_ptr<RedisRequest> command);
-		long long Call(std::shared_ptr<RedisRequest> command);
+        void Send(const std::shared_ptr<RedisRequest>& command);
+		long long Call(const std::shared_ptr<RedisRequest>& command);
 		const RedisClientConfig & GetConfig() { return mConfig;}
 		const std::string & GetName() const { return this->mConfig.Name; }
     private:
@@ -33,7 +33,7 @@ namespace Sentry
         bool InitRedisClient(const std::string& pwd);
         void OnReceiveLine(const asio::error_code &code, std::istream & is, size_t) final;
         void OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t) final;
-        std::shared_ptr<RedisResponse> SyncCommand(std::shared_ptr<RedisRequest> command);
+        std::shared_ptr<RedisResponse> SyncCommand(const std::shared_ptr<RedisRequest>& command);
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
     private:
         size_t mIndex;

@@ -3,9 +3,9 @@
 //
 
 #include"LuaLogger.h"
-#include"App/App.h"
-#include"String/StringHelper.h"
-#include"Component/LogComponent.h"
+#include"Entity/App/App.h"
+#include"Util/String/StringHelper.h"
+#include"Log/Component/LogComponent.h"
 using namespace Sentry;
 namespace Lua
 {

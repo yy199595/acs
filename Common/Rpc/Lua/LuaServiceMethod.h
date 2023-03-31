@@ -1,6 +1,6 @@
 #pragma once
-#include"Client/Message.h"
-#include"Method/ServiceMethod.h"
+#include"Rpc/Client/Message.h"
+#include"Rpc/Method/ServiceMethod.h"
 #include<google/protobuf/message.h>
 using namespace google::protobuf;
 struct lua_State;

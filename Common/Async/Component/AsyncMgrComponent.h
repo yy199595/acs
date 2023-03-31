@@ -6,8 +6,8 @@
 #include<memory>
 #include<tuple>
 #include<functional>
-#include"Component/Component.h"
-#include"Coroutine/TaskContext.h"
+#include"Core/Component/Component.h"
+#include"Async/Coroutine/TaskContext.h"
 
 namespace Sentry
 {

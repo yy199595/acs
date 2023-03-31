@@ -4,12 +4,13 @@
 
 #ifndef SERVER_MONGORPCCOMPONENT_H
 #define SERVER_MONGORPCCOMPONENT_H
-#include"Guid/NumberBuilder.h"
-#include"Client/MongoProto.h"
-#include"Client/MongoClient.h"
-#include"Client/BsonDocument.h"
-#include"Guid/NumberBuilder.h"
-#include"Component/RpcTaskComponent.h"
+#include"Util/Guid/NumberBuilder.h"
+#include"Mongo/Client/MongoProto.h"
+#include"Mongo/Client/MongoClient.h"
+#include"Mongo/Client/BsonDocument.h"
+#include"Util/Guid/NumberBuilder.h"
+#include"Mongo/Config/MongoConfig.h"
+#include"Rpc/Component/RpcTaskComponent.h"
 
 using namespace Mongo;
 
@@ -18,7 +19,7 @@ namespace Sentry
 	class MongoTask : public IRpcTask<Mongo::CommandResponse>
 	{
 	public:
-		MongoTask(int taskId);	
+		explicit MongoTask(int taskId);
     public:
 		void OnResponse(std::shared_ptr<Mongo::CommandResponse> response) final;
 		std::shared_ptr<Mongo::CommandResponse> Await() { return mTask.Await(); }
@@ -39,6 +40,7 @@ namespace Sentry
         void CloseClients();
         bool Ping(int index);
         bool SetIndex(const std::string & tab, const std::string & name);
+		inline const MongoConfig & Config() const { return this->mConfig; }
     public:
 		int MakeMongoClient();
         void OnClientError(int index, int code);
@@ -47,11 +49,13 @@ namespace Sentry
         void Send(TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request);
 		std::shared_ptr<Mongo::CommandResponse> Run(TcpMongoClient * mongoClient, const std::shared_ptr<CommandRequest>& request);
 	 private:
+		bool Awake() final;
 		void OnConnectSuccessful(const std::string &address) final;
 		void OnMessage(std::shared_ptr<CommandResponse> message) final;
 		void OnTaskComplete(int key) final { this->mRequestId.Push(key); }
 	private:
-		 unsigned int mWaitCount;
+		MongoConfig mConfig;
+		unsigned int mWaitCount;
 		Util::NumberBuilder<int, 10> mRequestId;
         std::vector<std::shared_ptr<TcpMongoClient>> mMongoClients;
     };
