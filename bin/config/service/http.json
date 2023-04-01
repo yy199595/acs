@@ -14,30 +14,10 @@
 		}
 	},
 	"ServerWeb": {
-		"Main": {
-			"Type": "GET",
-			"Async": false,
-			"Path": "/"
-		},
 		"Info": {
 			"Type": "GET",
 			"Async": true,
 			"Path": "/server/info"
-		},
-		"Ping": {
-			"Type": "GET",
-			"Async": false,
-			"Path": "/server/ping"
-		},
-		"Hello": {
-			"Type": "GET",
-			"Async": false,
-			"Path": "/server/hello"
-		},
-		"DownLoad": {
-			"Type": "GET",
-			"Async": false,
-			"Path": "/download"
 		},
 		"Hotfix": {
 			"Type": "GET",

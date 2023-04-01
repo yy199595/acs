@@ -20,5 +20,6 @@ namespace Sentry
 		unsigned int mWaitCount;
 	};
 }
+#define BIND_COMMON_HTTP_METHOD(func) this->GetRegister().Bind(GET_FUNC_NAME(#func), &func)
 
 #endif //APP_COMMON_HTTP_SERVICE_PHYSICALHTTPSERVICE_H

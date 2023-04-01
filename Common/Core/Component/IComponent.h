@@ -149,6 +149,6 @@ namespace Sentry
 		virtual void OnLogin(long long userId) = 0;
 		virtual void OnLogout(long long userId) = 0;
 	};
-
 	class SocketProxy;
+	extern std::string GET_FUNC_NAME(const std::string& fullName);
 }

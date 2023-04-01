@@ -116,11 +116,6 @@ namespace Http
         JPEG = 9
     };
 
-    namespace ConetntSuffix
-    {
-
-    }
-
     namespace ContentName
     {
         constexpr char* CSS = "text/css";

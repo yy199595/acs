@@ -34,7 +34,6 @@ namespace Sentry
 		unsigned int mWaitCount;
 		ServiceMethodRegister mMethodRegister;
 	};
-	extern std::string GET_FUNC_NAME(const std::string& fullName);
 #define BIND_COMMON_RPC_METHOD(func) LOG_CHECK_RET_FALSE(this->GetMethodRegistry().Bind(GET_FUNC_NAME(#func), &func));
 #define BIND_ADDRESS_RPC_METHOD(func) LOG_CHECK_RET_FALSE(this->GetMethodRegistry().BindAddress(GET_FUNC_NAME(#func), &func));
 }

@@ -12,36 +12,12 @@
 #include"Rpc/Component/NodeMgrComponent.h"
 namespace Sentry
 {
-	bool ServerWeb::Awake()
-	{
-		std::string directory;
-		std::vector<std::string> files;
-		const ServerConfig * config = ServerConfig::Inst();
-		LOG_CHECK_RET_FALSE(config->GetPath("html", directory));
-		Helper::Directory::GetFilePaths(directory, "*.html", files);
-		for(const std::string & path : files)
-		{
-			std::string fileName, content;
-			Helper::File::ReadTxtFile(path, content);
-			Helper::Directory::GetFileName(path, fileName);
-			this->mHtmlFiles.emplace(fileName, content);
-		}
-		return true;
-	}
-
     bool ServerWeb::OnInit()
 	{
-		HttpServiceRegister& registry = this->GetRegister();
-		registry.Bind("Main", &ServerWeb::Main);
-		registry.Bind("Info", &ServerWeb::Info);
-		registry.Bind("Ping", &ServerWeb::Ping);
-		registry.Bind("Hello", &ServerWeb::Hello);
-		registry.Bind("Sleep", &ServerWeb::Sleep);
-		registry.Bind("Hotfix", &ServerWeb::Hotfix);
-		registry.Bind("DownLoad", &ServerWeb::DownLoad);
-
-        registry.Bind("Login", &ServerWeb::Login);
-        registry.Bind("Register", &ServerWeb::Register);
+		BIND_COMMON_HTTP_METHOD(ServerWeb::Info);
+		BIND_COMMON_HTTP_METHOD(ServerWeb::Login);
+		BIND_COMMON_HTTP_METHOD(ServerWeb::Hotfix);
+		BIND_COMMON_HTTP_METHOD(ServerWeb::Register);
 		return true;
 	}
 
@@ -56,23 +32,6 @@ namespace Sentry
 
     int ServerWeb::Register(const Http::Request& request, Http::DataResponse& response)
     {
-        return XCode::Successful;
-    }
-
-    int ServerWeb::Main(const Http::Request& request, Http::DataResponse& response)
-	{
-		auto iter = this->mHtmlFiles.find("index.html");
-		if(iter == this->mHtmlFiles.end())
-		{
-			return XCode::Failure;
-		}
-		response.Html(HttpStatus::OK, iter->second);
-		return XCode::Successful;
-	}
-
-	int ServerWeb::Ping(const Http::Request &request, Http::DataResponse &response)
-    {
-        response.Str(HttpStatus::OK,"pong");
         return XCode::Successful;
     }
 
@@ -94,26 +53,6 @@ namespace Sentry
 		}
 		return XCode::Successful;
 	}
-
-	int ServerWeb::Sleep(const Json::Reader &request, Json::Writer&response)
-    {
-        std::string time;
-        request.GetMember("time", time);
-        this->mApp->GetTaskComponent()->Sleep(std::stoi(time));
-        response.Add("time").Add(std::stoi(time));
-        return XCode::Successful;
-    }
-
-	int ServerWeb::Hello(const Http::Request &request, Http::DataResponse &response)
-    {
-		response.Str(HttpStatus::OK,"hello");
-		return XCode::Successful;
-    }
-
-	int ServerWeb::DownLoad(const Http::Request &request, Http::DataResponse &response)
-    {
-        return XCode::Successful;
-    }
 
 	int ServerWeb::Info(Json::Writer&response)
     {
