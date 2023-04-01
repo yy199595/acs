@@ -16,21 +16,6 @@ end
 function Main.OnClusterComplete()
     
     --Mongo.ClearTable("user.account_info")
-    --Mysql.Create({
-    --    name = "server.registry",
-    --    fields = {
-    --        server_name = "",
-    --        rpc_address = "",
-    --        http_address = "",
-    --        last_ping_time = 0,
-    --    },
-    --    keys = {
-    --        "rpc_address"
-    --    },
-    --    index = {
-    --        "rpc_address"
-    --    }
-    --})
 
     local id = Mysql.Make()
     local res = Mysql.Exec(id, "insert into server.registry(server_name,rpc_address,http_address)values('test','127.0.0.1:7788','http://127.0.0.1:80')")

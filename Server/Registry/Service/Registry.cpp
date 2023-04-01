@@ -92,12 +92,12 @@ namespace Sentry
 	{
 		std::stringstream sqlStream;
 		const std::string& name = request.str();
-		sqlStream << "select server_name,rpc_address,"
-					 "http_address,last_ping_time from " << this->mTable;
+		sqlStream << "select * from " << this->mTable;
 		if (!name.empty())
 		{
-			sqlStream << " where server_name='" << name << "';";
+			sqlStream << " where server_name='" << name << "'";
 		}
+		sqlStream << ";";
 		const std::string sql = sqlStream.str();
 #ifdef __ENABLE_MYSQL__
 		std::shared_ptr<Mysql::QueryCommand> command
@@ -113,6 +113,7 @@ namespace Sentry
 		for (size_t index = 0; index < result.size(); index++)
 		{
 			Json::Reader document;
+			CONSOLE_LOG_INFO(result[index]);
 			const std::string& json = result.at(index);
 			if (!document.ParseJson(result.at(index)))
 			{
@@ -121,7 +122,7 @@ namespace Sentry
 			long long time = 0;
 			long long now = Helper::Time::NowSecTime();
 			document.GetMember("last_ping_time", time);
-			//if (now - time <= 15)
+			if (now - time <= 15)
 			{
 				s2s::server::info* message = response.add_list();
 				document.GetMember("server_name", *message->mutable_name());

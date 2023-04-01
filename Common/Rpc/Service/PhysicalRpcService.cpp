@@ -38,7 +38,7 @@ namespace Sentry
             CONSOLE_LOG_DEBUG(this->GetName() <<
                 " wait handler message count [" << this->mWaitCount << "] time = [" << time << "s]");
         }
-        CONSOLE_LOG_ERROR(this->GetName() << " handler all message complete");
+        CONSOLE_LOG_INFO(this->GetName() << " handler all message complete");
     }
     int PhysicalRpcService::Invoke(const std::string &func, std::shared_ptr<Rpc::Packet> message)
     {

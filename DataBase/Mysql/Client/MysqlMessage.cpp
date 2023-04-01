@@ -98,22 +98,23 @@ namespace Mysql
 		std::string json;
         while(MYSQL_ROW row = mysql_fetch_row(result1))
         {
+			json.clear();
 			size_t count = 0;
-
             Json::Writer jsonDocument;
             unsigned int fieldCount = mysql_field_count(sock);
             unsigned long* lengths = mysql_fetch_lengths(result1);
-            for (unsigned int index = 0; index < fieldCount; index++)
+			for (unsigned int index = 0; index < fieldCount; index++)
             {
-                st_mysql_field* filed = mysql_fetch_field(result1);
-                if(QueryCommand::Write(jsonDocument, filed, row[index], lengths[index]))
+				st_mysql_field* field = mysql_fetch_field_direct(result1, index);
+				if(QueryCommand::Write(jsonDocument, field, row[index], lengths[index]))
 				{
 					count++;
 				}
             }
-			if(count > 0 && jsonDocument.WriterStream(&json) > 0)
+			if(count > 0)
 			{
-				response->Add(json);
+				jsonDocument.WriterStream(&json);
+				response->Add(json.c_str(), json.size());
 			}
         }
         mysql_free_result(result1);
