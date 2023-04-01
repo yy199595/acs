@@ -129,6 +129,7 @@ namespace Http
         constexpr char* GIF = "image/gif";
         constexpr char* ICO = "image/x-icon";
 		constexpr char * MP4 = "video/mp4";
+		constexpr char * Bin = "application/octet-stream";
     };
 };
 

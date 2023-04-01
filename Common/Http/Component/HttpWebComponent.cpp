@@ -49,20 +49,24 @@ namespace Sentry
 		for(auto iter = files.begin(); iter != files.end(); iter++)
 		{
             std::string type;
+			Http::StaticSource source;
 			const std::string & fullPath = *iter;
 			const std::string path = fullPath.substr(dir.size());
             if (Helper::File::GetFileType(fullPath, type))
             {
-                Http::StaticSource source;
                 auto iter1 = this->mTypeContent.find(type);
                 if (iter1 != this->mTypeContent.end())
                 {
                     source.mPath = fullPath;
                     source.mType = iter1->second;
-                    this->mStaticSourceDir.emplace(path, source);
-                }              
-            }
-			
+                }
+				else
+				{
+					source.mPath = fullPath;
+					source.mType = Http::ContentName::Bin;
+				}
+				this->mStaticSourceDir.emplace(path, source);
+			}
 		}
 	}
 
