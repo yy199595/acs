@@ -136,7 +136,7 @@ namespace Sentry
 		{
 #ifdef __DEBUG__
             const std::string& address = this->mSocket->GetAddress();
-			CONSOLE_LOG_ERROR("send http message error : [" << address << "]");
+			CONSOLE_LOG_ERROR("send http message error : [" << address << "] " << code.message());
 #endif
 		}
         this->PopMessage();
