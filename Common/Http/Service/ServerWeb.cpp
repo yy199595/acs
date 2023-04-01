@@ -15,6 +15,7 @@ namespace Sentry
     bool ServerWeb::OnInit()
 	{
 		BIND_COMMON_HTTP_METHOD(ServerWeb::Info);
+		BIND_COMMON_HTTP_METHOD(ServerWeb::Stop);
 		BIND_COMMON_HTTP_METHOD(ServerWeb::Login);
 		BIND_COMMON_HTTP_METHOD(ServerWeb::Hotfix);
 		BIND_COMMON_HTTP_METHOD(ServerWeb::Register);
@@ -50,6 +51,37 @@ namespace Sentry
 		{
 			int code = rpcService->Call(location, "Hotfix");
             response.Add(location.c_str()).Add(CodeConfig::Inst()->GetDesc(code));
+		}
+		return XCode::Successful;
+	}
+
+	int ServerWeb::Stop(Json::Writer & response)
+	{
+		std::string address;
+		Node * node = this->GetComponent<Node>();
+		RpcService* rpcService = this->mApp->GetService<Registry>();
+		NodeMgrComponent * locationComponent = this->GetComponent<NodeMgrComponent>();
+		if(!locationComponent->GetServer(rpcService->GetServer(), address))
+		{
+			response.Add("error").Add("not find registry server address");
+			return XCode::AddressAllotFailure;
+		}
+		com::type::string message;
+		std::shared_ptr<s2s::server::list> list
+			= std::make_shared<s2s::server::list>();
+		int code = rpcService->Call(address, "Query", message, list);
+		if(code != XCode::Successful)
+		{
+			response.Add("error").Add(CodeConfig::Inst()->GetDesc(code));
+			return XCode::Failure;
+		}
+		for (int index = 0; index < list->list_size(); index++)
+		{
+			const s2s::server::info& info = list->list(index);
+			{
+				int code = node->Call(info.rpc(), "Stop");
+				response.Add(info.rpc()).Add(CodeConfig::Inst()->GetDesc(code));
+			}
 		}
 		return XCode::Successful;
 	}

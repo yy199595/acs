@@ -156,6 +156,9 @@ namespace Sentry
         }
         return true;
     }
-
+	void HttpWebComponent::OnDestroy()
+	{
+		this->StopListen();
+	}
 
 }

@@ -71,7 +71,9 @@
     },
     "Node": {
         "Ping": {},
-        "Stop": {},
+        "Stop": {
+            "Async":true
+        },
         "Hotfix": {},
         "LoadConfig": {},
         "Join": {

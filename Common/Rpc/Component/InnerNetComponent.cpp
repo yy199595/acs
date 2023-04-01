@@ -319,4 +319,8 @@ namespace Sentry
 		}
 		return count;
 	}
+	void InnerNetComponent::OnDestroy()
+	{
+		this->StopListen();
+	}
 }// namespace Sentry

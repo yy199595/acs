@@ -5,71 +5,31 @@
 #include"Telnet/Component/ConsoleComponent.h"
 namespace Tcp
 {
-	TelnetClientContext::TelnetClientContext(const std::shared_ptr<SocketProxy>& socketProxy, ConsoleComponent * component)
-		: Tcp::TcpContext(socketProxy), mConsoleComponent(component)
+	TelnetClientContext::TelnetClientContext(const std::shared_ptr<SocketProxy>& socketProxy)
+		: Tcp::TcpContext(socketProxy)
 	{
 		this->mSocket = socketProxy;
 	}
 
-	void TelnetClientContext::StartRead()
+	bool TelnetClientContext::StartConnect()
 	{
-#ifdef ONLY_MAIN_THREAD
-		this->ReceiveLine();
-#else
-		Asio::Context & netWorkThread = this->mSocket->GetThread();
-		netWorkThread.post(std::bind(&TelnetClientContext::ReceiveLine, this));
-#endif
+		return this->ConnectSync();
 	}
 
-	void TelnetClientContext::OnReceiveLine(const Asio::Code & code, std::istream & is, size_t)
+	bool TelnetClientContext::ReadCommand(std::string& command)
 	{
-		if(code)
+		std::istream is(&this->mRecvBuffer);
+		if(this->RecvLineSync() <= 0)
 		{
-			this->CloseContext();
-			CONSOLE_LOG_ERROR(code.message());
-			return;
+			return false;
 		}
-		std::string lineMessage;
-		std::getline(is, lineMessage);
-		const std::string & address = this->GetAddress();
-#ifdef ONLY_MAIN_THREAD
-		this->mConsoleComponent->OnReceive(address, lineMessage);
-#else
-		Asio::Context & netWorkThread = App::Inst()->MainThread();
-		netWorkThread.post(std::bind(&ConsoleComponent::OnReceive, this->mConsoleComponent,address , lineMessage));
-#endif
+		std::getline(is, command);
+		return true;
 	}
 
-	void TelnetClientContext::SendProtoMessage(const std::shared_ptr<TelnetProto>& message)
+	bool TelnetClientContext::SendCommand(const std::string& command)
 	{
-#ifdef ONLY_MAIN_THREAD
-		this->Write(message);
-#else
-		Asio::Context &netWorkThread = this->mSocket->GetThread();
-		netWorkThread.post(std::bind(&TelnetClientContext::Write, this, message));
-#endif
-	}
-
-	void TelnetClientContext::OnSendMessage(const Asio::Code & code, std::shared_ptr<ProtoMessage> message)
-	{
-		if(code)
-		{
-			this->CloseContext();
-			CONSOLE_LOG_ERROR(code.message());
-		}
-        this->PopMessage();
-	}
-
-	void TelnetClientContext::CloseContext()
-	{
-		this->mSocket->Close();
-		const std::string & address = this->GetAddress();
-#ifdef ONLY_MAIN_THREAD
-		this->mConsoleComponent->OnClientError(address);
-#else
-		asio::io_service & netWorkThread = App::Inst()->MainThread();
-		netWorkThread.post(std::bind(&ConsoleComponent::OnClientError, this->mConsoleComponent, address));
-#endif
+		return true;
 	}
 }
 

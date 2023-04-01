@@ -1,14 +1,16 @@
+#include<iostream>
 #include"ConsoleComponent.h"
 #include"Entity/App/App.h"
-#include"Rpc/Service/PhysicalRpcService.h"
+#include"Entity/Unit/Unit.h"
+#include"Http/Component/HttpComponent.h"
 #include"Async/Component/AsyncMgrComponent.h"
-#define BIND_FUNC(name, func) this->mFunctionMap.emplace(name, std::bind(&func, this, args1, args2));
 
+#include"Telnet/Component/ServerCmdComponent.h"
 namespace Sentry
 {
-	void TelnetProto::Add(const std::string& conetnt)
+	void TelnetProto::Add(const std::string& content)
 	{
-		this->mContents.emplace_back(conetnt);
+		this->mContents.emplace_back(content);
 	}
 
 	void TelnetProto::Add(const char* str, size_t size)
@@ -29,137 +31,53 @@ namespace Sentry
 using namespace Tcp;
 namespace Sentry
 {
-	bool ConsoleComponent::LateAwake()
+	void ConsoleComponent::OnClusterComplete()
 	{
+		this->mCommandUnit = new Unit(1);
+		this->mHttpComponent = this->GetComponent<HttpComponent>();
 		this->mTaskComponent = this->GetComponent<AsyncMgrComponent>();
-		return true;
+		this->mTaskComponent->Start(&ConsoleComponent::Update, this);
+
+		this->mCommandUnit->AddComponent("server", std::make_unique<ServerCmdComponent>());
 	}
 
-    bool ConsoleComponent::Start()
-    {
-        return this->StartListen("console");
-    }
-
-	void ConsoleComponent::OnListen(std::shared_ptr<SocketProxy> socket)
+	void ConsoleComponent::Close(const std::string & request)
 	{
-		std::shared_ptr<TelnetClientContext> telnetClient =
-			std::make_shared<TelnetClientContext>(socket, this);
 
-		const std::string & address = socket->GetAddress();
-		std::shared_ptr<TelnetProto> telnetProto(new TelnetProto());
-		telnetProto->Add("welcome connect sertry server");
-
-
-		telnetClient->StartRead();
-		this->mTelnetClients.emplace(address, telnetClient);
-		telnetClient->SendProtoMessage(telnetProto);
 	}
-
-	void ConsoleComponent::OnReceive(const std::string & address, const std::string& message)
+	void ConsoleComponent::Update()
 	{
-		std::shared_ptr<Tcp::TelnetClientContext> telnetClientContext = this->GetClient(address);
-		if(telnetClientContext != nullptr)
+		while(true)
 		{
-			std::vector<std::string> splitStrings;
-			std::shared_ptr<TelnetProto> telnetProto(new TelnetProto());
-			google::protobuf::SplitStringUsing(message, "\r\n", &splitStrings);
-            if(!this->Invoke(splitStrings, telnetProto))
-            {
-                telnetProto->Add("===== CMD ERR =====");
-            }
-            else
-            {
-                telnetProto->Add("===== CMD OK =====");
-            }
-
-			telnetClientContext->StartRead();
-			telnetClientContext->SendProtoMessage(telnetProto);
-		}
-	}
-
-    bool ConsoleComponent::Invoke(std::vector<std::string> &request, std::shared_ptr<TelnetProto> response)
-    {
-        if(request.empty())
-        {
-            response->Add("request empty");
-            return false;
-        }
-        const std::string & cmd = request[0];
-        auto iter = this->mFunctionMap.find(cmd);
-        if(iter == this->mFunctionMap.end())
-        {
-            response->Add("unknow cmd " + cmd);
-            return false;
-        }
-        std::vector<Component *> components;
-        this->mApp->GetComponents(components);
-        for(Component * component : components)
-        {
-           IHotfix *hotfix = component->Cast<IHotfix>();
-           if(hotfix != nullptr)
-           {
-               hotfix->OnHotFix();
-               response->Add(component->GetName());
-           }
-        }
-        return true;
-    }
-
-	std::shared_ptr<Tcp::TelnetClientContext> ConsoleComponent::GetClient(const std::string& address)
-	{
-		auto iter = this->mTelnetClients.find(address);
-		return iter != this->mTelnetClients.end() ? iter->second : nullptr;
-	}
-
-	bool ConsoleComponent::Help(const std::string& parameter, std::vector<std::string>& response)
-	{
-		auto iter = this->mFunctionMap.begin();
-		for (; iter != this->mFunctionMap.end(); iter++)
-		{
-			response.emplace_back(iter->first);
-		}
-		return true;
-	}
-
-	bool ConsoleComponent::Start(const std::string& parameter, std::vector<std::string>& response)
-	{
-		return true;
-	}
-
-	bool ConsoleComponent::Close(const std::string& parameter, std::vector<std::string>& response)
-	{
-        this->mApp->Stop();
-		return true;
-	}
-
-	bool ConsoleComponent::Services(const std::string& parameter, std::vector<std::string>& response)
-	{
-		std::vector<std::string> components;
-		this->mApp->GetComponents(components);
-		for(const std::string & name : components)
-		{
-			if(this->GetComponent<PhysicalRpcService>(name) != nullptr)
+			std::string line;
+			std::getline(std::cin, line);
+			if(line == "quit")
 			{
-				response.emplace_back(name);
+				this->mApp->Stop();
+				CONSOLE_LOG_INFO("close console successful");
+				break;
 			}
-		}
-		return true;
-	}
-
-	bool ConsoleComponent::Offset(const string& parameter, std::vector<string>& response)
-	{
-		long long value = std::stoll(parameter);
-		Helper::Time::SetScaleTotalTime(value);
-		LOG_WARN("now time = " << Helper::Time::GetDateString());
-		return true;
-	}
-	void ConsoleComponent::OnClientError(const std::string & address)
-	{
-		auto iter = this->mTelnetClients.find(address);
-		if(iter != this->mTelnetClients.end())
-		{
-			this->mTelnetClients.erase(iter);
-			CONSOLE_LOG_ERROR("[" << address << "] disconnect");
+			std::string command;
+			std::string request1;
+			std::string request2;
+			size_t pos = line.find(' ');
+			if(pos != std::string::npos)
+			{
+				command = line.substr(0, pos);
+				request1 = line.substr(pos + 1);
+				pos = request1.find(' ');
+				if(pos != std::string::npos)
+				{
+					request2 = request1.substr(pos+ 1);
+					request1 = request1.substr(0, pos);
+				}
+			}
+			ConsoleCmdComponent * commandComponent =
+				this->mCommandUnit->GetComponent<ConsoleCmdComponent>(command);
+			if(commandComponent == nullptr || !commandComponent->Invoke(request1, request2))
+			{
+				CONSOLE_LOG_ERROR("unknown command [" << command << " " << request1 << "]");
+			}
 		}
 	}
 }

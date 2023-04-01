@@ -1,8 +1,8 @@
 #pragma once
 #include<vector>
+#include"Core/Component/Component.h"
 #include"Proto/Message/ProtoMessage.h"
 #include"Telnet/Client/TelnetClientContext.h"
-#include"Server/Component/TcpListenerComponent.h"
 
 namespace Sentry
 {
@@ -24,36 +24,21 @@ namespace Tcp
 {
 	class TelnetClientContext;
 }
-
 namespace Sentry
 {
-	using ConsoleFunction = std::function<bool(const std::string&, std::vector<std::string>&)>;
-    class ConsoleComponent : public TcpListenerComponent, public IStart
+	class ConsoleComponent : public Component, public IComplete
 	{
 	 public:
 		ConsoleComponent() = default;
-	 public:
-        bool Start() final;
-        bool LateAwake() final;
-		void OnClientError(const std::string & address);
-		void OnListen(std::shared_ptr<SocketProxy> socket) final;
-		void OnReceive(const std::string & address, const std::string & message);
-
-    private:
-        bool Invoke(std::vector<std::string> & request, std::shared_ptr<TelnetProto> response);
 	 private:
-		bool Offset(const std::string& parameter, std::vector<std::string>& response);
-		bool Help(const std::string& parameter, std::vector<std::string>& response);
-		bool Start(const std::string& parameter, std::vector<std::string>& response);
-		bool Close(const std::string& parameter, std::vector<std::string>& response);
-		bool Services(const std::string& parameter, std::vector<std::string>& response);
-
-	private:
-		std::shared_ptr<Tcp::TelnetClientContext> GetClient(const std::string & address);
+		void Close(const std::string & request);
+		void OnClusterComplete() final;
 	 private:
+		void Update();
+	 private:
+		class Unit * mCommandUnit;
+		class HttpComponent * mHttpComponent;
 		class AsyncMgrComponent* mTaskComponent;
-		std::unordered_map<std::string, ConsoleFunction> mFunctionMap;
-		std::unordered_map<std::string, std::shared_ptr<Tcp::TelnetClientContext>> mTelnetClients;
 	};
 }
 

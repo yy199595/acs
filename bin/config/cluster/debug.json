@@ -24,5 +24,11 @@
             "HttpComponent",
             "ClientComponent"
         ]
+    },
+    "Console": {
+        "Component": [
+            "HttpComponent",
+            "ConsoleComponent"
+        ]
     }
 }

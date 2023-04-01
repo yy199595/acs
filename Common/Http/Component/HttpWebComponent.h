@@ -36,7 +36,8 @@ namespace Sentry
 		unsigned int GetWaitCount() const { return this->mWaitCount; }
     private:
         bool LateAwake() final;
-        void OnRecord(Json::Writer &document) final;
+		void OnDestroy() final;
+		void OnRecord(Json::Writer &document) final;
         bool OnDelClient(const std::string& address) final;
 		void OnRequest(std::shared_ptr<Http::Request> request) final;
 		void Invoke(const HttpMethodConfig* config, const std::shared_ptr<Http::Request>& request);

@@ -135,17 +135,15 @@ namespace Sentry
         {
             for (RpcService *component: components)
             {
-                if(component->IsStartService())
+                if(component != this && component->IsStartService())
                 {
                     component->WaitAllMessageComplete();
                     component->Close();
                 }
             }
         }
-
-		CONSOLE_LOG_INFO("shutdown server int 10s after");
-		TimerComponent * timerComponent = this->mApp->GetTimerComponent();
-		timerComponent->DelayCall(10 * 1000, &App::Stop, this->mApp);
+		AsyncMgrComponent * taskComponent = this->mApp->GetTaskComponent();
+		taskComponent->Start(&App::Stop, this->mApp);
         return XCode::Successful;
     }
 

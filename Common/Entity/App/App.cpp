@@ -175,10 +175,23 @@ namespace Sentry
 
 	void App::Stop()
     {
-        this->mMainContext->stop();
-        LOG_WARN("close server successful ");
-        this->mLogComponent->SaveAllLog();
-    }
+		std::vector<Component *> components;
+		this->GetComponents(components);
+		for(Component * component : components)
+		{
+			component->OnDestroy();
+		}
+		for(int index = 5; index >= 0; index--)
+		{
+			CONSOLE_LOG_INFO("shutdown " <<
+				ServerConfig::Inst()->Name() << " in [" << index << "s] after...");
+			this->mTaskComponent->Sleep(1000);
+		}
+
+		this->mMainContext->stop();
+		this->mLogComponent->SaveAllLog();
+		LOG_WARN("close " << ServerConfig::Inst()->Name() << " successful ");
+	}
 
 	void App::StartAllComponent()
     {
@@ -230,12 +243,12 @@ namespace Sentry
 					CONSOLE_LOG_INFO(server << " start successful ...");
 				}
 			}
-			std::vector<IComplete*> completeComponents;
-			this->GetComponents<IComplete>(completeComponents);
-			for (IComplete* complete : completeComponents)
-			{
-				complete->OnClusterComplete();
-			}
+		}
+		std::vector<IComplete*> completeComponents;
+		this->GetComponents<IComplete>(completeComponents);
+		for (IComplete* complete : completeComponents)
+		{
+			complete->OnClusterComplete();
 		}
         long long t = Helper::Time::NowMilTime() - this->mStartTime;
         LOG_INFO("===== start " << ServerConfig::Inst()->Name() << " successful [" << t / 1000.0f << "]s ===========");

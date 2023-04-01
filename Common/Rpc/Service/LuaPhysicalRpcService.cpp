@@ -84,7 +84,7 @@ namespace Sentry
             CONSOLE_LOG_INFO(this->GetName() <<
                 " wait handler message count [" << this->mWaitCount << "]");
         }
-        CONSOLE_LOG_ERROR(this->GetName() << " handler all message complete");
+        CONSOLE_LOG_INFO(this->GetName() << " handler all message complete");
     }
 
 	void LuaPhysicalRpcService::OnLogin(long long userId)

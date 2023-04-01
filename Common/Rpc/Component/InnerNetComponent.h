@@ -22,6 +22,7 @@ namespace Sentry
 		void OnSendFailure(const std::string& address, std::shared_ptr<Rpc::Packet> message) final;
 	 protected:
         bool LateAwake() final;
+		void OnDestroy() final;
 		void OnFrameUpdate(float t) final;
         void OnRecord(Json::Writer & document) final;
 		void OnListen(std::shared_ptr<SocketProxy> socket) final;

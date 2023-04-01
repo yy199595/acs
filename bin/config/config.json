@@ -55,6 +55,11 @@
             "cluster": "config/cluster/debug.json"
         }
     },
+    "Console": {
+        "path": {
+            "cluster": "config/cluster/debug.json"
+        }
+    },
     "HttpServer": {
         "address": {
             "rpc": "127.0.0.1:7790",

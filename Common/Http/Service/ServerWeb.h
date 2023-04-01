@@ -15,6 +15,7 @@ namespace Sentry
     private:
         bool OnInit() final;
     private:
+		int Stop(Json::Writer & response);
         int Info(Json::Writer & response);
 		int Hotfix(Json::Writer& response);
         int Login(const Http::Request& request, Http::DataResponse& response);
