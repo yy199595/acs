@@ -9,25 +9,24 @@
 
 namespace Sentry
 {
-    class HttpRequestTask : public IRpcTask<Http::Response>
+    class HttpRequestTask : public IRpcTask<Http::IResponse>
     {
     public:
         explicit HttpRequestTask(int id);
     public:
-        void OnTimeout();
-        void OnResponse(std::shared_ptr<Http::Response> response) final;
-        std::shared_ptr<Http::Response> Await() { return this->mTask.Await();}
+        void OnResponse(std::shared_ptr<Http::IResponse> response) final;
+        std::shared_ptr<Http::IResponse> Await() { return this->mTask.Await();}
     private:
         long long mTaskId;
-        TaskSource<std::shared_ptr<Http::Response>> mTask;
+        TaskSource<std::shared_ptr<Http::IResponse>> mTask;
     };
-    typedef std::shared_ptr<IRpcTask<Http::Response>> SharedHttpRpcTask;
+    typedef std::shared_ptr<IRpcTask<Http::DataResponse>> SharedHttpRpcTask;
 }
 
 namespace Sentry
 {
     class HttpRequestClient;
-    class LuaHttpRequestTask : public IRpcTask<Http::Response>
+    class LuaHttpRequestTask : public IRpcTask<Http::IResponse>
     {
     public:
         explicit LuaHttpRequestTask(lua_State * lua);
@@ -35,7 +34,7 @@ namespace Sentry
     public:     
         int Await();
     public:    
-        void OnResponse(std::shared_ptr<Http::Response> response) final;
+        void OnResponse(std::shared_ptr<Http::IResponse> response) final;
     private:
         int mRef;
         lua_State * mLua;

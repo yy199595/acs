@@ -14,7 +14,7 @@
 namespace Sentry
 {
 	template<typename T>
-	using HttpMethod = int(T::*)(const Http::Request& request, Http::Response& response);
+	using HttpMethod = int(T::*)(const Http::Request& request, Http::DataResponse& response);
 
     template<typename T>
     using HttpJsonMethod1 = int(T::*)(const Json::Reader & request);
@@ -32,7 +32,7 @@ namespace Sentry
 	 public:
         virtual bool IsLuaMethod() const = 0;
         const std::string & GetName() const { return this->mName; }
-		virtual int Invoke(const Http::Request & request, Http::Response & response) = 0;
+		virtual int Invoke(const Http::Request & request, Http::DataResponse & response) = 0;
 
     private:
         const std::string mName;
@@ -49,7 +49,7 @@ namespace Sentry
 
 	 public:
         bool IsLuaMethod() const { return false; }
-		int Invoke(const Http::Request & request, Http::Response & response)
+		int Invoke(const Http::Request & request, Http::DataResponse & response)
 		{
 			return (this->mObj->*mFunction)(request, response);
 		}
@@ -70,7 +70,7 @@ namespace Sentry
 
     public:
         bool IsLuaMethod() const { return false; }
-        int Invoke(const Http::Request& request, Http::Response& response)
+        int Invoke(const Http::Request& request, Http::DataResponse& response)
         {
             int code;
             std::unique_ptr<Json::Writer> document(new Json::Writer());
@@ -113,7 +113,7 @@ namespace Sentry
 
     public:
         bool IsLuaMethod() const final { return false; }
-        int Invoke(const Http::Request& request, Http::Response& response) final
+        int Invoke(const Http::Request& request, Http::DataResponse& response) final
         {
             int code = XCode::Failure;
             std::unique_ptr<Json::Reader> document1(new Json::Reader());
@@ -155,7 +155,7 @@ namespace Sentry
 
     public:
         bool IsLuaMethod() const { return false; }
-        int Invoke(const Http::Request & request, Http::Response & response)
+        int Invoke(const Http::Request & request, Http::DataResponse & response)
         {
             int code = XCode::Failure;
             std::unique_ptr<Json::Writer> document2(new Json::Writer());

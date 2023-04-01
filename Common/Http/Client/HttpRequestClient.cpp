@@ -17,12 +17,20 @@ namespace Sentry
 		this->mHttpComponent = httpComponent;
     }
 
-	void HttpRequestClient::Do(std::shared_ptr<Http::Request> httpRequest, int taskId, int timeout)
+	void HttpRequestClient::Do(std::shared_ptr<Http::Request> request, int taskId, int timeout)
+	{
+		std::shared_ptr<Http::IResponse> response =
+			std::make_shared<Http::DataResponse>();
+		this->Do(request, response, taskId, timeout);
+	}
+
+	void HttpRequestClient::Do(std::shared_ptr<Http::Request> request,
+		std::shared_ptr<Http::IResponse> response, int taskId, int timeout)
 	{
 		this->mTaskId = taskId;
 		this->mTimeout = timeout;
-		this->mRequest = std::move(httpRequest);
-		this->mResponse = std::make_shared<Http::Response>();
+		this->mRequest = request;
+		this->mResponse = response;
 #ifdef ONLY_MAIN_THREAD
 		this->ConnectHost();
 #else

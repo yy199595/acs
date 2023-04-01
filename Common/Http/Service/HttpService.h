@@ -14,12 +14,12 @@ namespace Json
 namespace Http
 {
     class Request;
-    class Response;
+    class DataResponse;
 }
 namespace Sentry
 {
     class HttpService : public Component,
-						public IService<Http::Request, Http::Response>
+						public IService<Http::Request, Http::DataResponse>
 	{
 	 public:
 		HttpService();

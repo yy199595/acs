@@ -17,6 +17,7 @@ namespace Sentry
 		HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy, HttpComponent * component);
 	 public:
 		void Do(std::shared_ptr<Http::Request> request, int taskId, int timeout = 15);
+		void Do(std::shared_ptr<Http::Request> request, std::shared_ptr<Http::IResponse> response, int taskId, int timeout = 15);
 	 private:
         void ConnectHost();
         void OnTimeout(Asio::Code code);
@@ -30,7 +31,7 @@ namespace Sentry
 		int mTimeout;
 		HttpComponent * mHttpComponent;
         std::shared_ptr<Http::Request> mRequest;
-		std::shared_ptr<Http::Response> mResponse;
+		std::shared_ptr<Http::IResponse> mResponse;
         std::shared_ptr<asio::steady_timer> mTimer;
     };
 }

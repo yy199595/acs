@@ -10,7 +10,8 @@
 namespace Http
 {
     class Request;
-    class Response;
+	class IResponse;
+    class DataResponse;
 }
 namespace Sentry
 {
@@ -22,7 +23,7 @@ namespace Sentry
 	 public:
 		void StartReceive(int timeout = 15);
 		void StartWriter(HttpStatus code);
-		void StartWriter(const std::shared_ptr<Http::Response>& message);
+		void StartWriter(const std::shared_ptr<Http::IResponse>& message);
         std::shared_ptr<Http::Request> Request() { return this->mHttpRequest;}
 	 private:
 		void ClosetClient();

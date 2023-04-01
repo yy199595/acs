@@ -18,12 +18,10 @@ namespace Sentry
 	HttpComponent::HttpComponent()
 	{
 		this->mNetComponent = nullptr;
-		this->mTaskComponent = nullptr;
 	}
 
 	bool HttpComponent::LateAwake()
 	{
-		this->mTaskComponent = this->mApp->GetTaskComponent();
         this->mNetComponent = this->GetComponent<ThreadComponent>();
 		return true;
 	}
@@ -42,7 +40,7 @@ namespace Sentry
 		return std::make_shared<HttpRequestClient>(socketProxy, this);
 	}
 
-	std::shared_ptr<Http::Response> HttpComponent::Get(const std::string& url, float second)
+	std::shared_ptr<Http::DataResponse> HttpComponent::Get(const std::string& url, float second)
     {
         std::shared_ptr<Http::GetRequest> request(new Http::GetRequest());
         if (!request->SetUrl(url))
@@ -50,7 +48,7 @@ namespace Sentry
             LOG_ERROR("parse " << url << " error");
             return nullptr;
         }
-		std::shared_ptr<Http::Response> response = this->Request(request);
+		std::shared_ptr<Http::DataResponse> response = this->Request(request);
         if (response != nullptr && response->Code() != HttpStatus::OK)
         {
             LOG_ERROR("[GET] " << url << " error = "
@@ -96,18 +94,19 @@ namespace Sentry
 		}
 	}
 
-	std::shared_ptr<Http::Response> HttpComponent::Request(const std::shared_ptr<Http::Request> & request)
+	std::shared_ptr<Http::DataResponse> HttpComponent::Request(const std::shared_ptr<Http::Request> & request)
 	{
 		int taskId = this->mNumberPool.Pop();
-		std::shared_ptr<HttpRequestTask> httpRpcTask(new HttpRequestTask(taskId));
 		std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
+		std::shared_ptr<HttpRequestTask> httpRpcTask(new HttpRequestTask(taskId));
 
 		httpAsyncClient->Do(request, taskId);
+		this->AddTask(taskId, httpRpcTask);
 		this->mUseClients.emplace(taskId, httpAsyncClient);
-		return this->AddTask(taskId, httpRpcTask)->Await();
+		return std::static_pointer_cast<Http::DataResponse>(httpRpcTask->Await());
 	}
 
-	std::shared_ptr<Http::Response> HttpComponent::Post(const std::string& url, const std::string& data, float second)
+	std::shared_ptr<Http::DataResponse> HttpComponent::Post(const std::string& url, const std::string& data, float second)
     {
         std::shared_ptr<Http::PostRequest> request(new Http::PostRequest());
         if (request->SetUrl(url))
@@ -115,7 +114,7 @@ namespace Sentry
             return nullptr;
         }
 		request->Json(data);
-        std::shared_ptr<Http::Response> response = this->Request(request);
+        std::shared_ptr<Http::DataResponse> response = this->Request(request);
         if (response != nullptr && response->Code() != HttpStatus::OK)
         {
             LOG_ERROR("[POST] " << url << " error = "

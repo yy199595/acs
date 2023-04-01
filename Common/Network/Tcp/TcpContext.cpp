@@ -183,8 +183,8 @@ namespace Tcp
         {
             std::ostream os(&this->mSendBuffer);
             Asio::Socket & tcpSocket = this->mSocket->GetSocket();
-            std::shared_ptr<TcpContext> self = this->shared_from_this();
-            const int length = this->mMessagqQueue.front()->Serialize(os);
+			int length = this->mMessagqQueue.front()->Serialize(os);
+			std::shared_ptr<TcpContext> self = this->shared_from_this();
             asio::async_write(tcpSocket, this->mSendBuffer, [this, self, length]
                     (const Asio::Code & code, size_t size)
             {

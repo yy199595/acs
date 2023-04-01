@@ -71,27 +71,28 @@ namespace Sentry
 		const std::string & address = request->From();
         const HttpMethodConfig *httpConfig = HttpConfig::Inst()->GetMethodConfig(request->Path());
         if (httpConfig == nullptr)
-        {
-			const std::string & path = request->Path();
+		{
+			const std::string& path = request->Path();
 			auto iter = this->mStaticSourceDir.find(path);
-			if(iter != this->mStaticSourceDir.end())
+			if (iter != this->mStaticSourceDir.end())
 			{
 				std::string content;
-                Http::StaticSource & staticSource = iter->second;
-				if(Helper::File::ReadTxtFile(staticSource.mPath, content))
+				std::ifstream* fs = new std::ifstream();
+				Http::StaticSource& staticSource = iter->second;
+				fs->open(staticSource.mPath, std::ios::in | std::ios::binary);
+				if (!fs->is_open())
 				{
-					std::shared_ptr<Http::Response> response
-						= std::make_shared<Http::Response>();
-					response->Content(HttpStatus::OK, staticSource.mType, content);
-					this->Send(address, response);
+					delete fs;
+					this->Send(address, HttpStatus::NOT_FOUND);
 					return;
 				}
+				this->Send(address, staticSource.mType, fs);
+				return;
 			}
-			//this->ClosetHttpClient(address);
-            this->Send(address, HttpStatus::NOT_FOUND);
-            LOG_ERROR("[" << address << "] <<" << request->Path() << ">>" << HttpStatusToString(HttpStatus::NOT_FOUND));
-            return;
-        }
+			this->Send(address, HttpStatus::NOT_FOUND);
+			LOG_ERROR("[" << address << "] <<" << request->Path() << ">>" << HttpStatusToString(HttpStatus::NOT_FOUND));
+			return;
+		}
 
         if (!httpConfig->Type.empty() && httpConfig->Type != request->Method())
         {			
@@ -122,7 +123,7 @@ namespace Sentry
         else
         {
             const std::string& method = config->Method;
-            std::shared_ptr<Http::Response> response(new Http::Response());
+            std::shared_ptr<Http::DataResponse> response(new Http::DataResponse());
             int code = httpService->Invoke(method, request, response);
             if (code != XCode::Successful)
             {

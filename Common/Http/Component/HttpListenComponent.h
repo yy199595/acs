@@ -12,7 +12,8 @@
 namespace Http
 {
 	class Request;
-	class Response;
+	class IResponse;
+	class DataResponse;
 }
 namespace Sentry
 {
@@ -26,8 +27,9 @@ namespace Sentry
         virtual void OnRequest(std::shared_ptr<Http::Request> request) = 0;
     protected:
         bool Send(const std::string& address, HttpStatus code);
-        bool Send(const std::string& address, const std::string & str);            
-        bool Send(const std::string& address, std::shared_ptr<Http::Response> response);
+        bool Send(const std::string& address, const std::string & str);
+		bool Send(const std::string& address, std::shared_ptr<Http::IResponse> response);
+		bool Send(const std::string& address, const std::string & type, std::ifstream * fs);
     private:     
         std::queue<std::shared_ptr<HttpHandlerClient>> mClientPools;
         std::unordered_map<std::string, std::shared_ptr<HttpHandlerClient>> mHttpClients;

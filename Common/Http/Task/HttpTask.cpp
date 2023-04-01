@@ -7,20 +7,12 @@
 namespace Sentry
 {
     HttpRequestTask::HttpRequestTask(int id)
-        : IRpcTask<Http::Response>(id)
+        : IRpcTask<Http::IResponse>(id)
     {
 
     }
 
-    void HttpRequestTask::OnTimeout()
-    {
-        std::shared_ptr<Http::Response> response(new Http::Response());
-        {
-            this->OnResponse(response);
-        }
-    }
-
-    void HttpRequestTask::OnResponse(std::shared_ptr<Http::Response> response)
+    void HttpRequestTask::OnResponse(std::shared_ptr<Http::IResponse> response)
     {
         this->mTask.SetResult(response);
     }
@@ -29,9 +21,8 @@ namespace Sentry
 namespace Sentry
 {
     LuaHttpRequestTask::LuaHttpRequestTask(lua_State *lua)
-        : IRpcTask<Http::Response>(0),mRef(0), mLua(lua)
+        : IRpcTask<Http::IResponse>(0), mRef(0), mLua(lua)
     {
-        //lua_pushthread(lua);
         if(lua_isthread(this->mLua, -1))
         {
             this->mRef = luaL_ref(lua, LUA_REGISTRYINDEX);
@@ -46,19 +37,23 @@ namespace Sentry
         }
     }
 
-    void LuaHttpRequestTask::OnResponse(std::shared_ptr<Http::Response> response)
+    void LuaHttpRequestTask::OnResponse(std::shared_ptr<Http::IResponse> response)
     {
         lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
         lua_State* coroutine = lua_tothread(this->mLua, -1);
         if(response != nullptr)
         {
-            //TODO
-            // response->GetData().Writer(this->mLua);
+            int count = 1;
             int code = (int)response->Code();
             lua_pushinteger(this->mLua, code);
-            const std::string & conetnt = response->GetContent();
-            lua_pushlstring(this->mLua, conetnt.c_str(), conetnt.size());
-            Lua::Coroutine::Resume(coroutine, this->mLua, 2);
+            if(std::shared_ptr<Http::DataResponse> dataResponse =
+                std::dynamic_pointer_cast<Http::DataResponse>(response))
+            {
+                count++;
+                const std::string & content = dataResponse->GetContent();
+                lua_pushlstring(this->mLua, content.c_str(), content.size());
+            }
+            Lua::Coroutine::Resume(coroutine, this->mLua, count);
             return;
         }
         Lua::Coroutine::Resume(coroutine, this->mLua, 0);

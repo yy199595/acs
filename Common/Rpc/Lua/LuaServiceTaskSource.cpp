@@ -11,7 +11,7 @@
 #include"XCode/XCode.h"
 namespace Sentry
 {
-	LuaServiceTaskSource::LuaServiceTaskSource(Http::Response* message)
+	LuaServiceTaskSource::LuaServiceTaskSource(Http::DataResponse* message)
 		: mHttpData(message)
     {		
         this->mCode = XCode::LuaCoroutineWait;

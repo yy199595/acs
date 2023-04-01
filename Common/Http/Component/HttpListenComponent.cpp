@@ -67,13 +67,13 @@ namespace Sentry
         {
             return false;
         }
-        std::shared_ptr<Http::Response> response
-            = std::make_shared<Http::Response>();
+        std::shared_ptr<Http::DataResponse> response
+            = std::make_shared<Http::DataResponse>();
         response->Str(HttpStatus::OK, str);
         iter->second->StartWriter(response);
         return true;
     }
-    bool HttpListenComponent::Send(const std::string& address, std::shared_ptr<Http::Response> response)
+    bool HttpListenComponent::Send(const std::string& address, std::shared_ptr<Http::IResponse> response)
     {
         auto iter = this->mHttpClients.find(address);
         if (iter == this->mHttpClients.end())
@@ -83,4 +83,12 @@ namespace Sentry
         iter->second->StartWriter(response);
         return true;
     }
+	bool HttpListenComponent::Send(const std::string& address, const std::string& type, std::ifstream* fs)
+	{
+		std::shared_ptr<Http::IResponse> response
+			= std::make_shared<Http::FileResponse>(fs);
+		response->Header().Add("content-type", type);
+		response->Header().Add("content-length", response->ContentSize());
+		return this->Send(address, response);
+	}
 }

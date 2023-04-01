@@ -22,7 +22,7 @@ namespace Sentry
 	}
 
 	int LuaPhysicalHttpService::Invoke(const string& name,
-		const std::shared_ptr<Http::Request> &request, std::shared_ptr<Http::Response> &response)
+		const std::shared_ptr<Http::Request> &request, std::shared_ptr<Http::DataResponse> &response)
 	{
 		HttpServiceRegister & httpRegister = this->GetRegister();
 		std::shared_ptr<HttpServiceMethod> method = httpRegister.GetMethod(name);

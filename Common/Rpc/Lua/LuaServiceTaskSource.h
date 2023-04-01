@@ -14,7 +14,7 @@ namespace Sentry
     class LuaServiceTaskSource final
     {
     public:
-        explicit LuaServiceTaskSource(Http::Response* message);
+        explicit LuaServiceTaskSource(Http::DataResponse* message);
         explicit LuaServiceTaskSource(std::shared_ptr<Message> message);
     public:
 		static int SetRpc(lua_State * lua);
@@ -23,7 +23,7 @@ namespace Sentry
         int Await();
     private:
         int mCode;
-        Http::Response* mHttpData;
+        Http::DataResponse* mHttpData;
         TaskSource<void> mTaskSource;
         std::shared_ptr<Message> mRpcData;
     };

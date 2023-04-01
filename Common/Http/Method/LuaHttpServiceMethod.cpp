@@ -19,7 +19,7 @@ namespace Sentry
         this->mLuaComponent = App::Inst()->GetComponent<LuaScriptComponent>();
     }
 
-    int LuaHttpServiceMethod::Invoke(const Http::Request &request, Http::Response &response)
+    int LuaHttpServiceMethod::Invoke(const Http::Request &request, Http::DataResponse &response)
     {
         lua_State* lua = this->mLuaComponent->GetLuaEnv();
         if(this->mConfig->IsAsync && !Lua::Function::Get(lua, "coroutine", "http"))
@@ -43,7 +43,7 @@ namespace Sentry
         return this->mConfig->IsAsync ? this->CallAsync(response) : this->Call(response);
     }
 
-    int LuaHttpServiceMethod::Call(Http::Response &response)
+    int LuaHttpServiceMethod::Call(Http::DataResponse &response)
     {
         lua_State* lua = this->mLuaComponent->GetLuaEnv();
         if (lua_pcall(lua, 1, 2, 0) != LUA_OK)
@@ -71,7 +71,7 @@ namespace Sentry
         return lua_tointeger(lua, -2);
     }
 
-    int LuaHttpServiceMethod::CallAsync(Http::Response &response)
+    int LuaHttpServiceMethod::CallAsync(Http::DataResponse &response)
     {
         lua_State* lua = this->mLuaComponent->GetLuaEnv();       
 		std::unique_ptr<LuaServiceTaskSource> luaTaskSource =

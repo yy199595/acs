@@ -31,7 +31,7 @@ namespace Sentry
 #endif
 	}
 
-    void HttpHandlerClient::StartWriter(const std::shared_ptr<Http::Response>& message)
+    void HttpHandlerClient::StartWriter(const std::shared_ptr<Http::IResponse>& message)
     {
 #ifdef ONLY_MAIN_THREAD
         this->Write(message);
@@ -43,7 +43,7 @@ namespace Sentry
 
     void HttpHandlerClient::StartWriter(HttpStatus code)
     {
-        std::shared_ptr<Http::Response> message = std::make_shared<Http::Response>();
+        std::shared_ptr<Http::DataResponse> message = std::make_shared<Http::DataResponse>();
         {
             message->SetCode(code);
 #ifdef ONLY_MAIN_THREAD
@@ -85,8 +85,8 @@ namespace Sentry
             this->mHttpRequest = Http::New(this->mMethod, from);
             if (this->mHttpRequest == nullptr)
             {
-                std::shared_ptr<Http::Response> response
-                    = std::make_shared<Http::Response>();
+                std::shared_ptr<Http::DataResponse> response
+                    = std::make_shared<Http::DataResponse>();
 
                 response->Str(HttpStatus::METHOD_NOT_ALLOWED, "unknown method");
 				this->Write(response);

@@ -9,7 +9,7 @@
 namespace Http
 {
     class Request;
-    class Response;
+    class DataResponse;
 }
 
 namespace Http

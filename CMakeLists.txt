@@ -12,6 +12,12 @@ set(CMAKE_CXX_STANDARD 14)
 include(CMake/define.cmake)
 include(CMake/function.cmake)
 
+if(__DEBUG__)
+    SET(CMAKE_BUILD_TYPE "Debug")
+else()
+    SET(CMAKE_BUILD_TYPE "Release")
+endif()
+
 find_program(PROTOC_EXECUTABLE protoc)
 if(NOT PROTOC_EXECUTABLE)
     message("[warning]:请安装protoc来自动生成pb代码")
@@ -91,11 +97,6 @@ list(APPEND CommonFiles ${CommonSrc} ${ProtocolSrc} ${DataBaseSource})
 
 #LINK_DIRECTORIES(Libs/lib)
 #SET(CMAKE_BUILD_TYPE "Debug")
-if(__DEBUG__)
-    SET(CMAKE_BUILD_TYPE "Debug")
-else()
-    SET(CMAKE_BUILD_TYPE "Release")
-endif()
 
 list(APPEND ServerFiles ${MainSource} ${ServerSource})
 

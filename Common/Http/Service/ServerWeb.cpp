@@ -45,7 +45,7 @@ namespace Sentry
 		return true;
 	}
 
-    int ServerWeb::Login(const Http::Request &request, Http::Response &response)
+    int ServerWeb::Login(const Http::Request &request, Http::DataResponse &response)
     {
         std::string account,password;
         Http::Parameter parameter(request.Content());
@@ -54,12 +54,12 @@ namespace Sentry
         return XCode::Successful;
     }
 
-    int ServerWeb::Register(const Http::Request& request, Http::Response& response)
+    int ServerWeb::Register(const Http::Request& request, Http::DataResponse& response)
     {
         return XCode::Successful;
     }
 
-    int ServerWeb::Main(const Http::Request& request, Http::Response& response)
+    int ServerWeb::Main(const Http::Request& request, Http::DataResponse& response)
 	{
 		auto iter = this->mHtmlFiles.find("index.html");
 		if(iter == this->mHtmlFiles.end())
@@ -70,7 +70,7 @@ namespace Sentry
 		return XCode::Successful;
 	}
 
-	int ServerWeb::Ping(const Http::Request &request, Http::Response &response)
+	int ServerWeb::Ping(const Http::Request &request, Http::DataResponse &response)
     {
         response.Str(HttpStatus::OK,"pong");
         return XCode::Successful;
@@ -104,13 +104,13 @@ namespace Sentry
         return XCode::Successful;
     }
 
-	int ServerWeb::Hello(const Http::Request &request, Http::Response &response)
+	int ServerWeb::Hello(const Http::Request &request, Http::DataResponse &response)
     {
 		response.Str(HttpStatus::OK,"hello");
 		return XCode::Successful;
     }
 
-	int ServerWeb::DownLoad(const Http::Request &request, Http::Response &response)
+	int ServerWeb::DownLoad(const Http::Request &request, Http::DataResponse &response)
     {
         return XCode::Successful;
     }

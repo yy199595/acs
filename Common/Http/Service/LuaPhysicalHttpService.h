@@ -18,7 +18,7 @@ namespace Sentry
 		bool OnClose() final { return true; }
 		bool IsStartService() final { return true;}
 		int Invoke(const std::string & name,
-			const std::shared_ptr<Http::Request> &, std::shared_ptr<Http::Response> &) final;
+			const std::shared_ptr<Http::Request> &, std::shared_ptr<Http::DataResponse> &) final;
 	private:
 		unsigned int mSumCount;
 		unsigned int mWaitCount;
