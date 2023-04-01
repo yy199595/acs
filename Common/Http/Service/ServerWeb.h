@@ -4,6 +4,7 @@
 
 #ifndef APP_SERVERWEB_H
 #define APP_SERVERWEB_H
+#include"Message/s2s.pb.h"
 #include"PhysicalHttpService.h"
 namespace Sentry
 {
@@ -14,6 +15,7 @@ namespace Sentry
         ~ServerWeb() final = default;
     private:
         bool OnInit() final;
+		int QueryServer(std::shared_ptr<s2s::server::list> & response);
     private:
 		int Stop(Json::Writer & response);
         int Info(Json::Writer & response);

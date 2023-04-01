@@ -58,28 +58,27 @@ namespace Sentry
 	int ServerWeb::Stop(Json::Writer & response)
 	{
 		std::string address;
-		Node * node = this->GetComponent<Node>();
-		RpcService* rpcService = this->mApp->GetService<Registry>();
+		RpcService	* registryService = this->mApp->GetService<Registry>();
 		NodeMgrComponent * locationComponent = this->GetComponent<NodeMgrComponent>();
-		if(!locationComponent->GetServer(rpcService->GetServer(), address))
+		if(!locationComponent->GetServer(registryService->GetServer(), address))
 		{
-			response.Add("error").Add("not find registry server address");
 			return XCode::AddressAllotFailure;
 		}
 		com::type::string message;
-		std::shared_ptr<s2s::server::list> list
-			= std::make_shared<s2s::server::list>();
-		int code = rpcService->Call(address, "Query", message, list);
+		std::shared_ptr<s2s::server::list> list =
+			std::make_shared<s2s::server::list>();
+		int code = registryService->Call(address, "Query", message, list);
 		if(code != XCode::Successful)
 		{
 			response.Add("error").Add(CodeConfig::Inst()->GetDesc(code));
 			return XCode::Failure;
 		}
+		RpcService * nodeService = this->GetComponent<Node>();
 		for (int index = 0; index < list->list_size(); index++)
 		{
 			const s2s::server::info& info = list->list(index);
 			{
-				int code = node->Call(info.rpc(), "Stop");
+				int code = nodeService->Call(info.rpc(), "Stop");
 				response.Add(info.rpc()).Add(CodeConfig::Inst()->GetDesc(code));
 			}
 		}
@@ -89,31 +88,29 @@ namespace Sentry
 	int ServerWeb::Info(Json::Writer&response)
     {
 		std::string address;
-		Node * node = this->GetComponent<Node>();
-		RpcService* rpcService = this->mApp->GetService<Registry>();
+		RpcService	* registryService = this->mApp->GetService<Registry>();
 		NodeMgrComponent * locationComponent = this->GetComponent<NodeMgrComponent>();
-		if(!locationComponent->GetServer(rpcService->GetServer(), address))
+		if(!locationComponent->GetServer(registryService->GetServer(), address))
 		{
-			response.Add("error").Add("not find registry server address");
 			return XCode::AddressAllotFailure;
 		}
-
 		com::type::string message;
-		const std::string func("Query");
-		std::shared_ptr<s2s::server::list> list = std::make_shared<s2s::server::list>();
-		int code = rpcService->Call(address, func, message, list);
+		std::shared_ptr<s2s::server::list> list =
+			std::make_shared<s2s::server::list>();
+		int code = registryService->Call(address, "Query", message, list);
 		if(code != XCode::Successful)
 		{
 			response.Add("error").Add(CodeConfig::Inst()->GetDesc(code));
 			return XCode::Failure;
 		}
 		const std::string method("RunInfo");
+		RpcService * nodeService = this->GetComponent<Node>();
 		for (int index = 0; index < list->list_size(); index++)
 		{
 			const s2s::server::info& info = list->list(index);
 			std::shared_ptr<com::type::string> resp =
 				std::make_shared<com::type::string>();
-			int code = node->Call(info.rpc(), method, resp);
+			int code = nodeService->Call(info.rpc(), method, resp);
 			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
 			if (code == XCode::Successful)
 			{
@@ -131,5 +128,9 @@ namespace Sentry
 		}
 		return XCode::Successful;
     }
+	int ServerWeb::QueryServer(std::shared_ptr<s2s::server::list>& response)
+	{
+
+	}
 
 }

@@ -122,7 +122,7 @@ namespace Sentry
 			long long time = 0;
 			long long now = Helper::Time::NowSecTime();
 			document.GetMember("last_ping_time", time);
-			if (now - time <= 15)
+			if (now - time <= 30)
 			{
 				s2s::server::info* message = response.add_list();
 				document.GetMember("server_name", *message->mutable_name());
