@@ -18,7 +18,7 @@ namespace Sentry
         bool OnStart() final;
     private:
         int Ping(const Rpc::Packet & head);
-        int Query(const com::type::string& request, s2s::server::list& response);
+        int Query(const s2s::server::query& request, s2s::server::list& response);
 		int Register(const std::string & address,const s2s::server::info & request);
         int UnRegister(const std::string& address, const com::type::string& request);
     private:

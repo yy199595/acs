@@ -59,14 +59,6 @@ void Debug::Backtrace(std::string &trace, int size, int skip)
 
 void Debug::Console(Debug::Level color, const std::string &log)
 {
-    //Debug::ShowInWatchDog(color, log);
-#ifdef __ALL_OUTPUT_LOG__
-    LogComponent *logComponent = App::Inst()->GetLogger();
-    if (logComponent != nullptr)
-    {
-        logComponent->OutputLog(color, log);
-    }
-#endif
     switch (color)
     {
         case Debug::Level::info:
@@ -144,5 +136,75 @@ void Debug::Console(Debug::Level color, const std::string &log)
         }
             break;
     }
+}
 
+void Debug::Print(Debug::Level color, const std::string & log)
+{
+	switch (color)
+	{
+		case Debug::Level::info:
+		{
+#ifdef _WIN32
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
+				FOREGROUND_BLUE | FOREGROUND_GREEN |
+				FOREGROUND_INTENSITY);
+			printf("%s\n", log.c_str());
+#else
+			printf("%s%s\e[34m\n", "\e[1m", log.c_str());
+#endif
+		}
+			break;
+		case Debug::Level::debug:
+		{
+#ifdef _WIN32
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
+				FOREGROUND_INTENSITY | 2);
+			printf("%s\n", log.c_str());
+#else
+			printf("%s%s\e[0m\n", "\e[32m", log.c_str());
+#endif
+		}
+			break;
+		case Debug::Level::warn:
+		{
+#ifdef _WIN32
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
+				FOREGROUND_INTENSITY | 6);
+			printf("%s\n", log.c_str());
+#else
+			printf("%s%s\e[0m\n", "\e[33m", log.c_str());
+#endif
+		}
+			break;
+		case Debug::Level::err:
+		{
+#ifdef _WIN32
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
+				FOREGROUND_INTENSITY | 4);
+			printf("%s\n", log.c_str());
+#else
+			printf("%s%s\e[0m\n", "\e[31m", log.c_str());
+#endif
+		}
+			break;
+		case Debug::Level::critical:
+		{
+#ifdef _WIN32
+			SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),
+				FOREGROUND_INTENSITY | FOREGROUND_BLUE |
+				FOREGROUND_RED);
+			printf("%s\n", log.c_str());
+#else
+			printf("%s%s\e[0m\n", "\e[35m", log.c_str());
+#endif
+#ifdef __DEBUG_STACK__
+			backward::StackTrace st;
+			st.load_here(64);
+			backward::Printer p;
+			p.color_mode = backward::ColorMode::always;
+			p.print(st, stderr);
+#endif
+		}
+			break;
+	}
 }

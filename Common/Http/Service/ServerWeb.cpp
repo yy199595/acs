@@ -94,7 +94,7 @@ namespace Sentry
 		{
 			return XCode::AddressAllotFailure;
 		}
-		com::type::string message;
+		s2s::server::query message;
 		std::shared_ptr<s2s::server::list> list =
 			std::make_shared<s2s::server::list>();
 		int code = registryService->Call(address, "Query", message, list);

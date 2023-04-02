@@ -7,6 +7,7 @@ message registry
     string http_address = 3; //http地址
     int64 last_ping_time = 4; //上次ping时间
     string last_time_str = 5; //上次ping时间
+    int32 server_group_id = 6; //服务器组id
 }
 
 message log

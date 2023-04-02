@@ -12,6 +12,11 @@ message server
     {
         repeated info list = 1;
     }
+    message query
+    {
+        int32 group_id = 1;
+        string server_name = 2;
+    }
 }
 
 message user

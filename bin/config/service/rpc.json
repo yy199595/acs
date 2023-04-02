@@ -24,7 +24,7 @@
         },
         "Query": {
             "Async": true,
-            "Request": "com.type.string",
+            "Request": "s2s.server.query",
             "Response": "s2s.server.list"
         },
         "Register": {

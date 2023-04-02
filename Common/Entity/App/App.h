@@ -18,6 +18,7 @@ namespace Sentry
 	{
 	 public:
 		explicit App();
+		static void HandleSignal(int signal);
 	 public:
         inline float GetFps() const { return this->mLogicFps; }
 		inline LogComponent* GetLogger() { return this->mLogComponent; }

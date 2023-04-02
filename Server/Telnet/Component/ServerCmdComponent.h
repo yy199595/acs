@@ -14,6 +14,7 @@ namespace Sentry
 	 private:
 		bool Awake();
 		void Stop(const std::string & args);
+		void Info(const std::string & args);
 	 private:
 		class HttpComponent * mHttpComponent;
 	};

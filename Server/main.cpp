@@ -145,10 +145,15 @@ public:
 	}
 };
 
+
 int main(int argc, char **argv)
 {
-	RpcCsvConfig config;
-	config.LoadConfig("./config/service/rpc.csv");
+//	RpcCsvConfig config;
+//	config.LoadConfig("./config/service/rpc.csv");
+//	signal(SIGINT, App::HandleSignal);
+//	signal(SIGQUIT, App::HandleSignal);
+//	signal(SIGTERM, App::HandleSignal);
+//	signal(SIGKILL, App::HandleSignal);
 #ifdef __OS_WIN__
     system("chcp 65001 > nul"); 
 #endif

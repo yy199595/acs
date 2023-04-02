@@ -20,28 +20,28 @@ namespace Sentry
 	public:
 		const std::string& GetServer() const { return this->mCluster; }
 	public:
-		int Send(const std::string& func, const Message& message);
+		int Send(const std::string& func, const Message& request);
 		int Send(const std::string& address, const std::string& func);
-		int Send(const std::string& address, const std::string& func, const Message& message);
+		int Send(const std::string& address, const std::string& func, const Message& request);
 	public:
 		int Send(long long userId, const std::string& func);
-		int Send(long long userId, const std::string& func, const Message& message);
-		int Send(const std::string & address, const std::string & func, long long userId, const Message * message = nullptr);
+		int Send(long long userId, const std::string& func, const Message& request);
+		int Send(const std::string & address, const std::string & func, long long userId, const Message * request = nullptr);
 	public:
 		int Call(const std::string& address, const std::string& func);
-		int Call(const std::string& address, const std::string& func, const Message& message);
+		int Call(const std::string& address, const std::string& func, const Message& request);
 		int Call(const std::string& address, const std::string& func, std::shared_ptr<Message> response);
-		int Call(const std::string& address, const std::string& func, const Message& message, std::shared_ptr<Message> response);
+		int Call(const std::string& address, const std::string& func, const Message& request, std::shared_ptr<Message> response);
 	public:
 		int Call(long long userId, const std::string& func);
-		int Call(long long userId, const std::string& func, const Message& message);
+		int Call(long long userId, const std::string& func, const Message& request);
 		int Call(long long userId, const std::string& func, std::shared_ptr<Message> response);
-		int Call(long long userId, const std::string& func, const Message& message, std::shared_ptr<Message> response);
+		int Call(long long userId, const std::string& func, const Message& request, std::shared_ptr<Message> response);
 	public:
-		bool StartSend(long long userId, const std::string& func, const Message* message = nullptr);
-		bool StartSend(const std::string& address, const std::string& func, const Message* message = nullptr);
-		std::shared_ptr<Rpc::Packet> CallAwait(long long userId, const std::string& func, const Message* message = nullptr);
-		std::shared_ptr<Rpc::Packet> CallAwait(const std::string& address, const std::string& func, const Message* message = nullptr);
+		bool StartSend(long long userId, const std::string& func, const Message* request = nullptr);
+		bool StartSend(const std::string& address, const std::string& func, const Message* request = nullptr);
+		std::shared_ptr<Rpc::Packet> CallAwait(long long userId, const std::string& func, const Message* request = nullptr);
+		std::shared_ptr<Rpc::Packet> CallAwait(const std::string& address, const std::string& func, const Message* request = nullptr);
 	protected:
 		bool LateAwake() final;
 	public:

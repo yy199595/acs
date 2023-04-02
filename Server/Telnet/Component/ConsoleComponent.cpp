@@ -49,12 +49,26 @@ namespace Sentry
 	{
 		while(true)
 		{
+			Debug::Print(spdlog::level::debug, "请输入命令");
 			std::string line;
 			std::getline(std::cin, line);
 			if(line == "quit")
 			{
 				this->mApp->Stop();
 				CONSOLE_LOG_INFO("close console successful");
+				break;
+			}
+			else if(line == "help")
+			{
+				std::stringstream ss;
+				std::vector<ConsoleCmdComponent *> components;
+				this->mCommandUnit->GetComponents(components);
+				for(ConsoleCmdComponent * consoleCmdComponent : components)
+				{
+					consoleCmdComponent->Help(ss);
+					ss << "\n";
+				}
+				Debug::Print(Debug::Level::info, ss.str());
 				break;
 			}
 			std::string command;
@@ -76,7 +90,9 @@ namespace Sentry
 				this->mCommandUnit->GetComponent<ConsoleCmdComponent>(command);
 			if(commandComponent == nullptr || !commandComponent->Invoke(request1, request2))
 			{
-				CONSOLE_LOG_ERROR("unknown command [" << command << " " << request1 << "]");
+				std::stringstream ss;
+				ss << "unknown command [" << command << " " << request1 << "]";
+				Debug::Print(Debug::Level::err, ss.str());
 			}
 		}
 	}

@@ -9,6 +9,7 @@
 #include"Server/Component/TextConfigComponent.h"
 #include"Server/Component/ThreadComponent.h"
 #include"Cluster/Component/LaunchComponent.h"
+#include<csignal>
 using namespace Sentry;
 using namespace std::chrono;
 #ifdef __OS_WIN__
@@ -35,7 +36,9 @@ namespace Sentry
 
 	bool App::LoadComponent()
 	{
-        
+		signal(SIGQUIT, App::HandleSignal);
+		signal(SIGKILL, App::HandleSignal);
+		signal(SIGTERM, App::HandleSignal);
 		this->mTaskComponent = this->GetOrAddComponent<AsyncMgrComponent>();
 		this->mLogComponent = this->GetOrAddComponent<LogComponent>();
 		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
@@ -253,6 +256,12 @@ namespace Sentry
         long long t = Helper::Time::NowMilTime() - this->mStartTime;
         LOG_INFO("===== start " << ServerConfig::Inst()->Name() << " successful [" << t / 1000.0f << "]s ===========");
     }
+	void App::HandleSignal(int signal)
+	{
+		AsyncMgrComponent* component =
+			App::Inst()->GetTaskComponent();
+		component->Start(&App::Stop, App::Inst());
+	}
 #ifdef __OS_WIN__
 	void App::UpdateConsoleTitle()
 	{       

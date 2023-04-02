@@ -71,7 +71,7 @@ namespace Sentry
 		this->mMysqlComponent = this->GetComponent<MysqlDBComponent>();
 		LOG_CHECK_RET_FALSE(this->mMysqlComponent != nullptr);
         this->mIndex = this->mMysqlComponent->MakeMysqlClient();
-		std::vector<std::string> keys{ "rpc_address" };
+		std::vector<std::string> keys{ "rpc_address", "server_group_id" };
 		std::shared_ptr<Mysql::CreateTabCommand> command =
                 std::make_shared<Mysql::CreateTabCommand>(this->mTable,message, keys);
         return this->mMysqlComponent->Run(this->mIndex , command)->IsOk();
@@ -88,14 +88,19 @@ namespace Sentry
 #endif
 	}
 
-	int Registry::Query(const com::type::string& request, s2s::server::list& response)
+	int Registry::Query(const s2s::server::query& request, s2s::server::list& response)
 	{
 		std::stringstream sqlStream;
-		const std::string& name = request.str();
 		sqlStream << "select * from " << this->mTable;
-		if (!name.empty())
+		if(!request.server_name().empty())
 		{
+			const std::string & name = request.server_name();
 			sqlStream << " where server_name='" << name << "'";
+		}
+		if(request.group_id() != 0)
+		{
+			int id = request.group_id();
+			sqlStream << " and server_group_id=" << id;
 		}
 		sqlStream << ";";
 		const std::string sql = sqlStream.str();
