@@ -1,2 +1,1 @@
-pkill -9 app
-tail -f ./nohup.out
+pkill -15 app
