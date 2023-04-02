@@ -10,13 +10,12 @@
 #include"Server/Component/ThreadComponent.h"
 #include"Cluster/Component/LaunchComponent.h"
 #include<csignal>
+#ifdef __OS_WIN__
+#include<Windows.h>
+#endif
+
 using namespace Sentry;
 using namespace std::chrono;
-#ifdef __OS_WIN__
-#include"Component/HttpWebComponent.h"
-#include"Component/MongoDBComponent.h"
-#include"Component/InnerNetMessageComponent.h"
-#endif
 
 namespace Sentry
 {
@@ -36,9 +35,13 @@ namespace Sentry
 
 	bool App::LoadComponent()
 	{
-		signal(SIGQUIT, App::HandleSignal);
-		signal(SIGKILL, App::HandleSignal);
-		signal(SIGTERM, App::HandleSignal);
+#ifndef __OS_WIN__
+        signal(SIGQUIT, App::HandleSignal);
+        signal(SIGKILL, App::HandleSignal);
+#endif
+        signal(SIGTERM, App::HandleSignal);
+        signal(SIGINT, App::HandleSignal);
+        //SetConsoleCtrlHandler((PHANDLER_ROUTINE)WinHandlerSignal, true);
 		this->mTaskComponent = this->GetOrAddComponent<AsyncMgrComponent>();
 		this->mLogComponent = this->GetOrAddComponent<LogComponent>();
 		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
@@ -266,22 +269,22 @@ namespace Sentry
 	void App::UpdateConsoleTitle()
 	{       
         std::string title = ServerConfig::Inst()->Name();
-        HttpWebComponent * httpComponent = this->GetComponent<HttpWebComponent>();
-        MongoDBComponent* mongoComponent = this->GetComponent<MongoDBComponent>();
-        InnerNetMessageComponent * innerComponent = this->GetComponent<InnerNetMessageComponent>();
-        title.append(fmt::format("   fps:{0}  ", this->mLogicFps));
-        if (innerComponent != nullptr)
-        {
-            //title.append(fmt::format("rpc:{0}  ", innerComponent->GetWaitCount()));
-        }
-        if (httpComponent != nullptr)
-        {
-            title.append(fmt::format("http:{0}  ", httpComponent->GetWaitCount()));
-        }
-        if (mongoComponent != nullptr)
-        {
-            title.append(fmt::format("mogo:{0}  ", mongoComponent->GetWaitCount()));
-        }
+        //HttpWebComponent * httpComponent = this->GetComponent<HttpWebComponent>();
+        //MongoDBComponent* mongoComponent = this->GetComponent<MongoDBComponent>();
+        //InnerNetMessageComponent * innerComponent = this->GetComponent<InnerNetMessageComponent>();
+        //title.append(fmt::format("   fps:{0}  ", this->mLogicFps));
+        //if (innerComponent != nullptr)
+        //{
+        //    //title.append(fmt::format("rpc:{0}  ", innerComponent->GetWaitCount()));
+        //}
+        //if (httpComponent != nullptr)
+        //{
+        //    title.append(fmt::format("http:{0}  ", httpComponent->GetWaitCount()));
+        //}
+        //if (mongoComponent != nullptr)
+        //{
+        //    title.append(fmt::format("mogo:{0}  ", mongoComponent->GetWaitCount()));
+        //}
 		SetConsoleTitle(title.c_str());
 	}
 #endif

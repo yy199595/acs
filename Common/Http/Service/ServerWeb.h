@@ -15,7 +15,6 @@ namespace Sentry
         ~ServerWeb() final = default;
     private:
         bool OnInit() final;
-		int QueryServer(std::shared_ptr<s2s::server::list> & response);
     private:
 		int Stop(Json::Writer & response);
         int Info(Json::Writer & response);

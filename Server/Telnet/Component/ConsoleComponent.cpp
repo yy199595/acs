@@ -49,7 +49,7 @@ namespace Sentry
 	{
 		while(true)
 		{
-			Debug::Print(spdlog::level::debug, "请输入命令");
+			Debug::Print(spdlog::level::debug, "please input cmd");
 			std::string line;
 			std::getline(std::cin, line);
 			if(line == "quit")

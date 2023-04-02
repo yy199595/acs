@@ -18,7 +18,6 @@ namespace Sentry
 	{
 	 public:
 		explicit App();
-		static void HandleSignal(int signal);
 	 public:
         inline float GetFps() const { return this->mLogicFps; }
 		inline LogComponent* GetLogger() { return this->mLogComponent; }
@@ -40,7 +39,8 @@ namespace Sentry
 #endif
 		bool LoadComponent();
 		void WaitServerStart();
-		void StartAllComponent();
+		void StartAllComponent();		
+		static void HandleSignal(int signal);
 	 private:
         int mTickCount;
 		float mLogicFps;

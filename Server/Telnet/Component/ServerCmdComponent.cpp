@@ -19,15 +19,15 @@ namespace Sentry
 
 	void ServerCmdComponent::Help(std::stringstream& ss)
 	{
-		ss << "server stop + http服地址	: 关闭所有服务器" << "\n";
-		ss << "server info + http服地址	: 获取运行服务器信息" << "\n";
+		ss << "server stop + http address	: stop all server" << "\n";
+		ss << "server info + http address	: get server run info" << "\n";
 	}
 
 	void ServerCmdComponent::Info(const std::string& args)
 	{
 		if(args.empty())
 		{
-			Debug::Print(spdlog::level::err, "输入http服的地址 ip:port");
+			Debug::Print(spdlog::level::err, "input http address ip:port");
 			return;
 		}
 		std::string url = fmt::format("http://{0}/server/info", args);
@@ -35,7 +35,7 @@ namespace Sentry
 		std::shared_ptr<Http::DataResponse> response = this->mHttpComponent->Get(url, 100.0);
 		if(response == nullptr || response->Code() != HttpStatus::OK)
 		{
-			Debug::Print(spdlog::level::err, "执行命令失败");
+			Debug::Print(spdlog::level::err, "invoke command failure");
 		}
 		else
 		{
@@ -48,8 +48,8 @@ namespace Sentry
 	void ServerCmdComponent::Stop(const std::string& args)
 	{
 		if(args.empty())
-		{
-			Debug::Print(spdlog::level::err, "输入http服的地址 ip:port");
+		{		
+			Debug::Print(spdlog::level::err, "input http address ip:port");
 			return;
 		}
 		std::string url = fmt::format("http://{0}/server/stop", args);

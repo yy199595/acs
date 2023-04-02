@@ -128,9 +128,4 @@ namespace Sentry
 		}
 		return XCode::Successful;
     }
-	int ServerWeb::QueryServer(std::shared_ptr<s2s::server::list>& response)
-	{
-
-	}
-
 }
