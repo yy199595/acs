@@ -25,7 +25,7 @@ namespace Helper
 
         extern bool GetFileName(const std::string &path, std::string & name);
 
-        extern void FormatJson(const std::string &json, std::string & format);
+        extern std::string FormatJson(const std::string &json);
 
         extern void ReplaceString(std::string &outstring, const std::string& str1, const std::string& str2);
 

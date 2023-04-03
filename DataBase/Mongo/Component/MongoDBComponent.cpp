@@ -6,7 +6,9 @@
 #include"Server/Config/ServerConfig.h"
 #include"Server/Component/ThreadComponent.h"
 #include "Util/Time/TimeHelper.h"
-
+#ifdef __DEBUG__
+#include"Util/String/StringHelper.h"
+#endif
 namespace Sentry
 {
 	MongoTask::MongoTask(int id)

@@ -39,9 +39,8 @@ namespace Sentry
 		}
 		else
 		{
-			std::string json;
-			Helper::Str::FormatJson(response->GetContent(), json);
-			Debug::Print(spdlog::level::info, json);
+			const std::string & json = response->GetContent();
+			Debug::Print(spdlog::level::info, Helper::Str::FormatJson(json));
 		}
 	}
 

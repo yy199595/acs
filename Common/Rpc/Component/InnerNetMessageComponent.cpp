@@ -94,19 +94,24 @@ namespace Sentry
 		}
 #ifdef __DEBUG__
         std::string json("{}");
+		std::string serverName = message->From();
         ProtoComponent * component = this->GetComponent<ProtoComponent>();
-        if(!config->Request.empty())
+		const ServiceNodeInfo * nodeInfo = this->mInnerComponent->GetSeverInfo(message->From());
+		if(nodeInfo != nullptr)
+		{
+			serverName = nodeInfo->SrvName;
+		}
+		if(!config->Request.empty())
         {
             std::shared_ptr<Message> request = component->New(config->Request);
             if (request != nullptr && request->ParseFromString(message->GetBody()))
             {
                 json.clear();
-                std::string str;
-                google::protobuf::util::MessageToJsonString(*request, &str);
-                Helper::Str::FormatJson(str, json);
+                google::protobuf::util::MessageToJsonString(*request, &json);
             }
         }
-        CONSOLE_LOG_DEBUG("func = [" << config->FullName << "] request = " << json);
+        CONSOLE_LOG_DEBUG(serverName << "call func = ["
+			<< config->FullName << "] request = " << Helper::Str::FormatJson(json));
 #endif
 		this->mWaitCount++;
 		int code = logicService->Invoke(config->Method, message);
@@ -118,13 +123,19 @@ namespace Sentry
             if (response != nullptr && response->ParseFromString(message->GetBody()))
             {
                 json.clear();
-                std::string str;
-                google::protobuf::util::MessageToJsonString(*response, &str);
-                Helper::Str::FormatJson(str, json);
+                google::protobuf::util::MessageToJsonString(*response, &json);
             }
         }
-        const std::string & desc = CodeConfig::Inst()->GetDesc(code);
-        CONSOLE_LOG_INFO("func = [" << config->FullName << "] code = " << desc << " response = " << json);
+		if(code == XCode::Successful)
+		{
+			CONSOLE_LOG_INFO(serverName << " call func = ["
+				<< config->FullName << "] " << " response = " << Helper::Str::FormatJson(json));
+		}
+		else
+		{
+			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
+			CONSOLE_LOG_ERROR(serverName << "call func = [" << config->FullName << "] code = " << desc);
+		}
 		//LOG_INFO("call [" << config->FullName << "] use time = " << timer.GetMs() << "ms");
 #endif
 		this->mWaitCount--;

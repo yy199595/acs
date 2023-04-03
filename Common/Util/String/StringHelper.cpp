@@ -60,8 +60,9 @@ namespace Helper
 		return false;
     }
 
-    void Str::FormatJson(const std::string &json, std::string & format)
+    std::string Str::FormatJson(const std::string &json)
     {
+		std::string format;
         auto getLevelStr = [](int level, std::string &str) {
             for (int i = 0; i < level; i++)
             {
@@ -103,6 +104,7 @@ namespace Helper
                     break;
             }
         }
+		return format;
     }
 
     std::string Str::RandomString(size_t size)

@@ -31,20 +31,18 @@ message(${CMAKE_BINARY_DIR})
 
 set(ContextPath ${CMAKE_CURRENT_SOURCE_DIR}/Common/Async/Coroutine/Context)
 if(WIN32)
-    SET(AsmFiles ${ContextPath}/context_x64.asm)
+    SET(asm_file ${ContextPath}/context_x64.asm)
     if(MSVC)
         if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-            set(AsmFiles ${ContextPath}/context_x86.asm)
+            set(asm_file ${ContextPath}/context_x86.asm)
         endif()
-        set_property(SOURCE ${AsmFiles} PROPERTY LANGUAGE ASM_MASM)
+        set_property(SOURCE ${asm_file} PROPERTY LANGUAGE ASM_MASM)
     else()
-        set(AsmFiles ${ContextPath}/context.S)
+        set(asm_file ${ContextPath}/context.S)
     endif()
 else()
-    SET(AsmFiles ${ContextPath}/context.S)
+    SET(asm_file ${ContextPath}/context.S)
 endif()
-MESSAGE(${AsmFiles})
-
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fexec-charset=GBK")
 
 #第三方库包含
@@ -85,20 +83,8 @@ include_directories(${PROJECT_SOURCE_DIR}/Common)
 include_directories(${PROJECT_SOURCE_DIR}/Server)
 include_directories(${PROJECT_SOURCE_DIR}/DataBase)
 
-file(GLOB_RECURSE ProtocolSrc "Gen/*.h" "Gen/*.cpp" "Gen/*.hpp" "Gen/*.c" "Gen/*.cc")
-file(GLOB_RECURSE CommonSrc "Common/*.h" "Common/*.cpp" "Common/*.hpp" "Common/*.c")
-
-file(GLOB_RECURSE ServerSource "Server/*.h" "Server/*.cpp" "Server/*.hpp" "Server/*.c")
-file(GLOB_RECURSE ClientSource "Client/*.h" "Client/*.cpp" "Client/*.hpp" "Client/*.c")
-
-file(GLOB_RECURSE DataBaseSource "DataBase/*.h" "DataBase/*.cpp" "DataBase/*.hpp" "DataBase/*.c")
-
-list(APPEND CommonFiles ${CommonSrc} ${ProtocolSrc} ${DataBaseSource})
-
 #LINK_DIRECTORIES(Libs/lib)
 #SET(CMAKE_BUILD_TYPE "Debug")
-
-list(APPEND ServerFiles ${MainSource} ${ServerSource})
 
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)
@@ -108,9 +94,42 @@ else()
     message("[warning]:请安装ccache来提高编译速度")
 endif()
 
-ADD_EXECUTABLE(app ${AsmFiles} ${CommonFiles} ${ServerFiles} ${ClientSource})
 
-list(APPEND StaticLibs lua)
+file(GLOB_RECURSE src_proto "Gen/*.cpp" "Gen/*.cc")
+file(GLOB_RECURSE src_common "Common/*.cpp" "Common/*.c")
+file(GLOB_RECURSE src_server "Server/*.c" "Server/*.cpp")
+file(GLOB_RECURSE src_client "Client/*.c" "Client/*.cpp")
+file(GLOB_RECURSE src_database "DataBase/*.cpp" "DataBase/*.c")
+list(APPEND build_files ${asm_file} ${src_common} ${src_proto})
+list(APPEND build_files ${src_database} ${src_server} ${src_client})
+
+if(MSVC) #创建vs目录
+
+    #file(GLOB_RECURSE file_cmake "CMake/*.cmake")
+    file(GLOB_RECURSE file_proto "Gen/*.h" "Gen/*.hpp")
+    file(GLOB_RECURSE file_server "Server/*.h" "Server/*.hpp")
+    file(GLOB_RECURSE file_client "Client/*.h" "Client/*.hpp")
+    file(GLOB_RECURSE file_common "Common/*.h" "Common/*.hpp")
+    file(GLOB_RECURSE file_database "DataBase/*.h" "DataBase/*.hpp")
+    file(GLOB_RECURSE file_bin "bin/*.json" "bin/*.lua" "bin/*.proto" "bin/*.html")
+
+    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+    
+    list(APPEND build_files ${file_bin})
+    list(APPEND build_files ${file_cmake})
+    list(APPEND build_files ${file_common})
+    list(APPEND build_files ${file_proto})
+    list(APPEND build_files ${file_server})
+    list(APPEND build_files ${file_client})
+    list(APPEND build_files ${file_database})
+
+    foreach(file_name ${build_files})
+        source_group_by_dir(${PROJECT_SOURCE_DIR} ${file_name})
+    endforeach()
+endif()
+ADD_EXECUTABLE(app ${build_files})
+
+list(APPEND static_lib lua)
 
 if(__ENABLE_JEMALLOC__)
 
@@ -120,48 +139,40 @@ if(__ENABLE_JEMALLOC__)
         #execute_process(COMMAND sudo apt-get install libjemalloc-dev)
     endif()
 
-    list(APPEND StaticLibs jemalloc)
+    list(APPEND static_lib jemalloc)
 endif()
 
 if(__ENABLE_MIMALLOC__)
-    #list(APPEND StaticLibs mimalloc)
+    #list(APPEND static_lib mimalloc)
 endif()
 
 if(__ENABLE_OPEN_SSL__)
-    list(APPEND StaticLibs ssl crypto)
+    list(APPEND static_lib ssl crypto)
 endif()
 
 if(__ENABLE_MYSQL__)
     if(WIN32)
-        list(APPEND StaticLibs libmysql mysqlclient)
+        list(APPEND static_lib libmysql mysqlclient)
     elseif(APPLE)
-        list(APPEND StaticLibs mysqlclient yassl)
+        list(APPEND static_lib mysqlclient yassl)
     else()
-        list(APPEND StaticLibs mysqlclient yassl)
+        list(APPEND static_lib mysqlclient yassl)
     endif()
 endif()
 
-
-if(MSVC) #创建vs目录
-    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-    list(APPEND CxxFiles ${AsmFiles} ${CommonFiles} ${ServerFiles} ${ClientSource})
-    foreach(file_name ${CxxFiles})
-        source_group_by_dir(${PROJECT_SOURCE_DIR} ${file_name})
-    endforeach()
-endif()
 
 if(WIN32)
     message("当前为win平台")
     add_definitions(-D __OS_WIN__)
     if(MSVC)
-        list(APPEND StaticLibs libprotobufd)
+        list(APPEND static_lib libprotobufd)
     else()
-        list(APPEND StaticLibs protobufd Ws2_32 Dbghelp Mswsock)
+        list(APPEND static_lib protobufd Ws2_32 Dbghelp Mswsock)
     endif()
 elseif(APPLE)
     message("当前为mac平台")
     add_definitions(-D __OS_MAC__)
-    list(APPEND StaticLibs protobufd pthread)
+    list(APPEND static_lib protobufd pthread)
 elseif(UNIX)
     message("当前为linux平台")
     add_definitions(-D __OS_LINUX__)
@@ -172,15 +183,15 @@ elseif(UNIX)
 
     if(kernel_release MATCHES ".*-microsoft*")
         message("当前是wsl系统")
-        list(APPEND StaticLibs protobufd pthread dl)
+        list(APPEND static_lib protobufd pthread dl)
     else()
-        list(APPEND StaticLibs protobufd pthread dl)
+        list(APPEND static_lib protobufd pthread dl)
     endif()
 else()
     message(FATAL_ERROR "未知平台")
 endif()
 
-TARGET_LINK_LIBRARIES(app ${StaticLibs})
+TARGET_LINK_LIBRARIES(app ${static_lib})
 SET(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 

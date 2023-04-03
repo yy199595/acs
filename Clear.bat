@@ -24,6 +24,7 @@ del /F /S /Q *.vcxproj
 del /F /S /Q *.filters
 del /F /S /Q *.user
 del /F /S /Q *.sln
+rmdir  /s/q build
 rmdir /s/q .vs
 rmdir /s/q CMakeFiles
 rmdir /s/q cmake-build-debug
