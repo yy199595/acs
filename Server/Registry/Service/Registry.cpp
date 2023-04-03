@@ -178,7 +178,7 @@ namespace Sentry
 	int Registry::Ping(const Rpc::Packet& packet)
 	{
 		const std::string & address = packet.From();
-		const ServiceNodeInfo * nodeInfo = this->mInnerComponent->GetSeverInfo(address);
+		const NodeInfo * nodeInfo = this->mInnerComponent->GetNodeInfo(address);
 		if(nodeInfo != nullptr)
 		{
             std::stringstream st;

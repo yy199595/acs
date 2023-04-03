@@ -97,35 +97,34 @@ namespace Sentry
     }
 
     bool InnerNetComponent::OnAuth(const std::shared_ptr<Rpc::Packet>& message)
-    {
-        const Rpc::Head &head = message->GetHead();
-        const std::string& address = message->From();
-        std::unique_ptr<ServiceNodeInfo> serverNode(new ServiceNodeInfo());
-        {
-            LOG_CHECK_RET_FALSE(head.Get("name", serverNode->SrvName));
-            LOG_CHECK_RET_FALSE(head.Get("user", serverNode->UserName));
-            LOG_CHECK_RET_FALSE(head.Get("rpc", serverNode->RpcAddress));
-            LOG_CHECK_RET_FALSE(head.Get("passwd", serverNode->PassWord));
-            if (serverNode->RpcAddress.empty())
-            {
+	{
+		NodeInfo nodeInfo;
+		const Rpc::Head& head = message->GetHead();
+		const std::string& address = message->From();
+
+		LOG_CHECK_RET_FALSE(head.Get("name", nodeInfo.SrvName));
+		LOG_CHECK_RET_FALSE(head.Get("user", nodeInfo.UserName));
+		LOG_CHECK_RET_FALSE(head.Get("rpc", nodeInfo.RpcAddress));
+		LOG_CHECK_RET_FALSE(head.Get("passwd", nodeInfo.PassWord));
+		if (nodeInfo.RpcAddress.empty())
+		{
+			this->StartClose(address);
+			return false;
+		}
+		if (!this->mUserMaps.empty())
+		{
+			auto iter = this->mUserMaps.find(nodeInfo.UserName);
+			if (iter == this->mUserMaps.end() || iter->second != nodeInfo.PassWord)
+			{
 				this->StartClose(address);
-                return false;
-            }
-            if (!this->mUserMaps.empty())
-            {
-                auto iter = this->mUserMaps.find(serverNode->UserName);
-                if (iter == this->mUserMaps.end() || iter->second != serverNode->PassWord)
-                {
-					this->StartClose(address);
-                    CONSOLE_LOG_ERROR(address << " auth failure");
-                    return false;
-                }
-            }
-            serverNode->LocalAddress = address;			
-        }
-        this->mLocationMaps.emplace(address, std::move(serverNode));
-        return true;
-    }
+				CONSOLE_LOG_ERROR(address << " auth failure");
+				return false;
+			}
+		}
+		nodeInfo.LocalAddress = address;
+		this->mLocationMaps.emplace(address, nodeInfo);
+		return true;
+	}
 
     bool InnerNetComponent::IsAuth(const std::string &address)
     {
@@ -264,10 +263,10 @@ namespace Sentry
         document.Add("client").Add(this->mRpcClientMap.size());
     }
 
-	const ServiceNodeInfo *InnerNetComponent::GetSeverInfo(const std::string &address) const
+	const NodeInfo *InnerNetComponent::GetNodeInfo(const std::string &address) const
 	{
 		auto iter = this->mLocationMaps.find(address);		
-		return iter != this->mLocationMaps.end() ? iter->second.get() : nullptr;
+		return iter != this->mLocationMaps.end() ? &iter->second : nullptr;
 	}
 
 	void InnerNetComponent::OnFrameUpdate(float t)

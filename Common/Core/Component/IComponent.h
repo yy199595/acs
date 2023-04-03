@@ -126,7 +126,7 @@ namespace Sentry
 		virtual void OnSendFailure(const std::string& address, std::shared_ptr<T> message) { }
     };
 
-    class ServiceNodeInfo
+    class NodeInfo
     {
     public:
         std::string SrvName;

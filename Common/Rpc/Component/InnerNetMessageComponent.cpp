@@ -96,7 +96,7 @@ namespace Sentry
         std::string json("{}");
 		std::string serverName = message->From();
         ProtoComponent * component = this->GetComponent<ProtoComponent>();
-		const ServiceNodeInfo * nodeInfo = this->mInnerComponent->GetSeverInfo(message->From());
+		const NodeInfo * nodeInfo = this->mInnerComponent->GetNodeInfo(message->From());
 		if(nodeInfo != nullptr)
 		{
 			serverName = nodeInfo->SrvName;

@@ -27,10 +27,9 @@ namespace Sentry
         void OnRecord(Json::Writer & document) final;
 		void OnListen(std::shared_ptr<SocketProxy> socket) final;
 	 public:
-        const ServiceNodeInfo * GetSeverInfo(const std::string & address) const;
-	 public:
         InnerNetClient * GetSession(const std::string& address);
         InnerNetClient * GetOrCreateSession(const std::string& address);
+		const NodeInfo * GetNodeInfo(const std::string & address) const;
 	public:
 		bool Send(const std::shared_ptr<Rpc::Packet>& message); //发送到本地
 		bool Send(const std::string & address, const std::shared_ptr<Rpc::Packet>& message);
@@ -48,7 +47,7 @@ namespace Sentry
         class InnerNetMessageComponent* mMessageComponent;
         std::unordered_map<std::string, std::string> mUserMaps;
 		std::queue<std::shared_ptr<Rpc::Packet>> mWaitMessages;
+		std::unordered_map<std::string, NodeInfo> mLocationMaps;
 		std::unordered_map<std::string, std::shared_ptr<InnerNetClient>> mRpcClientMap;
-        std::unordered_map<std::string, std::unique_ptr<ServiceNodeInfo>> mLocationMaps;
     };
 }
