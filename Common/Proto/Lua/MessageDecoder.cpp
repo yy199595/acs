@@ -143,8 +143,12 @@ namespace Sentry
 				const Message& msg = reflection->GetRepeatedMessage(message, field, index);
 				if (msg.GetTypeName() == "google.protobuf.Any")
 				{
+					std::shared_ptr<Message> anyMessage;
 					const Any& any = static_cast<const Any&>(msg);
-					std::shared_ptr<Message> anyMessage = this->mMsgComponent->New(any);
+					if(!this->mMsgComponent->New(any, anyMessage))
+					{
+						return false;
+					}
 					this->Decode(*anyMessage);
 					return true;
 				}
@@ -202,8 +206,12 @@ namespace Sentry
 			const Message & msg = reflection->GetMessage(message, field);
 			if(msg.GetTypeName() == "google.protobuf.Any")
 			{
+				std::shared_ptr<Message> anyMessage;
 				const Any & any = static_cast<const Any&>(msg);
-				std::shared_ptr<Message> anyMessage = this->mMsgComponent->New(any);
+				if(!this->mMsgComponent->New(any, anyMessage))
+				{
+					return false;
+				}
 				this->Decode(*anyMessage);
 				return true;
 			}

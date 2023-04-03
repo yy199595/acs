@@ -35,10 +35,10 @@ namespace Sentry
         ProtoComponent();
         ~ProtoComponent() = default;
     public:
-        std::shared_ptr<Message> New(const Any & any);
-        std::shared_ptr<Message> New(const std::string & name);
-        std::shared_ptr<Message> New(const std::string & name, const std::string & json);
-		std::shared_ptr<Message> New(const std::string & name, const char * json, size_t size);
+        bool New(const Any & any, std::shared_ptr<Message> & message);
+		bool New(const std::string & name, std::shared_ptr<Message> & message);
+		bool New(const std::string & name, const std::string & json, std::shared_ptr<Message> & message);
+		bool New(const std::string & name, const char * json, size_t size, std::shared_ptr<Message> & message);
 	 public:
         bool HasMessage(const std::string & name);
 		bool Write(lua_State * lua, const Message & message);

@@ -35,7 +35,12 @@ namespace Sentry
             const std::string user(iter->name.GetString());
             const std::string passwd(iter->value.GetString());
             this->mUserMaps.emplace(user, passwd);
-        }  
+        }
+		NodeInfo nodeInfo;
+		nodeInfo.SrvName = ServerConfig::Inst()->Name();
+		config->GetLocation("rpc", nodeInfo.RpcAddress);
+		config->GetLocation("http", nodeInfo.HttpAddress);
+		this->mLocationMaps.emplace(nodeInfo.RpcAddress, nodeInfo);
         LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<ThreadComponent>());
         LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>());
 		return this->StartListen("rpc");

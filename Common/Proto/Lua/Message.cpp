@@ -28,11 +28,21 @@ namespace Lua
 		else if (lua_isstring(lua, 2))
 		{
 			size_t size = 0;
+			std::shared_ptr<Message> message;
 			const char * json = luaL_checklstring(lua, 2, &size);
-			UserDataParameter::Write(lua, messageComponent->New(name, json, size));
+			if(!messageComponent->New(name, json, size, message))
+			{
+				return 0;
+			}
+			UserDataParameter::Write(lua, message);
 			return 1;
 		}
-		UserDataParameter::Write(lua,  messageComponent->New(name));
+		std::shared_ptr<Message> message;
+		if(!messageComponent->New(name, message))
+		{
+			return 0;
+		}
+		UserDataParameter::Write(lua,  message);
 		return 1;
 	}
 

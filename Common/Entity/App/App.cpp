@@ -225,24 +225,30 @@ namespace Sentry
         this->GetComponents<IComplete>(completeComponents);
         for(IComplete * complete : completeComponents)
         {
-            complete->OnLocalComplete();
+			Component* component = dynamic_cast<Component*>(complete);
+			long long timerId = this->mTimerComponent->DelayCall(1000 * 10, [component]()
+			{
+				CONSOLE_LOG_FATAL(component->GetName() << " [OnLocalComplete] time out");
+			});
+			complete->OnLocalComplete();
+			this->mTimerComponent->CancelTimer(timerId);
         }
         CONSOLE_LOG_DEBUG("start all component complete");
         this->WaitServerStart();
     }
 
 	void App::WaitServerStart() //等待依赖的服务启动完成
-    {
-		NodeMgrComponent *locationComponent = this->GetComponent<NodeMgrComponent>();
-		if(locationComponent != nullptr)
+	{
+		NodeMgrComponent* locationComponent = this->GetComponent<NodeMgrComponent>();
+		if (locationComponent != nullptr)
 		{
 			std::unordered_set<std::string> services;
-			std::vector<VirtualRpcService *> allVirtualServices;
+			std::vector<VirtualRpcService*> allVirtualServices;
 			this->GetComponents<VirtualRpcService>(allVirtualServices);
-			for(const VirtualRpcService * service : allVirtualServices)
+			for (const VirtualRpcService* service: allVirtualServices)
 			{
-				const std::string & server = service->GetServer();
-				if(services.find(server) == services.end())
+				const std::string& server = service->GetServer();
+				if (services.find(server) == services.end())
 				{
 					services.insert(server);
 					locationComponent->WaitServerStart(server);
@@ -252,13 +258,19 @@ namespace Sentry
 		}
 		std::vector<IComplete*> completeComponents;
 		this->GetComponents<IComplete>(completeComponents);
-		for (IComplete* complete : completeComponents)
+		for (IComplete* complete: completeComponents)
 		{
+			Component* component = dynamic_cast<Component*>(complete);
+			long long timerId = this->mTimerComponent->DelayCall(1000 * 10, [component]()
+			{
+				CONSOLE_LOG_FATAL(component->GetName() << " [OnClusterComplete] time out");
+			});
 			complete->OnClusterComplete();
+			this->mTimerComponent->CancelTimer(timerId);
 		}
-        long long t = Helper::Time::NowMilTime() - this->mStartTime;
-        LOG_INFO("===== start " << ServerConfig::Inst()->Name() << " successful [" << t / 1000.0f << "]s ===========");
-    }
+		long long t = Helper::Time::NowMilTime() - this->mStartTime;
+		LOG_INFO("===== start " << ServerConfig::Inst()->Name() << " successful [" << t / 1000.0f << "]s ===========");
+	}
 	void App::HandleSignal(int signal)
 	{
 		AsyncMgrComponent* component =

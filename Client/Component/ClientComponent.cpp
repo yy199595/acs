@@ -134,32 +134,36 @@ namespace Client
 	}
 
     void ClientComponent::OnRequest(const Rpc::Packet &message)
-    {
-        std::string tab, func;
-        if(!message.GetMethod(tab, func))
-        {
-            return;
-        }
-        if(!this->mLuaComponent->GetFunction(tab, func))
-        {
-            LOG_ERROR("not find lua function [" << tab << "." << func << "]");
-            return;
-        }
-        int count = 0;
-        std::string name;
-        if(message.ConstHead().Get("pb", name))
-        {
-            count++;
-            std::shared_ptr<Message> data = this->mProtoComponent->New(name);
-            if(data == nullptr || !data->ParseFromString(message.GetBody()))
-            {
-                return;
-            }
-            this->mProtoComponent->Write(this->mLuaComponent->GetLuaEnv(), *data);
-        }
-        if(lua_pcall(this->mLuaComponent->GetLuaEnv(), count, 0, 0) != LUA_OK)
-        {
-            LOG_ERROR(lua_tostring(this->mLuaComponent->GetLuaEnv(), -1));
-        }
-    }
+	{
+		std::string tab, func;
+		if (!message.GetMethod(tab, func))
+		{
+			return;
+		}
+		if (!this->mLuaComponent->GetFunction(tab, func))
+		{
+			LOG_ERROR("not find lua function [" << tab << "." << func << "]");
+			return;
+		}
+		int count = 0;
+		std::string name;
+		if (message.ConstHead().Get("pb", name))
+		{
+			count++;
+			std::shared_ptr<Message> data;
+			if (!this->mProtoComponent->New(name, data))
+			{
+				return;
+			}
+			if (!data->ParseFromString(message.GetBody()))
+			{
+				return;
+			}
+			this->mProtoComponent->Write(this->mLuaComponent->GetLuaEnv(), *data);
+		}
+		if (lua_pcall(this->mLuaComponent->GetLuaEnv(), count, 0, 0) != LUA_OK)
+		{
+			LOG_ERROR(lua_tostring(this->mLuaComponent->GetLuaEnv(), -1));
+		}
+	}
 }

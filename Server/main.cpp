@@ -58,8 +58,6 @@ using namespace Sentry;
 
 void RegisterComponent()
 {
-// rpc
-    ComponentFactory::Add<InnerNetMessageComponent>("InnerNetMessageComponent");
 // common
     ComponentFactory::Add<AsyncMgrComponent>("AsyncMgrComponent");
     ComponentFactory::Add<TimerComponent>("TimerComponent");
@@ -74,6 +72,7 @@ void RegisterComponent()
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
     ComponentFactory::Add<InnerNetComponent>("InnerNetComponent");
 	ComponentFactory::Add<NodeMgrComponent>("NodeMgrComponent");
+	ComponentFactory::Add<InnerNetMessageComponent>("InnerNetMessageComponent");
 
 // gate
 	ComponentFactory::Add<GateComponent>("GateComponent");

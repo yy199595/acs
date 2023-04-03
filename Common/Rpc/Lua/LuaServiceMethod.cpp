@@ -45,11 +45,10 @@ namespace Sentry
 		std::shared_ptr<Message> response;
 		if (!this->mConfig->Response.empty())
 		{
-			response = this->mMsgComponent->New(this->mConfig->Response);
-            if (response == nullptr)
-            {
-                return XCode::CreateProtoFailure;
-            }
+			if(!this->mMsgComponent->New(this->mConfig->Response, response))
+			{
+				return XCode::CreateProtoFailure;
+			}
 		}
 		std::unique_ptr<LuaServiceTaskSource> luaTaskSource =
                 std::make_unique<LuaServiceTaskSource>(response);
@@ -93,10 +92,13 @@ namespace Sentry
         std::shared_ptr<Message> request;
         if (!this->mConfig->Request.empty())
         {
-            request = this->mMsgComponent->New(this->mConfig->Request);
-            if (request == nullptr || !message.ParseMessage(request.get()))
+			if(!this->mMsgComponent->New(this->mConfig->Request, request))
+			{
+				return false;
+			}
+            if (!message.ParseMessage(request.get()))
             {
-                return XCode::CallLuaFunctionFail;
+                return XCode::ParseMessageError;
             }
         }
         int count = 1;

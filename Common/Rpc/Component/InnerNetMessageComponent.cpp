@@ -103,14 +103,18 @@ namespace Sentry
 		}
 		if(!config->Request.empty())
         {
-            std::shared_ptr<Message> request = component->New(config->Request);
-            if (request != nullptr && request->ParseFromString(message->GetBody()))
-            {
-                json.clear();
-                google::protobuf::util::MessageToJsonString(*request, &json);
-            }
+            std::shared_ptr<Message> request;
+			if(component->New(config->Request, request))
+			{
+				if (request->ParseFromString(message->GetBody()))
+				{
+					json.clear();
+					google::protobuf::util::MessageToJsonString(*request, &json);
+				}
+			}
+
         }
-        CONSOLE_LOG_DEBUG(serverName << "call func = ["
+        CONSOLE_LOG_DEBUG(serverName << " call func = ["
 			<< config->FullName << "] request = " << Helper::Str::FormatJson(json));
 #endif
 		this->mWaitCount++;
@@ -119,12 +123,16 @@ namespace Sentry
         json.assign("{}");
         if(code == XCode::Successful && !config->Response.empty())
         {
-            std::shared_ptr<Message> response = component->New(config->Response);
-            if (response != nullptr && response->ParseFromString(message->GetBody()))
-            {
-                json.clear();
-                google::protobuf::util::MessageToJsonString(*response, &json);
-            }
+            std::shared_ptr<Message> response;
+			if(component->New(config->Response, response))
+			{
+				if (response->ParseFromString(message->GetBody()))
+				{
+					json.clear();
+					google::protobuf::util::MessageToJsonString(*response, &json);
+				}
+			}
+
         }
 		if(code == XCode::Successful)
 		{

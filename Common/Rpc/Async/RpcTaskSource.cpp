@@ -33,26 +33,29 @@ namespace Sentry
 	void LuaRpcTaskSource::OnResponse(std::shared_ptr<Rpc::Packet> response)
 	{
 #ifdef __DEBUG__
-        std::string func;
-        long long t2 = Helper::Time::NowMilTime();
-        if(response->GetHead().Get("func", func))
-        {
-            long long ms = t2 - this->t1;
-            CONSOLE_LOG_INFO("lua call " << func << " use time [" << ms << "ms]");
-        }
+		std::string func;
+		long long t2 = Helper::Time::NowMilTime();
+		if (response->GetHead().Get("func", func))
+		{
+			long long ms = t2 - this->t1;
+			CONSOLE_LOG_INFO("lua call " << func << " use time [" << ms << "ms]");
+		}
 #endif
-        int code = 0;
-        response->GetHead().Get("code", code);
-        if(code == (int)XCode::Successful && !this->mResp.empty())
-        {
-            ProtoComponent * messageComponent = App::Inst()->GetMsgComponent();
-            std::shared_ptr<Message> message = messageComponent->New(this->mResp);
-            if(message != nullptr && response->ParseMessage(message.get()))
-            {
-                this->mTask.SetResult(XCode::Successful, message);
-            }
-            return;
-        }
-		this->mTask.SetResult(code, nullptr);
+		int code = 0;
+		std::shared_ptr<Message> message;
+		response->GetHead().Get("code", code);
+		if (code == (int)XCode::Successful && !this->mResp.empty())
+		{
+			ProtoComponent* messageComponent = App::Inst()->GetMsgComponent();
+			if(!messageComponent->New(this->mResp, message))
+			{
+				code = XCode::CreateProtoFailure;
+			}
+			else if(!response->ParseMessage(message.get()))
+			{
+				code = XCode::ParseMessageError;
+			}
+		}
+		this->mTask.SetResult(code, message);
 	}
 }

@@ -1,7 +1,7 @@
-HofixHelper = {}
-HofixHelper.hofixModules = {}
+HotfixHelper = {}
+HotfixHelper.hotfixModules = {}
 
-function HofixHelper.LoadModuleByName(moduleName)
+function HotfixHelper.LoadModuleByName(moduleName)
     local oldModule = package.loaded[moduleName] or {}
     package.loaded[moduleName] = nil
     require(moduleName)
@@ -15,4 +15,4 @@ function HofixHelper.LoadModuleByName(moduleName)
     Log.Info("load " .. moduleName .. " Successful")
     return oldModule
 end
-return HofixHelper
+return HotfixHelper

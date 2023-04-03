@@ -88,15 +88,12 @@ namespace Sentry
 
 
         std::ifstream fs(fullPath);
-        const std::string md5 = Helper::Md5::GetMd5(fs);
-        auto iter = this->mFiles.find(fileName);
-        if(iter != this->mFiles.end())
-        {
-            if(iter->second == md5)
-            {
-                return true;
-            }
-        }
+		auto iter = this->mFiles.find(fileName);
+		const std::string md5 = Helper::Md5::GetMd5(fs);
+        if(iter != this->mFiles.end() && iter->second == md5)
+		{
+			return true;
+		}
         this->mFiles[fileName] = md5;
         const FileDescriptor * fileDescriptor = this->mImporter->Import(fileName);
 		if (fileDescriptor == nullptr)
@@ -136,76 +133,74 @@ namespace Sentry
 		}
 	}
 
-    std::shared_ptr<Message> ProtoComponent::New(const Any &any)
+    bool ProtoComponent::New(const Any &any, std::shared_ptr<Message> & message)
     {
         std::string fullName;
         if(!Any::ParseAnyTypeUrl(any.type_url(), &fullName))
         {
-            return nullptr;
+            return false;
         }
-        std::shared_ptr<Message> message = this->New(fullName);
-        if(message != nullptr && any.UnpackTo(message.get()))
-        {
-            return message;
-        }
-        return nullptr;
+        if(!this->New(fullName, message))
+		{
+			return false;
+		}
+		return any.UnpackTo(message.get());
     }
 
-    std::shared_ptr<Message> ProtoComponent::New(const std::string & name)
+    bool ProtoComponent::New(const std::string & name, std::shared_ptr<Message> & message)
     {
-        const Message * message = this->FindMessage(name);
-        if(message == nullptr)
+        const Message * tmpMessage = this->FindMessage(name);
+        if(tmpMessage == nullptr)
         {
             LOG_ERROR("find protobuf message [" << name << "] error");
-            return nullptr;
+            return false;
         }
-        return std::shared_ptr<Message>(message->New());
+        message = std::shared_ptr<Message>(tmpMessage->New());
+		return true;
     }
 
-    std::shared_ptr<Message> ProtoComponent::New(const std::string &name, const std::string &json)
+    bool ProtoComponent::New(const std::string &name, const std::string &json, std::shared_ptr<Message> & message)
     {
-        std::shared_ptr<Message> message = this->New(name);
-        if(message != nullptr && util::JsonStringToMessage(json, message.get()).ok())
-        {
-            return message;
-        }
-        return nullptr;
+		if(!this->New(name, message))
+		{
+			return false;
+		}
+		return util::JsonStringToMessage(json, message.get()).ok();
     }
 
-	std::shared_ptr<Message> ProtoComponent::New(const string& name, const char* json, size_t size)
+	bool ProtoComponent::New(const string& name, const char* json, size_t size, std::shared_ptr<Message> & message)
 	{
-		std::shared_ptr<Message> message = this->New(name);
-		if(message != nullptr && util::JsonStringToMessage(StringPiece(json, size), message.get()).ok())
+		if(!this->New(name, message))
 		{
-			return message;
+			return false;
 		}
-		return nullptr;
+		return util::JsonStringToMessage(StringPiece(json, size), message.get()).ok();
 	}
 
     const Message * ProtoComponent::FindMessage(const std::string &name)
-    {
-        auto iter1 = this->mDynamicMessageMap.find(name);
-        if(iter1 != this->mDynamicMessageMap.end())
-        {
-            return iter1->second;
-        }
+	{
+		auto iter1 = this->mDynamicMessageMap.find(name);
+		if (iter1 != this->mDynamicMessageMap.end())
+		{
+			return iter1->second;
+		}
 
-        //静态查找
-        const DescriptorPool* pDescriptorPool = DescriptorPool::generated_pool();
-        const Descriptor* pDescriptor = pDescriptorPool->FindMessageTypeByName(name);
-        if(pDescriptor != nullptr)
-        {
-            MessageFactory *factory = MessageFactory::generated_factory();
-            const Message *pMessage = factory->GetPrototype(pDescriptor);
-            if(pMessage != nullptr)
-            {
-                this->mStaticMessageMap.emplace(name, pMessage);
-                return pMessage;
-            }
-            return nullptr;
-        }
-        return nullptr;
-    }
+		//静态查找
+		const DescriptorPool* pDescriptorPool = DescriptorPool::generated_pool();
+		const Descriptor* pDescriptor = pDescriptorPool->FindMessageTypeByName(name);
+		if (pDescriptor == nullptr)
+		{
+			return nullptr;
+		}
+		MessageFactory* factory = MessageFactory::generated_factory();
+		const Message* pMessage = factory->GetPrototype(pDescriptor);
+		if (pMessage == nullptr)
+		{
+			return nullptr;
+		}
+		this->mStaticMessageMap.emplace(name, pMessage);
+		return pMessage;
+	}
 
     bool ProtoComponent::HasMessage(const std::string &name)
     {
@@ -226,11 +221,11 @@ namespace Sentry
 	}
 	std::shared_ptr<Message> ProtoComponent::Read(lua_State * lua, const std::string& name, int index)
 	{
-        std::shared_ptr<Message> message = this->New(name);
-        if (message == nullptr)
-        {
-            return nullptr;
-        }
+        std::shared_ptr<Message> message;
+		if(!this->New(name, message))
+		{
+			return nullptr;
+		}
 		MessageEncoder messageEncoder(lua);
         return messageEncoder.Encode(message, index) ? message : nullptr;
 	}

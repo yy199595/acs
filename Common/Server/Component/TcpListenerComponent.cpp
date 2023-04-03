@@ -22,13 +22,16 @@ namespace Sentry
 
     bool TcpListenerComponent::StopListen()
     {
-        asio::error_code code;
-        this->mBindAcceptor->close(code);
-        if(code)
-        {
-            CONSOLE_LOG_ERROR(code.message());
-            return false;
-        }
+		if(this->mBindAcceptor != nullptr)
+		{
+			asio::error_code code;
+			this->mBindAcceptor->close(code);
+			if (code)
+			{
+				CONSOLE_LOG_ERROR(code.message());
+				return false;
+			}
+		}
         return true;
     }
 

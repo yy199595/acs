@@ -13,8 +13,10 @@
 #include"Proto/Component/ProtoComponent.h"
 
 #ifdef __ENABLE_MYSQL__
+
 #include"Mysql/Client/MysqlMessage.h"
 #include"Mysql/Component/MysqlDBComponent.h"
+
 #else
 #include"Util/String/StringHelper.h"
 #include"Sqlite/Component/SqliteComponent.h"
@@ -56,12 +58,12 @@ namespace Sentry
 		return true;
 	}
 
-    bool Registry::OnStart()
+	bool Registry::OnStart()
 	{
+		std::shared_ptr<Message> message;
 		ProtoComponent* component = this->GetComponent<ProtoComponent>();
 		LOG_CHECK_RET_FALSE(component->Import("mysql/server.proto"));
-		std::shared_ptr<Message> message = component->New("server.registry");
-		if(message == nullptr)
+		if (!component->New("server.registry", message))
 		{
 			LOG_ERROR("create protobuf type [server.registry] error");
 			return false;
@@ -70,11 +72,11 @@ namespace Sentry
 		this->mTable = message->GetTypeName();
 		this->mMysqlComponent = this->GetComponent<MysqlDBComponent>();
 		LOG_CHECK_RET_FALSE(this->mMysqlComponent != nullptr);
-        this->mIndex = this->mMysqlComponent->MakeMysqlClient();
+		this->mIndex = this->mMysqlComponent->MakeMysqlClient();
 		std::vector<std::string> keys{ "rpc_address", "server_group_id" };
 		std::shared_ptr<Mysql::CreateTabCommand> command =
-                std::make_shared<Mysql::CreateTabCommand>(this->mTable,message, keys);
-        return this->mMysqlComponent->Run(this->mIndex , command)->IsOk();
+				std::make_shared<Mysql::CreateTabCommand>(this->mTable, message, keys);
+		return this->mMysqlComponent->Run(this->mIndex, command)->IsOk();
 #else
 		std::vector<std::string> ret;
 		std::string name = message->GetTypeName();
@@ -92,12 +94,12 @@ namespace Sentry
 	{
 		std::stringstream sqlStream;
 		sqlStream << "select * from " << this->mTable;
-		if(!request.server_name().empty())
+		if (!request.server_name().empty())
 		{
-			const std::string & name = request.server_name();
+			const std::string& name = request.server_name();
 			sqlStream << " where server_name='" << name << "'";
 		}
-		if(request.group_id() != 0)
+		if (request.group_id() != 0)
 		{
 			int id = request.group_id();
 			sqlStream << " and server_group_id=" << id;
@@ -106,11 +108,11 @@ namespace Sentry
 		const std::string sql = sqlStream.str();
 #ifdef __ENABLE_MYSQL__
 		std::shared_ptr<Mysql::QueryCommand> command
-			= std::make_shared<Mysql::QueryCommand>(sql);
+				= std::make_shared<Mysql::QueryCommand>(sql);
 
 		std::shared_ptr<Mysql::Response> response1 =
-			this->mMysqlComponent->Run(this->mIndex, command);
-		const std::vector<std::string> & result = response1->Array();
+				this->mMysqlComponent->Run(this->mIndex, command);
+		const std::vector<std::string>& result = response1->Array();
 #else
 		std::vector<std::string> result;
 		this->mSqliteComponent->Query(this->mDatabaseIndex, sql.c_str(), result);
@@ -145,10 +147,10 @@ namespace Sentry
 		const std::string& server = request.name();
 		LOG_ERROR_RETURN_CODE(!rpc.empty(), XCode::CallArgsError);
 		LOG_ERROR_RETURN_CODE(!server.empty(), XCode::CallArgsError);
-        std::stringstream st;
-        st << "replace into " << this->mTable << " (server_name,rpc_address,";
-        st << "http_address,last_ping_time,last_time_str) values('" << server <<"','" << rpc;
-        st << "','" << http << "'," << Helper::Time::NowSecTime() <<",'" << Helper::Time::GetDateString() << "');";
+		std::stringstream st;
+		st << "replace into " << this->mTable << " (server_name,rpc_address,";
+		st << "http_address,last_ping_time,last_time_str) values('" << server << "','" << rpc;
+		st << "','" << http << "'," << Helper::Time::NowSecTime() << ",'" << Helper::Time::GetDateString() << "');";
 		const std::string sql = st.str();
 #ifdef __ENABLE_MYSQL__
 		if (!this->mMysqlComponent->Execute(this->mIndex, std::make_shared<Mysql::SqlCommand>(sql)))
@@ -167,7 +169,7 @@ namespace Sentry
 		this->mNodeComponent->AddHttpServer(server, http);
 
 		RpcService* rpcService = this->mApp->GetService<Node>();
-		for (const std::string& server : this->mRegistryServers)
+		for (const std::string& server: this->mRegistryServers)
 		{
 			rpcService->Send(server, func, request);
 			LOG_INFO("send server join message to " << server);
@@ -177,22 +179,22 @@ namespace Sentry
 
 	int Registry::Ping(const Rpc::Packet& packet)
 	{
-		const std::string & address = packet.From();
-		const NodeInfo * nodeInfo = this->mInnerComponent->GetNodeInfo(address);
-		if(nodeInfo != nullptr)
+		const std::string& address = packet.From();
+		const NodeInfo* nodeInfo = this->mInnerComponent->GetNodeInfo(address);
+		if (nodeInfo != nullptr)
 		{
-            std::stringstream st;
-            long long time = Helper::Time::NowSecTime();
+			std::stringstream st;
+			long long time = Helper::Time::NowSecTime();
 			const std::string table("server.registry");
-			const std::string & rpc = nodeInfo->RpcAddress;
-            st << "update " << this->mTable << "SET last_ping_time=" << time;
-            st << ",last_time_str='" << Helper::Time::GetDateString() << "' where rpc_address='" << rpc << "'";
-            const std::string sql = st.str();
+			const std::string& rpc = nodeInfo->RpcAddress;
+			st << "update " << this->mTable << "SET last_ping_time=" << time;
+			st << ",last_time_str='" << Helper::Time::GetDateString() << "' where rpc_address='" << rpc << "'";
+			const std::string sql = st.str();
 #ifdef __ENABLE_MYSQL__
-			if(!this->mMysqlComponent->Execute(this->mIndex, std::make_shared<Mysql::SqlCommand>(sql)))
-            {
-                return XCode::SaveToMysqlFailure;
-            }
+			if (!this->mMysqlComponent->Execute(this->mIndex, std::make_shared<Mysql::SqlCommand>(sql)))
+			{
+				return XCode::SaveToMysqlFailure;
+			}
 #else
 			if(!this->mSqliteComponent->Exec(this->mDatabaseIndex, sql.c_str()))
 			{
@@ -230,7 +232,7 @@ namespace Sentry
 		{
 			this->mRegistryServers.erase(iter);
 		}
-		for (const std::string& target : this->mRegistryServers)
+		for (const std::string& target: this->mRegistryServers)
 		{
 			rpcService->Send(target, func, request);
 		}

@@ -56,11 +56,11 @@ namespace Sentry
 
     int MysqlDB::Create(const db::mysql::create &request)
     {
-        std::shared_ptr<Message> message = this->mProtoComponent->New(request.data());
-        if (message == nullptr)
-        {
-            return XCode::CallArgsError;
-        }
+        std::shared_ptr<Message> message;
+		if(!this->mProtoComponent->New(request.data(), message))
+		{
+			return XCode::CallArgsError;
+		}
 		const std::string & table = request.table();
         if(table.find('.') == std::string::npos)
         {
@@ -122,8 +122,8 @@ namespace Sentry
 			return XCode::CallArgsError;
 		}
 		const Any & data = request.data();
-		std::shared_ptr<Message> message = this->mProtoComponent->New(data);
-		if(message == nullptr)
+		std::shared_ptr<Message> message;
+		if(!this->mProtoComponent->New(data, message))
 		{
 			return XCode::CreateProtoFailure;
 		}
@@ -143,9 +143,9 @@ namespace Sentry
 		{
 			return XCode::CallArgsError;
 		}
+		std::shared_ptr<Message> message;
 		const Any & data = request.data();
-		std::shared_ptr<Message> message = this->mProtoComponent->New(data);
-		if(message == nullptr)
+		if(!this->mProtoComponent->New(data, message))
 		{
 			return XCode::CreateProtoFailure;
 		}
