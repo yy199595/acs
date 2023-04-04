@@ -6,4 +6,4 @@ nohup ./app ./config/config.json HttpServer &
 nohup ./app ./config/config.json ChatServer &
 nohup ./app ./config/config.json GateServer &
 nohup ./app ./config/config.json LogServer &
-tail -f ./nohup.out
+ps -ux|grep app
