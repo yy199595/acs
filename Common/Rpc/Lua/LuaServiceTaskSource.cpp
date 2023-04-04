@@ -12,13 +12,13 @@
 namespace Sentry
 {
 	LuaServiceTaskSource::LuaServiceTaskSource(Http::DataResponse* message)
-		: mHttpData(message)
+		: mHttpData(message), mRpcData(nullptr)
     {		
         this->mCode = XCode::LuaCoroutineWait;
     }
 
 	LuaServiceTaskSource::LuaServiceTaskSource(std::shared_ptr<Message> message)
-		: mRpcData(std::move(message)), mHttpData(nullptr)
+		: mHttpData(nullptr), mRpcData(std::move(message))
 	{
 
 	}

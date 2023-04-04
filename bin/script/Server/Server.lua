@@ -16,6 +16,7 @@ end
 function Main.OnClusterComplete()
     
     --Mongo.ClearTable("user.account_info")
+    Http.Download("http://127.0.0.1:8080/1122.exe", "./3344.exe");
 
     local id = Mysql.Make()
     local res = Mysql.Exec(id, "insert into server.registry(server_name,rpc_address,http_address)values('test','127.0.0.1:7788','http://127.0.0.1:80')")

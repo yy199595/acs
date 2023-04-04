@@ -16,10 +16,10 @@ namespace Sentry
 	 public:
 		HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy, HttpComponent * component);
 	 public:
-		void Do(std::shared_ptr<Http::Request> request, int taskId, int timeout = 15);
 		void Do(std::shared_ptr<Http::Request> request, std::shared_ptr<Http::IResponse> response, int taskId, int timeout = 15);
 	 private:
         void ConnectHost();
+		void OnReadLater(int num);
         void OnTimeout(Asio::Code code);
         void OnComplete(HttpStatus code);
         void OnConnect(const asio::error_code &error, int count) final;

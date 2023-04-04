@@ -241,7 +241,6 @@ namespace Sentry
 
 	void Registry::OnSecondUpdate(int tick)
 	{
-		if (tick % 10 != 0) return;
-		long long now = Helper::Time::NowSecTime();
+
 	}
 }

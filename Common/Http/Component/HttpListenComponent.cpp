@@ -89,8 +89,8 @@ namespace Sentry
 			= std::make_shared<Http::FileResponse>(fs);
 		{
 			response->SetCode(HttpStatus::OK);
-			response->Header().Add("content-type", type);
-			response->Header().Add("content-length", response->ContentSize());
+			response->Header().Add(Http::HeadName::ContentType, type);
+			response->Header().Add(Http::HeadName::ContentLength, response->ContentSize());
 		}
 		return this->Send(address, response);
 	}

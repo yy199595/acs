@@ -11,6 +11,8 @@ namespace Json
 {
     class Writer;
 }
+
+
 namespace Http
 {
     class IResponse : public IStream, public Tcp::ProtoMessage
@@ -24,10 +26,10 @@ namespace Http
 		const std::string & GetError() const { return this->mError; }
 	 protected:
 		virtual int OnWriterContent(std::ostream & buff) = 0;
-		virtual bool OnReadContent(const char * str, size_t size) = 0;
+		virtual int OnReadContent(const char * str, size_t size) = 0;
 	 public:
 		virtual size_t ContentSize() = 0;
-		bool OnRead(std::istream &buffer) final;
+		int OnRead(std::istream &buffer) final;
 		int OnWrite(std::ostream &buffer) final;
 		int Serialize(std::ostream &os) final { return this->OnWrite(os); }
 	 protected:
@@ -43,8 +45,9 @@ namespace Http
     {
 	 protected:
 		int OnWriterContent(std::ostream &buff) final;
-		bool OnReadContent(const char *str, size_t size) final;
+		int OnReadContent(const char *str, size_t size) final;
     public:
+		void OnComplete() final { }
 		void Str(HttpStatus code, const std::string & str);
         void Json(HttpStatus code, Json::Writer & doc);
 		void Html(HttpStatus code, const std::string & html);
@@ -69,8 +72,9 @@ namespace Http
 		FileResponse(std::ofstream * fs);
 		~FileResponse();
 	 public:
+		void OnComplete() final;
 		int OnWriterContent(std::ostream &buff) final;
-		bool OnReadContent(const char *str, size_t size) final;
+		int OnReadContent(const char *str, size_t size) final;
 	 private:
 		size_t ContentSize() final { return this->mFileSize; }
 	 private:

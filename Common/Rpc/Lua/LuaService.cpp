@@ -87,7 +87,6 @@ namespace Lua
         }
         if (!methodConfig->Request.empty())
         {
-			int t1 = lua_type(lua, 3);
             const std::string &pb = methodConfig->Request;
             ProtoComponent *messageComponent = App::Inst()->GetMsgComponent();
             std::shared_ptr<Message> message = messageComponent->Read(lua, pb, 3);
@@ -211,7 +210,6 @@ namespace Lua
         }
         if (!methodConfig->Request.empty())
         {
-            int t1 = lua_type(lua, 3);
             const std::string& pb = methodConfig->Request;
             ProtoComponent* messageComponent = App::Inst()->GetMsgComponent();
             std::shared_ptr<Message> message = messageComponent->Read(lua, pb, 3);
@@ -229,7 +227,7 @@ namespace Lua
         }
 
         lua_pushthread(lua);
-        const std::string& response = methodConfig->Response;
+        //const std::string& response = methodConfig->Response;
         request->GetHead().Add("func", methodConfig->FullName);
         InnerNetMessageComponent* netMessageComponent = App::Inst()->GetComponent<InnerNetMessageComponent>();
         if (netMessageComponent == nullptr)

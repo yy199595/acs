@@ -103,7 +103,7 @@ namespace Sentry
 			std::unique_ptr<Component> component = ComponentFactory::CreateComponent<T>();
 			if (component == nullptr)
 			{
-				const char * name = typeid(T).name();
+				//const char * name = typeid(T).name();
 				return false;
 			}
 			const std::string& name = ComponentFactory::GetName<T>();

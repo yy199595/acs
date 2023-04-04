@@ -123,6 +123,7 @@ namespace Sentry
 			}
 		}
 		this->mMd5 = md5;
+		return true;
 	}
 
 	bool CsvTextConfig::LoadConfig(const std::string& path)

@@ -44,7 +44,6 @@ namespace Lua
             return lua_isfunction(this->mLua, -1);
         }
         lua_getref(this->mLua, this->mIndex);
-        const char * n = lua_typename(this->mLua, -1);
         if(lua_getfunction(this->mLua, -1, func.c_str()))
         {
             if(ref)

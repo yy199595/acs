@@ -56,6 +56,8 @@ namespace Helper
             case FieldDescriptor::TYPE_STRING:
                 value = reflection->GetString(message, fileDesc);
                 break;
+			default:
+				return false;
         }
         return true;
     }

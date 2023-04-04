@@ -10,14 +10,14 @@ namespace Sentry
 {
 
 	InnerNetClient::InnerNetClient(IRpc<Rpc::Packet>* component, std::shared_ptr<SocketProxy> socket)
-		: TcpContext(std::move(socket), 1024 * 1024), mComponent(component), mIsClient(false)
+		: TcpContext(std::move(socket), 1024 * 1024), mIsClient(false), mComponent(component)
 	{
         this->mState = Tcp::DecodeState::Head;
 	}
 
 	InnerNetClient::InnerNetClient(IRpc<Rpc::Packet> * component,
                                    std::shared_ptr<SocketProxy> socket, AuthInfo info)
-		: TcpContext(std::move(socket), 1024 * 1024), mComponent(component), mAuthInfo(std::move(info)), mIsClient(true)
+		: TcpContext(std::move(socket), 1024 * 1024), mIsClient(true), mAuthInfo(std::move(info)), mComponent(component)
     {
         this->mState = Tcp::DecodeState::Head;
     }

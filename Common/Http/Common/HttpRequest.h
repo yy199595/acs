@@ -46,11 +46,11 @@ namespace Http
         const std::string & Content() const { return this->mContent;}
         bool GetParameter(const std::string & key, std::string & value) const;
     public:
-        bool OnRead(std::istream &buffer) final;
+        int OnRead(std::istream &buffer) final;
         int OnWrite(std::ostream &buffer) final;
         int Serialize(std::ostream &os) final;
     protected:
-        virtual bool OnReadContent(std::istream & buffer) = 0;
+        virtual int OnReadContent(std::istream & buffer) = 0;
         virtual int OnWriteContent(std::ostream & buffer) = 0;
     protected:
         Head mHead;
@@ -77,7 +77,8 @@ namespace Http
 		GetRequest(): Request("GET", "") { }
 		GetRequest(const std::string & from) :Request("GET", from) { }
     protected:
-        bool OnReadContent(std::istream &buffer) final;
+        void OnComplete() final { }
+        int OnReadContent(std::istream &buffer) final;
         int OnWriteContent(std::ostream &buffer) final;
     protected:
         bool WriteLua(lua_State* lua) const final;
@@ -98,7 +99,8 @@ namespace Http
         void Json(const std::string & json);
         void Json(const char * str, size_t size);
     public:
-        bool OnReadContent(std::istream &buffer) final;
+        void OnComplete() final;
+        int OnReadContent(std::istream &buffer) final;
         int OnWriteContent(std::ostream &buffer) final;
     protected:
         bool WriteLua(lua_State* lua) const final;

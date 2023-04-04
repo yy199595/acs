@@ -16,7 +16,7 @@ namespace Sentry
     {
     public:
         NodeConfig(const std::string & name)
-            : mName(name), mIsAutoAllot(false) { }
+            : mIsAutoAllot(false), mName(name) { }
     public:
         bool OnLoadConfig(const rapidjson::Value & value);
     public:

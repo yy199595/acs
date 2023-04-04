@@ -17,13 +17,6 @@ namespace Sentry
 		this->mHttpComponent = httpComponent;
     }
 
-	void HttpRequestClient::Do(std::shared_ptr<Http::Request> request, int taskId, int timeout)
-	{
-		std::shared_ptr<Http::IResponse> response =
-			std::make_shared<Http::DataResponse>();
-		this->Do(request, response, taskId, timeout);
-	}
-
 	void HttpRequestClient::Do(std::shared_ptr<Http::Request> request,
 		std::shared_ptr<Http::IResponse> response, int taskId, int timeout)
 	{
@@ -88,6 +81,7 @@ namespace Sentry
             asio::error_code err;
             this->mTimer->cancel_one(err);
         }
+        this->mResponse->OnComplete();
 #ifdef ONLY_MAIN_THREAD
         this->mHttpComponent->OnResponse(this->mTaskId, std::move(this->mResponse));
 #else
@@ -98,44 +92,58 @@ namespace Sentry
     }
 
     void HttpRequestClient::OnReceiveLine(const Asio::Code &code, std::istream &is, size_t size)
-    {
-        if(this->mTimer != nullptr)
-        {
-            Asio::Code err;
-            this->mTimer->cancel(err);
-            this->mTimer = nullptr;
-        }
-        if(code && code != asio::error::eof)
-        {
-            this->OnComplete(HttpStatus::INTERNAL_SERVER_ERROR);
-            return;
-        }
-        else
-        {
-            this->mResponse->OnRead(is);
-            this->ReceiveSomeMessage();
-        }
-    }
+	{
+		if (this->mTimer != nullptr)
+		{
+			Asio::Code err;
+			this->mTimer->cancel(err);
+			this->mTimer = nullptr;
+		}
+		if (code && code != asio::error::eof)
+		{
+			this->OnReadLater(HTTP_READ_ERROR);
+			return;
+		}
+		this->OnReadLater(this->mResponse->OnRead(is));
+	}
+
+	void HttpRequestClient::OnReadLater(int num)
+	{
+		switch(num)
+		{
+			case 0: //完成
+				this->OnComplete(HttpStatus::OK);
+				break;
+			case -1: //读一行
+				this->ReceiveLine();
+				break;
+			case -2: //读一些
+				this->ReceiveSomeMessage();
+				break;
+			case -3: //消息错误
+				this->OnComplete(HttpStatus::INTERNAL_SERVER_ERROR);
+				break;
+			default:
+				this->ReceiveMessage(num);
+				break;
+		}
+	}
 
     void HttpRequestClient::OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t size)
-    {
-        if(code && code != asio::error::eof)
-        {
-            this->OnComplete(HttpStatus::INTERNAL_SERVER_ERROR);
-        }
-        else
-        {
-            if (code == asio::error::eof || size == 0)
-            {
-                this->OnComplete(HttpStatus::OK);
-                return;
-            }
-            this->mResponse->OnRead(is);
-            {
-                this->ReceiveSomeMessage();
-            }
-        }
-    }
+	{
+		if (code && code != asio::error::eof)
+		{
+			this->OnReadLater(HTTP_READ_ERROR);
+			return;
+		}
+		if (code == asio::error::eof || size == 0)
+		{
+			this->OnComplete(HttpStatus::OK);
+			this->OnReadLater(HTTP_READ_COMPLETE);
+			return;
+		}
+		this->OnReadLater(this->mResponse->OnRead(is));
+	}
 
     void HttpRequestClient::ConnectHost()
     {

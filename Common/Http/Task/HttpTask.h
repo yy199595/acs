@@ -12,12 +12,11 @@ namespace Sentry
     class HttpRequestTask : public IRpcTask<Http::IResponse>
     {
     public:
-        explicit HttpRequestTask(int id);
+        explicit HttpRequestTask();
     public:
         void OnResponse(std::shared_ptr<Http::IResponse> response) final;
         std::shared_ptr<Http::IResponse> Await() { return this->mTask.Await();}
-    private:
-        long long mTaskId;
+    private:        
         TaskSource<std::shared_ptr<Http::IResponse>> mTask;
     };
     typedef std::shared_ptr<IRpcTask<Http::DataResponse>> SharedHttpRpcTask;

@@ -17,16 +17,16 @@ namespace Sentry
 		HttpComponent();
 	 public:
 		std::shared_ptr<HttpRequestClient> CreateClient();
-		int Download(const std::string & url, const std::string & path);
+		bool Download(const std::string & url, const std::string & path);
 		std::shared_ptr<Http::DataResponse> Get(const std::string& url, float second = 15.0f);
 		std::shared_ptr<Http::DataResponse> Post(const std::string& url, const std::string& data, float second = 15.0f);
 	public:
-		void Send(const std::shared_ptr<Http::Request> & request, int & taskId);
+		std::shared_ptr<Http::DataResponse> Request(const std::shared_ptr<Http::Request>& request);
+		void Send(const std::shared_ptr<Http::Request> & request, std::shared_ptr<Http::IResponse> response, int & taskId);
     private:
         bool LateAwake() final;
 		void OnTaskComplete(int key) final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
-		std::shared_ptr<Http::DataResponse> Request(const std::shared_ptr<Http::Request> & request);
 	 private:
         class ThreadComponent * mNetComponent;
 		Util::NumberBuilder<int, 10> mNumberPool;

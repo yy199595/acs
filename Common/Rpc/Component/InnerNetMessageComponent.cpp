@@ -36,7 +36,7 @@ namespace Sentry
 
 	int InnerNetMessageComponent::HandlerRequest(std::shared_ptr<Rpc::Packet> message)
 	{
-        const Rpc::Head & head = message->ConstHead();
+        //const Rpc::Head & head = message->ConstHead();
 		const std::string & fullName = message->GetHead().GetStr("func");
         const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
         if(methodConfig == nullptr)

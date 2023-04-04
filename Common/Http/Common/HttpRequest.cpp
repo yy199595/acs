@@ -84,7 +84,7 @@ namespace Http
 		}
 		return false;
 	}
-    bool Request::OnRead(std::istream &buffer)
+    int Request::OnRead(std::istream &buffer)
     {
         if(this->mState == DecodeState::None)
         {
@@ -121,7 +121,7 @@ namespace Http
 
 namespace Http
 {
-    bool GetRequest::OnReadContent(std::istream &buffer)
+    int GetRequest::OnReadContent(std::istream &buffer)
     {
 		this->mPath = this->mUrl;
         size_t pos = this->mUrl.find('?');
@@ -129,7 +129,7 @@ namespace Http
         {
             this->mContent = this->mUrl.substr(pos + 1);
         }
-        return true;
+        return HTTP_READ_COMPLETE;
     }
 
     bool GetRequest::WriteLua(lua_State* lua) const
@@ -173,17 +173,28 @@ namespace Http
 
 namespace Http
 {
-    bool PostRequest::OnReadContent(std::istream &buffer)
+    int PostRequest::OnReadContent(std::istream &buffer)
     {
-        char buff[128] = {0};
-        this->mPath = this->mUrl;
-        size_t size = buffer.readsome(buff, sizeof(buff));
-        while(size > 0)
-        {
-            this->mContent.append(buff, size);
-            size = buffer.readsome(buff, sizeof(buff));
-        }
-        return false;
+		char buff[128] = {0};
+		int length = this->mHead.ContentLength();
+		if(length > 0)
+		{
+			size_t size = buffer.readsome(buff, sizeof(buff));
+			while(size > 0)
+			{
+				this->mContent.append(buff, size);
+				size = buffer.readsome(buff, sizeof(buff));
+			}
+			int len = length - this->mContent.size();
+			return len <= 512 ? len : 512;
+		}
+		size_t size = buffer.readsome(buff, sizeof(buff));
+		while(size > 0)
+		{
+			this->mContent.append(buff, size);
+			size = buffer.readsome(buff, sizeof(buff));
+		}
+		return HTTP_READ_SOME;
     }
 
     bool PostRequest::WriteLua(lua_State* lua) const
@@ -212,7 +223,9 @@ namespace Http
 
     void PostRequest::Str(const std::string &str)
     {
-        this->mContent = str;
+        this->mContent.assign(str);
+		this->mHead.Add(Http::HeadName::ContentType, Http::ContentName::TEXT);
+		this->mHead.Add(Http::HeadName::ContentLength, this->mContent.size());
     }
 
     void PostRequest::Json(const std::string &json)
@@ -222,8 +235,9 @@ namespace Http
 
     void PostRequest::Json(const char *str, size_t size)
     {
-        this->mContent.append(str, size);
-        this->mHead.Add("content-type", "applocation/json");
+        this->mContent.assign(str, size);
+		this->mHead.Add(Http::HeadName::ContentType, Http::ContentName::JSON);
+		this->mHead.Add(Http::HeadName::ContentLength, this->mContent.size());
     }
 
     int PostRequest::OnWriteContent(std::ostream &buffer)
@@ -231,6 +245,11 @@ namespace Http
         buffer.write(this->mContent.c_str(), this->mContent.size());
         return 0;
     }
+
+	void PostRequest::OnComplete()
+	{
+		this->mPath = this->mUrl;
+	}
 }
 
 namespace Http

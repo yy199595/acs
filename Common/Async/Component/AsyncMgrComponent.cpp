@@ -17,10 +17,9 @@ namespace Sentry
 	}
 
 	AsyncMgrComponent::AsyncMgrComponent()
-		: mMainContext(nullptr),
-		  mRunContext(nullptr)
 	{
-
+		this->mRunContext = nullptr;
+		this->mMainContext = nullptr;
 	}
 
 	void AsyncMgrComponent::RunTask(tb_context_t context)

@@ -26,6 +26,17 @@ namespace Http
         return true;
     }
 
+	bool Head::Get(const std::string& k, int& v) const
+	{
+		auto iter = this->mHeads.find(k);
+		if (iter == this->mHeads.end())
+		{
+			return false;
+		}
+		v = std::stoi(iter->second);
+		return true;
+	}
+
     bool Head::Get(const std::string& k, long long& v) const
     {
         auto iter = this->mHeads.find(k);
@@ -48,16 +59,18 @@ namespace Http
         return true;
     }
 
-    bool Head::OnRead(std::istream &buffer)
+    int Head::OnRead(std::istream &buffer)
     {
         std::string lineData;
         while(std::getline(buffer, lineData))
         {
             if(lineData == "\r")
             {
-                return true;
+				this->Get(Http::HeadName::ContentType, this->mContentType);
+				this->Get(Http::HeadName::ContentLength, this->mContentLength);
+                return HTTP_READ_COMPLETE;
             }
-            size_t pos = lineData.find(":");
+            size_t pos = lineData.find(':');
             if (pos != std::string::npos)
             {
                 size_t length = lineData.size() - pos - 2;
@@ -65,12 +78,13 @@ namespace Http
                 this->mHeads.emplace(key, lineData.substr(pos + 1, length));
             }
         }
-        return false;
+        return HTTP_READ_LINE;
     }
 
     int Head::OnWrite(std::ostream &buffer)
     {
-        for(auto iter = this->mHeads.begin(); iter != this->mHeads.end(); iter++)
+		auto iter = this->mHeads.begin();
+        for(; iter != this->mHeads.end(); iter++)
         {
             const std::string & key = iter->first;
             const std::string & value = iter->second;

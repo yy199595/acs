@@ -21,7 +21,7 @@ namespace Sentry
         this->mTypeContent["css"] = Http::ContentName::CSS;
         this->mTypeContent["json"] = Http::ContentName::JSON;
         this->mTypeContent["html"] = Http::ContentName::HTML;
-        this->mTypeContent["txt"] = Http::ContentName::STRING;
+        this->mTypeContent["txt"] = Http::ContentName::TEXT;
 		this->mTypeContent["mp4"] = Http::ContentName::MP4;
         this->mTypeContent["ico"] = Http::ContentName::ICO;
         this->mTypeContent["png"] = Http::ContentName::PNG;

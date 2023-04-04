@@ -12,10 +12,11 @@ namespace Http
 	IResponse::IResponse()
 	{
 		this->mVersion = HttpVersion;
+		this->mCode = (int)HttpStatus::OK;
 		this->mParseState = DecodeState::None;
 	}
 
-	bool IResponse::OnRead(std::istream& buffer)
+	int IResponse::OnRead(std::istream& buffer)
 	{
 		if(this->mParseState == DecodeState::None)
 		{
@@ -27,26 +28,29 @@ namespace Http
 		}
 		if(this->mParseState == DecodeState::Head)
 		{
-			if(!this->mHead.OnRead(buffer))
+			if(this->mHead.OnRead(buffer) == HTTP_READ_LINE)
 			{
-				return false;
+				return HTTP_READ_LINE;
 			}
 			this->mParseState = DecodeState::Body;
 		}
 		if(this->mParseState == DecodeState::Body)
 		{
-			char buff[128] = {0};
+			int count = 0;
+			char buff[512] = {0};
 			size_t size = buffer.readsome(buff, sizeof(buff));
 			while(size > 0)
 			{
-				if(this->OnReadContent(buff, size))
+				count = this->OnReadContent(buff, size);
+				if(count <= 0)
 				{
-					return true;
+					return count;
 				}
 				size = buffer.readsome(buff, sizeof(buff));
 			}
+			return count;
 		}
-		return false;
+		return HTTP_READ_ERROR;
 	}
 
 	int IResponse::OnWrite(std::ostream& buffer)
@@ -60,8 +64,7 @@ namespace Http
 			buffer << "\r\n";
 			this->mParseState = DecodeState::Body;
 		}
-		int count = this->OnWriterContent(buffer);
-		return count;
+		return this->OnWriterContent(buffer);
 	}
 }
 
@@ -75,10 +78,16 @@ namespace Http
 		return 0;
 	}
 
-	bool DataResponse::OnReadContent(const char* str, size_t size)
+	int DataResponse::OnReadContent(const char* str, size_t size)
 	{
+		long long length = this->mHead.ContentLength();
+		if(length > 0)
+		{
+			this->mContent.append(str, size);
+			return length - this->mContent.size();
+		}
 		this->mContent.append(str, size);
-		return true;
+		return HTTP_READ_SOME;
 	}
 
 
@@ -86,24 +95,24 @@ namespace Http
     {
 		this->mCode = (int)code;
         this->mContent.assign(str.c_str(), str.size());
-		this->mHead.Add("content-type", Http::ContentName::STRING);
-		this->mHead.Add("content-length", (int)this->mContent.size());
+		this->mHead.Add(Http::HeadName::ContentType, Http::ContentName::TEXT);
+		this->mHead.Add(Http::HeadName::ContentLength, (int)this->mContent.size());
 	}
 
     void DataResponse::Json(HttpStatus code, Json::Writer& doc)
     {
 		this->mCode = (int)code;
 		doc.WriterStream(&mContent);
-        this->mHead.Add("content-type", Http::ContentName::JSON);
-		this->mHead.Add("content-length", (int)this->mContent.size());
+        this->mHead.Add(Http::HeadName::ContentType, Http::ContentName::JSON);
+		this->mHead.Add(Http::HeadName::ContentLength, (int)this->mContent.size());
 	}
 
 	void DataResponse::Html(HttpStatus code, const std::string& html)
 	{
 		this->mCode = (int)code;
 		this->mContent.assign(html);
-		this->mHead.Add("content-type", Http::ContentName::HTML);
-		this->mHead.Add("content-length", (int)this->mContent.size());
+		this->mHead.Add(Http::HeadName::ContentType, Http::ContentName::HTML);
+		this->mHead.Add(Http::HeadName::ContentLength, (int)this->mContent.size());
 	}
 
     void DataResponse::Json(HttpStatus code, const std::string &json)
@@ -115,16 +124,16 @@ namespace Http
     {
 		this->mCode = (int)code;
 		this->mContent.assign(str, len);
-        this->mHead.Add("content-type", Http::ContentName::JSON);
-		this->mHead.Add("content-length", (int)this->mContent.size());
+        this->mHead.Add(Http::HeadName::ContentType, Http::ContentName::JSON);
+		this->mHead.Add(Http::HeadName::ContentLength, (int)this->mContent.size());
 	}
 
     void DataResponse::Content(HttpStatus code, const std::string& type, const std::string& str)
     {
 		this->mCode = (int)code;
 		this->mContent.assign(str);
-        this->mHead.Add("content-type", type);
-        this->mHead.Add("content-length", (int)this->mContent.size());
+        this->mHead.Add(Http::HeadName::ContentType, type);
+        this->mHead.Add(Http::HeadName::ContentLength, (int)this->mContent.size());
     }
 }
 
@@ -160,11 +169,36 @@ namespace Http
 		}
 	}
 
-	bool FileResponse::OnReadContent(const char* str, size_t size)
+	int FileResponse::OnReadContent(const char* str, size_t size)
 	{
 		assert(this->mOutput);
+		int length = this->mHead.ContentLength();
+		if (length > 0)
+		{
+			this->mCurSize += size;
+			this->mOutput->write(str, size);
+			int len = length - (int)this->mCurSize;
+			return len <= 512 ? len : 512;
+		}
+		this->mCurSize += size;
 		this->mOutput->write(str, size);
-		return false;
+		return HTTP_READ_SOME;
+	}
+
+	void FileResponse::OnComplete()
+	{
+		if (this->mInput)
+		{
+			this->mInput->close();
+			delete this->mInput;
+		}
+		if (this->mOutput)
+		{
+			this->mOutput->close();
+			delete this->mOutput;
+		}
+		this->mInput = nullptr;
+		this->mOutput = nullptr;
 	}
 
 	int FileResponse::OnWriterContent(std::ostream& buff)
@@ -185,10 +219,6 @@ namespace Http
 			}
 
 		} while (readCount > 0 && index < 20);
-//#ifdef __DEBUG__
-//		float process = this->mCurSize / (float )this->mFileSize;
-//		CONSOLE_LOG_INFO("send : [" << (int)(process * 100) << "%]");
-//#endif
 		return (int)(this->mFileSize - this->mCurSize);
 	}
 }

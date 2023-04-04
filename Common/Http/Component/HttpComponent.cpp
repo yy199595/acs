@@ -12,7 +12,7 @@
 #include"Entity/App/App.h"
 #include"Script/Lua/ClassProxyHelper.h"
 #include"Http/Common/HttpRequest.h"
-#include"Http/Common/HttpResponse.h"
+//#include"Http/Common/HttpResponse.h"
 namespace Sentry
 {
 	HttpComponent::HttpComponent()
@@ -65,9 +65,29 @@ namespace Sentry
 		luaRegister.PushExtensionFunction("Download", Lua::HttpClient::Download);
 	}
 
-	int HttpComponent::Download(const string& url, const string& path)
+	bool HttpComponent::Download(const string& url, const string& path)
     {
-        return XCode::Successful;
+		std::shared_ptr<Http::GetRequest> request(new Http::GetRequest());
+		if (!request->SetUrl(url))
+		{
+			LOG_ERROR("parse " << url << " error");
+			return XCode::Failure;
+		}
+		std::ofstream* fs = new std::ofstream(path, std::ios::ate);
+		if(!fs->is_open())
+		{
+			delete fs;
+			return false;
+		}
+		
+		std::shared_ptr<HttpRequestTask> httpRpcTask = std::make_shared<HttpRequestTask>();
+		std::shared_ptr<Http::FileResponse> response = std::make_shared<Http::FileResponse>(fs);
+		{
+			int taskId = 0;
+			this->AddTask(taskId, httpRpcTask);
+			this->Send(request, response, taskId);
+		}
+		return httpRpcTask->Await()->Code() == HttpStatus::OK;
     }
 
 	void HttpComponent::OnTaskComplete(int key)
@@ -84,25 +104,28 @@ namespace Sentry
 		}
 	}
 
-	void HttpComponent::Send(const std::shared_ptr<Http::Request>& request, int& taskId)
+	void HttpComponent::Send(const std::shared_ptr<Http::Request>& request, 
+		std::shared_ptr<Http::IResponse> response, int& taskId)
 	{
 		taskId = this->mNumberPool.Pop();
 		std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
 		{
-			httpAsyncClient->Do(request, taskId);
+			
+			httpAsyncClient->Do(request, response, taskId);
 			this->mUseClients.emplace(taskId, httpAsyncClient);
 		}
 	}
 
-	std::shared_ptr<Http::DataResponse> HttpComponent::Request(const std::shared_ptr<Http::Request> & request)
-	{
-		int taskId = this->mNumberPool.Pop();
+	std::shared_ptr<Http::DataResponse> HttpComponent::Request(const std::shared_ptr<Http::Request>& request)
+	{	
 		std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
-		std::shared_ptr<HttpRequestTask> httpRpcTask(new HttpRequestTask(taskId));
-
-		httpAsyncClient->Do(request, taskId);
-		this->AddTask(taskId, httpRpcTask);
-		this->mUseClients.emplace(taskId, httpAsyncClient);
+		std::shared_ptr<HttpRequestTask> httpRpcTask = std::make_shared<HttpRequestTask>();
+		std::shared_ptr<Http::DataResponse> response = std::make_shared<Http::DataResponse>();
+		{
+			int taskId = 0;
+			this->AddTask(taskId, httpRpcTask);
+			this->Send(request, response, taskId);
+		}
 		return std::static_pointer_cast<Http::DataResponse>(httpRpcTask->Await());
 	}
 

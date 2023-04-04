@@ -251,7 +251,7 @@ namespace Helper
 
 	std::string Sha1::GetHash(const char* str, size_t size)
 	{
-		size_t sz = 0;
+		//size_t sz = 0;
 		uint8_t digest[SHA1_DIGEST_SIZE];
 		SHA1_CTX ctx;
 		sat_SHA1_Init(&ctx);

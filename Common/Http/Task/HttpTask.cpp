@@ -6,8 +6,8 @@
 #include"Util/Json/Lua/Json.h"
 namespace Sentry
 {
-    HttpRequestTask::HttpRequestTask(int id)
-        : IRpcTask<Http::IResponse>(id)
+    HttpRequestTask::HttpRequestTask()
+        : IRpcTask<Http::IResponse>(0)
     {
 
     }
