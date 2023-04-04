@@ -18,6 +18,7 @@ namespace Sentry
         bool OnInit() final;
 		bool OnStart() final;
         void OnClose() final;
+		int GetClientHandle(int flag = 0);
     private:
 		int Insert(const db::mongo::insert & request);
 		int Delete(const db::mongo::remove & request);
@@ -26,7 +27,9 @@ namespace Sentry
 		int Query(const db::mongo::query::request & request, db::mongo::query::response & response);
 		int RunCommand(const db::mongo::command::request & request, db::mongo::command::response & response);
     private:
+		size_t mIndex;
         std::string mBuffer;
+		std::vector<int> mClients;
         class MongoDBComponent * mMongoComponent;
     };
 }

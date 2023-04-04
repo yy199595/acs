@@ -20,8 +20,11 @@ namespace Sentry
 
 	void MysqlClient::Start()
 	{
-		this->mThread = new std::thread([this] { Update(); });
-		this->mThread->detach();
+		if (this->mThread == nullptr)
+		{
+			this->mThread = new std::thread([this] { Update(); });
+			this->mThread->detach();
+		}
 	}
 
 	void MysqlClient::Update()

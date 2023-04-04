@@ -31,33 +31,38 @@ namespace Sentry
 
 namespace Sentry
 {
-    class MongoDBComponent : public RpcTaskComponent<int,Mongo::CommandResponse>, public IRpc<Mongo::CommandResponse>
+    class MongoDBComponent : public RpcTaskComponent<int,Mongo::CommandResponse>, 
+		public IRpc<Mongo::CommandResponse>, public ILuaRegister
 	{
 	public:
 		MongoDBComponent();
 		~MongoDBComponent() final = default;
 	public:
-        void CloseClients();
-        bool Ping(int index);
+        bool Ping(int id);
         bool SetIndex(const std::string & tab, const std::string & name);
 		inline const MongoConfig & Config() const { return this->mConfig; }
     public:
-		int MakeMongoClient();
+		bool GetClientHandler(int & id);
         void OnClientError(int index, int code);
-        TcpMongoClient * GetClient(int index = -1);
 		unsigned int GetWaitCount() const { return this->mWaitCount; }
-        void Send(TcpMongoClient * mongoClient, std::shared_ptr<CommandRequest> request);
-		std::shared_ptr<Mongo::CommandResponse> Run(TcpMongoClient * mongoClient, const std::shared_ptr<CommandRequest>& request);
+	public:
+        bool Send(int id, std::shared_ptr<CommandRequest> request, int & taskId);
+		std::shared_ptr<Mongo::CommandResponse> Run(int id, const std::shared_ptr<CommandRequest>& request);
 	 private:
 		bool Awake() final;
+		void OnDestroy() final;
+		bool LateAwake() final;
+		TcpMongoClient* GetClient(int index = -1);
+		void OnLuaRegister(Lua::ClassProxyHelper& luaRegister) final;
 		void OnConnectSuccessful(const std::string &address) final;
 		void OnMessage(std::shared_ptr<CommandResponse> message) final;
 		void OnTaskComplete(int key) final { this->mRequestId.Push(key); }
 	private:
 		MongoConfig mConfig;
 		unsigned int mWaitCount;
+		std::queue<int> mAllotQueue;
 		Util::NumberBuilder<int, 10> mRequestId;
-        std::vector<std::shared_ptr<TcpMongoClient>> mMongoClients;
+        std::unordered_map<int, std::shared_ptr<TcpMongoClient>> mMongoClients;
     };
 }
 

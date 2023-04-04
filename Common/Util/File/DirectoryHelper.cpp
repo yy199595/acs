@@ -18,6 +18,7 @@
 #define MakeDirectory(path) mkdir(path.c_str(), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH | S_IXOTH)
 #endif
 #define PATH_MAX_LENGHT 1024
+#include<regex>
 namespace Helper
 {
     namespace Directory
@@ -36,7 +37,12 @@ namespace Helper
             }
             return MakeDirectory(dir) != -1;
         }
-
+        bool IsValidPath(const std::string& path)
+        {          
+            const std::regex pathRegex(R"(^([a-zA-Z]:)?[\\/](?:[^\\/:\*\?"<>\|]+[\\/])*[^\\/:\*\?"<>\|]*$)");
+            return std::regex_match(path, pathRegex);
+        }
+       
     bool DeleteDir(const std::string& dir)
     {
 #ifdef __OS_WIN__

@@ -95,9 +95,9 @@ namespace Http
         }
         if(this->mState == DecodeState::Head)
         {
-            if(!this->mHead.OnRead(buffer))
+            if (this->mHead.OnRead(buffer) == HTTP_READ_LINE)
             {
-                return false;
+                return HTTP_READ_LINE;
             }
             this->mState = DecodeState::Body;
         }

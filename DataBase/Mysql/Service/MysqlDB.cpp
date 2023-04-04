@@ -36,7 +36,8 @@ namespace Sentry
 		const MysqlConfig & config = this->mMysqlComponent->Config();
         for (int index = 0; index <config.MaxCount; index++)
         {
-			int id = this->mMysqlComponent->MakeMysqlClient();
+			int id = 0;
+			if(this->mMysqlComponent->GetClientHandle(id))
 			{
 				this->mClientIdQueue.emplace(id);
 				this->mClientIds.emplace_back(id);
@@ -47,11 +48,7 @@ namespace Sentry
 
     void MysqlDB::OnClose()
     {
-        this->WaitAllMessageComplete();
-		for(int id : this->mClientIds)
-		{
-			this->mMysqlComponent->CloseClient(id);
-		}
+        this->WaitAllMessageComplete();		
     }
 
     int MysqlDB::Create(const db::mysql::create &request)

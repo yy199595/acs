@@ -108,6 +108,13 @@ namespace Sentry
 		else
 		{
 			this->mHttpRequest->OnComplete();
+			if (this->mTimer != nullptr)
+			{
+				this->mTimeout = 0;
+				asio::error_code code;
+				this->mTimer->cancel(code);
+				this->mTimer = nullptr;
+			}
 #ifdef ONLY_MAIN_THREAD
 			this->mHttpComponent->OnRequest(address, this->mHttpRequest);
 #else

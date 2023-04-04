@@ -100,22 +100,21 @@ namespace Lua
         size_t size, size2 = 0;
         const char* url = luaL_checklstring(lua, 1, &size);
         const char* path = luaL_checklstring(lua, 2, &size2);
+        if (!Helper::Directory::IsValidPath(path))
+        {
+            luaL_error(lua, "path error : %s", path);
+            return 0;
+        }
         std::shared_ptr<Http::GetRequest> request = std::make_shared<Http::GetRequest>();
         if (!request->SetUrl(std::string(url, size)))
         {
             luaL_error(lua, "parse post url : [%s] failure", url);
             return 0;
         }
-        std::ofstream* fs = new std::ofstream(path, std::ios::ate);
-        if (!fs->is_open())
-        {
-            delete fs;
-            luaL_error(lua, "open file : %s failure", path);
-            return 0;
-        }
+       
         int taskId = 0;
         std::shared_ptr<LuaHttpRequestTask> luaHttpTask(new LuaHttpRequestTask(lua));
-        std::shared_ptr<Http::FileResponse> response = std::make_shared<Http::FileResponse>(fs);
+        std::shared_ptr<Http::FileResponse> response = std::make_shared<Http::FileResponse>(path);
         httpComponent->Send(request, response, taskId);
         return httpComponent->AddTask(taskId, luaHttpTask)->Await();
 	}

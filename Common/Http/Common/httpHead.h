@@ -37,6 +37,7 @@ namespace Http
     class Head : public IStream
     {
     public:
+        Head() : mContentLength(0) { }
         bool Add(const std::string & k, int v);
         bool Add(const std::string & k, const std::string & v);
     public:

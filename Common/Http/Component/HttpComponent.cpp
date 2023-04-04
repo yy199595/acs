@@ -12,6 +12,7 @@
 #include"Entity/App/App.h"
 #include"Script/Lua/ClassProxyHelper.h"
 #include"Http/Common/HttpRequest.h"
+#include"Util/File/DirectoryHelper.h"
 //#include"Http/Common/HttpResponse.h"
 namespace Sentry
 {
@@ -73,15 +74,13 @@ namespace Sentry
 			LOG_ERROR("parse " << url << " error");
 			return XCode::Failure;
 		}
-		std::ofstream* fs = new std::ofstream(path, std::ios::ate);
-		if(!fs->is_open())
+		if (!Helper::Directory::IsValidPath(path))
 		{
-			delete fs;
-			return false;
+			return XCode::CallArgsError;
 		}
-		
+	
 		std::shared_ptr<HttpRequestTask> httpRpcTask = std::make_shared<HttpRequestTask>();
-		std::shared_ptr<Http::FileResponse> response = std::make_shared<Http::FileResponse>(fs);
+		std::shared_ptr<Http::FileResponse> response = std::make_shared<Http::FileResponse>(path);
 		{
 			int taskId = 0;
 			this->AddTask(taskId, httpRpcTask);

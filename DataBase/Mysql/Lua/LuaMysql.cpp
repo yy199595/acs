@@ -21,7 +21,12 @@ namespace Lua
 			luaL_error(lua, "not find [MysqlDBComponent]");
 			return 0;
 		}
-		int id = component->MakeMysqlClient();
+		int id = 0;
+		if (!component->GetClientHandle(id))
+		{
+			luaL_error(lua, "get mysql client handle error");
+			return 0;
+		}
 		lua_pushinteger(lua, id);
 		return 1;
 	}

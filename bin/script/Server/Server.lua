@@ -1,6 +1,6 @@
 
 local Main = {}
-local Mongo = require("Server.MongoComponent")
+local MongoDB = require("Server.MongoComponent")
 
 function Main.Awake()
 
@@ -15,14 +15,15 @@ end
 
 function Main.OnClusterComplete()
     
-    --Mongo.ClearTable("user.account_info")
-    Http.Download("http://127.0.0.1:8080/1122.exe", "./3344.exe");
-
+    --MongoDB.ClearTable("user.account_info")
+    --Http.Download("http://127.0.0.1:8080/1122.exe", "D:\\trunk\\ssh\\Sentry\\bin\\1122.exe");
+    local res, data = Http.Get("http://www.baidu.com")
+    print("baidu res = ", res, data)
     local id = Mysql.Make()
     local res = Mysql.Exec(id, "insert into server.registry(server_name,rpc_address,http_address)values('test','127.0.0.1:7788','http://127.0.0.1:80')")
     res = Mysql.QueryOnce(id, "select * from server.registry")
     table.print(res)
-    local code = Mongo.InsertOnce("user.account_info", {
+    local code = MongoDB.InsertOnce("user.account_info", {
         _id = "646585122@qq.com",
         user_id = 11223344,
         phone_num = 13716061995,
@@ -31,7 +32,7 @@ function Main.OnClusterComplete()
         token = "JJIOJOIJOJOO"
     }, 0)
     Log.Error("code = ", code)
-    code = Mongo.Update("user.account_info", {
+    code = MongoDB.Update("user.account_info", {
         _id = "646585122@qq.com",
     }, {
         login_time = os.time(),
@@ -40,7 +41,7 @@ function Main.OnClusterComplete()
     }, 0)
     Log.Error("code = ", code)
 
-   local response = Mongo.QueryOnce("user.account_info", {
+   local response = MongoDB.QueryOnce("user.account_info", {
         _id = "646585122@qq.com",
     })
    table.print(response)

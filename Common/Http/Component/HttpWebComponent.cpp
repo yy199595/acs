@@ -78,23 +78,15 @@ namespace Sentry
 		{
 			const std::string& path = request->Path();
 			auto iter = this->mStaticSourceDir.find(path);
-			if (iter != this->mStaticSourceDir.end())
-			{
-				std::string content;
-				std::ifstream* fs = new std::ifstream();
-				Http::StaticSource& staticSource = iter->second;
-				fs->open(staticSource.mPath, std::ios::in | std::ios::binary);
-				if (!fs->is_open())
-				{
-					delete fs;
-					this->Send(address, HttpStatus::NOT_FOUND);
-					return;
-				}
-				this->Send(address, staticSource.mType, fs);
+			if (iter == this->mStaticSourceDir.end())
+			{						
+                this->Send(address, HttpStatus::NOT_FOUND);
+                LOG_ERROR("[" << address << "] <<" << request->Path() 
+                    << ">>" << HttpStatusToString(HttpStatus::NOT_FOUND));
 				return;
 			}
-			this->Send(address, HttpStatus::NOT_FOUND);
-			LOG_ERROR("[" << address << "] <<" << request->Path() << ">>" << HttpStatusToString(HttpStatus::NOT_FOUND));
+            Http::StaticSource& staticSource = iter->second;
+            this->SendFile(address, staticSource.mType, staticSource.mPath);
 			return;
 		}
 

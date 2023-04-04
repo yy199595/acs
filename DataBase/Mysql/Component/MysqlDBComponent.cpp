@@ -41,15 +41,46 @@ namespace Sentry
 		return true;
 	}
 
-    void MysqlDBComponent::CloseClient(int id)
-    {
-		auto iter = this->mMysqlClients.find(id);
-		if(iter != this->mMysqlClients.end())
+	bool MysqlDBComponent::LateAwake()
+	{
+		for (int index = 0; index < this->mConfig.MaxCount; index++)
+		{
+			std::shared_ptr<MysqlClient> mysqlClient
+				= std::make_shared<MysqlClient>(this, this->mConfig);
+
+			mysqlClient->Start();
+			int id = this->mNumberPool.Pop();
+			this->mAllotQueue.push(id);
+			this->mMysqlClients.emplace(id, std::move(mysqlClient));
+		}
+		return !this->mMysqlClients.empty();
+	}
+
+	bool MysqlDBComponent::GetClientHandle(int & id)
+	{
+		if (this->mAllotQueue.empty())
+		{
+			return false;
+		}
+		id = this->mAllotQueue.front();
+		this->mAllotQueue.push(id);
+		this->mAllotQueue.pop();
+		return true;
+	}
+
+	void MysqlDBComponent::OnDestroy()
+	{
+		while (!this->mAllotQueue.empty())
+		{
+			this->mAllotQueue.pop();
+		}
+		auto iter = this->mMysqlClients.begin();
+		for (;iter != this->mMysqlClients.end(); iter++)
 		{
 			iter->second->Stop();
-			this->mMysqlClients.erase(iter);
 		}
-    }
+		this->mMysqlClients.clear();
+	}
 
 	void MysqlDBComponent::OnConnectSuccessful(const std::string& address)
 	{
@@ -65,17 +96,6 @@ namespace Sentry
 		int key = message->TaskId();
 		this->OnResponse(key, message);
 	}
-
-    int MysqlDBComponent::MakeMysqlClient()
-    {
-        std::shared_ptr<MysqlClient> mysqlClient
-                = std::make_shared<MysqlClient>(this, this->mConfig);
-
-        mysqlClient->Start();
-		int id = this->mNumberPool.Pop();
-        this->mMysqlClients.emplace(id, std::move(mysqlClient));
-        return id;
-    }
 
     bool MysqlDBComponent::Ping(int index)
     {

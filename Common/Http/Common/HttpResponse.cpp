@@ -21,9 +21,12 @@ namespace Http
 		if(this->mParseState == DecodeState::None)
 		{
 			buffer >> this->mVersion;
-			buffer >> this->mCode;
-			buffer >> this->mError;
-			buffer.ignore(2); //放弃\r\n
+			buffer >> this->mCode;		
+			std::getline(buffer, this->mError);
+			if (!this->mError.empty() && this->mError.back() == '\r')
+			{
+				this->mError.pop_back();
+			}
 			this->mParseState = DecodeState::Head;
 		}
 		if(this->mParseState == DecodeState::Head)
@@ -38,7 +41,8 @@ namespace Http
 		{
 			int count = 0;
 			char buff[512] = {0};
-			size_t size = buffer.readsome(buff, sizeof(buff));
+			buffer.read(buff, sizeof(buff));
+			size_t size = buffer.gcount();
 			while(size > 0)
 			{
 				count = this->OnReadContent(buff, size);
@@ -46,7 +50,8 @@ namespace Http
 				{
 					return count;
 				}
-				size = buffer.readsome(buff, sizeof(buff));
+				buffer.read(buff, sizeof(buff));
+				size = buffer.gcount();
 			}
 			return count;
 		}
@@ -55,14 +60,18 @@ namespace Http
 
 	int IResponse::OnWrite(std::ostream& buffer)
 	{
+		HttpStatus code = this->GetCode();
 		if(this->mParseState == DecodeState::None)
 		{
-			buffer << this->mVersion << ' ' << this->mCode << ' '
-				   << HttpStatusToString((HttpStatus)this->mCode) << "\r\n";
-			this->mHead.Add("content-length", (int)this->ContentSize());
+			buffer << this->mVersion << ' ' << (int)code << ' '
+				   << HttpStatusToString(code) << "\r\n";
 			this->mHead.OnWrite(buffer);
 			buffer << "\r\n";
 			this->mParseState = DecodeState::Body;
+		}
+		if (code != HttpStatus::OK)
+		{
+			return 0;
 		}
 		return this->OnWriterContent(buffer);
 	}
@@ -139,20 +148,13 @@ namespace Http
 
 namespace Http
 {
-	FileResponse::FileResponse(std::ifstream* fs)
-		: mInput(fs), mOutput(nullptr)
-	{
-		this->mCurSize = 0;
-		fs->seekg(0, std::ios_base::end);
-		this->mFileSize = fs->tellg();
-		this->mInput->seekg(0, std::ios::beg);
-	}
-
-	FileResponse::FileResponse(std::ofstream* fs)
-		: mOutput(fs), mInput(nullptr)
+	FileResponse::FileResponse(const std::string & path)
+		: mPath(path)
 	{
 		this->mCurSize = 0;
 		this->mFileSize = 0;
+		this->mInput = nullptr;
+		this->mOutput = nullptr;
 	}
 
 	FileResponse::~FileResponse()
@@ -169,19 +171,47 @@ namespace Http
 		}
 	}
 
-	int FileResponse::OnReadContent(const char* str, size_t size)
+	size_t FileResponse::ContentSize()
 	{
-		assert(this->mOutput);
-		int length = this->mHead.ContentLength();
-		if (length > 0)
+		if (this->mInput == nullptr)
 		{
-			this->mCurSize += size;
-			this->mOutput->write(str, size);
-			int len = length - (int)this->mCurSize;
-			return len <= 512 ? len : 512;
+			this->mInput = new std::ifstream();
+			this->mInput->open(this->mPath, std::ios::in | std::ios::binary);
+			if (!this->mInput->is_open())
+			{
+				return HTTP_READ_ERROR;
+			}
+		}
+		if (this->mFileSize == 0)
+		{
+			this->mInput->seekg(0, std::ios::end);
+			this->mFileSize = this->mInput->tellg();
+			this->mInput->seekg(0, std::ios::beg);
+		}
+		return this->mFileSize;
+	}
+
+	int FileResponse::OnReadContent(const char* str, size_t size)
+	{	
+		int length = this->mHead.ContentLength();
+		if (this->mOutput == nullptr)
+		{
+			this->mOutput = new std::ofstream();
+			this->mOutput->open(this->mPath, std::ios::ate | std::ios::binary);
+			if (!this->mOutput->is_open())
+			{
+				return HTTP_READ_ERROR;
+			}
 		}
 		this->mCurSize += size;
 		this->mOutput->write(str, size);
+		if (length > 0)
+		{					
+			int len = length - (int)this->mCurSize;
+			/*double process = this->mCurSize / (double)length;
+			CONSOLE_LOG_DEBUG("process = [" << process * 100 << "%s]");*/
+			return len <= 1024 ? len : 1024;
+		}		
 		return HTTP_READ_SOME;
 	}
 
@@ -194,6 +224,7 @@ namespace Http
 		}
 		if (this->mOutput)
 		{
+			this->mOutput->flush();
 			this->mOutput->close();
 			delete this->mOutput;
 		}
@@ -201,16 +232,28 @@ namespace Http
 		this->mOutput = nullptr;
 	}
 
+	HttpStatus FileResponse::GetCode()
+	{
+		if (this->ContentSize() < 0)
+		{
+			return HttpStatus::INTERNAL_SERVER_ERROR;
+		}
+		return (HttpStatus)this->mCode;
+	}
+
 	int FileResponse::OnWriterContent(std::ostream& buff)
 	{
 		size_t index = 0;
 		size_t readCount = 0;
-		constexpr int Length = 100;
-		char file[Length] = { 0 };
+		 char file[100] = { 0 };
+		if (this->mInput == nullptr)
+		{
+			return HTTP_READ_ERROR;
+		}
 		do
 		{
 			index++;
-			this->mInput->read(file, Length);
+			this->mInput->read(file, sizeof(file));
 			readCount = this->mInput->gcount();
 			if(readCount > 0)
 			{
@@ -218,7 +261,7 @@ namespace Http
 				this->mCurSize += readCount;
 			}
 
-		} while (readCount > 0 && index < 20);
+		} while (!this->mInput->eof() && readCount > 0 && index < 20);
 		return (int)(this->mFileSize - this->mCurSize);
 	}
 }

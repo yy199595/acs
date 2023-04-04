@@ -137,8 +137,7 @@ namespace Sentry
 			return;
 		}
 		if (code == asio::error::eof || size == 0)
-		{
-			this->OnComplete(HttpStatus::OK);
+		{			
 			this->OnReadLater(HTTP_READ_COMPLETE);
 			return;
 		}

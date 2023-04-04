@@ -105,7 +105,7 @@ list(APPEND build_files ${src_database} ${src_server} ${src_client})
 
 if(MSVC) #创建vs目录
 
-    #file(GLOB_RECURSE file_cmake "CMake/*.cmake")
+    file(GLOB_RECURSE file_cmake "CMake/*.cmake")
     file(GLOB_RECURSE file_proto "Gen/*.h" "Gen/*.hpp")
     file(GLOB_RECURSE file_server "Server/*.h" "Server/*.hpp")
     file(GLOB_RECURSE file_client "Client/*.h" "Client/*.hpp")

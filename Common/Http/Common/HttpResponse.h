@@ -27,6 +27,7 @@ namespace Http
 	 protected:
 		virtual int OnWriterContent(std::ostream & buff) = 0;
 		virtual int OnReadContent(const char * str, size_t size) = 0;
+		virtual HttpStatus GetCode() { return (HttpStatus)this->mCode; }
 	 public:
 		virtual size_t ContentSize() = 0;
 		int OnRead(std::istream &buffer) final;
@@ -68,15 +69,15 @@ namespace Http
 	class FileResponse : public IResponse
 	{
 	 public:
-		FileResponse(std::ifstream * fs);
-		FileResponse(std::ofstream * fs);
+		FileResponse(const std::string & path);		
 		~FileResponse();
 	 public:
 		void OnComplete() final;
+		HttpStatus GetCode() final;
 		int OnWriterContent(std::ostream &buff) final;
 		int OnReadContent(const char *str, size_t size) final;
 	 private:
-		size_t ContentSize() final { return this->mFileSize; }
+		 size_t ContentSize() final;
 	 private:
 		size_t mCurSize;
 		size_t mFileSize;

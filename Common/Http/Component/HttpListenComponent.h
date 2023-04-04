@@ -29,7 +29,7 @@ namespace Sentry
         bool Send(const std::string& address, HttpStatus code);
         bool Send(const std::string& address, const std::string & str);
 		bool Send(const std::string& address, std::shared_ptr<Http::IResponse> response);
-		bool Send(const std::string& address, const std::string & type, std::ifstream * fs);
+		bool SendFile(const std::string& address, const std::string & type, const std::string & path);
     private:     
         std::queue<std::shared_ptr<HttpHandlerClient>> mClientPools;
         std::unordered_map<std::string, std::shared_ptr<HttpHandlerClient>> mHttpClients;

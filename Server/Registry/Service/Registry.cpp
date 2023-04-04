@@ -72,7 +72,10 @@ namespace Sentry
 		this->mTable = message->GetTypeName();
 		this->mMysqlComponent = this->GetComponent<MysqlDBComponent>();
 		LOG_CHECK_RET_FALSE(this->mMysqlComponent != nullptr);
-		this->mIndex = this->mMysqlComponent->MakeMysqlClient();
+		if (!this->mMysqlComponent->GetClientHandle(this->mIndex))
+		{
+			return false;
+		}
 		std::vector<std::string> keys{ "rpc_address", "server_group_id" };
 		std::shared_ptr<Mysql::CreateTabCommand> command =
 				std::make_shared<Mysql::CreateTabCommand>(this->mTable, message, keys);

@@ -83,10 +83,10 @@ namespace Sentry
         iter->second->StartWriter(response);
         return true;
     }
-	bool HttpListenComponent::Send(const std::string& address, const std::string& type, std::ifstream* fs)
+	bool HttpListenComponent::SendFile(const std::string& address, const std::string& type, const std::string & path)
 	{
 		std::shared_ptr<Http::IResponse> response
-			= std::make_shared<Http::FileResponse>(fs);
+			= std::make_shared<Http::FileResponse>(path);
 		{
 			response->SetCode(HttpStatus::OK);
 			response->Header().Add(Http::HeadName::ContentType, type);

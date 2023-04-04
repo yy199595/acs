@@ -10,6 +10,7 @@ namespace Sentry
 {
     MongoDB::MongoDB()
     {
+        this->mIndex = 0;
         this->mMongoComponent = nullptr;
     }
 
@@ -33,18 +34,36 @@ namespace Sentry
 
 	bool MongoDB::OnStart()
 	{
+        int id = 0;
 		const MongoConfig & config = this->mMongoComponent->Config();
 		for(int index = 0; index < config.MaxCount; index++)
 		{
-			this->mMongoComponent->MakeMongoClient();
+            if (this->mMongoComponent->GetClientHandler(id))
+            {
+                this->mClients.emplace_back(id);
+            }
 		}
-		return this->mMongoComponent->Ping(0);
+		return this->mMongoComponent->Ping(id);
 	}
 
     void MongoDB::OnClose()
     {
         this->WaitAllMessageComplete(); //等待所有任务完成
-        this->mMongoComponent->CloseClients();
+    }
+
+    int MongoDB::GetClientHandle(int flag)
+    {
+        if (flag == 0)
+        {
+            int id = this->mClients[this->mIndex++];
+            if (this->mIndex >= this->mClients.size())
+            {
+                this->mIndex = 0;
+            }
+            return id;
+        }
+        int index = flag % this->mClients.size();
+        return this->mClients[index];
     }
 
     int MongoDB::RunCommand(const db::mongo::command::request &request, db::mongo::command::response &response)
@@ -55,8 +74,8 @@ namespace Sentry
         {
             return XCode::CallArgsError;
         }
-        TcpMongoClient * mongoClient = this->mMongoComponent->GetClient();
-        std::shared_ptr<CommandResponse> mongoResponse = this->mMongoComponent->Run(mongoClient, mongoRequest);
+        int id = this->GetClientHandle();    
+        std::shared_ptr<CommandResponse> mongoResponse = this->mMongoComponent->Run(id, mongoRequest);
         if (mongoResponse != nullptr)
         {
             for (size_t index = 0; index < mongoResponse->GetDocumentSize(); index++)
@@ -94,8 +113,9 @@ namespace Sentry
         Bson::Writer::Array documentArray(document);
         mongoRequest->document.Add("insert", tab);
 		mongoRequest->document.Add("documents", documentArray);
-		TcpMongoClient * mongoClient = this->mMongoComponent->GetClient(request.flag());
-		std::shared_ptr<CommandResponse> response = this->mMongoComponent->Run(mongoClient, mongoRequest);
+
+        int handle = this->GetClientHandle(request.flag());
+		std::shared_ptr<CommandResponse> response = this->mMongoComponent->Run(handle, mongoRequest);
 		if (response == nullptr || response->GetDocumentSize() <= 0)
 		{
 #ifdef __DEBUG__
@@ -141,8 +161,8 @@ namespace Sentry
 
         mongoRequest->document.Add("delete", tab);
         mongoRequest->document.Add("deletes", documentArray);
-        TcpMongoClient * mongoClient = this->mMongoComponent->GetClient(request.flag());
-        std::shared_ptr<CommandResponse> response = this->mMongoComponent->Run(mongoClient, mongoRequest);
+        int handle = this->GetClientHandle(request.flag());
+        std::shared_ptr<CommandResponse> response = this->mMongoComponent->Run(handle, mongoRequest);
         if(response == nullptr || response->GetDocumentSize() <= 0)
         {
 #ifdef __DEBUG__
@@ -193,8 +213,9 @@ namespace Sentry
         Bson::Writer::Array updates(updateInfo);
         mongoRequest->document.Add("update", tab);
         mongoRequest->document.Add("updates", updates);
-        TcpMongoClient * mongoClient = this->mMongoComponent->GetClient(request.flag());
-        std::shared_ptr<CommandResponse> response = this->mMongoComponent->Run(mongoClient, mongoRequest);
+
+        int handle = this->GetClientHandle(request.flag());
+        std::shared_ptr<CommandResponse> response = this->mMongoComponent->Run(handle, mongoRequest);
         if (response == nullptr || response->GetDocumentSize() == 0)
         {
             return XCode::Failure;
@@ -230,10 +251,10 @@ namespace Sentry
 		{
 			return XCode::CallArgsError;
 		}
+        int handle = this->GetClientHandle();
         mongoRequest->collectionName = request.tab();
         mongoRequest->numberToReturn = request.limit();
-        TcpMongoClient * mongoClient = this->mMongoComponent->GetClient();
-        std::shared_ptr<CommandResponse> queryResponse = this->mMongoComponent->Run(mongoClient, mongoRequest);
+        std::shared_ptr<CommandResponse> queryResponse = this->mMongoComponent->Run(handle, mongoRequest);
 
         if (queryResponse == nullptr || queryResponse->GetDocumentSize() <= 0)
         {

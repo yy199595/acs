@@ -10,6 +10,8 @@ namespace Helper
 
         extern bool DeleteDir(const std::string& dir);
 
+        extern bool IsValidPath(const std::string& path);
+     
         extern bool DirectorIsExist(const std::string& dir);
 
         extern bool GetFilePaths(const std::string& dir, std::vector<std::string> &paths);

@@ -32,26 +32,26 @@ namespace Sentry
 	class MysqlDBComponent : public RpcTaskComponent<int, Mysql::Response>,
 							 public IRpc<Mysql::Response>, public ILuaRegister
     {
-    public:
-        void CloseClient(int id);
-		int MakeMysqlClient();
-		bool Ping(int index = 0);
 	public:
+		bool Ping(int index = 0);
+		bool GetClientHandle(int& id);
 		const MysqlConfig & Config() const { return this->mConfig; }
 		bool Execute(int index, const std::shared_ptr<Mysql::ICommand>& command);
 		bool Send(int index, const std::shared_ptr<Mysql::ICommand> & command, int & rpcId);
 		std::shared_ptr<Mysql::Response> Run(int index, const std::shared_ptr<Mysql::ICommand>& command);
 	 private:
 		bool Awake() final;
+		bool LateAwake() final;
+		void OnDestroy() final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 		void OnConnectSuccessful(const std::string &address) final;
 		void OnMessage(std::shared_ptr<Mysql::Response> message) final;
 		void OnTaskComplete(int key) final { this->mNumberPool.Push(key);}
 	private:
 		MysqlConfig mConfig;
+		std::queue<int> mAllotQueue;
 		std::unique_ptr<SqlHelper> mSqlHelper;
 		Util::NumberBuilder<int, 1> mNumberPool;
-		//std::vector<std::unique_ptr<MysqlClient>> mMysqlClients;
 		std::unordered_map<int, std::shared_ptr<MysqlClient>> mMysqlClients;
     };
 }
