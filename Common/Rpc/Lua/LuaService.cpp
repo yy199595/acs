@@ -11,7 +11,7 @@
 #include"Proto/Component/ProtoComponent.h"
 #include"Rpc/Component/NodeMgrComponent.h"
 #include"Rpc/Component/InnerNetMessageComponent.h"
-using namespace Sentry;
+using namespace Tendo;
 namespace Lua
 {
 	int Service::Call(lua_State* lua)

@@ -7,7 +7,7 @@
 
 #endif //APP_SYSTEM_H
 #include<string>
-namespace Sentry
+namespace Tendo
 {
     class System
     {

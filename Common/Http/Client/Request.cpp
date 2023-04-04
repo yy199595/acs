@@ -4,7 +4,7 @@
 
 #include "Request.h"
 
-namespace Sentry
+namespace Tendo
 {
 	bool HttpRequest::GetHead(const std::string& k, std::string& value) const
 	{

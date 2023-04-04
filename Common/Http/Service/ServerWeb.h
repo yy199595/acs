@@ -6,7 +6,7 @@
 #define APP_SERVERWEB_H
 #include"Message/s2s.pb.h"
 #include"PhysicalHttpService.h"
-namespace Sentry
+namespace Tendo
 {
     class ServerWeb : public PhysicalHttpService
     {

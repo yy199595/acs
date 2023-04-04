@@ -4,7 +4,7 @@
 #include"Network/Tcp/Asio.h"
 #include"Core/Component/Component.h"
 
-namespace Sentry
+namespace Tendo
 {
     class AsioThread
     {
@@ -19,7 +19,7 @@ namespace Sentry
     };
 }
 
-namespace Sentry
+namespace Tendo
 {
 	class ThreadComponent : public Component, public IDestroy
 	{

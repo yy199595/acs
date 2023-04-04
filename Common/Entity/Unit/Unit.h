@@ -1,6 +1,6 @@
 #pragma once
 #include"Core/Component/ComponentFactory.h"
-namespace Sentry
+namespace Tendo
 {
     class Unit
 	{

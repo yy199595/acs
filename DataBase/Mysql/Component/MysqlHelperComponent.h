@@ -6,7 +6,7 @@
 #include"Core/Component/Component.h"
 #include"google/protobuf/util/json_util.h"
 using namespace google::protobuf;
-namespace Sentry
+namespace Tendo
 {
     class MysqlHelperComponent final : public Component
 	{

@@ -7,7 +7,7 @@
 #include<string>
 #include<unordered_map>
 
-namespace Sentry
+namespace Tendo
 {
 	class ITextConfig
 	{
@@ -17,7 +17,7 @@ namespace Sentry
 		virtual bool LoadConfig(const std::string & path) = 0;
 	};
 }
-namespace Sentry
+namespace Tendo
 {
 	class TextConfig : public ITextConfig
     {

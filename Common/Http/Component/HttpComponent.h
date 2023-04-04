@@ -8,7 +8,7 @@ namespace Http
 	class IResponse;
 	class DataResponse;
 }
-namespace Sentry
+namespace Tendo
 {
     class HttpRequestClient;
 	class HttpComponent : public RpcTaskComponent<int, Http::IResponse>, public ILuaRegister

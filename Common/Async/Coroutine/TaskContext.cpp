@@ -1,6 +1,6 @@
 #include"TaskContext.h"
 #include"memory.h"
-namespace Sentry
+namespace Tendo
 {
 	TaskContext::TaskContext()
 	{

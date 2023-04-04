@@ -14,10 +14,10 @@
 #include<Windows.h>
 #endif
 
-using namespace Sentry;
+using namespace Tendo;
 using namespace std::chrono;
 
-namespace Sentry
+namespace Tendo
 {
 
 	App::App() : Unit(0),
@@ -37,7 +37,7 @@ namespace Sentry
 	bool App::LoadComponent()
 	{
 #ifndef __OS_WIN__
-        signal(SIGQUIT, App::HandleSignal);
+		signal(SIGQUIT, App::HandleSignal);
         signal(SIGKILL, App::HandleSignal);
 #endif
         signal(SIGTERM, App::HandleSignal);

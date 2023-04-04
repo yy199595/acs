@@ -4,7 +4,7 @@
 
 #include"CoroutineLock.h"
 #include"Entity/App/App.h"
-namespace Sentry
+namespace Tendo
 {
 	CoroutineLock::CoroutineLock()
 	{

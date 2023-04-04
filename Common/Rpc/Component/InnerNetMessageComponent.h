@@ -4,7 +4,7 @@
 #include"Rpc/Async/RpcTaskSource.h"
 #include"Server/Config/MethodConfig.h"
 
-namespace Sentry
+namespace Tendo
 {
 	class RpcService;
 

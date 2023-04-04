@@ -8,7 +8,7 @@
 #include"Proto/Component/ProtoComponent.h"
 #include"Mysql/Component/MysqlDBComponent.h"
 
-namespace Sentry
+namespace Tendo
 {
 	MysqlDB::MysqlDB()
 	{

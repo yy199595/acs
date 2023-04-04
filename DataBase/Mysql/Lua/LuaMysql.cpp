@@ -9,7 +9,7 @@
 #include"Mysql/Lua/LuaMysqlTask.h"
 #include"Mysql/Client/MysqlMessage.h"
 #include"Mysql/Component/MysqlDBComponent.h"
-using namespace Sentry;
+using namespace Tendo;
 namespace Lua
 {
 	int LuaMysql::Make(lua_State* lua)

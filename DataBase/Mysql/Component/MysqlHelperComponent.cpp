@@ -5,7 +5,7 @@
 #include"Mysql/Service/MysqlDB.h"
 #include"Rpc/Component/NodeMgrComponent.h"
 #include"Entity/App/App.h"
-namespace Sentry
+namespace Tendo
 {
 	bool MysqlHelperComponent::LateAwake()
 	{

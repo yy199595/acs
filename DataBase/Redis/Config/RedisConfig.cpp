@@ -5,7 +5,7 @@
 #include"RedisConfig.h"
 #include"Util/String/StringHelper.h"
 #include"rapidjson/document.h"
-namespace Sentry
+namespace Tendo
 {
     bool RedisConfig::OnLoadText(const char *str, size_t length)
 	{

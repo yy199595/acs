@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace Sentry
+namespace Tendo
 {
     class MethodConfig
     {

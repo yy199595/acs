@@ -6,7 +6,7 @@
 #include"Entity/App/App.h"
 #include"Util/Json/Lua/Json.h"
 #include"Sqlite/Component/SqliteComponent.h"
-using namespace Sentry;
+using namespace Tendo;
 namespace Lua
 {
 	int Sqlite::Open(lua_State* lua)

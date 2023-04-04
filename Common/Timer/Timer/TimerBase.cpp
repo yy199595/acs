@@ -1,5 +1,5 @@
 #include "TimerBase.h"
-namespace Sentry
+namespace Tendo
 {
     TimerBase::TimerBase(long long ms)
     {

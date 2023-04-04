@@ -1,7 +1,7 @@
 #pragma once
 #include"asio/ip/tcp.hpp"
 #include"Core/Component/Component.h"
-namespace Sentry
+namespace Tendo
 {
     class TcpListenerComponent : public Component
 	{

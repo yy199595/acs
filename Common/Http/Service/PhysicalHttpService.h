@@ -5,7 +5,7 @@
 #ifndef APP_COMMON_HTTP_SERVICE_PHYSICALHTTPSERVICE_H
 #define APP_COMMON_HTTP_SERVICE_PHYSICALHTTPSERVICE_H
 #include"HttpService.h"
-namespace Sentry
+namespace Tendo
 {
 	class PhysicalHttpService : public HttpService
 	{

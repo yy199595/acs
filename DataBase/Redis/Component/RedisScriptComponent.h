@@ -6,7 +6,7 @@
 #define APP_REDISSCRIPTCOMPONENT_H
 #include"Redis/Client/RedisDefine.h"
 #include"Core/Component/Component.h"
-namespace Sentry
+namespace Tendo
 {
     class RedisScriptComponent : public Component, public IStart
     {

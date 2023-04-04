@@ -3,7 +3,7 @@
 #include"Rpc/Method/MethodProxy.h"
 #include"Network/Tcp/SocketProxy.h"
 
-namespace Sentry
+namespace Tendo
 {
     AsioThread::AsioThread()
         : mThread(nullptr),
@@ -26,7 +26,7 @@ namespace Sentry
     }
 }
 
-namespace Sentry
+namespace Tendo
 {
     bool ThreadComponent::Awake()
     {

@@ -3,7 +3,7 @@
 //
 #include"Message.h"
 
-namespace Sentry
+namespace Tendo
 {
 	MessageEncoder::MessageEncoder(lua_State* lua)
 	{

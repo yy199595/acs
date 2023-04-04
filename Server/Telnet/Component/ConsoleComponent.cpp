@@ -6,7 +6,7 @@
 #include"Async/Component/AsyncMgrComponent.h"
 
 #include"Telnet/Component/ServerCmdComponent.h"
-namespace Sentry
+namespace Tendo
 {
 	void TelnetProto::Add(const std::string& content)
 	{
@@ -29,7 +29,7 @@ namespace Sentry
 }
 
 using namespace Tcp;
-namespace Sentry
+namespace Tendo
 {
 	void ConsoleComponent::OnClusterComplete()
 	{

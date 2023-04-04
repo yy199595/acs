@@ -13,7 +13,7 @@ constexpr int LUA_MYSQL_EXEC = 1;
 constexpr int LUA_MYSQL_QUERY = 2;
 constexpr int LUA_MYSQL_QUERY_ONE = 3;
 
-namespace Sentry
+namespace Tendo
 {
 
 	class LuaMysqlTask : public IRpcTask<Mysql::Response>

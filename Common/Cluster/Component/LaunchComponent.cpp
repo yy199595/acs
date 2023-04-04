@@ -12,7 +12,7 @@
 #include"Http//Service/LuaPhysicalHttpService.h"
 #include"Rpc/Component/NodeMgrComponent.h"
 #include"Script/Component/LuaScriptComponent.h"
-namespace Sentry
+namespace Tendo
 {
     bool LaunchComponent::Awake()
     {

@@ -4,7 +4,7 @@
 
 #include "RedisNode.h"
 
-namespace Sentry
+namespace Tendo
 {
 	RedisNode::RedisNode(const RedisClientConfig* config)
 		: mConfig(config)

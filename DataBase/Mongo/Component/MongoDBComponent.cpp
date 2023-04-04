@@ -11,7 +11,7 @@
 #ifdef __DEBUG__
 #include"Util/String/StringHelper.h"
 #endif
-namespace Sentry
+namespace Tendo
 {
 	MongoTask::MongoTask(int id)
         : IRpcTask<Mongo::CommandResponse>(id) { }
@@ -22,7 +22,7 @@ namespace Sentry
 	}
 }
 
-namespace Sentry
+namespace Tendo
 {
     MongoDBComponent::MongoDBComponent()
     {

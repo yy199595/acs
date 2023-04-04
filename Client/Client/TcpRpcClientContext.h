@@ -5,7 +5,7 @@
 #include"Async/Source/TaskSource.h"
 
 
-using namespace Sentry;
+using namespace Tendo;
 using namespace Tcp;
 namespace Client
 {

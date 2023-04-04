@@ -208,8 +208,8 @@ namespace Http
 		if (length > 0)
 		{					
 			int len = length - (int)this->mCurSize;
-			/*double process = this->mCurSize / (double)length;
-			CONSOLE_LOG_DEBUG("process = [" << process * 100 << "%s]");*/
+			double process = this->mCurSize / (double)length;
+			CONSOLE_LOG_DEBUG("receive process = [" << process * 100 << "%s]");
 			return len <= 1024 ? len : 1024;
 		}		
 		return HTTP_READ_SOME;
@@ -260,6 +260,9 @@ namespace Http
 				buff.write(file, readCount);
 				this->mCurSize += readCount;
 			}
+
+			double process = this->mCurSize / (double)this->mFileSize;
+			CONSOLE_LOG_DEBUG("send process = [" << process * 100 << "%s]");
 
 		} while (!this->mInput->eof() && readCount > 0 && index < 20);
 		return (int)(this->mFileSize - this->mCurSize);

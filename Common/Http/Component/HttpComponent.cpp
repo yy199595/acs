@@ -14,7 +14,7 @@
 #include"Http/Common/HttpRequest.h"
 #include"Util/File/DirectoryHelper.h"
 //#include"Http/Common/HttpResponse.h"
-namespace Sentry
+namespace Tendo
 {
 	HttpComponent::HttpComponent()
 	{

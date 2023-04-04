@@ -4,7 +4,7 @@
 
 #include"VirtualRpcService.h"
 #include"XCode/XCode.h"
-namespace Sentry
+namespace Tendo
 {
 	int VirtualRpcService::Invoke(const std::string &name, std::shared_ptr<Rpc::Packet> message)
 	{

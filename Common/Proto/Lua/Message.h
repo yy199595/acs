@@ -6,7 +6,7 @@
 #define SERVER_MESSAGE_H
 #include"Script/Lua/LuaInclude.h"
 #include"Proto/Component/ProtoComponent.h"
-namespace Sentry
+namespace Tendo
 {
 	class MessageDecoder //转lua
 	{
@@ -27,7 +27,7 @@ namespace Sentry
 	};
 }
 
-namespace Sentry
+namespace Tendo
 {
 	class MessageEncoder
 	{

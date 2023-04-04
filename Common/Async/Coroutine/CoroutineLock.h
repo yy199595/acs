@@ -6,7 +6,7 @@
 #define SERVER_COROUTINELOCK_H
 #include<queue>
 #include"Async/Source/TaskSource.h"
-namespace Sentry
+namespace Tendo
 {
 	class CoroutineLock
 	{

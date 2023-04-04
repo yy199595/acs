@@ -9,7 +9,7 @@
 #include"Timer/Component/TimerComponent.h"
 #include"Log/Component/LogComponent.h"
 
-namespace Sentry
+namespace Tendo
 {
 	enum class ServerStatus
 	{
@@ -20,7 +20,7 @@ namespace Sentry
 	};
 }
 
-namespace Sentry
+namespace Tendo
 {
 	class RpcService;
 	class ProtoComponent;

@@ -5,7 +5,7 @@
 #include"Redis/Client/TcpRedisClient.h"
 #include"Rpc/Component/RpcTaskComponent.h"
 
-namespace Sentry
+namespace Tendo
 {
 	class ThreadComponent;
 

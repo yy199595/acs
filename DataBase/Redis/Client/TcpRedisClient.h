@@ -12,7 +12,7 @@
 #include"Async/Coroutine/CoroutineLock.h"
 #include"Core/Component/IComponent.h"
 using namespace Tcp;
-namespace Sentry
+namespace Tendo
 {
     class RedisComponent;
     class TcpRedisClient final : public Tcp::TcpContext

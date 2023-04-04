@@ -9,7 +9,7 @@ namespace Rpc
 {
     class Packet;
 };
-namespace Sentry
+namespace Tendo
 {
 	class ServiceMethod;
 	class InnerNetClient;

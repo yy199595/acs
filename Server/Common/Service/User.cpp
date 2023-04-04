@@ -7,7 +7,7 @@
 #include"Rpc/Component/InnerNetComponent.h"
 #include"Rpc/Component/NodeMgrComponent.h"
 #include"Gate/Component/GateComponent.h"
-namespace Sentry
+namespace Tendo
 {
 
     bool User::Awake()

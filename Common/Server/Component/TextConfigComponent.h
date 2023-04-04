@@ -6,7 +6,7 @@
 #define APP_TEXTCONFIGCOMPONENT_H
 #include"Server/Config/TextConfig.h"
 #include"Core/Component/Component.h"
-namespace Sentry
+namespace Tendo
 {
     class TextConfigComponent : public Component, public IHotfix
     {

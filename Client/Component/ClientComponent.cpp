@@ -14,7 +14,7 @@
 namespace Client
 {
 	ClientTask::ClientTask(int id)
-        : Sentry::IRpcTask<Rpc::Packet>(id)
+        : Tendo::IRpcTask<Rpc::Packet>(id)
 	{
 		
 	}

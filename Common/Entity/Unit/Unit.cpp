@@ -1,7 +1,7 @@
 #include"Unit.h"
 #include"Entity/App/App.h"
 #include"Core/Component/Component.h"
-namespace Sentry
+namespace Tendo
 {
 	Unit::Unit(long long id) : mUnitId(id)
 	{

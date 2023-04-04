@@ -3,7 +3,7 @@
 //
 
 #include"LocationUnit.h"
-namespace Sentry
+namespace Tendo
 {
 
     bool LocationUnit::Del(const std::string &service)

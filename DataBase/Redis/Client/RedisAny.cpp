@@ -3,7 +3,7 @@
 //
 
 #include "RedisAny.h"
-namespace Sentry
+namespace Tendo
 {
 	RedisNumber::RedisNumber(int value)
 		: mValue(value)

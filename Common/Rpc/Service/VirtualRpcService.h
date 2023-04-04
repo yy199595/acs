@@ -5,7 +5,7 @@
 #ifndef _SERVICEAGENT_H_
 #define _SERVICEAGENT_H_
 #include"RpcService.h"
-namespace Sentry
+namespace Tendo
 {
 	class VirtualRpcService final : public RpcService
 	{

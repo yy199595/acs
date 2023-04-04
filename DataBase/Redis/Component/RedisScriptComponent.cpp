@@ -7,7 +7,7 @@
 #include"RedisComponent.h"
 #include"Util/File/FileHelper.h"
 #include"Core/System/System.h"
-namespace Sentry
+namespace Tendo
 {
     bool RedisScriptComponent::LateAwake()
     {

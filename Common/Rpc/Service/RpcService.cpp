@@ -11,7 +11,7 @@
 #ifdef __RPC_DEBUG_LOG__
 #include<google/protobuf/util/json_util.h>
 #endif
-namespace Sentry
+namespace Tendo
 {
 	bool RpcService::LateAwake()
 	{
@@ -30,7 +30,7 @@ namespace Sentry
     }
 }
 
-namespace Sentry
+namespace Tendo
 {
 
 	int RpcService::Send(const string& address, const string& func)
@@ -174,7 +174,7 @@ namespace Sentry
 
 }
 
-namespace Sentry
+namespace Tendo
 {
     int RpcService::Send(long long userId, const std::string &func)
     {

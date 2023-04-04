@@ -11,7 +11,7 @@
 #include"Component/ClientComponent.h"
 #include"Proto/Component/ProtoComponent.h"
 using namespace Client;
-using namespace Sentry;
+using namespace Tendo;
 namespace Lua
 {
 	int ClientEx::Call(lua_State* lua)

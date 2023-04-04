@@ -7,7 +7,7 @@
 #include"Util/Json/Lua/Encoder.h"
 #include"Script/Lua/UserDataParameter.h"
 #include"google/protobuf/util/json_util.h"
-using namespace Sentry;
+using namespace Tendo;
 
 namespace Lua
 {

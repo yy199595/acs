@@ -5,7 +5,7 @@
 #define LOG_FILE_MAX_SUM 10
 #define LOG_FILE_MAX_SIZE 1024 * 1024 * 100
 
-namespace Sentry
+namespace Tendo
 {
     class LogComponent final : public Component, public ISecondUpdate
 	{

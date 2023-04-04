@@ -6,7 +6,7 @@
 #define _REQUEST_H_
 #include<string>
 #include<unordered_map>
-namespace Sentry
+namespace Tendo
 {
 	class HttpRequest
 	{

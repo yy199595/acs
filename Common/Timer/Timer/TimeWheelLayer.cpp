@@ -1,5 +1,5 @@
 #include"TimeWheelLayer.h"
-namespace Sentry
+namespace Tendo
 {
     TimeWheelLayer::TimeWheelLayer(int layerId, int count, int min, int max)
         : mLayerId(layerId), mMaxCount(count), mMin(min), mMax(max)

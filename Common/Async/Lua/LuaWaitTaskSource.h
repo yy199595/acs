@@ -10,7 +10,7 @@
 #include"Async/Lua/LuaCoroutine.h"
 #include"google/protobuf/message.h"
 using namespace google::protobuf;
-namespace Sentry
+namespace Tendo
 {
 	// 在lua中等待c++协程
 	class LuaWaitTaskSource

@@ -8,7 +8,7 @@
 #include"backward.hpp"
 #endif
 #include"Log/Component/LogComponent.h"
-using namespace Sentry;
+using namespace Tendo;
 
 #define DUMP_STACK_DEPTH_MAX 100
 void Debug::Lua(const char *log)

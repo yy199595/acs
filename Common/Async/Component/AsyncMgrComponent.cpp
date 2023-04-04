@@ -5,7 +5,7 @@
 #include"Util/Time/TimeHelper.h"
 #endif
 using namespace std::chrono;
-namespace Sentry
+namespace Tendo
 {
 	void MainEntry(tb_context_from_t context)
 	{

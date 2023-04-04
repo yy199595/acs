@@ -8,7 +8,7 @@
 #include"Script/Lua/LuaInclude.h"
 #include"Util/Json/Lua/Json.h"
 
-namespace Sentry
+namespace Tendo
 {
 	LuaMysqlTask::LuaMysqlTask(lua_State *lua, int id, int method)
 		: IRpcTask<Mysql::Response>(id), mLua(lua)

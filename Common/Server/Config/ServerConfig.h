@@ -7,7 +7,7 @@
 #include"Util/Json/JsonReader.h"
 #include"Server/Config/TextConfig.h"
 #include"Core/Singleton/Singleton.h"
-namespace Sentry
+namespace Tendo
 {
     struct ListenConfig
     {

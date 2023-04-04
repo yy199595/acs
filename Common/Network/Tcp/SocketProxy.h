@@ -3,7 +3,7 @@
 #include"Asio.h"
 #include"Log/Common/CommonLogDef.h"
 
-namespace Sentry
+namespace Tendo
 {
 	class SocketProxy
 	{
@@ -29,7 +29,7 @@ namespace Sentry
     };
 }
 
-namespace Sentry
+namespace Tendo
 {
 	enum DataMessageType
 	{

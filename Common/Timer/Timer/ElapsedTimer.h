@@ -5,7 +5,7 @@
 #ifndef GAMEKEEPER_ELAPSEDTIMER_H
 #define GAMEKEEPER_ELAPSEDTIMER_H
 #include"Util/Time/TimeHelper.h"
-namespace Sentry
+namespace Tendo
 {
     class ElapsedTimer
     {

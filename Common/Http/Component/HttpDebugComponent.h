@@ -2,7 +2,7 @@
 #include"Rpc/Client/Message.h"
 #include"HttpListenComponent.h"
 
-namespace Sentry
+namespace Tendo
 {
 	class HttpDebugComponent final : public HttpListenComponent
 	{

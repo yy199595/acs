@@ -3,7 +3,7 @@
 #include"google/protobuf/message.h"
 #include"Util/Guid/NumberBuilder.h"
 #include"Core/Component/Component.h"
-namespace Sentry
+namespace Tendo
 {
 	class SqlHelper;
 	class SqliteComponent : public Component, public ILuaRegister, public IDestroy

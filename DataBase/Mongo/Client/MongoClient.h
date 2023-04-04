@@ -13,9 +13,9 @@
 #include"Async/Coroutine/CoroutineLock.h"
 
 using namespace Tcp;
-using namespace Sentry;
+using namespace Tendo;
 
-namespace Sentry
+namespace Tendo
 {
 	class MongoDBComponent;
 }

@@ -6,7 +6,7 @@
 #include"Util/Json/JsonWriter.h"
 #include"Async/Lua/LuaCoroutine.h"
 #include"google/protobuf/util/json_util.h"
-namespace Sentry
+namespace Tendo
 {
     RedisRequest::RedisRequest(const std::string &cmd)
 		: mCommand(cmd)
@@ -88,7 +88,7 @@ namespace Sentry
 	}
 }
 
-namespace Sentry
+namespace Tendo
 {
     RedisResponse::RedisResponse()
         : mDataSize(0), mLineCount(0),
@@ -255,7 +255,7 @@ namespace Sentry
 	}
 }
 
-namespace Sentry
+namespace Tendo
 {
     RedisTask::RedisTask(int ms)
         : IRpcTask<RedisResponse>(ms)

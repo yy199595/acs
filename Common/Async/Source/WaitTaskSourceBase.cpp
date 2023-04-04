@@ -5,7 +5,7 @@
 #include "Util/Guid/Guid.h"
 #include "Entity/App/App.h"
 #include "Util/Time/TimeHelper.h"
-namespace Sentry
+namespace Tendo
 {
     WaitTaskSourceBase::WaitTaskSourceBase()
     {

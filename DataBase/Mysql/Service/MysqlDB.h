@@ -4,7 +4,7 @@
 #include"Mysql/Client/MysqlClient.h"
 #include"Rpc/Service/PhysicalRpcService.h"
 
-namespace Sentry
+namespace Tendo
 {
 	class MysqlDB : public PhysicalRpcService
 	{

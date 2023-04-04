@@ -6,7 +6,7 @@
 #define SERVER_LOCALSERVICECOMPONENT_H
 #include"RpcService.h"
 #include"Rpc/Method/MethodRegister.h"
-namespace Sentry
+namespace Tendo
 {
 	//ʵ����� �ܴ����߼�
 	class PhysicalRpcService : public RpcService, public IServerRecord

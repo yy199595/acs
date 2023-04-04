@@ -6,7 +6,7 @@
 #define GAMEKEEPER_GATESERVICE_H
 #include"Message/s2s.pb.h"
 #include"Rpc/Service/PhysicalRpcService.h"
-namespace Sentry
+namespace Tendo
 {
 	class Gate final : public PhysicalRpcService
 	{

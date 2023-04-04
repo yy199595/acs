@@ -7,7 +7,7 @@
 #include"Server/Component/ThreadComponent.h"
 #include"Http/Common/HttpResponse.h"
 #include"Entity/App/App.h"
-namespace Sentry
+namespace Tendo
 {
     void HttpListenComponent::OnListen(std::shared_ptr<SocketProxy> socket)
     {

@@ -10,7 +10,7 @@
 #include"Server/Config/ServiceConfig.h"
 #include"Rpc/Lua/LuaServiceMethod.h"
 #include"Script/Component/LuaScriptComponent.h"
-namespace Sentry
+namespace Tendo
 {
     extern std::string GET_FUNC_NAME(const std::string& fullName)
     {

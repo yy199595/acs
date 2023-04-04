@@ -8,7 +8,7 @@
 #include"Server/Config/ServiceConfig.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include"Server/Config/CodeConfig.h"
-namespace Sentry
+namespace Tendo
 {
     bool TextConfigComponent::Awake()
     {

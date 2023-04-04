@@ -7,7 +7,7 @@
 #include"Async/Lua/LuaWaitTaskSource.h"
 using namespace com;
 using namespace google::protobuf;
-namespace Sentry
+namespace Tendo
 {
     template<typename T>
     class IRpcTask : public std::enable_shared_from_this<IRpcTask<T>>

@@ -12,7 +12,7 @@
 #include "Mysql/Config/MysqlConfig.h"
 
 struct lua_State;
-namespace Sentry
+namespace Tendo
 {
     class MysqlTask : public IRpcTask<Mysql::Response>
     {
@@ -26,7 +26,7 @@ namespace Sentry
     };
 }
 
-namespace Sentry
+namespace Tendo
 {
     class MysqlClient;
 	class MysqlDBComponent : public RpcTaskComponent<int, Mysql::Response>,

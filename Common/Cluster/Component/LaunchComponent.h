@@ -6,7 +6,7 @@
 #define APP_LAUNCHCOMPONENT_H
 #include"Core/Component/Component.h"
 
-namespace Sentry
+namespace Tendo
 {
 	class LaunchComponent final : public Component, public IStart, public IDestroy
     {

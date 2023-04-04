@@ -7,7 +7,7 @@
 #include<vector>
 #include"Server/Config/TextConfig.h"
 #include"Core/Singleton/Singleton.h"
-namespace Sentry
+namespace Tendo
 {
     class MysqlConfig : public TextConfig
     {

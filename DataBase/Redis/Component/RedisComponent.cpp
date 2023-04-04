@@ -11,7 +11,7 @@
 #ifdef __DEBUG__
 #include "Timer/Timer/ElapsedTimer.h"
 #endif
-namespace Sentry
+namespace Tendo
 {
     bool RedisComponent::Awake()
     {

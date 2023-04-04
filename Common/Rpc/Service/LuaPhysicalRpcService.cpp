@@ -5,7 +5,7 @@
 #include"Server/Config/ServiceConfig.h"
 #include"Rpc/Method/MethodRegister.h"
 #include"Script/Component/LuaScriptComponent.h"
-namespace Sentry
+namespace Tendo
 {
 	LuaPhysicalRpcService::LuaPhysicalRpcService()
 		: mMethodRegister(this)

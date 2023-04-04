@@ -10,7 +10,7 @@
 #include"Proto/Message/ProtoMessage.h"
 using namespace google::protobuf;
 
-namespace Sentry
+namespace Tendo
 {
 	enum class RedisRespType
 	{
@@ -37,7 +37,7 @@ namespace RedisCommand
     }
 }
 
-namespace Sentry
+namespace Tendo
 {
     class RedisTask;
     class LuaRedisTask;

@@ -4,7 +4,7 @@
 #include"Proto/Message/ProtoMessage.h"
 #include"Telnet/Client/TelnetClientContext.h"
 
-namespace Sentry
+namespace Tendo
 {
 	class TelnetProto : public Tcp::ProtoMessage
 	{
@@ -24,7 +24,7 @@ namespace Tcp
 {
 	class TelnetClientContext;
 }
-namespace Sentry
+namespace Tendo
 {
 	class ConsoleComponent : public Component, public IComplete
 	{

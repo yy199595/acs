@@ -12,7 +12,7 @@
 #include"Server/Component/TextConfigComponent.h"
 #include"Rpc/Component/InnerNetMessageComponent.h"
 
-namespace Sentry
+namespace Tendo
 {
 	Node::Node()
 	{

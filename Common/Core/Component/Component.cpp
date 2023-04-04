@@ -1,6 +1,6 @@
 #include"Component.h"
 #include"Entity/App/App.h"
-namespace Sentry
+namespace Tendo
 {
 	Component::Component()
 		: mUnit(nullptr)

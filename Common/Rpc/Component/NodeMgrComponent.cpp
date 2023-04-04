@@ -9,7 +9,7 @@
 #include"Async/Component/AsyncMgrComponent.h"
 #include"Entity/App/App.h"
 #include"Server/Config/CodeConfig.h"
-namespace Sentry
+namespace Tendo
 {
     void NodeMgrComponent::AddRpcServer(const std::string& name, const std::string& address)
     {

@@ -13,7 +13,7 @@ namespace Rpc
 {
     class Packet;
 }
-namespace Sentry
+namespace Tendo
 {
 
 	class OuterNetClient;

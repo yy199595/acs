@@ -5,7 +5,7 @@
 #ifndef GameKeeper_SERVERPATH_H
 #define GameKeeper_SERVERPATH_H
 
-namespace Sentry
+namespace Tendo
 {
     class ServerPath
     {

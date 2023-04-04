@@ -7,7 +7,7 @@
 #include"Proto/Component/ProtoComponent.h"
 #include"Script/Component/LuaScriptComponent.h"
 #include"google/protobuf/util/json_util.h"
-namespace Sentry
+namespace Tendo
 {
 
 	LuaServiceMethod::LuaServiceMethod(const RpcMethodConfig * config)

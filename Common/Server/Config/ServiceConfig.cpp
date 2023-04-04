@@ -3,7 +3,7 @@
 #include"Entity/App/App.h"
 #include"rapidjson/document.h"
 #include"Cluster/Config/ClusterConfig.h"
-namespace Sentry
+namespace Tendo
 {
 	bool RpcServiceConfig::OnLoadConfig(const rapidjson::Value & json)
 	{
@@ -86,7 +86,7 @@ namespace Sentry
     }
 }
 
-namespace Sentry
+namespace Tendo
 {
 	bool HttpServiceConfig::OnLoadConfig(const rapidjson::Value & json)
 	{
@@ -131,7 +131,7 @@ namespace Sentry
     }
 }
 
-namespace Sentry
+namespace Tendo
 {
     bool RpcConfig::OnLoadText(const char *str, size_t length)
     {
@@ -186,7 +186,7 @@ namespace Sentry
     }
 }
 
-namespace Sentry
+namespace Tendo
 {
     bool HttpConfig::OnLoadText(const char *str, size_t length)
     {

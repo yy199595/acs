@@ -4,7 +4,7 @@
 
 #include"HttpTask.h"
 #include"Util/Json/Lua/Json.h"
-namespace Sentry
+namespace Tendo
 {
     HttpRequestTask::HttpRequestTask()
         : IRpcTask<Http::IResponse>(0)
@@ -18,7 +18,7 @@ namespace Sentry
     }
 }
 
-namespace Sentry
+namespace Tendo
 {
     LuaHttpRequestTask::LuaHttpRequestTask(lua_State *lua)
         : IRpcTask<Http::IResponse>(0), mRef(0), mLua(lua)

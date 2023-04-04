@@ -3,7 +3,7 @@
 #include<memory>
 #include<unordered_map>
 #include"Component.h"
-namespace Sentry
+namespace Tendo
 {
     template<typename T>
     class TypeProxy : public Type
@@ -19,7 +19,7 @@ namespace Sentry
     };
 }
 
-namespace Sentry
+namespace Tendo
 {
 	class ComponentFactory
 	{
@@ -90,7 +90,7 @@ namespace Sentry
 	};
 
 	template<typename T>
-	std::unique_ptr<Component> Sentry::ComponentFactory::CreateComponent()
+	std::unique_ptr<Component> Tendo::ComponentFactory::CreateComponent()
 	{
 		size_t key = typeid(T).hash_code();
 		auto iter = mTypeInfoMap1.find(key);

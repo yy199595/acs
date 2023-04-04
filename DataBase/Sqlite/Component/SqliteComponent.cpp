@@ -6,7 +6,7 @@
 #include"Common/SqlHelper.h"
 #include"Sqlite/Lua/LuaSqlite.h"
 #include"Script/Lua/ClassProxyHelper.h"
-namespace Sentry
+namespace Tendo
 {
 	bool SqliteComponent::Awake()
 	{

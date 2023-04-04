@@ -6,7 +6,7 @@
 #define SERVER_WAITLUATASKSOURCE_H
 #include"Script/Lua/LuaParameter.h"
 #include"Async/Source/TaskSource.h"
-namespace Sentry
+namespace Tendo
 {
 	// 在c++中等待lua完成
 	class WaitLuaTaskSource final : public WaitTaskSourceBase

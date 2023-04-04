@@ -9,7 +9,7 @@
 #include<vector>
 #include<unordered_map>
 #include"Server/Config/TextConfig.h"
-namespace Sentry
+namespace Tendo
 {
     struct RedisClientConfig
     {

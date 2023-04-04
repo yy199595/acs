@@ -16,7 +16,7 @@ namespace Http
     class Request;
     class DataResponse;
 }
-namespace Sentry
+namespace Tendo
 {
     class HttpService : public Component,
 						public IService<Http::Request, Http::DataResponse>

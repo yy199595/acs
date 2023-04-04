@@ -5,7 +5,7 @@
 #include"MongoConfig.h"
 #include"rapidjson/document.h"
 #include"Util/String/StringHelper.h"
-namespace Sentry
+namespace Tendo
 {
     bool MongoConfig::OnLoadText(const char *str, size_t length)
 	{

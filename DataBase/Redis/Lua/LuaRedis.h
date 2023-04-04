@@ -5,14 +5,14 @@
 #ifndef _LUAREDIS_H_
 #define _LUAREDIS_H_
 #include"Script/Lua/LuaInclude.h"
-namespace Sentry
+namespace Tendo
 {
 	class RedisRequest;
 	class TcpRedisClient;
 	class RedisComponent;
 }
 
-using namespace Sentry;
+using namespace Tendo;
 namespace Lua
 {
 	namespace Redis

@@ -3,7 +3,7 @@
 #include"queue"
 #include"TimerBase.h"
 
-namespace Sentry
+namespace Tendo
 {
     class TimeWheelLayer
     {

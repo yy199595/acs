@@ -7,7 +7,7 @@
 #include"Mongo/Service/MongoDB.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include"Rpc/Component/NodeMgrComponent.h"
-namespace Sentry
+namespace Tendo
 {
 	bool MongoHelperComponent::LateAwake()
     {

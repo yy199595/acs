@@ -6,7 +6,7 @@
 #define APP_SINGLETON_H
 #include<assert.h>
 
-namespace Sentry
+namespace Tendo
 {
     template<typename T>
     class Singleton
@@ -39,7 +39,7 @@ namespace Sentry
     };
 }
 
-namespace Sentry
+namespace Tendo
 {
     template<typename T>
     T * Singleton<T>::mInstance = nullptr;

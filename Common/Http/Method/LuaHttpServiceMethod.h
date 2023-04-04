@@ -7,7 +7,7 @@
 #include"HttpServiceMethod.h"
 
 struct lua_State;
-namespace Sentry
+namespace Tendo
 {
     class HttpMethodConfig;
     class LuaHttpServiceMethod : public HttpServiceMethod

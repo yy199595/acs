@@ -7,7 +7,7 @@
 #include"Message/db.pb.h"
 #include"Mongo/Client/MongoProto.h"
 #include"Rpc/Service/PhysicalRpcService.h"
-namespace Sentry
+namespace Tendo
 {
     class MongoDB final : public PhysicalRpcService
 	{

@@ -6,7 +6,7 @@
 #include"Entity/App/App.h"
 #include"Util/String/StringHelper.h"
 #include"Log/Component/LogComponent.h"
-using namespace Sentry;
+using namespace Tendo;
 namespace Lua
 {
 	namespace Log

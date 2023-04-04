@@ -3,7 +3,7 @@
 #include"Timer/Timer/TimeWheelLayer.h"
 #include"Core/Component/Component.h"
 #include"Rpc/Method/MethodProxy.h"
-namespace Sentry
+namespace Tendo
 {
     class TimerComponent final : public Component, public ISystemUpdate, public ILuaRegister
 	{

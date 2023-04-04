@@ -9,7 +9,7 @@
 #include"google/protobuf/util/json_util.h"
 #include"Core/Singleton/Singleton.h"
 
-namespace Sentry
+namespace Tendo
 {
 	InnerNetComponent::InnerNetComponent()
 	{

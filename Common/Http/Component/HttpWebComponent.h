@@ -22,7 +22,7 @@ namespace Http
     };
 }
 
-namespace Sentry
+namespace Tendo
 {
     class HttpMethodConfig;
     class HttpHandlerClient;

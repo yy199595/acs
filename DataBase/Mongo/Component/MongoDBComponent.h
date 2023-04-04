@@ -14,7 +14,7 @@
 
 using namespace Mongo;
 
-namespace Sentry
+namespace Tendo
 {
 	class MongoTask : public IRpcTask<Mongo::CommandResponse>
 	{
@@ -29,7 +29,7 @@ namespace Sentry
 }
 
 
-namespace Sentry
+namespace Tendo
 {
     class MongoDBComponent : public RpcTaskComponent<int,Mongo::CommandResponse>, 
 							 public IRpc<Mongo::CommandResponse>, public ILuaRegister, public IDestroy

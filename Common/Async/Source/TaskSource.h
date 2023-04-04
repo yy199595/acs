@@ -5,7 +5,7 @@
 #ifndef GAMEKEEPER_TASKSOURCE_H
 #define GAMEKEEPER_TASKSOURCE_H
 #include"WaitTaskSourceBase.h"
-namespace Sentry
+namespace Tendo
 {
     class LoopTaskSource : public WaitTaskSourceBase
     {
@@ -43,7 +43,7 @@ namespace Sentry
     }
 }
 
-namespace Sentry
+namespace Tendo
 {
 	template<typename T>
 	class PtrTaskSource : public WaitTaskSourceBase
@@ -74,7 +74,7 @@ namespace Sentry
 	}
 }
 
-namespace Sentry
+namespace Tendo
 {
     template<> class TaskSource<void> : public WaitTaskSourceBase
     {
@@ -84,7 +84,7 @@ namespace Sentry
     };
 }
 
-namespace Sentry
+namespace Tendo
 {
     template<typename T>
     class TaskSource<T *> { };
@@ -96,7 +96,7 @@ namespace Sentry
     class TaskSource<const T &> { };
 }
 
-namespace Sentry
+namespace Tendo
 {
     template<typename T>
     class TaskSource<std::shared_ptr<T>> : public WaitTaskSourceBase

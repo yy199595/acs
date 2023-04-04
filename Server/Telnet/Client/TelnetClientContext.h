@@ -5,7 +5,7 @@
 #include"Network/Tcp/TcpContext.h"
 #include"Async/Source/TaskSource.h"
 
-namespace Sentry
+namespace Tendo
 {
 	class TelnetProto;
 	class ConsoleComponent;

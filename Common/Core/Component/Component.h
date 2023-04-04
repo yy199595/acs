@@ -2,7 +2,7 @@
 
 #include"IComponent.h"
 #include"Log/Common/CommonLogDef.h"
-namespace Sentry
+namespace Tendo
 {
 	class App;
 	class Component;
@@ -19,7 +19,7 @@ namespace Sentry
 	};
 }
 
-namespace Sentry
+namespace Tendo
 {
 	class Unit;
 	class Component

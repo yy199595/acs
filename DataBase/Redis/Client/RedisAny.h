@@ -6,7 +6,7 @@
 #define _REDISANY_H_
 #include<string>
 #include<iostream>
-namespace Sentry
+namespace Tendo
 {
 	class RedisAny
 	{

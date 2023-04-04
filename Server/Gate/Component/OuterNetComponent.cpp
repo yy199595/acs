@@ -12,7 +12,7 @@
 #include"Util/Json/JsonWriter.h"
 #include"Gate/Service/Gate.h"
 #include"Entity/App/App.h"
-namespace Sentry
+namespace Tendo
 {
 	bool OuterNetComponent::Awake()
 	{

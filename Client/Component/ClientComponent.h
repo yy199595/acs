@@ -3,10 +3,10 @@
 #include"Rpc/Client/Message.h"
 #include"Async/Source/TaskSource.h"
 #include"Rpc/Component/RpcTaskComponent.h"
-using namespace Sentry;
+using namespace Tendo;
 using namespace google::protobuf;
 
-namespace Sentry
+namespace Tendo
 {
     class TimerComponent;
     class HttpComponent;
@@ -16,7 +16,7 @@ namespace Sentry
 
 namespace Client
 {
-    class ClientTask : public Sentry::IRpcTask<Rpc::Packet>
+    class ClientTask : public Tendo::IRpcTask<Rpc::Packet>
     {
     public:
         explicit ClientTask(int id);
@@ -28,7 +28,7 @@ namespace Client
     };
 }
 
-namespace Sentry
+namespace Tendo
 {
 	class ProtoComponent;
 	class LuaScriptComponent;

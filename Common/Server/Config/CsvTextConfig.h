@@ -7,7 +7,7 @@
 #include"TextConfig.h"
 #include<vector>
 
-namespace Sentry
+namespace Tendo
 {
 	class CsvLineData
 	{
@@ -23,7 +23,7 @@ namespace Sentry
 	};
 }
 
-namespace Sentry
+namespace Tendo
 {
 	class CsvTextConfig : public ITextConfig
 	{

@@ -8,7 +8,7 @@
 #include"Network/Tcp/TcpContext.h"
 #include"Http/Common/HttpRequest.h"
 #include"Http/Common/HttpResponse.h"
-namespace Sentry
+namespace Tendo
 {
 	class HttpComponent;
 	class HttpRequestClient : public Tcp::TcpContext

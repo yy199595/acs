@@ -1,6 +1,6 @@
 #include"Message/s2s.pb.h"
 #include"Rpc/Service/PhysicalRpcService.h"
-namespace Sentry
+namespace Tendo
 {
 	class WatchDog : public PhysicalRpcService
 	{

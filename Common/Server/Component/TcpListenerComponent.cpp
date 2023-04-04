@@ -5,7 +5,7 @@
 #include"Server/Component/ThreadComponent.h"
 #include"Entity/App/App.h"
 #include"Network/Tcp/Asio.h"
-namespace Sentry
+namespace Tendo
 {
 	TcpListenerComponent::TcpListenerComponent()
     {

@@ -5,7 +5,7 @@
 #include"Script/Module/LuaModule.h"
 #include"Script/Component/LuaScriptComponent.h"
 #include"Http/Method/LuaHttpServiceMethod.h"
-namespace Sentry
+namespace Tendo
 {
 
     HttpService::HttpService()

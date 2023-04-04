@@ -10,7 +10,7 @@
 #include"Util/File/DirectoryHelper.h"
 #include"Util/File/FileHelper.h"
 #include"Rpc/Component/NodeMgrComponent.h"
-namespace Sentry
+namespace Tendo
 {
     bool ServerWeb::OnInit()
 	{

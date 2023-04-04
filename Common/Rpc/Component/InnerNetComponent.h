@@ -5,7 +5,7 @@
 #include"Rpc/Client/InnerNetClient.h"
 #include"Server/Component/TcpListenerComponent.h"
 
-namespace Sentry
+namespace Tendo
 {
 	// 管理内网rpc的session
 	class InnerNetComponent : public TcpListenerComponent, public IRpc<Rpc::Packet>,

@@ -13,7 +13,7 @@ namespace Http
 	class IResponse;
     class DataResponse;
 }
-namespace Sentry
+namespace Tendo
 {
 	class HttpListenComponent;
 	class HttpHandlerClient final : public Tcp::TcpContext

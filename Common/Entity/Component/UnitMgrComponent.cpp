@@ -1,6 +1,6 @@
 #include"UnitMgrComponent.h"
 #include"Entity/App/App.h"
-namespace Sentry
+namespace Tendo
 {
 	bool UnitMgrComponent::LateAwake()
 	{

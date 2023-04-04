@@ -9,7 +9,7 @@
 #include"Script/Lua/LuaInclude.h"
 #include"Http/Method/HttpServiceMethod.h"
 #include"Core/Component/Component.h"
-namespace Sentry
+namespace Tendo
 {
 	class ServiceMethodRegister
 	{
@@ -113,7 +113,7 @@ namespace Sentry
 	};
 }
 
-namespace Sentry
+namespace Tendo
 {
 	class HttpServiceRegister
 	{

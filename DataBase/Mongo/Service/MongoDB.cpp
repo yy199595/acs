@@ -6,7 +6,7 @@
 #include"Entity/App/App.h"
 #include"Mongo/Config/MongoConfig.h"
 #include"Mongo/Component/MongoDBComponent.h"
-namespace Sentry
+namespace Tendo
 {
     MongoDB::MongoDB()
     {

@@ -6,7 +6,7 @@
 #include"Entity/App/App.h"
 #include"Script/Lua/UserDataParameter.h"
 #include"Gate/Component/GateComponent.h"
-using namespace Sentry;
+using namespace Tendo;
 using namespace Lua::UserDataParameter;
 namespace Lua
 {

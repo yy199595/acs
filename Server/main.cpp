@@ -54,7 +54,7 @@
 #include"WatchDog/Component/WatchDogComponent.h"
 #include "Server/Config/CsvTextConfig.h"
 
-using namespace Sentry;
+using namespace Tendo;
 
 void RegisterComponent()
 {

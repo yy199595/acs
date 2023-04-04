@@ -2,7 +2,7 @@
 #include"Entity/App/App.h"
 #include"Util/Time/TimeHelper.h"
 #include"Proto/Component/ProtoComponent.h"
-namespace Sentry
+namespace Tendo
 {
     RpcTaskSource::RpcTaskSource(int ms)
         : IRpcTask<Rpc::Packet>(ms)
@@ -20,7 +20,7 @@ namespace Sentry
 	}
 }
 
-namespace Sentry
+namespace Tendo
 {
 	LuaRpcTaskSource::LuaRpcTaskSource(lua_State* lua, int id, const std::string & resp)
 		: IRpcTask<Rpc::Packet>(id), mTask(lua), mResp(resp)

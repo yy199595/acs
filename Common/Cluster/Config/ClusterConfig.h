@@ -10,7 +10,7 @@
 #include"Server/Config/TextConfig.h"
 #include"rapidjson/document.h"
 #include"Core/Singleton/Singleton.h"
-namespace Sentry
+namespace Tendo
 {
     class NodeConfig
     {
@@ -37,7 +37,7 @@ namespace Sentry
     };
 }
 
-namespace Sentry
+namespace Tendo
 {
     class ClusterConfig : public TextConfig, public ConstSingleton<ClusterConfig>
     {

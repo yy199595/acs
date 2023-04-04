@@ -21,7 +21,7 @@
 #include"Util/String/StringHelper.h"
 #include"Sqlite/Component/SqliteComponent.h"
 #endif
-namespace Sentry
+namespace Tendo
 {
 	Registry::Registry()
 	{

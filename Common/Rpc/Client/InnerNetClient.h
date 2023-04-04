@@ -3,7 +3,7 @@
 #include"Network/Tcp/TcpContext.h"
 #include"Core/Component/IComponent.h"
 using namespace Tcp;
-namespace Sentry
+namespace Tendo
 {
 	struct AuthInfo
 	{
@@ -14,7 +14,7 @@ namespace Sentry
 		std::string RpcAddress;
 	};
 }
-namespace Sentry
+namespace Tendo
 {
 	class InnerNetClient : public Tcp::TcpContext
 	{

@@ -4,7 +4,7 @@
 #include<google/protobuf/message.h>
 using namespace google::protobuf;
 struct lua_State;
-namespace Sentry
+namespace Tendo
 {
 
 	class RpcMethodConfig;

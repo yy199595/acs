@@ -5,7 +5,7 @@
 #include"Script/Lua/LuaInclude.h"
 #include"Util/Json/JsonWriter.h"
 #include"Rpc/Method/MethodRegister.h"
-namespace Sentry
+namespace Tendo
 {
 	class LuaScriptComponent;
 	class ServiceMethodRegister;

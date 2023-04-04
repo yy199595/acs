@@ -5,7 +5,7 @@
 #include"rapidjson/document.h"
 
 using namespace google::protobuf;
-namespace Sentry
+namespace Tendo
 {
 	class SqlHelper
 	{

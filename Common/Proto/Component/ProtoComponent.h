@@ -10,7 +10,7 @@
 #include"google/protobuf/compiler/importer.h"
 using namespace google::protobuf;
 struct lua_State;
-namespace Sentry
+namespace Tendo
 {
 
     class ImportError : public compiler::MultiFileErrorCollector

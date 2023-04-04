@@ -4,7 +4,7 @@
 
 #include"RedisStringComponent.h"
 #include"RedisComponent.h"
-namespace Sentry
+namespace Tendo
 {
     bool RedisStringComponent::LateAwake()
     {

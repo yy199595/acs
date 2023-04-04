@@ -10,7 +10,7 @@
 #include"Entity/Unit/LocationUnit.h"
 #include"Core/Component/Component.h"
 
-namespace Sentry
+namespace Tendo
 {
 	class NodeMgrComponent final : public Component
     {

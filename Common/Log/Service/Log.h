@@ -6,7 +6,7 @@
 #define _LOG_H_
 #include"Message/s2s.pb.h"
 #include"Rpc/Service/PhysicalRpcService.h"
-namespace Sentry
+namespace Tendo
 {
 	class Log final : public PhysicalRpcService
 	{

@@ -4,7 +4,7 @@
 
 #include"WaitLuaTaskSource.h"
 #include"Script/Lua/UserDataParameter.h"
-namespace Sentry
+namespace Tendo
 {
 	WaitLuaTaskSource::WaitLuaTaskSource()
 	{

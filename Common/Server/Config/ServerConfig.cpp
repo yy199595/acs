@@ -9,7 +9,7 @@
 #include"Util/File/FileHelper.h"
 #include"Util/String/StringHelper.h"
 #include"Util/File/DirectoryHelper.h"
-namespace Sentry
+namespace Tendo
 {
 	ServerConfig::ServerConfig(std::string  server)
 		: TextConfig("ServerConfig"), mName(std::move(server))

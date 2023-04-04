@@ -8,7 +8,7 @@
 #include"Server/Config/TextConfig.h"
 #include"Core/Singleton/Singleton.h"
 #include"rapidjson/document.h"
-namespace Sentry
+namespace Tendo
 {
     class IServiceConfigBase
     {

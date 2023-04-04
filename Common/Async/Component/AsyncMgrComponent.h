@@ -9,7 +9,7 @@
 #include"Core/Component/Component.h"
 #include"Async/Coroutine/TaskContext.h"
 
-namespace Sentry
+namespace Tendo
 {
 	class AsyncMgrComponent final : public Component, public ISystemUpdate, public ILastFrameUpdate
 	{

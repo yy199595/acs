@@ -8,7 +8,7 @@
 #include"MysqlMessage.h"
 #include"Entity/App/App.h"
 #include"Mysql/Config/MysqlConfig.h"
-namespace Sentry
+namespace Tendo
 {
 	MysqlClient::MysqlClient(IRpc<Mysql::Response> *component, const MysqlConfig & config)
 							 : mComponent(component), mConfig(config)

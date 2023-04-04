@@ -1,11 +1,11 @@
 #include "ComponentFactory.h"
-namespace Sentry
+namespace Tendo
 {
 	std::string ComponentFactory::mEmpty;
 	std::unordered_map<size_t, Type*> ComponentFactory::mTypeInfoMap1;
 	std::unordered_map<std::string, Type*> ComponentFactory::mTypeInfoMap;
 
-	Sentry::Type* ComponentFactory::GetType(const std::string& name)
+	Tendo::Type* ComponentFactory::GetType(const std::string& name)
 	{
 		auto iter = mTypeInfoMap.find(name);
 		return iter != mTypeInfoMap.end() ? iter->second : nullptr;

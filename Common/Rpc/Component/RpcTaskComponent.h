@@ -6,7 +6,7 @@
 #define SERVER_RPCTASKCOMPONENT_H
 #include"Core/Component/Component.h"
 #include"Rpc/Async/RpcTaskSource.h"
-namespace Sentry
+namespace Tendo
 {
     template<typename K,typename T>
     class RpcTaskComponent : public Component

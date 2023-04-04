@@ -41,7 +41,7 @@ namespace Method
 
 }
 
-namespace Sentry
+namespace Tendo
 {
 	enum class CorState
 	{

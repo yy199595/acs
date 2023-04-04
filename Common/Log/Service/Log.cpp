@@ -4,7 +4,7 @@
 
 #include"Log.h"
 #include"Log/Component/LogComponent.h"
-namespace Sentry
+namespace Tendo
 {
 	bool Log::OnInit()
 	{

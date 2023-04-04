@@ -5,7 +5,7 @@
 #ifndef SERVER_LOCALLUAHTTPSERVICE_H
 #define SERVER_LOCALLUAHTTPSERVICE_H
 #include"HttpService.h"
-namespace Sentry
+namespace Tendo
 {
     class LuaPhysicalHttpService : public HttpService
     {

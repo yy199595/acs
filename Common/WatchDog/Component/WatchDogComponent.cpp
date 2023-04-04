@@ -1,6 +1,6 @@
 #include"WatchDogComponent.h"
 
-namespace Sentry
+namespace Tendo
 {
 	bool WatchDogComponent::LateAwake()
 	{

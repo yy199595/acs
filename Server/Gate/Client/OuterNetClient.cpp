@@ -10,7 +10,7 @@
 #endif
 #include"Gate/Component/OuterNetComponent.h"
 
-namespace Sentry
+namespace Tendo
 {
 	OuterNetClient::OuterNetClient(std::shared_ptr<SocketProxy> socket,
                                    OuterNetComponent* component)

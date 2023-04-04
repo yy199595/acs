@@ -10,7 +10,7 @@ namespace Json
     class Writer;
 }
 
-namespace Sentry
+namespace Tendo
 {
 	class Component;
 	class IStart

@@ -5,7 +5,7 @@
 #include"ClusterConfig.h"
 #include"Core/System/System.h"
 #include"Server/Config/ServerConfig.h"
-namespace Sentry
+namespace Tendo
 {
     bool NodeConfig::IsStart(const std::string &service) const
     {
@@ -86,7 +86,7 @@ namespace Sentry
 
 }
 
-namespace Sentry
+namespace Tendo
 {
     bool ClusterConfig::OnLoadText(const char *str, size_t length)
     {

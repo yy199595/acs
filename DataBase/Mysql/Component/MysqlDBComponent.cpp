@@ -10,7 +10,7 @@
 #include"Mysql/Client/MysqlClient.h"
 #include"Mysql/Lua/LuaMysql.h"
 #include"Script/Lua/ClassProxyHelper.h"
-namespace Sentry
+namespace Tendo
 {
     MysqlTask::MysqlTask(int taskId)
         : IRpcTask<Mysql::Response>(taskId)
@@ -24,12 +24,12 @@ namespace Sentry
     }
 }
 
-namespace Sentry
+namespace Tendo
 {
 
 }
 
-namespace Sentry
+namespace Tendo
 {
 	bool MysqlDBComponent::Awake()
 	{

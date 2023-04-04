@@ -11,7 +11,7 @@
 #include"Rpc/Component/NodeMgrComponent.h"
 #include"Rpc/Component/InnerNetComponent.h"
 #include"Core/Component/ComponentFactory.h"
-namespace Sentry
+namespace Tendo
 {
 	bool GateComponent::LateAwake()
 	{

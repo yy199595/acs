@@ -7,7 +7,7 @@
 #include<memory>
 #include"Timer/Timer/DelayTimer.h"
 #include"Timer/Component/TimerComponent.h"
-using namespace Sentry;
+using namespace Tendo;
 
 namespace Lua
 {

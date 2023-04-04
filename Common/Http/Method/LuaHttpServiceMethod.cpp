@@ -10,7 +10,7 @@
 #include"Proto/Component/ProtoComponent.h"
 #include"Script/Component/LuaScriptComponent.h"
 
-namespace Sentry
+namespace Tendo
 {
     LuaHttpServiceMethod::LuaHttpServiceMethod(const HttpMethodConfig *config)
         : HttpServiceMethod(config->Method)

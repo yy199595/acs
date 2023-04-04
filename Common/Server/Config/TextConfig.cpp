@@ -6,7 +6,7 @@
 #include"Util/Md5/MD5.h"
 #include"Core/System/System.h"
 #include"Log/Common/CommonLogDef.h"
-namespace Sentry
+namespace Tendo
 {
     const std::string &TextConfig::WorkPath() const
     {

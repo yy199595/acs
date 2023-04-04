@@ -11,7 +11,7 @@
 #include"Http/Client/Http.h"
 #include"Http/Common/HttpRequest.h"
 #include"Http/Common/HttpResponse.h"
-namespace Sentry
+namespace Tendo
 {
 	template<typename T>
 	using HttpMethod = int(T::*)(const Http::Request& request, Http::DataResponse& response);

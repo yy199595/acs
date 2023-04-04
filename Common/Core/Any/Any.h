@@ -9,7 +9,7 @@
 #include <string>
 #include <memory>
 #include <typeindex>
-namespace Sentry
+namespace Tendo
 {
 	struct Any
 	{

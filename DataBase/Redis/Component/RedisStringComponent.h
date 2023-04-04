@@ -6,7 +6,7 @@
 #define APP_REDISSTRINGCOMPONENT_H
 #include"Core/Component/Component.h"
 
-namespace Sentry
+namespace Tendo
 {
     class RedisStringComponent : public Component
     {

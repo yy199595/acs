@@ -5,7 +5,7 @@
 #include"Message.h"
 
 #define NOUSER
-namespace Sentry
+namespace Tendo
 {
 	MessageDecoder::MessageDecoder(lua_State* lua, ProtoComponent* component)
 	{

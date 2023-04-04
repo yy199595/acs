@@ -5,7 +5,7 @@
 #include"Util/Json/JsonReader.h"
 #include"google/protobuf/util/json_util.h"
 using namespace google::protobuf;
-namespace Sentry
+namespace Tendo
 {
 	template<typename T>
 	using ServiceMethodType1 = int(T::*)();
@@ -54,7 +54,7 @@ namespace Sentry
 }// namespace Sentry
 
 
-namespace Sentry
+namespace Tendo
 {
 
 	class ServiceMethod

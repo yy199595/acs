@@ -1,5 +1,5 @@
 #include"WatchDog.h"
-namespace Sentry
+namespace Tendo
 {
     bool WatchDog::OnInit()
     {

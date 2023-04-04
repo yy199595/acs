@@ -6,7 +6,7 @@
 #include"Script/Lua/Function.h"
 #include"Script/Module/LuaModule.h"
 #include"Script/Component/LuaScriptComponent.h"
-namespace Sentry
+namespace Tendo
 {
 	LuaPhysicalHttpService::LuaPhysicalHttpService()
 	{

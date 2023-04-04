@@ -3,7 +3,7 @@
 #include"Timer/Timer/TimerBase.h"
 #include"Async/Lua/LuaWaitTaskSource.h"
 #include"Timer/Component/TimerComponent.h"
-using namespace Sentry;
+using namespace Tendo;
 #define Await(task) task->Await()
 namespace Lua
 {

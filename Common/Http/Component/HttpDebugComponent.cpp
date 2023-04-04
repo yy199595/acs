@@ -9,7 +9,7 @@
 #include"Rpc/Component/NodeMgrComponent.h"
 #include"Rpc/Component/InnerNetMessageComponent.h"
 
-namespace Sentry
+namespace Tendo
 {
 	bool HttpDebugComponent::LateAwake()
 	{

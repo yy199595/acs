@@ -3,7 +3,7 @@
 #include"TimerBase.h"
 #include"Script/Lua/LuaInclude.h"
 #include"Rpc/Method/MethodProxy.h"
-namespace Sentry
+namespace Tendo
 {
 	class DelayTimer : public TimerBase
 	{
@@ -18,7 +18,7 @@ namespace Sentry
 	};
 }// namespace Sentry
 
-namespace Sentry
+namespace Tendo
 {
 	class LuaTimer final : public TimerBase
 	{

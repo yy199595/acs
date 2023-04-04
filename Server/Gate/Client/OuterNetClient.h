@@ -7,7 +7,7 @@
 #include"Rpc/Client/Message.h"
 #include"Network/Tcp/TcpContext.h"
 using namespace Tcp;
-namespace Sentry
+namespace Tendo
 {
     // 网关session
 	class OuterNetComponent;

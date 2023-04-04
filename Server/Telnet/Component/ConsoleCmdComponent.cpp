@@ -3,7 +3,7 @@
 //
 
 #include "ConsoleCmdComponent.h"
-namespace Sentry
+namespace Tendo
 {
 	void ConsoleCmdComponent::Add(const std::string& cmd, CommandMethod method)
 	{

@@ -17,7 +17,7 @@
 #define COR_POOL_COUNT 100
 
 
-namespace Sentry
+namespace Tendo
 {
 
 	class TaskContext;
@@ -39,7 +39,7 @@ namespace Sentry
     };
 }
 
-namespace Sentry
+namespace Tendo
 {
 	class AsyncMgrComponent;
     class CoroutineGroup : public std::enable_shared_from_this<CoroutineGroup>

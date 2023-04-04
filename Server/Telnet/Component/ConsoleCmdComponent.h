@@ -10,7 +10,7 @@
 #include<Core/Component/Component.h>
 using CommandMethod = std::function<void(const std::string &)>;
 
-namespace Sentry
+namespace Tendo
 {
 	class ConsoleCmdComponent : public Component
 	{

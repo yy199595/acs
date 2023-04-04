@@ -9,7 +9,7 @@
 #include"Http/Common/HttpResponse.h"
 #include"Http/Component/HttpListenComponent.h"
 
-namespace Sentry
+namespace Tendo
 {
 	HttpHandlerClient::HttpHandlerClient(HttpListenComponent * httpComponent, std::shared_ptr<SocketProxy> socketProxy)
 		: Tcp::TcpContext(std::move(socketProxy))

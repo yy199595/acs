@@ -7,7 +7,7 @@
 #include"Util/Json/Lua/values.hpp"
 #include"Proto/Component/ProtoComponent.h"
 #include<google/protobuf/util/json_util.h>
-namespace Sentry
+namespace Tendo
 {
 	LuaWaitTaskSource::LuaWaitTaskSource(lua_State* lua)
 			: mRef(0), mLua(lua)

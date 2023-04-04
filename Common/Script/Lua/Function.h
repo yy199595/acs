@@ -4,7 +4,7 @@
 #include"Script/Lua/LuaParameter.h"
 #include"Log/Common/CommonLogDef.h"
 #include"Async/Lua/WaitLuaTaskSource.h"
-using namespace Sentry;
+using namespace Tendo;
 
 namespace Lua
 {

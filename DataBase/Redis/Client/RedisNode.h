@@ -7,7 +7,7 @@
 #include<vector>
 #include<memory>
 #include"TcpRedisClient.h"
-namespace Sentry
+namespace Tendo
 {
 	class RedisNode
 	{

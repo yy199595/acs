@@ -5,7 +5,7 @@
 #ifndef _SERVERCMDCOMPONENT_H_
 #define _SERVERCMDCOMPONENT_H_
 #include"ConsoleCmdComponent.h"
-namespace Sentry
+namespace Tendo
 {
 	class ServerCmdComponent : public ConsoleCmdComponent
 	{

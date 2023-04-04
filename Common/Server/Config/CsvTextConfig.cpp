@@ -8,7 +8,7 @@
 #include"CsvTextConfig.h"
 #include"Util/String/StringHelper.h"
 
-namespace Sentry
+namespace Tendo
 {
 	bool CsvLineData::Add(const std::string& key, const std::string& value)
 	{
@@ -66,7 +66,7 @@ namespace Sentry
 	}
 }
 
-namespace Sentry
+namespace Tendo
 {
 	CsvTextConfig::CsvTextConfig(std::string  name)
 		: mName(std::move(name))

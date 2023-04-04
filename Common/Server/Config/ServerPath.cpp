@@ -4,7 +4,7 @@
 
 #include"ServerPath.h"
 #include"Util/File/DirectoryHelper.h"
-namespace Sentry
+namespace Tendo
 {
     ServerPath::ServerPath(int argc, char **argv)
     {

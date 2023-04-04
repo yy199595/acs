@@ -9,7 +9,7 @@
 #include"Proto/Lua/Message.h"
 #include"Util/Json/Lua/Json.h"
 #include"XCode/XCode.h"
-namespace Sentry
+namespace Tendo
 {
 	LuaServiceTaskSource::LuaServiceTaskSource(Http::DataResponse* message)
 		: mHttpData(message), mRpcData(nullptr)
@@ -53,7 +53,7 @@ namespace Sentry
 	}
 }
 
-namespace Sentry
+namespace Tendo
 {
 	int LuaServiceTaskSource::SetHttp(lua_State* lua)
 	{

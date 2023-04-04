@@ -7,7 +7,7 @@
 #include"Http/Common/HttpResponse.h"
 #include"Rpc/Async/RpcTaskSource.h"
 
-namespace Sentry
+namespace Tendo
 {
     class HttpRequestTask : public IRpcTask<Http::IResponse>
     {
@@ -22,7 +22,7 @@ namespace Sentry
     typedef std::shared_ptr<IRpcTask<Http::DataResponse>> SharedHttpRpcTask;
 }
 
-namespace Sentry
+namespace Tendo
 {
     class HttpRequestClient;
     class LuaHttpRequestTask : public IRpcTask<Http::IResponse>

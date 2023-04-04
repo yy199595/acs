@@ -8,7 +8,7 @@
 #include"Rpc/Async/RpcTaskSource.h"
 #include"Proto/Component/ProtoComponent.h"
 #include"Rpc/Component/InnerNetMessageComponent.h"
-using namespace Sentry;
+using namespace Tendo;
 namespace Lua
 {
 	int LuaApp::GetComponent(lua_State* lua)

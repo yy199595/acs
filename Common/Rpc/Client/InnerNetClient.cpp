@@ -6,7 +6,7 @@
 #include"Rpc/Client/Rpc.h"
 #include"Util/Guid/Guid.h"
 #include"Core/System/System.h"
-namespace Sentry
+namespace Tendo
 {
 
 	InnerNetClient::InnerNetClient(IRpc<Rpc::Packet>* component, std::shared_ptr<SocketProxy> socket)

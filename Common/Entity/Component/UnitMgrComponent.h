@@ -3,7 +3,7 @@
 #include<unordered_map>
 #include"Core/Component/Component.h"
 
-namespace Sentry
+namespace Tendo
 {
 	class Unit;
 	class UnitMgrComponent : public Component

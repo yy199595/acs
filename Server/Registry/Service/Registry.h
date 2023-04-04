@@ -6,7 +6,7 @@
 #define APP_LOCATIONSERVICE_H
 #include"Message/s2s.pb.h"
 #include"Rpc/Service/PhysicalRpcService.h"
-namespace Sentry
+namespace Tendo
 {
 	class Registry final : public PhysicalRpcService, public ISecondUpdate
     {

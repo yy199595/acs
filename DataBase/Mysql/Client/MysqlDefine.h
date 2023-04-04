@@ -13,7 +13,7 @@
 #include"XCode/XCode.h"
 
 using namespace std;
-namespace Sentry
+namespace Tendo
 {
     class SqlHelper;
 

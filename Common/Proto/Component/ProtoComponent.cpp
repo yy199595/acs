@@ -11,7 +11,7 @@
 #include"google/protobuf/dynamic_message.h"
 #include"Proto/Lua/Message.h"
 #include"Script/Lua/ClassProxyHelper.h"
-namespace Sentry
+namespace Tendo
 {
     ImportError::ImportError()
         : mHasError(false), mHasWarning(false)
@@ -31,7 +31,7 @@ namespace Sentry
     }
 }
 
-namespace Sentry
+namespace Tendo
 {
 	ProtoComponent::ProtoComponent()
 	{

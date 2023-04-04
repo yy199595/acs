@@ -14,7 +14,7 @@
 #endif
 #include"Entity/App/App.h"
 #include"Gate/Component/OuterNetComponent.h"
-namespace Sentry
+namespace Tendo
 {
 	InnerNetMessageComponent::InnerNetMessageComponent()
 	{

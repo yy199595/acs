@@ -9,7 +9,7 @@
 #include"Script/Lua/LuaInclude.h"
 #include"google/protobuf/message.h"
 using namespace google::protobuf;
-namespace Sentry
+namespace Tendo
 {
     class LuaServiceTaskSource final
     {

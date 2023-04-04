@@ -7,7 +7,7 @@
 #include"Core/System/System.h"
 #include"spdlog/sinks/rotating_file_sink.h"
 #include"WatchDog/Component/WatchDogComponent.h"
-namespace Sentry
+namespace Tendo
 {
 	// 单线程  st  多线程  mt
 	bool LogComponent::Awake()

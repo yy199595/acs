@@ -5,7 +5,7 @@
 #include"Script/Module/LuaModule.h"
 #include"Core/Component/Component.h"
 struct lua_State;
-namespace Sentry
+namespace Tendo
 {
     class LuaScriptComponent : public Component, public IStart, 
 			public IComplete, public IHotfix, public ISecondUpdate,

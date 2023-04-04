@@ -5,7 +5,7 @@
 #ifndef GAMEKEEPER_TASKSOURCEBASE_H
 #define GAMEKEEPER_TASKSOURCEBASE_H
 #include<memory>
-namespace Sentry
+namespace Tendo
 {
     enum class TaskState
     {

@@ -6,7 +6,7 @@
 #include"Util/File/FileHelper.h"
 #include"Util/String/StringHelper.h"
 #include"Entity/App/App.h"
-namespace Sentry
+namespace Tendo
 {
 	TcpRedisClient::TcpRedisClient(std::shared_ptr<SocketProxy> socket,
 		const RedisClientConfig& config, IRpc<RedisResponse>* component)

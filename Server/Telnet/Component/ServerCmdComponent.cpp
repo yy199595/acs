@@ -7,7 +7,7 @@
 #include"Util/String/StringHelper.h"
 #include"Http/Common/HttpResponse.h"
 #include"Http/Component/HttpComponent.h"
-namespace Sentry
+namespace Tendo
 {
 	bool ServerCmdComponent::Awake()
 	{

@@ -7,7 +7,7 @@
 #include"Rpc/Lua/LuaServiceMethod.h"
 #include"Rpc/Service/PhysicalRpcService.h"
 #include"Proto/Component/ProtoComponent.h"
-namespace Sentry
+namespace Tendo
 {
 	bool ServiceMethodRegister::AddMethod(std::shared_ptr<ServiceMethod> method)
 	{
@@ -83,7 +83,7 @@ namespace Sentry
 	}
 }
 
-namespace Sentry
+namespace Tendo
 {
 	std::shared_ptr<HttpServiceMethod> HttpServiceRegister::GetMethod(const string& name)
 	{

@@ -2,7 +2,7 @@
 #include"Message/s2s.pb.h"
 #include"Core/Component/Component.h"
 
-namespace Sentry
+namespace Tendo
 {
 	class WatchDogComponent final : public Component, public ISecondUpdate
 	{

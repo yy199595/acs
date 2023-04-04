@@ -1,7 +1,7 @@
 #include"CoroutineDef.h"
 #include"TaskContext.h"
 #include"Entity/App/App.h"
-namespace Sentry
+namespace Tendo
 {
 	TaskContextPool::~TaskContextPool()
 	{
@@ -56,7 +56,7 @@ namespace Sentry
 	}
 }
 
-namespace Sentry
+namespace Tendo
 {
 	CoroutineGroup::CoroutineGroup()
 	{

@@ -10,7 +10,7 @@
 #include <mutex>
 #include <condition_variable>
 
-namespace Sentry
+namespace Tendo
 {
 	template<typename T>
 	class ThreadQueue

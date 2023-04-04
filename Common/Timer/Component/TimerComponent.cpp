@@ -3,7 +3,7 @@
 #include"Entity/App/App.h"
 #include"Script/Lua/ClassProxyHelper.h"
 #include"Timer/Lua/Timer.h"
-namespace Sentry
+namespace Tendo
 {
 	bool TimerComponent::Awake()
 	{

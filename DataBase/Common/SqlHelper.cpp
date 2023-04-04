@@ -3,7 +3,7 @@
 #include"google/protobuf/util/json_util.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
-namespace Sentry
+namespace Tendo
 {
     void SqlHelper::GetFiles(const Message &message, std::stringstream &ss, char cc)
     {

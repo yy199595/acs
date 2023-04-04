@@ -10,7 +10,7 @@
 #include"Redis/Component/RedisComponent.h"
 #include"Redis/Component/RedisScriptComponent.h"
 
-using namespace Sentry;
+using namespace Tendo;
 namespace Lua
 {
 	int Redis::Run(lua_State* lua)

@@ -23,7 +23,7 @@
 #include "Server/Component/TextConfigComponent.h"
 
 using namespace Lua;
-namespace Sentry
+namespace Tendo
 {
 	bool LuaScriptComponent::Awake()
 	{

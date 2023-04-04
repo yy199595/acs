@@ -11,7 +11,7 @@
 #include"Util/File/DirectoryHelper.h"
 #include"Util/File/FileHelper.h"
 #include"Server/Component/ThreadComponent.h"
-namespace Sentry
+namespace Tendo
 {
     HttpWebComponent::HttpWebComponent()
         : mSumCount(0), mWaitCount(0),

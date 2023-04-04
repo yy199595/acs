@@ -9,7 +9,7 @@
 #include<unistd.h>
 #endif // __OS_WIN__
 #include"spdlog/fmt/fmt.h"
-namespace Sentry
+namespace Tendo
 {
     bool System::Init(int argc, char **argv)
     {

@@ -12,7 +12,7 @@
 #include"Mysql/Config/MysqlConfig.h"
 #include"Core/Component/IComponent.h"
 
-namespace Sentry
+namespace Tendo
 {
     class MysqlDBComponent;
 

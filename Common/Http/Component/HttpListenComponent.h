@@ -15,7 +15,7 @@ namespace Http
 	class IResponse;
 	class DataResponse;
 }
-namespace Sentry
+namespace Tendo
 {
     class HttpHandlerClient;
     class HttpListenComponent : public TcpListenerComponent

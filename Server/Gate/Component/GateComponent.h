@@ -7,7 +7,7 @@
 #include"google/protobuf/message.h"
 #include"Core/Component/Component.h"
 using namespace google::protobuf;
-namespace Sentry
+namespace Tendo
 {
 	class GateComponent final : public Component, public ILuaRegister
 	{

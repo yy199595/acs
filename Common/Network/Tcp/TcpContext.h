@@ -6,7 +6,7 @@
 #define GAMEKEEPER_TCPCLIENT_H
 #include<list>
 #include"SocketProxy.h"
-using namespace Sentry;
+using namespace Tendo;
 
 namespace Tcp
 {

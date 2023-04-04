@@ -11,7 +11,7 @@
 #include"Server/Config/CodeConfig.h"
 #include"Gate/Component/OuterNetComponent.h"
 #include"Rpc/Component/NodeMgrComponent.h"
-namespace Sentry
+namespace Tendo
 {
     Gate::Gate()
     {

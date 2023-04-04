@@ -12,7 +12,7 @@
 #include"Http/Common/HttpRequest.h"
 #include"Http/Task/HttpTask.h"
 #include"Entity/App/App.h"
-using namespace Sentry;
+using namespace Tendo;
 namespace Lua
 {
 	int HttpClient::Get(lua_State* lua)
