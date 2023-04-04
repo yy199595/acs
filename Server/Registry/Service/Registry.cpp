@@ -247,4 +247,12 @@ namespace Tendo
 	{
 
 	}
+	void Registry::OnClose()
+	{
+		AsyncMgrComponent * component = this->GetComponent<AsyncMgrComponent>();
+		if(component != nullptr)
+		{
+			component->Sleep(1000 * 10);
+		}
+	}
 }
