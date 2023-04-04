@@ -2,8 +2,7 @@
 #ifdef __OS_WIN__
 #include<direct.h>
 #else
-#include<unistd.h>
-#endif // 
+#endif //
 #include<regex>
 #include"ServerConfig.h"
 #include"Log/Common/CommonLogDef.h"

@@ -8,7 +8,7 @@
 #else
 #include<unistd.h>
 #endif // __OS_WIN__
-#include"Log/Common/CommonLogDef.h"
+#include"spdlog/fmt/fmt.h"
 namespace Sentry
 {
     bool System::Init(int argc, char **argv)

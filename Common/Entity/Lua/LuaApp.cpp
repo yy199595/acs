@@ -6,7 +6,6 @@
 #include"Entity/App/App.h"
 #include"Rpc/Service/RpcService.h"
 #include"Rpc/Async/RpcTaskSource.h"
-#include"Server//Config/ServiceConfig.h"
 #include"Proto/Component/ProtoComponent.h"
 #include"Rpc/Component/InnerNetMessageComponent.h"
 using namespace Sentry;

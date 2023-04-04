@@ -74,7 +74,7 @@ namespace Sentry
             if(code == asio::error::operation_aborted) //强制取消
             {
                 this->mBindAcceptor = nullptr;
-                CONSOLE_LOG_ERROR("close listen " << this->GetName());
+                CONSOLE_LOG_ERROR("close listen " << this->GetName() << " [" << this->mListenPort << "]");
                 this->OnStopListen();
                 return;
             }

@@ -247,9 +247,9 @@ namespace Sentry
 			complete->OnLocalComplete();
 			this->mTimerComponent->CancelTimer(timerId);
         }
-        this->WaitServerStart();
-		this->mStatus = ServerStatus::Ready;
 		CONSOLE_LOG_DEBUG("start all component complete");
+		this->mStatus = ServerStatus::Ready;
+		this->WaitServerStart();
     }
 
 	void App::WaitServerStart() //等待依赖的服务启动完成

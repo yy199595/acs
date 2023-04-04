@@ -4,7 +4,6 @@
 
 #ifndef SERVER_WAITLUATASKSOURCE_H
 #define SERVER_WAITLUATASKSOURCE_H
-#include"Script/Lua/LuaInclude.h"
 #include"Script/Lua/LuaParameter.h"
 #include"Async/Source/TaskSource.h"
 namespace Sentry

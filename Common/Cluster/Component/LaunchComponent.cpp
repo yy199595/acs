@@ -9,8 +9,6 @@
 #include"Cluster//Config/ClusterConfig.h"
 #include"Rpc/Service/VirtualRpcService.h"
 #include"Rpc/Service/LuaPhysicalRpcService.h"
-#include"Rpc/Service/PhysicalRpcService.h"
-#include"Http/Service/HttpService.h"
 #include"Http//Service/LuaPhysicalHttpService.h"
 #include"Rpc/Component/NodeMgrComponent.h"
 #include"Script/Component/LuaScriptComponent.h"
