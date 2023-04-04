@@ -26,6 +26,12 @@ namespace Sentry
 		virtual void OnClusterComplete() { } //集群内所有服务启动完毕
 	};
 
+	class IDestroy
+	{
+	public:
+		virtual void OnDestroy() = 0;
+	};
+
 	class IServerChange
 	{
 	public:

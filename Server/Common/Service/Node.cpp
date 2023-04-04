@@ -162,8 +162,8 @@ namespace Sentry
 		Json::Writer document;
         {
             document.BeginObject("server");
-            document.Add("name").Add(ServerConfig::Inst()->Name());
-            document.Add("fps").Add((int)this->mApp->GetFps());
+			document.Add("fps").Add((int)this->mApp->GetFps());
+			document.Add("name").Add(ServerConfig::Inst()->Name());
             document.Add("cpu").Add(std::thread::hardware_concurrency());
             document.Add(Json::End::EndObject);
         }
@@ -199,4 +199,20 @@ namespace Sentry
         }
         return XCode::Successful;
     }
+
+	void Node::OnClose()
+	{
+		std::string address;
+		RpcService* rpcService = this->mApp->GetService<Registry>();
+		const std::string & server = rpcService->GetServer();
+		if(this->mNodeComponent->GetServer(server, address))
+		{
+			com::type::string request;
+			const ServerConfig* config = ServerConfig::Inst();
+			config->GetLocation("rpc", *request.mutable_str());
+			int code = rpcService->Call(address, "UnRegister", request);
+			const std::string & desc = CodeConfig::Inst()->GetDesc(code);
+			CONSOLE_LOG_INFO("unregister " << request.str() << " code = " << desc);
+		}
+	}
 }

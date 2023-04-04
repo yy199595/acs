@@ -1,5 +1,5 @@
 Player = {}
-require("Component.LoginComponent")
+require("Client.LoginComponent")
 function Player:Call(func, message)
     return Client.Call(self.session, func, message)
 end

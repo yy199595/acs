@@ -12,6 +12,17 @@
 
 namespace Sentry
 {
+	enum class ServerStatus
+	{
+		Init,
+		Ready, //启动完成
+		Running, // 正在运行
+		Closing	 //正在关闭
+	};
+}
+
+namespace Sentry
+{
 	class RpcService;
 	class ProtoComponent;
     class App final : public Unit, public Singleton<App>
@@ -45,6 +56,7 @@ namespace Sentry
         int mTickCount;
 		float mLogicFps;
         bool mIsStartDone;
+		ServerStatus mStatus;
         std::thread::id mThreadId;
         const long long mStartTime;
         AsyncMgrComponent* mTaskComponent;

@@ -284,7 +284,8 @@ namespace Sentry
 	{
 		if (this->mLuaEnv != nullptr)
 		{
-			// lua_close(this->mLuaEnv);
+			lua_close(this->mLuaEnv);
+			this->mLuaEnv = nullptr;
 		}
 	}
 

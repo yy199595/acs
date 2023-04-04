@@ -26,7 +26,7 @@ namespace Sentry
 {
     class HttpMethodConfig;
     class HttpHandlerClient;
-    class HttpWebComponent : public HttpListenComponent, public IServerRecord
+	class HttpWebComponent : public HttpListenComponent, public IServerRecord, public IDestroy
     {
     public:
         HttpWebComponent();

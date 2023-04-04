@@ -326,5 +326,10 @@ namespace Sentry
 	void InnerNetComponent::OnDestroy()
 	{
 		this->StopListen();
+		auto iter = this->mRpcClientMap.begin();
+		for(; iter != this->mRpcClientMap.end(); iter++)
+		{
+			this->StartClose(iter->first);
+		}
 	}
 }// namespace Sentry

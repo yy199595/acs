@@ -10,7 +10,7 @@ namespace Sentry
 	class ThreadComponent;
 
     class RedisComponent final : public RpcTaskComponent<int, RedisResponse>,
-								 public ILuaRegister, public IStart, public IRpc<RedisResponse>
+								 public ILuaRegister, public IStart, public IRpc<RedisResponse>, public IDestroy
 	{
 	 public:
 		RedisComponent() = default;
@@ -34,6 +34,7 @@ namespace Sentry
     private:
         bool Awake() final;
         bool Start() final;
+		void OnDestroy() final;
         bool LateAwake() final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 		void OnTaskComplete(int key) final { this->mNumberPool.Push(key);}

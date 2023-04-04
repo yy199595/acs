@@ -239,6 +239,7 @@ namespace Sentry
 		{
 			rpcService->Send(target, func, request);
 		}
+		LOG_WARN("remove server : " << request.str());
 		return XCode::Successful;
 	}
 

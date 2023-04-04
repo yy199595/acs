@@ -84,6 +84,7 @@ namespace Sentry
             delete thread;
         }
         this->mNetThreads.clear();
+		CONSOLE_LOG_INFO("delete net work thread");
 	}
 
     Asio::Context& ThreadComponent::GetContext()

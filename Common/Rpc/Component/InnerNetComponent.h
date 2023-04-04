@@ -8,8 +8,8 @@
 namespace Sentry
 {
 	// 管理内网rpc的session
-	class InnerNetComponent : public TcpListenerComponent,
-							  public IRpc<Rpc::Packet>, public IServerRecord, public IFrameUpdate
+	class InnerNetComponent : public TcpListenerComponent, public IRpc<Rpc::Packet>,
+			public IServerRecord, public IFrameUpdate, public IDestroy
 	{
 	 public:
 		InnerNetComponent();

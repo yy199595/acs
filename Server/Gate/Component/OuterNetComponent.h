@@ -18,7 +18,7 @@ namespace Sentry
 
 	class OuterNetClient;
     class OuterNetComponent : public TcpListenerComponent, public IRpc<Rpc::Packet>,
-							  public IComplete, public IServerRecord, public IFrameUpdate
+							  public IComplete, public IServerRecord, public IFrameUpdate, public IDestroy
 	{
 	 public:
 		OuterNetComponent() = default;

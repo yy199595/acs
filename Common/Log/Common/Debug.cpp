@@ -9,6 +9,8 @@
 #endif
 #include"Log/Component/LogComponent.h"
 using namespace Sentry;
+
+#define DUMP_STACK_DEPTH_MAX 100
 void Debug::Lua(const char *log)
 {
     std::string logMessage(log);
@@ -33,11 +35,10 @@ void Debug::Log(Debug::Level color, const std::string &log)
     {
         switch (color)
         {
-            case spdlog::level::err:
             case spdlog::level::critical:
             {
                 std::string trace;
-                Debug::Backtrace(trace, 15, 2);
+                Debug::Backtrace(trace);
                 Debug::Console(color, log + trace);
 				logComponent->SaveLog(color, log + trace);
             }
@@ -52,9 +53,88 @@ void Debug::Log(Debug::Level color, const std::string &log)
     }
 }
 
-void Debug::Backtrace(std::string &trace, int size, int skip)
+void demangle(char * msg, std::string &out)
 {
-    
+	char *mangled_name = 0, *offset_begin = 0, *offset_end = 0;
+
+	// find parantheses and +address offset surrounding mangled name
+	for (char *p = msg; p && *p; ++p)
+	{
+		if (*p == '(')
+		{
+			mangled_name = p;
+		}
+		else if (*p == '+')
+		{
+			offset_begin = p;
+		}
+		else if (*p == ')')
+		{
+			offset_end = p;
+			break;
+		}
+	}
+	// if the line could be processed, attempt to demangle the symbol
+	if (mangled_name && offset_begin && offset_end &&
+		mangled_name < offset_begin)
+	{
+		*mangled_name++ = '\0';
+		*offset_begin++ = '\0';
+		*offset_end++ = '\0';
+
+		int status;
+		char * real_name = abi::__cxa_demangle(mangled_name, 0, 0, &status);
+
+		// if demangling is successful, output the demangled function name
+		if (status == 0)
+		{
+			out = out + real_name + "+" + offset_begin + offset_end;
+		}
+			// otherwise, output the mangled function name
+		else
+		{
+			out = out + mangled_name + "+" + offset_begin + offset_end;
+		}
+		free(real_name);
+	}
+	else
+		// otherwise, save the whole line
+		out += msg;
+}
+
+void Debug::Backtrace(std::string &trace)
+{
+#ifdef __OS_LINUX__
+	void *stack_trace[DUMP_STACK_DEPTH_MAX] = { 0 };
+	char **stack_strings = NULL;
+	int stack_depth = 0;
+	int i = 0;
+	char index[5];
+
+	/* 获取栈中各层调用函数地址 */
+	stack_depth = backtrace(stack_trace, DUMP_STACK_DEPTH_MAX);
+
+	/* 查找符号表将函数调用地址转换为函数名称 */
+	stack_strings = (char **)backtrace_symbols(stack_trace, stack_depth);
+	if (NULL == stack_strings) {
+		trace += " Memory is not enough while dump Stack Trace! \n";
+		return;
+	}
+
+	/* 保存调用栈 */
+	trace += "Backtrace:\n\t";
+	for (i = 1; i < stack_depth; ++i) {
+		snprintf(index, sizeof(index), "#%02d ", i);
+		trace += index;
+		demangle(stack_strings[i], trace);
+		trace += "\n\t";
+	}
+
+	/* 获取函数名称时申请的内存需要自行释放 */
+	free(stack_strings);
+	stack_strings = NULL;
+#endif
+	return;
 }
 
 void Debug::Console(Debug::Level color, const std::string &log)

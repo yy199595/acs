@@ -131,19 +131,10 @@ ADD_EXECUTABLE(app ${build_files})
 
 list(APPEND static_lib lua)
 
-if(__ENABLE_JEMALLOC__)
-
-    find_package(Jemalloc)
-    if(NOT Jemalloc_FOUND)
-        message(ERROR "请安装jemalloc 命令:sudo apt-get install libjemalloc-dev")
-        #execute_process(COMMAND sudo apt-get install libjemalloc-dev)
-    endif()
-
+find_package(Jemalloc QUIET)
+if(Jemalloc_FOUND)
     list(APPEND static_lib jemalloc)
-endif()
-
-if(__ENABLE_MIMALLOC__)
-    #list(APPEND static_lib mimalloc)
+    message("使用jemalloc作为内存池")
 endif()
 
 if(__ENABLE_OPEN_SSL__)
@@ -151,13 +142,13 @@ if(__ENABLE_OPEN_SSL__)
 endif()
 
 if(__ENABLE_MYSQL__)
+    #set(CMAKE_LIBRARY_PATH ${PROJECT_SOURCE_DIR}/Libs/mysql/lib)
     if(WIN32)
         list(APPEND static_lib libmysql mysqlclient)
     else()
         list(APPEND static_lib mysqlclient yassl)
     endif()
 endif()
-
 
 if(WIN32)
     message("当前为win平台")

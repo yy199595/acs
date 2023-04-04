@@ -30,7 +30,7 @@ namespace Sentry
 {
     class MysqlClient;
 	class MysqlDBComponent : public RpcTaskComponent<int, Mysql::Response>,
-							 public IRpc<Mysql::Response>, public ILuaRegister
+							 public IRpc<Mysql::Response>, public ILuaRegister, public IDestroy
     {
 	public:
 		bool Ping(int index = 0);

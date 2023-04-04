@@ -6,7 +6,7 @@
 namespace Sentry
 {
 	class SqlHelper;
-	class SqliteComponent : public Component, public ILuaRegister
+	class SqliteComponent : public Component, public ILuaRegister, public IDestroy
 	{
 	public:
 		SqliteComponent() = default;

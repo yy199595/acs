@@ -35,11 +35,6 @@ namespace Sentry
 		this->mLastTime = now;
 	}
 
-	void LogComponent::OnDestroy()
-	{
-		this->SaveAllLog();
-	}
-
 	void LogComponent::SaveAllLog()
 	{
 		auto iter = this->mLoggers.begin();

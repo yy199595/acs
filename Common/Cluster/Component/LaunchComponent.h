@@ -8,7 +8,7 @@
 
 namespace Sentry
 {
-    class LaunchComponent final : public Component, public IStart
+	class LaunchComponent final : public Component, public IStart, public IDestroy
     {
     public:
         LaunchComponent() = default;
@@ -17,6 +17,7 @@ namespace Sentry
         bool Awake() final;
         bool Start() final;
 		bool LateAwake() final;
+		void OnDestroy() final;
     };
 }
 

@@ -31,6 +31,7 @@ namespace Sentry
         this->mTaskComponent = nullptr;
         this->mTimerComponent = nullptr;
         this->mMessageComponent = nullptr;
+		this->mStatus = ServerStatus::Init;
 	}
 
 	bool App::LoadComponent()
@@ -181,11 +182,24 @@ namespace Sentry
 
 	void App::Stop()
     {
-		std::vector<Component *> components;
-		this->GetComponents(components);
-		for(Component * component : components)
+		if(this->mStatus == ServerStatus::Closing)
 		{
-			component->OnDestroy();
+			return;
+		}
+		this->mStatus = ServerStatus::Closing;
+#ifdef __DEBUG__
+		CONSOLE_LOG_ERROR("start close " << ServerConfig::Inst()->Name());
+#endif
+		std::vector<IDestroy *> components;
+		this->GetComponents<IDestroy>(components);
+		std::reverse(components.begin(), components.end());
+		for(IDestroy * destroy : components)
+		{
+#ifdef __DEBUG__
+			Component * component = dynamic_cast<Component*>(destroy);
+			CONSOLE_LOG_DEBUG(component->GetName() << ".OnDestroy");
+#endif
+			destroy->OnDestroy();
 		}
 		for(int index = 5; index >= 0; index--)
 		{
@@ -233,8 +247,9 @@ namespace Sentry
 			complete->OnLocalComplete();
 			this->mTimerComponent->CancelTimer(timerId);
         }
-        CONSOLE_LOG_DEBUG("start all component complete");
         this->WaitServerStart();
+		this->mStatus = ServerStatus::Ready;
+		CONSOLE_LOG_DEBUG("start all component complete");
     }
 
 	void App::WaitServerStart() //等待依赖的服务启动完成
@@ -268,6 +283,7 @@ namespace Sentry
 			complete->OnClusterComplete();
 			this->mTimerComponent->CancelTimer(timerId);
 		}
+		this->mStatus = ServerStatus::Running;
 		long long t = Helper::Time::NowMilTime() - this->mStartTime;
 		LOG_INFO("===== start " << ServerConfig::Inst()->Name() << " successful [" << t / 1000.0f << "]s ===========");
 	}

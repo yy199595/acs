@@ -17,7 +17,6 @@ namespace Sentry
 		void SaveLog(const std::string & name, spdlog::level::level_enum type, const std::string& log);
 	 protected:
 		bool Awake() final;
-		void OnDestroy() final;
 		void OnSecondUpdate(int tick) final;
 	 private:
 		std::shared_ptr<spdlog::logger> GetLogger(const std::string & name);

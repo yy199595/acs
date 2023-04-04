@@ -8,7 +8,8 @@ struct lua_State;
 namespace Sentry
 {
     class LuaScriptComponent : public Component, public IStart, 
-							   public IComplete, public IHotfix, public ISecondUpdate, public IServerRecord
+			public IComplete, public IHotfix, public ISecondUpdate,
+							   public IServerRecord, public IDestroy
 	{
 	 public:
 		LuaScriptComponent() = default;

@@ -25,44 +25,18 @@ option(ONLY_MAIN_THREAD "启用单线程模式" OFF)
 option(__NET_ERROR_LOG__ "打印网络层错误" ON)
 option(__ENABLE_MYSQL__ "是否使用mysql" ON)
 option(__ENABLE_REDIS__ "是否使用redis" ON)
-option(__INNER_MSG_FORWARD__ "内部消息走中转" OFF)
-option(__ALL_OUTPUT_LOG__ "打印所有进程log" OFF)
 
 option(__ENABLE_MONGODB__ "是否使用mongodb" ON)
 option(__ENABLE_MIMALLOC__ "启用mimalloc管理内存" OFF)
-option(__ENABLE_JEMALLOC__ "启用jemalloc管理内存" OFF)
 
 set(CMAKE_COMMON_DIR ${PROJECT_SOURCE_DIR})
 
-if(__ENABLE_JEMALLOC__)
-    message("启用jemalloc管理内存")
-    add_definitions(-D __ENABLE_JEMALLOC__)
-endif()
-
-if(__ALL_OUTPUT_LOG__)
-    message("打印所有进程log")
-    add_definitions(-D __ALL_OUTPUT_LOG__)
-endif()
-
-if(__INNER_MSG_FORWARD__)
-    message("服务器内部消息全部走中转")
-    add_definitions(-D __INNER_MSG_FORWARD__)
-endif()
-
-if(__COROUTINE_BUFFER_STRING__)
-    message("使用string作为协程栈")
-    add_definitions(-D __COROUTINE_BUFFER_STRING__)
-endif()
 
 if(__ENABLE_OPEN_SSL__)
     message("启用ssl")
     add_definitions(-D __ENABLE_OPEN_SSL__)
 endif()
 
-if(__ENABLE_MIMALLOC__)
-    message("启用mimalloc管理内存")
-    add_definitions(-D __ENABLE_MIMALLOC__)
-endif()
 
 if(ONLY_MAIN_THREAD)
     message("当前网络为单线程模型")
@@ -89,16 +63,6 @@ endif()
 if(__DEBUG__)
     message("当前为debug模式")
     add_definitions(-D __DEBUG__)
-
-    if(__HTTP_DEBUG_LOG__)
-        message("打印http日志到控制台")
-        add_definitions(-D __HTTP_DEBUG_LOG__)
-    endif()
-
-    if(__NET_ERROR_LOG__)
-        message("打印网络错误到控制台")
-        add_definitions(-D __NET_ERROR_LOG__)
-    endif()
 
     if(__REDIS_DEBUG__)
         message("打印redis命令到控制台")

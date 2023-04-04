@@ -94,4 +94,13 @@ namespace Sentry
 		}
 		return this->Send(address, response);
 	}
+
+	void HttpListenComponent::ClearClients()
+	{
+		while(!this->mClientPools.empty())
+		{
+			this->mClientPools.pop();
+		}
+		this->mHttpClients.clear();
+	}
 }

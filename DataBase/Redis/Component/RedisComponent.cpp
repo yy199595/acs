@@ -155,4 +155,14 @@ namespace Sentry
 		redisClientContext->Send(request);
 		return true;
 	}
+	void RedisComponent::OnDestroy()
+	{
+		for(auto & redisClient : this->mRedisClients)
+		{
+			std::shared_ptr<RedisRequest> request
+					= std::make_shared<RedisRequest>("QUIT");
+
+			redisClient->Send(request);
+		}
+	}
 }

@@ -167,4 +167,18 @@ namespace Sentry
 		}
 		return true;
 	}
+
+	void LaunchComponent::OnDestroy()
+	{
+		std::vector<IServiceBase *> allServices;
+		this->mApp->GetComponents(allServices);
+		for(IServiceBase * service : allServices)
+		{
+			service->Close();
+#ifdef __DEBUG__
+			Component* component = dynamic_cast<Component*>(service);
+			CONSOLE_LOG_INFO(component->GetName() << ".OnClose");
+#endif
+		}
+	}
 }

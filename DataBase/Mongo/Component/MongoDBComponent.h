@@ -32,7 +32,7 @@ namespace Sentry
 namespace Sentry
 {
     class MongoDBComponent : public RpcTaskComponent<int,Mongo::CommandResponse>, 
-		public IRpc<Mongo::CommandResponse>, public ILuaRegister
+							 public IRpc<Mongo::CommandResponse>, public ILuaRegister, public IDestroy
 	{
 	public:
 		MongoDBComponent();

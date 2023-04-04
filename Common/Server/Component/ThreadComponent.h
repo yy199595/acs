@@ -21,7 +21,7 @@ namespace Sentry
 
 namespace Sentry
 {
-	class ThreadComponent : public Component
+	class ThreadComponent : public Component, public IDestroy
 	{
 	 public:
 		ThreadComponent() = default;

@@ -26,6 +26,7 @@ namespace Sentry
         virtual bool OnDelClient(const std::string& address) = 0;
         virtual void OnRequest(std::shared_ptr<Http::Request> request) = 0;
     protected:
+		void ClearClients();
         bool Send(const std::string& address, HttpStatus code);
         bool Send(const std::string& address, const std::string & str);
 		bool Send(const std::string& address, std::shared_ptr<Http::IResponse> response);
