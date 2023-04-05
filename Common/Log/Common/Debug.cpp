@@ -1,12 +1,13 @@
 //
 // Created by zmhy0073 on 2022/9/22.
 //
+#ifdef __OS_MAC__
+#include <cxxabi.h>
+#include <execinfo.h>
+#endif
 #include"Debug.h"
 #include"Util/Time/TimeHelper.h"
 #include"Entity/App/App.h"
-#ifndef __DEBUG_STACK__
-#include"backward.hpp"
-#endif
 #include"Log/Component/LogComponent.h"
 using namespace Tendo;
 
@@ -38,9 +39,16 @@ void Debug::Log(Debug::Level color, const std::string &log)
             case spdlog::level::critical:
             {
                 std::string trace;
-                Debug::Backtrace(trace);
-                Debug::Console(color, log + trace);
-				logComponent->SaveLog(color, log + trace);
+                if(Debug::Backtrace(trace) > 0)
+				{
+					Debug::Console(color, log + "/n" + trace);
+					logComponent->SaveLog(color, log + "/n" + trace);
+				}
+				else
+				{
+					Debug::Console(color, log);
+					logComponent->SaveLog(color, log);
+				}
             }
                 break;
             default:
@@ -102,9 +110,10 @@ void demangle(char * msg, std::string &out)
 		out += msg;
 }
 
-void Debug::Backtrace(std::string &trace)
+int Debug::Backtrace(std::string &trace)
 {
-#ifdef __OS_LINUX__
+	int count = 0;
+#ifndef __OS_WIN__
 	void *stack_trace[DUMP_STACK_DEPTH_MAX] = { 0 };
 	char **stack_strings = NULL;
 	int stack_depth = 0;
@@ -118,12 +127,13 @@ void Debug::Backtrace(std::string &trace)
 	stack_strings = (char **)backtrace_symbols(stack_trace, stack_depth);
 	if (NULL == stack_strings) {
 		trace += " Memory is not enough while dump Stack Trace! \n";
-		return;
+		return 0;
 	}
-
 	/* 保存调用栈 */
 	trace += "Backtrace:\n\t";
-	for (i = 1; i < stack_depth; ++i) {
+	for (i = 1; i < stack_depth; ++i)
+	{
+		count++;
 		snprintf(index, sizeof(index), "#%02d ", i);
 		trace += index;
 		demangle(stack_strings[i], trace);
@@ -134,7 +144,7 @@ void Debug::Backtrace(std::string &trace)
 	free(stack_strings);
 	stack_strings = NULL;
 #endif
-	return;
+	return count;
 }
 
 void Debug::Console(Debug::Level color, const std::string &log)

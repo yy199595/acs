@@ -121,6 +121,7 @@ namespace Tendo
 			Asio::Context& io = App::Inst()->MainThread();
 			io.post(std::bind(&HttpListenComponent::OnRequest, this->mHttpComponent, this->mHttpRequest));
 #endif
+			this->mHttpRequest = nullptr;
 		}
 	}
 

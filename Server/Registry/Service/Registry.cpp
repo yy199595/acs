@@ -250,9 +250,10 @@ namespace Tendo
 	void Registry::OnClose()
 	{
 		AsyncMgrComponent * component = this->GetComponent<AsyncMgrComponent>();
-		if(component != nullptr)
+		for(int index = 0; index < 10; index++)
 		{
-			component->Sleep(1000 * 10);
+			component->Sleep(1000);
+			CONSOLE_LOG_DEBUG("wait other server close");
 		}
 	}
 }
