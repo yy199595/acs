@@ -61,6 +61,7 @@ void Debug::Log(Debug::Level color, const std::string &log)
     }
 }
 
+#ifndef __OS_WIN__
 void demangle(char * msg, std::string &out)
 {
 	char *mangled_name = 0, *offset_begin = 0, *offset_end = 0;
@@ -109,7 +110,7 @@ void demangle(char * msg, std::string &out)
 		// otherwise, save the whole line
 		out += msg;
 }
-
+#endif
 int Debug::Backtrace(std::string &trace)
 {
 	int count = 0;
