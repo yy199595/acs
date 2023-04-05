@@ -124,7 +124,7 @@ namespace Tendo
 		{
 			Json::Reader document;
 			CONSOLE_LOG_INFO(result[index]);
-			const std::string& json = result.at(index);
+			//const std::string& json = result.at(index);
 			if (!document.ParseJson(result.at(index)))
 			{
 				return XCode::ParseJsonFailure;

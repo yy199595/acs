@@ -2,7 +2,7 @@
 namespace Tendo
 {
     TimeWheelLayer::TimeWheelLayer(int layerId, int count, int min, int max)
-        : mLayerId(layerId), mMaxCount(count), mMin(min), mMax(max)
+        : mMin(min), mMax(max), mLayerId(layerId), mMaxCount(count)
     {
         this->mCurIndex = 0;
         for (int index = 0; index < count; index++)

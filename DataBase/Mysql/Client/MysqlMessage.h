@@ -22,7 +22,7 @@ namespace Mysql
 	{
     public:
         explicit Response(int taskId)
-            : mTaskId(taskId) ,mIsOk(true) { }
+            :mIsOk(true), mTaskId(taskId) { }
     public:
 		void SetError(const char * str);
 		bool IsOk() const { return this->mIsOk;}

@@ -234,7 +234,7 @@ namespace Json
 			}
 			return true;
 		}
-		return true;
+		return false;
 	}
 }
 
@@ -299,7 +299,7 @@ namespace Json
 			value = jsonValue->GetDouble();
 			return true;
 		}
-			return false;
+        return false;
 	}
 	bool Reader::GetMember(const char* k1, const char* k2, long long int& value) const
 	{
@@ -319,8 +319,7 @@ namespace Json
 			value = jsonValue->GetUint();
 			return true;
 		}
-
-			return false;
+        return false;
 	}
 	bool Reader::GetMember(const char* k1, const char* k2, std::string& value) const
 	{
@@ -332,10 +331,8 @@ namespace Json
 			value.append(str, size);
 			return true;
 		}
-
-
-			return false;
-	}
+        return false;
+    }
 	bool Reader::GetMember(const char* k1, const char* k2, std::vector<int>& value) const
 	{
 		const rapidjson::Value * jsonValue = this->GetJsonValue(k1, k2);
@@ -372,6 +369,7 @@ namespace Json
 			}
 			return true;
 		}
+        return false;
 	}
 	bool Reader::GetMember(const char* k1, const char* k2, std::vector<std::string>& value) const
 	{
@@ -392,6 +390,7 @@ namespace Json
 			}
 			return true;
 		}
+        return false;
 	}
 }
 

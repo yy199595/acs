@@ -8,7 +8,7 @@
 namespace Tcp
 {
 	TcpContext::TcpContext(std::shared_ptr<SocketProxy> socket, size_t count)
-		: mMaxCount(count), mRecvBuffer(count)
+		: mRecvBuffer(count), mMaxCount(count)
 	{
         this->mSendCount = 0;
 		this->mLastOperTime = 0;
@@ -140,37 +140,37 @@ namespace Tcp
 
 	void TcpContext::Write(std::shared_ptr<ProtoMessage> message)
 	{
-        if(this->mMessagqQueue.empty())
+        if(this->mMessageQueue.empty())
         {
-            this->mMessagqQueue.emplace_back(message);
-            this->mSendCount = this->mMessagqQueue.size();
+            this->mMessageQueue.emplace_back(message);
+            this->mSendCount = this->mMessageQueue.size();
             this->SendFromMessageQueue();
             return;
         }
-        this->mMessagqQueue.emplace_back(message);
-        this->mSendCount = this->mMessagqQueue.size();
+        this->mMessageQueue.emplace_back(message);
+        this->mSendCount = this->mMessageQueue.size();
 	}
 
     size_t TcpContext::PopAllMessage()
     {
         size_t count = 0;
-        while(!this->mMessagqQueue.empty())
+        while(!this->mMessageQueue.empty())
         {
             count++;
-            this->mMessagqQueue.pop_front();
+            this->mMessageQueue.pop_front();
         }
-        this->mSendCount = this->mMessagqQueue.size();
+        this->mSendCount = this->mMessageQueue.size();
         return count;
     }
 
     std::shared_ptr<ProtoMessage> TcpContext::PopMessage()
     {
         std::shared_ptr<ProtoMessage> message;
-        if(!this->mMessagqQueue.empty())
+        if(!this->mMessageQueue.empty())
         {
-            message = this->mMessagqQueue.front();
-            this->mMessagqQueue.pop_front();
-            this->mSendCount = this->mMessagqQueue.size();
+            message = this->mMessageQueue.front();
+            this->mMessageQueue.pop_front();
+            this->mSendCount = this->mMessageQueue.size();
         }
         return message;
     }
@@ -179,11 +179,11 @@ namespace Tcp
     {
         //assert(this->mSendBuffer.size() == 0);
 		//assert(this->mMessagqQueue.size() <= 100);
-        if(!this->mMessagqQueue.empty())
+        if(!this->mMessageQueue.empty())
         {
             std::ostream os(&this->mSendBuffer);
             Asio::Socket & tcpSocket = this->mSocket->GetSocket();
-			int length = this->mMessagqQueue.front()->Serialize(os);
+			int length = this->mMessageQueue.front()->Serialize(os);
 			std::shared_ptr<TcpContext> self = this->shared_from_this();
             asio::async_write(tcpSocket, this->mSendBuffer, [this, self, length]
                     (const Asio::Code & code, size_t size)
@@ -194,7 +194,7 @@ namespace Tcp
                     return;
                 }
                 this->ClearSendStream();
-                this->OnSendMessage(code, this->mMessagqQueue.front());
+                this->OnSendMessage(code, this->mMessageQueue.front());
             });
             this->mLastOperTime = Helper::Time::NowSecTime();
             return true;

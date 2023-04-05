@@ -83,16 +83,15 @@ namespace Bson
 		}
 
 		bool Document::Get(const char *key, double &value) const
-		{
-			_bson::bsonelement bsonelement = this->getField(key);
-			switch (bsonelement.type())
-			{
-			case _bson::BSONType::NumberDouble:
-				value = bsonelement.Double();
-				return true;
-			}
-			return false;
-		}
+        {
+            _bson::bsonelement element = this->getField(key);
+            if (element.type() != _bson::BSONType::NumberDouble)
+            {
+                return false;
+            }
+            value = element.Double();
+            return true;
+        }
 	}
 	namespace Writer
 	{
@@ -160,7 +159,6 @@ namespace Bson
             for (; iter != document.MemberEnd(); iter++)
             {
                 const char *key = iter->name.GetString();
-                const rapidjson::Value & value = iter->value;
                 if (!this->WriterToBson(key, *this, iter->value))
                 {
                     return false;
@@ -292,10 +290,11 @@ namespace Bson
 			else if (jsonValue.IsObject())
 			{
 				Document obj;
-				for (auto iter = jsonValue.MemberBegin(); iter != jsonValue.MemberEnd(); iter++)
+                auto iter = jsonValue.MemberBegin();
+				for (; iter != jsonValue.MemberEnd(); iter++)
 				{
-					const char *key = iter->name.GetString();
-					if (!this->WriterToBson(key, obj, iter->value))
+					const char *name = iter->name.GetString();
+					if (!this->WriterToBson(name, obj, iter->value))
 					{
 						return false;
 					}
@@ -366,145 +365,148 @@ namespace Bson
 namespace Bson
 {
 	namespace Reader
-	{
-		bool Document::Get(const char *key, int &value) const
-		{
-			_bson::bsonelement bsonelement = this->getField(key);
-			if (bsonelement.type() == _bson::BSONType::NumberInt)
-			{
-				value = bsonelement.Int();
-				return true;
-			}
-			return false;
-		}
+    {
+        bool Document::Get(const char *key, int &value) const
+        {
+            _bson::bsonelement element = this->getField(key);
+            if (element.type() == _bson::BSONType::NumberInt)
+            {
+                value = element.Int();
+                return true;
+            }
+            return false;
+        }
 
-		bool Document::Get(const char *key, bool &value) const
-		{
-			_bson::bsonelement bsonelement = this->getField(key);
-			if (bsonelement.type() == _bson::BSONType::Bool)
-			{
-				value = bsonelement.Bool();
-				return true;
-			}
-			return false;
-		}
+        bool Document::Get(const char *key, bool &value) const
+        {
+            _bson::bsonelement element = this->getField(key);
+            if (element.type() == _bson::BSONType::Bool)
+            {
+                value = element.Bool();
+                return true;
+            }
+            return false;
+        }
 
-		bool Document::Get(const char *key, long long &value) const
-		{
-			_bson::bsonelement bsonelement = this->getField(key);
-			switch (bsonelement.type())
-			{
-			case _bson::BSONType::NumberInt:
-				value = bsonelement.Int();
-				return true;
-			case _bson::BSONType::NumberLong:
-				value = bsonelement.Long();
-				return true;
-			}
-			return false;
-		}
+        bool Document::Get(const char *key, long long &value) const
+        {
+            _bson::bsonelement element = this->getField(key);
+            switch (element.type())
+            {
+                case _bson::BSONType::NumberInt:
+                    value = element.Int();
+                    return true;
+                case _bson::BSONType::NumberLong:
+                    value = element.Long();
+                    return true;
+                default:
+                    return false;
+            }
+        }
 
-		bool Document::Get(const char *key, std::string &value) const
-		{
-			_bson::bsonelement bsonelement = this->getField(key);
-			switch (bsonelement.type())
-			{
-			case _bson::BSONType::String:
-				value = bsonelement.String();
-				return true;
-			case _bson::BSONType::BinData:
-			{
-				int len = 0;
-				const char *str = bsonelement.binData(len);
-				value.append(str, len);
-				return true;
-			}
-			}
-			return false;
-		}
+        bool Document::Get(const char *key, std::string &value) const
+        {
+            _bson::bsonelement element = this->getField(key);
+            switch (element.type())
+            {
+                case _bson::BSONType::String:
+                    value = element.String();
+                    return true;
+                case _bson::BSONType::BinData:
+                {
+                    int len = 0;
+                    const char *str = element.binData(len);
+                    value.append(str, len);
+                    return true;
+                }
+                default:
+                    return false;
+            }
+            return false;
+        }
 
-		_bson::BSONType Document::Type(const char *key) const
-		{
-			_bson::bsonelement bsonelement = this->getField(key);
-			return bsonelement.type();
-		}
+        _bson::BSONType Document::Type(const char *key) const
+        {
+            _bson::bsonelement element = this->getField(key);
+            return element.type();
+        }
 
-		void Document::WriterToJson(std::string &json)
-		{
-			Json::Writer jsonWriter;
-			std::set<std::string> elements;
-			this->getFieldNames(elements);
-			for (const std::string &key : elements)
-			{
-				jsonWriter.Add(key);
-				this->WriterToJson(this->getField(key), jsonWriter);
-			}
-			jsonWriter.WriterStream(&json);
-		}
+        void Document::WriterToJson(std::string &json)
+        {
+            Json::Writer jsonWriter;
+            std::set<std::string> elements;
+            this->getFieldNames(elements);
+            for (const std::string &key: elements)
+            {
+                jsonWriter.Add(key);
+                this->WriterToJson(this->getField(key), jsonWriter);
+            }
+            jsonWriter.WriterStream(&json);
+        }
 
-		void Document::WriterToJson(const _bson::bsonelement &bsonelement, Json::Writer &json)
-		{
-			switch (bsonelement.type())
-			{
-			case _bson::BSONType::Bool:
-				json.Add(bsonelement.Bool());
-				break;
-			case _bson::BSONType::String:
-				json.Add(bsonelement.String());
-				break;
-			case _bson::BSONType::NumberInt:
-				json.Add(bsonelement.Int());
-				break;
-			case _bson::BSONType::NumberLong:
-				json.Add(bsonelement.Long());
-				break;
-			case _bson::BSONType::NumberDouble:
-				json.Add(bsonelement.Double());
-				break;
-			case _bson::BSONType::BinData:
-			{
-				int len = 0;
-				const char * str = bsonelement.binData(len);
-				json.Add(str, len);
-			}
-			break;
-			case _bson::BSONType::Object:
-			{
-				json.BeginObject();
-				std::set<std::string> elements;
-				_bson::bsonobj obj = bsonelement.object();
-				obj.getFieldNames(elements);
-				for (const std::string &key : elements)
-				{
-					json.Add(key);
-					this->WriterToJson(obj.getField(key), json);
-				}
-				json.Add(Json::End::EndObject);
-			}
-			break;
-			case _bson::BSONType::Array:
-			{
-				json.BeginArray();
-				std::set<std::string> elements;
-				const _bson::bsonobj obj = bsonelement.object();
-				obj.getFieldNames(elements);
-				for (const std::string &key : elements)
-				{
-					this->WriterToJson(obj.getField(key), json);
-				}
-				json.Add(Json::End::EndArray);
-			}
-			break;
-			case _bson::BSONType::Timestamp:
-				json.Add(bsonelement.timestampValue());
-				break;
-			case _bson::BSONType::Date:
-				json.Add((long long)bsonelement.date().asInt64());
-				break;
-			default:
-				json.Add(bsonelement.toString());
-				break;
-			}
-		}
-	}
+        void Document::WriterToJson(const _bson::bsonelement &element, Json::Writer &json)
+        {
+            switch (element.type())
+            {
+                case _bson::BSONType::Bool:
+                    json.Add(element.Bool());
+                    break;
+                case _bson::BSONType::String:
+                    json.Add(element.String());
+                    break;
+                case _bson::BSONType::NumberInt:
+                    json.Add(element.Int());
+                    break;
+                case _bson::BSONType::NumberLong:
+                    json.Add(element.Long());
+                    break;
+                case _bson::BSONType::NumberDouble:
+                    json.Add(element.Double());
+                    break;
+                case _bson::BSONType::BinData:
+                {
+                    int len = 0;
+                    const char *str = element.binData(len);
+                    json.Add(str, len);
+                }
+                    break;
+                case _bson::BSONType::Object:
+                {
+                    json.BeginObject();
+                    std::set<std::string> elements;
+                    _bson::bsonobj obj = element.object();
+                    obj.getFieldNames(elements);
+                    for (const std::string &key: elements)
+                    {
+                        json.Add(key);
+                        this->WriterToJson(obj.getField(key), json);
+                    }
+                    json.Add(Json::End::EndObject);
+                }
+                    break;
+                case _bson::BSONType::Array:
+                {
+                    json.BeginArray();
+                    std::set<std::string> elements;
+                    const _bson::bsonobj obj = element.object();
+                    obj.getFieldNames(elements);
+                    for (const std::string &key: elements)
+                    {
+                        this->WriterToJson(obj.getField(key), json);
+                    }
+                    json.Add(Json::End::EndArray);
+                }
+                    break;
+                case _bson::BSONType::Timestamp:
+                    json.Add(element.timestampValue());
+                    break;
+                case _bson::BSONType::Date:
+                    json.Add((long long) element.date().asInt64());
+                    break;
+                default:
+                    json.Add(element.toString());
+                    break;
+            }
+        }
+    }
 }

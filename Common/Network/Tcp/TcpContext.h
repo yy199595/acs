@@ -65,7 +65,7 @@ namespace Tcp
 		const size_t mMaxCount;
 		long long mLastOperTime;
 		std::unique_ptr<asio::steady_timer> mTimer;
-        std::list<std::shared_ptr<ProtoMessage>> mMessagqQueue;
+        std::list<std::shared_ptr<ProtoMessage>> mMessageQueue;
 	};
 }
 #endif //GAMEKEEPER_TCPCLIENT_H

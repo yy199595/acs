@@ -21,8 +21,8 @@ namespace Tendo
 {
 
 	App::App() : Unit(0),
-        mStartTime(Helper::Time::NowMilTime()),
-				 mThreadId(std::this_thread::get_id())
+        mThreadId(std::this_thread::get_id()),
+				 mStartTime(Helper::Time::NowMilTime())
 	{
         this->mLogicFps = 0;
         this->mTickCount = 0;

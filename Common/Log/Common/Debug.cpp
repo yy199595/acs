@@ -1,11 +1,11 @@
 //
 // Created by zmhy0073 on 2022/9/22.
 //
-#ifdef __OS_MAC__
-#include <cxxabi.h>
-#include <execinfo.h>
-#endif
 #include"Debug.h"
+#ifndef __OS_WIN__
+#include<cxxabi.h>
+#include<execinfo.h>
+#endif
 #include"Util/Time/TimeHelper.h"
 #include"Entity/App/App.h"
 #include"Log/Component/LogComponent.h"
@@ -225,6 +225,8 @@ void Debug::Console(Debug::Level color, const std::string &log)
 #endif
         }
             break;
+        default:
+            break;
     }
 }
 
@@ -296,5 +298,7 @@ void Debug::Print(Debug::Level color, const std::string & log)
 #endif
 		}
 			break;
+        default:
+            break;
 	}
 }

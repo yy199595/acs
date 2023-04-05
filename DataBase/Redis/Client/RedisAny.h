@@ -11,6 +11,7 @@ namespace Tendo
 	class RedisAny
 	{
 	 public:
+        virtual ~RedisAny() { }
 		virtual bool IsNumber() const = 0;
 		virtual bool IsString() const = 0;
 		virtual void Write(std::iostream & io) = 0;

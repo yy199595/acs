@@ -78,12 +78,12 @@ namespace Tendo
 	{
 	 public:
 		ServiceMethod1(const std::string name, T* o, ServiceMethodType1<T> func)
-			: ServiceMethod(name), _o(o), _func(func), mHasUserId(false)
+			: ServiceMethod(name), _o(o), mHasUserId(false), _func(func)
 		{
 		}
 
 		ServiceMethod1(const std::string name, T* o, ServiceMethodType11<T> func)
-			: ServiceMethod(name), _o(o), _objfunc(func), mHasUserId(true)
+			: ServiceMethod(name), _o(o), mHasUserId(true), _objfunc(func)
 		{
 		}
 	 public:
@@ -117,12 +117,12 @@ namespace Tendo
 	{
 	 public:
 		ServiceMethod2(const std::string name, T* o, ServiceMethodType2<T, T1> func)
-			: ServiceMethod(name), _o(o), _func(func), mHasUserId(false)
+			: ServiceMethod(name), _o(o),mHasUserId(false), _func(func)
 		{
 		}
 
 		ServiceMethod2(const std::string name, T* o, ServiceMethodType22<T, T1> func)
-			: ServiceMethod(name), _o(o), _objfunc(func), mHasUserId(true)
+			: ServiceMethod(name), _o(o), mHasUserId(true), _objfunc(func)
 		{
 		}
 	 public:
@@ -162,12 +162,12 @@ namespace Tendo
 	 public:
 		typedef int(T::*ServerFunc)(long long, const T1&, T2&);
 		ServiceMethod3(const std::string name, T* o, ServiceMethodType3<T, T1, T2> func)
-			: ServiceMethod(name), _o(o), _func(func), mHasUserId(false)
+			: ServiceMethod(name), _o(o),mHasUserId(false), _func(func)
 		{
 		}
 
 		ServiceMethod3(const std::string name, T* o, ServiceMethodType33<T, T1, T2> func)
-			: ServiceMethod(name), _o(o), _objfunc(func), mHasUserId(true)
+			: ServiceMethod(name), _o(o), mHasUserId(true), _objfunc(func)
 		{
 		}
 	 public:
@@ -225,12 +225,12 @@ namespace Tendo
 	{
 	 public:
 		ServiceMethod4(const std::string name, T* o, ServiceMethodType4<T, T1> func)
-			: ServiceMethod(name), _o(o), _func(func), mHasUserId(false)
+			: ServiceMethod(name), _o(o),mHasUserId(false), _func(func)
 		{
 		}
 
 		ServiceMethod4(const std::string name, T* o, ServiceMethodType44<T, T1> func)
-			: ServiceMethod(name), _o(o), _objfunc(func), mHasUserId(true)
+			: ServiceMethod(name), _o(o), mHasUserId(true), _objfunc(func)
 		{
 		}
 	 public:

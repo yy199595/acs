@@ -1,4 +1,4 @@
-#pragma once;
+#pragma once
 #include"Rpc/Client/Message.h"
 #include"HttpListenComponent.h"
 

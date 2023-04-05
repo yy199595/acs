@@ -98,38 +98,38 @@ namespace Http
 
     namespace MethodName
     {
-        constexpr char* GET = "GET";
-		constexpr char* POST = "POST";
+        constexpr const char* GET = "GET";
+		constexpr const char* POST = "POST";
     };
 
 	namespace HeadName
 	{
-		constexpr char * SetCookie = "Set-Cookie";
-		constexpr char * ContentType = "Content-Type";
-		constexpr char * ContentLength = "Content-Length";
+		constexpr const char * SetCookie = "Set-Cookie";
+		constexpr const char * ContentType = "Content-Type";
+		constexpr  const char * ContentLength = "Content-Length";
 	}
 
     namespace ContentName
     {
-		constexpr char* CSS = "text/css";
-		constexpr char* LUA = "text/lua";
-		constexpr char* HTML = "text/html";
-		constexpr char* JS = "application/javascript";
+		constexpr const char* CSS = "text/css";
+		constexpr const char* LUA = "text/lua";
+		constexpr const char* HTML = "text/html";
+		constexpr const char* JS = "application/javascript";
 
-		constexpr char* JPEG = "image/jpeg";
-		constexpr char* PNG = "image/png";
-		constexpr char* GIF = "image/gif";
-		constexpr char* ICO = "image/x-icon";
-		constexpr char * MP4 = "video/mp4";
+		constexpr const char* JPEG = "image/jpeg";
+		constexpr const char* PNG = "image/png";
+		constexpr const char* GIF = "image/gif";
+		constexpr const char* ICO = "image/x-icon";
+		constexpr const char * MP4 = "video/mp4";
 
-		constexpr char* TEXT = "text/plain";
-		constexpr char* JSON = "application/json";
-		constexpr char * XML = "application/xml";
-		constexpr char * XHTML = "application/xhtml+xml";
+		constexpr const char* TEXT = "text/plain";
+		constexpr const char* JSON = "application/json";
+		constexpr const char * XML = "application/xml";
+		constexpr const char * XHTML = "application/xhtml+xml";
 
-		constexpr char * PDF = "application/pdf";
-		constexpr char * WORD = "application/msword";
-		constexpr char * Bin = "application/octet-stream";
+		constexpr const char * PDF = "application/pdf";
+		constexpr const char * WORD = "application/msword";
+		constexpr const char * Bin = "application/octet-stream";
     };
 };
 

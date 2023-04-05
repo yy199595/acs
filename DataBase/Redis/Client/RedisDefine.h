@@ -28,11 +28,11 @@ namespace RedisCommand
 {
     namespace Str
     {
-        static const char * Get = "GET";
-        static const char * Set = "SET";
-        static const char * Append = "APPEND";
-        static const char * AddOne = "INCR";
-        static const char * SubOne = "DECR";
+        constexpr const char * Get = "GET";
+        constexpr const char * Set = "SET";
+        constexpr const char * Append = "APPEND";
+        constexpr const char * AddOne = "INCR";
+        constexpr const char * SubOne = "DECR";
 
     }
 }

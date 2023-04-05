@@ -91,8 +91,8 @@ namespace Tendo
 namespace Tendo
 {
     RedisResponse::RedisResponse()
-        : mDataSize(0), mLineCount(0),
-        mDataCount(0), mNumber(-1), mTaskId(0)
+        : mTaskId(0), mDataSize(0),
+        mLineCount(0), mDataCount(0), mNumber(-1)
     {
         this->mType = RedisRespType::REDIS_NONE;
     }
