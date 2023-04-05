@@ -6,7 +6,7 @@ else()
     enable_language(C CXX ASM)
 endif()
 
-#add_definitions(-w) #忽略警告
+add_definitions(-w) #忽略警告
 add_definitions(-D ASIO_STANDALONE)
 
 option(protobuf_BUILD_TESTS OFF)
