@@ -125,7 +125,7 @@ namespace Tcp
             this->OnReceiveMessage(code, is, length);
 			return;
 		}
-		length -= this->mRecvBuffer.size();
+		length -= (int)this->mRecvBuffer.size();
 		this->mLastOperTime = Helper::Time::NowSecTime();
         Asio::Socket & tcpSocket = this->mSocket->GetSocket();
 		std::shared_ptr<TcpContext> self = this->shared_from_this();

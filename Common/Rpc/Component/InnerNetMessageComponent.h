@@ -37,7 +37,6 @@ namespace Tendo
 		int HandlerResponse(const std::shared_ptr<Rpc::Packet>& message);
 		int HandlerBroadcast(const std::shared_ptr<Rpc::Packet>& message);
 		void OnTaskComplete(int key) final { this->mNumberPool.Push(key); }
-		void Send(const std::string& address, int code, const std::shared_ptr<Rpc::Packet>& pack);
         void Invoke(const RpcMethodConfig * config, const std::shared_ptr<Rpc::Packet>& message);
     private:
 		unsigned int mWaitCount;

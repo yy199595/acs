@@ -57,21 +57,6 @@ namespace Tendo
 		return XCode::Successful;
 	}
 
-    void InnerNetMessageComponent::Send(const std::string& address, int code, const std::shared_ptr<Rpc::Packet>& message)
-    { 
-        if (!message->GetHead().Has("rpc"))
-        {
-            return; //不需要返回
-        }
-        message->GetHead().Remove("id");
-        message->GetHead().Add("code", code);
-#ifndef __DEBUG__
-		message->GetHead().Remove("func");
-#endif
-        message->SetType(Tcp::Type::Response);
-        this->mInnerComponent->Send(message->From(), message);
-    }
-
     void InnerNetMessageComponent::Invoke(const RpcMethodConfig *config, const std::shared_ptr<Rpc::Packet>& message)
 	{
 		RpcService* logicService = this->mApp->GetService(config->Service);
@@ -86,9 +71,8 @@ namespace Tendo
 			timerId = this->mTimerComponent->DelayCall(config->Timeout,
 				[message, config, this]()
 				{
-				  message->GetHead().Add("code", XCode::CallTimeout);
 				  LOG_ERROR("call [" << config->FullName << "] code = call time out");
-				  this->Send(message->From(), XCode::CallTimeout, message);
+				  this->mInnerComponent->Send(message->From(), XCode::CallTimeout, message);
 				}
 			);
 		}
@@ -157,8 +141,7 @@ namespace Tendo
 			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
 			CONSOLE_LOG_INFO("call [" << config->FullName << "] code = " << desc);
 		}
-		message->SetType(Tcp::Type::Response);
-		this->Send(message->From(), code, message);
+		this->mInnerComponent->Send(message->From(), code, message);
 	}
 
 

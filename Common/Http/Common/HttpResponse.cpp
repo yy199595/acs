@@ -89,11 +89,11 @@ namespace Http
 
 	int DataResponse::OnReadContent(const char* str, size_t size)
 	{
-		long long length = this->mHead.ContentLength();
+		int length = this->mHead.ContentLength();
 		if(length > 0)
 		{
 			this->mContent.append(str, size);
-			return length - this->mContent.size();
+			return length - (int)this->mContent.size();
 		}
 		this->mContent.append(str, size);
 		return HTTP_READ_SOME;

@@ -33,6 +33,7 @@ namespace Tendo
 	public:
 		bool Send(const std::shared_ptr<Rpc::Packet>& message); //发送到本地
 		bool Send(const std::string & address, const std::shared_ptr<Rpc::Packet>& message);
+        bool Send(const std::string & address, int code, const std::shared_ptr<Rpc::Packet>& pack);
 	public:
 		size_t GetConnectClients(std::vector<std::string> & list) const; //获取所有连接进来的客户端
 		size_t Broadcast(const std::shared_ptr<Rpc::Packet>& message) const; //广播给所有链接进来的客户端
