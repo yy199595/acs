@@ -27,7 +27,7 @@ namespace Lua
         size_t size = 0;
         const char* str = luaL_checklstring(lua, 1, &size);
         std::shared_ptr<Http::GetRequest> request = std::make_shared<Http::GetRequest>();
-        std::shared_ptr<Http::DataResponse> response = std::make_shared<Http::DataResponse>();
+        std::shared_ptr<Http::IResponse> response = std::make_shared<Http::DataResponse>();
         if (!request->SetUrl(std::string(str, size)))
         {
             luaL_error(lua, "parse get url : [%s] failure", str);
@@ -78,7 +78,7 @@ namespace Lua
             return 0;
         }
         std::shared_ptr<LuaHttpRequestTask> luaHttpTask(new LuaHttpRequestTask(lua));
-        std::shared_ptr<Http::DataResponse> response = std::make_shared<Http::DataResponse>();
+        std::shared_ptr<Http::IResponse> response = std::make_shared<Http::DataResponse>();
 
 #ifdef __DEBUG__
         //LOG_DEBUG("[http POST] url = " << std::string(str, size) << " data = " << postRequest->Content());
@@ -114,7 +114,7 @@ namespace Lua
        
         int taskId = 0;
         std::shared_ptr<LuaHttpRequestTask> luaHttpTask(new LuaHttpRequestTask(lua));
-        std::shared_ptr<Http::FileResponse> response = std::make_shared<Http::FileResponse>(path);
+        std::shared_ptr<Http::IResponse> response = std::make_shared<Http::FileResponse>(path);
         httpComponent->Send(request, response, taskId);
         return httpComponent->AddTask(taskId, luaHttpTask)->Await();
 	}

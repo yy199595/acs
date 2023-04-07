@@ -60,6 +60,8 @@ namespace Http
         : mMethod(method)
     {
 		this->mFrom = from;
+		this->mAsync = true;
+		this->mTimeout = 0;
 		this->mVersion = HttpVersion;
         this->mState = DecodeState::None;
     }

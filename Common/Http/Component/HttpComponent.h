@@ -16,16 +16,17 @@ namespace Tendo
 	 public:
 		HttpComponent();
 	 public:
-		std::shared_ptr<HttpRequestClient> CreateClient();
-		bool Download(const std::string & url, const std::string & path);
-		std::shared_ptr<Http::DataResponse> Get(const std::string& url, float second = 15.0f);
-		std::shared_ptr<Http::DataResponse> Post(const std::string& url, const std::string& data, float second = 15.0f);
+		bool Download(const std::string & url, const std::string & path, bool async = true);
+		std::shared_ptr<Http::DataResponse> Get(const std::string& url, bool async = true, int second = 15);
+		std::shared_ptr<Http::DataResponse> Post(const std::string& url, const std::string& data, bool async = true, int second = 15);
 	public:
-		std::shared_ptr<Http::DataResponse> Request(const std::shared_ptr<Http::Request>& request);
-		void Send(const std::shared_ptr<Http::Request> & request, std::shared_ptr<Http::IResponse> response, int & taskId);
+		std::shared_ptr<Http::DataResponse> AsyncRequest(const std::shared_ptr<Http::Request>& request);
+		bool Send(const std::shared_ptr<Http::Request> & request, std::shared_ptr<Http::IResponse> & response); // 同步发送
+		bool Send(const std::shared_ptr<Http::Request> & request, std::shared_ptr<Http::IResponse> & response, int & taskId); // 异步发送
     private:
         bool LateAwake() final;
 		void OnTaskComplete(int key) final;
+		std::shared_ptr<HttpRequestClient> CreateClient();
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 	 private:
         class ThreadComponent * mNetComponent;

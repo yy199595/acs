@@ -16,7 +16,7 @@ namespace Tendo
 	 public:
 		HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy, HttpComponent * component);
 	 public:
-		void Do(std::shared_ptr<Http::Request> request, std::shared_ptr<Http::IResponse> response, int taskId, int timeout = 15);
+		void Do(std::shared_ptr<Http::Request> request, std::shared_ptr<Http::IResponse> response, int taskId);
 	 private:
         void ConnectHost();
 		void OnReadLater(int num);
@@ -28,7 +28,6 @@ namespace Tendo
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
 	 private:
 		int mTaskId;
-		int mTimeout;
 		HttpComponent * mHttpComponent;
         std::shared_ptr<Http::Request> mRequest;
 		std::shared_ptr<Http::IResponse> mResponse;

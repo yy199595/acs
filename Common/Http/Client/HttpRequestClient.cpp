@@ -12,15 +12,13 @@ namespace Tendo
 		: Tcp::TcpContext(std::move(socketProxy))
     {
         this->mTaskId = 0;
-        this->mTimeout = 15; //默认十五秒
 		this->mHttpComponent = httpComponent;
     }
 
 	void HttpRequestClient::Do(std::shared_ptr<Http::Request> request,
-		std::shared_ptr<Http::IResponse> response, int taskId, int timeout)
+		std::shared_ptr<Http::IResponse> response, int taskId)
 	{
 		this->mTaskId = taskId;
-		this->mTimeout = timeout;
 		this->mRequest = request;
 		this->mResponse = response;
 #ifdef ONLY_MAIN_THREAD
@@ -151,10 +149,11 @@ namespace Tendo
         const std::string & port = this->mRequest->Port();
         Asio::Context & context = this->mSocket->GetThread();
 
-        if(this->mTimeout > 0)
+		int timeout = this->mRequest->Timeout();
+        if(timeout > 0)
         {
-            std::chrono::seconds timeout{this->mTimeout};
-            this->mTimer = std::make_shared<asio::steady_timer>(context, timeout);
+            std::chrono::seconds second{timeout};
+            this->mTimer = std::make_shared<asio::steady_timer>(context, second);
             this->mTimer->async_wait(std::bind(&HttpRequestClient::OnTimeout, this, args1));
         }
         std::shared_ptr<Asio::Resolver> resolver(new Asio::Resolver (context));
