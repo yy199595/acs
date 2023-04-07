@@ -38,8 +38,8 @@ namespace Http
         virtual bool WriteDocument(rapidjson::Document * document) const = 0;
     public:
 		bool SetUrl(const std::string & url);
-		bool SetAsync(bool async) { this->mAsync = async;}
-		bool SetTimeout(int second) { this->mTimeout = second; }
+		void SetAsync(bool async) { this->mAsync = async;}
+		void SetTimeout(int second) { this->mTimeout = second; }
         inline const std::string & Url() const { return this->mUrl; }
         inline const std::string & Host() const { return this->mHost; }
         inline const std::string & Port() const { return this->mPort; }

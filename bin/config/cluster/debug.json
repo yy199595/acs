@@ -11,13 +11,14 @@
             "ServerWeb": true,
             "Account": true
         },
-        "Component": [
-            "HttpComponent",
-            "RedisComponent",
-            "HttpWebComponent",
-            "HttpWebComponent",
-            "HttpDebugComponent"
-        ]
+      "Component": [
+        "HttpComponent",
+        "KcpComponent",
+        "RedisComponent",
+        "HttpWebComponent",
+        "HttpWebComponent",
+        "HttpDebugComponent"
+      ]
     },
     "Client": {
         "Component": [

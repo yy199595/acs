@@ -53,9 +53,8 @@ namespace Tendo
 
 		if(async)
 		{
-			request->SetAsync(async);
 			request->SetTimeout(second);
-			std::shared_ptr<Http::DataResponse> response = this->AsyncRequest(request);
+			std::shared_ptr<Http::DataResponse> response = this->Await(request);
 			if (response != nullptr && response->Code() != HttpStatus::OK)
 			{
 				LOG_ERROR("[GET] " << url << " error = "
@@ -104,7 +103,6 @@ namespace Tendo
 
 		if(async)
 		{
-			request->SetAsync(async);
 			std::shared_ptr<HttpRequestTask> httpRpcTask = std::make_shared<HttpRequestTask>();
 			std::shared_ptr<Http::IResponse> response = std::make_shared<Http::FileResponse>(path);
 			{
@@ -143,10 +141,7 @@ namespace Tendo
 	bool HttpComponent::Send(const std::shared_ptr<Http::Request>& request,
 		std::shared_ptr<Http::IResponse> & response, int& taskId)
 	{
-		if (!request->Async())
-		{
-			return false;
-		}
+		request->SetAsync(true);
 		taskId = this->mNumberPool.Pop();
 		std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
 		{
@@ -156,7 +151,7 @@ namespace Tendo
 		return true;
 	}
 
-	std::shared_ptr<Http::DataResponse> HttpComponent::AsyncRequest(const std::shared_ptr<Http::Request>& request)
+	std::shared_ptr<Http::DataResponse> HttpComponent::Await(const std::shared_ptr<Http::Request>& request)
 	{
 		std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
 		std::shared_ptr<HttpRequestTask> httpRpcTask = std::make_shared<HttpRequestTask>();
@@ -178,23 +173,41 @@ namespace Tendo
             return nullptr;
         }
 		request->Json(data);
-		request->SetAsync(async);
-		request->SetTimeout(second);
-        std::shared_ptr<Http::DataResponse> response = this->AsyncRequest(request);
-        if (response != nullptr && response->Code() != HttpStatus::OK)
-        {
-            LOG_ERROR("[POST] " << url << " error = "
-                               << HttpStatusToString(response->Code()));
-        }
-        return response;
+		if(async)
+		{
+			request->SetAsync(async);
+			request->SetTimeout(second);
+			std::shared_ptr<Http::DataResponse> response = this->Await(request);
+			if (response != nullptr && response->Code() != HttpStatus::OK)
+			{
+				LOG_ERROR("[POST] " << url << " error = "
+									<< HttpStatusToString(response->Code()));
+			}
+			return response;
+		}
+		else
+		{
+			std::shared_ptr<Http::IResponse> response
+				= std::make_shared<Http::DataResponse>();
+			if(!this->Send(request, response))
+			{
+				return nullptr;
+			}
+			if (response->Code() != HttpStatus::OK)
+			{
+				LOG_ERROR("[POST] " << url << " error = "
+									<< HttpStatusToString(response->Code()));
+			}
+			return std::static_pointer_cast<Http::DataResponse>(response);
+		}
     }
 
 	bool HttpComponent::Send(const std::shared_ptr<Http::Request>& request, std::shared_ptr<Http::IResponse>& response)
 	{
-		assert(request->Async());
 		try
 		{
 			asio::io_context io;
+			request->SetAsync(false);
 			asio::ip::tcp::resolver resolver(io);
 			asio::ip::tcp::resolver::results_type endpoints =
 					resolver.resolve(request->Host(), request->Port());

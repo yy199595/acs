@@ -45,18 +45,19 @@ namespace Helper
 
     bool Str::GetFileName(const std::string &path, std::string & name)
     {
-        size_t pos = path.find_last_of('\\');
-        if (pos != std::string::npos)
-        {
-            name = path.substr(pos + 1, path.size());
-			return true;
-        }
-        pos = path.find_last_of('/');
+		size_t pos = path.find_last_of('/');
 		if(pos != std::string::npos)
 		{
 			name = path.substr(pos + 1, path.size());
 			return true;
 		}
+		pos = path.find_last_of('\\');
+        if (pos != std::string::npos)
+        {
+            name = path.substr(pos + 1, path.size());
+			return true;
+        }
+
 		return false;
     }
 

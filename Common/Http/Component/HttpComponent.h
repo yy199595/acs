@@ -20,7 +20,7 @@ namespace Tendo
 		std::shared_ptr<Http::DataResponse> Get(const std::string& url, bool async = true, int second = 15);
 		std::shared_ptr<Http::DataResponse> Post(const std::string& url, const std::string& data, bool async = true, int second = 15);
 	public:
-		std::shared_ptr<Http::DataResponse> AsyncRequest(const std::shared_ptr<Http::Request>& request);
+		std::shared_ptr<Http::DataResponse> Await(const std::shared_ptr<Http::Request>& request);
 		bool Send(const std::shared_ptr<Http::Request> & request, std::shared_ptr<Http::IResponse> & response); // 同步发送
 		bool Send(const std::shared_ptr<Http::Request> & request, std::shared_ptr<Http::IResponse> & response, int & taskId); // 异步发送
     private:

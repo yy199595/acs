@@ -29,8 +29,8 @@
 #include"Registry/Service/Registry.h"
 #include"Common/Service/User.h"
 
-
 #include"Component/ClientComponent.h"
+#include"Kcp/Component/KcpComponent.h"
 #ifdef __ENABLE_MONGODB__
 #include"Mongo/Service/MongoDB.h"
 #include"Mongo/Component/MongoDBComponent.h"
@@ -67,6 +67,7 @@ void RegisterComponent()
     ComponentFactory::Add<ProtoComponent>("ProtoComponent");
 
 //server
+	ComponentFactory::Add<KcpComponent>("KcpComponent");
     ComponentFactory::Add<LaunchComponent>("LaunchComponent");
     ComponentFactory::Add<TextConfigComponent>("TextConfigComponent");
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
@@ -100,7 +101,6 @@ void RegisterComponent()
     ComponentFactory::Add<HttpDebugComponent>("HttpDebugComponent");
   
     ComponentFactory::Add<ServerWeb>("ServerWeb");
-
     ComponentFactory::Add<WatchDogComponent>("WatchDogComponent");
 
 // lua
@@ -128,7 +128,7 @@ void RegisterServiceComponent()
 int main(int argc, char **argv)
 {
 #ifdef __OS_WIN__
-    system("chcp 65001 > nul"); 
+    //system("chcp 65001 > nul"); 
 #endif
 	RegisterComponent();
 	RegisterServiceComponent();
