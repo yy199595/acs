@@ -21,6 +21,7 @@ namespace Tendo
     {
     public:
         explicit MysqlClient(IRpc<Mysql::Response> *component, const MysqlConfig & config);
+		~MysqlClient();
     public:
         void Stop();
 		void Start();
