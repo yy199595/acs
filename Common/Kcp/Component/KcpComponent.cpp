@@ -15,14 +15,20 @@ namespace Tendo
 	
 	int KcpComponent::KcpSendCallback(const char * buf, int len, ikcpcb * kcp, void * user)
 	{
-		udp::socket* socket = (udp::socket*)user;
+		asio::error_code ec;
+		udp::socket* socket = (udp::socket*)kcp->user;
+		udp::endpoint target(asio::ip::make_address("127.0.0.1"), 1234);
+
 		//auto endPoint = socket->local_endpoint();
 		try
 		{
-			asio::ip::udp::endpoint endpoint(asio::ip::address_v4::from_string("127.0.0.1"), 1234);
-			CONSOLE_LOG_DEBUG("send udp message to " << endpoint.port());
-			size_t size = socket->send_to(asio::buffer(buf, len), endpoint);
-			CONSOLE_LOG_DEBUG("send udp message successful " << "   " << std::string(buf, size));
+			size_t size = socket->send_to(asio::buffer(buf, len),  target, 0, ec);
+			if(!ec)
+			{
+				CONSOLE_LOG_DEBUG("send udp message successful size=" << size);
+				return 1;
+			}
+			CONSOLE_LOG_ERROR(ec.message());
 		}
 		catch (const std::exception& e)
 		{
@@ -54,38 +60,34 @@ namespace Tendo
 
 
 				// Create a KCP object
-				ikcpcb* kcp = ikcp_create(0x11223355, &socket);
+				udp::socket udpSocket(io_service, udp::endpoint(udp::v4(), 0));
+				udp::endpoint target(asio::ip::make_address("127.0.0.1"), 1234);
 
-				// Set the output function for KCP
+				ikcpcb* kcp = ikcp_create(1, (void *)&udpSocket);
 				kcp->output = KcpComponent::KcpSendCallback;
-				kcp->user = &socket;
-				// Set the interval for KCP
 				ikcp_nodelay(kcp, 1, 10, 2, 1);
 
 				// Send a message to the server
 				std::string message = "Hello, server!";
-				asio::ip::udp::endpoint endpoint(asio::ip::udp::v4(), 1234);
-				
-				udp::socket socket(io_service, endpoint);
-				socket.bind(endpoint);
-				while (true)
+				while (!io_service.stopped())
 				{
-					asio::ip::udp::endpoint endpoint(asio::ip::udp::v4(), 1234);
-					size_t size = socket.send_to(asio::buffer(message.c_str(), message.size()), endpoint);
-					CONSOLE_LOG_DEBUG("send udp message successful " << "   " << message);
-
-
-					//ikcp_send(kcp, message.c_str(), message.size());
+					//asio::error_code ec;
+					//socket.send_to(asio::buffer(message.c_str(), message.size()), target, 0, ec);
+					ikcp_send(kcp, message.c_str(), message.size());
 
 					////// Update KCP
-					//ikcp_update(kcp, time(NULL));
+					ikcp_update(kcp, time(NULL));
 					//io_service.poll();
 					std::this_thread::sleep_for(std::chrono::seconds(1));
-
 				}
 			});
 		t->detach();
 		return true;
+	}
+
+	void KcpComponent::Update(asio::io_service& io, long long time)
+	{
+
 	}
 
 	bool KcpComponent::StartListen(const char* name)
@@ -96,66 +98,88 @@ namespace Tendo
 			LOG_ERROR("not find listen config " << name);
 			return false;
 		}
-
-		try
+		asio::io_service & main = this->mApp->MainThread();
+		this->mThread = new std::thread([&main, this]()
 		{
-			std::thread* t = new std::thread([port]()
+			asio::io_context io;
+			bool startReceive = true;
+			asio::io_service::work work(io);
+			std::chrono::milliseconds ms(1);
+			std::array<char, 56635> receiveBuffer;
+			asio::ip::udp::endpoint clientEndpoint;
+			asio::ip::udp::socket udpSocket(io, udp::endpoint(udp::v4(), 1234));
+			ikcpcb* kcp = ikcp_create(0x11223344, &udpSocket);
+			while (!io.stopped())
+			{
+				io.poll();
+				if(startReceive)
 				{
-					std::this_thread::sleep_for(std::chrono::seconds(5));
-					asio::io_service io_service;
-					asio::io_service::work work(io_service);
+					startReceive = false;
+					udpSocket.async_receive_from(asio::buffer(receiveBuffer), clientEndpoint, 0,
+						[&clientEndpoint, &startReceive, &receiveBuffer](const asio::error_code& code, size_t size)
+						{
+							if (code)
+							{
+								CONSOLE_LOG_ERROR(code.message());
+							}
+							startReceive = true;
+						});
+				}
+				long long time = Helper::Time::NowMicTime();
 
-					// Create a UDP socket
-					
-
-					// Create a UDP endpoint
-					asio::ip::udp::endpoint endpoint(asio::ip::udp::v4(), 1234);
-
-					// Bind the socket to the endpoint
-					/*socket.open(endpoint.protocol());
-					socket.bind(endpoint);*/
-
-					asio::ip::udp::socket socket(io_service, endpoint);
-
-					CONSOLE_LOG_INFO("listen udp message : " << endpoint.port());
-
-					// Create a KCP object
-					ikcpcb* kcp = ikcp_create(0x11223344, nullptr);
-
-					// Set the output function for KCP
-					kcp->output = KcpComponent::KcpSendCallback;
-
-					// Set the interval for KCP
-					ikcp_nodelay(kcp, 1, 10, 2, 1);
-
-					// Receive a message from a client
-					asio::ip::udp::endpoint client_endpoint;
-					std::array<char, 1024> recv_buffer;
-					while (true)
-					{
-						io_service.poll();
-						size_t size = socket.receive_from(asio::buffer(recv_buffer), client_endpoint);
-
-						CONSOLE_LOG_DEBUG("receive udp message : " << std::string(recv_buffer.data(), recv_buffer.size()));
-						// Set the user data for KCP
-						kcp->user = &socket;
-
-						// Update KCP
-						ikcp_input(kcp, recv_buffer.data(), recv_buffer.size());
-
-						ikcp_update(kcp, time(NULL));
-						std::this_thread::sleep_for(std::chrono::seconds(1));
-					}
-					return 0;
-				});
-			t->detach();
-			return true;
-		}
-		catch (std::exception& e)
-		{
-			std::cerr << "Exception: " << e.what() << std::endl;
-			return false;
-		}
+				this->Update(io, time);
+				ikcp_update(kcp, (IUINT32)time);
+				std::this_thread::sleep_for(ms);
+			}
+		});
+		this->mThread->detach();
+//		try
+//		{
+//			std::thread* t = new std::thread([port]()
+//				{
+//					std::this_thread::sleep_for(std::chrono::seconds(5));
+//					asio::io_service io_service;
+//					asio::io_service::work work(io_service);
+//
+//					// Create a UDP socket
+//
+//
+//					asio::ip::udp::socket socket(io_service, udp::endpoint(udp::v4(), 1234));
+//
+//					ikcpcb* kcp = ikcp_create(0x11223344, nullptr);
+//
+//					// Set the output function for KCP
+//					kcp->output = KcpComponent::KcpSendCallback;
+//
+//					// Set the interval for KCP
+//					ikcp_nodelay(kcp, 1, 10, 2, 1);
+//
+//					// Receive a message from a client
+//					asio::ip::udp::endpoint client_endpoint;
+//					std::array<char, 1024> recv_buffer;
+//					while (!io_service.stopped())
+//					{
+//						socket.receive_from(asio::buffer(recv_buffer), client_endpoint);
+//						CONSOLE_LOG_INFO("receive udp message : " << client_endpoint.address().to_string());
+//						// Set the user data for KCP
+//						kcp->user = &socket;
+//						ikcp_input(kcp, recv_buffer.data(), recv_buffer.size());
+//
+//						// Update KCP
+//
+//						ikcp_update(kcp, time(NULL));
+//						std::this_thread::sleep_for(std::chrono::seconds(1));
+//					}
+//					return 0;
+//				});
+//			t->detach();
+//			return true;
+//		}
+//		catch (std::exception& e)
+//		{
+//			std::cerr << "Exception: " << e.what() << std::endl;
+//			return false;
+//		}
 		return true;
 	}
 }

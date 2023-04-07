@@ -64,6 +64,7 @@ namespace Tendo
 			}
 		}
 		mysql_close(this->mMysqlClient);
+		CONSOLE_LOG_INFO("close mysql client successful");
 	}
 
 	void MysqlClient::Stop()
@@ -107,6 +108,14 @@ namespace Tendo
 		Asio::Context& io = App::Inst()->MainThread();
 		io.post(std::bind(&IRpc<Mysql::Response>::OnConnectSuccessful, this->mComponent, address));
 		return true;
+	}
+	MysqlClient::~MysqlClient()
+	{
+		if(this->mThread != nullptr)
+		{
+			delete this->mThread;
+			this->mThread = nullptr;
+		}
 	}
 }
 
