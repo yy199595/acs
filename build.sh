@@ -1,5 +1,6 @@
 echo "start build server..."
-read cmd
+# shellcheck disable=SC2124
+cmd="$@"
 start_time=$(date)
 current_path=$(pwd)
 cd $current_path || exit
