@@ -13,7 +13,6 @@
         },
       "Component": [
         "HttpComponent",
-        "KcpComponent",
         "RedisComponent",
         "HttpWebComponent",
         "HttpWebComponent",
