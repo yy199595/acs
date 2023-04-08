@@ -14,3 +14,7 @@ macro(source_group_by_dir dir source_files)
         endforeach(sgbd_file)
     endif(MSVC)
 endmacro(source_group_by_dir)
+
+function(git_clone url path)
+    execute_process(COMMAND git clone ${url} ${path})
+endfunction()
