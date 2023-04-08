@@ -18,6 +18,7 @@ for arg in $cmd; do
         cd ./jemalloc || exit
         ./autogen.sh
         ./configure
+        make
     fi
 
     if [[ $arg == "openssl" ]]; then
@@ -30,7 +31,6 @@ for arg in $cmd; do
         cd ./openssl || exit
         ./config
         make
-        cp -R include/openssl ../Libs/openssl/
     fi
 done
 

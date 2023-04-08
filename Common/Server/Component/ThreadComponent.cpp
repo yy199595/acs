@@ -2,7 +2,8 @@
 #include"Entity/App/App.h"
 #include"Rpc/Method/MethodProxy.h"
 #include"Network/Tcp/SocketProxy.h"
-
+#include<asio/ssl.hpp>
+using namespace asio::ip;
 namespace Tendo
 {
     AsioThread::AsioThread()
@@ -29,42 +30,46 @@ namespace Tendo
 namespace Tendo
 {
     bool ThreadComponent::Awake()
-    {
-        int taskCount = 0;
-        const ServerConfig* config = ServerConfig::Inst();
-        config->GetMember("thread", "task", taskCount);
+	{
+		int taskCount = 0;
+		const ServerConfig* config = ServerConfig::Inst();
+		config->GetMember("thread", "task", taskCount);
 #ifdef __ENABLE_OPEN_SSL__
-        std::string sslFile;
-        config.GetPath("ssl", sslFile);
-        IAsioThread& t = this->GetApp()->GetTaskScheduler();
-        this->GetApp()->GetTaskScheduler().LoadVeriftFile("");
+		// Create an SSL context
+		asio::ssl::context sslContext(asio::ssl::context::sslv23);
 
-        asio::ssl::stream<asio::ip::tcp::socket> sslSocket(t, t.GetSSL());
+// Load the certificate file
+		sslContext.load_verify_file("path/to/certificate.pem");
 
-        tcp::resolver resolver(t);
-        tcp::resolver::query query("https://baidu.com", "https");
-        asio::connect(sslSocket.lowest_layer(), resolver.resolve(query));
-        sslSocket.lowest_layer().set_option(tcp::no_delay(true));
+// Create an SSL socket using the SSL context
+		std::shared_ptr<SocketProxy> socket = this->CreateSocket();
+		asio::ssl::stream<asio::ip::tcp::socket&> sslSocket(socket->GetSocket(), sslContext);
 
-        // 执行SSL握手并认证远程主机的证书
-        sslSocket.set_verify_mode(asio::ssl::verify_peer);
-        sslSocket.set_verify_callback(asio::ssl::host_name_verification("https://baidu.com"));
-        sslSocket.handshake(asio::ssl::stream_base::client);
+// Connect to the HTTPS endpoint of Baidu Calendar
+		asio::ip::tcp::resolver resolver(socket->GetThread());
+		asio::ip::tcp::resolver::query query("calendar.baidu.com", "https");
+		asio::ip::tcp::resolver::iterator endpointIterator = resolver.resolve(query);
 
+// Perform SSL handshake
+		asio::connect(sslSocket.lowest_layer(), endpointIterator);
+		sslSocket.handshake(asio::ssl::stream_base::client);
+
+// Send an HTTPS request to Baidu Calendar to search for "日历"
+		std::string request = "GET /s?wd=%E6%97%A5%E5%8E%86 HTTP/1.1\r\n"
+							  "Host: calendar.baidu.com\r\n"
+							  "Connection: close\r\n\r\n";
+		asio::write(sslSocket, asio::buffer(request));
 #endif
 #ifndef ONLY_MAIN_THREAD
-        int networkCount = 1;
-        config->GetMember("thread", "network", networkCount);
-        for (int index = 0; index < networkCount; index++)
-        {
-            this->mNetThreads.push_back(new AsioThread());
-#ifdef __ENABLE_OPEN_SSL__
-            this->mNetThreads[index]->LoadVeriftFile(sslFile);
+		int networkCount = 1;
+		config->GetMember("thread", "network", networkCount);
+		for (int index = 0; index < networkCount; index++)
+		{
+			this->mNetThreads.push_back(new AsioThread());
+		}
 #endif
-        }
-#endif
-        return true;
-    }
+		return true;
+	}
 
 	bool ThreadComponent::LateAwake()
     {
@@ -88,18 +93,41 @@ namespace Tendo
 	}
 
     Asio::Context& ThreadComponent::GetContext()
-    {
+	{
 #ifdef ONLY_MAIN_THREAD
-        return this->mApp->MainThread();
+		return this->mApp->MainThread();
 #else
-        AsioThread* t = this->mNetThreads.front();
-        {
-            this->mNetThreads.pop_front();
-            this->mNetThreads.push_back(t);
-        }
+		AsioThread* t = this->mNetThreads.front();
+		{
+			this->mNetThreads.pop_front();
+			this->mNetThreads.push_back(t);
+		}
 #endif
-        return t->Context();
-    }
+		return t->Context();
+
+//		asio::ssl::context sslContext(asio::ssl::context::sslv23);
+//
+//// 2. Load the server certificate and private key
+//		sslContext.use_certificate_file("path/to/server.crt", asio::ssl::context::pem);
+//		sslContext.use_private_key_file("path/to/server.key", asio::ssl::context::pem);
+//
+//// 3. Create an acceptor to listen for incoming connections
+//		asio::io_service ioService;
+//		asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), 443);
+//		asio::ip::tcp::acceptor acceptor(ioService, endpoint);
+//
+//// 4. Start accepting connections
+//		asio::ssl::stream<asio::ip::tcp::socket> sslSocket(ioService, sslContext);
+//		acceptor.accept(sslSocket.lowest_layer());
+//		sslSocket.handshake(asio::ssl::stream_base::server);
+//
+//// 5. Handle the connection in a separate thread or coroutine
+//		std::thread connectionThread([&sslSocket]()
+//		{
+//			// Handle the connection here
+//		});
+//		connectionThread.detach();
+	}
 
     std::shared_ptr<SocketProxy> ThreadComponent::CreateSocket()
     {

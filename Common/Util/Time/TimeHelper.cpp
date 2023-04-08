@@ -10,18 +10,9 @@ namespace Helper
 
 	bool Time::IsSameDay(time_t t1, time_t t2)
 	{
-		int time1[3] = { 0 };
-		int time2[3] = { 0 };
-		GetHourMinSecond(t1, time1);
-		GetHourMinSecond(t2, time2);
-		for (size_t index = 0; index < 3; index++)
-		{
-			if (time1[index] != time2[index])
-			{
-				return false;
-			}
-		}
-		return true;
+        std::tm tm1 = *std::localtime(&t1);
+        std::tm tm2 = *std::localtime(&t2);
+        return (tm1.tm_year == tm2.tm_year && tm1.tm_mon == tm2.tm_mon && tm1.tm_mday == tm2.tm_mday);
 	}
 
     void Time::SetScaleTotalTime(int second)

@@ -17,7 +17,6 @@ option(protobuf_BUILD_CONFORMANCE OFF)
 option(__DEBUG__ "debug模式" ON)
 
 option(__DEBUG_STACK__ "开启堆栈打印" ON)
-option(__ENABLE_OPEN_SSL__ "开启SSL" OFF)
 option(__HTTP_DEBUG_LOG__ "打印http日志" OFF)
 option(__REDIS_DEBUG__ "开始redis调试" OFF)
 option(ONLY_MAIN_THREAD "启用单线程模式" OFF)
@@ -30,11 +29,6 @@ option(__ENABLE_MIMALLOC__ "启用mimalloc管理内存" OFF)
 
 set(CMAKE_COMMON_DIR ${PROJECT_SOURCE_DIR})
 
-
-if(__ENABLE_OPEN_SSL__)
-    message("启用ssl")
-    add_definitions(-D __ENABLE_OPEN_SSL__)
-endif()
 
 
 if(ONLY_MAIN_THREAD)

@@ -124,11 +124,18 @@ if(MSVC) #创建vs目录
 endif()
 ADD_EXECUTABLE(app ${build_files})
 
-find_package(Jemalloc QUIET)
-if(Jemalloc_FOUND)
-    list(APPEND static_lib jemalloc)
+if(EXISTS ${PROJECT_SOURCE_DIR}/Libs/jemalloc/lib/libjemalloc.a)
     message("使用jemalloc作为内存池")
+    target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/jemalloc/lib/libjemalloc.a)
 endif()
+
+if (EXISTS ${PROJECT_SOURCE_DIR}/Libs/openssl/libssl.a)
+    message("启用ssl")
+    add_definitions(-D __ENABLE_OPEN_SSL__)
+    include_directories(${PROJECT_SOURCE_DIR}/Libs/openssl/include)
+    target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/openssl/libssl.a)
+    target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/openssl/libcrypto.a)
+endif ()
 
 if(__ENABLE_OPEN_SSL__)
     list(APPEND static_lib ssl crypto)
