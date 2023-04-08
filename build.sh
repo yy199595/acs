@@ -21,6 +21,10 @@ for arg in $cmd; do
         make
     fi
 
+    if [[ $arg == "mysql" ]]; then
+        wget http://cdn.tarsyun.com/src/mysql-connector-c-6.1.11-src.fixed.zip
+    fi
+
     if [[ $arg == "openssl" ]]; then
         cd ./Libs/ || exit
         if [ -d "./Libs/openssl" ]; then
