@@ -14,7 +14,6 @@ include(CMake/url.cmake)
 include(CMake/code.cmake)
 include(CMake/define.cmake)
 include(CMake/function.cmake)
-git_clone(${openssl_url} ${libs_path}/openssl)
 
 if(__DEBUG__)
     SET(CMAKE_BUILD_TYPE "Debug")
