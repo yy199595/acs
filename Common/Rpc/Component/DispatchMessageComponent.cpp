@@ -1,4 +1,4 @@
-﻿#include"InnerNetMessageComponent.h"
+﻿#include"DispatchMessageComponent.h"
 
 #include"Async/Component/AsyncMgrComponent.h"
 #include"Rpc/Lua/LuaServiceMethod.h"
@@ -16,7 +16,7 @@
 #include"Gate/Component/OuterNetComponent.h"
 namespace Tendo
 {
-	InnerNetMessageComponent::InnerNetMessageComponent()
+	DispatchMessageComponent::DispatchMessageComponent()
 	{
 		this->mWaitCount = 0;
 		this->mTaskComponent = nullptr;
@@ -25,7 +25,7 @@ namespace Tendo
 		this->mTimerComponent = nullptr;
 	}
 
-	bool InnerNetMessageComponent::LateAwake()
+	bool DispatchMessageComponent::LateAwake()
 	{
         this->mTimerComponent = this->mApp->GetTimerComponent();
         this->mOuterComponent = this->GetComponent<OuterNetComponent>();
@@ -34,10 +34,10 @@ namespace Tendo
 		return true;
 	}
 
-	int InnerNetMessageComponent::HandlerRequest(std::shared_ptr<Rpc::Packet> message)
+	int DispatchMessageComponent::HandlerRequest(const std::shared_ptr<Rpc::Packet> & message)
 	{
         //const Rpc::Head & head = message->ConstHead();
-		const std::string & fullName = message->GetHead().GetStr("func");
+		const std::string & fullName = message->ConstHead().GetStr("func");
         const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
         if(methodConfig == nullptr)
         {
@@ -53,11 +53,11 @@ namespace Tendo
             this->Invoke(methodConfig, message);
             return XCode::Successful;
         }
-        this->mTaskComponent->Start(&InnerNetMessageComponent::Invoke, this, methodConfig, message);
+        this->mTaskComponent->Start(&DispatchMessageComponent::Invoke, this, methodConfig, message);
 		return XCode::Successful;
 	}
 
-    void InnerNetMessageComponent::Invoke(const RpcMethodConfig *config, const std::shared_ptr<Rpc::Packet>& message)
+    void DispatchMessageComponent::Invoke(const RpcMethodConfig *config, const std::shared_ptr<Rpc::Packet>& message)
 	{
 		RpcService* logicService = this->mApp->GetService(config->Service);
 		if (logicService == nullptr || !logicService->IsStartService())
@@ -71,8 +71,8 @@ namespace Tendo
 			timerId = this->mTimerComponent->DelayCall(config->Timeout,
 				[message, config, this]()
 				{
-				  LOG_ERROR("call [" << config->FullName << "] code = call time out");
-				  this->mInnerComponent->Send(message->From(), XCode::CallTimeout, message);
+				    LOG_ERROR("call [" << config->FullName << "] code = call time out");
+				    this->mInnerComponent->Send(message->From(), XCode::CallTimeout, message);
 				}
 			);
 		}
@@ -144,47 +144,23 @@ namespace Tendo
 		this->mInnerComponent->Send(message->From(), code, message);
 	}
 
-
-    bool InnerNetMessageComponent::Ping(const std::string &address)
-    {
-        std::shared_ptr<Rpc::Packet> message = std::make_shared<Rpc::Packet>();
-        {
-            message->SetType(Tcp::Type::Ping);
-        }
-        std::shared_ptr<Rpc::Packet> response = this->Call(address, message);
-        return response->GetCode(XCode::Failure) == XCode::Successful;
-    }
-
-    std::shared_ptr<Rpc::Packet> InnerNetMessageComponent::Call(
-        const std::string &address, const std::shared_ptr<Rpc::Packet>& message)
-    {
-        int rpcId = 0;
-		if(!this->Send(address, message, rpcId))
-		{
-			return nullptr;
-		}
-        std::shared_ptr<RpcTaskSource> taskSource =
-			std::make_shared<RpcTaskSource>(rpcId);
-        return this->AddTask(rpcId, taskSource)->Await();
-    }
-
-    int InnerNetMessageComponent::OnMessage(const std::shared_ptr<Rpc::Packet>& message)
+    int DispatchMessageComponent::OnMessage(const std::shared_ptr<Rpc::Packet>& message)
     {
         switch (message->GetType())
         {
-        case Tcp::Type::Request:
-            return this->HandlerRequest(message);
-        case Tcp::Type::Response:
-			return this->HandlerResponse(message);
-		case Tcp::Type::Forward:
-			return this->HandlerForward(message);
-		case Tcp::Type::Broadcast:
-			return this->HandlerBroadcast(message);
+            case Tcp::Type::Request:
+                return this->HandlerRequest(message);
+            case Tcp::Type::Response:
+                return this->HandlerResponse(message);
+            case Tcp::Type::Forward:
+                return this->HandlerForward(message);
+            case Tcp::Type::Broadcast:
+                return this->HandlerBroadcast(message);
         }
-		return XCode::Successful;
+        return XCode::Successful;
     }
 
-	int InnerNetMessageComponent::HandlerForward(const std::shared_ptr<Rpc::Packet>& message)
+	int DispatchMessageComponent::HandlerForward(const std::shared_ptr<Rpc::Packet>& message)
 	{
 		if (this->mOuterComponent == nullptr)
 		{
@@ -204,29 +180,29 @@ namespace Tendo
 		return XCode::Successful;
 	}
 
-	int InnerNetMessageComponent::HandlerResponse(const std::shared_ptr<Rpc::Packet>& message)
-	{
-		if (this->mOuterComponent != nullptr)
-		{
-			std::string address;
-			// 网关转发过来的消息 必须带client字段
-			if (message->GetHead().Get("cli", address))
-			{
-				message->GetHead().Remove("cli");
-				this->mOuterComponent->Send(address, message);
-				return XCode::Successful;
-			}
-		}
-		int rpcId = 0;
-		if (message->GetHead().Get("rpc", rpcId))
-		{
-			this->OnResponse(rpcId, message);
-			return XCode::Successful;
-		}
-		return XCode::Successful;
-	}
+	int DispatchMessageComponent::HandlerResponse(const std::shared_ptr<Rpc::Packet>& message)
+    {
+        if (this->mOuterComponent != nullptr)
+        {
+            std::string address;
+            // 网关转发过来的消息 必须带client字段
+            if (message->GetHead().Get("cli", address))
+            {
+                message->GetHead().Remove("cli");
+                this->mOuterComponent->Send(address, message);
+                return XCode::Successful;
+            }
+        }
+        int rpcId = 0;
+        if (!message->GetHead().Get("rpc", rpcId))
+        {
+            return XCode::CallArgsError;
+        }
+        this->OnResponse(rpcId, message);
+        return XCode::Successful;
+    }
 
-	int InnerNetMessageComponent::HandlerBroadcast(const std::shared_ptr<Rpc::Packet>& message)
+	int DispatchMessageComponent::HandlerBroadcast(const std::shared_ptr<Rpc::Packet>& message)
 	{
         if(this->mOuterComponent == nullptr)
         {
@@ -235,30 +211,5 @@ namespace Tendo
         message->SetType(Tcp::Type::Request);
         this->mOuterComponent->Broadcast(message);
 		return XCode::Successful;
-	}
-
-
-	bool InnerNetMessageComponent::Send(const std::string &address, const std::shared_ptr<Rpc::Packet>& message)
-    {
-        if (this->mInnerComponent == nullptr)
-        {
-            return false;
-        }
-        message->GetHead().Remove("address");
-        assert(message->GetType() < (int)Tcp::Type::Max);
-        assert(message->GetType() > (int)Tcp::Type::None);
-        return this->mInnerComponent->Send(address, message);
-    }
-	bool InnerNetMessageComponent::Send(const string& address, const std::shared_ptr<Rpc::Packet>& message, int& id)
-	{
-		int rpcId = this->mNumberPool.Pop();
-		message->GetHead().Add("rpc", rpcId);
-		if(!this->Send(address, message))
-		{
-			this->mNumberPool.Push(rpcId);
-			return false;
-		}
-		id = rpcId;
-		return true;
 	}
 }// namespace Sentry

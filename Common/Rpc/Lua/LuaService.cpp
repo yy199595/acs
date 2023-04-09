@@ -10,16 +10,18 @@
 #include"Rpc/Async/RpcTaskSource.h"
 #include"Proto/Component/ProtoComponent.h"
 #include"Rpc/Component/NodeMgrComponent.h"
-#include"Rpc/Component/InnerNetMessageComponent.h"
+#include"Rpc/Component/InnerNetComponent.h"
+#include"Rpc/Component/DispatchMessageComponent.h"
 using namespace Tendo;
 namespace Lua
 {
 	int Service::Call(lua_State* lua)
     {
-		InnerNetMessageComponent * innerMessageComponent = App::Inst()->GetComponent<InnerNetMessageComponent>();
-		if (innerMessageComponent == nullptr)
+        InnerNetComponent * pNetComponent = App::Inst()->GetComponent<InnerNetComponent>();
+        DispatchMessageComponent * pMessageComponent = App::Inst()->GetComponent<DispatchMessageComponent>();
+		if (pNetComponent == nullptr || pMessageComponent == nullptr)
 		{
-			luaL_error(lua, "InnerNetMessageComponent Is Null");
+			luaL_error(lua, "InnerNetComponent Is Null");
 			return 0;
 		}
 
@@ -106,14 +108,14 @@ namespace Lua
         lua_pushthread(lua);
         const std::string &response = methodConfig->Response;
 		request->GetHead().Add("func", methodConfig->FullName);
-        if (!innerMessageComponent->Send(address, request, rpdId))
+        if (!pNetComponent->Send(address, request, rpdId))
         {
             luaL_error(lua, "send request message error");
             return 0;
         }
 		std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource
 			= std::make_shared<LuaRpcTaskSource>(lua, rpdId, response);
-        return innerMessageComponent->AddTask(rpdId, luaRpcTaskSource)->Await();
+        return pMessageComponent->AddTask(rpdId, luaRpcTaskSource)->Await();
     }
 
 	int Service::AllotServer(lua_State *lua)
@@ -229,13 +231,13 @@ namespace Lua
         lua_pushthread(lua);
         //const std::string& response = methodConfig->Response;
         request->GetHead().Add("func", methodConfig->FullName);
-        InnerNetMessageComponent* netMessageComponent = App::Inst()->GetComponent<InnerNetMessageComponent>();
-        if (netMessageComponent == nullptr)
+        InnerNetComponent * pNetComponent = App::Inst()->GetComponent<InnerNetComponent>();
+        if (pNetComponent == nullptr)
         {
-            luaL_error(lua, "InnerNetMessageComponent Is Null");
+            luaL_error(lua, "DispatchMessageComponent Is Null");
             return 0;
         }
-        if (!netMessageComponent->Send(address, request))
+        if (!pNetComponent->Send(address, request))
         {
             luaL_error(lua, "send request message error");
             return 0;

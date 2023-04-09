@@ -16,7 +16,7 @@ namespace Tendo
 	class RpcService : public Component, public IServiceBase
 	{
 	public:
-		RpcService() = default;
+		RpcService();
 	public:
 		const std::string& GetServer() const { return this->mCluster; }
 	public:
@@ -51,7 +51,7 @@ namespace Tendo
 		std::string mCluster;
 		std::string mLocationAddress;
 		std::vector<std::string> mServiceHosts;
-		class NodeMgrComponent* mLocationComponent;
-		class InnerNetMessageComponent* mMessageComponent;
+        class InnerNetComponent* mNetComponent;
+        class NodeMgrComponent* mLocationComponent;
 	};
 }

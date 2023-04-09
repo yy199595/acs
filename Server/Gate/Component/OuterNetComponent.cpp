@@ -6,7 +6,7 @@
 #include"Gate/Client/OuterNetClient.h"
 #include"Server/Component/ThreadComponent.h"
 #include"Rpc/Component/NodeMgrComponent.h"
-#include"Rpc/Component/InnerNetMessageComponent.h"
+#include"Rpc/Component/InnerNetComponent.h"
 #include"Util/Md5/MD5.h"
 #include"Server/Config/CodeConfig.h"
 #include"Util/Json/JsonWriter.h"
@@ -26,7 +26,7 @@ namespace Tendo
 		this->mMaxHandlerCount = 500;
 		this->mGateService = this->mApp->GetService<Gate>();
 		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
-		this->mInnerMessageComponent = this->GetComponent<InnerNetMessageComponent>();
+		this->mInnerNetComponent = this->GetComponent<InnerNetComponent>();
 		ServerConfig::Inst()->GetMember("message", "outer", this->mMaxHandlerCount);
 		return true;
 	}
@@ -131,7 +131,7 @@ namespace Tendo
 		}
 #endif // __DEBUG__
 		this->mWaitCount++;
-		if(!this->mInnerMessageComponent->Send(target, message))
+		if(!this->mInnerNetComponent->Send(target, message))
 		{
 			return XCode::NetWorkError;
 		}

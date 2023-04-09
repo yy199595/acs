@@ -7,14 +7,14 @@
 #include"Server/Config/CodeConfig.h"
 #include"Util//Json/JsonWriter.h"
 #include"Rpc/Component/NodeMgrComponent.h"
-#include"Rpc/Component/InnerNetMessageComponent.h"
+#include"Rpc/Component/InnerNetComponent.h"
 
 namespace Tendo
 {
 	bool HttpDebugComponent::LateAwake()
 	{
 		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
-		this->mInnerComponent = this->GetComponent<InnerNetMessageComponent>();
+		this->mInnerComponent = this->GetComponent<InnerNetComponent>();
 		return this->StartListen("debug");
 	}
 	bool HttpDebugComponent::OnDelClient(const std::string& address)

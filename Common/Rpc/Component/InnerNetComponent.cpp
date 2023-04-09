@@ -3,7 +3,7 @@
 #include"Entity/App/App.h"
 #include"Util/String/StringHelper.h"
 #include"Network/Tcp/SocketProxy.h"
-#include"InnerNetMessageComponent.h"
+#include"DispatchMessageComponent.h"
 #include"Util/File/FileHelper.h"
 #include"Server/Component/ThreadComponent.h"
 #include"google/protobuf/util/json_util.h"
@@ -42,7 +42,7 @@ namespace Tendo
         config->GetLocation("http", nodeInfo.HttpAddress);
         this->mLocationMaps.emplace(nodeInfo.RpcAddress, nodeInfo);
         LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<ThreadComponent>());
-        LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>());
+        LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<DispatchMessageComponent>());
         return this->StartListen("rpc");
     }
 
@@ -273,6 +273,32 @@ namespace Tendo
             return false;
         }
         clientSession->Send(message);
+        return true;
+    }
+
+    std::shared_ptr<Rpc::Packet> InnerNetComponent::Call(const std::string & address, const std::shared_ptr<Rpc::Packet> & message)
+    {
+        int taskId = this->mMessageComponent->PopTaskId();
+        message->GetHead().Add("rpc", taskId);
+        if(!this->Send(address, message))
+        {
+            this->mMessageComponent->PushTaskId(taskId);
+            return nullptr;
+        }
+        std::shared_ptr<RpcTaskSource> taskSource =
+                std::make_shared<RpcTaskSource>(taskId);
+       return  this->mMessageComponent->AddTask(taskId, taskSource)->Await();
+    }
+
+    bool InnerNetComponent::Send(const std::string & address, const std::shared_ptr<Rpc::Packet>& message, int & taskId)
+    {
+        taskId = this->mMessageComponent->PopTaskId();
+        message->GetHead().Add("rpc", taskId);
+        if(!this->Send(address, message))
+        {
+            this->mMessageComponent->PushTaskId(taskId);
+            return false;
+        }
         return true;
     }
 

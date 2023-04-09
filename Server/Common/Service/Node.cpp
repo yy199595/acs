@@ -10,7 +10,7 @@
 #include"Rpc/Component/InnerNetComponent.h"
 #include"Rpc/Component/NodeMgrComponent.h"
 #include"Server/Component/TextConfigComponent.h"
-#include"Rpc/Component/InnerNetMessageComponent.h"
+#include"Rpc/Component/DispatchMessageComponent.h"
 
 namespace Tendo
 {
@@ -22,7 +22,7 @@ namespace Tendo
 	bool Node::Awake()
 	{
 		this->mApp->AddComponent<InnerNetComponent>();
-		this->mApp->AddComponent<InnerNetMessageComponent>();
+		this->mApp->AddComponent<DispatchMessageComponent>();
 		return true;
 	}
 

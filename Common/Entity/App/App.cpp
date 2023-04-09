@@ -299,7 +299,7 @@ namespace Tendo
         std::string title = ServerConfig::Inst()->Name();
         //HttpWebComponent * httpComponent = this->GetComponent<HttpWebComponent>();
         //MongoDBComponent* mongoComponent = this->GetComponent<MongoDBComponent>();
-        //InnerNetMessageComponent * innerComponent = this->GetComponent<InnerNetMessageComponent>();
+        //DispatchMessageComponent * innerComponent = this->GetComponent<DispatchMessageComponent>();
         //title.append(fmt::format("   fps:{0}  ", this->mLogicFps));
         //if (innerComponent != nullptr)
         //{

@@ -7,16 +7,21 @@
 #include"Server/Config/CodeConfig.h"
 #include"Rpc/Component/InnerNetComponent.h"
 #include"Rpc/Component/NodeMgrComponent.h"
-#include"Rpc/Component/InnerNetMessageComponent.h"
 #ifdef __RPC_DEBUG_LOG__
 #include<google/protobuf/util/json_util.h>
 #endif
 namespace Tendo
 {
+    RpcService::RpcService()
+    {
+        this->mNetComponent = nullptr;
+        this->mLocationComponent = nullptr;
+    }
+
 	bool RpcService::LateAwake()
 	{
-		this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
-		this->mMessageComponent = this->GetComponent<InnerNetMessageComponent>();
+        this->mNetComponent = this->GetComponent<InnerNetComponent>();
+        this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
 		ClusterConfig::Inst()->GetServerName(this->GetName(), this->mCluster);
         if (!ServerConfig::Inst()->GetLocation("rpc", this->mLocationAddress))
         {
@@ -79,7 +84,7 @@ namespace Tendo
             request->WriteMessage(message);
             request->GetHead().Add("func", name);
         }
-        return this->mMessageComponent->Send(address, request);
+        return this->mNetComponent->Send(address, request);
     }
 
     std::shared_ptr<Rpc::Packet> RpcService::CallAwait(
@@ -100,7 +105,7 @@ namespace Tendo
             request->WriteMessage(message);
             request->GetHead().Add("func", name);
         }
-		return this->mMessageComponent->Call(address, request);
+		return this->mNetComponent->Call(address, request);
 	}
 
 	int RpcService::Send(const std::string& address, const std::string& func, const Message& message)
@@ -282,7 +287,7 @@ namespace Tendo
             request->GetHead().Add("id", userId);
             request->GetHead().Add("func", methodConfig->FullName);
         }
-        return this->mMessageComponent->Send(address, request);
+        return this->mNetComponent->Send(address, request);
     }
 
     std::shared_ptr<Rpc::Packet> RpcService::CallAwait(
@@ -318,7 +323,7 @@ namespace Tendo
             request->SetProto(Tcp::Porto::Protobuf);
             request->GetHead().Add("func", methodConfig->FullName);
         }
-        return this->mMessageComponent->Call(address, request);
+        return this->mNetComponent->Call(address, request);
     }
 
 	int RpcService::Send(const std::string & address,
@@ -348,6 +353,6 @@ namespace Tendo
 			request->GetHead().Add("id", userId);
 			request->GetHead().Add("func", methodConfig->FullName);
 		}
-		return this->mMessageComponent->Send(address, request);
+		return this->mNetComponent->Send(address, request);
 	}
 }

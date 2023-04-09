@@ -43,13 +43,14 @@ namespace Tendo
 
 	bool MysqlDBComponent::LateAwake()
 	{
+        int id = 0;
 		for (int index = 0; index < this->mConfig.MaxCount; index++)
 		{
+            id++;
 			std::shared_ptr<MysqlClient> mysqlClient
 				= std::make_shared<MysqlClient>(this, this->mConfig);
 
 			mysqlClient->Start();
-			int id = this->mNumberPool.Pop();
 			this->mAllotQueue.push(id);
 			this->mMysqlClients.emplace(id, std::move(mysqlClient));
 		}
@@ -136,7 +137,7 @@ namespace Tendo
 		{
 			return false;
 		}
-		rpcId = this->mNumberPool.Pop();
+		rpcId = this->PopTaskId();
 		command->SetRpcId(rpcId);
 		iter->second->Push(command);
 		return true;

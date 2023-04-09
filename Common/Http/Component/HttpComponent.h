@@ -30,7 +30,6 @@ namespace Tendo
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 	 private:
         class ThreadComponent * mNetComponent;
-		Util::NumberBuilder<int, 10> mNumberPool;
 		std::queue<std::shared_ptr<HttpRequestClient>> mClientPools;
 		std::unordered_map<int, std::shared_ptr<HttpRequestClient>> mUseClients;
 	};

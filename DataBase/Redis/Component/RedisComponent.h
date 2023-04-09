@@ -37,10 +37,8 @@ namespace Tendo
 		void OnDestroy() final;
         bool LateAwake() final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
-		void OnTaskComplete(int key) final { this->mNumberPool.Push(key);}
 	private:
 		RedisConfig mConfig;
-        Util::NumberBuilder<int, 1> mNumberPool;
         std::vector<std::shared_ptr<TcpRedisClient>> mRedisClients;
     };
 

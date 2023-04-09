@@ -2,7 +2,9 @@
 #include"Entity/App/App.h"
 #include"Rpc/Method/MethodProxy.h"
 #include"Network/Tcp/SocketProxy.h"
+#ifdef __ENABLE_OPEN_SSL__
 #include<asio/ssl.hpp>
+#endif
 using namespace asio::ip;
 namespace Tendo
 {

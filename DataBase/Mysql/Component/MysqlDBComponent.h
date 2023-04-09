@@ -46,12 +46,10 @@ namespace Tendo
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 		void OnConnectSuccessful(const std::string &address) final;
 		void OnMessage(std::shared_ptr<Mysql::Response> message) final;
-		void OnTaskComplete(int key) final { this->mNumberPool.Push(key);}
 	private:
 		MysqlConfig mConfig;
 		std::queue<int> mAllotQueue;
 		std::unique_ptr<SqlHelper> mSqlHelper;
-		Util::NumberBuilder<int, 1> mNumberPool;
 		std::unordered_map<int, std::shared_ptr<MysqlClient>> mMysqlClients;
     };
 }

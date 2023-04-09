@@ -18,7 +18,7 @@ option(protobuf_BUILD_TESTS OFF)
 option(protobuf_BUILD_EXAMPLES OFF)
 option(protobuf_BUILD_CONFORMANCE OFF)
 if(WIN32 AND NOT MSVC)
-    set(protobuf_BUILD_SHARED_LIBS ON) #编译动态库
+    #set(protobuf_BUILD_SHARED_LIBS ON) #编译动态库
 endif()
 option(__DEBUG__ "debug模式" ON)
 

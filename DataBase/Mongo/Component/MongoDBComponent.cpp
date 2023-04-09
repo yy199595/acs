@@ -39,9 +39,10 @@ namespace Tendo
 
     bool MongoDBComponent::LateAwake()
     {
+        int id = 0;
         for (int index = 0; index < this->mConfig.MaxCount; index++)
         {
-            int id = this->mRequestId.Pop();
+            id++;
             const std::string& ip = this->mConfig.Address[0].Ip;
             const unsigned int port = this->mConfig.Address[0].Port;
             ThreadComponent* threadComponent =
@@ -132,7 +133,7 @@ namespace Tendo
         {
             request->collectionName = request->dataBase + ".$cmd";
         }
-        taskId = this->mRequestId.Pop();
+        taskId = this->PopTaskId();
         request->header.requestID = taskId;
         mongoClient->SendMongoCommand(request);
         return true;

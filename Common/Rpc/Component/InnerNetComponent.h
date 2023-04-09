@@ -34,6 +34,8 @@ namespace Tendo
 		bool Send(const std::shared_ptr<Rpc::Packet>& message); //发送到本地
 		bool Send(const std::string & address, const std::shared_ptr<Rpc::Packet>& message);
         bool Send(const std::string & address, int code, const std::shared_ptr<Rpc::Packet>& pack);
+        bool Send(const std::string & address, const std::shared_ptr<Rpc::Packet>& message, int & id);
+        std::shared_ptr<Rpc::Packet> Call(const std::string & address, const std::shared_ptr<Rpc::Packet> & message);
 	public:
 		size_t GetConnectClients(std::vector<std::string> & list) const; //获取所有连接进来的客户端
 		size_t Broadcast(const std::shared_ptr<Rpc::Packet>& message) const; //广播给所有链接进来的客户端
@@ -45,7 +47,7 @@ namespace Tendo
 		std::string mLocation;
 		unsigned int mSumCount;
         class ThreadComponent * mNetComponent;
-        class InnerNetMessageComponent* mMessageComponent;
+        class DispatchMessageComponent* mMessageComponent;
         std::unordered_map<std::string, std::string> mUserMaps;
 		std::queue<std::shared_ptr<Rpc::Packet>> mWaitMessages;
 		std::unordered_map<std::string, NodeInfo> mLocationMaps;

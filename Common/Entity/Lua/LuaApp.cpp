@@ -7,7 +7,7 @@
 #include"Rpc/Service/RpcService.h"
 #include"Rpc/Async/RpcTaskSource.h"
 #include"Proto/Component/ProtoComponent.h"
-#include"Rpc/Component/InnerNetMessageComponent.h"
+#include"Rpc/Component/DispatchMessageComponent.h"
 using namespace Tendo;
 namespace Lua
 {

@@ -126,7 +126,6 @@ namespace Tendo
 
 	void HttpComponent::OnTaskComplete(int key)
 	{
-		this->mNumberPool.Push(key);
 		auto iter = this->mUseClients.find(key);
 		if(iter != this->mUseClients.end())
 		{
@@ -142,7 +141,7 @@ namespace Tendo
 		std::shared_ptr<Http::IResponse> & response, int& taskId)
 	{
 		request->SetAsync(true);
-		taskId = this->mNumberPool.Pop();
+		taskId = this->PopTaskId();
 		std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
 		{
 			httpAsyncClient->Do(request, response, taskId);

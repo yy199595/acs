@@ -54,8 +54,8 @@ namespace Tendo
 #ifdef __DEBUG__
 		std::unordered_map<int, long long> mRecords;
 #endif
-		std::queue<std::shared_ptr<Rpc::Packet>> mMessages;
-		class InnerNetMessageComponent * mInnerMessageComponent;
+        class InnerNetComponent * mInnerNetComponent;
+        std::queue<std::shared_ptr<Rpc::Packet>> mMessages;
         std::queue<std::shared_ptr<OuterNetClient>> mClientPools;
 		std::unordered_map<std::string, long long> mAddressUserMap; //验证过的客户端
 		std::unordered_map<long long, std::string> mUserAddressMap; //验证过的客户端

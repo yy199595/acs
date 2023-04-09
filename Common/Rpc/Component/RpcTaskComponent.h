@@ -16,7 +16,6 @@ namespace Tendo
         ~RpcTaskComponent() = default;
         typedef std::shared_ptr<IRpcTask<T>> RpcTask;
     public:
-        void OnTimeout(K k);
         template<typename T1>
         T1 * AddTask(K k, std::shared_ptr<T1> task)
         {
@@ -29,26 +28,17 @@ namespace Tendo
 			this->mTasks.emplace(k, task);
             return task.get();
         }
+        K PopTaskId() { return this->mNumberPool.Pop(); }
+        void PushTaskId(K k) { this->mNumberPool.Push(k); }
         bool OnResponse(K key, std::shared_ptr<T> message);
 	protected:
-		virtual void OnTaskComplete(K key) { }
+        virtual void OnTaskComplete(K k) { }
         virtual void OnNotFindResponse(K key, std::shared_ptr<T> message);
     private:
         std::unordered_map<K, RpcTask> mTasks;
+        Util::NumberBuilder<K, 1> mNumberPool;
     };
 
-    template<typename K,typename T>
-    void RpcTaskComponent<K, T>::OnTimeout(K key)
-    {
-        auto iter = this->mTasks.find(key);
-        if(iter != this->mTasks.end())
-        {
-            RpcTask rpcTask = iter->second;
-            rpcTask->OnTimeout();
-            this->mTasks.erase(iter);
-            LOG_ERROR(this->GetName() << " rpc task time out id " << key);
-        }
-    }
 
     template<typename K,typename T>
     bool RpcTaskComponent<K, T>::OnResponse(K key, std::shared_ptr<T> message)
@@ -63,9 +53,10 @@ namespace Tendo
 		if(rpcTask != nullptr)
 		{
 			rpcTask->OnResponse(message);
-			this->OnTaskComplete(key);
 		}
 		this->mTasks.erase(iter);
+        this->OnTaskComplete(key);
+        this->mNumberPool.Push(key);
 		return true;
     }
 

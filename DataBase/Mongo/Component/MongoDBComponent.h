@@ -56,12 +56,10 @@ namespace Tendo
 		void OnLuaRegister(Lua::ClassProxyHelper& luaRegister) final;
 		void OnConnectSuccessful(const std::string &address) final;
 		void OnMessage(std::shared_ptr<CommandResponse> message) final;
-		void OnTaskComplete(int key) final { this->mRequestId.Push(key); }
 	private:
 		MongoConfig mConfig;
 		unsigned int mWaitCount;
 		std::queue<int> mAllotQueue;
-		Util::NumberBuilder<int, 10> mRequestId;
         std::unordered_map<int, std::shared_ptr<TcpMongoClient>> mMongoClients;
     };
 }

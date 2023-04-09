@@ -151,7 +151,7 @@ namespace Tendo
 		{
 			return false;
 		}
-		id = this->mNumberPool.Pop();
+		id = this->PopTaskId();
 		redisClientContext->Send(request);
 		return true;
 	}

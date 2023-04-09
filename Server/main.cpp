@@ -10,7 +10,7 @@
 
 #include"Rpc/Component/InnerNetComponent.h"
 #include"Gate/Component/OuterNetComponent.h"
-#include"Rpc/Component/InnerNetMessageComponent.h"
+#include"Rpc/Component/DispatchMessageComponent.h"
 
 #include"Gate/Component/GateComponent.h"
 
@@ -73,7 +73,7 @@ void RegisterComponent()
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
     ComponentFactory::Add<InnerNetComponent>("InnerNetComponent");
 	ComponentFactory::Add<NodeMgrComponent>("NodeMgrComponent");
-	ComponentFactory::Add<InnerNetMessageComponent>("InnerNetMessageComponent");
+	ComponentFactory::Add<DispatchMessageComponent>("DispatchMessageComponent");
 
 // gate
 	ComponentFactory::Add<GateComponent>("GateComponent");

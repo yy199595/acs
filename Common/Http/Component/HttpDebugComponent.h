@@ -17,6 +17,6 @@ namespace Tendo
 		bool GetAddress(const std::string& service, long long id, std::string& address);
 	private:
 		class NodeMgrComponent* mNodeComponent;
-		class InnerNetMessageComponent* mInnerComponent;
+		class InnerNetComponent* mInnerComponent;
 	};
 }
