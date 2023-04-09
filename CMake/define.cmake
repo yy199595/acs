@@ -9,11 +9,17 @@ endif()
 add_definitions(-w) #忽略警告
 add_definitions(-D ASIO_STANDALONE)
 
+
+#option(protobuf_BUILD_TESTS OFF)
+#option(protobuf_BUILD_EXAMPLES OFF)
+#option(protobuf_BUILD_CONFORMANCE OFF)
+#option(protobuf_BUILD_SHARED_LIBS ON)
 option(protobuf_BUILD_TESTS OFF)
 option(protobuf_BUILD_EXAMPLES OFF)
 option(protobuf_BUILD_CONFORMANCE OFF)
-#option(protobuf_BUILD_PROTOC_BINARIES OFF)
-
+if(WIN32 AND NOT MSVC)
+    set(protobuf_BUILD_SHARED_LIBS ON) #编译动态库
+endif()
 option(__DEBUG__ "debug模式" ON)
 
 option(__DEBUG_STACK__ "开启堆栈打印" ON)
