@@ -1,4 +1,4 @@
-# Tendo 是一个轻量级，分布式rpc微服务框架
+# <center>Tendo 是一个轻量级，分布式rpc微服务框架
 # 特点：
 ### 1. 跨平台
 支持windows，Linux，Mac(支持m1和intel芯片)
@@ -27,5 +27,7 @@ rpc通信基于自己实现的二进制协议
 支持把c++的方法，类导给lua使用，在c++中等待lua协程完成  
 ### 7. 调试
 所有接口支持使用ApiPost发送一个json的形式调试,或者直接使用框架自带客户端调试,客户端支持模拟多个用户操作  
+
+#####QQ：646585122
 # [编译和运行](./ReadMe/build.md)
-# [配置文件说明](./ReadMe/config.md)
+# [教程](./ReadMe/menu.md)
