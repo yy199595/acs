@@ -20,6 +20,9 @@ namespace Http
 	{
 		if(this->mParseState == DecodeState::None)
 		{
+			/*std::string firstLine;
+			std::getline(buffer, firstLine);*/
+
 			buffer >> this->mVersion;
 			buffer >> this->mCode;		
 			std::getline(buffer, this->mError);
@@ -28,6 +31,7 @@ namespace Http
 				this->mError.pop_back();
 			}
 			this->mParseState = DecodeState::Head;
+			return HTTP_READ_LINE;
 		}
 		if(this->mParseState == DecodeState::Head)
 		{
@@ -35,7 +39,7 @@ namespace Http
 			{
 				return HTTP_READ_LINE;
 			}
-			this->mParseState = DecodeState::Body;
+			this->mParseState = DecodeState::Body;			
 		}
 		if(this->mParseState == DecodeState::Body)
 		{
@@ -85,6 +89,46 @@ namespace Http
 		const size_t size = this->mContent.size();
 		buff.write(str, size);
 		return 0;
+	}
+
+	int DataResponse::WriteToLua(lua_State* lua)
+	{
+		lua_createtable(lua, 0, 5);
+		{
+			lua_pushstring(lua, "code");
+			lua_pushinteger(lua, this->mCode);
+			lua_rawset(lua, -3);
+		}
+		{
+			lua_pushstring(lua, "version");
+			lua_pushstring(lua, this->mVersion.c_str());
+			lua_rawset(lua, -3);
+		}
+		{
+			lua_pushstring(lua, "status");
+			lua_pushstring(lua, this->mError.c_str());
+			lua_rawset(lua, -3);
+		}
+		{
+			lua_pushstring(lua, "head");
+			lua_createtable(lua, 0, this->mHead.HeadCount());
+			auto iter = this->mHead.Begin();
+			for (; iter != this->mHead.End(); iter++)
+			{
+				const char* key = iter->first.c_str();
+				const char* value = iter->second.c_str();
+				lua_pushstring(lua, key);
+				lua_pushstring(lua, value);
+				lua_rawset(lua, -3);
+			}
+			lua_rawset(lua, -3);
+		}
+		{
+			lua_pushstring(lua, "data");
+			lua_pushlstring(lua, this->mContent.c_str(), this->mContent.size());
+			lua_rawset(lua, -3);
+		}
+		return 1;
 	}
 
 	int DataResponse::OnReadContent(const char* str, size_t size)
@@ -191,6 +235,11 @@ namespace Http
 		return this->mFileSize;
 	}
 
+	int FileResponse::WriteToLua(lua_State* lua)
+	{
+		lua_pushinteger(lua, this->mCode);
+		return 1;
+	}
 	int FileResponse::OnReadContent(const char* str, size_t size)
 	{	
 		int length = this->mHead.ContentLength();
@@ -209,7 +258,9 @@ namespace Http
 		{					
 			int len = length - (int)this->mCurSize;
 			double process = this->mCurSize / (double)length;
-			CONSOLE_LOG_DEBUG("receive process = [" << process * 100 << "%s]");
+#ifdef __DEBUG__
+			CONSOLE_LOG_DEBUG("download file process = [" << process * 100 << "%s]");
+#endif // __DEBUG__
 			return len <= 1024 ? len : 1024;
 		}		
 		return HTTP_READ_SOME;
@@ -227,6 +278,9 @@ namespace Http
 			this->mOutput->flush();
 			this->mOutput->close();
 			delete this->mOutput;
+#ifdef __DEBUG__
+			CONSOLE_LOG_DEBUG("download file to disk : " << this->mPath);
+#endif
 		}
 		this->mInput = nullptr;
 		this->mOutput = nullptr;

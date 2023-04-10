@@ -39,24 +39,14 @@ namespace Tendo
 
     void LuaHttpRequestTask::OnResponse(std::shared_ptr<Http::IResponse> response)
     {
+        int count = 0;
         lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
         lua_State* coroutine = lua_tothread(this->mLua, -1);
         if(response != nullptr)
         {
-            int count = 1;
-            int code = (int)response->Code();
-            lua_pushinteger(this->mLua, code);
-            if(std::shared_ptr<Http::DataResponse> dataResponse =
-                std::dynamic_pointer_cast<Http::DataResponse>(response))
-            {
-                count++;
-                const std::string & content = dataResponse->GetContent();
-                lua_pushlstring(this->mLua, content.c_str(), content.size());
-            }
-            Lua::Coroutine::Resume(coroutine, this->mLua, count);
-            return;
+            count = response->WriteToLua(this->mLua);       
         }
-        Lua::Coroutine::Resume(coroutine, this->mLua, 0);
+        Lua::Coroutine::Resume(coroutine, this->mLua, count);
     }
 
     int LuaHttpRequestTask::Await()

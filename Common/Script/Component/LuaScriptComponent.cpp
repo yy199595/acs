@@ -42,7 +42,12 @@ namespace Tendo
 		//        Lua::ClassProxyHelper luaRegister(this->mLuaEnv, "ServerConfig");
 		//        luaRegister.BeginNewTable();
 		//        lua_getglobal(this->mLuaEnv, "ServerConfig");
-
+		{
+			lua_getglobal(this->mLuaEnv, "os");
+			lua_pushstring(this->mLuaEnv, "workdir");
+			lua_pushstring(this->mLuaEnv, System::WorkPath().c_str());
+			lua_rawset(this->mLuaEnv, -3);
+		}
 		Lua::ClassProxyHelper luaRegister0(this->mLuaEnv, "App");
 		luaRegister0.BeginRegister<App>();
 		luaRegister0.PushExtensionFunction("GetComponent", Lua::LuaApp::GetComponent);

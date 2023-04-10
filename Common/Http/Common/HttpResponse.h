@@ -6,6 +6,7 @@
 #define APP_HTTPRESPONSE_H
 #include<fstream>
 #include"httpHead.h"
+#include"Script/Lua/LuaInclude.h"
 #include"Proto/Message/ProtoMessage.h"
 namespace Json
 {
@@ -24,6 +25,8 @@ namespace Http
 		void SetCode(HttpStatus code) { this->mCode = (int)code; }
         HttpStatus Code() const { return (HttpStatus)this->mCode; }
 		const std::string & GetError() const { return this->mError; }
+	public:
+		virtual int WriteToLua(lua_State* lua) = 0;
 	 protected:
 		virtual int OnWriterContent(std::ostream & buff) = 0;
 		virtual int OnReadContent(const char * str, size_t size) = 0;
@@ -45,6 +48,7 @@ namespace Http
     class DataResponse : public IResponse
     {
 	 protected:
+		int WriteToLua(lua_State* lua) final;
 		int OnWriterContent(std::ostream &buff) final;
 		int OnReadContent(const char *str, size_t size) final;
     public:
@@ -78,6 +82,7 @@ namespace Http
 		int OnReadContent(const char *str, size_t size) final;
 	 private:
 		 size_t ContentSize() final;
+		 int WriteToLua(lua_State* lua)final;
 	 private:
 		size_t mCurSize;
 		size_t mFileSize;

@@ -15,11 +15,10 @@
 using namespace Tendo;
 namespace Lua
 {
-	int HttpClient::Get(lua_State* lua)
+    int HttpClient::Get(lua_State* lua)
     {
-        lua_pushthread(lua);        
-        HttpComponent* httpComponent = App::Inst()->GetComponent<HttpComponent>();
-        if (httpComponent == nullptr)
+        HttpComponent* pHttpComponent = App::Inst()->GetComponent<HttpComponent>();
+        if (pHttpComponent == nullptr)
         {
             luaL_error(lua, "HttpComponent Is Null");
             return 0;
@@ -33,15 +32,25 @@ namespace Lua
             luaL_error(lua, "parse get url : [%s] failure", str);
             return 0;
         }
-		std::shared_ptr<LuaHttpRequestTask> luaHttpTask
-				= std::make_shared<LuaHttpRequestTask>(lua);
+        if (lua_isboolean(lua, 2) && !lua_toboolean(lua, 2))
+        {
+            if (!pHttpComponent->Send(request, response))
+            {
+                luaL_error(lua, "http get net work error");
+                return 0;
+            }
+            return response->WriteToLua(lua);
+        }
+        lua_pushthread(lua);
+        std::shared_ptr<LuaHttpRequestTask> luaHttpTask
+            = std::make_shared<LuaHttpRequestTask>(lua);
 #ifdef __DEBUG__
         LOG_DEBUG("[http GET] url = " << std::string(str, size));
 #endif
 
-		int taskId = 0;
-		httpComponent->Send(request, response, taskId);
-        return httpComponent->AddTask(taskId, luaHttpTask)->Await();
+        int taskId = 0;
+        pHttpComponent->Send(request, response, taskId);
+        return pHttpComponent->AddTask(taskId, luaHttpTask)->Await();
     }
 
 	int HttpClient::Post(lua_State* lua)
@@ -79,7 +88,15 @@ namespace Lua
         }
         std::shared_ptr<LuaHttpRequestTask> luaHttpTask(new LuaHttpRequestTask(lua));
         std::shared_ptr<Http::IResponse> response = std::make_shared<Http::DataResponse>();
-
+        if (lua_isboolean(lua, 3) && !lua_toboolean(lua, 2))
+        {
+            if (!httpComponent->Send(request, response))
+            {
+                luaL_error(lua, "http get net work error");
+                return 0;
+            }
+            return response->WriteToLua(lua);
+        }
 #ifdef __DEBUG__
         //LOG_DEBUG("[http POST] url = " << std::string(str, size) << " data = " << postRequest->Content());
 #endif
@@ -111,10 +128,19 @@ namespace Lua
             luaL_error(lua, "parse post url : [%s] failure", url);
             return 0;
         }
-       
+        std::shared_ptr<Http::IResponse> response = std::make_shared<Http::FileResponse>(path);
+        if (lua_isboolean(lua, 3) && !lua_toboolean(lua, 3))
+        {
+            if (!httpComponent->Send(request, response))
+            {
+                luaL_error(lua, "http get net work error");
+                return 0;
+            }
+            return response->WriteToLua(lua);
+        }
+
         int taskId = 0;
         std::shared_ptr<LuaHttpRequestTask> luaHttpTask(new LuaHttpRequestTask(lua));
-        std::shared_ptr<Http::IResponse> response = std::make_shared<Http::FileResponse>(path);
         httpComponent->Send(request, response, taskId);
         return httpComponent->AddTask(taskId, luaHttpTask)->Await();
 	}

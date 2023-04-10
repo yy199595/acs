@@ -6,6 +6,7 @@
 #include"Entity/App/App.h"
 #include"Util/File/FileHelper.h"
 #include"Core/System/System.h"
+#include"Http/Component/HttpComponent.h"
 #include"Cluster//Config/ClusterConfig.h"
 #include"Rpc/Service/VirtualRpcService.h"
 #include"Rpc/Service/LuaPhysicalRpcService.h"
@@ -16,6 +17,7 @@ namespace Tendo
 {
     bool LaunchComponent::Awake()
     {
+        this->mApp->AddComponent<HttpComponent>();
 		if(ServerConfig::Inst()->UseLua())
 		{
 			this->mApp->AddComponent<LuaScriptComponent>();

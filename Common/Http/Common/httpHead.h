@@ -37,6 +37,7 @@ namespace Http
     class Head : public IStream
     {
     public:
+        typedef std::unordered_map<std::string, std::string>::iterator Iter;
         Head() : mContentLength(0) { }
         bool Add(const std::string & k, int v);
         bool Add(const std::string & k, const std::string & v);
@@ -44,6 +45,9 @@ namespace Http
 		bool Get(const std::string& k, int& v) const;
         bool Get(const std::string& k, long long& v) const;
         bool Get(const std::string & k, std::string & v) const;
+        Iter End() { return this->mHeads.end(); }
+        Iter Begin() { return this->mHeads.begin(); }
+        size_t HeadCount() const { return this->mHeads.size(); }
     public:
         int OnRead(std::istream & buffer) final;
         int OnWrite(std::ostream & buffer) final;

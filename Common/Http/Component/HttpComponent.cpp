@@ -206,47 +206,101 @@ namespace Tendo
 		try
 		{
 			asio::io_context io;
+			asio::error_code code;
 			request->SetAsync(false);
 			asio::ip::tcp::resolver resolver(io);
 			asio::ip::tcp::resolver::results_type endpoints =
-					resolver.resolve(request->Host(), request->Port());
+				resolver.resolve(request->Host(), request->Port(), code);
+			if (code)
+			{
+				CONSOLE_LOG_ERROR(code.message());
+				return false;
+			}
 
 			asio::ip::tcp::socket socket(io);
-			asio::connect(socket, endpoints);
+			asio::connect(socket, endpoints, code);
+
+			if (code)
+			{
+				CONSOLE_LOG_ERROR(code.message());
+				return false;
+			}
 
 			asio::streambuf requestBuf;
 			std::ostream requestStream(&requestBuf);
-			while (request->Serialize(requestStream) <= 0)
+			int length = 0;
+			do
 			{
-				asio::write(socket, requestBuf);
-			}
+				length = request->Serialize(requestStream);
+				{
+					asio::write(socket, requestBuf, code);
+					if (code)
+					{
+						CONSOLE_LOG_ERROR(code.message());
+						return false;
+					}
+				}
+			} while (length > 0);
+
 			asio::streambuf responseBuf;
-			std::istream responseStream(&requestBuf);
-			asio::read_until(socket, responseBuf, "\r\n");
+			std::istream responseStream(&responseBuf);
+			asio::read_until(socket, responseBuf, "\r\n", code);
+			if (code)
+			{
+				CONSOLE_LOG_ERROR(code.message());
+				return false;
+			}
 		ON_READ_HANDLE:
 			int num = response->OnRead(responseStream);
 			switch (num)
 			{
-				case HTTP_READ_LINE:
-					asio::read_until(socket, responseBuf, "\r\n");
-					goto ON_READ_HANDLE;
-					break;
-				case HTTP_READ_SOME:
-					asio::read(socket, responseBuf, asio::transfer_at_least(1));
-					goto ON_READ_HANDLE;
-					break;
-				case HTTP_READ_ERROR:
+			case HTTP_READ_LINE:
+				asio::read_until(socket, responseBuf, "\r\n", code);
+				if (code)
+				{
+					CONSOLE_LOG_ERROR(code.message());
 					return false;
-				case HTTP_READ_COMPLETE:
-					return true;
-				default:
-					asio::async_read(socket, responseBuf, asio::transfer_exactly(num));
-					goto ON_READ_HANDLE;
-					break;
+				}
+				goto ON_READ_HANDLE;
+				break;
+			case HTTP_READ_SOME:
+				asio::read(socket, responseBuf, asio::transfer_at_least(1), code);
+				if (code)
+				{
+					if (code == asio::error::eof)
+					{
+						response->OnComplete();
+						return true;
+					}
+					CONSOLE_LOG_ERROR(code.message());
+					return false;
+				}
+				goto ON_READ_HANDLE;
+				break;
+			case HTTP_READ_ERROR:
+				return false;
+			case HTTP_READ_COMPLETE:
+				response->OnComplete();
+				return true;
+			default:
+				asio::read(socket, responseBuf, asio::transfer_exactly(num), code);
+				if (code)
+				{
+					if (code == asio::error::eof)
+					{
+						response->OnComplete();
+						return true;
+					}
+					CONSOLE_LOG_ERROR(code.message());
+					return false;
+				}
+				goto ON_READ_HANDLE;
+				break;
 			}
 		}
 		catch(asio::system_error & code)
 		{
+			CONSOLE_LOG_DEBUG(code.what());
 			return false;
 		}
 	}

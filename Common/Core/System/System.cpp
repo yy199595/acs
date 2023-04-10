@@ -9,6 +9,7 @@
 #include<unistd.h>
 #endif // __OS_WIN__
 #include"spdlog/fmt/fmt.h"
+#include"Util/String/StringHelper.h"
 namespace Tendo
 {
     bool System::Init(int argc, char **argv)
@@ -23,7 +24,8 @@ namespace Tendo
             System::IsInit = true;
             System::mExePath = argv[0];
             System::mConfigPath = "./config/config.json";
-            System::mWorkPath = fmt::format("{0}/", getcwd(nullptr, 0));
+            System::mWorkPath = fmt::format("{0}/", getcwd(nullptr, 0));         
+            Helper::Str::ReplaceString(System::mWorkPath, "\\", "/");           
             return true;
         }
 #endif
@@ -31,6 +33,7 @@ namespace Tendo
         System::mExePath = argv[0];
         System::mConfigPath = argv[1];
         System::mWorkPath = fmt::format("{0}/", getcwd(nullptr, 0));
+        Helper::Str::ReplaceString(System::mWorkPath, "\\", "/");
         return true;
     }
 

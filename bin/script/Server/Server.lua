@@ -3,6 +3,12 @@ local Main = {}
 local MongoDB = require("Server.MongoComponent")
 
 function Main.Awake()
+    print(os.workdir)
+
+    local path = string.format("%s1122.html", os.workdir)
+     Http.Download("http://www.example.com", path, false)
+
+     --table.print(response)
 
     --local id = Sqlite.Open("server")
     --local res = Sqlite.Query(id, "select * from registry")
@@ -15,10 +21,11 @@ end
 
 function Main.OnClusterComplete()
     
+     
+
     --MongoDB.ClearTable("user.account_info")
     --Http.Download("http://127.0.0.1:8080/1122.exe", "D:\\trunk\\ssh\\Sentry\\bin\\1122.exe");
-    local res, data = Http.Get("http://www.baidu.com")
-    print("baidu res = ", res, data)
+   
     local id = Mysql.Make()
     local res = Mysql.Exec(id, "insert into server.registry(server_name,rpc_address,http_address)values('test','127.0.0.1:7788','http://127.0.0.1:80')")
     res = Mysql.QueryOnce(id, "select * from server.registry")
