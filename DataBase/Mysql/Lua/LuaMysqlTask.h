@@ -19,14 +19,13 @@ namespace Tendo
 	class LuaMysqlTask : public IRpcTask<Mysql::Response>
 	{
 	public:
-		LuaMysqlTask(lua_State* lua, int id, int method);
+		LuaMysqlTask(lua_State* lua, int id);
 		~LuaMysqlTask();
 	public:
 		int Await();
 		void OnResponse(std::shared_ptr<Mysql::Response> response) final;
 	private:
 		int mRef;
-		int mMethod;
 		lua_State* mLua;
 	};
 }

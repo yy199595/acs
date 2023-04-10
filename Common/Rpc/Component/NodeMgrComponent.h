@@ -33,6 +33,7 @@ namespace Tendo
         bool GetServer(const std::string & name, long long userId, std::string & address);
 		bool GetServer(long long userId, std::unordered_map<std::string, std::string> & servers);
 	 private:
+        
         std::unordered_map<std::string, std::vector<std::string>> mRpcServers;
         std::unordered_map<long long, std::unique_ptr<LocationUnit>> mUnitLocations;
     };

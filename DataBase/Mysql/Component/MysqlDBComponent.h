@@ -36,8 +36,10 @@ namespace Tendo
 		bool Ping(int index = 0);
 		bool GetClientHandle(int& id);
 		const MysqlConfig & Config() const { return this->mConfig; }
+		bool Execute(const std::shared_ptr<Mysql::ICommand>& command);
 		bool Execute(int index, const std::shared_ptr<Mysql::ICommand>& command);
 		bool Send(int index, const std::shared_ptr<Mysql::ICommand> & command, int & rpcId);
+		std::shared_ptr<Mysql::Response> Run(const std::shared_ptr<Mysql::ICommand>& command);
 		std::shared_ptr<Mysql::Response> Run(int index, const std::shared_ptr<Mysql::ICommand>& command);
 	 private:
 		bool Awake() final;
@@ -50,6 +52,7 @@ namespace Tendo
 		MysqlConfig mConfig;
 		std::queue<int> mAllotQueue;
 		std::unique_ptr<SqlHelper> mSqlHelper;
+		std::shared_ptr<MysqlClient> mMainClient;
 		std::unordered_map<int, std::shared_ptr<MysqlClient>> mMysqlClients;
     };
 }

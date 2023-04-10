@@ -57,7 +57,6 @@ namespace Lua
 		}
 		int rpcId = 0;
 		size_t size = 0;
-		lua_pushthread(lua);
 		int id = (int)luaL_checkinteger(lua, 1);
 		const char* sql = luaL_checklstring(lua, 2, &size);
 		std::shared_ptr<Mysql::ICommand> command;
@@ -73,13 +72,19 @@ namespace Lua
 			default:
 				return 0;
 		}
+		if (id == 0)
+		{
+			std::shared_ptr<Mysql::Response> response = component->Run(command);
+			return response->WriteToLua(lua);
+		}
+		lua_pushthread(lua);
 		if (!component->Send(id, command, rpcId))
 		{
 			luaL_error(lua, "send mysql command error");
 			return 0;
 		}
 		std::shared_ptr<LuaMysqlTask> luaMysqlTask
-			= std::make_shared<LuaMysqlTask>(lua, rpcId, method);
+			= std::make_shared<LuaMysqlTask>(lua, rpcId);
 		return component->AddTask(rpcId, luaMysqlTask)->Await();
 	}
 }

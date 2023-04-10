@@ -20,21 +20,15 @@ namespace Tendo
         int Ping(const Rpc::Packet & head);
         int Query(const s2s::server::query& request, s2s::server::list& response);
 		int Register(const std::string & address,const s2s::server::info & request);
-        int UnRegister(const std::string& address, const com::type::string& request);
+        int UnRegister(const std::string& address, const s2s::server::info& request);
     private:
 		void OnClose() final;
 		void OnSecondUpdate(int tick) final;
 	 private:
-        int mIndex;
 		std::string mTable;
+        class RedisComponent* mRedisComponent;
         class NodeMgrComponent * mNodeComponent;
         class InnerNetComponent* mInnerComponent;
-#ifdef __ENABLE_MYSQL__
-		class MysqlDBComponent * mMysqlComponent;
-#else
-		int mDatabaseIndex;
-		class SqliteComponent * mSqliteComponent;
-#endif
         std::unordered_set<std::string> mRegistryServers;
     };
 }

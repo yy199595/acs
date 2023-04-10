@@ -16,15 +16,26 @@ namespace Tendo
     bool RedisComponent::Awake()
     {
 		std::string path;
+		LOG_CHECK_RET_FALSE(ServerConfig::Inst()->GetPath("db", path));
+		LOG_CHECK_RET_FALSE(this->mConfig.LoadConfig(path));
         LOG_CHECK_RET_FALSE(this->mApp->AddComponent<RedisScriptComponent>());
         LOG_CHECK_RET_FALSE(this->mApp->AddComponent<RedisStringComponent>());
-		LOG_CHECK_RET_FALSE(ServerConfig::Inst()->GetPath("db", path));
-		return this->mConfig.LoadConfig(path);
+
+		Asio::Context& io = this->mApp->MainThread();
+		std::shared_ptr<Tcp::SocketProxy> socket = std::make_shared<Tcp::SocketProxy>(io);
+
+		socket->Init(this->Config().Address[0].Ip, this->Config().Address[0].Port);
+		this->mMainClient =	std::make_shared<TcpRedisClient>(socket, this->mConfig.Config(), this);
+		return this->mMainClient->AuthUser();	
     }
 
     bool RedisComponent::LateAwake()
     {
-        return this->MakeRedisClient(this->Config());
+		for (int index = 0; index < this->Config().Count; index++)
+		{
+			this->MakeRedisClient(this->Config());
+		}
+		return true;
     }
 
 	void RedisComponent::OnConnectSuccessful(const std::string& address)
@@ -40,16 +51,6 @@ namespace Tendo
 		}
 		long long id = message->TaskId();
 		this->OnResponse(id, message);
-	}
-
-    bool RedisComponent::Start()
-	{
-		if (!this->Ping(0))
-		{
-			CONSOLE_LOG_ERROR("start  redis client error");
-			return false;
-		}
-		return true;
 	}
 
     TcpRedisClient * RedisComponent::MakeRedisClient(const RedisClientConfig & config)
@@ -127,12 +128,18 @@ namespace Tendo
         return redisResponse;
     }
 
+	std::shared_ptr<RedisResponse> RedisComponent::SyncRun(const std::shared_ptr<RedisRequest>& request)
+	{
+		return this->mMainClient->SyncCommand(request);
+	}
+
 	void RedisComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
 	{
 		luaRegister.BeginNewTable("Redis");
 		luaRegister.PushExtensionFunction("Run", Lua::Redis::Run);
 		luaRegister.PushExtensionFunction("Call", Lua::Redis::Call);
         luaRegister.PushExtensionFunction("Send", Lua::Redis::Send);
+		luaRegister.PushExtensionFunction("SyncRun", Lua::Redis::SyncRun);
     }
 	bool RedisComponent::Send(std::shared_ptr<RedisRequest> request)
 	{
@@ -157,6 +164,7 @@ namespace Tendo
 	}
 	void RedisComponent::OnDestroy()
 	{
+		this->SyncRun("QUIT");
 		for(auto & redisClient : this->mRedisClients)
 		{
 			std::shared_ptr<RedisRequest> request

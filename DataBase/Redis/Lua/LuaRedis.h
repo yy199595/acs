@@ -20,6 +20,7 @@ namespace Lua
 		int Run(lua_State * lua);
 		int Call(lua_State * lua);
         int Send(lua_State * lua);
+		int SyncRun(lua_State* lua);
 	};
 }
 

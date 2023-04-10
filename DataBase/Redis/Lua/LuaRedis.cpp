@@ -140,4 +140,42 @@ namespace Lua
 		}
         return 0;
     }
+
+    int Redis::SyncRun(lua_State* lua)
+    {
+        RedisComponent* redisComponent = App::Inst()->GetComponent<RedisComponent>();
+        if (redisComponent == nullptr)
+        {
+            luaL_error(lua, "RedisComponent Is Null");
+            return 0;
+        }
+        const char* command = luaL_checkstring(lua, 1);
+        std::shared_ptr<RedisRequest> request(new RedisRequest(command));
+        int count = (int)luaL_len(lua, 2);
+        for (int i = 0; i < count; i++)
+        {
+            lua_geti(lua, 2, i + 1);
+            int index = lua_absindex(lua, -1);
+            if (lua_isstring(lua, index))
+            {
+                size_t size = 0;
+                const char* str = lua_tolstring(lua, index, &size);
+                request->AddString(str, size);
+            }
+            else if (lua_isinteger(lua, index))
+            {
+                long long num = lua_tointeger(lua, index);
+                request->AddParameter(num);
+            }
+            else if (lua_istable(lua, index))
+            {
+                std::string json;
+                Lua::RapidJson::Read(lua, index, &json);
+                request->AddParameter(json);
+            }
+            lua_pop(lua, 1);
+        }
+        std::shared_ptr<RedisResponse> response = redisComponent->SyncRun(request);
+        return response != nullptr ? response->WriteToLua(lua) : 0;
+    }
 }

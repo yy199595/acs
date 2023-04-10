@@ -11,39 +11,20 @@
 #include"Rpc/Component/NodeMgrComponent.h"
 
 #include"Proto/Component/ProtoComponent.h"
+#include"Redis/Component/RedisComponent.h"
 
-#ifdef __ENABLE_MYSQL__
-
-#include"Mysql/Client/MysqlMessage.h"
-#include"Mysql/Component/MysqlDBComponent.h"
-
-#else
-#include"Util/String/StringHelper.h"
-#include"Sqlite/Component/SqliteComponent.h"
-#endif
 namespace Tendo
 {
 	Registry::Registry()
 	{
-		this->mIndex = 0;
 		this->mNodeComponent = nullptr;
 		this->mInnerComponent = nullptr;
-#ifdef __ENABLE_MYSQL__
-		this->mMysqlComponent = nullptr;
-#else
-		this->mDatabaseIndex = 0;
-		this->mSqliteComponent = nullptr;
-#endif
-
+		this->mRedisComponent = nullptr;
 	}
 
 	bool Registry::Awake()
 	{
-#ifndef __ENABLE_MYSQL__
-		this->mApp->AddComponent<SqliteComponent>();
-#else
-		this->mApp->AddComponent<MysqlDBComponent>();
-#endif
+		this->mApp->AddComponent<RedisComponent>();
 		return true;
 	}
 
@@ -53,6 +34,7 @@ namespace Tendo
 		BIND_COMMON_RPC_METHOD(Registry::Query);
 		BIND_ADDRESS_RPC_METHOD(Registry::Register);
 		BIND_ADDRESS_RPC_METHOD(Registry::UnRegister);
+		this->mRedisComponent = this->GetComponent<RedisComponent>();
 		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
 		this->mInnerComponent = this->GetComponent<InnerNetComponent>();
 		return true;
@@ -68,76 +50,55 @@ namespace Tendo
 			LOG_ERROR("create protobuf type [server.registry] error");
 			return false;
 		}
-#ifdef __ENABLE_MYSQL__
-		this->mTable = message->GetTypeName();
-		this->mMysqlComponent = this->GetComponent<MysqlDBComponent>();
-		LOG_CHECK_RET_FALSE(this->mMysqlComponent != nullptr);
-		if (!this->mMysqlComponent->GetClientHandle(this->mIndex))
-		{
-			return false;
-		}
-		std::vector<std::string> keys{ "rpc_address", "server_group_id" };
-		std::shared_ptr<Mysql::CreateTabCommand> command =
-				std::make_shared<Mysql::CreateTabCommand>(this->mTable, message, keys);
-		return this->mMysqlComponent->Run(this->mIndex, command)->IsOk();
-#else
-		std::vector<std::string> ret;
-		std::string name = message->GetTypeName();
-		Helper::Str::Split(name, ".", ret);
 
-		this->mTable = std::move(ret[1]);
-		const std::string key("rpc_address");
-		this->mSqliteComponent = this->GetComponent<SqliteComponent>();
-		this->mDatabaseIndex = this->mSqliteComponent->Open(ret[0]);
-		return this->mSqliteComponent->MakeTable(this->mDatabaseIndex, key, *message);
-#endif
+		return true;
 	}
 
 	int Registry::Query(const s2s::server::query& request, s2s::server::list& response)
 	{
-		std::stringstream sqlStream;
-		sqlStream << "select * from " << this->mTable;
+		std::vector<std::string> list;
 		if (!request.server_name().empty())
 		{
 			const std::string& name = request.server_name();
-			sqlStream << " where server_name='" << name << "'";
-		}
-		if (request.group_id() != 0)
-		{
-			int id = request.group_id();
-			sqlStream << " and server_group_id=" << id;
-		}
-		sqlStream << ";";
-		const std::string sql = sqlStream.str();
-#ifdef __ENABLE_MYSQL__
-		std::shared_ptr<Mysql::QueryCommand> command
-				= std::make_shared<Mysql::QueryCommand>(sql);
-
-		std::shared_ptr<Mysql::Response> response1 =
-				this->mMysqlComponent->Run(this->mIndex, command);
-		const std::vector<std::string>& result = response1->Array();
-#else
-		std::vector<std::string> result;
-		this->mSqliteComponent->Query(this->mDatabaseIndex, sql.c_str(), result);
-#endif
-		for (size_t index = 0; index < result.size(); index++)
-		{
-			Json::Reader document;
-			CONSOLE_LOG_INFO(result[index]);
-			//const std::string& json = result.at(index);
-			if (!document.ParseJson(result.at(index)))
+			if (ClusterConfig::Inst()->GetConfig(name) == nullptr)
 			{
-				return XCode::ParseJsonFailure;
+				return XCode::NotFoundRpcConfig;
 			}
-			long long time = 0;
-			long long now = Helper::Time::NowSecTime();
-			document.GetMember("last_ping_time", time);
-			if (now - time <= 30)
+			list.emplace_back(name);
+		}
+		else
+		{		
+			ClusterConfig::Inst()->GetServers(list);		
+		}
+		for (const std::string& server : list)
+		{
+			std::shared_ptr<RedisResponse> result =
+				this->mRedisComponent->Run("HVALS", server);
+			for (size_t index = 0; index < result->GetArraySize(); index++)
 			{
-				s2s::server::info* message = response.add_list();
-				document.GetMember("server_name", *message->mutable_name());
-				document.GetMember("rpc_address", *message->mutable_rpc());
-				document.GetMember("http_address", *message->mutable_http());
+				const RedisAny* redisAny = result->Get(index);
+				if (!redisAny->IsString())
+				{
+					continue;
+				}
+				const RedisString* redisString = redisAny->Cast<RedisString>();
+				const std::string& json = redisString->GetValue();
+				Json::Reader document;
+				CONSOLE_LOG_INFO(json);
+				if (!document.ParseJson(json))
+				{
+					return XCode::ParseJsonFailure;
+				}
+				long long time = 0;
+				//long long now = Helper::Time::NowSecTime();
+				document.GetMember("time", time);
+				//if (now - time <= 30)
+				{
+					s2s::server::info* message = response.add_list();
+					document.GetMember("rpc", *message->mutable_rpc());
+					document.GetMember("http", *message->mutable_http());
+					document.GetMember("name", *message->mutable_name());
+				}
 			}
 		}
 		return XCode::Successful;
@@ -150,27 +111,27 @@ namespace Tendo
 		const std::string& server = request.name();
 		LOG_ERROR_RETURN_CODE(!rpc.empty(), XCode::CallArgsError);
 		LOG_ERROR_RETURN_CODE(!server.empty(), XCode::CallArgsError);
-		std::stringstream st;
-		st << "replace into " << this->mTable << " (server_name,rpc_address,";
-		st << "http_address,last_ping_time,last_time_str) values('" << server << "','" << rpc;
-		st << "','" << http << "'," << Helper::Time::NowSecTime() << ",'" << Helper::Time::GetDateString() << "');";
-		const std::string sql = st.str();
-#ifdef __ENABLE_MYSQL__
-		if (!this->mMysqlComponent->Execute(this->mIndex, std::make_shared<Mysql::SqlCommand>(sql)))
+
+		Json::Writer jsonWriter;
+		jsonWriter.Add("rpc").Add(rpc);
+		jsonWriter.Add("http").Add(http);
+		jsonWriter.Add("name").Add(server);
+		jsonWriter.Add("time").Add(Helper::Time::NowSecTime());
 		{
-			return XCode::SaveToMysqlFailure;
+			std::string value;
+			jsonWriter.WriterStream(&value);
+			std::shared_ptr<RedisResponse> response = 
+				this->mRedisComponent->SyncRun("HSET", server, rpc, value);
+			if (response->GetNumber() != 1 && response->GetNumber() != 0)
+			{
+				return XCode::Failure;
+			}
 		}
-#else
-		if (!this->mSqliteComponent->Exec(this->mDatabaseIndex, sql.c_str()))
-		{
-			return XCode::SaveToMysqlFailure;
-		}
-#endif
+
 		const std::string func("Join");
 		this->mRegistryServers.insert(address);
 		this->mNodeComponent->AddRpcServer(server, rpc);
 		this->mNodeComponent->AddHttpServer(server, http);
-
 		RpcService* rpcService = this->mApp->GetService<Node>();
 		for (const std::string& server: this->mRegistryServers)
 		{
@@ -182,64 +143,29 @@ namespace Tendo
 
 	int Registry::Ping(const Rpc::Packet& packet)
 	{
-		const std::string& address = packet.From();
-		const NodeInfo* nodeInfo = this->mInnerComponent->GetNodeInfo(address);
-		if (nodeInfo != nullptr)
-		{
-			std::stringstream st;
-			long long time = Helper::Time::NowSecTime();
-			const std::string table("server.registry");
-			const std::string& rpc = nodeInfo->RpcAddress;
-			st << "update " << this->mTable << "SET last_ping_time=" << time;
-			st << ",last_time_str='" << Helper::Time::GetDateString() << "' where rpc_address='" << rpc << "'";
-			const std::string sql = st.str();
-#ifdef __ENABLE_MYSQL__
-			if (!this->mMysqlComponent->Execute(this->mIndex, std::make_shared<Mysql::SqlCommand>(sql)))
-			{
-				return XCode::SaveToMysqlFailure;
-			}
-#else
-			if(!this->mSqliteComponent->Exec(this->mDatabaseIndex, sql.c_str()))
-			{
-				return XCode::SaveToMysqlFailure;
-			}
-#endif
-		}
+		
 		return XCode::Successful;
 	}
 
-	int Registry::UnRegister(const std::string& address, const com::type::string& request)
+	int Registry::UnRegister(const std::string& address, const s2s::server::info& request)
 	{
-		const std::string& rpc = request.str();
+		const std::string& rpc = request.rpc();
+		const std::string& server = request.name();
 		LOG_ERROR_RETURN_CODE(!rpc.empty(), XCode::CallArgsError);
-		if (!this->mNodeComponent->DelServer(rpc))
+		LOG_ERROR_RETURN_CODE(!server.empty(), XCode::CallArgsError);
+
+		std::shared_ptr<RedisResponse> response =
+			this->mRedisComponent->SyncRun("HDEL", server, rpc);
+		if (response == nullptr || (response->GetNumber() != 1 && response->GetNumber() != 0))
 		{
 			return XCode::Failure;
 		}
-		RpcService* rpcService = this->mApp->GetService<Node>();
-		const std::string sql = fmt::format("delete from {0} where rpc_address='{1}'", this->mTable, rpc);
-#ifdef __ENABLE_MYSQL__
-		if (!this->mMysqlComponent->Run(this->mIndex, std::make_shared<Mysql::SqlCommand>(sql))->IsOk())
-		{
-			return XCode::SaveToMysqlFailure;
-		}
-#else
-		if(!this->mSqliteComponent->Exec(this->mDatabaseIndex, sql.c_str()))
-		{
-			return XCode::SaveToMysqlFailure;
-		}
-#endif
-		const std::string func("Exit");
 		auto iter = this->mRegistryServers.find(address);
 		if (iter != this->mRegistryServers.end())
 		{
 			this->mRegistryServers.erase(iter);
 		}
-		for (const std::string& target: this->mRegistryServers)
-		{
-			rpcService->Send(target, func, request);
-		}
-		LOG_WARN("remove server : " << request.str());
+		LOG_WARN("remove server : " << rpc);
 		return XCode::Successful;
 	}
 

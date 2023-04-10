@@ -11,16 +11,21 @@
 #include"Server/Config/CodeConfig.h"
 #include"Gate/Component/OuterNetComponent.h"
 #include"Rpc/Component/NodeMgrComponent.h"
+
+#include"Redis/Client/RedisDefine.h"
+#include"Redis/Component/RedisComponent.h"
 namespace Tendo
 {
     Gate::Gate()
     {
+		this->mIndex = 0;
 		this->mUserService = nullptr;
 		this->mNodeComponent = nullptr;
         this->mOuterComponent = nullptr;
     }
 	bool Gate::Awake()
 	{
+		this->mApp->AddComponent<RedisComponent>();
 		this->mApp->AddComponent<OuterNetComponent>();
 		return true;
 	}
@@ -40,19 +45,19 @@ namespace Tendo
 	}
 
 	bool Gate::OnStart()
-	{
+	{	
         const ServerConfig * config = ServerConfig::Inst();
 		this->mUserService = this->mApp->GetService<User>();
 		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
 		this->mOuterComponent = this->GetComponent<OuterNetComponent>();
 		LOG_CHECK_RET_FALSE(config->GetLocation("rpc", this->mInnerAddress));
 		LOG_CHECK_RET_FALSE(config->GetLocation("gate", this->mOuterAddress));
-        return true;
+		return true;
 	}
 
     void Gate::OnClose()
     {
-		this->GetComponent<OuterNetComponent>()->StopListen();
+		
     }
 
 	int Gate::Allocation(long long userId, s2s::allot::response &response)
@@ -64,6 +69,18 @@ namespace Tendo
 		{
 			return XCode::Failure;
 		}
+		/*std::shared_ptr<RedisResponse> result = 
+			this->mRedisComponent->SyncRun("SETNX", token, userId);
+		if (result == nullptr || result->GetNumber() != 1)
+		{
+			return XCode::SaveToRedisFailure;
+		}
+		result = this->mRedisComponent->SyncRun("EXPIRE", token, 30);
+		if (!result->IsOk())
+		{
+			return XCode::SaveToRedisFailure;
+		}*/
+		
 		this->mTokens.emplace(token, userId);
 		{
 			response.set_token(token);
@@ -88,7 +105,7 @@ namespace Tendo
 		}
 		long long userId = iter->second;
 		this->mTokens.erase(iter);
-		int code = this->OnLogin(userId);
+		int code = this->OnLogin(userId, token);
 		if(code != XCode::Successful)
 		{
 			this->mNodeComponent->DelUnit(userId);
@@ -99,7 +116,7 @@ namespace Tendo
 		return XCode::Successful;
 	}
 
-	int Gate::OnLogin(long long userId)
+	int Gate::OnLogin(long long userId, const std::string & token)
 	{
 		static std::string func("Login");
 		std::vector<const NodeConfig *> configs;

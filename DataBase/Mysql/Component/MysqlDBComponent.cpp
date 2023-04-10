@@ -38,7 +38,8 @@ namespace Tendo
 		const ServerConfig * config = ServerConfig::Inst();
 		LOG_CHECK_RET_FALSE(config->GetPath("db", path));
 		LOG_CHECK_RET_FALSE(this->mConfig.LoadConfig(path));
-		return true;
+		this->mMainClient = std::make_shared<MysqlClient>(this, this->mConfig);
+		return this->mMainClient->StartConnect();
 	}
 
 	bool MysqlDBComponent::LateAwake()
@@ -130,6 +131,11 @@ namespace Tendo
 		return response;
 	}
 
+	std::shared_ptr<Mysql::Response> MysqlDBComponent::Run(const std::shared_ptr<Mysql::ICommand>& command)
+	{
+		return this->mMainClient->Run(command);
+	}
+
 	bool MysqlDBComponent::Send(int id,  const std::shared_ptr<Mysql::ICommand> & command, int & rpcId)
 	{
 		auto iter = this->mMysqlClients.find(id);
@@ -146,6 +152,12 @@ namespace Tendo
 	bool MysqlDBComponent::Execute(int index, const std::shared_ptr<Mysql::ICommand>& command)
 	{
 		std::shared_ptr<Mysql::Response> response = this->Run(index, command);
+		return response != nullptr && response->IsOk();
+	}
+
+	bool MysqlDBComponent::Execute(const std::shared_ptr<Mysql::ICommand>& command)
+	{
+		std::shared_ptr<Mysql::Response> response = this->Run(command);
 		return response != nullptr && response->IsOk();
 	}
 }

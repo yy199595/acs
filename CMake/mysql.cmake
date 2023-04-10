@@ -1,13 +1,15 @@
 
 if(MSVC)
-    if(EXISTS ${PROJECT_SOURCE_DIR}/Libs/mysql/lib/mysqlclient.lib)
+    if(EXISTS ${PROJECT_SOURCE_DIR}/Libs/mysql/lib/libmysql.lib
+        AND ${PROJECT_SOURCE_DIR}/Libs/mysql/lib/mysqlclient.lib)
         message("MSVC启用mysql客户端")
         add_definitions(-D __ENABLE_MYSQL__)
         target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/mysql/lib/libmysql.lib)
         target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/mysql/lib/mysqlclient.lib)
     endif()
 else()
-    if(EXISTS ${PROJECT_SOURCE_DIR}/Libs/mysql/lib/libmysqlclient.a)
+    if(EXISTS ${PROJECT_SOURCE_DIR}/Libs/mysql/lib/libyassl.a
+        AND EXISTS ${PROJECT_SOURCE_DIR}/Libs/mysql/lib/libmysqlclient.a)
         message("GCC启用mysql客户端")
         add_definitions(-D __ENABLE_MYSQL__)
         target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/mysql/lib/libyassl.a)

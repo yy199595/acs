@@ -22,7 +22,7 @@ namespace Tendo
 		explicit InnerNetClient(IRpc<Rpc::Packet> * component,
 			std::shared_ptr<Tcp::SocketProxy> socket);
 		explicit InnerNetClient(IRpc<Rpc::Packet> * component,
-			std::shared_ptr<Tcp::SocketProxy> socket, AuthInfo  info);
+			std::shared_ptr<Tcp::SocketProxy> socket, AuthInfo info);
 		~InnerNetClient() override = default;
 	 public:
 		void StartClose();

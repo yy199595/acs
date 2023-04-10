@@ -10,7 +10,7 @@ namespace Tendo
 	class ThreadComponent;
 
     class RedisComponent final : public RpcTaskComponent<int, RedisResponse>,
-								 public ILuaRegister, public IStart, public IRpc<RedisResponse>, public IDestroy
+								 public ILuaRegister, public IRpc<RedisResponse>, public IDestroy
 	{
 	 public:
 		RedisComponent() = default;
@@ -24,8 +24,11 @@ namespace Tendo
         bool Send(const std::string & cmd, Args&& ... args);
         template<typename ... Args>
         std::shared_ptr<RedisResponse> Run(const std::string & cmd, Args&& ... args);
+        template<typename ... Args> //同步命令
+        std::shared_ptr<RedisResponse> SyncRun(const std::string& cmd, Args&& ... args);
     public:
         std::shared_ptr<RedisResponse> Run(const std::shared_ptr<RedisRequest>& request);
+        std::shared_ptr<RedisResponse> SyncRun(const std::shared_ptr<RedisRequest>& request);
     private:
 		TcpRedisClient * GetClient(size_t index = -1);
 		void OnConnectSuccessful(const std::string &address) final;
@@ -33,12 +36,12 @@ namespace Tendo
 		TcpRedisClient * MakeRedisClient(const RedisClientConfig & config);
     private:
         bool Awake() final;
-        bool Start() final;
 		void OnDestroy() final;
         bool LateAwake() final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 	private:
 		RedisConfig mConfig;
+        std::shared_ptr<TcpRedisClient> mMainClient;
         std::vector<std::shared_ptr<TcpRedisClient>> mRedisClients;
     };
 
@@ -48,6 +51,14 @@ namespace Tendo
         std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>(cmd);
         RedisRequest::InitParameter(request, std::forward<Args>(args)...);
         return this->Run(request);
+    }
+
+    template<typename ...Args>
+    inline std::shared_ptr<RedisResponse> RedisComponent::SyncRun(const std::string& cmd, Args && ...args)
+    {
+        std::shared_ptr<RedisRequest> request = std::make_shared<RedisRequest>(cmd);
+        RedisRequest::InitParameter(request, std::forward<Args>(args)...);
+        return this->mMainClient->SyncCommand(request);
     }
 
     template<typename ... Args>

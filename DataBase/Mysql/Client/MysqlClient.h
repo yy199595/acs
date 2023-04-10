@@ -26,6 +26,7 @@ namespace Tendo
         void Stop();
 		void Start();
 		bool StartConnect();
+        std::shared_ptr<Mysql::Response> Run(const std::shared_ptr<Mysql::ICommand>& command);
     private:
         void Update();
     private:

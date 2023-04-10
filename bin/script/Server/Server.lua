@@ -1,12 +1,16 @@
 
 local Main = {}
 local MongoDB = require("Server.MongoComponent")
-
+local redis = require("Server.RedisComponent")
 function Main.Awake()
-    print(os.workdir)
 
-    local path = string.format("%s1122.html", os.workdir)
-     Http.Download("http://www.example.com", path, false)
+    local t1 = Time.NowMilTime()
+    redis.SyncRun("SET", "123", 12345)
+    redis.SyncRun("SET", "234", 12345)
+    redis.SyncRun("SET", "345", 12345)
+    local res = redis.SyncRun("KEYS *")
+    table.print(res)
+    print("use time = ", Time.NowMilTime() - t1)
 
      --table.print(response)
 

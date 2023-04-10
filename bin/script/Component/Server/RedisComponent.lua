@@ -13,6 +13,11 @@ function RedisComponent.Send(cmd, ...)
     return redis.Send(cmd, table.pack(...))
 end
 
+function RedisComponent.SyncRun(cmd, ...)
+    assert(type(cmd) == "string")
+    return redis.SyncRun(cmd, table.pack(...))
+end
+
 function RedisComponent.AddCounter(key)
     assert(type(key) == "string")
     local response = this.Run("INCR", key)

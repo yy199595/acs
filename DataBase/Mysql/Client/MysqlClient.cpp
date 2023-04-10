@@ -109,6 +109,23 @@ namespace Tendo
 		io.post(std::bind(&IRpc<Mysql::Response>::OnConnectSuccessful, this->mComponent, address));
 		return true;
 	}
+	std::shared_ptr<Mysql::Response> MysqlClient::Run(const std::shared_ptr<Mysql::ICommand>& command)
+	{
+		if (this->mThread != nullptr)
+		{
+			return nullptr;
+		}
+		std::shared_ptr<Mysql::Response> response =
+			std::make_shared<Mysql::Response>(0);
+		if (!command->Invoke(this->mMysqlClient, response))
+		{
+			std::string sql;
+			command->GetSql(sql);
+			CONSOLE_LOG_ERROR("sql : " << sql);
+			CONSOLE_LOG_ERROR("err : " << response->GetError());
+		}
+		return response;
+	}
 	MysqlClient::~MysqlClient()
 	{
 		if(this->mThread != nullptr)

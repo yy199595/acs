@@ -25,15 +25,16 @@ namespace Tendo
 		long long Call(const std::shared_ptr<RedisRequest>& command);
 		const RedisClientConfig & GetConfig() { return mConfig;}
 		const std::string & GetName() const { return this->mConfig.Name; }
+    public:
+        bool AuthUser();
+        std::shared_ptr<RedisResponse> SyncCommand(const std::shared_ptr<RedisRequest>& command);
     private:
-		bool AuthUser();
 		void OnReadComplete();
         void StartPingServer();
         void CloseFreeClient();
         bool InitRedisClient(const std::string& pwd);
         void OnReceiveLine(const asio::error_code &code, std::istream & is, size_t) final;
         void OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t) final;
-        std::shared_ptr<RedisResponse> SyncCommand(const std::shared_ptr<RedisRequest>& command);
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
     private:
         size_t mIndex;

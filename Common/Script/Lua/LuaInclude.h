@@ -257,3 +257,9 @@ namespace Lua
 		std::shared_ptr<T> mNativePtr;
 	};
 }
+
+class ILuaWrite
+{
+public:
+	virtual int WriteToLua(lua_State* lua) = 0;
+};

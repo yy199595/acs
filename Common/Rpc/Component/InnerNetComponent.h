@@ -40,7 +40,7 @@ namespace Tendo
 		size_t GetConnectClients(std::vector<std::string> & list) const; //获取所有连接进来的客户端
 		size_t Broadcast(const std::shared_ptr<Rpc::Packet>& message) const; //广播给所有链接进来的客户端
 	private:
-        bool IsAuth(const std::string & address);          
+        bool IsAuth(const std::string & address);
         bool OnAuth(const std::shared_ptr<Rpc::Packet>& message);
 	 private:
 		int mMaxHandlerCount;

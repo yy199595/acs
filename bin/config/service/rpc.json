@@ -32,9 +32,9 @@
             "Request": "s2s.server.info"
         },
         "UnRegister": {
-            "Async": true,
-            "Request": "com.type.string"
-        }
+          "Async": true,
+          "Request": "s2s.server.info"
+      }
     },
     "MysqlDB": {
         "Add": {

@@ -144,6 +144,18 @@ namespace Tendo
         return iter != this->mNodeConfigs.end() ? iter->second.get() : nullptr;
     }
 
+    void ClusterConfig::GetServers(std::vector<std::string>& list) const
+    {
+        auto iter = this->mNodeConfigs.begin();
+        for (; iter != this->mNodeConfigs.end(); iter++)
+        {
+            if (iter->second->ServiceCount() > 0)
+            {
+                list.emplace_back(iter->second->GetName());
+            }
+        }
+    }
+
     size_t ClusterConfig::GetNodeConfigs(std::vector<const NodeConfig *> &nodes) const
     {
         auto iter = this->mNodeConfigs.begin();

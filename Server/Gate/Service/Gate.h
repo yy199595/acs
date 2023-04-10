@@ -22,11 +22,14 @@ namespace Tendo
 		bool OnInit() final;
 		bool OnStart() final;
         void OnClose() final;
-		int OnLogin(long long userId);
+		int OnLogin(long long userId, const std::string & token);
 	 private:
+		int mIndex;
+		std::string mTable;
 		std::string mInnerAddress;
 		std::string mOuterAddress;
 		class RpcService * mUserService;
+		class RedisComponent* mRedisComponent;
 		class NodeMgrComponent * mNodeComponent;
 		class OuterNetComponent* mOuterComponent;
 		std::unordered_map<std::string, long long> mTokens;

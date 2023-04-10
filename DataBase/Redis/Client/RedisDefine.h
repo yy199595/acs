@@ -4,6 +4,7 @@
 #include<vector>
 #include"RedisAny.h"
 #include"XCode/XCode.h"
+#include"Script/Lua/LuaInclude.h"
 #include"Util/Json/JsonWriter.h"
 #include"google/protobuf/message.h"
 #include"Rpc/Async/RpcTaskSource.h"
@@ -104,6 +105,7 @@ namespace Tendo
     public:
         bool IsOk();
 		void Clear();
+        int WriteToLua(lua_State* lua);
     private:
         int OnDecodeArray(std::istream & os);
         int OnReceiveFirstLine(std::istream & os);

@@ -14,11 +14,12 @@
 #include<sstream>
 #include<vector>
 #include"Util/Json/JsonWriter.h"
+#include"Script/Lua/LuaInclude.h"
 #include"google/protobuf/message.h"
 using namespace google::protobuf;
 namespace Mysql
 {
-	class Response
+	class Response : public ILuaWrite
 	{
     public:
         explicit Response(int taskId)
@@ -27,6 +28,7 @@ namespace Mysql
 		void SetError(const char * str);
 		bool IsOk() const { return this->mIsOk;}
 		int TaskId() const { return this->mTaskId; }
+        int WriteToLua(lua_State* lua) final;
         const std::string & GetError() const { return this->mError;}
 	public:
 		void Add(const std::string & json);

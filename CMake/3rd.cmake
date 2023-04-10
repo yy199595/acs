@@ -1,6 +1,7 @@
 
 # openssl
-if (EXISTS ${PROJECT_SOURCE_DIR}/Libs/openssl/libssl.a)
+if (EXISTS ${PROJECT_SOURCE_DIR}/Libs/openssl/libssl.a
+    AND EXISTS ${PROJECT_SOURCE_DIR}/Libs/openssl/libcrypto.a)
     message("启用ssl")
     #add_definitions(-D __ENABLE_OPEN_SSL__)
     target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/openssl/libssl.a)

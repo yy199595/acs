@@ -50,6 +50,7 @@ namespace Tendo
     public:
         const NodeConfig * GetConfig() const;
         const NodeConfig * GetConfig(const std::string & name) const;
+        void GetServers(std::vector<std::string>& list) const;
         size_t GetNodeConfigs(std::vector<const NodeConfig *> & nodes) const;
         bool GetServerName(const std::string& service, std::string& node) const;
     private:

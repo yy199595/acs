@@ -18,3 +18,12 @@ message log
     string content = 4; //日志内容
     int64 log_time = 5;    //时间
 }
+
+message user_address
+{
+    int64 user_id = 1;
+    string token = 2;
+    string server_name = 3;
+    string rpc_address = 4;
+    int64 last_ping_time = 5; //上次ping时间
+}

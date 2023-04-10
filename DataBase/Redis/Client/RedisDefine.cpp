@@ -245,6 +245,50 @@ namespace Tendo
 		this->mType = RedisRespType::REDIS_NONE;
 	}
 
+	int RedisResponse::WriteToLua(lua_State* lua)
+	{
+
+		switch (this->GetType())
+		{
+		case RedisRespType::REDIS_NUMBER:
+			lua_pushinteger(lua, this->GetNumber());
+			return 1;
+		case RedisRespType::REDIS_ERROR:
+		case RedisRespType::REDIS_STRING:
+		case RedisRespType::REDIS_BIN_STRING:
+		{
+			const std::string& str = this->GetString();
+			lua_pushlstring(lua, str.c_str(), str.size());
+			return 1;
+		}
+		break;
+		case RedisRespType::REDIS_ARRAY:
+		{
+			lua_createtable(lua, 0, this->mArray.size());
+			for (size_t index = 0; index < this->mArray.size(); index++)
+			{
+				const RedisAny* redisAny = this->mArray[index];
+				if (redisAny->IsString())
+				{
+					const std::string& str = ((const RedisString*)redisAny)->GetValue();
+					lua_pushlstring(lua, str.c_str(), str.size());
+				}
+				else if (redisAny->IsNumber())
+				{
+					long long num = ((const RedisNumber*)redisAny)->GetValue();
+					lua_pushinteger(lua, num);
+				}
+				lua_seti(lua, -2, index + 1);
+			}
+			return 1;
+		}
+		case RedisRespType::REDIS_NONE:
+			lua_pushnil(lua);
+			return 1;
+		}
+		return 0;
+	}
+
 	const RedisAny* RedisResponse::Get(size_t index)
 	{
 		if(index < this->mArray.size())
@@ -296,52 +340,13 @@ namespace Tendo
 
     void LuaRedisTask::OnResponse(std::shared_ptr<RedisResponse> response)
 	{
+		int count = 0;
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
 		lua_State* coroutine = lua_tothread(this->mLua, -1);
 		if (response != nullptr)
 		{
-			switch (response->GetType())
-			{
-				case RedisRespType::REDIS_NUMBER:
-					lua_pushinteger(this->mLua, response->GetNumber());
-					break;
-				case RedisRespType::REDIS_ERROR:
-				case RedisRespType::REDIS_STRING:
-				case RedisRespType::REDIS_BIN_STRING:
-				{
-					const std::string& str = response->GetString();
-					lua_pushlstring(this->mLua, str.c_str(), str.size());
-				}
-					break;
-				case RedisRespType::REDIS_ARRAY:
-				{
-					lua_createtable(this->mLua, 0, response->GetArraySize());
-					for (size_t index = 0; index < response->GetArraySize(); index++)
-					{
-						const RedisAny* redisAny = response->Get(index);
-						if (redisAny->IsString())
-						{
-							const std::string& str = ((const RedisString*)redisAny)->GetValue();
-							lua_pushlstring(this->mLua, str.c_str(), str.size());
-						}
-						else if (redisAny->IsNumber())
-						{
-							long long num = ((const RedisNumber*)redisAny)->GetValue();
-							lua_pushinteger(this->mLua, num);
-						}
-						lua_seti(this->mLua, -2, index + 1);
-					}
-				}
-					break;
-				case RedisRespType::REDIS_NONE:
-					lua_pushnil(this->mLua);
-					break;
-			}
-		}
-		else
-		{
-			lua_pushnil(this->mLua);
-		}
-		Lua::Coroutine::Resume(coroutine, this->mLua, 1);
+			count = response->WriteToLua(this->mLua);			
+		}		
+		Lua::Coroutine::Resume(coroutine, this->mLua, count);
 	}
 }
