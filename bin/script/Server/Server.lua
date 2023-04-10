@@ -30,10 +30,10 @@ function Main.OnClusterComplete()
     --MongoDB.ClearTable("user.account_info")
     --Http.Download("http://127.0.0.1:8080/1122.exe", "D:\\trunk\\ssh\\Sentry\\bin\\1122.exe");
    
-    local id = Mysql.Make()
-    local res = Mysql.Exec(id, "insert into server.registry(server_name,rpc_address,http_address)values('test','127.0.0.1:7788','http://127.0.0.1:80')")
-    res = Mysql.QueryOnce(id, "select * from server.registry")
-    table.print(res)
+    --local id = Mysql.Make()
+    --local res = Mysql.Exec(id, "insert into server.registry(server_name,rpc_address,http_address)values('test','127.0.0.1:7788','http://127.0.0.1:80')")
+    --res = Mysql.QueryOnce(id, "select * from server.registry")
+    --table.print(res)
     local code = MongoDB.InsertOnce("user.account_info", {
         _id = "646585122@qq.com",
         user_id = 11223344,

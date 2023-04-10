@@ -3,7 +3,7 @@
 #include"Util/File/DirectoryHelper.h"
 #include"Util/Json/JsonWriter.h"
 #include"Util/String/StringHelper.h"
-#include"Common/SqlHelper.h"
+#include"Util/Sql/SqlHelper.h"
 #include"Sqlite/Lua/LuaSqlite.h"
 #include"Script/Lua/ClassProxyHelper.h"
 namespace Tendo

@@ -7,7 +7,6 @@
 #include"Rpc.h"
 #include<string>
 #include<vector>
-#include"XCode/XCode.h"
 #include<unordered_map>
 #include"Util/Proto/ProtoHelper.h"
 #include"Proto//Message/ProtoMessage.h"

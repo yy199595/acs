@@ -1,5 +1,6 @@
 ﻿
 #include"InnerNetComponent.h"
+#include"XCode/XCode.h"
 #include"Entity/App/App.h"
 #include"Util/String/StringHelper.h"
 #include"Network/Tcp/SocketProxy.h"

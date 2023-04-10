@@ -2,7 +2,7 @@
 // Created by 64658 on 2021/8/5.
 //
 #include"HttpComponent.h"
-
+#include"XCode/XCode.h"
 #include"Server/Config/MethodConfig.h"
 #include"Log/Component/LogComponent.h"
 #include"Server/Component/ThreadComponent.h"

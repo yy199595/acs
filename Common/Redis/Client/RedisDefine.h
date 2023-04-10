@@ -3,7 +3,6 @@
 #include<string>
 #include<vector>
 #include"RedisAny.h"
-#include"XCode/XCode.h"
 #include"Script/Lua/LuaInclude.h"
 #include"Util/Json/JsonWriter.h"
 #include"google/protobuf/message.h"
@@ -97,7 +96,7 @@ namespace Tendo
 		RedisRequest::Encode(self, std::forward<Args>(args)...);
     }
 
-    class RedisResponse
+	class RedisResponse : public ILuaWrite
     {
 	public:
 		RedisResponse();
@@ -105,7 +104,7 @@ namespace Tendo
     public:
         bool IsOk();
 		void Clear();
-        int WriteToLua(lua_State* lua);
+        int WriteToLua(lua_State* lua) final;
     private:
         int OnDecodeArray(std::istream & os);
         int OnReceiveFirstLine(std::istream & os);

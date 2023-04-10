@@ -75,13 +75,16 @@ namespace Tendo
 	{
 		std::shared_ptr<RedisRequest> request =
 			std::static_pointer_cast<RedisRequest>(this->PopMessage());
-		this->mCurResponse->SetTaskId(request->GetTaskId());
+		if(request->GetTaskId() > 0)
+		{
+			this->mCurResponse->SetTaskId(request->GetTaskId());
 #ifdef ONLY_MAIN_THREAD
-		this->mComponent->OnMessage(this->mCurResponse);
+			this->mComponent->OnMessage(this->mCurResponse);
 #else
-		asio::io_service & io = App::Inst()->MainThread();
-		io.post(std::bind(&IRpc<RedisResponse>::OnMessage, this->mComponent, this->mCurResponse));
+			asio::io_service& io = App::Inst()->MainThread();
+			io.post(std::bind(&IRpc<RedisResponse>::OnMessage, this->mComponent, this->mCurResponse));
 #endif
+		}
 		this->mCurResponse = std::make_shared<RedisResponse>();
 		this->SendFromMessageQueue();
 	}

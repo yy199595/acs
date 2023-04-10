@@ -3,7 +3,6 @@
 #include<vector>
 #include<shared_mutex>
 #include<unordered_map>
-#include"XCode/XCode.h"
 #include"MethodConfig.h"
 #include"Server/Config/TextConfig.h"
 #include"Core/Singleton/Singleton.h"

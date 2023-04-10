@@ -3,6 +3,7 @@
 //
 
 #include"Client.h"
+#include"XCode/XCode.h"
 #include"Entity/App/App.h"
 #include"Server/Config/ServiceConfig.h"
 #include"Util/String/StringHelper.h"

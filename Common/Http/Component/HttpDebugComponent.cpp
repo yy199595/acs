@@ -1,4 +1,5 @@
 #include"HttpDebugComponent.h"
+#include"XCode/XCode.h"
 #include"Http/Common/HttpRequest.h"
 #include"Http/Common/HttpResponse.h"
 #include"Util/String/StringHelper.h"

@@ -1,8 +1,8 @@
 ﻿
 #ifdef __ENABLE_MYSQL__
 
-#include"XCode/XCode.h"
 #include"Message/db.pb.h"
+#include"XCode/XCode.h"
 #include"Core/Component/Component.h"
 #include"google/protobuf/util/json_util.h"
 using namespace google::protobuf;

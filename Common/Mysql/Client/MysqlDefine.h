@@ -10,7 +10,6 @@
 #include"mysql.h"
 #include<memory>
 #include<unordered_map>
-#include"XCode/XCode.h"
 
 using namespace std;
 namespace Tendo

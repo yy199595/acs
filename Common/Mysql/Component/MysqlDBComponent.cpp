@@ -6,7 +6,7 @@
 
 #include"MysqlDBComponent.h"
 #include"Entity/App/App.h"
-#include"Common/SqlHelper.h"
+#include"Util/Sql/SqlHelper.h"
 #include"Mysql/Client/MysqlClient.h"
 #include"Mysql/Lua/LuaMysql.h"
 #include"Script/Lua/ClassProxyHelper.h"

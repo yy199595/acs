@@ -5,7 +5,6 @@
 #pragma once
 #include<memory>
 #include<unordered_map>
-#include"XCode/XCode.h"
 #include"Server/Config/TextConfig.h"
 #include"Core/Singleton/Singleton.h"
 namespace Tendo

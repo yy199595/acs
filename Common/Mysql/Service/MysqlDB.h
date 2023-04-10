@@ -1,6 +1,6 @@
 #pragma once
 #ifdef __ENABLE_MYSQL__
-#include"Common//SqlHelper.h"
+#include"Util/Sql/SqlHelper.h"
 #include"Mysql/Client/MysqlClient.h"
 #include"Rpc/Service/PhysicalRpcService.h"
 
