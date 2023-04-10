@@ -27,8 +27,8 @@ namespace Lua
 
 		std::shared_ptr<Rpc::Packet> request(new Rpc::Packet());
         {
-            request->SetType(Tcp::Type::Request);
-            request->SetProto(Tcp::Porto::Protobuf);
+            request->SetType(Msg::Type::Request);
+            request->SetProto(Msg::Porto::Protobuf);
         }
 		std::string address;
 		const RpcMethodConfig * methodConfig = nullptr;
@@ -152,8 +152,8 @@ namespace Lua
     {
         std::shared_ptr<Rpc::Packet> request(new Rpc::Packet());
         {
-            request->SetType(Tcp::Type::Request);
-            request->SetProto(Tcp::Porto::Protobuf);
+            request->SetType(Msg::Type::Request);
+            request->SetProto(Msg::Porto::Protobuf);
         }
         std::string address;
         const RpcMethodConfig* methodConfig = nullptr;

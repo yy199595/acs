@@ -56,8 +56,8 @@ namespace Tendo
 				}
 				head.Add("http", address);
 				head.Add("func", fullName);
-				message->SetProto(Tcp::Porto::Json);
-				message->SetType(Tcp::Type::Request);
+				message->SetProto(Msg::Porto::Json);
+				message->SetType(Msg::Type::Request);
 				std::shared_ptr<Http::PostRequest> postRequest =
 					std::dynamic_pointer_cast<Http::PostRequest>(request);
 				if (postRequest != nullptr)

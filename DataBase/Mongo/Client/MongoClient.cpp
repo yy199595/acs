@@ -30,15 +30,15 @@ namespace Mongo
         //TODO
     }
 
-    TcpMongoClient::TcpMongoClient(std::shared_ptr<SocketProxy> socket,
-			IRpc<CommandResponse>* component, const MongoConfig & config)
+    TcpMongoClient::TcpMongoClient(std::shared_ptr<Tcp::SocketProxy> socket,
+			Tendo::IRpc<CommandResponse>* component, const MongoConfig & config)
 		: Tcp::TcpContext(std::move(socket), 1024 * 1024), mComponent(component), mConfig(config)
 	{
         this->mIndex = 0;
         this->mAddress = config.Address[0].FullAddress;
 	}
 
-	void TcpMongoClient::OnSendMessage(const Asio::Code & code, std::shared_ptr<ProtoMessage> message)
+	void TcpMongoClient::OnSendMessage(const Asio::Code & code, std::shared_ptr<Tcp::ProtoMessage> message)
 	{
 		if (code)
 		{
@@ -163,8 +163,8 @@ namespace Mongo
 #ifdef ONLY_MAIN_THREAD
 			this->mComponent->OnConnectSuccessful(address);
 #else
-			asio::io_service& io = App::Inst()->MainThread();
-			io.post(std::bind(&IRpc<CommandResponse>::OnConnectSuccessful, this->mComponent, address));
+			asio::io_service& io = Tendo::App::Inst()->MainThread();
+			io.post(std::bind(&Tendo::IRpc<CommandResponse>::OnConnectSuccessful, this->mComponent, address));
 #endif
 			return true;
 		}
@@ -202,8 +202,8 @@ namespace Mongo
 #ifdef ONLY_MAIN_THREAD
 			this->mComponent->OnMessage(response);
 #else
-			asio::io_service& io = App::Inst()->MainThread();
-			io.post(std::bind(&IRpc<CommandResponse>::OnMessage, this->mComponent, response));
+			asio::io_service& io = Tendo::App::Inst()->MainThread();
+			io.post(std::bind(&Tendo::IRpc<CommandResponse>::OnMessage, this->mComponent, response));
 #endif
 			this->PopMessage();
 			this->mMongoResponse = nullptr;

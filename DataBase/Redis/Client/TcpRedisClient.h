@@ -11,14 +11,14 @@
 #include"Redis/Config/RedisConfig.h"
 #include"Async/Coroutine/CoroutineLock.h"
 #include"Core/Component/IComponent.h"
-using namespace Tcp;
+
 namespace Tendo
 {
     class RedisComponent;
     class TcpRedisClient final : public Tcp::TcpContext
     {
     public:
-        TcpRedisClient(std::shared_ptr<SocketProxy> socket,
+        TcpRedisClient(std::shared_ptr<Tcp::SocketProxy> socket,
 				const RedisClientConfig & config, IRpc<RedisResponse> * component);
     public:
         void Send(const std::shared_ptr<RedisRequest>& command);
@@ -34,7 +34,7 @@ namespace Tendo
         void OnReceiveLine(const asio::error_code &code, std::istream & is, size_t) final;
         void OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t) final;
         std::shared_ptr<RedisResponse> SyncCommand(const std::shared_ptr<RedisRequest>& command);
-        void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
+        void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
     private:
         size_t mIndex;
 		std::string mAddress;

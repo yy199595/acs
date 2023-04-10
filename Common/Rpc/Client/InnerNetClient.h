@@ -20,16 +20,15 @@ namespace Tendo
 	{
 	 public:
 		explicit InnerNetClient(IRpc<Rpc::Packet> * component,
-			std::shared_ptr<SocketProxy> socket);
+			std::shared_ptr<Tcp::SocketProxy> socket);
 		explicit InnerNetClient(IRpc<Rpc::Packet> * component,
-			std::shared_ptr<SocketProxy> socket, AuthInfo  info);
+			std::shared_ptr<Tcp::SocketProxy> socket, AuthInfo  info);
 		~InnerNetClient() override = default;
 	 public:
 		void StartClose();
 		void StartReceive();
 		bool IsClient() const { return this->mIsClient; }
         void Send(std::shared_ptr<Rpc::Packet> message);
-		long long Call(std::shared_ptr<Rpc::Packet> message);
 	 private:
         void Update();
         void CloseSocket(int code);

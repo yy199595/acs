@@ -8,7 +8,7 @@
 #include"Entity/App/App.h"
 namespace Tendo
 {
-	TcpRedisClient::TcpRedisClient(std::shared_ptr<SocketProxy> socket,
+	TcpRedisClient::TcpRedisClient(std::shared_ptr<Tcp::SocketProxy> socket,
 		const RedisClientConfig& config, IRpc<RedisResponse>* component)
 		: Tcp::TcpContext(std::move(socket), 1024 * 1024), mConfig(config), mComponent(component)
 	{
@@ -86,7 +86,8 @@ namespace Tendo
 		this->SendFromMessageQueue();
 	}
 
-    void TcpRedisClient::OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message)
+    void TcpRedisClient::OnSendMessage(const asio::error_code &code,
+			std::shared_ptr<Tcp::ProtoMessage> message)
 	{
 		if (code)
 		{

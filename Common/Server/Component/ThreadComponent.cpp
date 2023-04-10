@@ -131,9 +131,9 @@ namespace Tendo
 //		connectionThread.detach();
 	}
 
-    std::shared_ptr<SocketProxy> ThreadComponent::CreateSocket()
+    std::shared_ptr<Tcp::SocketProxy> ThreadComponent::CreateSocket()
     {
-        std::shared_ptr<SocketProxy> socket;
+        std::shared_ptr<Tcp::SocketProxy> socket;
 #ifdef ONLY_MAIN_THREAD
         asio::io_service & io = this->mApp->MainThread();
         socket = std::make_shared<SocketProxy>(io);
@@ -141,11 +141,11 @@ namespace Tendo
 		if(this->mNetThreads.empty())
 		{
 			asio::io_service & io = this->mApp->MainThread();
-			return std::make_shared<SocketProxy>(io);
+			return std::make_shared<Tcp::SocketProxy>(io);
 		}
         AsioThread* t = this->mNetThreads.front();
         {
-            socket = std::make_shared<SocketProxy>(t->Context());
+            socket = std::make_shared<Tcp::SocketProxy>(t->Context());
         }
         this->mNetThreads.pop_front();
         this->mNetThreads.push_back(t);
@@ -153,15 +153,15 @@ namespace Tendo
         return socket;
     }
 
-    std::shared_ptr<SocketProxy> ThreadComponent::CreateSocket(const std::string &ip, unsigned short port)
+    std::shared_ptr<Tcp::SocketProxy> ThreadComponent::CreateSocket(const std::string &ip, unsigned short port)
     {
-        std::shared_ptr<SocketProxy> socket = this->CreateSocket();
+        std::shared_ptr<Tcp::SocketProxy> socket = this->CreateSocket();
         {
             socket->Init(ip, port);
         }
         return socket;
     }
-	std::shared_ptr<SocketProxy> ThreadComponent::CreateSocket(const std::string& address)
+	std::shared_ptr<Tcp::SocketProxy> ThreadComponent::CreateSocket(const std::string& address)
 	{
 		size_t pos = address.find(':');
 		if(pos == std::string::npos)

@@ -5,7 +5,7 @@
 #include"Component/ClientComponent.h"
 namespace Client
 {
-	TcpRpcClientContext::TcpRpcClientContext(std::shared_ptr<SocketProxy> socket, ClientComponent * component)
+	TcpRpcClientContext::TcpRpcClientContext(std::shared_ptr<Tcp::SocketProxy> socket, ClientComponent * component)
         : Tcp::TcpContext(std::move(socket))
 	{
 		this->mClientComponent = component;

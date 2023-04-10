@@ -12,7 +12,7 @@
 
 namespace Tendo
 {
-	OuterNetClient::OuterNetClient(std::shared_ptr<SocketProxy> socket,
+	OuterNetClient::OuterNetClient(std::shared_ptr<Tcp::SocketProxy> socket,
                                    OuterNetComponent* component)
 		: TcpContext(socket), mGateComponent(component)
 	{

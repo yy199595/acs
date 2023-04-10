@@ -25,7 +25,7 @@ namespace Tendo
 		void OnDestroy() final;
 		void OnFrameUpdate(float t) final;
         void OnRecord(Json::Writer & document) final;
-		void OnListen(std::shared_ptr<SocketProxy> socket) final;
+		void OnListen(std::shared_ptr<Tcp::SocketProxy> socket) final;
 	 public:
         InnerNetClient * GetSession(const std::string& address);
         InnerNetClient * GetOrCreateSession(const std::string& address);

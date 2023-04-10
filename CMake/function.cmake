@@ -15,6 +15,10 @@ macro(source_group_by_dir dir source_files)
     endif(MSVC)
 endmacro(source_group_by_dir)
 
-function(git_clone url path)
-    execute_process(COMMAND git clone ${url} ${path})
+function(git_clone url path version) #克隆指定版本
+    if(version)
+        execute_process(COMMAND git clone -b version --depth=1 ${url} ${path})
+    else()
+        execute_process(COMMAND git clone ${url} ${path})
+    endif()
 endfunction()

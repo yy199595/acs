@@ -1,5 +1,5 @@
 #pragma once
-#include"asio/ip/tcp.hpp"
+#include"Network/Tcp/SocketProxy.h"
 #include"Core/Component/Component.h"
 namespace Tendo
 {
@@ -15,7 +15,7 @@ namespace Tendo
     protected:
         void ListenConnect();
         virtual void OnStopListen() { };
-        virtual void OnListen(std::shared_ptr<SocketProxy> socket) = 0;
+        virtual void OnListen(std::shared_ptr<Tcp::SocketProxy> socket) = 0;
     private:
         size_t mListenCount;
         unsigned short mListenPort;

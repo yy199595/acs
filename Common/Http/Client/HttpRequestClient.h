@@ -14,7 +14,7 @@ namespace Tendo
 	class HttpRequestClient : public Tcp::TcpContext
 	{
 	 public:
-		HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy, HttpComponent * component);
+		HttpRequestClient(std::shared_ptr<Tcp::SocketProxy> socketProxy, HttpComponent * component);
 	 public:
 		void Do(std::shared_ptr<Http::Request> request, std::shared_ptr<Http::IResponse> response, int taskId);
 	 private:

@@ -7,7 +7,7 @@
 #include<stdexcept>
 #include<unordered_map>
 #include"Log/Common/CommonLogDef.h"
-namespace Tcp
+namespace Msg
 {
     namespace Type
     {

@@ -11,7 +11,7 @@
 
 namespace Tendo
 {
-	HttpHandlerClient::HttpHandlerClient(HttpListenComponent * httpComponent, std::shared_ptr<SocketProxy> socketProxy)
+	HttpHandlerClient::HttpHandlerClient(HttpListenComponent * httpComponent, std::shared_ptr<Tcp::SocketProxy> socketProxy)
 		: Tcp::TcpContext(std::move(socketProxy))
 	{
         this->mTimeout = 15;

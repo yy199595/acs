@@ -47,10 +47,10 @@ namespace Tendo
         try
         {
             Asio::Context& io = this->mApp->MainThread();
-            this->mBindAcceptor = std::make_unique<Asio::Acceptor>(io);
             Asio::EndPoint ep(asio::ip::address_v4(), port);
+			this->mBindAcceptor = std::make_unique<Asio::Acceptor>(io);
 
-            this->mListenPort = port;
+			this->mListenPort = port;
             this->mBindAcceptor->open(ep.protocol());
             this->mBindAcceptor->bind(ep);
             this->mBindAcceptor->listen();
@@ -66,7 +66,7 @@ namespace Tendo
     }
 	void TcpListenerComponent::ListenConnect()
 	{
-        std::shared_ptr<SocketProxy> socketProxy 
+        std::shared_ptr<Tcp::SocketProxy> socketProxy
             = this->mThreadComponent->CreateSocket();
 		this->mBindAcceptor->async_accept(socketProxy->GetSocket(),
 			[this, socketProxy](const asio::error_code & code)

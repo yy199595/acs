@@ -266,7 +266,7 @@ namespace Rpc
     void Packet::SetContent(const std::string & content)
     {
         this->mBody = content;
-        this->mProto = (int)Tcp::Porto::String;
+        this->mProto = Msg::Porto::String;
     }
 
     std::shared_ptr<Packet> Packet::Clone() const
@@ -286,14 +286,14 @@ namespace Rpc
     {
         switch (this->mProto)
         {
-        case (int)Tcp::Porto::Protobuf:
+        case Msg::Porto::Protobuf:
             if (message->ParseFromString(this->mBody))
             {
                 this->mBody.clear();
                 return true;
             }
             return false;
-        case (int)Tcp::Porto::Json:
+        case Msg::Porto::Json:
             if (Helper::Protocol::FromJson(message, this->mBody))
             {
                 this->mBody.clear();
@@ -315,9 +315,9 @@ namespace Rpc
         }
         switch (this->mProto)
         {
-        case (int)Tcp::Porto::Protobuf:
+        case Msg::Porto::Protobuf:
             return message->SerializeToString(&mBody);
-        case (int)Tcp::Porto::Json:
+        case Msg::Porto::Json:
             return Helper::Protocol::GetJson(*message, &mBody);
         }
         CONSOLE_LOG_FATAL("proto error write error");

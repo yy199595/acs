@@ -13,7 +13,7 @@ namespace Client
 	class TcpRpcClientContext : public Tcp::TcpContext
 	{
 	public:
-		TcpRpcClientContext(std::shared_ptr<SocketProxy> socket, ClientComponent * component);
+		TcpRpcClientContext(std::shared_ptr<Tcp::SocketProxy> socket, ClientComponent * component);
 	public:
 		void SendToServer(const std::shared_ptr<Rpc::Packet>& request);
 	protected:

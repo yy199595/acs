@@ -9,7 +9,7 @@
 #include"Entity/App/App.h"
 namespace Tendo
 {
-    void HttpListenComponent::OnListen(std::shared_ptr<SocketProxy> socket)
+    void HttpListenComponent::OnListen(std::shared_ptr<Tcp::SocketProxy> socket)
     {
 #ifdef __DEBUG__
         //LOG_DEBUG("handler http socket count = " << count++);

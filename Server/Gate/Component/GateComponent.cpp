@@ -34,7 +34,7 @@ namespace Tendo
         std::shared_ptr<Rpc::Packet> data =
             std::make_shared<Rpc::Packet>();
 		{
-            data->SetType(Tcp::Type::Forward);
+            data->SetType(Msg::Type::Forward);
 			data->GetHead().Add("id", userId);
 			data->GetHead().Add("func", func);
 		}
@@ -55,8 +55,8 @@ namespace Tendo
 		}
         std::shared_ptr<Rpc::Packet> data(new Rpc::Packet());
         {
-            data->SetType(Tcp::Type::Forward);
-            data->SetProto(Tcp::Porto::Protobuf);
+            data->SetType(Msg::Type::Forward);
+            data->SetProto(Msg::Porto::Protobuf);
         }
         data->GetHead().Add("func", func);
         data->GetHead().Add("id", userId);
@@ -80,8 +80,8 @@ namespace Tendo
 
         std::shared_ptr<Rpc::Packet> data(new Rpc::Packet());
         {
-            data->SetType(Tcp::Type::Broadcast);
-            data->SetProto(Tcp::Porto::Protobuf);
+            data->SetType(Msg::Type::Broadcast);
+            data->SetProto(Msg::Porto::Protobuf);
         }
         data->GetHead().Add("func", func);
         for(const std::string & address : locations)
@@ -102,8 +102,8 @@ namespace Tendo
 
         std::shared_ptr<Rpc::Packet> data(new Rpc::Packet());
         {
-            data->SetType(Tcp::Type::Broadcast);
-            data->SetProto(Tcp::Porto::Protobuf);
+            data->SetType(Msg::Type::Broadcast);
+            data->SetProto(Msg::Porto::Protobuf);
         }
         data->GetHead().Add("func", func);
         data->GetHead().Add("pb", message.GetTypeName());

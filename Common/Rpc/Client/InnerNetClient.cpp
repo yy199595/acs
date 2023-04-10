@@ -9,14 +9,14 @@
 namespace Tendo
 {
 
-	InnerNetClient::InnerNetClient(IRpc<Rpc::Packet>* component, std::shared_ptr<SocketProxy> socket)
+	InnerNetClient::InnerNetClient(IRpc<Rpc::Packet>* component, std::shared_ptr<Tcp::SocketProxy> socket)
 		: TcpContext(std::move(socket), 1024 * 1024), mIsClient(false), mComponent(component)
 	{
         this->mState = Tcp::DecodeState::Head;
 	}
 
 	InnerNetClient::InnerNetClient(IRpc<Rpc::Packet> * component,
-                                   std::shared_ptr<SocketProxy> socket, AuthInfo info)
+                                   std::shared_ptr<Tcp::SocketProxy> socket, AuthInfo info)
 		: TcpContext(std::move(socket), 1024 * 1024), mIsClient(true), mAuthInfo(std::move(info)), mComponent(component)
     {
         this->mState = Tcp::DecodeState::Head;
@@ -41,19 +41,6 @@ namespace Tendo
         t.post(std::bind(&InnerNetClient::Write, this, message));
 #endif
     }
-
-	long long InnerNetClient::Call(std::shared_ptr<Rpc::Packet> message)
-	{
-		long long taskId = Helper::Guid::Create();
-		message->GetHead().Add("rpc", taskId);
-#ifdef ONLY_MAIN_THREAD
-		this->Send(message);
-#else
-		asio::io_service &t = this->mSocket->GetThread();
-		t.post(std::bind(&InnerNetClient::Write, this, message));
-#endif
-		return taskId;
-	}
 
     void InnerNetClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
     {
@@ -197,7 +184,7 @@ namespace Tendo
 #ifdef __DEBUG__
             const std::string& address = this->mSocket->GetAddress();
             CONSOLE_LOG_ERROR("connect inner error : [" << address << "]");
-#endif //
+#endif
 			this->mSocket->Close();
 			Asio::Context & context = this->mSocket->GetThread();
 			this->mTimer = std::make_unique<asio::steady_timer>(context, std::chrono::seconds(5));
@@ -217,7 +204,7 @@ namespace Tendo
         {
             Rpc::Head& head = authMessage->GetHead();
             {
-                authMessage->SetType(Tcp::Type::Auth);
+                authMessage->SetType(Msg::Type::Auth);
                 head.Add("name", this->mAuthInfo.ServerName);
                 head.Add("user", this->mAuthInfo.UserName);
                 head.Add("passwd", this->mAuthInfo.PassWord);
@@ -234,5 +221,4 @@ namespace Tendo
             this->CloseSocket(XCode::NetWorkError);
         }
     }
-
 }

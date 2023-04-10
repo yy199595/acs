@@ -43,7 +43,7 @@ namespace Tendo
 		void OnFrameUpdate(float t) final;
 	 private:
         void OnRecord(Json::Writer & document) final;
-        void OnListen(std::shared_ptr<SocketProxy> socket) final;
+        void OnListen(std::shared_ptr<Tcp::SocketProxy> socket) final;
 		bool GetUserId(const std::string & address, long long & userId) const;
 	private:
 		int mMaxHandlerCount;

@@ -64,10 +64,10 @@ namespace Tendo
 		const std::string& address = message->From();
 		switch (message->GetType())
 		{
-			case Tcp::Type::Ping:
+			case Msg::Type::Ping:
 			{
 				message->SetContent("hello");
-				message->SetType(Tcp::Type::Response);
+				message->SetType(Msg::Type::Response);
 				this->Send(address, message);
 				break;
 			}
@@ -97,7 +97,7 @@ namespace Tendo
 				{
 					message->Clear();
 					message->GetHead().Remove("func");
-					message->SetType(Tcp::Type::Response);
+					message->SetType(Msg::Type::Response);
 					message->GetHead().Add("code", code);
 					this->Send(message->From(), message);
 				}
@@ -143,7 +143,7 @@ namespace Tendo
 #ifdef __DEBUG__
 		int rpcId = 0;
 		const Rpc::Head& head = message->ConstHead();
-		if (message->GetType() == Tcp::Type::Response
+		if (message->GetType() == Msg::Type::Response
 			&& head.Get("rpc", rpcId))
 		{
 			std::string func;
@@ -158,7 +158,7 @@ namespace Tendo
 			}
 		}
 #endif
-		if(message->GetType() == Tcp::Type::Response)
+		if(message->GetType() == Msg::Type::Response)
 		{
 			this->mWaitCount--;
 		}
@@ -171,7 +171,7 @@ namespace Tendo
 		return true;
 	}
 
-    void OuterNetComponent::OnListen(std::shared_ptr<SocketProxy> socket)
+    void OuterNetComponent::OnListen(std::shared_ptr<Tcp::SocketProxy> socket)
     {
         const std::string &address = socket->GetAddress();
         auto iter = this->mGateClientMap.find(address);

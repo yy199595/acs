@@ -18,10 +18,6 @@ namespace Tcp
 
     bool TcpContext::Reset(std::shared_ptr<SocketProxy> socket)
     {
-        if(this->mSocket != nullptr && this->mSocket->GetSocket().is_open())
-        {
-            return false;
-        }
         this->mLastOperTime = 0;
         this->mConnectCount = 0;
         this->ClearSendStream();

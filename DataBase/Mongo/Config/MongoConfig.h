@@ -7,9 +7,9 @@
 #include<vector>
 #include"Server/Config/TextConfig.h"
 #include"Core/Singleton/Singleton.h"
-namespace Tendo
+namespace Mongo
 {
-    class MongoConfig : public TextConfig
+    class MongoConfig : public Tendo::TextConfig
     {
     public:
         MongoConfig() : TextConfig("MongoConfig") { }

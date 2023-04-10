@@ -40,15 +40,15 @@ namespace Client
         const std::string &address = message->From();
         switch (type)
         {
-            case Tcp::Type::Ping:
+            case Msg::Type::Ping:
             {
                 LOG_INFO("[" << address << " ping message = " << message->GetBody());
             }
                 break;
-            case Tcp::Type::Request:
+            case Msg::Type::Request:
                 this->OnRequest(*message);
                 break;
-            case Tcp::Type::Response:
+            case Msg::Type::Response:
             {
                 int rpcId = 0;
                 if (message->GetHead().Get("rpc", rpcId))
@@ -116,7 +116,7 @@ namespace Client
         ThreadComponent * netComponent =
 			this->GetComponent<ThreadComponent>();
 
-		std::shared_ptr<SocketProxy> socketProxy =
+		std::shared_ptr<Tcp::SocketProxy> socketProxy =
 			netComponent->CreateSocket(ip, port);
 
 		std::shared_ptr<TcpRpcClientContext> client =

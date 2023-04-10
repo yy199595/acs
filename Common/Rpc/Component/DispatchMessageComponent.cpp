@@ -148,13 +148,13 @@ namespace Tendo
     {
         switch (message->GetType())
         {
-            case Tcp::Type::Request:
+            case Msg::Type::Request:
                 return this->HandlerRequest(message);
-            case Tcp::Type::Response:
+            case Msg::Type::Response:
                 return this->HandlerResponse(message);
-            case Tcp::Type::Forward:
+            case Msg::Type::Forward:
                 return this->HandlerForward(message);
-            case Tcp::Type::Broadcast:
+            case Msg::Type::Broadcast:
                 return this->HandlerBroadcast(message);
         }
         return XCode::Successful;
@@ -172,7 +172,7 @@ namespace Tendo
 			return XCode::CallArgsError;
 		}
 		message->GetHead().Remove("id");
-		message->SetType(Tcp::Type::Request);
+		message->SetType(Msg::Type::Request);
 		if(!this->mOuterComponent->Send(userId, message))
 		{
 			return XCode::NotFindUser;
@@ -208,7 +208,7 @@ namespace Tendo
         {
             return XCode::Failure;
         }
-        message->SetType(Tcp::Type::Request);
+        message->SetType(Msg::Type::Request);
         this->mOuterComponent->Broadcast(message);
 		return XCode::Successful;
 	}

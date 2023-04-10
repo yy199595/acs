@@ -3,7 +3,7 @@
 #include"Asio.h"
 #include"Log/Common/CommonLogDef.h"
 
-namespace Tendo
+namespace Tcp
 {
 	class SocketProxy
 	{

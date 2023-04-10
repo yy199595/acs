@@ -79,8 +79,8 @@ namespace Tendo
         std::shared_ptr<Rpc::Packet> request =
             std::make_shared<Rpc::Packet>();
         {
-            request->SetType(Tcp::Type::Request);
-            request->SetProto(Tcp::Porto::Protobuf);
+            request->SetType(Msg::Type::Request);
+            request->SetProto(Msg::Porto::Protobuf);
             request->WriteMessage(message);
             request->GetHead().Add("func", name);
         }
@@ -100,8 +100,8 @@ namespace Tendo
         std::shared_ptr<Rpc::Packet> request =
             std::make_shared<Rpc::Packet>();
         {
-            request->SetType(Tcp::Type::Request);
-            request->SetProto(Tcp::Porto::Protobuf);
+            request->SetType(Msg::Type::Request);
+            request->SetProto(Msg::Porto::Protobuf);
             request->WriteMessage(message);
             request->GetHead().Add("func", name);
         }
@@ -282,8 +282,8 @@ namespace Tendo
         std::shared_ptr<Rpc::Packet> request = std::make_shared<Rpc::Packet>();
         {
             request->WriteMessage(message);
-            request->SetType(Tcp::Type::Request);
-            request->SetProto(Tcp::Porto::Protobuf);
+            request->SetType(Msg::Type::Request);
+            request->SetProto(Msg::Porto::Protobuf);
             request->GetHead().Add("id", userId);
             request->GetHead().Add("func", methodConfig->FullName);
         }
@@ -319,8 +319,8 @@ namespace Tendo
         std::shared_ptr<Rpc::Packet> request = std::make_shared<Rpc::Packet>();
         {
             request->WriteMessage(message);
-            request->SetType(Tcp::Type::Request);
-            request->SetProto(Tcp::Porto::Protobuf);
+            request->SetType(Msg::Type::Request);
+            request->SetProto(Msg::Porto::Protobuf);
             request->GetHead().Add("func", methodConfig->FullName);
         }
         return this->mNetComponent->Call(address, request);
@@ -348,8 +348,8 @@ namespace Tendo
 		std::shared_ptr<Rpc::Packet> request = std::make_shared<Rpc::Packet>();
 		{
 			request->WriteMessage(message);
-			request->SetType(Tcp::Type::Request);
-			request->SetProto(Tcp::Porto::Protobuf);
+			request->SetType(Msg::Type::Request);
+			request->SetProto(Msg::Porto::Protobuf);
 			request->GetHead().Add("id", userId);
 			request->GetHead().Add("func", methodConfig->FullName);
 		}

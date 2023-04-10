@@ -6,7 +6,6 @@
 #define GAMEKEEPER_TCPCLIENT_H
 #include<list>
 #include"SocketProxy.h"
-using namespace Tendo;
 
 namespace Tcp
 {
@@ -61,11 +60,12 @@ namespace Tcp
         asio::streambuf mRecvBuffer;
 		std::shared_ptr<SocketProxy> mSocket;
 	 private:
-        size_t mSendCount;   
+        size_t mSendCount;
 		const size_t mMaxCount;
 		long long mLastOperTime;
 		std::unique_ptr<asio::steady_timer> mTimer;
         std::list<std::shared_ptr<ProtoMessage>> mMessageQueue;
 	};
 }
+
 #endif //GAMEKEEPER_TCPCLIENT_H

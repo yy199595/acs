@@ -14,7 +14,7 @@ namespace Tendo
  	class OuterNetClient : public Tcp::TcpContext
 	{
 	 public:
-		OuterNetClient(std::shared_ptr<SocketProxy> socket, OuterNetComponent* component);
+		OuterNetClient(std::shared_ptr<Tcp::SocketProxy> socket, OuterNetComponent* component);
 		~OuterNetClient() final = default;
 	 public:
 		void StartClose();

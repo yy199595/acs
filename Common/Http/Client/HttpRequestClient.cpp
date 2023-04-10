@@ -8,7 +8,7 @@
 #include"Http/Component/HttpComponent.h"
 namespace Tendo
 {
-    HttpRequestClient::HttpRequestClient(std::shared_ptr<SocketProxy> socketProxy, HttpComponent * httpComponent)
+    HttpRequestClient::HttpRequestClient(std::shared_ptr<Tcp::SocketProxy> socketProxy, HttpComponent * httpComponent)
 		: Tcp::TcpContext(std::move(socketProxy))
     {
         this->mTaskId = 0;

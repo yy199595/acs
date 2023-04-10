@@ -26,8 +26,8 @@ namespace Lua
         }
 		std::shared_ptr<Rpc::Packet> request(new Rpc::Packet());
 		{
-			request->SetType(Tcp::Type::Request);
-			request->SetProto(Tcp::Porto::Protobuf);
+			request->SetType(Msg::Type::Request);
+			request->SetProto(Msg::Porto::Protobuf);
 		}
 
         ProtoComponent * messageComponent = App::Inst()->GetMsgComponent();
@@ -53,7 +53,7 @@ namespace Lua
         }
 		else if(lua_isstring(lua, 3))
 		{
-			request->SetProto(Tcp::Porto::String);
+			request->SetProto(Msg::Porto::String);
 			request->SetContent(lua_tostring(lua, 3));
 		}
         int rpcId = 0;

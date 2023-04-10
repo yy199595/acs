@@ -57,7 +57,7 @@ namespace Tendo
         const std::string & ip = config.Address[0].Ip;
         const unsigned int port = config.Address[0].Port;
         ThreadComponent * component = this->GetComponent<ThreadComponent>();
-        std::shared_ptr<SocketProxy> socketProxy = component->CreateSocket();
+        std::shared_ptr<Tcp::SocketProxy> socketProxy = component->CreateSocket();
         if(socketProxy == nullptr)
         {
             return nullptr;

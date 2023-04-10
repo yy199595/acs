@@ -19,7 +19,7 @@ namespace Tendo
 	class HttpHandlerClient final : public Tcp::TcpContext
 	{
 	 public:
-		HttpHandlerClient(HttpListenComponent * httpComponent, std::shared_ptr<SocketProxy> socketProxy);
+		HttpHandlerClient(HttpListenComponent * httpComponent, std::shared_ptr<Tcp::SocketProxy> socketProxy);
 	 public:
 		void StartReceive(int timeout = 15);
 		void StartWriter(HttpStatus code);

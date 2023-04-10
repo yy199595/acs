@@ -1,6 +1,6 @@
 #include"SocketProxy.h"
 #include<spdlog/fmt/fmt.h>
-namespace Tendo
+namespace Tcp
 {
 	SocketProxy::SocketProxy(asio::io_service& thread)
 		: mNetThread(thread)

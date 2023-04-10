@@ -31,7 +31,7 @@ namespace Tendo
 	std::shared_ptr<HttpRequestClient> HttpComponent::CreateClient()
 	{
         std::shared_ptr<HttpRequestClient> httpClient;
-		std::shared_ptr<SocketProxy> socketProxy  = this->mNetComponent->CreateSocket();
+		std::shared_ptr<Tcp::SocketProxy> socketProxy  = this->mNetComponent->CreateSocket();
         if(!this->mClientPools.empty())
         {
             httpClient = this->mClientPools.front();

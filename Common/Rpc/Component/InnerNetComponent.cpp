@@ -56,7 +56,7 @@ namespace Tendo
         this->mSumCount++;
         int type = message->GetType();
         const std::string &address = message->From();
-        if (type != Tcp::Type::Auth && address != this->mLocation)
+        if (type != Msg::Type::Auth && address != this->mLocation)
         {
             if (!this->IsAuth(address))
             {
@@ -67,18 +67,18 @@ namespace Tendo
         }
         switch (type)
         {
-            case Tcp::Type::Auth:
+            case Msg::Type::Auth:
                 this->OnAuth(message);
                 break;
-            case Tcp::Type::Logout:
+            case Msg::Type::Logout:
                 this->StartClose(address);
                 break;
-            case Tcp::Type::Request:
+            case Msg::Type::Request:
                 this->mWaitMessages.push(message);
                 break;
-            case Tcp::Type::Forward:
-            case Tcp::Type::Response:
-            case Tcp::Type::Broadcast:
+            case Msg::Type::Forward:
+            case Msg::Type::Response:
+            case Msg::Type::Broadcast:
                 this->mMessageComponent->OnMessage(message);
                 break;
             default:
@@ -89,11 +89,11 @@ namespace Tendo
 
     void InnerNetComponent::OnSendFailure(const std::string &address, std::shared_ptr<Rpc::Packet> message)
     {
-        if (message->GetType() == (int) Tcp::Type::Request)
+        if (message->GetType() == Msg::Type::Request)
         {
             if (message->GetHead().Has("rpc"))
             {
-                message->SetType(Tcp::Type::Response);
+                message->SetType(Msg::Type::Response);
                 message->GetHead().Add("code", XCode::NetWorkError);
                 this->mMessageComponent->OnMessage(message);
                 return;
@@ -148,7 +148,7 @@ namespace Tendo
         }
     }
 
-    void InnerNetComponent::OnListen(std::shared_ptr<SocketProxy> socket)
+    void InnerNetComponent::OnListen(std::shared_ptr<Tcp::SocketProxy> socket)
     {
         const std::string &address = socket->GetAddress();
         auto iter = this->mRpcClientMap.find(address);
@@ -191,7 +191,7 @@ namespace Tendo
             CONSOLE_LOG_ERROR("parse address error : [" << address << "]");
             return nullptr;
         }
-        std::shared_ptr<SocketProxy> socketProxy = this->mNetComponent->CreateSocket();
+        std::shared_ptr<Tcp::SocketProxy> socketProxy = this->mNetComponent->CreateSocket();
         if (socketProxy == nullptr)
         {
             return nullptr;
@@ -242,7 +242,7 @@ namespace Tendo
 #ifndef __DEBUG__
         message->GetHead().Remove("func");
 #endif
-        message->SetType(Tcp::Type::Response);
+        message->SetType(Msg::Type::Response);
         this->Send(message->From(), message);
         return true;
     }
@@ -260,7 +260,7 @@ namespace Tendo
         InnerNetClient *clientSession = nullptr;
         switch (message->GetType())
         {
-            case Tcp::Type::Response:
+            case Msg::Type::Response:
                 clientSession = this->GetSession(address);
                 break;
             default:
@@ -327,7 +327,7 @@ namespace Tendo
                 {
                     message->Clear();
                     message->GetHead().Add("code", code);
-                    message->SetType(Tcp::Type::Response);
+                    message->SetType(Msg::Type::Response);
                     this->Send(message->From(), message);
                 }
             }
