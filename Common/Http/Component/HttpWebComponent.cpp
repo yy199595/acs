@@ -39,6 +39,7 @@ namespace Tendo
 		}
         std::vector<HttpService *> httpServices;
         this->mTaskComponent = this->mApp->GetTaskComponent();
+        ServerConfig::Inst()->GetPath("home", this->mHomePath);
         return this->mApp->GetComponents(httpServices) && this->StartListen("http");
     }
 
@@ -72,10 +73,16 @@ namespace Tendo
 
     void HttpWebComponent::OnRequest(std::shared_ptr<Http::Request> request)
     {
+        this->mSumCount++;
 		const std::string & address = request->From();
         const HttpMethodConfig *httpConfig = HttpConfig::Inst()->GetMethodConfig(request->Path());
         if (httpConfig == nullptr)
 		{
+            if (request->Path() == "/")
+            {
+                this->OnHomePage(request);
+                return;
+            }
 			const std::string& path = request->Path();
 			auto iter = this->mStaticSourceDir.find(path);
 			if (iter == this->mStaticSourceDir.end())
@@ -105,9 +112,22 @@ namespace Tendo
         }
         this->mTaskComponent->Start(&HttpWebComponent::Invoke, this, httpConfig, request);
     }
+
+    void HttpWebComponent::OnHomePage(std::shared_ptr<Http::Request> request)
+    {
+        const std::string& address = request->From();
+        if (this->mHomePath.empty())
+        {
+            this->Send(address, HttpStatus::NOT_FOUND);
+            LOG_ERROR("[" << address << "] <<" << request->Path()
+                << ">>" << HttpStatusToString(HttpStatus::NOT_FOUND));
+            return;
+        }      
+        this->SendFile(address, Http::ContentName::HTML, this->mHomePath);
+    }
+
     void HttpWebComponent::Invoke(const HttpMethodConfig* config, const std::shared_ptr<Http::Request>& request)
     {
-		this->mSumCount++;
         this->mWaitCount++;
 		const std::string & address = request->From();
         HttpService* httpService = this->GetComponent<HttpService>(config->Service);

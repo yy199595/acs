@@ -39,9 +39,11 @@ namespace Tendo
 		void OnDestroy() final;
 		void OnRecord(Json::Writer &document) final;
         bool OnDelClient(const std::string& address) final;
+        void OnHomePage(std::shared_ptr<Http::Request> request); //ฝ๘ศ๋ึ๗าณ
 		void OnRequest(std::shared_ptr<Http::Request> request) final;
 		void Invoke(const HttpMethodConfig* config, const std::shared_ptr<Http::Request>& request);
     private:
+        std::string mHomePath;
         unsigned int mSumCount;
         unsigned int mWaitCount;
         class AsyncMgrComponent * mTaskComponent;

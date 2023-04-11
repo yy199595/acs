@@ -133,6 +133,7 @@ namespace Tendo
 
     std::shared_ptr<Tcp::SocketProxy> ThreadComponent::CreateSocket()
     {
+		
         std::shared_ptr<Tcp::SocketProxy> socket;
 #ifdef ONLY_MAIN_THREAD
         asio::io_service & io = this->mApp->MainThread();

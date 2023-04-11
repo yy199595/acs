@@ -24,14 +24,17 @@ namespace Tendo
 		~MysqlClient();
     public:
         void Stop();
+        void Ping();
 		void Start();
 		bool StartConnect();
+        long long LastRunTime() { return this->mLastTime; }
         std::shared_ptr<Mysql::Response> Run(const std::shared_ptr<Mysql::ICommand>& command);
     private:
         void Update();
     private:
         size_t mIndex;
         MYSQL *mMysqlClient;
+        long long mLastTime;
 		std::thread * mThread;
 		const MysqlConfig & mConfig;
 		IRpc<Mysql::Response> *mComponent;

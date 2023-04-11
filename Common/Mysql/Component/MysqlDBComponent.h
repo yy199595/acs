@@ -30,7 +30,7 @@ namespace Tendo
 {
     class MysqlClient;
 	class MysqlDBComponent : public RpcTaskComponent<int, Mysql::Response>,
-							 public IRpc<Mysql::Response>, public ILuaRegister, public IDestroy
+							 public IRpc<Mysql::Response>, public ILuaRegister, public IDestroy, public ISecondUpdate
     {
 	public:
 		bool Ping(int index = 0);
@@ -45,6 +45,7 @@ namespace Tendo
 		bool Awake() final;
 		bool LateAwake() final;
 		void OnDestroy() final;
+		void OnSecondUpdate(int tick) final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 		void OnConnectSuccessful(const std::string &address) final;
 		void OnMessage(std::shared_ptr<Mysql::Response> message) final;

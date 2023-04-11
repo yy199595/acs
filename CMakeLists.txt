@@ -53,7 +53,6 @@ include_directories(${PROJECT_SOURCE_DIR}/Client)
 
 include_directories(${PROJECT_SOURCE_DIR}/Common)
 include_directories(${PROJECT_SOURCE_DIR}/Server)
-include_directories(${PROJECT_SOURCE_DIR}/DataBase)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/lua ${PROJECT_SOURCE_DIR}/Libs/bin/lua)
 add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/spdlog ${PROJECT_SOURCE_DIR}/Libs/bin/spdlog)
@@ -64,29 +63,28 @@ file(GLOB_RECURSE src_proto "Gen/*.cpp" "Gen/*.cc")
 file(GLOB_RECURSE src_common "Common/*.cpp" "Common/*.c")
 file(GLOB_RECURSE src_server "Server/*.c" "Server/*.cpp")
 file(GLOB_RECURSE src_client "Client/*.c" "Client/*.cpp")
-file(GLOB_RECURSE src_database "DataBase/*.cpp" "DataBase/*.c")
-list(APPEND build_files ${asm_file} ${src_common} ${src_proto})
-list(APPEND build_files ${src_database} ${src_server} ${src_client})
+list(APPEND build_files ${asm_file} ${src_common})
+list(APPEND build_files ${src_proto} ${src_server} ${src_client})
 
 if(MSVC) #创建vs目录
 
+    #file(GLOB_RECURSE file_md "ReadMe/*.md")
     file(GLOB_RECURSE file_cmake "CMake/*.cmake")
     file(GLOB_RECURSE file_proto "Gen/*.h" "Gen/*.hpp")
     file(GLOB_RECURSE file_server "Server/*.h" "Server/*.hpp")
     file(GLOB_RECURSE file_client "Client/*.h" "Client/*.hpp")
     file(GLOB_RECURSE file_common "Common/*.h" "Common/*.hpp")
-    file(GLOB_RECURSE file_database "DataBase/*.h" "DataBase/*.hpp")
     file(GLOB_RECURSE file_bin "bin/*.json" "bin/*.lua" "bin/*.proto" "bin/*.html")
 
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
     
+    #list(APPEND build_files ${file_md})
     list(APPEND build_files ${file_bin})
     list(APPEND build_files ${file_cmake})
     list(APPEND build_files ${file_common})
     list(APPEND build_files ${file_proto})
     list(APPEND build_files ${file_server})
     list(APPEND build_files ${file_client})
-    list(APPEND build_files ${file_database})
 
     foreach(file_name ${build_files})
         source_group_by_dir(${PROJECT_SOURCE_DIR} ${file_name})

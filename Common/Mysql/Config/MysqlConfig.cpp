@@ -24,6 +24,10 @@ namespace Tendo
         this->User = json["user"].GetString();
         this->MaxCount = json["count"].GetInt();
         this->Password = json["passwd"].GetString();
+        if (json.HasMember("ping"))
+        {
+            this->Ping = json["ping"].GetInt();
+        }
         for (unsigned int index = 0; index < json["address"].Size(); index++)
         {
             Net::Address addressInfo;

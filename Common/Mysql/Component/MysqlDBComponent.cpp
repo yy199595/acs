@@ -84,6 +84,26 @@ namespace Tendo
 		this->mMysqlClients.clear();
 	}
 
+	void MysqlDBComponent::OnSecondUpdate(int tick)
+	{
+		if (tick % this->mConfig.Ping)
+		{
+			auto iter = this->mMysqlClients.begin();
+			long long now = Helper::Time::NowSecTime();
+			for (; iter != this->mMysqlClients.end(); iter++)
+			{
+				std::shared_ptr<MysqlClient>& mysqClient = iter->second;
+				if (now - mysqClient->LastRunTime() >= this->mConfig.Ping)
+				{
+					mysqClient->Ping();
+#ifdef __DEBUG__
+					CONSOLE_LOG_DEBUG("start ping mysql client : " << iter->first);
+#endif
+				}
+			}
+		}
+	}
+
 	void MysqlDBComponent::OnConnectSuccessful(const std::string& address)
 	{
 		LOG_INFO("mysql client [" << address << "] auth successful");

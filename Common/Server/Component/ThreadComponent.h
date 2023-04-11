@@ -36,6 +36,7 @@ namespace Tendo
 		std::shared_ptr<Tcp::SocketProxy> CreateSocket(const std::string & ip, unsigned short port);
     private:
 #ifndef ONLY_MAIN_THREAD
+        std::mutex mMutex;
         std::list<AsioThread *> mNetThreads;
 #endif
 	};

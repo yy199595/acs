@@ -259,8 +259,8 @@ namespace Http
 			int len = length - (int)this->mCurSize;
 			double process = this->mCurSize / (double)length;
 #ifdef __DEBUG__
-			CONSOLE_LOG_DEBUG("download file process = [" << process * 100 << "%s]");
-#endif // __DEBUG__
+			//CONSOLE_LOG_DEBUG("download file process = [" << process * 100 << "%s]");
+#endif
 			return len <= 1024 ? len : 1024;
 		}		
 		return HTTP_READ_SOME;
@@ -315,8 +315,8 @@ namespace Http
 				this->mCurSize += readCount;
 			}
 
-			double process = this->mCurSize / (double)this->mFileSize;
-			CONSOLE_LOG_DEBUG("send process = [" << process * 100 << "%s]");
+		/*	double process = this->mCurSize / (double)this->mFileSize;
+			CONSOLE_LOG_DEBUG("send process = [" << process * 100 << "%s]");*/
 
 		} while (!this->mInput->eof() && readCount > 0 && index < 20);
 		return (int)(this->mFileSize - this->mCurSize);

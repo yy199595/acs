@@ -55,7 +55,7 @@ namespace Tendo
 					const s2s::server::info& info = response->list(index);
 					{
 						this->AddRpcServer(info.name(), info.rpc());
-						this->AddHttpServer(info.name(), info.rpc());
+						this->AddHttpServer(info.name(), info.http());
 					}
 				}
 				return;

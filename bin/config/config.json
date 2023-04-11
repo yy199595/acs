@@ -11,6 +11,7 @@
     "path": {
         "proto": "proto",
         "html": "www/html",
+        "home": "www/html/home.html",
         "sqlite": "data/sqlite/",
         "db": "config/db/db.json",
         "code": "XCode/XCode.csv",

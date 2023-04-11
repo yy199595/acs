@@ -14,6 +14,7 @@ namespace Tendo
 							 : mComponent(component), mConfig(config)
     {
         this->mIndex = 0;
+		this->mLastTime = 0;
 		this->mThread = nullptr;
         this->mMysqlClient = nullptr;
     }
@@ -39,14 +40,20 @@ namespace Tendo
 		}
 		std::string error;
 		std::shared_ptr<Mysql::ICommand> command;
+		this->mLastTime = Helper::Time::NowSecTime();
 		Asio::Context& io = App::Inst()->MainThread();
 		std::shared_ptr<MysqlClient> self = this->shared_from_this();
 		while (true)
 		{
 			this->WaitPop(command);
-			int rpcId = command->GetRpcId();
-			if (rpcId > 0)
+			this->mLastTime = Helper::Time::NowSecTime();
+			if (command->GetRpcId() == -1) //Í£Ö¹ÃüÁî
 			{
+				break;
+			}
+			else if(command->GetRpcId() > 0)			
+			{
+				int rpcId = command->GetRpcId();
 				std::shared_ptr<Mysql::Response> response =
 					std::make_shared<Mysql::Response>(rpcId);
 				if (!command->Invoke(this->mMysqlClient, response))
@@ -60,7 +67,9 @@ namespace Tendo
 			}
 			else
 			{
-				break;
+				std::shared_ptr<Mysql::Response> response =
+					std::make_shared<Mysql::Response>(0);
+				command->Invoke(this->mMysqlClient, response);		
 			}
 		}
 		mysql_close(this->mMysqlClient);
@@ -71,8 +80,17 @@ namespace Tendo
 	{
 		std::shared_ptr<Mysql::ICommand>
 		    stopCommand = std::make_shared<Mysql::StopCommand>();
+		stopCommand->SetRpcId(-1);
 		this->Push(stopCommand);
     }
+
+	void MysqlClient::Ping()
+	{
+		std::shared_ptr<Mysql::ICommand>
+			pingCommand = std::make_shared<Mysql::PingCommand>();
+		pingCommand->SetRpcId(0);
+		this->Push(pingCommand);
+	}
 
 	bool MysqlClient::StartConnect()
 	{

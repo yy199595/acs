@@ -12,11 +12,12 @@ namespace Tendo
     class MysqlConfig : public TextConfig
     {
     public:
-        MysqlConfig() : TextConfig("MysqlConfig"), MaxCount(0) { }
+        MysqlConfig() : TextConfig("MysqlConfig"), Ping(30), MaxCount(0) { }
     protected:
        bool OnLoadText(const char *str, size_t length) final;
         bool OnReloadText(const char *str, size_t length) final;
     public:
+        int Ping;
         int MaxCount;
         std::string User;
         std::string Password;
