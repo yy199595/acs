@@ -55,13 +55,6 @@ namespace Tendo
 		return 0;
     }
 
-    std::shared_ptr<RedisTask> RedisRequest::MakeTask(int id)
-    {
-        std::shared_ptr<RedisTask> redisTask = std::make_shared<RedisTask>(id);
-        this->mTaskId = redisTask->GetRpcId();
-        return redisTask;
-    }
-
     std::shared_ptr<LuaRedisTask> RedisRequest::MakeLuaTask(lua_State *lua, int id)
     {
         std::shared_ptr<LuaRedisTask> redisTask(new LuaRedisTask(lua, id));

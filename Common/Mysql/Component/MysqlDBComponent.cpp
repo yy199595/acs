@@ -93,7 +93,7 @@ namespace Tendo
 			for (; iter != this->mMysqlClients.end(); iter++)
 			{
 				std::shared_ptr<MysqlClient>& mysqClient = iter->second;
-				if (now - mysqClient->LastRunTime() >= this->mConfig.Ping)
+				if (mysqClient->LastRunTime() != 0 && now - mysqClient->LastRunTime() >= this->mConfig.Ping)
 				{
 					mysqClient->Ping();
 #ifdef __DEBUG__

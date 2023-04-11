@@ -22,6 +22,18 @@ namespace Helper
 #endif
         }
 
+        bool GetFileName(const std::string& path, std::string& name)
+        {
+            std::regex pattern("/([^/]+)\\.[\\w]+$");
+            std::smatch match;
+            if (!std::regex_search(path, match, pattern)) 
+            {
+                return false;
+            }
+            name = match[1];
+            return true;
+        }
+
         extern bool GetFileType(const std::string &path, std::string &type)
 		{
 			std::smatch match;

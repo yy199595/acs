@@ -49,7 +49,7 @@ namespace Tendo
     public:
 		std::string ToJson();
 		int Serialize(std::ostream &os) final;
-		std::shared_ptr<RedisTask> MakeTask(int id);
+        void SetRpcTaskId(int id) { this->mTaskId = id;  }
         std::shared_ptr<LuaRedisTask> MakeLuaTask(lua_State * lua, int id);
     public:
 		template<typename ... Args>

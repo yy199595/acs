@@ -8,15 +8,15 @@
 #include"Core/Component/Component.h"
 namespace Tendo
 {
-    class RedisScriptComponent : public Component, public IStart
+    class RedisScriptComponent : public Component
     {
     public:
         RedisScriptComponent() = default;
     public:
         std::shared_ptr<RedisRequest> MakeLuaRequest(const std::string & fullName, const std::string & json);
-        std::unique_ptr<std::string> Call(const std::string & func, const std::string & json);
+        std::shared_ptr<RedisResponse> Call(const std::string & func, const std::string & json, bool async = true);
     private:
-        bool Start() final;
+       // bool Start() final;
         bool LateAwake() final;
         bool OnLoadScript(const std::string & name, const std::string &md5);
     private:

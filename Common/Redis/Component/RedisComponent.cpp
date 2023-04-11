@@ -115,7 +115,7 @@ namespace Tendo
 			LOG_ERROR("send redis cmd error : "  << request->ToJson());
 			return nullptr;
 		}
-		std::shared_ptr<RedisTask> redisTask = request->MakeTask(taskId);
+		std::shared_ptr<RedisTask> redisTask = std::make_shared<RedisTask>(taskId);
 		std::shared_ptr<RedisResponse> redisResponse = this->AddTask(taskId, redisTask)->Await();
 #ifdef __DEBUG__
         LOG_INFO(request->GetCommand() << " use time = [" << elapsedTimer.GetMs() << "ms]");
@@ -130,7 +130,14 @@ namespace Tendo
 
 	std::shared_ptr<RedisResponse> RedisComponent::SyncRun(const std::shared_ptr<RedisRequest>& request)
 	{
-		return this->mMainClient->SyncCommand(request);
+		std::shared_ptr<RedisResponse> response = 
+			this->mMainClient->SyncCommand(request);
+		if (response != nullptr && response->HasError())
+		{
+			//LOG_ERROR(request->ToJson());
+			LOG_ERROR(response->GetString());
+		}
+		return response;
 	}
 
 	void RedisComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
@@ -159,6 +166,7 @@ namespace Tendo
 			return false;
 		}
 		id = this->PopTaskId();
+		request->SetRpcTaskId(id);
 		redisClientContext->Send(request);
 		return true;
 	}

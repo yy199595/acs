@@ -4,6 +4,7 @@
 #include "Entity/App/App.h"
 #include "Util/Md5/MD5.h"
 #include "Util/Guid/Guid.h"
+#include "Util/File/FileHelper.h"
 #include "Util/File/DirectoryHelper.h"
 #include "Async/Lua/WaitLuaTaskSource.h"
 #include "Rpc//Lua/LuaServiceTaskSource.h"
@@ -150,7 +151,7 @@ namespace Tendo
 	Lua::LuaModule *LuaScriptComponent::LoadModuleByPath(const std::string &path)
 	{
 		std::string name;
-		Helper::Directory::GetFileName(path, name);
+		Helper::File::GetFileName(path, name);
 		std::unique_ptr<Lua::LuaModule> luaModule =
 			std::make_unique<Lua::LuaModule>(this->mLuaEnv, name, path);
 		if (!luaModule->Awake())
@@ -159,11 +160,9 @@ namespace Tendo
 			return nullptr;
 		}
 		Lua::LuaModule *result = luaModule.get();
-		{
-			const std::string moduleName = name.substr(0, name.find('.'));
-
-			LOG_INFO("start load lua module [" << moduleName << "]");
-			this->mModules.emplace(moduleName, std::move(luaModule));
+		{		
+			LOG_INFO("start load lua module [" << name << "]");
+			this->mModules.emplace(name, std::move(luaModule));
 		}
 		return result;
 	}

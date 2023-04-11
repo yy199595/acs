@@ -47,15 +47,10 @@ namespace Tendo
 		{
 			this->mConfig.Password = jsonData["passwd"].GetString();
 		}
-		if (jsonData.HasMember("scripts") && jsonData["scripts"].IsObject())
+		if (jsonData.HasMember("script"))
 		{
-			const rapidjson::Value& value = jsonData["scripts"];
-			for (auto iter = value.MemberBegin(); iter != value.MemberEnd(); iter++)
-			{
-				const std::string key(iter->name.GetString());
-				const std::string value(iter->value.GetString());
-				this->mConfig.LuaFiles.emplace(key, this->WorkPath() + value);
-			}
+			this->mConfig.Script = jsonData["script"].GetString();
+			this->mConfig.Script = this->WorkPath() + this->mConfig.Script;
 		}
 		return true;
 	}

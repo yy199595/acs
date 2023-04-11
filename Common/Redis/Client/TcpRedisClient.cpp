@@ -71,23 +71,23 @@ namespace Tendo
 		this->ReceiveLine();
 	}
 
-	void TcpRedisClient::OnReadComplete()
-	{
-		std::shared_ptr<RedisRequest> request =
-			std::static_pointer_cast<RedisRequest>(this->PopMessage());
-		if(request->GetTaskId() > 0)
-		{
-			this->mCurResponse->SetTaskId(request->GetTaskId());
+    void TcpRedisClient::OnReadComplete()
+    {
+        std::shared_ptr<RedisRequest> request =
+            std::static_pointer_cast<RedisRequest>(this->PopMessage());
+        if (request != nullptr && request->GetTaskId() > 0)
+        {
+            this->mCurResponse->SetTaskId(request->GetTaskId());
 #ifdef ONLY_MAIN_THREAD
-			this->mComponent->OnMessage(this->mCurResponse);
+            this->mComponent->OnMessage(this->mCurResponse);
 #else
-			asio::io_service& io = App::Inst()->MainThread();
-			io.post(std::bind(&IRpc<RedisResponse>::OnMessage, this->mComponent, this->mCurResponse));
+            asio::io_service& io = App::Inst()->MainThread();
+            io.post(std::bind(&IRpc<RedisResponse>::OnMessage, this->mComponent, this->mCurResponse));
 #endif
-		}
-		this->mCurResponse = std::make_shared<RedisResponse>();
-		this->SendFromMessageQueue();
-	}
+        }
+        this->mCurResponse = std::make_shared<RedisResponse>();
+        this->SendFromMessageQueue();
+    }
 
     void TcpRedisClient::OnSendMessage(const asio::error_code &code,
 			std::shared_ptr<Tcp::ProtoMessage> message)

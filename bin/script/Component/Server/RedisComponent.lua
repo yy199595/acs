@@ -30,10 +30,10 @@ function RedisComponent.SubCounter(key)
     return type(response) == "number" and response or 0
 end
 
-function RedisComponent.Call(lua, tab)
+function RedisComponent.Call(lua, tab, async)
     assert(type(tab) == "table")
     assert(type(lua) == "string")
-    local response = redis.Call(lua, tab)
+    local response = redis.Call(lua, tab, async)
     if response == nil then
         return nil
     end

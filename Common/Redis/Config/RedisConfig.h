@@ -18,9 +18,9 @@ namespace Tendo
         int Index;
         int FreeClient;
         std::string Name;
+        std::string Script;
         std::string Password;
         std::vector<Net::Address> Address;
-        std::unordered_map<std::string, std::string> LuaFiles;
     };
 
 

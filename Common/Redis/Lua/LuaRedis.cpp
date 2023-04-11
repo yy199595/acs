@@ -69,7 +69,6 @@ namespace Lua
             return 0;
         }
         std::string json;
-        lua_pushthread(lua);
         const char *fullName = luaL_checkstring(lua, 1);
         if (lua_isstring(lua, 2))
         {
@@ -86,10 +85,17 @@ namespace Lua
             luaL_error(lua, "parameter muset table or string");
             return 0;
         }
+        std::shared_ptr<RedisRequest> request =
+            redisScriptComponent->MakeLuaRequest(fullName, json);
+        if (lua_isboolean(lua, 3) && !lua_toboolean(lua, 3))
+        {
+            std::shared_ptr<RedisResponse> response 
+                = redisComponent->SyncRun(request);
+            return response != nullptr ? response->WriteToLua(lua) : 0;
+        }
 
 		int id = 0;
-		std::shared_ptr<RedisRequest> request =
-			redisScriptComponent->MakeLuaRequest(fullName, json);
+        lua_pushthread(lua);
 		if(!redisComponent->Send(request, id))
 		{
 			luaL_error(lua, "send redis cmd error");

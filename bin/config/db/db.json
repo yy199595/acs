@@ -6,12 +6,9 @@
         "timeout": 3,
         "count": 2,
         "free": 30,
-        "index": 0,
-        "scripts":{
-            "lock": "config/db/redis/lock.lua",
-            "user": "config/db/redis/user.lua"
-        },
-        "passwd": "199595yjz."
+        "index": 0,      
+        "passwd": "199595yjz.",
+        "script": "config/db/redis"
     },
     "mysql": {
         "count": 1,
