@@ -36,6 +36,12 @@ for arg in $cmd; do
         ./config
         make
     fi
+
+    if [[ $arg == "lib" ]]; then
+        make lua
+        make spdlog
+        make libprotobuf
+    fi
 done
 
 cd $current_path || exit
@@ -45,13 +51,6 @@ find ./ -name cmake_install.cmake -delete
 find ./ -name CMakeCache.txt -delete
 cmake ./CMakeLists.txt
 
-make lua
-make spdlog
-make libprotobuf
-if ! command -v protoc &> /dev/null
-then
-    make protoc && install
-fi
 make app
 
 # shellcheck disable=SC2038
