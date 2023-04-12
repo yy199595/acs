@@ -38,20 +38,19 @@ for arg in $cmd; do
     fi
 
     if [[ $arg == "lib" ]]; then
+        cd $current_path || exit
+        cmake ./CMakeLists.txt
         make lua
         make spdlog
         make libprotobuf
     fi
+
+    if [[ $arg == "debug" ]]; then
+        cd $current_path || exit
+        cmake ./CMakeLists.txt
+        make app
+    fi
 done
-
-cd $current_path || exit
-# shellcheck disable=SC2038
-find ./ -name CMakeFiles | xargs rm -r
-find ./ -name cmake_install.cmake -delete
-find ./ -name CMakeCache.txt -delete
-cmake ./CMakeLists.txt
-
-make app
 
 # shellcheck disable=SC2038
 find ./ -name CMakeFiles | xargs rm -r
