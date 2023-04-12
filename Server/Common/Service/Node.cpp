@@ -77,7 +77,6 @@ namespace Tendo
 #ifdef __DEBUG__
 			LOG_INFO("start register to [" << address << "]");
 #endif
-			rpcService->SetProto(Msg::Porto::Json);
 			int code = rpcService->Call(address, func, message);
 			if (code != XCode::Successful)
 			{
