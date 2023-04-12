@@ -21,6 +21,12 @@ else()
     SET(CMAKE_BUILD_TYPE "Release")
 endif()
 
+find_program(CCACHE_PROGRAM ccache)
+if (CCACHE_PROGRAM)
+    message("使用 ccache 作为编译缓存")
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+endif()
+
 set(ContextPath ${CMAKE_CURRENT_SOURCE_DIR}/Common/Async/Coroutine/Context)
 if(WIN32)
     SET(asm_file ${ContextPath}/context_x64.asm)
