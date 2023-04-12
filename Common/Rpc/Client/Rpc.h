@@ -31,6 +31,12 @@ namespace Msg
 		constexpr int MemoryBind = 4;
 		constexpr int Max = 255;
     };
+
+	namespace Net
+	{
+		constexpr int Tcp = 1; //tcp
+		constexpr int Http = 2; //http
+	}
 }
 
 constexpr int RPC_PACK_HEAD_LEN = sizeof(int) + sizeof(char) + sizeof(char);

@@ -155,7 +155,7 @@ namespace Tendo
 		std::shared_ptr<Rpc::Packet> message
 			= std::make_shared<Rpc::Packet>();
 		{
-			message->SetNet(Rpc::Net::HTTP);
+			message->SetNet(Msg::Net::Http);
 			message->SetFrom(request->From());
 			message->SetProto(Msg::Porto::Json);
 			message->SetType(Msg::Type::Request);

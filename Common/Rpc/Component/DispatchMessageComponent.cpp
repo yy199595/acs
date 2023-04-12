@@ -13,6 +13,7 @@
 #include"Proto/Component/ProtoComponent.h"
 #endif
 #include"Entity/Unit/App.h"
+#include"Rpc/Client/Message.h"
 #include"Http/Component/HttpWebComponent.h"
 #include"Gate/Component/OuterNetComponent.h"
 namespace Tendo
@@ -90,13 +91,22 @@ namespace Tendo
 		}
 		if (!config->Request.empty())
 		{
-			std::shared_ptr<Message> request;
-			if (component->New(config->Request, request))
+			switch(message->GetProto())
 			{
-				if (request->ParseFromString(message->GetBody()))
+				case Msg::Porto::Json:
+					json = message->GetBody();
+					break;
+				case Msg::Porto::Protobuf:
 				{
-					json.clear();
-					google::protobuf::util::MessageToJsonString(*request, &json);
+					std::shared_ptr<Message> request;
+					if (component->New(config->Request, request))
+					{
+						if (request->ParseFromString(message->GetBody()))
+						{
+							json.clear();
+							google::protobuf::util::MessageToJsonString(*request, &json);
+						}
+					}
 				}
 			}
 		}
@@ -109,16 +119,25 @@ namespace Tendo
 		json.assign("{}");
 		if (code == XCode::Successful && !config->Response.empty())
 		{
-			std::shared_ptr<Message> response;
-			if (component->New(config->Response, response))
+			switch(message->GetProto())
 			{
-				if (response->ParseFromString(message->GetBody()))
+				case Msg::Porto::Json:
+					json = message->GetBody();
+					break;
+				case Msg::Porto::Protobuf:
 				{
-					json.clear();
-					google::protobuf::util::MessageToJsonString(*response, &json);
+					std::shared_ptr<Message> response;
+					if (component->New(config->Response, response))
+					{
+						if (response->ParseFromString(message->GetBody()))
+						{
+							json.clear();
+							google::protobuf::util::MessageToJsonString(*response, &json);
+						}
+					}
+					break;
 				}
 			}
-
 		}
 		if (code == XCode::Successful)
 		{
@@ -146,10 +165,10 @@ namespace Tendo
 		const std::string& address = message->From();
 		switch (message->GetNet())
 		{
-			case Rpc::Net::TCP:
+			case Msg::Net::Tcp:
 				this->mInnerComponent->Send(address, code, message);
 				break;
-			case Rpc::Net::HTTP:
+			case Msg::Net::Http:
 				this->mWebComponent->SendData(address, code, message);
 				break;
 			default:

@@ -13,11 +13,6 @@
 
 namespace Rpc
 {
-	namespace Net
-	{
-		constexpr int TCP = 1;
-		constexpr int HTTP = 2;
-	}
     class Head : protected std::unordered_map<std::string, std::string>
     {
     public:

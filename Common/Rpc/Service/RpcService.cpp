@@ -14,13 +14,17 @@ namespace Tendo
 {
     RpcService::RpcService()
     {
-        this->mNetComponent = nullptr;
-        this->mLocationComponent = nullptr;
+		this->mAsync = true;
+        this->mTcpComponent = nullptr;
+		this->mHttpComponent = nullptr;
+		this->mNetType = Msg::Net::Tcp;
+		this->mProto = Msg::Porto::Protobuf;
+		this->mLocationComponent = nullptr;
     }
 
 	bool RpcService::LateAwake()
 	{
-        this->mNetComponent = this->GetComponent<InnerNetComponent>();
+        this->mTcpComponent = this->GetComponent<InnerNetComponent>();
         this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
 		ClusterConfig::Inst()->GetServerName(this->GetName(), this->mCluster);
         if (!ServerConfig::Inst()->GetLocation("rpc", this->mLocationAddress))
@@ -29,10 +33,6 @@ namespace Tendo
         }
         return true;
 	}
-    bool RpcService::RandomAddress(std::string& address)
-    {
-        return this->mLocationComponent->GetServer(this->mCluster, address);
-    }
 }
 
 namespace Tendo
@@ -78,13 +78,13 @@ namespace Tendo
         }
         std::shared_ptr<Rpc::Packet> request =
             std::make_shared<Rpc::Packet>();
-        {
-            request->SetType(Msg::Type::Request);
-            request->SetProto(Msg::Porto::Protobuf);
-            request->WriteMessage(message);
-            request->GetHead().Add("func", name);
-        }
-        return this->mNetComponent->Send(address, request);
+		{
+			request->SetType(Msg::Type::Request);
+			request->SetProto(this->mProto);
+			request->WriteMessage(message);
+			request->GetHead().Add("func", name);
+		}
+        return this->mTcpComponent->Send(address, request);
     }
 
     std::shared_ptr<Rpc::Packet> RpcService::CallAwait(
@@ -101,11 +101,11 @@ namespace Tendo
             std::make_shared<Rpc::Packet>();
         {
             request->SetType(Msg::Type::Request);
-            request->SetProto(Msg::Porto::Protobuf);
+            request->SetProto(this->mProto);
             request->WriteMessage(message);
             request->GetHead().Add("func", name);
         }
-		return this->mNetComponent->Call(address, request);
+		return this->mTcpComponent->Call(address, request);
 	}
 
 	int RpcService::Send(const std::string& address, const std::string& func, const Message& message)
@@ -283,11 +283,11 @@ namespace Tendo
         {
             request->WriteMessage(message);
             request->SetType(Msg::Type::Request);
-            request->SetProto(Msg::Porto::Protobuf);
+            request->SetProto(this->mProto);
             request->GetHead().Add("id", userId);
             request->GetHead().Add("func", methodConfig->FullName);
         }
-        return this->mNetComponent->Send(address, request);
+        return this->mTcpComponent->Send(address, request);
     }
 
     std::shared_ptr<Rpc::Packet> RpcService::CallAwait(
@@ -320,10 +320,10 @@ namespace Tendo
         {
             request->WriteMessage(message);
             request->SetType(Msg::Type::Request);
-            request->SetProto(Msg::Porto::Protobuf);
+            request->SetProto(this->mProto);
             request->GetHead().Add("func", methodConfig->FullName);
         }
-        return this->mNetComponent->Call(address, request);
+        return this->mTcpComponent->Call(address, request);
     }
 
 	int RpcService::Send(const std::string & address,
@@ -353,6 +353,6 @@ namespace Tendo
 			request->GetHead().Add("id", userId);
 			request->GetHead().Add("func", methodConfig->FullName);
 		}
-		return this->mNetComponent->Send(address, request);
+		return this->mTcpComponent->Send(address, request);
 	}
 }

@@ -26,10 +26,9 @@ namespace Tendo
 		void OnFrameUpdate(float t) final;
         void OnRecord(Json::Writer & document) final;
 		void OnListen(std::shared_ptr<Tcp::SocketProxy> socket) final;
-	 public:
+	 private:
         InnerNetTcpClient * GetSession(const std::string& address);
         InnerNetTcpClient * GetOrCreateSession(const std::string& address);
-		const NodeInfo * GetNodeInfo(const std::string & address) const;
 	public:
 		bool Send(const std::shared_ptr<Rpc::Packet>& message); //发送到本地
 		bool Send(const std::string & address, const std::shared_ptr<Rpc::Packet>& message);
@@ -37,6 +36,7 @@ namespace Tendo
         bool Send(const std::string & address, const std::shared_ptr<Rpc::Packet>& message, int & id);
         std::shared_ptr<Rpc::Packet> Call(const std::string & address, const std::shared_ptr<Rpc::Packet> & message);
 	public:
+		const NodeInfo * GetNodeInfo(const std::string & address) const;
 		size_t GetConnectClients(std::vector<std::string> & list) const; //获取所有连接进来的客户端
 		size_t Broadcast(const std::shared_ptr<Rpc::Packet>& message) const; //广播给所有链接进来的客户端
 	private:

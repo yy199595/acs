@@ -56,7 +56,7 @@ namespace Tendo
     {
         this->mSumCount++;
         int type = message->GetType();
-		message->SetNet(Rpc::Net::TCP);
+		message->SetNet(Msg::Net::Tcp);
 		const std::string &address = message->From();
         if (type != Msg::Type::Auth && address != this->mLocation)
         {
@@ -228,7 +228,7 @@ namespace Tendo
 
     bool InnerNetComponent::Send(const std::shared_ptr<Rpc::Packet> &message)
     {
-		message->SetNet(Rpc::Net::TCP);
+		message->SetNet(Msg::Net::Tcp);
         message->SetFrom(this->mLocation);
         this->mMessageComponent->OnMessage(message);
         return true;
