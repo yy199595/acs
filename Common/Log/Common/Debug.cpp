@@ -117,7 +117,7 @@ void demangle(char * msg, std::string &out)
 int Debug::Backtrace(std::string &trace)
 {
 	int count = 0;
-#ifndef __OS_WIN__
+#ifdef __OS_LINUX__
 	void *stack_trace[DUMP_STACK_DEPTH_MAX] = { 0 };
 	char **stack_strings = NULL;
 	int stack_depth = 0;
