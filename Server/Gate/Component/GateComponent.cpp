@@ -10,7 +10,7 @@
 #include"Lua/Engine/ClassProxyHelper.h"
 #include"Rpc/Component/NodeMgrComponent.h"
 #include"Rpc/Component/InnerNetComponent.h"
-#include"Core/Component/ComponentFactory.h"
+#include"Entity/Component/ComponentFactory.h"
 namespace Tendo
 {
 	bool GateComponent::LateAwake()

@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include"Rpc/Client/Message.h"
 #include"Network/Tcp/TcpContext.h"
-#include"Core/Component/IComponent.h"
+#include"Entity/Component/IComponent.h"
 using namespace Tcp;
 namespace Tendo
 {

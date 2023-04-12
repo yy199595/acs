@@ -86,12 +86,14 @@ namespace Tendo
 
 	void ThreadComponent::OnDestroy()
 	{
+#ifndef ONLY_MAIN_THREAD
         for (AsioThread* thread : this->mNetThreads)
         {
             delete thread;
         }
         this->mNetThreads.clear();
 		CONSOLE_LOG_INFO("delete net work thread");
+#endif
 	}
 
     Asio::Context& ThreadComponent::GetContext()
@@ -104,8 +106,9 @@ namespace Tendo
 			this->mNetThreads.pop_front();
 			this->mNetThreads.push_back(t);
 		}
-#endif
 		return t->Context();
+#endif
+
 
 //		asio::ssl::context sslContext(asio::ssl::context::sslv23);
 //
@@ -137,7 +140,7 @@ namespace Tendo
         std::shared_ptr<Tcp::SocketProxy> socket;
 #ifdef ONLY_MAIN_THREAD
         asio::io_service & io = this->mApp->MainThread();
-        socket = std::make_shared<SocketProxy>(io);
+        socket = std::make_shared<Tcp::SocketProxy>(io);
 #else
 		if(this->mNetThreads.empty())
 		{

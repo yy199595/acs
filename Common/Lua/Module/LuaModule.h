@@ -5,7 +5,7 @@
 #ifndef _LUAMODULE_H_
 #define _LUAMODULE_H_
 #include"Lua/Engine/Function.h"
-#include"Core/Component/IComponent.h"
+#include"Entity/Component/IComponent.h"
 namespace Lua
 {
 	class LuaModule

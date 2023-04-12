@@ -1,6 +1,6 @@
 #pragma once
 #include"Network/Tcp/SocketProxy.h"
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 namespace Tendo
 {
     class TcpListenerComponent : public Component

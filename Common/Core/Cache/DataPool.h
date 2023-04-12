@@ -11,117 +11,47 @@
 #include<unordered_map>
 namespace Pool
 {
-    template<typename TKey, typename TValue>
-    class DataPool
-    {
-    public:
-        DataPool(size_t count):mMaxCount(count) { }
-    public:
-        void Clear();
-        bool Remove(const TKey & key);
-        std::shared_ptr<TValue> Get(const TKey & kye);
-        void Add(const TKey & key, std::shared_ptr<TValue> value);
-    private:
-        bool RemoveKey(const TKey & key);
-    private:
-        std::list<TKey> mKeys;
-        const size_t mMaxCount;
-        std::unordered_map<TKey, std::shared_ptr<TValue>> mDatas;
-    };
-    template<typename TKey, typename TValue>
-    void DataPool<TKey, TValue>::Clear()
-    {
-        this->mKeys.clear();
-        this->mDatas.clear();
-    }
+	template<typename K, typename V>
+	class LRUCache {
+	public:
+		LRUCache(int capacity) {
+			this->capacity = capacity;
+		}
 
-    template<typename TKey, typename TValue>
-    bool DataPool<TKey, TValue>::Remove(const TKey &key)
-    {
-        auto iter = this->mDatas.find(key);
-        if(iter != this->mDatas.end())
-        {
-            this->RemoveKey(key);
-            this->mDatas.erase(iter);
-            return true;
-        }
-        return false;
-    }
+		std::shared_ptr<V> Get(K key) {
+			auto it = cache.find(key);
+			if (it == cache.end()) {
+				// Key not found in cache
+				return nullptr;
+			}
 
-    template<typename TKey, typename TValue>
-    bool DataPool<TKey, TValue>::RemoveKey(const TKey &key)
-    {
-        auto iter = this->mKeys.begin();
-        for (; iter != this->mKeys.end(); iter++)
-        {
-            if ((*iter) == key)
-            {
-                this->mKeys.erase(iter);
-                return true;
-            }
-        }
-        return false;
-    }
+			cacheList.splice(cacheList.begin(), cacheList, it->second);
+			return it->second->second;
+		}
 
-    template<typename TKey, typename TValue>
-    void DataPool<TKey, TValue>::Add(const TKey &key, std::shared_ptr<TValue> value)
-    {
-        this->RemoveKey(key);
-        this->mDatas[key] = value;
-        this->mKeys.emplace_back(key);
-        while (!this->mKeys.empty() && this->mDatas.size() >= this->mMaxCount)
-        {
-            TKey id = this->mKeys.front();
-            auto iter1 = this->mDatas.find(id);
-            if (iter1 != this->mDatas.end())
-            {
-                this->mDatas.erase(iter1);
-            }
-            this->mKeys.pop_front();
-        }
-    }
-    template<typename TKey, typename TValue>
-    std::shared_ptr<TValue> DataPool<TKey, TValue>::Get(const TKey &key)
-    {
-        auto iter = this->mDatas.find(key);
-        if(iter != this->mDatas.end())
-        {
-            this->RemoveKey(key);
-            this->mKeys.emplace_back(key);
-            return iter->second;
-        }
-        return nullptr;
-    }
-}
+		void Put(K key, std::shared_ptr<V> value) {
+			auto it = cache.find(key);
+			if (it != cache.end()) {
+				it->second->second = value;
+				cacheList.splice(cacheList.begin(), cacheList, it->second);
+				return;
+			}
 
-namespace Pool
-{
-    template<typename T, size_t MAX_COUNT>
-    class ChchePool
-    {
-    public:
-        std::shared_ptr<T> Get()
-        {
-            std::shared_ptr<T> data;
-            if(!this->mDatas.empty())
-            {
-                data = this->mDatas.front();
-                this->mDatas.pop_front();
-                return data;
-            }
-            return std::make_shared<T>();
-        }
-        void Add(std::shared_ptr<T> data)
-        {
-            if(this->mDatas.size() + 1 < this->mMaxCount)
-            {
-                data->Clear();
-                this->mDatas.emplace_back(data);
-            }
-        }
-    private:
-        std::list<std::shared_ptr<T>> mDatas;
-    };
+			cacheList.emplace_front(key, value);
+			cache[key] = cacheList.begin();
+
+			if (cache.size() > capacity) {
+				K keyToRemove = cacheList.back().first;
+				cacheList.pop_back();
+				cache.erase(keyToRemove);
+			}
+		}
+
+	private:
+		int capacity;
+		std::list<std::pair<K, std::shared_ptr<V>>> cacheList;
+		std::unordered_map<K, typename std::list<std::pair<K, std::shared_ptr<V>>>::iterator> cache;
+	};
 }
 
 

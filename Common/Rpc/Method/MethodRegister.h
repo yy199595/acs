@@ -8,7 +8,7 @@
 #include"ServiceMethod.h"
 #include"Lua/Engine/Define.h"
 #include"Http/Method/HttpServiceMethod.h"
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 namespace Tendo
 {
 	class ServiceMethodRegister

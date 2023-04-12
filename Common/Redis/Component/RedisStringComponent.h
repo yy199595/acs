@@ -4,7 +4,7 @@
 
 #ifndef APP_REDISSTRINGCOMPONENT_H
 #define APP_REDISSTRINGCOMPONENT_H
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 
 namespace Tendo
 {

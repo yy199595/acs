@@ -3,7 +3,7 @@
 
 #include"Message/db.pb.h"
 #include"XCode/XCode.h"
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 #include"google/protobuf/util/json_util.h"
 using namespace google::protobuf;
 namespace Tendo

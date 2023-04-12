@@ -92,10 +92,10 @@ namespace Tendo
 			long long now = Helper::Time::NowSecTime();
 			for (; iter != this->mMysqlClients.end(); iter++)
 			{
-				std::shared_ptr<MysqlClient>& mysqClient = iter->second;
-				if (mysqClient->LastRunTime() != 0 && now - mysqClient->LastRunTime() >= this->mConfig.Ping)
+				std::shared_ptr<MysqlClient>& mysqlClient = iter->second;
+				if (mysqlClient->LastRunTime() != 0 && now - mysqlClient->LastRunTime() >= this->mConfig.Ping)
 				{
-					mysqClient->Ping();
+					mysqlClient->Ping();
 #ifdef __DEBUG__
 					CONSOLE_LOG_DEBUG("start ping mysql client : " << iter->first);
 #endif

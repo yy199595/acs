@@ -5,7 +5,7 @@
 #ifndef APP_EVENTMGRCOMPONENT_H
 #define APP_EVENTMGRCOMPONENT_H
 #include<unordered_map>
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 
 namespace Tendo
 {

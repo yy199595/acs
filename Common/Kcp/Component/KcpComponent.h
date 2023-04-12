@@ -8,7 +8,7 @@
 #include<unordered_map>
 #include"Kcp/Common/ikcp.h"
 #include"Network/Tcp/Asio.h"
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 namespace Tendo
 {
 	class KcpComponent : public Component, public ISecondUpdate

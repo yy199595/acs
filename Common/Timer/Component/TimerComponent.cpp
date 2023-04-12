@@ -1,7 +1,7 @@
 ﻿#include"TimerComponent.h"
 #include"Timer/Timer/DelayTimer.h"
 #include"Entity/Unit/App.h"
-#include"lua/Engine/ClassProxyHelper.h"
+#include"Lua/Engine/ClassProxyHelper.h"
 #include"Timer/Lua/Timer.h"
 namespace Tendo
 {

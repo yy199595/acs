@@ -6,7 +6,7 @@
 #include<memory>
 #include<tuple>
 #include<functional>
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 #include"Async/Coroutine/TaskContext.h"
 
 namespace Tendo

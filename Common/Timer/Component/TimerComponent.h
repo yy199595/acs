@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include<unordered_map>
 #include"Timer/Timer/TimeWheelLayer.h"
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 #include"Rpc/Method/MethodProxy.h"
 namespace Tendo
 {

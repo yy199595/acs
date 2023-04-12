@@ -4,7 +4,7 @@
 
 #ifndef APP_LAUNCHCOMPONENT_H
 #define APP_LAUNCHCOMPONENT_H
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 
 namespace Tendo
 {

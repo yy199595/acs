@@ -5,7 +5,7 @@
 #ifndef _ASIOCOMPONENT_H_
 #define _ASIOCOMPONENT_H_
 #include"Rpc/Client/Message.h"
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 namespace Tendo
 {
 	class AsioComponent : public Component, public IRpc<Rpc::Packet>

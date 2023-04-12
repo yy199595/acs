@@ -1,7 +1,7 @@
 #pragma once
 #include<vector>
 #include<unordered_map>
-#include"Core/Component/Component.h"
+#include"Component.h"
 
 namespace Tendo
 {

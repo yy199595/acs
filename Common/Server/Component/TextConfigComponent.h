@@ -5,7 +5,7 @@
 #ifndef APP_TEXTCONFIGCOMPONENT_H
 #define APP_TEXTCONFIGCOMPONENT_H
 #include"Server/Config/TextConfig.h"
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 namespace Tendo
 {
     class TextConfigComponent : public Component, public IHotfix

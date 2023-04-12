@@ -7,7 +7,7 @@
 #include<sstream>
 #include<functional>
 #include<unordered_map>
-#include<Core/Component/Component.h>
+#include"Entity/Component/Component.h"
 using CommandMethod = std::function<void(const std::string &)>;
 
 namespace Tendo

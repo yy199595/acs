@@ -1,6 +1,6 @@
 #include<queue>
 #include"Message/s2s.pb.h"
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 
 namespace Tendo
 {

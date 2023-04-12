@@ -5,7 +5,7 @@
 #ifndef _GATEAGENTCOMPONENT_H_
 #define _GATEAGENTCOMPONENT_H_
 #include"google/protobuf/message.h"
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 using namespace google::protobuf;
 namespace Tendo
 {

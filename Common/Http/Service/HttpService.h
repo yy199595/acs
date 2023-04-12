@@ -4,7 +4,7 @@
 
 #ifndef SENTRY_HTTPSERVICE_H
 #define SENTRY_HTTPSERVICE_H
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 #include"Rpc/Method/MethodRegister.h"
 #include"Server//Config/ServiceConfig.h"
 namespace Json

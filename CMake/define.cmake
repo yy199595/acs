@@ -23,13 +23,9 @@ endif()
 option(__DEBUG__ "debug模式" ON)
 
 option(__DEBUG_STACK__ "开启堆栈打印" ON)
-option(__HTTP_DEBUG_LOG__ "打印http日志" OFF)
-option(__REDIS_DEBUG__ "开始redis调试" OFF)
+
 option(ONLY_MAIN_THREAD "启用单线程模式" OFF)
 option(__NET_ERROR_LOG__ "打印网络层错误" ON)
-option(__ENABLE_REDIS__ "是否使用redis" ON)
-
-option(__ENABLE_MONGODB__ "是否使用mongodb" ON)
 
 set(CMAKE_COMMON_DIR ${PROJECT_SOURCE_DIR})
 
@@ -42,24 +38,9 @@ else()
     message("当前网络为多线程模型")
 endif()
 
-if(__ENABLE_REDIS__)
-    message("启用redis数据库")
-    add_definitions(-D __ENABLE_REDIS__)
-endif()
-
-if(__ENABLE_MONGODB__)
-    message("启用mongodb数据库")
-    add_definitions(-D __ENABLE_MONGODB__)
-endif()
-
 if(__DEBUG__)
     message("当前为debug模式")
     add_definitions(-D __DEBUG__)
-
-    if(__REDIS_DEBUG__)
-        message("打印redis命令到控制台")
-        add_definitions(-D __REDIS_DEBUG__)
-    endif()
 endif()
 
 if(WIN32)

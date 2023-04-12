@@ -10,7 +10,7 @@
 #include"Async/Source/TaskSource.h"
 #include"Redis/Config/RedisConfig.h"
 #include"Async/Coroutine/CoroutineLock.h"
-#include"Core/Component/IComponent.h"
+#include"Entity/Component/IComponent.h"
 
 namespace Tendo
 {

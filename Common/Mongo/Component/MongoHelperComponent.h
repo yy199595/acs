@@ -5,7 +5,7 @@
 #ifndef _MONGOAGENTCOMPONENT_H_
 #define _MONGOAGENTCOMPONENT_H_
 #include"Message/db.pb.h"
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 using namespace google::protobuf;
 namespace Tendo
 {

@@ -97,7 +97,7 @@ namespace Tendo
 				{
 					response = std::make_shared<Http::DataResponse>();
 					response->SetCode(HttpStatus::METHOD_NOT_ALLOWED);
-					LOG_ERROR("[" << address << "] <<" << request->Url() << ">>"
+					LOG_ERROR("[" << address << "] <<" << path << ">>"
 						<< HttpStatusToString(HttpStatus::METHOD_NOT_ALLOWED));
 					break;
 				}
@@ -126,7 +126,7 @@ namespace Tendo
 			}
 			response = std::make_shared<Http::DataResponse>();
 			response->SetCode(HttpStatus::METHOD_NOT_ALLOWED);
-			LOG_ERROR("[" << address << "] <<" << request->Path()
+			LOG_ERROR("[" << address << "] <<" << path
 						  << ">>" << HttpStatusToString(HttpStatus::NOT_FOUND));
 		}
 		while(false);

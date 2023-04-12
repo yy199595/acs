@@ -1,6 +1,6 @@
 #pragma once
 #include<vector>
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 #include"Proto/Message/ProtoMessage.h"
 #include"Telnet/Client/TelnetClientContext.h"
 

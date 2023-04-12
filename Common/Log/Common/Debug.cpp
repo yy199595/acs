@@ -36,13 +36,16 @@ void Debug::Log(Debug::Level color, const std::string &log)
     {
         switch (color)
         {
+			case spdlog::level::err:
             case spdlog::level::critical:
             {
                 std::string trace;
                 if(Debug::Backtrace(trace) > 0)
 				{
-					Debug::Console(color, log + "/n" + trace);
-					logComponent->SaveLog(color, log + "/n" + trace);
+					Debug::Console(color, log);
+					Debug::Console(color, trace);
+					logComponent->SaveLog(color, log);
+					logComponent->SaveLog(color, trace);
 				}
 				else
 				{

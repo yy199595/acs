@@ -80,7 +80,7 @@ namespace Tendo
             std::shared_ptr<Rpc::Packet> packet = std::static_pointer_cast<Rpc::Packet>(data);
             {
 #ifdef ONLY_MAIN_THREAD
-                this->mTcpComponent->OnMessage(address, std::move(packet));
+                this->mComponent->OnSendFailure(address, std::move(packet));
 #else
                 asio::io_service& io = App::Inst()->MainThread();
                 io.post(std::bind(&IRpc<Rpc::Packet>::OnSendFailure, this->mComponent, address, packet));

@@ -2,7 +2,7 @@
 #include<list>
 #include<string>
 #include"Network/Tcp/SocketProxy.h"
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 
 namespace Tendo
 {

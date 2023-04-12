@@ -116,7 +116,7 @@ namespace Tendo
 				this->mTimer = nullptr;
 			}
 #ifdef ONLY_MAIN_THREAD
-			this->mHttpComponent->OnRequest(address, this->mHttpRequest);
+			this->mHttpComponent->OnRequest(this->mHttpRequest);
 #else
 			Asio::Context& io = App::Inst()->MainThread();
 			io.post(std::bind(&HttpListenComponent::OnRequest, this->mHttpComponent, this->mHttpRequest));

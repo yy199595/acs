@@ -2,7 +2,7 @@
 
 #include<memory>
 #include<vector>
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 #include<google/protobuf/message.h>
 using namespace google::protobuf;
 namespace Rpc

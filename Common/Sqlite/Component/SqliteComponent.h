@@ -2,7 +2,7 @@
 #include<unordered_map>
 #include"google/protobuf/message.h"
 #include"Util/Guid/NumberBuilder.h"
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 namespace Tendo
 {
 	class SqlHelper;

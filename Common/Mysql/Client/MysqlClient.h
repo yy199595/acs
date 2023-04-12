@@ -10,7 +10,7 @@
 #include"Network/Tcp/TcpContext.h"
 #include"Core/Queue/ThreadQueue.h"
 #include"Mysql/Config/MysqlConfig.h"
-#include"Core/Component/IComponent.h"
+#include"Entity/Component/IComponent.h"
 
 namespace Tendo
 {

@@ -3,7 +3,7 @@
 #include<memory>
 #include<unordered_map>
 #include"Lua/Module/LuaModule.h"
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 struct lua_State;
 namespace Tendo
 {

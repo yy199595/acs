@@ -1,5 +1,5 @@
 #pragma once
-#include"Core/Component/ComponentFactory.h"
+#include"Entity/Component/ComponentFactory.h"
 namespace Tendo
 {
     class Unit

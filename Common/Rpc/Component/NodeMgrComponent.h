@@ -8,7 +8,7 @@
 #include<string>
 #include<unordered_map>
 #include"Entity/Unit/LocationUnit.h"
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 
 namespace Tendo
 {

@@ -1,6 +1,6 @@
 #include"Unit.h"
 #include"App.h"
-#include"Core/Component/Component.h"
+#include"Entity/Component/Component.h"
 namespace Tendo
 {
 	Unit::Unit(long long id) : mUnitId(id)
