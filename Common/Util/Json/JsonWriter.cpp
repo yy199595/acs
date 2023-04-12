@@ -31,20 +31,6 @@ namespace Json
 		return *this;
 	}
 
-	Writer& Writer::Add(Json::End type)
-	{
-		switch(type)
-		{
-		case End::EndObject:
-			this->mWriter.EndObject();
-			break;
-		case End::EndArray:
-			this->mWriter.EndArray();
-			break;
-		}
-		return *this;
-	}
-
 	Writer& Writer::Add(std::vector<int>& value)
 	{
 		this->mWriter.StartArray();
@@ -74,7 +60,7 @@ namespace Json
 		{
 			this->mWriter.String(val.c_str(), val.size());
 		}
-		this->Add(Json::End::EndArray);
+		this->mWriter.EndArray();
 		return *this;
 	}
 }

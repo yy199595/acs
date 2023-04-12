@@ -2,7 +2,7 @@
 #ifdef __ENABLE_MYSQL__
 
 #include"MysqlDB.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include"Util/Proto/ProtoHelper.h"
 #include"Mysql/Client/MysqlMessage.h"
 #include"Proto/Component/ProtoComponent.h"

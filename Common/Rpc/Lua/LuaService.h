@@ -4,7 +4,7 @@
 
 #ifndef _SERVICE_H_
 #define _SERVICE_H_
-#include"Script/Lua/LuaInclude.h"
+#include"Lua/Engine/Define.h"
 namespace Lua
 {
 	namespace Service

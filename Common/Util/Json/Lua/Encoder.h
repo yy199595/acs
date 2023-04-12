@@ -5,10 +5,11 @@
 #ifndef SERVER_ENCODER_H
 #define SERVER_ENCODER_H
 
+#include <algorithm>
 #include"luax.hpp"
 #include"values.hpp"
 #include"rapidjson/document.h"
-#include"Script/Lua/LuaInclude.h"
+#include"Lua/Engine/Define.h"
 
 
 #include"rapidjson/document.h"
@@ -134,7 +135,7 @@ private:
 			{
 				size_t len = 0;
 				const char* key = lua_tolstring(L, -2, &len);
-				keys.push_back(Key(key, static_cast<SizeType>(len)));
+				keys.emplace_back(key, static_cast<SizeType>(len));
 			}
 
 			// pop value, leaving original key

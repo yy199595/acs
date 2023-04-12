@@ -4,11 +4,9 @@
 #include"Util/String/StringHelper.h"
 #include"Client/TcpRpcClientContext.h"
 #include"Lua/Client.h"
-#include"Proto/Lua/Message.h"
-#include"Entity/App/App.h"
-#include"Script/Lua/ClassProxyHelper.h"
+#include"Lua/Engine/ClassProxyHelper.h"
 #include"google/protobuf/util/json_util.h"
-#include"Script/Component/LuaScriptComponent.h"
+#include"Lua/Component/LuaScriptComponent.h"
 #include"Server/Component/ThreadComponent.h"
 #include"Proto/Component/ProtoComponent.h"
 namespace Client

@@ -4,11 +4,11 @@
 
 #include"Client.h"
 #include"XCode/XCode.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include"Server/Config/ServiceConfig.h"
 #include"Util/String/StringHelper.h"
 #include"Timer/Timer/ElapsedTimer.h"
-#include"Script/Lua/LuaParameter.h"
+#include"Lua/Engine/LuaParameter.h"
 #include"Component/ClientComponent.h"
 #include"Proto/Component/ProtoComponent.h"
 using namespace Client;
@@ -18,7 +18,7 @@ namespace Lua
 	int ClientEx::Call(lua_State* lua)
 	{
 		lua_pushthread(lua);
-		int session = luaL_checkinteger(lua, 1);
+		int session = (int)luaL_checkinteger(lua, 1);
         ClientComponent* clientComponent = App::Inst()->GetComponent<ClientComponent>();
         if(clientComponent == nullptr)
         {

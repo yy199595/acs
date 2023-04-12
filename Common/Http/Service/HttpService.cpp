@@ -2,8 +2,8 @@
 // Created by yjz on 2022/1/23.
 //
 #include"HttpService.h"
-#include"Script/Module/LuaModule.h"
-#include"Script/Component/LuaScriptComponent.h"
+#include"Lua/Module/LuaModule.h"
+#include"Lua/Component/LuaScriptComponent.h"
 #include"Http/Method/LuaHttpServiceMethod.h"
 namespace Tendo
 {

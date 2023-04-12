@@ -1,7 +1,7 @@
 ﻿#include "LuaScriptComponent.h"
-#include "Script/Lua/luadebug.h"
+#include "Lua/Engine/luadebug.h"
 
-#include "Entity/App/App.h"
+#include "Entity/Unit/App.h"
 #include "Util/Md5/MD5.h"
 #include "Util/Guid/Guid.h"
 #include "Util/File/FileHelper.h"
@@ -18,9 +18,9 @@
 #include "Server/Config/ServiceConfig.h"
 #include "Rpc/Lua/LuaService.h"
 #include "Util/Json/JsonWriter.h"
-#include "Script/Lua/Function.h"
-#include "Script/Module/LuaModule.h"
-#include "Script/Lua/ClassProxyHelper.h"
+#include "Lua/Engine/Function.h"
+#include "Lua/Module/LuaModule.h"
+#include "Lua/Engine/ClassProxyHelper.h"
 #include "Server/Component/TextConfigComponent.h"
 
 using namespace Lua;

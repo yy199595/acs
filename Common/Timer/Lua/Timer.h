@@ -4,7 +4,7 @@
 
 #ifndef _TIMER_H_
 #define _TIMER_H_
-#include"Script/Lua/LuaInclude.h"
+#include"Lua/Engine/Define.h"
 namespace Lua
 {
 	namespace Timer

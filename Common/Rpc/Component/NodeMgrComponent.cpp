@@ -7,7 +7,7 @@
 #include"Registry/Service/Registry.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include"Async/Component/AsyncMgrComponent.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include"Server/Config/CodeConfig.h"
 namespace Tendo
 {

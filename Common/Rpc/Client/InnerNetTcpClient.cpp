@@ -1,48 +1,48 @@
 ﻿
-#include"InnerNetClient.h"
+#include"InnerNetTcpClient.h"
 
 #include"XCode/XCode.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include"Rpc/Client/Rpc.h"
 #include"Util/Guid/Guid.h"
 #include"Core/System/System.h"
 namespace Tendo
 {
 
-	InnerNetClient::InnerNetClient(IRpc<Rpc::Packet>* component, std::shared_ptr<Tcp::SocketProxy> socket)
+	InnerNetTcpClient::InnerNetTcpClient(IRpc<Rpc::Packet>* component, std::shared_ptr<Tcp::SocketProxy> socket)
 		: TcpContext(std::move(socket), 1024 * 1024), mIsClient(false), mComponent(component)
 	{
         this->mState = Tcp::DecodeState::Head;
 	}
 
-	InnerNetClient::InnerNetClient(IRpc<Rpc::Packet> * component,
+	InnerNetTcpClient::InnerNetTcpClient(IRpc<Rpc::Packet> * component,
                                    std::shared_ptr<Tcp::SocketProxy> socket, AuthInfo info)
 		: TcpContext(std::move(socket), 1024 * 1024), mIsClient(true), mAuthInfo(std::move(info)), mComponent(component)
     {
         this->mState = Tcp::DecodeState::Head;
     }
 
-	void InnerNetClient::StartClose()
+	void InnerNetTcpClient::StartClose()
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->CloseSocket(XCode::NetActiveShutdown);
 #else
         Asio::Context & t = this->mSocket->GetThread();
-		t.post(std::bind(&InnerNetClient::CloseSocket, this, XCode::NetActiveShutdown));
+		t.post(std::bind(&InnerNetTcpClient::CloseSocket, this, XCode::NetActiveShutdown));
 #endif
 	}
 
-    void InnerNetClient::Send(std::shared_ptr<Rpc::Packet> message)
+    void InnerNetTcpClient::Send(std::shared_ptr<Rpc::Packet> message)
     {
 #ifdef ONLY_MAIN_THREAD
         this->Write(message);
 #else
         asio::io_service &t = this->mSocket->GetThread();
-        t.post(std::bind(&InnerNetClient::Write, this, message));
+        t.post(std::bind(&InnerNetTcpClient::Write, this, message));
 #endif
     }
 
-    void InnerNetClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
+    void InnerNetTcpClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
     {
 #ifdef __DEBUG__
         if (code && this->mConnectCount > 0)
@@ -64,7 +64,7 @@ namespace Tendo
         }
     }
 
-    void InnerNetClient::Update()
+    void InnerNetTcpClient::Update()
     {
         if (Helper::Time::NowSecTime() - this->GetLastOperTime() >= 30) // 30s没动静
         {
@@ -72,7 +72,7 @@ namespace Tendo
         }
     }
 
-    void InnerNetClient::CloseSocket(int code)
+    void InnerNetTcpClient::CloseSocket(int code)
     {
         const std::string& address = this->mSocket->GetAddress();
         while (std::shared_ptr<ProtoMessage> data = this->PopMessage())
@@ -100,7 +100,7 @@ namespace Tendo
 #endif
     }
 
-    void InnerNetClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t size)
+    void InnerNetTcpClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t size)
     {
         if (code)
         {
@@ -134,7 +134,7 @@ namespace Tendo
             {
                 this->mState = Tcp::DecodeState::Head;
                 const std::string& address = this->mSocket->GetAddress();
-                if (!this->mMessage->Parse(address,readStream, size))
+                if (!this->mMessage->Parse(address, readStream, size))
                 {
                     this->CloseSocket(XCode::UnKnowPacket);
                     return;
@@ -151,13 +151,13 @@ namespace Tendo
         }
     }
 
-	void InnerNetClient::StartReceive()
+	void InnerNetTcpClient::StartReceive()
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveMessage(RPC_PACK_HEAD_LEN);
 #else
         Asio::Context & t = this->mSocket->GetThread();
-        t.post(std::bind(&InnerNetClient::ReceiveMessage, this, RPC_PACK_HEAD_LEN));
+        t.post(std::bind(&InnerNetTcpClient::ReceiveMessage, this, RPC_PACK_HEAD_LEN));
 #endif
 #ifdef __DEBUG__
         const std::string& address = this->mSocket->GetAddress();
@@ -166,7 +166,7 @@ namespace Tendo
 
 	}
 
-	void InnerNetClient::OnConnect(const asio::error_code& error, int count)
+	void InnerNetTcpClient::OnConnect(const asio::error_code& error, int count)
 	{
         if (this->mTimer != nullptr)
         {
@@ -188,7 +188,7 @@ namespace Tendo
 			this->mSocket->Close();
 			Asio::Context & context = this->mSocket->GetThread();
 			this->mTimer = std::make_unique<asio::steady_timer>(context, std::chrono::seconds(5));
-			this->mTimer->async_wait(std::bind(&InnerNetClient::Connect, this->shared_from_this()));
+			this->mTimer->async_wait(std::bind(&InnerNetTcpClient::Connect, this->shared_from_this()));
 			return;
 		}
     

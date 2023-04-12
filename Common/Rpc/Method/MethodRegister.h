@@ -6,7 +6,7 @@
 #define SERVER_METHODREGISTER_H
 
 #include"ServiceMethod.h"
-#include"Script/Lua/LuaInclude.h"
+#include"Lua/Engine/Define.h"
 #include"Http/Method/HttpServiceMethod.h"
 #include"Core/Component/Component.h"
 namespace Tendo

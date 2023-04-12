@@ -3,8 +3,8 @@
 //
 
 #include"LuaGate.h"
-#include"Entity/App/App.h"
-#include"Script/Lua/UserDataParameter.h"
+#include"Entity/Unit/App.h"
+#include"Lua/Engine/UserDataParameter.h"
 #include"Gate/Component/GateComponent.h"
 using namespace Tendo;
 using namespace Lua::UserDataParameter;

@@ -4,8 +4,7 @@
 
 #ifndef SERVER_CLIENT_H
 #define SERVER_CLIENT_H
-#include"Script/Lua/LuaInclude.h"
-
+#include"Lua/Engine/Define.h"
 namespace Lua
 {
 	namespace ClientEx

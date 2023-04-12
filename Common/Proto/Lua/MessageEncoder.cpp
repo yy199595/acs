@@ -2,6 +2,7 @@
 // Created by yjz on 2022/6/3.
 //
 #include"Message.h"
+#include "Lua/Engine/LuaInclude.h"
 
 namespace Tendo
 {
@@ -141,7 +142,7 @@ namespace Tendo
 					{
 						return false;
 					}
-					static_cast<Any*>(submessage)->PackFrom(*message);
+					dynamic_cast<Any*>(submessage)->PackFrom(*message);
 					return true;
 				}
 
@@ -204,7 +205,7 @@ namespace Tendo
                 {
                     return false;
                 }
-                static_cast<Any*>(submessage)->PackFrom(*message);
+                dynamic_cast<Any*>(submessage)->PackFrom(*message);
                 return true;
             }
 			if(!this->EncoddeMessage(*submessage, field->message_type(), index))

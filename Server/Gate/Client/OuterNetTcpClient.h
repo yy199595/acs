@@ -11,11 +11,11 @@ namespace Tendo
 {
     // 网关session
 	class OuterNetComponent;
- 	class OuterNetClient : public Tcp::TcpContext
+ 	class OuterNetTcpClient : public Tcp::TcpContext
 	{
 	 public:
-		OuterNetClient(std::shared_ptr<Tcp::SocketProxy> socket, OuterNetComponent* component);
-		~OuterNetClient() final = default;
+		OuterNetTcpClient(std::shared_ptr<Tcp::SocketProxy> socket, OuterNetComponent* component);
+		~OuterNetTcpClient() final = default;
 	 public:
 		void StartClose();
 		void StartReceive(int second = 0);

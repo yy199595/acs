@@ -4,7 +4,7 @@
 
 #ifndef APP_LUAGATE_H
 #define APP_LUAGATE_H
-#include"Script/Lua/LuaInclude.h"
+#include"Lua/Engine/Define.h"
 namespace Lua
 {
     namespace Gate

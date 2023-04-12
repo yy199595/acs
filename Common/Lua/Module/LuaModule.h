@@ -4,8 +4,7 @@
 
 #ifndef _LUAMODULE_H_
 #define _LUAMODULE_H_
-#include"Script/Lua/LuaInclude.h"
-#include"Script/Lua/Function.h"
+#include"Lua/Engine/Function.h"
 #include"Core/Component/IComponent.h"
 namespace Lua
 {

@@ -3,10 +3,10 @@
 //
 
 #include"Gate.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include"Util/Md5/MD5.h"
 #include"Common/Service/User.h"
-#include"Gate/Client/OuterNetClient.h"
+#include"Gate/Client/OuterNetTcpClient.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include"Server/Config/CodeConfig.h"
 #include"Gate/Component/OuterNetComponent.h"

@@ -481,7 +481,7 @@ namespace Bson
                         json.Add(key);
                         this->WriterToJson(obj.getField(key), json);
                     }
-                    json.Add(Json::End::EndObject);
+                    json.EndObject();
                 }
                     break;
                 case _bson::BSONType::Array:
@@ -494,7 +494,7 @@ namespace Bson
                     {
                         this->WriterToJson(obj.getField(key), json);
                     }
-                    json.Add(Json::End::EndArray);
+                    json.EndArray();
                 }
                     break;
                 case _bson::BSONType::Timestamp:

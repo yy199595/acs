@@ -1,10 +1,10 @@
 ﻿#include"LuaPhysicalRpcService.h"
-#include"Script/Lua/Function.h"
-#include"Script/Module/LuaModule.h"
+#include"Lua/Engine/Function.h"
+#include"Lua/Module/LuaModule.h"
 #include"Rpc/Lua/LuaServiceMethod.h"
 #include"Server/Config/ServiceConfig.h"
 #include"Rpc/Method/MethodRegister.h"
-#include"Script/Component/LuaScriptComponent.h"
+#include"Lua/Component/LuaScriptComponent.h"
 namespace Tendo
 {
 	LuaPhysicalRpcService::LuaPhysicalRpcService()

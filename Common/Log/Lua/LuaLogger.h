@@ -1,7 +1,6 @@
 #pragma once
-
-#include "Script/Lua/LuaInclude.h"
-
+#include<string>
+#include"Lua/Engine/Define.h"
 namespace Lua
 {
 	namespace Log

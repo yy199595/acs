@@ -55,14 +55,6 @@ namespace Lua
 		return true;
 	}
 
-	bool Table::Serialization(Message& message)
-	{
-		message.Clear();
-		std::string mMessageBuffer;
-		this->Serialization(mMessageBuffer);
-		return JsonStringToMessage(mMessageBuffer, &message).ok();
-	}
-
 	std::string Table::ToJson()
 	{
 		if(Lua::Function::Get(this->mLuaEnv, "Json", "ToString"))

@@ -3,7 +3,7 @@
 //
 
 #include"LuaRedis.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include"Util/Json/Lua/Json.h"
 #include"Redis/Client/RedisDefine.h"
 #include"Proto/Component/ProtoComponent.h"

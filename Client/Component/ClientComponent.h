@@ -26,6 +26,7 @@ namespace Client
     private:
         TaskSource<std::shared_ptr<Rpc::Packet>> mTask;
     };
+	//typedef TaskSource<std::shared_ptr<Rpc::Packet>> ClientTask;
 }
 
 namespace Tendo

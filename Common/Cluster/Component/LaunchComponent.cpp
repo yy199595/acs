@@ -3,7 +3,7 @@
 //
 
 #include"LaunchComponent.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include"Util/File/FileHelper.h"
 #include"Core/System/System.h"
 #include"Http/Component/HttpComponent.h"
@@ -12,7 +12,7 @@
 #include"Rpc/Service/LuaPhysicalRpcService.h"
 #include"Http//Service/LuaPhysicalHttpService.h"
 #include"Rpc/Component/NodeMgrComponent.h"
-#include"Script/Component/LuaScriptComponent.h"
+#include"Lua/Component/LuaScriptComponent.h"
 namespace Tendo
 {
     bool LaunchComponent::Awake()

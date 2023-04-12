@@ -5,7 +5,7 @@
 
 #include"Util/File/FileHelper.h"
 #include"Util/String/StringHelper.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 namespace Tendo
 {
 	TcpRedisClient::TcpRedisClient(std::shared_ptr<Tcp::SocketProxy> socket,
@@ -26,11 +26,6 @@ namespace Tendo
 		t.post(std::bind(&TcpRedisClient::Write, this, command));
 #endif
         //CONSOLE_LOG_INFO("async command = " << command->ToJson());
-	}
-
-	long long TcpRedisClient::Call(const std::shared_ptr<RedisRequest>& command)
-	{
-		return 0;
 	}
 
 	void TcpRedisClient::OnReceiveLine(const Asio::Code & code, std::istream & is, size_t size)

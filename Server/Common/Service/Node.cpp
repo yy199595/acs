@@ -3,7 +3,7 @@
 //
 
 #include"Node.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include"Registry/Service/Registry.h"
 #include"Server/Config/CodeConfig.h"
 #include"Cluster/Config/ClusterConfig.h"
@@ -165,7 +165,7 @@ namespace Tendo
 			document.Add("fps").Add((int)this->mApp->GetFps());
 			document.Add("name").Add(ServerConfig::Inst()->Name());
             document.Add("cpu").Add(std::thread::hardware_concurrency());
-            document.Add(Json::End::EndObject);
+            document.EndObject();
         }
         std::vector<Component *> components;
         this->mApp->GetComponents(components);
@@ -182,7 +182,7 @@ namespace Tendo
 				}
                 document.BeginObject(key);
                 serverRecord->OnRecord(document);
-                document.Add(Json::End::EndObject);				
+                document.EndObject();
 			}
 		}
 		document.WriterStream(response.mutable_str());

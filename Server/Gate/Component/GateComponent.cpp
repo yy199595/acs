@@ -3,11 +3,11 @@
 //
 
 #include"GateComponent.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include"Gate/Service/Gate.h"
 #include"Gate/Lua/LuaGate.h"
 #include"Cluster/Config/ClusterConfig.h"
-#include"Script/Lua/ClassProxyHelper.h"
+#include"Lua/Engine/ClassProxyHelper.h"
 #include"Rpc/Component/NodeMgrComponent.h"
 #include"Rpc/Component/InnerNetComponent.h"
 #include"Core/Component/ComponentFactory.h"

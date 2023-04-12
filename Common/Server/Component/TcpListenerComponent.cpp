@@ -3,7 +3,7 @@
 #include"Rpc/Method/MethodProxy.h"
 #include"Server/Config/ServerConfig.h"
 #include"Server/Component/ThreadComponent.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include"Network/Tcp/Asio.h"
 namespace Tendo
 {

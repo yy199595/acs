@@ -4,7 +4,7 @@
 
 #ifndef SERVER_MESSAGE_H
 #define SERVER_MESSAGE_H
-#include"Script/Lua/LuaInclude.h"
+#include"Lua/Engine/Define.h"
 #include"Proto/Component/ProtoComponent.h"
 namespace Tendo
 {
@@ -32,7 +32,7 @@ namespace Tendo
 	class MessageEncoder
 	{
 	 public:
-		MessageEncoder(lua_State * lua);
+		explicit MessageEncoder(lua_State * lua);
 	 public:
 		bool Encode(std::shared_ptr<Message> proto, int index);
 	 private:

@@ -16,7 +16,7 @@ namespace Rpc
 namespace Tendo
 {
 
-	class OuterNetClient;
+	class OuterNetTcpClient;
     class OuterNetComponent : public TcpListenerComponent, public IRpc<Rpc::Packet>,
 							  public IComplete, public IServerRecord, public IFrameUpdate, public IDestroy
 	{
@@ -56,10 +56,10 @@ namespace Tendo
 #endif
         class InnerNetComponent * mInnerNetComponent;
         std::queue<std::shared_ptr<Rpc::Packet>> mMessages;
-        std::queue<std::shared_ptr<OuterNetClient>> mClientPools;
+        std::queue<std::shared_ptr<OuterNetTcpClient>> mClientPools;
 		std::unordered_map<std::string, long long> mAddressUserMap; //验证过的客户端
 		std::unordered_map<long long, std::string> mUserAddressMap; //验证过的客户端
-		std::unordered_map<std::string, std::shared_ptr<OuterNetClient>> mGateClientMap;
+		std::unordered_map<std::string, std::shared_ptr<OuterNetTcpClient>> mGateClientMap;
 	};
 }
 

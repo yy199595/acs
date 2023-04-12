@@ -16,14 +16,14 @@ namespace Tendo
 }
 namespace Tendo
 {
-	class InnerNetClient : public Tcp::TcpContext
+	class InnerNetTcpClient : public Tcp::TcpContext
 	{
 	 public:
-		explicit InnerNetClient(IRpc<Rpc::Packet> * component,
+		explicit InnerNetTcpClient(IRpc<Rpc::Packet> * component,
 			std::shared_ptr<Tcp::SocketProxy> socket);
-		explicit InnerNetClient(IRpc<Rpc::Packet> * component,
+		explicit InnerNetTcpClient(IRpc<Rpc::Packet> * component,
 			std::shared_ptr<Tcp::SocketProxy> socket, AuthInfo info);
-		~InnerNetClient() override = default;
+		~InnerNetTcpClient() override = default;
 	 public:
 		void StartClose();
 		void StartReceive();

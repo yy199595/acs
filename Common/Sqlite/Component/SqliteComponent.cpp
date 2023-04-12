@@ -5,7 +5,7 @@
 #include"Util/String/StringHelper.h"
 #include"Util/Sql/SqlHelper.h"
 #include"Sqlite/Lua/LuaSqlite.h"
-#include"Script/Lua/ClassProxyHelper.h"
+#include"Lua/Engine/ClassProxyHelper.h"
 namespace Tendo
 {
 	bool SqliteComponent::Awake()

@@ -14,7 +14,7 @@
 #include<sstream>
 #include<vector>
 #include"Util/Json/JsonWriter.h"
-#include"Script/Lua/LuaInclude.h"
+#include"Lua/Engine/Define.h"
 #include"google/protobuf/message.h"
 using namespace google::protobuf;
 namespace Mysql

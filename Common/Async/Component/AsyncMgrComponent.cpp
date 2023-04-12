@@ -1,5 +1,5 @@
 ﻿#include"AsyncMgrComponent.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include"Timer/Component/TimerComponent.h"
 #ifdef __DEBUG__
 #include"Util/Time/TimeHelper.h"
@@ -171,12 +171,17 @@ namespace Tendo
                 LOG_FATAL("not find task context : " << contextId);
                 continue;
             }
-            if (logicCoroutine->mState == CorState::Ready
-                || logicCoroutine->mState == CorState::Suspend)
-            {
-                this->mRunContext = logicCoroutine;
-                this->ResumeContext(logicCoroutine);
-            }
+			switch(logicCoroutine->mState)
+			{
+				case CorState::Ready:
+				case CorState::Suspend:
+					this->mRunContext = logicCoroutine;
+					this->ResumeContext(logicCoroutine);
+					break;
+				default:
+					assert(false);
+					break;
+			}
             this->mRunContext = nullptr;
             this->mResumeContexts.pop();
         }

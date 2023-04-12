@@ -5,7 +5,7 @@
 #ifndef SERVER_LUAWAITTASKSOURCE_H
 #define SERVER_LUAWAITTASKSOURCE_H
 
-#include"Script/Lua/LuaParameter.h"
+#include"Lua/Engine/LuaParameter.h"
 #include"Async/Lua/LuaCoroutine.h"
 #include"google/protobuf/message.h"
 using namespace google::protobuf;

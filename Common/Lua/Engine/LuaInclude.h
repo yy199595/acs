@@ -1,15 +1,10 @@
 #pragma once
 
-#include <assert.h>
+#include <cassert>
 #include <iostream>
 #include <memory>
-#include <string.h>
-
-extern "C" {
-#include <lauxlib.h>
-#include <lua.h>
-#include <lualib.h>
-};
+#include <cstring>
+#include "Define.h"
 
 #include "ClassNameProxy.h"
 #include "ParameterType.h"
@@ -18,10 +13,10 @@ namespace Lua
 {
 	inline std::string FormatFileAndLine(const char* file, const int line)
 	{
-		const size_t lenght = strlen(file);
+		int length = (int)strlen(file);
 		const char* fileName = nullptr;
 
-		for (size_t index = lenght - 1; index >= 0; index--)
+		for (int index = length - 1; index >= 0; index--)
 		{
 #ifdef _WIN32
 			if (file[index] == '\\')
@@ -39,7 +34,7 @@ namespace Lua
 		size_t size = sprintf_s(buffer, "%s:%d", fileName, line);
 #else
 		size_t size = sprintf(buffer, "%s:%d", fileName, line);
-#endif// _MSG
+#endif
 		return std::string(buffer, size);
 	}
 
@@ -257,9 +252,3 @@ namespace Lua
 		std::shared_ptr<T> mNativePtr;
 	};
 }
-
-class ILuaWrite
-{
-public:
-	virtual int WriteToLua(lua_State* lua) = 0;
-};

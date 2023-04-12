@@ -3,9 +3,9 @@
 //
 
 #include"LuaPhysicalHttpService.h"
-#include"Script/Lua/Function.h"
-#include"Script/Module/LuaModule.h"
-#include"Script/Component/LuaScriptComponent.h"
+#include"Lua/Engine/Function.h"
+#include"Lua/Module/LuaModule.h"
+#include"Lua/Component/LuaScriptComponent.h"
 namespace Tendo
 {
 	LuaPhysicalHttpService::LuaPhysicalHttpService()

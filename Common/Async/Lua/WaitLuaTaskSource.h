@@ -4,7 +4,7 @@
 
 #ifndef SERVER_WAITLUATASKSOURCE_H
 #define SERVER_WAITLUATASKSOURCE_H
-#include"Script/Lua/LuaParameter.h"
+#include"Lua/Engine/LuaParameter.h"
 #include"Async/Source/TaskSource.h"
 namespace Tendo
 {
@@ -13,7 +13,7 @@ namespace Tendo
 	{
 	 public:
 		explicit WaitLuaTaskSource();
-		~WaitLuaTaskSource();
+		~WaitLuaTaskSource() final;
 	public:
 		template<typename T> T Await();
 		static int SetResult(lua_State * lua);

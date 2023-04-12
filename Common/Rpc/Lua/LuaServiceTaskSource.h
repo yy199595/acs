@@ -6,7 +6,7 @@
 #define GAMEKEEPER_LUATASKSOURCE_H
 #include"Async/Source/TaskSource.h"
 #include"Http/Common//HttpResponse.h"
-#include"Script/Lua/LuaInclude.h"
+#include"Lua/Engine/Define.h"
 #include"google/protobuf/message.h"
 using namespace google::protobuf;
 namespace Tendo

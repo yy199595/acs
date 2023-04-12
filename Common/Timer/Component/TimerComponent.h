@@ -21,7 +21,7 @@ namespace Tendo
 				std::forward<F>(f), o, std::forward<Args>(args)...);
 			return this->AddTimer(ms, methodProxy);
 		}
-		long long AddTimer(std::shared_ptr<TimerBase> timer);
+		long long AddTimer(const std::shared_ptr<TimerBase>& timer);
 		long long AddTimer(unsigned int ms, StaticMethod* func);
 
 	 protected:

@@ -3,7 +3,7 @@
 #include<string>
 #include<vector>
 #include"RedisAny.h"
-#include"Script/Lua/LuaInclude.h"
+#include"Lua/Engine/Define.h"
 #include"Util/Json/JsonWriter.h"
 #include"google/protobuf/message.h"
 #include"Rpc/Async/RpcTaskSource.h"
@@ -44,8 +44,8 @@ namespace Tendo
  	class RedisRequest : public Tcp::ProtoMessage, public std::enable_shared_from_this<RedisRequest>
     {
     public:
-        RedisRequest(const std::string & cmd);
-		~RedisRequest() { }
+        explicit RedisRequest(const std::string & cmd);
+		~RedisRequest() = default;
     public:
 		std::string ToJson();
 		int Serialize(std::ostream &os) final;
@@ -69,7 +69,7 @@ namespace Tendo
         int GetTaskId() const { return this->mTaskId;}
         const std::string & GetCommand() const { return this->mCommand;}
 	private:
-        static void Encode(std::shared_ptr<RedisRequest> self) {}
+        static void Encode(const std::shared_ptr<RedisRequest>& self) {}
         template<typename T, typename... Args>
         static void Encode(std::shared_ptr<RedisRequest> self, const T &t, Args... args)
         {
@@ -144,8 +144,8 @@ namespace Tendo
     class RedisTask : public IRpcTask<RedisResponse>
     {
     public:
-        RedisTask(int id);
-        ~RedisTask() = default;
+        explicit RedisTask(int id);
+        ~RedisTask() final = default;
     public:       
         void OnResponse(std::shared_ptr<RedisResponse> response) final;
         std::shared_ptr<RedisResponse> Await() { return this->mTask.Await(); }
@@ -157,7 +157,7 @@ namespace Tendo
     {
     public:
         LuaRedisTask(lua_State * lua, int id);
-        ~LuaRedisTask();
+        ~LuaRedisTask() final;
     public:
         int Await();
         void OnResponse(std::shared_ptr<RedisResponse> response) final;

@@ -3,12 +3,12 @@
 //
 
 #include"LuaHttpServiceMethod.h"
-#include"Script/Lua/Function.h"
+#include"Lua/Engine/Function.h"
 #include"Util/Json/Lua/Json.h"
-#include"Script//Module/LuaModule.h"
+#include"Lua/Module/LuaModule.h"
 #include"Rpc/Lua/LuaServiceTaskSource.h"
 #include"Proto/Component/ProtoComponent.h"
-#include"Script/Component/LuaScriptComponent.h"
+#include"Lua/Component/LuaScriptComponent.h"
 
 namespace Tendo
 {

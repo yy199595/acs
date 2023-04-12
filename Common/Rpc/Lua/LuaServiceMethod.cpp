@@ -1,11 +1,11 @@
 #include"LuaServiceMethod.h"
-#include"Script/Lua/Function.h"
-#include"Entity/App/App.h"
-#include"Script/Module/LuaModule.h"
+#include"Lua/Engine/Function.h"
+#include"Entity/Unit/App.h"
+#include"Lua/Module/LuaModule.h"
 #include"Server/Config/ServiceConfig.h"
 #include"Rpc/Lua/LuaServiceTaskSource.h"
 #include"Proto/Component/ProtoComponent.h"
-#include"Script/Component/LuaScriptComponent.h"
+#include"Lua/Component/LuaScriptComponent.h"
 #include"google/protobuf/util/json_util.h"
 namespace Tendo
 {

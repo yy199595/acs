@@ -5,7 +5,7 @@
 #ifdef __ENABLE_MYSQL__
 
 #include"LuaMysqlTask.h"
-#include"Script/Lua/LuaInclude.h"
+#include"Lua/Engine/Define.h"
 #include"Util/Json/Lua/Json.h"
 
 namespace Tendo

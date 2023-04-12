@@ -2,14 +2,14 @@
 // Created by mac on 2022/4/6.
 //
 #include"PhysicalRpcService.h"
-#include "Rpc/Method/MethodRegister.h"
+#include"Rpc/Method/MethodRegister.h"
 
 
-#include"Entity/App/App.h"
-#include"Script/Module/LuaModule.h"
+#include"Entity/Unit/App.h"
+#include"Lua/Module/LuaModule.h"
 #include"Server/Config/ServiceConfig.h"
 #include"Rpc/Lua/LuaServiceMethod.h"
-#include"Script/Component/LuaScriptComponent.h"
+#include"Lua/Component/LuaScriptComponent.h"
 namespace Tendo
 {
     extern std::string GET_FUNC_NAME(const std::string& fullName)

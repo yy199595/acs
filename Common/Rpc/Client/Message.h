@@ -13,6 +13,11 @@
 
 namespace Rpc
 {
+	namespace Net
+	{
+		constexpr int TCP = 1;
+		constexpr int HTTP = 2;
+	}
     class Head : protected std::unordered_map<std::string, std::string>
     {
     public:
@@ -61,12 +66,15 @@ namespace Rpc
 		inline const Head & ConstHead() const { return this->mHead; }
 
         inline void SetType(int type) { this->mType = type; }
-
         inline void SetProto(int proto) { this->mProto = proto; }
 
         inline int GetType() const { return this->mType; }
-
         inline int GetProto() const { return this->mProto; }
+
+		inline int GetNet() const { return this->mNet; }
+		inline int SetNet(int net) { return this->mNet = net; }
+	public:
+
 
         inline void Clear() { this->mBody.clear();}
         void SetContent(const std::string & content);
@@ -86,7 +94,8 @@ namespace Rpc
 
     private:
         int mLen;
-        Head mHead;
+		int mNet;
+		Head mHead;
         int mType;
         int mProto;
         std::string mFrom;

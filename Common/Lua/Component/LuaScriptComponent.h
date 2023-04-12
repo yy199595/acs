@@ -2,7 +2,7 @@
 #include<set>
 #include<memory>
 #include<unordered_map>
-#include"Script/Module/LuaModule.h"
+#include"Lua/Module/LuaModule.h"
 #include"Core/Component/Component.h"
 struct lua_State;
 namespace Tendo
@@ -12,7 +12,7 @@ namespace Tendo
 							   public IServerRecord, public IDestroy
 	{
 	 public:
-		LuaScriptComponent() = default;
+		LuaScriptComponent() :mLuaEnv(nullptr) {};
 		virtual ~LuaScriptComponent() = default;
     public:
 		double GetMemorySize();

@@ -6,7 +6,7 @@
 
 #include"MysqlClient.h"
 #include"MysqlMessage.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include"Mysql/Config/MysqlConfig.h"
 namespace Tendo
 {
@@ -47,7 +47,7 @@ namespace Tendo
 		{
 			this->WaitPop(command);
 			this->mLastTime = Helper::Time::NowSecTime();
-			if (command->GetRpcId() == -1) //Í£Ö¹ÃüÁî
+			if (command->GetRpcId() == -1) //Í£Ö¹ï¿½ï¿½ï¿½ï¿½
 			{
 				break;
 			}

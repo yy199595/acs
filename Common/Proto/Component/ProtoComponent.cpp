@@ -3,14 +3,14 @@
 //
 
 #include"ProtoComponent.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include<fstream>
 #include"Util/Md5/MD5.h"
 #include"Util/File/DirectoryHelper.h"
 #include"google/protobuf/util/json_util.h"
 #include"google/protobuf/dynamic_message.h"
 #include"Proto/Lua/Message.h"
-#include"Script/Lua/ClassProxyHelper.h"
+#include"Lua/Engine/ClassProxyHelper.h"
 namespace Tendo
 {
     ImportError::ImportError()

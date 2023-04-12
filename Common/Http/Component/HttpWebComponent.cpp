@@ -3,7 +3,7 @@
 //
 
 #include"HttpWebComponent.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include"Server/Config/CodeConfig.h"
 #include"Server/Config/ServiceConfig.h"
 #include"Http/Client/HttpHandlerClient.h"
@@ -11,12 +11,14 @@
 #include"Util/File/DirectoryHelper.h"
 #include"Util/File/FileHelper.h"
 #include"Server/Component/ThreadComponent.h"
+#include"Rpc/Component/DispatchMessageComponent.h"
 namespace Tendo
 {
     HttpWebComponent::HttpWebComponent()
-        : mSumCount(0), mWaitCount(0),
-          mTaskComponent(nullptr)
+        : mSumCount(0), mWaitCount(0)
     {
+		this->mTaskComponent = nullptr;
+		this->mDispatchComponent = nullptr;
         this->mTypeContent["js"] = Http::ContentName::JS;
         this->mTypeContent["css"] = Http::ContentName::CSS;
         this->mTypeContent["json"] = Http::ContentName::JSON;
@@ -40,18 +42,18 @@ namespace Tendo
         std::vector<HttpService *> httpServices;
         this->mTaskComponent = this->mApp->GetTaskComponent();
         ServerConfig::Inst()->GetPath("home", this->mHomePath);
-        return this->mApp->GetComponents(httpServices) && this->StartListen("http");
+		this->mDispatchComponent = this->GetComponent<DispatchMessageComponent>();
+		return this->mApp->GetComponents(httpServices) && this->StartListen("http");
     }
 
 	void HttpWebComponent::AddStaticDir(const std::string& dir)
 	{
 		std::vector<std::string> files;
 		Helper::Directory::GetFilePaths(dir, files);
-		for(auto iter = files.begin(); iter != files.end(); iter++)
+		for(const std::string & fullPath : files)
 		{
             std::string type;
 			Http::StaticSource source;
-			const std::string & fullPath = *iter;
 			const std::string path = fullPath.substr(dir.size());
             if (Helper::File::GetFileType(fullPath, type))
             {
@@ -74,57 +76,99 @@ namespace Tendo
     void HttpWebComponent::OnRequest(std::shared_ptr<Http::Request> request)
     {
         this->mSumCount++;
+		std::shared_ptr<Http::IResponse> response;
 		const std::string & address = request->From();
-        const HttpMethodConfig *httpConfig = HttpConfig::Inst()->GetMethodConfig(request->Path());
-        if (httpConfig == nullptr)
+		do
 		{
-            if (request->Path() == "/")
-            {
-                this->OnHomePage(request);
-                return;
-            }
-			const std::string& path = request->Path();
-			auto iter = this->mStaticSourceDir.find(path);
-			if (iter == this->mStaticSourceDir.end())
-			{						
-                this->Send(address, HttpStatus::NOT_FOUND);
-                LOG_ERROR("[" << address << "] <<" << request->Path() 
-                    << ">>" << HttpStatusToString(HttpStatus::NOT_FOUND));
+			const std::string & path = request->Path();
+			if(path == "/")
+			{
+				response = std::make_shared<Http::FileResponse>(this->mHomePath);
+
+				response->SetCode(HttpStatus::OK);
+				response->Header().Add(Http::HeadName::ContentType, Http::ContentName::HTML);
+				response->Header().Add(Http::HeadName::ContentLength, (int)response->ContentSize());
+				break;
+			}
+			const HttpMethodConfig *httpConfig = HttpConfig::Inst()->GetMethodConfig(path);
+			if(httpConfig != nullptr)
+			{
+				if (!httpConfig->Type.empty() && httpConfig->Type != request->Method())
+				{
+					response = std::make_shared<Http::DataResponse>();
+					response->SetCode(HttpStatus::METHOD_NOT_ALLOWED);
+					LOG_ERROR("[" << address << "] <<" << request->Url() << ">>"
+						<< HttpStatusToString(HttpStatus::METHOD_NOT_ALLOWED));
+					break;
+				}
+				if (!httpConfig->IsAsync)
+				{
+					this->Invoke(httpConfig, request);
+					return;
+				}
+				this->mTaskComponent->Start(&HttpWebComponent::Invoke, this, httpConfig, request);
 				return;
 			}
-            Http::StaticSource& staticSource = iter->second;
-            this->SendFile(address, staticSource.mType, staticSource.mPath);
-			return;
+
+			auto iter = this->mStaticSourceDir.find(path);
+			if (iter != this->mStaticSourceDir.end())
+			{
+				Http::StaticSource& source = iter->second;
+				response = std::make_shared<Http::FileResponse>(source.mPath);
+				response->SetCode(HttpStatus::OK);
+				response->Header().Add(Http::HeadName::ContentType, source.mType);
+				response->Header().Add(Http::HeadName::ContentLength, (int)response->ContentSize());
+				break;
+			}
+			if(this->OnMessage(request))
+			{
+				return;
+			}
+			response = std::make_shared<Http::DataResponse>();
+			response->SetCode(HttpStatus::METHOD_NOT_ALLOWED);
+			LOG_ERROR("[" << address << "] <<" << request->Path()
+						  << ">>" << HttpStatusToString(HttpStatus::NOT_FOUND));
 		}
-
-        if (!httpConfig->Type.empty() && httpConfig->Type != request->Method())
-        {			
-			//this->ClosetHttpClient(address);
-            this->Send(address, HttpStatus::METHOD_NOT_ALLOWED);
-            LOG_ERROR("[" << address << "] <<" << request->Url() << ">>" << HttpStatusToString(HttpStatus::METHOD_NOT_ALLOWED));
-            return;
-        }
-
-        if (!httpConfig->IsAsync)
-        {
-            this->Invoke(httpConfig, request);
-            return;
-        }
-        this->mTaskComponent->Start(&HttpWebComponent::Invoke, this, httpConfig, request);
+		while(false);
+		this->Send(address, response);
     }
 
-    void HttpWebComponent::OnHomePage(std::shared_ptr<Http::Request> request)
+    bool HttpWebComponent::OnMessage(const std::shared_ptr<Http::Request>& request)
     {
-        const std::string& address = request->From();
-        if (this->mHomePath.empty())
-        {
-            this->Send(address, HttpStatus::NOT_FOUND);
-            LOG_ERROR("[" << address << "] <<" << request->Path()
-                << ">>" << HttpStatusToString(HttpStatus::NOT_FOUND));
-            return;
-        }      
-        this->SendFile(address, Http::ContentName::HTML, this->mHomePath);
-    }
+		if(this->mDispatchComponent == nullptr)
+		{
+			return false;
+		}
+		std::vector<std::string> result;
+        const std::string & path = request->Path();
+		size_t pos = path.find('/',1);
+		if(pos == std::string::npos || pos <= 1)
+		{
+			return false;
+		}
+		std::string func(path.c_str() + 1, path.size() - 1);
+		func[pos - 1] = '.';
+		if(RpcConfig::Inst()->GetMethodConfig(func) == nullptr)
+		{
+			return false;
+		}
+		std::shared_ptr<Rpc::Packet> message
+			= std::make_shared<Rpc::Packet>();
+		{
+			message->SetNet(Rpc::Net::HTTP);
+			message->SetFrom(request->From());
+			message->SetProto(Msg::Porto::Json);
+			message->SetType(Msg::Type::Request);
+			message->SetContent(request->Content());
+			message->GetHead().Add("func", func);
+		}
+		int code = this->mDispatchComponent->OnMessage(message);
+		if(code != XCode::Successful)
+		{
+			this->SendData(request->From(), code, nullptr);
+		}
+		return true;
+	}
 
     void HttpWebComponent::Invoke(const HttpMethodConfig* config, const std::shared_ptr<Http::Request>& request)
     {
@@ -149,7 +193,7 @@ namespace Tendo
 #endif
             }
             this->Send(address, response);
-        }            
+        }
         this->mWaitCount--;
     }
 
@@ -172,6 +216,22 @@ namespace Tendo
 	{
 		this->StopListen();
 		this->ClearClients();
+	}
+
+	bool HttpWebComponent::SendData(const string& address, int code, const std::shared_ptr<Rpc::Packet>& message)
+	{
+		std::shared_ptr<Http::DataResponse> response = std::make_shared<Http::DataResponse>();
+		response->Header().Add("code", code);
+		if (code == XCode::Successful && message != nullptr)
+		{
+			response->Content(HttpStatus::OK, Http::ContentName::JSON, message->GetBody());
+		}
+		else
+		{
+			const std::string & desc = CodeConfig::Inst()->GetDesc(code);
+			response->Content(HttpStatus::OK, Http::ContentName::TEXT, desc);
+		}
+		return this->Send(address, response);
 	}
 
 }

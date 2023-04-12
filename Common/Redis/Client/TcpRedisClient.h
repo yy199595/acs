@@ -22,7 +22,6 @@ namespace Tendo
 				const RedisClientConfig & config, IRpc<RedisResponse> * component);
     public:
         void Send(const std::shared_ptr<RedisRequest>& command);
-		long long Call(const std::shared_ptr<RedisRequest>& command);
 		const RedisClientConfig & GetConfig() { return mConfig;}
 		const std::string & GetName() const { return this->mConfig.Name; }
     public:

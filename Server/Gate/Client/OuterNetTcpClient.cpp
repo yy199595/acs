@@ -2,15 +2,15 @@
 // Created by mac on 2021/11/28.
 //
 
-#include"OuterNetClient.h"
+#include"OuterNetTcpClient.h"
 #include"XCode/XCode.h"
 #include"Util/Time/TimeHelper.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include"Gate/Component/OuterNetComponent.h"
 
 namespace Tendo
 {
-	OuterNetClient::OuterNetClient(std::shared_ptr<Tcp::SocketProxy> socket,
+	OuterNetTcpClient::OuterNetTcpClient(std::shared_ptr<Tcp::SocketProxy> socket,
                                    OuterNetComponent* component)
 		: TcpContext(socket), mGateComponent(component)
 	{
@@ -18,29 +18,29 @@ namespace Tendo
         this->mState = Tcp::DecodeState::Head;
 	}
 
-	void OuterNetClient::StartReceive(int second)
+	void OuterNetTcpClient::StartReceive(int second)
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->ReceiveMessage(RPC_PACK_HEAD_LEN);
 #else
         Asio::Context & t = this->mSocket->GetThread();
-        t.post(std::bind(&OuterNetClient::ReceiveMessage, this, RPC_PACK_HEAD_LEN));
+        t.post(std::bind(&OuterNetTcpClient::ReceiveMessage, this, RPC_PACK_HEAD_LEN));
         if(second != 0)
         {
             this->mTimeout = second;
-            t.post(std::bind(&OuterNetClient::StartTimer, this, second));
+            t.post(std::bind(&OuterNetTcpClient::StartTimer, this, second));
         }
 #endif 
 	}
 
-	void OuterNetClient::OnTimeOut()
+	void OuterNetTcpClient::OnTimeOut()
 	{
 		Asio::Context & t = App::Inst()->MainThread();
 		const std::string& address = this->mSocket->GetAddress();
 		t.post(std::bind(&OuterNetComponent::OnTimeout, this->mGateComponent, address));
 	}
 
-    void OuterNetClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t size)
+    void OuterNetTcpClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t size)
 	{
 		if (code)
 		{
@@ -89,7 +89,7 @@ namespace Tendo
 		}
 	}
 
-    void OuterNetClient::CloseSocket(int code)
+    void OuterNetTcpClient::CloseSocket(int code)
     {
 		this->StopTimer();
 		this->mSocket->Close();
@@ -102,7 +102,7 @@ namespace Tendo
 #endif
         }
 
-	void OuterNetClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
+	void OuterNetTcpClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
 	{
 		if(code)
 		{
@@ -119,24 +119,24 @@ namespace Tendo
         this->SendFromMessageQueue();
 	}
 
-	void OuterNetClient::StartClose()
+	void OuterNetTcpClient::StartClose()
 	{
 		int code = XCode::NetActiveShutdown;
 #ifdef ONLY_MAIN_THREAD
 		this->CloseSocket(code);
 #else
         Asio::Context & t = this->mSocket->GetThread();
-        t.post(std::bind(&OuterNetClient::CloseSocket, this, code));
+        t.post(std::bind(&OuterNetTcpClient::CloseSocket, this, code));
 #endif
 	}
 
-	void OuterNetClient::SendData(std::shared_ptr<Rpc::Packet> message)
+	void OuterNetTcpClient::SendData(std::shared_ptr<Rpc::Packet> message)
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->Write(message);
 #else
         Asio::Context & t = this->mSocket->GetThread();
-        t.post(std::bind(&OuterNetClient::Write, this, message));
+        t.post(std::bind(&OuterNetTcpClient::Write, this, message));
 #endif
 	}
 }

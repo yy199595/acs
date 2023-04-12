@@ -1,5 +1,5 @@
 #include"LogComponent.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include"spdlog/async.h"
 #ifdef __DEBUG__
 #include"Log/Common/Debug.h"

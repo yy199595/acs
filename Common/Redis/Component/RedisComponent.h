@@ -16,8 +16,8 @@ namespace Tendo
 		RedisComponent() = default;
     public:
 		bool Ping(size_t index);
-		bool Send(std::shared_ptr<RedisRequest> request);
-		bool Send(std::shared_ptr<RedisRequest> request, int & id);
+		bool Send(const std::shared_ptr<RedisRequest>& request);
+		bool Send(const std::shared_ptr<RedisRequest>& request, int & id);
 		inline const RedisClientConfig & Config() const { return this->mConfig.Config(); }
 	public:
         template<typename ... Args>

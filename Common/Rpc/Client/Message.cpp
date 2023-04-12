@@ -266,7 +266,6 @@ namespace Rpc
     void Packet::SetContent(const std::string & content)
     {
         this->mBody = content;
-        this->mProto = Msg::Porto::String;
     }
 
     std::shared_ptr<Packet> Packet::Clone() const
@@ -283,27 +282,28 @@ namespace Rpc
     }
 
     bool Packet::ParseMessage(Message* message)
-    {
-        switch (this->mProto)
-        {
-        case Msg::Porto::Protobuf:
-            if (message->ParseFromString(this->mBody))
-            {
-                this->mBody.clear();
-                return true;
-            }
-            return false;
-        case Msg::Porto::Json:
-            if (Helper::Protocol::FromJson(message, this->mBody))
-            {
-                this->mBody.clear();
-                return true;
-            }
-            return false;
-        }
-        CONSOLE_LOG_FATAL("proto error parse error");
-        return false;
-    }
+	{
+		switch (this->mProto)
+		{
+			case Msg::Porto::Protobuf:
+				if (message->ParseFromString(this->mBody))
+				{
+					this->mBody.clear();
+					return true;
+				}
+				return false;
+			case Msg::Porto::Json:
+				if (Helper::Protocol::FromJson(message, this->mBody))
+				{
+					this->mBody.clear();
+					return true;
+				}
+				return false;
+			default:
+			LOG_ERROR("unknown message proto : " << this->mProto);
+				return false;
+		}
+	}
 
 
     bool Packet::WriteMessage(const Message* message)

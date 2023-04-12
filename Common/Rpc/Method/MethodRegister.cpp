@@ -3,7 +3,7 @@
 //
 
 #include"MethodRegister.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include"Rpc/Lua/LuaServiceMethod.h"
 #include"Rpc/Service/PhysicalRpcService.h"
 #include"Proto/Component/ProtoComponent.h"

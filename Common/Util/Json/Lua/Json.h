@@ -4,7 +4,8 @@
 
 #ifndef SERVER_JSON_H
 #define SERVER_JSON_H
-#include"Script/Lua/LuaInclude.h"
+#include<string>
+#include"Lua/Engine/Define.h"
 namespace Lua
 {
 	namespace RapidJson

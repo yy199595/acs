@@ -12,13 +12,15 @@
 #include"Util/String/StringHelper.h"
 #include"Proto/Component/ProtoComponent.h"
 #endif
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
+#include"Http/Component/HttpWebComponent.h"
 #include"Gate/Component/OuterNetComponent.h"
 namespace Tendo
 {
 	DispatchMessageComponent::DispatchMessageComponent()
 	{
 		this->mWaitCount = 0;
+		this->mWebComponent = nullptr;
 		this->mTaskComponent = nullptr;
 		this->mInnerComponent = nullptr;
 		this->mOuterComponent = nullptr;
@@ -28,6 +30,7 @@ namespace Tendo
 	bool DispatchMessageComponent::LateAwake()
 	{
         this->mTimerComponent = this->mApp->GetTimerComponent();
+		this->mWebComponent = this->GetComponent<HttpWebComponent>();
         this->mOuterComponent = this->GetComponent<OuterNetComponent>();
 		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<AsyncMgrComponent>());
 		LOG_CHECK_RET_FALSE(this->mInnerComponent = this->GetComponent<InnerNetComponent>());
@@ -69,26 +72,26 @@ namespace Tendo
 		if (config->Timeout > 0)
 		{
 			timerId = this->mTimerComponent->DelayCall(config->Timeout,
-				[message, config, this]()
-				{
-				    LOG_ERROR("call [" << config->FullName << "] code = call time out");
-				    this->mInnerComponent->Send(message->From(), XCode::CallTimeout, message);
-				}
+					[message, config, this]()
+					{
+						LOG_ERROR("call [" << config->FullName << "] code = call time out");
+						this->mInnerComponent->Send(message->From(), XCode::CallTimeout, message);
+					}
 			);
 		}
 #ifdef __DEBUG__
-        std::string json("{}");
+		std::string json("{}");
 		std::string serverName = message->From();
-        ProtoComponent * component = this->GetComponent<ProtoComponent>();
-		const NodeInfo * nodeInfo = this->mInnerComponent->GetNodeInfo(message->From());
-		if(nodeInfo != nullptr)
+		ProtoComponent* component = this->GetComponent<ProtoComponent>();
+		const NodeInfo* nodeInfo = this->mInnerComponent->GetNodeInfo(message->From());
+		if (nodeInfo != nullptr)
 		{
 			serverName = nodeInfo->SrvName;
 		}
-		if(!config->Request.empty())
-        {
-            std::shared_ptr<Message> request;
-			if(component->New(config->Request, request))
+		if (!config->Request.empty())
+		{
+			std::shared_ptr<Message> request;
+			if (component->New(config->Request, request))
 			{
 				if (request->ParseFromString(message->GetBody()))
 				{
@@ -96,19 +99,18 @@ namespace Tendo
 					google::protobuf::util::MessageToJsonString(*request, &json);
 				}
 			}
-
-        }
-        CONSOLE_LOG_DEBUG(serverName << " call func = ["
-			<< config->FullName << "] request = " << Helper::Str::FormatJson(json));
+		}
+		CONSOLE_LOG_DEBUG(serverName << " call func = ["
+									 << config->FullName << "] request = " << Helper::Str::FormatJson(json));
 #endif
 		this->mWaitCount++;
 		int code = logicService->Invoke(config->Method, message);
 #ifdef __DEBUG__
-        json.assign("{}");
-        if(code == XCode::Successful && !config->Response.empty())
-        {
-            std::shared_ptr<Message> response;
-			if(component->New(config->Response, response))
+		json.assign("{}");
+		if (code == XCode::Successful && !config->Response.empty())
+		{
+			std::shared_ptr<Message> response;
+			if (component->New(config->Response, response))
 			{
 				if (response->ParseFromString(message->GetBody()))
 				{
@@ -117,11 +119,11 @@ namespace Tendo
 				}
 			}
 
-        }
-		if(code == XCode::Successful)
+		}
+		if (code == XCode::Successful)
 		{
 			CONSOLE_LOG_INFO(serverName << " call func = ["
-				<< config->FullName << "] " << " response = " << Helper::Str::FormatJson(json));
+										<< config->FullName << "] " << " response = " << Helper::Str::FormatJson(json));
 		}
 		else
 		{
@@ -136,12 +138,24 @@ namespace Tendo
 			LOG_ERROR("call [" << config->FullName << "] time out not return");
 			return;
 		}
-		if(code != XCode::Successful)
+		if (code != XCode::Successful)
 		{
 			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
 			CONSOLE_LOG_INFO("call [" << config->FullName << "] code = " << desc);
 		}
-		this->mInnerComponent->Send(message->From(), code, message);
+		const std::string& address = message->From();
+		switch (message->GetNet())
+		{
+			case Rpc::Net::TCP:
+				this->mInnerComponent->Send(address, code, message);
+				break;
+			case Rpc::Net::HTTP:
+				this->mWebComponent->SendData(address, code, message);
+				break;
+			default:
+				LOG_ERROR("unknown message net type");
+				break;
+		}
 	}
 
     int DispatchMessageComponent::OnMessage(const std::shared_ptr<Rpc::Packet>& message)

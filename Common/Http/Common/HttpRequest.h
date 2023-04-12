@@ -9,14 +9,14 @@
 #include"httpHead.h"
 #include<unordered_map>
 #include<rapidjson/document.h>
-#include"Script/Lua/LuaInclude.h"
+#include"Lua/Engine/Define.h"
 #include"Proto/Message/ProtoMessage.h"
 namespace Http
 {
     class Parameter
     {
     public:
-        Parameter(const std::string & content);
+        explicit Parameter(const std::string & content);
     public:
         bool Get(std::vector<std::string> & keys);
         bool Get(const std::string & key, std::string & value);
@@ -80,7 +80,7 @@ namespace Http
     {
     public:
 		GetRequest(): Request("GET", "") { }
-		GetRequest(const std::string & from) :Request("GET", from) { }
+		explicit GetRequest(const std::string & from) :Request("GET", from) { }
     protected:
         void OnComplete() final { }
         int OnReadContent(std::istream &buffer) final;
@@ -98,7 +98,7 @@ namespace Http
     {
     public:
 		PostRequest() : Request("POST", "") { }
-		PostRequest(const std::string & from) : Request("POST", from) { }
+		explicit PostRequest(const std::string & from) : Request("POST", from) { }
     public:
         void Str(const std::string & str);
         void Json(const std::string & json);

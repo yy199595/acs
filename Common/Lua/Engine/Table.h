@@ -1,9 +1,6 @@
 #pragma once
 
-#include"Script/Lua/Function.h"
-#include<google/protobuf/message.h>
-using namespace google::protobuf;
-
+#include"Lua/Engine/Function.h"
 namespace Lua
 {
 	class Table
@@ -22,15 +19,13 @@ namespace Lua
 		T GetMember(const char* name);
 
 	 public:
-		int GetRef()
+		int GetRef() const
 		{
 			return this->ref;
 		}
 		std::string ToJson();
 		std::shared_ptr<Table> GetTable(const std::string& name);
 		std::shared_ptr<Function> GetFunction(const std::string& name);
-
-		bool Serialization(Message& message);
 
 		bool Serialization(std::string& outString);
 

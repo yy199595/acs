@@ -124,6 +124,7 @@ namespace Http
 
 		constexpr const char* TEXT = "text/plain";
 		constexpr const char* JSON = "application/json";
+		constexpr const char * PB = "application/x-protobuf";
 		constexpr const char * XML = "application/xml";
 		constexpr const char * XHTML = "application/xhtml+xml";
 

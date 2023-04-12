@@ -15,6 +15,7 @@ namespace Http
 	class IResponse;
 	class DataResponse;
 }
+
 namespace Tendo
 {
     class HttpHandlerClient;
@@ -25,7 +26,7 @@ namespace Tendo
         void OnListen(std::shared_ptr<Tcp::SocketProxy> socket) final;
         virtual bool OnDelClient(const std::string& address) = 0;
         virtual void OnRequest(std::shared_ptr<Http::Request> request) = 0;
-    protected:
+	protected:
 		void ClearClients();
         bool Send(const std::string& address, HttpStatus code);
         bool Send(const std::string& address, const std::string & str);

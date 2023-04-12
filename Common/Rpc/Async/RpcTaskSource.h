@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include"Script/Lua/LuaInclude.h"
+#include"Lua/Engine/Define.h"
 #include"Rpc/Client/Message.h"
 #include"Util/Guid/NumberBuilder.h"
 #include"Async/Coroutine/CoroutineDef.h"
@@ -13,8 +13,8 @@ namespace Tendo
     class IRpcTask : public std::enable_shared_from_this<IRpcTask<T>>
     {
     public:
-        IRpcTask(int id) :mRpcId(id){ }
-        virtual ~IRpcTask() { }
+        explicit IRpcTask(int id) :mRpcId(id){ }
+        virtual ~IRpcTask() = default;
     public:
         int GetRpcId() { return mRpcId; }
     public:
@@ -26,7 +26,7 @@ namespace Tendo
     class RpcTaskSource : public IRpcTask<Rpc::Packet>
     {
     public:
-        RpcTaskSource(int ms);
+        explicit RpcTaskSource(int ms);
  
     protected:     
         void OnResponse(std::shared_ptr<Rpc::Packet> response) final;

@@ -4,7 +4,7 @@
 
 #ifndef SERVER_LUAHTTP_H
 #define SERVER_LUAHTTP_H
-#include"Script/Lua/LuaInclude.h"
+#include"Lua/Engine/Define.h"
 namespace Lua
 {
 	namespace HttpClient

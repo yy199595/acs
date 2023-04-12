@@ -12,7 +12,7 @@ namespace Rpc
 namespace Tendo
 {
 	class ServiceMethod;
-	class InnerNetClient;
+	class InnerNetTcpClient;
 	class RpcService : public Component, public IServiceBase
 	{
 	public:

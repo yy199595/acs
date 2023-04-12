@@ -30,8 +30,9 @@ namespace Json
 		Writer & BeginObject();
 		Writer & BeginArray(const char * key);
 		Writer & BeginObject(const char * key);
+		Writer & EndArray() { this->mWriter.EndArray(); }
+		Writer & EndObject() { this->mWriter.EndObject(); }
 
-		Writer & Add(Json::End type);
 		Writer & Add(std::vector<int> & value);
 		Writer & Add(rapidjson::Value& value);
 		Writer & Add(std::list<std::string> & value);

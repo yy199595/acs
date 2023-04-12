@@ -7,7 +7,7 @@
 #include"Server/Component/ThreadComponent.h"
 #include "Util/Time/TimeHelper.h"
 #include"Mongo/Lua/LuaMongo.h"
-#include"Script/Lua/ClassProxyHelper.h"
+#include"Lua/Engine/ClassProxyHelper.h"
 #ifdef __DEBUG__
 #include"Util/String/StringHelper.h"
 #endif

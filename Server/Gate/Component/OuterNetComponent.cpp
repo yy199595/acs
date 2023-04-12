@@ -3,7 +3,7 @@
 //
 
 #include"OuterNetComponent.h"
-#include"Gate/Client/OuterNetClient.h"
+#include"Gate/Client/OuterNetTcpClient.h"
 #include"Server/Component/ThreadComponent.h"
 #include"Rpc/Component/NodeMgrComponent.h"
 #include"Rpc/Component/InnerNetComponent.h"
@@ -11,7 +11,7 @@
 #include"Server/Config/CodeConfig.h"
 #include"Util/Json/JsonWriter.h"
 #include"Gate/Service/Gate.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 namespace Tendo
 {
 	bool OuterNetComponent::Awake()
@@ -180,7 +180,7 @@ namespace Tendo
             LOG_FATAL("handler socket error " << socket->GetAddress());
             return;
         }
-        std::shared_ptr<OuterNetClient> outerNetClient;
+        std::shared_ptr<OuterNetTcpClient> outerNetClient;
         if (!this->mClientPools.empty())
         {
             outerNetClient = this->mClientPools.front();
@@ -189,7 +189,7 @@ namespace Tendo
         }
         else
         {
-            outerNetClient = std::make_shared<OuterNetClient>(socket, this);
+            outerNetClient = std::make_shared<OuterNetTcpClient>(socket, this);
         }
         outerNetClient->StartReceive(10);
         this->mGateClientMap.emplace(address, outerNetClient);
@@ -203,7 +203,7 @@ namespace Tendo
 #ifdef __DEBUG__
             LOG_WARN("remove client [" << address << "]" << CodeConfig::Inst()->GetDesc(code));
 #endif
-            std::shared_ptr<OuterNetClient> gateClient = iter->second;
+            std::shared_ptr<OuterNetTcpClient> gateClient = iter->second;
             if (this->mClientPools.size() < 100)
             {
                 this->mClientPools.push(gateClient);

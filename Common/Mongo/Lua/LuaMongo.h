@@ -1,5 +1,5 @@
 #pragma once;
-#include"Script/Lua/LuaInclude.h"
+#include"Lua/Engine/Define.h"
 namespace Lua
 {
 	namespace LuaMongo

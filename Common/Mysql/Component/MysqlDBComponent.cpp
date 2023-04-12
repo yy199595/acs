@@ -5,11 +5,11 @@
 
 
 #include"MysqlDBComponent.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include"Util/Sql/SqlHelper.h"
 #include"Mysql/Client/MysqlClient.h"
 #include"Mysql/Lua/LuaMysql.h"
-#include"Script/Lua/ClassProxyHelper.h"
+#include"Lua/Engine/ClassProxyHelper.h"
 namespace Tendo
 {
     MysqlTask::MysqlTask(int taskId)

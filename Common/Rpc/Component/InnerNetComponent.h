@@ -2,7 +2,7 @@
 #include<queue>
 #include"Rpc/Client/Message.h"
 #include"Util/Json/JsonWriter.h"
-#include"Rpc/Client/InnerNetClient.h"
+#include"Rpc/Client/InnerNetTcpClient.h"
 #include"Server/Component/TcpListenerComponent.h"
 
 namespace Tendo
@@ -27,8 +27,8 @@ namespace Tendo
         void OnRecord(Json::Writer & document) final;
 		void OnListen(std::shared_ptr<Tcp::SocketProxy> socket) final;
 	 public:
-        InnerNetClient * GetSession(const std::string& address);
-        InnerNetClient * GetOrCreateSession(const std::string& address);
+        InnerNetTcpClient * GetSession(const std::string& address);
+        InnerNetTcpClient * GetOrCreateSession(const std::string& address);
 		const NodeInfo * GetNodeInfo(const std::string & address) const;
 	public:
 		bool Send(const std::shared_ptr<Rpc::Packet>& message); //发送到本地
@@ -51,6 +51,6 @@ namespace Tendo
         std::unordered_map<std::string, std::string> mUserMaps;
 		std::queue<std::shared_ptr<Rpc::Packet>> mWaitMessages;
 		std::unordered_map<std::string, NodeInfo> mLocationMaps;
-		std::unordered_map<std::string, std::shared_ptr<InnerNetClient>> mRpcClientMap;
+		std::unordered_map<std::string, std::shared_ptr<InnerNetTcpClient>> mRpcClientMap;
     };
 }

@@ -2,7 +2,7 @@
 #define __LUA_RAPIDJSON_TOLUAHANDLER_HPP__
 
 #include <vector>
-#include"Script/Lua/LuaInclude.h"
+#include"Lua/Engine/Define.h"
 #include"rapidjson/rapidjson.h"
 #include"rapidjson/document.h"
 #include"rapidjson/reader.h"

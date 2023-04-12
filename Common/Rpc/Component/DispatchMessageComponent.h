@@ -32,9 +32,10 @@ namespace Tendo
 		int HandlerRequest(const std::shared_ptr<Rpc::Packet> & message);
 		int HandlerResponse(const std::shared_ptr<Rpc::Packet>& message);
 		int HandlerBroadcast(const std::shared_ptr<Rpc::Packet>& message);
-        void Invoke(const RpcMethodConfig * config, const std::shared_ptr<Rpc::Packet>& message);
+		void Invoke(const RpcMethodConfig * config, const std::shared_ptr<Rpc::Packet>& message);
     private:
 		unsigned int mWaitCount;
+		class HttpWebComponent * mWebComponent;
 		class AsyncMgrComponent* mTaskComponent;
 		class TimerComponent* mTimerComponent;
 		class OuterNetComponent* mOuterComponent;

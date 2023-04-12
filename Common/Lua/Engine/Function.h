@@ -1,7 +1,7 @@
 #pragma once
 
-#include"Entity/App/App.h"
-#include"Script/Lua/LuaParameter.h"
+#include"Entity/Unit/App.h"
+#include"Lua/Engine/LuaParameter.h"
 #include"Log/Common/CommonLogDef.h"
 #include"Async/Lua/WaitLuaTaskSource.h"
 using namespace Tendo;

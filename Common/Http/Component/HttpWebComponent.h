@@ -6,6 +6,8 @@
 #define SERVER_HTTPSERVICECOMPONENT_H
 #include<unordered_set>
 #include"HttpListenComponent.h"
+#include"Rpc/Client/Message.h"
+
 namespace Http
 {
     class Request;
@@ -34,12 +36,13 @@ namespace Tendo
     public:
 		void AddStaticDir(const std::string & dir);
 		unsigned int GetWaitCount() const { return this->mWaitCount; }
+		bool SendData(const std::string &address, int code, const std::shared_ptr<Rpc::Packet> &message);
     private:
         bool LateAwake() final;
 		void OnDestroy() final;
 		void OnRecord(Json::Writer &document) final;
         bool OnDelClient(const std::string& address) final;
-        void OnHomePage(std::shared_ptr<Http::Request> request); //½øÈëÖ÷Ò³
+        bool OnMessage(const std::shared_ptr<Http::Request>& request);
 		void OnRequest(std::shared_ptr<Http::Request> request) final;
 		void Invoke(const HttpMethodConfig* config, const std::shared_ptr<Http::Request>& request);
     private:
@@ -47,7 +50,8 @@ namespace Tendo
         unsigned int mSumCount;
         unsigned int mWaitCount;
         class AsyncMgrComponent * mTaskComponent;
-        std::unordered_map<std::string, unsigned int> mTasks;
+		class DispatchMessageComponent * mDispatchComponent;
+		std::unordered_map<std::string, unsigned int> mTasks;
         std::unordered_map<std::string, std::string> mTypeContent;
 		std::unordered_map<std::string, Http::StaticSource> mStaticSourceDir;
 	};

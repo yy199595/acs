@@ -1,7 +1,7 @@
 ﻿
 #include"InnerNetComponent.h"
 #include"XCode/XCode.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include"Util/String/StringHelper.h"
 #include"Network/Tcp/SocketProxy.h"
 #include"DispatchMessageComponent.h"
@@ -56,7 +56,8 @@ namespace Tendo
     {
         this->mSumCount++;
         int type = message->GetType();
-        const std::string &address = message->From();
+		message->SetNet(Rpc::Net::TCP);
+		const std::string &address = message->From();
         if (type != Msg::Type::Auth && address != this->mLocation)
         {
             if (!this->IsAuth(address))
@@ -156,8 +157,8 @@ namespace Tendo
         if (iter == this->mRpcClientMap.end())
         {
             assert(!address.empty());
-            std::shared_ptr<InnerNetClient> tcpSession
-                    = std::make_shared<InnerNetClient>(this, socket);
+            std::shared_ptr<InnerNetTcpClient> tcpSession
+                    = std::make_shared<InnerNetTcpClient>(this, socket);
 
             tcpSession->StartReceive();
             this->mRpcClientMap.emplace(address, tcpSession);
@@ -169,7 +170,7 @@ namespace Tendo
         auto iter = this->mRpcClientMap.find(address);
         if (iter != this->mRpcClientMap.end())
         {
-            std::shared_ptr<InnerNetClient> innerNetClient = iter->second;
+            std::shared_ptr<InnerNetTcpClient> innerNetClient = iter->second;
             if (innerNetClient != nullptr)
             {
                 innerNetClient->StartClose();
@@ -178,9 +179,9 @@ namespace Tendo
         }
     }
 
-    InnerNetClient *InnerNetComponent::GetOrCreateSession(const std::string &address)
+    InnerNetTcpClient *InnerNetComponent::GetOrCreateSession(const std::string &address)
     {
-        InnerNetClient *localSession = this->GetSession(address);
+        InnerNetTcpClient *localSession = this->GetSession(address);
         if (localSession != nullptr)
         {
             return localSession;
@@ -207,14 +208,14 @@ namespace Tendo
         }
 
         socketProxy->Init(ip, port);
-        std::shared_ptr<InnerNetClient> newClient =
-                std::make_shared<InnerNetClient>(this, socketProxy, authInfo);
+        std::shared_ptr<InnerNetTcpClient> newClient =
+                std::make_shared<InnerNetTcpClient>(this, socketProxy, authInfo);
 
         this->mRpcClientMap.emplace(socketProxy->GetAddress(), newClient);
         return newClient.get();
     }
 
-    InnerNetClient *InnerNetComponent::GetSession(const std::string &address)
+    InnerNetTcpClient *InnerNetComponent::GetSession(const std::string &address)
     {
         auto iter = this->mRpcClientMap.find(address);
         if (iter == this->mRpcClientMap.end())
@@ -227,6 +228,7 @@ namespace Tendo
 
     bool InnerNetComponent::Send(const std::shared_ptr<Rpc::Packet> &message)
     {
+		message->SetNet(Rpc::Net::TCP);
         message->SetFrom(this->mLocation);
         this->mMessageComponent->OnMessage(message);
         return true;
@@ -258,7 +260,7 @@ namespace Tendo
             io.post(std::bind(&InnerNetComponent::OnMessage, this, message));
             return true;
         }
-        InnerNetClient *clientSession = nullptr;
+        InnerNetTcpClient *clientSession = nullptr;
         switch (message->GetType())
         {
             case Msg::Type::Response:

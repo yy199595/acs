@@ -1,7 +1,7 @@
 ﻿#include"TimerComponent.h"
 #include"Timer/Timer/DelayTimer.h"
-#include"Entity/App/App.h"
-#include"Script/Lua/ClassProxyHelper.h"
+#include"Entity/Unit/App.h"
+#include"lua/Engine/ClassProxyHelper.h"
 #include"Timer/Lua/Timer.h"
 namespace Tendo
 {
@@ -12,16 +12,16 @@ namespace Tendo
 		{
 			int count = index == 0
 						? this->FirstLayerCount : this->OtherLayerCount;
-			int end = FirstLayerCount * std::pow(OtherLayerCount, index);
+			int end = FirstLayerCount * (int)std::pow(OtherLayerCount, index);
 
 			int start = index == 0 ? 0 :
-						FirstLayerCount * std::pow(OtherLayerCount, index - 1);
+						FirstLayerCount * (int)std::pow(OtherLayerCount, index - 1);
 			this->mTimerLayers.push_back(new TimeWheelLayer(index, count, start, end));
 		}
         return true;
 	}
 
-	long long TimerComponent::AddTimer(std::shared_ptr<TimerBase> timer)
+	long long TimerComponent::AddTimer(const std::shared_ptr<TimerBase>& timer)
 	{
 		if (timer == nullptr || !this->AddTimerToWheel(timer))
 		{
@@ -68,7 +68,7 @@ namespace Tendo
 		}
 		long long nowTime = Helper::Time::NowMilTime();
 		long long subTime = nowTime - this->mNextUpdateTime;
-		const int tick = subTime / this->TimerPrecision;
+		const int tick = (int)subTime / this->TimerPrecision;
 
 		if (tick <= 0) return;
 
@@ -87,9 +87,8 @@ namespace Tendo
 
 		for (int count = 0; count < tick; count++)
 		{
-			for (size_t index = 0; index < this->mTimerLayers.size(); index++)
+			for (auto timeWheelLayer : this->mTimerLayers)
 			{
-				TimeWheelLayer* timeWheelLayer = this->mTimerLayers[index];
 				std::queue<long long>& timerQueue = timeWheelLayer->GetTimerQueue();
 				if (timeWheelLayer->GetLayerId() == 0)
 				{

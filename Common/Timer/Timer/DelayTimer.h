@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include"TimerBase.h"
-#include"Script/Lua/LuaInclude.h"
+#include"Lua/Engine/Define.h"
 #include"Rpc/Method/MethodProxy.h"
 namespace Tendo
 {
@@ -25,7 +25,7 @@ namespace Tendo
 	public:
 		LuaTimer(long long ms, int ref, lua_State * lua)
 			: TimerBase(ms), ref(ref), mLua(lua) { }
-			~LuaTimer() { luaL_unref(this->mLua, LUA_REGISTRYINDEX, ref);}
+			~LuaTimer() final { luaL_unref(this->mLua, LUA_REGISTRYINDEX, ref);}
 	public:
 		void Invoke() final
 		{

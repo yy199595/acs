@@ -1,12 +1,12 @@
 ﻿#include"RedisComponent.h"
 #include"Redis/Lua/LuaRedis.h"
 
-#include"Script/Lua/ClassProxyHelper.h"
+#include"Lua/Engine/ClassProxyHelper.h"
 #include"Redis/Client/TcpRedisClient.h"
 #include"Server/Component/ThreadComponent.h"
 #include"Redis/Component/RedisScriptComponent.h"
 #include"Redis/Component/RedisStringComponent.h"
-#include"Entity/App/App.h"
+#include"Entity/Unit/App.h"
 #include"Redis/Config/RedisConfig.h"
 #ifdef __DEBUG__
 #include "Timer/Timer/ElapsedTimer.h"
@@ -16,7 +16,8 @@ namespace Tendo
     bool RedisComponent::Awake()
     {
 		std::string path;
-		LOG_CHECK_RET_FALSE(ServerConfig::Inst()->GetPath("db", path));
+		const ServerConfig * config = ServerConfig::Inst();
+		LOG_CHECK_RET_FALSE(config->GetPath("db", path));
 		LOG_CHECK_RET_FALSE(this->mConfig.LoadConfig(path));
         LOG_CHECK_RET_FALSE(this->mApp->AddComponent<RedisScriptComponent>());
         LOG_CHECK_RET_FALSE(this->mApp->AddComponent<RedisStringComponent>());
@@ -49,7 +50,7 @@ namespace Tendo
 		{
 			LOG_ERROR(message->GetString());
 		}
-		long long id = message->TaskId();
+		int id = message->TaskId();
 		this->OnResponse(id, message);
 	}
 
@@ -148,7 +149,7 @@ namespace Tendo
         luaRegister.PushExtensionFunction("Send", Lua::Redis::Send);
 		luaRegister.PushExtensionFunction("SyncRun", Lua::Redis::SyncRun);
     }
-	bool RedisComponent::Send(std::shared_ptr<RedisRequest> request)
+	bool RedisComponent::Send(const std::shared_ptr<RedisRequest>& request)
 	{
 		TcpRedisClient * redisClientContext = this->GetClient();
 		if(redisClientContext == nullptr)
@@ -158,7 +159,7 @@ namespace Tendo
 		redisClientContext->Send(request);
 		return true;
 	}
-	bool RedisComponent::Send(std::shared_ptr<RedisRequest> request, int& id)
+	bool RedisComponent::Send(const std::shared_ptr<RedisRequest>& request, int& id)
 	{
 		TcpRedisClient * redisClientContext = this->GetClient();
 		if(redisClientContext == nullptr)
