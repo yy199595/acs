@@ -31,11 +31,10 @@
 
 #include"Component/ClientComponent.h"
 #include"Kcp/Component/KcpComponent.h"
-#ifdef __ENABLE_MONGODB__
+
 #include"Mongo/Service/MongoDB.h"
 #include"Mongo/Component/MongoDBComponent.h"
 #include"Mongo/Component/MongoHelperComponent.h"
-#endif
 
 #ifdef __ENABLE_MYSQL__
 #include"Mysql/Service/MysqlDB.h"
@@ -43,11 +42,10 @@
 #include"Mysql/Component/MysqlHelperComponent.h"
 #endif
 
-#ifdef __ENABLE_REDIS__
 #include"Redis/Component/RedisComponent.h"
 #include"Redis/Component/RedisStringComponent.h"
 #include"Redis/Component/RedisScriptComponent.h"
-#endif
+
 #include"Sqlite/Component/SqliteComponent.h"
 
 #include"WatchDog/Service/WatchDog.h"
@@ -80,16 +78,13 @@ void RegisterComponent()
 	ComponentFactory::Add<OuterNetComponent>("OuterNetComponent");
     ComponentFactory::Add<SqliteComponent>("SqliteComponent");
 // db
-#ifdef __ENABLE_REDIS__
+
     ComponentFactory::Add<RedisComponent>("RedisComponent");
     ComponentFactory::Add<RedisStringComponent>("RedisStringComponent");
     ComponentFactory::Add<RedisScriptComponent>("RedisScriptComponent");
-#endif
 
-#ifdef __ENABLE_MONGODB__
     ComponentFactory::Add<MongoDBComponent>("MongoDBComponent");
     ComponentFactory::Add<MongoHelperComponent>("MongoHelperComponent");
-#endif
 
 #ifdef __ENABLE_MYSQL__
     ComponentFactory::Add<MysqlDBComponent>("MysqlDBComponent");
@@ -116,9 +111,8 @@ void RegisterServiceComponent()
     ComponentFactory::Add<Node>("Node");
     ComponentFactory::Add<Registry>("Registry");
     ComponentFactory::Add<WatchDog>("WatchDog");
-#ifdef __ENABLE_MONGODB__
+
     ComponentFactory::Add<MongoDB>("MongoDB");
-#endif
 
 #ifdef __ENABLE_MYSQL__
     ComponentFactory::Add<MysqlDB>("MysqlDB");

@@ -34,11 +34,13 @@ namespace Tendo
 		{
 			for (const std::string& name : components)
 			{
-				if (!this->mApp->HasComponent(name)
-					&& !this->mApp->AddComponent(name))
+				if(!this->mApp->HasComponent(name))
 				{
-					LOG_ERROR("add " << name << " error");
-					return false;
+					if(!this->mApp->AddComponent(name))
+					{
+						LOG_ERROR("add " << name << " error");
+						return false;
+					}
 				}
 				//CONSOLE_LOG_INFO(ServerConfig::Inst()->Name() << " add component [" << name << "]");
 			}
