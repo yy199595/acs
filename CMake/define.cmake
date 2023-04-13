@@ -23,7 +23,7 @@ endif()
 option(__DEBUG__ "debug模式" ON)
 
 option(__DEBUG_STACK__ "开启堆栈打印" ON)
-
+option(__RPC_MESSAGE__ "打印rpc消息" ON)
 option(ONLY_MAIN_THREAD "启用单线程模式" OFF)
 option(__NET_ERROR_LOG__ "打印网络层错误" ON)
 
@@ -41,6 +41,10 @@ endif()
 if(__DEBUG__)
     message("当前为debug模式")
     add_definitions(-D __DEBUG__)
+    if(__RPC_MESSAGE__)
+        message("打印rpc消息")
+        add_definitions(-D __RPC_MESSAGE__)
+    endif()
 endif()
 
 if(WIN32)

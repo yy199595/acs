@@ -33,7 +33,7 @@ namespace Tendo
 
 	void LuaRpcTaskSource::OnResponse(std::shared_ptr<Rpc::Packet> response)
 	{
-#ifdef __DEBUG__
+#ifdef __RPC_MESSAGE__
 		std::string func;
 		long long t2 = Helper::Time::NowMilTime();
 		if (response->GetHead().Get("func", func))

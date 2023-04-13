@@ -40,15 +40,16 @@ namespace Client
     class TcpRpcClientContext;
 
     class ClientComponent : public RpcTaskComponent<int, Rpc::Packet>,
-            public ILuaRegister,  public IRpc<Rpc::Packet>
+            public ILuaRegister, public IDestroy, public IRpc<Rpc::Packet>
     {
     public:
         ClientComponent();
         ~ClientComponent() final = default;
     public:
+		bool Close(int id);
 		int New(const std::string & ip, unsigned short port);
         bool Send(int id, const std::shared_ptr<Rpc::Packet>& request, int & rpcId);
-		std::shared_ptr<Rpc::Packet> Call(int id, std::shared_ptr<Rpc::Packet> request);
+		std::shared_ptr<Rpc::Packet> Call(int id, const std::shared_ptr<Rpc::Packet> & request, bool async = true);
         void OnMessage(std::shared_ptr<Rpc::Packet> message) final;
     protected:
         bool LateAwake() final;
@@ -58,6 +59,7 @@ namespace Client
         void OnTaskComplete(int key) final { this->mNumberPool.Push(key); }
     private:
         void OnRequest(const Rpc::Packet & message);
+		void OnDestroy() final;
     private:
         unsigned int mIndex;
 		ProtoComponent * mProtoComponent;

@@ -93,7 +93,7 @@ namespace Client
         return true;
     }
 
-	std::shared_ptr<Rpc::Packet> ClientComponent::Call(int id, std::shared_ptr<Rpc::Packet> request)
+	std::shared_ptr<Rpc::Packet> ClientComponent::Call(int id, const std::shared_ptr<Rpc::Packet> & request, bool async)
 	{
 		auto iter = this->mClients.find(id);
 		if(iter == this->mClients.end())
@@ -101,22 +101,26 @@ namespace Client
 			return nullptr;
 		}
 		int rpcId = this->mNumberPool.Pop();
-        std::shared_ptr<ClientTask> clientRpcTask
-            = std::make_shared<ClientTask>(rpcId);
-		
-		iter->second->SendToServer(std::move(request));
-		return this->AddTask(rpcId, clientRpcTask)->Await();
+		if(async)
+		{
+			std::shared_ptr<ClientTask> clientRpcTask
+					= std::make_shared<ClientTask>(rpcId);
+			iter->second->SendToServer(std::move(request));
+			return this->AddTask(rpcId, clientRpcTask)->Await();
+		}
+        iter->second->SendToServer(request, false);
+		return iter->second->Receive();
 	}
 
 	int ClientComponent::New(const std::string& ip, unsigned short port)
 	{
 		int id = this->mNumberPool.Pop();
-        ThreadComponent * netComponent =
-			this->GetComponent<ThreadComponent>();
+		Asio::Context & io = this->mApp->MainThread();
 
 		std::shared_ptr<Tcp::SocketProxy> socketProxy =
-			netComponent->CreateSocket(ip, port);
+			std::make_shared<Tcp::SocketProxy>(io);
 
+		socketProxy->Init(ip, port);
 		std::shared_ptr<TcpRpcClientContext> client =
 			std::make_shared<TcpRpcClientContext>(socketProxy, this);
 		this->mClients.emplace(id, client);
@@ -162,6 +166,45 @@ namespace Client
 		if (lua_pcall(this->mLuaComponent->GetLuaEnv(), count, 0, 0) != LUA_OK)
 		{
 			LOG_ERROR(lua_tostring(this->mLuaComponent->GetLuaEnv(), -1));
+		}
+	}
+
+	bool ClientComponent::Close(int id)
+	{
+		auto iter = this->mClients.find(id);
+		if(iter == this->mClients.end())
+		{
+			return false;
+		}
+		std::shared_ptr<Rpc::Packet> message
+				= std::make_shared<Rpc::Packet>();
+		{
+			message->SetType(Msg::Type::Request);
+			message->SetProto(Msg::Porto::Protobuf);
+			message->GetHead().Add("func", "Gate.Logout");
+			message->GetHead().Add("rpc", this->mNumberPool.Pop());
+		}
+		std::shared_ptr<TcpRpcClientContext> client = iter->second;
+		{
+			this->mClients.erase(iter);
+			client->SendToServer(message, false);
+		}
+		client->Receive();
+		client->Close();
+		return true;
+	}
+
+	void ClientComponent::OnDestroy()
+	{
+		std::vector<int> clients;
+		auto iter = this->mClients.begin();
+		for(; iter != this->mClients.end(); iter++)
+		{
+			clients.emplace_back(iter->first);
+		}
+		for(const int & id : clients)
+		{
+			this->Close(id);
 		}
 	}
 }

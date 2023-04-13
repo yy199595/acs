@@ -12,14 +12,15 @@ namespace Client
         this->mState = Tcp::DecodeState::Head;
     }
 
-	void TcpRpcClientContext::SendToServer(const std::shared_ptr<Rpc::Packet>& message)
+	void TcpRpcClientContext::SendToServer(const std::shared_ptr<Rpc::Packet>& message, bool async)
 	{
-#ifdef ONLY_MAIN_THREAD
-        this->Write(message);
-#else
-        Asio::Context & io = this->mSocket->GetThread();
-        io.post(std::bind(&TcpRpcClientContext::Write, this, message));
-#endif
+		if (async)
+		{
+			Asio::Context& io = this->mSocket->GetThread();
+			io.post(std::bind(&TcpRpcClientContext::Write, this, message));
+			return;
+		}
+		this->SendSync(message);
 	}
 
     void TcpRpcClientContext::OnSendMessage(const Asio::Code & code, std::shared_ptr<ProtoMessage> message)
@@ -77,15 +78,38 @@ namespace Client
                     return;
                 }
                 this->ReceiveMessage(RPC_PACK_HEAD_LEN);
-#ifdef ONLY_MAIN_THREAD
-                this->mClientComponent->OnMessage(std::move(this->mMessage));
-#else
                 Asio::Context & io = App::Inst()->MainThread();
                 io.post(std::bind(&ClientComponent::OnMessage,
                                   this->mClientComponent, std::move(this->mMessage)));
-#endif
             }
                 break;
 		}
     }
+
+	void TcpRpcClientContext::Close()
+	{
+		this->mSocket->Close();
+	}
+
+	std::shared_ptr<Rpc::Packet> TcpRpcClientContext::Receive()
+	{
+		int len = 0;
+		this->RecvSync(RPC_PACK_HEAD_LEN);
+		std::istream readStream(&this->mRecvBuffer);
+		this->mMessage = std::make_shared<Rpc::Packet>();
+		if(!this->mMessage->ParseLen(readStream, len))
+		{
+			return nullptr;
+		}
+		if(this->RecvSync(len) <= 0)
+		{
+			return nullptr;
+		}
+		const std::string& address = this->mSocket->GetAddress();
+		if(!this->mMessage->Parse(address, readStream, len))
+		{
+			return nullptr;
+		}
+		return this->mMessage;
+	}
 }

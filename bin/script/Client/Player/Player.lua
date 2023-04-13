@@ -16,6 +16,7 @@ function Player:Login()
     local loginInfo = LoginComponent.Login(account, password)
     if loginInfo == nil or loginInfo.code ~= XCode.Successful then
         Log.Error(account, ": 使用http登陆失败")
+        table.print(loginInfo)
         return false
     end
 
@@ -42,12 +43,14 @@ function Player.New(info)
 end
 
 function Player:Update()
+    self:Login()
     while true do
         local code = self:Call("Chat.Chat", {
             user_id = 1122, msg_type = 1, message = "hello"
         })
-        if code == XCode.Successful then
-
+        if code == XCode.NetWorkError then
+            Log.Error("net work error stop call")
+            return
         end
         --coroutine.sleep(1000)
     end

@@ -143,7 +143,7 @@ namespace Tendo
             }
         }
 		AsyncMgrComponent * taskComponent = this->mApp->GetTaskComponent();
-		taskComponent->Start(&App::Stop, this->mApp);
+		taskComponent->Start(&App::Stop, this->mApp, 0);
         return XCode::Successful;
     }
 

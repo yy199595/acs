@@ -36,7 +36,6 @@ void Debug::Log(Debug::Level color, const std::string &log)
     {
         switch (color)
         {
-			case spdlog::level::err:
             case spdlog::level::critical:
             {
                 std::string trace;

@@ -37,11 +37,12 @@ namespace Tendo
 	bool App::LoadComponent()
 	{
 #ifndef __OS_WIN__
-		signal(SIGQUIT, App::HandleSignal);
-        signal(SIGKILL, App::HandleSignal);
+		signal(SIGQUIT, App::OnServerStop);
+        signal(SIGKILL, App::OnServerStop);
 #endif
-        signal(SIGTERM, App::HandleSignal);
-        signal(SIGINT, App::HandleSignal);
+        signal(SIGTERM, App::OnServerStop);
+        signal(SIGINT, App::OnServerStop);
+		signal(SIGSEGV, App::OnServerError); //异常退出
         //SetConsoleCtrlHandler((PHANDLER_ROUTINE)WinHandlerSignal, true);
 		this->mTaskComponent = this->GetOrAddComponent<AsyncMgrComponent>();
 		this->mLogComponent = this->GetOrAddComponent<LogComponent>();
@@ -180,7 +181,7 @@ namespace Tendo
 #endif // __OS_WIN__
     }
 
-	void App::Stop()
+	void App::Stop(int signum)
     {
 		if(this->mStatus == ServerStatus::Closing)
 		{
@@ -210,7 +211,8 @@ namespace Tendo
 
 		this->mMainContext->stop();
 		this->mLogComponent->SaveAllLog();
-		LOG_WARN("close " << ServerConfig::Inst()->Name() << " successful ");
+		CONSOLE_LOG_INFO("close " << ServerConfig::Inst()->Name() << " successful ");
+		exit(signum);
 	}
 
 	void App::StartAllComponent()
@@ -228,7 +230,7 @@ namespace Tendo
             if(!component->Start())
             {
                 LOG_ERROR("start [" << name << "] failure");
-                this->Stop();
+                this->Stop(0);
                 return;
             }
             this->mTimerComponent->CancelTimer(timeId);
@@ -287,11 +289,26 @@ namespace Tendo
 		long long t = Helper::Time::NowMilTime() - this->mStartTime;
 		LOG_INFO("===== start " << ServerConfig::Inst()->Name() << " successful [" << t / 1000.0f << "]s ===========");
 	}
-	void App::HandleSignal(int signal)
+	void App::OnServerStop(int signal)
 	{
+		CONSOLE_LOG_ERROR("signal = " << signal);
 		AsyncMgrComponent* component =
 			App::Inst()->GetTaskComponent();
-		component->Start(&App::Stop, App::Inst());
+		component->Start(&App::Stop, App::Inst(), signal);
+	}
+
+	void App::OnServerError(int signal)
+	{
+		std::string trace;
+		App * app = App::Inst();
+		LogComponent * logComponent = app->mLogComponent;
+		if(Debug::Backtrace(trace) > 0)
+		{
+			CONSOLE_LOG_ERROR(trace);
+			logComponent->SaveLog(spdlog::level::critical, trace);
+		}
+		logComponent->SaveAllLog();
+		exit(signal);
 	}
 #ifdef __OS_WIN__
 	void App::UpdateConsoleTitle()

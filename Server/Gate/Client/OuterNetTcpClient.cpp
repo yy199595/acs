@@ -44,8 +44,8 @@ namespace Tendo
 	{
 		if (code)
 		{
-#ifdef __NET_ERROR_LOG__
-			//CONSOLE_LOG_ERROR(code.message());
+#ifdef __DEBUG__
+			CONSOLE_LOG_ERROR(code.message());
 			const std::string& address = this->mSocket->GetAddress();
 			CONSOLE_LOG_ERROR("receive outer message error : [" << address << "]");
 #endif
@@ -106,7 +106,7 @@ namespace Tendo
 	{
 		if(code)
 		{
-#ifdef __NET_ERROR_LOG__
+#ifdef __DEBUG__
 			//CONSOLE_LOG_ERROR(code.message());
             const std::string& address = this->mSocket->GetAddress();
             CONSOLE_LOG_ERROR("send outer message error : [" << address << "]");

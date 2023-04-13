@@ -143,6 +143,7 @@ namespace Tendo
 				LOG_ERROR("call " << server << " [" << address << "] code = " << desc);;
 			}
 			this->mNodeComponent->AddRpcServer(server, userId, address);
+			CONSOLE_LOG_INFO("add " << server << " [" << address << "] to " << userId);
 		}
 		return XCode::Successful;
 	}

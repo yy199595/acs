@@ -124,7 +124,7 @@ namespace Http
 			lua_rawset(lua, -3);
 		}
 		{
-			lua_pushstring(lua, "data");
+			lua_pushstring(lua, "body");
 			lua_pushlstring(lua, this->mContent.c_str(), this->mContent.size());
 			lua_rawset(lua, -3);
 		}

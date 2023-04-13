@@ -14,7 +14,9 @@ namespace Client
 	public:
 		TcpRpcClientContext(std::shared_ptr<Tcp::SocketProxy> socket, ClientComponent * component);
 	public:
-		void SendToServer(const std::shared_ptr<Rpc::Packet>& request);
+		void Close();
+		std::shared_ptr<Rpc::Packet> Receive();
+		void SendToServer(const std::shared_ptr<Rpc::Packet>& request, bool async = true);
 	protected:
         void OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;

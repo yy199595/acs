@@ -36,7 +36,7 @@ namespace Tendo
 		inline TimerComponent* GetTimerComponent() { return this->mTimerComponent; }
 		inline ProtoComponent * GetMsgComponent() { return this->mMessageComponent; }
 	 public:
-		void Stop();
+		void Stop(int signum);
         int Run(int argc, char ** argv);
 		template<typename T>
 		inline RpcService * GetService();
@@ -50,7 +50,8 @@ namespace Tendo
 		bool LoadComponent();
 		void WaitServerStart();
 		void StartAllComponent();		
-		static void HandleSignal(int signal);
+		static void OnServerStop(int signal);
+		static void OnServerError(int signal);
 	 private:
         int mTickCount;
 		float mLogicFps;

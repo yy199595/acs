@@ -153,7 +153,7 @@ namespace Tendo
 			{
 				long long time = iter1->second;
 				long long t = Helper::Time::NowSecTime() - time;
-				LOG_DEBUG("client call " << func << " use time [" << t << "ms]");
+				LOG_DEBUG("client call [" << func << "] use time [" << t << "ms]");
 				this->mRecords.erase(iter1);
 			}
 		}
@@ -197,12 +197,12 @@ namespace Tendo
 
 	void OuterNetComponent::OnCloseSocket(const std::string & address, int code)
     {
+#ifdef __DEBUG__
+		LOG_WARN("remove client [" << address << "]" << CodeConfig::Inst()->GetDesc(code));
+#endif
         auto iter = this->mGateClientMap.find(address);
         if (iter != this->mGateClientMap.end())
         {
-#ifdef __DEBUG__
-            LOG_WARN("remove client [" << address << "]" << CodeConfig::Inst()->GetDesc(code));
-#endif
             std::shared_ptr<OuterNetTcpClient> gateClient = iter->second;
             if (this->mClientPools.size() < 100)
             {

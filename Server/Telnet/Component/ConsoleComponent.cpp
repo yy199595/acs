@@ -54,7 +54,7 @@ namespace Tendo
 			std::getline(std::cin, line);
 			if(line == "quit")
 			{
-				this->mApp->Stop();
+				this->mApp->Stop(0);
 				CONSOLE_LOG_INFO("close console successful");
 				break;
 			}
