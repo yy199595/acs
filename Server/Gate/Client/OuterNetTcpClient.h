@@ -22,7 +22,6 @@ namespace Tendo
 		void SendData(std::shared_ptr<Rpc::Packet> message);
 	 protected:
 		void OnTimeOut() final;
-		void OnConnect(const asio::error_code &error) {}
         void OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t) final;
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
 	private:

@@ -32,14 +32,36 @@ namespace Tendo
 #endif
 	}
 
-    void InnerNetTcpClient::Send(std::shared_ptr<Rpc::Packet> message)
+
+    bool InnerNetTcpClient::Send(const std::shared_ptr<Rpc::Packet>& message, bool async)
     {
+		if(async)
+		{
 #ifdef ONLY_MAIN_THREAD
-        this->Write(message);
+			this->Write(message);
 #else
-        asio::io_service &t = this->mSocket->GetThread();
-        t.post(std::bind(&InnerNetTcpClient::Write, this, message));
+			asio::io_service& t = this->mSocket->GetThread();
+			t.post(std::bind(&InnerNetTcpClient::Write, this, message));
 #endif
+			return true;
+		}
+		else
+		{
+			asio::io_service& t = this->mSocket->GetThread();
+			if(!App::Inst()->IsMainContext(&t))
+			{
+				return false;
+			}
+			if(this->SendSync(message) <= 0)
+			{
+				if(!this->ConnectSync())
+				{
+					return false;
+				}
+				return this->SendSync(message) > 0;
+			}
+			return true;
+		}
     }
 
     void InnerNetTcpClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
@@ -100,7 +122,38 @@ namespace Tendo
 #endif
     }
 
-    void InnerNetTcpClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t size)
+	std::shared_ptr<Rpc::Packet> InnerNetTcpClient::Call(const std::shared_ptr<Rpc::Packet>& message)
+	{
+		if(!this->Send(message, false))
+		{
+			return nullptr;
+		}
+		if(this->RecvSync(RPC_PACK_HEAD_LEN) <= 0)
+		{
+			return nullptr;
+		}
+		int len = 0;
+		std::iostream readStream(&this->mRecvBuffer);
+		this->mMessage = std::make_shared<Rpc::Packet>();
+		if(!this->mMessage->ParseLen(readStream, len))
+		{
+			this->CloseSocket(XCode::UnKnowPacket);
+			return nullptr;
+		}
+		if(this->RecvSync(len) <= 0)
+		{
+			return nullptr;
+		}
+		const std::string& address = this->mSocket->GetAddress();
+		if (!this->mMessage->Parse(address, readStream, len))
+		{
+			return nullptr;
+		}
+		return std::move(this->mMessage);
+	}
+
+
+	void InnerNetTcpClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t size)
     {
         if (code)
         {

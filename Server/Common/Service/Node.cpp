@@ -203,16 +203,21 @@ namespace Tendo
 	void Node::OnClose()
 	{
 		std::string address;
+		const ServerConfig * config = ServerConfig::Inst();
 		RpcService* rpcService = this->mApp->GetService<Registry>();
 		const std::string & server = rpcService->GetServer();
 		if(this->mNodeComponent->GetServer(server, address))
 		{
-			com::type::string request;
-			const ServerConfig* config = ServerConfig::Inst();
-			config->GetLocation("rpc", *request.mutable_str());
-			int code = rpcService->Call(address, "UnRegister", request);
+			s2s::server::info message;
+			{
+				message.set_name(config->Name());
+				config->GetLocation("rpc", *message.mutable_rpc());
+				config->GetLocation("http", *message.mutable_http());
+			}
+
+			int code = rpcService->Call(address, "UnRegister", message);
 			const std::string & desc = CodeConfig::Inst()->GetDesc(code);
-			CONSOLE_LOG_INFO("unregister " << request.str() << " code = " << desc);
+			CONSOLE_LOG_INFO("unregister " << message.rpc() << " code = " << desc);
 		}
 	}
 }

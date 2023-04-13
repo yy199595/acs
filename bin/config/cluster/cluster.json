@@ -1,4 +1,14 @@
 {
+    "GateServer": {
+        "AutoAllot": false,
+        "Service": {
+            "Gate": true,
+            "Node": true,
+            "Chat": false,
+            "User": false,
+            "Registry": false
+        }
+    },
     "ChatServer": {
         "AutoAllot": true,
         "Service": {
@@ -25,16 +35,6 @@
             "HttpWebComponent",
             "HttpDebugComponent"
         ]
-    },
-    "GateServer": {
-        "AutoAllot": false,
-        "Service": {
-            "Gate": true,
-            "Node": true,
-            "Chat": false,
-            "User": false,
-            "Registry": false
-        }
     },
     "DataServer": {
         "AutoAllot": false,

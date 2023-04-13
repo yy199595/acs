@@ -35,6 +35,7 @@ namespace Tendo
 		inline AsyncMgrComponent* GetTaskComponent() { return this->mTaskComponent; }
 		inline TimerComponent* GetTimerComponent() { return this->mTimerComponent; }
 		inline ProtoComponent * GetMsgComponent() { return this->mMessageComponent; }
+		inline bool IsMainContext(const Asio::Context * io) const { return this->mMainContext.get() == io;}
 	 public:
 		void Stop(int signum);
         int Run(int argc, char ** argv);

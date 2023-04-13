@@ -64,24 +64,29 @@ namespace Tendo
 		{
 			return XCode::AddressAllotFailure;
 		}
-		com::type::string message;
 		std::shared_ptr<s2s::server::list> list =
 			std::make_shared<s2s::server::list>();
-		int code = registryService->Call(address, "Query", message, list);
+		int code = registryService->Call(address, "Query", list);
 		if(code != XCode::Successful)
 		{
 			response.Add("error").Add(CodeConfig::Inst()->GetDesc(code));
 			return XCode::Failure;
 		}
+		std::string local;
+		ServerConfig::Inst()->GetLocation("rpc", local);
 		RpcService * nodeService = this->GetComponent<Node>();
 		for (int index = 0; index < list->list_size(); index++)
 		{
 			const s2s::server::info& info = list->list(index);
 			{
-				int code = nodeService->Call(info.rpc(), "Stop");
-				response.Add(info.rpc()).Add(CodeConfig::Inst()->GetDesc(code));
+				if(info.rpc() != local)
+				{
+					int code = nodeService->Call(info.rpc(), "Stop");
+					response.Add(info.rpc()).Add(CodeConfig::Inst()->GetDesc(code));
+				}
 			}
 		}
+		this->mApp->GetTaskComponent()->Start(&App::Stop, this->mApp, 0);
 		return XCode::Successful;
 	}
 
