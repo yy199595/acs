@@ -14,6 +14,7 @@ function Player:Login()
     local phoneNum = self.phone
     LoginComponent.Register(account, password, phoneNum)
     local loginInfo = LoginComponent.Login(account, password)
+    table.print(loginInfo)
     if loginInfo == nil or loginInfo.code ~= XCode.Successful then
         Log.Error(account, ": 使用http登陆失败")
         table.print(loginInfo)

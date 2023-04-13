@@ -123,6 +123,7 @@ namespace Client
 		socketProxy->Init(ip, port);
 		std::shared_ptr<TcpRpcClientContext> client =
 			std::make_shared<TcpRpcClientContext>(socketProxy, this);
+		CONSOLE_LOG_INFO("create new client : [" << socketProxy->GetAddress() << "]");
 		this->mClients.emplace(id, client);
         return id;
 	}

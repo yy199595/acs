@@ -50,6 +50,13 @@ for arg in $cmd; do
         cmake ./CMakeLists.txt
         make app
     fi
+
+    if [[ $arg == "protoc" ]]; then
+        cd $current_path || exit
+        cmake ./CMakeLists.txt
+        make protoc
+        cmake ./CMakeLists.txt
+    fi
 done
 
 # shellcheck disable=SC2038
