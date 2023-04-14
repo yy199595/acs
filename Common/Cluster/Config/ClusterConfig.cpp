@@ -13,8 +13,9 @@ namespace Tendo
         return iter != this->mServices.end() && iter->second;
     }
 
-    bool NodeConfig::OnLoadConfig(const rapidjson::Value &value)
+    bool NodeConfig::OnLoadConfig(const rapidjson::Value &value, int index)
     {
+		this->mIndex = index;
 		this->mIsAutoAllot = false;
         if(value.HasMember("Service"))
         {
@@ -95,13 +96,14 @@ namespace Tendo
         {
             return false;
         }
+		int index = 0;
         auto iter = document.MemberBegin();
         for(; iter != document.MemberEnd(); iter++)
         {
             const std::string name(iter->name.GetString());
             const rapidjson::Value & jsonValue = iter->value;
             std::unique_ptr<NodeConfig> nodeConfig(new NodeConfig(name));
-            if(!nodeConfig->OnLoadConfig(jsonValue))
+            if(!nodeConfig->OnLoadConfig(jsonValue, index++))
             {
                 return false;
             }

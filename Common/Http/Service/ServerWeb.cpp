@@ -10,6 +10,9 @@
 #include"Util/File/DirectoryHelper.h"
 #include"Util/File/FileHelper.h"
 #include"Rpc/Component/NodeMgrComponent.h"
+#include "Timer/Timer/ElapsedTimer.h"
+#include"Cluster/Config/ClusterConfig.h"
+
 namespace Tendo
 {
     bool ServerWeb::OnInit()
@@ -75,15 +78,36 @@ namespace Tendo
 		std::string local;
 		ServerConfig::Inst()->GetLocation("rpc", local);
 		RpcService * nodeService = this->GetComponent<Node>();
+		std::vector<const s2s::server::info *> serverInfos;
 		for (int index = 0; index < list->list_size(); index++)
 		{
 			const s2s::server::info& info = list->list(index);
-			{
-				if(info.rpc() != local)
+			serverInfos.emplace_back(&info);
+		}
+		std::sort(serverInfos.begin(), serverInfos.end(), []
+			(const s2s::server::info * info1, const s2s::server::info * info2)->bool
+		{
+				const NodeConfig * config1 = ClusterConfig::Inst()->GetConfig(info1->name());
+				const NodeConfig * config2 = ClusterConfig::Inst()->GetConfig(info2->name());
+				if(config1 != nullptr && config2 != nullptr)
 				{
-					int code = nodeService->Call(info.rpc(), "Stop");
-					response.Add(info.rpc()).Add(CodeConfig::Inst()->GetDesc(code));
+					return config1->GetIndex() < config2->GetIndex();
 				}
+				return true;
+		});
+		for(const s2s::server::info * info : serverInfos)
+		{
+			if(info->rpc() != local)
+			{
+				ElapsedTimer timer;
+				int code = nodeService->Call(info->rpc(), "Stop");
+				response.BeginObject(info->rpc().c_str());
+				response.Add("rpc").Add(info->rpc());
+				response.Add("name").Add(info->name());
+				response.Add("http").Add(info->http());
+				response.Add("ms").Add(timer.GetMs());
+				response.Add("code").Add(CodeConfig::Inst()->GetDesc(code));
+				response.EndObject();
 			}
 		}
 		this->mApp->GetTaskComponent()->Start(&App::Stop, this->mApp, 0);

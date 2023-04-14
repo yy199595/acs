@@ -18,8 +18,9 @@ namespace Tendo
         NodeConfig(const std::string & name)
             : mIsAutoAllot(false), mName(name) { }
     public:
-        bool OnLoadConfig(const rapidjson::Value & value);
+        bool OnLoadConfig(const rapidjson::Value & value, int index);
     public:
+		int GetIndex() const { return this->mIndex;}
         bool IsStart(const std::string & service) const;
         bool HasService(const std::string & service) const;
         bool IsAuthAllot() const { return this->mIsAutoAllot; }
@@ -29,6 +30,7 @@ namespace Tendo
         size_t GetComponents(std::vector<std::string> & components) const;
         size_t GetServices(std::vector<std::string> & services, bool start = false) const;
     private:
+		int mIndex; //决定了服务器关闭顺序
 		std::string mLua;
         bool mIsAutoAllot;
         const std::string mName;
