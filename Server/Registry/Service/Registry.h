@@ -22,7 +22,7 @@ namespace Tendo
 		int Register(const std::string & address,const s2s::server::info & request);
         int UnRegister(const std::string& address, const s2s::server::info& request);
     private:
-		void OnClose() final;
+		void OnClose() final { }
 		void OnSecondUpdate(int tick) final;
 	 private:
 		std::string mTable;
