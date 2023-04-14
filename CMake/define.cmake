@@ -20,7 +20,6 @@ option(protobuf_BUILD_CONFORMANCE OFF)
 if(WIN32 AND NOT MSVC)
     #set(protobuf_BUILD_SHARED_LIBS ON) #编译动态库
 endif()
-option(__DEBUG__ "debug模式" ON)
 
 option(__DEBUG_STACK__ "开启堆栈打印" ON)
 option(__RPC_MESSAGE__ "打印rpc消息" ON)
@@ -29,7 +28,14 @@ option(__NET_ERROR_LOG__ "打印网络层错误" ON)
 
 set(CMAKE_COMMON_DIR ${PROJECT_SOURCE_DIR})
 
-
+message("================ [" ${CMAKE_BUILD_TYPE} "] ==============")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_definitions(-D __DEBUG__)
+    if(__RPC_MESSAGE__)
+        message("打印rpc消息")
+        add_definitions(-D __RPC_MESSAGE__)
+    endif()
+endif()
 
 if(ONLY_MAIN_THREAD)
     message("当前网络为单线程模型")
@@ -39,12 +45,8 @@ else()
 endif()
 
 if(__DEBUG__)
-    message("当前为debug模式")
-    add_definitions(-D __DEBUG__)
-    if(__RPC_MESSAGE__)
-        message("打印rpc消息")
-        add_definitions(-D __RPC_MESSAGE__)
-    endif()
+    message("------------")
+
 endif()
 
 if(WIN32)

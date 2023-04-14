@@ -15,11 +15,7 @@ include(CMake/code.cmake)
 include(CMake/define.cmake)
 include(CMake/function.cmake)
 
-if(__DEBUG__)
-    SET(CMAKE_BUILD_TYPE "Debug")
-else()
-    SET(CMAKE_BUILD_TYPE "Release")
-endif()
+
 
 find_program(CCACHE_PROGRAM ccache)
 if (CCACHE_PROGRAM)

@@ -47,8 +47,14 @@ for arg in $cmd; do
 
     if [[ $arg == "debug" ]]; then
         cd $current_path || exit
-        cmake ./CMakeLists.txt
+        cmake -DCMAKE_BUILD_TYPE=Debug ./CMakeLists.txt
         make app
+    fi
+
+    if [[ $arg == "release" ]]; then
+          cd $current_path || exit
+          cmake -DCMAKE_BUILD_TYPE=Release ./CMakeLists.txt
+          make app
     fi
 
     if [[ $arg == "protoc" ]]; then
