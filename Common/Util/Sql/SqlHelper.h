@@ -1,9 +1,8 @@
 #pragma once
 
 #include<sstream>
-#include"Message/db.pb.h"
+#include"Message/s2s/db.pb.h"
 #include"rapidjson/document.h"
-
 using namespace google::protobuf;
 namespace Tendo
 {

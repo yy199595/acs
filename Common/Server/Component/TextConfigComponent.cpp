@@ -36,10 +36,10 @@ namespace Tendo
 
     bool TextConfigComponent::LoadTextConfig(std::unique_ptr<ITextConfig> config, const std::string &path)
     {
-        const std::string & name = config->GetName();
+        const std::string & name = config->GetConfigName();
         if(this->mConfigs.find(name) != this->mConfigs.end())
         {
-            LOG_ERROR("multiple load [" << config->GetName() << "]");
+            LOG_ERROR("multiple load [" << config->GetConfigName() << "]");
             return false;
         }
         if(!config->LoadConfig(path))

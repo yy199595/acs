@@ -19,6 +19,7 @@
 #include"Http/Component/HttpWebComponent.h"
 #include"Http/Component/HttpDebugComponent.h"
 #include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/InnerRpcComponent.h"
 
 #include"Server/Component/TextConfigComponent.h"
 #include"Cluster/Component/LaunchComponent.h"
@@ -28,6 +29,7 @@
 #include"Http/Service/ServerWeb.h"
 #include"Registry/Service/Registry.h"
 #include"Common/Service/User.h"
+#include"Registry/Component/RegistryComponent.h"
 
 #include"Component/ClientComponent.h"
 #include"Kcp/Component/KcpComponent.h"
@@ -44,7 +46,7 @@
 
 #include"Redis/Component/RedisComponent.h"
 #include"Redis/Component/RedisStringComponent.h"
-#include"Redis/Component/RedisScriptComponent.h"
+#include"Redis/Component/RedisLuaComponent.h"
 
 #include"Sqlite/Component/SqliteComponent.h"
 
@@ -71,6 +73,8 @@ void RegisterComponent()
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
     ComponentFactory::Add<InnerNetComponent>("InnerNetComponent");
 	ComponentFactory::Add<NodeMgrComponent>("NodeMgrComponent");
+	ComponentFactory::Add<InnerRpcComponent>("RpcNetComponent");
+	ComponentFactory::Add<RegistryComponent>("RegistryComponent");
 	ComponentFactory::Add<DispatchMessageComponent>("DispatchMessageComponent");
 
 // gate
@@ -81,7 +85,7 @@ void RegisterComponent()
 
     ComponentFactory::Add<RedisComponent>("RedisComponent");
     ComponentFactory::Add<RedisStringComponent>("RedisStringComponent");
-    ComponentFactory::Add<RedisScriptComponent>("RedisScriptComponent");
+    ComponentFactory::Add<RedisLuaComponent>("RedisScriptComponent");
 
     ComponentFactory::Add<MongoDBComponent>("MongoDBComponent");
     ComponentFactory::Add<MongoHelperComponent>("MongoHelperComponent");

@@ -12,6 +12,7 @@ struct lua_State;
 constexpr int LUA_MYSQL_EXEC = 1;
 constexpr int LUA_MYSQL_QUERY = 2;
 constexpr int LUA_MYSQL_QUERY_ONE = 3;
+constexpr int LUA_MYSQL_CREATE_TABLE = 4;
 
 namespace Tendo
 {

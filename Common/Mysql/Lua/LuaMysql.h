@@ -16,6 +16,7 @@ namespace Lua
 		int Exec(lua_State * lua);
 		int Query(lua_State * lua);
 		int QueryOnce(lua_State * lua);
+		int CreateTable(lua_State * lua);
 		int Invoke(lua_State * lua, int method);
 	}
 }

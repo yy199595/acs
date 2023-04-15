@@ -39,10 +39,10 @@ namespace Tendo
         size_t key = typeid(T).hash_code();
         if(this->mKeys.find(key) != this->mKeys.end())
         {
-            LOG_ERROR("multiple load [" << config->GetName() << "] type = " << typeid(T).name());
+            LOG_ERROR("multiple load [" << config->GetConfigName() << "] type = " << typeid(T).name());
             return false;
         }
-        this->mKeys[key] = config->GetName();
+        this->mKeys[key] = config->GetConfigName();
         return this->LoadTextConfig(std::move(config), path);
     }
     template<typename T>

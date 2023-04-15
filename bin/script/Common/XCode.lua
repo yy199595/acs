@@ -41,4 +41,9 @@ XCode =
 	AccountNotExists = 38,--账号不存在
 	AddressAllotFailure = 39,--服务分配失败
 	LuaCoroutineWait = 40,--等待lua协程完成
+	MakeTcpRequestFailure = 41,--创建tcp请求错误
+	MakeHttpRequestFailure = 42,--创建http请求错误
+	ParseHttpUrlFailure = 43,--解析http的url失败
+	UnknownMessageNetType = 44,--未知的传输网络类型
+	OnlyUseTcpProtocol = 45,--只能使用tcp协议
 }

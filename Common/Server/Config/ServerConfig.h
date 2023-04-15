@@ -13,10 +13,10 @@ namespace Tendo
     {
     public:
         std::string Ip;
-        std::string Name;
-        std::string Address;
+        std::string Net;
         unsigned short Port = 0;
     };
+
 
     class ServerConfig : public Json::Reader, public TextConfig, public ConstSingleton<ServerConfig>
     {
@@ -25,22 +25,26 @@ namespace Tendo
     public:
 		bool UseLua() const { return this->mUseLua;}
 		bool GetLuaConfig(const std::string & name, std::string & value) const;
-        bool GetListen(const std::string & name, unsigned short & port) const;
-        bool GetLocation(const char * name, std::string & location) const;
+		bool GetListen(std::vector<std::string> & names) const;
+		bool GetListen(const std::string & name, unsigned short & port) const;
+		bool GetListen(const std::string & name, std::string & net, unsigned short & port) const;
+		bool GetLocation(const char * name, std::string & location) const;
     protected:
         bool OnLoadText(const char *str, size_t length) final;
         bool OnReloadText(const char *str, size_t length) final;
 	 public:
+		int GetId() const { return this->mId; }
         const std::string& Name() const { return this->mName; } //服务器名字
 		const std::string & GetContent() const { return this->mContent;}
 		bool GetPath(const std::string & name, std::string & path) const;
 	private:
 		bool ParseHttpAddress(const std::string & address, unsigned short & port) const;
     private:
+		int mId;
 		bool mUseLua;
 		std::string mContent;
         const std::string mName;
-        std::unordered_map<std::string, unsigned int> mListens;
+        std::unordered_map<std::string, ListenConfig> mListens;
         std::unordered_map<std::string, std::string> mPaths;
         std::unordered_map<std::string, std::string> mLocations;
 		std::unordered_map<std::string, std::string> mLuaConfigs;

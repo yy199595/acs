@@ -45,9 +45,9 @@ namespace Tendo
 		if (code)
 		{
 #ifdef __DEBUG__
-			CONSOLE_LOG_ERROR(code.message());
-			const std::string& address = this->mSocket->GetAddress();
-			CONSOLE_LOG_ERROR("receive outer message error : [" << address << "]");
+			//CONSOLE_LOG_ERROR(code.message());
+			//const std::string& address = this->mSocket->GetAddress();
+			//CONSOLE_LOG_ERROR("receive outer message error : [" << address << "]");
 #endif
 			this->CloseSocket(XCode::NetReceiveFailure);
 			return;

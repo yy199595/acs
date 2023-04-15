@@ -30,9 +30,10 @@ namespace Tendo
         }
         for (unsigned int index = 0; index < json["address"].Size(); index++)
         {
+			std::string net;
             Net::Address addressInfo;
             addressInfo.FullAddress.assign(json["address"][index].GetString());
-            if(!Helper::Str::SplitAddr(addressInfo.FullAddress, addressInfo.Ip, addressInfo.Port))
+            if(!Helper::Str::SplitAddr(addressInfo.FullAddress, net, addressInfo.Ip, addressInfo.Port))
             {
                 return false;
             }

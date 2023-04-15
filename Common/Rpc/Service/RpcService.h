@@ -19,8 +19,6 @@ namespace Tendo
 		RpcService();
 	public:
 		inline void SetProto(int proto) { this->mProto = proto; }
-		inline void SetAsync(bool async) { this->mAsync = async; }
-		inline void SetNetType(int type) { this->mNetType = type;}
 		const std::string& GetServer() const { return this->mCluster; }
 	public:
 		int Send(const std::string& func, const Message& request);
@@ -51,13 +49,8 @@ namespace Tendo
 		virtual int Invoke(const std::string& method, std::shared_ptr<Rpc::Packet> message) = 0;
 	private:
 		int mProto;
-		int mAsync;
-		int mNetType;
 		std::string mCluster;
 		std::string mLocationAddress;
-		std::vector<std::string> mServiceHosts;
-		class HttpComponent * mHttpComponent;
-		class InnerNetComponent* mTcpComponent;
-        class NodeMgrComponent* mLocationComponent;
+		class InnerRpcComponent * mNetComponent;
 	};
 }

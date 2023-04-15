@@ -242,6 +242,13 @@ namespace Http
 		this->mHead.Add(Http::HeadName::ContentLength, this->mContent.size());
     }
 
+	void PostRequest::Protobuf(const std::string& protobuf)
+	{
+		this->mContent.assign(protobuf);
+		this->mHead.Add(Http::HeadName::ContentType, Http::ContentName::PB);
+		this->mHead.Add(Http::HeadName::ContentLength, this->mContent.size());
+	}
+
     int PostRequest::OnWriteContent(std::ostream &buffer)
     {
         buffer.write(this->mContent.c_str(), this->mContent.size());

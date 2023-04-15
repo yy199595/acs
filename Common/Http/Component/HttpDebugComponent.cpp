@@ -123,8 +123,13 @@ namespace Tendo
 		ClusterConfig::Inst()->GetServerName(service, server);
 		if (id == 0)
 		{
+			const char * listen = "http";
+			if(this->mNodeComponent->GetServer(server, address, listen))
+			{
+				return true;
+			}
 			return this->mNodeComponent->GetServer(server, address);
 		}
-		return this->mNodeComponent->GetServer(server, id, address);		
+		return this->mNodeComponent->GetServer(server, id, address);
 	}
 }

@@ -4,141 +4,82 @@
 
 #include"NodeMgrComponent.h"
 #include"Util/Math/MathHelper.h"
+#include"Util/Time/TimeHelper.h"
 #include"Registry/Service/Registry.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include"Async/Component/AsyncMgrComponent.h"
 #include"Entity/Unit/App.h"
+#include"Util/String/StringHelper.h"
 #include"Server/Config/CodeConfig.h"
 namespace Tendo
 {
-    void NodeMgrComponent::AddRpcServer(const std::string& name, const std::string& address)
+    bool NodeMgrComponent::AddServer(int id, const std::string& server, const std::string & name, const std::string& address)
     {
-		LOG_CHECK_RET(!address.empty());
-		const NodeConfig* config = ClusterConfig::Inst()->GetConfig(name);
-		LOG_CHECK_LOG_RET(config != nullptr, "not find cluster config " << name);
+		LOG_CHECK_RET_FALSE(!address.empty());
+		LOG_CHECK_RET_FALSE(ClusterConfig::Inst()->GetConfig(server));
 
-		auto iter = this->mRpcServers.find(name);
-		if(iter == this->mRpcServers.end())
+		auto iter = this->mServers.find(id);
+		if(iter == this->mServers.end())
 		{
-			std::vector<std::string> item;
-			this->mRpcServers.emplace(name, item);
+			this->mServers.emplace(id, std::make_unique<LocationUnit>());
 		}
-        std::vector<std::string> & locations = this->mRpcServers[name];
-        if(std::find(locations.begin(), locations.end(), address) == locations.end())
-        {
-            locations.emplace_back(address);
-            LOG_WARN(name << " add rpc server address [" << address << "]");
-        }
+		this->mServers[id]->Add(name, address);
+		auto iter1 = this->mRpcServers.find(server);
+		if(iter1 == this->mRpcServers.end())
+		{
+			std::vector<int> list;
+			this->mRpcServers.emplace(server, list);
+		}
+		std::vector<int> &list = this->mRpcServers[server];
+		if(std::find(list.begin(), list.end(), id) == list.end())
+		{
+			list.emplace_back(id);
+		}
+		LOG_INFO(server << " add " << name << " [" << address << "]");
+		return true;
     }
 
-	void NodeMgrComponent::WaitServerStart(const std::string& server)
+	bool NodeMgrComponent::DelServer(int id)
 	{
-		int count = 0;
-		while (this->mRpcServers.count(server) == 0)
-		{
-			std::string address;
-			RpcService* rpcService = this->mApp->GetService<Registry>();
-			if (!this->GetServer(rpcService->GetServer(), address))
-			{
-				this->mApp->GetTaskComponent()->Sleep(2000);
-				continue;
-			}
-			com::type::string request;
-			request.set_str(server);
-			std::shared_ptr<s2s::server::list> response
-				= std::make_shared<s2s::server::list>();
-			LOG_DEBUG("query " << server << " address count =" << count++);		
-			if(rpcService->Call(address, "Query", request, response) == XCode::Successful)
-			{
-				for (int index = 0; index < response->list_size(); index++)
-				{
-					const s2s::server::info& info = response->list(index);
-					{
-						this->AddRpcServer(info.name(), info.rpc());
-						this->AddHttpServer(info.name(), info.http());
-					}
-				}
-				return;
-			}
-			this->mApp->GetTaskComponent()->Sleep(2000);
-		}		
-	}
-
-	void NodeMgrComponent::AddHttpServer(const std::string& name, const std::string& address)
-	{
-		if(address.empty())
-		{
-			return;
-		}
-		LOG_WARN(name << " add http server address [" << address << "]");
-	}
-
-	bool NodeMgrComponent::DelServer(const std::string& address)
-	{
-		auto iter = this->mRpcServers.begin();
-		for (; iter != this->mRpcServers.end(); iter++)
-		{
-			auto iter1 = std::find(
-				iter->second.begin(), iter->second.end(), address);
-			if (iter1 != iter->second.end())
-			{
-				iter->second.erase(iter1);
-				return true;
-			}
-		}
-		return false;
-	}
-
-	bool NodeMgrComponent::GetServers(std::vector<std::string>& hosts)
-	{
-		auto iter = this->mRpcServers.begin();
-		for(; iter != this->mRpcServers.end(); iter++)
-		{
-			for(const std::string & address : iter->second)
-			{
-				hosts.emplace_back(address);
-			}
-		}
-		return !hosts.empty();
-	}
-
-	bool NodeMgrComponent::GetServers(const std::string& server, std::vector<std::string>& hosts)
-	{
-		auto iter = this->mRpcServers.find(server);
-		if(iter == this->mRpcServers.end())
+		auto iter = this->mServers.find(id);
+		if (iter == this->mServers.end())
 		{
 			return false;
 		}
-		hosts = iter->second;
+		this->mServers.erase(iter);
 		return true;
 	}
 
-    bool NodeMgrComponent::GetServer(const std::string & name, std::string & address)
-    {	
-        auto iter = this->mRpcServers.find(name);
-        if(iter == this->mRpcServers.end())
-        {
-			std::string server;
-			if (!ClusterConfig::Inst()->GetServerName(name, server))
-			{
-				return false;
-			}
-			iter = this->mRpcServers.find(server);
-			if (iter == this->mRpcServers.end())
-			{
-				return false;
-			}
-        }
-        int size = (int)iter->second.size();
-        int index = Helper::Math::Random<int>(0, size - 1);
-        address = iter->second[index];
-        return true;
-    }
+    bool NodeMgrComponent::GetServer(const std::string & server, std::string & address, const char * listen)
+	{
+		std::string name("rpc");
+		if(listen != nullptr)
+		{
+			name.assign(listen);
+		}
+		auto iter = this->mRpcServers.find(name);
+		if (iter == this->mRpcServers.end())
+		{
+			return false;
+		}
+		if (iter->second.empty())
+		{
+			return false;
+		}
+		int size = (int)iter->second.size();
+		int id = Helper::Math::Random<int>(0, size - 1);
+		auto iter1 = this->mServers.find(id);
+		if(iter1 == this->mServers.end())
+		{
+			return false;
+		}
+		return iter1->second->Get(name, address);
+	}
 
     bool NodeMgrComponent::GetServer(const std::string & name, long long index, std::string & address)
     {
-		auto iter1 = this->mUnitLocations.find(index);
-		if (iter1 != this->mUnitLocations.end())
+		auto iter1 = this->mClients.find(index);
+		if (iter1 != this->mClients.end())
 		{
 			if (iter1->second->Get(name, address))
 			{
@@ -158,57 +99,80 @@ namespace Tendo
 
 	bool NodeMgrComponent::DelUnit(long long id)
 	{
-		auto iter = this->mUnitLocations.find(id);
-		if(iter == this->mUnitLocations.end())
+		auto iter = this->mClients.find(id);
+		if(iter == this->mClients.end())
 		{
 			return false;
 		}
-		this->mUnitLocations.erase(iter);
+		this->mClients.erase(iter);
 		return true;
 	}
 
-	bool NodeMgrComponent::DelServer(const std::string& server, long long id)
-	{
-		auto iter = this->mUnitLocations.find(id);
-		if (iter == this->mUnitLocations.end())
-		{
-			return false;
-		}
-		if (iter->second->Del(server) 
-			&& iter->second->GetLocationSize() == 0)
-		{
-			this->mUnitLocations.erase(iter);
-		}		
-		return true;
-	}
 
 	bool NodeMgrComponent::AddRpcServer(const std::string& server, long long id, const std::string& address)
 	{
 		LocationUnit* localUnit = nullptr;
-		auto iter = this->mUnitLocations.find(id);
-		if (iter == this->mUnitLocations.end())
+		auto iter = this->mClients.find(id);
+		if (iter == this->mClients.end())
 		{
 			std::unique_ptr<LocationUnit> tmp = std::make_unique<LocationUnit>();
 			{
 				localUnit = tmp.get();
-				this->mUnitLocations.emplace(id, std::move(tmp));
+				this->mClients.emplace(id, std::move(tmp));
 			}
 		}
 		else
 		{
 			localUnit = iter->second.get();
-		}		
+		}
 		localUnit->Add(server, address);
 		return true;
 	}
 
     bool NodeMgrComponent::GetServer(long long int userId, std::unordered_map<std::string, std::string> &servers)
     {
-        auto iter = this->mUnitLocations.find(userId);
-        if(iter == this->mUnitLocations.end())
+        auto iter = this->mClients.find(userId);
+        if(iter == this->mClients.end())
         {
             return false;
         }
 		return iter->second->Get(servers);
     }
+
+	bool NodeMgrComponent::GetServer(const string& server, std::vector<std::string>& servers, const char * listen)
+	{
+		std::string name("rpc");
+		if(listen != nullptr)
+		{
+			name.assign(listen);
+		}
+		auto iter = this->mRpcServers.find(server);
+		if(iter == this->mRpcServers.end())
+		{
+			return false;
+		}
+		for (auto& id : iter->second)
+		{
+			auto iter1 = this->mServers.find(id);
+			if(iter1 != this->mServers.end())
+			{
+				std::string address;
+				if (iter1->second->Get(name, address))
+				{
+					servers.emplace_back(address);
+				}
+			}
+		}
+		return !servers.empty();
+	}
+
+	bool NodeMgrComponent::HasServer(const string& server) const
+	{
+		auto iter = this->mRpcServers.find(server);
+		if(iter == this->mRpcServers.end())
+		{
+			return false;
+		}
+		return iter->second.size() > 0;
+	}
 }

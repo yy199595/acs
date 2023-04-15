@@ -2,7 +2,7 @@
 // Created by zmhy0073 on 2022/11/2.
 //
 
-#include"RedisScriptComponent.h"
+#include"RedisLuaComponent.h"
 #include"Util/String/StringHelper.h"
 #include"RedisComponent.h"
 #include"Util/File/FileHelper.h"
@@ -10,7 +10,7 @@
 #include"Core/System/System.h"
 namespace Tendo
 {
-    bool RedisScriptComponent::LateAwake()
+    bool RedisLuaComponent::LateAwake()
     {
         this->mComponent = this->GetComponent<RedisComponent>();
         std::vector<std::string> luaFiles;
@@ -36,7 +36,7 @@ namespace Tendo
         return true;
     }
 
-    bool RedisScriptComponent::OnLoadScript(const std::string &name, const std::string &md5)
+    bool RedisLuaComponent::OnLoadScript(const std::string &name, const std::string &md5)
     {
         auto iter = this->mLuaMap.find(name);
         if(iter != this->mLuaMap.end())
@@ -48,7 +48,7 @@ namespace Tendo
         return true;
     }
 
-    std::shared_ptr<RedisRequest> RedisScriptComponent::MakeLuaRequest(const std::string &fullName, const std::string &json)
+    std::shared_ptr<RedisRequest> RedisLuaComponent::MakeLuaRequest(const std::string &fullName, const std::string &json)
     {
         size_t pos = fullName.find('.');
         if(pos == std::string::npos)
@@ -67,7 +67,7 @@ namespace Tendo
         return RedisRequest::MakeLua(tag, func, json);
     }
 
-    std::shared_ptr<RedisResponse> RedisScriptComponent::Call(const std::string &func, const std::string &json, bool async)
+    std::shared_ptr<RedisResponse> RedisLuaComponent::Call(const std::string &func, const std::string &json, bool async)
     {
         std::shared_ptr<RedisRequest> request = this->MakeLuaRequest(func, json);
         if(request == nullptr)
@@ -77,13 +77,10 @@ namespace Tendo
         std::shared_ptr<RedisResponse> response = async 
             ? this->mComponent->Run(request) : this->mComponent->SyncRun(request);
 
-        if (response == nullptr || response->HasError())
+        if (response != nullptr && response->HasError())
         {
-            return nullptr;
+			LOG_ERROR("call [" << func << "] error : " << response->GetString());
         }
-#ifdef __DEBUG__
-        LOG_DEBUG("call lua " << func << " response json = " << response->GetString());
-#endif
         return response;
     }
 

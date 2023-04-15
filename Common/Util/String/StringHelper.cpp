@@ -138,36 +138,30 @@ namespace Helper
 
 namespace Helper
 {
-    bool Str::SplitAddr(const std::string& address, std::string& ip, unsigned short& port)
+    bool Str::SplitAddr(const std::string& address, std::string & net, std::string& ip, unsigned short& port)
     {
-		if(Str::IsRpcAddr(address))
+		std::smatch match;
+		std::regex pattern(R"((\w+)://(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d+))");
+		if (!std::regex_search(address, match, pattern))
 		{
-			size_t pos = address.find(':');
-			if (pos == std::string::npos)
-			{
-				return false;
-			}
-			ip = address.substr(0, pos);
-			port = (unsigned short)std::stoul(address.substr(pos + 1));
-			return true;
+			return false;
 		}
-		else if(Str::IsHttpAddr(address))
-		{
-			std::regex pattern("(http://)?([^:/]+)(:\\d+)?");
-			std::smatch match;
-			if (std::regex_search(address, match, pattern))
-			{
-				ip = match[2];
-				port = std::stol(match[3].str().substr(1));
-				return true;
-			}
-		}
-		return false;
+		net = match[1].str();
+		ip = match[2].str();
+		port = (unsigned short)std::stoi(match[3].str());
+		return true;
     }
+
+	bool Str::IsIpAddress(const std::string& str)
+	{
+		std::regex pattern("^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$");
+		return std::regex_match(str, pattern);
+	}
 
 	bool Str::IsRpcAddr(const std::string& address)
 	{
-		std::regex pattern(R"(^\d{1,3}(\.\d{1,3}){3}:\d{1,5}$)");
+		//std::regex pattern(R"(^\d{1,3}(\.\d{1,3}){3}:\d{1,5}$)");
+		std::regex pattern(R"(tcp://[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?)");
 		return std::regex_match(address, pattern);
 	}
 

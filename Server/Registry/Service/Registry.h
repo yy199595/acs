@@ -4,7 +4,8 @@
 
 #ifndef APP_LOCATIONSERVICE_H
 #define APP_LOCATIONSERVICE_H
-#include"Message/s2s.pb.h"
+#include"Message/s2s/s2s.pb.h"
+#include"Message/com/com.pb.h"
 #include"Rpc/Service/PhysicalRpcService.h"
 namespace Tendo
 {
@@ -18,18 +19,18 @@ namespace Tendo
         bool OnStart() final;
     private:
         int Ping(const Rpc::Packet & head);
-        int Query(const s2s::server::query& request, s2s::server::list& response);
-		int Register(const std::string & address,const s2s::server::info & request);
-        int UnRegister(const std::string& address, const s2s::server::info& request);
+		int UnRegister(const com::type::int32& request);
+		int Register(const std::string & address, const s2s::server::info & request);
+		int Query(const s2s::server::query& request, s2s::server::list& response);
+
     private:
 		void OnClose() final { }
 		void OnSecondUpdate(int tick) final;
 	 private:
 		std::string mTable;
-        class RedisComponent* mRedisComponent;
+		std::unordered_set<std::string> mServers;
+        class RedisLuaComponent* mRedisComponent;
         class NodeMgrComponent * mNodeComponent;
-        class InnerNetComponent* mInnerComponent;
-        std::unordered_set<std::string> mRegistryServers;
     };
 }
 

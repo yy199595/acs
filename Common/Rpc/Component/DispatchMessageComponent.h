@@ -35,10 +35,9 @@ namespace Tendo
 		void Invoke(const RpcMethodConfig * config, const std::shared_ptr<Rpc::Packet>& message);
     private:
 		unsigned int mWaitCount;
-		class HttpWebComponent * mWebComponent;
+		class InnerRpcComponent * mNetComponent;
 		class AsyncMgrComponent* mTaskComponent;
 		class TimerComponent* mTimerComponent;
 		class OuterNetComponent* mOuterComponent;
-		class InnerNetComponent* mInnerComponent;
 	};
 }

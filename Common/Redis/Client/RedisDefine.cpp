@@ -65,6 +65,7 @@ namespace Tendo
 	std::string RedisRequest::ToJson()
 	{
 		Json::Writer jsonWriter;
+		jsonWriter.Add(this->mCommand);
 		jsonWriter.Add(this->mParameters);
 		return jsonWriter.JsonString();
 	}

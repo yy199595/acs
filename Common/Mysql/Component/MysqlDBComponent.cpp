@@ -133,6 +133,8 @@ namespace Tendo
 		luaRegister.PushExtensionFunction("Exec", Lua::LuaMysql::Exec);
 		luaRegister.PushExtensionFunction("Query", Lua::LuaMysql::Query);
 		luaRegister.PushExtensionFunction("QueryOnce", Lua::LuaMysql::QueryOnce);
+		luaRegister.PushExtensionFunction("CreateTable", Lua::LuaMysql::CreateTable);
+
 	}
 
 	std::shared_ptr<Mysql::Response> MysqlDBComponent::Run(int index, const std::shared_ptr<Mysql::ICommand>& command)

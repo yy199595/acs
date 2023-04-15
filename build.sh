@@ -22,7 +22,22 @@ for arg in $cmd; do
     fi
 
     if [[ $arg == "mysql" ]]; then
-        wget http://cdn.tarsyun.com/src/mysql-connector-c-6.1.11-src.fixed.zip
+        cd $current_path || exit
+        if [ -d "./Libs/mysql/lib" ]; then
+            mkdir -p "./Libs/mysql/lib"
+        fi
+        if [ -d "./Libs/bin/mysql-connector-c-6.1.11-src" ]; then
+            echo "mysql already exists locally"
+        else
+            cd ./Libs/bin/ || exit
+            wget http://cdn.tarsyun.com/src/mysql-connector-c-6.1.11-src.fixed.zip
+            unzip mysql-connector-c-6.1.11-src.fixed.zip
+            rm -rf mysql-connector-c-6.1.11-src.fixed.zip
+        fi
+        cd $current_path/Libs/bin/mysql-connector-c-6.1.11-src || exit
+        cmake ./CMakeLists.txt
+        make
+        cd $current_path || exit
     fi
 
     if [[ $arg == "openssl" ]]; then

@@ -5,7 +5,7 @@
 #ifndef APP_USERBEHAVIOR_H
 #define APP_USERBEHAVIOR_H
 
-#include"Message/s2s.pb.h"
+#include"Message/s2s/s2s.pb.h"
 #include"Rpc/Service/PhysicalRpcService.h"
 namespace Tendo
 {

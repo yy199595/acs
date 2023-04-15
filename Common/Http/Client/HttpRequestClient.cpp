@@ -6,6 +6,8 @@
 #include"Util/Guid/Guid.h"
 #include"Entity/Unit/App.h"
 #include"Http/Component/HttpComponent.h"
+#include "Util/String/StringHelper.h"
+
 namespace Tendo
 {
     HttpRequestClient::HttpRequestClient(std::shared_ptr<Tcp::SocketProxy> socketProxy, HttpComponent * httpComponent)
@@ -156,6 +158,12 @@ namespace Tendo
             this->mTimer = std::make_shared<asio::steady_timer>(context, second);
             this->mTimer->async_wait(std::bind(&HttpRequestClient::OnTimeout, this, args1));
         }
+		if(Helper::Str::IsIpAddress(host))
+		{
+			this->mSocket->Init(host, std::stoi(port));
+			this->Connect();
+			return;
+		}
         std::shared_ptr<Asio::Resolver> resolver(new Asio::Resolver (context));
         std::shared_ptr<Asio::ResolverQuery> query(new Asio::ResolverQuery(host, port));
         resolver->async_resolve(*query, [this, resolver, query, port, host]

@@ -39,7 +39,7 @@ namespace Tendo
     {
         unsigned short port = 0;
         this->mThreadComponent = this->GetComponent<ThreadComponent>();
-        if(!ServerConfig::Inst()->GetListen(name, port))
+        if(!ServerConfig::Inst()->GetListen(name, this->mNet, port))
         {
             LOG_ERROR("not find listen config " << name);
             return false;
@@ -67,7 +67,7 @@ namespace Tendo
 	void TcpListenerComponent::ListenConnect()
 	{
         std::shared_ptr<Tcp::SocketProxy> socketProxy
-            = this->mThreadComponent->CreateSocket();
+            = this->mThreadComponent->CreateSocket(this->mNet);
 		this->mBindAcceptor->async_accept(socketProxy->GetSocket(),
 			[this, socketProxy](const asio::error_code & code)
 		{

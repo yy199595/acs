@@ -54,12 +54,12 @@ function MongoComponent.QueryOnce(tab, data)
     return nil
 end
 
-function MongoComponent.Query(tab, data, limit)
-    if type(data) == "table" then
-        data = rapidjson.encode(data)
+function MongoComponent.Query(tab, where, limit)
+    if type(where) == "table" then
+        where = rapidjson.encode(where)
     end
-    print("query json ", data)
-    assert(type(data) == "string")
+    print("query json ", where)
+    assert(type(where) == "string")
     local address = Service.AllotServer("MongoDB")
     local code, response = Service.Call(address, "MongoDB.Query", {
         tab = tab,
@@ -77,14 +77,14 @@ function MongoComponent.Query(tab, data, limit)
     end
     return responses
 end
-
-function MongoComponent.QueryDatas(tab, list)
+-- 同时查询多个 _id,参数是匹配的_id列表
+function MongoComponent.QueryWheres(tab, wheres)
     assert(type(tab) == "string")
-    assert(type(list) == "table" and #list > 0)
+    assert(type(wheres) == "table" and #list > 0)
 
     local request = {
         _id = {
-            ["$in"] = list
+            ["$in"] = wheres
         }
     }
     local address = Service.AllotServer("MongoDB")

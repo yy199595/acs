@@ -5,27 +5,17 @@
 #include"Util/String/StringHelper.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include"Server/Config/CodeConfig.h"
-#include"Rpc/Component/InnerNetComponent.h"
-#include"Rpc/Component/NodeMgrComponent.h"
-#ifdef __RPC_DEBUG_LOG__
-#include<google/protobuf/util/json_util.h>
-#endif
+#include"Rpc/Component/InnerRpcComponent.h"
 namespace Tendo
 {
     RpcService::RpcService()
     {
-		this->mAsync = true;
-        this->mTcpComponent = nullptr;
-		this->mHttpComponent = nullptr;
-		this->mNetType = Msg::Net::Tcp;
 		this->mProto = Msg::Porto::Protobuf;
-		this->mLocationComponent = nullptr;
     }
 
 	bool RpcService::LateAwake()
 	{
-        this->mTcpComponent = this->GetComponent<InnerNetComponent>();
-        this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
+		this->mNetComponent = this->GetComponent<InnerRpcComponent>();
 		ClusterConfig::Inst()->GetServerName(this->GetName(), this->mCluster);
         if (!ServerConfig::Inst()->GetLocation("rpc", this->mLocationAddress))
         {
@@ -49,22 +39,7 @@ namespace Tendo
 
 	int RpcService::Send(const std::string& func, const Message& message)
 	{
-		std::vector<std::string> locations;		
-		if(!this->mLocationComponent->GetServers(this->mCluster, locations))
-		{
-			LOG_ERROR(this->mCluster <<  " address list empty");
-			return XCode::Failure;
-		}
-
-		for(const std::string & address : locations)
-		{
-            if(address != this->mLocationAddress &&
-				!this->StartSend(address, func, &message))
-            {
-                LOG_ERROR("send to " << address << "failure");
-            }
-		}
-		return XCode::Successful;
+		return this->mNetComponent->Send(func, this->mCluster, this->mProto, &message);
 	}
 
     bool RpcService::StartSend(const std::string& address, const std::string& func, const Message* message)
@@ -76,15 +51,7 @@ namespace Tendo
             LOG_ERROR("not find rpc method config " << name);
             return false;
         }
-        std::shared_ptr<Rpc::Packet> request =
-            std::make_shared<Rpc::Packet>();
-		{
-			request->SetType(Msg::Type::Request);
-			request->SetProto(this->mProto);
-			request->WriteMessage(message);
-			request->GetHead().Add("func", name);
-		}
-        return this->mTcpComponent->Send(address, request);
+		return this->mNetComponent->Send(address, name, this->mProto, 0, message);
     }
 
     std::shared_ptr<Rpc::Packet> RpcService::CallAwait(
@@ -97,24 +64,12 @@ namespace Tendo
             LOG_ERROR("not find rpc method config " << name);
             return nullptr;
         }
-        std::shared_ptr<Rpc::Packet> request =
-            std::make_shared<Rpc::Packet>();
-        {
-            request->SetType(Msg::Type::Request);
-            request->SetProto(this->mProto);
-            request->WriteMessage(message);
-            request->GetHead().Add("func", name);
-        }
-		return this->mTcpComponent->Call(address, request);
+		return this->mNetComponent->Call(address, name, this->mProto, 0, message);
 	}
 
 	int RpcService::Send(const std::string& address, const std::string& func, const Message& message)
     {
-        if(!this->StartSend(address, func, &message))
-        {
-            return XCode::Failure;
-        }
-        return XCode::Successful;
+        return this->StartSend(address, func, &message) ? XCode::Successful : XCode::SendMessageFail;
     }
 
 	int RpcService::Call(const std::string & address, const string& func)
@@ -273,21 +228,7 @@ namespace Tendo
                 return false;
             }
         }
-
-        std::string address;
-		if(!this->mLocationComponent->GetServer(this->mCluster, userId, address))
-        {
-            return XCode::Failure;
-        }
-        std::shared_ptr<Rpc::Packet> request = std::make_shared<Rpc::Packet>();
-        {
-            request->WriteMessage(message);
-            request->SetType(Msg::Type::Request);
-            request->SetProto(this->mProto);
-            request->GetHead().Add("id", userId);
-            request->GetHead().Add("func", methodConfig->FullName);
-        }
-        return this->mTcpComponent->Send(address, request);
+		return this->mNetComponent->Send(userId, this->mCluster, fullName, this->mProto, message);
     }
 
     std::shared_ptr<Rpc::Packet> RpcService::CallAwait(
@@ -310,20 +251,7 @@ namespace Tendo
                 return nullptr;
             }
         }
-
-        std::string address;
-        if(!this->mLocationComponent->GetServer(this->mCluster, userId, address))
-        {
-            return nullptr;
-        }
-        std::shared_ptr<Rpc::Packet> request = std::make_shared<Rpc::Packet>();
-        {
-            request->WriteMessage(message);
-            request->SetType(Msg::Type::Request);
-            request->SetProto(this->mProto);
-            request->GetHead().Add("func", methodConfig->FullName);
-        }
-        return this->mTcpComponent->Call(address, request);
+		return this->mNetComponent->Call(userId, this->mCluster, fullName, this->mProto, message);
     }
 
 	int RpcService::Send(const std::string & address,
@@ -345,14 +273,6 @@ namespace Tendo
 				return XCode::CallArgsError;
 			}
 		}
-		std::shared_ptr<Rpc::Packet> request = std::make_shared<Rpc::Packet>();
-		{
-			request->WriteMessage(message);
-			request->SetType(Msg::Type::Request);
-			request->SetProto(Msg::Porto::Protobuf);
-			request->GetHead().Add("id", userId);
-			request->GetHead().Add("func", methodConfig->FullName);
-		}
-		return this->mTcpComponent->Send(address, request);
+		return this->mNetComponent->Send(address, fullName, this->mProto, userId, message);
 	}
 }

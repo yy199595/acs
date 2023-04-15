@@ -4,7 +4,7 @@
 
 #ifndef GAMEKEEPER_GATESERVICE_H
 #define GAMEKEEPER_GATESERVICE_H
-#include"Message/s2s.pb.h"
+#include"Message/s2s/s2s.pb.h"
 #include"Rpc/Service/PhysicalRpcService.h"
 namespace Tendo
 {

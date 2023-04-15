@@ -33,7 +33,7 @@
         },
         "UnRegister": {
           "Async": true,
-          "Request": "s2s.server.info"
+          "Request": "com.type.int32"
       }
     },
     "MysqlDB": {

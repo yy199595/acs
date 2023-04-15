@@ -14,6 +14,7 @@ namespace Tendo
 	ServerConfig::ServerConfig(std::string  server)
 		: TextConfig("ServerConfig"), mName(std::move(server))
 	{
+		this->mId = 0;
 		this->mUseLua = false;
 	}
 
@@ -38,6 +39,10 @@ namespace Tendo
 		{
 			return false;
 		}
+		if(iter->value.HasMember("id"))
+		{
+			this->mId = iter->value["id"].GetInt();
+		}
 		if(iter->value.HasMember("lua"))
 		{
 			const rapidjson::Value& document = iter->value["lua"];
@@ -54,16 +59,15 @@ namespace Tendo
 			const rapidjson::Value& document = iter->value["address"];
 			for (auto iter1 = document.MemberBegin(); iter1 != document.MemberEnd(); iter1++)
 			{
-				std::string ip;
-				unsigned short port = 0;
+				ListenConfig listenConfig;
 				const std::string key(iter1->name.GetString());
 				const std::string address(iter1->value.GetString());
-				if(!Helper::Str::SplitAddr(address, ip, port))
+				if(!Helper::Str::SplitAddr(address, listenConfig.Net, listenConfig.Ip, listenConfig.Port))
 				{
 					return false;
 				}
-				this->mListens.emplace(key, port);
 				this->mLocations.emplace(key, address);
+				this->mListens.emplace(key, listenConfig);
 			}
 		}
 
@@ -99,7 +103,29 @@ namespace Tendo
 		{
 			return false;
 		}
-		listen = (unsigned short)iter->second;
+		listen = iter->second.Port;
+		return true;
+	}
+
+	bool ServerConfig::GetListen(const std::string& name, std::string& net, unsigned short& port) const
+	{
+		auto iter = this->mListens.find(name);
+		if (iter == this->mListens.end())
+		{
+			return false;
+		}
+		net = iter->second.Net;
+		port = iter->second.Port;
+		return true;
+	}
+
+	bool ServerConfig::GetListen(std::vector<std::string>& names) const
+	{
+		auto iter = this->mLocations.begin();
+		for(; iter != this->mLocations.end(); iter++)
+		{
+			names.emplace_back(iter->first);
+		}
 		return true;
 	}
 

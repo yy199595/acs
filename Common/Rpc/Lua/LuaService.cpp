@@ -138,12 +138,25 @@ namespace Lua
                 return 1;
             }
 		}
-       
-		std::string address;
-		if(locationComponent->GetServer(server, address))
+		else if(lua_isstring(lua, 2))
 		{
-			lua_pushlstring(lua, address.c_str(), address.size());
-			return 1;
+			std::string address;
+			const char * listen = lua_tostring(lua, 2);
+			if(locationComponent->GetServer(server, address, listen))
+			{
+				lua_pushlstring(lua, address.c_str(), address.size());
+				return 1;
+			}
+		}
+		else
+		{
+			std::string address;
+			const char * listen = "rpc";
+			if(locationComponent->GetServer(server, address, listen))
+			{
+				lua_pushlstring(lua, address.c_str(), address.size());
+				return 1;
+			}
 		}
 		return 0;
 	}
@@ -181,7 +194,7 @@ namespace Lua
             
             NodeMgrComponent* locationComponent = 
                 App::Inst()->GetComponent<NodeMgrComponent>();
-            if (locationComponent->GetServer(methodConfig->Service, address))
+            if (locationComponent->GetServer(methodConfig->Server, userId, address))
             {
                 return 0;
             }          
@@ -262,18 +275,22 @@ namespace Lua
     int Service::GetServerList(lua_State* lua)
     {
         std::string server;
-        std::vector<std::string> servers;
-        const std::string service = luaL_checkstring(lua, 1);
+		const char * listen = "rpc";
+		const char * service = luaL_checkstring(lua, 1);
+		if(lua_isstring(lua, 2))
+		{
+			listen = lua_tostring(lua, 2);
+		}
         if (!ClusterConfig::Inst()->GetServerName(service, server))
         {
             return 0;
         }
-        NodeMgrComponent* locationComponent = App::Inst()->GetComponent<NodeMgrComponent>();
-        if (locationComponent != nullptr && locationComponent->GetServers(server, servers))
+		std::vector<std::string> servers;
+		NodeMgrComponent* locationComponent = App::Inst()->GetComponent<NodeMgrComponent>();
+        if (locationComponent != nullptr && locationComponent->GetServer(server, servers, listen))
         {
             lua_newtable(lua);
             int top = lua_gettop(lua);
-          
             for (size_t index = 0; index < servers.size(); index++)
             {
                 lua_pushinteger(lua, index);

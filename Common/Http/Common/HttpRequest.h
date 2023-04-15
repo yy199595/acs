@@ -6,6 +6,7 @@
 #define APP_HTTPREQUEST_H
 #include<string>
 #include<fstream>
+#include<vector>
 #include"httpHead.h"
 #include<unordered_map>
 #include<rapidjson/document.h>
@@ -30,7 +31,7 @@ namespace Http
     public:
         explicit Request(const char * method, const std::string & from);
     public:
-        inline const Head & Header() const { return this->mHead; }
+        inline Head & Header() { return this->mHead; }
 		inline const std::string & From() const { return this->mFrom; }
 		inline const std::string & Method() const { return this->mMethod; }
     public:
@@ -103,6 +104,7 @@ namespace Http
         void Str(const std::string & str);
         void Json(const std::string & json);
         void Json(const char * str, size_t size);
+		void Protobuf(const std::string & protobuf);
     public:
         void OnComplete() final;
         int OnReadContent(std::istream &buffer) final;

@@ -17,6 +17,7 @@ namespace Tendo
         virtual void OnStopListen() { };
         virtual void OnListen(std::shared_ptr<Tcp::SocketProxy> socket) = 0;
     private:
+		std::string mNet;
         size_t mListenCount;
         unsigned short mListenPort;
         class ThreadComponent * mThreadComponent;

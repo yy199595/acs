@@ -8,7 +8,7 @@ namespace Tcp
 	class SocketProxy
 	{
 	 public:
-		explicit SocketProxy(Asio::Context & io);
+		explicit SocketProxy(Asio::Context & io, const std::string & net);
 		~SocketProxy();
 	 public:
         void Init();
@@ -22,6 +22,7 @@ namespace Tcp
 		inline const std::string& GetAddress() { return this->mAddress; }
 	 private:
 		std::string mIp;
+		std::string mNet;
 		unsigned short mPort;
 		std::string mAddress;
         Asio::Socket * mSocket;

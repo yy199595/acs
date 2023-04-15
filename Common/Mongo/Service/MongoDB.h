@@ -4,7 +4,7 @@
 
 #ifndef SERVER_MONGOSERVICE_H
 #define SERVER_MONGOSERVICE_H
-#include"Message/db.pb.h"
+#include"Message/s2s/db.pb.h"
 #include"Mongo/Client/MongoProto.h"
 #include"Rpc/Service/PhysicalRpcService.h"
 namespace Tendo

@@ -9,6 +9,7 @@
 #include"Mysql/Lua/LuaMysqlTask.h"
 #include"Mysql/Client/MysqlMessage.h"
 #include"Mysql/Component/MysqlDBComponent.h"
+#include"Proto/Component/ProtoComponent.h"
 using namespace Tendo;
 namespace Lua
 {
@@ -36,6 +37,11 @@ namespace Lua
 		return Invoke(lua, LUA_MYSQL_EXEC);
 	}
 
+	int LuaMysql::CreateTable(lua_State* lua)
+	{
+		return Invoke(lua, LUA_MYSQL_CREATE_TABLE);
+	}
+
 	int LuaMysql::Query(lua_State* lua)
 	{
 		return Invoke(lua, LUA_MYSQL_QUERY);
@@ -58,16 +64,46 @@ namespace Lua
 		int rpcId = 0;
 		size_t size = 0;
 		int id = (int)luaL_checkinteger(lua, 1);
-		const char* sql = luaL_checklstring(lua, 2, &size);
 		std::shared_ptr<Mysql::ICommand> command;
 		switch (method)
 		{
 			case LUA_MYSQL_EXEC:
+			{
+				const char* sql = luaL_checklstring(lua, 2, &size);
 				command = std::make_shared<Mysql::SqlCommand>(std::string(sql, size));
+			}
 				break;
 			case LUA_MYSQL_QUERY:
 			case LUA_MYSQL_QUERY_ONE:
+			{
+				const char* sql = luaL_checklstring(lua, 2, &size);
 				command = std::make_shared<Mysql::QueryCommand>(std::string(sql, size));
+			}
+				break;
+			case LUA_MYSQL_CREATE_TABLE:
+			{
+				const char * tb = luaL_checkstring(lua, 2);
+				const char * pb = luaL_checkstring(lua, 3);
+				ProtoComponent *messageComponent = App::Inst()->GetMsgComponent();
+				std::shared_ptr<Message> message = messageComponent->Read(lua, pb, 4);
+				if(message == nullptr)
+				{
+					luaL_error(lua, "create %s error", pb);
+					return 0;
+				}
+				std::vector<std::string> keys;
+				if(lua_istable(lua, 5))
+				{
+					lua_pushnil(lua);
+					while (lua_next(lua, -2) != 0)
+					{
+						const char * key = luaL_checkstring(lua, -1);
+						keys.emplace_back(key);
+						lua_pop(lua, 1);
+					}
+				}
+				command = std::make_shared<Mysql::CreateTabCommand>(tb, message, keys);
+			}
 				break;
 			default:
 				return 0;

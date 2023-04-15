@@ -2,6 +2,7 @@
 // Created by zmhy0073 on 2022/8/29.
 //
 #include"ServerWeb.h"
+#include"Message/s2s/s2s.pb.h"
 #include"Core/System/System.h"
 #include"Entity/Unit/App.h"
 #include"Server/Config/CodeConfig.h"
@@ -48,13 +49,8 @@ namespace Tendo
 			response.Add("error").Add("LocationComponent or InnerService Is Null");
 			return XCode::Failure;
 		}
-		std::vector<std::string> locations;
-		locationComponent->GetServers(locations);
-		for(const std::string & location : locations)
-		{
-			int code = rpcService->Call(location, "Hotfix");
-            response.Add(location.c_str()).Add(CodeConfig::Inst()->GetDesc(code));
-		}
+		// TODO
+
 		return XCode::Successful;
 	}
 
@@ -97,14 +93,25 @@ namespace Tendo
 		});
 		for(const s2s::server::info * info : serverInfos)
 		{
-			if(info->rpc() != local)
+			auto iter = info->listens().find("http");
+			if(iter == info->listens().end())
+			{
+				iter = info->listens().find("tcp");
+			}
+			if(iter != info->listens().end())
 			{
 				ElapsedTimer timer;
-				int code = nodeService->Call(info->rpc(), "Stop");
-				response.BeginObject(info->rpc().c_str());
-				response.Add("rpc").Add(info->rpc());
+				const std::string & address = iter->second;
+				int code = nodeService->Call(address, "Stop");
+				response.BeginObject(address.c_str());
+				auto iter1 = info->listens().begin();
+				for(; iter1 != info->listens().end(); iter1++)
+				{
+					const std::string & key = iter1->first;
+					const std::string & value = iter1->second;
+					response.Add(key.c_str()).Add(value);
+				}
 				response.Add("name").Add(info->name());
-				response.Add("http").Add(info->http());
 				response.Add("ms").Add(timer.GetMs());
 				response.Add("code").Add(CodeConfig::Inst()->GetDesc(code));
 				response.EndObject();
@@ -137,22 +144,27 @@ namespace Tendo
 		for (int index = 0; index < list->list_size(); index++)
 		{
 			const s2s::server::info& info = list->list(index);
-			std::shared_ptr<com::type::string> resp =
-				std::make_shared<com::type::string>();
-			int code = nodeService->Call(info.rpc(), method, resp);
-			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-			if (code == XCode::Successful)
+			auto iter = info.listens().find("http");
+			if(iter != info.listens().end())
 			{
-				rapidjson::Document document;
-				const std::string& json = resp->str();
-				if (!document.Parse(json.c_str(), json.size()).HasParseError())
-				{					
-					response.Add(info.rpc()).Add(document);
+				std::shared_ptr<com::type::string> resp =
+						std::make_shared<com::type::string>();
+				const std::string & address = iter->second;
+				int code = nodeService->Call(address, method, resp);
+				const std::string& desc = CodeConfig::Inst()->GetDesc(code);
+				if (code == XCode::Successful)
+				{
+					rapidjson::Document document;
+					const std::string& json = resp->str();
+					if (!document.Parse(json.c_str(), json.size()).HasParseError())
+					{
+						response.Add(address).Add(document);
+					}
 				}
-			}
-			else
-			{
-				response.Add(info.rpc()).Add(desc);
+				else
+				{
+					response.Add(address).Add(desc);
+				}
 			}
 		}
 		return XCode::Successful;

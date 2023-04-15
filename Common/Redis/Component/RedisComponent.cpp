@@ -4,7 +4,7 @@
 #include"Lua/Engine/ClassProxyHelper.h"
 #include"Redis/Client/TcpRedisClient.h"
 #include"Server/Component/ThreadComponent.h"
-#include"Redis/Component/RedisScriptComponent.h"
+#include"Redis/Component/RedisLuaComponent.h"
 #include"Redis/Component/RedisStringComponent.h"
 #include"Entity/Unit/App.h"
 #include"Redis/Config/RedisConfig.h"
@@ -19,11 +19,11 @@ namespace Tendo
 		const ServerConfig * config = ServerConfig::Inst();
 		LOG_CHECK_RET_FALSE(config->GetPath("db", path));
 		LOG_CHECK_RET_FALSE(this->mConfig.LoadConfig(path));
-        LOG_CHECK_RET_FALSE(this->mApp->AddComponent<RedisScriptComponent>());
+        LOG_CHECK_RET_FALSE(this->mApp->AddComponent<RedisLuaComponent>());
         LOG_CHECK_RET_FALSE(this->mApp->AddComponent<RedisStringComponent>());
 
 		Asio::Context& io = this->mApp->MainThread();
-		std::shared_ptr<Tcp::SocketProxy> socket = std::make_shared<Tcp::SocketProxy>(io);
+		std::shared_ptr<Tcp::SocketProxy> socket = std::make_shared<Tcp::SocketProxy>(io, "tcp");
 
 		socket->Init(this->Config().Address[0].Ip, this->Config().Address[0].Port);
 		this->mMainClient =	std::make_shared<TcpRedisClient>(socket, this->mConfig.Config(), this);
@@ -59,7 +59,7 @@ namespace Tendo
         const std::string & ip = config.Address[0].Ip;
         const unsigned int port = config.Address[0].Port;
         ThreadComponent * component = this->GetComponent<ThreadComponent>();
-        std::shared_ptr<Tcp::SocketProxy> socketProxy = component->CreateSocket();
+        std::shared_ptr<Tcp::SocketProxy> socketProxy = component->CreateSocket("tcp");
         if(socketProxy == nullptr)
         {
             return nullptr;
@@ -119,7 +119,7 @@ namespace Tendo
 		std::shared_ptr<RedisTask> redisTask = std::make_shared<RedisTask>(taskId);
 		std::shared_ptr<RedisResponse> redisResponse = this->AddTask(taskId, redisTask)->Await();
 #ifdef __DEBUG__
-        LOG_INFO(request->GetCommand() << " use time = [" << elapsedTimer.GetMs() << "ms]");
+        LOG_INFO("async redis cmd (" << request->GetCommand() << ") use time = [" << elapsedTimer.GetMs() << "ms]");
 #endif
         if (redisResponse != nullptr && redisResponse->HasError())
         {
@@ -131,11 +131,17 @@ namespace Tendo
 
 	std::shared_ptr<RedisResponse> RedisComponent::SyncRun(const std::shared_ptr<RedisRequest>& request)
 	{
+#ifdef __DEBUG__
+		ElapsedTimer elapsedTimer;
+#endif
 		std::shared_ptr<RedisResponse> response = 
 			this->mMainClient->SyncCommand(request);
+#ifdef __DEBUG__
+		LOG_INFO("sync redis cmd (" << request->GetCommand() << ") use time = [" << elapsedTimer.GetMs() << "ms]");
+#endif
 		if (response != nullptr && response->HasError())
 		{
-			//LOG_ERROR(request->ToJson());
+			LOG_ERROR(request->ToJson());
 			LOG_ERROR(response->GetString());
 		}
 		return response;

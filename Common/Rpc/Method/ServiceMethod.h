@@ -1,9 +1,7 @@
 ﻿#pragma once
-#include<Message/com.pb.h>
-#include<XCode/XCode.h>
+#include"XCode/XCode.h"
 #include"Rpc/Client/Message.h"
 #include"Util/Json/JsonReader.h"
-#include"google/protobuf/util/json_util.h"
 using namespace google::protobuf;
 namespace Tendo
 {

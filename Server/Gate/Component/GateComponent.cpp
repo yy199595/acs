@@ -73,7 +73,7 @@ namespace Tendo
 	{
         std::vector<std::string> locations;
 		const std::string name = ComponentFactory::GetName<Gate>();
-		if(!this->mNodeComponent->GetServers(name, locations))
+		if(!this->mNodeComponent->GetServer(name, locations))
 		{
 			return XCode::Failure;
 		}
@@ -95,7 +95,7 @@ namespace Tendo
 	{
 		std::vector<std::string> locations;
 		const std::string & name = this->mGate->GetServer();
-		if(!this->mNodeComponent->GetServers(name, locations))
+		if(!this->mNodeComponent->GetServer(name, locations))
 		{
 			return XCode::Failure;
 		}

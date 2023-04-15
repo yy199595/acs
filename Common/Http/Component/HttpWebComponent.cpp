@@ -154,12 +154,20 @@ namespace Tendo
 		}
 		std::shared_ptr<Rpc::Packet> message
 			= std::make_shared<Rpc::Packet>();
+		if(request->Header().ContentType() == Http::ContentName::PB)
+		{
+			message->SetProto(Msg::Porto::Protobuf);
+			message->SetContent(request->Content());
+		}
+		else if(request->Header().ContentType() == Http::ContentName::JSON)
+		{
+			message->SetProto(Msg::Porto::Json);
+			message->SetContent(request->Content());
+		}
 		{
 			message->SetNet(Msg::Net::Http);
 			message->SetFrom(request->From());
-			message->SetProto(Msg::Porto::Json);
 			message->SetType(Msg::Type::Request);
-			message->SetContent(request->Content());
 			message->GetHead().Add("func", func);
 		}
 		int code = this->mDispatchComponent->OnMessage(message);

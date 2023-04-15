@@ -31,9 +31,9 @@ namespace Tendo
 		void OnDestroy() final;
     public:
         Asio::Context& GetContext();
-        std::shared_ptr<Tcp::SocketProxy> CreateSocket();
-		std::shared_ptr<Tcp::SocketProxy> CreateSocket(const std::string & address);
-		std::shared_ptr<Tcp::SocketProxy> CreateSocket(const std::string & ip, unsigned short port);
+        std::shared_ptr<Tcp::SocketProxy> CreateSocket(const std::string & net);
+		std::shared_ptr<Tcp::SocketProxy> CreateSocket(const std::string & net, const std::string & address);
+		std::shared_ptr<Tcp::SocketProxy> CreateSocket(const std::string & net, const std::string & ip, unsigned short port);
     private:
 #ifndef ONLY_MAIN_THREAD
         std::mutex mMutex;

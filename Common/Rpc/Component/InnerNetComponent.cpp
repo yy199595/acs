@@ -187,13 +187,14 @@ namespace Tendo
             return localSession;
         }
         std::string ip;
+		std::string net;
         unsigned short port = 0;
-        if (!Helper::Str::SplitAddr(address, ip, port))
+        if (!Helper::Str::SplitAddr(address, net, ip, port))
         {
             CONSOLE_LOG_ERROR("parse address error : [" << address << "]");
             return nullptr;
         }
-        std::shared_ptr<Tcp::SocketProxy> socketProxy = this->mNetComponent->CreateSocket();
+        std::shared_ptr<Tcp::SocketProxy> socketProxy = this->mNetComponent->CreateSocket(net);
         if (socketProxy == nullptr)
         {
             return nullptr;

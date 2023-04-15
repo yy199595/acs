@@ -118,7 +118,7 @@ namespace Client
 		Asio::Context & io = this->mApp->MainThread();
 
 		std::shared_ptr<Tcp::SocketProxy> socketProxy =
-			std::make_shared<Tcp::SocketProxy>(io);
+			std::make_shared<Tcp::SocketProxy>(io, "tcp");
 
 		socketProxy->Init(ip, port);
 		std::shared_ptr<TcpRpcClientContext> client =

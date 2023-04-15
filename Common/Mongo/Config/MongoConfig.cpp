@@ -28,9 +28,10 @@ namespace Mongo
 		const rapidjson::Value& jsonArray = jsonData["address"];
 		for (unsigned int index = 0; index < jsonArray.Size(); index++)
 		{
+			std::string net;
 			Net::Address addressInfo;
 			addressInfo.FullAddress.assign(jsonArray[index].GetString());
-			if(!Helper::Str::SplitAddr(addressInfo.FullAddress, addressInfo.Ip, addressInfo.Port))
+			if(!Helper::Str::SplitAddr(addressInfo.FullAddress, net, addressInfo.Ip, addressInfo.Port))
 			{
 				return false;
 			}

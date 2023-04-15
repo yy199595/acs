@@ -5,7 +5,6 @@
 #include"Async/Coroutine/CoroutineDef.h"
 #include"Async/Source/TaskSource.h"
 #include"Async/Lua/LuaWaitTaskSource.h"
-using namespace com;
 using namespace google::protobuf;
 namespace Tendo
 {

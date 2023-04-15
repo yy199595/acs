@@ -106,4 +106,5 @@ function MysqlComponent.Update(tabName, where, update, flag)
         update_json = rapidjson.encode(update)
     })
 end
+
 return MysqlComponent

@@ -23,13 +23,6 @@ end
 
 
 function Main.OnClusterComplete()
-     print("========================")
-    local res = redis.Call("str.timeout", {
-        key = "key1",
-        value = "value1",
-        time = 10
-    }, false)
-    table.print(res)
     --MongoDB.ClearTable("user.account_info")
     --Http.Download("http://127.0.0.1:8080/1122.exe", "D:\\trunk\\ssh\\Sentry\\bin\\1122.exe");
    

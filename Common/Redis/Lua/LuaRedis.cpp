@@ -8,7 +8,7 @@
 #include"Redis/Client/RedisDefine.h"
 #include"Proto/Component/ProtoComponent.h"
 #include"Redis/Component/RedisComponent.h"
-#include"Redis/Component/RedisScriptComponent.h"
+#include"Redis/Component/RedisLuaComponent.h"
 
 using namespace Tendo;
 namespace Lua
@@ -62,7 +62,7 @@ namespace Lua
             luaL_error(lua, "RedisComponent Is Null");
             return 0;
         }
-        RedisScriptComponent* redisScriptComponent = App::Inst()->GetComponent<RedisScriptComponent>();
+        RedisLuaComponent* redisScriptComponent = App::Inst()->GetComponent<RedisLuaComponent>();
         if (redisScriptComponent == nullptr)
         {
             luaL_error(lua, "RedisScriptComponent Is Null");

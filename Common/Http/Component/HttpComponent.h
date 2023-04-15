@@ -21,9 +21,13 @@ namespace Tendo
 		std::shared_ptr<Http::DataResponse> Post(const std::string& url, const std::string& data, bool async = true, int second = 15);
 	public:
 		std::shared_ptr<Http::DataResponse> Await(const std::shared_ptr<Http::Request>& request);
+
+		bool Send(const std::shared_ptr<Http::Request> & request); // 不接受返回数据
 		bool Send(const std::shared_ptr<Http::Request> & request, std::shared_ptr<Http::IResponse> & response); // 同步发送
 		bool Send(const std::shared_ptr<Http::Request> & request, std::shared_ptr<Http::IResponse> & response, int & taskId); // 异步发送
-    private:
+	public:
+		bool Send(const std::string & address, const std::shared_ptr<Rpc::Packet> & message);
+	private:
         bool LateAwake() final;
 		void OnTaskComplete(int key) final;
 		std::shared_ptr<HttpRequestClient> CreateClient();

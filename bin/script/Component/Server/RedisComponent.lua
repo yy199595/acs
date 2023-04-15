@@ -33,11 +33,7 @@ end
 function RedisComponent.Call(lua, tab, async)
     assert(type(tab) == "table")
     assert(type(lua) == "string")
-    local response = redis.Call(lua, tab, async)
-    if response == nil then
-        return nil
-    end
-    return rapidjson.decode(response)
+    return redis.Call(lua, tab, async)
 end
 
 function RedisComponent.Lock(key, time)

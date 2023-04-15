@@ -52,6 +52,7 @@ include_directories(Libs/openssl/include)
 #公共组件
 include_directories(${PROJECT_SOURCE_DIR}/Gen)
 include_directories(${PROJECT_SOURCE_DIR}/Client)
+include_directories(${PROJECT_SOURCE_DIR}/Gen/Message)
 
 include_directories(${PROJECT_SOURCE_DIR}/Common)
 include_directories(${PROJECT_SOURCE_DIR}/Server)

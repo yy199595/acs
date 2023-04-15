@@ -24,9 +24,7 @@
         "name": "root",
         "passwd": "199595yjz."
     },
-    "registry": [
-        "127.0.0.1:7788"
-    ],
+    "registry": "tcp://127.0.0.1:7788",
     "Client": {
         "lua": {
             "common": "script/Common",
@@ -39,12 +37,11 @@
         }
     },
     "Server": {
+        "id" : 100,
         "address": {
-            "kcp": "127.0.0.1:1234",
-            "rpc": "127.0.0.1:7788",
-            "gate": "127.0.0.1:1995",
-            "console": "127.0.0.1:8888",
-            "http": "http://127.0.0.1:8080/",
+            "rpc": "tcp://127.0.0.1:7788",
+            "gate": "tcp://127.0.0.1:1995",
+            "http": "http://127.0.0.1:8080",
             "debug": "http://127.0.0.1:8088"
         },
         "lua": {
@@ -63,9 +60,10 @@
         }
     },
     "HttpServer": {
+        "id": 5,
         "address": {
-            "rpc": "127.0.0.1:7790",
-            "http": "http://127.0.0.1:80/",
+            "rpc": "tcp://127.0.0.1:7790",
+            "http": "http://127.0.0.1:80",
             "debug": "http://127.0.0.1:8088"
         },
         "lua": {
@@ -75,8 +73,9 @@
         }
     },
     "ChatServer": {
+        "id": 4,
         "address": {
-            "rpc": "127.0.0.1:7791"
+            "rpc": "tcp://127.0.0.1:7791"
         },
         "lua": {
             "common": "script/Common",
@@ -85,14 +84,16 @@
         }
     },
     "GateServer": {
+        "id": 3,
         "address": {
-            "rpc": "127.0.0.1:7792",
-            "gate": "43.143.76.75:1995"
+            "rpc": "tcp://127.0.0.1:7792",
+            "gate": "tcp://43.143.76.75:1995"
         }
     },
     "DataServer": {
+        "id": 2,
         "address": {
-            "rpc": "127.0.0.1:7793"
+            "rpc": "tcp://127.0.0.1:7793"
         },
         "lua": {
             "common": "script/Common",
@@ -102,13 +103,9 @@
         }
     },
     "RegistryServer": {
+        "id": 1,
         "address": {
-            "rpc": "127.0.0.1:7788"
-        }
-    },
-    "LogServer": {
-        "address": {
-            "rpc": "127.0.0.1:7794"
+            "rpc": "tcp://127.0.0.1:7788"
         }
     },
     "white_list": [

@@ -32,7 +32,7 @@ namespace Tendo
 	public:
 		bool ReloadConfig() final;
 		bool LoadConfig(const std::string &path) final;
-		const std::string & GetName() const final { return this->mName; }
+		const std::string & GetConfigName() const final { return this->mName; }
 	protected:
 		virtual bool OnLoadLine(const CsvLineData & lineData) = 0;
 		virtual bool OnReLoadLine(const CsvLineData & lineData) = 0;

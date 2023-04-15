@@ -1,4 +1,4 @@
-#include"Message/s2s.pb.h"
+#include"Message/s2s/s2s.pb.h"
 #include"Rpc/Service/PhysicalRpcService.h"
 namespace Tendo
 {

@@ -11,12 +11,12 @@
             "ServerWeb": true,
             "Account": true
         },
-      "Component": [
-        "HttpComponent",
-        "RedisComponent",
-        "HttpWebComponent",
-        "HttpDebugComponent"
-      ]
+        "Component": [
+            "RedisComponent",
+            "MysqlDBComponent",
+            "RegistryComponent",
+            "HttpDebugComponent"
+        ]
     },
     "Client": {
         "Component": [

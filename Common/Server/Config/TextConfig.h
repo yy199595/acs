@@ -13,7 +13,7 @@ namespace Tendo
 	{
 	public:
 		virtual bool ReloadConfig() = 0;
-		virtual const std::string & GetName() const = 0;
+		virtual const std::string & GetConfigName() const = 0;
 		virtual bool LoadConfig(const std::string & path) = 0;
 	};
 }
@@ -28,7 +28,7 @@ namespace Tendo
         const std::string & WorkPath() const;
 		bool LoadConfig(const std::string & path) final;
 		const std::string & Path() const { return this->mPath; }
-        const std::string & GetName() const final { return this->mName; }
+        const std::string & GetConfigName() const final { return this->mName; }
     protected:
         virtual bool OnLoadText(const char * str, size_t length) = 0;
         virtual bool OnReloadText(const char * str, size_t length) = 0;

@@ -2,8 +2,8 @@
 #include<spdlog/fmt/fmt.h>
 namespace Tcp
 {
-	SocketProxy::SocketProxy(asio::io_service& thread)
-		: mNetThread(thread)
+	SocketProxy::SocketProxy(asio::io_service& thread, const std::string & net)
+		: mNet(net), mNetThread(thread)
 	{
 		this->mSocket = new Asio::Socket(this->mNetThread);
 	}
@@ -16,7 +16,7 @@ namespace Tcp
         {
             this->mPort = endPoint.port();
             this->mIp = endPoint.address().to_string();
-            this->mAddress = fmt::format("{0}:{1}", this->mIp, this->mPort);
+            this->mAddress = fmt::format("{0}://{1}:{2}", this->mNet, this->mIp, this->mPort);
         }
     }
 
@@ -29,7 +29,7 @@ namespace Tcp
         }
 		this->mIp = ip;
 		this->mPort = port;
-        this->mAddress = fmt::format("{0}:{1}", ip, port);
+        this->mAddress = fmt::format("{0}://{1}:{2}", this->mNet, ip, port);
     }
 
     SocketProxy::~SocketProxy()

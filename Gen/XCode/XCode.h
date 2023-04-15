@@ -42,4 +42,9 @@ namespace XCode
 	 constexpr int AccountNotExists = 38;//账号不存在
 	 constexpr int AddressAllotFailure = 39;//服务分配失败
 	 constexpr int LuaCoroutineWait = 40;//等待lua协程完成
+	 constexpr int MakeTcpRequestFailure = 41;//创建tcp请求错误
+	 constexpr int MakeHttpRequestFailure = 42;//创建http请求错误
+	 constexpr int ParseHttpUrlFailure = 43;//解析http的url失败
+	 constexpr int UnknownMessageNetType = 44;//未知的传输网络类型
+	 constexpr int OnlyUseTcpProtocol = 45;//只能使用tcp协议
 };

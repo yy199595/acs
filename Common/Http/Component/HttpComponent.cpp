@@ -31,7 +31,7 @@ namespace Tendo
 	std::shared_ptr<HttpRequestClient> HttpComponent::CreateClient()
 	{
         std::shared_ptr<HttpRequestClient> httpClient;
-		std::shared_ptr<Tcp::SocketProxy> socketProxy  = this->mNetComponent->CreateSocket();
+		std::shared_ptr<Tcp::SocketProxy> socketProxy  = this->mNetComponent->CreateSocket("http");
         if(!this->mClientPools.empty())
         {
             httpClient = this->mClientPools.front();
@@ -157,10 +157,10 @@ namespace Tendo
 		std::shared_ptr<Http::IResponse> response = std::make_shared<Http::DataResponse>();
 		{
 			int taskId = 0;
-			this->AddTask(taskId, httpRpcTask);
 			this->Send(request, response, taskId);
+			this->AddTask(taskId, httpRpcTask)->Await();
 		}
-		return std::static_pointer_cast<Http::DataResponse>(httpRpcTask->Await());
+		return std::static_pointer_cast<Http::DataResponse>(response);
 	}
 
 	std::shared_ptr<Http::DataResponse> HttpComponent::Post(const std::string& url,
@@ -303,5 +303,16 @@ namespace Tendo
 			CONSOLE_LOG_DEBUG(code.what());
 			return false;
 		}
+	}
+
+	bool HttpComponent::Send(const string& address, const std::shared_ptr<Rpc::Packet>& message)
+	{
+
+
+	}
+
+	bool HttpComponent::Send(const std::shared_ptr<Http::Request>& request)
+	{
+		return false;
 	}
 }

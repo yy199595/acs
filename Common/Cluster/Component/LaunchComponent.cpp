@@ -13,11 +13,16 @@
 #include"Http//Service/LuaPhysicalHttpService.h"
 #include"Rpc/Component/NodeMgrComponent.h"
 #include"Lua/Component/LuaScriptComponent.h"
+#include"Rpc/Component/InnerRpcComponent.h"
+#include"Rpc/Component/InnerNetComponent.h"
+#include"Http/Component/HttpWebComponent.h"
+#include"Rpc/Component/DispatchMessageComponent.h"
 namespace Tendo
 {
     bool LaunchComponent::Awake()
     {
         this->mApp->AddComponent<HttpComponent>();
+		this->mApp->AddComponent<InnerRpcComponent>();
 		if(ServerConfig::Inst()->UseLua())
 		{
 			this->mApp->AddComponent<LuaScriptComponent>();
@@ -25,7 +30,15 @@ namespace Tendo
 		unsigned short port = 0;
 		if(ServerConfig::Inst()->GetListen("rpc", port))
 		{
-			LOG_CHECK_RET_FALSE(this->mApp->AddComponent<NodeMgrComponent>());
+			this->mApp->AddComponent<NodeMgrComponent>();
+			this->mApp->AddComponent<InnerNetComponent>();
+			this->mApp->AddComponent<DispatchMessageComponent>();
+		}
+		if(ServerConfig::Inst()->GetListen("http", port))
+		{
+			this->mApp->AddComponent<NodeMgrComponent>();
+			this->mApp->AddComponent<HttpWebComponent>();
+			this->mApp->AddComponent<DispatchMessageComponent>();
 		}
 
         std::vector<std::string> components;
@@ -148,11 +161,6 @@ namespace Tendo
 #endif
                 }
             }
-        }
-        if (locationComponent != nullptr)
-        {
-            locationComponent->AddRpcServer(ServerConfig::Inst()->Name(), location);
-            locationComponent->AddHttpServer(ServerConfig::Inst()->Name(), httpLocation);
         }
         return true;
     }
