@@ -1,17 +1,31 @@
-echo "start build server..."
+#!/bin/bash
+
 # shellcheck disable=SC2124
 cmd="$@"
 start_time=$(date)
 current_path=$(pwd)
 cd $current_path || exit
-# Define a string array
 
+if [ ! -n "$1" ] ;then
+  echo "***********************************************************"
+  echo "*                                                         *"
+  echo "*           debug        build server type=debug          *"
+  echo "*           release      build server type=release        *"
+  echo "*           lib          build lua protobuf spdlog        *"
+  echo "*           mysql        download mysql and build         *"
+  echo "*           jemalloc     download jemalloc and build      *"
+  echo "*           openssl      download openssl and build       *"
+  echo "*                                                         *"
+  echo "***********************************************************"
+else
+    cmake ./CMakeLists.txt
+    echo "start build server..."
+fi
 for arg in $cmd; do
-    cd $current_path || exit
     if [[ $arg == "jemalloc" ]]; then
         cd ./Libs/ || exit
         if [ -d "./Libs/jemalloc" ]; then
-            echo "jemalloc already exists locally"
+            echo "jemalloc already exists local"
         else
             git clone https://github.com/jemalloc/jemalloc.git
         fi
@@ -54,7 +68,6 @@ for arg in $cmd; do
 
     if [[ $arg == "lib" ]]; then
         cd $current_path || exit
-        cmake ./CMakeLists.txt
         make lua
         make spdlog
         make libprotobuf
@@ -74,7 +87,6 @@ for arg in $cmd; do
 
     if [[ $arg == "protoc" ]]; then
         cd $current_path || exit
-        cmake ./CMakeLists.txt
         make protoc
         cmake ./CMakeLists.txt
     fi
