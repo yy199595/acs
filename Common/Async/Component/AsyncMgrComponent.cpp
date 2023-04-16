@@ -61,7 +61,7 @@ namespace Tendo
             StaticMethod *sleepMethod = NewMethodProxy(
                 &AsyncMgrComponent::Resume, this, id);
             timerComponent->AddTimer(ms, sleepMethod);
-            this->YieldCoroutine();
+			this->Yield();
         }
 	}
 
@@ -91,7 +91,7 @@ namespace Tendo
 		}
 	}
 
-	bool AsyncMgrComponent::YieldCoroutine()
+	bool AsyncMgrComponent::Yield()
 	{
 		assert(this->mRunContext);
 		assert(this->mRunContext->mState == CorState::Running);
@@ -129,12 +129,12 @@ namespace Tendo
 		return coroutine;
 	}
 
-	bool AsyncMgrComponent::YieldCoroutine(unsigned int& mCorId)
+	bool AsyncMgrComponent::Yield(unsigned int& mCorId)
 	{
 		if (this->mRunContext != nullptr)
 		{
 			mCorId = this->mRunContext->mCoroutineId;
-			return this->YieldCoroutine();
+			return this->Yield();
 		}
 		LOG_FATAL("not coroutine context");
 		return false;

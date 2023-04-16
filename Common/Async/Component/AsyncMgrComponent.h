@@ -17,27 +17,27 @@ namespace Tendo
 		AsyncMgrComponent();
 	 public:
 		template<typename F, typename T, typename ... Args>
-		TaskContext* Start(F&& f, T* o, Args&& ... args)
+		unsigned int Start(F&& f, T* o, Args&& ... args)
 		{
 			TaskContext* co = this->MakeContext(
 				NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...));
 			this->Resume(co->mCoroutineId);
-			return co;
+			return co->mCoroutineId;
 		}
-		TaskContext* Start(std::function<void()>&& func)
+		unsigned int Start(std::function<void()>&& func)
 		{
 			TaskContext* co = this->MakeContext(
                     new LambdaMethod(std::move(func)));
 			this->Resume(co->mCoroutineId);
-			return co;
+			return co->mCoroutineId;
 		}
 
     private:
 		TaskContext* MakeContext(StaticMethod* func);
 	 public:
-		bool YieldCoroutine();
+		bool Yield();
 
-		bool YieldCoroutine(unsigned int& mCorId);
+		bool Yield(unsigned int& mCorId);
 
 		void Sleep(long long ms);
 

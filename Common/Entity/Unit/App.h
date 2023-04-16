@@ -50,9 +50,7 @@ namespace Tendo
 #endif
 		bool LoadComponent();
 		void WaitServerStart();
-		void StartAllComponent();		
-		static void OnServerStop(int signal);
-		static void OnServerError(int signal);
+		void StartAllComponent();
 	 private:
         int mTickCount;
 		float mLogicFps;

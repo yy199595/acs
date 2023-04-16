@@ -36,14 +36,6 @@ namespace Tendo
 
 	bool App::LoadComponent()
 	{
-#ifndef __OS_WIN__
-		signal(SIGQUIT, App::OnServerStop);
-        signal(SIGKILL, App::OnServerStop);
-#endif
-        signal(SIGTERM, App::OnServerStop);
-        signal(SIGINT, App::OnServerStop);
-		signal(SIGSEGV, App::OnServerError); //异常退出
-        //SetConsoleCtrlHandler((PHANDLER_ROUTINE)WinHandlerSignal, true);
 		this->mTaskComponent = this->GetOrAddComponent<AsyncMgrComponent>();
 		this->mLogComponent = this->GetOrAddComponent<LogComponent>();
 		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
@@ -271,27 +263,6 @@ namespace Tendo
 		this->mStatus = ServerStatus::Running;
 		long long t = Helper::Time::NowMilTime() - this->mStartTime;
 		LOG_INFO("===== start " << ServerConfig::Inst()->Name() << " successful [" << t / 1000.0f << "]s ===========");
-	}
-	void App::OnServerStop(int signal)
-	{
-		CONSOLE_LOG_ERROR("signal = " << signal);
-		AsyncMgrComponent* component =
-			App::Inst()->GetTaskComponent();
-		component->Start(&App::Stop, App::Inst(), signal);
-	}
-
-	void App::OnServerError(int signal)
-	{
-		std::string trace;
-		App * app = App::Inst();
-		LogComponent * logComponent = app->mLogComponent;
-		if(Debug::Backtrace(trace) > 0)
-		{
-			CONSOLE_LOG_ERROR(trace);
-			logComponent->SaveLog(spdlog::level::critical, trace);
-		}
-		logComponent->SaveAllLog();
-		exit(signal);
 	}
 #ifdef __OS_WIN__
 	void App::UpdateConsoleTitle()
