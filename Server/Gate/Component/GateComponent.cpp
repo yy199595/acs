@@ -31,8 +31,8 @@ namespace Tendo
             return XCode::NotFindUser;
         }		
 
-        std::shared_ptr<Rpc::Packet> data =
-            std::make_shared<Rpc::Packet>();
+        std::shared_ptr<Msg::Packet> data =
+            std::make_shared<Msg::Packet>();
 		{
             data->SetType(Msg::Type::Forward);
 			data->GetHead().Add("id", userId);
@@ -53,7 +53,7 @@ namespace Tendo
 		{
 			return XCode::NotFindUser;
 		}
-        std::shared_ptr<Rpc::Packet> data(new Rpc::Packet());
+        std::shared_ptr<Msg::Packet> data(new Msg::Packet());
         {
             data->SetType(Msg::Type::Forward);
             data->SetProto(Msg::Porto::Protobuf);
@@ -78,7 +78,7 @@ namespace Tendo
 			return XCode::Failure;
 		}
 
-        std::shared_ptr<Rpc::Packet> data(new Rpc::Packet());
+        std::shared_ptr<Msg::Packet> data(new Msg::Packet());
         {
             data->SetType(Msg::Type::Broadcast);
             data->SetProto(Msg::Porto::Protobuf);
@@ -100,7 +100,7 @@ namespace Tendo
 			return XCode::Failure;
 		}
 
-        std::shared_ptr<Rpc::Packet> data(new Rpc::Packet());
+        std::shared_ptr<Msg::Packet> data(new Msg::Packet());
         {
             data->SetType(Msg::Type::Broadcast);
             data->SetProto(Msg::Porto::Protobuf);

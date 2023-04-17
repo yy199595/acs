@@ -5,7 +5,7 @@
 #include"Entity/Component/Component.h"
 #include<google/protobuf/message.h>
 using namespace google::protobuf;
-namespace Rpc
+namespace Msg
 {
     class Packet;
 };
@@ -41,12 +41,12 @@ namespace Tendo
 	public:
 		bool StartSend(long long userId, const std::string& func, const Message* request = nullptr);
 		bool StartSend(const std::string& address, const std::string& func, const Message* request = nullptr);
-		std::shared_ptr<Rpc::Packet> CallAwait(long long userId, const std::string& func, const Message* request = nullptr);
-		std::shared_ptr<Rpc::Packet> CallAwait(const std::string& address, const std::string& func, const Message* request = nullptr);
+		std::shared_ptr<Msg::Packet> CallAwait(long long userId, const std::string& func, const Message* request = nullptr);
+		std::shared_ptr<Msg::Packet> CallAwait(const std::string& address, const std::string& func, const Message* request = nullptr);
 	protected:
 		bool LateAwake() final;
 	public:
-		virtual int Invoke(const std::string& method, std::shared_ptr<Rpc::Packet> message) = 0;
+		virtual int Invoke(const std::string& method, std::shared_ptr<Msg::Packet> message) = 0;
 	private:
 		int mProto;
 		std::string mCluster;

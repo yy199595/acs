@@ -20,7 +20,7 @@ namespace Tendo
 		void WaitAllMessageComplete() final { };
 		bool IsStartService() final { return false; }
     private:
-		int Invoke(const std::string& name, std::shared_ptr<Rpc::Packet> message) final;
+		int Invoke(const std::string& name, std::shared_ptr<Msg::Packet> message) final;
 	};
 }
 

@@ -22,7 +22,7 @@ namespace Tendo
 	 public:
 		bool DelServer(int id);
 		bool DelUnit(long long id);
-        bool AddRpcServer(const std::string& server, long long id, const std::string& address);
+        void AddRpcServer(const std::string& server, long long userId, const std::string& address);
     public:
 		bool HasServer(const std::string & server) const;
         bool GetServer(const std::string & name, long long userId, std::string & address);

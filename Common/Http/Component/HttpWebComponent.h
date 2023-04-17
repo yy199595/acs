@@ -36,7 +36,7 @@ namespace Tendo
     public:
 		void AddStaticDir(const std::string & dir);
 		unsigned int GetWaitCount() const { return this->mWaitCount; }
-		bool SendData(const std::string &address, int code, const std::shared_ptr<Rpc::Packet> &message);
+		bool SendData(const std::string &address, int code, const std::shared_ptr<Msg::Packet> &message);
     private:
         bool LateAwake() final;
 		void OnDestroy() final;
@@ -50,7 +50,7 @@ namespace Tendo
         unsigned int mSumCount;
         unsigned int mWaitCount;
         class AsyncMgrComponent * mTaskComponent;
-		class DispatchMessageComponent * mDispatchComponent;
+		class DispatchComponent * mDispatchComponent;
 		std::unordered_map<std::string, unsigned int> mTasks;
         std::unordered_map<std::string, std::string> mTypeContent;
 		std::unordered_map<std::string, Http::StaticSource> mStaticSourceDir;

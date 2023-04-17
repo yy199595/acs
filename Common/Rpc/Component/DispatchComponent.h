@@ -19,20 +19,21 @@ namespace Tendo
 		long long Time;
 	};
 #endif
-    class DispatchMessageComponent : public RpcTaskComponent<int, Rpc::Packet>
+    class DispatchComponent : public RpcTaskComponent<int, Msg::Packet>
 	{
 	 public:
-		DispatchMessageComponent();
+		DispatchComponent();
     public:
-		int OnMessage(const std::shared_ptr<Rpc::Packet>& message);
+		int OnMessage(const std::shared_ptr<Msg::Packet>& message);
 		unsigned int WaitCount() const { return this->mWaitCount; }
     private:
 		bool LateAwake() final;
-		int HandlerForward(const std::shared_ptr<Rpc::Packet>& message);
-		int HandlerRequest(const std::shared_ptr<Rpc::Packet> & message);
-		int HandlerResponse(const std::shared_ptr<Rpc::Packet>& message);
-		int HandlerBroadcast(const std::shared_ptr<Rpc::Packet>& message);
-		void Invoke(const RpcMethodConfig * config, const std::shared_ptr<Rpc::Packet>& message);
+		int OnPublishMessage(const std::shared_ptr<Msg::Packet>& message);
+		int OnForwardMessage(const std::shared_ptr<Msg::Packet>& message);
+		int OnRequestMessage(const std::shared_ptr<Msg::Packet> & message);
+		int OnResponseMessage(const std::shared_ptr<Msg::Packet>& message);
+		int OnBroadcastMessage(const std::shared_ptr<Msg::Packet>& message);
+		void Invoke(const RpcMethodConfig * config, const std::shared_ptr<Msg::Packet>& message);
     private:
 		unsigned int mWaitCount;
 		class InnerRpcComponent * mNetComponent;

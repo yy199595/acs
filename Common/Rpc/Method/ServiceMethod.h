@@ -30,10 +30,10 @@ namespace Tendo
 	using ServiceMethodType44 = int(T::*)(long long, T1 &);
 
 	template<typename T>
-	using ServiceMethodType6 = int(T::*)(const Rpc::Packet & packet);
+	using ServiceMethodType6 = int(T::*)(const Msg::Packet & packet);
 
 	template<typename T>
-	using ServiceMethodType7 = int(T::*)(const Rpc::Packet& request, Rpc::Packet & response);
+	using ServiceMethodType7 = int(T::*)(const Msg::Packet& request, Msg::Packet & response);
 
 	template<typename T, typename T1>
 	using ServiceMethodType8 = int(T::*)(const std::string & address, const T1&);
@@ -62,7 +62,7 @@ namespace Tendo
 			: mName(std::move(name)) {}
 	 public:
 		virtual bool IsLuaMethod() = 0;
-		virtual int Invoke(Rpc::Packet & message) = 0;
+		virtual int Invoke(Msg::Packet & message) = 0;
 		const std::string& GetName()
 		{
 			return this->mName;
@@ -86,7 +86,7 @@ namespace Tendo
 		}
 	 public:
 
-		int Invoke(Rpc::Packet & message) final
+		int Invoke(Msg::Packet & message) final
 		{
 			if (!this->mHasUserId)
 			{
@@ -124,7 +124,7 @@ namespace Tendo
 		{
 		}
 	 public:
-		int Invoke(Rpc::Packet & message) override
+		int Invoke(Msg::Packet & message) override
 		{
             std::unique_ptr<T1> request(new T1());
             if(!message.ParseMessage(request.get()))
@@ -169,7 +169,7 @@ namespace Tendo
 		{
 		}
 	 public:
-		int Invoke(Rpc::Packet & message) override
+		int Invoke(Msg::Packet & message) override
 		{
             std::unique_ptr<T1> request(new T1());
             std::unique_ptr<T2> response(new T2());
@@ -232,7 +232,7 @@ namespace Tendo
 		{
 		}
 	 public:
-		int Invoke(Rpc::Packet & message) override
+		int Invoke(Msg::Packet & message) override
 		{
 			std::unique_ptr<T1> response(new T1());
             if (this->mHasUserId)
@@ -313,7 +313,7 @@ namespace Tendo
 
 	 public:
 		bool IsLuaMethod() override { return false; };
-		int Invoke(Rpc::Packet & message) override
+		int Invoke(Msg::Packet & message) override
 		{
 			return (_o->*_func)(message);
 		}
@@ -334,7 +334,7 @@ namespace Tendo
 
 	public:
 		bool IsLuaMethod() override { return false; };
-		int Invoke(Rpc::Packet& message) override
+		int Invoke(Msg::Packet& message) override
 		{
 			return (_o->*_func)(message, message);
 		}
@@ -355,7 +355,7 @@ namespace Tendo
 
 	public:
 		bool IsLuaMethod() override { return false; };
-		int Invoke(Rpc::Packet& message) override
+		int Invoke(Msg::Packet& message) override
 		{
 			std::unique_ptr<T1> request(new T1());
 			const std::string& address = message.From();

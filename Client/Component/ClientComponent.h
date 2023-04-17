@@ -16,15 +16,15 @@ namespace Tendo
 
 namespace Client
 {
-    class ClientTask : public Tendo::IRpcTask<Rpc::Packet>
+    class ClientTask : public Tendo::IRpcTask<Msg::Packet>
     {
     public:
         explicit ClientTask(int id);
     public:
-        void OnResponse(std::shared_ptr<Rpc::Packet> response) final;
-        std::shared_ptr<Rpc::Packet> Await() { return this->mTask.Await(); }
+        void OnResponse(std::shared_ptr<Msg::Packet> response) final;
+        std::shared_ptr<Msg::Packet> Await() { return this->mTask.Await(); }
     private:
-        TaskSource<std::shared_ptr<Rpc::Packet>> mTask;
+        TaskSource<std::shared_ptr<Msg::Packet>> mTask;
     };
 	//typedef TaskSource<std::shared_ptr<Rpc::Packet>> ClientTask;
 }
@@ -39,8 +39,8 @@ namespace Client
 {
     class TcpRpcClientContext;
 
-    class ClientComponent : public RpcTaskComponent<int, Rpc::Packet>,
-            public ILuaRegister, public IDestroy, public IRpc<Rpc::Packet>
+    class ClientComponent : public RpcTaskComponent<int, Msg::Packet>,
+            public ILuaRegister, public IDestroy, public IRpc<Msg::Packet>
     {
     public:
         ClientComponent();
@@ -48,9 +48,9 @@ namespace Client
     public:
 		bool Close(int id);
 		int New(const std::string & ip, unsigned short port);
-        bool Send(int id, const std::shared_ptr<Rpc::Packet>& request, int & rpcId);
-		std::shared_ptr<Rpc::Packet> Call(int id, const std::shared_ptr<Rpc::Packet> & request, bool async = true);
-        void OnMessage(std::shared_ptr<Rpc::Packet> message) final;
+        bool Send(int id, const std::shared_ptr<Msg::Packet>& request, int & rpcId);
+		std::shared_ptr<Msg::Packet> Call(int id, const std::shared_ptr<Msg::Packet> & request, bool async = true);
+        void OnMessage(std::shared_ptr<Msg::Packet> message) final;
     protected:
         bool LateAwake() final;
         void StartClose(const std::string &address) final;
@@ -58,7 +58,7 @@ namespace Client
         void OnCloseSocket(const std::string &address, int code) final;
         void OnTaskComplete(int key) final { this->mNumberPool.Push(key); }
     private:
-        void OnRequest(const Rpc::Packet & message);
+        void OnRequest(const Msg::Packet & message);
 		void OnDestroy() final;
     private:
         unsigned int mIndex;

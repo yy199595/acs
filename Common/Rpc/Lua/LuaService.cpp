@@ -11,21 +11,21 @@
 #include"Proto/Component/ProtoComponent.h"
 #include"Rpc/Component/NodeMgrComponent.h"
 #include"Rpc/Component/InnerNetComponent.h"
-#include"Rpc/Component/DispatchMessageComponent.h"
+#include"Rpc/Component/DispatchComponent.h"
 using namespace Tendo;
 namespace Lua
 {
 	int Service::Call(lua_State* lua)
     {
         InnerNetComponent * pNetComponent = App::Inst()->GetComponent<InnerNetComponent>();
-        DispatchMessageComponent * pMessageComponent = App::Inst()->GetComponent<DispatchMessageComponent>();
+        DispatchComponent * pMessageComponent = App::Inst()->GetComponent<DispatchComponent>();
 		if (pNetComponent == nullptr || pMessageComponent == nullptr)
 		{
 			luaL_error(lua, "InnerNetComponent Is Null");
 			return 0;
 		}
 
-		std::shared_ptr<Rpc::Packet> request(new Rpc::Packet());
+		std::shared_ptr<Msg::Packet> request(new Msg::Packet());
         {
             request->SetType(Msg::Type::Request);
             request->SetProto(Msg::Porto::Protobuf);
@@ -163,7 +163,7 @@ namespace Lua
 
     int Service::Send(lua_State* lua)
     {
-        std::shared_ptr<Rpc::Packet> request(new Rpc::Packet());
+        std::shared_ptr<Msg::Packet> request(new Msg::Packet());
         {
             request->SetType(Msg::Type::Request);
             request->SetProto(Msg::Porto::Protobuf);

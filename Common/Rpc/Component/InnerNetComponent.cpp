@@ -4,7 +4,7 @@
 #include"Entity/Unit/App.h"
 #include"Util/String/StringHelper.h"
 #include"Network/Tcp/SocketProxy.h"
-#include"DispatchMessageComponent.h"
+#include"DispatchComponent.h"
 #include"Util/File/FileHelper.h"
 #include"Server/Component/ThreadComponent.h"
 #include"google/protobuf/util/json_util.h"
@@ -43,7 +43,7 @@ namespace Tendo
         config->GetLocation("http", nodeInfo.HttpAddress);
         this->mLocationMaps.emplace(nodeInfo.RpcAddress, nodeInfo);
         LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<ThreadComponent>());
-        LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<DispatchMessageComponent>());
+        LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<DispatchComponent>());
         return this->StartListen("rpc");
     }
 
@@ -52,7 +52,7 @@ namespace Tendo
 
     }
 
-    void InnerNetComponent::OnMessage(std::shared_ptr<Rpc::Packet> message)
+    void InnerNetComponent::OnMessage(std::shared_ptr<Msg::Packet> message)
     {
         this->mSumCount++;
         int type = message->GetType();
@@ -89,7 +89,7 @@ namespace Tendo
         }
     }
 
-    void InnerNetComponent::OnSendFailure(const std::string &address, std::shared_ptr<Rpc::Packet> message)
+    void InnerNetComponent::OnSendFailure(const std::string &address, std::shared_ptr<Msg::Packet> message)
     {
         if (message->GetType() == Msg::Type::Request)
         {
@@ -103,10 +103,10 @@ namespace Tendo
         }
     }
 
-    bool InnerNetComponent::OnAuth(const std::shared_ptr<Rpc::Packet> &message)
+    bool InnerNetComponent::OnAuth(const std::shared_ptr<Msg::Packet> &message)
     {
         NodeInfo nodeInfo;
-        const Rpc::Head &head = message->GetHead();
+        const Msg::Head &head = message->GetHead();
         const std::string &address = message->From();
 
         LOG_CHECK_RET_FALSE(head.Get("name", nodeInfo.SrvName));
@@ -135,17 +135,17 @@ namespace Tendo
 
     bool InnerNetComponent::IsAuth(const std::string &address)
     {
-        auto iter = this->mRpcClientMap.find(address);
-        return iter != this->mRpcClientMap.end();
+        auto iter = this->mRemoteClients.find(address);
+        return iter != this->mRemoteClients.end();
     }
 
 
     void InnerNetComponent::OnCloseSocket(const std::string &address, int code)
     {
-        auto iter = this->mRpcClientMap.find(address);
-        if (iter != this->mRpcClientMap.end())
+        auto iter = this->mRemoteClients.find(address);
+        if (iter != this->mRemoteClients.end())
         {
-            this->mRpcClientMap.erase(iter);
+            this->mRemoteClients.erase(iter);
             LOG_WARN("close server address : " << address);
         }
     }
@@ -153,39 +153,44 @@ namespace Tendo
     void InnerNetComponent::OnListen(std::shared_ptr<Tcp::SocketProxy> socket)
     {
         const std::string &address = socket->GetAddress();
-        auto iter = this->mRpcClientMap.find(address);
-        if (iter == this->mRpcClientMap.end())
+        auto iter = this->mRemoteClients.find(address);
+        if (iter == this->mRemoteClients.end())
         {
             assert(!address.empty());
             std::shared_ptr<InnerNetTcpClient> tcpSession
                     = std::make_shared<InnerNetTcpClient>(this, socket);
 
             tcpSession->StartReceive();
-            this->mRpcClientMap.emplace(address, tcpSession);
+            this->mRemoteClients.emplace(address, tcpSession);
         }
     }
 
     void InnerNetComponent::StartClose(const std::string &address)
     {
-        auto iter = this->mRpcClientMap.find(address);
-        if (iter != this->mRpcClientMap.end())
+        auto iter = this->mRemoteClients.find(address);
+        if (iter != this->mRemoteClients.end())
         {
             std::shared_ptr<InnerNetTcpClient> innerNetClient = iter->second;
             if (innerNetClient != nullptr)
             {
                 innerNetClient->StartClose();
             }
-            this->mRpcClientMap.erase(iter);
+            this->mRemoteClients.erase(iter);
         }
     }
 
-    InnerNetTcpClient *InnerNetComponent::GetOrCreateSession(const std::string &address)
+    InnerNetTcpClient *InnerNetComponent::GetLocalClient(const std::string& address)
     {
-        InnerNetTcpClient *localSession = this->GetSession(address);
-        if (localSession != nullptr)
-        {
-            return localSession;
-        }
+		auto iter = this->mRemoteClients.find(address);
+		if(iter != this->mRemoteClients.end())
+		{
+			return iter->second.get();
+		}
+		auto iter1 = this->mLocalClients.find(address);
+		if(iter1 != this->mLocalClients.end())
+		{
+			return iter1->second.get();
+		}
         std::string ip;
 		std::string net;
         unsigned short port = 0;
@@ -194,12 +199,7 @@ namespace Tendo
             CONSOLE_LOG_ERROR("parse address error : [" << address << "]");
             return nullptr;
         }
-        std::shared_ptr<Tcp::SocketProxy> socketProxy = this->mNetComponent->CreateSocket(net);
-        if (socketProxy == nullptr)
-        {
-            return nullptr;
-        }
-        AuthInfo authInfo;
+		AuthInfo authInfo;
         const ServerConfig *config = ServerConfig::Inst();
         {
             authInfo.ServerName = config->Name();
@@ -207,19 +207,17 @@ namespace Tendo
             config->GetMember("user", "name", authInfo.UserName);
             config->GetMember("user", "passwd", authInfo.PassWord);
         }
+		std::shared_ptr<Tcp::SocketProxy> socketProxy = this->mNetComponent->CreateSocket(net, ip, port);
+        std::shared_ptr<InnerNetTcpClient> localClient = std::make_shared<InnerNetTcpClient>(this, socketProxy, authInfo);
 
-        socketProxy->Init(ip, port);
-        std::shared_ptr<InnerNetTcpClient> newClient =
-                std::make_shared<InnerNetTcpClient>(this, socketProxy, authInfo);
-
-        this->mRpcClientMap.emplace(socketProxy->GetAddress(), newClient);
-        return newClient.get();
+        this->mLocalClients.emplace(socketProxy->GetAddress(), localClient);
+        return localClient.get();
     }
 
-    InnerNetTcpClient *InnerNetComponent::GetSession(const std::string &address)
+    InnerNetTcpClient *InnerNetComponent::GetRemoteClient(const std::string& address)
     {
-        auto iter = this->mRpcClientMap.find(address);
-        if (iter == this->mRpcClientMap.end())
+        auto iter = this->mRemoteClients.find(address);
+        if (iter == this->mRemoteClients.end())
         {
             return nullptr;
         }
@@ -227,7 +225,7 @@ namespace Tendo
     }
 
 
-    bool InnerNetComponent::Send(const std::shared_ptr<Rpc::Packet> &message)
+    bool InnerNetComponent::Send(const std::shared_ptr<Msg::Packet> &message)
     {
 		message->SetNet(Msg::Net::Tcp);
         message->SetFrom(this->mLocation);
@@ -235,7 +233,7 @@ namespace Tendo
         return true;
     }
 
-    bool InnerNetComponent::Send(const std::string &address, int code, const std::shared_ptr<Rpc::Packet> &message)
+    bool InnerNetComponent::Send(const std::string &address, int code, const std::shared_ptr<Msg::Packet> &message)
     {
         if (!message->GetHead().Has("rpc"))
         {
@@ -251,7 +249,7 @@ namespace Tendo
         return true;
     }
 
-    bool InnerNetComponent::Send(const std::string &address, const std::shared_ptr<Rpc::Packet> &message)
+    bool InnerNetComponent::Send(const std::string &address, const std::shared_ptr<Msg::Packet> &message)
     {
         if (address == this->mLocation) //发送到本机
         {
@@ -265,10 +263,10 @@ namespace Tendo
         switch (message->GetType())
         {
             case Msg::Type::Response:
-                clientSession = this->GetSession(address);
+                clientSession = this->GetRemoteClient(address);
                 break;
             default:
-                clientSession = this->GetOrCreateSession(address);
+                clientSession = this->GetLocalClient(address);
                 break;
         }
         if (clientSession == nullptr)
@@ -280,7 +278,7 @@ namespace Tendo
         return true;
     }
 
-    std::shared_ptr<Rpc::Packet> InnerNetComponent::Call(const std::string & address, const std::shared_ptr<Rpc::Packet> & message)
+    std::shared_ptr<Msg::Packet> InnerNetComponent::Call(const std::string & address, const std::shared_ptr<Msg::Packet> & message)
     {
         int taskId = this->mMessageComponent->PopTaskId();
         message->GetHead().Add("rpc", taskId);
@@ -294,7 +292,7 @@ namespace Tendo
        return  this->mMessageComponent->AddTask(taskId, taskSource)->Await();
     }
 
-    bool InnerNetComponent::Send(const std::string & address, const std::shared_ptr<Rpc::Packet>& message, int & taskId)
+    bool InnerNetComponent::Send(const std::string & address, const std::shared_ptr<Msg::Packet>& message, int & taskId)
     {
         taskId = this->mMessageComponent->PopTaskId();
         message->GetHead().Add("rpc", taskId);
@@ -311,7 +309,7 @@ namespace Tendo
         document.Add("sum").Add(this->mSumCount);
         document.Add("wait").Add(this->mMessageComponent->WaitCount());
         document.Add("auth").Add(this->mLocationMaps.size());
-        document.Add("client").Add(this->mRpcClientMap.size());
+        document.Add("client").Add(this->mRemoteClients.size());
     }
 
     const NodeInfo *InnerNetComponent::GetNodeInfo(const std::string &address) const
@@ -324,7 +322,7 @@ namespace Tendo
     {
         for (int index = 0; index < this->mMaxHandlerCount && !this->mWaitMessages.empty(); index++)
         {
-            std::shared_ptr<Rpc::Packet> message = this->mWaitMessages.front();
+            std::shared_ptr<Msg::Packet> message = this->mWaitMessages.front();
             {
                 int code = this->mMessageComponent->OnMessage(message);
                 if (code != XCode::Successful && message->GetHead().Has("rpc"))
@@ -342,39 +340,34 @@ namespace Tendo
     size_t InnerNetComponent::GetConnectClients(std::vector<std::string> &list) const
     {
         size_t count = 0;
-        auto iter = this->mRpcClientMap.begin();
-        for (; iter != this->mRpcClientMap.end(); iter++)
-        {
-            if (!iter->second->IsClient()) //连接进来的
-            {
-                count++;
-                list.emplace_back(iter->first);
-            }
-        }
+		list.reserve(this->mRemoteClients.size());
+        auto iter = this->mRemoteClients.begin();
+        for (; iter != this->mRemoteClients.end(); iter++)
+		{
+			count++;
+			list.emplace_back(iter->first);
+		}
         return count;
     }
 
 
-    size_t InnerNetComponent::Broadcast(const std::shared_ptr<Rpc::Packet> &message) const
+    size_t InnerNetComponent::Broadcast(const std::shared_ptr<Msg::Packet> &message) const
     {
         size_t count = 0;
-        auto iter = this->mRpcClientMap.begin();
-        for (; iter != this->mRpcClientMap.end(); iter++)
-        {
-            if (!iter->second->IsClient()) //连接进来的
-            {
-                count++;
-                iter->second->Send(message->Clone());
-            }
-        }
+        auto iter = this->mRemoteClients.begin();
+        for (; iter != this->mRemoteClients.end(); iter++)
+		{
+			count++;
+			iter->second->Send(message->Clone());
+		}
         return count;
     }
 
     void InnerNetComponent::OnDestroy()
     {
         this->StopListen();
-        auto iter = this->mRpcClientMap.begin();
-        for (; iter != this->mRpcClientMap.end(); iter++)
+        auto iter = this->mRemoteClients.begin();
+        for (; iter != this->mRemoteClients.end(); iter++)
         {
             this->StartClose(iter->first);
         }

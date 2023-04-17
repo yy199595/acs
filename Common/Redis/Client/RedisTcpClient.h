@@ -15,10 +15,10 @@
 namespace Tendo
 {
     class RedisComponent;
-    class TcpRedisClient final : public Tcp::TcpContext
+    class RedisTcpClient final : public Tcp::TcpContext
     {
     public:
-        TcpRedisClient(std::shared_ptr<Tcp::SocketProxy> socket,
+        RedisTcpClient(std::shared_ptr<Tcp::SocketProxy> socket,
 				const RedisClientConfig & config, IRpc<RedisResponse> * component);
     public:
         void Send(const std::shared_ptr<RedisRequest>& command);
@@ -37,6 +37,7 @@ namespace Tendo
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
     private:
         size_t mIndex;
+		bool mIsSubClient; //是否是发布订阅客户端
 		std::string mAddress;
         RedisClientConfig mConfig;
 		IRpc<RedisResponse> * mComponent;

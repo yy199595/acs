@@ -48,9 +48,9 @@ namespace Tendo
 				return;
 			}
 			long long value = 0;
-			std::shared_ptr<Rpc::Packet> message(new Rpc::Packet());
+			std::shared_ptr<Msg::Packet> message(new Msg::Packet());
 			{
-				Rpc::Head& head = message->GetHead();
+				Msg::Head& head = message->GetHead();
 				if (request->Header().Get("id", value))
 				{
 					head.Add("id", value);
@@ -77,9 +77,9 @@ namespace Tendo
 		}
 	}
 
-	void HttpDebugComponent::Call(const std::string& address, std::shared_ptr<Rpc::Packet>& message)
+	void HttpDebugComponent::Call(const std::string& address, std::shared_ptr<Msg::Packet>& message)
 	{
-		std::shared_ptr<Rpc::Packet> response =
+		std::shared_ptr<Msg::Packet> response =
 			this->mInnerComponent->Call(address, message);
 		Json::Writer document;
 		if (response == nullptr)

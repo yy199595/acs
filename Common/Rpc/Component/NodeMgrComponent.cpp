@@ -57,18 +57,14 @@ namespace Tendo
 		{
 			name.assign(listen);
 		}
-		auto iter = this->mRpcServers.find(name);
-		if (iter == this->mRpcServers.end())
-		{
-			return false;
-		}
-		if (iter->second.empty())
+		auto iter = this->mRpcServers.find(server);
+		if (iter == this->mRpcServers.end() || iter->second.empty())
 		{
 			return false;
 		}
 		int size = (int)iter->second.size();
-		int id = Helper::Math::Random<int>(0, size - 1);
-		auto iter1 = this->mServers.find(id);
+		int idx = Helper::Math::Random<int>(0, size - 1);
+		auto iter1 = this->mServers.find(iter->second[idx]);
 		if(iter1 == this->mServers.end())
 		{
 			return false;
@@ -109,24 +105,19 @@ namespace Tendo
 	}
 
 
-	bool NodeMgrComponent::AddRpcServer(const std::string& server, long long id, const std::string& address)
+	void NodeMgrComponent::AddRpcServer(const std::string& server, long long userId, const std::string& address)
 	{
-		LocationUnit* localUnit = nullptr;
-		auto iter = this->mClients.find(id);
+		auto iter = this->mClients.find(userId);
 		if (iter == this->mClients.end())
 		{
 			std::unique_ptr<LocationUnit> tmp = std::make_unique<LocationUnit>();
 			{
-				localUnit = tmp.get();
-				this->mClients.emplace(id, std::move(tmp));
+				tmp->Add(server, address);
+				this->mClients.emplace(userId, std::move(tmp));
 			}
+			return;
 		}
-		else
-		{
-			localUnit = iter->second.get();
-		}
-		localUnit->Add(server, address);
-		return true;
+		iter->second->Add(server, address);
 	}
 
     bool NodeMgrComponent::GetServer(long long int userId, std::unordered_map<std::string, std::string> &servers)

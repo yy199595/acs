@@ -20,6 +20,8 @@ namespace Tendo
 		std::string mNet;
         size_t mListenCount;
         unsigned short mListenPort;
+		std::mutex mMutex;
+		std::condition_variable mVal;
         class ThreadComponent * mThreadComponent;
         std::unique_ptr<asio::ip::tcp::acceptor> mBindAcceptor;
     };

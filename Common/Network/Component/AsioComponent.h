@@ -8,11 +8,11 @@
 #include"Entity/Component/Component.h"
 namespace Tendo
 {
-	class AsioComponent : public Component, public IRpc<Rpc::Packet>
+	class AsioComponent : public Component, public IRpc<Msg::Packet>
 	{
 	 public:
-		virtual int Send(const std::string & address, const std::shared_ptr<Rpc::Packet> & message) = 0;
-		virtual int Send(const std::string & address, int code, const std::shared_ptr<Rpc::Packet> & message) = 0;
+		virtual int Send(const std::string & address, const std::shared_ptr<Msg::Packet> & message) = 0;
+		virtual int Send(const std::string & address, int code, const std::shared_ptr<Msg::Packet> & message) = 0;
 	};
 }
 

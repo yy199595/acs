@@ -11,7 +11,7 @@
 #include"Util/Proto/ProtoHelper.h"
 #include"Proto//Message/ProtoMessage.h"
 
-namespace Rpc
+namespace Msg
 {
     class Head : protected std::unordered_map<std::string, std::string>
     {
@@ -97,7 +97,7 @@ namespace Rpc
         std::string mBody;
     };
 }
-typedef std::shared_ptr<Rpc::Packet> RpcPacket;
+typedef std::shared_ptr<Msg::Packet> RpcPacket;
 
 
 #endif //APP_MESSAGE_H

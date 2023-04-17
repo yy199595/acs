@@ -19,7 +19,7 @@ namespace Tendo
 		bool Close() final;
 		bool IsStartService() final{ return true; }
 		unsigned int GetWaitMessageCount() const final { return this->mWaitCount; }
-		int Invoke(const std::string& func, std::shared_ptr<Rpc::Packet> message) final;
+		int Invoke(const std::string& func, std::shared_ptr<Msg::Packet> message) final;
 	protected:
 		bool LoadFromLua() final;
 		virtual void OnClose(){ };

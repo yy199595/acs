@@ -1,34 +1,35 @@
 //
 // Created by zmhy0073 on 2022/1/15.
 //
-#include"TcpRedisClient.h"
+#include"RedisTcpClient.h"
 
 #include"Util/File/FileHelper.h"
 #include"Util/String/StringHelper.h"
 #include"Entity/Unit/App.h"
 namespace Tendo
 {
-	TcpRedisClient::TcpRedisClient(std::shared_ptr<Tcp::SocketProxy> socket,
+	RedisTcpClient::RedisTcpClient(std::shared_ptr<Tcp::SocketProxy> socket,
 		const RedisClientConfig& config, IRpc<RedisResponse>* component)
 		: Tcp::TcpContext(std::move(socket), 1024 * 1024), mConfig(config), mComponent(component)
 	{
         this->mIndex = 0;
+		this->mIsSubClient = false;
         this->mAddress = this->mConfig.Address[0].FullAddress;
         this->mCurResponse = std::make_shared<RedisResponse>();
 	}
 
-	void TcpRedisClient::Send(const std::shared_ptr<RedisRequest>& command)
+	void RedisTcpClient::Send(const std::shared_ptr<RedisRequest>& command)
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->Write(command);
 #else
         Asio::Context & t = this->mSocket->GetThread();
-		t.post(std::bind(&TcpRedisClient::Write, this, command));
+		t.post(std::bind(&RedisTcpClient::Write, this, command));
 #endif
         //CONSOLE_LOG_INFO("async command = " << command->ToJson());
 	}
 
-	void TcpRedisClient::OnReceiveLine(const Asio::Code & code, std::istream & is, size_t size)
+	void RedisTcpClient::OnReceiveLine(const Asio::Code & code, std::istream & is, size_t size)
 	{
 		if (code)
 		{
@@ -50,14 +51,8 @@ namespace Tendo
 		}
 	}
 
-	void TcpRedisClient::OnReceiveMessage(const asio::error_code& code, std::istream & is, size_t size)
+	void RedisTcpClient::OnReceiveMessage(const asio::error_code& code, std::istream & is, size_t size)
 	{
-        /*if(this->mCurResponse == nullptr)
-        {
-            this->ClearRecvStream();
-            return;
-        }*/
-        
 		if (this->mCurResponse->OnRecvMessage(is) == 0)
 		{
 			this->OnReadComplete();
@@ -66,25 +61,32 @@ namespace Tendo
 		this->ReceiveLine();
 	}
 
-    void TcpRedisClient::OnReadComplete()
-    {
-        std::shared_ptr<RedisRequest> request =
-            std::static_pointer_cast<RedisRequest>(this->PopMessage());
-        if (request != nullptr && request->GetTaskId() > 0)
-        {
-            this->mCurResponse->SetTaskId(request->GetTaskId());
+    void RedisTcpClient::OnReadComplete()
+	{
+		std::shared_ptr<RedisRequest> request =
+				std::static_pointer_cast<RedisRequest>(this->PopMessage());
+		if (request != nullptr && request->GetTaskId() > 0)
+		{
+			if (request->GetCommand() == "SUBSCRIBE")
+			{
+				this->mIsSubClient = true;
+			}
+			this->mCurResponse->SetTaskId(request->GetTaskId());
+		}
 #ifdef ONLY_MAIN_THREAD
-            this->mComponent->OnMessage(this->mCurResponse);
+		this->mComponent->OnMessage(this->mCurResponse);
 #else
-            asio::io_service& io = App::Inst()->MainThread();
-            io.post(std::bind(&IRpc<RedisResponse>::OnMessage, this->mComponent, this->mCurResponse));
+		asio::io_service& io = App::Inst()->MainThread();
+		io.post(std::bind(&IRpc<RedisResponse>::OnMessage, this->mComponent, this->mCurResponse));
 #endif
-        }
-        this->mCurResponse = std::make_shared<RedisResponse>();
-        this->SendFromMessageQueue();
-    }
+		this->mCurResponse = std::make_shared<RedisResponse>();
+		if (!this->SendFromMessageQueue() && this->mIsSubClient)
+		{
+			this->ReceiveLine();
+		}
+	}
 
-    void TcpRedisClient::OnSendMessage(const asio::error_code &code,
+    void RedisTcpClient::OnSendMessage(const asio::error_code &code,
 			std::shared_ptr<Tcp::ProtoMessage> message)
 	{
 		if (code)
@@ -101,7 +103,7 @@ namespace Tendo
 		this->ReceiveLine();
 	}
 
-	bool TcpRedisClient::AuthUser()
+	bool RedisTcpClient::AuthUser()
     {
         if (this->mIndex >= this->mConfig.Address.size())
         {
@@ -129,7 +131,7 @@ namespace Tendo
         return this->InitRedisClient(this->mConfig.Password);
     }
 
-    bool TcpRedisClient::InitRedisClient(const std::string & pwd)
+    bool RedisTcpClient::InitRedisClient(const std::string & pwd)
     {
         assert(this->mSendBuffer.size() == 0);
         assert(this->mRecvBuffer.size() == 0);
@@ -160,7 +162,7 @@ namespace Tendo
             int s = this->mConfig.FreeClient;
             asio::io_service & io = this->mSocket->GetThread();
             this->mCloseTimer = std::make_shared<asio::steady_timer>(io, std::chrono::seconds(s));
-            this->mCloseTimer->async_wait(std::bind(&TcpRedisClient::CloseFreeClient, this));
+            this->mCloseTimer->async_wait(std::bind(&RedisTcpClient::CloseFreeClient, this));
         }
 #ifdef ONLY_MAIN_THREAD
         this->mComponent->OnConnectSuccessful(this->mAddress);
@@ -171,7 +173,7 @@ namespace Tendo
         return true;
     }
 
-    std::shared_ptr<RedisResponse> TcpRedisClient::SyncCommand(const std::shared_ptr<RedisRequest>& request)
+    std::shared_ptr<RedisResponse> RedisTcpClient::SyncCommand(const std::shared_ptr<RedisRequest>& request)
     {
         assert(this->mRecvBuffer.size() == 0);
         //CONSOLE_LOG_DEBUG("sync command = " << request->ToJson());
@@ -205,7 +207,7 @@ namespace Tendo
         return redisResponse;
     }
 
-    void TcpRedisClient::StartPingServer()
+    void RedisTcpClient::StartPingServer()
     {
         long long nowTime = Helper::Time::NowSecTime();
         if(nowTime - this->GetLastOperTime() >= 10) //十秒没进行操作 ping一下
@@ -214,10 +216,10 @@ namespace Tendo
         }
         asio::io_service &io = this->mSocket->GetThread();
         this->mTimer = std::make_shared<asio::steady_timer>(io, std::chrono::seconds(10));
-        this->mTimer->async_wait(std::bind(&TcpRedisClient::StartPingServer, this));
+        this->mTimer->async_wait(std::bind(&RedisTcpClient::StartPingServer, this));
     }
 
-    void TcpRedisClient::CloseFreeClient()
+    void RedisTcpClient::CloseFreeClient()
     {
         int second = this->mConfig.FreeClient;
         long long nowTime = Helper::Time::NowSecTime();
@@ -230,7 +232,7 @@ namespace Tendo
         {
             asio::io_service &io = this->mSocket->GetThread();
             this->mCloseTimer = std::make_shared<asio::steady_timer>(io, std::chrono::seconds(second));
-            this->mCloseTimer->async_wait(std::bind(&TcpRedisClient::CloseFreeClient, this));
+            this->mCloseTimer->async_wait(std::bind(&RedisTcpClient::CloseFreeClient, this));
         }
     }
 }

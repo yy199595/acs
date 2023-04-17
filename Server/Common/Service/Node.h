@@ -19,7 +19,7 @@ namespace Tendo
         int Stop();
         int Hotfix();
         int LoadConfig();
-		int Ping(const Rpc::Packet& packet);
+		int Ping(const Msg::Packet& packet);
 		int Join(const s2s::server::info& request); //新服务器加入
         int Exit(const com::type::int32& request); //服务器退出
         int RunInfo(com::type::string& response); // 获取运行信息

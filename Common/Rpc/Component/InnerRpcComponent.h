@@ -20,14 +20,14 @@ namespace Tendo
 		int Send(long long userId, const std::string & server, const std::string & func, int proto, const google::protobuf::Message * message = nullptr);
 		int Send(const std::string & address, const std::string & func, int proto, long long userId = 0, const google::protobuf::Message * message = nullptr);
 	public:
-		std::shared_ptr<Rpc::Packet> Call(long long userId, const std::string & server, const std::string & func, int proto, const google::protobuf::Message * message = nullptr);
-		std::shared_ptr<Rpc::Packet> Call(const std::string & address, const std::string & func, int proto, long long userId = 0, const google::protobuf::Message * message = nullptr);
+		std::shared_ptr<Msg::Packet> Call(long long userId, const std::string & server, const std::string & func, int proto, const google::protobuf::Message * message = nullptr);
+		std::shared_ptr<Msg::Packet> Call(const std::string & address, const std::string & func, int proto, long long userId = 0, const google::protobuf::Message * message = nullptr);
 	public:
 		bool FormatUrl(const std::string & address, const std::string & func, std::string & url);
-		std::shared_ptr<Rpc::Packet> MakeTcpRequest(long long userId, const std::string & func, int protoc, const google::protobuf::Message * message);
+		std::shared_ptr<Msg::Packet> MakeTcpRequest(long long userId, const std::string & func, int protoc, const google::protobuf::Message * message);
 		std::shared_ptr<Http::PostRequest> MakeHttpRequest(long long userId, const std::string & func, int protoc, const google::protobuf::Message * message);
 	public:
-		bool Send(const std::string & address, int code, const std::shared_ptr<Rpc::Packet> & message);
+		bool Send(const std::string & address, int code, const std::shared_ptr<Msg::Packet> & message);
 	private:
 		bool LateAwake() final;
 	private:

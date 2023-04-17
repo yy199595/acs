@@ -9,31 +9,44 @@
 #include"Kcp/Common/ikcp.h"
 #include"Network/Tcp/Asio.h"
 #include"Entity/Component/Component.h"
+#include "Rpc/Client/Message.h"
+
+using AsioTimer = asio::steady_timer;
+using AsioUdpSocket = asio::ip::udp::socket;
+using AsioUdpEndpoint = asio::ip::udp::endpoint;
+
+struct KcpClient
+{
+	ikcpcb * kcp;
+	AsioUdpEndpoint endpoint;
+};
 namespace Tendo
 {
-	class KcpComponent : public Component, public ISecondUpdate
+	class KcpComponent : public Component
 	{
 	public:
 		KcpComponent();
 		bool StartListen(const char* name);
 	private:
 		bool LateAwake() final;
-		void OnSecondUpdate(int tick);
 		static int OnServerSend(const char* buf, int len, ikcpcb* kcp, void* user);
 		static int OnClientSend(const char* buf, int len, ikcpcb* kcp, void* user);
 	private:
-		void Main();
+		void Start();
 		void Receive();
-		void Update(Asio::Context& context);
+		void Update(const asio::error_code & code);
+	private:
+		void OnMessage(std::shared_ptr<Msg::Packet> message);
 	private:
 		unsigned short mPort;
-		std::thread* mThread;
 		ikcpcb* mKcpServer;
 		Asio::Context* mContext;
-		asio::ip::udp::socket* mServerSocket;
-		std::array<char, 56635> mReceiveBuffer;
-		asio::ip::udp::endpoint mClientEndpoint;
-		std::unordered_map<std::string, IKCPCB*> mKcpClients;
+		AsioUdpEndpoint mEndpoint;
+		asio::streambuf mRecvBuffer;
+		std::unique_ptr<AsioTimer> mTimer;
+		std::array<char, 65535> mReceiveBuffer;
+		std::unique_ptr<AsioUdpSocket> mUdpSocket;
+		std::unordered_map<unsigned int, KcpClient *> mKcpClients;
 	};
 }
 

@@ -58,7 +58,7 @@ namespace Tendo
 		return true;
 	}
 
-	void OuterNetComponent::OnMessage(std::shared_ptr<Rpc::Packet> message)
+	void OuterNetComponent::OnMessage(std::shared_ptr<Msg::Packet> message)
 	{
 		this->mSumCount++;
 		const std::string& address = message->From();
@@ -88,7 +88,7 @@ namespace Tendo
 	{
 		for (int index = 0; index < this->mMaxHandlerCount && !this->mMessages.empty(); index++)
 		{
-			std::shared_ptr<Rpc::Packet> message = this->mMessages.front();
+			std::shared_ptr<Msg::Packet> message = this->mMessages.front();
 			{
 				long long userId = 0;
 				message->GetHead().Get("id", userId);
@@ -106,7 +106,7 @@ namespace Tendo
 		}
 	}
 
-	int OuterNetComponent::OnRequest(long long userId, std::shared_ptr<Rpc::Packet>& message)
+	int OuterNetComponent::OnRequest(long long userId, std::shared_ptr<Msg::Packet>& message)
 	{
 		const std::string & fullName = message->GetHead().GetStr("func");
 		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
@@ -138,11 +138,11 @@ namespace Tendo
 		return XCode::Successful;
 	}
 
-	bool OuterNetComponent::Send(const std::string& address, const std::shared_ptr<Rpc::Packet>& message)
+	bool OuterNetComponent::Send(const std::string& address, const std::shared_ptr<Msg::Packet>& message)
 	{
 #ifdef __DEBUG__
 		int rpcId = 0;
-		const Rpc::Head& head = message->ConstHead();
+		const Msg::Head& head = message->ConstHead();
 		if (message->GetType() == Msg::Type::Response
 			&& head.Get("rpc", rpcId))
 		{
@@ -234,7 +234,7 @@ namespace Tendo
 		}
     }
 
-    bool OuterNetComponent::Send(long long userId, const std::shared_ptr<Rpc::Packet>& message)
+    bool OuterNetComponent::Send(long long userId, const std::shared_ptr<Msg::Packet>& message)
     {
 		auto iter = this->mUserAddressMap.find(userId);
 		if(iter == this->mUserAddressMap.end())
@@ -273,7 +273,7 @@ namespace Tendo
 		userId = iter->second;
 		return true;
 	}
-	size_t OuterNetComponent::Broadcast(const std::shared_ptr<Rpc::Packet>& message)
+	size_t OuterNetComponent::Broadcast(const std::shared_ptr<Msg::Packet>& message)
 	{
 		size_t count = 0;
 		auto iter = this->mAddressUserMap.begin();

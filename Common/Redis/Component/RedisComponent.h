@@ -2,7 +2,7 @@
 
 #include"Util/Guid/Guid.h"
 #include"Redis/Config/RedisConfig.h"
-#include"Redis/Client/TcpRedisClient.h"
+#include"Redis/Client/RedisTcpClient.h"
 #include"Rpc/Component/RpcTaskComponent.h"
 
 namespace Tendo
@@ -20,6 +20,8 @@ namespace Tendo
 		bool Send(const std::shared_ptr<RedisRequest>& request, int & id);
 		inline const RedisClientConfig & Config() const { return this->mConfig.Config(); }
 	public:
+		bool SubChanel(const std::string & chanel);
+	public:
         template<typename ... Args>
         bool Send(const std::string & cmd, Args&& ... args);
         template<typename ... Args>
@@ -30,10 +32,10 @@ namespace Tendo
         std::shared_ptr<RedisResponse> Run(const std::shared_ptr<RedisRequest>& request);
         std::shared_ptr<RedisResponse> SyncRun(const std::shared_ptr<RedisRequest>& request);
     private:
-		TcpRedisClient * GetClient(size_t index = -1);
+		RedisTcpClient * GetClient(size_t index = -1);
 		void OnConnectSuccessful(const std::string &address) final;
         void OnMessage(std::shared_ptr<RedisResponse> message) final;
-		TcpRedisClient * MakeRedisClient(const RedisClientConfig & config);
+		RedisTcpClient * MakeRedisClient(const RedisClientConfig & config);
     private:
         bool Awake() final;
 		void OnDestroy() final;
@@ -41,8 +43,10 @@ namespace Tendo
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 	private:
 		RedisConfig mConfig;
-        std::shared_ptr<TcpRedisClient> mMainClient;
-        std::vector<std::shared_ptr<TcpRedisClient>> mRedisClients;
+		std::shared_ptr<RedisTcpClient> mSubClient;
+		std::shared_ptr<RedisTcpClient> mMainClient;
+		class DispatchComponent * mDispatchComponent;
+		std::vector<std::shared_ptr<RedisTcpClient>> mRedisClients;
     };
 
     template<typename ... Args>
@@ -64,7 +68,7 @@ namespace Tendo
     template<typename ... Args>
     bool RedisComponent::Send(const std::string &cmd, Args &&...args)
     {
-        TcpRedisClient * redisClient = this->GetClient();
+        RedisTcpClient * redisClient = this->GetClient();
         if(redisClient == nullptr)
         {
             return false;

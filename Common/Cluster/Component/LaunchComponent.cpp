@@ -16,7 +16,7 @@
 #include"Rpc/Component/InnerRpcComponent.h"
 #include"Rpc/Component/InnerNetComponent.h"
 #include"Http/Component/HttpWebComponent.h"
-#include"Rpc/Component/DispatchMessageComponent.h"
+#include"Rpc/Component/DispatchComponent.h"
 namespace Tendo
 {
     bool LaunchComponent::Awake()
@@ -32,13 +32,13 @@ namespace Tendo
 		{
 			this->mApp->AddComponent<NodeMgrComponent>();
 			this->mApp->AddComponent<InnerNetComponent>();
-			this->mApp->AddComponent<DispatchMessageComponent>();
+			this->mApp->AddComponent<DispatchComponent>();
 		}
 		if(ServerConfig::Inst()->GetListen("http", port))
 		{
 			this->mApp->AddComponent<NodeMgrComponent>();
 			this->mApp->AddComponent<HttpWebComponent>();
-			this->mApp->AddComponent<DispatchMessageComponent>();
+			this->mApp->AddComponent<DispatchComponent>();
 		}
 
         std::vector<std::string> components;

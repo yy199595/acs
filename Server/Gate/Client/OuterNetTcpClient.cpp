@@ -14,7 +14,6 @@ namespace Tendo
                                    OuterNetComponent* component)
 		: TcpContext(socket), mGateComponent(component)
 	{
-        this->mTimeout = 0;
         this->mState = Tcp::DecodeState::Head;
 	}
 
@@ -25,9 +24,8 @@ namespace Tendo
 #else
         Asio::Context & t = this->mSocket->GetThread();
         t.post(std::bind(&OuterNetTcpClient::ReceiveMessage, this, RPC_PACK_HEAD_LEN));
-        if(second != 0)
+        if(second > 0)
         {
-            this->mTimeout = second;
             t.post(std::bind(&OuterNetTcpClient::StartTimer, this, second));
         }
 #endif 
@@ -58,7 +56,7 @@ namespace Tendo
 			{
 				int len = 0;
 				this->mState = Tcp::DecodeState::Body;
-				this->mMessage = std::make_shared<Rpc::Packet>();
+				this->mMessage = std::make_shared<Msg::Packet>();
 				if (!this->mMessage->ParseLen(readStream, len))
 				{
 					this->CloseSocket(XCode::UnKnowPacket);
@@ -130,7 +128,7 @@ namespace Tendo
 #endif
 	}
 
-	void OuterNetTcpClient::SendData(std::shared_ptr<Rpc::Packet> message)
+	void OuterNetTcpClient::SendData(std::shared_ptr<Msg::Packet> message)
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->Write(message);

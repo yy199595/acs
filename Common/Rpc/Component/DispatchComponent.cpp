@@ -1,4 +1,4 @@
-﻿#include"DispatchMessageComponent.h"
+﻿#include"DispatchComponent.h"
 
 #include"Async/Component/AsyncMgrComponent.h"
 #include"Rpc/Lua/LuaServiceMethod.h"
@@ -19,7 +19,7 @@
 
 namespace Tendo
 {
-	DispatchMessageComponent::DispatchMessageComponent()
+	DispatchComponent::DispatchComponent()
 	{
 		this->mWaitCount = 0;
 		this->mNetComponent = nullptr;
@@ -28,7 +28,7 @@ namespace Tendo
 		this->mTimerComponent = nullptr;
 	}
 
-	bool DispatchMessageComponent::LateAwake()
+	bool DispatchComponent::LateAwake()
 	{
         this->mTimerComponent = this->mApp->GetTimerComponent();
 		this->mNetComponent = this->GetComponent<InnerRpcComponent>();
@@ -37,7 +37,7 @@ namespace Tendo
 		return true;
 	}
 
-	int DispatchMessageComponent::HandlerRequest(const std::shared_ptr<Rpc::Packet> & message)
+	int DispatchComponent::OnRequestMessage(const std::shared_ptr<Msg::Packet> & message)
 	{
         //const Rpc::Head & head = message->ConstHead();
 		const std::string & fullName = message->ConstHead().GetStr("func");
@@ -56,11 +56,11 @@ namespace Tendo
             this->Invoke(methodConfig, message);
             return XCode::Successful;
         }
-        this->mTaskComponent->Start(&DispatchMessageComponent::Invoke, this, methodConfig, message);
+        this->mTaskComponent->Start(&DispatchComponent::Invoke, this, methodConfig, message);
 		return XCode::Successful;
 	}
 
-    void DispatchMessageComponent::Invoke(const RpcMethodConfig *config, const std::shared_ptr<Rpc::Packet>& message)
+    void DispatchComponent::Invoke(const RpcMethodConfig *config, const std::shared_ptr<Msg::Packet>& message)
 	{
 		RpcService* logicService = this->mApp->GetService(config->Service);
 		if (logicService == nullptr || !logicService->IsStartService())
@@ -155,23 +155,31 @@ namespace Tendo
 		this->mNetComponent->Send(address, code, message);
 	}
 
-    int DispatchMessageComponent::OnMessage(const std::shared_ptr<Rpc::Packet>& message)
+    int DispatchComponent::OnMessage(const std::shared_ptr<Msg::Packet>& message)
     {
         switch (message->GetType())
         {
             case Msg::Type::Request:
-                return this->HandlerRequest(message);
+                return this->OnRequestMessage(message);
             case Msg::Type::Response:
-                return this->HandlerResponse(message);
+                return this->OnResponseMessage(message);
             case Msg::Type::Forward:
-                return this->HandlerForward(message);
+                return this->OnForwardMessage(message);
             case Msg::Type::Broadcast:
-                return this->HandlerBroadcast(message);
+                return this->OnBroadcastMessage(message);
+			case Msg::Type::SubPublish:
+				return this->OnPublishMessage(message);
         }
+		LOG_ERROR("unknown message type : " << message->GetType());
         return XCode::Successful;
     }
 
-	int DispatchMessageComponent::HandlerForward(const std::shared_ptr<Rpc::Packet>& message)
+	int DispatchComponent::OnPublishMessage(const std::shared_ptr<Msg::Packet>& message)
+	{
+		return XCode::Successful;
+	}
+
+	int DispatchComponent::OnForwardMessage(const std::shared_ptr<Msg::Packet>& message)
 	{
 		if (this->mOuterComponent == nullptr)
 		{
@@ -191,7 +199,7 @@ namespace Tendo
 		return XCode::Successful;
 	}
 
-	int DispatchMessageComponent::HandlerResponse(const std::shared_ptr<Rpc::Packet>& message)
+	int DispatchComponent::OnResponseMessage(const std::shared_ptr<Msg::Packet>& message)
     {
         if (this->mOuterComponent != nullptr)
         {
@@ -213,7 +221,7 @@ namespace Tendo
         return XCode::Successful;
     }
 
-	int DispatchMessageComponent::HandlerBroadcast(const std::shared_ptr<Rpc::Packet>& message)
+	int DispatchComponent::OnBroadcastMessage(const std::shared_ptr<Msg::Packet>& message)
 	{
         if(this->mOuterComponent == nullptr)
         {

@@ -56,7 +56,7 @@ namespace Tendo
 		return true;
 	}
 
-	int LuaPhysicalRpcService::Invoke(const std::string &name, std::shared_ptr<Rpc::Packet> message)
+	int LuaPhysicalRpcService::Invoke(const std::string &name, std::shared_ptr<Msg::Packet> message)
 	{
 		if(!this->mIsHandlerMessage || !this->IsStartService())
 		{

@@ -2,10 +2,11 @@
 #include"Redis/Lua/LuaRedis.h"
 
 #include"Lua/Engine/ClassProxyHelper.h"
-#include"Redis/Client/TcpRedisClient.h"
+#include"Redis/Client/RedisTcpClient.h"
 #include"Server/Component/ThreadComponent.h"
 #include"Redis/Component/RedisLuaComponent.h"
 #include"Redis/Component/RedisStringComponent.h"
+#include"Rpc/Component/DispatchComponent.h"
 #include"Entity/Unit/App.h"
 #include"Redis/Config/RedisConfig.h"
 #ifdef __DEBUG__
@@ -26,7 +27,7 @@ namespace Tendo
 		std::shared_ptr<Tcp::SocketProxy> socket = std::make_shared<Tcp::SocketProxy>(io, "tcp");
 
 		socket->Init(this->Config().Address[0].Ip, this->Config().Address[0].Port);
-		this->mMainClient =	std::make_shared<TcpRedisClient>(socket, this->mConfig.Config(), this);
+		this->mMainClient =	std::make_shared<RedisTcpClient>(socket, this->mConfig.Config(), this);
 		return this->mMainClient->AuthUser();	
     }
 
@@ -36,6 +37,7 @@ namespace Tendo
 		{
 			this->MakeRedisClient(this->Config());
 		}
+		this->mDispatchComponent = this->GetComponent<DispatchComponent>();
 		return true;
     }
 
@@ -50,11 +52,28 @@ namespace Tendo
 		{
 			LOG_ERROR(message->GetString());
 		}
-		int id = message->TaskId();
-		this->OnResponse(id, message);
+		if(message->TaskId() != 0)
+		{
+			int id = message->TaskId();
+			this->OnResponse(id, message);
+		}
+		else if(message->GetType() == RedisRespType::REDIS_ARRAY
+			&& message->GetArraySize() == 3)
+		{
+			const RedisString * redisAny2 = message->Get(1)->Cast<RedisString>();
+			const RedisString * redisAny3 = message->Get(2)->Cast<RedisString>();
+			std::shared_ptr<Msg::Packet> request = std::make_shared<Msg::Packet>();
+			{
+				request->SetType(Msg::Type::SubPublish);
+				request->SetContent(redisAny3->GetValue());
+				request->SetFrom(this->mSubClient->GetAddress());
+				request->GetHead().Add("channel", redisAny2->GetValue());
+			}
+			this->mDispatchComponent->OnMessage(request);
+		}
 	}
 
-    TcpRedisClient * RedisComponent::MakeRedisClient(const RedisClientConfig & config)
+    RedisTcpClient * RedisComponent::MakeRedisClient(const RedisClientConfig & config)
     {
         const std::string & ip = config.Address[0].Ip;
         const unsigned int port = config.Address[0].Port;
@@ -65,8 +84,8 @@ namespace Tendo
             return nullptr;
         }
         socketProxy->Init(ip, port);
-        std::shared_ptr<TcpRedisClient> redisClient =
-            std::make_shared<TcpRedisClient>(socketProxy, config, this);
+        std::shared_ptr<RedisTcpClient> redisClient =
+            std::make_shared<RedisTcpClient>(socketProxy, config, this);
         this->mRedisClients.emplace_back(redisClient);
         return redisClient.get();
     }
@@ -79,7 +98,7 @@ namespace Tendo
         return response != nullptr && !response->HasError();
     }
 
-    TcpRedisClient * RedisComponent::GetClient(size_t index)
+    RedisTcpClient * RedisComponent::GetClient(size_t index)
     {
 		if(this->mRedisClients.empty())
 		{
@@ -90,8 +109,8 @@ namespace Tendo
 			index = index % this->mRedisClients.size();
 			return this->mRedisClients[index].get();
 		}
-        std::shared_ptr<TcpRedisClient> tempRedisClint = this->mRedisClients.front();
-        for (std::shared_ptr<TcpRedisClient> & redisClient: this->mRedisClients)
+        std::shared_ptr<RedisTcpClient> tempRedisClint = this->mRedisClients.front();
+        for (std::shared_ptr<RedisTcpClient> & redisClient: this->mRedisClients)
         {
             if(redisClient->WaitSendCount() <= 5)
             {
@@ -157,7 +176,7 @@ namespace Tendo
     }
 	bool RedisComponent::Send(const std::shared_ptr<RedisRequest>& request)
 	{
-		TcpRedisClient * redisClientContext = this->GetClient();
+		RedisTcpClient * redisClientContext = this->GetClient();
 		if(redisClientContext == nullptr)
 		{
 			return false;
@@ -167,7 +186,7 @@ namespace Tendo
 	}
 	bool RedisComponent::Send(const std::shared_ptr<RedisRequest>& request, int& id)
 	{
-		TcpRedisClient * redisClientContext = this->GetClient();
+		RedisTcpClient * redisClientContext = this->GetClient();
 		if(redisClientContext == nullptr)
 		{
 			return false;
@@ -187,5 +206,36 @@ namespace Tendo
 
 			redisClient->Send(request);
 		}
+	}
+
+	bool RedisComponent::SubChanel(const string& chanel)
+	{
+		if(this->mSubClient == nullptr)
+		{
+			const std::string & ip = this->mConfig.Config().Address[0].Ip;
+			const unsigned int port = this->mConfig.Config().Address[0].Port;
+			ThreadComponent * component = this->GetComponent<ThreadComponent>();
+			std::shared_ptr<Tcp::SocketProxy> socketProxy = component->CreateSocket("redis", ip, port);
+			this->mSubClient = std::make_shared<RedisTcpClient>(socketProxy, this->mConfig.Config(), this);
+		}
+		if(this->mSubClient == nullptr)
+		{
+			return false;
+		}
+		int taskId = 0;
+		std::shared_ptr<RedisRequest> request = RedisRequest::Make("SUBSCRIBE", chanel);
+		if(!this->Send(request, taskId))
+		{
+			LOG_ERROR("send redis cmd error : "  << request->ToJson());
+			return false;
+		}
+		std::shared_ptr<RedisTask> redisTask = std::make_shared<RedisTask>(taskId);
+		std::shared_ptr<RedisResponse> redisResponse = this->AddTask(taskId, redisTask)->Await();
+		if (redisResponse != nullptr && redisResponse->HasError())
+		{
+			LOG_ERROR(request->ToJson());
+			LOG_ERROR(redisResponse->GetString());
+		}
+		return redisResponse != nullptr && redisResponse->GetArraySize() == 3;
 	}
 }

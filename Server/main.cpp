@@ -10,7 +10,7 @@
 
 #include"Rpc/Component/InnerNetComponent.h"
 #include"Gate/Component/OuterNetComponent.h"
-#include"Rpc/Component/DispatchMessageComponent.h"
+#include"Rpc/Component/DispatchComponent.h"
 
 #include"Gate/Component/GateComponent.h"
 
@@ -75,7 +75,7 @@ void RegisterComponent()
 	ComponentFactory::Add<NodeMgrComponent>("NodeMgrComponent");
 	ComponentFactory::Add<InnerRpcComponent>("RpcNetComponent");
 	ComponentFactory::Add<RegistryComponent>("RegistryComponent");
-	ComponentFactory::Add<DispatchMessageComponent>("DispatchMessageComponent");
+	ComponentFactory::Add<DispatchComponent>("DispatchMessageComponent");
 
 // gate
 	ComponentFactory::Add<GateComponent>("GateComponent");
@@ -125,6 +125,7 @@ void RegisterServiceComponent()
 
 int main(int argc, char **argv)
 {
+
 #ifdef __OS_WIN__
     system("chcp 65001 > nul");
 #endif

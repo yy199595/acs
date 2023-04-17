@@ -90,7 +90,7 @@ namespace Tendo
 		this->mNodeComponent->AddRpcServer(server, userId, this->mInnerAddress);
 		return XCode::Successful;
     }
-	int Gate::Login(const Rpc::Packet& packet)
+	int Gate::Login(const Msg::Packet& packet)
 	{
 		std::string address;
 		if(!packet.ConstHead().Get("cli", address))

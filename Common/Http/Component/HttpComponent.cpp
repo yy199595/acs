@@ -305,7 +305,7 @@ namespace Tendo
 		}
 	}
 
-	bool HttpComponent::Send(const string& address, const std::shared_ptr<Rpc::Packet>& message)
+	bool HttpComponent::Send(const string& address, const std::shared_ptr<Msg::Packet>& message)
 	{
 
 

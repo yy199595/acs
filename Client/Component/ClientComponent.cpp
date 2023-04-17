@@ -12,12 +12,12 @@
 namespace Client
 {
 	ClientTask::ClientTask(int id)
-        : Tendo::IRpcTask<Rpc::Packet>(id)
+        : Tendo::IRpcTask<Msg::Packet>(id)
 	{
 		
 	}
 
-	void ClientTask::OnResponse(std::shared_ptr<Rpc::Packet> response)
+	void ClientTask::OnResponse(std::shared_ptr<Msg::Packet> response)
 	{
 		this->mTask.SetResult(response);
 	}
@@ -32,7 +32,7 @@ namespace Client
 		this->mProtoComponent = nullptr;
 	}
 
-    void ClientComponent::OnMessage(std::shared_ptr<Rpc::Packet> message)
+    void ClientComponent::OnMessage(std::shared_ptr<Msg::Packet> message)
     {
         int type = message->GetType();
         const std::string &address = message->From();
@@ -79,7 +79,7 @@ namespace Client
 		return true;
     }
 
-    bool ClientComponent::Send(int id, const std::shared_ptr<Rpc::Packet>& request, int& rpcId)
+    bool ClientComponent::Send(int id, const std::shared_ptr<Msg::Packet>& request, int& rpcId)
     {
         auto iter = this->mClients.find(id);
         if (iter == this->mClients.end())
@@ -93,7 +93,7 @@ namespace Client
         return true;
     }
 
-	std::shared_ptr<Rpc::Packet> ClientComponent::Call(int id, const std::shared_ptr<Rpc::Packet> & request, bool async)
+	std::shared_ptr<Msg::Packet> ClientComponent::Call(int id, const std::shared_ptr<Msg::Packet> & request, bool async)
 	{
 		auto iter = this->mClients.find(id);
 		if(iter == this->mClients.end())
@@ -136,7 +136,7 @@ namespace Client
 		luaRegister.PushExtensionFunction("Call", Lua::ClientEx::Call);      
 	}
 
-    void ClientComponent::OnRequest(const Rpc::Packet &message)
+    void ClientComponent::OnRequest(const Msg::Packet &message)
 	{
 		std::string tab, func;
 		if (!message.GetMethod(tab, func))
@@ -177,8 +177,8 @@ namespace Client
 		{
 			return false;
 		}
-		std::shared_ptr<Rpc::Packet> message
-				= std::make_shared<Rpc::Packet>();
+		std::shared_ptr<Msg::Packet> message
+				= std::make_shared<Msg::Packet>();
 		{
 			message->SetType(Msg::Type::Request);
 			message->SetProto(Msg::Porto::Protobuf);

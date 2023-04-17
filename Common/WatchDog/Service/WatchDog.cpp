@@ -8,7 +8,7 @@ namespace Tendo
         return true;
     }
 
-    int WatchDog::Ping(const Rpc::Packet& message)
+    int WatchDog::Ping(const Msg::Packet& message)
     {
         return 0;
     }

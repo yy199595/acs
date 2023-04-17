@@ -9,7 +9,7 @@
 #include<unordered_set>
 #include"Server/Component/TcpListenerComponent.h"
 
-namespace Rpc
+namespace Msg
 {
     class Packet;
 }
@@ -17,7 +17,7 @@ namespace Tendo
 {
 
 	class OuterNetTcpClient;
-    class OuterNetComponent : public TcpListenerComponent, public IRpc<Rpc::Packet>,
+    class OuterNetComponent : public TcpListenerComponent, public IRpc<Msg::Packet>,
 							  public IComplete, public IServerRecord, public IFrameUpdate, public IDestroy
 	{
 	 public:
@@ -26,15 +26,15 @@ namespace Tendo
 	 public:
 		void OnTimeout(const std::string &address) final;
 		void StartClose(const std::string & address) final;
-		void OnMessage(std::shared_ptr<Rpc::Packet> message) final;
+		void OnMessage(std::shared_ptr<Msg::Packet> message) final;
 		void OnCloseSocket(const std::string & address, int code) final;
     public:
 		bool StopClient(long long userId);
 		bool BindClient(const std::string & address, long long userId);
-		size_t Broadcast(const std::shared_ptr<Rpc::Packet> & message);
-		int OnRequest(long long userId, std::shared_ptr<Rpc::Packet> & message);
-		bool Send(long long userId, const std::shared_ptr<Rpc::Packet> & message);
-		bool Send(const std::string & address, const std::shared_ptr<Rpc::Packet> & message);
+		size_t Broadcast(const std::shared_ptr<Msg::Packet> & message);
+		int OnRequest(long long userId, std::shared_ptr<Msg::Packet> & message);
+		bool Send(long long userId, const std::shared_ptr<Msg::Packet> & message);
+		bool Send(const std::string & address, const std::shared_ptr<Msg::Packet> & message);
 	private:
 		bool Awake() final;
 		bool LateAwake() final;
@@ -55,7 +55,7 @@ namespace Tendo
 		std::unordered_map<int, long long> mRecords;
 #endif
         class InnerNetComponent * mInnerNetComponent;
-        std::queue<std::shared_ptr<Rpc::Packet>> mMessages;
+        std::queue<std::shared_ptr<Msg::Packet>> mMessages;
         std::queue<std::shared_ptr<OuterNetTcpClient>> mClientPools;
 		std::unordered_map<std::string, long long> mAddressUserMap; //验证过的客户端
 		std::unordered_map<long long, std::string> mUserAddressMap; //验证过的客户端

@@ -9,6 +9,8 @@
 #include<iostream>
 #include"Entity/Unit/App.h"
 #include"Kcp/Common/ikcp.h"
+#include "Server/Component/ThreadComponent.h"
+
 using asio::ip::udp;
 namespace Tendo
 {
@@ -65,175 +67,99 @@ namespace Tendo
 
 	KcpComponent::KcpComponent()
 	{
-		this->mThread = nullptr;
-		this->mServerSocket = nullptr;
+		this->mPort = 0;
+		this->mTimer = nullptr;
+		this->mUdpSocket = nullptr;
 		this->mContext = nullptr;
 		this->mKcpServer = nullptr;
-		this->mPort = 0;
 	}
 
-	void KcpComponent::OnSecondUpdate(int tick)
-	{
-		
-		
-	}
 
 	bool KcpComponent::LateAwake()
 	{
-		this->StartListen("kcp");
-		std::thread* t = new std::thread([]()
-			{
-				std::this_thread::sleep_for(std::chrono::seconds(5));
-				asio::io_service io_service;
-				asio::io_service::work work(io_service);
-
-				// Create a UDP socket
-				
-
-				// Create a UDP endpoint
-
-
-				// Create a KCP object
-				udp::socket udpSocket(io_service, udp::endpoint(udp::v4(), 0));
-				udp::endpoint target(asio::ip::make_address("127.0.0.1"), 1234);
-
-				ikcpcb* kcp = ikcp_create(1, (void *)&udpSocket);
-				kcp->output = KcpComponent::OnClientSend;
-				ikcp_nodelay(kcp, 1, 10, 2, 1);
-
-				// Send a message to the server
-				std::string message = "Hello, server!";
-				while (!io_service.stopped())
-				{
-					//asio::error_code ec;
-					//socket.send_to(asio::buffer(message.c_str(), message.size()), target, 0, ec);
-					ikcp_send(kcp, message.c_str(), message.size());
-
-					////// Update KCP
-					ikcp_update(kcp, time(NULL));
-					//io_service.poll();
-					std::this_thread::sleep_for(std::chrono::seconds(1));
-				}
-			});
-		t->detach();
-		return true;
+		return this->StartListen("kcp");
 	}
 
-	void KcpComponent::Main()
+	void KcpComponent::Start()
 	{
-		asio::error_code ec;
-		std::chrono::milliseconds ms(1);
-		this->mContext = new Asio::Context(1);
-		Asio::ContextWork work(*this->mContext);
-		this->mKcpServer = ikcp_create(1, this);
-		this->mKcpServer->output = KcpComponent::OnServerSend;
-		this->mServerSocket = new udp::socket(*this->mContext, udp::endpoint(udp::v4(), 1234));
-
+		std::chrono::milliseconds ms(10);
 		this->mContext->post(std::bind(&KcpComponent::Receive, this));
-		while (!this->mContext->stopped())
-		{
-			this->mContext->poll(ec);
-			this->Update(*this->mContext);
-			std::this_thread::sleep_for(ms);
-		}
+		this->mTimer = std::make_unique<AsioTimer>(*this->mContext, ms);
+		this->mTimer->async_wait(std::bind(&KcpComponent::Update, this, std::placeholders::_1));
 	}
 
-	void KcpComponent::Update(Asio::Context& context)
+	void KcpComponent::Update(const asio::error_code& code)
 	{
-
+		if(code == asio::error::operation_aborted) //定时器被取消
+		{
+			return;
+		}
+		std::chrono::milliseconds ms(10);
+		ikcp_update(this->mKcpServer, time(NULL));
+		this->mTimer->expires_at(this->mTimer->expiry() + ms);
+		this->mContext->post(std::bind(&KcpComponent::Receive, this));
+		this->mTimer->async_wait(std::bind(&KcpComponent::Update, this, std::placeholders::_1));
 	}
 
 	void KcpComponent::Receive()
 	{
-		this->mServerSocket->async_receive_from(asio::buffer(this->mReceiveBuffer), this->mClientEndpoint, 0,
+		this->mUdpSocket->async_receive_from(asio::buffer(this->mReceiveBuffer), this->mEndpoint, 0,
 			[this](const asio::error_code& code, size_t size)
 			{
 				if (code)
 				{
 					CONSOLE_LOG_ERROR(code.message());
 				}
-				// ���յ���Ϣ
-				std::string ip = this->mClientEndpoint.address().to_string();
-				std::string address = fmt::format("{0}:{1}", ip, this->mClientEndpoint.port());
-
-				ikcpcb* kcpClient = nullptr;
-				auto iter = this->mKcpClients.begin();
-				if (iter == this->mKcpClients.end()) //������
-				{
-					udp::endpoint* endPoint = new udp::endpoint(this->mClientEndpoint);
-					{
-						kcpClient = ikcp_create(1, endPoint);
-						kcpClient->output = KcpComponent::OnClientSend;
-						this->mKcpClients.emplace(address, kcpClient);
-					}
-				}
 				else
 				{
-					kcpClient = iter->second;
-				}
+					uint32 conv = ikcp_getconv(this->mReceiveBuffer.data());
 
-				ikcp_send(kcpClient, this->mReceiveBuffer.data(), size);
+					int len = 0;
+					std::iostream istream(&this->mRecvBuffer);
+					istream.write(this->mReceiveBuffer.data(), size);
+					std::string ip = this->mEndpoint.address().to_string();
+					std::shared_ptr<Msg::Packet> message = std::make_shared<Msg::Packet>();
+					std::string address = fmt::format("kcp://{0}:{1}", ip, this->mEndpoint.port());
+					if(message->ParseLen(istream, len) && message->Parse(address, istream, size -len))
+					{
+						asio::io_service & io = this->mApp->MainThread();
+						io.post(std::bind(&KcpComponent::OnMessage, this, message));
+					}
+					ikcp_input(this->mKcpServer, this->mReceiveBuffer.data(), size);
+				}
 				this->mContext->post(std::bind(&KcpComponent::Receive, this));
-				ikcp_input(this->mKcpServer, this->mReceiveBuffer.data(), size);
 			});
 	}
 
-	
+	void KcpComponent::OnMessage(std::shared_ptr<Msg::Packet> message)
+	{
+
+	}
 
 	bool KcpComponent::StartListen(const char* name)
 	{
-		if(!ServerConfig::Inst()->GetListen(name, this->mPort))
+		if (!ServerConfig::Inst()->GetListen(name, this->mPort))
 		{
 			LOG_ERROR("not find listen config " << name);
 			return false;
 		}
-		if (this->mThread != nullptr)
+		ThreadComponent* threadComponent = this->GetComponent<ThreadComponent>();
+		try
+		{
+			this->mKcpServer = ikcp_create(1, this);
+			this->mContext = &threadComponent->GetContext();
+			AsioUdpEndpoint endpoint(udp::v4(), this->mPort);
+			this->mKcpServer->output = KcpComponent::OnServerSend;
+			this->mUdpSocket = std::make_unique<AsioUdpSocket>(*this->mContext, endpoint);
+			this->mContext->post(std::bind(&KcpComponent::Start, this));
+			return true;
+		}
+		catch (const asio::system_error& ec)
 		{
 			return false;
 		}
-		this->mThread = new std::thread(std::bind(&KcpComponent::Main, this));
-		this->mThread->detach();
-		return true;
-		/*this->mThread = new std::thread([this]()
-		{
-			asio::io_context io;
-			bool startReceive = true;
-			asio::io_service::work work(io);
-			std::chrono::milliseconds ms(1);
-			std::array<char, 56635> receiveBuffer;
-			asio::ip::udp::endpoint* endPoint = new asio::ip::udp::endpoint();
-			asio::ip::udp::socket udpSocket(io, udp::endpoint(udp::v4(), 1234));
-			ikcpcb* kcp = ikcp_create(0x11223344, &udpSocket);
-			unsigned int index = 1;
-			while (!io.stopped())
-			{
-				io.poll();
-				if(startReceive)
-				{
-					startReceive = false;
-					udpSocket.async_receive_from(asio::buffer(receiveBuffer), *endPoint, 0,
-						[endPoint, &index, &startReceive, &receiveBuffer](const asio::error_code& code, size_t size)
-						{
-							if (code)
-							{
-								CONSOLE_LOG_ERROR(code.message());
-							}
-							startReceive = true;
-							ikcpcb * kcpClient = ikcp_create(index++, endPoint);
-							
-						});
-					
-				}
-				long long time = Helper::Time::NowMicTime();
-
-				this->Update(io, time);
-				ikcp_update(kcp, (IUINT32)time);
-				std::this_thread::sleep_for(ms);
-			}
-		});
-		this->mThread->detach();
-		return true;*/
 	}
+
 }
 
 

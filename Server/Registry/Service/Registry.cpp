@@ -17,8 +17,7 @@ namespace Tendo
 {
 	Registry::Registry()
 	{
-		this->mNodeComponent = nullptr;
-		this->mRedisComponent = nullptr;
+		this->mRedisLuaComponent = nullptr;
 	}
 
 	bool Registry::Awake()
@@ -33,8 +32,7 @@ namespace Tendo
 		BIND_COMMON_RPC_METHOD(Registry::Query);
 		BIND_ADDRESS_RPC_METHOD(Registry::Register);
 		BIND_COMMON_RPC_METHOD(Registry::UnRegister);
-		this->mRedisComponent = this->GetComponent<RedisLuaComponent>();
-		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
+		this->mRedisLuaComponent = this->GetComponent<RedisLuaComponent>();
 		return true;
 	}
 
@@ -64,7 +62,7 @@ namespace Tendo
 			list.emplace_back(name);
 		}
 		else
-		{		
+		{
 			ClusterConfig::Inst()->GetServers(list);		
 		}
 		for (const std::string& server : list)
@@ -89,7 +87,7 @@ namespace Tendo
 			return XCode::ProtoCastJsonFailure;
 		}
 		std::shared_ptr<RedisResponse> response =
-				this->mRedisComponent->Call(func, json, false);
+				this->mRedisLuaComponent->Call(func, json, false);
 		LOG_ERROR_RETURN_CODE(response && response->GetNumber() >= 0, XCode::SaveToRedisFailure);
 
 		this->mServers.emplace(address);
@@ -101,7 +99,7 @@ namespace Tendo
 		return XCode::Successful;
 	}
 
-	int Registry::Ping(const Rpc::Packet& packet)
+	int Registry::Ping(const Msg::Packet& packet)
 	{
 		
 		return XCode::Successful;

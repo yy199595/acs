@@ -25,7 +25,7 @@ namespace Lua
             luaL_error(lua, "not find ClientComponent");
             return 0;
         }
-		std::shared_ptr<Rpc::Packet> request(new Rpc::Packet());
+		std::shared_ptr<Msg::Packet> request(new Msg::Packet());
 		{
 			request->SetType(Msg::Type::Request);
 			request->SetProto(Msg::Porto::Protobuf);

@@ -35,7 +35,7 @@ namespace Tendo
 		if(address.find(this->mTcp) == 0)
 		{
 			LOG_ERROR_RETURN_CODE(this->mTcpComponent, XCode::NetWorkError);
-			std::shared_ptr<Rpc::Packet> request =
+			std::shared_ptr<Msg::Packet> request =
 					this->MakeTcpRequest(userId, func, proto, message);
 			LOG_ERROR_RETURN_CODE(request != nullptr, XCode::MakeTcpRequestFailure);
 			return this->mTcpComponent->Send(address, request) ? XCode::Successful : XCode::SendMessageFail;
@@ -68,7 +68,7 @@ namespace Tendo
 		return this->Send(address, func, proto, userId, message);
 	}
 
-	std::shared_ptr<Rpc::Packet> InnerRpcComponent::Call(long long int userId,
+	std::shared_ptr<Msg::Packet> InnerRpcComponent::Call(long long int userId,
 			const string& server, const string& func, int proto, const google::protobuf::Message* message)
 	{
 		std::string address;
@@ -81,14 +81,14 @@ namespace Tendo
 
 	}
 
-	std::shared_ptr<Rpc::Packet> InnerRpcComponent::Call(const string& address,
+	std::shared_ptr<Msg::Packet> InnerRpcComponent::Call(const string& address,
 			const string& func, int proto, long long int userId, const google::protobuf::Message* message)
 	{
 		LOG_WARN("call [" << address << "] func:" << func);
 		if(address.find(this->mTcp) == 0)
 		{
 			LOG_CHECK_RET_NULL(this->mTcpComponent);
-			std::shared_ptr<Rpc::Packet> request =
+			std::shared_ptr<Msg::Packet> request =
 					this->MakeTcpRequest(userId, func, proto, message);
 			LOG_CHECK_RET_NULL(request != nullptr);
 			return this->mTcpComponent->Call(address, request);
@@ -107,8 +107,8 @@ namespace Tendo
 			{
 				return nullptr;
 			}
-			std::shared_ptr<Rpc::Packet> rpcResponse
-					= std::make_shared<Rpc::Packet>();
+			std::shared_ptr<Msg::Packet> rpcResponse
+					= std::make_shared<Msg::Packet>();
 			{
 				rpcResponse->SetProto(proto);
 				rpcResponse->SetType(Msg::Type::Response);
@@ -125,11 +125,11 @@ namespace Tendo
 		return nullptr;
 	}
 
-	std::shared_ptr<Rpc::Packet> InnerRpcComponent::MakeTcpRequest(long long int userId, const string& func, int proto,
+	std::shared_ptr<Msg::Packet> InnerRpcComponent::MakeTcpRequest(long long int userId, const string& func, int proto,
 			const google::protobuf::Message* message)
 	{
-		std::shared_ptr<Rpc::Packet> request
-			= std::make_shared<Rpc::Packet>();
+		std::shared_ptr<Msg::Packet> request
+			= std::make_shared<Msg::Packet>();
 		request->SetProto(proto);
 		request->SetType(Msg::Type::Request);
 		if (userId != 0)
@@ -209,7 +209,7 @@ namespace Tendo
 		return count;
 	}
 
-	bool InnerRpcComponent::Send(const string& address, int code, const std::shared_ptr<Rpc::Packet>& message)
+	bool InnerRpcComponent::Send(const string& address, int code, const std::shared_ptr<Msg::Packet>& message)
 	{
 		if(address.find(this->mTcp) == 0)
 		{

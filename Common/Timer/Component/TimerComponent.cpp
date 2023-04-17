@@ -87,7 +87,7 @@ namespace Tendo
 
 		for (int count = 0; count < tick; count++)
 		{
-			for (auto timeWheelLayer : this->mTimerLayers)
+			for (auto & timeWheelLayer : this->mTimerLayers)
 			{
 				std::queue<long long>& timerQueue = timeWheelLayer->GetTimerQueue();
 				if (timeWheelLayer->GetLayerId() == 0)

@@ -19,7 +19,7 @@ namespace Tendo
 	 public:
 		void StartClose();
 		void StartReceive(int second = 0);
-		void SendData(std::shared_ptr<Rpc::Packet> message);
+		void SendData(std::shared_ptr<Msg::Packet> message);
 	 protected:
 		void OnTimeOut() final;
         void OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t) final;
@@ -27,11 +27,10 @@ namespace Tendo
 	private:
         void CloseSocket(int code);
 	 private:
-		int mTimeout;
 		unsigned int mMaxQps;
         Tcp::DecodeState mState;
         OuterNetComponent* mGateComponent;
-        std::shared_ptr<Rpc::Packet> mMessage;
+        std::shared_ptr<Msg::Packet> mMessage;
 	};
 }
 

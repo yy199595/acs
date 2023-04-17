@@ -172,31 +172,29 @@ namespace Tcp
     }
 
     bool TcpContext::SendFromMessageQueue()
-    {
-        //assert(this->mSendBuffer.size() == 0);
-		//assert(this->mMessagqQueue.size() <= 100);
-        if(!this->mMessageQueue.empty())
-        {
-            std::ostream os(&this->mSendBuffer);
-            Asio::Socket & tcpSocket = this->mSocket->GetSocket();
-			int length = this->mMessageQueue.front()->Serialize(os);
-			std::shared_ptr<TcpContext> self = this->shared_from_this();
-            asio::async_write(tcpSocket, this->mSendBuffer, [this, self, length]
-                    (const Asio::Code & code, size_t size)
-            {
-                if(length > 0 && !code)
-                {
-                    this->SendFromMessageQueue();
-                    return;
-                }
-                this->ClearSendStream();
-                this->OnSendMessage(code, this->mMessageQueue.front());
-            });
-            this->mLastOperTime = Helper::Time::NowSecTime();
-            return true;
-        }
-        return false;
-    }
+	{
+		if (this->mMessageQueue.empty())
+		{
+			return false;
+		}
+		std::ostream os(&this->mSendBuffer);
+		Asio::Socket& tcpSocket = this->mSocket->GetSocket();
+		int length = this->mMessageQueue.front()->Serialize(os);
+		std::shared_ptr<TcpContext> self = this->shared_from_this();
+		asio::async_write(tcpSocket, this->mSendBuffer, [this, self, length]
+				(const Asio::Code& code, size_t size)
+		{
+			if (length > 0 && !code)
+			{
+				this->SendFromMessageQueue();
+				return;
+			}
+			this->ClearSendStream();
+			this->OnSendMessage(code, this->mMessageQueue.front());
+		});
+		this->mLastOperTime = Helper::Time::NowSecTime();
+		return true;
+	}
 }
 
 namespace Tcp
@@ -289,6 +287,23 @@ namespace Tcp
 		}
 	}
 
+	void TcpContext::OnTimer(const asio::error_code& code, int timeout)
+	{
+		if(code)
+		{
+			return;
+		}
+		long long now = Helper::Time::NowSecTime();
+		if(now - this->mLastOperTime >= timeout) //超时
+		{
+			this->OnTimeOut();
+			return;
+		}
+		std::chrono::seconds seconds(timeout);
+		this->mTimer->expires_at(this->mTimer->expiry() + seconds);
+		this->mTimer->async_wait(std::bind(&TcpContext::OnTimer, this, std::placeholders::_1, timeout));
+	}
+
 	void TcpContext::StartTimer(int timeout)
 	{
 		if(this->mTimer != nullptr)
@@ -297,23 +312,7 @@ namespace Tcp
 		}
 		std::chrono::seconds seconds(timeout);
 		Asio::Context& io = this->mSocket->GetThread();
-		std::shared_ptr<TcpContext> self = this->shared_from_this();
-		this->mTimer = std::make_unique<asio::steady_timer>(io, timeout);
-		this->mTimer->async_wait([self, timeout](const asio::error_code & code)
-		{
-			if(code)
-			{
-				return;
-			}
-			long long now = Helper::Time::NowSecTime();
-			if(now - self->mLastOperTime >= timeout) //超时
-			{
-				self->OnTimeOut();
-				return;
-			}
-			self->mTimer = nullptr;
-		  	Asio::Context& io = self->mSocket->GetThread();
-			io.post(std::bind(&TcpContext::StartTimer, self, timeout));
-		});
+		this->mTimer = std::make_unique<asio::steady_timer>(io, seconds);
+		this->mTimer->async_wait(std::bind(&TcpContext::OnTimer, this, std::placeholders::_1, timeout));
 	};
 }

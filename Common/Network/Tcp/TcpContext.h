@@ -48,7 +48,8 @@ namespace Tcp
 	protected:
 		void StopTimer();
 		void StartTimer(int timeout);
-	 protected:
+		void OnTimer(const asio::error_code & code, int timeout);
+	protected:
 		virtual void OnTimeOut() { }
         virtual void OnConnect(const Asio::Code & error, int count) { throw std::logic_error("");}
         virtual void OnReceiveLine(const Asio::Code & code, std::istream & readStream, size_t size) {}

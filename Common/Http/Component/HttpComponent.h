@@ -26,7 +26,7 @@ namespace Tendo
 		bool Send(const std::shared_ptr<Http::Request> & request, std::shared_ptr<Http::IResponse> & response); // 同步发送
 		bool Send(const std::shared_ptr<Http::Request> & request, std::shared_ptr<Http::IResponse> & response, int & taskId); // 异步发送
 	public:
-		bool Send(const std::string & address, const std::shared_ptr<Rpc::Packet> & message);
+		bool Send(const std::string & address, const std::shared_ptr<Msg::Packet> & message);
 	private:
         bool LateAwake() final;
 		void OnTaskComplete(int key) final;

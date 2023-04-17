@@ -22,27 +22,27 @@ namespace Tendo
         int mRpcId;
     };
 
-    class RpcTaskSource : public IRpcTask<Rpc::Packet>
+    class RpcTaskSource : public IRpcTask<Msg::Packet>
     {
     public:
         explicit RpcTaskSource(int ms);
  
     protected:     
-        void OnResponse(std::shared_ptr<Rpc::Packet> response) final;
+        void OnResponse(std::shared_ptr<Msg::Packet> response) final;
     public:
-		std::shared_ptr<Rpc::Packet> Await();
+		std::shared_ptr<Msg::Packet> Await();
     private:
-        TaskSource<std::shared_ptr<Rpc::Packet>> mTaskSource;
+        TaskSource<std::shared_ptr<Msg::Packet>> mTaskSource;
     };
 
-	class LuaRpcTaskSource :  public IRpcTask<Rpc::Packet>
+	class LuaRpcTaskSource :  public IRpcTask<Msg::Packet>
 	{
 	 public:
 		LuaRpcTaskSource(lua_State * lua, int id, const std::string & response);
 	 public:
 		int Await() { return this->mTask.Await(); }	
 	 private:
-		void OnResponse(std::shared_ptr<Rpc::Packet> response) final;
+		void OnResponse(std::shared_ptr<Msg::Packet> response) final;
 	 private:	
 		LuaWaitTaskSource mTask;
         const std::string mResp;

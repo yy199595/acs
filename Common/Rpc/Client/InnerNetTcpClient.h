@@ -19,17 +19,17 @@ namespace Tendo
 	class InnerNetTcpClient : public Tcp::TcpContext
 	{
 	 public:
-		explicit InnerNetTcpClient(IRpc<Rpc::Packet> * component,
+		explicit InnerNetTcpClient(IRpc<Msg::Packet> * component,
 			std::shared_ptr<Tcp::SocketProxy> socket);
-		explicit InnerNetTcpClient(IRpc<Rpc::Packet> * component,
+		explicit InnerNetTcpClient(IRpc<Msg::Packet> * component,
 			std::shared_ptr<Tcp::SocketProxy> socket, AuthInfo info);
 		~InnerNetTcpClient() override = default;
 	 public:
 		void StartClose();
 		void StartReceive();
 		bool IsClient() const { return this->mIsClient; }
-		bool Send(const std::shared_ptr<Rpc::Packet>& message, bool async = true);
-		std::shared_ptr<Rpc::Packet> Call(const std::shared_ptr<Rpc::Packet>& message); //同步读取
+		bool Send(const std::shared_ptr<Msg::Packet>& message, bool async = true);
+		std::shared_ptr<Msg::Packet> Call(const std::shared_ptr<Msg::Packet>& message); //同步读取
 	 private:
         void Update();
         void CloseSocket(int code);
@@ -40,8 +40,8 @@ namespace Tendo
 		bool mIsClient;
 		AuthInfo mAuthInfo;
         Tcp::DecodeState mState;
-        IRpc<Rpc::Packet> * mComponent;
-        std::shared_ptr<Rpc::Packet> mMessage;
+        IRpc<Msg::Packet> * mComponent;
+        std::shared_ptr<Msg::Packet> mMessage;
         std::unique_ptr<asio::steady_timer> mTimer;
 	};
 }// namespace Sentry

@@ -64,6 +64,7 @@ namespace Tendo
 #endif
 #ifndef ONLY_MAIN_THREAD
 		int networkCount = 1;
+		std::lock_guard<std::mutex> lock(this->mMutex);
 		config->GetMember("thread", "network", networkCount);
 		for (int index = 0; index < networkCount; index++)
 		{
@@ -108,40 +109,16 @@ namespace Tendo
 		}
 		return t->Context();
 #endif
-
-
-//		asio::ssl::context sslContext(asio::ssl::context::sslv23);
-//
-//// 2. Load the server certificate and private key
-//		sslContext.use_certificate_file("path/to/server.crt", asio::ssl::context::pem);
-//		sslContext.use_private_key_file("path/to/server.key", asio::ssl::context::pem);
-//
-//// 3. Create an acceptor to listen for incoming connections
-//		asio::io_service ioService;
-//		asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), 443);
-//		asio::ip::tcp::acceptor acceptor(ioService, endpoint);
-//
-//// 4. Start accepting connections
-//		asio::ssl::stream<asio::ip::tcp::socket> sslSocket(ioService, sslContext);
-//		acceptor.accept(sslSocket.lowest_layer());
-//		sslSocket.handshake(asio::ssl::stream_base::server);
-//
-//// 5. Handle the connection in a separate thread or coroutine
-//		std::thread connectionThread([&sslSocket]()
-//		{
-//			// Handle the connection here
-//		});
-//		connectionThread.detach();
 	}
 
     std::shared_ptr<Tcp::SocketProxy> ThreadComponent::CreateSocket(const std::string & net)
     {
-		
         std::shared_ptr<Tcp::SocketProxy> socket;
 #ifdef ONLY_MAIN_THREAD
         asio::io_service & io = this->mApp->MainThread();
         socket = std::make_shared<Tcp::SocketProxy>(io);
 #else
+		std::lock_guard<std::mutex> lock(this->mMutex);
 		if(this->mNetThreads.empty())
 		{
 			asio::io_service & io = this->mApp->MainThread();

@@ -6,6 +6,8 @@
 #define args1 std::placeholders::_1
 #define args2 std::placeholders::_2
 #define args3 std::placeholders::_3
+#define args4 std::placeholders::_4
+#define args5 std::placeholders::_5
 
 inline std::string FormatFileLine(const char * file, const int line)
 {

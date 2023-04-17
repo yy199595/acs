@@ -6,16 +6,16 @@
 namespace Tendo
 {
     RpcTaskSource::RpcTaskSource(int ms)
-        : IRpcTask<Rpc::Packet>(ms)
+        : IRpcTask<Msg::Packet>(ms)
     {
 
     }
-    void RpcTaskSource::OnResponse(std::shared_ptr<Rpc::Packet> response)
+    void RpcTaskSource::OnResponse(std::shared_ptr<Msg::Packet> response)
     {
         this->mTaskSource.SetResult(response);
     }
 
-	std::shared_ptr<Rpc::Packet> RpcTaskSource::Await()
+	std::shared_ptr<Msg::Packet> RpcTaskSource::Await()
 	{
 		return this->mTaskSource.Await();
 	}
@@ -24,14 +24,14 @@ namespace Tendo
 namespace Tendo
 {
 	LuaRpcTaskSource::LuaRpcTaskSource(lua_State* lua, int id, const std::string & resp)
-		: IRpcTask<Rpc::Packet>(id), mTask(lua), mResp(resp)
+		: IRpcTask<Msg::Packet>(id), mTask(lua), mResp(resp)
 	{
 #ifdef __DEBUG__
       this->t1 = Helper::Time::NowMilTime();
 #endif
 	}
 
-	void LuaRpcTaskSource::OnResponse(std::shared_ptr<Rpc::Packet> response)
+	void LuaRpcTaskSource::OnResponse(std::shared_ptr<Msg::Packet> response)
 	{
 #ifdef __RPC_MESSAGE__
 		std::string func;

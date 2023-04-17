@@ -12,7 +12,7 @@ namespace Client
         this->mState = Tcp::DecodeState::Head;
     }
 
-	void TcpRpcClientContext::SendToServer(const std::shared_ptr<Rpc::Packet>& message, bool async)
+	void TcpRpcClientContext::SendToServer(const std::shared_ptr<Msg::Packet>& message, bool async)
 	{
 		if (async)
 		{
@@ -58,7 +58,7 @@ namespace Client
             {
                 int len = 0;
                 this->mState = Tcp::DecodeState::Body;
-                this->mMessage = std::make_shared<Rpc::Packet>();
+                this->mMessage = std::make_shared<Msg::Packet>();
                 if(!this->mMessage->ParseLen(readStream, len))
                 {
                     CONSOLE_LOG_ERROR("unknow message type = "
@@ -91,12 +91,12 @@ namespace Client
 		this->mSocket->Close();
 	}
 
-	std::shared_ptr<Rpc::Packet> TcpRpcClientContext::Receive()
+	std::shared_ptr<Msg::Packet> TcpRpcClientContext::Receive()
 	{
 		int len = 0;
 		this->RecvSync(RPC_PACK_HEAD_LEN);
 		std::istream readStream(&this->mRecvBuffer);
-		this->mMessage = std::make_shared<Rpc::Packet>();
+		this->mMessage = std::make_shared<Msg::Packet>();
 		if(!this->mMessage->ParseLen(readStream, len))
 		{
 			return nullptr;

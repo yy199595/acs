@@ -6,7 +6,7 @@
 #include"XCode/XCode.h"
 namespace Tendo
 {
-	int VirtualRpcService::Invoke(const std::string &name, std::shared_ptr<Rpc::Packet> message)
+	int VirtualRpcService::Invoke(const std::string &name, std::shared_ptr<Msg::Packet> message)
 	{
 		return XCode::CallServiceNotFound;
 	}

@@ -5,7 +5,7 @@
 #include"Message.h"
 #include"Util/Math/MathHelper.h"
 
-namespace Rpc
+namespace Msg
 {
     bool Head::Add(const std::string& key, int value)
     {

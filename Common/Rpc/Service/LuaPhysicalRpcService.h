@@ -22,7 +22,7 @@ namespace Tendo
 		bool IsStartService() final { return true; }
 		void OnRecord(Json::Writer &document) final;
 		unsigned int GetWaitMessageCount() const final { return this->mWaitCount; };
-		int Invoke(const std::string& name, std::shared_ptr<Rpc::Packet> message) final;
+		int Invoke(const std::string& name, std::shared_ptr<Msg::Packet> message) final;
 	 private:
 		void OnLogin(long long userId) final;
 		void OnLogout(long long userId) final;

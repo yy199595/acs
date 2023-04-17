@@ -18,7 +18,7 @@ namespace Tendo
 		this->mLuaEnv = this->mLuaComponent->GetLuaEnv();
 	}
 
-	int LuaServiceMethod::Call(int count, Rpc::Packet & message)
+	int LuaServiceMethod::Call(int count, Msg::Packet & message)
 	{
 		if (lua_pcall(this->mLuaEnv, count, 2, 0) != 0)
 		{
@@ -40,7 +40,7 @@ namespace Tendo
 		return XCode::Successful;
 	}
 
-	int LuaServiceMethod::CallAsync(int count, Rpc::Packet & message)
+	int LuaServiceMethod::CallAsync(int count, Msg::Packet & message)
     {
 		std::shared_ptr<Message> response;
 		if (!this->mConfig->Response.empty())
@@ -69,7 +69,7 @@ namespace Tendo
         return code;
     }
 
-	int LuaServiceMethod::Invoke(Rpc::Packet & message)
+	int LuaServiceMethod::Invoke(Msg::Packet & message)
     {
         if (this->mConfig->IsAsync)
         {

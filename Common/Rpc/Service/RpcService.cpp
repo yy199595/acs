@@ -54,7 +54,7 @@ namespace Tendo
 		return this->mNetComponent->Send(address, name, this->mProto, 0, message);
     }
 
-    std::shared_ptr<Rpc::Packet> RpcService::CallAwait(
+    std::shared_ptr<Msg::Packet> RpcService::CallAwait(
         const std::string &address, const std::string &func, const Message *message)
 	{
         const std::string name = fmt::format("{0}.{1}", this->GetName(), func);
@@ -74,7 +74,7 @@ namespace Tendo
 
 	int RpcService::Call(const std::string & address, const string& func)
     {
-        std::shared_ptr<Rpc::Packet> response = this->CallAwait(address, func);
+        std::shared_ptr<Msg::Packet> response = this->CallAwait(address, func);
         if (response == nullptr)
         {
             return XCode::NetWorkError;
@@ -84,7 +84,7 @@ namespace Tendo
 
 	int RpcService::Call(const std::string & address, const string& func, const Message& message)
 	{
-        std::shared_ptr<Rpc::Packet> response = this->CallAwait(address, func, &message);
+        std::shared_ptr<Msg::Packet> response = this->CallAwait(address, func, &message);
 		if(response == nullptr)
 		{
 			return XCode::NetWorkError;
@@ -95,7 +95,7 @@ namespace Tendo
 	int RpcService::Call(const std::string & address, const string& func, std::shared_ptr<Message> response)
 	{
 		assert(response != nullptr);
-		std::shared_ptr<Rpc::Packet> data = this->CallAwait(address, func, nullptr);
+		std::shared_ptr<Msg::Packet> data = this->CallAwait(address, func, nullptr);
 		if (data == nullptr)
 		{
 			return XCode::Failure;
@@ -116,7 +116,7 @@ namespace Tendo
 			std::shared_ptr<Message> response)
 	{
 		assert(response != nullptr);
-        std::shared_ptr<Rpc::Packet> data = this->CallAwait(address, func, &message);
+        std::shared_ptr<Msg::Packet> data = this->CallAwait(address, func, &message);
         if(data == nullptr)
         {
             return XCode::Failure;
@@ -157,19 +157,19 @@ namespace Tendo
 
 	int RpcService::Call(long long userId, const std::string& func)
 	{
-        std::shared_ptr<Rpc::Packet> response = this->CallAwait(userId, func);
+        std::shared_ptr<Msg::Packet> response = this->CallAwait(userId, func);
         return response != nullptr ? response->GetCode(XCode::Failure) : XCode::Failure;
 	}
 
 	int RpcService::Call(long long userId, const std::string& func, const Message& message)
 	{
-        std::shared_ptr<Rpc::Packet> response = this->CallAwait(userId, func, &message);
+        std::shared_ptr<Msg::Packet> response = this->CallAwait(userId, func, &message);
         return response != nullptr ? response->GetCode(XCode::Failure) : XCode::Failure;
 	}
 
 	int RpcService::Call(long long userId, const std::string& func, std::shared_ptr<Message> response)
 	{
-        std::shared_ptr<Rpc::Packet> responsePackage = this->CallAwait(userId, func);
+        std::shared_ptr<Msg::Packet> responsePackage = this->CallAwait(userId, func);
         if(responsePackage == nullptr)
         {
             return XCode::Failure;
@@ -188,7 +188,7 @@ namespace Tendo
 
 	int RpcService::Call(long long userId, const std::string& func, const Message& message, std::shared_ptr<Message> response)
 	{
-        std::shared_ptr<Rpc::Packet> responsePackage = this->CallAwait(userId, func, &message);
+        std::shared_ptr<Msg::Packet> responsePackage = this->CallAwait(userId, func, &message);
         if(responsePackage == nullptr)
         {
             return XCode::Failure;
@@ -231,7 +231,7 @@ namespace Tendo
 		return this->mNetComponent->Send(userId, this->mCluster, fullName, this->mProto, message);
     }
 
-    std::shared_ptr<Rpc::Packet> RpcService::CallAwait(
+    std::shared_ptr<Msg::Packet> RpcService::CallAwait(
         long long userId, const std::string &func, const Message *message)
     {
         assert(userId > 0);

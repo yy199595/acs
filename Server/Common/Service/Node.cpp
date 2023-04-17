@@ -31,7 +31,7 @@ namespace Tendo
 		return true;
     }
 
-	int Node::Ping(const Rpc::Packet& packet)
+	int Node::Ping(const Msg::Packet& packet)
     {
         CONSOLE_LOG_FATAL("[" << packet.From() << "] ping server");
         return XCode::Successful;

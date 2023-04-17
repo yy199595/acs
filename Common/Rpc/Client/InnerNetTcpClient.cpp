@@ -9,13 +9,13 @@
 namespace Tendo
 {
 
-	InnerNetTcpClient::InnerNetTcpClient(IRpc<Rpc::Packet>* component, std::shared_ptr<Tcp::SocketProxy> socket)
+	InnerNetTcpClient::InnerNetTcpClient(IRpc<Msg::Packet>* component, std::shared_ptr<Tcp::SocketProxy> socket)
 		: TcpContext(std::move(socket), 1024 * 1024), mIsClient(false), mComponent(component)
 	{
         this->mState = Tcp::DecodeState::Head;
 	}
 
-	InnerNetTcpClient::InnerNetTcpClient(IRpc<Rpc::Packet> * component,
+	InnerNetTcpClient::InnerNetTcpClient(IRpc<Msg::Packet> * component,
                                    std::shared_ptr<Tcp::SocketProxy> socket, AuthInfo info)
 		: TcpContext(std::move(socket), 1024 * 1024), mIsClient(true), mAuthInfo(std::move(info)), mComponent(component)
     {
@@ -33,7 +33,7 @@ namespace Tendo
 	}
 
 
-    bool InnerNetTcpClient::Send(const std::shared_ptr<Rpc::Packet>& message, bool async)
+    bool InnerNetTcpClient::Send(const std::shared_ptr<Msg::Packet>& message, bool async)
     {
 		if(async)
 		{
@@ -99,13 +99,13 @@ namespace Tendo
         const std::string& address = this->mSocket->GetAddress();
         while (std::shared_ptr<ProtoMessage> data = this->PopMessage())
         {
-            std::shared_ptr<Rpc::Packet> packet = std::static_pointer_cast<Rpc::Packet>(data);
+            std::shared_ptr<Msg::Packet> packet = std::static_pointer_cast<Msg::Packet>(data);
             {
 #ifdef ONLY_MAIN_THREAD
                 this->mComponent->OnSendFailure(address, std::move(packet));
 #else
                 asio::io_service& io = App::Inst()->MainThread();
-                io.post(std::bind(&IRpc<Rpc::Packet>::OnSendFailure, this->mComponent, address, packet));
+                io.post(std::bind(&IRpc<Msg::Packet>::OnSendFailure, this->mComponent, address, packet));
 #endif
             }
         }
@@ -118,11 +118,11 @@ namespace Tendo
         this->mComponent->OnCloseSocket(address, code);
 #else
         asio::io_service& taskScheduler = App::Inst()->MainThread();
-        taskScheduler.post(std::bind(&IRpc<Rpc::Packet>::OnCloseSocket, this->mComponent, address, code));
+        taskScheduler.post(std::bind(&IRpc<Msg::Packet>::OnCloseSocket, this->mComponent, address, code));
 #endif
     }
 
-	std::shared_ptr<Rpc::Packet> InnerNetTcpClient::Call(const std::shared_ptr<Rpc::Packet>& message)
+	std::shared_ptr<Msg::Packet> InnerNetTcpClient::Call(const std::shared_ptr<Msg::Packet>& message)
 	{
 		if(!this->Send(message, false))
 		{
@@ -134,7 +134,7 @@ namespace Tendo
 		}
 		int len = 0;
 		std::iostream readStream(&this->mRecvBuffer);
-		this->mMessage = std::make_shared<Rpc::Packet>();
+		this->mMessage = std::make_shared<Msg::Packet>();
 		if(!this->mMessage->ParseLen(readStream, len))
 		{
 			this->CloseSocket(XCode::UnKnowPacket);
@@ -172,7 +172,7 @@ namespace Tendo
                 int len = 0;
                 Asio::Code code;
                 this->mState = Tcp::DecodeState::Body;
-                this->mMessage = std::make_shared<Rpc::Packet>();
+                this->mMessage = std::make_shared<Msg::Packet>();
                 if(!this->mMessage->ParseLen(readStream, len))
                 {
                     this->CloseSocket(XCode::UnKnowPacket);
@@ -197,7 +197,7 @@ namespace Tendo
                 this->mComponent->OnMessage(std::move(this->mMessage));
 #else
                 asio::io_service & io = App::Inst()->MainThread();
-                io.post(std::bind(&IRpc<Rpc::Packet>::OnMessage, this->mComponent, std::move(this->mMessage)));
+                io.post(std::bind(&IRpc<Msg::Packet>::OnMessage, this->mComponent, std::move(this->mMessage)));
 #endif
             }
                 break;
@@ -250,12 +250,12 @@ namespace Tendo
 #ifdef __DEBUG__     
         CONSOLE_LOG_INFO("connect server [" << address << "] successful");
 #endif
-		io.post(std::bind(&IRpc<Rpc::Packet>::OnConnectSuccessful, this->mComponent, address));
+		io.post(std::bind(&IRpc<Msg::Packet>::OnConnectSuccessful, this->mComponent, address));
 
-        std::shared_ptr<Rpc::Packet> authMessage 
-            = std::make_shared<Rpc::Packet>();
+        std::shared_ptr<Msg::Packet> authMessage
+            = std::make_shared<Msg::Packet>();
         {
-            Rpc::Head& head = authMessage->GetHead();
+            Msg::Head& head = authMessage->GetHead();
             {
                 authMessage->SetType(Msg::Type::Auth);
                 head.Add("name", this->mAuthInfo.ServerName);

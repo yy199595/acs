@@ -5,6 +5,8 @@
 #include"Server/Component/ThreadComponent.h"
 #include"Entity/Unit/App.h"
 #include"Network/Tcp/Asio.h"
+#include "Timer/Timer/ElapsedTimer.h"
+
 namespace Tendo
 {
 	TcpListenerComponent::TcpListenerComponent()
@@ -36,34 +38,51 @@ namespace Tendo
     }
 
 	bool TcpListenerComponent::StartListen(const char * name)
-    {
-        unsigned short port = 0;
-        this->mThreadComponent = this->GetComponent<ThreadComponent>();
-        if(!ServerConfig::Inst()->GetListen(name, this->mNet, port))
-        {
-            LOG_ERROR("not find listen config " << name);
-            return false;
-        }
-        try
-        {
-            Asio::Context& io = this->mApp->MainThread();
-            Asio::EndPoint ep(asio::ip::address_v4(), port);
-			this->mBindAcceptor = std::make_unique<Asio::Acceptor>(io);
+	{
+		unsigned short port = 0;
+		this->mThreadComponent = this->GetComponent<ThreadComponent>();
+		if (!ServerConfig::Inst()->GetListen(name, this->mNet, port))
+		{
+			LOG_ERROR("not find listen config " << name);
+			return false;
+		}
+		this->mListenPort = 0;
+#ifdef __DEBUG__
+		ElapsedTimer elapsedTimer;
+#endif
+		Asio::Context& io = this->mThreadComponent->GetContext();
+		io.post([this, port, &io]()
+		{
+			try
+			{
+				Asio::EndPoint ep(asio::ip::address_v4(), port);
+				this->mBindAcceptor = std::make_unique<Asio::Acceptor>(io);
 
-			this->mListenPort = port;
-            this->mBindAcceptor->open(ep.protocol());
-            this->mBindAcceptor->bind(ep);
-            this->mBindAcceptor->listen();
-            io.post(std::bind(&TcpListenerComponent::ListenConnect, this));
-            LOG_INFO(this->GetName() << " listen [" << port << "] successful");
-            return true;
-        }
-        catch (std::system_error & err)
-        {
-            LOG_ERROR(fmt::format("{0}  listen [{1}] failure {2}", this->GetName(), port, err.what()));
-            return false;
-        }
-    }
+				this->mBindAcceptor->open(ep.protocol());
+				this->mBindAcceptor->bind(ep);
+				this->mBindAcceptor->listen();
+				io.post(std::bind(&TcpListenerComponent::ListenConnect, this));
+				this->mListenPort = port;
+			}
+			catch (std::system_error& err)
+			{
+				this->mListenPort = 0;
+				CONSOLE_LOG_ERROR(fmt::format("{0}  listen [{1}] failure {2}", this->GetName(), port, err.what()));
+				return false;
+			}
+			this->mVal.notify_one();
+		});
+		std::unique_lock<std::mutex> lock(this->mMutex);
+		this->mVal.wait(lock);
+#ifdef __DEBUG__
+		if(this->mListenPort > 0)
+		{
+			LOG_INFO(this->GetName() << " listen [" << port << "] successful use " << elapsedTimer.GetMs() << " ms");
+			return true;
+		}
+#endif
+		return this->mListenPort > 0;
+	}
 	void TcpListenerComponent::ListenConnect()
 	{
         std::shared_ptr<Tcp::SocketProxy> socketProxy
@@ -71,12 +90,13 @@ namespace Tendo
 		this->mBindAcceptor->async_accept(socketProxy->GetSocket(),
 			[this, socketProxy](const asio::error_code & code)
 		{
-            if(code == asio::error::operation_aborted) //强制取消
+			Asio::Context & main = this->mApp->MainThread();
+			if(code == asio::error::operation_aborted) //强制取消
             {
                 this->mBindAcceptor = nullptr;
-                CONSOLE_LOG_ERROR("close listen " << this->GetName() << " [" << this->mListenPort << "]");
-                this->OnStopListen();
-                return;
+				main.post(std::bind(&TcpListenerComponent::OnStopListen, this));
+				CONSOLE_LOG_ERROR("close listen " << this->GetName() << " [" << this->mListenPort << "]");
+				return;
             }
 			if (code)
 			{
@@ -87,11 +107,10 @@ namespace Tendo
 			{
                 socketProxy->Init();
                 this->mListenCount++;
-                this->OnListen(socketProxy);
-                CONSOLE_LOG_DEBUG(socketProxy->GetAddress() << " connect to " << this->GetName());
+				main.post(std::bind(&TcpListenerComponent::OnListen, this, socketProxy));
+				CONSOLE_LOG_DEBUG(socketProxy->GetAddress() << " connect to " << this->GetName());
             }
-            Asio::Context& io = this->mApp->MainThread();
-            io.post(std::bind(&TcpListenerComponent::ListenConnect, this));
+			this->ListenConnect();
 		});
 	}
 }

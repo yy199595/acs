@@ -11,7 +11,7 @@
 #include"Util/File/DirectoryHelper.h"
 #include"Util/File/FileHelper.h"
 #include"Server/Component/ThreadComponent.h"
-#include"Rpc/Component/DispatchMessageComponent.h"
+#include"Rpc/Component/DispatchComponent.h"
 namespace Tendo
 {
     HttpWebComponent::HttpWebComponent()
@@ -42,7 +42,7 @@ namespace Tendo
         std::vector<HttpService *> httpServices;
         this->mTaskComponent = this->mApp->GetTaskComponent();
         ServerConfig::Inst()->GetPath("home", this->mHomePath);
-		this->mDispatchComponent = this->GetComponent<DispatchMessageComponent>();
+		this->mDispatchComponent = this->GetComponent<DispatchComponent>();
 		return this->mApp->GetComponents(httpServices) && this->StartListen("http");
     }
 
@@ -152,8 +152,8 @@ namespace Tendo
 		{
 			return false;
 		}
-		std::shared_ptr<Rpc::Packet> message
-			= std::make_shared<Rpc::Packet>();
+		std::shared_ptr<Msg::Packet> message
+			= std::make_shared<Msg::Packet>();
 		if(request->Header().ContentType() == Http::ContentName::PB)
 		{
 			message->SetProto(Msg::Porto::Protobuf);
@@ -226,7 +226,7 @@ namespace Tendo
 		this->ClearClients();
 	}
 
-	bool HttpWebComponent::SendData(const string& address, int code, const std::shared_ptr<Rpc::Packet>& message)
+	bool HttpWebComponent::SendData(const string& address, int code, const std::shared_ptr<Msg::Packet>& message)
 	{
 		std::shared_ptr<Http::DataResponse> response = std::make_shared<Http::DataResponse>();
 		response->Header().Add("code", code);
