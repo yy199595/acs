@@ -27,7 +27,6 @@ namespace Tendo
 		ThreadComponent() = default;
 	 public:
 		bool Awake() final;
-		bool LateAwake() final;
 		void OnDestroy() final;
     public:
         Asio::Context& GetContext();

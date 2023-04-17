@@ -70,20 +70,15 @@ namespace Tendo
 		{
 			this->mNetThreads.push_back(new AsioThread());
 		}
+
+		for (AsioThread* thread : this->mNetThreads)
+		{
+			thread->Run();
+		}
 #endif
 		return true;
 	}
 
-	bool ThreadComponent::LateAwake()
-    {
-#ifndef ONLY_MAIN_THREAD
-        for (AsioThread* thread : this->mNetThreads)
-        {
-            thread->Run();
-        }
-#endif
-        return true;
-    }
 
 	void ThreadComponent::OnDestroy()
 	{
