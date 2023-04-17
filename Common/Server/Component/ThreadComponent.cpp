@@ -102,6 +102,7 @@ namespace Tendo
 #ifdef ONLY_MAIN_THREAD
 		return this->mApp->MainThread();
 #else
+		std::lock_guard<std::mutex> lock(this->mMutex);
 		AsioThread* t = this->mNetThreads.front();
 		{
 			this->mNetThreads.pop_front();
