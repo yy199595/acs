@@ -135,6 +135,11 @@ namespace Tendo
 
     bool InnerNetComponent::IsAuth(const std::string &address)
     {
+		auto iter1 = this->mLocalClients.find(address);
+		if(iter1 != this->mLocalClients.end())
+		{
+			return true;
+		}
         auto iter = this->mRemoteClients.find(address);
         return iter != this->mRemoteClients.end();
     }
