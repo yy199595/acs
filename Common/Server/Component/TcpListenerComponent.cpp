@@ -50,6 +50,7 @@ namespace Tendo
 #ifdef __DEBUG__
 		ElapsedTimer elapsedTimer;
 #endif
+		std::unique_lock<std::mutex> lock(this->mMutex);
 		Asio::Context& io = this->mThreadComponent->GetContext();
 		io.post([this, port, &io]()
 		{
@@ -72,8 +73,7 @@ namespace Tendo
 			}
 			this->mVal.notify_one();
 		});
-		std::unique_lock<std::mutex> lock(this->mMutex);
-		this->mVal.wait(lock);
+		this->mVal.wait(lock, [this]() {return this->mListenPort > 0; });
 #ifdef __DEBUG__
 		if(this->mListenPort > 0)
 		{
