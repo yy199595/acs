@@ -57,23 +57,13 @@ namespace Tendo
         this->mSumCount++;
         int type = message->GetType();
 		message->SetNet(Msg::Net::Tcp);
-		const std::string &address = message->From();
-        if (type != Msg::Type::Auth && address != this->mLocation)
-        {
-            if (!this->IsAuth(address))
-            {
-                this->StartClose(address);
-                CONSOLE_LOG_ERROR("close " << address << " not auth");
-                return;
-            }
-        }
         switch (type)
         {
             case Msg::Type::Auth:
                 this->OnAuth(message);
                 break;
             case Msg::Type::Logout:
-                this->StartClose(address);
+                this->StartClose(message->From());
                 break;
             case Msg::Type::Request:
                 this->mWaitMessages.push(message);
@@ -158,16 +148,12 @@ namespace Tendo
     void InnerNetComponent::OnListen(std::shared_ptr<Tcp::SocketProxy> socket)
     {
         const std::string &address = socket->GetAddress();
-        auto iter = this->mRemoteClients.find(address);
-        if (iter == this->mRemoteClients.end())
-        {
-            assert(!address.empty());
-            std::shared_ptr<InnerNetTcpClient> tcpSession
-                    = std::make_shared<InnerNetTcpClient>(this, socket);
 
-            tcpSession->StartReceive();
-            this->mRemoteClients.emplace(address, tcpSession);
-        }
+		std::shared_ptr<InnerNetTcpClient> tcpSession
+			= std::make_shared<InnerNetTcpClient>(this, socket);
+
+		tcpSession->StartReceive();
+		this->mRemoteClients.emplace(address, tcpSession);
     }
 
     void InnerNetComponent::StartClose(const std::string &address)
