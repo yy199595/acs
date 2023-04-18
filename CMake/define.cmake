@@ -44,11 +44,6 @@ else()
     message("当前网络为多线程模型")
 endif()
 
-if(__DEBUG__)
-    message("------------")
-
-endif()
-
 if(WIN32)
     message("当前为win平台")
     add_definitions(-D __OS_WIN__)

@@ -58,6 +58,7 @@ namespace Tendo
 		jsonWriter.Add("name").Add(request.str());
 		std::shared_ptr<RedisResponse> response1 =
 				this->mRedisLuaComponent->Call(func, jsonWriter.JsonString(), false);
+		LOG_ERROR_RETURN_CODE(response1 && response1->GetType() == RedisRespType::REDIS_ARRAY, XCode::Failure);
 		for(size_t index = 0; index < response1->GetArraySize(); index++)
 		{
 			const RedisString * redisString = response1->Get(index)->Cast<RedisString>();
