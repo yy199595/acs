@@ -5,7 +5,7 @@
 #include"Util/File/DirectoryHelper.h"
 #include"Rpc/Service/VirtualRpcService.h"
 #include"Proto/Component/ProtoComponent.h"
-#include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/LocationComponent.h"
 #include"Server/Component/TextConfigComponent.h"
 #include"Server/Component/ThreadComponent.h"
 #include"Cluster/Component/LaunchComponent.h"

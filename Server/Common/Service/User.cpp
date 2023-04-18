@@ -5,7 +5,7 @@
 #include"User.h"
 #include"Entity/Unit/App.h"
 #include"Rpc/Component/InnerNetComponent.h"
-#include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/LocationComponent.h"
 #include"Gate/Component/GateComponent.h"
 namespace Tendo
 {
@@ -25,7 +25,7 @@ namespace Tendo
 
     bool User::OnStart()
     {
-		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
+		this->mNodeComponent = this->GetComponent<LocationComponent>();
         this->mInnerNetComponent = this->GetComponent<InnerNetComponent>();
         return true;
     }

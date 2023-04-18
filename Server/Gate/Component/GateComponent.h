@@ -12,7 +12,7 @@ namespace Tendo
 	class GateComponent final : public Component, public ILuaRegister
 	{
 	 public:
-		GateComponent() = default;
+		GateComponent();
 		~GateComponent() = default;
     public:
 		int Send(long long userId, const std::string & func);
@@ -25,8 +25,8 @@ namespace Tendo
 		void OnLuaRegister(Lua::ClassProxyHelper & luaRegister) final;
 	 private:
 		class RpcService * mGate{};
-		class NodeMgrComponent* mNodeComponent{};
-        class InnerNetComponent * mInnerComponent{};
+		class LocationComponent* mNodeComponent;
+        class InnerNetComponent * mInnerComponent;
 	};
 }
 

@@ -16,10 +16,11 @@ namespace Msg
 		constexpr int Ping = 2;       //
 		constexpr int Request = 3;    //请求消息
 		constexpr int Response = 4;   //请求的返回
-		constexpr int Forward = 5;    //网关转发给客户端消息
+		constexpr int Forward = 5;    //转发消息
 		constexpr int Broadcast = 6;  //广播消息
 		constexpr int SubPublish = 7; //发布订阅消息
 		constexpr int Logout = 8;     //退出消息
+		constexpr int Client = 9; 	  //服务器发到客户端的消息
         constexpr int Max = 255;
     };
     namespace Porto

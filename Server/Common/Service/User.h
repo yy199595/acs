@@ -22,7 +22,7 @@ namespace Tendo
         bool Awake() final;
         bool OnStart() final;
     private:
-		class NodeMgrComponent * mNodeComponent;
+		class LocationComponent * mNodeComponent;
         class InnerNetComponent * mInnerNetComponent;
     };
 }

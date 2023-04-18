@@ -163,12 +163,15 @@ namespace Tendo
                 return this->OnRequestMessage(message);
             case Msg::Type::Response:
                 return this->OnResponseMessage(message);
-            case Msg::Type::Forward:
+            case Msg::Type::Client:
                 return this->OnForwardMessage(message);
             case Msg::Type::Broadcast:
                 return this->OnBroadcastMessage(message);
 			case Msg::Type::SubPublish:
 				return this->OnPublishMessage(message);
+			case Msg::Type::Forward:
+				// TODO 中转
+				break;
         }
 		LOG_ERROR("unknown message type : " << message->GetType());
         return XCode::Successful;

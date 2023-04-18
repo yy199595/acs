@@ -74,8 +74,6 @@ namespace Tendo
 			{
 				IsListen = false;
 				this->mListenPort = 0;
-				asio::error_code code;
-				this->mBindAcceptor->close(code);
 				CONSOLE_LOG_ERROR(fmt::format("{0}  listen [{1}] failure {2}", this->GetName(), port, err.what()));
 			}
 			variable.notify_one();
@@ -101,7 +99,8 @@ namespace Tendo
 			Asio::Context & main = this->mApp->MainThread();
 			if(code == asio::error::operation_aborted) //强制取消
             {
-                this->mBindAcceptor = nullptr;
+				asio::error_code ec;
+                this->mBindAcceptor->close(ec);
 				main.post(std::bind(&TcpListenerComponent::OnStopListen, this));
 				CONSOLE_LOG_ERROR("close listen " << this->GetName() << " [" << this->mListenPort << "]");
 				return;

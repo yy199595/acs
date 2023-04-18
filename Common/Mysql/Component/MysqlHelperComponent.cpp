@@ -3,13 +3,13 @@
 #include"MysqlHelperComponent.h"
 #include"Util/String/StringHelper.h"
 #include"Mysql/Service/MysqlDB.h"
-#include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/LocationComponent.h"
 #include"Entity/Unit/App.h"
 namespace Tendo
 {
 	bool MysqlHelperComponent::LateAwake()
 	{
-        this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
+        this->mLocationComponent = this->GetComponent<LocationComponent>();
 		LOG_CHECK_RET_FALSE(this->mMysqlDB = this->mApp->GetService<MysqlDB>());
 		return true;
 	}

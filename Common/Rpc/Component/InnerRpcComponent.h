@@ -36,7 +36,7 @@ namespace Tendo
 		class HttpComponent * mHttpComponent;
 		class HttpWebComponent * mWebComponent;
 		class InnerNetComponent * mTcpComponent;
-		class NodeMgrComponent * mNodeComponent;
+		class LocationComponent * mNodeComponent;
 	};
 }
 

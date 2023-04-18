@@ -36,7 +36,7 @@ namespace Tendo
         db::mongo::insert mInsertRequest;
         db::mongo::remove mRemoveRequest;
 		db::mongo::query::request mQueryRequest;
-		class NodeMgrComponent * mLocationComponent;
+		class LocationComponent * mLocationComponent;
 	};
 }
 

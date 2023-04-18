@@ -12,14 +12,13 @@ namespace Tendo
 	public:
 		RegistryComponent();
 	public:
-		bool Query(const std::string & server, bool async = true);
+		int Query(const std::string & server);
 	private:
 		bool LateAwake() final;
 		void OnLocalComplete() final;
 	private:
 		std::string mAddress;
-		class NodeMgrComponent * mNodeComponent;
-		class RedisLuaComponent * mRedisComponent;
+		class LocationComponent * mNodeComponent;
 	};
 }
 

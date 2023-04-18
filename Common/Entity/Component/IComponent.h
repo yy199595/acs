@@ -35,8 +35,8 @@ namespace Tendo
 	class IServerChange
 	{
 	public:
-		virtual void OnExit(int id) = 0;
-		virtual void OnJoin(int id) = 0;
+		virtual void OnExit(const std::string & name) = 0;
+		virtual void OnJoin(const std::string & name) = 0;
 	};
 
 	class IFrameUpdate

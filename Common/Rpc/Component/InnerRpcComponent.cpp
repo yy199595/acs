@@ -6,7 +6,7 @@
 #include"XCode/XCode.h"
 #include"Http/Component/HttpComponent.h"
 #include"Rpc/Component/InnerNetComponent.h"
-#include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/LocationComponent.h"
 #include "Http/Common/HttpRequest.h"
 #include "Http/Common/HttpResponse.h"
 #include"Http/Component/HttpWebComponent.h"
@@ -24,7 +24,7 @@ namespace Tendo
 	{
 		this->mHttpComponent = this->GetComponent<HttpComponent>();
 		this->mWebComponent = this->GetComponent<HttpWebComponent>();
-		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
+		this->mNodeComponent = this->GetComponent<LocationComponent>();
 		this->mTcpComponent = this->GetComponent<InnerNetComponent>();
 		return true;
 	}
@@ -84,7 +84,7 @@ namespace Tendo
 	std::shared_ptr<Msg::Packet> InnerRpcComponent::Call(const string& address,
 			const string& func, int proto, long long int userId, const google::protobuf::Message* message)
 	{
-		LOG_WARN("call [" << address << "] func:" << func);
+		LOG_WARN("call [" << address << "] func = " << func);
 		if(address.find(this->mTcp) == 0)
 		{
 			LOG_CHECK_RET_NULL(this->mTcpComponent);

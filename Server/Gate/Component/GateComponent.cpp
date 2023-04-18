@@ -8,14 +8,14 @@
 #include"Gate/Lua/LuaGate.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include"Lua/Engine/ClassProxyHelper.h"
-#include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/LocationComponent.h"
 #include"Rpc/Component/InnerNetComponent.h"
 #include"Entity/Component/ComponentFactory.h"
 namespace Tendo
 {
 	bool GateComponent::LateAwake()
 	{
-		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
+		this->mNodeComponent = this->GetComponent<LocationComponent>();
         this->mInnerComponent = this->GetComponent<InnerNetComponent>();
 		LOG_CHECK_RET_FALSE(this->mGate = this->mApp->GetService<Gate>());
 		return true;
@@ -34,7 +34,7 @@ namespace Tendo
         std::shared_ptr<Msg::Packet> data =
             std::make_shared<Msg::Packet>();
 		{
-            data->SetType(Msg::Type::Forward);
+            data->SetType(Msg::Type::Client);
 			data->GetHead().Add("id", userId);
 			data->GetHead().Add("func", func);
 		}
@@ -123,5 +123,11 @@ namespace Tendo
 		luaRegister.BeginNewTable("Gate");
 		luaRegister.PushExtensionFunction("Send", Lua::Gate::Send);
 		luaRegister.PushExtensionFunction("BroadCast", Lua::Gate::BroadCast);
+	}
+
+	GateComponent::GateComponent()
+	{
+		this->mNodeComponent = nullptr;
+		this->mInnerComponent = nullptr;
 	}
 }

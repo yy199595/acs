@@ -9,7 +9,7 @@
 #include"Util/String/StringHelper.h"
 #include"Rpc/Async/RpcTaskSource.h"
 #include"Proto/Component/ProtoComponent.h"
-#include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/LocationComponent.h"
 #include"Rpc/Component/InnerNetComponent.h"
 #include"Rpc/Component/DispatchComponent.h"
 using namespace Tendo;
@@ -54,8 +54,8 @@ namespace Lua
                 return 0;
             }
             std::string server;
-            NodeMgrComponent* locationComponent = 
-                App::Inst()->GetComponent<NodeMgrComponent>();
+            LocationComponent* locationComponent =
+                App::Inst()->GetComponent<LocationComponent>();
             if (!ClusterConfig::Inst()->GetServerName(methodConfig->Service, server))
             {
                 luaL_error(lua, "not cluster config %s", methodConfig->Service.c_str());
@@ -127,7 +127,7 @@ namespace Lua
             luaL_error(lua, "not find server : service = %s ", service.c_str());
             return 0;
         }
-		NodeMgrComponent * locationComponent = App::Inst()->GetComponent<NodeMgrComponent>();
+		LocationComponent * locationComponent = App::Inst()->GetComponent<LocationComponent>();
 		if(lua_isinteger(lua, 2))
 		{
 			std::string address;
@@ -192,8 +192,8 @@ namespace Lua
                 return 0;
             }
             
-            NodeMgrComponent* locationComponent = 
-                App::Inst()->GetComponent<NodeMgrComponent>();
+            LocationComponent* locationComponent =
+                App::Inst()->GetComponent<LocationComponent>();
             if (locationComponent->GetServer(methodConfig->Server, userId, address))
             {
                 return 0;
@@ -286,7 +286,7 @@ namespace Lua
             return 0;
         }
 		std::vector<std::string> servers;
-		NodeMgrComponent* locationComponent = App::Inst()->GetComponent<NodeMgrComponent>();
+		LocationComponent* locationComponent = App::Inst()->GetComponent<LocationComponent>();
         if (locationComponent != nullptr && locationComponent->GetServer(server, servers, listen))
         {
             lua_newtable(lua);

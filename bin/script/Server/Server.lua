@@ -4,12 +4,7 @@ local MongoDB = require("Server.MongoComponent")
 local redis = require("Server.RedisComponent")
 function Main.Awake()
 
-    local t1 = Time.NowMilTime()
-    redis.SyncRun("SET", "234", 12345)
-    redis.SyncRun("SET", "345", 12345)
-    local res = redis.SyncRun("KEYS *")
-    table.print(res)
-    print("use time = ", Time.NowMilTime() - t1)
+    redis.SyncRun("FLUSHALL")
 
      --table.print(response)
 
@@ -52,5 +47,7 @@ function Main.OnClusterComplete()
         _id = "646585122@qq.com",
     })
    table.print(response)
+    print("++++++++++++++++++++++")
+   table.print(redis.SyncRun("HVALS","Registry.Server"))
 end
 return Main

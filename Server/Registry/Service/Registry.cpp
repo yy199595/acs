@@ -8,7 +8,7 @@
 #include"Common/Service/Node.h"
 #include"Util/String/StringHelper.h"
 #include"Cluster/Config/ClusterConfig.h"
-#include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/LocationComponent.h"
 #include"Proto/Component/ProtoComponent.h"
 #include"Redis/Component/RedisComponent.h"
 #include"Redis/Component/RedisLuaComponent.h"
@@ -49,25 +49,26 @@ namespace Tendo
 		return true;
 	}
 
-	int Registry::Query(const s2s::server::query& request, s2s::server::list& response)
+	int Registry::Query(const com::type::string& request, s2s::server::list& response)
 	{
-		std::vector<std::string> list;
-		if (!request.server_name().empty())
-		{
-			const std::string& name = request.server_name();
-			if (ClusterConfig::Inst()->GetConfig(name) == nullptr)
-			{
-				return XCode::NotFoundRpcConfig;
-			}
-			list.emplace_back(name);
-		}
-		else
-		{
-			ClusterConfig::Inst()->GetServers(list);		
-		}
-		for (const std::string& server : list)
-		{
+		const std::string func("registry.query");
+		LOG_ERROR_RETURN_CODE(!request.str().empty(), XCode::CallArgsError);
 
+		Json::Writer jsonWriter;
+		jsonWriter.Add("name").Add(request.str());
+		std::shared_ptr<RedisResponse> response1 =
+				this->mRedisLuaComponent->Call(func, jsonWriter.JsonString(), false);
+		for(size_t index = 0; index < response1->GetArraySize(); index++)
+		{
+			const RedisString * redisString = response1->Get(index)->Cast<RedisString>();
+			if(redisString != nullptr && !redisString->GetValue().empty())
+			{
+				s2s::server::info * info = response.add_list();
+				if(!util::JsonStringToMessage(redisString->GetValue(), info).ok())
+				{
+					return XCode::JsonCastProtoFailure;
+				}
+			}
 		}
 		return XCode::Successful;
 	}

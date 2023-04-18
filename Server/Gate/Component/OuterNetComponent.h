@@ -50,7 +50,7 @@ namespace Tendo
 		unsigned int mSumCount;
 		unsigned int mWaitCount;
 		class RpcService * mGateService;
-		class NodeMgrComponent * mNodeComponent;
+		class LocationComponent * mNodeComponent;
 #ifdef __DEBUG__
 		std::unordered_map<int, long long> mRecords;
 #endif

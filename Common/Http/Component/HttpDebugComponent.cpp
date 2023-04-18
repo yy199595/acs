@@ -7,14 +7,14 @@
 #include"Cluster/Config/ClusterConfig.h"
 #include"Server/Config/CodeConfig.h"
 #include"Util//Json/JsonWriter.h"
-#include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/LocationComponent.h"
 #include"Rpc/Component/InnerNetComponent.h"
 
 namespace Tendo
 {
 	bool HttpDebugComponent::LateAwake()
 	{
-		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
+		this->mNodeComponent = this->GetComponent<LocationComponent>();
 		this->mInnerComponent = this->GetComponent<InnerNetComponent>();
 		return this->StartListen("debug");
 	}

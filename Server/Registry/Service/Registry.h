@@ -21,7 +21,7 @@ namespace Tendo
         int Ping(const Msg::Packet & head);
 		int UnRegister(const com::type::int32& request);
 		int Register(const std::string & address, const s2s::server::info & request);
-		int Query(const s2s::server::query& request, s2s::server::list& response);
+		int Query(const com::type::string& request, s2s::server::list& response);
 
     private:
 		void OnClose() final { }

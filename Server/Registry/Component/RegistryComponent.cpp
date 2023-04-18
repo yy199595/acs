@@ -8,14 +8,14 @@
 #include"Redis/Component/RedisLuaComponent.h"
 #include"Server/Config/ServerConfig.h"
 #include"Server/Config/CodeConfig.h"
-#include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/LocationComponent.h"
 #include"Cluster/Config/ClusterConfig.h"
 
 namespace Tendo
 {
 	RegistryComponent::RegistryComponent()
 	{
-		this->mRedisComponent = nullptr;
+		this->mNodeComponent = nullptr;
 	}
 
 	bool RegistryComponent::LateAwake()
@@ -26,8 +26,7 @@ namespace Tendo
 			LOG_ERROR("not find config registry address");
 			return false;
 		}
-		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
-		this->mRedisComponent = this->GetComponent<RedisLuaComponent>();
+		this->mNodeComponent = this->GetComponent<LocationComponent>();
 		return true;
 	}
 
@@ -39,7 +38,6 @@ namespace Tendo
 
 		s2s::server::info message;
 		{
-			message.set_id(config->GetId());
 			message.set_name(config->Name());
 			std::vector<std::string> listens;
 			config->GetListen(listens);
@@ -76,8 +74,7 @@ namespace Tendo
 		{
 			while(!this->mNodeComponent->HasServer(server))
 			{
-				this->Query(server, false);
-				if(!this->mNodeComponent->HasServer(server))
+				if(this->Query(server) <= 0 && !this->mNodeComponent->HasServer(server))
 				{
 					LOG_WARN("------ wait [" << server << "] start ------");
 					this->mApp->GetTaskComponent()->Sleep(1000 * 2);
@@ -86,46 +83,32 @@ namespace Tendo
 		}
 	}
 
-	bool RegistryComponent::Query(const string& server, bool async)
+	int RegistryComponent::Query(const string& server)
 	{
-		const std::string func("registry.query");
-		LOG_CHECK_RET_FALSE(this->mRedisComponent);
+		com::type::string request;
+		request.set_str(server);
+		const std::string func("Query");
+		RpcService * rpcService = this->mApp->GetService<Registry>();
 
-		std::string json;
-		Json::Writer jsonWriter;
-		jsonWriter.Add("name").Add(server);
-		jsonWriter.WriterStream(&json);
-		std::shared_ptr<RedisResponse> response
-			= this->mRedisComponent->Call(func, json, async);
-		LOG_CHECK_RET_FALSE(response && response->GetArraySize() > 0);
-		for(size_t index = 0; index < response->GetArraySize(); index++)
+		std::shared_ptr<s2s::server::list> response = std::make_shared<s2s::server::list>();
+		if(rpcService->Call(this->mAddress, func, request, response) != XCode::Successful)
 		{
-			const RedisString * redisString = response->Cast<RedisString>(index);
-			if(redisString != nullptr)
+			return 0;
+		}
+		for(int index = 0; index < response->list_size(); index++)
+		{
+			const s2s::server::info & info = response->list(index);
 			{
-				Json::Reader jsonReader;
-				const std::string & json = redisString->GetValue();
-				if(!jsonReader.ParseJson(json))
+				ServerData data(info.name());
+				for (auto iter = info.listens().begin(); iter != info.listens().end(); iter++)
 				{
-					return false;
+					data.Add(iter->first, iter->second);
+					const std::string& listen = iter->first;
+					const std::string& address = iter->second;
 				}
-				int id = 0;
-				std::string address;
-				jsonReader.GetMember("id", id);
-				const rapidjson::Value * jsonValue = jsonReader.GetJsonValue("listens");
-				if(jsonValue != nullptr && jsonValue->IsObject())
-				{
-					auto iter = jsonValue->MemberBegin();
-					for(; iter != jsonValue->MemberEnd(); iter++)
-					{
-						const char * key = iter->name.GetString();
-						const char * address = iter->value.GetString();
-						this->mNodeComponent->AddServer(id, server, key, address);
-					}
-				}
+				this->mNodeComponent->AddServer(data);
 			}
 		}
-		return true;
+		return response->list_size();
 	}
-
 }

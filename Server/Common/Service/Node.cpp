@@ -8,7 +8,7 @@
 #include"Registry/Service/Registry.h"
 #include"Server/Config/CodeConfig.h"
 #include"Cluster/Config/ClusterConfig.h"
-#include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/LocationComponent.h"
 #include"Server/Component/TextConfigComponent.h"
 
 namespace Tendo
@@ -27,7 +27,7 @@ namespace Tendo
 		BIND_COMMON_RPC_METHOD(Node::Hotfix);
 		BIND_COMMON_RPC_METHOD(Node::RunInfo);
 		BIND_COMMON_RPC_METHOD(Node::LoadConfig);
-		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
+		this->mNodeComponent = this->GetComponent<LocationComponent>();
 		return true;
     }
 
@@ -45,35 +45,43 @@ namespace Tendo
 			LOG_ERROR("not find cluster config : " << server);
 			return XCode::Failure;
 		}
-		int id = request.id();
+		ServerData data(server);
 		auto iter = request.listens().begin();
 		for(; iter != request.listens().end(); iter++)
 		{
-			const std::string & name = iter->first;
-			const std::string & address = iter->second;
-			this->mNodeComponent->AddServer(id, server, name, address);
+			data.Add(iter->first, iter->second);
 		}
+		this->mNodeComponent->AddServer(data);
 		std::vector<IServerChange *> components;
 		this->mApp->GetComponents(components);
 		for(IServerChange * listen : components)
 		{
-			listen->OnJoin(id);
+			listen->OnJoin(server);
 		}
 		return XCode::Successful;
 	}
 
-    int Node::Exit(const com::type::int32 &request)
-    {
-       	int id = request.value();
-		std::vector<IServerChange *> components;
-		this->mApp->GetComponents(components);
-		for(IServerChange * listen : components)
+    int Node::Exit(const s2s::server::info &request)
+	{
+		std::string rpc;
+		auto iter = request.listens().find("rpc");
+		if (iter == request.listens().end())
 		{
-			listen->OnExit(id);
+			return XCode::CallArgsError;
 		}
-		this->mNodeComponent->DelServer(id);
+		rpc = iter->second;
+		const std::string& name = request.name();
+		this->mNodeComponent->DelServer(name, rpc);
+
+
+		std::vector<IServerChange*> components;
+		this->mApp->GetComponents(components);
+		for (IServerChange* listen: components)
+		{
+			listen->OnExit(name);
+		}
 		return XCode::Successful;
-    }
+	}
 
     int Node::Stop()
     {
@@ -153,8 +161,12 @@ namespace Tendo
 		const ServerConfig * config = ServerConfig::Inst();
 		RpcService* rpcService = this->mApp->GetService<Registry>();
 
-		com::type::int32 request;
-		request.set_value(config->GetId());
+		s2s::server::info request;
+		{
+			request.set_name(config->Name());
+			config->GetLocation("rpc", address);
+			request.mutable_listens()->insert({ "rpc", address});
+		}
 		int code = rpcService->Call(address, "UnRegister", request);
 		const std::string & desc = CodeConfig::Inst()->GetDesc(code);
 		CONSOLE_LOG_INFO("unregister " << config->Name()  << " code = " << desc);

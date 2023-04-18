@@ -14,7 +14,6 @@ namespace Tendo
 	ServerConfig::ServerConfig(std::string  server)
 		: TextConfig("ServerConfig"), mName(std::move(server))
 	{
-		this->mId = 0;
 		this->mUseLua = false;
 	}
 
@@ -38,10 +37,6 @@ namespace Tendo
 		if (iter == this->MemberEnd())
 		{
 			return false;
-		}
-		if(iter->value.HasMember("id"))
-		{
-			this->mId = iter->value["id"].GetInt();
 		}
 		if(iter->value.HasMember("lua"))
 		{

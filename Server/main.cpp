@@ -18,7 +18,7 @@
 #include"Http/Component/HttpComponent.h"
 #include"Http/Component/HttpWebComponent.h"
 #include"Http/Component/HttpDebugComponent.h"
-#include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/LocationComponent.h"
 #include"Rpc/Component/InnerRpcComponent.h"
 
 #include"Server/Component/TextConfigComponent.h"
@@ -72,7 +72,7 @@ void RegisterComponent()
     ComponentFactory::Add<TextConfigComponent>("TextConfigComponent");
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
     ComponentFactory::Add<InnerNetComponent>("InnerNetComponent");
-	ComponentFactory::Add<NodeMgrComponent>("NodeMgrComponent");
+	ComponentFactory::Add<LocationComponent>("NodeMgrComponent");
 	ComponentFactory::Add<InnerRpcComponent>("RpcNetComponent");
 	ComponentFactory::Add<RegistryComponent>("RegistryComponent");
 	ComponentFactory::Add<DispatchComponent>("DispatchMessageComponent");
@@ -125,7 +125,6 @@ void RegisterServiceComponent()
 
 int main(int argc, char **argv)
 {
-
 #ifdef __OS_WIN__
     system("chcp 65001 > nul");
 #endif

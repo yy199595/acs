@@ -5,7 +5,7 @@
 #include"OuterNetComponent.h"
 #include"Gate/Client/OuterNetTcpClient.h"
 #include"Server/Component/ThreadComponent.h"
-#include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/LocationComponent.h"
 #include"Rpc/Component/InnerNetComponent.h"
 #include"Util/Md5/MD5.h"
 #include"Server/Config/CodeConfig.h"
@@ -25,7 +25,7 @@ namespace Tendo
 	{
 		this->mMaxHandlerCount = 500;
 		this->mGateService = this->mApp->GetService<Gate>();
-		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
+		this->mNodeComponent = this->GetComponent<LocationComponent>();
 		this->mInnerNetComponent = this->GetComponent<InnerNetComponent>();
 		ServerConfig::Inst()->GetMember("message", "outer", this->mMaxHandlerCount);
 		return true;

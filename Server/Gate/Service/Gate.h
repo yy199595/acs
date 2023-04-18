@@ -30,7 +30,7 @@ namespace Tendo
 		std::string mOuterAddress;
 		class RpcService * mUserService;
 		class RedisComponent* mRedisComponent;
-		class NodeMgrComponent * mNodeComponent;
+		class LocationComponent * mNodeComponent;
 		class OuterNetComponent* mOuterComponent;
 		std::unordered_map<std::string, long long> mTokens;
 	};

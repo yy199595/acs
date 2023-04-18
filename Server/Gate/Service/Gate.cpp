@@ -10,7 +10,7 @@
 #include"Cluster/Config/ClusterConfig.h"
 #include"Server/Config/CodeConfig.h"
 #include"Gate/Component/OuterNetComponent.h"
-#include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/LocationComponent.h"
 
 #include"Redis/Client/RedisDefine.h"
 #include"Redis/Component/RedisComponent.h"
@@ -48,7 +48,7 @@ namespace Tendo
 	{	
         const ServerConfig * config = ServerConfig::Inst();
 		this->mUserService = this->mApp->GetService<User>();
-		this->mNodeComponent = this->GetComponent<NodeMgrComponent>();
+		this->mNodeComponent = this->GetComponent<LocationComponent>();
 		this->mOuterComponent = this->GetComponent<OuterNetComponent>();
 		LOG_CHECK_RET_FALSE(config->GetLocation("rpc", this->mInnerAddress));
 		LOG_CHECK_RET_FALSE(config->GetLocation("gate", this->mOuterAddress));
@@ -87,7 +87,7 @@ namespace Tendo
 			response.set_address(this->mOuterAddress);
 		}
 		const std::string & server = this->GetServer();
-		this->mNodeComponent->AddRpcServer(server, userId, this->mInnerAddress);
+		this->mNodeComponent->BindServer(server, userId, this->mInnerAddress);
 		return XCode::Successful;
     }
 	int Gate::Login(const Msg::Packet& packet)
@@ -142,7 +142,7 @@ namespace Tendo
 				const std::string& desc = CodeConfig::Inst()->GetDesc(code);
 				LOG_ERROR("call " << server << " [" << address << "] code = " << desc);;
 			}
-			this->mNodeComponent->AddRpcServer(server, userId, address);
+			this->mNodeComponent->BindServer(server, userId, address);
 			CONSOLE_LOG_INFO("add " << server << " [" << address << "] to " << userId);
 		}
 		return XCode::Successful;

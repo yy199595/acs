@@ -10,7 +10,7 @@
 #include"Registry/Service/Registry.h"
 #include"Util/File/DirectoryHelper.h"
 #include"Util/File/FileHelper.h"
-#include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/LocationComponent.h"
 #include "Timer/Timer/ElapsedTimer.h"
 #include"Cluster/Config/ClusterConfig.h"
 
@@ -43,7 +43,7 @@ namespace Tendo
 	int ServerWeb::Hotfix(Json::Writer&response)
 	{
 		RpcService * rpcService = this->mApp->GetService<Node>();
-		NodeMgrComponent * locationComponent = this->GetComponent<NodeMgrComponent>();
+		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
 		if(locationComponent == nullptr || rpcService == nullptr)
 		{
 			response.Add("error").Add("LocationComponent or InnerService Is Null");
@@ -58,7 +58,7 @@ namespace Tendo
 	{
 		std::string address;
 		RpcService	* registryService = this->mApp->GetService<Registry>();
-		NodeMgrComponent * locationComponent = this->GetComponent<NodeMgrComponent>();
+		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
 		if(!locationComponent->GetServer(registryService->GetServer(), address))
 		{
 			return XCode::AddressAllotFailure;
@@ -125,7 +125,7 @@ namespace Tendo
     {
 		std::string address;
 		RpcService	* registryService = this->mApp->GetService<Registry>();
-		NodeMgrComponent * locationComponent = this->GetComponent<NodeMgrComponent>();
+		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
 		if(!locationComponent->GetServer(registryService->GetServer(), address))
 		{
 			return XCode::AddressAllotFailure;

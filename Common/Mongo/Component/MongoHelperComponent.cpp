@@ -7,12 +7,12 @@
 #include"Mongo/Service/MongoDB.h"
 #include<google/protobuf/util/json_util.h>
 #include"Cluster/Config/ClusterConfig.h"
-#include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/LocationComponent.h"
 namespace Tendo
 {
 	bool MongoHelperComponent::LateAwake()
     {
-        this->mLocationComponent = this->GetComponent<NodeMgrComponent>();
+        this->mLocationComponent = this->GetComponent<LocationComponent>();
 		LOG_CHECK_RET_FALSE(this->mMongoDB = this->mApp->GetService<MongoDB>());
 		return true;
     }

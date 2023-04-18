@@ -33,14 +33,12 @@ namespace Tendo
         bool OnLoadText(const char *str, size_t length) final;
         bool OnReloadText(const char *str, size_t length) final;
 	 public:
-		int GetId() const { return this->mId; }
         const std::string& Name() const { return this->mName; } //服务器名字
 		const std::string & GetContent() const { return this->mContent;}
 		bool GetPath(const std::string & name, std::string & path) const;
 	private:
 		bool ParseHttpAddress(const std::string & address, unsigned short & port) const;
     private:
-		int mId;
 		bool mUseLua;
 		std::string mContent;
         const std::string mName;

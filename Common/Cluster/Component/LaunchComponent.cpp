@@ -11,7 +11,7 @@
 #include"Rpc/Service/VirtualRpcService.h"
 #include"Rpc/Service/LuaPhysicalRpcService.h"
 #include"Http//Service/LuaPhysicalHttpService.h"
-#include"Rpc/Component/NodeMgrComponent.h"
+#include"Rpc/Component/LocationComponent.h"
 #include"Lua/Component/LuaScriptComponent.h"
 #include"Rpc/Component/InnerRpcComponent.h"
 #include"Rpc/Component/InnerNetComponent.h"
@@ -30,13 +30,13 @@ namespace Tendo
 		unsigned short port = 0;
 		if(ServerConfig::Inst()->GetListen("rpc", port))
 		{
-			this->mApp->AddComponent<NodeMgrComponent>();
+			this->mApp->AddComponent<LocationComponent>();
 			this->mApp->AddComponent<InnerNetComponent>();
 			this->mApp->AddComponent<DispatchComponent>();
 		}
 		if(ServerConfig::Inst()->GetListen("http", port))
 		{
-			this->mApp->AddComponent<NodeMgrComponent>();
+			this->mApp->AddComponent<LocationComponent>();
 			this->mApp->AddComponent<HttpWebComponent>();
 			this->mApp->AddComponent<DispatchComponent>();
 		}
@@ -117,7 +117,7 @@ namespace Tendo
         const ServerConfig* config = ServerConfig::Inst();
         const ClusterConfig* clusterConfig = ClusterConfig::Inst();
         TimerComponent* timerComponent = this->GetComponent<TimerComponent>();
-        NodeMgrComponent* locationComponent = this->GetComponent<NodeMgrComponent>();
+        LocationComponent* locationComponent = this->GetComponent<LocationComponent>();
 
         std::string location, httpLocation;
         std::vector<std::string> components;

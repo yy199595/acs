@@ -39,7 +39,7 @@ namespace Tendo
 	private:
 		std::string mServerName;
 		class RpcService* mMysqlDB;
-		class NodeMgrComponent * mLocationComponent;
+		class LocationComponent * mLocationComponent;
 	};
 
 	template<typename T>
