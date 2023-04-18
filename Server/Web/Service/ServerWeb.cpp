@@ -23,6 +23,8 @@ namespace Tendo
 		BIND_COMMON_HTTP_METHOD(ServerWeb::Login);
 		BIND_COMMON_HTTP_METHOD(ServerWeb::Hotfix);
 		BIND_COMMON_HTTP_METHOD(ServerWeb::Register);
+		LOG_CHECK_RET_FALSE(this->GetComponent<LocationComponent>());
+		LOG_CHECK_RET_FALSE(this->GetComponent<RegistryComponent>());
 		return true;
 	}
 
