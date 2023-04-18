@@ -51,9 +51,11 @@ namespace Tendo
 		ElapsedTimer elapsedTimer;
 #endif
 		std::mutex mutex;
+		std::chrono::milliseconds ms(2);
 		std::condition_variable variable;
 		Asio::Context& io = this->mThreadComponent->GetContext();
-		io.post([this, port, &io, &mutex, &variable]()
+		std::shared_ptr<Asio::Timer> timer(new Asio::Timer(io, ms));
+		timer->async_wait([this, port, &io, &mutex, &variable](const asio::error_code & ec)
 		{
 			std::unique_lock<std::mutex> lock(mutex);
 			try
@@ -70,6 +72,8 @@ namespace Tendo
 			catch (std::system_error& err)
 			{
 				this->mListenPort = 0;
+				asio::error_code code;
+				this->mBindAcceptor->close(code);
 				CONSOLE_LOG_ERROR(fmt::format("{0}  listen [{1}] failure {2}", this->GetName(), port, err.what()));
 				return false;
 			}
