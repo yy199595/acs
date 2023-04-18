@@ -54,11 +54,9 @@ function registry.query(request)
     local key = util.get_key(request.name)
     local values = redis.call("HVALS", key)
     for _, json in ipairs(values) do
-        local data = cjson.decode(json)
+        --local data = cjson.decode(json)
         --local t = now - data.ping_time
-        if data == data.name then
-            table.insert(response, json)
-        end
+        table.insert(response, json)
     end
     return response
 end

@@ -31,7 +31,7 @@ namespace Tendo
 		inline T* GetOrAddComponent();
 
 		template<typename T>
-		inline std::shared_ptr<T> Cast();
+		inline T * Cast() { return dynamic_cast<T*>(this); }
 
 	 public:
 		size_t GetComponents(std::vector<Component*>& components) const;
@@ -136,11 +136,5 @@ namespace Tendo
 			return this->GetComponent<T>();
 		}
 		return component;
-	}
-
-	template<typename T>
-	inline std::shared_ptr<T> Unit::Cast()
-	{
-		return dynamic_cast<T>(this);
 	}
 }

@@ -111,4 +111,16 @@ namespace Tendo
 		}
 		return response->list_size();
 	}
+
+	int RegistryComponent::Query()
+	{
+		int count = 0;
+		std::vector<std::string> servers;
+		ClusterConfig::Inst()->GetServers(servers);
+		for (const std::string& server: servers)
+		{
+			count += this->Query(server);
+		}
+		return count;
+	}
 }

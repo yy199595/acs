@@ -6,6 +6,7 @@
 #define APP_LOCATIONSERVICE_H
 #include"Message/s2s/s2s.pb.h"
 #include"Message/com/com.pb.h"
+#include"Event/Common/EventFactory.h"
 #include"Rpc/Service/PhysicalRpcService.h"
 namespace Tendo
 {

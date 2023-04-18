@@ -13,7 +13,7 @@
 #include"Rpc/Component/LocationComponent.h"
 #include "Timer/Timer/ElapsedTimer.h"
 #include"Cluster/Config/ClusterConfig.h"
-
+#include"Registry/Component/RegistryComponent.h"
 namespace Tendo
 {
     bool ServerWeb::OnInit()
@@ -56,65 +56,28 @@ namespace Tendo
 
 	int ServerWeb::Stop(Json::Writer & response)
 	{
-		std::string address;
-		RpcService	* registryService = this->mApp->GetService<Registry>();
-		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
-		if(!locationComponent->GetServer(registryService->GetServer(), address))
+		std::string rpc;
+		ServerConfig::Inst()->GetLocation("rpc", rpc);
+		RpcService * rpcService = this->mApp->GetService<Node>();
+		RegistryComponent * pRegistryComponent = this->GetComponent<RegistryComponent>();
+		LocationComponent * pLocationComponent = this->GetComponent<LocationComponent>();
+
+		std::vector<std::string> servers;
+		std::vector<std::string> rpcListens;
+		ClusterConfig::Inst()->GetServers(servers);
+
+		for(const std::string & server : servers)
 		{
-			return XCode::AddressAllotFailure;
-		}
-		std::shared_ptr<s2s::server::list> list =
-			std::make_shared<s2s::server::list>();
-		int code = registryService->Call(address, "Query", list);
-		if(code != XCode::Successful)
-		{
-			response.Add("error").Add(CodeConfig::Inst()->GetDesc(code));
-			return XCode::Failure;
-		}
-		std::string local;
-		ServerConfig::Inst()->GetLocation("rpc", local);
-		RpcService * nodeService = this->GetComponent<Node>();
-		std::vector<const s2s::server::info *> serverInfos;
-		for (int index = 0; index < list->list_size(); index++)
-		{
-			const s2s::server::info& info = list->list(index);
-			serverInfos.emplace_back(&info);
-		}
-		std::sort(serverInfos.begin(), serverInfos.end(), []
-			(const s2s::server::info * info1, const s2s::server::info * info2)->bool
-		{
-				const NodeConfig * config1 = ClusterConfig::Inst()->GetConfig(info1->name());
-				const NodeConfig * config2 = ClusterConfig::Inst()->GetConfig(info2->name());
-				if(config1 != nullptr && config2 != nullptr)
-				{
-					return config1->GetIndex() < config2->GetIndex();
-				}
-				return true;
-		});
-		for(const s2s::server::info * info : serverInfos)
-		{
-			auto iter = info->listens().find("http");
-			if(iter == info->listens().end())
+			rpcListens.clear();
+			pRegistryComponent->Query(server);
+			pLocationComponent->GetServer(server, rpcListens);
+			for(const std::string & address : rpcListens)
 			{
-				iter = info->listens().find("tcp");
-			}
-			if(iter != info->listens().end())
-			{
-				ElapsedTimer timer;
-				const std::string & address = iter->second;
-				int code = nodeService->Call(address, "Stop");
-				response.BeginObject(address.c_str());
-				auto iter1 = info->listens().begin();
-				for(; iter1 != info->listens().end(); iter1++)
+				if(address != rpc)
 				{
-					const std::string & key = iter1->first;
-					const std::string & value = iter1->second;
-					response.Add(key.c_str()).Add(value);
+					int code = rpcService->Call(address, "Stop");
+					response.Add(address).Add(CodeConfig::Inst()->GetDesc(code));
 				}
-				response.Add("name").Add(info->name());
-				response.Add("ms").Add(timer.GetMs());
-				response.Add("code").Add(CodeConfig::Inst()->GetDesc(code));
-				response.EndObject();
 			}
 		}
 		this->mApp->GetTaskComponent()->Start(&App::Stop, this->mApp, 0);

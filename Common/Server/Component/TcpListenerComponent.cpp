@@ -52,17 +52,18 @@ namespace Tendo
 #endif
 		std::mutex mutex;
 		bool IsListen = false;
+		this->mListenPort = port;
 		std::chrono::milliseconds ms(2);
 		std::condition_variable variable;
 		Asio::Context& io = this->mThreadComponent->GetContext();
 		std::shared_ptr<Asio::Timer> timer(new Asio::Timer(io, ms));
-		timer->async_wait([this, port, &io, &mutex, &variable, &IsListen](const asio::error_code & ec)
+		timer->async_wait([this, &io, &mutex, &variable, &IsListen](const asio::error_code & ec)
 		{
 			std::unique_lock<std::mutex> lock(mutex);
 			try
 			{
-				Asio::EndPoint ep(asio::ip::address_v4(), port);
 				this->mBindAcceptor = std::make_unique<Asio::Acceptor>(io);
+				Asio::EndPoint ep(asio::ip::address_v4(), this->mListenPort);
 
 				this->mBindAcceptor->open(ep.protocol());
 				this->mBindAcceptor->bind(ep);
@@ -73,8 +74,7 @@ namespace Tendo
 			catch (std::system_error& err)
 			{
 				IsListen = false;
-				this->mListenPort = 0;
-				CONSOLE_LOG_ERROR(fmt::format("{0}  listen [{1}] failure {2}", this->GetName(), port, err.what()));
+				CONSOLE_LOG_ERROR(fmt::format("{0}  listen [{1}] failure {2}", this->GetName(), this->mListenPort, err.what()));
 			}
 			variable.notify_one();
 		});

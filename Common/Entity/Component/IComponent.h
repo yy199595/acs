@@ -63,6 +63,18 @@ namespace Tendo
 		virtual void OnLastFrameUpdate() = 0;
 	};
 
+	class IInnerClient
+	{
+	public:
+		virtual void OnDisConnect(const std::string & address) = 0;
+	};
+
+	class IOuterClient
+	{
+	public:
+		virtual void OnDisConnect(const std::string & address) = 0;
+	};
+
 	class ILuaRegister
 	{
 	public:

@@ -4,7 +4,8 @@ message server
 {
     message info
     {
-        string name = 2;
+        string name = 1;
+        int64 ping_time = 2;
         map<string, string> listens = 3;
     }
     message list
