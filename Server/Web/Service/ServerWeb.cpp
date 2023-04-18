@@ -16,6 +16,10 @@
 #include"Registry/Component/RegistryComponent.h"
 namespace Tendo
 {
+	bool ServerWeb::Awake()
+	{
+		this->mApp->AddComponent<RegistryComponent>();
+	}
     bool ServerWeb::OnInit()
 	{
 		BIND_COMMON_HTTP_METHOD(ServerWeb::Info);
