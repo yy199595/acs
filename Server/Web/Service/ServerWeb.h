@@ -13,7 +13,6 @@ namespace Tendo
         ServerWeb() = default;
         ~ServerWeb() final = default;
     private:
-		bool Awake() final;
         bool OnInit() final;
     private:
 		int Stop(Json::Writer & response);

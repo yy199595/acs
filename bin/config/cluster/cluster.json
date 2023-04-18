@@ -7,7 +7,10 @@
             "Chat": false,
             "User": false,
             "Registry": false
-        }
+        },
+        "Component": [
+            "RegistryComponent"
+        ]
     },
     "ChatServer": {
         "AutoAllot": true,
@@ -17,7 +20,10 @@
             "Chat": true,
             "Gate": false,
             "Registry": false
-        }
+        },
+        "Component": [
+            "RegistryComponent"
+        ]
     },
     "HttpServer": {
         "AutoAllot": false,
@@ -33,6 +39,7 @@
             "HttpComponent",
             "RedisComponent",
             "HttpWebComponent",
+            "RegistryComponent",
             "HttpDebugComponent"
         ]
     },
@@ -42,7 +49,10 @@
             "Node": true,
             "MongoDB": true,
             "Registry": false
-        }
+        },
+        "Component": [
+            "RegistryComponent"
+        ]
     },
     "RegistryServer": {
         "AutoAllot": false,
