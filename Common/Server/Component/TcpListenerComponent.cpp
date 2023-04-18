@@ -50,10 +50,12 @@ namespace Tendo
 #ifdef __DEBUG__
 		ElapsedTimer elapsedTimer;
 #endif
-		std::unique_lock<std::mutex> lock(this->mMutex);
+		std::mutex mutex;
+		std::condition_variable variable;
 		Asio::Context& io = this->mThreadComponent->GetContext();
-		io.post([this, port, &io]()
+		io.post([this, port, &io, &mutex, &variable]()
 		{
+			std::unique_lock<std::mutex> lock(mutex);
 			try
 			{
 				Asio::EndPoint ep(asio::ip::address_v4(), port);
@@ -71,9 +73,10 @@ namespace Tendo
 				CONSOLE_LOG_ERROR(fmt::format("{0}  listen [{1}] failure {2}", this->GetName(), port, err.what()));
 				return false;
 			}
-			this->mVal.notify_one();
+			variable.notify_one();
 		});
-		this->mVal.wait(lock, [this]() {return this->mListenPort > 0; });
+		std::unique_lock<std::mutex> lock(mutex);
+		variable.wait(lock, [this]() {return this->mListenPort > 0; });
 #ifdef __DEBUG__
 		if(this->mListenPort > 0)
 		{
