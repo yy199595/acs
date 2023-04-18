@@ -51,11 +51,12 @@ namespace Tendo
 		ElapsedTimer elapsedTimer;
 #endif
 		std::mutex mutex;
+		bool IsListen = false;
 		std::chrono::milliseconds ms(2);
 		std::condition_variable variable;
 		Asio::Context& io = this->mThreadComponent->GetContext();
 		std::shared_ptr<Asio::Timer> timer(new Asio::Timer(io, ms));
-		timer->async_wait([this, port, &io, &mutex, &variable](const asio::error_code & ec)
+		timer->async_wait([this, port, &io, &mutex, &variable, &IsListen](const asio::error_code & ec)
 		{
 			std::unique_lock<std::mutex> lock(mutex);
 			try
@@ -67,28 +68,28 @@ namespace Tendo
 				this->mBindAcceptor->bind(ep);
 				this->mBindAcceptor->listen();
 				io.post(std::bind(&TcpListenerComponent::ListenConnect, this));
-				this->mListenPort = port;
+				IsListen = true;
 			}
 			catch (std::system_error& err)
 			{
+				IsListen = false;
 				this->mListenPort = 0;
 				asio::error_code code;
 				this->mBindAcceptor->close(code);
 				CONSOLE_LOG_ERROR(fmt::format("{0}  listen [{1}] failure {2}", this->GetName(), port, err.what()));
-				return false;
 			}
 			variable.notify_one();
 		});
 		std::unique_lock<std::mutex> lock(mutex);
-		variable.wait(lock, [this]() {return this->mListenPort > 0; });
+		variable.wait(lock, [this, &IsListen]() {return IsListen;; });
 #ifdef __DEBUG__
-		if(this->mListenPort > 0)
+		if(IsListen)
 		{
 			LOG_INFO(this->GetName() << " listen [" << port << "] successful use " << elapsedTimer.GetMs() << " ms");
 			return true;
 		}
 #endif
-		return this->mListenPort > 0;
+		return IsListen;
 	}
 	void TcpListenerComponent::ListenConnect()
 	{
