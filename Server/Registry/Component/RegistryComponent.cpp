@@ -57,6 +57,11 @@ namespace Tendo
 			int code = rpcService->Call(this->mAddress, func, message);
 			if (code == XCode::Successful)
 			{
+				ServerData serverData(rpcService->GetServer());
+				{
+					serverData.Add("rpc", this->mAddress);
+					this->mNodeComponent->AddServer(serverData);
+				}
 				const std::string& server = rpcService->GetServer();
 				LOG_INFO("register to [" << this->mAddress << "] successful");
 				break;

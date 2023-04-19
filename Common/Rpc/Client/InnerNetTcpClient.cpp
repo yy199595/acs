@@ -81,6 +81,14 @@ namespace Tendo
         }
         else
         {
+//			std::shared_ptr<Msg::Packet> sendMessage = std::static_pointer_cast<Msg::Packet>(message);
+//			if(sendMessage != nullptr && sendMessage->GetType() == Msg::Type::Request)
+//			{
+//				int rpcId = 0;
+//				sendMessage->ConstHead().Get("rpc", rpcId);
+//				this->mWaitResMessages.emplace(rpcId, sendMessage);
+//			}
+
             this->PopMessage();
             this->SendFromMessageQueue();
         }
@@ -161,7 +169,7 @@ namespace Tendo
 #ifdef __DEBUG__
             const std::string& address = this->mSocket->GetAddress();
             CONSOLE_LOG_ERROR("receive inner message error : [" << address << "] " << code.message());
-#endif // 
+#endif
             this->CloseSocket(XCode::NetWorkError);
             return;
         }

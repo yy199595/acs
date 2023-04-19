@@ -43,5 +43,6 @@ namespace Tendo
         IRpc<Msg::Packet> * mComponent;
         std::shared_ptr<Msg::Packet> mMessage;
         std::unique_ptr<asio::steady_timer> mTimer;
+		//std::unordered_map<int, std::shared_ptr<Msg::Packet>> mWaitResMessages; //等待返回的消息
 	};
 }// namespace Sentry
