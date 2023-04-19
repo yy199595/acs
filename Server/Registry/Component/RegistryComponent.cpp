@@ -52,21 +52,20 @@ namespace Tendo
 #ifdef __DEBUG__
 		LOG_INFO("start register to [" << this->mAddress << "]");
 #endif
-		int code = XCode::Successful;
 		do
 		{
-			code = rpcService->Call(this->mAddress, func, message);
-			if (code != XCode::Successful)
+			int code = rpcService->Call(this->mAddress, func, message);
+			if (code == XCode::Successful)
 			{
-				LOG_ERROR("register to [" << this->mAddress << "] "
-										  << CodeConfig::Inst()->GetDesc(code));
-				this->mApp->GetTaskComponent()->Sleep(1000 * 5);
-				continue;
+				const std::string& server = rpcService->GetServer();
+				LOG_INFO("register to [" << this->mAddress << "] successful");
+				break;
 			}
-			const std::string& server = rpcService->GetServer();
-			LOG_INFO("register to [" << this->mAddress << "] successful");
+			LOG_ERROR("register to [" << this->mAddress << "] "
+									  << CodeConfig::Inst()->GetDesc(code));
+			this->mApp->GetTaskComponent()->Sleep(1000 * 5);
 		}
-		while(code != XCode::Successful);
+		while(true);
 
 		std::vector<std::string> servers;
 		ClusterConfig::Inst()->GetServers(servers);

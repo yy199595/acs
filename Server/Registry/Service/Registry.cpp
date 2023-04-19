@@ -13,16 +13,23 @@
 #include"Redis/Component/RedisComponent.h"
 #include"Redis/Component/RedisLuaComponent.h"
 #include"google/protobuf/util/json_util.h"
+
+#include"Message/mysql/server.pb.h"
+#include"Mysql/Client/MysqlMessage.h"
+#include"Mysql/Component/MysqlDBComponent.h"
+#include "Util/Sql/SqlHelper.h"
+
 namespace Tendo
 {
 	Registry::Registry()
 	{
-		this->mRedisLuaComponent = nullptr;
+		this->mMysqlComponent = nullptr;
 	}
 
 	bool Registry::Awake()
 	{
 		this->mApp->AddComponent<RedisComponent>();
+		this->mApp->AddComponent<MysqlDBComponent>();
 		return true;
 	}
 
@@ -32,43 +39,52 @@ namespace Tendo
 		BIND_COMMON_RPC_METHOD(Registry::Query);
 		BIND_ADDRESS_RPC_METHOD(Registry::Register);
 		BIND_COMMON_RPC_METHOD(Registry::UnRegister);
-		this->mRedisLuaComponent = this->GetComponent<RedisLuaComponent>();
+		this->mMysqlComponent = this->GetComponent<MysqlDBComponent>();
 		return true;
 	}
 
 	bool Registry::OnStart()
 	{
-		std::shared_ptr<Message> message;
-		ProtoComponent* component = this->GetComponent<ProtoComponent>();
-		LOG_CHECK_RET_FALSE(component->Import("mysql/server.proto"));
-		if (!component->New("server.registry", message))
-		{
-			LOG_ERROR("create protobuf type [server.registry] error");
-			return false;
-		}
-		return true;
+		std::shared_ptr<server::registry> message = std::make_shared<server::registry>();
+		this->mTable = message->GetTypeName();
+		std::vector<std::string> keys {"rpc_address", "server_name" };
+		std::shared_ptr<Mysql::ICommand> command =
+				std::make_shared<Mysql::CreateTabCommand>(this->mTable, message, keys);
+		return this->mMysqlComponent->Execute(command);
 	}
 
 	int Registry::Query(const com::type::string& request, s2s::server::list& response)
 	{
-		const std::string func("registry.query");
-		LOG_ERROR_RETURN_CODE(!request.str().empty(), XCode::CallArgsError);
-
-		Json::Writer jsonWriter;
-		jsonWriter.Add("name").Add(request.str());
-		std::shared_ptr<RedisResponse> response1 =
-				this->mRedisLuaComponent->Call(func, jsonWriter.JsonString(), false);
-		LOG_ERROR_RETURN_CODE(response1 && response1->GetType() == RedisRespType::REDIS_ARRAY, XCode::Failure);
-		for(size_t index = 0; index < response1->GetArraySize(); index++)
+		const std::string & server = request.str();
+		LOG_ERROR_RETURN_CODE(!server.empty(), XCode::CallArgsError);
+		std::string sql = fmt::format("SELECT * from %s where server_name='%s'", this->mTable, server);
+		std::shared_ptr<Mysql::ICommand> queryCommand = std::make_shared<Mysql::QueryCommand>(sql);
+		std::shared_ptr<Mysql::Response> mysqlResponse = this->mMysqlComponent->Run(queryCommand);
+		if(!mysqlResponse->IsOk())
 		{
-			const RedisString * redisString = response1->Get(index)->Cast<RedisString>();
-			if(redisString != nullptr && !redisString->GetValue().empty())
+			return XCode::MysqlInvokeFailure;
+		}
+		for(size_t index = 0; index < mysqlResponse->ArraySize(); index++)
+		{
+			Json::Reader jsonReader;
+			const std::string & json = mysqlResponse->Get(index);
+			if(!jsonReader.ParseJson(json))
 			{
-				s2s::server::info * info = response.add_list();
-				if(!util::JsonStringToMessage(redisString->GetValue(), info).ok())
-				{
-					return XCode::JsonCastProtoFailure;
-				}
+				return XCode::ParseJsonFailure;
+			}
+			long long time = 0;
+			std::string name, rpc, http, gate;
+			jsonReader.GetMember("server_name", name);
+			jsonReader.GetMember("rpc_address", rpc);
+			jsonReader.GetMember("http_address", http);
+			jsonReader.GetMember("gate_address", gate);
+			jsonReader.GetMember("last_ping_time", time);
+			s2s::server::info * info = response.add_list();
+			{
+				info->set_name(name);
+				info->mutable_listens()->insert({"rpc", rpc});
+				info->mutable_listens()->insert({"http", http});
+				info->mutable_listens()->insert({"gate", gate});
 			}
 		}
 		return XCode::Successful;
@@ -80,18 +96,38 @@ namespace Tendo
 		{
 			return XCode::OnlyUseTcpProtocol;
 		}
-		std::string json;
-		const std::string func("registry.add");
-		LOG_ERROR_RETURN_CODE(!request.name().empty(), XCode::CallArgsError);
-		LOG_ERROR_RETURN_CODE(!request.listens().empty(), XCode::CallArgsError);
-		if(!util::MessageToJsonString(request, &json).ok())
+		server::registry message;
+		message.set_server_name(request.name());
+		auto iter1 = request.listens().find("rpc");
+		auto iter2 = request.listens().find("http");
+		auto iter3 = request.listens().find("gate");
+		if(iter1 != request.listens().end())
 		{
-			return XCode::ProtoCastJsonFailure;
+			message.set_rpc_address(iter1->second);
 		}
-		std::shared_ptr<RedisResponse> response =
-				this->mRedisLuaComponent->Call(func, json, false);
-		LOG_ERROR_RETURN_CODE(response && response->GetNumber() == 0, XCode::SaveToRedisFailure);
+		if(iter2 != request.listens().end())
+		{
+			message.set_http_address(iter2->second);
+		}
+		if(iter3 != request.listens().end())
+		{
+			message.set_gate_address(iter3->second);
+		}
+		message.set_last_ping_time(Helper::Time::NowSecTime());
+		message.set_last_time_str(Helper::Time::GetDateString());
 
+		std::string sql;
+		SqlHelper sqlHelper;
+		if(!sqlHelper.Replace(message,sql))
+		{
+			return XCode::CallArgsError;
+		}
+		std::shared_ptr<Mysql::QueryCommand> queryCommand
+			= std::make_shared<Mysql::QueryCommand>(sql);
+		if(!this->mMysqlComponent->Execute(queryCommand))
+		{
+			return XCode::SaveToMysqlFailure;
+		}
 		this->mServers.emplace(address, request.name());
 		RpcService * node = this->mApp->GetService<Node>();
 		for(auto iter = this->mServers.begin(); iter != this->mServers.end(); iter++)

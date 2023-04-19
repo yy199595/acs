@@ -7,7 +7,7 @@
 #include"Message/s2s/s2s.pb.h"
 #include"Message/com/com.pb.h"
 #include"Rpc/Service/PhysicalRpcService.h"
-struct InnerClientDisconnectEvent;
+
 namespace Tendo
 {
 	class Registry final : public PhysicalRpcService, public ISecondUpdate, public IEvent<DisConnectEvent>
@@ -30,7 +30,7 @@ namespace Tendo
 		void OnSecondUpdate(int tick) final;
 	 private:
 		std::string mTable;
-        class RedisLuaComponent* mRedisLuaComponent;
+		class MysqlDBComponent * mMysqlComponent;
 		std::unordered_map<std::string, std::string> mServers;
     };
 }
