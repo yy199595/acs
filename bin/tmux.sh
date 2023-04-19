@@ -12,11 +12,11 @@ tmux select-layout even-vertical #垂直布局
 
 
 # Run a process in each pane
-tmux send-keys -t 0 './app ./config/config.json RegistryServer' C-m
-tmux send-keys -t 1 './app ./config/config.json DataServer' C-m
-tmux send-keys -t 2 './app ./config/config.json HttpServer' C-m
-tmux send-keys -t 3 './app ./config/config.json ChatServer' C-m
-tmux send-keys -t 4 './app ./config/config.json GateServer' C-m
+tmux send-keys -t 0 './app ./config/run/cluster.json RegistryServer' C-m
+tmux send-keys -t 1 './app ./config/run/cluster.json DataServer' C-m
+tmux send-keys -t 2 './app ./config/run/cluster.json HttpServer' C-m
+tmux send-keys -t 3 './app ./config/run/cluster.json ChatServer' C-m
+tmux send-keys -t 4 './app ./config/run/cluster.json GateServer' C-m
 
 # Attach to the tmux session to view the output
 tmux attach-session
