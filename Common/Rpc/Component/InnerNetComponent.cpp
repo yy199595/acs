@@ -141,7 +141,10 @@ namespace Tendo
         if (iter != this->mRemoteClients.end())
         {
             this->mRemoteClients.erase(iter);
-            LOG_WARN("close server address : " << address);
+			DisConnectEvent disConnectEvent;
+			disConnectEvent.Addr = address;
+			this->mApp->Dispatch(&disConnectEvent);
+			LOG_WARN("close server address : " << address);
         }
     }
 
@@ -161,15 +164,10 @@ namespace Tendo
         auto iter = this->mRemoteClients.find(address);
         if (iter != this->mRemoteClients.end())
         {
-            std::shared_ptr<InnerNetTcpClient> innerNetClient = iter->second;
-            if (innerNetClient != nullptr)
+            if (iter->second != nullptr)
             {
-                innerNetClient->StartClose();
+				iter->second->StartClose();
             }
-            this->mRemoteClients.erase(iter);
-			DisConnectEvent disConnectEvent;
-			disConnectEvent.Addr = address;
-			this->mApp->Dispatch(&disConnectEvent);
         }
     }
 

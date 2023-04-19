@@ -74,7 +74,8 @@ namespace Tendo
 		{
 			while(!this->mNodeComponent->HasServer(server))
 			{
-				if(this->Query(server) <= 0 && !this->mNodeComponent->HasServer(server))
+				this->Query(server);
+				if(!this->mNodeComponent->HasServer(server))
 				{
 					LOG_WARN("------ wait [" << server << "] start ------");
 					this->mApp->GetTaskComponent()->Sleep(1000 * 2);
