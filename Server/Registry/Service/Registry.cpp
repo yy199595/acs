@@ -57,7 +57,7 @@ namespace Tendo
 	{
 		const std::string & server = request.str();
 		LOG_ERROR_RETURN_CODE(!server.empty(), XCode::CallArgsError);
-		std::string sql = fmt::format("SELECT * from %s where server_name='%s'", this->mTable, server);
+		std::string sql = fmt::format("SELECT * from {0} where server_name='{1}'", this->mTable, server);
 		std::shared_ptr<Mysql::ICommand> queryCommand = std::make_shared<Mysql::QueryCommand>(sql);
 		std::shared_ptr<Mysql::Response> mysqlResponse = this->mMysqlComponent->Run(queryCommand);
 		if(!mysqlResponse->IsOk())
