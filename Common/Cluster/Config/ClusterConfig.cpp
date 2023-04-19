@@ -74,11 +74,11 @@ namespace Tendo
         {
             if(start)
             {
-                if(value.second)
-                {
-                    services.emplace_back(value.first);
-                }
-                continue;
+				if(value.second)
+				{
+					services.emplace_back(value.first);
+				}
+				continue;
             }
             services.emplace_back(value.first);
         }

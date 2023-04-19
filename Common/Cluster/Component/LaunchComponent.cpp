@@ -117,7 +117,6 @@ namespace Tendo
         const ServerConfig* config = ServerConfig::Inst();
         const ClusterConfig* clusterConfig = ClusterConfig::Inst();
         TimerComponent* timerComponent = this->GetComponent<TimerComponent>();
-        LocationComponent* locationComponent = this->GetComponent<LocationComponent>();
 
         std::string location, httpLocation;
         std::vector<std::string> components;

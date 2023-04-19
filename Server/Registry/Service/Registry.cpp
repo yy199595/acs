@@ -66,25 +66,20 @@ namespace Tendo
 		}
 		for(size_t index = 0; index < mysqlResponse->ArraySize(); index++)
 		{
-			Json::Reader jsonReader;
+			server::registry message;
 			const std::string & json = mysqlResponse->Get(index);
-			if(!jsonReader.ParseJson(json))
+			if(!util::JsonStringToMessage(json, &message).ok())
 			{
-				return XCode::ParseJsonFailure;
+				return XCode::JsonCastProtoFailure;
 			}
-			long long time = 0;
-			std::string name, rpc, http, gate;
-			jsonReader.GetMember("server_name", name);
-			jsonReader.GetMember("rpc_address", rpc);
-			jsonReader.GetMember("http_address", http);
-			jsonReader.GetMember("gate_address", gate);
-			jsonReader.GetMember("last_ping_time", time);
 			s2s::server::info * info = response.add_list();
 			{
-				info->set_server_name(name);
-				info->mutable_listens()->insert({"rpc", rpc});
-				info->mutable_listens()->insert({"http", http});
-				info->mutable_listens()->insert({"gate", gate});
+				info->set_server_id(message.server_id());
+				info->set_server_name(message.server_name());
+				info->set_group_id(message.server_group_id());
+				info->mutable_listens()->insert({"rpc", message.rpc_address()});
+				info->mutable_listens()->insert({"http", message.http_address()});
+				info->mutable_listens()->insert({"gate", message.gate_address()});
 			}
 		}
 		return XCode::Successful;

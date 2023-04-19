@@ -70,13 +70,14 @@ namespace Tendo
 		while(true);
 
 		std::vector<std::string> servers;
-		ClusterConfig::Inst()->GetServers(servers);
-		for(const std::string & server : servers)
+		std::vector<RpcService *> components;
+		this->mApp->GetComponents<RpcService>(components);
+		for(RpcService * rpcService1 : components)
 		{
+			const std::string & server = rpcService1->GetServer();
 			while(!this->mNodeComponent->HasServer(server))
 			{
-				this->Query(server);
-				if(!this->mNodeComponent->HasServer(server))
+				if(this->Query(server) <= 0)
 				{
 					LOG_WARN("------ wait [" << server << "] start ------");
 					this->mApp->GetTaskComponent()->Sleep(1000 * 2);
