@@ -122,9 +122,9 @@ namespace Tendo
 		{
 			return XCode::CallArgsError;
 		}
-		std::shared_ptr<Mysql::QueryCommand> queryCommand
-			= std::make_shared<Mysql::QueryCommand>(sql);
-		if(!this->mMysqlComponent->Execute(queryCommand))
+		std::shared_ptr<Mysql::SqlCommand> command
+			= std::make_shared<Mysql::SqlCommand>(sql);
+		if(!this->mMysqlComponent->Execute(command))
 		{
 			return XCode::SaveToMysqlFailure;
 		}
