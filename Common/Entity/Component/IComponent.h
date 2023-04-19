@@ -63,18 +63,19 @@ namespace Tendo
 		virtual void OnLastFrameUpdate() = 0;
 	};
 
-	class IInnerClient
+	template<typename T>
+	class IEvent
 	{
 	public:
-		virtual void OnDisConnect(const std::string & address) = 0;
+		virtual void Invoke(const T * message) = 0;
 	};
 
-	class IOuterClient
+	class DisConnectEvent
 	{
 	public:
-		virtual void OnDisConnect(const std::string & address) = 0;
+		std::string Addr;
 	};
-
+	
 	class ILuaRegister
 	{
 	public:

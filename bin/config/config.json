@@ -24,7 +24,7 @@
         "name": "root",
         "passwd": "199595yjz."
     },
-    "registry": "tcp://127.0.0.1:7788",
+    "registry": "tcp://43.143.76.75:7788",
     "Client": {
         "lua": {
             "common": "script/Common",
@@ -61,13 +61,13 @@
     "HttpServer": {
         "address": {
             "rpc": "tcp://127.0.0.1:7790",
-            "http": "http://127.0.0.1:80",
+            "http": "http://127.0.0.1:8080",
             "debug": "http://127.0.0.1:8088"
         },
         "lua": {
             "common": "script/Common",
             "component":"script/Component",
-            "module": "script/Server/HttpServer"           
+            "module": "script/Server/HttpServer"
         }
     },
     "ChatServer": {

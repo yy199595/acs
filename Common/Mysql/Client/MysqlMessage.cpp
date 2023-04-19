@@ -21,7 +21,7 @@ namespace Mysql
 		this->mIsOk = false;
 	}
 
-    int Response::WriteToLua(lua_State* lua)
+    int Response::WriteToLua(lua_State* lua) const
     {
         lua_pushboolean(lua, this->IsOk());
         if (this->mResults.empty())

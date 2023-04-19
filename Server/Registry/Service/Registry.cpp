@@ -90,13 +90,13 @@ namespace Tendo
 		}
 		std::shared_ptr<RedisResponse> response =
 				this->mRedisLuaComponent->Call(func, json, false);
-		LOG_ERROR_RETURN_CODE(response && response->GetNumber() >= 0, XCode::SaveToRedisFailure);
+		LOG_ERROR_RETURN_CODE(response && response->GetNumber() == 0, XCode::SaveToRedisFailure);
 
-		this->mServers.emplace(address);
+		this->mServers.emplace(address, request.name());
 		RpcService * node = this->mApp->GetService<Node>();
-		for(const std::string & address : this->mServers)
+		for(auto iter = this->mServers.begin(); iter != this->mServers.end(); iter++)
 		{
-			node->Send(address, "Join", request);
+			node->Send(iter->first, "Join", request);
 		}
 		return XCode::Successful;
 	}
@@ -116,5 +116,17 @@ namespace Tendo
 	void Registry::OnSecondUpdate(int tick)
 	{
 
+	}
+
+	void Registry::Invoke(const DisConnectEvent* message)
+	{
+		const std::string & address = message->Addr;
+		auto iter = this->mServers.find(address);
+		if(iter == this->mServers.end())
+		{
+			return;
+		}
+		const std::string & name = iter->second;
+		LOG_WARN(name << " [" << address << "] disconnect ");
 	}
 }

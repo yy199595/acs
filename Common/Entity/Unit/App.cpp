@@ -20,7 +20,7 @@ using namespace std::chrono;
 namespace Tendo
 {
 
-	App::App() : Unit(0),
+	App::App() : EventUnit(0),
         mThreadId(std::this_thread::get_id()),
 				 mStartTime(Helper::Time::NowMilTime())
 	{

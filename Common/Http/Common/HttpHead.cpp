@@ -92,4 +92,14 @@ namespace Http
         }
         return 0;
     }
+
+	void Head::Keys(std::vector<std::string>& keys) const
+	{
+		keys.reserve(this->mHeads.size());
+		auto iter = this->mHeads.begin();
+		for(; iter != this->mHeads.end(); iter++)
+		{
+			keys.emplace_back(iter->first);
+		}
+	}
 }

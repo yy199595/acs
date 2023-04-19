@@ -167,6 +167,9 @@ namespace Tendo
                 innerNetClient->StartClose();
             }
             this->mRemoteClients.erase(iter);
+			DisConnectEvent disConnectEvent;
+			disConnectEvent.Addr = address;
+			this->mApp->Dispatch(&disConnectEvent);
         }
     }
 

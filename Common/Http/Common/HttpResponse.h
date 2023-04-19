@@ -16,17 +16,21 @@ namespace Json
 
 namespace Http
 {
-	class IResponse : public IStream, public Tcp::ProtoMessage, public ILuaWrite
+	class IResponse : public IStream, public Tcp::ProtoMessage
     {
 	 public:
 		IResponse();
-    public:
+
+		virtual int WriteToLua(lua_State* lua) const = 0;
+
+	public:
 		Head & Header() { return this->mHead; }
 		void SetCode(HttpStatus code) { this->mCode = (int)code; }
         HttpStatus Code() const { return (HttpStatus)this->mCode; }
 		const std::string & GetError() const { return this->mError; }
 	 protected:
 		virtual int OnWriterContent(std::ostream & buff) = 0;
+
 		virtual int OnReadContent(const char * str, size_t size) = 0;
 		virtual HttpStatus GetCode() { return (HttpStatus)this->mCode; }
 	 public:
@@ -46,7 +50,7 @@ namespace Http
     class DataResponse : public IResponse
     {
 	 protected:
-		int WriteToLua(lua_State* lua) final;
+		int WriteToLua(lua_State* lua) const final;
 		int OnWriterContent(std::ostream &buff) final;
 		int OnReadContent(const char *str, size_t size) final;
     public:
@@ -80,7 +84,7 @@ namespace Http
 		int OnReadContent(const char *str, size_t size) final;
 	 private:
 		 size_t ContentSize() final;
-		 int WriteToLua(lua_State* lua)final;
+		 int WriteToLua(lua_State* lua) const final;
 	 private:
 		size_t mCurSize;
 		size_t mFileSize;

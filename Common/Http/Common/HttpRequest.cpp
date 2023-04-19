@@ -134,15 +134,15 @@ namespace Http
         return HTTP_READ_COMPLETE;
     }
 
-    bool GetRequest::WriteLua(lua_State* lua) const
+    int GetRequest::WriteToLua(lua_State* lua) const
     {
         rapidjson::Document document;
         if (this->WriteDocument(&document))
         {
             values::pushValue(lua, document);
-            return true;
+            return 1;
         }
-        return false;         
+        return 0;
     }
 
     bool GetRequest::WriteDocument(rapidjson::Document* document) const
@@ -199,7 +199,7 @@ namespace Http
 		return HTTP_READ_SOME;
     }
 
-    bool PostRequest::WriteLua(lua_State* lua) const
+    int PostRequest::WriteToLua(lua_State* lua) const
     {
         const char * str = this->mContent.c_str();
         const size_t length = this->mContent.size();
@@ -207,9 +207,9 @@ namespace Http
         {
             rapidjson::extend::StringStream s(str, length);
             values::pushDecoded(lua, s);
-            return true;
+            return 1;
         }
-        return false;
+        return 0;
     }
 
     bool PostRequest::WriteDocument(rapidjson::Document* document) const

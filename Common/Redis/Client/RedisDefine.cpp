@@ -239,9 +239,8 @@ namespace Tendo
 		this->mType = RedisRespType::REDIS_NONE;
 	}
 
-	int RedisResponse::WriteToLua(lua_State* lua)
+	int RedisResponse::WriteToLua(lua_State* lua) const
 	{
-
 		switch (this->GetType())
 		{
 		case RedisRespType::REDIS_NUMBER:

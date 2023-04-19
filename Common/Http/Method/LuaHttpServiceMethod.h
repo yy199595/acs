@@ -16,7 +16,7 @@ namespace Tendo
         LuaHttpServiceMethod(const HttpMethodConfig * config);
     public:
         bool IsLuaMethod() const { return true; }
-        int Invoke(const Http::Request &request, Http::DataResponse &response) final;
+        int Invoke(const Http::Request & request, Http::DataResponse &response) final;
 
     private:
         int Call(Http::DataResponse & response);

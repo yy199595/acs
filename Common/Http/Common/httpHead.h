@@ -7,6 +7,7 @@
 #include<string>
 #include<istream>
 #include<ostream>
+#include<vector>
 #include<unordered_map>
 #include"Http/Client/Http.h"
 
@@ -45,9 +46,8 @@ namespace Http
 		bool Get(const std::string& k, int& v) const;
         bool Get(const std::string& k, long long& v) const;
         bool Get(const std::string & k, std::string & v) const;
-        Iter End() { return this->mHeads.end(); }
-        Iter Begin() { return this->mHeads.begin(); }
-        size_t HeadCount() const { return this->mHeads.size(); }
+		void Keys(std::vector<std::string> & keys) const;
+		size_t HeadCount() const { return this->mHeads.size(); }
     public:
         int OnRead(std::istream & buffer) final;
         int OnWrite(std::ostream & buffer) final;

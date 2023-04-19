@@ -8,7 +8,7 @@
 #include"Rpc/Service/PhysicalRpcService.h"
 namespace Tendo
 {
-	class Gate final : public PhysicalRpcService
+	class Gate final : public PhysicalRpcService, public IEvent<DisConnectEvent>
 	{
 	 public:
 		Gate();
@@ -22,6 +22,7 @@ namespace Tendo
 		bool OnInit() final;
 		bool OnStart() final;
         void OnClose() final;
+		void Invoke(const DisConnectEvent *message) final;
 		int OnLogin(long long userId, const std::string & token);
 	 private:
 		int mIndex;

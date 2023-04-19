@@ -2,8 +2,7 @@
 // Created by MyPC on 2023/4/12.
 //
 
-#ifndef APP_DEFINE_H
-#define APP_DEFINE_H
+#pragma once;
 
 extern "C" {
 #include <lauxlib.h>
@@ -15,7 +14,5 @@ extern "C" {
 class ILuaWrite
 {
 public:
-	virtual int WriteToLua(lua_State* lua) = 0;
+	virtual int WriteToLua(lua_State* lua) const = 0;
 };
-
-#endif //APP_DEFINE_H

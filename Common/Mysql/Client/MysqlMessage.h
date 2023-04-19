@@ -28,7 +28,7 @@ namespace Mysql
 		void SetError(const char * str);
 		bool IsOk() const { return this->mIsOk;}
 		int TaskId() const { return this->mTaskId; }
-        int WriteToLua(lua_State* lua) final;
+        int WriteToLua(lua_State* lua) const final;
         const std::string & GetError() const { return this->mError;}
 	public:
 		void Add(const std::string & json);

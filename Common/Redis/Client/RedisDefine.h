@@ -104,7 +104,7 @@ namespace Tendo
     public:
         bool IsOk();
 		void Clear();
-        int WriteToLua(lua_State* lua) final;
+        int WriteToLua(lua_State* lua) const final;
     private:
         int OnDecodeArray(std::istream & os);
         int OnReceiveFirstLine(std::istream & os);

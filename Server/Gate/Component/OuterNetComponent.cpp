@@ -24,7 +24,6 @@ namespace Tendo
 	bool OuterNetComponent::LateAwake()
 	{
 		this->mMaxHandlerCount = 500;
-		this->mGateService = this->mApp->GetService<Gate>();
 		this->mNodeComponent = this->GetComponent<LocationComponent>();
 		this->mInnerNetComponent = this->GetComponent<InnerNetComponent>();
 		ServerConfig::Inst()->GetMember("message", "outer", this->mMaxHandlerCount);
@@ -200,6 +199,9 @@ namespace Tendo
 #ifdef __DEBUG__
 		LOG_WARN("remove client [" << address << "]" << CodeConfig::Inst()->GetDesc(code));
 #endif
+		DisConnectEvent disConnectEvent;
+		disConnectEvent.Addr = address;
+		this->mApp->Dispatch(&disConnectEvent);
         auto iter = this->mGateClientMap.find(address);
         if (iter != this->mGateClientMap.end())
         {
@@ -220,7 +222,6 @@ namespace Tendo
 			{
 				this->mUserAddressMap.erase(iter2);
 			}
-			this->mGateService->Send(userId, "Logout");
 		}
     }
 

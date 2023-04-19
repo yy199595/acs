@@ -49,7 +49,6 @@ namespace Tendo
 		int mMaxHandlerCount;
 		unsigned int mSumCount;
 		unsigned int mWaitCount;
-		class RpcService * mGateService;
 		class LocationComponent * mNodeComponent;
 #ifdef __DEBUG__
 		std::unordered_map<int, long long> mRecords;

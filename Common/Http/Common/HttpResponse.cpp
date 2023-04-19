@@ -91,7 +91,7 @@ namespace Http
 		return 0;
 	}
 
-	int DataResponse::WriteToLua(lua_State* lua)
+	int DataResponse::WriteToLua(lua_State* lua) const
 	{
 		lua_createtable(lua, 0, 5);
 		{
@@ -111,15 +111,18 @@ namespace Http
 		}
 		{
 			lua_pushstring(lua, "head");
-			lua_createtable(lua, 0, this->mHead.HeadCount());
-			auto iter = this->mHead.Begin();
-			for (; iter != this->mHead.End(); iter++)
+			std::vector<std::string> keys;
+			this->mHead.Keys(keys);
+			lua_createtable(lua, 0, keys.size());
+			for(const std::string & key : keys)
 			{
-				const char* key = iter->first.c_str();
-				const char* value = iter->second.c_str();
-				lua_pushstring(lua, key);
-				lua_pushstring(lua, value);
-				lua_rawset(lua, -3);
+				std::string value;
+				if(this->mHead.Get(key, value))
+				{
+					lua_pushstring(lua, key.c_str());
+					lua_pushstring(lua, value.c_str());
+					lua_rawset(lua, -3);
+				}
 			}
 			lua_rawset(lua, -3);
 		}
@@ -235,7 +238,7 @@ namespace Http
 		return this->mFileSize;
 	}
 
-	int FileResponse::WriteToLua(lua_State* lua)
+	int FileResponse::WriteToLua(lua_State* lua) const
 	{
 		lua_pushinteger(lua, this->mCode);
 		return 1;

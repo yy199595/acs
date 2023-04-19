@@ -19,7 +19,7 @@ namespace Tendo
         this->mLuaComponent = App::Inst()->GetComponent<LuaScriptComponent>();
     }
 
-    int LuaHttpServiceMethod::Invoke(const Http::Request &request, Http::DataResponse &response)
+    int LuaHttpServiceMethod::Invoke(const Http::Request & request, Http::DataResponse &response)
     {
         lua_State* lua = this->mLuaComponent->GetLuaEnv();
         if(this->mConfig->IsAsync && !Lua::Function::Get(lua, "coroutine", "http"))
@@ -36,7 +36,7 @@ namespace Tendo
             response.Json(HttpStatus::OK, document);
             return XCode::CallFunctionNotExist;          
         }
-        if (!request.WriteLua(lua))
+        if (request.WriteToLua(lua) == 0)
         {
             lua_pushnil(lua);
         }

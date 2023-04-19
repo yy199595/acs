@@ -25,8 +25,10 @@ namespace Tendo
 	class Component
 	{
 	 public:
-		Component();
+		explicit Component();
 		Component(const Component &) = delete;
+		Component(const Component &&) = delete;
+		Component & operator =(const Component &) = delete;
 	public:
 		friend class Unit;
 		friend class ComponentFactory;

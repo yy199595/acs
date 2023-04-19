@@ -167,4 +167,9 @@ namespace Tendo
 		CONSOLE_LOG_ERROR("user:" << userId << " logout");
 		return XCode::Successful;
 	}
+
+	void Gate::Invoke(const DisConnectEvent* message)
+	{
+		const std::string & address = message->Addr;
+	}
 }

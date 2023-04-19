@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include"Network/Tcp/Asio.h"
-#include"Entity/Unit/Unit.h"
+#include"Entity/Unit/EventUnit.h"
 #include"Server/Config/ServerConfig.h"
 #include"Server/Config/ServerPath.h"
 #include"Core/Singleton/Singleton.h"
@@ -24,7 +24,7 @@ namespace Tendo
 {
 	class RpcService;
 	class ProtoComponent;
-    class App final : public Unit, public Singleton<App>
+    class App final : public EventUnit, public Singleton<App>
 	{
 	 public:
 		explicit App();
