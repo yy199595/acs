@@ -39,19 +39,21 @@ namespace Tendo
 
     int Node::Join(const s2s::server::info &request)
 	{
-		const std::string & server = request.name();
+		int id = request.server_id();
+		const std::string & server = request.server_name();
 		if (!ClusterConfig::Inst()->GetConfig(server))
 		{
 			LOG_ERROR("not find cluster config : " << server);
 			return XCode::Failure;
 		}
-		ServerData data(server);
-		auto iter = request.listens().begin();
-		for(; iter != request.listens().end(); iter++)
+		LocationUnit * locationUnit = this->mNodeComponent->GetOrCreateServer(id, server);
 		{
-			data.Add(iter->first, iter->second);
+			auto iter = request.listens().begin();
+			for(; iter != request.listens().end(); iter++)
+			{
+				locationUnit->Add(iter->first, iter->second);
+			}
 		}
-		this->mNodeComponent->AddServer(data);
 		std::vector<IServerChange *> components;
 		this->mApp->GetComponents(components);
 		for(IServerChange * listen : components)
@@ -63,15 +65,9 @@ namespace Tendo
 
     int Node::Exit(const s2s::server::info &request)
 	{
-		std::string rpc;
-		auto iter = request.listens().find("rpc");
-		if (iter == request.listens().end())
-		{
-			return XCode::CallArgsError;
-		}
-		rpc = iter->second;
-		const std::string& name = request.name();
-		this->mNodeComponent->DelServer(name, rpc);
+		int id = request.server_id();
+		const std::string& name = request.server_name();
+		this->mNodeComponent->DelServer(id, name);
 
 
 		std::vector<IServerChange*> components;
@@ -163,9 +159,8 @@ namespace Tendo
 
 		s2s::server::info request;
 		{
-			request.set_name(config->Name());
-			config->GetLocation("rpc", address);
-			request.mutable_listens()->insert({ "rpc", address});
+			request.set_server_name(config->Name());
+			request.set_server_id(config->ServerId());
 		}
 		int code = rpcService->Call(address, "UnRegister", request);
 		const std::string & desc = CodeConfig::Inst()->GetDesc(code);

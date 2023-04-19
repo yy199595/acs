@@ -29,7 +29,6 @@ namespace Tendo
 		void OnRecord(Json::Writer& document) final;
 		inline ServiceMethodRegister& GetMethodRegistry() { return this->mMethodRegister; }
 	private:
-		bool mIsHandle;
 		unsigned int mSumCount;
 		unsigned int mWaitCount;
 		ServiceMethodRegister mMethodRegister;

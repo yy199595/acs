@@ -59,6 +59,9 @@
         "Service": {
             "Node": true,
             "Registry": true
-        }
+        },
+        "Component": [
+            "RegistryComponent"
+        ]
     }
 }

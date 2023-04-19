@@ -31,7 +31,7 @@ namespace Tendo
 	 private:
 		std::string mTable;
 		class MysqlDBComponent * mMysqlComponent;
-		std::unordered_map<std::string, std::string> mServers;
+		std::unordered_map<std::string, s2s::server::info *> mServers;
     };
 }
 

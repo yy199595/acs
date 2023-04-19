@@ -11,8 +11,6 @@
 #include"Util/File/DirectoryHelper.h"
 #include"Util/File/FileHelper.h"
 #include"Rpc/Component/LocationComponent.h"
-#include "Timer/Timer/ElapsedTimer.h"
-#include"Cluster/Config/ClusterConfig.h"
 #include"Registry/Component/RegistryComponent.h"
 namespace Tendo
 {
@@ -32,8 +30,8 @@ namespace Tendo
     {
         std::string account,password;
         Http::Parameter parameter(request.Content());
-        LOG_ERROR_RETURN_CODE(parameter.Get("account,", account), XCode::CallArgsError);
-        LOG_ERROR_RETURN_CODE(parameter.Get("password", password), XCode::CallArgsError);
+		LOG_ERROR_CHECK_ARGS(parameter.Get("account,", account));
+		LOG_ERROR_CHECK_ARGS(parameter.Get("password", password));
         return XCode::Successful;
     }
 
@@ -58,28 +56,23 @@ namespace Tendo
 
 	int ServerWeb::Stop(Json::Writer & response)
 	{
-		std::string rpc;
-		ServerConfig::Inst()->GetLocation("rpc", rpc);
+		std::string server;
+		const ServerConfig * config = ServerConfig::Inst();
 		RpcService * rpcService = this->mApp->GetService<Node>();
 		RegistryComponent * pRegistryComponent = this->GetComponent<RegistryComponent>();
 		LocationComponent * pLocationComponent = this->GetComponent<LocationComponent>();
 
-		std::vector<std::string> servers;
-		std::vector<std::string> rpcListens;
-		ClusterConfig::Inst()->GetServers(servers);
-
-		for(const std::string & server : servers)
+		pRegistryComponent->Query(server);
+		std::vector<LocationUnit *> servers;
+		pLocationComponent->GetAllServer(servers);
+		for(LocationUnit * locationUnit : servers)
 		{
-			rpcListens.clear();
-			pRegistryComponent->Query(server);
-			pLocationComponent->GetServer(server, rpcListens);
-			for(const std::string & address : rpcListens)
+			if(locationUnit->GetId() != config->ServerId())
 			{
-				if(address != rpc)
-				{
-					int code = rpcService->Call(address, "Stop");
-					response.Add(address).Add(CodeConfig::Inst()->GetDesc(code));
-				}
+				std::string address;
+				locationUnit->Get("rpc", address);
+				int code = rpcService->Call(address, "Stop");
+				response.Add(address).Add(CodeConfig::Inst()->GetDesc(code));
 			}
 		}
 		this->mApp->GetTaskComponent()->Start(&App::Stop, this->mApp, 0);

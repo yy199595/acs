@@ -4,9 +4,10 @@ message server
 {
     message info
     {
-        string name = 1;
-        int64 ping_time = 2;
-        map<string, string> listens = 3;
+        int32 server_id = 1;
+        int32 group_id = 2;
+        string server_name = 3;
+        map<string, string> listens = 4;
     }
     message list
     {

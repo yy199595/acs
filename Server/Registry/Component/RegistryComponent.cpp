@@ -38,7 +38,9 @@ namespace Tendo
 
 		s2s::server::info message;
 		{
-			message.set_name(config->Name());
+			message.set_server_name(config->Name());
+			message.set_group_id(config->GroupId());
+			message.set_server_id(config->ServerId());
 			std::vector<std::string> listens;
 			config->GetListen(listens);
 			for (const std::string& name: listens)
@@ -57,11 +59,6 @@ namespace Tendo
 			int code = rpcService->Call(this->mAddress, func, message);
 			if (code == XCode::Successful)
 			{
-				ServerData serverData(rpcService->GetServer());
-				{
-					serverData.Add("rpc", this->mAddress);
-					this->mNodeComponent->AddServer(serverData);
-				}
 				const std::string& server = rpcService->GetServer();
 				LOG_INFO("register to [" << this->mAddress << "] successful");
 				break;
@@ -104,28 +101,19 @@ namespace Tendo
 		{
 			const s2s::server::info & info = response->list(index);
 			{
-				ServerData data(info.name());
-				for (auto iter = info.listens().begin(); iter != info.listens().end(); iter++)
+				int id = info.server_id();
+				const std::string & name = info.server_name();
+				LocationUnit * locationUnit = this->mNodeComponent->GetOrCreateServer(id, name);
 				{
-					data.Add(iter->first, iter->second);
-					const std::string& listen = iter->first;
-					const std::string& address = iter->second;
+					for (auto iter = info.listens().begin(); iter != info.listens().end(); iter++)
+					{
+						const std::string& listen = iter->first;
+						const std::string& address = iter->second;
+						locationUnit->Add(listen, address);
+					}
 				}
-				this->mNodeComponent->AddServer(data);
 			}
 		}
 		return response->list_size();
-	}
-
-	int RegistryComponent::Query()
-	{
-		int count = 0;
-		std::vector<std::string> servers;
-		ClusterConfig::Inst()->GetServers(servers);
-		for (const std::string& server: servers)
-		{
-			count += this->Query(server);
-		}
-		return count;
 	}
 }

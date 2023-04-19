@@ -23,13 +23,11 @@ namespace Tendo
     {
         this->mSumCount = 0;
         this->mWaitCount = 0;
-        this->mIsHandle = false;
     }
 
     void PhysicalRpcService::WaitAllMessageComplete()
     {
         int time = 0;
-        this->mIsHandle = false;
         AsyncMgrComponent *taskComponent = this->mApp->GetTaskComponent();
         while (this->mWaitCount > 0)
         {
@@ -42,7 +40,7 @@ namespace Tendo
     }
     int PhysicalRpcService::Invoke(const std::string &func, std::shared_ptr<Msg::Packet> message)
     {
-        if (!this->IsStartService() || !this->mIsHandle)
+        if (!this->IsStartService())
         {
             LOG_ERROR(this->GetName() << " is not start");
             return XCode::CallServiceNotFound;
@@ -91,7 +89,6 @@ namespace Tendo
 		{
 			return false;
 		}
-		this->mIsHandle = true;
 		LuaScriptComponent* luaScriptComponent = this->GetComponent<LuaScriptComponent>();
 		if (luaScriptComponent != nullptr)
 		{

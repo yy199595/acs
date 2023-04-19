@@ -2,7 +2,7 @@ syntax = "proto3";
 package server;
 message registry
 {
-    string server_id = 1; //服务器id
+    int32 server_id = 1; //服务器id
     string server_name = 2; //服务器名字
     string rpc_address = 3; //rpc地址
     string http_address = 4; //http地址

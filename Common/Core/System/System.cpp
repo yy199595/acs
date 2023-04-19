@@ -23,7 +23,7 @@ namespace Tendo
         {
             System::IsInit = true;
             System::mExePath = argv[0];
-            System::mConfigPath = "./config/config.json";
+            System::mConfigPath = "./config/run/all.json";
             System::mWorkPath = fmt::format("{0}/", getcwd(nullptr, 0));         
             Helper::Str::ReplaceString(System::mWorkPath, "\\", "/");           
             return true;

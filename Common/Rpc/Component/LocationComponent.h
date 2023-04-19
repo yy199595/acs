@@ -55,8 +55,9 @@ namespace Tendo
         LocationComponent() = default;
         ~LocationComponent() = default;
     public:
-        bool AddServer(const ServerData & serverData);
-		bool DelServer(const std::string & server, const std::string & rpc);
+		bool DelServer(int id, const std::string & name);
+		void GetAllServer(std::vector<LocationUnit *> & servers);
+		LocationUnit * GetOrCreateServer(int id, const std::string & name);
 	public:
 		bool DelUnit(long long userId);
 		bool DelUnit(const std::string & server, long long userId);
@@ -69,8 +70,9 @@ namespace Tendo
 		bool GetServer(const std::string & server, std::vector<std::string> & servers, const std::string & listen = "rpc");
 	private:
 		//std::unordered_map<int, std::unique_ptr<LocationUnit>> mServers;
+		std::unordered_map<std::string, std::vector<int>> mServerNames;
+		std::unordered_map<int, std::unique_ptr<LocationUnit>> mServers;
 		std::unordered_map<long long, std::unique_ptr<LocationUnit>> mClients;
-		std::unordered_map<std::string, std::vector<ServerData>> mServers;
 	};
 }
 

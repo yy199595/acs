@@ -12,8 +12,7 @@ namespace Tendo
 	public:
 		RegistryComponent();
 	public:
-		int Query();
-		int Query(const std::string & server);
+		int Query(const std::string & server = "");
 	private:
 		bool LateAwake() final;
 		void OnLocalComplete() final;

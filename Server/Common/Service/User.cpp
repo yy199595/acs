@@ -38,7 +38,7 @@ namespace Tendo
 			const s2s::server::info & info = request.list(index);
 			{
 				//TODO
-				const std::string& server = info.name();
+				const std::string& server = info.server_name();
 				//const std::string& address = info.rpc();
 				//this->mNodeComponent->AddRpcServer(server, userId, address);
 			}

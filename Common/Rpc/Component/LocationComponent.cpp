@@ -52,52 +52,37 @@ namespace Tendo
 
 namespace Tendo
 {
-    bool LocationComponent::AddServer(const ServerData& serverData)
-    {
-		const std::string & name = serverData.Name();
-		const std::string & rpc = serverData.RpcAddress();
-		auto iter = this->mServers.find(name);
-		if(iter == this->mServers.end())
-		{
-			std::vector<ServerData> list;
-			this->mServers.emplace(name, list);
-		}
-
-		std::vector<ServerData> & list = this->mServers[name];
-		auto iter1 = std::find(list.begin(), list.end(), rpc);
-		if(iter1 != list.end())
-		{
-			return false;
-		}
-		list.emplace_back(serverData);
-		return true;
-    }
-
-	bool LocationComponent::DelServer(const std::string & server, const std::string & rpc)
+	bool LocationComponent::DelServer(int id, const std::string& name)
 	{
-		auto iter = this->mServers.find(server);
+		auto iter = this->mServers.find(id);
 		if (iter == this->mServers.end())
 		{
 			return false;
 		}
-		std::vector<ServerData>& list = iter->second;
-		list.erase(std::remove_if(list.begin(), list.end(), [&](const ServerData& info)
+		this->mServers.erase(iter);
+		auto iter1 = this->mServerNames.find(name);
+		if(iter1 != this->mServerNames.end())
 		{
-			return info.RpcAddress() == rpc;
-		}), list.end());
+			std::remove(iter1->second.begin(), iter1->second.end(), id);
+		}
 		return true;
 	}
 
     bool LocationComponent::GetServer(const std::string & server, std::string & address, const std::string & listen)
 	{
-		auto iter = this->mServers.find(server);
-		if (iter == this->mServers.end() || iter->second.empty())
+		auto iter = this->mServerNames.find(server);
+		if (iter == this->mServerNames.end() || iter->second.empty())
 		{
 			return false;
 		}
 		int size = (int)iter->second.size();
-		int idx = Helper::Math::Random<int>(0, size - 1);
-		return iter->second[idx].Get(listen, address);
+		int id = iter->second[Helper::Math::Random<int>(0, size - 1)];
+		auto iter1 = this->mServers.find(id);
+		if(iter1 == this->mServers.end())
+		{
+			return false;
+		}
+		return iter1->second->Get(listen, address);
 	}
 
     bool LocationComponent::GetServer(const std::string & name, long long userId, std::string & address)
@@ -157,31 +142,71 @@ namespace Tendo
 		return iter->second->Get(servers);
     }
 
-	bool LocationComponent::GetServer(const string& server, std::vector<std::string>& servers, const std::string & listen)
+	bool LocationComponent::HasServer(const string& server) const
 	{
-		auto iter = this->mServers.find(server);
-		if(iter == this->mServers.end())
+		auto iter = this->mServerNames.find(server);
+		if(iter == this->mServerNames.end())
 		{
 			return false;
 		}
-		std::string address;
-		for (const ServerData & data : iter->second)
+		return iter->second.size() > 0;
+	}
+
+	LocationUnit* LocationComponent::GetOrCreateServer(int id, const std::string& name)
+	{
+		LocationUnit* ret = nullptr;
+		auto iter = this->mServers.find(id);
+		if (iter != this->mServers.end())
 		{
-			if(data.Get(listen, address))
+			ret = iter->second.get();
+		}
+		else
+		{
+			std::unique_ptr<LocationUnit> locationUnit
+					= std::make_unique<LocationUnit>(name, id);
+			ret = locationUnit.get();
+			this->mServers.emplace(id, std::move(locationUnit));
+			auto iter = this->mServerNames.find(name);
+			if(iter == this->mServerNames.end())
 			{
+				std::vector<int> servers;
+				this->mServerNames.emplace(name, servers);
+			}
+			this->mServerNames[name].emplace_back(id);
+		}
+		return ret;
+	}
+
+	bool LocationComponent::GetServer(const string& server, std::vector<std::string>& servers, const string& listen)
+	{
+		auto iter = this->mServerNames.find(server);
+		if(iter == this->mServerNames.end())
+		{
+			return false;
+		}
+		for(int id : iter->second)
+		{
+			auto iter1 = this->mServers.find(id);
+			if(iter1 != this->mServers.end())
+			{
+				std::string address;
+				iter1->second->Get(listen, address);
 				servers.emplace_back(address);
 			}
 		}
 		return !servers.empty();
 	}
 
-	bool LocationComponent::HasServer(const string& server) const
+	void LocationComponent::GetAllServer(std::vector<LocationUnit*>& servers)
 	{
-		auto iter = this->mServers.find(server);
-		if(iter == this->mServers.end())
+		servers.reserve(this->mServers.size());
+		auto iter = this->mServers.begin();
+		for(; iter != this->mServers.end(); iter++)
 		{
-			return false;
+			servers.emplace_back(iter->second.get());
 		}
-		return iter->second.size() > 0;
+		std::sort(servers.begin(), servers.end(), [](LocationUnit * p1, LocationUnit * p2)->bool {
+			return p1->GetId() > p2->GetId();
+		});
 	}
 }

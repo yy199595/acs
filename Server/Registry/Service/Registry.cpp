@@ -81,7 +81,7 @@ namespace Tendo
 			jsonReader.GetMember("last_ping_time", time);
 			s2s::server::info * info = response.add_list();
 			{
-				info->set_name(name);
+				info->set_server_name(name);
 				info->mutable_listens()->insert({"rpc", rpc});
 				info->mutable_listens()->insert({"http", http});
 				info->mutable_listens()->insert({"gate", gate});
@@ -97,7 +97,6 @@ namespace Tendo
 			return XCode::OnlyUseTcpProtocol;
 		}
 		server::registry message;
-		message.set_server_name(request.name());
 		auto iter1 = request.listens().find("rpc");
 		auto iter2 = request.listens().find("http");
 		auto iter3 = request.listens().find("gate");
@@ -113,6 +112,9 @@ namespace Tendo
 		{
 			message.set_gate_address(iter3->second);
 		}
+		message.set_server_id(request.server_id());
+		message.set_server_name(request.server_name());
+		message.set_server_group_id(request.group_id());
 		message.set_last_ping_time(Helper::Time::NowSecTime());
 		message.set_last_time_str(Helper::Time::GetDateString());
 
@@ -128,11 +130,11 @@ namespace Tendo
 		{
 			return XCode::SaveToMysqlFailure;
 		}
-		this->mServers.emplace(address, request.name());
-		RpcService * node = this->mApp->GetService<Node>();
+		this->mServers.emplace(address, request.New());
+		RpcService * rpcService = this->mApp->GetService<Node>();
 		for(auto iter = this->mServers.begin(); iter != this->mServers.end(); iter++)
 		{
-			node->Send(iter->first, "Join", request);
+			rpcService->Send(iter->first, "Join", request);
 		}
 		return XCode::Successful;
 	}
@@ -162,7 +164,19 @@ namespace Tendo
 		{
 			return;
 		}
-		const std::string & name = iter->second;
-		LOG_WARN(name << " [" << address << "] disconnect ");
+		const s2s::server::info * info = iter->second;
+		this->mServers.erase(iter);
+		LOG_WARN(info->server_name() << " [" << address << "] disconnect ");
+		{
+			s2s::server::info request;
+			request.set_server_id(info->server_id());
+			request.set_server_name(info->server_name());
+			RpcService * rpcService = this->mApp->GetService<Node>();
+			for(auto iter = this->mServers.begin(); iter != this->mServers.end(); iter++)
+			{
+				rpcService->Send(iter->first, "Exit", request);
+			}
+		}
+		delete info;
 	}
 }
