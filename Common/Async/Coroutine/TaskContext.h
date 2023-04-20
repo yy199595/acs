@@ -51,7 +51,7 @@ namespace Tendo
 		Finish,
 	};
 
-	class AsyncMgrComponent;
+	class CoroutineComponent;
 
 	struct Stack
 	{

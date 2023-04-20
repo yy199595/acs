@@ -5,7 +5,7 @@
 #include"Server/Config/ServerPath.h"
 #include"Core/Singleton/Singleton.h"
 #include"Server/Config/ServiceConfig.h"
-#include"Async/Component/AsyncMgrComponent.h"
+#include"Async/Component/CoroutineComponent.h"
 #include"Timer/Component/TimerComponent.h"
 #include"Log/Component/LogComponent.h"
 
@@ -32,7 +32,7 @@ namespace Tendo
         inline float GetFps() const { return this->mLogicFps; }
 		inline LogComponent* GetLogger() { return this->mLogComponent; }
 		inline Asio::Context & MainThread() { return *this->mMainContext; }
-		inline AsyncMgrComponent* GetTaskComponent() { return this->mTaskComponent; }
+		inline CoroutineComponent* GetTaskComponent() { return this->mTaskComponent; }
 		inline TimerComponent* GetTimerComponent() { return this->mTimerComponent; }
 		inline ProtoComponent * GetMsgComponent() { return this->mMessageComponent; }
 		inline bool IsMainContext(const Asio::Context * io) const { return this->mMainContext.get() == io;}
@@ -58,7 +58,7 @@ namespace Tendo
 		ServerStatus mStatus;
         std::thread::id mThreadId;
         const long long mStartTime;
-        AsyncMgrComponent* mTaskComponent;
+        CoroutineComponent* mTaskComponent;
 		LogComponent* mLogComponent;
 		TimerComponent* mTimerComponent;
 		ProtoComponent * mMessageComponent;

@@ -1,6 +1,6 @@
 ﻿#include"Entity/Unit/App.h"
 #include"Timer/Component/TimerComponent.h"
-#include"Async/Component/AsyncMgrComponent.h"
+#include"Async/Component/CoroutineComponent.h"
 #include"Lua/Component/LuaScriptComponent.h"
 #include"Entity/Component/UnitMgrComponent.h"
 #include"Telnet/Component/ConsoleComponent.h"
@@ -59,7 +59,7 @@ using namespace Tendo;
 void RegisterComponent()
 {
 // common
-    ComponentFactory::Add<AsyncMgrComponent>("AsyncMgrComponent");
+    ComponentFactory::Add<CoroutineComponent>("CoroutineComponent");
     ComponentFactory::Add<TimerComponent>("TimerComponent");
     ComponentFactory::Add<LogComponent>("LogComponent");
     ComponentFactory::Add<UnitMgrComponent>("UnitMgrComponent");

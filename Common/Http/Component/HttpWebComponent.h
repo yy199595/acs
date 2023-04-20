@@ -49,7 +49,7 @@ namespace Tendo
         std::string mHomePath;
         unsigned int mSumCount;
         unsigned int mWaitCount;
-        class AsyncMgrComponent * mTaskComponent;
+        class CoroutineComponent * mTaskComponent;
 		class DispatchComponent * mDispatchComponent;
 		std::unordered_map<std::string, unsigned int> mTasks;
         std::unordered_map<std::string, std::string> mTypeContent;

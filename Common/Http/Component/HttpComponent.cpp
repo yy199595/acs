@@ -305,12 +305,6 @@ namespace Tendo
 		}
 	}
 
-	bool HttpComponent::Send(const string& address, const std::shared_ptr<Msg::Packet>& message)
-	{
-
-
-	}
-
 	bool HttpComponent::Send(const std::shared_ptr<Http::Request>& request)
 	{
 		return false;

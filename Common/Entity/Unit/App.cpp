@@ -36,7 +36,7 @@ namespace Tendo
 
 	bool App::LoadComponent()
 	{
-		this->mTaskComponent = this->GetOrAddComponent<AsyncMgrComponent>();
+		this->mTaskComponent = this->GetOrAddComponent<CoroutineComponent>();
 		this->mLogComponent = this->GetOrAddComponent<LogComponent>();
 		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
 		this->mMessageComponent = this->GetOrAddComponent<ProtoComponent>();

@@ -37,7 +37,7 @@ namespace Tendo
     private:
 		unsigned int mWaitCount;
 		class InnerRpcComponent * mNetComponent;
-		class AsyncMgrComponent* mTaskComponent;
+		class CoroutineComponent* mTaskComponent;
 		class TimerComponent* mTimerComponent;
 		class OuterNetComponent* mOuterComponent;
 	};

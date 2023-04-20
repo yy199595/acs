@@ -7,8 +7,8 @@ tmux split-window -v
 
 tmux split-window -h
 tmux split-window -v
-tmux select-layout even-vertical #垂直布局
-#tmux select-layout even-horizontal #水平布局
+#tmux select-layout even-vertical #垂直布局
+tmux select-layout even-horizontal #水平布局
 
 
 # Run a process in each pane

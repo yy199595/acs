@@ -41,7 +41,7 @@ namespace Tendo
 
 namespace Tendo
 {
-	class AsyncMgrComponent;
+	class CoroutineComponent;
     class CoroutineGroup : public std::enable_shared_from_this<CoroutineGroup>
 	{
 	 public:
@@ -52,6 +52,6 @@ namespace Tendo
         void WaitAll(std::vector<TaskContext *> & taskContexts);
     private:
 		unsigned int mCoroutineId;
-		AsyncMgrComponent* mCorComponent;
+		CoroutineComponent* mCorComponent;
 	};
 }

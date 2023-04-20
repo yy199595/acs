@@ -3,7 +3,7 @@
 #include"Entity/Unit/App.h"
 #include"Entity/Unit/Unit.h"
 #include"Http/Component/HttpComponent.h"
-#include"Async/Component/AsyncMgrComponent.h"
+#include"Async/Component/CoroutineComponent.h"
 
 #include"Telnet/Component/ServerCmdComponent.h"
 namespace Tendo
@@ -35,7 +35,7 @@ namespace Tendo
 	{
 		this->mCommandUnit = new Unit(1);
 		this->mHttpComponent = this->GetComponent<HttpComponent>();
-		this->mTaskComponent = this->GetComponent<AsyncMgrComponent>();
+		this->mTaskComponent = this->GetComponent<CoroutineComponent>();
 		this->mTaskComponent->Start(&ConsoleComponent::Update, this);
 
 		this->mCommandUnit->AddComponent("server", std::make_unique<ServerCmdComponent>());

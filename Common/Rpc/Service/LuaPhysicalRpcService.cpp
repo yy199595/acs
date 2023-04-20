@@ -77,7 +77,7 @@ namespace Tendo
     void LuaPhysicalRpcService::WaitAllMessageComplete()
     {
         this->mIsHandlerMessage = false;
-        AsyncMgrComponent *taskComponent = this->mApp->GetTaskComponent();
+        CoroutineComponent *taskComponent = this->mApp->GetTaskComponent();
         while (this->mWaitCount > 0)
         {
             taskComponent->Sleep(100);

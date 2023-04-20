@@ -1,6 +1,6 @@
 ﻿#include"DispatchComponent.h"
 
-#include"Async/Component/AsyncMgrComponent.h"
+#include"Async/Component/CoroutineComponent.h"
 #include"Rpc/Lua/LuaServiceMethod.h"
 #include"Server/Config/ServiceConfig.h"
 #include"InnerNetComponent.h"
@@ -33,7 +33,7 @@ namespace Tendo
         this->mTimerComponent = this->mApp->GetTimerComponent();
 		this->mNetComponent = this->GetComponent<InnerRpcComponent>();
 		this->mOuterComponent = this->GetComponent<OuterNetComponent>();
-		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<AsyncMgrComponent>());
+		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<CoroutineComponent>());
 		return true;
 	}
 

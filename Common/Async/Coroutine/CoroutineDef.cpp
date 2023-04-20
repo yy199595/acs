@@ -75,7 +75,7 @@ namespace Tendo
     void CoroutineGroup::WaitAll()
     {
         this->mCorComponent = App::Inst()->GetTaskComponent();
-		this->mCorComponent->Yield(this->mCoroutineId);
+		this->mCorComponent->YieldCoroutine(this->mCoroutineId);
     }
 
     void CoroutineGroup::WaitAll(std::vector<TaskContext *> &taskContexts)
@@ -88,7 +88,7 @@ namespace Tendo
                 assert(taskContext->mGroup == nullptr);
                 taskContext->mGroup = this->shared_from_this();
             }
-			this->mCorComponent->Yield(this->mCoroutineId);
+			this->mCorComponent->YieldCoroutine(this->mCoroutineId);
         }
     }
 }

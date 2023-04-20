@@ -17,7 +17,7 @@ namespace Tendo
 		if(this->mIsLock)
 		{
 			this->mWaitTasks.push(this->mTaskComponent->GetContextId());
-			this->mTaskComponent->Yield();
+			this->mTaskComponent->YieldCoroutine();
 		}
 		this->mIsLock = true;
 	}

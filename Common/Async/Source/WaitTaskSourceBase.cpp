@@ -45,7 +45,7 @@ namespace Tendo
 		if(this->mState == TaskState::TaskReady)
         {
             this->mState = TaskState::TaskAwait;
-			App::Inst()->GetTaskComponent()->Yield(this->mCorId);
+			App::Inst()->GetTaskComponent()->YieldCoroutine(this->mCorId);
             return true;
         }
         return false;

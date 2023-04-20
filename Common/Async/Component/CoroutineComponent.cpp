@@ -1,4 +1,4 @@
-﻿#include"AsyncMgrComponent.h"
+﻿#include"CoroutineComponent.h"
 #include"Entity/Unit/App.h"
 #include"Timer/Component/TimerComponent.h"
 #ifdef __DEBUG__
@@ -9,20 +9,20 @@ namespace Tendo
 {
 	void MainEntry(tb_context_from_t context)
 	{
-		AsyncMgrComponent * taskComponent = (AsyncMgrComponent*)context.priv;
+		CoroutineComponent * taskComponent = (CoroutineComponent*)context.priv;
 		if (taskComponent != nullptr)
 		{
 			taskComponent->RunTask(context.ctx);
 		}
 	}
 
-	AsyncMgrComponent::AsyncMgrComponent()
+	CoroutineComponent::CoroutineComponent()
 	{
 		this->mRunContext = nullptr;
 		this->mMainContext = nullptr;
 	}
 
-	void AsyncMgrComponent::RunTask(tb_context_t context)
+	void CoroutineComponent::RunTask(tb_context_t context)
 	{
 		this->mMainContext = context;
 		if (this->mRunContext != nullptr)
@@ -39,7 +39,7 @@ namespace Tendo
 		tb_context_jump(this->mMainContext, nullptr);
 	}
 
-	bool AsyncMgrComponent::Awake()
+	bool CoroutineComponent::Awake()
 	{
 		this->mRunContext = nullptr;
 		for (Stack& stack : this->mSharedStack)
@@ -52,20 +52,20 @@ namespace Tendo
         return true;
 	}
 
-	void AsyncMgrComponent::Sleep(long long ms)
+	void CoroutineComponent::Sleep(long long ms)
 	{
         TimerComponent * timerComponent = this->mApp->GetTimerComponent();
         if(timerComponent != nullptr && ms > 0)
         {
             unsigned int id = this->mRunContext->mCoroutineId;
             StaticMethod *sleepMethod = NewMethodProxy(
-                &AsyncMgrComponent::Resume, this, id);
+					&CoroutineComponent::Resume, this, id);
             timerComponent->AddTimer(ms, sleepMethod);
-			this->Yield();
+			this->YieldCoroutine();
         }
 	}
 
-	void AsyncMgrComponent::ResumeContext(TaskContext* co)
+	void CoroutineComponent::ResumeContext(TaskContext* co)
 	{
 		co->mState = CorState::Running;
 		Stack& stack = mSharedStack[co->sid];
@@ -91,7 +91,7 @@ namespace Tendo
 		}
 	}
 
-	bool AsyncMgrComponent::Yield()
+	bool CoroutineComponent::YieldCoroutine()
 	{
 		assert(this->mRunContext);
 		assert(this->mRunContext->mState == CorState::Running);
@@ -104,7 +104,7 @@ namespace Tendo
 		return true;
 	}
 
-	void AsyncMgrComponent::Resume(unsigned int id)
+	void CoroutineComponent::Resume(unsigned int id)
 	{
         assert(this->mApp->IsMainThread());
         if(this->mCorPool.Get(id) == nullptr)
@@ -115,7 +115,7 @@ namespace Tendo
         this->mResumeContexts.push(id);
 	}
 
-	TaskContext* AsyncMgrComponent::MakeContext(StaticMethod* func)
+	TaskContext* CoroutineComponent::MakeContext(StaticMethod* func)
 	{
 		TaskContext* coroutine = this->mCorPool.Pop();
 		if (coroutine != nullptr)
@@ -129,18 +129,18 @@ namespace Tendo
 		return coroutine;
 	}
 
-	bool AsyncMgrComponent::Yield(unsigned int& mCorId)
+	bool CoroutineComponent::YieldCoroutine(unsigned int& mCorId)
 	{
 		if (this->mRunContext != nullptr)
 		{
 			mCorId = this->mRunContext->mCoroutineId;
-			return this->Yield();
+			return this->YieldCoroutine();
 		}
 		LOG_FATAL("not coroutine context");
 		return false;
 	}
 
-	void AsyncMgrComponent::SaveStack(unsigned int id)
+	void CoroutineComponent::SaveStack(unsigned int id)
 	{
 		if (id == 0) return;
 		TaskContext* coroutine = this->mCorPool.Get(id);
@@ -159,7 +159,7 @@ namespace Tendo
         memcpy(coroutine->mStack.p, coroutine->mContext, coroutine->mStack.size);
     }
 
-	void AsyncMgrComponent::OnSystemUpdate()
+	void CoroutineComponent::OnSystemUpdate()
 	{
 		unsigned int contextId = 0;
         while(!this->mResumeContexts.empty())
@@ -186,7 +186,7 @@ namespace Tendo
             this->mResumeContexts.pop();
         }
 	}
-	void AsyncMgrComponent::OnLastFrameUpdate()
+	void CoroutineComponent::OnLastFrameUpdate()
 	{
 		while (!this->mLastQueues.empty())
 		{

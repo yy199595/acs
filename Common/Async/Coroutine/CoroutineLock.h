@@ -19,7 +19,7 @@ namespace Tendo
 	private:
 		bool mIsLock;
 		std::queue<unsigned int> mWaitTasks;
-		class AsyncMgrComponent* mTaskComponent;
+		class CoroutineComponent * mTaskComponent;
 	};
 
 	class AutoCoroutineLock

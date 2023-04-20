@@ -25,7 +25,7 @@ namespace Tendo
 	 private:
 		void StartComponents(long long objectId);
 	 private:
-		class AsyncMgrComponent* mCorComponent;
+		class CoroutineComponent* mCorComponent;
 		std::unordered_map<long long, std::unique_ptr<Unit>> mGameObjects;
 	};
 	template<typename T>

@@ -38,7 +38,7 @@ namespace Tendo
 	 private:
 		class Unit * mCommandUnit;
 		class HttpComponent * mHttpComponent;
-		class AsyncMgrComponent* mTaskComponent;
+		class CoroutineComponent* mTaskComponent;
 	};
 }
 

@@ -4,5 +4,5 @@ IF NOT EXIST build (
 )
 cd ./build
 
-cmake ../CMakeLists.txt
+cmake -DCMAKE_BUILD_TYPE=Debug ../CMakeLists.txt
 pause

@@ -11,10 +11,10 @@
 
 namespace Tendo
 {
-	class AsyncMgrComponent final : public Component, public ISystemUpdate, public ILastFrameUpdate
+	class CoroutineComponent final : public Component, public ISystemUpdate, public ILastFrameUpdate
 	{
 	 public:
-		AsyncMgrComponent();
+		CoroutineComponent();
 	 public:
 		template<typename F, typename T, typename ... Args>
 		unsigned int Start(F&& f, T* o, Args&& ... args)
@@ -31,13 +31,10 @@ namespace Tendo
 			this->Resume(co->mCoroutineId);
 			return co->mCoroutineId;
 		}
-
-    private:
-		TaskContext* MakeContext(StaticMethod* func);
 	 public:
-		bool Yield();
+		bool YieldCoroutine();
 
-		bool Yield(unsigned int& mCorId);
+		bool YieldCoroutine(unsigned int& mCorId);
 
 		void Sleep(long long ms);
 
@@ -60,7 +57,8 @@ namespace Tendo
 	 private:
 		void SaveStack(unsigned int id);
 		void ResumeContext(TaskContext* co);
-	 private:
+        TaskContext* MakeContext(StaticMethod* func);
+    private:
 		TaskContextPool mCorPool;
 		TaskContext* mRunContext;
 		tb_context_t mMainContext;
