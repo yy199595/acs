@@ -44,10 +44,11 @@ namespace Tendo
 		//        luaRegister.BeginNewTable();
 		//        lua_getglobal(this->mLuaEnv, "ServerConfig");
 		{
-			lua_getglobal(this->mLuaEnv, "os");
-			lua_pushstring(this->mLuaEnv, "workdir");
-			lua_pushstring(this->mLuaEnv, System::WorkPath().c_str());
-			lua_rawset(this->mLuaEnv, -3);
+			Lua::ClassProxyHelper os(this->mLuaEnv, "os");
+
+			os.PushMember("workdir", System::WorkPath());
+			os.PushStaticFunction("ms", Helper::Time::NowMilTime);
+			os.PushStaticFunction("time", Helper::Time::NowSecTime);
 		}
 		Lua::ClassProxyHelper luaRegister0(this->mLuaEnv, "App");
 		luaRegister0.BeginRegister<App>();

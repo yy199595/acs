@@ -4,6 +4,7 @@
 
 #ifndef GAMEKEEPER_LUATASKSOURCE_H
 #define GAMEKEEPER_LUATASKSOURCE_H
+#include"Rpc/Client/Message.h"
 #include"Async/Source/TaskSource.h"
 #include"Http/Common//HttpResponse.h"
 #include"Lua/Engine/Define.h"
@@ -14,18 +15,21 @@ namespace Tendo
     class LuaServiceTaskSource final
     {
     public:
-        explicit LuaServiceTaskSource(Http::DataResponse* message);
-        explicit LuaServiceTaskSource(std::shared_ptr<Message> message);
-    public:
+		explicit LuaServiceTaskSource(Http::DataResponse* message);
+		explicit LuaServiceTaskSource(Msg::Packet * packet, std::shared_ptr<Message> & message);
+	public:
 		static int SetRpc(lua_State * lua);
         static int SetHttp(lua_State* lua);
+	private:
+		void WriteRpcResponse(lua_State * lua);
     public:
         int Await();
     private:
         int mCode;
-        Http::DataResponse* mHttpData;
-        TaskSource<void> mTaskSource;
-        std::shared_ptr<Message> mRpcData;
+		Msg::Packet * mRpcData;
+		TaskSource<void> mTaskSource;
+		Http::DataResponse* mHttpData;
+		std::shared_ptr<Message> mMessage;
     };
 }
 

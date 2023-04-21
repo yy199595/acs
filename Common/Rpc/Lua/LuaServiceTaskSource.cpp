@@ -15,10 +15,10 @@ namespace Tendo
         this->mCode = XCode::LuaCoroutineWait;
     }
 
-	LuaServiceTaskSource::LuaServiceTaskSource(std::shared_ptr<Message> message)
-		: mHttpData(nullptr), mRpcData(std::move(message))
+	LuaServiceTaskSource::LuaServiceTaskSource(Msg::Packet* packet, std::shared_ptr<Message> & message)
+		: mHttpData(nullptr), mRpcData(packet), mMessage(message)
 	{
-
+		this->mCode = XCode::LuaCoroutineWait;
 	}
 
     int LuaServiceTaskSource::Await()
@@ -30,22 +30,53 @@ namespace Tendo
         return this->mCode;
     }
 
+	void LuaServiceTaskSource::WriteRpcResponse(lua_State* lua)
+	{
+		this->mCode = luaL_checkinteger(lua, 2);
+		if(this->mCode == XCode::Successful)
+		{
+			switch(this->mRpcData->GetProto())
+			{
+				case Msg::Porto::Json:
+				case Msg::Porto::String:
+				{
+					if (lua_istable(lua, 3))
+					{
+						std::string json;
+						Lua::RapidJson::Read(lua, 3, &json);
+						this->mRpcData->SetContent(json);
+					}
+					else if (lua_isstring(lua, 3))
+					{
+						size_t len = 0;
+						const char* str = lua_tolstring(lua, 3, &len);
+						this->mRpcData->SetContent({ str, len });
+					}
+				}
+					break;
+				case Msg::Porto::Protobuf:
+				{
+					if (lua_istable(lua, 3) && this->mMessage != nullptr)
+					{
+						MessageEncoder messageEncoder(lua);
+						if (!messageEncoder.Encode(this->mMessage, 3))
+						{
+							this->mCode = XCode::ParseMessageError;
+						}
+						this->mRpcData->WriteMessage(this->mMessage.get());
+					}
+				}
+					break;
+			}
+		}
+	}
+
 	int LuaServiceTaskSource::SetRpc(lua_State* lua)
 	{
 		LuaServiceTaskSource* luaServiceTaskSource =
 			Lua::UserDataParameter::Read<LuaServiceTaskSource*>(lua, 1);
-		luaServiceTaskSource->mCode = luaL_checkinteger(lua, 2);
-		if (luaServiceTaskSource->mCode == XCode::Successful)
-		{
-			if (lua_istable(lua, 3) && luaServiceTaskSource->mRpcData != nullptr)
-			{
-				MessageEncoder messageEncoder(lua);
-				if (!messageEncoder.Encode(luaServiceTaskSource->mRpcData, 3))
-				{
-					luaServiceTaskSource->mCode = XCode::ParseMessageError;
-				}
-			}
-		}       
+
+		luaServiceTaskSource->WriteRpcResponse(lua);
 		luaServiceTaskSource->mTaskSource.SetResult();
 		return 1;
 	}

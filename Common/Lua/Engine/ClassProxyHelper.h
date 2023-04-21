@@ -28,6 +28,9 @@ namespace Lua
 		template<typename T, typename Base>
 		void PushBaseClass();
 
+		template<typename T>
+		void PushMember(const char * name, const T & value);
+
 		template<typename T, typename Ret, typename ... Args>
 		void PushMemberFunction(const char* name, Ret(T::*func)(Args ...));
 
@@ -199,5 +202,16 @@ namespace Lua
 			lua_setmetatable(this->mLua, -2);
 		}
 		lua_setglobal(this->mLua, this->mName.c_str());
+	}
+
+	template<typename T>
+	void ClassProxyHelper::PushMember(const char* name, const T& value)
+	{
+		lua_getglobal(this->mLua, this->mName.c_str());
+		if (lua_istable(this->mLua, -1))
+		{
+			Lua::Parameter::Write<T>(this->mLua, value);
+			lua_setfield(this->mLua, -2, name);
+		}
 	}
 }

@@ -16,8 +16,8 @@ namespace Tendo
 		bool IsLuaMethod() final { return true; }
 		int Invoke(Msg::Packet & message) final;
 	 private:
-		int Call(int count, Msg::Packet & message);
-		int CallAsync(int count, Msg::Packet & message);
+		int Call(Msg::Packet & message);
+		int CallAsync(Msg::Packet & message);
 	 private:
 		lua_State* mLuaEnv;
         const RpcMethodConfig * mConfig;

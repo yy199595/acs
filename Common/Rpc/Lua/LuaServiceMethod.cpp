@@ -2,6 +2,7 @@
 #include"Lua/Engine/Function.h"
 #include"Entity/Unit/App.h"
 #include"Lua/Module/LuaModule.h"
+#include"Util/Json/Lua/Json.h"
 #include"Server/Config/ServiceConfig.h"
 #include"Rpc/Lua/LuaServiceTaskSource.h"
 #include"Proto/Component/ProtoComponent.h"
@@ -18,29 +19,55 @@ namespace Tendo
 		this->mLuaEnv = this->mLuaComponent->GetLuaEnv();
 	}
 
-	int LuaServiceMethod::Call(int count, Msg::Packet & message)
+	int LuaServiceMethod::Call(Msg::Packet & message)
 	{
-		if (lua_pcall(this->mLuaEnv, count, 2, 0) != 0)
+		if (lua_pcall(this->mLuaEnv, 1, 2, 0) != 0)
 		{
-            message.GetHead().Add("error", lua_tostring(this->mLuaEnv, -1));
+			const char * err = lua_tostring(this->mLuaEnv, -1);
+			message.GetHead().Add("error", err);
+			LOG_ERROR("call lua " << this->mConfig->FullName << " error=" << err);
 			return XCode::CallLuaFunctionFail;
 		}
-		int code = lua_tointeger(this->mLuaEnv, -2);
+		int code = lua_tointeger(this->mLuaEnv, 1);
 		const std::string & res = this->mConfig->Response;
 		if (code != XCode::Successful || res.empty())
 		{
 			return code;
 		}
-		std::shared_ptr<Message> response = this->mMsgComponent->Read(this->mLuaEnv, res, -1);
-		if(response == nullptr)
+		switch(message.GetProto())
 		{
-			return XCode::CreateProtoFailure;
+			case Msg::Porto::Json:
+			case Msg::Porto::String:
+			{
+				if (lua_istable(this->mLuaEnv, 3))
+				{
+					std::string json;
+					Lua::RapidJson::Read(this->mLuaEnv, 3, &json);
+					message.SetContent(json);
+				}
+				else if (lua_isstring(this->mLuaEnv, 3))
+				{
+					size_t len = 0;
+					const char* str = lua_tolstring(this->mLuaEnv, 3, &len);
+					message.SetContent({ str, len });
+				}
+			}
+				break;
+			case Msg::Porto::Protobuf:
+			{
+				std::shared_ptr<Message> response = this->mMsgComponent->Read(this->mLuaEnv, res, -1);
+				if(response == nullptr)
+				{
+					return XCode::CreateProtoFailure;
+				}
+				message.WriteMessage(response.get());
+			}
+				break;
 		}
-        message.WriteMessage(response.get());
 		return XCode::Successful;
 	}
 
-	int LuaServiceMethod::CallAsync(int count, Msg::Packet & message)
+	int LuaServiceMethod::CallAsync(Msg::Packet & message)
     {
 		std::shared_ptr<Message> response;
 		if (!this->mConfig->Response.empty())
@@ -51,22 +78,14 @@ namespace Tendo
 			}
 		}
 		std::unique_ptr<LuaServiceTaskSource> luaTaskSource =
-                std::make_unique<LuaServiceTaskSource>(response);
+                std::make_unique<LuaServiceTaskSource>(&message, response);
         Lua::UserDataParameter::Write(this->mLuaEnv, luaTaskSource.get());
-        if (lua_pcall(this->mLuaEnv, count + 2, 1, 0) != 0)
+        if (lua_pcall(this->mLuaEnv, 3, 1, 0) != 0)
         {           
             message.GetHead().Add("error", lua_tostring(this->mLuaEnv, -1));
             return XCode::CallLuaFunctionFail;
         }
-        int code = luaTaskSource->Await();
-        if (code == XCode::Successful && response != nullptr)
-        {
-            if (message.WriteMessage(response.get()))
-            {
-                return XCode::SerializationFailure;
-            }
-        }     
-        return code;
+        return luaTaskSource->Await();
     }
 
 	int LuaServiceMethod::Invoke(Msg::Packet & message)
@@ -89,31 +108,60 @@ namespace Tendo
 		{
 			return XCode::CallServiceNotFound;
 		}
-        std::shared_ptr<Message> request;
-        if (!this->mConfig->Request.empty())
-        {
-			if(!this->mMsgComponent->New(this->mConfig->Request, request))
+		lua_createtable(this->mLuaEnv, 0, 3);
+		{
+			long long userId = 0;
+			if (message.GetHead().Get("id", userId))
 			{
-				return false;
+				lua_pushinteger(this->mLuaEnv, userId);
+				lua_setfield(this->mLuaEnv, -2, "userId");
 			}
-            if (!message.ParseMessage(request.get()))
-            {
-                return XCode::ParseMessageError;
-            }
-        }
-        int count = 1;
-        long long userId = 0;
-        message.GetHead().Get("id", userId);
-        lua_pushinteger(this->mLuaEnv, userId);
-        if (request != nullptr)
-        {
-            count++;
-            this->mMsgComponent->Write(this->mLuaEnv, *request);
-        }
+			{
+				const std::string& from = message.From();
+				lua_pushlstring(this->mLuaEnv, from.c_str(), from.size());
+				lua_setfield(this->mLuaEnv, -2, "from");
+			}
+			{
+				switch (message.GetProto())
+				{
+					case Msg::Porto::Json:
+					{
+						const std::string& json = message.GetBody();
+						Lua::RapidJson::Write(this->mLuaEnv, json);
+					}
+						break;
+					case Msg::Porto::String:
+					{
+						const std::string& str = message.GetBody();
+						lua_pushlstring(this->mLuaEnv, str.c_str(), str.size());
+					}
+						break;
+					case Msg::Porto::Protobuf:
+					{
+						if (!this->mConfig->Request.empty())
+						{
+							std::shared_ptr<Message> request;
+							if (!this->mMsgComponent->New(this->mConfig->Request, request))
+							{
+								return false;
+							}
+							if (!message.ParseMessage(request.get()))
+							{
+								return XCode::ParseMessageError;
+							}
+							this->mMsgComponent->Write(this->mLuaEnv, *request);
+							lua_setfield(this->mLuaEnv, -2, "message");
+						}
+					}
+						break;
+				}
+			}
+		}
+
         if (!this->mConfig->IsAsync)
         {
-            return this->Call(count, message);
+            return this->Call(message);
         }
-        return this->CallAsync(count, message);
+        return this->CallAsync(message);
     }
 }

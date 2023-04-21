@@ -152,10 +152,10 @@ int Debug::Backtrace(std::string &trace)
 
 void Debug::Console(Debug::Level color, const std::string &log)
 {
-#ifdef __DEBUG__
-	std::string title = " <" + ServerConfig::Inst()->Name() + "> ";
-	(const_cast<std::string&>(log)).insert(0, title);
-#endif
+//#ifdef __DEBUG__
+//	std::string title = " <" + ServerConfig::Inst()->Name() + "> ";
+//	(const_cast<std::string&>(log)).insert(0, title);
+//#endif
     switch (color)
     {
         case Debug::Level::info:

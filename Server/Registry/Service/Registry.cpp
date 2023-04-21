@@ -47,7 +47,7 @@ namespace Tendo
 	{
 		std::shared_ptr<server::registry> message = std::make_shared<server::registry>();
 		this->mTable = message->GetTypeName();
-		std::vector<std::string> keys {"rpc_address", "server_name" };
+		std::vector<std::string> keys {"server_id"};
 		std::shared_ptr<Mysql::ICommand> command =
 				std::make_shared<Mysql::CreateTabCommand>(this->mTable, message, keys);
 		return this->mMysqlComponent->Execute(command);

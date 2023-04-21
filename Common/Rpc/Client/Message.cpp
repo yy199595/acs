@@ -307,20 +307,22 @@ namespace Msg
 
 
     bool Packet::WriteMessage(const Message* message)
-    {
-        this->mBody.clear();
-        if (message == nullptr)
-        {
-            return true;
-        }
-        switch (this->mProto)
-        {
-        case Msg::Porto::Protobuf:
-            return message->SerializeToString(&mBody);
-        case Msg::Porto::Json:
-            return Helper::Protocol::GetJson(*message, &mBody);
-        }
-        CONSOLE_LOG_FATAL("proto error write error");
-        return false;
-    }
+	{
+		this->mBody.clear();
+		if (message == nullptr)
+		{
+			return true;
+		}
+		switch (this->mProto)
+		{
+			case Msg::Porto::String:
+				break;
+			case Msg::Porto::Protobuf:
+				return message->SerializeToString(&mBody);
+			case Msg::Porto::Json:
+				return Helper::Protocol::GetJson(*message, &mBody);
+		}
+		CONSOLE_LOG_FATAL("proto error write error");
+		return false;
+	}
 }
