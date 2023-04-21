@@ -1,42 +1,52 @@
 
 local AccountService = {}
 local tabName = "user.account_info"
-local Mongo = require"Server.MongoComponent"
-
+local mysql = require("Server.MysqlClient")
+local redis = require("Server.RedisComponent")
 function AccountService.Awake()
     print("启动账号服务")
-    return true
+    return mysql.NewTable(0, tabName, {
+        pb = tabName,
+        keys = { "account "}
+    })
 end
 
 function AccountService.Register(request)
-    assert(request.account, "register account is nil")
-    assert(request.password, "register password is nil")
-    assert(request.phone_num, "register phone number is nil")
 
-    local account = request.account
-    local userInfo = Mongo.QueryOnce(tabName, {
-        _id = request.account
-    })
-    if userInfo ~= nil then
-        return XCode.AccountAlreadyExists, "账号已经存在"
+    table.print(request)
+    local message = rapidjson.decode(request.message)
+    assert(message.account, "register account is nil")
+    assert(message.password, "register password is nil")
+    assert(message.phone_num, "register phone number is nil")
+
+    local id = mysql.Open()
+    local result = mysql.QueryOne(id, tabName, {
+        "user_id"
+    }, { account = message.account })
+    if result ~= nil then
+        return XCode.AccountAlreadyExists
     end
+
     local nowTime = os.time()
-    local user_id = Guid.Create()
-    Log.Info(string.format("start register account %s", account))
-    local str = string.format("%s%d%d", request.address, nowTime, user_id)
-
-    request.user_id = user_id
-    request.login_time = nowTime
-    request.create_time = nowTime
-    request._id = requestInfo.account
-    request.token = Md5.ToString(str)
-    Log.Info("register account : ", rapidjson.encode(request))
-    if Mongo.InsertOnce(tabName, request, request.user_id) == XCode.Successful then
-        Log.Warn("注册账号", account, "成功, 玩家id=", user_id)
-        return XCode.Successful
+    local userId = redis.AddCounter("user_id")
+    local str = string.format("%s%d%d", ip, nowTime, userId)
+    local ip = string.match(request.from, "http://(%d+.%d+.%d+.%d+):%d+")
+    local data = {
+        user_id = userId,
+        login_time = nowTime,
+        create_time = nowTime,
+        account = message.account,
+        password = message.password,
+        phone_num = message.phone_num,
+        last_login_ip = ip,
+        token = Md5.ToString(str)
+    }
+    result = mysql.Insert(id, tabName, data)
+    if not result then
+        return XCode.SaveToMysqlFailure
     end
-    Log.Error("保存数据到mongodb失败,注册失败")
-    return XCode.Failure, "保存数据到mongodb失败"
+    Log.Info("register account : ", rapidjson.encode(message))
+    return XCode.Successful
 end
 
 function AccountService.Login(request)

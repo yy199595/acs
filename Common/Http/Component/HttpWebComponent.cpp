@@ -40,7 +40,7 @@ namespace Tendo
 			this->AddStaticDir(dir);
 		}
         std::vector<HttpService *> httpServices;
-        this->mTaskComponent = this->mApp->GetTaskComponent();
+        this->mTaskComponent = this->mApp->GetCoroutine();
         ServerConfig::Inst()->GetPath("home", this->mHomePath);
 		this->mDispatchComponent = this->GetComponent<DispatchComponent>();
 		return this->mApp->GetComponents(httpServices) && this->StartListen("http");

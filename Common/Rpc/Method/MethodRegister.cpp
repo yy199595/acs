@@ -11,7 +11,7 @@ namespace Tendo
 {
 	bool ServiceMethodRegister::AddMethod(std::shared_ptr<ServiceMethod> method)
 	{
-        ProtoComponent * protoComponent = App::Inst()->GetMsgComponent();
+        ProtoComponent * protoComponent = App::Inst()->GetProto();
         RpcService * serviceComponent = this->mComponent->Cast<RpcService>();
         LOG_CHECK_RET_FALSE(serviceComponent != nullptr);
 

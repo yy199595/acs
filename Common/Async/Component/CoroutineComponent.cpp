@@ -54,7 +54,7 @@ namespace Tendo
 
 	void CoroutineComponent::Sleep(long long ms)
 	{
-        TimerComponent * timerComponent = this->mApp->GetTimerComponent();
+        TimerComponent * timerComponent = this->mApp->GetTimer();
         if(timerComponent != nullptr && ms > 0)
         {
             unsigned int id = this->mRunContext->mCoroutineId;

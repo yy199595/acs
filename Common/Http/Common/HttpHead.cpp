@@ -102,4 +102,17 @@ namespace Http
 			keys.emplace_back(iter->first);
 		}
 	}
+
+	int Head::WriteToLua(lua_State* lua) const
+	{
+		lua_createtable(lua, 0, this->mHeads.size());
+		for(const auto & item : this->mHeads)
+		{
+			const std::string & key = item.first;
+			const std::string & val = item.second;
+			lua_pushlstring(lua, val.c_str(), val.size());
+			lua_setfield(lua, -2, key.c_str());
+		}
+		return 0;
+	}
 }

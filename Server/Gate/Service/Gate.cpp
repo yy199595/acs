@@ -12,8 +12,6 @@
 #include"Gate/Component/OuterNetComponent.h"
 #include"Rpc/Component/LocationComponent.h"
 
-#include"Redis/Client/RedisDefine.h"
-#include"Redis/Component/RedisComponent.h"
 namespace Tendo
 {
     Gate::Gate()
@@ -25,7 +23,6 @@ namespace Tendo
     }
 	bool Gate::Awake()
 	{
-		this->mApp->AddComponent<RedisComponent>();
 		this->mApp->AddComponent<OuterNetComponent>();
 		return true;
 	}
@@ -69,17 +66,7 @@ namespace Tendo
 		{
 			return XCode::Failure;
 		}
-		/*std::shared_ptr<RedisResponse> result = 
-			this->mRedisComponent->SyncRun("SETNX", token, userId);
-		if (result == nullptr || result->GetNumber() != 1)
-		{
-			return XCode::SaveToRedisFailure;
-		}
-		result = this->mRedisComponent->SyncRun("EXPIRE", token, 30);
-		if (!result->IsOk())
-		{
-			return XCode::SaveToRedisFailure;
-		}*/
+
 		
 		this->mTokens.emplace(token, userId);
 		{
@@ -168,7 +155,7 @@ namespace Tendo
 		return XCode::Successful;
 	}
 
-	void Gate::Invoke(const DisConnectEvent* message)
+	void Gate::OnEvent(const Tendo::DisConnectEvent* message)
 	{
 		const std::string & address = message->Addr;
 	}

@@ -5,8 +5,8 @@
 #ifndef APP_EVENTUNIT_H
 #define APP_EVENTUNIT_H
 #include"Unit.h"
-
-
+#include<list>
+class ILuaWrite;
 namespace Tendo
 {
 	class EventUnit : public Unit
@@ -16,7 +16,7 @@ namespace Tendo
 		template<typename T>
 		int Dispatch(const T * message);
 	private:
-		std::unordered_map<size_t, std::vector<std::string>> mEvents;
+		std::unordered_map<size_t, std::list<std::string>> mEvents;
 	};
 
 	template<typename T>
@@ -35,13 +35,13 @@ namespace Tendo
 				if(eventComponent != nullptr)
 				{
 					count++;
-					eventComponent->Invoke(message);
+					eventComponent->OnEvent(message);
 				}
 			}
 		}
 		else
 		{
-			std::vector<std::string> tmp;
+			std::list<std::string> tmp;
 			this->mEvents.emplace(hash, tmp);
 			std::vector<std::string> components;
 			this->GetComponents(components);
@@ -51,7 +51,7 @@ namespace Tendo
 				if(eventComponent != nullptr)
 				{
 					count++;
-					eventComponent->Invoke(message);
+					eventComponent->OnEvent(message);
 					this->mEvents[hash].emplace_back(name);
 				}
 			}

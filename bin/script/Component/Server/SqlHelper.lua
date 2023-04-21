@@ -76,9 +76,22 @@ function SqlHelper.QuerySql(name, keys, where, limit)
     end
     local whereString = table.concat(wheres, ",")
     if limit == nil then
-        return string.format("SELECT % FROM %s WHERE %s;", fieldString, name, whereString)
+        return string.format("SELECT %s FROM %s WHERE %s;", fieldString, name, whereString)
     end
     return string.format("SELECT %s FROM %s WHERE %s LIMIT %d;", fieldString, name, whereString, limit)
+end
+
+function SqlHelper.DeleteSql(name, where)
+    local wheres = { }
+    for k, v in pairs(where) do
+        if type(v) == "string" then
+            table.insert(wheres, string.format("%s='%s'", k, v))
+        else
+            table.insert(wheres, string.format("%s=%s", k, tostring(v)))
+        end
+    end
+    local whereString = table.concat(wheres, ",")
+    return string.format("DELETE FROM %s WHERE %s;", name, whereString)
 end
 
 return SqlHelper

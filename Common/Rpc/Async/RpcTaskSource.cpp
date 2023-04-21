@@ -47,7 +47,7 @@ namespace Tendo
 		response->GetHead().Get("code", code);
 		if (code == (int)XCode::Successful && !this->mResp.empty())
 		{
-			ProtoComponent* messageComponent = App::Inst()->GetMsgComponent();
+			ProtoComponent* messageComponent = App::Inst()->GetProto();
 			if(!messageComponent->New(this->mResp, message))
 			{
 				code = XCode::CreateProtoFailure;

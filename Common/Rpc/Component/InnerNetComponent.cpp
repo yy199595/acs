@@ -37,11 +37,6 @@ namespace Tendo
             const std::string passwd(iter->value.GetString());
             this->mUserMaps.emplace(user, passwd);
         }
-        NodeInfo nodeInfo;
-        nodeInfo.SrvName = ServerConfig::Inst()->Name();
-        config->GetLocation("rpc", nodeInfo.RpcAddress);
-        config->GetLocation("http", nodeInfo.HttpAddress);
-        this->mLocationMaps.emplace(nodeInfo.RpcAddress, nodeInfo);
         LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<ThreadComponent>());
         LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<DispatchComponent>());
         return this->StartListen("rpc");
@@ -101,25 +96,7 @@ namespace Tendo
 
         LOG_CHECK_RET_FALSE(head.Get("name", nodeInfo.SrvName));
         LOG_CHECK_RET_FALSE(head.Get("user", nodeInfo.UserName));
-        LOG_CHECK_RET_FALSE(head.Get("rpc", nodeInfo.RpcAddress));
         LOG_CHECK_RET_FALSE(head.Get("passwd", nodeInfo.PassWord));
-        if (nodeInfo.RpcAddress.empty())
-        {
-            this->StartClose(address);
-            return false;
-        }
-        if (!this->mUserMaps.empty())
-        {
-            auto iter = this->mUserMaps.find(nodeInfo.UserName);
-            if (iter == this->mUserMaps.end() || iter->second != nodeInfo.PassWord)
-            {
-                this->StartClose(address);
-                CONSOLE_LOG_ERROR(address << " auth failure");
-                return false;
-            }
-        }
-        nodeInfo.LocalAddress = address;
-        this->mLocationMaps.emplace(address, nodeInfo);
         return true;
     }
 

@@ -5,7 +5,6 @@
 #include"LocationComponent.h"
 #include"Util/Math/MathHelper.h"
 #include"Util/Time/TimeHelper.h"
-#include"Registry/Service/Registry.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include"Async/Component/CoroutineComponent.h"
 #include"Entity/Unit/App.h"
@@ -142,7 +141,7 @@ namespace Tendo
 		return iter->second->Get(servers);
     }
 
-	bool LocationComponent::HasServer(const string& server) const
+	bool LocationComponent::HasServer(const std::string& server) const
 	{
 		auto iter = this->mServerNames.find(server);
 		if(iter == this->mServerNames.end())
@@ -177,7 +176,7 @@ namespace Tendo
 		return ret;
 	}
 
-	bool LocationComponent::GetServer(const string& server, std::vector<std::string>& servers, const string& listen)
+	bool LocationComponent::GetServer(const std::string& server, std::vector<std::string>& servers, const std::string& listen)
 	{
 		auto iter = this->mServerNames.find(server);
 		if(iter == this->mServerNames.end())

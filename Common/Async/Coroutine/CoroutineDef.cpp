@@ -61,7 +61,7 @@ namespace Tendo
 	CoroutineGroup::CoroutineGroup()
 	{
         this->mCoroutineId = 0;
-        this->mCorComponent = App::Inst()->GetTaskComponent();
+        this->mCorComponent = App::Inst()->GetCoroutine();
 	}
 
     CoroutineGroup::~CoroutineGroup()
@@ -74,7 +74,7 @@ namespace Tendo
 
     void CoroutineGroup::WaitAll()
     {
-        this->mCorComponent = App::Inst()->GetTaskComponent();
+        this->mCorComponent = App::Inst()->GetCoroutine();
 		this->mCorComponent->YieldCoroutine(this->mCoroutineId);
     }
 
@@ -82,7 +82,7 @@ namespace Tendo
     {
         if(!taskContexts.empty())
         {
-            this->mCorComponent = App::Inst()->GetTaskComponent();
+            this->mCorComponent = App::Inst()->GetCoroutine();
             for(TaskContext * taskContext : taskContexts)
             {
                 assert(taskContext->mGroup == nullptr);

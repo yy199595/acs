@@ -32,7 +32,7 @@ namespace Tendo
 			return true;
 		case TaskState::TaskAwait:
 			this->mState = state;
-			App::Inst()->GetTaskComponent()->Resume(this->mCorId);
+				App::Inst()->GetCoroutine()->Resume(this->mCorId);
 			return true;
 		case TaskState::TaskFinish:
 			break;
@@ -45,7 +45,7 @@ namespace Tendo
 		if(this->mState == TaskState::TaskReady)
         {
             this->mState = TaskState::TaskAwait;
-			App::Inst()->GetTaskComponent()->YieldCoroutine(this->mCorId);
+			App::Inst()->GetCoroutine()->YieldCoroutine(this->mCorId);
             return true;
         }
         return false;

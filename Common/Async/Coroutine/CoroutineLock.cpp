@@ -9,7 +9,7 @@ namespace Tendo
 	CoroutineLock::CoroutineLock()
 	{
 		this->mIsLock = false;
-		this->mTaskComponent = App::Inst()->GetTaskComponent();
+		this->mTaskComponent = App::Inst()->GetCoroutine();
 	}
 
 	void CoroutineLock::Lock()

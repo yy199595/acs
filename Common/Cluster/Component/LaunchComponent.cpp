@@ -189,6 +189,6 @@ namespace Tendo
 			CONSOLE_LOG_INFO(component->GetName() << ".OnClose");
 #endif
 		}
-		this->mApp->GetTaskComponent()->Sleep(2000); //等待处理的消息返回
+		this->mApp->GetCoroutine()->Sleep(2000); //等待处理的消息返回
 	}
 }

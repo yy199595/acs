@@ -35,24 +35,18 @@ namespace Tendo
 
 	bool LuaScriptComponent::LateAwake()
 	{
-		//        const ServerConfig *config = ServerConfig::Inst();
-		//        const std::string &json = config->GetContent();
-		//		Lua::RapidJson::Write(this->mLuaEnv, json);
-		//        lua_setglobal(this->mLuaEnv, "ServerConfig");
-		//
-		//        Lua::ClassProxyHelper luaRegister(this->mLuaEnv, "ServerConfig");
-		//        luaRegister.BeginNewTable();
-		//        lua_getglobal(this->mLuaEnv, "ServerConfig");
 		{
 			Lua::ClassProxyHelper os(this->mLuaEnv, "os");
 
-			os.PushMember("workdir", System::WorkPath());
+			os.PushMember("dir", System::WorkPath());
 			os.PushStaticFunction("ms", Helper::Time::NowMilTime);
 			os.PushStaticFunction("time", Helper::Time::NowSecTime);
 		}
-		Lua::ClassProxyHelper luaRegister0(this->mLuaEnv, "App");
-		luaRegister0.BeginRegister<App>();
-		luaRegister0.PushExtensionFunction("GetComponent", Lua::LuaApp::GetComponent);
+		{
+			Lua::ClassProxyHelper app(this->mLuaEnv, "App");
+			app.BeginRegister<App>();
+			app.PushExtensionFunction("GetComponent", Lua::LuaApp::GetComponent);
+		}
 
 		Lua::ClassProxyHelper luaRegister1(this->mLuaEnv, "WaitLuaTaskSource");
 		luaRegister1.BeginRegister<WaitLuaTaskSource>();

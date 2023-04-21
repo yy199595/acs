@@ -10,6 +10,7 @@ namespace Tendo
 	class LuaScriptComponent;
 	class ServiceMethodRegister;
 	class LuaPhysicalRpcService : public RpcService, public IClient, public IServerRecord
+			, public IEvent<DisConnectEvent>
 	{
 	 public:
 		LuaPhysicalRpcService();
@@ -26,6 +27,7 @@ namespace Tendo
 	 private:
 		void OnLogin(long long userId) final;
 		void OnLogout(long long userId) final;
+		void OnEvent(const DisConnectEvent *message) final;
     private:
 		bool mIsHandlerMessage;
 		unsigned int mSumCount;

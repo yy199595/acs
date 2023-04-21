@@ -6,14 +6,13 @@ function Chat.OnLogin(userId)
 end
 
 function Chat.Chat(request)
-    table.print(request)
     coroutine.sleep(1000)
     local message = request.message
     local chatMessage = Proto.New("c2s.chat.notice", {
         msg_type = message.msg_type,
         message = message.message
     })
-    Gate.Send(id, "ChatComponent.Private", chatMessage)
+    --Gate.Send(id, "ChatComponent.Private", chatMessage)
     Gate.BroadCast("ChatComponent.Chat", chatMessage)
     return XCode.Successful
 end

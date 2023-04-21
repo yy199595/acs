@@ -20,19 +20,19 @@
     },
     "Registry": {
         "Ping": {
-            "Async": true
+            "Async": false
         },
         "Query": {
-            "Async": true,
+            "Async": false,
             "Request": "s2s.server.query",
             "Response": "s2s.server.list"
         },
         "Register": {
-            "Async": true,
+            "Async": false,
             "Request": "s2s.server.info"
         },
         "UnRegister": {
-          "Async": true,
+          "Async": false,
           "Request": "s2s.server.info"
       }
     },
@@ -126,7 +126,7 @@
     },
     "Chat": {
         "Chat": {
-            "Async": false,
+            "Async": true,
             "IsClient": true,
             "Request": "c2s.chat.request"
         },

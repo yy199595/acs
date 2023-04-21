@@ -42,7 +42,7 @@ namespace Tendo
 		lua_pushinteger(this->mLua, (int)code);
 		if (code == XCode::Successful && response != nullptr)
 		{
-			App::Inst()->GetMsgComponent()->Write(this->mLua, *response);
+			App::Inst()->GetProto()->Write(this->mLua, *response);
             Lua::Coroutine::Resume(coroutine, this->mLua, 2);
 			return;
 		}
@@ -57,7 +57,7 @@ namespace Tendo
 	{
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
 		lua_State* coroutine = lua_tothread(this->mLua, -1);
-		App::Inst()->GetMsgComponent()->Write(this->mLua, message);
+		App::Inst()->GetProto()->Write(this->mLua, message);
         Lua::Coroutine::Resume(coroutine, this->mLua, 1);
 	}
 }

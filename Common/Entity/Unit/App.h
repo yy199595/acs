@@ -32,9 +32,9 @@ namespace Tendo
         inline float GetFps() const { return this->mLogicFps; }
 		inline LogComponent* GetLogger() { return this->mLogComponent; }
 		inline Asio::Context & MainThread() { return *this->mMainContext; }
-		inline CoroutineComponent* GetTaskComponent() { return this->mTaskComponent; }
-		inline TimerComponent* GetTimerComponent() { return this->mTimerComponent; }
-		inline ProtoComponent * GetMsgComponent() { return this->mMessageComponent; }
+		inline TimerComponent* GetTimer() { return this->mTimerComponent; }
+		inline ProtoComponent * GetProto() { return this->mMessageComponent; }
+		inline CoroutineComponent* GetCoroutine() { return this->mTaskComponent; }
 		inline bool IsMainContext(const Asio::Context * io) const { return this->mMainContext.get() == io;}
 	 public:
 		void Stop(int signum);

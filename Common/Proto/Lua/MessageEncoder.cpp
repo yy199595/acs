@@ -32,9 +32,11 @@ namespace Tendo
 		for (int i = 0; i < descriptor->field_count(); i++)
 		{
 			const FieldDescriptor* field = descriptor->field(i);
+			const std::string & name = field->name();
 			lua_getfield(this->mLua, index, field->name().c_str());
 			if(!this->EncodeField(message, field, lua_absindex(this->mLua, -1)))
 			{
+				luaL_error(this->mLua, "encode field : %s", field->name().c_str());
 				return false;
 			}
 			lua_pop(this->mLua, 1);
@@ -87,7 +89,7 @@ namespace Tendo
 			{
 				return false;
 			}
-			if(this->EncodeField(*submessage, value, lua_absindex(this->mLua, -1)))
+			if(!this->EncodeField(*submessage, value, lua_absindex(this->mLua, -1)))
 			{
 				return false;
 			}

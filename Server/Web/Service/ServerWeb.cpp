@@ -7,7 +7,6 @@
 #include"Entity/Unit/App.h"
 #include"Server/Config/CodeConfig.h"
 #include"Common/Service/Node.h"
-#include"Registry/Service/Registry.h"
 #include"Util/File/DirectoryHelper.h"
 #include"Util/File/FileHelper.h"
 #include"Rpc/Component/LocationComponent.h"
@@ -75,56 +74,12 @@ namespace Tendo
 				response.Add(address).Add(CodeConfig::Inst()->GetDesc(code));
 			}
 		}
-		this->mApp->GetTaskComponent()->Start(&App::Stop, this->mApp, 0);
+		this->mApp->GetCoroutine()->Start(&App::Stop, this->mApp, 0);
 		return XCode::Successful;
 	}
 
 	int ServerWeb::Info(Json::Writer&response)
     {
-		std::string address;
-		RpcService	* registryService = this->mApp->GetService<Registry>();
-		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
-		if(!locationComponent->GetServer(registryService->GetServer(), address))
-		{
-			return XCode::AddressAllotFailure;
-		}
-		s2s::server::query message;
-		std::shared_ptr<s2s::server::list> list =
-			std::make_shared<s2s::server::list>();
-		int code = registryService->Call(address, "Query", message, list);
-		if(code != XCode::Successful)
-		{
-			response.Add("error").Add(CodeConfig::Inst()->GetDesc(code));
-			return XCode::Failure;
-		}
-		const std::string method("RunInfo");
-		RpcService * nodeService = this->GetComponent<Node>();
-		for (int index = 0; index < list->list_size(); index++)
-		{
-			const s2s::server::info& info = list->list(index);
-			auto iter = info.listens().find("http");
-			if(iter != info.listens().end())
-			{
-				std::shared_ptr<com::type::string> resp =
-						std::make_shared<com::type::string>();
-				const std::string & address = iter->second;
-				int code = nodeService->Call(address, method, resp);
-				const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-				if (code == XCode::Successful)
-				{
-					rapidjson::Document document;
-					const std::string& json = resp->str();
-					if (!document.Parse(json.c_str(), json.size()).HasParseError())
-					{
-						response.Add(address).Add(document);
-					}
-				}
-				else
-				{
-					response.Add(address).Add(desc);
-				}
-			}
-		}
 		return XCode::Successful;
     }
 }

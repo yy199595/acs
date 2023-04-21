@@ -67,15 +67,16 @@ namespace Tendo
 	class IEvent
 	{
 	public:
-		virtual void Invoke(const T * message) = 0;
+		virtual void OnEvent(const T * message) = 0;
 	};
 
 	class DisConnectEvent
 	{
 	public:
 		std::string Addr;
+		static constexpr char * Name = "";
 	};
-	
+
 	class ILuaRegister
 	{
 	public:
@@ -151,9 +152,6 @@ namespace Tendo
         std::string SrvName;
         std::string UserName;
         std::string PassWord;
-        std::string RpcAddress;
-        std::string HttpAddress;
-		std::string LocalAddress;
     };
 
     class IServerRecord

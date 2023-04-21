@@ -90,7 +90,7 @@ namespace Lua
         if (!methodConfig->Request.empty())
         {
             const std::string &pb = methodConfig->Request;
-            ProtoComponent *messageComponent = App::Inst()->GetMsgComponent();
+            ProtoComponent *messageComponent = App::Inst()->GetProto();
             std::shared_ptr<Message> message = messageComponent->Read(lua, pb, 3);
             if (message == nullptr)
             {
@@ -226,7 +226,7 @@ namespace Lua
         if (!methodConfig->Request.empty())
         {
             const std::string& pb = methodConfig->Request;
-            ProtoComponent* messageComponent = App::Inst()->GetMsgComponent();
+            ProtoComponent* messageComponent = App::Inst()->GetProto();
             std::shared_ptr<Message> message = messageComponent->Read(lua, pb, 3);
             if (message == nullptr)
             {

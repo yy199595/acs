@@ -22,7 +22,7 @@ namespace Tendo
 		bool OnInit() final;
 		bool OnStart() final;
         void OnClose() final;
-		void Invoke(const DisConnectEvent *message) final;
+		void OnEvent(const DisConnectEvent *message) final;
 		int OnLogin(long long userId, const std::string & token);
 	 private:
 		int mIndex;
@@ -30,7 +30,6 @@ namespace Tendo
 		std::string mInnerAddress;
 		std::string mOuterAddress;
 		class RpcService * mUserService;
-		class RedisComponent* mRedisComponent;
 		class LocationComponent * mNodeComponent;
 		class OuterNetComponent* mOuterComponent;
 		std::unordered_map<std::string, long long> mTokens;

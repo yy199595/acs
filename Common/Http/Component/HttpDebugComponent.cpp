@@ -72,7 +72,7 @@ namespace Tendo
 				this->Send(address, "get target address error");
 				return;
 			}
-			CoroutineComponent* taskComponent = this->mApp->GetTaskComponent();
+			CoroutineComponent* taskComponent = this->mApp->GetCoroutine();
 			taskComponent->Start(&HttpDebugComponent::Call, this, target, message);
 		}
 	}

@@ -27,7 +27,6 @@
 #include"Gate/Service/Gate.h"
 #include"Common/Service/Node.h"
 #include"Web/Service/ServerWeb.h"
-#include"Registry/Service/Registry.h"
 #include"Common/Service/User.h"
 #include"Registry/Component/RegistryComponent.h"
 
@@ -113,7 +112,6 @@ void RegisterServiceComponent()
 	ComponentFactory::Add<Gate>("Gate");
 	ComponentFactory::Add<User>("User");
     ComponentFactory::Add<Node>("Node");
-    ComponentFactory::Add<Registry>("Registry");
     ComponentFactory::Add<WatchDog>("WatchDog");
 
     ComponentFactory::Add<MongoDB>("MongoDB");

@@ -4,7 +4,7 @@
 
 #include"HttpRequest.h"
 #include<regex>
-#include"Util/Json/Lua/values.hpp"
+#include"Util/Json/Lua/Json.h"
 #include"Util/String/StringHelper.h"
 #include"Util/File/DirectoryHelper.h"
 namespace Http
@@ -119,6 +119,24 @@ namespace Http
         os << "Connection: close\r\n\r\n";
         return this->OnWriteContent(os);
     }
+
+	int Request::WriteToLua(lua_State* lua) const
+	{
+		lua_createtable(lua, 0, 3);
+		{
+			lua_pushstring(lua, this->mFrom.c_str());
+			lua_setfield(lua, -2, "from");
+		}
+		{
+			this->mHead.WriteToLua(lua);
+			lua_setfield(lua, -2, "head");
+		}
+		{
+			this->WriteMessageToLua(lua);
+			lua_setfield(lua, -2, "message");
+		}
+		return 1;
+	}
 }
 
 namespace Http
@@ -134,16 +152,24 @@ namespace Http
         return HTTP_READ_COMPLETE;
     }
 
-    int GetRequest::WriteToLua(lua_State* lua) const
-    {
-        rapidjson::Document document;
-        if (this->WriteDocument(&document))
-        {
-            values::pushValue(lua, document);
-            return 1;
-        }
-        return 0;
-    }
+	void GetRequest::WriteMessageToLua(lua_State* lua) const
+	{
+		std::vector<std::string> keys;
+		Http::Parameter parameter(this->mContent);
+		if(parameter.Get(keys))
+		{
+			std::string value;
+			lua_createtable(lua, 0, keys.size());
+			for(const std::string & key : keys)
+			{
+				parameter.Get(key, value);
+				lua_pushlstring(lua, value.c_str(), value.size());
+				lua_setfield(lua, -2, key.c_str());
+			}
+			return;
+		}
+		lua_pushlstring(lua, this->mContent.c_str(), this->mContent.size());
+	}
 
     bool GetRequest::WriteDocument(rapidjson::Document* document) const
     {
@@ -199,19 +225,6 @@ namespace Http
 		return HTTP_READ_SOME;
     }
 
-    int PostRequest::WriteToLua(lua_State* lua) const
-    {
-        const char * str = this->mContent.c_str();
-        const size_t length = this->mContent.size();
-        if (str != nullptr && length > 0)
-        {
-            rapidjson::extend::StringStream s(str, length);
-            values::pushDecoded(lua, s);
-            return 1;
-        }
-        return 0;
-    }
-
     bool PostRequest::WriteDocument(rapidjson::Document* document) const
     {
         const char* str = this->mContent.c_str();
@@ -258,6 +271,19 @@ namespace Http
 	void PostRequest::OnComplete()
 	{
 		this->mPath = this->mUrl;
+	}
+
+	void PostRequest::WriteMessageToLua(lua_State* lua) const
+	{
+		if(this->mHead.ContentType() == Http::ContentName::JSON)
+		{
+			Lua::RapidJson::Write(lua, this->mContent);
+		}
+		else
+		{
+			const std::string & str = this->mContent;
+			lua_pushlstring(lua, str.c_str(), str.size());
+		}
 	}
 }
 

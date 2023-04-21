@@ -5,7 +5,7 @@ local redis = require("Server.RedisComponent")
 function Main.Awake()
 
     redis.SyncRun("FLUSHALL")
-    print(os.ms(), os.time(), os.workdir)
+    print(os.ms(), os.time(), os.dir)
 
      --table.print(response)
 

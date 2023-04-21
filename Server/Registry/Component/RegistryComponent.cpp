@@ -4,12 +4,14 @@
 
 #include"RegistryComponent.h"
 #include"Entity/Unit/App.h"
-#include"Registry/Service/Registry.h"
 #include"Redis/Component/RedisLuaComponent.h"
 #include"Server/Config/ServerConfig.h"
 #include"Server/Config/CodeConfig.h"
 #include"Rpc/Component/LocationComponent.h"
 #include"Cluster/Config/ClusterConfig.h"
+#include "s2s/s2s.pb.h"
+#include"Rpc/Service/RpcService.h"
+#include "XCode/XCode.h"
 
 namespace Tendo
 {
@@ -34,7 +36,7 @@ namespace Tendo
 	{
 		const std::string func("Register");
 		const ServerConfig* config = ServerConfig::Inst();
-		RpcService* rpcService = this->mApp->GetService<Registry>();
+		RpcService* rpcService = this->mApp->GetService("Registry");
 
 		s2s::server::info message;
 		{
@@ -65,7 +67,7 @@ namespace Tendo
 			}
 			LOG_ERROR("register to [" << this->mAddress << "] "
 									  << CodeConfig::Inst()->GetDesc(code));
-			this->mApp->GetTaskComponent()->Sleep(1000 * 5);
+			this->mApp->GetCoroutine()->Sleep(1000 * 5);
 		}
 		while(true);
 
@@ -77,10 +79,11 @@ namespace Tendo
 			const std::string & server = rpcService1->GetServer();
 			while(!this->mNodeComponent->HasServer(server))
 			{
-				if(this->Query(server) <= 0)
+				this->Query(server);
+				if(!this->mNodeComponent->HasServer(server))
 				{
 					LOG_WARN("------ wait [" << server << "] start ------");
-					this->mApp->GetTaskComponent()->Sleep(1000 * 2);
+					this->mApp->GetCoroutine()->Sleep(1000 * 2);
 				}
 			}
 		}
@@ -88,11 +91,13 @@ namespace Tendo
 
 	int RegistryComponent::Query(const string& server)
 	{
-		com::type::string request;
-		request.set_str(server);
+		s2s::server::query request;
+		{
+			request.set_group_id(0);
+			request.set_server_name(server);
+		}
 		const std::string func("Query");
-		RpcService * rpcService = this->mApp->GetService<Registry>();
-
+		RpcService* rpcService = this->mApp->GetService("Registry");
 		std::shared_ptr<s2s::server::list> response = std::make_shared<s2s::server::list>();
 		if(rpcService->Call(this->mAddress, func, request, response) != XCode::Successful)
 		{

@@ -5,7 +5,6 @@
 #include"Node.h"
 #include"Entity/Unit/App.h"
 #include"Util/String/StringHelper.h"
-#include"Registry/Service/Registry.h"
 #include"Server/Config/CodeConfig.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include"Rpc/Component/LocationComponent.h"
@@ -93,7 +92,20 @@ namespace Tendo
                 }
             }
         }
-		CoroutineComponent * taskComponent = this->mApp->GetTaskComponent();
+		std::string address;
+		const ServerConfig * config = ServerConfig::Inst();
+		RpcService* rpcService = this->mApp->GetService("Registry");
+
+		s2s::server::info request;
+		{
+			request.set_server_name(config->Name());
+			request.set_server_id(config->ServerId());
+		}
+		int code = rpcService->Call(address, "UnRegister", request);
+		const std::string & desc = CodeConfig::Inst()->GetDesc(code);
+		CONSOLE_LOG_INFO("unregister " << config->Name()  << " code = " << desc);
+
+		CoroutineComponent * taskComponent = this->mApp->GetCoroutine();
 		taskComponent->Start(&App::Stop, this->mApp, 0);
         return XCode::Successful;
     }
@@ -150,20 +162,4 @@ namespace Tendo
         }
         return XCode::Successful;
     }
-
-	void Node::OnClose()
-	{
-		std::string address;
-		const ServerConfig * config = ServerConfig::Inst();
-		RpcService* rpcService = this->mApp->GetService<Registry>();
-
-		s2s::server::info request;
-		{
-			request.set_server_name(config->Name());
-			request.set_server_id(config->ServerId());
-		}
-		int code = rpcService->Call(address, "UnRegister", request);
-		const std::string & desc = CodeConfig::Inst()->GetDesc(code);
-		CONSOLE_LOG_INFO("unregister " << config->Name()  << " code = " << desc);
-	}
 }

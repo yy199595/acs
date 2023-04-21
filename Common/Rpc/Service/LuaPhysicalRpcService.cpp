@@ -77,7 +77,7 @@ namespace Tendo
     void LuaPhysicalRpcService::WaitAllMessageComplete()
     {
         this->mIsHandlerMessage = false;
-        CoroutineComponent *taskComponent = this->mApp->GetTaskComponent();
+        CoroutineComponent *taskComponent = this->mApp->GetCoroutine();
         while (this->mWaitCount > 0)
         {
             taskComponent->Sleep(100);
@@ -130,5 +130,10 @@ namespace Tendo
 		const std::string & name = this->GetName();
 		Lua::LuaModule * luaModule = this->mLuaComponent->GetModule(name);
 		return luaModule != nullptr && luaModule->Start();
+	}
+
+	void LuaPhysicalRpcService::OnEvent(const DisConnectEvent* message)
+	{
+
 	}
 }

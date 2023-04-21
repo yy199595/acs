@@ -13,7 +13,7 @@ namespace Lua
 {
 	int Timer::Add(lua_State* lua)
     {
-        TimerComponent* timerComponent = App::Inst()->GetTimerComponent();
+        TimerComponent* timerComponent = App::Inst()->GetTimer();
         if (timerComponent == nullptr)
         {
             luaL_error(lua, "TimerComponent Is Null");
@@ -35,7 +35,7 @@ namespace Lua
 
 	int Timer::Remove(lua_State* lua)
 	{
-        TimerComponent* timerComponent = App::Inst()->GetTimerComponent();
+        TimerComponent* timerComponent = App::Inst()->GetTimer();
         if (timerComponent == nullptr)
         {
             luaL_error(lua, "TimerComponent Is Null");

@@ -10,7 +10,7 @@
 #include<vector>
 #include<unordered_map>
 #include"Http/Client/Http.h"
-
+#include"Lua/Engine/Define.h"
 #define HTTP_READ_LINE -1
 #define HTTP_READ_SOME -2
 #define HTTP_READ_ERROR -3
@@ -35,7 +35,7 @@ namespace Http
 
 namespace Http
 {
-    class Head : public IStream
+	class Head : public IStream, public ILuaWrite
     {
     public:
         typedef std::unordered_map<std::string, std::string>::iterator Iter;
@@ -48,6 +48,7 @@ namespace Http
         bool Get(const std::string & k, std::string & v) const;
 		void Keys(std::vector<std::string> & keys) const;
 		size_t HeadCount() const { return this->mHeads.size(); }
+		int WriteToLua(lua_State *lua) const final;
     public:
         int OnRead(std::istream & buffer) final;
         int OnWrite(std::ostream & buffer) final;

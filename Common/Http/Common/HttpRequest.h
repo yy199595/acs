@@ -26,7 +26,7 @@ namespace Http
     };
 
 
-	class Request : public IStream, public Tcp::ProtoMessage
+	class Request : public IStream, public Tcp::ProtoMessage, public ILuaWrite
     {
     public:
         explicit Request(const char * method, const std::string & from);
@@ -35,8 +35,10 @@ namespace Http
 		inline const std::string & From() const { return this->mFrom; }
 		inline const std::string & Method() const { return this->mMethod; }
     public:
-		virtual int WriteToLua(lua_State * lua) const = 0;
+		int WriteToLua(lua_State *lua) const final;
         virtual bool WriteDocument(rapidjson::Document * document) const = 0;
+	protected:
+		virtual void WriteMessageToLua(lua_State * lua) const = 0;
     public:
 		bool SetUrl(const std::string & url);
 		void SetAsync(bool async) { this->mAsync = async;}
@@ -87,7 +89,7 @@ namespace Http
         int OnReadContent(std::istream &buffer) final;
         int OnWriteContent(std::ostream &buffer) final;
     protected:
-		int WriteToLua(lua_State* lua) const final;
+		void WriteMessageToLua(lua_State *lua) const final;
         bool WriteDocument(rapidjson::Document* document) const final;
     };
 
@@ -110,7 +112,7 @@ namespace Http
         int OnReadContent(std::istream &buffer) final;
         int OnWriteContent(std::ostream &buffer) final;
     protected:
-		int WriteToLua(lua_State* lua) const final;
+		void WriteMessageToLua(lua_State *lua) const final;
         bool WriteDocument(rapidjson::Document* document) const final;
     };
 }

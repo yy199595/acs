@@ -22,30 +22,21 @@ namespace Mysql
 	}
 
     int Response::WriteToLua(lua_State* lua) const
-    {
-        lua_pushboolean(lua, this->IsOk());
-        if (this->mResults.empty())
-        {
-            return 1;
-        }
-        if (this->mResults.size() == 1)
-        {
-            const std::string& json = this->mResults[0];
-            Lua::RapidJson::Write(lua, this->mResults[0]);
-            return 2;
-        }
-        else
-        {
-            lua_createtable(lua, 0, this->mResults.size());
-            for (int index = 0; index < this->mResults.size(); index++)
-            {
-                lua_pushinteger(lua, index + 1);
-                Lua::RapidJson::Write(lua, this->mResults[0]);
-                lua_settable(lua, -3);
-            }
-        }
-        return 2;
-    }
+	{
+		lua_pushboolean(lua, this->IsOk());
+		if (this->mResults.empty())
+		{
+			return 1;
+		}
+		lua_createtable(lua, 0, this->mResults.size());
+		for (int index = 0; index < this->mResults.size(); index++)
+		{
+			lua_pushinteger(lua, index + 1);
+			Lua::RapidJson::Write(lua, this->mResults[0]);
+			lua_settable(lua, -3);
+		}
+		return 2;
+	}
 
 	void Response::Add(const std::string& json)
 	{

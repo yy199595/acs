@@ -31,7 +31,7 @@ namespace Lua
 			request->SetProto(Msg::Porto::Protobuf);
 		}
 
-        ProtoComponent * messageComponent = App::Inst()->GetMsgComponent();
+        ProtoComponent * messageComponent = App::Inst()->GetProto();
         const std::string func = CommonParameter::Read<std::string>(lua,2);
         const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
         if (methodConfig == nullptr)

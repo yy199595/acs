@@ -4,7 +4,7 @@ namespace Tendo
 {
 	bool UnitMgrComponent::LateAwake()
 	{
-		this->mCorComponent = this->mApp->GetTaskComponent();
+		this->mCorComponent = this->mApp->GetCoroutine();
 		return true;
 	}
 

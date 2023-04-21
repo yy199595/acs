@@ -82,14 +82,25 @@ namespace Lua
 				break;
 			case LUA_MYSQL_CREATE_TABLE:
 			{
+				std::shared_ptr<Message> message;
 				const char * tb = luaL_checkstring(lua, 2);
 				const char * pb = luaL_checkstring(lua, 3);
-				ProtoComponent *messageComponent = App::Inst()->GetMsgComponent();
-				std::shared_ptr<Message> message = messageComponent->Read(lua, pb, 4);
-				if(message == nullptr)
+				ProtoComponent* messageComponent = App::Inst()->GetProto();
+				if(lua_istable(lua, 4))
 				{
-					luaL_error(lua, "create %s error", pb);
-					return 0;
+					message = messageComponent->Read(lua, pb, 4);
+					if (message == nullptr)
+					{
+						luaL_error(lua, "create %s error", pb);
+						return 0;
+					}
+				}
+				else
+				{
+					if(!messageComponent->New(pb, message))
+					{
+						return 0;
+					}
 				}
 				std::vector<std::string> keys;
 				if(lua_istable(lua, 5))

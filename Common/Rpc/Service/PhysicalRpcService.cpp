@@ -28,7 +28,7 @@ namespace Tendo
     void PhysicalRpcService::WaitAllMessageComplete()
     {
         int time = 0;
-        CoroutineComponent *taskComponent = this->mApp->GetTaskComponent();
+        CoroutineComponent *taskComponent = this->mApp->GetCoroutine();
         while (this->mWaitCount > 0)
         {
             time++;

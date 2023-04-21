@@ -25,7 +25,6 @@ namespace Tendo
         int RunInfo(com::type::string& response); // 获取运行信息
     private:
 		bool OnInit() final;
-		void OnClose() final;
     private:
         class LocationComponent* mNodeComponent;
     };
