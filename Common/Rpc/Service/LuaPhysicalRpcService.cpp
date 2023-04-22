@@ -21,6 +21,11 @@ namespace Tendo
 	{
 		const std::string & name = this->GetName();
 		this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
+        if(this->mLuaComponent == nullptr)
+        {
+            LOG_ERROR("not find LuaScriptComponent");
+            return false;
+        }
 		if(this->mLuaComponent->LoadModule(name) == nullptr)
 		{
 			LOG_FATAL("load lua module [" << name << "] failure");

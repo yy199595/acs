@@ -79,6 +79,11 @@
         "id": 1,
         "address": {
             "rpc": "tcp://127.0.0.1:7788"
+        },
+        "lua": {
+            "common": "script/Common",
+            "component":"script/Component",
+            "module": "script/Server/RegistryServer"
         }
     },
     "white_list": [
