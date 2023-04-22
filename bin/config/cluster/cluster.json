@@ -61,6 +61,7 @@
             "Registry": true
         },
         "Component": [
+            "MysqlDBComponent",
             "RegistryComponent"
         ]
     }

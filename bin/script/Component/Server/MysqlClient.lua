@@ -1,5 +1,6 @@
 local MysqlClient = { }
 local mysqlCli = Mysql
+assert(mysqlCli)
 local helper = require("Server.SqlHelper")
 function MysqlClient.Insert(id, name, tab)
     local sql = helper.InsertSql(name, tab)
