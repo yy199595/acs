@@ -11,6 +11,8 @@ namespace Lua
 	{
 		int Call(lua_State * lua);
 		int Send(lua_State* lua);
+		int RangeServer(lua_State * lua); //随机一个服务器
+		int GetAddrById(lua_State * lua); //根据服务器id获取地址
         int FindService(lua_State* lua);
         int AddLocation(lua_State * lua);
         int AllotServer(lua_State * lua);

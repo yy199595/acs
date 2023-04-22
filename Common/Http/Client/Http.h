@@ -104,9 +104,22 @@ namespace Http
 
 	namespace HeadName
 	{
-		constexpr const char * SetCookie = "Set-Cookie";
-		constexpr const char * ContentType = "Content-Type";
-		constexpr  const char * ContentLength = "Content-Length";
+		constexpr const char * SetCookie = "set-cookie";
+		constexpr const char * ContentType = "content-type";
+		constexpr  const char * ContentLength = "content-length";
+	}
+
+	namespace ContentEnum
+	{
+		enum class Type
+		{
+			JSON,
+			TEXT,
+			PB,
+			JS,
+			JPEG,
+			PNG,
+		};
 	}
 
     namespace ContentName
@@ -127,7 +140,7 @@ namespace Http
 		constexpr const char * PB = "application/x-protobuf";
 		constexpr const char * XML = "application/xml";
 		constexpr const char * XHTML = "application/xhtml+xml";
-
+		constexpr const char * FORM = "application/x-www-form-urlencoded";
 		constexpr const char * PDF = "application/pdf";
 		constexpr const char * WORD = "application/msword";
 		constexpr const char * Bin = "application/octet-stream";

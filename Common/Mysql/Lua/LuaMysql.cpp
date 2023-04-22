@@ -99,6 +99,7 @@ namespace Lua
 				{
 					if(!messageComponent->New(pb, message))
 					{
+						luaL_error(lua, "create %s error", pb);
 						return 0;
 					}
 				}

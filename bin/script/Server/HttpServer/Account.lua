@@ -5,16 +5,17 @@ local mysql = require("Server.MysqlClient")
 local redis = require("Server.RedisComponent")
 function AccountService.Awake()
     print("启动账号服务")
+    Proto.Import("mysql/user.proto")
     return mysql.NewTable(0, tabName, {
         pb = tabName,
-        keys = { "account "}
+        keys = { "account"}
     })
 end
 
 function AccountService.Register(request)
 
     table.print(request)
-    local message = rapidjson.decode(request.message)
+    local message = request.message
     assert(message.account, "register account is nil")
     assert(message.password, "register password is nil")
     assert(message.phone_num, "register phone number is nil")
@@ -29,17 +30,17 @@ function AccountService.Register(request)
 
     local nowTime = os.time()
     local userId = redis.AddCounter("user_id")
-    local str = string.format("%s%d%d", ip, nowTime, userId)
     local ip = string.match(request.from, "http://(%d+.%d+.%d+.%d+):%d+")
+    local str = string.format("%s%d%d", ip, nowTime, userId)
     local data = {
         user_id = userId,
         login_time = nowTime,
-        create_time = nowTime,
+        register_time = nowTime,
         account = message.account,
-        password = message.password,
+        pass_word = message.password,
         phone_num = message.phone_num,
         last_login_ip = ip,
-        token = Md5.ToString(str)
+        login_token = Md5.ToString(str)
     }
     result = mysql.Insert(id, tabName, data)
     if not result then
@@ -51,26 +52,52 @@ end
 
 function AccountService.Login(request)
 
-    assert(type(request.account) == "string", "user account is not string")
-    assert(type(request.password) == "string", "user password is not string")
+    local message = request.message
+    assert(type(message.account) == "string", "user account is not string")
+    assert(type(message.password) == "string", "user password is not string")
 
-    local userInfo = Mongo.QueryOnce(tabName, {
-        _id = request.account
+    local id = mysql.Open()
+    local userInfo = mysql.QueryOne(id, tabName, { "pass_word", "user_id" }, {
+        account = message.account
     })
+
     if userInfo == nil or request.password ~= userInfo.password then
         return XCode.Failure, "账号不存在或者密码错误"
     end
+    local ip = string.match(request.from, "http://(%d+.%d+.%d+.%d+):%d+")
+    local str = string.format("%s%d%d", ip, nowTime, userId)
+    local token = Md5.ToString(str)
 
-    local code, data = Service.Call(userInfo.user_id, "Gate.Allocation", {
-        value = userInfo.user_id
+    local serverId = Service.RangeServer("Gate")
+    local rpcAddress = Service.GetAddrById(serverId, "rpc")
+    local gateAddress = Service.GetAddrById(serverId, "gate")
+
+
+    local code = Service.Call(rpcAddress, "Gate.Allocation", {
+        token = token,
+        user_id = userInfo.user_id
     })
-    if code ~= XCode.Successful or data == nil then
-        return XCode.AllotUser, "分配网关失败"
+
+    if code ~= XCode.Successful then
+        return XCode.AddressAllotFailure, "分配网关失败"
     end
-    Mongo.Update(tabName, { _id = request.account },
-                {  last_login_time = os.time(),  token = data.token }, userInfo.user_id)
+
+    local data = {
+        last_login_ip = ip,
+        login_time = os.time(),
+        login_token = token
+    }
+    local res = mysql.Update(id, tabName, data, {
+        account = message.account
+    })
+    if not res then
+        return XCode.SaveToMysqlFailure, "更新数据失败"
+    end
     Log.Warn(string.format("玩家%s登录成功,玩家id=%d", request.account, userInfo.user_id))
-    return XCode.Successful, data
+    return XCode.Successful, {
+        token = token,
+        address = gateAddress
+    }
 end
 
 return AccountService

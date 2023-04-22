@@ -57,22 +57,16 @@ namespace Tendo
 		
     }
 
-	int Gate::Allocation(long long userId, s2s::allot::response &response)
+	int Gate::Allocation(const s2s::allot_request &request)
     {
-		long long now = Helper::Time::NowSecTime();
-		std::string str = fmt::format("{0}:{1}", now, userId);
-		const std::string token = Helper::Md5::GetMd5(str);
+		long long userId = request.user_id();
+		const std::string & token = request.token();
 		if(this->mTokens.find(token) != this->mTokens.end())
 		{
 			return XCode::Failure;
 		}
 
-		
 		this->mTokens.emplace(token, userId);
-		{
-			response.set_token(token);
-			response.set_address(this->mOuterAddress);
-		}
 		const std::string & server = this->GetServer();
 		this->mNodeComponent->BindServer(server, userId, this->mInnerAddress);
 		return XCode::Successful;

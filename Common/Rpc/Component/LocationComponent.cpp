@@ -208,4 +208,26 @@ namespace Tendo
 			return p1->GetId() > p2->GetId();
 		});
 	}
+
+	int LocationComponent::RangeServer(const std::string& server) const
+	{
+		auto iter = this->mServerNames.find(server);
+		if (iter == this->mServerNames.end() || iter->second.empty())
+		{
+			return -1;
+		}
+		int size = (int)iter->second.size();
+		return iter->second[Helper::Math::Random<int>(0, size - 1)];
+	}
+
+	bool LocationComponent::GetAddress(int id, const std::string& listen, std::string& address)
+	{
+		auto iter = this->mServers.find(id);
+		if(iter == this->mServers.end())
+		{
+			return false;
+		}
+		return  iter->second->Get(listen, address);
+	}
+
 }

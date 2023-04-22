@@ -278,12 +278,26 @@ namespace Http
 		if(this->mHead.ContentType() == Http::ContentName::JSON)
 		{
 			Lua::RapidJson::Write(lua, this->mContent);
+			return;
 		}
-		else
+		else if(this->mHead.ContentType() == Http::ContentName::FORM)
 		{
-			const std::string & str = this->mContent;
-			lua_pushlstring(lua, str.c_str(), str.size());
+			std::vector<std::string> keys;
+			Http::Parameter parameter(this->mContent);
+			if(parameter.Get(keys))
+			{
+				std::string value;
+				lua_createtable(lua, 0, keys.size());
+				for(const std::string & key : keys)
+				{
+					parameter.Get(key, value);
+					lua_pushlstring(lua, value.c_str(), value.size());
+				}
+				return;
+			}
 		}
+		const std::string & str = this->mContent;
+		lua_pushlstring(lua, str.c_str(), str.size());
 	}
 }
 

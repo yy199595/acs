@@ -14,8 +14,7 @@
             "IsClient": true
         },
         "Allocation": {
-            "Request": "com.type.int64",
-            "Response": "s2s.allot.response"
+            "Request": "s2s.allot.request",
         }
     },
     "Registry": {

@@ -17,6 +17,6 @@ message account_info
 	bool is_new_user = 8;
 	int32 ared_id = 9;
 	int32 login_channel = 10;
-	area_list user_area_list = 11;
+	string login_token = 11;
 }
 

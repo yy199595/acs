@@ -105,6 +105,8 @@ namespace Tendo
 		luaRegister9.PushExtensionFunction("FindService", Lua::Service::FindService);
 		luaRegister9.PushExtensionFunction("AllotServer", Lua::Service::AllotServer);
 		luaRegister9.PushExtensionFunction("GetServerList", Lua::Service::GetServerList);
+		luaRegister9.PushExtensionFunction("RangeServer", Lua::Service::RangeServer);
+		luaRegister9.PushExtensionFunction("GetAddrById", Lua::Service::GetAddrById);
 
 		std::vector<ILuaRegister *> components;
 		this->mApp->GetComponents(components);

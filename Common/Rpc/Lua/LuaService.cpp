@@ -267,6 +267,49 @@ namespace Lua
         return 1;
     }
 
+	int Service::RangeServer(lua_State* lua)
+	{
+		std::string server;
+		const char * service = luaL_checkstring(lua, 1);
+		if(!ClusterConfig::Inst()->GetServerName(service, server))
+		{
+			luaL_error(lua, "not find server : %s", service);
+			return 0;
+		}
+		LocationComponent * locationComponent = App::Inst()->GetComponent<LocationComponent>();
+		if(locationComponent == nullptr)
+		{
+			luaL_error(lua, "not find LocationComponent");
+			return 0;
+		}
+		int id = locationComponent->RangeServer(server);
+		if(id == -1)
+		{
+			return 0;
+		}
+		lua_pushinteger(lua, id);
+		return 1;
+	}
+
+	int Service::GetAddrById(lua_State* lua)
+	{
+		int id = luaL_checkinteger(lua, 1);
+		const char * listen = luaL_checkstring(lua, 2);
+		LocationComponent * locationComponent = App::Inst()->GetComponent<LocationComponent>();
+		if(locationComponent == nullptr)
+		{
+			luaL_error(lua, "not find LocationComponent");
+			return 0;
+		}
+		std::string address;
+		if(!locationComponent->GetAddress(id, listen, address))
+		{
+			return 0;
+		}
+		lua_pushlstring(lua, address.c_str(), address.size());
+		return 1;
+	}
+
     int Service::AddLocation(lua_State *lua)
     {
         return 0;

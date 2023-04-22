@@ -21,7 +21,6 @@ namespace Tendo
 	 private:
 		lua_State* mLuaEnv;
         const RpcMethodConfig * mConfig;
-		class ProtoComponent * mMsgComponent;
 		class LuaScriptComponent * mLuaComponent;
 	};
 }

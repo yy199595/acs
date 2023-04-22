@@ -18,7 +18,6 @@ namespace Mysql
 	void Response::SetError(const char* str)
 	{
 		this->mError = str;
-		this->mIsOk = false;
 	}
 
     int Response::WriteToLua(lua_State* lua) const

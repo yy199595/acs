@@ -2,6 +2,7 @@
 // Created by yjz on 2022/10/27.
 //
 #include"httpHead.h"
+#include"Util/String/StringHelper.h"
 namespace Http
 {
     bool Head::Add(const std::string &k, int v)
@@ -75,7 +76,11 @@ namespace Http
             {
                 size_t length = lineData.size() - pos - 2;
                 std::string key = lineData.substr(0, pos);
-                this->mHeads.emplace(key, lineData.substr(pos + 1, length));
+				std::string val = lineData.substr(pos + 1, length);
+
+				Helper::Str::Tolower(key);
+				Helper::Str::ClearBlank(val);
+				this->mHeads.emplace(key, val);
             }
         }
         return HTTP_READ_LINE;

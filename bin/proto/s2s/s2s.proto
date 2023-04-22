@@ -58,10 +58,10 @@ message log
 
 message allot
 {
-    message response
+    message request
     {
         string token = 1;
-        string address = 2; //网关地址
+        int64 user_id = 2;
     }
 
     message save

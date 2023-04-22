@@ -52,7 +52,7 @@ LIST(APPEND PROTO_FLAGS -I${CMAKE_SOURCE_DIR}/bin/proto)
 file(GLOB_RECURSE c2s_proto ${CMAKE_SOURCE_DIR}/bin/proto/c2s/*.proto)
 file(GLOB_RECURSE s2s_proto ${CMAKE_SOURCE_DIR}/bin/proto/s2s/*.proto)
 file(GLOB_RECURSE com_proto ${CMAKE_SOURCE_DIR}/bin/proto/com/*.proto)
-file(GLOB_RECURSE mysql_proto ${CMAKE_SOURCE_DIR}/bin/proto/mysql/*.proto)
+#file(GLOB_RECURSE mysql_proto ${CMAKE_SOURCE_DIR}/bin/proto/mysql/*.proto)
 
 #execute_process(COMMAND cd ${protoc_dir})
 if(has_protoc) # 生成源码

@@ -23,12 +23,12 @@ namespace Mysql
 	{
     public:
         explicit Response(int taskId)
-            :mIsOk(true), mTaskId(taskId) { }
+            :mTaskId(taskId) { }
     public:
 		void SetError(const char * str);
-		bool IsOk() const { return this->mIsOk;}
 		int TaskId() const { return this->mTaskId; }
         int WriteToLua(lua_State* lua) const final;
+		bool IsOk() const { return this->mError.empty();}
         const std::string & GetError() const { return this->mError;}
 	public:
 		void Add(const std::string & json);
@@ -37,7 +37,6 @@ namespace Mysql
 		const std::string & Get(size_t index) const { return this->mResults[index]; }
 		const std::vector<std::string> & Array() const { return this->mResults; }
     private:
-        bool mIsOk;
 		int mTaskId;
         std::string mError;
 		std::vector<std::string> mResults;

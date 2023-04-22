@@ -14,7 +14,6 @@ namespace Tendo
 	LuaServiceMethod::LuaServiceMethod(const RpcMethodConfig * config)
 		: ServiceMethod(config->Method), mLuaEnv(nullptr), mConfig(config)
 	{
-		this->mMsgComponent = App::Inst()->GetComponent<ProtoComponent>();
 		this->mLuaComponent = App::Inst()->GetComponent<LuaScriptComponent>();
 		this->mLuaEnv = this->mLuaComponent->GetLuaEnv();
 	}
@@ -55,7 +54,8 @@ namespace Tendo
 				break;
 			case Msg::Porto::Protobuf:
 			{
-				std::shared_ptr<Message> response = this->mMsgComponent->Read(this->mLuaEnv, res, -1);
+				ProtoComponent * protoComponent = App::Inst()->GetProto();
+				std::shared_ptr<Message> response = protoComponent->Read(this->mLuaEnv, res, -1);
 				if(response == nullptr)
 				{
 					return XCode::CreateProtoFailure;
@@ -72,7 +72,8 @@ namespace Tendo
 		std::shared_ptr<Message> response;
 		if (!this->mConfig->Response.empty())
 		{
-			if(!this->mMsgComponent->New(this->mConfig->Response, response))
+			ProtoComponent * protoComponent = App::Inst()->GetProto();
+			if(!protoComponent->New(this->mConfig->Response, response))
 			{
 				return XCode::CreateProtoFailure;
 			}
@@ -141,7 +142,8 @@ namespace Tendo
 						if (!this->mConfig->Request.empty())
 						{
 							std::shared_ptr<Message> request;
-							if (!this->mMsgComponent->New(this->mConfig->Request, request))
+							ProtoComponent * protoComponent = App::Inst()->GetProto();
+							if (!protoComponent->New(this->mConfig->Request, request))
 							{
 								return false;
 							}
@@ -149,12 +151,18 @@ namespace Tendo
 							{
 								return XCode::ParseMessageError;
 							}
-							this->mMsgComponent->Write(this->mLuaEnv, *request);
-							lua_setfield(this->mLuaEnv, -2, "message");
+							protoComponent->Write(this->mLuaEnv, *request);
+						}
+						else
+						{
+							lua_pushnil(this->mLuaEnv);
 						}
 					}
 						break;
+					default:
+						return XCode::UnKnowPacket;
 				}
+				lua_setfield(this->mLuaEnv, -2, "message");
 			}
 		}
 
