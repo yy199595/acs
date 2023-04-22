@@ -230,4 +230,14 @@ namespace Tendo
 		return  iter->second->Get(listen, address);
 	}
 
+	LocationUnit* LocationComponent::GetServerById(int id)
+	{
+		auto iter = this->mServers.find(id);
+		if(iter == this->mServers.end())
+		{
+			return nullptr;
+		}
+		return iter->second.get();
+	}
+
 }

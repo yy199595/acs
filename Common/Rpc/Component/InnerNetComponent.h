@@ -36,7 +36,6 @@ namespace Tendo
         bool Send(const std::string & address, const std::shared_ptr<Msg::Packet>& message, int & id);
         std::shared_ptr<Msg::Packet> Call(const std::string & address, const std::shared_ptr<Msg::Packet> & message);
 	public:
-		const NodeInfo * GetNodeInfo(const std::string & address) const;
 		size_t GetConnectClients(std::vector<std::string> & list) const; //获取所有连接进来的客户端
 		size_t Broadcast(const std::shared_ptr<Msg::Packet>& message) const; //广播给所有链接进来的客户端
 	private:

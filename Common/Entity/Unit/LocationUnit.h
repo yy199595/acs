@@ -23,6 +23,7 @@ namespace Tendo
         inline size_t GetLocationSize() const { return this->mLocations.size(); }
 	public:
 		int GetId() const { return this->mId; }
+		const std::string & Name() const { return this->mName; }
     private:
 		int mId;
 		std::string mName;

@@ -28,19 +28,19 @@ namespace Tendo
 {
     class HttpMethodConfig;
     class HttpHandlerClient;
-	class HttpWebComponent : public HttpListenComponent, public IServerRecord, public IDestroy
+	class HttpWebComponent : public HttpListenComponent, public IDestroy
     {
     public:
         HttpWebComponent();
         ~HttpWebComponent() = default;
     public:
 		void AddStaticDir(const std::string & dir);
+		unsigned int GetSumCount() const { return this->mSumCount; }
 		unsigned int GetWaitCount() const { return this->mWaitCount; }
 		bool SendData(const std::string &address, int code, const std::shared_ptr<Msg::Packet> &message);
     private:
         bool LateAwake() final;
 		void OnDestroy() final;
-		void OnRecord(Json::Writer &document) final;
         bool OnDelClient(const std::string& address) final;
         bool OnMessage(const std::shared_ptr<Http::Request>& request);
 		void OnRequest(std::shared_ptr<Http::Request> request) final;

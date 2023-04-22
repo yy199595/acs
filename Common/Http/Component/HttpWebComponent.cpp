@@ -205,12 +205,6 @@ namespace Tendo
         this->mWaitCount--;
     }
 
-    void HttpWebComponent::OnRecord(Json::Writer&document)
-    {
-        document.Add("sum").Add(this->mSumCount);
-        document.Add("wait").Add(this->mWaitCount);
-    }
-
     bool HttpWebComponent::OnDelClient(const std::string& address)
     {
         auto iter = this->mTasks.find(address);

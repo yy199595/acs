@@ -62,21 +62,30 @@ function SqlHelper.UpdateSql(name, update, where)
 end
 
 function SqlHelper.QuerySql(name, keys, where, limit)
-    local wheres = { }
-    for k, v in pairs(where) do
-        if type(v) == "string" then
-            table.insert(wheres, string.format("%s='%s'", k, v))
-        else
-            table.insert(wheres, string.format("%s=%s", k, tostring(v)))
+    local whereString
+    if type(where) == "table" then
+        local wheres = { }
+        for k, v in pairs(where) do
+            if type(v) == "string" then
+                table.insert(wheres, string.format("%s='%s'", k, v))
+            else
+                table.insert(wheres, string.format("%s=%s", k, tostring(v)))
+            end
         end
+        whereString = table.concat(wheres, ",")
     end
     local fieldString = "*"
     if type(keys) == "table" then
         fieldString = table.concat(keys, ",")
     end
-    local whereString = table.concat(wheres, ",")
     if limit == nil then
+        if whereString == nil then
+            return string.format("SELECT %s FROM %s;", fieldString, name)
+        end
         return string.format("SELECT %s FROM %s WHERE %s;", fieldString, name, whereString)
+    end
+    if whereString == nil then
+        return nil
     end
     return string.format("SELECT %s FROM %s WHERE %s LIMIT %d;", fieldString, name, whereString, limit)
 end

@@ -66,7 +66,7 @@ namespace Tendo
 
     void HttpHandlerClient::OnReceiveLine(const Asio::Code &code, std::istream &is, size_t size)
     {
-        if(code && code != asio::error::eof)
+        if((code && code != asio::error::eof) || size == 0)
         {
             this->ClosetClient();
         }

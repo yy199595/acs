@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>服务器列表</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even){background-color: #f2f2f2}
+    </style>
+</head>
+<body>
+<h1>服务器列表</h1>
+<button  id="refresh-btn">刷新</button>
+<table>
+    <tr>
+        <th>服务器ID</th>
+        <th>服务器名称</th>
+        <th>RPC地址</th>
+        <th>HTTP地址</th>
+        <th>网关地址</th>
+    </tr>
+    <tbody id="server-list"></tbody>
+</table>
+
+<script>
+    function  refreshServerList() {
+        fetch('http://localhost:8080/server/info', { mode : 'no-cors'})
+            .then(response => response.json())
+            .then(data => {
+                const serverList = document.getElementById('server-list');
+                data.list.forEach(server => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${server.id}</td>
+                             <td>${server.name}</td>
+                             <td>${server.rpc}</td>
+                             <td>${server.http}</td>
+                             <td>${server.gate}</td>`;
+                    serverList.appendChild(row);
+                });
+            });
+    }
+    refreshServerList();
+    //  点击刷新按钮请求数据
+    document.getElementById('refresh-btn').addEventListener('click',  ()  =>  {
+        // fetch("http://127.0.0.1:8080/server/info", { mode : 'no-cors'})
+        //     .then(response => {
+        //         refreshServerList()
+        // });
+        refreshServerList();
+    });
+</script>
+</body>
+</html>

@@ -78,20 +78,12 @@
 
 <div class="container">
     <h1>分布式服务器Sentry管理后台</h1>
-<!--    <strong> 加粗 </strong>-->
-<!--    <img src="./R.jpg" alt="测试内容" height="500" width="300">-->
-    <form class="form">
-<!--        <em>哈哈</em>-->
-        <input type="text" placeholder="输入账号">
-        <input type="password" placeholder="输入密码">
+    <form class="form" method="POST" action="http://127.0.0.1:8080/server/login">
+        <input type="text" name="account" placeholder="输入账号">
+        <input type="password" name="password" placeholder="输入密码">
         <button type="submit">登录</button>
-        <button type="submit">注册</button>
+        <button type="submit" formaction="http://127.0.0.1:8080/server/register">注册</button>
     </form>
-<!--    <a href="http://www.baidu.com">百度</a>-->
-<!--    <a href="login.html">去登录</a>-->
-<!--    <a href="R.jpg">打开图片</a>-->
-<!--    <a href="matlto:646585122@qq.com">邮箱</a>-->
-<!--    <a href="tel:13716061995">电话 </a>-->
 </div>
 
 </body>

@@ -97,7 +97,7 @@ namespace Tendo
 				{
 					mysqlClient->Ping();
 #ifdef __DEBUG__
-					CONSOLE_LOG_DEBUG("start ping mysql client : " << iter->first);
+					//CONSOLE_LOG_DEBUG("start ping mysql client : " << iter->first);
 #endif
 				}
 			}

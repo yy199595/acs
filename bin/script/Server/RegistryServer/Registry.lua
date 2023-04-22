@@ -36,10 +36,15 @@ end
 
 function Registry.Query(request)
     table.print(request)
+    local result = nil
     local name = request.message.server_name
-    local result = mysql.Query(0, tab_name, nil, {
-        server_name = name
-    })
+    if #name == 0 then
+        result = mysql.Query(0, tab_name)
+    else
+        result = mysql.Query(0, tab_name, nil, {
+            server_name = name
+        })
+    end
     if result == nil then
         return XCode.MysqlResultIsNull
     end

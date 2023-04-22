@@ -55,13 +55,12 @@ namespace Tendo
 
 	int ServerWeb::Stop(Json::Writer & response)
 	{
-		std::string server;
 		const ServerConfig * config = ServerConfig::Inst();
 		RpcService * rpcService = this->mApp->GetService<Node>();
 		RegistryComponent * pRegistryComponent = this->GetComponent<RegistryComponent>();
 		LocationComponent * pLocationComponent = this->GetComponent<LocationComponent>();
 
-		pRegistryComponent->Query(server);
+		pRegistryComponent->Query();
 		std::vector<LocationUnit *> servers;
 		pLocationComponent->GetAllServer(servers);
 		for(LocationUnit * locationUnit : servers)
@@ -80,6 +79,27 @@ namespace Tendo
 
 	int ServerWeb::Info(Json::Writer&response)
     {
+		RegistryComponent * pRegistryComponent = this->GetComponent<RegistryComponent>();
+		LocationComponent * pLocationComponent = this->GetComponent<LocationComponent>();
+
+		pRegistryComponent->Query();
+		std::vector<LocationUnit *> servers;
+		pLocationComponent->GetAllServer(servers);
+		response.BeginArray("list");
+		for(LocationUnit * locationUnit : servers)
+		{
+			int id = locationUnit->GetId();
+			std::string rpc, http, gate;
+			locationUnit->Get("rpc", rpc);
+			locationUnit->Get("http", http);
+			locationUnit->Get("gate", gate);
+			response.BeginObject();
+			response.Add("id").Add(id);
+			response.Add("name").Add(locationUnit->Name());
+			response.Add("rpc").Add(rpc).Add("http").Add(http).Add("gate").Add(gate);
+			response.EndObject();
+		}
+		response.EndArray();
 		return XCode::Successful;
     }
 }

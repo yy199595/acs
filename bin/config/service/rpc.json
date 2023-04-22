@@ -14,7 +14,7 @@
             "IsClient": true
         },
         "Allocation": {
-            "Request": "s2s.allot.request",
+            "Request": "s2s.allot.request"
         }
     },
     "Registry": {

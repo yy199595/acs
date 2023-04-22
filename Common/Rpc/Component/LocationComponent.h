@@ -57,6 +57,8 @@ namespace Tendo
     public:
 		bool DelServer(int id, const std::string & name);
 		void GetAllServer(std::vector<LocationUnit *> & servers);
+	public:
+		LocationUnit * GetServerById(int id);
 		LocationUnit * GetOrCreateServer(int id, const std::string & name);
 		int RangeServer(const std::string & server) const;
 		bool GetAddress(int id, const std::string & listen, std::string & address);

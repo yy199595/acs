@@ -5,7 +5,7 @@ user.add_user = function(request)
     if redis.call("SADD", "user_account", request.account) == 0 then
         return 0
     end
-    return redis.call("INCR", "user_id") + 1995;
+    return redis.call("INCR", "user_id") + 1995
 end
 
 user.set_token = function(request)

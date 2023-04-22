@@ -281,12 +281,6 @@ namespace Tendo
         document.Add("client").Add(this->mRemoteClients.size());
     }
 
-    const NodeInfo *InnerNetComponent::GetNodeInfo(const std::string &address) const
-    {
-        auto iter = this->mLocationMaps.find(address);
-        return iter != this->mLocationMaps.end() ? &iter->second : nullptr;
-    }
-
     void InnerNetComponent::OnFrameUpdate(float t)
     {
         for (int index = 0; index < this->mMaxHandlerCount && !this->mWaitMessages.empty(); index++)

@@ -93,8 +93,10 @@ namespace Http
         {
             const std::string & key = iter->first;
             const std::string & value = iter->second;
-            buffer << key << ':' << value << "\r\n";
+            buffer << key << ": " << value << "\r\n";
         }
+		buffer << "Access-Control-Allow-Origin: *" << "\r\n";
+		buffer << "Access-Control-Allow-Credentials: true" << "\r\n";
         return 0;
     }
 
