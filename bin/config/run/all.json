@@ -1,26 +1,26 @@
 {
+    "id": 0,
     "fps": 15,
-    "Name": "Server",
+    "name": "Server",
     "thread": {
         "task": 1,
         "network": 4
     },
-    "id" : 0,
     "message": {
         "inner": 500,
         "outer": 1000
     },
     "path": {
-        "proto": "proto",
-        "html": "www/html",
-        "home": "www/html/home.html",
-        "sqlite": "data/sqlite/",
-        "db": "config/db/db.json",
-        "code": "XCode/XCode.csv",
-        "user": "config/user.json",
-        "rpc": "config/service/rpc.json",
-        "http": "config/service/http.json",
-        "cluster": "config/cluster/debug.json"
+        "proto": "${WORK_PATH}/proto",
+        "html": "${WORK_PATH}/www/html",
+        "home": "${WORK_PATH}/www/html/home.html",
+        "sqlite": "${WORK_PATH}/data/sqlite/",
+        "db": "${WORK_PATH}/config/db/db.json",
+        "code": "${WORK_PATH}/XCode/XCode.csv",
+        "user": "${WORK_PATH}/config/user.json",
+        "rpc": "${WORK_PATH}/config/service/rpc.json",
+        "http": "${WORK_PATH}/config/service/http.json",
+        "cluster": "${WORK_PATH}/config/cluster/debug.json"
     },
     "user": {
         "name": "root",
@@ -34,10 +34,10 @@
         "debug": "http://127.0.0.1:8088"
     },
     "lua": {
-        "common": "script/Common",
-        "module": "script/Server",
-        "component":"script/Component",
-        "main": "script/Server/Server.lua"
+        "common": "${WORK_PATH}/script/Common",
+        "module": "${WORK_PATH}/script/Server",
+        "component":"${WORK_PATH}/script/Component",
+        "main": "${WORK_PATH}/script/Server/Server.lua"
     },
     "white_list": [
         "127.0.0.1"

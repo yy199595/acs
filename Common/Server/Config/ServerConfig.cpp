@@ -33,8 +33,8 @@ namespace Tendo
 			CONSOLE_LOG_ERROR("parse " << this->Path() << " failure");
 			return false;
 		}
-        this->GetMember("name", this->mName);
-        this->GetMember("id", this->mServerId);
+		assert(this->GetMember("name", this->mName));
+		assert(this->GetMember("id", this->mServerId));
         this->mEnvVals["${WORK_PATH}"] = System::WorkPath();
 		if(this->HasMember("lua"))
 		{
@@ -84,6 +84,17 @@ namespace Tendo
                 Helper::Str::ReplaceString(mPath.second, k, v);
             }
         }
+
+		for(auto & mPath : this->mLuaConfigs)
+		{
+			const std::string & value = mPath.second;
+			for(auto & mEnvVal : this->mEnvVals)
+			{
+				const std::string & k = mEnvVal.first;
+				const std::string & v = mEnvVal.second;
+				Helper::Str::ReplaceString(mPath.second, k, v);
+			}
+		}
 		return true;
 	}
 
@@ -140,24 +151,6 @@ namespace Tendo
 			return true;
 		}
 		return false;
-	}
-	bool ServerConfig::ParseHttpAddress(const std::string& address, unsigned short & port) const
-	{
-		std::cmatch what;
-		std::regex pattern("(http|https)://([^/ :]+):?([^/ ]*)(/.*)?");
-		if (!std::regex_match(address.c_str(), what, pattern))
-		{
-			return false;
-		}
-		std::string protocol = std::string(what[1].first, what[1].second);
-		std::string portStr = std::string(what[3].first, what[3].second);
-		if (portStr.length() == 0)
-		{
-			port = (protocol == "http" ? 80 : 443);
-			return true;
-		}
-		port = std::stoi(portStr);
-		return true;
 	}
 	bool ServerConfig::GetLuaConfig(const std::string& name, std::string& value) const
 	{

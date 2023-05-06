@@ -5,6 +5,7 @@
         "network": 4
     },
     "id" : 1,
+    "name": "Client",
     "message": {
         "inner": 500,
         "outer": 1000

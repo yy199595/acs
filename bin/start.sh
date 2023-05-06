@@ -1,9 +1,8 @@
 rm -rf ./log
 rm -rf ./nohup.out
-nohup ./app ./config/run/cluster.json RegistryServer &
-nohup ./app ./config/run/cluster.json DataServer &
-nohup ./app ./config/run/cluster.json HttpServer &
-nohup ./app ./config/run/cluster.json ChatServer &
-nohup ./app ./config/run/cluster.json GateServer &
-nohup ./app ./config/run/cluster.json LogServer &
+nohup ./app ./config/run/registry.json &
+nohup ./app ./config/run/data.json &
+nohup ./app ./config/run/http.json &
+nohup ./app ./config/run/chat.json &
+nohup ./app ./config/run/gate.json &
 tail -f ./nohup.out

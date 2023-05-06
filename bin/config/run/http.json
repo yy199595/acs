@@ -1,7 +1,7 @@
 {
     "fps": 15,
-    "id" : 2,
-    "name": "RegistryServer",
+    "id" : 200,
+    "name": "DataServer",
     "thread": {
         "task": 1,
         "network": 4
@@ -12,6 +12,8 @@
     },
     "path": {
         "proto": "${WORK_PATH}/proto",
+        "html": "${WORK_PATH}/www/html",
+        "home": "${WORK_PATH}/www/html/home.html",
         "sqlite": "${WORK_PATH}/data/sqlite/",
         "db": "${WORK_PATH}/config/db/db.json",
         "code": "${WORK_PATH}/XCode/XCode.csv",
@@ -26,12 +28,14 @@
     },
     "registry": "tcp://127.0.0.1:7788",
     "listen": {
-       "rpc": "tcp://127.0.0.1:7788"
+        "rpc": "tcp://127.0.0.1:7790",
+        "http": "http://127.0.0.1:8080",
+        "debug": "http://127.0.0.1:8088"
     },
     "lua": {
         "common": "${WORK_PATH}/script/Common",
         "component":"${WORK_PATH}/script/Component",
-        "module": "${WORK_PATH}/script/Server/RegistryServer"
+        "module": "${WORK_PATH}/script/Server/HttpServer"
     },
     "white_list": [
         "127.0.0.1"

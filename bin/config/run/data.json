@@ -1,7 +1,7 @@
 {
     "fps": 15,
-    "id" : 2,
-    "name": "RegistryServer",
+    "id" : 100,
+    "name": "DataServer",
     "thread": {
         "task": 1,
         "network": 4
@@ -26,12 +26,12 @@
     },
     "registry": "tcp://127.0.0.1:7788",
     "listen": {
-       "rpc": "tcp://127.0.0.1:7788"
+        "rpc": "tcp://127.0.0.1:7793"
     },
     "lua": {
         "common": "${WORK_PATH}/script/Common",
         "component":"${WORK_PATH}/script/Component",
-        "module": "${WORK_PATH}/script/Server/RegistryServer"
+        "module": "${WORK_PATH}/script/Server/DataServer"
     },
     "white_list": [
         "127.0.0.1"

@@ -1,5 +1,4 @@
 ﻿#include "LuaScriptComponent.h"
-#include "Lua/Engine/luadebug.h"
 
 #include "Entity/Unit/App.h"
 #include "Util/Md5/MD5.h"
@@ -12,7 +11,6 @@
 #include "Log/Lua/LuaLogger.h"
 #include "Util/Json/Lua/Json.h"
 #include "Async/Lua/LuaCoroutine.h"
-#include "Util/Json/Lua/Encoder.h"
 #include "Util/Md5/LuaMd5.h"
 #include "Core/System/System.h"
 #include "Server/Config/ServiceConfig.h"
@@ -41,6 +39,19 @@ namespace Tendo
 			os.PushMember("dir", System::WorkPath());
 			os.PushStaticFunction("ms", Helper::Time::NowMilTime);
 			os.PushStaticFunction("time", Helper::Time::NowSecTime);
+#ifdef __OS_MAC__
+			os.PushMember("type", std::string("mac"));
+#elif __OS_LINUX__
+			os.PushMember("type", std::string("linux"));
+#elif __OS__WIN__
+			os.PushMember("type", std::string("win"));
+#endif
+
+#ifdef __DEBUG__
+			os.PushMember("debug", true);
+#else
+			os.PushMember("debug", false);
+#endif
 		}
 		{
 			Lua::ClassProxyHelper app(this->mLuaEnv, "App");
@@ -209,14 +220,9 @@ namespace Tendo
 		std::vector<std::string> luaFiles;
 		std::string common, module, main, component;
 		const ServerConfig *config = ServerConfig::Inst();
-		if (config->GetLuaConfig("component", component))
-		{
-			this->mComponentPath = System::FormatPath(component);
-		}
-
+		config->GetLuaConfig("component", this->mComponentPath);
 		if (config->GetLuaConfig("common", common))
 		{
-			common = System::FormatPath(common);
 			if (!Helper::Directory::GetFilePaths(common, "*.lua", luaFiles))
 			{
 				return false;
@@ -233,15 +239,13 @@ namespace Tendo
 
 		this->AddRequire(common);
 		this->AddRequire(this->mComponentPath);
-		if (config->GetLuaConfig("module", module))
+		if (config->GetLuaConfig("module", this->mModulePath))
 		{
-			this->mModulePath = System::FormatPath(module);
 			this->AddRequire(this->mModulePath);
 		}
 
 		if (config->GetLuaConfig("main", main))
 		{
-			main = System::FormatPath(main);
 			return this->LoadModuleByPath(main) != nullptr;
 		}
 		return true;
