@@ -21,7 +21,7 @@ namespace Tendo
     class ServerConfig : public Json::Reader, public TextConfig, public ConstSingleton<ServerConfig>
     {
     public:
-        explicit ServerConfig(std::string  name);
+        explicit ServerConfig();
     public:
 
 		bool UseLua() const { return this->mUseLua;}
@@ -45,8 +45,9 @@ namespace Tendo
 		bool mUseLua;
 		int mGroupId;
 		int mServerId;
+        std::string mName;
 		std::string mContent;
-        const std::string mName;
+        std::unordered_map<std::string, std::string> mEnvVals;
         std::unordered_map<std::string, ListenConfig> mListens;
         std::unordered_map<std::string, std::string> mPaths;
         std::unordered_map<std::string, std::string> mLocations;

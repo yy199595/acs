@@ -80,8 +80,7 @@ namespace Tendo
 #endif
             return -1;
         }
-        std::string name = argc >= 3 ? argv[2] : "Server";
-        std::unique_ptr<ServerConfig> serverConfig(new ServerConfig(name));
+        std::unique_ptr<ServerConfig> serverConfig(new ServerConfig());
 
         if (!serverConfig->LoadConfig(System::ConfigPath()))
         {

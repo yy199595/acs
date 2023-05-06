@@ -24,7 +24,7 @@ namespace Tendo
             System::IsInit = true;
             System::mExePath = argv[0];
             System::mConfigPath = "./config/run/all.json";
-            System::mWorkPath = fmt::format("{0}/", getcwd(nullptr, 0));         
+            System::mWorkPath = fmt::format("{0}", getcwd(NULL, 0));
             Helper::Str::ReplaceString(System::mWorkPath, "\\", "/");           
             return true;
         }

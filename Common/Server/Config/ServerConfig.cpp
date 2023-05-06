@@ -1,18 +1,20 @@
-﻿#include<utility>
+﻿
 #ifdef __OS_WIN__
 #include<direct.h>
 #else
 #endif //
 #include<regex>
 #include"ServerConfig.h"
+#include"Core/System/System.h"
 #include"Log/Common/CommonLogDef.h"
 #include"Util/File/FileHelper.h"
 #include"Util/String/StringHelper.h"
 #include"Util/File/DirectoryHelper.h"
+
 namespace Tendo
 {
-	ServerConfig::ServerConfig(std::string  server)
-		: TextConfig("ServerConfig"), mName(std::move(server))
+	ServerConfig::ServerConfig()
+		: TextConfig("ServerConfig")
 	{
 		this->mServerId = 0;
 		this->mGroupId = 0;
@@ -31,28 +33,13 @@ namespace Tendo
 			CONSOLE_LOG_ERROR("parse " << this->Path() << " failure");
 			return false;
 		}
-		if (!this->HasMember(this->mName.c_str()))
+        this->GetMember("name", this->mName);
+        this->GetMember("id", this->mServerId);
+        this->mEnvVals["${WORK_PATH}"] = System::WorkPath();
+		if(this->HasMember("lua"))
 		{
-			return false;
-		}
-		auto iter1 = this->FindMember("id");
-		if(iter1 != this->MemberEnd())
-		{
-			this->mGroupId = iter1->value.GetInt();
-		}
-		auto iter = this->FindMember(this->mName.c_str());
-		if (iter == this->MemberEnd())
-		{
-			return false;
-		}
-		if(iter->value.HasMember("id"))
-		{
-			this->mServerId = iter->value["id"].GetInt();
-		}
-		if(iter->value.HasMember("lua"))
-		{
-			const rapidjson::Value& document = iter->value["lua"];
-			for(auto iter = document.MemberBegin(); iter != document.MemberEnd(); iter++)
+			const rapidjson::Value * document = this->GetJsonValue("lua");
+			for(auto iter = document->MemberBegin(); iter != document->MemberEnd(); iter++)
 			{
 				const std::string key = iter->name.GetString();
 				const std::string value = iter->value.GetString();
@@ -60,10 +47,10 @@ namespace Tendo
 			}
 			this->mUseLua = true;
 		}
-		if (iter->value.HasMember("address"))
+		if (this->HasMember("listen"))
 		{
-			const rapidjson::Value& document = iter->value["address"];
-			for (auto iter1 = document.MemberBegin(); iter1 != document.MemberEnd(); iter1++)
+			const rapidjson::Value * document = this->GetJsonValue("listen");
+			for (auto iter1 = document->MemberBegin(); iter1 != document->MemberEnd(); iter1++)
 			{
 				ListenConfig listenConfig;
 				const std::string key(iter1->name.GetString());
@@ -74,17 +61,6 @@ namespace Tendo
 				}
 				this->mLocations.emplace(key, address);
 				this->mListens.emplace(key, listenConfig);
-			}
-		}
-
-		if (iter->value.HasMember("path"))
-		{
-			const rapidjson::Value& document = iter->value["path"];
-			for (auto iter1 = document.MemberBegin(); iter1 != document.MemberEnd(); iter1++)
-			{
-				const std::string key(iter1->name.GetString());
-				const std::string value(iter1->value.GetString());
-				this->mPaths.emplace(key, this->WorkPath() + value);
 			}
 		}
 
@@ -99,6 +75,16 @@ namespace Tendo
 				this->mPaths.emplace(key, this->WorkPath() + value);
 			}
 		}
+        for(auto & mPath : this->mPaths)
+        {
+            const std::string & value = mPath.second;
+            for(auto & mEnvVal : this->mEnvVals)
+            {
+                const std::string & k = mEnvVal.first;
+                const std::string & v = mEnvVal.second;
+                Helper::Str::ReplaceString(mPath.second, k, v);
+            }
+        }
 		return true;
 	}
 
