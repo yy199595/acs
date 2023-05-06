@@ -71,8 +71,7 @@ namespace Tendo
 			for (; iter1 != jsonObject.MemberEnd(); iter1++)
 			{
 				const std::string key(iter1->name.GetString());
-				const std::string value(iter1->value.GetString());
-				this->mPaths.emplace(key, this->WorkPath() + value);
+				this->mPaths.emplace(key, std::string(iter1->value.GetString()));
 			}
 		}
         for(auto & mPath : this->mPaths)
