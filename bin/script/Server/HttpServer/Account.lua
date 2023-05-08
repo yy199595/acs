@@ -1,12 +1,15 @@
-require("XCode")
+
+local md5 = Md5
 local log = require("Log")
+local XCode = require("XCode")
+local proto = require("Proto")
 local AccountService = {}
 local tabName = "user.account_info"
 local mysql = require("Server.MysqlClient")
 local redis = require("Server.RedisComponent")
 function AccountService.Awake()
     print("启动账号服务")
-    Proto.Import("mysql/user.proto")
+    proto.Import("mysql/user.proto")
     return mysql.NewTable(0, tabName, {
         pb = tabName,
         keys = { "account" }

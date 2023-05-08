@@ -1,4 +1,5 @@
 local Chat = { }
+require("XCode")
 require("coroutine")
 local proto = require("Proto")
 function Chat.OnLogin(userId)
@@ -15,7 +16,7 @@ function Chat.Chat(request)
     })
     --Gate.Send(id, "ChatComponent.Private", chatMessage)
     Gate.BroadCast("ChatComponent.Chat", chatMessage)
-    return xcode.Successful
+    return XCode.Successful
 end
 local count = 0
 
