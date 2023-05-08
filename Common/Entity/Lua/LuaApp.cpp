@@ -4,10 +4,11 @@
 
 #include"LuaApp.h"
 #include"Entity/Unit/App.h"
+
 #include"Rpc/Service/RpcService.h"
 #include"Rpc/Async/RpcTaskSource.h"
+#include"Lua/Engine/LocalClassProxy.h"
 #include"Proto/Component/ProtoComponent.h"
-#include"Rpc/Component/DispatchComponent.h"
 using namespace Tendo;
 namespace Lua
 {

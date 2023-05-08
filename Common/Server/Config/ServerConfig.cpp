@@ -38,13 +38,8 @@ namespace Tendo
         this->mEnvVals["${WORK_PATH}"] = System::WorkPath();
 		if(this->HasMember("lua"))
 		{
-			const rapidjson::Value * document = this->GetJsonValue("lua");
-			for(auto iter = document->MemberBegin(); iter != document->MemberEnd(); iter++)
-			{
-				const std::string key = iter->name.GetString();
-				const std::string value = iter->value.GetString();
-				this->mLuaConfigs.emplace(key, value);
-			}
+			this->GetMember("lua", "main", this->mMainLua);
+			this->GetMember("lua", "path", this->mLuaRequires);
 			this->mUseLua = true;
 		}
 		if (this->HasMember("listen"))
@@ -85,15 +80,20 @@ namespace Tendo
             }
         }
 
-		for(auto & mPath : this->mLuaConfigs)
+		for(std::string & value : this->mLuaRequires)
 		{
-			const std::string & value = mPath.second;
 			for(auto & mEnvVal : this->mEnvVals)
 			{
 				const std::string & k = mEnvVal.first;
 				const std::string & v = mEnvVal.second;
-				Helper::Str::ReplaceString(mPath.second, k, v);
+				Helper::Str::ReplaceString(value, k, v);
 			}
+		}
+		for(auto & mEnvVal : this->mEnvVals)
+		{
+			const std::string & k = mEnvVal.first;
+			const std::string & v = mEnvVal.second;
+			Helper::Str::ReplaceString(this->mMainLua, k, v);
 		}
 		return true;
 	}
@@ -151,15 +151,5 @@ namespace Tendo
 			return true;
 		}
 		return false;
-	}
-	bool ServerConfig::GetLuaConfig(const std::string& name, std::string& value) const
-	{
-		auto iter = this->mLuaConfigs.find(name);
-		if(iter == this->mLuaConfigs.end())
-		{
-			return false;
-		}
-		value = iter->second;
-		return true;
 	}
 }

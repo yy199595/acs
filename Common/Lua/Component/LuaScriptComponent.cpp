@@ -81,20 +81,18 @@ namespace Tendo
 		luaRegister4.PushExtensionFunction("start", Lua::Coroutine::Start);
 		luaRegister4.PushExtensionFunction("sleep", Lua::Coroutine::Sleep);
 
-		Lua::ClassProxyHelper luaRegister5(this->mLuaEnv, "Log");
+		Lua::ClassProxyHelper luaRegister5(this->mLuaEnv, "Logger");
 		luaRegister5.BeginNewTable();
-		luaRegister5.PushExtensionFunction("Info", Lua::Log::Info);
-		luaRegister5.PushExtensionFunction("Debug", Lua::Log::Debug);
-		luaRegister5.PushExtensionFunction("Error", Lua::Log::Error);
-		luaRegister5.PushExtensionFunction("Warn", Lua::Log::Warning);
-		luaRegister5.PushExtensionFunction("LuaError", Lua::Log::LuaError);
+		luaRegister5.PushExtensionFunction("Output", Lua::Log::Output);
+//		luaRegister5.PushExtensionFunction("Info", Lua::Log::Info);
+//		luaRegister5.PushExtensionFunction("Debug", Lua::Log::Debug);
+//		luaRegister5.PushExtensionFunction("Error", Lua::Log::Error);
+//		luaRegister5.PushExtensionFunction("Warn", Lua::Log::Warning);
+//		luaRegister5.PushExtensionFunction("LuaError", Lua::Log::LuaError);
 
-		Lua::ClassProxyHelper luaRegister55(this->mLuaEnv, "Console");
+		Lua::ClassProxyHelper luaRegister55(this->mLuaEnv, "ConsoleLog");
 		luaRegister55.BeginNewTable();
-		luaRegister55.PushExtensionFunction("Info", Lua::Console::Info);
-		luaRegister55.PushExtensionFunction("Debug", Lua::Console::Debug);
-		luaRegister55.PushExtensionFunction("Warn", Lua::Console::Warning);
-		luaRegister55.PushExtensionFunction("Error", Lua::Console::Error);
+		luaRegister55.PushExtensionFunction("Show", Lua::Console::Show);
 
 		Lua::ClassProxyHelper luaRegister6(this->mLuaEnv, "Guid");
 		luaRegister6.BeginNewTable();
@@ -119,63 +117,67 @@ namespace Tendo
 		luaRegister9.PushExtensionFunction("RangeServer", Lua::Service::RangeServer);
 		luaRegister9.PushExtensionFunction("GetAddrById", Lua::Service::GetAddrById);
 
-		std::vector<ILuaRegister *> components;
+		std::vector<ILuaRegister*> components;
 		this->mApp->GetComponents(components);
-		for (ILuaRegister *component : components)
+		for (ILuaRegister* component: components)
 		{
-			const std::string &name = dynamic_cast<Component *>(component)->GetName();
+			const std::string& name = dynamic_cast<Component*>(component)->GetName();
 			Lua::ClassProxyHelper luaRegister(this->mLuaEnv, name);
 			component->OnLuaRegister(luaRegister);
 		}
 		return this->LoadAllFile();
 	}
 
-	bool LuaScriptComponent::GetFunction(const std::string &tab, const std::string &func)
+	bool LuaScriptComponent::GetFunction(const std::string& tab, const std::string& func)
 	{
 		return Lua::Function::Get(this->mLuaEnv, tab.c_str(), func.c_str());
 	}
 
-	Lua::LuaModule *LuaScriptComponent::LoadModule(const std::string &name)
+	Lua::LuaModule* LuaScriptComponent::LoadModule(const std::string& name)
 	{
 		auto iter1 = this->mModules.find(name);
 		if (iter1 != this->mModules.end())
 		{
 			return iter1->second.get();
 		}
-		std::vector<std::string> luaFiles;
-		Helper::Directory::GetFilePaths(this->mModulePath, "*.lua", luaFiles);
-		for (const std::string &path : luaFiles)
+		const ServerConfig * config = ServerConfig::Inst();
+		for(const std::string & path : config->RequirePath())
 		{
 			std::string fileName;
-			Helper::Directory::GetFileName(path, fileName);
-			if (fileName == fmt::format("{0}.lua", name))
+			std::vector<std::string> luaFiles;
+			Helper::Directory::GetFilePaths(path, "*.lua", luaFiles);
+			for (const std::string& filePath : luaFiles)
 			{
-				return this->LoadModuleByPath(path);
+				Helper::File::GetFileName(filePath, fileName);
+				if (name == fileName)
+				{
+					return this->LoadModuleByPath(filePath);
+				}
 			}
 		}
 		return nullptr;
 	}
 
-	Lua::LuaModule *LuaScriptComponent::LoadModuleByPath(const std::string &path)
+	Lua::LuaModule* LuaScriptComponent::LoadModuleByPath(const std::string& path)
 	{
 		std::string name;
 		Helper::File::GetFileName(path, name);
 		std::unique_ptr<Lua::LuaModule> luaModule =
-			std::make_unique<Lua::LuaModule>(this->mLuaEnv, name, path);
+				std::make_unique<Lua::LuaModule>(this->mLuaEnv, name, path);
 		if (!luaModule->Awake())
 		{
 			LOG_ERROR("load lua module [" << name << "] error");
 			return nullptr;
 		}
-		Lua::LuaModule *result = luaModule.get();
-		{		
+		Lua::LuaModule* result = luaModule.get();
+		{
 			LOG_INFO("start load lua module [" << name << "]");
 			this->mModules.emplace(name, std::move(luaModule));
 		}
 		return result;
 	}
 
-	Lua::LuaModule *LuaScriptComponent::GetModule(const std::string &name)
+	Lua::LuaModule* LuaScriptComponent::GetModule(const std::string& name)
 	{
 		auto iter1 = this->mModules.find(name);
 		return iter1 == this->mModules.end() ? nullptr : iter1->second.get();
@@ -192,8 +194,8 @@ namespace Tendo
 
 	bool LuaScriptComponent::Start()
 	{
-		const std::string &name = ServerConfig::Inst()->Name();
-		Lua::LuaModule *luaModule = this->GetModule(name);
+		const std::string& name = ServerConfig::Inst()->Name();
+		Lua::LuaModule* luaModule = this->GetModule(name);
 		return luaModule == nullptr || luaModule->Start();
 	}
 
@@ -217,48 +219,28 @@ namespace Tendo
 
 	bool LuaScriptComponent::LoadAllFile()
 	{
-		std::vector<std::string> luaFiles;
-		std::string common, module, main, component;
-		const ServerConfig *config = ServerConfig::Inst();
-		config->GetLuaConfig("component", this->mComponentPath);
-		if (config->GetLuaConfig("common", common))
-		{
-			if (!Helper::Directory::GetFilePaths(common, "*.lua", luaFiles))
-			{
-				return false;
-			}
-			for (const std::string &path : luaFiles)
-			{
-				if (luaL_dofile(this->mLuaEnv, path.c_str()) != LUA_OK)
-				{
-					LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
-					return false;
-				}
-			}
-		}
+		const ServerConfig* config = ServerConfig::Inst();
 
-		this->AddRequire(common);
-		this->AddRequire(this->mComponentPath);
-		if (config->GetLuaConfig("module", this->mModulePath))
+		std::string main(config->MainLua());
+		if (main.empty())
 		{
-			this->AddRequire(this->mModulePath);
+			return true;
 		}
-
-		if (config->GetLuaConfig("main", main))
+		for(const std::string & path : config->RequirePath())
 		{
-			return this->LoadModuleByPath(main) != nullptr;
+			this->AddRequire(path);
 		}
-		return true;
+		this->LoadModuleByPath(main) != nullptr;
 	}
 
 	void LuaScriptComponent::OnHotFix()
 	{
-		std::vector<Component *> components;
+		std::vector<Component*> components;
 		this->mApp->GetComponents(components);
-		for (Component *component : components)
+		for (Component* component: components)
 		{
-			const std::string &name = component->GetName();
-			IServiceBase *service = component->Cast<IServiceBase>();
+			const std::string& name = component->GetName();
+			IServiceBase* service = component->Cast<IServiceBase>();
 			if (service != nullptr && this->GetModule(name) == nullptr)
 			{
 				if (!this->LoadModule(component->GetName()))
@@ -271,12 +253,12 @@ namespace Tendo
 		auto iter = this->mModules.begin();
 		for (; iter != this->mModules.end(); iter++)
 		{
-			const std::string &name = iter->first;
-			Lua::LuaModule *luaModule = iter->second.get();
+			const std::string& name = iter->first;
+			Lua::LuaModule* luaModule = iter->second.get();
 			if (luaModule != nullptr && luaModule->Hotfix())
 			{
 				LOG_INFO(name << " hotfix successful");
-				IServiceBase *service = this->GetComponent<IServiceBase>(name);
+				IServiceBase* service = this->GetComponent<IServiceBase>(name);
 				if (service != nullptr && service->IsStartService())
 				{
 					service->LoadFromLua();
@@ -294,7 +276,7 @@ namespace Tendo
 		}
 	}
 
-	void LuaScriptComponent::AddRequire(const std::string &path)
+	void LuaScriptComponent::AddRequire(const std::string& path)
 	{
 		if (path.empty())
 			return;
@@ -304,7 +286,7 @@ namespace Tendo
 			this->mDirectorys.insert(path);
 			lua_getglobal(this->mLuaEnv, "package");
 			lua_getfield(this->mLuaEnv, -1, "path");
-			const char *str = lua_tolstring(this->mLuaEnv, -1, &size);
+			const char* str = lua_tolstring(this->mLuaEnv, -1, &size);
 			std::string fullPath = std::string(str, size) + ";" + path + "/?.lua";
 			lua_pushlstring(this->mLuaEnv, fullPath.c_str(), fullPath.size());
 			lua_setfield(this->mLuaEnv, -3, "path");
@@ -341,14 +323,15 @@ namespace Tendo
 		return 0;
 	}
 
-	void LuaScriptComponent::OnRecord(Json::Writer &document)
+	void LuaScriptComponent::OnRecord(Json::Writer& document)
 	{
 		double size = this->GetMemorySize();
 		double free = this->CollectGarbage();
 		document.Add("free").Add(fmt::format("{0}mb", free / 1024));
 		document.Add("memory").Add(fmt::format("{0}mb", size / 1024));
 	}
-	bool LuaScriptComponent::UnloadModule(const string &name)
+
+	bool LuaScriptComponent::UnloadModule(const string& name)
 	{
 		auto iter = this->mModules.find(name);
 		if (iter != this->mModules.end())

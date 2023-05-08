@@ -1,20 +1,21 @@
-
 local Chat = { }
+require("coroutine")
+local proto = require("Proto")
 function Chat.OnLogin(userId)
     coroutine.sleep(1000)
-    print(string.format("玩家%d登录聊天服务",userId))
+    print(string.format("玩家%d登录聊天服务", userId))
 end
 
 function Chat.Chat(request)
     coroutine.sleep(1000)
     local message = request.message
-    local chatMessage = Proto.New("c2s.chat.notice", {
+    local chatMessage = proto.New("c2s.chat.notice", {
         msg_type = message.msg_type,
         message = message.message
     })
     --Gate.Send(id, "ChatComponent.Private", chatMessage)
     Gate.BroadCast("ChatComponent.Chat", chatMessage)
-    return XCode.Successful
+    return xcode.Successful
 end
 local count = 0
 

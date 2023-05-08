@@ -26,8 +26,11 @@
     },
     "registry": "tcp://127.0.0.1:7788",
     "lua": {
-        "common": "${WORK_PATH}/script/Common",
-        "module":"${WORK_PATH}/script/Client",
+        "path": [
+            "${WORK_PATH}/script/Common",
+            "${WORK_PATH}/script/Client",
+            "${WORK_PATH}/script/Component"
+        ],
         "component": "${WORK_PATH}/script/Component",
         "main": "${WORK_PATH}/script/Client/Client.lua"
     },

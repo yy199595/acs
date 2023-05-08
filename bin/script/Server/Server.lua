@@ -1,13 +1,18 @@
+require("XCode")
+require("TableUtil")
+local log = require("Log")
+local redis = require("Server.RedisComponent")
+local MongoDB = require("Server.MongoComponent")
+
 
 local Main = {}
-local MongoDB = require("Server.MongoComponent")
-local redis = require("Server.RedisComponent")
 function Main.Awake()
 
     redis.SyncRun("FLUSHALL")
     print(os.ms(), os.time(), os.dir)
 
-     --table.print(response)
+    log.Info("112233", { "112288", 1122})
+    --table.print(response)
 
     --local id = Sqlite.Open("server")
     --local res = Sqlite.Query(id, "select * from registry")
@@ -17,11 +22,10 @@ function Main.Awake()
     return true
 end
 
-
 function Main.OnClusterComplete()
     --MongoDB.ClearTable("user.account_info")
     --Http.Download("http://127.0.0.1:8080/1122.exe", "D:\\trunk\\ssh\\Sentry\\bin\\1122.exe");
-   
+
     --local id = Mysql.Make()
     --local res = Mysql.Exec(id, "insert into server.registry(server_name,rpc_address,http_address)values('test','127.0.0.1:7788','http://127.0.0.1:80')")
     --res = Mysql.QueryOnce(id, "select * from server.registry")
@@ -49,11 +53,11 @@ function Main.OnClusterComplete()
     }, 0)
     Log.Error("code = ", code)
 
-   local response = MongoDB.QueryOnce("user.account_info", {
+    local response = MongoDB.QueryOnce("user.account_info", {
         _id = "646585122@qq.com",
     })
-   table.print(response)
+    table.print(response)
     print("++++++++++++++++++++++")
-   table.print(redis.SyncRun("HVALS","Registry.Server"))
+    table.print(redis.SyncRun("HVALS", "Registry.Server"))
 end
 return Main

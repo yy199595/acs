@@ -31,9 +31,11 @@
         "rpc": "tcp://127.0.0.1:7791"
     },
     "lua": {
-        "common": "${WORK_PATH}/script/Common",
-        "component":"${WORK_PATH}/script/Component",
-        "module": "${WORK_PATH}/script/Server/ChatServer"
+        "path": [
+            "${WORK_PATH}/script/Common",
+            "${WORK_PATH}/script/Component",
+            "${WORK_PATH}/script/Server/ChatServer"
+        ]
     },
     "white_list": [
         "127.0.0.1"

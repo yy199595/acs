@@ -9,8 +9,8 @@
 #include"Log/Common/CommonLogDef.h"
 namespace Lua
 {
-	LuaModule::LuaModule(lua_State* lua, std::string  name, std::string  path)
-		: mLua(lua), mName(std::move(name)), mPath(std::move(path))
+	LuaModule::LuaModule(lua_State* lua, std::string  name, const std::string & path)
+		: mLua(lua), mName(std::move(name)), mPath(path)
 	{
 		this->mRef = 0;
 		this->mIsUpdate = false;

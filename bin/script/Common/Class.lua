@@ -3,6 +3,6 @@ Class = {}
 
 function Class.Clone(meta)
     local tab = {}
-    setmetatable(tab, meta)
+    setmetatable(tab, { __index = meta })
     return tab
 end

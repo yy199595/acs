@@ -1,4 +1,5 @@
-
+require("XCode")
+local log = require("Log")
 local AccountService = {}
 local tabName = "user.account_info"
 local mysql = require("Server.MysqlClient")
@@ -8,7 +9,7 @@ function AccountService.Awake()
     Proto.Import("mysql/user.proto")
     return mysql.NewTable(0, tabName, {
         pb = tabName,
-        keys = { "account"}
+        keys = { "account" }
     })
 end
 
@@ -46,7 +47,7 @@ function AccountService.Register(request)
     if not result then
         return XCode.SaveToMysqlFailure
     end
-    Log.Info("register account : ", rapidjson.encode(message))
+    log.Info("register account : ", message)
     return XCode.Successful
 end
 
@@ -72,7 +73,6 @@ function AccountService.Login(request)
     local rpcAddress = Service.GetAddrById(serverId, "rpc")
     local gateAddress = Service.GetAddrById(serverId, "gate")
 
-
     local code = Service.Call(rpcAddress, "Gate.Allocation", {
         token = token,
         user_id = userInfo.user_id
@@ -93,7 +93,7 @@ function AccountService.Login(request)
     if not res then
         return XCode.SaveToMysqlFailure, "更新数据失败"
     end
-    Log.Warn(string.format("玩家%s登录成功,玩家id=%d", request.account, userInfo.user_id))
+    log.Warn(string.format("玩家%s登录成功,玩家id=%d", request.account, userInfo.user_id))
     return XCode.Successful, {
         token = token,
         address = gateAddress

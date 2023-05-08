@@ -33,9 +33,11 @@
         "debug": "http://127.0.0.1:8088"
     },
     "lua": {
-        "common": "${WORK_PATH}/script/Common",
-        "component":"${WORK_PATH}/script/Component",
-        "module": "${WORK_PATH}/script/Server/HttpServer"
+        "path": [
+            "${WORK_PATH}/script/Common",
+            "${WORK_PATH}/script/Component",
+            "${WORK_PATH}/script/Server/HttpServer"
+        ]
     },
     "white_list": [
         "127.0.0.1"

@@ -11,7 +11,7 @@ namespace Lua
 	class LuaModule
 	{
 	public:
-		LuaModule(lua_State* lua, std::string  name, std::string  path);
+		LuaModule(lua_State* lua, std::string  name, const std::string & path);
 		~LuaModule();
 	public:
 		bool Awake();

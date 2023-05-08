@@ -5,27 +5,11 @@ namespace Lua
 {
 	namespace Log
 	{
-		extern int Debug(lua_State* luaEnv);
-
-		extern int Info(lua_State* luaEnv);
-
-		extern int Error(lua_State* luaEnv);
-
-		extern int Warning(lua_State* luaEnv);
-
-		extern int LuaError(lua_State* luaEnv);
-
-		extern void GetLuaString(lua_State* luaEnv, std::string & ret);
+		extern int Output(lua_State * lua);
 	}
 
 	namespace Console
 	{
-		extern int Debug(lua_State* luaEnv);
-
-		extern int Info(lua_State* luaEnv);
-
-		extern int Error(lua_State* luaEnv);
-
-		extern int Warning(lua_State* luaEnv);
+		extern int Show(lua_State* luaEnv);
 	}
 }

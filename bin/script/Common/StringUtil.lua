@@ -1,8 +1,6 @@
 
-StringUtil = {}
 
-StringUtil.Empty = ""
-function StringUtil.SplitString(str, reps)
+function string.split(str, reps)
     local resultStrList = {}
     string.gsub(str,'[^'..reps..']+',function ( w )
         table.insert(resultStrList,w)
@@ -10,8 +8,8 @@ function StringUtil.SplitString(str, reps)
     return resultStrList
 end
 
-function StringUtil.ParseAddress(addrss)
-    local res = StringUtil.SplitString(addrss, ":")
+function string.addr(addrss)
+    local res = string.split(addrss, ":")
     if #res == 2 then
         return res[1], tonumber(res[2])
     end

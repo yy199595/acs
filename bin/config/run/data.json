@@ -29,9 +29,11 @@
         "rpc": "tcp://127.0.0.1:7793"
     },
     "lua": {
-        "common": "${WORK_PATH}/script/Common",
-        "component":"${WORK_PATH}/script/Component",
-        "module": "${WORK_PATH}/script/Server/DataServer"
+        "path": [
+            "${WORK_PATH}/script/Common",
+            "${WORK_PATH}/script/Component",
+            "${WORK_PATH}/script/Server/DataServer"
+        ],
     },
     "white_list": [
         "127.0.0.1"

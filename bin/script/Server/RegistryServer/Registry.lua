@@ -1,3 +1,4 @@
+
 local Registry = { }
 local registers = { }
 local tab_name = "server.registry"
@@ -7,7 +8,7 @@ function Registry.Awake()
     Proto.Import("mysql/server.proto")
     return mysql.NewTable(0, tab_name, {
         pb = "server.registry",
-        keys = { "server_id"},
+        keys = { "server_id" },
         fields = { }
     })
 end
@@ -70,7 +71,7 @@ function Registry.Ping(request)
     if info == nil then
         return XCode.Failure
     end
-    mysql.Update(0, tab_name, { last_ping_time = os.time()}, {
+    mysql.Update(0, tab_name, { last_ping_time = os.time() }, {
         server_id = info.server_id
     })
     return XCode.Successful
