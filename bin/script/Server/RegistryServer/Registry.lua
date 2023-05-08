@@ -2,7 +2,7 @@
 
 local Registry = { }
 local registers = { }
-local XCode = require("XCode")
+require("XCode")
 local tab_name = "server.registry"
 local mysql = require("Server.MysqlClient")
 
