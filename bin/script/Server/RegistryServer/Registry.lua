@@ -3,6 +3,7 @@
 local Registry = { }
 local registers = { }
 require("XCode")
+require("TableUtil")
 local tab_name = "server.registry"
 local mysql = require("Server.MysqlClient")
 
