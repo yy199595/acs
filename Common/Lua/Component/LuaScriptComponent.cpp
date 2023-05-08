@@ -84,11 +84,6 @@ namespace Tendo
 		Lua::ClassProxyHelper luaRegister5(this->mLuaEnv, "Logger");
 		luaRegister5.BeginNewTable();
 		luaRegister5.PushExtensionFunction("Output", Lua::Log::Output);
-//		luaRegister5.PushExtensionFunction("Info", Lua::Log::Info);
-//		luaRegister5.PushExtensionFunction("Debug", Lua::Log::Debug);
-//		luaRegister5.PushExtensionFunction("Error", Lua::Log::Error);
-//		luaRegister5.PushExtensionFunction("Warn", Lua::Log::Warning);
-//		luaRegister5.PushExtensionFunction("LuaError", Lua::Log::LuaError);
 
 		Lua::ClassProxyHelper luaRegister55(this->mLuaEnv, "ConsoleLog");
 		luaRegister55.BeginNewTable();
@@ -230,7 +225,7 @@ namespace Tendo
 		{
 			this->AddRequire(path);
 		}
-		this->LoadModuleByPath(main) != nullptr;
+		return this->LoadModuleByPath(main) != nullptr;
 	}
 
 	void LuaScriptComponent::OnHotFix()
