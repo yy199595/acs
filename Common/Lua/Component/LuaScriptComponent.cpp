@@ -215,16 +215,15 @@ namespace Tendo
 	bool LuaScriptComponent::LoadAllFile()
 	{
 		const ServerConfig* config = ServerConfig::Inst();
-
-		std::string main(config->MainLua());
-		if (main.empty())
-		{
-			return true;
-		}
 		for(const std::string & path : config->RequirePath())
 		{
 			this->AddRequire(path);
 		}
+		if (config->MainLua().empty())
+		{
+			return true;
+		}
+		std::string main(config->MainLua());
 		return this->LoadModuleByPath(main) != nullptr;
 	}
 
