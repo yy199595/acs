@@ -7,42 +7,40 @@
 local Log = { }
 
 local logger = Logger
+local debug_getinfo = debug.getinfo
 local console = require("Console")
-
+local fmt = console.FormatLog
 function Log.Info(...)
-    local runInfo = debug.getinfo(2)
-    local message = console.FormatLog(runInfo, ...)
+    local runInfo = debug_getinfo(2)
+    local message = fmt(runInfo, ...)
     console.Show(console.LogDebug, message)
     logger.Output(console.LogDebug, message)
 end
 
 function Log.Debug(...)
-    local runInfo = debug.getinfo(2)
+    local runInfo = debug_getinfo(2)
     local message = console.FormatLog(runInfo, ...)
     console.Show(console.LogDebug, message)
     logger.Output(console.LogDebug, message)
 end
 
 function Log.Warning(...)
-    local runInfo = debug.getinfo(2)
-    local message = console.FormatLog(runInfo, ...)
-
+    local runInfo = debug_getinfo(2)
+    local message = fmt(runInfo, ...)
     console.Show(console.LogWarn, message)
     logger.Output(console.LogWarn, message)
 end
 
 function Log.Error(...)
-    local runInfo = debug.getinfo(2)
-    local message = console.FormatLog(runInfo, ...)
-
+    local runInfo = debug_getinfo(2)
+    local message = fmt(runInfo, ...)
     console.Show(console.LogError, message)
     logger.Output(console.LogError, message)
 end
 
 function Log.Fatal(...)
-    local runInfo = debug.getinfo(2)
-    local message = console.FormatLog(runInfo, ...)
-
+    local runInfo = debug_getinfo(2)
+    local message = fmt(runInfo, ...)
     console.Show(console.LogFatal, message)
     logger.Output(console.LogFatal, message)
 end

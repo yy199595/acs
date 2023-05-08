@@ -4,14 +4,13 @@ local log = require("Log")
 local redis = require("Server.RedisComponent")
 local MongoDB = require("Server.MongoComponent")
 
-
 local Main = {}
 function Main.Awake()
 
     redis.SyncRun("FLUSHALL")
     print(os.ms(), os.time(), os.dir)
 
-    log.Info("112233", { "112288", 1122})
+    log.Info("112233", { "112288", 1122 })
     --table.print(response)
 
     --local id = Sqlite.Open("server")

@@ -13,24 +13,30 @@ Console.LogFatal = 5
 
 local json = rapidjson
 local console = ConsoleLog
+local table_pack = table.pack
+local string_math = string.match
+local string_fmt = string.format
+local table_insert = table.insert
+local table_concat = table.concat
+local debug_getinfo = debug.getinfo
 Console.FormatLog = function(runInfo, ...)
     local ret = { }
-    local val = { ... }
+    local val = table_pack(...)
     local line = runInfo.currentline
-    local name = string.match(runInfo.short_src, ".+/([^/]*%.%w+)$")
-    table.insert(ret, string.format("%s:%d", name, line))
+    local name = string_math(runInfo.short_src, ".+/([^/]*%.%w+)$")
+    table_insert(ret, string_fmt("%s:%d", name, line))
 
     for _, v in ipairs(val) do
         if type(v) == "table" then
-            table.insert(ret, json.encode(v))
+            table_insert(ret, json.encode(v))
         else if type(v) == "string" then
-            table.insert(ret, v)
+            table_insert(ret, v)
         else
-            table.insert(ret, tostring(v))
+            table_insert(ret, tostring(v))
         end
         end
     end
-    return table.concat(ret, " ")
+    return table_concat(ret, " ")
 end
 
 function Console.Show(type, message)
@@ -41,35 +47,35 @@ end
 
 function Console.Info(...)
     if os.debug then
-        local runInfo = debug.getinfo(2)
+        local runInfo = debug_getinfo(2)
         console.Show(Console.LogInfo, Console.FormatLog(runInfo, ...))
     end
 end
 
 function Console.Debug(...)
     if os.debug then
-        local runInfo = debug.getinfo(2)
+        local runInfo = debug_getinfo(2)
         console.Show(Console.LogDebug, Console.FormatLog(runInfo, ...))
     end
 end
 
 function Console.Warning(...)
     if os.debug then
-        local runInfo = debug.getinfo(2)
+        local runInfo = debug_getinfo(2)
         console.Show(Console.LogWarn, Console.FormatLog(runInfo, ...))
     end
 end
 
 function Console.Error(...)
     if os.debug then
-        local runInfo = debug.getinfo(2)
+        local runInfo = debug_getinfo(2)
         console.Show(Console.LogError, Console.FormatLog(runInfo, ...))
     end
 end
 
 function Console.Fatal(...)
     if os.debug then
-        local runInfo = debug.getinfo(2)
+        local runInfo = debug_getinfo(2)
         console.Output(Console.LogFatal, Console.FormatLog(runInfo, ...))
     end
 end
