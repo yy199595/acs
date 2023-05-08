@@ -31,7 +31,6 @@
             "${WORK_PATH}/script/Client",
             "${WORK_PATH}/script/Component"
         ],
-        "component": "${WORK_PATH}/script/Component",
         "main": "${WORK_PATH}/script/Client/Client.lua"
     },
     "white_list": [

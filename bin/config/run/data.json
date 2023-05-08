@@ -31,9 +31,9 @@
     "lua": {
         "path": [
             "${WORK_PATH}/script/Common",
-            "${WORK_PATH}/script/Component",
-            "${WORK_PATH}/script/Server/DataServer"
-        ],
+            "${WORK_PATH}/script/Server",
+            "${WORK_PATH}/script/Component"
+        ]
     },
     "white_list": [
         "127.0.0.1"
