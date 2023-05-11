@@ -70,7 +70,7 @@ namespace Msg
 		inline int SetNet(int net) { return this->mNet = net; }
 	public:
 
-
+		std::string * Body() { return &this->mBody; }
         inline void Clear() { this->mBody.clear();}
         void SetContent(const std::string & content);
         inline const std::string& From() const { return this->mFrom; }

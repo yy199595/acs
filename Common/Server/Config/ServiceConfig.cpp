@@ -1,7 +1,7 @@
 ﻿#include "ServiceConfig.h"
-
 #include"Entity/Unit/App.h"
 #include"rapidjson/document.h"
+#include"Rpc/Client/Message.h"
 #include"Cluster/Config/ClusterConfig.h"
 namespace Tendo
 {
@@ -15,64 +15,67 @@ namespace Tendo
 		this->mMethodConfigs.clear();
 		auto iter = json.MemberBegin();
 		for(; iter != json.MemberEnd(); iter++)
-        {
-            const rapidjson::Value &jsonValue = iter->value;
-            if(jsonValue.IsObject())
-            {
-                const char *name = iter->name.GetString();
-                std::string fullName = fmt::format("{0}.{1}", this->GetName(), name);
-                if(this->mMethodConfigs.find(name) == this->mMethodConfigs.end())
-                {
-                    std::unique_ptr<RpcMethodConfig> config =
-                            std::make_unique<RpcMethodConfig>();
-                    this->mMethodConfigs.emplace(name, std::move(config));
-                }
+		{
+			const rapidjson::Value& jsonValue = iter->value;
+			if (jsonValue.IsObject())
+			{
+				const char* name = iter->name.GetString();
+				std::string fullName = fmt::format("{0}.{1}", this->GetName(), name);
+				if (this->mMethodConfigs.find(name) == this->mMethodConfigs.end())
+				{
+					std::unique_ptr<RpcMethodConfig> config =
+							std::make_unique<RpcMethodConfig>();
+					this->mMethodConfigs.emplace(name, std::move(config));
+				}
 				std::string server;
-				const std::string & service = this->GetName();
-                RpcMethodConfig * serviceConfig = this->mMethodConfigs[name].get();
-                {
-                    serviceConfig->Timeout = 0;
-                    serviceConfig->Method = name;
-                    serviceConfig->IsAsync = false;
-                    serviceConfig->IsClient = false;
+				const std::string& service = this->GetName();
+				RpcMethodConfig* serviceConfig = this->mMethodConfigs[name].get();
+				{
+					serviceConfig->Timeout = 0;
+					serviceConfig->Method = name;
+					serviceConfig->IsAsync = false;
+					serviceConfig->IsClient = false;
 					serviceConfig->IsOpen = true;
-                    serviceConfig->FullName = fullName;
-                    serviceConfig->Service = this->GetName();
-                }
-				if(ClusterConfig::Inst()->GetServerName(service,server))
+					serviceConfig->FullName = fullName;
+					serviceConfig->Proto = Msg::Porto::None;
+					serviceConfig->Service = this->GetName();
+				}
+				if (ClusterConfig::Inst()->GetServerName(service, server))
 				{
 					serviceConfig->Server = server;
 				}
-				if(jsonValue.HasMember("IsOpen"))
-                {
-                    serviceConfig->IsOpen = jsonValue["IsOpen"].GetBool();
-                }
-				if(jsonValue.HasMember("IsClient"))
+				if (jsonValue.HasMember("IsOpen"))
+				{
+					serviceConfig->IsOpen = jsonValue["IsOpen"].GetBool();
+				}
+				if (jsonValue.HasMember("IsClient"))
 				{
 					serviceConfig->IsClient = jsonValue["IsClient"].GetBool();
 				}
-                if(jsonValue.HasMember("Async"))
-                {
-                    serviceConfig->IsAsync = jsonValue["Async"].GetBool();
-                }
-                if (jsonValue.HasMember("Request"))
-                {
-                    serviceConfig->Request = jsonValue["Request"].GetString();
-                }
-                if (jsonValue.HasMember("Response"))
-                {
-                    serviceConfig->Response = jsonValue["Response"].GetString();
-                }
-                if (jsonValue.HasMember("Timeout"))
-                {
-                    serviceConfig->Timeout = jsonValue["Timeout"].GetInt();
-                }
-				if(serviceConfig->IsClient)
+				if (jsonValue.HasMember("Async"))
+				{
+					serviceConfig->IsAsync = jsonValue["Async"].GetBool();
+				}
+				if (jsonValue.HasMember("Request"))
+				{
+					serviceConfig->Proto = Msg::Porto::Json;
+					serviceConfig->Request = jsonValue["Request"].GetString();
+				}
+				if (jsonValue.HasMember("Response"))
+				{
+					serviceConfig->Proto = Msg::Porto::Protobuf;
+					serviceConfig->Response = jsonValue["Response"].GetString();
+				}
+				if (jsonValue.HasMember("Timeout"))
+				{
+					serviceConfig->Timeout = jsonValue["Timeout"].GetInt();
+				}
+				if (serviceConfig->IsClient)
 				{
 					this->mIsClient = true;
 				}
-            }
-        }
+			}
+		}
 		return true;
 	}
 

@@ -7,6 +7,15 @@ using namespace Tendo;
 #define Await(task) task->Await()
 namespace Lua
 {
+	bool Coroutine::IsRunning(lua_State* lua)
+	{
+		if(lua == nullptr)
+		{
+			return false;
+		}
+		int top = lua_gettop(lua);
+		return top == 1 && lua_isthread(lua, 1);
+	}
 	int Coroutine::Sleep(lua_State* lua)
 	{
 		if(!lua_isnumber(lua, 1))

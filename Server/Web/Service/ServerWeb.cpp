@@ -61,9 +61,9 @@ namespace Tendo
 		LocationComponent * pLocationComponent = this->GetComponent<LocationComponent>();
 
 		pRegistryComponent->Query();
-		std::vector<LocationUnit *> servers;
+		std::vector<ServerUnit *> servers;
 		pLocationComponent->GetAllServer(servers);
-		for(LocationUnit * locationUnit : servers)
+		for(ServerUnit * locationUnit : servers)
 		{
 			if(locationUnit->GetId() != config->ServerId())
 			{
@@ -83,10 +83,10 @@ namespace Tendo
 		LocationComponent * pLocationComponent = this->GetComponent<LocationComponent>();
 
 		pRegistryComponent->Query();
-		std::vector<LocationUnit *> servers;
+		std::vector<ServerUnit *> servers;
 		pLocationComponent->GetAllServer(servers);
 		response.BeginArray("list");
-		for(LocationUnit * locationUnit : servers)
+		for(ServerUnit * locationUnit : servers)
 		{
 			int id = locationUnit->GetId();
 			std::string rpc, http, gate;

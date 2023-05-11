@@ -212,6 +212,8 @@ namespace Tendo
         luaRegister.BeginNewTable("Proto");
 		luaRegister.PushExtensionFunction("New", Lua::MessageEx::New);
 		luaRegister.PushExtensionFunction("Import", Lua::MessageEx::Import);
+		luaRegister.PushExtensionFunction("Encode", Lua::MessageEx::Encode);
+		luaRegister.PushExtensionFunction("Decode", Lua::MessageEx::Decode);
 	}
 
 	bool ProtoComponent::Write(lua_State * lua, const Message& message)

@@ -109,7 +109,7 @@ namespace Tendo
 			{
 				int id = info.server_id();
 				const std::string & name = info.server_name();
-				LocationUnit * locationUnit = this->mNodeComponent->GetOrCreateServer(id, name);
+				ServerUnit * locationUnit = this->mNodeComponent->GetOrCreateServer(id, name);
 				{
 					for (auto iter = info.listens().begin(); iter != info.listens().end(); iter++)
 					{

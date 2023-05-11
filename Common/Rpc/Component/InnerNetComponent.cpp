@@ -336,4 +336,14 @@ namespace Tendo
         }
     }
 
+	bool InnerNetComponent::Send(int targetId, const std::shared_ptr<Msg::Packet>& message)
+	{
+		return false;
+	}
+
+	bool InnerNetComponent::Send(int targetId, const std::shared_ptr<Msg::Packet>& message, int& id)
+	{
+		return false;
+	}
+
 }// namespace Sentry
