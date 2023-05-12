@@ -197,8 +197,9 @@ namespace Tendo
 			int proto, const google::protobuf::Message* message)
 	{
 		int count = 0;
+		const std::string listen("rpc");
 		std::vector<std::string> servers;
-		this->mNodeComponent->GetServer(server, servers);
+		this->mNodeComponent->GetServer(server, listen, servers);
 		for(const std::string & address : servers)
 		{
 			if(this->Send(address, func, proto, message) == XCode::Successful)

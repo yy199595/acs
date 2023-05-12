@@ -27,8 +27,8 @@ namespace Lua
 
 		std::shared_ptr<Msg::Packet> request(new Msg::Packet());
         {
-            request->SetType(Msg::Type::Request);
-            request->SetProto(Msg::Porto::Protobuf);
+			request->SetProto(Msg::Porto::None);
+			request->SetType(Msg::Type::Request);
         }
 		std::string address;
 		const RpcMethodConfig * methodConfig = nullptr;
@@ -87,23 +87,40 @@ namespace Lua
             luaL_error(lua, "call service parameter error");
             return 0;
         }
-        if (!methodConfig->Request.empty())
-        {
-            const std::string &pb = methodConfig->Request;
-            ProtoComponent *messageComponent = App::Inst()->GetProto();
-            std::shared_ptr<Message> message = messageComponent->Read(lua, pb, 3);
-            if (message == nullptr)
-            {
-                luaL_error(lua, "lua call %s request is empty", methodConfig->FullName.c_str());
-                return 0;
-            }
-            if(message->GetTypeName() != methodConfig->Request)
-            {
-                luaL_error(lua, "lua call %s request type error", methodConfig->FullName.c_str());
-                return 0;
-            }
-            request->WriteMessage(message.get());
-        }
+		if(lua_istable(lua, 3))
+		{
+			if (!methodConfig->Request.empty())
+			{
+				const std::string &pb = methodConfig->Request;
+				ProtoComponent *messageComponent = App::Inst()->GetProto();
+				std::shared_ptr<Message> message = messageComponent->Read(lua, pb, 3);
+				if (message == nullptr)
+				{
+					luaL_error(lua, "lua call %s request is empty", methodConfig->FullName.c_str());
+					return 0;
+				}
+				if(message->GetTypeName() != methodConfig->Request)
+				{
+					luaL_error(lua, "lua call %s request type error", methodConfig->FullName.c_str());
+					return 0;
+				}
+				request->WriteMessage(message.get());
+				request->SetProto(Msg::Porto::Protobuf);
+			}
+			else
+			{
+				request->SetProto(Msg::Porto::Json);
+				Lua::RapidJson::Read(lua, 3, request->Body());
+			}
+		}
+		else if(lua_isstring(lua, 3))
+		{
+			size_t size = 0;
+			const char * str = luaL_tolstring(lua, 3, &size);
+			request->Append(str, size);
+			request->SetProto(Msg::Porto::String);
+		}
+
 		int rpdId = 0;
         lua_pushthread(lua);
         const std::string &response = methodConfig->Response;
@@ -137,26 +154,19 @@ namespace Lua
                 lua_pushlstring(lua, address.c_str(), address.size());
                 return 1;
             }
+			return 0;
 		}
-		else if(lua_isstring(lua, 2))
+		std::string address;
+		std::string listen("rpc");
+		if(lua_isstring(lua, 2))
 		{
 			std::string address;
-			const char * listen = lua_tostring(lua, 2);
-			if(locationComponent->GetServer(server, address, listen))
-			{
-				lua_pushlstring(lua, address.c_str(), address.size());
-				return 1;
-			}
+			listen = lua_tostring(lua, 2);
 		}
-		else
+		if(locationComponent->GetServer(server,listen, address))
 		{
-			std::string address;
-			const char * listen = "rpc";
-			if(locationComponent->GetServer(server, address, listen))
-			{
-				lua_pushlstring(lua, address.c_str(), address.size());
-				return 1;
-			}
+			lua_pushlstring(lua, address.c_str(), address.size());
+			return 1;
 		}
 		return 0;
 	}
@@ -165,8 +175,8 @@ namespace Lua
     {
         std::shared_ptr<Msg::Packet> request(new Msg::Packet());
         {
-            request->SetType(Msg::Type::Request);
-            request->SetProto(Msg::Porto::Protobuf);
+			request->SetProto(Msg::Porto::None);
+			request->SetType(Msg::Type::Request);
         }
         std::string address;
         const RpcMethodConfig* methodConfig = nullptr;
@@ -223,26 +233,41 @@ namespace Lua
             luaL_error(lua, "call service parameter error");
             return 0;
         }
-        if (!methodConfig->Request.empty())
-        {
-            const std::string& pb = methodConfig->Request;
-            ProtoComponent* messageComponent = App::Inst()->GetProto();
-            std::shared_ptr<Message> message = messageComponent->Read(lua, pb, 3);
-            if (message == nullptr)
-            {
-                luaL_error(lua, "lua call %s request is empty", methodConfig->FullName.c_str());
-                return 0;
-            }
-            if (message->GetTypeName() != methodConfig->Request)
-            {
-                luaL_error(lua, "lua call %s request type error", methodConfig->FullName.c_str());
-                return 0;
-            }
-            request->WriteMessage(message.get());
-        }
+		if(lua_istable(lua, 3))
+		{
+			if (!methodConfig->Request.empty())
+			{
+				const std::string& pb = methodConfig->Request;
+				ProtoComponent* messageComponent = App::Inst()->GetProto();
+				std::shared_ptr<Message> message = messageComponent->Read(lua, pb, 3);
+				if (message == nullptr)
+				{
+					luaL_error(lua, "lua call %s request is empty", methodConfig->FullName.c_str());
+					return 0;
+				}
+				if (message->GetTypeName() != methodConfig->Request)
+				{
+					luaL_error(lua, "lua call %s request type error", methodConfig->FullName.c_str());
+					return 0;
+				}
+				request->WriteMessage(message.get());
+				request->SetProto(Msg::Porto::Protobuf);
+			}
+			else
+			{
+				request->SetProto(Msg::Porto::Json);
+				Lua::RapidJson::Read(lua, 3, request->Body());
+			}
+		}
+		else if(lua_isstring(lua, 3))
+		{
+			size_t size = 0;
+			const char * str = luaL_tolstring(lua, 3, &size);
+			request->Append(str, size);
+			request->SetProto(Msg::Porto::String);
+		}
 
         lua_pushthread(lua);
-        //const std::string& response = methodConfig->Response;
         request->GetHead().Add("func", methodConfig->FullName);
         InnerNetComponent * pNetComponent = App::Inst()->GetComponent<InnerNetComponent>();
         if (pNetComponent == nullptr)
@@ -318,7 +343,7 @@ namespace Lua
     int Service::GetServerList(lua_State* lua)
     {
         std::string server;
-		const char * listen = "rpc";
+		std::string listen("rpc");
 		const char * service = luaL_checkstring(lua, 1);
 		if(lua_isstring(lua, 2))
 		{
@@ -330,7 +355,7 @@ namespace Lua
         }
 		std::vector<std::string> servers;
 		LocationComponent* locationComponent = App::Inst()->GetComponent<LocationComponent>();
-        if (locationComponent != nullptr && locationComponent->GetServer(server, servers, listen))
+        if (locationComponent != nullptr && locationComponent->GetServer(server, listen, servers))
         {
             lua_newtable(lua);
             int top = lua_gettop(lua);

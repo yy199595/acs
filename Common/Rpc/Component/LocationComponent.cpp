@@ -11,42 +11,6 @@
 #include"Util/String/StringHelper.h"
 #include"Server/Config/CodeConfig.h"
 #include"Sqlite/Component/SqliteComponent.h"
-namespace Tendo
-{
-	ServerData::ServerData(const std::string& name)
-		: mName(name)
-	{
-
-	}
-
-	bool ServerData::Get(const std::string& listen, std::string & address) const
-	{
-		auto iter = this->mListens.find(listen);
-		if(iter == this->mListens.end())
-		{
-			return false;
-		}
-		address = iter->second;
-		return true;
-	}
-
-	bool ServerData::Add(const std::string& listen, const std::string& address)
-	{
-		auto iter = this->mListens.find(listen);
-		if(iter == this->mListens.end())
-		{
-			if(listen == "rpc")
-			{
-				this->mRpc = address;
-			}
-			this->mListens.emplace(listen, address);
-			return true;
-		}
-		return false;
-	}
-
-
-}
 
 
 namespace Tendo
@@ -67,7 +31,7 @@ namespace Tendo
 		return true;
 	}
 
-    bool LocationComponent::GetServer(const std::string & server, std::string & address, const std::string & listen)
+    bool LocationComponent::GetServer(const std::string & server,  const std::string & listen, std::string & address)
 	{
 		auto iter = this->mServerNames.find(server);
 		if (iter == this->mServerNames.end() || iter->second.empty())
@@ -105,7 +69,7 @@ namespace Tendo
 		return true;
 	}
 
-	bool LocationComponent::DelUnit(const std::string& server, long long userId)
+	bool LocationComponent::DelUnit(long long userId, const std::string& server)
 	{
 		auto iter = this->mClients.find(userId);
 		if(iter == this->mClients.end())
@@ -176,7 +140,7 @@ namespace Tendo
 		return ret;
 	}
 
-	bool LocationComponent::GetServer(const std::string& server, std::vector<std::string>& servers, const std::string& listen)
+	bool LocationComponent::GetServer(const std::string& server, const std::string& listen, std::vector<std::string>& servers)
 	{
 		auto iter = this->mServerNames.find(server);
 		if(iter == this->mServerNames.end())

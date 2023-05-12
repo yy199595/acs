@@ -123,12 +123,12 @@ namespace Tendo
 		ClusterConfig::Inst()->GetServerName(service, server);
 		if (id == 0)
 		{
-			const char * listen = "http";
-			if(this->mNodeComponent->GetServer(server, address, listen))
+			const std::string listen("rpc");
+			if(this->mNodeComponent->GetServer(server, listen, address))
 			{
 				return true;
 			}
-			return this->mNodeComponent->GetServer(server, address);
+			return false;
 		}
 		return this->mNodeComponent->GetServer(server, id, address);
 	}

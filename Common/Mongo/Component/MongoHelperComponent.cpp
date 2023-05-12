@@ -12,6 +12,7 @@ namespace Tendo
 {
 	bool MongoHelperComponent::LateAwake()
     {
+		this->mRpc = "rpc";
         this->mLocationComponent = this->GetComponent<LocationComponent>();
 		LOG_CHECK_RET_FALSE(this->mMongoDB = this->mApp->GetService<MongoDB>());
 		return true;
@@ -27,7 +28,7 @@ namespace Tendo
 	{
 		std::string address;
 		const std::string & name = this->mMongoDB->GetServer();
-		if(!this->mLocationComponent->GetServer(name, address))
+		if(!this->mLocationComponent->GetServer(name, "rpc", address))
 		{
 			return XCode::AddressAllotFailure;
 		}
@@ -46,7 +47,7 @@ namespace Tendo
     {
 		std::string address;
 		const std::string & name = this->mMongoDB->GetServer();
-		if(!this->mLocationComponent->GetServer(name, address))
+		if(!this->mLocationComponent->GetServer(name, this->mRpc, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
@@ -61,7 +62,7 @@ namespace Tendo
 	{
 		std::string address;
 		const std::string & name = this->mMongoDB->GetServer();
-		if(!this->mLocationComponent->GetServer(name, address))
+		if(!this->mLocationComponent->GetServer(name, this->mRpc, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
@@ -75,7 +76,7 @@ namespace Tendo
 	{
 		std::string address;
 		const std::string & name = this->mMongoDB->GetServer();
-		if (!this->mLocationComponent->GetServer(name, address))
+		if (!this->mLocationComponent->GetServer(name, this->mRpc, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
@@ -91,7 +92,7 @@ namespace Tendo
 	{
 		std::string address;
 		const std::string & name = this->mMongoDB->GetServer();
-		if (!this->mLocationComponent->GetServer(name, address))
+		if (!this->mLocationComponent->GetServer(name,this->mRpc, address))
 		{
 			return XCode::AddressAllotFailure;
 		}
@@ -143,7 +144,7 @@ namespace Tendo
         }
 		std::string address;
 		const std::string & name = this->mMongoDB->GetServer();
-		if (!this->mLocationComponent->GetServer(name, address))
+		if (!this->mLocationComponent->GetServer(name, this->mRpc, address))
 		{
 			return XCode::AddressAllotFailure;
 		}

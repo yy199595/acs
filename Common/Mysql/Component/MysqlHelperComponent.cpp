@@ -55,7 +55,8 @@ namespace Tendo
 	int MysqlHelperComponent::Call(const std::string& func, const Message& data, std::shared_ptr<db::mysql::response> response)
 	{
 		std::string address;
-		if(!this->mLocationComponent->GetServer(this->mServerName, address))
+		const std::string listen("rpc");
+		if(!this->mLocationComponent->GetServer(this->mServerName, listen, address))
 		{
 			return XCode::CallServiceNotFound;
 		}

@@ -71,9 +71,10 @@ namespace Tendo
 
 	int GateComponent::BroadCast(const std::string& func)
 	{
+		const std::string listen("rpc");
         std::vector<std::string> locations;
 		const std::string name = ComponentFactory::GetName<Gate>();
-		if(!this->mNodeComponent->GetServer(name, locations))
+		if(!this->mNodeComponent->GetServer(name, listen, locations))
 		{
 			return XCode::Failure;
 		}
@@ -93,13 +94,13 @@ namespace Tendo
 
 	int GateComponent::BroadCast(const std::string& func, const Message& message)
 	{
+		const std::string listen("rpc");
 		std::vector<std::string> locations;
 		const std::string & name = this->mGate->GetServer();
-		if(!this->mNodeComponent->GetServer(name, locations))
+		if(!this->mNodeComponent->GetServer(name, listen, locations) || locations.empty())
 		{
 			return XCode::Failure;
 		}
-
         std::shared_ptr<Msg::Packet> data(new Msg::Packet());
         {
             data->SetType(Msg::Type::Broadcast);

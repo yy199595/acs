@@ -31,6 +31,7 @@ namespace Tendo
     private:
 		bool LateAwake() final;
 	 private:
+		std::string mRpc;
 		class RpcService* mMongoDB;
         db::mongo::update mUpdateRequest;
         db::mongo::insert mInsertRequest;

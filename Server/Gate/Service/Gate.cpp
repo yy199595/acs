@@ -99,6 +99,7 @@ namespace Tendo
 
 	int Gate::OnLogin(long long userId, const std::string & token)
 	{
+		const std::string listen("rpc");
 		static std::string func("Login");
 		std::vector<const NodeConfig *> configs;
 		ClusterConfig::Inst()->GetNodeConfigs(configs);
@@ -112,7 +113,7 @@ namespace Tendo
 			s2s::user::login message;
 			message.set_user_id(userId);
 			const std::string& server = nodeConfig->GetName();
-			if (!this->mNodeComponent->GetServer(server, address))
+			if (!this->mNodeComponent->GetServer(server, listen, address))
 			{
 				LOG_ERROR("user:" << userId << " allot [" << server << "]" << "error");
 				return XCode::AddressAllotFailure;
