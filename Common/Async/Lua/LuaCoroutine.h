@@ -11,7 +11,8 @@ namespace Lua
 	{
 		extern int Sleep(lua_State * lua);
 		extern int Start(lua_State * lua);
-        extern void Resume(lua_State * cor, lua_State * lua, int args);
+		extern bool IsRunning(lua_State * lua);
+		extern void Resume(lua_State * cor, lua_State * lua, int args);
 	}
 }
 

@@ -5,6 +5,7 @@
 #include"Lua/Engine/Define.h"
 #include"Util/Json/JsonWriter.h"
 #include"Rpc/Method/MethodRegister.h"
+
 namespace Tendo
 {
 	class LuaScriptComponent;

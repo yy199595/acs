@@ -28,9 +28,9 @@ namespace Tendo
 namespace Tendo
 {
 
-	int RpcService::Send(const string& address, const string& func)
+	int RpcService::Send(int id, const string& func)
 	{
-		if(!this->StartSend(address, func, nullptr))
+		if(!this->StartSend(id, func, nullptr))
 		{
 			return XCode::Failure;
 		}
@@ -42,7 +42,7 @@ namespace Tendo
 		return this->mNetComponent->Send(func, this->mCluster, this->mProto, &message);
 	}
 
-    bool RpcService::StartSend(const std::string& address, const std::string& func, const Message* message)
+    bool RpcService::StartSend(int id, const std::string& func, const Message* message)
     {
         const std::string name = fmt::format("{0}.{1}", this->GetName(), func);
         const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(name);
@@ -51,11 +51,11 @@ namespace Tendo
             LOG_ERROR("not find rpc method config " << name);
             return false;
         }
-		return this->mNetComponent->Send(address, name, this->mProto, 0, message);
+		return this->mNetComponent->Send(id, name, this->mProto, 0, message);
     }
 
     std::shared_ptr<Msg::Packet> RpcService::CallAwait(
-        const std::string &address, const std::string &func, const Message *message)
+        int id, const std::string &func, const Message *message)
 	{
         const std::string name = fmt::format("{0}.{1}", this->GetName(), func);
         const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(name);
@@ -64,17 +64,17 @@ namespace Tendo
             LOG_ERROR("not find rpc method config " << name);
             return nullptr;
         }
-		return this->mNetComponent->Call(address, name, this->mProto, 0, message);
+		return this->mNetComponent->Call(id, name, this->mProto, message);
 	}
 
-	int RpcService::Send(const std::string& address, const std::string& func, const Message& message)
+	int RpcService::Send(int id, const std::string& func, const Message& message)
     {
-        return this->StartSend(address, func, &message) ? XCode::Successful : XCode::SendMessageFail;
+        return this->StartSend(id, func, &message) ? XCode::Successful : XCode::SendMessageFail;
     }
 
-	int RpcService::Call(const std::string & address, const string& func)
+	int RpcService::Call(int id, const string& func)
     {
-        std::shared_ptr<Msg::Packet> response = this->CallAwait(address, func);
+        std::shared_ptr<Msg::Packet> response = this->CallAwait(id, func);
         if (response == nullptr)
         {
             return XCode::NetWorkError;
@@ -82,9 +82,9 @@ namespace Tendo
         return response->GetCode(XCode::Failure);
     }
 
-	int RpcService::Call(const std::string & address, const string& func, const Message& message)
+	int RpcService::Call(int id, const string& func, const Message& message)
 	{
-        std::shared_ptr<Msg::Packet> response = this->CallAwait(address, func, &message);
+        std::shared_ptr<Msg::Packet> response = this->CallAwait(id, func, &message);
 		if(response == nullptr)
 		{
 			return XCode::NetWorkError;
@@ -92,10 +92,10 @@ namespace Tendo
         return response->GetCode(XCode::Failure);
     }
 
-	int RpcService::Call(const std::string & address, const string& func, std::shared_ptr<Message> response)
+	int RpcService::Call(int id, const string& func, std::shared_ptr<Message> response)
 	{
 		assert(response != nullptr);
-		std::shared_ptr<Msg::Packet> data = this->CallAwait(address, func, nullptr);
+		std::shared_ptr<Msg::Packet> data = this->CallAwait(id, func, nullptr);
 		if (data == nullptr)
 		{
 			return XCode::Failure;
@@ -112,11 +112,11 @@ namespace Tendo
 	}
 
 
-	int RpcService::Call(const std::string & address, const string& func, const Message& message,
+	int RpcService::Call(int id, const string& func, const Message& message,
 			std::shared_ptr<Message> response)
 	{
 		assert(response != nullptr);
-        std::shared_ptr<Msg::Packet> data = this->CallAwait(address, func, &message);
+        std::shared_ptr<Msg::Packet> data = this->CallAwait(id, func, &message);
         if(data == nullptr)
         {
             return XCode::Failure;
@@ -253,26 +253,4 @@ namespace Tendo
         }
 		return this->mNetComponent->Call(userId, this->mCluster, fullName, this->mProto, message);
     }
-
-	int RpcService::Send(const std::string & address,
-		const std::string & func, long long userId, const Message * message)
-	{
-		const std::string fullName = fmt::format("{0}.{1}", this->GetName(), func);
-		const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
-		if(methodConfig == nullptr)
-		{
-			LOG_ERROR("not find [" << fullName << "] config");
-			return XCode::NotFoundRpcConfig;
-		}
-
-		if(!methodConfig->Request.empty() && message != nullptr)
-		{
-			if(message->GetTypeName() != methodConfig->Request)
-			{
-				LOG_ERROR("call [" << fullName << "] request type error");
-				return XCode::CallArgsError;
-			}
-		}
-		return this->mNetComponent->Send(address, fullName, this->mProto, userId, message);
-	}
 }

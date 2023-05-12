@@ -120,16 +120,17 @@ namespace Tendo
 	bool HttpDebugComponent::GetAddress(const std::string& service, long long id, std::string& address)
 	{		
 		std::string server;
+		const std::string listen("rpc");
 		ClusterConfig::Inst()->GetServerName(service, server);
 		if (id == 0)
 		{
-			const std::string listen("rpc");
-			if(this->mNodeComponent->GetServer(server, listen, address))
+			int serverId = this->mNodeComponent->RangeServer(server);
+			if(this->mNodeComponent->GetServerAddress(serverId, listen, address))
 			{
 				return true;
 			}
 			return false;
 		}
-		return this->mNodeComponent->GetServer(server, id, address);
+		return this->mNodeComponent->GetServerAddress(id, server, listen, address);
 	}
 }

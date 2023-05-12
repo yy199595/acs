@@ -2,18 +2,18 @@
 // Created by zmhy0073 on 2022/10/14.
 //
 
-#ifndef APP_LOCATIONUNIT_H
-#define APP_LOCATIONUNIT_H
+#ifndef APP_SERVERUNIT_H
+#define APP_SERVERUNIT_H
 #include<string>
 #include<vector>
 #include<unordered_map>
 namespace Tendo
 {
-	class LocationUnit
+	class ServerUnit
     {
     public:
-        LocationUnit() = default;
-		LocationUnit(const std::string & name, int id) : mId(id), mName(name) { }
+        ServerUnit() = default;
+		ServerUnit(const std::string & name, int id) : mId(id), mName(name) { }
     public:
         bool Del(const std::string & server);
         bool Get(std::vector<std::string> & servers);
@@ -29,7 +29,20 @@ namespace Tendo
 		std::string mName;
         std::unordered_map<std::string, std::string> mLocations;
     };
+
+	class ClientUnit
+	{
+	public:
+		ClientUnit(long long userId);
+	public:
+		bool Remove(const std::string & server);
+		void Add(const std::string & server, int id);
+		bool Get(const std::string & server, int & id);
+	private:
+		long long mUserId;
+		std::unordered_map<std::string, int> mServerMaps;
+	};
 }
 
 
-#endif //APP_LOCATIONUNIT_H
+#endif //APP_SERVERUNIT_H

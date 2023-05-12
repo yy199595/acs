@@ -45,7 +45,7 @@ namespace Tendo
 			LOG_ERROR("not find cluster config : " << server);
 			return XCode::Failure;
 		}
-		LocationUnit * locationUnit = this->mNodeComponent->GetOrCreateServer(id, server);
+		ServerUnit * locationUnit = this->mNodeComponent->GetOrCreateServer(id, server);
 		{
 			auto iter = request.listens().begin();
 			for(; iter != request.listens().end(); iter++)

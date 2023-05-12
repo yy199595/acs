@@ -29,11 +29,12 @@ function Main.OnClusterComplete()
     --local res = Mysql.Exec(id, "insert into server.registry(server_name,rpc_address,http_address)values('test','127.0.0.1:7788','http://127.0.0.1:80')")
     --res = Mysql.QueryOnce(id, "select * from server.registry")
     --table.print(res)
-    local address = Service.AllotServer("Chat")
-    Service.Call(address, "Chat.Chat", {
+    local chat = require("Service").New("Chat")
+    chat:Call(nil, "Chat", {
         msg_type = 1,
-        message = "nihao"
+        message = "hello"
     })
+
     local code = MongoDB.InsertOnce("user.account_info", {
         _id = "646585122@qq.com",
         user_id = 11223344,

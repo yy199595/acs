@@ -12,7 +12,6 @@ namespace Tendo
 {
 	bool MongoHelperComponent::LateAwake()
     {
-		this->mRpc = "rpc";
         this->mLocationComponent = this->GetComponent<LocationComponent>();
 		LOG_CHECK_RET_FALSE(this->mMongoDB = this->mApp->GetService<MongoDB>());
 		return true;
@@ -26,81 +25,67 @@ namespace Tendo
 
 	int MongoHelperComponent::Insert(const char* tab, const Message& message, int index)
 	{
-		std::string address;
-		const std::string & name = this->mMongoDB->GetServer();
-		if(!this->mLocationComponent->GetServer(name, "rpc", address))
-		{
-			return XCode::AddressAllotFailure;
-		}
-
 		db::mongo::insert request;
-		request.set_tab(tab);
-		request.set_flag(index);
+		{
+			request.set_tab(tab);
+			request.set_flag(index);
+		}
+		const std::string & name = this->mMongoDB->GetServer();
+		int targetId = this->mLocationComponent->RangeServer(name);
 		if(!util::MessageToJsonString(message, request.mutable_json()).ok())
 		{
 			return XCode::CallServiceNotFound;
 		}
-		return this->mMongoDB->Call(address, "Insert", request);
+		return this->mMongoDB->Call(targetId, "Insert", request);
 	}
 
 	int MongoHelperComponent::Update(const char *tab, const std::string &select, const std::string &data, int index)
     {
-		std::string address;
-		const std::string & name = this->mMongoDB->GetServer();
-		if(!this->mLocationComponent->GetServer(name, this->mRpc, address))
+		db::mongo::update request;
 		{
-			return XCode::AddressAllotFailure;
+			request.set_tab(tab);
+			request.set_update(data);
+			request.set_select(select);
 		}
-        db::mongo::update request;
-        request.set_tab(tab);
-        request.set_update(std::move(data));
-        request.set_select(std::move(select));
-        return this->mMongoDB->Call(address, "Update", request);
+		const std::string & name = this->mMongoDB->GetServer();
+		int targetId = this->mLocationComponent->RangeServer(name);
+        return this->mMongoDB->Call(targetId, "Update", request);
     }
 
 	int MongoHelperComponent::Insert(const char* tab, const std::string& json, int index)
 	{
-		std::string address;
 		const std::string & name = this->mMongoDB->GetServer();
-		if(!this->mLocationComponent->GetServer(name, this->mRpc, address))
-		{
-			return XCode::AddressAllotFailure;
-		}
+		int targetId = this->mLocationComponent->RangeServer(name);
+
 		this->mInsertRequest.set_tab(tab);
         this->mInsertRequest.set_flag(index);
-        this->mInsertRequest.set_json(std::move(json));
-        return this->mMongoDB->Call(address, "Insert", this->mInsertRequest);
+        this->mInsertRequest.set_json(json);
+        return this->mMongoDB->Call(targetId, "Insert", this->mInsertRequest);
 	}
 
 	int MongoHelperComponent::Remove(const char* tab, const std::string& select, int limit, int index)
 	{
-		std::string address;
 		const std::string & name = this->mMongoDB->GetServer();
-		if (!this->mLocationComponent->GetServer(name, this->mRpc, address))
-		{
-			return XCode::AddressAllotFailure;
-		}
+		int targetId = this->mLocationComponent->RangeServer(name);
+
 		this->mRemoveRequest.set_tab(tab);
         this->mRemoveRequest.set_flag(index);
         this->mRemoveRequest.set_limit(limit);
-        this->mRemoveRequest.set_json(std::move(select));
-        return this->mMongoDB->Call(address, "Remove", this->mRemoveRequest);
+        this->mRemoveRequest.set_json(select);
+        return this->mMongoDB->Call(targetId, "Remove", this->mRemoveRequest);
 	}
 
 	int MongoHelperComponent::Query(const char* tab,
                                       const std::string& select, std::shared_ptr<Message> response)
 	{
-		std::string address;
 		const std::string & name = this->mMongoDB->GetServer();
-		if (!this->mLocationComponent->GetServer(name,this->mRpc, address))
-		{
-			return XCode::AddressAllotFailure;
-		}
+		int targetId = this->mLocationComponent->RangeServer(name);
+
 		this->mQueryRequest.set_tab(tab);
         this->mQueryRequest.set_limit(1);
-        this->mQueryRequest.set_json(std::move(select));
+        this->mQueryRequest.set_json(select);
 		std::shared_ptr<db::mysql::response> result(new db::mysql::response());
-		int code = this->mMongoDB->Call(address, "Query", this->mQueryRequest, result);
+		int code = this->mMongoDB->Call(targetId, "Query", this->mQueryRequest, result);
 		if(code == XCode::Successful && result->jsons_size() > 0)
 		{
 			const std::string & json = result->jsons(0);
@@ -142,20 +127,17 @@ namespace Tendo
             default:
                 return XCode::CallArgsError;
         }
-		std::string address;
 		const std::string & name = this->mMongoDB->GetServer();
-		if (!this->mLocationComponent->GetServer(name, this->mRpc, address))
-		{
-			return XCode::AddressAllotFailure;
-		}
+		int targetId = this->mLocationComponent->RangeServer(name);
+
         this->mUpdateRequest.Clear();
         if(!util::MessageToJsonString(message, this->mUpdateRequest.mutable_update()).ok())
         {
             return XCode::ProtoCastJsonFailure;
         }
         this->mUpdateRequest.set_tab(std::move(message.GetTypeName()));
-        this->mUpdateRequest.set_select(std::move(select.JsonString()));
-        return this->mMongoDB->Call(address, "Update", this->mUpdateRequest);
+        this->mUpdateRequest.set_select(select.JsonString());
+        return this->mMongoDB->Call(targetId, "Update", this->mUpdateRequest);
     }
 
 	int MongoHelperComponent::Save(const char *tab, long long id, const std::string &data)

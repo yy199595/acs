@@ -2,11 +2,11 @@
 // Created by zmhy0073 on 2022/10/14.
 //
 
-#include"LocationUnit.h"
+#include"ServerUnit.h"
 namespace Tendo
 {
 
-    bool LocationUnit::Del(const std::string &service)
+    bool ServerUnit::Del(const std::string &service)
     {
         auto iter = this->mLocations.find(service);
         if(iter == this->mLocations.end())
@@ -16,12 +16,12 @@ namespace Tendo
         this->mLocations.erase(iter);
         return true;
     }
-    void LocationUnit::Add(const std::string &server, const std::string &address)
+    void ServerUnit::Add(const std::string &server, const std::string &address)
     {
         this->mLocations[server] = address;
     }
 
-    bool LocationUnit::Get(std::vector<std::string> &servers)
+    bool ServerUnit::Get(std::vector<std::string> &servers)
     {
         auto iter = this->mLocations.begin();
         for (; iter != this->mLocations.end(); iter++)
@@ -31,7 +31,7 @@ namespace Tendo
         return !servers.empty();
     }
 
-    bool LocationUnit::Get(const std::string &server, std::string &address) const
+    bool ServerUnit::Get(const std::string &server, std::string &address) const
     {
         auto iter = this->mLocations.find(server);
         if(iter == this->mLocations.end())
@@ -42,7 +42,7 @@ namespace Tendo
         return true;
     }
 
-    bool LocationUnit::Get(std::unordered_map<std::string, std::string> &servers) const
+    bool ServerUnit::Get(std::unordered_map<std::string, std::string> &servers) const
     {
         if(this->mLocations.empty())
         {
@@ -55,4 +55,39 @@ namespace Tendo
         }
         return true;
     }
+}
+
+namespace Tendo
+{
+	ClientUnit::ClientUnit(long long userId)
+	{
+		this->mUserId = userId;
+	}
+
+	void ClientUnit::Add(const std::string& server, int id)
+	{
+		this->mServerMaps[server] = id;
+	}
+
+	bool ClientUnit::Remove(const std::string& server)
+	{
+		auto iter = this->mServerMaps.find(server);
+		if(iter == this->mServerMaps.end())
+		{
+			return false;
+		}
+		this->mServerMaps.erase(iter);
+		return true;
+	}
+
+	bool ClientUnit::Get(const std::string& server, int& id)
+	{
+		auto iter = this->mServerMaps.find(server);
+		if(iter == this->mServerMaps.end())
+		{
+			return false;
+		}
+		id = iter->second;
+		return true;
+	}
 }

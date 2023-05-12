@@ -5,8 +5,8 @@
 #include"LuaService.h"
 #include"Entity/Unit/App.h"
 #include"Util/Json/Lua/Json.h"
+#include"Async/Lua/LuaCoroutine.h"
 #include"Cluster/Config/ClusterConfig.h"
-#include"Util/String/StringHelper.h"
 #include"Rpc/Async/RpcTaskSource.h"
 #include"Proto/Component/ProtoComponent.h"
 #include"Rpc/Component/LocationComponent.h"
@@ -17,6 +17,7 @@ namespace Lua
 {
 	int Service::Call(lua_State* lua)
     {
+		assert(Lua::Coroutine::IsRunning(lua));
         InnerNetComponent * pNetComponent = App::Inst()->GetComponent<InnerNetComponent>();
         DispatchComponent * pMessageComponent = App::Inst()->GetComponent<DispatchComponent>();
 		if (pNetComponent == nullptr || pMessageComponent == nullptr)
@@ -27,213 +28,26 @@ namespace Lua
 
 		std::shared_ptr<Msg::Packet> request(new Msg::Packet());
         {
-			request->SetProto(Msg::Porto::None);
-			request->SetType(Msg::Type::Request);
+            request->SetType(Msg::Type::Request);
+            request->SetProto(Msg::Porto::Protobuf);
         }
-		std::string address;
-		const RpcMethodConfig * methodConfig = nullptr;
-        if (lua_isnil(lua, 1))
-        {
-            ServerConfig::Inst()->GetLocation("rpc", address);
-            const std::string fullName = luaL_checkstring(lua, 2);
-            methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
-        }
-        else if (lua_isinteger(lua, 1)) //userId
-        {
-            long long userId = lua_tointeger(lua, 1);
-            request->GetHead().Add("id", userId);
-#ifdef __INNER_MSG_FORWARD__
-            ForwardHelperComponent* forwardComponent = App::Inst()->GetComponent<ForwardHelperComponent>();
-            forwardComponent->GetLocation(userId, address);
-#else
-            std::string fullName = luaL_checkstring(lua, 2);
-            methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
-            if (methodConfig == nullptr)
-            {
-                luaL_error(lua, "not find config %s", fullName.c_str());
-                return 0;
-            }
-            std::string server;
-            LocationComponent* locationComponent =
-                App::Inst()->GetComponent<LocationComponent>();
-            if (!ClusterConfig::Inst()->GetServerName(methodConfig->Service, server))
-            {
-                luaL_error(lua, "not cluster config %s", methodConfig->Service.c_str());
-                return 0;
-            }
-            locationComponent->GetServer(server, userId, address);
-#endif
-        }
-        else if (lua_isstring(lua, 1)) //address
-        {
-#ifdef __INNER_MSG_FORWARD__
-            const char * to = lua_tostring(lua, 2);
-            request->GetHead().Add("to", std::string(to));
-            ForwardHelperComponent * forwardComponent = App::Inst()->GetComponent<ForwardHelperComponent>();
-            forwardComponent->GetLocation(address);
-#else
-            address.append(lua_tostring(lua, 1));
-#endif
-			std::string fullName = luaL_checkstring(lua, 2);
-			methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
-			if(methodConfig == nullptr)
-			{
-				luaL_error(lua, "not find config %s", fullName.c_str());
-				return 0;
-			}
-        }
-        if (address.empty() || methodConfig == nullptr)
-        {
-            luaL_error(lua, "call service parameter error");
-            return 0;
-        }
-		if(lua_istable(lua, 3))
-		{
-			if (!methodConfig->Request.empty())
-			{
-				const std::string &pb = methodConfig->Request;
-				ProtoComponent *messageComponent = App::Inst()->GetProto();
-				std::shared_ptr<Message> message = messageComponent->Read(lua, pb, 3);
-				if (message == nullptr)
-				{
-					luaL_error(lua, "lua call %s request is empty", methodConfig->FullName.c_str());
-					return 0;
-				}
-				if(message->GetTypeName() != methodConfig->Request)
-				{
-					luaL_error(lua, "lua call %s request type error", methodConfig->FullName.c_str());
-					return 0;
-				}
-				request->WriteMessage(message.get());
-				request->SetProto(Msg::Porto::Protobuf);
-			}
-			else
-			{
-				request->SetProto(Msg::Porto::Json);
-				Lua::RapidJson::Read(lua, 3, request->Body());
-			}
-		}
-		else if(lua_isstring(lua, 3))
-		{
-			size_t size = 0;
-			const char * str = luaL_tolstring(lua, 3, &size);
-			request->Append(str, size);
-			request->SetProto(Msg::Porto::String);
-		}
-
-		int rpdId = 0;
-        lua_pushthread(lua);
-        const std::string &response = methodConfig->Response;
-		request->GetHead().Add("func", methodConfig->FullName);
-        if (!pNetComponent->Send(address, request, rpdId))
-        {
-            luaL_error(lua, "send request message error");
-            return 0;
-        }
-		std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource
-			= std::make_shared<LuaRpcTaskSource>(lua, rpdId, response);
-        return pMessageComponent->AddTask(rpdId, luaRpcTaskSource)->Await();
-    }
-
-	int Service::AllotServer(lua_State *lua)
-	{
-        std::string server;
-		const std::string service = luaL_checkstring(lua, 1);
-        if (!ClusterConfig::Inst()->GetServerName(service, server))
-        {
-            luaL_error(lua, "not find server : service = %s ", service.c_str());
-            return 0;
-        }
-		LocationComponent * locationComponent = App::Inst()->GetComponent<LocationComponent>();
+		int targetId = (int)luaL_checkinteger(lua, 1);
 		if(lua_isinteger(lua, 2))
 		{
-			std::string address;
-			long long userId = lua_tointeger(lua, 2);
-            if (locationComponent->GetServer(server, userId, address))
-            {
-                lua_pushlstring(lua, address.c_str(), address.size());
-                return 1;
-            }
+			long long useId = lua_tointeger(lua, 2);
+			if(useId > 0)
+			{
+				request->GetHead().Add("id", useId);
+			}
+		}
+		std::string fullName = luaL_checkstring(lua, 3);
+		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
+		if (methodConfig == nullptr)
+		{
+			luaL_error(lua, "call service parameter error");
 			return 0;
 		}
-		std::string address;
-		std::string listen("rpc");
-		if(lua_isstring(lua, 2))
-		{
-			std::string address;
-			listen = lua_tostring(lua, 2);
-		}
-		if(locationComponent->GetServer(server,listen, address))
-		{
-			lua_pushlstring(lua, address.c_str(), address.size());
-			return 1;
-		}
-		return 0;
-	}
-
-    int Service::Send(lua_State* lua)
-    {
-        std::shared_ptr<Msg::Packet> request(new Msg::Packet());
-        {
-			request->SetProto(Msg::Porto::None);
-			request->SetType(Msg::Type::Request);
-        }
-        std::string address;
-        const RpcMethodConfig* methodConfig = nullptr;
-        if (lua_isnil(lua, 1))
-        {
-            ServerConfig::Inst()->GetLocation("rpc", address);
-            const std::string fullName = luaL_checkstring(lua, 2);
-            methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
-        }
-        else if (lua_isinteger(lua, 1)) //userId
-        {
-            long long userId = lua_tointeger(lua, 1);
-            request->GetHead().Add("id", userId);
-#ifdef __INNER_MSG_FORWARD__
-            ForwardHelperComponent* forwardComponent = App::Inst()->GetComponent<ForwardHelperComponent>();
-            forwardComponent->GetLocation(userId, address);
-#else
-            std::string fullName = luaL_checkstring(lua, 2);
-            methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
-            if (methodConfig == nullptr)
-            {
-                luaL_error(lua, "not find config %s", fullName.c_str());
-                return 0;
-            }
-            
-            LocationComponent* locationComponent =
-                App::Inst()->GetComponent<LocationComponent>();
-            if (locationComponent->GetServer(methodConfig->Server, userId, address))
-            {
-                return 0;
-            }          
-#endif
-        }
-        else if (lua_isstring(lua, 1)) //address
-        {
-#ifdef __INNER_MSG_FORWARD__
-            const char* to = lua_tostring(lua, 2);
-            request->GetHead().Add("to", std::string(to));
-            ForwardHelperComponent* forwardComponent = App::Inst()->GetComponent<ForwardHelperComponent>();
-            forwardComponent->GetLocation(address);
-#else
-            address.append(lua_tostring(lua, 1));
-#endif
-            std::string fullName = luaL_checkstring(lua, 2);
-            methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
-            if (methodConfig == nullptr)
-            {
-                luaL_error(lua, "not find config %s", fullName.c_str());
-                return 0;
-            }
-        }
-        if (address.empty() || methodConfig == nullptr)
-        {
-            luaL_error(lua, "call service parameter error");
-            return 0;
-        }
-		if(lua_istable(lua, 3))
+		if(lua_istable(lua, 4))
 		{
 			if (!methodConfig->Request.empty())
 			{
@@ -256,14 +70,135 @@ namespace Lua
 			else
 			{
 				request->SetProto(Msg::Porto::Json);
-				Lua::RapidJson::Read(lua, 3, request->Body());
+				Lua::RapidJson::Read(lua, 4, request->Body());
 			}
 		}
-		else if(lua_isstring(lua, 3))
+		else if(lua_isstring(lua, 4))
 		{
 			size_t size = 0;
-			const char * str = luaL_tolstring(lua, 3, &size);
-			request->Append(str, size);
+			const char * str = luaL_tolstring(lua, 4, &size);
+			request->Body()->append(str, size);
+			request->SetProto(Msg::Porto::String);
+		}
+
+		int rpdId = 0;
+        lua_pushthread(lua);
+        const std::string &response = methodConfig->Response;
+		request->GetHead().Add("func", methodConfig->FullName);
+        if (!pNetComponent->Send(targetId, request, rpdId))
+        {
+            luaL_error(lua, "send request message error");
+            return 0;
+        }
+		std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource
+			= std::make_shared<LuaRpcTaskSource>(lua, rpdId, response);
+        return pMessageComponent->AddTask(rpdId, luaRpcTaskSource)->Await();
+    }
+
+	int Service::GetTarget(lua_State* lua)
+	{
+		std::string server;
+		long long userId = luaL_checkinteger(lua, 1);
+		const char * service = luaL_checkstring(lua, 2);
+		if (!ClusterConfig::Inst()->GetServerName(service, server))
+		{
+			luaL_error(lua, "not find server : service = %s ", service);
+			return 0;
+		}
+		LocationComponent * locationComponent = App::Inst()->GetComponent<LocationComponent>();
+		if(locationComponent == nullptr)
+		{
+			luaL_error(lua, "not find LocationComponent");
+			return 0;
+		}
+		ClientUnit * clientUnit = locationComponent->GetClientById(userId);
+		if(clientUnit == nullptr)
+		{
+			return 0;
+		}
+		int serverId = 0;
+		if(clientUnit->Get(server, serverId))
+		{
+			lua_pushinteger(lua, serverId);
+			return 1;
+		}
+		return 0;
+	}
+
+	int Service::AllotServer(lua_State *lua)
+	{
+        std::string server;
+		const std::string service = luaL_checkstring(lua, 1);
+        if (!ClusterConfig::Inst()->GetServerName(service, server))
+        {
+            luaL_error(lua, "not find server : service = %s ", service.c_str());
+            return 0;
+        }
+		LocationComponent * locationComponent = App::Inst()->GetComponent<LocationComponent>();
+		if(locationComponent == nullptr)
+		{
+			luaL_error(lua, "not find LocationComponent");
+			return 0;
+		}
+		int targetId = locationComponent->RangeServer(server);
+		lua_pushinteger(lua, targetId);
+		return 1;
+	}
+
+    int Service::Send(lua_State* lua)
+    {
+        std::shared_ptr<Msg::Packet> request(new Msg::Packet());
+        {
+			request->SetProto(Msg::Porto::None);
+			request->SetType(Msg::Type::Request);
+        }
+		int targetId = luaL_checkinteger(lua, 1);
+		if(lua_isinteger(lua, 2))
+		{
+			long long useId = lua_tointeger(lua, 2);
+			if(useId > 0)
+			{
+				request->GetHead().Add("id", useId);
+			}
+		}
+		std::string fullName = luaL_checkstring(lua, 3);
+		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
+        if (methodConfig == nullptr)
+        {
+            luaL_error(lua, "call service parameter error");
+            return 0;
+        }
+		if(lua_istable(lua, 4))
+		{
+			if (!methodConfig->Request.empty())
+			{
+				const std::string& pb = methodConfig->Request;
+				ProtoComponent* messageComponent = App::Inst()->GetProto();
+				std::shared_ptr<Message> message = messageComponent->Read(lua, pb, 3);
+				if (message == nullptr)
+				{
+					luaL_error(lua, "lua call %s request is empty", methodConfig->FullName.c_str());
+					return 0;
+				}
+				if (message->GetTypeName() != methodConfig->Request)
+				{
+					luaL_error(lua, "lua call %s request type error", methodConfig->FullName.c_str());
+					return 0;
+				}
+				request->WriteMessage(message.get());
+				request->SetProto(Msg::Porto::Protobuf);
+			}
+			else
+			{
+				request->SetProto(Msg::Porto::Json);
+				Lua::RapidJson::Read(lua, 4, request->Body());
+			}
+		}
+		else if(lua_isstring(lua, 4))
+		{
+			size_t size = 0;
+			const char * str = luaL_tolstring(lua, 4, &size);
+			request->Body()->append(str, size);
 			request->SetProto(Msg::Porto::String);
 		}
 
@@ -275,7 +210,7 @@ namespace Lua
             luaL_error(lua, "DispatchMessageComponent Is Null");
             return 0;
         }
-        if (!pNetComponent->Send(address, request))
+        if (!pNetComponent->Send(targetId, request))
         {
             luaL_error(lua, "send request message error");
             return 0;
@@ -327,7 +262,7 @@ namespace Lua
 			return 0;
 		}
 		std::string address;
-		if(!locationComponent->GetAddress(id, listen, address))
+		if(!locationComponent->GetServerAddress(id, listen, address))
 		{
 			return 0;
 		}
@@ -342,33 +277,6 @@ namespace Lua
 
     int Service::GetServerList(lua_State* lua)
     {
-        std::string server;
-		std::string listen("rpc");
-		const char * service = luaL_checkstring(lua, 1);
-		if(lua_isstring(lua, 2))
-		{
-			listen = lua_tostring(lua, 2);
-		}
-        if (!ClusterConfig::Inst()->GetServerName(service, server))
-        {
-            return 0;
-        }
-		std::vector<std::string> servers;
-		LocationComponent* locationComponent = App::Inst()->GetComponent<LocationComponent>();
-        if (locationComponent != nullptr && locationComponent->GetServer(server, listen, servers))
-        {
-            lua_newtable(lua);
-            int top = lua_gettop(lua);
-            for (size_t index = 0; index < servers.size(); index++)
-            {
-                lua_pushinteger(lua, index);
-                const std::string& data = servers[index];
-                lua_pushlstring(lua, data.c_str(), data.size());
-                lua_settable(lua, -3);
-            }
-            lua_settop(lua, top);
-            return 1;
-        }
         return 0;
     }
 }

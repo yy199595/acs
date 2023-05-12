@@ -12,51 +12,44 @@
 #include"Server/Config/CodeConfig.h"
 #include"Sqlite/Component/SqliteComponent.h"
 
-
 namespace Tendo
 {
-	bool LocationComponent::DelServer(int id, const std::string& name)
+	bool LocationComponent::DelServer(int id)
 	{
-		auto iter = this->mServers.find(id);
-		if (iter == this->mServers.end())
+		ServerUnit * serverUnit = this->GetServerById(id);
+		if(serverUnit == nullptr)
 		{
 			return false;
 		}
-		this->mServers.erase(iter);
+		const std::string & name = serverUnit->Name();
 		auto iter1 = this->mServerNames.find(name);
 		if(iter1 != this->mServerNames.end())
 		{
 			std::remove(iter1->second.begin(), iter1->second.end(), id);
 		}
+		auto iter = this->mServers.find(id);
+		if (iter != this->mServers.end())
+		{
+			this->mServers.erase(iter);
+		}
 		return true;
 	}
 
-    bool LocationComponent::GetServer(const std::string & server,  const std::string & listen, std::string & address)
+	ClientUnit* LocationComponent::GetClientById(long long id)
 	{
-		auto iter = this->mServerNames.find(server);
-		if (iter == this->mServerNames.end() || iter->second.empty())
+		auto iter = this->mClients.find(id);
+		if(iter == this->mClients.end())
 		{
-			return false;
+			ClientUnit * clientUnit1 = nullptr;
+			std::unique_ptr<ClientUnit> clientUnit(new ClientUnit(id));
+			{
+				clientUnit1 = clientUnit.get();
+				this->mClients.emplace(id, std::move(clientUnit));
+			}
+			return clientUnit1;
 		}
-		int size = (int)iter->second.size();
-		int id = iter->second[Helper::Math::Random<int>(0, size - 1)];
-		auto iter1 = this->mServers.find(id);
-		if(iter1 == this->mServers.end())
-		{
-			return false;
-		}
-		return iter1->second->Get(listen, address);
+		return iter->second.get();
 	}
-
-    bool LocationComponent::GetServer(const std::string & name, long long userId, std::string & address)
-    {
-		auto iter1 = this->mClients.find(userId);
-		if (iter1 == this->mClients.end())
-		{
-			return false;
-		}
-		return iter1->second->Get(name, address);
-    }
 
 	bool LocationComponent::DelUnit(long long userId)
 	{
@@ -69,41 +62,15 @@ namespace Tendo
 		return true;
 	}
 
-	bool LocationComponent::DelUnit(long long userId, const std::string& server)
+	bool LocationComponent::DelUnit(const std::string& server, long long userId)
 	{
 		auto iter = this->mClients.find(userId);
 		if(iter == this->mClients.end())
 		{
 			return false;
 		}
-		return iter->second->Del(server);
+		return iter->second->Remove(server);
 	}
-
-
-	void LocationComponent::BindServer(const std::string& server, long long userId, const std::string& address)
-	{
-		auto iter = this->mClients.find(userId);
-		if (iter == this->mClients.end())
-		{
-			std::unique_ptr<LocationUnit> tmp = std::make_unique<LocationUnit>();
-			{
-				tmp->Add(server, address);
-				this->mClients.emplace(userId, std::move(tmp));
-			}
-			return;
-		}
-		iter->second->Add(server, address);
-	}
-
-    bool LocationComponent::GetServer(long long int userId, std::unordered_map<std::string, std::string> &servers)
-    {
-        auto iter = this->mClients.find(userId);
-        if(iter == this->mClients.end())
-        {
-            return false;
-        }
-		return iter->second->Get(servers);
-    }
 
 	bool LocationComponent::HasServer(const std::string& server) const
 	{
@@ -115,9 +82,9 @@ namespace Tendo
 		return iter->second.size() > 0;
 	}
 
-	LocationUnit* LocationComponent::GetOrCreateServer(int id, const std::string& name)
+	ServerUnit* LocationComponent::GetOrCreateServer(int id, const std::string& name)
 	{
-		LocationUnit* ret = nullptr;
+		ServerUnit* ret = nullptr;
 		auto iter = this->mServers.find(id);
 		if (iter != this->mServers.end())
 		{
@@ -125,8 +92,8 @@ namespace Tendo
 		}
 		else
 		{
-			std::unique_ptr<LocationUnit> locationUnit
-					= std::make_unique<LocationUnit>(name, id);
+			std::unique_ptr<ServerUnit> locationUnit
+					= std::make_unique<ServerUnit>(name, id);
 			ret = locationUnit.get();
 			this->mServers.emplace(id, std::move(locationUnit));
 			auto iter = this->mServerNames.find(name);
@@ -140,27 +107,7 @@ namespace Tendo
 		return ret;
 	}
 
-	bool LocationComponent::GetServer(const std::string& server, const std::string& listen, std::vector<std::string>& servers)
-	{
-		auto iter = this->mServerNames.find(server);
-		if(iter == this->mServerNames.end())
-		{
-			return false;
-		}
-		for(int id : iter->second)
-		{
-			auto iter1 = this->mServers.find(id);
-			if(iter1 != this->mServers.end())
-			{
-				std::string address;
-				iter1->second->Get(listen, address);
-				servers.emplace_back(address);
-			}
-		}
-		return !servers.empty();
-	}
-
-	void LocationComponent::GetAllServer(std::vector<LocationUnit*>& servers)
+	void LocationComponent::GetAllServer(std::vector<ServerUnit*>& servers)
 	{
 		servers.reserve(this->mServers.size());
 		auto iter = this->mServers.begin();
@@ -168,7 +115,7 @@ namespace Tendo
 		{
 			servers.emplace_back(iter->second.get());
 		}
-		std::sort(servers.begin(), servers.end(), [](LocationUnit * p1, LocationUnit * p2)->bool {
+		std::sort(servers.begin(), servers.end(), [](ServerUnit * p1, ServerUnit * p2)->bool {
 			return p1->GetId() > p2->GetId();
 		});
 	}
@@ -184,17 +131,7 @@ namespace Tendo
 		return iter->second[Helper::Math::Random<int>(0, size - 1)];
 	}
 
-	bool LocationComponent::GetAddress(int id, const std::string& listen, std::string& address)
-	{
-		auto iter = this->mServers.find(id);
-		if(iter == this->mServers.end())
-		{
-			return false;
-		}
-		return  iter->second->Get(listen, address);
-	}
-
-	LocationUnit* LocationComponent::GetServerById(int id)
+	ServerUnit* LocationComponent::GetServerById(int id)
 	{
 		auto iter = this->mServers.find(id);
 		if(iter == this->mServers.end())
@@ -202,6 +139,42 @@ namespace Tendo
 			return nullptr;
 		}
 		return iter->second.get();
+	}
+
+	void LocationComponent::BindServer(const std::string& server, long long int userId, int serverId)
+	{
+		ClientUnit * clientUnit = this->GetClientById(userId);
+		if(clientUnit == nullptr)
+		{
+			return;
+		}
+		clientUnit->Add(server, serverId);
+	}
+
+	bool LocationComponent::GetServerAddress(int id, const std::string& listen, std::string& address)
+	{
+		ServerUnit * serverUnit = this->GetServerById(id);
+		if(serverUnit == nullptr)
+		{
+			return false;
+		}
+		return serverUnit->Get(listen, address);
+	}
+
+	bool LocationComponent::GetServerAddress(long long userId,
+			const std::string & server, const std::string& listen, std::string& address)
+	{
+		ClientUnit * clientUnit = this->GetClientById(userId);
+		if(clientUnit == nullptr)
+		{
+			return false;
+		}
+		int serverId = 0;
+		if(!clientUnit->Get(server, serverId))
+		{
+			return false;
+		}
+		return this->GetServerAddress(serverId, listen, address);
 	}
 
 }

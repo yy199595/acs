@@ -6,7 +6,7 @@ require("XCode")
 require("TableUtil")
 local tab_name = "server.registry"
 local mysql = require("Server.MysqlClient")
-
+local nodeService = require("Service").New("Node")
 function Registry.Awake()
     Proto.Import("mysql/server.proto")
     return mysql.NewTable(0, tab_name, {

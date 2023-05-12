@@ -17,8 +17,10 @@ namespace Tendo
 	class RpcMethodConfig final : public MethodConfig
 	{
 	public:
+		int Proto;
 		bool IsOpen;
 		bool IsClient;
+		std::string Net;
 		std::string Request;
 		std::string Response;
 		std::string FullName;

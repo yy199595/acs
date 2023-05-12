@@ -8,7 +8,7 @@
 #include<string>
 #include<unordered_set>
 #include<unordered_map>
-#include"Entity/Unit/LocationUnit.h"
+#include"Entity/Unit/ServerUnit.h"
 #include"Entity/Component/Component.h"
 
 namespace Tendo
@@ -20,27 +20,25 @@ namespace Tendo
         LocationComponent() = default;
         ~LocationComponent() = default;
     public:
-		bool DelServer(int id, const std::string & name);
-		void GetAllServer(std::vector<LocationUnit *> & servers);
+		bool DelServer(int id);
+		void GetAllServer(std::vector<ServerUnit *> & servers);
 	public:
-		LocationUnit * GetServerById(int id);
+		ServerUnit * GetServerById(int id);
+		ClientUnit * GetClientById(long long id);
 		int RangeServer(const std::string & server) const;
-		LocationUnit * GetOrCreateServer(int id, const std::string & name);
-		bool GetAddress(int id, const std::string & listen, std::string & address);
+		ServerUnit * GetOrCreateServer(int id, const std::string & name);
 	public:
 		bool DelUnit(long long userId);
-		bool DelUnit(long long userId, const std::string & server);
-		void BindServer(const std::string& server, long long userId, const std::string& address); //绑定玩家转发服务器
+		bool DelUnit(const std::string & server, long long userId);
+		void BindServer(const std::string& server, long long userId, int serverId); //绑定玩家转发服务器
     public:
 		bool HasServer(const std::string & server) const;
-        bool GetServer(const std::string & name, long long userId, std::string & address);
-		bool GetServer(long long userId, std::unordered_map<std::string, std::string> & servers);
-		bool GetServer(const std::string & server, const std::string & listen, std::string & address);
-		bool GetServer(const std::string & server, const std::string & listen, std::vector<std::string> & servers);
+		bool GetServerAddress(int id, const std::string & listen, std::string & address);
+		bool GetServerAddress(long long userId, const std::string & server, const std::string & listen, std::string & address);
 	private:
 		std::unordered_map<std::string, std::vector<int>> mServerNames;
-		std::unordered_map<int, std::unique_ptr<LocationUnit>> mServers;
-		std::unordered_map<long long, std::unique_ptr<LocationUnit>> mClients;
+		std::unordered_map<int, std::unique_ptr<ServerUnit>> mServers;
+		std::unordered_map<long long, std::unique_ptr<ClientUnit>> mClients;
 	};
 }
 

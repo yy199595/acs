@@ -70,7 +70,7 @@ namespace Msg
 		inline int SetNet(int net) { return this->mNet = net; }
 	public:
 
-		std::string * Body() { return &this->mBody;}
+		std::string * Body() { return &this->mBody; }
         inline void Clear() { this->mBody.clear();}
         void SetContent(const std::string & content);
         inline const std::string& From() const { return this->mFrom; }
@@ -78,7 +78,6 @@ namespace Msg
         inline const std::string & GetBody() const { return this->mBody;}
         inline void SetFrom(const std::string& address) { this->mFrom = address; }
         inline void Append(const std::string & data) { this->mBody.append(data); }
-		inline void Append(const char * str, size_t size) { this->mBody.append(str, size); }
         bool GetMethod(std::string &service, std::string &method) const;
     public:
         std::shared_ptr<Packet> Clone() const;
