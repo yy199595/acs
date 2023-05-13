@@ -34,6 +34,7 @@ end
 function Log.Error(...)
     local runInfo = debug_getinfo(2)
     local message = fmt(runInfo, ...)
+    message = debug.traceback() .. message
     console.Show(console.LogError, message)
     logger.Output(console.LogError, message)
 end
@@ -41,6 +42,7 @@ end
 function Log.Fatal(...)
     local runInfo = debug_getinfo(2)
     local message = fmt(runInfo, ...)
+    message = debug.traceback() .. message
     console.Show(console.LogFatal, message)
     logger.Output(console.LogFatal, message)
 end
