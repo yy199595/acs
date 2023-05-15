@@ -12,6 +12,8 @@
 #include"Util/Json/JsonWriter.h"
 #include"Gate/Service/Gate.h"
 #include"Entity/Unit/App.h"
+#include"Entity/Unit/Player.h"
+#include"Entity/Component/PlayerMgrComponent.h"
 namespace Tendo
 {
 	bool OuterNetComponent::Awake()
@@ -25,6 +27,7 @@ namespace Tendo
 	{
 		this->mMaxHandlerCount = 500;
 		this->mNodeComponent = this->GetComponent<LocationComponent>();
+		this->mPlayerComponent = this->GetComponent<PlayerMgrComponent>();
 		this->mInnerNetComponent = this->GetComponent<InnerNetComponent>();
 		ServerConfig::Inst()->GetMember("message", "outer", this->mMaxHandlerCount);
 		return true;
@@ -115,9 +118,14 @@ namespace Tendo
 		}
 		std::string target;
 		const std::string & server = methodConfig->Server;
-		if (!this->mNodeComponent->GetServer(server, userId, target))
+		Player * player = this->mPlayerComponent->GetPlayer(userId);
+		if(player == nullptr)
 		{
 			return XCode::NotFindUser;
+		}
+		if(!player->GetAddr(server, target))
+		{
+			return XCode::NotFoundPlayerRpcAddress;
 		}
 		message->GetHead().Add("id", userId);
 		message->GetHead().Add("cli", message->From());
@@ -199,9 +207,6 @@ namespace Tendo
 #ifdef __DEBUG__
 		LOG_WARN("remove client [" << address << "]" << CodeConfig::Inst()->GetDesc(code));
 #endif
-		DisConnectEvent disConnectEvent;
-		disConnectEvent.Addr = address;
-		this->mApp->Dispatch(&disConnectEvent);
         auto iter = this->mGateClientMap.find(address);
         if (iter != this->mGateClientMap.end())
         {

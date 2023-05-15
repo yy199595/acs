@@ -53,7 +53,8 @@ namespace Tendo
 #ifdef __DEBUG__
 		std::unordered_map<int, long long> mRecords;
 #endif
-        class InnerNetComponent * mInnerNetComponent;
+		class PlayerMgrComponent * mPlayerComponent;
+		class InnerNetComponent * mInnerNetComponent;
         std::queue<std::shared_ptr<Msg::Packet>> mMessages;
         std::queue<std::shared_ptr<OuterNetTcpClient>> mClientPools;
 		std::unordered_map<std::string, long long> mAddressUserMap; //验证过的客户端
