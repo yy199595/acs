@@ -2,7 +2,7 @@
 #include"Timer/Component/TimerComponent.h"
 #include"Async/Component/CoroutineComponent.h"
 #include"Lua/Component/LuaScriptComponent.h"
-#include"Entity/Component/UnitMgrComponent.h"
+#include"Entity/Component/PlayerMgrComponent.h"
 #include"Telnet/Component/ConsoleComponent.h"
 #include"Server/Component/ThreadComponent.h"
 #include"Log/Component/LogComponent.h"
@@ -61,7 +61,7 @@ void RegisterComponent()
     ComponentFactory::Add<CoroutineComponent>("CoroutineComponent");
     ComponentFactory::Add<TimerComponent>("TimerComponent");
     ComponentFactory::Add<LogComponent>("LogComponent");
-    ComponentFactory::Add<UnitMgrComponent>("UnitMgrComponent");
+    ComponentFactory::Add<PlayerMgrComponent>("PlayerMgrComponent");
     ComponentFactory::Add<ThreadComponent>("ThreadComponent");
     ComponentFactory::Add<ProtoComponent>("ProtoComponent");
 

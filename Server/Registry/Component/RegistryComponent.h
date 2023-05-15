@@ -18,7 +18,8 @@ namespace Tendo
 		void OnLocalComplete() final;
 	private:
 		std::string mAddress;
-		class LocationComponent * mNodeComponent;
+		std::string mService;
+		class LocationComponent * mLocationComponent;
 	};
 }
 

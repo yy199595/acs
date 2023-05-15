@@ -42,6 +42,7 @@ namespace Tendo
         template<typename T>
         size_t GetComponents(std::vector<T *> & components) const;
 	 protected:
+		virtual bool LateAwake() = 0;
 		virtual void OnAddComponent(Component * component) {}
 		virtual bool OnDelComponent(Component * component) { return true; }
 	 public:

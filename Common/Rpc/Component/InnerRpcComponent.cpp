@@ -22,62 +22,26 @@ namespace Tendo
 		return true;
 	}
 
-	int InnerRpcComponent::Send(int id, const std::string& func, int proto, long long userId, const Message* message)
+	int InnerRpcComponent::Send(const std::string & addr, const std::string& func, int proto, long long userId, const Message* message)
 	{
-		std::string address;
-		if(!this->mNodeComponent->GetServerAddress(id, this->mRpc, address))
-		{
-			return XCode::NetWorkError;
-		}
 		LOG_ERROR_RETURN_CODE(this->mTcpComponent, XCode::NetWorkError);
 		std::shared_ptr<Msg::Packet> request =
-				this->MakeTcpRequest(userId, func, proto, message);
+				this->MakeRequest(userId, func, proto, message);
 		LOG_ERROR_RETURN_CODE(request != nullptr, XCode::MakeTcpRequestFailure);
-		return this->mTcpComponent->Send(address, request) ? XCode::Successful : XCode::SendMessageFail;
+		return this->mTcpComponent->Send(addr, request) ? XCode::Successful : XCode::SendMessageFail;
 	}
-
-	int InnerRpcComponent::Send(long long int userId, const std::string & server,
-			const string& func, int proto, const google::protobuf::Message* message)
-	{
-		int targetId = 0;
-		ClientUnit * clientUnit = this->mNodeComponent->GetClientById(userId);
-		if(clientUnit == nullptr)
-		{
-			return XCode::NotFindUser;
-		}
-		clientUnit->Get(server, targetId);
-		return this->Send(targetId, func, proto, userId, message);
-	}
-
-	std::shared_ptr<Msg::Packet> InnerRpcComponent::Call(long long int userId,
-			const string& server, const string& func, int proto, const google::protobuf::Message* message)
-	{
-		int targetId = 0;
-		ClientUnit * clientUnit = this->mNodeComponent->GetClientById(userId);
-		if(clientUnit == nullptr)
-		{
-			return nullptr;
-		}
-		clientUnit->Get(server, targetId);
-		return this->Call(targetId, func, proto, userId, message);
-	}
-
-	std::shared_ptr<Msg::Packet> InnerRpcComponent::Call(int id,
+	
+	std::shared_ptr<Msg::Packet> InnerRpcComponent::Call(const std::string & addr,
 			const string& func, int proto, long long int userId, const google::protobuf::Message* message)
 	{
-		std::string address;
 		LOG_CHECK_RET_NULL(this->mTcpComponent);
 		std::shared_ptr<Msg::Packet> request =
-				this->MakeTcpRequest(userId, func, proto, message);
+				this->MakeRequest(userId, func, proto, message);
 		LOG_CHECK_RET_NULL(request != nullptr);
-		if(!this->mNodeComponent->GetServerAddress(id, this->mRpc, address))
-		{
-			return nullptr;
-		}
-		return this->mTcpComponent->Call(address, request);
+		return this->mTcpComponent->Call(addr, request);
 	}
 
-	std::shared_ptr<Msg::Packet> InnerRpcComponent::MakeTcpRequest(long long int userId, const string& func, int proto,
+	std::shared_ptr<Msg::Packet> InnerRpcComponent::MakeRequest(long long int userId, const string& func, int proto,
 			const google::protobuf::Message* message)
 	{
 		std::shared_ptr<Msg::Packet> request

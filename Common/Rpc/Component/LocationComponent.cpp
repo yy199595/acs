@@ -35,43 +35,6 @@ namespace Tendo
 		return true;
 	}
 
-	ClientUnit* LocationComponent::GetClientById(long long id)
-	{
-		auto iter = this->mClients.find(id);
-		if(iter == this->mClients.end())
-		{
-			ClientUnit * clientUnit1 = nullptr;
-			std::unique_ptr<ClientUnit> clientUnit(new ClientUnit(id));
-			{
-				clientUnit1 = clientUnit.get();
-				this->mClients.emplace(id, std::move(clientUnit));
-			}
-			return clientUnit1;
-		}
-		return iter->second.get();
-	}
-
-	bool LocationComponent::DelUnit(long long userId)
-	{
-		auto iter = this->mClients.find(userId);
-		if(iter == this->mClients.end())
-		{
-			return false;
-		}
-		this->mClients.erase(iter);
-		return true;
-	}
-
-	bool LocationComponent::DelUnit(const std::string& server, long long userId)
-	{
-		auto iter = this->mClients.find(userId);
-		if(iter == this->mClients.end())
-		{
-			return false;
-		}
-		return iter->second->Remove(server);
-	}
-
 	bool LocationComponent::HasServer(const std::string& server) const
 	{
 		auto iter = this->mServerNames.find(server);
@@ -141,16 +104,6 @@ namespace Tendo
 		return iter->second.get();
 	}
 
-	void LocationComponent::BindServer(const std::string& server, long long int userId, int serverId)
-	{
-		ClientUnit * clientUnit = this->GetClientById(userId);
-		if(clientUnit == nullptr)
-		{
-			return;
-		}
-		clientUnit->Add(server, serverId);
-	}
-
 	bool LocationComponent::GetServerAddress(int id, const std::string& listen, std::string& address)
 	{
 		ServerUnit * serverUnit = this->GetServerById(id);
@@ -160,21 +113,4 @@ namespace Tendo
 		}
 		return serverUnit->Get(listen, address);
 	}
-
-	bool LocationComponent::GetServerAddress(long long userId,
-			const std::string & server, const std::string& listen, std::string& address)
-	{
-		ClientUnit * clientUnit = this->GetClientById(userId);
-		if(clientUnit == nullptr)
-		{
-			return false;
-		}
-		int serverId = 0;
-		if(!clientUnit->Get(server, serverId))
-		{
-			return false;
-		}
-		return this->GetServerAddress(serverId, listen, address);
-	}
-
 }

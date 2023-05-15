@@ -131,6 +131,7 @@ namespace Tendo
 			}
 			return false;
 		}
-		return this->mNodeComponent->GetServerAddress(id, server, listen, address);
+		return false; //TODO
+		//return this->mNodeComponent->GetServerAddress(id, server, listen, address);
 	}
 }

@@ -33,7 +33,7 @@ namespace Tendo
 {
 	void ConsoleComponent::OnClusterComplete()
 	{
-		this->mCommandUnit = new Unit(1);
+		this->mCommandUnit; //= new Unit(1);
 		this->mHttpComponent = this->GetComponent<HttpComponent>();
 		this->mTaskComponent = this->GetComponent<CoroutineComponent>();
 		this->mTaskComponent->Start(&ConsoleComponent::Update, this);

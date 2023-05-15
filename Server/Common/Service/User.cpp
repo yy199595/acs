@@ -54,14 +54,9 @@ namespace Tendo
 
     int User::Logout(const s2s::user::logout &request)
     {
-		long long userId = request.user_id();
-		this->mNodeComponent->DelUnit(userId);
-		std::vector<IClient*> clientComponents;
-		this->mApp->GetComponents(clientComponents);
-		for(IClient * client : clientComponents)
-		{
-			client->OnLogout(userId);
-		}
+		long long userId = request.user_id(); 
+		// TODO
+		
 		return XCode::Successful;
     }
 

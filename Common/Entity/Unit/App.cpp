@@ -20,7 +20,7 @@ using namespace std::chrono;
 namespace Tendo
 {
 
-	App::App() : EventUnit(0),
+	App::App() :
         mThreadId(std::this_thread::get_id()),
 				 mStartTime(Helper::Time::NowMilTime())
 	{
@@ -66,6 +66,7 @@ namespace Tendo
 				}
 			}
         }
+		LOG_CHECK_RET_FALSE(this->LateAwake());
         this->mTaskComponent->Start(&App::StartAllComponent, this);
         return true;
 	}

@@ -47,4 +47,6 @@ namespace XCode
 	 constexpr int ParseHttpUrlFailure = 43;//解析http的url失败
 	 constexpr int UnknownMessageNetType = 44;//未知的传输网络类型
 	 constexpr int OnlyUseTcpProtocol = 45;//只能使用tcp协议
+	 constexpr int NotFoundServerRpcAddress = 46;//找不到服务器rpc地址
+	 constexpr int NotFoundPlayerRpcAddress = 47;//找不到玩家所在服务器地址
 };

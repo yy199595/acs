@@ -118,10 +118,7 @@ namespace Tendo
         if (iter != this->mRemoteClients.end())
         {
             this->mRemoteClients.erase(iter);
-			DisConnectEvent disConnectEvent;
-			disConnectEvent.Addr = address;
-			this->mApp->Dispatch(&disConnectEvent);
-			LOG_WARN("close server address : " << address);
+			// TODO
         }
     }
 

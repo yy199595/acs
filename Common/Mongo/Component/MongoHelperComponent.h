@@ -23,21 +23,14 @@ namespace Tendo
 		int Remove(const char * tab, const std::string & select, int limit = 1, int index = 0);
 		int Query(const char * tab, const std::string & select, std::shared_ptr<Message> response);
 		int Update(const char * tab, const std::string & select, const std::string & data, int index);
-
     public:
+		bool Awake() final;
 		int Save(const Message & message);
 		int Save(const char * tab, long long id, const std::string & data);
 		int Save(const char * tab, const std::string & id, const std::string & data);
-    private:
-		bool LateAwake() final;
 	 private:
 		std::string mRpc;
-		class RpcService* mMongoDB;
-        db::mongo::update mUpdateRequest;
-        db::mongo::insert mInsertRequest;
-        db::mongo::remove mRemoveRequest;
-		db::mongo::query::request mQueryRequest;
-		class LocationComponent * mLocationComponent;
+		std::string mServer;
 	};
 }
 

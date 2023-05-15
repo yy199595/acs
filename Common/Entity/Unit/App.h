@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include"Network/Tcp/Asio.h"
-#include"Entity/Unit/EventUnit.h"
+#include"Entity/Unit/Server.h"
 #include"Server/Config/ServerConfig.h"
 #include"Server/Config/ServerPath.h"
 #include"Core/Singleton/Singleton.h"
@@ -24,7 +24,7 @@ namespace Tendo
 {
 	class RpcService;
 	class ProtoComponent;
-    class App final : public EventUnit, public Singleton<App>
+    class App final : public Server, public Singleton<App>
 	{
 	 public:
 		explicit App();
@@ -58,9 +58,9 @@ namespace Tendo
 		ServerStatus mStatus;
         std::thread::id mThreadId;
         const long long mStartTime;
-        CoroutineComponent* mTaskComponent;
 		LogComponent* mLogComponent;
 		TimerComponent* mTimerComponent;
+		CoroutineComponent* mTaskComponent;
 		ProtoComponent * mMessageComponent;
         std::unique_ptr<Asio::Context> mMainContext;
         std::unordered_map<std::string, RpcService*> mServiceMap;

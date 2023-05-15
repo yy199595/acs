@@ -14,7 +14,6 @@
 #include "Util/Md5/LuaMd5.h"
 #include "Core/System/System.h"
 #include "Server/Config/ServiceConfig.h"
-#include "Rpc/Lua/LuaService.h"
 #include "Util/Json/JsonWriter.h"
 #include "Lua/Engine/Function.h"
 #include "Lua/Module/LuaModule.h"
@@ -56,6 +55,9 @@ namespace Tendo
 		{
 			Lua::ClassProxyHelper app(this->mLuaEnv, "App");
 			app.BeginRegister<App>();
+			app.PushExtensionFunction("Send", Lua::LuaApp::Send);
+			app.PushExtensionFunction("Call", Lua::LuaApp::Call);
+			app.PushExtensionFunction("GetAddr", Lua::LuaApp::GetAddr);
 			app.PushExtensionFunction("GetComponent", Lua::LuaApp::GetComponent);
 		}
 
@@ -101,16 +103,6 @@ namespace Tendo
 		Lua::ClassProxyHelper luaRegister8(this->mLuaEnv, "Md5");
 		luaRegister8.BeginNewTable();
 		luaRegister8.PushExtensionFunction("ToString", Lua::Md5::ToString);
-
-		Lua::ClassProxyHelper luaRegister9(this->mLuaEnv, "Service");
-		luaRegister9.BeginNewTable();
-		luaRegister9.PushExtensionFunction("Call", Lua::Service::Call);
-		luaRegister9.PushExtensionFunction("Send", Lua::Service::Send);
-		luaRegister9.PushExtensionFunction("FindService", Lua::Service::FindService);
-		luaRegister9.PushExtensionFunction("AllotServer", Lua::Service::AllotServer);
-		luaRegister9.PushExtensionFunction("GetServerList", Lua::Service::GetServerList);
-		luaRegister9.PushExtensionFunction("RangeServer", Lua::Service::RangeServer);
-		luaRegister9.PushExtensionFunction("GetAddrById", Lua::Service::GetAddrById);
 
 		std::vector<ILuaRegister*> components;
 		this->mApp->GetComponents(components);

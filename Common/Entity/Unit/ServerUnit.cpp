@@ -56,38 +56,3 @@ namespace Tendo
         return true;
     }
 }
-
-namespace Tendo
-{
-	ClientUnit::ClientUnit(long long userId)
-	{
-		this->mUserId = userId;
-	}
-
-	void ClientUnit::Add(const std::string& server, int id)
-	{
-		this->mServerMaps[server] = id;
-	}
-
-	bool ClientUnit::Remove(const std::string& server)
-	{
-		auto iter = this->mServerMaps.find(server);
-		if(iter == this->mServerMaps.end())
-		{
-			return false;
-		}
-		this->mServerMaps.erase(iter);
-		return true;
-	}
-
-	bool ClientUnit::Get(const std::string& server, int& id)
-	{
-		auto iter = this->mServerMaps.find(server);
-		if(iter == this->mServerMaps.end())
-		{
-			return false;
-		}
-		id = iter->second;
-		return true;
-	}
-}

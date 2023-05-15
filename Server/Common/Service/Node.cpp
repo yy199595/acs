@@ -57,7 +57,7 @@ namespace Tendo
 		this->mApp->GetComponents(components);
 		for(IServerChange * listen : components)
 		{
-			listen->OnJoin(server);
+			listen->OnJoin(id);
 		}
 		return XCode::Successful;
 	}
@@ -65,15 +65,12 @@ namespace Tendo
     int Node::Exit(const s2s::server::info &request)
 	{
 		int id = request.server_id();
-		const std::string& name = request.server_name();
-		this->mNodeComponent->DelServer(id, name);
-
-
+		this->mNodeComponent->DelServer(id);
 		std::vector<IServerChange*> components;
 		this->mApp->GetComponents(components);
 		for (IServerChange* listen: components)
 		{
-			listen->OnExit(name);
+			listen->OnExit(id);
 		}
 		return XCode::Successful;
 	}
@@ -94,20 +91,17 @@ namespace Tendo
         }
 		std::string address;
 		const ServerConfig * config = ServerConfig::Inst();
-		RpcService* rpcService = this->mApp->GetService("Registry");
-
 		s2s::server::info request;
 		{
 			request.set_server_name(config->Name());
 			request.set_server_id(config->ServerId());
 		}
-		int code = rpcService->Call(address, "UnRegister", request);
+		const std::string func("Registry.UnRegister");
+		int code = this->mApp->Call(address, func, request);
+		this->mApp->GetCoroutine()->Start(&App::Stop, this->mApp, 0);
 		const std::string & desc = CodeConfig::Inst()->GetDesc(code);
 		CONSOLE_LOG_INFO("unregister " << config->Name()  << " code = " << desc);
-
-		CoroutineComponent * taskComponent = this->mApp->GetCoroutine();
-		taskComponent->Start(&App::Stop, this->mApp, 0);
-        return XCode::Successful;
+		return XCode::Successful;
     }
 
     int Node::LoadConfig()

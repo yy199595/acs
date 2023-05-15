@@ -16,16 +16,11 @@ namespace Tendo
 	public:
 		InnerRpcComponent();
 	public:
-		int Send(int id, const std::string & func, int proto, long long userId, const Message * message = nullptr);
-		int Send(const std::string & func, const std::string & server, int proto, const Message * message);
-		int Send(long long userId, const std::string & server, const std::string & func, int proto, const Message * message = nullptr);
-	public:
-		std::shared_ptr<Msg::Packet> Call(int id, const std::string & func, int proto, long long userId, const google::protobuf::Message * message = nullptr);
-		std::shared_ptr<Msg::Packet> Call(long long userId, const std::string & server, const std::string & func, int proto, const Message * message = nullptr);
-	public:
-		std::shared_ptr<Msg::Packet> MakeTcpRequest(long long userId, const std::string & func, int protoc, const google::protobuf::Message * message);
-	public:
 		bool Send(const std::string & address, int code, const std::shared_ptr<Msg::Packet> & message);
+		int Send(const std::string & func, const std::string & server, int proto, const Message * message);
+		int Send(const std::string & addr, const std::string & func, int proto, long long userId, const Message * message = nullptr);
+		std::shared_ptr<Msg::Packet> MakeRequest(long long userId, const std::string & func, int protoc, const google::protobuf::Message * message);
+		std::shared_ptr<Msg::Packet> Call(const std::string & addr, const std::string & func, int proto, long long userId, const google::protobuf::Message * message = nullptr);
 	private:
 		bool LateAwake() final;
 	private:

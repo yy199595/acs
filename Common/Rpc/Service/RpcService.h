@@ -16,40 +16,12 @@ namespace Tendo
 	class RpcService : public Component, public IServiceBase
 	{
 	public:
-		RpcService();
-	public:
-		inline void SetProto(int proto) { this->mProto = proto; }
 		const std::string& GetServer() const { return this->mCluster; }
-	public:
-		int Send(int id, const std::string& func);
-		int Send(const std::string& func, const Message& request);
-		int Send(int id, const std::string& func, const Message& request);
-	public:
-		int Send(long long userId, const std::string& func);
-		int Send(long long userId, const std::string& func, const Message& request);
-	public:
-		int Call(int id, const std::string& func);
-		int Call(int id, const std::string& func, const Message& request);
-		int Call(int id, const std::string& func, std::shared_ptr<Message> response);
-		int Call(int id, const std::string& func, const Message& request, std::shared_ptr<Message> response);
-	public:
-		int Call(long long userId, const std::string& func);
-		int Call(long long userId, const std::string& func, const Message& request);
-		int Call(long long userId, const std::string& func, std::shared_ptr<Message> response);
-		int Call(long long userId, const std::string& func, const Message& request, std::shared_ptr<Message> response);
-	public:
-		bool StartSend(long long userId, const std::string& func, const Message* request = nullptr);
-		bool StartSend(int id, const std::string& func, const Message* request = nullptr);
-		std::shared_ptr<Msg::Packet> CallAwait(long long userId, const std::string& func, const Message* request = nullptr);
-		std::shared_ptr<Msg::Packet> CallAwait(int id, const std::string& func, const Message* request = nullptr);
 	protected:
 		bool LateAwake() final;
 	public:
 		virtual int Invoke(const std::string& method, std::shared_ptr<Msg::Packet> message) = 0;
 	private:
-		int mProto;
 		std::string mCluster;
-		std::string mLocationAddress;
-		class InnerRpcComponent * mNetComponent;
 	};
 }

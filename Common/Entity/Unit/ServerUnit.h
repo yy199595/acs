@@ -29,19 +29,6 @@ namespace Tendo
 		std::string mName;
         std::unordered_map<std::string, std::string> mLocations;
     };
-
-	class ClientUnit
-	{
-	public:
-		ClientUnit(long long userId);
-	public:
-		bool Remove(const std::string & server);
-		void Add(const std::string & server, int id);
-		bool Get(const std::string & server, int & id);
-	private:
-		long long mUserId;
-		std::unordered_map<std::string, int> mServerMaps;
-	};
 }
 
 

@@ -13,7 +13,7 @@
 
 namespace Tendo
 {
-	// 记录所有服务地址和所有玩家所在服务器
+	// 记录所有服务地址
 	class LocationComponent final : public Component
     {
     public:
@@ -24,21 +24,14 @@ namespace Tendo
 		void GetAllServer(std::vector<ServerUnit *> & servers);
 	public:
 		ServerUnit * GetServerById(int id);
-		ClientUnit * GetClientById(long long id);
 		int RangeServer(const std::string & server) const;
 		ServerUnit * GetOrCreateServer(int id, const std::string & name);
-	public:
-		bool DelUnit(long long userId);
-		bool DelUnit(const std::string & server, long long userId);
-		void BindServer(const std::string& server, long long userId, int serverId); //绑定玩家转发服务器
     public:
 		bool HasServer(const std::string & server) const;
 		bool GetServerAddress(int id, const std::string & listen, std::string & address);
-		bool GetServerAddress(long long userId, const std::string & server, const std::string & listen, std::string & address);
 	private:
-		std::unordered_map<std::string, std::vector<int>> mServerNames;
 		std::unordered_map<int, std::unique_ptr<ServerUnit>> mServers;
-		std::unordered_map<long long, std::unique_ptr<ClientUnit>> mClients;
+		std::unordered_map<std::string, std::vector<int>> mServerNames;
 	};
 }
 

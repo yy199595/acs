@@ -16,8 +16,9 @@
 namespace Tendo
 {
 	RegistryComponent::RegistryComponent()
+		: mService("Registry")
 	{
-		this->mNodeComponent = nullptr;
+		this->mLocationComponent = nullptr;
 	}
 
 	bool RegistryComponent::LateAwake()
@@ -28,15 +29,16 @@ namespace Tendo
 			LOG_ERROR("not find config registry address");
 			return false;
 		}
-		this->mNodeComponent = this->GetComponent<LocationComponent>();
+		RpcService* rpcService = this->mApp->GetService("Registry");
+		this->mLocationComponent = this->GetComponent<LocationComponent>();
+		LOG_CHECK_RET_FALSE(rpcService != nullptr && this->mLocationComponent != nullptr);
 		return true;
 	}
 
 	void RegistryComponent::OnLocalComplete()
 	{
-		const std::string func("Register");
+		const std::string func("Registry.Register");
 		const ServerConfig* config = ServerConfig::Inst();
-		RpcService* rpcService = this->mApp->GetService("Registry");
 
 		s2s::server::info message;
 		{
@@ -58,10 +60,9 @@ namespace Tendo
 #endif
 		do
 		{
-			int code = rpcService->Call(this->mAddress, func, message);
+			int code = this->mApp->Call(this->mAddress, func, message);
 			if (code == XCode::Successful)
 			{
-				const std::string& server = rpcService->GetServer();
 				LOG_INFO("register to [" << this->mAddress << "] successful");
 				break;
 			}
@@ -77,10 +78,10 @@ namespace Tendo
 		for(RpcService * rpcService1 : components)
 		{
 			const std::string & server = rpcService1->GetServer();
-			while(!this->mNodeComponent->HasServer(server))
+			while(!this->mLocationComponent->HasServer(server))
 			{
 				this->Query(server);
-				if(!this->mNodeComponent->HasServer(server))
+				if(!this->mLocationComponent->HasServer(server))
 				{
 					LOG_WARN("------ wait [" << server << "] start ------");
 					this->mApp->GetCoroutine()->Sleep(1000 * 2);
@@ -96,20 +97,20 @@ namespace Tendo
 			request.set_group_id(0);
 			request.set_server_name(server);
 		}
-		const std::string func("Query");
-		RpcService* rpcService = this->mApp->GetService("Registry");
-		std::shared_ptr<s2s::server::list> response = std::make_shared<s2s::server::list>();
-		if(rpcService->Call(this->mAddress, func, request, response) != XCode::Successful)
+		const std::string func("Registry.Query");
+		std::shared_ptr<s2s::server::list> response(new s2s::server::list());
+		if(this->mApp->Call(this->mAddress, func, request, response) != XCode::Successful)
 		{
-			return 0;
+
 		}
+
 		for(int index = 0; index < response->list_size(); index++)
 		{
 			const s2s::server::info & info = response->list(index);
 			{
 				int id = info.server_id();
 				const std::string & name = info.server_name();
-				ServerUnit * locationUnit = this->mNodeComponent->GetOrCreateServer(id, name);
+				ServerUnit * locationUnit = this->mLocationComponent->GetOrCreateServer(id, name);
 				{
 					for (auto iter = info.listens().begin(); iter != info.listens().end(); iter++)
 					{
