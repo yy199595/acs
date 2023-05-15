@@ -56,7 +56,6 @@ namespace Tendo
 	int ServerWeb::Stop(Json::Writer & response)
 	{
 		const ServerConfig * config = ServerConfig::Inst();
-		RpcService * rpcService = this->mApp->GetService<Node>();
 		RegistryComponent * pRegistryComponent = this->GetComponent<RegistryComponent>();
 		LocationComponent * pLocationComponent = this->GetComponent<LocationComponent>();
 
@@ -65,11 +64,12 @@ namespace Tendo
 		pLocationComponent->GetAllServer(servers);
 		for(ServerUnit * locationUnit : servers)
 		{
+			const std::string func("Node.Stop");
 			if(locationUnit->GetId() != config->ServerId())
 			{
 				std::string address;
 				locationUnit->Get("rpc", address);
-				int code = rpcService->Call(address, "Stop");
+				int code = this->mApp->Call(address, func);
 				response.Add(address).Add(CodeConfig::Inst()->GetDesc(code));
 			}
 		}

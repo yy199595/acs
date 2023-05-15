@@ -23,6 +23,7 @@ namespace Tendo
 		int Call(const std::string & addr, const std::string & func, std::shared_ptr<pb::Message> response);
 		int Call(const std::string & addr, const std::string & func, const pb::Message & request, std::shared_ptr<pb::Message> response);
 	public:
+		bool GetAddr(int targetId, std::string & addr);
 		bool GetAddr(const std::string &server, int &targetId) final;
 		bool GetAddr(const std::string &server, std::string &addr) final;
 	};

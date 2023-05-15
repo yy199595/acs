@@ -10,9 +10,6 @@
 #include"Rpc/Component/LocationComponent.h"
 namespace Tendo
 {
-	Player::Player(long long id)
-		: NetUnit(id) { }
-
 	int Player::Send(const std::string& func)
 	{
 		std::string address;
@@ -165,7 +162,7 @@ namespace Tendo
 		for(const auto & info : this->mServerAddrs)
 		{
 			int targetId = info.second;
-			if(this->mLocationComponent->GetServerAddress(targetId,listen, address))
+			if(this->mLocationComponent->GetServerAddress(targetId, listen, address))
 			{
 				std::shared_ptr<Msg::Packet> message;
 				if (this->NewRequest(func, nullptr, message) == XCode::Successful)
@@ -182,7 +179,30 @@ namespace Tendo
 
 	int Player::BroadCast(const std::string& func, const Message& request)
 	{
-		return 0;
+		const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
+		if(methodConfig == nullptr)
+		{
+			return 0;
+		}
+		int count = 0;
+		std::string address;
+		const std::string listen("rpc");
+		for(const auto & info : this->mServerAddrs)
+		{
+			int targetId = info.second;
+			if(this->mLocationComponent->GetServerAddress(targetId, listen, address))
+			{
+				std::shared_ptr<Msg::Packet> message;
+				if (this->NewRequest(func, &request, message) == XCode::Successful)
+				{
+					if (this->mInnerComponent->Send(address, message))
+					{
+						count++;
+					}
+				}
+			}
+		}
+		return count;
 	}
 
 

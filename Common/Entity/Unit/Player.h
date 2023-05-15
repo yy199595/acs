@@ -11,8 +11,7 @@ namespace Tendo
 	class Player : public NetUnit
 	{
 	public:
-		Player(long long id);
-	public:
+		using NetUnit::NetUnit;
 		int Send(const std::string & func);
 		int Send(const std::string & func, const pb::Message & request);
 	public:

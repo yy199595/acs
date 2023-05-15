@@ -4,21 +4,18 @@
 
 #include"Gate.h"
 #include"Entity/Unit/App.h"
-#include"Util/Md5/MD5.h"
 #include"Common/Service/User.h"
 #include"Gate/Client/OuterNetTcpClient.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include"Server/Config/CodeConfig.h"
 #include"Gate/Component/OuterNetComponent.h"
 #include"Rpc/Component/LocationComponent.h"
-
+#include"Entity/Component/PlayerMgrComponent.h"
 namespace Tendo
 {
     Gate::Gate()
     {
 		this->mIndex = 0;
-		this->mUserService = nullptr;
-		this->mNodeComponent = nullptr;
         this->mOuterComponent = nullptr;
     }
 	bool Gate::Awake()
@@ -44,9 +41,8 @@ namespace Tendo
 	bool Gate::OnStart()
 	{	
         const ServerConfig * config = ServerConfig::Inst();
-		this->mUserService = this->mApp->GetService<User>();
-		this->mNodeComponent = this->GetComponent<LocationComponent>();
 		this->mOuterComponent = this->GetComponent<OuterNetComponent>();
+		this->mPlayerComponent = this->GetComponent<PlayerMgrComponent>();
 		LOG_CHECK_RET_FALSE(config->GetLocation("rpc", this->mInnerAddress));
 		LOG_CHECK_RET_FALSE(config->GetLocation("gate", this->mOuterAddress));
 		return true;
@@ -68,7 +64,11 @@ namespace Tendo
 
 		this->mTokens.emplace(token, userId);
 		const std::string & server = this->GetServer();
-		this->mNodeComponent->BindServer(server, userId, this->mInnerAddress);
+		std::unique_ptr<Player> player = std::make_unique<Player>(userId);
+		{
+			player->GetAddr(this->GetServer(), this->mInnerAddress);
+		}
+		this->mPlayerComponent->AddPlayer(std::move(player));
 		return XCode::Successful;
     }
 	int Gate::Login(const Msg::Packet& packet)
@@ -89,7 +89,7 @@ namespace Tendo
 		int code = this->OnLogin(userId, token);
 		if(code != XCode::Successful)
 		{
-			this->mNodeComponent->DelUnit(userId);
+			this->mPlayerComponent->DelPlayer(userId);
 			return code;
 		}
 		this->mOuterComponent->BindClient(address, userId);
@@ -99,32 +99,36 @@ namespace Tendo
 
 	int Gate::OnLogin(long long userId, const std::string & token)
 	{
-		const std::string listen("rpc");
-		static std::string func("Login");
+		int targetId = 0;
+		std::string address;
+		const std::string func("User.Login");
 		std::vector<const NodeConfig *> configs;
 		ClusterConfig::Inst()->GetNodeConfigs(configs);
+		Player * player = this->mPlayerComponent->GetPlayer(userId);
 		for(const NodeConfig * nodeConfig : configs)
 		{
 			if (!nodeConfig->IsAuthAllot())
 			{
 				continue;
 			}
-			std::string address;
 			s2s::user::login message;
 			message.set_user_id(userId);
 			const std::string& server = nodeConfig->GetName();
-			if (!this->mNodeComponent->GetServer(server, listen, address))
+			if(!this->mApp->GetAddr(server, targetId) || !this->mApp->GetAddr(targetId, address))
 			{
-				LOG_ERROR("user:" << userId << " allot [" << server << "]" << "error");
+				this->mPlayerComponent->DelPlayer(userId);
 				return XCode::AddressAllotFailure;
 			}
-			int code = this->mUserService->Call(address, func, message);
+			player->GetAddr(server, targetId);
+			int code = this->mApp->Call(address, func, message);
 			if(code != XCode::Successful)
 			{
+				this->mPlayerComponent->DelPlayer(userId);
 				const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-				LOG_ERROR("call " << server << " [" << address << "] code = " << desc);;
+				LOG_ERROR("call " << server << " [" << address << "] code = " << desc);
+				return XCode::Failure;
 			}
-			this->mNodeComponent->BindServer(server, userId, address);
+			player->AddAddr(server, targetId);
 			CONSOLE_LOG_INFO("add " << server << " [" << address << "] to " << userId);
 		}
 		return XCode::Successful;
@@ -133,20 +137,16 @@ namespace Tendo
 	int Gate::Logout(long long userId)
 	{
 		this->mOuterComponent->StopClient(userId);
-		std::unordered_map<std::string, std::string> userAddress;
-		if(!this->mNodeComponent->GetServer(userId, userAddress))
+		Player * player = this->mPlayerComponent->GetPlayer(userId);
+		if(player == nullptr)
 		{
 			return XCode::NotFindUser;
 		}
-		static std::string func("Logout");
-		auto iter = userAddress.begin();
-		for(; iter != userAddress.end(); iter++)
+		player->BroadCast(std::string("User.Logout"));
 		{
-			const std::string & address = iter->second;
-			this->mUserService->Send(address, func, userId);
+			this->mPlayerComponent->DelPlayer(userId);
+			CONSOLE_LOG_ERROR("user:" << userId << " logout");
 		}
-		this->mNodeComponent->DelUnit(userId);
-		CONSOLE_LOG_ERROR("user:" << userId << " logout");
 		return XCode::Successful;
 	}
 

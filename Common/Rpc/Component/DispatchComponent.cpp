@@ -41,6 +41,7 @@ namespace Tendo
 	{
         //const Rpc::Head & head = message->ConstHead();
 		const std::string & fullName = message->ConstHead().GetStr("func");
+		LOG_DEBUG("func = " << fullName);
         const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
         if(methodConfig == nullptr)
         {

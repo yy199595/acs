@@ -26,12 +26,10 @@ namespace Tendo
 		int OnLogin(long long userId, const std::string & token);
 	 private:
 		int mIndex;
-		std::string mTable;
 		std::string mInnerAddress;
 		std::string mOuterAddress;
-		class RpcService * mUserService;
-		class LocationComponent * mNodeComponent;
 		class OuterNetComponent* mOuterComponent;
+		class PlayerMgrComponent * mPlayerComponent;
 		std::unordered_map<std::string, long long> mTokens;
 	};
 

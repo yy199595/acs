@@ -130,4 +130,9 @@ namespace Tendo
 	{
 		return this->mInnerComponent->Send(addr, message);
 	}
+	bool Server::GetAddr(int targetId, string& addr)
+	{
+		const std::string listen("rpc");
+		return this->mLocationComponent->GetServerAddress(targetId, listen, addr);
+	}
 }

@@ -1,12 +1,13 @@
 #pragma once
 #include<vector>
+#include<memory>
 #include<unordered_map>
 #include"Component.h"
-
+#include"Entity/Unit/Player.h"
 namespace Tendo
 {
-	class Player;
-	class PlayerMgrComponent : public Component
+	//class Player;
+	class PlayerMgrComponent final : public Component
 	{
 	 public:
 		PlayerMgrComponent() = default;
@@ -14,12 +15,12 @@ namespace Tendo
 	 public:
 		bool LateAwake() final;
 	 public:
-		Player * GetPlayer(long long userId);
+		Player * GetPlayer(long long playerId);
+		bool AddPlayer(std::unique_ptr<Player> player);
 	 public:
 		bool DelPlayer(long long userId);
-		bool Add(std::unique_ptr<Player> gameObject);
 		void GetPlayers(std::vector<Player *>& players);
-		size_t GetPlayerCount() const { return this->mPlayers.size(); }
+		inline size_t GetPlayerCount() const { return this->mPlayers.size(); }
 	 private:
 		void StartComponents(long long objectId);
 	 private:

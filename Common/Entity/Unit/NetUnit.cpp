@@ -39,6 +39,7 @@ namespace Tendo
 			{
 				message->GetHead().Add("id", this->GetUnitId());
 			}
+			message->GetHead().Add("func", func);
 		}
 		return XCode::Successful;
 	}

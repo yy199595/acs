@@ -16,7 +16,6 @@
 namespace Tendo
 {
 	RegistryComponent::RegistryComponent()
-		: mService("Registry")
 	{
 		this->mLocationComponent = nullptr;
 	}
@@ -45,14 +44,15 @@ namespace Tendo
 			message.set_server_name(config->Name());
 			message.set_group_id(config->GroupId());
 			message.set_server_id(config->ServerId());
-			std::vector<std::string> listens;
-			config->GetListen(listens);
-			for (const std::string& name: listens)
-			{
-				std::string listenAddress;
-				config->GetLocation(name.c_str(), listenAddress);
-				message.mutable_listens()->insert({ name, listenAddress });
-			}
+		}
+
+		std::vector<std::string> listens;
+		ServerConfig::Inst()->GetListen(listens);
+		for (const std::string& name: listens)
+		{
+			std::string listenAddress;
+			config->GetLocation(name.c_str(), listenAddress);
+			message.mutable_listens()->insert({ name, listenAddress });
 		}
 
 #ifdef __DEBUG__

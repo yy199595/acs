@@ -9,7 +9,7 @@ namespace Tendo
 		return true;
 	}
 
-	bool PlayerMgrComponent::Add(std::unique_ptr<Player> player)
+	bool PlayerMgrComponent::AddPlayer(std::unique_ptr<Player> player)
 	{
 		LOG_CHECK_RET_FALSE(player);
 		long long id = player->GetUnitId();
@@ -55,12 +55,13 @@ namespace Tendo
         return iter->second.get();
 	}
 
-	void PlayerMgrComponent::GetPlayers(std::vector<Player*>& gameObjects)
+	void PlayerMgrComponent::GetPlayers(std::vector<Player*>& players)
 	{
 		auto iter = this->mPlayers.begin();
+		players.reserve(this->mPlayers.size());
 		for (; iter != this->mPlayers.end(); iter++)
 		{
-			gameObjects.push_back(iter->second.get());
+			players.push_back(iter->second.get());
 		}
 	}
 
