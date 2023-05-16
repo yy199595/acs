@@ -179,28 +179,22 @@ namespace Tendo
 		}
 	}
 
-	bool LuaScriptComponent::Start()
+	void LuaScriptComponent::Start()
 	{
 		const std::string& name = ServerConfig::Inst()->Name();
 		Lua::LuaModule* luaModule = this->GetModule(name);
-		return luaModule == nullptr || luaModule->Start();
-	}
-
-	void LuaScriptComponent::OnLocalComplete()
-	{
-		auto iter = this->mModules.begin();
-		for (; iter != this->mModules.end(); iter++)
+		if(luaModule != nullptr)
 		{
-			iter->second->OnLocalComplete();
+			luaModule->Start();
 		}
 	}
 
-	void LuaScriptComponent::OnClusterComplete()
+	void LuaScriptComponent::OnComplete()
 	{
 		auto iter = this->mModules.begin();
 		for (; iter != this->mModules.end(); iter++)
 		{
-			iter->second->OnClusterComplete();
+			iter->second->OnComplete();
 		}
 	}
 

@@ -26,12 +26,12 @@ namespace Tendo
 		virtual ~HttpService() = default;
 	 protected:
 		virtual bool OnInit() = 0;
-		virtual bool OnClose() { return true; }
-		virtual bool OnStart() { return true; }
+		virtual void OnClose() {  }
+		virtual void OnStart() { }
 	protected:
 		bool Init() final;
-		bool Start() final;
-		bool Close() final;
+		void Start() final;
+		void Close() final;
 		bool LateAwake() final;
 		bool LoadFromLua() final;
 		HttpServiceRegister & GetRegister() { return this->mServiceRegister;}

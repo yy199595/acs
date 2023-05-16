@@ -40,11 +40,6 @@ namespace Tendo
     }
     int PhysicalRpcService::Invoke(const std::string &func, std::shared_ptr<Msg::Packet> message)
     {
-        if (!this->IsStartService())
-        {
-            LOG_ERROR(this->GetName() << " is not start");
-            return XCode::CallServiceNotFound;
-        }
         std::shared_ptr<ServiceMethod> serviceMethod = this->mMethodRegister.GetMethod(func);
         if (serviceMethod == nullptr)
         {

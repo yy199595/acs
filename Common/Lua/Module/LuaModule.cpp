@@ -44,7 +44,7 @@ namespace Lua
 		MD5 md5(fs);
 		this->mMd5 = md5.toString();
 		this->mRef = luaL_ref(mLua, LUA_REGISTRYINDEX);
-		if(this->GetFunction("Awake", false))
+		if(this->GetOnceFunction("Awake"))
 		{
 			if(lua_pcall(this->mLua, 0, 1, 0) != LUA_OK)
 			{
@@ -106,76 +106,61 @@ namespace Lua
 		return true;
 	}
 
-	bool LuaModule::Start()
+	void LuaModule::Start()
 	{
-		if(this->GetFunction("Start", false))
-		{
-			WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLua);
-			return luaTaskSource != nullptr && luaTaskSource->Await<bool>();
-		}
-		return true;
+		this->Await("Start");
 	}
 
-	void LuaModule::OnLocalComplete()
+	void LuaModule::OnComplete()
 	{
-		if (this->GetFunction("OnLocalComplete", false))
-		{
-			WaitLuaTaskSource* luaTaskSource = Lua::Function::Call(this->mLua);
-			if (luaTaskSource != nullptr)
-			{
-				luaTaskSource->Await<void>();
-			}
-		}
-	}
-
-	void LuaModule::OnClusterComplete()
-	{
-		if (this->GetFunction("OnClusterComplete", false))
-		{
-			WaitLuaTaskSource* luaTaskSource = Lua::Function::Call(this->mLua);
-			if (luaTaskSource != nullptr)
-			{
-				luaTaskSource->Await<void>();
-			}
-		}
+		this->Await("OnComplete");
 	}
 
 	bool LuaModule::Close()
 	{
-		if(this->GetFunction("Close", false))
-		{
-			WaitLuaTaskSource * luaTaskSource = Lua::Function::Call(this->mLua);
-			return luaTaskSource != nullptr && luaTaskSource->Await<bool>();
-		}
-		return true;
+		return this->Await("Close");
 	}
 
-	bool LuaModule::GetFunction(const std::string& name, bool cache)
+	bool LuaModule::GetOnceFunction(const std::string& name)
+	{
+		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
+		if (!lua_istable(this->mLua, -1))
+		{
+			return false;
+		}
+		if (lua_getfield(this->mLua, -1, name.c_str()))
+		{
+			if (!lua_isfunction(this->mLua, -1))
+			{
+				return false;
+			}
+			return true;
+		}
+	}
+
+	bool LuaModule::GetFunction(const std::string& name)
 	{
 		auto iter = this->mFunctions.find(name);
-		if(iter != this->mFunctions.end())
+		if (iter != this->mFunctions.end())
 		{
 			int ref = iter->second;
 			lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, ref);
 			return true;
 		}
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
-		if(!lua_istable(this->mLua, -1))
+		if (!lua_istable(this->mLua, -1))
 		{
 			return false;
 		}
-		if(lua_getfield(this->mLua, -1, name.c_str()))
+		if (lua_getfield(this->mLua, -1, name.c_str()))
 		{
-			if(!lua_isfunction(this->mLua, -1))
+			if (!lua_isfunction(this->mLua, -1))
 			{
 				return false;
 			}
-			if(cache)
-			{
-				int ref = luaL_ref(mLua, LUA_REGISTRYINDEX);
-				this->mFunctions.emplace(name, ref);
-				lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, ref);
-			}
+			int ref = luaL_ref(mLua, LUA_REGISTRYINDEX);
+			this->mFunctions.emplace(name, ref);
+			lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, ref);
 			return true;
 		}
 		return false;

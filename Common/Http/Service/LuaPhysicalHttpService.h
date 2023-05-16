@@ -14,8 +14,8 @@ namespace Tendo
         ~LuaPhysicalHttpService() = default;
     private:
 		bool OnInit() final;
-		bool OnStart() final { return true; }
-		bool OnClose() final { return true; }
+		void OnStart() final {}
+		void OnClose() final { }
 		bool IsStartService() final { return true;}
 		int Invoke(const std::string & name,
 			const std::shared_ptr<Http::Request> &, std::shared_ptr<Http::DataResponse> &) final;

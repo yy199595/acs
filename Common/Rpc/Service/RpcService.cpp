@@ -1,15 +1,18 @@
 ﻿#include"RpcService.h"
-#include"Server/Config/ServerConfig.h"
 #include"Rpc/Lua/LuaServiceMethod.h"
-#include"Server/Config/ServiceConfig.h"
-#include"Util/String/StringHelper.h"
 #include"Cluster/Config/ClusterConfig.h"
-#include"Server/Config/CodeConfig.h"
-#include"Rpc/Component/InnerRpcComponent.h"
+#include"Lua/Component/LuaScriptComponent.h"
 namespace Tendo
 {
 	bool RpcService::LateAwake()
 	{
-		return ClusterConfig::Inst()->GetServerName(this->GetName(), this->mCluster);
+		const std::string & name = this->GetName();
+		LuaScriptComponent * luaComponent = this->GetComponent<LuaScriptComponent>();
+		LOG_CHECK_RET_FALSE(ClusterConfig::Inst()->GetServerName(name, this->mCluster));
+		if(luaComponent != nullptr)
+		{
+			this->mLuaModule = luaComponent->LoadModule(name);
+		}
+		return this->OnInit();
 	}
 }

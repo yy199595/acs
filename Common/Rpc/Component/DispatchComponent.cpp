@@ -41,13 +41,12 @@ namespace Tendo
 	{
         //const Rpc::Head & head = message->ConstHead();
 		const std::string & fullName = message->ConstHead().GetStr("func");
-		LOG_DEBUG("func = " << fullName);
         const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
         if(methodConfig == nullptr)
         {
             return XCode::CallFunctionNotExist;
         }
-        if(this->mApp->GetService(methodConfig->Service) == nullptr)
+        if(this->GetComponent<RpcService>(methodConfig->Service) == nullptr)
         {
             LOG_ERROR("call service not exist : [" << methodConfig->Service << "]");
             return XCode::CallServiceNotFound;
@@ -63,8 +62,9 @@ namespace Tendo
 
     void DispatchComponent::Invoke(const RpcMethodConfig *config, const std::shared_ptr<Msg::Packet>& message)
 	{
-		RpcService* logicService = this->mApp->GetService(config->Service);
-		if (logicService == nullptr || !logicService->IsStartService())
+		const std::string & service = config->Service;
+		RpcService* logicService = this->GetComponent<RpcService>(service);
+		if (logicService == nullptr)
 		{
 			LOG_ERROR("call [" << config->FullName << "] server not found");
 			return;

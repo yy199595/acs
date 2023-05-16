@@ -78,35 +78,32 @@ namespace Tendo
 		return true;
 	}
 
-	bool HttpService::Start()
+	void HttpService::Start()
 	{
-		if(!this->OnStart())
-		{
-			return false;
-		}
+		this->OnStart();
 		const std::string & name = this->GetName();
 		if(this->mLuaComponent != nullptr)
 		{
 			Lua::LuaModule* luaModule = this->mLuaComponent->GetModule(name);
-			return luaModule == nullptr || luaModule->Start();
+			if(luaModule != nullptr)
+			{
+				luaModule->Start();
+			}
 		}
-		return true;
 	}
 
-	bool HttpService::Close()
+	void HttpService::Close()
 	{
         this->mServiceRegister.Clear();
-        if (!this->OnClose())
-        {
-            return false;
-        }
-
+        this->OnClose();
 		const std::string & name = this->GetName();
 		if(this->mLuaComponent != nullptr)
 		{
 			Lua::LuaModule* luaModule = this->mLuaComponent->GetModule(name);
-			return luaModule == nullptr || luaModule->Close();
+			if(luaModule != nullptr)
+			{
+				luaModule->Close();
+			}
 		}
-		return true;
 	}
 }

@@ -1,40 +1,31 @@
 {
     "GateServer": {
         "AutoAllot": false,
-        "Service": {
-            "Gate": true,
-            "Node": true,
-            "Chat": false,
-            "User": false,
-            "Registry": false
-        },
         "Component": [
             "RegistryComponent"
+        ],
+        "Service": [
+            "Gate",
+            "Node"
         ]
     },
     "ChatServer": {
         "AutoAllot": true,
-        "Service": {
-            "User": true,
-            "Node": true,
-            "Chat": true,
-            "Gate": false,
-            "Registry": false
-        },
+        "Service": [
+            "User",
+            "Node",
+            "Chat"
+        ],
         "Component": [
             "RegistryComponent"
         ]
     },
     "HttpServer": {
         "AutoAllot": false,
-        "Service": {
-            "Node": true,
-            "Account": true,
-            "Gate": false,
-            "Registry": false,
-            "MongoDB": false,
-            "ServerWeb": true
-        },
+        "Service": [
+            "Node",
+            "Account"
+        ],
         "Component": [
             "HttpComponent",
             "RedisComponent",
@@ -45,21 +36,20 @@
     },
     "DataServer": {
         "AutoAllot": false,
-        "Service": {
-            "Node": true,
-            "MongoDB": true,
-            "Registry": false
-        },
+        "Service": [
+            "Node",
+            "MongoDB"
+        ],
         "Component": [
             "RegistryComponent"
         ]
     },
     "RegistryServer": {
         "AutoAllot": false,
-        "Service": {
-            "Node": true,
-            "Registry": true
-        },
+        "Service" :[
+            "Node",
+            "Registry"
+        ],
         "Component": [
             "MysqlDBComponent",
             "RegistryComponent"

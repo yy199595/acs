@@ -78,12 +78,7 @@ namespace Tendo
 		{
 			return nullptr;
 		}
-		T* component = this->GetComponent<T>(type->Name);
-		if (component != nullptr)
-		{
-			return component;
-		}
-		return nullptr;
+		return this->GetComponent<T>(type->Name);
 	}
 
 	template<typename T>
@@ -93,7 +88,7 @@ namespace Tendo
 		if (iter != this->mComponentMap.end())
 		{
 			Component* component = iter->second.get();
-			return dynamic_cast<T*>(component);
+			return static_cast<T*>(component);
 		}
 		return nullptr;
 	}

@@ -15,15 +15,19 @@ namespace Lua
 		~LuaModule();
 	public:
 		bool Awake();
-		bool Start();
+		void Start();
 		bool Close();
 		bool Hotfix();
+		void OnComplete();
 		void Update(int tick);
-		void OnLocalComplete();
-		void OnClusterComplete();
+	public:
 		template<typename ... Args>
-		bool Invoke(const std::string & func, Args && ... args);
-		bool GetFunction(const std::string& name, bool cache = true);
+		bool Call(const std::string & func, Args && ... args);
+		template<typename ... Args>
+		bool Await(const std::string & func, Args && ... args);
+	public:
+		bool GetFunction(const std::string& name);
+		bool GetOnceFunction(const std::string& name);
 	private:
 		int mRef;
 		bool mIsUpdate;
@@ -35,9 +39,24 @@ namespace Lua
 	};
 
 	template<typename... Args>
-	bool LuaModule::Invoke(const std::string& func, Args&& ... args)
+	bool LuaModule::Call(const std::string& func, Args&& ... args)
 	{
-		if(!this->GetFunction(func))
+		if(!this->GetOnceFunction(func))
+		{
+			return false;
+		}
+		Parameter::WriteArgs<Args...>(this->mLua, std::forward<Args>(args)...);
+		if (lua_pcall(this->mLua, sizeof...(Args), 0, 0) != LUA_OK)
+		{
+			return false;
+		}
+		return true;
+	}
+
+	template<typename... Args>
+	bool LuaModule::Await(const std::string& func, Args&& ... args)
+	{
+		if(!this->GetOnceFunction(func))
 		{
 			return false;
 		}

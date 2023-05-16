@@ -25,11 +25,10 @@ namespace Tendo
         bool GetFunction(const std::string & tab, const std::string & func);
 	 protected:
 		bool Awake() final;
-		bool Start() final;
+		void Start() final;
 		bool LateAwake() final;
 		void OnDestroy() final;
-		void OnLocalComplete() final;
-		void OnClusterComplete() final;
+		void OnComplete() final;
         void OnSecondUpdate(const int tick) final;
         void OnHotFix() final;
 		void OnRecord(Json::Writer &document) final;

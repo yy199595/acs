@@ -39,9 +39,6 @@ namespace Tendo
 	 public:
 		void Stop(int signum);
         int Run(int argc, char ** argv);
-		template<typename T>
-		inline RpcService * GetService();
-		inline RpcService * GetService(const std::string & name);
         bool OnDelComponent(Component *component) final { return false; }
         inline bool IsMainThread() const { return this->mThreadId == std::this_thread::get_id();}
     private:
@@ -49,7 +46,6 @@ namespace Tendo
 		void UpdateConsoleTitle();
 #endif
 		bool LoadComponent();
-		void WaitServerStart();
 		void StartAllComponent();
 	 private:
         int mTickCount;
@@ -63,19 +59,5 @@ namespace Tendo
 		CoroutineComponent* mTaskComponent;
 		ProtoComponent * mMessageComponent;
         std::unique_ptr<Asio::Context> mMainContext;
-        std::unordered_map<std::string, RpcService*> mServiceMap;
     };
-
-	inline RpcService* App::GetService(const std::string& name)
-	{
-		auto iter = this->mServiceMap.find(name);
-		return iter != this->mServiceMap.end() ? iter->second : nullptr;
-	}
-	template<typename T>
-	inline RpcService* App::GetService()
-	{
-		const std::string & name = ComponentFactory::GetName<T>();
-		auto iter = this->mServiceMap.find(name);
-		return iter != this->mServiceMap.end() ? iter->second : nullptr;
-	}
 }// namespace Sentry

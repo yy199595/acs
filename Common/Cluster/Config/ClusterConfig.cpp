@@ -7,28 +7,22 @@
 #include"Server/Config/ServerConfig.h"
 namespace Tendo
 {
-    bool NodeConfig::IsStart(const std::string &service) const
-    {
-        auto iter = this->mServices.find(service);
-        return iter != this->mServices.end() && iter->second;
-    }
-
     bool NodeConfig::OnLoadConfig(const rapidjson::Value &value, int index)
     {
 		this->mIndex = index;
 		this->mIsAutoAllot = false;
         if(value.HasMember("Service"))
         {
-            if(!value["Service"].IsObject())
+            if(!value["Service"].IsArray())
             {
                 return false;
             }
-            auto iter = value["Service"].MemberBegin();
-            for(; iter != value["Service"].MemberEnd(); iter++)
-            {
-                const std::string service(iter->name.GetString());
-                this->mServices.emplace(service, iter->value.GetBool());
-            }
+			const rapidjson::Value & jsonArray = value["Service"];
+			for(unsigned int index = 0; index<jsonArray.Size();index++)
+			{
+				const rapidjson::Value& element = jsonArray[index];
+				this->mServices.emplace(std::string(element.GetString()));
+			}
         }
         if(value.HasMember("Component"))
         {
@@ -62,25 +56,11 @@ namespace Tendo
         return components.size();
     }
 
-    bool NodeConfig::HasService(const std::string &service) const
+    size_t NodeConfig::GetServices(std::vector<std::string> &services) const
     {
-        auto iter = this->mServices.find(service);
-        return iter != this->mServices.end() && iter->second;
-    }
-
-    size_t NodeConfig::GetServices(std::vector<std::string> &services, bool start) const
-    {
-        for(auto & value : this->mServices)
+        for(const std::string & value : this->mServices)
         {
-            if(start)
-            {
-				if(value.second)
-				{
-					services.emplace_back(value.first);
-				}
-				continue;
-            }
-            services.emplace_back(value.first);
+            services.emplace_back(value);
         }
         return services.size();
     }
@@ -108,7 +88,7 @@ namespace Tendo
                 return false;
             }
             std::vector<std::string> services;
-            nodeConfig->GetServices(services, true);
+            nodeConfig->GetServices(services);
             for (const std::string& service : services)
             {               
                 this->mServiceNodes[service] = name;

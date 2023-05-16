@@ -21,21 +21,19 @@ namespace Tendo
         bool OnLoadConfig(const rapidjson::Value & value, int index);
     public:
 		int GetIndex() const { return this->mIndex;}
-        bool IsStart(const std::string & service) const;
-        bool HasService(const std::string & service) const;
         bool IsAuthAllot() const { return this->mIsAutoAllot; }
         const std::string & GetName() const { return this->mName;}
         const std::string & GetMainLua() const { return this->mLua ;}
         size_t ServiceCount() const { return this->mServices.size(); }
-        size_t GetComponents(std::vector<std::string> & components) const;
-        size_t GetServices(std::vector<std::string> & services, bool start = false) const;
+		size_t GetServices(std::vector<std::string> & services) const;
+		size_t GetComponents(std::vector<std::string> & components) const;
     private:
 		int mIndex; //决定了服务器关闭顺序
 		std::string mLua;
         bool mIsAutoAllot;
         const std::string mName;
-        std::unordered_set<std::string> mComponents;
-        std::unordered_map<std::string, bool> mServices;
+		std::unordered_set<std::string> mServices;
+		std::unordered_set<std::string> mComponents;
     };
 }
 

@@ -8,7 +8,6 @@
 #include"Core/System/System.h"
 #include"Http/Component/HttpComponent.h"
 #include"Cluster//Config/ClusterConfig.h"
-#include"Rpc/Service/VirtualRpcService.h"
 #include"Rpc/Service/LuaPhysicalRpcService.h"
 #include"Http//Service/LuaPhysicalHttpService.h"
 #include"Rpc/Component/LocationComponent.h"
@@ -66,30 +65,18 @@ namespace Tendo
                 const RpcServiceConfig* rpcServiceConfig = RpcConfig::Inst()->GetConfig(name);
                 const HttpServiceConfig* httpServiceConfig = HttpConfig::Inst()->GetConfig(name);
                 if (rpcServiceConfig != nullptr)
-                {
-                    //创建实体服务
-                    if (nodeConfig->IsStart(name))
-                    {
-                        if (!this->mApp->AddComponent(name))
-                        {
-                            std::unique_ptr<Component> component(new LuaPhysicalRpcService());
-                            if (!this->mApp->AddComponent(name, std::move(component)))
-                            {
-                                LOG_ERROR("add physical service [" << name << "] error");
-                                return false;
-                            }
-                        }
-                    }
-                    else //创建虚拟服务
-                    {
-                        std::unique_ptr<Component> component(new VirtualRpcService());
-                        if (!this->mApp->AddComponent(name, std::move(component)))
-                        {
-                            LOG_ERROR("add virtual service [" << name << "] error");
-                            return false;
-                        }
-                    }
-                }
+				{
+					//创建实体服务
+					if (!this->mApp->AddComponent(name))
+					{
+						std::unique_ptr<Component> component(new LuaPhysicalRpcService());
+						if (!this->mApp->AddComponent(name, std::move(component)))
+						{
+							LOG_ERROR("add physical service [" << name << "] error");
+							return false;
+						}
+					}
+				}
                 else if(httpServiceConfig != nullptr)
                 {
                     if (!this->mApp->AddComponent(name))
@@ -112,57 +99,26 @@ namespace Tendo
         return true;
     }
 
-    bool LaunchComponent::Start()
+    void LaunchComponent::Start()
     {
-        const ServerConfig* config = ServerConfig::Inst();
-        const ClusterConfig* clusterConfig = ClusterConfig::Inst();
-        TimerComponent* timerComponent = this->GetComponent<TimerComponent>();
-
-        std::string location, httpLocation;
-        std::vector<std::string> components;
-        config->GetLocation("rpc", location);
-        config->GetLocation("http", httpLocation);
-        if (clusterConfig->GetConfig()->GetServices(components, true) > 0)
-        {
-            for (const std::string& name : components)
-            {
+		std::vector<IServiceBase *> components;
+		this->mApp->GetComponents<IServiceBase>(components);
+		for(IServiceBase * localService : components)
+		{
 #ifdef __DEBUG__
-                long long t1 = Helper::Time::NowMilTime();
+			long long t1 = Helper::Time::NowMilTime();
 #endif
-                long long id = timerComponent->DelayCall(10 * 1000, [name]()
-                {
-                    CONSOLE_LOG_ERROR("start service [" << name << "] timeout");
-                });
-                if (!this->GetComponent<IServiceBase>(name)->Start())
-                {
-                    LOG_ERROR("start service [" << name << "] failure");
-                    return false;
-                }
-                timerComponent->CancelTimer(id);
-                if (RpcConfig::Inst()->GetConfig(name) != nullptr)
-                {
-                    LOG_CHECK_RET_FALSE(!location.empty());
+			Component * component = dynamic_cast<Component*>(localService);
+			{
+				localService->Start();
+			}
 #ifdef __DEBUG__
-                    long long t2 = Helper::Time::NowMilTime();
-                    LOG_INFO("start rpc service [" << name << "] successful use time [" << t2 - t1 << "ms]");
-#else
-                    LOG_INFO("start rpc service [" << name << "] successful");
+			long long t2 = Helper::Time::NowMilTime();
+			CONSOLE_LOG_INFO("start" << component->GetName() << " time = [" << (t2 - t1) << "ms]")
 #endif
-                }
-                else if (HttpConfig::Inst()->GetConfig(name) != nullptr)
-                {
-                    long long t2 = Helper::Time::NowMilTime();
-                    LOG_CHECK_RET_FALSE(!httpLocation.empty());
-#ifdef __DEBUG__
-                    LOG_INFO("start http service [" << name << "] successful use time [" << t2 - t1 << "ms]");
-#else
-                    LOG_INFO("start http service [" << name << "] successful");
-#endif
-                }
-            }
-        }
-        return true;
+		}
     }
+
 	bool LaunchComponent::LateAwake()
 	{
 		std::vector<IServiceBase *> allServices;

@@ -16,14 +16,13 @@ namespace Tendo
 	class IStart
 	{
 	public:
-		virtual bool Start() = 0;
+		virtual void Start() = 0;
 	};
 
 	class IComplete
 	{
 	public:
-		virtual void OnLocalComplete() { }; //本机所有服务启动完毕
-		virtual void OnClusterComplete() { } //集群内所有服务启动完毕
+		virtual void OnComplete() { }; //启动完毕
 	};
 
 	class IDestroy
@@ -117,11 +116,10 @@ namespace Tendo
 	{
 	public:
 		virtual bool Init() = 0; // 注册rpc方法
-		virtual bool Start() = 0; //协程中调用
-		virtual bool Close() = 0; //协程中调用
+		virtual void Start() = 0; //协程中调用
+		virtual void Close() = 0; //协程中调用
 		virtual bool LoadFromLua() = 0; //在热更新的时候调用
         virtual void OnCloseComplete() { }
-		virtual bool IsStartService() = 0;
         virtual void WaitAllMessageComplete() { };
         virtual unsigned int GetWaitMessageCount() const { return 0; }
 	};

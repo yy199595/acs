@@ -15,7 +15,7 @@ namespace Tendo
         ~LaunchComponent() = default;
     private:
         bool Awake() final;
-        bool Start() final;
+        void Start() final;
 		bool LateAwake() final;
 		void OnDestroy() final;
     };

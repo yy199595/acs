@@ -19,11 +19,6 @@ namespace Lua
 		}
 
 	 public:
-		int GetRef()
-		{
-			return this->ref;
-		}
-		
 		static std::shared_ptr<Function> Create(lua_State* luaEnv, const std::string& name);
 
 		static std::shared_ptr<Function> Create(lua_State* luaEnv, const std::string& tabName, const std::string& name);
@@ -35,8 +30,6 @@ namespace Lua
 
 		template<typename... Args>
 		void Action(Args... args);
-
-
 
 		inline int GetFunctionRef() const
 		{
@@ -54,6 +47,7 @@ namespace Lua
         static WaitLuaTaskSource * Call(lua_State * lua, const char * tab, const char * func);
 		template<typename ... Args>
 		static WaitLuaTaskSource * Call(lua_State * lua, Args &&... args);
+
 	 public:
 		template<typename T>
 		static T Invoke(lua_State * lua);

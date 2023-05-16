@@ -4,6 +4,10 @@
 #include<google/protobuf/message.h>
 using namespace google::protobuf;
 struct lua_State;
+namespace Lua
+{
+	class LuaModule;
+}
 namespace Tendo
 {
 

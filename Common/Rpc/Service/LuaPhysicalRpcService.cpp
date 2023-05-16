@@ -114,14 +114,13 @@ namespace Tendo
 		}
 	}
 
-	bool LuaPhysicalRpcService::Close()
+	void LuaPhysicalRpcService::Close()
 	{
 		if(this->mLuaComponent != nullptr)
 		{
 			const std::string & name = this->GetName();
-			return this->mLuaComponent->UnloadModule(name);
+			this->mLuaComponent->UnloadModule(name);
 		}
-		return true;
 	}
 
 	void LuaPhysicalRpcService::OnRecord(Json::Writer& document)
@@ -130,15 +129,13 @@ namespace Tendo
 		document.Add("wait").Add(this->mWaitCount);
 		document.Add("client").Add(this->mUserCount);
 	}
-	bool LuaPhysicalRpcService::Start()
+	void LuaPhysicalRpcService::Start()
 	{
 		const std::string & name = this->GetName();
 		Lua::LuaModule * luaModule = this->mLuaComponent->GetModule(name);
-		return luaModule != nullptr && luaModule->Start();
-	}
-
-	void LuaPhysicalRpcService::OnEvent(const DisConnectEvent* message)
-	{
-
+		if(luaModule != nullptr)
+		{
+			luaModule->Start();
+		}
 	}
 }

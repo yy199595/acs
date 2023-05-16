@@ -15,16 +15,12 @@ namespace Tendo
 		PhysicalRpcService();
 	public:
 		bool Init() final;
-		bool Start() final;
-		bool Close() final;
-		bool IsStartService() final{ return true; }
+		void Start() final;
+		void Close() final;
 		unsigned int GetWaitMessageCount() const final { return this->mWaitCount; }
 		int Invoke(const std::string& func, std::shared_ptr<Msg::Packet> message) final;
 	protected:
 		bool LoadFromLua() final;
-		virtual void OnClose(){ };
-		virtual bool OnInit() = 0;
-		virtual bool OnStart()  { return true; }
 		void WaitAllMessageComplete() final;
 		void OnRecord(Json::Writer& document) final;
 		inline ServiceMethodRegister& GetMethodRegistry() { return this->mMethodRegister; }

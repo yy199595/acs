@@ -3,7 +3,6 @@
 #include"Core/System/System.h"
 #include"Timer/Timer/ElapsedTimer.h"
 #include"Util/File/DirectoryHelper.h"
-#include"Rpc/Service/VirtualRpcService.h"
 #include"Proto/Component/ProtoComponent.h"
 #include"Rpc/Component/LocationComponent.h"
 #include"Server/Component/TextConfigComponent.h"
@@ -48,15 +47,6 @@ namespace Tendo
         std::vector<Component *> components;
         if(this->GetComponents(components) > 0)
         {
-            for (Component *component: components)
-            {
-				RpcService * rpcService = component->Cast<RpcService>();
-				if(rpcService != nullptr)
-				{
-					const std::string & name = component->GetName();
-					this->mServiceMap.emplace(name, rpcService);
-				}
-            }
 			for (Component *component: components)
 			{
 				if(!component->LateAwake())
@@ -219,12 +209,7 @@ namespace Tendo
             {
                 LOG_FATAL(name << " start time out");
             });
-            if(!component->Start())
-            {
-                LOG_ERROR("start [" << name << "] failure");
-                this->Stop(0);
-                return;
-            }
+			component->Start();
             this->mTimerComponent->CancelTimer(timeId);
             LOG_DEBUG("start " << name << " successful use time = [" << timer.GetSecond() << "s]");
         }
@@ -238,32 +223,14 @@ namespace Tendo
 			{
 				CONSOLE_LOG_FATAL(component->GetName() << " [OnLocalComplete] time out");
 			});
-			complete->OnLocalComplete();
+			complete->OnComplete();
 			this->mTimerComponent->CancelTimer(timerId);
         }
-		CONSOLE_LOG_DEBUG("start all component complete");
 		this->mStatus = ServerStatus::Ready;
-		this->WaitServerStart();
-    }
-
-	void App::WaitServerStart() //等待依赖的服务启动完成
-	{
-		std::vector<IComplete*> completeComponents;
-		this->GetComponents<IComplete>(completeComponents);
-		for (IComplete* complete: completeComponents)
-		{
-			Component* component = dynamic_cast<Component*>(complete);
-			long long timerId = this->mTimerComponent->DelayCall(1000 * 10, [component]()
-			{
-				CONSOLE_LOG_FATAL(component->GetName() << " [OnClusterComplete] time out");
-			});
-			complete->OnClusterComplete();
-			this->mTimerComponent->CancelTimer(timerId);
-		}
-		this->mStatus = ServerStatus::Running;
 		long long t = Helper::Time::NowMilTime() - this->mStartTime;
 		LOG_INFO("===== start " << ServerConfig::Inst()->Name() << " successful [" << t / 1000.0f << "]s ===========");
-	}
+    }
+
 #ifdef __OS_WIN__
 	void App::UpdateConsoleTitle()
 	{       
