@@ -7,12 +7,6 @@
 #include"Server/Config/ServerConfig.h"
 namespace Tendo
 {
-	bool ActorMgrComponent::LateAwake()
-	{
-		const ServerConfig * config = ServerConfig::Inst();
-		this->mApp->SetName(config->Name());
-		return this->AddActor(this->mApp);
-	}
 	bool ActorMgrComponent::AddActor(Actor* actor)
 	{
 		long long id = actor->GetUnitId();

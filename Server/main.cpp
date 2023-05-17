@@ -122,13 +122,20 @@ void RegisterServiceComponent()
     ComponentFactory::Add<MysqlDB>("MysqlDB");
 #endif
 }
-
+#include"Core/System/System.h"
 int main(int argc, char **argv)
 {
 #ifdef __OS_WIN__
     system("chcp 65001 > nul");
 #endif
-	RegisterComponent();
-	RegisterServiceComponent();
-	return (new App())->Run(argc, argv);
+	ServerConfig config;
+	System::Init(argc, argv);
+	if(config.LoadConfig(System::ConfigPath()))
+	{
+		RegisterComponent();
+		RegisterServiceComponent();
+		return std::make_unique<App>()->Run();
+	}
+	CONSOLE_LOG_FATAL("load config error");
+	return -1;
 }

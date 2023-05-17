@@ -19,7 +19,7 @@ using namespace std::chrono;
 namespace Tendo
 {
 
-	App::App() : Actor(0, std::string()),
+	App::App() : Actor(ServerConfig::Inst()->ServerId(), ""),
         mThreadId(std::this_thread::get_id()),
 				 mStartTime(Helper::Time::NowMilTime())
 	{
@@ -31,6 +31,7 @@ namespace Tendo
         this->mTimerComponent = nullptr;
         this->mMessageComponent = nullptr;
 		this->mStatus = ServerStatus::Init;
+		this->SetName(ServerConfig::Inst()->Name());
 	}
 
 	bool App::LoadComponent()
@@ -57,30 +58,13 @@ namespace Tendo
 				}
 			}
         }
+		this->mActorComponent->AddActor(this);
         this->mTaskComponent->Start(&App::StartAllComponent, this);
         return true;
 	}
 
-	int App::Run(int argc, char ** argv)
+	int App::Run()
     {
-        if (!System::Init(argc, argv))
-        {
-            CONSOLE_LOG_FATAL("start failure");
-#ifdef __OS_WIN__
-            return getchar();
-#endif
-            return -1;
-        }
-        std::unique_ptr<ServerConfig> serverConfig(new ServerConfig());
-
-        if (!serverConfig->LoadConfig(System::ConfigPath()))
-        {
-            CONSOLE_LOG_FATAL("load server config error");
-#ifdef __OS_WIN__
-            return getchar();
-#endif
-            return -2;
-        }
         this->mMainContext = std::make_unique<Asio::Context>();
         if (!this->LoadComponent())
         {

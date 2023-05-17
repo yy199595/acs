@@ -39,8 +39,8 @@ namespace Tendo
 		inline CoroutineComponent* GetCoroutine() { return this->mTaskComponent; }
 		inline bool IsMainContext(const Asio::Context * io) const { return this->mMainContext.get() == io;}
 	 public:
+		int Run();
 		void Stop(int signum);
-        int Run(int argc, char ** argv);
         bool OnDelComponent(Component *component) final { return false; }
         inline bool IsMainThread() const { return this->mThreadId == std::this_thread::get_id();}
     private:

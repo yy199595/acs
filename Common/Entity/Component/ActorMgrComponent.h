@@ -20,8 +20,6 @@ namespace Tendo
 		bool DelActor(long long id);
 		bool DelActor(const std::string & addr);
 	 private:
-		bool LateAwake() final;
-	 private:
 		std::unordered_map<long long, Actor*> mActors;
 		std::unordered_map<std::string, Actor*> mAddrActors;
 		std::unordered_map<std::string, std::vector<long long>> mActorNames;
