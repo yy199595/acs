@@ -19,13 +19,12 @@ namespace Tendo
 		long long Time;
 	};
 #endif
-    class DispatchComponent : public RpcTaskComponent<int, Msg::Packet>
+	class DispatchComponent : public RpcTaskComponent<int, Msg::Packet>, public IDestroy
 	{
 	 public:
 		DispatchComponent();
     public:
 		int OnMessage(const std::shared_ptr<Msg::Packet>& message);
-		unsigned int WaitCount() const { return this->mWaitCount; }
     private:
 		bool LateAwake() final;
 		int OnPublishMessage(const std::shared_ptr<Msg::Packet>& message);
@@ -34,11 +33,16 @@ namespace Tendo
 		int OnResponseMessage(const std::shared_ptr<Msg::Packet>& message);
 		int OnBroadcastMessage(const std::shared_ptr<Msg::Packet>& message);
 		void Invoke(const RpcMethodConfig * config, const std::shared_ptr<Msg::Packet>& message);
+	private:
+		void AddWaitCount(const std::string & name);
+		void SubWaitCount(const std::string & name);
     private:
 		unsigned int mWaitCount;
 		class InnerRpcComponent * mNetComponent;
 		class CoroutineComponent* mTaskComponent;
 		class TimerComponent* mTimerComponent;
 		class OuterNetComponent* mOuterComponent;
+		std::unordered_map<std::string, int> mWaitCounts;
+		std::unordered_map<std::string, int> mDoneCounts;
 	};
 }

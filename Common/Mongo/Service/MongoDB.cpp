@@ -43,7 +43,10 @@ namespace Tendo
                 this->mClients.emplace_back(id);
             }
 		}
-		this->mMongoComponent->Ping(id);
+		while(!this->mMongoComponent->Ping(id))
+		{
+			LOG_ERROR("try ping mongo server");
+		}
 	}
 
     void MongoDB::OnStop()

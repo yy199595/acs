@@ -39,14 +39,13 @@ namespace Tendo
 
 	int DispatchComponent::OnRequestMessage(const std::shared_ptr<Msg::Packet> & message)
 	{
-        //const Rpc::Head & head = message->ConstHead();
 		const std::string & fullName = message->ConstHead().GetStr("func");
         const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
         if(methodConfig == nullptr)
         {
             return XCode::CallFunctionNotExist;
         }
-        if(this->GetComponent<RpcService>(methodConfig->Service) == nullptr)
+        if(this->mApp->GetComponentByName(methodConfig->Service) == nullptr)
         {
             LOG_ERROR("call service not exist : [" << methodConfig->Service << "]");
             return XCode::CallServiceNotFound;
@@ -62,10 +61,12 @@ namespace Tendo
 
     void DispatchComponent::Invoke(const RpcMethodConfig *config, const std::shared_ptr<Msg::Packet>& message)
 	{
+		this->AddWaitCount(service);
 		const std::string & service = config->Service;
 		RpcService* logicService = this->GetComponent<RpcService>(service);
 		if (logicService == nullptr)
 		{
+			this->SubWaitCount(service);
 			LOG_ERROR("call [" << config->FullName << "] server not found");
 			return;
 		}
@@ -75,6 +76,7 @@ namespace Tendo
 			timerId = this->mTimerComponent->DelayCall(config->Timeout,
 					[message, config, this]()
 					{
+						this->SubWaitCount(config->Service);
 						LOG_ERROR("call [" << config->FullName << "] code = call time out");
 						this->mNetComponent->Send(message->From(), XCode::CallTimeout, message);
 					}
@@ -110,6 +112,9 @@ namespace Tendo
 #endif
 		this->mWaitCount++;
 		int code = logicService->Invoke(config->Method, message);
+		{
+			this->SubWaitCount(service);
+		}
 #ifdef __RPC_MESSAGE__
 		json.assign("{}");
 		if (code == XCode::Successful && !config->Response.empty())
@@ -234,5 +239,25 @@ namespace Tendo
         message->SetType(Msg::Type::Request);
         this->mOuterComponent->Broadcast(message);
 		return XCode::Successful;
+	}
+
+	void DispatchComponent::AddWaitCount(const std::string& name)
+	{
+		auto iter = this->mWaitCounts.find(name);
+		if(iter == this->mWaitCounts.end())
+		{
+			this->mWaitCounts.emplace(name, 1);
+			return;
+		}
+		iter->second++;
+	}
+
+	void DispatchComponent::SubWaitCount(const std::string& name)
+	{
+		auto iter = this->mWaitCounts.find(name);
+		if(iter != this->mWaitCounts.end())
+		{
+			iter->second--;
+		}
 	}
 }// namespace Sentry
