@@ -6,7 +6,7 @@
 
 #include"MysqlClient.h"
 #include"MysqlMessage.h"
-#include"Entity/Unit/App.h"
+#include"Entity/Actor/App.h"
 #include"Mysql/Config/MysqlConfig.h"
 namespace Tendo
 {

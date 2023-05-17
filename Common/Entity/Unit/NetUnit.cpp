@@ -3,7 +3,7 @@
 //
 
 #include "NetUnit.h"
-#include "App.h"
+#include "Entity/Actor/App.h"
 #include "XCode/XCode.h"
 #include "Rpc/Client/Message.h"
 #include "Rpc/Component/InnerNetComponent.h"

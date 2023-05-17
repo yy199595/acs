@@ -3,7 +3,7 @@
 //
 
 #include "LuaSqlite.h"
-#include"Entity/Unit/App.h"
+#include"Entity/Actor/App.h"
 #include"Util/Json/Lua/Json.h"
 #include"Sqlite/Component/SqliteComponent.h"
 using namespace Tendo;

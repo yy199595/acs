@@ -1,5 +1,5 @@
 ﻿#include"ThreadComponent.h"
-#include"Entity/Unit/App.h"
+#include"Entity/Actor/App.h"
 #include"Rpc/Method/MethodProxy.h"
 #include"Network/Tcp/SocketProxy.h"
 #ifdef __ENABLE_OPEN_SSL__

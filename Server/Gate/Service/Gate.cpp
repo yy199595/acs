@@ -3,7 +3,7 @@
 //
 
 #include"Gate.h"
-#include"Entity/Unit/App.h"
+#include"Entity/Actor/App.h"
 #include"Common/Service/User.h"
 #include"Gate/Client/OuterNetTcpClient.h"
 #include"Cluster/Config/ClusterConfig.h"

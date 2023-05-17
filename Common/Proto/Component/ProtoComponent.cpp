@@ -3,7 +3,7 @@
 //
 
 #include"ProtoComponent.h"
-#include"Entity/Unit/App.h"
+#include"Entity/Actor/App.h"
 #include<fstream>
 #include"Util/Md5/MD5.h"
 #include"Util/File/DirectoryHelper.h"

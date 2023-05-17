@@ -5,7 +5,7 @@
 #include"HttpResponse.h"
 #include"Util/Json/JsonWriter.h"
 #ifdef __DEBUG__
-#include"Entity/Unit/App.h"
+#include"Entity/Actor/App.h"
 #endif
 namespace Http
 {

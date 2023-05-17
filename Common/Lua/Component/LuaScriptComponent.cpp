@@ -1,6 +1,6 @@
 ﻿#include "LuaScriptComponent.h"
 
-#include "Entity/Unit/App.h"
+#include "Entity/Actor/App.h"
 #include "Util/Md5/MD5.h"
 #include "Util/Guid/Guid.h"
 #include "Util/File/FileHelper.h"

@@ -3,7 +3,7 @@
 //
 
 #include"LuaGate.h"
-#include"Entity/Unit/App.h"
+#include"Entity/Actor/App.h"
 #include"Lua/Engine/UserDataParameter.h"
 #include"Gate/Component/GateComponent.h"
 using namespace Tendo;

@@ -3,7 +3,7 @@
 //
 
 #include"GateComponent.h"
-#include"Entity/Unit/App.h"
+#include"Entity/Actor/App.h"
 #include"Gate/Service/Gate.h"
 #include"Gate/Lua/LuaGate.h"
 #include"Cluster/Config/ClusterConfig.h"

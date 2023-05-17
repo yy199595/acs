@@ -5,7 +5,7 @@
 #include"Mysql/Service/MysqlDB.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include"Rpc/Component/LocationComponent.h"
-#include"Entity/Unit/App.h"
+#include"Entity/Actor/App.h"
 
 namespace Tendo
 {

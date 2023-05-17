@@ -1,5 +1,5 @@
 #include"Component.h"
-#include"Entity/Unit/App.h"
+#include"Entity/Actor/App.h"
 namespace Tendo
 {
 	Component::Component()

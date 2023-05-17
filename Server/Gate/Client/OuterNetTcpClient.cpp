@@ -5,7 +5,7 @@
 #include"OuterNetTcpClient.h"
 #include"XCode/XCode.h"
 #include"Util/Time/TimeHelper.h"
-#include"Entity/Unit/App.h"
+#include"Entity/Actor/App.h"
 #include"Gate/Component/OuterNetComponent.h"
 
 namespace Tendo

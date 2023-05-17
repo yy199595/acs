@@ -5,7 +5,7 @@
 
 
 #include"MysqlDBComponent.h"
-#include"Entity/Unit/App.h"
+#include"Entity/Actor/App.h"
 #include"Util/Sql/SqlHelper.h"
 #include"Mysql/Client/MysqlClient.h"
 #include"Mysql/Lua/LuaMysql.h"

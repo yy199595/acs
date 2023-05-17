@@ -3,7 +3,7 @@
 //
 
 #include"LuaApp.h"
-#include"Entity/Unit/App.h"
+#include"Entity/Actor/App.h"
 #include"XCode/XCode.h"
 #include"Util/Json/Lua/Json.h"
 #include"Entity/Unit/Player.h"

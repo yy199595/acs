@@ -10,7 +10,7 @@
 #include"Proto/Component/ProtoComponent.h"
 #endif
 #include"XCode/XCode.h"
-#include"Entity/Unit/App.h"
+#include"Entity/Actor/App.h"
 #include"Rpc/Client/Message.h"
 #include"Rpc/Service/RpcService.h"
 #include"Rpc/Component/InnerRpcComponent.h"

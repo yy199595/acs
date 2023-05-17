@@ -7,7 +7,7 @@
 #include"Redis/Component/RedisLuaComponent.h"
 #include"Redis/Component/RedisStringComponent.h"
 #include"Rpc/Component/DispatchComponent.h"
-#include"Entity/Unit/App.h"
+#include"Entity/Actor/App.h"
 #include"Redis/Config/RedisConfig.h"
 #ifdef __DEBUG__
 #include "Timer/Timer/ElapsedTimer.h"
