@@ -31,17 +31,16 @@ namespace Tendo
 			request.set_flag(index);
 		}
 		const std::string func("MongoDB.Insert");
+		Actor * targetActor = this->mApp->Random(this->mServer);
 		if (!util::MessageToJsonString(message, request.mutable_json()).ok())
 		{
 			return XCode::CallServiceNotFound;
 		}
-		return this->GetActor()->Call(func, request);
-	}
-
-	Actor* MongoHelperComponent::GetActor()
-	{
-		ActorMgrComponent * actorMgrComponent = this->mApp->GetActorMgr();
-		return actorMgrComponent->RandomActor(this->mServer);
+		if(targetActor == nullptr)
+		{
+			return XCode::AddressAllotFailure;
+		}
+		return targetActor->Call(func, request);
 	}
 
 	int MongoHelperComponent::Update(const char* tab, const std::string& select, const std::string& data, int index)
@@ -53,7 +52,12 @@ namespace Tendo
 			request.set_select(select);
 		}
 		const std::string func("MongoDB.Update");
-		return this->GetActor()->Call(func, request);
+		Actor * targetActor = this->mApp->Random(this->mServer);
+		if(targetActor == nullptr)
+		{
+			return XCode::AddressAllotFailure;
+		}
+		return targetActor->Call(func, request);
 	}
 
 	int MongoHelperComponent::Insert(const char* tab, const std::string& json, int index)
@@ -65,7 +69,12 @@ namespace Tendo
 			request.set_json(json);
 		}
 		const std::string func("MongoDB.Insert");
-		return this->GetActor()->Call(func, request);
+		Actor * targetActor = this->mApp->Random(this->mServer);
+		if(targetActor == nullptr)
+		{
+			return XCode::AddressAllotFailure;
+		}
+		return targetActor->Call(func, request);
 	}
 
 	int MongoHelperComponent::Remove(const char* tab, const std::string& select, int limit, int index)
@@ -78,7 +87,12 @@ namespace Tendo
 			request.set_json(select);
 		}
 		const std::string func("MongoDB.Remove");
-		return this->GetActor()->Call(func, request);
+		Actor * targetActor = this->mApp->Random(this->mServer);
+		if(targetActor == nullptr)
+		{
+			return XCode::AddressAllotFailure;
+		}
+		return targetActor->Call(func, request);
 	}
 
 	int MongoHelperComponent::Query(const char* tab,
@@ -93,7 +107,12 @@ namespace Tendo
 		const std::string func("MongoDB.Query");
 		std::shared_ptr<db::mongo::query::response> result
 			= std::make_shared<db::mongo::query::response>();
-		int code = this->GetActor()->Call(func, request, result);
+		Actor * targetActor = this->mApp->Random(this->mServer);
+		if(targetActor == nullptr)
+		{
+			return XCode::AddressAllotFailure;
+		}
+		int code = targetActor->Call(func, request, result);
 		if(code == XCode::Successful && result->jsons_size() > 0)
 		{
 			const std::string& json = result->jsons(0);
@@ -144,7 +163,12 @@ namespace Tendo
 		request.set_tab(message.GetTypeName());
 		request.set_select(select.JsonString());
 		const std::string func("MongoDB.Update");
-		return this->GetActor()->Call(func, request);
+		Actor * targetActor = this->mApp->Random(this->mServer);
+		if(targetActor == nullptr)
+		{
+			return XCode::AddressAllotFailure;
+		}
+		return targetActor->Call(func, request);
 	}
 
 	int MongoHelperComponent::Save(const char* tab, long long id, const std::string& data)

@@ -30,6 +30,7 @@ namespace Tendo
 	 public:
 		explicit App();
 	 public:
+		Actor * Random(const std::string & name);
         inline float GetFps() const { return this->mLogicFps; }
 		inline LogComponent* GetLogger() { return this->mLogComponent; }
 		inline Asio::Context & MainThread() { return *this->mMainContext; }

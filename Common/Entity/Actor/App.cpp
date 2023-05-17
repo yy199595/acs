@@ -34,6 +34,16 @@ namespace Tendo
 		this->SetName(ServerConfig::Inst()->Name());
 	}
 
+	Actor* App::Random(const std::string& name)
+	{
+		Actor * actor = this->mActorComponent->RandomActor(name);
+		if(actor == nullptr && name == this->GetName())
+		{
+			return this;
+		}
+		return actor;
+	}
+
 	bool App::LoadComponent()
 	{
 		this->mTaskComponent = this->GetOrAddComponent<CoroutineComponent>();

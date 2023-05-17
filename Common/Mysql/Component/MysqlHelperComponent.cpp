@@ -25,15 +25,12 @@ namespace Tendo
 			request.set_table(message.GetTypeName());
 		}
 		const std::string func("MysqlDB.Add");
-		return this->GetActor()->Call(func, request);
-	}
-
-	Actor* MysqlHelperComponent::GetActor()
-	{
-		ActorMgrComponent * component = this->mApp->GetActorMgr();
+		Actor * targetActor = this->mApp->Random(this->mServer);
+		if(targetActor == nullptr)
 		{
-			return component->RandomActor(this->mServer);
+			return XCode::AddressAllotFailure;
 		}
+		return targetActor->Call(func, request);
 	}
 
 	int MysqlHelperComponent::Save(const Message& data, int flag)
@@ -45,7 +42,12 @@ namespace Tendo
 			request.mutable_data()->PackFrom(data);
 		}
 		const std::string func("MysqlDB.Save");
-		return this->GetActor()->Call(func, request);
+		Actor * targetActor = this->mApp->Random(this->mServer);
+		if(targetActor == nullptr)
+		{
+			return XCode::AddressAllotFailure;
+		}
+		return targetActor->Call(func, request);
 	}
 
 	int MysqlHelperComponent::Delete(const std::string& table, const std::string& deleteJson, int flag)
@@ -56,7 +58,12 @@ namespace Tendo
 			request.set_where_json(deleteJson);
 		}
 		const std::string func("MysqlDB.Delete");
-		return this->GetActor()->Call(func, request);
+		Actor * targetActor = this->mApp->Random(this->mServer);
+		if(targetActor == nullptr)
+		{
+			return XCode::AddressAllotFailure;
+		}
+		return targetActor->Call(func, request);
 	}
 
 	int MysqlHelperComponent::Update(const std::string& table, const std::string& updateJson,
@@ -70,7 +77,12 @@ namespace Tendo
 			request.set_update_json(updateJson);
 		}
 		const std::string func("MysqlDB.Update");
-		return this->GetActor()->Call(func, request);
+		Actor * targetActor = this->mApp->Random(this->mServer);
+		if(targetActor == nullptr)
+		{
+			return XCode::AddressAllotFailure;
+		}
+		return targetActor->Call(func, request);
 	}
 
 	int MysqlHelperComponent::QueryOnce(const std::string& json, std::shared_ptr<Message> response)
@@ -84,7 +96,12 @@ namespace Tendo
 		const std::string func("MysqlDB.Query");
 		std::shared_ptr<db::mysql::response>
 				result = std::make_shared<db::mysql::response>();
-		int code = this->GetActor()->Call(func, request, result);
+		Actor * targetActor = this->mApp->Random(this->mServer);
+		if(targetActor == nullptr)
+		{
+			return XCode::AddressAllotFailure;
+		}
+		int code = targetActor->Call(func, request, result);
 		if (code != XCode::Successful)
 		{
 			return code;
