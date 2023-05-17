@@ -7,10 +7,10 @@
 
 #include"Message/s2s/s2s.pb.h"
 #include"Message/com/com.pb.h"
-#include"Rpc/Service/PhysicalRpcService.h"
+#include"Rpc/Service/RpcService.h"
 namespace Tendo
 {
-	class Node final : public PhysicalRpcService
+	class Node final : public RpcService
     {
     public:
         Node();

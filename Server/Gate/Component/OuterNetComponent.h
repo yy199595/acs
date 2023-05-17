@@ -39,7 +39,7 @@ namespace Tendo
 		bool Awake() final;
 		bool LateAwake() final;
         void OnDestroy() final;
-        void OnClusterComplete() final;
+		void Complete() final;
 		void OnFrameUpdate(float t) final;
 	 private:
         void OnRecord(Json::Writer & document) final;

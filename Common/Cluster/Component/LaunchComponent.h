@@ -8,16 +8,13 @@
 
 namespace Tendo
 {
-	class LaunchComponent final : public Component, public IStart, public IDestroy
+	class LaunchComponent final : public Component
     {
     public:
         LaunchComponent() = default;
         ~LaunchComponent() = default;
     private:
         bool Awake() final;
-        void Start() final;
-		bool LateAwake() final;
-		void OnDestroy() final;
     };
 }
 

@@ -30,6 +30,11 @@ namespace Tendo
 		BIND_COMMON_RPC_METHOD(Gate::Login);
 		BIND_COMMON_RPC_METHOD(Gate::Logout);
 		BIND_COMMON_RPC_METHOD(Gate::Allocation);
+		const ServerConfig* config = ServerConfig::Inst();
+		this->mOuterComponent = this->GetComponent<OuterNetComponent>();
+		this->mPlayerComponent = this->GetComponent<PlayerMgrComponent>();
+		LOG_CHECK_RET_FALSE(config->GetLocation("rpc", this->mInnerAddress));
+		LOG_CHECK_RET_FALSE(config->GetLocation("gate", this->mOuterAddress));
 		return true;
     }
 
@@ -38,17 +43,7 @@ namespace Tendo
 		return XCode::Successful;
 	}
 
-	bool Gate::OnStart()
-	{	
-        const ServerConfig * config = ServerConfig::Inst();
-		this->mOuterComponent = this->GetComponent<OuterNetComponent>();
-		this->mPlayerComponent = this->GetComponent<PlayerMgrComponent>();
-		LOG_CHECK_RET_FALSE(config->GetLocation("rpc", this->mInnerAddress));
-		LOG_CHECK_RET_FALSE(config->GetLocation("gate", this->mOuterAddress));
-		return true;
-	}
-
-    void Gate::OnClose()
+    void Gate::OnStop()
     {
 		
     }
@@ -148,10 +143,5 @@ namespace Tendo
 			CONSOLE_LOG_ERROR("user:" << userId << " logout");
 		}
 		return XCode::Successful;
-	}
-
-	void Gate::OnEvent(const Tendo::DisConnectEvent* message)
-	{
-		const std::string & address = message->Addr;
 	}
 }

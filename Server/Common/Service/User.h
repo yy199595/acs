@@ -6,10 +6,10 @@
 #define APP_USERBEHAVIOR_H
 
 #include"Message/s2s/s2s.pb.h"
-#include"Rpc/Service/PhysicalRpcService.h"
+#include"Rpc/Service/RpcService.h"
 namespace Tendo
 {
-    class User : public PhysicalRpcService
+    class User : public RpcService
     {
     public:
         User() = default;
@@ -20,10 +20,6 @@ namespace Tendo
     private:
 		bool OnInit() final;
         bool Awake() final;
-        bool OnStart() final;
-    private:
-		class LocationComponent * mNodeComponent;
-        class InnerNetComponent * mInnerNetComponent;
     };
 }
 

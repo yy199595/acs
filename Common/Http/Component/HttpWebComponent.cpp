@@ -182,7 +182,7 @@ namespace Tendo
         this->mWaitCount++;
 		const std::string & address = request->From();
         HttpService* httpService = this->GetComponent<HttpService>(config->Service);
-        if (httpService == nullptr || !httpService->IsStartService())
+        if (httpService == nullptr)
         {           
             this->Send(address, HttpStatus::NOT_FOUND);
             LOG_ERROR("[" << address << "] <<" << request->Url() << ">>" << HttpStatusToString(HttpStatus::NOT_FOUND));         

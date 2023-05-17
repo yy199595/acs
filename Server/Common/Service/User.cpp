@@ -23,13 +23,6 @@ namespace Tendo
 		return true;
 	}
 
-    bool User::OnStart()
-    {
-		this->mNodeComponent = this->GetComponent<LocationComponent>();
-        this->mInnerNetComponent = this->GetComponent<InnerNetComponent>();
-        return true;
-    }
-
     int User::Login(const s2s::user::login & request)
     {
 		long long userId = request.user_id();
@@ -42,12 +35,6 @@ namespace Tendo
 				//const std::string& address = info.rpc();
 				//this->mNodeComponent->AddRpcServer(server, userId, address);
 			}
-		}
-		std::vector<IClient*> clientComponents;
-		this->mApp->GetComponents(clientComponents);
-		for(IClient * client : clientComponents)
-		{
-			client->OnLogin(userId);
 		}
         return XCode::Successful;
     }

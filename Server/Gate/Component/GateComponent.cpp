@@ -17,7 +17,6 @@ namespace Tendo
 	{
 		this->mNodeComponent = this->GetComponent<LocationComponent>();
         this->mInnerComponent = this->GetComponent<InnerNetComponent>();
-		LOG_CHECK_RET_FALSE(this->mGate = this->mApp->GetService<Gate>());
 		return true;
 	}
 

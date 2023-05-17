@@ -32,7 +32,6 @@ namespace Tendo
 		ConsoleComponent() = default;
 	 private:
 		void Close(const std::string & request);
-		void OnClusterComplete() final;
 	 private:
 		void Update();
 	 private:

@@ -6,18 +6,18 @@
 #define SERVER_MONGOSERVICE_H
 #include"Message/s2s/db.pb.h"
 #include"Mongo/Client/MongoProto.h"
-#include"Rpc/Service/PhysicalRpcService.h"
+#include"Rpc/Service/RpcService.h"
 namespace Tendo
 {
-    class MongoDB final : public PhysicalRpcService
+    class MongoDB final : public RpcService
 	{
 	public:
 		MongoDB();
 	private:
 		bool Awake() final;
         bool OnInit() final;
-		bool OnStart() final;
-        void OnClose() final;
+		void OnStart() final;
+        void OnStop() final;
 		int GetClientHandle(int flag = 0);
     private:
 		int Insert(const db::mongo::insert & request);

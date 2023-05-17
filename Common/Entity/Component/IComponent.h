@@ -22,7 +22,7 @@ namespace Tendo
 	class IComplete
 	{
 	public:
-		virtual void OnComplete() { }; //启动完毕
+		virtual void Complete() { }; //启动完毕
 	};
 
 	class IDestroy
@@ -112,20 +112,9 @@ namespace Tendo
         virtual void OnLogout(long long userId) = 0;
     };
 
-	class IServiceBase
-	{
-	public:
-		virtual bool Init() = 0; // 注册rpc方法
-		virtual void Start() = 0; //协程中调用
-		virtual void Close() = 0; //协程中调用
-		virtual bool LoadFromLua() = 0; //在热更新的时候调用
-        virtual void OnCloseComplete() { }
-        virtual void WaitAllMessageComplete() { };
-        virtual unsigned int GetWaitMessageCount() const { return 0; }
-	};
 
 	template<typename T1, typename T2>
-	class IService : public IServiceBase
+	class IService
 	{
 	public:
 		virtual int Invoke(const std::string&, const std::shared_ptr<T1> &, std::shared_ptr<T2> &) = 0;

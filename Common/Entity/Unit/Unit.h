@@ -88,7 +88,7 @@ namespace Tendo
 		if (iter != this->mComponentMap.end())
 		{
 			Component* component = iter->second.get();
-			return static_cast<T*>(component);
+			return dynamic_cast<T*>(component);
 		}
 		return nullptr;
 	}

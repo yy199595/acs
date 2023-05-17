@@ -29,7 +29,7 @@ namespace Tendo
 		return true;
 	}
 
-	bool MysqlDB::OnStart()
+	void MysqlDB::OnStart()
     {
         this->mProtoComponent = this->GetComponent<ProtoComponent>();
         this->mMysqlComponent = this->GetComponent<MysqlDBComponent>();
@@ -43,12 +43,12 @@ namespace Tendo
 				this->mClientIds.emplace_back(id);
 			}
         }
-        return this->mMysqlComponent->Ping(0);
+        this->mMysqlComponent->Ping(0);
     }
 
-    void MysqlDB::OnClose()
+    void MysqlDB::OnStop()
     {
-        this->WaitAllMessageComplete();		
+        	
     }
 
     int MysqlDB::Create(const db::mysql::create &request)

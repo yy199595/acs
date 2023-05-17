@@ -41,14 +41,6 @@ namespace Tendo
 
 	int ServerWeb::Hotfix(Json::Writer&response)
 	{
-		RpcService * rpcService = this->mApp->GetService<Node>();
-		LocationComponent * locationComponent = this->GetComponent<LocationComponent>();
-		if(locationComponent == nullptr || rpcService == nullptr)
-		{
-			response.Add("error").Add("LocationComponent or InnerService Is Null");
-			return XCode::Failure;
-		}
-		// TODO
 
 		return XCode::Successful;
 	}

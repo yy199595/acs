@@ -32,7 +32,7 @@ namespace Tendo
         return true;
     }
 
-	bool MongoDB::OnStart()
+	void MongoDB::OnStart()
 	{
         int id = 0;
 		const MongoConfig & config = this->mMongoComponent->Config();
@@ -43,12 +43,12 @@ namespace Tendo
                 this->mClients.emplace_back(id);
             }
 		}
-		return this->mMongoComponent->Ping(id);
+		this->mMongoComponent->Ping(id);
 	}
 
-    void MongoDB::OnClose()
+    void MongoDB::OnStop()
     {
-        this->WaitAllMessageComplete(); //等待所有任务完成
+        
     }
 
     int MongoDB::GetClientHandle(int flag)

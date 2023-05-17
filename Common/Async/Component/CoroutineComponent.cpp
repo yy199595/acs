@@ -199,4 +199,21 @@ namespace Tendo
 			this->mLastQueues.pop();
 		}
 	}
+
+	void CoroutineComponent::WaitAll(std::vector<unsigned int>& coroutines)
+	{
+		std::vector<TaskContext*> taskContexts;
+		taskContexts.reserve(coroutines.size());
+		std::shared_ptr<CoroutineGroup> waitContext
+			= std::make_shared<CoroutineGroup>();
+		for (const unsigned int& id : coroutines)
+		{
+			TaskContext* coroutine = this->mCorPool.Get(id);
+			if (coroutine != nullptr)
+			{
+				waitContext->Add(coroutine);
+			}
+		}
+		waitContext->WaitConmlete();
+	}
 }

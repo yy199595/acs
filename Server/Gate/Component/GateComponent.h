@@ -24,7 +24,6 @@ namespace Tendo
 		bool LateAwake() final;
 		void OnLuaRegister(Lua::ClassProxyHelper & luaRegister) final;
 	 private:
-		class RpcService * mGate{};
 		class LocationComponent* mNodeComponent;
         class InnerNetComponent * mInnerComponent;
 	};

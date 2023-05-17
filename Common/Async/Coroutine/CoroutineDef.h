@@ -48,8 +48,9 @@ namespace Tendo
 		explicit CoroutineGroup();
         ~CoroutineGroup();
 	 public:
-        void WaitAll();
-        void WaitAll(std::vector<TaskContext *> & taskContexts);
+        void Add(unsigned int id);
+		void Add(TaskContext * coroutine);
+        void WaitConmlete();
     private:
 		unsigned int mCoroutineId;
 		CoroutineComponent* mCorComponent;

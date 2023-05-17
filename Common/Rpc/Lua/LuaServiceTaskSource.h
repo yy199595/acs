@@ -15,8 +15,8 @@ namespace Tendo
     class LuaServiceTaskSource final
     {
     public:
+		explicit LuaServiceTaskSource(Msg::Packet * packet);
 		explicit LuaServiceTaskSource(Http::DataResponse* message);
-		explicit LuaServiceTaskSource(Msg::Packet * packet, std::shared_ptr<Message> & message);
 	public:
 		static int SetRpc(lua_State * lua);
         static int SetHttp(lua_State* lua);
@@ -29,7 +29,6 @@ namespace Tendo
 		Msg::Packet * mRpcData;
 		TaskSource<void> mTaskSource;
 		Http::DataResponse* mHttpData;
-		std::shared_ptr<Message> mMessage;
     };
 }
 

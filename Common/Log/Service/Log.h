@@ -5,10 +5,10 @@
 #ifndef _LOG_H_
 #define _LOG_H_
 #include"Message/s2s/s2s.pb.h"
-#include"Rpc/Service/PhysicalRpcService.h"
+#include"Rpc/Service/RpcService.h"
 namespace Tendo
 {
-	class Log final : public PhysicalRpcService
+	class Log final : public RpcService
 	{
 	 public:
 		Log() = default;
@@ -16,7 +16,6 @@ namespace Tendo
 		int Login(const s2s::log::login & request);
 	 protected:
 		bool OnInit() final;
-		bool OnStart() final { return true; }
 	};
 }
 

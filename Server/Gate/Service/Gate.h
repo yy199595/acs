@@ -5,10 +5,10 @@
 #ifndef GAMEKEEPER_GATESERVICE_H
 #define GAMEKEEPER_GATESERVICE_H
 #include"Message/s2s/s2s.pb.h"
-#include"Rpc/Service/PhysicalRpcService.h"
+#include"Rpc/Service/RpcService.h"
 namespace Tendo
 {
-	class Gate final : public PhysicalRpcService, public IEvent<DisConnectEvent>
+	class Gate final : public RpcService
 	{
 	 public:
 		Gate();
@@ -20,9 +20,7 @@ namespace Tendo
 	private:
 		bool Awake() final;
 		bool OnInit() final;
-		bool OnStart() final;
-        void OnClose() final;
-		void OnEvent(const DisConnectEvent *message) final;
+        void OnStop() final;
 		int OnLogin(long long userId, const std::string & token);
 	 private:
 		int mIndex;

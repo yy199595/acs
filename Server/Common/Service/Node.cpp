@@ -82,11 +82,7 @@ namespace Tendo
         {
             for (RpcService *component: components)
             {
-                if(component != this && component->IsStartService())
-                {
-                    component->WaitAllMessageComplete();
-                    component->Close();
-                }
+                // TODO
             }
         }
 		std::string address;
@@ -128,19 +124,7 @@ namespace Tendo
         this->mApp->GetComponents(components);
 		for(Component * component : components)
 		{
-            const char* key = component->GetName().c_str();
-			IServerRecord * serverRecord = component->Cast<IServerRecord>();
-			if(serverRecord != nullptr)
-			{
-				IServiceBase * serviceBase = component->Cast<IServiceBase>();
-				if(serviceBase != nullptr && !serviceBase->IsStartService())
-				{
-					continue;
-				}
-                document.BeginObject(key);
-                serverRecord->OnRecord(document);
-                document.EndObject();
-			}
+           
 		}
 		document.WriterStream(response.mutable_str());
 		return XCode::Successful;

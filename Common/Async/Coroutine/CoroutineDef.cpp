@@ -72,23 +72,21 @@ namespace Tendo
         }
     }
 
-    void CoroutineGroup::WaitAll()
+    void CoroutineGroup::Add(unsigned int)
     {
-        this->mCorComponent = App::Inst()->GetCoroutine();
-		this->mCorComponent->YieldCoroutine(this->mCoroutineId);
+        
     }
 
-    void CoroutineGroup::WaitAll(std::vector<TaskContext *> &taskContexts)
+    void CoroutineGroup::Add(TaskContext* coroutine)
     {
-        if(!taskContexts.empty())
+        if (coroutine != nullptr)
         {
-            this->mCorComponent = App::Inst()->GetCoroutine();
-            for(TaskContext * taskContext : taskContexts)
-            {
-                assert(taskContext->mGroup == nullptr);
-                taskContext->mGroup = this->shared_from_this();
-            }
-			this->mCorComponent->YieldCoroutine(this->mCoroutineId);
+            coroutine->mGroup = this->shared_from_this();
         }
+    }
+
+    void CoroutineGroup::WaitConmlete()
+    {
+        this->mCorComponent->YieldCoroutine(this->mCoroutineId);
     }
 }

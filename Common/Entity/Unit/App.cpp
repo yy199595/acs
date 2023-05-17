@@ -223,7 +223,7 @@ namespace Tendo
 			{
 				CONSOLE_LOG_FATAL(component->GetName() << " [OnLocalComplete] time out");
 			});
-			complete->OnComplete();
+			complete->Complete();
 			this->mTimerComponent->CancelTimer(timerId);
         }
 		this->mStatus = ServerStatus::Ready;

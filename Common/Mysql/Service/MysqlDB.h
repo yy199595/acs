@@ -2,11 +2,11 @@
 #ifdef __ENABLE_MYSQL__
 #include"Util/Sql/SqlHelper.h"
 #include"Mysql/Client/MysqlClient.h"
-#include"Rpc/Service/PhysicalRpcService.h"
+#include"Rpc/Service/RpcService.h"
 
 namespace Tendo
 {
-	class MysqlDB : public PhysicalRpcService
+	class MysqlDB : public RpcService
 	{
 	 public:
 		MysqlDB();
@@ -28,8 +28,8 @@ namespace Tendo
 
 	 private:
 		bool OnInit() final;
-		bool OnStart() final;
-        void OnClose() final;
+		void OnStart() final;
+        void OnStop() final;
 		int GetClientId(int flag = 0);
 	private:
 		SqlHelper mSqlHelper;

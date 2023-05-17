@@ -13,7 +13,6 @@
 #include "Async/Lua/LuaCoroutine.h"
 #include "Util/Md5/LuaMd5.h"
 #include "Core/System/System.h"
-#include "Server/Config/ServiceConfig.h"
 #include "Util/Json/JsonWriter.h"
 #include "Lua/Engine/Function.h"
 #include "Lua/Module/LuaModule.h"
@@ -26,6 +25,7 @@ namespace Tendo
 	bool LuaScriptComponent::Awake()
 	{
 		this->mLuaEnv = luaL_newstate();
+		this->mMainModule = nullptr;
 		luaL_openlibs(mLuaEnv);
 		return true;
 	}
@@ -122,11 +122,6 @@ namespace Tendo
 
 	Lua::LuaModule* LuaScriptComponent::LoadModule(const std::string& name)
 	{
-		auto iter1 = this->mModules.find(name);
-		if (iter1 != this->mModules.end())
-		{
-			return iter1->second.get();
-		}
 		const ServerConfig * config = ServerConfig::Inst();
 		for(const std::string & path : config->RequirePath())
 		{
@@ -149,52 +144,39 @@ namespace Tendo
 	{
 		std::string name;
 		Helper::File::GetFileName(path, name);
-		std::unique_ptr<Lua::LuaModule> luaModule =
-				std::make_unique<Lua::LuaModule>(this->mLuaEnv, name, path);
-		if (!luaModule->Awake())
+		LuaModule* luaModule = new LuaModule(this->mLuaEnv, name);
+		if (!luaModule->LoadFromPath(path))
 		{
+			delete luaModule;
 			LOG_ERROR("load lua module [" << name << "] error");
 			return nullptr;
 		}
-		Lua::LuaModule* result = luaModule.get();
-		{
-			LOG_INFO("start load lua module [" << name << "]");
-			this->mModules.emplace(name, std::move(luaModule));
-		}
-		return result;
+		LOG_INFO("start load lua module [" << name << "]");
+		return luaModule;
 	}
 
-	Lua::LuaModule* LuaScriptComponent::GetModule(const std::string& name)
-	{
-		auto iter1 = this->mModules.find(name);
-		return iter1 == this->mModules.end() ? nullptr : iter1->second.get();
-	}
 
 	void LuaScriptComponent::OnSecondUpdate(const int tick)
 	{
-		auto iter = this->mModules.begin();
-		for (; iter != this->mModules.end(); iter++)
+		if(this->mMainModule != nullptr)
 		{
-			iter->second->Update(tick);
+			this->mMainModule->Update(tick);
 		}
 	}
 
 	void LuaScriptComponent::Start()
 	{
-		const std::string& name = ServerConfig::Inst()->Name();
-		Lua::LuaModule* luaModule = this->GetModule(name);
-		if(luaModule != nullptr)
+		if(this->mMainModule != nullptr)
 		{
-			luaModule->Start();
+			this->mMainModule->Await("OnStart");
 		}
 	}
 
-	void LuaScriptComponent::OnComplete()
+	void LuaScriptComponent::Complete()
 	{
-		auto iter = this->mModules.begin();
-		for (; iter != this->mModules.end(); iter++)
+		if(this->mMainModule != nullptr)
 		{
-			iter->second->OnComplete();
+			this->mMainModule->Await("OnComplete");
 		}
 	}
 
@@ -210,45 +192,27 @@ namespace Tendo
 			return true;
 		}
 		std::string main(config->MainLua());
-		return this->LoadModuleByPath(main) != nullptr;
+		this->mMainModule = this->LoadModuleByPath(main);
+		LOG_CHECK_RET_FALSE(this->mMainModule != nullptr);
+		return true;
 	}
 
 	void LuaScriptComponent::OnHotFix()
 	{
-		std::vector<Component*> components;
-		this->mApp->GetComponents(components);
-		for (Component* component: components)
+		if(this->mMainModule != nullptr)
 		{
-			const std::string& name = component->GetName();
-			IServiceBase* service = component->Cast<IServiceBase>();
-			if (service != nullptr && this->GetModule(name) == nullptr)
-			{
-				if (!this->LoadModule(component->GetName()))
-				{
-					LOG_ERROR("load lua module [" << name << "failure");
-				}
-			}
-		}
-
-		auto iter = this->mModules.begin();
-		for (; iter != this->mModules.end(); iter++)
-		{
-			const std::string& name = iter->first;
-			Lua::LuaModule* luaModule = iter->second.get();
-			if (luaModule != nullptr && luaModule->Hotfix())
-			{
-				LOG_INFO(name << " hotfix successful");
-				IServiceBase* service = this->GetComponent<IServiceBase>(name);
-				if (service != nullptr && service->IsStartService())
-				{
-					service->LoadFromLua();
-				}
-			}
+			this->mMainModule->Hotfix();
 		}
 	}
 
 	void LuaScriptComponent::OnDestroy()
 	{
+		if(this->mMainModule != nullptr)
+		{
+			this->mMainModule->Await("OnStop");
+			delete this->mMainModule;
+			this->mMainModule = nullptr;
+		}
 		if (this->mLuaEnv != nullptr)
 		{
 			lua_close(this->mLuaEnv);
@@ -309,17 +273,5 @@ namespace Tendo
 		double free = this->CollectGarbage();
 		document.Add("free").Add(fmt::format("{0}mb", free / 1024));
 		document.Add("memory").Add(fmt::format("{0}mb", size / 1024));
-	}
-
-	bool LuaScriptComponent::UnloadModule(const string& name)
-	{
-		auto iter = this->mModules.find(name);
-		if (iter != this->mModules.end())
-		{
-			iter->second->Close();
-			this->mModules.erase(iter);
-			return true;
-		}
-		return false;
 	}
 }

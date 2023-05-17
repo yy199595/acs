@@ -28,13 +28,11 @@ namespace Tendo
 			LOG_ERROR("not find config registry address");
 			return false;
 		}
-		RpcService* rpcService = this->mApp->GetService("Registry");
 		this->mLocationComponent = this->GetComponent<LocationComponent>();
-		LOG_CHECK_RET_FALSE(rpcService != nullptr && this->mLocationComponent != nullptr);
 		return true;
 	}
 
-	void RegistryComponent::OnLocalComplete()
+	void RegistryComponent::Complete()
 	{
 		const std::string func("Registry.Register");
 		const ServerConfig* config = ServerConfig::Inst();

@@ -4,10 +4,10 @@
 
 #ifndef APP_SERVERWEB_H
 #define APP_SERVERWEB_H
-#include"Http/Service/PhysicalHttpService.h"
+#include"Http/Service/HttpService.h"
 namespace Tendo
 {
-    class ServerWeb : public PhysicalHttpService
+    class ServerWeb : public HttpService
     {
     public:
         ServerWeb() = default;

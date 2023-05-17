@@ -15,8 +15,8 @@ namespace Tendo
         this->mCode = XCode::LuaCoroutineWait;
     }
 
-	LuaServiceTaskSource::LuaServiceTaskSource(Msg::Packet* packet, std::shared_ptr<Message> & message)
-		: mHttpData(nullptr), mRpcData(packet), mMessage(message)
+	LuaServiceTaskSource::LuaServiceTaskSource(Msg::Packet* packet)
+		: mHttpData(nullptr), mRpcData(packet)
 	{
 		this->mCode = XCode::LuaCoroutineWait;
 	}
@@ -35,38 +35,32 @@ namespace Tendo
 		this->mCode = luaL_checkinteger(lua, 2);
 		if(this->mCode == XCode::Successful)
 		{
-			switch(this->mRpcData->GetProto())
+			if (lua_istable(lua, 3))
 			{
-				case Msg::Porto::Json:
-				case Msg::Porto::String:
+				if (this->mRpcData->mBindData != nullptr)
 				{
-					if (lua_istable(lua, 3))
+					MessageEncoder messageEncoder(lua);
+					this->mRpcData->SetProto(Msg::Porto::Protobuf);
+					std::shared_ptr<Message> message = this->mRpcData->mBindData;
+					if (!messageEncoder.Encode(message, 3))
 					{
-						std::string json;
-						Lua::RapidJson::Read(lua, 3, &json);
-						this->mRpcData->SetContent(json);
+						this->mCode = XCode::ParseMessageError;
 					}
-					else if (lua_isstring(lua, 3))
-					{
-						size_t len = 0;
-						const char* str = lua_tolstring(lua, 3, &len);
-						this->mRpcData->SetContent({ str, len });
-					}
+					this->mRpcData->WriteMessage(message.get());
+					this->mRpcData->mBindData = nullptr;
 				}
-					break;
-				case Msg::Porto::Protobuf:
+				else
 				{
-					if (lua_istable(lua, 3) && this->mMessage != nullptr)
-					{
-						MessageEncoder messageEncoder(lua);
-						if (!messageEncoder.Encode(this->mMessage, 3))
-						{
-							this->mCode = XCode::ParseMessageError;
-						}
-						this->mRpcData->WriteMessage(this->mMessage.get());
-					}
+					this->mRpcData->SetProto(Msg::Porto::Json);
+					Lua::RapidJson::Read(lua, 3, this->mRpcData->Body());
 				}
-					break;
+			}
+			else if (lua_isstring(lua, 3))
+			{
+				size_t len = 0;
+				const char* str = lua_tolstring(lua, 3, &len);
+				this->mRpcData->Body()->append(str, len);
+				this->mRpcData->SetProto(Msg::Porto::String);
 			}
 		}
 	}

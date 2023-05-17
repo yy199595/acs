@@ -8,8 +8,8 @@
 #include"Core/System/System.h"
 #include"Http/Component/HttpComponent.h"
 #include"Cluster//Config/ClusterConfig.h"
-#include"Rpc/Service/LuaPhysicalRpcService.h"
-#include"Http//Service/LuaPhysicalHttpService.h"
+#include"Rpc/Service/LuaRpcService.h"
+#include"Http//Service/LuaHttpService.h"
 #include"Rpc/Component/LocationComponent.h"
 #include"Lua/Component/LuaScriptComponent.h"
 #include"Rpc/Component/InnerRpcComponent.h"
@@ -69,7 +69,7 @@ namespace Tendo
 					//创建实体服务
 					if (!this->mApp->AddComponent(name))
 					{
-						std::unique_ptr<Component> component(new LuaPhysicalRpcService());
+						std::unique_ptr<Component> component(new LuaRpcService());
 						if (!this->mApp->AddComponent(name, std::move(component)))
 						{
 							LOG_ERROR("add physical service [" << name << "] error");
@@ -81,7 +81,7 @@ namespace Tendo
                 {
                     if (!this->mApp->AddComponent(name))
                     {
-                        std::unique_ptr<Component> component(new LuaPhysicalHttpService());
+                        std::unique_ptr<Component> component(new LuaHttpService());
                         if (!this->mApp->AddComponent(name, std::move(component)))
                         {
                             LOG_ERROR("add http service [" << name << "] error");
@@ -98,53 +98,4 @@ namespace Tendo
         }
         return true;
     }
-
-    void LaunchComponent::Start()
-    {
-		std::vector<IServiceBase *> components;
-		this->mApp->GetComponents<IServiceBase>(components);
-		for(IServiceBase * localService : components)
-		{
-#ifdef __DEBUG__
-			long long t1 = Helper::Time::NowMilTime();
-#endif
-			Component * component = dynamic_cast<Component*>(localService);
-			{
-				localService->Start();
-			}
-#ifdef __DEBUG__
-			long long t2 = Helper::Time::NowMilTime();
-			CONSOLE_LOG_INFO("start" << component->GetName() << " time = [" << (t2 - t1) << "ms]")
-#endif
-		}
-    }
-
-	bool LaunchComponent::LateAwake()
-	{
-		std::vector<IServiceBase *> allServices;
-		this->mApp->GetComponents(allServices);
-		for(IServiceBase * service : allServices)
-		{
-			if(!service->Init())
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	void LaunchComponent::OnDestroy()
-	{
-		std::vector<IServiceBase *> allServices;
-		this->mApp->GetComponents(allServices);
-		for(IServiceBase * service : allServices)
-		{
-			service->Close();
-#ifdef __DEBUG__
-			Component* component = dynamic_cast<Component*>(service);
-			CONSOLE_LOG_INFO(component->GetName() << ".OnClose");
-#endif
-		}
-		this->mApp->GetCoroutine()->Sleep(2000); //等待处理的消息返回
-	}
 }

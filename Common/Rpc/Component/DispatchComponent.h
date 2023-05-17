@@ -8,7 +8,7 @@ namespace Tendo
 {
 	class RpcService;
 
-	class LuaPhysicalRpcService;
+	class LuaRpcService;
 
 	class ServiceMethod;
 

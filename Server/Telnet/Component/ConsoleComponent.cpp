@@ -31,15 +31,15 @@ namespace Tendo
 using namespace Tcp;
 namespace Tendo
 {
-	void ConsoleComponent::OnClusterComplete()
-	{
-		this->mCommandUnit; //= new Unit(1);
-		this->mHttpComponent = this->GetComponent<HttpComponent>();
-		this->mTaskComponent = this->GetComponent<CoroutineComponent>();
-		this->mTaskComponent->Start(&ConsoleComponent::Update, this);
+	//void ConsoleComponent::OnClusterComplete()
+	//{
+	//	this->mCommandUnit; //= new Unit(1);
+	//	this->mHttpComponent = this->GetComponent<HttpComponent>();
+	//	this->mTaskComponent = this->GetComponent<CoroutineComponent>();
+	//	this->mTaskComponent->Start(&ConsoleComponent::Update, this);
 
-		this->mCommandUnit->AddComponent("server", std::make_unique<ServerCmdComponent>());
-	}
+	//	this->mCommandUnit->AddComponent("server", std::make_unique<ServerCmdComponent>());
+	//}
 
 	void ConsoleComponent::Close(const std::string & request)
 	{

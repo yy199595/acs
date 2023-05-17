@@ -102,14 +102,11 @@ namespace Tendo
 		}
 
 	public:
+		ServiceMethod* GetMethod(const std::string& name);
 		bool AddMethod(std::shared_ptr<ServiceMethod> method);
-        void ClearLuaMethods() { this->mLuaMethodMap.clear(); }
-        std::shared_ptr<ServiceMethod> GetMethod(const std::string& name);
 	private:
 		Component * mComponent;
 		std::unordered_map<std::string, std::shared_ptr<ServiceMethod>> mMethodMap;
-		std::unordered_map<std::string, std::shared_ptr<ServiceMethod>> mLuaMethodMap;
-
 	};
 }
 
@@ -179,13 +176,12 @@ namespace Tendo
 
 
     public:		
+		void Clear() { this->mHttpMethodMap.clear(); }
+		HttpServiceMethod* GetMethod(const std::string& name);
         bool AddMethod(std::shared_ptr<HttpServiceMethod> method);
-        std::shared_ptr<HttpServiceMethod> GetMethod(const std::string & name);
-        void Clear() { this->mHttpMethodMap.clear(); this->mLuaHttpMethodMap.clear(); }
     private:
 		Component * mComponent;
 		std::unordered_map<std::string, std::shared_ptr<HttpServiceMethod>> mHttpMethodMap;
-        std::unordered_map<std::string, std::shared_ptr<HttpServiceMethod>> mLuaHttpMethodMap;
     };
 }
 

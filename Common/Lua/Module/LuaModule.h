@@ -11,15 +11,13 @@ namespace Lua
 	class LuaModule
 	{
 	public:
-		LuaModule(lua_State* lua, std::string name, const std::string & path);
+		LuaModule(lua_State* lua, std::string name);
 		~LuaModule();
 	public:
 		bool Awake();
-		void Start();
-		bool Close();
 		bool Hotfix();
-		void OnComplete();
 		void Update(int tick);
+		bool LoadFromPath(const std::string & path);
 	public:
 		template<typename ... Args>
 		bool Call(const std::string & func, Args && ... args);
@@ -27,14 +25,17 @@ namespace Lua
 		bool Await(const std::string & func, Args && ... args);
 	public:
 		bool GetFunction(const std::string& name);
+		bool HasFunction(const std::string & name);
 		bool GetOnceFunction(const std::string& name);
+	public:
+		lua_State * GetLuaEnv() { return this->mLua;}
 	private:
 		int mRef;
 		bool mIsUpdate;
 		std::string mMd5;
 		lua_State* mLua;
+		std::string mPath;
 		const std::string mName;
-		const std::string mPath;
 		std::unordered_map<std::string, int> mFunctions;
 	};
 

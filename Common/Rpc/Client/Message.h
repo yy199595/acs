@@ -95,6 +95,8 @@ namespace Msg
         int mProto;
         std::string mFrom;
         std::string mBody;
+	public:
+		std::shared_ptr<Message> mBindData;
     };
 }
 typedef std::shared_ptr<Msg::Packet> RpcPacket;

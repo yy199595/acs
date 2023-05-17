@@ -33,7 +33,7 @@ namespace Tendo
 		return true;
 	}
 
-    void OuterNetComponent::OnClusterComplete()
+    void OuterNetComponent::Complete()
     {
         if(!this->StartListen("gate"))
         {

@@ -9,8 +9,8 @@
 #include"Log/Common/CommonLogDef.h"
 namespace Lua
 {
-	LuaModule::LuaModule(lua_State* lua, std::string  name, const std::string & path)
-		: mLua(lua), mName(std::move(name)), mPath(path)
+	LuaModule::LuaModule(lua_State* lua, std::string  name)
+		: mLua(lua), mName(std::move(name))
 	{
 		this->mRef = 0;
 		this->mIsUpdate = false;
@@ -24,13 +24,14 @@ namespace Lua
 		}
 	}
 
-	bool LuaModule::Awake()
+	bool LuaModule::LoadFromPath(const std::string& path)
 	{
 		if(!this->mMd5.empty())
 		{
 			return true;
 		}
-		if(luaL_dofile(this->mLua, this->mPath.c_str()) != LUA_OK)
+		
+		if(luaL_dofile(this->mLua, path.c_str()) != LUA_OK)
 		{
             LOG_FATAL(lua_tostring(this->mLua, -1));
 			return false;
@@ -40,25 +41,18 @@ namespace Lua
 			LOG_ERROR(this->mName << " is not return lua table");
 			return false;
 		}
-		std::ifstream fs(this->mPath, std::ios::in);
+		std::ifstream fs(path, std::ios::in);
 		MD5 md5(fs);
+		this->mPath = path;
 		this->mMd5 = md5.toString();
 		this->mRef = luaL_ref(mLua, LUA_REGISTRYINDEX);
-		if(this->GetOnceFunction("Awake"))
-		{
-			if(lua_pcall(this->mLua, 0, 1, 0) != LUA_OK)
-			{
-                LUA_LOG_ERROR(lua_tostring(this->mLua, -1));
-				return false;
-			}
-		}
-		this->mIsUpdate = this->GetFunction("Update");
+		this->mIsUpdate = this->GetFunction("OnUpdate");
 		return true;
 	}
 
 	void LuaModule::Update(int tick)
 	{
-		const static std::string name("Update");
+		const static std::string name("OnUpdate");
 		if (this->mIsUpdate && this->GetFunction(name))
 		{
 			lua_pushinteger(this->mLua, tick);
@@ -103,22 +97,14 @@ namespace Lua
 		{
 			this->GetFunction(func);
 		}
+		this->mIsUpdate = this->GetFunction("OnUpdate");
 		return true;
 	}
 
-	void LuaModule::Start()
+	bool LuaModule::HasFunction(const std::string & name)
 	{
-		this->Await("Start");
-	}
-
-	void LuaModule::OnComplete()
-	{
-		this->Await("OnComplete");
-	}
-
-	bool LuaModule::Close()
-	{
-		return this->Await("Close");
+		auto iter = this->mFunctions.find(name);
+		return iter != this->mFunctions.end();
 	}
 
 	bool LuaModule::GetOnceFunction(const std::string& name)
@@ -165,4 +151,5 @@ namespace Lua
 		}
 		return false;
 	}
+
 }

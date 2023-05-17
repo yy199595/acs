@@ -54,6 +54,7 @@ namespace Tendo
 			return this->mRunContext == nullptr ? 0 :
 				   this->mRunContext->mCoroutineId;
 		}
+		void WaitAll(std::vector<unsigned int> & coroutines);
 	 private:
 		void SaveStack(unsigned int id);
 		void ResumeContext(TaskContext* co);

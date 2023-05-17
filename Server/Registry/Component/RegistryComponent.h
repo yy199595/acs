@@ -14,8 +14,8 @@ namespace Tendo
 	public:
 		int Query(const std::string & server = "");
 	private:
+		void Complete() final;
 		bool LateAwake() final;
-		void OnLocalComplete() final;
 	private:
 		std::string mAddress;
 		class LocationComponent * mLocationComponent;
