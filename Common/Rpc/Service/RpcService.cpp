@@ -39,8 +39,8 @@ namespace Tendo
 			{
 				this->mLuaModule->GetFunction(rpcMethodConfig->Method);
 			}
-			return true;
 		}
+		return true;
 	}
 
 	int RpcService::Invoke(const std::string& method, const std::shared_ptr<Msg::Packet>& message)

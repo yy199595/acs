@@ -5,8 +5,9 @@
 #include"Server/Config/ServerPath.h"
 #include"Core/Singleton/Singleton.h"
 #include"Server/Config/ServiceConfig.h"
-#include"Async/Component/CoroutineComponent.h"
 #include"Timer/Component/TimerComponent.h"
+#include"Async/Component/CoroutineComponent.h"
+#include"Entity/Component/ActorMgrComponent.h"
 #include"Log/Component/LogComponent.h"
 
 namespace Tendo
@@ -24,7 +25,7 @@ namespace Tendo
 {
 	class RpcService;
 	class ProtoComponent;
-    class App final : public Server, public Singleton<App>
+    class App final : public Actor, public Singleton<App>
 	{
 	 public:
 		explicit App();
@@ -34,6 +35,7 @@ namespace Tendo
 		inline Asio::Context & MainThread() { return *this->mMainContext; }
 		inline TimerComponent* GetTimer() { return this->mTimerComponent; }
 		inline ProtoComponent * GetProto() { return this->mMessageComponent; }
+		inline ActorMgrComponent * GetActorMgr() { return this->mActorComponent; }
 		inline CoroutineComponent* GetCoroutine() { return this->mTaskComponent; }
 		inline bool IsMainContext(const Asio::Context * io) const { return this->mMainContext.get() == io;}
 	 public:
@@ -58,6 +60,7 @@ namespace Tendo
 		TimerComponent* mTimerComponent;
 		CoroutineComponent* mTaskComponent;
 		ProtoComponent * mMessageComponent;
-        std::unique_ptr<Asio::Context> mMainContext;
+		ActorMgrComponent * mActorComponent;
+		std::unique_ptr<Asio::Context> mMainContext;
     };
 }// namespace Sentry

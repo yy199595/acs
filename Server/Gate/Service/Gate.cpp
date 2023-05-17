@@ -94,11 +94,10 @@ namespace Tendo
 
 	int Gate::OnLogin(long long userId, const std::string & token)
 	{
-		int targetId = 0;
-		std::string address;
 		const std::string func("User.Login");
 		std::vector<const NodeConfig *> configs;
 		ClusterConfig::Inst()->GetNodeConfigs(configs);
+		ActorMgrComponent * component = this->mApp->GetActorMgr();
 		Player * player = this->mPlayerComponent->GetPlayer(userId);
 		for(const NodeConfig * nodeConfig : configs)
 		{
@@ -108,23 +107,22 @@ namespace Tendo
 			}
 			s2s::user::login message;
 			message.set_user_id(userId);
-			const std::string& server = nodeConfig->GetName();
-			if(!this->mApp->GetAddr(server, targetId) || !this->mApp->GetAddr(targetId, address))
+			const std::string & name = nodeConfig->GetName();
+			Actor * targetActor = component->RandomActor(name);
+			if(targetActor == nullptr)
 			{
-				this->mPlayerComponent->DelPlayer(userId);
 				return XCode::AddressAllotFailure;
 			}
-			player->GetAddr(server, targetId);
-			int code = this->mApp->Call(address, func, message);
+			int code = targetActor->Call(func, message);
 			if(code != XCode::Successful)
 			{
 				this->mPlayerComponent->DelPlayer(userId);
 				const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-				LOG_ERROR("call " << server << " [" << address << "] code = " << desc);
+				LOG_ERROR("call " << name << " [" << targetActor->GetAddr() << "] code = " << desc);
 				return XCode::Failure;
 			}
-			player->AddAddr(server, targetId);
-			CONSOLE_LOG_INFO("add " << server << " [" << address << "] to " << userId);
+			player->AddAddr(name, (int)targetActor->GetUnitId());
+			CONSOLE_LOG_INFO("add " << name << " [" << targetActor->GetAddr() << "] to " << userId);
 		}
 		return XCode::Successful;
 	}

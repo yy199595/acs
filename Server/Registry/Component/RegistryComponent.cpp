@@ -22,14 +22,16 @@ namespace Tendo
 
 	bool RegistryComponent::LateAwake()
 	{
+		std::string address;
 		const ServerConfig * config = ServerConfig::Inst();
-		if(!config->GetMember("registry", this->mAddress))
+		if(!config->GetMember("registry", address))
 		{
 			LOG_ERROR("not find config registry address");
 			return false;
 		}
+		this->mActor = std::make_unique<Actor>(0, address);
 		this->mLocationComponent = this->GetComponent<LocationComponent>();
-		return true;
+		return this->mActor->LateAwake();
 	}
 
 	void RegistryComponent::Complete()
@@ -54,17 +56,17 @@ namespace Tendo
 		}
 
 #ifdef __DEBUG__
-		LOG_INFO("start register to [" << this->mAddress << "]");
+		LOG_INFO("start register to [" << this->mActor->GetAddr() << "]");
 #endif
 		do
 		{
-			int code = this->mApp->Call(this->mAddress, func, message);
+			int code = this->mActor->Call(func, message);
 			if (code == XCode::Successful)
 			{
-				LOG_INFO("register to [" << this->mAddress << "] successful");
+				LOG_INFO("register to [" << this->mActor->GetAddr() << "] successful");
 				break;
 			}
-			LOG_ERROR("register to [" << this->mAddress << "] "
+			LOG_ERROR("register to [" << this->mActor->GetAddr() << "] "
 									  << CodeConfig::Inst()->GetDesc(code));
 			this->mApp->GetCoroutine()->Sleep(1000 * 5);
 		}
@@ -97,7 +99,7 @@ namespace Tendo
 		}
 		const std::string func("Registry.Query");
 		std::shared_ptr<s2s::server::list> response(new s2s::server::list());
-		if(this->mApp->Call(this->mAddress, func, request, response) != XCode::Successful)
+		if(this->mActor->Call(func, request, response) != XCode::Successful)
 		{
 
 		}

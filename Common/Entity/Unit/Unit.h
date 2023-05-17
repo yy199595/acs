@@ -36,13 +36,13 @@ namespace Tendo
 		inline T * Cast() { return dynamic_cast<T*>(this); }
 
 	 public:
+		virtual bool LateAwake() = 0;
 		size_t GetComponents(std::vector<Component*>& components) const;
 		size_t GetComponents(std::vector<std::string>& components) const;
 
         template<typename T>
         size_t GetComponents(std::vector<T *> & components) const;
 	 protected:
-		virtual bool LateAwake() = 0;
 		virtual void OnAddComponent(Component * component) {}
 		virtual bool OnDelComponent(Component * component) { return true; }
 	 public:

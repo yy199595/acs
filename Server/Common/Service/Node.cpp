@@ -85,7 +85,6 @@ namespace Tendo
                 // TODO
             }
         }
-		std::string address;
 		const ServerConfig * config = ServerConfig::Inst();
 		s2s::server::info request;
 		{
@@ -93,7 +92,7 @@ namespace Tendo
 			request.set_server_id(config->ServerId());
 		}
 		const std::string func("Registry.UnRegister");
-		int code = this->mApp->Call(address, func, request);
+		int code = this->mApp->Call(func, request);
 		this->mApp->GetCoroutine()->Start(&App::Stop, this->mApp, 0);
 		const std::string & desc = CodeConfig::Inst()->GetDesc(code);
 		CONSOLE_LOG_INFO("unregister " << config->Name()  << " code = " << desc);

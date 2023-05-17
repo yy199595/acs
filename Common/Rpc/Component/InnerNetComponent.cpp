@@ -217,7 +217,7 @@ namespace Tendo
 
     bool InnerNetComponent::Send(const std::string &address, const std::shared_ptr<Msg::Packet> &message)
     {
-        if (address == this->mLocation) //发送到本机
+        if (address.empty() || address == this->mLocation) //发送到本机
         {
             message->SetFrom(address);
             //this->mMessageComponent->OnMessage(message);
@@ -273,7 +273,6 @@ namespace Tendo
     void InnerNetComponent::OnRecord(Json::Writer &document)
     {
         document.Add("sum").Add(this->mSumCount);
-        document.Add("wait").Add(this->mMessageComponent->WaitCount());
         document.Add("auth").Add(this->mLocationMaps.size());
         document.Add("client").Add(this->mRemoteClients.size());
     }
@@ -332,15 +331,4 @@ namespace Tendo
             this->StartClose(iter->first);
         }
     }
-
-	bool InnerNetComponent::Send(int targetId, const std::shared_ptr<Msg::Packet>& message)
-	{
-		return false;
-	}
-
-	bool InnerNetComponent::Send(int targetId, const std::shared_ptr<Msg::Packet>& message, int& id)
-	{
-		return false;
-	}
-
 }// namespace Sentry

@@ -20,6 +20,7 @@
 #include"Http/Component/HttpDebugComponent.h"
 #include"Rpc/Component/LocationComponent.h"
 #include"Rpc/Component/InnerRpcComponent.h"
+#include"Entity/Component/ActorMgrComponent.h"
 
 #include"Server/Component/TextConfigComponent.h"
 #include"Cluster/Component/LaunchComponent.h"
@@ -64,6 +65,7 @@ void RegisterComponent()
     ComponentFactory::Add<PlayerMgrComponent>("PlayerMgrComponent");
     ComponentFactory::Add<ThreadComponent>("ThreadComponent");
     ComponentFactory::Add<ProtoComponent>("ProtoComponent");
+	ComponentFactory::Add<ActorMgrComponent>("ActorMgrComponent");
 
 //server
 	ComponentFactory::Add<KcpComponent>("KcpComponent");
@@ -74,7 +76,7 @@ void RegisterComponent()
 	ComponentFactory::Add<LocationComponent>("NodeMgrComponent");
 	ComponentFactory::Add<InnerRpcComponent>("RpcNetComponent");
 	ComponentFactory::Add<RegistryComponent>("RegistryComponent");
-	ComponentFactory::Add<DispatchComponent>("DispatchMessageComponent");
+	ComponentFactory::Add<DispatchComponent>("DispatchComponent");
 
 // gate
 	ComponentFactory::Add<GateComponent>("GateComponent");

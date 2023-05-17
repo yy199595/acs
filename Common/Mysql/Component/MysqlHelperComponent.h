@@ -26,6 +26,7 @@ namespace Tendo
 
     private:
 		bool Awake() final;
+		class Actor * GetActor();
 	private:
 		std::string mServer;
 	};

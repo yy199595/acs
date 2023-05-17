@@ -59,10 +59,7 @@ namespace Tendo
 			const std::string func("Node.Stop");
 			if(locationUnit->GetId() != config->ServerId())
 			{
-				std::string address;
-				locationUnit->Get("rpc", address);
-				int code = this->mApp->Call(address, func);
-				response.Add(address).Add(CodeConfig::Inst()->GetDesc(code));
+
 			}
 		}
 		this->mApp->GetCoroutine()->Start(&App::Stop, this->mApp, 0);

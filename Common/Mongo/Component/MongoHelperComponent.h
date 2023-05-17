@@ -29,6 +29,8 @@ namespace Tendo
 		int Save(const char * tab, long long id, const std::string & data);
 		int Save(const char * tab, const std::string & id, const std::string & data);
 	 private:
+		class Actor * GetActor();
+	 private:
 		std::string mRpc;
 		std::string mServer;
 	};

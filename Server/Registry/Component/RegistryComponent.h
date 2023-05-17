@@ -17,7 +17,7 @@ namespace Tendo
 		void Complete() final;
 		bool LateAwake() final;
 	private:
-		std::string mAddress;
+		std::unique_ptr<class Actor> mActor;
 		class LocationComponent * mLocationComponent;
 	};
 }

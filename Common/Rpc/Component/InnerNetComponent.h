@@ -30,9 +30,6 @@ namespace Tendo
 		InnerNetTcpClient * GetLocalClient(const std::string& address); //本地tcp客户端
 		InnerNetTcpClient * GetRemoteClient(const std::string& address); //远程tcp客户端
 	public:
-		bool Send(int targetId, const std::shared_ptr<Msg::Packet>& message);
-		bool Send(int targetId, const std::shared_ptr<Msg::Packet>& message, int & id);
-	public:
 		bool Send(const std::shared_ptr<Msg::Packet>& message); //发送到本地
 		bool Send(const std::string & address, const std::shared_ptr<Msg::Packet>& message);
         bool Send(const std::string & address, int code, const std::shared_ptr<Msg::Packet>& pack);

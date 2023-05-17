@@ -115,10 +115,7 @@ namespace Lua
 			luaL_error(lua, "not find service name : %s", service.c_str());
 			return 0;
 		}
-		if(!App::Inst()->GetAddr(server, addr))
-		{
-			return 0;
-		}
+		// TODO
 		lua_pushlstring(lua, addr.c_str(), addr.size());
 		return 1;
 	}
@@ -133,7 +130,8 @@ namespace Lua
 			lua_pushinteger(lua, code);
 			return 1;
 		}
-		lua_pushinteger(lua, App::Inst()->Send(addr, message));
+		//TODO
+		//lua_pushinteger(lua, App::Inst()->Send(addr, message));
 		return 1;
 	}
 

@@ -19,7 +19,7 @@ using namespace std::chrono;
 namespace Tendo
 {
 
-	App::App() :
+	App::App() : Actor(0, std::string()),
         mThreadId(std::this_thread::get_id()),
 				 mStartTime(Helper::Time::NowMilTime())
 	{
@@ -39,6 +39,7 @@ namespace Tendo
 		this->mLogComponent = this->GetOrAddComponent<LogComponent>();
 		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
 		this->mMessageComponent = this->GetOrAddComponent<ProtoComponent>();
+		this->mActorComponent = this->GetOrAddComponent<ActorMgrComponent>();
 
         LOG_CHECK_RET_FALSE(this->AddComponent<TextConfigComponent>());
         //LOG_CHECK_RET_FALSE(this->AddComponent<LocationComponent>());
@@ -56,7 +57,6 @@ namespace Tendo
 				}
 			}
         }
-		LOG_CHECK_RET_FALSE(this->LateAwake());
         this->mTaskComponent->Start(&App::StartAllComponent, this);
         return true;
 	}

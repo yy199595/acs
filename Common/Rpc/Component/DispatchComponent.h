@@ -19,7 +19,7 @@ namespace Tendo
 		long long Time;
 	};
 #endif
-	class DispatchComponent : public RpcTaskComponent<int, Msg::Packet>, public IDestroy
+	class DispatchComponent : public RpcTaskComponent<int, Msg::Packet>
 	{
 	 public:
 		DispatchComponent();

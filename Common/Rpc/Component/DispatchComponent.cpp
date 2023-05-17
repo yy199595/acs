@@ -61,7 +61,7 @@ namespace Tendo
 
     void DispatchComponent::Invoke(const RpcMethodConfig *config, const std::shared_ptr<Msg::Packet>& message)
 	{
-		this->AddWaitCount(service);
+		this->AddWaitCount(config->Service);
 		const std::string & service = config->Service;
 		RpcService* logicService = this->GetComponent<RpcService>(service);
 		if (logicService == nullptr)
