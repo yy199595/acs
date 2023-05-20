@@ -221,15 +221,13 @@ namespace Tendo
 		MessageDecoder messageDecoder(lua, this);
 		return messageDecoder.Decode(message);
 	}
-	std::shared_ptr<Message> ProtoComponent::Read(lua_State * lua, const std::string& name, int index)
+	bool ProtoComponent::Read(lua_State * lua, const std::string& name, int index, std::shared_ptr<Message> & message)
 	{
-        std::shared_ptr<Message> message;
 		if(!this->New(name, message))
 		{
-			return nullptr;
+			return false;
 		}
 		MessageEncoder messageEncoder(lua);
-        return messageEncoder.Encode(message, index) ? message : nullptr;
+        return messageEncoder.Encode(message, index);
 	}
-
 }

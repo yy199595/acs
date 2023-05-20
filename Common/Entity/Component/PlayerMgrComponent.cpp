@@ -5,7 +5,6 @@ namespace Tendo
 {
 	bool PlayerMgrComponent::LateAwake()
 	{
-		this->mCorComponent = this->mApp->GetCoroutine();
 		return true;
 	}
 
@@ -20,6 +19,7 @@ namespace Tendo
             return false;
         }
 
+		player->LateAwake();
 		std::vector<Component *> components;
 		player->GetComponents(components);
 		for (Component * component : components)

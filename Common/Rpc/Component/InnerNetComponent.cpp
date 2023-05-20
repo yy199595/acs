@@ -322,7 +322,22 @@ namespace Tendo
         return count;
     }
 
-    void InnerNetComponent::OnDestroy()
+	int InnerNetComponent::LuaCall(lua_State * lua,
+			const std::string & address, const std::shared_ptr<Msg::Packet> & message)
+	{
+		int rpcId = 0;
+		if (!this->Send(address, message, rpcId))
+		{
+			luaL_error(lua, "send request message error");
+			return 0;
+		}
+		const std::string & response = message->From();
+		std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource
+				= std::make_shared<LuaRpcTaskSource>(lua, rpcId, response);
+		return this->mMessageComponent->AddTask(rpcId, luaRpcTaskSource)->Await();
+	}
+
+	void InnerNetComponent::OnDestroy()
     {
         this->StopListen();
         auto iter = this->mRemoteClients.begin();

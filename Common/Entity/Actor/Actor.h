@@ -5,17 +5,21 @@
 #ifndef _ACTOR_H_
 #define _ACTOR_H_
 #include"Entity/Unit/Unit.h"
-#include<google/protobuf/message.h>
-namespace pb = google::protobuf;
+#include"Proto/Include/Message.h"
+namespace Msg
+{
+	class Packet;
+}
 namespace Tendo
 {
 	class Actor : public Unit
 	{
 	 public:
-		Actor(long long id, const std::string& addr);
+		Actor(long long id, std::string  addr);
 	 public:
-		bool LateAwake() final;
+		bool LateAwake() override;
 		int Send(const std::string& func);
+		int Send(const std::shared_ptr<Msg::Packet> & message);
 		int Send(const std::string& func, const pb::Message& request);
 	 public:
 		int Call(const std::string & func);
@@ -23,12 +27,16 @@ namespace Tendo
 		int Call(const std::string & func, std::shared_ptr<pb::Message> response);
 		int Call(const std::string & func, const pb::Message & request, std::shared_ptr<pb::Message> response);
 	 public:
-		const std::string& GetAddr() { return this->mAddr; }
 		const std::string& GetName() { return this->mName; }
+		const std::string& GetActorAddr() { return this->mAddr; }
 		void SetName(const std::string& name) { this->mName = name; }
+	protected:
+		virtual int GetAddress(const std::string & func, std::string & addr);
+		std::shared_ptr<Msg::Packet> Make(const std::string & func, const pb::Message * message);
 	 private:
 		std::string mAddr;
 		std::string mName;
+	protected:
 		class InnerNetComponent * mNetComponent;
 	};
 }

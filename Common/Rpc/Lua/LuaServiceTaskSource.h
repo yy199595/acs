@@ -8,8 +8,6 @@
 #include"Async/Source/TaskSource.h"
 #include"Http/Common//HttpResponse.h"
 #include"Lua/Engine/Define.h"
-#include"google/protobuf/message.h"
-using namespace google::protobuf;
 namespace Tendo
 {
     class LuaServiceTaskSource final

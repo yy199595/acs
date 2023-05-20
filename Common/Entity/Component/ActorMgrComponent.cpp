@@ -15,8 +15,8 @@ namespace Tendo
 		{
 			return false;
 		}
-		const std::string & addr = actor->GetAddr();
 		const std::string & name = actor->GetName();
+		const std::string & addr = actor->GetActorAddr();
 		{
 			this->mActors.emplace(id, actor);
 			this->mAddrActors.emplace(addr, actor);

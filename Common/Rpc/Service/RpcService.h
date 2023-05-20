@@ -1,11 +1,8 @@
 ﻿#pragma once
 
 #include<memory>
-#include<vector>
 #include"Entity/Component/Component.h"
-#include "Rpc/Method/MethodRegister.h"
-#include<google/protobuf/message.h>
-using namespace google::protobuf;
+#include"Rpc/Method/MethodRegister.h"
 namespace Msg
 {
     class Packet;

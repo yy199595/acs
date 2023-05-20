@@ -4,7 +4,7 @@
 #include"Util/Json/JsonWriter.h"
 #include"Rpc/Client/InnerNetTcpClient.h"
 #include"Server/Component/TcpListenerComponent.h"
-
+struct lua_State;
 namespace Tendo
 {
 	// 管理内网rpc的session
@@ -35,6 +35,8 @@ namespace Tendo
         bool Send(const std::string & address, int code, const std::shared_ptr<Msg::Packet>& pack);
         bool Send(const std::string & address, const std::shared_ptr<Msg::Packet>& message, int & id);
         std::shared_ptr<Msg::Packet> Call(const std::string & address, const std::shared_ptr<Msg::Packet> & message);
+	public:
+		int LuaCall(lua_State * lua, const std::string & address, const std::shared_ptr<Msg::Packet> & message);
 	public:
 		size_t GetConnectClients(std::vector<std::string> & list) const; //获取所有连接进来的客户端
 		size_t Broadcast(const std::shared_ptr<Msg::Packet>& message) const; //广播给所有链接进来的客户端

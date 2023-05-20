@@ -15,8 +15,7 @@
 #include<vector>
 #include"Util/Json/JsonWriter.h"
 #include"Lua/Engine/Define.h"
-#include"google/protobuf/message.h"
-using namespace google::protobuf;
+#include"Proto/Include/Message.h"
 namespace Mysql
 {
 	class Response : public ILuaWrite
@@ -45,7 +44,7 @@ namespace Mysql
 	{
 	 public:
         ICommand() : mTaskId(0) { }
-		virtual ~ICommand() { }
+		virtual ~ICommand() = default;
 		virtual void GetSql(std::string & sql) { }
         virtual bool Invoke(MYSQL *, std::shared_ptr<Response> & response) = 0;
 	public:
@@ -98,12 +97,12 @@ namespace Mysql
     {
     public:
         CreateTabCommand(std::string  table,
-				std::shared_ptr<Message> message, std::vector<std::string> & keys);
+				std::shared_ptr<pb::Message> message, std::vector<std::string> & keys);
     public:
 		bool Invoke(MYSQL *, std::shared_ptr<Response> & response) final;
 	private:
         void ClearBuffer();
-        bool ForeachMessage(const FieldDescriptor * field);
+        bool ForeachMessage(const pb::FieldDescriptor * field);
         bool CreateTable(MYSQL * sock, const std::string & tab, std::string & eror);
         bool CheckTableField(MYSQL * sock, const std::string & tab, std::string & error);
         bool AddNewField(MYSQL * sock, const std::string & tab, const std::string & field, std::string & error);
@@ -111,7 +110,7 @@ namespace Mysql
 		std::string mTable;
         std::stringstream mBuffer;
         std::vector<std::string> mKeys;
-        std::shared_ptr<Message> mMessage;
+        std::shared_ptr<pb::Message> mMessage;
     };
 }
 
@@ -120,7 +119,7 @@ namespace Mysql
     class SetMainKeyCommand : public ICommand
     {
     public:
-        SetMainKeyCommand(const std::string & tab, std::vector<std::string> & keys);
+        SetMainKeyCommand(std::string  tab, std::vector<std::string> & keys);
     public:
 		bool Invoke(MYSQL *, std::shared_ptr<Response> & response) final;
 	private:

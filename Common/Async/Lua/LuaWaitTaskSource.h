@@ -7,15 +7,13 @@
 
 #include"Lua/Engine/LuaParameter.h"
 #include"Async/Lua/LuaCoroutine.h"
-#include"google/protobuf/message.h"
-using namespace google::protobuf;
 namespace Tendo
 {
 	// 在lua中等待c++协程
 	class LuaWaitTaskSource
 	{
 	public:
-		LuaWaitTaskSource(lua_State* lua);
+		explicit LuaWaitTaskSource(lua_State* lua);
 
 		~LuaWaitTaskSource();
 
@@ -26,11 +24,6 @@ namespace Tendo
 
 		template<typename T>
 		void SetResult(T result);
-
-		void SetMessage(const Message & message);
-
-		void SetResult(int code, std::shared_ptr <Message> response);
-
 	private:
 		int mRef;
 		lua_State* mLua;

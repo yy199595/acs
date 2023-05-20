@@ -4,31 +4,24 @@
 
 #ifndef APP_PLAYER_H
 #define APP_PLAYER_H
-#include "NetUnit.h"
+#include"Entity/Actor/Actor.h"
 
 namespace Tendo
 {
-	class Player : public NetUnit
+	class Player : public Actor
 	{
 	public:
-		using NetUnit::NetUnit;
-		int Send(const std::string & func);
-		int Send(const std::string & func, const pb::Message & request);
-	public:
-		int Call(const std::string & func, const pb::Message & request);
-		int Call(const std::string & func, const pb::Message & request, std::shared_ptr<pb::Message> response);
-	public:
-		int BroadCast(const std::string & func);
-		int BroadCast(const std::string & func, const pb::Message & request);
+		Player(long long playerId, const std::string & gate);
 	public:
 		bool DelAddr(const std::string & server);
-		void AddAddr(const std::string & server, int id);
-		bool GetAddr(const std::string &server, int &targetId) final;
-		bool GetAddr(const std::string &server, std::string &addr) final;
+		void AddAddr(const std::string & server, long long id);
+		int GetAddress(const std::string &func, std::string &addr) final;
+	public:
+		int SendToClient(const std::string & func);
+		int SendToClient(const std::string & func, const pb::Message & request);
 	private:
-		int MakeRequest(const std::string & func, const pb::Message * message, std::string & addr, std::shared_ptr<Msg::Packet> & request);
-	private:
-		std::unordered_map<std::string, int> mServerAddrs;
+		class ActorMgrComponent * mActorComponent;
+		std::unordered_map<std::string, long long> mServerAddrs;
 	};
 }
 

@@ -8,9 +8,8 @@
 #include<string>
 #include<vector>
 #include<unordered_map>
-#include"Util/Proto/ProtoHelper.h"
-#include"Proto//Message/ProtoMessage.h"
-
+#include"Proto/Include/Message.h"
+#include"Proto/Message/ProtoMessage.h"
 namespace Msg
 {
     class Head : protected std::unordered_map<std::string, std::string>
@@ -83,9 +82,9 @@ namespace Msg
         std::shared_ptr<Packet> Clone() const;
     public:
        
-        bool ParseMessage(Message * message);
+        bool ParseMessage(pb::Message * message);
 
-        bool WriteMessage(const Message* message);
+        bool WriteMessage(const pb::Message* message);
 
     private:
         int mLen;
@@ -96,7 +95,7 @@ namespace Msg
         std::string mFrom;
         std::string mBody;
 	public:
-		std::shared_ptr<Message> mBindData;
+		std::shared_ptr<pb::Message> mBindData;
     };
 }
 typedef std::shared_ptr<Msg::Packet> RpcPacket;

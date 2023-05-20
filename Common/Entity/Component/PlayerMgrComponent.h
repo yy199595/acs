@@ -10,7 +10,7 @@ namespace Tendo
 	class PlayerMgrComponent final : public Component
 	{
 	 public:
-		PlayerMgrComponent() = default;
+		PlayerMgrComponent()  = default;
 		~PlayerMgrComponent() = default;
 	 public:
 		bool LateAwake() final;
@@ -23,8 +23,7 @@ namespace Tendo
 		inline size_t GetPlayerCount() const { return this->mPlayers.size(); }
 	 private:
 		void StartComponents(long long objectId);
-	 private:
-		class CoroutineComponent* mCorComponent;
+	private:
 		std::unordered_map<long long, std::unique_ptr<Player>> mPlayers;
 	};
 }

@@ -4,7 +4,7 @@
 
 #include"Message.h"
 #include"Util/Math/MathHelper.h"
-
+#include"Proto/Include/MessageJson.h"
 namespace Msg
 {
     bool Head::Add(const std::string& key, int value)
@@ -281,7 +281,7 @@ namespace Msg
         return message;
     }
 
-    bool Packet::ParseMessage(Message* message)
+    bool Packet::ParseMessage(pb::Message* message)
 	{
 		switch (this->mProto)
 		{
@@ -293,7 +293,7 @@ namespace Msg
 				}
 				return false;
 			case Msg::Porto::Json:
-				if (Helper::Protocol::FromJson(message, this->mBody))
+				if(pb_json::JsonStringToMessage(this->mBody, message).ok())
 				{
 					this->mBody.clear();
 					return true;
@@ -306,13 +306,13 @@ namespace Msg
 	}
 
 
-    bool Packet::WriteMessage(const Message* message)
+    bool Packet::WriteMessage(const pb::Message* message)
 	{
-		this->mBody.clear();
 		if (message == nullptr)
 		{
 			return true;
 		}
+		this->mBody.clear();
 		switch (this->mProto)
 		{
 			case Msg::Porto::String:
@@ -320,7 +320,7 @@ namespace Msg
 			case Msg::Porto::Protobuf:
 				return message->SerializeToString(&mBody);
 			case Msg::Porto::Json:
-				return Helper::Protocol::GetJson(*message, &mBody);
+				return pb_json::MessageToJsonString(*message, &mBody).ok();
 		}
 		CONSOLE_LOG_FATAL("proto error write error");
 		return false;

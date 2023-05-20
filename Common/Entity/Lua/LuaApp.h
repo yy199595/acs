@@ -16,11 +16,12 @@ namespace Lua
 {
 	namespace LuaApp
 	{
+		extern int GetActor(lua_State * lua);
 		extern int Send(lua_State * lua);
 		extern int Call(lua_State * lua);
 		extern int GetAddr(lua_State * lua);
 		extern int GetComponent(lua_State * lua);
-		extern int MakeRequest(lua_State * lua, std::shared_ptr<Msg::Packet> & message, std::string & addr, std::string & response);
+		extern int MakeRequest(lua_State * lua, std::shared_ptr<Msg::Packet> & message, std::string & addr);
 	};
 }
 

@@ -2,7 +2,6 @@
 #include"Util/Md5/MD5.h"
 #include<regex>
 #include"Util/Math/MathHelper.h"
-#include"google/protobuf/message.h"
 namespace Helper
 {
     std::string Str::EmptyStr;

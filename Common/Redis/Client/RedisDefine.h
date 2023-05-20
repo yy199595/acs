@@ -5,7 +5,6 @@
 #include"RedisAny.h"
 #include"Lua/Engine/Define.h"
 #include"Util/Json/JsonWriter.h"
-#include"google/protobuf/message.h"
 #include"Rpc/Async/RpcTaskSource.h"
 #include"Proto/Message/ProtoMessage.h"
 using namespace google::protobuf;

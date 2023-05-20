@@ -42,7 +42,7 @@ namespace Tendo
 	 public:
         bool HasMessage(const std::string & name);
 		bool Write(lua_State * lua, const Message & message);
-		std::shared_ptr<Message> Read(lua_State * lua, const std::string & name, int index);
+		bool Read(lua_State * lua, const std::string & name, int index, std::shared_ptr<Message> & message);
 	 private:
         bool LateAwake() final;
 		void LoopMessage(const Descriptor * descriptor);

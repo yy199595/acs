@@ -126,11 +126,11 @@ namespace Tendo
 		return this->mLocationComponent->GetServerAddress(targetId, listen, addr);
 	}
 
-	int Server::Send(const string& addr, const std::shared_ptr<Msg::Packet>& message)
+	int Server::Send(const std::string& addr, const std::shared_ptr<Msg::Packet>& message)
 	{
 		return this->mInnerComponent->Send(addr, message);
 	}
-	bool Server::GetAddr(int targetId, string& addr)
+	bool Server::GetAddr(int targetId, std::string& addr)
 	{
 		const std::string listen("rpc");
 		return this->mLocationComponent->GetServerAddress(targetId, listen, addr);

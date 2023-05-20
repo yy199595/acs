@@ -194,7 +194,7 @@ namespace Mysql
 namespace Mysql
 {
     CreateTabCommand::CreateTabCommand(std::string  tab,
-			std::shared_ptr<google::protobuf::Message> message, std::vector<std::string> & keys)
+			std::shared_ptr<pb::Message> message, std::vector<std::string> & keys)
         : mMessage(std::move(message)), mKeys(keys), mTable(std::move(tab))
     {
 
@@ -294,10 +294,10 @@ namespace Mysql
             }
         }
         mysql_free_result(result1);
-        const Descriptor* descriptor = this->mMessage->GetDescriptor();
+        const pb::Descriptor* descriptor = this->mMessage->GetDescriptor();
         for (int index = 0; index < descriptor->field_count(); index++)
         {
-            const FieldDescriptor *fileDescriptor = descriptor->field(index);
+            const pb::FieldDescriptor *fileDescriptor = descriptor->field(index);
             if (fileDescriptor == nullptr)
             {
                 error = fmt::format("proto field error index = {0}", index);
@@ -317,7 +317,7 @@ namespace Mysql
     bool CreateTabCommand::AddNewField(MYSQL *sock, const std::string &tab,
                                        const std::string &field, std::string &error)
     {
-        const FieldDescriptor * fieldDescriptor = this->mMessage->GetDescriptor()->FindFieldByName(field);
+        const pb::FieldDescriptor * fieldDescriptor = this->mMessage->GetDescriptor()->FindFieldByName(field);
         if(fieldDescriptor == nullptr)
         {
             error = fmt::format("not find filed : {0}", field);
@@ -346,10 +346,10 @@ namespace Mysql
     {
         this->ClearBuffer();
         this->mBuffer << "CREATE TABLE `" << tab << "`(";
-        const Descriptor *descriptor = this->mMessage->GetDescriptor();
+        const pb::Descriptor *descriptor = this->mMessage->GetDescriptor();
         for (int index = 0; index < descriptor->field_count(); index++)
         {
-            const FieldDescriptor *fileDescriptor = descriptor->field(index);
+            const pb::FieldDescriptor *fileDescriptor = descriptor->field(index);
             if (fileDescriptor == nullptr)
             {
                 error = fmt::format("proto field error index = {0}", index);
@@ -391,9 +391,9 @@ namespace Mysql
         return true;
     }
 
-    bool CreateTabCommand::ForeachMessage(const FieldDescriptor *field)
+    bool CreateTabCommand::ForeachMessage(const pb::FieldDescriptor *field)
     {
-        const Message &message = *this->mMessage;
+        const pb::Message &message = *this->mMessage;
         this->mBuffer << "`" << field->name() << "` ";
         if (field->is_repeated())
         {
@@ -401,34 +401,34 @@ namespace Mysql
         }
         switch (field->type())
         {
-            case FieldDescriptor::TYPE_INT32:
+            case pb::FieldDescriptor::TYPE_INT32:
                 this->mBuffer << "INT(20) NOT NULL DEFAULT 0";
                 return true;
-            case FieldDescriptor::TYPE_UINT32:
+            case pb::FieldDescriptor::TYPE_UINT32:
                 this->mBuffer << "INT(20) NOT NULL DEFAULT 0";
                 return true;
-            case FieldDescriptor::TYPE_UINT64:
+            case pb::FieldDescriptor::TYPE_UINT64:
                 this->mBuffer << "BIGINT(32) NOT NULL DEFAULT 0";
                 return true;
-            case FieldDescriptor::TYPE_INT64:
+            case pb::FieldDescriptor::TYPE_INT64:
                 this->mBuffer << "BIGINT(32) NOT NULL DEFAULT 0";
                 return true;
-            case FieldDescriptor::TYPE_FLOAT:
+            case pb::FieldDescriptor::TYPE_FLOAT:
                 this->mBuffer << "FLOAT(20) NOT NULL DEFAULT 0";
                 return true;
-            case FieldDescriptor::TYPE_DOUBLE:
+            case pb::FieldDescriptor::TYPE_DOUBLE:
                 this->mBuffer << "DOUBLE(32) NOT NULL DEFAULT 0";
                 return true;
-            case FieldDescriptor::TYPE_STRING:
+            case pb::FieldDescriptor::TYPE_STRING:
                 this->mBuffer << "VARCHAR(64) NOT NULL DEFAULT ''";
                 return true;
-            case FieldDescriptor::TYPE_BYTES:
+            case pb::FieldDescriptor::TYPE_BYTES:
                 this->mBuffer << "BLOB(64) NOT NULL DEFAULT ''";
                 return true;
-            case FieldDescriptor::TYPE_BOOL:
+            case pb::FieldDescriptor::TYPE_BOOL:
                 this->mBuffer << "BOOLEAN NOT NULL DEFAULT 0";
                 return true;
-            case FieldDescriptor::TYPE_MESSAGE:
+            case pb::FieldDescriptor::TYPE_MESSAGE:
                 this->mBuffer << "JSON";
                 return true;
             default:
@@ -440,8 +440,8 @@ namespace Mysql
 
 namespace Mysql
 {
-    SetMainKeyCommand::SetMainKeyCommand(const std::string &tab, std::vector<std::string> &keys)
-        : mTable(tab), mKeys(keys)
+    SetMainKeyCommand::SetMainKeyCommand(std::string tab, std::vector<std::string> &keys)
+        : mTable(std::move(tab)), mKeys(keys)
     {
 
     }

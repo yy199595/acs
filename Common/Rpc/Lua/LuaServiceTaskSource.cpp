@@ -32,7 +32,7 @@ namespace Tendo
 
 	void LuaServiceTaskSource::WriteRpcResponse(lua_State* lua)
 	{
-		this->mCode = luaL_checkinteger(lua, 2);
+		this->mCode = (int)luaL_checkinteger(lua, 2);
 		if(this->mCode == XCode::Successful)
 		{
 			if (lua_istable(lua, 3))
@@ -41,7 +41,7 @@ namespace Tendo
 				{
 					MessageEncoder messageEncoder(lua);
 					this->mRpcData->SetProto(Msg::Porto::Protobuf);
-					std::shared_ptr<Message> message = this->mRpcData->mBindData;
+					std::shared_ptr<pb::Message> message = this->mRpcData->mBindData;
 					if (!messageEncoder.Encode(message, 3))
 					{
 						this->mCode = XCode::ParseMessageError;

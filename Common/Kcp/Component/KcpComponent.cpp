@@ -112,7 +112,7 @@ namespace Tendo
 				}
 				else
 				{
-					uint32 conv = ikcp_getconv(this->mReceiveBuffer.data());
+					unsigned int conv = ikcp_getconv(this->mReceiveBuffer.data());
 
 					int len = 0;
 					std::iostream istream(&this->mRecvBuffer);

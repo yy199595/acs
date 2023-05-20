@@ -9,7 +9,6 @@
 #include"Entity/Unit/Player.h"
 #include"Server/Config/ServiceConfig.h"
 #include"Cluster/Config/ClusterConfig.h"
-#include"Rpc/Service/RpcService.h"
 #include"Rpc/Async/RpcTaskSource.h"
 #include"Lua/Engine/LocalClassProxy.h"
 #include"Proto/Component/ProtoComponent.h"
@@ -31,7 +30,7 @@ namespace Lua
 		return ComponentType::WriteObj(lua, component, name);
 	}
 
-	int LuaApp::MakeRequest(lua_State * lua, std::shared_ptr<Msg::Packet> & message, std::string & addr, std::string & response)
+	int LuaApp::MakeRequest(lua_State * lua, std::shared_ptr<Msg::Packet> & message, std::string & addr)
 	{
 		const std::string func = luaL_checkstring(lua, 2);
 		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
@@ -60,7 +59,7 @@ namespace Lua
 				luaL_error(lua, "not find user : %lld", userId);
 				return XCode::NotFindUser;
 			}
-			if(!player->GetAddr(methodConfig->Server, addr))
+			if(!player->GetAddress(methodConfig->Server, addr))
 			{
 				return XCode::NotFoundPlayerRpcAddress;
 			}
@@ -80,6 +79,7 @@ namespace Lua
 			if (!methodConfig->Request.empty())
 			{
 				const std::string& name = methodConfig->Request;
+				std::shared_ptr<Message>
 				std::shared_ptr<Message> request = App::Inst()->GetProto()->Read(lua, name, 3);
 				if (request == nullptr)
 				{
@@ -102,7 +102,7 @@ namespace Lua
 			const char * str = luaL_tolstring(lua, 3, &size);
 			message->Body()->append(str, size);
 		}
-		response = methodConfig->Response;
+		message->SetFrom(methodConfig->Response);
 		return XCode::Successful;
 	}
 
@@ -120,44 +120,47 @@ namespace Lua
 		return 1;
 	}
 
+	int LuaApp::GetActor(lua_State * lua)
+	{
+		App * app = App::Inst();
+		if(lua_isnil(lua, -1))
+		{
+			Lua::Parameter::Write(lua, app);
+			return 1;
+		}
+		long long actorId = luaL_checkinteger(lua, 1);
+		Actor * actor = app->GetActorMgr()->GetActor(actorId);
+		Lua::Parameter::Write(lua, actor);
+		return 1;
+	}
+
 	int LuaApp::Send(lua_State* lua)
 	{
-		std::string response, addr;
+		std::string addr;
+		App * app = App::Inst();
 		std::shared_ptr<Msg::Packet> message;
-		int code = LuaApp::MakeRequest(lua, message, addr, response);
+		int code = LuaApp::MakeRequest(lua, message, addr);
 		if(code != XCode::Successful)
 		{
 			lua_pushinteger(lua, code);
 			return 1;
 		}
-		//TODO
-		//lua_pushinteger(lua, App::Inst()->Send(addr, message));
+		app->GetComponent<InnerNetComponent>()->Send(addr, message);
 		return 1;
 	}
 
 	int LuaApp::Call(lua_State* lua)
 	{
+		std::string addr;
 		lua_pushthread(lua);
-		std::string response, addr;
+		App * app = App::Inst();
 		std::shared_ptr<Msg::Packet> message;
-		int code = LuaApp::MakeRequest(lua, message, addr, response);
+		int code = LuaApp::MakeRequest(lua, message, addr);
 		if(code != XCode::Successful)
 		{
 			lua_pushinteger(lua, code);
 			return 1;
 		}
-		int rpcId = 0;
-		App * app = App::Inst();
-		InnerNetComponent * netComponent = app->GetComponent<InnerNetComponent>();
-		DispatchComponent * dispatchComponent = app->GetComponent<DispatchComponent>();
-		if (!netComponent->Send(addr, message, rpcId))
-		{
-			luaL_error(lua, "send request message error");
-			return 0;
-		}
-
-		std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource
-				= std::make_shared<LuaRpcTaskSource>(lua, rpcId, response);
-		return dispatchComponent->AddTask(rpcId, luaRpcTaskSource)->Await();
+		return app->GetComponent<InnerNetComponent>()->LuaCall(lua, addr, message);
 	}
 }
