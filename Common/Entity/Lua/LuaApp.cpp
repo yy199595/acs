@@ -78,10 +78,9 @@ namespace Lua
 		{
 			if (!methodConfig->Request.empty())
 			{
+				std::shared_ptr<pb::Message> request;
 				const std::string& name = methodConfig->Request;
-				std::shared_ptr<Message>
-				std::shared_ptr<Message> request = App::Inst()->GetProto()->Read(lua, name, 3);
-				if (request == nullptr)
+				if (App::Inst()->GetProto()->Read(lua, name, 3, request))
 				{
 					luaL_error(lua, "create request message error : %s", name.c_str());
 					return XCode::CreateProtoFailure;

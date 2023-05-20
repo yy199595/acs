@@ -5,11 +5,8 @@
 #ifndef _ACTOR_H_
 #define _ACTOR_H_
 #include"Entity/Unit/Unit.h"
+#include"Rpc/Client/Message.h"
 #include"Proto/Include/Message.h"
-namespace Msg
-{
-	class Packet;
-}
 namespace Tendo
 {
 	class Actor : public Unit

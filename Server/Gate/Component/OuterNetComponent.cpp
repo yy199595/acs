@@ -123,7 +123,7 @@ namespace Tendo
 		{
 			return XCode::NotFindUser;
 		}
-		if(!player->GetAddr(server, target))
+		if(!player->GetAddress(server, target))
 		{
 			return XCode::NotFoundPlayerRpcAddress;
 		}

@@ -56,17 +56,18 @@ namespace Tendo
 		}
 
 #ifdef __DEBUG__
-		LOG_INFO("start register to [" << this->mActor->GetAddr() << "]");
+		const std::string & addr = this->mActor->GetActorAddr();
+		LOG_INFO("start register to [" << addr << "]");
 #endif
 		do
 		{
 			int code = this->mActor->Call(func, message);
 			if (code == XCode::Successful)
 			{
-				LOG_INFO("register to [" << this->mActor->GetAddr() << "] successful");
+				LOG_INFO("register to [" << this->mActor->GetActorAddr() << "] successful");
 				break;
 			}
-			LOG_ERROR("register to [" << this->mActor->GetAddr() << "] "
+			LOG_ERROR("register to [" << this->mActor->GetActorAddr() << "] "
 									  << CodeConfig::Inst()->GetDesc(code));
 			this->mApp->GetCoroutine()->Sleep(1000 * 5);
 		}

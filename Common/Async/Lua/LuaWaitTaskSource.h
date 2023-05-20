@@ -7,6 +7,7 @@
 
 #include"Lua/Engine/LuaParameter.h"
 #include"Async/Lua/LuaCoroutine.h"
+#include"Proto/Include/Message.h"
 namespace Tendo
 {
 	// 在lua中等待c++协程
@@ -24,7 +25,9 @@ namespace Tendo
 
 		template<typename T>
 		void SetResult(T result);
-	private:
+
+		void SetResult(int code, std::shared_ptr<pb::Message> response);
+	 private:
 		int mRef;
 		lua_State* mLua;
 	};

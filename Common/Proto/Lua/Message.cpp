@@ -22,7 +22,12 @@ namespace Lua
 		}
 		if (lua_istable(lua, 2))
 		{
-			UserDataParameter::Write(lua,  messageComponent->Read(lua, name, 2));
+			std::shared_ptr<Message> message;
+			if(!messageComponent->Read(lua, name, 2, message))
+			{
+				return 0;
+			}
+			UserDataParameter::Write(lua,  message);
 			return 1;
 		}
 		else if (lua_isstring(lua, 2))
@@ -53,7 +58,10 @@ namespace Lua
 		ProtoComponent* messageComponent = App::Inst()->GetProto();
 		if (lua_istable(lua, 2))
 		{
-			message = messageComponent->Read(lua, name, 2);
+			if(!messageComponent->Read(lua, name, 2, message))
+			{
+				return 0;
+			}
 		}
 		else if(lua_isstring(lua, 2))
 		{

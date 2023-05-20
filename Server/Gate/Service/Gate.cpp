@@ -59,9 +59,10 @@ namespace Tendo
 
 		this->mTokens.emplace(token, userId);
 		const std::string & server = this->GetServer();
-		std::unique_ptr<Player> player = std::make_unique<Player>(userId);
+		const std::string & address = this->mInnerAddress;
+		std::unique_ptr<Player> player = std::make_unique<Player>(userId, address);
 		{
-			player->GetAddr(this->GetServer(), this->mInnerAddress);
+			player->AddAddr(this->GetServer(), this->mApp->GetUnitId());
 		}
 		this->mPlayerComponent->AddPlayer(std::move(player));
 		return XCode::Successful;
@@ -118,11 +119,11 @@ namespace Tendo
 			{
 				this->mPlayerComponent->DelPlayer(userId);
 				const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-				LOG_ERROR("call " << name << " [" << targetActor->GetAddr() << "] code = " << desc);
+				LOG_ERROR("call " << name << " [" << targetActor->GetActorAddr() << "] code = " << desc);
 				return XCode::Failure;
 			}
 			player->AddAddr(name, (int)targetActor->GetUnitId());
-			CONSOLE_LOG_INFO("add " << name << " [" << targetActor->GetAddr() << "] to " << userId);
+			CONSOLE_LOG_INFO("add " << name << " [" << targetActor->GetActorAddr() << "] to " << userId);
 		}
 		return XCode::Successful;
 	}
@@ -134,11 +135,6 @@ namespace Tendo
 		if(player == nullptr)
 		{
 			return XCode::NotFindUser;
-		}
-		player->BroadCast(std::string("User.Logout"));
-		{
-			this->mPlayerComponent->DelPlayer(userId);
-			CONSOLE_LOG_ERROR("user:" << userId << " logout");
 		}
 		return XCode::Successful;
 	}

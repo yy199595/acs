@@ -44,9 +44,13 @@ namespace Lua
 		//std::shared_ptr<LuaWaitTaskSource> luaWaitTaskSource(new LuaWaitTaskSource(lua));
         if (lua_istable(lua, 3) && !methodConfig->Request.empty())
         {
+			std::shared_ptr<Message> message;
             const std::string& name = methodConfig->Request;
-            std::shared_ptr<Message> message = messageComponent->Read(lua, name, 3);
-            if (message == nullptr || !request->WriteMessage(message.get()))
+			if(!messageComponent->Read(lua, name, 3, message))
+			{
+				return 0;
+			}
+            if (!request->WriteMessage(message.get()))
             {
                 LOG_ERROR("write request message error : [" << func << "]");
                 return 0;
