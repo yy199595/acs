@@ -7,32 +7,35 @@
 #include"Entity/Unit/Unit.h"
 #include"Rpc/Client/Message.h"
 #include"Proto/Include/Message.h"
+struct lua_State;
 namespace Tendo
 {
 	class Actor : public Unit
 	{
 	 public:
-		Actor(long long id, std::string  addr);
+		explicit Actor(long long id);
 	 public:
-		bool LateAwake() override;
+		bool LateAwake() final;
 		int Send(const std::string& func);
-		int Send(const std::shared_ptr<Msg::Packet> & message);
 		int Send(const std::string& func, const pb::Message& request);
 	 public:
 		int Call(const std::string & func);
 		int Call(const std::string & func, const pb::Message & request);
 		int Call(const std::string & func, std::shared_ptr<pb::Message> response);
 		int Call(const std::string & func, const pb::Message & request, std::shared_ptr<pb::Message> response);
+	private:
+		int LuaSend(lua_State * lua, const std::string & func, const std::shared_ptr<Msg::Packet> & message);
+		int LuaCall(lua_State * lua, const std::string & func, const std::shared_ptr<Msg::Packet> & message);
+	public:
+		static int LuaCallEx(lua_State * lua);
+		static int LuaSendEx(lua_State * lua);
 	 public:
-		const std::string& GetName() { return this->mName; }
-		const std::string& GetActorAddr() { return this->mAddr; }
-		void SetName(const std::string& name) { this->mName = name; }
+		long long GetActorId() { return this->GetUnitId(); }
+		virtual int GetAddress(const std::string & func, std::string & addr) = 0;
 	protected:
-		virtual int GetAddress(const std::string & func, std::string & addr);
+		virtual bool OnInit() = 0;
 		std::shared_ptr<Msg::Packet> Make(const std::string & func, const pb::Message * message);
-	 private:
-		std::string mAddr;
-		std::string mName;
+		int MakeMessage(lua_State * lua, int idx, const std::string & func, std::shared_ptr<Msg::Packet> & message);
 	protected:
 		class InnerNetComponent * mNetComponent;
 	};

@@ -2,7 +2,6 @@
 #include"Timer/Component/TimerComponent.h"
 #include"Async/Component/CoroutineComponent.h"
 #include"Lua/Component/LuaScriptComponent.h"
-#include"Entity/Component/PlayerMgrComponent.h"
 #include"Telnet/Component/ConsoleComponent.h"
 #include"Server/Component/ThreadComponent.h"
 #include"Log/Component/LogComponent.h"
@@ -18,8 +17,6 @@
 #include"Http/Component/HttpComponent.h"
 #include"Http/Component/HttpWebComponent.h"
 #include"Http/Component/HttpDebugComponent.h"
-#include"Rpc/Component/LocationComponent.h"
-#include"Rpc/Component/InnerRpcComponent.h"
 #include"Entity/Component/ActorMgrComponent.h"
 
 #include"Server/Component/TextConfigComponent.h"
@@ -62,7 +59,6 @@ void RegisterComponent()
     ComponentFactory::Add<CoroutineComponent>("CoroutineComponent");
     ComponentFactory::Add<TimerComponent>("TimerComponent");
     ComponentFactory::Add<LogComponent>("LogComponent");
-    ComponentFactory::Add<PlayerMgrComponent>("PlayerMgrComponent");
     ComponentFactory::Add<ThreadComponent>("ThreadComponent");
     ComponentFactory::Add<ProtoComponent>("ProtoComponent");
 	ComponentFactory::Add<ActorMgrComponent>("ActorMgrComponent");
@@ -73,8 +69,6 @@ void RegisterComponent()
     ComponentFactory::Add<TextConfigComponent>("TextConfigComponent");
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
     ComponentFactory::Add<InnerNetComponent>("InnerNetComponent");
-	ComponentFactory::Add<LocationComponent>("NodeMgrComponent");
-	ComponentFactory::Add<InnerRpcComponent>("RpcNetComponent");
 	ComponentFactory::Add<RegistryComponent>("RegistryComponent");
 	ComponentFactory::Add<DispatchComponent>("DispatchComponent");
 
@@ -108,8 +102,9 @@ void RegisterComponent()
     ComponentFactory::Add<Client::ClientComponent>("ClientComponent");
 }
 
-void RegisterServiceComponent()
+void RegisterAll()
 {
+	RegisterComponent();
 	ComponentFactory::Add<Log>("Log");
 	ComponentFactory::Add<Gate>("Gate");
 	ComponentFactory::Add<User>("User");
@@ -128,13 +123,14 @@ int main(int argc, char **argv)
 #ifdef __OS_WIN__
     system("chcp 65001 > nul");
 #endif
+	RegisterAll();
 	ServerConfig config;
 	System::Init(argc, argv);
 	if(config.LoadConfig(System::ConfigPath()))
 	{
-		RegisterComponent();
-		RegisterServiceComponent();
-		return std::make_unique<App>()->Run();
+		int id = config.ServerId();
+		const std::string & name = config.Name();
+		return std::make_shared<App>(id, name)->Run();
 	}
 	CONSOLE_LOG_FATAL("load config error");
 	return -1;

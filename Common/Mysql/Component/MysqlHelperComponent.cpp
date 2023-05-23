@@ -4,7 +4,6 @@
 #include"Util/String/StringHelper.h"
 #include"Mysql/Service/MysqlDB.h"
 #include"Cluster/Config/ClusterConfig.h"
-#include"Rpc/Component/LocationComponent.h"
 #include"Entity/Actor/App.h"
 
 namespace Tendo
@@ -13,7 +12,6 @@ namespace Tendo
 	{
 		const std::string& name = ComponentFactory::GetName<MysqlDB>();
 		return ClusterConfig::Inst()->GetServerName(name, this->mServer);
-		return true;
 	}
 
 	int MysqlHelperComponent::Add(const Message& message, int flag)

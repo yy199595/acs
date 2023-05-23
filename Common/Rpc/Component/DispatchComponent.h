@@ -38,9 +38,9 @@ namespace Tendo
 		void SubWaitCount(const std::string & name);
     private:
 		unsigned int mWaitCount;
-		class InnerRpcComponent * mNetComponent;
-		class CoroutineComponent* mTaskComponent;
 		class TimerComponent* mTimerComponent;
+		class InnerNetComponent * mNetComponent;
+		class CoroutineComponent* mTaskComponent;
 		class OuterNetComponent* mOuterComponent;
 		std::unordered_map<std::string, int> mWaitCounts;
 		std::unordered_map<std::string, int> mDoneCounts;

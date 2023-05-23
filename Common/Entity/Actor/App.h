@@ -8,7 +8,7 @@
 #include"Async/Component/CoroutineComponent.h"
 #include"Entity/Component/ActorMgrComponent.h"
 #include"Log/Component/LogComponent.h"
-
+#include"Entity/Actor/Server.h"
 namespace Tendo
 {
 	enum class ServerStatus
@@ -19,15 +19,15 @@ namespace Tendo
 		Closing	 //正在关闭
 	};
 }
-
+struct lua_State;
 namespace Tendo
 {
 	class RpcService;
 	class ProtoComponent;
-    class App final : public Actor, public Singleton<App>
+	class App final : public Server, public Singleton<App>
 	{
 	 public:
-		explicit App();
+		explicit App(int id, const std::string & name);
 	 public:
 		Actor * Random(const std::string & name);
         inline float GetFps() const { return this->mLogicFps; }
@@ -35,7 +35,7 @@ namespace Tendo
 		inline Asio::Context & MainThread() { return *this->mMainContext; }
 		inline TimerComponent* GetTimer() { return this->mTimerComponent; }
 		inline ProtoComponent * GetProto() { return this->mMessageComponent; }
-		inline ActorMgrComponent * GetActorMgr() { return this->mActorComponent; }
+		inline ActorMgrComponent * ActorMgr() { return this->mActorComponent; }
 		inline CoroutineComponent* GetCoroutine() { return this->mTaskComponent; }
 		inline bool IsMainContext(const Asio::Context * io) const { return this->mMainContext.get() == io;}
 	 public:
@@ -43,6 +43,8 @@ namespace Tendo
 		void Stop(int signum);
         bool OnDelComponent(Component *component) final { return false; }
         inline bool IsMainThread() const { return this->mThreadId == std::this_thread::get_id();}
+	public:
+		static int LuaRandom(lua_State * lua);
     private:
 #ifdef __OS_WIN__
 		void UpdateConsoleTitle();

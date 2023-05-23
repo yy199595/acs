@@ -49,11 +49,9 @@ namespace Tendo
 		int mMaxHandlerCount;
 		unsigned int mSumCount;
 		unsigned int mWaitCount;
-		class LocationComponent * mNodeComponent;
 #ifdef __DEBUG__
 		std::unordered_map<int, long long> mRecords;
 #endif
-		class PlayerMgrComponent * mPlayerComponent;
 		class InnerNetComponent * mInnerNetComponent;
         std::queue<std::shared_ptr<Msg::Packet>> mMessages;
         std::queue<std::shared_ptr<OuterNetTcpClient>> mClientPools;

@@ -5,7 +5,6 @@
 #include"User.h"
 #include"Entity/Actor/App.h"
 #include"Rpc/Component/InnerNetComponent.h"
-#include"Rpc/Component/LocationComponent.h"
 #include"Gate/Component/GateComponent.h"
 namespace Tendo
 {

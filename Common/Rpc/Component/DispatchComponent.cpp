@@ -13,10 +13,10 @@
 #include"Entity/Actor/App.h"
 #include"Rpc/Client/Message.h"
 #include"Rpc/Service/RpcService.h"
-#include"Rpc/Component/InnerRpcComponent.h"
 #include"Gate/Component/OuterNetComponent.h"
-#include "google/protobuf/util/json_util.h"
-
+#ifdef __RPC_MESSAGE__
+#include"Proto/Include/MessageJson.h"
+#endif
 namespace Tendo
 {
 	DispatchComponent::DispatchComponent()
@@ -31,7 +31,7 @@ namespace Tendo
 	bool DispatchComponent::LateAwake()
 	{
         this->mTimerComponent = this->mApp->GetTimer();
-		this->mNetComponent = this->GetComponent<InnerRpcComponent>();
+		this->mNetComponent = this->GetComponent<InnerNetComponent>();
 		this->mOuterComponent = this->GetComponent<OuterNetComponent>();
 		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<CoroutineComponent>());
 		return true;
@@ -85,7 +85,7 @@ namespace Tendo
 #ifdef __RPC_MESSAGE__
 		std::string json("{}");
 		std::string serverName = message->From();
-		ProtoComponent* component = this->GetComponent<ProtoComponent>();
+		ProtoComponent* component = this->mApp->GetProto();
 		if (!config->Request.empty())
 		{
 			switch(message->GetProto())
@@ -101,7 +101,7 @@ namespace Tendo
 						if (request->ParseFromString(message->GetBody()))
 						{
 							json.clear();
-							google::protobuf::util::MessageToJsonString(*request, &json);
+							pb_json::MessageToJsonString(*request, &json);
 						}
 					}
 				}

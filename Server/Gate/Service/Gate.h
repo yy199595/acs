@@ -22,12 +22,14 @@ namespace Tendo
 		bool OnInit() final;
         void OnStop() final;
 		int OnLogin(long long userId, const std::string & token);
+	private:
+		std::shared_ptr<class Player> NewPlayer(long long userId);
 	 private:
 		int mIndex;
 		std::string mInnerAddress;
 		std::string mOuterAddress;
 		class OuterNetComponent* mOuterComponent;
-		class PlayerMgrComponent * mPlayerComponent;
+		class ActorMgrComponent * mActorComponent;
 		std::unordered_map<std::string, long long> mTokens;
 	};
 

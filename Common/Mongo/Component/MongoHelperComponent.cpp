@@ -5,10 +5,8 @@
 #include"MongoHelperComponent.h"
 #include"Entity/Actor/App.h"
 #include"Mongo/Service/MongoDB.h"
-#include<google/protobuf/util/json_util.h>
+#include"Proto/Include/MessageJson.h"
 #include"Cluster/Config/ClusterConfig.h"
-#include"Rpc/Component/LocationComponent.h"
-
 namespace Tendo
 {
 	bool MongoHelperComponent::Awake()
@@ -32,7 +30,7 @@ namespace Tendo
 		}
 		const std::string func("MongoDB.Insert");
 		Actor * targetActor = this->mApp->Random(this->mServer);
-		if (!util::MessageToJsonString(message, request.mutable_json()).ok())
+		if (!pb_json::MessageToJsonString(message, request.mutable_json()).ok())
 		{
 			return XCode::CallServiceNotFound;
 		}

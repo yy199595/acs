@@ -10,15 +10,14 @@ namespace Tendo
 	class RegistryComponent : public Component, public IComplete
 	{
 	public:
-		RegistryComponent();
+		RegistryComponent() = default;
 	public:
 		int Query(const std::string & server = "");
 	private:
 		void Complete() final;
 		bool LateAwake() final;
 	private:
-		std::unique_ptr<class Actor> mActor;
-		class LocationComponent * mLocationComponent;
+		std::shared_ptr<class Server> mActor;
 	};
 }
 

@@ -4,10 +4,8 @@
 
 #include"RegistryComponent.h"
 #include"Entity/Actor/App.h"
-#include"Redis/Component/RedisLuaComponent.h"
 #include"Server/Config/ServerConfig.h"
 #include"Server/Config/CodeConfig.h"
-#include"Rpc/Component/LocationComponent.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include "s2s/s2s.pb.h"
 #include"Rpc/Service/RpcService.h"
@@ -15,11 +13,6 @@
 
 namespace Tendo
 {
-	RegistryComponent::RegistryComponent()
-	{
-		this->mLocationComponent = nullptr;
-	}
-
 	bool RegistryComponent::LateAwake()
 	{
 		std::string address;
@@ -29,8 +22,8 @@ namespace Tendo
 			LOG_ERROR("not find config registry address");
 			return false;
 		}
-		this->mActor = std::make_unique<Actor>(0, address);
-		this->mLocationComponent = this->GetComponent<LocationComponent>();
+		this->mActor = std::make_shared<Server>(1, "RegistryServer");
+		this->mActor->AddListen("rpc", address);
 		return this->mActor->LateAwake();
 	}
 
@@ -45,30 +38,23 @@ namespace Tendo
 			message.set_group_id(config->GroupId());
 			message.set_server_id(config->ServerId());
 		}
-
 		std::vector<std::string> listens;
 		ServerConfig::Inst()->GetListen(listens);
-		for (const std::string& name: listens)
+		for(const std::string & name : listens)
 		{
-			std::string listenAddress;
-			config->GetLocation(name.c_str(), listenAddress);
-			message.mutable_listens()->insert({ name, listenAddress });
+			std::string address;
+			config->GetLocation(name.c_str(), address);
+			message.mutable_listens()->insert({name, address});
 		}
 
-#ifdef __DEBUG__
-		const std::string & addr = this->mActor->GetActorAddr();
-		LOG_INFO("start register to [" << addr << "]");
-#endif
 		do
 		{
 			int code = this->mActor->Call(func, message);
 			if (code == XCode::Successful)
 			{
-				LOG_INFO("register to [" << this->mActor->GetActorAddr() << "] successful");
+				LOG_INFO("register successful");
 				break;
 			}
-			LOG_ERROR("register to [" << this->mActor->GetActorAddr() << "] "
-									  << CodeConfig::Inst()->GetDesc(code));
 			this->mApp->GetCoroutine()->Sleep(1000 * 5);
 		}
 		while(true);
@@ -79,14 +65,9 @@ namespace Tendo
 		for(RpcService * rpcService1 : components)
 		{
 			const std::string & server = rpcService1->GetServer();
-			while(!this->mLocationComponent->HasServer(server))
+			if(this->mApp->Random(server) == nullptr)
 			{
 				this->Query(server);
-				if(!this->mLocationComponent->HasServer(server))
-				{
-					LOG_WARN("------ wait [" << server << "] start ------");
-					this->mApp->GetCoroutine()->Sleep(1000 * 2);
-				}
 			}
 		}
 	}
@@ -111,13 +92,16 @@ namespace Tendo
 			{
 				int id = info.server_id();
 				const std::string & name = info.server_name();
-				ServerUnit * locationUnit = this->mLocationComponent->GetOrCreateServer(id, name);
+				if(this->mApp->ActorMgr()->GetActor(id) == nullptr)
 				{
-					for (auto iter = info.listens().begin(); iter != info.listens().end(); iter++)
+					std::shared_ptr<Server> actor = std::make_shared<Server>(id, name);
 					{
-						const std::string& listen = iter->first;
-						const std::string& address = iter->second;
-						locationUnit->Add(listen, address);
+						auto iter = info.listens().begin();
+						for (; iter != info.listens().end(); iter++)
+						{
+							actor->AddListen(iter->first, iter->second);
+						}
+						this->mApp->ActorMgr()->AddServer(actor);
 					}
 				}
 			}

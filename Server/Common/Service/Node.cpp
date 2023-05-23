@@ -7,16 +7,10 @@
 #include"Util/String/StringHelper.h"
 #include"Server/Config/CodeConfig.h"
 #include"Cluster/Config/ClusterConfig.h"
-#include"Rpc/Component/LocationComponent.h"
 #include"Server/Component/TextConfigComponent.h"
 
 namespace Tendo
 {
-	Node::Node()
-	{
-		this->mNodeComponent = nullptr;
-	}
-
     bool Node::OnInit()
     {
 		BIND_COMMON_RPC_METHOD(Node::Ping);
@@ -26,7 +20,6 @@ namespace Tendo
 		BIND_COMMON_RPC_METHOD(Node::Hotfix);
 		BIND_COMMON_RPC_METHOD(Node::RunInfo);
 		BIND_COMMON_RPC_METHOD(Node::LoadConfig);
-		this->mNodeComponent = this->GetComponent<LocationComponent>();
 		return true;
     }
 
@@ -45,13 +38,19 @@ namespace Tendo
 			LOG_ERROR("not find cluster config : " << server);
 			return XCode::Failure;
 		}
-		ServerUnit * locationUnit = this->mNodeComponent->GetOrCreateServer(id, server);
+		if(this->mApp->ActorMgr()->GetActor(id) == nullptr)
 		{
-			auto iter = request.listens().begin();
-			for(; iter != request.listens().end(); iter++)
+			std::shared_ptr<Server> actor = std::make_shared<Server>(id, server);
 			{
-				locationUnit->Add(iter->first, iter->second);
+				auto iter = request.listens().begin();
+				for(; iter != request.listens().end(); iter++)
+				{
+					const std::string & name = iter->first;
+					const std::string & address = iter->second;
+					actor->AddListen(name, address);
+				}
 			}
+			this->mApp->ActorMgr()->AddServer(actor);
 		}
 		std::vector<IServerChange *> components;
 		this->mApp->GetComponents(components);
@@ -65,7 +64,7 @@ namespace Tendo
     int Node::Exit(const s2s::server::info &request)
 	{
 		int id = request.server_id();
-		this->mNodeComponent->DelServer(id);
+		this->mApp->ActorMgr()->DelActor(id);
 		std::vector<IServerChange*> components;
 		this->mApp->GetComponents(components);
 		for (IServerChange* listen: components)

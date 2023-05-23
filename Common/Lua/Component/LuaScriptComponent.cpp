@@ -7,7 +7,6 @@
 #include "Util/File/DirectoryHelper.h"
 #include "Async/Lua/WaitLuaTaskSource.h"
 #include "Rpc//Lua/LuaServiceTaskSource.h"
-#include "Entity/Lua/LuaApp.h"
 #include "Log/Lua/LuaLogger.h"
 #include "Util/Json/Lua/Json.h"
 #include "Async/Lua/LuaCoroutine.h"
@@ -39,11 +38,11 @@ namespace Tendo
 			os.PushStaticFunction("ms", Helper::Time::NowMilTime);
 			os.PushStaticFunction("time", Helper::Time::NowSecTime);
 #ifdef __OS_MAC__
-			os.PushMember("type", std::string("mac"));
+			os.PushMember("platform", std::string("mac"));
 #elif __OS_LINUX__
-			os.PushMember("type", std::string("linux"));
+			os.PushMember("platform", std::string("linux"));
 #elif __OS__WIN__
-			os.PushMember("type", std::string("win"));
+			os.PushMember("platform", std::string("win"));
 #endif
 
 #ifdef __DEBUG__
@@ -55,10 +54,10 @@ namespace Tendo
 		{
 			Lua::ClassProxyHelper app(this->mLuaEnv, "App");
 			app.BeginRegister<App>();
-			app.PushExtensionFunction("Send", Lua::LuaApp::Send);
-			app.PushExtensionFunction("Call", Lua::LuaApp::Call);
-			app.PushExtensionFunction("GetAddr", Lua::LuaApp::GetAddr);
-			app.PushExtensionFunction("GetComponent", Lua::LuaApp::GetComponent);
+			app.PushExtensionFunction("Send", Actor::LuaSendEx);
+			app.PushExtensionFunction("Call", Actor::LuaCallEx);
+			app.PushExtensionFunction("Random", App::LuaRandom);
+			app.PushExtensionFunction("SendToClient", Player::SendToClientEx);
 		}
 
 		Lua::ClassProxyHelper luaRegister1(this->mLuaEnv, "WaitLuaTaskSource");

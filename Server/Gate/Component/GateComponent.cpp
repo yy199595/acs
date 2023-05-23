@@ -8,14 +8,12 @@
 #include"Gate/Lua/LuaGate.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include"Lua/Engine/ClassProxyHelper.h"
-#include"Rpc/Component/LocationComponent.h"
 #include"Rpc/Component/InnerNetComponent.h"
 #include"Entity/Component/ComponentFactory.h"
 namespace Tendo
 {
 	bool GateComponent::LateAwake()
 	{
-		this->mNodeComponent = this->GetComponent<LocationComponent>();
         this->mInnerComponent = this->GetComponent<InnerNetComponent>();
 		return true;
 	}
@@ -54,7 +52,6 @@ namespace Tendo
 
 	GateComponent::GateComponent()
 	{
-		this->mNodeComponent = nullptr;
 		this->mInnerComponent = nullptr;
 	}
 }

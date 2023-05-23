@@ -9,7 +9,6 @@
 #include"Common/Service/Node.h"
 #include"Util/File/DirectoryHelper.h"
 #include"Util/File/FileHelper.h"
-#include"Rpc/Component/LocationComponent.h"
 #include"Registry/Component/RegistryComponent.h"
 namespace Tendo
 {
@@ -20,7 +19,6 @@ namespace Tendo
 		BIND_COMMON_HTTP_METHOD(ServerWeb::Login);
 		BIND_COMMON_HTTP_METHOD(ServerWeb::Hotfix);
 		BIND_COMMON_HTTP_METHOD(ServerWeb::Register);
-		LOG_CHECK_RET_FALSE(this->GetComponent<LocationComponent>());
 		LOG_CHECK_RET_FALSE(this->GetComponent<RegistryComponent>());
 		return true;
 	}
@@ -47,48 +45,12 @@ namespace Tendo
 
 	int ServerWeb::Stop(Json::Writer & response)
 	{
-		const ServerConfig * config = ServerConfig::Inst();
-		RegistryComponent * pRegistryComponent = this->GetComponent<RegistryComponent>();
-		LocationComponent * pLocationComponent = this->GetComponent<LocationComponent>();
-
-		pRegistryComponent->Query();
-		std::vector<ServerUnit *> servers;
-		pLocationComponent->GetAllServer(servers);
-		for(ServerUnit * locationUnit : servers)
-		{
-			const std::string func("Node.Stop");
-			if(locationUnit->GetId() != config->ServerId())
-			{
-
-			}
-		}
 		this->mApp->GetCoroutine()->Start(&App::Stop, this->mApp, 0);
 		return XCode::Successful;
 	}
 
 	int ServerWeb::Info(Json::Writer&response)
     {
-		RegistryComponent * pRegistryComponent = this->GetComponent<RegistryComponent>();
-		LocationComponent * pLocationComponent = this->GetComponent<LocationComponent>();
-
-		pRegistryComponent->Query();
-		std::vector<ServerUnit *> servers;
-		pLocationComponent->GetAllServer(servers);
-		response.BeginArray("list");
-		for(ServerUnit * locationUnit : servers)
-		{
-			int id = locationUnit->GetId();
-			std::string rpc, http, gate;
-			locationUnit->Get("rpc", rpc);
-			locationUnit->Get("http", http);
-			locationUnit->Get("gate", gate);
-			response.BeginObject();
-			response.Add("id").Add(id);
-			response.Add("name").Add(locationUnit->Name());
-			response.Add("rpc").Add(rpc).Add("http").Add(http).Add("gate").Add(gate);
-			response.EndObject();
-		}
-		response.EndArray();
 		return XCode::Successful;
     }
 }

@@ -7,14 +7,12 @@
 #include"Cluster/Config/ClusterConfig.h"
 #include"Server/Config/CodeConfig.h"
 #include"Util//Json/JsonWriter.h"
-#include"Rpc/Component/LocationComponent.h"
 #include"Rpc/Component/InnerNetComponent.h"
 
 namespace Tendo
 {
 	bool HttpDebugComponent::LateAwake()
 	{
-		this->mNodeComponent = this->GetComponent<LocationComponent>();
 		this->mInnerComponent = this->GetComponent<InnerNetComponent>();
 		return this->StartListen("debug");
 	}
@@ -124,12 +122,7 @@ namespace Tendo
 		ClusterConfig::Inst()->GetServerName(service, server);
 		if (id == 0)
 		{
-			int serverId = this->mNodeComponent->RangeServer(server);
-			if(this->mNodeComponent->GetServerAddress(serverId, listen, address))
-			{
-				return true;
-			}
-			return false;
+
 		}
 		return false; //TODO
 		//return this->mNodeComponent->GetServerAddress(id, server, listen, address);

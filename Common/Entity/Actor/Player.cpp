@@ -5,16 +5,23 @@
 #include"Player.h"
 #include"XCode/XCode.h"
 #include"Entity/Actor/App.h"
+#include"Lua/Engine/Define.h"
 #include"Server/Config/ServerConfig.h"
 #include"Rpc/Component/InnerNetComponent.h"
-#include"Rpc/Component/LocationComponent.h"
 namespace Tendo
 {
 	Player::Player(long long playerId, const std::string & gate)
-		: Actor(playerId, gate)
+		: Actor(playerId)
 	{
-		this->mActorComponent = App::Inst()->GetActorMgr();
+		this->mAddress = gate;
+		this->mActorComponent = App::Inst()->ActorMgr();
 	}
+
+	bool Player::OnInit()
+	{
+		return !this->mAddress.empty();
+	}
+
 	bool Player::DelAddr(const std::string& server)
 	{
 		auto iter = this->mServerAddrs.find(server);
@@ -28,6 +35,10 @@ namespace Tendo
 
 	void Player::AddAddr(const std::string& server, long long id)
 	{
+		if(server.empty() || id == 0)
+		{
+			return;
+		}
 		this->mServerAddrs[server] = id;
 	}
 
@@ -37,8 +48,7 @@ namespace Tendo
 		{
 			message->SetType(Msg::Type::Client);
 		}
-		const std::string & gate = this->GetActorAddr();
-		if(!this->mNetComponent->Send(gate, message))
+		if(!this->mNetComponent->Send(this->mAddress, message))
 		{
 			return XCode::SendMessageFail;
 		}
@@ -51,8 +61,7 @@ namespace Tendo
 		{
 			message->SetType(Msg::Type::Client);
 		}
-		const std::string & gate = this->GetActorAddr();
-		if(!this->mNetComponent->Send(gate, message))
+		if(!this->mNetComponent->Send(this->mAddress, message))
 		{
 			return XCode::SendMessageFail;
 		}
@@ -67,16 +76,22 @@ namespace Tendo
 			return XCode::NotFoundRpcConfig;
 		}
 		auto iter = this->mServerAddrs.find(methodConfig->Server);
-		if(iter  != this->mServerAddrs.end())
+		if(iter != this->mServerAddrs.end())
 		{
 			long long actorId = iter->second;
 			Actor * targetActor = this->mActorComponent->GetActor(actorId);
-			if(targetActor != nullptr)
+			if(targetActor != nullptr && targetActor->GetAddress(func, addr))
 			{
-				addr = targetActor->GetActorAddr();
 				return XCode::Successful;
 			}
 		}
 		return XCode::NotFoundPlayerRpcAddress;
+	}
+
+	int Player::SendToClientEx(lua_State* lua)
+	{
+		long long playerId = luaL_checkinteger(lua, 1);
+		const std::string func(luaL_checkstring(lua, 2));
+		return 0;
 	}
 }

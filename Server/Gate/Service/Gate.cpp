@@ -9,8 +9,6 @@
 #include"Cluster/Config/ClusterConfig.h"
 #include"Server/Config/CodeConfig.h"
 #include"Gate/Component/OuterNetComponent.h"
-#include"Rpc/Component/LocationComponent.h"
-#include"Entity/Component/PlayerMgrComponent.h"
 namespace Tendo
 {
     Gate::Gate()
@@ -31,8 +29,8 @@ namespace Tendo
 		BIND_COMMON_RPC_METHOD(Gate::Logout);
 		BIND_COMMON_RPC_METHOD(Gate::Allocation);
 		const ServerConfig* config = ServerConfig::Inst();
+		this->mActorComponent = this->mApp->ActorMgr();
 		this->mOuterComponent = this->GetComponent<OuterNetComponent>();
-		this->mPlayerComponent = this->GetComponent<PlayerMgrComponent>();
 		LOG_CHECK_RET_FALSE(config->GetLocation("rpc", this->mInnerAddress));
 		LOG_CHECK_RET_FALSE(config->GetLocation("gate", this->mOuterAddress));
 		return true;
@@ -60,11 +58,10 @@ namespace Tendo
 		this->mTokens.emplace(token, userId);
 		const std::string & server = this->GetServer();
 		const std::string & address = this->mInnerAddress;
-		std::unique_ptr<Player> player = std::make_unique<Player>(userId, address);
+		if(this->mActorComponent->GetActor(userId) != nullptr) //玩家在线
 		{
-			player->AddAddr(this->GetServer(), this->mApp->GetUnitId());
+			return XCode::Failure;
 		}
-		this->mPlayerComponent->AddPlayer(std::move(player));
 		return XCode::Successful;
     }
 	int Gate::Login(const Msg::Packet& packet)
@@ -85,7 +82,7 @@ namespace Tendo
 		int code = this->OnLogin(userId, token);
 		if(code != XCode::Successful)
 		{
-			this->mPlayerComponent->DelPlayer(userId);
+			this->mActorComponent->DelActor(userId);
 			return code;
 		}
 		this->mOuterComponent->BindClient(address, userId);
@@ -93,13 +90,23 @@ namespace Tendo
 		return XCode::Successful;
 	}
 
+	std::shared_ptr<class Player> Gate::NewPlayer(long long userId)
+	{
+		const std::string & addr = this->mInnerAddress;
+		std::shared_ptr<Player> player = std::make_shared<Player>(userId, addr);
+		{
+			player->AddAddr(this->GetServer(), this->mApp->GetActorId());
+		}
+		return player;
+	}
+
 	int Gate::OnLogin(long long userId, const std::string & token)
 	{
 		const std::string func("User.Login");
 		std::vector<const NodeConfig *> configs;
 		ClusterConfig::Inst()->GetNodeConfigs(configs);
-		ActorMgrComponent * component = this->mApp->GetActorMgr();
-		Player * player = this->mPlayerComponent->GetPlayer(userId);
+		ActorMgrComponent * component = this->mApp->ActorMgr();
+		std::shared_ptr<Player> player = this->NewPlayer(userId);
 		for(const NodeConfig * nodeConfig : configs)
 		{
 			if (!nodeConfig->IsAuthAllot())
@@ -117,21 +124,21 @@ namespace Tendo
 			int code = targetActor->Call(func, message);
 			if(code != XCode::Successful)
 			{
-				this->mPlayerComponent->DelPlayer(userId);
 				const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-				LOG_ERROR("call " << name << " [" << targetActor->GetActorAddr() << "] code = " << desc);
+				LOG_ERROR("call " << name <<  "] code = " << desc);
 				return XCode::Failure;
 			}
-			player->AddAddr(name, (int)targetActor->GetUnitId());
-			CONSOLE_LOG_INFO("add " << name << " [" << targetActor->GetActorAddr() << "] to " << userId);
+			player->AddAddr(name, targetActor->GetActorId());
+			CONSOLE_LOG_INFO("add " << name << "] to " << userId);
 		}
+		this->mActorComponent->AddPlayer(player);
 		return XCode::Successful;
 	}
 
 	int Gate::Logout(long long userId)
 	{
 		this->mOuterComponent->StopClient(userId);
-		Player * player = this->mPlayerComponent->GetPlayer(userId);
+		Actor * player = this->mApp->ActorMgr()->GetActor(userId);
 		if(player == nullptr)
 		{
 			return XCode::NotFindUser;

@@ -5,23 +5,29 @@
 #ifndef _ACTORMGRCOMPONENT_H_
 #define _ACTORMGRCOMPONENT_H_
 #include"Component.h"
-#include"Entity/Actor/Actor.h"
+#include"Entity/Actor/Server.h"
+#include"Entity/Actor/Player.h"
 namespace Tendo
 {
 	class ActorMgrComponent : public Component
 	{
 	 public:
-		bool AddActor(Actor * actor);
 		Actor * GetActor(long long id);
-		Actor * GetActor(const std::string & addr);
+		Player * GetPlayer(long long playerId);
+		Server * GetServer(long long serverId);
+	public:
+		bool AddPlayer(std::shared_ptr<Player> player);
+		bool AddServer(std::shared_ptr<Server> server);
+		void GetServers(std::vector<Server *> & servers);
+	public:
 		Actor * RandomActor(const std::string & name);
-		Actor * GetOrCreateActor(long long id, const std::string & addr);
 	 public:
 		bool DelActor(long long id);
-		bool DelActor(const std::string & addr);
-	 private:
-		std::unordered_map<long long, Actor*> mActors;
-		std::unordered_map<std::string, Actor*> mAddrActors;
+	private:
+		bool AddRandomActor(const std::string & name, Actor * actor);
+	private:
+		std::unordered_map<long long, std::shared_ptr<Server>> mServers;
+		std::unordered_map<long long, std::shared_ptr<Player>> mPlayers;
 		std::unordered_map<std::string, std::vector<long long>> mActorNames;
 	};
 }

@@ -10,45 +10,41 @@
 #include"Cluster//Config/ClusterConfig.h"
 #include"Rpc/Service/LuaRpcService.h"
 #include"Http//Service/LuaHttpService.h"
-#include"Rpc/Component/LocationComponent.h"
 #include"Lua/Component/LuaScriptComponent.h"
-#include"Rpc/Component/InnerRpcComponent.h"
 #include"Rpc/Component/InnerNetComponent.h"
 #include"Http/Component/HttpWebComponent.h"
 #include"Rpc/Component/DispatchComponent.h"
 namespace Tendo
 {
     bool LaunchComponent::Awake()
-    {
-        this->mApp->AddComponent<HttpComponent>();
-		this->mApp->AddComponent<InnerRpcComponent>();
-		if(ServerConfig::Inst()->UseLua())
+	{
+		this->mApp->AddComponent<HttpComponent>();
+		if (ServerConfig::Inst()->UseLua())
 		{
 			this->mApp->AddComponent<LuaScriptComponent>();
 		}
 		unsigned short port = 0;
-		if(ServerConfig::Inst()->GetListen("rpc", port))
+		if (!ServerConfig::Inst()->GetListen("rpc", port))
 		{
-			this->mApp->AddComponent<LocationComponent>();
-			this->mApp->AddComponent<InnerNetComponent>();
-			this->mApp->AddComponent<DispatchComponent>();
+			return false;
 		}
-		if(ServerConfig::Inst()->GetListen("http", port))
+		this->mApp->AddComponent<InnerNetComponent>();
+		this->mApp->AddComponent<DispatchComponent>();
+		if (ServerConfig::Inst()->GetListen("http", port))
 		{
-			this->mApp->AddComponent<LocationComponent>();
 			this->mApp->AddComponent<HttpWebComponent>();
 			this->mApp->AddComponent<DispatchComponent>();
 		}
 
-        std::vector<std::string> components;
+		std::vector<std::string> components;
 		const NodeConfig* nodeConfig = ClusterConfig::Inst()->GetConfig();
-        if (nodeConfig->GetComponents(components))
+		if (nodeConfig->GetComponents(components))
 		{
-			for (const std::string& name : components)
+			for (const std::string& name: components)
 			{
-				if(!this->mApp->HasComponent(name))
+				if (!this->mApp->HasComponent(name))
 				{
-					if(!this->mApp->AddComponent(name))
+					if (!this->mApp->AddComponent(name))
 					{
 						LOG_ERROR("add " << name << " error");
 						return false;
@@ -57,14 +53,14 @@ namespace Tendo
 				//CONSOLE_LOG_INFO(ServerConfig::Inst()->Name() << " add component [" << name << "]");
 			}
 		}
-        components.clear();
-        if (nodeConfig->GetServices(components) > 0)
-        {
-            for (const std::string& name : components)
-            {
-                const RpcServiceConfig* rpcServiceConfig = RpcConfig::Inst()->GetConfig(name);
-                const HttpServiceConfig* httpServiceConfig = HttpConfig::Inst()->GetConfig(name);
-                if (rpcServiceConfig != nullptr)
+		components.clear();
+		if (nodeConfig->GetServices(components) > 0)
+		{
+			for (const std::string& name: components)
+			{
+				const RpcServiceConfig* rpcServiceConfig = RpcConfig::Inst()->GetConfig(name);
+				const HttpServiceConfig* httpServiceConfig = HttpConfig::Inst()->GetConfig(name);
+				if (rpcServiceConfig != nullptr)
 				{
 					//创建实体服务
 					if (!this->mApp->AddComponent(name))
@@ -77,25 +73,25 @@ namespace Tendo
 						}
 					}
 				}
-                else if(httpServiceConfig != nullptr)
-                {
-                    if (!this->mApp->AddComponent(name))
-                    {
-                        std::unique_ptr<Component> component(new LuaHttpService());
-                        if (!this->mApp->AddComponent(name, std::move(component)))
-                        {
-                            LOG_ERROR("add http service [" << name << "] error");
-                            return false;
-                        }
-                    }
-                }
-                else
-                {
-                    LOG_ERROR("not find service config [" << name << "]");
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
+				else if (httpServiceConfig != nullptr)
+				{
+					if (!this->mApp->AddComponent(name))
+					{
+						std::unique_ptr<Component> component(new LuaHttpService());
+						if (!this->mApp->AddComponent(name, std::move(component)))
+						{
+							LOG_ERROR("add http service [" << name << "] error");
+							return false;
+						}
+					}
+				}
+				else
+				{
+					LOG_ERROR("not find service config [" << name << "]");
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 }

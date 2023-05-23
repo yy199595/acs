@@ -46,10 +46,7 @@ namespace Tendo
 		virtual void OnAddComponent(Component * component) {}
 		virtual bool OnDelComponent(Component * component) { return true; }
 	 public:
-		inline long long GetUnitId() const
-		{
-			return this->mUnitId;
-		}
+		inline long long GetUnitId() const { return this->mUnitId; }
 	 private:
 		long long mUnitId;
 		std::vector<std::string> mSortComponents;

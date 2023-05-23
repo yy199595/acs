@@ -1,14 +1,13 @@
 ﻿
 #include"App.h"
 #include"Core/System/System.h"
+#include"Lua/Engine/Define.h"
 #include"Timer/Timer/ElapsedTimer.h"
 #include"Util/File/DirectoryHelper.h"
 #include"Proto/Component/ProtoComponent.h"
-#include"Rpc/Component/LocationComponent.h"
 #include"Server/Component/TextConfigComponent.h"
 #include"Server/Component/ThreadComponent.h"
 #include"Cluster/Component/LaunchComponent.h"
-#include<csignal>
 #ifdef __OS_WIN__
 #include<Windows.h>
 #endif
@@ -19,7 +18,7 @@ using namespace std::chrono;
 namespace Tendo
 {
 
-	App::App() : Actor(ServerConfig::Inst()->ServerId(), ""),
+	App::App(int id, const std::string & name) : Server(id, name),
         mThreadId(std::this_thread::get_id()),
 				 mStartTime(Helper::Time::NowMilTime())
 	{
@@ -29,19 +28,36 @@ namespace Tendo
         this->mLogComponent = nullptr;
         this->mTaskComponent = nullptr;
         this->mTimerComponent = nullptr;
-        this->mMessageComponent = nullptr;
+		this->mActorComponent = nullptr;
+		this->mMessageComponent = nullptr;
 		this->mStatus = ServerStatus::Init;
-		this->SetName(ServerConfig::Inst()->Name());
 	}
 
 	Actor* App::Random(const std::string& name)
 	{
 		Actor * actor = this->mActorComponent->RandomActor(name);
-		if(actor == nullptr && name == this->GetName())
+		if(actor == nullptr && name == this->Name())
 		{
 			return this;
 		}
 		return actor;
+	}
+
+	int App::LuaRandom(lua_State* lua)
+	{
+		if(lua_isstring(lua, 1))
+		{
+			std::string name(lua_tostring(lua, 1));
+			Actor * actor = App::Inst()->Random(name);
+			if(actor == nullptr)
+			{
+				return 0;
+			}
+			lua_pushinteger(lua, actor->GetActorId());
+			return 1;
+		}
+		lua_pushinteger(lua, App::Inst()->GetActorId());
+		return 1;
 	}
 
 	bool App::LoadComponent()
@@ -53,7 +69,6 @@ namespace Tendo
 		this->mActorComponent = this->GetOrAddComponent<ActorMgrComponent>();
 
         LOG_CHECK_RET_FALSE(this->AddComponent<TextConfigComponent>());
-        //LOG_CHECK_RET_FALSE(this->AddComponent<LocationComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<ThreadComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<LaunchComponent>());
         std::vector<Component *> components;
@@ -68,7 +83,7 @@ namespace Tendo
 				}
 			}
         }
-		this->mActorComponent->AddActor(this);
+		this->mActorComponent->AddServer(this->shared_from_this());
         this->mTaskComponent->Start(&App::StartAllComponent, this);
         return true;
 	}
@@ -181,13 +196,13 @@ namespace Tendo
 		for(int index = 5; index >= 0; index--)
 		{
 			CONSOLE_LOG_INFO("shutdown " <<
-				ServerConfig::Inst()->Name() << " in [" << index << "s] after...");
+				this->Name() << " in [" << index << "s] after...");
 			this->mTaskComponent->Sleep(1000);
 		}
 
 		this->mMainContext->stop();
 		this->mLogComponent->SaveAllLog();
-		CONSOLE_LOG_INFO("close " << ServerConfig::Inst()->Name() << " successful ");
+		CONSOLE_LOG_INFO("close " << this->Name() << " successful ");
 		exit(signum);
 	}
 
@@ -222,7 +237,7 @@ namespace Tendo
         }
 		this->mStatus = ServerStatus::Ready;
 		long long t = Helper::Time::NowMilTime() - this->mStartTime;
-		LOG_INFO("===== start " << ServerConfig::Inst()->Name() << " successful [" << t / 1000.0f << "]s ===========");
+		LOG_INFO("===== start " << this->Name() << " successful [" << t / 1000.0f << "]s ===========");
     }
 
 #ifdef __OS_WIN__
