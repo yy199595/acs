@@ -2,9 +2,7 @@
 
 #include<list>
 #include<queue>
-#include<stack>
 #include<memory>
-#include<tuple>
 #include<functional>
 #include"Entity/Component/Component.h"
 #include"Async/Coroutine/TaskContext.h"

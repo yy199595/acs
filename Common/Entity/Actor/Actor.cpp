@@ -22,7 +22,7 @@ namespace Tendo
 	bool Actor::LateAwake()
 	{
 		this->mNetComponent = App::Inst()->GetComponent<InnerNetComponent>();
-		LOG_CHECK_RET_FALSE(this->mNetComponent);
+		LOG_CHECK_RET_FALSE(this->mNetComponent)
 		return this->OnInit();
 	}
 
@@ -33,52 +33,44 @@ namespace Tendo
 		{
 			return XCode::NotFoundServerRpcAddress;
 		}
-		std::shared_ptr<Msg::Packet> message = this->Make(func, nullptr);
-		if(!this->mNetComponent->Send(addr, message))
-		{
-			return XCode::SendMessageFail;
-		}
-		return XCode::Successful;
+		const std::shared_ptr<Msg::Packet> message = this->Make(func, nullptr);
+		return this->mNetComponent->Send(addr, message) ? XCode::Successful : XCode::SendMessageFail;
 	}
 
 	int Actor::Send(const std::string& func, const pb::Message& request)
 	{
 		std::string addr;
-		int code = this->GetAddress(func, addr);
+		const int code = this->GetAddress(func, addr);
 		if(code != XCode::Successful)
 		{
 			LOG_ERROR("call " << func << " code =" << code);
 			return code;
 		}
-		std::shared_ptr<Msg::Packet> message = this->Make(func, &request);
-		if(!this->mNetComponent->Send(addr, message))
-		{
-			return XCode::SendMessageFail;
-		}
-		return XCode::Successful;
+		const std::shared_ptr<Msg::Packet> message = this->Make(func, &request);
+		return this->mNetComponent->Send(addr, message) ? XCode::Successful : XCode::SendMessageFail;
 	}
 
 	int Actor::Call(const std::string& func)
 	{
 		std::string addr;
-		int code = this->GetAddress(func, addr);
+		const int code = this->GetAddress(func, addr);
 		if(code != XCode::Successful)
 		{
 			LOG_ERROR("call " << func << " code =" << code);
 			return code;
 		}
-		std::shared_ptr<Msg::Packet> message = std::make_shared<Msg::Packet>();
+		const std::shared_ptr<Msg::Packet> message = std::make_shared<Msg::Packet>();
 		{
 			message->SetType(Msg::Type::Request);
 			message->GetHead().Add("func", func);
 		}
 
-		std::shared_ptr<Msg::Packet> result =
+		const std::shared_ptr<Msg::Packet> result =
 			this->mNetComponent->Call(addr, message);
 		return result != nullptr ? result->GetCode() : XCode::NetWorkError;
 	}
 
-	std::shared_ptr<Msg::Packet> Actor::Make(const std::string& func, const pb::Message* request)
+	std::shared_ptr<Msg::Packet> Actor::Make(const std::string& func, const pb::Message* request) const
 	{
 		std::shared_ptr<Msg::Packet> message = std::make_shared<Msg::Packet>();
 		{
@@ -97,15 +89,15 @@ namespace Tendo
 	int Actor::Call(const std::string& func, const pb::Message& request)
 	{
 		std::string addr;
-		int code = this->GetAddress(func, addr);
+		const int code = this->GetAddress(func, addr);
 		if(code != XCode::Successful)
 		{
 			LOG_ERROR("call " << func << " code =" << code);
 			return code;
 		}
-		std::shared_ptr<Msg::Packet> message = this->Make(func, &request);
+		const std::shared_ptr<Msg::Packet> message = this->Make(func, &request);
 
-		std::shared_ptr<Msg::Packet> result =
+		const std::shared_ptr<Msg::Packet> result =
 			this->mNetComponent->Call(addr, message);
 		return result != nullptr ? result->GetCode() : XCode::NetWorkError;
 	}
@@ -119,9 +111,9 @@ namespace Tendo
 			LOG_ERROR("call " << func << " code =" << code);
 			return code;
 		}
-		std::shared_ptr<Msg::Packet> message = this->Make(func, nullptr);
+		const std::shared_ptr<Msg::Packet> message = this->Make(func, nullptr);
 
-		std::shared_ptr<Msg::Packet> result =
+		const std::shared_ptr<Msg::Packet> result =
 			this->mNetComponent->Call(addr, message);
 		code = result != nullptr ? result->GetCode() : XCode::NetWorkError;
 		if(code == XCode::Successful)
@@ -143,9 +135,9 @@ namespace Tendo
 			LOG_ERROR("call " << func << " code =" << code);
 			return code;
 		}
-		std::shared_ptr<Msg::Packet> message = this->Make(func, &request);
+		const std::shared_ptr<Msg::Packet> message = this->Make(func, &request);
 
-		std::shared_ptr<Msg::Packet> result =
+		const std::shared_ptr<Msg::Packet> result =
 			this->mNetComponent->Call(addr, message);
 		code = result != nullptr ? result->GetCode() : XCode::NetWorkError;
 		if(code == XCode::Successful)
@@ -160,7 +152,7 @@ namespace Tendo
 
 	int Actor::LuaSendEx(lua_State* lua)
 	{
-		long long actorId = luaL_checkinteger(lua, 1);
+		const long long actorId = luaL_checkinteger(lua, 1);
 		const std::string func(luaL_checkstring(lua, 2));
 		Actor * actor = App::Inst()->ActorMgr()->GetActor(actorId);
 		if(actor == nullptr)
@@ -169,18 +161,18 @@ namespace Tendo
 			return 1;
 		}
 		std::shared_ptr<Msg::Packet> message;
-		int code = actor->MakeMessage(lua, 3, func, message);
+		const int code = actor->MakeMessage(lua, 3, func, message);
 		if(code != XCode::Successful)
 		{
 			lua_pushinteger(lua, code);
 			return 1;
 		}
-		return actor->LuaCall(lua, func, message);
+		return actor->LuaSend(lua, func, message);
 	}
 
 	int Actor::LuaCallEx(lua_State* lua)
 	{
-		long long actorId = luaL_checkinteger(lua, 1);
+		const long long actorId = luaL_checkinteger(lua, 1);
 		const std::string func(luaL_checkstring(lua, 2));
 		Actor * actor = App::Inst()->ActorMgr()->GetActor(actorId);
 		if(actor == nullptr)
@@ -189,7 +181,7 @@ namespace Tendo
 			return 1;
 		}
 		std::shared_ptr<Msg::Packet> message;
-		int code = actor->MakeMessage(lua, 3, func, message);
+		const int code = actor->MakeMessage(lua, 3, func, message);
 		if(code != XCode::Successful)
 		{
 			lua_pushinteger(lua, code);
@@ -198,7 +190,8 @@ namespace Tendo
 		return actor->LuaCall(lua, func, message);
 	}
 
-	int Actor::MakeMessage(lua_State* lua, int idx, const std::string& func, std::shared_ptr<Msg::Packet>& message)
+	int Actor::MakeMessage(lua_State* lua, int idx,
+		const std::string& func, std::shared_ptr<Msg::Packet>& message) const
 	{
 		App* app = App::Inst();
 		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
@@ -222,15 +215,12 @@ namespace Tendo
 				message = this->Make(func, request.get());
 				return XCode::Successful;
 			}
-			else
-			{
-				message = this->Make(func, nullptr);
-				message->SetProto(Msg::Porto::Json);
-				Lua::RapidJson::Read(lua, idx, message->Body());
-				return XCode::Successful;
-			}
+			message = this->Make(func, nullptr);
+			message->SetProto(Msg::Porto::Json);
+			Lua::RapidJson::Read(lua, idx, message->Body());
+			return XCode::Successful;
 		}
-		else if (lua_isstring(lua, idx))
+		if (lua_isstring(lua, idx))
 		{
 			size_t count = 0;
 			message = this->Make(func, nullptr);

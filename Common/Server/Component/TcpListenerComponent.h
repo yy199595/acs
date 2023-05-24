@@ -9,7 +9,7 @@ namespace Tendo
 		TcpListenerComponent();
 		~TcpListenerComponent();
 	 public:
-        bool StopListen();
+        bool StopListen() const;
         bool StartListen(const char * name);
         unsigned short GetListenPort() const { return this->mListenPort;}
     protected:

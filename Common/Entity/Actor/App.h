@@ -1,8 +1,7 @@
 ﻿#pragma once
 #include"Network/Tcp/Asio.h"
-#include"Server/Config/ServerConfig.h"
-#include"Server/Config/ServerPath.h"
 #include"Core/Singleton/Singleton.h"
+#include"Server/Config/ServerConfig.h"
 #include"Server/Config/ServiceConfig.h"
 #include"Timer/Component/TimerComponent.h"
 #include"Async/Component/CoroutineComponent.h"
@@ -27,13 +26,14 @@ namespace Tendo
 	class App final : public Server, public Singleton<App>
 	{
 	 public:
-		explicit App(int id, const std::string & name);
+		explicit App(ServerConfig * config);
 	 public:
 		Actor * Random(const std::string & name);
         inline float GetFps() const { return this->mLogicFps; }
 		inline LogComponent* GetLogger() { return this->mLogComponent; }
 		inline Asio::Context & MainThread() { return *this->mMainContext; }
 		inline TimerComponent* GetTimer() { return this->mTimerComponent; }
+		inline const ServerConfig * Config() const { return this->mConfig; }
 		inline ProtoComponent * GetProto() { return this->mMessageComponent; }
 		inline ActorMgrComponent * ActorMgr() { return this->mActorComponent; }
 		inline CoroutineComponent* GetCoroutine() { return this->mTaskComponent; }
@@ -56,6 +56,7 @@ namespace Tendo
 		float mLogicFps;
         bool mIsStartDone;
 		ServerStatus mStatus;
+		ServerConfig * mConfig;
         std::thread::id mThreadId;
         const long long mStartTime;
 		LogComponent* mLogComponent;

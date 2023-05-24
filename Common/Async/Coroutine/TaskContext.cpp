@@ -15,8 +15,8 @@ namespace Tendo
 	{
 		this->mFunction->run();
 		delete this->mFunction;
+		this->mGroup = nullptr;
 		this->mFunction = nullptr;
-        std::move(this->mGroup);
 		this->mState = CorState::Finish;
 	}
 	TaskContext::~TaskContext()

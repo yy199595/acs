@@ -35,7 +35,7 @@ namespace Tendo
     {
 		std::string dir;
 		this->mWaitCount = 0;
-		if(ServerConfig::Inst()->GetPath("html", dir))
+		if(this->mApp->Config()->GetPath("html", dir))
 		{
 			this->AddStaticDir(dir);
 		}

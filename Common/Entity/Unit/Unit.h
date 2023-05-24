@@ -8,6 +8,7 @@ namespace Tendo
 		explicit Unit(long long id);
 		Unit(const Unit &) = delete;
 		Unit(const Unit &&) = delete;
+    	virtual ~Unit() = default;
 		Unit & operator = (const Unit &) = delete;
 	 public:
 		template<typename T>

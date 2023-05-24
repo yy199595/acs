@@ -6,12 +6,11 @@
 #define GAMEKEEPER_RPCPROXYCLIENT_H
 #include"Rpc/Client/Message.h"
 #include"Network/Tcp/TcpContext.h"
-using namespace Tcp;
 namespace Tendo
 {
     // 网关session
 	class OuterNetComponent;
- 	class OuterNetTcpClient : public Tcp::TcpContext
+ 	class OuterNetTcpClient final : public Tcp::TcpContext
 	{
 	 public:
 		OuterNetTcpClient(std::shared_ptr<Tcp::SocketProxy> socket, OuterNetComponent* component);
@@ -23,13 +22,13 @@ namespace Tendo
 	 protected:
 		void OnTimeOut() final;
         void OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t) final;
-		void OnSendMessage(const asio::error_code &code, std::shared_ptr<ProtoMessage> message) final;
+		void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
 	private:
         void CloseSocket(int code);
 	 private:
 		unsigned int mMaxQps;
         Tcp::DecodeState mState;
-        OuterNetComponent* mGateComponent;
+        OuterNetComponent* mOuterComponent;
         std::shared_ptr<Msg::Packet> mMessage;
 	};
 }

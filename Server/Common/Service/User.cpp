@@ -5,13 +5,11 @@
 #include"User.h"
 #include"Entity/Actor/App.h"
 #include"Rpc/Component/InnerNetComponent.h"
-#include"Gate/Component/GateComponent.h"
 namespace Tendo
 {
 
     bool User::Awake()
     {
-        this->mApp->AddComponent<GateComponent>();
         return true;
     }
 

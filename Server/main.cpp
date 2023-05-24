@@ -11,9 +11,6 @@
 #include"Gate/Component/OuterNetComponent.h"
 #include"Rpc/Component/DispatchComponent.h"
 
-#include"Gate/Component/GateComponent.h"
-
-
 #include"Http/Component/HttpComponent.h"
 #include"Http/Component/HttpWebComponent.h"
 #include"Http/Component/HttpDebugComponent.h"
@@ -49,8 +46,8 @@
 
 #include"WatchDog/Service/WatchDog.h"
 #include"WatchDog/Component/WatchDogComponent.h"
-#include "Server/Config/CsvTextConfig.h"
 
+#include"Server/Config/ServerConfig.h"
 using namespace Tendo;
 
 void RegisterComponent()
@@ -73,7 +70,6 @@ void RegisterComponent()
 	ComponentFactory::Add<DispatchComponent>("DispatchComponent");
 
 // gate
-	ComponentFactory::Add<GateComponent>("GateComponent");
 	ComponentFactory::Add<OuterNetComponent>("OuterNetComponent");
     ComponentFactory::Add<SqliteComponent>("SqliteComponent");
 // db
@@ -121,17 +117,15 @@ void RegisterAll()
 int main(int argc, char **argv)
 {
 #ifdef __OS_WIN__
-    system("chcp 65001 > nul");
+	system("chcp 65001 > nul");
 #endif
 	RegisterAll();
 	ServerConfig config;
 	System::Init(argc, argv);
-	if(config.LoadConfig(System::ConfigPath()))
+	if (!config.LoadConfig(System::ConfigPath()))
 	{
-		int id = config.ServerId();
-		const std::string & name = config.Name();
-		return std::make_shared<App>(id, name)->Run();
+		CONSOLE_LOG_FATAL("load config error")
+		return -1;
 	}
-	CONSOLE_LOG_FATAL("load config error");
-	return -1;
+	return std::make_shared<App>(&config)->Run();
 }

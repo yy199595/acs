@@ -18,13 +18,13 @@ namespace Tendo
     {
 		std::string path;
 		const ServerConfig * config = ServerConfig::Inst();
-		LOG_CHECK_RET_FALSE(config->GetPath("db", path));
-		LOG_CHECK_RET_FALSE(this->mConfig.LoadConfig(path));
+		LOG_CHECK_RET_FALSE(config->GetPath("db", path))
+		LOG_CHECK_RET_FALSE(this->mConfig.LoadConfig(path))
         LOG_CHECK_RET_FALSE(this->mApp->AddComponent<RedisLuaComponent>());
         LOG_CHECK_RET_FALSE(this->mApp->AddComponent<RedisStringComponent>());
 
 		Asio::Context& io = this->mApp->MainThread();
-		std::shared_ptr<Tcp::SocketProxy> socket = std::make_shared<Tcp::SocketProxy>(io, "tcp");
+		std::shared_ptr<Tcp::SocketProxy> socket = std::make_shared<Tcp::SocketProxy>(io);
 
 		socket->Init(this->Config().Address[0].Ip, this->Config().Address[0].Port);
 		this->mMainClient =	std::make_shared<RedisTcpClient>(socket, this->mConfig.Config(), this);
@@ -215,7 +215,7 @@ namespace Tendo
 			const std::string & ip = this->mConfig.Config().Address[0].Ip;
 			const unsigned int port = this->mConfig.Config().Address[0].Port;
 			ThreadComponent * component = this->GetComponent<ThreadComponent>();
-			std::shared_ptr<Tcp::SocketProxy> socketProxy = component->CreateSocket("redis", ip, port);
+			std::shared_ptr<Tcp::SocketProxy> socketProxy = component->CreateSocket(ip, port);
 			this->mSubClient = std::make_shared<RedisTcpClient>(socketProxy, this->mConfig.Config(), this);
 		}
 		if(this->mSubClient == nullptr)

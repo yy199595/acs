@@ -3,7 +3,6 @@
 //
 
 #include"WaitLuaTaskSource.h"
-#include"Lua/Engine/UserDataParameter.h"
 namespace Tendo
 {
 	WaitLuaTaskSource::WaitLuaTaskSource()

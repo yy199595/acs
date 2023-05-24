@@ -5,7 +5,6 @@
 #include"LaunchComponent.h"
 #include"Entity/Actor/App.h"
 #include"Util/File/FileHelper.h"
-#include"Core/System/System.h"
 #include"Http/Component/HttpComponent.h"
 #include"Cluster//Config/ClusterConfig.h"
 #include"Rpc/Service/LuaRpcService.h"
@@ -14,6 +13,8 @@
 #include"Rpc/Component/InnerNetComponent.h"
 #include"Http/Component/HttpWebComponent.h"
 #include"Rpc/Component/DispatchComponent.h"
+#include "Server/Config/ServerConfig.h"
+
 namespace Tendo
 {
     bool LaunchComponent::Awake()
@@ -50,7 +51,6 @@ namespace Tendo
 						return false;
 					}
 				}
-				//CONSOLE_LOG_INFO(ServerConfig::Inst()->Name() << " add component [" << name << "]");
 			}
 		}
 		components.clear();

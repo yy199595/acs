@@ -16,7 +16,7 @@ namespace Tendo
 	 public:
 		HttpComponent();
 	 public:
-		bool Download(const std::string & url, const std::string & path, bool async = true);
+		int Download(const std::string & url, const std::string & path, bool async = true);
 		std::shared_ptr<Http::DataResponse> Get(const std::string& url, bool async = true, int second = 15);
 		std::shared_ptr<Http::DataResponse> Post(const std::string& url, const std::string& data, bool async = true, int second = 15);
 	public:

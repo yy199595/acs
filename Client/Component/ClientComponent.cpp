@@ -5,7 +5,6 @@
 #include"Client/TcpRpcClientContext.h"
 #include"Lua/Client.h"
 #include"Lua/Engine/ClassProxyHelper.h"
-#include"google/protobuf/util/json_util.h"
 #include"Lua/Component/LuaScriptComponent.h"
 #include"Server/Component/ThreadComponent.h"
 #include"Proto/Component/ProtoComponent.h"
@@ -34,13 +33,13 @@ namespace Client
 
     void ClientComponent::OnMessage(std::shared_ptr<Msg::Packet> message)
     {
-        int type = message->GetType();
+        const int type = message->GetType();
         const std::string &address = message->From();
         switch (type)
         {
             case Msg::Type::Ping:
             {
-                LOG_INFO("[" << address << " ping message = " << message->GetBody());
+                LOG_INFO("[" << address << " ping message = " << message->GetBody())
             }
                 break;
             case Msg::Type::Request:
@@ -56,7 +55,7 @@ namespace Client
             }
                 break;
             default:
-            CONSOLE_LOG_ERROR("unknown message type = " << type);
+            CONSOLE_LOG_ERROR("unknown message type = " << type)
                 break;
         }
     }
@@ -118,12 +117,12 @@ namespace Client
 		Asio::Context & io = this->mApp->MainThread();
 
 		std::shared_ptr<Tcp::SocketProxy> socketProxy =
-			std::make_shared<Tcp::SocketProxy>(io, "tcp");
+			std::make_shared<Tcp::SocketProxy>(io);
 
 		socketProxy->Init(ip, port);
 		std::shared_ptr<TcpRpcClientContext> client =
 			std::make_shared<TcpRpcClientContext>(socketProxy, this);
-		CONSOLE_LOG_INFO("create new client : [" << socketProxy->GetAddress() << "]");
+		CONSOLE_LOG_INFO("create new client : [" << socketProxy->GetAddress() << "]")
 		this->mClients.emplace(id, client);
         return id;
 	}
@@ -136,7 +135,7 @@ namespace Client
 		luaRegister.PushExtensionFunction("Call", Lua::ClientEx::Call);      
 	}
 
-    void ClientComponent::OnRequest(const Msg::Packet &message)
+    void ClientComponent::OnRequest(const Msg::Packet &message) const
 	{
 		std::string tab, func;
 		if (!message.GetMethod(tab, func))
@@ -145,7 +144,7 @@ namespace Client
 		}
 		if (!this->mLuaComponent->GetFunction(tab, func))
 		{
-			LOG_ERROR("not find lua function [" << tab << "." << func << "]");
+			LOG_ERROR("not find lua function [" << tab << "." << func << "]")
 			return;
 		}
 		int count = 0;
@@ -166,7 +165,7 @@ namespace Client
 		}
 		if (lua_pcall(this->mLuaComponent->GetLuaEnv(), count, 0, 0) != LUA_OK)
 		{
-			LOG_ERROR(lua_tostring(this->mLuaComponent->GetLuaEnv(), -1));
+			LOG_ERROR(lua_tostring(this->mLuaComponent->GetLuaEnv(), -1))
 		}
 	}
 
@@ -177,15 +176,14 @@ namespace Client
 		{
 			return false;
 		}
-		std::shared_ptr<Msg::Packet> message
-				= std::make_shared<Msg::Packet>();
+		const std::shared_ptr<Msg::Packet> message = std::make_shared<Msg::Packet>();
 		{
 			message->SetType(Msg::Type::Request);
 			message->SetProto(Msg::Porto::Protobuf);
 			message->GetHead().Add("func", "Gate.Logout");
 			message->GetHead().Add("rpc", this->mNumberPool.Pop());
 		}
-		std::shared_ptr<TcpRpcClientContext> client = iter->second;
+		const std::shared_ptr<TcpRpcClientContext> client = iter->second;
 		{
 			this->mClients.erase(iter);
 			client->SendToServer(message, false);

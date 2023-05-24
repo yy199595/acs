@@ -1,7 +1,7 @@
 ﻿
 #include"App.h"
-#include"Core/System/System.h"
 #include"Lua/Engine/Define.h"
+#include"Server/Config/ServerConfig.h"
 #include"Timer/Timer/ElapsedTimer.h"
 #include"Util/File/DirectoryHelper.h"
 #include"Proto/Component/ProtoComponent.h"
@@ -18,7 +18,8 @@ using namespace std::chrono;
 namespace Tendo
 {
 
-	App::App(int id, const std::string & name) : Server(id, name),
+	App::App(ServerConfig * config) :
+		Server(config->ServerId(), config->Name()),
         mThreadId(std::this_thread::get_id()),
 				 mStartTime(Helper::Time::NowMilTime())
 	{
@@ -90,7 +91,8 @@ namespace Tendo
 
 	int App::Run()
     {
-        this->mMainContext = std::make_unique<Asio::Context>();
+		srand(time(nullptr));
+		this->mMainContext = std::make_unique<Asio::Context>();
         if (!this->LoadComponent())
         {
             this->mLogComponent->SaveAllLog();

@@ -12,7 +12,7 @@ namespace Tendo
     {
     public:
         LaunchComponent() = default;
-        ~LaunchComponent() = default;
+        ~LaunchComponent() final = default;
     private:
         bool Awake() final;
     };

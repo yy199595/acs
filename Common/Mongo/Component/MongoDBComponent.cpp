@@ -49,7 +49,7 @@ namespace Tendo
                 this->GetComponent<ThreadComponent>();
 
             std::shared_ptr<Tcp::SocketProxy> socketProxy =
-                threadComponent->CreateSocket("tcp", ip, port);
+                threadComponent->CreateSocket(ip, port);
 
             std::shared_ptr<TcpMongoClient> mongoClientContext =
                 std::make_shared<TcpMongoClient>(socketProxy, this, this->mConfig);

@@ -26,19 +26,19 @@ namespace Tendo
         rapidjson::Document document;
         this->mMaxHandlerCount = 2000;
         const ServerConfig *config = ServerConfig::Inst();
-        LOG_CHECK_RET_FALSE(config->GetPath("user", path));
+        LOG_CHECK_RET_FALSE(config->GetPath("user", path))
         config->GetMember("message", "inner", this->mMaxHandlerCount);
-        LOG_CHECK_RET_FALSE(config->GetLocation("rpc", this->mLocation));
-        LOG_CHECK_RET_FALSE(Helper::File::ReadJsonFile(path, document));
+        LOG_CHECK_RET_FALSE(config->GetLocation("rpc", this->mLocation))
+        LOG_CHECK_RET_FALSE(Helper::File::ReadJsonFile(path, document))
         auto iter = document.MemberBegin();
-        for (; iter != document.MemberEnd(); iter++)
+        for (; iter != document.MemberEnd(); ++iter)
         {
             const std::string user(iter->name.GetString());
             const std::string passwd(iter->value.GetString());
             this->mUserMaps.emplace(user, passwd);
         }
-        LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<ThreadComponent>());
-        LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<DispatchComponent>());
+        LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<ThreadComponent>())
+        LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<DispatchComponent>())
         return this->StartListen("rpc");
     }
 
@@ -50,7 +50,7 @@ namespace Tendo
     void InnerNetComponent::OnMessage(std::shared_ptr<Msg::Packet> message)
     {
         this->mSumCount++;
-        int type = message->GetType();
+        const int type = message->GetType();
 		message->SetNet(Msg::Net::Tcp);
         switch (type)
         {
@@ -69,7 +69,7 @@ namespace Tendo
                 this->mMessageComponent->OnMessage(message);
                 break;
             default:
-            LOG_FATAL("unknown message type : " << message->GetType());
+            LOG_FATAL("unknown message type : " << message->GetType())
                 break;
         }
     }
@@ -83,7 +83,6 @@ namespace Tendo
                 message->SetType(Msg::Type::Response);
                 message->GetHead().Add("code", XCode::NetWorkError);
                 this->mMessageComponent->OnMessage(message);
-                return;
             }
         }
     }
@@ -94,9 +93,9 @@ namespace Tendo
         const Msg::Head &head = message->GetHead();
         const std::string &address = message->From();
 
-        LOG_CHECK_RET_FALSE(head.Get("name", nodeInfo.SrvName));
-        LOG_CHECK_RET_FALSE(head.Get("user", nodeInfo.UserName));
-        LOG_CHECK_RET_FALSE(head.Get("passwd", nodeInfo.PassWord));
+        LOG_CHECK_RET_FALSE(head.Get("name", nodeInfo.SrvName))
+        LOG_CHECK_RET_FALSE(head.Get("user", nodeInfo.UserName))
+        LOG_CHECK_RET_FALSE(head.Get("passwd", nodeInfo.PassWord))
         return true;
     }
 
@@ -162,7 +161,7 @@ namespace Tendo
         unsigned short port = 0;
         if (!Helper::Str::SplitAddr(address, net, ip, port))
         {
-            CONSOLE_LOG_ERROR("parse address error : [" << address << "]");
+            CONSOLE_LOG_ERROR("parse address error : [" << address << "]")
             return nullptr;
         }
 		AuthInfo authInfo;
@@ -173,7 +172,7 @@ namespace Tendo
             config->GetMember("user", "name", authInfo.UserName);
             config->GetMember("user", "passwd", authInfo.PassWord);
         }
-		std::shared_ptr<Tcp::SocketProxy> socketProxy = this->mNetComponent->CreateSocket(net, ip, port);
+		std::shared_ptr<Tcp::SocketProxy> socketProxy = this->mNetComponent->CreateSocket(ip, port);
         std::shared_ptr<InnerNetTcpClient> localClient = std::make_shared<InnerNetTcpClient>(this, socketProxy, authInfo);
 
         this->mLocalClients.emplace(socketProxy->GetAddress(), localClient);
@@ -237,7 +236,7 @@ namespace Tendo
         }
         if (clientSession == nullptr)
         {
-            LOG_ERROR("not find rpc client : [" << address << "]");
+            LOG_ERROR("not find rpc client : [" << address << "]")
             return false;
         }
         clientSession->Send(message);

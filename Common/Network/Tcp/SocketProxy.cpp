@@ -2,21 +2,22 @@
 #include<spdlog/fmt/fmt.h>
 namespace Tcp
 {
-	SocketProxy::SocketProxy(asio::io_service& thread, const std::string & net)
-		: mNet(net), mNetThread(thread)
+	SocketProxy::SocketProxy(asio::io_service& thread)
+		: mNetThread(thread)
 	{
+		this->mPort = 0;
 		this->mSocket = new Asio::Socket(this->mNetThread);
 	}
 
     void SocketProxy::Init()
     {
         asio::error_code code;
-        Asio::EndPoint endPoint = this->mSocket->remote_endpoint(code);
+        const Asio::EndPoint endPoint = this->mSocket->remote_endpoint(code);
         if (this->mSocket->is_open() && !code)
         {
             this->mPort = endPoint.port();
             this->mIp = endPoint.address().to_string();
-            this->mAddress = fmt::format("{0}://{1}:{2}", this->mNet, this->mIp, this->mPort);
+            this->mAddress = fmt::format("{0}:{1}", this->mIp, this->mPort);
         }
     }
 
@@ -24,12 +25,12 @@ namespace Tcp
     {
         if(ip.empty() || port == 0)
         {
-            CONSOLE_LOG_ERROR("Inti Socket Error Address Error");
+            CONSOLE_LOG_ERROR("Inti Socket Error Address Error")
             return;
         }
 		this->mIp = ip;
 		this->mPort = port;
-        this->mAddress = fmt::format("{0}://{1}:{2}", this->mNet, ip, port);
+        this->mAddress = fmt::format("{0}:{1}", ip, port);
     }
 
     SocketProxy::~SocketProxy()
@@ -37,7 +38,7 @@ namespace Tcp
         delete this->mSocket;
     }
 
-	void SocketProxy::Close()
+	void SocketProxy::Close() const
 	{
 		if (this->mSocket->is_open())
 		{

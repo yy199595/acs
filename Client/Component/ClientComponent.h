@@ -4,7 +4,6 @@
 #include"Async/Source/TaskSource.h"
 #include"Rpc/Component/RpcTaskComponent.h"
 using namespace Tendo;
-using namespace google::protobuf;
 
 namespace Tendo
 {
@@ -39,12 +38,14 @@ namespace Client
 {
     class TcpRpcClientContext;
 
-    class ClientComponent : public RpcTaskComponent<int, Msg::Packet>,
+    class ClientComponent final : public RpcTaskComponent<int, Msg::Packet>,
             public ILuaRegister, public IDestroy, public IRpc<Msg::Packet>
     {
     public:
         ClientComponent();
         ~ClientComponent() final = default;
+        ClientComponent(const ClientComponent &) = delete;
+        ClientComponent(const ClientComponent &&) = delete;
     public:
 		bool Close(int id);
 		int New(const std::string & ip, unsigned short port);
@@ -58,7 +59,7 @@ namespace Client
         void OnCloseSocket(const std::string &address, int code) final;
         void OnTaskComplete(int key) final { this->mNumberPool.Push(key); }
     private:
-        void OnRequest(const Msg::Packet & message);
+        void OnRequest(const Msg::Packet & message) const;
 		void OnDestroy() final;
     private:
         unsigned int mIndex;

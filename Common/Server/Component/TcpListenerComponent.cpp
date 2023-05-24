@@ -22,7 +22,7 @@ namespace Tendo
 		this->mBindAcceptor->close(err);
 	}
 
-    bool TcpListenerComponent::StopListen()
+    bool TcpListenerComponent::StopListen() const
     {
 		if(this->mBindAcceptor != nullptr)
 		{
@@ -30,7 +30,7 @@ namespace Tendo
 			this->mBindAcceptor->close(code);
 			if (code)
 			{
-				CONSOLE_LOG_ERROR(code.message());
+				CONSOLE_LOG_ERROR(code.message())
 				return false;
 			}
 		}
@@ -43,7 +43,7 @@ namespace Tendo
 		this->mThreadComponent = this->GetComponent<ThreadComponent>();
 		if (!ServerConfig::Inst()->GetListen(name, this->mNet, port))
 		{
-			LOG_ERROR("not find listen config " << name);
+			LOG_ERROR("not find listen config " << name)
 			return false;
 		}
 		this->mListenPort = 0;
@@ -83,7 +83,7 @@ namespace Tendo
 #ifdef __DEBUG__
 		if(IsListen)
 		{
-			LOG_INFO(this->GetName() << " listen [" << port << "] successful use " << elapsedTimer.GetMs() << " ms");
+			LOG_INFO(this->GetName() << " listen [" << port << "] successful use " << elapsedTimer.GetMs() << " ms")
 			return true;
 		}
 #endif
@@ -102,20 +102,20 @@ namespace Tendo
 				asio::error_code ec;
                 this->mBindAcceptor->close(ec);
 				main.post(std::bind(&TcpListenerComponent::OnStopListen, this));
-				CONSOLE_LOG_ERROR("close listen " << this->GetName() << " [" << this->mListenPort << "]");
+				CONSOLE_LOG_ERROR("close listen " << this->GetName() << " [" << this->mListenPort << "]")
 				return;
             }
 			if (code)
 			{
                 socketProxy->Close();
-				CONSOLE_LOG_FATAL(this->GetName() << " " << code.message());
+				CONSOLE_LOG_FATAL(this->GetName() << " " << code.message())
 			}
 			else
 			{
                 socketProxy->Init();
                 this->mListenCount++;
 				main.post(std::bind(&TcpListenerComponent::OnListen, this, socketProxy));
-				CONSOLE_LOG_DEBUG(socketProxy->GetAddress() << " connect to " << this->GetName());
+				CONSOLE_LOG_DEBUG(socketProxy->GetAddress() << " connect to " << this->GetName())
             }
 			this->ListenConnect();
 		});

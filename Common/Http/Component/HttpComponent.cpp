@@ -3,7 +3,6 @@
 //
 #include"HttpComponent.h"
 #include"XCode/XCode.h"
-#include"Server/Config/MethodConfig.h"
 #include"Log/Component/LogComponent.h"
 #include"Server/Component/ThreadComponent.h"
 #include"Http/Client/HttpRequestClient.h"
@@ -14,7 +13,6 @@
 #include"Lua/Engine/ClassProxyHelper.h"
 #include"Http/Common/HttpRequest.h"
 #include"Util/File/DirectoryHelper.h"
-//#include"Http/Common/HttpResponse.h"
 namespace Tendo
 {
 	HttpComponent::HttpComponent()
@@ -31,7 +29,7 @@ namespace Tendo
 	std::shared_ptr<HttpRequestClient> HttpComponent::CreateClient()
 	{
         std::shared_ptr<HttpRequestClient> httpClient;
-		std::shared_ptr<Tcp::SocketProxy> socketProxy  = this->mNetComponent->CreateSocket("http");
+		std::shared_ptr<Tcp::SocketProxy> socketProxy  = this->mNetComponent->CreateSocket();
         if(!this->mClientPools.empty())
         {
             httpClient = this->mClientPools.front();
@@ -44,7 +42,7 @@ namespace Tendo
 
 	std::shared_ptr<Http::DataResponse> HttpComponent::Get(const std::string& url, bool async, int second)
     {
-        std::shared_ptr<Http::GetRequest> request(new Http::GetRequest());
+        const std::shared_ptr<Http::GetRequest> request(new Http::GetRequest());
         if (!request->SetUrl(url))
         {
             LOG_ERROR("parse " << url << " error");
@@ -58,7 +56,7 @@ namespace Tendo
 			if (response != nullptr && response->Code() != HttpStatus::OK)
 			{
 				LOG_ERROR("[GET] " << url << " error = "
-								   << HttpStatusToString(response->Code()));
+								   << HttpStatusToString(response->Code()))
 			}
 			return response;
 		}
@@ -73,7 +71,7 @@ namespace Tendo
 			if(response->Code() != HttpStatus::OK)
 			{
 				LOG_ERROR("[GET] " << url << " error = "
-								   << HttpStatusToString(response->Code()));
+								   << HttpStatusToString(response->Code()))
 			}
 			return std::static_pointer_cast<Http::DataResponse>(response);
 		}
@@ -87,14 +85,14 @@ namespace Tendo
 		luaRegister.PushExtensionFunction("Download", Lua::HttpClient::Download);
 	}
 
-	bool HttpComponent::Download(const string& url, const string& path, bool async)
-    {
+	int HttpComponent::Download(const string& url, const string& path, bool async)
+	{
 		if (!Helper::Directory::IsValidPath(path))
 		{
 			return XCode::CallArgsError;
 		}
 
-		std::shared_ptr<Http::GetRequest> request(new Http::GetRequest());
+		const std::shared_ptr<Http::GetRequest> request(new Http::GetRequest());
 		if (!request->SetUrl(url))
 		{
 			LOG_ERROR("parse " << url << " error");
@@ -103,7 +101,7 @@ namespace Tendo
 
 		if(async)
 		{
-			std::shared_ptr<HttpRequestTask> httpRpcTask = std::make_shared<HttpRequestTask>();
+			const std::shared_ptr<HttpRequestTask> httpRpcTask = std::make_shared<HttpRequestTask>();
 			std::shared_ptr<Http::IResponse> response = std::make_shared<Http::FileResponse>(path);
 			{
 				int taskId = 0;
@@ -112,17 +110,15 @@ namespace Tendo
 			}
 			return httpRpcTask->Await()->Code() == HttpStatus::OK;
 		}
-		else
+		
+		std::shared_ptr<Http::IResponse> response
+			= std::make_shared<Http::FileResponse>(path);
+		if(!this->Send(request, response))
 		{
-			std::shared_ptr<Http::IResponse> response
-				= std::make_shared<Http::FileResponse>(path);
-			if(!this->Send(request, response))
-			{
-				return false;
-			}
-			return response->Code() == HttpStatus::OK;
+			return false;
 		}
-    }
+		return response->Code() == HttpStatus::OK;
+	}
 
 	void HttpComponent::OnTaskComplete(int key)
 	{
@@ -153,7 +149,7 @@ namespace Tendo
 	std::shared_ptr<Http::DataResponse> HttpComponent::Await(const std::shared_ptr<Http::Request>& request)
 	{
 		std::shared_ptr<HttpRequestClient> httpAsyncClient = this->CreateClient();
-		std::shared_ptr<HttpRequestTask> httpRpcTask = std::make_shared<HttpRequestTask>();
+		const std::shared_ptr<HttpRequestTask> httpRpcTask = std::make_shared<HttpRequestTask>();
 		std::shared_ptr<Http::IResponse> response = std::make_shared<Http::DataResponse>();
 		{
 			int taskId = 0;
@@ -166,7 +162,7 @@ namespace Tendo
 	std::shared_ptr<Http::DataResponse> HttpComponent::Post(const std::string& url,
 			const std::string& data, bool async, int second)
     {
-        std::shared_ptr<Http::PostRequest> request(new Http::PostRequest());
+        const std::shared_ptr<Http::PostRequest> request(new Http::PostRequest());
         if (request->SetUrl(url))
         {
             return nullptr;
@@ -180,7 +176,7 @@ namespace Tendo
 			if (response != nullptr && response->Code() != HttpStatus::OK)
 			{
 				LOG_ERROR("[POST] " << url << " error = "
-									<< HttpStatusToString(response->Code()));
+									<< HttpStatusToString(response->Code()))
 			}
 			return response;
 		}
@@ -195,7 +191,7 @@ namespace Tendo
 			if (response->Code() != HttpStatus::OK)
 			{
 				LOG_ERROR("[POST] " << url << " error = "
-									<< HttpStatusToString(response->Code()));
+									<< HttpStatusToString(response->Code()))
 			}
 			return std::static_pointer_cast<Http::DataResponse>(response);
 		}
@@ -213,7 +209,7 @@ namespace Tendo
 				resolver.resolve(request->Host(), request->Port(), code);
 			if (code)
 			{
-				CONSOLE_LOG_ERROR(code.message());
+				CONSOLE_LOG_ERROR(code.message())
 				return false;
 			}
 
@@ -222,7 +218,7 @@ namespace Tendo
 
 			if (code)
 			{
-				CONSOLE_LOG_ERROR(code.message());
+				CONSOLE_LOG_ERROR(code.message())
 				return false;
 			}
 
@@ -236,7 +232,7 @@ namespace Tendo
 					asio::write(socket, requestBuf, code);
 					if (code)
 					{
-						CONSOLE_LOG_ERROR(code.message());
+						CONSOLE_LOG_ERROR(code.message())
 						return false;
 					}
 				}
@@ -247,7 +243,7 @@ namespace Tendo
 			asio::read_until(socket, responseBuf, "\r\n", code);
 			if (code)
 			{
-				CONSOLE_LOG_ERROR(code.message());
+				CONSOLE_LOG_ERROR(code.message())
 				return false;
 			}
 		ON_READ_HANDLE:
@@ -258,7 +254,7 @@ namespace Tendo
 				asio::read_until(socket, responseBuf, "\r\n", code);
 				if (code)
 				{
-					CONSOLE_LOG_ERROR(code.message());
+					CONSOLE_LOG_ERROR(code.message())
 					return false;
 				}
 				goto ON_READ_HANDLE;
@@ -272,7 +268,7 @@ namespace Tendo
 						response->OnComplete();
 						return true;
 					}
-					CONSOLE_LOG_ERROR(code.message());
+					CONSOLE_LOG_ERROR(code.message())
 					return false;
 				}
 				goto ON_READ_HANDLE;
@@ -291,7 +287,7 @@ namespace Tendo
 						response->OnComplete();
 						return true;
 					}
-					CONSOLE_LOG_ERROR(code.message());
+					CONSOLE_LOG_ERROR(code.message())
 					return false;
 				}
 				goto ON_READ_HANDLE;
@@ -300,7 +296,7 @@ namespace Tendo
 		}
 		catch(asio::system_error & code)
 		{
-			CONSOLE_LOG_DEBUG(code.what());
+			CONSOLE_LOG_DEBUG(code.what())
 			return false;
 		}
 	}

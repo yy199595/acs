@@ -30,12 +30,12 @@ namespace Tendo
 		static int LuaCallEx(lua_State * lua);
 		static int LuaSendEx(lua_State * lua);
 	 public:
-		long long GetActorId() { return this->GetUnitId(); }
+		long long GetActorId() const { return this->GetUnitId(); }
 		virtual int GetAddress(const std::string & func, std::string & addr) = 0;
 	protected:
 		virtual bool OnInit() = 0;
-		std::shared_ptr<Msg::Packet> Make(const std::string & func, const pb::Message * message);
-		int MakeMessage(lua_State * lua, int idx, const std::string & func, std::shared_ptr<Msg::Packet> & message);
+		std::shared_ptr<Msg::Packet> Make(const std::string & func, const pb::Message * message) const;
+		int MakeMessage(lua_State * lua, int idx, const std::string & func, std::shared_ptr<Msg::Packet> & message) const;
 	protected:
 		class InnerNetComponent * mNetComponent;
 	};

@@ -26,6 +26,7 @@ namespace Tendo
 	{
 	 public:
 		explicit Component();
+		virtual ~Component() = default;
 		Component(const Component &) = delete;
 		Component(const Component &&) = delete;
 		Component & operator =(const Component &) = delete;

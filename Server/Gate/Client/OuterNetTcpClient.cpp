@@ -12,7 +12,7 @@ namespace Tendo
 {
 	OuterNetTcpClient::OuterNetTcpClient(std::shared_ptr<Tcp::SocketProxy> socket,
                                    OuterNetComponent* component)
-		: TcpContext(socket), mGateComponent(component)
+		: TcpContext(socket), mOuterComponent(component)
 	{
         this->mState = Tcp::DecodeState::Head;
 	}
@@ -35,7 +35,7 @@ namespace Tendo
 	{
 		Asio::Context & t = App::Inst()->MainThread();
 		const std::string& address = this->mSocket->GetAddress();
-		t.post(std::bind(&OuterNetComponent::OnTimeout, this->mGateComponent, address));
+		t.post(std::bind(&OuterNetComponent::OnTimeout, this->mOuterComponent, address));
 	}
 
     void OuterNetTcpClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t size)
@@ -79,8 +79,7 @@ namespace Tendo
 				this->mGateComponent->OnMessage(std::move(this->mMessage));
 #else
 				Asio::Context& io = App::Inst()->MainThread();
-				io.post(std::bind(&OuterNetComponent::OnMessage,
-					this->mGateComponent, this->mMessage));
+				io.post(std::bind(&OuterNetComponent::OnMessage, this->mOuterComponent, this->mMessage));
 #endif
 			}
 				break;
@@ -96,11 +95,11 @@ namespace Tendo
         this->mGateComponent->OnCloseSocket(address, code);
 #else
         Asio::Context& mainTaskScheduler = App::Inst()->MainThread();
-        mainTaskScheduler.post(std::bind(&OuterNetComponent::OnCloseSocket, this->mGateComponent, address, code));
+        mainTaskScheduler.post(std::bind(&OuterNetComponent::OnCloseSocket, this->mOuterComponent, address, code));
 #endif
         }
 
-	void OuterNetTcpClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
+	void OuterNetTcpClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<Tcp::ProtoMessage> message)
 	{
 		if(code)
 		{
