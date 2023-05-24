@@ -6,50 +6,32 @@
 #include"Util/String/StringHelper.h"
 namespace Tendo
 {
-    bool CodeConfig::OnLoadText(const char *str, size_t length)
+
+    bool CodeConfig::OnLoadLine(const CsvLineData& lineData)
     {
-        size_t start = 0;
-        std::vector<std::string> lines;
-        for(size_t index = 0; index < length; index++)
+        std::unique_ptr<CodeLineConfig> lineConfig = std::make_unique<CodeLineConfig>();
         {
-            if(str[index] == '\n')
-            {
-                lines.emplace_back(str + start, index - start);
-                start = index;
-            }
+            lineData.Get("Name", lineConfig->Name);
+            lineData.Get("Desc", lineConfig->Desc);
+            lineConfig->Code = (int)this->mConfigs.size();
         }
-        std::vector<std::string> rets;
-        for(size_t index = 0; index < lines.size() -1; index++)
-        {
-            rets.clear();
-            if(Helper::Str::Split(lines[index + 1], ",", rets) != 2)
-            {
-                return false;
-            }
-            std::unique_ptr<CodeLineConfig> lineConfig(new CodeLineConfig());
-            {
-                lineConfig->Name = rets[0];
-                lineConfig->Desc = rets[1];
-                lineConfig->Code = index;
-            }
-            this->mConfigs.emplace(lineConfig->Code, std::move(lineConfig));
-        }
+        this->mConfigs.emplace(lineConfig->Code, std::move(lineConfig));
         return true;
     }
 
+    bool CodeConfig::OnReLoadLine(const CsvLineData& lineData)
+    {
+        return true;
+    }
+    
     const std::string & CodeConfig::GetDesc(int code) const
     {
-        static const std::string unknow("unknow error");
+        static const std::string unknown("unknown error");
         auto iter = this->mConfigs.find((int)code);
         if(iter != this->mConfigs.end())
         {
             return iter->second->Desc;
         }
-        return unknow;
-    }
-
-    bool CodeConfig::OnReloadText(const char *str, size_t length)
-    {
-        return true;
+        return unknown;
     }
 }

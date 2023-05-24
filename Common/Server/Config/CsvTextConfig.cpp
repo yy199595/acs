@@ -94,7 +94,7 @@ namespace Tendo
 		}
 		std::vector<std::string> fields;
 		std::vector<std::string> values;
-		if(Helper::Str::Split(line, ",", fields) == 0)
+		if(Helper::Str::Split(line, ',', fields) == 0)
 		{
 			return false;
 		}
@@ -107,7 +107,7 @@ namespace Tendo
 			}
 			values.clear();
 			CsvLineData lineData;
-			if(Helper::Str::Split(line, ",", values) != size)
+			if(Helper::Str::Split(line, ',', values) != size)
 			{
 				return false;
 			}
@@ -144,7 +144,7 @@ namespace Tendo
 		}
 		std::vector<std::string> fields;
 		std::vector<std::string> values;
-		if(Helper::Str::Split(line, ",", fields) == 0)
+		if(Helper::Str::Split(line, ',', fields) == 0)
 		{
 			return false;
 		}
@@ -161,7 +161,7 @@ namespace Tendo
 				line.pop_back();
 			}
 			CsvLineData lineData;
-			if(Helper::Str::Split(line, ",", values) != size)
+			if(Helper::Str::Split(line, ',', values) != size)
 			{
 				return false;
 			}

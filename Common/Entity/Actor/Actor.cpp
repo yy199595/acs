@@ -5,6 +5,7 @@
 #include"Actor.h"
 #include"XCode/XCode.h"
 #include"Rpc/Client/Message.h"
+#include"Util/Time/TimeHelper.h"
 #include"Lua/Engine/LuaParameter.h"
 #include"Proto/Include/MessageJson.h"
 #include"Util/Json/Lua/Json.h"
@@ -17,13 +18,14 @@ namespace Tendo
 		: Unit(id)
 	{
 		this->mNetComponent = nullptr;
+		this->mLastTime = Helper::Time::NowSecTime();
 	}
 
 	bool Actor::LateAwake()
 	{
 		this->mNetComponent = App::Inst()->GetComponent<InnerNetComponent>();
-		LOG_CHECK_RET_FALSE(this->mNetComponent)
-		return this->OnInit();
+		LOG_CHECK_RET_FALSE(this->mNetComponent != nullptr && this->OnInit());
+		return true;
 	}
 
 	int Actor::Send(const std::string& func)
@@ -33,6 +35,7 @@ namespace Tendo
 		{
 			return XCode::NotFoundServerRpcAddress;
 		}
+		this->mLastTime = Helper::Time::NowSecTime();
 		const std::shared_ptr<Msg::Packet> message = this->Make(func, nullptr);
 		return this->mNetComponent->Send(addr, message) ? XCode::Successful : XCode::SendMessageFail;
 	}
@@ -46,6 +49,7 @@ namespace Tendo
 			LOG_ERROR("call " << func << " code =" << code);
 			return code;
 		}
+		this->mLastTime = Helper::Time::NowSecTime();
 		const std::shared_ptr<Msg::Packet> message = this->Make(func, &request);
 		return this->mNetComponent->Send(addr, message) ? XCode::Successful : XCode::SendMessageFail;
 	}
@@ -64,9 +68,8 @@ namespace Tendo
 			message->SetType(Msg::Type::Request);
 			message->GetHead().Add("func", func);
 		}
-
-		const std::shared_ptr<Msg::Packet> result =
-			this->mNetComponent->Call(addr, message);
+		this->mLastTime = Helper::Time::NowSecTime();
+		const std::shared_ptr<Msg::Packet> result = this->mNetComponent->Call(addr, message);
 		return result != nullptr ? result->GetCode() : XCode::NetWorkError;
 	}
 
@@ -95,10 +98,9 @@ namespace Tendo
 			LOG_ERROR("call " << func << " code =" << code);
 			return code;
 		}
+		this->mLastTime = Helper::Time::NowSecTime();
 		const std::shared_ptr<Msg::Packet> message = this->Make(func, &request);
-
-		const std::shared_ptr<Msg::Packet> result =
-			this->mNetComponent->Call(addr, message);
+		const std::shared_ptr<Msg::Packet> result = this->mNetComponent->Call(addr, message);
 		return result != nullptr ? result->GetCode() : XCode::NetWorkError;
 	}
 
@@ -111,10 +113,9 @@ namespace Tendo
 			LOG_ERROR("call " << func << " code =" << code);
 			return code;
 		}
+		this->mLastTime = Helper::Time::NowSecTime();
 		const std::shared_ptr<Msg::Packet> message = this->Make(func, nullptr);
-
-		const std::shared_ptr<Msg::Packet> result =
-			this->mNetComponent->Call(addr, message);
+		const std::shared_ptr<Msg::Packet> result = this->mNetComponent->Call(addr, message);
 		code = result != nullptr ? result->GetCode() : XCode::NetWorkError;
 		if(code == XCode::Successful)
 		{
@@ -135,10 +136,9 @@ namespace Tendo
 			LOG_ERROR("call " << func << " code =" << code);
 			return code;
 		}
+		this->mLastTime = Helper::Time::NowSecTime();
 		const std::shared_ptr<Msg::Packet> message = this->Make(func, &request);
-
-		const std::shared_ptr<Msg::Packet> result =
-			this->mNetComponent->Call(addr, message);
+		const std::shared_ptr<Msg::Packet> result = this->mNetComponent->Call(addr, message);
 		code = result != nullptr ? result->GetCode() : XCode::NetWorkError;
 		if(code == XCode::Successful)
 		{
@@ -240,6 +240,7 @@ namespace Tendo
 			lua_pushinteger(lua, XCode::NotFoundPlayerRpcAddress);
 			return 1;
 		}
+		this->mLastTime = Helper::Time::NowSecTime();
 		return this->mNetComponent->LuaCall(lua, address, message);
 	}
 
@@ -254,6 +255,7 @@ namespace Tendo
 				code = XCode::NotFoundPlayerRpcAddress;
 				break;
 			}
+			this->mLastTime = Helper::Time::NowSecTime();
 			if(!this->mNetComponent->Send(address, message))
 			{
 				code = XCode::SendMessageFail;

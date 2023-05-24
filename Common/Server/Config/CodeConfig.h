@@ -5,8 +5,8 @@
 #pragma once
 #include<memory>
 #include<unordered_map>
-#include"Server/Config/TextConfig.h"
 #include"Core/Singleton/Singleton.h"
+#include"Server/Config/CsvTextConfig.h"
 namespace Tendo
 {
     class CodeLineConfig
@@ -17,15 +17,15 @@ namespace Tendo
         std::string Desc;
     };
 
-    class CodeConfig : public TextConfig, public ConstSingleton<CodeConfig>
+    class CodeConfig : public CsvTextConfig, public ConstSingleton<CodeConfig>
     {
     public:
-        CodeConfig() : TextConfig("CodeConfig") { }
+        CodeConfig() : CsvTextConfig("CodeConfig") { }
     public:
         const std::string & GetDesc(int code) const;
     private:
-        bool OnLoadText(const char *str, size_t length) final;
-        bool OnReloadText(const char *str, size_t length) final;
+        bool OnLoadLine(const CsvLineData& lineData) final;
+        bool OnReLoadLine(const CsvLineData& lineData) final;
     private:
         std::unordered_map<int, std::unique_ptr<CodeLineConfig>> mConfigs;
     };

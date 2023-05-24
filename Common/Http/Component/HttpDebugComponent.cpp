@@ -30,7 +30,7 @@ namespace Tendo
 		{
 			this->Send(address, "please use post call");
 		}
-		else if (Helper::Str::Split(path, "/", splitPath) != 2)
+		else if (Helper::Str::Split(path, '/', splitPath) != 2)
 		{
 			this->Send(address, "request path error");
 		}

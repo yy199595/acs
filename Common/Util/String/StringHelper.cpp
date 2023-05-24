@@ -1,6 +1,7 @@
 ﻿#include"StringHelper.h"
 #include"Util/Md5/MD5.h"
 #include<regex>
+#include<sstream>
 #include"Util/Math/MathHelper.h"
 namespace Helper
 {
@@ -21,9 +22,14 @@ namespace Helper
         std::transform(str.begin(), str.end(), str.begin(), ::toupper);
     }
 
-    size_t Str::Split(const std::string &targetString, const char * cc, std::vector<std::string>& ret)
+    size_t Str::Split(const std::string &targetString, char cc, std::vector<std::string>& ret)
     {
-		//TODO
+        std::string item;
+        std::stringstream ss(targetString);
+        while (std::getline(ss, item, cc)) 
+        {
+            ret.emplace_back(item);
+        }
         return ret.size();
     }
 

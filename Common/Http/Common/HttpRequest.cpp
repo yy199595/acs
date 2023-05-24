@@ -12,7 +12,7 @@ namespace Http
     Parameter::Parameter(const std::string & content)
     {
         std::vector<std::string> result;
-        if(Helper::Str::Split(content, "&", result) > 0)
+        if(Helper::Str::Split(content, '&', result) > 0)
         {
             for (const std::string &filed: result)
             {

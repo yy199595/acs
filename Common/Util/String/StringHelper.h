@@ -29,7 +29,7 @@ namespace Helper
 
         extern void ReplaceString(std::string &outstring, const std::string& str1, const std::string& str2);
 
-        extern size_t Split(const std::string &targetString, const char * cc, std::vector<std::string> &ret);
+        extern size_t Split(const std::string &targetString, char cc, std::vector<std::string> &ret);
     }
 
     namespace Str

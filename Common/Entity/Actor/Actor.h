@@ -38,6 +38,8 @@ namespace Tendo
 		int MakeMessage(lua_State * lua, int idx, const std::string & func, std::shared_ptr<Msg::Packet> & message) const;
 	protected:
 		class InnerNetComponent * mNetComponent;
+	private:
+		long long mLastTime;
 	};
 }
 

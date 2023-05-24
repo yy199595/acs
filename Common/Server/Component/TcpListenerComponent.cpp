@@ -92,7 +92,7 @@ namespace Tendo
 	void TcpListenerComponent::ListenConnect()
 	{
         std::shared_ptr<Tcp::SocketProxy> socketProxy
-            = this->mThreadComponent->CreateSocket(this->mNet);
+            = this->mThreadComponent->CreateSocket();
 		this->mBindAcceptor->async_accept(socketProxy->GetSocket(),
 			[this, socketProxy](const asio::error_code & code)
 		{

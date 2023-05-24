@@ -21,7 +21,7 @@ namespace Tendo
 	App::App(ServerConfig * config) :
 		Server(config->ServerId(), config->Name()),
         mThreadId(std::this_thread::get_id()),
-				 mStartTime(Helper::Time::NowMilTime())
+		mStartTime(Helper::Time::NowMilTime()), mConfig(config)
 	{
         this->mLogicFps = 0;
         this->mTickCount = 0;
@@ -84,6 +84,17 @@ namespace Tendo
 				}
 			}
         }
+		std::vector<std::string> listens;
+		this->mConfig->GetListen(listens);
+		for (const std::string& name : listens)
+		{
+			std::string address;
+			const char* key = name.c_str();
+			if (this->mConfig->GetLocation(key, address))
+			{
+				this->AddListen(name, address);
+			}
+		}
 		this->mActorComponent->AddServer(this->shared_from_this());
         this->mTaskComponent->Start(&App::StartAllComponent, this);
         return true;
@@ -96,6 +107,7 @@ namespace Tendo
         if (!this->LoadComponent())
         {
             this->mLogComponent->SaveAllLog();
+			CONSOLE_LOG_ERROR("init component failure");
 #ifdef __OS_WIN__
             return getchar();
 #endif

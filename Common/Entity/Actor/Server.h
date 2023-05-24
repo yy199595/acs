@@ -13,6 +13,7 @@ namespace Tendo
 	public:
 		explicit Server(int id, const std::string & name);
 	public:
+		static int GetListenEx(lua_State * lua);
 		bool GetListen(const std::string & name, std::string & addr);
 		void AddListen(const std::string & name, const std::string & addr);
 		int GetAddress(const std::string &func, std::string &addr) final;

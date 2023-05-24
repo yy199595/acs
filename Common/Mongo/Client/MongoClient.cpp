@@ -94,7 +94,7 @@ namespace Mongo
         std::string parsedSource = _bson::base64::decode(server_first);
 
         std::vector<std::string> ret;
-        Helper::Str::Split(parsedSource, ",", ret);
+        Helper::Str::Split(parsedSource, ',', ret);
 
         std::string salt(ret[1].c_str() + 2, ret[1].size() - 2);
         std::string rnonce(ret[0].c_str() + 2, ret[0].size() - 2);

@@ -38,16 +38,14 @@ namespace Tendo
 			LOG_ERROR("not find cluster config : " << server);
 			return XCode::Failure;
 		}
-		if(this->mApp->ActorMgr()->GetActor(id) == nullptr)
+		if(this->mApp->ActorMgr()->GetServer(id) == nullptr)
 		{
 			std::shared_ptr<Server> actor = std::make_shared<Server>(id, server);
 			{
 				auto iter = request.listens().begin();
 				for(; iter != request.listens().end(); iter++)
 				{
-					const std::string & name = iter->first;
-					const std::string & address = iter->second;
-					actor->AddListen(name, address);
+					actor->AddListen(iter->first, iter->second);
 				}
 			}
 			this->mApp->ActorMgr()->AddServer(actor);

@@ -57,6 +57,7 @@ namespace Tendo
 			app.PushExtensionFunction("Send", Actor::LuaSendEx);
 			app.PushExtensionFunction("Call", Actor::LuaCallEx);
 			app.PushExtensionFunction("Random", App::LuaRandom);
+			app.PushExtensionFunction("GetListen", App::GetListenEx);
 			app.PushExtensionFunction("SendToClient", Player::SendToClientEx);
 		}
 

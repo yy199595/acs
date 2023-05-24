@@ -31,7 +31,7 @@ namespace Tendo
 	{
 		std::vector<std::string> result;
 		const std::string name = message.GetTypeName();
-		if(!Helper::Str::Split(name, ".", result))
+		if(!Helper::Str::Split(name, '.', result))
 		{
 			return false;
 		}
