@@ -79,7 +79,7 @@ namespace Tendo
         {
             for (RpcService *component: components)
             {
-                // TODO
+				component->Stop();
             }
         }
 		const ServerConfig * config = ServerConfig::Inst();

@@ -17,8 +17,7 @@ namespace Tendo
 	class RpcMethodConfig;
 	class RpcServiceConfig;
 	class InnerNetTcpClient;
-	class RpcService : public Component, public IStart, public IComplete,
-			public IDestroy, public ISecondUpdate, public IHotfix
+	class RpcService : public Component, public IStart, public IComplete, public ISecondUpdate, public IHotfix
 	{
 	public:
 		RpcService();
@@ -32,10 +31,10 @@ namespace Tendo
 	private:
 		void Start() final;
 		void Complete() final;
-		void OnDestroy() final;
 		void OnHotFix() final;
 		void OnSecondUpdate(int tick) final;
 	public:
+		void Stop();
 		Lua::LuaModule * GetLuaModule() { return this->mLuaModule; }
 		const std::string& GetServer() const { return this->mCluster; }
 		int Invoke(const std::string& method, const std::shared_ptr<Msg::Packet>& message);

@@ -80,7 +80,7 @@ namespace Tendo
 			if (message.ConstHead().Get("id", userId))
 			{
 				lua_pushinteger(lua, userId);
-				lua_setfield(lua, -2, "userId");
+				lua_setfield(lua, -2, "id");
 			}
 			{
 				const std::string& from = message.From();
@@ -208,7 +208,7 @@ namespace Tendo
 		}
 	}
 
-	void RpcService::OnDestroy()
+	void RpcService::Stop()
 	{
 		this->OnStop();
 		if(this->mLuaModule != nullptr)

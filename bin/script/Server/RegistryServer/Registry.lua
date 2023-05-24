@@ -18,7 +18,7 @@ end
 function Registry.Register(request)
     local address = request.from
     local message = request.message
-
+    table.print(request)
     local data = {
         last_ping_time = os.time(),
         server_id = message.server_id,
