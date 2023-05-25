@@ -14,6 +14,7 @@ namespace Tendo
 		Player(long long playerId, int gate);
 	public:
 		bool OnInit() final;
+		void OnRegister(std::string &json) final;
 		bool DelAddr(const std::string & server);
 		void GetActors(std::vector<int> & actors) const;
 		void AddAddr(const std::string & server, int id);

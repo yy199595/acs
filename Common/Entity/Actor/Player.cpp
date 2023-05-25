@@ -11,7 +11,7 @@
 namespace Tendo
 {
 	Player::Player(long long playerId, int gateId)
-		: Actor(playerId)
+		: Actor(playerId, "Player")
 	{
 		this->mGateId = gateId;
 		this->mActorComponent = App::Inst()->ActorMgr();
@@ -113,5 +113,17 @@ namespace Tendo
 			return XCode::NotFoundActor;
 		}
 		return gateActor->Send(message);
+	}
+	void Player::OnRegister(std::string& json)
+	{
+		Json::Writer jsonWriter;
+		auto iter = this->mServerAddrs.begin();
+		for(; iter != this->mServerAddrs.end(); iter++)
+		{
+			const std::string & name = iter->first;
+			jsonWriter.Add(name).Add(iter->second);
+		}
+		jsonWriter.Add("time").Add(Helper::Time::NowSecTime());
+		jsonWriter.WriterStream(&json);
 	}
 }

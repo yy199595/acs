@@ -19,7 +19,7 @@
             "Request": "s2s.allot.request"
         }
     },
-    "Registry": {
+    "ActorRegistry": {
         "Ping": {
             "Async": false
         },

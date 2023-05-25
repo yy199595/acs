@@ -16,12 +16,12 @@ namespace Tendo
         Node() = default;
         ~Node() = default;
     private:
-        int Stop();
         int Hotfix();
-        int LoadConfig();
+		int Shutdown();
+		int LoadConfig();
 		int Ping(const Msg::Packet& packet);
-		int Join(const s2s::server::info& request); //新服务器加入
-        int Exit(const s2s::server::info& request); //服务器退出
+		int Join(const s2s::registry::request& request); //新服务器加入
+        int Exit(const s2s::registry::request& request); //服务器退出
         int RunInfo(com::type::string& response); // 获取运行信息
     private:
 		bool OnInit() final;

@@ -45,6 +45,7 @@
 #include"Sqlite/Component/SqliteComponent.h"
 
 #include"WatchDog/Service/WatchDog.h"
+#include"Registry/Service/ActorRegistry.h"
 #include"WatchDog/Component/WatchDogComponent.h"
 
 #include"Server/Config/ServerConfig.h"
@@ -103,11 +104,11 @@ void RegisterAll()
 	RegisterComponent();
 	ComponentFactory::Add<Log>("Log");
 	ComponentFactory::Add<Gate>("Gate");
-	ComponentFactory::Add<Login>("Login");
     ComponentFactory::Add<Node>("Node");
-    ComponentFactory::Add<WatchDog>("WatchDog");
-
-    ComponentFactory::Add<MongoDB>("MongoDB");
+	ComponentFactory::Add<Login>("Login");
+	ComponentFactory::Add<MongoDB>("MongoDB");
+	ComponentFactory::Add<WatchDog>("WatchDog");
+	ComponentFactory::Add<ActorRegistry>("ActorRegistry");
 
 #ifdef __ENABLE_MYSQL__
     ComponentFactory::Add<MysqlDB>("MysqlDB");

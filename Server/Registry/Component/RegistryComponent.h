@@ -18,9 +18,6 @@ namespace Tendo
 		void Complete() final;
 		bool LateAwake() final;
 		bool RegisterServer();
-	private:
-		std::shared_ptr<class Server> mActor;
-		std::shared_ptr<RedisTcpClient> mMainClient;
 	};
 }
 

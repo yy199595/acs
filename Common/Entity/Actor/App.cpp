@@ -68,6 +68,13 @@ namespace Tendo
 				this->AddListen(name, address);
 			}
 		}
+		std::string address;
+		LOG_CHECK_RET_FALSE(this->mConfig->GetPath("registry", address));
+		std::shared_ptr<Server> actor = std::make_shared<Server>(0, "Registry");
+		{
+			actor->AddListen("rpc", address);
+			this->mActorComponent->AddServer(actor);
+		}
 		this->mActorComponent->AddServer(this->shared_from_this());
         this->mTaskComponent->Start(&App::StartAllComponent, this);
         return true;

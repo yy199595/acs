@@ -9,7 +9,7 @@
 namespace Tendo
 {
 	Server::Server(int id, const std::string & name)
-		: Actor(id), mName(name), mRpc("rpc")
+		: Actor(id, name), mRpc("rpc")
 	{
 
 	}
@@ -62,5 +62,16 @@ namespace Tendo
 			return XCode::SendMessageFail;
 		}
 		return XCode::Successful;
+	}
+	void Server::OnRegister(std::string& json)
+	{
+		Json::Writer jsonWriter;
+		auto iter = this->mListens.begin();
+		jsonWriter.Add("name").Add(this->Name());
+		for(; iter != this->mListens.end(); iter++)
+		{
+			jsonWriter.Add(iter->first).Add(iter->second);
+		}
+		jsonWriter.Add("time").Add(Helper::Time::NowSecTime());
 	}
 }

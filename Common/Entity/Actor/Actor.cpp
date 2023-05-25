@@ -14,8 +14,8 @@
 #include"Proto/Component/ProtoComponent.h"
 namespace Tendo
 {
-	Actor::Actor(long long id)
-		: Unit(id)
+	Actor::Actor(long long id, const std::string & name)
+		: Unit(id), mName(name)
 	{
 		this->mNetComponent = nullptr;
 		this->mLastTime = Helper::Time::NowSecTime();

@@ -19,11 +19,10 @@ namespace Tendo
 		int GetAddress(const std::string &func, std::string &addr) final;
 	public:
 		bool OnInit() final;
-		const std::string & Name() const { return this->mName; }
+		void OnRegister(std::string &json) final;
 		const std::string & Address() const { return this->mRpcAddress; }
 	private:
 		std::string mRpc;
-		std::string mName;
 		std::string mRpcAddress;
 		std::unordered_map<std::string, std::string> mListens;
 	};
