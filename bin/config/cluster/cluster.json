@@ -12,7 +12,7 @@
     "ChatServer": {
         "AutoAllot": true,
         "Service": [
-            "User",
+            "Login",
             "Node",
             "Chat"
         ],

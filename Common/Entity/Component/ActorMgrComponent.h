@@ -20,7 +20,7 @@ namespace Tendo
 		bool AddServer(std::shared_ptr<Server> server);
 		void GetServers(std::vector<Server *> & servers);
 	public:
-		Actor * RandomActor(const std::string & name);
+		Server * Random(const std::string & name);
 	 public:
 		bool DelActor(long long id);
 	private:

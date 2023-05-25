@@ -15,6 +15,7 @@
 #include "Util/Json/JsonWriter.h"
 #include "Lua/Engine/Function.h"
 #include "Lua/Module/LuaModule.h"
+#include "Entity/Lua/LuaActor.h"
 #include "Lua/Engine/ClassProxyHelper.h"
 #include "Server/Component/TextConfigComponent.h"
 
@@ -54,11 +55,11 @@ namespace Tendo
 		{
 			Lua::ClassProxyHelper app(this->mLuaEnv, "App");
 			app.BeginRegister<App>();
-			app.PushExtensionFunction("Send", Actor::LuaSendEx);
-			app.PushExtensionFunction("Call", Actor::LuaCallEx);
-			app.PushExtensionFunction("Random", App::LuaRandom);
-			app.PushExtensionFunction("GetListen", App::GetListenEx);
-			app.PushExtensionFunction("SendToClient", Player::SendToClientEx);
+			app.PushExtensionFunction("Send", LuaActor::Send);
+			app.PushExtensionFunction("Call", LuaActor::Call);
+			app.PushExtensionFunction("Random", LuaActor::Random);
+			app.PushExtensionFunction("GetListen", LuaActor::GetListen);
+			app.PushExtensionFunction("SendToClient", LuaActor::SendToClient);
 		}
 
 		Lua::ClassProxyHelper luaRegister1(this->mLuaEnv, "WaitLuaTaskSource");

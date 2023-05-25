@@ -24,7 +24,7 @@ namespace Tendo
 		return true;
 	}
 
-	Actor* ActorMgrComponent::RandomActor(const std::string& name)
+	Server* ActorMgrComponent::Random(const std::string& name)
 	{
 		auto iter = this->mActorNames.find(name);
 		if(iter == this->mActorNames.end())
@@ -32,7 +32,7 @@ namespace Tendo
 			return nullptr;
 		}
 		int index = rand() % (int)iter->second.size();
-		return this->GetActor(iter->second[index]);
+		return this->GetServer(iter->second[index]);
 	}
 
 	Actor* ActorMgrComponent::GetActor(long long id)
@@ -57,6 +57,12 @@ namespace Tendo
 		auto iter1 = this->mServers.find(id);
 		if(iter1 != this->mServers.end())
 		{
+			std::vector<IServer *> components;
+			this->mApp->GetComponents(components);
+			for(IServer * listen : components)
+			{
+				listen->OnExit((int)id);
+			}
 			this->mServers.erase(iter1);
 			return true;
 		}
@@ -97,6 +103,12 @@ namespace Tendo
 		if(name.empty() || iter != this->mServers.end() || !server->LateAwake())
 		{
 			return false;
+		}
+		std::vector<IServer *> components;
+		this->mApp->GetComponents(components);
+		for(IServer * listen : components)
+		{
+			listen->OnJoin((int)serverId);
 		}
 		this->AddRandomActor(name, server.get());
 		this->mServers.emplace(serverId, std::move(server));

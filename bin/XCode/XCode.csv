@@ -47,3 +47,4 @@ UnknownMessageNetType,未知的传输网络类型
 OnlyUseTcpProtocol,只能使用tcp协议
 NotFoundServerRpcAddress,找不到服务器rpc地址
 NotFoundPlayerRpcAddress,找不到玩家所在服务器地址
+NotFoundActor,找不到Actor

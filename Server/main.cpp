@@ -22,7 +22,7 @@
 #include"Gate/Service/Gate.h"
 #include"Common/Service/Node.h"
 #include"Web/Service/ServerWeb.h"
-#include"Common/Service/User.h"
+#include"Common/Service/Login.h"
 #include"Registry/Component/RegistryComponent.h"
 
 #include"Component/ClientComponent.h"
@@ -103,7 +103,7 @@ void RegisterAll()
 	RegisterComponent();
 	ComponentFactory::Add<Log>("Log");
 	ComponentFactory::Add<Gate>("Gate");
-	ComponentFactory::Add<User>("User");
+	ComponentFactory::Add<Login>("Login");
     ComponentFactory::Add<Node>("Node");
     ComponentFactory::Add<WatchDog>("WatchDog");
 

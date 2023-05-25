@@ -2,18 +2,16 @@
     "Server": {
         "AutoAllot": true,
         "Service": [
-            "User",
+            "Login",
             "Node",
             "Gate",
             "MongoDB",
             "Chat",
-            "Registry",
             "ServerWeb",
             "Account"
         ],
         "Component": [
             "RedisComponent",
-            "MysqlDBComponent",
             "RegistryComponent",
             "HttpDebugComponent"
         ]

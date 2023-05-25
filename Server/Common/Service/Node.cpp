@@ -50,12 +50,6 @@ namespace Tendo
 			}
 			this->mApp->ActorMgr()->AddServer(actor);
 		}
-		std::vector<IServerChange *> components;
-		this->mApp->GetComponents(components);
-		for(IServerChange * listen : components)
-		{
-			listen->OnJoin(id);
-		}
 		return XCode::Successful;
 	}
 
@@ -63,12 +57,6 @@ namespace Tendo
 	{
 		int id = request.server_id();
 		this->mApp->ActorMgr()->DelActor(id);
-		std::vector<IServerChange*> components;
-		this->mApp->GetComponents(components);
-		for (IServerChange* listen: components)
-		{
-			listen->OnExit(id);
-		}
 		return XCode::Successful;
 	}
 
@@ -82,17 +70,12 @@ namespace Tendo
 				component->Stop();
             }
         }
-		const ServerConfig * config = ServerConfig::Inst();
 		s2s::server::info request;
 		{
-			request.set_server_name(config->Name());
-			request.set_server_id(config->ServerId());
+			request.set_server_name(this->mApp->Name());
+			request.set_server_id(this->mApp->Config()->ServerId());
 		}
-		const std::string func("Registry.UnRegister");
-		int code = this->mApp->Call(func, request);
 		this->mApp->GetCoroutine()->Start(&App::Stop, this->mApp, 0);
-		const std::string & desc = CodeConfig::Inst()->GetDesc(code);
-		CONSOLE_LOG_INFO("unregister " << config->Name()  << " code = " << desc);
 		return XCode::Successful;
     }
 

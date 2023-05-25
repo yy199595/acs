@@ -150,46 +150,6 @@ namespace Tendo
 		return code;
 	}
 
-	int Actor::LuaSendEx(lua_State* lua)
-	{
-		const long long actorId = luaL_checkinteger(lua, 1);
-		const std::string func(luaL_checkstring(lua, 2));
-		Actor * actor = App::Inst()->ActorMgr()->GetActor(actorId);
-		if(actor == nullptr)
-		{
-			lua_pushinteger(lua, XCode::NotFindUser);
-			return 1;
-		}
-		std::shared_ptr<Msg::Packet> message;
-		const int code = actor->MakeMessage(lua, 3, func, message);
-		if(code != XCode::Successful)
-		{
-			lua_pushinteger(lua, code);
-			return 1;
-		}
-		return actor->LuaSend(lua, func, message);
-	}
-
-	int Actor::LuaCallEx(lua_State* lua)
-	{
-		const long long actorId = luaL_checkinteger(lua, 1);
-		const std::string func(luaL_checkstring(lua, 2));
-		Actor * actor = App::Inst()->ActorMgr()->GetActor(actorId);
-		if(actor == nullptr)
-		{
-			lua_pushinteger(lua, XCode::NotFindUser);
-			return 1;
-		}
-		std::shared_ptr<Msg::Packet> message;
-		const int code = actor->MakeMessage(lua, 3, func, message);
-		if(code != XCode::Successful)
-		{
-			lua_pushinteger(lua, code);
-			return 1;
-		}
-		return actor->LuaCall(lua, func, message);
-	}
-
 	int Actor::MakeMessage(lua_State* lua, int idx,
 		const std::string& func, std::shared_ptr<Msg::Packet>& message) const
 	{

@@ -4,7 +4,7 @@
 
 #include"Gate.h"
 #include"Entity/Actor/App.h"
-#include"Common/Service/User.h"
+#include"Common/Service/Login.h"
 #include"Gate/Client/OuterNetTcpClient.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include"Server/Config/CodeConfig.h"
@@ -92,45 +92,58 @@ namespace Tendo
 
 	std::shared_ptr<class Player> Gate::NewPlayer(long long userId)
 	{
-		const std::string & addr = this->mInnerAddress;
-		std::shared_ptr<Player> player = std::make_shared<Player>(userId, addr);
+		int actorId = (int)this->mApp->GetActorId();
+		std::shared_ptr<Player> player = std::make_shared<Player>(userId, actorId);
 		{
-			player->AddAddr(this->GetServer(), this->mApp->GetActorId());
+			player->AddAddr(this->GetServer(), actorId);
 		}
 		return player;
 	}
 
 	int Gate::OnLogin(long long userId, const std::string & token)
 	{
-		const std::string func("User.Login");
+		const std::string func("Login.OnLogin");
 		std::vector<const NodeConfig *> configs;
 		ClusterConfig::Inst()->GetNodeConfigs(configs);
-		ActorMgrComponent * component = this->mApp->ActorMgr();
 		std::shared_ptr<Player> player = this->NewPlayer(userId);
+
+		s2s::login::request message;
+		message.set_user_id(userId);
 		for(const NodeConfig * nodeConfig : configs)
 		{
 			if (!nodeConfig->IsAuthAllot())
 			{
 				continue;
 			}
-			s2s::user::login message;
-			message.set_user_id(userId);
 			const std::string & name = nodeConfig->GetName();
-			Actor * targetActor = component->RandomActor(name);
+			Server * targetActor = this->mActorComponent->Random(name);
 			if(targetActor == nullptr)
 			{
 				return XCode::AddressAllotFailure;
 			}
-			int code = targetActor->Call(func, message);
+			int serverId = (int)targetActor->GetActorId();
+
+			player->AddAddr(name, serverId);
+			message.mutable_actors()->insert({name, serverId});
+		}
+		std::vector<int> actors;
+		player->GetActors(actors);
+		for(int actorId : actors)
+		{
+			Server * targetServer = this->mActorComponent->GetServer(actorId);
+			if(targetServer == nullptr)
+			{
+				return XCode::NotFoundActor;
+			}
+			int code = targetServer->Call(func, message);
 			if(code != XCode::Successful)
 			{
 				const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-				LOG_ERROR("call " << name <<  "] code = " << desc);
+				LOG_ERROR("call " << targetServer->Name() <<  "] code = " << desc);
 				return XCode::Failure;
 			}
-			player->AddAddr(name, targetActor->GetActorId());
-			CONSOLE_LOG_INFO("add " << name << "] to " << userId);
 		}
+
 		this->mActorComponent->AddPlayer(player);
 		return XCode::Successful;
 	}

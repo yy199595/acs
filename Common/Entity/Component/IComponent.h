@@ -31,7 +31,7 @@ namespace Tendo
 		virtual void OnDestroy() = 0;
 	};
 
-	class IServerChange
+	class IServer
 	{
 	public:
 		virtual void OnExit(int id) = 0;

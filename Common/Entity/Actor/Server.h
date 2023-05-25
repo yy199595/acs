@@ -13,16 +13,18 @@ namespace Tendo
 	public:
 		explicit Server(int id, const std::string & name);
 	public:
-		static int GetListenEx(lua_State * lua);
+		int Send(const std::shared_ptr<Msg::Packet> & message);
 		bool GetListen(const std::string & name, std::string & addr);
 		void AddListen(const std::string & name, const std::string & addr);
 		int GetAddress(const std::string &func, std::string &addr) final;
 	public:
 		bool OnInit() final;
-		const std::string & Name() { return this->mName; }
+		const std::string & Name() const { return this->mName; }
+		const std::string & Address() const { return this->mRpcAddress; }
 	private:
 		std::string mRpc;
 		std::string mName;
+		std::string mRpcAddress;
 		std::unordered_map<std::string, std::string> mListens;
 	};
 }

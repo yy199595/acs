@@ -10,7 +10,8 @@
 #include "s2s/s2s.pb.h"
 #include"Rpc/Service/RpcService.h"
 #include "XCode/XCode.h"
-
+#include "Redis/Client/RedisTcpClient.h"
+#include "Server/Component/ThreadComponent.h"
 namespace Tendo
 {
 	bool RegistryComponent::LateAwake()
@@ -22,54 +23,52 @@ namespace Tendo
 			LOG_ERROR("not find config registry address");
 			return false;
 		}
-		this->mActor = std::make_shared<Server>(1, "RegistryServer");
-		this->mActor->AddListen("rpc", address);
-		return this->mActor->LateAwake();
+		std::string path;
+		RedisConfig configLoader;
+		config->GetPath("db", path);
+		if(!configLoader.LoadConfig(path))
+		{
+			return false;
+		}
+		Asio::Context & io = this->mApp->MainThread();
+		RedisClientConfig redisConfig = configLoader.Config();
+		std::shared_ptr<Tcp::SocketProxy> socket = std::make_shared<Tcp::SocketProxy>(io);
+		this->mMainClient = std::make_shared<RedisTcpClient>(socket, redisConfig, nullptr);
+		return this->mMainClient->AuthUser();
 	}
 
-	void RegistryComponent::Complete()
+	bool RegistryComponent::RegisterServer()
 	{
-		const std::string func("Registry.Register");
+		long long time = Helper::Time::NowSecTime();
 		const ServerConfig* config = ServerConfig::Inst();
-
-		s2s::server::info message;
+		std::shared_ptr<RedisRequest> request = RedisRequest::Make("HSET");
 		{
-			message.set_server_name(config->Name());
-			message.set_group_id(config->GroupId());
-			message.set_server_id(config->ServerId());
+			request->AddParameter(config->Name());
+			request->AddParameter(config->ServerId());
 		}
+		Json::Writer jsonWriter;
 		std::vector<std::string> listens;
 		ServerConfig::Inst()->GetListen(listens);
 		for(const std::string & name : listens)
 		{
 			std::string address;
-			config->GetLocation(name.c_str(), address);
-			message.mutable_listens()->insert({name, address});
-		}
-
-		do
-		{
-			int code = this->mActor->Call(func, message);
-			if (code == XCode::Successful)
+			if(config->GetLocation(name.c_str(), address))
 			{
-				LOG_INFO("register successful");
-				break;
-			}
-			this->mApp->GetCoroutine()->Sleep(1000 * 5);
-		}
-		while(true);
-
-		std::vector<std::string> servers;
-		std::vector<RpcService *> components;
-		this->mApp->GetComponents<RpcService>(components);
-		for(RpcService * rpcService1 : components)
-		{
-			const std::string & server = rpcService1->GetServer();
-			if(this->mApp->Random(server) == nullptr)
-			{
-				this->Query(server);
+				jsonWriter.Add(name).Add(address);
 			}
 		}
+		jsonWriter.Add("time").Add(time);
+		request->AddParameter(jsonWriter.JsonString());
+		return this->mMainClient->SyncCommand(request) != nullptr;
+	}
+
+	void RegistryComponent::Complete()
+	{
+		while(!this->RegisterServer())
+		{
+			LOG_ERROR("register " << this->mApp->Name() << " failure");
+		}
+
 	}
 
 	int RegistryComponent::Query(const string& server)

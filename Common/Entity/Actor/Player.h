@@ -11,20 +11,21 @@ namespace Tendo
 	class Player : public Actor
 	{
 	public:
-		Player(long long playerId, const std::string & gate);
+		Player(long long playerId, int gate);
 	public:
 		bool OnInit() final;
 		bool DelAddr(const std::string & server);
-		void AddAddr(const std::string & server, long long id);
+		void GetActors(std::vector<int> & actors) const;
+		void AddAddr(const std::string & server, int id);
 		int GetAddress(const std::string &func, std::string &addr) final;
 	public:
 		int SendToClient(const std::string & func);
+		int SendToClient(const std::shared_ptr<Msg::Packet> & message);
 		int SendToClient(const std::string & func, const pb::Message & request);
-		static int SendToClientEx(lua_State * lua);
 	private:
-		std::string mAddress;
+		int mGateId;
 		class ActorMgrComponent * mActorComponent;
-		std::unordered_map<std::string, long long> mServerAddrs;
+		std::unordered_map<std::string, int> mServerAddrs;
 	};
 }
 

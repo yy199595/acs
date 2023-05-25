@@ -20,14 +20,20 @@ message server
     }
 }
 
-message user
+
+message login
 {
-    message login
+    message request
     {
         int64 user_id = 1;
-        repeated server.info list = 2;
+        string gate_addr = 2;
+        map<string, int32> actors = 3;
     }
-    message logout
+}
+
+message logout
+{
+    message request
     {
         int64 user_id = 1;
     }

@@ -10,16 +10,21 @@
 #include"Rpc/Component/InnerNetComponent.h"
 namespace Tendo
 {
-	Player::Player(long long playerId, const std::string & gate)
+	Player::Player(long long playerId, int gateId)
 		: Actor(playerId)
 	{
-		this->mAddress = gate;
+		this->mGateId = gateId;
 		this->mActorComponent = App::Inst()->ActorMgr();
 	}
 
 	bool Player::OnInit()
 	{
-		return !this->mAddress.empty();
+		if(!this->mActorComponent->GetServer(this->mGateId))
+		{
+			LOG_ERROR("not find gate actor : " << this->mGateId);
+			return false;
+		}
+		return true;
 	}
 
 	bool Player::DelAddr(const std::string& server)
@@ -33,7 +38,7 @@ namespace Tendo
 		return true;
 	}
 
-	void Player::AddAddr(const std::string& server, long long id)
+	void Player::AddAddr(const std::string& server, int id)
 	{
 		if(server.empty() || id == 0)
 		{
@@ -42,30 +47,42 @@ namespace Tendo
 		this->mServerAddrs[server] = id;
 	}
 
+	void Player::GetActors(std::vector<int>& actors) const
+	{
+		actors.reserve(this->mServerAddrs.size());
+		auto iter = this->mServerAddrs.begin();
+		for(; iter != this->mServerAddrs.end(); iter++)
+		{
+			actors.emplace_back(iter->second);
+		}
+	}
+
 	int Player::SendToClient(const std::string& func)
 	{
-		std::shared_ptr<Msg::Packet> message = this->Make(func, nullptr);
+		std::shared_ptr<Msg::Packet> message = std::make_shared<Msg::Packet>();
 		{
 			message->SetType(Msg::Type::Client);
+			message->GetHead().Add("func", func);
+			message->GetHead().Add("id", this->GetActorId());
 		}
-		if(!this->mNetComponent->Send(this->mAddress, message))
-		{
-			return XCode::SendMessageFail;
-		}
-		return XCode::Successful;
+		return this->SendToClient(message);
 	}
 
 	int Player::SendToClient(const std::string& func, const pb::Message& request)
 	{
-		std::shared_ptr<Msg::Packet> message = this->Make(func, &request);
+		std::shared_ptr<Msg::Packet> message = std::make_shared<Msg::Packet>();
 		{
 			message->SetType(Msg::Type::Client);
+			message->SetProto(Msg::Porto::Protobuf);
+			if(!message->WriteMessage(&request))
+			{
+				return XCode::SerializationFailure;
+			}
+			message->GetHead().Add("func", func);
+			message->GetHead().Add("id", this->GetActorId());
+			message->GetHead().Add("pb", request.GetTypeName());
 		}
-		if(!this->mNetComponent->Send(this->mAddress, message))
-		{
-			return XCode::SendMessageFail;
-		}
-		return XCode::Successful;
+		return this->SendToClient(message);
 	}
 
 	int Player::GetAddress(const std::string& func, std::string& addr)
@@ -85,13 +102,16 @@ namespace Tendo
 				return XCode::Successful;
 			}
 		}
-		return XCode::NotFoundPlayerRpcAddress;
+		return XCode::NotFoundActor;
 	}
 
-	int Player::SendToClientEx(lua_State* lua)
+	int Player::SendToClient(const std::shared_ptr<Msg::Packet>& message)
 	{
-		long long playerId = luaL_checkinteger(lua, 1);
-		const std::string func(luaL_checkstring(lua, 2));
-		return 0;
+		Server * gateActor = this->mActorComponent->GetServer(this->mGateId);
+		if(gateActor == nullptr)
+		{
+			return XCode::NotFoundActor;
+		}
+		return gateActor->Send(message);
 	}
 }

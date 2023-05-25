@@ -34,33 +34,6 @@ namespace Tendo
 		this->mStatus = ServerStatus::Init;
 	}
 
-	Actor* App::Random(const std::string& name)
-	{
-		Actor * actor = this->mActorComponent->RandomActor(name);
-		if(actor == nullptr && name == this->Name())
-		{
-			return this;
-		}
-		return actor;
-	}
-
-	int App::LuaRandom(lua_State* lua)
-	{
-		if(lua_isstring(lua, 1))
-		{
-			std::string name(lua_tostring(lua, 1));
-			Actor * actor = App::Inst()->Random(name);
-			if(actor == nullptr)
-			{
-				return 0;
-			}
-			lua_pushinteger(lua, actor->GetActorId());
-			return 1;
-		}
-		lua_pushinteger(lua, App::Inst()->GetActorId());
-		return 1;
-	}
-
 	bool App::LoadComponent()
 	{
 		this->mTaskComponent = this->GetOrAddComponent<CoroutineComponent>();

@@ -5,7 +5,7 @@
 #include"Server.h"
 #include"XCode/XCode.h"
 #include"Entity/Actor/App.h"
-#include"Lua/Engine/Define.h"
+#include"Rpc/Component/InnerNetComponent.h"
 namespace Tendo
 {
 	Server::Server(int id, const std::string & name)
@@ -16,7 +16,7 @@ namespace Tendo
 
 	bool Server::OnInit()
 	{
-		if (this->mListens.count(this->mRpc) == 0)
+		if(!this->GetListen(this->mRpc, this->mRpcAddress))
 		{
 			LOG_ERROR("not rpc address " << this->Name());
 			return false;
@@ -55,17 +55,12 @@ namespace Tendo
 		return true;
 	}
 
-	int Server::GetListenEx(lua_State* lua)
+	int Server::Send(const std::shared_ptr<Msg::Packet>& message)
 	{
-		std::string address;
-		long long id = luaL_checkinteger(lua, 1);
-		const std::string name(luaL_checkstring(lua, 2));
-		Server * server = App::Inst()->ActorMgr()->GetServer(id);
-		if(server == nullptr || !server->GetListen(name, address))
+		if(!this->mNetComponent->Send(this->mRpcAddress, message))
 		{
-			return 0;
+			return XCode::SendMessageFail;
 		}
-		lua_pushlstring(lua, address.c_str(), address.size());
-		return 1;
+		return XCode::Successful;
 	}
 }

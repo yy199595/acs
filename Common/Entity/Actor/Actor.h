@@ -23,19 +23,16 @@ namespace Tendo
 		int Call(const std::string & func, const pb::Message & request);
 		int Call(const std::string & func, std::shared_ptr<pb::Message> response);
 		int Call(const std::string & func, const pb::Message & request, std::shared_ptr<pb::Message> response);
-	private:
+	public:
 		int LuaSend(lua_State * lua, const std::string & func, const std::shared_ptr<Msg::Packet> & message);
 		int LuaCall(lua_State * lua, const std::string & func, const std::shared_ptr<Msg::Packet> & message);
+		int MakeMessage(lua_State * lua, int idx, const std::string & func, std::shared_ptr<Msg::Packet> & message) const;
 	public:
-		static int LuaCallEx(lua_State * lua);
-		static int LuaSendEx(lua_State * lua);
-	 public:
 		long long GetActorId() const { return this->GetUnitId(); }
 		virtual int GetAddress(const std::string & func, std::string & addr) = 0;
 	protected:
 		virtual bool OnInit() = 0;
 		std::shared_ptr<Msg::Packet> Make(const std::string & func, const pb::Message * message) const;
-		int MakeMessage(lua_State * lua, int idx, const std::string & func, std::shared_ptr<Msg::Packet> & message) const;
 	protected:
 		class InnerNetComponent * mNetComponent;
 	private:

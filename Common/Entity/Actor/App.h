@@ -28,7 +28,6 @@ namespace Tendo
 	 public:
 		explicit App(ServerConfig * config);
 	 public:
-		Actor * Random(const std::string & name);
         inline float GetFps() const { return this->mLogicFps; }
 		inline LogComponent* GetLogger() { return this->mLogComponent; }
 		inline Asio::Context & MainThread() { return *this->mMainContext; }
@@ -43,8 +42,6 @@ namespace Tendo
 		void Stop(int signum);
         bool OnDelComponent(Component *component) final { return false; }
         inline bool IsMainThread() const { return this->mThreadId == std::this_thread::get_id();}
-	public:
-		static int LuaRandom(lua_State * lua);
     private:
 #ifdef __OS_WIN__
 		void UpdateConsoleTitle();

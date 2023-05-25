@@ -87,14 +87,14 @@
             "Response": "google.protobuf.StringValue"
         }
     },
-    "User": {
-        "Login": {
+    "Login": {
+        "OnLogin": {
             "Async":true,
-            "Request": "s2s.user.login"
+            "Request": "s2s.login.request"
         },
-        "Logout": {
+        "OnLogout": {
             "Async":true,
-            "Request": "s2s.user.logout"
+            "Request": "s2s.logout.request"
         }
     },
     "MongoDB": {

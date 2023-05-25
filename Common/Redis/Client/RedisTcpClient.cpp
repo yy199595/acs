@@ -20,6 +20,11 @@ namespace Tendo
 
 	void RedisTcpClient::Send(const std::shared_ptr<RedisRequest>& command)
 	{
+		assert(this->mComponent);
+		if(this->mComponent == nullptr)
+		{
+			return;
+		}
 #ifdef ONLY_MAIN_THREAD
 		this->Write(command);
 #else
@@ -159,17 +164,20 @@ namespace Tendo
 
         if(this->mConfig.FreeClient > 0)
         {
-            int s = this->mConfig.FreeClient;
             asio::io_service & io = this->mSocket->GetThread();
-            this->mCloseTimer = std::make_shared<asio::steady_timer>(io, std::chrono::seconds(s));
+			std::chrono::seconds second(this->mConfig.FreeClient);
+			this->mCloseTimer = std::make_shared<asio::steady_timer>(io, second);
             this->mCloseTimer->async_wait(std::bind(&RedisTcpClient::CloseFreeClient, this));
         }
+		if(this->mComponent != nullptr)
+		{
 #ifdef ONLY_MAIN_THREAD
-        this->mComponent->OnConnectSuccessful(this->mAddress);
+			this->mComponent->OnConnectSuccessful(this->mAddress);
 #else
-        asio::io_service & taskThread = App::Inst()->MainThread();
-        taskThread.post(std::bind(&IRpc<RedisResponse>::OnConnectSuccessful, this->mComponent, this->mAddress));
+			asio::io_service& taskThread = App::Inst()->MainThread();
+			taskThread.post(std::bind(&IRpc<RedisResponse>::OnConnectSuccessful, this->mComponent, this->mAddress));
 #endif
+		}
         return true;
     }
 

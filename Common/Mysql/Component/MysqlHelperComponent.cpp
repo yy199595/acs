@@ -23,7 +23,7 @@ namespace Tendo
 			request.set_table(message.GetTypeName());
 		}
 		const std::string func("MysqlDB.Add");
-		Actor * targetActor = this->mApp->Random(this->mServer);
+		Server * targetActor = this->mApp->ActorMgr()->Random(this->mServer);
 		if(targetActor == nullptr)
 		{
 			return XCode::AddressAllotFailure;
@@ -40,7 +40,7 @@ namespace Tendo
 			request.mutable_data()->PackFrom(data);
 		}
 		const std::string func("MysqlDB.Save");
-		Actor * targetActor = this->mApp->Random(this->mServer);
+		Server * targetActor = this->mApp->ActorMgr()->Random(this->mServer);
 		if(targetActor == nullptr)
 		{
 			return XCode::AddressAllotFailure;
@@ -56,7 +56,7 @@ namespace Tendo
 			request.set_where_json(deleteJson);
 		}
 		const std::string func("MysqlDB.Delete");
-		Actor * targetActor = this->mApp->Random(this->mServer);
+		Server * targetActor = this->mApp->ActorMgr()->Random(this->mServer);
 		if(targetActor == nullptr)
 		{
 			return XCode::AddressAllotFailure;
@@ -75,7 +75,7 @@ namespace Tendo
 			request.set_update_json(updateJson);
 		}
 		const std::string func("MysqlDB.Update");
-		Actor * targetActor = this->mApp->Random(this->mServer);
+		Server * targetActor = this->mApp->ActorMgr()->Random(this->mServer);
 		if(targetActor == nullptr)
 		{
 			return XCode::AddressAllotFailure;
@@ -92,9 +92,8 @@ namespace Tendo
 		}
 
 		const std::string func("MysqlDB.Query");
-		std::shared_ptr<db::mysql::response>
-				result = std::make_shared<db::mysql::response>();
-		Actor * targetActor = this->mApp->Random(this->mServer);
+		Server * targetActor = this->mApp->ActorMgr()->Random(this->mServer);
+		std::shared_ptr<db::mysql::response> result = std::make_shared<db::mysql::response>();
 		if(targetActor == nullptr)
 		{
 			return XCode::AddressAllotFailure;

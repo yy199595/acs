@@ -48,4 +48,5 @@ XCode =
 	OnlyUseTcpProtocol = 45,--只能使用tcp协议
 	NotFoundServerRpcAddress = 46,--找不到服务器rpc地址
 	NotFoundPlayerRpcAddress = 47,--找不到玩家所在服务器地址
+	NotFoundActor = 48,--找不到Actor
 }

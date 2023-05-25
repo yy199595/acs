@@ -49,4 +49,5 @@ namespace XCode
 	 constexpr int OnlyUseTcpProtocol = 45;//只能使用tcp协议
 	 constexpr int NotFoundServerRpcAddress = 46;//找不到服务器rpc地址
 	 constexpr int NotFoundPlayerRpcAddress = 47;//找不到玩家所在服务器地址
+	 constexpr int NotFoundActor = 48;//找不到Actor
 };

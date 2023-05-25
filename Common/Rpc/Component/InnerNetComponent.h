@@ -54,6 +54,5 @@ namespace Tendo
 		std::unordered_map<std::string, NodeInfo> mLocationMaps;
 		std::unordered_map<std::string, std::shared_ptr<InnerNetTcpClient>> mLocalClients; //本地客户端(连接别的)
 		std::unordered_map<std::string, std::shared_ptr<InnerNetTcpClient>> mRemoteClients; //远程客户端(连接过来的)
-		//std::unordered_map<std::string, std::shared_ptr<InnerNetTcpClient>> mWaitAuthClients; //等待验证客户端
 	};
 }

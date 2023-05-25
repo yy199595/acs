@@ -7,6 +7,7 @@
 #include"Entity/Component/Component.h"
 namespace Tendo
 {
+	class RedisTcpClient;
 	class RegistryComponent : public Component, public IComplete
 	{
 	public:
@@ -16,8 +17,10 @@ namespace Tendo
 	private:
 		void Complete() final;
 		bool LateAwake() final;
+		bool RegisterServer();
 	private:
 		std::shared_ptr<class Server> mActor;
+		std::shared_ptr<RedisTcpClient> mMainClient;
 	};
 }
 
