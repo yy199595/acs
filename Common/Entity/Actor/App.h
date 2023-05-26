@@ -29,6 +29,7 @@ namespace Tendo
 		explicit App(ServerConfig * config);
 	 public:
         inline float GetFps() const { return this->mLogicFps; }
+		inline bool IsStartDone() const { return this->mIsStartDone; }
 		inline LogComponent* GetLogger() { return this->mLogComponent; }
 		inline Asio::Context & MainThread() { return *this->mMainContext; }
 		inline TimerComponent* GetTimer() { return this->mTimerComponent; }
@@ -47,6 +48,7 @@ namespace Tendo
 		void UpdateConsoleTitle();
 #endif
 		bool LoadComponent();
+		bool InitComponent();
 		void StartAllComponent();
 	 private:
         int mTickCount;

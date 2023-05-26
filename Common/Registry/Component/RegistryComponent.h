@@ -8,16 +8,18 @@
 namespace Tendo
 {
 	class RedisTcpClient;
-	class RegistryComponent : public Component, public IComplete
+	class RegistryComponent : public Component
 	{
 	public:
 		RegistryComponent() = default;
 	public:
-		int Query(const std::string & server = "");
+		void WaitRegister();
 	private:
-		void Complete() final;
 		bool LateAwake() final;
 		bool RegisterServer();
+	private:
+		class Actor * mThisActor;
+		class CoroutineComponent * mCorComponent;
 	};
 }
 

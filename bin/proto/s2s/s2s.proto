@@ -1,22 +1,6 @@
 syntax = "proto3";
 package s2s;
 
-message registry
-{
-    message request
-    {
-        int64 id = 1;
-        string name = 2;
-        string json = 3;
-    }
-    message query
-    {
-        string name = 1;
-        int64 actor_id = 2;
-    }
-}
-
-
 message login
 {
     message request

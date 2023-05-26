@@ -1,0 +1,21 @@
+syntax = "proto3";
+package registry;
+
+message actor
+{
+  string name = 1;
+  int64 actor_id = 2;
+  string actor_json = 3;
+}
+message query
+{
+  message request
+  {
+    string name = 1;
+    int64 actor_id = 2;
+  }
+  message response
+  {
+    repeated actor actors = 1;
+  }
+}

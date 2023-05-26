@@ -5,9 +5,10 @@
 #ifndef APP_INNERSERVICE_H
 #define APP_INNERSERVICE_H
 
-#include"Message/s2s/s2s.pb.h"
 #include"Message/com/com.pb.h"
 #include"Rpc/Service/RpcService.h"
+#include"Message/s2s/registry.pb.h"
+
 namespace Tendo
 {
 	class Node final : public RpcService
@@ -20,8 +21,8 @@ namespace Tendo
 		int Shutdown();
 		int LoadConfig();
 		int Ping(const Msg::Packet& packet);
-		int Join(const s2s::registry::request& request); //新服务器加入
-        int Exit(const s2s::registry::request& request); //服务器退出
+		int Join(const registry::actor & request); //新服务器加入
+        int Exit(const registry::actor & request); //服务器退出
         int RunInfo(com::type::string& response); // 获取运行信息
     private:
 		bool OnInit() final;

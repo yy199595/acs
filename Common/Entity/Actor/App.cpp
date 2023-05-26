@@ -8,6 +8,7 @@
 #include"Server/Component/TextConfigComponent.h"
 #include"Server/Component/ThreadComponent.h"
 #include"Cluster/Component/LaunchComponent.h"
+#include"Registry/Component/RegistryComponent.h"
 #ifdef __OS_WIN__
 #include<Windows.h>
 #endif
@@ -45,18 +46,17 @@ namespace Tendo
         LOG_CHECK_RET_FALSE(this->AddComponent<TextConfigComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<ThreadComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<LaunchComponent>());
-        std::vector<Component *> components;
-        if(this->GetComponents(components) > 0)
-        {
-			for (Component *component: components)
+
+		std::string address;
+		if(this->mConfig->GetPath("registry", address))
+		{
+			std::shared_ptr<Server> actor = std::make_shared<Server>(0, "Registry");
 			{
-				if(!component->LateAwake())
-				{
-					LOG_ERROR(component->GetName() << " LateAwake");
-					return false;
-				}
+				actor->AddListen("rpc", address);
+				this->mActorComponent->AddServer(actor);
 			}
-        }
+			this->AddComponent<RegistryComponent>();
+		}
 		std::vector<std::string> listens;
 		this->mConfig->GetListen(listens);
 		for (const std::string& name : listens)
@@ -68,16 +68,25 @@ namespace Tendo
 				this->AddListen(name, address);
 			}
 		}
-		std::string address;
-		LOG_CHECK_RET_FALSE(this->mConfig->GetPath("registry", address));
-		std::shared_ptr<Server> actor = std::make_shared<Server>(0, "Registry");
-		{
-			actor->AddListen("rpc", address);
-			this->mActorComponent->AddServer(actor);
-		}
+		LOG_CHECK_RET_FALSE(this->InitComponent());
 		this->mActorComponent->AddServer(this->shared_from_this());
         this->mTaskComponent->Start(&App::StartAllComponent, this);
         return true;
+	}
+
+	bool App::InitComponent()
+	{
+		std::vector<Component*> components;
+		this->GetComponents(components);
+		for (Component* component: components)
+		{
+			if (!component->LateAwake())
+			{
+				LOG_ERROR(component->GetName() << " LateAwake");
+				return false;
+			}
+		}
+		return true;
 	}
 
 	int App::Run()
@@ -217,6 +226,11 @@ namespace Tendo
             LOG_DEBUG("start " << name << " successful use time = [" << timer.GetSecond() << "s]");
         }
         this->mIsStartDone = true; //开始帧循环
+		RegistryComponent * registryComponent = this->GetComponent<RegistryComponent>();
+		if(registryComponent != nullptr)
+		{
+			registryComponent->WaitRegister();
+		}
         std::vector<IComplete *> completeComponents;
         this->GetComponents<IComplete>(completeComponents);
         for(IComplete * complete : completeComponents)

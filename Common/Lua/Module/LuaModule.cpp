@@ -152,4 +152,10 @@ namespace Lua
 		return false;
 	}
 
+	bool LuaModule::Awake()
+	{
+
+		return false;
+	}
+
 }

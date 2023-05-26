@@ -29,13 +29,13 @@ namespace Tendo
         return XCode::Successful;
     }
 
-    int Node::Join(const s2s::registry::request &request)
+    int Node::Join(const registry::actor &request)
 	{
 
 		return XCode::Successful;
 	}
 
-    int Node::Exit(const s2s::registry::request &request)
+    int Node::Exit(const registry::actor &request)
 	{
 		return XCode::Successful;
 	}
