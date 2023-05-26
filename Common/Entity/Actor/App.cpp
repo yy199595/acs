@@ -48,7 +48,7 @@ namespace Tendo
         LOG_CHECK_RET_FALSE(this->AddComponent<LaunchComponent>());
 
 		std::string address;
-		if(this->mConfig->GetPath("registry", address))
+		if(this->mConfig->GetMember("registry", address))
 		{
 			std::shared_ptr<Server> actor = std::make_shared<Server>(0, "Registry");
 			{

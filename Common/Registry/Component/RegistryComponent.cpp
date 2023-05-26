@@ -20,7 +20,7 @@ namespace Tendo
 
 	bool RegistryComponent::RegisterServer()
 	{
-		const std::string func("Registry.Register");
+		const std::string func("ActorRegistry.Add");
 		Server * registry = this->mApp->ActorMgr()->GetServer(0);
 
 		registry::actor request;

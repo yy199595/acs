@@ -27,7 +27,7 @@ option(ONLY_MAIN_THREAD "启用单线程模式" OFF)
 option(__NET_ERROR_LOG__ "打印网络层错误" ON)
 
 set(CMAKE_COMMON_DIR ${PROJECT_SOURCE_DIR})
-
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 message("================ [" ${CMAKE_BUILD_TYPE} "] ==============")
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-D __DEBUG__)
@@ -71,7 +71,7 @@ else()
 #- - wno -sign-compare:禁用与符号比较相关的警告。
 #- - wno -class-memaccess:禁用类成员访问相关的警告。
 #- - wno -strict-aliasing:禁用严格混叠相关的警告。
-    add_compile_options(-Wall -g -Wno-sign-compare -Wno-class-memaccess -Wno-strict-aliasing)
+    add_compile_options(-Wall -g -Wno-sign-compare -Wno-class-memaccess -Wno-strict-aliasing -fstandalone-debug)
     if(APPLE)
         add_compile_options(-fno-pie)
     endif()

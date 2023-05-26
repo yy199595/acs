@@ -8,7 +8,8 @@
             "MongoDB",
             "Chat",
             "ServerWeb",
-            "Account"
+            "Account",
+            "ActorRegistry"
         ],
         "Component": [
             "RedisComponent",

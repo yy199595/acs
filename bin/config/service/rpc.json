@@ -25,16 +25,16 @@
         },
         "Query": {
             "Async": false,
-            "Request": "s2s.server.query",
-            "Response": "s2s.server.list"
+            "Request": "registry.query.request",
+            "Response": "registry.query.response"
         },
-        "Register": {
-            "Async": false,
-            "Request": "s2s.server.info"
+        "Add": {
+            "Async": true,
+            "Request": "registry.actor"
         },
-        "UnRegister": {
+        "Del": {
           "Async": false,
-          "Request": "s2s.server.info"
+          "Request": "registry.actor"
       }
     },
     "MysqlDB": {
@@ -78,10 +78,13 @@
         "Hotfix": {},
         "LoadConfig": {},
         "Join": {
-            "Request": "s2s.server.info"
+            "Request": "registry.actor"
         },
         "Exit": {
-            "Request": "s2s.server.info"
+            "Request": "registry.actor"
+        },
+        "Shutdown": {
+
         },
         "RunInfo": {
             "Response": "google.protobuf.StringValue"

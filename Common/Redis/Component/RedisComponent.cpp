@@ -78,12 +78,11 @@ namespace Tendo
         const std::string & ip = config.Address[0].Ip;
         const unsigned int port = config.Address[0].Port;
         ThreadComponent * component = this->GetComponent<ThreadComponent>();
-        std::shared_ptr<Tcp::SocketProxy> socketProxy = component->CreateSocket("tcp");
+        std::shared_ptr<Tcp::SocketProxy> socketProxy = component->CreateSocket(ip, port);
         if(socketProxy == nullptr)
         {
             return nullptr;
         }
-        socketProxy->Init(ip, port);
         std::shared_ptr<RedisTcpClient> redisClient =
             std::make_shared<RedisTcpClient>(socketProxy, config, this);
         this->mRedisClients.emplace_back(redisClient);
