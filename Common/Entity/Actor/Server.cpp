@@ -68,10 +68,14 @@ namespace Tendo
 		Json::Writer jsonWriter;
 		auto iter = this->mListens.begin();
 		jsonWriter.Add("name").Add(this->Name());
+		jsonWriter.Add("id").Add(this->GetActorId());
+		jsonWriter.BeginObject("listen");
 		for(; iter != this->mListens.end(); iter++)
 		{
 			jsonWriter.Add(iter->first).Add(iter->second);
 		}
+		jsonWriter.EndObject();
 		jsonWriter.Add("time").Add(Helper::Time::NowSecTime());
+		jsonWriter.WriterStream(&json);
 	}
 }

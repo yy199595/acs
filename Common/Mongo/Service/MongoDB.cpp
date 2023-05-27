@@ -22,6 +22,7 @@ namespace Tendo
 
 	bool MongoDB::OnInit()
     {
+        BIND_COMMON_RPC_METHOD(MongoDB::Save);
         BIND_COMMON_RPC_METHOD(MongoDB::Query);
         BIND_COMMON_RPC_METHOD(MongoDB::Insert);
         BIND_COMMON_RPC_METHOD(MongoDB::Delete);
@@ -208,7 +209,7 @@ namespace Tendo
 
         Bson::Writer::Document updateInfo;
         updateInfo.Add("multi", true);
-        updateInfo.Add("upsert", false);
+        updateInfo.Add("upsert", false); //false没有更新不成功
         updateInfo.Add("u", updateDocument);
         updateInfo.Add("q", selectorDocument);
 
@@ -225,6 +226,56 @@ namespace Tendo
         }
         int count = 0;
         Bson::Reader::Document &result = response->Get();
+        return (result.Get("n", count) && count > 0) ? XCode::Successful : XCode::Failure;
+    }
+
+    int MongoDB::Save(const db::mongo::update& request)
+    {
+        const size_t pos = request.tab().find('.');
+        if (pos == std::string::npos)
+        {
+            CONSOLE_LOG_ERROR("[" << request.tab() << "] parse error xxx.xxx");
+            return XCode::CallArgsError;
+        }
+
+        Bson::Writer::Document dataDocument;
+        if (!dataDocument.FromByJson(request.update()))
+        {
+            return XCode::CallArgsError;
+        }
+        std::string id;
+        Bson::Writer::Document selectorDocument;
+        if (!selectorDocument.FromByJson(request.select(), id))
+        {
+            return XCode::CallArgsError;
+        }
+        std::shared_ptr<CommandRequest> mongoRequest(new CommandRequest);
+
+        const std::string tab = request.tab().substr(pos + 1);
+        mongoRequest->dataBase = request.tab().substr(0, pos);
+
+        Bson::Writer::Document updateDocument;
+        updateDocument.Add(request.tag().c_str(), dataDocument);
+
+        Bson::Writer::Document updateInfo;
+        updateInfo.Add("multi", true);
+        updateInfo.Add("upsert", true);
+        updateInfo.Add("u", updateDocument);
+        updateInfo.Add("q", selectorDocument);
+
+
+        Bson::Writer::Array updates(updateInfo);
+        mongoRequest->document.Add("update", tab);
+        mongoRequest->document.Add("updates", updates);
+
+        int handle = this->GetClientHandle(request.flag());
+        std::shared_ptr<CommandResponse> response = this->mMongoComponent->Run(handle, mongoRequest);
+        if (response == nullptr || response->GetDocumentSize() == 0)
+        {
+            return XCode::Failure;
+        }
+        int count = 0;
+        Bson::Reader::Document& result = response->Get();
         return (result.Get("n", count) && count > 0) ? XCode::Successful : XCode::Failure;
     }
 

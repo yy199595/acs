@@ -20,6 +20,7 @@ namespace Tendo
         void OnStop() final;
 		int GetClientHandle(int flag = 0);
     private:
+		int Save(const db::mongo::update& request);
 		int Insert(const db::mongo::insert & request);
 		int Delete(const db::mongo::remove & request);
 		int Update(const db::mongo::update & request);

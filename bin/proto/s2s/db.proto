@@ -44,6 +44,7 @@ message mongo
         string tag = 4;
         int32 flag = 5;
     }
+
     message command
     {
         message request

@@ -117,12 +117,15 @@ namespace Tendo
 	void Player::OnRegister(std::string& json)
 	{
 		Json::Writer jsonWriter;
+		jsonWriter.Add("id").Add(this->GetActorId());
+		jsonWriter.BeginObject("addr");
 		auto iter = this->mServerAddrs.begin();
 		for(; iter != this->mServerAddrs.end(); iter++)
 		{
 			const std::string & name = iter->first;
 			jsonWriter.Add(name).Add(iter->second);
 		}
+		jsonWriter.EndObject();
 		jsonWriter.Add("time").Add(Helper::Time::NowSecTime());
 		jsonWriter.WriterStream(&json);
 	}

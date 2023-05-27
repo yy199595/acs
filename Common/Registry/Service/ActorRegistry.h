@@ -6,6 +6,7 @@
 #define _ACTORREGISTRY_H_
 #include"Rpc/Service/RpcService.h"
 #include"Message/s2s/registry.pb.h"
+#include"Registry/Target/TargetRegistry.h"
 namespace Tendo
 {
 	class ActorRegistry : public RpcService
@@ -18,10 +19,7 @@ namespace Tendo
 		int Del(const registry::actor & request);
 		int Query(const registry::query::request & request, registry::query::response &response);
 	private:
-		int OnQuery(const std::string & name, registry::query::response & response);
-		int OnQuery(const std::string & name, long long id, registry::query::response & response);
-	private:
-		class RedisComponent * mRedisComponent;
+		std::unique_ptr<TargetRegistry> mTarget;
 	};
 }
 
