@@ -152,19 +152,20 @@ namespace Tendo
 			return XCode::CallArgsError;
 		}
 
-        std::shared_ptr<CommandRequest> mongoRequest
-            = std::make_shared<CommandRequest>();
-        const std::string tab = request.tab().substr(pos + 1);
-        mongoRequest->dataBase = request.tab().substr(0, pos);
+        std::shared_ptr<CommandRequest> mongoRequest = std::make_shared<CommandRequest>();
+        {
+            const std::string tab = request.tab().substr(pos + 1);
+            mongoRequest->dataBase = request.tab().substr(0, pos);
 
-        Bson::Writer::Document delDocument;
-        delDocument.Add("q", document);
-        delDocument.Add("limit", request.limit());
+            Bson::Writer::Document delDocument;
+            delDocument.Add("q", document);
+            delDocument.Add("limit", request.limit());
 
-        Bson::Writer::Array documentArray(delDocument);
+            Bson::Writer::Array documentArray(delDocument);
 
-        mongoRequest->document.Add("delete", tab);
-        mongoRequest->document.Add("deletes", documentArray);
+            mongoRequest->document.Add("delete", tab);
+            mongoRequest->document.Add("deletes", documentArray);
+        }
         int handle = this->GetClientHandle(request.flag());
         std::shared_ptr<CommandResponse> response = this->mMongoComponent->Run(handle, mongoRequest);
         if(response == nullptr || response->GetDocumentSize() <= 0)
