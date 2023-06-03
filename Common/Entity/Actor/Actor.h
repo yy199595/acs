@@ -32,7 +32,7 @@ namespace Tendo
 		long long GetActorId() const { return this->GetUnitId(); }
 	 public:
 		virtual bool OnInit() = 0;
-		virtual void OnRegister(std::string & json) = 0;
+		virtual void OnRegister(std::string * json) = 0;
 		virtual bool DecodeFromJson(const std::string & json) { return true;}
 		virtual int GetAddress(const std::string & func, std::string & addr) = 0;
 	protected:

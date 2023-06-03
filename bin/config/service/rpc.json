@@ -105,6 +105,10 @@
             "Async": true,
             "Request": "db.mongo.insert"
         },
+        "Save": {
+            "Async": true,
+            "Request": ""
+        },
         "Delete": {
             "Async": true,
             "Request": "db.mongo.remove"

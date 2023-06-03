@@ -15,6 +15,7 @@ namespace Tendo
 		int Query(const std::string& name, registry::query::response& response) final;
 		int Query(const std::string& name, long long id, registry::query::response& response) final;
 	private:
+		App* mApp;
 		MongoDBComponent* mMongo;
 	};
 }

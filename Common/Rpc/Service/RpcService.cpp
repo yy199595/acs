@@ -30,7 +30,8 @@ namespace Tendo
 		{
 			this->mLuaModule = luaComponent->LoadModule(name);
 		}
-		LOG_CHECK_RET_FALSE(this->OnInit() && this->mConfig);
+		LOG_CHECK_RET_FALSE(this->mConfig);
+		LOG_CHECK_RET_FALSE(this->OnInit());
 		if(this->mLuaModule != nullptr)
 		{
 			std::vector<const RpcMethodConfig*> rpcMethodConfigs;

@@ -63,7 +63,7 @@ namespace Tendo
 		}
 		return XCode::Successful;
 	}
-	void ServerActor::OnRegister(std::string& json)
+	void ServerActor::OnRegister(std::string * json)
 	{
 		Json::Writer jsonWriter;
 		auto iter = this->mListens.begin();
@@ -76,6 +76,6 @@ namespace Tendo
 		}
 		jsonWriter.EndObject();
 		jsonWriter.Add("time").Add(Helper::Time::NowSecTime());
-		jsonWriter.WriterStream(&json);
+		jsonWriter.WriterStream(json);
 	}
 }

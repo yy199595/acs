@@ -121,12 +121,6 @@ namespace Tendo
 		return this->AddServer(server);
 	}
 
-	bool ActorMgrComponent::AddServer(std::shared_ptr<ServerActor> server, const std::string& json)
-	{
-		LOG_CHECK_RET_FALSE(server->DecodeFromJson(json) && this->AddServer(server));
-		return true;
-	}
-
 	void ActorMgrComponent::GetServers(std::vector<ServerActor *>& servers)
 	{
 		auto iter = this->mServers.begin();

@@ -5,11 +5,12 @@
 #include"ActorRegistry.h"
 #include"Entity/Actor/App.h"
 #include"Registry/Target/RedisRegistry.h"
+#include"Registry/Target/MongoRegistry.h"
 namespace Tendo
 {
 	bool ActorRegistry::Awake()
 	{
-		this->mTarget = std::make_unique<RedisRegistry>();
+		this->mTarget = std::make_unique<MongoRegistry>();
 		return this->mTarget->Awake(this->mApp);
 	}
 	bool ActorRegistry::OnInit()

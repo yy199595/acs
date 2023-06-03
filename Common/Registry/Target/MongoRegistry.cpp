@@ -1,12 +1,14 @@
 #include"MongoRegistry.h"
 #include"Entity/Actor/App.h"
 #include"XCode/XCode.h"
+#include"s2s/db.pb.h"
 #include"Mongo/Client/BsonDocument.h"
 #include"Mongo/Component/MongoDBComponent.h"
 namespace Tendo
 {
 	bool MongoRegistry::Awake(App* app)
 	{
+		this->mApp = app;
 		app->AddComponent<MongoDBComponent>();
 		return false;
 	}
@@ -45,7 +47,18 @@ namespace Tendo
 
 	int MongoRegistry::Add(const std::string& name, long long id, const std::string& json)
 	{
-		return 0;
+		Json::Writer select;
+		select.Add("_id", id);
+		const std::string func("MongoDB.Save");
+		const std::string tab = fmt::format("Registry.{0}", name);
+		db::mongo::update request;
+		{
+			request.set_tab(tab);
+			request.set_update(json);
+			request.set_flag((int)id);
+			select.WriterStream(request.mutable_select());
+		};
+		return this->mApp->Call(func, request);
 	}
 
 	int MongoRegistry::Query(const std::string& name, registry::query::response& response)

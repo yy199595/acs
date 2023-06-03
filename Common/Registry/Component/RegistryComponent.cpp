@@ -27,7 +27,7 @@ namespace Tendo
 		{
 			request.set_name(this->mThisActor->Name());
 			request.set_actor_id(this->mThisActor->GetActorId());
-			this->mThisActor->OnRegister(*request.mutable_name());
+			this->mThisActor->OnRegister(request.mutable_actor_json());
 		}
 		return registry->Call(func, request) == XCode::Successful;
 	}

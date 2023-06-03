@@ -114,7 +114,7 @@ namespace Tendo
 		}
 		return gateActor->Send(message);
 	}
-	void PlayerActor::OnRegister(std::string& json)
+	void PlayerActor::OnRegister(std::string* json)
 	{
 		Json::Writer jsonWriter;
 		jsonWriter.Add("id").Add(this->GetActorId());
@@ -127,6 +127,6 @@ namespace Tendo
 		}
 		jsonWriter.EndObject();
 		jsonWriter.Add("time").Add(Helper::Time::NowSecTime());
-		jsonWriter.WriterStream(&json);
+		jsonWriter.WriterStream(json);
 	}
 }
