@@ -14,6 +14,7 @@ namespace Tendo
 	}
 	bool ActorRegistry::OnInit()
 	{
+		this->mActorMgr = this->mApp->ActorMgr();
 		BIND_COMMON_RPC_METHOD(ActorRegistry::Add);
 		BIND_COMMON_RPC_METHOD(ActorRegistry::Del);
 		BIND_COMMON_RPC_METHOD(ActorRegistry::Query);
@@ -32,11 +33,11 @@ namespace Tendo
 	}
 
 	int ActorRegistry::Add(const registry::actor & request)
-	{		
+	{
 		long long actorId = request.actor_id();
 		const std::string & name = request.name();
 		const std::string &	json = request.actor_json();
-		return this->mTarget->Add(name, actorId, json);
+		return  this->mTarget->Add(name, actorId, json);
 	}
 
 	int ActorRegistry::Del(const registry::actor& request)

@@ -29,7 +29,7 @@ namespace Tendo
 			request.set_flag(index);
 		}
 		const std::string func("MongoDB.Insert");
-		Server * targetActor = this->mApp->ActorMgr()->Random(this->mServer);
+		ServerActor * targetActor = this->mApp->ActorMgr()->Random(this->mServer);
 		if (!pb_json::MessageToJsonString(message, request.mutable_json()).ok())
 		{
 			return XCode::CallServiceNotFound;
@@ -50,7 +50,7 @@ namespace Tendo
 			request.set_select(select);
 		}
 		const std::string func("MongoDB.Update");
-		Server * targetActor = this->mApp->ActorMgr()->Random(this->mServer);
+		ServerActor * targetActor = this->mApp->ActorMgr()->Random(this->mServer);
 		if(targetActor == nullptr)
 		{
 			return XCode::AddressAllotFailure;
@@ -67,7 +67,7 @@ namespace Tendo
 			request.set_json(json);
 		}
 		const std::string func("MongoDB.Insert");
-		Server * targetActor = this->mApp->ActorMgr()->Random(this->mServer);
+		ServerActor * targetActor = this->mApp->ActorMgr()->Random(this->mServer);
 		if(targetActor == nullptr)
 		{
 			return XCode::AddressAllotFailure;
@@ -85,7 +85,7 @@ namespace Tendo
 			request.set_json(select);
 		}
 		const std::string func("MongoDB.Remove");
-		Server * targetActor = this->mApp->ActorMgr()->Random(this->mServer);
+		ServerActor * targetActor = this->mApp->ActorMgr()->Random(this->mServer);
 		if(targetActor == nullptr)
 		{
 			return XCode::AddressAllotFailure;
@@ -105,7 +105,7 @@ namespace Tendo
 		const std::string func("MongoDB.Query");
 		std::shared_ptr<db::mongo::query::response> result
 			= std::make_shared<db::mongo::query::response>();
-		Server * targetActor = this->mApp->ActorMgr()->Random(this->mServer);
+		ServerActor * targetActor = this->mApp->ActorMgr()->Random(this->mServer);
 		if(targetActor == nullptr)
 		{
 			return XCode::AddressAllotFailure;
@@ -161,7 +161,7 @@ namespace Tendo
 		request.set_tab(message.GetTypeName());
 		request.set_select(select.JsonString());
 		const std::string func("MongoDB.Update");
-		Server * targetActor = this->mApp->ActorMgr()->Random(this->mServer);
+		ServerActor * targetActor = this->mApp->ActorMgr()->Random(this->mServer);
 		if(targetActor == nullptr)
 		{
 			return XCode::AddressAllotFailure;

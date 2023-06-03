@@ -11,7 +11,7 @@
 #include"Util/Json/JsonWriter.h"
 #include"Gate/Service/Gate.h"
 #include"Entity/Actor/App.h"
-#include"Entity/Actor/Player.h"
+#include"Entity/Actor/PlayerActor.h"
 namespace Tendo
 {
 	bool OuterNetComponent::Awake()

@@ -8,10 +8,10 @@
 
 namespace Tendo
 {
-	class Server : public Actor, public std::enable_shared_from_this<Server>
+	class ServerActor : public Actor, public std::enable_shared_from_this<ServerActor>
 	{
 	public:
-		explicit Server(int id, const std::string & name);
+		explicit ServerActor(int id, const std::string & name);
 	public:
 		int Send(const std::shared_ptr<Msg::Packet> & message);
 		bool GetListen(const std::string & name, std::string & addr);

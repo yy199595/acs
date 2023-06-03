@@ -4,6 +4,7 @@
 
 #ifndef _ACTORREGISTRY_H_
 #define _ACTORREGISTRY_H_
+#include "Entity/Component/ActorMgrComponent.h"
 #include"Rpc/Service/RpcService.h"
 #include"Message/s2s/registry.pb.h"
 #include"Registry/Target/TargetRegistry.h"
@@ -19,6 +20,7 @@ namespace Tendo
 		int Del(const registry::actor & request);
 		int Query(const registry::query::request & request, registry::query::response &response);
 	private:
+		class ActorMgrComponent * mActorMgr;
 		std::unique_ptr<TargetRegistry> mTarget;
 	};
 }

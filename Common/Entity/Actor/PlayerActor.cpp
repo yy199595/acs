@@ -2,7 +2,7 @@
 // Created by leyi on 2023/5/15.
 //
 
-#include"Player.h"
+#include"PlayerActor.h"
 #include"XCode/XCode.h"
 #include"Entity/Actor/App.h"
 #include"Lua/Engine/Define.h"
@@ -10,14 +10,14 @@
 #include"Rpc/Component/InnerNetComponent.h"
 namespace Tendo
 {
-	Player::Player(long long playerId, int gateId)
+	PlayerActor::PlayerActor(long long playerId, int gateId)
 		: Actor(playerId, "Player")
 	{
 		this->mGateId = gateId;
 		this->mActorComponent = App::Inst()->ActorMgr();
 	}
 
-	bool Player::OnInit()
+	bool PlayerActor::OnInit()
 	{
 		if(!this->mActorComponent->GetServer(this->mGateId))
 		{
@@ -27,7 +27,7 @@ namespace Tendo
 		return true;
 	}
 
-	bool Player::DelAddr(const std::string& server)
+	bool PlayerActor::DelAddr(const std::string& server)
 	{
 		auto iter = this->mServerAddrs.find(server);
 		if(iter == this->mServerAddrs.end())
@@ -38,7 +38,7 @@ namespace Tendo
 		return true;
 	}
 
-	void Player::AddAddr(const std::string& server, int id)
+	void PlayerActor::AddAddr(const std::string& server, int id)
 	{
 		if(server.empty() || id == 0)
 		{
@@ -47,7 +47,7 @@ namespace Tendo
 		this->mServerAddrs[server] = id;
 	}
 
-	void Player::GetActors(std::vector<int>& actors) const
+	void PlayerActor::GetActors(std::vector<int>& actors) const
 	{
 		actors.reserve(this->mServerAddrs.size());
 		auto iter = this->mServerAddrs.begin();
@@ -57,7 +57,7 @@ namespace Tendo
 		}
 	}
 
-	int Player::SendToClient(const std::string& func)
+	int PlayerActor::SendToClient(const std::string& func)
 	{
 		std::shared_ptr<Msg::Packet> message = std::make_shared<Msg::Packet>();
 		{
@@ -68,7 +68,7 @@ namespace Tendo
 		return this->SendToClient(message);
 	}
 
-	int Player::SendToClient(const std::string& func, const pb::Message& request)
+	int PlayerActor::SendToClient(const std::string& func, const pb::Message& request)
 	{
 		std::shared_ptr<Msg::Packet> message = std::make_shared<Msg::Packet>();
 		{
@@ -85,7 +85,7 @@ namespace Tendo
 		return this->SendToClient(message);
 	}
 
-	int Player::GetAddress(const std::string& func, std::string& addr)
+	int PlayerActor::GetAddress(const std::string& func, std::string& addr)
 	{
 		const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
 		if(methodConfig == nullptr)
@@ -105,16 +105,16 @@ namespace Tendo
 		return XCode::NotFoundActor;
 	}
 
-	int Player::SendToClient(const std::shared_ptr<Msg::Packet>& message)
+	int PlayerActor::SendToClient(const std::shared_ptr<Msg::Packet>& message)
 	{
-		Server * gateActor = this->mActorComponent->GetServer(this->mGateId);
+		ServerActor * gateActor = this->mActorComponent->GetServer(this->mGateId);
 		if(gateActor == nullptr)
 		{
 			return XCode::NotFoundActor;
 		}
 		return gateActor->Send(message);
 	}
-	void Player::OnRegister(std::string& json)
+	void PlayerActor::OnRegister(std::string& json)
 	{
 		Json::Writer jsonWriter;
 		jsonWriter.Add("id").Add(this->GetActorId());

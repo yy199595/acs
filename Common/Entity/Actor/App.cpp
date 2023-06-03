@@ -20,7 +20,7 @@ namespace Tendo
 {
 
 	App::App(ServerConfig * config) :
-		Server(config->ServerId(), config->Name()),
+		ServerActor(config->ServerId(), config->Name()),
         mThreadId(std::this_thread::get_id()),
 		mStartTime(Helper::Time::NowMilTime()), mConfig(config)
 	{
@@ -50,7 +50,7 @@ namespace Tendo
 		std::string address;
 		if(this->mConfig->GetMember("registry", address))
 		{
-			std::shared_ptr<Server> actor = std::make_shared<Server>(0, "Registry");
+			std::shared_ptr<ServerActor> actor = std::make_shared<ServerActor>(0, "Registry");
 			{
 				actor->AddListen("rpc", address);
 				this->mActorComponent->AddServer(actor);

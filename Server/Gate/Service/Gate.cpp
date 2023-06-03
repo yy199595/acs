@@ -90,10 +90,10 @@ namespace Tendo
 		return XCode::Successful;
 	}
 
-	std::shared_ptr<class Player> Gate::NewPlayer(long long userId)
+	std::shared_ptr<class PlayerActor> Gate::NewPlayer(long long userId)
 	{
 		int actorId = (int)this->mApp->GetActorId();
-		std::shared_ptr<Player> player = std::make_shared<Player>(userId, actorId);
+		std::shared_ptr<PlayerActor> player = std::make_shared<PlayerActor>(userId, actorId);
 		{
 			player->AddAddr(this->GetServer(), actorId);
 		}
@@ -105,7 +105,7 @@ namespace Tendo
 		const std::string func("Login.OnLogin");
 		std::vector<const NodeConfig *> configs;
 		ClusterConfig::Inst()->GetNodeConfigs(configs);
-		std::shared_ptr<Player> player = this->NewPlayer(userId);
+		std::shared_ptr<PlayerActor> player = this->NewPlayer(userId);
 
 		s2s::login::request message;
 		message.set_user_id(userId);
@@ -116,7 +116,7 @@ namespace Tendo
 				continue;
 			}
 			const std::string & name = nodeConfig->GetName();
-			Server * targetActor = this->mActorComponent->Random(name);
+			ServerActor * targetActor = this->mActorComponent->Random(name);
 			if(targetActor == nullptr)
 			{
 				return XCode::AddressAllotFailure;
@@ -130,7 +130,7 @@ namespace Tendo
 		player->GetActors(actors);
 		for(int actorId : actors)
 		{
-			Server * targetServer = this->mActorComponent->GetServer(actorId);
+			ServerActor * targetServer = this->mActorComponent->GetServer(actorId);
 			if(targetServer == nullptr)
 			{
 				return XCode::NotFoundActor;

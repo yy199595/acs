@@ -23,7 +23,7 @@ namespace Tendo
         void OnStop() final;
 		int OnLogin(long long userId, const std::string & token);
 	private:
-		std::shared_ptr<class Player> NewPlayer(long long userId);
+		std::shared_ptr<class PlayerActor> NewPlayer(long long userId);
 	 private:
 		int mIndex;
 		std::string mInnerAddress;

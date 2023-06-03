@@ -52,7 +52,7 @@ namespace Tendo
         return true;
 	}
 
-	void CoroutineComponent::Sleep(long long ms)
+	void CoroutineComponent::Sleep(unsigned int ms)
 	{
         TimerComponent * timerComponent = this->mApp->GetTimer();
         if(timerComponent != nullptr && ms > 0)
@@ -61,7 +61,7 @@ namespace Tendo
             StaticMethod *sleepMethod = NewMethodProxy(
 					&CoroutineComponent::Resume, this, id);
             timerComponent->AddTimer(ms, sleepMethod);
-			this->YieldCoroutine();
+			assert(this->YieldCoroutine());
         }
 	}
 
@@ -91,7 +91,7 @@ namespace Tendo
 		}
 	}
 
-	bool CoroutineComponent::YieldCoroutine()
+	bool CoroutineComponent::YieldCoroutine() const
 	{
 		assert(this->mRunContext);
 		assert(this->mRunContext->mState == CorState::Running);
@@ -129,7 +129,7 @@ namespace Tendo
 		return coroutine;
 	}
 
-	bool CoroutineComponent::YieldCoroutine(unsigned int& mCorId)
+	bool CoroutineComponent::YieldCoroutine(unsigned int& mCorId) const
 	{
 		if (this->mRunContext != nullptr)
 		{

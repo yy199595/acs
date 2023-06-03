@@ -7,7 +7,7 @@
 #include"Async/Component/CoroutineComponent.h"
 #include"Entity/Component/ActorMgrComponent.h"
 #include"Log/Component/LogComponent.h"
-#include"Entity/Actor/Server.h"
+#include"Entity/Actor/ServerActor.h"
 namespace Tendo
 {
 	enum class ServerStatus
@@ -23,7 +23,7 @@ namespace Tendo
 {
 	class RpcService;
 	class ProtoComponent;
-	class App final : public Server, public Singleton<App>
+	class App final : public ServerActor, public Singleton<App>
 	{
 	 public:
 		explicit App(ServerConfig * config);

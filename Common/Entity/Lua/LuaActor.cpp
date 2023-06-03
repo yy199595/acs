@@ -60,7 +60,7 @@ namespace Tendo
 			message->SetType(Msg::Type::Client);
 			message->GetHead().Add("func", func);
 		}
-		Player * player = nullptr;
+		PlayerActor * player = nullptr;
 		do
 		{
 			player = App::Inst()->ActorMgr()->GetPlayer(playerId);
@@ -115,7 +115,7 @@ namespace Tendo
 		{
 
 			std::string name(lua_tostring(lua, 1));
-			Server * actor = App::Inst()->ActorMgr()->Random(name);
+			ServerActor * actor = App::Inst()->ActorMgr()->Random(name);
 			if(actor == nullptr)
 			{
 				return 0;
@@ -131,7 +131,7 @@ namespace Tendo
 		std::string address;
 		long long id = luaL_checkinteger(lua, 1);
 		const std::string name(luaL_checkstring(lua, 2));
-		Server * server = App::Inst()->ActorMgr()->GetServer(id);
+		ServerActor * server = App::Inst()->ActorMgr()->GetServer(id);
 		if(server == nullptr || !server->GetListen(name, address))
 		{
 			return 0;

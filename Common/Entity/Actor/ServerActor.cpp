@@ -2,19 +2,19 @@
 // Created by leyi on 2023/5/23.
 //
 
-#include"Server.h"
+#include"ServerActor.h"
 #include"XCode/XCode.h"
 #include"Entity/Actor/App.h"
 #include"Rpc/Component/InnerNetComponent.h"
 namespace Tendo
 {
-	Server::Server(int id, const std::string & name)
+	ServerActor::ServerActor(int id, const std::string & name)
 		: Actor(id, name), mRpc("rpc")
 	{
 
 	}
 
-	bool Server::OnInit()
+	bool ServerActor::OnInit()
 	{
 		if(!this->GetListen(this->mRpc, this->mRpcAddress))
 		{
@@ -24,7 +24,7 @@ namespace Tendo
 		return true;
 	}
 
-	int Server::GetAddress(const std::string& func, std::string& addr)
+	int ServerActor::GetAddress(const std::string& func, std::string& addr)
 	{
 		auto iter = this->mListens.find(this->mRpc);
 		if(iter == this->mListens.end())
@@ -35,7 +35,7 @@ namespace Tendo
 		return XCode::Successful;
 	}
 
-	void Server::AddListen(const std::string& name, const std::string& addr)
+	void ServerActor::AddListen(const std::string& name, const std::string& addr)
 	{
 		if (addr.empty() || name.empty())
 		{
@@ -44,7 +44,7 @@ namespace Tendo
 		this->mListens[name] = addr;
 	}
 
-	bool Server::GetListen(const std::string& name, std::string& addr)
+	bool ServerActor::GetListen(const std::string& name, std::string& addr)
 	{
 		auto iter = this->mListens.find(name);
 		if(iter == this->mListens.end())
@@ -55,7 +55,7 @@ namespace Tendo
 		return true;
 	}
 
-	int Server::Send(const std::shared_ptr<Msg::Packet>& message)
+	int ServerActor::Send(const std::shared_ptr<Msg::Packet>& message)
 	{
 		if(!this->mNetComponent->Send(this->mRpcAddress, message))
 		{
@@ -63,7 +63,7 @@ namespace Tendo
 		}
 		return XCode::Successful;
 	}
-	void Server::OnRegister(std::string& json)
+	void ServerActor::OnRegister(std::string& json)
 	{
 		Json::Writer jsonWriter;
 		auto iter = this->mListens.begin();

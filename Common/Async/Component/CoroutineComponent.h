@@ -30,11 +30,11 @@ namespace Tendo
 			return co->mCoroutineId;
 		}
 	 public:
-		bool YieldCoroutine();
+		bool YieldCoroutine() const;
 
-		bool YieldCoroutine(unsigned int& mCorId);
+		bool YieldCoroutine(unsigned int& mCorId) const;
 
-		void Sleep(long long ms);
+		void Sleep(unsigned int ms);
 
 		void Resume(unsigned int id);
 

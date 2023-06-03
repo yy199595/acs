@@ -8,10 +8,10 @@
 
 namespace Tendo
 {
-	class Player : public Actor
+	class PlayerActor : public Actor
 	{
 	public:
-		Player(long long playerId, int gate);
+		PlayerActor(long long playerId, int gate);
 	public:
 		bool OnInit() final;
 		void OnRegister(std::string &json) final;

@@ -33,6 +33,7 @@ namespace Tendo
 	 public:
 		virtual bool OnInit() = 0;
 		virtual void OnRegister(std::string & json) = 0;
+		virtual bool DecodeFromJson(const std::string & json) { return true;}
 		virtual int GetAddress(const std::string & func, std::string & addr) = 0;
 	protected:
 		std::shared_ptr<Msg::Packet> Make(const std::string & func, const pb::Message * message) const;

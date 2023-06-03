@@ -24,10 +24,10 @@ namespace Tendo
     int Login::OnLogin(long long id, const s2s::login::request & request)
 	{
 		long long playerId = request.user_id();
-		Player * player = this->mActorComponent->GetPlayer(playerId);
+		PlayerActor * player = this->mActorComponent->GetPlayer(playerId);
 		if(player == nullptr)
 		{
-			std::shared_ptr<Player> newPlayer = std::make_shared<Player>(playerId, id);
+			std::shared_ptr<PlayerActor> newPlayer = std::make_shared<PlayerActor>(playerId, id);
 			{
 				player = newPlayer.get();
 				this->mActorComponent->AddPlayer(newPlayer);
