@@ -182,102 +182,12 @@ namespace Tendo
     // $gt:大于   $lt:小于  $gte:大于或等于  $lte:小于或等于 $ne:不等于
     int MongoDB::Update(const db::mongo::update &request)
     {
-        const size_t pos = request.tab().find('.');
-        if (pos == std::string::npos)
-        {
-            CONSOLE_LOG_ERROR("[" << request.tab() << "] parse error xxx.xxx");
-            return XCode::CallArgsError;
-        }
-
-        Bson::Writer::Document dataDocument;
-        if (!dataDocument.FromByJson(request.update()))
-        {
-            return XCode::CallArgsError;
-        }
-        std::string id;
-        Bson::Writer::Document selectorDocument;
-        if (!selectorDocument.FromByJson(request.select(), id))
-        {
-            return XCode::CallArgsError;
-        }
-        std::shared_ptr<CommandRequest> mongoRequest(new CommandRequest);
-
-        const std::string tab = request.tab().substr(pos + 1);
-        mongoRequest->dataBase = request.tab().substr(0, pos);
-
-        Bson::Writer::Document updateDocument;
-        updateDocument.Add(request.tag().c_str(), dataDocument);
-
-        Bson::Writer::Document updateInfo;
-        updateInfo.Add("multi", true);
-        updateInfo.Add("upsert", false); //false没有更新不成功
-        updateInfo.Add("u", updateDocument);
-        updateInfo.Add("q", selectorDocument);
-
-
-        Bson::Writer::Array updates(updateInfo);
-        mongoRequest->document.Add("update", tab);
-        mongoRequest->document.Add("updates", updates);
-
-        int handle = this->GetClientHandle(request.flag());
-        std::shared_ptr<CommandResponse> response = this->mMongoComponent->Run(handle, mongoRequest);
-        if (response == nullptr || response->GetDocumentSize() == 0)
-        {
-            return XCode::Failure;
-        }
-        int count = 0;
-        Bson::Reader::Document &result = response->Get();
-        return (result.Get("n", count) && count > 0) ? XCode::Successful : XCode::Failure;
+        return this->UpdateData(request, false);
     }
 
     int MongoDB::Save(const db::mongo::update& request)
     {
-        const size_t pos = request.tab().find('.');
-        if (pos == std::string::npos)
-        {
-            CONSOLE_LOG_ERROR("[" << request.tab() << "] parse error xxx.xxx");
-            return XCode::CallArgsError;
-        }
-
-        Bson::Writer::Document dataDocument;
-        if (!dataDocument.FromByJson(request.update()))
-        {
-            return XCode::CallArgsError;
-        }
-        std::string id;
-        Bson::Writer::Document selectorDocument;
-        if (!selectorDocument.FromByJson(request.select(), id))
-        {
-            return XCode::CallArgsError;
-        }
-        std::shared_ptr<CommandRequest> mongoRequest(new CommandRequest);
-
-        const std::string tab = request.tab().substr(pos + 1);
-        mongoRequest->dataBase = request.tab().substr(0, pos);
-
-        Bson::Writer::Document updateDocument;
-        updateDocument.Add(request.tag().c_str(), dataDocument);
-
-        Bson::Writer::Document updateInfo;
-        updateInfo.Add("multi", true);
-        updateInfo.Add("upsert", true);
-        updateInfo.Add("u", updateDocument);
-        updateInfo.Add("q", selectorDocument);
-
-
-        Bson::Writer::Array updates(updateInfo);
-        mongoRequest->document.Add("update", tab);
-        mongoRequest->document.Add("updates", updates);
-
-        int handle = this->GetClientHandle(request.flag());
-        std::shared_ptr<CommandResponse> response = this->mMongoComponent->Run(handle, mongoRequest);
-        if (response == nullptr || response->GetDocumentSize() == 0)
-        {
-            return XCode::Failure;
-        }
-        int count = 0;
-        Bson::Reader::Document& result = response->Get();
-        return (result.Get("n", count) && count > 0) ? XCode::Successful : XCode::Failure;
+        return this->UpdateData(request, true);
     }
 
     int MongoDB::SetIndex(const db::mongo::index &request)
@@ -322,6 +232,65 @@ namespace Tendo
             document->WriterToJson(*json);
         }
         return XCode::Successful;
+    }
+
+    int MongoDB::UpdateData(const db::mongo::update &request, bool upsert)
+    {
+        const size_t pos = request.tab().find('.');
+        const std::string & select = request.select();
+        const std::string & update = request.update();
+        if (pos == std::string::npos)
+        {
+            CONSOLE_LOG_ERROR("[" << request.tab() << "] parse error xxx.xxx");
+            return XCode::CallArgsError;
+        }
+
+        Bson::Writer::Document dataDocument;
+        if (!dataDocument.FromByJson(update))
+        {
+            return XCode::CallArgsError;
+        }
+        std::string id;
+        Bson::Writer::Document selectorDocument;
+        if (!selectorDocument.FromByJson(select, id))
+        {
+            return XCode::CallArgsError;
+        }
+        std::shared_ptr<CommandRequest> mongoRequest(new CommandRequest);
+
+        const std::string tab = request.tab().substr(pos + 1);
+        mongoRequest->dataBase = request.tab().substr(0, pos);
+
+        const char * tag = "$set";
+        Bson::Writer::Document updateDocument;
+        if(!request.tag().empty())
+        {
+            tag = request.tag().c_str();
+        }
+        updateDocument.Add(tag, dataDocument);
+
+        Bson::Writer::Document updateInfo;
+        updateInfo.Add("multi", true);
+        updateInfo.Add("upsert", upsert);
+        updateInfo.Add("u", updateDocument);
+        updateInfo.Add("q", selectorDocument);
+
+
+        Bson::Writer::Array updates(updateInfo);
+        mongoRequest->document.Add("update", tab);
+        mongoRequest->document.Add("updates", updates);
+
+        int handle = this->GetClientHandle(request.flag());
+        std::shared_ptr<CommandResponse> response = this->mMongoComponent->Run(handle, mongoRequest);
+        if (response == nullptr || response->GetDocumentSize() == 0)
+        {
+            return XCode::Failure;
+        }
+        int count = 0;
+        std::string json;
+        response->Get().WriterToJson(json);
+        Bson::Reader::Document& result = response->Get();
+        return (result.Get("n", count) && count > 0) ? XCode::Successful : XCode::Failure;
     }
 
 }

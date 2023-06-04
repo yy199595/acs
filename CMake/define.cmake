@@ -71,7 +71,7 @@ else()
 #- - wno -sign-compare:禁用与符号比较相关的警告。
 #- - wno -class-memaccess:禁用类成员访问相关的警告。
 #- - wno -strict-aliasing:禁用严格混叠相关的警告。
-    add_compile_options(-Wall -g -Wno-sign-compare -Wno-class-memaccess -Wno-strict-aliasing -fstandalone-debug)
+    add_compile_options(-Wall -g -Wno-sign-compare -Wno-class-memaccess -Wno-strict-aliasing)
     if(APPLE)
         add_compile_options(-fno-pie)
     endif()

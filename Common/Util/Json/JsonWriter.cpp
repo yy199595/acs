@@ -145,7 +145,7 @@ namespace Json
 		{
 			const char* str = value.GetString();
 			const size_t size = value.GetStringLength();
-			this->Add(str, size);
+			this->AddBin(str, size);
 		}
 		else if (value.IsInt64())
 		{

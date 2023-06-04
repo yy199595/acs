@@ -4,7 +4,6 @@
 
 #ifndef _ACTORREGISTRY_H_
 #define _ACTORREGISTRY_H_
-#include "Entity/Component/ActorMgrComponent.h"
 #include"Rpc/Service/RpcService.h"
 #include"Message/s2s/registry.pb.h"
 #include"Registry/Target/TargetRegistry.h"

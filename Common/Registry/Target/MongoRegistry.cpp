@@ -10,7 +10,7 @@ namespace Tendo
 	{
 		this->mApp = app;
 		app->AddComponent<MongoDBComponent>();
-		return false;
+		return true;
 	}
 
 	bool MongoRegistry::LateAwake(App* app)
@@ -48,7 +48,7 @@ namespace Tendo
 	int MongoRegistry::Add(const std::string& name, long long id, const std::string& json)
 	{
 		Json::Writer select;
-		select.Add("_id", id);
+		select.Add("_id").Add(id);
 		const std::string func("MongoDB.Save");
 		const std::string tab = fmt::format("Registry.{0}", name);
 		db::mongo::update request;

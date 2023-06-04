@@ -47,7 +47,7 @@ namespace Json
 #ifndef __OS_WIN__
 		inline Writer& Add(size_t value) { this->mWriter.Uint(value); return *this; }
 #endif
-		inline Writer& Add(const char * str, size_t size) { this->mWriter.String(str, size); return *this; }
+		inline Writer& AddBin(const char * str, size_t size) { this->mWriter.String(str, size); return *this; }
 		inline Writer& Add(const std::string & value) { this->mWriter.String(value.c_str(), value.size()); return *this;}
 	public:
 		

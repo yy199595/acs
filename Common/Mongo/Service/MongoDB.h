@@ -28,6 +28,8 @@ namespace Tendo
 		int Query(const db::mongo::query::request & request, db::mongo::query::response & response);
 		int RunCommand(const db::mongo::command::request & request, db::mongo::command::response & response);
     private:
+        int UpdateData(const db::mongo::update & request, bool upsert);
+    private:
 		size_t mIndex;
         std::string mBuffer;
 		std::vector<int> mClients;

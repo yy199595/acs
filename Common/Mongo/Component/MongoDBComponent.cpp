@@ -8,9 +8,6 @@
 #include "Util/Time/TimeHelper.h"
 #include"Mongo/Lua/LuaMongo.h"
 #include"Lua/Engine/ClassProxyHelper.h"
-#ifdef __DEBUG__
-#include"Util/String/StringHelper.h"
-#endif
 namespace Tendo
 {
 	MongoTask::MongoTask(int id)
@@ -121,7 +118,7 @@ namespace Tendo
         return true;
     }
 
-    bool MongoDBComponent::Send(int id, std::shared_ptr<CommandRequest> request, int& taskId)
+    bool MongoDBComponent::Send(int id, const std::shared_ptr<CommandRequest>& request, int& taskId)
     {
         TcpMongoClient* mongoClient = this->GetClient(id);
         if (mongoClient == nullptr)

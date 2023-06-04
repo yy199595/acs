@@ -96,7 +96,6 @@ namespace Tendo
         if (!this->LoadComponent())
         {
             this->mLogComponent->SaveAllLog();
-			CONSOLE_LOG_ERROR("init component failure");
 #ifdef __OS_WIN__
             return getchar();
 #endif

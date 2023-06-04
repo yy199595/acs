@@ -467,7 +467,7 @@ namespace Bson
                 {
                     int len = 0;
                     const char *str = element.binData(len);
-                    json.Add(str, len);
+                    json.AddBin(str, len);
                 }
                     break;
                 case _bson::BSONType::Object:

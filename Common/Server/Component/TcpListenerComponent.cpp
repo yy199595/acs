@@ -11,6 +11,7 @@ namespace Tendo
 {
 	TcpListenerComponent::TcpListenerComponent()
     {
+        this->mListenPort = 0;
         this->mListenCount = 0;
         this->mBindAcceptor = nullptr;
         this->mThreadComponent = nullptr;
@@ -18,8 +19,11 @@ namespace Tendo
 
 	TcpListenerComponent::~TcpListenerComponent()
 	{
-		Asio::Code err;
-		this->mBindAcceptor->close(err);
+        if(this->mBindAcceptor != nullptr)
+        {
+            Asio::Code err;
+            this->mBindAcceptor->close(err);
+        }
 	}
 
     bool TcpListenerComponent::StopListen() const

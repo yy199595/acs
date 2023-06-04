@@ -46,7 +46,7 @@ namespace Tendo
         void OnClientError(int index, int code);
 		unsigned int GetWaitCount() const { return this->mWaitCount; }
 	public:
-        bool Send(int id, std::shared_ptr<CommandRequest> request, int & taskId);
+        bool Send(int id, const std::shared_ptr<CommandRequest>& request, int & taskId);
 		std::shared_ptr<Mongo::CommandResponse> Run(int id, const std::shared_ptr<CommandRequest>& request);
 	 private:
 		bool Awake() final;

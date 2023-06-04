@@ -172,7 +172,7 @@ namespace Mysql
             case enum_field_types::MYSQL_TYPE_VAR_STRING:
             {
                 //rapidjson::Value value(str, len);
-                document.Add(filed->name).Add(str, len);
+                document.Add(filed->name).AddBin(str, len);
                 return true;
             }
             case enum_field_types::MYSQL_TYPE_JSON:
