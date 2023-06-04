@@ -15,7 +15,6 @@ namespace Tendo
 	}
 	bool ActorRegistry::OnInit()
 	{
-		this->mActorMgr = this->mApp->ActorMgr();
 		BIND_COMMON_RPC_METHOD(ActorRegistry::Add);
 		BIND_COMMON_RPC_METHOD(ActorRegistry::Del);
 		BIND_COMMON_RPC_METHOD(ActorRegistry::Query);

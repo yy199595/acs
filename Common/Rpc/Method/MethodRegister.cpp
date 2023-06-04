@@ -41,11 +41,10 @@ namespace Tendo
 		auto iter = this->mMethodMap.find(name);
 		if (iter != this->mMethodMap.end())
 		{
-			LOG_FATAL(this->mComponent->GetName() << "." << name << " already exist");
+			LOG_FATAL(fullName << " already exist");
 			return false;
 		}
 		this->mMethodMap.emplace(name, method);
-		//LOG_DEBUG("add new c++ service method [" << this->mService <<'.' << name << ']');
 		return true;
 	}
 

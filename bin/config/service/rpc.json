@@ -1,13 +1,11 @@
 {
     "Gate": {
         "Ping": {
-            "Net": "rpc",
             "Async": false,
             "IsOpen": true,
             "IsClient": true
         },
         "Login": {
-            "Net": "rpc",
             "Async": true,
             "IsClient": true
         },

@@ -15,23 +15,18 @@ namespace Tendo
 
 	bool Unit::AddComponent(const std::string& name)
 	{
-		auto iter = this->mComponentMap.find(name);
-		if (iter != this->mComponentMap.end())
+		std::unique_ptr<Component> component = ComponentFactory::CreateComponent(name);
+		if(component == nullptr)
 		{
 			return false;
 		}
-		return this->AddComponent(name, ComponentFactory::CreateComponent(name));
+		return this->AddComponent(name, std::move(component));
 	}
 
 	bool Unit::AddComponent(const std::string& name, std::unique_ptr<Component> component)
 	{
-		if (component == nullptr)
+		if(this->HasComponent(name))
 		{
-			return false;
-		}
-		if (this->mComponentMap.find(name) != this->mComponentMap.end())
-		{
-			LOG_ERROR("add " << name << " failure");
 			return false;
 		}
 		component->mName = name;
