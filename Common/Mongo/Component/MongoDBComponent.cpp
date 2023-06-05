@@ -40,8 +40,8 @@ namespace Tendo
         for (int index = 0; index < this->mConfig.MaxCount; index++)
         {
             id++;
-            const std::string& ip = this->mConfig.Address[0].Ip;
-            const unsigned int port = this->mConfig.Address[0].Port;
+            const std::string& ip = this->mConfig.Address.Ip;
+            const unsigned int port = this->mConfig.Address.Port;
             ThreadComponent* threadComponent =
                 this->GetComponent<ThreadComponent>();
 

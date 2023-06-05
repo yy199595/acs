@@ -2,12 +2,12 @@
 // Created by yjz on 2023/5/17.
 //
 
-#include"ActorMgrComponent.h"
+#include"ActorComponent.h"
 #include"Entity/Actor/App.h"
 #include"Server/Config/ServerConfig.h"
 namespace Tendo
 {
-	bool ActorMgrComponent::AddRandomActor(const std::string& name, Tendo::Actor* actor)
+	bool ActorComponent::AddRandomActor(const std::string& name, Tendo::Actor* actor)
 	{
 		if (name.empty())
 		{
@@ -24,7 +24,7 @@ namespace Tendo
 		return true;
 	}
 
-	ServerActor* ActorMgrComponent::Random(const std::string& name)
+	ServerActor* ActorComponent::Random(const std::string& name)
 	{
 		auto iter = this->mActorNames.find(name);
 		if(iter == this->mActorNames.end())
@@ -35,7 +35,7 @@ namespace Tendo
 		return this->GetServer(iter->second[index]);
 	}
 
-	Actor* ActorMgrComponent::GetActor(long long id)
+	Actor* ActorComponent::GetActor(long long id)
 	{
 		auto iter = this->mServers.find(id);
 		if(iter != this->mServers.end())
@@ -46,7 +46,7 @@ namespace Tendo
 		return iter1 != this->mPlayers.end() ? iter1->second.get() : nullptr;
 	}
 
-	bool ActorMgrComponent::DelActor(long long id)
+	bool ActorComponent::DelActor(long long id)
 	{
 		auto iter = this->mPlayers.find(id);
 		if(iter != this->mPlayers.end())
@@ -69,7 +69,7 @@ namespace Tendo
 		return false;
 	}
 
-	bool ActorMgrComponent::AddPlayer(std::shared_ptr<PlayerActor> player)
+	bool ActorComponent::AddPlayer(std::shared_ptr<PlayerActor> player)
 	{
 		long long playerId = player->GetActorId();
 		auto iter = this->mPlayers.find(playerId);
@@ -82,7 +82,7 @@ namespace Tendo
 		return true;
 	}
 
-	bool ActorMgrComponent::AddServer(std::shared_ptr<ServerActor> server)
+	bool ActorComponent::AddServer(std::shared_ptr<ServerActor> server)
 	{
 		assert(server->GetActorId() < 10000);
 		long long serverId = server->GetActorId();
@@ -103,25 +103,25 @@ namespace Tendo
 		return true;
 	}
 
-	PlayerActor* ActorMgrComponent::GetPlayer(long long playerId)
+	PlayerActor* ActorComponent::GetPlayer(long long playerId)
 	{
 		auto iter = this->mPlayers.find(playerId);
 		return iter != this->mPlayers.end() ? iter->second.get() : nullptr;
 	}
 
-	ServerActor* ActorMgrComponent::GetServer(long long serverId)
+	ServerActor* ActorComponent::GetServer(long long serverId)
 	{
 		auto iter = this->mServers.find(serverId);
 		return iter != this->mServers.end() ? iter->second.get() : nullptr;
 	}
 
-	bool ActorMgrComponent::AddServer(std::shared_ptr<ServerActor> server, const std::string & json)
+	bool ActorComponent::AddServer(std::shared_ptr<ServerActor> server, const std::string & json)
 	{
 		server->DecodeFromJson(json);
 		return this->AddServer(server);
 	}
 
-	void ActorMgrComponent::GetServers(std::vector<ServerActor *>& servers)
+	void ActorComponent::GetServers(std::vector<ServerActor *>& servers)
 	{
 		auto iter = this->mServers.begin();
 		for(; iter != this->mServers.end(); iter++)

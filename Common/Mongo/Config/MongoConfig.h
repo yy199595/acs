@@ -22,7 +22,7 @@ namespace Mongo
         std::string DB;
         std::string User;
         std::string Password;
-        std::vector<Net::Address> Address;
+        Net::Address Address;
     };
 }
 

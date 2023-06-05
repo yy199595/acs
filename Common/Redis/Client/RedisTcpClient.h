@@ -36,7 +36,6 @@ namespace Tendo
         void OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t) final;
         void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
     private:
-        size_t mIndex;
 		bool mIsSubClient; //是否是发布订阅客户端
 		std::string mAddress;
         RedisClientConfig mConfig;

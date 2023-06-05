@@ -20,8 +20,6 @@ namespace Tendo
 		bool Send(const std::shared_ptr<RedisRequest>& request, int & id);
 		inline const RedisClientConfig & Config() const { return this->mConfig.Config(); }
 	public:
-		bool SubChanel(const std::string & chanel);
-	public:
         template<typename ... Args>
         bool Send(const std::string & cmd, Args&& ... args);
         template<typename ... Args>
@@ -42,8 +40,8 @@ namespace Tendo
         bool LateAwake() final;
 		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
 	private:
+        size_t mIndex;
 		RedisConfig mConfig;
-		std::shared_ptr<RedisTcpClient> mSubClient;
 		std::shared_ptr<RedisTcpClient> mMainClient;
 		class DispatchComponent * mDispatchComponent;
 		std::vector<std::shared_ptr<RedisTcpClient>> mRedisClients;

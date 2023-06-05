@@ -7,12 +7,6 @@
 #include"Rpc/Component/InnerNetComponent.h"
 namespace Tendo
 {
-
-    bool Login::Awake()
-    {
-        return true;
-    }
-
 	bool Login::OnInit()
 	{
 		BIND_COMMON_RPC_METHOD(Login::OnLogin);
@@ -42,7 +36,8 @@ namespace Tendo
 
     int Login::OnLogout(long long id, const s2s::logout::request& request)
     {
-
+		long long userId = request.user_id();
+    	this->mActorComponent->DelActor(userId);
 		return XCode::Successful;
     }
 

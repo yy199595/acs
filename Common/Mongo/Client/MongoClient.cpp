@@ -34,8 +34,7 @@ namespace Mongo
 			Tendo::IRpc<CommandResponse>* component, const MongoConfig & config)
 		: Tcp::TcpContext(std::move(socket), 1024 * 1024), mComponent(component), mConfig(config)
 	{
-        this->mIndex = 0;
-        this->mAddress = config.Address[0].FullAddress;
+        this->mAddress = config.Address.FullAddress;
 	}
 
 	void TcpMongoClient::OnSendMessage(const Asio::Code & code, std::shared_ptr<Tcp::ProtoMessage> message)
@@ -247,12 +246,8 @@ namespace Mongo
 
 	bool TcpMongoClient::StartAuthBySha1()
 	{
-        if(this->mIndex >= this->mConfig.Address.size())
-        {
-            return false;
-        }
-        const Net::Address & address
-            = this->mConfig.Address[this->mIndex];
+       
+        const Net::Address& address = this->mConfig.Address;
         this->mSocket->Init(address.Ip, address.Port);
 #ifdef __DEBUG__
         CONSOLE_LOG_DEBUG("start connect mongo server [" << address.FullAddress << "]");
@@ -260,13 +255,11 @@ namespace Mongo
 
 		if(!this->ConnectSync())
 		{
-            this->mIndex++;
 #ifdef __DEBUG__
             CONSOLE_LOG_ERROR("connect mongo server [" << address.FullAddress << "] failure");
 #endif // __DEBUG__
 			return this->StartAuthBySha1();
 		}
-        this->mIndex = 0;
 #ifdef __DEBUG__
         CONSOLE_LOG_DEBUG("connect mongo server [" << address.FullAddress << "]successful");
 #endif

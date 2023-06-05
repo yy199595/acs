@@ -17,6 +17,7 @@ namespace Tendo
     bool RedisComponent::Awake()
     {
 		std::string path;
+		this->mIndex = 0;
 		const ServerConfig * config = ServerConfig::Inst();
 		LOG_CHECK_RET_FALSE(config->GetPath("db", path))
 		LOG_CHECK_RET_FALSE(this->mConfig.LoadConfig(path))
@@ -26,7 +27,7 @@ namespace Tendo
 		Asio::Context& io = this->mApp->MainThread();
 		std::shared_ptr<Tcp::SocketProxy> socket = std::make_shared<Tcp::SocketProxy>(io);
 
-		socket->Init(this->Config().Address[0].Ip, this->Config().Address[0].Port);
+		socket->Init(this->Config().Address.Ip, this->Config().Address.Port);
 		this->mMainClient =	std::make_shared<RedisTcpClient>(socket, this->mConfig.Config(), this);
 		return this->mMainClient->AuthUser();	
     }
@@ -66,7 +67,6 @@ namespace Tendo
 			{
 				request->SetType(Msg::Type::SubPublish);
 				request->SetContent(redisAny3->GetValue());
-				request->SetFrom(this->mSubClient->GetAddress());
 				request->GetHead().Add("channel", redisAny2->GetValue());
 			}
 			this->mDispatchComponent->OnMessage(request);
@@ -75,8 +75,8 @@ namespace Tendo
 
     RedisTcpClient * RedisComponent::MakeRedisClient(const RedisClientConfig & config)
     {
-        const std::string & ip = config.Address[0].Ip;
-        const unsigned int port = config.Address[0].Port;
+        const std::string & ip = config.Address.Ip;
+        const unsigned int port = config.Address.Port;
         ThreadComponent * component = this->GetComponent<ThreadComponent>();
         std::shared_ptr<Tcp::SocketProxy> socketProxy = component->CreateSocket(ip, port);
         if(socketProxy == nullptr)
@@ -99,28 +99,15 @@ namespace Tendo
 
     RedisTcpClient * RedisComponent::GetClient(size_t index)
     {
-		if(this->mRedisClients.empty())
+		if (this->mRedisClients.empty())
 		{
 			return nullptr;
 		}
-		if(index > 0)
+		if (this->mIndex >= this->mRedisClients.size())
 		{
-			index = index % this->mRedisClients.size();
-			return this->mRedisClients[index].get();
+			this->mIndex = 0;
 		}
-        std::shared_ptr<RedisTcpClient> tempRedisClint = this->mRedisClients.front();
-        for (std::shared_ptr<RedisTcpClient> & redisClient: this->mRedisClients)
-        {
-            if(redisClient->WaitSendCount() <= 5)
-            {
-                return redisClient.get();
-            }
-            if(tempRedisClint->WaitSendCount() < redisClient->WaitSendCount())
-            {
-                tempRedisClint = redisClient;
-            }
-        }
-        return tempRedisClint.get();
+		return this->mRedisClients[this->mIndex++].get();		
     }
 
     std::shared_ptr<RedisResponse> RedisComponent::Run(const std::shared_ptr<RedisRequest>& request)
@@ -199,42 +186,8 @@ namespace Tendo
 	{
 		this->SyncRun("QUIT");
 		for(auto & redisClient : this->mRedisClients)
-		{
-			std::shared_ptr<RedisRequest> request
-					= std::make_shared<RedisRequest>("QUIT");
-
-			redisClient->Send(request);
+		{			
+			redisClient->Send(RedisRequest::Make("QUIT"));
 		}
-	}
-
-	bool RedisComponent::SubChanel(const string& chanel)
-	{
-		if(this->mSubClient == nullptr)
-		{
-			const std::string & ip = this->mConfig.Config().Address[0].Ip;
-			const unsigned int port = this->mConfig.Config().Address[0].Port;
-			ThreadComponent * component = this->GetComponent<ThreadComponent>();
-			std::shared_ptr<Tcp::SocketProxy> socketProxy = component->CreateSocket(ip, port);
-			this->mSubClient = std::make_shared<RedisTcpClient>(socketProxy, this->mConfig.Config(), this);
-		}
-		if(this->mSubClient == nullptr)
-		{
-			return false;
-		}
-		int taskId = 0;
-		std::shared_ptr<RedisRequest> request = RedisRequest::Make("SUBSCRIBE", chanel);
-		if(!this->Send(request, taskId))
-		{
-			LOG_ERROR("send redis cmd error : "  << request->ToJson());
-			return false;
-		}
-		std::shared_ptr<RedisTask> redisTask = std::make_shared<RedisTask>(taskId);
-		std::shared_ptr<RedisResponse> redisResponse = this->AddTask(taskId, redisTask)->Await();
-		if (redisResponse != nullptr && redisResponse->HasError())
-		{
-			LOG_ERROR(request->ToJson());
-			LOG_ERROR(redisResponse->GetString());
-		}
-		return redisResponse != nullptr && redisResponse->GetArraySize() == 3;
 	}
 }

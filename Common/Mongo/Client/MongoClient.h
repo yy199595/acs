@@ -34,7 +34,6 @@ namespace Mongo
 		void OnSendMessage(const asio::error_code &code, std::shared_ptr<Tcp::ProtoMessage> message) final;
 		std::shared_ptr<CommandResponse> SyncSendMongoCommand(std::shared_ptr<CommandRequest> request);
 	private:
-        size_t mIndex;
         std::string mAddress;
 		const MongoConfig & mConfig;
 		asio::streambuf streamBuffer;

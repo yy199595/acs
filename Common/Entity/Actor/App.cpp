@@ -41,7 +41,7 @@ namespace Tendo
 		this->mLogComponent = this->GetOrAddComponent<LogComponent>();
 		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
 		this->mMessageComponent = this->GetOrAddComponent<ProtoComponent>();
-		this->mActorComponent = this->GetOrAddComponent<ActorMgrComponent>();
+		this->mActorComponent = this->GetOrAddComponent<ActorComponent>();
 
         LOG_CHECK_RET_FALSE(this->AddComponent<TextConfigComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<ThreadComponent>());

@@ -9,7 +9,7 @@
 #include"Entity/Actor/PlayerActor.h"
 namespace Tendo
 {
-	class ActorMgrComponent : public Component
+	class ActorComponent : public Component
 	{
 	 public:
 		Actor * GetActor(long long id);

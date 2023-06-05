@@ -25,19 +25,14 @@ namespace Mongo
 			this->MaxCount = jsonData["count"].GetInt();
 			this->Password = jsonData["passwd"].GetString();
 		}
-		const rapidjson::Value& jsonArray = jsonData["address"];
-		for (unsigned int index = 0; index < jsonArray.Size(); index++)
+		std::string net;
+		Net::Address& addr = this->Address;
+		addr.FullAddress.assign(jsonData["address"].GetString());
+		if (!Helper::Str::SplitAddr(addr.FullAddress, net, addr.Ip, addr.Port))
 		{
-			std::string net;
-			Net::Address addressInfo;
-			addressInfo.FullAddress.assign(jsonArray[index].GetString());
-			if(!Helper::Str::SplitAddr(addressInfo.FullAddress, net, addressInfo.Ip, addressInfo.Port))
-			{
-				return false;
-			}
-			this->Address.emplace_back(addressInfo);
+			return false;
 		}
-		return this->Address.size() > 0;
+		return true;
 	}
 
     bool MongoConfig::OnReloadText(const char *str, size_t length)

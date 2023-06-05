@@ -20,7 +20,7 @@ namespace Tendo
         std::string Name;
         std::string Script;
         std::string Password;
-        std::vector<Net::Address> Address;
+        Net::Address Address;
     };
 
 

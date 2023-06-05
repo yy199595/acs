@@ -14,7 +14,7 @@
 #include"Http/Component/HttpComponent.h"
 #include"Http/Component/HttpWebComponent.h"
 #include"Http/Component/HttpDebugComponent.h"
-#include"Entity/Component/ActorMgrComponent.h"
+#include"Entity/Component/ActorComponent.h"
 
 #include"Server/Component/TextConfigComponent.h"
 #include"Cluster/Component/LaunchComponent.h"
@@ -59,7 +59,7 @@ void RegisterComponent()
     ComponentFactory::Add<LogComponent>("LogComponent");
     ComponentFactory::Add<ThreadComponent>("ThreadComponent");
     ComponentFactory::Add<ProtoComponent>("ProtoComponent");
-	ComponentFactory::Add<ActorMgrComponent>("ActorMgrComponent");
+	ComponentFactory::Add<ActorComponent>("ActorMgrComponent");
 
 //server
 	ComponentFactory::Add<KcpComponent>("KcpComponent");

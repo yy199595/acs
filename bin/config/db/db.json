@@ -1,30 +1,24 @@
 {
-    "redis": {
-        "address": [
-            "tcp://43.143.76.75:6379"
-        ],
-        "timeout": 3,
-        "count": 2,
-        "free": 30,
-        "index": 0,      
-        "passwd": "199595yjz.",
-        "script": "config/db/redis"
-    },
-    "mysql": {
-        "count": 1,
-        "address": [
-            "tcp://43.143.76.75:3306"
-        ],
-        "user": "yjz",
-        "passwd": "199595yjz."
-    },
-    "mongo": {
-        "count" : 10,
-        "db": "yjz",
-        "address": [
-            "tcp://43.143.76.75:27017"
-        ],
-        "user" : "admin",
-        "passwd" : "199595yjz."
-    }
+  "redis": {
+    "timeout": 3,
+    "count": 2,
+    "free": 30,
+    "index": 0,
+    "passwd": "199595yjz.",
+    "script": "config/db/redis",
+    "address": "tcp://43.143.76.75:6379"
+  },
+  "mysql": {
+    "count": 1,
+    "user": "yjz",
+    "passwd": "199595yjz.",
+    "address": "tcp://43.143.76.75:3306"
+  },
+  "mongo": {
+    "count": 10,
+    "db": "yjz",
+    "user": "admin",
+    "passwd": "199595yjz.",
+    "address": "tcp://43.143.76.75:27017"
+  }
 }

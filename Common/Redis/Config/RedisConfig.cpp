@@ -3,8 +3,8 @@
 //
 
 #include"RedisConfig.h"
-#include"Util/String/StringHelper.h"
 #include"rapidjson/document.h"
+#include"Util/String/StringHelper.h"
 namespace Tendo
 {
     bool RedisConfig::OnLoadText(const char *str, size_t length)
@@ -28,18 +28,15 @@ namespace Tendo
         {
             return false;
         }
-		const rapidjson::Value & json = jsonData["address"];
-        for(unsigned int index = 0;index < json.Size();index++)
-        {
-			std::string net;
-            Net::Address addressInfo;
-			addressInfo.FullAddress.assign(json[index].GetString());
-            if(!Helper::Str::SplitAddr(addressInfo.FullAddress,net, addressInfo.Ip, addressInfo.Port))
-            {
-                return false;
-            }
-            this->mConfig.Address.emplace_back(addressInfo);
-        }
+
+		std::string net;
+		Net::Address& addr = this->mConfig.Address;
+		addr.FullAddress.assign(jsonData["address"].GetString());
+		if (!Helper::Str::SplitAddr(addr.FullAddress, net, addr.Ip, addr.Port))
+		{
+			return false;
+		}
+		
 		if (jsonData.HasMember("free"))
 		{
 			this->mConfig.FreeClient = jsonData["free"].GetInt();

@@ -19,9 +19,8 @@ namespace Tendo
 		int OnLogout(long long id, const s2s::logout::request & request);
 	private:
 		bool OnInit() final;
-        bool Awake() final;
 	private:
-		class ActorMgrComponent * mActorComponent;
+		class ActorComponent * mActorComponent;
     };
 }
 

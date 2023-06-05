@@ -25,7 +25,7 @@ namespace Tendo
 		int SendToClient(const std::string & func, const pb::Message & request);
 	private:
 		int mGateId;
-		class ActorMgrComponent * mActorComponent;
+		class ActorComponent * mActorComponent;
 		std::unordered_map<std::string, int> mServerAddrs;
 	};
 }

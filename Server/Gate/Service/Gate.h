@@ -29,7 +29,7 @@ namespace Tendo
 		std::string mInnerAddress;
 		std::string mOuterAddress;
 		class OuterNetComponent* mOuterComponent;
-		class ActorMgrComponent * mActorComponent;
+		class ActorComponent * mActorComponent;
 		std::unordered_map<std::string, long long> mTokens;
 	};
 

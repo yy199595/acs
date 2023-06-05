@@ -12,9 +12,8 @@ namespace Tendo
 		const RedisClientConfig& config, IRpc<RedisResponse>* component)
 		: Tcp::TcpContext(std::move(socket), 1024 * 1024), mConfig(config), mComponent(component)
 	{
-        this->mIndex = 0;
 		this->mIsSubClient = false;
-        this->mAddress = this->mConfig.Address[0].FullAddress;
+        this->mAddress = this->mConfig.Address.FullAddress;
         this->mCurResponse = std::make_shared<RedisResponse>();
 	}
 
@@ -98,7 +97,6 @@ namespace Tendo
 		{
 			if (!this->AuthUser())
 			{
-				this->mIndex = 0;
 				CONSOLE_LOG_FATAL("redis auth failure");
 				return;
 			}
@@ -109,27 +107,22 @@ namespace Tendo
 	}
 
 	bool RedisTcpClient::AuthUser()
-    {
-        if (this->mIndex >= this->mConfig.Address.size())
+    {      
+        const Net::Address& address = this->mConfig.Address;
         {
-            return false;
+            this->mAddress = address.FullAddress;
+            this->mSocket->Init(address.Ip, address.Port);
         }
-        const Net::Address &address =
-                this->mConfig.Address[this->mIndex];
-        this->mAddress = address.FullAddress;
-        this->mSocket->Init(address.Ip, address.Port); 
 #ifdef __DEBUG__
         CONSOLE_LOG_DEBUG("start connect redis server [" << address.FullAddress << "]");
 #endif
         if (!this->ConnectSync())
-        {
-            this->mIndex++;
+        {         
 #ifdef __DEBUG__
             CONSOLE_LOG_ERROR("connect redis server [" << address.FullAddress << "] failure");
 #endif // __DEBUG__
             return this->AuthUser();
-        }
-        this->mIndex = 0;
+        }      
 #ifdef __DEBUG__
         CONSOLE_LOG_DEBUG("connect redis server [" << address.FullAddress << "]successful");
 #endif
@@ -145,8 +138,7 @@ namespace Tendo
             std::shared_ptr<RedisRequest> authCommand = RedisRequest::Make("AUTH", this->mConfig.Password);
             std::shared_ptr<RedisResponse> response = this->SyncCommand(authCommand);
             if(response == nullptr || !response->IsOk())
-            {
-				this->mIndex++;
+            {				
 				this->mSocket->Close();
                 CONSOLE_LOG_ERROR("auth redis user failure");
 				return this->AuthUser();
