@@ -31,9 +31,9 @@ namespace Tendo
 	bool DispatchComponent::LateAwake()
 	{
         this->mTimerComponent = this->mApp->GetTimer();
+		this->mTaskComponent = this->mApp->GetCoroutine();
 		this->mNetComponent = this->GetComponent<InnerNetComponent>();
 		this->mOuterComponent = this->GetComponent<OuterNetComponent>();
-		LOG_CHECK_RET_FALSE(this->mTaskComponent = this->GetComponent<CoroutineComponent>());
 		return true;
 	}
 
