@@ -13,7 +13,6 @@ namespace Tendo
 	MysqlClient::MysqlClient(IRpc<Mysql::Response> *component, const MysqlConfig & config)
 							 : mComponent(component), mConfig(config)
     {
-        this->mIndex = 0;
 		this->mLastTime = 0;
 		this->mThread = nullptr;
         this->mMysqlClient = nullptr;
@@ -32,7 +31,6 @@ namespace Tendo
 	{
 		while (!this->StartConnect())
 		{
-			this->mIndex = 0;
 			std::this_thread::sleep_for(std::chrono::seconds(3));
 #ifdef __DEBUG__
 			CONSOLE_LOG_ERROR("reconnect mysql server");
@@ -94,31 +92,24 @@ namespace Tendo
 
 	bool MysqlClient::StartConnect()
 	{
-		if (this->mIndex >= this->mConfig.Address.size())
-		{
-			CONSOLE_LOG_ERROR("connect mysql failure");
-			return false;
-		}
 		MYSQL* mysql = mysql_init(nullptr);
 		const char* user = this->mConfig.User.c_str();
 		const char* pwd = this->mConfig.Password.c_str();
-		const std::string& ip = this->mConfig.Address[this->mIndex].Ip;
-		unsigned short port = this->mConfig.Address[this->mIndex].Port;
-		const std::string& address = this->mConfig.Address[this->mIndex].FullAddress;
+		const char * ip = this->mConfig.Address.Ip.c_str();
+		unsigned short port = this->mConfig.Address.Port;
+		const std::string& address = this->mConfig.Address.FullAddress;
 #ifdef __DEBUG__
 		CONSOLE_LOG_DEBUG("start connect mysql server [" << address << "]");
 #endif // __DEBUG__
 
-		if (!mysql_real_connect(mysql, ip.c_str(), user, pwd, "", port, NULL, CLIENT_FOUND_ROWS))
+		if (!mysql_real_connect(mysql, ip, user, pwd, "", port, NULL, CLIENT_FOUND_ROWS))
 		{
-			this->mIndex++;
 #ifdef __DEBUG__
 			CONSOLE_LOG_ERROR(mysql_error(mysql));
 			//CONSOLE_LOG_ERROR("connect mysql server [" << address << "] failure");
 #endif
 			return this->StartConnect();
 		}
-		this->mIndex = 0;
 		this->mMysqlClient = mysql;
 #ifdef __DEBUG__
 		CONSOLE_LOG_DEBUG("connect mysql server [" << address << "]successful");

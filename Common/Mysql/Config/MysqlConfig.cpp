@@ -10,37 +10,34 @@
 namespace Tendo
 {
     bool MysqlConfig::OnLoadText(const char *str, size_t length)
-    {
-        rapidjson::Document document;
-        if (document.Parse(str, length).HasParseError())
-        {
-            return false;
-        }
-        if (!document.HasMember("mysql"))
-        {
-            return false;
-        }
-        rapidjson::Value &json = document["mysql"];
-        this->User = json["user"].GetString();
-        this->MaxCount = json["count"].GetInt();
-        this->Password = json["passwd"].GetString();
-        if (json.HasMember("ping"))
-        {
-            this->Ping = json["ping"].GetInt();
-        }
-        for (unsigned int index = 0; index < json["address"].Size(); index++)
-        {
-			std::string net;
-            Net::Address addressInfo;
-            addressInfo.FullAddress.assign(json["address"][index].GetString());
-            if(!Helper::Str::SplitAddr(addressInfo.FullAddress, net, addressInfo.Ip, addressInfo.Port))
-            {
-                return false;
-            }
-            this->Address.emplace_back(addressInfo);
-        }
-        return this->Address.size() > 0;
-    }
+	{
+		rapidjson::Document document;
+		if (document.Parse(str, length).HasParseError())
+		{
+			return false;
+		}
+		if (!document.HasMember("mysql"))
+		{
+			return false;
+		}
+		rapidjson::Value& json = document["mysql"];
+		this->User = json["user"].GetString();
+		this->MaxCount = json["count"].GetInt();
+		this->Password = json["passwd"].GetString();
+		if (json.HasMember("ping"))
+		{
+			this->Ping = json["ping"].GetInt();
+		}
+
+		std::string net;
+		Net::Address& addr = this->Address;
+		addr.FullAddress.assign(json["address"].GetString());
+		if (!Helper::Str::SplitAddr(addr.FullAddress, net, addr.Ip, addr.Port))
+		{
+			return false;
+		}
+		return true;
+	}
 
     bool MysqlConfig::OnReloadText(const char *str, size_t length)
     {

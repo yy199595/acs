@@ -32,7 +32,6 @@ namespace Tendo
     private:
         void Update();
     private:
-        size_t mIndex;
         MYSQL *mMysqlClient;
         long long mLastTime;
 		std::thread * mThread;

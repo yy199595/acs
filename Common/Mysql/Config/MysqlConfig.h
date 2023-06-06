@@ -21,7 +21,7 @@ namespace Tendo
         int MaxCount;
         std::string User;
         std::string Password;
-        std::vector<Net::Address> Address;
+        Net::Address Address;
     };
 }
 
