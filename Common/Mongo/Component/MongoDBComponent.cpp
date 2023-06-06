@@ -188,7 +188,7 @@ namespace Tendo
         keys.Add(name.c_str(), 1);
 
         document.Add("key", keys);
-        document.Add("unique", true);
+        document.Add("unique", true); //是否为唯一索引
         document.Add("name", name.c_str());
         Bson::Writer::Array documentArray1(document);
 

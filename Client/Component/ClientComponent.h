@@ -9,7 +9,7 @@ namespace Tendo
 {
     class TimerComponent;
     class HttpComponent;
-	class LuaScriptComponent;
+	class LuaComponent;
 	class ThreadComponent;
 }
 
@@ -31,7 +31,7 @@ namespace Client
 namespace Tendo
 {
 	class ProtoComponent;
-	class LuaScriptComponent;
+	class LuaComponent;
 }
 
 namespace Client
@@ -64,7 +64,7 @@ namespace Client
     private:
         unsigned int mIndex;
 		ProtoComponent * mProtoComponent;
-		LuaScriptComponent * mLuaComponent;
+		LuaComponent * mLuaComponent;
 		Util::NumberBuilder<int, 10> mNumberPool;
 		std::unordered_map<long long, long long> mTimers;
 		std::unordered_map<size_t, std::shared_ptr<TcpRpcClientContext>> mClients;

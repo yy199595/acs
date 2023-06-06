@@ -39,6 +39,7 @@ namespace Tendo
 		const std::string& GetServer() const { return this->mCluster; }
 		int Invoke(const std::string& method, const std::shared_ptr<Msg::Packet>& message);
 	private:
+		void CacheLuaFunction();
 		int CallLua(const RpcMethodConfig * config, Msg::Packet & message);
 		int AwaitCallLua(const RpcMethodConfig * config, Msg::Packet & message);
 		int WriterToLua(const RpcMethodConfig * config, Msg::Packet & message);

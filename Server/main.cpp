@@ -1,7 +1,7 @@
 ﻿#include"Entity/Actor/App.h"
 #include"Timer/Component/TimerComponent.h"
 #include"Async/Component/CoroutineComponent.h"
-#include"Lua/Component/LuaScriptComponent.h"
+#include"Lua/Component/LuaComponent.h"
 #include"Telnet/Component/ConsoleComponent.h"
 #include"Server/Component/ThreadComponent.h"
 #include"Log/Component/LogComponent.h"
@@ -95,7 +95,7 @@ void RegisterComponent()
     ComponentFactory::Add<WatchDogComponent>("WatchDogComponent");
 
 // lua
-    ComponentFactory::Add<LuaScriptComponent>("LuaScriptComponent");
+    ComponentFactory::Add<LuaComponent>("LuaScriptComponent");
     ComponentFactory::Add<Client::ClientComponent>("ClientComponent");
 }
 

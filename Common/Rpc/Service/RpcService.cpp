@@ -1,6 +1,6 @@
 ﻿#include"RpcService.h"
 #include"Cluster/Config/ClusterConfig.h"
-#include"Lua/Component/LuaScriptComponent.h"
+#include"Lua/Component/LuaComponent.h"
 #include"Proto/Component/ProtoComponent.h"
 #include "Util/Json/Lua/Json.h"
 #include "Rpc/Lua/LuaServiceTaskSource.h"
@@ -24,7 +24,7 @@ namespace Tendo
 	{
 		const std::string & name = this->GetName();
 		this->mConfig = RpcConfig::Inst()->GetConfig(name);
-		LuaScriptComponent * luaComponent = this->GetComponent<LuaScriptComponent>();
+		LuaComponent * luaComponent = this->GetComponent<LuaComponent>();
 		LOG_CHECK_RET_FALSE(ClusterConfig::Inst()->GetServerName(name, this->mCluster));
 		if(luaComponent != nullptr)
 		{
@@ -34,12 +34,7 @@ namespace Tendo
         LOG_CHECK_RET_FALSE(this->OnInit());
 		if(this->mLuaModule != nullptr)
 		{
-			std::vector<const RpcMethodConfig*> rpcMethodConfigs;
-			this->mConfig->GetMethodConfigs(rpcMethodConfigs);
-			for (const RpcMethodConfig* rpcMethodConfig: rpcMethodConfigs)
-			{
-				this->mLuaModule->GetFunction(rpcMethodConfig->Method);
-			}
+			this->CacheLuaFunction();
 		}
 		return true;
 	}
@@ -222,9 +217,20 @@ namespace Tendo
 
 	void RpcService::OnHotFix()
 	{
-		if(this->mLuaModule != nullptr)
+		if (this->mLuaModule != nullptr)
 		{
 			this->mLuaModule->Hotfix();
+			this->CacheLuaFunction();
+		}
+	}
+
+	void RpcService::CacheLuaFunction()
+	{
+		std::vector<const RpcMethodConfig*> rpcMethodConfigs;
+		this->mConfig->GetMethodConfigs(rpcMethodConfigs);
+		for (const RpcMethodConfig* rpcMethodConfig: rpcMethodConfigs)
+		{
+			this->mLuaModule->AddCache(rpcMethodConfig->Method);
 		}
 	}
 

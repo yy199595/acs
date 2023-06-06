@@ -105,7 +105,7 @@
         },
         "Save": {
             "Async": true,
-            "Request": ""
+            "Request": "db.mongo.update"
         },
         "Delete": {
             "Async": true,

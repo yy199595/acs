@@ -2,14 +2,14 @@
 #include"Entity/Component/ComponentFactory.h"
 namespace Tendo
 {
-    class Unit
+    class Entity
 	{
 	 public:
-		explicit Unit(long long id);
-		Unit(const Unit &) = delete;
-		Unit(const Unit &&) = delete;
-    	virtual ~Unit() = default;
-		Unit & operator = (const Unit &) = delete;
+		explicit Entity(long long id);
+		Entity(const Entity &) = delete;
+		Entity(const Entity &&) = delete;
+    	virtual ~Entity() = default;
+		Entity & operator = (const Entity &) = delete;
 	 public:
 		template<typename T>
 		inline bool AddComponent();
@@ -47,15 +47,15 @@ namespace Tendo
 		virtual void OnAddComponent(Component * component) {}
 		virtual bool OnDelComponent(Component * component) { return true; }
 	 public:
-		inline long long GetUnitId() const { return this->mUnitId; }
+		inline long long GetEntityId() const { return this->mEntityId; }
 	 private:
-		long long mUnitId;
+		long long mEntityId;
 		std::vector<std::string> mSortComponents;
 		std::unordered_map<std::string, std::unique_ptr<Component>> mComponentMap;
 	};
 
     template<typename T>
-    size_t Unit::GetComponents(std::vector<T *> &components) const
+    size_t Entity::GetComponents(std::vector<T *> &components) const
     {
         for(const std::string & name : this->mSortComponents)
         {
@@ -69,7 +69,7 @@ namespace Tendo
     }
 
 	template<typename T>
-	inline T* Unit::GetComponent() const
+	inline T* Entity::GetComponent() const
 	{
 		Type* type = ComponentFactory::GetType<T>();
 		if (type == nullptr)
@@ -80,7 +80,7 @@ namespace Tendo
 	}
 
 	template<typename T>
-	T* Unit::GetComponent(const std::string& name) const
+	T* Entity::GetComponent(const std::string& name) const
 	{
 		auto iter = this->mComponentMap.find(name);
 		if (iter != this->mComponentMap.end())
@@ -92,7 +92,7 @@ namespace Tendo
 	}
 
 	template<typename T>
-	inline bool Unit::AddComponent()
+	inline bool Entity::AddComponent()
 	{
 		if (this->GetComponent<T>() == nullptr)
 		{			
@@ -109,7 +109,7 @@ namespace Tendo
 	}
 
 	template<typename T>
-	inline bool Unit::RemoveComponent()
+	inline bool Entity::RemoveComponent()
 	{
 		Type* type = ComponentFactory::GetType<T>();
 		if (type == nullptr)
@@ -120,7 +120,7 @@ namespace Tendo
 	}
 
 	template<typename T>
-	inline T* Unit::GetOrAddComponent()
+	inline T* Entity::GetOrAddComponent()
 	{
 		T* component = this->GetComponent<T>();
 		if (component == nullptr)

@@ -15,7 +15,7 @@
 namespace Tendo
 {
 	Actor::Actor(long long id, const std::string & name)
-		: Unit(id), mName(name)
+		: Entity(id), mName(name)
 	{
 		this->mNetComponent = nullptr;
 		this->mLastTime = Helper::Time::NowSecTime();
@@ -79,7 +79,7 @@ namespace Tendo
 		{
 			message->SetType(Msg::Type::Request);
 			message->GetHead().Add("func", func);
-			message->GetHead().Add("id", this->GetUnitId());
+			message->GetHead().Add("id", this->GetEntityId());
 			if(request != nullptr)
 			{
 				message->SetProto(Msg::Porto::Protobuf);

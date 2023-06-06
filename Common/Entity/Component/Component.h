@@ -21,7 +21,7 @@ namespace Tendo
 
 namespace Tendo
 {
-	class Unit;
+	class Entity;
 	class Component
 	{
 	 public:
@@ -31,9 +31,9 @@ namespace Tendo
 		Component(const Component &&) = delete;
 		Component & operator =(const Component &) = delete;
 	public:
-		friend class Unit;
+		friend class Entity;
 		friend class ComponentFactory;
-		inline Unit * GetUnit() { return this->mUnit; }
+		inline Entity * GetUnit() { return this->mUnit; }
 		inline const std::string& GetName() { return this->mName; }
         inline long long GetUnitId() const { return this->mEntityId; }
         template<typename T>
@@ -62,7 +62,7 @@ namespace Tendo
 		long long mEntityId;
     protected:
         App * mApp;
-        Unit * mUnit;
+        Entity * mUnit;
     };
 	template<typename T>
 	inline T* Component::GetComponent()

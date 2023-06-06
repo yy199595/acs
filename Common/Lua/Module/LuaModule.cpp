@@ -81,58 +81,33 @@ namespace Lua
 			return false;
 		}
 		int ref = this->mRef;
-		std::set<std::string> functions;
 		this->mRef = luaL_ref(mLua, LUA_REGISTRYINDEX);
 		luaL_unref(this->mLua, LUA_REGISTRYINDEX, ref);
-		auto iter = this->mFunctions.begin();
-		for(; iter != this->mFunctions.end(); iter++)
-		{
-			ref = iter->second;
-			functions.insert(iter->first);
-			luaL_unref(this->mLua, LUA_REGISTRYINDEX, ref);
-		}
-		this->mFunctions.clear();
+
+		this->mCaches.clear();
 		this->mMd5 = md5.toString();
-		for(const std::string & func : functions)
-		{
-			this->GetFunction(func);
-		}
 		this->mIsUpdate = this->GetFunction("OnUpdate");
+		return true;
+	}
+
+	bool LuaModule::AddCache(const std::string& name)
+	{
+		if(!this->GetFunction(name))
+		{
+			return false;
+		}
+		this->mCaches.insert(name);
 		return true;
 	}
 
 	bool LuaModule::HasFunction(const std::string & name)
 	{
-		auto iter = this->mFunctions.find(name);
-		return iter != this->mFunctions.end();
-	}
-
-	bool LuaModule::GetOnceFunction(const std::string& name)
-	{
-		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
-		if (!lua_istable(this->mLua, -1))
-		{
-			return false;
-		}
-		if (lua_getfield(this->mLua, -1, name.c_str()))
-		{
-			if (!lua_isfunction(this->mLua, -1))
-			{
-				return false;
-			}
-			return true;
-		}
+		auto iter = this->mCaches.find(name);
+		return iter != this->mCaches.end();
 	}
 
 	bool LuaModule::GetFunction(const std::string& name)
 	{
-		auto iter = this->mFunctions.find(name);
-		if (iter != this->mFunctions.end())
-		{
-			int ref = iter->second;
-			lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, ref);
-			return true;
-		}
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
 		if (!lua_istable(this->mLua, -1))
 		{
@@ -140,21 +115,8 @@ namespace Lua
 		}
 		if (lua_getfield(this->mLua, -1, name.c_str()))
 		{
-			if (!lua_isfunction(this->mLua, -1))
-			{
-				return false;
-			}
-			int ref = luaL_ref(mLua, LUA_REGISTRYINDEX);
-			this->mFunctions.emplace(name, ref);
-			lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, ref);
-			return true;
+			return lua_isfunction(this->mLua, -1);
 		}
-		return false;
-	}
-
-	bool LuaModule::Awake()
-	{
-
 		return false;
 	}
 

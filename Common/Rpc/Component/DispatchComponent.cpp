@@ -83,7 +83,7 @@ namespace Tendo
 			);
 		}
 #ifdef __RPC_MESSAGE__
-		std::string json("{}");
+		std::string json;
 		std::string serverName = message->From();
 		ProtoComponent* component = this->mApp->GetProto();
 		if (!config->Request.empty())
@@ -107,8 +107,13 @@ namespace Tendo
 				}
 			}
 		}
-		CONSOLE_LOG_DEBUG(serverName << " call func = ["
-									 << config->FullName << "] request = " << Helper::Str::FormatJson(json));
+		std::stringstream ss1;
+		ss1 << serverName << " call func = [" << config->FullName << "]";
+		if(!json.empty())
+		{
+			ss1 << " request = " << Helper::Str::FormatJson(json);
+		}
+		CONSOLE_LOG_DEBUG(ss1.str());
 #endif
 		this->mWaitCount++;
 		int code = logicService->Invoke(config->Method, message);
@@ -116,7 +121,7 @@ namespace Tendo
 			this->SubWaitCount(service);
 		}
 #ifdef __RPC_MESSAGE__
-		json.assign("{}");
+		json.clear();
 		if (code == XCode::Successful && !config->Response.empty())
 		{
 			switch(message->GetProto())
@@ -141,8 +146,13 @@ namespace Tendo
 		}
 		if (code == XCode::Successful && message->GetHead().Has("rpc"))
 		{
-			CONSOLE_LOG_INFO(serverName << " call func = ["
-										<< config->FullName << "] " << " response = " << Helper::Str::FormatJson(json));
+			std::stringstream ss;
+			ss << serverName << " call func = [" << config->FullName << "]";
+			if(!json.empty())
+			{
+				ss << " response = " << Helper::Str::FormatJson(json);
+			}
+			CONSOLE_LOG_INFO(ss.str());
 		}
 		else if(code != XCode::Successful)
 		{

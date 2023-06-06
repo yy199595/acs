@@ -4,15 +4,15 @@
 
 #ifndef APP_EVENTUNIT_H
 #define APP_EVENTUNIT_H
-#include"Unit.h"
+#include"Entity.h"
 #include<list>
 class ILuaWrite;
 namespace Tendo
 {
-	class EventUnit : public Unit
+	class EventUnit : public Entity
 	{
 	public:
-		using Unit::Unit;
+		using Entity::Entity;
 		template<typename T>
 		int Dispatch(const T * message);
 	private:

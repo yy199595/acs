@@ -14,7 +14,6 @@ namespace Lua
 		LuaModule(lua_State* lua, std::string name);
 		~LuaModule();
 	public:
-		bool Awake();
 		bool Hotfix();
 		void Update(int tick);
 		bool LoadFromPath(const std::string & path);
@@ -24,9 +23,9 @@ namespace Lua
 		template<typename ... Args>
 		bool Await(const std::string & func, Args && ... args);
 	public:
+		bool AddCache(const std::string & name);
 		bool GetFunction(const std::string& name);
 		bool HasFunction(const std::string & name);
-		bool GetOnceFunction(const std::string& name);
 	public:
 		lua_State * GetLuaEnv() { return this->mLua;}
 	private:
@@ -36,13 +35,13 @@ namespace Lua
 		lua_State* mLua;
 		std::string mPath;
 		const std::string mName;
-		std::unordered_map<std::string, int> mFunctions;
+		std::unordered_set<std::string> mCaches;
 	};
 
 	template<typename... Args>
 	bool LuaModule::Call(const std::string& func, Args&& ... args)
 	{
-		if(!this->GetOnceFunction(func))
+		if(!this->GetFunction(func))
 		{
 			return false;
 		}
@@ -57,7 +56,7 @@ namespace Lua
 	template<typename... Args>
 	bool LuaModule::Await(const std::string& func, Args&& ... args)
 	{
-		if(!this->GetOnceFunction(func))
+		if(!this->GetFunction(func))
 		{
 			return false;
 		}

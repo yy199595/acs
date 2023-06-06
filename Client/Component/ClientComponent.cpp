@@ -5,7 +5,7 @@
 #include"Client/TcpRpcClientContext.h"
 #include"Lua/Client.h"
 #include"Lua/Engine/ClassProxyHelper.h"
-#include"Lua/Component/LuaScriptComponent.h"
+#include"Lua/Component/LuaComponent.h"
 #include"Server/Component/ThreadComponent.h"
 #include"Proto/Component/ProtoComponent.h"
 namespace Client
@@ -74,7 +74,7 @@ namespace Client
     {
         //this->mTimerComponent = this->GetComponent<TimerComponent>();
         this->mProtoComponent = this->GetComponent<ProtoComponent>();
-        this->mLuaComponent = this->GetComponent<LuaScriptComponent>();
+        this->mLuaComponent = this->GetComponent<LuaComponent>();
 		return true;
     }
 

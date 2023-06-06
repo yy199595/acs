@@ -4,13 +4,13 @@
 
 #ifndef _ACTOR_H_
 #define _ACTOR_H_
-#include"Entity/Unit/Unit.h"
+#include"Entity/Unit/Entity.h"
 #include"Rpc/Client/Message.h"
 #include"Proto/Include/Message.h"
 struct lua_State;
 namespace Tendo
 {
-	class Actor : public Unit
+	class Actor : public Entity
 	{
 	 public:
 		explicit Actor(long long id, const std::string & name);
@@ -29,7 +29,7 @@ namespace Tendo
 		int LuaCall(lua_State * lua, const std::string & func, const std::shared_ptr<Msg::Packet> & message);
 		int MakeMessage(lua_State * lua, int idx, const std::string & func, std::shared_ptr<Msg::Packet> & message) const;
 	public:
-		long long GetActorId() const { return this->GetUnitId(); }
+		long long GetActorId() const { return this->GetEntityId(); }
 	 public:
 		virtual bool OnInit() = 0;
 		virtual void OnRegister(std::string * json) = 0;

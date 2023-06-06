@@ -7,13 +7,13 @@
 struct lua_State;
 namespace Tendo
 {
-    class LuaScriptComponent : public Component, public IStart, 
-			public IComplete, public IHotfix, public ISecondUpdate,
-							   public IServerRecord, public IDestroy
+    class LuaComponent : public Component, public IStart,
+						 public IComplete, public IHotfix, public ISecondUpdate,
+						 public IServerRecord, public IDestroy
 	{
 	 public:
-		LuaScriptComponent() :mLuaEnv(nullptr) {};
-		virtual ~LuaScriptComponent() = default;
+		LuaComponent() : mLuaEnv(nullptr) {};
+		virtual ~LuaComponent() = default;
     public:
 		double GetMemorySize();
 		double CollectGarbage();
@@ -39,6 +39,5 @@ namespace Tendo
 		std::string mComponentPath;
 		Lua::LuaModule * mMainModule;
 		std::set<std::string> mDirectorys;
-		std::unordered_map<std::string, int> mFuncs;
 	};
 }

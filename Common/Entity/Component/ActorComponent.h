@@ -7,6 +7,10 @@
 #include"Component.h"
 #include"Entity/Actor/ServerActor.h"
 #include"Entity/Actor/PlayerActor.h"
+namespace Lua
+{
+	class LuaModule;
+};
 namespace Tendo
 {
 	class ActorComponent : public Component
@@ -25,8 +29,10 @@ namespace Tendo
 	 public:
 		bool DelActor(long long id);
 	private:
+		bool LateAwake() final;
 		bool AddRandomActor(const std::string & name, Actor * actor);
 	private:
+		Lua::LuaModule * mLuaModule;
 		std::unordered_map<long long, std::shared_ptr<ServerActor>> mServers;
 		std::unordered_map<long long, std::shared_ptr<PlayerActor>> mPlayers;
 		std::unordered_map<std::string, std::vector<long long>> mActorNames;

@@ -9,7 +9,7 @@
 #include"Cluster//Config/ClusterConfig.h"
 #include"Rpc/Service/LuaRpcService.h"
 #include"Http//Service/LuaHttpService.h"
-#include"Lua/Component/LuaScriptComponent.h"
+#include"Lua/Component/LuaComponent.h"
 #include"Rpc/Component/InnerNetComponent.h"
 #include"Http/Component/HttpWebComponent.h"
 #include"Rpc/Component/DispatchComponent.h"
@@ -22,7 +22,7 @@ namespace Tendo
 		this->mApp->AddComponent<HttpComponent>();
 		if (ServerConfig::Inst()->UseLua())
 		{
-			this->mApp->AddComponent<LuaScriptComponent>();
+			this->mApp->AddComponent<LuaComponent>();
 		}
 		unsigned short port = 0;
 		if (!ServerConfig::Inst()->GetListen("rpc", port))

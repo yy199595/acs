@@ -35,7 +35,7 @@ namespace Tendo
 	 private:
 		void Update();
 	 private:
-		class Unit * mCommandUnit;
+		class Entity * mCommandUnit;
 		class HttpComponent * mHttpComponent;
 		class CoroutineComponent* mTaskComponent;
 	};

@@ -1,6 +1,7 @@
 require("XCode")
 require("TableUtil")
 local log = require("Log")
+
 local redis = require("Server.RedisComponent")
 local MongoDB = require("Server.MongoComponent")
 

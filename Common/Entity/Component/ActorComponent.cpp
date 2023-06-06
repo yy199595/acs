@@ -3,17 +3,34 @@
 //
 
 #include"ActorComponent.h"
-#include"Entity/Actor/App.h"
 #include"Server/Config/ServerConfig.h"
+#include"Lua/Component/LuaComponent.h"
 namespace Tendo
 {
+	bool ActorComponent::LateAwake()
+	{
+		this->mLuaModule = nullptr;
+		LuaComponent * luaComponent = this->GetComponent<LuaComponent>();
+		if(luaComponent != nullptr)
+		{
+			this->mLuaModule = luaComponent->LoadModule(this->GetName());
+			if(this->mLuaModule != nullptr)
+			{
+				this->mLuaModule->AddCache("AddPlayer");
+				this->mLuaModule->AddCache("DelPlayer");
+				this->mLuaModule->AddCache("AddServer");
+				this->mLuaModule->AddCache("DelServer");
+			}
+		}
+		return true;
+	}
 	bool ActorComponent::AddRandomActor(const std::string& name, Tendo::Actor* actor)
 	{
 		if (name.empty())
 		{
 			return false;
 		}
-		long long actorId = actor->GetUnitId();
+		long long actorId = actor->GetEntityId();
 		auto iter1 = this->mActorNames.find(name);
 		if (iter1 == this->mActorNames.end())
 		{
@@ -52,18 +69,22 @@ namespace Tendo
 		if(iter != this->mPlayers.end())
 		{
 			this->mPlayers.erase(iter);
+			const std::string func("DelPlayer");
+			if(this->mLuaModule && this->mLuaModule->HasFunction(func))
+			{
+				this->mLuaModule->Call(func, id);
+			}
 			return true;
 		}
 		auto iter1 = this->mServers.find(id);
 		if(iter1 != this->mServers.end())
 		{
-			std::vector<IServer *> components;
-			this->mApp->GetComponents(components);
-			for(IServer * listen : components)
-			{
-				listen->OnExit((int)id);
-			}
 			this->mServers.erase(iter1);
+			const std::string func("DelServer");
+			if(this->mLuaModule && this->mLuaModule->HasFunction(func))
+			{
+				this->mLuaModule->Call(func, id);
+			}
 			return true;
 		}
 		return false;
@@ -77,8 +98,13 @@ namespace Tendo
 		{
 			return false;
 		}
+		const std::string func("AddPlayer");
 		assert(player->GetActorId() > 10000);
 		this->mPlayers.emplace(playerId, player);
+		if(this->mLuaModule && this->mLuaModule->HasFunction(func))
+		{
+			this->mLuaModule->Call(func, playerId);
+		}
 		return true;
 	}
 
@@ -98,8 +124,13 @@ namespace Tendo
 		{
 			listen->OnJoin((int)serverId);
 		}
+		const std::string func("AddServer");
 		this->AddRandomActor(name, server.get());
 		this->mServers.emplace(serverId, std::move(server));
+		if(this->mLuaModule && this->mLuaModule->HasFunction(func))
+		{
+			this->mLuaModule->Call(func, serverId);
+		}
 		return true;
 	}
 

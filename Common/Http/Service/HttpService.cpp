@@ -4,7 +4,7 @@
 #include"HttpService.h"
 #include"Lua/Module/LuaModule.h"
 #include"Util/Json/Lua/Json.h"
-#include"Lua/Component/LuaScriptComponent.h"
+#include"Lua/Component/LuaComponent.h"
 #include "Rpc/Lua/LuaServiceTaskSource.h"
 
 namespace Tendo
@@ -20,7 +20,7 @@ namespace Tendo
     {
 		const std::string & name = this->GetName();
 		this->mConfig = HttpConfig::Inst()->GetConfig(name);
-		LuaScriptComponent * luaComponent = this->GetComponent<LuaScriptComponent>();
+		LuaComponent * luaComponent = this->GetComponent<LuaComponent>();
 		if(luaComponent != nullptr)
 		{
 			this->mLuaModule = luaComponent->LoadModule(name);

@@ -1,19 +1,19 @@
-#include"Unit.h"
+#include"Entity.h"
 #include"Entity/Actor/App.h"
 #include"Entity/Component/Component.h"
 namespace Tendo
 {
-	Unit::Unit(long long id) : mUnitId(id)
+	Entity::Entity(long long id) : mEntityId(id)
 	{
 	}
 
-	bool Unit::HasComponent(const std::string& name)
+	bool Entity::HasComponent(const std::string& name)
 	{
 		auto iter = this->mComponentMap.find(name);
 		return iter != this->mComponentMap.end();
 	}
 
-	bool Unit::AddComponent(const std::string& name)
+	bool Entity::AddComponent(const std::string& name)
 	{
 		std::unique_ptr<Component> component = ComponentFactory::CreateComponent(name);
 		if(component == nullptr)
@@ -23,7 +23,7 @@ namespace Tendo
 		return this->AddComponent(name, std::move(component));
 	}
 
-	bool Unit::AddComponent(const std::string& name, std::unique_ptr<Component> component)
+	bool Entity::AddComponent(const std::string& name, std::unique_ptr<Component> component)
 	{
 		if(this->HasComponent(name))
 		{
@@ -31,7 +31,7 @@ namespace Tendo
 		}
 		component->mName = name;
         component->mUnit = this;
-        component->mEntityId = mUnitId;
+        component->mEntityId = mEntityId;
 
 		if(!component->Awake())
         {
@@ -44,7 +44,7 @@ namespace Tendo
 	}
 
 
-	size_t Unit::GetComponents(std::vector<Component*>& components) const
+	size_t Entity::GetComponents(std::vector<Component*>& components) const
 	{
         for(const std::string & name : this->mSortComponents)
         {
@@ -57,7 +57,7 @@ namespace Tendo
         return components.size();
 	}
 
-	size_t Unit::GetComponents(std::vector<std::string>& components) const
+	size_t Entity::GetComponents(std::vector<std::string>& components) const
 	{
 		components.clear();
 		components.insert(components.end(),
@@ -65,13 +65,13 @@ namespace Tendo
         return components.size();
 	}
 
-	Component* Unit::GetComponentByName(const std::string& name) const
+	Component* Entity::GetComponentByName(const std::string& name) const
 	{
 		auto iter = this->mComponentMap.find(name);
 		return iter != this->mComponentMap.end() ? iter->second.get() : nullptr;
 	}
 
-	bool Unit::RemoveComponent(const std::string& name)
+	bool Entity::RemoveComponent(const std::string& name)
 	{
 		auto iter = this->mComponentMap.find(name);
 		if (iter != this->mComponentMap.end())

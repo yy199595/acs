@@ -1,4 +1,4 @@
-﻿#include "LuaScriptComponent.h"
+﻿#include "LuaComponent.h"
 
 #include "Entity/Actor/App.h"
 #include "Util/Md5/MD5.h"
@@ -22,7 +22,7 @@
 using namespace Lua;
 namespace Tendo
 {
-	bool LuaScriptComponent::Awake()
+	bool LuaComponent::Awake()
 	{
 		this->mLuaEnv = luaL_newstate();
 		this->mMainModule = nullptr;
@@ -30,7 +30,7 @@ namespace Tendo
 		return true;
 	}
 
-	bool LuaScriptComponent::LateAwake()
+	bool LuaComponent::LateAwake()
 	{
 		{
 			Lua::ClassProxyHelper os(this->mLuaEnv, "os");
@@ -116,12 +116,12 @@ namespace Tendo
 		return this->LoadAllFile();
 	}
 
-	bool LuaScriptComponent::GetFunction(const std::string& tab, const std::string& func)
+	bool LuaComponent::GetFunction(const std::string& tab, const std::string& func)
 	{
 		return Lua::Function::Get(this->mLuaEnv, tab.c_str(), func.c_str());
 	}
 
-	Lua::LuaModule* LuaScriptComponent::LoadModule(const std::string& name)
+	Lua::LuaModule* LuaComponent::LoadModule(const std::string& name)
 	{
 		const ServerConfig * config = ServerConfig::Inst();
 		for(const std::string & path : config->RequirePath())
@@ -141,7 +141,7 @@ namespace Tendo
 		return nullptr;
 	}
 
-	Lua::LuaModule* LuaScriptComponent::LoadModuleByPath(const std::string& path)
+	Lua::LuaModule* LuaComponent::LoadModuleByPath(const std::string& path)
 	{
 		std::string name;
 		Helper::File::GetFileName(path, name);
@@ -157,7 +157,7 @@ namespace Tendo
 	}
 
 
-	void LuaScriptComponent::OnSecondUpdate(const int tick)
+	void LuaComponent::OnSecondUpdate(const int tick)
 	{
 		if(this->mMainModule != nullptr)
 		{
@@ -165,7 +165,7 @@ namespace Tendo
 		}
 	}
 
-	void LuaScriptComponent::Start()
+	void LuaComponent::Start()
 	{
 		if(this->mMainModule != nullptr)
 		{
@@ -173,7 +173,7 @@ namespace Tendo
 		}
 	}
 
-	void LuaScriptComponent::Complete()
+	void LuaComponent::Complete()
 	{
 		if(this->mMainModule != nullptr)
 		{
@@ -181,7 +181,7 @@ namespace Tendo
 		}
 	}
 
-	bool LuaScriptComponent::LoadAllFile()
+	bool LuaComponent::LoadAllFile()
 	{
 		const ServerConfig* config = ServerConfig::Inst();
 		for(const std::string & path : config->RequirePath())
@@ -198,7 +198,7 @@ namespace Tendo
 		return true;
 	}
 
-	void LuaScriptComponent::OnHotFix()
+	void LuaComponent::OnHotFix()
 	{
 		if(this->mMainModule != nullptr)
 		{
@@ -206,7 +206,7 @@ namespace Tendo
 		}
 	}
 
-	void LuaScriptComponent::OnDestroy()
+	void LuaComponent::OnDestroy()
 	{
 		if(this->mMainModule != nullptr)
 		{
@@ -221,7 +221,7 @@ namespace Tendo
 		}
 	}
 
-	void LuaScriptComponent::AddRequire(const std::string& path)
+	void LuaComponent::AddRequire(const std::string& path)
 	{
 		if (path.empty())
 			return;
@@ -238,7 +238,7 @@ namespace Tendo
 		}
 	}
 
-	double LuaScriptComponent::CollectGarbage()
+	double LuaComponent::CollectGarbage()
 	{
 		double start = this->GetMemorySize();
 		if (Lua::Function::Get(this->mLuaEnv, "collectgarbage"))
@@ -253,7 +253,7 @@ namespace Tendo
 		return start - this->GetMemorySize();
 	}
 
-	double LuaScriptComponent::GetMemorySize()
+	double LuaComponent::GetMemorySize()
 	{
 		if (Lua::Function::Get(this->mLuaEnv, "collectgarbage"))
 		{
@@ -268,7 +268,7 @@ namespace Tendo
 		return 0;
 	}
 
-	void LuaScriptComponent::OnRecord(Json::Writer& document)
+	void LuaComponent::OnRecord(Json::Writer& document)
 	{
 		double size = this->GetMemorySize();
 		double free = this->CollectGarbage();
