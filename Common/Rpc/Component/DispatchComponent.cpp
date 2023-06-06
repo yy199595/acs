@@ -146,13 +146,13 @@ namespace Tendo
 		}
 		if (code == XCode::Successful && message->GetHead().Has("rpc"))
 		{
-			std::stringstream ss;
-			ss << serverName << " call func = [" << config->FullName << "]";
+			std::stringstream ss2;
+			ss2 << serverName << " call func = [" << config->FullName << "]";
 			if(!json.empty())
 			{
-				ss << " response = " << Helper::Str::FormatJson(json);
+				ss2 << " response = " << Helper::Str::FormatJson(json);
 			}
-			CONSOLE_LOG_INFO(ss.str());
+			CONSOLE_LOG_INFO(ss2.str());
 		}
 		else if(code != XCode::Successful)
 		{
