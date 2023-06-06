@@ -3,13 +3,14 @@
 #include"XCode/XCode.h"
 #include"s2s/db.pb.h"
 #include"Mongo/Client/BsonDocument.h"
+#include"Mongo/Service/MongoDB.h"
 #include"Mongo/Component/MongoDBComponent.h"
 namespace Tendo
 {
 	bool MongoRegistry::Awake(App* app)
 	{
 		this->mApp = app;
-		app->AddComponent<MongoDBComponent>();
+		app->AddComponent<MongoDB>();
 		return true;
 	}
 
