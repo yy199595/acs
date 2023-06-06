@@ -6,6 +6,7 @@
 #include"Entity/Actor/App.h"
 #include"Mongo/Config/MongoConfig.h"
 #include"Mongo/Component/MongoDBComponent.h"
+#include"Mongo/Client/MongoFactory.h"
 namespace Tendo
 {
     MongoDB::MongoDB()
@@ -94,33 +95,20 @@ namespace Tendo
 
     int MongoDB::Insert(const db::mongo::insert &request)
 	{
-        const size_t pos = request.tab().find('.');
-        if(pos == std::string::npos)
-        {
-            CONSOLE_LOG_ERROR("[" << request.tab() << "] parse error xxx.xxx");
-            return XCode::CallArgsError;
-        }
-
-        std::string id;
-        Bson::Writer::Document document;
-        if (!document.FromByJson(request.json(), id))
-        {
-            return XCode::CallArgsError;
-        }
-
-        std::shared_ptr<CommandRequest> mongoRequest
-            = std::make_shared<CommandRequest>();
-
-        const std::string tab = request.tab().substr(pos + 1);
-        mongoRequest->dataBase = request.tab().substr(0, pos);
-
-        Bson::Writer::Array documentArray(document);
-        mongoRequest->document.Add("insert", tab);
-		mongoRequest->document.Add("documents", documentArray);
-
-        int handle = this->GetClientHandle(request.flag());
-		std::shared_ptr<CommandResponse> response = this->mMongoComponent->Run(handle, mongoRequest);
-		if (response == nullptr || response->GetDocumentSize() <= 0)
+		Bson::Writer::Document document;
+		const std::string & tab = request.tab();
+		if (!document.FromByJson(request.json()))
+		{
+			return XCode::CallArgsError;
+		}
+		std::shared_ptr<CommandRequest> mongoRequest = MongoFactory::Insert(tab, document);
+		if(mongoRequest == nullptr)
+		{
+			return XCode::CallArgsError;
+		}
+		int handle = this->GetClientHandle(request.flag());
+		std::shared_ptr<CommandResponse> mongoResponse = this->mMongoComponent->Run(handle, mongoRequest);
+		if (mongoResponse == nullptr || mongoResponse->GetDocumentSize() <= 0)
 		{
 #ifdef __DEBUG__
 			LOG_ERROR("insert [" << tab << "] failure json =" << request.json());
@@ -128,44 +116,23 @@ namespace Tendo
 			return XCode::Failure;
 		}
         int res = 0;
-        Bson::Reader::Document & result = response->Get();
-        if(result.Get("n", res) && res > 0)
-        {
-            return XCode::Successful;
-        }
-        return XCode::Failure;
+        Bson::Reader::Document & result = mongoResponse->Get();
+        return result.Get("n", res) && res > 0 ? XCode::Successful : XCode::Failure;
 	}
 
     int MongoDB::Delete(const db::mongo::remove &request)
     {
-        const size_t pos = request.tab().find('.');
-        if(pos == std::string::npos)
-        {
-            CONSOLE_LOG_ERROR("[" << request.tab() << "] parse error xxx.xxx");
-            return XCode::CallArgsError;
-        }
-
-        std::string id;
         Bson::Writer::Document document;
-        if(!document.FromByJson(request.json(), id))
+        if(!document.FromByJson(request.json()))
 		{
 			return XCode::CallArgsError;
 		}
-
-        std::shared_ptr<CommandRequest> mongoRequest = std::make_shared<CommandRequest>();
-        {
-            const std::string tab = request.tab().substr(pos + 1);
-            mongoRequest->dataBase = request.tab().substr(0, pos);
-
-            Bson::Writer::Document delDocument;
-            delDocument.Add("q", document);
-            delDocument.Add("limit", request.limit());
-
-            Bson::Writer::Array documentArray(delDocument);
-
-            mongoRequest->document.Add("delete", tab);
-            mongoRequest->document.Add("deletes", documentArray);
-        }
+		const std::string & tab = request.tab();
+        std::shared_ptr<CommandRequest> mongoRequest = MongoFactory::Delete(tab, document);
+		if(mongoRequest == nullptr)
+		{
+			return XCode::CallArgsError;
+		}
         int handle = this->GetClientHandle(request.flag());
         std::shared_ptr<CommandResponse> response = this->mMongoComponent->Run(handle, mongoRequest);
         if(response == nullptr || response->GetDocumentSize() <= 0)
@@ -210,15 +177,15 @@ namespace Tendo
         {
             return XCode::CallArgsError;
         }
-        std::shared_ptr<CommandRequest> mongoRequest
-                = std::make_shared<CommandRequest>();
-        if (!mongoRequest->document.FromByJson(request.json()))
+		const int limit = request.limit();
+		const std::string & tab = request.tab();
+		const std::string & json = request.json();
+        std::shared_ptr<CommandRequest> mongoRequest = MongoFactory::Query(tab, json, limit);
+		if(mongoRequest == nullptr)
 		{
 			return XCode::CallArgsError;
 		}
         int handle = this->GetClientHandle();
-        mongoRequest->collectionName = request.tab();
-        mongoRequest->numberToReturn = request.limit();
         std::shared_ptr<CommandResponse> queryResponse = this->mMongoComponent->Run(handle, mongoRequest);
 
         if (queryResponse == nullptr || queryResponse->GetDocumentSize() <= 0)
@@ -236,50 +203,23 @@ namespace Tendo
 
     int MongoDB::UpdateData(const db::mongo::update &request, bool upsert)
     {
-        const size_t pos = request.tab().find('.');
-        const std::string & select = request.select();
-        const std::string & update = request.update();
-        if (pos == std::string::npos)
-        {
-            CONSOLE_LOG_ERROR("[" << request.tab() << "] parse error xxx.xxx");
-            return XCode::CallArgsError;
-        }
-
         Bson::Writer::Document dataDocument;
-        if (!dataDocument.FromByJson(update))
+        if (!dataDocument.FromByJson(request.update()))
         {
             return XCode::CallArgsError;
         }
-        std::string id;
         Bson::Writer::Document selectorDocument;
-        if (!selectorDocument.FromByJson(select, id))
+        if (!selectorDocument.FromByJson(request.select()))
         {
             return XCode::CallArgsError;
         }
-        std::shared_ptr<CommandRequest> mongoRequest(new CommandRequest);
-
-        const std::string tab = request.tab().substr(pos + 1);
-        mongoRequest->dataBase = request.tab().substr(0, pos);
-
-        const char * tag = "$set";
-        Bson::Writer::Document updateDocument;
-        if(!request.tag().empty())
-        {
-            tag = request.tag().c_str();
-        }
-        updateDocument.Add(tag, dataDocument);
-
-        Bson::Writer::Document updateInfo;
-        updateInfo.Add("multi", true);
-        updateInfo.Add("upsert", upsert);
-        updateInfo.Add("u", updateDocument);
-        updateInfo.Add("q", selectorDocument);
-
-
-        Bson::Writer::Array updates(updateInfo);
-        mongoRequest->document.Add("update", tab);
-        mongoRequest->document.Add("updates", updates);
-
+		const std::string & table = request.tab();
+		const char * tag = request.tag().empty() ? "$set" : request.tag().c_str();
+        std::shared_ptr<CommandRequest> mongoRequest = MongoFactory::Update(table, selectorDocument, dataDocument, tag, upsert);
+		if(mongoRequest == nullptr)
+		{
+			return XCode::CallArgsError;
+		}
         int handle = this->GetClientHandle(request.flag());
         std::shared_ptr<CommandResponse> response = this->mMongoComponent->Run(handle, mongoRequest);
         if (response == nullptr || response->GetDocumentSize() == 0)

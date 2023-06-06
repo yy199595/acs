@@ -15,7 +15,7 @@
 #include"Rpc/Service/RpcService.h"
 #include"Gate/Component/OuterNetComponent.h"
 #ifdef __RPC_MESSAGE__
-#include"Proto/Include/MessageJson.h"
+#include"Proto/Include/Message.h"
 #endif
 namespace Tendo
 {
@@ -137,7 +137,7 @@ namespace Tendo
 						if (response->ParseFromString(message->GetBody()))
 						{
 							json.clear();
-							google::protobuf::util::MessageToJsonString(*response, &json);
+							pb_json::MessageToJsonString(*response, &json);
 						}
 					}
 					break;

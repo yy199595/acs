@@ -122,51 +122,6 @@ namespace Bson
 			return true;
 		}
 
-        bool Document::FromByJson(const std::string &json, std::string &id)
-        {
-            rapidjson::Document document;
-            if (document.Parse(json.c_str(), json.size()).HasParseError())
-            {
-                return false;
-            }
-            auto findIter = document.FindMember("_id");
-            if(findIter != document.MemberEnd())
-            {
-                rapidjson::Value & value = findIter->value;
-                if(value.IsInt())
-                {
-                    id = std::to_string(value.GetInt());
-                }
-                else if(value.IsInt64())
-                {
-                    id = std::to_string(value.GetInt64());
-                }
-                else if(value.IsUint())
-                {
-                    id = std::to_string(value.GetUint());
-                }
-                else if(value.IsUint64())
-                {
-                    id = std::to_string(value.GetUint64());
-                }
-                else if(value.IsString())
-                {
-                    id = value.GetString();
-                }
-            }
-
-            auto iter = document.MemberBegin();
-            for (; iter != document.MemberEnd(); iter++)
-            {
-                const char *key = iter->name.GetString();
-                if (!this->WriterToBson(key, *this, iter->value))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
 		bool Document::WriterToBson(Array& document, const rapidjson::Value& jsonValue)
 		{
 			if (jsonValue.IsString())

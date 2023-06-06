@@ -58,6 +58,10 @@ namespace Tendo
 		{
 			for (const std::string& name: components)
 			{
+				if(this->mApp->HasComponent(name))
+				{
+					continue;
+				}
 				const RpcServiceConfig* rpcServiceConfig = RpcConfig::Inst()->GetConfig(name);
 				const HttpServiceConfig* httpServiceConfig = HttpConfig::Inst()->GetConfig(name);
 				if (rpcServiceConfig != nullptr)

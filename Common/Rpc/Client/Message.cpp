@@ -4,7 +4,7 @@
 
 #include"Message.h"
 #include"Util/Math/MathHelper.h"
-#include"Proto/Include/MessageJson.h"
+#include"Proto/Include/Message.h"
 namespace Msg
 {
     bool Head::Add(const std::string& key, int value)

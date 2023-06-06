@@ -7,7 +7,7 @@
 #include"Rpc/Client/Message.h"
 #include"Util/Time/TimeHelper.h"
 #include"Lua/Engine/LuaParameter.h"
-#include"Proto/Include/MessageJson.h"
+#include"Proto/Include/Message.h"
 #include"Util/Json/Lua/Json.h"
 #include"Server/Config/ServiceConfig.h"
 #include"Rpc/Component/InnerNetComponent.h"

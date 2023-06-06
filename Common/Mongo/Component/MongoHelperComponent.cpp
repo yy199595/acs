@@ -5,7 +5,7 @@
 #include"MongoHelperComponent.h"
 #include"Entity/Actor/App.h"
 #include"Mongo/Service/MongoDB.h"
-#include"Proto/Include/MessageJson.h"
+#include"Proto/Include/Message.h"
 #include"Cluster/Config/ClusterConfig.h"
 namespace Tendo
 {

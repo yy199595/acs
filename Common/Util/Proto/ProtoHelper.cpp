@@ -3,7 +3,7 @@
 //
 
 #include"ProtoHelper.h"
-#include"Proto/Include/MessageJson.h"
+#include"Proto/Include/Message.h"
 namespace Helper
 {
     bool Protocol::FromJson(pb::Message *message, const std::string &json)

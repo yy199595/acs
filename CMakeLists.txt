@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.1.3)
 
+if(CMAKE_COMPILER_IS_GNUCXX)
+    add_compile_options(-flto)
+endif(CMAKE_COMPILER_IS_GNUCXX)
+
 find_program(CLANG_EXECUTABLE clang)
 #if(CLANG_EXECUTABLE)
 #    message("当前使用编译器为clang")
