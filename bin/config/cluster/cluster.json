@@ -49,10 +49,6 @@
         "Service" :[
             "Node",
             "ActorRegistry"
-        ],
-        "Component": [
-            "MysqlDBComponent",
-            "RegistryComponent"
         ]
     }
 }
