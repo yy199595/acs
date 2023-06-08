@@ -14,6 +14,7 @@ namespace Tendo
     Gate::Gate()
     {
 		this->mIndex = 0;
+		this->mActorComponent = nullptr;
         this->mOuterComponent = nullptr;
     }
 	bool Gate::Awake()
@@ -25,11 +26,11 @@ namespace Tendo
     bool Gate::OnInit()
     {
 		BIND_COMMON_RPC_METHOD(Gate::Ping);
+		BIND_COMMON_RPC_METHOD(Gate::Enter);
 		BIND_COMMON_RPC_METHOD(Gate::Login);
 		BIND_COMMON_RPC_METHOD(Gate::Logout);
-		BIND_COMMON_RPC_METHOD(Gate::Allocation);
-		const ServerConfig* config = ServerConfig::Inst();
 		this->mActorComponent = this->mApp->ActorMgr();
+		const ServerConfig* config = ServerConfig::Inst();
 		this->mOuterComponent = this->GetComponent<OuterNetComponent>();
 		LOG_CHECK_RET_FALSE(config->GetLocation("rpc", this->mInnerAddress));
 		LOG_CHECK_RET_FALSE(config->GetLocation("gate", this->mOuterAddress));
@@ -40,11 +41,6 @@ namespace Tendo
 	{
 		return XCode::Successful;
 	}
-
-    void Gate::OnStop()
-    {
-		
-    }
 
 	int Gate::Enter(const s2s::allot_request &request)
     {

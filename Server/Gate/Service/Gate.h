@@ -20,7 +20,6 @@ namespace Tendo
 	private:
 		bool Awake() final;
 		bool OnInit() final;
-        void OnStop() final;
 		int OnLogin(long long userId, const std::string & token);
 	private:
 		std::shared_ptr<class PlayerActor> NewPlayer(long long userId);
