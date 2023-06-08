@@ -58,13 +58,14 @@ namespace Tendo
  	class RpcServiceConfig :  public IServiceConfig<RpcMethodConfig>
 	{
 	 public:
-		using IServiceConfig::IServiceConfig;
+		RpcServiceConfig(const std::string & name);
     public:
         bool IsClient() const { return this->mIsClient; }
         bool OnLoadConfig(const rapidjson::Value &json) final;
         bool OnReLoadConfig(const rapidjson::Value & json) final;
     private:
         bool mIsClient;
+		std::unordered_map<std::string, int> mNets;
     };
 
 	class HttpServiceConfig : public IServiceConfig<HttpMethodConfig>

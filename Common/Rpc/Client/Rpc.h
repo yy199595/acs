@@ -37,6 +37,7 @@ namespace Msg
 	{
 		constexpr int Tcp = 1; //tcp
 		constexpr int Http = 2; //http
+		constexpr int Redis = 3; //redis队列
 	}
 }
 

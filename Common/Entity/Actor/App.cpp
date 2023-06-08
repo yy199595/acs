@@ -5,7 +5,7 @@
 #include"Timer/Timer/ElapsedTimer.h"
 #include"Util/File/DirectoryHelper.h"
 #include"Proto/Component/ProtoComponent.h"
-#include"Server/Component/TextConfigComponent.h"
+#include"Server/Component/ConfigComponent.h"
 #include"Server/Component/ThreadComponent.h"
 #include"Cluster/Component/LaunchComponent.h"
 #include"Registry/Component/RegistryComponent.h"
@@ -43,7 +43,7 @@ namespace Tendo
 		this->mMessageComponent = this->GetOrAddComponent<ProtoComponent>();
 		this->mActorComponent = this->GetOrAddComponent<ActorComponent>();
 
-        LOG_CHECK_RET_FALSE(this->AddComponent<TextConfigComponent>());
+        LOG_CHECK_RET_FALSE(this->AddComponent<ConfigComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<ThreadComponent>());
         LOG_CHECK_RET_FALSE(this->AddComponent<LaunchComponent>());
 

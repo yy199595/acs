@@ -5,6 +5,14 @@
 #include"Cluster/Config/ClusterConfig.h"
 namespace Tendo
 {
+	RpcServiceConfig::RpcServiceConfig(const std::string& name)
+		: IServiceConfig<RpcMethodConfig>(name)
+	{
+		this->mNets["tcp"] = Msg::Net::Tcp;
+		this->mNets["http"] = Msg::Net::Http;
+		this->mNets["redis"] = Msg::Net::Redis;
+	}
+
 	bool RpcServiceConfig::OnLoadConfig(const rapidjson::Value & json)
 	{
 		if(!json.IsObject())
@@ -32,10 +40,11 @@ namespace Tendo
 				RpcMethodConfig* serviceConfig = this->mMethodConfigs[name].get();
 				{
 					serviceConfig->Timeout = 0;
+					serviceConfig->IsOpen = true;
 					serviceConfig->Method = name;
 					serviceConfig->IsAsync = false;
 					serviceConfig->IsClient = false;
-					serviceConfig->IsOpen = true;
+					serviceConfig->Net = Msg::Net::Tcp;
 					serviceConfig->FullName = fullName;
 					serviceConfig->Proto = Msg::Porto::None;
 					serviceConfig->Service = this->GetName();
@@ -43,6 +52,17 @@ namespace Tendo
 				if (ClusterConfig::Inst()->GetServerName(service, server))
 				{
 					serviceConfig->Server = server;
+				}
+				if(jsonValue.HasMember("Net"))
+				{
+					std::string net(jsonValue["Net"].GetString());
+					auto iter = this->mNets.find(net);
+					if(iter == this->mNets.end())
+					{
+						LOG_ERROR("not find net : " << net);
+						return false;
+					}
+					serviceConfig->Net = iter->second;
 				}
 				if (jsonValue.HasMember("IsOpen"))
 				{

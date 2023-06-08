@@ -39,9 +39,9 @@ namespace Tendo
     private:
 		unsigned int mWaitCount;
 		class TimerComponent* mTimerComponent;
-		class InnerNetComponent * mNetComponent;
 		class CoroutineComponent* mTaskComponent;
 		class OuterNetComponent* mOuterComponent;
+		class RouterComponent * mRouterComponent;
 		std::unordered_map<std::string, int> mWaitCounts;
 		std::unordered_map<std::string, int> mDoneCounts;
 	};

@@ -2,7 +2,7 @@
 // Created by zmhy0073 on 2022/10/13.
 //
 
-#include"TextConfigComponent.h"
+#include"ConfigComponent.h"
 #include"Core/System/System.h"
 #include"Server/Config/ServerConfig.h"
 #include"Server/Config/ServiceConfig.h"
@@ -10,7 +10,7 @@
 #include"Server/Config/CodeConfig.h"
 namespace Tendo
 {
-    bool TextConfigComponent::Awake()
+    bool ConfigComponent::Awake()
     {
         std::string path = System::ConfigPath();
         const ServerConfig* config = ServerConfig::Inst();
@@ -34,7 +34,7 @@ namespace Tendo
         return true;
     }
 
-    bool TextConfigComponent::LoadTextConfig(std::unique_ptr<ITextConfig> config, const std::string &path)
+    bool ConfigComponent::LoadTextConfig(std::unique_ptr<ITextConfig> config, const std::string &path)
     {
         const std::string & name = config->GetConfigName();
         if(this->mConfigs.find(name) != this->mConfigs.end())
@@ -52,7 +52,7 @@ namespace Tendo
         return true;
     }
 
-    void TextConfigComponent::OnHotFix()
+    void ConfigComponent::OnHotFix()
     {
         auto iter = this->mConfigs.begin();
         for(; iter != this->mConfigs.end(); iter++)

@@ -16,7 +16,7 @@ namespace Tendo
 		int Ping(long long userId);
 		int Logout(long long userId);
 		int Login(const Msg::Packet & packet);
-		int Allocation(const s2s::allot::request & request);
+		int Enter(const s2s::allot::request & request);
 	private:
 		bool Awake() final;
 		bool OnInit() final;

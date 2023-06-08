@@ -14,15 +14,17 @@
 #include"Rpc/Client/Message.h"
 #include"Rpc/Service/RpcService.h"
 #include"Gate/Component/OuterNetComponent.h"
+#include"Router/Component/RouterComponent.h"
 #ifdef __RPC_MESSAGE__
 #include"Proto/Include/Message.h"
 #endif
+
 namespace Tendo
 {
 	DispatchComponent::DispatchComponent()
 	{
 		this->mWaitCount = 0;
-		this->mNetComponent = nullptr;
+		this->mRouterComponent = nullptr;
 		this->mTaskComponent = nullptr;
 		this->mOuterComponent = nullptr;
 		this->mTimerComponent = nullptr;
@@ -32,7 +34,7 @@ namespace Tendo
 	{
         this->mTimerComponent = this->mApp->GetTimer();
 		this->mTaskComponent = this->mApp->GetCoroutine();
-		this->mNetComponent = this->GetComponent<InnerNetComponent>();
+		this->mRouterComponent = this->GetComponent<RouterComponent>();
 		this->mOuterComponent = this->GetComponent<OuterNetComponent>();
 		return true;
 	}
@@ -78,13 +80,12 @@ namespace Tendo
 					{
 						this->SubWaitCount(config->Service);
 						LOG_ERROR("call [" << config->FullName << "] code = call time out");
-						this->mNetComponent->Send(message->From(), XCode::CallTimeout, message);
+						this->mRouterComponent->Send(message->From(), XCode::CallTimeout, message);
 					}
 			);
 		}
 #ifdef __RPC_MESSAGE__
 		std::string json;
-		std::string serverName = message->From();
 		ProtoComponent* component = this->mApp->GetProto();
 		if (!config->Request.empty())
 		{
@@ -108,7 +109,7 @@ namespace Tendo
 			}
 		}
 		std::stringstream ss1;
-		ss1 << serverName << " call func = [" << config->FullName << "]";
+		ss1 << message->From() << " call func = [" << config->FullName << "]";
 		if(!json.empty())
 		{
 			ss1 << " request = " << Helper::Str::FormatJson(json);
@@ -147,7 +148,7 @@ namespace Tendo
 		if (code == XCode::Successful && message->GetHead().Has("rpc"))
 		{
 			std::stringstream ss2;
-			ss2 << serverName << " call func = [" << config->FullName << "]";
+			ss2 << message->From() << " call func = [" << config->FullName << "]";
 			if(!json.empty())
 			{
 				ss2 << " response = " << Helper::Str::FormatJson(json);
@@ -157,7 +158,7 @@ namespace Tendo
 		else if(code != XCode::Successful)
 		{
 			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-			CONSOLE_LOG_ERROR(serverName << " call func = [" << config->FullName << "] code = " << desc);
+			CONSOLE_LOG_ERROR(message->From() << " call func = [" << config->FullName << "] code = " << desc);
 		}
 		//LOG_INFO("call [" << config->FullName << "] use time = " << timer.GetMs() << "ms");
 #endif
@@ -168,7 +169,7 @@ namespace Tendo
 			return;
 		}
 		const std::string& address = message->From();
-		this->mNetComponent->Send(address, code, message);
+		this->mRouterComponent->Send(address, code, message);
 	}
 
     int DispatchComponent::OnMessage(const std::shared_ptr<Msg::Packet>& message)

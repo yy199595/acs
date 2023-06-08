@@ -39,14 +39,13 @@ function coroutine.http(func, request, taskSource)
         if not state then
             json.error = error
             json.code = XCode.CallLuaFunctionFail
-        else if error ~= XCode.Successful then
+        elseif error ~= XCode.Successful then
             json.code = error
             json.error = response
         else
-            json.code =error
+            json.code = error
             json.error = "OK"
             json.data = response
-        end
         end
         taskSource:SetHttp(json.code, json)
     end

@@ -2,6 +2,7 @@
 #include<queue>
 #include"Rpc/Client/Message.h"
 #include"Util/Json/JsonWriter.h"
+#include"Rpc/Interface/ISend.h"
 #include"Rpc/Client/InnerNetTcpClient.h"
 #include"Server/Component/TcpListenerComponent.h"
 struct lua_State;
@@ -9,7 +10,7 @@ namespace Tendo
 {
 	// 管理内网rpc的session
 	class InnerNetComponent : public TcpListenerComponent, public IRpc<Msg::Packet>,
-			public IServerRecord, public IFrameUpdate, public IDestroy
+							  public IServerRecord, public IFrameUpdate, public IDestroy, public ISender
 	{
 	 public:
 		InnerNetComponent();
@@ -30,13 +31,7 @@ namespace Tendo
 		InnerNetTcpClient * GetLocalClient(const std::string& address); //本地tcp客户端
 		InnerNetTcpClient * GetRemoteClient(const std::string& address); //远程tcp客户端
 	public:
-		bool Send(const std::shared_ptr<Msg::Packet>& message); //发送到本地
-		bool Send(const std::string & address, const std::shared_ptr<Msg::Packet>& message);
-        bool Send(const std::string & address, int code, const std::shared_ptr<Msg::Packet>& pack);
-        bool Send(const std::string & address, const std::shared_ptr<Msg::Packet>& message, int & id);
-        std::shared_ptr<Msg::Packet> Call(const std::string & address, const std::shared_ptr<Msg::Packet> & message);
-	public:
-		int LuaCall(lua_State * lua, const std::string & address, const std::shared_ptr<Msg::Packet> & message);
+		int Send(const std::string & address, const std::shared_ptr<Msg::Packet>& message) final;
 	public:
 		size_t GetConnectClients(std::vector<std::string> & list) const; //获取所有连接进来的客户端
 		size_t Broadcast(const std::shared_ptr<Msg::Packet>& message) const; //广播给所有链接进来的客户端

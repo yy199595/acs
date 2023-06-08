@@ -2,17 +2,17 @@
 // Created by zmhy0073 on 2022/10/13.
 //
 
-#ifndef APP_TEXTCONFIGCOMPONENT_H
-#define APP_TEXTCONFIGCOMPONENT_H
+#ifndef APP_CONFIGCOMPONENT_H
+#define APP_CONFIGCOMPONENT_H
 #include"Server/Config/TextConfig.h"
 #include"Entity/Component/Component.h"
 namespace Tendo
 {
-    class TextConfigComponent : public Component, public IHotfix
+    class ConfigComponent : public Component, public IHotfix
     {
     public:
-        TextConfigComponent() = default;
-        ~TextConfigComponent() = default;
+        ConfigComponent() = default;
+        ~ConfigComponent() = default;
     public:
         void OnHotFix() final;
 
@@ -33,7 +33,7 @@ namespace Tendo
     };
 
     template<typename T>
-    bool TextConfigComponent::LoadTextConfig(const std::string & path)
+    bool ConfigComponent::LoadTextConfig(const std::string & path)
     {
         std::unique_ptr<T> config(new T());
         size_t key = typeid(T).hash_code();
@@ -46,7 +46,7 @@ namespace Tendo
         return this->LoadTextConfig(std::move(config), path);
     }
     template<typename T>
-    const T * TextConfigComponent::GetTextConfig()
+    const T * ConfigComponent::GetTextConfig()
     {
         size_t key = typeid(T).hash_code();
         auto iter = this->mKeys.find(key);
@@ -59,7 +59,7 @@ namespace Tendo
     }
 
     template<typename T>
-    const T *TextConfigComponent::GetTextConfig(const std::string &name)
+    const T *ConfigComponent::GetTextConfig(const std::string &name)
     {
         auto iter1 = this->mConfigs.find(name);
         return iter1 != this->mConfigs.end() ?  static_cast<T*>(iter1->second.get()) : nullptr;
@@ -67,4 +67,4 @@ namespace Tendo
 }
 
 
-#endif //APP_TEXTCONFIGCOMPONENT_H
+#endif //APP_CONFIGCOMPONENT_H

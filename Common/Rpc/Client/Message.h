@@ -43,7 +43,7 @@ namespace Msg
         bool Add(const std::string &key, const std::string &value);
     };
 
-    class Packet : public Tcp::ProtoMessage
+	class Packet : public Tcp::ProtoMessage, public std::enable_shared_from_this<Packet>
     {
     public:
         bool ParseLen(std::istream &os, int & len);

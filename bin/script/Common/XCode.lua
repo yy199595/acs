@@ -49,4 +49,5 @@ XCode =
 	NotFoundServerRpcAddress = 46,--找不到服务器rpc地址
 	NotFoundPlayerRpcAddress = 47,--找不到玩家所在服务器地址
 	NotFoundActor = 48,--找不到Actor
+	NotFoundActorAddress = 49,--找不到actor地址
 }

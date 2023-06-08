@@ -133,7 +133,7 @@ namespace Tendo
 		}
 	}
 
-	bool HttpComponent::Send(const std::shared_ptr<Http::Request>& request,
+	int HttpComponent::Send(const std::shared_ptr<Http::Request>& request,
 		std::shared_ptr<Http::IResponse> & response, int& taskId)
 	{
 		request->SetAsync(true);
@@ -143,7 +143,7 @@ namespace Tendo
 			httpAsyncClient->Do(request, response, taskId);
 			this->mUseClients.emplace(taskId, httpAsyncClient);
 		}
-		return true;
+		return XCode::Successful;
 	}
 
 	std::shared_ptr<Http::DataResponse> HttpComponent::Await(const std::shared_ptr<Http::Request>& request)
@@ -197,7 +197,7 @@ namespace Tendo
 		}
     }
 
-	bool HttpComponent::Send(const std::shared_ptr<Http::Request>& request, std::shared_ptr<Http::IResponse>& response)
+	int HttpComponent::Send(const std::shared_ptr<Http::Request>& request, std::shared_ptr<Http::IResponse>& response)
 	{
 		try
 		{
@@ -206,11 +206,11 @@ namespace Tendo
 			request->SetAsync(false);
 			asio::ip::tcp::resolver resolver(io);
 			asio::ip::tcp::resolver::results_type endpoints =
-				resolver.resolve(request->Host(), request->Port(), code);
+					resolver.resolve(request->Host(), request->Port(), code);
 			if (code)
 			{
 				CONSOLE_LOG_ERROR(code.message())
-				return false;
+				return XCode::NetWorkError;
 			}
 
 			asio::ip::tcp::socket socket(io);
@@ -219,7 +219,7 @@ namespace Tendo
 			if (code)
 			{
 				CONSOLE_LOG_ERROR(code.message())
-				return false;
+				return XCode::NetWorkError;
 			}
 
 			asio::streambuf requestBuf;
@@ -233,7 +233,7 @@ namespace Tendo
 					if (code)
 					{
 						CONSOLE_LOG_ERROR(code.message())
-						return false;
+						return XCode::NetWorkError;
 					}
 				}
 			} while (length > 0);
@@ -250,59 +250,99 @@ namespace Tendo
 			int num = response->OnRead(responseStream);
 			switch (num)
 			{
-			case HTTP_READ_LINE:
-				asio::read_until(socket, responseBuf, "\r\n", code);
-				if (code)
-				{
-					CONSOLE_LOG_ERROR(code.message())
-					return false;
-				}
-				goto ON_READ_HANDLE;
-				break;
-			case HTTP_READ_SOME:
-				asio::read(socket, responseBuf, asio::transfer_at_least(1), code);
-				if (code)
-				{
-					if (code == asio::error::eof)
+				case HTTP_READ_LINE:
+					asio::read_until(socket, responseBuf, "\r\n", code);
+					if (code)
 					{
-						response->OnComplete();
-						return true;
+						CONSOLE_LOG_ERROR(code.message())
+						return XCode::NetWorkError;
 					}
-					CONSOLE_LOG_ERROR(code.message())
-					return false;
-				}
-				goto ON_READ_HANDLE;
-				break;
-			case HTTP_READ_ERROR:
-				return false;
-			case HTTP_READ_COMPLETE:
-				response->OnComplete();
-				return true;
-			default:
-				asio::read(socket, responseBuf, asio::transfer_exactly(num), code);
-				if (code)
-				{
-					if (code == asio::error::eof)
+					goto ON_READ_HANDLE;
+					break;
+				case HTTP_READ_SOME:
+					asio::read(socket, responseBuf, asio::transfer_at_least(1), code);
+					if (code)
 					{
-						response->OnComplete();
-						return true;
+						if (code == asio::error::eof)
+						{
+							response->OnComplete();
+							return XCode::Successful;
+						}
+						CONSOLE_LOG_ERROR(code.message())
+						return XCode::NetWorkError;
 					}
-					CONSOLE_LOG_ERROR(code.message())
-					return false;
-				}
-				goto ON_READ_HANDLE;
-				break;
+					goto ON_READ_HANDLE;
+					break;
+				case HTTP_READ_ERROR:
+					return XCode::NetWorkError;
+				case HTTP_READ_COMPLETE:
+					response->OnComplete();
+					return XCode::Successful;
+				default:
+					asio::read(socket, responseBuf, asio::transfer_exactly(num), code);
+					if (code)
+					{
+						if (code == asio::error::eof)
+						{
+							response->OnComplete();
+							return XCode::Successful;
+						}
+						CONSOLE_LOG_ERROR(code.message())
+						return XCode::NetWorkError;
+					}
+					goto ON_READ_HANDLE;
+					break;
 			}
 		}
-		catch(asio::system_error & code)
+		catch (asio::system_error& code)
 		{
 			CONSOLE_LOG_DEBUG(code.what())
-			return false;
+			return XCode::NetWorkError;
 		}
+		return XCode::Successful;
 	}
 
-	bool HttpComponent::Send(const std::shared_ptr<Http::Request>& request)
+	int HttpComponent::Send(const std::shared_ptr<Http::Request>& request)
 	{
-		return false;
+		return 0;
+	}
+
+	void HttpComponent::OnNotFindResponse(int key, std::shared_ptr<Http::IResponse> message)
+	{
+
+	}
+
+	int HttpComponent::MakeFromMessage(const std::string& addr,
+			const std::shared_ptr<Msg::Packet>& message, std::shared_ptr<Http::Request>& request)
+	{
+		std::shared_ptr<Http::PostRequest> postRequest = std::make_shared<Http::PostRequest>();
+		{
+			if (!postRequest->SetUrl(fmt::format("{0}/web/rpc", addr)))
+			{
+				return XCode::ParseHttpUrlFailure;
+			}
+			std::string value;
+			request = postRequest;
+			std::vector<std::string> keys;
+			message->GetHead().Get(keys);
+			for (const std::string& key: keys)
+			{
+				message->GetHead().Get(key, value);
+				postRequest->Header().Add(key, value);
+			}
+			postRequest->Str(message->GetBody());
+		}
+		return XCode::Successful;
+	}
+
+	int HttpComponent::Send(const std::string& address, const std::shared_ptr<Msg::Packet>& message)
+	{
+		std::shared_ptr<Http::Request> request;
+		int code = this->MakeFromMessage(address, message, request);
+		if (code != XCode::Successful)
+		{
+			return code;
+		}
+		return this->Send(request);
 	}
 }

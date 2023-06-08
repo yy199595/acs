@@ -16,7 +16,7 @@
 #include"Http/Component/HttpDebugComponent.h"
 #include"Entity/Component/ActorComponent.h"
 
-#include"Server/Component/TextConfigComponent.h"
+#include"Server/Component/ConfigComponent.h"
 #include"Cluster/Component/LaunchComponent.h"
 #include"Log/Service/Log.h"
 #include"Gate/Service/Gate.h"
@@ -49,6 +49,7 @@
 #include"WatchDog/Component/WatchDogComponent.h"
 
 #include"Server/Config/ServerConfig.h"
+#include"Router/Component/RouterComponent.h"
 using namespace Tendo;
 
 void RegisterComponent()
@@ -64,12 +65,12 @@ void RegisterComponent()
 //server
 	ComponentFactory::Add<KcpComponent>("KcpComponent");
     ComponentFactory::Add<LaunchComponent>("LaunchComponent");
-    ComponentFactory::Add<TextConfigComponent>("TextConfigComponent");
+    ComponentFactory::Add<ConfigComponent>("TextConfigComponent");
 	ComponentFactory::Add<ConsoleComponent>("ConsoleComponent");
     ComponentFactory::Add<InnerNetComponent>("InnerNetComponent");
 	ComponentFactory::Add<RegistryComponent>("RegistryComponent");
 	ComponentFactory::Add<DispatchComponent>("DispatchComponent");
-
+	ComponentFactory::Add<RouterComponent>("RouterComponent");
 // gate
 	ComponentFactory::Add<OuterNetComponent>("OuterNetComponent");
     ComponentFactory::Add<SqliteComponent>("SqliteComponent");

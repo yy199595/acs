@@ -7,7 +7,7 @@
 #include"Util/String/StringHelper.h"
 #include"Server/Config/CodeConfig.h"
 #include"Cluster/Config/ClusterConfig.h"
-#include"Server/Component/TextConfigComponent.h"
+#include"Server/Component/ConfigComponent.h"
 
 namespace Tendo
 {
@@ -48,7 +48,7 @@ namespace Tendo
 
     int Node::LoadConfig()
     {
-        TextConfigComponent * textComponent = this->GetComponent<TextConfigComponent>();
+        ConfigComponent * textComponent = this->GetComponent<ConfigComponent>();
         if(textComponent != nullptr)
         {
             textComponent->OnHotFix();

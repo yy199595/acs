@@ -16,6 +16,6 @@ namespace Tendo
 		void Call(const std::string & target, std::shared_ptr<Msg::Packet>& message);
 		bool GetAddress(const std::string& service, long long id, std::string& address);
 	private:
-		class InnerNetComponent* mInnerComponent;
+		class RouterComponent * mRouterComponent;
 	};
 }

@@ -46,7 +46,7 @@ namespace Tendo
 		
     }
 
-	int Gate::Allocation(const s2s::allot_request &request)
+	int Gate::Enter(const s2s::allot_request &request)
     {
 		long long userId = request.user_id();
 		const std::string & token = request.token();

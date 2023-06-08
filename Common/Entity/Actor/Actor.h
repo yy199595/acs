@@ -38,7 +38,7 @@ namespace Tendo
 	protected:
 		std::shared_ptr<Msg::Packet> Make(const std::string & func, const pb::Message * message) const;
 	protected:
-		class InnerNetComponent * mNetComponent;
+		class RouterComponent * mRouterComponent;
 	private:
 		long long mLastTime;
 		const std::string mName;

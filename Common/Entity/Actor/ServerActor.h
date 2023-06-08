@@ -17,6 +17,8 @@ namespace Tendo
 		bool GetListen(const std::string & name, std::string & addr);
 		void AddListen(const std::string & name, const std::string & addr);
 		int GetAddress(const std::string &func, std::string &addr) final;
+	private:
+		bool GetListen(int net, std::string & address);
 	public:
 		bool OnInit() final;
 		void OnRegister(std::string *json) final;

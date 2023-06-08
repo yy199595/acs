@@ -14,12 +14,15 @@
 #include"Http/Component/HttpWebComponent.h"
 #include"Rpc/Component/DispatchComponent.h"
 #include "Server/Config/ServerConfig.h"
-
+#include"Router/Component/RouterComponent.h"
 namespace Tendo
 {
     bool LaunchComponent::Awake()
 	{
 		this->mApp->AddComponent<HttpComponent>();
+		this->mApp->AddComponent<RouterComponent>();
+		this->mApp->AddComponent<InnerNetComponent>();
+		this->mApp->AddComponent<DispatchComponent>();
 		if (ServerConfig::Inst()->UseLua())
 		{
 			this->mApp->AddComponent<LuaComponent>();
@@ -29,12 +32,10 @@ namespace Tendo
 		{
 			return false;
 		}
-		this->mApp->AddComponent<InnerNetComponent>();
-		this->mApp->AddComponent<DispatchComponent>();
+
 		if (ServerConfig::Inst()->GetListen("http", port))
 		{
 			this->mApp->AddComponent<HttpWebComponent>();
-			this->mApp->AddComponent<DispatchComponent>();
 		}
 
 		std::vector<std::string> components;

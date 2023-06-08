@@ -4,6 +4,7 @@
 
 #include"Login.h"
 #include"Entity/Actor/App.h"
+#include"Lua/Module/LuaModule.h"
 #include"Rpc/Component/InnerNetComponent.h"
 namespace Tendo
 {
@@ -31,13 +32,23 @@ namespace Tendo
 		{
 			player->AddAddr(actorInfo.first, actorInfo.second);
 		}
+		Lua::LuaModule * luaModule = this->GetLuaModule();
+		if(luaModule != nullptr)
+		{
+			luaModule->Await("OnPlayerLogin", playerId);
+		}
 		return XCode::Successful;
 	}
 
     int Login::OnLogout(long long id, const s2s::logout::request& request)
     {
-		long long userId = request.user_id();
-    	this->mActorComponent->DelActor(userId);
+		long long playerId = request.user_id();
+    	this->mActorComponent->DelActor(playerId);
+		Lua::LuaModule * luaModule = this->GetLuaModule();
+		if(luaModule != nullptr)
+		{
+			luaModule->Await("OnPlayerLogout", playerId);
+		}
 		return XCode::Successful;
     }
 

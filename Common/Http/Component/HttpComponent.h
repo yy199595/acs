@@ -1,5 +1,6 @@
 
 #pragma once
+#include"Rpc/Interface/ISend.h"
 #include"Util/Guid/NumberBuilder.h"
 #include"Rpc/Component/RpcTaskComponent.h"
 namespace Http
@@ -11,7 +12,7 @@ namespace Http
 namespace Tendo
 {
     class HttpRequestClient;
-	class HttpComponent : public RpcTaskComponent<int, Http::IResponse>, public ILuaRegister
+	class HttpComponent : public RpcTaskComponent<int, Http::IResponse>, public ILuaRegister, public ISender
 	{
 	 public:
 		HttpComponent();
@@ -22,9 +23,13 @@ namespace Tendo
 	public:
 		std::shared_ptr<Http::DataResponse> Await(const std::shared_ptr<Http::Request>& request);
 
-		bool Send(const std::shared_ptr<Http::Request> & request); // 不接受返回数据
-		bool Send(const std::shared_ptr<Http::Request> & request, std::shared_ptr<Http::IResponse> & response); // 同步发送
-		bool Send(const std::shared_ptr<Http::Request> & request, std::shared_ptr<Http::IResponse> & response, int & taskId); // 异步发送
+		int Send(const std::shared_ptr<Http::Request> & request); // 不接受返回数据
+		int Send(const std::shared_ptr<Http::Request> & request, std::shared_ptr<Http::IResponse> & response); // 同步发送
+		int Send(const std::shared_ptr<Http::Request> & request, std::shared_ptr<Http::IResponse> & response, int & taskId); // 异步发送
+	private:
+		void OnNotFindResponse(int key, std::shared_ptr<Http::IResponse> message) final;
+		int Send(const std::string &address, const std::shared_ptr<Msg::Packet> &message) final;
+		int MakeFromMessage(const std::string & addr, const std::shared_ptr<Msg::Packet> &message, std::shared_ptr<Http::Request> & request);
 	private:
         bool LateAwake() final;
 		void OnTaskComplete(int key) final;

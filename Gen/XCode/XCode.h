@@ -50,4 +50,5 @@ namespace XCode
 	 constexpr int NotFoundServerRpcAddress = 46;//找不到服务器rpc地址
 	 constexpr int NotFoundPlayerRpcAddress = 47;//找不到玩家所在服务器地址
 	 constexpr int NotFoundActor = 48;//找不到Actor
+	 constexpr int NotFoundActorAddress = 49;//找不到actor地址
 };

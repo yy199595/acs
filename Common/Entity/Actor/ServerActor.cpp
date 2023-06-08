@@ -5,7 +5,8 @@
 #include"ServerActor.h"
 #include"XCode/XCode.h"
 #include"Entity/Actor/App.h"
-#include"Rpc/Component/InnerNetComponent.h"
+#include"Util/Json/JsonWriter.h"
+#include"Router/Component/RouterComponent.h"
 namespace Tendo
 {
 	ServerActor::ServerActor(int id, const std::string & name)
@@ -55,9 +56,28 @@ namespace Tendo
 		return true;
 	}
 
+	bool ServerActor::GetListen(int net, std::string& address)
+	{
+		switch(net)
+		{
+			case Msg::Net::Tcp:
+				return this->GetListen("rpc", address);
+			case Msg::Net::Http:
+				return this->GetListen("http", address);
+			case Msg::Net::Redis:
+				return this->GetListen("redis", address);
+		}
+		return false;
+	}
+
 	int ServerActor::Send(const std::shared_ptr<Msg::Packet>& message)
 	{
-		if(!this->mNetComponent->Send(this->mRpcAddress, message))
+		std::string address;
+		if(!this->GetListen(message->GetNet(), address))
+		{
+			return XCode::NotFoundActorAddress;
+		}
+		if(!this->mRouterComponent->Send(address, message))
 		{
 			return XCode::SendMessageFail;
 		}

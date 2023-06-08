@@ -9,7 +9,7 @@
 #include"Server/Component/ThreadComponent.h"
 #include"google/protobuf/util/json_util.h"
 #include"Core/Singleton/Singleton.h"
-
+#include"XCode/XCode.h"
 namespace Tendo
 {
     InnerNetComponent::InnerNetComponent()
@@ -17,7 +17,6 @@ namespace Tendo
         this->mSumCount = 0;
         this->mMaxHandlerCount = 0;
         this->mNetComponent = nullptr;
-        this->mMessageComponent = nullptr;
     }
 
     bool InnerNetComponent::LateAwake()
@@ -189,40 +188,14 @@ namespace Tendo
         return iter->second.get();
     }
 
-
-    bool InnerNetComponent::Send(const std::shared_ptr<Msg::Packet> &message)
-    {
-		message->SetNet(Msg::Net::Tcp);
-        message->SetFrom(this->mLocation);
-        this->mMessageComponent->OnMessage(message);
-        return true;
-    }
-
-    bool InnerNetComponent::Send(const std::string &address, int code, const std::shared_ptr<Msg::Packet> &message)
-    {
-        if (!message->GetHead().Has("rpc"))
-        {
-            return false; //不需要返回
-        }
-        message->GetHead().Remove("id");
-        message->GetHead().Add("code", code);
-#ifndef __DEBUG__
-        message->GetHead().Remove("func");
-#endif
-        message->SetType(Msg::Type::Response);
-        this->Send(message->From(), message);
-        return true;
-    }
-
-    bool InnerNetComponent::Send(const std::string &address, const std::shared_ptr<Msg::Packet> &message)
+    int InnerNetComponent::Send(const std::string &address, const std::shared_ptr<Msg::Packet> &message)
     {
         if (address.empty() || address == this->mLocation) //发送到本机
         {
             message->SetFrom(address);
-            //this->mMessageComponent->OnMessage(message);
             Asio::Context &io = this->mApp->MainThread();
             io.post(std::bind(&InnerNetComponent::OnMessage, this, message));
-            return true;
+            return XCode::Successful;
         }
         InnerNetTcpClient *clientSession = nullptr;
         switch (message->GetType())
@@ -237,36 +210,10 @@ namespace Tendo
         if (clientSession == nullptr)
         {
             LOG_ERROR("not find rpc client : [" << address << "]")
-            return false;
+            return XCode::SendMessageFail;
         }
         clientSession->Send(message);
-        return true;
-    }
-
-    std::shared_ptr<Msg::Packet> InnerNetComponent::Call(const std::string & address, const std::shared_ptr<Msg::Packet> & message)
-    {
-        int taskId = this->mMessageComponent->PopTaskId();
-        message->GetHead().Add("rpc", taskId);
-        if(!this->Send(address, message))
-        {
-            this->mMessageComponent->PushTaskId(taskId);
-            return nullptr;
-        }
-        std::shared_ptr<RpcTaskSource> taskSource =
-                std::make_shared<RpcTaskSource>(taskId);
-       return  this->mMessageComponent->AddTask(taskId, taskSource)->Await();
-    }
-
-    bool InnerNetComponent::Send(const std::string & address, const std::shared_ptr<Msg::Packet>& message, int & taskId)
-    {
-        taskId = this->mMessageComponent->PopTaskId();
-        message->GetHead().Add("rpc", taskId);
-        if(!this->Send(address, message))
-        {
-            this->mMessageComponent->PushTaskId(taskId);
-            return false;
-        }
-        return true;
+        return XCode::Successful;
     }
 
     void InnerNetComponent::OnRecord(Json::Writer &document)
@@ -320,21 +267,6 @@ namespace Tendo
 		}
         return count;
     }
-
-	int InnerNetComponent::LuaCall(lua_State * lua,
-			const std::string & address, const std::shared_ptr<Msg::Packet> & message)
-	{
-		int rpcId = 0;
-		if (!this->Send(address, message, rpcId))
-		{
-			luaL_error(lua, "send request message error");
-			return 0;
-		}
-		const std::string & response = message->From();
-		std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource
-				= std::make_shared<LuaRpcTaskSource>(lua, rpcId, response);
-		return this->mMessageComponent->AddTask(rpcId, luaRpcTaskSource)->Await();
-	}
 
 	void InnerNetComponent::OnDestroy()
     {

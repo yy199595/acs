@@ -17,7 +17,7 @@
 #include "Lua/Module/LuaModule.h"
 #include "Entity/Lua/LuaActor.h"
 #include "Lua/Engine/ClassProxyHelper.h"
-#include "Server/Component/TextConfigComponent.h"
+#include "Server/Component/ConfigComponent.h"
 
 using namespace Lua;
 namespace Tendo

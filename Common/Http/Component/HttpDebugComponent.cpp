@@ -7,13 +7,13 @@
 #include"Cluster/Config/ClusterConfig.h"
 #include"Server/Config/CodeConfig.h"
 #include"Util//Json/JsonWriter.h"
-#include"Rpc/Component/InnerNetComponent.h"
+#include"Router/Component/RouterComponent.h"
 
 namespace Tendo
 {
 	bool HttpDebugComponent::LateAwake()
 	{
-		this->mInnerComponent = this->GetComponent<InnerNetComponent>();
+		this->mRouterComponent = this->GetComponent<RouterComponent>();
 		return this->StartListen("debug");
 	}
 	bool HttpDebugComponent::OnDelClient(const std::string& address)
@@ -78,7 +78,7 @@ namespace Tendo
 	void HttpDebugComponent::Call(const std::string& address, std::shared_ptr<Msg::Packet>& message)
 	{
 		std::shared_ptr<Msg::Packet> response =
-			this->mInnerComponent->Call(address, message);
+			this->mRouterComponent->Call(address, message);
 		Json::Writer document;
 		if (response == nullptr)
 		{
