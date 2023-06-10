@@ -23,8 +23,6 @@ namespace Tendo
     public:
         explicit ServerConfig();
     public:
-
-		bool UseLua() const { return this->mUseLua;}
 		bool GetListen(std::vector<std::string> & names) const;
 		bool GetListen(const std::string & name, unsigned short & port) const;
 		bool GetListen(const std::string & name, std::string & net, unsigned short & port) const;
@@ -38,21 +36,13 @@ namespace Tendo
 		const std::string& Name() const { return this->mName; } //服务器名字
 		const std::string & GetContent() const { return this->mContent;}
 		bool GetPath(const std::string & name, std::string & path) const;
-	public:
-		const std::string & MainLua() const { return this->mMainLua; }
-		const std::vector<std::string> & RequirePath() const { return this->mLuaRequires;}
     private:
-		bool mUseLua;
 		int mGroupId;
 		int mServerId;
         std::string mName;
 		std::string mContent;
-		std::string mMainLua;
-		std::vector<std::string> mLuaRequires;
-        std::unordered_map<std::string, std::string> mEnvVals;
         std::unordered_map<std::string, ListenConfig> mListens;
         std::unordered_map<std::string, std::string> mPaths;
         std::unordered_map<std::string, std::string> mLocations;
-		//std::unordered_map<std::string, std::string> mLuaConfigs;
     };
 }

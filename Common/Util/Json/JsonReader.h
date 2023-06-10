@@ -61,8 +61,8 @@ namespace Json
 		bool GetMember(std::vector<std::string>& value) const;
 
 	 public:
-		const rapidjson::Value* GetJsonValue(const char* key) const;
-		const rapidjson::Value* GetJsonValue(const char* k1, const char* k2) const;
+		const rapidjson::Value* GetValue(const char* key) const;
+		const rapidjson::Value* GetValue(const char* k1, const char* k2) const;
 	 private:
 		std::string mJson;
 		//rapidjson::WriterDocument mJsonDocument;

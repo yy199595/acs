@@ -18,7 +18,6 @@ namespace Tendo
 	{
 		this->mServerId = 0;
 		this->mGroupId = 0;
-		this->mUseLua = false;
 	}
 
 	bool ServerConfig::OnReloadText(const char* str, size_t length)
@@ -35,16 +34,10 @@ namespace Tendo
 		}
 		assert(this->GetMember("name", this->mName));
 		assert(this->GetMember("id", this->mServerId));
-        this->mEnvVals["${WORK_PATH}"] = System::WorkPath();
-		if(this->HasMember("lua"))
-		{
-			this->GetMember("lua", "main", this->mMainLua);
-			this->GetMember("lua", "path", this->mLuaRequires);
-			this->mUseLua = true;
-		}
+
 		if (this->HasMember("listen"))
 		{
-			const rapidjson::Value * document = this->GetJsonValue("listen");
+			const rapidjson::Value * document = this->GetValue("listen");
 			for (auto iter1 = document->MemberBegin(); iter1 != document->MemberEnd(); iter1++)
 			{
 				ListenConfig listenConfig;
@@ -71,30 +64,8 @@ namespace Tendo
 		}
         for(auto & mPath : this->mPaths)
         {
-            const std::string & value = mPath.second;
-            for(auto & mEnvVal : this->mEnvVals)
-            {
-                const std::string & k = mEnvVal.first;
-                const std::string & v = mEnvVal.second;
-                Helper::Str::ReplaceString(mPath.second, k, v);
-            }
+			System::SubValue(mPath.second);
         }
-
-		for(std::string & value : this->mLuaRequires)
-		{
-			for(auto & mEnvVal : this->mEnvVals)
-			{
-				const std::string & k = mEnvVal.first;
-				const std::string & v = mEnvVal.second;
-				Helper::Str::ReplaceString(value, k, v);
-			}
-		}
-		for(auto & mEnvVal : this->mEnvVals)
-		{
-			const std::string & k = mEnvVal.first;
-			const std::string & v = mEnvVal.second;
-			Helper::Str::ReplaceString(this->mMainLua, k, v);
-		}
 		return true;
 	}
 

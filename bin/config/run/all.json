@@ -11,6 +11,7 @@
         "outer": 1000
     },
     "path": {
+        "log": "${WORK_PATH}/log",
         "proto": "${WORK_PATH}/proto",
         "html": "${WORK_PATH}/www/html",
         "home": "${WORK_PATH}/www/html/home.html",
@@ -34,10 +35,12 @@
         "debug": "http://127.0.0.1:8088"
     },
     "lua": {
-        "path": [
-            "${WORK_PATH}/script/Common",
+        "require": [
             "${WORK_PATH}/script/Server",
             "${WORK_PATH}/script/Component"
+        ],
+        "loadfile": [
+            "${WORK_PATH}/script/Common"
         ],
         "main": "${WORK_PATH}/script/Server/Server.lua"
     },

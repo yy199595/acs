@@ -23,7 +23,7 @@ namespace Tendo
 		this->mApp->AddComponent<RouterComponent>();
 		this->mApp->AddComponent<InnerNetComponent>();
 		this->mApp->AddComponent<DispatchComponent>();
-		if (ServerConfig::Inst()->UseLua())
+		if(this->mApp->Config()->GetValue("lua") != nullptr)
 		{
 			this->mApp->AddComponent<LuaComponent>();
 		}

@@ -15,7 +15,10 @@ namespace Tendo
         this->mLastTime = 0;
         this->mLogSaveTime = 3;
         this->mServerName = ServerConfig::Inst()->Name();
-        this->mLogSavePath = fmt::format("{0}/log", System::WorkPath());
+		if(!this->mApp->Config()->GetPath("log", this->mLogSavePath))
+		{
+			this->mLogSavePath = fmt::format("{0}/log", System::WorkPath());
+		}
         return true;
     }
 

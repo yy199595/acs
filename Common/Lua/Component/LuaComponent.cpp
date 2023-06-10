@@ -18,14 +18,21 @@
 #include "Entity/Lua/LuaActor.h"
 #include "Lua/Engine/ClassProxyHelper.h"
 #include "Server/Component/ConfigComponent.h"
-
 using namespace Lua;
 namespace Tendo
 {
+	LuaComponent::LuaComponent()
+	{
+		this->mLuaEnv = nullptr;
+	}
+
 	bool LuaComponent::Awake()
 	{
-		this->mLuaEnv = luaL_newstate();
 		this->mMainModule = nullptr;
+		const rapidjson::Value * config = this->mApp->Config()->GetValue("lua");
+		LOG_CHECK_RET_FALSE(config != nullptr && this->mLuaConfig->Init(*config));
+
+		this->mLuaEnv = luaL_newstate();
 		luaL_openlibs(mLuaEnv);
 		return true;
 	}
@@ -123,8 +130,7 @@ namespace Tendo
 
 	Lua::LuaModule* LuaComponent::LoadModule(const std::string& name)
 	{
-		const ServerConfig * config = ServerConfig::Inst();
-		for(const std::string & path : config->RequirePath())
+		for(const std::string & path : this->mLuaConfig->Requires())
 		{
 			std::string fileName;
 			std::vector<std::string> luaFiles;
@@ -183,16 +189,24 @@ namespace Tendo
 
 	bool LuaComponent::LoadAllFile()
 	{
-		const ServerConfig* config = ServerConfig::Inst();
-		for(const std::string & path : config->RequirePath())
+		for(const std::string & path : this->mLuaConfig->Requires())
 		{
 			this->AddRequire(path);
 		}
-		if (config->MainLua().empty())
+		for(const std::string & path : this->mLuaConfig->LoadFiles())
+		{
+			if(luaL_dofile(this->mLuaEnv, path.c_str()) != LUA_OK)
+			{
+				LOG_FATAL(lua_tostring(this->mLuaEnv, -1));
+				return false;
+			}
+		}
+
+		if(this->mLuaConfig->Main().empty())
 		{
 			return true;
 		}
-		std::string main(config->MainLua());
+		std::string main = this->mLuaConfig->Main();
 		this->mMainModule = this->LoadModuleByPath(main);
 		LOG_CHECK_RET_FALSE(this->mMainModule != nullptr);
 		return true;
@@ -223,12 +237,9 @@ namespace Tendo
 
 	void LuaComponent::AddRequire(const std::string& path)
 	{
-		if (path.empty())
-			return;
-		if (this->mDirectorys.find(path) == this->mDirectorys.end())
+		if (!path.empty())
 		{
 			size_t size = 0;
-			this->mDirectorys.insert(path);
 			lua_getglobal(this->mLuaEnv, "package");
 			lua_getfield(this->mLuaEnv, -1, "path");
 			const char* str = lua_tolstring(this->mLuaEnv, -1, &size);

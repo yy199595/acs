@@ -3,6 +3,7 @@
 #include<memory>
 #include<unordered_map>
 #include"Lua/Module/LuaModule.h"
+#include"Server/Config/LuaConfig.h"
 #include"Entity/Component/Component.h"
 struct lua_State;
 namespace Tendo
@@ -12,7 +13,7 @@ namespace Tendo
 						 public IServerRecord, public IDestroy
 	{
 	 public:
-		LuaComponent() : mLuaEnv(nullptr) {};
+		LuaComponent();
 		virtual ~LuaComponent() = default;
     public:
 		double GetMemorySize();
@@ -35,9 +36,9 @@ namespace Tendo
 		Lua::LuaModule* LoadModuleByPath(const std::string& name);
 	 private:
         lua_State* mLuaEnv;
-        std::string mModulePath;
+		std::string mModulePath;
 		std::string mComponentPath;
 		Lua::LuaModule * mMainModule;
-		std::set<std::string> mDirectorys;
+		std::unique_ptr<LuaConfig> mLuaConfig;
 	};
 }

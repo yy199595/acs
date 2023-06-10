@@ -7,6 +7,7 @@
 
 #endif //APP_SYSTEM_H
 #include<string>
+#include<unordered_map>
 namespace Tendo
 {
     class System
@@ -17,10 +18,17 @@ namespace Tendo
         static const std::string & ExePath() { return System::mExePath; }
         static const std::string & WorkPath() { return System::mWorkPath; }
         static const std::string & ConfigPath() { return System::mConfigPath;}
-    private:
-        static bool IsInit;       
+	public:
+		static bool SubValue(std::string & value);
+		static bool GetEnv(const std::string & k, int & v);
+		static bool GetEnv(const std::string & k, std::string & v);
+		static bool SetEnv(const std::string & k, const std::string & v);
+	private:
+        static bool IsInit;
         static std::string mExePath;
         static std::string mWorkPath;
         static std::string mConfigPath;
-    };
+		static std::unordered_map<std::string, std::string> mEnvs;
+		static std::unordered_map<std::string, std::string> mSubValues;
+	};
 }

@@ -38,7 +38,7 @@ namespace Json
 		return !this->HasParseError();
 	}
 
-	const rapidjson::Value* Reader::GetJsonValue(const char* key) const
+	const rapidjson::Value* Reader::GetValue(const char* key) const
 	{
 		auto iter = this->FindMember(key);
 		return iter != this->MemberEnd() ? &iter->value : nullptr;
@@ -46,7 +46,7 @@ namespace Json
 
 	bool Reader::GetMember(const char* key, int& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(key);
+		const rapidjson::Value * jsonValue = this->GetValue(key);
 		if(jsonValue != nullptr && jsonValue->IsInt())
 		{
 			value = jsonValue->GetInt();
@@ -56,7 +56,7 @@ namespace Json
 	}
 	bool Reader::GetMember(const char* key, bool& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(key);
+		const rapidjson::Value * jsonValue = this->GetValue(key);
 		if(jsonValue != nullptr && jsonValue->IsBool())
 		{
 			value = jsonValue->GetBool();
@@ -66,7 +66,7 @@ namespace Json
 	}
 	bool Reader::GetMember(const char* key, float& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(key);
+		const rapidjson::Value * jsonValue = this->GetValue(key);
 		if(jsonValue != nullptr && jsonValue->IsFloat())
 		{
 			value = jsonValue->GetFloat();
@@ -76,7 +76,7 @@ namespace Json
 	}
 	bool Reader::GetMember(const char* key, double& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(key);
+		const rapidjson::Value * jsonValue = this->GetValue(key);
 		if(jsonValue != nullptr && jsonValue->IsDouble())
 		{
 			value = jsonValue->GetDouble();
@@ -87,7 +87,7 @@ namespace Json
 
 	bool Reader::GetMember(const char* key, short& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(key);
+		const rapidjson::Value * jsonValue = this->GetValue(key);
 		if(jsonValue != nullptr && jsonValue->IsInt())
 		{
 			value = (short )jsonValue->GetInt();
@@ -98,7 +98,7 @@ namespace Json
 
 	bool Reader::GetMember(const char* key, unsigned short& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(key);
+		const rapidjson::Value * jsonValue = this->GetValue(key);
 		if(jsonValue != nullptr && jsonValue->IsUint())
 		{
 			value = (unsigned short)jsonValue->GetUint();
@@ -109,12 +109,12 @@ namespace Json
 
 	bool Reader::HasMember(const char* key)
 	{
-		return this->GetJsonValue(key) != nullptr;
+		return this->GetValue(key) != nullptr;
 	}
 
 	bool Reader::GetMember(const char* key, long long& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(key);
+		const rapidjson::Value * jsonValue = this->GetValue(key);
 		if(jsonValue != nullptr && jsonValue->IsInt64())
 		{
 			value = jsonValue->GetInt64();
@@ -125,7 +125,7 @@ namespace Json
 
 	bool Reader::GetMember(const char* key, std::string& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(key);
+		const rapidjson::Value * jsonValue = this->GetValue(key);
 		if(jsonValue != nullptr && jsonValue->IsString())
 		{
 			const char * str = jsonValue->GetString();
@@ -137,7 +137,7 @@ namespace Json
 	}
 	bool Reader::GetMember(const char* key, unsigned int& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(key);
+		const rapidjson::Value * jsonValue = this->GetValue(key);
 		if(jsonValue != nullptr && jsonValue->IsUint())
 		{
 			value = jsonValue->GetUint();
@@ -147,7 +147,7 @@ namespace Json
 	}
 	bool Reader::GetMember(const char* key, std::vector<int>& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(key);
+		const rapidjson::Value * jsonValue = this->GetValue(key);
 		if(jsonValue != nullptr && jsonValue->IsArray())
 		{
 			auto jsonArray = jsonValue->GetArray();
@@ -166,7 +166,7 @@ namespace Json
 	}
 	bool Reader::GetMember(const char* key, std::vector<long long>& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(key);
+		const rapidjson::Value * jsonValue = this->GetValue(key);
 		if(jsonValue != nullptr && jsonValue->IsArray())
 		{
 			auto jsonArray = jsonValue->GetArray();
@@ -185,7 +185,7 @@ namespace Json
 	}
 	bool Reader::GetMember(const char* key, std::vector<std::string>& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(key);
+		const rapidjson::Value * jsonValue = this->GetValue(key);
 		if(jsonValue != nullptr && jsonValue->IsArray())
 		{
 			auto jsonArray = jsonValue->GetArray();
@@ -207,7 +207,7 @@ namespace Json
 	}
 	bool Reader::GetMember(const char * k1, std::vector<const rapidjson::Value *> & value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(k1);
+		const rapidjson::Value * jsonValue = this->GetValue(k1);
 		if(jsonValue->IsArray())
 		{
 			auto jsonArray = jsonValue->GetArray();
@@ -223,7 +223,7 @@ namespace Json
 
 	bool Reader::GetMember(const char* k1, std::unordered_map<std::string, const rapidjson::Value*>& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(k1);
+		const rapidjson::Value * jsonValue = this->GetValue(k1);
 		if(jsonValue->IsObject())
 		{
 			auto iter = jsonValue->MemberBegin();
@@ -240,7 +240,7 @@ namespace Json
 
 namespace Json
 {
-	const rapidjson::Value* Reader::GetJsonValue(const char* k1, const char* k2) const
+	const rapidjson::Value* Reader::GetValue(const char* k1, const char* k2) const
 	{
 		auto iter = this->FindMember(k1);
 		if(iter == this->MemberEnd() || !iter->value.IsObject())
@@ -252,7 +252,7 @@ namespace Json
 	}
 	bool Reader::GetMember(const char* k1, const char* k2, int& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(k1, k2);
+		const rapidjson::Value * jsonValue = this->GetValue(k1, k2);
 		if(jsonValue != nullptr && jsonValue->IsInt())
 		{
 			value = jsonValue->GetInt();
@@ -262,7 +262,7 @@ namespace Json
 	}
 	bool Reader::GetMember(const char* k1, const char* k2, bool& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(k1, k2);
+		const rapidjson::Value * jsonValue = this->GetValue(k1, k2);
 		if(jsonValue != nullptr && jsonValue->IsBool())
 		{
 			value = jsonValue->GetBool();
@@ -273,7 +273,7 @@ namespace Json
 
 	bool Reader::GetMember(const char* k1, const char* k2, float& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(k1, k2);
+		const rapidjson::Value * jsonValue = this->GetValue(k1, k2);
 		if(jsonValue != nullptr && jsonValue->IsFloat())
 		{
 			value = jsonValue->GetFloat();
@@ -283,7 +283,7 @@ namespace Json
 	}
 	bool Reader::GetMember(const char* k1, const char* k2, short& value) const
 	{
-		const rapidjson::Value* jsonValue = this->GetJsonValue(k1, k2);
+		const rapidjson::Value* jsonValue = this->GetValue(k1, k2);
 		if (jsonValue != nullptr && jsonValue->IsInt())
 		{
 			value = (short)jsonValue->GetInt();
@@ -293,7 +293,7 @@ namespace Json
 	}
 	bool Reader::GetMember(const char* k1, const char* k2, double& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(k1, k2);
+		const rapidjson::Value * jsonValue = this->GetValue(k1, k2);
 		if(jsonValue != nullptr && jsonValue->IsDouble())
 		{
 			value = jsonValue->GetDouble();
@@ -303,7 +303,7 @@ namespace Json
 	}
 	bool Reader::GetMember(const char* k1, const char* k2, long long int& value) const
 	{
-		const rapidjson::Value* jsonValue = this->GetJsonValue(k1, k2);
+		const rapidjson::Value* jsonValue = this->GetValue(k1, k2);
 		if (jsonValue != nullptr && jsonValue->IsInt64())
 		{
 			value = jsonValue->GetInt64();
@@ -313,7 +313,7 @@ namespace Json
 	}
 	bool Reader::GetMember(const char* k1, const char* k2, unsigned int& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(k1, k2);
+		const rapidjson::Value * jsonValue = this->GetValue(k1, k2);
 		if(jsonValue != nullptr && jsonValue->IsUint())
 		{
 			value = jsonValue->GetUint();
@@ -323,7 +323,7 @@ namespace Json
 	}
 	bool Reader::GetMember(const char* k1, const char* k2, std::string& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(k1, k2);
+		const rapidjson::Value * jsonValue = this->GetValue(k1, k2);
 		if(jsonValue != nullptr && jsonValue->IsString())
 		{
 			const char * str = jsonValue->GetString();
@@ -335,7 +335,7 @@ namespace Json
     }
 	bool Reader::GetMember(const char* k1, const char* k2, std::vector<int>& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(k1, k2);
+		const rapidjson::Value * jsonValue = this->GetValue(k1, k2);
 		if(jsonValue != nullptr && jsonValue->IsArray())
 		{
 			auto jsonArray = jsonValue->GetArray();
@@ -354,7 +354,7 @@ namespace Json
 	}
 	bool Reader::GetMember(const char* k1, const char* k2, std::vector<long long int>& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(k1, k2);
+		const rapidjson::Value * jsonValue = this->GetValue(k1, k2);
 		if(jsonValue != nullptr && jsonValue->IsArray())
 		{
 			auto jsonArray = jsonValue->GetArray();
@@ -373,7 +373,7 @@ namespace Json
 	}
 	bool Reader::GetMember(const char* k1, const char* k2, std::vector<std::string>& value) const
 	{
-		const rapidjson::Value * jsonValue = this->GetJsonValue(k1, k2);
+		const rapidjson::Value * jsonValue = this->GetValue(k1, k2);
 		if(jsonValue != nullptr && jsonValue->IsArray())
 		{
 			auto jsonArray = jsonValue->GetArray();
@@ -453,7 +453,7 @@ namespace Json
 	}
 	bool Reader::GetMember(const char* k1, const char* k2, unsigned short& value) const
 	{
-		const rapidjson::Value* jsonValue = this->GetJsonValue(k1, k2);
+		const rapidjson::Value* jsonValue = this->GetValue(k1, k2);
 		if (jsonValue != nullptr && jsonValue->IsUint())
 		{
 			value = (unsigned short)jsonValue->GetUint();
