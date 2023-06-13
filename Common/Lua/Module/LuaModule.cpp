@@ -46,8 +46,34 @@ namespace Lua
 		this->mPath = path;
 		this->mMd5 = md5.toString();
 		this->mRef = luaL_ref(mLua, LUA_REGISTRYINDEX);
+		
+		this->InitModule();
 		this->mIsUpdate = this->GetFunction("OnUpdate");
 		return true;
+	}
+
+	void LuaModule::InitModule()
+	{
+		this->SetMember("name", this->mName);
+		this->SetMember("path", this->mPath);
+	}
+
+	void LuaModule::SetMember(const char* key, int value)
+	{
+		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
+		{
+			lua_pushinteger(this->mLua, value);
+			lua_setfield(this->mLua, -2, key);
+		}
+	}
+
+	void LuaModule::SetMember(const char* key, const std::string& value)
+	{
+		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
+		{
+			lua_pushlstring(this->mLua, value.c_str(), value.size());
+			lua_setfield(this->mLua, -2, key);
+		}
 	}
 
 	void LuaModule::Update(int tick)
@@ -84,6 +110,7 @@ namespace Lua
 		this->mRef = luaL_ref(mLua, LUA_REGISTRYINDEX);
 		luaL_unref(this->mLua, LUA_REGISTRYINDEX, ref);
 
+		this->InitModule();
 		this->mCaches.clear();
 		this->mMd5 = md5.toString();
 		this->mIsUpdate = this->GetFunction("OnUpdate");

@@ -6,6 +6,7 @@
 #define SERVER_MONGOSERVICE_H
 #include"Message/s2s/db.pb.h"
 #include"Mongo/Client/MongoProto.h"
+#include "Mongo/Config/MongoConfig.h"
 #include"Rpc/Service/RpcService.h"
 namespace Tendo
 {
@@ -33,6 +34,7 @@ namespace Tendo
 		size_t mIndex;
         std::string mBuffer;
 		std::vector<int> mClients;
+    	Mongo::MongoConfig mConfig;
         class MongoDBComponent * mMongoComponent;
     };
 }

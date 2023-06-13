@@ -12,7 +12,7 @@
 #include"Util/String/StringHelper.h"
 namespace Tendo
 {
-    bool System::Init(int argc, char **argv)
+	bool System::Init(int argc, char** argv)
 	{
 		if (System::IsInit || argc < 2)
 		{
@@ -36,15 +36,22 @@ namespace Tendo
 				return false;
 			}
 			System::SetEnv(result[0], result[1]);
-		}
-		mSubValues["WORK_PATH"] = mWorkPath;
+		}		
+		return System::AddValue("WORK_PATH", mWorkPath);
+	}
+
+	bool System::AddValue(const std::string& key, std::string& value)
+	{
+		char buffer[256] = { 0 };
+		sprintf(buffer, "${%s}", key.c_str());
+		mSubValues[std::string(buffer)] = value;
 		return true;
 	}
 
 	bool System::GetEnv(const std::string& k, int& v)
 	{
 		std::string value;
-		if(!System::GetEnv(k, value))
+		if (!System::GetEnv(k, value))
 		{
 			return false;
 		}
@@ -55,7 +62,7 @@ namespace Tendo
 	bool System::GetEnv(const std::string& k, std::string& v)
 	{
 		auto iter = System::mEnvs.find(k);
-		if(iter == System::mEnvs.end())
+		if (iter == System::mEnvs.end())
 		{
 			return false;
 		}
@@ -65,21 +72,20 @@ namespace Tendo
 
 	bool System::SubValue(std::string& value)
 	{
-		int count = 0;
 		std::smatch match;
 		std::regex re(R"(\$?\{[^}]*\})");   // 匹配 ${...} 或 $${...} 格式的字符串
-		while(std::regex_search(value, match, re))
+		if (std::regex_search(value, match, re))
 		{
-			std::string env(match[1]);
-			auto iter = System::mSubValues.find(env);
-			if(iter != System::mSubValues.end())
+			auto iter = mSubValues.begin();
+			for (; iter != mSubValues.end(); iter++)
 			{
-				count++;
-				std::string key = fmt::format("${{0}}", env);
-				Helper::Str::ReplaceString(value, key, iter->second);
+				const std::string& key = iter->first;
+				const std::string& val = iter->second;
+				Helper::Str::ReplaceString(value, key, val);
 			}
+			return true;
 		}
-		return count > 0;
+		return false;
 	}
 
 	bool System::SetEnv(const std::string& k, const std::string& v)

@@ -17,18 +17,19 @@
 #include "Lua/Module/LuaModule.h"
 #include "Entity/Lua/LuaActor.h"
 #include "Lua/Engine/ClassProxyHelper.h"
-#include "Server/Component/ConfigComponent.h"
 using namespace Lua;
 namespace Tendo
 {
 	LuaComponent::LuaComponent()
 	{
 		this->mLuaEnv = nullptr;
+		this->mMainModule = nullptr;
 	}
 
 	bool LuaComponent::Awake()
 	{
 		this->mMainModule = nullptr;
+		this->mLuaConfig = std::make_unique<LuaConfig>();
 		const rapidjson::Value * config = this->mApp->Config()->GetValue("lua");
 		LOG_CHECK_RET_FALSE(config != nullptr && this->mLuaConfig->Init(*config));
 
@@ -193,15 +194,6 @@ namespace Tendo
 		{
 			this->AddRequire(path);
 		}
-		for(const std::string & path : this->mLuaConfig->LoadFiles())
-		{
-			if(luaL_dofile(this->mLuaEnv, path.c_str()) != LUA_OK)
-			{
-				LOG_FATAL(lua_tostring(this->mLuaEnv, -1));
-				return false;
-			}
-		}
-
 		if(this->mLuaConfig->Main().empty())
 		{
 			return true;

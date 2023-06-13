@@ -8,9 +8,7 @@
 #include"Mongo/Config/MongoConfig.h"
 #include"Network/Tcp/TcpContext.h"
 #include"Network/Tcp/SocketProxy.h"
-#include"Async/Source/TaskSource.h"
 #include"Entity/Component/IComponent.h"
-#include"Async/Coroutine/CoroutineLock.h"
 
 namespace Tendo
 {

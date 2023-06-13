@@ -18,11 +18,13 @@ namespace Tendo
         static const std::string & ExePath() { return System::mExePath; }
         static const std::string & WorkPath() { return System::mWorkPath; }
         static const std::string & ConfigPath() { return System::mConfigPath;}
-	public:
-		static bool SubValue(std::string & value);
+	public: 
 		static bool GetEnv(const std::string & k, int & v);
 		static bool GetEnv(const std::string & k, std::string & v);
 		static bool SetEnv(const std::string & k, const std::string & v);
+    public:
+        static bool SubValue(std::string& value);
+        static bool AddValue(const std::string& key, std::string& value);
 	private:
         static bool IsInit;
         static std::string mExePath;

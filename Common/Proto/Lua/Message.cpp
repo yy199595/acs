@@ -6,7 +6,6 @@
 #include"Entity/Actor/App.h"
 #include"Util/Json/Lua/Encoder.h"
 #include"Lua/Engine/UserDataParameter.h"
-#include"google/protobuf/util/json_util.h"
 using namespace Tendo;
 
 namespace Lua

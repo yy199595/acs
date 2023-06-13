@@ -6,8 +6,10 @@ namespace Tendo
 	class RedisRegistry : public TargetRegistry
 	{
 	public:
-		bool Awake(App* app) final;
-		bool LateAwake(App* app) final;
+		RedisRegistry();
+	protected:
+		bool Awake() final;
+		bool LateAwake() final;
 	protected:
 		int Del(const std::string& name, long long id) final;
 		int Add(const std::string& name, long long id, const std::string& json) final;

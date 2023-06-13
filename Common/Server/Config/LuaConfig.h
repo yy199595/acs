@@ -5,6 +5,7 @@
 #ifndef APP_LUACONFIG_H
 #define APP_LUACONFIG_H
 #include<vector>
+#include<string>
 #include<rapidjson/document.h>
 struct lua_State;
 namespace Tendo

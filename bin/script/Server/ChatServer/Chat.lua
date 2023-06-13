@@ -1,13 +1,13 @@
-local Chat = { }
-require("XCode")
-require("coroutine")
+require("RpcService")
 local proto = require("Proto")
-function Chat.OnLogin(userId)
+local Chat = Class("RpcService")
+
+function Chat:OnLogin(userId)
     coroutine.sleep(1000)
     print(string.format("玩家%d登录聊天服务", userId))
 end
 
-function Chat.Chat(request)
+function Chat:Chat(request)
     coroutine.sleep(1000)
     local message = request.message
     local chatMessage = proto.New("c2s.chat.notice", {
@@ -20,7 +20,7 @@ function Chat.Chat(request)
 end
 local count = 0
 
-function Chat.Ping(request)
+function Chat:Ping(request)
     count = count + 1
     print(os.time(), "count = " .. count)
     return XCode.Successful

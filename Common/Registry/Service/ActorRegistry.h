@@ -19,7 +19,7 @@ namespace Tendo
 		int Del(const registry::actor & request);
 		int Query(const registry::query::request & request, registry::query::response &response);
 	private:
-		std::unique_ptr<TargetRegistry> mTarget;
+		TargetRegistry * mTarget;
 	};
 }
 

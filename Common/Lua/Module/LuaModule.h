@@ -28,6 +28,10 @@ namespace Lua
 		bool HasFunction(const std::string & name);
 	public:
 		lua_State * GetLuaEnv() { return this->mLua;}
+		void SetMember(const char* key, int value);
+		void SetMember(const char* key, const std::string & value);
+	private:
+		void InitModule();
 	private:
 		int mRef;
 		bool mIsUpdate;

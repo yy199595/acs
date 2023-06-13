@@ -36,6 +36,7 @@ namespace Tendo
 	private:
 		void AddWaitCount(const std::string & name);
 		void SubWaitCount(const std::string & name);
+		bool EncodeJson(const std::shared_ptr<Msg::Packet> & message, std::string & json) const;
     private:
 		unsigned int mWaitCount;
 		class TimerComponent* mTimerComponent;

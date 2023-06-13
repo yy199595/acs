@@ -4,16 +4,20 @@
 #include"Redis/Component/RedisComponent.h"
 namespace Tendo
 {
-	bool RedisRegistry::Awake(App * app)
+	RedisRegistry::RedisRegistry()
 	{
 		this->mRedis = nullptr;
-		app->AddComponent<RedisComponent>();
-		return true;
 	}
 
-	bool RedisRegistry::LateAwake(App* app)
+	bool RedisRegistry::Awake()
 	{
-		this->mRedis = app->GetComponent<RedisComponent>();
+		this->mApp->AddComponent<RedisComponent>();
+		return true;
+	}
+	
+	bool RedisRegistry::LateAwake()
+	{
+		this->mRedis = this->mApp->GetComponent<RedisComponent>();
 		return this->mRedis != nullptr;
 	}
 

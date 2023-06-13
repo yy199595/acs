@@ -225,17 +225,12 @@ namespace Tendo
             LOG_DEBUG("start " << name << " successful use time = [" << timer.GetSecond() << "s]");
         }
         this->mIsStartDone = true; //开始帧循环
-		RegistryComponent * registryComponent = this->GetComponent<RegistryComponent>();
-		if(registryComponent != nullptr)
-		{
-			registryComponent->WaitRegister();
-		}
         std::vector<IComplete *> completeComponents;
         this->GetComponents<IComplete>(completeComponents);
         for(IComplete * complete : completeComponents)
         {
 			Component* component = dynamic_cast<Component*>(complete);
-			long long timerId = this->mTimerComponent->DelayCall(1000 * 10, [component]()
+			const long long timerId = this->mTimerComponent->DelayCall(1000 * 10, [component]()
 			{
 				CONSOLE_LOG_FATAL(component->GetName() << " [OnLocalComplete] time out");
 			});

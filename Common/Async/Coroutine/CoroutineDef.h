@@ -3,7 +3,7 @@
 #include<memory>
 #include<unordered_map>
 #include"Util/Guid/NumberBuilder.h"
-#include"Rpc/Method/MethodProxy.h"
+//#include"Rpc/Method/MethodProxy.h"
 #include"Context/context.h"
 #define STACK_SIZE 1024 * 1024
 #ifdef __DEBUG__

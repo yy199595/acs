@@ -188,28 +188,27 @@ namespace Tendo
         return iter->second.get();
     }
 
-    int InnerNetComponent::Send(const std::string &address, const std::shared_ptr<Msg::Packet> &message)
+    int InnerNetComponent::Send(const std::string &addr, const std::shared_ptr<Msg::Packet> &message)
     {
-        if (address.empty() || address == this->mLocation) //发送到本机
+        if (addr.empty() || addr == this->mLocation) //发送到本机
         {
-            message->SetFrom(address);
-            Asio::Context &io = this->mApp->MainThread();
-            io.post(std::bind(&InnerNetComponent::OnMessage, this, message));
+            message->SetFrom(addr);
+            this->OnMessage(message);
             return XCode::Successful;
         }
         InnerNetTcpClient *clientSession = nullptr;
         switch (message->GetType())
         {
             case Msg::Type::Response:
-                clientSession = this->GetRemoteClient(address);
+                clientSession = this->GetRemoteClient(addr);
                 break;
             default:
-                clientSession = this->GetLocalClient(address);
+                clientSession = this->GetLocalClient(addr);
                 break;
         }
         if (clientSession == nullptr)
         {
-            LOG_ERROR("not find rpc client : [" << address << "]")
+            LOG_ERROR("not find rpc client : [" << addr << "]")
             return XCode::SendMessageFail;
         }
         clientSession->Send(message);

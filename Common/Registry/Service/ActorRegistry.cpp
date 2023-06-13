@@ -10,15 +10,16 @@ namespace Tendo
 {
 	bool ActorRegistry::Awake()
 	{
-		this->mTarget = std::make_unique<MongoRegistry>();
-		return this->mTarget->Awake(this->mApp);
+		this->mTarget = this->mApp->GetOrAddComponent<MongoRegistry>();
+		return true;
 	}
+	
 	bool ActorRegistry::OnInit()
 	{
 		BIND_COMMON_RPC_METHOD(ActorRegistry::Add);
 		BIND_COMMON_RPC_METHOD(ActorRegistry::Del);
 		BIND_COMMON_RPC_METHOD(ActorRegistry::Query);
-		return this->mTarget->LateAwake(this->mApp);
+		return true;
 	}
 
 	int ActorRegistry::Query(const registry::query::request& request, registry::query::response & response)

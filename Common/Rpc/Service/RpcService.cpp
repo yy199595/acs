@@ -16,7 +16,7 @@ namespace Tendo
 	}
 
 	RpcService::RpcService()
-		: mMethodRegister(this), mConfig(nullptr)
+		: mConfig(nullptr), mMethodRegister(this)
 	{
 		this->mLuaModule = nullptr;
 	}
@@ -29,6 +29,12 @@ namespace Tendo
 		if(luaComponent != nullptr)
 		{
 			this->mLuaModule = luaComponent->LoadModule(name);
+			if(this->mLuaModule != nullptr)
+			{
+				std::string server;
+				ClusterConfig::Inst()->GetServerName(name, server);
+				this->mLuaModule->SetMember("server", server);
+			}
 		}
         LOG_CHECK_RET_FALSE(this->mConfig);
         LOG_CHECK_RET_FALSE(this->OnInit());
@@ -70,6 +76,7 @@ namespace Tendo
 	int RpcService::WriterToLua(const RpcMethodConfig * config, Msg::Packet & message)
 	{
 		lua_State* lua = this->mLuaModule->GetLuaEnv();
+		lua_pushlstring(lua, config->Method.c_str(), config->Method.size());
 		lua_createtable(lua, 0, 3);
 		{
 			long long userId = 0;
@@ -122,13 +129,15 @@ namespace Tendo
 
 	int RpcService::CallLua(const RpcMethodConfig * config, Msg::Packet & message)
 	{
-		this->mLuaModule->GetFunction(config->Method);
+		this->mLuaModule->GetFunction("__Invoke");
+		lua_State* lua = this->mLuaModule->GetLuaEnv();
+
+		lua_pushvalue(lua, -2);
 		if(this->WriterToLua(config, message) != XCode::Successful)
 		{
 			return XCode::CallLuaFunctionFail;
 		}
-		lua_State * lua = this->mLuaModule->GetLuaEnv();
-		if (lua_pcall(lua, 1, 2, 0) != LUA_OK)
+		if (lua_pcall(lua, 1, 3, 0) != LUA_OK)
 		{
 			const char * err = lua_tostring(lua, -1);
 			message.GetHead().Add("error", err);
@@ -165,20 +174,19 @@ namespace Tendo
 
 	int RpcService::AwaitCallLua(const RpcMethodConfig * config, Msg::Packet& message)
 	{
-		lua_State * lua = this->mLuaModule->GetLuaEnv();
-		if (!Lua::Function::Get(lua, "coroutine", "rpc"))
-		{
-			return XCode::CallLuaFunctionFail;
-		}
-		this->mLuaModule->GetFunction(config->Method);
+		this->mLuaModule->GetFunction("__Call");
+		lua_State* lua = this->mLuaModule->GetLuaEnv();
+
+		lua_pushvalue(lua, -2);
 		if(this->WriterToLua(config, message) != XCode::Successful)
 		{
 			return XCode::CallLuaFunctionFail;
 		}
 		std::unique_ptr<LuaServiceTaskSource> luaTaskSource =
 				std::make_unique<LuaServiceTaskSource>(&message);
+
 		Lua::UserDataParameter::Write(lua, luaTaskSource.get());
-		if (lua_pcall(lua, 3, 1, 0) != LUA_OK)
+		if (lua_pcall(lua, 4, 1, 0) != LUA_OK)
 		{
 			message.GetHead().Add("error", lua_tostring(lua, -1));
 			return XCode::CallLuaFunctionFail;

@@ -17,8 +17,11 @@ namespace Tendo
 
     bool MongoDB::Awake()
     {
-        this->mApp->AddComponent<MongoDBComponent>();
-		return true;
+    	std::string path;
+    	this->mApp->Config()->GetPath("db", path);
+    	this->mApp->AddComponent<MongoDBComponent>();
+		LOG_CHECK_RET_FALSE(this->mConfig.LoadConfig(path));
+    	return true;
     }
 
 	bool MongoDB::OnInit()
@@ -36,18 +39,13 @@ namespace Tendo
 
 	void MongoDB::OnStart()
 	{
-        int id = 0;
-		const MongoConfig & config = this->mMongoComponent->Config();
-		for(int index = 0; index < config.MaxCount; index++)
+		for(int index = 0; index < this->mConfig.MaxCount; index++)
 		{
-            if (this->mMongoComponent->GetClientHandler(id))
-            {
-                this->mClients.emplace_back(id);
-            }
-		}
-		while(!this->mMongoComponent->Ping(id))
-		{
-			LOG_ERROR("try ping mongo server");
+			int id = this->mMongoComponent->MakeMongoClient(this->mConfig);
+			while(!this->mMongoComponent->Ping(id))
+			{
+				LOG_ERROR("try ping mongo server");
+			}
 		}
 	}
 
@@ -73,14 +71,13 @@ namespace Tendo
 
     int MongoDB::RunCommand(const db::mongo::command::request &request, db::mongo::command::response &response)
     {
-        std::shared_ptr<CommandRequest> mongoRequest
-                = std::make_shared<CommandRequest>();
+        const std::shared_ptr<Mongo::CommandRequest> mongoRequest = std::make_shared<Mongo::CommandRequest>();
         if (!mongoRequest->document.FromByJson(request.json()))
         {
             return XCode::CallArgsError;
         }
         int id = this->GetClientHandle();    
-        std::shared_ptr<CommandResponse> mongoResponse = this->mMongoComponent->Run(id, mongoRequest);
+        const std::shared_ptr<Mongo::CommandResponse> mongoResponse = this->mMongoComponent->Run(id, mongoRequest);
         if (mongoResponse != nullptr)
         {
             for (size_t index = 0; index < mongoResponse->GetDocumentSize(); index++)
@@ -101,13 +98,13 @@ namespace Tendo
 		{
 			return XCode::CallArgsError;
 		}
-		std::shared_ptr<CommandRequest> mongoRequest = MongoFactory::Insert(tab, document);
+		const std::shared_ptr<Mongo::CommandRequest> mongoRequest = Mongo::MongoFactory::Insert(tab, document);
 		if(mongoRequest == nullptr)
 		{
 			return XCode::CallArgsError;
 		}
 		int handle = this->GetClientHandle(request.flag());
-		std::shared_ptr<CommandResponse> mongoResponse = this->mMongoComponent->Run(handle, mongoRequest);
+		const std::shared_ptr<Mongo::CommandResponse> mongoResponse = this->mMongoComponent->Run(handle, mongoRequest);
 		if (mongoResponse == nullptr || mongoResponse->GetDocumentSize() <= 0)
 		{
 #ifdef __DEBUG__
@@ -128,13 +125,13 @@ namespace Tendo
 			return XCode::CallArgsError;
 		}
 		const std::string & tab = request.tab();
-        std::shared_ptr<CommandRequest> mongoRequest = MongoFactory::Delete(tab, document);
+        const std::shared_ptr<Mongo::CommandRequest> mongoRequest = Mongo::MongoFactory::Delete(tab, document);
 		if(mongoRequest == nullptr)
 		{
 			return XCode::CallArgsError;
 		}
         int handle = this->GetClientHandle(request.flag());
-        std::shared_ptr<CommandResponse> response = this->mMongoComponent->Run(handle, mongoRequest);
+        const std::shared_ptr<Mongo::CommandResponse> response = this->mMongoComponent->Run(handle, mongoRequest);
         if(response == nullptr || response->GetDocumentSize() <= 0)
         {
 #ifdef __DEBUG__
@@ -167,7 +164,7 @@ namespace Tendo
         }
         const std::string & tab = request.tab();
         const std::string & name = request.name();
-        return this->mMongoComponent->SetIndex(tab, name) ? XCode::Successful : XCode::Failure;
+        return this->mMongoComponent->SetIndex(1, tab, name) ? XCode::Successful : XCode::Failure;
     }
 
     int MongoDB::Query(const db::mongo::query::request &request, db::mongo::query::response &response)
@@ -180,13 +177,13 @@ namespace Tendo
 		const int limit = request.limit();
 		const std::string & tab = request.tab();
 		const std::string & json = request.json();
-        std::shared_ptr<CommandRequest> mongoRequest = MongoFactory::Query(tab, json, limit);
+         std::shared_ptr<Mongo::CommandRequest> mongoRequest = Mongo::MongoFactory::Query(tab, json, limit);
 		if(mongoRequest == nullptr)
 		{
 			return XCode::CallArgsError;
 		}
         int handle = this->GetClientHandle();
-        std::shared_ptr<CommandResponse> queryResponse = this->mMongoComponent->Run(handle, mongoRequest);
+        std::shared_ptr<Mongo::CommandResponse> queryResponse = this->mMongoComponent->Run(handle, mongoRequest);
 
         if (queryResponse == nullptr || queryResponse->GetDocumentSize() <= 0)
         {
@@ -215,13 +212,13 @@ namespace Tendo
         }
 		const std::string & table = request.tab();
 		const char * tag = request.tag().empty() ? "$set" : request.tag().c_str();
-        std::shared_ptr<CommandRequest> mongoRequest = MongoFactory::Update(table, selectorDocument, dataDocument, tag, upsert);
+        const std::shared_ptr<Mongo::CommandRequest> mongoRequest = Mongo::MongoFactory::Update(table, selectorDocument, dataDocument, tag, upsert);
 		if(mongoRequest == nullptr)
 		{
 			return XCode::CallArgsError;
 		}
         int handle = this->GetClientHandle(request.flag());
-        std::shared_ptr<CommandResponse> response = this->mMongoComponent->Run(handle, mongoRequest);
+        const std::shared_ptr<Mongo::CommandResponse> response = this->mMongoComponent->Run(handle, mongoRequest);
         if (response == nullptr || response->GetDocumentSize() == 0)
         {
             return XCode::Failure;
@@ -229,7 +226,7 @@ namespace Tendo
         int count = 0;
         std::string json;
         response->Get().WriterToJson(json);
-        Bson::Reader::Document& result = response->Get();
+        const Bson::Reader::Document& result = response->Get();
         return (result.Get("n", count) && count > 0) ? XCode::Successful : XCode::Failure;
     }
 

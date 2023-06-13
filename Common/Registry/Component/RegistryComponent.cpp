@@ -18,7 +18,7 @@ namespace Tendo
 		return true;
 	}
 
-	bool RegistryComponent::RegisterServer()
+	bool RegistryComponent::RegisterServer() const
 	{
 		const std::string func("ActorRegistry.Add");
 		ServerActor * registry = this->mApp->ActorMgr()->GetServer(0);
@@ -29,10 +29,16 @@ namespace Tendo
 			request.set_actor_id(this->mThisActor->GetActorId());
 			this->mThisActor->OnRegister(request.mutable_actor_json());
 		}
-		return registry->Call(func, request) == XCode::Successful;
+		const int code = registry->Call(func, request);
+		if(code != XCode::Successful)
+		{
+			LOG_ERROR("registry code = " << CodeConfig::Inst()->GetDesc(code));
+			return false;
+		}
+		return true;
 	}
 
-	void RegistryComponent::WaitRegister()
+	void RegistryComponent::Complete()
 	{
 		while(!this->RegisterServer())
 		{

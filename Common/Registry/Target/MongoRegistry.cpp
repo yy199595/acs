@@ -3,31 +3,44 @@
 #include"XCode/XCode.h"
 #include"s2s/db.pb.h"
 #include"Mongo/Client/BsonDocument.h"
-#include"Mongo/Service/MongoDB.h"
+#include"Mongo/Client/MongoFactory.h"
 #include"Mongo/Component/MongoDBComponent.h"
 namespace Tendo
 {
-	bool MongoRegistry::Awake(App* app)
+	MongoRegistry::MongoRegistry()
 	{
-		this->mApp = app;
-		app->AddComponent<MongoDB>();
+		this->mIndex = 0;
+		this->mMongo = nullptr;
+	}
+
+	bool MongoRegistry::Awake()
+	{
+		std::string path;
+		this->mApp->Config()->GetPath("db", path);
+		this->mApp->AddComponent<MongoDBComponent>();
+		LOG_CHECK_RET_FALSE(this->mConfig.LoadConfig(path));
 		return true;
 	}
 
-	bool MongoRegistry::LateAwake(App* app)
+	bool MongoRegistry::LateAwake()
 	{
-		this->mMongo = app->GetComponent<MongoDBComponent>();
-		return this->mMongo != nullptr;
+		this->mMongo = this->mApp->GetComponent<MongoDBComponent>();
+		this->mIndex = this->mMongo->MakeMongoClient(this->mConfig);
+		return true;
 	}
 
+	void MongoRegistry::Start()
+	{
+		while(!this->mMongo->Ping(this->mIndex))
+		{
+			this->mApp->GetCoroutine()->Sleep(1000);
+		}
+	}
+
+	
 	int MongoRegistry::Del(const std::string& name, long long id)
 	{
-		int hanlder = 0;
-		if(!this->mMongo->GetClientHandler(hanlder))
-		{
-			return XCode::Failure;
-		}
-		std::shared_ptr<CommandRequest> mongoRequest = std::make_shared<CommandRequest>();
+		std::shared_ptr<Mongo::CommandRequest> mongoRequest = std::make_shared<Mongo::CommandRequest>();
 		{
 			mongoRequest->dataBase = "Registry";
 			std::string tab = fmt::format("{0}.{1}", mongoRequest->dataBase, name);
@@ -42,7 +55,7 @@ namespace Tendo
 			mongoRequest->document.Add("delete", name);
 			mongoRequest->document.Add("deletes", documentArray);
 		}
-		std::shared_ptr<Mongo::CommandResponse> response = this->mMongo->Run(hanlder, mongoRequest);
+		std::shared_ptr<Mongo::CommandResponse> response = this->mMongo->Run(this->mIndex, mongoRequest);
 		return 0;
 	}
 

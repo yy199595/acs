@@ -23,48 +23,30 @@ namespace Tendo
 {
     MongoDBComponent::MongoDBComponent()
     {
+        this->mIndex = 0;
         this->mWaitCount = 0;     
     }
 
-	bool MongoDBComponent::Awake()
-	{
-		std::string path;
-		const ServerConfig * config = ServerConfig::Inst();
-		LOG_CHECK_RET_FALSE(config->GetPath("db", path));
-		return this->mConfig.LoadConfig(path);
-	}
-
-    bool MongoDBComponent::LateAwake()
+    int MongoDBComponent::MakeMongoClient(const Mongo::MongoConfig& config)
     {
-        int id = 0;
-        for (int index = 0; index < this->mConfig.MaxCount; index++)
+        const std::string& ip = config.Address.Ip;
+        const unsigned short port = config.Address.Port;
+        ThreadComponent* threadComponent = this->GetComponent<ThreadComponent>();
         {
-            id++;
-            const std::string& ip = this->mConfig.Address.Ip;
-            const unsigned int port = this->mConfig.Address.Port;
-            ThreadComponent* threadComponent =
-                this->GetComponent<ThreadComponent>();
-
-            std::shared_ptr<Tcp::SocketProxy> socketProxy =
-                threadComponent->CreateSocket(ip, port);
-
-            std::shared_ptr<TcpMongoClient> mongoClientContext =
-                std::make_shared<TcpMongoClient>(socketProxy, this, this->mConfig);
-
-            this->mAllotQueue.push(id);
-            this->mMongoClients.emplace(id, mongoClientContext);
+            this->mIndex++;
+            std::shared_ptr<Tcp::SocketProxy> socketProxy = threadComponent->CreateSocket(ip, port);
+            std::shared_ptr<Mongo::TcpMongoClient> mongoClientContext = std::make_shared<Mongo::TcpMongoClient>(socketProxy, this, config);
+            this->mMongoClients.emplace(this->mIndex, mongoClientContext);
         }
-        return true;
+        return this->mIndex;
     }
 
+    
     void MongoDBComponent::OnDestroy()
     {
-        while (!this->mAllotQueue.empty())
-        {
-            this->mAllotQueue.pop();
-        }
+        this->mIndex = 0;
         auto iter = this->mMongoClients.begin();
-        for (; iter != this->mMongoClients.end(); iter++)
+        for (; iter != this->mMongoClients.end(); ++iter)
         {
             iter->second->Stop();
         }
@@ -77,13 +59,12 @@ namespace Tendo
 		LOG_INFO("mongo client [" << address << "] auth successful");
 	}
 
-	void MongoDBComponent::OnMessage(std::shared_ptr<CommandResponse> message)
+	void MongoDBComponent::OnMessage(std::shared_ptr<Mongo::CommandResponse> message)
 	{
-		int taskId = message->GetHead().responseTo;
-		this->OnResponse(taskId, message);
+		this->OnResponse(message->GetHead().responseTo, message);
 	}
 
-    TcpMongoClient * MongoDBComponent::GetClient(int index)
+    Mongo::TcpMongoClient * MongoDBComponent::GetClient(int index)
     {       
         if (this->mMongoClients.empty())
         {
@@ -106,21 +87,9 @@ namespace Tendo
         luaRegister.PushExtensionFunction("QueryOnce", Lua::LuaMongo::QueryOnce);
     }
 
-    bool MongoDBComponent::GetClientHandler(int& id)
+    bool MongoDBComponent::Send(int id, const std::shared_ptr<Mongo::CommandRequest>& request, int& taskId)
     {
-        if (this->mAllotQueue.empty())
-        {
-            return false;
-        }
-        id = this->mAllotQueue.front();
-        this->mAllotQueue.pop();
-        this->mAllotQueue.push(id);
-        return true;
-    }
-
-    bool MongoDBComponent::Send(int id, const std::shared_ptr<CommandRequest>& request, int& taskId)
-    {
-        TcpMongoClient* mongoClient = this->GetClient(id);
+        Mongo::TcpMongoClient* mongoClient = this->GetClient(id);
         if (mongoClient == nullptr)
         {
             return false;
@@ -137,7 +106,7 @@ namespace Tendo
     }
 
 	std::shared_ptr<Mongo::CommandResponse> MongoDBComponent::Run(
-        int id, const std::shared_ptr<CommandRequest>& request)
+        int id, const std::shared_ptr<Mongo::CommandRequest>& request)
 	{      
         int taskId = 0;
         if (!this->Send(id, request, taskId))
@@ -178,40 +147,40 @@ namespace Tendo
 #endif
 	}
 
-    bool MongoDBComponent::SetIndex(const std::string &tab, const std::string &name)
+    bool MongoDBComponent::SetIndex(int id, const std::string &tab, const std::string &name)
     {
-        std::shared_ptr<CommandRequest> mongoRequest
-            = std::make_shared<CommandRequest>();
-
-        Bson::Writer::Document keys;
-        Bson::Writer::Document document;
-        keys.Add(name.c_str(), 1);
-
-        document.Add("key", keys);
-        document.Add("unique", true); //是否为唯一索引
-        document.Add("name", name.c_str());
-        Bson::Writer::Array documentArray1(document);
-
-        const size_t pos = tab.find('.');
-        if(pos == std::string::npos)
+        const std::shared_ptr<Mongo::CommandRequest> mongoRequest = std::make_shared<Mongo::CommandRequest>();
         {
-            return false;
-        }
+            Bson::Writer::Document keys;
+            Bson::Writer::Document document;
+            keys.Add(name.c_str(), 1);
 
-        std::string tab1 = tab.substr(pos + 1);
-        mongoRequest->dataBase = tab.substr(0, pos);
-        mongoRequest->document.Add("createIndexes", tab1);
-        mongoRequest->document.Add("indexes", documentArray1);
+            document.Add("key", keys);
+            document.Add("unique", true); //是否为唯一索引
+            document.Add("name", name.c_str());
+            Bson::Writer::Array documentArray1(document);
+
+            const size_t pos = tab.find('.');
+            if(pos == std::string::npos)
+            {
+                return false;
+            }
+
+            std::string tab1 = tab.substr(pos + 1);
+            mongoRequest->dataBase = tab.substr(0, pos);
+            mongoRequest->document.Add("createIndexes", tab1);
+            mongoRequest->document.Add("indexes", documentArray1);
+        }
         return this->Run(0, mongoRequest) != nullptr;
     }
 
 	bool MongoDBComponent::Ping(int id)
     {
-        std::shared_ptr<CommandRequest> mongoRequest
-                = std::make_shared<CommandRequest>();
-
-        mongoRequest->dataBase = this->mConfig.DB;
-        mongoRequest->document.Add("ping", 1);
+        std::shared_ptr<Mongo::CommandRequest> mongoRequest = std::make_shared<Mongo::CommandRequest>();
+        {
+            mongoRequest->dataBase = "admin";
+            mongoRequest->document.Add("ping", 1);
+        }
         return this->Run(id, mongoRequest) != nullptr;
     }
 

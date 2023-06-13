@@ -37,10 +37,8 @@
     "lua": {
         "require": [
             "${WORK_PATH}/script/Server",
+            "${WORK_PATH}/script/Common",
             "${WORK_PATH}/script/Component"
-        ],
-        "loadfile": [
-            "${WORK_PATH}/script/Common"
         ],
         "main": "${WORK_PATH}/script/Server/Server.lua"
     },

@@ -84,84 +84,13 @@ namespace Tendo
 					}
 			);
 		}
-#ifdef __RPC_MESSAGE__
-		std::string json;
-		ProtoComponent* component = this->mApp->GetProto();
-		if (!config->Request.empty())
-		{
-			switch(message->GetProto())
-			{
-				case Msg::Porto::Json:
-					json = message->GetBody();
-					break;
-				case Msg::Porto::Protobuf:
-				{
-					std::shared_ptr<Message> request;
-					if (component->New(config->Request, request))
-					{
-						if (request->ParseFromString(message->GetBody()))
-						{
-							json.clear();
-							pb_json::MessageToJsonString(*request, &json);
-						}
-					}
-				}
-			}
-		}
-		std::stringstream ss1;
-		ss1 << message->From() << " call func = [" << config->FullName << "]";
-		if(!json.empty())
-		{
-			ss1 << " request = " << Helper::Str::FormatJson(json);
-		}
-		CONSOLE_LOG_DEBUG(ss1.str());
-#endif
+
 		this->mWaitCount++;
-		int code = logicService->Invoke(config->Method, message);
+		const int code = logicService->Invoke(config->Method, message);
 		{
 			this->SubWaitCount(service);
 		}
-#ifdef __RPC_MESSAGE__
-		json.clear();
-		if (code == XCode::Successful && !config->Response.empty())
-		{
-			switch(message->GetProto())
-			{
-				case Msg::Porto::Json:
-					json = message->GetBody();
-					break;
-				case Msg::Porto::Protobuf:
-				{
-					std::shared_ptr<Message> response;
-					if (component->New(config->Response, response))
-					{
-						if (response->ParseFromString(message->GetBody()))
-						{
-							json.clear();
-							pb_json::MessageToJsonString(*response, &json);
-						}
-					}
-					break;
-				}
-			}
-		}
-		if (code == XCode::Successful && message->GetHead().Has("rpc"))
-		{
-			std::stringstream ss2;
-			ss2 << message->From() << " call func = [" << config->FullName << "]";
-			if(!json.empty())
-			{
-				ss2 << " response = " << Helper::Str::FormatJson(json);
-			}
-			CONSOLE_LOG_INFO(ss2.str());
-		}
-		else if(code != XCode::Successful)
-		{
-			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-			CONSOLE_LOG_ERROR(message->From() << " call func = [" << config->FullName << "] code = " << desc);
-		}
-		//LOG_INFO("call [" << config->FullName << "] use time = " << timer.GetMs() << "ms");
-#endif
+
 		this->mWaitCount--;
 		if (timerId > 0 && !this->mTimerComponent->CancelTimer(timerId))
 		{
@@ -171,6 +100,36 @@ namespace Tendo
 		const std::string& address = message->From();
 		this->mRouterComponent->Send(address, code, message);
 	}
+
+	bool DispatchComponent::EncodeJson(const std::shared_ptr<Msg::Packet>& message, std::string& json) const
+	{
+		switch(message->GetProto())
+		{
+		case Msg::Porto::Json:
+			json = message->GetBody();
+			return true;
+		case Msg::Porto::Protobuf:
+			{
+				std::string func;
+				message->ConstHead().Get("func", func);
+				const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
+				if(methodConfig == nullptr)
+				{
+					return false;
+				}
+				std::shared_ptr<Message> data;
+				const std::string & pb = message->GetType() ==
+					Msg::Type::Response ? methodConfig->Response : methodConfig->Request;
+				if(!pb.empty() && this->mApp->GetProto()->New(pb, data))
+				{
+					return pb_json::MessageToJsonString(*data, &json).ok();
+				}
+			}
+			break;
+		}
+		return false;
+	}
+
 
     int DispatchComponent::OnMessage(const std::shared_ptr<Msg::Packet>& message)
     {
