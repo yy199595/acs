@@ -1,0 +1,40 @@
+{
+    "fps": 15,
+    "id" : 2,
+    "name": "Center",
+    "thread": {
+        "task": 1,
+        "network": 4
+    },
+    "message": {
+        "inner": 500,
+        "outer": 1000
+    },
+    "path": {
+        "proto": "${WORK_PATH}/proto",
+        "sqlite": "${WORK_PATH}/data/sqlite/",
+        "db": "${WORK_PATH}/config/db/db.json",
+        "code": "${WORK_PATH}/XCode/XCode.csv",
+        "user": "${WORK_PATH}/config/user.json",
+        "rpc": "${WORK_PATH}/config/service/rpc.json",
+        "http": "${WORK_PATH}/config/service/http.json",
+        "cluster": "${WORK_PATH}/config/cluster/cluster.json"
+    },
+    "user": {
+        "name": "root",
+        "passwd": "199595yjz."
+    },
+    "listen": {
+       "rpc": "tcp://127.0.0.1:7788"
+    },
+    "lua": {
+        "path": [
+            "${WORK_PATH}/script/Common",
+            "${WORK_PATH}/script/Server",
+            "${WORK_PATH}/script/Component"
+        ]
+    },
+    "white_list": [
+        "127.0.0.1"
+    ]
+}
