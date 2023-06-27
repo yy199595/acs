@@ -74,6 +74,15 @@ namespace Tendo
 		Type* type = ComponentFactory::GetType<T>();
 		if (type == nullptr)
 		{
+			auto iter = this->mComponentMap.begin();
+			for(; iter != this->mComponentMap.end(); iter++)
+			{
+				T * component = iter->second->Cast<T>();
+				if(component != nullptr)
+				{
+					return component;
+				}
+			}
 			return nullptr;
 		}
 		return this->GetComponent<T>(type->Name);

@@ -2,9 +2,9 @@
     "fps": 15,
     "thread": {
         "task": 1,
-        "network": 4
+        "network": 1
     },
-    "id" : 1,
+    "id" : 2,
     "name": "Client",
     "message": {
         "inner": 500,
@@ -13,23 +13,26 @@
     "path": {
         "proto": "${WORK_PATH}/proto",
         "html": "${WORK_PATH}/www/html",
-        "home": "${WORK_PATH}/www/html/home.html",
         "sqlite": "${WORK_PATH}/data/sqlite/",
         "db": "${WORK_PATH}/config/db/db.json",
         "code": "${WORK_PATH}/XCode/XCode.csv",
         "user": "${WORK_PATH}/config/user.json",
+        "home": "${WORK_PATH}/www/html/home.html",
+        "rpc": "${WORK_PATH}/config/service/rpc.json",
         "cluster": "${WORK_PATH}/config/cluster/debug.json"
     },
     "user": {
         "name": "root",
         "passwd": "199595yjz."
     },
-    "registry": "tcp://127.0.0.1:7788",
     "lua": {
-        "path": [
+        "require": [
             "${WORK_PATH}/script/Common",
-            "${WORK_PATH}/script/Client",
-            "${WORK_PATH}/script/Component"
+            "${WORK_PATH}/script/Client/Player",
+            "${WORK_PATH}/script/Client/Component"
+        ],
+        "loadfile": [
+            "${WORK_PATH}/script/Common"
         ],
         "main": "${WORK_PATH}/script/Client/Client.lua"
     },

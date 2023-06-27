@@ -38,7 +38,7 @@ namespace Tendo
 	class LuaRpcTaskSource :  public IRpcTask<Msg::Packet>
 	{
 	 public:
-		LuaRpcTaskSource(lua_State * lua, int id, const std::string & response);
+		LuaRpcTaskSource(lua_State * lua, int id, std::string  response);
 	 public:
 		int Await() { return this->mTask.Await(); }	
 	 private:

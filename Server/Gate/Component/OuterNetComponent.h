@@ -35,6 +35,7 @@ namespace Tendo
 		int OnRequest(long long userId, std::shared_ptr<Msg::Packet> & message);
 		bool Send(long long userId, const std::shared_ptr<Msg::Packet> & message);
 		bool Send(const std::string & address, const std::shared_ptr<Msg::Packet> & message);
+		bool Send(const std::string & address, int code, const std::shared_ptr<Msg::Packet> & message);
 	private:
 		bool Awake() final;
 		bool LateAwake() final;

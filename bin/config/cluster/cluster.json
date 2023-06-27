@@ -1,26 +1,20 @@
 {
-    "GateServer": {
+    "Gate": {
         "AutoAllot": false,
-        "Component": [
-            "RegistryComponent"
-        ],
         "Service": [
             "Gate",
             "Node"
         ]
     },
-    "ChatServer": {
+    "Chat": {
         "AutoAllot": true,
         "Service": [
             "Login",
             "Node",
             "Chat"
-        ],
-        "Component": [
-            "RegistryComponent"
         ]
     },
-    "HttpServer": {
+    "Http": {
         "AutoAllot": false,
         "Service": [
             "Node",
@@ -30,25 +24,24 @@
             "HttpComponent",
             "RedisComponent",
             "HttpWebComponent",
-            "RegistryComponent",
             "HttpDebugComponent"
         ]
     },
-    "DataServer": {
+    "Data": {
         "AutoAllot": false,
         "Service": [
             "Node",
             "MongoDB"
         ],
         "Component": [
-            "RegistryComponent"
+            "RedisComponent"
         ]
     },
-    "RegistryServer": {
+    "Center": {
         "AutoAllot": false,
-        "Service" :[
+        "Service": [
             "Node",
-            "ActorRegistry"
+            "ServerRegistry"
         ]
     }
 }

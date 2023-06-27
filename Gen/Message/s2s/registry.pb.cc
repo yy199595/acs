@@ -16,12 +16,7 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 
-extern PROTOBUF_INTERNAL_EXPORT_s2s_2fregistry_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_actor_s2s_2fregistry_2eproto;
 namespace registry {
-class actorDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<actor> _instance;
-} _actor_default_instance_;
 class query_requestDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<query_request> _instance;
@@ -35,20 +30,6 @@ class queryDefaultTypeInternal {
   ::google::protobuf::internal::ExplicitlyConstructed<query> _instance;
 } _query_default_instance_;
 }  // namespace registry
-static void InitDefaultsactor_s2s_2fregistry_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::registry::_actor_default_instance_;
-    new (ptr) ::registry::actor();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::registry::actor::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<0> scc_info_actor_s2s_2fregistry_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsactor_s2s_2fregistry_2eproto}, {}};
-
 static void InitDefaultsquery_request_s2s_2fregistry_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -74,9 +55,8 @@ static void InitDefaultsquery_response_s2s_2fregistry_2eproto() {
   ::registry::query_response::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<1> scc_info_query_response_s2s_2fregistry_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsquery_response_s2s_2fregistry_2eproto}, {
-      &scc_info_actor_s2s_2fregistry_2eproto.base,}};
+::google::protobuf::internal::SCCInfo<0> scc_info_query_response_s2s_2fregistry_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsquery_response_s2s_2fregistry_2eproto}, {}};
 
 static void InitDefaultsquery_s2s_2fregistry_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -93,32 +73,23 @@ static void InitDefaultsquery_s2s_2fregistry_2eproto() {
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsquery_s2s_2fregistry_2eproto}, {}};
 
 void InitDefaults_s2s_2fregistry_2eproto() {
-  ::google::protobuf::internal::InitSCC(&scc_info_actor_s2s_2fregistry_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_query_request_s2s_2fregistry_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_query_response_s2s_2fregistry_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_query_s2s_2fregistry_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_s2s_2fregistry_2eproto[4];
+::google::protobuf::Metadata file_level_metadata_s2s_2fregistry_2eproto[3];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_s2s_2fregistry_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_s2s_2fregistry_2eproto = nullptr;
 
 const ::google::protobuf::uint32 TableStruct_s2s_2fregistry_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::registry::actor, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::registry::actor, name_),
-  PROTOBUF_FIELD_OFFSET(::registry::actor, actor_id_),
-  PROTOBUF_FIELD_OFFSET(::registry::actor, actor_json_),
-  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::registry::query_request, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::registry::query_request, id_),
   PROTOBUF_FIELD_OFFSET(::registry::query_request, name_),
-  PROTOBUF_FIELD_OFFSET(::registry::query_request, actor_id_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::registry::query_response, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -132,14 +103,12 @@ const ::google::protobuf::uint32 TableStruct_s2s_2fregistry_2eproto::offsets[] P
   ~0u,  // no _weak_field_map_
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::registry::actor)},
-  { 8, -1, sizeof(::registry::query_request)},
-  { 15, -1, sizeof(::registry::query_response)},
-  { 21, -1, sizeof(::registry::query)},
+  { 0, -1, sizeof(::registry::query_request)},
+  { 7, -1, sizeof(::registry::query_response)},
+  { 13, -1, sizeof(::registry::query)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::google::protobuf::Message*>(&::registry::_actor_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::registry::_query_request_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::registry::_query_response_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::registry::_query_default_instance_),
@@ -148,20 +117,18 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_s2s_2fregistry_2eproto = {
   {}, AddDescriptors_s2s_2fregistry_2eproto, "s2s/registry.proto", schemas,
   file_default_instances, TableStruct_s2s_2fregistry_2eproto::offsets,
-  file_level_metadata_s2s_2fregistry_2eproto, 4, file_level_enum_descriptors_s2s_2fregistry_2eproto, file_level_service_descriptors_s2s_2fregistry_2eproto,
+  file_level_metadata_s2s_2fregistry_2eproto, 3, file_level_enum_descriptors_s2s_2fregistry_2eproto, file_level_service_descriptors_s2s_2fregistry_2eproto,
 };
 
 const char descriptor_table_protodef_s2s_2fregistry_2eproto[] =
-  "\n\022s2s/registry.proto\022\010registry\";\n\005actor\022"
-  "\014\n\004name\030\001 \001(\t\022\020\n\010actor_id\030\002 \001(\003\022\022\n\nactor"
-  "_json\030\003 \001(\t\"_\n\005query\032)\n\007request\022\014\n\004name\030"
-  "\001 \001(\t\022\020\n\010actor_id\030\002 \001(\003\032+\n\010response\022\037\n\006a"
-  "ctors\030\001 \003(\0132\017.registry.actorb\006proto3"
+  "\n\022s2s/registry.proto\022\010registry\"H\n\005query\032"
+  "#\n\007request\022\n\n\002id\030\001 \001(\003\022\014\n\004name\030\002 \001(\t\032\032\n\010"
+  "response\022\016\n\006actors\030\001 \003(\tb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_s2s_2fregistry_2eproto = {
   false, InitDefaults_s2s_2fregistry_2eproto, 
   descriptor_table_protodef_s2s_2fregistry_2eproto,
-  "s2s/registry.proto", &assign_descriptors_table_s2s_2fregistry_2eproto, 196,
+  "s2s/registry.proto", &assign_descriptors_table_s2s_2fregistry_2eproto, 112,
 };
 
 void AddDescriptors_s2s_2fregistry_2eproto() {
@@ -177,421 +144,6 @@ namespace registry {
 
 // ===================================================================
 
-void actor::InitAsDefaultInstance() {
-}
-class actor::HasBitSetters {
- public:
-};
-
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int actor::kNameFieldNumber;
-const int actor::kActorIdFieldNumber;
-const int actor::kActorJsonFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-actor::actor()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:registry.actor)
-}
-actor::actor(const actor& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.name().size() > 0) {
-    name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
-  }
-  actor_json_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.actor_json().size() > 0) {
-    actor_json_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.actor_json_);
-  }
-  actor_id_ = from.actor_id_;
-  // @@protoc_insertion_point(copy_constructor:registry.actor)
-}
-
-void actor::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_actor_s2s_2fregistry_2eproto.base);
-  name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  actor_json_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  actor_id_ = PROTOBUF_LONGLONG(0);
-}
-
-actor::~actor() {
-  // @@protoc_insertion_point(destructor:registry.actor)
-  SharedDtor();
-}
-
-void actor::SharedDtor() {
-  name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  actor_json_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-
-void actor::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const actor& actor::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_actor_s2s_2fregistry_2eproto.base);
-  return *internal_default_instance();
-}
-
-
-void actor::Clear() {
-// @@protoc_insertion_point(message_clear_start:registry.actor)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  actor_json_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  actor_id_ = PROTOBUF_LONGLONG(0);
-  _internal_metadata_.Clear();
-}
-
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* actor::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<actor*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-    switch (tag >> 3) {
-      // string name = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("registry.actor.name");
-        object = msg->mutable_name();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      // int64 actor_id = 2;
-      case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 16) goto handle_unusual;
-        msg->set_actor_id(::google::protobuf::internal::ReadVarint(&ptr));
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        break;
-      }
-      // string actor_json = 3;
-      case 3: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("registry.actor.actor_json");
-        object = msg->mutable_actor_json();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
-        }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
-      }
-    }  // switch
-  }  // while
-  return ptr;
-string_till_end:
-  static_cast<::std::string*>(object)->clear();
-  static_cast<::std::string*>(object)->reserve(size);
-  goto len_delim_till_end;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool actor::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:registry.actor)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // string name = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_name()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->name().data(), static_cast<int>(this->name().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "registry.actor.name"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // int64 actor_id = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (16 & 0xFF)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &actor_id_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string actor_json = 3;
-      case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_actor_json()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->actor_json().data(), static_cast<int>(this->actor_json().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "registry.actor.actor_json"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:registry.actor)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:registry.actor)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void actor::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:registry.actor)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // string name = 1;
-  if (this->name().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->name().data(), static_cast<int>(this->name().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "registry.actor.name");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      1, this->name(), output);
-  }
-
-  // int64 actor_id = 2;
-  if (this->actor_id() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(2, this->actor_id(), output);
-  }
-
-  // string actor_json = 3;
-  if (this->actor_json().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->actor_json().data(), static_cast<int>(this->actor_json().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "registry.actor.actor_json");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      3, this->actor_json(), output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:registry.actor)
-}
-
-::google::protobuf::uint8* actor::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:registry.actor)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // string name = 1;
-  if (this->name().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->name().data(), static_cast<int>(this->name().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "registry.actor.name");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        1, this->name(), target);
-  }
-
-  // int64 actor_id = 2;
-  if (this->actor_id() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(2, this->actor_id(), target);
-  }
-
-  // string actor_json = 3;
-  if (this->actor_json().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->actor_json().data(), static_cast<int>(this->actor_json().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "registry.actor.actor_json");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        3, this->actor_json(), target);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:registry.actor)
-  return target;
-}
-
-size_t actor::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:registry.actor)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  // string name = 1;
-  if (this->name().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->name());
-  }
-
-  // string actor_json = 3;
-  if (this->actor_json().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->actor_json());
-  }
-
-  // int64 actor_id = 2;
-  if (this->actor_id() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->actor_id());
-  }
-
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void actor::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:registry.actor)
-  GOOGLE_DCHECK_NE(&from, this);
-  const actor* source =
-      ::google::protobuf::DynamicCastToGenerated<actor>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:registry.actor)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:registry.actor)
-    MergeFrom(*source);
-  }
-}
-
-void actor::MergeFrom(const actor& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:registry.actor)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (from.name().size() > 0) {
-
-    name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
-  }
-  if (from.actor_json().size() > 0) {
-
-    actor_json_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.actor_json_);
-  }
-  if (from.actor_id() != 0) {
-    set_actor_id(from.actor_id());
-  }
-}
-
-void actor::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:registry.actor)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void actor::CopyFrom(const actor& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:registry.actor)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool actor::IsInitialized() const {
-  return true;
-}
-
-void actor::Swap(actor* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void actor::InternalSwap(actor* other) {
-  using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  name_.Swap(&other->name_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  actor_json_.Swap(&other->actor_json_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  swap(actor_id_, other->actor_id_);
-}
-
-::google::protobuf::Metadata actor::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_s2s_2fregistry_2eproto);
-  return ::file_level_metadata_s2s_2fregistry_2eproto[kIndexInFileMessages];
-}
-
-
-// ===================================================================
-
 void query_request::InitAsDefaultInstance() {
 }
 class query_request::HasBitSetters {
@@ -599,8 +151,8 @@ class query_request::HasBitSetters {
 };
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int query_request::kIdFieldNumber;
 const int query_request::kNameFieldNumber;
-const int query_request::kActorIdFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 query_request::query_request()
@@ -616,7 +168,7 @@ query_request::query_request(const query_request& from)
   if (from.name().size() > 0) {
     name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
   }
-  actor_id_ = from.actor_id_;
+  id_ = from.id_;
   // @@protoc_insertion_point(copy_constructor:registry.query.request)
 }
 
@@ -624,7 +176,7 @@ void query_request::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_query_request_s2s_2fregistry_2eproto.base);
   name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  actor_id_ = PROTOBUF_LONGLONG(0);
+  id_ = PROTOBUF_LONGLONG(0);
 }
 
 query_request::~query_request() {
@@ -652,7 +204,7 @@ void query_request::Clear() {
   (void) cached_has_bits;
 
   name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  actor_id_ = PROTOBUF_LONGLONG(0);
+  id_ = PROTOBUF_LONGLONG(0);
   _internal_metadata_.Clear();
 }
 
@@ -669,9 +221,16 @@ const char* query_request::_InternalParse(const char* begin, const char* end, vo
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // string name = 1;
+      // int64 id = 1;
       case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
+        msg->set_id(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // string name = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         ctx->extra_parse_data().SetFieldName("registry.query.request.name");
@@ -683,13 +242,6 @@ const char* query_request::_InternalParse(const char* begin, const char* end, vo
         GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
         ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
         ptr += size;
-        break;
-      }
-      // int64 actor_id = 2;
-      case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 16) goto handle_unusual;
-        msg->set_actor_id(::google::protobuf::internal::ReadVarint(&ptr));
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
       default: {
@@ -726,28 +278,28 @@ bool query_request::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // string name = 1;
+      // int64 id = 1;
       case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_name()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->name().data(), static_cast<int>(this->name().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "registry.query.request.name"));
+        if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
+                 input, &id_)));
         } else {
           goto handle_unusual;
         }
         break;
       }
 
-      // int64 actor_id = 2;
+      // string name = 2;
       case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (16 & 0xFF)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &actor_id_)));
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_name()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->name().data(), static_cast<int>(this->name().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "registry.query.request.name"));
         } else {
           goto handle_unusual;
         }
@@ -781,19 +333,19 @@ void query_request::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string name = 1;
+  // int64 id = 1;
+  if (this->id() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(1, this->id(), output);
+  }
+
+  // string name = 2;
   if (this->name().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->name().data(), static_cast<int>(this->name().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
       "registry.query.request.name");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      1, this->name(), output);
-  }
-
-  // int64 actor_id = 2;
-  if (this->actor_id() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(2, this->actor_id(), output);
+      2, this->name(), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -809,7 +361,12 @@ void query_request::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string name = 1;
+  // int64 id = 1;
+  if (this->id() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(1, this->id(), target);
+  }
+
+  // string name = 2;
   if (this->name().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->name().data(), static_cast<int>(this->name().length()),
@@ -817,12 +374,7 @@ void query_request::SerializeWithCachedSizes(
       "registry.query.request.name");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        1, this->name(), target);
-  }
-
-  // int64 actor_id = 2;
-  if (this->actor_id() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(2, this->actor_id(), target);
+        2, this->name(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -846,18 +398,18 @@ size_t query_request::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string name = 1;
+  // string name = 2;
   if (this->name().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->name());
   }
 
-  // int64 actor_id = 2;
-  if (this->actor_id() != 0) {
+  // int64 id = 1;
+  if (this->id() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->actor_id());
+        this->id());
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -891,8 +443,8 @@ void query_request::MergeFrom(const query_request& from) {
 
     name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
   }
-  if (from.actor_id() != 0) {
-    set_actor_id(from.actor_id());
+  if (from.id() != 0) {
+    set_id(from.id());
   }
 }
 
@@ -923,7 +475,7 @@ void query_request::InternalSwap(query_request* other) {
   _internal_metadata_.Swap(&other->_internal_metadata_);
   name_.Swap(&other->name_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  swap(actor_id_, other->actor_id_);
+  swap(id_, other->id_);
 }
 
 ::google::protobuf::Metadata query_request::GetMetadata() const {
@@ -1002,18 +554,21 @@ const char* query_response::_InternalParse(const char* begin, const char* end, v
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // repeated .registry.actor actors = 1;
+      // repeated string actors = 1;
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         do {
           ptr = ::google::protobuf::io::ReadSize(ptr, &size);
           GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          parser_till_end = ::registry::actor::_InternalParse;
+          ctx->extra_parse_data().SetFieldName("registry.query.response.actors");
           object = msg->add_actors();
-          if (size > end - ptr) goto len_delim_till_end;
+          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+            goto string_till_end;
+          }
+          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
           ptr += size;
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
-              {parser_till_end, object}, ptr - size, ptr));
           if (ptr >= end) break;
         } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 10 && (ptr += 1));
         break;
@@ -1033,6 +588,10 @@ const char* query_response::_InternalParse(const char* begin, const char* end, v
     }  // switch
   }  // while
   return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
 len_delim_till_end:
   return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
                                {parser_till_end, object}, size);
@@ -1048,11 +607,16 @@ bool query_response::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // repeated .registry.actor actors = 1;
+      // repeated string actors = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-                input, add_actors()));
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_actors()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->actors(this->actors_size() - 1).data(),
+            static_cast<int>(this->actors(this->actors_size() - 1).length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "registry.query.response.actors"));
         } else {
           goto handle_unusual;
         }
@@ -1086,13 +650,14 @@ void query_response::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated .registry.actor actors = 1;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->actors_size()); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1,
-      this->actors(static_cast<int>(i)),
-      output);
+  // repeated string actors = 1;
+  for (int i = 0, n = this->actors_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->actors(i).data(), static_cast<int>(this->actors(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "registry.query.response.actors");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      1, this->actors(i), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1108,12 +673,14 @@ void query_response::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // repeated .registry.actor actors = 1;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->actors_size()); i < n; i++) {
+  // repeated string actors = 1;
+  for (int i = 0, n = this->actors_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->actors(i).data(), static_cast<int>(this->actors(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "registry.query.response.actors");
     target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        1, this->actors(static_cast<int>(i)), target);
+      WriteStringToArray(1, this->actors(i), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1137,15 +704,12 @@ size_t query_response::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated .registry.actor actors = 1;
-  {
-    unsigned int count = static_cast<unsigned int>(this->actors_size());
-    total_size += 1UL * count;
-    for (unsigned int i = 0; i < count; i++) {
-      total_size +=
-        ::google::protobuf::internal::WireFormatLite::MessageSize(
-          this->actors(static_cast<int>(i)));
-    }
+  // repeated string actors = 1;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->actors_size());
+  for (int i = 0, n = this->actors_size(); i < n; i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->actors(i));
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -1203,7 +767,7 @@ void query_response::Swap(query_response* other) {
 void query_response::InternalSwap(query_response* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  CastToBase(&actors_)->InternalSwap(CastToBase(&other->actors_));
+  actors_.InternalSwap(CastToBase(&other->actors_));
 }
 
 ::google::protobuf::Metadata query_response::GetMetadata() const {
@@ -1425,9 +989,6 @@ void query::InternalSwap(query* other) {
 }  // namespace registry
 namespace google {
 namespace protobuf {
-template<> PROTOBUF_NOINLINE ::registry::actor* Arena::CreateMaybeMessage< ::registry::actor >(Arena* arena) {
-  return Arena::CreateInternal< ::registry::actor >(arena);
-}
 template<> PROTOBUF_NOINLINE ::registry::query_request* Arena::CreateMaybeMessage< ::registry::query_request >(Arena* arena) {
   return Arena::CreateInternal< ::registry::query_request >(arena);
 }

@@ -15,18 +15,17 @@ namespace Tendo
 		return ClusterConfig::Inst()->GetServerName(name, this->mServer);
 	}
 
-	int MongoHelperComponent::Insert(const Message& message, int index)
+	int MongoHelperComponent::Insert(const Message& message)
 	{
 		const std::string tab = message.GetTypeName();
-		return this->Insert(tab.c_str(), message, index);
+		return this->Insert(tab.c_str(), message);
 	}
 
-	int MongoHelperComponent::Insert(const char* tab, const Message& message, int index)
+	int MongoHelperComponent::Insert(const char* tab, const Message& message)
 	{
 		db::mongo::insert request;
 		{
 			request.set_tab(tab);
-			request.set_flag(index);
 		}
 		const std::string func("MongoDB.Insert");
 		ServerActor * targetActor = this->mApp->ActorMgr()->Random(this->mServer);
@@ -41,7 +40,7 @@ namespace Tendo
 		return targetActor->Call(func, request);
 	}
 
-	int MongoHelperComponent::Update(const char* tab, const std::string& select, const std::string& data, int index)
+	int MongoHelperComponent::Update(const char* tab, const std::string& select, const std::string& data)
 	{
 		db::mongo::update request;
 		{
@@ -58,12 +57,11 @@ namespace Tendo
 		return targetActor->Call(func, request);
 	}
 
-	int MongoHelperComponent::Insert(const char* tab, const std::string& json, int index)
+	int MongoHelperComponent::Insert(const char* tab, const std::string& json)
 	{
 		db::mongo::insert request;
 		{
 			request.set_tab(tab);
-			request.set_flag(index);
 			request.set_json(json);
 		}
 		const std::string func("MongoDB.Insert");
@@ -75,12 +73,11 @@ namespace Tendo
 		return targetActor->Call(func, request);
 	}
 
-	int MongoHelperComponent::Remove(const char* tab, const std::string& select, int limit, int index)
+	int MongoHelperComponent::Remove(const char* tab, const std::string& select, int limit)
 	{
 		db::mongo::remove request;
 		{
 			request.set_tab(tab);
-			request.set_flag(index);
 			request.set_limit(limit);
 			request.set_json(select);
 		}
@@ -94,17 +91,17 @@ namespace Tendo
 	}
 
 	int MongoHelperComponent::Query(const char* tab,
-			const std::string& select, std::shared_ptr<Message> response)
+			const std::string& select, std::shared_ptr<Message> & response)
 	{
-		db::mongo::query::request request;
+		db::mongo::find::request request;
 		{
 			request.set_tab(tab);
 			request.set_limit(1);
 			request.set_json(select);
 		}
 		const std::string func("MongoDB.Query");
-		std::shared_ptr<db::mongo::query::response> result
-			= std::make_shared<db::mongo::query::response>();
+		std::shared_ptr<db::mongo::find::response> result
+			= std::make_shared<db::mongo::find::response>();
 		ServerActor * targetActor = this->mApp->ActorMgr()->Random(this->mServer);
 		if(targetActor == nullptr)
 		{
@@ -173,13 +170,13 @@ namespace Tendo
 	{
 		Json::Writer select;
 		select.Add("_id").Add(id);
-		return this->Update(tab, select.JsonString(), data, id % 10000);
+		return this->Update(tab, select.JsonString(), data);
 	}
 
 	int MongoHelperComponent::Save(const char* tab, const std::string& id, const std::string& data)
 	{
 		Json::Writer select;
 		select.Add("_id").Add(id);
-		return this->Update(tab, select.JsonString(), data, 0);
+		return this->Update(tab, select.JsonString(), data);
 	}
 }

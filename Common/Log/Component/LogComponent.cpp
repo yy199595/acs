@@ -105,6 +105,7 @@ namespace Tendo
 			}
 			catch(spdlog::spdlog_ex & ex)
 			{
+				LOG_ERROR(ex.what());
 				return nullptr;
 			}
 		}

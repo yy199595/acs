@@ -4,9 +4,7 @@
 
 #include"Node.h"
 #include"Entity/Actor/App.h"
-#include"Util/String/StringHelper.h"
 #include"Server/Config/CodeConfig.h"
-#include"Cluster/Config/ClusterConfig.h"
 #include"Server/Component/ConfigComponent.h"
 
 namespace Tendo
@@ -29,13 +27,13 @@ namespace Tendo
         return XCode::Successful;
     }
 
-    int Node::Join(const registry::actor &request)
+    int Node::Join(const com::type::json &request)
 	{
 
 		return XCode::Successful;
 	}
 
-    int Node::Exit(const registry::actor &request)
+    int Node::Exit(const com::type::int64 &request)
 	{
 		return XCode::Successful;
 	}
@@ -56,7 +54,7 @@ namespace Tendo
         return XCode::Successful;
     }
 
-	int Node::RunInfo(com::type::string& response)
+	int Node::RunInfo(com::type::json& response)
 	{
 		Json::Writer document;
         {
@@ -66,13 +64,7 @@ namespace Tendo
             document.Add("cpu").Add(std::thread::hardware_concurrency());
             document.EndObject();
         }
-        std::vector<Component *> components;
-        this->mApp->GetComponents(components);
-		for(Component * component : components)
-		{
-           
-		}
-		document.WriterStream(response.mutable_str());
+		document.WriterStream(response.mutable_json());
 		return XCode::Successful;
 	}
 

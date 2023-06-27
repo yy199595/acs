@@ -10,7 +10,7 @@
 #include"google/protobuf/util/json_util.h"
 #include"google/protobuf/dynamic_message.h"
 #include"Proto/Lua/Message.h"
-#include"Lua/Engine/ClassProxyHelper.h"
+#include"Lua/Engine/ModuleClass.h"
 namespace Tendo
 {
     ImportError::ImportError()
@@ -18,6 +18,7 @@ namespace Tendo
     {
 
     }
+
     void ImportError::AddError(const std::string &filename, int line, int column, const std::string &message)
     {
         this->mHasError = true;
@@ -207,13 +208,13 @@ namespace Tendo
         return this->FindMessage(name) != nullptr;
     }
 
-    void ProtoComponent::OnLuaRegister(Lua::ClassProxyHelper &luaRegister)
-    {
-        luaRegister.BeginNewTable("Proto");
-		luaRegister.PushExtensionFunction("New", Lua::MessageEx::New);
-		luaRegister.PushExtensionFunction("Import", Lua::MessageEx::Import);
-		luaRegister.PushExtensionFunction("Encode", Lua::MessageEx::Encode);
-		luaRegister.PushExtensionFunction("Decode", Lua::MessageEx::Decode);
+	void ProtoComponent::OnLuaRegister(Lua::ModuleClass &luaRegister, std::string &name)
+	{
+		name = "Proto";
+		luaRegister.AddFunction("New", Lua::MessageEx::New);
+		luaRegister.AddFunction("Import", Lua::MessageEx::Import);
+		luaRegister.AddFunction("Encode", Lua::MessageEx::Encode);
+		luaRegister.AddFunction("Decode", Lua::MessageEx::Decode);
 	}
 
 	bool ProtoComponent::Write(lua_State * lua, const Message& message)
@@ -221,6 +222,7 @@ namespace Tendo
 		MessageDecoder messageDecoder(lua, this);
 		return messageDecoder.Decode(message);
 	}
+
 	bool ProtoComponent::Read(lua_State * lua, const std::string& name, int index, std::shared_ptr<Message> & message)
 	{
 		if(!this->New(name, message))

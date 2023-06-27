@@ -17,7 +17,7 @@ namespace Tendo
         const std::string & name = method->GetName();
         const std::string & service = serviceComponent->GetName();
         std::string fullName = fmt::format("{0}.{1}", service, name);
-        const RpcMethodConfig * config = RpcConfig::Inst()->GetMethodConfig(fullName);
+        const RpcMethodConfig * config = SrvRpcConfig::Inst()->GetMethodConfig(fullName);
         {
             if(config == nullptr)
             {

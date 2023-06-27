@@ -22,7 +22,6 @@ namespace Tendo
     public:
 		void Clear();
         TaskState GetState() const { return this->mState; }
-        long long GetTaskId() const { return this->mTaskId;}
         long long GetCreateTime() const { return this->mCreateTime;}
         bool IsComplete() { return this->mState == TaskState::TaskFinish;}
     protected:
@@ -30,7 +29,6 @@ namespace Tendo
         bool ResumeTask(TaskState state = TaskState::TaskFinish);
     private:
         TaskState mState;
-        long long mTaskId;
         unsigned int mCorId;
         long long mCreateTime;
     };

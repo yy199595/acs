@@ -21,24 +21,29 @@
         "user": "${WORK_PATH}/config/user.json",
         "rpc": "${WORK_PATH}/config/service/rpc.json",
         "http": "${WORK_PATH}/config/service/http.json",
+        "client": "${WORK_PATH}/config/service/client.json",
         "cluster": "${WORK_PATH}/config/cluster/debug.json"
     },
     "user": {
         "name": "root",
         "passwd": "199595yjz."
     },
-    "registry": "tcp://127.0.0.1:7788",
+    "center": "tcp://127.0.0.1:7788",
     "listen": {
-        "rpc": "tcp://127.0.0.1:7788",
-        "gate": "tcp://127.0.0.1:1995",
-        "http": "http://127.0.0.1:8080",
+        "rpc": "rpc://127.0.0.1:7788",
+        "gate": "rpc://127.0.0.1:1995",
+        "http": "http://127.0.0.1:80",
         "debug": "http://127.0.0.1:8088"
     },
     "lua": {
         "require": [
             "${WORK_PATH}/script/Server",
             "${WORK_PATH}/script/Common",
-            "${WORK_PATH}/script/Component"
+            "${WORK_PATH}/script/Component",
+            "${WORK_PATH}/script/Component/Server"
+        ],
+        "loadfile": [
+            "${WORK_PATH}/script/Common"
         ],
         "main": "${WORK_PATH}/script/Server/Server.lua"
     },

@@ -25,10 +25,8 @@ namespace Tendo
 	private:
 		ISender * GetSender(int net);
 	private:
-		class HttpComponent * mHttpComponent;
-		class RedisComponent * mRedisComponent;
-		class InnerNetComponent * mNetComponent;
 		class DispatchComponent * mDisComponent;
+		std::unordered_map<int, ISender *> mSenders;
 	};
 }
 

@@ -17,7 +17,7 @@
             "Request": "s2s.allot.request"
         }
     },
-    "ActorRegistry": {
+    "ServerRegistry": {
         "Ping": {
             "Async": false
         },
@@ -27,12 +27,15 @@
             "Response": "registry.query.response"
         },
         "Add": {
-            "Async": true,
-            "Request": "registry.actor"
+            "Async": false,
+            "Request": "com.type.json"
+        },
+        "Watch": {
+            "Async": false,
+            "Request": "com.array.string"
         },
         "Del": {
-          "Async": false,
-          "Request": "registry.actor"
+          "Async": true
       }
     },
     "MysqlDB": {
@@ -76,16 +79,14 @@
         "Hotfix": {},
         "LoadConfig": {},
         "Join": {
-            "Request": "registry.actor"
+            "Request": "com.type.json"
         },
-        "Exit": {
-            "Request": "registry.actor"
-        },
+        "Exit": { },
         "Shutdown": {
 
         },
         "RunInfo": {
-            "Response": "google.protobuf.StringValue"
+            "Response": "com.type.json"
         }
     },
     "Login": {
@@ -111,10 +112,15 @@
             "Async": true,
             "Request": "db.mongo.remove"
         },
-        "Query": {
+        "Find": {
             "Async": true,
-            "Request": "db.mongo.query.request",
-            "Response": "db.mongo.query.response"
+            "Request": "db.mongo.find.request",
+            "Response": "db.mongo.find.response"
+        },
+        "FindOne": {
+            "Async": true,
+            "Request": "db.mongo.find_one.request",
+            "Response": "db.mongo.find_one.response"
         },
         "Update": {
             "Async": true,
@@ -124,7 +130,7 @@
             "Async": true,
             "Request": "db.mongo.index"
         },
-        "RunCommand": {
+        "Command": {
             "Async": true,
             "Request": "db.mongo.command.request",
             "Response": "db.mongo.command.response"

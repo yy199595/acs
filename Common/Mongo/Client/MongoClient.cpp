@@ -37,6 +37,22 @@ namespace Mongo
         this->mAddress = config.Address.FullAddress;
 	}
 
+	TcpMongoClient::TcpMongoClient(std::shared_ptr<Tcp::SocketProxy> socket, const Mongo::MongoConfig & config)
+		: Tcp::TcpContext(std::move(socket), 1024 * 1024), mComponent(nullptr), mConfig(config)
+	{
+
+	}
+
+	std::shared_ptr<CommandRequest> TcpMongoClient::MakePing()
+	{
+		std::shared_ptr<Mongo::CommandRequest> mongoRequest = std::make_shared<Mongo::CommandRequest>();
+		{
+			mongoRequest->dataBase = this->mConfig.User;
+			mongoRequest->document.Add("ping", 1);
+		}
+		return mongoRequest;
+	}
+
 	void TcpMongoClient::OnSendMessage(const Asio::Code & code, std::shared_ptr<Tcp::ProtoMessage> message)
 	{
 		if (code)
@@ -75,17 +91,17 @@ namespace Mongo
         request1->document.Add("mechanism", "SCRAM-SHA-1");
         request1->document.Add("payload", payload);
 
-        std::shared_ptr<CommandResponse> response1 =
-                this->SyncSendMongoCommand(request1);
-        if(response1 == nullptr && response1->GetDocumentSize() == 0)
-        {
-            return false;
-        }
+        std::shared_ptr<CommandResponse> response1 = this->SyncSendMongoCommand(request1);
+		if(response1 == nullptr || response1->Document() == nullptr)
+		{
+			return false;
+		}
+
         int conversationId = 0;
         std::string server_first;
-        Bson::Reader::Document & document1 = response1->Get();
-        if(!document1.Get("payload", server_first) ||
-           !document1.Get("conversationId", conversationId))
+        Bson::Reader::Document* document1 = response1->Document();
+        if(!document1->Get("payload", server_first) ||
+           !document1->Get("conversationId", conversationId))
         {
             return false;
         }
@@ -118,57 +134,71 @@ namespace Mongo
 
 
         std::shared_ptr<Mongo::CommandRequest> request2(new CommandRequest());
-        request2->header.requestID = 1;
-        request2->collectionName = db + ".$cmd";
+		{
+			request2->header.requestID = 1;
+			request2->collectionName = db + ".$cmd";
 
-        request2->document.Add("saslContinue", 1);
-        request2->document.Add("conversationId", conversationId);
-        request2->document.Add("payload", client_final);
-
-        std::shared_ptr<CommandResponse> response2 =
-                this->SyncSendMongoCommand(request2);
-        if(response2 == nullptr || response2->GetDocumentSize() == 0)
-        {
-            return false;
-        }
+			request2->document.Add("saslContinue", 1);
+			request2->document.Add("conversationId", conversationId);
+			request2->document.Add("payload", client_final);
+		}
+        std::shared_ptr<CommandResponse> response2 = this->SyncSendMongoCommand(request2);
+        if(response2 == nullptr || response2->Document() == nullptr)
+		{
+			return false;
+		}
         parsedSource.clear();
-        Bson::Reader::Document & document2 = response2->Get();
-        if(!document2.Get("payload", parsedSource))
+        Bson::Reader::Document * document2 = response2->Document();
+        if(!document2->Get("payload", parsedSource))
         {
             return false;
         }
         bool done = false;
-        if(document2.Get("done", done) && done)
+        if(document2->Get("done", done) && done)
         {
             return true;
         }
         std::shared_ptr<CommandRequest> request3(new CommandRequest());
-        request3->header.requestID = 1;
-        request3->collectionName = db + ".$cmd";
-        request3->document.Add("saslContinue", 1);
-        request3->document.Add("conversationId", conversationId);
-        request3->document.Add("payload", "");
-
-        std::shared_ptr<CommandResponse> response3 =
-                this->SyncSendMongoCommand(request3);
-        if(response3 == nullptr && response3->GetDocumentSize() == 0)
-        {
-            return false;
-        }
-        Bson::Reader::Document & document3 = response3->Get();
-        if(document3.IsOk() && document3.Get("done", done) && done)
 		{
-			const std::string & address = this->mSocket->GetAddress();
+			request3->header.requestID = 1;
+			request3->collectionName = db + ".$cmd";
+			request3->document.Add("saslContinue", 1);
+			request3->document.Add("conversationId", conversationId);
+			request3->document.Add("payload", "");
+		}
+
+        std::shared_ptr<CommandResponse> response3 = this->SyncSendMongoCommand(request3);
+
+		if(response3 == nullptr || response3->Document() == nullptr)
+		{
+			return false;
+		}
+
+        Bson::Reader::Document * document3 = response3->Document();
+        if(document3->IsOk() && document3->Get("done", done) && done)
+		{
+			if(this->mComponent != nullptr)
+			{
+				const std::string& address = this->mSocket->GetAddress();
 #ifdef ONLY_MAIN_THREAD
-			this->mComponent->OnConnectSuccessful(address);
+				this->mComponent->OnConnectSuccessful(address);
 #else
-			asio::io_service& io = Tendo::App::Inst()->MainThread();
-			io.post(std::bind(&Tendo::IRpc<CommandResponse>::OnConnectSuccessful, this->mComponent, address));
+				asio::io_service& io = Tendo::App::Inst()->MainThread();
+				std::shared_ptr<Tcp::TcpContext> self = this->shared_from_this();
+				io.post([this, address, self] { this->mComponent->OnConnectSuccessful(address); });
 #endif
+			}
 			return true;
 		}
 		return false;
     }
+
+	bool TcpMongoClient::SyncAuth()
+	{
+		if(this->mComponent != nullptr)
+			return false;
+		return this->StartAuthBySha1();
+	}
 
     void TcpMongoClient::OnReceiveMessage(const asio::error_code &code, std::istream & is, size_t size)
 	{
@@ -202,7 +232,8 @@ namespace Mongo
 			this->mComponent->OnMessage(response);
 #else
 			asio::io_service& io = Tendo::App::Inst()->MainThread();
-			io.post(std::bind(&Tendo::IRpc<CommandResponse>::OnMessage, this->mComponent, response));
+			std::shared_ptr<Tcp::TcpContext> self = this->shared_from_this();
+			io.post([this, response, self] { this->mComponent->OnMessage(response); });
 #endif
 			this->PopMessage();
 			this->mMongoResponse = nullptr;
@@ -211,13 +242,14 @@ namespace Mongo
 
 	}
 
-	void TcpMongoClient::SendMongoCommand(std::shared_ptr<CommandRequest> request)
+	void TcpMongoClient::SendMongoCommand(const std::shared_ptr<CommandRequest>& request)
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->Write(request);
 #else
         asio::io_service & t = this->mSocket->GetThread();
-		t.post(std::bind(&TcpMongoClient::Write, this, request));
+		std::shared_ptr<Tcp::TcpContext> self = this->shared_from_this();
+		t.post([this, request, self] { this->Write(request); });
 #endif
 	}
 
@@ -232,21 +264,19 @@ namespace Mongo
 			return nullptr;
 		}
 		std::istream readStream1(&this->mRecvBuffer);
-		std::shared_ptr<CommandResponse> response(new CommandResponse());
-		if(this->RecvSync(response->OnReceiveHead(readStream1)) <= 0)
+		std::shared_ptr<CommandResponse> response = std::make_shared<CommandResponse>();
 		{
-			return nullptr;
-		}
-		if(response->OnReceiveBody(readStream1) <= 0)
-		{
-			return nullptr;
+			if (this->RecvSync(response->OnReceiveHead(readStream1)) <= 0)
+			{
+				return nullptr;
+			}
+			response->OnReceiveBody(readStream1);
 		}
 		return response;
 	}
 
 	bool TcpMongoClient::StartAuthBySha1()
 	{
-       
         const Net::Address& address = this->mConfig.Address;
         this->mSocket->Init(address.Ip, address.Port);
 #ifdef __DEBUG__
@@ -258,7 +288,7 @@ namespace Mongo
 #ifdef __DEBUG__
             CONSOLE_LOG_ERROR("connect mongo server [" << address.FullAddress << "] failure");
 #endif // __DEBUG__
-			return this->StartAuthBySha1();
+			return false;
 		}
 #ifdef __DEBUG__
         CONSOLE_LOG_DEBUG("connect mongo server [" << address.FullAddress << "]successful");

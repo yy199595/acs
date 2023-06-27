@@ -72,8 +72,14 @@ namespace Bson
 	namespace Reader
 	{
 		Document::Document(const char *bson)
-			: _bson::bsonobj(bson)
+			: mObject(bson)
 		{
+		}
+
+		Document::Document(_bson::bsonobj object)
+			: mObject(object)
+		{
+
 		}
 
 		bool Document::IsOk() const
@@ -84,7 +90,7 @@ namespace Bson
 
 		bool Document::Get(const char *key, double &value) const
         {
-            _bson::bsonelement element = this->getField(key);
+            _bson::bsonelement element = this->mObject.getField(key);
             if (element.type() != _bson::BSONType::NumberDouble)
             {
                 return false;
@@ -92,6 +98,79 @@ namespace Bson
             value = element.Double();
             return true;
         }
+
+
+		bool Document::Get(const char* key, std::vector<std::string>& document)
+		{
+			_bson::bsonelement element = this->mObject.getField(key);
+			if (element.type() != _bson::BSONType::Array
+			)
+			{
+				return false;
+			}
+
+			for(const _bson::bsonelement & element : element.Array())
+			{
+				switch(element.type())
+				{
+					case _bson::BSONType::String:
+						document.emplace_back(element.String());
+						break;
+					case _bson::BSONType::BinData:
+					{
+						int len = 0;
+						const char* bin = element.binData(len);
+						document.emplace_back(bin, len);
+					}
+						break;
+					default:
+						return false;
+				}
+			}
+			return true;
+		}
+
+		bool Document::Get(const char* key, std::vector<_bson::bsonelement>& document)
+		{
+			_bson::bsonelement element = this->mObject.getField(key);
+			if (element.type() != _bson::BSONType::Object)
+			{
+				return false;
+			}
+			document = element.Array();
+			return true;
+		}
+
+		bool Document::Get(const char* key, std::vector<std::shared_ptr<Document>>& document)
+		{
+			_bson::bsonelement element = this->mObject.getField(key);
+			if(element.type() != _bson::BSONType::Array)
+			{
+				return false;
+			}
+			std::vector<_bson::bsonelement> arr = element.Array();
+			for(_bson::bsonelement & item : arr)
+			{
+				if (item.type() != _bson::BSONType::Object)
+				{
+					return false;
+				}
+				document.emplace_back(std::make_shared<Document>(item.object()));
+			}
+			return true;
+		}
+
+
+		bool Document::Get(const char* key, std::shared_ptr<Document>& document)
+		{
+			_bson::bsonelement element = this->mObject.getField(key);
+			if (element.type() != _bson::BSONType::Object)
+			{
+				return false;
+			}
+			document = std::make_shared<Document>(element.object());
+			return true;
+		}
 	}
 	namespace Writer
 	{
@@ -100,13 +179,26 @@ namespace Bson
 		{
 			int length = 0;
 			Bson::Reader::Document obj(this->Serialize(length));
-			obj.WriterToJson(json);
+			obj.WriterToJson(&json);
+		}
+
+		std::string Document::ToJson()
+		{
+			int length = 0;
+			std::string json;
+			Bson::Reader::Document obj(this->Serialize(length));
+			obj.WriterToJson(&json);
+			return json;
 		}
 
 		bool Document::FromByJson(const std::string &json)
 		{
 			rapidjson::Document document;
 			if (document.Parse(json.c_str(), json.size()).HasParseError())
+			{
+				return false;
+			}
+			if(!document.IsObject())
 			{
 				return false;
 			}
@@ -323,7 +415,7 @@ namespace Bson
     {
         bool Document::Get(const char *key, int &value) const
         {
-            _bson::bsonelement element = this->getField(key);
+            _bson::bsonelement element = this->mObject.getField(key);
             if (element.type() == _bson::BSONType::NumberInt)
             {
                 value = element.Int();
@@ -334,7 +426,7 @@ namespace Bson
 
         bool Document::Get(const char *key, bool &value) const
         {
-            _bson::bsonelement element = this->getField(key);
+            _bson::bsonelement element = this->mObject.getField(key);
             if (element.type() == _bson::BSONType::Bool)
             {
                 value = element.Bool();
@@ -345,7 +437,7 @@ namespace Bson
 
         bool Document::Get(const char *key, long long &value) const
         {
-            _bson::bsonelement element = this->getField(key);
+            _bson::bsonelement element = this->mObject.getField(key);
             switch (element.type())
             {
                 case _bson::BSONType::NumberInt:
@@ -361,7 +453,7 @@ namespace Bson
 
         bool Document::Get(const char *key, std::string &value) const
         {
-            _bson::bsonelement element = this->getField(key);
+            _bson::bsonelement element = this->mObject.getField(key);
             switch (element.type())
             {
                 case _bson::BSONType::String:
@@ -377,26 +469,25 @@ namespace Bson
                 default:
                     return false;
             }
-            return false;
         }
 
         _bson::BSONType Document::Type(const char *key) const
         {
-            _bson::bsonelement element = this->getField(key);
+            _bson::bsonelement element = this->mObject.getField(key);
             return element.type();
         }
 
-        void Document::WriterToJson(std::string &json)
+        void Document::WriterToJson(std::string *json)
         {
             Json::Writer jsonWriter;
             std::set<std::string> elements;
-            this->getFieldNames(elements);
+            this->mObject.getFieldNames(elements);
             for (const std::string &key: elements)
             {
                 jsonWriter.Add(key);
-                this->WriterToJson(this->getField(key), jsonWriter);
+                this->WriterToJson(this->mObject.getField(key), jsonWriter);
             }
-            jsonWriter.WriterStream(&json);
+            jsonWriter.WriterStream(json);
         }
 
         void Document::WriterToJson(const _bson::bsonelement &element, Json::Writer &json)
@@ -463,5 +554,6 @@ namespace Bson
                     break;
             }
         }
-    }
+
+	}
 }

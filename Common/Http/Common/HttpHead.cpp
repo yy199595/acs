@@ -95,8 +95,8 @@ namespace Http
             const std::string & value = iter->second;
             buffer << key << ": " << value << "\r\n";
         }
-		buffer << "Access-Control-Allow-Origin: *" << "\r\n";
-		buffer << "Access-Control-Allow-Credentials: true" << "\r\n";
+		//buffer << "Access-Control-Allow-Origin: *" << "\r\n";
+		//buffer << "Access-Control-Allow-Credentials: true" << "\r\n";
         return 0;
     }
 
@@ -112,7 +112,8 @@ namespace Http
 
 	int Head::WriteToLua(lua_State* lua) const
 	{
-		lua_createtable(lua, 0, this->mHeads.size());
+		size_t size = this->mHeads.size();
+		lua_createtable(lua, 0, (int)size);
 		for(const auto & item : this->mHeads)
 		{
 			const std::string & key = item.first;

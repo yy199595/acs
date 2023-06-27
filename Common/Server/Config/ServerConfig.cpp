@@ -62,9 +62,9 @@ namespace Tendo
 				this->mPaths.emplace(key, std::string(iter1->value.GetString()));
 			}
 		}
-        for(auto & mPath : this->mPaths)
+        for(auto & path : this->mPaths)
         {
-			System::SubValue(mPath.second);
+			System::SubValue(path.second);
         }
 		return true;
 	}

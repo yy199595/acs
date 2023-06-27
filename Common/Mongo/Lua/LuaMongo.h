@@ -1,4 +1,4 @@
-#pragma once;
+#pragma once
 #include"Lua/Engine/Define.h"
 namespace Lua
 {

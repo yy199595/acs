@@ -12,8 +12,11 @@ namespace Tendo
 		extern int Send(lua_State * l);
 		extern int Call(lua_State * l);
 		extern int Random(lua_State * l);
+		extern int AddWatch(lua_State * l);
 		extern int GetListen(lua_State * l);
+		extern int NewServer(lua_State * l);
 		extern int SendToClient(lua_State * l);
+		extern int LuaPushCode(lua_State * l, int code);
 	};
 }
 

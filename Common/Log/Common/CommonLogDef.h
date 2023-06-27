@@ -15,11 +15,7 @@ inline std::string FormatFileLine(const char * file, const int line)
 	const size_t length = strlen(file);
 	for (size_t index = length - 1; index > 0; index--)
 	{
-#ifdef _MSC_VER
-		if (file[index] == '\\')
-#else
-		if(file[index] == '/')
-#endif
+		if (file[index] == '/' || file[index] == '\\')
 		{
 			fileName = file + index + 1;
 			break;
@@ -33,6 +29,12 @@ inline std::string FormatFileLine(const char * file, const int line)
 	size_t size = sprintf(buffer, "%s:%d  ", fileName, line);
 #endif // _MSC_VER
 	return std::string(buffer, size);
+}
+
+#define LOG_FMT_ERR(_fmt, ...) { 									\
+    std::string f = FormatFileLine(__FILE__, __LINE__);             \
+	std::string log = fmt::format(_fmt, __VA_ARGS__); 			\
+	Debug::Log(spdlog::level::level_enum::err, f + log);    			\
 }
 
 #define LUA_LOG_ERROR(log) \

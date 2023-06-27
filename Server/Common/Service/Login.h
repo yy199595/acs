@@ -13,7 +13,7 @@ namespace Tendo
     {
     public:
         Login() = default;
-        ~Login() = default;
+        ~Login() override = default;
     private:
 		int OnLogin(long long id, const s2s::login::request & request);
 		int OnLogout(long long id, const s2s::logout::request & request);

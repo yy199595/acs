@@ -4,7 +4,7 @@
 
 #ifndef APP_CONFIGCOMPONENT_H
 #define APP_CONFIGCOMPONENT_H
-#include"Server/Config/TextConfig.h"
+#include"Config/Base/TextConfig.h"
 #include"Entity/Component/Component.h"
 namespace Tendo
 {
@@ -12,9 +12,9 @@ namespace Tendo
     {
     public:
         ConfigComponent() = default;
-        ~ConfigComponent() = default;
+        ~ConfigComponent() override = default;
     public:
-        void OnHotFix() final;
+        bool OnHotFix() final;
 
         template<typename T>
         const T * GetTextConfig();

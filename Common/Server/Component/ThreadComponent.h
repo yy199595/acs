@@ -31,7 +31,6 @@ namespace Tendo
     public:
         Asio::Context& GetContext();
         std::shared_ptr<Tcp::SocketProxy> CreateSocket();
-		std::shared_ptr<Tcp::SocketProxy> CreateSocket(const std::string & address);
 		std::shared_ptr<Tcp::SocketProxy> CreateSocket(const std::string & ip, unsigned short port);
     private:
 #ifndef ONLY_MAIN_THREAD

@@ -54,12 +54,16 @@ namespace Helper
             {
                 return false;
             }
-            std::string line;
-            while (std::getline(fs, line))
-            {
-                outFile.append(line);
-                outFile += "\n";
-            }
+			char buffer[128] = { 0};
+			while(!fs.eof())
+			{
+				fs.read(buffer, sizeof(buffer));
+				const size_t count = fs.gcount();
+				if(count > 0)
+				{
+					outFile.append(buffer, count);
+				}
+			}
             fs.close();
             return true;
         }
@@ -73,15 +77,14 @@ namespace Helper
                 return false;
             }
             std::string line;
-            MD5 fileMd5(fs);
-            md5 = fileMd5.toString();
+            md5 = MD5(fs).toString();
             while (std::getline(fs, line))
             {
                 outFile.append(line);
                 outFile += "\n";
             }
             fs.close();
-            return true;
+            return !outFile.empty();
         }
 
         bool ReadJsonFile(const std::string &path, rapidjson::Document &document)

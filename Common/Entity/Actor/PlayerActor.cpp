@@ -87,7 +87,7 @@ namespace Tendo
 
 	int PlayerActor::GetAddress(const std::string& func, std::string& addr)
 	{
-		const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
+		const RpcMethodConfig * methodConfig = SrvRpcConfig::Inst()->GetMethodConfig(func);
 		if(methodConfig == nullptr)
 		{
 			return XCode::NotFoundRpcConfig;
@@ -128,5 +128,10 @@ namespace Tendo
 		jsonWriter.EndObject();
 		jsonWriter.Add("time").Add(Helper::Time::NowSecTime());
 		jsonWriter.WriterStream(json);
+	}
+
+	void PlayerActor::OnWriteRpcHead(const std::string& func, Msg::Head& head) const
+	{
+		head.Add("id", this->GetActorId());
 	}
 }

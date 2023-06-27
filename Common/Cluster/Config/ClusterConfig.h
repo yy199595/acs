@@ -7,8 +7,8 @@
 #include<vector>
 #include<unordered_map>
 #include<unordered_set>
-#include"Server/Config/TextConfig.h"
 #include"rapidjson/document.h"
+#include"Config/Base/JsonConfig.h"
 #include"Core/Singleton/Singleton.h"
 namespace Tendo
 {
@@ -39,14 +39,14 @@ namespace Tendo
 
 namespace Tendo
 {
-    class ClusterConfig : public TextConfig, public ConstSingleton<ClusterConfig>
+    class ClusterConfig : public JsonConfig, public ConstSingleton<ClusterConfig>
     {
     public:
-        ClusterConfig() : TextConfig("ClusterConfig") { }
+        ClusterConfig() : JsonConfig("ClusterConfig") { }
 
     private:
-        bool OnLoadText(const char *str, size_t length) final;
-        bool OnReloadText(const char *str, size_t length) final;
+		bool OnLoadJson(rapidjson::Document &document) final;
+		bool OnReLoadJson(rapidjson::Document &document) final;
     public:
         const NodeConfig * GetConfig() const;
         const NodeConfig * GetConfig(const std::string & name) const;

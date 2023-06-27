@@ -12,16 +12,7 @@
 using namespace Tendo;
 
 #define DUMP_STACK_DEPTH_MAX 100
-void Debug::Lua(const char *log)
-{
-    std::string logMessage(log);
-    size_t pos = logMessage.find_last_of('/');
-    if (pos != std::string::npos)
-    {
-        logMessage = logMessage.substr(pos + 1);
-    }
-    Debug::Log(Debug::Level::err, logMessage);
-}
+
 
 void Debug::LuaError(const char* str)
 {

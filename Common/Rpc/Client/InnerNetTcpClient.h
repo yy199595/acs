@@ -28,8 +28,7 @@ namespace Tendo
 		void StartClose();
 		void StartReceive();
 		bool IsClient() const { return this->mIsClient; }
-		bool Send(const std::shared_ptr<Msg::Packet>& message, bool async = true);
-		std::shared_ptr<Msg::Packet> Call(const std::shared_ptr<Msg::Packet>& message); //同步读取
+		void Send(const std::shared_ptr<Msg::Packet>& message);
 	 private:
         void Update();
         void CloseSocket(int code);

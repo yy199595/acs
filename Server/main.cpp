@@ -25,12 +25,14 @@
 #include"Common/Service/Login.h"
 #include"Registry/Component/RegistryComponent.h"
 
-#include"Component/ClientComponent.h"
 #include"Kcp/Component/KcpComponent.h"
 
 #include"Mongo/Service/MongoDB.h"
 #include"Mongo/Component/MongoDBComponent.h"
 #include"Mongo/Component/MongoHelperComponent.h"
+
+#include"Registry/Target/MongoRegistryComponent.h"
+#include"Registry/Target/RedisRegistryComponent.h"
 
 #ifdef __ENABLE_MYSQL__
 #include"Mysql/Service/MysqlDB.h"
@@ -45,7 +47,7 @@
 #include"Sqlite/Component/SqliteComponent.h"
 
 #include"WatchDog/Service/WatchDog.h"
-#include"Registry/Service/ActorRegistry.h"
+#include"Registry/Service/ServerRegistry.h"
 #include"WatchDog/Component/WatchDogComponent.h"
 
 #include"Server/Config/ServerConfig.h"
@@ -83,6 +85,9 @@ void RegisterComponent()
     ComponentFactory::Add<MongoDBComponent>("MongoDBComponent");
     ComponentFactory::Add<MongoHelperComponent>("MongoHelperComponent");
 
+	ComponentFactory::Add<RedisRegistryComponent>("RedisRegistryComponent");
+	ComponentFactory::Add<MongoRegistryComponent>("MongoRegistryComponent");
+
 #ifdef __ENABLE_MYSQL__
     ComponentFactory::Add<MysqlDBComponent>("MysqlDBComponent");
     ComponentFactory::Add<MysqlHelperComponent>("MysqlHelperComponent");
@@ -97,7 +102,6 @@ void RegisterComponent()
 
 // lua
     ComponentFactory::Add<LuaComponent>("LuaScriptComponent");
-    ComponentFactory::Add<Client::ClientComponent>("ClientComponent");
 }
 
 void RegisterAll()
@@ -109,7 +113,7 @@ void RegisterAll()
 	ComponentFactory::Add<Login>("Login");
 	ComponentFactory::Add<MongoDB>("MongoDB");
 	ComponentFactory::Add<WatchDog>("WatchDog");
-	ComponentFactory::Add<ActorRegistry>("ActorRegistry");
+	ComponentFactory::Add<ServerRegistry>("ServerRegistry");
 
 #ifdef __ENABLE_MYSQL__
     ComponentFactory::Add<MysqlDB>("MysqlDB");
@@ -122,12 +126,16 @@ int main(int argc, char **argv)
 	system("chcp 65001 > nul");
 #endif
 	RegisterAll();
+	std::string path;
 	ServerConfig config;
 	System::Init(argc, argv);
-	if (!config.LoadConfig(System::ConfigPath()))
+	if (System::GetEnv("config", path) && config.LoadConfig(path))
 	{
-		CONSOLE_LOG_FATAL("load config error")
-		return -1;
+#ifdef __OS_WIN__
+		SetConsoleTitle(config.Name().c_str());
+#endif
+		return std::make_shared<App>(&config)->Run();
 	}
-	return std::make_shared<App>(&config)->Run();
+	CONSOLE_LOG_ERROR("start server fail please check config");
+	return -1;
 }

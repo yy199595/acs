@@ -5,6 +5,7 @@
 #ifndef GAMEKEEPER_TCPCLIENT_H
 #define GAMEKEEPER_TCPCLIENT_H
 #include<list>
+#include<queue>
 #include"SocketProxy.h"
 
 namespace Tcp
@@ -31,9 +32,9 @@ namespace Tcp
 		void ReceiveLine();
 		void ReceiveSomeMessage();
 		void ReceiveMessage(int size);
-        void Write(std::shared_ptr<ProtoMessage> message);
-		template<typename T>
-		std::shared_ptr<T> Cast() { return std::dynamic_pointer_cast<T>(this->shared_from_this());}
+        void Write(const std::shared_ptr<ProtoMessage>& message);
+//		template<typename T>
+//		std::shared_ptr<T> Cast() { return std::dynamic_pointer_cast<T>(this->shared_from_this());}
 	 protected:
 		bool ConnectSync(); //同步连接
 		size_t RecvLineSync(); //同步读一行
@@ -65,7 +66,7 @@ namespace Tcp
 		const size_t mMaxCount;
 		long long mLastOperTime;
 		std::unique_ptr<asio::steady_timer> mTimer;
-        std::list<std::shared_ptr<ProtoMessage>> mMessageQueue;
+        std::queue<std::shared_ptr<ProtoMessage>> mMessageQueue;
 	};
 }
 

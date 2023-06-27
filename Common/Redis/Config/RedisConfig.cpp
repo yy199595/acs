@@ -3,6 +3,7 @@
 //
 
 #include"RedisConfig.h"
+#include"Core/System/System.h"
 #include"rapidjson/document.h"
 #include"Util/String/StringHelper.h"
 namespace Tendo
@@ -48,7 +49,7 @@ namespace Tendo
 		if (jsonData.HasMember("script"))
 		{
 			this->mConfig.Script = jsonData["script"].GetString();
-			this->mConfig.Script = this->WorkPath() + this->mConfig.Script;
+			System::SubValue(this->mConfig.Script);
 		}
 		return true;
 	}

@@ -2,7 +2,7 @@
 #include"Network/Tcp/Asio.h"
 #include"Core/Singleton/Singleton.h"
 #include"Server/Config/ServerConfig.h"
-#include"Server/Config/ServiceConfig.h"
+#include"Rpc/Config/ServiceConfig.h"
 #include"Timer/Component/TimerComponent.h"
 #include"Async/Component/CoroutineComponent.h"
 #include"Entity/Component/ActorComponent.h"
@@ -40,13 +40,13 @@ namespace Tendo
 		inline bool IsMainContext(const Asio::Context * io) const { return this->mMainContext.get() == io;}
 	 public:
 		int Run();
+		bool Hotfix();
 		void Stop(int signum);
+		bool AddWatch(const std::string & name);
+		void GetWatch(std::vector<std::string> & servers) const;
         bool OnDelComponent(Component *component) final { return false; }
         inline bool IsMainThread() const { return this->mThreadId == std::this_thread::get_id();}
     private:
-#ifdef __OS_WIN__
-		void UpdateConsoleTitle();
-#endif
 		bool LoadComponent();
 		bool InitComponent();
 		void StartAllComponent();
@@ -63,6 +63,7 @@ namespace Tendo
 		CoroutineComponent* mTaskComponent;
 		ProtoComponent * mMessageComponent;
 		ActorComponent * mActorComponent;
+		std::unordered_set<std::string> mWatchList;
 		std::unique_ptr<Asio::Context> mMainContext;
     };
 }// namespace Sentry

@@ -50,16 +50,37 @@ namespace Tendo
 			LOG_ERROR("not find listen config " << name)
 			return false;
 		}
-		this->mListenPort = 0;
+		this->mListenPort = port;
 #ifdef __DEBUG__
 		ElapsedTimer elapsedTimer;
 #endif
+		LOG_CHECK_RET_FALSE(this->mThreadComponent);
+		Asio::Context& io = this->mThreadComponent->GetContext();
+#ifdef ONLY_MAIN_THREAD
+		try
+		{
+			Asio::EndPoint ep(asio::ip::address(), this->mListenPort);
+			this->mBindAcceptor = std::make_unique<Asio::Acceptor>(io);
+
+			this->mBindAcceptor->open(ep.protocol());
+			this->mBindAcceptor->bind(ep);
+			this->mBindAcceptor->listen();
+
+			this->StartAccept();
+			LOG_INFO(this->GetName() << " listen [" << port << "] successful use " << elapsedTimer.GetMs() << " ms")
+			return true;
+		}
+		catch (std::system_error& err)
+		{
+			CONSOLE_LOG_ERROR(fmt::format("{0}  listen [{1}] failure {2}", this->GetName(), this->mListenPort, err.what()));
+			return false;
+		}
+
+#else
 		std::mutex mutex;
 		bool IsListen = false;
-		this->mListenPort = port;
 		std::chrono::milliseconds ms(2);
 		std::condition_variable variable;
-		Asio::Context& io = this->mThreadComponent->GetContext();
 		std::shared_ptr<Asio::Timer> timer(new Asio::Timer(io, ms));
 		timer->async_wait([this, &io, &mutex, &variable, &IsListen](const asio::error_code & ec)
 		{
@@ -67,12 +88,12 @@ namespace Tendo
 			try
 			{
 				this->mBindAcceptor = std::make_unique<Asio::Acceptor>(io);
-				Asio::EndPoint ep(asio::ip::address_v4(), this->mListenPort);
+				Asio::EndPoint ep(asio::ip::address(), this->mListenPort);
 
 				this->mBindAcceptor->open(ep.protocol());
 				this->mBindAcceptor->bind(ep);
 				this->mBindAcceptor->listen();
-				io.post(std::bind(&TcpListenerComponent::ListenConnect, this));
+				io.post([this]() { this->StartAccept(); });
 				IsListen = true;
 			}
 			catch (std::system_error& err)
@@ -92,36 +113,45 @@ namespace Tendo
 		}
 #endif
 		return IsListen;
+#endif
 	}
-	void TcpListenerComponent::ListenConnect()
+	void TcpListenerComponent::StartAccept()
 	{
-        std::shared_ptr<Tcp::SocketProxy> socketProxy
-            = this->mThreadComponent->CreateSocket();
+		std::shared_ptr<Tcp::SocketProxy> socketProxy
+				= this->mThreadComponent->CreateSocket();
 		this->mBindAcceptor->async_accept(socketProxy->GetSocket(),
-			[this, socketProxy](const asio::error_code & code)
-		{
-			Asio::Context & main = this->mApp->MainThread();
-			if(code == asio::error::operation_aborted) //强制取消
-            {
-				asio::error_code ec;
-                this->mBindAcceptor->close(ec);
-				main.post(std::bind(&TcpListenerComponent::OnStopListen, this));
-				CONSOLE_LOG_ERROR("close listen " << this->GetName() << " [" << this->mListenPort << "]")
-				return;
-            }
-			if (code)
-			{
-                socketProxy->Close();
-				CONSOLE_LOG_FATAL(this->GetName() << " " << code.message())
-			}
-			else
-			{
-                socketProxy->Init();
-                this->mListenCount++;
-				main.post(std::bind(&TcpListenerComponent::OnListen, this, socketProxy));
-				CONSOLE_LOG_DEBUG(socketProxy->GetAddress() << " connect to " << this->GetName())
-            }
-			this->ListenConnect();
-		});
+				[this, socketProxy](const asio::error_code& code)
+				{
+					Asio::Context& main = this->mApp->MainThread();
+					if (code == asio::error::operation_aborted) //强制取消
+					{
+						asio::error_code ec;
+						this->mBindAcceptor->close(ec);
+#ifdef ONLY_MAIN_THREAD
+						this->OnStopListen();
+#else
+						main.post(std::bind(&TcpListenerComponent::OnStopListen, this));
+#endif
+						CONSOLE_LOG_ERROR("close listen " << this->GetName() << " [" << this->mListenPort << "]")
+						return;
+					}
+					if (code)
+					{
+						socketProxy->Close();
+						CONSOLE_LOG_FATAL(this->GetName() << " " << code.message())
+					}
+					else
+					{
+						socketProxy->Init();
+						this->mListenCount++;
+#ifdef ONLY_MAIN_THREAD
+						this->OnListen(socketProxy);
+#else
+						main.post(std::bind(&TcpListenerComponent::OnListen, this, socketProxy));
+#endif
+						CONSOLE_LOG_DEBUG(socketProxy->GetAddress() << " connect to " << this->GetName())
+					}
+					this->StartAccept();
+				});
 	}
 }

@@ -50,4 +50,7 @@ XCode =
 	NotFoundPlayerRpcAddress = 47,--找不到玩家所在服务器地址
 	NotFoundActor = 48,--找不到Actor
 	NotFoundActorAddress = 49,--找不到actor地址
+	AccountPasswordError = 50,--账号不存在或者密码错误
+	PlayerOnLine = 51,--玩家已经在线
+	PlayerNotOnLine = 52,--玩家不在线
 }

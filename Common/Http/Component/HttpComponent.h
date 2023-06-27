@@ -34,7 +34,7 @@ namespace Tendo
         bool LateAwake() final;
 		void OnTaskComplete(int key) final;
 		std::shared_ptr<HttpRequestClient> CreateClient();
-		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
+		void OnLuaRegister(Lua::ModuleClass &luaRegister, std::string &name) final;
 	 private:
         class ThreadComponent * mNetComponent;
 		std::queue<std::shared_ptr<HttpRequestClient>> mClientPools;

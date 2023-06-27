@@ -82,9 +82,9 @@ namespace Tendo
 	{
 		LuaServiceTaskSource* luaServiceTaskSource =
 			Lua::UserDataParameter::Read<LuaServiceTaskSource*>(lua, 1);
-		luaServiceTaskSource->mCode = (int)luaL_checkinteger(lua, 2);
 		if (luaServiceTaskSource->mHttpData != nullptr)
 		{
+			luaServiceTaskSource->mCode = (int)luaL_checkinteger(lua, 2);
 			if (lua_istable(lua, 3))
 			{
 				std::string data;

@@ -1,7 +1,7 @@
 {
     "fps": 15,
     "id" : 200,
-    "name": "DataServer",
+    "name": "Chat",
     "thread": {
         "task": 1,
         "network": 4
@@ -26,15 +26,18 @@
         "name": "root",
         "passwd": "199595yjz."
     },
-    "registry": "tcp://127.0.0.1:7788",
+    "center": "tcp://127.0.0.1:7788",
     "listen": {
         "rpc": "tcp://127.0.0.1:7791"
     },
     "lua": {
-        "path": [
+        "require": [
             "${WORK_PATH}/script/Common",
             "${WORK_PATH}/script/Server",
             "${WORK_PATH}/script/Component"
+        ],
+        "loadfile": [
+            "${WORK_PATH}/script/Common"
         ]
     },
     "white_list": [

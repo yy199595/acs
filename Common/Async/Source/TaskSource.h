@@ -116,12 +116,8 @@ namespace Tendo
     template<typename T>
     bool TaskSource<std::shared_ptr<T>>::SetResult(std::shared_ptr<T> data)
     {
-        if(this->ResumeTask())
-        {
-            this->mData = data;
-            return true;
-        }
-        return false;
+		this->mData = data;
+		return this->ResumeTask();
     }
 }
 

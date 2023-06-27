@@ -157,6 +157,19 @@ namespace Helper
 		return true;
     }
 
+	bool Str::SplitAddr(const std::string& address, std::string& ip, unsigned short& port)
+	{
+		std::smatch match;
+		std::regex pattern(R"((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d+))");
+		if (!std::regex_search(address, match, pattern))
+		{
+			return false;
+		}
+		ip = match[1].str();
+		port = (unsigned short)std::stoi(match[2].str());
+		return true;
+	}
+
 	bool Str::IsIpAddress(const std::string& str)
 	{
 		std::regex pattern("^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$");

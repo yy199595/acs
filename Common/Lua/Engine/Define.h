@@ -2,7 +2,7 @@
 // Created by MyPC on 2023/4/12.
 //
 
-#pragma once;
+#pragma once
 
 extern "C" {
 #include <lauxlib.h>

@@ -9,6 +9,10 @@ endif()
 add_definitions(-w) #忽略警告
 add_definitions(-D ASIO_STANDALONE)
 
+if(MSVC)
+    add_definitions(-D _WIN32_WINNT=0x0601)
+    add_compile_options(/W4 /wd4100 /wd4127 /wd4819)
+endif()
 
 #option(protobuf_BUILD_TESTS OFF)
 #option(protobuf_BUILD_EXAMPLES OFF)
@@ -23,18 +27,26 @@ endif()
 
 option(__DEBUG_STACK__ "开启堆栈打印" ON)
 option(__RPC_MESSAGE__ "打印rpc消息" ON)
-option(ONLY_MAIN_THREAD "启用单线程模式" OFF)
+option(ONLY_MAIN_THREAD "启用单线程模式" ON)
 option(__NET_ERROR_LOG__ "打印网络层错误" ON)
+option(__COR_SHARED_STACK__ "使用共享栈" ON)
+
 
 set(CMAKE_COMMON_DIR ${PROJECT_SOURCE_DIR})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 message("================ [" ${CMAKE_BUILD_TYPE} "] ==============")
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-D __DEBUG__)
+    add_definitions(-D __APP_HOTFIX__)
     if(__RPC_MESSAGE__)
         message("打印rpc消息")
         add_definitions(-D __RPC_MESSAGE__)
     endif()
+endif()
+
+if(__COR_SHARED_STACK__)
+    message("协程使用共享栈")
+    add_definitions(-D __COR_SHARED_STACK__)
 endif()
 
 if(ONLY_MAIN_THREAD)

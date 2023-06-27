@@ -65,11 +65,10 @@ namespace Tendo
 			case Msg::Type::Ping:
 			{
 				message->SetContent("hello");
-				message->SetType(Msg::Type::Response);
-				this->Send(address, message);
+				this->Send(address, XCode::Successful, message);
 				break;
 			}
-			default:
+			case Msg::Type::Request:
 			{
 				long long userId = 0;
 				if (this->GetUserId(address, userId))
@@ -79,6 +78,9 @@ namespace Tendo
 				this->mMessages.push(std::move(message));
 				break;
 			}
+			default:
+			LOG_ERROR("unknown message " << message->ToString());
+				break;
 		}
 	}
 
@@ -91,13 +93,14 @@ namespace Tendo
 				long long userId = 0;
 				message->GetHead().Get("id", userId);
 				int code = this->OnRequest(userId, message);
-				if(code != XCode::Successful && message->GetHead().Has("rpc"))
+				if(code != XCode::Successful)
 				{
-					message->Clear();
-					message->GetHead().Remove("func");
-					message->SetType(Msg::Type::Response);
-					message->GetHead().Add("code", code);
-					this->Send(message->From(), message);
+					this->Send(message->From(), code, message);
+#ifdef __DEBUG__
+					std::string func;
+					message->GetHead().Get("func", func);
+					LOG_ERROR(userId << " call " << func << " code : " << CodeConfig::Inst()->GetDesc(code));
+#endif
 				}
 			}
 			this->mMessages.pop();
@@ -107,23 +110,33 @@ namespace Tendo
 	int OuterNetComponent::OnRequest(long long userId, std::shared_ptr<Msg::Packet>& message)
 	{
 		const std::string & fullName = message->GetHead().GetStr("func");
-		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
+		const RpcMethodConfig* methodConfig = SrvRpcConfig::Inst()->GetMethodConfig(fullName);
 		if (methodConfig == nullptr || !methodConfig->IsClient || !methodConfig->IsOpen)
 		{
 			return XCode::CallFunctionNotExist;
 		}
 		std::string target;
-		const std::string & server = methodConfig->Server;
-		Actor * player = this->mApp->ActorMgr()->GetActor(userId);
-		if(player == nullptr)
+		if(userId == 0)
 		{
-			return XCode::NotFindUser;
+			if(!this->mApp->GetListen("rpc", target))
+			{
+				return XCode::NotFoundServerRpcAddress;
+			}
 		}
-		if(!player->GetAddress(server, target))
+		else
 		{
-			return XCode::NotFoundPlayerRpcAddress;
+			const std::string& server = methodConfig->Server;
+			PlayerActor* player = this->mApp->ActorMgr()->GetPlayer(userId);
+			if (player == nullptr)
+			{
+				return XCode::NotFindUser;
+			}
+			if (!player->GetAddress(server, target))
+			{
+				return XCode::NotFoundPlayerRpcAddress;
+			}
+			message->GetHead().Add("id", userId);
 		}
-		message->GetHead().Add("id", userId);
 		message->GetHead().Add("cli", message->From());
 #ifdef __DEBUG__
 		int rpcId = 0;
@@ -134,11 +147,7 @@ namespace Tendo
 		}
 #endif // __DEBUG__
 		this->mWaitCount++;
-		if(!this->mInnerNetComponent->Send(target, message))
-		{
-			return XCode::NetWorkError;
-		}
-		return XCode::Successful;
+		return this->mInnerNetComponent->Send(target, message);
 	}
 
 	bool OuterNetComponent::Send(const std::string& address, const std::shared_ptr<Msg::Packet>& message)
@@ -172,6 +181,19 @@ namespace Tendo
 		}
 		iter->second->SendData(message);
 		return true;
+	}
+
+	bool OuterNetComponent::Send(const std::string& address, int code, const std::shared_ptr<Msg::Packet>& message)
+	{
+		if(message->GetHead().Has("rpc"))
+		{
+			message->Clear();
+			message->GetHead().Remove("func");
+			message->SetType(Msg::Type::Response);
+			message->GetHead().Add("code", code);
+			return this->Send(message->From(), message);
+		}
+		return false;
 	}
 
     void OuterNetComponent::OnListen(std::shared_ptr<Tcp::SocketProxy> socket)

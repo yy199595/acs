@@ -5,23 +5,24 @@
 #include"Message.h"
 #include"Util/Math/MathHelper.h"
 #include"Proto/Include/Message.h"
+#include"Util/Json/JsonWriter.h"
 namespace Msg
 {
     bool Head::Add(const std::string& key, int value)
     {
-        auto iter = this->find(key);
-        if(iter != this->end())
+        auto iter = this->mItems.find(key);
+        if(iter != this->mItems.end())
         {
             return false;
         }
-        this->emplace(key, std::to_string(value));
+        this->mItems.emplace(key, std::to_string(value));
         return true;
     }
 
     bool Head::Get(std::vector<std::string> &keys) const
     {
-        auto iter = this->begin();
-        for(; iter != this->end(); iter++)
+        auto iter = this->mItems.begin();
+        for(; iter != this->mItems.end(); iter++)
         {
             keys.emplace_back(iter->first);
         }
@@ -31,8 +32,8 @@ namespace Msg
 
     bool Head::Get(const std::string &key, int &value) const
     {
-        auto iter = this->find(key);
-        if(iter == this->end())
+        auto iter = this->mItems.find(key);
+        if(iter == this->mItems.end())
         {
             return false;
         }
@@ -47,8 +48,8 @@ namespace Msg
 
     bool Head::Get(const std::string &key, long long &value) const
     {
-        auto iter = this->find(key);
-        if(iter == this->end())
+        auto iter = this->mItems.find(key);
+        if(iter == this->mItems.end())
         {
             return false;
         }
@@ -63,25 +64,25 @@ namespace Msg
 
     bool Head::Has(const std::string &key) const
     {
-        auto iter = this->find(key);
-        return iter != this->end();
+        auto iter = this->mItems.find(key);
+        return iter != this->mItems.end();
     }
 
     bool Head::Remove(const std::string &key)
     {
-        auto iter = this->find(key);
-        if(iter == this->end())
+        auto iter = this->mItems.find(key);
+        if(iter == this->mItems.end())
         {
             return false;
         }
-        this->erase(iter);
+        this->mItems.erase(iter);
         return true;
     }
 
     bool Head::Get(const std::string& key, std::string& value) const
     {
-        auto iter = this->find(key);
-        if(iter == this->end())
+        auto iter = this->mItems.find(key);
+        if(iter == this->mItems.end())
         {
             return false;
         }
@@ -92,15 +93,15 @@ namespace Msg
     const std::string& Head::GetStr(const std::string& key) const
     {
         static std::string empty;
-        auto iter = this->find(key);
-        return iter != this->end() ? iter->second : empty;
+        auto iter = this->mItems.find(key);
+        return iter != this->mItems.end() ? iter->second : empty;
     }
 
     size_t Head::Parse(std::istream& os)
     {
-        this->clear();
         size_t len = 0;
-        std::string line, key, value;
+		this->mItems.clear();
+		std::string line, key, value;
         while (std::getline(os, line))
         {
             len += (line.size() + 1);
@@ -115,7 +116,7 @@ namespace Msg
             }
             key = line.substr(0, pos);
             value = line.substr(pos + 1);
-            this->emplace(key, value);
+            this->mItems.emplace(key, value);
             line.clear();
         }
         return len;
@@ -124,8 +125,8 @@ namespace Msg
     size_t Head::GetLength() const
     {
         size_t len = 0;
-        auto iter = this->begin();
-        for (; iter != this->end(); iter++)
+        auto iter = this->mItems.begin();
+        for (; iter != this->mItems.end(); iter++)
         {
             len += (iter->first.size() + 1);
             len += (iter->second.size() + 1);
@@ -135,8 +136,8 @@ namespace Msg
 
     bool Head::Serialize(std::ostream& os) const
     {
-        auto iter = this->begin();
-        for(; iter != this->end(); iter++)
+        auto iter = this->mItems.begin();
+        for(; iter != this->mItems.end(); iter++)
         {
             os.write(iter->first.c_str(), iter->first.size()) << '=';
             os.write(iter->second.c_str(), iter->second.size()) << '\n';
@@ -147,23 +148,23 @@ namespace Msg
 
     bool Head::Add(const std::string& key, long long value)
     {
-        auto iter = this->find(key);
-        if(iter != this->end())
+        auto iter = this->mItems.find(key);
+        if(iter != this->mItems.end())
         {
             return false;
         }
-        this->emplace(key, std::to_string(value));
+        this->mItems.emplace(key, std::to_string(value));
         return true;
     }
 
     bool Head::Add(const std::string& key, const std::string& value)
     {
-        auto iter = this->find(key);
-        if(iter != this->end())
+        auto iter = this->mItems.find(key);
+        if(iter != this->mItems.end())
         {
             return false;
         }
-        this->emplace(key, value);
+        this->mItems.emplace(key, value);
         return true;
     }
 
@@ -173,7 +174,7 @@ namespace Msg
         {
             int len;
             char buf[sizeof(int)];
-        } buffer;
+        } buffer{};
         if (is.readsome(buffer.buf, sizeof(int)) != sizeof(int))
         {
             return false;
@@ -247,21 +248,18 @@ namespace Msg
     }
 
     int Packet::Serialize(std::ostream &os)
-    {
-        union
-        {
-            int len = 0;
-            char buf[sizeof(int)];
-        } buffer;
-        buffer.len = this->mHead.GetLength() + this->mBody.size();
+	{
+		char buff[sizeof(this->mLen)] = { };
+		this->mLen = this->mHead.GetLength() + this->mBody.size();
 
-        os.write(buffer.buf, sizeof(int));
-        os << (char) this->mType << (char) this->mProto;
+		memcpy(buff, &this->mLen, sizeof(this->mLen));
+		os.write(buff, sizeof(this->mLen));
+		os << (char)this->mType << (char)this->mProto;
 
-        this->mHead.Serialize(os);
-        os.write(this->mBody.c_str(), this->mBody.size());
-        return 0;
-    }
+		this->mHead.Serialize(os);
+		os.write(this->mBody.c_str(), this->mBody.size());
+		return 0;
+	}
 
     void Packet::SetContent(const std::string & content)
     {
@@ -303,6 +301,35 @@ namespace Msg
 			LOG_ERROR("unknown message proto : " << this->mProto);
 				return false;
 		}
+	}
+
+	std::string Packet::ToString()
+	{
+		Json::Writer jsonWriter;
+		jsonWriter.BeginObject("head");
+		for(const auto & item : this->mHead)
+		{
+			jsonWriter.Add(item.first).Add(item.second);
+		}
+		jsonWriter.EndObject();
+		switch(this->mProto)
+		{
+			case Msg::Porto::String:
+				jsonWriter.Add("data").Add(this->mBody);
+				break;
+			case Msg::Porto::Json:
+			{
+				rapidjson::Document document;
+				document.Parse(this->mBody.c_str(), this->mBody.size());
+				jsonWriter.Add("data").Add(document);
+				break;
+			}
+			case Msg::Porto::Protobuf:
+			{
+				break;
+			}
+		}
+		return jsonWriter.JsonString();
 	}
 
 

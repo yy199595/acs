@@ -3,7 +3,7 @@
 #include<memory>
 namespace Lua
 {
-    class ClassProxyHelper;
+    class ModuleClass;
 }
 namespace Json
 {
@@ -69,49 +69,17 @@ namespace Tendo
 		virtual void OnEvent(const T * message) = 0;
 	};
 
-	class DisConnectEvent
-	{
-	public:
-		std::string Addr;
-		static constexpr char * Name = "";
-	};
-
 	class ILuaRegister
 	{
 	public:
-		virtual void OnLuaRegister(Lua::ClassProxyHelper& luaRegister) = 0;
+		virtual void OnLuaRegister(Lua::ModuleClass& luaRegister, std::string & name) = 0;
 	};
 
 	class IHotfix
 	{
 	public:
-		virtual void OnHotFix() = 0;
+		virtual bool OnHotFix() = 0;
 	};
-
-	class ILoadConfig
-	{
-	public:
-		virtual bool OnLoadConfig() = 0;
-	};
-
-	class IZeroRefresh
-	{
-	public:
-		virtual void OnZeroRefresh() = 0;
-		virtual void GetRefreshTime(int& hour, int& min)
-		{
-			hour = 0;
-			min = 0;
-		}
-	};
-
-    class IServiceUnitSystem
-    {
-    public:
-        virtual void OnLogin(long long userId) = 0;
-        virtual void OnLogout(long long userId) = 0;
-    };
-
 
 	template<typename T1, typename T2>
 	class IService
@@ -124,7 +92,7 @@ namespace Tendo
 	class IRpc
 	{
 	public:
-        virtual ~IRpc() { }
+        virtual ~IRpc() = default;
 		virtual void OnTimeout(const std::string & address) { }
 		virtual void StartClose(const std::string& address) { };
 		virtual void OnConnectSuccessful(const std::string & address) { }
@@ -147,12 +115,6 @@ namespace Tendo
         virtual void OnRecord(Json::Writer & document) = 0;
     };
 
-	class IClient
-	{
-	 public:
-		virtual void OnLogin(long long userId) = 0;
-		virtual void OnLogout(long long userId) = 0;
-	};
 	class SocketProxy;
 	extern std::string GET_FUNC_NAME(const std::string& fullName);
 }

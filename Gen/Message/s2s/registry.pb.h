@@ -41,7 +41,7 @@ struct TableStruct_s2s_2fregistry_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[4]
+  static const ::google::protobuf::internal::ParseTable schema[3]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -49,9 +49,6 @@ struct TableStruct_s2s_2fregistry_2eproto {
 };
 void AddDescriptors_s2s_2fregistry_2eproto();
 namespace registry {
-class actor;
-class actorDefaultTypeInternal;
-extern actorDefaultTypeInternal _actor_default_instance_;
 class query;
 class queryDefaultTypeInternal;
 extern queryDefaultTypeInternal _query_default_instance_;
@@ -64,7 +61,6 @@ extern query_responseDefaultTypeInternal _query_response_default_instance_;
 }  // namespace registry
 namespace google {
 namespace protobuf {
-template<> ::registry::actor* Arena::CreateMaybeMessage<::registry::actor>(Arena*);
 template<> ::registry::query* Arena::CreateMaybeMessage<::registry::query>(Arena*);
 template<> ::registry::query_request* Arena::CreateMaybeMessage<::registry::query_request>(Arena*);
 template<> ::registry::query_response* Arena::CreateMaybeMessage<::registry::query_response>(Arena*);
@@ -73,148 +69,6 @@ template<> ::registry::query_response* Arena::CreateMaybeMessage<::registry::que
 namespace registry {
 
 // ===================================================================
-
-class actor :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:registry.actor) */ {
- public:
-  actor();
-  virtual ~actor();
-
-  actor(const actor& from);
-
-  inline actor& operator=(const actor& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  actor(actor&& from) noexcept
-    : actor() {
-    *this = ::std::move(from);
-  }
-
-  inline actor& operator=(actor&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const actor& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const actor* internal_default_instance() {
-    return reinterpret_cast<const actor*>(
-               &_actor_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    0;
-
-  void Swap(actor* other);
-  friend void swap(actor& a, actor& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline actor* New() const final {
-    return CreateMaybeMessage<actor>(nullptr);
-  }
-
-  actor* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<actor>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const actor& from);
-  void MergeFrom(const actor& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(actor* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // string name = 1;
-  void clear_name();
-  static const int kNameFieldNumber = 1;
-  const ::std::string& name() const;
-  void set_name(const ::std::string& value);
-  #if LANG_CXX11
-  void set_name(::std::string&& value);
-  #endif
-  void set_name(const char* value);
-  void set_name(const char* value, size_t size);
-  ::std::string* mutable_name();
-  ::std::string* release_name();
-  void set_allocated_name(::std::string* name);
-
-  // string actor_json = 3;
-  void clear_actor_json();
-  static const int kActorJsonFieldNumber = 3;
-  const ::std::string& actor_json() const;
-  void set_actor_json(const ::std::string& value);
-  #if LANG_CXX11
-  void set_actor_json(::std::string&& value);
-  #endif
-  void set_actor_json(const char* value);
-  void set_actor_json(const char* value, size_t size);
-  ::std::string* mutable_actor_json();
-  ::std::string* release_actor_json();
-  void set_allocated_actor_json(::std::string* actor_json);
-
-  // int64 actor_id = 2;
-  void clear_actor_id();
-  static const int kActorIdFieldNumber = 2;
-  ::google::protobuf::int64 actor_id() const;
-  void set_actor_id(::google::protobuf::int64 value);
-
-  // @@protoc_insertion_point(class_scope:registry.actor)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr name_;
-  ::google::protobuf::internal::ArenaStringPtr actor_json_;
-  ::google::protobuf::int64 actor_id_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_s2s_2fregistry_2eproto;
-};
-// -------------------------------------------------------------------
 
 class query_request :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:registry.query.request) */ {
@@ -254,7 +108,7 @@ class query_request :
                &_query_request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    0;
 
   void Swap(query_request* other);
   friend void swap(query_request& a, query_request& b) {
@@ -311,9 +165,9 @@ class query_request :
 
   // accessors -------------------------------------------------------
 
-  // string name = 1;
+  // string name = 2;
   void clear_name();
-  static const int kNameFieldNumber = 1;
+  static const int kNameFieldNumber = 2;
   const ::std::string& name() const;
   void set_name(const ::std::string& value);
   #if LANG_CXX11
@@ -325,11 +179,11 @@ class query_request :
   ::std::string* release_name();
   void set_allocated_name(::std::string* name);
 
-  // int64 actor_id = 2;
-  void clear_actor_id();
-  static const int kActorIdFieldNumber = 2;
-  ::google::protobuf::int64 actor_id() const;
-  void set_actor_id(::google::protobuf::int64 value);
+  // int64 id = 1;
+  void clear_id();
+  static const int kIdFieldNumber = 1;
+  ::google::protobuf::int64 id() const;
+  void set_id(::google::protobuf::int64 value);
 
   // @@protoc_insertion_point(class_scope:registry.query.request)
  private:
@@ -337,7 +191,7 @@ class query_request :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr name_;
-  ::google::protobuf::int64 actor_id_;
+  ::google::protobuf::int64 id_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2fregistry_2eproto;
 };
@@ -381,7 +235,7 @@ class query_response :
                &_query_response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    1;
 
   void Swap(query_response* other);
   friend void swap(query_response& a, query_response& b) {
@@ -438,24 +292,34 @@ class query_response :
 
   // accessors -------------------------------------------------------
 
-  // repeated .registry.actor actors = 1;
+  // repeated string actors = 1;
   int actors_size() const;
   void clear_actors();
   static const int kActorsFieldNumber = 1;
-  ::registry::actor* mutable_actors(int index);
-  ::google::protobuf::RepeatedPtrField< ::registry::actor >*
-      mutable_actors();
-  const ::registry::actor& actors(int index) const;
-  ::registry::actor* add_actors();
-  const ::google::protobuf::RepeatedPtrField< ::registry::actor >&
-      actors() const;
+  const ::std::string& actors(int index) const;
+  ::std::string* mutable_actors(int index);
+  void set_actors(int index, const ::std::string& value);
+  #if LANG_CXX11
+  void set_actors(int index, ::std::string&& value);
+  #endif
+  void set_actors(int index, const char* value);
+  void set_actors(int index, const char* value, size_t size);
+  ::std::string* add_actors();
+  void add_actors(const ::std::string& value);
+  #if LANG_CXX11
+  void add_actors(::std::string&& value);
+  #endif
+  void add_actors(const char* value);
+  void add_actors(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField<::std::string>& actors() const;
+  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_actors();
 
   // @@protoc_insertion_point(class_scope:registry.query.response)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField< ::registry::actor > actors_;
+  ::google::protobuf::RepeatedPtrField<::std::string> actors_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2fregistry_2eproto;
 };
@@ -499,7 +363,7 @@ class query :
                &_query_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    2;
 
   void Swap(query* other);
   friend void swap(query& a, query& b) {
@@ -576,133 +440,23 @@ class query :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
-// actor
-
-// string name = 1;
-inline void actor::clear_name() {
-  name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& actor::name() const {
-  // @@protoc_insertion_point(field_get:registry.actor.name)
-  return name_.GetNoArena();
-}
-inline void actor::set_name(const ::std::string& value) {
-  
-  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:registry.actor.name)
-}
-#if LANG_CXX11
-inline void actor::set_name(::std::string&& value) {
-  
-  name_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:registry.actor.name)
-}
-#endif
-inline void actor::set_name(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:registry.actor.name)
-}
-inline void actor::set_name(const char* value, size_t size) {
-  
-  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:registry.actor.name)
-}
-inline ::std::string* actor::mutable_name() {
-  
-  // @@protoc_insertion_point(field_mutable:registry.actor.name)
-  return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* actor::release_name() {
-  // @@protoc_insertion_point(field_release:registry.actor.name)
-  
-  return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void actor::set_allocated_name(::std::string* name) {
-  if (name != nullptr) {
-    
-  } else {
-    
-  }
-  name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
-  // @@protoc_insertion_point(field_set_allocated:registry.actor.name)
-}
-
-// int64 actor_id = 2;
-inline void actor::clear_actor_id() {
-  actor_id_ = PROTOBUF_LONGLONG(0);
-}
-inline ::google::protobuf::int64 actor::actor_id() const {
-  // @@protoc_insertion_point(field_get:registry.actor.actor_id)
-  return actor_id_;
-}
-inline void actor::set_actor_id(::google::protobuf::int64 value) {
-  
-  actor_id_ = value;
-  // @@protoc_insertion_point(field_set:registry.actor.actor_id)
-}
-
-// string actor_json = 3;
-inline void actor::clear_actor_json() {
-  actor_json_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& actor::actor_json() const {
-  // @@protoc_insertion_point(field_get:registry.actor.actor_json)
-  return actor_json_.GetNoArena();
-}
-inline void actor::set_actor_json(const ::std::string& value) {
-  
-  actor_json_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:registry.actor.actor_json)
-}
-#if LANG_CXX11
-inline void actor::set_actor_json(::std::string&& value) {
-  
-  actor_json_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:registry.actor.actor_json)
-}
-#endif
-inline void actor::set_actor_json(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  actor_json_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:registry.actor.actor_json)
-}
-inline void actor::set_actor_json(const char* value, size_t size) {
-  
-  actor_json_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:registry.actor.actor_json)
-}
-inline ::std::string* actor::mutable_actor_json() {
-  
-  // @@protoc_insertion_point(field_mutable:registry.actor.actor_json)
-  return actor_json_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* actor::release_actor_json() {
-  // @@protoc_insertion_point(field_release:registry.actor.actor_json)
-  
-  return actor_json_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void actor::set_allocated_actor_json(::std::string* actor_json) {
-  if (actor_json != nullptr) {
-    
-  } else {
-    
-  }
-  actor_json_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), actor_json);
-  // @@protoc_insertion_point(field_set_allocated:registry.actor.actor_json)
-}
-
-// -------------------------------------------------------------------
-
 // query_request
 
-// string name = 1;
+// int64 id = 1;
+inline void query_request::clear_id() {
+  id_ = PROTOBUF_LONGLONG(0);
+}
+inline ::google::protobuf::int64 query_request::id() const {
+  // @@protoc_insertion_point(field_get:registry.query.request.id)
+  return id_;
+}
+inline void query_request::set_id(::google::protobuf::int64 value) {
+  
+  id_ = value;
+  // @@protoc_insertion_point(field_set:registry.query.request.id)
+}
+
+// string name = 2;
 inline void query_request::clear_name() {
   name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -755,52 +509,77 @@ inline void query_request::set_allocated_name(::std::string* name) {
   // @@protoc_insertion_point(field_set_allocated:registry.query.request.name)
 }
 
-// int64 actor_id = 2;
-inline void query_request::clear_actor_id() {
-  actor_id_ = PROTOBUF_LONGLONG(0);
-}
-inline ::google::protobuf::int64 query_request::actor_id() const {
-  // @@protoc_insertion_point(field_get:registry.query.request.actor_id)
-  return actor_id_;
-}
-inline void query_request::set_actor_id(::google::protobuf::int64 value) {
-  
-  actor_id_ = value;
-  // @@protoc_insertion_point(field_set:registry.query.request.actor_id)
-}
-
 // -------------------------------------------------------------------
 
 // query_response
 
-// repeated .registry.actor actors = 1;
+// repeated string actors = 1;
 inline int query_response::actors_size() const {
   return actors_.size();
 }
 inline void query_response::clear_actors() {
   actors_.Clear();
 }
-inline ::registry::actor* query_response::mutable_actors(int index) {
-  // @@protoc_insertion_point(field_mutable:registry.query.response.actors)
-  return actors_.Mutable(index);
-}
-inline ::google::protobuf::RepeatedPtrField< ::registry::actor >*
-query_response::mutable_actors() {
-  // @@protoc_insertion_point(field_mutable_list:registry.query.response.actors)
-  return &actors_;
-}
-inline const ::registry::actor& query_response::actors(int index) const {
+inline const ::std::string& query_response::actors(int index) const {
   // @@protoc_insertion_point(field_get:registry.query.response.actors)
   return actors_.Get(index);
 }
-inline ::registry::actor* query_response::add_actors() {
-  // @@protoc_insertion_point(field_add:registry.query.response.actors)
+inline ::std::string* query_response::mutable_actors(int index) {
+  // @@protoc_insertion_point(field_mutable:registry.query.response.actors)
+  return actors_.Mutable(index);
+}
+inline void query_response::set_actors(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:registry.query.response.actors)
+  actors_.Mutable(index)->assign(value);
+}
+#if LANG_CXX11
+inline void query_response::set_actors(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:registry.query.response.actors)
+  actors_.Mutable(index)->assign(std::move(value));
+}
+#endif
+inline void query_response::set_actors(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  actors_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:registry.query.response.actors)
+}
+inline void query_response::set_actors(int index, const char* value, size_t size) {
+  actors_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:registry.query.response.actors)
+}
+inline ::std::string* query_response::add_actors() {
+  // @@protoc_insertion_point(field_add_mutable:registry.query.response.actors)
   return actors_.Add();
 }
-inline const ::google::protobuf::RepeatedPtrField< ::registry::actor >&
+inline void query_response::add_actors(const ::std::string& value) {
+  actors_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:registry.query.response.actors)
+}
+#if LANG_CXX11
+inline void query_response::add_actors(::std::string&& value) {
+  actors_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:registry.query.response.actors)
+}
+#endif
+inline void query_response::add_actors(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  actors_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:registry.query.response.actors)
+}
+inline void query_response::add_actors(const char* value, size_t size) {
+  actors_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:registry.query.response.actors)
+}
+inline const ::google::protobuf::RepeatedPtrField<::std::string>&
 query_response::actors() const {
   // @@protoc_insertion_point(field_list:registry.query.response.actors)
   return actors_;
+}
+inline ::google::protobuf::RepeatedPtrField<::std::string>*
+query_response::mutable_actors() {
+  // @@protoc_insertion_point(field_mutable_list:registry.query.response.actors)
+  return &actors_;
 }
 
 // -------------------------------------------------------------------
@@ -810,8 +589,6 @@ query_response::actors() const {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

@@ -22,7 +22,8 @@ namespace Tendo
 		PlayerActor * player = this->mActorComponent->GetPlayer(playerId);
 		if(player == nullptr)
 		{
-			std::shared_ptr<PlayerActor> newPlayer = std::make_shared<PlayerActor>(playerId, id);
+			int gateId = (int)id;
+			std::shared_ptr<PlayerActor> newPlayer = std::make_shared<PlayerActor>(playerId, gateId);
 			{
 				player = newPlayer.get();
 				this->mActorComponent->AddPlayer(newPlayer);
@@ -35,7 +36,12 @@ namespace Tendo
 		Lua::LuaModule * luaModule = this->GetLuaModule();
 		if(luaModule != nullptr)
 		{
-			luaModule->Await("OnPlayerLogin", playerId);
+			int code = luaModule->Await("_OnLogin", playerId);
+			if(code == XCode::CallLuaFunctionFail)
+			{
+				this->mActorComponent->DelActor(playerId);
+				return code;
+			}
 		}
 		return XCode::Successful;
 	}
@@ -47,7 +53,7 @@ namespace Tendo
 		Lua::LuaModule * luaModule = this->GetLuaModule();
 		if(luaModule != nullptr)
 		{
-			luaModule->Await("OnPlayerLogout", playerId);
+			luaModule->Await("_OnLogout", playerId);
 		}
 		return XCode::Successful;
     }

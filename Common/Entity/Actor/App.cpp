@@ -4,6 +4,7 @@
 #include"Server/Config/ServerConfig.h"
 #include"Timer/Timer/ElapsedTimer.h"
 #include"Util/File/DirectoryHelper.h"
+#include"Cluster/Config/ClusterConfig.h"
 #include"Proto/Component/ProtoComponent.h"
 #include"Server/Component/ConfigComponent.h"
 #include"Server/Component/ThreadComponent.h"
@@ -37,18 +38,23 @@ namespace Tendo
 
 	bool App::LoadComponent()
 	{
-		this->mTaskComponent = this->GetOrAddComponent<CoroutineComponent>();
-		this->mLogComponent = this->GetOrAddComponent<LogComponent>();
-		this->mTimerComponent = this->GetOrAddComponent<TimerComponent>();
-		this->mMessageComponent = this->GetOrAddComponent<ProtoComponent>();
-		this->mActorComponent = this->GetOrAddComponent<ActorComponent>();
+		this->AddComponent<LogComponent>();
+		this->AddComponent<TimerComponent>();
+		this->AddComponent<ProtoComponent>();
+		this->AddComponent<ActorComponent>();
+        this->AddComponent<ConfigComponent>();
+        this->AddComponent<ThreadComponent>();
+        this->AddComponent<LaunchComponent>();
+		this->AddComponent<CoroutineComponent>();
 
-        LOG_CHECK_RET_FALSE(this->AddComponent<ConfigComponent>());
-        LOG_CHECK_RET_FALSE(this->AddComponent<ThreadComponent>());
-        LOG_CHECK_RET_FALSE(this->AddComponent<LaunchComponent>());
+		this->mLogComponent = this->GetComponent<LogComponent>();
+		this->mTimerComponent = this->GetComponent<TimerComponent>();
+		this->mActorComponent = this->GetComponent<ActorComponent>();
+		this->mMessageComponent = this->GetComponent<ProtoComponent>();
+		this->mTaskComponent = this->GetComponent<CoroutineComponent>();
 
 		std::string address;
-		if(this->mConfig->GetMember("registry", address))
+		if(this->mConfig->GetMember("center", address))
 		{
 			std::shared_ptr<ServerActor> actor = std::make_shared<ServerActor>(0, "Registry");
 			{
@@ -61,7 +67,6 @@ namespace Tendo
 		this->mConfig->GetListen(listens);
 		for (const std::string& name : listens)
 		{
-			std::string address;
 			const char* key = name.c_str();
 			if (this->mConfig->GetLocation(key, address))
 			{
@@ -72,6 +77,22 @@ namespace Tendo
 		this->mActorComponent->AddServer(this->shared_from_this());
         this->mTaskComponent->Start(&App::StartAllComponent, this);
         return true;
+	}
+
+	bool App::Hotfix()
+	{
+		std::vector<IHotfix *> hotfixComponents;
+		this->GetComponents<IHotfix>(hotfixComponents);
+		for(IHotfix * hotfixComponent : hotfixComponents)
+		{
+			if(!hotfixComponent->OnHotFix())
+			{
+				Component * component = dynamic_cast<Component*>(hotfixComponent);
+				LOG_ERROR("[" << component->GetName() << "] invoke hotfix failure");
+				return false;
+			}
+		}
+		return true;
 	}
 
 	bool App::InitComponent()
@@ -89,21 +110,45 @@ namespace Tendo
 		return true;
 	}
 
+	bool App::AddWatch(const std::string& name)
+	{
+		std::string server;
+		if(!ClusterConfig::Inst()->GetServerName(name, server))
+		{
+			return false;
+		}
+		if(this->mWatchList.count(server) == 0)
+		{
+			this->mWatchList.insert(server);
+			LOG_DEBUG("add watch server : " << server);
+		}
+		return true;
+	}
+
+	void App::GetWatch(std::vector<std::string>& servers) const
+	{
+		for(const std::string & name : this->mWatchList)
+		{
+			servers.emplace_back(name);
+		}
+	}
+
 	int App::Run()
     {
-		srand(time(nullptr));
+		srand(Helper::Time::NowMilTime());
 		this->mMainContext = std::make_unique<Asio::Context>();
         if (!this->LoadComponent())
         {
             this->mLogComponent->SaveAllLog();
 #ifdef __OS_WIN__
             return getchar();
+#else
+			return -1;
 #endif
-            return -1;
         }
+		long long logicStartTime = 0;
         Asio::ContextWork work(*this->mMainContext);
         const std::chrono::milliseconds sleepTime(1);
-        long long logicStartTime = Helper::Time::NowMilTime();
         long long logicSecondTime = Helper::Time::NowMilTime();
         long long logicLastUpdateTime = Helper::Time::NowMilTime();
 
@@ -124,19 +169,19 @@ namespace Tendo
         ServerConfig::Inst()->GetMember("fps", fps);
         long long logicUpdateInterval = 1000 / fps;
         while (!this->mMainContext->stopped())
-        {
-            this->mMainContext->poll(code);
-            for (ISystemUpdate *component: systemUpdateComponents)
-            {
-                component->OnSystemUpdate();
-            }
-            if (this->mIsStartDone)
+		{
+			this->mMainContext->poll(code);
+			for (ISystemUpdate* component: systemUpdateComponents)
+			{
+				component->OnSystemUpdate();
+			}
+			if (this->mIsStartDone)
 			{
 				logicStartTime = Helper::Time::NowMilTime();
 				if (logicStartTime - logicLastUpdateTime >= logicUpdateInterval)
 				{
 					logicRunCount++;
-					for (IFrameUpdate* component : frameUpdateComponents)
+					for (IFrameUpdate* component: frameUpdateComponents)
 					{
 						component->OnFrameUpdate(deltaTime);
 					}
@@ -144,13 +189,11 @@ namespace Tendo
 					if (logicStartTime - logicSecondTime >= 1000)
 					{
 						this->mTickCount++;
-#ifdef __OS_WIN__
-						this->UpdateConsoleTitle();
-#endif
 						long long nowTime = Helper::Time::NowMilTime();
-						float seconds = (nowTime - logicSecondTime) / 1000.0f;
+						long long costTime = nowTime - logicSecondTime;
+						float seconds = (float )costTime / 1000.0f;
 						this->mLogicFps = (float)logicRunCount / seconds;
-						for (ISecondUpdate* component : secondUpdateComponents)
+						for (ISecondUpdate* component: secondUpdateComponents)
 						{
 							component->OnSecondUpdate(this->mTickCount);
 						}
@@ -158,15 +201,15 @@ namespace Tendo
 						logicSecondTime = Helper::Time::NowMilTime();
 					}
 
-					for (ILastFrameUpdate* component : lastFrameUpdateComponents)
+					for (ILastFrameUpdate* component: lastFrameUpdateComponents)
 					{
 						component->OnLastFrameUpdate();
 					}
 					logicLastUpdateTime = Helper::Time::NowMilTime();
 				}
 			}
-            std::this_thread::sleep_for(sleepTime);
-        }
+			std::this_thread::sleep_for(sleepTime);
+		}
 #ifdef __OS_WIN__
         return std::getchar();
 #else
@@ -211,10 +254,10 @@ namespace Tendo
 	void App::StartAllComponent()
     {
         std::vector<IStart*> startComponents;
-        this->GetComponents(startComponents);
+        this->GetComponents<IStart>(startComponents);
         for(IStart * component : startComponents)
         {
-            ElapsedTimer timer;
+            //ElapsedTimer timer;
             const std::string & name = dynamic_cast<Component*>(component)->GetName();
             long long timeId = this->mTimerComponent->DelayCall(10 * 1000, [name]()
             {
@@ -222,7 +265,7 @@ namespace Tendo
             });
 			component->Start();
             this->mTimerComponent->CancelTimer(timeId);
-            LOG_DEBUG("start " << name << " successful use time = [" << timer.GetSecond() << "s]");
+            //LOG_DEBUG("start " << name << " successful use time = [" << timer.GetMs() << "ms]");
         }
         this->mIsStartDone = true; //开始帧循环
         std::vector<IComplete *> completeComponents;
@@ -241,28 +284,4 @@ namespace Tendo
 		long long t = Helper::Time::NowMilTime() - this->mStartTime;
 		LOG_INFO("===== start " << this->Name() << " successful [" << t / 1000.0f << "]s ===========");
     }
-
-#ifdef __OS_WIN__
-	void App::UpdateConsoleTitle()
-	{       
-        std::string title = ServerConfig::Inst()->Name();
-        //HttpWebComponent * httpComponent = this->GetComponent<HttpWebComponent>();
-        //MongoDBComponent* mongoComponent = this->GetComponent<MongoDBComponent>();
-        //DispatchMessageComponent * innerComponent = this->GetComponent<DispatchMessageComponent>();
-        //title.append(fmt::format("   fps:{0}  ", this->mLogicFps));
-        //if (innerComponent != nullptr)
-        //{
-        //    //title.append(fmt::format("rpc:{0}  ", innerComponent->GetWaitCount()));
-        //}
-        //if (httpComponent != nullptr)
-        //{
-        //    title.append(fmt::format("http:{0}  ", httpComponent->GetWaitCount()));
-        //}
-        //if (mongoComponent != nullptr)
-        //{
-        //    title.append(fmt::format("mogo:{0}  ", mongoComponent->GetWaitCount()));
-        //}
-		SetConsoleTitle(title.c_str());
-	}
-#endif
 }

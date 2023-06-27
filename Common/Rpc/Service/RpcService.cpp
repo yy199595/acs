@@ -6,7 +6,6 @@
 #include "Rpc/Lua/LuaServiceTaskSource.h"
 #include "Proto/Lua/Message.h"
 
-
 namespace Tendo
 {
 	extern std::string GET_FUNC_NAME(const std::string& fullName)
@@ -23,7 +22,7 @@ namespace Tendo
 	bool RpcService::LateAwake()
 	{
 		const std::string & name = this->GetName();
-		this->mConfig = RpcConfig::Inst()->GetConfig(name);
+		this->mConfig = SrvRpcConfig::Inst()->GetConfig(name);
 		LuaComponent * luaComponent = this->GetComponent<LuaComponent>();
 		LOG_CHECK_RET_FALSE(ClusterConfig::Inst()->GetServerName(name, this->mCluster));
 		if(luaComponent != nullptr)
@@ -33,14 +32,15 @@ namespace Tendo
 			{
 				std::string server;
 				ClusterConfig::Inst()->GetServerName(name, server);
-				this->mLuaModule->SetMember("server", server);
+				this->mLuaModule->SetMember("__server", server);
 			}
 		}
-        LOG_CHECK_RET_FALSE(this->mConfig);
-        LOG_CHECK_RET_FALSE(this->OnInit());
+        LOG_CHECK_RET_FALSE(this->mConfig && this->OnInit());
 		if(this->mLuaModule != nullptr)
 		{
 			this->CacheLuaFunction();
+			int code = this->mLuaModule->Call("Awake");
+			return code != XCode::CallLuaFunctionFail;
 		}
 		return true;
 	}
@@ -131,8 +131,6 @@ namespace Tendo
 	{
 		this->mLuaModule->GetFunction("__Invoke");
 		lua_State* lua = this->mLuaModule->GetLuaEnv();
-
-		lua_pushvalue(lua, -2);
 		if(this->WriterToLua(config, message) != XCode::Successful)
 		{
 			return XCode::CallLuaFunctionFail;
@@ -176,8 +174,6 @@ namespace Tendo
 	{
 		this->mLuaModule->GetFunction("__Call");
 		lua_State* lua = this->mLuaModule->GetLuaEnv();
-
-		lua_pushvalue(lua, -2);
 		if(this->WriterToLua(config, message) != XCode::Successful)
 		{
 			return XCode::CallLuaFunctionFail;
@@ -188,7 +184,7 @@ namespace Tendo
 		Lua::UserDataParameter::Write(lua, luaTaskSource.get());
 		if (lua_pcall(lua, 4, 1, 0) != LUA_OK)
 		{
-			message.GetHead().Add("error", lua_tostring(lua, -1));
+			LOG_ERROR(lua_tostring(lua, -1));
 			return XCode::CallLuaFunctionFail;
 		}
 		return luaTaskSource->Await();
@@ -218,18 +214,23 @@ namespace Tendo
 		if(this->mLuaModule != nullptr)
 		{
 			this->mLuaModule->Await("OnStop");
+
 			delete this->mLuaModule;
 			this->mLuaModule = nullptr;
 		}
 	}
 
-	void RpcService::OnHotFix()
+	bool RpcService::OnHotFix()
 	{
 		if (this->mLuaModule != nullptr)
 		{
-			this->mLuaModule->Hotfix();
+			if(!this->mLuaModule->Hotfix())
+			{
+				return false;
+			}
 			this->CacheLuaFunction();
 		}
+		return true;
 	}
 
 	void RpcService::CacheLuaFunction()

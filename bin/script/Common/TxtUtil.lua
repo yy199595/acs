@@ -1,10 +1,20 @@
-TxtUtil = {}
-TxtUtil.ReadJsonFile = function(path)
-    local file = io.open(path, 'r')
-    if file ~= nil then
-        local str = file:read("*all")
-        return JsonUtil.ToObject(str)
+local TextReader = { }
+
+function TextReader:LoadCsv(path)
+    local file = io.open(path)
+    local content = file:lines()
+    for line in file:lines() do
+
     end
 end
 
-return TxtUtil
+function TextReader:ReadLines(path)
+    local lines = { }
+    local fs = io.open(path)
+    for line in fs:lines() do
+        table.insert(lines, line)
+    end
+    return lines
+end
+
+return TextReader

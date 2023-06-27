@@ -11,18 +11,18 @@
 using namespace google::protobuf;
 namespace Tendo
 {
-	class MongoHelperComponent : public Component
+	class MongoHelperComponent final : public Component
 	{
 	 public:
 		MongoHelperComponent() = default;
-		~MongoHelperComponent() = default;
+		~MongoHelperComponent() final = default;
 	 public:
-		int Insert(const Message & message, int index);
-		int Insert(const char * tab, const Message & message, int index = 0);
-		int Insert(const char * tab, const std::string & json, int index = 0);
-		int Remove(const char * tab, const std::string & select, int limit = 1, int index = 0);
-		int Query(const char * tab, const std::string & select, std::shared_ptr<Message> response);
-		int Update(const char * tab, const std::string & select, const std::string & data, int index);
+		int Insert(const Message & message);
+		int Insert(const char * tab, const Message & message);
+		int Insert(const char * tab, const std::string & json);
+		int Remove(const char * tab, const std::string & select, int limit);
+		int Update(const char * tab, const std::string & select, const std::string & data);
+		int Query(const char * tab, const std::string & select, std::shared_ptr<Message> & response);
     public:
 		bool Awake() final;
 		int Save(const Message & message);

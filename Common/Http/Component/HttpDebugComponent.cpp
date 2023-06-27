@@ -39,7 +39,7 @@ namespace Tendo
 			const std::string& service = splitPath[0];
 			const std::string& method = splitPath[1];
 			std::string fullName = fmt::format("{0}.{1}", service, method);
-			const RpcMethodConfig* config = RpcConfig::Inst()->GetMethodConfig(fullName);
+			const RpcMethodConfig* config = SrvRpcConfig::Inst()->GetMethodConfig(fullName);
 			if (config == nullptr)
 			{
 				this->Send(address, "call rpc method not find");
@@ -92,7 +92,7 @@ namespace Tendo
 			{
 				std::string fullName;
 				message->GetHead().Get("func", fullName);
-				const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
+				const RpcMethodConfig* methodConfig = SrvRpcConfig::Inst()->GetMethodConfig(fullName);
 				if (!methodConfig->Response.empty())
 				{
 					rapidjson::Document json;

@@ -2,7 +2,7 @@
 
 #include"Util/Guid/Guid.h"
 #include"Redis/Config/RedisConfig.h"
-#include"Redis/Client/RedisTcpClient.h"
+#include"Redis/Client/RedisClient.h"
 #include"Rpc/Component/RpcTaskComponent.h"
 
 namespace Tendo
@@ -30,21 +30,21 @@ namespace Tendo
         std::shared_ptr<RedisResponse> Run(const std::shared_ptr<RedisRequest>& request);
         std::shared_ptr<RedisResponse> SyncRun(const std::shared_ptr<RedisRequest>& request);
     private:
-		RedisTcpClient * GetClient(size_t index = -1);
+		RedisClient * GetClient(size_t index = -1);
 		void OnConnectSuccessful(const std::string &address) final;
         void OnMessage(std::shared_ptr<RedisResponse> message) final;
-		RedisTcpClient * MakeRedisClient(const RedisClientConfig & config);
+		RedisClient * MakeRedisClient(const RedisClientConfig & config);
     private:
         bool Awake() final;
 		void OnDestroy() final;
         bool LateAwake() final;
-		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
+		void OnLuaRegister(Lua::ModuleClass &luaRegister, std::string &name) final;
 	private:
         size_t mIndex;
 		RedisConfig mConfig;
-		std::shared_ptr<RedisTcpClient> mMainClient;
+		std::shared_ptr<RedisClient> mMainClient;
 		class DispatchComponent * mDispatchComponent;
-		std::vector<std::shared_ptr<RedisTcpClient>> mRedisClients;
+		std::vector<std::shared_ptr<RedisClient>> mRedisClients;
     };
 
     template<typename ... Args>
@@ -66,7 +66,7 @@ namespace Tendo
     template<typename ... Args>
     bool RedisComponent::Send(const std::string &cmd, Args &&...args)
     {
-        RedisTcpClient * redisClient = this->GetClient();
+        RedisClient * redisClient = this->GetClient();
         if(redisClient == nullptr)
         {
             return false;

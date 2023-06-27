@@ -38,8 +38,7 @@ namespace Tendo
 
 		bool AddTimerToWheel(std::shared_ptr<TimerBase> timer);
 
-        void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
-
+      	void OnLuaRegister(Lua::ModuleClass &luaRegister, std::string &name) final;
     private:
 		const int LayerCount = 5;
 		const int TimerPrecision = 20;

@@ -26,7 +26,7 @@ namespace Tendo
 		template<typename T>
 		void SetResult(T result);
 
-		void SetResult(int code, std::shared_ptr<pb::Message> response);
+		void SetResult(int code, const std::shared_ptr<pb::Message>& response);
 	 private:
 		int mRef;
 		lua_State* mLua;

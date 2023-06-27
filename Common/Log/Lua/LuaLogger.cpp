@@ -24,6 +24,12 @@ namespace Lua
 		return 0;
 	}
 
+	int Log::OnCallError(lua_State* lua)
+	{
+		assert(false);
+		return 0;
+	}
+
 	int Console::Show(lua_State* lua)
 	{
 		size_t size = 0;

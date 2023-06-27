@@ -8,6 +8,7 @@
 #else
 #include<unistd.h>
 #endif // __OS_WIN__
+#include<cstdlib>
 #include"spdlog/fmt/fmt.h"
 #include"Util/String/StringHelper.h"
 namespace Tendo
@@ -20,7 +21,6 @@ namespace Tendo
 		}
 		System::IsInit = true;
 		System::mExePath = argv[0];
-		System::mConfigPath = argv[1];
 		System::mWorkPath = fmt::format("{0}/", getcwd(nullptr, 0));
 		Helper::Str::ReplaceString(System::mWorkPath, "\\", "/");
 		if (System::mWorkPath.back() == '/')
@@ -30,13 +30,17 @@ namespace Tendo
 		std::vector<std::string> result;
 		for (int index = 2; index < argc; index++)
 		{
-			const std::string line(argv[index]);
-			if (Helper::Str::Split(line, '=', result) != 2)
+			result.clear();
+			std::string line(argv[index]);
+			const std::string str = line = line.substr(2);
+			if (Helper::Str::Split(str, '=', result) != 2)
 			{
 				return false;
 			}
 			System::SetEnv(result[0], result[1]);
-		}		
+		}
+		std::string config(argv[1]);
+		System::SetEnv("config", config);
 		return System::AddValue("WORK_PATH", mWorkPath);
 	}
 
@@ -61,12 +65,12 @@ namespace Tendo
 
 	bool System::GetEnv(const std::string& k, std::string& v)
 	{
-		auto iter = System::mEnvs.find(k);
-		if (iter == System::mEnvs.end())
+		const char * val = getenv(k.c_str());
+		if(val == nullptr)
 		{
 			return false;
 		}
-		v = iter->second;
+		v = val;
 		return true;
 	}
 
@@ -88,15 +92,13 @@ namespace Tendo
 		return false;
 	}
 
-	bool System::SetEnv(const std::string& k, const std::string& v)
+	void System::SetEnv(const std::string& k, const std::string& v)
 	{
-		auto iter = System::mEnvs.find(k);
-		if(iter != System::mEnvs.end())
-		{
-			return false;
-		}
-		System::mEnvs.emplace(k, v);
-		return true;
+#if WIN32
+		_putenv_s(k.c_str(), v.c_str());
+#else
+		setenv(k.c_str(), v.c_str(), 1);
+#endif
 	}
 
     std::string System::FormatPath(const std::string &path)
@@ -107,7 +109,5 @@ namespace Tendo
     bool System::IsInit = false;
     std::string System::mExePath;
     std::string System::mWorkPath;
-    std::string System::mConfigPath;
-	std::unordered_map<std::string, std::string> System::mEnvs;
 	std::unordered_map<std::string, std::string> System::mSubValues;
 }

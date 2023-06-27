@@ -30,33 +30,31 @@ namespace Tendo
 namespace Tendo
 {
     class MongoDBComponent : public RpcTaskComponent<int,Mongo::CommandResponse>, 
-							 public IRpc<Mongo::CommandResponse>, public ILuaRegister, public IDestroy
+							 public IRpc<Mongo::CommandResponse>, public IStart, public ISecondUpdate, public IDestroy
 	{
 	public:
 		MongoDBComponent();
 		~MongoDBComponent() final = default;
 	public:
-        bool Ping(int id);
-    	int MakeMongoClient(const Mongo::MongoConfig & config);
-        bool SetIndex(int id, const std::string & tab, const std::string & name);
-    public:
-		bool GetClientHandler(int & id);
-        void OnClientError(int index, int code);
 		unsigned int GetWaitCount() const { return this->mWaitCount; }
-	public:
-        bool Send(int id, const std::shared_ptr<Mongo::CommandRequest>& request, int & taskId);
+		int MakeMongoClient(const Mongo::MongoConfig & config, bool async = true);
 		std::shared_ptr<Mongo::CommandResponse> Run(int id, const std::shared_ptr<Mongo::CommandRequest>& request);
-	 private:
+	private:
+		std::shared_ptr<Mongo::CommandResponse> SyncRun(int id, const std::shared_ptr<Mongo::CommandRequest>& request);
+		std::shared_ptr<Mongo::CommandResponse> AsyncRun(int id, const std::shared_ptr<Mongo::CommandRequest>& request);
+	private:
+		void Ping();
+		void Start() final;
 		void OnDestroy() final;
-    	Mongo::TcpMongoClient* GetClient(int index = -1);
-		void OnLuaRegister(Lua::ClassProxyHelper& luaRegister) final;
+		void OnSecondUpdate(int tick) final;
 		void OnConnectSuccessful(const std::string &address) final;
 		void OnMessage(std::shared_ptr<Mongo::CommandResponse> message) final;
 	private:
     	int mIndex;
 		unsigned int mWaitCount;
         std::unordered_map<int, std::shared_ptr<Mongo::TcpMongoClient>> mMongoClients;
-    };
+		std::unordered_map<int, std::shared_ptr<Mongo::TcpMongoClient>> mSyncMongoClients;
+	};
 }
 
 

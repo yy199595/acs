@@ -76,7 +76,7 @@ namespace Tendo
 				}
 				this->ReceiveMessage(RPC_PACK_HEAD_LEN);
 #ifdef ONLY_MAIN_THREAD
-				this->mGateComponent->OnMessage(std::move(this->mMessage));
+				this->mOuterComponent->OnMessage(std::move(this->mMessage));
 #else
 				Asio::Context& io = App::Inst()->MainThread();
 				io.post(std::bind(&OuterNetComponent::OnMessage, this->mOuterComponent, this->mMessage));
@@ -92,7 +92,7 @@ namespace Tendo
 		this->mSocket->Close();
         const std::string& address = this->GetAddress();
 #ifdef ONLY_MAIN_THREAD
-        this->mGateComponent->OnCloseSocket(address, code);
+        this->mOuterComponent->OnCloseSocket(address, code);
 #else
         Asio::Context& mainTaskScheduler = App::Inst()->MainThread();
         mainTaskScheduler.post(std::bind(&OuterNetComponent::OnCloseSocket, this->mOuterComponent, address, code));

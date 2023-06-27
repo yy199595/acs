@@ -55,8 +55,6 @@ namespace Bson
 			~Document() = default;
 
 		public:
-
-		public:
             void WriterToJson(std::string & json);
             bool FromByJson(const std::string& json);
         public:
@@ -107,6 +105,8 @@ namespace Bson
 		public:
 			int GetStreamLength();
 
+			std::string ToJson();
+
 			bool WriterToStream(std::ostream& os);
 
 			bool WriterToBson(Array& document, const rapidjson::Value& jsonValue);
@@ -117,13 +117,13 @@ namespace Bson
 
 	namespace Reader
 	{
-		class Document : protected _bson::bsonobj
+		class Document
 		{
 		public:
 			Document(const char* bson);
-
+			Document(_bson::bsonobj object);
 		public:
-			void WriterToJson(std::string& json);
+			void WriterToJson(std::string * json);
 
 			_bson::BSONType Type(const char* key) const;
 
@@ -139,9 +139,21 @@ namespace Bson
 
 			bool Get(const char* key, std::string& value) const;
 
-            int Length() const { return this->objsize();}
+			int Length() const { return this->mObject.objsize(); }
+
+			bool Get(const char * key, std::shared_ptr<Document> & document);
+
+			bool Get(const char * key, std::vector<std::shared_ptr<Document>> & document);
+
+			bool Get(const char * key, std::vector<std::string> & document);
+
+			bool Get(const char * key, std::vector<_bson::bsonelement> & document);
+
+			int GetLength() const { return this->mObject.objsize(); }
 		private:
 			void WriterToJson(const _bson::bsonelement& bsonelement, Json::Writer& json);
+		private:
+			_bson::bsonobj mObject;
 		};
 	}
 }

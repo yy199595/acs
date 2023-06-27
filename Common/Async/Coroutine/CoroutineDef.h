@@ -5,12 +5,18 @@
 #include"Util/Guid/NumberBuilder.h"
 //#include"Rpc/Method/MethodProxy.h"
 #include"Context/context.h"
-#define STACK_SIZE 1024 * 1024
+#ifdef 	__COR_SHARED_STACK__
+#define STACK_SIZE (1024 * 1024)
 #ifdef __DEBUG__
-	#define SHARED_STACK_NUM 2 //共享栈个数
+#define SHARED_STACK_NUM 2 //共享栈个数
 #else
-	#define SHARED_STACK_NUM 8 //共享栈个数
+#define SHARED_STACK_NUM 8 //共享栈个数
 #endif
+#else
+#define STACK_SIZE (1024 * 1024)
+#endif
+
+
 #define COR_POOL_COUNT 100
 
 

@@ -43,7 +43,7 @@ namespace Tendo
 		std::string mLocation;
 		unsigned int mSumCount;
         class ThreadComponent * mNetComponent;
-        class DispatchComponent* mMessageComponent;
+        class DispatchComponent* mDisComponent;
         std::unordered_map<std::string, std::string> mUserMaps;
 		std::queue<std::shared_ptr<Msg::Packet>> mWaitMessages;
 		std::unordered_map<std::string, NodeInfo> mLocationMaps;

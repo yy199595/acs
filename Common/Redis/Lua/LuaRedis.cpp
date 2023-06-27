@@ -87,6 +87,11 @@ namespace Lua
         }
         std::shared_ptr<RedisRequest> request =
             redisScriptComponent->MakeLuaRequest(fullName, json);
+		if(request == nullptr)
+		{
+			LOG_ERROR("call redis lua fail : " << fullName);
+			return 0;
+		}
         if (lua_isboolean(lua, 3) && !lua_toboolean(lua, 3))
         {
             std::shared_ptr<RedisResponse> response 

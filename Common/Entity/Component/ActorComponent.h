@@ -20,7 +20,8 @@ namespace Tendo
 		PlayerActor * GetPlayer(long long playerId);
 		ServerActor * GetServer(long long serverId);
 	public:
-		bool AddPlayer(std::shared_ptr<PlayerActor> player);
+		bool AddServer(const std::string & json);
+		bool AddPlayer(const std::shared_ptr<PlayerActor>& player);
 		bool AddServer(std::shared_ptr<ServerActor> server);
 		void GetServers(std::vector<ServerActor *> & servers);
 		bool AddServer(std::shared_ptr<ServerActor> server, const std::string & json);

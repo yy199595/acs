@@ -90,7 +90,38 @@ namespace Tendo
 		return false;
 	}
 
-	bool ActorComponent::AddPlayer(std::shared_ptr<PlayerActor> player)
+	bool ActorComponent::AddServer(const std::string& json)
+	{
+		rapidjson::Document document;
+		if (document.Parse(json.c_str(), json.size()).HasParseError())
+		{
+			LOG_ERROR("parse json fail : " << json);
+			return false;
+		}
+		LOG_CHECK_RET_FALSE(document.HasMember("id"));
+		LOG_CHECK_RET_FALSE(document.HasMember("name"));
+		LOG_CHECK_RET_FALSE(document.HasMember("listen"));
+
+		int actorId = document["id"].GetInt();
+		const std::string name = document["name"].GetString();
+		if(this->GetServer(actorId) != nullptr)
+		{
+			return true;
+		}
+		std::shared_ptr<ServerActor> serverActor = std::make_shared<ServerActor>(actorId, name);
+		{
+			const rapidjson::Value& listens = document["listen"];
+			for (auto iter = listens.MemberBegin(); iter != listens.MemberEnd(); iter++)
+			{
+				const std::string key(iter->name.GetString());
+				const std::string value(iter->value.GetString());
+				serverActor->AddListen(key, value);
+			}
+		}
+		return this->AddServer(serverActor);
+	}
+
+	bool ActorComponent::AddPlayer(const std::shared_ptr<PlayerActor>& player)
 	{
 		long long playerId = player->GetActorId();
 		auto iter = this->mPlayers.find(playerId);
@@ -110,7 +141,6 @@ namespace Tendo
 
 	bool ActorComponent::AddServer(std::shared_ptr<ServerActor> server)
 	{
-		assert(server->GetActorId() < 10000);
 		long long serverId = server->GetActorId();
 		const std::string& name = server->Name();
 		auto iter = this->mServers.find(serverId);

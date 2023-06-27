@@ -134,16 +134,16 @@ namespace Tcp
 			});
 	}
 
-	void TcpContext::Write(std::shared_ptr<ProtoMessage> message)
+	void TcpContext::Write(const std::shared_ptr<ProtoMessage>& message)
 	{
         if(this->mMessageQueue.empty())
         {
-            this->mMessageQueue.emplace_back(message);
+            this->mMessageQueue.push(message);
             this->mSendCount = this->mMessageQueue.size();
             this->SendFromMessageQueue();
             return;
         }
-        this->mMessageQueue.emplace_back(message);
+        this->mMessageQueue.push(message);
         this->mSendCount = this->mMessageQueue.size();
 	}
 
@@ -153,7 +153,7 @@ namespace Tcp
         while(!this->mMessageQueue.empty())
         {
             count++;
-            this->mMessageQueue.pop_front();
+            this->mMessageQueue.pop();
         }
         this->mSendCount = this->mMessageQueue.size();
         return count;
@@ -165,7 +165,7 @@ namespace Tcp
         if(!this->mMessageQueue.empty())
         {
             message = this->mMessageQueue.front();
-            this->mMessageQueue.pop_front();
+            this->mMessageQueue.pop();
             this->mSendCount = this->mMessageQueue.size();
         }
         return message;
@@ -256,25 +256,24 @@ namespace Tcp
 	size_t TcpContext::SendSync(const std::shared_ptr<ProtoMessage>& message)
 	{
 		size_t sum = 0;
-		Asio::Code code;
         std::ostream os(&this->mSendBuffer);
 		int length = message->Serialize(os);
 		Asio::Socket & tcpSocket = this->mSocket->GetSocket();
-		sum += asio::write(tcpSocket, this->mSendBuffer, code);
-		while(length > 0 && sum > 0 && !code)
+		try
 		{
-			try
+			sum += asio::write(tcpSocket, this->mSendBuffer);
+			while (length > 0 && sum > 0)
 			{
 				sum += asio::write(tcpSocket, this->mSendBuffer);
 				length = message->Serialize(os);
 			}
-			catch (std::system_error & error)
-			{
-				printf("sync send failure %s\n", error.what());
-				return 0;
-			}
+			return sum;
 		}
-		return sum;
+		catch (std::system_error & error)
+		{
+			CONSOLE_LOG_ERROR("sync send " << error.what());
+			return 0;
+		}
 	}
 
 	void TcpContext::StopTimer()

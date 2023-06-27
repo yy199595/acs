@@ -7,10 +7,9 @@ message mongo
     {
         string tab = 1;
         string json = 2;
-        int32 flag = 3;
     }
 
-    message query
+    message find
     {
         message request
         {
@@ -24,17 +23,30 @@ message mongo
             repeated string jsons = 1;
         }
     }
+    message find_one
+    {
+        message request
+        {
+            string tab = 1;
+            string where = 2;
+            repeated string fields = 3;
+        }
+        message response
+        {
+            string json = 1;
+        }
+    }
+
     message remove
     {
         string tab = 1;
         string json = 2;
         int32 limit = 3;
-        int32 flag = 4;
     }
     message index
     {
         string tab = 1;
-        string name = 2;
+        repeated string keys = 2;
     }
     message update
     {
@@ -42,18 +54,19 @@ message mongo
         string select = 2;
         string update = 3;
         string tag = 4;
-        int32 flag = 5;
     }
 
     message command
     {
         message request
         {
-            string json = 1;
+            string tab = 1;
+            string cmd = 2;
+            string json = 3;
         }
         message response
         {
-            repeated bytes jsons = 1;
+            string json = 1;
         }
     }
 }

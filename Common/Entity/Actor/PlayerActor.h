@@ -24,6 +24,8 @@ namespace Tendo
 		int SendToClient(const std::shared_ptr<Msg::Packet> & message);
 		int SendToClient(const std::string & func, const pb::Message & request);
 	private:
+		void OnWriteRpcHead(const std::string &func, Msg::Head &head) const final;
+	private:
 		int mGateId;
 		class ActorComponent * mActorComponent;
 		std::unordered_map<std::string, int> mServerAddrs;

@@ -69,13 +69,8 @@ namespace Tendo
 
 namespace Tendo
 {
-    bool ClusterConfig::OnLoadText(const char *str, size_t length)
+    bool ClusterConfig::OnLoadJson(rapidjson::Document& document)
     {
-        rapidjson::Document document;
-        if(document.Parse(str, length).HasParseError())
-        {
-            return false;
-        }
 		int index = 0;
         auto iter = document.MemberBegin();
         for(; iter != document.MemberEnd(); iter++)
@@ -95,7 +90,7 @@ namespace Tendo
             }
             this->mNodeConfigs.emplace(name, std::move(nodeConfig));
         }
-        return true;
+        return this->GetConfig() != nullptr;
     }
 
     bool ClusterConfig::GetServerName(const std::string& service, std::string& node) const
@@ -109,7 +104,7 @@ namespace Tendo
         return true;
     }
 
-    bool ClusterConfig::OnReloadText(const char *str, size_t length)
+    bool ClusterConfig::OnReLoadJson(rapidjson::Document& document)
     {
         return true;
     }

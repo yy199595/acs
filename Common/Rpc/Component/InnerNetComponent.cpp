@@ -13,9 +13,11 @@
 namespace Tendo
 {
     InnerNetComponent::InnerNetComponent()
+		: ISender(Msg::Net::Tcp)
     {
         this->mSumCount = 0;
         this->mMaxHandlerCount = 0;
+		this->mDisComponent = nullptr;
         this->mNetComponent = nullptr;
     }
 
@@ -27,7 +29,6 @@ namespace Tendo
         const ServerConfig *config = ServerConfig::Inst();
         LOG_CHECK_RET_FALSE(config->GetPath("user", path))
         config->GetMember("message", "inner", this->mMaxHandlerCount);
-        LOG_CHECK_RET_FALSE(config->GetLocation("rpc", this->mLocation))
         LOG_CHECK_RET_FALSE(Helper::File::ReadJsonFile(path, document))
         auto iter = document.MemberBegin();
         for (; iter != document.MemberEnd(); ++iter)
@@ -37,8 +38,12 @@ namespace Tendo
             this->mUserMaps.emplace(user, passwd);
         }
         LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<ThreadComponent>())
-        LOG_CHECK_RET_FALSE(this->mMessageComponent = this->GetComponent<DispatchComponent>())
-        return this->StartListen("rpc");
+        LOG_CHECK_RET_FALSE(this->mDisComponent = this->GetComponent<DispatchComponent>())
+		if(config->GetLocation("rpc", this->mLocation))
+		{
+			LOG_CHECK_RET_FALSE(this->StartListen("rpc"));
+		}
+		return true;
     }
 
     void InnerNetComponent::OnConnectSuccessful(const std::string &address)
@@ -65,7 +70,7 @@ namespace Tendo
             case Msg::Type::Forward:
             case Msg::Type::Response:
             case Msg::Type::Broadcast:
-                this->mMessageComponent->OnMessage(message);
+                this->mDisComponent->OnMessage(message);
                 break;
             default:
             LOG_FATAL("unknown message type : " << message->GetType())
@@ -81,7 +86,7 @@ namespace Tendo
             {
                 message->SetType(Msg::Type::Response);
                 message->GetHead().Add("code", XCode::NetWorkError);
-                this->mMessageComponent->OnMessage(message);
+                this->mDisComponent->OnMessage(message);
             }
         }
     }
@@ -156,9 +161,8 @@ namespace Tendo
 			return iter1->second.get();
 		}
         std::string ip;
-		std::string net;
         unsigned short port = 0;
-        if (!Helper::Str::SplitAddr(address, net, ip, port))
+        if (!Helper::Str::SplitAddr(address, ip, port))
         {
             CONSOLE_LOG_ERROR("parse address error : [" << address << "]")
             return nullptr;
@@ -171,10 +175,11 @@ namespace Tendo
             config->GetMember("user", "name", authInfo.UserName);
             config->GetMember("user", "passwd", authInfo.PassWord);
         }
+
 		std::shared_ptr<Tcp::SocketProxy> socketProxy = this->mNetComponent->CreateSocket(ip, port);
         std::shared_ptr<InnerNetTcpClient> localClient = std::make_shared<InnerNetTcpClient>(this, socketProxy, authInfo);
 
-        this->mLocalClients.emplace(socketProxy->GetAddress(), localClient);
+        this->mLocalClients.emplace(address, localClient);
         return localClient.get();
     }
 
@@ -228,7 +233,7 @@ namespace Tendo
         {
             std::shared_ptr<Msg::Packet> message = this->mWaitMessages.front();
             {
-                int code = this->mMessageComponent->OnMessage(message);
+                int code = this->mDisComponent->OnMessage(message);
                 if (code != XCode::Successful && message->GetHead().Has("rpc"))
                 {
                     message->Clear();

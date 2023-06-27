@@ -1,10 +1,11 @@
-local Login = { }
 
-function Login.OnPlayerLogin(playerId)
+local Login = Class("RpcService")
+
+function Login:_OnLogin(playerId)
 
 end
 
-function Login.OnPlayerLogout(playerId)
+function Login:_OnLogout(playerId)
 
 end
 

@@ -3,19 +3,21 @@
 //
 #include"App.h"
 #include"Actor.h"
+
+#include <utility>
 #include"XCode/XCode.h"
 #include"Rpc/Client/Message.h"
 #include"Util/Time/TimeHelper.h"
 #include"Lua/Engine/LuaParameter.h"
 #include"Proto/Include/Message.h"
 #include"Util/Json/Lua/Json.h"
-#include"Server/Config/ServiceConfig.h"
+#include"Rpc/Config/ServiceConfig.h"
 #include"Proto/Component/ProtoComponent.h"
 #include"Router/Component/RouterComponent.h"
 namespace Tendo
 {
-	Actor::Actor(long long id, const std::string & name)
-		: Entity(id), mName(name)
+	Actor::Actor(long long id, std::string  name)
+		: Entity(id), mName(std::move(name))
 	{
 		this->mRouterComponent = nullptr;
 		this->mLastTime = Helper::Time::NowSecTime();
@@ -83,7 +85,7 @@ namespace Tendo
 
 	std::shared_ptr<Msg::Packet> Actor::Make(const std::string& func, const pb::Message* request) const
 	{
-		const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
+		const RpcMethodConfig * methodConfig = SrvRpcConfig::Inst()->GetMethodConfig(func);
 		if(methodConfig == nullptr)
 		{
 			LOG_ERROR("not rpc config : [" << func << "]");
@@ -94,11 +96,17 @@ namespace Tendo
 			message->SetNet(methodConfig->Net);
 			message->SetType(Msg::Type::Request);
 			message->GetHead().Add("func", func);
-			message->GetHead().Add("id", this->GetEntityId());
 			if(request != nullptr)
 			{
 				message->SetProto(Msg::Porto::Protobuf);
-				message->WriteMessage(request);
+				if(!message->WriteMessage(request))
+				{
+					return nullptr;
+				}
+			}
+			if(!methodConfig->IsClient)
+			{
+				this->OnWriteRpcHead(func, message->GetHead());
 			}
 		}
 		return message;
@@ -123,7 +131,7 @@ namespace Tendo
 		return result != nullptr ? result->GetCode() : XCode::NetWorkError;
 	}
 
-	int Actor::Call(const std::string& func, std::shared_ptr<pb::Message> response)
+	int Actor::Call(const std::string& func, const std::shared_ptr<pb::Message>& response)
 	{
 		std::string addr;
 		int code = this->GetAddress(func, addr);
@@ -151,7 +159,7 @@ namespace Tendo
 		return code;
 	}
 
-	int Actor::Call(const std::string& func, const pb::Message& request, std::shared_ptr<pb::Message> response)
+	int Actor::Call(const std::string& func, const pb::Message& request, const std::shared_ptr<pb::Message>& response)
 	{
 		std::string addr;
 		int code = this->GetAddress(func, addr);
@@ -183,10 +191,10 @@ namespace Tendo
 		const std::string& func, std::shared_ptr<Msg::Packet>& message) const
 	{
 		App* app = App::Inst();
-		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
+		const RpcMethodConfig* methodConfig = SrvRpcConfig::Inst()->GetMethodConfig(func);
 		if (methodConfig == nullptr)
 		{
-			LOG_ERROR("not found rpc config" << func);
+			LOG_ERROR("call [" << func << "] fail not rpc config");
 			return XCode::NotFoundRpcConfig;
 		}
 
@@ -199,14 +207,23 @@ namespace Tendo
 				const std::string& name = methodConfig->Request;
 				if (!protoComponent->Read(lua, name, idx, request))
 				{
+					LOG_ERROR("call [" << func << "] fail request=" << name);
 					return XCode::CreateProtoFailure;
 				}
 				message = this->Make(func, request.get());
+				if(!methodConfig->Response.empty())
+				{
+					message->GetHead().Add("res", methodConfig->Response);
+				}
 				return XCode::Successful;
 			}
 			message = this->Make(func, nullptr);
 			message->SetProto(Msg::Porto::Json);
 			message->SetNet(methodConfig->Net);
+			if(!methodConfig->Response.empty())
+			{
+				message->GetHead().Add("res", methodConfig->Response);
+			}
 			Lua::RapidJson::Read(lua, idx, message->Body());
 			return XCode::Successful;
 		}
@@ -215,8 +232,14 @@ namespace Tendo
 			size_t count = 0;
 			message = this->Make(func, nullptr);
 			const char* str = lua_tolstring(lua, idx, &count);
-			message->Body()->append(str, count);
-			message->SetProto(Msg::Porto::String);
+			{
+				message->Body()->append(str, count);
+				message->SetProto(Msg::Porto::String);
+				if(!methodConfig->Response.empty())
+				{
+					message->GetHead().Add("res", methodConfig->Response);
+				}
+			}
 			return XCode::Successful;
 		}
 		return XCode::CallArgsError;
@@ -225,9 +248,10 @@ namespace Tendo
 	int Actor::LuaCall(lua_State* lua, const std::string & func, const std::shared_ptr<Msg::Packet> & message)
 	{
 		std::string address;
-		if(!this->GetAddress(func, address))
+		int code = this->GetAddress(func, address);
+		if(code != XCode::Successful)
 		{
-			lua_pushinteger(lua, XCode::NotFoundPlayerRpcAddress);
+			lua_pushinteger(lua, code);
 			return 1;
 		}
 		this->mLastTime = Helper::Time::NowSecTime();
@@ -240,9 +264,9 @@ namespace Tendo
 		int code = XCode::Successful;
 		do
 		{
-			if(!this->GetAddress(func, address))
+			code = this->GetAddress(func, address);
+			if(code != XCode::Successful)
 			{
-				code = XCode::NotFoundPlayerRpcAddress;
 				break;
 			}
 			this->mLastTime = Helper::Time::NowSecTime();

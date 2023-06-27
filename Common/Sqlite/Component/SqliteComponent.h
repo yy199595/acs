@@ -19,7 +19,7 @@ namespace Tendo
 	private:
 		bool Awake() final;
 		void OnDestroy() final;
-		void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
+		void OnLuaRegister(Lua::ModuleClass &luaRegister, std::string &name) final;
 	private:
 		std::string mName;
 		std::string mPath;

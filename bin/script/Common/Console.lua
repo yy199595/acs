@@ -12,7 +12,8 @@ Console.LogError = 4
 Console.LogFatal = 5
 
 local json = rapidjson
-local console = ConsoleLog
+local console = require("Logger")
+
 local table_pack = table.pack
 local string_math = string.match
 local string_fmt = string.format

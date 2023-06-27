@@ -42,7 +42,7 @@ struct TableStruct_s2s_2fdb_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[20]
+  static const ::google::protobuf::internal::ParseTable schema[23]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -62,21 +62,30 @@ extern mongo_command_requestDefaultTypeInternal _mongo_command_request_default_i
 class mongo_command_response;
 class mongo_command_responseDefaultTypeInternal;
 extern mongo_command_responseDefaultTypeInternal _mongo_command_response_default_instance_;
+class mongo_find;
+class mongo_findDefaultTypeInternal;
+extern mongo_findDefaultTypeInternal _mongo_find_default_instance_;
+class mongo_find_one;
+class mongo_find_oneDefaultTypeInternal;
+extern mongo_find_oneDefaultTypeInternal _mongo_find_one_default_instance_;
+class mongo_find_one_request;
+class mongo_find_one_requestDefaultTypeInternal;
+extern mongo_find_one_requestDefaultTypeInternal _mongo_find_one_request_default_instance_;
+class mongo_find_one_response;
+class mongo_find_one_responseDefaultTypeInternal;
+extern mongo_find_one_responseDefaultTypeInternal _mongo_find_one_response_default_instance_;
+class mongo_find_request;
+class mongo_find_requestDefaultTypeInternal;
+extern mongo_find_requestDefaultTypeInternal _mongo_find_request_default_instance_;
+class mongo_find_response;
+class mongo_find_responseDefaultTypeInternal;
+extern mongo_find_responseDefaultTypeInternal _mongo_find_response_default_instance_;
 class mongo_index;
 class mongo_indexDefaultTypeInternal;
 extern mongo_indexDefaultTypeInternal _mongo_index_default_instance_;
 class mongo_insert;
 class mongo_insertDefaultTypeInternal;
 extern mongo_insertDefaultTypeInternal _mongo_insert_default_instance_;
-class mongo_query;
-class mongo_queryDefaultTypeInternal;
-extern mongo_queryDefaultTypeInternal _mongo_query_default_instance_;
-class mongo_query_request;
-class mongo_query_requestDefaultTypeInternal;
-extern mongo_query_requestDefaultTypeInternal _mongo_query_request_default_instance_;
-class mongo_query_response;
-class mongo_query_responseDefaultTypeInternal;
-extern mongo_query_responseDefaultTypeInternal _mongo_query_response_default_instance_;
 class mongo_remove;
 class mongo_removeDefaultTypeInternal;
 extern mongo_removeDefaultTypeInternal _mongo_remove_default_instance_;
@@ -117,11 +126,14 @@ template<> ::db::mongo* Arena::CreateMaybeMessage<::db::mongo>(Arena*);
 template<> ::db::mongo_command* Arena::CreateMaybeMessage<::db::mongo_command>(Arena*);
 template<> ::db::mongo_command_request* Arena::CreateMaybeMessage<::db::mongo_command_request>(Arena*);
 template<> ::db::mongo_command_response* Arena::CreateMaybeMessage<::db::mongo_command_response>(Arena*);
+template<> ::db::mongo_find* Arena::CreateMaybeMessage<::db::mongo_find>(Arena*);
+template<> ::db::mongo_find_one* Arena::CreateMaybeMessage<::db::mongo_find_one>(Arena*);
+template<> ::db::mongo_find_one_request* Arena::CreateMaybeMessage<::db::mongo_find_one_request>(Arena*);
+template<> ::db::mongo_find_one_response* Arena::CreateMaybeMessage<::db::mongo_find_one_response>(Arena*);
+template<> ::db::mongo_find_request* Arena::CreateMaybeMessage<::db::mongo_find_request>(Arena*);
+template<> ::db::mongo_find_response* Arena::CreateMaybeMessage<::db::mongo_find_response>(Arena*);
 template<> ::db::mongo_index* Arena::CreateMaybeMessage<::db::mongo_index>(Arena*);
 template<> ::db::mongo_insert* Arena::CreateMaybeMessage<::db::mongo_insert>(Arena*);
-template<> ::db::mongo_query* Arena::CreateMaybeMessage<::db::mongo_query>(Arena*);
-template<> ::db::mongo_query_request* Arena::CreateMaybeMessage<::db::mongo_query_request>(Arena*);
-template<> ::db::mongo_query_response* Arena::CreateMaybeMessage<::db::mongo_query_response>(Arena*);
 template<> ::db::mongo_remove* Arena::CreateMaybeMessage<::db::mongo_remove>(Arena*);
 template<> ::db::mongo_update* Arena::CreateMaybeMessage<::db::mongo_update>(Arena*);
 template<> ::db::mysql* Arena::CreateMaybeMessage<::db::mysql>(Arena*);
@@ -262,12 +274,6 @@ class mongo_insert :
   ::std::string* release_json();
   void set_allocated_json(::std::string* json);
 
-  // int32 flag = 3;
-  void clear_flag();
-  static const int kFlagFieldNumber = 3;
-  ::google::protobuf::int32 flag() const;
-  void set_flag(::google::protobuf::int32 value);
-
   // @@protoc_insertion_point(class_scope:db.mongo.insert)
  private:
   class HasBitSetters;
@@ -275,31 +281,30 @@ class mongo_insert :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr tab_;
   ::google::protobuf::internal::ArenaStringPtr json_;
-  ::google::protobuf::int32 flag_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2fdb_2eproto;
 };
 // -------------------------------------------------------------------
 
-class mongo_query_request :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:db.mongo.query.request) */ {
+class mongo_find_request :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:db.mongo.find.request) */ {
  public:
-  mongo_query_request();
-  virtual ~mongo_query_request();
+  mongo_find_request();
+  virtual ~mongo_find_request();
 
-  mongo_query_request(const mongo_query_request& from);
+  mongo_find_request(const mongo_find_request& from);
 
-  inline mongo_query_request& operator=(const mongo_query_request& from) {
+  inline mongo_find_request& operator=(const mongo_find_request& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  mongo_query_request(mongo_query_request&& from) noexcept
-    : mongo_query_request() {
+  mongo_find_request(mongo_find_request&& from) noexcept
+    : mongo_find_request() {
     *this = ::std::move(from);
   }
 
-  inline mongo_query_request& operator=(mongo_query_request&& from) noexcept {
+  inline mongo_find_request& operator=(mongo_find_request&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -311,34 +316,34 @@ class mongo_query_request :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const mongo_query_request& default_instance();
+  static const mongo_find_request& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const mongo_query_request* internal_default_instance() {
-    return reinterpret_cast<const mongo_query_request*>(
-               &_mongo_query_request_default_instance_);
+  static inline const mongo_find_request* internal_default_instance() {
+    return reinterpret_cast<const mongo_find_request*>(
+               &_mongo_find_request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     1;
 
-  void Swap(mongo_query_request* other);
-  friend void swap(mongo_query_request& a, mongo_query_request& b) {
+  void Swap(mongo_find_request* other);
+  friend void swap(mongo_find_request& a, mongo_find_request& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline mongo_query_request* New() const final {
-    return CreateMaybeMessage<mongo_query_request>(nullptr);
+  inline mongo_find_request* New() const final {
+    return CreateMaybeMessage<mongo_find_request>(nullptr);
   }
 
-  mongo_query_request* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<mongo_query_request>(arena);
+  mongo_find_request* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<mongo_find_request>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const mongo_query_request& from);
-  void MergeFrom(const mongo_query_request& from);
+  void CopyFrom(const mongo_find_request& from);
+  void MergeFrom(const mongo_find_request& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -360,7 +365,7 @@ class mongo_query_request :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(mongo_query_request* other);
+  void InternalSwap(mongo_find_request* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -432,7 +437,7 @@ class mongo_query_request :
   ::google::protobuf::int32 limit() const;
   void set_limit(::google::protobuf::int32 value);
 
-  // @@protoc_insertion_point(class_scope:db.mongo.query.request)
+  // @@protoc_insertion_point(class_scope:db.mongo.find.request)
  private:
   class HasBitSetters;
 
@@ -446,25 +451,25 @@ class mongo_query_request :
 };
 // -------------------------------------------------------------------
 
-class mongo_query_response :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:db.mongo.query.response) */ {
+class mongo_find_response :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:db.mongo.find.response) */ {
  public:
-  mongo_query_response();
-  virtual ~mongo_query_response();
+  mongo_find_response();
+  virtual ~mongo_find_response();
 
-  mongo_query_response(const mongo_query_response& from);
+  mongo_find_response(const mongo_find_response& from);
 
-  inline mongo_query_response& operator=(const mongo_query_response& from) {
+  inline mongo_find_response& operator=(const mongo_find_response& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  mongo_query_response(mongo_query_response&& from) noexcept
-    : mongo_query_response() {
+  mongo_find_response(mongo_find_response&& from) noexcept
+    : mongo_find_response() {
     *this = ::std::move(from);
   }
 
-  inline mongo_query_response& operator=(mongo_query_response&& from) noexcept {
+  inline mongo_find_response& operator=(mongo_find_response&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -476,34 +481,34 @@ class mongo_query_response :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const mongo_query_response& default_instance();
+  static const mongo_find_response& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const mongo_query_response* internal_default_instance() {
-    return reinterpret_cast<const mongo_query_response*>(
-               &_mongo_query_response_default_instance_);
+  static inline const mongo_find_response* internal_default_instance() {
+    return reinterpret_cast<const mongo_find_response*>(
+               &_mongo_find_response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     2;
 
-  void Swap(mongo_query_response* other);
-  friend void swap(mongo_query_response& a, mongo_query_response& b) {
+  void Swap(mongo_find_response* other);
+  friend void swap(mongo_find_response& a, mongo_find_response& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline mongo_query_response* New() const final {
-    return CreateMaybeMessage<mongo_query_response>(nullptr);
+  inline mongo_find_response* New() const final {
+    return CreateMaybeMessage<mongo_find_response>(nullptr);
   }
 
-  mongo_query_response* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<mongo_query_response>(arena);
+  mongo_find_response* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<mongo_find_response>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const mongo_query_response& from);
-  void MergeFrom(const mongo_query_response& from);
+  void CopyFrom(const mongo_find_response& from);
+  void MergeFrom(const mongo_find_response& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -525,7 +530,7 @@ class mongo_query_response :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(mongo_query_response* other);
+  void InternalSwap(mongo_find_response* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -563,7 +568,7 @@ class mongo_query_response :
   const ::google::protobuf::RepeatedPtrField<::std::string>& jsons() const;
   ::google::protobuf::RepeatedPtrField<::std::string>* mutable_jsons();
 
-  // @@protoc_insertion_point(class_scope:db.mongo.query.response)
+  // @@protoc_insertion_point(class_scope:db.mongo.find.response)
  private:
   class HasBitSetters;
 
@@ -574,25 +579,25 @@ class mongo_query_response :
 };
 // -------------------------------------------------------------------
 
-class mongo_query :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:db.mongo.query) */ {
+class mongo_find :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:db.mongo.find) */ {
  public:
-  mongo_query();
-  virtual ~mongo_query();
+  mongo_find();
+  virtual ~mongo_find();
 
-  mongo_query(const mongo_query& from);
+  mongo_find(const mongo_find& from);
 
-  inline mongo_query& operator=(const mongo_query& from) {
+  inline mongo_find& operator=(const mongo_find& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  mongo_query(mongo_query&& from) noexcept
-    : mongo_query() {
+  mongo_find(mongo_find&& from) noexcept
+    : mongo_find() {
     *this = ::std::move(from);
   }
 
-  inline mongo_query& operator=(mongo_query&& from) noexcept {
+  inline mongo_find& operator=(mongo_find&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -604,34 +609,34 @@ class mongo_query :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const mongo_query& default_instance();
+  static const mongo_find& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const mongo_query* internal_default_instance() {
-    return reinterpret_cast<const mongo_query*>(
-               &_mongo_query_default_instance_);
+  static inline const mongo_find* internal_default_instance() {
+    return reinterpret_cast<const mongo_find*>(
+               &_mongo_find_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     3;
 
-  void Swap(mongo_query* other);
-  friend void swap(mongo_query& a, mongo_query& b) {
+  void Swap(mongo_find* other);
+  friend void swap(mongo_find& a, mongo_find& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline mongo_query* New() const final {
-    return CreateMaybeMessage<mongo_query>(nullptr);
+  inline mongo_find* New() const final {
+    return CreateMaybeMessage<mongo_find>(nullptr);
   }
 
-  mongo_query* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<mongo_query>(arena);
+  mongo_find* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<mongo_find>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const mongo_query& from);
-  void MergeFrom(const mongo_query& from);
+  void CopyFrom(const mongo_find& from);
+  void MergeFrom(const mongo_find& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -653,7 +658,7 @@ class mongo_query :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(mongo_query* other);
+  void InternalSwap(mongo_find* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -667,12 +672,398 @@ class mongo_query :
 
   // nested types ----------------------------------------------------
 
-  typedef mongo_query_request request;
-  typedef mongo_query_response response;
+  typedef mongo_find_request request;
+  typedef mongo_find_response response;
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:db.mongo.query)
+  // @@protoc_insertion_point(class_scope:db.mongo.find)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2fdb_2eproto;
+};
+// -------------------------------------------------------------------
+
+class mongo_find_one_request :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:db.mongo.find_one.request) */ {
+ public:
+  mongo_find_one_request();
+  virtual ~mongo_find_one_request();
+
+  mongo_find_one_request(const mongo_find_one_request& from);
+
+  inline mongo_find_one_request& operator=(const mongo_find_one_request& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  mongo_find_one_request(mongo_find_one_request&& from) noexcept
+    : mongo_find_one_request() {
+    *this = ::std::move(from);
+  }
+
+  inline mongo_find_one_request& operator=(mongo_find_one_request&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const mongo_find_one_request& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const mongo_find_one_request* internal_default_instance() {
+    return reinterpret_cast<const mongo_find_one_request*>(
+               &_mongo_find_one_request_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    4;
+
+  void Swap(mongo_find_one_request* other);
+  friend void swap(mongo_find_one_request& a, mongo_find_one_request& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline mongo_find_one_request* New() const final {
+    return CreateMaybeMessage<mongo_find_one_request>(nullptr);
+  }
+
+  mongo_find_one_request* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<mongo_find_one_request>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const mongo_find_one_request& from);
+  void MergeFrom(const mongo_find_one_request& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(mongo_find_one_request* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated string fields = 3;
+  int fields_size() const;
+  void clear_fields();
+  static const int kFieldsFieldNumber = 3;
+  const ::std::string& fields(int index) const;
+  ::std::string* mutable_fields(int index);
+  void set_fields(int index, const ::std::string& value);
+  #if LANG_CXX11
+  void set_fields(int index, ::std::string&& value);
+  #endif
+  void set_fields(int index, const char* value);
+  void set_fields(int index, const char* value, size_t size);
+  ::std::string* add_fields();
+  void add_fields(const ::std::string& value);
+  #if LANG_CXX11
+  void add_fields(::std::string&& value);
+  #endif
+  void add_fields(const char* value);
+  void add_fields(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField<::std::string>& fields() const;
+  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_fields();
+
+  // string tab = 1;
+  void clear_tab();
+  static const int kTabFieldNumber = 1;
+  const ::std::string& tab() const;
+  void set_tab(const ::std::string& value);
+  #if LANG_CXX11
+  void set_tab(::std::string&& value);
+  #endif
+  void set_tab(const char* value);
+  void set_tab(const char* value, size_t size);
+  ::std::string* mutable_tab();
+  ::std::string* release_tab();
+  void set_allocated_tab(::std::string* tab);
+
+  // string where = 2;
+  void clear_where();
+  static const int kWhereFieldNumber = 2;
+  const ::std::string& where() const;
+  void set_where(const ::std::string& value);
+  #if LANG_CXX11
+  void set_where(::std::string&& value);
+  #endif
+  void set_where(const char* value);
+  void set_where(const char* value, size_t size);
+  ::std::string* mutable_where();
+  ::std::string* release_where();
+  void set_allocated_where(::std::string* where);
+
+  // @@protoc_insertion_point(class_scope:db.mongo.find_one.request)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField<::std::string> fields_;
+  ::google::protobuf::internal::ArenaStringPtr tab_;
+  ::google::protobuf::internal::ArenaStringPtr where_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2fdb_2eproto;
+};
+// -------------------------------------------------------------------
+
+class mongo_find_one_response :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:db.mongo.find_one.response) */ {
+ public:
+  mongo_find_one_response();
+  virtual ~mongo_find_one_response();
+
+  mongo_find_one_response(const mongo_find_one_response& from);
+
+  inline mongo_find_one_response& operator=(const mongo_find_one_response& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  mongo_find_one_response(mongo_find_one_response&& from) noexcept
+    : mongo_find_one_response() {
+    *this = ::std::move(from);
+  }
+
+  inline mongo_find_one_response& operator=(mongo_find_one_response&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const mongo_find_one_response& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const mongo_find_one_response* internal_default_instance() {
+    return reinterpret_cast<const mongo_find_one_response*>(
+               &_mongo_find_one_response_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    5;
+
+  void Swap(mongo_find_one_response* other);
+  friend void swap(mongo_find_one_response& a, mongo_find_one_response& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline mongo_find_one_response* New() const final {
+    return CreateMaybeMessage<mongo_find_one_response>(nullptr);
+  }
+
+  mongo_find_one_response* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<mongo_find_one_response>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const mongo_find_one_response& from);
+  void MergeFrom(const mongo_find_one_response& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(mongo_find_one_response* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string json = 1;
+  void clear_json();
+  static const int kJsonFieldNumber = 1;
+  const ::std::string& json() const;
+  void set_json(const ::std::string& value);
+  #if LANG_CXX11
+  void set_json(::std::string&& value);
+  #endif
+  void set_json(const char* value);
+  void set_json(const char* value, size_t size);
+  ::std::string* mutable_json();
+  ::std::string* release_json();
+  void set_allocated_json(::std::string* json);
+
+  // @@protoc_insertion_point(class_scope:db.mongo.find_one.response)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr json_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_s2s_2fdb_2eproto;
+};
+// -------------------------------------------------------------------
+
+class mongo_find_one :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:db.mongo.find_one) */ {
+ public:
+  mongo_find_one();
+  virtual ~mongo_find_one();
+
+  mongo_find_one(const mongo_find_one& from);
+
+  inline mongo_find_one& operator=(const mongo_find_one& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  mongo_find_one(mongo_find_one&& from) noexcept
+    : mongo_find_one() {
+    *this = ::std::move(from);
+  }
+
+  inline mongo_find_one& operator=(mongo_find_one&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const mongo_find_one& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const mongo_find_one* internal_default_instance() {
+    return reinterpret_cast<const mongo_find_one*>(
+               &_mongo_find_one_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    6;
+
+  void Swap(mongo_find_one* other);
+  friend void swap(mongo_find_one& a, mongo_find_one& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline mongo_find_one* New() const final {
+    return CreateMaybeMessage<mongo_find_one>(nullptr);
+  }
+
+  mongo_find_one* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<mongo_find_one>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const mongo_find_one& from);
+  void MergeFrom(const mongo_find_one& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(mongo_find_one* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef mongo_find_one_request request;
+  typedef mongo_find_one_response response;
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:db.mongo.find_one)
  private:
   class HasBitSetters;
 
@@ -720,7 +1111,7 @@ class mongo_remove :
                &_mongo_remove_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    7;
 
   void Swap(mongo_remove* other);
   friend void swap(mongo_remove& a, mongo_remove& b) {
@@ -811,12 +1202,6 @@ class mongo_remove :
   ::google::protobuf::int32 limit() const;
   void set_limit(::google::protobuf::int32 value);
 
-  // int32 flag = 4;
-  void clear_flag();
-  static const int kFlagFieldNumber = 4;
-  ::google::protobuf::int32 flag() const;
-  void set_flag(::google::protobuf::int32 value);
-
   // @@protoc_insertion_point(class_scope:db.mongo.remove)
  private:
   class HasBitSetters;
@@ -825,7 +1210,6 @@ class mongo_remove :
   ::google::protobuf::internal::ArenaStringPtr tab_;
   ::google::protobuf::internal::ArenaStringPtr json_;
   ::google::protobuf::int32 limit_;
-  ::google::protobuf::int32 flag_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2fdb_2eproto;
 };
@@ -869,7 +1253,7 @@ class mongo_index :
                &_mongo_index_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    8;
 
   void Swap(mongo_index* other);
   friend void swap(mongo_index& a, mongo_index& b) {
@@ -926,6 +1310,28 @@ class mongo_index :
 
   // accessors -------------------------------------------------------
 
+  // repeated string keys = 2;
+  int keys_size() const;
+  void clear_keys();
+  static const int kKeysFieldNumber = 2;
+  const ::std::string& keys(int index) const;
+  ::std::string* mutable_keys(int index);
+  void set_keys(int index, const ::std::string& value);
+  #if LANG_CXX11
+  void set_keys(int index, ::std::string&& value);
+  #endif
+  void set_keys(int index, const char* value);
+  void set_keys(int index, const char* value, size_t size);
+  ::std::string* add_keys();
+  void add_keys(const ::std::string& value);
+  #if LANG_CXX11
+  void add_keys(::std::string&& value);
+  #endif
+  void add_keys(const char* value);
+  void add_keys(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField<::std::string>& keys() const;
+  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_keys();
+
   // string tab = 1;
   void clear_tab();
   static const int kTabFieldNumber = 1;
@@ -940,27 +1346,13 @@ class mongo_index :
   ::std::string* release_tab();
   void set_allocated_tab(::std::string* tab);
 
-  // string name = 2;
-  void clear_name();
-  static const int kNameFieldNumber = 2;
-  const ::std::string& name() const;
-  void set_name(const ::std::string& value);
-  #if LANG_CXX11
-  void set_name(::std::string&& value);
-  #endif
-  void set_name(const char* value);
-  void set_name(const char* value, size_t size);
-  ::std::string* mutable_name();
-  ::std::string* release_name();
-  void set_allocated_name(::std::string* name);
-
   // @@protoc_insertion_point(class_scope:db.mongo.index)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField<::std::string> keys_;
   ::google::protobuf::internal::ArenaStringPtr tab_;
-  ::google::protobuf::internal::ArenaStringPtr name_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2fdb_2eproto;
 };
@@ -1004,7 +1396,7 @@ class mongo_update :
                &_mongo_update_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    9;
 
   void Swap(mongo_update* other);
   friend void swap(mongo_update& a, mongo_update& b) {
@@ -1117,12 +1509,6 @@ class mongo_update :
   ::std::string* release_tag();
   void set_allocated_tag(::std::string* tag);
 
-  // int32 flag = 5;
-  void clear_flag();
-  static const int kFlagFieldNumber = 5;
-  ::google::protobuf::int32 flag() const;
-  void set_flag(::google::protobuf::int32 value);
-
   // @@protoc_insertion_point(class_scope:db.mongo.update)
  private:
   class HasBitSetters;
@@ -1132,7 +1518,6 @@ class mongo_update :
   ::google::protobuf::internal::ArenaStringPtr select_;
   ::google::protobuf::internal::ArenaStringPtr update_;
   ::google::protobuf::internal::ArenaStringPtr tag_;
-  ::google::protobuf::int32 flag_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2fdb_2eproto;
 };
@@ -1176,7 +1561,7 @@ class mongo_command_request :
                &_mongo_command_request_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    10;
 
   void Swap(mongo_command_request* other);
   friend void swap(mongo_command_request& a, mongo_command_request& b) {
@@ -1233,9 +1618,37 @@ class mongo_command_request :
 
   // accessors -------------------------------------------------------
 
-  // string json = 1;
+  // string tab = 1;
+  void clear_tab();
+  static const int kTabFieldNumber = 1;
+  const ::std::string& tab() const;
+  void set_tab(const ::std::string& value);
+  #if LANG_CXX11
+  void set_tab(::std::string&& value);
+  #endif
+  void set_tab(const char* value);
+  void set_tab(const char* value, size_t size);
+  ::std::string* mutable_tab();
+  ::std::string* release_tab();
+  void set_allocated_tab(::std::string* tab);
+
+  // string cmd = 2;
+  void clear_cmd();
+  static const int kCmdFieldNumber = 2;
+  const ::std::string& cmd() const;
+  void set_cmd(const ::std::string& value);
+  #if LANG_CXX11
+  void set_cmd(::std::string&& value);
+  #endif
+  void set_cmd(const char* value);
+  void set_cmd(const char* value, size_t size);
+  ::std::string* mutable_cmd();
+  ::std::string* release_cmd();
+  void set_allocated_cmd(::std::string* cmd);
+
+  // string json = 3;
   void clear_json();
-  static const int kJsonFieldNumber = 1;
+  static const int kJsonFieldNumber = 3;
   const ::std::string& json() const;
   void set_json(const ::std::string& value);
   #if LANG_CXX11
@@ -1252,6 +1665,8 @@ class mongo_command_request :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr tab_;
+  ::google::protobuf::internal::ArenaStringPtr cmd_;
   ::google::protobuf::internal::ArenaStringPtr json_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2fdb_2eproto;
@@ -1296,7 +1711,7 @@ class mongo_command_response :
                &_mongo_command_response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    11;
 
   void Swap(mongo_command_response* other);
   friend void swap(mongo_command_response& a, mongo_command_response& b) {
@@ -1353,34 +1768,26 @@ class mongo_command_response :
 
   // accessors -------------------------------------------------------
 
-  // repeated bytes jsons = 1;
-  int jsons_size() const;
-  void clear_jsons();
-  static const int kJsonsFieldNumber = 1;
-  const ::std::string& jsons(int index) const;
-  ::std::string* mutable_jsons(int index);
-  void set_jsons(int index, const ::std::string& value);
+  // string json = 1;
+  void clear_json();
+  static const int kJsonFieldNumber = 1;
+  const ::std::string& json() const;
+  void set_json(const ::std::string& value);
   #if LANG_CXX11
-  void set_jsons(int index, ::std::string&& value);
+  void set_json(::std::string&& value);
   #endif
-  void set_jsons(int index, const char* value);
-  void set_jsons(int index, const void* value, size_t size);
-  ::std::string* add_jsons();
-  void add_jsons(const ::std::string& value);
-  #if LANG_CXX11
-  void add_jsons(::std::string&& value);
-  #endif
-  void add_jsons(const char* value);
-  void add_jsons(const void* value, size_t size);
-  const ::google::protobuf::RepeatedPtrField<::std::string>& jsons() const;
-  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_jsons();
+  void set_json(const char* value);
+  void set_json(const char* value, size_t size);
+  ::std::string* mutable_json();
+  ::std::string* release_json();
+  void set_allocated_json(::std::string* json);
 
   // @@protoc_insertion_point(class_scope:db.mongo.command.response)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField<::std::string> jsons_;
+  ::google::protobuf::internal::ArenaStringPtr json_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_s2s_2fdb_2eproto;
 };
@@ -1424,7 +1831,7 @@ class mongo_command :
                &_mongo_command_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    12;
 
   void Swap(mongo_command* other);
   friend void swap(mongo_command& a, mongo_command& b) {
@@ -1532,7 +1939,7 @@ class mongo :
                &_mongo_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    13;
 
   void Swap(mongo* other);
   friend void swap(mongo& a, mongo& b) {
@@ -1588,7 +1995,8 @@ class mongo :
   // nested types ----------------------------------------------------
 
   typedef mongo_insert insert;
-  typedef mongo_query query;
+  typedef mongo_find find;
+  typedef mongo_find_one find_one;
   typedef mongo_remove remove;
   typedef mongo_index index;
   typedef mongo_update update;
@@ -1644,7 +2052,7 @@ class mysql_create :
                &_mysql_create_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    14;
 
   void Swap(mysql_create* other);
   friend void swap(mysql_create& a, mysql_create& b) {
@@ -1797,7 +2205,7 @@ class mysql_exec :
                &_mysql_exec_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    15;
 
   void Swap(mysql_exec* other);
   friend void swap(mysql_exec& a, mysql_exec& b) {
@@ -1924,7 +2332,7 @@ class mysql_add :
                &_mysql_add_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    16;
 
   void Swap(mysql_add* other);
   friend void swap(mysql_add& a, mysql_add& b) {
@@ -2061,7 +2469,7 @@ class mysql_save :
                &_mysql_save_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    17;
 
   void Swap(mysql_save* other);
   friend void swap(mysql_save& a, mysql_save& b) {
@@ -2198,7 +2606,7 @@ class mysql_query :
                &_mysql_query_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    18;
 
   void Swap(mysql_query* other);
   friend void swap(mysql_query& a, mysql_query& b) {
@@ -2363,7 +2771,7 @@ class mysql_remove :
                &_mysql_remove_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    19;
 
   void Swap(mysql_remove* other);
   friend void swap(mysql_remove& a, mysql_remove& b) {
@@ -2505,7 +2913,7 @@ class mysql_update :
                &_mysql_update_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    20;
 
   void Swap(mysql_update* other);
   friend void swap(mysql_update& a, mysql_update& b) {
@@ -2662,7 +3070,7 @@ class mysql_response :
                &_mysql_response_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    21;
 
   void Swap(mysql_response* other);
   friend void swap(mysql_response& a, mysql_response& b) {
@@ -2805,7 +3213,7 @@ class mysql :
                &_mysql_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    19;
+    22;
 
   void Swap(mysql* other);
   friend void swap(mysql& a, mysql& b) {
@@ -2996,289 +3404,515 @@ inline void mongo_insert::set_allocated_json(::std::string* json) {
   // @@protoc_insertion_point(field_set_allocated:db.mongo.insert.json)
 }
 
-// int32 flag = 3;
-inline void mongo_insert::clear_flag() {
-  flag_ = 0;
-}
-inline ::google::protobuf::int32 mongo_insert::flag() const {
-  // @@protoc_insertion_point(field_get:db.mongo.insert.flag)
-  return flag_;
-}
-inline void mongo_insert::set_flag(::google::protobuf::int32 value) {
-  
-  flag_ = value;
-  // @@protoc_insertion_point(field_set:db.mongo.insert.flag)
-}
-
 // -------------------------------------------------------------------
 
-// mongo_query_request
+// mongo_find_request
 
 // string tab = 1;
-inline void mongo_query_request::clear_tab() {
+inline void mongo_find_request::clear_tab() {
   tab_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& mongo_query_request::tab() const {
-  // @@protoc_insertion_point(field_get:db.mongo.query.request.tab)
+inline const ::std::string& mongo_find_request::tab() const {
+  // @@protoc_insertion_point(field_get:db.mongo.find.request.tab)
   return tab_.GetNoArena();
 }
-inline void mongo_query_request::set_tab(const ::std::string& value) {
+inline void mongo_find_request::set_tab(const ::std::string& value) {
   
   tab_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:db.mongo.query.request.tab)
+  // @@protoc_insertion_point(field_set:db.mongo.find.request.tab)
 }
 #if LANG_CXX11
-inline void mongo_query_request::set_tab(::std::string&& value) {
+inline void mongo_find_request::set_tab(::std::string&& value) {
   
   tab_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:db.mongo.query.request.tab)
+  // @@protoc_insertion_point(field_set_rvalue:db.mongo.find.request.tab)
 }
 #endif
-inline void mongo_query_request::set_tab(const char* value) {
+inline void mongo_find_request::set_tab(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   tab_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:db.mongo.query.request.tab)
+  // @@protoc_insertion_point(field_set_char:db.mongo.find.request.tab)
 }
-inline void mongo_query_request::set_tab(const char* value, size_t size) {
+inline void mongo_find_request::set_tab(const char* value, size_t size) {
   
   tab_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:db.mongo.query.request.tab)
+  // @@protoc_insertion_point(field_set_pointer:db.mongo.find.request.tab)
 }
-inline ::std::string* mongo_query_request::mutable_tab() {
+inline ::std::string* mongo_find_request::mutable_tab() {
   
-  // @@protoc_insertion_point(field_mutable:db.mongo.query.request.tab)
+  // @@protoc_insertion_point(field_mutable:db.mongo.find.request.tab)
   return tab_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* mongo_query_request::release_tab() {
-  // @@protoc_insertion_point(field_release:db.mongo.query.request.tab)
+inline ::std::string* mongo_find_request::release_tab() {
+  // @@protoc_insertion_point(field_release:db.mongo.find.request.tab)
   
   return tab_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void mongo_query_request::set_allocated_tab(::std::string* tab) {
+inline void mongo_find_request::set_allocated_tab(::std::string* tab) {
   if (tab != nullptr) {
     
   } else {
     
   }
   tab_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), tab);
-  // @@protoc_insertion_point(field_set_allocated:db.mongo.query.request.tab)
+  // @@protoc_insertion_point(field_set_allocated:db.mongo.find.request.tab)
 }
 
 // string json = 2;
-inline void mongo_query_request::clear_json() {
+inline void mongo_find_request::clear_json() {
   json_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& mongo_query_request::json() const {
-  // @@protoc_insertion_point(field_get:db.mongo.query.request.json)
+inline const ::std::string& mongo_find_request::json() const {
+  // @@protoc_insertion_point(field_get:db.mongo.find.request.json)
   return json_.GetNoArena();
 }
-inline void mongo_query_request::set_json(const ::std::string& value) {
+inline void mongo_find_request::set_json(const ::std::string& value) {
   
   json_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:db.mongo.query.request.json)
+  // @@protoc_insertion_point(field_set:db.mongo.find.request.json)
 }
 #if LANG_CXX11
-inline void mongo_query_request::set_json(::std::string&& value) {
+inline void mongo_find_request::set_json(::std::string&& value) {
   
   json_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:db.mongo.query.request.json)
+  // @@protoc_insertion_point(field_set_rvalue:db.mongo.find.request.json)
 }
 #endif
-inline void mongo_query_request::set_json(const char* value) {
+inline void mongo_find_request::set_json(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
   json_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:db.mongo.query.request.json)
+  // @@protoc_insertion_point(field_set_char:db.mongo.find.request.json)
 }
-inline void mongo_query_request::set_json(const char* value, size_t size) {
+inline void mongo_find_request::set_json(const char* value, size_t size) {
   
   json_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:db.mongo.query.request.json)
+  // @@protoc_insertion_point(field_set_pointer:db.mongo.find.request.json)
 }
-inline ::std::string* mongo_query_request::mutable_json() {
+inline ::std::string* mongo_find_request::mutable_json() {
   
-  // @@protoc_insertion_point(field_mutable:db.mongo.query.request.json)
+  // @@protoc_insertion_point(field_mutable:db.mongo.find.request.json)
   return json_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* mongo_query_request::release_json() {
-  // @@protoc_insertion_point(field_release:db.mongo.query.request.json)
+inline ::std::string* mongo_find_request::release_json() {
+  // @@protoc_insertion_point(field_release:db.mongo.find.request.json)
   
   return json_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void mongo_query_request::set_allocated_json(::std::string* json) {
+inline void mongo_find_request::set_allocated_json(::std::string* json) {
   if (json != nullptr) {
     
   } else {
     
   }
   json_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), json);
-  // @@protoc_insertion_point(field_set_allocated:db.mongo.query.request.json)
+  // @@protoc_insertion_point(field_set_allocated:db.mongo.find.request.json)
 }
 
 // int32 limit = 3;
-inline void mongo_query_request::clear_limit() {
+inline void mongo_find_request::clear_limit() {
   limit_ = 0;
 }
-inline ::google::protobuf::int32 mongo_query_request::limit() const {
-  // @@protoc_insertion_point(field_get:db.mongo.query.request.limit)
+inline ::google::protobuf::int32 mongo_find_request::limit() const {
+  // @@protoc_insertion_point(field_get:db.mongo.find.request.limit)
   return limit_;
 }
-inline void mongo_query_request::set_limit(::google::protobuf::int32 value) {
+inline void mongo_find_request::set_limit(::google::protobuf::int32 value) {
   
   limit_ = value;
-  // @@protoc_insertion_point(field_set:db.mongo.query.request.limit)
+  // @@protoc_insertion_point(field_set:db.mongo.find.request.limit)
 }
 
 // repeated string fields = 4;
-inline int mongo_query_request::fields_size() const {
+inline int mongo_find_request::fields_size() const {
   return fields_.size();
 }
-inline void mongo_query_request::clear_fields() {
+inline void mongo_find_request::clear_fields() {
   fields_.Clear();
 }
-inline const ::std::string& mongo_query_request::fields(int index) const {
-  // @@protoc_insertion_point(field_get:db.mongo.query.request.fields)
+inline const ::std::string& mongo_find_request::fields(int index) const {
+  // @@protoc_insertion_point(field_get:db.mongo.find.request.fields)
   return fields_.Get(index);
 }
-inline ::std::string* mongo_query_request::mutable_fields(int index) {
-  // @@protoc_insertion_point(field_mutable:db.mongo.query.request.fields)
+inline ::std::string* mongo_find_request::mutable_fields(int index) {
+  // @@protoc_insertion_point(field_mutable:db.mongo.find.request.fields)
   return fields_.Mutable(index);
 }
-inline void mongo_query_request::set_fields(int index, const ::std::string& value) {
-  // @@protoc_insertion_point(field_set:db.mongo.query.request.fields)
+inline void mongo_find_request::set_fields(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:db.mongo.find.request.fields)
   fields_.Mutable(index)->assign(value);
 }
 #if LANG_CXX11
-inline void mongo_query_request::set_fields(int index, ::std::string&& value) {
-  // @@protoc_insertion_point(field_set:db.mongo.query.request.fields)
+inline void mongo_find_request::set_fields(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:db.mongo.find.request.fields)
   fields_.Mutable(index)->assign(std::move(value));
 }
 #endif
-inline void mongo_query_request::set_fields(int index, const char* value) {
+inline void mongo_find_request::set_fields(int index, const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   fields_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:db.mongo.query.request.fields)
+  // @@protoc_insertion_point(field_set_char:db.mongo.find.request.fields)
 }
-inline void mongo_query_request::set_fields(int index, const char* value, size_t size) {
+inline void mongo_find_request::set_fields(int index, const char* value, size_t size) {
   fields_.Mutable(index)->assign(
     reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:db.mongo.query.request.fields)
+  // @@protoc_insertion_point(field_set_pointer:db.mongo.find.request.fields)
 }
-inline ::std::string* mongo_query_request::add_fields() {
-  // @@protoc_insertion_point(field_add_mutable:db.mongo.query.request.fields)
+inline ::std::string* mongo_find_request::add_fields() {
+  // @@protoc_insertion_point(field_add_mutable:db.mongo.find.request.fields)
   return fields_.Add();
 }
-inline void mongo_query_request::add_fields(const ::std::string& value) {
+inline void mongo_find_request::add_fields(const ::std::string& value) {
   fields_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:db.mongo.query.request.fields)
+  // @@protoc_insertion_point(field_add:db.mongo.find.request.fields)
 }
 #if LANG_CXX11
-inline void mongo_query_request::add_fields(::std::string&& value) {
+inline void mongo_find_request::add_fields(::std::string&& value) {
   fields_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:db.mongo.query.request.fields)
+  // @@protoc_insertion_point(field_add:db.mongo.find.request.fields)
 }
 #endif
-inline void mongo_query_request::add_fields(const char* value) {
+inline void mongo_find_request::add_fields(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   fields_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:db.mongo.query.request.fields)
+  // @@protoc_insertion_point(field_add_char:db.mongo.find.request.fields)
 }
-inline void mongo_query_request::add_fields(const char* value, size_t size) {
+inline void mongo_find_request::add_fields(const char* value, size_t size) {
   fields_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:db.mongo.query.request.fields)
+  // @@protoc_insertion_point(field_add_pointer:db.mongo.find.request.fields)
 }
 inline const ::google::protobuf::RepeatedPtrField<::std::string>&
-mongo_query_request::fields() const {
-  // @@protoc_insertion_point(field_list:db.mongo.query.request.fields)
+mongo_find_request::fields() const {
+  // @@protoc_insertion_point(field_list:db.mongo.find.request.fields)
   return fields_;
 }
 inline ::google::protobuf::RepeatedPtrField<::std::string>*
-mongo_query_request::mutable_fields() {
-  // @@protoc_insertion_point(field_mutable_list:db.mongo.query.request.fields)
+mongo_find_request::mutable_fields() {
+  // @@protoc_insertion_point(field_mutable_list:db.mongo.find.request.fields)
   return &fields_;
 }
 
 // -------------------------------------------------------------------
 
-// mongo_query_response
+// mongo_find_response
 
 // repeated string jsons = 1;
-inline int mongo_query_response::jsons_size() const {
+inline int mongo_find_response::jsons_size() const {
   return jsons_.size();
 }
-inline void mongo_query_response::clear_jsons() {
+inline void mongo_find_response::clear_jsons() {
   jsons_.Clear();
 }
-inline const ::std::string& mongo_query_response::jsons(int index) const {
-  // @@protoc_insertion_point(field_get:db.mongo.query.response.jsons)
+inline const ::std::string& mongo_find_response::jsons(int index) const {
+  // @@protoc_insertion_point(field_get:db.mongo.find.response.jsons)
   return jsons_.Get(index);
 }
-inline ::std::string* mongo_query_response::mutable_jsons(int index) {
-  // @@protoc_insertion_point(field_mutable:db.mongo.query.response.jsons)
+inline ::std::string* mongo_find_response::mutable_jsons(int index) {
+  // @@protoc_insertion_point(field_mutable:db.mongo.find.response.jsons)
   return jsons_.Mutable(index);
 }
-inline void mongo_query_response::set_jsons(int index, const ::std::string& value) {
-  // @@protoc_insertion_point(field_set:db.mongo.query.response.jsons)
+inline void mongo_find_response::set_jsons(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:db.mongo.find.response.jsons)
   jsons_.Mutable(index)->assign(value);
 }
 #if LANG_CXX11
-inline void mongo_query_response::set_jsons(int index, ::std::string&& value) {
-  // @@protoc_insertion_point(field_set:db.mongo.query.response.jsons)
+inline void mongo_find_response::set_jsons(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:db.mongo.find.response.jsons)
   jsons_.Mutable(index)->assign(std::move(value));
 }
 #endif
-inline void mongo_query_response::set_jsons(int index, const char* value) {
+inline void mongo_find_response::set_jsons(int index, const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   jsons_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:db.mongo.query.response.jsons)
+  // @@protoc_insertion_point(field_set_char:db.mongo.find.response.jsons)
 }
-inline void mongo_query_response::set_jsons(int index, const char* value, size_t size) {
+inline void mongo_find_response::set_jsons(int index, const char* value, size_t size) {
   jsons_.Mutable(index)->assign(
     reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:db.mongo.query.response.jsons)
+  // @@protoc_insertion_point(field_set_pointer:db.mongo.find.response.jsons)
 }
-inline ::std::string* mongo_query_response::add_jsons() {
-  // @@protoc_insertion_point(field_add_mutable:db.mongo.query.response.jsons)
+inline ::std::string* mongo_find_response::add_jsons() {
+  // @@protoc_insertion_point(field_add_mutable:db.mongo.find.response.jsons)
   return jsons_.Add();
 }
-inline void mongo_query_response::add_jsons(const ::std::string& value) {
+inline void mongo_find_response::add_jsons(const ::std::string& value) {
   jsons_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:db.mongo.query.response.jsons)
+  // @@protoc_insertion_point(field_add:db.mongo.find.response.jsons)
 }
 #if LANG_CXX11
-inline void mongo_query_response::add_jsons(::std::string&& value) {
+inline void mongo_find_response::add_jsons(::std::string&& value) {
   jsons_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:db.mongo.query.response.jsons)
+  // @@protoc_insertion_point(field_add:db.mongo.find.response.jsons)
 }
 #endif
-inline void mongo_query_response::add_jsons(const char* value) {
+inline void mongo_find_response::add_jsons(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   jsons_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:db.mongo.query.response.jsons)
+  // @@protoc_insertion_point(field_add_char:db.mongo.find.response.jsons)
 }
-inline void mongo_query_response::add_jsons(const char* value, size_t size) {
+inline void mongo_find_response::add_jsons(const char* value, size_t size) {
   jsons_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:db.mongo.query.response.jsons)
+  // @@protoc_insertion_point(field_add_pointer:db.mongo.find.response.jsons)
 }
 inline const ::google::protobuf::RepeatedPtrField<::std::string>&
-mongo_query_response::jsons() const {
-  // @@protoc_insertion_point(field_list:db.mongo.query.response.jsons)
+mongo_find_response::jsons() const {
+  // @@protoc_insertion_point(field_list:db.mongo.find.response.jsons)
   return jsons_;
 }
 inline ::google::protobuf::RepeatedPtrField<::std::string>*
-mongo_query_response::mutable_jsons() {
-  // @@protoc_insertion_point(field_mutable_list:db.mongo.query.response.jsons)
+mongo_find_response::mutable_jsons() {
+  // @@protoc_insertion_point(field_mutable_list:db.mongo.find.response.jsons)
   return &jsons_;
 }
 
 // -------------------------------------------------------------------
 
-// mongo_query
+// mongo_find
+
+// -------------------------------------------------------------------
+
+// mongo_find_one_request
+
+// string tab = 1;
+inline void mongo_find_one_request::clear_tab() {
+  tab_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& mongo_find_one_request::tab() const {
+  // @@protoc_insertion_point(field_get:db.mongo.find_one.request.tab)
+  return tab_.GetNoArena();
+}
+inline void mongo_find_one_request::set_tab(const ::std::string& value) {
+  
+  tab_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:db.mongo.find_one.request.tab)
+}
+#if LANG_CXX11
+inline void mongo_find_one_request::set_tab(::std::string&& value) {
+  
+  tab_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:db.mongo.find_one.request.tab)
+}
+#endif
+inline void mongo_find_one_request::set_tab(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  tab_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:db.mongo.find_one.request.tab)
+}
+inline void mongo_find_one_request::set_tab(const char* value, size_t size) {
+  
+  tab_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:db.mongo.find_one.request.tab)
+}
+inline ::std::string* mongo_find_one_request::mutable_tab() {
+  
+  // @@protoc_insertion_point(field_mutable:db.mongo.find_one.request.tab)
+  return tab_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* mongo_find_one_request::release_tab() {
+  // @@protoc_insertion_point(field_release:db.mongo.find_one.request.tab)
+  
+  return tab_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void mongo_find_one_request::set_allocated_tab(::std::string* tab) {
+  if (tab != nullptr) {
+    
+  } else {
+    
+  }
+  tab_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), tab);
+  // @@protoc_insertion_point(field_set_allocated:db.mongo.find_one.request.tab)
+}
+
+// string where = 2;
+inline void mongo_find_one_request::clear_where() {
+  where_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& mongo_find_one_request::where() const {
+  // @@protoc_insertion_point(field_get:db.mongo.find_one.request.where)
+  return where_.GetNoArena();
+}
+inline void mongo_find_one_request::set_where(const ::std::string& value) {
+  
+  where_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:db.mongo.find_one.request.where)
+}
+#if LANG_CXX11
+inline void mongo_find_one_request::set_where(::std::string&& value) {
+  
+  where_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:db.mongo.find_one.request.where)
+}
+#endif
+inline void mongo_find_one_request::set_where(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  where_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:db.mongo.find_one.request.where)
+}
+inline void mongo_find_one_request::set_where(const char* value, size_t size) {
+  
+  where_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:db.mongo.find_one.request.where)
+}
+inline ::std::string* mongo_find_one_request::mutable_where() {
+  
+  // @@protoc_insertion_point(field_mutable:db.mongo.find_one.request.where)
+  return where_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* mongo_find_one_request::release_where() {
+  // @@protoc_insertion_point(field_release:db.mongo.find_one.request.where)
+  
+  return where_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void mongo_find_one_request::set_allocated_where(::std::string* where) {
+  if (where != nullptr) {
+    
+  } else {
+    
+  }
+  where_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), where);
+  // @@protoc_insertion_point(field_set_allocated:db.mongo.find_one.request.where)
+}
+
+// repeated string fields = 3;
+inline int mongo_find_one_request::fields_size() const {
+  return fields_.size();
+}
+inline void mongo_find_one_request::clear_fields() {
+  fields_.Clear();
+}
+inline const ::std::string& mongo_find_one_request::fields(int index) const {
+  // @@protoc_insertion_point(field_get:db.mongo.find_one.request.fields)
+  return fields_.Get(index);
+}
+inline ::std::string* mongo_find_one_request::mutable_fields(int index) {
+  // @@protoc_insertion_point(field_mutable:db.mongo.find_one.request.fields)
+  return fields_.Mutable(index);
+}
+inline void mongo_find_one_request::set_fields(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:db.mongo.find_one.request.fields)
+  fields_.Mutable(index)->assign(value);
+}
+#if LANG_CXX11
+inline void mongo_find_one_request::set_fields(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:db.mongo.find_one.request.fields)
+  fields_.Mutable(index)->assign(std::move(value));
+}
+#endif
+inline void mongo_find_one_request::set_fields(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  fields_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:db.mongo.find_one.request.fields)
+}
+inline void mongo_find_one_request::set_fields(int index, const char* value, size_t size) {
+  fields_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:db.mongo.find_one.request.fields)
+}
+inline ::std::string* mongo_find_one_request::add_fields() {
+  // @@protoc_insertion_point(field_add_mutable:db.mongo.find_one.request.fields)
+  return fields_.Add();
+}
+inline void mongo_find_one_request::add_fields(const ::std::string& value) {
+  fields_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:db.mongo.find_one.request.fields)
+}
+#if LANG_CXX11
+inline void mongo_find_one_request::add_fields(::std::string&& value) {
+  fields_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:db.mongo.find_one.request.fields)
+}
+#endif
+inline void mongo_find_one_request::add_fields(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  fields_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:db.mongo.find_one.request.fields)
+}
+inline void mongo_find_one_request::add_fields(const char* value, size_t size) {
+  fields_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:db.mongo.find_one.request.fields)
+}
+inline const ::google::protobuf::RepeatedPtrField<::std::string>&
+mongo_find_one_request::fields() const {
+  // @@protoc_insertion_point(field_list:db.mongo.find_one.request.fields)
+  return fields_;
+}
+inline ::google::protobuf::RepeatedPtrField<::std::string>*
+mongo_find_one_request::mutable_fields() {
+  // @@protoc_insertion_point(field_mutable_list:db.mongo.find_one.request.fields)
+  return &fields_;
+}
+
+// -------------------------------------------------------------------
+
+// mongo_find_one_response
+
+// string json = 1;
+inline void mongo_find_one_response::clear_json() {
+  json_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& mongo_find_one_response::json() const {
+  // @@protoc_insertion_point(field_get:db.mongo.find_one.response.json)
+  return json_.GetNoArena();
+}
+inline void mongo_find_one_response::set_json(const ::std::string& value) {
+  
+  json_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:db.mongo.find_one.response.json)
+}
+#if LANG_CXX11
+inline void mongo_find_one_response::set_json(::std::string&& value) {
+  
+  json_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:db.mongo.find_one.response.json)
+}
+#endif
+inline void mongo_find_one_response::set_json(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  json_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:db.mongo.find_one.response.json)
+}
+inline void mongo_find_one_response::set_json(const char* value, size_t size) {
+  
+  json_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:db.mongo.find_one.response.json)
+}
+inline ::std::string* mongo_find_one_response::mutable_json() {
+  
+  // @@protoc_insertion_point(field_mutable:db.mongo.find_one.response.json)
+  return json_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* mongo_find_one_response::release_json() {
+  // @@protoc_insertion_point(field_release:db.mongo.find_one.response.json)
+  
+  return json_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void mongo_find_one_response::set_allocated_json(::std::string* json) {
+  if (json != nullptr) {
+    
+  } else {
+    
+  }
+  json_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), json);
+  // @@protoc_insertion_point(field_set_allocated:db.mongo.find_one.response.json)
+}
+
+// -------------------------------------------------------------------
+
+// mongo_find_one
 
 // -------------------------------------------------------------------
 
@@ -3404,20 +4038,6 @@ inline void mongo_remove::set_limit(::google::protobuf::int32 value) {
   // @@protoc_insertion_point(field_set:db.mongo.remove.limit)
 }
 
-// int32 flag = 4;
-inline void mongo_remove::clear_flag() {
-  flag_ = 0;
-}
-inline ::google::protobuf::int32 mongo_remove::flag() const {
-  // @@protoc_insertion_point(field_get:db.mongo.remove.flag)
-  return flag_;
-}
-inline void mongo_remove::set_flag(::google::protobuf::int32 value) {
-  
-  flag_ = value;
-  // @@protoc_insertion_point(field_set:db.mongo.remove.flag)
-}
-
 // -------------------------------------------------------------------
 
 // mongo_index
@@ -3475,57 +4095,73 @@ inline void mongo_index::set_allocated_tab(::std::string* tab) {
   // @@protoc_insertion_point(field_set_allocated:db.mongo.index.tab)
 }
 
-// string name = 2;
-inline void mongo_index::clear_name() {
-  name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// repeated string keys = 2;
+inline int mongo_index::keys_size() const {
+  return keys_.size();
 }
-inline const ::std::string& mongo_index::name() const {
-  // @@protoc_insertion_point(field_get:db.mongo.index.name)
-  return name_.GetNoArena();
+inline void mongo_index::clear_keys() {
+  keys_.Clear();
 }
-inline void mongo_index::set_name(const ::std::string& value) {
-  
-  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:db.mongo.index.name)
+inline const ::std::string& mongo_index::keys(int index) const {
+  // @@protoc_insertion_point(field_get:db.mongo.index.keys)
+  return keys_.Get(index);
+}
+inline ::std::string* mongo_index::mutable_keys(int index) {
+  // @@protoc_insertion_point(field_mutable:db.mongo.index.keys)
+  return keys_.Mutable(index);
+}
+inline void mongo_index::set_keys(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:db.mongo.index.keys)
+  keys_.Mutable(index)->assign(value);
 }
 #if LANG_CXX11
-inline void mongo_index::set_name(::std::string&& value) {
-  
-  name_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:db.mongo.index.name)
+inline void mongo_index::set_keys(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:db.mongo.index.keys)
+  keys_.Mutable(index)->assign(std::move(value));
 }
 #endif
-inline void mongo_index::set_name(const char* value) {
+inline void mongo_index::set_keys(int index, const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
-  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:db.mongo.index.name)
+  keys_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:db.mongo.index.keys)
 }
-inline void mongo_index::set_name(const char* value, size_t size) {
-  
-  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:db.mongo.index.name)
+inline void mongo_index::set_keys(int index, const char* value, size_t size) {
+  keys_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:db.mongo.index.keys)
 }
-inline ::std::string* mongo_index::mutable_name() {
-  
-  // @@protoc_insertion_point(field_mutable:db.mongo.index.name)
-  return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+inline ::std::string* mongo_index::add_keys() {
+  // @@protoc_insertion_point(field_add_mutable:db.mongo.index.keys)
+  return keys_.Add();
 }
-inline ::std::string* mongo_index::release_name() {
-  // @@protoc_insertion_point(field_release:db.mongo.index.name)
-  
-  return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+inline void mongo_index::add_keys(const ::std::string& value) {
+  keys_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:db.mongo.index.keys)
 }
-inline void mongo_index::set_allocated_name(::std::string* name) {
-  if (name != nullptr) {
-    
-  } else {
-    
-  }
-  name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
-  // @@protoc_insertion_point(field_set_allocated:db.mongo.index.name)
+#if LANG_CXX11
+inline void mongo_index::add_keys(::std::string&& value) {
+  keys_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:db.mongo.index.keys)
+}
+#endif
+inline void mongo_index::add_keys(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  keys_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:db.mongo.index.keys)
+}
+inline void mongo_index::add_keys(const char* value, size_t size) {
+  keys_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:db.mongo.index.keys)
+}
+inline const ::google::protobuf::RepeatedPtrField<::std::string>&
+mongo_index::keys() const {
+  // @@protoc_insertion_point(field_list:db.mongo.index.keys)
+  return keys_;
+}
+inline ::google::protobuf::RepeatedPtrField<::std::string>*
+mongo_index::mutable_keys() {
+  // @@protoc_insertion_point(field_mutable_list:db.mongo.index.keys)
+  return &keys_;
 }
 
 // -------------------------------------------------------------------
@@ -3744,25 +4380,117 @@ inline void mongo_update::set_allocated_tag(::std::string* tag) {
   // @@protoc_insertion_point(field_set_allocated:db.mongo.update.tag)
 }
 
-// int32 flag = 5;
-inline void mongo_update::clear_flag() {
-  flag_ = 0;
-}
-inline ::google::protobuf::int32 mongo_update::flag() const {
-  // @@protoc_insertion_point(field_get:db.mongo.update.flag)
-  return flag_;
-}
-inline void mongo_update::set_flag(::google::protobuf::int32 value) {
-  
-  flag_ = value;
-  // @@protoc_insertion_point(field_set:db.mongo.update.flag)
-}
-
 // -------------------------------------------------------------------
 
 // mongo_command_request
 
-// string json = 1;
+// string tab = 1;
+inline void mongo_command_request::clear_tab() {
+  tab_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& mongo_command_request::tab() const {
+  // @@protoc_insertion_point(field_get:db.mongo.command.request.tab)
+  return tab_.GetNoArena();
+}
+inline void mongo_command_request::set_tab(const ::std::string& value) {
+  
+  tab_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:db.mongo.command.request.tab)
+}
+#if LANG_CXX11
+inline void mongo_command_request::set_tab(::std::string&& value) {
+  
+  tab_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:db.mongo.command.request.tab)
+}
+#endif
+inline void mongo_command_request::set_tab(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  tab_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:db.mongo.command.request.tab)
+}
+inline void mongo_command_request::set_tab(const char* value, size_t size) {
+  
+  tab_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:db.mongo.command.request.tab)
+}
+inline ::std::string* mongo_command_request::mutable_tab() {
+  
+  // @@protoc_insertion_point(field_mutable:db.mongo.command.request.tab)
+  return tab_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* mongo_command_request::release_tab() {
+  // @@protoc_insertion_point(field_release:db.mongo.command.request.tab)
+  
+  return tab_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void mongo_command_request::set_allocated_tab(::std::string* tab) {
+  if (tab != nullptr) {
+    
+  } else {
+    
+  }
+  tab_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), tab);
+  // @@protoc_insertion_point(field_set_allocated:db.mongo.command.request.tab)
+}
+
+// string cmd = 2;
+inline void mongo_command_request::clear_cmd() {
+  cmd_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& mongo_command_request::cmd() const {
+  // @@protoc_insertion_point(field_get:db.mongo.command.request.cmd)
+  return cmd_.GetNoArena();
+}
+inline void mongo_command_request::set_cmd(const ::std::string& value) {
+  
+  cmd_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:db.mongo.command.request.cmd)
+}
+#if LANG_CXX11
+inline void mongo_command_request::set_cmd(::std::string&& value) {
+  
+  cmd_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:db.mongo.command.request.cmd)
+}
+#endif
+inline void mongo_command_request::set_cmd(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  cmd_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:db.mongo.command.request.cmd)
+}
+inline void mongo_command_request::set_cmd(const char* value, size_t size) {
+  
+  cmd_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:db.mongo.command.request.cmd)
+}
+inline ::std::string* mongo_command_request::mutable_cmd() {
+  
+  // @@protoc_insertion_point(field_mutable:db.mongo.command.request.cmd)
+  return cmd_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* mongo_command_request::release_cmd() {
+  // @@protoc_insertion_point(field_release:db.mongo.command.request.cmd)
+  
+  return cmd_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void mongo_command_request::set_allocated_cmd(::std::string* cmd) {
+  if (cmd != nullptr) {
+    
+  } else {
+    
+  }
+  cmd_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), cmd);
+  // @@protoc_insertion_point(field_set_allocated:db.mongo.command.request.cmd)
+}
+
+// string json = 3;
 inline void mongo_command_request::clear_json() {
   json_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -3819,73 +4547,57 @@ inline void mongo_command_request::set_allocated_json(::std::string* json) {
 
 // mongo_command_response
 
-// repeated bytes jsons = 1;
-inline int mongo_command_response::jsons_size() const {
-  return jsons_.size();
+// string json = 1;
+inline void mongo_command_response::clear_json() {
+  json_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void mongo_command_response::clear_jsons() {
-  jsons_.Clear();
+inline const ::std::string& mongo_command_response::json() const {
+  // @@protoc_insertion_point(field_get:db.mongo.command.response.json)
+  return json_.GetNoArena();
 }
-inline const ::std::string& mongo_command_response::jsons(int index) const {
-  // @@protoc_insertion_point(field_get:db.mongo.command.response.jsons)
-  return jsons_.Get(index);
-}
-inline ::std::string* mongo_command_response::mutable_jsons(int index) {
-  // @@protoc_insertion_point(field_mutable:db.mongo.command.response.jsons)
-  return jsons_.Mutable(index);
-}
-inline void mongo_command_response::set_jsons(int index, const ::std::string& value) {
-  // @@protoc_insertion_point(field_set:db.mongo.command.response.jsons)
-  jsons_.Mutable(index)->assign(value);
+inline void mongo_command_response::set_json(const ::std::string& value) {
+  
+  json_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:db.mongo.command.response.json)
 }
 #if LANG_CXX11
-inline void mongo_command_response::set_jsons(int index, ::std::string&& value) {
-  // @@protoc_insertion_point(field_set:db.mongo.command.response.jsons)
-  jsons_.Mutable(index)->assign(std::move(value));
+inline void mongo_command_response::set_json(::std::string&& value) {
+  
+  json_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:db.mongo.command.response.json)
 }
 #endif
-inline void mongo_command_response::set_jsons(int index, const char* value) {
+inline void mongo_command_response::set_json(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  jsons_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:db.mongo.command.response.jsons)
+  
+  json_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:db.mongo.command.response.json)
 }
-inline void mongo_command_response::set_jsons(int index, const void* value, size_t size) {
-  jsons_.Mutable(index)->assign(
-    reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:db.mongo.command.response.jsons)
+inline void mongo_command_response::set_json(const char* value, size_t size) {
+  
+  json_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:db.mongo.command.response.json)
 }
-inline ::std::string* mongo_command_response::add_jsons() {
-  // @@protoc_insertion_point(field_add_mutable:db.mongo.command.response.jsons)
-  return jsons_.Add();
+inline ::std::string* mongo_command_response::mutable_json() {
+  
+  // @@protoc_insertion_point(field_mutable:db.mongo.command.response.json)
+  return json_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void mongo_command_response::add_jsons(const ::std::string& value) {
-  jsons_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:db.mongo.command.response.jsons)
+inline ::std::string* mongo_command_response::release_json() {
+  // @@protoc_insertion_point(field_release:db.mongo.command.response.json)
+  
+  return json_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-#if LANG_CXX11
-inline void mongo_command_response::add_jsons(::std::string&& value) {
-  jsons_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:db.mongo.command.response.jsons)
-}
-#endif
-inline void mongo_command_response::add_jsons(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  jsons_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:db.mongo.command.response.jsons)
-}
-inline void mongo_command_response::add_jsons(const void* value, size_t size) {
-  jsons_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:db.mongo.command.response.jsons)
-}
-inline const ::google::protobuf::RepeatedPtrField<::std::string>&
-mongo_command_response::jsons() const {
-  // @@protoc_insertion_point(field_list:db.mongo.command.response.jsons)
-  return jsons_;
-}
-inline ::google::protobuf::RepeatedPtrField<::std::string>*
-mongo_command_response::mutable_jsons() {
-  // @@protoc_insertion_point(field_mutable_list:db.mongo.command.response.jsons)
-  return &jsons_;
+inline void mongo_command_response::set_allocated_json(::std::string* json) {
+  if (json != nullptr) {
+    
+  } else {
+    
+  }
+  json_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), json);
+  // @@protoc_insertion_point(field_set_allocated:db.mongo.command.response.json)
 }
 
 // -------------------------------------------------------------------
@@ -4997,6 +5709,12 @@ mysql_response::mutable_jsons() {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

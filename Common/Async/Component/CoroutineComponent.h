@@ -54,14 +54,18 @@ namespace Tendo
 		}
 		void WaitAll(std::vector<unsigned int> & coroutines);
 	 private:
+#ifdef 	__COR_SHARED_STACK__
 		void SaveStack(unsigned int id);
+#endif
 		void ResumeContext(TaskContext* co);
         TaskContext* MakeContext(StaticMethod* func);
     private:
 		TaskContextPool mCorPool;
 		TaskContext* mRunContext;
 		tb_context_t mMainContext;
+#ifdef __COR_SHARED_STACK__
 		Stack mSharedStack[SHARED_STACK_NUM];
+#endif
 		std::queue<unsigned int> mLastQueues;
         std::queue<unsigned int> mResumeContexts;
 	};

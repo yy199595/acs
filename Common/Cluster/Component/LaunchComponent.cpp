@@ -19,6 +19,7 @@ namespace Tendo
 {
     bool LaunchComponent::Awake()
 	{
+		unsigned short port = 0;
 		this->mApp->AddComponent<HttpComponent>();
 		this->mApp->AddComponent<RouterComponent>();
 		this->mApp->AddComponent<InnerNetComponent>();
@@ -27,12 +28,6 @@ namespace Tendo
 		{
 			this->mApp->AddComponent<LuaComponent>();
 		}
-		unsigned short port = 0;
-		if (!ServerConfig::Inst()->GetListen("rpc", port))
-		{
-			return false;
-		}
-
 		if (ServerConfig::Inst()->GetListen("http", port))
 		{
 			this->mApp->AddComponent<HttpWebComponent>();
@@ -63,7 +58,7 @@ namespace Tendo
 				{
 					continue;
 				}
-				const RpcServiceConfig* rpcServiceConfig = RpcConfig::Inst()->GetConfig(name);
+				const RpcServiceConfig* rpcServiceConfig = SrvRpcConfig::Inst()->GetConfig(name);
 				const HttpServiceConfig* httpServiceConfig = HttpConfig::Inst()->GetConfig(name);
 				if (rpcServiceConfig != nullptr)
 				{

@@ -1,34 +1,13 @@
-local AccountList = { }
-table.insert(AccountList, { account = "10012233@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012234@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012235@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012236@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012237@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012238@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012239@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012240@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012251@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012242@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --
- --table.insert(AccountList, { account = "10012243@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012244@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012245@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012246@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012247@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012248@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012249@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012250@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012251@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012252@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --
- --table.insert(AccountList, { account = "10012253@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012254@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012255@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012256@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012257@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012258@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012259@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012260@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012261@qq.com", passwd = "123456", phoneNum = 13716061995 })
- --table.insert(AccountList, { account = "10012262@qq.com", passwd = "123456", phoneNum = 13716061995 })
-return AccountList
+
+local accounts = { }
+local ACCOUNT_COUNT = 1
+for i = 10000, 10000 + ACCOUNT_COUNT do
+    local tab = {
+        account = string.format("%s@qq.com", i),
+        passwd = tostring(i + os.time()),
+        phone_num = 13716061990 + i
+    }
+    table.insert(accounts, tab)
+end
+
+return accounts

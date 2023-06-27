@@ -2,7 +2,7 @@
 #include"RpcTaskComponent.h"
 #include"Rpc/Client/Message.h"
 #include"Rpc/Async/RpcTaskSource.h"
-#include"Server/Config/MethodConfig.h"
+#include"Rpc/Config/MethodConfig.h"
 
 namespace Tendo
 {

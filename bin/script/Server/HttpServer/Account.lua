@@ -1,106 +1,81 @@
 
-local md5 = Md5
-local log = require("Log")
-local XCode = require("XCode")
-local proto = require("Proto")
-local AccountService = {}
+local md5 = require("Md5")
 local tabName = "user.account_info"
-local mysql = require("Server.MysqlClient")
-local redis = require("Server.RedisComponent")
-function AccountService.Awake()
-    print("启动账号服务")
-    proto.Import("mysql/user.proto")
-    return mysql.NewTable(0, tabName, {
-        pb = tabName,
-        keys = { "account" }
-    })
+local log_warn = require("Log").Warning
+local mongo = require("MongoComponent")
+local redis = require("RedisComponent")
+
+local AccountService = Class("HttpService")
+
+function AccountService:Awake()
+
+    self.redis = redis
+    self.app:AddWatch("Gate")
+    self.app:AddWatch("MongoDB")
 end
 
-function AccountService.Register(request)
+function AccountService:Complete()
+    local code = mongo:Drop(tabName)
+    self.session = self.app:Allot("MongoDB")
+end
 
-    table.print(request)
+function AccountService:NewToken(user_id)
+    local str = tostring(os.time())
+    return md5.ToString(str .. tostring(user_id))
+end
+
+function AccountService:Register(request)
+
     local message = request.message
     assert(message.account, "register account is nil")
     assert(message.password, "register password is nil")
-    assert(message.phone_num, "register phone number is nil")
 
-    local id = mysql.Open()
-    local result = mysql.QueryOne(id, tabName, {
-        "user_id"
-    }, { account = message.account })
-    if result ~= nil then
+    local account_info = mongo:FindOne(tabName, { _id = message.account}, { "user_id"})
+    if account_info ~= nil then
+        log_warn(message.account, " already exists")
         return XCode.AccountAlreadyExists
     end
 
-    local nowTime = os.time()
-    local userId = redis.AddCounter("user_id")
-    local ip = string.match(request.from, "http://(%d+.%d+.%d+.%d+):%d+")
-    local str = string.format("%s%d%d", ip, nowTime, userId)
-    local data = {
-        user_id = userId,
-        login_time = nowTime,
-        register_time = nowTime,
+    local user_id = self.redis:AddCounter("user_id", 10000)
+    return mongo:InsertOnce(tabName, {
+        _id = message.account,
+        user_id = user_id,
+        login_time = 0,
         account = message.account,
-        pass_word = message.password,
-        phone_num = message.phone_num,
-        last_login_ip = ip,
-        login_token = Md5.ToString(str)
-    }
-    result = mysql.Insert(id, tabName, data)
-    if not result then
-        return XCode.SaveToMysqlFailure
-    end
-    log.Info("register account : ", message)
-    return XCode.Successful
+        password = message.password,
+        create_time = os.time(),
+        last_login_ip = message.from,
+        auth_token = ""
+    })
 end
 
-function AccountService.Login(request)
+function AccountService:Login(request)
 
     local message = request.message
     assert(type(message.account) == "string", "user account is not string")
     assert(type(message.password) == "string", "user password is not string")
 
-    local id = mysql.Open()
-    local userInfo = mysql.QueryOne(id, tabName, { "pass_word", "user_id" }, {
-        account = message.account
-    })
+    local response = mongo:FindOne(tabName, {
+        _id = message.account }, { "password", "user_id" })
 
-    if userInfo == nil or request.password ~= userInfo.password then
-        return XCode.Failure, "账号不存在或者密码错误"
+    log_warn(response.password, message.password)
+    if response == nil or response.password ~= message.password then
+        print("账号密码错误")
+        return XCode.AccountPasswordError
     end
-    local ip = string.match(request.from, "http://(%d+.%d+.%d+.%d+):%d+")
-    local str = string.format("%s%d%d", ip, nowTime, userId)
-    local token = Md5.ToString(str)
 
-    local serverId = Service.RangeServer("Gate")
-    local rpcAddress = Service.GetAddrById(serverId, "rpc")
-    local gateAddress = Service.GetAddrById(serverId, "gate")
-
-    local code = Service.Call(rpcAddress, "Gate.Allocation", {
+    local session = self.app:Allot("Gate")
+    local token = self:NewToken(response.user_id)
+    local code = self.app:Call(session, "Gate.Enter", {
         token = token,
-        user_id = userInfo.user_id
+        user_id = response.user_id
     })
 
     if code ~= XCode.Successful then
-        return XCode.AddressAllotFailure, "分配网关失败"
+        return XCode.AddressAllotFailure
     end
-
-    local data = {
-        last_login_ip = ip,
-        login_time = os.time(),
-        login_token = token
-    }
-    local res = mysql.Update(id, tabName, data, {
-        account = message.account
-    })
-    if not res then
-        return XCode.SaveToMysqlFailure, "更新数据失败"
-    end
-    log.Warn(string.format("玩家%s登录成功,玩家id=%d", request.account, userInfo.user_id))
-    return XCode.Successful, {
-        token = token,
-        address = gateAddress
-    }
+    local gate = self.app:GetListen(session, "gate")
+    return XCode.Successful, { token = token, address = gate }
 end
 
 return AccountService

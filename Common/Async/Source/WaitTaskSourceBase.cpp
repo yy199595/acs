@@ -11,7 +11,6 @@ namespace Tendo
     {
         this->mCorId = 0;
         this->mState = TaskState::TaskReady;
-        this->mTaskId = Helper::Guid::Create();
         this->mCreateTime = Helper::Time::NowMilTime();
     }
 
@@ -19,26 +18,25 @@ namespace Tendo
 	{
 		this->mCorId = 0;
 		this->mState = TaskState::TaskReady;
-		this->mTaskId = Helper::Guid::Create();
 		this->mCreateTime = Helper::Time::NowMilTime();
 	}
 
     bool WaitTaskSourceBase::ResumeTask(TaskState state)
-    {
-        switch(this->mState)
+	{
+		switch (this->mState)
 		{
-		case TaskState::TaskReady:
-			this->mState = state;
-			return true;
-		case TaskState::TaskAwait:
-			this->mState = state;
+			case TaskState::TaskReady:
+				this->mState = state;
+				return true;
+			case TaskState::TaskAwait:
+				this->mState = state;
 				App::Inst()->GetCoroutine()->Resume(this->mCorId);
-			return true;
-		case TaskState::TaskFinish:
-			break;
+				return true;
+			case TaskState::TaskFinish:
+				break;
 		}
-        return false;
-    }
+		return false;
+	}
 
     bool WaitTaskSourceBase::YieldTask()
     {

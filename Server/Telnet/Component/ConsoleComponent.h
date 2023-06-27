@@ -1,4 +1,5 @@
 #pragma once
+#include<list>
 #include<vector>
 #include"Entity/Component/Component.h"
 #include"Proto/Message/ProtoMessage.h"

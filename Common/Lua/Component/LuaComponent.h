@@ -3,18 +3,18 @@
 #include<memory>
 #include<unordered_map>
 #include"Lua/Module/LuaModule.h"
-#include"Server/Config/LuaConfig.h"
+#include"Lua/Config/LuaConfig.h"
 #include"Entity/Component/Component.h"
 struct lua_State;
 namespace Tendo
 {
-    class LuaComponent : public Component, public IStart,
+    class LuaComponent final : public Component, public IStart,
 						 public IComplete, public IHotfix, public ISecondUpdate,
 						 public IServerRecord, public IDestroy
 	{
 	 public:
 		LuaComponent();
-		virtual ~LuaComponent() = default;
+		virtual ~LuaComponent() final = default;
     public:
 		double GetMemorySize();
 		double CollectGarbage();
@@ -27,11 +27,12 @@ namespace Tendo
 		bool LateAwake() final;
 		void OnDestroy() final;
 		void Complete() final;
-		void OnHotFix() final;
+		bool OnHotFix() final;
         void OnSecondUpdate(int tick) final;
 		void OnRecord(Json::Writer &document) final;
     private:
 		bool LoadAllFile();
+		void RegisterLuaClass();
         void AddRequire(const std::string & direct);
 		Lua::LuaModule* LoadModuleByPath(const std::string& name);
 	 private:

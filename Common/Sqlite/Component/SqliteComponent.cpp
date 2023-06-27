@@ -5,7 +5,7 @@
 #include"Util/String/StringHelper.h"
 #include"Util/Sql/SqlHelper.h"
 #include"Sqlite/Lua/LuaSqlite.h"
-#include"Lua/Engine/ClassProxyHelper.h"
+#include"Lua/Engine/ModuleClass.h"
 namespace Tendo
 {
 	bool SqliteComponent::Awake()
@@ -18,13 +18,13 @@ namespace Tendo
 		return true;
 	}
 
-	void SqliteComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
+	void SqliteComponent::OnLuaRegister(Lua::ModuleClass& luaRegister, std::string& name)
 	{
-		luaRegister.BeginNewTable("Sqlite");
-		luaRegister.PushExtensionFunction("Open", Lua::Sqlite::Open);
-		luaRegister.PushExtensionFunction("Exec", Lua::Sqlite::Exec);
-		luaRegister.PushExtensionFunction("Query", Lua::Sqlite::Query);
-		luaRegister.PushExtensionFunction("QueryOnce", Lua::Sqlite::QueryOnce);
+		name = "Sqlite";
+		luaRegister.AddFunction("Open", Lua::Sqlite::Open);
+		luaRegister.AddFunction("Exec", Lua::Sqlite::Exec);
+		luaRegister.AddFunction("Query", Lua::Sqlite::Query);
+		luaRegister.AddFunction("QueryOnce", Lua::Sqlite::QueryOnce);
 	}
 
 	bool SqliteComponent::MakeTable(int id, const std::string & key, const google::protobuf::Message& message)
@@ -84,13 +84,14 @@ namespace Tendo
 		auto iter = this->mDatabases.find(id);
 		if(iter == this->mDatabases.end())
 		{
+			LOG_ERROR("not find sqlite handle : " << id);
 			return false;
 		}
-		char* errMessage = 0;
+		char* errMessage = nullptr;
 		sqlite3 * db = iter->second;
-		if (sqlite3_exec(db, sql, 0, 0, &errMessage) != SQLITE_OK)
+		if (sqlite3_exec(db, sql, nullptr, nullptr, &errMessage) != SQLITE_OK)
 		{
-			LOG_FATAL(sql);
+			//LOG_FATAL(sql);
 			LOG_ERROR(errMessage);
 			sqlite3_free(errMessage);
 			return false;

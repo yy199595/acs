@@ -1,4 +1,6 @@
 ﻿#include"RpcTaskSource.h"
+
+#include <utility>
 #include"XCode/XCode.h"
 #include"Entity/Actor/App.h"
 #include"Util/Time/TimeHelper.h"
@@ -23,8 +25,8 @@ namespace Tendo
 
 namespace Tendo
 {
-	LuaRpcTaskSource::LuaRpcTaskSource(lua_State* lua, int id, const std::string & resp)
-		: IRpcTask<Msg::Packet>(id), mTask(lua), mResp(resp)
+	LuaRpcTaskSource::LuaRpcTaskSource(lua_State* lua, int id, std::string  resp)
+		: IRpcTask<Msg::Packet>(id), mTask(lua), mResp(std::move(resp))
 	{
 #ifdef __DEBUG__
       this->t1 = Helper::Time::NowMilTime();

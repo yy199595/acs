@@ -1,16 +1,12 @@
-local DataServer = { }
-DataServer.Start = function()
+
+local Main = { }
+
+function Main:Awake()
 
 end
-local function CreateTable(tabName, keys)
-    local code = App.Call("MysqlService.Create", {
-        keys = keys,
-        data = Proto.New(tabName)
-    })
-    return code == XCode.Successful
+
+function Main:Complete()
+
 end
 
-function DataServer.OnLocalComplete()
-    --CreateTable("user.account_info", {"account"})
-end
-return DataServer
+return Main

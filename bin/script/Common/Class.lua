@@ -1,12 +1,26 @@
+local log = require("Log")
+local log_error = log.Error
+function OnError(...)
+    log_error(...)
+end
 
-function Class(...)
-    local class = { }
-    local metas = table.pack(...)
-    for _, meta in ipairs(metas) do
-        if type(meta) == 'string' then
-            meta = require(meta)
+function Class(base, ...)
+
+    local class = {
+        OnInit = function(...)
+
         end
-        setmetatable(class, meta)
+    }
+    if base ~= nil then
+        local meta = require(base)
+        if type(meta) ~= "table" then
+            return nil
+        end
+        for key, val in pairs(meta) do
+            class[key] = val
+        end
     end
+
+    class.OnInit(class, ...)
     return class
 end

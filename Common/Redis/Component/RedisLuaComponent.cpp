@@ -44,7 +44,7 @@ namespace Tendo
             return false;
         }
         this->mLuaMap.emplace(name, md5);
-        CONSOLE_LOG_INFO("load redis lua [" << name << "] successful");
+        //CONSOLE_LOG_INFO("load redis lua [" << name << "] successful");
         return true;
     }
 

@@ -4,43 +4,33 @@
 
 #include"RouterComponent.h"
 #include"XCode/XCode.h"
-#include"Entity/Actor/ServerActor.h"
-#include"Http/Component/HttpComponent.h"
-#include"Redis/Component/RedisComponent.h"
-#include"Rpc/Component/InnerNetComponent.h"
+#include"Entity/Actor/App.h"
 #include"Rpc/Component/DispatchComponent.h"
 
 namespace Tendo
 {
 	RouterComponent::RouterComponent()
 	{
-		this->mNetComponent = nullptr;
-		this->mHttpComponent = nullptr;
-		this->mRedisComponent = nullptr;
+        this->mDisComponent = nullptr;
 	}
 
 	bool RouterComponent::LateAwake()
 	{
-		this->mHttpComponent = this->GetComponent<HttpComponent>();
-		this->mRedisComponent = this->GetComponent<RedisComponent>();
-		this->mNetComponent = this->GetComponent<InnerNetComponent>();
+		std::vector<ISender*> senders;
+		this->mApp->GetComponents(senders);
+		for(ISender * sender : senders)
+		{
+			int net = sender->NetType();
+			this->mSenders.emplace(net, sender);
+		}
 		this->mDisComponent = this->GetComponent<DispatchComponent>();
 		return this->mDisComponent != nullptr;
 	}
 
 	ISender * RouterComponent::GetSender(int net)
 	{
-		switch (net)
-		{
-			case Msg::Net::Tcp:
-				return this->mNetComponent;
-			case Msg::Net::Http:
-				return this->mHttpComponent;
-			case Msg::Net::Redis:
-				//return this->mRedisComponent;
-				break;
-		}
-		return nullptr;
+		auto iter = this->mSenders.find(net);
+		return iter == this->mSenders.end() ? nullptr : iter->second;
 	}
 
 	int RouterComponent::LuaCall(lua_State* lua,
@@ -52,17 +42,25 @@ namespace Tendo
 			lua_pushinteger(lua, XCode::NotFoundActorAddress);
 			return 1;
 		}
+		std::string response;
+		if(message->GetHead().Get("res", response))
+		{
+			message->GetHead().Remove("res");
+		}
+
 
 		int rpc = this->mDisComponent->PopTaskId();
-		message->GetHead().Add("rpc", rpc);
-		if(!sender->Send(address, message))
-		{
-			lua_pushinteger(lua, XCode::SendMessageFail);
-			return 1;
-		}
-		const std::string & response = message->From();
 		std::shared_ptr<LuaRpcTaskSource> luaRpcTaskSource
 				= std::make_shared<LuaRpcTaskSource>(lua, rpc, response);
+		{
+			message->GetHead().Add("rpc", rpc);
+			if (sender->Send(address, message) != XCode::Successful)
+			{
+				this->mDisComponent->PushTaskId(rpc);
+				lua_pushinteger(lua, XCode::SendMessageFail);
+				return 1;
+			}
+		}
 		return this->mDisComponent->AddTask(rpc, luaRpcTaskSource)->Await();
 	}
 
@@ -108,7 +106,7 @@ namespace Tendo
 			int taskId = this->mDisComponent->PopTaskId();
 
 			message->GetHead().Add("rpc", taskId);
-			if(!sender->Send(addr, message))
+			if(sender->Send(addr, message) != XCode::Successful)
 			{
 				this->mDisComponent->PushTaskId(taskId);
 				response = std::make_shared<Msg::Packet>();

@@ -17,6 +17,8 @@
 #include "Lua/Module/LuaModule.h"
 #include "Entity/Lua/LuaActor.h"
 #include "Lua/Engine/ClassProxyHelper.h"
+
+#include "Lua/Engine/ModuleClass.h"
 using namespace Lua;
 namespace Tendo
 {
@@ -36,6 +38,31 @@ namespace Tendo
 		this->mLuaEnv = luaL_newstate();
 		luaL_openlibs(mLuaEnv);
 		return true;
+	}
+
+	void LuaComponent::RegisterLuaClass()
+	{
+		Lua::ClassProxyHelper luaRegister1(this->mLuaEnv, "WaitLuaTaskSource");
+		luaRegister1.BeginRegister<WaitLuaTaskSource>();
+		luaRegister1.PushCtor<WaitLuaTaskSource>();
+		luaRegister1.PushStaticExtensionFunction("SetResult", WaitLuaTaskSource::SetResult);
+
+		Lua::ClassProxyHelper luaRegister2(this->mLuaEnv, "LuaServiceTaskSource");
+		luaRegister2.BeginRegister<LuaServiceTaskSource>();
+		luaRegister2.PushExtensionFunction("SetRpc", LuaServiceTaskSource::SetRpc);
+		luaRegister2.PushExtensionFunction("SetHttp", LuaServiceTaskSource::SetHttp);
+
+//		Lua::ClassProxyHelper luaRegister3(this->mLuaEnv, "Time");
+//		luaRegister3.BeginNewTable();
+//		luaRegister3.PushStaticFunction("GetDateStr", Helper::Time::GetDateStr);
+//		luaRegister3.PushStaticFunction("GetDateString", Helper::Time::GetDateString);
+//		luaRegister3.PushStaticFunction("NowSecTime", Helper::Time::NowSecTime);
+//		luaRegister3.PushStaticFunction("NowMilTime", Helper::Time::NowMilTime);
+//		luaRegister3.PushStaticFunction("GetYearMonthDayString", Helper::Time::GetYearMonthDayString);
+
+		Lua::ClassProxyHelper luaRegister4(this->mLuaEnv, "coroutine");
+		luaRegister4.PushExtensionFunction("start", Lua::Coroutine::Start);
+		luaRegister4.PushExtensionFunction("sleep", Lua::Coroutine::Sleep);
 	}
 
 	bool LuaComponent::LateAwake()
@@ -60,66 +87,39 @@ namespace Tendo
 			os.PushMember("debug", false);
 #endif
 		}
-		{
-			Lua::ClassProxyHelper app(this->mLuaEnv, "App");
-			app.BeginRegister<App>();
-			app.PushExtensionFunction("Send", LuaActor::Send);
-			app.PushExtensionFunction("Call", LuaActor::Call);
-			app.PushExtensionFunction("Random", LuaActor::Random);
-			app.PushExtensionFunction("GetListen", LuaActor::GetListen);
-			app.PushExtensionFunction("SendToClient", LuaActor::SendToClient);
-		}
+		this->RegisterLuaClass();
+		Lua::ModuleClass moduleRegistry(this->mLuaEnv);
 
-		Lua::ClassProxyHelper luaRegister1(this->mLuaEnv, "WaitLuaTaskSource");
-		luaRegister1.BeginRegister<WaitLuaTaskSource>();
-		luaRegister1.PushCtor<WaitLuaTaskSource>();
-		luaRegister1.PushStaticExtensionFunction("SetResult", WaitLuaTaskSource::SetResult);
+		moduleRegistry.Start();
+		moduleRegistry.AddFunction("Send", LuaActor::Send);
+		moduleRegistry.AddFunction("Call", LuaActor::Call);
+		moduleRegistry.AddFunction("Random", LuaActor::Random);
+		moduleRegistry.AddFunction("AddWatch", LuaActor::AddWatch);
+		moduleRegistry.AddFunction("GetListen", LuaActor::GetListen);
+		moduleRegistry.AddFunction("NewServer", LuaActor::NewServer);
+		moduleRegistry.AddFunction("SendToClient", LuaActor::SendToClient).End("Actor");
 
-		Lua::ClassProxyHelper luaRegister2(this->mLuaEnv, "LuaServiceTaskSource");
-		luaRegister2.BeginRegister<LuaServiceTaskSource>();
-		luaRegister2.PushExtensionFunction("SetRpc", LuaServiceTaskSource::SetRpc);
-		luaRegister2.PushExtensionFunction("SetHttp", LuaServiceTaskSource::SetHttp);
+		moduleRegistry.Start();
+		moduleRegistry.AddFunction("Output", Lua::Log::Output);
+		moduleRegistry.AddFunction("Show", Lua::Console::Show).End("Logger");
 
-		Lua::ClassProxyHelper luaRegister3(this->mLuaEnv, "Time");
-		luaRegister3.BeginNewTable();
-		luaRegister3.PushStaticFunction("GetDateStr", Helper::Time::GetDateStr);
-		luaRegister3.PushStaticFunction("GetDateString", Helper::Time::GetDateString);
-		luaRegister3.PushStaticFunction("NowSecTime", Helper::Time::NowSecTime);
-		luaRegister3.PushStaticFunction("NowMilTime", Helper::Time::NowMilTime);
-		luaRegister3.PushStaticFunction("GetYearMonthDayString", Helper::Time::GetYearMonthDayString);
+		moduleRegistry.Start();
+		moduleRegistry.AddFunction("encode", Lua::RapidJson::Encode);
+		moduleRegistry.AddFunction("decode", Lua::RapidJson::Decode).End("json");
 
-		Lua::ClassProxyHelper luaRegister4(this->mLuaEnv, "coroutine");
-		luaRegister4.PushExtensionFunction("start", Lua::Coroutine::Start);
-		luaRegister4.PushExtensionFunction("sleep", Lua::Coroutine::Sleep);
-
-		Lua::ClassProxyHelper luaRegister5(this->mLuaEnv, "Logger");
-		luaRegister5.BeginNewTable();
-		luaRegister5.PushExtensionFunction("Output", Lua::Log::Output);
-
-		Lua::ClassProxyHelper luaRegister55(this->mLuaEnv, "ConsoleLog");
-		luaRegister55.BeginNewTable();
-		luaRegister55.PushExtensionFunction("Show", Lua::Console::Show);
-
-		Lua::ClassProxyHelper luaRegister6(this->mLuaEnv, "Guid");
-		luaRegister6.BeginNewTable();
-		luaRegister6.PushStaticFunction("Create", Helper::Guid::Create);
-
-		Lua::ClassProxyHelper luaRegister7(this->mLuaEnv, "rapidjson");
-		luaRegister7.BeginNewTable();
-		luaRegister7.PushExtensionFunction("encode", Lua::RapidJson::Encode);
-		luaRegister7.PushExtensionFunction("decode", Lua::RapidJson::Decode);
-
-		Lua::ClassProxyHelper luaRegister8(this->mLuaEnv, "Md5");
-		luaRegister8.BeginNewTable();
-		luaRegister8.PushExtensionFunction("ToString", Lua::Md5::ToString);
+		moduleRegistry.Start();
+		moduleRegistry.AddFunction("ToString", Lua::Md5::ToString).End("Md5");
 
 		std::vector<ILuaRegister*> components;
 		this->mApp->GetComponents(components);
 		for (ILuaRegister* component: components)
 		{
-			const std::string& name = dynamic_cast<Component*>(component)->GetName();
-			Lua::ClassProxyHelper luaRegister(this->mLuaEnv, name);
-			component->OnLuaRegister(luaRegister);
+			std::string name;
+			moduleRegistry.Start();
+			component->OnLuaRegister(moduleRegistry, name);
+			{
+				moduleRegistry.End(name.c_str());
+			}
 		}
 		return this->LoadAllFile();
 	}
@@ -159,7 +159,7 @@ namespace Tendo
 			LOG_ERROR("load lua module [" << name << "] error");
 			return nullptr;
 		}
-		LOG_INFO("start load lua module [" << name << "]");
+		//LOG_INFO("start load lua module [" << name << "]");
 		return luaModule;
 	}
 
@@ -194,22 +194,43 @@ namespace Tendo
 		{
 			this->AddRequire(path);
 		}
+		for(const std::string & dir : this->mLuaConfig->LoadFiles())
+		{
+			std::vector<std::string> paths;
+			Helper::Directory::GetFilePaths(dir, paths);
+			for(const std::string & fullPath : paths)
+			{
+				if(luaL_dofile(this->mLuaEnv, fullPath.c_str()) != LUA_OK)
+				{
+					LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+					return false;
+				}
+			}
+		}
 		if(this->mLuaConfig->Main().empty())
 		{
 			return true;
 		}
 		std::string main = this->mLuaConfig->Main();
 		this->mMainModule = this->LoadModuleByPath(main);
-		LOG_CHECK_RET_FALSE(this->mMainModule != nullptr);
+		if(this->mMainModule != nullptr)
+		{
+			int code = this->mMainModule->Call("Awake");
+			if(code == XCode::CallLuaFunctionFail)
+			{
+				return false;
+			}
+		}
 		return true;
 	}
 
-	void LuaComponent::OnHotFix()
+	bool LuaComponent::OnHotFix()
 	{
 		if(this->mMainModule != nullptr)
 		{
-			this->mMainModule->Hotfix();
+			return this->mMainModule->Hotfix();
 		}
+		return true;
 	}
 
 	void LuaComponent::OnDestroy()

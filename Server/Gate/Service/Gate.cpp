@@ -56,7 +56,7 @@ namespace Tendo
 		const std::string & address = this->mInnerAddress;
 		if(this->mActorComponent->GetActor(userId) != nullptr) //玩家在线
 		{
-			return XCode::Failure;
+			return XCode::PlayerOnLine;
 		}
 		return XCode::Successful;
     }
@@ -115,6 +115,7 @@ namespace Tendo
 			ServerActor * targetActor = this->mActorComponent->Random(name);
 			if(targetActor == nullptr)
 			{
+				LOG_FMT_ERR("allot server {0} fail", name);
 				return XCode::AddressAllotFailure;
 			}
 			int serverId = (int)targetActor->GetActorId();
@@ -135,7 +136,7 @@ namespace Tendo
 			if(code != XCode::Successful)
 			{
 				const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-				LOG_ERROR("call " << targetServer->Name() <<  "] code = " << desc);
+				LOG_ERROR("call [" << func <<  "] code = " << desc);
 				return XCode::Failure;
 			}
 		}

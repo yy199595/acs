@@ -6,34 +6,30 @@
 #include"Entity/Actor/App.h"
 #include"Server/Config/CodeConfig.h"
 #include "XCode/XCode.h"
-#include "Message/s2s/registry.pb.h"
-
+#include"Message/com/com.pb.h"
+#include"Message/s2s/registry.pb.h"
 namespace Tendo
 {
 	bool RegistryComponent::LateAwake()
 	{
-		this->mCorComponent = this->mApp->GetCoroutine();
 		LOG_CHECK_RET_FALSE(this->mApp->ActorMgr()->GetServer(0));
-		LOG_CHECK_RET_FALSE(this->mThisActor = this->mUnit->Cast<Actor>());
 		return true;
 	}
 
 	bool RegistryComponent::RegisterServer() const
 	{
-		const std::string func("ActorRegistry.Add");
-		ServerActor * registry = this->mApp->ActorMgr()->GetServer(0);
-
-		registry::actor request;
+		const std::string func("ServerRegistry.Add");
+		ServerActor * registryActor = this->mApp->ActorMgr()->GetServer(0);
 		{
-			request.set_name(this->mThisActor->Name());
-			request.set_actor_id(this->mThisActor->GetActorId());
-			this->mThisActor->OnRegister(request.mutable_actor_json());
-		}
-		const int code = registry->Call(func, request);
-		if(code != XCode::Successful)
-		{
-			LOG_ERROR("registry code = " << CodeConfig::Inst()->GetDesc(code));
-			return false;
+			com::type::json request;
+			this->mApp->OnRegister(request.mutable_json());
+			const int code = registryActor->Call(func, request);
+			if (code != XCode::Successful)
+			{
+				LOG_ERROR("registry code = " << CodeConfig::Inst()->GetDesc(code));
+				return false;
+			}
+			LOG_INFO("register to center successful");
 		}
 		return true;
 	}
@@ -42,9 +38,37 @@ namespace Tendo
 	{
 		while(!this->RegisterServer())
 		{
-			LOG_ERROR("register " << this->mThisActor->Name()
-				<< " failure actor id=" << this->mThisActor->GetActorId());
-			this->mApp->GetCoroutine()->Sleep(1000);
+			LOG_ERROR("register " << this->mApp->Name()
+				<< " failure actor id = " << this->mApp->GetActorId());
+			this->mApp->GetCoroutine()->Sleep(5000);
+		}
+		std::vector<std::string> watchs;
+		const std::string func("ServerRegistry.Query");
+		std::shared_ptr<registry::query::response> response
+			= std::make_shared<registry::query::response>();
+		ActorComponent * actorComponent = this->mApp->ActorMgr();
+		ServerActor * registryActor = this->mApp->ActorMgr()->GetServer(0);
+		{
+			this->mApp->GetWatch(watchs);
+			registry::query::request request;
+			for (const std::string& name: watchs)
+			{
+				request.set_name(name);
+				int code = registryActor->Call(func, request, response);
+				if(code != XCode::Successful)
+				{
+					LOG_ERROR("query [" << name << "] code = "
+							<< CodeConfig::Inst()->GetDesc(code));
+				}
+				for(const std::string & json : response->actors())
+				{
+					actorComponent->AddServer(json);
+				}
+				if(actorComponent->Random(name) == nullptr)
+				{
+					LOG_WARN("wait [" << name << "] start ...");
+				}
+			}
 		}
 	}
 }

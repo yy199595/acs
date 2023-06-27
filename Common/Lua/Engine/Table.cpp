@@ -24,8 +24,8 @@ namespace Lua
 		{
 			return nullptr;
 		}
-		int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
-		return std::make_shared<Function>(this->mLuaEnv, ref);
+		int ref1 = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
+		return std::make_shared<Function>(this->mLuaEnv, ref1);
 	}
 
 	std::shared_ptr<Table> Table::GetTable(const std::string& name)

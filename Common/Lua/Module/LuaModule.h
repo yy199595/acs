@@ -2,8 +2,8 @@
 // Created by yjz on 2022/11/22.
 //
 
-#ifndef _LUAMODULE_H_
-#define _LUAMODULE_H_
+#pragma once
+#include"XCode/XCode.h"
 #include"Lua/Engine/Function.h"
 #include"Entity/Component/IComponent.h"
 namespace Lua
@@ -19,19 +19,20 @@ namespace Lua
 		bool LoadFromPath(const std::string & path);
 	public:
 		template<typename ... Args>
-		bool Call(const std::string & func, Args && ... args);
+		int Call(const std::string & func, Args && ... args);
 		template<typename ... Args>
-		bool Await(const std::string & func, Args && ... args);
+		int Await(const std::string & func, Args && ... args);
 	public:
 		bool AddCache(const std::string & name);
 		bool GetFunction(const std::string& name);
 		bool HasFunction(const std::string & name);
 	public:
 		lua_State * GetLuaEnv() { return this->mLua;}
-		void SetMember(const char* key, int value);
+		void SetMember(const char* key, long long value);
 		void SetMember(const char* key, const std::string & value);
 	private:
 		void InitModule();
+		void OnCallError(const std::string & func);
 	private:
 		int mRef;
 		bool mIsUpdate;
@@ -43,35 +44,40 @@ namespace Lua
 	};
 
 	template<typename... Args>
-	bool LuaModule::Call(const std::string& func, Args&& ... args)
+	int LuaModule::Call(const std::string& func, Args&& ... args)
 	{
 		if(!this->GetFunction(func))
 		{
-			return false;
+			return XCode::CallFunctionNotExist;
 		}
 		Parameter::WriteArgs<Args...>(this->mLua, std::forward<Args>(args)...);
-		if (lua_pcall(this->mLua, sizeof...(Args), 0, 0) != LUA_OK)
+		if (lua_pcall(this->mLua, sizeof...(Args) + 1, 0, 0) != LUA_OK)
 		{
-			return false;
+			this->OnCallError(func);
+			return XCode::CallLuaFunctionFail;
 		}
-		return true;
+		return XCode::Successful;
 	}
 
 	template<typename... Args>
-	bool LuaModule::Await(const std::string& func, Args&& ... args)
+	int LuaModule::Await(const std::string& func, Args&& ... args)
 	{
-		if(!this->GetFunction(func))
+        Lua::Function::Get(this->mLua, "coroutine", "call");
+        lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
+        lua_pushlstring(this->mLua, func.c_str(), func.size());
+        Lua::Parameter::WriteArgs(this->mLua, std::forward<Args>(args)...);
+
+		if(lua_pcall(this->mLua, sizeof...(Args) + 2, 1, 0) != LUA_OK)
 		{
-			return false;
+			this->OnCallError(func);
+			return XCode::CallLuaFunctionFail;
 		}
-		WaitLuaTaskSource * taskSource = Lua::Function::Call(this->mLua, std::forward<Args>(args)...);
-		if(taskSource != nullptr)
+		WaitLuaTaskSource * taskSource = PtrProxy<WaitLuaTaskSource>::Read(this->mLua, -1);
+		if(taskSource == nullptr)
 		{
-			taskSource->Await<void>();
-			return true;
+			return XCode::CallLuaFunctionFail;
 		}
-		return false;
+		taskSource->Await<void>();
+		return XCode::Successful;
 	}
 }
-
-#endif //_LUAMODULE_H_

@@ -1,12 +1,11 @@
 ﻿#include"DispatchComponent.h"
 
 #include"Async/Component/CoroutineComponent.h"
-#include"Server/Config/ServiceConfig.h"
+#include"Rpc/Config/ServiceConfig.h"
 #include"InnerNetComponent.h"
 #include"Timer/Timer/ElapsedTimer.h"
 #include"Server/Config/CodeConfig.h"
 #ifdef __DEBUG__
-#include"Util/String/StringHelper.h"
 #include"Proto/Component/ProtoComponent.h"
 #endif
 #include"XCode/XCode.h"
@@ -42,7 +41,7 @@ namespace Tendo
 	int DispatchComponent::OnRequestMessage(const std::shared_ptr<Msg::Packet> & message)
 	{
 		const std::string & fullName = message->ConstHead().GetStr("func");
-        const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
+        const RpcMethodConfig * methodConfig = SrvRpcConfig::Inst()->GetMethodConfig(fullName);
         if(methodConfig == nullptr)
         {
             return XCode::CallFunctionNotExist;
@@ -85,10 +84,23 @@ namespace Tendo
 			);
 		}
 
-		this->mWaitCount++;
-		const int code = logicService->Invoke(config->Method, message);
+		int code = XCode::Successful;
+		try
 		{
-			this->SubWaitCount(service);
+			this->mWaitCount++;
+			code = logicService->Invoke(config->Method, message);
+		}
+		catch (std::logic_error & e)
+		{
+			code = XCode::ThrowError;
+			message->GetHead().Add("err", e.what());
+			LOG_ERROR("[" << config->FullName << "] " << e.what());
+		}
+		this->SubWaitCount(service);
+		if(code !=  XCode::Successful)
+		{
+			LOG_ERROR(message->From() << " call [" << config->FullName
+									  << "] code = " << CodeConfig::Inst()->GetDesc(code));
 		}
 
 		this->mWaitCount--;
@@ -112,7 +124,7 @@ namespace Tendo
 			{
 				std::string func;
 				message->ConstHead().Get("func", func);
-				const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
+				const RpcMethodConfig * methodConfig = SrvRpcConfig::Inst()->GetMethodConfig(func);
 				if(methodConfig == nullptr)
 				{
 					return false;

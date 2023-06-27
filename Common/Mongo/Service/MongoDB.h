@@ -17,8 +17,6 @@ namespace Tendo
 	private:
 		bool Awake() final;
         bool OnInit() final;
-		void OnStart() final;
-        void OnStop() final;
 		int GetClientHandle(int flag = 0);
     private:
 		int Save(const db::mongo::update& request);
@@ -26,8 +24,9 @@ namespace Tendo
 		int Delete(const db::mongo::remove & request);
 		int Update(const db::mongo::update & request);
 		int SetIndex(const db::mongo::index & request);
-		int Query(const db::mongo::query::request & request, db::mongo::query::response & response);
-		int RunCommand(const db::mongo::command::request & request, db::mongo::command::response & response);
+		int Find(const db::mongo::find::request & request, db::mongo::find::response & response);
+		int FindOne(const db::mongo::find_one::request & request, db::mongo::find_one::response & response);
+		int Command(const db::mongo::command::request & request, db::mongo::command::response & response);
     private:
         int UpdateData(const db::mongo::update & request, bool upsert);
     private:

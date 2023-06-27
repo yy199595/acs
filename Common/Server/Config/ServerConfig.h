@@ -5,7 +5,7 @@
 #include<string>
 #include<unordered_map>
 #include"Util/Json/JsonReader.h"
-#include"Server/Config/TextConfig.h"
+#include"Config/Base/TextConfig.h"
 #include"Core/Singleton/Singleton.h"
 namespace Tendo
 {

@@ -1,7 +1,7 @@
 ﻿#include"TimerComponent.h"
 #include"Timer/Timer/DelayTimer.h"
 #include"Entity/Actor/App.h"
-#include"Lua/Engine/ClassProxyHelper.h"
+#include"Lua/Engine/ModuleClass.h"
 #include"Timer/Lua/Timer.h"
 namespace Tendo
 {
@@ -41,12 +41,12 @@ namespace Tendo
 		return this->AddTimer(std::make_shared<DelayTimer>(ms, func));
 	}
 
-    void TimerComponent::OnLuaRegister(Lua::ClassProxyHelper &luaRegister)
-    {
-        luaRegister.BeginNewTable("Timer");
-        luaRegister.PushExtensionFunction("Add", Lua::Timer::Add);
-        luaRegister.PushExtensionFunction("Remove", Lua::Timer::Remove);
-    }
+	void TimerComponent::OnLuaRegister(Lua::ModuleClass &luaRegister, std::string &name)
+	{
+		name = "Timer";
+		luaRegister.AddFunction("Add", Lua::Timer::Add);
+		luaRegister.AddFunction("Remove", Lua::Timer::Remove);
+	}
 
 	bool TimerComponent::CancelTimer(long long id)
 	{

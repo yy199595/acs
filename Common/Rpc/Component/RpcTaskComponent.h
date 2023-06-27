@@ -13,11 +13,11 @@ namespace Tendo
     {
     public:
         RpcTaskComponent() = default;
-        ~RpcTaskComponent() = default;
+        ~RpcTaskComponent() override = default;
         typedef std::shared_ptr<IRpcTask<T>> RpcTask;
     public:
         template<typename T1>
-        T1 * AddTask(K k, std::shared_ptr<T1> task)
+        std::shared_ptr<T1> AddTask(K k, std::shared_ptr<T1> task)
         {
             auto iter = this->mTasks.find(k);
             if(iter != this->mTasks.end())
@@ -26,7 +26,7 @@ namespace Tendo
                 return nullptr;
             }
 			this->mTasks.emplace(k, task);
-            return task.get();
+            return task;
         }
         K PopTaskId() { return this->mNumberPool.Pop(); }
         void PushTaskId(K k) { this->mNumberPool.Push(k); }

@@ -1,11 +1,11 @@
 //
 // Created by yjz on 2022/11/22.
 //
-
+#include<fstream>
 #include"LuaModule.h"
 #include"Lua/Engine/Function.h"
 #include"Util/Md5/MD5.h"
-#include<fstream>
+#include"Util/String/StringHelper.h"
 #include"Log/Common/CommonLogDef.h"
 namespace Lua
 {
@@ -33,18 +33,18 @@ namespace Lua
 		
 		if(luaL_dofile(this->mLua, path.c_str()) != LUA_OK)
 		{
-            LOG_FATAL(lua_tostring(this->mLua, -1));
+			LOG_ERROR(lua_tostring(this->mLua, -1));
 			return false;
 		}
 		if(!lua_istable(this->mLua, -1))
 		{
-			LOG_ERROR(this->mName << " is not return lua table");
+			LOG_FMT_ERR("load lua file : [{}.lua] return is not table", this->mName);
 			return false;
 		}
-		std::ifstream fs(path, std::ios::in);
-		MD5 md5(fs);
+		std::ifstream fs;
 		this->mPath = path;
-		this->mMd5 = md5.toString();
+		fs.open(path, std::ios::in);
+		this->mMd5 = Helper::Md5::GetMd5(fs);
 		this->mRef = luaL_ref(mLua, LUA_REGISTRYINDEX);
 		
 		this->InitModule();
@@ -54,11 +54,12 @@ namespace Lua
 
 	void LuaModule::InitModule()
 	{
-		this->SetMember("name", this->mName);
-		this->SetMember("path", this->mPath);
+		this->SetMember("__name", this->mName);
+		this->SetMember("__path", this->mPath);
+		this->SetMember("__time", Helper::Time::NowSecTime());
 	}
 
-	void LuaModule::SetMember(const char* key, int value)
+	void LuaModule::SetMember(const char* key, long long value)
 	{
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
 		{
@@ -79,41 +80,43 @@ namespace Lua
 	void LuaModule::Update(int tick)
 	{
 		const static std::string name("OnUpdate");
-		if (this->mIsUpdate && this->GetFunction(name))
+		if (this->mIsUpdate)
 		{
-			lua_pushinteger(this->mLua, tick);
-			if (lua_pcall(this->mLua, 1, 0, 0) != LUA_OK)
-			{
-                LUA_LOG_ERROR(lua_tostring(this->mLua, -1));
-			}
+			this->Call(name, tick);
 		}
 	}
 
 	bool LuaModule::Hotfix()
 	{
-		std::ifstream fs(this->mPath, std::ios::in);
-		MD5 md5(fs);
-		if(this->mMd5 == md5.toString()) //文件没有改变
+		std::ifstream fs;
+		fs.open(this->mPath, std::ios::in);
+		std::string md5 = Helper::Md5::GetMd5(fs);
+		if(this->mMd5 == md5) //文件没有改变
 		{
+			fs.close();
 			return true;
 		}
+		fs.close();
+		LOG_DEBUG("reload lua file : " << this->mName << ".lua");
 		if(luaL_dofile(this->mLua, this->mPath.c_str()) != LUA_OK)
 		{
-            LUA_LOG_ERROR(lua_tostring(this->mLua, -1));
+			this->OnCallError("DoFile");
 			return false;
 		}
 		if(!lua_istable(this->mLua, -1))
 		{
+			LOG_FMT_ERR("load lua file : [{}.lua] return is not table", this->mName);
 			return false;
 		}
-		int ref = this->mRef;
+		lua_unref(this->mLua, this->mRef);
 		this->mRef = luaL_ref(mLua, LUA_REGISTRYINDEX);
-		luaL_unref(this->mLua, LUA_REGISTRYINDEX, ref);
-
-		this->InitModule();
-		this->mCaches.clear();
-		this->mMd5 = md5.toString();
-		this->mIsUpdate = this->GetFunction("OnUpdate");
+		LOG_INFO("reload [" << this->mPath << "] successful");
+		{
+			this->mMd5 = md5;
+			this->InitModule();
+			this->mCaches.clear();
+			this->mIsUpdate = this->GetFunction("OnUpdate");
+		}
 		return true;
 	}
 
@@ -142,9 +145,35 @@ namespace Lua
 		}
 		if (lua_getfield(this->mLua, -1, name.c_str()))
 		{
-			return lua_isfunction(this->mLua, -1);
+			if(lua_isfunction(this->mLua, -1))
+			{
+				lua_pushvalue(this->mLua, -2);
+				return true;
+			}
 		}
 		return false;
+	}
+
+	void LuaModule::OnCallError(const std::string & func)
+	{
+		size_t length = 0;
+		const char * errorInfo = nullptr;
+		const char * str = luaL_tolstring(this->mLua, -1, &length);
+		for (size_t index = length - 1; index > 0; index--)
+		{
+			if(str[index] == '/'|| str[index] == '\\')
+			{
+				errorInfo = str + index + 1;
+				length = length - index - 1;
+				break;
+			}
+		}
+		if(errorInfo != nullptr && length > 0)
+		{
+			Debug::Log(Debug::Level::err, std::string(errorInfo, length));
+			return;
+		}
+        LOG_FMT_ERR("[{0}.{1}] : {2}", this->mName, func, std::string(str, length));
 	}
 
 }

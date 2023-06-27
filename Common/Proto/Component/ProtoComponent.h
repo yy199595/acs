@@ -47,7 +47,7 @@ namespace Tendo
         bool LateAwake() final;
 		void LoopMessage(const Descriptor * descriptor);
         const Message * FindMessage(const std::string & name);
-        void OnLuaRegister(Lua::ClassProxyHelper &luaRegister) final;
+		void OnLuaRegister(Lua::ModuleClass &luaRegister, std::string &name) final;
 	 public:
         bool Load(const char * path);
 		bool Import(const char * proto);

@@ -1,8 +1,8 @@
 ﻿#include"RedisComponent.h"
 #include"Redis/Lua/LuaRedis.h"
 
-#include"Lua/Engine/ClassProxyHelper.h"
-#include"Redis/Client/RedisTcpClient.h"
+#include"Lua/Engine/ModuleClass.h"
+#include"Redis/Client/RedisClient.h"
 #include"Server/Component/ThreadComponent.h"
 #include"Redis/Component/RedisLuaComponent.h"
 #include"Redis/Component/RedisStringComponent.h"
@@ -28,7 +28,7 @@ namespace Tendo
 		std::shared_ptr<Tcp::SocketProxy> socket = std::make_shared<Tcp::SocketProxy>(io);
 
 		socket->Init(this->Config().Address.Ip, this->Config().Address.Port);
-		this->mMainClient =	std::make_shared<RedisTcpClient>(socket, this->mConfig.Config(), this);
+		this->mMainClient =	std::make_shared<RedisClient>(socket, this->mConfig.Config(), this);
 		return this->mMainClient->AuthUser();	
     }
 
@@ -73,7 +73,7 @@ namespace Tendo
 		}
 	}
 
-    RedisTcpClient * RedisComponent::MakeRedisClient(const RedisClientConfig & config)
+    RedisClient * RedisComponent::MakeRedisClient(const RedisClientConfig & config)
     {
         const std::string & ip = config.Address.Ip;
         const unsigned int port = config.Address.Port;
@@ -83,8 +83,8 @@ namespace Tendo
         {
             return nullptr;
         }
-        std::shared_ptr<RedisTcpClient> redisClient =
-            std::make_shared<RedisTcpClient>(socketProxy, config, this);
+        std::shared_ptr<RedisClient> redisClient =
+            std::make_shared<RedisClient>(socketProxy, config, this);
         this->mRedisClients.emplace_back(redisClient);
         return redisClient.get();
     }
@@ -97,7 +97,7 @@ namespace Tendo
         return response != nullptr && !response->HasError();
     }
 
-    RedisTcpClient * RedisComponent::GetClient(size_t index)
+    RedisClient * RedisComponent::GetClient(size_t index)
     {
 		if (this->mRedisClients.empty())
 		{
@@ -152,17 +152,18 @@ namespace Tendo
 		return response;
 	}
 
-	void RedisComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
+	void RedisComponent::OnLuaRegister(Lua::ModuleClass &luaRegister, std::string &name)
 	{
-		luaRegister.BeginNewTable("Redis");
-		luaRegister.PushExtensionFunction("Run", Lua::Redis::Run);
-		luaRegister.PushExtensionFunction("Call", Lua::Redis::Call);
-        luaRegister.PushExtensionFunction("Send", Lua::Redis::Send);
-		luaRegister.PushExtensionFunction("SyncRun", Lua::Redis::SyncRun);
+		name = "Redis";
+		luaRegister.AddFunction("Run", Lua::Redis::Run);
+		luaRegister.AddFunction("Call", Lua::Redis::Call);
+        luaRegister.AddFunction("Send", Lua::Redis::Send);
+		luaRegister.AddFunction("Sync", Lua::Redis::SyncRun);
     }
+
 	bool RedisComponent::Send(const std::shared_ptr<RedisRequest>& request)
 	{
-		RedisTcpClient * redisClientContext = this->GetClient();
+		RedisClient * redisClientContext = this->GetClient();
 		if(redisClientContext == nullptr)
 		{
 			return false;
@@ -172,7 +173,7 @@ namespace Tendo
 	}
 	bool RedisComponent::Send(const std::shared_ptr<RedisRequest>& request, int& id)
 	{
-		RedisTcpClient * redisClientContext = this->GetClient();
+		RedisClient * redisClientContext = this->GetClient();
 		if(redisClientContext == nullptr)
 		{
 			return false;

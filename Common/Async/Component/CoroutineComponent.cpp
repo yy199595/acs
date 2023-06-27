@@ -28,12 +28,14 @@ namespace Tendo
 		if (this->mRunContext != nullptr)
 		{
 			this->mRunContext->Invoke();
+#ifdef __COR_SHARED_STACK__
 			int sid = this->mRunContext->sid;
 			Stack& stack = this->mSharedStack[sid];
 			if (stack.co == this->mRunContext->mCoroutineId)
 			{
 				stack.co = 0;
 			}
+#endif
 			this->mCorPool.Push(this->mRunContext);
 		}
 		tb_context_jump(this->mMainContext, nullptr);
@@ -42,6 +44,7 @@ namespace Tendo
 	bool CoroutineComponent::Awake()
 	{
 		this->mRunContext = nullptr;
+#ifdef __COR_SHARED_STACK__
 		for (Stack& stack : this->mSharedStack)
 		{
 			stack.co = 0;
@@ -49,6 +52,7 @@ namespace Tendo
 			stack.p = new char[STACK_SIZE];
 			stack.top = (char*)stack.p + STACK_SIZE;
 		}
+#endif
         return true;
 	}
 
@@ -68,22 +72,30 @@ namespace Tendo
 	void CoroutineComponent::ResumeContext(TaskContext* co)
 	{
 		co->mState = CorState::Running;
+#ifdef __COR_SHARED_STACK__
 		Stack& stack = mSharedStack[co->sid];
+#else
+		Stack& stack = co->mStack;
+#endif
 		if (co->mContext == nullptr)
 		{
+#ifdef __COR_SHARED_STACK__
 			if (stack.co != co->mCoroutineId)
 			{
 				this->SaveStack(stack.co);
 				stack.co = co->mCoroutineId;
 			}
+#endif
 			this->mRunContext->mContext = tb_context_make(stack.p, stack.size, MainEntry);
 		}
+#ifdef __COR_SHARED_STACK__
 		else if (stack.co != co->mCoroutineId)
 		{
 			this->SaveStack(stack.co);
 			stack.co = co->mCoroutineId;
             memcpy(co->mContext, co->mStack.p, co->mStack.size);
 		}
+#endif
 		tb_context_from_t from = tb_context_jump(co->mContext, this);
 		if (from.priv != nullptr)
 		{
@@ -94,12 +106,7 @@ namespace Tendo
 	bool CoroutineComponent::YieldCoroutine() const
 	{
 		assert(this->mRunContext);
-		assert(this->mRunContext->mState == CorState::Running);
-		this->mRunContext->mSwitchCount++;
 		this->mRunContext->mState = CorState::Suspend;
-#ifdef __DEBUG__
-      this->mRunContext->mSwitchTime = Helper::Time::NowSecTime();
-#endif
 		tb_context_jump(this->mMainContext, this->mRunContext);
 		return true;
 	}
@@ -122,9 +129,6 @@ namespace Tendo
 		{
 			coroutine->mFunction = func;
 			coroutine->mState = CorState::Ready;
-#ifdef __DEBUG__
-			coroutine->mSwitchTime = Helper::Time::NowSecTime();
-#endif
 		}
 		return coroutine;
 	}
@@ -140,6 +144,7 @@ namespace Tendo
 		return false;
 	}
 
+#ifdef 	__COR_SHARED_STACK__
 	void CoroutineComponent::SaveStack(unsigned int id)
 	{
 		if (id == 0) return;
@@ -156,8 +161,10 @@ namespace Tendo
             assert(coroutine->mStack.p);
         }
         coroutine->mStack.size = size;
+		//LOG_WARN("coroutine stack size : "<< size);
         memcpy(coroutine->mStack.p, coroutine->mContext, coroutine->mStack.size);
     }
+#endif
 
 	void CoroutineComponent::OnSystemUpdate()
 	{

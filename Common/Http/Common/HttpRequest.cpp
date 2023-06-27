@@ -124,16 +124,19 @@ namespace Http
 	{
 		lua_createtable(lua, 0, 3);
 		{
+			lua_pushstring(lua, "from");
 			lua_pushstring(lua, this->mFrom.c_str());
-			lua_setfield(lua, -2, "from");
+			lua_rawset(lua, -3);
 		}
 		{
+			lua_pushstring(lua, "head");
 			this->mHead.WriteToLua(lua);
-			lua_setfield(lua, -2, "head");
+			lua_rawset(lua, -3);
 		}
 		{
+			lua_pushstring(lua, "message");
 			this->WriteMessageToLua(lua);
-			lua_setfield(lua, -2, "message");
+			lua_rawset(lua, -3);
 		}
 		return 1;
 	}

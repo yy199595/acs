@@ -11,6 +11,7 @@ namespace Tcp
 	{
 	 public:
 		ProtoMessage() = default;
+		virtual std::string  ToString() { return {}; }
 		virtual int Serialize(std::string& os) { return 0; }
 		virtual int Serialize(std::ostream & os) = 0; //返回剩余要发送的字节数
 	 protected:

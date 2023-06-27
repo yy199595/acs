@@ -15,10 +15,8 @@ namespace Mongo
 		}
 		mongoRequest = std::make_shared<CommandRequest>();
 		{
-			const std::string tab = table.substr(pos + 1);
+			mongoRequest->document.Add(command, table);
 			mongoRequest->dataBase = table.substr(0, pos);
-
-			mongoRequest->document.Add(command, tab);
 		}
 		return true;
 	}
@@ -34,14 +32,14 @@ namespace Mongo
 		return mongoRequest;
 	}
 
-	std::shared_ptr<CommandRequest> MongoFactory::Delete(const std::string& table, Bson::Writer::Document& document)
+	std::shared_ptr<CommandRequest> MongoFactory::Delete(const std::string& table, Bson::Writer::Document& document, int limit)
 	{
 		std::shared_ptr<CommandRequest> mongoRequest;
 		if(MongoFactory::New(table, "delete", mongoRequest))
 		{
 			Bson::Writer::Document delDocument;
 			{
-				delDocument.Add("limit", 1);
+				delDocument.Add("limit", limit);
 				delDocument.Add("q", document);
 			}
 			Bson::Writer::Array documents(delDocument);
@@ -74,15 +72,76 @@ namespace Mongo
 
 	std::shared_ptr<CommandRequest> MongoFactory::Query(const std::string& tab, const std::string & json, int limit)
 	{
-		std::shared_ptr<CommandRequest> mongoRequest = std::make_shared<CommandRequest>();
+		std::shared_ptr<CommandRequest> mongoRequest;
+		if(!MongoFactory::New(tab, "find", mongoRequest))
 		{
-			mongoRequest->collectionName = tab;
-			mongoRequest->numberToReturn = limit;
-			if(!mongoRequest->document.FromByJson(json))
-			{
-				return nullptr;
-			}
+			return nullptr;
 		}
+		Bson::Writer::Document filter;
+		if(!filter.FromByJson(json))
+		{
+			return nullptr;
+		}
+		Bson::Writer::Document mode;
+		mode.Add("mode", "secondaryPreferred");
+
+		mongoRequest->document.Add("$readPreference", mode);
+		mongoRequest->document.Add("filter", filter);
+		mongoRequest->document.Add("limit", limit);
+//		std::shared_ptr<CommandRequest> mongoRequest = std::make_shared<CommandRequest>();
+//		{
+//			mongoRequest->collectionName = tab;
+//			mongoRequest->numberToReturn = limit;
+//			if(!mongoRequest->document.FromByJson(json))
+//			{
+//				return nullptr;
+//			}
+//		}
+		return mongoRequest;
+	}
+
+	std::shared_ptr<CommandRequest> MongoFactory::Command(const std::string& table, const std::string & cmd, const std::string & json)
+	{
+		std::shared_ptr<CommandRequest> mongoRequest;
+		if (!MongoFactory::New(table, cmd.c_str(), mongoRequest))
+		{
+			return nullptr;
+		}
+		if (!json.empty() && !mongoRequest->document.FromByJson(json))
+		{
+			return nullptr;
+		}
+		return mongoRequest;
+	}
+
+	std::shared_ptr<CommandRequest> MongoFactory::CreateIndex(
+			const std::string& table, const std::vector<std::string>& keys)
+	{
+		if(keys.empty())
+		{
+			return nullptr;
+		}
+		std::shared_ptr<CommandRequest> mongoRequest;
+		if (!MongoFactory::New(table, "createIndexes", mongoRequest))
+		{
+			return nullptr;
+		}
+		Bson::Writer::Array documentArray1;
+
+		bool unique = keys.size() == 1;
+		for(const std::string & name : keys)
+		{
+			Bson::Writer::Document key;
+			Bson::Writer::Document document;
+			key.Add(name.c_str(), 1);
+
+			document.Add("key", key);
+			document.Add("unique", unique); //是否为唯一索引
+			document.Add("name", name.c_str());
+
+			documentArray1.Add(document);
+		}
+		mongoRequest->document.Add("indexes", documentArray1);
 		return mongoRequest;
 	}
 }

@@ -5,7 +5,7 @@
 #include"HttpWebComponent.h"
 #include"Entity/Actor/App.h"
 #include"Server/Config/CodeConfig.h"
-#include"Server/Config/ServiceConfig.h"
+#include"Rpc/Config/ServiceConfig.h"
 #include"Http/Client/HttpHandlerClient.h"
 #include"Http/Service/HttpService.h"
 #include"Util/File/DirectoryHelper.h"
@@ -147,7 +147,7 @@ namespace Tendo
 		}
 		std::string func(path.c_str() + 1, path.size() - 1);
 		func[pos - 1] = '.';
-		if(RpcConfig::Inst()->GetMethodConfig(func) == nullptr)
+		if(SrvRpcConfig::Inst()->GetMethodConfig(func) == nullptr)
 		{
 			return false;
 		}
@@ -192,11 +192,11 @@ namespace Tendo
             const std::string& method = config->Method;
             std::shared_ptr<Http::DataResponse> response(new Http::DataResponse());
             int code = httpService->Invoke(method, request, response);
-            if (code != XCode::Successful)
+            if (code != XCode::Successful && code != XCode::LuaCoroutineWait)
             {
 #ifdef __DEBUG__
                 LOG_ERROR("[" << config->Type << "] " << config->Path 
-                    << " : " << CodeConfig::Inst()->GetDesc(code));
+                    << " : error = " << CodeConfig::Inst()->GetDesc(code));
 #endif
             }
             this->Send(address, response);

@@ -6,10 +6,12 @@
 
 local Log = { }
 
-local logger = Logger
+local logger = require("Logger")
 local debug_getinfo = debug.getinfo
+local debug_traceback = debug.traceback
 local console = require("Console")
 local fmt = console.FormatLog
+
 function Log.Info(...)
     local runInfo = debug_getinfo(2)
     local message = fmt(runInfo, ...)
@@ -17,11 +19,28 @@ function Log.Info(...)
     logger.Output(console.LogDebug, message)
 end
 
+function Log.OnError(error_msg)
+
+    local pos = string.find(error_msg, "/[^/]*$")
+    if pos then
+        error_msg = string.sub(error_msg, pos + 1)
+    end
+    local message = debug_traceback(error_msg, 2)
+    console.Show(console.LogError, message)
+    logger.Output(console.LogError, message)
+end
+
 function Log.Debug(...)
     local runInfo = debug_getinfo(2)
     local message = console.FormatLog(runInfo, ...)
     console.Show(console.LogDebug, message)
     logger.Output(console.LogDebug, message)
+end
+
+function Log.Stack(err)
+    local stack = debug_traceback(err, 5)
+    console.Show(console.LogError, stack)
+    logger.Output(console.LogError, stack)
 end
 
 function Log.Warning(...)
@@ -34,7 +53,7 @@ end
 function Log.Error(...)
     local runInfo = debug_getinfo(2)
     local message = fmt(runInfo, ...)
-    message = debug.traceback() .. message
+    --message = debug_traceback() .. message
     console.Show(console.LogError, message)
     logger.Output(console.LogError, message)
 end

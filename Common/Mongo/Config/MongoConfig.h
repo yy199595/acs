@@ -5,7 +5,7 @@
 #ifndef APP_MONGOCONFIG_H
 #define APP_MONGOCONFIG_H
 #include<vector>
-#include"Server/Config/TextConfig.h"
+#include"Config/Base/TextConfig.h"
 #include"Core/Singleton/Singleton.h"
 namespace Mongo
 {
@@ -18,7 +18,7 @@ namespace Mongo
        	bool OnLoadText(const char *str, size_t length) final;
         bool OnReloadText(const char *str, size_t length) final;
     public:
-        int MaxCount;
+		int MaxCount;
         std::string DB;
         std::string User;
         std::string Password;

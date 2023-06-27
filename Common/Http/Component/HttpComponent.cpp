@@ -10,12 +10,13 @@
 #include"Http/Lua/LuaHttp.h"
 #include"Entity/Actor/App.h"
 #include"Network/Tcp/Asio.h"
-#include"Lua/Engine/ClassProxyHelper.h"
+#include"Lua/Engine/ModuleClass.h"
 #include"Http/Common/HttpRequest.h"
 #include"Util/File/DirectoryHelper.h"
 namespace Tendo
 {
 	HttpComponent::HttpComponent()
+		: ISender(Msg::Net::Http)
 	{
 		this->mNetComponent = nullptr;
 	}
@@ -77,12 +78,12 @@ namespace Tendo
 		}
     }
 
-	void HttpComponent::OnLuaRegister(Lua::ClassProxyHelper& luaRegister)
+	void HttpComponent::OnLuaRegister(Lua::ModuleClass &luaRegister, std::string &name)
 	{
-        luaRegister.BeginNewTable("Http");
-		luaRegister.PushExtensionFunction("Get", Lua::HttpClient::Get);
-		luaRegister.PushExtensionFunction("Post", Lua::HttpClient::Post);
-		luaRegister.PushExtensionFunction("Download", Lua::HttpClient::Download);
+		name = "Http";
+		luaRegister.AddFunction("Get", Lua::HttpClient::Get);
+		luaRegister.AddFunction("Post", Lua::HttpClient::Post);
+		luaRegister.AddFunction("Download", Lua::HttpClient::Download);
 	}
 
 	int HttpComponent::Download(const string& url, const string& path, bool async)
@@ -258,7 +259,6 @@ namespace Tendo
 						return XCode::NetWorkError;
 					}
 					goto ON_READ_HANDLE;
-					break;
 				case HTTP_READ_SOME:
 					asio::read(socket, responseBuf, asio::transfer_at_least(1), code);
 					if (code)
@@ -272,7 +272,6 @@ namespace Tendo
 						return XCode::NetWorkError;
 					}
 					goto ON_READ_HANDLE;
-					break;
 				case HTTP_READ_ERROR:
 					return XCode::NetWorkError;
 				case HTTP_READ_COMPLETE:
@@ -291,7 +290,6 @@ namespace Tendo
 						return XCode::NetWorkError;
 					}
 					goto ON_READ_HANDLE;
-					break;
 			}
 		}
 		catch (asio::system_error& code)
@@ -299,7 +297,6 @@ namespace Tendo
 			CONSOLE_LOG_DEBUG(code.what())
 			return XCode::NetWorkError;
 		}
-		return XCode::Successful;
 	}
 
 	int HttpComponent::Send(const std::shared_ptr<Http::Request>& request)

@@ -8,7 +8,7 @@
 #include<string>
 #include<vector>
 #include<unordered_map>
-#include"Server/Config/TextConfig.h"
+#include"Config/Base/TextConfig.h"
 namespace Tendo
 {
     struct RedisClientConfig

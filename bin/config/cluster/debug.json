@@ -9,10 +9,11 @@
             "Chat",
             "ServerWeb",
             "Account",
-            "ActorRegistry"
+            "ServerRegistry"
         ],
         "Component": [
             "RedisComponent",
+            "SqliteComponent",
             "RegistryComponent",
             "HttpDebugComponent"
         ]

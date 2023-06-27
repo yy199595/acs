@@ -1,59 +1,86 @@
-Player = {}
-require("Client.LoginComponent")
+local Player = {}
+local PlayerCounter = 10000
+local log = require("Log")
+local log_error = require("Log").Error
+function Player:OnInit(info)
+
+    self.updates = {}
+    self.player_id = 0
+    self.components = { }
+    self.app = require("App")
+    self.account = info.account
+    self.passwd = info.passwd
+    assert(self.account)
+    assert(self.passwd)
+
+    self:AddComponent("LoginComponent")
+    self:AddComponent("ChatComponent")
+end
+
+function Player:AddComponent(name)
+    local component = Class(name)
+    if component == nil then
+        log_error(string.format("add %s fail", name))
+        return false
+    end
+    component.player = self
+    if component["OnUpdate"] ~= nil then
+        self.updates[name] = component
+    end
+    self.components[name] = component
+end
+
+function Player:DelComponent(name)
+    if self.updates[name] ~= nil then
+        self.updates[name] = nil
+    end
+    if self.components[name] ~= nil then
+        self.components[name] = nil
+    end
+end
+
+function Player:_Invoke(name, ...)
+    local func = self[name]
+    if func ~= nil then
+        local code, result = xpcall(func, log_error, self, ...)
+        if not code then
+            log_error(debug.traceback(), result)
+        end
+    end
+    for _, component in pairs(self.components) do
+        local func1 = component[name]
+        if func1 ~= nil then
+            local code, result = xpcall(func1, log_error, component, ...)
+            if not code then
+                log_error(debug.traceback(), result)
+            end
+        end
+    end
+end
+
+function Player:OnLogin(data)
+
+    self.token = data.token
+    self.address = data.address
+    self.player_id = PlayerCounter
+    PlayerCounter = PlayerCounter + 1
+    self.app:Make(self.player_id, self.address, "client")
+
+    local code = self:Call("Gate.Login", self.token)
+    if code ~= XCode.Successful then
+        log.Error(self.account, " 登录网关服务器 [", self.address, "] 失败")
+        return
+    end
+    self:_Invoke("OnLoginSuccess")
+    log.Debug(self.account, " 登录网关服务器[", self.address, "]成功")
+end
+
 function Player:Call(func, message)
-    return Client.Call(self.session, func, message)
+    return self.app:Call(self.player_id, func, message)
 end
 
 function Player:Send(func, message)
-    Client.Send(self.session, func, message)
+    return self.app:Send(self.player_id, func, message)
 end
 
-function Player:Login()
-    local account = self.account
-    local password = self.password
-    local phoneNum = self.phone
-    LoginComponent.Register(account, password, phoneNum)
-    local loginInfo = LoginComponent.Login(account, password)
-    table.print(loginInfo)
-    if loginInfo == nil or loginInfo.code ~= XCode.Successful then
-        Log.Error(account, ": 使用http登陆失败")
-        table.print(loginInfo)
-        return false
-    end
-
-    local token = loginInfo.data.token
-    local address = loginInfo.data.address
-    self.session = Client.New(loginInfo.data.address)
-    local code = self:Call("Gate.Login", token)
-    if code ~= XCode.Successful then
-        Log.Error(account, " 登录网关服务器 [", address, "] 失败")
-        return false
-    end
-    Log.Debug(account, " 登录网关服务器[", address, "]成功")
-end
-
-function Player.New(info)
-    local tab = {
-        account = info.account,
-        password = info.passwd,
-        phone = info.phoneNum,
-        session = 0
-    }
-    setmetatable(tab, {__index = Player})
-    return tab
-end
-
-function Player:Update()
-    self:Login()
-    while true do
-        local code = self:Call("Chat.Chat", {
-            user_id = 1122, msg_type = 1, message = "hello"
-        })
-        if code == XCode.NetWorkError then
-            Log.Error("net work error stop call")
-            return
-        end
-        --coroutine.sleep(1000)
-    end
-end
 return Player

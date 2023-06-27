@@ -138,15 +138,5 @@ namespace Tendo
         }
         return socket;
     }
-	std::shared_ptr<Tcp::SocketProxy> ThreadComponent::CreateSocket(const std::string& address)
-	{
-		size_t pos = address.find(':');
-		if(pos == std::string::npos)
-		{
-			return nullptr;
-		}
-		const std::string ip = address.substr(0, pos);
-		const std::string port = address.substr(pos + 1);
-		return this->CreateSocket(ip, std::stoi(port));
-	}
+
 }

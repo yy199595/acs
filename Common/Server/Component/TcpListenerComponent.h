@@ -7,13 +7,12 @@ namespace Tendo
 	{
 	 public:
 		TcpListenerComponent();
-		~TcpListenerComponent();
+		~TcpListenerComponent() override;
 	 public:
         bool StopListen() const;
         bool StartListen(const char * name);
-        unsigned short GetListenPort() const { return this->mListenPort;}
     protected:
-        void ListenConnect();
+        void StartAccept();
         virtual void OnStopListen() { };
         virtual void OnListen(std::shared_ptr<Tcp::SocketProxy> socket) = 0;
     private:

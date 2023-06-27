@@ -26,8 +26,9 @@ namespace Tendo
 #ifdef ONLY_MAIN_THREAD
 		this->ConnectHost();
 #else
-		Asio::Context & netWorkThread = this->mSocket->GetThread();
-		netWorkThread.post(std::bind(&HttpRequestClient::ConnectHost, this));
+		std::shared_ptr<Tcp::TcpContext> self = this->shared_from_this();
+		Asio::Context & io = this->mSocket->GetThread();
+		io.post([this, self] { ConnectHost(); });
 #endif
 	}
 
@@ -85,8 +86,7 @@ namespace Tendo
         this->mHttpComponent->OnResponse(this->mTaskId, std::move(this->mResponse));
 #else
         Asio::Context &io = App::Inst()->MainThread();
-        io.post(std::bind(&HttpComponent::OnResponse,
-                          this->mHttpComponent, this->mTaskId, std::move(this->mResponse)));
+        io.post([this, capture0 = std::move(this->mResponse)] { this->mHttpComponent->OnResponse(this->mTaskId, capture0); });
 #endif
     }
 
@@ -156,7 +156,7 @@ namespace Tendo
         {
             std::chrono::seconds second{timeout};
             this->mTimer = std::make_shared<asio::steady_timer>(context, second);
-            this->mTimer->async_wait(std::bind(&HttpRequestClient::OnTimeout, this, args1));
+            this->mTimer->async_wait([this](auto && PH1) { OnTimeout(std::forward<decltype(PH1)>(PH1)); });
         }
 		if(Helper::Str::IsIpAddress(host))
 		{
@@ -175,8 +175,8 @@ namespace Tendo
                 return;
             }
             Asio::Socket & tcpSocket = this->mSocket->GetSocket();
-            asio::async_connect(tcpSocket, iterator, [this]
-                (const asio::error_code & code, Asio::Resolver::iterator iter)
+            asio::async_connect(tcpSocket, std::move(iterator), [this]
+                (const asio::error_code & code, const Asio::Resolver::iterator& iter)
             {
                 this->OnConnect(code, 0);
             });

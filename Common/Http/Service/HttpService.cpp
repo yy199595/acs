@@ -13,7 +13,7 @@ namespace Tendo
     HttpService::HttpService()
 		: mServiceRegister(this), mConfig(nullptr)
     {
-
+		this->mLuaModule = nullptr;
     }
 
     bool HttpService::LateAwake()
@@ -32,8 +32,10 @@ namespace Tendo
 			this->mConfig->GetMethodConfigs(methodConfigs);
 			for (const HttpMethodConfig* methodConfig: methodConfigs)
 			{
-				this->mLuaModule->GetFunction(methodConfig->Method);
+				this->mLuaModule->AddCache(methodConfig->Method);
 			}
+			int code = this->mLuaModule->Call("Awake");
+			return code != XCode::CallLuaFunctionFail;
 		}
 		return true;
     }
@@ -43,7 +45,7 @@ namespace Tendo
 		this->OnStart();
 		if(this->mLuaModule != nullptr)
 		{
-			this->mLuaModule->Await("OnStart");
+			this->mLuaModule->Await("Start");
 		}
 	}
 
@@ -56,12 +58,13 @@ namespace Tendo
 		}
 	}
 
-	void HttpService::OnHotFix()
+	bool HttpService::OnHotFix()
 	{
 		if(this->mLuaModule != nullptr)
 		{
-			this->mLuaModule->Hotfix();
+			return this->mLuaModule->Hotfix();
 		}
+		return true;
 	}
 
 	void HttpService::Complete()
@@ -69,7 +72,7 @@ namespace Tendo
 		this->OnComplete();
 		if(this->mLuaModule != nullptr)
 		{
-			this->mLuaModule->Await("OnComplete");
+			this->mLuaModule->Await("Complete");
 		}
 	}
 
@@ -78,7 +81,7 @@ namespace Tendo
 		this->OnStop();
 		if(this->mLuaModule != nullptr)
 		{
-			this->mLuaModule->Await("OnStop");
+			this->mLuaModule->Await("Stop");
 			delete this->mLuaModule;
 			this->mLuaModule = nullptr;
 		}
@@ -106,58 +109,59 @@ namespace Tendo
 
 	int HttpService::CallLua(const std::string & method, const Http::Request& request, Http::DataResponse& response)
 	{
-		this->mLuaModule->GetFunction(method);
+		this->mLuaModule->GetFunction("__Invoke");
 		lua_State * lua = this->mLuaModule->GetLuaEnv();
 		{
 			request.WriteToLua(lua);
-			if (lua_pcall(lua, 1, 2, 0) != LUA_OK)
+			if(lua_pcall(lua, 1, 3, 0) != LUA_OK)
 			{
 				Json::Writer document;
-				document.Add("error").Add(lua_tostring(lua, -1));
-				document.Add("code").Add((int)XCode::CallLuaFunctionFail);
+				int code = XCode::CallLuaFunctionFail;
+				const char * err = lua_tostring(lua, -1);
+				{
+					document.Add("code").Add(code);
+					document.Add("error").Add(err);
+					LOG_ERROR(err);
+				}
 				response.Json(HttpStatus::OK, document);
 				return XCode::CallLuaFunctionFail;
 			}
-			if (lua_isstring(lua, -1))
-			{
-				size_t size = 0;
-				const char *json = lua_tolstring(lua, -1, &size);
-				response.Json(HttpStatus::OK, json, size);
-				return XCode::Successful;
-			}
-			else if (lua_istable(lua, -1))
+			if (lua_istable(lua, -1))
 			{
 				std::string data;
 				Lua::RapidJson::Read(lua, -1, &data);
 				response.Json(HttpStatus::OK, data.c_str(), data.size());
-				return XCode::Successful;
+				return (int)luaL_checkinteger(lua, -2);
 			}
+			return XCode::Failure;
 		}
-		return (int)luaL_checkinteger(lua, -2);
 	}
 
 	int HttpService::AwaitCallLua(const std::string & method, const Http::Request& request, Http::DataResponse& response)
 	{
+		this->mLuaModule->GetFunction("__Call");
 		lua_State * lua = this->mLuaModule->GetLuaEnv();
-		if(!Lua::Function::Get(lua, "coroutine", "http"))
 		{
-			return XCode::CallLuaFunctionFail;
-		}
-		this->mLuaModule->GetFunction(method);
-		{
+			lua_pushstring(lua, method.c_str());
+
 			request.WriteToLua(lua);
+			std::unique_ptr<LuaServiceTaskSource> luaTaskSource =
+					std::make_unique<LuaServiceTaskSource>(&response);
+			Lua::UserDataParameter::Write(lua, luaTaskSource.get());
+			if (lua_pcall(lua, 4, 1, 0) != LUA_OK)
+			{
+				Json::Writer document;
+				int code = XCode::CallLuaFunctionFail;
+				const char * err = lua_tostring(lua, -1);
+				{
+					document.Add("code").Add(code);
+					document.Add("error").Add(err);
+					LOG_ERROR(err);
+				}
+				response.Json(HttpStatus::OK, document);
+				return XCode::CallLuaFunctionFail;
+			}
+			return luaTaskSource->Await();
 		}
-		std::unique_ptr<LuaServiceTaskSource> luaTaskSource =
-				std::make_unique<LuaServiceTaskSource>(&response);
-		Lua::UserDataParameter::Write(lua, luaTaskSource.get());
-		if (lua_pcall(lua, 3, 1, 0) != LUA_OK)
-		{
-			Json::Writer document;
-			document.Add("error").Add(lua_tostring(lua, -1));
-			document.Add("code").Add((int)XCode::CallLuaFunctionFail);
-			response.Json(HttpStatus::OK, document);
-			return XCode::CallLuaFunctionFail;
-		}
-		return luaTaskSource->Await();
 	}
 }

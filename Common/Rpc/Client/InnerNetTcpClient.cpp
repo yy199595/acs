@@ -28,40 +28,19 @@ namespace Tendo
 		this->CloseSocket(XCode::NetActiveShutdown);
 #else
         Asio::Context & t = this->mSocket->GetThread();
-		t.post(std::bind(&InnerNetTcpClient::CloseSocket, this, XCode::NetActiveShutdown));
+		std::shared_ptr<TcpContext> self = this->shared_from_this();
+		t.post([this, self] { CloseSocket(XCode::NetActiveShutdown); });
 #endif
 	}
 
-
-    bool InnerNetTcpClient::Send(const std::shared_ptr<Msg::Packet>& message, bool async)
+    void InnerNetTcpClient::Send(const std::shared_ptr<Msg::Packet>& message)
     {
-		if(async)
-		{
 #ifdef ONLY_MAIN_THREAD
 			this->Write(message);
 #else
 			asio::io_service& t = this->mSocket->GetThread();
-			t.post(std::bind(&InnerNetTcpClient::Write, this, message));
+			t.post([this, message] { this->Write(message); });
 #endif
-			return true;
-		}
-		else
-		{
-			asio::io_service& t = this->mSocket->GetThread();
-			if(!App::Inst()->IsMainContext(&t))
-			{
-				return false;
-			}
-			if(this->SendSync(message) <= 0)
-			{
-				if(!this->ConnectSync())
-				{
-					return false;
-				}
-				return this->SendSync(message) > 0;
-			}
-			return true;
-		}
     }
 
     void InnerNetTcpClient::OnSendMessage(const asio::error_code& code, std::shared_ptr<ProtoMessage> message)
@@ -81,14 +60,6 @@ namespace Tendo
         }
         else
         {
-//			std::shared_ptr<Msg::Packet> sendMessage = std::static_pointer_cast<Msg::Packet>(message);
-//			if(sendMessage != nullptr && sendMessage->GetType() == Msg::Type::Request)
-//			{
-//				int rpcId = 0;
-//				sendMessage->ConstHead().Get("rpc", rpcId);
-//				this->mWaitResMessages.emplace(rpcId, sendMessage);
-//			}
-
             this->PopMessage();
             this->SendFromMessageQueue();
         }
@@ -113,7 +84,8 @@ namespace Tendo
                 this->mComponent->OnSendFailure(address, std::move(packet));
 #else
                 asio::io_service& io = App::Inst()->MainThread();
-                io.post(std::bind(&IRpc<Msg::Packet>::OnSendFailure, this->mComponent, address, packet));
+				std::shared_ptr<TcpContext> self = this->shared_from_this();
+				io.post([this, address, packet, self] { this->mComponent->OnSendFailure(address, packet); });
 #endif
             }
         }
@@ -126,40 +98,10 @@ namespace Tendo
         this->mComponent->OnCloseSocket(address, code);
 #else
         asio::io_service& taskScheduler = App::Inst()->MainThread();
-        taskScheduler.post(std::bind(&IRpc<Msg::Packet>::OnCloseSocket, this->mComponent, address, code));
+		std::shared_ptr<TcpContext> self = this->shared_from_this();
+		taskScheduler.post([this, address, code, self] { this->mComponent->OnCloseSocket(address, code); });
 #endif
     }
-
-	std::shared_ptr<Msg::Packet> InnerNetTcpClient::Call(const std::shared_ptr<Msg::Packet>& message)
-	{
-		if(!this->Send(message, false))
-		{
-			return nullptr;
-		}
-		if(this->RecvSync(RPC_PACK_HEAD_LEN) <= 0)
-		{
-			return nullptr;
-		}
-		int len = 0;
-		std::iostream readStream(&this->mRecvBuffer);
-		this->mMessage = std::make_shared<Msg::Packet>();
-		if(!this->mMessage->ParseLen(readStream, len))
-		{
-			this->CloseSocket(XCode::UnKnowPacket);
-			return nullptr;
-		}
-		if(this->RecvSync(len) <= 0)
-		{
-			return nullptr;
-		}
-		const std::string& address = this->mSocket->GetAddress();
-		if (!this->mMessage->Parse(address, readStream, len))
-		{
-			return nullptr;
-		}
-		return std::move(this->mMessage);
-	}
-
 
 	void InnerNetTcpClient::OnReceiveMessage(const asio::error_code &code, std::istream & readStream, size_t size)
     {
@@ -205,7 +147,8 @@ namespace Tendo
                 this->mComponent->OnMessage(std::move(this->mMessage));
 #else
                 asio::io_service & io = App::Inst()->MainThread();
-                io.post(std::bind(&IRpc<Msg::Packet>::OnMessage, this->mComponent, std::move(this->mMessage)));
+				std::shared_ptr<TcpContext> self = this->shared_from_this();
+				io.post([this, self, capture0 = std::move(this->mMessage)] { this->mComponent->OnMessage(capture0); });
 #endif
             }
                 break;
@@ -218,7 +161,8 @@ namespace Tendo
 		this->ReceiveMessage(RPC_PACK_HEAD_LEN);
 #else
         Asio::Context & t = this->mSocket->GetThread();
-        t.post(std::bind(&InnerNetTcpClient::ReceiveMessage, this, RPC_PACK_HEAD_LEN));
+		std::shared_ptr<TcpContext> self = this->shared_from_this();
+        t.post([this, self] { this->ReceiveMessage(RPC_PACK_HEAD_LEN); });
 #endif
 #ifdef __DEBUG__
         const std::string& address = this->mSocket->GetAddress();
@@ -248,8 +192,9 @@ namespace Tendo
 #endif
 			this->mSocket->Close();
 			Asio::Context & context = this->mSocket->GetThread();
+			std::shared_ptr<TcpContext> self = this->shared_from_this();
 			this->mTimer = std::make_unique<asio::steady_timer>(context, std::chrono::seconds(5));
-			this->mTimer->async_wait(std::bind(&InnerNetTcpClient::Connect, this->shared_from_this()));
+			this->mTimer->async_wait([this, self](const asio::error_code & code){ this->Connect(); });
 			return;
 		}
     
@@ -258,7 +203,8 @@ namespace Tendo
 #ifdef __DEBUG__     
         CONSOLE_LOG_INFO("connect server [" << address << "] successful");
 #endif
-		io.post(std::bind(&IRpc<Msg::Packet>::OnConnectSuccessful, this->mComponent, address));
+		std::shared_ptr<TcpContext> self = this->shared_from_this();
+		io.post([this, address, self] { this->mComponent->OnConnectSuccessful(address); });
 
         std::shared_ptr<Msg::Packet> authMessage
             = std::make_shared<Msg::Packet>();

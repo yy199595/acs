@@ -12,7 +12,7 @@ namespace Tendo
 		this->mIndex = 0;
 	}
 
-	void RedisNode::AddClient(std::shared_ptr<RedisTcpClient> client)
+	void RedisNode::AddClient(std::shared_ptr<RedisClient> client)
 	{
 		this->mClients.push_back(client);
 	}
@@ -32,13 +32,13 @@ namespace Tendo
 		}
 	}
 
-	std::shared_ptr<RedisTcpClient> RedisNode::GetFreeClient()
+	std::shared_ptr<RedisClient> RedisNode::GetFreeClient()
 	{
 		if(this->mClients.empty())
 		{
 			return nullptr;
 		}
-		for(std::shared_ptr<RedisTcpClient> redisClientContext : this->mClients)
+		for(std::shared_ptr<RedisClient> redisClientContext : this->mClients)
 		{
 			//if(!redisClientContext->IsUse())
 			{

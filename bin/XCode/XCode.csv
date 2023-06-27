@@ -49,3 +49,6 @@ NotFoundServerRpcAddress,找不到服务器rpc地址
 NotFoundPlayerRpcAddress,找不到玩家所在服务器地址
 NotFoundActor,找不到Actor
 NotFoundActorAddress,找不到actor地址
+AccountPasswordError,账号不存在或者密码错误
+PlayerOnLine,玩家已经在线
+PlayerNotOnLine,玩家不在线

@@ -40,14 +40,17 @@ namespace Tendo
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
         Lua::Coroutine::Resume(lua_tothread(this->mLua, -1), this->mLua, 0);
 	}
-	void LuaWaitTaskSource::SetResult(int code, std::shared_ptr<pb::Message> response)
+	void LuaWaitTaskSource::SetResult(int code, const std::shared_ptr<pb::Message>& response)
 	{
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
 		lua_State* coroutine = lua_tothread(this->mLua, -1);
 		lua_pushinteger(this->mLua, (int)code);
 		if (code == XCode::Successful && response != nullptr)
 		{
-			App::Inst()->GetProto()->Write(this->mLua, *response);
+			if(!App::Inst()->GetProto()->Write(this->mLua, *response))
+			{
+				LOG_ERROR("write response message to lua fail : " << response->GetTypeName());
+			}
 			Lua::Coroutine::Resume(coroutine, this->mLua, 2);
 			return;
 		}

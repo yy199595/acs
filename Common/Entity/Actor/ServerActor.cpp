@@ -6,23 +6,29 @@
 #include"XCode/XCode.h"
 #include"Entity/Actor/App.h"
 #include"Util/Json/JsonWriter.h"
+#include"Util/String/StringHelper.h"
 #include"Router/Component/RouterComponent.h"
 namespace Tendo
 {
 	ServerActor::ServerActor(int id, const std::string & name)
 		: Actor(id, name), mRpc("rpc")
 	{
-
+		this->mServerId = 0;
 	}
 
 	bool ServerActor::OnInit()
 	{
 		if(!this->GetListen(this->mRpc, this->mRpcAddress))
 		{
-			LOG_ERROR("not rpc address " << this->Name());
-			return false;
+			LOG_WARN("not rpc address " << this->Name());
 		}
+		this->mServerId = App::Inst()->GetActorId();
 		return true;
+	}
+
+	void ServerActor::OnWriteRpcHead(const std::string& func, Msg::Head& head) const
+	{
+		head.Add("id", this->mServerId);
 	}
 
 	int ServerActor::GetAddress(const std::string& func, std::string& addr)
@@ -36,13 +42,26 @@ namespace Tendo
 		return XCode::Successful;
 	}
 
-	void ServerActor::AddListen(const std::string& name, const std::string& addr)
+	bool ServerActor::AddListen(const std::string& name, const std::string& addr)
 	{
 		if (addr.empty() || name.empty())
 		{
-			return;
+			return false;
 		}
-		this->mListens[name] = addr;
+		std::string ip, net;
+		unsigned short port = 0;
+		if(Helper::Str::SplitAddr(addr, ip, port))
+		{
+			this->mListens[name] = addr;
+			return true;
+		}
+		if(Helper::Str::SplitAddr(addr, net, ip, port))
+		{
+			this->mListens[name] = fmt::format("{0}:{1}", ip, port);
+			return true;
+		}
+		LOG_FMT_ERR("add {0} {1} [{2}] fail", this->Name(), name, addr);
+		return true;
 	}
 
 	bool ServerActor::GetListen(const std::string& name, std::string& addr)

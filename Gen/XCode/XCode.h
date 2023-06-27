@@ -51,4 +51,7 @@ namespace XCode
 	 constexpr int NotFoundPlayerRpcAddress = 47;//找不到玩家所在服务器地址
 	 constexpr int NotFoundActor = 48;//找不到Actor
 	 constexpr int NotFoundActorAddress = 49;//找不到actor地址
+	 constexpr int AccountPasswordError = 50;//账号不存在或者密码错误
+	 constexpr int PlayerOnLine = 51;//玩家已经在线
+	 constexpr int PlayerNotOnLine = 52;//玩家不在线
 };

@@ -6,7 +6,7 @@
 #define SENTRY_HTTPSERVICE_H
 #include"Entity/Component/Component.h"
 #include"Rpc/Method/MethodRegister.h"
-#include"Server//Config/ServiceConfig.h"
+#include"Rpc/Config/ServiceConfig.h"
 namespace Json
 {
     class Writer;
@@ -38,7 +38,7 @@ namespace Tendo
 		virtual void OnComplete() { }
 	protected:
 		void Start() final;
-		void OnHotFix() final;
+		bool OnHotFix() final;
 		void Complete() final;
 		void OnDestroy() final;
 		bool LateAwake() final;

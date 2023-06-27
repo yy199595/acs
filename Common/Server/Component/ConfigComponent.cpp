@@ -5,33 +5,32 @@
 #include"ConfigComponent.h"
 #include"Core/System/System.h"
 #include"Server/Config/ServerConfig.h"
-#include"Server/Config/ServiceConfig.h"
+#include"Rpc/Config/ServiceConfig.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include"Server/Config/CodeConfig.h"
+#include"Rpc/Config/ClientConfig.h"
+#define TRY_LOAD_CONFIG(cfg, name, T) 						\
+{                                     						\
+	std::string path;										\
+	if(cfg->GetPath(name, path)) 							\
+	{														\
+		LOG_CHECK_RET_FALSE(this->LoadTextConfig<T>(path));	\
+	}														\
+}
 namespace Tendo
 {
     bool ConfigComponent::Awake()
     {
-        std::string path = System::ConfigPath();
         const ServerConfig* config = ServerConfig::Inst();
-        if(config->GetPath("cluster", path))
-        {
-            LOG_CHECK_RET_FALSE(this->LoadTextConfig<ClusterConfig>(path));
-        }
-        if(config->GetPath("rpc", path))
-        {
-            LOG_CHECK_RET_FALSE(this->LoadTextConfig<RpcConfig>(path));
-        }
-        if(config->GetPath("http", path))
-        {
-            LOG_CHECK_RET_FALSE(this->LoadTextConfig<HttpConfig>(path));
-        }
+		{
+			TRY_LOAD_CONFIG(config, "cluster", ClusterConfig);
+			TRY_LOAD_CONFIG(config, "code", CodeConfig);
 
-        if(config->GetPath("code", path))
-        {
-            LOG_CHECK_RET_FALSE(this->LoadTextConfig<CodeConfig>(path));
-        }
-        return true;
+			TRY_LOAD_CONFIG(config, "http", HttpConfig);
+			TRY_LOAD_CONFIG(config, "rpc", SrvRpcConfig);
+			TRY_LOAD_CONFIG(config, "client", ClientConfig);
+		}
+		return true;
     }
 
     bool ConfigComponent::LoadTextConfig(std::unique_ptr<ITextConfig> config, const std::string &path)
@@ -52,7 +51,7 @@ namespace Tendo
         return true;
     }
 
-    void ConfigComponent::OnHotFix()
+    bool ConfigComponent::OnHotFix()
     {
         auto iter = this->mConfigs.begin();
         for(; iter != this->mConfigs.end(); iter++)
@@ -61,12 +60,9 @@ namespace Tendo
             {
                 const std::string & name = iter->first;
                 LOG_ERROR("reload [" << name << "] failure");
-            }
-            else
-            {
-                const std::string & name = iter->first;
-                LOG_INFO("reload [" << name << "] successful");
+				return false;
             }
         }
+		return true;
     }
 }

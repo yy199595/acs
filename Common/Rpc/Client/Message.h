@@ -10,9 +10,12 @@
 #include<unordered_map>
 #include"Proto/Include/Message.h"
 #include"Proto/Message/ProtoMessage.h"
+
+typedef std::unordered_map<std::string, std::string> StrHashMap;
+typedef std::unordered_map<std::string, std::string>::iterator StrHashMapIter;
 namespace Msg
 {
-    class Head : protected std::unordered_map<std::string, std::string>
+    class Head
     {
     public:
         bool Has(const std::string &key) const;
@@ -26,12 +29,16 @@ namespace Msg
         bool Get(std::vector<std::string> & keys) const;
 
         const std::string& GetStr(const std::string& key) const;
+
     public:
         size_t GetLength() const;
 
         size_t Parse(std::istream &os);
 
         bool Serialize(std::ostream &os) const;
+
+		StrHashMapIter begin() { return this->mItems.begin(); }
+		StrHashMapIter end() { return this->mItems.end(); }
 
     public:
         bool Remove(const std::string &key);
@@ -41,6 +48,8 @@ namespace Msg
         bool Add(const std::string &key, long long value);
 
         bool Add(const std::string &key, const std::string &value);
+	private:
+		std::unordered_map<std::string, std::string> mItems;
     };
 
 	class Packet : public Tcp::ProtoMessage, public std::enable_shared_from_this<Packet>
@@ -67,8 +76,9 @@ namespace Msg
 
 		inline int GetNet() const { return this->mNet; }
 		inline int SetNet(int net) { return this->mNet = net; }
-	public:
 
+	public:
+		std::string ToString() final;
 		std::string * Body() { return &this->mBody; }
         inline void Clear() { this->mBody.clear();}
         void SetContent(const std::string & content);

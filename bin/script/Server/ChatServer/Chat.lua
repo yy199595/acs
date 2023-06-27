@@ -1,6 +1,9 @@
-require("RpcService")
-local proto = require("Proto")
+
 local Chat = Class("RpcService")
+
+function Chat:Awake()
+    self.app:AddWatch("Gate")
+end
 
 function Chat:OnLogin(userId)
     coroutine.sleep(1000)
@@ -8,14 +11,12 @@ function Chat:OnLogin(userId)
 end
 
 function Chat:Chat(request)
-    coroutine.sleep(1000)
+    local player_id = request.id
     local message = request.message
-    local chatMessage = proto.New("c2s.chat.notice", {
+    self.app:SendToClient(player_id, "ChatComponent.Chat", {
         msg_type = message.msg_type,
         message = message.message
     })
-    --Gate.Send(id, "ChatComponent.Private", chatMessage)
-    Gate.BroadCast("ChatComponent.Chat", chatMessage)
     return XCode.Successful
 end
 local count = 0

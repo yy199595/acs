@@ -168,41 +168,44 @@ namespace Tendo
 		char cc = os.get();
 		this->mDataSize = 0;
 		std::getline(os, this->mString);
-        if(this->mString.empty())
-        {
-            return 0;
-        }
+		if (this->mString.empty())
+		{
+			return 0;
+		}
 		this->mString.pop_back();
 		switch (cc)
 		{
-		case '+': //字符串类型
-			this->mType = RedisRespType::REDIS_STRING;
-			break;
-		case '-': //错误
-			this->mType = RedisRespType::REDIS_ERROR;
-			break;
-		case ':': //整型
-			this->mType = RedisRespType::REDIS_NUMBER;
-			this->mNumber = std::stoll(this->mString);
-			break;
-		case '$': //二进制字符串
-			this->mType = RedisRespType::REDIS_BIN_STRING;
-			this->mDataSize = std::stoi(this->mString);
-			if(this->mDataSize == -1)
-			{
-				this->mString.clear();
-				return 0;
-			}
-			break;
-		case '*': //数组
-			this->mDataSize = -1;
-			this->mType = RedisRespType::REDIS_ARRAY;
-			this->mDataCount = std::stoi(this->mString);
-            if(this->mDataCount == 0)
-            {
-                return 0;
-            }
-			break;
+			case '+': //字符串类型
+				this->mType = RedisRespType::REDIS_STRING;
+				break;
+			case '-': //错误
+				this->mType = RedisRespType::REDIS_ERROR;
+				break;
+			case ':': //整型
+				this->mType = RedisRespType::REDIS_NUMBER;
+				this->mNumber = std::stoll(this->mString);
+				break;
+			case '$': //二进制字符串
+				this->mType = RedisRespType::REDIS_BIN_STRING;
+				this->mDataSize = std::stoi(this->mString);
+				if (this->mDataSize == -1)
+				{
+					this->mString.clear();
+					return 0;
+				}
+				break;
+			case '*': //数组
+				this->mDataSize = -1;
+				this->mType = RedisRespType::REDIS_ARRAY;
+				this->mDataCount = std::stoi(this->mString);
+				if (this->mDataCount == 0)
+				{
+					return 0;
+				}
+				break;
+			default:
+			CONSOLE_LOG_ERROR("unknown type : " << cc);
+				break;
 		}
 		return this->mDataSize;
 	}
