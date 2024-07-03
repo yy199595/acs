@@ -22,16 +22,16 @@
 			name = Check;
 			productName = Check;
 		};
-		40C44ADC0E3798F4008FCC51 /* Version Info */ = {
+		40C44ADC0E3798F4008FCC51 /* Version CardInfo */ = {
 			isa = PBXAggregateTarget;
-			buildConfigurationList = 40C44AE40E379905008FCC51 /* Build configuration list for PBXAggregateTarget "Version Info" */;
+			buildConfigurationList = 40C44AE40E379905008FCC51 /* Build configuration list for PBXAggregateTarget "Version CardInfo" */;
 			buildPhases = (
 				40C44ADB0E3798F4008FCC51 /* Generate Version.h */,
 			);
-			comments = "The generation of Version.h must be performed in its own target. Since the Info.plist is preprocessed before any of the other build phases in gtest, the Version.h file would not be ready if included as a build phase of that target.";
+			comments = "The generation of Version.h must be performed in its own target. Since the CardInfo.plist is preprocessed before any of the other build phases in gtest, the Version.h file would not be ready if included as a build phase of that target.";
 			dependencies = (
 			);
-			name = "Version Info";
+			name = "Version CardInfo";
 			productName = Version.h;
 		};
 /* End PBXAggregateTarget section */
@@ -257,7 +257,7 @@
 		40D4CDF20E30E07400294801 /* FrameworkTarget.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = FrameworkTarget.xcconfig; sourceTree = "<group>"; };
 		40D4CDF30E30E07400294801 /* General.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = General.xcconfig; sourceTree = "<group>"; };
 		40D4CDF40E30E07400294801 /* ReleaseProject.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = ReleaseProject.xcconfig; sourceTree = "<group>"; };
-		40D4CF510E30F5E200294801 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		40D4CF510E30F5E200294801 /* CardInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = CardInfo.plist; sourceTree = "<group>"; };
 		4539C8FF0EC27F6400A70F4C /* gtest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = gtest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4539C9330EC280AE00A70F4C /* gtest-param-test.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "gtest-param-test.h"; sourceTree = "<group>"; };
 		4539C9350EC280E200A70F4C /* gtest-linked_ptr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "gtest-linked_ptr.h"; sourceTree = "<group>"; };
@@ -451,7 +451,7 @@
 		40D4CF4E0E30F5E200294801 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				40D4CF510E30F5E200294801 /* Info.plist */,
+				40D4CF510E30F5E200294801 /* CardInfo.plist */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -648,7 +648,7 @@
 				4089A0120FFACEFC000B29AE /* sample1_unittest-framework */,
 				40C84989101A36A60083642A /* sample1_unittest-static */,
 				3B238F5F0E828B5400846E11 /* Check */,
-				40C44ADC0E3798F4008FCC51 /* Version Info */,
+				40C44ADC0E3798F4008FCC51 /* Version CardInfo */,
 			);
 		};
 /* End PBXProject section */
@@ -780,7 +780,7 @@
 		};
 		40C44AE60E379922008FCC51 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 40C44ADC0E3798F4008FCC51 /* Version Info */;
+			target = 40C44ADC0E3798F4008FCC51 /* Version CardInfo */;
 			targetProxy = 40C44AE50E379922008FCC51 /* PBXContainerItemProxy */;
 		};
 		40C8497B101A36850083642A /* PBXTargetDependency */ = {
@@ -1033,7 +1033,7 @@
 					../,
 					../include/,
 				);
-				INFOPLIST_FILE = Resources/Info.plist;
+				INFOPLIST_FILE = Resources/CardInfo.plist;
 				INFOPLIST_PREFIX_HEADER = "$(PROJECT_TEMP_DIR)/Version.h";
 				INFOPLIST_PREPROCESS = YES;
 				PRODUCT_NAME = gtest;
@@ -1054,7 +1054,7 @@
 					../,
 					../include/,
 				);
-				INFOPLIST_FILE = Resources/Info.plist;
+				INFOPLIST_FILE = Resources/CardInfo.plist;
 				INFOPLIST_PREFIX_HEADER = "$(PROJECT_TEMP_DIR)/Version.h";
 				INFOPLIST_PREPROCESS = YES;
 				PRODUCT_NAME = gtest;
@@ -1113,7 +1113,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		40C44AE40E379905008FCC51 /* Build configuration list for PBXAggregateTarget "Version Info" */ = {
+		40C44AE40E379905008FCC51 /* Build configuration list for PBXAggregateTarget "Version CardInfo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				40C44ADF0E3798F4008FCC51 /* Debug */,

@@ -2,8 +2,8 @@
 // Created by yjz on 2022/4/4.
 //
 
-#ifndef _TIMER_H_
-#define _TIMER_H_
+#ifndef APP_TIMER_H
+#define APP_TIMER_H
 #include"Lua/Engine/Define.h"
 namespace Lua
 {
@@ -11,7 +11,9 @@ namespace Lua
 	{
 		extern int Add(lua_State * lua);
 		extern int Remove(lua_State * lua);
+		extern int AddUpdate(lua_State * lua);
+		extern int AddSecond(lua_State * lua);
 	}
 }
 
-#endif //_TIMER_H_
+#endif //APP_TIMER_H

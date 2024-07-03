@@ -1,0 +1,26 @@
+{
+    "Cache.Put": {
+        "Async": true,
+        "Request": "db.mongo.insert"
+    },
+    "Cache.Delete": {
+        "Async": true,
+        "Request": "db.mongo.remove"
+    },
+    "Cache.FindOne": {
+        "Async": true,
+        "Timeout" : 2000,
+        "Request": "db.mongo.find_one.request",
+        "Response": "db.mongo.find_one.response"
+    },
+    "Cache.FindPage": {
+        "Async": true,
+        "Timeout" : 2000,
+        "Request": "db.mongo.find_page.request",
+        "Response": "db.mongo.find_page.response"
+    },
+    "Cache.Update": {
+        "Async": true,
+        "Request": "db.mongo.update"
+    }
+}

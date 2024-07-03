@@ -2,13 +2,13 @@
 // Created by mac on 2022/5/31.
 //
 
-#ifndef SERVER_LUAWAITTASKSOURCE_H
-#define SERVER_LUAWAITTASKSOURCE_H
+#ifndef APP_LUAWAITTASKSOURCE_H
+#define APP_LUAWAITTASKSOURCE_H
 
 #include"Lua/Engine/LuaParameter.h"
 #include"Async/Lua/LuaCoroutine.h"
-#include"Proto/Include/Message.h"
-namespace Tendo
+#include"Rpc/Client/Message.h"
+namespace joke
 {
 	// 在lua中等待c++协程
 	class LuaWaitTaskSource
@@ -25,8 +25,7 @@ namespace Tendo
 
 		template<typename T>
 		void SetResult(T result);
-
-		void SetResult(int code, const std::shared_ptr<pb::Message>& response);
+		void SetResult(int code, rpc::Packet * response);
 	 private:
 		int mRef;
 		lua_State* mLua;
@@ -41,4 +40,4 @@ namespace Tendo
         Lua::Coroutine::Resume(coroutine, this->mLua, 1);
 	}
 }
-#endif //SERVER_LUAWAITTASKSOURCE_H
+#endif //APP_LUAWAITTASKSOURCE_H

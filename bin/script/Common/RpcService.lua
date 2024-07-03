@@ -1,35 +1,49 @@
 
-require("Class")
+require("XCode")
 local xpcall = _G.xpcall
-local coroutine = _G.coroutine
+local app = require("App")
+local cor_new = coroutine.create
+local cor_resume = coroutine.resume
 local log_error = require("Log").OnError
 local CODE_CALL_FAIL = XCode.CallLuaFunctionFail
 local CODE_NOT_EXIST = XCode.CallFunctionNotExist
 
-local RpcService = Class("Component")
+
+local rpc_services = { }
+local RpcService = { }
+
+local rpc = function(class, func, request, taskSource)
+	local status, code, response = xpcall(func, log_error, class, request)
+	if not status then
+		taskSource:SetRpc(CODE_CALL_FAIL, code)
+	else
+		taskSource:SetRpc(code, response)
+	end
+end
+
+local async = function(class, func, task, ...)
+	local _, response = xpcall(func, log_error, class, ...)
+	task:SetResult(response)
+end
+
+function RpcService:Await(name, taskSource, ...)
+
+	local func = self[name]
+	if func == nil then
+		return false
+	end
+	local co = cor_new(async)
+	cor_resume(co, self, func, taskSource, ...)
+	return true
+end
 
 function RpcService:__Call(name, request, taskSource)
 	local func = self[name]
 	if func == nil then
 		return CODE_NOT_EXIST
 	end
-	local context = function()
-		local status, code, response = xpcall(func, log_error, self, request)
-		if not status then
-			taskSource:SetRpc(CODE_CALL_FAIL, code)
-		else
-			taskSource:SetRpc(code, response)
-		end
-	end
-	coroutine.start(context, taskSource)
-end
-
-function RpcService:__Hotfix(tab)
-	for key, val in pairs(tab) do
-		if type(val) == "function" then
-			self[key] = val
-		end
-	end
+	local co = cor_new(rpc)
+	cor_resume(co, self, func, request, taskSource)
 end
 
 function RpcService:__Invoke(name, request)
@@ -44,4 +58,21 @@ function RpcService:__Invoke(name, request)
 	return code, response
 end
 
-return RpcService
+return function()
+	local info = debug.getinfo(2, "S")
+	local service = rpc_services[info.short_src]
+	if service == nil then
+		service = { }
+		service.app = app
+		setmetatable(service, RpcService)
+		service.__source = info.short_src
+		rpc_services[info.short_src] = service
+		return service
+	end
+	for k, v in pairs(service) do
+		if type(v) == "function" then
+			service[k] = nil
+		end
+	end
+	return service
+end

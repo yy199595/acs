@@ -5,45 +5,22 @@
 #include"ClusterConfig.h"
 #include"Core/System/System.h"
 #include"Server/Config/ServerConfig.h"
-namespace Tendo
+namespace joke
 {
-    bool NodeConfig::OnLoadConfig(const rapidjson::Value &value, int index)
+    bool NodeConfig::OnLoadConfig(const json::r::Value &value)
     {
-		this->mIndex = index;
-		this->mIsAutoAllot = false;
-        if(value.HasMember("Service"))
-        {
-            if(!value["Service"].IsArray())
-            {
-                return false;
-            }
-			const rapidjson::Value & jsonArray = value["Service"];
-			for(unsigned int index = 0; index<jsonArray.Size();index++)
-			{
-				const rapidjson::Value& element = jsonArray[index];
-				this->mServices.emplace(std::string(element.GetString()));
-			}
-        }
-        if(value.HasMember("Component"))
-        {
-            if(!value["Component"].IsArray())
-            {
-                return false;
-            }
-            for(size_t index = 0; index < value["Component"].Size(); index++)
-            {
-                const rapidjson::Value & data = value["Component"][index];
-                this->mComponents.emplace(std::string(data.GetString()));
-            }
-        }
-        if(value.HasMember("AutoAllot"))
-        {
-            this->mIsAutoAllot = value["AutoAllot"].GetBool();
-        }
-        if(value.HasMember("lua"))
-        {
-            this->mLua = value["lua"].GetString();
-        }
+		this->mServices.clear();
+		this->mComponents.clear();
+		std::vector<std::string> services;
+		std::vector<std::string> components;
+		if(value.Get("Service", services))
+		{
+			this->mServices.insert(services.begin(), services.end());
+		}
+		if(value.Get("Component", components))
+		{
+			this->mComponents.insert(components.begin(), components.end());
+		}
         return true;
     }
 
@@ -65,31 +42,43 @@ namespace Tendo
         return services.size();
     }
 
+	bool NodeConfig::HasService(const std::string& service) const
+	{
+		auto iter = this->mServices.find(service);
+		return iter != this->mServices.end();
+	}
+
 }
 
-namespace Tendo
+namespace joke
 {
-    bool ClusterConfig::OnLoadJson(rapidjson::Document& document)
+    bool ClusterConfig::OnLoadJson()
     {
-		int index = 0;
-        auto iter = document.MemberBegin();
-        for(; iter != document.MemberEnd(); iter++)
-        {
-            const std::string name(iter->name.GetString());
-            const rapidjson::Value & jsonValue = iter->value;
-            std::unique_ptr<NodeConfig> nodeConfig(new NodeConfig(name));
-            if(!nodeConfig->OnLoadConfig(jsonValue, index++))
-            {
-                return false;
-            }
-            std::vector<std::string> services;
-            nodeConfig->GetServices(services);
-            for (const std::string& service : services)
-            {               
-                this->mServiceNodes[service] = name;
-            }
-            this->mNodeConfigs.emplace(name, std::move(nodeConfig));
-        }
+		std::vector<const char *> keys;
+		if(this->GetKeys(keys) <= 0)
+		{
+			return false;
+		}
+		std::unique_ptr<json::r::Value> value;
+		for(const char * key : keys)
+		{
+			if(!this->Get(key, value))
+			{
+				return false;
+			}
+			const std::string name(key);
+			std::unique_ptr<NodeConfig> nodeConfig = std::make_unique<NodeConfig>(name);
+			{
+				nodeConfig->OnLoadConfig(*value);
+				std::vector<std::string> services;
+				nodeConfig->GetServices(services);
+				for (const std::string& service: services)
+				{
+					this->mServiceNodes[service] = name;
+				}
+			}
+			this->mNodeConfigs.emplace(name, std::move(nodeConfig));
+		}
         return this->GetConfig() != nullptr;
     }
 
@@ -104,14 +93,15 @@ namespace Tendo
         return true;
     }
 
-    bool ClusterConfig::OnReLoadJson(rapidjson::Document& document)
+    bool ClusterConfig::OnReLoadJson()
     {
         return true;
     }
 
     const NodeConfig *ClusterConfig::GetConfig() const
-    {        
-        auto iter = this->mNodeConfigs.find(ServerConfig::Inst()->Name());
+    {
+		const std::string & name = ServerConfig::Inst()->Name();
+        auto iter = this->mNodeConfigs.find(name);
         return iter != this->mNodeConfigs.end() ? iter->second.get() : nullptr;
     }
 

@@ -1,0 +1,29 @@
+{
+    "Node.Add": {
+        "Request": "com.type.json"
+    },
+    "Node.Del": {
+        "Request": "com.type.json"
+    },
+    "Node.Find": {
+        "Response": "com.type.json"
+    },
+    "Node.Ping": {
+
+    },
+    "Node.Hotfix": {
+
+    },
+    "Node.SetLogLevel" : {
+        "Request" : "com.type.int32"
+    },
+    "Node.RunInfo": {
+        "Response": "com.type.json"
+    },
+    "Node.Shutdown": {
+        "Async":true
+    },
+    "Node.LoadConfig": {
+
+    }
+}

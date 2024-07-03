@@ -1,47 +1,30 @@
-
-
 local type = _G.type
-local xpcall = xpcall
-local assert = _G.assert
-local json = require("json")
+
 local tab_pack = table.pack
-local log_error = require("Log").OnError
+local tab_insert = table.insert
+local str_format = string.format
+local json = require("util.json")
+local redis = require("db.redis")
+local Component = require("Component")
 
-local RedisComponent = Class("Component")
-
-RedisComponent.redis = require("Redis")
+local RedisComponent = Component()
 
 ---@param cmd string
 function RedisComponent:Run(cmd, ...)
-    local func = self.redis.Run
     local parameter = tab_pack(...)
-    local status, response = xpcall(func, log_error, cmd, parameter)
-    if not status then
-        return
-    end
-    return response
+    return redis.Run(cmd, parameter)
 end
 
 ---@param cmd string
 function RedisComponent:Send(cmd, ...)
-    local func = self.redis.Send
     local parameter = tab_pack(...)
-    local status, response = xpcall(func, log_error, cmd, parameter)
-    if not status then
-        return
-    end
-    return response
+    return redis.Send(cmd, parameter)
 end
 
 ---@param cmd string
 function RedisComponent:SyncRun(cmd, ...)
-    local func = self.redis.Sync
     local parameter = tab_pack(...)
-    local status, response = xpcall(func, log_error, cmd, parameter)
-    if not status then
-        return
-    end
-    return response
+    return redis.Sync(cmd, parameter)
 end
 
 ---@param key string
@@ -61,22 +44,19 @@ function RedisComponent:SubCounter(key)
     return type(response) == "number" and response or 0
 end
 
----@param lua string xxx.xxx
----@param tab table
+---@param name string xxx.xxx
+---@param req table
 ---@param async boolean
-function RedisComponent:Call(name, tab, async)
-    local func = self.redis.Call
-    local status, response = xpcall(func, log_error, name, tab, async)
-    if not status then
-        return
+function RedisComponent:Call(name, req, async)
+    local response = redis.Call(name, req, async)
+    if response and #response > 0 then
+        return json.decode(response)
     end
     return response
 end
 
 function RedisComponent:Lock(key, time)
-    assert(type(key) == "string")
-    assert(type(time) == "number")
-    local response = self.redis.Call("lock.lock", {
+    local response = redis.Call("lock.lock", {
         key = key, time = time
     })
     return json.decode(response).res
@@ -91,9 +71,9 @@ function RedisComponent:Set(key, value, second)
         value = json.encode(value)
     end
     if type(second) == "number" and second > 0 then
-       return self:Run("SETEX", key, second, value)
+        return self:Run("SETEX", key, second, value)
     else
-       return self:Run("SET", key, value)
+        return self:Run("SET", key, value)
     end
 end
 
@@ -105,6 +85,93 @@ function RedisComponent:Get(key, tab)
         return json.decode(response)
     end
     return response
+end
+
+function RedisComponent:ClearAll()
+    self:Run("FLUSHALL")
+end
+
+---@param key string
+---@param timeout number
+---@return boolean
+function RedisComponent:Lock(key, timeout)
+    local response = self:Call("lock.lock", {
+        key = key, time = timeout
+    })
+    return response and response == 1
+end
+
+---@param key string
+function RedisComponent:UnLock(key)
+    local response = self:Call("lock.unlock", {
+        key = key
+    })
+    return response and response == 1
+end
+
+---@param tab string
+---@param id any
+---@param value table
+function RedisComponent:HashSet(tab, id, value)
+    local items = { }
+    tab_insert(items, str_format("%s:%s", tab, id))
+    for k, v in pairs(value) do
+        tab_insert(items, k)
+        tab_insert(items, v)
+    end
+    return redis.Run("HMSET", items)
+end
+
+---@param tab string
+---@param id any
+---@param field string
+---@param value number
+function RedisComponent:HashInc(tab, id, field, value)
+    local key = str_format("%s:%s", tab, id)
+    return redis.Run("HINCRBY", tab_pack(key, field, value or 1))
+end
+
+---@param tab string
+---@param id any
+---@param field string
+---@param value any
+function RedisComponent:HashUpdate(tab, id, field, value)
+    if value == nil then
+        return
+    end
+    local key = str_format("%s:%s", tab, id)
+    return redis.Run("HSET", tab_pack(key, field, value))
+end
+
+---@param tab string
+---@param message any
+function RedisComponent:ListPush(tab, id, message)
+    local key = str_format("%s:%s", tab, id)
+    return redis.Run("RPUSH", tab_pack(key, message))
+end
+
+---@param tab string
+---@param id any
+---@param start number
+---@param stop number
+function RedisComponent:ListRange(tab, id, start, stop)
+    local key = str_format("%s:%s", tab, id)
+    return redis.Run("LRANGE", tab_pack(key, start, stop))
+end
+
+function RedisComponent:ListLen(tab, id)
+    local key = str_format("%s:%s", tab, id)
+    return redis.Run("LLEN", tab_pack(key))
+end
+
+function RedisComponent:For(start, pattern)
+    local res = self:Run("SCAN", start, "MATCH", pattern)
+    if #res == 0 then
+        return 0, { }
+    end
+    local count = tonumber(res[1])
+    table.remove(res, 1)
+    return count, res
 end
 
 return RedisComponent

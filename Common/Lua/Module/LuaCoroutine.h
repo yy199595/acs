@@ -16,7 +16,7 @@ namespace Lua
 		~LuaCoroutine() { luaL_unref(this->mLua, LUA_REGISTRYINDEX, ref);}
 	public:
 		template<typename... Args>
-		Tendo::WaitLuaTaskSource * Await(const Args&& ... args);
+		tendo::WaitLuaTaskSource * Await(const Args&& ... args);
 	private:
 		inline bool GetFunction(const char * name);
 	private:
@@ -31,7 +31,7 @@ namespace Lua
 	}
 
 	template<typename... Args>
-	Tendo::WaitLuaTaskSource * LuaCoroutine::Await(const Args&& ...args)
+	tendo::WaitLuaTaskSource * LuaCoroutine::Await(const Args&& ...args)
 	{
 		if(!lua_isfunction(this->mLua, -1))
 		{
@@ -49,7 +49,7 @@ namespace Lua
 			LOG_ERROR(lua_tostring(this->mLua, -1));
 			return nullptr;
 		}
-		return Lua::PtrProxy<Tendo::WaitLuaTaskSource>::Read(this->mLua, -1);
+		return Lua::PtrProxy<tendo::WaitLuaTaskSource>::Read(this->mLua, -1);
 	}
 
 	bool LuaCoroutine::GetFunction(const char* name)

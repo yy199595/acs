@@ -1,23 +1,62 @@
 ﻿
-#ifdef __OS_WIN__
-#include<direct.h>
-#else
-#endif //
-#include<regex>
 #include"ServerConfig.h"
 #include"Core/System/System.h"
-#include"Log/Common/CommonLogDef.h"
 #include"Util/File/FileHelper.h"
-#include"Util/String/StringHelper.h"
+#include"Log/Common/CommonLogDef.h"
 #include"Util/File/DirectoryHelper.h"
 
-namespace Tendo
+namespace joke
 {
 	ServerConfig::ServerConfig()
-		: TextConfig("ServerConfig")
+		: JsonConfig("ServerConfig")
 	{
-		this->mServerId = 0;
-		this->mGroupId = 0;
+
+	}
+
+	bool ServerConfig::OnReLoadJson()
+	{
+		return true;
+	}
+
+	bool ServerConfig::OnLoadText(const char* str, size_t length)
+	{
+		json::r::Document mainDocument;
+		json::w::Document jsonDocument;
+		if(!mainDocument.Decode(str, length))
+		{
+			return false;
+		}
+		std::string directory;
+		const std::string & path = this->Path();
+		help::dir::GetDirByPath(path, directory);
+		std::unique_ptr<json::r::Value> jsonArray;
+		if(mainDocument.Get("include", jsonArray) && jsonArray->IsArray())
+		{
+			size_t index = 0;
+			std::string file;
+			while (jsonArray->Get(index, file))
+			{
+				std::string content;
+				json::r::Document document1;
+				if(System::ReadFile(fmt::format("{}/{}", directory, file), content))
+				{
+					if(!document1.Decode(content))
+					{
+						return false;
+					}
+					ServerConfig::Append(jsonDocument, document1);
+				}
+				index++;
+			}
+		}
+		std::string json;
+		this->Append(jsonDocument, mainDocument);
+		if(jsonDocument.Encode(&json, true) && this->Decode(json))
+		{
+			//printf("%s\n", json.c_str());
+			return this->OnLoadJson();
+		}
+		return false;
 	}
 
 	bool ServerConfig::OnReloadText(const char* str, size_t length)
@@ -25,91 +64,59 @@ namespace Tendo
 		return true;
 	}
 
-	bool ServerConfig::OnLoadText(const char* str, size_t length)
+	void ServerConfig::Append(json::w::Value& target, json::r::Value& source)
 	{
-		if (!this->ParseJson(str, length))
+		std::vector<const char *> keys;
+		if(source.GetKeys(keys) > 0)
 		{
-			CONSOLE_LOG_ERROR("parse " << this->Path() << " failure");
-			return false;
-		}
-		assert(this->GetMember("name", this->mName));
-		assert(this->GetMember("id", this->mServerId));
-
-		if (this->HasMember("listen"))
-		{
-			const rapidjson::Value * document = this->GetValue("listen");
-			for (auto iter1 = document->MemberBegin(); iter1 != document->MemberEnd(); iter1++)
+			for(const char * key : keys)
 			{
-				ListenConfig listenConfig;
-				const std::string key(iter1->name.GetString());
-				const std::string address(iter1->value.GetString());
-				if(!Helper::Str::SplitAddr(address, listenConfig.Net, listenConfig.Ip, listenConfig.Port))
+				std::unique_ptr<json::r::Value> jsonValue;
+				if(source.Get(key, jsonValue))
 				{
-					return false;
+					target.Add(key, jsonValue->GetValue());
 				}
-				this->mLocations.emplace(key, address);
-				this->mListens.emplace(key, listenConfig);
 			}
 		}
+	}
 
-		if (this->HasMember("path") && (*this)["path"].IsObject())
+	bool ServerConfig::OnLoadJson()
+	{
+		std::unique_ptr<json::r::Value> jsonObject;
+		if(!this->Get("core", jsonObject))
 		{
-			const rapidjson::Value& jsonObject = (*this)["path"];
-			auto iter1 = jsonObject.MemberBegin();
-			for (; iter1 != jsonObject.MemberEnd(); iter1++)
+			return false;
+		}
+		std::string secret;
+		if(jsonObject->Get("secret", secret))
+		{
+			if(help::fs::FileIsExist(secret))
 			{
-				const std::string key(iter1->name.GetString());
-				this->mPaths.emplace(key, std::string(iter1->value.GetString()));
+				help::fs::ReadTxtFile(secret, this->mSecret);
+			}
+			else
+			{
+				this->mSecret = secret;
 			}
 		}
-        for(auto & path : this->mPaths)
-        {
-			System::SubValue(path.second);
-        }
-		return true;
-	}
-
-	bool ServerConfig::GetListen(const std::string& name, unsigned short& listen) const
-	{
-		auto iter = this->mListens.find(name);
-		if (iter == this->mListens.end())
+		jsonObject->Get("name", this->mName);
+		if(this->Get("path", jsonObject) && jsonObject->IsObject())
 		{
-			return false;
+			std::vector<const char *> keys;
+			if(jsonObject->GetKeys(keys) > 0)
+			{
+				std::unique_ptr<json::r::Value> value;
+				for (const char* k: keys)
+				{
+					if (!jsonObject->Get(k, value))
+					{
+						return false;
+					}
+					this->mPaths.emplace(k, value->ToString());
+				}
+			}
 		}
-		listen = iter->second.Port;
-		return true;
-	}
-
-	bool ServerConfig::GetListen(const std::string& name, std::string& net, unsigned short& port) const
-	{
-		auto iter = this->mListens.find(name);
-		if (iter == this->mListens.end())
-		{
-			return false;
-		}
-		net = iter->second.Net;
-		port = iter->second.Port;
-		return true;
-	}
-
-	bool ServerConfig::GetListen(std::vector<std::string>& names) const
-	{
-		auto iter = this->mLocations.begin();
-		for(; iter != this->mLocations.end(); iter++)
-		{
-			names.emplace_back(iter->first);
-		}
-		return true;
-	}
-
-	bool ServerConfig::GetLocation(const char* name, std::string& location) const
-	{
-		auto iter = this->mLocations.find(name);
-		if (iter == this->mLocations.end())
-		{
-			return false;
-		}
-		location = iter->second;
+		System::SetEnv("name", this->mName);
 		return true;
 	}
 
@@ -122,5 +129,17 @@ namespace Tendo
 			return true;
 		}
 		return false;
+	}
+
+	std::unique_ptr<json::r::Document> ServerConfig::Read(const std::string& name) const
+	{
+		std::string path;
+		if(!this->GetPath(name, path))
+		{
+			return nullptr;
+		}
+		std::unique_ptr<json::r::Document>
+		        document = std::make_unique<json::r::Document>();
+		return document->FromFile(path) ? std::move(document) : nullptr;
 	}
 }

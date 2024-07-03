@@ -2,18 +2,20 @@
 // Created by zmhy0073 on 2022/6/2.
 //
 
-#ifndef SERVER_MESSAGECOMPONENT_H
-#define SERVER_MESSAGECOMPONENT_H
-#include"Entity/Component/Component.h"
+#ifndef APP_PROTOCOMPONENT_H
+#define APP_PROTOCOMPONENT_H
+
+#include"Proto/Include/Message.h"
 #include"google/protobuf/any.pb.h"
+#include"Entity/Component/Component.h"
 #include"google/protobuf/dynamic_message.h"
 #include"google/protobuf/compiler/importer.h"
-using namespace google::protobuf;
+
 struct lua_State;
-namespace Tendo
+namespace joke
 {
 
-    class ImportError : public compiler::MultiFileErrorCollector
+	class ImportError : public pb::compiler::MultiFileErrorCollector
     {
     public:
         ImportError();
@@ -29,39 +31,40 @@ namespace Tendo
         bool mHasWarning;
     };
 
-    class ProtoComponent final : public Component, public ILuaRegister
+	class ProtoComponent final : public Component, public ILuaRegister, public IHotfix
     {
     public:
         ProtoComponent();
-        ~ProtoComponent() = default;
+        ~ProtoComponent() override = default;
     public:
-        bool New(const Any & any, std::shared_ptr<Message> & message);
-		bool New(const std::string & name, std::shared_ptr<Message> & message);
-		bool New(const std::string & name, const std::string & json, std::shared_ptr<Message> & message);
-		bool New(const std::string & name, const char * json, size_t size, std::shared_ptr<Message> & message);
+		bool Load(const char * path);
+		pb::Message * Temp(const std::string & name);
+		bool Import(const char * proto, std::vector<std::string> & types);
+		bool New(const pb::Any & any, std::unique_ptr<pb::Message> & message);
+		bool New(const std::string & name, std::unique_ptr<pb::Message> & message);
+		bool New(const std::string & name, const std::string & json, std::unique_ptr<pb::Message> & message);
+		bool New(const std::string & name, const char * json, size_t size, std::unique_ptr<pb::Message> & message);
 	 public:
-        bool HasMessage(const std::string & name);
-		bool Write(lua_State * lua, const Message & message);
-		bool Read(lua_State * lua, const std::string & name, int index, std::shared_ptr<Message> & message);
+		bool Write(lua_State * lua, const pb::Message & message);
+		pb::Message * Read(lua_State * lua, const std::string & name, int index);
 	 private:
-        bool LateAwake() final;
-		void LoopMessage(const Descriptor * descriptor);
-        const Message * FindMessage(const std::string & name);
-		void OnLuaRegister(Lua::ModuleClass &luaRegister, std::string &name) final;
-	 public:
-        bool Load(const char * path);
-		bool Import(const char * proto);
-	 private:
+		bool OnHotFix() final;
+		bool LateAwake() final;
+		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
+        const pb::Message * FindMessage(const std::string & name);
+		void LoopMessage(const pb::Descriptor * descriptor, std::vector<std::string> & protos);
+	private:
 		std::unique_ptr<ImportError> mImportError;
-		std::unique_ptr<compiler::Importer> mImporter;
-        std::unordered_map<std::string, std::string> mFiles;
-        std::unique_ptr<compiler::DiskSourceTree> mSourceTree;
-		std::unique_ptr<DynamicMessageFactory> mDynamicMessageFactory;
-		std::unordered_map<std::string, const Message *> mStaticMessageMap;
-		std::unordered_map<std::string, const Message *> mDynamicMessageMap;
-		std::vector<std::unique_ptr<DynamicMessageFactory>> mDynamicMessageFactorys;
+		std::unique_ptr<pb::compiler::Importer> mImporter;
+        std::unordered_map<std::string, long long> mFiles;
+        std::unique_ptr<pb::compiler::DiskSourceTree> mSourceTree;
+		std::unordered_map<std::string, pb::Message *> mTempMessages;
+		std::unique_ptr<pb::DynamicMessageFactory> mDynamicMessageFactory;
+		std::unordered_map<std::string, const pb::Message *> mStaticMessageMap;
+		std::unordered_map<std::string, const pb::Message *> mDynamicMessageMap;
+		std::vector<std::unique_ptr<pb::DynamicMessageFactory>> mDynamicMessageFactorys;
 	};
 }
 
 
-#endif //SERVER_MESSAGECOMPONENT_H
+#endif //APP_PROTOCOMPONENT_H

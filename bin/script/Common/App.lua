@@ -1,17 +1,60 @@
 
-local App = { }
 
+require("Class")
+require("XCode")
+require("Coroutine")
 local xpcall = _G.xpcall
-local this = require("Actor")
+local Module = require("Module")
 local log_err = require("Log").Stack
+
+local app = require("core.app")
+local router = require("core.router")
+local config = app.GetConfig()
+
+
+local App = Module()
+SetMember(App, "agent", { })
+
+function App:Invoke(name, ...)
+    for _, component in pairs(self.components) do
+        local func = component[name]
+        if type(func) == "function" then
+            xpcall(func, log_err, component, ...)
+        end
+    end
+end
+
+---@return number
+function App:NewGuid()
+    return app.NewGuid()
+end
+
+---@return string
+function App:NewUuid()
+    return app.NewUuid()
+end
+
+---@param name string
+---@return boolean
+function App:HasComponent(name)
+    return app.HasComponent(name)
+end
+
+---@param key string
+---@return any
+function App:GetConfig(key)
+    if key ~= nil then
+        return config[key]
+    end
+    return config
+end
 
 ---@param actorId number
 ---@param name string
 ---@param request table
 ---@return number
 function App:Send(actorId, name, request)
-    local func = this.Send
-    local status, code = xpcall(func, log_err, actorId, name, request)
+    local status, code = xpcall(router.Send, log_err, actorId, name, request)
     if not status then
         return XCode.CallLuaFunctionFail
     end
@@ -23,44 +66,17 @@ end
 ---@param request table
 ---@return number table
 function App:Call(actorId, name, request)
-    local func = this.Call
-    local status, code, response = xpcall(func, log_err, actorId, name, request)
+    local status, code, response = xpcall(router.Call, log_err, actorId, name, request)
     if not status then
         return XCode.CallLuaFunctionFail
     end
     return code, response
 end
 
----@param actorId number
----@param name string
----@return string
-function App:GetListen(actorId, name)
-    local func = this.GetListen
-    local status, addr = xpcall(func, log_err, actorId, name)
-    if not status then
-        return
-    end
-    return addr
-end
-
-
----@param playerId number
----@param name string
----@param request table
----@return number
-function App:SendToClient(playerId, name, request)
-    local func = this.SendToClient
-    local status, code, result = xpcall(func, log_err, playerId, name, request)
-    if not status then
-        return XCode.CallArgsError
-    end
-    return code, result
-end
-
 ---@param service string
 ---@return string
 function App:Allot(service)
-    local func = this.Random
+    local func = app.Random
     local status, id = xpcall(func, log_err, service)
     if not status then
         return
@@ -68,18 +84,14 @@ function App:Allot(service)
     return id
 end
 
----@param id number
----@param addr string
 ---@param name string
-function App:Make(id, addr, name)
-    local func = this.NewServer
-    xpcall(func, log_err, id, addr, name)
+---@return table
+function App:GetServers(name)
+    return app.GetServers(name)
 end
 
----@param service string
-function App:AddWatch(service)
-    local func = this.AddWatch
-    xpcall(func, log_err, service)
+function App:GetPath(key)
+    return app.GetPath(key)
 end
 
 return App

@@ -1,8 +1,9 @@
 #pragma once
-#include<time.h>
+#include<ctime>
 #include<string>
 
-namespace Helper
+#define TIME_FORMAT "%Y-%m-%d %H:%M:%S"
+namespace help
 {
     namespace Time
     {
@@ -19,19 +20,30 @@ namespace Helper
         extern std::string GetDateStr(long long time = 0);
 
         // 获取毫秒时间戳
-        extern long long NowMilTime();
+        extern long long NowMil();
 
         // 获取秒级时间戳
-        extern long long NowSecTime();
+        extern long long NowSec();
 
         // 获取微妙级时间戳
-        extern long long NowMicTime();
+        extern long long NowMic();
 
-        // 获取时间字符串 精确到秒
+		//获取gmt时间
+		extern std::string GetDateGMT(long long t = time(nullptr));
+
+		extern std::string GetDateISO(long long t = time(nullptr));
+
+		extern std::string GetDateDT(long long t = time(nullptr));
+
+		// 获取时间字符串 精确到秒
         extern std::string GetDateString(long long t = time(nullptr));
+
 
         // 获取时间字符串精确到天
         extern std::string GetYearMonthDayString();
+
+		// 根据字符串获取时间戳
+		extern long long GetTimeByString(const std::string & str);
 
         //获取今天零点时间戳
         extern long long GetNewTime(int day = 0, int hour = 0, int minute = 0, int second = 0);

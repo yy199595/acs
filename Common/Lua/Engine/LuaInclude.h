@@ -140,7 +140,7 @@ namespace Lua
 
 		template<typename... Args>
 		inline void WriteArgs(lua_State* lua, Args... args);
-	}// namespace Parameter
+	}// namespace FromData
 
 
 	template<typename T>
@@ -204,14 +204,10 @@ namespace Lua
 	struct SharedPtrProxy
 	{
 	 public:
-		SharedPtrProxy(std::shared_ptr<T> t)
-			: mNativePtr(t)
-		{
-		}
+		explicit SharedPtrProxy(std::shared_ptr<T> t)
+			: mNativePtr(t) { }
 
-		~SharedPtrProxy()
-		{
-		}
+		~SharedPtrProxy() = default;
 
 	 public:
 		static std::shared_ptr<T> Read(lua_State* lua, int index)
@@ -250,5 +246,35 @@ namespace Lua
 
 	 private:
 		std::shared_ptr<T> mNativePtr;
+	};
+
+
+	template<typename T>
+	struct UniquePtrProxy
+	{
+	public:
+		explicit UniquePtrProxy(std::unique_ptr<T> t)
+				: mNativePtr(std::move(t)) { }
+
+		~UniquePtrProxy() = default;
+
+	public:
+		static std::unique_ptr<T> Read(lua_State* lua, int index)
+		{
+			if (lua_isuserdata(lua, index))
+			{
+				UniquePtrProxy<T>* p = (UniquePtrProxy<T>*)(lua_touserdata(lua, index));
+				return std::move(p->mNativePtr);
+			}
+			return nullptr;
+		}
+
+		static void Write(lua_State* lua, std::unique_ptr<T> data)
+		{
+			if (data == nullptr) return;
+			new(lua_newuserdata(lua, sizeof(UniquePtrProxy<T>))) UniquePtrProxy<T>(std::move(data));
+		}
+	private:
+		std::unique_ptr<T> mNativePtr;
 	};
 }

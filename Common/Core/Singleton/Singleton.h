@@ -4,9 +4,9 @@
 
 #ifndef APP_SINGLETON_H
 #define APP_SINGLETON_H
-#include<assert.h>
+#include<cassert>
 
-namespace Tendo
+namespace joke
 {
     template<typename T>
     class Singleton
@@ -39,7 +39,7 @@ namespace Tendo
     };
 }
 
-namespace Tendo
+namespace joke
 {
     template<typename T>
     T * Singleton<T>::mInstance = nullptr;

@@ -1,14 +1,16 @@
 ﻿#pragma once
+#include<list>
 #include<unordered_map>
+#include"Rpc/Method/MethodProxy.h"
 #include"Timer/Timer/TimeWheelLayer.h"
 #include"Entity/Component/Component.h"
-#include"Rpc/Method/MethodProxy.h"
-namespace Tendo
+namespace joke
 {
-    class TimerComponent final : public Component, public ISystemUpdate, public ILuaRegister
+    class TimerComponent final : public Component, public ISystemUpdate,
+								 public ILuaRegister, public IFrameUpdate, public ISecondUpdate
 	{
 	 public:
-		TimerComponent() = default;
+		TimerComponent();
 	 public:
 		bool CancelTimer(long long id);
 
@@ -19,26 +21,22 @@ namespace Tendo
 		{
 			StaticMethod* methodProxy = NewMethodProxy(
 				std::forward<F>(f), o, std::forward<Args>(args)...);
-			return this->AddTimer(ms, methodProxy);
+			return this->CreateTimer(ms, methodProxy);
 		}
-		long long AddTimer(const std::shared_ptr<TimerBase>& timer);
-		long long AddTimer(unsigned int ms, StaticMethod* func);
-
-	 protected:
+	public:
+		bool AddTimer(std::unique_ptr<TimerBase> timer);
+		void AddUpdateTimer(std::unique_ptr<TimerBase> timer);
+		void AddSecondTimer(std::unique_ptr<TimerBase> timer);
+		long long CreateTimer(unsigned int ms, StaticMethod* func);
+	private:
 		bool Awake() final;
-
-		bool LateAwake() final
-		{
-			return true;
-		}
-
+		void OnFrameUpdate() final;
 		void OnSystemUpdate() final;
-
+		void OnSecondUpdate(int tick) final;
+		bool InvokeTimer(long long timerId);
 		bool AddTimerToWheel(long long timerId);
-
-		bool AddTimerToWheel(std::shared_ptr<TimerBase> timer);
-
-      	void OnLuaRegister(Lua::ModuleClass &luaRegister, std::string &name) final;
+		bool AddTimerToWheel(std::unique_ptr<TimerBase> timer);
+      	void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
     private:
 		const int LayerCount = 5;
 		const int TimerPrecision = 20;
@@ -46,8 +44,10 @@ namespace Tendo
 		const int FirstLayerCount = 256;
 	 private:
 		long long mNextUpdateTime;
-        std::queue<long long> mRemoveTimers;
+		std::list<long long> mUpdateTimer;
+		std::list<long long> mSecondTimer;
 		std::vector<TimeWheelLayer*> mTimerLayers;
-		std::unordered_map<unsigned int, std::shared_ptr<TimerBase>> mTimerMap;//所有timer的列表
+		std::queue<long long> mLastFrameTriggerTimers;
+		std::unordered_map<long long, std::unique_ptr<TimerBase>> mTimerMap;//所有timer的列表
 	};
 }// namespace Sentry

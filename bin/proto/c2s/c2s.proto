@@ -9,23 +9,6 @@ message ServerInfo
     int32 server_state = 3;
 }
 
-message rpc
-{
-    message call
-    {
-        string func = 1;
-        google.protobuf.Any data = 2;
-    }
-}
-
-message auth
-{
-    message request
-    {
-        string token = 1;
-    }
-}
-
 message chat
 {
     message request
@@ -37,7 +20,8 @@ message chat
 
     message notice
     {
-        int32 msg_type = 1;
-        string message = 2;
+        int64 user_id = 1;
+        int32 msg_type = 2;
+        string message = 3;
     }
 }

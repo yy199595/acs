@@ -53,7 +53,7 @@ namespace Lua
 		lua_pop(this->mLua, 1);
 	}
 
-	ClassProxyHelper ClassProxyHelper::Clone(const string& name)
+	ClassProxyHelper ClassProxyHelper::Clone(const std::string& name)
 	{
 		return ClassProxyHelper(this->mLua, name);
 	}

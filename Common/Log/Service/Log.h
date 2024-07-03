@@ -2,11 +2,11 @@
 // Created by yjz on 2023/3/2.
 //
 
-#ifndef _LOG_H_
-#define _LOG_H_
+#ifndef APP_LOG_H
+#define APP_LOG_H
 #include"Message/s2s/s2s.pb.h"
 #include"Rpc/Service/RpcService.h"
-namespace Tendo
+namespace joke
 {
 	class Log final : public RpcService
 	{
@@ -19,4 +19,4 @@ namespace Tendo
 	};
 }
 
-#endif //_LOG_H_
+#endif //APP_LOG_H

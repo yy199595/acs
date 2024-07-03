@@ -1,10 +1,9 @@
 #include "TimerBase.h"
-namespace Tendo
+namespace joke
 {
     TimerBase::TimerBase(long long ms)
     {
-		this->mTimerId = Helper::Guid::Create();
-        this->mStartTime = Helper::Time::NowMilTime();
-        this->mTargetTime = this->mStartTime + ms;
+		this->mTimerId = help::Guid::Create();
+        this->mTargetTime = help::Time::NowMil() + ms;
     }
 }// namespace Sentry

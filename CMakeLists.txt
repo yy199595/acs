@@ -48,27 +48,34 @@ endif()
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fexec-charset=GBK")
 
 #第三方库包含
-include_directories(Libs/json)
-include_directories(Libs/lua/src)
+include_directories(Libs/leveldb)
+#include_directories(Libs/lua/src)
 include_directories(Libs/protobuf/src)
 include_directories(Libs/spdlog/include)
 include_directories(Libs/asio/include)
 include_directories(Libs/mysql/include)
+include_directories(Libs/leveldb/include)
+include_directories(Libs/fmt/include)
+
+if(__ENABLE_OPEN_SSL__)
 include_directories(Libs/openssl/include)
+#include_directories(Libs/openssl/include/crypto)
+endif()
 
 #公共组件
 include_directories(${PROJECT_SOURCE_DIR}/Gen)
 include_directories(${PROJECT_SOURCE_DIR}/Client)
+
 include_directories(${PROJECT_SOURCE_DIR}/Gen/Message)
 
 include_directories(${PROJECT_SOURCE_DIR}/Common)
 include_directories(${PROJECT_SOURCE_DIR}/Server)
+include_directories(${PROJECT_SOURCE_DIR}/Common/DB)
+include_directories(${PROJECT_SOURCE_DIR}/Common/Net)
+include_directories(${PROJECT_SOURCE_DIR}/Common/Lua/Src)
+include_directories(${PROJECT_SOURCE_DIR}/Common/OpenSSL/include)
 
-add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/lua ${PROJECT_SOURCE_DIR}/Libs/bin/lua)
-add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/spdlog ${PROJECT_SOURCE_DIR}/Libs/bin/spdlog)
-#add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/mimalloc ${PROJECT_SOURCE_DIR}/Libs/bin/mimalloc)
 add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/protobuf/cmake ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf)
-
 
 file(GLOB_RECURSE src_proto "Gen/*.cpp" "Gen/*.cc")
 file(GLOB_RECURSE src_common "Common/*.cpp" "Common/*.c")
@@ -85,7 +92,7 @@ if(MSVC) #创建vs目录
     file(GLOB_RECURSE file_server "Server/*.h" "Server/*.hpp")
     file(GLOB_RECURSE file_client "Client/*.h" "Client/*.hpp")
     file(GLOB_RECURSE file_common "Common/*.h" "Common/*.hpp")
-    file(GLOB_RECURSE file_bin "bin/*.json" "bin/*.lua" "bin/*.proto" "bin/*.html")
+    file(GLOB_RECURSE file_bin "bin/*.csv" "bin/*.json" "bin/*.lua" "bin/*.proto" "bin/*.html")
 
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
     
@@ -101,30 +108,39 @@ if(MSVC) #创建vs目录
         source_group_by_dir(${PROJECT_SOURCE_DIR} ${file_name})
     endforeach()
 endif()
+
 ADD_EXECUTABLE(app ${build_files})
 
 include(CMake/3rd.cmake)
-include(CMake/mysql.cmake) #add_lib 必须在add_exe之后
+#include(CMake/mysql.cmake) #add_lib 必须在add_exe之后
 
 if(WIN32)
-    if(MSVC)       
-        target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/lua/Debug/lua.lib)
+    if(MSVC)
         target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf/Debug/libprotobufd.lib)
+        if(__ENABLE_OPEN_SSL__)
+            target_link_libraries(app Crypt32)
+            target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/openssl/lib/libssl.lib)
+            target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/openssl/lib/libcrypto.lib)
+        endif()
     else()
         #list(APPEND static_lib protobufd Ws2_32 Dbghelp Mswsock)
         target_link_libraries(app Ws2_32 Dbghelp Mswsock)
-        target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/lua/liblua.a)
         target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf/libprotobufd.a)
         #target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf/libprotobufd.dll)
     endif()
 elseif(APPLE)
     target_link_libraries(app ${CMAKE_THREAD_LIBS_INIT})
-    target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/lua/liblua.a)
+    if(__ENABLE_OPEN_SSL__)
+        target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/openssl/lib/libssl.a)
+        target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/openssl/lib/libcrypto.a)
+    endif()
     target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf/libprotobufd.a)
-    #target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf/libprotobufd.dylib)
 elseif(UNIX)
     target_link_libraries(app pthread dl)
-    target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/lua/liblua.a)
+    if(__ENABLE_OPEN_SSL__)
+        target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/openssl/lib/libssl.a)
+        target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/openssl/lib/libcrypto.a)
+    endif()
     if (EXISTS ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf/libprotobufd.a)
         target_link_libraries(app ${PROJECT_SOURCE_DIR}/Libs/bin/protobuf/libprotobufd.a)
     else()

@@ -21,27 +21,82 @@ endif()
 option(protobuf_BUILD_TESTS OFF)
 option(protobuf_BUILD_EXAMPLES OFF)
 option(protobuf_BUILD_CONFORMANCE OFF)
+option(LEVELDB_BUILD_TESTS OFF)
+option(LEVELDB_BUILD_BENCHMARKS OFF)
+option(MI_BUILD_SHARED OFF)
+option(MI_BUILD_OBJECT OFF)
+option(MI_BUILD_TESTS OFF)
+
+option(__ENABLE_LEVEL_DB OFF)
+
 if(WIN32 AND NOT MSVC)
     #set(protobuf_BUILD_SHARED_LIBS ON) #编译动态库
 endif()
 
+option(__ENABLE_SPD_LOG__ "使用spdlog" OFF)
+
 option(__DEBUG_STACK__ "开启堆栈打印" ON)
-option(__RPC_MESSAGE__ "打印rpc消息" ON)
-option(ONLY_MAIN_THREAD "启用单线程模式" ON)
+option(ONLY_MAIN_THREAD "启用单线程模式" OFF)
 option(__NET_ERROR_LOG__ "打印网络层错误" ON)
 option(__COR_SHARED_STACK__ "使用共享栈" ON)
+
+option(__CONSOLE_LOG__ "控制台打印日志" ON)
+option(__ENABLE_SYSTEM_DEBUG "打印系统日志" ON)
+option(__ENABLE_OPEN_SSL__ "开启openssl" ON)
+
+if(APPLE)
+    option(__ENABLE_DING_DING_PUSH "开启钉钉通知" OFF)
+elseif(UNIX)
+    option(__ENABLE_DING_DING_PUSH "开启钉钉通知" ON)
+else()
+    option(__ENABLE_DING_DING_PUSH "开启钉钉通知" OFF)
+endif()
+
+add_definitions(-DLOG_LEVEL_DEBUG=1) #debug
+add_definitions(-DLOG_LEVEL_INFO=2) #info
+add_definitions(-DLOG_LEVEL_WARN=3) #warn
+add_definitions(-DLOG_LEVEL_ERROR=4) #error
+add_definitions(-DLOG_LEVEL_FATAL=5) #fatal
+add_definitions(-DLOG_LEVEL_OFF=6) #关闭
+
+if(__ENABLE_SYSTEM_DEBUG)
+    add_definitions(-D __ENABLE_SYSTEM_DEBUG)
+endif()
+
+if(__CONSOLE_LOG__)
+    add_definitions(-D __CONSOLE_LOG__)
+endif()
+
+if(__ENABLE_DING_DING_PUSH)
+    message("开启钉钉通知")
+    add_definitions(-D __ENABLE_DING_DING_PUSH)
+else()
+    message("关闭钉钉通知")
+endif()
+
+if(__ENABLE_OPEN_SSL__)
+    message("使用openssl")
+    add_definitions(-D __ENABLE_OPEN_SSL__)
+endif()
 
 
 set(CMAKE_COMMON_DIR ${PROJECT_SOURCE_DIR})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 message("================ [" ${CMAKE_BUILD_TYPE} "] ==============")
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-D __DEBUG__)
     add_definitions(-D __APP_HOTFIX__)
-    if(__RPC_MESSAGE__)
-        message("打印rpc消息")
-        add_definitions(-D __RPC_MESSAGE__)
-    endif()
+    add_definitions(-DSET_LOG_LEVEL=1)
+else()
+    add_definitions(-DSET_LOG_LEVEL=2)
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3")
+endif()
+
+if(__ENABLE_SPD_LOG__)
+    message("使用spdlog")
+    add_definitions(-D __ENABLE_SPD_LOG__)
 endif()
 
 if(__COR_SHARED_STACK__)

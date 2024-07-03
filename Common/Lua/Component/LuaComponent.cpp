@@ -1,26 +1,25 @@
 ﻿#include "LuaComponent.h"
 
 #include "Entity/Actor/App.h"
-#include "Util/Md5/MD5.h"
 #include "Util/Guid/Guid.h"
 #include "Util/File/FileHelper.h"
+#include "Util/String/String.h"
 #include "Util/File/DirectoryHelper.h"
 #include "Async/Lua/WaitLuaTaskSource.h"
 #include "Rpc//Lua/LuaServiceTaskSource.h"
-#include "Log/Lua/LuaLogger.h"
-#include "Util/Json/Lua/Json.h"
 #include "Async/Lua/LuaCoroutine.h"
-#include "Util/Md5/LuaMd5.h"
+#include "Util/Crypt/LuaMd5.h"
 #include "Core/System/System.h"
-#include "Util/Json/JsonWriter.h"
-#include "Lua/Engine/Function.h"
 #include "Lua/Module/LuaModule.h"
 #include "Entity/Lua/LuaActor.h"
 #include "Lua/Engine/ClassProxyHelper.h"
-
 #include "Lua/Engine/ModuleClass.h"
+#include "Util/File/Lua/LuaFile.h"
+#include "Yyjson/Lua/ljson.h"
+#include "Proto/Message/IProto.h"
+#include "Auth/Lua/Auth.h"
 using namespace Lua;
-namespace Tendo
+namespace joke
 {
 	LuaComponent::LuaComponent()
 	{
@@ -30,35 +29,56 @@ namespace Tendo
 
 	bool LuaComponent::Awake()
 	{
-		this->mMainModule = nullptr;
+		std::unique_ptr<json::r::Value> jsonObject;
 		this->mLuaConfig = std::make_unique<LuaConfig>();
-		const rapidjson::Value * config = this->mApp->Config()->GetValue("lua");
-		LOG_CHECK_RET_FALSE(config != nullptr && this->mLuaConfig->Init(*config));
+		const ServerConfig * config = ServerConfig::Inst();
+		LOG_CHECK_RET_FALSE(config->Get("lua", jsonObject));
+		LOG_CHECK_RET_FALSE(this->mLuaConfig->Init(*jsonObject));
 
 		this->mLuaEnv = luaL_newstate();
 		luaL_openlibs(mLuaEnv);
+		this->RegisterLuaClass();
 		return true;
 	}
 
 	void LuaComponent::RegisterLuaClass()
 	{
+		Lua::ClassProxyHelper os(this->mLuaEnv, "os");
+
+		os.PushMember("dir", System::WorkPath());
+		os.PushStaticFunction("setenv", System::LuaSetEnv);
+#ifdef __OS_MAC__
+		os.PushMember("platform", std::string("mac"));
+#elif __OS_LINUX__
+		os.PushMember("platform", std::string("linux"));
+#elif __OS_WIN__
+		os.PushMember("platform", std::string("win"));
+#endif
+
+#ifdef __DEBUG__
+		os.PushMember("debug", true);
+#else
+		os.PushMember("debug", false);
+#endif
+		os.BeginNewTable("time");
+		os.PushStaticFunction("ms", help::Time::NowMil);
+		os.PushStaticFunction("now", help::Time::NowSec);
+
+		Lua::ClassProxyHelper luaHttpRegister(this->mLuaEnv, "Head");
+		luaHttpRegister.BeginRegister<tcp::IHeader>();
+		luaHttpRegister.PushExtensionFunction("Get", tcp::IHeader::LuaGet);
+		luaHttpRegister.PushExtensionFunction("ToString", tcp::IHeader::LuaToString);
+
 		Lua::ClassProxyHelper luaRegister1(this->mLuaEnv, "WaitLuaTaskSource");
 		luaRegister1.BeginRegister<WaitLuaTaskSource>();
 		luaRegister1.PushCtor<WaitLuaTaskSource>();
 		luaRegister1.PushStaticExtensionFunction("SetResult", WaitLuaTaskSource::SetResult);
 
+
 		Lua::ClassProxyHelper luaRegister2(this->mLuaEnv, "LuaServiceTaskSource");
 		luaRegister2.BeginRegister<LuaServiceTaskSource>();
 		luaRegister2.PushExtensionFunction("SetRpc", LuaServiceTaskSource::SetRpc);
 		luaRegister2.PushExtensionFunction("SetHttp", LuaServiceTaskSource::SetHttp);
-
-//		Lua::ClassProxyHelper luaRegister3(this->mLuaEnv, "Time");
-//		luaRegister3.BeginNewTable();
-//		luaRegister3.PushStaticFunction("GetDateStr", Helper::Time::GetDateStr);
-//		luaRegister3.PushStaticFunction("GetDateString", Helper::Time::GetDateString);
-//		luaRegister3.PushStaticFunction("NowSecTime", Helper::Time::NowSecTime);
-//		luaRegister3.PushStaticFunction("NowMilTime", Helper::Time::NowMilTime);
-//		luaRegister3.PushStaticFunction("GetYearMonthDayString", Helper::Time::GetYearMonthDayString);
 
 		Lua::ClassProxyHelper luaRegister4(this->mLuaEnv, "coroutine");
 		luaRegister4.PushExtensionFunction("start", Lua::Coroutine::Start);
@@ -67,156 +87,144 @@ namespace Tendo
 
 	bool LuaComponent::LateAwake()
 	{
-		{
-			Lua::ClassProxyHelper os(this->mLuaEnv, "os");
-
-			os.PushMember("dir", System::WorkPath());
-			os.PushStaticFunction("ms", Helper::Time::NowMilTime);
-			os.PushStaticFunction("time", Helper::Time::NowSecTime);
-#ifdef __OS_MAC__
-			os.PushMember("platform", std::string("mac"));
-#elif __OS_LINUX__
-			os.PushMember("platform", std::string("linux"));
-#elif __OS__WIN__
-			os.PushMember("platform", std::string("win"));
-#endif
-
-#ifdef __DEBUG__
-			os.PushMember("debug", true);
-#else
-			os.PushMember("debug", false);
-#endif
-		}
-		this->RegisterLuaClass();
 		Lua::ModuleClass moduleRegistry(this->mLuaEnv);
 
 		moduleRegistry.Start();
-		moduleRegistry.AddFunction("Send", LuaActor::Send);
-		moduleRegistry.AddFunction("Call", LuaActor::Call);
+		moduleRegistry.AddFunction("Find", Lua::LuaFile::Find);
+		moduleRegistry.AddFunction("GetMd5", Lua::LuaFile::GetMd5);
+		moduleRegistry.AddFunction("IsExist", Lua::LuaFile::IsExist);
+		moduleRegistry.AddFunction("GetFiles", Lua::LuaFile::GetFiles);
+		moduleRegistry.AddFunction("GetFileName", Lua::LuaFile::GetFileName);
+		moduleRegistry.AddFunction("GetLastWriteTime", Lua::LuaFile::GetLastWriteTime).End("util.fs");
+
+		moduleRegistry.Start();
 		moduleRegistry.AddFunction("Random", LuaActor::Random);
-		moduleRegistry.AddFunction("AddWatch", LuaActor::AddWatch);
+		moduleRegistry.AddFunction("GetPath", LuaActor::GetPath);
+		moduleRegistry.AddFunction("NewGuid", LuaActor::NewGuid);
+		moduleRegistry.AddFunction("NewUuid", LuaActor::NewUuid);
 		moduleRegistry.AddFunction("GetListen", LuaActor::GetListen);
-		moduleRegistry.AddFunction("NewServer", LuaActor::NewServer);
-		moduleRegistry.AddFunction("SendToClient", LuaActor::SendToClient).End("Actor");
+		moduleRegistry.AddFunction("GetConfig", LuaActor::GetConfig);
+		moduleRegistry.AddFunction("GetServers", LuaActor::GetServers);
+		moduleRegistry.AddFunction("MakeServer", LuaActor::MakeServer);
+		moduleRegistry.AddFunction("HasComponent", LuaActor::HasComponent);
+		moduleRegistry.AddFunction("AddComponent", LuaActor::AddComponent).End("core.app");
 
 		moduleRegistry.Start();
-		moduleRegistry.AddFunction("Output", Lua::Log::Output);
-		moduleRegistry.AddFunction("Show", Lua::Console::Show).End("Logger");
+		moduleRegistry.AddFunction("read", lua::yyjson::read_file);
+		moduleRegistry.AddFunction("encode", lua::yyjson::encode);
+		moduleRegistry.AddFunction("pretty", lua::yyjson::pretty);
+		moduleRegistry.AddFunction("decode", lua::yyjson::decode).End("util.json");
 
 		moduleRegistry.Start();
-		moduleRegistry.AddFunction("encode", Lua::RapidJson::Encode);
-		moduleRegistry.AddFunction("decode", Lua::RapidJson::Decode).End("json");
+		moduleRegistry.AddFunction("ToString", Lua::Md5::ToString).End("util.md5");
 
 		moduleRegistry.Start();
-		moduleRegistry.AddFunction("ToString", Lua::Md5::ToString).End("Md5");
+		moduleRegistry.AddFunction("Decode", Lua::base64::Decode);
+		moduleRegistry.AddFunction("Encode", Lua::base64::Encode).End("util.base64");
+
+		moduleRegistry.Start();
+		moduleRegistry.AddFunction("Create", lua::ljwt::Create);
+		moduleRegistry.AddFunction("Verify", lua::ljwt::Verify).End("auth.jwt");
 
 		std::vector<ILuaRegister*> components;
 		this->mApp->GetComponents(components);
 		for (ILuaRegister* component: components)
 		{
-			std::string name;
 			moduleRegistry.Start();
-			component->OnLuaRegister(moduleRegistry, name);
-			{
-				moduleRegistry.End(name.c_str());
-			}
+			component->OnLuaRegister(moduleRegistry);
 		}
 		return this->LoadAllFile();
 	}
 
-	bool LuaComponent::GetFunction(const std::string& tab, const std::string& func)
+	Lua::LuaModule * LuaComponent::LoadModule(const std::string& name)
 	{
-		return Lua::Function::Get(this->mLuaEnv, tab.c_str(), func.c_str());
-	}
-
-	Lua::LuaModule* LuaComponent::LoadModule(const std::string& name)
-	{
-		for(const std::string & path : this->mLuaConfig->Requires())
+		LuaModule * luaModule = nullptr;
+		if(this->mLuaModules.Get(name, luaModule))
 		{
-			std::string fileName;
-			std::vector<std::string> luaFiles;
-			Helper::Directory::GetFilePaths(path, "*.lua", luaFiles);
-			for (const std::string& filePath : luaFiles)
-			{
-				Helper::File::GetFileName(filePath, fileName);
-				if (name == fileName)
-				{
-					return this->LoadModuleByPath(filePath);
-				}
-			}
+			return luaModule;
 		}
-		return nullptr;
-	}
-
-	Lua::LuaModule* LuaComponent::LoadModuleByPath(const std::string& path)
-	{
-		std::string name;
-		Helper::File::GetFileName(path, name);
-		LuaModule* luaModule = new LuaModule(this->mLuaEnv, name);
-		if (!luaModule->LoadFromPath(path))
+		if(!this->mModulePaths.Has(name))
 		{
-			delete luaModule;
-			LOG_ERROR("load lua module [" << name << "] error");
 			return nullptr;
 		}
-		//LOG_INFO("start load lua module [" << name << "]");
-		return luaModule;
-	}
-
-
-	void LuaComponent::OnSecondUpdate(const int tick)
-	{
-		if(this->mMainModule != nullptr)
+		lua_getglobal(this->mLuaEnv, "require");
+		lua_pushstring(this->mLuaEnv, name.c_str());
+		if(lua_pcall(this->mLuaEnv, 1, 1, 0) != LUA_OK)
 		{
-			this->mMainModule->Update(tick);
+			LOG_ERROR("{}", lua_tostring(this->mLuaEnv, -1));
+			return nullptr;
 		}
+
+		luaL_checktype(this->mLuaEnv, -1, LUA_TTABLE);
+		int ref = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
+		luaModule = new LuaModule(this->mLuaEnv, name, ref);
+		{
+			this->mLuaModules.Add(name, luaModule);
+		}
+		return luaModule;
 	}
 
 	void LuaComponent::Start()
 	{
-		if(this->mMainModule != nullptr)
-		{
-			this->mMainModule->Await("OnStart");
-		}
+		IF_NOT_NULL_CALL(this->mMainModule, Await, "OnStart");
 	}
 
 	void LuaComponent::Complete()
 	{
-		if(this->mMainModule != nullptr)
-		{
-			this->mMainModule->Await("OnComplete");
-		}
+		IF_NOT_NULL_CALL(this->mMainModule, Await, "OnComplete");
 	}
 
 	bool LuaComponent::LoadAllFile()
 	{
-		for(const std::string & path : this->mLuaConfig->Requires())
+		std::vector<std::string> loadModules;
+		std::string work = System::WorkPath() + '/';
+		std::unordered_set<std::string> directors;
+		for (const std::string& path: this->mLuaConfig->Requires())
 		{
-			this->AddRequire(path);
-		}
-		for(const std::string & dir : this->mLuaConfig->LoadFiles())
-		{
-			std::vector<std::string> paths;
-			Helper::Directory::GetFilePaths(dir, paths);
-			for(const std::string & fullPath : paths)
+			std::vector<std::string> files;
+			help::dir::GetFilePaths(path, "*.lua", files);
+			for (const std::string& filePath: files)
 			{
-				if(luaL_dofile(this->mLuaEnv, fullPath.c_str()) != LUA_OK)
+				std::string director;
+				std::string moduleName;
+				if (help::dir::GetDirByPath(filePath, director))
 				{
-					LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
-					return false;
+					directors.insert(director);
+				}
+				long long time = help::fs::GetLastWriteTime(filePath);
+				if (help::fs::GetFileName(filePath, moduleName))
+				{
+					ModuleInfo * moduleInfo = new ModuleInfo();
+					{
+						moduleInfo->Name = moduleName;
+						moduleInfo->FullPath = filePath;
+						moduleInfo->LastWriteTime = time;
+						moduleInfo->LocalPath = filePath;
+						help::Str::ReplaceString(moduleInfo->LocalPath, work, "");
+					}
+					if(!this->mModulePaths.Add(moduleName, moduleInfo))
+					{
+						LOG_ERROR("module name : {}  {}", moduleName, filePath);
+						return false;
+					}
 				}
 			}
 		}
-		if(this->mLuaConfig->Main().empty())
+		for (const std::string& director: directors)
+		{
+			this->AddRequire(director);
+		}
+
+		if (this->mLuaConfig->Main().empty())
 		{
 			return true;
 		}
 		std::string main = this->mLuaConfig->Main();
-		this->mMainModule = this->LoadModuleByPath(main);
-		if(this->mMainModule != nullptr)
+		this->mMainModule = this->LoadModule(main);
+		if (this->mMainModule)
 		{
 			int code = this->mMainModule->Call("Awake");
-			if(code == XCode::CallLuaFunctionFail)
+			if (code == XCode::CallLuaFunctionFail)
 			{
 				return false;
 			}
@@ -226,25 +234,46 @@ namespace Tendo
 
 	bool LuaComponent::OnHotFix()
 	{
-		if(this->mMainModule != nullptr)
+		auto iter = this->mModulePaths.Begin();
+		for (; iter != this->mModulePaths.End(); iter++)
 		{
-			return this->mMainModule->Hotfix();
+			this->CheckModuleHotfix(iter->first);
 		}
 		return true;
 	}
 
+	void LuaComponent::CheckModuleHotfix(const std::string& module)
+	{
+		ModuleInfo * moduleInfo = nullptr;
+		if (!this->mModulePaths.Get(module, moduleInfo))
+		{
+			return;
+		}
+		const std::string& path = moduleInfo->FullPath;
+		long long time = help::fs::GetLastWriteTime(path);
+		if (moduleInfo->LastWriteTime == time)
+		{
+			return;
+		}
+		moduleInfo->LastWriteTime = time;
+		if (luaL_dofile(this->mLuaEnv, path.c_str()) != LUA_OK)
+		{
+			LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+			return;
+		}
+		LuaModule * luaModule = nullptr;
+		if (this->mLuaModules.Get(module, luaModule))
+		{
+			luaModule->OnModuleHotfix();
+		}
+		LOG_INFO("load lua file [{}] ok", moduleInfo->LocalPath);
+	}
+
 	void LuaComponent::OnDestroy()
 	{
-		if(this->mMainModule != nullptr)
+		if(this->mMainModule)
 		{
 			this->mMainModule->Await("OnStop");
-			delete this->mMainModule;
-			this->mMainModule = nullptr;
-		}
-		if (this->mLuaEnv != nullptr)
-		{
-			lua_close(this->mLuaEnv);
-			this->mLuaEnv = nullptr;
 		}
 	}
 
@@ -256,7 +285,8 @@ namespace Tendo
 			lua_getglobal(this->mLuaEnv, "package");
 			lua_getfield(this->mLuaEnv, -1, "path");
 			const char* str = lua_tolstring(this->mLuaEnv, -1, &size);
-			std::string fullPath = std::string(str, size) + ";" + path + "/?.lua";
+			//std::string fullPath = std::string(str, size) + ";" + path + "?.lua";
+			std::string fullPath = fmt::format("{}?.lua;{}", path, std::string(str, size));
 			lua_pushlstring(this->mLuaEnv, fullPath.c_str(), fullPath.size());
 			lua_setfield(this->mLuaEnv, -3, "path");
 		}
@@ -264,39 +294,35 @@ namespace Tendo
 
 	double LuaComponent::CollectGarbage()
 	{
+		lua_settop(this->mLuaEnv, 0);
 		double start = this->GetMemorySize();
-		if (Lua::Function::Get(this->mLuaEnv, "collectgarbage"))
+		lua_getglobal(this->mLuaEnv, "collectgarbage");
+
+		lua_pushstring(this->mLuaEnv, "collect");
+		if (lua_pcall(this->mLuaEnv, 1, 1, 0) != LUA_OK)
 		{
-			lua_pushstring(this->mLuaEnv, "collect");
-			if (lua_pcall(this->mLuaEnv, 1, 1, 0) != LUA_OK)
-			{
-				LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
-				return 0;
-			}
+			LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+			return 0;
 		}
 		return start - this->GetMemorySize();
 	}
 
 	double LuaComponent::GetMemorySize()
 	{
-		if (Lua::Function::Get(this->mLuaEnv, "collectgarbage"))
+		lua_settop(this->mLuaEnv, 0);
+		lua_getglobal(this->mLuaEnv, "collectgarbage");
+
+		lua_pushstring(this->mLuaEnv, "count");
+		if (lua_pcall(this->mLuaEnv, 1, 1, 0) != LUA_OK)
 		{
-			lua_pushstring(this->mLuaEnv, "count");
-			if (lua_pcall(this->mLuaEnv, 1, 1, 0) != LUA_OK)
-			{
-				LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
-				return 0;
-			}
-			return lua_tonumber(this->mLuaEnv, -1);
+			LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+			return 0;
 		}
-		return 0;
+		return lua_tonumber(this->mLuaEnv, -1);
 	}
 
-	void LuaComponent::OnRecord(Json::Writer& document)
+	void LuaComponent::OnRecord(json::w::Document& document)
 	{
-		double size = this->GetMemorySize();
-		double free = this->CollectGarbage();
-		document.Add("free").Add(fmt::format("{0}mb", free / 1024));
-		document.Add("memory").Add(fmt::format("{0}mb", size / 1024));
+		document.Add("lua", (int)this->GetMemorySize());
 	}
 }

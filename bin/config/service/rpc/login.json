@@ -1,0 +1,10 @@
+{
+    "Login.OnLogin": {
+        "Async":true,
+        "Request": "s2s.login.request"
+    },
+    "Login.OnLogout": {
+        "Async":true,
+        "Request": "s2s.logout.request"
+    }
+}

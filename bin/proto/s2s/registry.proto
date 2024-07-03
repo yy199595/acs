@@ -1,12 +1,18 @@
 syntax = "proto3";
-package registry;
+package reg;
+message data
+{
+    int32 id = 1;
+    string name = 2;
+    int64 ping_time = 3;
+    string json = 4;
+}
 
 message query
 {
     message request
     {
         int64 id = 1;
-        string name = 2;
     }
     message response
     {

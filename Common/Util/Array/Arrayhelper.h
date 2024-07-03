@@ -2,12 +2,12 @@
 // Created by mac on 2022/5/27.
 //
 
-#ifndef SERVER_ARRAYHELPER_H
-#define SERVER_ARRAYHELPER_H
+#ifndef APP_ARRAYHELPER_H
+#define APP_ARRAYHELPER_H
 #include<list>
 #include<vector>
 #include<string>
-namespace Helper
+namespace help
 {
 	namespace Array
 	{
@@ -88,4 +88,4 @@ namespace Helper
 	}
 }
 
-#endif //SERVER_ARRAYHELPER_H
+#endif //APP_ARRAYHELPER_H

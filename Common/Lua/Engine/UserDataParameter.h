@@ -85,18 +85,17 @@ namespace Lua
 			}
 		};
 	}
-	using namespace std;
 	namespace UserDataParameter
 	{
 		template<typename T>
-		struct UserDataStruct<shared_ptr<T>>
+		struct UserDataStruct<std::shared_ptr<T>>
 		{
-			static shared_ptr<T> Read(lua_State* lua, int index)
+			static std::shared_ptr<T> Read(lua_State* lua, int index)
 			{
 				return SharedPtrProxy<T>::Read(lua, index);
 			}
 
-			static void Write(lua_State* lua, shared_ptr<T> data)
+			static void Write(lua_State* lua, std::shared_ptr<T> data)
 			{
 				size_t size = sizeof(SharedPtrProxy<T>);
 				new(lua_newuserdata(lua, size))SharedPtrProxy<T>(data);

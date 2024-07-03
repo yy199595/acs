@@ -6,6 +6,7 @@ namespace Lua
 	namespace Log
 	{
 		extern int Output(lua_State * lua);
+		extern void Error(lua_State * lua);
 		extern int OnCallError(lua_State * lua);
 	}
 

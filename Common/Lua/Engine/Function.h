@@ -4,7 +4,7 @@
 #include"Lua/Engine/LuaParameter.h"
 #include"Log/Common/CommonLogDef.h"
 #include"Async/Lua/WaitLuaTaskSource.h"
-using namespace Tendo;
+using namespace joke;
 
 namespace Lua
 {
@@ -19,9 +19,9 @@ namespace Lua
 		}
 
 	 public:
-		static std::shared_ptr<Function> Create(lua_State* luaEnv, const std::string& name);
+		static std::unique_ptr<Function> Create(lua_State* luaEnv, const std::string& name);
 
-		static std::shared_ptr<Function> Create(lua_State* luaEnv, const std::string& tabName, const std::string& name);
+		static std::unique_ptr<Function> Create(lua_State* luaEnv, const std::string& tabName, const std::string& name);
 
 	 public:
 

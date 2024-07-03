@@ -19,21 +19,21 @@ namespace Parameter
     {
         lua_pushinteger(lua, (int) data);
     }
-}// namespace Parameter
+}// namespace FromData
 
-//namespace Parameter
+//namespace FromData
 //{
 //	template<typename T>
 //	inline typename std::enable_if<ConstParameter::IsConstParameter<T>::value, T>::type Read(lua_State * lua, int index)
 //	{
 //		typedef ConstParameter::ConstProxy<T>::Type Type;
-//		return Parameter::Read<Type>(lua, index);
+//		return FromData::Read<Type>(lua, index);
 //	}
 //	template<typename T>
 //	inline typename std::enable_if<ConstParameter::IsConstParameter<T>::value, void>::type WriteString(lua_State * lua, T data)
 //	{
 //		typedef ConstParameter::ConstProxy<T>::Type Type;
-//		Parameter::WriteString<Type>(lua, data);
+//		FromData::WriteString<Type>(lua, data);
 //	}
 //}
 
@@ -70,7 +70,7 @@ namespace Lua
 		{
 			return (T)CommonParameter::Read<int>(lua, index);
 		}
-	}// namespace Parameter
+	}// namespace FromData
 
 	namespace Parameter
 	{
@@ -88,7 +88,7 @@ namespace Lua
 		{
 			return ContainerParameter::Read<T>(lua, index);
 		}
-	}// namespace Parameter
+	}// namespace FromData
 
 	namespace Parameter
 	{
@@ -106,7 +106,7 @@ namespace Lua
 		Write(lua_State* lua, T data)
 		{
 		}
-	}// namespace Parameter
+	}// namespace FromData
 
 	namespace Parameter
 	{
@@ -126,7 +126,7 @@ namespace Lua
 			UserDataParameter::Write<T>(lua, data);
 		}
 
-	}// namespace Parameter
+	}// namespace FromData
 
 	namespace Parameter
 	{
@@ -151,5 +151,5 @@ namespace Lua
 		{
 			Encode(lua, std::forward<Args>(args)...);
 		}
-	}// namespace Parameter
+	}// namespace FromData
 }

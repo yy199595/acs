@@ -1,106 +1,111 @@
-local MysqlComponent = {}
 
-local json = rapidjson
-require("XCode")
-local proto = require("Proto")
-local rpcService = require("Service")
-local mysqlService = rpcService.New("MysqlDB")
-function MysqlComponent.Create(tabName, keys, data)
-    local request = proto.New(tabName, data)
-    return mysqlService:Call(nil, "Create", {
-        keys = keys,
-        data = request
+local app = require("App")
+local json = require("util.json")
+
+local Component = require("Component")
+
+local MYSQL_DB = "MysqlDB"
+local MYSQL_INSERT = "MysqlDB.Add"
+local MYSQL_QUERY = "MysqlDB.Query"
+local MYSQL_UPDATE = "MysqlDB.Update"
+local MYSQL_DELETE = "MysqlDB.Delete"
+
+
+local json_encode = json.encode
+local json_decode = json.decode
+local table_insert = table.insert
+
+local MysqlComponent = Component()
+
+function MysqlComponent:GetActorId()
+    if app:HasComponent(MYSQL_DB) then
+        return nil
+    end
+    return app:Allot(MYSQL_DB)
+end
+
+---@param tab string
+---@param data table
+---@return number
+function MysqlComponent:Insert(tab, data)
+    local actorId = self:GetActorId()
+    return app:Call(actorId, MYSQL_INSERT, {
+        table = tab,
+        data = json_encode(data)
     })
 end
 
-function MysqlComponent.Add(tabName, data, flag)
-    assert(type(data) == "table")
-    assert(type(flag) == "number")
-    assert(type(tabName) == "string")
-    return mysqlService:Call(nil, "Add", {
-        table = tabName,
-        flag = flag,
-        data = proto.New(tabName, data)
+---@param tab string
+---@param filter table
+---@return number
+function MysqlComponent:Delete(tab, filter)
+    local actorId = self:GetActorId()
+    return app:Call(actorId, MYSQL_DELETE, {
+        table = tab,
+        where_json = json_encode(filter)
     })
 end
 
-function MysqlComponent.Delete(tabName, where, flag)
-    assert(type(where) == "table")
-    assert(type(flag) == "number")
-    assert(type(tabName) == "string")
-
-    return mysqlService:Call(nil, "MysqlDB.Delete", {
-        table = tabName,
-        flag = flag,
-        where_json = json.encode(where)
-    })
-end
-
-function MysqlComponent.QueryOnce(tabName, where)
-    assert(type(where) == "table")
-    assert(type(tabName) == "string")
-
-    local code, response = mysqlService:Call(address, "Query", {
+---@param tab string
+---@param filter table
+---@param fields table
+---@return table
+function MysqlComponent:FindOne(tab, filter, fields)
+    local request = {
+        table = tab,
         limit = 1,
-        table = tabName,
-        where_json = json.encode(where)
-    })
-    if code ~= XCode.Successful then
+        where_json = json_encode(filter)
+    }
+    if fields and next(fields) then
+        request.fields = fields
+    end
+    local actorId = self:GetActorId()
+    local code, results = app:Call(actorId, MYSQL_QUERY, request)
+    if code ~= XCode.Ok or #results == 0 then
         return nil
     end
-    return json.decode(response.jsons[1])
+    local str = results[1]
+    return json_decode(str)
 end
 
-function MysqlComponent.QueryAll(tabName, where, limit)
-    assert(type(where) == "table")
-    assert(type(tabName) == "string")
-    local code, response = mysqlService:Call(nil, "Query", {
-        table = tabName,
-        limit = limit or 0,
-        where_json = json.encode(where)
-    })
-    if code ~= XCode.Successful then
+---@param tab string
+---@param filter table
+---@param fields table
+---@param limit number
+---@return number
+function MysqlComponent:Find(tab, filter, fields, limit)
+    local request = {
+        table = tab,
+        limit = limit or 0
+    }
+    if fields and next(fields) then
+        request.fields = fields
+    end
+    if filter and next(filter) then
+        request.where_json = json_encode(filter)
+    end
+    local actorId = self:GetActorId()
+    local code, response = app:Call(actorId, MYSQL_QUERY, request)
+    if code ~= XCode.Ok or #response.jsons == 0 then
         return nil
     end
-    local res = { }
-    for _, json in ipairs(response.jsons) do
-        table.insert(res, json.decode(json))
+    local jsons = { }
+    for _, str in ipairs(response.jsons) do
+        table_insert(jsons, json_decode(str))
     end
-    return res
+    return jsons
 end
 
-function MysqlComponent.QueryFields(tabName, fields, where, limit)
-    assert(type(fields) == "table")
-    assert(type(where) == "table")
-    assert(type(tabName) == "string")
-
-    local code, response = mysqlService:Call(nil, "Query", {
-        table = tabName,
-        limit = limit or 0,
-        fields = fields,
-        where_json = json.encode(where)
-    })
-    if code ~= XCode.Successful then
-        return nil
-    end
-    local res = { }
-    for _, json in ipairs(response.jsons) do
-        table.insert(res, json.encode(json))
-    end
-    return res
-end
-
-function MysqlComponent.Update(tabName, where, update, flag)
-    assert(type(where) == "table")
-    assert(type(flag) == "number")
-    assert(type(update) == "table")
-    assert(type(tabName) == "string")
-
-    return mysqlService:Call(nil, "MysqlDB.Update", {
-        flag = flag,
-        table = tabName,
-        where_json = json.encode(where),
-        update_json = json.encode(update)
+---@param tab string
+---@param filter table
+---@param update table
+---@return number
+function MysqlComponent:Update(tab, filter, update)
+    local actorId = self:GetActorId()
+    return app:Call(actorId, MYSQL_UPDATE, {
+        table = tab,
+        where_json = json_encode(filter),
+        update_json = json_encode(update)
     })
 end
 

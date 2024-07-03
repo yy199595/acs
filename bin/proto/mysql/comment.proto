@@ -1,0 +1,14 @@
+
+syntax = "proto3";
+package yy;
+
+message comment
+{
+    int64 uuid = 1; //评论唯一id
+    string open_id = 2; //评论人id
+    string content = 3; //评论内容
+    int64 parent_id = 4; //父评论id
+    int64 root_id = 5;   //顶级评论id
+    int64 create_time = 6;  //创建时间
+    repeated int64 likes = 7; //点赞人
+}

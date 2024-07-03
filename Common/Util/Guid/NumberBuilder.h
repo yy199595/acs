@@ -1,6 +1,6 @@
 #pragma once
 #include<queue>
-namespace Util
+namespace help
 {
     template<typename T, int Start>
     class NumberBuilder

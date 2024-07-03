@@ -1,6 +1,6 @@
 #include"Component.h"
 #include"Entity/Actor/App.h"
-namespace Tendo
+namespace joke
 {
 	Component::Component()
 		: mUnit(nullptr)

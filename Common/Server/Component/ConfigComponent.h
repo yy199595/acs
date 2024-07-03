@@ -4,11 +4,12 @@
 
 #ifndef APP_CONFIGCOMPONENT_H
 #define APP_CONFIGCOMPONENT_H
+#include<unordered_map>
 #include"Config/Base/TextConfig.h"
 #include"Entity/Component/Component.h"
-namespace Tendo
+namespace joke
 {
-    class ConfigComponent : public Component, public IHotfix
+    class ConfigComponent final : public Component, public IHotfix
     {
     public:
         ConfigComponent() = default;
@@ -39,7 +40,7 @@ namespace Tendo
         size_t key = typeid(T).hash_code();
         if(this->mKeys.find(key) != this->mKeys.end())
         {
-            LOG_ERROR("multiple load [" << config->GetConfigName() << "] type = " << typeid(T).name());
+            LOG_ERROR("multiple load {} type ={}", config->GetConfigName(), typeid(T).name());
             return false;
         }
         this->mKeys[key] = config->GetConfigName();

@@ -2,9 +2,9 @@
 
 #include<sstream>
 #include"Message/s2s/db.pb.h"
-#include"rapidjson/document.h"
-using namespace google::protobuf;
-namespace Tendo
+#include"Proto/Include/Message.h"
+#include"Yyjson/Document/Document.h"
+namespace joke
 {
 	class SqlHelper
 	{
@@ -12,13 +12,11 @@ namespace Tendo
 		SqlHelper() = default;
 	 public:
 
+		bool Insert(const std::string & table, json::r::Document &, std::string& sqlCommand);
 
-        bool Insert(const Message &, std::string& sqlCommand);
+		bool Replace(const std::string & table, json::r::Document &, std::string& sqlCommand);
 
-		bool Replace(const Message &, std::string& sqlCommand);
-
-
-		bool Select(const Message & message, const std::string & where,
+		bool Select(const pb::Message & message, const std::string & where,
 			int limit, std::string & sqlCommand);
 
         bool Select(const std::string & table, const std::string & where,
@@ -28,24 +26,18 @@ namespace Tendo
 
         bool Update(const std::string & table, const std::string & where, const std::string & update, std::string& sqlCommand);
 
-        bool ToSqlCommand(const std::string& table, const std::string& cmd, const Message& message, std::string& sql);
+        bool ToSqlCommand(const std::string& table, const std::string& cmd, json::r::Document& message, std::string& sql);
 
-		bool Create(const Message & message, const std::string & tab, const std::vector<std::string> & keys, std::string & sql);
+		bool Create(const std::string & tab, const pb::Message & message, const std::vector<std::string> & keys, std::string & sql);
 
 	public:
-        bool GetValue(const std::string & key, std::string & value);
-        std::shared_ptr<Message> GetData() { return std::move(this->mMessage); }
-        bool GetValue(rapidjson::Document & document, const std::string & key, std::string & value);
+        std::unique_ptr<pb::Message> GetData() { return std::move(this->mMessage); }
     private:
-        bool Parse(rapidjson::Document & doc, const std::string & json);
-        void GetFiles(const Message & message, std::stringstream & ss, char cc = ',');
-        bool WriterToStream(std::stringstream& stream, const rapidjson::Value& jsonValue);
-
+        void GetFiles(const pb::Message & message, std::stringstream & ss, char cc = ',');
+        bool WriterToStream(std::stringstream& stream, const json::r::Value& jsonValue);
     private:
-        rapidjson::Document mDocument1;
-        rapidjson::Document mDocument2;
-        std::shared_ptr<Message> mMessage;
         std::stringstream mSqlCommandStream;
 		std::stringstream mSqlCommandStream2;
-    };
+		std::unique_ptr<pb::Message> mMessage;
+	};
 }

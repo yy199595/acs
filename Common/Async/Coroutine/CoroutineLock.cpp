@@ -4,20 +4,23 @@
 
 #include"CoroutineLock.h"
 #include"Entity/Actor/App.h"
-namespace Tendo
+namespace joke
 {
-	CoroutineLock::CoroutineLock()
+	CoroutineLock::CoroutineLock(CoroutineComponent * cor)
 	{
 		this->mIsLock = false;
-		this->mTaskComponent = App::Inst()->GetCoroutine();
+		this->mCoroutine = cor;
 	}
 
 	void CoroutineLock::Lock()
 	{
 		if(this->mIsLock)
 		{
-			this->mWaitTasks.push(this->mTaskComponent->GetContextId());
-			this->mTaskComponent->YieldCoroutine();
+			unsigned int id = this->mCoroutine->GetContextId();
+			{
+				this->mWaitTasks.push(id);
+				this->mCoroutine->YieldCoroutine();
+			}
 		}
 		this->mIsLock = true;
 	}
@@ -27,7 +30,7 @@ namespace Tendo
 		if(!this->mWaitTasks.empty())
 		{
 			unsigned int id = this->mWaitTasks.front();
-			this->mTaskComponent->Resume(id);
+			this->mCoroutine->Resume(id);
 			this->mWaitTasks.pop();
 		}
 		this->mIsLock = !this->mWaitTasks.empty();

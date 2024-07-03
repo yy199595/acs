@@ -5,8 +5,9 @@
 #ifndef GAMEKEEPER_GATESERVICE_H
 #define GAMEKEEPER_GATESERVICE_H
 #include"Message/s2s/s2s.pb.h"
+#include"Core/Map/HashMap.h"
 #include"Rpc/Service/RpcService.h"
-namespace Tendo
+namespace joke
 {
 	class Gate final : public RpcService
 	{
@@ -15,21 +16,14 @@ namespace Tendo
 	 private:
 		int Ping(long long userId);
 		int Logout(long long userId);
-		int Login(const Msg::Packet & packet);
-		int Enter(const s2s::allot::request & request);
+		int Login(const rpc::Packet & request);
 	private:
 		bool Awake() final;
 		bool OnInit() final;
-		int OnLogin(long long userId, const std::string & token);
-	private:
-		std::shared_ptr<class PlayerActor> NewPlayer(long long userId);
+		void OnDisConnect(long long id);
 	 private:
-		int mIndex;
-		std::string mInnerAddress;
-		std::string mOuterAddress;
-		class OuterNetComponent* mOuterComponent;
 		class ActorComponent * mActorComponent;
-		std::unordered_map<std::string, long long> mTokens;
+		class OuterNetComponent* mOuterComponent;
 	};
 
 }

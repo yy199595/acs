@@ -16,7 +16,7 @@ namespace Lua
 		luaL_unref(mLuaEnv, LUA_REGISTRYINDEX, this->ref);
 	}
 
-	std::shared_ptr<Function> Table::GetFunction(const std::string& name)
+	std::unique_ptr<Function> Table::GetFunction(const std::string& name)
 	{
 		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->ref);
 		lua_getfield(this->mLuaEnv, -1, name.c_str());
@@ -25,10 +25,10 @@ namespace Lua
 			return nullptr;
 		}
 		int ref1 = luaL_ref(this->mLuaEnv, LUA_REGISTRYINDEX);
-		return std::make_shared<Function>(this->mLuaEnv, ref1);
+		return std::make_unique<Function>(this->mLuaEnv, ref1);
 	}
 
-	std::shared_ptr<Table> Table::GetTable(const std::string& name)
+	std::unique_ptr<Table> Table::GetTable(const std::string& name)
 	{
 		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->ref);
 		lua_getfield(this->mLuaEnv, -1, name.c_str());
@@ -36,16 +36,16 @@ namespace Lua
 		{
 			return nullptr;
 		}
-		return std::make_shared<Table>(this->mLuaEnv, -1, name);
+		return std::make_unique<Table>(this->mLuaEnv, -1, name);
 	}
 
-	std::shared_ptr<Table> Table::Create(lua_State* luaEnv, const std::string& name)
+	std::unique_ptr<Table> Table::Create(lua_State* luaEnv, const std::string& name)
 	{
 		lua_getglobal(luaEnv, name.c_str());
 		if (lua_istable(luaEnv, -1))
 		{
 			int ref = luaL_ref(luaEnv, LUA_REGISTRYINDEX);
-			return std::make_shared<Table>(luaEnv, ref, name);
+			return std::make_unique<Table>(luaEnv, ref, name);
 		}
 		return nullptr;
 	}

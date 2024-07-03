@@ -1,57 +1,49 @@
 
-local Log = require("Log")
-local json = require("json")
-local http = require("Http")
-local LoginComponent = Class()
+local log = require("Log")
+local json = require("util.json")
+local Component = require("Component")
+local str_format = string.format
 
-local host = "http://127.0.0.1:80/%s"
+local LoginComponent = Component()
+local http = require("HttpComponent")
+local host = os.getenv("APP_HOST") or "http://127.0.0.1:80"
 
-function LoginComponent:Start()
-    local passwd = self.player.passwd
-    local account = self.player.account
+function LoginComponent:Update()
 
-    self:Register(account, passwd)
-    local code, response = self:Login(account, passwd)
-    if code == XCode.Successful then
-        Log.Info(self.player.account, " login successful")
-    else
-        Log.Error(self.player.account, " login failure")
-        return
-    end
-    self.player:_Invoke("OnLogin", response)
+    self:Get(str_format("%s/admin/hello", host))
+    self:Get(str_format("%s/admin/ping?id=%d", host, 1))
+    self:Post(str_format("%s/admin/login", host), {
+        account = "646585122@qq.com",
+        passwd = "123456",
+        dev_id = "iPone13 mini",
+        dev = 'ios'
+    })
 end
 
-function LoginComponent:Register(account, passwd)
-    local url = string.format(host, "user/register")
-    local response = http.Post(url, {
-        account = account,
-        password = passwd,
-    })
-    if response.code ~= 200 then
-        Log.Error(response.status)
-        return nil
-    end
-    local message = json.decode(response.body)
-    if message.code ~= XCode.Successful then
-        return nil
-    end
-    return message.code, message.data
+function LoginComponent:Get(url)
+    local t1 = time.ms()
+    local response = http:Do("GET", url)
+    log.Warning("(%s) time = [%s]ms response = %s", url, time.ms() - t1, json.encode(response))
+end
+
+function LoginComponent:Post(url, data)
+    local t1 = os.clock() * 1000
+    local response = http:Do("POST", url, nil, data)
+    log.Warning("(%s) time = [%s]ms response = %s", url, os.clock() * 1000 - t1, json.encode(response))
 end
 
 function LoginComponent:Login(account, passwd) -- 获取gate地址
-    local url = string.format(host, "user/login")
-    local response = http.Post(url, {
+    local url = string.format("%s/%s", host, "account/login")
+    local response = http:Post(url, {
         account = account,
         password = passwd
     })
-    if response.code ~= 200 then
-        Log.Error(response.status)
-        return { code = XCode.Failure }
+
+    if response.code ~= XCode.Ok then
+        log.Error("%s login code = %s", account, response.code)
+        return
     end
-    local message = json.decode(response.body)
-    if message.code ~= XCode.Successful then
-        return message.code
-    end
-    return message.code, message.data
+    log.Debug("login response = %s", json.encode(response))
+    return response
 end
 return LoginComponent

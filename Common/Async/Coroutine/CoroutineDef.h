@@ -1,17 +1,14 @@
 #pragma once
-#include<queue>
+#include<list>
 #include<memory>
 #include<unordered_map>
+#include"Core/Pool/ArrayPool.h"
 #include"Util/Guid/NumberBuilder.h"
-//#include"Rpc/Method/MethodProxy.h"
+#include"Entity/Component/IComponent.h"
 #include"Context/context.h"
 #ifdef 	__COR_SHARED_STACK__
 #define STACK_SIZE (1024 * 1024)
-#ifdef __DEBUG__
-#define SHARED_STACK_NUM 2 //共享栈个数
-#else
-#define SHARED_STACK_NUM 8 //共享栈个数
-#endif
+#define SHARED_STACK_NUM 1 //共享栈个数
 #else
 #define STACK_SIZE (1024 * 1024)
 #endif
@@ -20,7 +17,7 @@
 #define COR_POOL_COUNT 100
 
 
-namespace Tendo
+namespace joke
 {
 
 	class TaskContext;
@@ -31,18 +28,19 @@ namespace Tendo
 		virtual ~TaskContextPool();
 	public:
 		TaskContext * Pop();
-		void Push(TaskContext * coroutine);
+		size_t GetMemory() const;
 		TaskContext* Get(unsigned int id);
-		size_t GetCorCount() { return this->mCoroutines.size(); }
-		
+		void Push(TaskContext * coroutine);
+		size_t GetWaitCount() const;
+		size_t GetCount() const { return this->mCoroutines.size(); }
 	private:
-        std::queue<TaskContext *> mCorPool;
-        Util::NumberBuilder<unsigned int, 10> mNumPool;
+		math::NumberPool<unsigned int> mNumPool;
+		custom::ArrayPool<TaskContext, 100> mCorPool;
 		std::unordered_map<unsigned int, TaskContext*> mCoroutines;
-    };
+	};
 }
 
-namespace Tendo
+namespace joke
 {
 	class CoroutineComponent;
     class CoroutineGroup : public std::enable_shared_from_this<CoroutineGroup>
@@ -51,9 +49,9 @@ namespace Tendo
 		explicit CoroutineGroup();
         ~CoroutineGroup();
 	 public:
-        void Add(unsigned int id);
+		void WaitComplete();
+		void Add(unsigned int id);
 		void Add(TaskContext * coroutine);
-        void WaitConmlete();
     private:
 		unsigned int mCoroutineId;
 		CoroutineComponent* mCorComponent;

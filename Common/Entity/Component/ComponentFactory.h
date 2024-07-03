@@ -1,9 +1,8 @@
 #pragma once
-#include<queue>
 #include<memory>
 #include<unordered_map>
 #include"Component.h"
-namespace Tendo
+namespace joke
 {
     template<typename T>
     class TypeProxy : public Type
@@ -19,7 +18,7 @@ namespace Tendo
     };
 }
 
-namespace Tendo
+namespace joke
 {
 	class ComponentFactory
 	{
@@ -71,7 +70,7 @@ namespace Tendo
 	};
 
 	template<typename T>
-	std::unique_ptr<Component> Tendo::ComponentFactory::CreateComponent()
+	std::unique_ptr<Component> joke::ComponentFactory::CreateComponent()
 	{
 		size_t key = typeid(T).hash_code();
 		auto iter = mTypeInfoMap1.find(key);

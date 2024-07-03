@@ -4,61 +4,67 @@
 
 #ifndef GAMEKEEPER_GATECLIENTCOMPONENT_H
 #define GAMEKEEPER_GATECLIENTCOMPONENT_H
-#include<queue>
-#include<unordered_map>
-#include<unordered_set>
-#include"Server/Component/TcpListenerComponent.h"
 
-namespace Msg
+#include"Core/Map/HashMap.h"
+#include"Core/Queue/Queue.h"
+#include"Log/Common/Logger.h"
+#include"Core/Pool/ArrayPool.h"
+#include"Server/Component/ListenerComponent.h"
+
+namespace rpc
 {
     class Packet;
-}
-namespace Tendo
-{
+	class InnerClient;
 
-	class OuterNetTcpClient;
-    class OuterNetComponent : public TcpListenerComponent, public IRpc<Msg::Packet>,
-							  public IComplete, public IServerRecord, public IFrameUpdate, public IDestroy
+	struct RpcRecord
+	{
+		int rpcId;
+		std::string address;
+	};
+	class OuterClient;
+}
+
+namespace joke
+{
+	class OuterNetComponent final : public Component, public ITcpListen,
+		public IRpc<rpc::Packet, rpc::Packet>, public IServerRecord
 	{
 	 public:
-		OuterNetComponent() = default;
+		OuterNetComponent();
 		~OuterNetComponent() final = default;
 	 public:
-		void OnTimeout(const std::string &address) final;
-		void StartClose(const std::string & address) final;
-		void OnMessage(std::shared_ptr<Msg::Packet> message) final;
-		void OnCloseSocket(const std::string & address, int code) final;
-    public:
+		void OnTimeout(int id) final;
+		void StartClose(int id, int code) final;
+		void OnCloseSocket(int id, int code) final;
+	public:
 		bool StopClient(long long userId);
-		bool BindClient(const std::string & address, long long userId);
-		size_t Broadcast(const std::shared_ptr<Msg::Packet> & message);
-		int OnRequest(long long userId, std::shared_ptr<Msg::Packet> & message);
-		bool Send(long long userId, const std::shared_ptr<Msg::Packet> & message);
-		bool Send(const std::string & address, const std::shared_ptr<Msg::Packet> & message);
-		bool Send(const std::string & address, int code, const std::shared_ptr<Msg::Packet> & message);
+		void Broadcast(rpc::Packet * message);
+		bool Send(int id, rpc::Packet * message);
+		bool AddPlayer(long long userId, int sockId);
+		bool Send(int id, int code, rpc::Packet * message);
+		bool SendToPlayer(long long userId, rpc::Packet * message);
+		inline size_t GetPlayerCount() const { return this->mUserAddressMap.Size(); }
 	private:
-		bool Awake() final;
 		bool LateAwake() final;
-        void OnDestroy() final;
-		void Complete() final;
-		void OnFrameUpdate(float t) final;
-	 private:
-        void OnRecord(Json::Writer & document) final;
-        void OnListen(std::shared_ptr<Tcp::SocketProxy> socket) final;
-		bool GetUserId(const std::string & address, long long & userId) const;
+		int Forward(int id, rpc::Packet * message);
+		int OnRequest(long long playerId, rpc::Packet * message);
+		void OnMessage(rpc::Packet * request, rpc::Packet *) final;
 	private:
-		int mMaxHandlerCount;
-		unsigned int mSumCount;
-		unsigned int mWaitCount;
-#ifdef __DEBUG__
-		std::unordered_map<int, long long> mRecords;
-#endif
-		class InnerNetComponent * mInnerNetComponent;
-        std::queue<std::shared_ptr<Msg::Packet>> mMessages;
-        std::queue<std::shared_ptr<OuterNetTcpClient>> mClientPools;
-		std::unordered_map<std::string, long long> mAddressUserMap; //验证过的客户端
-		std::unordered_map<long long, std::string> mUserAddressMap; //验证过的客户端
-		std::unordered_map<std::string, std::shared_ptr<OuterNetTcpClient>> mGateClientMap;
+		bool OnListen(tcp::Socket * socket) final;
+		void OnRecord(json::w::Document & document) final;
+	private:
+		int mWaitCount;
+		int mMaxConnectCount;
+		math::NumberPool<int> mNumPool;
+		math::NumberPool<int> mSocketPool;
+		class ActorComponent * mActComponent;
+		class ThreadComponent * mNetComponent;
+		custom::ArrayPool<rpc::OuterClient, 100> mClientPools;
+		custom::HashMap<int, long long> mAddressUserMap;  //fd和玩家id的映射表
+		custom::HashMap<long long, int> mUserAddressMap; //验证过的客户端
+		custom::Queue<rpc::Packet *> mBroadCastMessages; //广播消息
+		custom::HashMap<int, rpc::OuterClient *> mGateClientMap;
+		custom::HashMap<int, rpc::InnerClient *> mForwardClientMap; //中转到内网的客户端
 	};
 }
 

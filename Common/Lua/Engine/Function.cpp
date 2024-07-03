@@ -9,24 +9,24 @@ namespace Lua
 		this->ref = ref;
 	}
 
-	std::shared_ptr<Function> Function::Create(lua_State* luaEnv, const std::string& name)
+	std::unique_ptr<Function> Function::Create(lua_State* luaEnv, const std::string& name)
 	{
 		lua_getglobal(luaEnv, name.c_str());
 		if (lua_isfunction(luaEnv, -1))
 		{
 			int ref = luaL_ref(luaEnv, LUA_REGISTRYINDEX);
-			return std::make_shared<Function>(luaEnv, ref);
+			return std::make_unique<Function>(luaEnv, ref);
 		}
 		return nullptr;
 	}
 
-	std::shared_ptr<Function>
+	std::unique_ptr<Function>
 	Function::Create(lua_State* luaEnv, const std::string& tabName, const std::string& name)
 	{
 		if (lua_getfunction(luaEnv, tabName.c_str(), name.c_str()))
 		{
 			int ref = luaL_ref(luaEnv, LUA_REGISTRYINDEX);
-			return std::make_shared<Function>(luaEnv, ref);
+			return std::make_unique<Function>(luaEnv, ref);
 		}
 		return nullptr;
 	}

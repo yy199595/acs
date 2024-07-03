@@ -2,13 +2,12 @@
 // Created by yjz on 2023/3/23.
 //
 #include<sstream>
+#include<utility>
 #include<fstream>
-#include <utility>
-#include"Util/Md5/MD5.h"
 #include"CsvTextConfig.h"
-#include"Util/String/StringHelper.h"
-
-namespace Tendo
+#include"Util/String/String.h"
+#include"Util/File/FileHelper.h"
+namespace joke
 {
 	bool CsvLineData::Add(const std::string& key, const std::string& value)
 	{
@@ -66,25 +65,26 @@ namespace Tendo
 	}
 }
 
-namespace Tendo
+namespace joke
 {
 	CsvTextConfig::CsvTextConfig(std::string  name)
-		: mName(std::move(name))
+		: mName(std::move(name)), mLastWriteTime(0)
 	{
 
 	}
 
 	bool CsvTextConfig::ReloadConfig()
 	{
+		long long writeTime =help::fs::GetLastWriteTime(this->mPath);
+		if(writeTime == this->mLastWriteTime)
+		{
+			return true;
+		}
+		this->mLastWriteTime = writeTime;
 		std::ifstream fileStream(this->mPath, std::ios::out);
 		if(!fileStream.is_open())
 		{
 			return false;
-		}
-		std::string md5 = Helper::Md5::GetMd5(fileStream);
-		if(this->mMd5 == md5)
-		{
-			return true;
 		}
 
 		std::string line;
@@ -94,7 +94,7 @@ namespace Tendo
 		}
 		std::vector<std::string> fields;
 		std::vector<std::string> values;
-		if(Helper::Str::Split(line, ',', fields) == 0)
+		if(help::Str::Split(line, ',', fields) == 0)
 		{
 			return false;
 		}
@@ -107,7 +107,7 @@ namespace Tendo
 			}
 			values.clear();
 			CsvLineData lineData;
-			if(Helper::Str::Split(line, ',', values) != size)
+			if(help::Str::Split(line, ',', values) != size)
 			{
 				return false;
 			}
@@ -122,7 +122,6 @@ namespace Tendo
 				return false;
 			}
 		}
-		this->mMd5 = md5;
 		return true;
 	}
 
@@ -144,7 +143,7 @@ namespace Tendo
 		}
 		std::vector<std::string> fields;
 		std::vector<std::string> values;
-		if(Helper::Str::Split(line, ',', fields) == 0)
+		if(help::Str::Split(line, ',', fields) == 0)
 		{
 			return false;
 		}
@@ -161,7 +160,7 @@ namespace Tendo
 				line.pop_back();
 			}
 			CsvLineData lineData;
-			if(Helper::Str::Split(line, ',', values) != size)
+			if(help::Str::Split(line, ',', values) != size)
 			{
 				return false;
 			}
@@ -177,9 +176,7 @@ namespace Tendo
 			}
 		}
 		this->mPath = path;
-		fileStream.clear();
-		fileStream.seekg(0, std::ios::beg);
-		this->mMd5 = Helper::Md5::GetMd5(fileStream);
+		this->mLastWriteTime = help::fs::GetLastWriteTime(path);
 		return true;
 	}
 }

@@ -5,39 +5,41 @@
 #ifndef SERVER_COROUTINELOCK_H
 #define SERVER_COROUTINELOCK_H
 #include<queue>
+#include <utility>
 #include"Async/Source/TaskSource.h"
-namespace Tendo
+namespace joke
 {
+	class CoroutineComponent;
 	class CoroutineLock
 	{
 	public:
-		CoroutineLock();
+		CoroutineLock(CoroutineComponent * cor);
 	public:
 		void Lock();
 		void UnLock();
 		bool IsLock() const { return this->mIsLock;}
 	private:
 		bool mIsLock;
+		CoroutineComponent * mCoroutine;
 		std::queue<unsigned int> mWaitTasks;
-		class CoroutineComponent * mTaskComponent;
 	};
 
 	class AutoCoroutineLock
 	{
 	public:
-		AutoCoroutineLock(std::shared_ptr<CoroutineLock> lock)
+		explicit AutoCoroutineLock(CoroutineLock & lock)
 				: mLock(lock)
 		{
-			this->mLock->Lock();
+			this->mLock.Lock();
 		}
 
 		~AutoCoroutineLock()
 		{
-			this->mLock->UnLock();
+			this->mLock.UnLock();
 		}
 
 	private:
-		std::shared_ptr<CoroutineLock> mLock;
+		CoroutineLock & mLock;
 	};
 }
 

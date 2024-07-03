@@ -1,0 +1,53 @@
+{
+    "/log": {
+        "Type": "GET",
+        "Auth": false,
+        "Bind": "LogMgr.List",
+        "Desc": "查看服务器日志目录"
+    },
+    "log/look": {
+        "Type": "GET",
+        "Auth": false,
+        "Bind": "LogMgr.Look",
+        "Desc": "查看某个日志信息"
+    },
+    "/log/delete": {
+        "Type": "DELETE",
+        "Bind": "LogMgr.Delete",
+        "Desc": "删除某个日志文件"
+    },
+    "/log/set_level": {
+        "Type": "GET",
+        "Bind": "LogMgr.SetLevel",
+        "Desc": "设置日志等级"
+    },
+    "res/upload": {
+        "Type": "POST",
+        "Auth": true,
+        "Limit": 0,
+        "Permiss": 5,
+        "Bind": "ResourceMgr.Upload",
+        "ContentType": "multipart/form-data",
+        "Desc": "上传文件"
+    },
+    "/res/look": {
+        "Type": "GET",
+        "Async": false,
+        "Auth": false,
+        "Bind": "ResourceMgr.Look",
+        "Desc": "查看资源详情"
+    },
+    "/res/list": {
+        "Type": "GET",
+        "Async": false,
+        "Auth": false,
+        "Bind": "ResourceMgr.List",
+        "Desc": "查看资源列表"
+    },
+    "/res/download": {
+        "Type": "GET",
+        "Async": false,
+        "Bind": "ResourceMgr.Download",
+        "Desc": "下载某个资源"
+    }
+}

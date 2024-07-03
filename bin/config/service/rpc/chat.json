@@ -1,0 +1,18 @@
+{
+    "Chat.Ping": {
+        "Async": false,
+        "IsClient": true
+    },
+    "Chat.Sleep": {
+        "Async" : true
+    },
+    "Chat.OnChat": {
+        "Async": true,
+        "IsClient": true,
+        "Request": "c2s.chat.request"
+    },
+    "ChatComponent.OnChat" : {
+        "SendToClient" : true,
+        "Request": "c2s.chat.request"
+    }
+}

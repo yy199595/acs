@@ -1,7 +1,7 @@
 #pragma once
 #include<atomic>
 #include"Util/Time/TimeHelper.h"
-namespace Helper
+namespace help
 {
     class Guid
     {

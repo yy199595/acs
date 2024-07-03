@@ -8,23 +8,27 @@
 #include"Message/com/com.pb.h"
 #include"Rpc/Service/RpcService.h"
 
-namespace Tendo
+namespace joke
 {
 	class Node final : public RpcService
     {
     public:
         Node() = default;
-        ~Node() = default;
+        ~Node() final = default;
     private:
         int Hotfix();
 		int Shutdown();
 		int LoadConfig();
-		int Ping(const Msg::Packet& packet);
-		int Join(const com::type::json & request); //新服务器加入
-        int Exit(const com::type::int64 & request); //服务器退出
+		int Ping(long long id);
+		int Find(com::type::json & response);
+		int Add(const com::type::json & request); //新服务器加入
+        int Del(const com::type::int64 & request); //服务器退出
         int RunInfo(com::type::json & response); // 获取运行信息
-    private:
+		int SetLogLevel(const com::type::int32 & request);
+	private:
 		bool OnInit() final;
+	private:
+		class ActorComponent * mActComponent;
     };
 }
 

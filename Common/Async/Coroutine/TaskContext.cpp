@@ -1,6 +1,6 @@
 #include"TaskContext.h"
 #include"memory.h"
-namespace Tendo
+namespace joke
 {
 	TaskContext::TaskContext()
 	{
@@ -17,15 +17,16 @@ namespace Tendo
 	{
 		this->mFunction->run();
 		delete this->mFunction;
-		this->mGroup = nullptr;
 		this->mFunction = nullptr;
 		this->mState = CorState::Finish;
 	}
+
 	TaskContext::~TaskContext()
 	{
 		if (this->mStack.p)
 		{
 			free(this->mStack.p);
+			memset(&this->mStack, 0, sizeof(Stack));
 		}
 	}
 }

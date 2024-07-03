@@ -1,0 +1,33 @@
+{
+    "SqliteDB.Add": {
+        "Async": true,
+        "Request": "db.mysql.add"
+    },
+    "SqliteDB.Del": {
+        "Async": true,
+        "Type": "Server",
+        "Request": "db.mysql.remove"
+    },
+    "SqliteDB.Save": {
+        "Async": true,
+        "Request": "db.mysql.save"
+    },
+    "SqliteDB.Find": {
+        "Async": true,
+        "Request": "db.mysql.query",
+        "Response": "db.mysql.response"
+    },
+    "SqliteDB.FindOne": {
+        "Async": true,
+        "Request": "db.mysql.query",
+        "Response": "db.mysql.response"
+    },
+    "SqliteDB.Update": {
+        "Async": true,
+        "Request": "db.mysql.update"
+    },
+    "SqliteDB.Create": {
+        "Async": true,
+        "Request": "db.mysql.create"
+    }
+}

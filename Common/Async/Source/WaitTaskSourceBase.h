@@ -2,10 +2,10 @@
 // Created by zmhy0073 on 2021/11/29.
 //
 
-#ifndef GAMEKEEPER_TASKSOURCEBASE_H
-#define GAMEKEEPER_TASKSOURCEBASE_H
+#ifndef APP_WAITTASKSOURCEBASE_H
+#define APP_WAITTASKSOURCEBASE_H
 #include<memory>
-namespace Tendo
+namespace joke
 {
     enum class TaskState
     {
@@ -22,7 +22,6 @@ namespace Tendo
     public:
 		void Clear();
         TaskState GetState() const { return this->mState; }
-        long long GetCreateTime() const { return this->mCreateTime;}
         bool IsComplete() { return this->mState == TaskState::TaskFinish;}
     protected:
         bool YieldTask();
@@ -30,8 +29,7 @@ namespace Tendo
     private:
         TaskState mState;
         unsigned int mCorId;
-        long long mCreateTime;
     };
 }
 
-#endif //GAMEKEEPER_TASKSOURCEBASE_H
+#endif //APP_WAITTASKSOURCEBASE_H

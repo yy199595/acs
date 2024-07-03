@@ -3,329 +3,327 @@
 //
 
 #include"OuterNetComponent.h"
-#include"Gate/Client/OuterNetTcpClient.h"
-#include"Server/Component/ThreadComponent.h"
-#include"Rpc/Component/InnerNetComponent.h"
-#include"Util/Md5/MD5.h"
+#include"Gate/Client/OuterClient.h"
 #include"Server/Config/CodeConfig.h"
-#include"Util/Json/JsonWriter.h"
+
 #include"Gate/Service/Gate.h"
 #include"Entity/Actor/App.h"
-#include"Entity/Actor/PlayerActor.h"
-namespace Tendo
+#include"Entity/Actor/Player.h"
+#include"Server/Component/ThreadComponent.h"
+#include"Rpc/Client/InnerClient.h"
+#include"Core/Event/IEvent.h"
+#include"Rpc/Component/DispatchComponent.h"
+
+namespace joke
 {
-	bool OuterNetComponent::Awake()
+	OuterNetComponent::OuterNetComponent()
 	{
-		this->mSumCount = 0;
 		this->mWaitCount = 0;
-        return true;
-    }
+		this->mActComponent = nullptr;
+		this->mMaxConnectCount = 500;
+		this->mNetComponent = nullptr;
+	}
 
 	bool OuterNetComponent::LateAwake()
 	{
-		this->mMaxHandlerCount = 500;
-		this->mInnerNetComponent = this->GetComponent<InnerNetComponent>();
-		ServerConfig::Inst()->GetMember("message", "outer", this->mMaxHandlerCount);
-		return true;
-	}
-
-    void OuterNetComponent::Complete()
-    {
-        if(!this->StartListen("gate"))
-        {
-            LOG_FATAL("listen gate failure");
-            return;
-        }
-        LOG_INFO("wait client connect to gate ....");
-    }
-
-	void OuterNetComponent::OnTimeout(const std::string& address)
-	{
-
-	}
-
-	bool OuterNetComponent::BindClient(const std::string & address, long long userId)
-	{
-		auto iter1 = this->mAddressUserMap.find(address);
-		if(iter1 != this->mAddressUserMap.end())
+		const ServerConfig & config = this->mApp->Config();
+		this->mActComponent = this->GetComponent<ActorComponent>();
+		this->mNetComponent = this->GetComponent<ThreadComponent>();
+		std::unique_ptr<json::r::Value> jsonObejct;
+		if(config.Get("connect", jsonObejct))
 		{
-			return false;
+			jsonObejct->Get("outer", this->mMaxConnectCount);
 		}
-		this->mAddressUserMap.emplace(address, userId);
-		this->mUserAddressMap.emplace(userId, address);
 		return true;
 	}
 
-	void OuterNetComponent::OnMessage(std::shared_ptr<Msg::Packet> message)
+	void OuterNetComponent::OnTimeout(int id)
 	{
-		this->mSumCount++;
-		const std::string& address = message->From();
+		this->OnCloseSocket(id, XCode::NetTimeout);
+	}
+
+	void OuterNetComponent::OnMessage(rpc::Packet * message, rpc::Packet *)
+	{
+		int id = message->SockId();
+		message->SetNet(rpc::Net::Tcp);
 		switch (message->GetType())
 		{
-			case Msg::Type::Ping:
+			case rpc::Type::Request:
 			{
-				message->SetContent("hello");
-				this->Send(address, XCode::Successful, message);
+				long long playerId = -1;
+				int rpcId = message->GetRpcId();
+				if (!this->mAddressUserMap.Get(id, playerId))
+				{
+					message->GetHead().Add("sock", id);
+				}
+				message->GetHead().Add("id", playerId);
+
+				if (rpcId > 0)
+				{
+					++this->mWaitCount;
+					message->TempHead().Add("cli", id);
+					message->TempHead().Add("rpc", rpcId);
+				}
+				int code = this->OnRequest(playerId, message);
+				if(code != XCode::Ok)
+				{
+					this->StartClose(id, code);
+					return;
+				}
+				return;
+			}
+			case rpc::Type::Response:
+			{
+				int rpcId = 0;
+				if(message->TempHead().Del("rpc", rpcId))
+				{
+					--this->mWaitCount;
+					message->SetRpcId(rpcId);
+					if(message->TempHead().Del("cli", rpcId))
+					{
+						this->Send(rpcId, message);
+						return;
+					}
+				}
+			}
+			default:
+				LOG_ERROR("unknown message {}", message->ToString());
+				break;
+		}
+		delete message;
+	}
+
+	int OuterNetComponent::OnRequest(long long playerId, rpc::Packet * message)
+	{
+		const std::string& fullName = message->GetHead().GetStr("func");
+		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
+		if (methodConfig == nullptr || !methodConfig->IsClient || !methodConfig->IsOpen)
+		{
+			LOG_ERROR("call function not exist : {}", fullName)
+			return XCode::CallFunctionNotExist;
+		}
+
+		Player * player = this->mActComponent->GetPlayer(playerId);
+		if(player == nullptr)
+		{
+			this->Forward(this->mApp->GetSrvId(), message);
+			return XCode::Ok;
+		}
+
+		int serverId = 0;
+		const std::string & name = methodConfig->Server;
+		switch(methodConfig->Forward)
+		{
+			case rpc::Forward::Fixed: //转发到固定机器
+				if (!player->GetServerId(name, serverId))
+				{
+					return XCode::NotFoundServerRpcAddress;
+				}
+				break;
+			case rpc::Forward::Random:
+			{
+				Server * server = this->mActComponent->Random(name);
+				if(server == nullptr)
+				{
+					return XCode::AddressAllotFailure;
+				}
+				if(!server->GetAddress(*message, serverId))
+				{
+					return XCode::NotFoundActor;
+				}
 				break;
 			}
-			case Msg::Type::Request:
+			case rpc::Forward::Hash:
 			{
-				long long userId = 0;
-				if (this->GetUserId(address, userId))
+				Server * server = this->mActComponent->Hash(name, playerId);
+				if(server == nullptr)
 				{
-					message->GetHead().Add("id", userId);
+					return XCode::AddressAllotFailure;
 				}
-				this->mMessages.push(std::move(message));
+				if(!server->GetAddress(*message, serverId))
+				{
+					return XCode::NotFoundActor;
+				}
 				break;
 			}
 			default:
-			LOG_ERROR("unknown message " << message->ToString());
+			LOG_ERROR("unknown forward {}", message->ToString());
+				return XCode::Failure;
+		}
+		return this->Forward(serverId, message);
+	}
+
+	//转发到内网
+	int OuterNetComponent::Forward(int id, rpc::Packet * message)
+	{
+		rpc::InnerClient * tcpClient = nullptr;
+		do
+		{
+			if (this->mForwardClientMap.Get(id, tcpClient))
+			{
 				break;
+			}
+			std::string address;
+			static const std::string rpc("rpc");
+			if (!this->mActComponent->GetListen(id, rpc, address))
+			{
+				return XCode::NotFoundActorAddress;
+			}
+			tcp::Socket* socketProxy = this->mNetComponent->CreateSocket(address);
+			if (socketProxy == nullptr)
+			{
+				LOG_ERROR("create socket fail : {}", address)
+				break;
+			}
+			tcpClient = new rpc::InnerClient(id, this);
+			{
+				tcpClient->SetSocket(socketProxy);
+				this->mForwardClientMap.Add(id, tcpClient);
+			}
 		}
+		while(false);
+
+		if(tcpClient == nullptr)
+		{
+			return XCode::SendMessageFail;
+		}
+		message->SetRpcId(this->mNumPool.BuildNumber());
+		return tcpClient && tcpClient->Send(message) ? XCode::Ok : XCode::NetWorkError;
 	}
 
-	void OuterNetComponent::OnFrameUpdate(float t)
+	bool OuterNetComponent::Send(int id, rpc::Packet * message)
 	{
-		for (int index = 0; index < this->mMaxHandlerCount && !this->mMessages.empty(); index++)
-		{
-			std::shared_ptr<Msg::Packet> message = this->mMessages.front();
-			{
-				long long userId = 0;
-				message->GetHead().Get("id", userId);
-				int code = this->OnRequest(userId, message);
-				if(code != XCode::Successful)
-				{
-					this->Send(message->From(), code, message);
-#ifdef __DEBUG__
-					std::string func;
-					message->GetHead().Get("func", func);
-					LOG_ERROR(userId << " call " << func << " code : " << CodeConfig::Inst()->GetDesc(code));
-#endif
-				}
-			}
-			this->mMessages.pop();
-		}
-	}
-
-	int OuterNetComponent::OnRequest(long long userId, std::shared_ptr<Msg::Packet>& message)
-	{
-		const std::string & fullName = message->GetHead().GetStr("func");
-		const RpcMethodConfig* methodConfig = SrvRpcConfig::Inst()->GetMethodConfig(fullName);
-		if (methodConfig == nullptr || !methodConfig->IsClient || !methodConfig->IsOpen)
-		{
-			return XCode::CallFunctionNotExist;
-		}
-		std::string target;
-		if(userId == 0)
-		{
-			if(!this->mApp->GetListen("rpc", target))
-			{
-				return XCode::NotFoundServerRpcAddress;
-			}
-		}
-		else
-		{
-			const std::string& server = methodConfig->Server;
-			PlayerActor* player = this->mApp->ActorMgr()->GetPlayer(userId);
-			if (player == nullptr)
-			{
-				return XCode::NotFindUser;
-			}
-			if (!player->GetAddress(server, target))
-			{
-				return XCode::NotFoundPlayerRpcAddress;
-			}
-			message->GetHead().Add("id", userId);
-		}
-		message->GetHead().Add("cli", message->From());
-#ifdef __DEBUG__
-		int rpcId = 0;
-		if (message->ConstHead().Get("rpc", rpcId))
-		{
-			long long now = Helper::Time::NowSecTime();
-			this->mRecords.emplace(rpcId, now);
-		}
-#endif // __DEBUG__
-		this->mWaitCount++;
-		return this->mInnerNetComponent->Send(target, message);
-	}
-
-	bool OuterNetComponent::Send(const std::string& address, const std::shared_ptr<Msg::Packet>& message)
-	{
-#ifdef __DEBUG__
-		int rpcId = 0;
-		const Msg::Head& head = message->ConstHead();
-		if (message->GetType() == Msg::Type::Response
-			&& head.Get("rpc", rpcId))
-		{
-			std::string func;
-			head.Get("func", func);
-			auto iter1 = this->mRecords.find(rpcId);
-			if (iter1 != this->mRecords.end())
-			{
-				long long time = iter1->second;
-				long long t = Helper::Time::NowSecTime() - time;
-				LOG_DEBUG("client call [" << func << "] use time [" << t << "ms]");
-				this->mRecords.erase(iter1);
-			}
-		}
-#endif
-		if(message->GetType() == Msg::Type::Response)
-		{
-			this->mWaitCount--;
-		}
-		auto iter = this->mGateClientMap.find(address);
-		if (iter == this->mGateClientMap.end())
+		rpc::OuterClient * tcpClient = nullptr;
+		if(!this->mGateClientMap.Get(id, tcpClient))
 		{
 			return false;
 		}
-		iter->second->SendData(message);
+		return tcpClient->Send(message);
+	}
+
+	bool OuterNetComponent::AddPlayer(long long userId, int sockId)
+	{
+		if(!this->mUserAddressMap.Add(userId, sockId))
+		{
+			return false;
+		}
+		this->mAddressUserMap.Add(sockId, userId);
 		return true;
 	}
 
-	bool OuterNetComponent::Send(const std::string& address, int code, const std::shared_ptr<Msg::Packet>& message)
+	bool OuterNetComponent::Send(int id, int code, rpc::Packet * message)
 	{
-		if(message->GetHead().Has("rpc"))
+		if (message->GetRpcId() == 0)
 		{
-			message->Clear();
-			message->GetHead().Remove("func");
-			message->SetType(Msg::Type::Response);
-			message->GetHead().Add("code", code);
-			return this->Send(message->From(), message);
+			delete message;
+			return false;
 		}
-		return false;
+		message->Clear();
+		message->GetHead().Del("func");
+		message->SetType(rpc::Type::Response);
+		message->GetHead().Add("code", code);
+		return this->Send(message->SockId(), message);
 	}
 
-    void OuterNetComponent::OnListen(std::shared_ptr<Tcp::SocketProxy> socket)
-    {
-        const std::string &address = socket->GetAddress();
-        auto iter = this->mGateClientMap.find(address);
-        if (iter != this->mGateClientMap.end())
-        {
-            LOG_FATAL("handler socket error " << socket->GetAddress());
-            return;
-        }
-        std::shared_ptr<OuterNetTcpClient> outerNetClient;
-        if (!this->mClientPools.empty())
-        {
-            outerNetClient = this->mClientPools.front();
-            outerNetClient->Reset(socket);
-            this->mClientPools.pop();
-        }
-        else
-        {
-            outerNetClient = std::make_shared<OuterNetTcpClient>(socket, this);
-        }
-        outerNetClient->StartReceive(10);
-        this->mGateClientMap.emplace(address, outerNetClient);
-    }
-
-	void OuterNetComponent::OnCloseSocket(const std::string & address, int code)
-    {
-#ifdef __DEBUG__
-		LOG_WARN("remove client [" << address << "]" << CodeConfig::Inst()->GetDesc(code));
-#endif
-        auto iter = this->mGateClientMap.find(address);
-        if (iter != this->mGateClientMap.end())
-        {
-            std::shared_ptr<OuterNetTcpClient> gateClient = iter->second;
-            if (this->mClientPools.size() < 100)
-            {
-                this->mClientPools.push(gateClient);
-            }
-            this->mGateClientMap.erase(iter);
-        }
-        auto iter1 = this->mAddressUserMap.find(address);
-        if(iter1 != this->mAddressUserMap.end())
-        {
-			long long userId = iter1->second;
-            this->mAddressUserMap.erase(iter1);
-			auto iter2 = this->mUserAddressMap.find(userId);
-			if(iter2 != this->mUserAddressMap.end())
+	bool OuterNetComponent::OnListen(tcp::Socket * socket)
+	{
+		rpc::OuterClient* outerNetClient = nullptr;
+		if (this->mApp->GetStatus() < ServerStatus::Start)
+		{
+			return false;
+		}
+		outerNetClient = this->mClientPools.Pop();
+		if (outerNetClient == nullptr)
+		{
+			int id = this->mSocketPool.BuildNumber();
+			while (this->mGateClientMap.Has(id))
 			{
-				this->mUserAddressMap.erase(iter2);
+				id = this->mSocketPool.BuildNumber();
 			}
+			outerNetClient = new rpc::OuterClient(id, this);
 		}
-    }
-
-    void OuterNetComponent::OnDestroy()
-    {
-		this->StopListen();
-		auto iter = this->mGateClientMap.begin();
-		for(; iter != this->mGateClientMap.end(); iter++)
+		int id = outerNetClient->GetSockId();
+		if (!this->mGateClientMap.Add(id, outerNetClient))
 		{
-			iter->second->StartClose();
-		}
-    }
-
-    bool OuterNetComponent::Send(long long userId, const std::shared_ptr<Msg::Packet>& message)
-    {
-		auto iter = this->mUserAddressMap.find(userId);
-		if(iter == this->mUserAddressMap.end())
-		{
-			CONSOLE_LOG_ERROR("send message to user:" << userId << " failure");
+			this->mClientPools.Push(outerNetClient);
 			return false;
 		}
-		return this->Send(iter->second, message);
-    }
-
-	void OuterNetComponent::StartClose(const std::string & address)
-	{
-		auto iter = this->mGateClientMap.find(address);
-		if(iter == this->mGateClientMap.end())
-		{
-			return;
-		}
-		iter->second->StartClose();
-	}
-
-    void OuterNetComponent::OnRecord(Json::Writer &document)
-    {
-		document.Add("sum").Add(this->mSumCount);
-		document.Add("wait").Add(this->mWaitCount);
-        document.Add("auth").Add(this->mAddressUserMap.size());
-        document.Add("client").Add(this->mGateClientMap.size());
-    }
-
-	bool OuterNetComponent::GetUserId(const std::string& address, long long & userId) const
-	{
-		auto iter = this->mAddressUserMap.find(address);
-		if(iter == this->mAddressUserMap.end())
-		{
-			return false;
-		}
-		userId = iter->second;
+		outerNetClient->StartReceive(socket);
 		return true;
 	}
-	size_t OuterNetComponent::Broadcast(const std::shared_ptr<Msg::Packet>& message)
-	{
-		size_t count = 0;
-		auto iter = this->mAddressUserMap.begin();
-		for(; iter != this->mAddressUserMap.end(); iter++)
+
+	void OuterNetComponent::OnCloseSocket(int id, int code)
+    {
+		long long userId = 0;
+		if(this->mAddressUserMap.Del(id, userId))
 		{
-			const std::string & address = iter->first;
-			if(this->Send(address, message->Clone()))
+			this->mUserAddressMap.Del(userId);
+			help::OuterLogoutEvent::Trigger(userId);
+		}
+
+		rpc::OuterClient * tcpClient = nullptr;
+		if(this->mGateClientMap.Del(id, tcpClient))
+		{
+			this->mClientPools.Push(tcpClient);
+		}
+		LOG_WARN("remove client {} code = {}", userId, CodeConfig::Inst()->GetDesc(code));
+	}
+
+    bool OuterNetComponent::SendToPlayer(long long userId, rpc::Packet * message)
+    {
+		int socketId = 0;
+		if(!this->mUserAddressMap.Get(userId, socketId))
+		{
+			LOG_ERROR("send message to ({}) fail : {}", userId, message->ToString());
+			delete message;
+			return false;
+		}
+		LOG_DEBUG("send client({}) : {}", userId, message->ToString());
+		return this->Send(socketId, message);
+    }
+
+	void OuterNetComponent::StartClose(int id, int code)
+	{
+		rpc::OuterClient * tcpClient = nullptr;
+		if(this->mGateClientMap.Get(id, tcpClient))
+		{
+			tcpClient->Stop(code);
+		}
+	}
+
+    void OuterNetComponent::OnRecord(json::w::Document &document)
+    {
+		std::unique_ptr<json::w::Value> data = document.AddObject("outer");
+		{
+			data->Add("wait", this->mWaitCount);
+			data->Add("client", this->mGateClientMap.Size());
+			data->Add("sum", this->mNumPool.CurrentNumber());
+		}
+    }
+
+	void OuterNetComponent::Broadcast(rpc::Packet * message)
+	{
+		message->SetType(rpc::Type::Request);
+		auto iter = this->mAddressUserMap.Begin();
+		for(; iter != this->mAddressUserMap.End(); iter++)
+		{
+			std::unique_ptr<rpc::Packet> request = message->Clone();
 			{
-				count++;
+				int sockId = iter->first;
+				this->Send(sockId, request.release());
 			}
 		}
-		return count;
 	}
+
 	bool OuterNetComponent::StopClient(long long userId)
 	{
-		auto iter1 = this->mUserAddressMap.find(userId);
-		if(iter1 == this->mUserAddressMap.end())
+		int id = 0;
+		if(!this->mUserAddressMap.Get(userId,  id))
 		{
 			return false;
 		}
-		const std::string & address = iter1->second;
-		auto iter2 = this->mAddressUserMap.find(iter1->second);
-		if(iter2 != this->mAddressUserMap.end())
-		{
-			this->mAddressUserMap.erase(iter2);
-		}
-		this->StartClose(address);
-		this->mUserAddressMap.erase(iter1);
+		this->mAddressUserMap.Del(id);
+		this->StartClose(id, XCode::NetActiveShutdown);
 		return true;
 	}
 }

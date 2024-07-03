@@ -1,5 +1,4 @@
 
-
 function string.split(str, reps)
     local resultStrList = {}
     string.gsub(str,'[^'..reps..']+',function ( w )
@@ -8,8 +7,8 @@ function string.split(str, reps)
     return resultStrList
 end
 
-function string.addr(addrss)
-    local res = string.split(addrss, ":")
+function string.addr(address)
+    local res = string.split(address, ":")
     if #res == 2 then
         return res[1], tonumber(res[2])
     end

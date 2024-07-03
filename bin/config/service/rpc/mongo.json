@@ -1,0 +1,63 @@
+{
+    "MongoDB.Insert": {
+        "Async": true,
+        "Request": "db.mongo.insert"
+    },
+    "MongoDB.Save": {
+        "Async": true,
+        "Request": "db.mongo.update"
+    },
+    "MongoDB.Delete": {
+        "Async": true,
+        "Request": "db.mongo.remove"
+    },
+    "MongoDB.Find": {
+        "Async": true,
+        "Request": "db.mongo.find.request",
+        "Response": "db.mongo.find.response"
+    },
+    "MongoDB.Inc": {
+        "Async": true,
+        "Request": "db.mongo.inc.request",
+        "Response": "db.mongo.inc.response"
+    },
+    "MongoDB.Count": {
+        "Async": true,
+        "Request": "db.mongo.count.request",
+        "Response": "db.mongo.count.response"
+    },
+    "MongoDB.FindOne": {
+        "Async": true,
+        "Timeout" : 2000,
+        "Request": "db.mongo.find_one.request",
+        "Response": "db.mongo.find_one.response"
+    },
+    "MongoDB.FindPage": {
+        "Async": true,
+        "Timeout" : 2000,
+        "Request": "db.mongo.find_page.request",
+        "Response": "db.mongo.find_page.response"
+    },
+    "MongoDB.Update": {
+        "Async": true,
+        "Request": "db.mongo.update"
+    },
+    "MongoDB.Updates": {
+        "Async": true,
+        "Request": "db.mongo.updates"
+    },
+    "MongoDB.SetIndex": {
+        "Async": true,
+        "Request": "db.mongo.index"
+    },
+    "MongoDB.Command": {
+        "Async": true,
+        "Request": "db.mongo.command.request",
+        "Response": "db.mongo.command.response"
+    },
+    "MongoDB.FindAndModify": {
+        "Async": true,
+        "Request": "db.mongo.find_modify.request",
+        "Response": "db.mongo.find_modify.response"
+    }
+}

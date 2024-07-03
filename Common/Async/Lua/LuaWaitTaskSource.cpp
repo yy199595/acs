@@ -5,9 +5,10 @@
 #include"XCode/XCode.h"
 #include"Entity/Actor/App.h"
 #include"Async/Lua/LuaCoroutine.h"
+#include"Yyjson/Lua/ljson.h"
 #include"Proto/Component/ProtoComponent.h"
 #include<google/protobuf/util/json_util.h>
-namespace Tendo
+namespace joke
 {
 	LuaWaitTaskSource::LuaWaitTaskSource(lua_State* lua)
 			: mRef(0), mLua(lua)
@@ -40,20 +41,46 @@ namespace Tendo
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
         Lua::Coroutine::Resume(lua_tothread(this->mLua, -1), this->mLua, 0);
 	}
-	void LuaWaitTaskSource::SetResult(int code, const std::shared_ptr<pb::Message>& response)
+
+	void LuaWaitTaskSource::SetResult(int code, rpc::Packet * response)
 	{
+		int count = 1;
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
 		lua_State* coroutine = lua_tothread(this->mLua, -1);
-		lua_pushinteger(this->mLua, (int)code);
-		if (code == XCode::Successful && response != nullptr)
+		lua_pushinteger(this->mLua, code);
+		if(code == XCode::Ok)
 		{
-			if(!App::Inst()->GetProto()->Write(this->mLua, *response))
+			switch (response->GetProto())
 			{
-				LOG_ERROR("write response message to lua fail : " << response->GetTypeName());
+				case rpc::Porto::Json:
+				{
+					++count;
+					const std::string& json = response->GetBody();
+					lua::yyjson::write(this->mLua, json.c_str(), json.size());
+				}
+					break;
+				case rpc::Porto::Protobuf:
+				{
+					std::string name;
+					if(response->TempHead().Del("res", name))
+					{
+						pb::Message * message1 = App::Inst()->GetProto()->Temp(name);
+						if (message1 != nullptr)
+						{
+							++count;
+							response->ParseMessage(message1);
+							App::Inst()->GetProto()->Write(this->mLua, *message1);
+						}
+					}
+				}
+					break;
+				case rpc::Porto::String:
+					++count;
+					const std::string& str = response->GetBody();
+					lua_pushlstring(this->mLua, str.c_str(), str.size());
+					break;
 			}
-			Lua::Coroutine::Resume(coroutine, this->mLua, 2);
-			return;
 		}
-		Lua::Coroutine::Resume(coroutine, this->mLua, 1);
+		Lua::Coroutine::Resume(coroutine, this->mLua, count);
 	}
 }

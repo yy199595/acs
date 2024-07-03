@@ -84,24 +84,23 @@ namespace Lua
 			printError(L, "%s", "-------------------------");
 		}
 
-		inline std::string GetCurrentStack(lua_State* luaEnv)
+		inline std::string GetCurrentStack(lua_State* luaEnv, int level = 1)
 		{
-			int level = 1;
 			lua_Debug debugInfo;
 			std::string retstring;
-			while (lua_getstack(luaEnv, level, &debugInfo) == 0)
+			while(lua_getstack(luaEnv, level, &debugInfo))
 			{
-				lua_getinfo(luaEnv, "", &debugInfo);
+				lua_getinfo(luaEnv, "Slnt", &debugInfo);
 				char buffer[1024] = { 0 };
 #ifdef _MSC_VER
 				size_t size = sprintf_s(buffer, "%s, %d, %s\n", debugInfo.source, debugInfo.currentline, debugInfo.what);
 #else
-				size_t size = sprintf(buffer, "%s, %d, %s\n", debugInfo.source, debugInfo.currentline, debugInfo.what);
+				size_t size = sprintf(buffer, "%s:%d %s\n", debugInfo.source, debugInfo.currentline, debugInfo.what);
 #endif// _MSC_VER
-				PrintLuaLog(std::string(buffer, size));
 				retstring.append(buffer, size);
 				level++;
 			}
+			retstring.pop_back();
 			return retstring;
 		}
 	};// namespace LuaDebugStack

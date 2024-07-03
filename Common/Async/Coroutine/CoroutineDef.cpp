@@ -1,7 +1,8 @@
 #include"CoroutineDef.h"
 #include"TaskContext.h"
 #include"Entity/Actor/App.h"
-namespace Tendo
+
+namespace joke
 {
 	TaskContextPool::~TaskContextPool()
 	{
@@ -12,50 +13,67 @@ namespace Tendo
         }
         this->mCoroutines.clear();
 	}
+
 	TaskContext * TaskContextPool::Pop()
-    {
-        TaskContext *coroutine = nullptr;
-        if(this->mCorPool.empty())
-        {
-            coroutine = new TaskContext();
-        }
-        else
-        {
-            coroutine = this->mCorPool.front();
-            coroutine->mContext = nullptr;
-            coroutine->mFunction = nullptr;
-            coroutine->mState = CorState::Ready;
-            this->mCorPool.pop();
-        }
-        coroutine->mCoroutineId = this->mNumPool.Pop();
+	{
+		TaskContext* coroutine = this->mCorPool.Pop();
+		if (coroutine == nullptr)
+		{
+			coroutine = new TaskContext();
+		}
+
+		coroutine->mContext = nullptr;
+		coroutine->mFunction = nullptr;
+		coroutine->mState = CorState::Ready;
+		coroutine->mCoroutineId = this->mNumPool.BuildNumber();
 #ifdef __COR_SHARED_STACK__
-        coroutine->sid = coroutine->mCoroutineId & (SHARED_STACK_NUM - 1);
+		coroutine->sid = coroutine->mCoroutineId & (SHARED_STACK_NUM - 1);
 #else
 		coroutine->mStack.size = STACK_SIZE;
 		coroutine->mStack.p = new char[STACK_SIZE];
 		assert(coroutine->mStack.p);
 		//memset(coroutine->mStack.p, STACK_SIZE, 0);
 #endif
-        this->mCoroutines.emplace(coroutine->mCoroutineId, coroutine);
-        return coroutine;
-    }
+		this->mCoroutines.emplace(coroutine->mCoroutineId, coroutine);
+		return coroutine;
+	}
 
 	void TaskContextPool::Push(TaskContext * coroutine)
 	{
-        unsigned int id = coroutine->mCoroutineId;
-        auto iter = this->mCoroutines.find(id);
-        if(iter != this->mCoroutines.end())
-        {
-            this->mNumPool.Push(id);
-            this->mCoroutines.erase(iter);
-        }
-        if(this->mCorPool.size() >=COR_POOL_COUNT)
-        {
-            delete coroutine;
-            return;
-        }
-        this->mCorPool.push(coroutine);
+		long long id = coroutine->mCoroutineId;
+		auto iter = this->mCoroutines.find(id);
+		if (iter != this->mCoroutines.end())
+		{
+			this->mCoroutines.erase(iter);
+		}
+		this->mCorPool.Push(coroutine);
 	}
+
+	size_t TaskContextPool::GetWaitCount() const
+	{
+		size_t count = 0;
+		auto iter = this->mCoroutines.begin();
+		for(; iter != this->mCoroutines.end(); iter++)
+		{
+			if(iter->second->mState == CorState::Suspend)
+			{
+				count++;
+			}
+		}
+		return count;
+	}
+
+	size_t TaskContextPool::GetMemory() const
+	{
+		size_t size = 0;
+		auto iter = this->mCoroutines.begin();
+		for(; iter != this->mCoroutines.end(); iter++)
+		{
+			size += iter->second->mStack.size;
+		}
+		return size;
+	}
+
 	TaskContext * TaskContextPool::Get(unsigned int id)
 	{
         auto iter = this->mCoroutines.find(id);
@@ -63,12 +81,12 @@ namespace Tendo
 	}
 }
 
-namespace Tendo
+namespace joke
 {
 	CoroutineGroup::CoroutineGroup()
 	{
         this->mCoroutineId = 0;
-        this->mCorComponent = App::Inst()->GetCoroutine();
+        this->mCorComponent = App::Inst()->Coroutine();
 	}
 
     CoroutineGroup::~CoroutineGroup()
@@ -88,11 +106,11 @@ namespace Tendo
     {
         if (coroutine != nullptr)
         {
-            coroutine->mGroup = this->shared_from_this();
+
         }
     }
 
-    void CoroutineGroup::WaitConmlete()
+    void CoroutineGroup::WaitComplete()
     {
         this->mCorComponent->YieldCoroutine(this->mCoroutineId);
     }

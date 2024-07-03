@@ -3,7 +3,7 @@
 #include"TimerBase.h"
 #include"Lua/Engine/Define.h"
 #include"Rpc/Method/MethodProxy.h"
-namespace Tendo
+namespace joke
 {
 	class DelayTimer : public TimerBase
 	{
@@ -18,25 +18,21 @@ namespace Tendo
 	};
 }// namespace Sentry
 
-namespace Tendo
+namespace joke
 {
 	class LuaTimer final : public TimerBase
 	{
 	public:
-		LuaTimer(long long ms, int ref, lua_State * lua)
+		LuaTimer(lua_State * lua, int ref, long long ms)
 			: TimerBase(ms), ref(ref), mLua(lua) { }
-			~LuaTimer() final { luaL_unref(this->mLua, LUA_REGISTRYINDEX, ref);}
+		LuaTimer(lua_State * lua, int ref, std::string func, long long ms)
+				: TimerBase(ms), ref(ref), mMethod(std::move(func)), mLua(lua) { }
+		~LuaTimer() override { luaL_unref(this->mLua, LUA_REGISTRYINDEX, ref);}
 	public:
-		void Invoke() final
-		{
-			lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, ref);
-			if (lua_pcall(this->mLua, 0, 0, 0) != 0)
-			{
-				luaL_error(this->mLua, "[call function ] = %s", lua_tostring(this->mLua, -1));
-			}
-		}
+		void Invoke() final;
 	private:
 		int ref;
 		lua_State * mLua;
+		std::string mMethod;
 	};
 }

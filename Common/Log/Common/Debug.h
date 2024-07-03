@@ -8,14 +8,15 @@
 #endif //APP_CONSOLE_H
 
 #include<string>
-#include"spdlog/common.h"
+#include"Level.h"
+#include"spdlog/fmt/fmt.h"
+
 namespace Debug
 {
-    typedef spdlog::level::level_enum Level;
 	extern void LuaError(const char * str);
 	extern int Backtrace(std::string & trace);
-	extern void Log(Debug::Level color, const std::string & log);
-    extern void Console(Debug::Level color, const std::string & log);
-	extern void Print(Debug::Level color, const std::string & log);
-
+	extern void Console(const custom::LogInfo & log);
+	extern void Console(custom::LogLevel level, int code);
+	extern void Log(std::unique_ptr<custom::LogInfo> log);
+	extern void Print(custom::LogLevel level, const std::string & log);
 }

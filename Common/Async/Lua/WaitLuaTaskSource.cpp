@@ -3,7 +3,7 @@
 //
 
 #include"WaitLuaTaskSource.h"
-namespace Tendo
+namespace joke
 {
 	WaitLuaTaskSource::WaitLuaTaskSource()
 	{
@@ -13,7 +13,10 @@ namespace Tendo
 
 	WaitLuaTaskSource::~WaitLuaTaskSource()
 	{
-		lua_unref(this->mLua, this->ref);
+		if(this->ref != 0)
+		{
+			lua_unref(this->mLua, this->ref);
+		}
 	}
 
 	int WaitLuaTaskSource::SetResult(lua_State* lua)

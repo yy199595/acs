@@ -4,8 +4,8 @@
 #ifdef __DEBUG__
 #include"Util/Time/TimeHelper.h"
 #endif
-using namespace std::chrono;
-namespace Tendo
+
+namespace joke
 {
 	void MainEntry(tb_context_from_t context)
 	{
@@ -20,10 +20,11 @@ namespace Tendo
 	{
 		this->mRunContext = nullptr;
 		this->mMainContext = nullptr;
+		this->mTimerComponent = nullptr;
 	}
 
 	void CoroutineComponent::RunTask(tb_context_t context)
-	{
+    {
 		this->mMainContext = context;
 		if (this->mRunContext != nullptr)
 		{
@@ -50,57 +51,65 @@ namespace Tendo
 			stack.co = 0;
 			stack.size = STACK_SIZE;
 			stack.p = new char[STACK_SIZE];
+			memset(stack.p, 0, STACK_SIZE);
 			stack.top = (char*)stack.p + STACK_SIZE;
 		}
 #endif
         return true;
 	}
 
-	void CoroutineComponent::Sleep(unsigned int ms)
+	bool CoroutineComponent::LateAwake()
 	{
-        TimerComponent * timerComponent = this->mApp->GetTimer();
-        if(timerComponent != nullptr && ms > 0)
-        {
-            unsigned int id = this->mRunContext->mCoroutineId;
-            StaticMethod *sleepMethod = NewMethodProxy(
-					&CoroutineComponent::Resume, this, id);
-            timerComponent->AddTimer(ms, sleepMethod);
-			assert(this->YieldCoroutine());
-        }
+		this->mTimerComponent = this->GetComponent<TimerComponent>();
+		return true;
 	}
 
-	void CoroutineComponent::ResumeContext(TaskContext* co)
+	void CoroutineComponent::OnRecord(json::w::Document& document)
 	{
-		co->mState = CorState::Running;
-#ifdef __COR_SHARED_STACK__
-		Stack& stack = mSharedStack[co->sid];
-#else
-		Stack& stack = co->mStack;
-#endif
-		if (co->mContext == nullptr)
+		std::unique_ptr<json::w::Value> data = document.AddObject("coroutine");
 		{
-#ifdef __COR_SHARED_STACK__
-			if (stack.co != co->mCoroutineId)
+			data->Add("count", this->mCorPool.GetCount());
+			data->Add("memory", this->mCorPool.GetMemory());
+			data->Add("wait", this->mCorPool.GetWaitCount());
+		}
+	}
+
+	void CoroutineComponent::Sleep(unsigned int ms)
+	{
+		unsigned int id = this->mRunContext->mCoroutineId;
+		this->mTimerComponent->DelayCall((int)ms, [this, id]
+		{
+			this->Resume(id);
+		});
+		this->YieldCoroutine();
+	}
+
+	void CoroutineComponent::RunCoroutine(TaskContext * coroutine)
+	{
+		this->mRunContext = coroutine;
+		this->mRunContext->mState = CorState::Running;
+		Stack& stack = mSharedStack[this->mRunContext->sid];
+		if (this->mRunContext->mContext == nullptr)
+		{
+			if (stack.co != this->mRunContext->mCoroutineId)
 			{
 				this->SaveStack(stack.co);
-				stack.co = co->mCoroutineId;
+				stack.co = this->mRunContext->mCoroutineId;
 			}
-#endif
 			this->mRunContext->mContext = tb_context_make(stack.p, stack.size, MainEntry);
 		}
-#ifdef __COR_SHARED_STACK__
-		else if (stack.co != co->mCoroutineId)
+		else if (stack.co != this->mRunContext->mCoroutineId)
 		{
 			this->SaveStack(stack.co);
-			stack.co = co->mCoroutineId;
-            memcpy(co->mContext, co->mStack.p, co->mStack.size);
+			stack.co = this->mRunContext->mCoroutineId;
+            memcpy(this->mRunContext->mContext, this->mRunContext->mStack.p, this->mRunContext->mStack.size);
 		}
-#endif
-		tb_context_from_t from = tb_context_jump(co->mContext, this);
+		tb_context_from_t from = tb_context_jump(this->mRunContext->mContext, this);
 		if (from.priv != nullptr)
 		{
 			this->mRunContext->mContext = from.ctx;
 		}
+		this->mRunContext = nullptr;
 	}
 
 	bool CoroutineComponent::YieldCoroutine() const
@@ -113,13 +122,31 @@ namespace Tendo
 
 	void CoroutineComponent::Resume(unsigned int id)
 	{
-        assert(this->mApp->IsMainThread());
-        if(this->mCorPool.Get(id) == nullptr)
-        {
-            LOG_FATAL("try resume context id : " << id);
-            return;
-        }
-        this->mResumeContexts.push(id);
+		if(!this->mApp->IsMainThread())
+		{
+			LOG_FATAL("coroutine id={}", id)
+			return;
+		}
+		TaskContext* coroutine = this->mCorPool.Get(id);
+		if (coroutine == nullptr)
+		{
+			LOG_FATAL("try resume context id : {}", id);
+			return;
+		}
+		switch (coroutine->mState)
+		{
+			case CorState::Ready:
+			case CorState::Suspend:
+				this->mResumeContexts.push(coroutine);
+				break;
+			default:
+#ifdef __DEBUG__
+				assert(false);
+#else
+				LOG_FATAL("coroutine id:{} status:{}", id, (int)coroutine->mState);
+				break;
+#endif
+		}
 	}
 
 	TaskContext* CoroutineComponent::MakeContext(StaticMethod* func)
@@ -144,13 +171,13 @@ namespace Tendo
 		return false;
 	}
 
-#ifdef 	__COR_SHARED_STACK__
 	void CoroutineComponent::SaveStack(unsigned int id)
 	{
 		if (id == 0) return;
 		TaskContext* coroutine = this->mCorPool.Get(id);
 		if (coroutine == nullptr)
 		{
+			LOG_ERROR("coroutine context is null {}", id);
 			return;
 		}
         char* top = this->mSharedStack[coroutine->sid].top;
@@ -161,36 +188,23 @@ namespace Tendo
             assert(coroutine->mStack.p);
         }
         coroutine->mStack.size = size;
-		//LOG_WARN("coroutine stack size : "<< size);
         memcpy(coroutine->mStack.p, coroutine->mContext, coroutine->mStack.size);
     }
-#endif
 
 	void CoroutineComponent::OnSystemUpdate()
 	{
-		unsigned int contextId = 0;
         while(!this->mResumeContexts.empty())
         {
-            contextId = this->mResumeContexts.front();
-            TaskContext* logicCoroutine = this->mCorPool.Get(contextId);
-            if(logicCoroutine == nullptr)
-            {
-                LOG_FATAL("not find task context : " << contextId);
-                continue;
-            }
-			switch(logicCoroutine->mState)
+            this->mRunContext = this->mResumeContexts.front();
 			{
-				case CorState::Ready:
-				case CorState::Suspend:
-					this->mRunContext = logicCoroutine;
-					this->ResumeContext(logicCoroutine);
-					break;
-				default:
-					assert(false);
-					break;
+				this->mResumeContexts.pop();
+				if(this->mRunContext == nullptr)
+				{
+					LOG_FATAL("not find task context");
+					continue;
+				}
 			}
-            this->mRunContext = nullptr;
-            this->mResumeContexts.pop();
+			this->RunCoroutine(this->mRunContext);
         }
 	}
 	void CoroutineComponent::OnLastFrameUpdate()
@@ -201,7 +215,7 @@ namespace Tendo
 			TaskContext* coroutine = this->mCorPool.Get(id);
 			if (coroutine != nullptr)
 			{
-				this->mResumeContexts.push(id);
+				this->RunCoroutine(coroutine);
 			}
 			this->mLastQueues.pop();
 		}
@@ -221,6 +235,6 @@ namespace Tendo
 				waitContext->Add(coroutine);
 			}
 		}
-		waitContext->WaitConmlete();
+		waitContext->WaitComplete();
 	}
 }

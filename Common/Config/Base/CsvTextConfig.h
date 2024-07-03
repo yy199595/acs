@@ -5,9 +5,8 @@
 #ifndef APP_COMMON_SERVER_CONFIG_CSVTEXTCONFIG_H
 #define APP_COMMON_SERVER_CONFIG_CSVTEXTCONFIG_H
 #include"TextConfig.h"
-#include<vector>
-
-namespace Tendo
+#include<unordered_map>
+namespace joke
 {
 	class CsvLineData
 	{
@@ -23,7 +22,7 @@ namespace Tendo
 	};
 }
 
-namespace Tendo
+namespace joke
 {
 	class CsvTextConfig : public ITextConfig
 	{
@@ -37,9 +36,8 @@ namespace Tendo
 		virtual bool OnLoadLine(const CsvLineData & lineData) = 0;
 		virtual bool OnReLoadLine(const CsvLineData & lineData) = 0;
 	private:
-		std::string mMd5;
 		std::string mName;
-		std::string mPath;
+		long long mLastWriteTime;
 	};
 }
 

@@ -269,7 +269,7 @@ void CopyingInputStreamAdaptor::BackUp(int count) {
     << " Can't back up over more bytes than were returned by the last call"
        " to Next().";
   GOOGLE_CHECK_GE(count, 0)
-    << " Parameter to BackUp() can't be negative.";
+    << " FromData to BackUp() can't be negative.";
 
   backup_bytes_ = count;
 }

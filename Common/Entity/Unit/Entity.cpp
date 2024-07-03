@@ -1,7 +1,7 @@
 #include"Entity.h"
 #include"Entity/Actor/App.h"
 #include"Entity/Component/Component.h"
-namespace Tendo
+namespace joke
 {
 	Entity::Entity(long long id) : mEntityId(id)
 	{

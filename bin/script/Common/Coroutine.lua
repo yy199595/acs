@@ -1,40 +1,28 @@
 local xpcall = _G.xpcall
-local start_cor = coroutine.start
+
 local log_error = require("Log").OnError
+local coroutine_start = coroutine.start
 local new_task_source = WaitLuaTaskSource.New
 
-function coroutine.wakeup(cor, ...)
-    local res, ret = coroutine.resume(cor, ...)
-    assert(res, ret)
-    return ret
-end
-
-function coroutine.start(func, ...)
-    local co = coroutine.create(func)
-    coroutine.resume(co, ...)
-    return co
-end
-
-local callback = function(func, taskSource, ...)
-
-    local status, ret = xpcall(func, log_error, ...)
-    if not status then
-        taskSource:SetResult(nil)
-        return
-    end
-    taskSource:SetResult(ret)
-end
-
 function coroutine.call(class, name, ...)
+
     local func = class[name]
     if func == nil then
         return
     end
     local luaTaskSource = new_task_source()
-    start_cor(callback, func, luaTaskSource, class, ...)
+
+    coroutine_start(function(...)
+        local status, ret = xpcall(func, log_error, class, ...)
+        if not status then
+            luaTaskSource:SetResult(nil)
+            return
+        end
+        luaTaskSource:SetResult(ret)
+    end, ...)
+
     return luaTaskSource
 end
-
 
 function coroutine.rpc(func, request, taskSource)
     local context = function()
@@ -56,7 +44,7 @@ function coroutine.http(func, request, taskSource)
         if not state then
             json.error = error
             json.code = XCode.CallLuaFunctionFail
-        elseif error ~= XCode.Successful then
+        elseif error ~= XCode.Ok then
             json.code = error
             json.error = response
         else
@@ -66,5 +54,5 @@ function coroutine.http(func, request, taskSource)
         end
         taskSource:SetHttp(json.code, json)
     end
-    coroutine.start(context)
+    coroutine_start(context)
 end

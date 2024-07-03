@@ -2,12 +2,12 @@
 // Created by yjz on 2022/4/5.
 //
 
-#ifndef _LUACOROUTINE_H_
-#define _LUACOROUTINE_H_
+#ifndef APP_LUACOROUTINE_H
+#define APP_LUACOROUTINE_H
 #include"Lua/Engine/Define.h"
 namespace Lua
 {
-	namespace Coroutine
+    namespace Coroutine
 	{
 		extern int Sleep(lua_State * lua);
 		extern int Start(lua_State * lua);
@@ -16,4 +16,4 @@ namespace Lua
 	}
 }
 
-#endif //_LUACOROUTINE_H_
+#endif //APP_LUACOROUTINE_H

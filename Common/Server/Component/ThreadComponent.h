@@ -1,41 +1,42 @@
 ﻿#pragma once
-#include<list>
-#include<string>
-#include"Network/Tcp/SocketProxy.h"
+
+#include"Network/Tcp/Socket.h"
+#include"Core/Queue/ThreadQueue.h"
+#include"Core/Thread/AsioThread.h"
 #include"Entity/Component/Component.h"
 
-namespace Tendo
-{
-    class AsioThread
-    {
-    public:
-        AsioThread();
-    public:
-        void Run();
-        Asio::Context & Context() { return *mContext; }
-    private:
-        std::thread* mThread;
-        Asio::Context * mContext;
-    };
-}
+#ifdef __ENABLE_OPEN_SSL__
+#include<asio/ssl.hpp>
+#endif
 
-namespace Tendo
+namespace joke
 {
-	class ThreadComponent : public Component, public IDestroy
+	class ThreadComponent final : public Component
 	{
-	 public:
+	public:
 		ThreadComponent() = default;
-	 public:
+		~ThreadComponent() final;
+	public:
+		Asio::Context& GetContext();
+		tcp::Socket* CreateSocket();
+		tcp::Socket* CreateSocket(const std::string & addr);
+		tcp::Socket* CreateSocket(const std::string& ip, unsigned short port);
+		void CreateSockets(std::queue<tcp::Socket*> & sockets, int count = 10);
+#ifdef __ENABLE_OPEN_SSL__
+		tcp::Socket* CreateSocket(Asio::ssl::Context & ssl);
+		void CreateSockets(std::queue<tcp::Socket*>& sockets, Asio::ssl::Context& ssl, int count = 10);
+#endif
+	public:
+		void CloseThread();
+	private:
 		bool Awake() final;
-		void OnDestroy() final;
-    public:
-        Asio::Context& GetContext();
-        std::shared_ptr<Tcp::SocketProxy> CreateSocket();
-		std::shared_ptr<Tcp::SocketProxy> CreateSocket(const std::string & ip, unsigned short port);
-    private:
+	private:
 #ifndef ONLY_MAIN_THREAD
-        std::mutex mMutex;
-        std::list<AsioThread *> mNetThreads;
+		int mThreadCount;
+		custom::ThreadQueue<custom::AsioThread *> mNetThreads;
+#else
+		std::unique_ptr<Asio::Context> mContext;
+		std::unique_ptr<Asio::ContextWork> mWork;
 #endif
 	};
 }

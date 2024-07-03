@@ -1,0 +1,33 @@
+{
+    "MysqlDB.Add": {
+        "Async": true,
+        "Request": "db.mysql.add"
+    },
+    "MysqlDB.Save": {
+        "Async": true,
+        "Request": "db.mysql.save"
+    },
+    "MysqlDB.Exec": {
+        "Async": true,
+        "Request": "db.mysql.exec",
+        "Response": "db.mysql.response"
+    },
+    "MysqlDB.Query": {
+        "Async": true,
+        "Request": "db.mysql.query",
+        "Response": "db.mysql.response"
+    },
+    "MysqlDB.Update": {
+        "Async": true,
+        "Request": "db.mysql.update"
+    },
+    "MysqlDB.Create": {
+        "Async": true,
+        "Request": "db.mysql.create"
+    },
+    "MysqlDB.Delete": {
+        "Async": true,
+        "Type": "Server",
+        "Request": "db.mysql.remove"
+    }
+}

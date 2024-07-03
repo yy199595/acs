@@ -4,58 +4,72 @@
 
 #include"Login.h"
 #include"Entity/Actor/App.h"
+#include"Core/Event/IEvent.h"
 #include"Lua/Module/LuaModule.h"
-#include"Rpc/Component/InnerNetComponent.h"
-namespace Tendo
+#include"Master/Component/MasterComponent.h"
+namespace joke
 {
+	Login::Login()
+	{
+		this->mActorComponent = nullptr;
+		this->mMasterComponent = nullptr;
+	}
+
 	bool Login::OnInit()
 	{
-		BIND_COMMON_RPC_METHOD(Login::OnLogin);
-		BIND_COMMON_RPC_METHOD(Login::OnLogout);
+		BIND_SERVER_RPC_METHOD(Login::OnLogin);
+		BIND_SERVER_RPC_METHOD(Login::OnLogout);
 		this->mActorComponent = this->mApp->ActorMgr();
+		this->mApp->GetComponents(this->mLoginComponents);
+		this->mMasterComponent = this->GetComponent<MasterComponent>();
 		return true;
 	}
 
     int Login::OnLogin(long long id, const s2s::login::request & request)
 	{
 		long long playerId = request.user_id();
-		PlayerActor * player = this->mActorComponent->GetPlayer(playerId);
+		Player * player = this->mActorComponent->GetPlayer(playerId);
 		if(player == nullptr)
 		{
-			int gateId = (int)id;
-			std::shared_ptr<PlayerActor> newPlayer = std::make_shared<PlayerActor>(playerId, gateId);
+			player = new Player(playerId, id);
 			{
-				player = newPlayer.get();
-				this->mActorComponent->AddPlayer(newPlayer);
+				this->mActorComponent->AddPlayer(player);
 			}
 		}
 		for(const auto & actorInfo : request.actors())
 		{
-			player->AddAddr(actorInfo.first, actorInfo.second);
-		}
-		Lua::LuaModule * luaModule = this->GetLuaModule();
-		if(luaModule != nullptr)
-		{
-			int code = luaModule->Await("_OnLogin", playerId);
-			if(code == XCode::CallLuaFunctionFail)
+			int actorId = actorInfo.second;
+			const std::string & name = actorInfo.first;
+			if(!this->mActorComponent->HasServer(actorId))
 			{
-				this->mActorComponent->DelActor(playerId);
-				return code;
+				if(!this->mMasterComponent->SyncServer(actorId))
+				{
+					LOG_ERROR("not find server : {}", actorId);
+					return XCode::NotFoundServerRpcAddress;
+				}
 			}
+			player->AddAddr(name, actorId);
 		}
-		return XCode::Successful;
+
+		Lua::LuaModule * luaModule = this->GetLuaModule();
+		if(luaModule->HasFunction("_OnLogin"))
+		{
+			luaModule->Await("_OnLogin", playerId);
+		}
+
+		help::PlayerLoginEvent::Trigger(playerId);
+		return XCode::Ok;
 	}
 
     int Login::OnLogout(long long id, const s2s::logout::request& request)
     {
 		long long playerId = request.user_id();
     	this->mActorComponent->DelActor(playerId);
-		Lua::LuaModule * luaModule = this->GetLuaModule();
-		if(luaModule != nullptr)
+		for(ILogin * loginComponent : this->mLoginComponents)
 		{
-			luaModule->Await("_OnLogout", playerId);
+			loginComponent->OnLogout(playerId);
 		}
-		return XCode::Successful;
+		help::PlayerLogoutEvent::Trigger(playerId);
+		return XCode::Ok;
     }
-
 }

@@ -5,18 +5,15 @@
 ---
 
 local Log = { }
-
-local logger = require("Logger")
-local debug_getinfo = debug.getinfo
-local debug_traceback = debug.traceback
+local pcall = xpcall
+local string_fmt = string.format
 local console = require("Console")
-local fmt = console.FormatLog
+local logger = require("util.logger")
+local debug_traceback = debug.traceback
 
-function Log.Info(...)
-    local runInfo = debug_getinfo(2)
-    local message = fmt(runInfo, ...)
-    console.Show(console.LogDebug, message)
-    logger.Output(console.LogDebug, message)
+function Log.Info(fmt, ...)
+    local message = string_fmt(fmt, ...)
+    logger.Output(console.LogInfo, message)
 end
 
 function Log.OnError(error_msg)
@@ -26,43 +23,32 @@ function Log.OnError(error_msg)
         error_msg = string.sub(error_msg, pos + 1)
     end
     local message = debug_traceback(error_msg, 2)
-    console.Show(console.LogError, message)
     logger.Output(console.LogError, message)
 end
 
-function Log.Debug(...)
-    local runInfo = debug_getinfo(2)
-    local message = console.FormatLog(runInfo, ...)
-    console.Show(console.LogDebug, message)
+function Log.Debug(fmt, ...)
+    local message = string_fmt(fmt, ...)
     logger.Output(console.LogDebug, message)
 end
 
 function Log.Stack(err)
     local stack = debug_traceback(err, 5)
-    console.Show(console.LogError, stack)
     logger.Output(console.LogError, stack)
 end
 
-function Log.Warning(...)
-    local runInfo = debug_getinfo(2)
-    local message = fmt(runInfo, ...)
-    console.Show(console.LogWarn, message)
+function Log.Warning(fmt, ...)
+    local message = string_fmt(fmt, ...)
     logger.Output(console.LogWarn, message)
 end
 
-function Log.Error(...)
-    local runInfo = debug_getinfo(2)
-    local message = fmt(runInfo, ...)
-    --message = debug_traceback() .. message
-    console.Show(console.LogError, message)
+function Log.Error(fmt, ...)
+    local message = string_fmt(fmt, ...)
     logger.Output(console.LogError, message)
 end
 
-function Log.Fatal(...)
-    local runInfo = debug_getinfo(2)
-    local message = fmt(runInfo, ...)
-    message = debug.traceback() .. message
-    console.Show(console.LogFatal, message)
+function Log.Fatal(fmt, ...)
+    local msg = string_fmt(fmt, ...)
+    local message = debug_traceback() .. msg
     logger.Output(console.LogFatal, message)
 end
 

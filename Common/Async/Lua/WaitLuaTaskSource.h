@@ -2,11 +2,11 @@
 // Created by mac on 2022/3/31.
 //
 
-#ifndef SERVER_WAITLUATASKSOURCE_H
-#define SERVER_WAITLUATASKSOURCE_H
+#ifndef APP_WAITLUATASKSOURCE_H
+#define APP_WAITLUATASKSOURCE_H
 #include"Lua/Engine/LuaParameter.h"
 #include"Async/Source/TaskSource.h"
-namespace Tendo
+namespace joke
 {
 	// 在c++中等待lua完成
 	class WaitLuaTaskSource final : public WaitTaskSourceBase
@@ -30,4 +30,4 @@ namespace Tendo
 		return Lua::Parameter::Read<T>(this->mLua, -1);
 	}
 }
-#endif //SERVER_WAITLUATASKSOURCE_H
+#endif //APP_WAITLUATASKSOURCE_H

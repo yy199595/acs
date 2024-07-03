@@ -8,25 +8,36 @@
 #endif //APP_SYSTEM_H
 #include<string>
 #include<unordered_map>
-namespace Tendo
+namespace joke
 {
+
+	class SystemInfo
+	{
+	public:
+		double cpu = 0;
+		long long use_memory = 0;
+		long long max_memory = 0;
+	};
+
     class System
     {
     public:
         static bool Init(int argc, char **argv);
-        static std::string FormatPath(const std::string & path);
-        static const std::string & ExePath() { return System::mExePath; }
+		static void GetSystemInfo(SystemInfo & systemInfo);
+		static std::string FormatPath(const std::string & path);
         static const std::string & WorkPath() { return System::mWorkPath; }
 	public:
+        static bool HasEnv(const std::string& k);
 		static bool GetEnv(const std::string & k, int & v);
 		static bool GetEnv(const std::string & k, std::string & v);
 		static void SetEnv(const std::string & k, const std::string & v);
-    public:
-        static bool SubValue(std::string& value);
-        static bool AddValue(const std::string& key, std::string& value);
+		static bool AddValue(const std::string& key, std::string& value);
+		static bool ReadFile(const std::string & path, std::string & content);
+	public:
+		static void LuaSetEnv(const char * key, const char * val);
 	private:
-        static bool IsInit;
-        static std::string mExePath;
+        static bool SubValue(std::string& value);
+	private:
         static std::string mWorkPath;
 		static std::unordered_map<std::string, std::string> mSubValues;
 	};

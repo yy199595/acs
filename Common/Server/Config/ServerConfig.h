@@ -1,47 +1,30 @@
 #pragma once
-
-#include<set>
-#include<vector>
 #include<string>
 #include<unordered_map>
-#include"Util/Json/JsonReader.h"
-#include"Config/Base/TextConfig.h"
+#include"Config/Base/JsonConfig.h"
 #include"Core/Singleton/Singleton.h"
-namespace Tendo
+
+namespace joke
 {
-    struct ListenConfig
-    {
-    public:
-        std::string Ip;
-        std::string Net;
-        unsigned short Port = 0;
-    };
-
-
-    class ServerConfig : public Json::Reader, public TextConfig, public ConstSingleton<ServerConfig>
+	class ServerConfig : public JsonConfig, public ConstSingleton<ServerConfig>
     {
     public:
         explicit ServerConfig();
-    public:
-		bool GetListen(std::vector<std::string> & names) const;
-		bool GetListen(const std::string & name, unsigned short & port) const;
-		bool GetListen(const std::string & name, std::string & net, unsigned short & port) const;
-		bool GetLocation(const char * name, std::string & location) const;
-    protected:
-        bool OnLoadText(const char *str, size_t length) final;
-        bool OnReloadText(const char *str, size_t length) final;
-	 public:
-		int GroupId() const { return this->mGroupId; }
-		int ServerId() const { return this->mServerId;}
+	private:
+		bool OnLoadJson() final;
+		bool OnReLoadJson() final;
+		bool OnLoadText(const char *str, size_t length) final;
+		bool OnReloadText(const char *str, size_t length) final;
+	private:
+		static void Append(json::w::Value & document, json::r::Value & doc);
+	public:
 		const std::string& Name() const { return this->mName; } //服务器名字
-		const std::string & GetContent() const { return this->mContent;}
 		bool GetPath(const std::string & name, std::string & path) const;
+		const std::string & GetSecretKey() const { return this->mSecret; }
+		std::unique_ptr<json::r::Document> Read(const std::string & name) const;
     private:
-		int mGroupId;
-		int mServerId;
         std::string mName;
-		std::string mContent;
-        std::unordered_map<std::string, ListenConfig> mListens;
+		std::string mSecret;
         std::unordered_map<std::string, std::string> mPaths;
         std::unordered_map<std::string, std::string> mLocations;
     };

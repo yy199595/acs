@@ -3,8 +3,8 @@
 //
 
 #include"CodeConfig.h"
-#include"Util/String/StringHelper.h"
-namespace Tendo
+#include"Util/String/String.h"
+namespace joke
 {
 
     bool CodeConfig::OnLoadLine(const CsvLineData& lineData)

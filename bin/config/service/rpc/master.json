@@ -1,0 +1,16 @@
+{
+    "Master.Ping": {
+        "Async": true
+    },
+    "Master.Find": {
+        "Async": true,
+        "Request": "reg.query.request"
+    },
+    "Master.Push": {
+        "Async": true,
+        "Request": "com.type.json"
+    },
+    "Master.Del": {
+        "Async": true
+    }
+}

@@ -1,47 +1,85 @@
 {
-    "Gate": {
+    "gate": {
         "AutoAllot": false,
         "Service": [
             "Gate",
             "Node"
+        ],
+        "Component": [
+            "HttpComponent",
+            "MasterComponent"
         ]
     },
-    "Chat": {
+    "chat": {
         "AutoAllot": true,
         "Service": [
             "Login",
             "Node",
             "Chat"
+        ],
+        "Component": [
+            "GateComponent",
+            "RedisComponent",
+            "HttpComponent",
+            "MasterComponent"
         ]
     },
-    "Http": {
+    "http": {
         "AutoAllot": false,
         "Service": [
             "Node",
-            "Account"
+            "UserManager",
+            "AccountManager",
+            "ActivityManager",
+
+            "UserLogin",
+            "UserActivity",
+            "UserBaseData",
+
+            "Oss",
+            "City",
+            "Node",
+            "Admin",
+            "LogMgr",
+            "CityMgr",
+            "Collection",
+            "ResourceMgr",
+            "UserOrder",
+            "VipManager",
+            "OrderManager"
         ],
         "Component": [
             "HttpComponent",
             "RedisComponent",
-            "HttpWebComponent",
-            "HttpDebugComponent"
+            "MongoComponent",
+            "MasterComponent",
+            "HttpWebComponent"
         ]
     },
-    "Data": {
+    "data": {
         "AutoAllot": false,
         "Service": [
             "Node",
             "MongoDB"
         ],
         "Component": [
-            "RedisComponent"
+            "HttpComponent",
+            "RedisComponent",
+            "MasterComponent"
         ]
     },
-    "Center": {
+    "cent": {
         "AutoAllot": false,
         "Service": [
             "Node",
-            "ServerRegistry"
+            "Master"
+        ],
+        "Component": [
+            "HttpComponent",
+            "RedisComponent",
+            "SqliteComponent",
+            "HttpWebComponent",
+            "MasterComponent"
         ]
     }
 }

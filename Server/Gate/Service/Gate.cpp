@@ -3,17 +3,19 @@
 //
 
 #include"Gate.h"
+#include"Core/Event/IEvent.h"
 #include"Entity/Actor/App.h"
+#include"Core/System/System.h"
 #include"Common/Service/Login.h"
-#include"Gate/Client/OuterNetTcpClient.h"
+#include"Gate/Client/OuterClient.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include"Server/Config/CodeConfig.h"
+#include"Http/Component/HttpComponent.h"
 #include"Gate/Component/OuterNetComponent.h"
-namespace Tendo
+namespace joke
 {
     Gate::Gate()
     {
-		this->mIndex = 0;
 		this->mActorComponent = nullptr;
         this->mOuterComponent = nullptr;
     }
@@ -25,134 +27,135 @@ namespace Tendo
 
     bool Gate::OnInit()
     {
-		BIND_COMMON_RPC_METHOD(Gate::Ping);
-		BIND_COMMON_RPC_METHOD(Gate::Enter);
-		BIND_COMMON_RPC_METHOD(Gate::Login);
-		BIND_COMMON_RPC_METHOD(Gate::Logout);
+		BIND_PLAYER_RPC_METHOD(Gate::Ping);
+		BIND_PLAYER_RPC_METHOD(Gate::Login);
+		BIND_PLAYER_RPC_METHOD(Gate::Logout);
 		this->mActorComponent = this->mApp->ActorMgr();
-		const ServerConfig* config = ServerConfig::Inst();
 		this->mOuterComponent = this->GetComponent<OuterNetComponent>();
-		LOG_CHECK_RET_FALSE(config->GetLocation("rpc", this->mInnerAddress));
-		LOG_CHECK_RET_FALSE(config->GetLocation("gate", this->mOuterAddress));
 		return true;
     }
 
 	int Gate::Ping(long long userId)
 	{
-		return XCode::Successful;
-	}
-
-	int Gate::Enter(const s2s::allot_request &request)
-    {
-		long long userId = request.user_id();
-		const std::string & token = request.token();
-		if(this->mTokens.find(token) != this->mTokens.end())
-		{
-			return XCode::Failure;
-		}
-
-		this->mTokens.emplace(token, userId);
-		const std::string & server = this->GetServer();
-		const std::string & address = this->mInnerAddress;
-		if(this->mActorComponent->GetActor(userId) != nullptr) //玩家在线
-		{
-			return XCode::PlayerOnLine;
-		}
-		return XCode::Successful;
-    }
-	int Gate::Login(const Msg::Packet& packet)
-	{
-		std::string address;
-		if(!packet.ConstHead().Get("cli", address))
-		{
-			return XCode::CallArgsError;
-		}
-		const std::string & token = packet.GetBody();
-		auto iter = this->mTokens.find(token);
-		if(iter == this->mTokens.end())
+		if(!this->mActorComponent->HasPlayer(userId))
 		{
 			return XCode::NotFindUser;
 		}
-		long long userId = iter->second;
-		this->mTokens.erase(iter);
-		int code = this->OnLogin(userId, token);
-		if(code != XCode::Successful)
-		{
-			this->mActorComponent->DelActor(userId);
-			return code;
-		}
-		this->mOuterComponent->BindClient(address, userId);
-		LOG_INFO("user:" << userId << " login to gate successful");
-		return XCode::Successful;
+		return XCode::Ok;
 	}
 
-	std::shared_ptr<class PlayerActor> Gate::NewPlayer(long long userId)
+	int Gate::Login(const rpc::Packet & request)
 	{
-		int actorId = (int)this->mApp->GetActorId();
-		std::shared_ptr<PlayerActor> player = std::make_shared<PlayerActor>(userId, actorId);
-		{
-			player->AddAddr(this->GetServer(), actorId);
-		}
-		return player;
-	}
-
-	int Gate::OnLogin(long long userId, const std::string & token)
-	{
+		int sockId = 0;
+		long long userId = 0;
+		std::string serverName;
 		const std::string func("Login.OnLogin");
+		const std::string & token = request.GetBody();
+		LOG_DEBUG("player login token={}", request.GetBody());
+		ClusterConfig::Inst()->GetServerName("Account", serverName);
+		Server * loginServer = this->mActorComponent->Random(serverName);
+		if(loginServer == nullptr)
+		{
+			return XCode::AddressAllotFailure;
+		}
+		LOG_ERROR_CHECK_ARGS(request.ConstHead().Get("sock", sockId));
+		std::string path = fmt::format("/account/verify?token={}", token);
+		std::unique_ptr<json::r::Document> response = std::make_unique<json::r::Document>();
+		if(loginServer->Get(path, response.get())!= XCode::Ok )
+		{
+			return XCode::Failure;
+		}
+		std::unique_ptr<json::r::Value> jsonObject;
+		if(!response->Get("data", jsonObject))
+		{
+			return XCode::Failure;
+		}
+		jsonObject->Get("player_id", userId);
+		if(this->mActorComponent->HasPlayer(userId))
+		{
+			return XCode::NotFindUser;
+		}
+		int serverId = this->mApp->GetSrvId();
+		Player * player = new Player(userId, serverId);
+		{
+			player->AddAddr(this->mApp->Name(), serverId);
+			this->mOuterComponent->AddPlayer(userId, sockId);
+			this->mActorComponent->AddPlayer(player);
+		}
+
 		std::vector<const NodeConfig *> configs;
 		ClusterConfig::Inst()->GetNodeConfigs(configs);
-		std::shared_ptr<PlayerActor> player = this->NewPlayer(userId);
 
 		s2s::login::request message;
 		message.set_user_id(userId);
+		std::vector<int> targetServers;
 		for(const NodeConfig * nodeConfig : configs)
 		{
-			if (!nodeConfig->IsAuthAllot())
-			{
-				continue;
-			}
 			const std::string & name = nodeConfig->GetName();
-			ServerActor * targetActor = this->mActorComponent->Random(name);
-			if(targetActor == nullptr)
+			Server * server = this->mActorComponent->Random(name);
+			if(server == nullptr)
 			{
-				LOG_FMT_ERR("allot server {0} fail", name);
+				LOG_ERROR("allot server {0} fail", name);
 				return XCode::AddressAllotFailure;
 			}
-			int serverId = (int)targetActor->GetActorId();
-
+			int serverId = server->GetSrvId();
+			if(nodeConfig->HasService(ComponentFactory::GetName<class Login>()))
+			{
+				targetServers.emplace_back(serverId);
+			}
 			player->AddAddr(name, serverId);
 			message.mutable_actors()->insert({name, serverId});
 		}
-		std::vector<int> actors;
-		player->GetActors(actors);
-		for(int actorId : actors)
+
+		for(const int & serverId : targetServers)
 		{
-			ServerActor * targetServer = this->mActorComponent->GetServer(actorId);
-			if(targetServer == nullptr)
+			if(Server * server = this->mActorComponent->GetServer(serverId))
 			{
-				return XCode::NotFoundActor;
-			}
-			int code = targetServer->Call(func, message);
-			if(code != XCode::Successful)
-			{
-				const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-				LOG_ERROR("call [" << func <<  "] code = " << desc);
-				return XCode::Failure;
+				int code = server->Call(func, message);
+				if(code != XCode::Ok)
+				{
+					LOG_ERROR("call {} code = {}", func, CodeConfig::Inst()->GetDesc(code));
+					return XCode::Failure;
+				}
 			}
 		}
+		LOG_INFO("user:({}) login to gate successful", userId);
+		return XCode::Ok;
+	}
 
-		this->mActorComponent->AddPlayer(player);
-		return XCode::Successful;
+	void Gate::OnDisConnect(long long id)
+	{
+		if(Player * player = this->mActorComponent->GetPlayer(id))
+		{
+			player->Send("Gate.Logout");
+		}
 	}
 
 	int Gate::Logout(long long userId)
 	{
 		this->mOuterComponent->StopClient(userId);
-		Actor * player = this->mApp->ActorMgr()->GetActor(userId);
+		Player * player = this->mActorComponent->GetPlayer(userId);
 		if(player == nullptr)
 		{
 			return XCode::NotFindUser;
 		}
-		return XCode::Successful;
+		std::vector<int> servers;
+		player->GetActors(servers);
+		for (const int serverId : servers)
+		{
+			if (Server * server = this->mActorComponent->GetServer(serverId))
+			{			
+				const std::string& name = server->Name();
+				const NodeConfig * nodeConfig = ClusterConfig::Inst()->GetConfig(name);
+				if (nodeConfig != nullptr && nodeConfig->HasService(ComponentFactory::GetName<class Login>()))
+				{
+					s2s::logout::request request;
+					request.set_user_id(userId);
+					server->Send("Login.OnLogout", request);
+				}
+			}
+		}
+		this->mActorComponent->DelActor(userId);
+		return XCode::Ok;
 	}
 }

@@ -2,28 +2,23 @@
 
 #include <string>
 #include <vector>
-#include "rapidjson/document.h"
-namespace Helper
+#include <fstream>
+namespace help
 {
-    namespace File
+    namespace fs
     {
-        extern bool FileIsExist(const std::string &path);
-
-        extern bool GetFileName(const std::string& path, std::string& name); //不带后缀名
-
+		extern bool FileIsExist(const std::string &path);
+		extern bool GetFileSize(std::fstream & fs, size_t & size);
+		extern long long GetLastWriteTime(const std::string & path);
+		extern bool GetFileLine(const std::string & path, size_t & size);
+		extern bool GetFileSize(const std::string & path, size_t & size);
+		extern bool GetFileSize(const std::string & path, std::string & size);
+		extern bool GetFileName(const std::string& path, std::string& name);
 		extern bool GetFileType(const std::string & path, std::string & type);
-
         extern bool ReadTxtFile(const std::string &path, std::string &outFile);
-
-        extern bool ReadTxtFile(const std::string &path, std::string &outFile, std::string & md5);
-
-        extern bool ReadJsonFile(const std::string &path, rapidjson::Document &document);
-
-        extern bool ReadJsonFile(const std::string &path, rapidjson::Document &document, std::string &md5);
-
-        extern bool ReadTxtFile(const std::string &path, std::vector<std::string> &outLines);
-
-        extern bool WriterFile(const std::string &path, const std::string &fileContent);
-    }
+		extern bool ChangeName(const std::string & path, const std::string & name);
+		extern bool WriterFile(const std::string &path, const std::string &fileContent);
+		extern bool ReadTxtFile(const std::string &path, std::vector<std::string> &outLines);
+	}
 
 }// namespace FileHelper

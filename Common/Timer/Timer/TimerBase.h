@@ -3,7 +3,7 @@
 #include"Util/Guid/Guid.h"
 #include"Util/Time/TimeHelper.h"
 
-namespace Tendo
+namespace joke
 {
     class TimerBase
     {
@@ -16,11 +16,10 @@ namespace Tendo
     public:
         virtual void Invoke() = 0;
     public:
-		unsigned int GetTimerId() const { return mTimerId; }
+		long long GetTimerId() const { return mTimerId; }
         long long GetTargetTime() const { return this->mTargetTime; }
     private:
-        long long mStartTime;
-        long long mTargetTime;
-		unsigned int mTimerId;
+		long long mTimerId;
+		long long mTargetTime;
 	};
 }// namespace Sentry

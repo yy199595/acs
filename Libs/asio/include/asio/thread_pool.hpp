@@ -84,7 +84,7 @@ public:
   /// Executor used to submit functions to a thread pool.
   typedef basic_executor_type<std::allocator<void>, 0> executor_type;
 
-  /// Scheduler used to schedule receivers on a thread pool.
+  /// Coroutine used to schedule receivers on a thread pool.
   typedef basic_executor_type<std::allocator<void>, 0> scheduler_type;
 
 #if !defined(ASIO_NO_TS_EXECUTORS)

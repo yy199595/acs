@@ -1,26 +1,48 @@
-local log = require("Log")
-local log_error = log.Error
-function OnError(...)
-    log_error(...)
+
+local on_new_index = function(class, k, v)
+    class[k] = v
 end
 
-function Class(base, ...)
+local to_string = function(class)
+    return ""
+end
 
-    local class = {
-        OnInit = function(...)
-
-        end
-    }
+Clone = function(base)
+    local class = { }
     if base ~= nil then
-        local meta = require(base)
-        if type(meta) ~= "table" then
-            return nil
+        local super = base
+        if type(base) == "string" then
+            super = require(base)
         end
-        for key, val in pairs(meta) do
-            class[key] = val
+        for k, v in pairs(super) do
+            class[k] = v
         end
     end
+    return class
+end
 
-    class.OnInit(class, ...)
+---@param class table
+---@param key string
+---@param value any
+SetMember = function(class, key, value)
+    if class[key] == nil then
+        class[key] = value
+    end
+end
+
+Class = function(base)
+    local class = { }
+    if base ~= nil then
+        local super = base
+        if type(base) == "string" then
+            super = require(base)
+        end
+        setmetatable(class, {
+            __index = super,
+            __tostring = to_string,
+            __newindex = on_new_index,
+        })
+    end
+    class.SetMember = SetMember
     return class
 end

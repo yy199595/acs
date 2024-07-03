@@ -6,13 +6,17 @@
 #define APP_LAUNCHCOMPONENT_H
 #include"Entity/Component/Component.h"
 
-namespace Tendo
+namespace joke
 {
 	class LaunchComponent final : public Component
     {
     public:
         LaunchComponent() = default;
         ~LaunchComponent() final = default;
+	public:
+		bool AddService(const std::string & name);
+	private:
+		void AddComponent();
     private:
         bool Awake() final;
     };

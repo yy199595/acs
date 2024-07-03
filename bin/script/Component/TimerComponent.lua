@@ -1,6 +1,6 @@
 
 local this = _G.Timer
-local TimerComponent = Class("Component")
+local TimerComponent = { }
 
 ---@param ms number
 ---@param func function

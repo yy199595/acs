@@ -487,7 +487,7 @@ objectivec_EXTRA_DIST=                                                       \
   objectivec/Tests/CocoaPods/OSXCocoaPodsTester/OSXCocoaPodsTester/AppDelegate.m \
   objectivec/Tests/CocoaPods/OSXCocoaPodsTester/OSXCocoaPodsTester/Assets.xcassets/AppIcon.appiconset/Contents.json \
   objectivec/Tests/CocoaPods/OSXCocoaPodsTester/OSXCocoaPodsTester/Base.lproj/MainMenu.xib \
-  objectivec/Tests/CocoaPods/OSXCocoaPodsTester/OSXCocoaPodsTester/Info.plist \
+  objectivec/Tests/CocoaPods/OSXCocoaPodsTester/OSXCocoaPodsTester/CardInfo.plist \
   objectivec/Tests/CocoaPods/OSXCocoaPodsTester/OSXCocoaPodsTester/main.m    \
   objectivec/Tests/CocoaPods/OSXCocoaPodsTester/Podfile-framework            \
   objectivec/Tests/CocoaPods/OSXCocoaPodsTester/Podfile-static               \
@@ -502,7 +502,7 @@ objectivec_EXTRA_DIST=                                                       \
   objectivec/Tests/CocoaPods/iOSCocoaPodsTester/iOSCocoaPodsTester/Assets.xcassets/AppIcon.appiconset/Contents.json \
   objectivec/Tests/CocoaPods/iOSCocoaPodsTester/iOSCocoaPodsTester/Base.lproj/LaunchScreen.storyboard \
   objectivec/Tests/CocoaPods/iOSCocoaPodsTester/iOSCocoaPodsTester/Base.lproj/Main.storyboard \
-  objectivec/Tests/CocoaPods/iOSCocoaPodsTester/iOSCocoaPodsTester/Info.plist \
+  objectivec/Tests/CocoaPods/iOSCocoaPodsTester/iOSCocoaPodsTester/CardInfo.plist \
   objectivec/Tests/CocoaPods/iOSCocoaPodsTester/iOSCocoaPodsTester/ViewController.h \
   objectivec/Tests/CocoaPods/iOSCocoaPodsTester/iOSCocoaPodsTester/ViewController.m \
   objectivec/Tests/CocoaPods/iOSCocoaPodsTester/iOSCocoaPodsTester/main.m    \
@@ -583,7 +583,7 @@ objectivec_EXTRA_DIST=                                                       \
   objectivec/Tests/unittest_runtime_proto2.proto                              \
   objectivec/Tests/unittest_runtime_proto3.proto                              \
   objectivec/Tests/UnitTests-Bridging-Header.h                                \
-  objectivec/Tests/UnitTests-Info.plist                                       \
+  objectivec/Tests/UnitTests-CardInfo.plist                                       \
   Protobuf.podspec
 
 php_EXTRA_DIST=                                                       \

@@ -1,74 +1,63 @@
 
-local this = _G.Sqlite
-local json = _G.rapidjson
-local log_err = require("Log").OnError
-local SqliteComponent = Class("Component")
+require("StringUtil")
+local app = require("App")
+local helper = require("SqlHelper")
+local sqlite = require("db.sqlite")
 
-SqliteComponent.databases = { }
-local sql_helper = require("SqlHelper")
+local table_unpack = table.unpack
+local string_split = string.split
+local string_format = string.format
+
+local SqliteComponent = { }
 
 local GetDbInfo = function(tab)
-    local result = string.split(tab, ".")
-    return result[1], result[2]
-end
-
-function SqliteComponent:FindIdByName(db)
-    local id = self.databases[db]
-    if id == nil then
-        id = this.Open(db)
-        self.databases[db] = id
-    end
-    return id
+    local res = string_split(tab, ".")
+    return table_unpack(res)
 end
 
 function SqliteComponent:Drop(name)
-    local func = this.Exec
     local db, tab = GetDbInfo(name)
-    local id = self:FindIdByName(db)
-    local sql = string.format("DROP TABLE %s;", tab)
-    local status, response = xpcall(func, log_err, id, sql)
-    if not status then
-        return false
-    end
-    return response
+    return sqlite.Exec(db, string_format("DROP TABLE %s;", tab))
 end
 
 function SqliteComponent:Create(name, data, index)
-    local func = this.Exec
     local db, tab = GetDbInfo(name)
-    local id = self:FindIdByName(db)
-    local sql = sql_helper.CreateSql(tab, data)
-    local status, response = xpcall(func, log_err, id, sql)
-    if not status then
-        return
-    end
-    return response
+    local sql = helper.CreateSql(tab, data, index)
+    return sqlite.Exec(db, sql)
+end
+
+function SqliteComponent:CreateTabAutoKey(name, key)
+    local db, tab = GetDbInfo(name)
+    return sqlite.Exec(db, string_format("CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT);", tab, key))
+end
+
+function SqliteComponent:AddField(name, key, value)
+
+    local db, tab = GetDbInfo(name)
+    return sqlite.Exec(db, helper.AddFieldSql(tab, key, value))
+end
+
+function SqliteComponent:SetAutoKey(name, key)
+
+    local db, tab = GetDbInfo(name)
+    return sqlite.Exec(db, string_format("ALTER TABLE %s MODIFY %s INT AUTO_INCREMENT;", tab, key))
+end
+
+function SqliteComponent:AddPrimaryKey(name, key)
+
+    local db, tab = GetDbInfo(name)
+    return sqlite.Exec(db, helper.AddPrimaryKeySql(tab, key))
 end
 
 function SqliteComponent:Insert(name, data)
 
-    local func = this.Exec
     local db, tab = GetDbInfo(name)
-    local id = self:FindIdByName(db)
-    local sql = sql_helper.InsertSql(tab, data)
-    local status, response = xpcall(func, log_err, id, sql)
-    if not status then
-        return
-    end
-    return response
+    return sqlite.Exec(db, helper.InsertSql(tab, data))
 end
 
 function SqliteComponent:FindOne(name, select, fields)
-    local func = this.Query
     local db, tab = GetDbInfo(name)
-    local id = self:FindIdByName(db)
-    local sql = sql_helper.QuerySql(tab, fields, select, 1)
-    print(sql)
-    local status, response = xpcall(func, log_err, id, sql)
-    if not status then
-        return
-    end
-    return response[1]
+    return sqlite.FindOne(db, helper.QuerySql(tab, fields, select, 1))
 end
 
 return SqliteComponent

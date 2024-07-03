@@ -6,21 +6,20 @@
 #define APP_LUACONFIG_H
 #include<vector>
 #include<string>
-#include"rapidjson/document.h"
+#include"Yyjson/Document/Document.h"
+
 struct lua_State;
-namespace Tendo
+namespace joke
 {
 	class LuaConfig
 	{
 	public:
-		bool Init(const rapidjson::Value & data);
+		bool Init(const json::r::Value & data);
 		const std::string & Main() const { return this->mMain; }
 		std::vector<std::string> Requires() const { return this->mRequires; }
-		std::vector<std::string> LoadFiles() const { return this->mLoadfiles;}
 	private:
 		std::string mMain;
 		std::vector<std::string> mRequires;
-		std::vector<std::string> mLoadfiles;
 	};
 }
 

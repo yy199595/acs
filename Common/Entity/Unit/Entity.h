@@ -1,6 +1,7 @@
 #pragma once
+#include<vector>
 #include"Entity/Component/ComponentFactory.h"
-namespace Tendo
+namespace joke
 {
     class Entity
 	{
@@ -15,10 +16,14 @@ namespace Tendo
 		inline bool AddComponent();
 		bool HasComponent(const std::string& name);
 		bool AddComponent(const std::string& name);
+		void SetEntityId(long long id) { this->mEntityId = id; }
 		bool AddComponent(const std::string& name, std::unique_ptr<Component> component);
 
 		template<typename T>
 		inline T* GetComponent() const;
+
+		template<typename T>
+		inline T * GetChildComponent() const;
 
 		template<typename T>
 		inline T* GetComponent(const std::string& name) const;
@@ -53,6 +58,21 @@ namespace Tendo
 		std::vector<std::string> mSortComponents;
 		std::unordered_map<std::string, std::unique_ptr<Component>> mComponentMap;
 	};
+
+	template<typename T>
+	T* Entity::GetChildComponent() const
+	{
+		auto iter = this->mComponentMap.begin();
+		for(; iter != this->mComponentMap.end(); iter++)
+		{
+			T * component = iter->second->Cast<T>();
+			if(component != nullptr)
+			{
+				return component;
+			}
+		}
+		return nullptr;
+	}
 
     template<typename T>
     size_t Entity::GetComponents(std::vector<T *> &components) const

@@ -7,37 +7,31 @@
 #include<vector>
 #include<unordered_map>
 #include<unordered_set>
-#include"rapidjson/document.h"
 #include"Config/Base/JsonConfig.h"
+#include"Yyjson/Document/Document.h"
 #include"Core/Singleton/Singleton.h"
-namespace Tendo
+namespace joke
 {
     class NodeConfig
     {
     public:
-        NodeConfig(const std::string & name)
-            : mIsAutoAllot(false), mName(name) { }
+        explicit NodeConfig(std::string  name) : mName(std::move(name)) { }
     public:
-        bool OnLoadConfig(const rapidjson::Value & value, int index);
+        bool OnLoadConfig(const json::r::Value & value);
     public:
-		int GetIndex() const { return this->mIndex;}
-        bool IsAuthAllot() const { return this->mIsAutoAllot; }
+		bool HasService(const std::string & service) const;
         const std::string & GetName() const { return this->mName;}
-        const std::string & GetMainLua() const { return this->mLua ;}
         size_t ServiceCount() const { return this->mServices.size(); }
 		size_t GetServices(std::vector<std::string> & services) const;
 		size_t GetComponents(std::vector<std::string> & components) const;
     private:
-		int mIndex; //决定了服务器关闭顺序
-		std::string mLua;
-        bool mIsAutoAllot;
         const std::string mName;
 		std::unordered_set<std::string> mServices;
 		std::unordered_set<std::string> mComponents;
     };
 }
 
-namespace Tendo
+namespace joke
 {
     class ClusterConfig : public JsonConfig, public ConstSingleton<ClusterConfig>
     {
@@ -45,8 +39,8 @@ namespace Tendo
         ClusterConfig() : JsonConfig("ClusterConfig") { }
 
     private:
-		bool OnLoadJson(rapidjson::Document &document) final;
-		bool OnReLoadJson(rapidjson::Document &document) final;
+		bool OnLoadJson() final;
+		bool OnReLoadJson() final;
     public:
         const NodeConfig * GetConfig() const;
         const NodeConfig * GetConfig(const std::string & name) const;

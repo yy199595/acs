@@ -3,7 +3,7 @@
 #include"CoroutineDef.h"
 #include"Rpc/Method/MethodProxy.h"
 
-namespace Tendo
+namespace joke
 {
 	enum class CorState
 	{
@@ -40,6 +40,5 @@ namespace Tendo
         tb_context_t mContext;
 		StaticMethod* mFunction;
 		unsigned int mCoroutineId;
-        std::shared_ptr<CoroutineGroup> mGroup;
     };
 }

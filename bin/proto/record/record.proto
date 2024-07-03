@@ -1,0 +1,8 @@
+syntax = "proto3";
+package record;
+
+message data
+{
+    string tab = 1;
+    string json = 2;
+}

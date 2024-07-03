@@ -7,7 +7,7 @@
 #include<unordered_map>
 #include"Core/Singleton/Singleton.h"
 #include"Config/Base/CsvTextConfig.h"
-namespace Tendo
+namespace joke
 {
     class CodeLineConfig
     {

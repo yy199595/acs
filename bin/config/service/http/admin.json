@@ -1,0 +1,113 @@
+{
+	"/admin/ping": {
+		"Type": "GET",
+		"Async": true,
+		"Permiss": 100,
+		"Bind": "Admin.Ping",
+		"Desc": "Ping某个服务器进程",
+		"Request": {
+			"id": 1
+		}
+	},
+	"/admin/stop": {
+		"Type": "GET",
+		"Async": true,
+		"Permiss": 100,
+		"Bind": "Admin.Stop",
+		"Desc": "停止某个服务器进程",
+		"Request": {
+			"id": 1
+		}
+	},
+	"/admin/info": {
+		"Type": "GET",
+		"Async": true,
+		"Permiss": 100,
+		"Bind": "Admin.Info",
+		"Desc": "查看服务器进程信息"
+	},
+	"/admin/hello": {
+		"Type": "GET",
+		"Async": false,
+		"Auth": false,
+		"Bind": "Admin.Hello",
+		"Desc": "测试服务器hello"
+	},
+	"/admin/hotfix": {
+		"Type": "GET",
+		"Async": true,
+		"Permiss": 100,
+		"Bind": "Admin.Hotfix",
+		"Desc": "热更服务器",
+		"Request": {
+			"id": 1
+		}
+	},
+	"/admin/login": {
+		"Type": "GET",
+		"Async": true,
+		"Auth": false,
+		"Bind": "Admin.Login",
+		"Desc": "web后台登录",
+		"Request": {
+			"account": "yjz",
+			"passwd": "199595yjz."
+		}
+	},
+	"/admin/logout": {
+		"Type": "GET",
+		"Async": true,
+		"Bind": "Admin.Logout",
+		"Desc": "web后台退出账号"
+	},
+	"/admin/register": {
+		"Type": "POST",
+		"Async": true,
+		"Permiss": 100,
+		"Record": true,
+		"Bind": "Admin.Register",
+		"ContentType": "application/json",
+		"Desc": "web账号注册",
+		"Request": {
+			"city": 5001,
+			"name": "乐意",
+			"account": "yjz",
+			"passwd": "199595yjz."
+		}
+	},
+	"admin/list": {
+		"Type": "GET",
+		"Permiss": 100,
+		"Async": true,
+		"Bind": "Admin.List",
+		"Desc": "分页查看商户列表",
+		"Request": {
+			"page": 1
+		}
+	},
+	"/admin/rpc": {
+		"Type": "GET",
+		"Permiss": 100,
+		"Bind": "Admin.RpcInterface",
+		"Desc": "分页查看rpc接口"
+	},
+	"/admin/http": {
+		"Type": "GET",
+		"Permiss": 100,
+		"Bind": "Admin.HttpInterface",
+		"Desc": "分页查看http接口"
+	},
+	"/admin/menu": {
+		"Type": "GET",
+		"Permiss": 10,
+		"Bind": "Admin.Menu",
+		"Desc": "获取web菜单"
+	},
+	"/oss/request": {
+		"Type": "GET",
+		"Permiss": 10,
+		"Record": true,
+		"Bind": "Oss.Request",
+		"Desc": "申请oss信息"
+	}
+}

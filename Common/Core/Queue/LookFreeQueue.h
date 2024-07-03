@@ -1,12 +1,9 @@
-//
-// Created by 强哥 on 2023/3/20.
-//
 
 #ifndef APP_COMMON_CORE_QUEUE_LOOKFREEQUEUE_H
 #define APP_COMMON_CORE_QUEUE_LOOKFREEQUEUE_H
 #include <atomic>
 #include <queue>
-namespace Sentry
+namespace Thread
 {
 	template<typename T>
 	class LockFreeQueue

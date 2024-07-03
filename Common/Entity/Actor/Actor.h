@@ -2,18 +2,17 @@
 // Created by yjz on 2023/5/17.
 //
 
-#ifndef _ACTOR_H_
-#define _ACTOR_H_
+#ifndef APP_ACTOR_H
+#define APP_ACTOR_H
 #include"Entity/Unit/Entity.h"
 #include"Rpc/Client/Message.h"
-#include"Proto/Include/Message.h"
 struct lua_State;
-namespace Tendo
+namespace joke
 {
 	class Actor : public Entity
 	{
 	 public:
-		explicit Actor(long long id, std::string  name);
+		explicit Actor(long long id, std::string name);
 	 public:
 		bool LateAwake() final;
 		int Send(const std::string& func);
@@ -21,29 +20,28 @@ namespace Tendo
 		int Send(const std::string& func, const pb::Message& request);
 	 public:
 		int Call(const std::string & func);
+		int Call(std::unique_ptr<rpc::Packet> request);
+		int Call(const std::string & func, pb::Message * response);
 		int Call(const std::string & func, const pb::Message & request);
-		int Call(const std::string & func, const std::shared_ptr<pb::Message>& response);
-		int Call(const std::string & func, const pb::Message & request, const std::shared_ptr<pb::Message>& response);
+		int Call(const std::string & func, const pb::Message & request, pb::Message * response);
 	public:
-		int LuaSend(lua_State * lua, const std::string & func, const std::shared_ptr<Msg::Packet> & message);
-		int LuaCall(lua_State * lua, const std::string & func, const std::shared_ptr<Msg::Packet> & message);
-		int MakeMessage(lua_State * lua, int idx, const std::string & func, std::shared_ptr<Msg::Packet> & message) const;
-	public:
-		long long GetActorId() const { return this->GetEntityId(); }
+		int LuaSend(lua_State * lua, std::unique_ptr<rpc::Packet>);
+		int LuaCall(lua_State * lua, std::unique_ptr<rpc::Packet>);
+		int MakeMessage(lua_State * lua, int idx, const std::string & func, std::unique_ptr<rpc::Packet> &) const;
 	 public:
 		virtual bool OnInit() = 0;
-		virtual void OnRegister(std::string * json) = 0;
+		virtual void EncodeToJson(std::string * json) = 0;
 		virtual bool DecodeFromJson(const std::string & json) { return true;}
-		virtual int GetAddress(const std::string & func, std::string & addr) = 0;
 	protected:
-		virtual void OnWriteRpcHead(const std::string & func, Msg::Head & head) const { }
-		std::shared_ptr<Msg::Packet> Make(const std::string & func, const pb::Message * message) const;
+		virtual bool GetAddress(const rpc::Packet & request, int & id) const = 0;
+		virtual int Make(const std::string & func, std::unique_ptr<rpc::Packet> & request) const = 0;
 	protected:
 		class RouterComponent * mRouterComponent;
 	private:
 		long long mLastTime;
 		const std::string mName;
+		class ProtoComponent * mProto;
 	};
 }
 
-#endif //_ACTOR_H_
+#endif //APP_ACTOR_H

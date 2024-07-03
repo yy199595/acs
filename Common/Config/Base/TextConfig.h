@@ -2,12 +2,11 @@
 // Created by zmhy0073 on 2022/10/13.
 //
 
-#ifndef APP_CONFIG_H
-#define APP_CONFIG_H
+#ifndef APP_TEXTCONFIG_H
+#define APP_TEXTCONFIG_H
 #include<string>
-#include<unordered_map>
 
-namespace Tendo
+namespace joke
 {
 	class ITextConfig
 	{
@@ -15,27 +14,29 @@ namespace Tendo
 		virtual bool ReloadConfig() = 0;
 		virtual const std::string & GetConfigName() const = 0;
 		virtual bool LoadConfig(const std::string & path) = 0;
+	public:
+		inline const std::string & Path() const { return this->mPath; }
+	protected:
+		std::string mPath;
 	};
 }
-namespace Tendo
+namespace joke
 {
 	class TextConfig : public ITextConfig
     {
     public:
-        explicit TextConfig(const char * name) : mName(name) { }
+		virtual ~TextConfig() = default;
+        explicit TextConfig(const char * name) : mName(name), mLastWriteTime(0) { }
     public:
-        bool ReloadConfig() final;
-        const std::string & WorkPath() const;
-		bool LoadConfig(const std::string & path);
-		const std::string & Path() const { return this->mPath; }
+        bool ReloadConfig() override;
+		bool LoadConfig(const std::string & path) final;
         const std::string & GetConfigName() const final { return this->mName; }
     protected:
         virtual bool OnLoadText(const char * str, size_t length) = 0;
         virtual bool OnReloadText(const char * str, size_t length) = 0;
     private:
-        std::string mMd5;
-        std::string mPath;
         std::string mName;
+		long long mLastWriteTime;
     };
 }
 
@@ -49,4 +50,4 @@ namespace Net
         std::string FullAddress;
     };
 }
-#endif //APP_CONFIG_H
+#endif //APP_TEXTCONFIG_H

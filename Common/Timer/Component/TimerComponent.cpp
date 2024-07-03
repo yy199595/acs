@@ -3,11 +3,15 @@
 #include"Entity/Actor/App.h"
 #include"Lua/Engine/ModuleClass.h"
 #include"Timer/Lua/Timer.h"
-namespace Tendo
+namespace joke
 {
-	bool TimerComponent::Awake()
+	TimerComponent::TimerComponent()
 	{
 		this->mNextUpdateTime = 0;
+	}
+
+	bool TimerComponent::Awake()
+	{
 		for (int index = 0; index < this->LayerCount; index++)
 		{
 			int count = index == 0
@@ -18,34 +22,54 @@ namespace Tendo
 						FirstLayerCount * (int)std::pow(OtherLayerCount, index - 1);
 			this->mTimerLayers.push_back(new TimeWheelLayer(index, count, start, end));
 		}
-        return true;
+		return true;
 	}
 
-	long long TimerComponent::AddTimer(const std::shared_ptr<TimerBase>& timer)
+	bool TimerComponent::AddTimer(std::unique_ptr<TimerBase> timer)
 	{
-		if (timer == nullptr || !this->AddTimerToWheel(timer))
+		return this->AddTimerToWheel(std::move(timer));
+	}
+
+	void TimerComponent::AddUpdateTimer(std::unique_ptr<TimerBase> timer)
+	{
+		if (timer == nullptr)
 		{
-			return 0;
+			return;
 		}
-		return timer->GetTimerId();
+		this->mUpdateTimer.emplace_back(timer->GetTimerId());
+		this->mTimerMap.emplace(timer->mTimerId, std::move(timer));
 	}
 
-	long long TimerComponent::AddTimer(unsigned int ms, StaticMethod* func)
+	void TimerComponent::AddSecondTimer(std::unique_ptr<TimerBase> timer)
 	{
+		if (timer == nullptr)
+		{
+			return;
+		}
+		this->mSecondTimer.emplace_back(timer->GetTimerId());
+		this->mTimerMap.emplace(timer->mTimerId, std::move(timer));
+	}
+
+	long long TimerComponent::CreateTimer(unsigned int ms, StaticMethod* func)
+	{
+		std::unique_ptr<TimerBase> timerBase(new DelayTimer(ms, func));
 		if (ms == 0)
 		{
-			func->run();
-			delete func;
+			this->mLastFrameTriggerTimers.push(timerBase->mTimerId);
+			this->mTimerMap.emplace(timerBase->mTimerId, std::move(timerBase));
 			return 0;
 		}
-		return this->AddTimer(std::make_shared<DelayTimer>(ms, func));
+		long long id = timerBase->GetTimerId();
+		return this->AddTimer(std::move(timerBase)) ? id : 0;
 	}
 
-	void TimerComponent::OnLuaRegister(Lua::ModuleClass &luaRegister, std::string &name)
+	void TimerComponent::OnLuaRegister(Lua::ModuleClass &luaRegister)
 	{
-		name = "Timer";
 		luaRegister.AddFunction("Add", Lua::Timer::Add);
-		luaRegister.AddFunction("Remove", Lua::Timer::Remove);
+		luaRegister.AddFunction("Del", Lua::Timer::Remove);
+		luaRegister.AddFunction("AddUpdate", Lua::Timer::AddUpdate);
+		luaRegister.AddFunction("AddSecond", Lua::Timer::AddSecond);
+		luaRegister.End("core.timer");
 	}
 
 	bool TimerComponent::CancelTimer(long long id)
@@ -53,7 +77,7 @@ namespace Tendo
 		auto iter = this->mTimerMap.find(id);
 		if (iter != this->mTimerMap.end())
 		{
-            this->mRemoveTimers.push(id);
+            this->mTimerMap.erase(iter);
 			return true;
 		}
 		return false;
@@ -63,25 +87,14 @@ namespace Tendo
 	{
 		if (this->mNextUpdateTime == 0)
 		{
-			this->mNextUpdateTime = Helper::Time::NowMilTime();
+			this->mNextUpdateTime = help::Time::NowMil();
 			return;
 		}
-		long long nowTime = Helper::Time::NowMilTime();
+		long long nowTime = help::Time::NowMil();
 		long long subTime = nowTime - this->mNextUpdateTime;
 		const int tick = (int)subTime / this->TimerPrecision;
 
 		if (tick <= 0) return;
-
-        while(!this->mRemoveTimers.empty())
-        {
-            long long id = this->mRemoveTimers.front();
-            auto iter = this->mTimerMap.find(id);
-            if(iter != this->mTimerMap.end())
-            {
-                this->mTimerMap.erase(iter);
-            }
-            this->mRemoveTimers.pop();
-        }
 
 		this->mNextUpdateTime = nowTime - (subTime % this->TimerPrecision);
 
@@ -95,16 +108,7 @@ namespace Tendo
 					while (!timerQueue.empty())
 					{
 						long long id = timerQueue.front();
-						auto iter = this->mTimerMap.find(id);
-						if (iter != this->mTimerMap.end())
-						{
-							auto timerBase = iter->second;
-							if (timerBase != nullptr)
-							{
-								timerBase->Invoke();
-							}
-							this->mTimerMap.erase(iter);
-						}
+						this->InvokeTimer(id);
 						timerQueue.pop();
 					}
 				}
@@ -116,7 +120,6 @@ namespace Tendo
 						this->AddTimerToWheel(id);
 						timerQueue.pop();
 					}
-
 				}
 				if (!timeWheelLayer->JumpNextLayer())
 				{
@@ -126,6 +129,58 @@ namespace Tendo
 		}
 	}
 
+	void TimerComponent::OnFrameUpdate()
+	{
+		while(!this->mLastFrameTriggerTimers.empty())
+		{
+			long long timerId = this->mLastFrameTriggerTimers.front();
+			{
+				this->InvokeTimer(timerId);
+			}
+			this->mLastFrameTriggerTimers.pop();
+		}
+		auto iter = this->mUpdateTimer.begin();
+		for(; iter != this->mUpdateTimer.end(); )
+		{
+			auto item = this->mTimerMap.find(*iter);
+			if(item == this->mTimerMap.end())
+			{
+				this->mUpdateTimer.erase(iter++);
+				continue;
+			}
+			item->second->Invoke();
+			iter++;
+		}
+	}
+
+	void TimerComponent::OnSecondUpdate(int tick)
+	{
+		auto iter = this->mSecondTimer.begin();
+		for(; iter != this->mSecondTimer.end(); )
+		{
+			auto item = this->mTimerMap.find(*iter);
+			if(item == this->mTimerMap.end())
+			{
+				this->mSecondTimer.erase(iter++);
+				continue;
+			}
+			item->second->Invoke();
+			iter++;
+		}
+	}
+
+	bool TimerComponent::InvokeTimer(long long timerId)
+	{
+		auto iter = this->mTimerMap.find(timerId);
+		if (iter == this->mTimerMap.end())
+		{
+			return false;
+		}
+		iter->second->Invoke();
+		this->mTimerMap.erase(iter);
+		return true;
+	}
+
 	bool TimerComponent::AddTimerToWheel(long long timerId)
 	{
 		auto iter = this->mTimerMap.find(timerId);
@@ -133,34 +188,38 @@ namespace Tendo
 		{
 			return false;
 		}
-		auto timer = iter->second;
-		return this->AddTimerToWheel(timer);
+		std::unique_ptr<TimerBase> timerBase = std::move(iter->second);
+		{
+			this->mTimerMap.erase(iter);
+		}
+		return this->AddTimerToWheel(std::move(timerBase));
 	}
 
-	bool TimerComponent::AddTimerToWheel(std::shared_ptr<TimerBase> timer)
+	bool TimerComponent::AddTimerToWheel(std::unique_ptr<TimerBase> timer)
 	{
-		long long nowTime = Helper::Time::NowMilTime();
-		int tick = (timer->GetTargetTime() - nowTime) / this->TimerPrecision;
+		long long nowTime = help::Time::NowMil();
+		long long useTime = timer->GetTargetTime() - nowTime;
+		int tick = (int)useTime / this->TimerPrecision;
 		if (tick <= 0)
 		{
-			timer->Invoke();
+			this->mLastFrameTriggerTimers.push(timer->mTimerId);
+			this->mTimerMap.emplace(timer->mTimerId, std::move(timer));
 			return true;
 		}
 		for (auto timerLayer : this->mTimerLayers)
 		{
 			if (timerLayer->AddTimer(tick, timer->mTimerId))
 			{
-				this->mTimerMap.emplace(timer->mTimerId, timer);
+				this->mTimerMap.emplace(timer->mTimerId, std::move(timer));
 				return true;
 			}
 		}
-		LOG_ERROR("add timer failure id = " << timer->GetTimerId());
+		LOG_ERROR("add timer failure id {} ", timer->GetTimerId());
 		return false;
 	}
 
 	long long TimerComponent::DelayCall(int ms, std::function<void()>&& callback)
 	{
-		LambdaMethod * lambdaMethod = new LambdaMethod(std::move(callback));
-		return this->AddTimer(ms, lambdaMethod);
+		return this->CreateTimer(ms, new LambdaMethod(std::move(callback)));
 	}
 }// namespace Sentry

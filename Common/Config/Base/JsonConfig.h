@@ -4,21 +4,24 @@
 
 #ifndef APP_JSONCONFIG_H
 #define APP_JSONCONFIG_H
-#include"rapidjson/document.h"
 #include"Config/Base/TextConfig.h"
+#include"Yyjson/Document/Document.h"
 
-namespace Tendo
+namespace joke
 {
-	class JsonConfig : public TextConfig
+	class JsonConfig : public TextConfig, public json::r::Document
 	{
 	public:
 		using TextConfig::TextConfig;
+		bool OnLoadText(const char *str, size_t length) override;
+		bool OnReloadText(const char *str, size_t length) override;
 	private:
-		bool OnLoadText(const char *str, size_t length) final;
-		bool OnReloadText(const char *str, size_t length) final;
+		bool ReloadConfig() final;
 	protected:
-		virtual bool OnLoadJson(rapidjson::Document & document) = 0;
-		virtual bool OnReLoadJson(rapidjson::Document & document) = 0;
+		virtual bool OnLoadJson() = 0;
+		virtual bool OnReLoadJson() = 0;
+	private:
+		std::string mName;
 	};
 }
 

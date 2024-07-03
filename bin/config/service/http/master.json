@@ -1,0 +1,42 @@
+{
+    "/master/push": {
+        "Type": "POST",
+        "Async": true,
+        "Auth": true,
+        "Permiss": 100,
+        "Bind": "Master.Push",
+        "ContentType": "application/json",
+        "Desc": "注册服务器到中心",
+        "Request": {
+            "id": 0,
+            "name": "server",
+            "listen": {
+                "http": "127.0.0.1:80",
+                "rpc": "127.0.0.1:7788",
+                "https": "127.0.0.1:443"
+            }
+        }
+    },
+    "/master/find": {
+        "Type": "GET",
+        "Async": true,
+        "Auth": true,
+        "Permiss": 100,
+        "Bind": "Master.Find",
+        "Desc": "查找服务器进程",
+        "Request": {
+            "id": 0
+        }
+    },
+    "/master/del": {
+        "Type": "DELETE",
+        "Async": true,
+        "Auth": true,
+        "Permiss": 100,
+        "Bind": "Master.Del",
+        "Desc": "移除某个服务器",
+        "Request": {
+            "id": 0
+        }
+    }
+}

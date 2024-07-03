@@ -7,12 +7,12 @@
 
 #include"Message/s2s/s2s.pb.h"
 #include"Rpc/Service/RpcService.h"
-namespace Tendo
+namespace joke
 {
     class Login : public RpcService
     {
     public:
-        Login() = default;
+        Login();
         ~Login() override = default;
     private:
 		int OnLogin(long long id, const s2s::login::request & request);
@@ -20,8 +20,10 @@ namespace Tendo
 	private:
 		bool OnInit() final;
 	private:
+		std::vector<ILogin *> mLoginComponents;
 		class ActorComponent * mActorComponent;
-    };
+		class MasterComponent * mMasterComponent;
+	};
 }
 
 

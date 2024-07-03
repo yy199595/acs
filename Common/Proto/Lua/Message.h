@@ -6,44 +6,45 @@
 #define SERVER_MESSAGE_H
 #include"Lua/Engine/Define.h"
 #include"Proto/Component/ProtoComponent.h"
-namespace Tendo
+namespace joke
 {
 	class MessageDecoder //转lua
 	{
 	 public:
+		MessageDecoder(lua_State * lua);
 		MessageDecoder(lua_State * lua, ProtoComponent * component);
-		bool Decode(const Message & message);
+		bool Decode(const pb::Message & message);
 	 private:
-		bool DecodeField(const Message & message, const FieldDescriptor * field);
-		bool DecodeSingle(const Message & message, const FieldDescriptor * field);
-		bool DecodeTable(const Message & message, const FieldDescriptor * field);
-		bool DecodeRepeted(const Message & message, const FieldDescriptor * field);
-		bool DecodeRequired(const Message & message, const FieldDescriptor * field);
-		bool DecodeOptional(const Message & message, const FieldDescriptor * field);
-		bool DecodeMutiple(const Message & message, const FieldDescriptor * field, int index);
+		bool DecodeField(const pb::Message & message, const pb::FieldDescriptor * field);
+		bool DecodeSingle(const pb::Message & message, const pb::FieldDescriptor * field);
+		bool DecodeTable(const pb::Message & message, const pb::FieldDescriptor * field);
+		bool DecodeRepeted(const pb::Message & message, const pb::FieldDescriptor * field);
+		bool DecodeRequired(const pb::Message & message, const pb::FieldDescriptor * field);
+		bool DecodeOptional(const pb::Message & message, const pb::FieldDescriptor * field);
+		bool DecodeMutiple(const pb::Message & message, const pb::FieldDescriptor * field, int index);
 	 private:
 		lua_State * mLua;
 		ProtoComponent * mMsgComponent;
 	};
 }
 
-namespace Tendo
+namespace joke
 {
 	class MessageEncoder
 	{
 	 public:
 		explicit MessageEncoder(lua_State * lua);
 	 public:
-		bool Encode(std::shared_ptr<Message> proto, int index);
+		bool Encode(pb::Message & proto, int index);
 	 private:
-		bool EncodeField(Message & message, const FieldDescriptor * field, int index);
-		bool EncodeSingle(Message & message, const FieldDescriptor * field, int index);
-		bool EncodeTable(Message & message, const FieldDescriptor * field, int index);
-		bool EncodeRepeted(Message & message, const FieldDescriptor * field, int index);
-		bool EncodeRequired(Message & message, const FieldDescriptor * field, int index);
-		bool EncodeOptional(Message & message, const FieldDescriptor * field, int index);
-		bool EncodeMutiple(Message & message, const FieldDescriptor * field, int index);
-		bool EncoddeMessage(Message & message, const Descriptor * descriptor, int index);
+		bool EncodeField(pb::Message & message, const pb::FieldDescriptor * field, int index);
+		bool EncodeSingle(pb::Message & message, const pb::FieldDescriptor * field, int index);
+		bool EncodeTable(pb::Message & message, const pb::FieldDescriptor * field, int index);
+		bool EncodeRepeted(pb::Message & message, const pb::FieldDescriptor * field, int index);
+		bool EncodeRequired(pb::Message & message, const pb::FieldDescriptor * field, int index);
+		bool EncodeOptional(pb::Message & message, const pb::FieldDescriptor * field, int index);
+		bool EncodeMutiple(pb::Message & message, const pb::FieldDescriptor * field, int index);
+		bool EncoddeMessage(pb::Message & message, const pb::Descriptor * descriptor, int index);
 	 private:
 		lua_State * mLua;
 	};

@@ -1,31 +1,21 @@
 
-require("XCode")
+local components = { }
 local app = require("App")
 
-local Component = { }
-
-function Component:OnInit()
-    self.app = app
+return function()
+    local info = debug.getinfo(2, "S")
+    local module = components[info.short_src]
+    if module == nil then
+        module = { }
+        module.app = app
+        module.__source = info.short_src
+        components[info.short_src] = module
+        return module
+    end
+    for k, v in pairs(module) do
+        if type(v) == "function" then
+            module[k] = nil
+        end
+    end
+    return module
 end
-
-function Component:GetName()
-    return self.name
-end
-
-function Component:Send(id, func, request)
-    return self.app.Send(id, func, request)
-end
-
-function Component:Call(id, func, request)
-    return self.app.Call(id, func, request)
-end
-
-function Component:GetListen(name)
-    return self.app.GetListen(name)
-end
-
-function Component:Allot(name)
-    return self.app.Random(name)
-end
-
-return Component

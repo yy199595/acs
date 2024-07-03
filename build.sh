@@ -11,7 +11,7 @@ if [ ! -n "$1" ] ;then
   echo "*                                                         *"
   echo "*           debug        build server type=debug          *"
   echo "*           release      build server type=release        *"
-  echo "*           lib          build lua protobuf spdlog        *"
+  echo "*           lib          build protobuf and jemalloc      *"
   echo "*           mysql        download mysql and build         *"
   echo "*           jemalloc     download jemalloc and build      *"
   echo "*           openssl      download openssl and build       *"
@@ -36,7 +36,7 @@ for arg in $cmd; do
     fi
 
     if [[ $arg == "mysql" ]]; then
-        cd $current_path || exit
+        cd "$current_path" || exit
         if [ -d "./Libs/mysql/lib" ]; then
             mkdir -p "./Libs/mysql/lib"
         fi
@@ -48,15 +48,16 @@ for arg in $cmd; do
             unzip mysql-connector-c-6.1.11-src.fixed.zip
             rm -rf mysql-connector-c-6.1.11-src.fixed.zip
         fi
+        # shellcheck disable=SC2086
         cd $current_path/Libs/bin/mysql-connector-c-6.1.11-src || exit
         cmake ./CMakeLists.txt
         make
-        cd $current_path || exit
+        cd "$current_path" || exit
     fi
 
     if [[ $arg == "openssl" ]]; then
-        cd ./Libs/ || exit
-        if [ -d "./Libs/openssl" ]; then
+        cd ./Libs/bin || exit
+        if [ -d "./Libs/bin/openssl" ]; then
             echo "openssl already exists locally"
         else
             git clone https://github.com/openssl/openssl.git
@@ -64,31 +65,27 @@ for arg in $cmd; do
         cd ./openssl || exit
         ./config
         make
+        cp -r ./*.a ../../openssl/lib
+        cd "$current_path" || exit
+        rm -rf ./Lib/bin/openssl
     fi
 
     if [[ $arg == "lib" ]]; then
-        cd $current_path || exit
-        make lua
-        make spdlog
+        cd "$current_path" || exit
+        make protoc
         make libprotobuf
     fi
 
     if [[ $arg == "debug" ]]; then
-        cd $current_path || exit
+        cd "$current_path" || exit
         cmake -DCMAKE_BUILD_TYPE=Debug ./CMakeLists.txt
         make app
     fi
 
     if [[ $arg == "release" ]]; then
-          cd $current_path || exit
+          cd "$current_path" || exit
           cmake -DCMAKE_BUILD_TYPE=Release ./CMakeLists.txt
           make app
-    fi
-
-    if [[ $arg == "protoc" ]]; then
-        cd $current_path || exit
-        make protoc
-        cmake ./CMakeLists.txt
     fi
 done
 

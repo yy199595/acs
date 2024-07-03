@@ -3,28 +3,28 @@
 //
 #include"App.h"
 #include"Actor.h"
-
-#include <utility>
 #include"XCode/XCode.h"
 #include"Rpc/Client/Message.h"
 #include"Util/Time/TimeHelper.h"
 #include"Lua/Engine/LuaParameter.h"
 #include"Proto/Include/Message.h"
-#include"Util/Json/Lua/Json.h"
 #include"Rpc/Config/ServiceConfig.h"
+#include"Yyjson/Lua/ljson.h"
 #include"Proto/Component/ProtoComponent.h"
 #include"Router/Component/RouterComponent.h"
-namespace Tendo
+namespace joke
 {
 	Actor::Actor(long long id, std::string  name)
 		: Entity(id), mName(std::move(name))
 	{
+		this->mProto = nullptr;
 		this->mRouterComponent = nullptr;
-		this->mLastTime = Helper::Time::NowSecTime();
+		this->mLastTime = help::Time::NowSec();
 	}
 
 	bool Actor::LateAwake()
 	{
+		this->mProto = App::Inst()->GetProto();
 		this->mRouterComponent = App::Inst()->GetComponent<RouterComponent>();
 		LOG_CHECK_RET_FALSE(this->mRouterComponent != nullptr && this->OnInit());
 		return true;
@@ -32,126 +32,83 @@ namespace Tendo
 
 	int Actor::Send(const std::string& func)
 	{
-		std::string addr;
-		if(!this->GetAddress(func, addr))
+		std::unique_ptr<rpc::Packet> message;
+		int code = this->Make(func, message);
+		if(code != XCode::Ok)
 		{
-			return XCode::NotFoundServerRpcAddress;
+			return code;
 		}
-		this->mLastTime = Helper::Time::NowSecTime();
-		const std::shared_ptr<Msg::Packet> message = this->Make(func, nullptr);
-		if(message == nullptr)
-		{
-			return XCode::NotFoundRpcConfig;
-		}
-		return this->mRouterComponent->Send(addr, message) ? XCode::Successful : XCode::SendMessageFail;
+		int id = message->SockId();
+		this->mLastTime = help::Time::NowSec();
+		return this->mRouterComponent->Send(id, std::move(message));
 	}
 
 	int Actor::Send(const std::string& func, const pb::Message& request)
 	{
-		std::string addr;
-		const int code = this->GetAddress(func, addr);
-		if(code != XCode::Successful)
+		std::unique_ptr<rpc::Packet> message;
+		int code = this->Make(func, message);
+		if(code != XCode::Ok)
 		{
-			LOG_ERROR("call " << func << " code =" << code);
 			return code;
 		}
-		this->mLastTime = Helper::Time::NowSecTime();
-		const std::shared_ptr<Msg::Packet> message = this->Make(func, &request);
-		if(message == nullptr)
+		if(!message->WriteMessage(rpc::Porto::Protobuf, &request))
 		{
-			return XCode::NotFoundRpcConfig;
+			return XCode::SerializationFailure;
 		}
-		return this->mRouterComponent->Send(addr, message) ? XCode::Successful : XCode::SendMessageFail;
+		int id = message->SockId();
+		this->mLastTime = help::Time::NowSec();
+		return this->mRouterComponent->Send(id, std::move(message));
 	}
 
 	int Actor::Call(const std::string& func)
 	{
-		std::string addr;
-		const int code = this->GetAddress(func, addr);
-		if(code != XCode::Successful)
+		std::unique_ptr<rpc::Packet> message ;
+		int code = this->Make(func, message);
+		if(code != XCode::Ok)
 		{
-			LOG_ERROR("call " << func << " code =" << code);
 			return code;
 		}
-		this->mLastTime = Helper::Time::NowSecTime();
-		const std::shared_ptr<Msg::Packet> message = this->Make(func, nullptr);
-		if(message == nullptr)
-		{
-			return XCode::NotFoundRpcConfig;
-		}
-		const std::shared_ptr<Msg::Packet> result = this->mRouterComponent->Call(addr, message);
+		int id = message->SockId();
+		this->mLastTime = help::Time::NowSec();
+		rpc::Packet * result = this->mRouterComponent->Call(id, std::move(message));
 		return result != nullptr ? result->GetCode() : XCode::NetWorkError;
 	}
-
-	std::shared_ptr<Msg::Packet> Actor::Make(const std::string& func, const pb::Message* request) const
-	{
-		const RpcMethodConfig * methodConfig = SrvRpcConfig::Inst()->GetMethodConfig(func);
-		if(methodConfig == nullptr)
-		{
-			LOG_ERROR("not rpc config : [" << func << "]");
-			return nullptr;
-		}
-		std::shared_ptr<Msg::Packet> message = std::make_shared<Msg::Packet>();
-		{
-			message->SetNet(methodConfig->Net);
-			message->SetType(Msg::Type::Request);
-			message->GetHead().Add("func", func);
-			if(request != nullptr)
-			{
-				message->SetProto(Msg::Porto::Protobuf);
-				if(!message->WriteMessage(request))
-				{
-					return nullptr;
-				}
-			}
-			if(!methodConfig->IsClient)
-			{
-				this->OnWriteRpcHead(func, message->GetHead());
-			}
-		}
-		return message;
-	}
-
+	
 	int Actor::Call(const std::string& func, const pb::Message& request)
 	{
-		std::string addr;
-		const int code = this->GetAddress(func, addr);
-		if(code != XCode::Successful)
+		std::unique_ptr<rpc::Packet> message;
+		int code = this->Make(func, message);
+		if(code != XCode::Ok)
 		{
-			LOG_ERROR("call " << func << " code =" << code);
-			return code;
+			return XCode::MakeTcpRequestFailure;
 		}
-		this->mLastTime = Helper::Time::NowSecTime();
-		const std::shared_ptr<Msg::Packet> message = this->Make(func, &request);
-		if(message == nullptr)
+		if(!message->WriteMessage(rpc::Porto::Protobuf, &request))
 		{
-			return XCode::NotFoundRpcConfig;
+			return XCode::SerializationFailure;
 		}
-		const std::shared_ptr<Msg::Packet> result = this->mRouterComponent->Call(addr, message);
+		int id = message->SockId();
+		this->mLastTime = help::Time::NowSec();
+		const rpc::Packet * result = this->mRouterComponent->Call(id, std::move(message));
 		return result != nullptr ? result->GetCode() : XCode::NetWorkError;
 	}
 
-	int Actor::Call(const std::string& func, const std::shared_ptr<pb::Message>& response)
+	int Actor::Call(const std::string& func, pb::Message * response)
 	{
-		std::string addr;
-		int code = this->GetAddress(func, addr);
-		if(code != XCode::Successful)
+		std::unique_ptr<rpc::Packet> message;
+		int code = this->Make(func, message);
+		if(code != XCode::Ok)
 		{
-			LOG_ERROR("call " << func << " code =" << code);
 			return code;
 		}
-		this->mLastTime = Helper::Time::NowSecTime();
-		const std::shared_ptr<Msg::Packet> message = this->Make(func, nullptr);
-		if(message == nullptr)
+		int id = message->SockId();
+		rpc::Packet * result = this->mRouterComponent->Call(id, std::move(message));
+		if(result == nullptr)
 		{
-			return XCode::NotFoundRpcConfig;
+			return XCode::NetWorkError;
 		}
-		const std::shared_ptr<Msg::Packet> result =
-				this->mRouterComponent->Call(addr, message);
-		code = result != nullptr ? result->GetCode() : XCode::NetWorkError;
-		if(code == XCode::Successful)
+		if(result->GetCode() == XCode::Ok)
 		{
-			if(!result->ParseMessage(response.get()))
+			if(!result->ParseMessage(response))
 			{
 				return XCode::ParseMessageError;
 			}
@@ -159,124 +116,126 @@ namespace Tendo
 		return code;
 	}
 
-	int Actor::Call(const std::string& func, const pb::Message& request, const std::shared_ptr<pb::Message>& response)
+	int Actor::Call(std::unique_ptr<rpc::Packet> message)
 	{
-		std::string addr;
-		int code = this->GetAddress(func, addr);
-		if(code != XCode::Successful)
+		int id = 0;
+		if(!this->GetAddress(*message, id))
 		{
-			LOG_ERROR("call " << func << " code =" << code);
+			return XCode::NotFoundActorAddress;
+		}
+		rpc::Packet * result = this->mRouterComponent->Call(id, std::move(message));
+		if(result == nullptr)
+		{
+			return XCode::NetWorkError;
+		}
+		return result->GetCode();
+	}
+
+	int Actor::Call(const std::string& func, const pb::Message& request, pb::Message * response)
+	{
+		std::unique_ptr<rpc::Packet> message;
+		int code = this->Make(func, message);
+		if (code != XCode::Ok)
+		{
 			return code;
 		}
-		this->mLastTime = Helper::Time::NowSecTime();
-		const std::shared_ptr<Msg::Packet> message = this->Make(func, &request);
-		if(message == nullptr)
+		if(!message->WriteMessage(rpc::Porto::Protobuf, &request))
 		{
-			return XCode::CallFunctionNotExist;
+			return XCode::SerializationFailure;
 		}
-		const std::shared_ptr<Msg::Packet> result =
-				this->mRouterComponent->Call(addr, message);
-		code = result != nullptr ? result->GetCode() : XCode::NetWorkError;
-		if(code == XCode::Successful)
+		int id = message->SockId();
+		rpc::Packet* result = this->mRouterComponent->Call(id, std::move(message));
+		if (result == nullptr)
 		{
-			if(!result->ParseMessage(response.get()))
-			{
-				return XCode::ParseMessageError;
-			}
+			return XCode::NetWorkError;
+		}
+		code = result->GetCode();
+		if (code == XCode::Ok && !result->ParseMessage(response))
+		{
+			return XCode::ParseMessageError;
 		}
 		return code;
 	}
 
 	int Actor::MakeMessage(lua_State* lua, int idx,
-		const std::string& func, std::shared_ptr<Msg::Packet>& message) const
+		const std::string& func, std::unique_ptr<rpc::Packet> & message) const
 	{
-		App* app = App::Inst();
-		const RpcMethodConfig* methodConfig = SrvRpcConfig::Inst()->GetMethodConfig(func);
+		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
 		if (methodConfig == nullptr)
 		{
-			LOG_ERROR("call [" << func << "] fail not rpc config");
+			LOG_ERROR("call {} fail not rpc config", func);
 			return XCode::NotFoundRpcConfig;
 		}
-
-		if (lua_istable(lua, idx))
+		int code = this->Make(func, message);
+		if (code != XCode::Ok)
 		{
-			if (!methodConfig->Request.empty())
+			return code;
+		}
+		message->SetProto(rpc::Type::None);
+		switch (lua_type(lua, idx))
+		{
+			case LUA_TNIL:
+				message->SetProto(rpc::Porto::None);
+				return XCode::Ok;
+			case LUA_TSTRING:
 			{
-				std::shared_ptr<pb::Message> request;
-				ProtoComponent* protoComponent = app->GetProto();
-				const std::string& name = methodConfig->Request;
-				if (!protoComponent->Read(lua, name, idx, request))
+				size_t count = 0;
+				const char* str = lua_tolstring(lua, idx, &count);
 				{
-					LOG_ERROR("call [" << func << "] fail request=" << name);
-					return XCode::CreateProtoFailure;
+					message->Body()->append(str, count);
+					message->SetProto(rpc::Porto::String);
+					if (!methodConfig->Response.empty())
+					{
+						message->GetHead().Add("res", methodConfig->Response);
+					}
 				}
-				message = this->Make(func, request.get());
-				if(!methodConfig->Response.empty())
+				return XCode::Ok;
+			}
+			case LUA_TTABLE:
+			{
+				if (!methodConfig->Request.empty())
+				{
+					message->SetProto(rpc::Porto::Protobuf);
+					const std::string& name = methodConfig->Request;
+					pb::Message* request = this->mProto->Read(lua, name, idx);
+					if (request == nullptr)
+					{
+						LOG_ERROR("call {} fail request : {}", func, name);
+						return XCode::CreateProtoFailure;
+					}
+					if (!message->WriteMessage(request))
+					{
+						return XCode::SerializationFailure;
+					}
+					message->TempHead().Add("res", methodConfig->Response);
+
+					return XCode::Ok;
+				}
+				message->SetProto(rpc::Porto::Json);
+				if (!methodConfig->Response.empty())
 				{
 					message->GetHead().Add("res", methodConfig->Response);
 				}
-				return XCode::Successful;
+				lua::yyjson::read(lua, idx, *message->Body());
+				return XCode::Ok;
 			}
-			message = this->Make(func, nullptr);
-			message->SetProto(Msg::Porto::Json);
-			message->SetNet(methodConfig->Net);
-			if(!methodConfig->Response.empty())
-			{
-				message->GetHead().Add("res", methodConfig->Response);
-			}
-			Lua::RapidJson::Read(lua, idx, message->Body());
-			return XCode::Successful;
 		}
-		if (lua_isstring(lua, idx))
-		{
-			size_t count = 0;
-			message = this->Make(func, nullptr);
-			const char* str = lua_tolstring(lua, idx, &count);
-			{
-				message->Body()->append(str, count);
-				message->SetProto(Msg::Porto::String);
-				if(!methodConfig->Response.empty())
-				{
-					message->GetHead().Add("res", methodConfig->Response);
-				}
-			}
-			return XCode::Successful;
-		}
-		return XCode::CallArgsError;
+		return XCode::Ok;
 	}
 
-	int Actor::LuaCall(lua_State* lua, const std::string & func, const std::shared_ptr<Msg::Packet> & message)
+	int Actor::LuaCall(lua_State* lua, std::unique_ptr<rpc::Packet> message)
 	{
-		std::string address;
-		int code = this->GetAddress(func, address);
-		if(code != XCode::Successful)
-		{
-			lua_pushinteger(lua, code);
-			return 1;
-		}
-		this->mLastTime = Helper::Time::NowSecTime();
-		return this->mRouterComponent->LuaCall(lua, address, message);
+		int id = message->SockId();
+		this->mLastTime = help::Time::NowSec();
+		return this->mRouterComponent->LuaCall(lua, id, std::move(message));
 	}
 
-	int Actor::LuaSend(lua_State* lua, const string& func, const std::shared_ptr<Msg::Packet>& message)
+	int Actor::LuaSend(lua_State* lua, std::unique_ptr<rpc::Packet> message)
 	{
-		std::string address;
-		int code = XCode::Successful;
-		do
-		{
-			code = this->GetAddress(func, address);
-			if(code != XCode::Successful)
-			{
-				break;
-			}
-			this->mLastTime = Helper::Time::NowSecTime();
-			if(!this->mRouterComponent->Send(address, message))
-			{
-				code = XCode::SendMessageFail;
-				break;
-			}
-		}
-		while(false);
+		int id = message->SockId();
+		this->mLastTime = help::Time::NowSec();
+		int code = this->mRouterComponent->Send(id, std::move(message));
+
 		lua_pushinteger(lua, code);
 		return 1;
 	}

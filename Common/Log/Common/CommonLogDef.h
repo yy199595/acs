@@ -1,112 +1,102 @@
 ﻿#pragma once
-#include<sstream>
 #include<string>
 #include<cstring>
 #include"Log/Common/Debug.h"
-#define args1 std::placeholders::_1
-#define args2 std::placeholders::_2
-#define args3 std::placeholders::_3
-#define args4 std::placeholders::_4
-#define args5 std::placeholders::_5
 
 inline std::string FormatFileLine(const char * file, const int line)
 {
-    const char * fileName = nullptr;
-	const size_t length = strlen(file);
-	for (size_t index = length - 1; index > 0; index--)
+	const char* filename = strrchr(file, '/');
+	if(filename == nullptr)
 	{
-		if (file[index] == '/' || file[index] == '\\')
-		{
-			fileName = file + index + 1;
-			break;
-		}
+		filename = strrchr(file, '\\');
 	}
-	static char buffer[100] = {};
-	fileName = fileName == nullptr ? file : fileName;
-#ifdef _MSC_VER
-	size_t size = sprintf_s(buffer, "%s:%d  ", fileName, line);
+
+	if(filename != nullptr)
+	{
+		return fmt::format("{}:{}", filename + 1, line);
+	}
+	return fmt::format("{}:{}", file, line);
+}
+
+#if LOG_LEVEL_INFO >= SET_LOG_LEVEL
+#define LOG_INFO(...) \
+{                             \
+		std::unique_ptr<custom::LogInfo> log = std::make_unique<custom::LogInfo>();          \
+		log->Content = fmt::format(__VA_ARGS__);                \
+    	log->Level = custom::LogLevel::Info;                   \
+		log->File = FormatFileLine(__FILE__, __LINE__);   		\
+		Debug::Log(std::move(log));    									\
+}
 #else
-	size_t size = sprintf(buffer, "%s:%d  ", fileName, line);
-#endif // _MSC_VER
-	return std::string(buffer, size);
-}
-
-#define LOG_FMT_ERR(_fmt, ...) { 									\
-    std::string f = FormatFileLine(__FILE__, __LINE__);             \
-	std::string log = fmt::format(_fmt, __VA_ARGS__); 			\
-	Debug::Log(spdlog::level::level_enum::err, f + log);    			\
-}
-
-#define LUA_LOG_ERROR(log) \
-    Debug::Lua(log); \
+#define LOG_INFO(...)
+#endif
 
 
-#define GK_LOG(type, f, content)						\
-{                                     \
-	std::stringstream ss;                \
-	ss << f << content;\
-    Debug::Log(type, ss.str());		\
-}													\
-
-
-#define LOG_INFO(content) \
+#if LOG_LEVEL_DEBUG >= SET_LOG_LEVEL
+#define LOG_DEBUG(...) \
 {                             \
-		std::string f = FormatFileLine(__FILE__, __LINE__); \
-       	GK_LOG(spdlog::level::level_enum::info, f, content)        \
+		std::unique_ptr<custom::LogInfo> log = std::make_unique<custom::LogInfo>();          \
+		log->Content = fmt::format(__VA_ARGS__);                \
+    	log->Level = custom::LogLevel::Debug;                   \
+		log->File = FormatFileLine(__FILE__, __LINE__);   		\
+		Debug::Log(std::move(log));    									\
 }
+#else
+#define LOG_DEBUG(...)
+#endif
 
-#define LOG_DEBUG(content) \
+#if LOG_LEVEL_WARN >= SET_LOG_LEVEL
+#define LOG_WARN(...) \
 {                             \
-		std::string f = FormatFileLine(__FILE__, __LINE__); \
-       	GK_LOG(spdlog::level::level_enum::debug, f, content)        \
+		std::unique_ptr<custom::LogInfo> log = std::make_unique<custom::LogInfo>();          \
+		log->Content = fmt::format(__VA_ARGS__);                \
+    	log->Level = custom::LogLevel::Warn;                   \
+		log->File = FormatFileLine(__FILE__, __LINE__);   		\
+		Debug::Log(std::move(log));    									\
 }
+#else
+#define LOG_WARN(...)
+#endif
 
-#define LOG_WARN(content) \
-{                             \
-       	std::string f = FormatFileLine(__FILE__, __LINE__); \
-       	GK_LOG(spdlog::level::level_enum::warn, f, content)        \
-}
-
-#define LOG_ERROR(content) \
+#if LOG_LEVEL_ERROR >= SET_LOG_LEVEL
+#define LOG_ERROR(...) \
 {                                      \
-       	std::string f = FormatFileLine(__FILE__, __LINE__); \
-       	GK_LOG(spdlog::level::level_enum::err, f, content)          \
-}                              \
-
-#define LOG_FATAL(content) \
-{                                      \
-       	std::string f = FormatFileLine(__FILE__, __LINE__); \
-       	GK_LOG(spdlog::level::level_enum::critical, f, content)          \
-}                              \
-
-
-#define LOG_CHECK_FATAL(obj)			\
-{												\
-	if(!(obj))									\
-	{											\
-		LOG_FATAL(#obj);		                \
-	}											\
+ 		std::unique_ptr<custom::LogInfo> log = std::make_unique<custom::LogInfo>();          \
+		log->Content = fmt::format(__VA_ARGS__);                \
+    	log->Level = custom::LogLevel::Error;                   \
+		log->File = FormatFileLine(__FILE__, __LINE__);   		\
+		Debug::Log(std::move(log));    									\
 }
+#else
+#define LOG_ERROR(...)
+#endif
+
+#if LOG_LEVEL_ERROR >= SET_LOG_LEVEL
+#define LOG_FATAL(...) \
+{                                      \
+       	std::unique_ptr<custom::LogInfo> log = std::make_unique<custom::LogInfo>();          \
+		log->Content = fmt::format(__VA_ARGS__);                \
+    	log->Level = custom::LogLevel::Fatal;                   \
+		log->File = FormatFileLine(__FILE__, __LINE__);   		\
+		Debug::Log(std::move(log));    									\
+}
+#else
+#define LOG_FATAL(...)
+#endif
 
 #define LOG_CHECK_RET(obj) \
 {                                \
     if(!(obj)) { LOG_ERROR(#obj); return; }    \
 }
 
-#define LOG_CHECK_LOG_RET(obj, log) \
-{                                \
-    if(!(obj)) { LOG_ERROR(#obj << log); return; }    \
-}
-
-
-
 #define LOG_CHECK_RET_FALSE(obj) \
 {                                \
     if(!(obj)) { LOG_ERROR(#obj); return false; }    \
 }
 
-#define LOG_CHECK_RET_ZERO(obj){ \
-    if(!(obj)) { LOG_ERROR(#obj); return 0; }    \
+#define CHECK_FALSE_RETURN(obj, value) \
+{                                \
+    if(!(obj)) { return value; }    \
 }
 
 #define LOG_CHECK_RET_NULL(obj){ \
@@ -117,53 +107,42 @@ inline std::string FormatFileLine(const char * file, const int line)
     if(!(obj)) { LOG_ERROR(#obj); return code; }    \
 
 #define LOG_ERROR_CHECK_ARGS(obj) \
-    if(!(obj)) { LOG_ERROR(#obj); return XCode::CallArgsError; }    \
+    if(!(obj)) { LOG_ERROR(#obj); return XCode::CallArgsError; } \
 
-#define IF_THROW_ERROR(obj){ \
-    if(!(obj))                \
-    {              \
-        throw std::logic_error(#obj);\
-        }    \
+#define CHECK_ARGS(obj) \
+    if(!(obj)) { return XCode::CallArgsError; } \
+
+#define CONSOLE_LOG_ERROR(...){ \
+		custom::LogInfo log;          \
+		log.Content = fmt::format(__VA_ARGS__);                \
+    	log.Level = custom::LogLevel::Error;                   \
+		log.File = FormatFileLine(__FILE__, __LINE__);   		\
+		Debug::Console(log);    									\
 }
 
-#define TryInvoke(obj, content){ \
-        if(obj)                  \
-        {                        \
-            content;             \
-        }\
+#define CONSOLE_LOG_FATAL(...){ \
+		custom::LogInfo log;          \
+		log.Content = fmt::format(__VA_ARGS__);                \
+    	log.Level = custom::LogLevel::Fatal;                   \
+		log.File = FormatFileLine(__FILE__, __LINE__);   		\
+		Debug::Console(log);    									\
 }
 
-#define CONSOLE_LOG_ERROR(content){ \
-	std::string f = FormatFileLine(__FILE__, __LINE__); \
-	std::stringstream ss;                \
-	ss << f << content;                \
-	Debug::Console(Debug::Level::err, ss.str());\
+#define CONSOLE_LOG_INFO(...){ \
+		custom::LogInfo log;          \
+		log.Content = fmt::format(__VA_ARGS__);                \
+    	log.Level = custom::LogLevel::Info;                   \
+		log.File = FormatFileLine(__FILE__, __LINE__);   		\
+		Debug::Console(log);    									\
 }
 
-#define CONSOLE_LOG_FATAL(content){ \
-	std::string f = FormatFileLine(__FILE__, __LINE__); \
-	std::stringstream ss;                \
-	ss << f << content;                \
-	Debug::Console(Debug::Level::critical, ss.str());\
+#define CONSOLE_LOG_DEBUG(...) \
+{ \
+		custom::LogInfo log;          \
+		log.Content = fmt::format(__VA_ARGS__);                \
+    	log.Level = custom::LogLevel::Debug;                   \
+		log.File = FormatFileLine(__FILE__, __LINE__);   		\
+		Debug::Console(log);    									\
 }
 
-#define CONSOLE_LOG_INFO(content){ \
-	std::string f = FormatFileLine(__FILE__, __LINE__); \
-	std::stringstream ss;                \
-	ss << f << content;                \
-	Debug::Console(Debug::Level::info, ss.str());\
-}
-
-#define CONSOLE_LOG_DEBUG(content){ \
-	std::string f = FormatFileLine(__FILE__, __LINE__); \
-	std::stringstream ss;                \
-	ss << f << content;                \
-	Debug::Console(Debug::Level::debug, ss.str());\
-}
-
-#define THROW_LOGIC_ERROR(content){ \
-    std::string f = FormatFileLine(__FILE__, __LINE__); \
-	std::stringstream ss;                \
-	ss << f << content;                \
-    throw std::logic_error(ss.str());                                    \
-}
+#define IF_NOT_NULL_CALL(module, func, ...) { if(module != nullptr) { module->func(__VA_ARGS__); } };

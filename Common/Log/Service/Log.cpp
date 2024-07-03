@@ -3,17 +3,16 @@
 //
 
 #include"Log.h"
-#include"Log/Component/LogComponent.h"
-namespace Tendo
+namespace joke
 {
 	bool Log::OnInit()
 	{
-		BIND_COMMON_RPC_METHOD(Log::Login);
+		BIND_SERVER_RPC_METHOD(Log::Login);
 		return true;
 	}
 
 	int Log::Login(const s2s::log::login& request)
 	{
-		return XCode::Successful;
+		return XCode::Ok;
 	}
 }

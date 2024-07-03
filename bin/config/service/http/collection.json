@@ -1,0 +1,25 @@
+{
+    "/table_mgr/find": {
+        "Type": "GET",
+        "Async": true,
+        "Auth": true,
+        "Permiss": 100,
+        "Desc": "分页查找Mongo表",
+        "Bind": "Collection.FindPage",
+        "Request": {
+            "tab": "xxx",
+            "page": 1
+        }
+    },
+    "/table_mgr/delete": {
+        "Type": "GET",
+        "Async": true,
+        "Auth": true,
+        "Permiss": 100,
+        "Desc": "删除集合",
+        "Bind": "Collection.Delete",
+        "Request": {
+            "tab": "xxx"
+        }
+    }
+}

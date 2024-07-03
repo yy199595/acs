@@ -12,7 +12,7 @@ namespace Lua
 
 	 public:
 		static bool Get(lua_State * lua, const std::string & name);
-		static std::shared_ptr<Table> Create(lua_State* luaEnv, const std::string& name);
+		static std::unique_ptr<Table> Create(lua_State* luaEnv, const std::string& name);
 
 	 public:
 		template<typename T>
@@ -24,8 +24,8 @@ namespace Lua
 			return this->ref;
 		}
 		std::string ToJson();
-		std::shared_ptr<Table> GetTable(const std::string& name);
-		std::shared_ptr<Function> GetFunction(const std::string& name);
+		std::unique_ptr<Table> GetTable(const std::string& name);
+		std::unique_ptr<Function> GetFunction(const std::string& name);
 
 		bool Serialization(std::string& outString);
 

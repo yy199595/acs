@@ -4,16 +4,15 @@
 #include<fstream>
 #include"LuaModule.h"
 #include"Lua/Engine/Function.h"
-#include"Util/Md5/MD5.h"
-#include"Util/String/StringHelper.h"
 #include"Log/Common/CommonLogDef.h"
+#include "Util/Time/TimeHelper.h"
+
 namespace Lua
 {
-	LuaModule::LuaModule(lua_State* lua, std::string  name)
-		: mLua(lua), mName(std::move(name))
+	LuaModule::LuaModule(lua_State* lua, std::string name, int ref)
+			: mLua(lua), mName(std::move(name)), mRef(ref), mIsUpdate(false)
 	{
-		this->mRef = 0;
-		this->mIsUpdate = false;
+		this->InitModule();
 	}
 
 	LuaModule::~LuaModule()
@@ -24,39 +23,41 @@ namespace Lua
 		}
 	}
 
-	bool LuaModule::LoadFromPath(const std::string& path)
+	void LuaModule::OnModuleHotfix()
 	{
-		if(!this->mMd5.empty())
+		this->mCaches.clear();
+		lua_pushnil(this->mLua);
+		while (lua_next(this->mLua, -2) != 0)
 		{
-			return true;
+			if (lua_isfunction(this->mLua, -1))
+			{
+				std::string func(lua_tostring(this->mLua, -2));
+				this->mCaches.insert(func);
+			}
+			lua_pop(this->mLua, 1);
 		}
-		
-		if(luaL_dofile(this->mLua, path.c_str()) != LUA_OK)
-		{
-			LOG_ERROR(lua_tostring(this->mLua, -1));
-			return false;
-		}
-		if(!lua_istable(this->mLua, -1))
-		{
-			LOG_FMT_ERR("load lua file : [{}.lua] return is not table", this->mName);
-			return false;
-		}
-		std::ifstream fs;
-		this->mPath = path;
-		fs.open(path, std::ios::in);
-		this->mMd5 = Helper::Md5::GetMd5(fs);
-		this->mRef = luaL_ref(mLua, LUA_REGISTRYINDEX);
-		
-		this->InitModule();
-		this->mIsUpdate = this->GetFunction("OnUpdate");
-		return true;
+		this->mIsUpdate = this->mCaches.find("OnUpdate") != this->mCaches.end();
 	}
 
 	void LuaModule::InitModule()
 	{
 		this->SetMember("__name", this->mName);
-		this->SetMember("__path", this->mPath);
-		this->SetMember("__time", Helper::Time::NowSecTime());
+		this->SetMember("__time", help::Time::NowSec());
+
+		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
+
+		this->mCaches.clear();
+		lua_pushnil(this->mLua);
+		while (lua_next(this->mLua, -2) != 0)
+		{
+			if (lua_isfunction(this->mLua, -1))
+			{
+				std::string func(lua_tostring(this->mLua, -2));
+				this->mCaches.insert(func);
+			}
+			lua_pop(this->mLua, 1);
+		}
+		this->mIsUpdate = this->mCaches.find("OnUpdate") != this->mCaches.end();
 	}
 
 	void LuaModule::SetMember(const char* key, long long value)
@@ -77,59 +78,6 @@ namespace Lua
 		}
 	}
 
-	void LuaModule::Update(int tick)
-	{
-		const static std::string name("OnUpdate");
-		if (this->mIsUpdate)
-		{
-			this->Call(name, tick);
-		}
-	}
-
-	bool LuaModule::Hotfix()
-	{
-		std::ifstream fs;
-		fs.open(this->mPath, std::ios::in);
-		std::string md5 = Helper::Md5::GetMd5(fs);
-		if(this->mMd5 == md5) //文件没有改变
-		{
-			fs.close();
-			return true;
-		}
-		fs.close();
-		LOG_DEBUG("reload lua file : " << this->mName << ".lua");
-		if(luaL_dofile(this->mLua, this->mPath.c_str()) != LUA_OK)
-		{
-			this->OnCallError("DoFile");
-			return false;
-		}
-		if(!lua_istable(this->mLua, -1))
-		{
-			LOG_FMT_ERR("load lua file : [{}.lua] return is not table", this->mName);
-			return false;
-		}
-		lua_unref(this->mLua, this->mRef);
-		this->mRef = luaL_ref(mLua, LUA_REGISTRYINDEX);
-		LOG_INFO("reload [" << this->mPath << "] successful");
-		{
-			this->mMd5 = md5;
-			this->InitModule();
-			this->mCaches.clear();
-			this->mIsUpdate = this->GetFunction("OnUpdate");
-		}
-		return true;
-	}
-
-	bool LuaModule::AddCache(const std::string& name)
-	{
-		if(!this->GetFunction(name))
-		{
-			return false;
-		}
-		this->mCaches.insert(name);
-		return true;
-	}
-
 	bool LuaModule::HasFunction(const std::string & name)
 	{
 		auto iter = this->mCaches.find(name);
@@ -138,42 +86,65 @@ namespace Lua
 
 	bool LuaModule::GetFunction(const std::string& name)
 	{
+		lua_settop(this->mLua, 0);
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
 		if (!lua_istable(this->mLua, -1))
 		{
 			return false;
 		}
-		if (lua_getfield(this->mLua, -1, name.c_str()))
+		lua_getfield(this->mLua, -1, name.c_str());
+
+		if (lua_isfunction(this->mLua, -1))
 		{
-			if(lua_isfunction(this->mLua, -1))
-			{
-				lua_pushvalue(this->mLua, -2);
-				return true;
-			}
+			lua_pushvalue(this->mLua, -2);
+			return true;
 		}
 		return false;
 	}
 
-	void LuaModule::OnCallError(const std::string & func)
+	bool LuaModule::GetMetaFunction(const std::string& name)
 	{
-		size_t length = 0;
-		const char * errorInfo = nullptr;
-		const char * str = luaL_tolstring(this->mLua, -1, &length);
-		for (size_t index = length - 1; index > 0; index--)
+		lua_settop(this->mLua, 0);
+		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
+		luaL_getmetafield(this->mLua, -1, name.c_str());
+		if (lua_isfunction(this->mLua, -1))
 		{
-			if(str[index] == '/'|| str[index] == '\\')
-			{
-				errorInfo = str + index + 1;
-				length = length - index - 1;
-				break;
-			}
+			lua_pushvalue(this->mLua, -2);
+			return true;
 		}
-		if(errorInfo != nullptr && length > 0)
+		return false;
+	}
+
+	void LuaModule::SpliteError(std::string& error)
+	{
+		const char * str = lua_tostring(this->mLua, -1);
+		if(str == nullptr)
 		{
-			Debug::Log(Debug::Level::err, std::string(errorInfo, length));
 			return;
 		}
-        LOG_FMT_ERR("[{0}.{1}] : {2}", this->mName, func, std::string(str, length));
+		const char * errorInfo = strrchr(str, '/');
+		if(errorInfo == nullptr)
+		{
+			errorInfo = strrchr(str, '\\');
+		}
+		if(errorInfo != nullptr)
+		{
+			error.assign(errorInfo);
+			return;
+		}
+		error.assign(str);
+	}
+
+	void LuaModule::OnCallError(const std::string & func)
+	{
+		std::string error;
+		this->SpliteError(error);
+		std::unique_ptr<custom::LogInfo> logInfo = std::make_unique<custom::LogInfo>();
+		{
+			logInfo->Level = custom::LogLevel::Error;
+			logInfo->Content = fmt::format("[{}.{}] {}", this->mName, func, error);
+		}
+		Debug::Log(std::move(logInfo));
 	}
 
 }

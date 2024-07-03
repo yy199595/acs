@@ -1,0 +1,9 @@
+{
+    "client": {
+        "Component" : [
+            "HttpComponent",
+            "RedisComponent",
+            "ClientComponent"
+        ]
+    }
+}

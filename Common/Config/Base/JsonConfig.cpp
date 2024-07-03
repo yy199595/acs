@@ -3,29 +3,37 @@
 //
 
 #include"JsonConfig.h"
-#include"Util/File/FileHelper.h"
 #include"Log/Common/CommonLogDef.h"
-namespace Tendo
+
+namespace joke
 {
 	bool JsonConfig::OnLoadText(const char* str, size_t length)
 	{
-		rapidjson::Document document;
-		if(document.Parse(str, length).HasParseError())
+		if(!this->Decode(str, length))
 		{
-			LOG_ERROR("load json fail : " << this->Path());
+			CONSOLE_LOG_FATAL("load {} : {}", this->Path(),  this->GetError());
 			return false;
 		}
-		return this->OnLoadJson(document);
+		return this->OnLoadJson();
 	}
 
 	bool JsonConfig::OnReloadText(const char* str, size_t length)
 	{
-		rapidjson::Document document;
-		if(document.Parse(str, length).HasParseError())
+		if(!this->Decode(str, length))
 		{
-			LOG_ERROR("reload json fail : " << this->Path());
+			LOG_ERROR("load {} : {}", this->Path(),  this->GetError());
 			return false;
 		}
-		return this->OnReLoadJson(document);
+		return this->OnReLoadJson();
+	}
+
+	bool JsonConfig::ReloadConfig()
+	{
+		if(!this->FromFile(this->mPath))
+		{
+			LOG_ERROR("reload {} fail", this->Path());
+			return false;
+		}
+		return this->OnReLoadJson();
 	}
 }

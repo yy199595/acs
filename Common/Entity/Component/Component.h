@@ -2,7 +2,7 @@
 
 #include"IComponent.h"
 #include"Log/Common/CommonLogDef.h"
-namespace Tendo
+namespace joke
 {
 	class App;
 	class Component;
@@ -19,7 +19,7 @@ namespace Tendo
 	};
 }
 
-namespace Tendo
+namespace joke
 {
 	class Entity;
 	class Component

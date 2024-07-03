@@ -2,14 +2,14 @@
 // Created by yjz on 2022/4/28.
 //
 
-#ifndef _ANY_H_
-#define _ANY_H_
+#ifndef APP_ANY_H
+#define APP_ANY_H
 
 #include <iostream>
 #include <string>
 #include <memory>
 #include <typeindex>
-namespace Tendo
+namespace joke
 {
 	struct Any
 	{
@@ -108,4 +108,4 @@ namespace Tendo
 	};
 }
 
-#endif //_ANY_H_
+#endif //APP_ANY_H

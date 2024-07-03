@@ -1,33 +1,24 @@
 {
-    "Server": {
-        "AutoAllot": true,
+    "server": {
         "Service": [
             "Login",
             "Node",
             "Gate",
             "MongoDB",
-            "Chat",
-            "ServerWeb",
-            "Account",
-            "ServerRegistry"
+            "Admin",
+            "Collection",
+            "ResourceMgr",
+            "ChatComponent",    
+            "FileUpload",            
+            "QuickSDK"      
         ],
         "Component": [
-            "RedisComponent",
-            "SqliteComponent",
-            "RegistryComponent",
-            "HttpDebugComponent"
-        ]
-    },
-    "Client": {
-        "Component": [
-            "HttpComponent",
-            "ClientComponent"
-        ]
-    },
-    "Console": {
-        "Component": [
-            "HttpComponent",
-            "ConsoleComponent"
+            "OssComponent",
+            "GateComponent",
+            "ClientComponent",
+            "HttpWebComponent",
+            "MongoComponent",
+            "AdminComponent"
         ]
     }
 }

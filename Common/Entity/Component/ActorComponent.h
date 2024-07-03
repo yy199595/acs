@@ -2,42 +2,55 @@
 // Created by yjz on 2023/5/17.
 //
 
-#ifndef _ACTORMGRCOMPONENT_H_
-#define _ACTORMGRCOMPONENT_H_
-#include"Component.h"
-#include"Entity/Actor/ServerActor.h"
-#include"Entity/Actor/PlayerActor.h"
+#ifndef APP_ACTORCOMPONENT_H
+#define APP_ACTORCOMPONENT_H
+#include"Entity/Actor/Server.h"
+#include"Entity/Actor/Player.h"
+#include"Core/Map/HashMap.h"
+
 namespace Lua
 {
 	class LuaModule;
 };
-namespace Tendo
+namespace joke
 {
-	class ActorComponent : public Component
+	class ActorComponent : public Component, public IServerRecord, public ILuaRegister
 	{
-	 public:
+	public:
 		Actor * GetActor(long long id);
-		PlayerActor * GetPlayer(long long playerId);
-		ServerActor * GetServer(long long serverId);
+		bool HasPlayer(long long id) const;
+		bool HasServer(long long id) const;
+		Player * GetPlayer(long long playerId);
+		Server * GetServer(long long serverId);
+		bool HasServer(const std::string & name) const;
 	public:
-		bool AddServer(const std::string & json);
-		bool AddPlayer(const std::shared_ptr<PlayerActor>& player);
-		bool AddServer(std::shared_ptr<ServerActor> server);
-		void GetServers(std::vector<ServerActor *> & servers);
-		bool AddServer(std::shared_ptr<ServerActor> server, const std::string & json);
+		bool AddPlayer(Player * player);
+		bool AddServer(Server * server);
+		void GetServers(std::vector<int>& servers);
+		void GetServers(const std::string &name, std::vector<int>& servers);
+		bool GetListen(int id, const std::string & name, std::string & addr);
 	public:
-		ServerActor * Random(const std::string & name);
-	 public:
+		bool UpdateServer(json::r::Document &);
+		Server * MakeServer(const json::r::Document &);
+	public:
+		int Broadcast(const std::string & func);
+		int Broadcast(const std::string & func, const pb::Message & message);
+	public:
 		bool DelActor(long long id);
+		bool HasServer(const std::string & name);
+		Server * Random(const std::string& name);
+		Server * Hash(const std::string & name, long long index);
 	private:
 		bool LateAwake() final;
-		bool AddRandomActor(const std::string & name, Actor * actor);
+		void OnRecord(json::w::Document &document) final;
+		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
+		bool AddRandomActor(const std::string& name, Actor* actor);
 	private:
-		Lua::LuaModule * mLuaModule;
-		std::unordered_map<long long, std::shared_ptr<ServerActor>> mServers;
-		std::unordered_map<long long, std::shared_ptr<PlayerActor>> mPlayers;
+		Lua::LuaModule* mLuaModule;
+		std::unordered_map<long long, Server *> mServers;
+		std::unordered_map<long long, Player *> mPlayers;
 		std::unordered_map<std::string, std::vector<long long>> mActorNames;
 	};
 }
 
-#endif //_ACTORMGRCOMPONENT_H_
+#endif //APP_ACTORCOMPONENT_H
