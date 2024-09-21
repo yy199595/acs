@@ -30,28 +30,60 @@
 #include<cstdlib>
 #include<fstream>
 #include"spdlog/fmt/fmt.h"
-#include"Util/String/String.h"
-namespace joke
+#include"Util/Tools/String.h"
+#include"Log/Common/CommonLogDef.h"
+
+#ifdef __OS_WIN__
+
+#include <dbghelp.h>
+#include <tchar.h>
+#include <Util/Tools/TimeHelper.h>
+#pragma comment(lib, "dbghelp.lib")
+
+namespace os
+{
+	bool CreateMiniDump(EXCEPTION_POINTERS* pep) {
+		// 打开文件
+		std::string name = fmt::format("{}.dmp", help::Time::GetDateStr());
+		HANDLE hFile = CreateFile(_T(name.c_str()), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (hFile == INVALID_HANDLE_VALUE) {
+			return false;
+		}
+
+		// 创建转储文件
+		MINIDUMP_EXCEPTION_INFORMATION mei;
+		mei.ThreadId = GetCurrentThreadId();
+		mei.ExceptionPointers = pep;
+		mei.ClientPointers = FALSE;
+
+		BOOL result = MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, MiniDumpNormal, &mei, NULL, NULL);
+		CloseHandle(hFile);
+		return result != 0;
+	}
+
+	LONG WINAPI MyUnhandledExceptionFilter(EXCEPTION_POINTERS* pExceptionPtrs) {
+		CreateMiniDump(pExceptionPtrs);
+		return EXCEPTION_EXECUTE_HANDLER;
+	}
+}
+#endif
+
+namespace os
 {
 	bool System::Init(int argc, char** argv)
 	{
 		std::vector<std::string> commandLine;
-		for(int index = 0; index < argc; index++)
+		commandLine.reserve(argc);
+        for(int index = 0; index < argc; index++)
 		{
 			commandLine.emplace_back(argv[index]);
 		}
-		size_t index = 1;
+		System::SetEnv("id", "0"); //服务器id
+		System::SetEnv("log", "1"); //日志等级
+		System::SetEnv("name", "server"); //集群名称
+		System::SetEnv("db", "127.0.0.1"); //db地址
 		System::SetEnv("exe",  commandLine[0]);
 		System::SetEnv("config", "./config/run/all.json");
-		if(commandLine.size() >= 2)
-		{
-			std::string path = commandLine[1];
-			if(path.find("--") == std::string::npos)
-			{
-				index++;
-				System::SetEnv("config", path);
-			}
-		}
 		std::string work = fmt::format("{0}/", getcwd(nullptr, 0));
 		help::Str::ReplaceString(work, "\\", "/");
 		if (work.back() == '/')
@@ -60,24 +92,33 @@ namespace joke
 		}
 		System::mWorkPath = work;
 		std::vector<std::string> result;
-		for (; index < commandLine.size(); index++)
+		for (size_t index = 1; index < commandLine.size(); index++)
 		{
 			result.clear();
 			std::string line(commandLine[index]);
+			if(line.find("--") == std::string::npos)
+			{
+				CONSOLE_LOG_ERROR("args:{} format error", line);
+				return false;
+			}
 			const std::string str = line = line.substr(2);
 			if (help::Str::Split(str, '=', result) != 2)
 			{
+				CONSOLE_LOG_ERROR("args:{} format error", line);
 				return false;
 			}
 			System::SetEnv(result[0], result[1]);
 		}
 		std::string path;
 		System::GetEnv("CONFIG", path);
-		printf("config path = %s\n", path.c_str());
+		CONSOLE_LOG_DEBUG("config path = {}", path);
+#ifdef __OS_WIN__
+		SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
+#endif
 		return System::AddValue("WORK_DIR", work);
 	}
 
-	bool System::AddValue(const std::string& key, std::string& value)
+	bool System::AddValue(const std::string& key, const std::string& value)
 	{
 		char buffer[256] = { 0 };
 		sprintf(buffer, "${%s}", key.c_str());
@@ -146,6 +187,7 @@ namespace joke
 #else
 		setenv(key.c_str(), v.c_str(), 1);
 #endif
+		System::AddValue(k, v);
 	}
 
 	bool System::ReadFile(const std::string& path, std::string& content)
@@ -174,7 +216,7 @@ namespace joke
 		return fmt::format("{}/{}", mWorkPath, path);
     }
 
-	void System::GetSystemInfo(joke::SystemInfo& systemInfo)
+	bool System::GetSystemInfo(SystemInfo& systemInfo)
 	{
 #ifdef __OS_MAC__
 		mach_task_basic_info_data_t info;
@@ -216,7 +258,7 @@ namespace joke
 		std::ifstream statm("/proc/self/statm");
 		if (!statm.is_open()) {
 			// 打开文件失败
-			return;
+			return false;
 		}
 		std::string line;
 		std::getline(statm, line);
@@ -228,7 +270,7 @@ namespace joke
 
 		struct sysinfo mem_info;
     	if(sysinfo(&mem_info) != 0) {
-        	return;
+        	return false;
     	}
 		systemInfo.max_memory = mem_info.totalram;
 #else
@@ -253,7 +295,9 @@ namespace joke
 		memStatus.dwLength = sizeof(memStatus);
 		GlobalMemoryStatusEx(&memStatus);
 		systemInfo.max_memory = (long long)memStatus.ullTotalPhys;
+        CloseHandle(hProcess);
 #endif
+		return true;
 	}
 
     std::string System::mWorkPath;

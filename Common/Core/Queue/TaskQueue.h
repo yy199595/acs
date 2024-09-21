@@ -21,8 +21,8 @@ namespace custom
 		inline void Invoke(unsigned int maxCount = 500);
 	private:
 		std::mutex mMutex;
-		std::queue<joke::StaticMethod *> mReadQueue;
-		std::queue<joke::StaticMethod *> mWriteQueue;
+		std::queue<acs::StaticMethod *> mReadQueue;
+		std::queue<acs::StaticMethod *> mWriteQueue;
 	};
 
 	inline void TaskQueue::Invoke(unsigned int maxCount)
@@ -58,7 +58,7 @@ namespace custom
 	inline void TaskQueue::Start(F&& f, T* o, Args&& ...args)
 	{
 		this->mMutex.lock();
-		joke::StaticMethod* taskMethod =
+		acs::StaticMethod* taskMethod =
 				NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...);
 		this->mWriteQueue.emplace(taskMethod);
 		this->mMutex.unlock();
@@ -67,8 +67,8 @@ namespace custom
 	inline void TaskQueue::Start(std::function<void()>&& func)
 	{
 		this->mMutex.lock();
-		joke::StaticMethod * taskMethod =
-				new joke::LambdaMethod(std::move(func));
+		acs::StaticMethod * taskMethod =
+				new acs::LambdaMethod(std::move(func));
 		this->mWriteQueue.emplace(taskMethod);
 		this->mMutex.unlock();
 	}

@@ -22,6 +22,8 @@ namespace mongo
         std::string User;
 		std::string Address;
 		std::string Password;
+	public:
+		bool FromString(const std::string & url);
     };
 }
 

@@ -5,7 +5,7 @@
 #include"Url.h"
 #include<regex>
 #include"sstream"
-#include"Util/String/String.h"
+#include"Util/Tools/String.h"
 #include"Log/Common/CommonLogDef.h"
 namespace http
 {
@@ -50,7 +50,7 @@ namespace http
 		size_t count = os.readsome(buffer.get(), size);
 		if(count != size)
 		{
-			LOG_ERROR("read:{} size:{} count:{}", count, size, this->mReadCount);
+			CONSOLE_LOG_ERROR("read:{} size:{} count:{}", count, size, this->mReadCount);
 			return tcp::ReadDecodeError;
 		}
 		std::string lineData(buffer.get(), size - 2);

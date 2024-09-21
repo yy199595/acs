@@ -8,8 +8,8 @@
 #include "Lua/Engine/ModuleClass.h"
 #include "Http/Common/HttpRequest.h"
 #include "Http/Common/HttpResponse.h"
-
-namespace joke
+#include "Util/Tools/String.h"
+namespace acs
 {
 	std::unique_ptr<http::Request> Make(const std::string & url,
 			const json::w::Document & message, const char * type)
@@ -27,9 +27,7 @@ namespace joke
 			{
 				return nullptr;
 			}
-			std::string content;
-			document.Encode(&content);
-			request->SetContent(http::Header::JSON, content);
+			request->SetContent(document);
 		}
 		return request;
 	}
@@ -47,6 +45,8 @@ namespace joke
 			LOG_CHECK_RET_FALSE(jsonObject->Get("wx", this->mWxUrl))
 			LOG_CHECK_RET_FALSE(jsonObject->Get("ding", this->mDingUrl))
 		}
+		LOG_CHECK_RET_FALSE(help::Str::IsHttpAddr(this->mWxUrl))
+		LOG_CHECK_RET_FALSE(help::Str::IsHttpAddr(this->mDingUrl))
 		return true;
 	}
 
@@ -60,7 +60,7 @@ namespace joke
 	{
 		json::w::Document document;
 		document.Add("content", message);
-		std::unique_ptr<http::Request> request = joke::Make(this->mWxUrl, document, "text");
+		std::unique_ptr<http::Request> request = acs::Make(this->mWxUrl, document, "text");
 		{
 			this->mHttp->Send(std::move(request), [](http::Response* response)
 			{
@@ -85,7 +85,7 @@ namespace joke
 		}
 
 		document.Add("content", content);
-		auto request = joke::Make(url, document, "markdown");
+		auto request = acs::Make(url, document, "markdown");
 		{
 			this->mHttp->Send(std::move(request), [](http::Response* response)
 			{
@@ -139,7 +139,7 @@ namespace joke
 			}
 		}
 		std::string url = message.url.empty() ? this->mWxUrl : message.url;
-		auto request = joke::Make(url, document, "template_card");
+		auto request = acs::Make(url, document, "template_card");
 		if (async)
 		{
 			this->mHttp->Do(std::move(request));
@@ -156,7 +156,7 @@ namespace joke
 	{
 		json::w::Document document;
 		document.Add("content", message);
-		std::unique_ptr<http::Request> request = joke::Make(this->mDingUrl, document, "text");
+		std::unique_ptr<http::Request> request = acs::Make(this->mDingUrl, document, "text");
 		{
 			this->mHttp->Send(std::move(request), [](http::Response* response)
 			{

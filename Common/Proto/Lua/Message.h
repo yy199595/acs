@@ -6,7 +6,7 @@
 #define SERVER_MESSAGE_H
 #include"Lua/Engine/Define.h"
 #include"Proto/Component/ProtoComponent.h"
-namespace joke
+namespace acs
 {
 	class MessageDecoder //转lua
 	{
@@ -28,7 +28,7 @@ namespace joke
 	};
 }
 
-namespace joke
+namespace acs
 {
 	class MessageEncoder
 	{
@@ -58,6 +58,7 @@ namespace Lua
 		extern int Import(lua_State* lua);
 		extern int Encode(lua_State * lua);
 		extern int Decode(lua_State * lua);
+		extern int ToJson(lua_State * lua);
 	};
 }
 

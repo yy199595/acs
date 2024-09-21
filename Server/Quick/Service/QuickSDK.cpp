@@ -11,7 +11,7 @@
 
 #define LOG_CHECK_BREAK(obj) { if(!obj) { break; }}
 
-namespace joke
+namespace acs
 {
 	QuickSDK::QuickSDK()
 	{
@@ -41,12 +41,12 @@ namespace joke
 		std::string result = "FAILED";
 		do
 		{
-			const http::TextData* customData = request.GetBody()->To<const http::TextData>();
+			const http::TextContent* customData = request.GetBody()->To<const http::TextContent>();
 			if (customData == nullptr || customData->Content().empty())
 			{
 				break;
 			}
-			http::FromData fromData;
+			http::FromContent fromData;
 			if (!fromData.Decode(customData->Content()))
 			{
 				break;
@@ -108,7 +108,7 @@ namespace joke
 		{
 			return XCode::Failure;
 		}
-		const http::TextData * customData = response1->To<const http::TextData>();
+		const http::TextContent * customData = response1->To<const http::TextContent>();
 		if(customData == nullptr)
 		{
 			return XCode::Failure;

@@ -6,7 +6,7 @@
 #define APP_WECHAT_H
 #include "Http/Service/HttpService.h"
 
-namespace joke
+namespace acs
 {
 	class WeChat : public HttpService
 	{
@@ -17,10 +17,11 @@ namespace joke
 		bool OnInit() final;
 	private:
 		int Event(const http::Request & request, http::Response &);
-		int PhoneNum(const http::FromData & request, json::w::Document & response);
+		int PhoneNum(const http::FromContent & request, json::w::Document & response);
 	private:
 		class WeChatComponent * mWeChat;
 		class WXNoticeComponent * mNotice;
+		class WXComplaintComponent * mComplaint;
 	};
 }
 

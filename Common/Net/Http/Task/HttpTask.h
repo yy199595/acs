@@ -7,7 +7,7 @@
 #include"Http/Common/HttpResponse.h"
 #include"Rpc/Async/RpcTaskSource.h"
 
-namespace joke
+namespace acs
 {
 	class HttpRequestTask : public IRpcTask<http::Response>, protected WaitTaskSourceBase
     {
@@ -51,7 +51,7 @@ namespace joke
 	}
 }
 
-namespace joke
+namespace acs
 {
     class HttpRequestClient;
     class LuaHttpRequestTask : public IRpcTask<http::Response>

@@ -7,7 +7,7 @@
 #include"Mongo/Service/MongoDB.h"
 #include"Cluster/Config/ClusterConfig.h"
 
-namespace joke
+namespace acs
 {
 	MongoComponent::MongoComponent()
 	{
@@ -60,7 +60,7 @@ namespace joke
 		return code != XCode::Ok ? -2 : response->value();
 	}
 
-	int MongoComponent::Inc(const char* tab, json::w::Document& filter, const char* field, int value)
+	int MongoComponent::Inc(const char* tab, const json::w::Document& filter, const char* field, int value)
 	{
 		db::mongo::update request;
 		{
@@ -89,7 +89,19 @@ namespace joke
 		return this->Insert(request);
 	}
 
-	int MongoComponent::Update(const char* tab, json::w::Document& select, json::w::Document& update)
+	int MongoComponent::Save(const char* tab, const json::w::Document& select, const json::w::Document& update)
+	{
+		db::mongo::update request;
+		{
+			request.set_tab(tab);
+			request.set_tag("$set");
+		}
+		select.Encode(request.mutable_document()->mutable_filter());
+		update.Encode(request.mutable_document()->mutable_document());
+		return this->Save(request);
+	}
+
+	int MongoComponent::Update(const char* tab, const json::w::Document& select, const json::w::Document& update)
 	{
 		db::mongo::update request;
 		{
@@ -99,6 +111,17 @@ namespace joke
 		select.Encode(request.mutable_document()->mutable_filter());
 		update.Encode(request.mutable_document()->mutable_document());
 		return this->Update(request);
+	}
+
+	int MongoComponent::Save(const db::mongo::update& request)
+	{
+		const static std::string func("MongoDB.Save");
+		Server * targetServer = this->GetActor();
+		if(targetServer == nullptr)
+		{
+			return XCode::AddressAllotFailure;
+		}
+		return targetServer->Call(func, request);
 	}
 
 	int MongoComponent::Update(const db::mongo::update& request)
@@ -162,7 +185,7 @@ namespace joke
 		return targetServer->Send(func, request);
 	}
 
-	int MongoComponent::Insert(const char* tab, json::w::Document& json, bool call)
+	int MongoComponent::Insert(const char* tab, const json::w::Document& json, bool call)
 	{
 		db::mongo::insert request;
 		{
@@ -219,7 +242,7 @@ namespace joke
 		return targetServer->Call(func, request);
 	}
 
-	int MongoComponent::Remove(const char* tab, json::w::Document& select, int limit)
+	int MongoComponent::Remove(const char* tab, const json::w::Document& select, int limit)
 	{
 		db::mongo::remove request;
 		{
@@ -262,7 +285,7 @@ namespace joke
 	}
 
 	std::unique_ptr<db::mongo::find::response> MongoComponent::Find(
-			const char* tab, json::w::Document& select, int limit)
+			const char* tab, const json::w::Document& select, int limit)
 	{
 		db::mongo::find::request request;
 		{
@@ -273,7 +296,7 @@ namespace joke
 		return this->Find(request);
 	}
 
-	int MongoComponent::FindOne(const char* tab, json::w::Document& select, json::r::Document* response)
+	int MongoComponent::FindOne(const char* tab, const json::w::Document& select, json::r::Document* response)
 	{
 		db::mongo::find_one::request request;
 		{
@@ -322,7 +345,7 @@ namespace joke
 		return  code == XCode::Ok ? std::move(result) : nullptr;
 	}
 
-	int MongoComponent::Query(const char* tab, json::w::Document& filter, json::w::Value* response)
+	int MongoComponent::Query(const char* tab, const json::w::Document& filter, json::w::Value* response)
 	{
 		db::mongo::find::request message;
 		{
@@ -367,7 +390,7 @@ namespace joke
 		return targetServer->Call(func, request, response);
 	}
 
-	int MongoComponent::Count(const char* tab, json::w::Document& doc)
+	int MongoComponent::Count(const char* tab, const json::w::Document& doc)
 	{
 		db::mongo::count::request request;
 		{
@@ -386,7 +409,7 @@ namespace joke
 		return targetServer->Call(func, request, response.get()) == XCode::Ok ? response->count() : -1;
 	}
 
-	int MongoComponent::FindOne(const char* tab, json::w::Document & document, std::string* response)
+	int MongoComponent::FindOne(const char* tab, const json::w::Document & document, std::string* response)
 	{
 		db::mongo::find::request request;
 		{
@@ -444,5 +467,67 @@ namespace joke
 	std::unique_ptr<db::mongo::find::response> MongoComponent::Batch(mongo::Batch& batch)
 	{
 		return this->Find(*batch.Get());
+	}
+
+	int MongoComponent::Push(const char* tab, const json::w::Document& filter, const json::w::Document& value)
+	{
+		db::mongo::update request;
+		{
+			request.set_tab(tab);
+			request.set_tab("$push");
+			filter.Encode(request.mutable_document()->mutable_filter());
+			value.Encode(request.mutable_document()->mutable_document());
+		}
+		return this->Update(request);
+	}
+
+	std::vector<std::string> MongoComponent::GetDatabases()
+	{
+		std::vector<std::string> result;
+		Server* targetServer = this->GetActor();
+		const static std::string func("MongoDB.Databases");
+		std::unique_ptr<com::array::string> response = std::make_unique<com::array::string>();
+		do
+		{
+			if (targetServer == nullptr)
+			{
+				break;
+			}
+			if (targetServer->Call(func, response.get()) != XCode::Ok)
+			{
+				break;
+			}
+			for (int index = 0; index < response->array_size(); index++)
+			{
+				result.emplace_back(response->array(index));
+			}
+		} while (false);
+		return result;
+	}
+
+	std::vector<std::string> MongoComponent::GetCollects(const std::string& db)
+	{
+		std::vector<std::string> result;
+		Server* targetServer = this->GetActor();
+		const static std::string func("MongoDB.Collections");
+		std::unique_ptr<com::array::string> response = std::make_unique<com::array::string>();
+		do
+		{
+			if (targetServer == nullptr)
+			{
+				break;
+			}
+			com::type::string request;
+			request.set_str(db);
+			if (targetServer->Call(func, request, response.get()) != XCode::Ok)
+			{
+				break;
+			}
+			for (int index = 0; index < response->array_size(); index++)
+			{
+				result.emplace_back(response->array(index));
+			}
+		} while (false);
+		return result;
 	}
 }

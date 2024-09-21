@@ -7,7 +7,7 @@
 #include"Proto/Include/Message.h"
 #include"Entity/Component/Component.h"
 
-namespace joke
+namespace acs
 {
     class MysqlHelperComponent final : public Component
 	{

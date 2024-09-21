@@ -5,7 +5,7 @@
 #include"LuaModule.h"
 #include"Lua/Engine/Function.h"
 #include"Log/Common/CommonLogDef.h"
-#include "Util/Time/TimeHelper.h"
+#include "Util/Tools/TimeHelper.h"
 
 namespace Lua
 {

@@ -11,7 +11,7 @@ namespace custom
 	class MongoOutput : public IOutput
 	{
 	public:
-		explicit MongoOutput(mongo::MongoConfig  config);
+		explicit MongoOutput(mongo::MongoConfig config);
 	private:
 		bool Start(Asio::Context &io) final;
 		void Push(Asio::Context &io, const std::string &name, const custom::LogInfo &logInfo) final;

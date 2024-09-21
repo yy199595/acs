@@ -2,7 +2,7 @@
 #include<memory>
 #include<unordered_map>
 #include"Component.h"
-namespace joke
+namespace acs
 {
     template<typename T>
     class TypeProxy : public Type
@@ -18,7 +18,7 @@ namespace joke
     };
 }
 
-namespace joke
+namespace acs
 {
 	class ComponentFactory
 	{
@@ -70,7 +70,7 @@ namespace joke
 	};
 
 	template<typename T>
-	std::unique_ptr<Component> joke::ComponentFactory::CreateComponent()
+	std::unique_ptr<Component> acs::ComponentFactory::CreateComponent()
 	{
 		size_t key = typeid(T).hash_code();
 		auto iter = mTypeInfoMap1.find(key);

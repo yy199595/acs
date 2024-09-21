@@ -7,7 +7,7 @@
 #include"LuaMysqlTask.h"
 #include"Lua/Engine/Define.h"
 
-namespace joke
+namespace acs
 {
 	LuaMysqlTask::LuaMysqlTask(lua_State *lua, int id)
 		: IRpcTask<Mysql::Response>(id), mLua(lua)

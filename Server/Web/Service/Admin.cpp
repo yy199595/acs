@@ -2,18 +2,18 @@
 // Created by zmhy0073 on 2022/8/29.
 //
 #include"Admin.h"
-#include"Util/Zip/Zip.h"
+#include"Util/Tools/Zip.h"
 #include"Core/System/System.h"
 #include"Entity/Actor/App.h"
 #include"Util/File/DirectoryHelper.h"
 #include"Message/com/com.pb.h"
 #include"Util/File/FileHelper.h"
-#include"Util/Time/TimeHelper.h"
+#include"Util/Tools/TimeHelper.h"
 #include"Auth/Jwt/Jwt.h"
 #include"Proto/Component/ProtoComponent.h"
 #include"Web/Component/AdminComponent.h"
 #include"Mongo/Component/MongoComponent.h"
-namespace joke
+namespace acs
 {
 	Admin::Admin()
 	{
@@ -30,15 +30,20 @@ namespace joke
 
     bool Admin::OnInit()
 	{
-		BIND_COMMON_HTTP_METHOD(Admin::Ping);
 		BIND_COMMON_HTTP_METHOD(Admin::Info);
+		BIND_COMMON_HTTP_METHOD(Admin::Ping);
 		BIND_COMMON_HTTP_METHOD(Admin::Stop);
 		BIND_COMMON_HTTP_METHOD(Admin::Hello);
 		BIND_COMMON_HTTP_METHOD(Admin::Hotfix);
-		BIND_COMMON_HTTP_METHOD(Admin::Login);
-		BIND_COMMON_HTTP_METHOD(Admin::Register);
+		BIND_COMMON_HTTP_METHOD(Admin::AllInfo);
 		BIND_COMMON_HTTP_METHOD(Admin::RpcInterface);
 		BIND_COMMON_HTTP_METHOD(Admin::HttpInterface);
+
+		BIND_COMMON_HTTP_METHOD(Admin::List);
+		BIND_COMMON_HTTP_METHOD(Admin::Update);
+		BIND_COMMON_HTTP_METHOD(Admin::Remove);
+		BIND_COMMON_HTTP_METHOD(Admin::Login);
+		BIND_COMMON_HTTP_METHOD(Admin::Register);
 		this->mProto = this->GetComponent<ProtoComponent>();
 		this->mAdmin = this->GetComponent<AdminComponent>();
 		this->mActorComponent = this->GetComponent<ActorComponent>();
@@ -48,7 +53,7 @@ namespace joke
 	int Admin::Login(const http::Request& request, json::w::Document& response)
 	{
 		std::string user, password, ip;
-		const http::FromData & query = request.GetUrl().GetQuery();
+		const http::FromContent & query = request.GetUrl().GetQuery();
 		{
 			request.GetIp(ip);
 			LOG_ERROR_CHECK_ARGS(query.Get("user", user))
@@ -83,33 +88,65 @@ namespace joke
 			jsonData->Add("tick", tokenExpTime);
 		}
 		json::w::Document updater;
-		updater.Add("last_ip", ip);
+		updater.Add("login_ip", ip);
 		updater.Add("login_time", nowTime);
 		this->mAdmin->UpdateUser(userInfo->user_id, updater);
 		std::unique_ptr<json::w::Value> jsonInfo = response.AddObject("info");
 		{
 			jsonInfo->Add("login_ip", ip);
 			jsonInfo->Add("name", userInfo->name);
-			jsonInfo->Add("city_name", userInfo->city_name);
+			jsonInfo->Add("user_id", userInfo->user_id);
 			jsonInfo->Add("permission", userInfo->permission);
 			jsonInfo->Add("login_time", userInfo->login_time);
 			jsonInfo->Add("create_time", userInfo->create_time);
 		}
-		const_cast<http::FromData&>(query).Add(http::query::UserId, userInfo->user_id);
+		const_cast<http::FromContent&>(query).Add(http::query::UserId, userInfo->user_id);
 		return XCode::Ok;
 	}
 
 	int Admin::Register(const json::r::Document& request)
 	{
 		admin::UserInfo userInfo;
-		LOG_ERROR_CHECK_ARGS(request.Get("city", userInfo.city))
 		LOG_ERROR_CHECK_ARGS(request.Get("name", userInfo.name))
 		LOG_ERROR_CHECK_ARGS(request.Get("account", userInfo.account))
 		LOG_ERROR_CHECK_ARGS(request.Get("passwd", userInfo.password))
-		return XCode::Ok;
+		LOG_ERROR_CHECK_ARGS(request.Get("permiss", userInfo.permission))
+		return this->mAdmin->InsertUser(userInfo);
 	}
 
-	int Admin::Ping(const http::FromData & request, json::w::Value & response)
+	int Admin::Update(const http::Request& request, http::Response&)
+	{
+		int userId = 0;
+		if (!request.GetUrl().GetQuery().Get(http::query::UserId, userId))
+		{
+			return XCode::CallArgsError;
+		}
+		const http::JsonContent* jsonContent = request.GetBody()->To<const http::JsonContent>();
+		if (jsonContent == nullptr)
+		{
+			return XCode::CallArgsError;
+		}
+		int count = 0;
+		std::string passwd, name;
+		json::w::Document updater;
+		if (jsonContent->Get("name", name) && !name.empty())
+		{
+			count++;
+			updater.Add("name", name);
+		}
+		if (jsonContent->Get("passwd", passwd) && !passwd.empty())
+		{
+			count++;
+			updater.Add("password", passwd);
+		}
+		if (count == 0)
+		{
+			return XCode::Ok;
+		}
+		return this->mAdmin->UpdateUser(userId, updater);
+	}
+
+	int Admin::Ping(const http::FromContent & request, json::w::Value & response)
 	{
 		int id = 0;
 		if(!request.Get("id", id))
@@ -122,7 +159,7 @@ namespace joke
 			return XCode::NotFoundActor;
 		}
 		long long t1 = help::Time::NowMil();
-		int code = server->Call("Node.Ping");
+		int code = server->Call("NodeSystem.Ping");
 		{
 			response.Add("time", help::Time::NowMil() - t1);
 		}
@@ -135,7 +172,21 @@ namespace joke
 		return XCode::Ok;
 	}
 
-	void Admin::AddRpcData(json::w::Value & response, const joke::RpcMethodConfig* methodConfig)
+	int Admin::List(const http::FromContent& request, json::w::Document& response)
+	{
+		int page = 1;
+		LOG_ERROR_CHECK_ARGS(request.Get("page", page));
+		return this->mAdmin->List(page, response);
+	}
+
+	int Admin::Remove(const http::FromContent& request, json::w::Document& response)
+	{
+		int userId = 0;
+		LOG_ERROR_CHECK_ARGS(request.Get("id", userId));
+		return this->mAdmin->Remove(userId);
+	}
+
+	void Admin::AddRpcData(json::w::Value & response, const acs::RpcMethodConfig* methodConfig)
 	{
 		pb_json::JsonOptions options;
 		options.add_whitespace = true;
@@ -171,7 +222,7 @@ namespace joke
 		response.Add("async", methodConfig->IsAsync);
 	}
 
-	int Admin::RpcInterface(const http::FromData & request, json::w::Document & response)
+	int Admin::RpcInterface(const http::FromContent & request, json::w::Document & response)
 	{
 		int page = 0;
 		int type = 0;
@@ -206,7 +257,7 @@ namespace joke
 		return XCode::Ok;
 	}
 
-	int Admin::HttpInterface(const http::FromData & request, json::w::Document & response)
+	int Admin::HttpInterface(const http::FromContent & request, json::w::Document & response)
 	{
 		int page = 0;
 		std::string method, name;
@@ -249,7 +300,7 @@ namespace joke
 		return XCode::Ok;
 	}
 
-	int Admin::Hotfix(const http::FromData & request, json::w::Value&response)
+	int Admin::Hotfix(const http::FromContent & request, json::w::Value&response)
 	{
 		int id = 0;
 		if(!request.Get("id", id))
@@ -261,10 +312,10 @@ namespace joke
 		{
 			return XCode::NotFoundActor;
 		}
-		return server->Call("Node.Hotfix");
+		return server->Call("NodeSystem.Hotfix");
 	}
 
-	int Admin::Stop(const http::FromData & request, json::w::Value & response)
+	int Admin::Stop(const http::FromContent & request, json::w::Value & response)
 	{
 		int id = 0;
 		if(!request.Get("id", id))
@@ -278,14 +329,25 @@ namespace joke
 			response.Add("error", "not find server");
 			return XCode::NotFoundActor;
 		}
-		return server->Call("Node.Shutdown");
+		return server->Call("NodeSystem.Shutdown");
 	}
 
-	int Admin::Info(const http::FromData & request, json::w::Document& response)
+	int Admin::Info(const http::FromContent& request, json::w::Document& response)
+	{
+		std::unique_ptr<com::type::json> result = std::make_unique<com::type::json>();
+		if (this->mApp->Call("NodeSystem.RunInfo", result.get()) != XCode::Ok)
+		{
+			return XCode::Failure;
+		}
+		response.AddJson("data", result->json());
+		return XCode::Ok;
+	}
+
+	int Admin::AllInfo(const http::FromContent & request, json::w::Document& response)
     {
 		int id = -1;
 		std::vector<int> serverActors;
-		if(request.Get("id", id) & id >= 0)
+		if(request.Get("id", id) && id >= 0)
 		{
 			serverActors.emplace_back(id);
 		}
@@ -300,7 +362,7 @@ namespace joke
 			result->Clear();
 			if(Server * server = this->mActorComponent->GetServer(serverId))
 			{
-				if (server->Call("Node.RunInfo", result.get()) == XCode::Ok)
+				if (server->Call("NodeSystem.RunInfo", result.get()) == XCode::Ok)
 				{
 					document->PushJson(result->json());
 				}

@@ -7,7 +7,7 @@
 #include<fstream>
 #include <memory>
 #include"httpHead.h"
-#include"Http/Common/Data.h"
+#include"Http/Common/Content.h"
 #include"Lua/Engine/Define.h"
 #include"Proto/Message/IProto.h"
 #include"Yyjson/Document/Document.h"
@@ -28,7 +28,7 @@ namespace http
 	public:
 		template<typename T>
 		inline const T * To() const;
-		inline const Data * GetBody() const { return this->mBody.get(); }
+		inline const Content * GetBody() const { return this->mBody.get(); }
 	public:
 		void SetCode(HttpStatus code);
 		void Json(const std::string & json);
@@ -38,7 +38,7 @@ namespace http
 		bool OpenOrCreateFile(const std::string & path);
 		bool File(const std::string & type, const std::string & path);
 		void SetContent(const std::string & type, const std::string& str);
-		inline void SetContent(std::unique_ptr<Data> data) { this->mBody = std::move(data); }
+		inline void SetContent(std::unique_ptr<Content> data) { this->mBody = std::move(data); }
 	public:
 		std::string ToString() final;
 		int WriteToLua(lua_State *lua) const final;
@@ -52,7 +52,7 @@ namespace http
 		std::string mError;
 		std::string mChunked;
 		std::string mVersion;
-		std::unique_ptr<http::Data> mBody;
+		std::unique_ptr<http::Content> mBody;
 	};
 
 	template<typename T> inline const T* Response::To() const

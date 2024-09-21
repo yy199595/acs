@@ -17,7 +17,20 @@ namespace custom
 		int MaxSize = 1024 * 1024 * 20; //最大字节
 		std::string Root; //根目录
 		std::string Name;	//日志名字
-		std::string Server; //服务器名字
+	};
+
+	struct LogConfig
+	{
+		int max_line = 0;
+		int max_size = 0;
+		bool open = true;
+		std::string path;
+		std::string name;
+		std::string pem;
+		std::string wx;
+		std::string ding;
+		std::string mongo;
+		custom::LogLevel level;
 	};
 
 	class IOutput

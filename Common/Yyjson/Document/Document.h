@@ -68,13 +68,13 @@ namespace json
 		class Document : public Value
 		{
 		public:
-			Document(bool array = false);
-			Document(const std::string & json);
+			explicit Document(bool array = false);
+			explicit Document(const std::string & json);
 			Document(yyjson_mut_doc* doc, yyjson_mut_val* val);
-			~Document() override {yyjson_mut_doc_free(this->mDoc);}
+			~Document() final {yyjson_mut_doc_free(this->mDoc);}
 		public:
 			std::string JsonString(bool pretty = false);
-			bool Encode(std::string* json, bool pretty = false);
+			bool Encode(std::string* json, bool pretty = false) const;
 		private:
 		};
 	}
@@ -141,6 +141,8 @@ namespace json
 			std::string mError;
 		};
 	}
+
+	extern void Merge(json::w::Document & target, json::r::Value & source);
 }
 
 

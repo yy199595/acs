@@ -1,56 +1,69 @@
 <template>
     <div>
         <el-row :gutter="20">
-            <el-col :span="5">
-                <el-card shadow="hover" class="mgb20" style="height: 41vh">
-                    <div class="user-info-cont">
-                        <Avatar type="home" :userName="user.name"/>
-                    </div>
-                    <div style="font-size: 20px; color: #dd4a68">
-                        <span class="info-label">权限：</span>
-                        <span>{{ format_permiss(null, null, user.permission) }}</span>
-                    </div>
-                    <div style="font-size: 20px; color: #dd4a68">
-                        <span class="info-label">城市：</span>
-                        <span>{{ user.city_name }}</span>
-                    </div>
-                    <div class="user-info-list" style="font-size: 20px; color: #20a0ff">
-                        <span class="info-label">登录IP：</span>
-                        <span style="color: #dd4a68">{{ user.login_ip }}</span>
-                    </div>
-                    <div class="user-info-list" style="font-size: 20px; color: #79bbff">
-                        <span class="info-label">注册时间：</span>
-                        <span style="color: #67c23a;">{{ timeToStrTime(user.create_time * 1000) }}</span>
-                    </div>
-                    <div class="user-info-list" style="font-size: 20px; color: #a0cfff">
-                        <span class="info-label">登录时间：</span>
-                        <span style="color: #67c23a;">{{ timeToStrTime(user.login_time * 1000) }}</span>
-                    </div>
+            <el-col :span="6">
+                <el-card shadow="hover" class="mgb20" style="height: 45%">
+                    <el-descriptions title="用户信息" border column="1">
+                        <el-descriptions-item label="昵称">{{ user.name }}</el-descriptions-item>
+                        <el-descriptions-item label="权限">{{ format_permiss(null, null, user.permission) }}
+                        </el-descriptions-item>
+                        <el-descriptions-item label="登录IP">{{ user.login_ip }}</el-descriptions-item>
+                        <el-descriptions-item label="注册时间">{{ timeToStrTime(user.create_time * 1000) }}
+                        </el-descriptions-item>
+                        <el-descriptions-item label="登录时间">{{ timeToStrTime(user.login_time * 1000) }}
+                        </el-descriptions-item>
+                        <el-descriptions-item label="登录地点">{{ user.city_name }}</el-descriptions-item>
+                    </el-descriptions>
                 </el-card>
-                <el-button @click="show_view=true">小姐姐视频</el-button>
-<!--                <el-card shadow="hover" class="mgb20" style="height: 42vh">-->
-<!--                    <video width="250" height="350" controls autoplay>-->
-<!--                        <source src="http://api.yujn.cn/api/zzxjj.php?type=video">-->
-<!--                    </video>-->
-<!--                </el-card>-->
-                <el-dialog v-model="show_view" title="小姐姐视频">
-                    <el-button @click="index++">刷新</el-button>
-                    <video :key="index" width="500" height="600" controls autoplay src="http://api.yujn.cn/api/zzxjj.php?type=video">
+                <el-card shadow="hover" class="mgb20" style="height: 55%">
+                    <el-form inline="inline">
+                        <el-form-item>
+                            <h3>服务器信息</h3>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button icon="refresh" @click="refresh_sever_info"></el-button>
+                        </el-form-item>
+                    </el-form>
+                    <el-descriptions border column="1">
+                        <el-descriptions-item label="名字">{{ run_info.name }}</el-descriptions-item>
+                        <el-descriptions-item label="CPU使用率">{{
+                                run_info.cpu.toFixed(2) + "%"
+                            }}
+                        </el-descriptions-item>
 
-                    </video>
-                </el-dialog>
+                        <el-descriptions-item label="使用内存">
+                            {{ (run_info.use_memory / (1024 * 1024)).toFixed(2) + "MB" }}
+                        </el-descriptions-item>
+                        <el-descriptions-item label="物理内存">
+                            {{ (run_info.max_memory / (1024 * 1024 * 1024)).toFixed(2) + "G" }}
+                        </el-descriptions-item>
+                        <el-descriptions-item label="http总处理">{{ run_info.web.sum }}</el-descriptions-item>
+                        <el-descriptions-item label="Mongo总处理">{{ run_info.mongo.sum }}</el-descriptions-item>
+                        <el-descriptions-item label="启动时间">{{
+                                new Date(run_info.time).toLocaleString()
+                            }}
+                        </el-descriptions-item>
+                    </el-descriptions>
+                </el-card>
             </el-col>
-            <el-col :span="19">
-                <el-card shadow="hover" style="height: 85vh">
-                    <h3>操作记录</h3>
-                    <el-table :data="tab.list" border>
+            <el-col :span="18">
+                <el-card shadow="hover" style="height: 100%">
+                    <h4>操作记录</h4>
+                    <el-table :data="tab.list" border style="margin-top: 20px">
                         <el-table-column label="用户" prop="name"></el-table-column>
                         <el-table-column label="方法" prop="method"></el-table-column>
-                        <el-table-column label="路径" prop="url"></el-table-column>
-                        <el-table-column label="描述" prop="desc"></el-table-column>
-                        <el-table-column label="时间" prop="time" :formatter="format_time"></el-table-column>
-                        <el-table-column label="请求" prop="request" show-overflow-tooltip></el-table-column>
-                        <el-table-column label="返回" prop="response" show-overflow-tooltip></el-table-column>
+                        <el-table-column label="路径" prop="url" show-overflow-tooltip></el-table-column>
+                        <el-table-column label="描述" prop="desc" show-overflow-tooltip></el-table-column>
+                        <el-table-column label="时间" prop="time" show-overflow-tooltip
+                                         :formatter="format_time"></el-table-column>
+                        <el-table-column label="查看">
+                            <template #default="scope">
+                                <el-button type="primary" @click="look_http(scope.row)">查看</el-button>
+                                <el-button type="danger" v-if="user.permission === 100">删除</el-button>
+                            </template>
+                        </el-table-column>
+                        <!--                        <el-table-column label="请求" prop="request" show-overflow-tooltip></el-table-column>-->
+                        <!--                        <el-table-column label="返回" prop="response" show-overflow-tooltip></el-table-column>-->
                     </el-table>
 
                     <div class="pagination">
@@ -66,7 +79,17 @@
                 </el-card>
             </el-col>
         </el-row>
+        <el-dialog title="查看http请求" v-model="view.show">
+            <el-descriptions column="1">
+                <el-descriptions-item label="请求">
+                    <json-viewer :data="view.request" :key="view.index"></json-viewer>
+                </el-descriptions-item>
+                <el-descriptions-item label="返回">
+                    <json-viewer :data="view.response" :key="view.index"></json-viewer>
+                </el-descriptions-item>
+            </el-descriptions>
 
+        </el-dialog>
     </div>
 </template>
 
@@ -75,11 +98,16 @@
 import {format_permiss, format_time} from "../api/format";
 import {RequestOptRecord} from "../api/login";
 import Avatar from '../views/Avatar.vue';
+import axios from "axios";
+import service from "../utils/request";
+import {httpRequest} from "../utils/httpRequest";
+import JsonViewer from "./json_view.vue";
 
 
 export default {
     name: "welcome",
     components: {
+        JsonViewer,
         Avatar
     },
     data() {
@@ -88,12 +116,26 @@ export default {
                 list: [],
                 page: {
                     index: 1,
-                    count: 8,
+                    count: 10,
                     total: 0
                 },
             },
-            index : 1,
-            show_view : false,
+            index: 1,
+            show_view: false,
+            run_info: {
+                name: "",
+                fps: "",
+                time: 0,
+                cpu: 0,
+                use_memory: 0,
+                max_memory: 0,
+                web: {
+                    sum: 0
+                },
+                mongo: {
+                    sum: 0
+                }
+            },
             user: {
                 name: "",
                 login_ip: "",
@@ -102,18 +144,41 @@ export default {
                 login_time: 0,
                 create_time: 0,
             },
+            view: {
+                index: 0,
+                show: false,
+                request: {},
+                response: {}
+            },
             format_time: format_time,
             format_permiss: format_permiss
         }
     },
     methods: {
+        service,
         timeToStrTime(timestamp) {
             const date = new Date(timestamp);
-            return  date.toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai', hour12: false});
+            return date.toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai', hour12: false});
         },
+        look_http(data) {
+            this.view.index++
+            this.view.request = this.parse_data(data.request)
+            this.view.response = this.parse_data(data.response)
+            this.view.show = true
+        },
+
+        parse_data(data) {
+            try {
+                return JSON.parse(data)
+            } catch (e) {
+                const params = new URLSearchParams(data);
+                return Object.fromEntries(params.entries());
+            }
+        },
+
         handlePageChange(page) {
             this.tab.page.index = page
-            this.query_operator_record().then(()=> {
+            this.query_operator_record().then(() => {
 
             })
         },
@@ -124,21 +189,27 @@ export default {
                 this.tab.list = result.data.list
                 this.tab.page.total = result.data.count
             }
+        },
+        async refresh_sever_info() {
+            const response = await httpRequest.GET("/admin/info")
+            if (response.data.code === 0) {
+                this.run_info = response.data.data
+            }
         }
     },
     async mounted() {
         const user_json = localStorage.getItem("user_info")
         if (user_json && user_json.length > 0) {
             this.user = JSON.parse(user_json)
+            try {
+                const response = await axios.get(`http://ip-api.com/json/${this.user.login_ip}?lang=zh-CN`)
+                this.user.city_name = response.data.city
+            } catch (e) {
+                this.user.city_name = "未知"
+            }
         }
-        console.log(this.user)
-        // const response1 = await axios.get("https://findmyip.net/api/ipinfo.php?ip=" + this.user.login_ip)
-        // if(response1.status === 200 && response1.data.data)
-        // {
-        //     const result = response1.data.data["API_1"]
-        //     this.user.login_city = `${result.country}-${result.city}`
-        // }
-        this.query_operator_record().then(()=> {
+        await this.refresh_sever_info();
+        this.query_operator_record().then(() => {
 
         })
     }

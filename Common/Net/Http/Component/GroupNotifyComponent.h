@@ -48,7 +48,7 @@ namespace notify
 	};
 }
 
-namespace joke
+namespace acs
 {
 	class GroupNotifyComponent : public Component, public ILuaRegister, public IComplete
 	{

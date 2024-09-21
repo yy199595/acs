@@ -4,31 +4,32 @@
 #include"Network/Tcp/Asio.h"
 #include"Core/System/System.h"
 #include"Core/Thread/ThreadSync.h"
-#include"Util/Time/TimeHelper.h"
+#include"Util/Tools/TimeHelper.h"
+#include "Util/Tools/Math.h"
 #include"Server/Component/ThreadComponent.h"
 
-namespace joke
+namespace acs
 {
-	ListenData::ListenData(const ListenConfig & conf)
+	ListenData::ListenData(const ListenConfig& conf)
 #ifdef __ENABLE_OPEN_SSL__
 		: SslCtx(asio::ssl::context::tlsv12), Config(conf)
 	{
-		if(!this->Config.Cert.empty())
+		if (!this->Config.Cert.empty())
 		{
-			const std::string & key = this->Config.Key;
-			const std::string & cert = this->Config.Cert;
+			const std::string& key = this->Config.Key;
+			const std::string& cert = this->Config.Cert;
 			this->SslCtx.use_certificate_chain_file(cert);
 			this->SslCtx.use_private_key_file(key, asio::ssl::context::pem);
 		}
 	}
 #else
-	{ }
+	{}
 #endif
 
 	tcp::Socket* ListenData::Create(class ThreadComponent* component)
 	{
 #ifdef __ENABLE_OPEN_SSL__
-		if(!this->Config.Cert.empty())
+		if (!this->Config.Cert.empty())
 		{
 			return component->CreateSocket(this->SslCtx);
 		}
@@ -40,6 +41,7 @@ namespace joke
 	{
 		this->mOffsetPort = 0;
 		this->mAcceptor = nullptr;
+		this->mThreadComponent = nullptr;
 	}
 
 	ListenerComponent::~ListenerComponent()
@@ -60,10 +62,10 @@ namespace joke
 			LOG_CHECK_RET_FALSE(config->Get("core", jsonObj));
 			LOG_CHECK_RET_FALSE(jsonObj->Get("host", this->mHost));
 		}
-		System::GetEnv("port", this->mOffsetPort);
+		os::System::GetEnv("port", this->mOffsetPort);
 		LOG_CHECK_RET_FALSE(config->Get("listen", jsonObj));
 		LOG_CHECK_RET_FALSE(jsonObj->GetKeys(keys) > 0);
-		for (const char* key: keys)
+		for (const char* key : keys)
 		{
 			std::string value;
 			std::unique_ptr<json::r::Value> jsonData;
@@ -85,7 +87,7 @@ namespace joke
 			jsonData->Get("key", listenConfig.Key);
 			jsonData->Get("cert", listenConfig.Cert);
 #endif
-			if(listenConfig.Port > 0)
+			if (listenConfig.Port > 0)
 			{
 				listenConfig.Port += this->mOffsetPort;
 				listenConfig.Addr = fmt::format("{}://{}:{}", listenConfig.Protocol, this->mHost, listenConfig.Port);
@@ -102,47 +104,41 @@ namespace joke
 		std::unique_ptr<json::r::Value> listenObj;
 		this->mThreadComponent = this->GetComponent<ThreadComponent>();
 
-		for(const auto & item : this->mListenConfigs)
+		for (const auto& item : this->mListenConfigs)
 		{
-			const ListenConfig & config = item.second;
-			if(config.Port > 0 && !this->StartListen(config))
+			const ListenConfig& config = item.second;
+			if (config.Port > 0 && !this->StartListen(config))
 			{
 				LOG_ERROR("listen [{}] error", config.Addr);
 				return false;
 			}
 		}
 		auto iter = this->mListenDatas.begin();
-		for(; iter != this->mListenDatas.end(); iter++)
+		for (; iter != this->mListenDatas.end(); iter++)
 		{
-#ifdef __ENABLE_OPEN_SSL__
-			bool ssl = iter->second->IsEnableSsl();
-#else
-			bool ssl = false;
-#endif
-			const std::string & name = iter->first;
-			const std::string & address = iter->second->Config.Addr;
-			LOG_INFO("[{}] {} listen [{}] ok", ssl, name, address);
+			const std::string& name = iter->first;
+			LOG_INFO("[{}] listen [{}] ok", name, iter->second->Config.Addr);
 		}
 		//this->mThreadComponent->AddThread(&this->mThread);
 		return true;
 	}
 
-	bool ListenerComponent::StartListen(const ListenConfig & config)
+	bool ListenerComponent::StartListen(const ListenConfig& config)
 	{
-		Asio::Context & io = this->mThreadComponent->GetContext();
+		Asio::Context& io = this->mThreadComponent->GetContext();
 		std::unique_ptr<ListenData> listenData = std::make_unique<ListenData>(config);
 		{
 			listenData->Acceptor = std::make_unique<Asio::Acceptor>(io);
 			listenData->Listener = this->GetComponent<ITcpListen>(config.Component);
 		}
-		if(listenData->Listener == nullptr)
+		if (listenData->Listener == nullptr)
 		{
 			LOG_ERROR("not component {}", listenData->Config.Component);
 			return false;
 		}
 #ifdef ONLY_MAIN_THREAD
 		Asio::EndPoint ep(asio::ip::address(), config.Port);
-		while(!listenData->Acceptor->is_open())
+		while (!listenData->Acceptor->is_open())
 		{
 			try
 			{
@@ -160,26 +156,26 @@ namespace joke
 #else
 		custom::ThreadSync<bool> threadSync;
 		io.post([&threadSync, listenInfo = listenData.get(), this, config]
-		{
-			Asio::EndPoint ep(asio::ip::address(), config.Port);
-			while (!listenInfo->Acceptor->is_open())
 			{
-				try
+				Asio::EndPoint ep(asio::ip::address(), config.Port);
+				while (!listenInfo->Acceptor->is_open())
 				{
-					listenInfo->Acceptor->open(ep.protocol());
-					listenInfo->Acceptor->set_option(asio::ip::tcp::acceptor::reuse_address(true));
-					listenInfo->Acceptor->bind(ep);
-					listenInfo->Acceptor->listen();
+					try
+					{
+						listenInfo->Acceptor->open(ep.protocol());
+						listenInfo->Acceptor->set_option(asio::ip::tcp::acceptor::reuse_address(true));
+						listenInfo->Acceptor->bind(ep);
+						listenInfo->Acceptor->listen();
+					}
+					catch (std::system_error& error)
+					{
+						listenInfo->Acceptor->close();
+						std::this_thread::sleep_for(std::chrono::seconds(3));
+						CONSOLE_LOG_ERROR("listen [{}] {}", config.Addr, error.what());
+					}
 				}
-				catch (std::system_error& error)
-				{
-					listenInfo->Acceptor->close();
-					std::this_thread::sleep_for(std::chrono::seconds(3));
-					LOG_ERROR("listen [{}] {}", config.Addr, error.what());
-				}
-			}
-			threadSync.SetResult(listenInfo->Acceptor->is_open());
-		});
+				threadSync.SetResult(listenInfo->Acceptor->is_open());
+			});
 		if (!threadSync.Wait())
 		{
 			return false;
@@ -192,47 +188,24 @@ namespace joke
 		return true;
 	}
 
-	void ListenerComponent::AcceptConnect(joke::ListenData* listenData)
+	void ListenerComponent::AcceptConnect(acs::ListenData* listenData)
 	{
 		if (listenData->Acceptor == nullptr)
 		{
-			LOG_ERROR("{} acceptor is null", listenData->Config.Name);
 			return;
 		}
 		tcp::Socket* sock = listenData->Create(this->mThreadComponent);
 		listenData->Acceptor->async_accept(sock->Get(), [sock, this, listenData](const Asio::Code& code)
-		{
-			if (code.value() != Asio::OK)
 			{
-				sock->Close();
-				delete sock;
-				if (code != asio::error::operation_aborted)
+				do
 				{
-					LOG_ERROR("[{}] listen code:{}", listenData->Config.Addr, code.message());
-					return;
-
-				}
-				//LOG_ERROR("[{}] listen code:{}", listenData->Config.Addr, code.message());
-			}
-			else
-			{
-				sock->Init();
-
-#ifdef ONLY_MAIN_THREAD
-				if(!listenData->Listener->OnListen(sock))
-				{
-					sock->Close();
-					delete sock;
-				}
-#else
-
-				sock->Get().async_wait(asio::socket_base::wait_read, [listenData, sock](const asio::error_code& code)
-				{
+					
 					if (code.value() != Asio::OK)
 					{
-						sock->Close();
-						return;
+						sock->Destory();
+						break;
 					}
+					sock->Init();
 #ifdef __ENABLE_OPEN_SSL__
 					if (sock->IsOpenSsl())
 					{
@@ -241,30 +214,37 @@ namespace joke
 						ssl.handshake(asio::ssl::stream_base::server, code);
 						if (code.value() != Asio::OK)
 						{
-							sock->Close();
-							return;
+							sock->Destory();
+							break;
 						}
 					}
 #endif
-					listenData->SocketList.Push(sock);
-				});
-#endif
-			}
-			if (listenData->Acceptor != nullptr)
-			{
-				if (!listenData->Acceptor->is_open())
+#ifdef ONLY_MAIN_THREAD
+					this->OnAcceptSocket(listenData, sock);
+#else
+					Asio::Context& io = this->mApp->GetContext();
+					asio::post(io, std::bind(&ListenerComponent::OnAcceptSocket, this, listenData, sock));
+#endif			
+				} while (false);
+				if(listenData->Acceptor == nullptr)
 				{
 					return;
 				}
-			}
 #ifdef ONLY_MAIN_THREAD
-			this->AcceptConnect(listenData);
+				this->AcceptConnect(listenData);
 #else
-			const Asio::Executor& executor = listenData->Acceptor->get_executor();
-			//LOG_DEBUG("[{}] connect {} ok", sock->GetAddress(), listenData->Config.Addr);
-			asio::post(executor, std::bind(&ListenerComponent::AcceptConnect, this, listenData));
+				const Asio::Executor& executor = listenData->Acceptor->get_executor();
+				asio::post(executor, std::bind(&ListenerComponent::AcceptConnect, this, listenData));
 #endif
-		});
+			});
+	}
+
+	void ListenerComponent::OnAcceptSocket(ListenData* listenData, tcp::Socket* sock)
+	{
+		if (!listenData->Listener->OnListen(sock))
+		{
+			sock->Destory();
+		}
 	}
 
 	bool ListenerComponent::StartListen(const char* name)
@@ -292,7 +272,7 @@ namespace joke
 		return true;
 	}
 
-	bool ListenerComponent::StopListen(joke::ListenData* listenData)
+	bool ListenerComponent::StopListen(acs::ListenData* listenData)
 	{
 #ifdef ONLY_MAIN_THREAD
 		Asio::Code code;
@@ -312,28 +292,7 @@ namespace joke
 		return threadSync.Wait();
 #endif
 	}
-#ifndef ONLY_MAIN_THREAD
-	void ListenerComponent::OnSystemUpdate()
-	{
 
-		auto iter = this->mListenDatas.begin();
-		for(; iter != this->mListenDatas.end(); iter++)
-		{
-			ListenData * listenData = iter->second.get();
-			if(listenData->SocketList.Swap())
-			{
-				tcp::Socket * tcpSocket = nullptr;
-				while(listenData->SocketList.TryPop(tcpSocket))
-				{
-					if(!listenData->Listener->OnListen(tcpSocket))
-					{
-						tcpSocket->Close();
-					}
-				}
-			}
-		}
-	}
-#endif
 	void ListenerComponent::OnDestroy()
 	{
 		auto iter = this->mListenDatas.begin();

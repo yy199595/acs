@@ -178,17 +178,18 @@ namespace http
 {
 	class Request;
 	class Response;
-	class FromData;
-	class JsonData;
+	class FromContent;
+	class JsonContent;
 }
 
-namespace joke
+namespace acs
 {
+	//微信登录，支付组件
 	class WeChatComponent : public Component, public IStart
 	{
 	public:
 		WeChatComponent();
-		~WeChatComponent() = default;
+		~WeChatComponent() final = default;
 	private:
 		bool Awake() final;
 		void Start() final;
@@ -196,21 +197,22 @@ namespace joke
 	public:
 		bool CreateOrder(wx::OrderInfo * orderInfo);
 		bool CloseOrder(const std::string & orderId);
-		bool CreateComplaintUrl(const std::string url = "");
+		bool CreateComplaintUrl(const std::string& url = "");
 		std::unique_ptr<wx::UserInfo> GetUserInfo(const std::string & code);
 		std::unique_ptr<wx::OrderInfoResponse> GetOrder(const std::string & orderId);
 		std::unique_ptr<wx::UploadOrderResponse> GetOrderInfo(const std::string & orderId);
 		std::unique_ptr<wx::RefundResponse> Refund(const wx::OrderInfo & orderInfo, const std::string & reason);
-		std::unique_ptr<json::r::Document> DecodeData(const std::string & iv, const std::string & key, const std::string & data);
+		static std::unique_ptr<json::r::Document> DecodeData(const std::string & iv, const std::string & key, const std::string & data);
 	public:
+		http::Response * GetWxCode(const std::string & path);
 		bool OrderSign(const std::string & prepay_id, json::w::Value * document);
 		std::unique_ptr<wx::TransferResponse> Transfer(const wx::TransferRequest & request);
 	public:
-		std::unique_ptr<wx::PayResponse> DecodeResponse(const wx::PayMessage & message);
+		std::unique_ptr<wx::PayResponse> DecodeResponse(const wx::PayMessage & message) const;
 		std::unique_ptr<wx::ComplainInfo> DecodeComplain(const wx::ComplainRequest & message);
 		std::unique_ptr<wx::LinkInfo> GetLink(const std::string & path, const std::string & query);
 	public:
-		const http::JsonData * Get(const std::string & url, http::FromData & fromData);
+		const http::JsonContent * Get(const std::string & url, http::FromContent & fromData);
 	public:
 		bool SetJumpPath(const std::string & path);
 		bool AddTemplate(const std::string & id, const std::string & desc);

@@ -6,7 +6,7 @@
 #include "Proto/Lua/Message.h"
 
 #include"Core/System/System.h"
-namespace joke
+namespace acs
 {
 	extern std::string GET_FUNC_NAME(const std::string& fullName)
 	{
@@ -39,8 +39,8 @@ namespace joke
 				this->mLuaModule->SetMember("__server", this->mCluster);
 			}
 		}
+		this->mProto = App::GetProto();
 		LOG_CHECK_RET_FALSE(this->OnInit());
-		this->mProto = this->mApp->GetProto();
 		if(this->mLuaModule != nullptr)
 		{		
 			int code = this->mLuaModule->Call("Awake");

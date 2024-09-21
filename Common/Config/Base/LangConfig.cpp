@@ -4,7 +4,7 @@
 
 #include "LangConfig.h"
 #include "Util/File/FileHelper.h"
-namespace joke
+namespace acs
 {
 	bool LangConfig::Get(const std::string& key, std::string& value)
 	{

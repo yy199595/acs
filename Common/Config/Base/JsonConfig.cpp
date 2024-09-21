@@ -5,7 +5,7 @@
 #include"JsonConfig.h"
 #include"Log/Common/CommonLogDef.h"
 
-namespace joke
+namespace acs
 {
 	bool JsonConfig::OnLoadText(const char* str, size_t length)
 	{
@@ -22,16 +22,6 @@ namespace joke
 		if(!this->Decode(str, length))
 		{
 			LOG_ERROR("load {} : {}", this->Path(),  this->GetError());
-			return false;
-		}
-		return this->OnReLoadJson();
-	}
-
-	bool JsonConfig::ReloadConfig()
-	{
-		if(!this->FromFile(this->mPath))
-		{
-			LOG_ERROR("reload {} fail", this->Path());
 			return false;
 		}
 		return this->OnReLoadJson();

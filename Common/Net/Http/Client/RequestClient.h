@@ -15,9 +15,11 @@ namespace http
 	class RequestClient : public tcp::TcpClient
 	{
 	 public:
-		typedef joke::IRpc<Request, Response> Component;
+		typedef acs::IRpc<Request, Response> Component;
 		explicit RequestClient(Component * component);
 	 public:
+		bool SyncSend(std::unique_ptr<http::Request> request);
+		bool SyncSend(std::unique_ptr<http::Request> request, http::Response & response);
 		void Do(std::unique_ptr<http::Request> request, std::unique_ptr<http::Response> response, int taskId);
 	 private:
         void OnComplete(HttpStatus code);

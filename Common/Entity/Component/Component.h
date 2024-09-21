@@ -2,7 +2,7 @@
 
 #include"IComponent.h"
 #include"Log/Common/CommonLogDef.h"
-namespace joke
+namespace acs
 {
 	class App;
 	class Component;
@@ -19,7 +19,7 @@ namespace joke
 	};
 }
 
-namespace joke
+namespace acs
 {
 	class Entity;
 	class Component
@@ -38,6 +38,8 @@ namespace joke
         inline long long GetUnitId() const { return this->mEntityId; }
         template<typename T>
 		inline T* Cast() { return dynamic_cast<T*>(this); }
+
+		virtual int CalcMemberSize() const { return 0; }
 
 	 public:
 
@@ -80,11 +82,5 @@ namespace joke
 			return nullptr;
 		}
 		return dynamic_cast<T*>(component);
-	}
-
-	inline std::string GetFunctionName(const std::string func)
-	{
-		size_t pos = func.find("::");
-		return func.substr(pos + 2);
 	}
 }

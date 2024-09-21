@@ -5,7 +5,7 @@
 #ifndef APP_DELAYQUEUECOMPONENT_H
 #define APP_DELAYQUEUECOMPONENT_H
 #include "Entity/Component/Component.h"
-namespace joke
+namespace acs
 {
 	class DelayQueueComponent : public Component
 	{

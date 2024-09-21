@@ -6,7 +6,7 @@
 #define APP_LAUNCHCOMPONENT_H
 #include"Entity/Component/Component.h"
 
-namespace joke
+namespace acs
 {
 	class LaunchComponent final : public Component
     {

@@ -11,30 +11,29 @@
 #include"Util/File/DirectoryHelper.h"
 #include"Util/File/FileHelper.h"
 #include"Server/Config/CodeConfig.h"
-
+#include"Util/Tools/TimeHelper.h"
 #include"Lua/Engine/ModuleClass.h"
-#include"Redis/Component/RedisComponent.h"
 
-namespace joke
+namespace acs
 {
     HttpWebComponent::HttpWebComponent()
 	{
 		this->mConfig.Auth = true;
 		this->mCorComponent = nullptr;
-		this->mFactory.Add<http::FromData>(http::Header::FORM);
-		this->mFactory.Add<http::JsonData>(http::Header::JSON);
+		this->mFactory.Add<http::FromContent>(http::Header::FORM);
+		this->mFactory.Add<http::JsonContent>(http::Header::JSON);
 
-		this->mFactory.Add<http::TextData>(http::Header::TEXT);
-		this->mFactory.Add<http::TextData>(http::Header::XML);
-		this->mFactory.Add<http::TextData>(http::Header::TEXT);
+		this->mFactory.Add<http::TextContent>(http::Header::TEXT);
+		this->mFactory.Add<http::TextContent>(http::Header::XML);
+		this->mFactory.Add<http::TextContent>(http::Header::TEXT);
 
-		this->mFactory.Add<http::FileData>(http::Header::CSS);
-		this->mFactory.Add<http::FileData>(http::Header::HTML);
-		this->mFactory.Add<http::FileData>(http::Header::JPG);
-		this->mFactory.Add<http::FileData>(http::Header::PNG);
-		this->mFactory.Add<http::FileData>(http::Header::JPEG);
+		this->mFactory.Add<http::FileContent>(http::Header::CSS);
+		this->mFactory.Add<http::FileContent>(http::Header::HTML);
+		this->mFactory.Add<http::FileContent>(http::Header::JPG);
+		this->mFactory.Add<http::FileContent>(http::Header::PNG);
+		this->mFactory.Add<http::FileContent>(http::Header::JPEG);
 
-		this->mFactory.Add<http::MultipartFromData>(http::Header::MulFromData);
+		this->mFactory.Add<http::MultipartFromContent>(http::Header::MulFromData);
 	}
 
     bool HttpWebComponent::LateAwake()
@@ -46,12 +45,14 @@ namespace joke
 			const std::string & name = httpService->GetName();
 			this->mHttpServices.Add(name, httpService);
 		}
-		this->mCorComponent = this->mApp->Coroutine();
+		this->mCorComponent = App::Coroutine();
+		this->mApp->GetComponents(this->mRecordComponents);
 		return this->ReadHttpConfig();
     }
 
 	bool HttpWebComponent::AddRootDirector(const std::string& dir)
 	{
+        LOG_CHECK_RET_FALSE(help::dir::DirectorIsExist(dir));
 		auto iter = std::find(this->mRoots.begin(), this->mRoots.end(), dir);
 		if(iter != this->mRoots.end())
 		{
@@ -95,7 +96,6 @@ namespace joke
 		jsonObject->Get("index", this->mConfig.Index);
 		jsonObject->Get("upload", this->mConfig.Upload);
 		jsonObject->Get("domain", this->mConfig.Domain);
-		this->mKey = this->mApp->Config().GetSecretKey();
 		this->mConfig.Index = fmt::format("{}/{}", root, this->mConfig.Index);
 		return true;
 	}
@@ -117,15 +117,19 @@ namespace joke
 		const std::string& path = request->GetUrl().Path();
 		//response->Header().Add("Date", help::Time::GetDateGMT());
 		const HttpMethodConfig* httpConfig = HttpConfig::Inst()->GetMethodConfig(path);
-		LOG_DEBUG("[{}:{}]", request->GetUrl().Method(), request->GetUrl().ToStr());
+		//LOG_DEBUG("[{}:{}]", request->GetUrl().Method(), request->GetUrl().ToStr());
 		if (httpConfig == nullptr)
 		{
-			this->OnNotFound(request, response);
-			this->Send(sockId);
+			this->Send(sockId, this->OnNotFound(request, response));
 			return;
 		}
 		else
 		{
+			if (!httpConfig->Open)
+			{
+				this->Send(sockId, HttpStatus::NOT_FOUND);
+				return;
+			}
 			if (!request->IsMethod(httpConfig->Type))
 			{
 				if (request->IsMethod("OPTIONS"))
@@ -156,6 +160,16 @@ namespace joke
 					return;
 				}
 			}
+            if(!httpConfig->WhiteList.empty()) //白名单判断
+            {
+                std::string ip;
+                request->GetIp(ip);
+                if(httpConfig->WhiteList.find(ip) == httpConfig->WhiteList.end())
+                {
+                    this->Send(sockId, HttpStatus::NOT_FOUND);
+                    return;
+                }
+            }
 			if (request->IsMethod("GET"))
 			{
 				this->OnApi(httpConfig, request, response);
@@ -166,7 +180,7 @@ namespace joke
 	}
 
 	HttpStatus HttpWebComponent::CreateHttpData(
-			const joke::HttpMethodConfig* httpConfig, http::Request* request)
+			const acs::HttpMethodConfig* httpConfig, http::Request* request)
 	{
 		std::string cont_type;
 		//LOG_WARN("{} => {}", httpConfig->Path, request->Header().ToString())
@@ -183,7 +197,7 @@ namespace joke
 				return HttpStatus::BAD_REQUEST;
 			}
 		}
-		std::unique_ptr<http::Data> body;
+		std::unique_ptr<http::Content> body;
 		if(!this->mFactory.New(cont_type, body))
 		{
 			return HttpStatus::UNSUPPORTED_MEDIA_TYPE;
@@ -206,7 +220,7 @@ namespace joke
 			const int limit = httpConfig->Limit;
 			const std::string uuid = this->mApp->NewUuid();
 			const std::string & path = this->mConfig.Upload;
-			body->Cast<http::MultipartFromData>()->Init(path, uuid, limit);
+			body->Cast<http::MultipartFromContent>()->Init(path, uuid, limit);
 		}
 		else if(body->GetContentType() == http::ContentType::FILE)
 		{
@@ -223,7 +237,7 @@ namespace joke
 			std::string type = cont_type.substr(pos + 1);
 			const std::string & upload = this->mConfig.Upload;
 			const std::string path = fmt::format("{}/{}.{}", upload, guid, type);
-			if(!body->Cast<http::FileData>()->MakeFile(path))
+			if(!body->Cast<http::FileContent>()->MakeFile(path))
 			{
 				return HttpStatus::INTERNAL_SERVER_ERROR;
 			}
@@ -232,13 +246,13 @@ namespace joke
 		return HttpStatus::OK;
 	}
 
-	void HttpWebComponent::OnNotFound(http::Request* request, http::Response* response)
+	HttpStatus HttpWebComponent::OnNotFound(http::Request* request, http::Response* response)
 	{
 		const std::string & path = request->GetUrl().Path();
-		if(path == "/")
+		if(path == "/" && !this->mConfig.Index.empty())
 		{
 			response->File(http::Header::HTML, this->mConfig.Index);
-			return;
+			return HttpStatus::OK;
 		}
 		std::string filePath;
 		for(const std::string & dir : this->mRoots)
@@ -256,9 +270,9 @@ namespace joke
 				contentType = http::GetContentType(t);
 			}
 			response->File(contentType, filePath);
-			return;
+			return HttpStatus::OK;
 		}
-		response->SetCode(HttpStatus::NOT_FOUND);
+		return HttpStatus::NOT_FOUND;
 	}
 
     void HttpWebComponent::OnMessage(http::Request * request, http::Response * response)
@@ -277,7 +291,7 @@ namespace joke
 		this->Send(request->GetSockId(), HttpStatus::NOT_FOUND);
 	}
 
-	void HttpWebComponent::OnApi(const joke::HttpMethodConfig* httpConfig,
+	void HttpWebComponent::OnApi(const acs::HttpMethodConfig* httpConfig,
 			http::Request* request, http::Response* response)
 	{
 		if (!httpConfig->IsAsync)
@@ -299,6 +313,10 @@ namespace joke
 				LOG_WARN("not token field")
 				return HttpStatus::UNAUTHORIZED;
 			}
+		}
+		if(!config->Token.empty() && token == config->Token)
+		{
+			return HttpStatus::OK;
 		}
 #ifdef __ENABLE_OPEN_SSL__
 		json::r::Document document;
@@ -324,7 +342,7 @@ namespace joke
 			LOG_WARN("[{}:{}] token exp time", token, httpToken.UserId)
 			return HttpStatus::UNAUTHORIZED;
 		}
-		http::FromData & query = const_cast<http::FromData&>(request->GetUrl().GetQuery());
+		http::FromContent & query = const_cast<http::FromContent&>(request->GetUrl().GetQuery());
 		{
 			query.Set(http::query::UserId, httpToken.UserId);
 			query.Set(http::query::ClubId, httpToken.ClubId);
@@ -337,6 +355,15 @@ namespace joke
     void HttpWebComponent::Invoke(const HttpMethodConfig* config, http::Request * request, http::Response * response)
 	{
 		HttpStatus code = HttpStatus::OK;
+		for(HttpHandlerComponent * recordComponent : this->mRecordComponents)
+		{
+			int status = recordComponent->OnRequest(*config, *request);
+			if(status != (int)HttpStatus::OK && status != XCode::Ok)
+			{
+				this->Send(request->GetSockId(), (HttpStatus)status);
+				return;
+			}
+		}
 		do
 		{
 			http::Head & head = request->Header();
@@ -379,7 +406,11 @@ namespace joke
 			}
 #endif
 		} while (false);
-		//LOG_INFO("{}", response->ToString())
+
+		for(HttpHandlerComponent * recordComponent : this->mRecordComponents)
+		{
+			recordComponent->OnRequestDone(*config, *request, *response);
+		}
 		this->Send(request->GetSockId(), code);
 	}
 
@@ -387,8 +418,9 @@ namespace joke
 	{
 		std::unique_ptr<json::w::Value> data = document.AddObject("web");
 		{
+			data->Add("success", this->mSuccessCount);
+			data->Add("failure", this->mFailureCount);
 			data->Add("sum", this->mNumPool.CurrentNumber());
-			data->Add("pool", (int)this->mClientPools.Size());
 			data->Add("client", (int)this->mHttpClients.Size());
 			data->Add("wait", (int)(this->mWaitSockets.Size() + this->mHttpClients.Size()));
 		}

@@ -7,7 +7,7 @@
 #include <string>
 #include <unordered_map>
 #include "Core/Singleton/Singleton.h"
-namespace joke
+namespace acs
 {
 	class LangConfig : public Singleton<LangConfig>
 	{

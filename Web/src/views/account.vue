@@ -1,18 +1,21 @@
 <template>
-    <h3>账号列表</h3>
-    <el-row style='padding-left:15px;padding-top:30px'>
+    <el-row style='padding-left:15px;padding-top:10px'>
 
         <el-form inline="inline">
 
-            <el-form-item label="城市">
+            <el-form-item label="城市" style="width: 250px">
                 <el-select v-model="city_info.city_id" clearable placeholder="请选择城市">
                     <el-option v-for="(item, index) in city_info.list" :key="index"
                                :label="item.label" :value="item.value"></el-option>
                 </el-select>
             </el-form-item>
 
-            <el-form-item label='账号'>
-                <el-input v-model='query_info.open_id' placeholder='输入玩家账号'></el-input>
+            <el-form-item label='用户ID' style="width: 250px">
+                <el-input v-model='query_info.open_id' placeholder='输入用户ID'></el-input>
+            </el-form-item>
+
+            <el-form-item label='用户昵称' style="width: 250px">
+                <el-input v-model='query_info.nick' placeholder='输入用户昵称'></el-input>
             </el-form-item>
 
             <el-form-item>
@@ -82,7 +85,7 @@
 
 <script>
 import {format_time, format_permiss} from "../api/format";
-import {request_user_info, RequestAccountList, RequestDeleteAccount} from "../api/account";
+import {RequestAccountList, RequestDeleteAccount} from "../api/account";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {request_city_list} from "../api/activity";
 
@@ -91,6 +94,7 @@ export default {
     data() {
         return {
             query_info: {
+                nick : "",
                 open_id: "",
                 page: 1,
                 total: 0,
@@ -154,6 +158,8 @@ export default {
                     return "普通用户";
                 case 2:
                     return "永久会员"
+                case 3:
+                    return "普通群"
                 case 1: {
                     const now_time = new Date().getTime() / 1000
                     if (row.vip_time && row.vip_time > now_time) {
@@ -203,13 +209,24 @@ export default {
 
         on_btn_query() {
             this.account_list = []
+            //this.query_info.total = 0
             const page = this.query_info.page
             const open_id = this.query_info.open_id
             let city_id = this.city_info.city_id
             if (open_id && open_id.length > 0) {
                 city_id = 0
             }
-            RequestAccountList(page, open_id, city_id).then(response => {
+            const request = {
+                page: page,
+                open_id: open_id,
+                city_id: city_id
+            }
+            if(this.query_info.nick.length > 0)
+            {
+                request.nick = this.query_info.nick
+            }
+
+            RequestAccountList(request).then(response => {
                 const data = response.data.data
                 if (response.data.code === 0) {
                     if (Array.isArray(data.list) && data.list.length > 0) {

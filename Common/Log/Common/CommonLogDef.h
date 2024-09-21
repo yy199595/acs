@@ -145,4 +145,10 @@ inline std::string FormatFileLine(const char * file, const int line)
 		Debug::Console(log);    									\
 }
 
+#define CONSOLE_ERROR_RETURN_CODE(obj, code) \
+    if(!(obj)) { CONSOLE_LOG_ERROR(#obj); return code; }    \
+
+#define CONSOLE_ERROR_RETURN_FALSE(obj) \
+    if(!(obj)) { CONSOLE_LOG_ERROR(#obj); return false; }    \
+
 #define IF_NOT_NULL_CALL(module, func, ...) { if(module != nullptr) { module->func(__VA_ARGS__); } };

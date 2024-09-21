@@ -10,7 +10,7 @@
 #include"Core/Queue/DoubleBufferQueue.h"
 #endif
 
-namespace joke
+namespace acs
 {
 	enum class ListenCode
 	{
@@ -61,16 +61,9 @@ namespace joke
 #ifdef __ENABLE_OPEN_SSL__
 		Asio::ssl::Context SslCtx;
 #endif
-
-#ifndef ONLY_MAIN_THREAD
-		custom::DoubleBufferQueue<tcp::Socket *> SocketList;
-#endif
 	};
 
 	class ListenerComponent : public Component, public IDestroy
-#ifndef ONLY_MAIN_THREAD
-			, public ISystemUpdate
-#endif
 	{
 	public:
 		explicit ListenerComponent();
@@ -86,9 +79,8 @@ namespace joke
 		bool Awake() final;
 		bool LateAwake() final;
 		void OnDestroy() final;
-#ifndef ONLY_MAIN_THREAD
-		void OnSystemUpdate() final;
-#endif
+	private:
+		void OnAcceptSocket(ListenData* listenData, tcp::Socket* sock);
 	private:
 		int mOffsetPort;
 		std::string mHost; //主机地址

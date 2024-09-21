@@ -435,7 +435,7 @@ LUA_API void (lua_closeslot) (lua_State *L, int idx);
 
 
 /*
-** Event codes
+** EventSystem codes
 */
 #define LUA_HOOKCALL	0
 #define LUA_HOOKRET	1
@@ -445,7 +445,7 @@ LUA_API void (lua_closeslot) (lua_State *L, int idx);
 
 
 /*
-** Event masks
+** EventSystem masks
 */
 #define LUA_MASKCALL	(1 << LUA_HOOKCALL)
 #define LUA_MASKRET	(1 << LUA_HOOKRET)

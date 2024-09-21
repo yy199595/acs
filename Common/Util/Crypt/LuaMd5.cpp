@@ -7,7 +7,7 @@
 #include<ctime>
 #include"LuaMd5.h"
 #include"Proto/Bson/base64.h"
-#include"Util/String/String.h"
+#include"Util/Tools/String.h"
 namespace Lua
 {
     int Md5::ToString(lua_State *lua)

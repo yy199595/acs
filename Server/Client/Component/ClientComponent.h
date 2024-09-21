@@ -10,7 +10,7 @@
 #include"Rpc/Interface/ISend.h"
 #include"Entity/Component/Component.h"
 
-namespace joke
+namespace acs
 {
 	class ClientComponent final : public Component,
 			public IRpc<rpc::Packet, rpc::Packet>, public ISender, public ILuaRegister

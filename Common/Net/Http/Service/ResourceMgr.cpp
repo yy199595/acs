@@ -4,12 +4,12 @@
 #include "ResourceMgr.h"
 #include "Core/System/System.h"
 #include "Entity/Actor/App.h"
-#include "Util/String/String.h"
+#include "Util/Tools/String.h"
 #include "Util/File/FileHelper.h"
 #include "Util/File/DirectoryHelper.h"
 #include "Http/Component/HttpWebComponent.h"
-
-namespace joke
+#include "Http/Component/HttpComponent.h"
+namespace acs
 {
 	bool ResourceMgr::Awake()
 	{
@@ -35,13 +35,14 @@ namespace joke
 	{
 		BIND_COMMON_HTTP_METHOD(ResourceMgr::List);
 		BIND_COMMON_HTTP_METHOD(ResourceMgr::Look);
+		BIND_COMMON_HTTP_METHOD(ResourceMgr::Video);
 		BIND_COMMON_HTTP_METHOD(ResourceMgr::Upload);
 		BIND_COMMON_HTTP_METHOD(ResourceMgr::Download);
 		this->GetComponent<HttpWebComponent>()->AddRootDirector(this->mUpload);
 		return true;
 	}
 
-    int ResourceMgr::Download(const http::FromData &request, http::Response &response)
+    int ResourceMgr::Download(const http::FromContent &request, http::Response &response)
     {
 		std::string file;
         if(!request.Get("file", file))
@@ -62,7 +63,7 @@ namespace joke
         return XCode::Ok;
     }
 
-	int ResourceMgr::Look(const http::FromData& request, http::Response& response)
+	int ResourceMgr::Look(const http::FromContent& request, http::Response& response)
 	{
 		std::string file, type;
 		if(!request.Get("file", file) || file.empty())
@@ -91,12 +92,12 @@ namespace joke
 		return XCode::Ok;
 	}
 
-	int ResourceMgr::List(const http::FromData & request, http::Response& response)
+	int ResourceMgr::List(const http::FromContent & request, http::Response& response)
 	{
 		std::string dir;
 		request.Get("dir", dir);
 		dir = dir.empty() ? this->mUpload : fmt::format("{}/{}", this->mUpload, dir);
-		std::unique_ptr<http::TextData> customData(new http::TextData(http::Header::HTML));
+		std::unique_ptr<http::TextContent> customData(new http::TextContent(http::Header::HTML));
 		{
 			LOG_WARN("dir = {}", dir);
 			customData->Append("<!DOCTYPE html>");
@@ -179,9 +180,9 @@ namespace joke
 	int ResourceMgr::Upload(const http::Request& request, http::Response& response)
 	{
 		int userId = 0;
-		const http::Data* data = request.GetBody();
+		const http::Content* data = request.GetBody();
 		request.GetUrl().GetQuery().Get(http::query::UserId, userId);
-		const http::MultipartFromData* multiData = data->To<const http::MultipartFromData>();
+		const http::MultipartFromContent* multiData = data->To<const http::MultipartFromContent>();
 		if (multiData == nullptr)
 		{
 			return XCode::CallArgsError;
@@ -194,6 +195,23 @@ namespace joke
 		const std::string& name = multiData->FileName();
 		const std::string url = fmt::format("{}/{}", this->mDoMain, name);
 		response.SetContent(http::Header::TEXT, url);
+		return XCode::Ok;
+	}
+
+	int ResourceMgr::Video(const http::FromContent& request, json::w::Document& response)
+	{
+		HttpComponent* httpComponent = this->GetComponent<HttpComponent>();
+		http::Response* response1 = httpComponent->Get("http://api.yujn.cn/api/zzxjj.php?type=video");
+		if(response1 == nullptr)
+		{
+			return XCode::Failure;
+		}
+		std::string url;
+		if(!response1->Header().Get("Location", url))
+		{
+			return XCode::Failure;
+		}
+		response.Add("url", url);
 		return XCode::Ok;
 	}
 }

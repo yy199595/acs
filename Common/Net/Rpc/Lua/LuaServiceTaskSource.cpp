@@ -8,7 +8,7 @@
 #include"XCode/XCode.h"
 #include"Entity/Actor/App.h"
 #include"Yyjson/Lua/ljson.h"
-namespace joke
+namespace acs
 {
 	LuaServiceTaskSource::LuaServiceTaskSource(http::Response* message)
 		: mHttpData(message), mRpcData(nullptr)
@@ -45,7 +45,7 @@ namespace joke
 			if (this->mRpcData->TempHead().Get("pb", pb))
 			{
 				this->mRpcData->SetProto(rpc::Porto::Protobuf);
-				pb::Message* message = App::Inst()->GetProto()->Temp(pb);
+				pb::Message* message = App::GetProto()->Temp(pb);
 				if (message == nullptr)
 				{
 					this->mCode = XCode::CreateProtoFailure;
@@ -85,7 +85,7 @@ namespace joke
 	}
 }
 
-namespace joke
+namespace acs
 {
 	int LuaServiceTaskSource::SetHttp(lua_State* lua)
 	{

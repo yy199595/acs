@@ -10,7 +10,7 @@
 #include"Yyjson/Document/Document.h"
 #include"Http/Common/HttpRequest.h"
 #include"Http/Common/HttpResponse.h"
-namespace joke
+namespace acs
 {
 	template<typename T>
 	using HttpMethod = int(T::*)(const http::Request& request, http::Response& response);
@@ -38,13 +38,13 @@ namespace joke
 	using HttpMethod4 = int(T::*)(http::Response& response);
 
 	template<typename T>
-	using HttpFromMethod1= int(T::*)(const http::FromData & request, json::w::Value & response);
+	using HttpFromMethod1= int(T::*)(const http::FromContent & request, json::w::Value & response);
 
 	template<typename T>
-	using HttpFromMethod2 = int(T::*)(const http::FromData & request, http::Response & response);
+	using HttpFromMethod2 = int(T::*)(const http::FromContent & request, http::Response & response);
 
 	template<typename T>
-	using HttpFromMethod3 = int(T::*)(const http::FromData & request, json::w::Document & response);
+	using HttpFromMethod3 = int(T::*)(const http::FromContent & request, json::w::Document & response);
 
 	template<typename T>
 	using HttpFromMethod4 = int(T::*)(const http::Head & request, json::w::Document & response);
@@ -142,12 +142,12 @@ namespace joke
     public:
         int Invoke(const http::Request& request, http::Response& response) final
 		{
-			const http::Data* body = request.GetBody();
+			const http::Content* body = request.GetBody();
 			if (request.GetBody() == nullptr || body->GetContentType() != http::ContentType::JSON)
 			{
 				return XCode::CallArgsError;
 			}
-			const http::JsonData* jsonData = (const http::JsonData*)(body);
+			const http::JsonContent* jsonData = (const http::JsonContent*)(body);
 			std::unique_ptr<json::w::Document> document(new json::w::Document());
 			int code = (this->mObj->*mFunction)(*jsonData);
 			if (code != XCode::Ok)
@@ -176,8 +176,8 @@ namespace joke
     public:
         int Invoke(const http::Request& request, http::Response& response) final
 		{
-			const http::Data* body = request.GetBody();
-			const http::JsonData* jsonData = (const http::JsonData*)(body);
+			const http::Content* body = request.GetBody();
+			const http::JsonContent* jsonData = (const http::JsonContent*)(body);
 
 			if (jsonData == nullptr)
 			{
@@ -216,8 +216,8 @@ namespace joke
 	public:
 		int Invoke(const http::Request& request, http::Response& response) final
 		{
-			const http::Data* body = request.GetBody();
-			const http::JsonData* jsonData = (const http::JsonData*)(body);
+			const http::Content* body = request.GetBody();
+			const http::JsonContent* jsonData = (const http::JsonContent*)(body);
 
 			if (jsonData == nullptr)
 			{
@@ -256,8 +256,8 @@ namespace joke
 	public:
 		int Invoke(const http::Request& request, http::Response& response) final
 		{
-			const http::Data* body = request.GetBody();
-			const http::JsonData* jsonData = (const http::JsonData*)(body);
+			const http::Content* body = request.GetBody();
+			const http::JsonContent* jsonData = (const http::JsonContent*)(body);
 
 			if (jsonData == nullptr)
 			{
@@ -317,15 +317,15 @@ namespace joke
 		int Invoke(const http::Request & request, http::Response & response) final
 		{
 			int code = XCode::Ok;
-			const http::Data* body = request.GetBody();
+			const http::Content* body = request.GetBody();
 			std::unique_ptr<json::w::Document> document2 = std::make_unique<json::w::Document>();
 			do
 			{
-				const http::FromData* fromData = (const http::FromData*)body;
+				const http::FromContent* fromData = (const http::FromContent*)body;
 				std::unique_ptr<json::w::Value> data = document2->AddObject("data");
 				if (fromData == nullptr)
 				{
-					const http::FromData& fromData = request.GetUrl().GetQuery();
+					const http::FromContent& fromData = request.GetUrl().GetQuery();
 					code = (this->mObj->*mFunction)(fromData, *data);
 					break;
 				}
@@ -362,17 +362,17 @@ namespace joke
 	public:
 		int Invoke(const http::Request & request, http::Response & response) final
 		{
-			const http::Data * body = request.GetBody();
+			const http::Content * body = request.GetBody();
 			if(body != nullptr && body->GetContentType() != http::ContentType::FROM)
 			{
 				return XCode::CallArgsError;
 			}
 			if(body == nullptr)
 			{
-				const http::FromData & fromData = request.GetUrl().GetQuery();
+				const http::FromContent & fromData = request.GetUrl().GetQuery();
 				return (this->mObj->*mFunction)(fromData, response);
 			}
-			const http::FromData * fromData = (const http::FromData*) body;
+			const http::FromContent * fromData = (const http::FromContent*) body;
 			return (this->mObj->*mFunction)(*fromData, response);
 		}
 
@@ -394,13 +394,13 @@ namespace joke
 		int Invoke(const http::Request & request, http::Response & response) final
 		{
 			int code = XCode::Ok;
-			const http::Data* body = request.GetBody();
+			const http::Content* body = request.GetBody();
 			std::unique_ptr<json::w::Document> document2 = std::make_unique<json::w::Document>();
 			do
 			{
 				if (body == nullptr)
 				{
-					const http::FromData & fromData = request.GetUrl().GetQuery();
+					const http::FromContent & fromData = request.GetUrl().GetQuery();
 					code = (this->mObj->*mFunction)(fromData, *document2);
 					break;
 				}
@@ -408,7 +408,7 @@ namespace joke
 				{
 					return XCode::CallArgsError;
 				}
-				const http::FromData* fromData = (const http::FromData*)body;
+				const http::FromContent* fromData = (const http::FromContent*)body;
 				code = (this->mObj->*mFunction)(*fromData, *document2);
 			} while (false);
 			if(code != XCode::Ok)

@@ -13,7 +13,7 @@
 #include"Rpc/Component/RpcTaskComponent.h"
 
 struct lua_State;
-namespace joke
+namespace acs
 {
 	class MysqlTask : public IRpcTask<Mysql::Response>, protected WaitTaskSourceBase
     {
@@ -39,7 +39,7 @@ namespace joke
 	}
 }
 
-namespace joke
+namespace acs
 {
     class MysqlClient;
 	class MysqlDBComponent final : public RpcTaskComponent<int, Mysql::Response>,

@@ -3,7 +3,7 @@
         <el-form>
             <div class="container">
                 <el-form inline="inline">
-                    <el-form-item>
+                    <el-form-item label="接口类型">
                         <el-select style='width: 250px' v-model="query.type" placeholder="选择类型">
                             <el-option v-for="item in RpcTypeArray" :key="item.Type" :label="item.Name"
                                        :value="item.Type"/>
@@ -11,7 +11,7 @@
                     </el-form-item>
                     <el-form-item>
                         <el-form-item label='服务名字'>
-                            <el-input v-model='query.name'></el-input>
+                            <el-input v-model='query.name' placeholder="输入服务名字"></el-input>
                         </el-form-item>
                         <el-form-item>
                             <el-button type='primary' @click='onBtnQuery'>查询</el-button>
@@ -28,7 +28,7 @@
 
                     <el-table-column label="操作" width="220" align="center">
                         <template #default="scope">
-                            <el-button text :icon="Edit" @click="handleEdit(scope.row)">操作</el-button>
+                            <el-button text icon="Edit" @click="handleEdit(scope.row)">操作</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -132,7 +132,7 @@ const getData = () => {
 
     RequestRpcList(data).then(res => {
         if (res.data.code == 0) {
-            tableData.value = res.data.data.list
+            tableData.value = res.data.list
             tableData.value.map((data) => {
                 data.has_request = true
                 data.has_response = true
@@ -145,7 +145,7 @@ const getData = () => {
                     data.response = "无"
                 }
             })
-            pageTotal.value = res.data.data.count
+            pageTotal.value = res.data.count
             return
         }
         ElMessage.error("获取rpc接口数据失败")

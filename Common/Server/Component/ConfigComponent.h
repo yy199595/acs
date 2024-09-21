@@ -7,7 +7,7 @@
 #include<unordered_map>
 #include"Config/Base/TextConfig.h"
 #include"Entity/Component/Component.h"
-namespace joke
+namespace acs
 {
     class ConfigComponent final : public Component, public IHotfix
     {
@@ -28,6 +28,7 @@ namespace joke
         bool LoadTextConfig(std::unique_ptr<ITextConfig> config, const std::string & path);
     private:
         bool Awake() final;
+		bool LoadInterfaceConfig();
     private:
         std::unordered_map<size_t, std::string> mKeys;
         std::unordered_map<std::string, std::unique_ptr<ITextConfig>> mConfigs;

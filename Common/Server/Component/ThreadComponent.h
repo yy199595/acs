@@ -9,7 +9,7 @@
 #include<asio/ssl.hpp>
 #endif
 
-namespace joke
+namespace acs
 {
 	class ThreadComponent final : public Component
 	{

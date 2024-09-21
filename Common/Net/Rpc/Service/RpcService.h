@@ -12,7 +12,7 @@ namespace Lua
 	class LuaModule;
 }
 
-namespace joke
+namespace acs
 {
 	class ServiceMethod;
 	class RpcMethodConfig;

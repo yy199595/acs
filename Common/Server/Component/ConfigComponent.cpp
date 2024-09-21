@@ -20,7 +20,7 @@
 	}														\
 }
 
-namespace joke
+namespace acs
 {
     bool ConfigComponent::Awake()
 	{
@@ -29,15 +29,19 @@ namespace joke
 		{
 			LOG_CHECK_RET_FALSE(this->LoadTextConfig<CodeConfig>(path));
 		}
-		if(ServerConfig::Inst()->GetPath("cluster", path))
-		{
-			LOG_CHECK_RET_FALSE(this->LoadTextConfig<ClusterConfig>(path));
-		}
+
 		new http::ContentFactory();
+		return this->LoadInterfaceConfig();
+	}
+
+	bool ConfigComponent::LoadInterfaceConfig()
+	{
+		std::string dir;
 		if (ServerConfig::Inst()->GetPath("rpc", dir))
 		{
 			std::vector<std::string> paths;
 			std::unique_ptr<RpcConfig> config(new RpcConfig());
+
 			help::dir::GetFilePaths(dir, "*.json", paths);
 			for (const std::string& path: paths)
 			{
@@ -66,7 +70,6 @@ namespace joke
 			}
 			this->mConfigs.emplace(config->GetConfigName(), std::move(config));
 		}
-
 		return true;
 	}
 

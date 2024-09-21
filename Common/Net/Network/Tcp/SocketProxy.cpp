@@ -1,5 +1,5 @@
 #include"Socket.h"
-#include"Util/String/String.h"
+#include"Util/Tools/String.h"
 namespace tcp
 {
 	Socket::Socket(asio::io_service& thread)
@@ -120,5 +120,11 @@ namespace tcp
 			this->mSslSocket->shutdown(code);
 		}
 #endif
+	}
+
+	void Socket::Destory()
+	{
+		this->Close();
+		delete this;
 	}
 }

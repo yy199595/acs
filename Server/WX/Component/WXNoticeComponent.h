@@ -28,20 +28,22 @@ namespace wx
 	};
 }
 
-namespace joke
+namespace acs
 {
-	class WXNoticeComponent : public Component
+	//微信公众号通知
+	class WXNoticeComponent final : public Component, public IComplete
 	{
 	public:
 		WXNoticeComponent();
-		~WXNoticeComponent() = default;
+		~WXNoticeComponent() final = default;
 	private:
 		bool Awake() final;
 		bool LateAwake() final;
+		void Complete() final;
 	public:
 		void OnWxSubscribe(const std::string & openId);
 		void OnWxUnsubscribe(const std::string & openId);
-		std::string Truncate(const std::string & thing, int count = 20);
+		static std::string Truncate(const std::string & thing, int count = 20);
 		bool Send(const std::string & openId, const wx::NoticeData & noticeData);
 	private:
 		bool GetAccessToken();

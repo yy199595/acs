@@ -8,8 +8,8 @@
 #include"Redis/Client/RedisDefine.h"
 #include"Proto/Component/ProtoComponent.h"
 #include"Redis/Component/RedisComponent.h"
-
-using namespace joke;
+#include "Redis/Component/RedisSubComponent.h"
+using namespace acs;
 namespace Lua
 {
 	inline void ReadFromIndex(lua_State * lua, int index, ::redis::Request * request)
@@ -61,7 +61,7 @@ namespace Lua
 		static RedisComponent* redisComponent = nullptr;
 		if(redisComponent == nullptr)
 		{
-			redisComponent = App::Inst()->GetComponent<RedisComponent>();
+			redisComponent = App::Get<RedisComponent>();
 			if (redisComponent == nullptr)
 			{
 				luaL_error(lua, "RedisComponent Is Null");
@@ -92,7 +92,7 @@ namespace Lua
 		static RedisComponent* redisComponent = nullptr;
 		if(redisComponent == nullptr)
 		{
-			redisComponent = App::Inst()->GetComponent<RedisComponent>();
+			redisComponent = App::Get<RedisComponent>();
 			if (redisComponent == nullptr)
 			{
 				luaL_error(lua, "RedisComponent Is Null");
@@ -128,7 +128,7 @@ namespace Lua
 		static RedisComponent* redisComponent = nullptr;
 		if(redisComponent == nullptr)
 		{
-			redisComponent = App::Inst()->GetComponent<RedisComponent>();
+			redisComponent = App::Get<RedisComponent>();
 			if (redisComponent == nullptr)
 			{
 				luaL_error(lua, "RedisComponent Is Null");
@@ -158,7 +158,7 @@ namespace Lua
 		static RedisComponent* redisComponent = nullptr;
 		if(redisComponent == nullptr)
 		{
-			redisComponent = App::Inst()->GetComponent<RedisComponent>();
+			redisComponent = App::Get<RedisComponent>();
 			if (redisComponent == nullptr)
 			{
 				luaL_error(lua, "RedisComponent Is Null");
@@ -181,4 +181,31 @@ namespace Lua
         std::unique_ptr<::redis::Response> response = redisComponent->SyncRun(std::move(request));
         return response != nullptr ? response->WriteToLua(lua) : 0;
     }
+
+	int redis::Sub(lua_State* lua)
+	{
+		static RedisSubComponent * subComponent = nullptr;
+		if(subComponent == nullptr)
+		{
+			subComponent = App::Get<RedisSubComponent>();
+			if(subComponent == nullptr)
+			{
+				luaL_error(lua, "not add RedisSubComponent");
+				return 0;
+			}
+		}
+		const char* channel = luaL_checkstring(lua, 1);
+		if(!subComponent->SubChannel(channel))
+		{
+			lua_pushboolean(lua, false);
+			return 1;
+		}
+		lua_pushboolean(lua, true);
+		return 1;
+	}
+
+	int redis::UnSub(lua_State* lua)
+	{
+		return 0;
+	}
 }

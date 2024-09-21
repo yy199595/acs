@@ -7,7 +7,7 @@
 #include"Rpc/Interface/ISend.h"
 #include"Entity/Component/Component.h"
 struct lua_State;
-namespace joke
+namespace acs
 {
 	class Server;
 	class RouterComponent : public Component

@@ -12,7 +12,7 @@
 #include"Lua/Engine/ModuleClass.h"
 #include"Timer/Timer/ElapsedTimer.h"
 #include"Proto/Component/ProtoComponent.h"
-namespace joke
+namespace acs
 {
     MysqlTask::MysqlTask(int taskId)
         : IRpcTask<Mysql::Response>(taskId), mMessage(nullptr)
@@ -21,7 +21,7 @@ namespace joke
     }
 }
 
-namespace joke
+namespace acs
 {
 	bool MysqlDBComponent::Awake()
 	{

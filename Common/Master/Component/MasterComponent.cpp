@@ -15,7 +15,7 @@
 #include"Http/Component/HttpComponent.h"
 
 
-namespace joke
+namespace acs
 {
 	MasterComponent::MasterComponent()
 	{
@@ -26,28 +26,24 @@ namespace joke
 	bool MasterComponent::LateAwake()
 	{
 		std::unique_ptr<json::r::Value> jsonObject;
-		if(this->mApp->Config().Get("master", jsonObject))
+		if (this->mApp->Config().Get("master", jsonObject))
 		{
 			jsonObject->Get("host", this->mHost);
 		}
-		std::string key = this->mApp->Config().GetSecretKey();
-		{
-			json::w::Document document;
-			{
-				document.Add("t", 0);
-				document.Add("p", http::PermissAdmin);
-				document.Add("o", this->mApp->GetSrvId());
-			}
-			std::string data;
-			document.Encode(&data);
 #ifdef __ENABLE_OPEN_SSL__
-			this->mToken = jwt::Create(data, key);
-#else
-			LOG_CHECK_RET_FALSE(jsonObject->Get("token", this->mToken))
-#endif
+		json::w::Document document;
+		{
+			document.Add("t", 0);
+			document.Add("p", http::PermissAdmin);
+			document.Add("o", this->mApp->GetSrvId());
 		}
-		this->mActComponent = this->mApp->ActorMgr();
+		this->mToken = this->mApp->Sign(document);
+#else
+		LOG_CHECK_RET_FALSE(jsonObject->Get("token", this->mToken))
+#endif
+
 		this->mHttp = this->GetComponent<HttpComponent>();
+		this->mActComponent = this->GetComponent<ActorComponent>();
 		return true;
 	}
 
@@ -69,15 +65,15 @@ namespace joke
 			return false;
 		}
 		int code = 0;
-		const http::Data * httpData = response->GetBody();
-		const http::JsonData * jsonData = dynamic_cast<const http::JsonData*>(httpData);
+		const http::Content * httpData = response->GetBody();
+		const http::JsonContent * jsonData = dynamic_cast<const http::JsonContent*>(httpData);
 		return jsonData != nullptr && jsonData->Get("code", code) && code == XCode::Ok;
 	}
 
 	void MasterComponent::Complete()
 	{
 		int count = 0;
-		CoroutineComponent* coroutine = this->mApp->Coroutine();
+		CoroutineComponent* coroutine = App::Coroutine();
 		while (!this->RegisterServer())
 		{
 			count++;
@@ -98,7 +94,7 @@ namespace joke
 			while (!this->mActComponent->Hash(name, 0))
 			{
 				this->SyncServer();
-				this->mApp->Coroutine()->Sleep(1000);
+				App::Coroutine()->Sleep(1000);
 				LOG_WARN("===== wait {} start =====", name);
 			}
 		}
@@ -120,8 +116,8 @@ namespace joke
 			return false;
 		}
 		int code = 0;
-		const http::Data * httpData = response->GetBody();
-		const http::JsonData * jsonData = dynamic_cast<const http::JsonData*>(httpData);
+		const http::Content * httpData = response->GetBody();
+		const http::JsonContent * jsonData = dynamic_cast<const http::JsonContent*>(httpData);
 		return jsonData != nullptr && jsonData->Get("code", code) && code == XCode::Ok;
 	}
 }

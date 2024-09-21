@@ -4,10 +4,10 @@
 
 #include"Master.h"
 #include"Entity/Actor/App.h"
-#include"Util/Time/TimeHelper.h"
+#include"Util/Tools/TimeHelper.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include"Redis/Component/RedisComponent.h"
-namespace joke
+namespace acs
 {
 	constexpr int EXP_TIME = 15;
 	Master::Master() : mActorComponent(nullptr) { }
@@ -20,7 +20,7 @@ namespace joke
 		this->mRedis = this->GetComponent<RedisComponent>();
 		ClusterConfig::Inst()->GetServers(this->mConfServers);
 		this->mActorComponent = this->GetComponent<ActorComponent>();
-		this->mLock  = std::make_unique<CoroutineLock>(this->mApp->Coroutine());
+		this->mLock  = std::make_unique<CoroutineLock>(App::Coroutine());
 		return this->mRedis != nullptr && this->mActorComponent != nullptr;
 	}
 
@@ -43,7 +43,7 @@ namespace joke
 		{
 			this->mApp->StartCoroutine([this, serverId]()
 			{
-				const std::string func("Node.Ping");
+				const std::string func("NodeSystem.Ping");
 				Server* server = this->mActorComponent->GetServer(serverId);
 				if (server == nullptr || server->Call(func) != XCode::Ok)
 				{
@@ -61,7 +61,7 @@ namespace joke
 		}
 	}
 
-	int Master::Find(const http::FromData & request, json::w::Document & response)
+	int Master::Find(const http::FromContent & request, json::w::Document & response)
 	{
 		int id = 0;
 		int appId = 0;
@@ -77,14 +77,14 @@ namespace joke
 		if(this->mServerData.Get(id, json))
 		{
 			message.set_json(json);
-			return server->Send("Node.Add", message);
+			return server->Send("NodeSystem.Add", message);
 		}
 		this->mLock->Lock();
 		auto iter = this->mServerData.Begin();
 		for(; iter != this->mServerData.End(); iter++)
 		{
 			message.set_json(iter->second);
-			int code = server->Send("Node.Add", message);
+			int code = server->Send("NodeSystem.Add", message);
 			if(code != XCode::Ok)
 			{
 				this->mLock->UnLock();
@@ -118,7 +118,7 @@ namespace joke
 			Server * logicServer = this->mActorComponent->GetServer(serverId);
 			if(logicServer != nullptr)
 			{
-				logicServer->Call("Node.Add", message);
+				logicServer->Call("NodeSystem.Add", message);
 			}
 		}
 		this->mLock->UnLock();
@@ -127,7 +127,7 @@ namespace joke
 		return XCode::Ok;
 	}
 
-	int Master::Del(const http::FromData & request, json::w::Value & res)
+	int Master::Del(const http::FromContent & request, json::w::Value & res)
 	{
 		int actorId = 0;
 		request.Get("id", actorId);
@@ -145,7 +145,7 @@ namespace joke
 			com::type::int64 message;
 			message.set_value(actorId);
 			Server * logicServer = this->mActorComponent->GetServer(serverId);
-			if(logicServer != nullptr && logicServer->Call("Node.Del", message) == XCode::Ok)
+			if(logicServer != nullptr && logicServer->Call("NodeSystem.Del", message) == XCode::Ok)
 			{
 				LOG_DEBUG("notice server({}) ok", serverId);
 			}
@@ -160,7 +160,7 @@ namespace joke
 		com::type::int64 request;
 		request.set_value(serverId);
 		this->mServerData.Del(serverId);
-		this->mApp->Send("Node.Del", request);
+		this->mApp->Send("NodeSystem.Del", request);
 		this->mRedis->Run("DEL", fmt::format("server:", serverId));
 	}
 }

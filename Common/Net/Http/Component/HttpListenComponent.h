@@ -22,7 +22,7 @@ namespace http
 	class SessionClient;
 }
 
-namespace joke
+namespace acs
 {
 	enum MessageStatus
 	{
@@ -34,7 +34,7 @@ namespace joke
 		Shield = 6
 	};
 	class HttpListenComponent : public Component, public ITcpListen,
-                                public IRpc<http::Request, http::Response>, public ISecondUpdate
+                                public IRpc<http::Request, http::Response>
     {
 	public:
 		HttpListenComponent();
@@ -45,15 +45,13 @@ namespace joke
 		void StartClose(int id, int) final;
 		bool Send(int fd, HttpStatus code);
 	private:
-        void OnSecondUpdate(int tick) final;
 		bool OnListen(tcp::Socket * socket) final;
 		void OnCloseSocket(int, int code) final;
-		std::string RenderHtml(HttpStatus status);
 	protected:
 		unsigned int mSuccessCount; //成功次数
+		unsigned int mFailureCount; //失败次数
         math::NumberPool<int> mNumPool;
 		custom::Queue<tcp::Socket *> mWaitSockets;
-		custom::ArrayPool<http::SessionClient, 100> mClientPools;
 		custom::HashMap<int, http::SessionClient *> mHttpClients;
 	};
 }

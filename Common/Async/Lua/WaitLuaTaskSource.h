@@ -6,7 +6,7 @@
 #define APP_WAITLUATASKSOURCE_H
 #include"Lua/Engine/LuaParameter.h"
 #include"Async/Source/TaskSource.h"
-namespace joke
+namespace acs
 {
 	// 在c++中等待lua完成
 	class WaitLuaTaskSource final : public WaitTaskSourceBase

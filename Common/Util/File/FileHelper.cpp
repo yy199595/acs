@@ -1,4 +1,3 @@
-#include <sys/types.h>
 #include <sys/stat.h>
 #include "FileHelper.h"
 #include <fstream>
@@ -107,7 +106,7 @@ namespace help
 
 	long long fs::GetLastWriteTime(const std::string& path)
 	{
-		struct stat result;
+		struct stat result{};
 		if (stat(path.c_str(), &result) == 0)
 		{
 			return result.st_mtime;
@@ -191,12 +190,12 @@ namespace help
 		{
 			dir::MakeDir(nDirector);
 		}
-		std::fstream fs(path, std::ios::ate | std::ios::out);
+		std::fstream fs(path, std::ios::ate | std::ios::out | std::ios::binary);
 		if (!fs.is_open())
 		{
 			return false;
 		}
-		fs << fileContent;
+		fs.write(fileContent.c_str(), (std::streamsize)fileContent.size());
 		fs.close();
 		return true;
 	}

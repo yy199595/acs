@@ -12,7 +12,7 @@
 #include"google/protobuf/compiler/importer.h"
 
 struct lua_State;
-namespace joke
+namespace acs
 {
 
 	class ImportError : public pb::compiler::MultiFileErrorCollector
@@ -34,8 +34,8 @@ namespace joke
 	class ProtoComponent final : public Component, public ILuaRegister, public IHotfix
     {
     public:
-        ProtoComponent();
-        ~ProtoComponent() override = default;
+        ProtoComponent() = default;
+        ~ProtoComponent() final = default;
     public:
 		bool Load(const char * path);
 		pb::Message * Temp(const std::string & name);
@@ -45,11 +45,13 @@ namespace joke
 		bool New(const std::string & name, const std::string & json, std::unique_ptr<pb::Message> & message);
 		bool New(const std::string & name, const char * json, size_t size, std::unique_ptr<pb::Message> & message);
 	 public:
+		template<typename T>
+		inline bool RegisterMessage();
 		bool Write(lua_State * lua, const pb::Message & message);
 		pb::Message * Read(lua_State * lua, const std::string & name, int index);
 	 private:
+		bool Awake() final;
 		bool OnHotFix() final;
-		bool LateAwake() final;
 		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
         const pb::Message * FindMessage(const std::string & name);
 		void LoopMessage(const pb::Descriptor * descriptor, std::vector<std::string> & protos);
@@ -64,6 +66,21 @@ namespace joke
 		std::unordered_map<std::string, const pb::Message *> mDynamicMessageMap;
 		std::vector<std::unique_ptr<pb::DynamicMessageFactory>> mDynamicMessageFactorys;
 	};
+
+	template<typename T>
+	bool ProtoComponent::RegisterMessage()
+	{
+		google::protobuf::Message * p = new T();
+		std::string name = p->GetTypeName();
+		auto iter = this->mStaticMessageMap.find(name);
+		if(iter != this->mStaticMessageMap.end())
+		{
+			delete p;
+			return false;
+		}
+		this->mStaticMessageMap.emplace(name, p);
+		return true;
+	}
 }
 
 

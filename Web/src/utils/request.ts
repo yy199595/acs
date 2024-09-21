@@ -2,7 +2,7 @@ import axios, {AxiosInstance, AxiosError, AxiosResponse, AxiosRequestConfig} fro
 import {get_token} from "../api/token";
 
 const service: AxiosInstance = axios.create({
-    baseURL:"https://www.huwai.pro",
+    //baseURL:"https://www.huwai.pro",
     //baseURL: "http://127.0.0.1:8088",
     timeout: 5000
 });
@@ -34,7 +34,6 @@ service.interceptors.response.use(
         }
     },
     (error: AxiosError) => {
-        console.log(error);
         return Promise.reject();
     }
 );

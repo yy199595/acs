@@ -2,9 +2,9 @@
 #include"Sqlite/sqlite3.h"
 #include<unordered_map>
 #include"Proto/Include/Message.h"
-#include"Util/Guid/NumberBuilder.h"
+#include"Util/Tools/NumberBuilder.h"
 #include"Entity/Component/Component.h"
-namespace joke
+namespace acs
 {
 	class SqlHelper;
 	class SqliteComponent final : public Component, public ILuaRegister, public IDestroy
@@ -15,7 +15,6 @@ namespace joke
 		void Close(const std::string & db);
 		int Exec(const std::string & tab, const char * sql);
 		int Exec(const std::string & tab, const char * sql, std::string & err);
-		static bool Splite(const std::string & table, std::string & db, std::string & tab);
 		int Query(const std::string & tab, const char * sql, std::vector<std::string> & result);
 		int MakeTable(const std::string & tab, const pb::Message & message, const std::vector<std::string> & keys);
 	private:

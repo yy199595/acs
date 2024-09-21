@@ -4,7 +4,7 @@
 #include"Message.h"
 #include "Lua/Engine/LuaInclude.h"
 
-namespace joke
+namespace acs
 {
 	MessageEncoder::MessageEncoder(lua_State* lua)
 	{

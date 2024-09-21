@@ -3,11 +3,11 @@
 //
 
 #include"GateComponent.h"
-#include"Gate/Service/Gate.h"
+#include"Gate/Service/GateSystem.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include"Entity/Component/ActorComponent.h"
 
-namespace joke
+namespace acs
 {
 	GateComponent::GateComponent()
 	{
@@ -17,7 +17,7 @@ namespace joke
 	bool GateComponent::LateAwake()
 	{
 		this->mActor = this->GetComponent<ActorComponent>();
-		std::string name = ComponentFactory::GetName<Gate>();
+		std::string name = ComponentFactory::GetName<GateSystem>();
 		return ClusterConfig::Inst()->GetServerName(name, this->mGateName);
 	}
 

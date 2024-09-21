@@ -5,11 +5,11 @@
 #include "WXNoticeComponent.h"
 #include "Entity/Actor/App.h"
 #include "Http/Common/HttpResponse.h"
-#include "Util/Time/TimeHelper.h"
-#include "Util/String/String.h"
+#include "Util/Tools/TimeHelper.h"
+#include "Util/Tools/String.h"
 #include "Http/Component/HttpComponent.h"
 
-namespace joke
+namespace acs
 {
 	WXNoticeComponent::WXNoticeComponent()
 	{
@@ -40,6 +40,24 @@ namespace joke
 		return true;
 	}
 
+	void WXNoticeComponent::Complete()
+	{
+//		const std::string appid("wxdaabf12cb79dff86");
+//		const std::string openid("oej1o6uY7Z4IGoEHWAq7pWB2-4Dc");
+//		const std::string appsecret("1bb3de2bdf2f1dc1c0ee46054a1762ee");
+//
+//		this->mConfig.app_id = appid;
+//		this->mConfig.app_secret = appsecret;
+//
+//		wx::NoticeData noticeData;
+//
+//		noticeData.templateId = "76g0si38qbYUpV0kHrqR0-wkppsY8d8vI8krnOm3Fec";
+//		noticeData.data.emplace("keyword1", "WXNoticeComponent.cpp");
+//		noticeData.data.emplace("keyword2", fmt::format("金额 {:.2f}元", 5500 / 100.0f));
+//
+//		this->Send(openid, noticeData);
+	}
+
 	void WXNoticeComponent::OnWxUnsubscribe(const std::string& openId)
 	{
 
@@ -59,7 +77,7 @@ namespace joke
 		{
 			return;
 		}
-		const http::JsonData * jsonData = response->GetBody()->To<const http::JsonData>();
+		const http::JsonContent * jsonData = response->GetBody()->To<const http::JsonContent>();
 		if(jsonData == nullptr)
 		{
 			return;
@@ -67,9 +85,7 @@ namespace joke
 		std::string unionId, publicId;
 		LOG_CHECK_RET(jsonData->Get("unionid", unionId));
 		LOG_CHECK_RET(jsonData->Get("openid", publicId));
-		{
-			
-		}
+
 	}
 
 	bool WXNoticeComponent::GetAccessToken()
@@ -86,7 +102,7 @@ namespace joke
 			{
 				return false;
 			}
-			const http::JsonData* jsonData = response->GetBody()->To<const http::JsonData>();
+			const http::JsonContent* jsonData = response->GetBody()->To<const http::JsonContent>();
 			if (jsonData == nullptr)
 			{
 				return false;
@@ -99,12 +115,13 @@ namespace joke
 		return true;
 	}
 
+
 	std::string WXNoticeComponent::Truncate(const std::string& thing, int count)
 	{
-		if(help::utf8::Length(thing) <= 20) {
+		if(help::utf8::Length(thing) <= count) {
 			return thing;
 		}
-		return fmt::format("{}...", help::utf8::Sub(thing, 0, 17));
+		return fmt::format("{}...", help::utf8::Sub(thing, 0, count - 3));
 	}
 
 	bool WXNoticeComponent::Send(const std::string& openId, const wx::NoticeData & noticeData)
@@ -140,12 +157,12 @@ namespace joke
 		message.Add("data", document);
 		const std::string host("https://api.weixin.qq.com/cgi-bin/message/template/send");
 		const std::string url = fmt::format("{}?access_token={}", host, this->mToken.token);
-		http::Response * response = this->mHttp->Post(url, message.JsonString());
+		http::Response * response = this->mHttp->Post(url, message);
 		if(response == nullptr || response->GetBody() == nullptr)
 		{
 			return false;
 		}
-		const http::JsonData* jsonData = response->GetBody()->To<const http::JsonData>();
+		const http::JsonContent* jsonData = response->GetBody()->To<const http::JsonContent>();
 		if (jsonData == nullptr)
 		{
 			return false;

@@ -8,11 +8,11 @@ export const RequestCityList = ()=> {
     });
 }
 
-export const RequestAccountList = (page: number, account: string, city_id : number) => {
+export const RequestAccountList = (message : any) => {
     return request({
-        method: "get",
+        method: "POST",
         url: "./account_mgr/list",
-        params: {page: page, open_id: account, city_id : city_id},
+        data: message,
     });
 }
 

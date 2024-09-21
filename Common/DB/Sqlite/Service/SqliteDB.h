@@ -7,7 +7,7 @@
 #include"Message/s2s/db.pb.h"
 #include"Util/Sql/SqlHelper.h"
 #include"Rpc/Service/RpcService.h"
-namespace joke
+namespace acs
 {
 	class ProtoComponent;
 	class SqliteComponent;

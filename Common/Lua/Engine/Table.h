@@ -6,7 +6,7 @@ namespace Lua
 	class Table
 	{
 	 public:
-		Table(lua_State* luaEnv, int ref, const std::string& name);
+		Table(lua_State* luaEnv, int ref);
 
 		~Table();
 
@@ -15,25 +15,31 @@ namespace Lua
 		static std::unique_ptr<Table> Create(lua_State* luaEnv, const std::string& name);
 
 	 public:
+		inline int Length();
 		template<typename T>
-		T GetMember(const char* name);
+		inline T GetMember(const char* name);
+
 
 	 public:
-		int GetRef() const
-		{
-			return this->ref;
-		}
-		std::string ToJson();
+		std::unique_ptr<Table> GetTable(int index);
 		std::unique_ptr<Table> GetTable(const std::string& name);
 		std::unique_ptr<Function> GetFunction(const std::string& name);
-
-		bool Serialization(std::string& outString);
 
 	 private:
 		int ref;
 		lua_State* mLuaEnv;
-		std::string mTableName;
 	};
+
+	int Table::Length()
+	{
+		lua_rawgeti(this->mLuaEnv, LUA_REGISTRYINDEX, this->ref);
+		if (!lua_istable(this->mLuaEnv, -1))
+		{
+			return 0;
+		}
+		lua_len(this->mLuaEnv, -1);
+		return lua_tointeger(this->mLuaEnv, -1);
+	}
 
 	template<typename T>
 	T Table::GetMember(const char* name)

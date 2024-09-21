@@ -5,9 +5,9 @@
 #include<utility>
 #include<fstream>
 #include"CsvTextConfig.h"
-#include"Util/String/String.h"
+#include"Util/Tools/String.h"
 #include"Util/File/FileHelper.h"
-namespace joke
+namespace acs
 {
 	bool CsvLineData::Add(const std::string& key, const std::string& value)
 	{
@@ -65,7 +65,7 @@ namespace joke
 	}
 }
 
-namespace joke
+namespace acs
 {
 	CsvTextConfig::CsvTextConfig(std::string  name)
 		: mName(std::move(name)), mLastWriteTime(0)

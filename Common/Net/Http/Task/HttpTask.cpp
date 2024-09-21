@@ -4,7 +4,7 @@
 
 #include"HttpTask.h"
 
-namespace joke
+namespace acs
 {
     LuaHttpRequestTask::LuaHttpRequestTask(lua_State *lua)
         : IRpcTask<http::Response>(0), mRef(0), mLua(lua)

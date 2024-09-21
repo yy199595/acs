@@ -59,7 +59,7 @@ namespace Lua
 				int top = lua_gettop(lua);
 				for (size_t index = 0; index < data.size(); index++)
 				{
-					lua_pushinteger(lua, index);
+					lua_pushinteger(lua, index + 1);
 					const T value = data.at(index);
 					Parameter::Write(lua, value);
 					lua_settable(lua, -3);
@@ -108,7 +108,7 @@ namespace Lua
 			static std::shared_ptr<std::vector<T>> Read(lua_State* lua, int index)
 			{
 				assert(lua_istable(lua, index));
-				std::vector<T>* ret = new std::vector<T>();
+				std::vector<T> ret = new std::vector<T>();
 				lua_pushnil(lua);
 				while (lua_next(lua, index) != 0)
 				{
@@ -146,11 +146,11 @@ namespace Lua
 				assert(lua_istable(lua, index));
 				std::unordered_map<Key, Value> ret;
 				lua_pushnil(lua);
-				while (lua_next(lua, index) != 0)
+				while (lua_next(lua, -2) != 0)
 				{
 					const Key key = Parameter::Read<Key>(lua, -2);
 					const Value value = Parameter::Read<Value>(lua, -1);
-					ret.insert(std::make_pair(key, value));
+					ret.emplace(key, value);
 					lua_pop(lua, 1);
 				}
 				return ret;
@@ -240,7 +240,7 @@ namespace Lua
 				assert(lua_istable(lua, index));
 				std::map<Key, Value> ret;
 				lua_pushnil(lua);
-				while (lua_next(lua, index) != 0)
+				while (lua_next(lua, -2) != 0)
 				{
 					const Key key = Parameter::Read<Key>(lua, -2);
 					const Value value = Parameter::Read<Value>(lua, -1);
@@ -278,7 +278,7 @@ namespace Lua
 				assert(lua_istable(lua, index));
 				std::map<Key, Value>* ret = new std::map<Key, Value>();
 				lua_pushnil(lua);
-				while (lua_next(lua, index) != 0)
+				while (lua_next(lua, -2) != 0)
 				{
 					lua_type(lua, -1);
 					const Key key = Parameter::Read<Key>(lua, -2);
@@ -318,7 +318,7 @@ namespace Lua
 				assert(lua_istable(lua, index));
 				std::map<Key, Value>* ret = new std::map<Key, Value>();
 				lua_pushnil(lua);
-				while (lua_next(lua, index) != 0)
+				while (lua_next(lua, -2) != 0)
 				{
 					lua_type(lua, -1);
 					const Key key = Parameter::Read<Key>(lua, -2);

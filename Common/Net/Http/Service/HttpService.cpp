@@ -7,7 +7,7 @@
 #include"Lua/Component/LuaComponent.h"
 #include"Rpc/Lua/LuaServiceTaskSource.h"
 
-namespace joke
+namespace acs
 {
 
     HttpService::HttpService()

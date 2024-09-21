@@ -1,16 +1,16 @@
 <template>
     <div class="container">
-        <span style="color: #cf9236">服务器列表</span>
-        <el-form inline="inline">
-            <el-form-item label="类型">
-                <el-select placeholder="选择类型" v-model="server_name">
-                    <el-option v-for="name in server_name_list" :key="name" :label="name"></el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" @click="GetServerList">刷新</el-button>
-            </el-form-item>
-        </el-form>
+<!--        <span style="color: #cf9236">服务器列表</span>-->
+<!--        <el-form inline="inline">-->
+<!--            <el-form-item label="类型" style="width: 100rpx">-->
+<!--                <el-select placeholder="选择类型" v-model="server_name" style="width: 150px;">-->
+<!--                    <el-option v-for="name in server_name_list" :key="name" :label="name"></el-option>-->
+<!--                </el-select>-->
+<!--            </el-form-item>-->
+<!--            <el-form-item>-->
+<!--                <el-button type="primary" @click="GetServerList">刷新</el-button>-->
+<!--            </el-form-item>-->
+<!--        </el-form>-->
         <el-table class="table" border :data="server_list" style="font-size: 20px">
             <el-table-column type="expand">
                 <template #default="scope">

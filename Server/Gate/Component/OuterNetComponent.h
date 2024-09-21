@@ -24,7 +24,7 @@ namespace rpc
 	class OuterClient;
 }
 
-namespace joke
+namespace acs
 {
 	class OuterNetComponent final : public Component, public ITcpListen,
 		public IRpc<rpc::Packet, rpc::Packet>, public IServerRecord

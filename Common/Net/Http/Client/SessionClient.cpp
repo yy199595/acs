@@ -5,7 +5,7 @@
 #include"SessionClient.h"
 #include"XCode/XCode.h"
 #include"Entity/Actor/App.h"
-#include"Util/Time/TimeHelper.h"
+#include"Util/Tools/TimeHelper.h"
 
 namespace http
 {
@@ -22,8 +22,7 @@ namespace http
 #else
 		Asio::Socket& sock = this->mSocket->Get();
 		const Asio::Executor& exec = sock.get_executor();
-		asio::post(exec, [this]
-		{ this->ReadSome(5); });
+		asio::post(exec, [this] { this->ReadSome(5); });
 #endif
 	}
 
@@ -52,8 +51,7 @@ namespace http
 #else
 		Asio::Socket& sock = this->mSocket->Get();
 		const Asio::Executor& exec = sock.get_executor();
-		asio::post(exec, [this, code]
-		{ this->ClosetClient(code); });
+		asio::post(exec, [this, code] { this->ClosetClient(code); });
 #endif
 	}
 
@@ -94,24 +92,19 @@ namespace http
 		}
 		const HttpStatus status = this->mResponse.Code();
 		const std::string error = HttpStatusToString(status);
-		if (status == HttpStatus::OK)
-		{
-			LOG_DEBUG("({}ms) [{}:{}]=>{} ({})", time,
-					url.Method(), this->mRequest.GetSockId(), url.ToStr(), error);
-		}
-		else
+		if (status != HttpStatus::OK)
 		{
 			LOG_WARN("({}ms) [{}:{}]=>{} ({})", time,
 					url.Method(), this->mRequest.GetSockId(), url.ToStr(), error);
 		}
 #endif
 #ifdef ONLY_MAIN_THREAD
-		this->Write(&this->mResponse);
+		this->Write(this->mResponse);
 #else
 		Asio::Socket& sock = this->mSocket->Get();
 		asio::post(sock.get_executor(), [this]
 		{
-			this->Write(&this->mResponse);
+			this->Write(this->mResponse);
 		});
 #endif
 		return true;
@@ -170,7 +163,7 @@ namespace http
 #ifdef ONLY_MAIN_THREAD
 		this->mComponent->OnReadHead(&this->mRequest, &this->mResponse);
 #else
-		Asio::Context& t = joke::App::Inst()->GetContext();
+		Asio::Context& t = acs::App::GetContext();
 		t.post([this, req = &this->mRequest, res = &this->mResponse]
 		{
 			this->mComponent->OnReadHead(req, res);
@@ -185,14 +178,14 @@ namespace http
 		{
 			this->mResponse.SetCode(status);
 			this->mResponse.Header().SetKeepAlive(false);
-			this->Write(&this->mResponse);
+			this->Write(this->mResponse);
 		}
 		else
 		{
 #ifdef ONLY_MAIN_THREAD
 			this->mComponent->OnMessage(&this->mRequest, &this->mResponse);
 #else
-			Asio::Context& t = joke::App::Inst()->GetContext();
+			Asio::Context& t = acs::App::GetContext();
 			t.post([this, req = &this->mRequest, res = &this->mResponse]
 			{
 				this->mComponent->OnMessage(req, res);
@@ -251,6 +244,9 @@ namespace http
 
 	void SessionClient::Clear()
 	{
+		this->mPath = this->mRequest.GetUrl().Path();
+		this->mPath.append("&");
+		this->mPath.append(this->mRequest.GetUrl().GetQuery().ToStr());
 		this->StopTimer();
 		this->ClearBuffer();
 		this->mRequest.Clear();
@@ -267,12 +263,16 @@ namespace http
 		this->Clear();
 		this->mSocket->Close();
 		this->mRequest.SetSockId(0);
+		Asio::Socket& sock = this->mSocket->Get();
+		asio::post(sock.get_executor(), [this, code, sockId]()
+		{
 #ifdef ONLY_MAIN_THREAD
-		this->mComponent->OnCloseSocket(sockId, code);
+			this->mComponent->OnCloseSocket(sockId, code);
 #else
-		Asio::Context& t = joke::App::Inst()->GetContext();
-		t.post([this, code, sockId]
-		{ this->mComponent->OnCloseSocket(sockId, code); });
+			Asio::Context& t = acs::App::GetContext();
+			t.post([this, code, sockId] { this->mComponent->OnCloseSocket(sockId, code); });
 #endif
+		});
+
 	}
 }

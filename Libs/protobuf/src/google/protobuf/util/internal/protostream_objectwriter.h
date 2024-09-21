@@ -176,7 +176,7 @@ class PROTOBUF_EXPORT ProtoStreamObjectWriter : public ProtoWriter {
 
    private:
     // Before the "@type" field is encountered, we store all incoming data
-    // into this Event struct and replay them after we get the "@type" field.
+    // into this EventSystem struct and replay them after we get the "@type" field.
     class PROTOBUF_EXPORT Event {
      public:
       enum Type {

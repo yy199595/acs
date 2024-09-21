@@ -5,30 +5,99 @@
 #include"LogMgr.h"
 #include"Message/com/com.pb.h"
 #include"Entity/Actor/App.h"
-#include"Util/Time/TimeHelper.h"
+#include"Util/Tools/TimeHelper.h"
 #include"Util/File/FileHelper.h"
 #include"Util/File/DirectoryHelper.h"
 
-namespace joke
+namespace acs
 {
 	bool LogMgr::Awake()
 	{
-		std::unique_ptr<json::r::Value> jsonObject;
 		const ServerConfig& config = this->mApp->Config();
-		LOG_CHECK_RET_FALSE(config.Get("log", jsonObject));
-		LOG_CHECK_RET_FALSE(jsonObject->Get("path", this->mLogDir));
+		LOG_CHECK_RET_FALSE(config.Get("log_dir", this->mLogDir));
 		return true;
 	}
 
 	bool LogMgr::OnInit()
 	{
 		BIND_COMMON_HTTP_METHOD(LogMgr::List);
+		BIND_COMMON_HTTP_METHOD(LogMgr::Html);
 		BIND_COMMON_HTTP_METHOD(LogMgr::Look);
 		BIND_COMMON_HTTP_METHOD(LogMgr::Delete);
 		return true;
 	}
 
-	int LogMgr::Look(const http::FromData& request, http::Response& response)
+	int LogMgr::Html(const http::FromContent& request, http::Response& response)
+	{
+		std::string file;
+		if(!request.Get("file", file) || file.empty())
+		{
+			response.SetCode(HttpStatus::BAD_REQUEST);
+			return XCode::CallArgsError;
+		}
+		std::unique_ptr<http::TextContent> customData(new http::TextContent(http::Header::HTML));
+		{
+			customData->Append("<!DOCTYPE html>\n"
+							   "<html lang=\"en\">\n"
+							   "\n"
+							   "<head>\n"
+							   "    <meta charset=\"UTF-8\">\n"
+							   "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
+							   "    <title>Log Viewer</title>\n"
+							   "    <link rel=\"stylesheet\"href=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/atom-one-dark.min.css\">\n"
+							   "    <script src=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js\"></script>\n"
+							   "    <script src=\"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/languages/log.min.js\"></script>\n"
+							   "    <style>\n"
+							   "        body {\n"
+							   "            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n"
+							   "            margin: 0;\n"
+							   "            padding: 0;\n"
+							   "            background-color: #282c34;\n"
+							   "            color: #abb2bf;\n"
+							   "            display: flex;\n"
+							   "            flex-direction: column;\n"
+							   "            height: 100vh;\n"
+							   "            overflow: hidden;\n"
+							   "        }\n"
+							   "\n"
+							   "        h1 {\n"
+							   "            color: #61dafb;\n"
+							   "            text-align: center;\n"
+							   "            margin: 10px 0;\n"
+							   "        }\n"
+							   "\n"
+							   "        pre {\n"
+							   "            background-color: #1c1e22;\n"
+							   "            color: #f8f8f2;\n"
+							   "            padding: 20px;\n"
+							   "            border-radius: 0;\n"
+							   "            overflow: auto;\n"
+							   "            flex-grow: 1;\n"
+							   "            margin: 0;\n"
+							   "        }\n"
+							   "    </style>\n"
+							   "</head>");
+			customData->Append("<body>\n"
+							   "    <pre><code id=\"log-content\" class=\"log\"></code></pre>\n"
+							   "    <script>\n"
+							   "        const domain = window.location.origin;");
+			customData->Append(fmt::format("{}{}`)", "fetch(`${domain}/log/look?file=", file));
+			customData->Append(" .then(response => response.text())\n"
+							   "            .then(data => {\n"
+							   "                document.getElementById('log-content').textContent = data;\n"
+							   "                hljs.highlightElement(document.getElementById('log-content'));\n"
+							   "            })\n"
+							   "            .catch(error => console.error('Error fetching log file:', error));\n"
+							   "    </script>\n"
+							   "</body>\n"
+							   "\n"
+							   "</html>");
+		}
+		response.SetContent(std::move(customData));
+		return XCode::Ok;
+	}
+
+	int LogMgr::Look(const http::FromContent& request, http::Response& response)
 	{
 		std::string file;
 		if(!request.Get("file", file) || file.empty())
@@ -37,7 +106,7 @@ namespace joke
 			return XCode::CallArgsError;
 		}
 		std::string path = fmt::format("{}/{}",this->mLogDir, file);
-		std::unique_ptr<http::FileData> fileData = std::make_unique<http::FileData>();
+		std::unique_ptr<http::FileContent> fileData = std::make_unique<http::FileContent>();
 		{
 			fileData->OpenFile(path, http::Header::TEXT);
 		}
@@ -45,12 +114,12 @@ namespace joke
 		return XCode::Ok;
 	}
 
-	int LogMgr::List(const http::FromData& request, http::Response & response)
+	int LogMgr::List(const http::FromContent& request, http::Response & response)
 	{
 		std::string dir;
 		request.Get("dir", dir);
 		dir = dir.empty() ? this->mLogDir : fmt::format("{}/{}", this->mLogDir, dir);
-		std::unique_ptr<http::TextData> customData(new http::TextData(http::Header::HTML));
+		std::unique_ptr<http::TextContent> customData(new http::TextContent(http::Header::HTML));
 		{
 			customData->Append("<!DOCTYPE html>");
 			customData->Append("<meta http-equiv='Content-Type' content='text/html;charset=utf-8'/>");
@@ -71,18 +140,21 @@ namespace joke
 					directors.front().pop_back();
 				}
 				directors.front().pop_back();
-				customData->Append(fmt::format("<a href='/log'>{}</a>", "/log", "root"));
+				customData->Append(fmt::format("<a href='/log'>{}</a>", "root"));
 				customData->Append("</li>");
 			}
 			help::dir::GetDirAndFiles(dir, directors, files);
 
-			std::sort(directors.begin(), directors.end(),
-					[](const std::string & p1, const std::string & p2) ->bool
-					{
-						long long t1 = help::fs::GetLastWriteTime(p1);
-						long long t2 = help::fs::GetLastWriteTime(p2);
-						return t1 > t2;
-					});
+			if(directors.size() > 1)
+			{
+				std::sort(directors.begin() + 1, directors.end(),
+						[](const std::string& p1, const std::string& p2) -> bool
+						{
+							long long t1 = help::fs::GetLastWriteTime(p1);
+							long long t2 = help::fs::GetLastWriteTime(p2);
+							return t1 > t2;
+						});
+			}
 
 
 			for (const std::string& fullDir : directors)
@@ -91,7 +163,7 @@ namespace joke
 				customData->Append("<li>");
 				if (index == 0)
 				{
-					key = "返回";
+					key = "last";
 					index++;
 				}
 				else
@@ -127,7 +199,7 @@ namespace joke
 					long long time = help::fs::GetLastWriteTime(fullPath);
 					const std::string timeStr = help::Time::GetDateString(time);
 					customData->Append(fmt::format("<span>[{}][{}] &nbsp</span>",fileSize, timeStr));
-					customData->Append(fmt::format("<a href='/log/look?file={}'>&nbsp{}</a>", path, path));
+					customData->Append(fmt::format("<a href='/log/html?file={}'>&nbsp{}</a>", path, path));
 					customData->Append("</li>");
 					//html.emplace_back(fmt::format("<li><a href='{}'>{}</a></li>", url, path.substr(1)));
 				}
@@ -140,7 +212,7 @@ namespace joke
 		return XCode::Ok;
 	}
 
-	int LogMgr::Delete(const http::FromData& request, json::w::Value& response)
+	int LogMgr::Delete(const http::FromContent& request, json::w::Value& response)
 	{
 		std::string file;
 		if(!request.Get("file", file))
@@ -155,19 +227,19 @@ namespace joke
 		return XCode::Ok;
 	}
 
-	int LogMgr::SetLevel(const http::FromData& request, json::w::Value& response)
+	int LogMgr::SetLevel(const http::FromContent& request, json::w::Value& response)
 	{
 		int id = 0;
 		int level = 0;
 		LOG_ERROR_CHECK_ARGS(request.Get("id", id));
 		LOG_ERROR_CHECK_ARGS(request.Get("level", level));
-		Server * targetServer = this->mApp->ActorMgr()->GetServer(id);
+		Server * targetServer = App::ActorMgr()->GetServer(id);
 		if(targetServer == nullptr)
 		{
 			return XCode::NotFoundActor;
 		}
 		com::type::int32 message;
 		message.set_value(level);
-		return targetServer->Call("Node.SetLogLevel", message);
+		return targetServer->Call("NodeSystem.SetLogLevel", message);
 	}
 }

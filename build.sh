@@ -65,6 +65,9 @@ for arg in $cmd; do
         cd ./openssl || exit
         ./config
         make
+         if [ -d "../../openssl/lib" ]; then
+            mkdir -p "../../openssl/lib"
+        fi
         cp -r ./*.a ../../openssl/lib
         cd "$current_path" || exit
         rm -rf ./Lib/bin/openssl

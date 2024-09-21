@@ -3,6 +3,7 @@
 //
 
 #include "MongoFactory.h"
+#include "Util/Tools/TimeHelper.h"
 namespace mongo
 {
 	bool MongoFactory::New(const std::string& table, const char * command, std::unique_ptr<Request>& mongoRequest)
@@ -13,8 +14,7 @@ namespace mongo
 		}
 		mongoRequest = std::make_unique<Request>();
 		{
-			mongoRequest->cmd = command;
-			mongoRequest->document.Add(command, table);
+			mongoRequest->GetCollection(command, table);
 		}
 		return true;
 	}
@@ -37,7 +37,6 @@ namespace mongo
 		}
 		return mongoRequest;
 	}
-
 	std::unique_ptr<Request> MongoFactory::Insert(const std::string& table, bson::Writer::Document& document)
 	{
 		std::unique_ptr<Request> mongoRequest;

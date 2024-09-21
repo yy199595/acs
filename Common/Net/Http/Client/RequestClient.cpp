@@ -3,21 +3,21 @@
 //
 #include <regex>
 #include "RequestClient.h"
-#include "Util/Guid/Guid.h"
+#include "Util/Tools/Guid.h"
 #include "Entity/Actor/App.h"
 #include "Http/Component/HttpComponent.h"
-#include "Util/String/String.h"
+#include "Util/Tools/String.h"
 
 namespace http
 {
-	RequestClient::RequestClient(Component *httpComponent)
-		: tcp::TcpClient(0)
+	RequestClient::RequestClient(Component* httpComponent)
+			: tcp::TcpClient(0)
 	{
 		this->mComponent = httpComponent;
 	}
 
 	void RequestClient::Do(std::unique_ptr<http::Request> request,
-						   std::unique_ptr<http::Response> response, int taskId)
+			std::unique_ptr<http::Response> response, int taskId)
 	{
 		this->mRequest = std::move(request);
 		this->mResponse = std::move(response);
@@ -26,13 +26,74 @@ namespace http
 		const http::Url &url = this->mRequest->GetUrl();
 		this->Connect(url.Host(), url.Port(), 5);
 #else
-		Asio::Socket &sock = this->mSocket->Get();
-		const Asio::Executor &executor = sock.get_executor();
+		Asio::Socket& sock = this->mSocket->Get();
+		const Asio::Executor& executor = sock.get_executor();
 		asio::post(executor, [this]
-				   {
-			const http::Url & url = this->mRequest->GetUrl();
-			this->Connect(url.Host(), url.Port(), this->mRequest->Timeout()); });
+		{
+			const http::Url& url = this->mRequest->GetUrl();
+			this->Connect(url.Host(), url.Port(), this->mRequest->Timeout());
+		});
 #endif
+	}
+
+	bool RequestClient::SyncSend(std::unique_ptr<http::Request> request)
+	{
+		const http::Url& url = request->GetUrl();
+		if (!this->ConnectSync(url.Host(), url.Port()))
+		{
+			return false;
+		}
+		return this->SendSync(*request);
+	}
+
+	bool RequestClient::SyncSend(std::unique_ptr<http::Request> request, http::Response& response)
+	{
+		const http::Url& url = request->GetUrl();
+		if (!this->ConnectSync(url.Host(), url.Port()))
+		{
+			return false;
+		}
+		if (!this->SendSync(*request))
+		{
+			return false;
+		}
+
+		size_t size = 0;
+		std::istream is(&this->mRecvBuffer);
+		if (!this->RecvLineSync(size))
+		{
+			return false;
+		}
+		int flag = response.OnRecvMessage(is, size);
+		while (true)
+		{
+			switch (flag)
+			{
+				case tcp::ReadError:
+				case tcp::ReadDecodeError:
+					return false;
+				case tcp::ReadOneLine:
+					flag = this->RecvLineSync(size);
+					break;
+				case tcp::ReadSomeMessage:
+				{
+					size_t count = 0;
+					if (this->mSocket->CanRecvCount(count) && count > 0)
+					{
+						flag = this->RecvSync(count, size);
+						break;
+					}
+					return false;
+				}
+				case tcp::ReadDone:
+					return true;
+				default:
+					flag = this->RecvSync(flag, size);
+					break;
+			}
+			response.OnRecvMessage(is, size);
+		}
+		return true;
 	}
 
 	void RequestClient::OnConnect(bool result, int count)
@@ -49,7 +110,7 @@ namespace http
 		{
 			this->mSocket->SetOption(tcp::OptionType::KeepAlive, true);
 		}
-		this->Write(this->mRequest.get());
+		this->Write(*this->mRequest);
 	}
 
 	void RequestClient::OnSendMessage()
@@ -95,7 +156,7 @@ namespace http
 		{
 			this->mResponse->SetCode(code);
 		}
-		http::Data *httpData = const_cast<http::Data *>(this->mResponse->GetBody());
+		http::Content *httpData = const_cast<http::Content *>(this->mResponse->GetBody());
 		if (httpData != nullptr)
 		{
 			httpData->OnDecode();
@@ -115,7 +176,7 @@ namespace http
 #ifdef ONLY_MAIN_THREAD
 		this->mComponent->OnMessage(request, response);
 #else
-		Asio::Context &io = joke::App::Inst()->GetContext();
+		Asio::Context &io = acs::App::GetContext();
 		io.post([this, request, response]
 				{ this->mComponent->OnMessage(request, response); });
 #endif

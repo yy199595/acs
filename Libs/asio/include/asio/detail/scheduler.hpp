@@ -192,7 +192,7 @@ private:
   // Mutex to protect access to internal data.
   mutable mutex mutex_;
 
-  // Event to wake up blocked threads.
+  // EventSystem to wake up blocked threads.
   event wakeup_event_;
 
   // The task to be run by this service.

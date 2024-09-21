@@ -11,7 +11,7 @@
 #include"httpHead.h"
 #include<unordered_map>
 #include"Http/Common/Url.h"
-#include"Http/Common/Data.h"
+#include"Http/Common/Content.h"
 #include"Proto/Message/IProto.h"
 
 struct lua_State;
@@ -33,12 +33,12 @@ namespace http
 		inline bool IsHttps() const { return this->mUrl.IsHttps(); }
 		inline const http::Url & GetUrl() const { return this->mUrl; }
 	public:
-		inline const Data * GetBody() const { return this->mBody.get();}
+		inline const Content * GetBody() const { return this->mBody.get();}
 		inline const http::Head & ConstHeader() const { return this->mHead; }
-		inline void SetBody(std::unique_ptr<Data> body) { this->mBody = std::move(body);}
+		inline void SetBody(std::unique_ptr<Content> body) { this->mBody = std::move(body);}
 	public:
 		bool SetUrl(const std::string & url);
-		bool SetUrl(const std::string & url, const http::FromData & query);
+		bool SetUrl(const std::string & url, const http::FromContent & query);
 		int WriteToLua(lua_State *lua) const final;
 		inline void SetTimeout(int second) { this->mTimeout = second; }
 	public:
@@ -46,6 +46,7 @@ namespace http
 		void SetVerifyFile(const std::string & path) { this->mVerifyFile = path; }
 	public:
 		bool IsMethod(const std::string & method) const;
+		void SetContent(const json::w::Document & document);
 		void SetContent(const char * t, const std::string & content);
 		void SetContent(const char * t, const char * content, size_t size);
 	public:
@@ -62,7 +63,7 @@ namespace http
 		int mDecodeStatus;
 		long long mConeSize;
 		std::string mVerifyFile;
-		std::unique_ptr<http::Data> mBody;
+		std::unique_ptr<http::Content> mBody;
     };
 }
 

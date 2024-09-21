@@ -1,6 +1,6 @@
 #include"Component.h"
 #include"Entity/Actor/App.h"
-namespace joke
+namespace acs
 {
 	Component::Component()
 		: mUnit(nullptr)

@@ -2,8 +2,8 @@
 // Created by yjz on 2022/10/27.
 //
 #include"HttpRequest.h"
-#include"Util/Math/Math.h"
-#include"Util/Time/TimeHelper.h"
+#include"Util/Tools/Math.h"
+#include"Util/Tools/TimeHelper.h"
 #include"Log/Common/CommonLogDef.h"
 #include"Yyjson/Document/Document.h"
 #include"Lua/Engine/UserDataParameter.h"
@@ -39,7 +39,7 @@ namespace http
 		return this->mUrl.Decode(url);
 	}
 
-	bool Request::SetUrl(const std::string& url, const http::FromData& fromData)
+	bool Request::SetUrl(const std::string& url, const http::FromContent& fromData)
 	{
 		std::string query = fromData.Serialize();
 		return this->mUrl.Decode(fmt::format("{}?{}", url, query));
@@ -145,8 +145,8 @@ namespace http
 		}
 		{
 			lua_pushstring(lua, "query");
-			const http::FromData& fromData = this->mUrl.GetQuery();
-			(const_cast<http::FromData&>(fromData)).WriteToLua(lua);
+			const http::FromContent& fromData = this->mUrl.GetQuery();
+			(const_cast<http::FromContent&>(fromData)).WriteToLua(lua);
 			lua_rawset(lua, -3);
 		}
 		{
@@ -209,9 +209,18 @@ namespace http
 		this->SetContent(t,  content.c_str(), content.size());
 	}
 
+	void Request::SetContent(const json::w::Document& document)
+	{
+		std::unique_ptr<http::JsonContent> jsonContent = std::make_unique<http::JsonContent>();
+		{
+			jsonContent->Write(document);
+			this->mBody = std::move(jsonContent);
+		}
+	}
+
 	void Request::SetContent(const char* t, const char* content, size_t size)
 	{
-		std::unique_ptr<http::TextData> customData(new http::TextData());
+		std::unique_ptr<http::TextContent> customData(new http::TextContent());
 		{
 			customData->SetContent(t, content, size);
 			this->mBody = std::move(customData);

@@ -5,13 +5,13 @@
 #include "ClientComponent.h"
 #include "Yyjson/Lua/ljson.h"
 #include "Util/File/FileHelper.h"
-#include "Util/String/String.h"
+#include "Util/Tools/String.h"
 #include "Lua/Component/LuaComponent.h"
 #include "Client/Lua/LuaClient.h"
 #include"Lua/Engine/ModuleClass.h"
 #include "Proto/Component/ProtoComponent.h"
 #include "Rpc/Component/DispatchComponent.h"
-namespace joke
+namespace acs
 {
 	ClientComponent::ClientComponent() : ISender(rpc::Net::Client)
 	{
@@ -37,7 +37,7 @@ namespace joke
 			return -1;
 		}
 		static int index = 1;
-		Asio::Context & context = this->mApp->GetContext();
+		Asio::Context & context = App::GetContext();
 		tcp::Socket * tcpSocket = new tcp::Socket(context);
 		{
 			tcpSocket->Init(ip, port);

@@ -6,7 +6,7 @@
 #define APP_PLAYER_H
 #include"Entity/Actor/Actor.h"
 
-namespace joke
+namespace acs
 {
 	class Player : public Actor
 	{

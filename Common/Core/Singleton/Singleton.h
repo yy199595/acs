@@ -6,7 +6,7 @@
 #define APP_SINGLETON_H
 #include<cassert>
 
-namespace joke
+namespace acs
 {
     template<typename T>
     class Singleton
@@ -17,7 +17,7 @@ namespace joke
             assert(mInstance == nullptr);
             mInstance = (T*)this;
         }
-        static T * Inst() { return Singleton<T>::mInstance; }
+        static inline T * Inst() { return Singleton<T>::mInstance; }
     private:
         static T * mInstance;
     };
@@ -39,7 +39,7 @@ namespace joke
     };
 }
 
-namespace joke
+namespace acs
 {
     template<typename T>
     T * Singleton<T>::mInstance = nullptr;

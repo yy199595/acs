@@ -10,7 +10,7 @@
 #include"Util/String/String.h"
 #include"Core/Thread/ThreadSync.h"
 #include"Mysql/Config/MysqlConfig.h"
-namespace joke
+namespace acs
 {
 	MysqlClient::MysqlClient(Component* component, const mysql::MysqlConfig& config)
 			: mComponent(component), mConfig(config)
@@ -109,7 +109,7 @@ namespace joke
 				delete response;
 				return;
 			}
-			Asio::Context & t = App::Inst()->GetContext();
+			Asio::Context & t = App::GetContext();
 			t.post([this, request, response] { this->mComponent->OnMessage(request, response); });
 		});
 	}

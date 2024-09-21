@@ -5,14 +5,14 @@
 #include"Actor.h"
 #include"XCode/XCode.h"
 #include"Rpc/Client/Message.h"
-#include"Util/Time/TimeHelper.h"
-#include"Lua/Engine/LuaParameter.h"
+#include"Util/Tools/TimeHelper.h"
 #include"Proto/Include/Message.h"
 #include"Rpc/Config/ServiceConfig.h"
 #include"Yyjson/Lua/ljson.h"
 #include"Proto/Component/ProtoComponent.h"
 #include"Router/Component/RouterComponent.h"
-namespace joke
+#include "Message/s2s/s2s.pb.h"
+namespace acs
 {
 	Actor::Actor(long long id, std::string  name)
 		: Entity(id), mName(std::move(name))
@@ -24,8 +24,8 @@ namespace joke
 
 	bool Actor::LateAwake()
 	{
-		this->mProto = App::Inst()->GetProto();
-		this->mRouterComponent = App::Inst()->GetComponent<RouterComponent>();
+		this->mProto = App::GetProto();
+		this->mRouterComponent = App::Get<RouterComponent>();
 		LOG_CHECK_RET_FALSE(this->mRouterComponent != nullptr && this->OnInit());
 		return true;
 	}
@@ -172,6 +172,10 @@ namespace joke
 			return code;
 		}
 		message->SetProto(rpc::Type::None);
+		if (!methodConfig->Response.empty())
+		{
+			message->TempHead().Add("res", methodConfig->Response);
+		}
 		switch (lua_type(lua, idx))
 		{
 			case LUA_TNIL:
@@ -184,10 +188,6 @@ namespace joke
 				{
 					message->Body()->append(str, count);
 					message->SetProto(rpc::Porto::String);
-					if (!methodConfig->Response.empty())
-					{
-						message->GetHead().Add("res", methodConfig->Response);
-					}
 				}
 				return XCode::Ok;
 			}
@@ -207,15 +207,9 @@ namespace joke
 					{
 						return XCode::SerializationFailure;
 					}
-					message->TempHead().Add("res", methodConfig->Response);
-
 					return XCode::Ok;
 				}
 				message->SetProto(rpc::Porto::Json);
-				if (!methodConfig->Response.empty())
-				{
-					message->GetHead().Add("res", methodConfig->Response);
-				}
 				lua::yyjson::read(lua, idx, *message->Body());
 				return XCode::Ok;
 			}
@@ -238,5 +232,52 @@ namespace joke
 
 		lua_pushinteger(lua, code);
 		return 1;
+	}
+
+	int Actor::Publish(const std::string& event)
+	{
+		std::unique_ptr<rpc::Packet> message;
+		int code = this->Make("EventSystem.Publish", message);
+		if(code != XCode::Ok)
+		{
+			return code;
+		}
+		int id = message->SockId();
+		message->SetProto(rpc::Porto::String);
+		this->mLastTime = help::Time::NowSec();
+		message->GetHead().Add("channel", event);
+		return this->mRouterComponent->Send(id, std::move(message));
+	}
+
+	int Actor::Publish(const std::string& event, json::w::Document& document)
+	{
+		std::unique_ptr<rpc::Packet> message;
+		int code = this->Make("EventSystem.Publish", message);
+		if (code != XCode::Ok)
+		{
+			return code;
+		}
+		int id = message->SockId();
+		message->SetProto(rpc::Porto::Json);
+		this->mLastTime = help::Time::NowSec();
+		message->GetHead().Add("channel", event);
+		message->SetContent(document.JsonString());
+		return this->mRouterComponent->Send(id, std::move(message));
+	}
+
+	int Actor::Publish(const std::string& event, char proto, const std::string& data)
+	{
+		std::unique_ptr<rpc::Packet> message;
+		int code = this->Make("EventSystem.Publish", message);
+		if (code != XCode::Ok)
+		{
+			return code;
+		}
+		int id = message->SockId();
+		message->SetContent(proto, data);
+		message->SetProto(rpc::Porto::Json);
+		this->mLastTime = help::Time::NowSec();
+		message->GetHead().Add("channel", event);
+		return this->mRouterComponent->Send(id, std::move(message));
 	}
 }

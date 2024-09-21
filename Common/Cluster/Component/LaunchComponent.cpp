@@ -14,15 +14,32 @@
 #include"Rpc/Component/DispatchComponent.h"
 #include"Router/Component/RouterComponent.h"
 
-namespace joke
+namespace acs
 {
     bool LaunchComponent::Awake()
 	{
-		this->AddComponent();
-		std::vector<std::string> components;
-		LOG_CHECK_RET_FALSE(ClusterConfig::Inst());
+		std::unique_ptr<json::r::Value> luaObject;
+		if (this->mApp->Config().Get("lua", luaObject))
+		{
+			this->mApp->AddComponent<LuaComponent>();
+		}
+
+		if (ClusterConfig::Inst() == nullptr)
+		{
+			return true;
+		}
+		if (this->mApp->Config().Get("listen", luaObject))
+		{
+			this->mApp->AddComponent<ListenerComponent>();
+		}
 		const NodeConfig* nodeConfig = ClusterConfig::Inst()->GetConfig();
-		if (nodeConfig->GetComponents(components))
+		if(nodeConfig == nullptr)
+		{
+			LOG_ERROR("{} config is null", ClusterConfig::Inst()->GetConfigName());
+			return false;
+		}
+		std::vector<std::string> components;
+		if (nodeConfig->GetComponents(components) > 0)
 		{
 			for (const std::string& name: components)
 			{
@@ -37,24 +54,17 @@ namespace joke
 			}
 		}
 		components.clear();
-		std::unique_ptr<json::r::Value> luaObject;
-		if(this->mApp->Config().Get("lua", luaObject))
+		if (nodeConfig->GetServices(components) == 0)
 		{
-			this->mApp->AddComponent<LuaComponent>();
+			return true;
 		}
-		if(this->mApp->Config().Get("listen", luaObject))
+		this->AddComponent();
+		for (const std::string& name: components)
 		{
-			this->mApp->AddComponent<ListenerComponent>();
-		}
-		if (nodeConfig->GetServices(components) > 0)
-		{
-			for (const std::string& name: components)
+			if (!this->AddService(name))
 			{
-				if(!this->AddService(name))
-				{
-					LOG_ERROR("add service {} fail", name);
-					return false;
-				}
+				LOG_ERROR("add service {} fail", name);
+				return false;
 			}
 		}
 		return true;

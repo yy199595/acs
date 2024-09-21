@@ -13,6 +13,8 @@ namespace Lua
 		extern int Call(lua_State * lua);
 		extern int Send(lua_State * lua);
 		extern int SyncRun(lua_State* lua);
+		extern int Sub(lua_State* lua);
+		extern int UnSub(lua_State* lua);
 	};
 }
 

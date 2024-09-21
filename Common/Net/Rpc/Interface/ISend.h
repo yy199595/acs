@@ -6,7 +6,7 @@
 #define APP_ISEND_H
 #include"Rpc/Client/Message.h"
 
-namespace joke
+namespace acs
 {
 	class ISender
 	{

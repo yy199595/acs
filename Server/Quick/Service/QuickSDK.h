@@ -30,13 +30,13 @@ namespace quick
 	};
 }
 
-namespace joke
+namespace acs
 {
 	class QuickSDK : public HttpService
 	{
 	public:
 		QuickSDK();
-		~QuickSDK() = default;
+		~QuickSDK() final = default;
 	private:
 		bool Awake() final;
 		bool OnInit() final;

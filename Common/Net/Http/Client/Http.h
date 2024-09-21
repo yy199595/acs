@@ -99,6 +99,7 @@ namespace http
 	constexpr int PermissCreator = 8; //主创
 	constexpr int PermissCharge = 9;	//商户
 	constexpr int PermissPersonCharge = 10;	//主理人
+	constexpr int PermissOperate = 20; //运营者
 	constexpr int PermissAdmin = 100; //管理员权限
 
 	constexpr const char* CRLF = "\r\n";

@@ -4,13 +4,13 @@
 #include"Mongo/Client/MongoFactory.h"
 #include"Mongo/Component/MongoDBComponent.h"
 
-using namespace joke;
+using namespace acs;
 namespace Lua
 {
 	int LuaMongo::Run(lua_State * L)
 	{
-		using MongoComponent = joke::MongoDBComponent;
-		static MongoComponent * component = App::Inst()->GetComponent<MongoComponent>();
+		using MongoComponent = acs::MongoDBComponent;
+		static MongoComponent * component = App::Get<MongoComponent>();
 		if(component == nullptr)
 		{
 			luaL_error(L, "not find MongoDBComponent");

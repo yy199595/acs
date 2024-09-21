@@ -7,7 +7,7 @@
 #include"Proto/Component/ProtoComponent.h"
 #include"Mysql/Component/MysqlDBComponent.h"
 
-namespace joke
+namespace acs
 {
 	MysqlDB::MysqlDB()
 	{

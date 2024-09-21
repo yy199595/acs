@@ -6,11 +6,11 @@
 #include"Entity/Actor/App.h"
 #include"Rpc/Service/RpcService.h"
 #include"Proto/Component/ProtoComponent.h"
-namespace joke
+namespace acs
 {
 	bool ServiceMethodRegister::AddMethod(std::unique_ptr<ServiceMethod> method)
 	{
-        ProtoComponent * protoComponent = App::Inst()->GetProto();
+        ProtoComponent * protoComponent = App::GetProto();
         RpcService * serviceComponent = this->mComponent->Cast<RpcService>();
         LOG_CHECK_RET_FALSE(serviceComponent != nullptr);
 
@@ -68,7 +68,7 @@ namespace joke
 	}
 }
 
-namespace joke
+namespace acs
 {
 	HttpServiceMethod * HttpServiceRegister::GetMethod(const string& name)
 	{    

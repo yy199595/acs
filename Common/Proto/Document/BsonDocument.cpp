@@ -366,16 +366,22 @@ namespace bson
 
 				case YYJSON_TYPE_OBJ:
 				{
+					long long longNumber = 0;
 					std::vector<const char *> keys;
 					bson::Writer::Document document1;
 					std::unique_ptr<json::r::Value> value;
-					if(jsonValue.GetKeys(keys) > 0)
+					if(jsonValue.Get("int64", longNumber))
 					{
-						for(const char * key : keys)
+						document.Add(key, longNumber);
+						return true;
+					}
+					else if(jsonValue.GetKeys(keys) > 0)
+					{
+						for(const char * k : keys)
 						{
-							if(jsonValue.Get(key, value))
+							if(jsonValue.Get(k, value))
 							{
-								if(!this->WriterToBson(key, document1, *value))
+								if(!this->WriterToBson(k, document1, *value))
 								{
 									return false;
 								}
@@ -441,6 +447,12 @@ namespace bson
 
 			const char * str = build._done();
 			_b.appendBuf(str, build.len());
+		}
+		
+
+		void Document::Add(const char* key)
+		{
+			this->appendNull(key);
 		}
 
 		void Document::Add(const char *key, Document &document)

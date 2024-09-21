@@ -1,9 +1,9 @@
 ﻿#include "LuaComponent.h"
 
 #include "Entity/Actor/App.h"
-#include "Util/Guid/Guid.h"
+#include "Util/Tools/Guid.h"
 #include "Util/File/FileHelper.h"
-#include "Util/String/String.h"
+#include "Util/Tools/String.h"
 #include "Util/File/DirectoryHelper.h"
 #include "Async/Lua/WaitLuaTaskSource.h"
 #include "Rpc//Lua/LuaServiceTaskSource.h"
@@ -18,8 +18,11 @@
 #include "Yyjson/Lua/ljson.h"
 #include "Proto/Message/IProto.h"
 #include "Auth/Lua/Auth.h"
+#include "Core/Excel/excel.h"
+#include "Lua/Engine/Table.h"
+
 using namespace Lua;
-namespace joke
+namespace acs
 {
 	LuaComponent::LuaComponent()
 	{
@@ -45,8 +48,8 @@ namespace joke
 	{
 		Lua::ClassProxyHelper os(this->mLuaEnv, "os");
 
-		os.PushMember("dir", System::WorkPath());
-		os.PushStaticFunction("setenv", System::LuaSetEnv);
+		os.PushMember("dir", os::System::WorkPath());
+		os.PushStaticFunction("setenv", os::System::LuaSetEnv);
 #ifdef __OS_MAC__
 		os.PushMember("platform", std::string("mac"));
 #elif __OS_LINUX__
@@ -83,6 +86,31 @@ namespace joke
 		Lua::ClassProxyHelper luaRegister4(this->mLuaEnv, "coroutine");
 		luaRegister4.PushExtensionFunction("start", Lua::Coroutine::Start);
 		luaRegister4.PushExtensionFunction("sleep", Lua::Coroutine::Sleep);
+
+		Lua::ClassProxyHelper classProxyHelper1(this->mLuaEnv, "Cell");
+		classProxyHelper1.BeginRegister<lxlsx::Cell>();
+		classProxyHelper1.PushMemberField<lxlsx::Cell>("type", &lxlsx::Cell::type);
+		classProxyHelper1.PushMemberField<lxlsx::Cell>("value", &lxlsx::Cell::value);
+		classProxyHelper1.PushMemberField<lxlsx::Cell>("fmt_id", &lxlsx::Cell::fmt_id);
+		classProxyHelper1.PushMemberField<lxlsx::Cell>("fmt_code", &lxlsx::Cell::fmt_code);
+
+		Lua::ClassProxyHelper classProxyHelper2(this->mLuaEnv, "Sheet");
+		classProxyHelper2.BeginRegister<lxlsx::Sheet>();
+		classProxyHelper2.PushMemberField<lxlsx::Sheet>("name", &lxlsx::Sheet::name);
+		classProxyHelper2.PushMemberField<lxlsx::Sheet>("last_row", &lxlsx::Sheet::last_row);
+		classProxyHelper2.PushMemberField<lxlsx::Sheet>("last_col", &lxlsx::Sheet::last_col);
+		classProxyHelper2.PushMemberField<lxlsx::Sheet>("first_row", &lxlsx::Sheet::first_row);
+		classProxyHelper2.PushMemberField<lxlsx::Sheet>("first_col", &lxlsx::Sheet::first_col);
+		classProxyHelper2.PushMemberFunction<lxlsx::Sheet>("get_cell", &lxlsx::Sheet::get_cell);
+
+
+		Lua::ClassProxyHelper classProxyHelper3(this->mLuaEnv, "ExcelFile");
+		classProxyHelper3.BeginRegister<lxlsx::ExcelFile>();
+		classProxyHelper3.PushCtor<lxlsx::ExcelFile>();
+		classProxyHelper3.PushMemberFunction("Open", &lxlsx::ExcelFile::Open);
+		classProxyHelper3.PushMemberFunction("GetSheet", &lxlsx::ExcelFile::GetSheet);
+		classProxyHelper3.PushMemberFunction("GetSheets", &lxlsx::ExcelFile::GetSheets);
+
 	}
 
 	bool LuaComponent::LateAwake()
@@ -98,6 +126,7 @@ namespace joke
 		moduleRegistry.AddFunction("GetLastWriteTime", Lua::LuaFile::GetLastWriteTime).End("util.fs");
 
 		moduleRegistry.Start();
+		moduleRegistry.AddFunction("Stop", LuaActor::Stop);
 		moduleRegistry.AddFunction("Random", LuaActor::Random);
 		moduleRegistry.AddFunction("GetPath", LuaActor::GetPath);
 		moduleRegistry.AddFunction("NewGuid", LuaActor::NewGuid);
@@ -125,6 +154,11 @@ namespace joke
 		moduleRegistry.Start();
 		moduleRegistry.AddFunction("Create", lua::ljwt::Create);
 		moduleRegistry.AddFunction("Verify", lua::ljwt::Verify).End("auth.jwt");
+
+		moduleRegistry.Start();
+		moduleRegistry.AddFunction("Make", Lua::LuaDir::Make);
+		moduleRegistry.AddFunction("IsExist", Lua::LuaDir::IsExist).End("util.dir");
+
 
 		std::vector<ILuaRegister*> components;
 		this->mApp->GetComponents(components);
@@ -177,7 +211,7 @@ namespace joke
 	bool LuaComponent::LoadAllFile()
 	{
 		std::vector<std::string> loadModules;
-		std::string work = System::WorkPath() + '/';
+		std::string work = os::System::WorkPath() + '/';
 		std::unordered_set<std::string> directors;
 		for (const std::string& path: this->mLuaConfig->Requires())
 		{
@@ -221,7 +255,7 @@ namespace joke
 		}
 		std::string main = this->mLuaConfig->Main();
 		this->mMainModule = this->LoadModule(main);
-		if (this->mMainModule)
+		if (this->mMainModule != nullptr)
 		{
 			int code = this->mMainModule->Call("Awake");
 			if (code == XCode::CallLuaFunctionFail)
@@ -271,10 +305,7 @@ namespace joke
 
 	void LuaComponent::OnDestroy()
 	{
-		if(this->mMainModule)
-		{
-			this->mMainModule->Await("OnStop");
-		}
+		IF_NOT_NULL_CALL(this->mMainModule, Await, "OnStop");
 	}
 
 	void LuaComponent::AddRequire(const std::string& path)

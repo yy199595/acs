@@ -16,7 +16,7 @@
 #include"Lua/Engine/UserDataParameter.h"
 #include"Http/Component/HttpWebComponent.h"
 
-using namespace joke;
+using namespace acs;
 namespace Lua
 {
 	int HttpHead::Get(lua_State* L)
@@ -41,7 +41,7 @@ namespace Lua
 		static HttpComponent* httpComponent = nullptr;
 		if (httpComponent == nullptr)
 		{
-			httpComponent = App::Inst()->GetComponent<HttpComponent>();
+			httpComponent = App::Get<HttpComponent>();
 			if (httpComponent == nullptr)
 			{
 				luaL_error(lua, "HttpComponent Is Null");
@@ -117,7 +117,7 @@ namespace Lua
 		static HttpComponent* httpComponent = nullptr;
 		if (httpComponent == nullptr)
 		{
-			httpComponent = App::Inst()->GetComponent<HttpComponent>();
+			httpComponent = App::Get<HttpComponent>();
 			if (httpComponent == nullptr)
 			{
 				luaL_error(lua, "HttpComponent Is Null");
@@ -145,7 +145,7 @@ namespace Lua
 		static HttpComponent* httpComponent = nullptr;
 		if (httpComponent == nullptr)
 		{
-			httpComponent = App::Inst()->GetComponent<HttpComponent>();
+			httpComponent = App::Get<HttpComponent>();
 			if (httpComponent == nullptr)
 			{
 				luaL_error(lua, "HttpComponent Is Null");
@@ -194,7 +194,7 @@ namespace Lua
 
 	int HttpClient::Upload(lua_State* lua)
 	{
-		HttpComponent* httpComponent = App::Inst()->GetComponent<HttpComponent>();
+		HttpComponent* httpComponent = App::Get<HttpComponent>();
 		if (httpComponent == nullptr)
 		{
 			luaL_error(lua, "HttpComponent Is Null");
@@ -214,7 +214,7 @@ namespace Lua
 		{
 			type = lua_tostring(lua, 3);
 		}
-		std::unique_ptr<http::FileData> fileData = std::make_unique<http::FileData>();
+		std::unique_ptr<http::FileContent> fileData = std::make_unique<http::FileContent>();
 		{
 			if(!fileData->OpenFile(path, type))
 			{
@@ -234,7 +234,7 @@ namespace Lua
 
 	int HttpClient::Download(lua_State* lua)
 	{
-        HttpComponent* httpComponent = App::Inst()->GetComponent<HttpComponent>();
+        HttpComponent* httpComponent = App::Get<HttpComponent>();
         if (httpComponent == nullptr)
         {
             luaL_error(lua, "HttpComponent Is Null");
@@ -259,8 +259,8 @@ namespace Lua
         int taskId = 0;
 		lua_pushthread(lua);
 		request->Header().Add("Accept", "*/*");
-		request->Header().Add("User-Agent", "Chrome");
-		request->Header().Add("Accept-Encoding", "gzip, deflate, br");
+		//request->Header().Add("User-Agent", "Chrome");
+		//request->Header().Add("Accept-Encoding", "gzip, deflate, br");
         httpComponent->Send(std::move(request), std::move(response), taskId);
         return httpComponent->AddTask(taskId, new LuaHttpRequestTask(lua))->Await();
 	}

@@ -4,13 +4,13 @@
 
 #include"FileOutput.h"
 #include"spdlog/fmt/fmt.h"
-#include"Util/Time/TimeHelper.h"
+#include"Util/Tools/TimeHelper.h"
 #include"Util/File/FileHelper.h"
 #include"Util/File/DirectoryHelper.h"
-
+#include "Log/Common/CommonLogDef.h"
 namespace custom
 {
-	FileOutput::FileOutput(FileConfig  config)
+	FileOutput::FileOutput(FileConfig config)
 		: mConfig(std::move(config))
 	{
 		this->mIndex = 0;
@@ -27,8 +27,10 @@ namespace custom
 		}
 	}
 
-	bool FileOutput::Start(Asio::Context& io)
+	bool FileOutput::Init()
 	{
+		this->mIndex = 0;
+		this->mFileLine = 0;
 		const std::string & root = this->mConfig.Root;
 		std::string time = help::Time::GetYearMonthDayString();
 		const std::string dir = fmt::format("{}/{}", root, time);
@@ -39,6 +41,11 @@ namespace custom
 		this->mOpenFileTime = help::Time::NowSec();
 		this->mPath = fmt::format("{}/{}.log", dir, this->mConfig.Name);
 		return true;
+	}
+
+	bool FileOutput::Start(Asio::Context& io)
+	{
+		return this->Init();
 	}
 
 	bool FileOutput::OpenFile()
@@ -58,7 +65,7 @@ namespace custom
 
 	void FileOutput::OnTick(int tick)
 	{
-		this->Flush();
+
 	}
 
 	void FileOutput::Push(Asio::Context &io, const std::string& name, const custom::LogInfo& logData)
@@ -73,12 +80,19 @@ namespace custom
 		static std::string LogError(" [error]");
 		static std::string LogFatal(" [fatal]");
 		long long nowTime = help::Time::NowSec();
+
+		std::string t1 = help::Time::GetYearMonthDayString();
+		std::string t2 = help::Time::GetYearMonthDayString(this->mOpenFileTime);
+		if(t1 != t2)
+		{
+			CONSOLE_LOG_INFO("t1:{}  t2:{}", t1 , t2);
+		}
+		std::string time = help::Time::GetDateString(nowTime);
 		if(!help::Time::IsSameDay(nowTime, this->mOpenFileTime))
 		{
+			this->Init();
 			this->SwitchFile();
 		}
-
-		std::string time = help::Time::GetDateString(nowTime);
 		this->mDevStream.write(time.c_str(), (int)time.size());
 		switch (logData.Level)
 		{
@@ -134,9 +148,9 @@ namespace custom
 		this->mFileLine = 0;
 		this->mDevStream.flush();
 		this->mDevStream.close();
-		this->mOpenFileTime = help::Time::NowSec();
 		const std::string & root = this->mConfig.Root;
 		std::string time = help::Time::GetYearMonthDayString();
+
 		std::string dir = fmt::format("{}/{}", root, time);
 		if(!help::dir::DirectorIsExist(dir))
 		{

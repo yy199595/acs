@@ -2,10 +2,10 @@
 // Created by yjz on 2022/1/5.
 //
 #include"WaitTaskSourceBase.h"
-#include "Util/Guid/Guid.h"
+#include "Util/Tools/Guid.h"
 #include "Entity/Actor/App.h"
-#include "Util/Time/TimeHelper.h"
-namespace joke
+#include "Util/Tools/TimeHelper.h"
+namespace acs
 {
     WaitTaskSourceBase::WaitTaskSourceBase()
     {
@@ -28,7 +28,7 @@ namespace joke
 				return true;
 			case TaskState::TaskAwait:
 				this->mState = state;
-				App::Inst()->Coroutine()->Resume(this->mCorId);
+				App::Coroutine()->Resume(this->mCorId);
 				return true;
 			case TaskState::TaskFinish:
 				assert(false);
@@ -42,7 +42,7 @@ namespace joke
 		if(this->mState == TaskState::TaskReady)
         {
             this->mState = TaskState::TaskAwait;
-			App::Inst()->Coroutine()->YieldCoroutine(this->mCorId);
+			App::Coroutine()->YieldCoroutine(this->mCorId);
             return true;
         }
         return false;

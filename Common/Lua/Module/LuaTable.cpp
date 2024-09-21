@@ -42,7 +42,7 @@ namespace lua
 
 	void LuaTable::SetMember(const char* key, const pb::Message& value)
 	{
-		joke::MessageDecoder messageDecoder(this->mLua, nullptr);
+		acs::MessageDecoder messageDecoder(this->mLua, nullptr);
 		messageDecoder.Decode(value);
 	}
 }

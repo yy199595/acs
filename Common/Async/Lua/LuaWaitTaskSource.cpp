@@ -8,7 +8,7 @@
 #include"Yyjson/Lua/ljson.h"
 #include"Proto/Component/ProtoComponent.h"
 #include<google/protobuf/util/json_util.h>
-namespace joke
+namespace acs
 {
 	LuaWaitTaskSource::LuaWaitTaskSource(lua_State* lua)
 			: mRef(0), mLua(lua)
@@ -64,12 +64,12 @@ namespace joke
 					std::string name;
 					if(response->TempHead().Del("res", name))
 					{
-						pb::Message * message1 = App::Inst()->GetProto()->Temp(name);
+						pb::Message * message1 = App::GetProto()->Temp(name);
 						if (message1 != nullptr)
 						{
 							++count;
 							response->ParseMessage(message1);
-							App::Inst()->GetProto()->Write(this->mLua, *message1);
+							App::GetProto()->Write(this->mLua, *message1);
 						}
 					}
 				}

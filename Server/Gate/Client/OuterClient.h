@@ -13,7 +13,7 @@ namespace rpc
  	class OuterClient final : public tcp::TcpClient
 	{
 	 public:
-		typedef joke::IRpc<rpc::Packet, rpc::Packet> Component;
+		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;
 		explicit OuterClient(int id, Component* component);
 		~OuterClient() final = default;
 	 public:

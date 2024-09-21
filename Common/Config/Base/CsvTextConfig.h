@@ -6,7 +6,7 @@
 #define APP_COMMON_SERVER_CONFIG_CSVTEXTCONFIG_H
 #include"TextConfig.h"
 #include<unordered_map>
-namespace joke
+namespace acs
 {
 	class CsvLineData
 	{
@@ -22,7 +22,7 @@ namespace joke
 	};
 }
 
-namespace joke
+namespace acs
 {
 	class CsvTextConfig : public ITextConfig
 	{

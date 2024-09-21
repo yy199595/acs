@@ -16,7 +16,6 @@
 			<i class="el-icon-lx-emojifill" style="font-size: 30px; color: #ffc300"></i>
 			<span>&lt;i class=&quot;el-icon-lx-emojifill&quot;&gt;&lt;/i&gt;</span>
 		</p>
-		<br />
 		<h2>图标</h2>
 		<div class="search-box">
 			<el-input class="search" size="large" v-model="keyword" clearable placeholder="请输入图标名称"></el-input>

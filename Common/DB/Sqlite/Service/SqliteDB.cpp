@@ -4,10 +4,11 @@
 
 #include "SqliteDB.h"
 #include "Entity/Actor/App.h"
+#include "Util/Tools/String.h"
 #include "Proto/Component/ProtoComponent.h"
 #include "Sqlite/Component/SqliteComponent.h"
 
-namespace joke
+namespace acs
 {
 	bool SqliteDB::Awake()
 	{
@@ -17,7 +18,7 @@ namespace joke
 
 	bool SqliteDB::OnInit()
 	{
-		this->mProto = this->mApp->GetProto();
+		this->mProto = App::GetProto();
 		BIND_SERVER_RPC_METHOD(SqliteDB::Add);
 		BIND_SERVER_RPC_METHOD(SqliteDB::Del);
 		BIND_SERVER_RPC_METHOD(SqliteDB::Save);
@@ -25,7 +26,7 @@ namespace joke
 		BIND_SERVER_RPC_METHOD(SqliteDB::Create);
 		BIND_SERVER_RPC_METHOD(SqliteDB::Update);
 		BIND_SERVER_RPC_METHOD(SqliteDB::FindOne);
-		this->mComponent = this->GetComponent<SqliteComponent>();
+		LOG_CHECK_RET_FALSE(this->mComponent = this->GetComponent<SqliteComponent>())
 		return true;
 	}
 
@@ -38,12 +39,13 @@ namespace joke
 		}
 		std::string db, tab;
 		const std::string& table = request.table();
-		if(!SqliteComponent::Splite(table, db, tab))
+		if(!help::Str::Split(table, '.', db, tab))
 		{
 			return XCode::CallArgsError;
 		}
 		std::string sql;
 		std::vector<std::string> keys;
+		keys.reserve(request.keys_size());
 		for(int index = 0; index < request.keys_size(); index++)
 		{
 			keys.emplace_back(request.keys(index));
@@ -65,7 +67,7 @@ namespace joke
 		std::string db, tab, sql;
 		const std::string & json = request.data();
 		const std::string & table = request.table();
-		if(!SqliteComponent::Splite(table, db, tab))
+		if(!help::Str::Split(table, '.', db, tab))
 		{
 			return XCode::CallArgsError;
 		}
@@ -85,7 +87,7 @@ namespace joke
 	{
 		std::string sql, db, tab;
 		const std::string & table = request.table();
-		if(!SqliteComponent::Splite(table, db, tab))
+		if(!help::Str::Split(table, '.', db, tab))
 		{
 			return XCode::CallArgsError;
 		}
@@ -107,7 +109,7 @@ namespace joke
 		std::string sql, db, tab;
 		const std::string & json = request.data();
 		const std::string & table = request.table();
-		if(!SqliteComponent::Splite(table, db, tab))
+		if(!help::Str::Split(table, '.', db, tab))
 		{
 			return XCode::CallArgsError;
 		}
@@ -127,7 +129,7 @@ namespace joke
 	{
 		std::string sql, db, tab;
 		const std::string & table = request.table();
-		if(!SqliteComponent::Splite(table, db, tab))
+		if(!help::Str::Split(table, '.', db, tab))
 		{
 			return XCode::CallArgsError;
 		}
@@ -146,7 +148,7 @@ namespace joke
 		const std::string & table = request.table();
 		const std::string & where = request.where_json();
 
-		if(!SqliteComponent::Splite(table, db, tab))
+		if(!help::Str::Split(table, '.', db, tab))
 		{
 			return XCode::CallArgsError;
 		}
@@ -179,7 +181,7 @@ namespace joke
 		std::string sql, db, tab;
 		const std::string & table = request.table();
 		const std::string & where = request.where_json();
-		if(!SqliteComponent::Splite(table, db, tab))
+		if(!help::Str::Split(table, '.', db, tab))
 		{
 			return XCode::CallArgsError;
 		}

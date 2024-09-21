@@ -3,9 +3,9 @@
 #include"Network/Tcp/Socket.h"
 #include"Core/System/System.h"
 #include"Log/Output/ShowOutput.h"
-#include"Util/String/String.h"
-#include"Util/Time/TimeHelper.h"
-namespace joke
+#include"Util/Tools/String.h"
+#include"Util/Tools/TimeHelper.h"
+namespace acs
 {
     bool ThreadComponent::Awake()
 	{

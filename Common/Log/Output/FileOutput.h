@@ -19,6 +19,7 @@ namespace custom
 		bool Start(Asio::Context &io) final;
 		void Push(Asio::Context &io, const std::string &name, const custom::LogInfo &logInfo) final;
 	private:
+		bool Init();
 		bool OpenFile();
 		void SwitchFile();
 	private:
@@ -27,7 +28,6 @@ namespace custom
 		size_t mFileLine;	//当前文件大小
 		FileConfig mConfig;
 		std::ofstream mDevStream;
-		std::ofstream mErrStream;
 		long long mOpenFileTime; //上次打开文件时间
 	};
 }

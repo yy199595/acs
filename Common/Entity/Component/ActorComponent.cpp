@@ -1,13 +1,14 @@
 #include"ActorComponent.h"
 #include"Lua/Engine/ModuleClass.h"
 #include"Entity/Lua/LuaActor.h"
-#include"Util/String/String.h"
+#include"Util/Tools/String.h"
 #include"Server/Config/ServerConfig.h"
 #include"Lua/Component/LuaComponent.h"
 #include"Cluster/Config/ClusterConfig.h"
 
-namespace joke
+namespace acs
 {
+
 	bool ActorComponent::LateAwake()
 	{
 		this->mLuaModule = nullptr;
@@ -16,6 +17,29 @@ namespace joke
 		{
 			const std::string & name = this->GetName();
 			this->mLuaModule = luaComponent->LoadModule(name);
+		}
+		return this->LoadServerFromFile();
+	}
+
+	bool ActorComponent::LoadServerFromFile()
+	{
+		std::unique_ptr<json::r::Document> jsonDocument = ServerConfig::Inst()->Read("machine");
+		{
+			if (jsonDocument != nullptr && jsonDocument->IsArray())
+			{
+				for (size_t index = 0; index < jsonDocument->MemberCount(); index++)
+				{
+					std::unique_ptr<json::r::Value> jsonObject;
+					if(jsonDocument->Get(index, jsonObject))
+					{
+						Server * server = this->MakeServer(*jsonObject);
+						if(server == nullptr || !this->AddServer(server))
+						{
+							return false;
+						}
+					}
+				}
+			}
 		}
 		return true;
 	}
@@ -33,16 +57,17 @@ namespace joke
 	{
 		luaRegister.AddFunction("Send", LuaActor::Send);
 		luaRegister.AddFunction("Call", LuaActor::Call);
+		luaRegister.AddFunction("Publish", LuaActor::Publish);
 		luaRegister.AddFunction("AddAddr", LuaPlayer::AddAddr).End("core.router");
 	}
 
-	bool ActorComponent::AddRandomActor(const std::string& name, joke::Actor* actor)
+	bool ActorComponent::AddRandomActor(const std::string& name, acs::Actor* actor)
 	{
 		if (name.empty())
 		{
 			return false;
 		}
-		long long actorId = actor->GetEntityId();
+		long long actorId = actor->GetId();
 		auto iter1 = this->mActorNames.find(name);
 		if (iter1 == this->mActorNames.end())
 		{
@@ -88,7 +113,7 @@ namespace joke
 
 	bool ActorComponent::DelActor(long long id)
 	{
-		if(id == this->mApp->GetEntityId())
+		if(id == this->mApp->GetId())
 		{
 			LOG_WARN("try remove app:{}", id);
 			return false;
@@ -122,7 +147,7 @@ namespace joke
 		return false;
 	}
 
-	bool ActorComponent::UpdateServer(json::r::Document& document)
+	bool ActorComponent::UpdateServer(json::r::Value& document)
 	{
 		int id = 0;
 		std::string name;
@@ -155,7 +180,7 @@ namespace joke
 		return result;
 	}
 
-	Server * ActorComponent::MakeServer(const json::r::Document & document)
+	Server * ActorComponent::MakeServer(const json::r::Value & document)
 	{
 		int id = 0;
 		std::string name;
@@ -191,7 +216,7 @@ namespace joke
 
 	bool ActorComponent::AddPlayer(Player * player)
 	{
-		long long playerId = player->GetEntityId();
+		long long playerId = player->GetId();
 		if(this->GetPlayer(playerId) != nullptr)
 		{
 			return false;
@@ -202,7 +227,7 @@ namespace joke
 		{
 			this->mLuaModule->Call(func, playerId);
 		}
-		this->mPlayers.emplace(playerId, std::move(player));
+		this->mPlayers.emplace(playerId, player);
 		return true;
 	}
 
@@ -234,7 +259,7 @@ namespace joke
 		{
 			this->mLuaModule->Call(func, serverId);
 		}
-		this->mServers.emplace(serverId, std::move(server));
+		this->mServers.emplace(serverId, server);
 		return true;
 	}
 

@@ -6,14 +6,12 @@
 #include"Entity/Actor/App.h"
 #include"Mongo/Config/MongoConfig.h"
 #include"Mongo/Client/MongoFactory.h"
-#include "Log/Component/LoggerComponent.h"
 #include"Mongo/Component/MongoDBComponent.h"
 
-namespace joke
+namespace acs
 {
     MongoDB::MongoDB()
     {
-		this->mLogger = nullptr;
         this->mMongoComponent = nullptr;
     }
 
@@ -26,6 +24,7 @@ namespace joke
 	bool MongoDB::OnInit()
     {
 		BIND_SERVER_RPC_METHOD(MongoDB::Inc);
+		BIND_SERVER_RPC_METHOD(MongoDB::Sum);
 		BIND_SERVER_RPC_METHOD(MongoDB::Save);
 		BIND_SERVER_RPC_METHOD(MongoDB::Find);
 		BIND_SERVER_RPC_METHOD(MongoDB::Count);
@@ -37,11 +36,73 @@ namespace joke
 		BIND_SERVER_RPC_METHOD(MongoDB::Command);
 		BIND_SERVER_RPC_METHOD(MongoDB::FindOne);
 		BIND_SERVER_RPC_METHOD(MongoDB::FindPage);
+		BIND_SERVER_RPC_METHOD(MongoDB::Databases);
+		BIND_SERVER_RPC_METHOD(MongoDB::Collections);
 		BIND_SERVER_RPC_METHOD(MongoDB::FindAndModify);
-		this->mLogger = this->GetComponent<LoggerComponent>();
 		this->mMongoComponent = this->GetComponent<MongoDBComponent>();
-        return this->mMongoComponent != nullptr && this->mLogger->StartLogger("mongo");
+		return this->mMongoComponent != nullptr;
     }
+
+	int MongoDB::Databases(com::array::string& response)
+	{
+		std::unique_ptr<mongo::Request> request1 = std::make_unique<mongo::Request>();
+		{
+			bson::Writer::Document doc1;
+			doc1.Add("nameOnly", true);
+			request1->dataBase = "admin";
+			request1->collectionName = "admin.$cmd";
+			request1->document.Add("listDatabases", doc1);
+		}
+		mongo::Response* mongoResponse = this->mMongoComponent->Run(std::move(request1));
+		LOG_ERROR_RETURN_CODE(mongoResponse && mongoResponse->Document(), XCode::Failure);
+
+		std::vector<std::unique_ptr<bson::Reader::Document>> results;
+		bson::Reader::Document* readDocument = mongoResponse->Document();
+		LOG_ERROR_RETURN_CODE(readDocument->Get("databases", results), XCode::FindMongoDocumentFail);
+		for (std::unique_ptr<bson::Reader::Document>& document : results)
+		{
+			std::string name;
+			if (document->Get("name", name))
+			{
+				response.add_array(name);
+			}
+		}
+		return XCode::Ok;
+	}
+
+	int MongoDB::Collections(const com::type_string& request, com::array::string& response)
+	{
+		std::unique_ptr<mongo::Request> message = std::make_unique<mongo::Request>();
+		{
+			bson::Writer::Document doc1;
+			doc1.Add("nameOnly", true);
+			if (!request.str().empty())
+			{
+				message->dataBase = request.str();
+				message->collectionName = fmt::format("{}.$cmd", request.str());
+			}
+			message->document.Add("listCollections", doc1);
+		}
+		mongo::Response* mongoResponse = this->mMongoComponent->Run(std::move(message));
+		LOG_ERROR_RETURN_CODE(mongoResponse && mongoResponse->Document(), XCode::Failure);
+
+		bson::Reader::Document* readDocument = mongoResponse->Document();
+
+		std::unique_ptr<bson::Reader::Document> document1;
+		LOG_ERROR_RETURN_CODE(readDocument->Get("cursor", document1), XCode::FindMongoDocumentFail);
+
+		std::vector<std::unique_ptr<bson::Reader::Document>> results;
+		LOG_ERROR_RETURN_CODE(document1->Get("firstBatch", results), XCode::FindMongoDocumentFail);
+		for (std::unique_ptr<bson::Reader::Document>& document : results)
+		{
+			std::string name;
+			if (document->Get("name", name))
+			{
+				response.add_array(name);
+			}
+		}
+		return XCode::Ok;
+	}
 
 	int MongoDB::Inc(const db::mongo::inc::request& request, db::mongo::inc::response& response)
 	{
@@ -152,7 +213,7 @@ namespace joke
         return XCode::Failure;
     }
 
-    int MongoDB::Insert(const db::mongo::insert &request)
+    int MongoDB::Insert(const db::mongo::insert &request, db::mongo::response& response)
 	{
 		const std::string & tab = request.tab();
 		if(request.jsons_size() == 0)
@@ -178,50 +239,50 @@ namespace joke
 		{
 			return XCode::Failure;
 		}
-		int res = 0;
-		bson::Reader::Document * document1 = mongoResponse->Document();
-		return document1->Get("n", res) && res > 0 ? XCode::Ok : XCode::InsertMongoDocumentFail;
+		int count = 0;
+		if (mongoResponse->Document()->Get("n", count))
+		{
+			response.set_count(count);
+		}
+		return count > 0 ? XCode::Ok : XCode::InsertMongoDocumentFail;
 	}
 
-    int MongoDB::Delete(const db::mongo::remove &request)
-    {
-        bson::Writer::Document document;
-        if(!document.FromByJson(request.json()))
+	int MongoDB::Delete(const db::mongo::remove& request, db::mongo::response& response)
+	{
+		bson::Writer::Document document;
+		if (!document.FromByJson(request.json()))
 		{
 			return XCode::CallArgsError;
 		}
 		int limit = request.limit();
-		const std::string & tab = request.tab();
+		const std::string& tab = request.tab();
 		std::unique_ptr<mongo::Request> mongoRequest = mongo::MongoFactory::Delete(tab, document, limit);
-		if(mongoRequest == nullptr)
+		if (mongoRequest == nullptr)
 		{
 			return XCode::CallArgsError;
 		}
 		int count = 0;
-		std::unique_ptr<custom::LogInfo> logInfo = std::make_unique<custom::LogInfo>();
-		{
-			logInfo->Level = custom::LogLevel::Warn;
-			logInfo->Content = mongoRequest->ToString();
-			this->mLogger->PushLog("mongo", std::move(logInfo));
-		}
-		mongo::Response * mongoResponse = this->mMongoComponent->Run(std::move(mongoRequest));
+		mongo::Response* mongoResponse = this->mMongoComponent->Run(std::move(mongoRequest));
 		LOG_ERROR_RETURN_CODE(mongoResponse && mongoResponse->Document(), XCode::Failure);
-		bson::Reader::Document * document1 = mongoResponse->Document();
-        return (document1->Get("n", count) && count >= limit) ? XCode::Ok : XCode::Failure;
-    }
+		if (mongoResponse->Document()->Get("n", count))
+		{
+			response.set_count(count);
+		}
+		return  count >= limit ? XCode::Ok : XCode::Failure;
+	}
 
     // $gt:大于   $lt:小于  $gte:大于或等于  $lte:小于或等于 $ne:不等于
-    int MongoDB::Update(const db::mongo::update &request)
+    int MongoDB::Update(const db::mongo::update &request, db::mongo::response& response)
     {
-        return this->UpdateData(request, request.upsert());
+        return this->UpdateData(request, request.upsert(), response);
     }
 
-    int MongoDB::Save(const db::mongo::update& request)
+    int MongoDB::Save(const db::mongo::update& request, db::mongo::response& response)
     {
-        return this->UpdateData(request, true);
+        return this->UpdateData(request, true, response);
     }
 
-	int MongoDB::Updates(const db::mongo::updates& request)
+	int MongoDB::Updates(const db::mongo::updates& request, db::mongo::response& response)
 	{
 		if (request.tab().empty())
 		{
@@ -264,18 +325,15 @@ namespace joke
 			updates.Add(updateInfo);
 		}
 		mongoRequest->document.Add("updates", updates);
-		std::unique_ptr<custom::LogInfo> logInfo = std::make_unique<custom::LogInfo>();
-		{
-			logInfo->Level = custom::LogLevel::Info;
-			logInfo->Content = mongoRequest->ToString();
-			this->mLogger->PushLog("mongo", std::move(logInfo));
-		}
 		mongo::Response * mongoResponse = this->mMongoComponent->Run(std::move(mongoRequest));
 		LOG_ERROR_RETURN_CODE(mongoResponse && mongoResponse->Document(), XCode::UpdateMongoDocumentFail);
 
 		int count = 0;
-		bson::Reader::Document * result = mongoResponse->Document();
-		return (result->Get("nModified", count) && count >= request.document_size()) ? XCode::Ok : XCode::UpdateMongoDocumentFail;
+		if (mongoResponse->Document()->Get("nModified", count))
+		{
+			response.set_count(count);
+		}
+		return count >= request.document_size() ? XCode::Ok : XCode::UpdateMongoDocumentFail;
 	}
 
     int MongoDB::SetIndex(const db::mongo::index &request)
@@ -476,7 +534,7 @@ namespace joke
 		return XCode::Ok;
 	}
 
-    int MongoDB::UpdateData(const db::mongo::update &request, bool upsert)
+    int MongoDB::UpdateData(const db::mongo::update &request, bool upsert, db::mongo::response& response)
     {
         bson::Writer::Document dataDocument;
 		bson::Writer::Document selectorDocument;
@@ -497,18 +555,68 @@ namespace joke
 		{
 			return XCode::CallArgsError;
 		}
-		std::unique_ptr<custom::LogInfo> logInfo = std::make_unique<custom::LogInfo>();
-		{
-			logInfo->Level = custom::LogLevel::Info;
-			logInfo->Content = mongoRequest->ToString();
-			this->mLogger->PushLog("mongo", std::move(logInfo));
-		}
 		mongo::Response * mongoResponse = this->mMongoComponent->Run(std::move(mongoRequest));
 		LOG_ERROR_RETURN_CODE(mongoResponse && mongoResponse->Document(), XCode::UpdateMongoDocumentFail);
 
         int count = 0;
-		bson::Reader::Document * result = mongoResponse->Document();
-        return (result->Get("nModified", count) && count > 0) ? XCode::Ok : XCode::UpdateMongoDocumentFail;
+		if (mongoResponse->Document()->Get("nModified", count))
+		{
+			response.set_count(count);
+		}
+        return count > 0 ? XCode::Ok : XCode::UpdateMongoDocumentFail;
     }
 
+	int MongoDB::Sum(const db::mongo::sum::request & request, db::mongo::sum::response& response)
+	{
+		const std::string & tab = request.tab();
+		std::unique_ptr<mongo::Request> mongoRequest = std::make_unique<mongo::Request>();
+		{
+			bson::Writer::Array pipeline;
+			mongoRequest->GetCollection("aggregate", tab);
+			{
+				bson::Writer::Document document1;
+				bson::Writer::Document firstDocument;
+				if(!request.filter().empty())
+				{
+					bson::Writer::Document filter;
+					if(!filter.FromByJson(request.filter()))
+					{
+						return XCode::ParseJsonFailure;
+					}
+					bson::Writer::Document match;
+					match.Add("$match", filter);
+					pipeline.Add(match);
+				}
+				if(!request.by().empty())
+				{
+					document1.Add("_id", fmt::format("${}", request.by()));
+				}
+				else
+				{
+					document1.Add("_id");
+				}
+				bson::Writer::Document document2;
+				document2.Add("$sum", fmt::format("${}", request.field()));
+				document1.Add("value", document2);
+
+				firstDocument.Add("$group", document1);
+				pipeline.Add(firstDocument);
+			}
+			bson::Writer::Document cursor;
+			cursor.Add("batchSize", 30000);
+			mongoRequest->document.Add("cursor", cursor);
+			mongoRequest->document.Add("pipeline", pipeline);
+		}
+		mongo::Response * mongoResponse = this->mMongoComponent->Run(std::move(mongoRequest));
+		std::unique_ptr<bson::Reader::Document> document1;
+		LOG_ERROR_RETURN_CODE(mongoResponse->Document()->Get("cursor", document1), XCode::FindMongoDocumentFail);
+
+		std::vector<std::unique_ptr<bson::Reader::Document>> results;
+		LOG_ERROR_RETURN_CODE(document1->Get("firstBatch", results), XCode::FindMongoDocumentFail);
+		for (std::unique_ptr<bson::Reader::Document>& document: results)
+		{
+			document->WriterToJson(response.add_json());
+		}
+		return XCode::Ok;
+	}
 }

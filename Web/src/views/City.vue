@@ -3,7 +3,7 @@
         <h3>城市列表</h3>
         <el-form inline="inline">
             <el-form-item label="城市">
-                <el-input v-model="query.name"></el-input>
+                <el-input v-model="query.name" placeholder="输入省或者市"></el-input>
             </el-form-item>
             <el-form-item>
                 <el-button type='primary' @click='on_btn_query'>查询</el-button>

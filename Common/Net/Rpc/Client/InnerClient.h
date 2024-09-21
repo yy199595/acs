@@ -22,7 +22,7 @@ namespace rpc
 	class InnerClient : public tcp::TcpClient
 	{
 	 public:
-		typedef joke::IRpc<rpc::Packet, rpc::Packet> Component;
+		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;
 		explicit InnerClient(int id, Component * component);
 	public:
 		void Close();
@@ -41,8 +41,8 @@ namespace rpc
 		int mSockId;
 		int mDecodeStatus;
 		Component * mComponent;
-		rpc::Packet * mMessage;
 		rpc::ProtoHead mProtoHead;
+		std::unique_ptr<rpc::Packet> mMessage;
 		custom::Queue<rpc::Packet *> mSendMessages;
 		custom::HashMap<int, rpc::Packet *> mWaitResMessages; //等待返回的服务器消息
 	};

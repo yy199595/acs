@@ -13,7 +13,7 @@
 #include"Mysql/Config/MysqlConfig.h"
 #include"Entity/Component/IComponent.h"
 
-namespace joke
+namespace acs
 {
     class MysqlDBComponent;
 

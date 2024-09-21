@@ -11,7 +11,7 @@
 #include"Proto/Include/Message.h"
 #include"Mysql/Component/MysqlDBComponent.h"
 #include"Proto/Component/ProtoComponent.h"
-using namespace joke;
+using namespace acs;
 namespace Lua
 {
 	int LuaMysql::Exec(lua_State* lua)
@@ -39,7 +39,7 @@ namespace Lua
 		static MysqlDBComponent* mysqlComponent = nullptr;
 		if(mysqlComponent == nullptr)
 		{
-			mysqlComponent = App::Inst()->GetComponent<MysqlDBComponent>();
+			mysqlComponent = App::Get<MysqlDBComponent>();
 			if(mysqlComponent == nullptr)
 			{
 				luaL_error(lua, "not find [MysqlDBComponent]");

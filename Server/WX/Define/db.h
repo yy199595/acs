@@ -33,6 +33,8 @@ namespace mongo_tab
 	constexpr const char * ACTIVITY_DATA_LIST = "activity_data_list"; //活动数据表
 
 	constexpr const char * COMPLAINT_INFO_LIST = "complaint_info_list"; //投诉列表
+
+	constexpr const char * APPRAISE_LIST = "appraise_list"; //用户评价列表
 }
 
 namespace config

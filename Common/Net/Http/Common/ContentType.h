@@ -10,17 +10,17 @@
 #include"Core/Singleton/Singleton.h"
 namespace http
 {
-	class Data;
+	class Content;
 	class DataType
 	{
 	public:
-		virtual std::unique_ptr<Data> New() = 0;
+		virtual std::unique_ptr<Content> New() = 0;
 	};
 	template<typename T>
 	class DataTypeProxy : public DataType
 	{
 	public:
-		std::unique_ptr<Data> New() { return std::make_unique<T>(); }
+		std::unique_ptr<Content> New() { return std::make_unique<T>(); }
 	};
 }
 
@@ -29,7 +29,7 @@ namespace http
 	class ContentFactory
 	{
 	public:
-		bool New(const std::string & content, std::unique_ptr<Data> & data);
+		bool New(const std::string & content, std::unique_ptr<Content> & data);
 		template<typename T>
 		void Add(const std::string & content);
 	private:

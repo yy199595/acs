@@ -15,6 +15,12 @@ namespace custom
 
 	void Logger::Close()
 	{
+#ifdef ONLY_MAIN_THREAD
+		for(IOutput * output : this->mOutputs)
+		{
+			output->Close();
+		}
+#else
 		custom::ThreadSync<bool> threadSync;
 		this->mContext.post([this, &threadSync]
 		{
@@ -25,10 +31,19 @@ namespace custom
 			threadSync.SetResult(true);
 		});
 		threadSync.Wait();
+#endif
+
 	}
 
 	void Logger::Flush()
 	{
+
+#ifdef ONLY_MAIN_THREAD
+		for(IOutput * output : this->mOutputs)
+		{
+			output->Flush();
+		}
+#else
 		this->mContext.post([this]
 		{
 			for(IOutput * output : this->mOutputs)
@@ -36,10 +51,18 @@ namespace custom
 				output->Flush();
 			}
 		});
+#endif
+
 	}
 
 	void Logger::SetLevel(custom::LogLevel level)
 	{
+#ifdef ONLY_MAIN_THREAD
+		for(IOutput * output : this->mOutputs)
+		{
+			output->SetLevel(level);
+		}
+#else
 		this->mContext.post([this, level]
 			{
 				for(IOutput * output : this->mOutputs)
@@ -47,6 +70,8 @@ namespace custom
 					output->SetLevel(level);
 				}
 			});
+#endif
+
 	}
 
 	bool Logger::Start()
@@ -97,6 +122,12 @@ namespace custom
 
 	void Logger::Push(std::unique_ptr<LogInfo> log)
 	{
+#ifdef ONLY_MAIN_THREAD
+		for(IOutput * output : this->mOutputs)
+		{
+			output->Push(this->mContext, this->mName, *log);
+		}
+#else
 		this->mContext.post([this, logInfo = log.release()]
 		{
 			for(IOutput * output : this->mOutputs)
@@ -105,5 +136,7 @@ namespace custom
 			}
 			delete logInfo;
 		});
+#endif
+
 	}
 }

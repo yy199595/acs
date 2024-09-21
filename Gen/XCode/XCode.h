@@ -107,4 +107,5 @@ namespace XCode
 	 constexpr int TitleToLong = 103;//活动标题过长
 	 constexpr int InsufficientBalance = 104;//账户余额不足
 	 constexpr int VipCardBeUse = 105;//该链接已经被使用
+	 constexpr int AlreadyPermanentMember = 106;//您已经会员了
 };

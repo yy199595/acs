@@ -8,7 +8,7 @@
 #include<functional>
 #include<unordered_map>
 #include"Lua/Engine/LuaParameter.h"
-#include"Util/Guid/NumberBuilder.h"
+#include"Util/Tools/NumberBuilder.h"
 namespace help
 {
 	template<typename ... Args>
@@ -23,6 +23,17 @@ namespace help
 			};
 			mEvents.emplace(id, callback);
 			return id;
+		}
+
+		static bool Remove(int id)
+		{
+			auto iter = mEvents.find(id);
+			if(iter == mEvents.end())
+			{
+				return false;
+			}
+			mEvents.erase(iter);
+			return true;
 		}
 
 		static int Trigger(Args ... args)

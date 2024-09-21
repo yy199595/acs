@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1.3)
+cmake_minimum_required(VERSION 3.0)
 
 if(CMAKE_COMPILER_IS_GNUCXX)
     add_compile_options(-flto)
@@ -113,6 +113,13 @@ ADD_EXECUTABLE(app ${build_files})
 
 include(CMake/3rd.cmake)
 #include(CMake/mysql.cmake) #add_lib 必须在add_exe之后
+
+if(__MEMOEY_CHECK__)
+    target_link_options(app PRIVATE -fsanitize=address)
+    target_compile_options(app PRIVATE -fsanitize=address)
+endif()
+
+
 
 if(WIN32)
     if(MSVC)

@@ -137,9 +137,9 @@ namespace redis
 	}
 }
 
-namespace joke
+namespace acs
 {
-	class RedisTask : public joke::IRpcTask<redis::Response>, protected WaitTaskSourceBase
+	class RedisTask : public acs::IRpcTask<redis::Response>, protected WaitTaskSourceBase
     {
     public:
         explicit RedisTask(int id);
@@ -162,7 +162,7 @@ namespace joke
 		this->ResumeTask();
 	}
 
-    class LuaRedisTask : public joke::IRpcTask<redis::Response>
+    class LuaRedisTask : public acs::IRpcTask<redis::Response>
     {
     public:
         LuaRedisTask(lua_State * lua, int id);

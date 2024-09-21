@@ -35,7 +35,6 @@ endif()
 
 option(__ENABLE_SPD_LOG__ "使用spdlog" OFF)
 
-option(__DEBUG_STACK__ "开启堆栈打印" ON)
 option(ONLY_MAIN_THREAD "启用单线程模式" OFF)
 option(__NET_ERROR_LOG__ "打印网络层错误" ON)
 option(__COR_SHARED_STACK__ "使用共享栈" ON)
@@ -43,6 +42,7 @@ option(__COR_SHARED_STACK__ "使用共享栈" ON)
 option(__CONSOLE_LOG__ "控制台打印日志" ON)
 option(__ENABLE_SYSTEM_DEBUG "打印系统日志" ON)
 option(__ENABLE_OPEN_SSL__ "开启openssl" ON)
+option(__MEMOEY_CHECK__ "开启内存检查" OFF)
 
 if(APPLE)
     option(__ENABLE_DING_DING_PUSH "开启钉钉通知" OFF)
@@ -77,6 +77,11 @@ endif()
 if(__ENABLE_OPEN_SSL__)
     message("使用openssl")
     add_definitions(-D __ENABLE_OPEN_SSL__)
+endif()
+
+if(__MEMOEY_CHECK__)
+    message("开启内存检查")
+    add_definitions(-D __MEMOEY_CHECK__)
 endif()
 
 

@@ -3,7 +3,7 @@
 //
 
 #include "Document.h"
-
+#include "Util/Tools/Math.h"
 namespace json
 {
 	w::Value::Value()
@@ -78,12 +78,11 @@ namespace json
 
 	bool w::Value::Push(const json::w::Value& v)
 	{
-		if(!this->IsObject())
+		if(!this->IsArray())
 		{
 			return false;
 		}
 		return yyjson_mut_arr_add_val(this->mValue, v.mValue);
-		return true;
 	}
 
 	bool w::Value::Push(const char* v, size_t size)
@@ -107,8 +106,13 @@ namespace json
 		{
 			return false;
 		}
+
 		yyjson_mut_val * obj = yyjson_val_mut_copy(this->mDoc, doc->root);
-		return obj && yyjson_mut_arr_add_val(this->mValue, obj);
+		bool result = obj != nullptr && yyjson_mut_arr_add_val(this->mValue, obj);
+		{
+			yyjson_doc_free(doc);
+		}
+		return result;
 	}
 }
 
@@ -411,7 +415,7 @@ namespace json
 			return result;
 		}
 
-		bool Document::Encode(std::string* json, bool pretty)
+		bool Document::Encode(std::string* json, bool pretty) const
 		{
 			size_t data_len;
 			bool result = true;
@@ -468,6 +472,11 @@ namespace json
 			yyjson_val* val = yyjson_obj_get(this->mValue, k);
 			if (!yyjson_is_int(val))
 			{
+				if(yyjson_is_str(val))
+				{
+					const char * str = yyjson_get_str(val);
+					return help::Math::ToNumber(str, v);
+				}
 				return false;
 			}
 			v = yyjson_get_int(val);
@@ -804,6 +813,21 @@ namespace json
 			}
 			this->mValue = yyjson_doc_get_root(this->mDoc);
 			return true;
+		}
+	}
+	void Merge(json::w::Document & target, json::r::Value & source)
+	{
+		std::vector<const char *> keys;
+		if(source.GetKeys(keys) > 0)
+		{
+			for(const char * key : keys)
+			{
+				std::unique_ptr<json::r::Value> jsonValue;
+				if(source.Get(key, jsonValue))
+				{
+					target.Add(key, jsonValue->GetValue());
+				}
+			}
 		}
 	}
 }

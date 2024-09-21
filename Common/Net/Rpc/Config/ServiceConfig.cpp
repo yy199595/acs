@@ -1,27 +1,63 @@
 ﻿#include "ServiceConfig.h"
 #include"Rpc/Client/Message.h"
-#include"Util/String/String.h"
+#include"Util/Tools/String.h"
 #include"Cluster/Config/ClusterConfig.h"
+#include "Util/File/FileHelper.h"
 
-namespace joke
+namespace acs
 {
-    bool RpcConfig::OnLoadJson()
-    {
-		std::vector<const char *> keys;
-		if(this->GetKeys(keys) <= 0)
+
+	void InterfaceConfig::OnReload()
+	{
+		auto iter = this->mFileTime.begin();
+		for(; iter != this->mFileTime.end(); iter++)
+		{
+			const std::string & path = iter->first;
+			long long lastTime = help::fs::GetLastWriteTime(path);
+			if(iter->second != lastTime)
+			{
+				if(this->LoadConfig(path))
+				{
+					LOG_INFO("reload [{}] ok", path);
+				}
+				else
+				{
+					LOG_ERROR("reload [{}] fail", path);
+				}
+			}
+		}
+	}
+
+	void InterfaceConfig::OnLoad(const std::string& path)
+	{
+		long long time = help::fs::GetLastWriteTime(path);
+		this->mFileTime[path] = time;
+	}
+}
+
+namespace acs
+{
+	constexpr int RPC_ALL = 0;
+	constexpr int RPC_SERVER = 1;
+	constexpr int RPC_CLIENT = 2;
+
+	bool RpcConfig::OnLoadJson()
+	{
+		std::vector<const char*> keys;
+		if (this->GetKeys(keys) <= 0)
 		{
 			return false;
 		}
 		std::unique_ptr<json::r::Value> value;
-		for(const char * key : keys)
+		for (const char* key : keys)
 		{
-			if(!this->Get(key, value))
+			if (!this->Get(key, value))
 			{
 				return false;
 			}
 			std::string service, func;
 			const std::string method(key);
-			std::unique_ptr<RpcMethodConfig> methodConfig = std::make_unique<RpcMethodConfig>();
+			RpcMethodConfig * methodConfig = this->MakeConfig(method);
 			{
 				if (help::Str::Split(method, '.', service, func) != 0)
 				{
@@ -30,7 +66,7 @@ namespace joke
 				}
 				methodConfig->Timeout = 0;
 				methodConfig->Forward = 0;
-                methodConfig->IsDebug = false;
+				methodConfig->IsDebug = false;
 				methodConfig->IsOpen = true;
 				methodConfig->Method = func;
 				methodConfig->IsAsync = false;
@@ -53,17 +89,14 @@ namespace joke
 			value->Get("Request", methodConfig->Request);
 			value->Get("Response", methodConfig->Response);
 			value->Get("IsDebug", methodConfig->IsDebug);
-            value->Get("IsClient", methodConfig->IsClient);
-			value->Get("SendToClient", methodConfig->SendToClient);
+			value->Get("IsClient", methodConfig->IsClient);
+			value->Get("SendToClient", methodConfig->SendToClient);		
 			ClusterConfig::Inst()->GetServerName(service, methodConfig->Server);
-			this->mRpcMethodConfig.emplace(methodConfig->FullName, std::move(methodConfig));
 		}
 		return true;
-    }
+	}
 
-	constexpr int RPC_ALL = 0;
-	constexpr int RPC_SERVER = 1;
-	constexpr int RPC_CLIENT = 2;
+	
 	bool RpcConfig::GetMethodConfigs(std::vector<const RpcMethodConfig*>& configs, int type) const
 	{
 		for (auto iter = this->mRpcMethodConfig.begin(); iter != this->mRpcMethodConfig.end(); iter++)
@@ -71,32 +104,32 @@ namespace joke
 			const std::unique_ptr<RpcMethodConfig>& config = iter->second;
 			switch (type)
 			{
-				case RPC_ALL:
+			case RPC_ALL:
+				configs.emplace_back(config.get());
+				break;
+			case RPC_SERVER:
+				if (!config->IsClient)
+				{
 					configs.emplace_back(config.get());
-					break;
-				case RPC_SERVER:
-					if (!config->IsClient)
-					{
-						configs.emplace_back(config.get());
-					}
-					break;
-				case RPC_CLIENT:
-					if (config->IsClient)
-					{
-						configs.emplace_back(config.get());
-					}
-					break;
+				}
+				break;
+			case RPC_CLIENT:
+				if (config->IsClient)
+				{
+					configs.emplace_back(config.get());
+				}
+				break;
 			}
 		}
 		return !configs.empty();
 	}
 
-	bool RpcConfig::GetMethodConfigs(const std::string& name, std::vector<const RpcMethodConfig*> & configs) const
+	bool RpcConfig::GetMethodConfigs(const std::string& name, std::vector<const RpcMethodConfig*>& configs) const
 	{
-		for(auto iter = this->mRpcMethodConfig.begin(); iter != this->mRpcMethodConfig.end(); iter++)
+		for (auto iter = this->mRpcMethodConfig.begin(); iter != this->mRpcMethodConfig.end(); iter++)
 		{
-			const std::unique_ptr<RpcMethodConfig> & config = iter->second;
-			if(config->Service == name)
+			const std::unique_ptr<RpcMethodConfig>& config = iter->second;
+			if (config->Service == name)
 			{
 				configs.emplace_back(config.get());
 			}
@@ -104,10 +137,30 @@ namespace joke
 		return !configs.empty();
 	}
 
-    bool RpcConfig::OnReLoadJson()
-    {
-        return true;
-    }
+	bool RpcConfig::OnReLoadJson()
+	{
+		return this->OnLoadJson();
+	}
+
+	RpcMethodConfig* RpcConfig::MakeConfig(const std::string& name)
+	{
+		RpcMethodConfig* methodConfig = nullptr;
+		auto iter = this->mRpcMethodConfig.find(name);
+		if (iter == this->mRpcMethodConfig.end())
+		{
+			std::unique_ptr<RpcMethodConfig> config = std::make_unique<RpcMethodConfig>();
+			{
+				config->FullName = name;
+				methodConfig = config.get();
+				this->mRpcMethodConfig.emplace(name, std::move(config));
+			}
+		}
+		else
+		{
+			methodConfig = iter->second.get();
+		}
+		return methodConfig;
+	}
 
 	void RpcConfig::GetRpcMethods(std::vector<std::string>& methods) const
 	{
@@ -125,7 +178,7 @@ namespace joke
     }
 }
 
-namespace joke
+namespace acs
 {
     bool HttpConfig::OnLoadJson()
     {
@@ -142,10 +195,9 @@ namespace joke
 				return false;
 			}
 			std::string url(key);
-			std::unique_ptr<HttpMethodConfig> methodConfig = std::make_unique<HttpMethodConfig>();
+			HttpMethodConfig* methodConfig = this->MakeConfig(url);
 			{
 				std::string bindMethod;
-				methodConfig->Auth = true;
 				if(value->Get("Bind", bindMethod))
 				{
 					if(help::Str::Split(bindMethod,  '.', methodConfig->Service, methodConfig->Method) != 0)
@@ -154,22 +206,29 @@ namespace joke
 						return false;
 					}
 				}
-				methodConfig->Path = url;
 				methodConfig->Auth = true;
+				methodConfig->Open = true;
 				methodConfig->Permission = 1;
 				methodConfig->IsAsync = false;
 				methodConfig->IsRecord = false;
 				methodConfig->Limit = 1024 * 1024;
+				methodConfig->Headers.clear();
 				value->Get("Type", methodConfig->Type);
 				value->Get("Auth", methodConfig->Auth);
 				value->Get("Desc", methodConfig->Desc);
 				value->Get("Limit", methodConfig->Limit);
 				value->Get("Lock", methodConfig->IsLock);
 				value->Get("Async", methodConfig->IsAsync);
+				value->Get("Token", methodConfig->Token);
 				value->Get("Record", methodConfig->IsRecord);
 				value->Get("Permiss", methodConfig->Permission);
 				value->Get("ContentType", methodConfig->Content);
 				std::vector<std::string> headers;
+				if (methodConfig->Content.empty() && methodConfig->Type == "POST")
+				{
+					headers.emplace_back("Content-Type");
+					methodConfig->Content = "application/json";
+				}
 				if(!methodConfig->Content.empty())
 				{
 					headers.emplace_back("Content-Type");
@@ -177,6 +236,17 @@ namespace joke
 				if(methodConfig->Auth)
 				{
 					headers.emplace_back("Authorization");
+				}
+				std::unique_ptr<json::r::Value> jsonArray;
+				if(value->Get("WhiteList", jsonArray))
+				{
+					size_t index = 0;
+					std::string value;
+					while (jsonArray->Get(index, value))
+					{
+						index++;
+						methodConfig->WhiteList.emplace(value);
+					}
 				}
 				std::unique_ptr<json::r::Value> doc;
 				if(value->Get("Request", doc))
@@ -193,34 +263,40 @@ namespace joke
 						methodConfig->Headers += ", ";
 					}
 				}
-                this->AddMethodConfig(std::move(methodConfig));
+				this->mAllService.insert(methodConfig->Service);
 			}
-
 		}
 		return true;
     }
 
-
-	bool HttpConfig::AddMethodConfig(std::unique_ptr<HttpMethodConfig> config)
+	HttpMethodConfig* HttpConfig::MakeConfig(const std::string& url)
 	{
-		auto iter = this->mMethodConfigs.find(config->Path);
-		if(iter != this->mMethodConfigs.end())
+		std::string path(url);
+		if (path.find('/') != 0)
 		{
-			return false;
+			path.insert(0, "/");
 		}
-        if(config->Path.find('/') != 0)
-        {
-            config->Path.insert(0, "/");
-        }
-		this->mAllService.insert(config->Service);
-       // printf("url = %s\n", config->Path.c_str());
-		this->mMethodConfigs.emplace(config->Path, std::move(config));
-		return true;
+		HttpMethodConfig* methodConfig = nullptr;
+		auto iter = this->mMethodConfigs.find(path);
+		if (iter == this->mMethodConfigs.end())
+		{
+			std::unique_ptr<HttpMethodConfig> config = std::make_unique<HttpMethodConfig>();
+			{
+				config->Path = path;
+				methodConfig = config.get();
+				this->mMethodConfigs.emplace(path, std::move(config));
+			}
+		}
+		else
+		{
+			methodConfig = iter->second.get();
+		}
+		return methodConfig;
 	}
 
     bool HttpConfig::OnReLoadJson()
-    {
-        return true;
+    {		
+        return this->OnLoadJson();
     }
 
     const HttpMethodConfig *HttpConfig::GetMethodConfig(const std::string & path) const

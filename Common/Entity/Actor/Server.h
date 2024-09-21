@@ -6,13 +6,13 @@
 #define APP_SERVER_H
 #include"Actor.h"
 
-namespace joke
+namespace acs
 {
 	class Server : public Actor
 	{
 	public:
 		explicit Server(int id, const std::string & name);
-		bool Equal(long long id) const { return this->GetEntityId() == id; }
+		bool Equal(long long id) const { return this->GetId() == id; }
 		bool Equal(const std::string & addr) { return this->mRpcAddress == addr; }
 	public:
 		int DisConnect();
@@ -28,7 +28,7 @@ namespace joke
 	public:
 		bool OnInit() final;
 		void EncodeToJson(std::string *json) final;
-		int GetSrvId() const { return (int)this->GetEntityId(); }
+		int GetSrvId() const { return (int)this->GetId(); }
 		const std::string & Address() const { return this->mRpcAddress; }
 		int Make(const std::string &func, std::unique_ptr<rpc::Packet> &request) const final ;
 	private:

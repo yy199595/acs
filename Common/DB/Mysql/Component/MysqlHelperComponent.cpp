@@ -6,7 +6,7 @@
 #include"Cluster/Config/ClusterConfig.h"
 #include"Entity/Actor/App.h"
 
-namespace joke
+namespace acs
 {
 	bool MysqlHelperComponent::Awake()
 	{

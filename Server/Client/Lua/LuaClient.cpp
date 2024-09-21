@@ -10,7 +10,7 @@
 #include"Router/Component/RouterComponent.h"
 #include"Client/Component/ClientComponent.h"
 
-namespace joke
+namespace acs
 {
 	int LuaClient::Send(lua_State* l)
 	{
@@ -22,7 +22,7 @@ namespace joke
 			lua_pushinteger(l, XCode::Failure);
 			return 1;
 		}
-		RouterComponent * router = App::Inst()->GetComponent<RouterComponent>();
+		RouterComponent * router = App::Get<RouterComponent>();
 		if(router == nullptr)
 		{
 			lua_pushinteger(l, XCode::NetWorkError);
@@ -44,7 +44,7 @@ namespace joke
 			lua_pushinteger(l, XCode::Failure);
 			return 1;
 		}
-		RouterComponent * router = App::Inst()->GetComponent<RouterComponent>();
+		RouterComponent * router = App::Get<RouterComponent>();
 		if(router == nullptr)
 		{
 			lua_pushinteger(l, XCode::NetWorkError);
@@ -57,7 +57,7 @@ namespace joke
 	int LuaClient::Connect(lua_State* lua)
 	{
 		const std::string addr = luaL_checkstring(lua, 1);
-		ClientComponent * clientComponent = App::Inst()->GetComponent<ClientComponent>();
+		ClientComponent * clientComponent = App::Get<ClientComponent>();
 		{
 			int sessionId = clientComponent->Connect(addr);
 			lua_pushinteger(lua, sessionId);

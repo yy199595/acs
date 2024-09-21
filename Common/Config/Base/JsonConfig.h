@@ -7,7 +7,7 @@
 #include"Config/Base/TextConfig.h"
 #include"Yyjson/Document/Document.h"
 
-namespace joke
+namespace acs
 {
 	class JsonConfig : public TextConfig, public json::r::Document
 	{
@@ -15,8 +15,6 @@ namespace joke
 		using TextConfig::TextConfig;
 		bool OnLoadText(const char *str, size_t length) override;
 		bool OnReloadText(const char *str, size_t length) override;
-	private:
-		bool ReloadConfig() final;
 	protected:
 		virtual bool OnLoadJson() = 0;
 		virtual bool OnReLoadJson() = 0;

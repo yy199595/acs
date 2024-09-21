@@ -7,10 +7,10 @@
 #include"Entity/Actor/App.h"
 #include"Http/Common/HttpRequest.h"
 #include"Http/Common/HttpResponse.h"
-#include"Util/String/String.h"
+#include"Util/Tools/String.h"
 #include"Http/Component/HttpComponent.h"
 #include"Router/Component/RouterComponent.h"
-namespace joke
+namespace acs
 {
 	Server::Server(int id, const std::string & name)
 		: Actor(id, name), mRpc("rpc")
@@ -22,9 +22,9 @@ namespace joke
 	{
 		if(!this->GetListen(this->mRpc, this->mRpcAddress))
 		{
-			LOG_WARN("not rpc address:{} id:{}", this->Name(), this->GetEntityId());
+			LOG_WARN("not rpc address:{} id:{}", this->Name(), this->GetId());
 		}
-		this->mAppId = App::Inst()->GetEntityId();
+		this->mAppId = App::Inst()->GetId();
 		return true;
 	}
 
@@ -73,7 +73,7 @@ namespace joke
 		auto iter = this->mListens.find(name);
 		if(iter == this->mListens.end())
 		{
-			LOG_ERROR("{} not {} address", this->Name(), name);
+			LOG_WARN("{} not {} address", this->Name(), name);
 			return false;
 		}
 		addr = iter->second;
@@ -124,7 +124,7 @@ namespace joke
 		static HttpComponent* httpComponent = nullptr;
 		if (httpComponent == nullptr)
 		{
-			httpComponent = App::Inst()->GetComponent<HttpComponent>();
+			httpComponent = App::Get<HttpComponent>();
 		}
 		std::string listen;
 		if (!this->GetListen("http", listen))
@@ -139,14 +139,14 @@ namespace joke
 				return XCode::ParseHttpUrlFailure;
 			}
 		}
-		std::unique_ptr<http::TextData> textData = std::make_unique<http::TextData>();
+		std::unique_ptr<http::TextContent> textData = std::make_unique<http::TextContent>();
 		http::Response* httpResult = httpComponent->Do(std::move(request), std::move(textData));
 		if (httpResult == nullptr || httpResult->Code() != HttpStatus::OK)
 		{
 			return XCode::Failure;
 		}
 
-		const http::TextData* responseData = httpResult->To<const http::TextData>();
+		const http::TextContent* responseData = httpResult->To<const http::TextContent>();
 		if (responseData == nullptr)
 		{
 			return XCode::Failure;
@@ -164,20 +164,15 @@ namespace joke
 		static HttpComponent * httpComponent = nullptr;
 		if(httpComponent == nullptr)
 		{
-			httpComponent = App::Inst()->GetComponent<HttpComponent>();
+			httpComponent = App::Get<HttpComponent>();
 		}
 		std::string listen;
 		if(!this->GetListen("http", listen))
 		{
 			return XCode::NotFoundActorAddress;
 		}
-		std::string json;
-		if(!request.Encode(&json))
-		{
-			return XCode::CallArgsError;
-		}
 		std::string url = fmt::format("http://{}/{}", listen, path);
-		http::Response * httpResult = httpComponent->Post(url, json);
+		http::Response * httpResult = httpComponent->Post(url, request);
 		return XCode::Ok;
 	}
 

@@ -5,9 +5,9 @@
 #include "FileUpload.h"
 #include "Entity/Actor/App.h"
 #include "Util/File/FileHelper.h"
-#include "Util/Time/TimeHelper.h"
+#include "Util/Tools/TimeHelper.h"
 #include "Oss/Component/OssComponent.h"
-namespace joke
+namespace acs
 {
 	bool FileUpload::Awake()
 	{
@@ -30,7 +30,7 @@ namespace joke
 		return true;
 	}
 
-	int FileUpload::Oss(const http::FromData& request, json::w::Document & response)
+	int FileUpload::Oss(const http::FromContent& request, json::w::Document & response)
 	{
 		std::string fileName;
 		int userId, uploadType = 0;
@@ -132,9 +132,9 @@ namespace joke
 	int FileUpload::File(const http::Request &request, http::Response &response)
 	{
 		int userId = 0;
-		const http::Data* data = request.GetBody();
+		const http::Content* data = request.GetBody();
 		request.GetUrl().GetQuery().Get(http::query::UserId, userId);
-		const http::MultipartFromData* multiData = data->To<const http::MultipartFromData>();
+		const http::MultipartFromContent* multiData = data->To<const http::MultipartFromContent>();
 		if (multiData == nullptr)
 		{
 			return XCode::CallArgsError;
@@ -159,9 +159,9 @@ namespace joke
 	int FileUpload::OnUpload(const http::Request& request, const std::string& name, http::Response& response)
 	{
 		int userId = 0;
-		const http::Data* data = request.GetBody();
+		const http::Content* data = request.GetBody();
 		request.GetUrl().GetQuery().Get(http::query::UserId, userId);
-		const http::MultipartFromData* multiData = data->To<const http::MultipartFromData>();
+		const http::MultipartFromContent* multiData = data->To<const http::MultipartFromContent>();
 		if (multiData == nullptr)
 		{
 			return XCode::CallArgsError;

@@ -7,7 +7,7 @@
 #include"Entity/Actor/App.h"
 #include"Rpc/Component/DispatchComponent.h"
 
-namespace joke
+namespace acs
 {
 	RouterComponent::RouterComponent()
 	{

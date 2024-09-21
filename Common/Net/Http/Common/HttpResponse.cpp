@@ -5,7 +5,7 @@
 #include"HttpResponse.h"
 #include"Util/File/DirectoryHelper.h"
 #include"Lua/Engine/UserDataParameter.h"
-#include "Util/Math/Math.h"
+#include "Util/Tools/Math.h"
 #include "Log/Common/CommonLogDef.h"
 
 namespace http
@@ -61,11 +61,11 @@ namespace http
 				this->mHead.GetContentType(content_type);
 				if(content_type.find(http::Header::JSON) != std::string::npos)
 				{
-					this->mBody = std::make_unique<http::JsonData>();
+					this->mBody = std::make_unique<http::JsonContent>();
 				}
 				else
 				{
-					this->mBody = std::make_unique<http::TextData>();
+					this->mBody = std::make_unique<http::TextContent>();
 				}
 			}
 			this->mContSize = 0;
@@ -90,6 +90,10 @@ namespace http
 						return tcp::ReadDecodeError;
 					}
 					line.pop_back();
+					if(line.empty())
+					{
+						return tcp::ReadDone;
+					}
 					this->mContSize = std::stoi(line, nullptr, 16);
 					if(this->mContSize == 0)
 					{
@@ -123,12 +127,12 @@ namespace http
 
 	void Response::Json(const char* json, size_t size)
 	{
-		this->mBody = std::make_unique<http::JsonData>(json, size);
+		this->mBody = std::make_unique<http::JsonContent>(json, size);
 	}
 
 	void Response::Text(const char* text, size_t size)
 	{
-		std::unique_ptr<http::TextData> custom = std::make_unique<http::TextData>();
+		std::unique_ptr<http::TextContent> custom = std::make_unique<http::TextContent>();
 		{
 			custom->SetContent(http::Header::TEXT, text, size);
 		}
@@ -137,7 +141,7 @@ namespace http
 
 	void Response::Json(json::w::Document& document)
 	{
-		std::unique_ptr<http::JsonData> jsonData(new http::JsonData());
+		std::unique_ptr<http::JsonContent> jsonData(new http::JsonContent());
 		{
 			jsonData->Write(document);
 		}
@@ -146,7 +150,7 @@ namespace http
 
 	void Response::SetContent(const std::string & type, const std::string& str)
 	{
-		std::unique_ptr<http::TextData> customData(new http::TextData());
+		std::unique_ptr<http::TextContent> customData(new http::TextContent());
 		{
 			customData->SetContent(type, str.c_str(), str.size());
 		}
@@ -156,7 +160,7 @@ namespace http
 	bool Response::File(const std::string & type, const std::string& path)
 	{
 		this->mCode = (int)HttpStatus::OK;
-		std::unique_ptr<http::FileData> fileData(new http::FileData());
+		std::unique_ptr<http::FileContent> fileData(new http::FileContent());
 		{
 			if(!fileData->OpenFile(path, type))
 			{
@@ -181,7 +185,7 @@ namespace http
 		{
 			help::dir::MakeDir(dir);
 		}
-		std::unique_ptr<http::FileData> fileData(new http::FileData());
+		std::unique_ptr<http::FileContent> fileData(new http::FileContent());
 		{
 			if(!fileData->MakeFile(path))
 			{

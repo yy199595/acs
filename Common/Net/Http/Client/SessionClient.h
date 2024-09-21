@@ -16,7 +16,7 @@ namespace http
 	class SessionClient final : public tcp::TcpClient
 	{
 	 public:
-		typedef joke::IRpc<Request, Response> Component;
+		typedef acs::IRpc<Request, Response> Component;
 		explicit SessionClient(Component * component);
 	 public:
 		bool StartWriter();
@@ -32,10 +32,16 @@ namespace http
 		void OnReadError(const Asio::Code &code) final;
 		void OnReceiveLine(std::istream &is, size_t) final;
         void OnReceiveMessage(std::istream & is, size_t) final;
+	public:
+
+		const http::Request & GetRequest() const { return this->mRequest; }
+		const http::Response & GetResponse() const { return this->mResponse; }
 	private:
 		void Clear();
 		void OnSendMessage() final;
         void OnSendMessage(const asio::error_code &code) final;
+	public:
+		std::string mPath;
 	 private:
 		Component * mComponent;
 		http::Request mRequest;

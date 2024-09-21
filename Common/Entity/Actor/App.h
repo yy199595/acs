@@ -7,7 +7,7 @@
 #include"Async/Component/CoroutineComponent.h"
 #include"Entity/Component/ActorComponent.h"
 #include"Entity/Actor/Server.h"
-namespace joke
+namespace acs
 {
 	enum class ServerStatus
 	{
@@ -26,7 +26,7 @@ namespace joke
 	};
 }
 
-namespace joke
+namespace acs
 {
 	class RpcService;
 	class ProtoComponent;
@@ -37,13 +37,9 @@ namespace joke
 	 public:
 		void Sleep(int ms = 1000);
         inline float GetFps() const { return this->mLogicFps; }
-		inline Asio::Context & GetContext() { return this->mContext; }
 		inline long long StartTime() const { return this->mStartTime; }
 		inline const ServerConfig & Config() const { return mConfig; }
 		inline ServerStatus GetStatus() const { return this->mStatus; }
-		inline ProtoComponent * GetProto() { return this->mMessageComponent; }
-		inline ActorComponent * ActorMgr() { return this->mActorComponent; }
-		inline CoroutineComponent* Coroutine() { return this->mTaskComponent; }
 	 public:
 		int Run();
 		void Stop();
@@ -54,7 +50,13 @@ namespace joke
 		unsigned int StartCoroutine(std::function<void()> && func);
         bool OnDelComponent(Component *component) final { return false; }
         inline bool IsMainThread() const { return this->mThreadId == std::this_thread::get_id();}
-
+	public:
+		template<typename T>
+		static inline T * Get() { return App::Inst()->GetComponent<T>(); }
+		static inline Asio::Context & GetContext() { return App::Inst()->mContext; }
+		static inline ActorComponent * ActorMgr() { return App::Inst()->mActorComponent; }
+		static inline ProtoComponent * GetProto() { return App::Inst()->mMessageComponent; }
+		static inline CoroutineComponent* Coroutine() { return App::Inst()->mTaskComponent; }
 #ifdef __ENABLE_OPEN_SSL__
 	public:
 		std::string Sign(json::w::Document & document);
@@ -72,6 +74,7 @@ namespace joke
 		Asio::Context mContext;
 		ServerConfig & mConfig;
 		long long mLastGuidTime;
+		long long mNextNewDayTime; //下次新的一天时间
 		asio::signal_set mSignal;
 		std::thread::id mThreadId;
         const long long mStartTime;

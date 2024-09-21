@@ -6,7 +6,6 @@
 #define APP_OSSCOMPONENT_H
 
 #ifdef __ENABLE_OPEN_SSL__
-
 #include "Entity/Component/Component.h"
 
 namespace oss
@@ -29,15 +28,26 @@ namespace oss
 		std::string upload_dir;
 		std::vector<std::string> limit_type;
 	};
+
+	struct FromData
+	{
+		std::string policy;
+		std::string OSSAccessKeyId;
+		std::string success_action_status;
+		std::string signature;
+		std::string key;
+
+		std::string url;
+	};
 }
 
-namespace joke
+namespace acs
 {
 	class OssComponent : public Component
 	{
 	public:
-		OssComponent() = default;
-		~OssComponent() = default;
+		OssComponent();
+		~OssComponent() final = default;
 	private:
 		bool Awake() final;
 	public:
@@ -48,6 +58,6 @@ namespace joke
 }
 
 
-#endif //APP_OSSCOMPONENT_H
+#endif //__ENABLE_OPEN_SSL__
 
-#endif // __ENABLE_OPEN_SSL__
+#endif // APP_OSSCOMPONENT_H

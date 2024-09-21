@@ -2,11 +2,11 @@
 #include "XCode/XCode.h"
 #include"Server/Config/ServerConfig.h"
 #include"Util/File/DirectoryHelper.h"
-#include"Util/String/String.h"
+#include"Util/Tools/String.h"
 #include"Util/Sql/SqlHelper.h"
 #include"Sqlite/Lua/LuaSqlite.h"
 #include"Lua/Engine/ModuleClass.h"
-namespace joke
+namespace acs
 {
 	bool SqliteComponent::Awake()
 	{
@@ -25,27 +25,14 @@ namespace joke
 		luaRegister.End("db.sqlite");
 	}
 
-	bool SqliteComponent::Splite(const std::string& table, std::string& db, std::string& tab)
-	{
-		size_t pos = table.find('.');
-		if(pos == std::string::npos)
-		{
-			return false;
-		}
-		db = table.substr(0, pos);
-		tab = table.substr(pos + 1);
-		return true;
-	}
-
 	int SqliteComponent::MakeTable(const std::string & table,
 			const pb::Message& message, const std::vector<std::string> & keys)
 	{
 		std::string db, tab;
-		if(!SqliteComponent::Splite(table, db, tab))
+		if(!help::Str::Split(table, ',', db, tab))
 		{
 			return XCode::CallArgsError;
 		}
-
 		std::string sql;
 		SqlHelper sqlHelper;
 		if(!sqlHelper.Create(tab, message, keys, sql))

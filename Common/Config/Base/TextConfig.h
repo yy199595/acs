@@ -6,7 +6,7 @@
 #define APP_TEXTCONFIG_H
 #include<string>
 
-namespace joke
+namespace acs
 {
 	class ITextConfig
 	{
@@ -20,7 +20,7 @@ namespace joke
 		std::string mPath;
 	};
 }
-namespace joke
+namespace acs
 {
 	class TextConfig : public ITextConfig
     {
@@ -28,10 +28,12 @@ namespace joke
 		virtual ~TextConfig() = default;
         explicit TextConfig(const char * name) : mName(name), mLastWriteTime(0) { }
     public:
-        bool ReloadConfig() override;
+        bool ReloadConfig() final;
 		bool LoadConfig(const std::string & path) final;
         const std::string & GetConfigName() const final { return this->mName; }
     protected:
+		virtual void OnReload() { }
+		virtual void OnLoad(const std::string & path) { }
         virtual bool OnLoadText(const char * str, size_t length) = 0;
         virtual bool OnReloadText(const char * str, size_t length) = 0;
     private:

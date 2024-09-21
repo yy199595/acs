@@ -7,7 +7,7 @@
 #include"Entity/Actor/App.h"
 #include"Yyjson/Lua/ljson.h"
 #include"Sqlite/Component/SqliteComponent.h"
-using namespace joke;
+using namespace acs;
 namespace Lua
 {
 	int Sqlite::Exec(lua_State* lua)
@@ -15,7 +15,7 @@ namespace Lua
 		static SqliteComponent * sqliteComponent = nullptr;
 		if(sqliteComponent == nullptr)
 		{
-			sqliteComponent = App::Inst()->GetComponent<SqliteComponent>();
+			sqliteComponent = App::Get<SqliteComponent>();
 			if(sqliteComponent == nullptr)
 			{
 				luaL_error(lua, "not find SqliteComponent");
@@ -33,7 +33,7 @@ namespace Lua
 		static SqliteComponent * sqliteComponent = nullptr;
 		if(sqliteComponent == nullptr)
 		{
-			sqliteComponent = App::Inst()->GetComponent<SqliteComponent>();
+			sqliteComponent = App::Get<SqliteComponent>();
 			if(sqliteComponent == nullptr)
 			{
 				luaL_error(lua, "not find SqliteComponent");
@@ -67,7 +67,7 @@ namespace Lua
 		static SqliteComponent * sqliteComponent = nullptr;
 		if(sqliteComponent == nullptr)
 		{
-			sqliteComponent = App::Inst()->GetComponent<SqliteComponent>();
+			sqliteComponent = App::Get<SqliteComponent>();
 			if(sqliteComponent == nullptr)
 			{
 				luaL_error(lua, "not find SqliteComponent");

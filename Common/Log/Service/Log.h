@@ -6,7 +6,7 @@
 #define APP_LOG_H
 #include"Message/s2s/s2s.pb.h"
 #include"Rpc/Service/RpcService.h"
-namespace joke
+namespace acs
 {
 	class Log final : public RpcService
 	{

@@ -6,14 +6,14 @@
 #include"Entity/Actor/App.h"
 #include"Lua/Engine/UserDataParameter.h"
 
-using namespace joke;
+using namespace acs;
 
 namespace Lua
 {
 	int MessageEx::New(lua_State* lua)
 	{
 		const char* name = luaL_checkstring(lua, 1);
-		ProtoComponent* messageComponent = App::Inst()->GetProto();
+		ProtoComponent* messageComponent = App::GetProto();
 		if (messageComponent == nullptr)
 		{
 			luaL_error(lua, "ProtoComponent Is Null");
@@ -52,14 +52,41 @@ namespace Lua
 		return 1;
 	}
 
+	int MessageEx::ToJson(lua_State* lua)
+	{
+		if(lua_isuserdata(lua, 1))
+		{
+			pb::Message * pbMessage = Lua::UserDataParameter::Read<pb::Message*>(lua, 1);
+			if(pbMessage == nullptr)
+			{
+				return 0;
+			}
+			std::string json;
+			if(pb_json::MessageToJsonString(*pbMessage, &json).ok())
+			{
+				lua_pushlstring(lua, json.c_str(), json.size());
+				return 1;
+			}
+		}
+		return 0;
+	}
+
 	int MessageEx::Encode(lua_State* lua)
 	{
 		std::unique_ptr<pb::Message> message;
-		const char* name = luaL_checkstring(lua, 1);
-		ProtoComponent* messageComponent = App::Inst()->GetProto();
-		if (lua_istable(lua, 2))
+		if(lua_isuserdata(lua, 1))
 		{
-			pb::Message * data = messageComponent->Read(lua, name, 2);
+			pb::Message * pbMessage = Lua::UserDataParameter::Read<pb::Message*>(lua, 1);
+			if(pbMessage == nullptr)
+			{
+				return 0;
+			}
+			message.reset(pbMessage);
+		}
+		else if (lua_istable(lua, 2))
+		{
+			const char* name = luaL_checkstring(lua, 1);
+			pb::Message * data = App::GetProto()->Read(lua, name, 2);
 			if(data == nullptr)
 			{
 				return 0;
@@ -69,8 +96,9 @@ namespace Lua
 		else if(lua_isstring(lua, 2))
 		{
 			size_t size = 0;
+			const char* name = luaL_checkstring(lua, 1);
 			const char * json = luaL_checklstring(lua, 2, &size);
-			if(!messageComponent->New(name, json, size, message))
+			if(!App::GetProto()->New(name, json, size, message))
 			{
 				return 0;
 			}
@@ -91,7 +119,7 @@ namespace Lua
 		std::unique_ptr<pb::Message> message;
 		const char * name = luaL_checkstring(lua, 1);
 		const char * data = luaL_checklstring(lua, 2, &size);
-		ProtoComponent* messageComponent = App::Inst()->GetProto();
+		ProtoComponent* messageComponent = App::GetProto();
 		if(!messageComponent->New(name, message))
 		{
 			return 0;
@@ -107,7 +135,7 @@ namespace Lua
 	int MessageEx::Import(lua_State* lua)
 	{
 		const char* name = luaL_checkstring(lua, 1);
-		ProtoComponent* messageComponent = App::Inst()->GetProto();
+		ProtoComponent* messageComponent = App::GetProto();
 		if (messageComponent == nullptr)
 		{
 			luaL_error(lua, "ProtoComponent Is Null");

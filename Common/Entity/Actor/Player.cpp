@@ -8,15 +8,15 @@
 #include"Lua/Engine/Define.h"
 #include"Server/Config/ServerConfig.h"
 #include"Rpc/Component/InnerNetComponent.h"
-#include "Util/Time/TimeHelper.h"
+#include "Util/Tools/TimeHelper.h"
 
-namespace joke
+namespace acs
 {
 	Player::Player(long long playerId, int gateId)
 		: Actor(playerId, "Player")
 	{
 		this->mGateId = gateId;
-		this->mActorComponent = App::Inst()->ActorMgr();
+		this->mActorComponent = App::ActorMgr();
 	}
 
 	bool Player::OnInit()
@@ -50,7 +50,7 @@ namespace joke
 		if(iter == this->mServerAddrs.end() || iter->second != id)
 		{
 			this->mServerAddrs[server] = id;
-			LOG_DEBUG("player {} add [{}] id: {}", this->GetEntityId(), server, id);
+			LOG_DEBUG("player {} add [{}] id: {}", this->GetId(), server, id);
 		}
 	}
 
@@ -85,7 +85,7 @@ namespace joke
 	void Player::EncodeToJson(std::string* json)
 	{
 		json::w::Document jsonWriter;
-		jsonWriter.Add("id", this->GetEntityId());
+		jsonWriter.Add("id", this->GetId());
 		std::unique_ptr<json::w::Value> data = jsonWriter.AddObject("addr");
 		auto iter = this->mServerAddrs.begin();
 		for(; iter != this->mServerAddrs.end(); iter++)
@@ -119,7 +119,7 @@ namespace joke
 				if(!this->GetServerId(methodConfig->Server, serverId))
 				{
 					LOG_ERROR("find {} id player:{} server:{}",
-							methodConfig->Server, this->GetEntityId(), methodConfig->Server);
+							methodConfig->Server, this->GetId(), methodConfig->Server);
 					return XCode::AddressAllotFailure;
 				}
 				message->SetSockId(serverId);
@@ -128,7 +128,7 @@ namespace joke
 			}
 			message->SetProto(rpc::Porto::None);
 			message->GetHead().Add("func", func);
-			message->GetHead().Add("id", this->GetEntityId());
+			message->GetHead().Add("id", this->GetId());
 		}
 		return XCode::Ok;
 	}

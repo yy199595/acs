@@ -17,10 +17,10 @@
 #include "Server/Component/ConfigComponent.h"
 #include "Cluster/Component/LaunchComponent.h"
 #include "Log/Service/Log.h"
-#include "Gate/Service/Gate.h"
-#include "Common/Service/Node.h"
+#include "Gate/Service/GateSystem.h"
+#include "Common/Service/NodeSystem.h"
 #include "Web/Service/Admin.h"
-#include "Common/Service/Login.h"
+#include "Common/Service/LoginSystem.h"
 #include "Sqlite/Service/SqliteDB.h"
 #include "Master/Component/MasterComponent.h"
 #include "Gate/Component/GateComponent.h"
@@ -31,7 +31,7 @@
 #include "Mongo/Component/MongoDBComponent.h"
 #include "Mongo/Component/MongoComponent.h"
 
-#include "Redis/Component/SubComponent.h"
+#include "Redis/Component/RedisSubComponent.h"
 
 #include "WX/Component/WeChatComponent.h"
 
@@ -39,14 +39,19 @@
 #include "Web/Service/LogMgr.h"
 #include "Http/Service/ResourceMgr.h"
 
-
 #include "Record/Component/RecordComponent.h"
+
 
 #include "Redis/Component/DelayQueueComponent.h"
 #include "WX/Service/WeChat.h"
 #include "Http/Component/GroupNotifyComponent.h"
 
-#include "Operation/Component/OperationComponent.h"
+#include "WX/Component/WXComplaintComponent.h"
+
+#include "Watch/Service/Watch.h"
+#include "Watch/Component/WatchComponent.h"
+
+#include "Http/Component/HttpApiComponent.h"
 
 #ifdef __ENABLE_MYSQL__
 #include "Mysql/Service/MysqlDB.h"
@@ -64,7 +69,8 @@
 #include "Server/Config/ServerConfig.h"
 #include "Router/Component/RouterComponent.h"
 
-#include "Example/Service/Chat.h"
+#include "Example/Service/ChatSystem.h"
+
 
 #include "Upload/Service/FileUpload.h"
 
@@ -72,10 +78,12 @@
 #include "Oss/Component/OssComponent.h"
 #include "WX/Component/WXNoticeComponent.h"
 
-
 #include "Quick/Service/QuickSDK.h"
 
-using namespace joke;
+#include "Web/Service/MongoMgr.h"
+
+#include "Event/Service/EventSystem.h"
+using namespace acs;
 
 void RegisterComponent()
 {
@@ -96,7 +104,7 @@ void RegisterComponent()
 	REGISTER_COMPONENT(GateComponent);
 	REGISTER_COMPONENT(OuterNetComponent);
 
-	REGISTER_COMPONENT(SubComponent);
+	REGISTER_COMPONENT(RedisSubComponent);
 	REGISTER_COMPONENT(RedisComponent);
 	REGISTER_COMPONENT(SqliteComponent);
 	REGISTER_COMPONENT(MongoComponent);
@@ -111,21 +119,24 @@ void RegisterComponent()
 	REGISTER_COMPONENT(HttpComponent);
 	REGISTER_COMPONENT(LoggerComponent);
 	REGISTER_COMPONENT(HttpWebComponent);
+	REGISTER_COMPONENT(HttpApiComponent);
 	REGISTER_COMPONENT(ClientComponent);
 	REGISTER_COMPONENT(ListenerComponent);
 
 	REGISTER_COMPONENT(WeChatComponent);
-
 	REGISTER_COMPONENT(AdminComponent);
 	REGISTER_COMPONENT(RecordComponent);
 
 	REGISTER_COMPONENT(OssComponent);
-
-	REGISTER_COMPONENT(OperationComponent);
 	REGISTER_COMPONENT(DelayQueueComponent);
 	REGISTER_COMPONENT(WXNoticeComponent);
 
 	REGISTER_COMPONENT(GroupNotifyComponent);
+
+	REGISTER_COMPONENT(WXComplaintComponent);
+
+	REGISTER_COMPONENT(WatchComponent);
+
 }
 
 void RegisterAll()
@@ -133,9 +144,9 @@ void RegisterAll()
 	RegisterComponent();
 
 	REGISTER_COMPONENT(Log);
-	REGISTER_COMPONENT(Gate);
-	REGISTER_COMPONENT(Node);
-	REGISTER_COMPONENT(Login);
+	REGISTER_COMPONENT(GateSystem);
+	REGISTER_COMPONENT(NodeSystem);
+	REGISTER_COMPONENT(LoginSystem);
 
 	REGISTER_COMPONENT(Admin);
 	REGISTER_COMPONENT(Master);
@@ -147,33 +158,35 @@ void RegisterAll()
 
 	REGISTER_COMPONENT(WeChat);
 
-	REGISTER_COMPONENT(Chat);
+	REGISTER_COMPONENT(ChatSystem);
 	REGISTER_COMPONENT(LogMgr);
 	REGISTER_COMPONENT(ResourceMgr);
 
 	REGISTER_COMPONENT(FileUpload);
 
 	REGISTER_COMPONENT(QuickSDK);
+
+	REGISTER_COMPONENT(Watch);
+	REGISTER_COMPONENT(MongoMgr);
+	REGISTER_COMPONENT(EventSystem);
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-//#ifdef __OS_WIN__
-//	system("chcp 65001 > nul");
-//#endif
+#ifdef __OS_WIN__
+	system("chcp 65001 > nul");
+#endif
 	int id = 0;
 	RegisterAll();
 	std::string path;
 	ServerConfig config;
-	System::Init(argc, argv);
-	System::GetEnv("ID", id);
-	if (System::GetEnv("CONFIG", path) && config.LoadConfig(path))
-	{
-#ifdef __OS_WIN__
-		std::string title = fmt::format("{} pid={}", config.Name(), getpid());
-		SetConsoleTitle(title.c_str());
+	CONSOLE_ERROR_RETURN_CODE(os::System::Init(argc, argv), -1);
+#ifdef __DEBUG__
+	os::System::GetEnv("ID", id);
+#else
+	CONSOLE_ERROR_RETURN_CODE(os::System::GetEnv("ID", id), -1);
 #endif
-		return (new App(id, config))->Run();
-	}
-	return -1;
+	CONSOLE_ERROR_RETURN_CODE(os::System::GetEnv("CONFIG", path), -1);
+	CONSOLE_ERROR_RETURN_CODE(!path.empty() && config.LoadConfig(path), -1);
+	return (new App(id, config))->Run();
 }

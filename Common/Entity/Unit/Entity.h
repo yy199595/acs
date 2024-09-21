@@ -1,7 +1,7 @@
 #pragma once
 #include<vector>
 #include"Entity/Component/ComponentFactory.h"
-namespace joke
+namespace acs
 {
     class Entity
 	{
@@ -16,7 +16,6 @@ namespace joke
 		inline bool AddComponent();
 		bool HasComponent(const std::string& name);
 		bool AddComponent(const std::string& name);
-		void SetEntityId(long long id) { this->mEntityId = id; }
 		bool AddComponent(const std::string& name, std::unique_ptr<Component> component);
 
 		template<typename T>
@@ -52,9 +51,9 @@ namespace joke
 		virtual void OnAddComponent(Component * component) {}
 		virtual bool OnDelComponent(Component * component) { return true; }
 	 public:
-		inline long long GetEntityId() const { return this->mEntityId; }
+		inline long long GetId() const { return this->mId; }
 	 private:
-		long long mEntityId;
+		const long long mId;
 		std::vector<std::string> mSortComponents;
 		std::unordered_map<std::string, std::unique_ptr<Component>> mComponentMap;
 	};

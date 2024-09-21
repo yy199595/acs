@@ -5,27 +5,29 @@
 #include"Util/File/FileHelper.h"
 #include"Core/System/System.h"
 #include"Log/Common/CommonLogDef.h"
-namespace joke
+namespace acs
 {
     bool TextConfig::LoadConfig(const std::string &path)
     {
         std::string content;
         this->mPath = path;
-		if(!System::ReadFile(this->mPath, content))
+		if(!os::System::ReadFile(this->mPath, content))
 		{
 			CONSOLE_LOG_ERROR("read file [ {} ] fail", this->mPath);
 			return false;
 		}
-        if(this->OnLoadText(content.c_str(), content.size()))
+        if(!this->OnLoadText(content.c_str(), content.size()))
         {
-            this->mLastWriteTime = help::fs::GetLastWriteTime(path);
-            return true;
+            return false;
         }
-        return false;
+		this->OnLoad(path);
+		this->mLastWriteTime = help::fs::GetLastWriteTime(path);
+        return true;
     }
 
     bool TextConfig::ReloadConfig()
     {
+		this->OnReload();
 		long long t1 = help::fs::GetLastWriteTime(this->mPath);
 		if(t1 == this->mLastWriteTime)
 		{
@@ -38,6 +40,11 @@ namespace joke
 			CONSOLE_LOG_ERROR("reload file error", this->mPath);
 			return false;
 		}
-		return this->OnReloadText(content.c_str(), content.size());
+		if (!this->OnReloadText(content.c_str(), content.size()))
+		{
+			return false;
+		}
+		LOG_DEBUG("reload [{}] ok", this->mPath);
+		return true;
     }
 }

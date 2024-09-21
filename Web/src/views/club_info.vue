@@ -1,9 +1,8 @@
 <template>
-    <h3>部落列表</h3>
-    <el-row style='padding-left:15px;padding-top:30px'>
+    <el-row style='padding-left:15px;padding-top:10px'>
 
         <el-form inline="inline">
-            <el-form-item label="城市">
+            <el-form-item label="城市" style="width: 200px">
                 <el-select v-model="city_info.city_id" clearable placeholder="请选择城市">
                     <el-option v-for="(item, index) in city_info.list" :key="index"
                                :label="item.label" :value="item.value"></el-option>
@@ -29,7 +28,7 @@
             <el-table-column prop="desc" label="简介" show-overflow-tooltip></el-table-column>
             <el-table-column label="操作" width="200rpx">
                 <template #default="scope">
-                    <el-button type="danger" plain>解散</el-button>
+                    <el-button type="danger" @click="dissolve_club(scope.row)" plain>解散</el-button>
                     <el-button type="success" plain>修改</el-button>
                 </template>
             </el-table-column>
@@ -53,7 +52,7 @@
 import {format_time, format_permiss} from "../api/format";
 import {request_user_info, RequestAccountList, RequestDeleteAccount} from "../api/account";
 import {ElMessage, ElMessageBox} from "element-plus";
-import {request_city_list, request_club_list} from "../api/activity";
+import {dissolve_club, request_city_list, request_club_list} from "../api/activity";
 
 
 export default {
@@ -77,6 +76,19 @@ export default {
         navigateTo(id) {
             localStorage.setItem("role_id", id)
             this.$router.push("/role")
+        },
+
+        async dissolve_club(row) {
+            console.log(JSON.stringify(row))
+            await ElMessageBox.confirm(`确定解散[${row.nick}]吗`, '提示', {
+                type: 'error'
+            });
+           const response = await dissolve_club(row._id)
+            if(response.data.code === 0 ){
+                ElMessage.success("解散部落成功")
+                return
+            }
+            ElMessage.error(response.data.error)
         },
 
         on_btn_query() {

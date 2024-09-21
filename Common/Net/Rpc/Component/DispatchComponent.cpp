@@ -16,7 +16,7 @@
 
 #include"Core/System/System.h"
 
-namespace joke
+namespace acs
 {
 	DispatchComponent::DispatchComponent()
 	{
@@ -37,7 +37,7 @@ namespace joke
 			LOG_CHECK_RET_FALSE(this->mRpcServices.Add(name, rpcService));
 		}
 
-		this->mTaskComponent = this->mApp->Coroutine();
+		this->mTaskComponent = App::Coroutine();
 		this->mRouterComponent = this->GetComponent<RouterComponent>();
 		this->mOuterComponent = this->GetComponent<OuterNetComponent>();
 		return true;
@@ -45,7 +45,7 @@ namespace joke
 
 	void DispatchComponent::OnAppStop()
 	{
-		while(this->mWaitCount > 0)
+		while(this->mWaitCount > 1)
 		{
 			this->mApp->Sleep();
 			LOG_INFO("wait message count:{}", this->mWaitCount);
@@ -108,7 +108,7 @@ namespace joke
 			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
 			LOG_WARN("({}ms) invoke [{}] code:{} = {}", t, config->FullName, code, desc);
 		}
-		else if(t >= 500)
+		else if(t >= 2000)
 		{
 			LOG_WARN("({}ms) invoke [{}] too long time", t, config->FullName);
 		}

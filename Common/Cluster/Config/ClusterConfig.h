@@ -10,7 +10,7 @@
 #include"Config/Base/JsonConfig.h"
 #include"Yyjson/Document/Document.h"
 #include"Core/Singleton/Singleton.h"
-namespace joke
+namespace acs
 {
     class NodeConfig
     {
@@ -31,7 +31,7 @@ namespace joke
     };
 }
 
-namespace joke
+namespace acs
 {
     class ClusterConfig : public JsonConfig, public ConstSingleton<ClusterConfig>
     {

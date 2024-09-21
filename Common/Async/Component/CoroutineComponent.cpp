@@ -2,10 +2,10 @@
 #include"Entity/Actor/App.h"
 #include"Timer/Component/TimerComponent.h"
 #ifdef __DEBUG__
-#include"Util/Time/TimeHelper.h"
+#include"Util/Tools/TimeHelper.h"
 #endif
 
-namespace joke
+namespace acs
 {
 	void MainEntry(tb_context_from_t context)
 	{

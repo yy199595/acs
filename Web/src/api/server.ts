@@ -3,7 +3,7 @@ import request from '../utils/request';
 export const RequestAllList = () => {
     return request({
         method: "get",
-        url: "./admin/info",
+        url: "./admin/all_info",
     });
 }
 
@@ -16,10 +16,9 @@ export const RequestList = (id : number) => {
 
 export const RequestStopServer = async (id: number)=> {
     return request({
-        method: "post",
+        method: "get",
         url : "./admin/stop",
-        data : { id : id },
-        headers: {"content-type": "application/json"}
+        params : { id : id }
     })
 }
 
@@ -98,18 +97,18 @@ export const DeleteVipCard = (id : number) => {
     })
 }
 
-export const RequestOrderList = (page : number, status : number, id : string, city : number) => {
+export const RequestOrderList = (page : number, status : number, id : string, city : number, product_id : number, type : number) => {
     return request({
         method : "GET",
         url : "/order/list",
-        params : { page, status, id, city}
+        params : { page, status, id, city, product_id, type}
     })
 }
 
-export const PayOrder = (order_id : string) => {
+export const RefundOrder = (order_id : string) => {
     return request({
         method : "GET",
-        url : "/order/pay",
+        url : "/order/web_refund",
         params : { id : order_id }
     })
 }

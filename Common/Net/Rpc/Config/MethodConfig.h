@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include <string>
-
-namespace joke
+#include <unordered_set>
+namespace acs
 {
     class MethodConfig
     {
@@ -38,12 +38,15 @@ namespace joke
 	public:
 		bool Auth;
 		int Limit;
+		bool Open;
 		int Permission;
 		std::string Path;
 		std::string Type;
 		std::string Desc;
+		std::string Token;
 		std::string Content;
 		std::string Request;
+		std::unordered_set<std::string> WhiteList;
 	};
 
 }// namespace Sentry

@@ -3221,7 +3221,7 @@ SQLITE_API SQLITE_DEPRECATED void *sqlite3_profile(sqlite3*,
    void(*xProfile)(void*,const char*,sqlite3_uint64), void*);
 
 /*
-** CAPI3REF: SQL Trace Event Codes
+** CAPI3REF: SQL Trace EventSystem Codes
 ** KEYWORDS: SQLITE_TRACE
 **
 ** These constants identify classes of events that can be monitored

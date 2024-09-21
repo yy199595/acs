@@ -75,6 +75,9 @@ namespace mongo
 	public:
 		void Clear() final;
 		std::string ToString() final;
+#ifdef __DEBUG__
+		const std::string& ToJson() const { return this->mJson; }
+#endif
 		int OnSendMessage(std::ostream &os) final { return 0; }
 		int OnRecvMessage(std::istream &os, size_t size) final;
 	private:

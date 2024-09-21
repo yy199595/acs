@@ -1,23 +1,19 @@
 ﻿#include"App.h"
 
 #ifndef __OS_WIN__
-
 #include<csignal>
-
 #endif
 
 #include "Lua/Engine/Define.h"
 #include "Core/System/System.h"
 #include "Server/Config/ServerConfig.h"
 #include "Timer/Timer/ElapsedTimer.h"
-//#include "Util/File/DirectoryHelper.h"
+#include "Util/File/DirectoryHelper.h"
 #include "Proto/Component/ProtoComponent.h"
-#include "Server/Component/ConfigComponent.h"
 #include "Server/Component/ThreadComponent.h"
 #include "Cluster/Component/LaunchComponent.h"
 #include "Log/Component/LoggerComponent.h"
 #include "Timer/Component/TimerComponent.h"
-#include "Http/Component/GroupNotifyComponent.h"
 
 #include "Config/Base/LangConfig.h"
 
@@ -25,9 +21,10 @@
 
 #include "Auth/Aes/Aes.h"
 #include "Auth/Jwt/Jwt.h"
+#include "Cluster/Config/ClusterConfig.h"
 
 #endif
-namespace joke
+namespace acs
 {
 	App::App(int id, ServerConfig& config) :
 			Server(id, config.Name()), mSignal(mContext),
@@ -42,20 +39,29 @@ namespace joke
 		this->mActorComponent = nullptr;
 		this->mMessageComponent = nullptr;
 		this->mStatus = ServerStatus::Init;
+#ifdef __OS_WIN__
+		Debug::Init();
+#endif
 #ifdef __ENABLE_OPEN_SSL__
 		aes::Init();
 #endif
+		this->mNextNewDayTime = help::Time::GetNewTime(1);
 	}
 
 	bool App::LoadComponent()
 	{
-
+		std::string path;
+		if(this->mConfig.GetPath("cluster", path))
+		{
+			TextConfig* config = new ClusterConfig();
+			if (!config->LoadConfig(path))
+			{
+				return false;
+			}
+		}
 		this->AddComponent<ThreadComponent>();
 		this->AddComponent<LoggerComponent>();
 		LOG_CHECK_RET_FALSE(this->AddComponent<TimerComponent>());
-		LOG_CHECK_RET_FALSE(this->AddComponent<ProtoComponent>());
-		LOG_CHECK_RET_FALSE(this->AddComponent<ActorComponent>());
-		LOG_CHECK_RET_FALSE(this->AddComponent<ConfigComponent>());
 		LOG_CHECK_RET_FALSE(this->AddComponent<LaunchComponent>());
 		LOG_CHECK_RET_FALSE(this->AddComponent<CoroutineComponent>());
 
@@ -73,6 +79,9 @@ namespace joke
 		});
 #endif
 		this->mTaskComponent->Start(&App::StartAllComponent, this);
+		if(this->mActorComponent == nullptr) {
+			return true;
+		}
 		return this->mActorComponent->AddServer(this);
 	}
 
@@ -81,7 +90,7 @@ namespace joke
 		std::string path;
 		if (!this->mConfig.GetPath("lang", path))
 		{
-			return false;
+			return true;
 		}
 		return (new LangConfig())->LoadConfig(path);
 	}
@@ -123,7 +132,7 @@ namespace joke
 				return false;
 			}
 #ifdef __DEBUG__
-			LOG_DEBUG("[{}ms] [{}.LateAwake] ok", timer.GetMs(), component->GetName());
+			//LOG_DEBUG("[{}ms] [{}.LateAwake] ok", timer.GetMs(), component->GetName());
 #endif
 		}
 		return true;
@@ -159,7 +168,6 @@ namespace joke
 		std::vector<ISecondUpdate*> secondUpdateComponents;
 		std::vector<ILastFrameUpdate*> lastFrameUpdateComponents;
 		std::vector<ICoroutineSecond*> coroutineSecondComponents;
-
 		this->GetComponents<IFrameUpdate>(frameUpdateComponents);
 		this->GetComponents<ISystemUpdate>(systemUpdateComponents);
 		this->GetComponents<ISecondUpdate>(secondUpdateComponents);
@@ -178,7 +186,9 @@ namespace joke
 			jsonObject->Get("fps", fps);
 			jsonObject->Get("event", event);
 		}
+#ifndef __OS_WIN__
 		std::chrono::milliseconds sleepTime(1);
+#endif
 		long long logicUpdateInterval = 1000 / fps;
 
 		while (!this->mContext.stopped())
@@ -216,12 +226,22 @@ namespace joke
 						{
 							component->OnSecondUpdate(this->mTickCount);
 						}
+
 						for (ICoroutineSecond* component: coroutineSecondComponents)
 						{
 							this->mTaskComponent->Start(&ICoroutineSecond::OnCoroutineSecond, component,
 									this->mTickCount);
 						}
-
+						if((nowTime / 1000) >= this->mNextNewDayTime)
+						{
+							std::vector<ISystemNewDay*> systemNewDays;
+							this->GetComponents<ISystemNewDay>(systemNewDays);
+							for(ISystemNewDay * systemNewDay : systemNewDays)
+							{
+								systemNewDay->OnNewDay();
+							}
+							this->mNextNewDayTime = help::Time::GetNewTime(1);
+						}
 						logicRunCount = 0;
 						logicSecondTime = help::Time::NowMil();
 					}
@@ -232,6 +252,7 @@ namespace joke
 					}
 					logicLastUpdateTime = help::Time::NowMil();
 				}
+
 			}
 #ifndef __OS_WIN__
 			std::this_thread::sleep_for(sleepTime);
@@ -301,16 +322,15 @@ namespace joke
 		this->mStatus = ServerStatus::Closing;
 #ifdef __DEBUG__
 		CONSOLE_LOG_ERROR("start close {}", this->Name());
+#else
+        long long t1 = help::Time::NowMil();
 #endif
-		long long t1 = help::Time::NowMil();
-
 		std::vector<IAppStop *> stopComponent;
 		this->GetComponents<IAppStop>(stopComponent);
 
-		for(size_t index = 0; index < stopComponent.size(); index++)
+		for(IAppStop * component : stopComponent)
 		{
-			IAppStop * component = stopComponent.at(index);
-			if(component != nullptr)
+            if(component != nullptr)
 			{
 				component->OnAppStop(); //保存数据
 			}
@@ -327,7 +347,6 @@ namespace joke
 			{
 				nextComponent = components.at(index + 1);
 			}
-			component->OnDestroy();
 			std::string name2("null");
 			float process = (index + 1) / (float)components.size();
 			const std::string & name1 = dynamic_cast<Component*>(component)->GetName();
@@ -336,10 +355,13 @@ namespace joke
 				name2 = dynamic_cast<Component*>(nextComponent)->GetName();
 			}
 			CONSOLE_LOG_INFO("[{:.2f}%] close {} => {}", process * 100, name1, name2);
+			component->OnDestroy();
+
 		}
 #ifndef __DEBUG__
 		long long t = help::Time::NowMil() - t1;
-		GroupNotifyComponent* notify = this->GetComponent<GroupNotifyComponent>();
+		GroupNotifyComponent* groupNotifyComponent = this->GetComponent<GroupNotifyComponent>();
+		if(groupNotifyComponent != nullptr)
 		{
 			notify::TemplateCard cardInfo;
 			cardInfo.Jump.url = "https://huwai.pro";
@@ -348,7 +370,7 @@ namespace joke
 			cardInfo.data.emplace_back(LangConfig::Text("process"), fmt::format("{}:{}", this->mConfig.Name(), this->GetSrvId()));
 			cardInfo.data.emplace_back(LangConfig::Text("time"), help::Time::GetDateString());
 
-			notify->SendToWeChat(cardInfo, true);
+			groupNotifyComponent->SendToWeChat(cardInfo, true);
 		}
 #endif
 		this->mContext.stop();
@@ -375,6 +397,7 @@ namespace joke
 				LOG_DEBUG("[{}ms] => {}.Start", timer.GetMs(), name);
 			}
 		}
+        startComponents.clear();
 		this->mStatus = ServerStatus::Start; //开始帧循环
 		std::vector<IComplete*> completeComponents;
 		this->GetComponents<IComplete>(completeComponents);
@@ -388,11 +411,12 @@ namespace joke
 			complete->Complete();
 			timerComponent->CancelTimer(timerId);
 		}
+        completeComponents.clear();
 		this->mStatus = ServerStatus::Ready;
 		long long t = help::Time::NowMil() - this->mStartTime;
 #ifndef __DEBUG__
-		GroupNotifyComponent* notify = this->GetComponent<GroupNotifyComponent>();
-		if(notify != nullptr)
+		GroupNotifyComponent* groupNotifyComponent = this->GetComponent<GroupNotifyComponent>();
+		if(groupNotifyComponent != nullptr)
 		{
 			notify::TemplateCard cardInfo;
 			cardInfo.Jump.url = "https://huwai.pro";
@@ -402,7 +426,7 @@ namespace joke
 			cardInfo.data.emplace_back(LangConfig::Text("config"), this->mConfig.Path());
 			cardInfo.data.emplace_back(LangConfig::Text("time"), help::Time::GetDateString());
 
-			notify->SendToWeChat(cardInfo);
+			groupNotifyComponent->SendToWeChat(cardInfo);
 		}
 #endif
 		LOG_INFO("  ===== start {} ok [{:.2f}s] =======", this->Name(), t / 1000.0f);

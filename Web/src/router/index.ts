@@ -133,12 +133,12 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('../views/activity.vue'),
             },
             {
-                path: '/system',
-                name: 'system',
+                path: '/admin',
+                name: 'admin',
                 meta: {
-                    title: '条款设置',
+                    title: '后台账号',
                 },
-                component: () => import('../views/system.vue'),
+                component: () => import('../views/admin.vue'),
             }
         ],
     },

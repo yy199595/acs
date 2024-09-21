@@ -1,6 +1,6 @@
 #include"LuaRpcService.h"
 #include"Lua/Module/LuaModule.h"
-namespace joke
+namespace acs
 {
 	void LuaRpcService::OnLogin(long long playerId)
 	{

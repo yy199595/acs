@@ -58,7 +58,13 @@ namespace mongo
 	{
 		this->tab = tab;
 		this->cmd = cmd;
-		this->document.Add(cmd, tab);
+		std::string table(tab);
+		size_t  pos = tab.find('.');
+		if(pos != std::string::npos)
+		{
+			table = tab.substr(pos + 1);
+		}
+		this->document.Add(cmd, table);
 		return *this;
 	}
 }

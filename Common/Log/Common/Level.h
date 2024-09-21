@@ -5,29 +5,18 @@
 #ifndef APP_LEVEL_H
 #define APP_LEVEL_H
 #include<string>
-#ifdef __ENABLE_SPD_LOG__
-#include<spdlog/logger.h>
-#endif
 
 namespace custom
 {
 	enum class LogLevel
 	{
 		None = 0,
-#ifdef __ENABLE_SPD_LOG__
-		Debug 	= spdlog::level::debug,
-		Info  	= spdlog::level::info,
-		Warn 	= spdlog::level::warn,
-		Error 	= spdlog::level::err,
-		Fatal	= spdlog::level::critical
-#else
 		Debug = LOG_LEVEL_DEBUG,
 		Info = LOG_LEVEL_INFO,
 		Warn = LOG_LEVEL_WARN,
 		Error = LOG_LEVEL_ERROR,
 		Fatal = LOG_LEVEL_FATAL,
 		OFF = LOG_LEVEL_OFF,
-#endif
 	};
 
 	struct LogInfo

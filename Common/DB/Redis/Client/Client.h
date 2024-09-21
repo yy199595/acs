@@ -15,7 +15,7 @@ namespace redis
 	class Client : public tcp::TcpClient
 	{
 	public:
-		typedef joke::IRpc<Request, Response> Component;
+		typedef acs::IRpc<Request, Response> Component;
 		Client(tcp::Socket * socket, const Config & config, Component * component);
 	public:
 		bool Start();
@@ -37,9 +37,9 @@ namespace redis
 	private:
 		std::string mAddress;
 		Component * mComponent;
-		redis::Request * mRequest;
-		redis::Response * mResponse;
 		const redis::Config mConfig;
+		std::unique_ptr<redis::Request> mRequest;
+		std::unique_ptr<redis::Response> mResponse;
 	};
 }
 

@@ -1,8 +1,7 @@
 <template>
-    <h3>用户信息</h3>
     <el-form inline="inline">
-        <el-form-item label="用户ID">
-            <el-input v-model="input.user_id"></el-input>
+        <el-form-item label="用户ID" style="width: 250px">
+            <el-input v-model="input.user_id" placeholder="输入用户ID"></el-input>
         </el-form-item>
         <el-form-item>
             <el-button type="primary" @click="on_btn_query">查询</el-button>
@@ -39,6 +38,7 @@
             <el-descriptions-item label="会员类型" v-if="user_info.data.card_id === 0">{{ "非会员" }} </el-descriptions-item>
             <el-descriptions-item label="会员类型" v-if="user_info.data.card_id === 1">{{ "年卡会员"}} </el-descriptions-item>
             <el-descriptions-item label="会员类型" v-if="user_info.data.card_id === 2">{{ "永久会员"}} </el-descriptions-item>
+            <el-descriptions-item label="会员类型" v-if="user_info.data.card_id === 3">{{ "普通群"}} </el-descriptions-item>
 
             <el-descriptions-item label="头像">
 <!--                <el-link type="primary" :href="user_info.data.icon" target="_blank">{{ user_info.data.icon }}</el-link>-->
@@ -49,7 +49,7 @@
             <el-collapse-item title="活动列表" v-if="Array.isArray(user_info.data.activity_list)">
                 <el-table :data="user_info.data.activity_list" border>
                     <el-table-column label="活动ID" prop="_id"></el-table-column>
-                    <el-table-column label="标题" prop="title"></el-table-column>
+                    <el-table-column label="标题" prop="title" show-overflow-tooltip></el-table-column>
                     <el-table-column label="地址" prop="address" show-overflow-tooltip></el-table-column>
                     <el-table-column label="状态" prop="status" :formatter="format_status"></el-table-column>
                     <el-table-column label="开始时间" prop="start_time" :formatter="format_time"></el-table-column>
@@ -64,7 +64,7 @@
                     <el-table-column label="订单状态" prop="status" :formatter="format_order_status"></el-table-column>
                     <el-table-column label="金额" prop="price"></el-table-column>
                     <el-table-column label="产品ID" prop="product_id"></el-table-column>
-                    <el-table-column label="描述" prop="desc"></el-table-column>
+                    <el-table-column label="描述" prop="desc" show-overflow-tooltip></el-table-column>
                     <el-table-column label="创建时间" prop="create_time" :formatter="format_time"></el-table-column>
                 </el-table>
             </el-collapse-item>
@@ -83,7 +83,7 @@ export default {
     data() {
         return {
             input: {
-                user_id: "10013",
+                user_id: "",
             },
             user_info: {
                 data: null
@@ -200,16 +200,18 @@ export default {
         format_order_status(row, col, value) {
             switch (value) {
                 case 1: {
-                    return "待支付"
+                    return "等待支付"
                 }
                 case 2:
-                    return "已完成"
+                    return "支付完成"
                 case 3:
-                    return "已失败"
+                    return "等待退款"
                 case 4:
-                    return "已退款"
+                    return "已经退款"
                 case 5:
-                    return "已过期"
+                    return "已经过期"
+                case 6:
+                    return "确认收货"
             }
             return "未知类型"
         },

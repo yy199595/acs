@@ -9,7 +9,7 @@
 #include"Util/Crypt/sha1.h"
 #include"Entity/Actor/App.h"
 #include"Proto/Bson/base64.h"
-#include"Util/String/String.h"
+#include"Util/Tools/String.h"
 #include"Mongo/Config/MongoConfig.h"
 #include"Core/Thread/ThreadSync.h"
 #include"Mongo/Client/MongoFactory.h"
@@ -105,11 +105,6 @@ namespace mongo
 	void Client::OnSendMessage(const Asio::Code & code)
 	{
 		this->Connect();
-		if(this->mRequest != nullptr)
-		{
-			LOG_ERROR("send cmd : {}", this->mRequest->ToString());
-		}
-		LOG_ERROR("send code = {}", code.message());
 	}
 
     bool Client::Auth(const std::string &user, const std::string &db, const std::string &pwd)
@@ -224,14 +219,13 @@ namespace mongo
 	void Client::OnReadError(const Asio::Code& code)
 	{
 		this->Connect(3);
-		LOG_WARN("code = {}", code.message());
 	}
 
     void Client::OnReceiveMessage(std::istream & is, size_t size)
 	{
 		if (this->mResponse == nullptr)
 		{
-			this->mResponse = new mongo::Response();
+			this->mResponse = std::make_unique<mongo::Response>();
 		}
 
 		int length = this->mResponse->OnRecvMessage(is, size);
@@ -240,7 +234,7 @@ namespace mongo
 			this->ReadLength(length);
 			return;
 		}
-		this->OnResponse(XCode::Ok, this->mRequest, this->mResponse);
+		this->OnResponse(XCode::Ok, std::move(this->mRequest), std::move(this->mResponse));
 	}
 
 	void Client::OnResponse(int code)
@@ -250,23 +244,19 @@ namespace mongo
 		if (this->mRequest != nullptr)
 		{
 			int id = this->mRequest->header.requestID;
-			this->mResponse = new mongo::Response(id);
-			this->OnResponse(code, this->mRequest, this->mResponse);
+			this->mResponse = std::make_unique<mongo::Response>(id);
+			this->OnResponse(code, std::move(this->mRequest), std::move(this->mResponse));
 		}
-		this->mRequest = nullptr;
-		this->mResponse = nullptr;
 	}
 
-	void Client::OnResponse(int code, Request * request, Response * response)
+	void Client::OnResponse(int code, std::unique_ptr<Request> request, std::unique_ptr<Response> response)
 	{
 		this->StopTimer();
 		this->ClearBuffer();
 		if (this->mComponent == nullptr || request->header.requestID == 0)
 		{
-			delete request;
-			delete response;
-			this->mRequest = nullptr;
-			this->mResponse = nullptr;
+			this->mRequest.reset();
+			this->mResponse.reset();
 			return;
 		}
 		if(response->Document() != nullptr)
@@ -284,29 +274,52 @@ namespace mongo
 		}
 		int id = this->mConfig.Index;
 #ifdef ONLY_MAIN_THREAD
-		this->mComponent->OnMessage(id, request, response);
+		this->mComponent->OnMessage(id, request.release(), response.release());
 #else
-		Asio::Context & t = joke::App::Inst()->GetContext();
-		t.post([this, request, id, response] { this->mComponent->OnMessage(id, request, response); });
+		Asio::Context & t = acs::App::GetContext();
+		t.post([this, req = request.release(), id, resp = response.release()] {
+			this->mComponent->OnMessage(id, req, resp);
+		});
 #endif
-		this->mRequest = nullptr;
-		this->mResponse = nullptr;
 	}
 
 	void Client::SendMongoCommand(std::unique_ptr<Request> request)
 	{
 #ifdef ONLY_MAIN_THREAD
-		this->mRequest = request.release();
-		this->Write(this->mRequest);
+		this->mRequest = std::move(request);
+		this->Write(*this->mRequest);
 #else
 		Asio::Socket& sock = this->mSocket->Get();
 		const Asio::Executor& executor = sock.get_executor();
 		asio::post(executor, [this, data = request.release()]
 		{
-			this->mRequest = data;
-			this->Write(data);
+			this->mRequest.reset(data);
+			this->Write(*data);
 		});
 #endif
+	}
+
+	bool Client::SyncSend(std::unique_ptr<Request> request, mongo::Response& response)
+	{
+		if(!this->SendSync(*request))
+		{
+			return false;
+		}
+		size_t readSize = 0;
+		if(!this->RecvSync(sizeof(Head), readSize))
+		{
+			return false;
+		}
+		std::istream readStream1(&this->mRecvBuffer);
+		{
+			int count = response.OnRecvMessage(readStream1, readSize);
+			if (!this->RecvSync(count, readSize))
+			{
+				return false;
+			}
+			response.OnRecvMessage(readStream1, readSize);
+		}
+		return true;
 	}
 
 	std::unique_ptr<mongo::Response> Client::SyncMongoCommand(std::unique_ptr<Request> request)
@@ -326,7 +339,7 @@ namespace mongo
 
 	std::unique_ptr<Response> Client::SyncSendMongoCommand(std::unique_ptr<Request> request)
 	{
-		if(!this->SendSync(request.get()))
+		if(!this->SendSync(*request))
 		{
 			return nullptr;
 		}
@@ -365,14 +378,13 @@ namespace mongo
 		if(!this->Auth(this->mConfig.User, "admin", this->mConfig.Password))
 		{
 			this->OnResponse(XCode::NetWorkError);
-			LOG_ERROR("auth mongo[%s] failure", this->mConfig.Address);
 			return;
 		}
 		this->ClearSendStream();
 		this->ClearRecvStream();
 		if(this->mRequest != nullptr)
 		{
-			this->Write(this->mRequest);
+			this->Write(*this->mRequest);
 		}
 	}
 

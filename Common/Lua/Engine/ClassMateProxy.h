@@ -1,5 +1,5 @@
 #include "LuaInclude.h"
-
+#include "ValueProxy.h"
 namespace Lua
 {
 	namespace ClassMateProxy

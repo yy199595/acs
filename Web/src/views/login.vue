@@ -78,7 +78,7 @@ const submitForm = async () => {
             localStorage.setItem("user_info", JSON.stringify(response.data.info))
             await router.push('/');
         } else {
-            ElMessage.error(response.data.code)
+            ElMessage.error(response.data.error)
         }
     } catch (e) {
         ElMessage.error("登陆失败,请检查网络")
@@ -92,12 +92,12 @@ tags.clearTags();
 
 <style scoped>
 .login-wrap {
-    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
-    height: 100%;
-    background-size: 35%;
-    background-position: center;
-    background-image: url(../assets/img/login-bg.jpg);
+    height: 100vh;
+    background: url(../assets/img/login-bg.jpg) center/cover no-repeat;
 }
 
 .ms-title {

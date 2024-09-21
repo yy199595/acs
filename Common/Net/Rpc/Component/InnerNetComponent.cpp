@@ -8,7 +8,7 @@
 #include"Server/Component/ThreadComponent.h"
 #include"Server/Config/CodeConfig.h"
 #include"Core/Event/IEvent.h"
-namespace joke
+namespace acs
 {
 
     InnerNetComponent::InnerNetComponent()
@@ -21,7 +21,7 @@ namespace joke
 
     bool InnerNetComponent::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(this->mActComponent = this->mApp->ActorMgr())
+		LOG_CHECK_RET_FALSE(this->mActComponent = this->GetComponent<ActorComponent>())
 		LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<ThreadComponent>())
 		LOG_CHECK_RET_FALSE(this->mDisComponent = this->GetComponent<DispatchComponent>())
 		return true;
@@ -128,7 +128,11 @@ namespace joke
 
     void InnerNetComponent::OnCloseSocket(int id, int code)
 	{
-		this->mClients.Del(id);
+		auto iter = this->mClients.find(id);
+		if(iter != this->mClients.end())
+		{
+			this->mClients.erase(iter);
+		}
 		help::InnerLogoutEvent::Trigger(id);
 		LOG_ERROR("close [server:{}] code = {}", id, CodeConfig::Inst()->GetDesc(code));
 	}
@@ -136,53 +140,49 @@ namespace joke
 	bool InnerNetComponent::OnListen(tcp::Socket * socket)
 	{
 		int id = this->mNumPool.BuildNumber();
-		while (this->mClients.Has(id))
+		std::unique_ptr<rpc::InnerClient> tcpSession = std::make_unique<rpc::InnerClient>(id, this);
 		{
-			id = this->mNumPool.BuildNumber();
-		}
-		rpc::InnerClient* tcpSession = new rpc::InnerClient(id, this);
-		{
-			if (!this->mClients.Add(id, tcpSession))
-			{
-				delete tcpSession;
-				return false;
-			}
 			tcpSession->StartReceive(socket);
+			this->mClients.emplace(id, std::move(tcpSession));
 		}
 		return true;
 	}
 
     void InnerNetComponent::StartClose(int id)
     {
-		rpc::InnerClient * tcpClient;
-		if(this->mClients.Get(id, tcpClient))
+		auto iter = this->mClients.find(id);
+		if(iter != this->mClients.end())
 		{
-			tcpClient->Close();
+			iter->second->Close();
 		}
     }
 
-    bool InnerNetComponent::GetClient(int id, rpc::InnerClient *& tcpClient)
+	rpc::InnerClient * InnerNetComponent::GetClient(int id)
 	{
-		if (this->mClients.Get(id, tcpClient))
+		auto iter = this->mClients.find(id);
+		if(iter != this->mClients.end())
 		{
-			return true;
+			return iter->second.get();
 		}
 		std::string address;
 		if(!this->mActComponent->GetListen(id, "rpc", address))
 		{
-			return false;
+			return nullptr;
 		}
 		tcp::Socket* socketProxy = this->mNetComponent->CreateSocket(address);
 		if (socketProxy == nullptr)
 		{
 			LOG_ERROR("parse address fail : {}", address)
-			return false;
+			return nullptr;
 		}
-		tcpClient = new rpc::InnerClient(id, this);
+		rpc::InnerClient * innerClient = nullptr;
+		std::unique_ptr<rpc::InnerClient> tcpClient = std::make_unique<rpc::InnerClient>(id, this);
 		{
+			innerClient = tcpClient.get();
 			tcpClient->SetSocket(socketProxy);
-			return this->mClients.Add(id, tcpClient);
+			this->mClients.emplace(id, std::move(tcpClient));
 		}
+		return innerClient;
 	}
 
     int InnerNetComponent::Send(int id, rpc::Packet * message)
@@ -203,8 +203,8 @@ namespace joke
 			message->TempHead().Add("t", help::Time::NowMil());
 		}
 #endif
-        rpc::InnerClient * clientSession = nullptr;
-		if(!this->GetClient(id, clientSession))
+        rpc::InnerClient * clientSession = this->GetClient(id);
+		if(clientSession == nullptr)
 		{
 			LOG_ERROR("not find id : {}", id);
 			return XCode::NotFoundServerRpcAddress;
@@ -216,7 +216,7 @@ namespace joke
     {
 		std::unique_ptr<json::w::Value> data = document.AddObject("inner");
 		{
-			data->Add("client", (int)this->mClients.Size());
+			data->Add("client", (int)this->mClients.size());
 		}
     }
 

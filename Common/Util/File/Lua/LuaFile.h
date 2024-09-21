@@ -16,6 +16,12 @@ namespace Lua
 		int GetFileName(lua_State * lua);
 		int GetLastWriteTime(lua_State * lua);
 	};
+
+	namespace LuaDir
+	{
+		int Make(lua_State * lua);
+		int IsExist(lua_State * lua);
+	}
 }
 
 

@@ -8,7 +8,7 @@
 #include "Proto/Component/ProtoComponent.h"
 #include"Cluster/Component/LaunchComponent.h"
 
-namespace joke
+namespace acs
 {
 	int LuaActor::GetPath(lua_State* l)
 	{
@@ -46,7 +46,7 @@ namespace joke
 			luaL_error(l, "decode json fail");
 			return 0;
 		}
-		ActorComponent * actMgr = App::Inst()->ActorMgr();
+		ActorComponent * actMgr = App::ActorMgr();
 		Server * server = actMgr->MakeServer(document);
 		if(server == nullptr)
 		{
@@ -69,7 +69,7 @@ namespace joke
 		}
 		if (!App::Inst()->AddComponent(name))
 		{
-			LaunchComponent* launchComponent = App::Inst()->GetComponent<LaunchComponent>();
+			LaunchComponent* launchComponent = App::Get<LaunchComponent>();
 			if (launchComponent == nullptr)
 			{
 				luaL_error(l, "not find LaunchComponent");
@@ -97,9 +97,16 @@ namespace joke
 		return 1;
 	}
 
+	int LuaActor::Stop(lua_State* l)
+	{
+		CoroutineComponent * coroutine = App::Get<CoroutineComponent>();
+		coroutine->Start(&App::Stop, App::Inst());
+		return 0;
+	}
+
 	int LuaActor::Send(lua_State* lua)
 	{
-		ActorComponent* actComponent = App::Inst()->ActorMgr();
+		ActorComponent* actComponent = App::ActorMgr();
 		if (actComponent == nullptr)
 		{
 			luaL_error(lua, "not find ActorComponent");
@@ -134,7 +141,7 @@ namespace joke
 	int LuaActor::Call(lua_State* lua)
 	{
         lua_pushthread(lua);
-		ActorComponent* actComponent = App::Inst()->ActorMgr();
+		ActorComponent* actComponent = App::ActorMgr();
 		if (actComponent == nullptr)
 		{
 			luaL_error(lua, "not find ActorComponent");
@@ -171,10 +178,41 @@ namespace joke
 		return targetActor->LuaCall(lua, std::move(message));
 	}
 
+	int LuaActor::Publish(lua_State* lua)
+	{
+		ActorComponent* actComponent = App::ActorMgr();
+		if (actComponent == nullptr)
+		{
+			luaL_error(lua, "not find ActorComponent");
+			return 0;
+		}
+
+		Actor* targetActor = App::Inst();
+		if(lua_isnumber(lua, 1))
+		{
+			long long actorId = luaL_checkinteger(lua, 1);
+			targetActor = actComponent->GetActor(actorId);
+			if (targetActor == nullptr)
+			{
+				LOG_ERROR("not find actor:{}", actorId);
+				return LuaActor::LuaPushCode(lua, XCode::NotFoundActor);
+			}
+		}
+		std::unique_ptr<rpc::Packet> message;
+		std::string channel(luaL_checkstring(lua, 2));
+		const std::string func("EventSystem.Publish");
+		int code = targetActor->MakeMessage(lua, 3, func, message);
+		if (code != XCode::Ok)
+		{
+			return LuaActor::LuaPushCode(lua, code);
+		}
+		message->GetHead().Add("channel", channel);
+		return targetActor->LuaSend(lua, std::move(message));
+	}
+
 	int LuaActor::GetConfig(lua_State* lua)
 	{
-		const ServerConfig* config = ServerConfig::Inst();
-		const std::string json = config->ToString();
+		const std::string json = ServerConfig::Inst()->ToString();
 		if (!lua::yyjson::write(lua, json.c_str(), json.size()))
 		{
 			return 0;
@@ -192,7 +230,7 @@ namespace joke
 
 	int LuaActor::GetServers(lua_State* lua)
 	{
-		ActorComponent* actComponent = App::Inst()->ActorMgr();
+		ActorComponent* actComponent = App::ActorMgr();
 		if (actComponent == nullptr)
 		{
 			luaL_error(lua, "not find ActorComponent");
@@ -235,7 +273,7 @@ namespace joke
 			return 0;
 		}
 		Server* targetServer = nullptr;
-		ActorComponent* actorComponent = App::Inst()->ActorMgr();
+		ActorComponent* actorComponent = App::ActorMgr();
 
 		if (lua_isinteger(lua, 2))
 		{
@@ -264,7 +302,7 @@ namespace joke
 		std::string address;
 		long long id = luaL_checkinteger(lua, 1);
 		const std::string name(luaL_checkstring(lua, 2));
-		Server* server = App::Inst()->ActorMgr()->GetServer(id);
+		Server* server = App::ActorMgr()->GetServer(id);
 		if (server == nullptr)
 		{
 			LOG_ERROR("not find server : {}", id);
@@ -281,7 +319,7 @@ namespace joke
 	int LuaPlayer::AddAddr(lua_State* lua)
 	{
 		long long playerId = luaL_checkinteger(lua, 1);
-		Player* player = App::Inst()->ActorMgr()->GetPlayer(playerId);
+		Player* player = App::ActorMgr()->GetPlayer(playerId);
 		if (player == nullptr)
 		{
 			luaL_error(lua, "not find player:{}", playerId);

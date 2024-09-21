@@ -2,7 +2,7 @@
 #include"TaskContext.h"
 #include"Entity/Actor/App.h"
 
-namespace joke
+namespace acs
 {
 	TaskContextPool::~TaskContextPool()
 	{
@@ -81,12 +81,12 @@ namespace joke
 	}
 }
 
-namespace joke
+namespace acs
 {
 	CoroutineGroup::CoroutineGroup()
 	{
         this->mCoroutineId = 0;
-        this->mCorComponent = App::Inst()->Coroutine();
+        this->mCorComponent = App::Coroutine();
 	}
 
     CoroutineGroup::~CoroutineGroup()

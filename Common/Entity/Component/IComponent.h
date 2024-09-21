@@ -8,7 +8,7 @@ namespace Lua
     class ModuleClass;
 }
 
-namespace joke
+namespace acs
 {
 	class Component;
 	class IStart
@@ -60,6 +60,12 @@ namespace joke
 		virtual void OnSecondUpdate(int tick) = 0;
 	};
 
+	class ISystemNewDay
+	{
+	public:
+		virtual void OnNewDay() = 0;
+	};
+
 	class ICoroutineSecond
 	{
 	public:
@@ -89,6 +95,14 @@ namespace joke
 	{
 	public:
 		virtual int Invoke(const std::string&, const T1 &, T2 &) = 0;
+	};
+
+	template<typename C, typename T1, typename T2>
+	class IRequest
+	{
+	public:
+		virtual int OnRequest(const C & c, const T1 & t1) { return 0; }
+		virtual void OnRequestDone(const C & c, const T1 & t1, const T2 & t2) { }
 	};
 
 	template<typename T1, typename T2>

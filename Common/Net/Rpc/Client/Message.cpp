@@ -5,7 +5,7 @@
 #include"Message.h"
 #include"Proto/Include/Message.h"
 #include"Yyjson/Document/Document.h"
-#include"Util/String/String.h"
+#include"Util/Tools/String.h"
 namespace rpc
 {
 
@@ -150,6 +150,12 @@ namespace rpc
     {
         this->mBody = content;
     }
+
+	void Packet::SetContent(char proto, const std::string& content)
+	{
+		this->mBody = content;
+		this->mProtoHead.Porto = proto;
+	}
 
     std::unique_ptr<Packet> Packet::Clone() const
     {

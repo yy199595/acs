@@ -4,7 +4,7 @@
 #include"Config/Base/JsonConfig.h"
 #include"Core/Singleton/Singleton.h"
 
-namespace joke
+namespace acs
 {
 	class ServerConfig : public JsonConfig, public ConstSingleton<ServerConfig>
     {
@@ -15,8 +15,6 @@ namespace joke
 		bool OnReLoadJson() final;
 		bool OnLoadText(const char *str, size_t length) final;
 		bool OnReloadText(const char *str, size_t length) final;
-	private:
-		static void Append(json::w::Value & document, json::r::Value & doc);
 	public:
 		const std::string& Name() const { return this->mName; } //服务器名字
 		bool GetPath(const std::string & name, std::string & path) const;

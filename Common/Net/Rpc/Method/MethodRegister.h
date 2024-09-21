@@ -9,7 +9,7 @@
 #include"Lua/Engine/Define.h"
 #include"Http/Method/HttpServiceMethod.h"
 #include"Entity/Component/Component.h"
-namespace joke
+namespace acs
 {
 	class ServiceMethodRegister
 	{
@@ -94,6 +94,20 @@ namespace joke
 			return this->AddMethod(std::make_unique<ServiceMethod7<T>>(name, component, func, key));
 		}
 
+		template<typename T>
+		bool Bind(std::string name, ServiceMethodType8<T> func, const std::string key)
+		{
+			T* component = this->mComponent->Cast<T>();
+			return this->AddMethod(std::make_unique<ServiceMethod8<T>>(name, component, func, key));
+		}
+
+		template<typename T>
+		bool Bind(std::string name, ServiceMethodType9<T> func, const std::string key)
+		{
+			T* component = this->mComponent->Cast<T>();
+			return this->AddMethod(std::make_unique<ServiceMethod9<T>>(name, component, func, key));
+		}
+
 		template<typename T, typename T1>
 		bool Bind(std::string name, ServiceMethodType34<T, T1> func, const std::string key)
 		{
@@ -110,7 +124,7 @@ namespace joke
 	};
 }
 
-namespace joke
+namespace acs
 {
 	class HttpServiceRegister
 	{

@@ -7,9 +7,10 @@
 #include "Core/System/System.h"
 #include "Lua/Engine/ModuleClass.h"
 #include "Log/Lua/LuaLogger.h"
-#include "Util/Time/TimeHelper.h"
+#include "Util/Tools/TimeHelper.h"
 #include "Log/Output/FileOutput.h"
 #include "Log/Output/ShowOutput.h"
+#include "Log/Output/WeChatOutput.h"
 #include "Log/Output/MongoOutput.h"
 #include "Config/Base/LangConfig.h"
 #ifdef __ENABLE_DING_DING_PUSH
@@ -20,17 +21,14 @@
 #include "Http/Component/GroupNotifyComponent.h"
 #include "Server/Component/ThreadComponent.h"
 
-namespace joke
+namespace acs
 {
 	LoggerComponent::LoggerComponent()
 	{
-		this->mLogPath = "./log";
-		this->mNotify = nullptr;
-		this->mMainLogger = nullptr;
-		this->mLogLevel = custom::LogLevel::Debug;
+		this->mThread = nullptr;
 	}
 
-	LoggerComponent::~LoggerComponent() noexcept
+	LoggerComponent::~LoggerComponent()
 	{
 		this->mLoggers.clear();
 	}
@@ -38,63 +36,54 @@ namespace joke
 	bool LoggerComponent::Awake()
 	{
 		std::string name;
-		System::GetEnv("name", name);
-		this->mLogLevel = custom::LogLevel::Debug;
-		std::unique_ptr<json::r::Value> jsonObject;
+		os::System::GetEnv("name", name);
+		std::unique_ptr<json::r::Value> jsonArray;
 		this->mThread = this->GetComponent<ThreadComponent>();
-		if (this->mApp->Config().Get("log", jsonObject))
+		if (this->mApp->Config().Get("log", jsonArray))
 		{
-			int level = 0;
-			if (jsonObject->Get("level", level))
+			for(size_t  index = 0; index < jsonArray->MemberCount(); index++)
 			{
-				this->mLogLevel = (custom::LogLevel)level;
+				std::unique_ptr<json::r::Value> jsonObject;
+				if (!jsonArray->Get(index, jsonObject))
+				{
+					return false;
+				}
+				int level = 0;
+				custom::LogConfig config;
+				config.max_line = 1024 * 10;
+				config.max_line = 1024 * 1024;
+				LOG_CHECK_RET_FALSE(jsonObject->Get("level", level));
+				LOG_CHECK_RET_FALSE(jsonObject->Get("name", config.name))
+
+				config.level = (custom::LogLevel)level;
+				jsonObject->Get("wx", config.wx);
+				jsonObject->Get("open", config.open);
+				jsonObject->Get("ding", config.ding);
+
+				jsonObject->Get("pem", config.pem);
+				jsonObject->Get("path", config.path);
+				jsonObject->Get("mongo", config.mongo);
+				jsonObject->Get("max_size", config.max_size);
+				jsonObject->Get("max_line", config.max_line);
+
+				this->mConfig.emplace_back(config);
 			}
-			jsonObject->Get("path", this->mLogPath);
-			jsonObject->Get("max_size", this->mConf.MaxSize);
-			jsonObject->Get("max_line", this->mConf.MaxLine);
 		}
-		int id = this->mApp->GetSrvId();
-		this->mLogName = fmt::format("{}-{}", name, id);
-		this->mMainLogger = this->GetLogger(this->mLogName);
-		if (!this->mMainLogger->Start())
+
+		for(const custom::LogConfig & config : this->mConfig)
 		{
-			return false;
+			if(config.open && !this->Create(config))
+			{
+				return false;
+			}
 		}
-		this->mMainLogger->SetLevel(this->mLogLevel);
-#ifndef __DEBUG__
-		LOG_CHECK_RET_FALSE(LangConfig::Inst()->Get("time", this->mLangText.time))
-		LOG_CHECK_RET_FALSE(LangConfig::Inst()->Get("file", this->mLangText.file))
-		LOG_CHECK_RET_FALSE(LangConfig::Inst()->Get("info", this->mLangText.info))
-		LOG_CHECK_RET_FALSE(LangConfig::Inst()->Get("fatal", this->mLangText.fatal))
-		LOG_CHECK_RET_FALSE(LangConfig::Inst()->Get("debug", this->mLangText.debug))
-		LOG_CHECK_RET_FALSE(LangConfig::Inst()->Get("level", this->mLangText.level))
-		LOG_CHECK_RET_FALSE(LangConfig::Inst()->Get("error", this->mLangText.error))
-		LOG_CHECK_RET_FALSE(LangConfig::Inst()->Get("warn", this->mLangText.warning))
-		LOG_CHECK_RET_FALSE(LangConfig::Inst()->Get("content", this->mLangText.content))
-		LOG_CHECK_RET_FALSE(LangConfig::Inst()->Get("server_log_notify", this->mLangText.title))
-#endif
 		return true;
 	}
 
-	bool LoggerComponent::LateAwake()
-	{
-		this->mNotify = this->GetComponent<GroupNotifyComponent>();
-		return true;
-	}
-
-	void LoggerComponent::OnLuaRegister(Lua::ModuleClass &luaRegister)
+	void LoggerComponent::OnLuaRegister(Lua::ModuleClass& luaRegister)
 	{
 		luaRegister.AddFunction("Output", Lua::Log::Output);
 		luaRegister.AddFunction("Show", Lua::Console::Show).End("util.logger");
-	}
-
-	void LoggerComponent::OnRecord(json::w::Document &document)
-	{
-		std::unique_ptr<json::w::Value> data = document.AddObject("log");
-		{
-			data->Add("level", (int)this->mLogLevel);
-			data->Add("count", this->mLoggers.size());
-		}
 	}
 
 	void LoggerComponent::OnDestroy()
@@ -104,12 +93,16 @@ namespace joke
 
 	void LoggerComponent::Flush()
 	{
-		this->mMainLogger->Flush();
-	}
-
-	void LoggerComponent::SetLogLevel(custom::LogLevel level)
-	{
-		this->mLogLevel = level;
+		auto iter1 = this->mLoggers.begin();
+		for (; iter1 != this->mLoggers.end(); iter1++)
+		{
+			iter1->second->Flush();
+		}
+		auto iter = this->mLevelLoggers.begin();
+		for (; iter != this->mLevelLoggers.end(); iter++)
+		{
+			iter->second->Flush();
+		}
 	}
 
 	void LoggerComponent::DropAllLog()
@@ -119,14 +112,18 @@ namespace joke
 		{
 			iter->second->Close();
 		}
+		auto iter1 = this->mLevelLoggers.begin();
+		for (; iter1 != this->mLevelLoggers.end(); iter1++)
+		{
+			iter1->second->Close();
+		}
 	}
 
-	void LoggerComponent::Flush(const std::string &name)
+	void LoggerComponent::Flush(const std::string& name)
 	{
-		custom::Logger *logger = nullptr;
 		std::lock_guard<std::mutex> lock(this->mMutex);
 		auto iter = this->mLoggers.find(name);
-		if(iter != this->mLoggers.end())
+		if (iter != this->mLoggers.end())
 		{
 			iter->second->Flush();
 		}
@@ -135,50 +132,15 @@ namespace joke
 	void LoggerComponent::PushLog(std::unique_ptr<custom::LogInfo> log)
 	{
 		assert(this->mApp->IsMainThread());
-		if (log->Level >= this->mLogLevel)
+		custom::Logger* logger = this->GetLogger(log->Level);
+		if (logger != nullptr)
 		{
-#ifndef __DEBUG__
-			if(this->mNotify != nullptr && log->Level >= custom::LogLevel::Error)
-			{
-				std::string value;
-				notify::Markdown markdownInfo;
-				markdownInfo.title = this->mLangText.title;
-				switch (log->Level)
-				{
-					case custom::LogLevel::Debug:
-						value = this->mLangText.debug;
-						break;
-					case custom::LogLevel::Info:
-						value = this->mLangText.info;
-						break;
-					case custom::LogLevel::Warn:
-						value = this->mLangText.warning;
-						break;
-					case custom::LogLevel::Error:
-						value = this->mLangText.error;
-						break;
-					case custom::LogLevel::Fatal:
-						value = this->mLangText.fatal;
-						break;
-				}
-				markdownInfo.data.emplace_back(this->mLangText.level, value);
-				markdownInfo.data.emplace_back(this->mLangText.time, help::Time::GetDateString());
-				markdownInfo.data.emplace_back(this->mLangText.file, log->File);
-				if (!log->Stack.empty())
-				{
-					markdownInfo.data.emplace_back(this->mLangText.trace, log->Stack);
-				}
-				markdownInfo.data.emplace_back(this->mLangText.content, log->Content);
-				this->mNotify->SendToWeChat(markdownInfo);
-			}
-#endif
-			this->mMainLogger->Push(std::move(log));
+			logger->Push(std::move(log));
 		}
 	}
 
 	void LoggerComponent::PushLog(const std::string &name, std::unique_ptr<custom::LogInfo> logInfo)
 	{
-		custom::Logger *logger = nullptr;
 		std::lock_guard<std::mutex> lock(this->mMutex);
 		auto iter = this->mLoggers.find(name);
 		if(iter != this->mLoggers.end())
@@ -196,21 +158,46 @@ namespace joke
 	{
 		std::lock_guard<std::mutex> lock(this->mMutex);
 		auto iter = this->mLoggers.find(name);
-		if(iter != this->mLoggers.end())
+		return iter != this->mLoggers.end() ? iter->second : nullptr;
+	}
+
+	custom::Logger* LoggerComponent::GetLogger(custom::LogLevel logLevel)
+	{
+		std::lock_guard<std::mutex> lock(this->mMutex);
+		auto iter = this->mLevelLoggers.find(logLevel);
+		return iter != this->mLevelLoggers.end() ? iter->second : nullptr;
+	}
+
+	bool LoggerComponent::Create(const custom::LogConfig & config)
+	{
+		custom::Logger * logger = new custom::Logger(config.name, this->mThread->GetContext());
 		{
-			return iter->second.get();
+			if (!config.path.empty())
+			{
+				custom::FileConfig fileConfig;
+				fileConfig.Name = config.name;
+				fileConfig.MaxLine = config.max_line;
+				fileConfig.MaxSize = config.max_size;
+				const std::string & server = this->mApp->Name();
+				fileConfig.Root = fmt::format("{}/{}",config.path, server) ;
+				logger->AddOutput<custom::FileOutput>(fileConfig);
+			}
+			if (!config.wx.empty() && !config.pem.empty())
+			{
+				logger->AddOutput<custom::WeChatOutput>(config.wx, config.pem);
+			}
+			mongo::MongoConfig mongoConfig;
+			if (!config.mongo.empty() && mongoConfig.FromString(config.mongo))
+			{
+				logger->AddOutput<custom::MongoOutput>(mongoConfig);
+			}
 		}
-		custom::Logger * result = nullptr;
-		custom::FileConfig fileConfig = this->mConf;
-		std::unique_ptr<custom::Logger> logger = std::make_unique<custom::Logger>(name, this->mThread->GetContext());
+		if (!logger->Start())
 		{
-			result = logger.get();
-			fileConfig.Name = name;
-			fileConfig.Root = this->mLogPath;
-			fileConfig.Server = this->mApp->Name();
-			logger->AddOutput<custom::FileOutput>(fileConfig);
+			return false;
 		}
-		this->mLoggers.emplace(name, std::move(logger));
-		return result;
+		this->mLoggers.emplace(config.name, logger);
+		this->mLevelLoggers.emplace(config.level, logger);
+		return true;
 	}
 }

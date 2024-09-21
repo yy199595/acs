@@ -4,7 +4,7 @@
 
 #include"OuterClient.h"
 #include"XCode/XCode.h"
-#include"Util/Time/TimeHelper.h"
+#include"Util/Tools/TimeHelper.h"
 #include"Entity/Actor/App.h"
 #include"Gate/Component/OuterNetComponent.h"
 
@@ -51,7 +51,7 @@ namespace rpc
 		long long nowTime = help::Time::NowSec();
 		if(nowTime - this->mLastRecvTime >= 30)
 		{
-			Asio::Context & t = joke::App::Inst()->GetContext();
+			Asio::Context & t = acs::App::GetContext();
 			t.post([this] { this->mComponent->OnTimeout(this->mSockId); });
 			return;
 		}
@@ -125,7 +125,7 @@ namespace rpc
 #ifdef ONLY_MAIN_THREAD
 		this->mComponent->OnMessage(request, nullptr);
 #else
-		Asio::Context & t = joke::App::Inst()->GetContext();
+		Asio::Context & t = acs::App::GetContext();
 		t.post([this, request] { this->mComponent->OnMessage(request, nullptr); });
 #endif
 		this->mDecodeState = tcp::Decode::None;
@@ -135,26 +135,33 @@ namespace rpc
 
     void OuterClient::CloseSocket(int code)
 	{
-		if(this->mSocket == nullptr)
+		if(this->mSockId == 0)
 		{
 			return;
 		}
 		this->StopTimer();
 		this->mSocket->Close();
+		int sockId = this->mSockId;
 		rpc::Packet * message = nullptr;
 		while(this->mSendMessages.Pop(message))
 		{
 			delete message;
 			message = nullptr;
 		}
+		this->mSockId = 0;
 		this->ClearSendStream();
 		this->ClearRecvStream();
+		Asio::Socket & socket1 = this->mSocket->Get();
+		asio::post(socket1.get_executor(), [this, code, sockId]()
+		{
 #ifdef ONLY_MAIN_THREAD
-		this->mComponent->OnCloseSocket(this->mSockId, code);
+			this->mComponent->OnCloseSocket(sockId, code);
 #else
-		Asio::Context & t = joke::App::Inst()->GetContext();
-		t.post([this, code] { this->mComponent->OnCloseSocket(this->mSockId, code); });
+			Asio::Context & t = acs::App::GetContext();
+			t.post([this, code, sockId] { this->mComponent->OnCloseSocket(sockId, code); });
 #endif
+		});
+
 	}
 
 	void OuterClient::OnSendMessage()
@@ -167,7 +174,7 @@ namespace rpc
 		}
 		if(this->mSendMessages.Front(message))
 		{
-			this->Write(message);
+			this->Write(*message);
 		}
 	}
 
@@ -189,7 +196,7 @@ namespace rpc
 		}
 		LOG_CHECK_RET_FALSE(message);
 #ifdef ONLY_MAIN_THREAD
-		this->Write(message);
+		this->Write(*message);
 #else
 		Asio::Socket & sock = this->mSocket->Get();
 		const Asio::Executor & executor = sock.get_executor();
@@ -198,7 +205,7 @@ namespace rpc
 			this->mSendMessages.Push(message);
 			if(this->mSendMessages.Size() == 1)
 			{
-				this->Write(message);
+				this->Write(*message);
 			}
 		});
 #endif

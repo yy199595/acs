@@ -6,7 +6,7 @@
 #include"Gate/Client/OuterClient.h"
 #include"Server/Config/CodeConfig.h"
 
-#include"Gate/Service/Gate.h"
+#include"Gate/Service/GateSystem.h"
 #include"Entity/Actor/App.h"
 #include"Entity/Actor/Player.h"
 #include"Server/Component/ThreadComponent.h"
@@ -14,7 +14,7 @@
 #include"Core/Event/IEvent.h"
 #include"Rpc/Component/DispatchComponent.h"
 
-namespace joke
+namespace acs
 {
 	OuterNetComponent::OuterNetComponent()
 	{
@@ -29,10 +29,10 @@ namespace joke
 		const ServerConfig & config = this->mApp->Config();
 		this->mActComponent = this->GetComponent<ActorComponent>();
 		this->mNetComponent = this->GetComponent<ThreadComponent>();
-		std::unique_ptr<json::r::Value> jsonObejct;
-		if(config.Get("connect", jsonObejct))
+		std::unique_ptr<json::r::Value> jsonObject;
+		if(config.Get("connect", jsonObject))
 		{
-			jsonObejct->Get("outer", this->mMaxConnectCount);
+			jsonObject->Get("outer", this->mMaxConnectCount);
 		}
 		return true;
 	}
@@ -188,7 +188,7 @@ namespace joke
 			return XCode::SendMessageFail;
 		}
 		message->SetRpcId(this->mNumPool.BuildNumber());
-		return tcpClient && tcpClient->Send(message) ? XCode::Ok : XCode::NetWorkError;
+		return tcpClient->Send(message) ? XCode::Ok : XCode::NetWorkError;
 	}
 
 	bool OuterNetComponent::Send(int id, rpc::Packet * message)

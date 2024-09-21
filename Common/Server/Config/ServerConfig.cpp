@@ -5,7 +5,7 @@
 #include"Log/Common/CommonLogDef.h"
 #include"Util/File/DirectoryHelper.h"
 
-namespace joke
+namespace acs
 {
 	ServerConfig::ServerConfig()
 		: JsonConfig("ServerConfig")
@@ -38,19 +38,21 @@ namespace joke
 			{
 				std::string content;
 				json::r::Document document1;
-				if(System::ReadFile(fmt::format("{}/{}", directory, file), content))
+				std::string p = directory + file;
+				if (!os::System::ReadFile(p, content))
 				{
-					if(!document1.Decode(content))
-					{
-						return false;
-					}
-					ServerConfig::Append(jsonDocument, document1);
+					return false;
 				}
+				if (!document1.Decode(content))
+				{
+					return false;
+				}
+				json::Merge(jsonDocument, document1);
 				index++;
 			}
 		}
 		std::string json;
-		this->Append(jsonDocument, mainDocument);
+		json::Merge(jsonDocument, mainDocument);
 		if(jsonDocument.Encode(&json, true) && this->Decode(json))
 		{
 			//printf("%s\n", json.c_str());
@@ -62,22 +64,6 @@ namespace joke
 	bool ServerConfig::OnReloadText(const char* str, size_t length)
 	{
 		return true;
-	}
-
-	void ServerConfig::Append(json::w::Value& target, json::r::Value& source)
-	{
-		std::vector<const char *> keys;
-		if(source.GetKeys(keys) > 0)
-		{
-			for(const char * key : keys)
-			{
-				std::unique_ptr<json::r::Value> jsonValue;
-				if(source.Get(key, jsonValue))
-				{
-					target.Add(key, jsonValue->GetValue());
-				}
-			}
-		}
 	}
 
 	bool ServerConfig::OnLoadJson()
@@ -108,15 +94,15 @@ namespace joke
 				std::unique_ptr<json::r::Value> value;
 				for (const char* k: keys)
 				{
-					if (!jsonObject->Get(k, value))
+					std::string path;
+					if (jsonObject->Get(k, path))
 					{
-						return false;
+						this->mPaths.emplace(k, path);
 					}
-					this->mPaths.emplace(k, value->ToString());
 				}
 			}
 		}
-		System::SetEnv("name", this->mName);
+		os::System::SetEnv("name", this->mName);
 		return true;
 	}
 

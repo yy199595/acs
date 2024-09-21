@@ -2,7 +2,7 @@
     <div>
         <div class="container">
             <el-form inline="inline">
-                <el-form-item>
+                <el-form-item label="方法">
                     <el-select style='width: 250px' v-model="query.type" placeholder="选择类型">
                         <el-option v-for="item in HttpTypeArray" :key="item.type" :label="item.name"
                                    :value="item.type"/>
@@ -50,31 +50,30 @@
 
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" v-model="look_info.show" width="30%">
-            <el-form label-width="70px">
-                <el-form-item label="环境" label-width="100px">
+            <el-descriptions border column="1">
+                <el-descriptions-item label="环境">
                     <el-input v-model="look_info.conf.host" @input="on_input_change"></el-input>
-                </el-form-item>
-                <el-form-item label="Token" label-width="100px">
+                </el-descriptions-item>
+                <el-descriptions-item label="Authorization">
                     <el-input v-model="look_info.conf.token"></el-input>
-                </el-form-item>
-                <el-form-item label="url" label-width="100px">
+                </el-descriptions-item>
+                <el-descriptions-item label="url">
                     <el-input v-model="look_info.url" :disabled="true"></el-input>
-                </el-form-item>
-                <el-form-item label="Content-Type" label-width="100px" v-if="look_info.data.content.length > 0">
+                </el-descriptions-item >
+                <el-descriptions-item label="Content-Type" v-show="look_info.data.content.length > 0">
                     <el-input disabled v-model="look_info.data.content"></el-input>
-                </el-form-item>
-
-                <el-form-item label="请求" label-width="100px" v-if="look_info.data.request.length > 0">
-                    <el-input v-model="look_info.data.request" type="textarea" :rows='10'></el-input>
-                </el-form-item>
-                <el-form-item label="耗时" label-width="100px" v-if="look_info.ms > 0">
+                </el-descriptions-item>
+                <el-descriptions-item label="请求" v-show="look_info.data.request.length > 0">
+                    <el-input v-model="look_info.data.request" type="textarea" :rows='row.request'></el-input>
+                </el-descriptions-item>
+                <el-descriptions-item label="耗时" label-width="100px" v-show="look_info.ms > 0">
                     {{look_info.ms + "ms"}}
-                </el-form-item>
-                <el-form-item label="响应" label-width="100px" v-if="look_info.response != null">
-                   <el-input v-model="look_info.response" type="textarea" :rows="10"></el-input>
-                </el-form-item>
+                </el-descriptions-item>
+                <el-descriptions-item label="响应" label-width="100px" v-show="look_info.response != null" :key="row.index">
+                    <el-input v-model="look_info.response" type="textarea" :rows="row.response"></el-input>
+                </el-descriptions-item>
+            </el-descriptions>
 
-            </el-form>
             <template #footer>
 				<span class="dialog-footer">
 					<el-button type="primary" @click="on_btn_invoke">调用</el-button>
@@ -124,6 +123,11 @@ export default {
                 },
             ],
             tableData: [],
+            row : {
+                request : 1,
+                response : 1,
+                index : 0,
+            },
             look_info : {
                 show : false,
                 data : null,
@@ -176,7 +180,7 @@ export default {
             }
             if (this.look_info.conf.token.length > 0) {
                 config.headers = {
-                    "Access-Token": this.look_info.conf.token
+                    "Authorization": this.look_info.conf.token
                 }
             }
             try {
@@ -188,19 +192,27 @@ export default {
                 }
                 const t2 = new Date().getTime()
                 this.look_info.ms = t2 - t1
-                this.look_info.response = JSON.stringify({
+                const text = JSON.stringify({
                     code : response.status,
                     text : response.statusText,
                     headers : response.headers,
                     data : response.data
                 }, null, 4)
+
+                this.row.response = text.split("\n").length;
+                this.look_info.response = text;
+                this.row.index++
             }
             catch (e) {
-                this.look_info.response = JSON.stringify({
+                const text = JSON.stringify({
                     code : e.response.status,
                     text : e.response.statusText,
                     headers : e.response.headers,
                 }, null, 4)
+
+                this.row.response = text.split("\n").length;
+                this.look_info.response = text;
+                this.row.index++
             }
 
 
@@ -216,6 +228,7 @@ export default {
             {
                 const obj = JSON.parse(this.look_info.data.request)
                 this.look_info.data.request = JSON.stringify(obj, null, 2)
+                this.row.request = this.look_info.data.request.split("\n").length;
             }
             const conf = localStorage.getItem("api_conf")
             if(conf)
@@ -238,8 +251,10 @@ export default {
                     return "VIP";
                 case 10:
                     return "领队";
+                case 20:
+                    return "普通管理员"
                 case 100:
-                    return "管理员"
+                    return "超级管理员"
             }
             return "未知"
         }

@@ -3,7 +3,7 @@
 //
 
 #include"Log.h"
-namespace joke
+namespace acs
 {
 	bool Log::OnInit()
 	{

@@ -5,6 +5,7 @@
 #ifndef APP_CONFIG_H
 #define APP_CONFIG_H
 #include<string>
+#include<unordered_set>
 namespace http
 {
 	struct Config
@@ -14,6 +15,7 @@ namespace http
 		std::string Index;
 		std::string Upload;
 		std::string Domain;
+        std::unordered_set<std::string> WhiteList;
 	};
 }
 #endif //APP_CONFIG_H

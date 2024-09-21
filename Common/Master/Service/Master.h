@@ -9,7 +9,7 @@
 #include"Message/s2s/registry.pb.h"
 #include"Http/Service/HttpService.h"
 #include"Async/Coroutine/CoroutineLock.h"
-namespace joke
+namespace acs
 {
 	//服务器注册服务
 	class Master : public HttpService, public ISecondUpdate
@@ -21,9 +21,9 @@ namespace joke
 		void OnSecondUpdate(int tick) final;
 	 private:
 		void OnDisConnect(int id);
-		int Del(const http::FromData & request, json::w::Value & res);
+		int Del(const http::FromContent & request, json::w::Value & res);
 		int Push(const json::r::Document & request, json::w::Value & res);
-		int Find(const http::FromData & request, json::w::Document & response);
+		int Find(const http::FromContent & request, json::w::Document & response);
 	private:
 		std::string mToken;
 		class RedisComponent * mRedis;

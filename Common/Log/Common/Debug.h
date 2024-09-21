@@ -13,6 +13,9 @@
 
 namespace Debug
 {
+#ifdef __OS_WIN__
+	extern bool Init();
+#endif
 	extern void LuaError(const char * str);
 	extern int Backtrace(std::string & trace);
 	extern void Console(const custom::LogInfo & log);

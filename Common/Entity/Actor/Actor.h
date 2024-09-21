@@ -7,7 +7,7 @@
 #include"Entity/Unit/Entity.h"
 #include"Rpc/Client/Message.h"
 struct lua_State;
-namespace joke
+namespace acs
 {
 	class Actor : public Entity
 	{
@@ -24,6 +24,10 @@ namespace joke
 		int Call(const std::string & func, pb::Message * response);
 		int Call(const std::string & func, const pb::Message & request);
 		int Call(const std::string & func, const pb::Message & request, pb::Message * response);
+	public:
+		int Publish(const std::string & event);
+		int Publish(const std::string & event, json::w::Document & document);
+		int Publish(const std::string & event, char proto, const std::string & data);
 	public:
 		int LuaSend(lua_State * lua, std::unique_ptr<rpc::Packet>);
 		int LuaCall(lua_State * lua, std::unique_ptr<rpc::Packet>);

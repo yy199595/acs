@@ -102,4 +102,23 @@ namespace Lua
 		lua_pushinteger(lua, time);
 		return 1;
 	}
+
+	int LuaDir::Make(lua_State* lua)
+	{
+		std::string dir(luaL_checkstring(lua, 1));
+		if(help::dir::DirectorIsExist(dir))
+		{
+			lua_pushboolean(lua, true);
+			return 1;
+		}
+		lua_pushboolean(lua, help::dir::MakeDir(dir));
+		return 1;
+	}
+
+	int LuaDir::IsExist(lua_State* lua)
+	{
+		std::string dir(luaL_checkstring(lua, 1));
+		lua_pushboolean(lua, help::dir::DirectorIsExist(dir));
+		return 1;
+	}
 }

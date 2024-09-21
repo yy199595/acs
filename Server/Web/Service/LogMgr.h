@@ -6,7 +6,7 @@
 #define APP_LOGMGR_H
 #include"Http/Service/HttpService.h"
 
-namespace joke
+namespace acs
 {
 	class LogMgr : public HttpService
 	{
@@ -16,10 +16,11 @@ namespace joke
 		bool Awake() final;
 		bool OnInit() final;
 	private:
-		int Look(const http::FromData & request,  http::Response & response);
-		int List(const http::FromData & request,  http::Response & response);
-		int Delete(const http::FromData & request, json::w::Value & response);
-		int SetLevel(const http::FromData & request, json::w::Value & response);
+		int Html(const http::FromContent& request, http::Response& response);
+		int Look(const http::FromContent& request, http::Response& response);
+		int List(const http::FromContent & request,  http::Response & response);
+		int Delete(const http::FromContent & request, json::w::Value & response);
+		int SetLevel(const http::FromContent & request, json::w::Value & response);
 	private:
 		std::string mLogDir;
 	};

@@ -3,7 +3,7 @@
 #include <functional>
 #include <type_traits>
 
-namespace joke
+namespace acs
 {
 
 	class StaticMethod

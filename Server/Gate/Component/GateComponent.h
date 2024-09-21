@@ -6,7 +6,7 @@
 #define APP_GATECOMPONENT_H
 #include"Proto/Include/Message.h"
 #include"Entity/Component/Component.h"
-namespace joke
+namespace acs
 {
 	class GateComponent final : public Component
 	{

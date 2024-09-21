@@ -3,12 +3,11 @@
 
 #include<cstring>
 #include<typeinfo>
-#include"LuaParameter.h"
 #include"CtorFunction.h"
 #include"ClassMateProxy.h"
 #include"MemberFuncProxy.h"
 #include"StaticFuncProxy.h"
-
+#include "ValueProxy.h"
 namespace Lua
 {
 	class ClassProxyHelper
@@ -30,6 +29,9 @@ namespace Lua
 
 		template<typename T>
 		void PushMember(const char * name, const T & value);
+
+		template<typename T, typename V>
+		void PushMemberField(const char * name, V T::*member);
 
 		template<typename T, typename Ret, typename ... Args>
 		void PushMemberFunction(const char* name, Ret(T::*func)(Args ...));
@@ -61,6 +63,23 @@ namespace Lua
 		lua_State * mLua;
 		std::string mName;
 	};
+
+	template<typename T, typename V>
+	void ClassProxyHelper::PushMemberField(const char* name, V T::*member)
+	{
+		typedef V T::*Member;
+		lua_getglobal(this->mLua, this->mName.c_str());
+		if (lua_istable(this->mLua, -1))
+		{
+			char buff[100] = { 0 };
+			sprintf(buff, "get_%s", name);
+			lua_pushstring(this->mLua, buff);
+			new(lua_newuserdata(this->mLua, sizeof(Member))) Member(member);
+			lua_pushcclosure(this->mLua, ValueProxy<T, V>::Get, 1);
+			lua_settable(this->mLua, -3);
+		}
+		lua_pop(this->mLua, 1);
+	}
 
 	template<typename T, typename ... Args>
 	void ClassProxyHelper::PushCtor()

@@ -4,7 +4,7 @@
 #include"Rpc/Method/MethodProxy.h"
 #include"Timer/Timer/TimeWheelLayer.h"
 #include"Entity/Component/Component.h"
-namespace joke
+namespace acs
 {
     class TimerComponent final : public Component, public ISystemUpdate,
 								 public ILuaRegister, public IFrameUpdate, public ISecondUpdate

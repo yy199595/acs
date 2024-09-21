@@ -1,12 +1,12 @@
 ﻿#pragma once
 
-#include"Util/Guid/Guid.h"
+#include"Util/Tools/Guid.h"
 #include"Core/Queue/Queue.h"
 #include"Redis/Client/Client.h"
 #include"Redis/Config/RedisConfig.h"
 #include"Rpc/Component/RpcTaskComponent.h"
 
-namespace joke
+namespace acs
 {
 	struct RedisLuaData
 	{
@@ -15,7 +15,7 @@ namespace joke
 	};
 }
 
-namespace joke
+namespace acs
 {
 	class ThreadComponent;
 

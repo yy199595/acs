@@ -5,7 +5,7 @@
 #include"Message.h"
 
 #define NOUSER
-namespace joke
+namespace acs
 {
 	MessageDecoder::MessageDecoder(lua_State* lua)
 	{

@@ -14,7 +14,7 @@ namespace mongo
 	class Batch
 	{
 	public:
-		Batch(const char * tab)
+		explicit Batch(const char * tab)
 		{
 			this->mRequest = std::make_unique<db::mongo::find::request>();
 			{
@@ -47,7 +47,7 @@ namespace mongo
 	};
 }
 
-namespace joke
+namespace acs
 {
 	class MongoComponent final : public Component
 	{
@@ -56,41 +56,50 @@ namespace joke
 		~MongoComponent() final = default;
 	 public:
 		int Inc(const char * key);
-		int Inc(const char * tab, json::w::Document& filter, const char * field, int value = 1);
+		int Inc(const char * tab, const json::w::Document& filter, const char * field, int value = 1);
 	public:
 		int Insert(const char * tab, const pb::Message & message);
 		int Remove(const char * tab, const std::string & select, int limit);
-		int Remove(const char * tab, json::w::Document & select, int limit);
+		int Remove(const char * tab, const json::w::Document & select, int limit);
 		int SetIndex(const char * tab, const std::string & field, int sort = 1, bool unique = false);
 	public:
 		int Insert(const pb::Message & message);
 		int Insert(const db::mongo::insert & request);
-		int Insert(const char * tab, json::w::Document & json, bool call = true);
 		int Insert(const char * tab, const std::string & json, bool call = true);
+		int Insert(const char * tab, const json::w::Document & json, bool call = true);
 	public:
+		int Save(const db::mongo::update & request);
 		int Update(const db::mongo::update & request);
 		int Update(const db::mongo::updates & request);
 		int NoWaitUpdate(const db::mongo::update & request);
-		int Update(const char * tab, json::w::Document & select, json::w::Document & data);
+		int Save(const char * tab, const json::w::Document & select, const json::w::Document & data);
+		int Update(const char * tab, const json::w::Document & select, const json::w::Document & data);
+	public:
+		int Push(const char * tab, const json::w::Document & filter, const json::w::Document & value);
+		template<typename T>
+		int Push(const char * tab, const json::w::Document & filter, const char * field, const T & value);
 	public:
 		std::unique_ptr<db::mongo::find::response> Batch(mongo::Batch & batch);
-		int Query(const char * tab, json::w::Document&, json::w::Value * response);
 		int Query(const db::mongo::find::request & request, json::w::Value * response);
 		int Query(const char * tab, const std::string & select, pb::Message * response);
+		int Query(const char * tab, const json::w::Document&, json::w::Value * response);
 		int Query(const db::mongo::find::request & request, db::mongo::find::response * response);
 		int FindPage(const db::mongo::find_page::request & request, db::mongo::find_page::response * response);
 	public:
-		int Count(const char * tab, json::w::Document &);
-		int FindOne(const char * tab, json::w::Document& , std::string * response);
-		int FindOne(const char * tab, json::w::Document & select, json::r::Document * response);
+		int Count(const char * tab, const const json::w::Document &);
+		int FindOne(const char * tab, const json::w::Document& , std::string * response);
 		int FindOne(const db::mongo::find_one::request & request, json::r::Document * response);
+		int FindOne(const char * tab, const json::w::Document & select, json::r::Document * response);
 		std::unique_ptr<db::mongo::find_one::response> FindOnce(const db::mongo::find_one::request & request);
 		std::unique_ptr<db::mongo::find_modify ::response> FindAndModify(const db::mongo::find_modify::request & request);
+	public:
+		std::vector<std::string> GetDatabases();
+		std::vector<std::string> GetCollects(const std::string& db = "");
 	private:
 		class Server * GetActor();
 		std::unique_ptr<db::mongo::find::response> Find(const db::mongo::find::request & request);
-		std::unique_ptr<db::mongo::find::response> Find(const char * tab, json::w::Document & select, int limit = 1);
 		std::unique_ptr<db::mongo::find::response> Find(const char * tab, const std::string & select, int limit = 1);
+		std::unique_ptr<db::mongo::find::response> Find(const char * tab, const json::w::Document & select, int limit = 1);
     public:
 		bool Awake() final;
 		bool LateAwake() final;
@@ -100,6 +109,14 @@ namespace joke
 		std::string mServer;
 		class ActorComponent * mActComponent;
 	};
+
+	template<typename T>
+	int MongoComponent::Push(const char * tab, const json::w::Document & filter, const char * field, const T & value)
+	{
+		json::w::Document document;
+		document.Add(field, value);
+		return this->Push(tab, filter, document);
+	}
 }
 
 #endif //APP_MONGOCOMPONENT_H

@@ -30,7 +30,7 @@ namespace rpc
 		this->mSendMessages.Push(message);
 		if(this->mSendMessages.Size() == 1)
 		{
-			this->Write(message);
+			this->Write(*message);
 		}
 #else
 		Asio::Socket & sock = this->mSocket->Get();
@@ -39,7 +39,7 @@ namespace rpc
 			this->mSendMessages.Push(message);
 			if(this->mSendMessages.Size() == 1)
 			{
-				this->Write(message);
+				this->Write(*message);
 			}
 		});
 #endif
@@ -64,7 +64,7 @@ namespace rpc
 			}
 			if(this->mSendMessages.Front(waitMessage))
 			{
-				this->Write(waitMessage);
+				this->Write(*waitMessage);
 			}
 		}
 	}
@@ -78,7 +78,7 @@ namespace rpc
 			this->ClearSendStream();
 			if(this->mSendMessages.Front(message))
 			{
-				this->Write(message);
+				this->Write(*message);
 			}
 			this->ReadLength(rpc::RPC_PACK_HEAD_LEN);
 			this->mSocket->SetOption(tcp::OptionType::NoDelay, true);
@@ -137,7 +137,7 @@ namespace rpc
 #ifdef ONLY_MAIN_THREAD
 			this->mComponent->OnSendFailure(this->mSockId, data);
 #else
-			Asio::Context & t = joke::App::Inst()->GetContext();
+			Asio::Context & t = acs::App::GetContext();
 			t.post([this, data] { this->mComponent->OnSendFailure(this->mSockId, data); });
 #endif
 		}
@@ -146,12 +146,16 @@ namespace rpc
 		{
 			this->mSocket->Close();
 		}
+		Asio::Socket & socket1 = this->mSocket->Get();
+		asio::post(socket1.get_executor(), [this, code]()
+		{
 #ifdef ONLY_MAIN_THREAD
-		this->mComponent->OnCloseSocket(this->mSockId, code);
+			this->mComponent->OnCloseSocket(this->mSockId, code);
 #else
-		Asio::Context & t = joke::App::Inst()->GetContext();
-		asio::post(t, [this, code] { this->mComponent->OnCloseSocket(this->mSockId, code); });
+			Asio::Context & t = acs::App::GetContext();
+			asio::post(t, [this, code] { this->mComponent->OnCloseSocket(this->mSockId, code); });
 #endif
+		});
 	}
 
 	void InnerClient::OnReadError(const Asio::Code& code)
@@ -162,7 +166,7 @@ namespace rpc
 		}
 #ifdef __DEBUG__
 		const std::string& address = this->mSocket->GetAddress();
-		LOG_ERROR("receive {} inner message error : {}", address, code.message());
+		CONSOLE_LOG_ERROR("receive {} inner message error : {}", address, code.message());
 #endif
 		this->CloseSocket(XCode::NetReadFailure);
 	}
@@ -171,16 +175,17 @@ namespace rpc
 	{
 		if (header.Type != rpc::Type::Response)
 		{
-			this->mMessage = new rpc::Packet();
+			this->mMessage = std::make_unique<rpc::Packet>();
 			return true;
 		}
 
 		int rpcId = header.RpcId;
-		if (!this->mWaitResMessages.Del(rpcId, this->mMessage))
+		rpc::Packet* responseMessage = nullptr;
+		if (!this->mWaitResMessages.Del(rpcId, responseMessage))
 		{
-			LOG_ERROR("{} not find response id = {}", this->mSocket->GetAddress(), rpcId);
 			return false;
 		}
+		this->mMessage.reset(responseMessage);
 		return true;
 	}
 
@@ -220,10 +225,10 @@ namespace rpc
 		{
 			if(this->mComponent == nullptr)
 			{
-				delete this->mMessage;
+				this->mMessage.reset();
 				break;
 			}
-			rpc::Packet * request = this->mMessage;
+			rpc::Packet * request = this->mMessage.release();
 			{
 				this->mMessage = nullptr;
 				request->SetSockId(this->mSockId);
@@ -231,7 +236,7 @@ namespace rpc
 #ifdef ONLY_MAIN_THREAD
 			this->mComponent->OnMessage(request, nullptr);
 #else
-			Asio::Context & t = joke::App::Inst()->GetContext();
+			Asio::Context & t = acs::App::GetContext();
 			t.post([this, request] { this->mComponent->OnMessage(request, nullptr); });
 #endif
 		}

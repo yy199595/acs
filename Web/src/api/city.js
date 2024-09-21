@@ -16,11 +16,11 @@ export function open_city(code) {
     })
 }
 
-export function query_table(tab, page) {
+export function query_table(data) {
     return request({
-        method : "GET",
+        method : "POST",
         url : "/table_mgr/find",
-        params : { tab, page }
+        data : data
     })
 }
 

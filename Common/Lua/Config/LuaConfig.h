@@ -9,7 +9,7 @@
 #include"Yyjson/Document/Document.h"
 
 struct lua_State;
-namespace joke
+namespace acs
 {
 	class LuaConfig
 	{

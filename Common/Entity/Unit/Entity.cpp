@@ -1,9 +1,9 @@
 #include"Entity.h"
 #include"Entity/Actor/App.h"
 #include"Entity/Component/Component.h"
-namespace joke
+namespace acs
 {
-	Entity::Entity(long long id) : mEntityId(id)
+	Entity::Entity(long long id) : mId(id)
 	{
 	}
 
@@ -31,7 +31,7 @@ namespace joke
 		}
 		component->mName = name;
         component->mUnit = this;
-        component->mEntityId = mEntityId;
+        component->mEntityId = mId;
 
 		if(!component->Awake())
         {

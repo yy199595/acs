@@ -4,7 +4,7 @@
 
 #ifndef APP_URL_H
 #define APP_URL_H
-#include"Http/Common/Data.h"
+#include"Http/Common/Content.h"
 namespace http
 {
 	class Url : public tcp::IProto
@@ -19,7 +19,7 @@ namespace http
 		bool Decode(const std::string & url);
 	public:
 		std::string ToString() final { return this->mUrl; }
-		inline http::FromData * Query() { return &this->mQuery;}
+		inline http::FromContent * Query() { return &this->mQuery;}
 		inline const std::string & ToStr() const { return this->mUrl; }
 		inline bool IsHttps() const { return this->mProto == "https"; }
 		inline const std::string & Path() const { return this->mPath; }
@@ -28,7 +28,7 @@ namespace http
 		inline const std::string & Method() const { return this->mMethod; }
 		inline const std::string & Protocol() const { return this->mProto; }
 		inline const std::string & Version() const { return this->mVersion; }
-		inline const http::FromData & GetQuery() const { return this->mQuery; }
+		inline const http::FromContent & GetQuery() const { return this->mQuery; }
 	private:
 		int mReadCount;
 		std::string mUrl;
@@ -38,7 +38,7 @@ namespace http
 		std::string mProto;
 		std::string mMethod;
 		std::string mVersion;
-		http::FromData mQuery;
+		http::FromContent mQuery;
 	};
 }
 

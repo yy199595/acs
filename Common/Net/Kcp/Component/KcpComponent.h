@@ -20,7 +20,7 @@ struct KcpClient
 	ikcpcb * kcp;
 	AsioUdpEndpoint endpoint;
 };
-namespace joke
+namespace acs
 {
 	class KcpComponent : public Component
 	{

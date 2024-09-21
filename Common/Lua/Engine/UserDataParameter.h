@@ -69,19 +69,22 @@ namespace Lua
 
 			static void Write(lua_State* lua, T* data)
 			{
-				const char* typeName = ClassNameProxy::GetLuaClassName<T>();
-				if (data != nullptr && typeName != nullptr)
+				if (data == nullptr)
 				{
-					size_t size = sizeof(PtrProxy<T>);
-					new(lua_newuserdata(lua, size))PtrProxy<T>(data);
+					lua_pushnil(lua);
+					return;
+				}
+				size_t size = sizeof(PtrProxy<T>);
+				new(lua_newuserdata(lua, size))PtrProxy<T>(data);
+				const char* typeName = ClassNameProxy::GetLuaClassName<T>();
+				if (typeName != nullptr)
+				{
 					lua_getglobal(lua, typeName);
 					if (lua_istable(lua, -1))
 					{
 						lua_setmetatable(lua, -2);
-						return;
 					}
 				}
-				lua_pushnil(lua);
 			}
 		};
 	}

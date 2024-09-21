@@ -13,7 +13,7 @@
 #include"Util/File/DirectoryHelper.h"
 #include"Rpc/Component/DispatchComponent.h"
 
-namespace joke
+namespace acs
 {
 
 	HttpComponent::HttpComponent()
@@ -103,7 +103,8 @@ namespace joke
 		}
 		request->SetTimeout(second);
 		http::Response* response = this->Do(std::move(request));
-		if (response != nullptr && response->Code() != HttpStatus::OK)
+		if (response != nullptr && response->Code() != HttpStatus::OK
+			&& response->Code() != HttpStatus::FOUND)
 		{
 			LOG_ERROR("[GET] {} error={}", url, HttpStatusToString(response->Code()))
 		}
@@ -168,7 +169,7 @@ namespace joke
 		int taskId = this->mNumPool.BuildNumber();
 		std::unique_ptr<http::Response> response = std::make_unique<http::Response>();
 		http::RequestClient * httpAsyncClient = this->CreateClient(request.get());
-		LOG_DEBUG("connect {} server => {}:{}", url.Protocol(), url.Host(), url.Port());
+		//LOG_DEBUG("connect {} server => {}:{}", url.Protocol(), url.Host(), url.Port());
 		{
 			this->mUseClients.Add(taskId, httpAsyncClient);
 			this->AddTask(taskId, new HttpCallbackTask(cb));
@@ -181,7 +182,6 @@ namespace joke
 	{
 		request->Header().SetKeepAlive(false);
 		taskId = this->mNumPool.BuildNumber();
-		const http::Url & url = request->GetUrl();
 		http::RequestClient * httpAsyncClient = this->CreateClient(request.get());
 		//LOG_DEBUG("connect {} server => {}:{}", url.Protocol(), url.Host(), url.Port());
 		{
@@ -201,7 +201,7 @@ namespace joke
 		}
 	}
 
-	http::Response* HttpComponent::Do(std::unique_ptr<http::Request> request, std::unique_ptr<http::Data> body)
+	http::Response* HttpComponent::Do(std::unique_ptr<http::Request> request, std::unique_ptr<http::Content> body)
 	{
 		std::unique_ptr<http::Response> response = std::make_unique<http::Response>();
 		{
@@ -210,6 +210,23 @@ namespace joke
 			this->Send(std::move(request), std::move(response), taskId);
 			return this->AddTask(taskId, new HttpRequestTask())->Await();
 		}
+	}
+
+	http::Response* HttpComponent::Post(const std::string& url, const json::w::Document& document, int second)
+	{
+		std::unique_ptr<http::Request> request = std::make_unique<http::Request>("POST");
+		if (!request->SetUrl(url))
+		{
+			return nullptr;
+		}
+		request->SetTimeout(second);
+		request->SetContent(document);
+		http::Response * response = this->Do(std::move(request));
+		if (response != nullptr && response->Code() != HttpStatus::OK)
+		{
+			LOG_ERROR("[POST] {} fail:{}", url, HttpStatusToString(response->Code()))
+		}
+		return response;
 	}
 
 	http::Response * HttpComponent::Post(const std::string& url, const std::string& data, int second)

@@ -3,7 +3,7 @@
 //
 
 #include"LuaConfig.h"
-namespace joke
+namespace acs
 {
 	bool LuaConfig::Init(const json::r::Value& data)
 	{

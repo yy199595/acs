@@ -10,7 +10,9 @@
 #include"google/protobuf/dynamic_message.h"
 #include"Proto/Lua/Message.h"
 #include"Lua/Engine/ModuleClass.h"
-namespace joke
+#include "google/protobuf/struct.pb.h"
+#include"Yyjson/Lua/ljson.h"
+namespace acs
 {
     ImportError::ImportError()
         : mHasError(false), mHasWarning(false)
@@ -31,22 +33,17 @@ namespace joke
     }
 }
 
-namespace joke
+namespace acs
 {
-	ProtoComponent::ProtoComponent()
-	{
-		this->mImporter = nullptr;
-		this->mSourceTree = nullptr;
-	}
-
-    bool ProtoComponent::LateAwake()
+    bool ProtoComponent::Awake()
     {
         std::string path;
         const ServerConfig * config = ServerConfig::Inst();
 		if(config->GetPath("proto", path))
         {
-            return this->Load(path.c_str());
+			LOG_CHECK_RET_FALSE(this->Load(path.c_str()));
         }
+		this->RegisterMessage<google::protobuf::Struct>();
         return true;
     }
 
@@ -231,11 +228,21 @@ namespace joke
 		luaRegister.AddFunction("Import", Lua::MessageEx::Import);
 		luaRegister.AddFunction("Encode", Lua::MessageEx::Encode);
 		luaRegister.AddFunction("Decode", Lua::MessageEx::Decode);
+		luaRegister.AddFunction("ToJson", Lua::MessageEx::ToJson);
 		luaRegister.End("util.proto");
 	}
 
 	bool ProtoComponent::Write(lua_State * lua, const pb::Message& message)
 	{
+		if(message.GetTypeName() == "google.protobuf.Struct")
+		{
+			std::string json;
+			if(!pb_json::MessageToJsonString(message, &json).ok())
+			{
+				return false;
+			}
+			return lua::yyjson::write(lua, json.c_str(), json.size());
+		}
 		MessageDecoder messageDecoder(lua, this);
 		return messageDecoder.Decode(message);
 	}
@@ -246,6 +253,19 @@ namespace joke
 		if (message == nullptr)
 		{
 			return nullptr;
+		}
+		if(message->GetTypeName() == "google.protobuf.Struct")
+		{
+			std::string json;
+			if(!lua::yyjson::read(lua, index, json))
+			{
+				return nullptr;
+			}
+			if(!pb_json::JsonStringToMessage(json, message).ok())
+			{
+				return nullptr;
+			}
+			return message;
 		}
 		MessageEncoder messageEncoder(lua);
 		if (!messageEncoder.Encode(*message, index))

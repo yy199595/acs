@@ -3,12 +3,12 @@
 //
 
 #include"MongoOutput.h"
-#include"Util/Time/TimeHelper.h"
+#include"Util/Tools/TimeHelper.h"
 #include"Mongo/Client/MongoFactory.h"
 
 namespace custom
 {
-	MongoOutput::MongoOutput(mongo::MongoConfig  config)
+	MongoOutput::MongoOutput(mongo::MongoConfig config)
 		: mConfig(std::move(config))
 	{
 
@@ -62,12 +62,14 @@ namespace custom
 				document.Add("level", "fatal");
 				break;
 		}
-
-		std::unique_ptr<mongo::Request> request = mongo::MongoFactory::Insert(name, document);
+		document.Add("t", help::Time::NowSec());
+		std::string table = help::Time::GetYearMonthDayString();
+		std::unique_ptr<mongo::Request> request = mongo::MongoFactory::Insert(table, document);
 		{
 			request->dataBase = this->mConfig.DB;
 			request->collectionName = this->mCommand;
 		}
-		this->mMonClient->SendMongoCommand(std::move(request));
+		mongo::Response response;
+		this->mMonClient->SyncSend(std::move(request), response);
 	}
 }

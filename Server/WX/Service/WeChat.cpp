@@ -6,13 +6,15 @@
 #include "Entity/Actor/App.h"
 #include "WX/Component/WeChatComponent.h"
 #include "WX/Component/WXNoticeComponent.h"
+#include "WX/Component/WXComplaintComponent.h"
 
-namespace joke
+namespace acs
 {
 	WeChat::WeChat()
 	{
 		this->mWeChat = nullptr;
 		this->mNotice = nullptr;
+		this->mComplaint = nullptr;
 	}
 
 	bool WeChat::OnInit()
@@ -21,6 +23,7 @@ namespace joke
 		BIND_COMMON_HTTP_METHOD(WeChat::PhoneNum);
 		LOG_CHECK_RET_FALSE(this->mWeChat = this->GetComponent<WeChatComponent>())
 		LOG_CHECK_RET_FALSE(this->mNotice = this->GetComponent<WXNoticeComponent>())
+		LOG_CHECK_RET_FALSE(this->mComplaint = this->GetComponent<WXComplaintComponent>())
 
 		return true;
 	}
@@ -28,8 +31,8 @@ namespace joke
 	int WeChat::Event(const http::Request& request, http::Response& response)
 	{
 		std::string openId, text;
-		const http::Data* body = request.GetBody();
-		const http::FromData& query = request.GetUrl().GetQuery();
+		const http::Content* body = request.GetBody();
+		const http::FromContent& query = request.GetUrl().GetQuery();
 		if (query.Get("echostr", text))
 		{
 			std::string nonce;
@@ -45,7 +48,7 @@ namespace joke
 		else if (this->mNotice != nullptr && body != nullptr && query.Get("openid", openId))
 		{
 			//CONSOLE_LOG_ERROR("body = {}", request.GetBody()->ToStr())
-			const http::TextData* customData = body->To<const http::TextData>();
+			const http::TextContent* customData = body->To<const http::TextContent>();
 			if (customData != nullptr)
 			{
 				const std::string subscribe("[subscribe]");
@@ -64,8 +67,8 @@ namespace joke
 		else if (body != nullptr && body->GetContentType() == http::ContentType::JSON)
 		{
 			std::string Event;
-			const http::JsonData* jsonData = body->To<const http::JsonData>();
-			if (jsonData == nullptr || (!jsonData->Get("Event", Event)))
+			const http::JsonContent* jsonData = body->To<const http::JsonContent>();
+			if (jsonData == nullptr || (!jsonData->Get("EventSystem", Event)))
 			{
 				return XCode::CallArgsError;
 			}
@@ -73,13 +76,13 @@ namespace joke
 			{
 				return XCode::Ok;
 			}
-			
+			return this->mComplaint->OnComplaint(*jsonData);
 		}
 		response.Text(text.c_str(), text.size());
 		return XCode::Ok;
 	}
 
-	int WeChat::PhoneNum(const http::FromData& request, json::w::Document& response)
+	int WeChat::PhoneNum(const http::FromContent& request, json::w::Document& response)
 	{
 		int count = 0;
 		std::string code;

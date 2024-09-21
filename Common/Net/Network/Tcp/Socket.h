@@ -48,6 +48,7 @@ namespace tcp
 		bool SetOption(OptionType type, bool val);
     public:
         void Close();
+		void Destory();
 		inline std::string & GetIp() { return this->mIp;}
 		unsigned short GetPort() const { return this->mPort;}
 		inline bool IsClient() const { return this->mIsClient; }

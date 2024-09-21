@@ -12,7 +12,7 @@ namespace Lua
 {
 	class LuaModule;
 };
-namespace joke
+namespace acs
 {
 	class ActorComponent : public Component, public IServerRecord, public ILuaRegister
 	{
@@ -30,8 +30,8 @@ namespace joke
 		void GetServers(const std::string &name, std::vector<int>& servers);
 		bool GetListen(int id, const std::string & name, std::string & addr);
 	public:
-		bool UpdateServer(json::r::Document &);
-		Server * MakeServer(const json::r::Document &);
+		bool UpdateServer(json::r::Value &);
+		Server * MakeServer(const json::r::Value &);
 	public:
 		int Broadcast(const std::string & func);
 		int Broadcast(const std::string & func, const pb::Message & message);
@@ -42,6 +42,7 @@ namespace joke
 		Server * Hash(const std::string & name, long long index);
 	private:
 		bool LateAwake() final;
+		bool LoadServerFromFile();
 		void OnRecord(json::w::Document &document) final;
 		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
 		bool AddRandomActor(const std::string& name, Actor* actor);

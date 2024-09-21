@@ -20,7 +20,7 @@ namespace Lua
 {
 	class LuaModule;
 }
-namespace joke
+namespace acs
 {
     class HttpService : public Component, public IStart, public IDestroy, public IComplete
 	{

@@ -3,7 +3,7 @@
 #include"Rpc/Client/Message.h"
 
 using namespace google::protobuf;
-namespace joke
+namespace acs
 {
 	template<typename T>
 	using ServiceMethodType1 = int(T::*)();
@@ -38,6 +38,11 @@ namespace joke
 	template<typename T>
 	using ServiceMethodType7 = int(T::*)(const rpc::Packet& request, rpc::Packet & response);
 
+	template<typename T>
+	using ServiceMethodType8 = int(T::*)(const json::r::Document& request);
+
+	template<typename T>
+	using ServiceMethodType9 = int(T::*)(const json::r::Document& request, json::w::Document & response);
 
 //    template<typename T, typename T1>
 //    using ServiceMethodType5 = int(T::*)(const Rpc::Head & head, const T1 &);
@@ -53,7 +58,7 @@ namespace joke
 }// namespace Sentry
 
 
-namespace joke
+namespace acs
 {
 
 	class ServiceMethod
@@ -314,6 +319,63 @@ namespace joke
 		T* _o;
 		std::string mKey;
 		ServiceMethodType7<T> _func;
+	};
+
+	template<typename T>
+	class ServiceMethod8 : public ServiceMethod
+	{
+	public:
+		ServiceMethod8(const std::string name, T* o, ServiceMethodType8<T> func, std::string key)
+				: ServiceMethod(name), _o(o), mKey(std::move(key)), _func(func)
+		{
+
+		}
+
+	public:
+		bool IsLuaMethod() override { return false; };
+		int Invoke(rpc::Packet& message) override
+		{
+			std::unique_ptr<json::r::Document> request = std::make_unique<json::r::Document>();
+			if(!request->Decode(message.GetBody()))
+			{
+				return XCode::ParseJsonFailure;
+			}
+			return (_o->*_func)(*request);
+		}
+	private:
+		T* _o;
+		std::string mKey;
+		ServiceMethodType8<T> _func;
+	};
+
+	template<typename T>
+	class ServiceMethod9 : public ServiceMethod
+	{
+	public:
+		ServiceMethod9(const std::string name, T* o, ServiceMethodType9<T> func, std::string key)
+				: ServiceMethod(name), _o(o), mKey(std::move(key)), _func(func)
+		{
+
+		}
+
+	public:
+		bool IsLuaMethod() override { return false; };
+		int Invoke(rpc::Packet& message) override
+		{
+			std::unique_ptr<json::r::Document> request = std::make_unique<json::r::Document>();
+			std::unique_ptr<json::w::Document> response = std::make_unique<json::w::Document>();
+			if(!request->Decode(message.GetBody()))
+			{
+				return XCode::ParseJsonFailure;
+			}
+			int code = (_o->*_func)(*request, *response);
+			message.WriteMessage(response.get());
+			return code;
+		}
+	private:
+		T* _o;
+		std::string mKey;
+		ServiceMethodType9<T> _func;
 	};
 
 	template<typename T, typename T1>

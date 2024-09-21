@@ -16,7 +16,7 @@ namespace upload
 	const int FILE_VIDEO_RES = 6; //视频
 }
 
-namespace joke
+namespace acs
 {
 	class FileUpload : public HttpService
 	{
@@ -31,7 +31,7 @@ namespace joke
 		int Club(const http::Request & request, http::Response & response);
 		int Code(const http::Request & request, http::Response & response);
 		int File(const http::Request & request, http::Response & response);
-		int Oss(const http::FromData & request, json::w::Document & response);
+		int Oss(const http::FromContent & request, json::w::Document & response);
 	private:
 		int OnUpload(const http::Request & request, const std::string & name, http::Response & response);
 	private:

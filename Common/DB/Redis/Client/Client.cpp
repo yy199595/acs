@@ -4,7 +4,7 @@
 
 #include"Client.h"
 #include"Entity/Actor/App.h"
-#include"Util/Time/TimeHelper.h"
+#include"Util/Tools/TimeHelper.h"
 #include"Core/Thread/ThreadSync.h"
 
 namespace redis
@@ -70,9 +70,8 @@ namespace redis
 			{
 				if(this->mRequest != nullptr)
 				{
-					this->Write(this->mRequest);
+					this->Write(*this->mRequest);
 				}
-				LOG_INFO("redis[{}] connect {} ok", this->mConfig.Id, this->mConfig.Address);
 			}
 #ifdef ONLY_MAIN_THREAD
 			this->mComponent->OnConnectOK(this->mConfig.Index);
@@ -113,16 +112,16 @@ namespace redis
 	void Client::Send(std::unique_ptr<Request> command)
 	{
 #ifdef ONLY_MAIN_THREAD
-		this->mRequest = command.release();
-		this->Write(this->mRequest);
+		this->mRequest = std::move(command);
+		this->Write(*this->mRequest);
 #else
 		assert(!command->GetCommand().empty());
 		Asio::Socket& sock = this->mSocket->Get();
 		const Asio::Executor& executor = sock.get_executor();
 		asio::post(executor, [this, request = command.release()]
 		{
-			this->Write(request);
-			this->mRequest = request;
+			this->Write(*request);
+			this->mRequest.reset(request);
 		});
 #endif
 
@@ -143,10 +142,8 @@ namespace redis
 
 	void Client::OnReadError(const Asio::Code& code)
 	{
-		LOG_ERROR("code = {}", code.message());
 		if(this->mRequest != nullptr)
 		{
-			LOG_ERROR("request = {}", this->mRequest->ToString());
 			if(this->mResponse != nullptr)
 			{
 				this->mResponse->SetError(code.message());
@@ -161,7 +158,7 @@ namespace redis
 	{
 		if (this->mResponse == nullptr)
 		{
-			this->mResponse = new redis::Response();
+			this->mResponse = std::make_unique<redis::Response>();
 		}
 		this->OnReceiveOnce(this->mResponse->OnRecvLine(is, size));
 	}
@@ -219,7 +216,7 @@ namespace redis
 	std::unique_ptr<redis::Response> Client::ReadResponse(std::unique_ptr<redis::Request> request)
 	{
 		std::unique_ptr<redis::Response> redisResponse = std::make_unique<redis::Response>();
-		if (!this->SendSync(request.get()))
+		if (!this->SendSync(*request))
 		{
 			redisResponse->SetError("sync send redis cmd fai");
 			LOG_ERROR("sync send redis cmd fail : {}", request->ToString());
@@ -258,17 +255,17 @@ namespace redis
 		int id = this->mConfig.Id;
 		if (this->mResponse == nullptr)
 		{
-			this->mResponse = new redis::Response();
+			this->mResponse = std::make_unique<redis::Response>();
 			this->mResponse->SetError("unknown error");
 		}
 #ifdef ONLY_MAIN_THREAD
-		this->mComponent->OnMessage(id, this->mRequest, this->mResponse);
+		this->mComponent->OnMessage(id, this->mRequest.release(), this->mResponse.release());
 #else
-		Asio::Context& t = joke::App::Inst()->GetContext();
-		t.post([this, req = this->mRequest, id, res = this->mResponse]
-		{ this->mComponent->OnMessage(id, req, res); });
+		Asio::Context& t = acs::App::GetContext();
+		t.post([this, req = this->mRequest.release(), id, res = this->mResponse.release()]
+		{
+			this->mComponent->OnMessage(id, req, res);
+		});
 #endif
-		this->mRequest = nullptr;
-		this->mResponse = nullptr;
 	}
 }

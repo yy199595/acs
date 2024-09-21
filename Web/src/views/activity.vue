@@ -1,7 +1,7 @@
 <template>
     <h1>活动列表</h1>
     <el-form inline="inline">
-        <el-form-item title="状态">
+        <el-form-item title="状态" style="width: 200px">
             <el-select v-model="page_info.status" placeholder="请选择" @change="on_select_change">
                 <el-option
                     v-for="item in status_list"
@@ -11,7 +11,7 @@
                 </el-option>
             </el-select>
         </el-form-item>
-        <el-form-item title="城市">
+        <el-form-item title="城市" style="width: 200px">
             <el-select v-model="city.city" placeholder="请选择" @change="on_select_change">
                 <el-option
                     v-for="item in city.list"

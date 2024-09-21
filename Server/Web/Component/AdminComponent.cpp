@@ -5,11 +5,11 @@
 #include "AdminComponent.h"
 #include "WX/Define/db.h"
 #include "XCode/XCode.h"
-#include "Util/Time/TimeHelper.h"
+#include "Util/Tools/TimeHelper.h"
 #include "Http/Client/Http.h"
 #include "Server/Config/ServerConfig.h"
 #include "Mongo/Component/MongoComponent.h"
-namespace joke
+namespace acs
 {
 	AdminComponent::AdminComponent()
 	{
@@ -18,13 +18,28 @@ namespace joke
 
 	bool AdminComponent::LateAwake()
 	{
-		this->mMongo = this->GetComponent<MongoComponent>();
+		LOG_CHECK_RET_FALSE(this->mMongo = this->GetComponent<MongoComponent>())
 		return true;
 	}
 
 	void AdminComponent::Complete()
 	{
-		
+		admin::UserInfo userInfo;
+		{
+			userInfo.name = "乐意";
+			userInfo.account = "yjz";
+			userInfo.password = "199595yjz.";
+			userInfo.permission = http::PermissAdmin;
+		}
+		if(this->InsertUser(userInfo) == XCode::Ok)
+		{
+			json::w::Document updater;
+			json::w::Document filter;
+			filter.Add("_id", userInfo.account);
+			updater.Add("permission", http::PermissAdmin);
+			this->mMongo->Update(mongo_tab::ADMIN_LIST, filter, updater);
+		}
+		this->mMongo->SetIndex(mongo_tab::ADMIN_LIST, "user_id", 1, true);
 	}
 
 	int AdminComponent::UpdateUser(int userId, json::w::Document& document)
@@ -34,6 +49,62 @@ namespace joke
 		return this->mMongo->Update(mongo_tab::ADMIN_LIST, filter, document);
 	}
 
+	int AdminComponent::Remove(int userId)
+	{
+		json::w::Document filter;
+		filter.Add("user_id", userId);
+		return this->mMongo->Remove(mongo_tab::ADMIN_LIST, filter, 1);
+	}
+
+	int AdminComponent::List(int page, json::w::Document& response)
+	{
+		json::w::Document filter;
+		db::mongo::find_page::request request;
+		auto jsonArray = response.AddArray("list");
+		int count = this->mMongo->Count(mongo_tab::ADMIN_LIST, filter);
+		std::unique_ptr<db::mongo::find_page::response> response1 = std::make_unique<db::mongo::find_page::response>();
+		{
+			request.set_count(10);
+			request.set_page(page);
+
+			request.add_fields("_id");
+			request.add_fields("name");
+			request.add_fields("user_id");
+			request.add_fields("login_ip");
+			request.add_fields("permission");
+			request.add_fields("login_time");
+			request.add_fields("create_time");
+			request.set_tab(mongo_tab::ADMIN_LIST);
+			if (this->mMongo->FindPage(request, response1.get()) != XCode::Ok)
+			{
+				response.Add("count", 0);
+				return XCode::Failure;
+			}
+		}
+		response.Add("count", count);
+		for (int index = 0; index < response1->json_size(); index++)
+		{
+			jsonArray->PushJson(response1->json(index));
+		}
+		return XCode::Ok;
+	}
+
+	int AdminComponent::InsertUser(admin::UserInfo & userInfo)
+	{
+		json::w::Document document;
+		userInfo.user_id = this->mMongo->Inc("admin_id");
+		if(userInfo.user_id <= 0)
+		{
+			return XCode::Failure;
+		}
+		long long nowTime = help::Time::NowSec();
+		{
+			userInfo.login_time = nowTime;
+			userInfo.create_time = nowTime;
+		}
+		AdminComponent::Encode(userInfo, document);
+		return this->mMongo->Insert(mongo_tab::ADMIN_LIST, document);
+	}
 
 	std::unique_ptr<admin::UserInfo> AdminComponent::GetUserInfo(int userId)
 	{
@@ -44,7 +115,7 @@ namespace joke
 		{
 			return nullptr;
 		}
-		return this->Decode(*response);
+		return AdminComponent::Decode(*response);
 	}
 
 	std::unique_ptr<admin::UserInfo> AdminComponent::GetUserInfo(const std::string& account)
@@ -56,12 +127,11 @@ namespace joke
 		{
 			return nullptr;
 		}
-		return this->Decode(*response);
+		return AdminComponent::Decode(*response);
 	}
 
 	void AdminComponent::Encode(const admin::UserInfo& userInfo, json::w::Document& document)
 	{
-		document.Add("city", userInfo.city);
 		document.Add("name", userInfo.name);
 		document.Add("_id", userInfo.account);
 		document.Add("user_id", userInfo.user_id);
@@ -70,14 +140,12 @@ namespace joke
 		document.Add("login_time", userInfo.login_time);
 		document.Add("create_time", userInfo.create_time);
 		document.Add("permission", userInfo.permission);
-		document.Add("city_name", userInfo.city_name);
 	}
 
 	std::unique_ptr<admin::UserInfo> AdminComponent::Decode(json::r::Document& document)
 	{
 		std::unique_ptr<admin::UserInfo> userInfo = std::make_unique<admin::UserInfo>();
 		{
-			document.Get("city", userInfo->city);
 			document.Get("name", userInfo->name);
 			document.Get("_id", userInfo->account);
 			document.Get("user_id", userInfo->user_id);
@@ -86,7 +154,6 @@ namespace joke
 			document.Get("login_time", userInfo->login_time);
 			document.Get("create_time", userInfo->create_time);
 			document.Get("permission", userInfo->permission);
-			document.Get("city_name", userInfo->city_name);
 		}
 		return userInfo;
 	}

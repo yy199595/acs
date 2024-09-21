@@ -44,8 +44,10 @@ export function format_permiss(row, column, cellValue) {
             return "商家"
         case 10:
             return "主理人";
+        case 20:
+            return "普通管理员"
         case 100:
-            return "管理员"
+            return "超级管理员"
     }
     return "未知"
 }

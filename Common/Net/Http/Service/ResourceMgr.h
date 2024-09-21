@@ -7,7 +7,7 @@
 #include "HttpService.h"
 #include "Core/Map/HashMap.h"
 
-namespace joke
+namespace acs
 {
 	class ResourceMgr : public HttpService
 	{
@@ -18,10 +18,11 @@ namespace joke
 		bool Awake() final;
 		bool OnInit() final;
 	private:
-		int Look(const http::FromData& request, http::Response& response);
-		int List(const http::FromData& request, http::Response& response);
+		int Look(const http::FromContent& request, http::Response& response);
+		int List(const http::FromContent& request, http::Response& response);
 		int Upload(const http::Request & request, http::Response & response);
-		int Download(const http::FromData & request, http::Response & response);
+		int Video(const http::FromContent& request, json::w::Document& response);
+		int Download(const http::FromContent & request, http::Response & response);
 	private:
 		std::string mUpload;
 		std::string mDoMain;

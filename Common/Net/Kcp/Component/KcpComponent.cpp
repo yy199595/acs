@@ -12,7 +12,7 @@
 #include "Server/Component/ThreadComponent.h"
 
 using asio::ip::udp;
-namespace joke
+namespace acs
 {
 	
 	int KcpComponent::OnServerSend(const char * buf, int len, ikcpcb * kcp, void * user)

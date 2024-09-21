@@ -17,12 +17,10 @@
 #include "Http/Common/HttpRequest.h"
 #include "Http/Common/HttpResponse.h"
 #include "Http/Component/HttpComponent.h"
-
 #include "WX/Crypt/WXBizDataCrypt.h"
-#include "Redis/Component/RedisComponent.h"
 
 #include "Auth/Aes/Aes.h"
-
+#include "Core/System/System.h"
 const std::string WE_CHAT_HOST = "https://api.mch.weixin.qq.com";
 
 namespace wx
@@ -160,7 +158,7 @@ namespace wx
 	}
 }
 
-namespace joke
+namespace acs
 {
 
 	WeChatComponent::WeChatComponent()
@@ -192,86 +190,35 @@ namespace joke
 		return help::fs::ReadTxtFile(this->mConfig.pay.apiKeyPath, this->mConfig.pay.apiKey);
 	}
 
+	http::Response * WeChatComponent::GetWxCode(const std::string& path)
+	{
+		if (!this->GetAccessToken())
+		{
+			return nullptr;
+		}
+		json::w::Document document;
+		document.Add("width", 280);
+		document.Add("path", path);
+		document.Add("is_hyaline", true);
+		std::string host("https://api.weixin.qq.com/wxa/getwxacode");
+		std::string url = fmt::format("{}?access_token={}", host, this->mAccessToken.token);
+
+		std::unique_ptr<http::Request> request = std::make_unique<http::Request>();
+		{
+			request->SetUrl(url);
+			request->SetContent(document);
+		}
+		std::string contentType;
+		std::unique_ptr<http::Content> res = std::make_unique<http::TextContent>();
+		return this->mHttp->Do(std::move(request), std::move(res));
+	}
+
 	void WeChatComponent::Start()
 	{
 		if (!this->DownCertificates())
 		{
 			LOG_ERROR("down certificates fail");
 		}
-		LOG_CHECK_RET(this->SetJumpPath("/minePages/order"))
-
-//		wx::OrderInfo * orderInfo = new wx::OrderInfo();
-//
-//		orderInfo->price = 1;
-//		orderInfo->userId = 10044;
-//		orderInfo->desc = "we_chat-test";
-//		orderInfo->over_time = help::Time::NowSec() + 300;
-//		orderInfo->openId = "oKICo62BwywOrPjgD3eyfK_A7Ds4";
-//
-//		this->GetAccessToken();
-//		const std::string host("https://api.weixin.qq.com/cgi-bin/message/subscribe/send");
-//		std::string url = fmt::format("{}?access_token={}", host, this->mAccessToken.token);
-//
-//		json::w::Document document;
-//		document.Add("template_id", "Siju8bM6lZjva4X3x0-Fnh-XVCbQB6ABPaCD09wTNgs");
-//		document.Add("touser", "oKICo62BwywOrPjgD3eyfK_A7Ds4");
-//
-//		json::w::Document data;
-//		data.AddObject("time2")->Add("value", help::Time::GetDateStr());
-//		data.AddObject("thing5")->Add("value", "测试");
-//		data.AddObject("time7")->Add("value", help::Time::GetDateStr());
-//		data.AddObject("amount10")->Add("value", "￥100");
-//
-//		document.Add("data", data.JsonString());
-//		const http::Response * response =  this->mHttp->Post(url, document.JsonString());
-//		if(response != nullptr && response->GetBody())
-//		{
-//
-//		}
-
-//		wx::TransferRequest request;
-//		request.out_batch_no = this->mApp->NewUuid();
-//		request.batch_name = "test";
-//		request.batch_remark = "测试转账";
-//		request.transfer_scene_id = "1001";
-//
-//		for (int i = 0; i < 4; ++i)
-//		{
-//			wx::TransferDetail transferDetail;
-//			transferDetail.transfer_remark = fmt::format("转账[{}]", i);
-//			transferDetail.transfer_amount = 500;
-//			//transferDetail.user_name = "乐意";
-//			transferDetail.openid = "oKICo6yhcrzvqw5GbFU8rM3zivKc";
-//			transferDetail.out_detail_no = this->mApp->NewUuid();
-//			request.transfer_detail_list.emplace_back(transferDetail);
-//		}
-//
-//
-//		this->Transfer(request);
-
-		//this->CreateOrder(orderInfo);
-		//this->Refund(*orderInfo, "yjz");
-
-		//this->GetOrder("3670090983686537216");
-		//this->GetOrder(orderInfo->orderId);
-		//this->CloseOrder(orderInfo->orderId);
-
-
-		//OrderComponent * component = this->GetComponent<OrderComponent>();
-
-		//auto orderInfo1 = component->GetOrder("3682388787167494144");
-//		wx::OrderInfo orderInfo1;
-//		orderInfo1.logistics_type = 3;
-//		orderInfo1.desc = "测API发货";
-//		orderInfo1.orderId = "3682388787167494144";
-//		orderInfo1.openId = "oKICo6yhcrzvqw5GbFU8rM3zivKc";
-//
-//
-//		this->UploadOrder(orderInfo1);
-//
-//		auto response = this->GetOrderInfo("3682388787167494144");
-
-		//this->AddTemplate("1", "活动报名通知");
 	}
 
 	bool WeChatComponent::LateAwake()
@@ -283,12 +230,12 @@ namespace joke
 	bool WeChatComponent::DownCertificates()
 	{
 		std::unique_ptr<http::Request> request1 = this->NewRequest("GET", "/v3/certificates");
-		http::Response* response = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonData>());
+		http::Response* response = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonContent>());
 		if (response == nullptr)
 		{
 			return false;
 		}
-		const http::JsonData* jsonData = response->GetBody()->To<const http::JsonData>();
+		const http::JsonContent* jsonData = response->GetBody()->To<const http::JsonContent>();
 		std::unique_ptr<json::r::Value> jsonArray;
 		if (!jsonData->Get("data", jsonArray))
 		{
@@ -340,12 +287,12 @@ namespace joke
 		document.Add("merchant_trade_no", orderId);
 		std::string host("https://api.weixin.qq.com/wxa/sec/order/get_order");
 		std::string url = fmt::format("{}?access_token={}", host, this->mAccessToken.token);
-		http::Response* httpResponse = this->mHttp->Post(url, document.JsonString());
+		http::Response* httpResponse = this->mHttp->Post(url, document);
 		if (httpResponse == nullptr || httpResponse->GetBody() == nullptr)
 		{
 			return nullptr;
 		}
-		const http::JsonData* jsonData = httpResponse->GetBody()->To<const http::JsonData>();
+		const http::JsonContent* jsonData = httpResponse->GetBody()->To<const http::JsonContent>();
 		if (jsonData == nullptr)
 		{
 			return nullptr;
@@ -370,7 +317,7 @@ namespace joke
 
 	std::unique_ptr<wx::OrderInfoResponse> WeChatComponent::GetOrder(const std::string& orderId)
 	{
-		http::FromData request;
+		http::FromContent request;
 		request.Add("mchid", this->mConfig.pay.mchId);
 		std::string url = fmt::format("/v3/pay/transactions/out-trade-no/{}?mchid={}",
 				orderId, this->mConfig.pay.mchId);
@@ -379,12 +326,12 @@ namespace joke
 		{
 			return nullptr;
 		}
-		http::Response* response2 = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonData>());
+		http::Response* response2 = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonContent>());
 		if (response2 == nullptr || response2->Code() != HttpStatus::OK)
 		{
 			return nullptr;
 		}
-		const http::JsonData* jsonObject = response2->To<const http::JsonData>();
+		const http::JsonContent* jsonObject = response2->To<const http::JsonContent>();
 		std::unique_ptr<wx::OrderInfoResponse> response1 = std::make_unique<wx::OrderInfoResponse>();
 		{
 			jsonObject->Get("attach", response1->attach);
@@ -493,7 +440,7 @@ namespace joke
 			{
 				return false;
 			}
-			const http::JsonData* jsonData = response->GetBody()->To<const http::JsonData>();
+			const http::JsonContent* jsonData = response->GetBody()->To<const http::JsonContent>();
 			if (jsonData == nullptr)
 			{
 				return false;
@@ -532,12 +479,12 @@ namespace joke
 		document.AddObject("payer")->Add("openid", orderInfo.openId);
 		const std::string host("https://api.weixin.qq.com/wxa/sec/order/upload_shipping_info");
 		const std::string url = fmt::format("{}?access_token={}", host, this->mAccessToken.token);
-		http::Response* httpResponse = this->mHttp->Post(url, document.JsonString());
+		http::Response* httpResponse = this->mHttp->Post(url, document);
 		if (httpResponse == nullptr || httpResponse->GetBody() == nullptr)
 		{
 			return nullptr;
 		}
-		const http::JsonData* jsonData = httpResponse->GetBody()->To<const http::JsonData>();
+		const http::JsonContent* jsonData = httpResponse->GetBody()->To<const http::JsonContent>();
 		if (jsonData == nullptr)
 		{
 			return nullptr;
@@ -550,7 +497,7 @@ namespace joke
 		return uploadOrderResponse;
 	}
 
-	bool WeChatComponent::CreateComplaintUrl(const std::string url)
+	bool WeChatComponent::CreateComplaintUrl(const std::string& url)
 	{
 //		std::string host1("/v3/merchant-service/complaints-v2");
 //		std::string url1 = fmt::format("{}?begin_date=2024-06-28&end_date=2024-06-30",
@@ -571,7 +518,7 @@ namespace joke
 		std::unique_ptr<http::Request> request1 = this->NewRequest("GET", host);
 		{
 			http::Response* response = this->mHttp->Do(std::move(request1));
-			const http::JsonData* jsonData = response->To<http::JsonData>();
+			const http::JsonContent* jsonData = response->To<http::JsonContent>();
 			if (jsonData != nullptr)
 			{
 				std::string mchId, address;
@@ -597,7 +544,7 @@ namespace joke
 		message.Add("url", notifyUrl);
 		//message.Add("mchid", this->mConfig.pay.mchId);
 		std::unique_ptr<http::Request> request3 = this->NewRequest(host, message);
-		std::unique_ptr<http::JsonData> response2 = std::make_unique<http::JsonData>();
+		std::unique_ptr<http::JsonContent> response2 = std::make_unique<http::JsonContent>();
 		http::Response* response = this->mHttp->Do(std::move(request3), std::move(response2));
 		if (response == nullptr || response->Code() != HttpStatus::OK)
 		{
@@ -649,14 +596,14 @@ namespace joke
 		{
 			return false;
 		}
-		std::unique_ptr<http::JsonData> response2 = std::make_unique<http::JsonData>();
+		std::unique_ptr<http::JsonContent> response2 = std::make_unique<http::JsonContent>();
 		http::Response* response = this->mHttp->Do(std::move(request1), std::move(response2));
 		if (response == nullptr || response->Code() != HttpStatus::OK)
 		{
 			return false;
 		}
 
-		const http::JsonData* jsonData = response->To<const http::JsonData>();
+		const http::JsonContent* jsonData = response->To<const http::JsonContent>();
 		if (jsonData == nullptr)
 		{
 			return false;
@@ -727,14 +674,19 @@ namespace joke
 		{
 			return nullptr;
 		}
-		http::Response* response = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonData>());
+		http::Response* response = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonContent>());
 		if (response == nullptr || response->Code() != HttpStatus::OK)
 		{
+			if(response != nullptr)
+			{
+				LOG_ERROR("{}", response->ToString());
+			}
 			return nullptr;
 		}
-		const http::JsonData* jsonObject = response->To<http::JsonData>();
+		const http::JsonContent* jsonObject = response->To<http::JsonContent>();
 		if (jsonObject == nullptr)
 		{
+			LOG_ERROR("{}", response->ToString());
 			return nullptr;
 		}
 		std::unique_ptr<wx::RefundResponse> response1 = std::make_unique<wx::RefundResponse>();
@@ -751,6 +703,7 @@ namespace joke
 			std::unique_ptr<json::r::Value> amountObject;
 			if (!jsonObject->Get("amount", amountObject))
 			{
+				LOG_ERROR("{}", jsonObject->ToString());
 				return nullptr;
 			}
 			amountObject->Get("total", response1->amount.total);
@@ -768,18 +721,18 @@ namespace joke
 		const std::string host("https://api.weixin.qq.com/wxa/business/getuserphonenumber");
 		std::string url = fmt::format("{}?access_token={}", host, this->mAccessToken.token);
 		std::unique_ptr<http::Request> request1 = std::make_unique<http::Request>("POST");
-		std::unique_ptr<http::JsonData> responseBody = std::make_unique<http::JsonData>();
+		std::unique_ptr<http::JsonContent> responseBody = std::make_unique<http::JsonContent>();
 		{
 			request1->SetUrl(url);
 			json::w::Document message;
 			message.Add("code", code);
-			request1->SetContent(http::Header::JSON, message.JsonString());
+			request1->SetContent(message);
 			http::Response* response = this->mHttp->Do(std::move(request1), std::move(responseBody));
 			if (response == nullptr || response->Code() != HttpStatus::OK)
 			{
 				return nullptr;
 			}
-			const http::JsonData* jsonData = response->To<http::JsonData>();
+			const http::JsonContent* jsonData = response->To<http::JsonContent>();
 			if (jsonData == nullptr)
 			{
 				return nullptr;
@@ -808,15 +761,15 @@ namespace joke
 	{
 		std::unique_ptr<http::Request> request1 = std::make_unique<http::Request>("GET");
 		{
-			http::FromData fromData;
+			http::FromContent fromData;
 			fromData.Add("js_code", code);
 			fromData.Add("grant_type", "authorization_code");
 			fromData.Add("appid", this->mConfig.login.appId);
 			fromData.Add("secret", this->mConfig.login.secret);
 			request1->SetUrl("https://api.weixin.qq.com/sns/jscode2session", fromData);
 		}
-		http::Response* response1 = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonData>());
-		const http::JsonData* jsonData = response1->GetBody()->To<const http::JsonData>();
+		http::Response* response1 = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonContent>());
+		const http::JsonContent* jsonData = response1->GetBody()->To<const http::JsonContent>();
 		if (jsonData == nullptr)
 		{
 			LOG_ERROR("login_error:{}", response1->GetBody()->ToStr());
@@ -873,12 +826,12 @@ namespace joke
 			request->SetVerifyFile(this->mConfig.pay.publicKeyPath);
 			request->Header().Add("Wechatpay-Serial", this->mConfig.pay.certNumber);
 		}
-		http::Response* response = this->mHttp->Do(std::move(request), std::make_unique<http::JsonData>());
+		http::Response* response = this->mHttp->Do(std::move(request), std::make_unique<http::JsonContent>());
 		if (response == nullptr || response->Code() != HttpStatus::OK)
 		{
 			return nullptr;
 		}
-		const http::JsonData* document1 = response->To<http::JsonData>();
+		const http::JsonContent* document1 = response->To<http::JsonContent>();
 		if (document1 == nullptr)
 		{
 			LOG_ERROR("transfer_error:{}", response->GetBody()->ToStr());
@@ -908,13 +861,13 @@ namespace joke
 		std::unique_ptr<http::Request> request0 = std::make_unique<http::Request>("POST");
 		{
 			request0->SetUrl(url1);
-			request0->SetContent(http::Header::JSON, document.JsonString());
+			request0->SetContent(document);
 			http::Response* response = this->mHttp->Do(std::move(request0));
 			if (response == nullptr || response->Code() != HttpStatus::OK)
 			{
 				return nullptr;
 			}
-			const http::JsonData* jsonData = response->To<http::JsonData>();
+			const http::JsonContent* jsonData = response->To<http::JsonContent>();
 			if (jsonData == nullptr)
 			{
 				return nullptr;
@@ -951,7 +904,7 @@ namespace joke
 		return complainInfo;
 	}
 
-	std::unique_ptr<wx::PayResponse> WeChatComponent::DecodeResponse(const wx::PayMessage& message)
+	std::unique_ptr<wx::PayResponse> WeChatComponent::DecodeResponse(const wx::PayMessage& message) const
 	{
 		const std::string& sessionKey = this->mConfig.pay.apiV3key;
 		const std::string text = _bson::base64::decode(message.ciphertext);
@@ -1020,13 +973,13 @@ namespace joke
 		document.Add("sceneDesc", desc);
 		const std::string host("https://api.weixin.qq.com/wxaapi/newtmpl/addtemplate");
 		const std::string url = fmt::format("{}?access_token={}", host, this->mAccessToken.token);
-		http::Response* httpResponse = this->mHttp->Post(url, document.JsonString());
+		http::Response* httpResponse = this->mHttp->Post(url, document);
 
 		if (httpResponse == nullptr || httpResponse->GetBody() == nullptr)
 		{
 			return false;
 		}
-		const http::JsonData* jsonData = httpResponse->GetBody()->To<const http::JsonData>();
+		const http::JsonContent* jsonData = httpResponse->GetBody()->To<const http::JsonContent>();
 		if (jsonData == nullptr)
 		{
 			return false;
@@ -1049,12 +1002,12 @@ namespace joke
 		//POST https://api.weixin.qq.com/wxa/sec/order/set_msg_jump_path?access_token=ACCESS_TOKEN
 		const std::string host("https://api.weixin.qq.com/wxa/sec/order/set_msg_jump_path");
 		const std::string url = fmt::format("{}?access_token={}", host, this->mAccessToken.token);
-		const http::Response* response = this->mHttp->Post(url, request.JsonString());
+		const http::Response* response = this->mHttp->Post(url, request);
 		if (response == nullptr || response->GetBody() == nullptr)
 		{
 			return false;
 		}
-		const http::JsonData* jsonData = response->GetBody()->To<const http::JsonData>();
+		const http::JsonContent* jsonData = response->GetBody()->To<const http::JsonContent>();
 		if (jsonData == nullptr)
 		{
 			return false;
@@ -1072,7 +1025,7 @@ namespace joke
 		return true;
 	}
 
-	const http::JsonData* WeChatComponent::Get(const std::string& url, http::FromData& fromData)
+	const http::JsonContent* WeChatComponent::Get(const std::string& url, http::FromContent& fromData)
 	{
 		if (!this->GetAccessToken())
 		{
@@ -1087,7 +1040,7 @@ namespace joke
 			{
 				return nullptr;
 			}
-			return response->To<http::JsonData>();
+			return response->To<http::JsonContent>();
 		}
 	}
 }

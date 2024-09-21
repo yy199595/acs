@@ -8,9 +8,8 @@
 #endif //APP_SYSTEM_H
 #include<string>
 #include<unordered_map>
-namespace joke
+namespace os
 {
-
 	class SystemInfo
 	{
 	public:
@@ -23,7 +22,7 @@ namespace joke
     {
     public:
         static bool Init(int argc, char **argv);
-		static void GetSystemInfo(SystemInfo & systemInfo);
+		static bool GetSystemInfo(SystemInfo & systemInfo);
 		static std::string FormatPath(const std::string & path);
         static const std::string & WorkPath() { return System::mWorkPath; }
 	public:
@@ -31,8 +30,8 @@ namespace joke
 		static bool GetEnv(const std::string & k, int & v);
 		static bool GetEnv(const std::string & k, std::string & v);
 		static void SetEnv(const std::string & k, const std::string & v);
-		static bool AddValue(const std::string& key, std::string& value);
 		static bool ReadFile(const std::string & path, std::string & content);
+		static bool AddValue(const std::string& key, const std::string& value);
 	public:
 		static void LuaSetEnv(const char * key, const char * val);
 	private:

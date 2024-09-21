@@ -1,8 +1,8 @@
 #include "ContentType.h"
-#include "Http/Common/Data.h"
+#include "Http/Common/Content.h"
 namespace http
 {
-	bool ContentFactory::New(const std::string& content, std::unique_ptr<Data>& data)
+	bool ContentFactory::New(const std::string& content, std::unique_ptr<Content>& data)
 	{
 		auto iter = this->mContentFactoryMap.find(content);
 		if(iter == this->mContentFactoryMap.end())

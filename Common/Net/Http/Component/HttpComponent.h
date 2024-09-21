@@ -8,12 +8,12 @@
 #include"Rpc/Component/RpcTaskComponent.h"
 namespace http
 {
-	class Data;
+	class Content;
 	class Request;
 	class Response;
 	class RequestClient;
 }
-namespace joke
+namespace acs
 {
 	class HttpComponent : public RpcTaskComponent<int, http::Response, false>,
 			public ILuaRegister, public IRpc<http::Request, http::Response>
@@ -24,9 +24,10 @@ namespace joke
 		http::Response * Get(const std::string& url, int second = 15);
 		int Download(const std::string & url, const std::string & path);
 		http::Response * Post(const std::string& url, const std::string& data, int second = 15);
+		http::Response * Post(const std::string& url, const json::w::Document & json, int second = 15);
 	public:
 		http::Response * Do(std::unique_ptr<http::Request> request);
-		http::Response * Do(std::unique_ptr<http::Request> request, std::unique_ptr<http::Data> body);
+		http::Response * Do(std::unique_ptr<http::Request> request, std::unique_ptr<http::Content> body);
 	public:
 		int Send(std::unique_ptr<http::Request> request, std::function<void(http::Response*)> && cb);
 		int Send(std::unique_ptr<http::Request> request, std::unique_ptr<http::Response> response, int & taskId); // 异步发送

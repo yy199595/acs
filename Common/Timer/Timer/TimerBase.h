@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-#include"Util/Guid/Guid.h"
-#include"Util/Time/TimeHelper.h"
+#include"Util/Tools/Guid.h"
+#include"Util/Tools/TimeHelper.h"
 
-namespace joke
+namespace acs
 {
     class TimerBase
     {

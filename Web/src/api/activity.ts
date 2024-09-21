@@ -52,3 +52,10 @@ export const request_club_list = (page : number)=> {
         url : "/club_mgr/list?page=" + page
     })
 }
+
+export const dissolve_club = (id : number) => {
+    return request({
+        method :"GET",
+        url : "/club_mgr/dissolve?club_id=" + id
+    })
+}

@@ -3,7 +3,7 @@
 //
 #include"Log/Common/Debug.h"
 #include"ShowOutput.h"
-#include "Util/Time/TimeHelper.h"
+#include "Util/Tools/TimeHelper.h"
 
 namespace custom
 {
@@ -68,13 +68,6 @@ namespace custom
         	printf("%s [fatal] %s %s\n", time.c_str(), file.c_str(), log.c_str());
 #else
 				printf("%s%s [fatal ] %s %s\e[0m\n", "\e[35m", time.c_str(), file.c_str(), log.c_str());
-#endif
-#ifdef __DEBUG_STACK__
-			backward::StackTrace st;
-            st.load_here(64);
-            backward::Printer p;
-            p.color_mode = backward::ColorMode::always;
-            p.print(st, stderr);
 #endif
 			}
 				break;

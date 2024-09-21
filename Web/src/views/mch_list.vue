@@ -1,5 +1,4 @@
 <template>
-    <h3>用户信息</h3>
     <el-form inline="inline">
         <el-form-item label="搜索">
             <el-input></el-input>

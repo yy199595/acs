@@ -11,10 +11,8 @@ namespace admin
 {
 	struct UserInfo
 	{
-		int city = 0; //商户城市
 		int user_id = 0; //用户id
 		int permission = 1; //权限
-		std::string city_name;
 		std::string name; //昵称
 		std::string account; //账号
 		std::string password; //密码
@@ -24,24 +22,28 @@ namespace admin
 	};
 }
 
-namespace joke
+namespace acs
 {
 	class AdminComponent : public Component, public IComplete
 	{
 	public:
 		AdminComponent();
-		~AdminComponent() = default;
+		~AdminComponent() final = default;
 	public:
 		std::unique_ptr<admin::UserInfo> GetUserInfo(int userId);
 		std::unique_ptr<admin::UserInfo> GetUserInfo(const std::string & account);
 	public:
+		int InsertUser(admin::UserInfo & userInfo);
 		int UpdateUser(int userId, json::w::Document & document);
+	public:
+		int Remove(int userId);
+		int List(int page, json::w::Document & response);
 	private:
 		void Complete() final;
 		bool LateAwake() final;
 		std::unique_ptr<admin::UserInfo> Decode(const std::string & json);
-		std::unique_ptr<admin::UserInfo> Decode(json::r::Document & document);
-		void Encode(const admin::UserInfo & userInfo, json::w::Document & document);
+		static std::unique_ptr<admin::UserInfo> Decode(json::r::Document & document);
+		static void Encode(const admin::UserInfo & userInfo, json::w::Document & document);
 	private:
 		class MongoComponent * mMongo;
 	};

@@ -3,7 +3,7 @@
 #include"TimerBase.h"
 #include"Lua/Engine/Define.h"
 #include"Rpc/Method/MethodProxy.h"
-namespace joke
+namespace acs
 {
 	class DelayTimer : public TimerBase
 	{
@@ -18,7 +18,7 @@ namespace joke
 	};
 }// namespace Sentry
 
-namespace joke
+namespace acs
 {
 	class LuaTimer final : public TimerBase
 	{

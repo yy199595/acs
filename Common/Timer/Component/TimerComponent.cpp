@@ -3,7 +3,7 @@
 #include"Entity/Actor/App.h"
 #include"Lua/Engine/ModuleClass.h"
 #include"Timer/Lua/Timer.h"
-namespace joke
+namespace acs
 {
 	TimerComponent::TimerComponent()
 	{

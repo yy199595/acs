@@ -31,7 +31,6 @@
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
-#include <google/protobuf/any.pb.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_c2s_2fc2s_2eproto
@@ -42,7 +41,7 @@ struct TableStruct_c2s_2fc2s_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[4]
+  static const ::google::protobuf::internal::ParseTable schema[9]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -62,6 +61,21 @@ extern chat_noticeDefaultTypeInternal _chat_notice_default_instance_;
 class chat_request;
 class chat_requestDefaultTypeInternal;
 extern chat_requestDefaultTypeInternal _chat_request_default_instance_;
+class item;
+class itemDefaultTypeInternal;
+extern itemDefaultTypeInternal _item_default_instance_;
+class item_EquipInfo;
+class item_EquipInfoDefaultTypeInternal;
+extern item_EquipInfoDefaultTypeInternal _item_EquipInfo_default_instance_;
+class item_ItemInfo;
+class item_ItemInfoDefaultTypeInternal;
+extern item_ItemInfoDefaultTypeInternal _item_ItemInfo_default_instance_;
+class item_ItemList;
+class item_ItemListDefaultTypeInternal;
+extern item_ItemListDefaultTypeInternal _item_ItemList_default_instance_;
+class item_Value;
+class item_ValueDefaultTypeInternal;
+extern item_ValueDefaultTypeInternal _item_Value_default_instance_;
 }  // namespace c2s
 namespace google {
 namespace protobuf {
@@ -69,6 +83,11 @@ template<> ::c2s::ServerInfo* Arena::CreateMaybeMessage<::c2s::ServerInfo>(Arena
 template<> ::c2s::chat* Arena::CreateMaybeMessage<::c2s::chat>(Arena*);
 template<> ::c2s::chat_notice* Arena::CreateMaybeMessage<::c2s::chat_notice>(Arena*);
 template<> ::c2s::chat_request* Arena::CreateMaybeMessage<::c2s::chat_request>(Arena*);
+template<> ::c2s::item* Arena::CreateMaybeMessage<::c2s::item>(Arena*);
+template<> ::c2s::item_EquipInfo* Arena::CreateMaybeMessage<::c2s::item_EquipInfo>(Arena*);
+template<> ::c2s::item_ItemInfo* Arena::CreateMaybeMessage<::c2s::item_ItemInfo>(Arena*);
+template<> ::c2s::item_ItemList* Arena::CreateMaybeMessage<::c2s::item_ItemList>(Arena*);
+template<> ::c2s::item_Value* Arena::CreateMaybeMessage<::c2s::item_Value>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace c2s {
@@ -591,6 +610,636 @@ class chat :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_c2s_2fc2s_2eproto;
 };
+// -------------------------------------------------------------------
+
+class item_ItemInfo :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.item.ItemInfo) */ {
+ public:
+  item_ItemInfo();
+  virtual ~item_ItemInfo();
+
+  item_ItemInfo(const item_ItemInfo& from);
+
+  inline item_ItemInfo& operator=(const item_ItemInfo& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  item_ItemInfo(item_ItemInfo&& from) noexcept
+    : item_ItemInfo() {
+    *this = ::std::move(from);
+  }
+
+  inline item_ItemInfo& operator=(item_ItemInfo&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const item_ItemInfo& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const item_ItemInfo* internal_default_instance() {
+    return reinterpret_cast<const item_ItemInfo*>(
+               &_item_ItemInfo_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    4;
+
+  void Swap(item_ItemInfo* other);
+  friend void swap(item_ItemInfo& a, item_ItemInfo& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline item_ItemInfo* New() const final {
+    return CreateMaybeMessage<item_ItemInfo>(nullptr);
+  }
+
+  item_ItemInfo* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<item_ItemInfo>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const item_ItemInfo& from);
+  void MergeFrom(const item_ItemInfo& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(item_ItemInfo* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // int64 uuid = 1;
+  void clear_uuid();
+  static const int kUuidFieldNumber = 1;
+  ::google::protobuf::int64 uuid() const;
+  void set_uuid(::google::protobuf::int64 value);
+
+  // int32 count = 2;
+  void clear_count();
+  static const int kCountFieldNumber = 2;
+  ::google::protobuf::int32 count() const;
+  void set_count(::google::protobuf::int32 value);
+
+  // int32 item_id = 3;
+  void clear_item_id();
+  static const int kItemIdFieldNumber = 3;
+  ::google::protobuf::int32 item_id() const;
+  void set_item_id(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:c2s.item.ItemInfo)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::int64 uuid_;
+  ::google::protobuf::int32 count_;
+  ::google::protobuf::int32 item_id_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_c2s_2fc2s_2eproto;
+};
+// -------------------------------------------------------------------
+
+class item_EquipInfo :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.item.EquipInfo) */ {
+ public:
+  item_EquipInfo();
+  virtual ~item_EquipInfo();
+
+  item_EquipInfo(const item_EquipInfo& from);
+
+  inline item_EquipInfo& operator=(const item_EquipInfo& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  item_EquipInfo(item_EquipInfo&& from) noexcept
+    : item_EquipInfo() {
+    *this = ::std::move(from);
+  }
+
+  inline item_EquipInfo& operator=(item_EquipInfo&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const item_EquipInfo& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const item_EquipInfo* internal_default_instance() {
+    return reinterpret_cast<const item_EquipInfo*>(
+               &_item_EquipInfo_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    5;
+
+  void Swap(item_EquipInfo* other);
+  friend void swap(item_EquipInfo& a, item_EquipInfo& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline item_EquipInfo* New() const final {
+    return CreateMaybeMessage<item_EquipInfo>(nullptr);
+  }
+
+  item_EquipInfo* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<item_EquipInfo>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const item_EquipInfo& from);
+  void MergeFrom(const item_EquipInfo& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(item_EquipInfo* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // int64 uuid = 1;
+  void clear_uuid();
+  static const int kUuidFieldNumber = 1;
+  ::google::protobuf::int64 uuid() const;
+  void set_uuid(::google::protobuf::int64 value);
+
+  // int32 count = 2;
+  void clear_count();
+  static const int kCountFieldNumber = 2;
+  ::google::protobuf::int32 count() const;
+  void set_count(::google::protobuf::int32 value);
+
+  // int32 item_id = 3;
+  void clear_item_id();
+  static const int kItemIdFieldNumber = 3;
+  ::google::protobuf::int32 item_id() const;
+  void set_item_id(::google::protobuf::int32 value);
+
+  // int32 level = 4;
+  void clear_level();
+  static const int kLevelFieldNumber = 4;
+  ::google::protobuf::int32 level() const;
+  void set_level(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:c2s.item.EquipInfo)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::int64 uuid_;
+  ::google::protobuf::int32 count_;
+  ::google::protobuf::int32 item_id_;
+  ::google::protobuf::int32 level_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_c2s_2fc2s_2eproto;
+};
+// -------------------------------------------------------------------
+
+class item_Value :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.item.Value) */ {
+ public:
+  item_Value();
+  virtual ~item_Value();
+
+  item_Value(const item_Value& from);
+
+  inline item_Value& operator=(const item_Value& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  item_Value(item_Value&& from) noexcept
+    : item_Value() {
+    *this = ::std::move(from);
+  }
+
+  inline item_Value& operator=(item_Value&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const item_Value& default_instance();
+
+  enum KindCase {
+    kItemInfo = 1,
+    kEquipInfo = 2,
+    KIND_NOT_SET = 0,
+  };
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const item_Value* internal_default_instance() {
+    return reinterpret_cast<const item_Value*>(
+               &_item_Value_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    6;
+
+  void Swap(item_Value* other);
+  friend void swap(item_Value& a, item_Value& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline item_Value* New() const final {
+    return CreateMaybeMessage<item_Value>(nullptr);
+  }
+
+  item_Value* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<item_Value>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const item_Value& from);
+  void MergeFrom(const item_Value& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(item_Value* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .c2s.item.ItemInfo item_info = 1;
+  bool has_item_info() const;
+  void clear_item_info();
+  static const int kItemInfoFieldNumber = 1;
+  const ::c2s::item_ItemInfo& item_info() const;
+  ::c2s::item_ItemInfo* release_item_info();
+  ::c2s::item_ItemInfo* mutable_item_info();
+  void set_allocated_item_info(::c2s::item_ItemInfo* item_info);
+
+  // .c2s.item.EquipInfo equip_info = 2;
+  bool has_equip_info() const;
+  void clear_equip_info();
+  static const int kEquipInfoFieldNumber = 2;
+  const ::c2s::item_EquipInfo& equip_info() const;
+  ::c2s::item_EquipInfo* release_equip_info();
+  ::c2s::item_EquipInfo* mutable_equip_info();
+  void set_allocated_equip_info(::c2s::item_EquipInfo* equip_info);
+
+  void clear_kind();
+  KindCase kind_case() const;
+  // @@protoc_insertion_point(class_scope:c2s.item.Value)
+ private:
+  class HasBitSetters;
+  void set_has_item_info();
+  void set_has_equip_info();
+
+  inline bool has_kind() const;
+  inline void clear_has_kind();
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  union KindUnion {
+    KindUnion() {}
+    ::c2s::item_ItemInfo* item_info_;
+    ::c2s::item_EquipInfo* equip_info_;
+  } kind_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  ::google::protobuf::uint32 _oneof_case_[1];
+
+  friend struct ::TableStruct_c2s_2fc2s_2eproto;
+};
+// -------------------------------------------------------------------
+
+class item_ItemList :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.item.ItemList) */ {
+ public:
+  item_ItemList();
+  virtual ~item_ItemList();
+
+  item_ItemList(const item_ItemList& from);
+
+  inline item_ItemList& operator=(const item_ItemList& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  item_ItemList(item_ItemList&& from) noexcept
+    : item_ItemList() {
+    *this = ::std::move(from);
+  }
+
+  inline item_ItemList& operator=(item_ItemList&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const item_ItemList& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const item_ItemList* internal_default_instance() {
+    return reinterpret_cast<const item_ItemList*>(
+               &_item_ItemList_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  void Swap(item_ItemList* other);
+  friend void swap(item_ItemList& a, item_ItemList& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline item_ItemList* New() const final {
+    return CreateMaybeMessage<item_ItemList>(nullptr);
+  }
+
+  item_ItemList* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<item_ItemList>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const item_ItemList& from);
+  void MergeFrom(const item_ItemList& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(item_ItemList* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated .c2s.item.Value list = 1;
+  int list_size() const;
+  void clear_list();
+  static const int kListFieldNumber = 1;
+  ::c2s::item_Value* mutable_list(int index);
+  ::google::protobuf::RepeatedPtrField< ::c2s::item_Value >*
+      mutable_list();
+  const ::c2s::item_Value& list(int index) const;
+  ::c2s::item_Value* add_list();
+  const ::google::protobuf::RepeatedPtrField< ::c2s::item_Value >&
+      list() const;
+
+  // @@protoc_insertion_point(class_scope:c2s.item.ItemList)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::c2s::item_Value > list_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_c2s_2fc2s_2eproto;
+};
+// -------------------------------------------------------------------
+
+class item :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:c2s.item) */ {
+ public:
+  item();
+  virtual ~item();
+
+  item(const item& from);
+
+  inline item& operator=(const item& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  item(item&& from) noexcept
+    : item() {
+    *this = ::std::move(from);
+  }
+
+  inline item& operator=(item&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const item& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const item* internal_default_instance() {
+    return reinterpret_cast<const item*>(
+               &_item_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    8;
+
+  void Swap(item* other);
+  friend void swap(item& a, item& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline item* New() const final {
+    return CreateMaybeMessage<item>(nullptr);
+  }
+
+  item* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<item>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const item& from);
+  void MergeFrom(const item& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(item* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef item_ItemInfo ItemInfo;
+  typedef item_EquipInfo EquipInfo;
+  typedef item_Value Value;
+  typedef item_ItemList ItemList;
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:c2s.item)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_c2s_2fc2s_2eproto;
+};
 // ===================================================================
 
 
@@ -896,9 +1545,258 @@ inline void chat_notice::set_allocated_message(::std::string* message) {
 
 // chat
 
+// -------------------------------------------------------------------
+
+// item_ItemInfo
+
+// int64 uuid = 1;
+inline void item_ItemInfo::clear_uuid() {
+  uuid_ = PROTOBUF_LONGLONG(0);
+}
+inline ::google::protobuf::int64 item_ItemInfo::uuid() const {
+  // @@protoc_insertion_point(field_get:c2s.item.ItemInfo.uuid)
+  return uuid_;
+}
+inline void item_ItemInfo::set_uuid(::google::protobuf::int64 value) {
+  
+  uuid_ = value;
+  // @@protoc_insertion_point(field_set:c2s.item.ItemInfo.uuid)
+}
+
+// int32 count = 2;
+inline void item_ItemInfo::clear_count() {
+  count_ = 0;
+}
+inline ::google::protobuf::int32 item_ItemInfo::count() const {
+  // @@protoc_insertion_point(field_get:c2s.item.ItemInfo.count)
+  return count_;
+}
+inline void item_ItemInfo::set_count(::google::protobuf::int32 value) {
+  
+  count_ = value;
+  // @@protoc_insertion_point(field_set:c2s.item.ItemInfo.count)
+}
+
+// int32 item_id = 3;
+inline void item_ItemInfo::clear_item_id() {
+  item_id_ = 0;
+}
+inline ::google::protobuf::int32 item_ItemInfo::item_id() const {
+  // @@protoc_insertion_point(field_get:c2s.item.ItemInfo.item_id)
+  return item_id_;
+}
+inline void item_ItemInfo::set_item_id(::google::protobuf::int32 value) {
+  
+  item_id_ = value;
+  // @@protoc_insertion_point(field_set:c2s.item.ItemInfo.item_id)
+}
+
+// -------------------------------------------------------------------
+
+// item_EquipInfo
+
+// int64 uuid = 1;
+inline void item_EquipInfo::clear_uuid() {
+  uuid_ = PROTOBUF_LONGLONG(0);
+}
+inline ::google::protobuf::int64 item_EquipInfo::uuid() const {
+  // @@protoc_insertion_point(field_get:c2s.item.EquipInfo.uuid)
+  return uuid_;
+}
+inline void item_EquipInfo::set_uuid(::google::protobuf::int64 value) {
+  
+  uuid_ = value;
+  // @@protoc_insertion_point(field_set:c2s.item.EquipInfo.uuid)
+}
+
+// int32 count = 2;
+inline void item_EquipInfo::clear_count() {
+  count_ = 0;
+}
+inline ::google::protobuf::int32 item_EquipInfo::count() const {
+  // @@protoc_insertion_point(field_get:c2s.item.EquipInfo.count)
+  return count_;
+}
+inline void item_EquipInfo::set_count(::google::protobuf::int32 value) {
+  
+  count_ = value;
+  // @@protoc_insertion_point(field_set:c2s.item.EquipInfo.count)
+}
+
+// int32 item_id = 3;
+inline void item_EquipInfo::clear_item_id() {
+  item_id_ = 0;
+}
+inline ::google::protobuf::int32 item_EquipInfo::item_id() const {
+  // @@protoc_insertion_point(field_get:c2s.item.EquipInfo.item_id)
+  return item_id_;
+}
+inline void item_EquipInfo::set_item_id(::google::protobuf::int32 value) {
+  
+  item_id_ = value;
+  // @@protoc_insertion_point(field_set:c2s.item.EquipInfo.item_id)
+}
+
+// int32 level = 4;
+inline void item_EquipInfo::clear_level() {
+  level_ = 0;
+}
+inline ::google::protobuf::int32 item_EquipInfo::level() const {
+  // @@protoc_insertion_point(field_get:c2s.item.EquipInfo.level)
+  return level_;
+}
+inline void item_EquipInfo::set_level(::google::protobuf::int32 value) {
+  
+  level_ = value;
+  // @@protoc_insertion_point(field_set:c2s.item.EquipInfo.level)
+}
+
+// -------------------------------------------------------------------
+
+// item_Value
+
+// .c2s.item.ItemInfo item_info = 1;
+inline bool item_Value::has_item_info() const {
+  return kind_case() == kItemInfo;
+}
+inline void item_Value::set_has_item_info() {
+  _oneof_case_[0] = kItemInfo;
+}
+inline void item_Value::clear_item_info() {
+  if (has_item_info()) {
+    delete kind_.item_info_;
+    clear_has_kind();
+  }
+}
+inline ::c2s::item_ItemInfo* item_Value::release_item_info() {
+  // @@protoc_insertion_point(field_release:c2s.item.Value.item_info)
+  if (has_item_info()) {
+    clear_has_kind();
+      ::c2s::item_ItemInfo* temp = kind_.item_info_;
+    kind_.item_info_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::c2s::item_ItemInfo& item_Value::item_info() const {
+  // @@protoc_insertion_point(field_get:c2s.item.Value.item_info)
+  return has_item_info()
+      ? *kind_.item_info_
+      : *reinterpret_cast< ::c2s::item_ItemInfo*>(&::c2s::_item_ItemInfo_default_instance_);
+}
+inline ::c2s::item_ItemInfo* item_Value::mutable_item_info() {
+  if (!has_item_info()) {
+    clear_kind();
+    set_has_item_info();
+    kind_.item_info_ = CreateMaybeMessage< ::c2s::item_ItemInfo >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:c2s.item.Value.item_info)
+  return kind_.item_info_;
+}
+
+// .c2s.item.EquipInfo equip_info = 2;
+inline bool item_Value::has_equip_info() const {
+  return kind_case() == kEquipInfo;
+}
+inline void item_Value::set_has_equip_info() {
+  _oneof_case_[0] = kEquipInfo;
+}
+inline void item_Value::clear_equip_info() {
+  if (has_equip_info()) {
+    delete kind_.equip_info_;
+    clear_has_kind();
+  }
+}
+inline ::c2s::item_EquipInfo* item_Value::release_equip_info() {
+  // @@protoc_insertion_point(field_release:c2s.item.Value.equip_info)
+  if (has_equip_info()) {
+    clear_has_kind();
+      ::c2s::item_EquipInfo* temp = kind_.equip_info_;
+    kind_.equip_info_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::c2s::item_EquipInfo& item_Value::equip_info() const {
+  // @@protoc_insertion_point(field_get:c2s.item.Value.equip_info)
+  return has_equip_info()
+      ? *kind_.equip_info_
+      : *reinterpret_cast< ::c2s::item_EquipInfo*>(&::c2s::_item_EquipInfo_default_instance_);
+}
+inline ::c2s::item_EquipInfo* item_Value::mutable_equip_info() {
+  if (!has_equip_info()) {
+    clear_kind();
+    set_has_equip_info();
+    kind_.equip_info_ = CreateMaybeMessage< ::c2s::item_EquipInfo >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:c2s.item.Value.equip_info)
+  return kind_.equip_info_;
+}
+
+inline bool item_Value::has_kind() const {
+  return kind_case() != KIND_NOT_SET;
+}
+inline void item_Value::clear_has_kind() {
+  _oneof_case_[0] = KIND_NOT_SET;
+}
+inline item_Value::KindCase item_Value::kind_case() const {
+  return item_Value::KindCase(_oneof_case_[0]);
+}
+// -------------------------------------------------------------------
+
+// item_ItemList
+
+// repeated .c2s.item.Value list = 1;
+inline int item_ItemList::list_size() const {
+  return list_.size();
+}
+inline void item_ItemList::clear_list() {
+  list_.Clear();
+}
+inline ::c2s::item_Value* item_ItemList::mutable_list(int index) {
+  // @@protoc_insertion_point(field_mutable:c2s.item.ItemList.list)
+  return list_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::c2s::item_Value >*
+item_ItemList::mutable_list() {
+  // @@protoc_insertion_point(field_mutable_list:c2s.item.ItemList.list)
+  return &list_;
+}
+inline const ::c2s::item_Value& item_ItemList::list(int index) const {
+  // @@protoc_insertion_point(field_get:c2s.item.ItemList.list)
+  return list_.Get(index);
+}
+inline ::c2s::item_Value* item_ItemList::add_list() {
+  // @@protoc_insertion_point(field_add:c2s.item.ItemList.list)
+  return list_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::c2s::item_Value >&
+item_ItemList::list() const {
+  // @@protoc_insertion_point(field_list:c2s.item.ItemList.list)
+  return list_;
+}
+
+// -------------------------------------------------------------------
+
+// item
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

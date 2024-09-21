@@ -7,7 +7,7 @@
 #include"Rpc/Client/InnerClient.h"
 #include"Server/Component/ListenerComponent.h"
 struct lua_State;
-namespace joke
+namespace acs
 {
 	// 管理内网rpc的session
 	class InnerNetComponent : public Component, public ITcpListen,
@@ -29,12 +29,12 @@ namespace joke
 	private:
 		void OnRequest(rpc::Packet * message);
 		void OnForward(rpc::Packet * message);
-		bool GetClient(int id, rpc::InnerClient *& tcpClient);
+		rpc::InnerClient * GetClient(int id);
 	private:
 		math::NumberPool<int, 100> mNumPool;
 		class ActorComponent * mActComponent;
 		class ThreadComponent * mNetComponent;
         class DispatchComponent* mDisComponent;
-		custom::HashMap<int, rpc::InnerClient *> mClients; //本地客户端(连接别的)
+		std::unordered_map<int, std::unique_ptr<rpc::InnerClient>> mClients; //本地客户端(连接别的)
 	};
 }

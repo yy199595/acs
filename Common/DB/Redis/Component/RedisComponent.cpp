@@ -9,7 +9,7 @@
 #include"Util/File/FileHelper.h"
 #include"Util/File/DirectoryHelper.h"
 
-namespace joke
+namespace acs
 {
     bool RedisComponent::Awake()
     {
@@ -54,7 +54,7 @@ namespace joke
 				{
 					if(!redisCommandClient->Start())
 					{
-						LOG_ERROR("start redis [{}] fail count:{}", address, config.Id);
+						LOG_ERROR("connect redis [{}] fail count:{}", address, config.Id);
 						return false;
 					}
 					this->mFreeClients.Push(config.Id);
@@ -120,6 +120,7 @@ namespace joke
 
 	void RedisComponent::OnLuaRegister(Lua::ModuleClass &luaRegister)
 	{
+		luaRegister.AddFunction("Sub", Lua::redis::Sub);
 		luaRegister.AddFunction("Run", Lua::redis::Run);
 		luaRegister.AddFunction("Call", Lua::redis::Call);
         luaRegister.AddFunction("Send", Lua::redis::Send);
@@ -181,7 +182,7 @@ namespace joke
 		return true;
 	}
 
-	bool RedisComponent::Send(const joke::RedisLuaData& data)
+	bool RedisComponent::Send(const acs::RedisLuaData& data)
 	{
 		std::unique_ptr<redis::Request> request;
 		if (!this->MakeLuaRequest(data, request))
@@ -193,7 +194,7 @@ namespace joke
 		return true;
 	}
 
-	bool RedisComponent::Send(const joke::RedisLuaData& data, int& taskId)
+	bool RedisComponent::Send(const acs::RedisLuaData& data, int& taskId)
 	{
 		std::unique_ptr<redis::Request> request;
 		if (!this->MakeLuaRequest(data, request))
@@ -204,25 +205,23 @@ namespace joke
 		return true;
 	}
 
-	redis::Response* RedisComponent::CallLua(const joke::RedisLuaData& data)
+	redis::Response* RedisComponent::CallLua(const acs::RedisLuaData& data)
 	{
 		std::unique_ptr<redis::Request> request;
 		if(!this->MakeLuaRequest(data, request))
 		{
 			return nullptr;
 		}
-		LOG_DEBUG("call [{}] json:{}", data.name, data.json);
 		return this->Run(std::move(request));
 	}
 
-	std::unique_ptr<json::r::Document> RedisComponent::Call(const joke::RedisLuaData& data)
+	std::unique_ptr<json::r::Document> RedisComponent::Call(const acs::RedisLuaData& data)
 	{
 		std::unique_ptr<redis::Request> request;
 		if(!this->MakeLuaRequest(data, request))
 		{
 			return nullptr;
 		}
-		LOG_DEBUG("call [{}] json:{}", data.name, data.json);
 		redis::Response * response = this->Run(std::move(request));
 		if(response == nullptr || response->HasError())
 		{
@@ -236,7 +235,7 @@ namespace joke
 		return document;
 	}
 
-	bool RedisComponent::MakeLuaRequest(const joke::RedisLuaData& data, std::unique_ptr<redis::Request>& request)
+	bool RedisComponent::MakeLuaRequest(const acs::RedisLuaData& data, std::unique_ptr<redis::Request>& request)
 	{
 		const std::string & fullName = data.name;
 		size_t pos = fullName.find('.');

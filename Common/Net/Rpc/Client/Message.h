@@ -53,11 +53,13 @@ namespace rpc
 		void Clear() final;
 		std::string ToString() final;
 		std::string* Body() { return &this->mBody; }
-		void SetContent(const std::string& content);
 		inline int SockId() const { return this->mSockId; }
 		inline size_t GetSize() const{ return this->mBody.size(); }
 		inline const std::string& GetBody() const{ return this->mBody; }
 		inline void Append(const std::string& data){ this->mBody.append(data); }
+	public:
+		void SetContent(const std::string& content);
+		void SetContent(char proto, const std::string& content);
 	public:
 		bool ParseMessage(pb::Message* message);
 		bool WriteMessage(const pb::Message* message);

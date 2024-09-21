@@ -12,17 +12,19 @@ namespace http
 	class Response;
 }
 
-namespace joke
+namespace acs
 {
-	class RecordComponent : public Component
+	class HttpMethodConfig;
+	class RecordComponent : public Component, public IComplete, public IRequest<HttpMethodConfig, http::Request, http::Response>
 	{
 	public:
 		RecordComponent();
-		~RecordComponent() = default;
+		~RecordComponent() final = default;
 	private:
 		bool LateAwake() final;
+		void Complete() final;
 	public:
-		void OnRecord(const class HttpMethodConfig * config, http::Request * request, http::Response * response);
+		void OnRequestDone(const acs::HttpMethodConfig &c, const http::Request &t1, const http::Response &t2) final;
 	private:
 		class MongoComponent * mMongo;
 	};

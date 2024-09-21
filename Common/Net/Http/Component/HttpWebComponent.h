@@ -13,7 +13,7 @@
 
 namespace http
 {
-	class Data;
+	class Content;
     class Request;
     class Response;
 }
@@ -29,35 +29,37 @@ namespace http
 	};
 }
 
-namespace joke
+namespace acs
 {
     class HttpMethodConfig;
+	typedef IRequest<HttpMethodConfig, http::Request, http::Response> HttpHandlerComponent;
     class HttpWebComponent final : public HttpListenComponent, public IServerRecord
     {
     public:
         HttpWebComponent();
     private:
-		bool ReadHttpConfig();
 		bool LateAwake() final;
-		bool OnListenOk(const char * name) final;
-		void OnRecord(json::w::Document &document) final;
+		bool OnListenOk(const char* name) final;
+		void OnRecord(json::w::Document& document) final;
+	private:
+		bool ReadHttpConfig();
 		void OnApi(const HttpMethodConfig* config, http::Request * request, http::Response * response);
 		void Invoke(const HttpMethodConfig* config, http::Request * request, http::Response * response);
 	private:
-		void OnNotFound(http::Request * request, http::Response * response);
 		void OnReadHead(http::Request *request, http::Response *response) final;
 		void OnMessage(http::Request * request, http::Response * response) final;
+	private:
+		HttpStatus OnNotFound(http::Request* request, http::Response* response);
 		HttpStatus AuthToken(const HttpMethodConfig* config, http::Request *request);
 		HttpStatus CreateHttpData(const HttpMethodConfig* config, http::Request * request);
 	public:
 		bool AddRootDirector(const std::string & dir);
-		const http::Config & GetConfig() const { return this->mConfig; }
 	private:
-		std::string mKey;
 		http::Config mConfig;
 		http::ContentFactory mFactory;
 		std::vector<std::string> mRoots;
 		class CoroutineComponent * mCorComponent;
+		std::vector<HttpHandlerComponent *> mRecordComponents;
 		std::unordered_map<std::string, std::string> mDefaultHeader;
 		custom::HashMap<std::string, class HttpService *> mHttpServices;
 	};

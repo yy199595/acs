@@ -5,7 +5,7 @@
 #ifndef APP_LUACLIENT_H
 #define APP_LUACLIENT_H
 struct lua_State;
-namespace joke
+namespace acs
 {
 	namespace LuaClient
 	{

@@ -5,7 +5,7 @@
 #include"ClusterConfig.h"
 #include"Core/System/System.h"
 #include"Server/Config/ServerConfig.h"
-namespace joke
+namespace acs
 {
     bool NodeConfig::OnLoadConfig(const json::r::Value &value)
     {
@@ -50,7 +50,7 @@ namespace joke
 
 }
 
-namespace joke
+namespace acs
 {
     bool ClusterConfig::OnLoadJson()
     {

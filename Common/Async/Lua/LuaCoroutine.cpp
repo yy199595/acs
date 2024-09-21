@@ -5,7 +5,7 @@
 #include"Async/Lua/LuaWaitTaskSource.h"
 #include"Timer/Component/TimerComponent.h"
 
-using namespace joke;
+using namespace acs;
 
 namespace Lua
 {
@@ -23,7 +23,7 @@ namespace Lua
 		static TimerComponent* timerComponent = nullptr;
 		if (timerComponent == nullptr)
 		{
-			timerComponent = App::Inst()->GetComponent<TimerComponent>();
+			timerComponent = App::Get<TimerComponent>();
 			if (timerComponent == nullptr)
 			{
 				luaL_error(lua, "not find TimerComponent");

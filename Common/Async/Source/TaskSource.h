@@ -5,7 +5,7 @@
 #ifndef APP_TASKSOURCE_H
 #define APP_TASKSOURCE_H
 #include"WaitTaskSourceBase.h"
-namespace joke
+namespace acs
 {
     class LoopTaskSource : public WaitTaskSourceBase
     {
@@ -43,7 +43,7 @@ namespace joke
     }
 }
 
-namespace joke
+namespace acs
 {
     template<> class TaskSource<void> : public WaitTaskSourceBase
     {
@@ -53,7 +53,7 @@ namespace joke
     };
 }
 
-namespace joke
+namespace acs
 {
     template<typename T>
     class TaskSource<T *> { };
@@ -65,7 +65,7 @@ namespace joke
     class TaskSource<const T &> { };
 }
 
-namespace joke
+namespace acs
 {
 //    template<typename T>
 //    class TaskSource<std::shared_ptr<T>> : public WaitTaskSourceBase

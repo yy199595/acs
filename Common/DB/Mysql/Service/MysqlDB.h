@@ -4,7 +4,7 @@
 #include"Mysql/Client/MysqlClient.h"
 #include"Rpc/Service/RpcService.h"
 
-namespace joke
+namespace acs
 {
 	class MysqlDB : public RpcService
 	{

@@ -6,12 +6,12 @@
 #include "Http/Common/HttpRequest.h"
 #include "Http/Common/HttpResponse.h"
 #include "Rpc/Config/MethodConfig.h"
-#include "Util/Time/TimeHelper.h"
+#include "Util/Tools/TimeHelper.h"
 #include "Mongo/Component/MongoComponent.h"
 
 constexpr char * HTTP_RECORD_LIST = "http_record_list";
 
-namespace joke
+namespace acs
 {
 	RecordComponent::RecordComponent()
 	{
@@ -20,35 +20,44 @@ namespace joke
 
 	bool RecordComponent::LateAwake()
 	{
-		this->mMongo = this->GetComponent<MongoComponent>();
-		return this->mMongo != nullptr;
+		LOG_CHECK_RET_FALSE(this->mMongo = this->GetComponent<MongoComponent>())
+		return true;
 	}
 
-	void RecordComponent::OnRecord(const HttpMethodConfig * config, http::Request* request, http::Response* response)
+	void RecordComponent::Complete()
 	{
+		this->mMongo->SetIndex(HTTP_RECORD_LIST, "time", -1);
+	}
+
+	void RecordComponent::OnRequestDone(const HttpMethodConfig & config, const http::Request & request, const http::Response & response)
+	{
+		if(!config.IsRecord)
+		{
+			return;
+		}
 		json::w::Document document;
 		long long nowTime = help::Time::NowSec();
-		document.Add("url", config->Path);
-		document.Add("desc", config->Desc);
-		document.Add("method", config->Type);
+		document.Add("url", config.Path);
+		document.Add("desc", config.Desc);
+		document.Add("method", config.Type);
 		document.Add("time", nowTime);
-		if(request->GetBody() != nullptr)
+		if(request.GetBody() != nullptr)
 		{
-			std::string req = request->GetBody()->ToStr();
+			std::string req = request.GetBody()->ToStr();
 			document.Add("request", req);
 		}
-		else if(request->GetUrl().GetQuery().Size() > 0)
+		else if(request.GetUrl().GetQuery().Size() > 0)
 		{
-			std::string req = request->GetUrl().GetQuery().ToStr();
+			std::string req = request.GetUrl().GetQuery().ToStr();
 			document.Add("request", req);
 		}
-		if(response->GetBody() != nullptr)
+		if(response.GetBody() != nullptr)
 		{
-			std::string res = response->GetBody()->ToStr();
+			std::string res = response.GetBody()->ToStr();
 			document.Add("response", res);
 		}
 		int userId = 0;
-		if(request->GetUrl().GetQuery().Get(http::query::UserId, userId))
+		if(request.GetUrl().GetQuery().Get(http::query::UserId, userId))
 		{
 			document.Add("user_id", userId);
 		}
