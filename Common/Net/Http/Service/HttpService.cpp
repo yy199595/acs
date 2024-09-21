@@ -25,7 +25,11 @@ namespace acs
 		{
 			this->mLuaModule = luaComponent->LoadModule(name);
 		}
-		LOG_CHECK_RET_FALSE(this->OnInit());
+		if(!this->OnInit())
+		{
+			LOG_ERROR("[{}] Init Fail", name)
+			return false;
+		}
 		if(this->mLuaModule != nullptr)
 		{
 			int code = this->mLuaModule->Call("Awake");

@@ -7,7 +7,6 @@
             "NodeSystem",
             "GateSystem",
             "LogMgr",
-            "Oss",
             "EventSystem",
             "Collection",
             "ResourceMgr",
