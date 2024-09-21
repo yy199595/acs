@@ -1,0 +1,15 @@
+{
+    "include": [
+        "db_debug.json",
+        "com.json"
+    ],
+    "core": {
+        "name": "data"
+    },
+    "listen": {
+        "rpc": {"port" : 7793}
+    },
+    "lua": {
+        "main": "Main"
+    }
+}

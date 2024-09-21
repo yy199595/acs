@@ -1,0 +1,50 @@
+{
+    "include": [
+        "db.json",
+        "com.json"
+    ],
+    "core": {
+        "name": "http"
+    },
+    "listen": {
+        "http": {
+            "port": 80
+        },
+        "rpc": {
+            "port": 7790
+        },
+        "https" : {
+            "port" : 443
+        }
+    },
+    "user" : {
+        "nick" : "慢友",
+        "icon": "https://lf16-fe.bytedgame.com/obj/gamefe-sg/toutiao/fe/game_interface_platform_fe/icon.png"
+    },
+    "http": {
+        "auth": true,
+        "index": "index.html",
+        "root": "${WORK_DIR}/www/dist",
+        "domain": "http://www.huwai.pro",
+        "upload": "${WORK_DIR}/www/download",
+        "download": "${WORK_DIR}/www/download",
+        "token" : "01a153b6207dc11ed71bc0cd7f2e3896",
+        "header": {
+            "Server": "Joke-Server 1.1",
+            "Access-Control-Allow-Origin": "*"
+        }
+    },
+    "https": {
+        "auth": true,
+        "index": "index.html",
+        "root": "${WORK_DIR}/www/dist",
+        "domain": "https://www.huwai.pro",
+        "upload": "${WORK_DIR}/www/download",
+        "download": "${WORK_DIR}/www/download",
+        "token" : "01a153b6207dc11ed71bc0cd7f2e3896",
+        "header": {
+            "Server": "Joke-Server 1.1",
+            "Access-Control-Allow-Origin": "*"
+        }
+    }
+}

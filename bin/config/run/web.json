@@ -1,0 +1,29 @@
+{
+    "include": [
+        "db.json",
+        "com.json"
+    ],
+    "core": {
+        "name": "web"
+    },
+    "listen": {
+        "http": {
+            "port": 8080
+        },
+        "rpc": {
+            "port": 7794
+        }
+    },
+    "http": {
+        "auth": true,
+        "index": "index.html",
+        "root": "${WORK_DIR}/www/dist",
+        "upload": "${WORK_DIR}/www/download",
+        "download": "${WORK_DIR}/www/download",
+        "token" : "01a153b6207dc11ed71bc0cd7f2e3896",
+        "header": {
+            "Server": "Joke-Server 1.1",
+            "Access-Control-Allow-Origin": "*"
+        }
+    }
+}

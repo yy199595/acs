@@ -1,0 +1,112 @@
+{
+    "notify" : {
+        "wx" : "微信通知的url",
+        "ding" : "钉钉通知的url"
+    },
+    "net" : {
+        "http" : "HttpWebComponent",
+        "https" : "HttpWebComponent",
+        "rpc" : "InnerNetComponent",
+        "gate" : "OuterNetComponent",
+        "master" : "HttpWebComponent"
+    },
+    "listen" : {
+        "rpc" : {
+            "max_conn" : 512,
+            "protocol" : "rpc",
+            "component" : "InnerNetComponent"
+        },
+        "gate" : {
+            "max_conn" : 1024,
+            "protocol" : "rpc",
+            "component" : "OuterNetComponent"
+        },
+        "http" : {
+            "max_conn" : 256,
+            "protocol" : "http",
+            "component" : "HttpWebComponent"
+        },
+        "https" : {
+            "max_conn" : 256,
+            "protocol" : "https",
+            "component" : "HttpWebComponent",
+            "key": "",
+            "cert": ""
+        },
+        "master" : {
+            "max_conn" : 128,
+            "protocol" : "http",
+            "component" : "HttpWebComponent"
+        }
+    },
+    "connect": {
+        "inner": 500,
+        "outer": 1000
+    },
+    "core": {
+        "fps": 60,
+        "event": 1000,
+        "name": "test",
+        "host" : "127.0.0.1",
+        "secret" : "4437c3f2f3ec17e796467fa1b3288f9b"
+    },
+    "master": {
+        "auth": true,
+        "host" : "http://127.0.0.1:7777"
+    },
+    "oss": {
+        "bucket": "",
+        "region": "",
+        "key": "",
+        "secret": "",
+        "host" : ""
+    },
+    "path": {
+        "proto": "${WORK_DIR}/proto",
+        "lang" : "${WORK_DIR}/config/lang/lang.csv",
+        "vip": "${WORK_DIR}/config/card/vip.json",
+        "user": "${WORK_DIR}/config/user.json",
+        "sqlite": "${WORK_DIR}/data/sqlite/",
+        "code": "${WORK_DIR}/XCode/XCode.csv",
+        "rpc": "${WORK_DIR}/config/service/rpc",
+        "http": "${WORK_DIR}/config/service/http",
+        "client": "${WORK_DIR}/config/service/client.json",
+        "cluster": "${WORK_DIR}/config/cluster/web.json",
+        "machine" : "${WORK_DIR}/config/cluster/machine.json"
+    },
+    "lua": {
+        "require": [
+            "${WORK_DIR}/script/Common",
+            "${WORK_DIR}/script/Component",
+            "${WORK_DIR}/script/Server",
+            "${WORK_DIR}/script/Client",
+            "${WORK_DIR}/script/Tools"
+        ]
+    },
+    "ssl": {
+        "client": {
+            "pem": "${WORK_DIR}/ssl/ca.pem"
+        }
+    },
+    "wx" : {
+        "app_id" : "",
+        "app_secret": "",
+
+        "mch_id" : "",
+        "mch_num": "",
+        "api_key" : "",
+        "api_cert" : "",
+        "api_v3_key" : "",
+        "notify_url" : "",
+        "complaint_url" : "",
+        "public_key" : ""
+    },
+    "whcbqhn": {
+        "app_id": "",
+        "app_secret" : ""
+    },
+    "quick" : {
+        "pay_md5" : "",
+        "pay_num": ""
+    }
+}

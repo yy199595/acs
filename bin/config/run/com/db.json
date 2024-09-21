@@ -1,0 +1,39 @@
+{
+    "sub": {
+        "ping": 0,
+        "debug" : false,
+        "passwd": "199595yjz.",
+        "address": "${db}:6379"
+    },
+
+    "redis": {
+        "ping": 15,
+        "index": 0,
+        "count": 1,
+        "debug" : false,
+        "passwd": "199595yjz.",
+        "address": "${db}:6379",
+        "script": "${WORK_DIR}/config/db/redis"
+    },
+    "mysql": {
+        "ping" : 30,
+        "count": 4,
+        "db" : "yy",
+        "user": "yjz",
+        "passwd": "199595yjz",
+        "address": "${db}:3306",
+        "table" : ["mysql/comment.proto"]
+    },
+    "mongo": {
+        "ping": 15,
+        "count": 1,
+        "debug" : false,
+        "db": "yjz",
+        "user": "root",
+        "passwd": "199595yjz.",
+        "address": "${db}:27017"
+    },
+    "leveldb": {
+        "address": "${db}:7788"
+    }
+}

@@ -1,0 +1,48 @@
+{
+    "log": [
+        {
+            "level" : 1,
+            "open" : false,
+            "name" : "debug"
+        },
+        {
+            "level" : 2,
+            "open" : true,
+            "name" : "info",
+            "max_line": 10240,
+            "max_size": 104448,
+            "path": "${WORK_DIR}/log"
+        },
+        {
+            "level" : 3,
+            "open" : true,
+            "name" : "warn",
+            "max_line": 10240,
+            "max_size": 104448,
+            "path": "${WORK_DIR}/log"
+        },
+        {
+            "level" : 4,
+            "open" : true,
+            "name" : "error",
+            "max_line": 10240,
+            "max_size": 104448,
+            "path": "${WORK_DIR}/log",
+            "pem" : "${WORK_DIR}/ssl/ca.pem",
+            "wx" : "",
+            "ding" : ""
+        },
+        {
+            "level" : 5,
+            "open" : true,
+            "name" : "fatal",
+            "max_line": 10240,
+            "max_size": 104448,
+            "path": "${WORK_DIR}/log",
+            "pem" : "${WORK_DIR}/ssl/ca.pem",
+            "wx" : "",
+            "ding" : ""
+        }
+    ],
+    "log_dir" : "${WORK_DIR}/log"
+}

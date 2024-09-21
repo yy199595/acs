@@ -1,0 +1,19 @@
+{
+    "include": [
+        "com.json"
+    ],
+    "core": {
+        "name": "gate"
+    },
+    "listen": {
+        "rpc": {
+            "port": 7792
+        },
+        "gate": {
+            "port": 1995
+        }
+    },
+    "url": {
+        "account": "http://127.0.0.1:8080/account/verify"
+    }
+}

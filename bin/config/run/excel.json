@@ -1,0 +1,43 @@
+{
+    "include": [
+        "com/com.json",
+        "com/log.json"
+    ],
+    "log" : {
+        "wx": "",
+        "ding" : ""
+    },
+    "core": {
+        "name": "excel"
+    },
+    "lua": {
+        "main": "Excel"
+    },
+    "path": {
+        "cluster": null
+    },
+    "excel": {
+        "dir": "C:/Users/64658/Desktop/tmp/tmp/excel",
+        "output": [
+            {
+                "type": "json",
+                "ext": ".json",
+                "path": "C:/Users/64658/Desktop/tmp/tmp/excel/json"
+            },
+            {
+                "type": "lua",
+                "ext": ".lua",
+                "path": "C:/Users/64658/Desktop/tmp/tmp/excel/lua"
+            },
+            {
+                "type": "cpp",
+                "ext": ".h",
+                "path": "C:/Users/64658/Desktop/tmp/tmp/excel/cpp"
+            }
+        ],
+        "ignore": [
+            "@",
+            "#"
+        ]
+    }
+}

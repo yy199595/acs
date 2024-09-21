@@ -1,0 +1,24 @@
+{
+    "include": [
+        "com.json"
+    ],
+    "core": {
+        "name": "cent"
+    },
+    "listen": {
+        "rpc": {
+            "port": 7788
+        },
+        "master" : {
+            "port": 7777
+        }
+    },
+    "redis": {
+        "ping": 15,
+        "index": 1,
+        "count": 1,
+        "debug" : false,
+        "passwd": "199595yjz.",
+        "address": "101.34.67.141:6379"
+    }
+}
