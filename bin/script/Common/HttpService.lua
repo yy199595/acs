@@ -11,7 +11,6 @@ local log_error = require("Log").OnError
 local HttpService = Module()
 
 local context = function(class, func, request, taskSource)
-    local response = { }
     local status, code, result = xpcall(func, log_error, class, request)
     if not status then
         code = XCode.CallLuaFunctionFail
@@ -21,7 +20,6 @@ end
 
 function HttpService:__Invoke(name, request)
     local func = self[name]
-    local http_response = { }
     if func == nil then
         return XCode.CallFunctionNotExist
     else

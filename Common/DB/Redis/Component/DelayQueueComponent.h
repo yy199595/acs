@@ -7,11 +7,12 @@
 #include "Entity/Component/Component.h"
 namespace acs
 {
+	// redis消息队列
 	class DelayQueueComponent : public Component
 	{
 	public:
 		DelayQueueComponent();
-		~DelayQueueComponent() = default;
+		~DelayQueueComponent() final = default;
 	public:
 		std::vector<std::string> List(const std::string & key);
 		int Del(const std::string & key, const std::string & value);
