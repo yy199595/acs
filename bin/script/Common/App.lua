@@ -8,9 +8,8 @@ local Module = require("Module")
 local log_err = require("Log").Stack
 
 local app = require("core.app")
-local router = require("core.router")
 local config = app.GetConfig()
-
+local _, router = pcall(require, "core.router")
 
 local App = Module()
 SetMember(App, "agent", { })
@@ -29,6 +28,10 @@ function App:NewGuid()
     return app.NewGuid()
 end
 
+function App:Stop()
+    return app.Stop()
+end
+
 ---@return string
 function App:NewUuid()
     return app.NewUuid()
@@ -38,6 +41,17 @@ end
 ---@return boolean
 function App:HasComponent(name)
     return app.HasComponent(name)
+end
+
+---@param id number
+---@param channel string
+---@param message table
+function App:Publish(actorId, channel, message)
+    local status, code = xpcall(router.Publish, log_err, actorId, channel, message)
+    if not status then
+        return XCode.CallLuaFunctionFail
+    end
+    return code
 end
 
 ---@param key string

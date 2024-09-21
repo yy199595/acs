@@ -12,7 +12,7 @@ function GateComponent:Login(addr, token)
         log.Error("make client fail addr=%s", addr)
         return nil
     end
-    local code = router.Call(fd, "Gate.Login", token)
+    local code = router.Call(fd, "GateSystem.LoginSystem", token)
     if code ~= XCode.Ok then
         log.Error("login to [%s] fail token:(%s)", addr, token)
         return nil
@@ -22,13 +22,13 @@ end
 
 function GateComponent:Ping(fd)
     local t1 = os.clock() * 1000
-    local code = router.Call(fd, "Gate.Ping")
+    local code = router.Call(fd, "GateSystem.Ping")
     if code ~= XCode.Ok then
-        log.Error("call [Gate.Ping] code = (%d)", code)
+        log.Error("call [GateSystem.Ping] code = (%d)", code)
         return
     end
     local t2 = os.clock() * 1000 - t1
-    log.Debug("call Gate.Ping time = %s ms code=(%d)", t2, code)
+    log.Debug("call GateSystem.Ping time = %s ms code=(%d)", t2, code)
 end
 
 function GateComponent:Update(fd)

@@ -7,6 +7,9 @@
         "Bind": "Master.Push",
         "ContentType": "application/json",
         "Desc": "注册服务器到中心",
+        "WhiteList" : [
+            "127.0.0.1"
+        ],
         "Request": {
             "id": 0,
             "name": "server",

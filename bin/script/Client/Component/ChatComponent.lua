@@ -22,14 +22,14 @@ end
 
 function ChatComponent:CallPing(fd)
     local t1 = os.clock() * 1000
-    router.Call(fd, "Chat.Ping")
+    router.Call(fd, "ChatSystem.Ping")
     --log.Debug("ping chat time = [%s]ms", os.clock() * 1000 - t1)
 end
 
 function ChatComponent:CallChat(fd)
 
     local t1 = os.clock() * 1000
-    local code = router.Call(fd, "Chat.OnChat", {
+    local code = router.Call(fd, "ChatSystem.OnChat", {
         msg_type = 1,
         message = "hello"
     })

@@ -11,6 +11,12 @@
         "Bind": "LogMgr.Look",
         "Desc": "查看某个日志信息"
     },
+    "log/html": {
+        "Type": "GET",
+        "Auth": false,
+        "Bind": "LogMgr.Html",
+        "Desc": "查看某个日志信息"
+    },
     "/log/delete": {
         "Type": "DELETE",
         "Bind": "LogMgr.Delete",
@@ -49,5 +55,12 @@
         "Async": false,
         "Bind": "ResourceMgr.Download",
         "Desc": "下载某个资源"
+    },
+    "/res/video": {
+        "Type": "GET",
+        "Async": true,
+        "Auth" : false,
+        "Bind": "ResourceMgr.Video",
+        "Desc": "获取视频链接"
     }
 }

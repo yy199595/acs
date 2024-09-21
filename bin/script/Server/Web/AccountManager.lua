@@ -13,7 +13,7 @@ local AccountManager = HttpService()
 function AccountManager:List(request)
     local count = 0
     local response = { }
-    local user_id = request.query.open_id
+    local user_id = request.data.open_id
     local fields = { "_id", "user_id", "nick", "sex", "icon", "desc", "permission",
                       "create_time", "city_name", "card_id", "vip_time" }
     if user_id ~= nil and user_id ~= "" then
@@ -27,13 +27,19 @@ function AccountManager:List(request)
         end
     else
         local filter = { }
-        if request.query.city_id then
-            local city_id = tonumber(request.query.city_id)
+        if request.data.city_id then
+            local city_id = tonumber(request.data.city_id)
             if city_id and city_id > 0 then
                 filter.city = city_id
             end
         end
-        local page = tonumber(request.query.page)
+        local nick = request.data.nick
+        if nick ~= nil and nick ~= "" then
+            filter.nick = {
+                ["$regex"] = nick
+            }
+        end
+        local page = tonumber(request.data.page)
         if page == nil then
             return XCode.CallArgsError
         end

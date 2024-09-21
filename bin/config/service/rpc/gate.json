@@ -1,14 +1,14 @@
 {
-    "Gate.Ping": {
+    "GateSystem.Ping": {
         "Async": false,
         "IsOpen": true,
         "IsClient": true
     },
-    "Gate.Login": {
+    "GateSystem.Login": {
         "Async": true,
         "IsClient": true
     },
-    "Gate.Logout": {
+    "GateSystem.Logout": {
         "Async": true,
         "IsClient": true
     }

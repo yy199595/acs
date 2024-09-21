@@ -22,6 +22,12 @@ function ProtoHelper.Encode(name, data)
     return proto.Encode(name, data)
 end
 
+---@param data userdata
+---@return string
+function ProtoHelper.ToJson(data)
+    return proto.ToJson(data)
+end
+
 ---@param name string
 ---@param message string
 ---@return userdata

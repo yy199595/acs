@@ -121,7 +121,7 @@ function MongoComponent:FindPage(tab, select, page, count, fields, sort)
         request.sort = json_encode(sort)
     end
 
-    if select and next(select) then
+    if select and type(select) == "table" then
         request.where = json_encode(select)
     end
 
@@ -292,7 +292,7 @@ end
 ---@return number
 function MongoComponent:Count(tab, select)
     local request = { tab = tab }
-    if select ~= nil and next(select) then
+    if select ~= nil then
         request.where = json_encode(select)
     end
     local session = self:GetActorId()
@@ -354,6 +354,26 @@ function MongoComponent:DelArray(tab, filter, field, value)
     }, "$pull", false)
 end
 
+function MongoComponent:Databases()
+    local session = self:GetActorId()
+    local code, response = app:Call(session, "MongoDB.Databases")
+    if code ~= XCode.Ok or response == nil then
+        return nil
+    end
+    return response.array
+end
+
+function MongoComponent:Collections(name)
+    local session = self:GetActorId()
+    local code, response = app:Call(session, "MongoDB.Collections", {
+        str = name
+    })
+    if code ~= XCode.Ok or response == nil then
+        return nil
+    end
+    return response.array
+end
+
 function MongoComponent:FindAndModify(tab, query, update, fields)
     if query == nil or update == nil then
         log_error("query=%s update=%s", query, update)
@@ -380,6 +400,29 @@ function MongoComponent:FindAndModify(tab, query, update, fields)
         return nil
     end
     return json_decode(response.json)
+end
+
+function MongoComponent:Sum(tab, filter, by, field)
+
+    local request = {
+        by = by,
+        tab = tab,
+        field = field
+    }
+    if filter and next(filter) then
+        request.filter = json_encode(filter)
+    end
+
+    local session = self:GetActorId()
+    local code, response = app:Call(session, "MongoDB.Sum", request)
+    if code ~= XCode.Ok then
+        return nil
+    end
+    local responses = {}
+    for _, str in ipairs(response.json) do
+        table_insert(responses, json_decode(str))
+    end
+    return responses
 end
 
 return MongoComponent

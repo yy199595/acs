@@ -75,7 +75,7 @@ function Account:Login(request)
         address = "",
         token = token
     }
-    local gate_id =  app.Random("Gate")
+    local gate_id =  app.Random("GateSystem")
     response.address = app.GetListen(gate_id, "gate")
     if response.address == nil then
         return XCode.AddressAllotFailure

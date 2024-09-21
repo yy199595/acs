@@ -1,23 +1,24 @@
 {
     "include": [
-        "db.json",
-        "com.json"
+        "com/db.json",
+        "com/com.json",
+        "com/log.json"
     ],
     "core": {
-        "name": "server"
+        "name": "${name}"
     },
     "lua": {
         "main": "Server"
     },
     "listen": {
         "http": {
-            "port": 8088
+            "port": "${http}"
         },
         "rpc": {
-            "port": 7788
+            "port": "${rpc}"
         },
         "gate": {
-            "port": 1995
+            "port": "${gate}"
         }
     },
     "master": {
@@ -35,6 +36,8 @@
         }
     },
     "path": {
+        "machine" : "",
+        "home" : "${WORK_DIR}/config/card/home.json",
         "cluster": "${WORK_DIR}/config/cluster/debug.json"
     }
 }

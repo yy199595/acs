@@ -106,4 +106,5 @@ XCode =
 	TitleToLong = 103,--活动标题过长
 	InsufficientBalance = 104,--账户余额不足
 	VipCardBeUse = 105,--该链接已经被使用
+	AlreadyPermanentMember = 106,--您已经会员了
 }

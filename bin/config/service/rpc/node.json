@@ -1,29 +1,29 @@
 {
-    "Node.Add": {
+    "NodeSystem.Add": {
         "Request": "com.type.json"
     },
-    "Node.Del": {
+    "NodeSystem.Del": {
         "Request": "com.type.json"
     },
-    "Node.Find": {
+    "NodeSystem.Find": {
         "Response": "com.type.json"
     },
-    "Node.Ping": {
+    "NodeSystem.Ping": {
 
     },
-    "Node.Hotfix": {
+    "NodeSystem.Hotfix": {
 
     },
-    "Node.SetLogLevel" : {
+    "NodeSystem.SetLogLevel" : {
         "Request" : "com.type.int32"
     },
-    "Node.RunInfo": {
+    "NodeSystem.RunInfo": {
         "Response": "com.type.json"
     },
-    "Node.Shutdown": {
+    "NodeSystem.Shutdown": {
         "Async":true
     },
-    "Node.LoadConfig": {
+    "NodeSystem.LoadConfig": {
 
     }
 }

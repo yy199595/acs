@@ -1,85 +1,83 @@
 {
-    "gate": {
-        "AutoAllot": false,
-        "Service": [
-            "Gate",
-            "Node"
-        ],
-        "Component": [
-            "HttpComponent",
-            "MasterComponent"
-        ]
-    },
-    "chat": {
-        "AutoAllot": true,
-        "Service": [
-            "Login",
-            "Node",
-            "Chat"
-        ],
-        "Component": [
-            "GateComponent",
-            "RedisComponent",
-            "HttpComponent",
-            "MasterComponent"
-        ]
-    },
-    "http": {
-        "AutoAllot": false,
-        "Service": [
-            "Node",
-            "UserManager",
-            "AccountManager",
-            "ActivityManager",
-
-            "UserLogin",
-            "UserActivity",
-            "UserBaseData",
-
-            "Oss",
-            "City",
-            "Node",
-            "Admin",
-            "LogMgr",
-            "CityMgr",
-            "Collection",
-            "ResourceMgr",
-            "UserOrder",
-            "VipManager",
-            "OrderManager"
-        ],
-        "Component": [
-            "HttpComponent",
-            "RedisComponent",
-            "MongoComponent",
-            "MasterComponent",
-            "HttpWebComponent"
-        ]
-    },
-    "data": {
-        "AutoAllot": false,
-        "Service": [
-            "Node",
-            "MongoDB"
-        ],
-        "Component": [
-            "HttpComponent",
-            "RedisComponent",
-            "MasterComponent"
-        ]
-    },
-    "cent": {
-        "AutoAllot": false,
-        "Service": [
-            "Node",
-            "Master"
-        ],
-        "Component": [
-            "HttpComponent",
-            "RedisComponent",
-            "SqliteComponent",
-            "HttpWebComponent",
-            "MasterComponent"
-        ]
-    }
+	"gate": {
+		"AutoAllot": false,
+		"Service": [
+			"Gate",
+			"Node"
+		],
+		"Component": [
+			"HttpComponent",
+			"MasterComponent"
+		]
+	},
+	"chat": {
+		"AutoAllot": true,
+		"Service": [
+			"Login",
+			"Node",
+			"Chat"
+		],
+		"Component": [
+			"GateComponent",
+			"RedisComponent",
+			"HttpComponent",
+			"MasterComponent"
+		]
+	},
+	"http": {
+		"AutoAllot": false,
+		"Service": [
+			"Node",
+			"UserManager",
+			"AccountManager",
+			"ActivityManager",
+			"UserLogin",
+			"UserActivity",
+			"UserBaseData",
+			"Oss",
+			"City",
+			"Node",
+			"Admin",
+			"LogMgr",
+			"CityMgr",
+			"Collection",
+			"ResourceMgr",
+			"UserOrder",
+			"VipManager",
+			"OrderManager"
+		],
+		"Component": [
+			"HttpComponent",
+			"RedisComponent",
+			"MongoComponent",
+			"MasterComponent",
+			"HttpWebComponent"
+		]
+	},
+	"data": {
+		"AutoAllot": false,
+		"Service": [
+			"Node",
+			"MongoDB"
+		],
+		"Component": [
+			"HttpComponent",
+			"RedisComponent",
+			"MasterComponent"
+		]
+	},
+	"cent": {
+		"AutoAllot": false,
+		"Service": [
+			"Node",
+			"Master"
+		],
+		"Component": [
+			"HttpComponent",
+			"RedisComponent",
+			"SqliteComponent",
+			"HttpWebComponent",
+			"MasterComponent"
+		]
+	}
 }

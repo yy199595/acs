@@ -1,0 +1,31 @@
+{
+    "/watch/start" : {
+        "Type": "POST",
+        "Async": false,
+        "Auth" : false,
+        "Desc": "启动一个进程",
+        "Bind": "Watch.StartProcess",
+        "ContentType": "application/json",
+        "Request": {
+            "exe": "",
+            "args": ""
+        }
+    },
+    "/watch/close" : {
+        "Type": "GET",
+        "Async": false,
+        "Auth" : false,
+        "Desc": "启动一个进程",
+        "Bind": "Watch.CloseProcess",
+        "Request": {
+            "pid": 0
+        }
+    },
+    "/watch/list" : {
+        "Type": "GET",
+        "Async": false,
+        "Auth" : false,
+        "Desc": "获取进程列表",
+        "Bind": "Watch.List"
+    }
+}

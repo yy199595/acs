@@ -1,11 +1,12 @@
 {
     "/account_mgr/list": {
-        "Type": "GET",
+        "Type": "POST",
         "Async": true,
         "Auth": true,
-        "Permiss": 100,
+        "Permiss": 20,
         "Desc": "分页查看账号",
         "Bind": "AccountManager.List",
+        "ContentType": "application/json",
         "Request": {
             "page": 1
         }
@@ -14,7 +15,7 @@
         "Type": "GET",
         "Async": true,
         "Auth": true,
-        "Permiss": 100,
+        "Permiss": 20,
         "Desc": "查看用户数据",
         "Bind": "AccountManager.Find",
         "Request": {
@@ -40,8 +41,9 @@
         "Type": "GET",
         "Async": true,
         "Auth": true,
-        "Permiss": 100,
+        "Permiss": 20,
         "Desc": "删除账号",
+        "Record" : true,
         "Bind": "AccountManager.Delete",
         "Request": {
             "open_id": "xxxx"
@@ -51,7 +53,7 @@
         "Type": "GET",
         "Async": true,
         "Auth": true,
-        "Permiss": 100,
+        "Permiss": 20,
         "Desc": "后台查找用户数据",
         "Bind": "UserManager.Find",
         "Request": {

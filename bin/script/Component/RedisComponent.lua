@@ -4,8 +4,8 @@ local tab_pack = table.pack
 local tab_insert = table.insert
 local str_format = string.format
 local json = require("util.json")
-local redis = require("db.redis")
 local Component = require("Component")
+local _, redis = pcall(require, "db.redis")
 
 local RedisComponent = Component()
 
@@ -172,6 +172,26 @@ function RedisComponent:For(start, pattern)
     local count = tonumber(res[1])
     table.remove(res, 1)
     return count, res
+end
+
+function RedisComponent:Publish(channel, message)
+	local data = message
+    if type(message) == "table" then
+        data = json.encode(message)
+    end
+    return self:Run("PUBLISH", channel, data)
+end
+
+
+---@param channel string
+---@return boolean
+function RedisComponent:SubChannel(channel)
+    return redis.Sub(channel)
+end
+
+---@param channel string
+function RedisComponent:UnSubChannel(channel)
+
 end
 
 return RedisComponent

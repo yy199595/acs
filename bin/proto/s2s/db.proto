@@ -36,6 +36,21 @@ message mongo
         }
     }
 
+    message sum
+    {
+        message request
+        {
+            string tab = 1;
+            string by = 2;
+            string field = 3;
+            string filter = 4;
+        }
+        message response
+        {
+            repeated string json = 1;
+        }
+    }
+
     message count
     {
         message request
@@ -101,6 +116,11 @@ message mongo
         bool upsert = 4;
     }
 
+    message response
+    {
+        int32 count = 1;
+    }
+
     message inc
     {
         message request
@@ -139,6 +159,20 @@ message mongo
         message response
         {
             string json = 1;
+        }
+    }
+
+    message merge
+    {
+        message request
+        {
+            string field = 1;
+            string source = 2;
+            string target = 3;
+        }
+        message response
+        {
+            string uuid = 1;
         }
     }
 }

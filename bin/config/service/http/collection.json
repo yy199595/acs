@@ -1,14 +1,16 @@
 {
     "/table_mgr/find": {
-        "Type": "GET",
+        "Type": "POST",
         "Async": true,
         "Auth": true,
         "Permiss": 100,
         "Desc": "分页查找Mongo表",
         "Bind": "Collection.FindPage",
+        "ContentType": "application/json",
         "Request": {
             "tab": "xxx",
-            "page": 1
+            "page": 1,
+            "filter" : { }
         }
     },
     "/table_mgr/delete": {
@@ -17,9 +19,36 @@
         "Auth": true,
         "Permiss": 100,
         "Desc": "删除集合",
+        "Record" : true,
         "Bind": "Collection.Delete",
         "Request": {
             "tab": "xxx"
+        }
+    },
+    "/table_mgr/list": {
+        "Type": "GET",
+        "Async": true,
+        "Auth": true,
+        "Permiss": 100,
+        "Desc": "查看所有集合",
+        "Bind": "Collection.List"
+    },
+    "/table_mgr/tables": {
+        "Type": "GET",
+        "Async": true,
+        "Auth": true,
+        "Permiss": 100,
+        "Desc": "查看所有库和表",
+        "Bind": "Collection.Tables"
+    },
+    "/table_mgr/export": {
+        "Type": "GET",
+        "Async": true,
+        "Auth": false,
+        "Desc": "导出一个表",
+        "Bind": "MongoMgr.Export",
+        "Request" : {
+            "tab" : "xx.xx"
         }
     }
 }

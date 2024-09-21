@@ -21,6 +21,11 @@
         "Request": "db.mongo.inc.request",
         "Response": "db.mongo.inc.response"
     },
+    "MongoDB.Sum": {
+        "Async": true,
+        "Request": "db.mongo.sum.request",
+        "Response": "db.mongo.sum.response"
+    },
     "MongoDB.Count": {
         "Async": true,
         "Request": "db.mongo.count.request",
@@ -59,5 +64,14 @@
         "Async": true,
         "Request": "db.mongo.find_modify.request",
         "Response": "db.mongo.find_modify.response"
+    },
+    "MongoDB.Databases": {
+        "Async": true,
+        "Response": "com.array.string"
+    },
+    "MongoDB.Collections": {
+        "Async": true,
+        "Request": "com.type.string",
+        "Response": "com.array.string"
     }
 }

@@ -1,12 +1,19 @@
 {
-    "Chat.Ping": {
+    "ChatSystem.Ping": {
         "Async": false,
         "IsClient": true
     },
-    "Chat.Sleep": {
+    "ChatSystem.Sleep": {
         "Async" : true
     },
-    "Chat.OnChat": {
+    "ChatSystem.OnEvent" : {
+        "Async" : false
+    },
+    "ChatSystem.Request" : {
+        "Async" : true,
+        "Request" : "google.protobuf.Struct"
+    },
+    "ChatSystem.OnChat": {
         "Async": true,
         "IsClient": true,
         "Request": "c2s.chat.request"

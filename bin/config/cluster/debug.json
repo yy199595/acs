@@ -1,24 +1,34 @@
 {
+    "excel" : {
+
+    },
     "server": {
         "Service": [
-            "Login",
-            "Node",
-            "Gate",
-            "MongoDB",
-            "Admin",
+            "NodeSystem",
+            "GateSystem",
+            "LogMgr",
+            "Oss",
+            "EventSystem",
             "Collection",
             "ResourceMgr",
-            "ChatComponent",    
-            "FileUpload",            
-            "QuickSDK"      
+            "ChatComponent",
+            "FileUpload",
+            "QuickSDK",
+            "Watch",
+            "MongoMgr"
         ],
         "Component": [
+            "LoggerComponent",
+            "ConfigComponent",
             "OssComponent",
+            "ActorComponent",
             "GateComponent",
+            "ProtoComponent",
             "ClientComponent",
             "HttpWebComponent",
-            "MongoComponent",
-            "AdminComponent"
+            "WXNoticeComponent",
+            "WatchComponent",
+            "HttpApiComponent"
         ]
     }
 }

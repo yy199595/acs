@@ -51,13 +51,13 @@ return {
                 admin = true,
             },
             {
-                index = "vip",
-                title = "会员卡管理",
+                index = "order",
+                title = "订单管理",
                 admin = false,
             },
             {
-                index = "order",
-                title = "订单管理",
+                index = "admin",
+                title = "后台账号",
                 admin = false,
             }
         }
@@ -82,19 +82,6 @@ return {
                 index = "activity",
                 title = "活动列表",
                 admin = false,
-            }
-        }
-    },
-    {
-        icon = "Setting",
-        index = '4',
-        title = "条款管理",
-        admin = true,
-        subs = {
-            {
-                index = "system",
-                admin = true,
-                title = "条款设置"
             }
         }
     }
