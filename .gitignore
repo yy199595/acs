@@ -1,0 +1,11 @@
+Makefile
+bin/app
+*.log
+*.make
+*.cmake
+*.a
+*.txt
+/Libs/bin
+/build
+bin/proto/protoc
+bin/config/wx/publickey.pem
