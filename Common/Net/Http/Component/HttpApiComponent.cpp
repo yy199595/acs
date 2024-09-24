@@ -18,11 +18,6 @@ namespace acs
 		return true;
 	}
 
-	void HttpApiComponent::Complete()
-	{
-		this->GetHomePlace("59.172.127.159");
-	}
-
 	std::unique_ptr<api::IPHomePlace> HttpApiComponent::GetHomePlace(const std::string& ip) const
 	{
 		std::string url = fmt::format("http://ip-api.com/json/{}?lang=zh-CN", ip);

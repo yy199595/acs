@@ -4,6 +4,7 @@
 #include "Util/Tools/Guid.h"
 #include "Util/File/FileHelper.h"
 #include "Util/Tools/String.h"
+#include "Util/Tools/TimeHelper.h"
 #include "Util/File/DirectoryHelper.h"
 #include "Async/Lua/WaitLuaTaskSource.h"
 #include "Rpc//Lua/LuaServiceTaskSource.h"
@@ -20,6 +21,8 @@
 #include "Auth/Lua/Auth.h"
 #include "Core/Excel/excel.h"
 #include "Lua/Engine/Table.h"
+#include "Net/Lua/LuaSocket.h"
+#include "Net/Network/Tcp/Socket.h"
 
 using namespace Lua;
 namespace acs
@@ -111,6 +114,12 @@ namespace acs
 		classProxyHelper3.PushMemberFunction("GetSheet", &lxlsx::ExcelFile::GetSheet);
 		classProxyHelper3.PushMemberFunction("GetSheets", &lxlsx::ExcelFile::GetSheets);
 
+		Lua::ClassProxyHelper classProxyHelper4(this->mLuaEnv, "Socket");
+		classProxyHelper4.BeginRegister<tcp::Socket>();
+		classProxyHelper4.PushExtensionFunction("Send", Lua::Sock::Send);
+		classProxyHelper4.PushExtensionFunction("Read", Lua::Sock::Read);
+		classProxyHelper4.PushExtensionFunction("Query", Lua::Sock::Query);
+		classProxyHelper4.PushExtensionFunction("Connect", Lua::Sock::Connect);
 	}
 
 	bool LuaComponent::LateAwake()

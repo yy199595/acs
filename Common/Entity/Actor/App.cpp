@@ -167,24 +167,20 @@ namespace acs
 		std::vector<ISystemUpdate*> systemUpdateComponents;
 		std::vector<ISecondUpdate*> secondUpdateComponents;
 		std::vector<ILastFrameUpdate*> lastFrameUpdateComponents;
-		std::vector<ICoroutineSecond*> coroutineSecondComponents;
 		this->GetComponents<IFrameUpdate>(frameUpdateComponents);
 		this->GetComponents<ISystemUpdate>(systemUpdateComponents);
 		this->GetComponents<ISecondUpdate>(secondUpdateComponents);
-		this->GetComponents<ICoroutineSecond>(coroutineSecondComponents);
 		this->GetComponents<ILastFrameUpdate>(lastFrameUpdateComponents);
 
 
 		int fps = 15;
 		Asio::Code code;
-		int event = 100;
 		long long logicRunCount = 0;
 		Asio::ContextWork work(this->mContext);
 		std::unique_ptr<json::r::Value> jsonObject;
 		if (this->mConfig.Get("core", jsonObject))
 		{
 			jsonObject->Get("fps", fps);
-			jsonObject->Get("event", event);
 		}
 #ifndef __OS_WIN__
 		std::chrono::milliseconds sleepTime(1);
@@ -226,12 +222,7 @@ namespace acs
 						{
 							component->OnSecondUpdate(this->mTickCount);
 						}
-
-						for (ICoroutineSecond* component: coroutineSecondComponents)
-						{
-							this->mTaskComponent->Start(&ICoroutineSecond::OnCoroutineSecond, component,
-									this->mTickCount);
-						}
+					
 						if((nowTime / 1000) >= this->mNextNewDayTime)
 						{
 							std::vector<ISystemNewDay*> systemNewDays;
@@ -386,13 +377,13 @@ namespace acs
 		{
 			timer::ElapsedTimer timer;
 			const std::string& name = dynamic_cast<Component*>(component)->GetName();
-			long long timeId = timerComponent->DelayCall(10 * 1000, [name]()
+			const long long timeId = timerComponent->DelayCall(10 * 1000, [name]()
 			{
 				LOG_FATAL("{} start time out", name);
 			});
 			component->Start();
 			timerComponent->CancelTimer(timeId);
-			if (timer.GetMs() > 0)
+			if (timer.GetMs() > 100)
 			{
 				LOG_DEBUG("[{}ms] => {}.Start", timer.GetMs(), name);
 			}
@@ -403,12 +394,19 @@ namespace acs
 		this->GetComponents<IComplete>(completeComponents);
 		for (IComplete* complete: completeComponents)
 		{
+			timer::ElapsedTimer timer;
 			Component* component = dynamic_cast<Component*>(complete);
+			const std::string& name = dynamic_cast<Component*>(component)->GetName();
 			const long long timerId = timerComponent->DelayCall(1000 * 10, [component]()
+
 			{
 				LOG_ERROR("{0}.Complete call timeout", component->GetName());
 			});
 			complete->Complete();
+			if (timer.GetMs() > 100)
+			{
+				LOG_DEBUG("[{}ms] => {}.Complete", timer.GetMs(), name);
+			}
 			timerComponent->CancelTimer(timerId);
 		}
         completeComponents.clear();

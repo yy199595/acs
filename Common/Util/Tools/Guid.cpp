@@ -3,11 +3,13 @@
 //
 
 #include "Guid.h"
+#include "Util/Crypt/MD5.h"
+#include"Util/Tools/TimeHelper.h"
 namespace help
 {
-    int Guid::mIndex1 = 0;
-    short Guid::mIndex2 = 0;
-    long long Guid::mLastTime = 0;
+    int ID::mIndex1 = 0;
+    short ID::mIndex2 = 0;
+    long long ID::mLastTime = 0;
 
     long long ThreadGuid::mLastTime = 0;
     std::atomic_int ThreadGuid::mIndex1;
@@ -15,7 +17,13 @@ namespace help
 }
 namespace help
 {
-    long long Guid::Create()
+    std::string ID::UUid()
+    {
+        std::string str = std::to_string(ID::Create());
+        return help::Md5::GetMd5(str);
+    }
+
+    long long ID::Create()
     {
         long long nowTime = Time::NowSec();
         if (nowTime != mLastTime)
@@ -26,7 +34,7 @@ namespace help
         return (mLastTime << 31 | (++mIndex1));
     }
 
-    long long Guid::Create(short type)
+    long long ID::Create(short type)
     {
         long long nowTime = Time::NowSec();
         if (nowTime != mLastTime)

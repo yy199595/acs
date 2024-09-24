@@ -62,7 +62,7 @@ namespace acs
 
 	int HttpService::Invoke(const HttpMethodConfig * config, const http::Request& request, http::Response& response)
 	{
-		const std::string & method = config->Method;
+		const std::string & method = config->Method;		
 		if(this->mLuaModule != nullptr && this->mLuaModule->HasFunction(method))
 		{
 			if(!config->IsAsync)

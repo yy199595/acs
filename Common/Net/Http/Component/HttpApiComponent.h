@@ -37,7 +37,6 @@ namespace acs
 		std::unique_ptr<api::IPHomePlace> GetHomePlace(const std::string & ip) const;
 	private:
 		bool LateAwake() final;
-		void Complete() final;
 	private:
 		class HttpComponent * mHttp;
 	};

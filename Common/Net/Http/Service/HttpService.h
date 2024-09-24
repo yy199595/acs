@@ -4,6 +4,7 @@
 
 #ifndef APP_HTTPSERVICE_H
 #define APP_HTTPSERVICE_H
+#include<unordered_map>
 #include"Entity/Component/Component.h"
 #include"Rpc/Method/MethodRegister.h"
 #include"Rpc/Config/ServiceConfig.h"

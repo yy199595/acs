@@ -1,13 +1,15 @@
 #pragma once
 #include<atomic>
-#include"Util/Tools/TimeHelper.h"
+#include<string>
+
 namespace help
 {
-    class Guid
+    class ID
     {
     public:
         static long long Create();
-        long long Create(short type);
+        static std::string UUid();
+        static long long Create(short type);
     private:
         static int mIndex1;
         static short mIndex2;

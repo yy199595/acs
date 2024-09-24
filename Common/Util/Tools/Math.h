@@ -3,6 +3,7 @@
 #include<random>
 #include<string>
 #include<algorithm>
+#include<unordered_map>
 namespace help
 {
 namespace Math {
@@ -167,5 +168,38 @@ namespace Math {
 		value = std::stoll(str);
 		return true;
 	}
+
+    template<typename K>
+    class Statister
+    {
+    public:
+        Statister() = default;
+    public:
+        inline auto end() { return this->mNumbers.end(); }
+        inline auto begin() { return this->mNumbers.begin(); }
+        inline int Add(const K& key, int value = 1)
+        {
+            auto iter = this->mNumbers.find(key);
+            if (iter == this->mNumbers.end())
+            {
+                this->mNumbers.emplace(key, value);
+                return value;
+            }
+            iter->second += value;
+            return iter->second;
+        }
+        inline int Sub(const K& key, int value = 1)
+        {
+            auto iter = this->mNumbers.find(key);
+            if (iter == this->mNumbers.end())
+            {
+                return -1;
+            }
+            iter->second -= value;
+            return iter->second;
+        }
+    private:
+        std::unordered_map<K, long long> mNumbers;
+    };
 }
 }// namespace MathHelper

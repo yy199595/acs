@@ -66,12 +66,6 @@ namespace acs
 		virtual void OnNewDay() = 0;
 	};
 
-	class ICoroutineSecond
-	{
-	public:
-		virtual void OnCoroutineSecond(int tick) = 0;
-	};
-
 	class ILastFrameUpdate
 	{
 	public:
