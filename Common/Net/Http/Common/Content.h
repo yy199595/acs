@@ -207,7 +207,7 @@ namespace http
 		bool OnDecode() final;
 		void WriteToLua(lua_State *l) final;
 		int OnRecvMessage(std::istream & buffer, size_t size) final;
-		void Init(const std::string & dir, const std::string & name, size_t limit = 1024 * 1024 * 2); //最大2M
+		void Init(const std::string & dir, size_t limit = 1024 * 1024 * 2); //最大2M
 	public:
 		inline bool IsDone() const { return this->mDone; }
 		inline const std::string & Path() const { return this->mPath; }
@@ -221,6 +221,7 @@ namespace http
 		http::ContentType GetContentType() const final { return http::ContentType::MULTIPAR; }
 	private:
 		bool mDone;
+		int mLength;
 		size_t mMaxCount;
 		std::string mDir;
 		std::string mPath;
@@ -229,7 +230,8 @@ namespace http
 		std::string mFileName;
 		std::string mContType;
 		std::string mBoundary;
-		custom::HashMap<std::string, std::string> mHeader;
+		std::string mContent;
+		std::unordered_map<std::string, std::string> mFromData;
 	};
 }
 

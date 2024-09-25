@@ -4,10 +4,10 @@
 
 #include"Content.h"
 #include<sstream>
-#include"Util/Tools/Zip.h"
 #include"Yyjson/Lua/ljson.h"
 #include"Util/Tools/Math.h"
 #include"spdlog/fmt/fmt.h"
+#include "Util/File/DirectoryHelper.h"
 #include"Util/File/FileHelper.h"
 #include"Lua/Engine/LuaInclude.h"
 #include"Util/Tools/String.h"
@@ -511,7 +511,7 @@ namespace http
 	MultipartFromContent::MultipartFromContent()
 		: mDone(false), mMaxCount(1024 * 1024 * 5), mReadCount(0)
 	{
-
+		this->mLength = 0;
 	}
 
 	bool MultipartFromContent::OnDecode()
@@ -531,12 +531,11 @@ namespace http
 		lua_pushlstring(l, this->mPath.c_str(), this->mPath.size());
 	}
 
-	void MultipartFromContent::Init(const std::string& dir,  const std::string & name, size_t limit)
+	void MultipartFromContent::Init(const std::string& dir, size_t limit)
 	{
 		this->mDir = dir;
 		this->mReadCount = 0;
 		this->mMaxCount = limit;
-		this->mFileName = name;
 	}
 
 	std::string MultipartFromContent::ToStr() const
@@ -566,71 +565,105 @@ namespace http
 			{
 				this->mBoundary.pop_back();
 			}
-			this->mBoundary += "--";
 			return tcp::ReadOneLine;
 		}
-		if (this->mPath.empty())
+
+		if (this->mFile.is_open())
 		{
-			std::string line;
+			std::unique_ptr<char[]> buff = std::make_unique<char[]>(size);
+			size_t count = buffer.readsome(buff.get(), size);
+			if (count > 0)
+			{
+				if (strstr(buff.get(), this->mBoundary.c_str()) != NULL)
+				{
+					return tcp::ReadDone;
+				}
+				const char c1 = buff[count - 2];
+				const char c2 = buff[count - 1];
+				if (c1 == '\r' && c2 == '\n')
+				{
+					count -= 2;
+				}
+				this->mFile.write(buff.get(), count);
+				this->mFile.flush();
+			}
+			return tcp::ReadOneLine;
+		}
+
+		std::string line;
+		std::string field_name;
+		
+		if (std::getline(buffer, line))
+		{						
+			if (!line.empty() && line.back() == '\r')
+			{
+				line.pop_back();
+			}
+			
+			if (line == this->mBoundary)
+			{
+				return tcp::ReadOneLine;
+			}
+			static int index = 1;			
+			if (line.find("Content-Disposition:") != std::string::npos) {
+				// 解析字段名
+				size_t name_pos = line.find("name=\"");
+				if (name_pos != std::string::npos) {
+					size_t name_end = line.find("\"", name_pos + 6);
+					field_name = line.substr(name_pos + 6, name_end - name_pos - 6);
+				}
+				// 解析文件名（如果是文件）
+				size_t filename_pos = line.find("filename=\"");
+				if (filename_pos != std::string::npos) {
+					size_t filename_end = line.find("\"", filename_pos + 10);
+					this->mFileName = line.substr(filename_pos + 10, filename_end - filename_pos - 10);
+				}
+			}
 			while (std::getline(buffer, line))
 			{
-				this->mReadCount += (line.size() + 1);
-				if (line == "\r")
+				break;
+			}
+			while (std::getline(buffer, line))
+			{
+				break;
+			}
+			
+			if (!this->mFileName.empty())
+			{
+				std::string director;
+				this->mFromData.emplace("file_name", this->mFileName);
+				this->mPath = fmt::format("{}/{}", this->mDir, this->mFileName);
+				auto iter = this->mFromData.find("key");
+				if (iter != this->mFromData.end())
+				{
+					this->mPath = fmt::format("{}/{}", this->mDir, iter->second);
+				}
+
+				if (help::dir::GetDirByPath(this->mPath, director))
+				{
+					help::dir::MakeDir(director);
+				}
+				this->mFile.open(this->mPath, std::ios::out);
+				if (!this->mFile.is_open())
+				{
+					return tcp::ReadDecodeError;
+				}
+				while (std::getline(buffer, line))
 				{
 					break;
 				}
-				if (line.back() == '\r')
+			}	
+			if (!field_name.empty())
+			{
+				if (!line.empty() && line.back() == '\r')
 				{
 					line.pop_back();
 				}
-				size_t pos = line.find(':');
-				if (pos != std::string::npos)
-				{
-					std::string key = line.substr(0, pos);
-					std::string val = line.substr(pos + 1);
-					this->mHeader.Add(key, val);
-				}
+				this->mFromData.emplace(field_name, line);
 			}
-
-			std::string fileInfo;
-			if(!this->mHeader.Get(http::Header::ContentType, this->mContType))
-			{
-				return tcp::ReadDecodeError;
-			}
-			if (!this->mHeader.Get(http::Header::ContentDisposition, fileInfo))
-			{
-				return tcp::ReadDecodeError;
-			}
-			size_t pos = this->mContType.find('/');
-			if(pos == std::string::npos)
-			{
-				return tcp::ReadDecodeError;
-			}
-			std::string type = this->mContType.substr(pos + 1);
-			this->mFileName = fmt::format("{}.{}", this->mFileName, type);
-			this->mPath = fmt::format("{}/{}", this->mDir, this->mFileName);
-			this->mFile.open(this->mPath, std::ios::out | std::ios::trunc | std::ios::binary);
-			if (!this->mFile.is_open())
-			{
-				return tcp::ReadDecodeError;
-			}
-			return tcp::ReadSomeMessage;
-		}
-
-		std::unique_ptr<char[]> lienData(new char[size]);
-		size_t count = buffer.readsome(lienData.get(), size);
-		if(count > 0)
-		{
-			//std::cout << "count = " << count << std::endl;
-			if(strstr(lienData.get(), this->mBoundary.c_str()) != nullptr)
-			{
-				return tcp::ReadDone;
-			}
-			this->mReadCount+= count;
-			this->mFile.write(lienData.get(), count);
-			this->mFile.flush();
 		}
 		return tcp::ReadOneLine;
+		
 	}
 
 }
