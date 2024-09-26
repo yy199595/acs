@@ -35,28 +35,24 @@ namespace Lua
 	{
 		tcp::Socket* sock = Lua::UserDataParameter::Read<tcp::Socket*>(L, 1);
 		{
-			try
+			size_t size = 0;
+			std::string result;
+			asio::error_code code;
+			char buffer[1024] = { 0 };
+			do
 			{
-				size_t size = 0;
-				std::string result;
-				char buffer[1024] = { 0 };
-				do
+				size = sock->Get().read_some(asio::buffer(buffer), code);
+				if (code.value() != Asio::OK && code != asio::error::eof)
 				{
-					size = sock->Get().read_some(asio::buffer(buffer));
-					result.append(buffer, size);
-				} 
-				while (size > 0 && sock->Get().available() > 0);
-				lua_pushlstring(L, result.c_str(), result.size());
-				return 1;
-			}
-			catch (const asio::system_error& code)
-			{
-				luaL_error(L, "read : %s", code.what());
-				return 0;
-			}
-
+					luaL_error(L, "read : %s", code.message());
+					return 0;
+				}
+				result.append(buffer, size);				
+				LOG_DEBUG("{}=>{}", size, std::string(buffer, size));
+			} while (size > 0 && sock->Get().available() > 0);
+			lua_pushlstring(L, result.c_str(), result.size());
+			return 1;
 		}
-		return 0;
 	}
 
 	int Sock::Query(lua_State* L)

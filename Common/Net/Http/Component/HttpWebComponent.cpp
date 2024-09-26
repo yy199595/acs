@@ -218,9 +218,8 @@ namespace acs
 				return HttpStatus::BAD_REQUEST;
 			}
 			const int limit = httpConfig->Limit;
-			const std::string uuid = this->mApp->NewUuid();
 			const std::string & path = this->mConfig.Upload;
-			body->Cast<http::MultipartFromContent>()->Init(path, uuid, limit);
+			body->Cast<http::MultipartFromContent>()->Init(path, limit);
 		}
 		else if(body->GetContentType() == http::ContentType::FILE)
 		{

@@ -145,13 +145,7 @@ namespace acs
 		}
 		const std::string & path = multiData->Path();
 		const std::string& name = multiData->FileName();
-		const std::string newName = fmt::format("{}/{}", userId, name);
-		if(!help::fs::ChangeName(path, newName))
-		{
-			//LOG_ERROR("change file name {}=>{}", path, newName)
-			return XCode::Failure;
-		}
-		const std::string url = fmt::format("{}/{}", this->mDoMain, newName);
+		const std::string url = fmt::format("{}/{}", this->mDoMain, name);
 		response.SetContent(http::Header::TEXT, url);
 		return XCode::Ok;
 	}

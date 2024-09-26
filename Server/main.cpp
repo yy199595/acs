@@ -52,7 +52,7 @@
 #include "Watch/Component/WatchComponent.h"
 
 #include "Http/Component/HttpApiComponent.h"
-
+#include "Lua/Component/LuaListenComponent.h"
 #ifdef __ENABLE_MYSQL__
 #include "Mysql/Service/MysqlDB.h"
 #include "Mysql/Component/MysqlDBComponent.h"
@@ -136,6 +136,7 @@ void RegisterComponent()
 	REGISTER_COMPONENT(WXComplaintComponent);
 
 	REGISTER_COMPONENT(WatchComponent);
+	REGISTER_COMPONENT(LuaListenComponent);
 
 }
 

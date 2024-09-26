@@ -34,6 +34,7 @@ namespace acs
 		{
 			handlerClient->StartReceive(sockId, socket);
 			this->mHttpClients.Add(sockId, handlerClient);
+			LOG_DEBUG("connect sock id => {}", sockId);
 		}
 		return true;
 	}
@@ -61,6 +62,7 @@ namespace acs
 
 	void HttpListenComponent::OnCloseSocket(int id, int code)
 	{
+		LOG_WARN("close sock id => {}", id);
 		http::SessionClient* handlerClient = nullptr;
 		if (!this->mHttpClients.Del(id, handlerClient))
 		{
@@ -84,7 +86,7 @@ namespace acs
 			http::SessionClient* newClient = new http::SessionClient(this);
 			{
 				this->mHttpClients.Add(sockId, newClient);
-				newClient->StartReceive(sockId, tcpSocket);
+				newClient->StartReceive(sockId, tcpSocket, 0);
 			}	
 		}
 	}
