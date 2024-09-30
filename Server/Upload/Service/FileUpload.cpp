@@ -102,8 +102,8 @@ namespace acs
 			default:
 				return XCode::CallArgsError;
 		}
-		std::string json = this->mOss->Sign(policy);
-		if(json.empty())
+		std::string json;
+		if(!this->mOss->Sign(policy, json))
 		{
 			return XCode::Failure;
 		}

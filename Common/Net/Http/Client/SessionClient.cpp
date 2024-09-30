@@ -198,27 +198,30 @@ namespace http
 	{
 		switch (this->mRequest.OnRecvMessage(is, size))
 		{
-			case tcp::ReadDone:
-				this->OnComplete(HttpStatus::OK);
-				break;
-			case tcp::ReadOneLine:
-				this->ReadLine();
-				break;
-			case tcp::ReadSomeMessage:
-				this->ReadSome();
-				break;
-			case tcp::ReadError:
-				this->OnComplete(HttpStatus::INTERNAL_SERVER_ERROR);
-				break;
-			case tcp::ReadDecodeError:
-				this->OnComplete(HttpStatus::BAD_REQUEST);
-				break;
-			case tcp::ReadPause:
-				this->OnReadPause();
-				break;
-			case tcp::PacketLong:
-				this->OnComplete(HttpStatus::PAYLOAD_TOO_LARGE);
-				break;
+		case tcp::ReadDone:
+			this->OnComplete(HttpStatus::OK);
+			break;
+		case tcp::ReadOneLine:
+			this->ReadLine();
+			break;
+		case tcp::ReadSomeMessage:
+			this->ReadSome();
+			break;
+		case tcp::ReadError:
+			this->OnComplete(HttpStatus::INTERNAL_SERVER_ERROR);
+			break;
+		case tcp::ReadDecodeError:
+			this->OnComplete(HttpStatus::BAD_REQUEST);
+			break;
+		case tcp::ReadPause:
+			this->OnReadPause();
+			break;
+		case tcp::PacketLong:
+			this->OnComplete(HttpStatus::PAYLOAD_TOO_LARGE);
+			break;
+		case tcp::ReadAll:
+			this->ReadAll();
+			break;
 		}
 	}
 

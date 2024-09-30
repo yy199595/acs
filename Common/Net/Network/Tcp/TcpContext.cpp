@@ -127,6 +127,43 @@ namespace tcp
 		});
 	}
 
+	void TcpClient::ReadAll(int timeout)
+	{
+		if (!this->mSocket->IsOpen())
+		{
+			Asio::Code code(asio::error::not_socket);
+			this->OnReadError(code);
+			return;
+		}
+		this->StartTimer(timeout, TimeoutFlag::ReadCount);
+		auto callBack = [this](const asio::error_code& code, size_t size)
+			{
+				std::istream ss(&this->mRecvBuffer);
+				if (code.value() == Asio::OK)
+				{
+					this->OnReceiveMessage(ss, size);
+					return;
+				}
+				if (this->mRecvBuffer.size() > 0)
+				{
+					size = this->mRecvBuffer.size();
+					this->OnReceiveMessage(ss, size);
+				}
+				this->OnReadError(code);
+			};
+
+#ifdef __ENABLE_OPEN_SSL__
+		if (this->mSocket->IsOpenSsl())
+		{
+			Asio::ssl::Socket& sock = this->mSocket->SslSocket();
+			asio::async_read(sock, this->mRecvBuffer, asio::transfer_all(), callBack);
+			return;
+		}
+#endif
+		Asio::Socket& sock = this->mSocket->Get();
+		asio::async_read(sock, this->mRecvBuffer, asio::transfer_all(), callBack);
+	}
+
 	void TcpClient::ReadLine(int timeout)
 	{
 		if (!this->mSocket->IsOpen())

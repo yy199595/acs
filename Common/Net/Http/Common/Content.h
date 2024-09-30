@@ -213,15 +213,19 @@ namespace http
 		inline const std::string & Path() const { return this->mPath; }
 		inline const std::string & FileName() const { return this->mFileName; }
 		inline const std::string & ContentType() const { return this->mContType; }
+	public:
+		bool Add(const std::string& path);
+		bool Add(const std::string& k, const std::string& v);
 	private:
+		size_t GetContentLength() const;
 		std::string ToStr() const final;
-		int OnWriteBody(std::ostream &os) final { return 0;}
-		void OnWriteHead(std::ostream &os) final { }
+		int OnWriteBody(std::ostream& os) final;
+		void OnWriteHead(std::ostream& os) final;
 		int ContentLength() final { return (int)this->mReadCount;}
 		http::ContentType GetContentType() const final { return http::ContentType::MULTIPAR; }
 	private:
 		bool mDone;
-		int mLength;
+		size_t mLength;
 		size_t mMaxCount;
 		std::string mDir;
 		std::string mPath;
@@ -231,6 +235,7 @@ namespace http
 		std::string mContType;
 		std::string mBoundary;
 		std::string mContent;
+		std::vector<std::string> mHeader;
 		std::unordered_map<std::string, std::string> mFromData;
 	};
 }

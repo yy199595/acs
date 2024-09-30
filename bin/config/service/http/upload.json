@@ -31,8 +31,8 @@
         "Desc": "上传用户头像"
     },
     "/upload/file": {
-        "Type": "POST",
-        "Auth": true,
+        "Type": "PUT",
+        "Auth": false,
         "Permiss": 5,
         "Bind": "FileUpload.File",
         "ContentType": "multipart/form-data",

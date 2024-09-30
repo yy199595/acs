@@ -33,6 +33,7 @@ namespace tcp
 		const std::string & GetAddress() { return this->mSocket->GetAddress();}
 	protected:
 		void ClearBuffer();
+		void ReadAll(int timeout = 0);
 		void Connect(int timeout = 0);
 		void ReadLine(int timeout = 0);
 		void ReadSome(int timeout = 0);

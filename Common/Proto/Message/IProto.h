@@ -20,6 +20,7 @@ namespace tcp
 	constexpr int ReadDecodeError = -4; //解析错误
     constexpr int ReadPause = -5; //暂停
 	constexpr int PacketLong = -6; //包体过长
+	constexpr int ReadAll = -7;
 
 	namespace Decode
 	{

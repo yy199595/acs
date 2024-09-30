@@ -33,7 +33,6 @@ namespace oss
 	{
 		std::string policy;
 		std::string OSSAccessKeyId;
-		std::string success_action_status;
 		std::string signature;
 		std::string key;
 
@@ -43,17 +42,23 @@ namespace oss
 
 namespace acs
 {
-	class OssComponent : public Component
+	class OssComponent : public Component, public IComplete
 	{
 	public:
 		OssComponent();
 		~OssComponent() final = default;
 	private:
 		bool Awake() final;
+		bool LateAwake() final;
+		void Complete() final;
 	public:
-		std::string Sign(oss::Policy & policy);
+		void Upload(const std::string& path);
+	public:
+		bool Sign(const oss::Policy & policy, std::string & sign);
+		bool Sign(const oss::Policy& policy, oss::FromData & fromData);
 	private:
 		oss::Config mConfig;
+		class HttpComponent* mHttp;
 	};
 }
 

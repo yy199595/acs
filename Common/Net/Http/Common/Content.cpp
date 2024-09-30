@@ -13,6 +13,8 @@
 #include"Util/Tools/String.h"
 #include "Core/Map/HashMap.h"
 #include "Util/Crypt/Base64Helper.h"
+#include"Util/Tools/String.h"
+#include "Util/Tools/Guid.h"
 namespace http
 {
 	std::string UrlDecode(const std::string& url)
@@ -245,7 +247,7 @@ namespace http
 
 	void JsonContent::Write(const json::w::Document& document)
 	{
-		this->mJson.c_str();
+		this->mJson.clear();
 		document.Encode(&this->mJson);
 	}
 
@@ -526,6 +528,95 @@ namespace http
 		return true;
 	}
 
+	bool MultipartFromContent::Add(const std::string& path)
+	{
+		this->mFile.open(path, std::ios::in | std::ios::binary);
+		if (!this->mFile.is_open())
+		{
+			return false;
+		}
+		this->mLength = 0;
+		std::string fileName, fileType;
+		if (help::Str::GetFileName(path, fileName) && help::fs::GetFileType(path, fileType))
+		{
+			this->mPath = path;
+			std::stringstream ss;
+			ss << http::Header::ContentDisposition << ": form-data; ";
+			std::string contenType(http::GetContentType(fileType));
+			ss << fmt::format("name=\"file\"; filename=\"{}\"", fileName) << "\r\n";
+			ss << http::Header::ContentType << ": " << contenType << "\r\n";
+
+			this->mHeader.emplace_back(ss.str());
+			
+			return true;
+		}
+
+		return false;
+	}
+
+	size_t MultipartFromContent::GetContentLength() const
+	{
+		size_t length = this->mBoundary.size() + 4;
+		for (size_t i = 0; i < this->mHeader.size(); i++)
+		{
+			length += this->mHeader[i].size();
+			if (i < this->mHeader.size() - 1)
+			{
+				length += (this->mBoundary.size() + 4);
+			}
+		}
+		length += this->mBoundary.size() + 6;
+		return length;
+	}
+
+	bool MultipartFromContent::Add(const std::string& k, const std::string& v)
+	{
+		auto iter = this->mFromData.find(k);
+		if (iter != this->mFromData.end())
+		{
+			return false;
+		}
+		std::stringstream ss;
+		ss << http::Header::ContentDisposition << ": form-data; ";
+		ss << fmt::format("name=\"{}\"", k) << "\r\n\r\n" << v << "\r\n";
+		this->mHeader.emplace_back(ss.str());
+		return true;
+	}
+
+	int MultipartFromContent::OnWriteBody(std::ostream& os)
+	{
+		os << "--" << this->mBoundary << "\r\n";
+		for (size_t i = 0; i < this->mHeader.size(); i++)
+		{
+			const std::string& v = this->mHeader[i];
+
+			os.write(v.c_str(), v.size());			
+			if (i < this->mHeader.size() - 1)
+			{
+				os << "--" << this->mBoundary << "\r\n";
+			}		
+		}
+		
+		char buff[1024] = { 0 };
+		while (!this->mFile.eof())
+		{
+			this->mFile.read(buff, sizeof(buff));
+			if (this->mFile.gcount() > 0)
+			{
+				os.write(buff, this->mFile.gcount());
+			}
+		}		
+		os << "--" << this->mBoundary << "--\r\n";
+		return 0;
+	}
+
+	void MultipartFromContent::OnWriteHead(std::ostream& os)
+	{
+		this->mBoundary = fmt::format("----{}", help::ID::Create());
+		//os << http::Header::ContentLength << ": " << this->GetContentLength() << "\r\n";
+		os << http::Header::ContentType << ": " << fmt::format("multipart/form-data; boundary={}", this->mBoundary) << "\r\n";
+	}
+
 	void MultipartFromContent::WriteToLua(lua_State* l)
 	{
 		lua_pushlstring(l, this->mPath.c_str(), this->mPath.size());
@@ -569,21 +660,15 @@ namespace http
 		}
 
 		if (this->mFile.is_open())
-		{
+		{			
 			std::unique_ptr<char[]> buff = std::make_unique<char[]>(size);
 			size_t count = buffer.readsome(buff.get(), size);
 			if (count > 0)
 			{
 				if (strstr(buff.get(), this->mBoundary.c_str()) != NULL)
-				{
+				{					
 					return tcp::ReadDone;
-				}
-				const char c1 = buff[count - 2];
-				const char c2 = buff[count - 1];
-				if (c1 == '\r' && c2 == '\n')
-				{
-					count -= 2;
-				}
+				}				
 				this->mFile.write(buff.get(), count);
 				this->mFile.flush();
 			}
@@ -605,20 +690,23 @@ namespace http
 				return tcp::ReadOneLine;
 			}
 			static int index = 1;			
-			if (line.find("Content-Disposition:") != std::string::npos) {
-				// 解析字段名
+			if (line.find("Content-Disposition:") != std::string::npos)
+			{
 				size_t name_pos = line.find("name=\"");
-				if (name_pos != std::string::npos) {
+				if (name_pos != std::string::npos)
+				{
 					size_t name_end = line.find("\"", name_pos + 6);
 					field_name = line.substr(name_pos + 6, name_end - name_pos - 6);
 				}
-				// 解析文件名（如果是文件）
+
 				size_t filename_pos = line.find("filename=\"");
-				if (filename_pos != std::string::npos) {
+				if (filename_pos != std::string::npos)
+				{
 					size_t filename_end = line.find("\"", filename_pos + 10);
 					this->mFileName = line.substr(filename_pos + 10, filename_end - filename_pos - 10);
 				}
 			}
+
 			while (std::getline(buffer, line))
 			{
 				break;
@@ -633,25 +721,16 @@ namespace http
 				std::string director;
 				this->mFromData.emplace("file_name", this->mFileName);
 				this->mPath = fmt::format("{}/{}", this->mDir, this->mFileName);
-				auto iter = this->mFromData.find("key");
-				if (iter != this->mFromData.end())
-				{
-					this->mPath = fmt::format("{}/{}", this->mDir, iter->second);
-				}
-
+				
 				if (help::dir::GetDirByPath(this->mPath, director))
 				{
 					help::dir::MakeDir(director);
 				}
-				this->mFile.open(this->mPath, std::ios::out);
+				this->mFile.open(this->mPath, std::ios::out | std::ios::binary);
 				if (!this->mFile.is_open())
 				{
 					return tcp::ReadDecodeError;
-				}
-				while (std::getline(buffer, line))
-				{
-					break;
-				}
+				}	
 			}	
 			if (!field_name.empty())
 			{
@@ -659,11 +738,13 @@ namespace http
 				{
 					line.pop_back();
 				}
-				this->mFromData.emplace(field_name, line);
+				if (!line.empty())
+				{
+					this->mFromData.emplace(field_name, line);
+				}
 			}
 		}
-		return tcp::ReadOneLine;
-		
+		return tcp::ReadOneLine;	
 	}
 
 }
