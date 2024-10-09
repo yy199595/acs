@@ -87,10 +87,19 @@ namespace http
 				}
 				return tcp::ReadDone;
 			}
-			int flag = this->mBody->OnRecvMessage(buffer, size);
+			int flag = this->mBody->OnRecvMessage(buffer, size);		
 			if(this->mConeSize > 0 && this->mBody->ContentLength() >= this->mConeSize)
 			{
 				flag = tcp::ReadDone;
+			}
+
+			if (flag == tcp::ReadContentLength)
+			{
+				if (this->mConeSize <= 0)
+				{
+					return tcp::ReadDecodeError;
+				}
+				return this->mConeSize;
 			}
 			if(flag == 0 && !this->mBody->OnDecode())
 			{

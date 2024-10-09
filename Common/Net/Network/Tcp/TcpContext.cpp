@@ -273,20 +273,16 @@ namespace tcp
 
 		this->StartTimer(timeout, TimeoutFlag::ReadCount);
 		auto callBack = [this](const asio::error_code& code, size_t size)
-		{
-			std::istream ss(&this->mRecvBuffer);
-			if (code.value() == Asio::OK)
 			{
+				std::istream ss(&this->mRecvBuffer);
+				if (code.value() == Asio::OK)
+				{
+					this->OnReceiveMessage(ss, size);
+					return;
+				}
 				this->OnReceiveMessage(ss, size);
-				return;
-			}
-			if (this->mRecvBuffer.size() > 0)
-			{
-				size = this->mRecvBuffer.size();
-				this->OnReceiveMessage(ss, size);
-			}
-			this->OnReadError(code);
-		};
+				this->OnReadError(code);
+			};
 
 #ifdef __ENABLE_OPEN_SSL__
 		if (this->mSocket->IsOpenSsl())

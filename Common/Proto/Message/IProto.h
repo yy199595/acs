@@ -21,6 +21,7 @@ namespace tcp
     constexpr int ReadPause = -5; //暂停
 	constexpr int PacketLong = -6; //包体过长
 	constexpr int ReadAll = -7;
+	constexpr int ReadContentLength = -8;
 
 	namespace Decode
 	{

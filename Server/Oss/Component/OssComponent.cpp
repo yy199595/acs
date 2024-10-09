@@ -2,7 +2,8 @@
 // Created by leyi on 2024/4/1.
 //
 #ifdef __ENABLE_OPEN_SSL__
-
+#include <ctime>
+#include <iomanip>
 #include "OssComponent.h"
 #include "Entity/Actor/App.h"
 #include "Util/Tools/TimeHelper.h"
@@ -34,6 +35,32 @@ namespace acs
 		return std::string(reinterpret_cast<char*>(hash), len);
 	}
 
+	std::string hmac_sha1(const std::string& key, const std::string& data) {
+		unsigned char digest[EVP_MAX_MD_SIZE];
+		unsigned int digest_len;
+		HMAC(EVP_sha1(), key.c_str(), key.length(),
+			reinterpret_cast<const unsigned char*>(data.c_str()), data.length(), digest, &digest_len);
+
+		std::string result = std::string(reinterpret_cast<char*>(digest), digest_len);
+		return result;
+	}
+
+	std::string create_signature(const std::string& method, const std::string& content_md5, const std::string& content_type,
+		const std::string& date, const std::string& canonicalized_resource, const std::string& access_key_secret) {
+		std::string string_to_sign = method + "\n" + content_md5 + "\n" + content_type + "\n" + date + "\n" + canonicalized_resource;
+		std::string signature = hmac_sha1(access_key_secret, string_to_sign);
+		return help::Base64::Encode(signature);
+	}
+
+	std::string get_utc_time() {
+		std::time_t t = std::time(nullptr);
+		std::tm* gmt = std::gmtime(&t);
+		std::stringstream ss;
+		ss << std::put_time(gmt, "%a, %d %b %Y %H:%M:%S GMT");
+		return ss.str();
+	}
+	
+
 	OssComponent::OssComponent()
 	{
 		this->mHttp = nullptr;
@@ -63,44 +90,156 @@ namespace acs
 
 	void OssComponent::Complete()
 	{
-		this->Upload("C:/Users/64658/Desktop/yy/ace/bin/config/run/all.json");
+		this->Upload("C:/Users/64658/Desktop/yy/ace/bin/config/run/all.json", "10000");
+		this->FromUpload("C:/Users/64658/Desktop/yy/ace/bin/config/run/all.json", "10000");
 	}
 
-	void OssComponent::Upload(const std::string& path)
+	std::unique_ptr<oss::Response> OssComponent::Upload(const std::string& path, const std::string & dir)
 	{
-		std::string fileType;
-		oss::Policy ossPolicy;
-		help::fs::GetFileType(path, fileType);
-		help::Str::GetFileName(path, ossPolicy.file_name);
+		std::unique_ptr<oss::Response> ossResponse = std::make_unique<oss::Response>();
+		do
 		{
-			ossPolicy.upload_dir = "test/";
-			ossPolicy.max_length = 1024 * 1024 * 10;
-			ossPolicy.file_type = http::GetContentType(fileType);
-			ossPolicy.limit_type.emplace_back(ossPolicy.file_type);
-			ossPolicy.expiration = help::Time::NowSec() + (5 * 60);
-		}
-		oss::FromData fromData;
-		this->Sign(ossPolicy, fromData);
+			std::string fileType, fileName;
+			if (!help::fs::GetFileType(path, fileType))
+			{
+				ossResponse->code = HttpStatus::BAD_REQUEST;
+				break;
+			}
+			if (!help::Str::GetFileName(path, fileName))
+			{
+				ossResponse->code = HttpStatus::BAD_REQUEST;
+				break;
+			}
+			std::string contentType(http::GetContentType(fileType));
 
-		std::unique_ptr<http::Request> httpRequest = std::make_unique<http::Request>("PUT");
-		std::unique_ptr<http::MultipartFromContent> fromContent = std::make_unique<http::MultipartFromContent>();
-		{
-			fromContent->Add("policy", fromData.policy);
-			fromContent->Add("OSSAccessKeyId", fromData.OSSAccessKeyId);
-			fromContent->Add("success_action_status", "200");
-			fromContent->Add("signature", fromData.signature);
-			fromContent->Add("key", fromData.key);
-		}
-		fromContent->Add(path);
-		httpRequest->SetUrl(this->mConfig.host);
-		httpRequest->SetBody(std::move(fromContent));
+			const std::string date = get_utc_time();
+			std::string objectKey = fmt::format("{}/{}", dir, fileName);
+			std::string url = fmt::format("http://{}.{}.aliyuncs.com/{}",
+				this->mConfig.bucket, this->mConfig.region, objectKey);;
+			std::string canonicalized_resource = "/" + this->mConfig.bucket + "/" + objectKey;
+			std::unique_ptr<http::Request> httpRequest = std::make_unique<http::Request>("PUT");
+			{
+				httpRequest->SetUrl(url);
+				httpRequest->Header().Add("Date", date);
+				httpRequest->Header().Add("User-Agent", "acs");
+				std::string sign = create_signature("PUT", "", fileType,
+					date, canonicalized_resource, this->mConfig.secret);
 
-		http::Response * response = this->mHttp->Do(std::move(httpRequest));
-		if (response != nullptr)
-		{
-			LOG_WARN("{}", response->ToString());
-		}
+				std::string auth = fmt::format("OSS {}:{}", this->mConfig.key, sign);
+				httpRequest->Header().Add(http::Header::Auth, auth);
+			}
+			std::unique_ptr<http::FileContent> fileContent = std::make_unique<http::FileContent>();
+			{
+				if (!fileContent->OpenFile(path, fileType))
+				{
+					ossResponse->data = "open file fail";
+					ossResponse->code = HttpStatus::BAD_REQUEST;
+					break;
+				}
+			}
+
+			httpRequest->SetBody(std::move(fileContent));
+			std::unique_ptr<http::TextContent> textResponse = std::make_unique<http::TextContent>();
+			http::Response* response = this->mHttp->Do(std::move(httpRequest), std::move(textResponse));
+			if (response == nullptr)
+			{
+				ossResponse->data = "response is null";
+				ossResponse->code = HttpStatus::INTERNAL_SERVER_ERROR;
+				break;
+			}
+			ossResponse->code = response->Code();
+			if (response->Code() == HttpStatus::OK)
+			{
+				ossResponse->url = url;
+				break;
+			}
+			ossResponse->data = response->To<http::TextContent>()->Content();
+		} 
+		while (false);
+		return ossResponse;
 	}
+
+	std::unique_ptr<oss::Response> OssComponent::FromUpload(const std::string& path, const std::string& dir)
+	{
+		std::unique_ptr<oss::Response> ossResponse = std::make_unique<oss::Response>();
+		do
+		{
+			std::string fileType, fileName;
+			if (!help::fs::GetFileType(path, fileType))
+			{
+				ossResponse->code = HttpStatus::BAD_REQUEST;
+				break;
+			}
+			if (!help::Str::GetFileName(path, fileName))
+			{
+				ossResponse->code = HttpStatus::BAD_REQUEST;
+				break;
+			}
+			std::string contentType(http::GetContentType(fileType));
+
+			oss::Policy ossPolicy;
+			{
+				ossPolicy.upload_dir = dir;
+				ossPolicy.file_name = fileName;
+				ossPolicy.file_type = fileType;
+				ossPolicy.max_length = 1024 * 1024 * 10;
+				ossPolicy.limit_type.emplace_back(contentType);
+				ossPolicy.expiration = help::Time::NowSec() + 60 * 5;
+			}
+			oss::FromData fromData;
+			if (!this->Sign(ossPolicy, fromData))
+			{
+				ossResponse->code = HttpStatus::BAD_REQUEST;
+				ossResponse->data = "oss sign fail";
+				break;
+			}
+
+			const std::string date = get_utc_time();
+			std::string objectKey = fmt::format("{}/{}", dir, fileName);
+			
+			std::string canonicalized_resource = "/" + this->mConfig.bucket + "/" + objectKey;
+			std::unique_ptr<http::Request> httpRequest = std::make_unique<http::Request>("POST");
+			{
+				httpRequest->SetUrl(this->mConfig.host);
+				httpRequest->Header().Add("Date", date);
+				httpRequest->Header().Add("User-Agent", "acs");				
+			}
+			std::unique_ptr<http::MultipartFromContent> fileContent = std::make_unique<http::MultipartFromContent>();
+			{
+				fileContent->Add("policy", fromData.policy);
+				fileContent->Add("OSSAccessKeyId", fromData.OSSAccessKeyId);
+				fileContent->Add("success_action_status", "200");
+				fileContent->Add("signature", fromData.signature);
+				fileContent->Add("key", fromData.key);
+
+				if (!fileContent->Add("file", path))
+				{
+					ossResponse->data = "open file fail";
+					ossResponse->code = HttpStatus::BAD_REQUEST;
+					break;
+				}
+			}
+
+			httpRequest->SetBody(std::move(fileContent));
+			std::unique_ptr<http::TextContent> textResponse = std::make_unique<http::TextContent>();
+			http::Response* response = this->mHttp->Do(std::move(httpRequest), std::move(textResponse));
+			if (response == nullptr)
+			{
+				ossResponse->data = "response is null";
+				ossResponse->code = HttpStatus::INTERNAL_SERVER_ERROR;
+				break;
+			}
+			ossResponse->code = response->Code();
+			if (response->Code() == HttpStatus::OK)
+			{
+				ossResponse->url = fmt::format("{}/{}", this->mConfig.host, objectKey);
+				break;
+			}
+			ossResponse->data = response->To<http::TextContent>()->Content();
+		} while (false);
+		return ossResponse;
+	}
+
 
 	bool OssComponent::Sign(const oss::Policy& policy, std::string& sign)
 	{
@@ -195,7 +334,7 @@ namespace acs
 		std::string str2 = help::Base64::Encode(str1);
 		std::string str3 = computeSignature(this->mConfig.secret, str2);
 
-		std::string fullName = policy.upload_dir + policy.file_name;
+		std::string fullName = policy.upload_dir + "/" + policy.file_name;
 
 		fromData.policy = str2;
 		fromData.key = fullName;

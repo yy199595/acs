@@ -214,7 +214,6 @@ namespace http
 		inline const std::string & FileName() const { return this->mFileName; }
 		inline const std::string & ContentType() const { return this->mContType; }
 	public:
-		bool Add(const std::string& path);
 		bool Add(const std::string& k, const std::string& v);
 	private:
 		size_t GetContentLength() const;
@@ -232,6 +231,7 @@ namespace http
 		size_t mReadCount;
 		std::fstream mFile;
 		std::string mFileName;
+		std::string mFieldName;
 		std::string mContType;
 		std::string mBoundary;
 		std::string mContent;

@@ -6,6 +6,7 @@
 #define APP_OSSCOMPONENT_H
 
 #ifdef __ENABLE_OPEN_SSL__
+#include"Http/Client/Http.h"
 #include "Entity/Component/Component.h"
 
 namespace oss
@@ -38,6 +39,13 @@ namespace oss
 
 		std::string url;
 	};
+
+	struct Response
+	{
+		std::string url;
+		std::string data;
+		HttpStatus code = HttpStatus::OK;
+	};
 }
 
 namespace acs
@@ -52,7 +60,8 @@ namespace acs
 		bool LateAwake() final;
 		void Complete() final;
 	public:
-		void Upload(const std::string& path);
+		std::unique_ptr<oss::Response> Upload(const std::string& path, const std::string & dir);
+		std::unique_ptr<oss::Response> FromUpload(const std::string& path, const std::string& dir);
 	public:
 		bool Sign(const oss::Policy & policy, std::string & sign);
 		bool Sign(const oss::Policy& policy, oss::FromData & fromData);

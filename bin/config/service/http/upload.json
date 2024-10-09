@@ -31,7 +31,7 @@
         "Desc": "上传用户头像"
     },
     "/upload/file": {
-        "Type": "PUT",
+        "Type": "POST",
         "Auth": false,
         "Permiss": 5,
         "Bind": "FileUpload.File",

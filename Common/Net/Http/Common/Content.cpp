@@ -517,37 +517,45 @@ namespace http
 	}
 
 	bool MultipartFromContent::OnDecode()
-	{
-		if(!this->mFile.is_open())
-		{
-			this->mDone = false;
-			return false;
-		}
+	{		
 		this->mDone = true;
 		this->mFile.close();
 		return true;
 	}
 
-	bool MultipartFromContent::Add(const std::string& path)
+	bool MultipartFromContent::Add(const std::string& k, const std::string& v)
 	{
-		this->mFile.open(path, std::ios::in | std::ios::binary);
+		if (!help::fs::FileIsExist(v))
+		{
+			auto iter = this->mFromData.find(k);
+			if (iter != this->mFromData.end())
+			{
+				return false;
+			}
+			std::stringstream ss;
+			ss << http::Header::ContentDisposition << ": form-data; ";
+			ss << fmt::format("name=\"{}\"", k) << "\r\n\r\n" << v << "\r\n";
+			this->mHeader.emplace_back(ss.str());
+			return true;
+		}
+		this->mFile.open(v, std::ios::in | std::ios::binary);
 		if (!this->mFile.is_open())
 		{
 			return false;
 		}
 		this->mLength = 0;
 		std::string fileName, fileType;
-		if (help::Str::GetFileName(path, fileName) && help::fs::GetFileType(path, fileType))
+		if (help::Str::GetFileName(v, fileName) && help::fs::GetFileType(v, fileType))
 		{
-			this->mPath = path;
+			this->mPath = v;
 			std::stringstream ss;
-			ss << http::Header::ContentDisposition << ": form-data; ";
 			std::string contenType(http::GetContentType(fileType));
-			ss << fmt::format("name=\"file\"; filename=\"{}\"", fileName) << "\r\n";
+			ss << http::Header::ContentDisposition << ": form-data; ";
+			ss << fmt::format("name=\"{}\"; filename=\"{}\"", k, fileName) << "\r\n";
 			ss << http::Header::ContentType << ": " << contenType << "\r\n\r\n";
 
 			this->mHeader.emplace_back(ss.str());
-			
+
 			return true;
 		}
 
@@ -557,7 +565,7 @@ namespace http
 	size_t MultipartFromContent::GetContentLength() const
 	{
 		size_t size = 0;
-		size_t length = this->mBoundary.size() + 4;
+		size_t length = 0;
 		if (help::fs::GetFileSize(this->mPath, size))
 		{
 			length += size;
@@ -565,55 +573,32 @@ namespace http
 		for (size_t i = 0; i < this->mHeader.size(); i++)
 		{
 			length += this->mHeader[i].size();
-			if (i < this->mHeader.size() - 1)
-			{
-				length += (this->mBoundary.size() + 4);
-			}
+			length += (this->mBoundary.size() + 4);
 		}
 		length += (this->mBoundary.size() + 8);
 		return length;
 	}
 
-	bool MultipartFromContent::Add(const std::string& k, const std::string& v)
-	{
-		auto iter = this->mFromData.find(k);
-		if (iter != this->mFromData.end())
-		{
-			return false;
-		}
-		std::stringstream ss;
-		ss << http::Header::ContentDisposition << ": form-data; ";
-		ss << fmt::format("name=\"{}\"", k) << "\r\n\r\n" << v << "\r\n";
-		this->mHeader.emplace_back(ss.str());
-		return true;
-	}
-
 	int MultipartFromContent::OnWriteBody(std::ostream& os)
 	{
-		os << "--" << this->mBoundary << "\r\n";
-		for (size_t i = 0; i < this->mHeader.size(); i++)
+		for (const std::string& value : this->mHeader)
 		{
-			const std::string& v = this->mHeader[i];
-			{
-				os.write(v.c_str(), v.size());
-				if (i < this->mHeader.size() - 1)
-				{
-					os << "--" << this->mBoundary << "\r\n";
-				}
-			}
+			os << "--" << this->mBoundary << "\r\n";
+			os.write(value.c_str(), value.size());			
 		}
 		
 		char buff[1024] = { 0 };
 		while (!this->mFile.eof())
 		{
 			this->mFile.read(buff, sizeof(buff));
-			if (this->mFile.gcount() > 0)
+			size_t len = this->mFile.gcount();
+			if (len > 0)
 			{
-				os.write(buff, this->mFile.gcount());
+				os.write(buff, len);
 			}
-		}		
+		}	
 		os << "\r\n--" << this->mBoundary << "--\r\n";
-		/*
+	/*	
 			std::stringstream ss;
 			ss << os.rdbuf();
 			std::string str = ss.str();
@@ -625,7 +610,7 @@ namespace http
 	void MultipartFromContent::OnWriteHead(std::ostream& os)
 	{
 		size_t len = this->GetContentLength();
-		this->mBoundary = fmt::format("----------{}", help::ID::Create());
+		this->mBoundary = fmt::format("----{}", help::ID::Create());
 		os << http::Header::ContentType << ": " << fmt::format("multipart/form-data; boundary={}", this->mBoundary) << "\r\n";
 		os << http::Header::ContentLength << ": " << len << "\r\n";
 
@@ -655,6 +640,7 @@ namespace http
 
 	int MultipartFromContent::OnRecvMessage(std::istream& buffer, size_t size)
 	{
+		this->mReadCount += size;
 		if(this->mMaxCount > 0 && this->mReadCount >= this->mMaxCount)
 		{
 			return tcp::ReadDecodeError;
@@ -680,18 +666,17 @@ namespace http
 			if (count > 0)
 			{
 				if (strstr(buff.get(), this->mBoundary.c_str()) != NULL)
-				{					
-					return tcp::ReadDone;
-				}				
+				{			
+					this->mFile.close();
+					return tcp::ReadOneLine;
+				}
 				this->mFile.write(buff.get(), count);
 				this->mFile.flush();
 			}
 			return tcp::ReadOneLine;
 		}
 
-		std::string line;
-		std::string field_name;
-		
+		std::string line;		
 		if (std::getline(buffer, line))
 		{						
 			if (!line.empty() && line.back() == '\r')
@@ -702,15 +687,18 @@ namespace http
 			if (line == this->mBoundary)
 			{
 				return tcp::ReadOneLine;
+			}	
+			else if (line.empty())
+			{
+				return tcp::ReadOneLine;
 			}
-			static int index = 1;			
-			if (line.find("Content-Disposition:") != std::string::npos)
+			else if (line.find("Content-Disposition:") != std::string::npos)
 			{
 				size_t name_pos = line.find("name=\"");
 				if (name_pos != std::string::npos)
 				{
 					size_t name_end = line.find("\"", name_pos + 6);
-					field_name = line.substr(name_pos + 6, name_end - name_pos - 6);
+					this->mFieldName = line.substr(name_pos + 6, name_end - name_pos - 6);
 				}
 
 				size_t filename_pos = line.find("filename=\"");
@@ -719,21 +707,13 @@ namespace http
 					size_t filename_end = line.find("\"", filename_pos + 10);
 					this->mFileName = line.substr(filename_pos + 10, filename_end - filename_pos - 10);
 				}
-			}
-
-			while (std::getline(buffer, line))
-			{
-				break;
-			}
-			while (std::getline(buffer, line))
-			{
-				break;
+				return tcp::ReadOneLine;
 			}
 			
 			if (!this->mFileName.empty())
 			{
 				std::string director;
-				this->mFromData.emplace("file_name", this->mFileName);
+				this->mFromData.emplace(this->mFieldName, this->mFileName);
 				this->mPath = fmt::format("{}/{}", this->mDir, this->mFileName);
 				
 				if (help::dir::GetDirByPath(this->mPath, director))
@@ -744,9 +724,11 @@ namespace http
 				if (!this->mFile.is_open())
 				{
 					return tcp::ReadDecodeError;
-				}	
+				}
+				std::getline(buffer, line);
+				//this->mFileName.clear();
 			}	
-			if (!field_name.empty())
+			else if (!this->mFieldName.empty())
 			{
 				if (!line.empty() && line.back() == '\r')
 				{
@@ -754,8 +736,9 @@ namespace http
 				}
 				if (!line.empty())
 				{
-					this->mFromData.emplace(field_name, line);
+					this->mFromData.emplace(this->mFieldName, line);
 				}
+				//std::cout << this->mFieldName << ": " << line << std::endl;
 			}
 		}
 		return tcp::ReadOneLine;	

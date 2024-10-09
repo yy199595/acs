@@ -10,7 +10,7 @@
 namespace http
 {
 	SessionClient::SessionClient(Component* component)
-			: tcp::TcpClient(1024 * 4), mComponent(component)
+			: tcp::TcpClient(0), mComponent(component)
 	{
 
 	}
@@ -196,7 +196,13 @@ namespace http
 
 	void SessionClient::OnReceiveMessage(std::istream& is, size_t size)
 	{
-		switch (this->mRequest.OnRecvMessage(is, size))
+		int flag = this->mRequest.OnRecvMessage(is, size);
+		if (flag > 0)
+		{
+			this->ReadLength(flag);
+			return;
+		}
+		switch (flag)
 		{
 		case tcp::ReadDone:
 			this->OnComplete(HttpStatus::OK);
