@@ -94,8 +94,8 @@ namespace acs
 
 	void OssComponent::Complete()
 	{
-		this->Upload("C:/Users/64658/Desktop/yy/ace/bin/config/run/all.json", "10000");
-		this->FromUpload("C:/Users/64658/Desktop/yy/ace/bin/config/run/all.json", "10000");
+		//this->Upload("C:/Users/64658/Desktop/yy/ace/bin/config/run/all.json", "10000");
+		this->FromUpload("/Users/yy/Desktop/image/zhongqiuhaibao.jpg", "10000");
 	}
 
 	std::unique_ptr<http::Request> OssComponent::New(const std::string& path, const std::string& dir)
