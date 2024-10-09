@@ -2,7 +2,6 @@
 // Created by yjz on 2022/10/27.
 //
 #include"HttpRequest.h"
-#include"Util/Tools/Math.h"
 #include"Util/Tools/TimeHelper.h"
 #include"Log/Common/CommonLogDef.h"
 #include"Yyjson/Document/Document.h"
