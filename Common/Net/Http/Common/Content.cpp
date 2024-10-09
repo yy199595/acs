@@ -544,7 +544,7 @@ namespace http
 			ss << http::Header::ContentDisposition << ": form-data; ";
 			std::string contenType(http::GetContentType(fileType));
 			ss << fmt::format("name=\"file\"; filename=\"{}\"", fileName) << "\r\n";
-			ss << http::Header::ContentType << ": " << contenType << "\r\n";
+			ss << http::Header::ContentType << ": " << contenType << "\r\n\r\n";
 
 			this->mHeader.emplace_back(ss.str());
 			
@@ -556,7 +556,12 @@ namespace http
 
 	size_t MultipartFromContent::GetContentLength() const
 	{
+		size_t size = 0;
 		size_t length = this->mBoundary.size() + 4;
+		if (help::fs::GetFileSize(this->mPath, size))
+		{
+			length += size;
+		}
 		for (size_t i = 0; i < this->mHeader.size(); i++)
 		{
 			length += this->mHeader[i].size();
@@ -565,7 +570,7 @@ namespace http
 				length += (this->mBoundary.size() + 4);
 			}
 		}
-		length += this->mBoundary.size() + 6;
+		length += (this->mBoundary.size() + 8);
 		return length;
 	}
 
@@ -589,12 +594,13 @@ namespace http
 		for (size_t i = 0; i < this->mHeader.size(); i++)
 		{
 			const std::string& v = this->mHeader[i];
-
-			os.write(v.c_str(), v.size());			
-			if (i < this->mHeader.size() - 1)
 			{
-				os << "--" << this->mBoundary << "\r\n";
-			}		
+				os.write(v.c_str(), v.size());
+				if (i < this->mHeader.size() - 1)
+				{
+					os << "--" << this->mBoundary << "\r\n";
+				}
+			}
 		}
 		
 		char buff[1024] = { 0 };
@@ -606,15 +612,23 @@ namespace http
 				os.write(buff, this->mFile.gcount());
 			}
 		}		
-		os << "--" << this->mBoundary << "--\r\n";
+		os << "\r\n--" << this->mBoundary << "--\r\n";
+		/*
+			std::stringstream ss;
+			ss << os.rdbuf();
+			std::string str = ss.str();
+			help::fs::WriterFile("./a.json", str);
+		*/
 		return 0;
 	}
 
 	void MultipartFromContent::OnWriteHead(std::ostream& os)
 	{
-		this->mBoundary = fmt::format("----{}", help::ID::Create());
-		//os << http::Header::ContentLength << ": " << this->GetContentLength() << "\r\n";
+		size_t len = this->GetContentLength();
+		this->mBoundary = fmt::format("----------{}", help::ID::Create());
 		os << http::Header::ContentType << ": " << fmt::format("multipart/form-data; boundary={}", this->mBoundary) << "\r\n";
+		os << http::Header::ContentLength << ": " << len << "\r\n";
+
 	}
 
 	void MultipartFromContent::WriteToLua(lua_State* l)

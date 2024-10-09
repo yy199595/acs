@@ -9,6 +9,11 @@
 #include "Oss/Component/OssComponent.h"
 namespace acs
 {
+	FileUpload::FileUpload()
+	{
+		this->mOss = nullptr;
+	}
+
 	bool FileUpload::Awake()
 	{
 		std::unique_ptr<json::r::Value> jsonObject;

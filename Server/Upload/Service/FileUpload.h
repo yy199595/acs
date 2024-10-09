@@ -21,7 +21,7 @@ namespace acs
 	class FileUpload : public HttpService
 	{
 	public:
-		FileUpload() = default;
+		FileUpload();
 		~FileUpload() = default;
 	private:
 		bool Awake() final;

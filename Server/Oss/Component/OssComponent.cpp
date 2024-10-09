@@ -63,7 +63,7 @@ namespace acs
 
 	void OssComponent::Complete()
 	{
-		this->Upload("C:/Users/64658/Desktop/yy/ace/bin/www/dist/skill_card.png");
+		this->Upload("C:/Users/64658/Desktop/yy/ace/bin/config/run/all.json");
 	}
 
 	void OssComponent::Upload(const std::string& path)
@@ -81,6 +81,7 @@ namespace acs
 		}
 		oss::FromData fromData;
 		this->Sign(ossPolicy, fromData);
+
 		std::unique_ptr<http::Request> httpRequest = std::make_unique<http::Request>("PUT");
 		std::unique_ptr<http::MultipartFromContent> fromContent = std::make_unique<http::MultipartFromContent>();
 		{
@@ -91,13 +92,13 @@ namespace acs
 			fromContent->Add("key", fromData.key);
 		}
 		fromContent->Add(path);
-		httpRequest->SetUrl(OSS_HOST);
+		httpRequest->SetUrl(this->mConfig.host);
 		httpRequest->SetBody(std::move(fromContent));
 
 		http::Response * response = this->mHttp->Do(std::move(httpRequest));
-		if (response == nullptr || response->Code() != HttpStatus::OK)
+		if (response != nullptr)
 		{
-
+			LOG_WARN("{}", response->ToString());
 		}
 	}
 
