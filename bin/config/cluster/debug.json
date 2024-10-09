@@ -1,6 +1,5 @@
 {
-    "excel" : {
-
+    "excel": {
     },
     "server": {
         "Service": [
@@ -16,19 +15,18 @@
             "Watch",
             "MongoMgr"
         ],
-      "Component": [
-        "LoggerComponent",
-        "ConfigComponent",
-        "OssComponent",
-        "ActorComponent",
-        "GateComponent",
-        "ProtoComponent",
-        "ClientComponent",
-        "HttpWebComponent",
-        "WXNoticeComponent",
-        "WatchComponent",
-        "HttpApiComponent",
-        "LuaListenComponent"
-      ]
+        "Component": [
+            "LoggerComponent",
+            "ConfigComponent",
+            "OssComponent",
+            "ActorComponent",
+            "GateComponent",
+            "ProtoComponent",
+            "ClientComponent",
+            "HttpWebComponent",
+            "WXNoticeComponent",
+            "WatchComponent",
+            "HttpApiComponent"
+        ]
     }
 }

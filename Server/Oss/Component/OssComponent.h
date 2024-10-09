@@ -7,6 +7,7 @@
 
 #ifdef __ENABLE_OPEN_SSL__
 #include"Http/Client/Http.h"
+#include "Http/Common/HttpRequest.h"
 #include "Entity/Component/Component.h"
 
 namespace oss
@@ -50,7 +51,7 @@ namespace oss
 
 namespace acs
 {
-	class OssComponent : public Component, public IComplete
+	class OssComponent : public Component, public IComplete, public ILuaRegister
 	{
 	public:
 		OssComponent();
@@ -60,11 +61,14 @@ namespace acs
 		bool LateAwake() final;
 		void Complete() final;
 	public:
+		std::unique_ptr<http::Request> New(const std::string& path, const std::string & dir);
 		std::unique_ptr<oss::Response> Upload(const std::string& path, const std::string & dir);
 		std::unique_ptr<oss::Response> FromUpload(const std::string& path, const std::string& dir);
 	public:
-		void Sign(const oss::Policy & policy, json::w::Value & document);
 		void Sign(const oss::Policy& policy, oss::FromData & fromData);
+		void Sign(const oss::Policy & policy, json::w::Value & document);
+	private:
+		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
 	private:
 		oss::Config mConfig;
 		class HttpComponent* mHttp;

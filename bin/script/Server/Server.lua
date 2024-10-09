@@ -15,7 +15,9 @@ function Main:Awake()
 end
 
 function Main:OnComplete()
-
+    local oss = require("util.oss")
+    local url = oss.Upload("/Users/yy/Desktop/acs/Common/Timer/Lua/Timer.cpp", "10000")
+    print(url)
 end
 
 return Main

@@ -4,6 +4,8 @@
 #ifdef __ENABLE_OPEN_SSL__
 #include <ctime>
 #include <iomanip>
+#include "Oss/Lua/LuaOss.h"
+#include "Lua/Engine/ModuleClass.h"
 #include "OssComponent.h"
 #include "Entity/Actor/App.h"
 #include "Util/Tools/TimeHelper.h"
@@ -18,9 +20,6 @@
 #include <openssl/hmac.h>
 #include <openssl/sha.h>
 
-constexpr char* OSS_HOST = "https://yy-client.oss-rg-china-mainland.aliyuncs.com";
-//constexpr char* OSS_HOST = "http://127.0.0.1:8088/upload/file";
-
 namespace acs
 {
 	std::string computeSignature(const std::string& key, const std::string& data)
@@ -32,7 +31,7 @@ namespace acs
 		unsigned int len = SHA_DIGEST_LENGTH;
 		HMAC_Final(ctx, hash, &len);
 		HMAC_CTX_free(ctx);
-		return std::string(reinterpret_cast<char*>(hash), len);
+		return {reinterpret_cast<char*>(hash), len};
 	}
 
 	std::string hmac_sha1(const std::string& key, const std::string& data) {
@@ -79,6 +78,11 @@ namespace acs
 		ossObject->Get("bucket", this->mConfig.bucket);
 		ossObject->Get("region", this->mConfig.region);
 		ossObject->Get("secret", this->mConfig.secret);
+		LOG_CHECK_RET_FALSE(!this->mConfig.key.empty());
+		LOG_CHECK_RET_FALSE(!this->mConfig.host.empty());
+		LOG_CHECK_RET_FALSE(!this->mConfig.bucket.empty());
+		LOG_CHECK_RET_FALSE(!this->mConfig.region.empty());
+		LOG_CHECK_RET_FALSE(!this->mConfig.secret.empty());
 		return true;
 	}
 
@@ -94,51 +98,59 @@ namespace acs
 		this->FromUpload("C:/Users/64658/Desktop/yy/ace/bin/config/run/all.json", "10000");
 	}
 
+	std::unique_ptr<http::Request> OssComponent::New(const std::string& path, const std::string& dir)
+	{
+		std::string fileType, fileName;
+		if (!help::fs::GetFileType(path, fileType))
+		{
+			return nullptr;
+		}
+		if (!help::Str::GetFileName(path, fileName))
+		{
+			return nullptr;
+		}
+		std::string contentType(http::GetContentType(fileType));
+
+		const std::string date = get_utc_time();
+		std::string objectKey = fmt::format("{}/{}", dir, fileName);
+		std::string url = fmt::format("http://{}.{}.aliyuncs.com/{}",
+				this->mConfig.bucket, this->mConfig.region, objectKey);;
+		std::string canonicalized_resource = "/" + this->mConfig.bucket + "/" + objectKey;
+		std::unique_ptr<http::Request> httpRequest = std::make_unique<http::Request>("PUT");
+		{
+			httpRequest->SetUrl(url);
+			httpRequest->Header().Add("Date", date);
+			httpRequest->Header().Add("User-Agent", "acs");
+			std::string sign = create_signature("PUT", "", fileType,
+					date, canonicalized_resource, this->mConfig.secret);
+
+			std::string auth = fmt::format("OSS {}:{}", this->mConfig.key, sign);
+			httpRequest->Header().Add(http::Header::Auth, auth);
+		}
+		std::unique_ptr<http::FileContent> fileContent = std::make_unique<http::FileContent>();
+		{
+			if (!fileContent->OpenFile(path, fileType))
+			{
+				return nullptr;
+			}
+		}
+		httpRequest->SetBody(std::move(fileContent));
+		return httpRequest;
+	}
+
 	std::unique_ptr<oss::Response> OssComponent::Upload(const std::string& path, const std::string & dir)
 	{
 		std::unique_ptr<oss::Response> ossResponse = std::make_unique<oss::Response>();
 		do
 		{
-			std::string fileType, fileName;
-			if (!help::fs::GetFileType(path, fileType))
+			std::unique_ptr<http::Request> httpRequest = this->New(path, dir);
+			if(httpRequest == nullptr)
 			{
+				ossResponse->data = "create request fail";
 				ossResponse->code = HttpStatus::BAD_REQUEST;
 				break;
 			}
-			if (!help::Str::GetFileName(path, fileName))
-			{
-				ossResponse->code = HttpStatus::BAD_REQUEST;
-				break;
-			}
-			std::string contentType(http::GetContentType(fileType));
-
-			const std::string date = get_utc_time();
-			std::string objectKey = fmt::format("{}/{}", dir, fileName);
-			std::string url = fmt::format("http://{}.{}.aliyuncs.com/{}",
-				this->mConfig.bucket, this->mConfig.region, objectKey);;
-			std::string canonicalized_resource = "/" + this->mConfig.bucket + "/" + objectKey;
-			std::unique_ptr<http::Request> httpRequest = std::make_unique<http::Request>("PUT");
-			{
-				httpRequest->SetUrl(url);
-				httpRequest->Header().Add("Date", date);
-				httpRequest->Header().Add("User-Agent", "acs");
-				std::string sign = create_signature("PUT", "", fileType,
-					date, canonicalized_resource, this->mConfig.secret);
-
-				std::string auth = fmt::format("OSS {}:{}", this->mConfig.key, sign);
-				httpRequest->Header().Add(http::Header::Auth, auth);
-			}
-			std::unique_ptr<http::FileContent> fileContent = std::make_unique<http::FileContent>();
-			{
-				if (!fileContent->OpenFile(path, fileType))
-				{
-					ossResponse->data = "open file fail";
-					ossResponse->code = HttpStatus::BAD_REQUEST;
-					break;
-				}
-			}
-
-			httpRequest->SetBody(std::move(fileContent));
+			std::string url = httpRequest->GetUrl().ToStr();
 			std::unique_ptr<http::TextContent> textResponse = std::make_unique<http::TextContent>();
 			http::Response* response = this->mHttp->Do(std::move(httpRequest), std::move(textResponse));
 			if (response == nullptr)
@@ -333,6 +345,13 @@ namespace acs
 		fromData.OSSAccessKeyId = this->mConfig.key;
 		fromData.signature = help::Base64::Encode(str3);
 		fromData.url = fmt::format("{}/{}", this->mConfig.host, fullName);
+	}
+
+	void OssComponent::OnLuaRegister(Lua::ModuleClass& luaRegister)
+	{
+		luaRegister.AddFunction("Sign", oss::Sign);
+		luaRegister.AddFunction("Upload", oss::Upload);
+		luaRegister.End("util.oss");
 	}
 }
 

@@ -20,7 +20,7 @@ namespace http
 
 	int Url::OnSendMessage(std::ostream& os)
 	{
-		os << this->mMethod << " " << this->mUrl
+		os << this->mMethod << " " << this->mPath
 			<< " " << this->mVersion << http::CRLF;
 		return 0;
 	}
@@ -80,6 +80,7 @@ namespace http
 		return this->mQuery.Decode(query) ? tcp::ReadDone : tcp::ReadDecodeError;
 	}
 
+
 	bool Url::Decode(const std::string& url)
 	{
 		std::cmatch what;
@@ -87,17 +88,18 @@ namespace http
 		if (std::regex_match(url.c_str(), what, pattern))
 		{
 			this->mHost = std::string(what[2].first, what[2].second);
-			this->mUrl = std::string(what[4].first, what[4].second);
+			this->mPath = std::string(what[4].first, what[4].second);
 			this->mProto.append(what[1].first, what[1].second);
 			this->mPort = std::string(what[3].first, what[3].second);
-			if(this->mUrl.empty())
+			if(this->mPath.empty())
 			{
-				this->mUrl = "/";
+				this->mPath = "/";
 			}
 			if (0 == this->mPort.length())
 			{
 				this->mPort = this->IsHttps() ? "443" : "80";
 			}
+			this->mUrl = url;
 			return !this->mHost.empty();
 		}
 		return false;

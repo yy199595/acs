@@ -12,7 +12,7 @@ namespace acs
 	class HttpRequestTask : public IRpcTask<http::Response>, protected WaitTaskSourceBase
     {
     public:
-		~HttpRequestTask() { delete this->mData; }
+		~HttpRequestTask() final { delete this->mData; }
 		explicit HttpRequestTask() : IRpcTask<http::Response>(0), mData(nullptr) { }
     public:
         inline http::Response * Await();

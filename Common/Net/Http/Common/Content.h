@@ -113,7 +113,7 @@ namespace http
 		explicit TextContent() : mMaxSize(1024 * 500) { }
 		explicit TextContent(std::string t) : mMaxSize(10240), mConType(std::move(t)) {}
 	private:
-		void WriteToLua(lua_State *l) final;
+		void WriteToLua(lua_State *l) override;
 		bool OnDecode() final { return true; }
 		int OnWriteBody(std::ostream &os) final;
 		void OnWriteHead(std::ostream &os) final;
@@ -131,6 +131,7 @@ namespace http
 		http::ContentType GetContentType() const final { return http::ContentType::TEXT; }
 	private:
 		size_t mMaxSize;
+		std::string mUrl;
 		std::string mConType;
 		std::string mContent;
 	};
