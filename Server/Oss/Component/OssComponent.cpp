@@ -187,13 +187,7 @@ namespace acs
 				ossPolicy.expiration = help::Time::NowSec() + 60 * 5;
 			}
 			oss::FromData fromData;
-			if (!this->Sign(ossPolicy, fromData))
-			{
-				ossResponse->code = HttpStatus::BAD_REQUEST;
-				ossResponse->data = "oss sign fail";
-				break;
-			}
-
+			this->Sign(ossPolicy, fromData);
 			const std::string date = get_utc_time();
 			std::string objectKey = fmt::format("{}/{}", dir, fileName);
 			
@@ -241,7 +235,7 @@ namespace acs
 	}
 
 
-	bool OssComponent::Sign(const oss::Policy& policy, std::string& sign)
+	void OssComponent::Sign(const oss::Policy& policy, json::w::Value & document2)
 	{
 		json::w::Document document1;
 		document1.Add("expiration", help::Time::GetDateISO(policy.expiration));
@@ -277,7 +271,6 @@ namespace acs
 		std::string str3 = computeSignature(this->mConfig.secret, str2);
 		std::string signature = help::Base64::Encode(str3);
 
-		json::w::Document document2;
 		document2.Add("ossAccessKeyId", this->mConfig.key);
 		document2.Add("host", this->mConfig.host);
 		document2.Add("policy", str2);
@@ -286,7 +279,7 @@ namespace acs
 		size_t pos = policy.file_type.find('/');
 		if (pos == std::string::npos)
 		{
-			return false;
+			return;
 		}
 
 		std::string type = policy.file_type.substr(pos + 1);
@@ -296,10 +289,9 @@ namespace acs
 		document2.Add("key", fullName);
 		document2.Add("file", fileName);
 		document2.Add("url", fmt::format("{}/{}", this->mConfig.host, fullName));
-		return document2.Encode(&sign);
 	}
 
-	bool OssComponent::Sign(const oss::Policy& policy, oss::FromData& fromData)
+	void OssComponent::Sign(const oss::Policy& policy, oss::FromData& fromData)
 	{
 		json::w::Document document1;
 		document1.Add("expiration", help::Time::GetDateISO(policy.expiration));
@@ -341,7 +333,6 @@ namespace acs
 		fromData.OSSAccessKeyId = this->mConfig.key;
 		fromData.signature = help::Base64::Encode(str3);
 		fromData.url = fmt::format("{}/{}", this->mConfig.host, fullName);
-		return true;
 	}
 }
 

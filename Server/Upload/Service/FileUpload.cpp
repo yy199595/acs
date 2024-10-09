@@ -107,12 +107,9 @@ namespace acs
 			default:
 				return XCode::CallArgsError;
 		}
-		std::string json;
-		if(!this->mOss->Sign(policy, json))
-		{
-			return XCode::Failure;
-		}
-		response.AddJson("data", json);
+
+		auto jsonData = response.AddObject("data");
+		this->mOss->Sign(policy, *jsonData);
 		return XCode::Ok;
 	}
 
