@@ -10,7 +10,7 @@
 
 namespace http
 {
-    Request::Request() : mSockId(0), mBody(nullptr)
+    Request::Request() : mSockId(0)
     {
 		this->mConeSize = 0;
 		this->mTimeout = 0;
@@ -18,7 +18,7 @@ namespace http
     }
 
 	Request::Request(const char* method)
-		: mSockId(0) , mBody(nullptr), mUrl(method)
+		: mSockId(0), mUrl(method)
 	{
 		this->mConeSize = 0;
 		this->mTimeout = 0;
