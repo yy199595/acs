@@ -1,7 +1,7 @@
 #ifdef __ENABLE_MYSQL__
 
 #include"MysqlHelperComponent.h"
-#include"Util/String/String.h"
+#include"Util/Tools/String.h"
 #include"Mysql/Service/MysqlDB.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include"Entity/Actor/App.h"

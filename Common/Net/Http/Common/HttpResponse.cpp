@@ -63,6 +63,10 @@ namespace http
 				{
 					this->mBody = std::make_unique<http::JsonContent>();
 				}
+				else if (content_type.find(http::Header::XML) != std::string::npos)
+				{
+					this->mBody = std::make_unique<http::XMLContent>();
+				}
 				else
 				{
 					this->mBody = std::make_unique<http::TextContent>();
@@ -218,11 +222,12 @@ namespace http
 		json::w::Document js;
 		js.Add("status", this->mCode);
 		js.Add("status_text", this->mError);
+		js.AddJson("header", this->mHead.ToString());
 		if(this->mBody != nullptr)
 		{
 			js.Add("data", this->mBody->ToStr());
 		}
-		js.Encode(&json);
+		js.Encode(&json, true);
 		return json;
 	}
 

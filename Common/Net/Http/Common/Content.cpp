@@ -265,6 +265,42 @@ namespace http
 
 namespace http
 {
+	int XMLContent::OnRecvMessage(std::istream& is, size_t size)
+	{
+		static thread_local char buffer[512] = { 0 };
+		size_t count = is.readsome(buffer, sizeof(buffer));
+		while (count > 0)
+		{
+			this->mXml.append(buffer, count);
+			count = is.readsome(buffer, sizeof(buffer));
+		}
+		return tcp::ReadSomeMessage;
+	}
+
+	void XMLContent::OnWriteHead(std::ostream& os)
+	{
+		if (this->mXml.empty())
+		{
+			this->Encode(this->mXml);
+		}
+		os << http::Header::ContentType << ": " << http::Header::XML << "\r\n";
+		os << http::Header::ContentLength << ": " << this->mXml.size() << "\r\n";
+	}
+
+	void XMLContent::WriteToLua(lua_State* lua)
+	{
+		
+	}
+
+	int XMLContent::OnWriteBody(std::ostream& os)
+	{
+		os.write(this->mXml.c_str(), this->mXml.size());
+		return 0;
+	}
+}
+
+namespace http
+{
 	void TextContent::OnWriteHead(std::ostream& os)
 	{
 		os << http::Header::ContentType << ": " << this->mConType << "\r\n";
@@ -609,10 +645,9 @@ namespace http
 
 	void MultipartFromContent::OnWriteHead(std::ostream& os)
 	{
-		size_t len = this->GetContentLength();
 		this->mBoundary = fmt::format("----{}", help::ID::Create());
-		os << http::Header::ContentType << ": " << fmt::format("multipart/form-data; boundary={}", this->mBoundary) << "\r\n";
-		os << http::Header::ContentLength << ": " << len << "\r\n";
+		os << http::Header::ContentType << ": " << "multipart/form-data; boundary=" << this->mBoundary << "\r\n";
+		os << http::Header::ContentLength << ": " << this->GetContentLength() << "\r\n";
 
 	}
 
@@ -687,7 +722,7 @@ namespace http
 			if (line == this->mBoundary)
 			{
 				return tcp::ReadOneLine;
-			}	
+			}
 			else if (line.empty())
 			{
 				return tcp::ReadOneLine;

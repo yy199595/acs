@@ -63,7 +63,6 @@ namespace acs
 	public:
 		std::unique_ptr<http::Request> New(const std::string& path, const std::string & dir);
 		std::unique_ptr<oss::Response> Upload(const std::string& path, const std::string & dir);
-		std::unique_ptr<oss::Response> FromUpload(const std::string& path, const std::string& dir);
 	public:
 		void Sign(const oss::Policy& policy, oss::FromData & fromData);
 		void Sign(const oss::Policy & policy, json::w::Value & document);

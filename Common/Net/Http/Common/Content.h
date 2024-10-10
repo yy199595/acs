@@ -13,6 +13,7 @@
 #include"Http/Client/Http.h"
 #include"Proto/Message/IProto.h"
 #include "Core/Map/HashMap.h"
+#include"XML/Document/XDocument.h"
 #include<Yyjson/Document/Document.h>
 
 struct lua_State;
@@ -102,6 +103,30 @@ namespace http
 		int ContentLength() final { return (int)this->mJson.size(); }
 	private:
         std::string mJson;
+	};
+}
+
+namespace http
+{
+	class XMLContent : public Content, public xml::XDocument
+	{
+	public:
+		explicit XMLContent() = default;
+		explicit XMLContent(std::string  xml) : mXml(std::move(xml)) { }
+		explicit XMLContent(const char* xml, size_t size) : mXml(xml, size) { }
+		~XMLContent() override = default;
+	public:
+		http::ContentType GetContentType() const final { return http::ContentType::XML; }
+	private:
+		void WriteToLua(lua_State* l) final;
+		void OnWriteHead(std::ostream& os) final;
+		int OnWriteBody(std::ostream& os) final;
+		int OnRecvMessage(std::istream& is, size_t size) final;
+		bool OnDecode() final { return this->Decode(this->mXml); }
+		std::string ToStr() const final { return this->mXml; }
+		int ContentLength() final { return (int)this->mXml.size(); }
+	private:
+		std::string mXml;
 	};
 }
 

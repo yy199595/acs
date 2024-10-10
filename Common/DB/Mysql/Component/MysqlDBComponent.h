@@ -8,7 +8,7 @@
 #include"Core/Queue/Queue.h"
 #include"Mysql/Client/MysqlDefine.h"
 #include"Mysql/Client/MysqlMessage.h"
-#include"Util/Guid/NumberBuilder.h"
+#include"Util/Tools/NumberBuilder.h"
 #include "Mysql/Config/MysqlConfig.h"
 #include"Rpc/Component/RpcTaskComponent.h"
 

@@ -163,7 +163,7 @@ namespace acs
 
 		moduleRegistry.Start();
 		moduleRegistry.AddFunction("Create", lua::ljwt::Create);
-		moduleRegistry.AddFunction("Verify", lua::ljwt::Verify).End("auth.jwt");
+		moduleRegistry.AddFunction("Verify", lua::ljwt::Verify).End("util.jwt");
 
 		moduleRegistry.Start();
 		moduleRegistry.AddFunction("Make", Lua::LuaDir::Make);

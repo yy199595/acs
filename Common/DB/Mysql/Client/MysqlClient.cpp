@@ -7,7 +7,7 @@
 #include"MysqlClient.h"
 #include"MysqlMessage.h"
 #include"Entity/Actor/App.h"
-#include"Util/String/String.h"
+#include"Util/Tools/String.h"
 #include"Core/Thread/ThreadSync.h"
 #include"Mysql/Config/MysqlConfig.h"
 namespace acs

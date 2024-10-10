@@ -95,7 +95,7 @@ namespace acs
 	void OssComponent::Complete()
 	{
 		//this->Upload("C:/Users/64658/Desktop/yy/ace/bin/config/run/all.json", "10000");
-		this->FromUpload("/Users/yy/Desktop/image/zhongqiuhaibao.jpg", "10000");
+		//this->FromUpload("C:/Users/64658/Desktop/yy/ace/bin/config/run/all.json", "10000");
 	}
 
 	std::unique_ptr<http::Request> OssComponent::New(const std::string& path, const std::string& dir)
@@ -143,6 +143,12 @@ namespace acs
 		std::unique_ptr<oss::Response> ossResponse = std::make_unique<oss::Response>();
 		do
 		{
+			if (!help::fs::FileIsExist(path))
+			{
+				ossResponse->data = "file not exist";
+				ossResponse->code = HttpStatus::BAD_REQUEST;
+				break;
+			}
 			std::unique_ptr<http::Request> httpRequest = this->New(path, dir);
 			if(httpRequest == nullptr)
 			{
@@ -170,82 +176,6 @@ namespace acs
 		while (false);
 		return ossResponse;
 	}
-
-	std::unique_ptr<oss::Response> OssComponent::FromUpload(const std::string& path, const std::string& dir)
-	{
-		std::unique_ptr<oss::Response> ossResponse = std::make_unique<oss::Response>();
-		do
-		{
-			std::string fileType, fileName;
-			if (!help::fs::GetFileType(path, fileType))
-			{
-				ossResponse->code = HttpStatus::BAD_REQUEST;
-				break;
-			}
-			if (!help::Str::GetFileName(path, fileName))
-			{
-				ossResponse->code = HttpStatus::BAD_REQUEST;
-				break;
-			}
-			std::string contentType(http::GetContentType(fileType));
-
-			oss::Policy ossPolicy;
-			{
-				ossPolicy.upload_dir = dir;
-				ossPolicy.file_name = fileName;
-				ossPolicy.file_type = fileType;
-				ossPolicy.max_length = 1024 * 1024 * 10;
-				ossPolicy.limit_type.emplace_back(contentType);
-				ossPolicy.expiration = help::Time::NowSec() + 60 * 5;
-			}
-			oss::FromData fromData;
-			this->Sign(ossPolicy, fromData);
-			const std::string date = get_utc_time();
-			std::string objectKey = fmt::format("{}/{}", dir, fileName);
-			
-			std::string canonicalized_resource = "/" + this->mConfig.bucket + "/" + objectKey;
-			std::unique_ptr<http::Request> httpRequest = std::make_unique<http::Request>("POST");
-			{
-				httpRequest->SetUrl(this->mConfig.host);
-				httpRequest->Header().Add("Date", date);
-				httpRequest->Header().Add("User-Agent", "acs");				
-			}
-			std::unique_ptr<http::MultipartFromContent> fileContent = std::make_unique<http::MultipartFromContent>();
-			{
-				fileContent->Add("policy", fromData.policy);
-				fileContent->Add("OSSAccessKeyId", fromData.OSSAccessKeyId);
-				fileContent->Add("success_action_status", "200");
-				fileContent->Add("signature", fromData.signature);
-				fileContent->Add("key", fromData.key);
-
-				if (!fileContent->Add("file", path))
-				{
-					ossResponse->data = "open file fail";
-					ossResponse->code = HttpStatus::BAD_REQUEST;
-					break;
-				}
-			}
-
-			httpRequest->SetBody(std::move(fileContent));
-			std::unique_ptr<http::TextContent> textResponse = std::make_unique<http::TextContent>();
-			http::Response* response = this->mHttp->Do(std::move(httpRequest), std::move(textResponse));
-			if (response == nullptr)
-			{
-				ossResponse->data = "response is null";
-				ossResponse->code = HttpStatus::INTERNAL_SERVER_ERROR;
-				break;
-			}
-			ossResponse->code = response->Code();
-			if (response->Code() == HttpStatus::OK)
-			{
-				ossResponse->url = fmt::format("{}/{}", this->mConfig.host, objectKey);
-				break;
-			}
-			ossResponse->data = response->To<http::TextContent>()->Content();
-		} while (false);
-		return ossResponse;
-	}
-
 
 	void OssComponent::Sign(const oss::Policy& policy, json::w::Value & document2)
 	{

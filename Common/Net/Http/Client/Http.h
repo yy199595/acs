@@ -109,7 +109,7 @@ namespace http
 
 	enum ContentType
 	{
-		NONE = 0, FROM = 1, JSON = 2, TEXT = 3, FILE = 4, CHUNKED = 5, MULTIPAR = 6
+		NONE = 0, FROM = 1, JSON = 2, TEXT = 3, FILE = 4, CHUNKED = 5, MULTIPAR = 6, XML = 7
 	};
 
 	namespace query
@@ -158,7 +158,7 @@ namespace http
 		constexpr const char* TEXT = "text/plain";
 		constexpr const char* JSON = "application/json";
 		constexpr const char* PB = "application/x-protobuf";
-		constexpr const char* XML = "text/xml";
+		constexpr const char* XML = "application/xml";
 		constexpr const char* XHTML = "application/xhtml+xml";
 		constexpr const char* FORM = "application/x-www-form-urlencoded";
 		constexpr const char* PDF = "application/pdf";
