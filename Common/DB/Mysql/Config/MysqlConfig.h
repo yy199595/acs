@@ -1,7 +1,7 @@
 //
 // Created by zmhy0073 on 2022/10/26.
 //
-#ifdef __ENABLE_MYSQL__
+
 #ifndef APP_MYSQLCONFIG_H
 #define APP_MYSQLCONFIG_H
 #include<vector>
@@ -25,5 +25,3 @@ namespace mysql
 
 
 #endif //APP_MYSQLCONFIG_H
-
-#endif

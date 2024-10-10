@@ -225,13 +225,17 @@ namespace http
 {
     int JsonContent::OnRecvMessage(std::istream& is, size_t size)
     {
-		static thread_local char buffer[512] = { 0 };
-		size_t count = is.readsome(buffer, sizeof(buffer));
-		while(count > 0)
+		size_t count = 0;
+		char buffer[512] = { 0 };
+		do
 		{
-			this->mJson.append(buffer, count);
 			count = is.readsome(buffer, sizeof(buffer));
-		}
+			if (count > 0)
+			{
+				this->mJson.append(buffer, count);
+			}
+		} 
+		while (count > 0);		
 		return tcp::ReadSomeMessage;
 	}
 
@@ -267,13 +271,17 @@ namespace http
 {
 	int XMLContent::OnRecvMessage(std::istream& is, size_t size)
 	{
-		static thread_local char buffer[512] = { 0 };
-		size_t count = is.readsome(buffer, sizeof(buffer));
-		while (count > 0)
+		size_t count = 0;
+		char buffer[512] = { 0 };
+		do
 		{
-			this->mXml.append(buffer, count);
 			count = is.readsome(buffer, sizeof(buffer));
-		}
+			if (count > 0)
+			{
+				this->mXml.append(buffer, count);
+			}
+		} 
+		while (count > 0);
 		return tcp::ReadSomeMessage;
 	}
 
@@ -581,21 +589,19 @@ namespace http
 		}
 		this->mLength = 0;
 		std::string fileName, fileType;
-		if (help::Str::GetFileName(v, fileName) && help::fs::GetFileType(v, fileType))
+		if (!help::Str::GetFileName(v, fileName) && help::fs::GetFileType(v, fileType))
 		{
-			this->mPath = v;
-			std::stringstream ss;
-			std::string contenType(http::GetContentType(fileType));
-			ss << http::Header::ContentDisposition << ": form-data; ";
-			ss << fmt::format("name=\"{}\"; filename=\"{}\"", k, fileName) << "\r\n";
-			ss << http::Header::ContentType << ": " << contenType << "\r\n\r\n";
-
-			this->mHeader.emplace_back(ss.str());
-
-			return true;
+			return false;
 		}
+		this->mPath = v;
+		std::stringstream ss;
+		std::string contenType(http::GetContentType(fileType));
+		ss << http::Header::ContentDisposition << ": form-data; ";
+		ss << fmt::format("name=\"{}\"; filename=\"{}\"", k, fileName) << "\r\n";
+		ss << http::Header::ContentType << ": " << contenType << "\r\n\r\n";
 
-		return false;
+		this->mHeader.emplace_back(ss.str());
+		return true;
 	}
 
 	size_t MultipartFromContent::GetContentLength() const
