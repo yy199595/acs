@@ -1,46 +1,43 @@
 {
-    "include": [
-        "com/db.json",
-        "com/com.json",
-        "com/log.json"
-    ],
-    "core": {
-        "name": "${name}"
-    },
-    "lua": {
-        "main": "Server"
-    },
-    "listen": {
-        "http": {
-            "port": "${http}"
-        },
-        "rpc": {
-            "port": "${rpc}"
-        },
-      "gate": {
-        "port": "${gate}"
-      },
-      "lua": {
-        "port" : 8899
-      }
-    },
-    "master": {
-        "host" : "http://127.0.0.1:8088"
-    },
-    "http": {
-        "auth": true,
-        "index": "index.html",
-        "domain": "https://www.huwai.pro",
-        "root": "${WORK_DIR}/www/dist",
-        "upload": "${WORK_DIR}/www/dist",
-        "download": "${WORK_DIR}/www/dist",
-        "header": {
-            "Access-Control-Allow-Origin": "*"
-        }
-    },
-    "path": {
-        "machine" : "",
-        "home" : "${WORK_DIR}/config/card/home.json",
-        "cluster": "${WORK_DIR}/config/cluster/debug.json"
-    }
+	"include": [
+		"com/db.json",
+		"com/com.json",
+		"com/log.json"
+	],
+	"core": {
+		"name": "${name}"
+	},
+	"lua": {
+		"main": "Server"
+	},
+	"listen": {
+		"http": {
+			"port": "${http}"
+		},
+		"rpc": {
+			"port": "${rpc}"
+		},
+		"gate": {
+			"port": "${gate}"
+		}
+	},
+	"master": {
+		"host": "http://127.0.0.1:8088"
+	},
+	"http": {
+		"auth": true,
+		"index": "index.html",
+		"domain": "https://www.huwai.pro",
+		"root": "${WORK_DIR}/www/dist",
+		"upload": "${WORK_DIR}/www/dist",
+		"download": "${WORK_DIR}/www/dist",
+		"header": {
+			"Access-Control-Allow-Origin": "*"
+		}
+	},
+	"path": {
+		"machine": "",
+		"home": "${WORK_DIR}/config/card/home.json",
+		"cluster": "${WORK_DIR}/config/cluster/debug.json"
+	}
 }

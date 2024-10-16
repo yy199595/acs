@@ -133,7 +133,7 @@ namespace acs
 		}
 		if (listenData->Listener == nullptr)
 		{
-			LOG_ERROR("not component {}", listenData->Config.Component);
+			LOG_ERROR("not [{}] component {}", listenData->Config.Name, listenData->Config.Component);
 			return false;
 		}
 #ifdef ONLY_MAIN_THREAD

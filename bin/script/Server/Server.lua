@@ -15,9 +15,9 @@ function Main:Awake()
 end
 
 function Main:OnComplete()
-    local oss = require("util.oss")
-	local url = oss.Upload("C:/Users/64658/Desktop/yy/ace/bin/www/dist/bg.jpg", "10000")
-	print(url)
+    --local oss = require("util.oss")
+	--local url = oss.Upload("C:/Users/64658/Desktop/yy/ace/bin/www/dist/bg.jpg", "10000")
+	--print(url)
 end
 
 return Main

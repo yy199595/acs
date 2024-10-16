@@ -18,7 +18,6 @@
         "Component": [
             "LoggerComponent",
             "ConfigComponent",
-            "OssComponent",
             "ActorComponent",
             "GateComponent",
             "ProtoComponent",
