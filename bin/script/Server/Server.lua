@@ -11,7 +11,7 @@ SetMember(Main, "count", 1)
 proto.Import("record/record.proto")
 
 function Main:Awake()
-	
+
 end
 
 function Main:OnComplete()

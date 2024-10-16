@@ -1,7 +1,6 @@
 ﻿#include "LuaComponent.h"
 
 #include "Entity/Actor/App.h"
-#include "Util/Tools/Guid.h"
 #include "Util/File/FileHelper.h"
 #include "Util/Tools/String.h"
 #include "Util/Tools/TimeHelper.h"
@@ -20,7 +19,6 @@
 #include "Proto/Message/IProto.h"
 #include "Auth/Lua/Auth.h"
 #include "Core/Excel/excel.h"
-#include "Lua/Engine/Table.h"
 #include "Net/Lua/LuaSocket.h"
 #include "Net/Network/Tcp/Socket.h"
 
