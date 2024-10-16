@@ -12,7 +12,7 @@
 #endif
 
 #include<regex>
-#include"spdlog/fmt/fmt.h"
+#include"fmt.h"
 #include"DirectoryHelper.h"
 
 #pragma warning(disable : 4996)

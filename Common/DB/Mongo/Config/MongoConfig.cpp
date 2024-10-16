@@ -1,6 +1,6 @@
 #include "MongoConfig.h"
 #include <regex>
-#include <spdlog/fmt/fmt.h>
+#include <fmt.h>
 namespace mongo
 {
 	bool MongoConfig::FromString(const std::string& url)

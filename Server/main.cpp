@@ -25,8 +25,6 @@
 #include "Master/Component/MasterComponent.h"
 #include "Gate/Component/GateComponent.h"
 
-#include "Kcp/Component/KcpComponent.h"
-
 #include "Mongo/Service/MongoDB.h"
 #include "Mongo/Component/MongoDBComponent.h"
 #include "Mongo/Component/MongoComponent.h"
@@ -93,7 +91,6 @@ void RegisterComponent()
 	REGISTER_COMPONENT(ActorComponent);
 	REGISTER_COMPONENT(CoroutineComponent);
 
-	REGISTER_COMPONENT(KcpComponent);
 	REGISTER_COMPONENT(LaunchComponent);
 	REGISTER_COMPONENT(RouterComponent);
 	REGISTER_COMPONENT(InnerNetComponent);

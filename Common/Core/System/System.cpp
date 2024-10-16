@@ -29,7 +29,7 @@
 
 #include<cstdlib>
 #include<fstream>
-#include"spdlog/fmt/fmt.h"
+#include"fmt.h"
 #include"Util/Tools/String.h"
 #include"Log/Common/CommonLogDef.h"
 

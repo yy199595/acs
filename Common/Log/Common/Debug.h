@@ -9,7 +9,7 @@
 
 #include<string>
 #include"Level.h"
-#include"spdlog/fmt/fmt.h"
+#include"fmt.h"
 
 namespace Debug
 {
