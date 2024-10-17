@@ -86,7 +86,7 @@ namespace acs
 		int Query(const db::mongo::find::request & request, db::mongo::find::response * response);
 		int FindPage(const db::mongo::find_page::request & request, db::mongo::find_page::response * response);
 	public:
-		int Count(const char * tab, const const json::w::Document &);
+		int Count(const char * tab, const json::w::Document &);
 		int FindOne(const char * tab, const json::w::Document& , std::string * response);
 		int FindOne(const db::mongo::find_one::request & request, json::r::Document * response);
 		int FindOne(const char * tab, const json::w::Document & select, json::r::Document * response);
