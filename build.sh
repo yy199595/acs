@@ -15,6 +15,7 @@ if [ ! -n "$1" ] ;then
   echo "*           mysql        download mysql and build         *"
   echo "*           jemalloc     download jemalloc and build      *"
   echo "*           openssl      download openssl and build       *"
+  echo "*           wolfssl      download wolfssl and build       *"
   echo "*                                                         *"
   echo "***********************************************************"
 else
@@ -77,6 +78,11 @@ for arg in $cmd; do
         cd "$current_path" || exit
         make protoc
         make libprotobuf
+    fi
+
+    if [[ $arg == "wolfssl" ]]; then
+        cd "$current_path" || exit
+        make wolfssl
     fi
 
     if [[ $arg == "debug" ]]; then
