@@ -109,7 +109,8 @@ if (__ENABLE_OPEN_SSL__)
                 -DWOLFSSL_TIMING_RESISTANT
                 -DWOLFSSL_MAX_STRENGTH
                 -DENABLE_HARDEN
-                -DNO_BIG_INT
+                #-DNO_BIG_INT
+                -DWC_NO_HARDEN
         )
     else ()
         message("使用openssl")
