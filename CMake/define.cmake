@@ -103,6 +103,14 @@ if (__ENABLE_OPEN_SSL__)
         add_definitions(-DWOLFSSL_AES_HARDENED)
         add_definitions(-DWOLFSSL_SHA256_HARDENED)
         add_definitions(-DHAVE_EX_DATA)
+        add_definitions(
+                -DWOLFSSL_PUBLIC_MP
+                -DWOLFSSL_SP_MATH_ALL
+                -DWOLFSSL_TIMING_RESISTANT
+                -DWOLFSSL_MAX_STRENGTH
+                -DENABLE_HARDEN
+                -DNO_BIG_INT
+        )
     else ()
         message("使用openssl")
     endif ()
