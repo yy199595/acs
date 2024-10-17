@@ -117,6 +117,7 @@ namespace tcp
 				this->mSocket->SslSocket().async_handshake(asio::ssl::stream_base::client,
 						[this](const asio::error_code& err)
 						{
+							//CONSOLE_LOG_FATAL("{}", err.message())
 							this->OnConnect(err.value() == Asio::OK, this->mConnectCount);
 						});
 				return;

@@ -20,10 +20,10 @@ namespace acs
 
 	bool QuickSDK::Awake()
 	{
-		std::unique_ptr<json::r::Value> jsobObject;
-		LOG_CHECK_RET_FALSE(this->mApp->Config().Get("quick", jsobObject))
-		LOG_CHECK_RET_FALSE(jsobObject->Get("pay_md5", this->mConfig.md5))
-		LOG_CHECK_RET_FALSE(jsobObject->Get("pay_num", this->mConfig.str))
+		std::unique_ptr<json::r::Value> jsonObject;
+		LOG_CHECK_RET_FALSE(this->mApp->Config().Get("quick", jsonObject))
+		LOG_CHECK_RET_FALSE(jsonObject->Get("md5_key", this->mConfig.md5_key))
+		LOG_CHECK_RET_FALSE(jsonObject->Get("callback_key", this->mConfig.callback_key))
 		return true;
 	}
 
@@ -55,8 +55,8 @@ namespace acs
 			LOG_CHECK_BREAK(fromData.Get("sign", sign));
 			LOG_CHECK_BREAK(fromData.Get("nt_data", nt_data));
 			LOG_CHECK_BREAK(fromData.Get("md5Sign", md5_sign));
-			std::string input = fmt::format("{}{}{}", nt_data, sign, this->mConfig.md5);
-			if (help::Md5::GetMd5(input) != md5_sign)
+			std::string input = fmt::format("{}{}{}", nt_data, sign, this->mConfig.md5_key);
+			if (help::md5::GetMd5(input) != md5_sign)
 			{
 				break;
 			}
@@ -143,7 +143,7 @@ namespace acs
 			return false;
 		}
 		std::vector<char> data(list.size());
-		std::vector<char> keys(this->mConfig.str.begin(), this->mConfig.str.end());
+		std::vector<char> keys(this->mConfig.callback_key.begin(), this->mConfig.callback_key.end());
 
 		for (size_t i = 0; i < data.size(); ++i) {
 			int num = std::stoi(list[i]);

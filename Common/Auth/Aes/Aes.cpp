@@ -157,6 +157,9 @@ std::string aes::Aes256GcmDecode(const std::string &ciphertext,
 	int len, plaintext_len;
 
 	std::string plaintext;
+#ifndef EVP_GCM_TLS_TAG_LEN
+#define EVP_GCM_TLS_TAG_LEN 16
+#endif
 	plaintext.resize(ciphertext.size() - EVP_GCM_TLS_TAG_LEN);
 
 	// 创建并初始化解密上下文

@@ -45,6 +45,10 @@ namespace acs
 #ifdef __ENABLE_OPEN_SSL__
 		aes::Init();
 #endif
+
+#ifdef __ENABLE_OPEN_WOLF_SSL__
+
+#endif
 		this->mNextNewDayTime = help::Time::GetNewTime(1);
 	}
 

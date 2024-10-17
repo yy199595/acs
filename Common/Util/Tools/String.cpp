@@ -166,7 +166,7 @@ namespace help
     std::string Str::CreateNewToken()
     {
         const int size = Math::Random<int>(30, 100);
-        return Md5::GetMd5(RandomString(size));
+        return md5::GetMd5(RandomString(size));
     }
 }// namespace StringHelper
 

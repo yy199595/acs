@@ -65,7 +65,7 @@ private:
 
 namespace help
 {
-    namespace Md5
+    namespace md5
     {
         extern std::string GetMd5(ifstream &in);
 		extern std::string SumHex(const std::string & key);

@@ -55,27 +55,31 @@ namespace acs
 #ifdef __ENABLE_OPEN_SSL__
 		if(request->IsHttps())
 		{
-			asio::ssl::context * context = nullptr;
+			std::unique_ptr<asio::ssl::context> context;
 			const std::string & path = request->GetVerifyFile();
 			const std::string & fullPath = path.empty() ? this->mPemPath : path;
 			auto iter = this->mSslContexts.find(fullPath);
 			if(iter == this->mSslContexts.end())
 			{
 				Asio::Code code;
-				context = new asio::ssl::context(asio::ssl::context::sslv23);
-				context->load_verify_file(fullPath, code);
-				if(code.value() != Asio::OK)
+				context = std::make_unique<asio::ssl::context>(asio::ssl::context::sslv23);
+				//context->set_options(asio::ssl::context::default_workarounds | asio::ssl::context::no_sslv2 |asio::ssl::context::single_dh_use);
 				{
-					LOG_ERROR("load ssh : {}", fullPath);
-					return nullptr;
+					//context->set_verify_mode(asio::ssl::verify_none);
+					auto val = context->load_verify_file(fullPath, code);
+					if(code.value() != Asio::OK)
+					{
+						LOG_ERROR("load ssh : {}", fullPath);
+						return nullptr;
+					}
+					socketProxy = this->mNetComponent->CreateSocket(*context);
+					this->mSslContexts.emplace(fullPath, std::move(context));
 				}
-				this->mSslContexts.emplace(fullPath, context);
 			}
 			else
 			{
-				context = iter->second;
+				socketProxy = this->mNetComponent->CreateSocket(*iter->second);
 			}
-			socketProxy = this->mNetComponent->CreateSocket(*context);
 		}
 		else
 		{

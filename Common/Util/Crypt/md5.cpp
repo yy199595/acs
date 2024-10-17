@@ -365,31 +365,31 @@ string MD5::toString()
 
 namespace help
 {
-    std::string Md5::GetMd5(ifstream &in)
+    std::string md5::GetMd5(ifstream &in)
     {
         MD5 md5(in);
         return md5.toString();
     }
 
-    std::string Md5::GetMd5(const std::string &str)
+    std::string md5::GetMd5(const std::string &str)
     {
         MD5 md5(str);
         return md5.toString();
     }
 
-    std::string Md5::GetMd5(const char *str, size_t size)
+    std::string md5::GetMd5(const char *str, size_t size)
     {
         MD5 md5(str, size);
         return md5.toString();
     }
 
-	std::string Md5::SumHex(const std::string& key)
+	std::string md5::SumHex(const std::string& key)
 	{
 		//const std::string key1("440069e08fdef11byjzaca507f07fe9e6713643245318aa39d1");
 		std::string result;
 		char buffer[16] = {0};
 		std::regex regex1(".");
-		md5(key.c_str(), key.size(), buffer);
+		::md5(key.c_str(), key.size(), buffer);
 
 		std::string target(buffer, 16);
 		auto begin = std::sregex_iterator(target.begin(), target.end(), regex1);

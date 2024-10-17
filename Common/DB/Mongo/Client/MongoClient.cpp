@@ -150,7 +150,7 @@ namespace mongo
         int iterations = std::stoi(std::string(ret[2].c_str() + 2, ret[2].size() - 2));
 
         std::string without_proof = "c=biws,r=" + rnonce;
-        std::string pbkdf2_key = help::Md5::SumHex(
+        std::string pbkdf2_key = help::md5::SumHex(
                 fmt::format("{0}:mongo:{1}", user, pwd));
         std::string salted_pass = SaltPassword(pbkdf2_key,
                                                _bson::base64::decode(salt), iterations);

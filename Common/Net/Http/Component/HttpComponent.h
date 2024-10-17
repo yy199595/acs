@@ -44,7 +44,7 @@ namespace acs
 		math::NumberPool<int> mNumPool;
         class ThreadComponent * mNetComponent;
 #ifdef __ENABLE_OPEN_SSL__
-		std::unordered_map<std::string, asio::ssl::context *> mSslContexts;
+		std::unordered_map<std::string, std::unique_ptr<asio::ssl::context>> mSslContexts;
 #endif
 		std::string mPemPath;
 		custom::ArrayPool<http::RequestClient, 10> mClientPools;

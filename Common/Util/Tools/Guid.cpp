@@ -20,7 +20,7 @@ namespace help
     std::string ID::UUid()
     {
         std::string str = std::to_string(ID::Create());
-        return help::Md5::GetMd5(str);
+        return help::md5::GetMd5(str);
     }
 
     long long ID::Create()

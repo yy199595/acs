@@ -10,8 +10,8 @@ namespace quick
 {
 	struct Config
 	{
-		std::string md5;
-		std::string str;
+		std::string md5_key;
+		std::string callback_key;
 	};
 
 	struct PayNotify

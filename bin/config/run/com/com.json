@@ -106,7 +106,7 @@
         "app_secret" : ""
     },
     "quick" : {
-        "pay_md5" : "",
-        "pay_num": ""
+        "md5_key" : "",
+        "callback_key": ""
     }
 }

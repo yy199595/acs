@@ -153,7 +153,7 @@ namespace acs
 		moduleRegistry.AddFunction("decode", lua::yyjson::decode).End("util.json");
 
 		moduleRegistry.Start();
-		moduleRegistry.AddFunction("ToString", Lua::Md5::ToString).End("util.md5");
+		moduleRegistry.AddFunction("ToString", Lua::md5::ToString).End("util.md5");
 
 		moduleRegistry.Start();
 		moduleRegistry.AddFunction("Decode", Lua::base64::Decode);

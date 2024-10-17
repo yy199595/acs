@@ -10,7 +10,7 @@
 #include"Util/Tools/String.h"
 namespace Lua
 {
-    int Md5::ToString(lua_State *lua)
+    int md5::ToString(lua_State *lua)
     {
 		MD5 md5;
 		if(lua_isstring(lua, 1))

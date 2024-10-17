@@ -7,7 +7,7 @@
 #include"Lua/Engine/Define.h"
 namespace Lua
 {
-    namespace Md5
+    namespace md5
     {
         int ToString(lua_State *lua);
     }
