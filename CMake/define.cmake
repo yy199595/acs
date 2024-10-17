@@ -56,7 +56,6 @@ endif ()
 #add_definitions(-DOPENSSL)
 
 
-
 add_definitions(-DLOG_LEVEL_DEBUG=1) #debug
 add_definitions(-DLOG_LEVEL_INFO=2) #info
 add_definitions(-DLOG_LEVEL_WARN=3) #warn
@@ -93,8 +92,10 @@ if (__ENABLE_OPEN_SSL__)
         add_definitions(-DOPENSSL_EXTRA)
         add_definitions(-DWOLFSSL_IGNORE_FILE_WARN)
         add_definitions(-DHAVE_TLS_EXTENSIONS)
-        add_definitions(-DWOLFSSL_HAVE_MIN)
-        add_definitions(-DWOLFSSL_HAVE_MAX)
+        if (WIN32)
+            add_definitions(-DWOLFSSL_HAVE_MIN)
+            add_definitions(-DWOLFSSL_HAVE_MAX)
+        endif ()
         add_definitions(-DWOLFSSL_HARDEN)
         add_definitions(-DHAVE_AESGCM)
         add_definitions(-DOPENSSL_NO_ENGINE)
