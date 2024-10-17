@@ -4,7 +4,7 @@
 
 #include "QuickSDK.h"
 #include <regex>
-#include "Util/Crypt/MD5.h"
+#include "Util/Crypt/md5.h"
 #include "Entity/Actor/App.h"
 #include "XML/Document/XDocument.h"
 #include "Http/Component/HttpComponent.h"

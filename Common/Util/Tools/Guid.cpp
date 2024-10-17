@@ -3,7 +3,7 @@
 //
 
 #include "Guid.h"
-#include "Util/Crypt/MD5.h"
+#include "Util/Crypt/md5.h"
 #include"Util/Tools/TimeHelper.h"
 namespace help
 {

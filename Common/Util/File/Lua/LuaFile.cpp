@@ -4,7 +4,7 @@
 
 #include "LuaFile.h"
 #include "fstream"
-#include "Util/Crypt/MD5.h"
+#include "Util/Crypt/md5.h"
 #include "Util/File/FileHelper.h"
 #include "Util/File/DirectoryHelper.h"
 namespace Lua
