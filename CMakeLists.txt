@@ -56,12 +56,6 @@ include_directories(Libs/mysql/include)
 include_directories(Libs/leveldb/include)
 include_directories(Libs/fmt/include)
 
-
-if (__ENABLE_OPEN_SSL__)
-    include_directories(Libs/openssl/include)
-    #include_directories(Libs/openssl/include/crypto)
-endif ()
-
 #公共组件
 include_directories(${PROJECT_SOURCE_DIR}/Gen)
 include_directories(${PROJECT_SOURCE_DIR}/Client)
