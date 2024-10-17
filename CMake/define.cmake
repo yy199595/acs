@@ -44,7 +44,7 @@ option(__CONSOLE_LOG__ "控制台打印日志" ON)
 option(__ENABLE_SYSTEM_DEBUG "打印系统日志" ON)
 option(__ENABLE_OPEN_SSL__ "开启openssl" ON)
 option(__MEMOEY_CHECK__ "开启内存检查" OFF)
-option(__ENABLE_OPEN_WOLF_SSL__ "开启wolfssl" ON)
+option(__ENABLE_OPEN_WOLF_SSL__ "开启wolfssl" OFF)
 
 if (APPLE)
     option(__ENABLE_DING_DING_PUSH "开启钉钉通知" OFF)
@@ -83,35 +83,6 @@ if (__ENABLE_OPEN_SSL__)
     if (__ENABLE_OPEN_WOLF_SSL__)
         message("使用wolfssl")
         add_definitions(-D __ENABLE_OPEN_WOLF_SSL__)
-
-        add_definitions(-DASIO_USE_WOLFSSL)
-
-        add_definitions(-DOPENSSL_ALL)
-        add_definitions(-DOPENSSL_NO_SSL2)
-        add_definitions(-DOPENSSL_NO_SSL3)
-        add_definitions(-DOPENSSL_EXTRA)
-        add_definitions(-DWOLFSSL_IGNORE_FILE_WARN)
-        add_definitions(-DHAVE_TLS_EXTENSIONS)
-        if (WIN32)
-            add_definitions(-DWOLFSSL_HAVE_MIN)
-            add_definitions(-DWOLFSSL_HAVE_MAX)
-        endif ()
-        add_definitions(-DWOLFSSL_HARDEN)
-        add_definitions(-DHAVE_AESGCM)
-        add_definitions(-DOPENSSL_NO_ENGINE)
-        add_definitions(-DHAVE_ERROR_STRINGS)
-        add_definitions(-DWOLFSSL_AES_HARDENED)
-        add_definitions(-DWOLFSSL_SHA256_HARDENED)
-        add_definitions(-DHAVE_EX_DATA)
-        add_definitions(
-                -DWOLFSSL_PUBLIC_MP
-                -DWOLFSSL_SP_MATH_ALL
-                -DWOLFSSL_TIMING_RESISTANT
-                -DWOLFSSL_MAX_STRENGTH
-                -DENABLE_HARDEN
-                #-DNO_BIG_INT
-                -DWC_NO_HARDEN
-        )
     else ()
         message("使用openssl")
     endif ()
