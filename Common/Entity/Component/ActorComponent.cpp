@@ -9,6 +9,11 @@
 namespace acs
 {
 
+	ActorComponent::ActorComponent()
+	{
+		this->mLuaModule = nullptr;
+	}
+
 	bool ActorComponent::LateAwake()
 	{
 		this->mLuaModule = nullptr;

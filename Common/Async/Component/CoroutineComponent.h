@@ -47,7 +47,7 @@ namespace acs
 			return this->mRunContext == nullptr ? 0 :
 				   this->mRunContext->mCoroutineId;
 		}
-		void WaitAll(std::vector<unsigned int> & coroutines);
+		size_t Count() const { return this->mCorPool.GetCount(); }
 	 private:
 		void SaveStack(unsigned int id);
 		void RunCoroutine(TaskContext * coroutine);

@@ -19,10 +19,9 @@
         "ping" : 30,
         "count": 4,
         "db" : "yy",
-        "user": "yjz",
-        "passwd": "199595yjz",
-        "address": "${db}:3306",
-        "table" : ["mysql/comment.proto"]
+        "user": "root",
+        "passwd": "",
+        "address": "127.0.0.1:3306"
     },
     "mongo": {
         "ping": 15,

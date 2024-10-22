@@ -25,7 +25,8 @@
             "HttpWebComponent",
             "WXNoticeComponent",
             "WatchComponent",
-            "HttpApiComponent"
+            "HttpApiComponent",
+            "ClientComponent"
         ]
     }
 }

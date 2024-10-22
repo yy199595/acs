@@ -10,38 +10,11 @@
 #include<cstdio>
 #include<unordered_map>
 #include <utility>
-#include"Http/Client/Http.h"
+#include "IContent.h"
 #include"Proto/Message/IProto.h"
 #include "Core/Map/HashMap.h"
 #include"XML/Document/XDocument.h"
 #include<Yyjson/Document/Document.h>
-
-struct lua_State;
-
-namespace http
-{
-    class Content
-    {
-	public:
-		Content() = default;
-		virtual ~Content() = default;
-    public:
-        virtual bool OnDecode() = 0;
-		virtual void WriteToLua(lua_State * l) = 0;
-		virtual std::string ToStr() const { return ""; }
-        virtual void OnWriteHead(std::ostream & os) = 0;
-        virtual int OnWriteBody(std::ostream & os) = 0;
-        virtual int OnRecvMessage(std::istream & is, size_t size) = 0;
-		virtual int ContentLength() = 0;
-	public:
-		template<typename T>
-		T * Cast() { return static_cast<T*>(this); }
-		template<typename T>
-		const T * To() const { return dynamic_cast<T*>(this); }
-    public:
-        virtual http::ContentType GetContentType() const = 0;
-    };
-}
 
 namespace http
 {

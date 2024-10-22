@@ -21,6 +21,16 @@ namespace acs
 		return ClusterConfig::Inst()->GetServerName(name, this->mGateName);
 	}
 
+	bool GateComponent::Send(long long playerId, const std::string & func, const pb::Message& message)
+	{
+		Player * player = this->mActor->GetPlayer(playerId);
+		if(player == nullptr)
+		{
+			return false;
+		}
+		return player->Send(func, message) == XCode::Ok;
+	}
+
 	void GateComponent::BroadCast(const std::string& func, const pb::Message* data)
 	{
 		this->mGateServers.clear();

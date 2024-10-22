@@ -32,9 +32,7 @@ namespace acs
 		if(player == nullptr)
 		{
 			player = new Player(playerId, id);
-			{
-				this->mActorComponent->AddPlayer(player);
-			}
+			this->mActorComponent->AddPlayer(player);
 		}
 		for(const auto & actorInfo : request.actors())
 		{

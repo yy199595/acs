@@ -15,6 +15,7 @@ namespace acs
 		~GateComponent() override = default;
 	public:
 		void BroadCast(const std::string & func, const pb::Message * message = nullptr);
+		bool Send(long long playerId, const std::string & func, const pb::Message & message);
 	private:
 		bool LateAwake() final;
 	private:

@@ -17,6 +17,8 @@ namespace acs
 	class ActorComponent : public Component, public IServerRecord, public ILuaRegister
 	{
 	public:
+		ActorComponent();
+	public:
 		Actor * GetActor(long long id);
 		bool HasPlayer(long long id) const;
 		bool HasServer(long long id) const;

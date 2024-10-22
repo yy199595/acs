@@ -15,8 +15,8 @@ function Main:Awake()
 end
 
 function Main:OnComplete()
-    local res = http:Get("https://huwai.pro")
-    table.print(res)
+    --local res = http:Get("https://huwai.pro")
+    --table.print(res)
     --local oss = require("util.oss")
 	--local url = oss.Upload("C:/Users/64658/Desktop/yy/ace/bin/www/dist/bg.jpg", "10000")
 	--print(url)

@@ -52,8 +52,10 @@ namespace acs
 	{
 		std::unique_ptr<Mysql::IRequest>
 			pingCommand = std::make_unique<Mysql::PingRequest>();
-		pingCommand->SetRpcId(0);
-		this->Push(std::move(pingCommand));
+		{
+			pingCommand->SetRpcId(0);
+			this->Push(std::move(pingCommand));
+		}
 	}
 
 	bool MysqlClient::StartConnect()

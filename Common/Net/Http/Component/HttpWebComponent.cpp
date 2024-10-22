@@ -114,6 +114,11 @@ namespace acs
 			const std::string& key = iter->first;
 			response->Header().Add(key, iter->second);
 		}
+		if(request->ConstHeader().Has("Upgrade"))
+		{
+			this->Send(sockId, HttpStatus::UPGRADE_REQUIRED);
+			return;
+		}
 		const std::string& path = request->GetUrl().Path();
 		//response->Header().Add("Date", help::Time::GetDateGMT());
 		const HttpMethodConfig* httpConfig = HttpConfig::Inst()->GetMethodConfig(path);

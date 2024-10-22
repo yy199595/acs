@@ -69,7 +69,7 @@ namespace acs
 			}
 			this->mMysqlClients.Push(mysqlClient);
 		}
-		ProtoComponent * proto = this->mApp->GetProto();
+		ProtoComponent * proto = acs::App::GetProto();
 		for(const std::string & path : this->mConfig.Tables)
 		{
 			std::vector<std::string> types;

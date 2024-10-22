@@ -19,7 +19,7 @@ namespace Mysql
 		this->mTime = help::Time::NowMil();
 	}
 
-	long long IRequest::GetMs()
+	long long IRequest::GetMs() const
 	{
 		return help::Time::NowMil() - this->mTime;
 	}

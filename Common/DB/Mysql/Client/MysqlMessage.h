@@ -48,7 +48,7 @@ namespace Mysql
 		virtual void GetSql(std::string & sql) { }
         virtual bool Invoke(MYSQL *,  Response * response) = 0;
 	public:
-		long long GetMs();
+		long long GetMs() const;
 		int GetRpcId() const { return this->mTaskId; }
 		void SetRpcId(int id) { this->mTaskId = id;}
 	private:

@@ -13,6 +13,8 @@ namespace acs
 	public:
 		Player(long long playerId, int gate);
 	public:
+		int GetGateID() const { return this->mGateId; }
+	public:
 		bool OnInit() final;
 		void EncodeToJson(std::string *json) final;
 		bool DelAddr(const std::string & server);
