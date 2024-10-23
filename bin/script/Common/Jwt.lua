@@ -1,6 +1,6 @@
 
 local app = require("App")
-local ljwt = require("auth.jwt")
+local ljwt = require("util.jwt")
 
 local jwt = { }
 local core = app:GetConfig("core")

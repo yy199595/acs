@@ -57,8 +57,8 @@ void Debug::Log(std::unique_ptr<custom::LogInfo> log)
 #ifdef __DEBUG__
 	if (log->Level >= custom::LogLevel::Error)
 #else
-	if (log->Level >= custom::LogLevel::Fatal)
 #endif
+	if (log->Level >= custom::LogLevel::Fatal)
 	{
 		Debug::Backtrace(log->Stack);
 	}

@@ -28,20 +28,18 @@ namespace acs
 
 	bool ActorComponent::LoadServerFromFile()
 	{
-		std::unique_ptr<json::r::Document> jsonDocument = ServerConfig::Inst()->Read("machine");
+		auto jsonDocument = ServerConfig::Inst()->Read("machine");
+		if (jsonDocument != nullptr && jsonDocument->IsArray())
 		{
-			if (jsonDocument != nullptr && jsonDocument->IsArray())
+			for (size_t index = 0; index < jsonDocument->MemberCount(); index++)
 			{
-				for (size_t index = 0; index < jsonDocument->MemberCount(); index++)
+				std::unique_ptr<json::r::Value> jsonObject;
+				if (jsonDocument->Get(index, jsonObject))
 				{
-					std::unique_ptr<json::r::Value> jsonObject;
-					if(jsonDocument->Get(index, jsonObject))
+					Server* server = this->MakeServer(*jsonObject);
+					if (server == nullptr || !this->AddServer(server))
 					{
-						Server * server = this->MakeServer(*jsonObject);
-						if(server == nullptr || !this->AddServer(server))
-						{
-							return false;
-						}
+						return false;
 					}
 				}
 			}

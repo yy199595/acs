@@ -14,11 +14,9 @@ namespace acs
 	private:
 		bool OnInit() final;
 	private:
-		int OnEvent(const json::r::Document & request);
 		int OnChat(long long playerId, const c2s::chat::request & request);
 	private:
 		class GateComponent * mGate;
-		class RedisComponent * mRedis;
 		custom::HashMap<long long, long long> mChatTime;
 	};
 }

@@ -66,7 +66,7 @@ namespace lua
 		yyjson_write_err err;
 		yyjson_mut_doc* doc = yyjson_mut_doc_new(nullptr);
 		yyjson_mut_val* val = encode_one(L, doc, false, idx, 0);
-		yyjson_write_flag flag = YYJSON_WRITE_ALLOW_INVALID_UNICODE | YYJSON_WRITE_PRETTY;
+		yyjson_write_flag flag = YYJSON_WRITE_ALLOW_INVALID_UNICODE;
 		char* json = yyjson_mut_val_write_opts(val, flag, nullptr, &data_len, &err);
 		if(json == nullptr || data_len == 0)
 		{

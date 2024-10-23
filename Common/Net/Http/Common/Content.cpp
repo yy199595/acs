@@ -424,6 +424,15 @@ namespace http
 
 	bool FileContent::MakeFile(const std::string& path)
 	{
+		std::string director;
+		if(!help::dir::GetDirByPath(path, director))
+		{
+			return false;
+		}
+		if(!help::dir::DirectorIsExist(director))
+		{
+			help::dir::MakeDir(director);
+		}
 		this->mFile.open(path, std::ios::out | std::ios::trunc | std::ios::binary);
 		if(!this->mFile.is_open())
 		{

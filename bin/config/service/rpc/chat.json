@@ -6,9 +6,6 @@
     "ChatSystem.Sleep": {
         "Async" : true
     },
-    "ChatSystem.OnEvent" : {
-        "Async" : false
-    },
     "ChatSystem.Request" : {
         "Async" : true,
         "Request" : "google.protobuf.Struct"

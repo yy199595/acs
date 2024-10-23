@@ -94,12 +94,14 @@ if (MSVC) #创建vs目录
     file(GLOB_RECURSE file_server "Server/*.h" "Server/*.hpp")
     file(GLOB_RECURSE file_client "Client/*.h" "Client/*.hpp")
     file(GLOB_RECURSE file_common "Common/*.h" "Common/*.hpp")
+    #file(GLOB_RECURSE file_lib "Libs/*.h" "Libs/*.hpp" "Libs/*.c" "Libs/*.cpp")
     file(GLOB_RECURSE file_bin "bin/*.csv" "bin/*.json" "bin/*.lua" "bin/*.proto" "bin/*.html")
 
     set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
     #list(APPEND build_files ${file_md})
     list(APPEND build_files ${file_bin})
+    #list(APPEND build_files ${file_lib})
     list(APPEND build_files ${file_cmake})
     list(APPEND build_files ${file_common})
     list(APPEND build_files ${file_proto})

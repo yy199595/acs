@@ -44,13 +44,13 @@ namespace acs
 
 	void OuterNetComponent::OnMessage(rpc::Packet * message, rpc::Packet *)
 	{
-		int id = message->SockId();
 		message->SetNet(rpc::Net::Tcp);
 		switch (message->GetType())
 		{
 			case rpc::Type::Request:
 			{
 				long long playerId = -1;
+				int id = message->SockId();
 				int rpcId = message->GetRpcId();
 				if (!this->mAddressUserMap.Get(id, playerId))
 				{

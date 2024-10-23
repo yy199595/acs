@@ -8,7 +8,7 @@
 		"name": "${name}"
 	},
 	"lua": {
-		"main": "Server"
+		"main": "Client"
 	},
 	"listen": {
 		"http": {
@@ -38,6 +38,6 @@
 	"path": {
 		"machine": "",
 		"home": "${WORK_DIR}/config/card/home.json",
-		"cluster": "${WORK_DIR}/config/cluster/debug.json"
+		"cluster": "${WORK_DIR}/config/cluster/test.json"
 	}
 }

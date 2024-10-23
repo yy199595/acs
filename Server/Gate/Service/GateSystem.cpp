@@ -3,7 +3,6 @@
 //
 
 #include"GateSystem.h"
-#include"Core/Event/IEvent.h"
 #include"Entity/Actor/App.h"
 #include"Core/System/System.h"
 #include"Common/Service/LoginSystem.h"
@@ -47,33 +46,22 @@ namespace acs
 	int GateSystem::Login(const rpc::Packet & request)
 	{
 		int sockId = 0;
-		long long userId = 0;
-		std::string serverName;
-		const std::string func("LoginSystem.OnLogin");
+		request.ConstHead().Get("sock", sockId);
 		const std::string & token = request.GetBody();
-		LOG_DEBUG("player login token={}", request.GetBody());
-		ClusterConfig::Inst()->GetServerName("Account", serverName);
-		Server * loginServer = this->mActorComponent->Random(serverName);
-		if(loginServer == nullptr)
-		{
-			return XCode::AddressAllotFailure;
-		}
-		LOG_ERROR_CHECK_ARGS(request.ConstHead().Get("sock", sockId));
-		std::string path = fmt::format("/account/verify?token={}", token);
-		std::unique_ptr<json::r::Document> response = std::make_unique<json::r::Document>();
-		if(loginServer->Get(path, response.get())!= XCode::Ok )
+		const std::string func("LoginSystem.OnLogin");
+
+		json::r::Document document;
+		if(!this->mApp->DecodeSign(token, document))
 		{
 			return XCode::Failure;
 		}
-		std::unique_ptr<json::r::Value> jsonObject;
-		if(!response->Get("data", jsonObject))
+		long long userId, expTime = 0;
+		long long nowTime = help::Time::NowSec();
+		LOG_ERROR_CHECK_ARGS(document.Get("user_id", userId))
+		LOG_ERROR_CHECK_ARGS(document.Get("end_time", expTime))
+		if(nowTime >= expTime)
 		{
-			return XCode::Failure;
-		}
-		jsonObject->Get("player_id", userId);
-		if(this->mActorComponent->HasPlayer(userId))
-		{
-			return XCode::NotFindUser;
+			return XCode::TokenExpTime;
 		}
 		int serverId = this->mApp->GetSrvId();
 		Player * player = new Player(userId, serverId);
@@ -86,6 +74,8 @@ namespace acs
 		std::vector<const NodeConfig *> configs;
 		ClusterConfig::Inst()->GetNodeConfigs(configs);
 
+		// TODO  给用户分配服务器
+
 		s2s::login::request message;
 		message.set_user_id(userId);
 		std::vector<int> targetServers;
@@ -95,11 +85,11 @@ namespace acs
 			Server * server = this->mActorComponent->Random(name);
 			if(server == nullptr)
 			{
-				LOG_ERROR("allot server {0} fail", name);
+				LOG_ERROR("allot server [{0}] fail", name);
 				return XCode::AddressAllotFailure;
 			}
 			int serverId = server->GetSrvId();
-			if(nodeConfig->HasService(ComponentFactory::GetName<class LoginSystem>()))
+			if(nodeConfig->HasService(ComponentFactory::GetName<LoginSystem>()))
 			{
 				targetServers.emplace_back(serverId);
 			}
@@ -156,6 +146,7 @@ namespace acs
 			}
 		}
 		this->mActorComponent->DelActor(userId);
+		LOG_WARN("user:({}) logout to gate successful", userId);
 		return XCode::Ok;
 	}
 }

@@ -21,7 +21,7 @@
 #include "Core/Excel/excel.h"
 #include "Net/Lua/LuaSocket.h"
 #include "Net/Network/Tcp/Socket.h"
-
+#include "Util/Tools/LuaString.h"
 using namespace Lua;
 namespace acs
 {
@@ -166,6 +166,9 @@ namespace acs
 		moduleRegistry.Start();
 		moduleRegistry.AddFunction("Make", Lua::LuaDir::Make);
 		moduleRegistry.AddFunction("IsExist", Lua::LuaDir::IsExist).End("util.dir");
+
+		moduleRegistry.Start();
+		moduleRegistry.AddFunction("format", Lua::Str::Format).End("util.str");
 
 
 		std::vector<ILuaRegister*> components;

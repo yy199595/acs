@@ -83,7 +83,7 @@ namespace rpc
 			this->ReadLength(rpc::RPC_PACK_HEAD_LEN);
 			this->mSocket->SetOption(tcp::OptionType::NoDelay, true);
 			this->mSocket->SetOption(tcp::OptionType::KeepAlive, true);
-			CONSOLE_LOG_INFO("connect server [{}] ok", this->GetAddress());
+			//CONSOLE_LOG_INFO("connect server [{}] ok", this->GetAddress());
 			return;
 		}
 		this->CloseSocket(XCode::NetWorkError);

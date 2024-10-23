@@ -59,5 +59,17 @@
         "Request": {
             "open_id": "xxxx"
         }
+    },
+    "/account/login": {
+        "Type": "POST",
+        "Async": true,
+        "Auth": false,
+        "Desc": "账号密码登录",
+        "Bind": "Account.Login",
+        "ContentType": "application/json",
+        "Request": {
+            "account" : "",
+            "password" : ""
+        }
     }
 }

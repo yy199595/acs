@@ -31,7 +31,7 @@ namespace acs
 		Player * player = this->mActorComponent->GetPlayer(playerId);
 		if(player == nullptr)
 		{
-			player = new Player(playerId, id);
+			player = new Player(playerId, (int)id);
 			this->mActorComponent->AddPlayer(player);
 		}
 		for(const auto & actorInfo : request.actors())

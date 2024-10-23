@@ -14,7 +14,7 @@
         "main": "Excel"
     },
     "path": {
-        "cluster": null
+        "cluster": "${WORK_DIR}/config/cluster/excel.json"
     },
     "excel": {
         "dir": "C:/Users/64658/Desktop/tmp/tmp/excel",
