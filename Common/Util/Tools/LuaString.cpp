@@ -16,7 +16,7 @@ namespace Lua
 
 		int numArgs = lua_gettop(L) - 1;
 		std::vector<fmt::basic_format_arg<fmt::format_context>> args;
-
+		args.reserve(numArgs);
 		std::vector<std::string> tempArray;
 		for (int i = 2; i <= numArgs + 1; ++i)
 		{
@@ -26,7 +26,11 @@ namespace Lua
 					args.emplace_back(fmt::detail::make_arg<fmt::format_context>("nil"));
 					break;
 				case LUA_TNUMBER:
-					args.emplace_back(fmt::detail::make_arg<fmt::format_context>(lua_tonumber(L, i)));
+					if(lua_isinteger(L, i)) {
+						args.emplace_back(fmt::detail::make_arg<fmt::format_context>((long long)lua_tonumber(L, i)));
+					} else {
+						args.emplace_back(fmt::detail::make_arg<fmt::format_context>(lua_tonumber(L, i)));
+					}
 					break;
 				case LUA_TSTRING:
 					args.emplace_back(fmt::detail::make_arg<fmt::format_context>(lua_tostring(L, i)));
@@ -45,7 +49,7 @@ namespace Lua
 				}
 				default:
 				{
-					luaL_error(L, "Unsupported argument type");
+					luaL_error(L, "Unsupported argument type:%s", lua_typename(L, i));
 					return 0;
 				}
 			}
