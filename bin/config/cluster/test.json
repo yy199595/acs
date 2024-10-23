@@ -1,0 +1,35 @@
+{
+    "server": {
+        "Service": [
+            "NodeSystem",
+            "GateSystem",
+            "LogMgr",
+            "EventSystem",
+            "Collection",
+            "ResourceMgr",
+            "ChatComponent",
+            "FileUpload",
+            "QuickSDK",
+            "Watch",
+            "MongoMgr",
+            "Account",
+            "MongoDB",
+            "GateSystem",
+            "ChatSystem",
+            "ChatComponent"
+        ],
+        "Component": [
+            "LoggerComponent",
+            "ConfigComponent",
+            "ActorComponent",
+            "GateComponent",
+            "ProtoComponent",
+            "ClientComponent",
+            "HttpWebComponent",
+            "WXNoticeComponent",
+            "WatchComponent",
+            "HttpApiComponent",
+            "ClientComponent"
+        ]
+    }
+}
