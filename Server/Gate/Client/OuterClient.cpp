@@ -11,7 +11,7 @@
 namespace rpc
 {
 	OuterClient::OuterClient(int id, Component * component)
-		: TcpClient(rpc::OuterBufferMaxSize), mSockId(id)
+		: Client(rpc::OuterBufferMaxSize), mSockId(id)
 	{
 		this->mMaxQps = 0;
 		this->mMessage = nullptr;

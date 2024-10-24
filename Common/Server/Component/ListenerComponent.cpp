@@ -87,7 +87,7 @@ namespace acs
 			jsonData->Get("key", listenConfig.Key);
 			jsonData->Get("cert", listenConfig.Cert);
 #endif
-			if (listenConfig.Port > 0)
+			if (listenConfig.Port > 0 && !listenConfig.Component.empty())
 			{
 				listenConfig.Port += this->mOffsetPort;
 				listenConfig.Addr = fmt::format("{}://{}:{}", listenConfig.Protocol, this->mHost, listenConfig.Port);

@@ -114,11 +114,11 @@ namespace acs
 
 		Lua::ClassProxyHelper classProxyHelper4(this->mLuaEnv, "Socket");
 		classProxyHelper4.BeginRegister<tcp::Socket>();
-		classProxyHelper4.PushExtensionFunction("Send", Lua::Sock::Send);
-		classProxyHelper4.PushExtensionFunction("Read", Lua::Sock::Read);
-		classProxyHelper4.PushExtensionFunction("Query", Lua::Sock::Query);
-		classProxyHelper4.PushExtensionFunction("Close", Lua::Sock::Close);
-		classProxyHelper4.PushExtensionFunction("Connect", Lua::Sock::Connect);
+		classProxyHelper4.PushExtensionFunction("Send", Lua::TcpSock::Send);
+		classProxyHelper4.PushExtensionFunction("Read", Lua::TcpSock::Read);
+		classProxyHelper4.PushExtensionFunction("Query", Lua::TcpSock::Query);
+		classProxyHelper4.PushExtensionFunction("Close", Lua::TcpSock::Close);
+		classProxyHelper4.PushExtensionFunction("Connect", Lua::TcpSock::Connect);
 	}
 
 	bool LuaComponent::LateAwake()

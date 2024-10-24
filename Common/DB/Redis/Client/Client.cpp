@@ -10,8 +10,8 @@
 namespace redis
 {
 	Client::Client(tcp::Socket* socket, const Config& config, Component* com)
-		: tcp::TcpClient(socket, 0), mConfig(config),
-		mAddress(config.Address), mComponent(com)
+		: tcp::Client(socket, 0), mConfig(config),
+		  mAddress(config.Address), mComponent(com)
 	{
 		this->mRequest = nullptr;
 		this->mResponse = nullptr;

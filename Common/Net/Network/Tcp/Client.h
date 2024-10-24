@@ -22,12 +22,12 @@ namespace tcp
 namespace tcp
 {
     class IProto;
- 	class TcpClient
+ 	class Client
 	{
 	 public:
-		explicit TcpClient(size_t maxCount);
-		explicit TcpClient(tcp::Socket *socket, size_t maxCount);
-		virtual ~TcpClient() = default;
+		explicit Client(size_t maxCount);
+		explicit Client(tcp::Socket *socket, size_t maxCount);
+		virtual ~Client() = default;
 	public:
 		void SetSocket(Socket * socket);
 		const std::string & GetAddress() { return this->mSocket->GetAddress();}
@@ -77,4 +77,4 @@ namespace tcp
 	};
 }
 
-#endif //APP_TCPCLIENT_H
+#endif //APP_CLIENT_H

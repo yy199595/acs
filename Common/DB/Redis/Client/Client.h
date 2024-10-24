@@ -6,13 +6,13 @@
 #define APP_CLIENT_H
 
 #include"RedisDefine.h"
-#include"Network/Tcp/TcpClient.h"
+#include"Network/Tcp/Client.h"
 #include"Redis/Config/RedisConfig.h"
 #include"Entity/Component/IComponent.h"
 
 namespace redis
 {
-	class Client : public tcp::TcpClient
+	class Client : public tcp::Client
 	{
 	public:
 		typedef acs::IRpc<Request, Response> Component;

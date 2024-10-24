@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include"Core/Map/HashMap.h"
 #include"Rpc/Client/Message.h"
-#include"Network/Tcp/TcpClient.h"
+#include"Network/Tcp/Client.h"
 #include"Entity/Component/IComponent.h"
 using namespace tcp;
 
@@ -19,7 +19,7 @@ namespace rpc
 
 namespace rpc
 {
-	class InnerClient : public tcp::TcpClient
+	class InnerClient : public tcp::Client
 	{
 	 public:
 		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;

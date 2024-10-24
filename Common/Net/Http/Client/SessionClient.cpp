@@ -10,7 +10,7 @@
 namespace http
 {
 	SessionClient::SessionClient(Component* component)
-			: tcp::TcpClient(0), mComponent(component)
+			: tcp::Client(0), mComponent(component)
 	{
 
 	}

@@ -8,7 +8,7 @@
 		"name": "${name}"
 	},
 	"lua": {
-		"main": "Client"
+		"main": "Server"
 	},
 	"listen": {
 		"http": {
@@ -19,6 +19,9 @@
 		},
 		"gate": {
 			"port": "${gate}"
+		},
+		"udp" : {
+			"port" : "${udp}"
 		}
 	},
 	"master": {
@@ -38,6 +41,6 @@
 	"path": {
 		"machine": "",
 		"home": "${WORK_DIR}/config/card/home.json",
-		"cluster": "${WORK_DIR}/config/cluster/test.json"
+		"cluster": "${WORK_DIR}/config/cluster/debug.json"
 	}
 }

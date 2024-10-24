@@ -51,6 +51,7 @@
 
 #include "Http/Component/HttpApiComponent.h"
 #include "Lua/Component/LuaListenComponent.h"
+#include "Server/Component/UdpListenComponent.h"
 #ifdef __ENABLE_MYSQL__
 #include "Mysql/Service/MysqlDB.h"
 #include "Mysql/Component/MysqlDBComponent.h"
@@ -134,7 +135,7 @@ void RegisterComponent()
 
 	REGISTER_COMPONENT(WatchComponent);
 	REGISTER_COMPONENT(LuaListenComponent);
-
+	REGISTER_COMPONENT(UdpListenComponent);
 }
 
 void RegisterAll()

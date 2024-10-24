@@ -41,6 +41,7 @@ namespace rpc
 		constexpr char Http = 2; //http
 		constexpr char Redis = 3; //redis队列
 		constexpr char Client = 4; //客户端专用
+		constexpr char Udp = 5; //upd
 		constexpr char Max = 127;
 	}
 

@@ -6,14 +6,14 @@
 #define APP_SESSIONCLIENT_H
 
 #include"Http.h"
-#include"Network/Tcp/TcpClient.h"
+#include"Network/Tcp/Client.h"
 #include"Http/Common/HttpRequest.h"
 #include"Http/Common/HttpResponse.h"
 #include"Entity/Component/IComponent.h"
 
 namespace http
 {
-	class SessionClient final : public tcp::TcpClient
+	class SessionClient final : public tcp::Client
 	{
 	 public:
 		typedef acs::IRpc<Request, Response> Component;

@@ -9,7 +9,7 @@
 namespace rpc
 {
 	InnerClient::InnerClient(int id, Component* component)
-			: TcpClient(rpc::InnerBufferMaxSize), mSockId(id), mComponent(component)
+			: Client(rpc::InnerBufferMaxSize), mSockId(id), mComponent(component)
 	{
 		this->mMessage = nullptr;
 		this->mDecodeStatus = tcp::Decode::None;

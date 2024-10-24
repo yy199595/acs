@@ -1,7 +1,7 @@
 //
 // Created by zmhy0073 on 2022/1/15.
 //
-#include"TcpClient.h"
+#include"Client.h"
 #include"Log/Common/Debug.h"
 #include"Util/Tools/String.h"
 #include"Proto/Message/IProto.h"
@@ -9,20 +9,20 @@
 
 namespace tcp
 {
-	TcpClient::TcpClient(size_t maxCount)
+	Client::Client(size_t maxCount)
 			: mMaxCount(maxCount)
 	{
 		this->mConnectCount = 0;
 	}
 
-	TcpClient::TcpClient(Socket* socket, size_t count)
+	Client::Client(Socket* socket, size_t count)
 			: mMaxCount(count)
 	{
 		this->mConnectCount = 0;
 		this->mSocket.reset(socket);
 	}
 
-	void TcpClient::SetSocket(Socket* socket)
+	void Client::SetSocket(Socket* socket)
 	{
 		this->mConnectCount = 0;
 		this->ClearSendStream();
@@ -30,13 +30,13 @@ namespace tcp
 		this->mSocket.reset(socket);
 	}
 
-	void TcpClient::ClearBuffer()
+	void Client::ClearBuffer()
 	{
 		this->ClearSendStream();
 		this->ClearRecvStream();
 	}
 
-	void TcpClient::Connect(int timeout)
+	void Client::Connect(int timeout)
 	{
 		Asio::Code code;
 		this->mConnectCount++;
@@ -76,7 +76,7 @@ namespace tcp
 		});
 	}
 
-	void TcpClient::Connect(const std::string& host, const std::string& port, int timeout)
+	void Client::Connect(const std::string& host, const std::string& port, int timeout)
 	{
 		if (help::Str::IsIpAddress(host))
 		{
@@ -128,7 +128,7 @@ namespace tcp
 		});
 	}
 
-	void TcpClient::ReadAll(int timeout)
+	void Client::ReadAll(int timeout)
 	{
 		if (!this->mSocket->IsOpen())
 		{
@@ -165,7 +165,7 @@ namespace tcp
 		asio::async_read(sock, this->mRecvBuffer, asio::transfer_all(), callBack);
 	}
 
-	void TcpClient::ReadLine(int timeout)
+	void Client::ReadLine(int timeout)
 	{
 		if (!this->mSocket->IsOpen())
 		{
@@ -202,7 +202,7 @@ namespace tcp
 		asio::async_read_until(sock, this->mRecvBuffer, "\r\n", callback);
 	}
 
-	void TcpClient::ReadSome(int timeout)
+	void Client::ReadSome(int timeout)
 	{
 		if (!this->mSocket->IsOpen())
 		{
@@ -247,7 +247,7 @@ namespace tcp
 		asio::async_read(sock, this->mRecvBuffer, asio::transfer_at_least(1), callBack);
 	}
 
-	void TcpClient::ReadLength(int length, int timeout)
+	void Client::ReadLength(int length, int timeout)
 	{
 		if (length <= 0)
 		{
@@ -298,7 +298,7 @@ namespace tcp
 	}
 
 
-	void TcpClient::Write(tcp::IProto& message, int timeout)
+	void Client::Write(tcp::IProto& message, int timeout)
 	{
 		if (!this->mSocket->IsOpen())
 		{
@@ -339,7 +339,7 @@ namespace tcp
 
 namespace tcp
 {
-	void TcpClient::ClearRecvStream()
+	void Client::ClearRecvStream()
 	{
 		if (this->mRecvBuffer.size() > 0)
 		{
@@ -348,7 +348,7 @@ namespace tcp
 		}
 	}
 
-	bool TcpClient::ConnectSync(Asio::Code& code)
+	bool Client::ConnectSync(Asio::Code& code)
 	{
 		if (!this->mSocket->IsClient())
 		{
@@ -362,7 +362,7 @@ namespace tcp
 		return code.value() == Asio::OK;
 	}
 
-	bool TcpClient::ConnectSync(const std::string& host, const std::string& port)
+	bool Client::ConnectSync(const std::string& host, const std::string& port)
 	{
 		Asio::Code code;
 		int connPort = 0;
@@ -396,7 +396,7 @@ namespace tcp
 		return code.value() == Asio::OK;
 	}
 
-	void TcpClient::ClearSendStream()
+	void Client::ClearSendStream()
 	{
 		if (this->mSendBuffer.size() > 0)
 		{
@@ -405,7 +405,7 @@ namespace tcp
 		}
 	}
 
-	bool TcpClient::RecvSync(int length, size_t& size)
+	bool Client::RecvSync(int length, size_t& size)
 	{
 		try
 		{
@@ -436,7 +436,7 @@ namespace tcp
 		}
 	}
 
-	bool TcpClient::RecvLineSync(size_t& size)
+	bool Client::RecvLineSync(size_t& size)
 	{
 		try
 		{
@@ -462,7 +462,7 @@ namespace tcp
 		}
 	}
 
-	bool TcpClient::SendSync(tcp::IProto& message)
+	bool Client::SendSync(tcp::IProto& message)
 	{
 		try
 		{
@@ -498,7 +498,7 @@ namespace tcp
 		}
 	}
 
-	void TcpClient::StopTimer()
+	void Client::StopTimer()
 	{
 		if (this->mTimer != nullptr)
 		{
@@ -508,7 +508,7 @@ namespace tcp
 		}
 	}
 
-	void TcpClient::StopUpdate()
+	void Client::StopUpdate()
 	{
 		if (this->mUpdateTimer != nullptr)
 		{
@@ -518,7 +518,7 @@ namespace tcp
 		}
 	}
 
-	void TcpClient::StartUpdate(int timeout)
+	void Client::StartUpdate(int timeout)
 	{
 		if (this->mUpdateTimer == nullptr)
 		{
@@ -541,7 +541,7 @@ namespace tcp
 		});
 	}
 
-	void TcpClient::StartTimer(int timeout, TimeoutFlag flag)
+	void Client::StartTimer(int timeout, TimeoutFlag flag)
 	{
 		if (timeout <= 0) return;
 		Asio::Socket& sock = this->mSocket->Get();

@@ -6,13 +6,13 @@
 #define APP_MONGOCLIENT_H
 #include"MongoProto.h"
 #include"Mongo/Config/MongoConfig.h"
-#include"Network/Tcp/TcpClient.h"
+#include"Network/Tcp/Client.h"
 #include"Network/Tcp/Socket.h"
 #include"Entity/Component/IComponent.h"
 
 namespace mongo
 {
-	class Client : public tcp::TcpClient
+	class Client : public tcp::Client
 	{
 	 public:
 		typedef acs::IRpc<Request, Response> Component;

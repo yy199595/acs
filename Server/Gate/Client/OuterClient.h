@@ -5,12 +5,12 @@
 #ifndef GAMEKEEPER_RPCPROXYCLIENT_H
 #define GAMEKEEPER_RPCPROXYCLIENT_H
 #include"Rpc/Client/Message.h"
-#include"Network/Tcp/TcpClient.h"
+#include"Network/Tcp/Client.h"
 #include"Entity/Component/IComponent.h"
 namespace rpc
 {
     // 网关session
- 	class OuterClient final : public tcp::TcpClient
+ 	class OuterClient final : public tcp::Client
 	{
 	 public:
 		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;

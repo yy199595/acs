@@ -62,14 +62,14 @@ namespace mongo
 
     Client::Client(tcp::Socket * socket,
 			Component * component, const MongoConfig & config)
-		: tcp::TcpClient(socket, 0), mComponent(component), mConfig(config)
+		: tcp::Client(socket, 0), mComponent(component), mConfig(config)
 	{
 		this->mRequest = nullptr;
 		this->mResponse = nullptr;
 	}
 
 	Client::Client(tcp::Socket * socket, const MongoConfig &  config)
-		: tcp::TcpClient(socket, 0), mComponent(nullptr), mConfig(config)
+		: tcp::Client(socket, 0), mComponent(nullptr), mConfig(config)
 	{
 		this->mRequest = nullptr;
 		this->mResponse = nullptr;

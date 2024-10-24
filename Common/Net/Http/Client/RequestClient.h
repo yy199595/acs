@@ -5,14 +5,14 @@
 #ifndef APP_REQUESTCLIENT_H
 #define APP_REQUESTCLIENT_H
 #include"Http.h"
-#include"Network/Tcp/TcpClient.h"
+#include"Network/Tcp/Client.h"
 #include"Http/Common/HttpRequest.h"
 #include"Http/Common/HttpResponse.h"
 #include"Entity/Component/IComponent.h"
 
 namespace http
 {
-	class RequestClient : public tcp::TcpClient
+	class RequestClient : public tcp::Client
 	{
 	 public:
 		typedef acs::IRpc<Request, Response> Component;

@@ -11,7 +11,7 @@
 namespace http
 {
 	RequestClient::RequestClient(Component* httpComponent)
-			: tcp::TcpClient(0)
+			: tcp::Client(0)
 	{
 		this->mComponent = httpComponent;
 	}

@@ -10,7 +10,7 @@
 
 namespace Lua
 {
-	int Sock::Send(lua_State* L)
+	int TcpSock::Send(lua_State* L)
 	{
 		tcp::Socket* sock = Lua::UserDataParameter::Read<tcp::Socket*>(L, 1);
 		{
@@ -31,7 +31,7 @@ namespace Lua
 		return 0;
 	}
 
-	int Sock::Read(lua_State* L)
+	int TcpSock::Read(lua_State* L)
 	{
 		tcp::Socket* sock = Lua::UserDataParameter::Read<tcp::Socket*>(L, 1);
 		{
@@ -63,7 +63,7 @@ namespace Lua
 		}
 	}
 
-	int Sock::Close(lua_State* L)
+	int TcpSock::Close(lua_State* L)
 	{
 		tcp::Socket* sock = Lua::UserDataParameter::Read<tcp::Socket*>(L, 1);
 		{
@@ -73,7 +73,7 @@ namespace Lua
 		return 0;
 	}
 
-	int Sock::Query(lua_State* L)
+	int TcpSock::Query(lua_State* L)
 	{
 		std::vector<std::string> result;
 		std::string host(luaL_checkstring(L, 1));
@@ -107,11 +107,11 @@ namespace Lua
 		return 1;
 	}
 
-	int Sock::Connect(lua_State* L)
+	int TcpSock::Connect(lua_State* L)
 	{
 		std::string host(luaL_checkstring(L, 1));
 		const int port = luaL_checkinteger(L, 2);
-		Asio::Context& io = acs::App::Inst()->GetContext();
+		Asio::Context& io = acs::App::GetContext();
 		tcp::Socket* socket = new tcp::Socket(io);
 		try
 		{
@@ -138,5 +138,11 @@ namespace Lua
 			luaL_error(L, "connect : %s", code.what());
 			return 0;
 		}
+	}
+
+	int UdpSock::Send(lua_State* L)
+	{
+		std::string addr(luaL_checkstring(L, 1));
+		return 0;
 	}
 }
