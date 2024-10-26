@@ -106,7 +106,7 @@ namespace acs
 		if (code != XCode::Ok)
 		{
 			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-			LOG_WARN("({}ms) invoke [{}] code:{} = {}", t, config->FullName, code, desc);
+			//LOG_WARN("({}ms) invoke [{}] code:{} = {}", t, config->FullName, code, desc);
 		}
 		else if(t >= 2000)
 		{

@@ -27,8 +27,8 @@ namespace acs
 		bool OnListen(tcp::Socket * socket) final;
 		void OnRecord(json::w::Document & document) final;
 	private:
-		void OnRequest(rpc::Packet * message);
-		void OnForward(rpc::Packet * message);
+		int OnRequest(rpc::Packet * message);
+		int OnForward(rpc::Packet * message);
 		rpc::InnerClient * GetClient(int id);
 	private:
 		math::NumberPool<int, 100> mNumPool;

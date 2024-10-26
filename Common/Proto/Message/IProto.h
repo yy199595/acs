@@ -6,8 +6,9 @@
 #define APP_IPROTO_H
 #include<ostream>
 #include<istream>
-#include<cstring>
+#include<string>
 #include<unordered_map>
+#include <utility>
 struct lua_State;
 
 namespace tcp
@@ -65,6 +66,38 @@ namespace tcp
 	private:
 		long long mStartTime;
 	};
+
+	class TextProto : public IProto
+	{
+	public:
+		explicit TextProto(std::string  msg) : mMessage(std::move(msg)) { }
+		explicit TextProto(const char * msg, size_t size) : mMessage(msg, size) { }
+	private:
+		inline int OnSendMessage(std::ostream &os) final;
+		inline void Clear() final { this->mMessage.clear(); }
+		inline int OnRecvMessage(std::istream &os, size_t size) final;
+	private:
+		std::string mMessage;
+	};
+
+	inline int TextProto::OnSendMessage(std::ostream& os)
+	{
+		os.write(this->mMessage.c_str(), (int)this->mMessage.size());
+		return 0;
+	}
+
+	inline int TextProto::OnRecvMessage(std::istream& os, size_t size)
+	{
+		std::unique_ptr<char[]> buffer = std::make_unique<char[]>(size);
+		{
+			size_t count = os.readsome(buffer.get(), size);
+			if(count > 0)
+			{
+				this->mMessage.assign(buffer.get(), count);
+			}
+		}
+		return 0;
+	}
 
 	namespace Data
 	{

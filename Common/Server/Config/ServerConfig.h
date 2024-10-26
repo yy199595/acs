@@ -16,12 +16,14 @@ namespace acs
 		bool OnLoadText(const char *str, size_t length) final;
 		bool OnReloadText(const char *str, size_t length) final;
 	public:
+		const std::string& Host() const { return this->mHost; }
 		const std::string& Name() const { return this->mName; } //服务器名字
 		bool GetPath(const std::string & name, std::string & path) const;
 		const std::string & GetSecretKey() const { return this->mSecret; }
 		std::unique_ptr<json::r::Document> Read(const std::string & name) const;
     private:
         std::string mName;
+		std::string mHost;
 		std::string mSecret;
         std::unordered_map<std::string, std::string> mPaths;
         std::unordered_map<std::string, std::string> mLocations;

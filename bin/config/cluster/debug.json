@@ -12,7 +12,8 @@
             "ChatComponent",
             "FileUpload",
             "QuickSDK",
-            "Watch" 
+            "Watch",
+            "ChatSystem"
         ],
         "Component": [
             "LoggerComponent",
@@ -26,7 +27,7 @@
             "WatchComponent",
             "HttpApiComponent",
             "ClientComponent",
-            "UdpListenComponent"
+            "UdpComponent"
         ]
     }
 }

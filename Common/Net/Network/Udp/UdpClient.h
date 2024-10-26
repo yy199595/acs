@@ -4,27 +4,33 @@
 
 #ifndef APP_UDPCLIENT_H
 #define APP_UDPCLIENT_H
-#include "Net/Network/Tcp/Asio.h"
-#include "Proto/Message/IProto.h"
-using asio_udp = asio::ip::udp;
+#include "IClient.h"
+
 namespace udp
 {
-	class Client
+	class Client : public IClient
 	{
 	public:
-		explicit Client(asio::any_io_executor & io);
-		~Client();
+		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;
+		explicit Client(asio::io_context & io, Component * component, int id);
+		~Client() = default;
 	public:
-		bool Init(const std::string & local);
-		bool Init(asio_udp::socket * sock, const std::string & remote);
+		inline int SockId() const { return this->mSockId; }
+		bool Send(const std::string & addr, tcp::IProto * message) final;
+		inline asio_udp::socket & Socket() { return this->mSocket; }
 	public:
-		void Send(tcp::IProto * message);
+		void StartReceive() final;
 	private:
-		bool mDelete;
-		asio_udp::socket * mSocket;
+		void OnSendMessage();
+		void OnSendMessage(const Asio::Code & code);
+	private:
+		int mSockId;
+		Component * mComponent;
+		asio_udp::socket mSocket;
+		asio::io_context & mContext;
 		asio::streambuf mSendBuffer;
-		asio_udp::endpoint mEndPoint;
-		asio::any_io_executor mExecutor;
+		asio::streambuf mRecvBuffer;
+		asio_udp::endpoint mLocalEndpoint;
 		//char mSendBuffer[std::numeric_limits<unsigned short>::max()] = { 0 };
 	};
 }

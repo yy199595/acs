@@ -15,6 +15,17 @@ function Main:Awake()
 end
 
 function Main:OnComplete()
+
+    local app = require("App")
+
+    local code, res = app:Call(nil, "ChatSystem.OnChat", {
+        user_id = 10004,
+        msg_type = 1,
+        message = "hello"
+    })
+
+    print(code, res)
+
     --local res = http:Get("https://huwai.pro")
     --table.print(res)
     --local oss = require("util.oss")

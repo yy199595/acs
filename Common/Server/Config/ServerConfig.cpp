@@ -86,6 +86,7 @@ namespace acs
 			}
 		}
 		jsonObject->Get("name", this->mName);
+		jsonObject->Get("host", this->mHost);
 		if(this->Get("path", jsonObject) && jsonObject->IsObject())
 		{
 			std::vector<const char *> keys;

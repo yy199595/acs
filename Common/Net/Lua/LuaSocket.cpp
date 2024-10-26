@@ -4,10 +4,11 @@
 
 #include"LuaSocket.h"
 #include"Entity/Actor/App.h"
-#include"Net/Network/Tcp/Socket.h"
 #include"Util/Tools/String.h"
+#include"Network/Udp/UdpClient.h"
+#include"Net/Network/Tcp/Socket.h"
 #include"Lua/Engine/UserDataParameter.h"
-
+#include"Server/Component/UdpComponent.h"
 namespace Lua
 {
 	int TcpSock::Send(lua_State* L)
@@ -110,7 +111,7 @@ namespace Lua
 	int TcpSock::Connect(lua_State* L)
 	{
 		std::string host(luaL_checkstring(L, 1));
-		const int port = luaL_checkinteger(L, 2);
+		const int port = (int)luaL_checkinteger(L, 2);
 		Asio::Context& io = acs::App::GetContext();
 		tcp::Socket* socket = new tcp::Socket(io);
 		try
@@ -140,9 +141,51 @@ namespace Lua
 		}
 	}
 
+	int UdpSock::New(lua_State* L)
+	{
+		std::string ip;
+		unsigned short port = 0;
+		std::string addr(luaL_checkstring(L, 1));
+		if(!help::Str::SplitAddr(addr, ip, port))
+		{
+			luaL_error(L, "decode %s fail", addr.c_str());
+			return 0;
+		}
+		int id = (int)luaL_checkinteger(L, 2);
+		Asio::Context & ctx = acs::App::GetContext();
+		acs::UdpComponent * udpComponent = acs::App::Get<acs::UdpComponent>();
+		udp::Client * udpClient = new udp::Client(ctx, udpComponent, id);
+		udpClient->StartReceive();
+		Lua::UserDataParameter::Write(L, udpClient);
+		return 1;
+	}
+
 	int UdpSock::Send(lua_State* L)
 	{
-		std::string addr(luaL_checkstring(L, 1));
-		return 0;
+		udp::Client * udpClient = Lua::UserDataParameter::Read<udp::Client*>(L, 1);
+		if(udpClient == nullptr)
+		{
+			return 0;
+		}
+		size_t size = 0;
+		std::string addr(luaL_checkstring(L, 2));
+		const char * message = luaL_checklstring(L, 3, &size);
+		tcp::TextProto * textProto = new tcp::TextProto(message, size);
+		{
+			lua_pushboolean(L, udpClient->Send(addr, textProto));
+		}
+		return 1;
+	}
+
+	int UdpSock::Close(lua_State* L)
+	{
+		udp::Client * udpClient = Lua::UserDataParameter::Read<udp::Client*>(L, 1);
+		if(udpClient == nullptr)
+		{
+			return 0;
+		}
+		delete udpClient;
+		lua_pushboolean(L, true);
+		return 1;
 	}
 }

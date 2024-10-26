@@ -22,6 +22,7 @@
 #include "Net/Lua/LuaSocket.h"
 #include "Net/Network/Tcp/Socket.h"
 #include "Util/Tools/LuaString.h"
+#include "Network/Udp/UdpClient.h"
 using namespace Lua;
 namespace acs
 {
@@ -112,13 +113,19 @@ namespace acs
 		classProxyHelper3.PushMemberFunction("GetSheet", &lxlsx::ExcelFile::GetSheet);
 		classProxyHelper3.PushMemberFunction("GetSheets", &lxlsx::ExcelFile::GetSheets);
 
-		Lua::ClassProxyHelper classProxyHelper4(this->mLuaEnv, "Socket");
+		Lua::ClassProxyHelper classProxyHelper4(this->mLuaEnv, "TcpSocket");
 		classProxyHelper4.BeginRegister<tcp::Socket>();
 		classProxyHelper4.PushExtensionFunction("Send", Lua::TcpSock::Send);
 		classProxyHelper4.PushExtensionFunction("Read", Lua::TcpSock::Read);
 		classProxyHelper4.PushExtensionFunction("Query", Lua::TcpSock::Query);
 		classProxyHelper4.PushExtensionFunction("Close", Lua::TcpSock::Close);
 		classProxyHelper4.PushExtensionFunction("Connect", Lua::TcpSock::Connect);
+
+		Lua::ClassProxyHelper classProxyHelper5(this->mLuaEnv, "UdpSocket");
+		classProxyHelper5.BeginRegister<udp::Client>();
+		classProxyHelper5.PushExtensionFunction("Send", Lua::UdpSock::Send);
+		classProxyHelper5.PushExtensionFunction("Close", Lua::UdpSock::Close);
+
 	}
 
 	bool LuaComponent::LateAwake()
@@ -132,6 +139,9 @@ namespace acs
 		moduleRegistry.AddFunction("GetFiles", Lua::LuaFile::GetFiles);
 		moduleRegistry.AddFunction("GetFileName", Lua::LuaFile::GetFileName);
 		moduleRegistry.AddFunction("GetLastWriteTime", Lua::LuaFile::GetLastWriteTime).End("util.fs");
+
+		moduleRegistry.Start();
+		moduleRegistry.AddFunction("New", Lua::UdpSock::New).End("net.udp");
 
 		moduleRegistry.Start();
 		moduleRegistry.AddFunction("Stop", LuaActor::Stop);

@@ -81,6 +81,7 @@ namespace acs
 			}
 			this->mAllServices.insert(methodConfig->Service);
 
+			value->Get("Net", methodConfig->Net);
 			value->Get("Async", methodConfig->IsAsync);
 			value->Get("IsOpen", methodConfig->IsOpen);
 			value->Get("Record", methodConfig->IsRecord);

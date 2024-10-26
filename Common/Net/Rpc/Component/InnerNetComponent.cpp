@@ -37,10 +37,10 @@ namespace acs
 				this->StartClose(message->SockId());
 				break;
 			case rpc::Type::Request:
-				this->OnRequest(message);
-				return;
+				code = this->OnRequest(message);
+				break;
 			case rpc::Type::Forward:
-				this->OnForward(message);
+				code = this->OnForward(message);
 				break;
 			case rpc::Type::Response:
 			{
@@ -84,7 +84,7 @@ namespace acs
 		}
 	}
 
-	void InnerNetComponent::OnForward(rpc::Packet* message)
+	int InnerNetComponent::OnForward(rpc::Packet* message)
 	{
 		int target = 0;
 		int code = XCode::Ok;
@@ -107,8 +107,9 @@ namespace acs
 		if(code != XCode::Ok)
 		{
 			message->SetType(rpc::Type::Response);
-			this->Send(message->SockId(), message);
+			return this->Send(message->SockId(), message);
 		}
+		return XCode::Ok;
 	}
 
     void InnerNetComponent::OnSendFailure(int, rpc::Packet * message)
@@ -220,7 +221,7 @@ namespace acs
 		}
     }
 
-	void InnerNetComponent::OnRequest(rpc::Packet * message)
+	int InnerNetComponent::OnRequest(rpc::Packet * message)
 	{
 		int code = this->mDisComponent->OnMessage(message);
 		if (code != XCode::Ok)
@@ -230,13 +231,13 @@ namespace acs
 
 			if (message->GetRpcId() == 0)
 			{
-				delete message;
-				return;
+				return XCode::DeleteData;
 			}
 			message->Body()->clear();
 			message->GetHead().Add("code", code);
 			message->SetType(rpc::Type::Response);
-			this->Send(message->SockId(), message);
+			return this->Send(message->SockId(), message);
 		}
+		return XCode::Ok;
 	}
 }// namespace Sentry

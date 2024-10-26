@@ -41,6 +41,7 @@ namespace rpc
 		inline int GetRpcId() const{return this->mProtoHead.RpcId;}
 		inline char GetType() const { return this->mProtoHead.Type;}
 		inline char GetProto() const { return this->mProtoHead.Porto; }
+		inline ProtoHead & GetProtoHead() { return this->mProtoHead;}
 		inline const Head& ConstTempHead() const {return this->mTempHead;}
 	public:
 		void Init(const rpc::ProtoHead& protoHead);

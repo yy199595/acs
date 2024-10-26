@@ -1,4 +1,6 @@
 #include"ListenerComponent.h"
+
+#include <utility>
 #include"Network/Tcp/Socket.h"
 #include"Entity/Actor/App.h"
 #include"Network/Tcp/Asio.h"
@@ -10,9 +12,9 @@
 
 namespace acs
 {
-	ListenData::ListenData(const ListenConfig& conf)
+	ListenData::ListenData(ListenConfig  conf)
 #ifdef __ENABLE_OPEN_SSL__
-		: SslCtx(asio::ssl::context::tlsv12), Config(conf)
+		: SslCtx(asio::ssl::context::tlsv12), Config(std::move(conf))
 	{
 		if (!this->Config.Cert.empty())
 		{
@@ -60,7 +62,6 @@ namespace acs
 		const ServerConfig* config = ServerConfig::Inst();
 		{
 			LOG_CHECK_RET_FALSE(config->Get("core", jsonObj));
-			LOG_CHECK_RET_FALSE(jsonObj->Get("host", this->mHost));
 		}
 		os::System::GetEnv("port", this->mOffsetPort);
 		LOG_CHECK_RET_FALSE(config->Get("listen", jsonObj));
@@ -90,7 +91,8 @@ namespace acs
 			if (listenConfig.Port > 0 && !listenConfig.Component.empty())
 			{
 				listenConfig.Port += this->mOffsetPort;
-				listenConfig.Addr = fmt::format("{}://{}:{}", listenConfig.Protocol, this->mHost, listenConfig.Port);
+				const std::string & host = config->Host();
+				listenConfig.Addr = fmt::format("{}://{}:{}", listenConfig.Protocol, host, listenConfig.Port);
 				this->mListenConfigs.emplace(listenConfig.Name, listenConfig);
 			}
 		}

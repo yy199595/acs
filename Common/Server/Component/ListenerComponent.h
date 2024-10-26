@@ -47,7 +47,7 @@ namespace acs
 	struct ListenData
 	{
 	public:
-		ListenData(const ListenConfig & conf);
+		ListenData(ListenConfig  conf);
 	public:
 		tcp::Socket * Create(class ThreadComponent * component);
 
@@ -83,7 +83,6 @@ namespace acs
 		void OnAcceptSocket(ListenData* listenData, tcp::Socket* sock);
 	private:
 		int mOffsetPort;
-		std::string mHost; //主机地址
 		//custom::AsioThread mThread;
 		std::queue<tcp::Socket*> mSocketPool;
 		class ThreadComponent* mThreadComponent;

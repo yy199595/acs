@@ -18,7 +18,9 @@ namespace Lua
 
 	namespace UdpSock
 	{
+		extern int New(lua_State*);
 		extern int Send(lua_State*);
+		extern int Close(lua_State*);
 	}
 }
 
