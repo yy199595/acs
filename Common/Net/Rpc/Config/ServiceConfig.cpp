@@ -10,13 +10,13 @@ namespace acs
 	void InterfaceConfig::OnReload()
 	{
 		auto iter = this->mFileTime.begin();
-		for(; iter != this->mFileTime.end(); iter++)
+		for (; iter != this->mFileTime.end(); iter++)
 		{
-			const std::string & path = iter->first;
+			const std::string& path = iter->first;
 			long long lastTime = help::fs::GetLastWriteTime(path);
-			if(iter->second != lastTime)
+			if (iter->second != lastTime)
 			{
-				if(this->LoadConfig(path))
+				if (this->LoadConfig(path))
 				{
 					LOG_INFO("reload [{}] ok", path);
 				}
@@ -49,7 +49,7 @@ namespace acs
 			return false;
 		}
 		std::unique_ptr<json::r::Value> value;
-		for (const char* key : keys)
+		for (const char* key: keys)
 		{
 			if (!this->Get(key, value))
 			{
@@ -57,7 +57,7 @@ namespace acs
 			}
 			std::string service, func;
 			const std::string method(key);
-			RpcMethodConfig * methodConfig = this->MakeConfig(method);
+			RpcMethodConfig* methodConfig = this->MakeConfig(method);
 			{
 				if (help::Str::Split(method, '.', service, func) != 0)
 				{
@@ -65,7 +65,6 @@ namespace acs
 					return false;
 				}
 				methodConfig->Timeout = 0;
-				methodConfig->Forward = 0;
 				methodConfig->IsDebug = false;
 				methodConfig->IsOpen = true;
 				methodConfig->Method = func;
@@ -78,26 +77,59 @@ namespace acs
 				methodConfig->Net = rpc::Net::Tcp;
 				methodConfig->SendToClient = false;
 				methodConfig->Proto = rpc::Porto::None;
+				methodConfig->Forward = rpc::Forward::Fixed;
 			}
 			this->mAllServices.insert(methodConfig->Service);
 
-			value->Get("Net", methodConfig->Net);
+			std::unordered_map<std::string, int> NetMap{
+					{ "tcp",   rpc::Net::Tcp },
+					{ "udp",   rpc::Net::Udp },
+					{ "Http",  rpc::Net::Http },
+					{ "redis", rpc::Net::Redis },
+			};
+
+			std::unordered_map<std::string, int> ForwardMap{
+					{ "hash",   rpc::Forward::Hash },
+					{ "fixed",  rpc::Forward::Fixed },
+					{ "random", rpc::Forward::Random },
+			};
+
+			std::string net, forward;
+			if (value->Get("Net", net))
+			{
+				auto iter = NetMap.find(net);
+				if (iter == NetMap.end())
+				{
+					return false;
+				}
+				methodConfig->Net = iter->second;
+			}
+
+			if (value->Get("Forward", forward))
+			{
+				auto iter = ForwardMap.find(net);
+				if (iter == ForwardMap.end())
+				{
+					return false;
+				}
+				methodConfig->Forward = iter->second;
+			}
+
 			value->Get("Async", methodConfig->IsAsync);
 			value->Get("IsOpen", methodConfig->IsOpen);
 			value->Get("Record", methodConfig->IsRecord);
-			value->Get("Forward", methodConfig->Forward);
 			value->Get("Timeout", methodConfig->Timeout);
 			value->Get("Request", methodConfig->Request);
 			value->Get("Response", methodConfig->Response);
 			value->Get("IsDebug", methodConfig->IsDebug);
 			value->Get("IsClient", methodConfig->IsClient);
-			value->Get("SendToClient", methodConfig->SendToClient);		
+			value->Get("SendToClient", methodConfig->SendToClient);
 			ClusterConfig::Inst()->GetServerName(service, methodConfig->Server);
 		}
 		return true;
 	}
 
-	
+
 	bool RpcConfig::GetMethodConfigs(std::vector<const RpcMethodConfig*>& configs, int type) const
 	{
 		for (auto iter = this->mRpcMethodConfig.begin(); iter != this->mRpcMethodConfig.end(); iter++)
@@ -105,21 +137,21 @@ namespace acs
 			const std::unique_ptr<RpcMethodConfig>& config = iter->second;
 			switch (type)
 			{
-			case RPC_ALL:
-				configs.emplace_back(config.get());
-				break;
-			case RPC_SERVER:
-				if (!config->IsClient)
-				{
+				case RPC_ALL:
 					configs.emplace_back(config.get());
-				}
-				break;
-			case RPC_CLIENT:
-				if (config->IsClient)
-				{
-					configs.emplace_back(config.get());
-				}
-				break;
+					break;
+				case RPC_SERVER:
+					if (!config->IsClient)
+					{
+						configs.emplace_back(config.get());
+					}
+					break;
+				case RPC_CLIENT:
+					if (config->IsClient)
+					{
+						configs.emplace_back(config.get());
+					}
+					break;
 			}
 		}
 		return !configs.empty();
@@ -166,32 +198,32 @@ namespace acs
 	void RpcConfig::GetRpcMethods(std::vector<std::string>& methods) const
 	{
 		auto iter = this->mRpcMethodConfig.begin();
-		for(; iter != this->mRpcMethodConfig.end(); iter++)
+		for (; iter != this->mRpcMethodConfig.end(); iter++)
 		{
 			methods.emplace_back(iter->first);
 		}
 	}
 
-    const RpcMethodConfig *RpcConfig::GetMethodConfig(const std::string &fullName) const
-    {
-        auto iter = this->mRpcMethodConfig.find(fullName);
-        return iter != this->mRpcMethodConfig.end() ? iter->second.get() : nullptr;
-    }
+	const RpcMethodConfig* RpcConfig::GetMethodConfig(const std::string& fullName) const
+	{
+		auto iter = this->mRpcMethodConfig.find(fullName);
+		return iter != this->mRpcMethodConfig.end() ? iter->second.get() : nullptr;
+	}
 }
 
 namespace acs
 {
-    bool HttpConfig::OnLoadJson()
-    {
-		std::vector<const char *> keys;
-		if(this->GetKeys(keys) <= 0)
+	bool HttpConfig::OnLoadJson()
+	{
+		std::vector<const char*> keys;
+		if (this->GetKeys(keys) <= 0)
 		{
 			return false;
 		}
 		std::unique_ptr<json::r::Value> value;
-		for(const char * key : keys)
+		for (const char* key: keys)
 		{
-			if(!this->Get(key, value))
+			if (!this->Get(key, value))
 			{
 				return false;
 			}
@@ -199,9 +231,9 @@ namespace acs
 			HttpMethodConfig* methodConfig = this->MakeConfig(url);
 			{
 				std::string bindMethod;
-				if(value->Get("Bind", bindMethod))
+				if (value->Get("Bind", bindMethod))
 				{
-					if(help::Str::Split(bindMethod,  '.', methodConfig->Service, methodConfig->Method) != 0)
+					if (help::Str::Split(bindMethod, '.', methodConfig->Service, methodConfig->Method) != 0)
 					{
 						LOG_ERROR("bind function : {}", bindMethod);
 						return false;
@@ -230,16 +262,16 @@ namespace acs
 					headers.emplace_back("Content-Type");
 					methodConfig->Content = "application/json";
 				}
-				if(!methodConfig->Content.empty())
+				if (!methodConfig->Content.empty())
 				{
 					headers.emplace_back("Content-Type");
 				}
-				if(methodConfig->Auth)
+				if (methodConfig->Auth)
 				{
 					headers.emplace_back("Authorization");
 				}
 				std::unique_ptr<json::r::Value> jsonArray;
-				if(value->Get("WhiteList", jsonArray))
+				if (value->Get("WhiteList", jsonArray))
 				{
 					size_t index = 0;
 					std::string value;
@@ -250,12 +282,12 @@ namespace acs
 					}
 				}
 				std::unique_ptr<json::r::Value> doc;
-				if(value->Get("Request", doc))
+				if (value->Get("Request", doc))
 				{
 					methodConfig->Request = doc->ToString();
 				}
 				size_t index = 0;
-				for(const std::string & header : headers)
+				for (const std::string& header: headers)
 				{
 					index++;
 					methodConfig->Headers += header;
@@ -268,7 +300,7 @@ namespace acs
 			}
 		}
 		return true;
-    }
+	}
 
 	HttpMethodConfig* HttpConfig::MakeConfig(const std::string& url)
 	{
@@ -295,16 +327,16 @@ namespace acs
 		return methodConfig;
 	}
 
-    bool HttpConfig::OnReLoadJson()
-    {		
-        return this->OnLoadJson();
-    }
+	bool HttpConfig::OnReLoadJson()
+	{
+		return this->OnLoadJson();
+	}
 
-    const HttpMethodConfig *HttpConfig::GetMethodConfig(const std::string & path) const
-    {
-        auto iter = this->mMethodConfigs.find(path);
+	const HttpMethodConfig* HttpConfig::GetMethodConfig(const std::string& path) const
+	{
+		auto iter = this->mMethodConfigs.find(path);
 		return iter != this->mMethodConfigs.end() ? iter->second.get() : nullptr;
-    }
+	}
 
 	void HttpConfig::GetMethodList(std::vector<const HttpMethodConfig*>& configs, const std::string& url) const
 	{
@@ -324,7 +356,7 @@ namespace acs
 		auto iter = this->mMethodConfigs.begin();
 		for (; iter != this->mMethodConfigs.end(); iter++)
 		{
-			if(method.empty() || iter->second->Type == method)
+			if (method.empty() || iter->second->Type == method)
 			{
 				configs.emplace_back(iter->second.get());
 			}
