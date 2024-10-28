@@ -136,7 +136,7 @@ namespace acs
 		udp::Client * udpClient = nullptr;
 		Asio::Context & ctx = this->mThread->GetContext();
 		asio::any_io_executor executor = ctx.get_executor();
-		asio_udp::endpoint remote(asio::ip::make_address(address), port);
+		asio_udp::endpoint remote(asio::ip::make_address(ip), port);
 		std::unique_ptr<udp::Client> client = std::make_unique<udp::Client>(ctx, this, remote);
 		{
 			udpClient = client.get();
