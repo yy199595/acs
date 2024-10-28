@@ -90,6 +90,8 @@ namespace acs
 				return this->GetListen("http", address);
 			case rpc::Net::Redis:
 				return this->GetListen("redis", address);
+			case rpc::Net::Udp:
+				return this->GetListen("udp", address);
 			default:
 				return false;
 		}
@@ -156,7 +158,7 @@ namespace acs
 			return XCode::ParseJsonFailure;
 		}
 		int code = XCode::Ok;
-		return response->Get("code", code) ? code : XCode::Ok;
+		return response->Get(rpc::Header::code, code) ? code : XCode::Ok;
 	}
 
 	int Server::Post(const std::string& path, json::w::Document& request, json::r::Document* response) const
@@ -189,8 +191,8 @@ namespace acs
 			message->SetProto(rpc::Porto::None);
 			message->SetType(rpc::Type::Request);
 			message->SetNet((char)methodConfig->Net);
-			message->GetHead().Add("func", func);
-			message->GetHead().Add("app", this->mAppId);
+			message->GetHead().Add(rpc::Header::func, func);
+			message->GetHead().Add(rpc::Header::app_id, this->mAppId);
 		}
 		message->SetSockId(this->GetSrvId());
 		return XCode::Ok;

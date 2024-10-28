@@ -5,10 +5,10 @@
 #include"LuaSocket.h"
 #include"Entity/Actor/App.h"
 #include"Util/Tools/String.h"
-#include"Network/Udp/UdpClient.h"
+#include"Net/Udp/Common/UdpClient.h"
 #include"Net/Network/Tcp/Socket.h"
 #include"Lua/Engine/UserDataParameter.h"
-#include"Server/Component/UdpComponent.h"
+#include"Net/Udp/Component/UdpComponent.h"
 namespace Lua
 {
 	int TcpSock::Send(lua_State* L)
@@ -154,7 +154,8 @@ namespace Lua
 		int id = (int)luaL_checkinteger(L, 2);
 		Asio::Context & ctx = acs::App::GetContext();
 		acs::UdpComponent * udpComponent = acs::App::Get<acs::UdpComponent>();
-		udp::Client * udpClient = new udp::Client(ctx, udpComponent, id);
+		asio::ip::udp::endpoint remote(asio::ip::make_address(ip), port);
+		udp::Client * udpClient = new udp::Client(ctx, udpComponent, remote);
 		udpClient->StartReceive();
 		Lua::UserDataParameter::Write(L, udpClient);
 		return 1;
@@ -168,11 +169,11 @@ namespace Lua
 			return 0;
 		}
 		size_t size = 0;
-		std::string addr(luaL_checkstring(L, 2));
-		const char * message = luaL_checklstring(L, 3, &size);
+		const char * message = luaL_checklstring(L, 2, &size);
 		tcp::TextProto * textProto = new tcp::TextProto(message, size);
 		{
-			lua_pushboolean(L, udpClient->Send(addr, textProto));
+			udpClient->Send(textProto);
+			lua_pushboolean(L, true);
 		}
 		return 1;
 	}

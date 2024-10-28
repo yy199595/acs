@@ -10,15 +10,15 @@
 #include "Entity/Component/IComponent.h"
 
 using asio_udp = asio::ip::udp;
-constexpr int SHORT_COUNT = std::numeric_limits<unsigned short>::max();
+constexpr int UDP_SHORT_COUNT = std::numeric_limits<unsigned short>::max();
 
 namespace udp
 {
 	class IClient
 	{
 	public:
-		virtual void StartReceive() = 0;
-		virtual bool Send(const std::string & addr, tcp::IProto * message) = 0;
+		virtual void StartReceive() { };
+		virtual void Send(tcp::IProto * message) = 0;
 	};
 }
 

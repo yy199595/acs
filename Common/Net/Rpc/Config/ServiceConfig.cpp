@@ -84,6 +84,7 @@ namespace acs
 			std::unordered_map<std::string, int> NetMap{
 					{ "tcp",   rpc::Net::Tcp },
 					{ "udp",   rpc::Net::Udp },
+					{ "kcp",   rpc::Net::Kcp },
 					{ "Http",  rpc::Net::Http },
 					{ "redis", rpc::Net::Redis },
 			};

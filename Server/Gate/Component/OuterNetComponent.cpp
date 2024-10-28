@@ -54,15 +54,15 @@ namespace acs
 				int rpcId = message->GetRpcId();
 				if (!this->mAddressUserMap.Get(id, playerId))
 				{
-					message->GetHead().Add("sock", id);
+					message->GetHead().Add(rpc::Header::sock_id, id);
 				}
-				message->GetHead().Add("id", playerId);
+				message->GetHead().Add(rpc::Header::player_id, playerId);
 
 				if (rpcId > 0)
 				{
 					++this->mWaitCount;
-					message->TempHead().Add("cli", id);
-					message->TempHead().Add("rpc", rpcId);
+					message->TempHead().Add(rpc::Header::client_id, id);
+					message->TempHead().Add(rpc::Header::rpc_id, rpcId);
 				}
 				int code = this->OnRequest(playerId, message);
 				if(code != XCode::Ok)
@@ -75,11 +75,11 @@ namespace acs
 			case rpc::Type::Response:
 			{
 				int rpcId = 0;
-				if(message->TempHead().Del("rpc", rpcId))
+				if(message->TempHead().Del(rpc::Header::rpc_id, rpcId))
 				{
 					--this->mWaitCount;
 					message->SetRpcId(rpcId);
-					if(message->TempHead().Del("cli", rpcId))
+					if(message->TempHead().Del(rpc::Header::client_id, rpcId))
 					{
 						this->Send(rpcId, message);
 						return;
@@ -95,7 +95,7 @@ namespace acs
 
 	int OuterNetComponent::OnRequest(long long playerId, rpc::Packet * message)
 	{
-		const std::string& fullName = message->GetHead().GetStr("func");
+		const std::string& fullName = message->GetHead().GetStr(rpc::Header::func);
 		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
 		if (methodConfig == nullptr || !methodConfig->IsClient || !methodConfig->IsOpen)
 		{
@@ -219,9 +219,9 @@ namespace acs
 			return false;
 		}
 		message->Clear();
-		message->GetHead().Del("func");
 		message->SetType(rpc::Type::Response);
-		message->GetHead().Add("code", code);
+		message->GetHead().Del(rpc::Header::func);
+		message->GetHead().Add(rpc::Header::code, code);
 		return this->Send(message->SockId(), message);
 	}
 

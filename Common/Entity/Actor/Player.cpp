@@ -127,8 +127,8 @@ namespace acs
 				message->SetNet((char)methodConfig->Net);
 			}
 			message->SetProto(rpc::Porto::None);
-			message->GetHead().Add("func", func);
-			message->GetHead().Add("id", this->GetId());
+			message->GetHead().Add(rpc::Header::func , func);
+			message->GetHead().Add(rpc::Header::player_id, this->GetId());
 		}
 		return XCode::Ok;
 	}

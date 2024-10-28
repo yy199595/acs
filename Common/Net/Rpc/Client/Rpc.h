@@ -2,8 +2,7 @@
 // Created by zmhy0073 on 2021/10/14.
 //
 
-#ifndef GameKeeper_MESSAGESTREAM_H
-#define GameKeeper_MESSAGESTREAM_H
+#pragma once
 
 #include"Log/Common/CommonLogDef.h"
 namespace rpc
@@ -23,6 +22,21 @@ namespace rpc
 		constexpr char Client = 9; 	  //服务器发到客户端的消息
         constexpr char Max = 127;
     };
+
+	// rpc消息头
+	namespace Header
+	{
+		constexpr char* func = "func";
+		constexpr char* code = "code";
+		constexpr char* udp_addr = "udp";
+		constexpr char* sock_id = "sock";
+		constexpr char* player_id = "id";
+		constexpr char* rpc_id = "rpc";
+		constexpr char* client_id = "cli";
+		constexpr char* forward_tar = "tar";
+		constexpr char* app_id = "app";
+	}
+
 	//协议类型
     namespace Porto
     {
@@ -42,6 +56,8 @@ namespace rpc
 		constexpr char Redis = 3; //redis队列
 		constexpr char Client = 4; //客户端专用
 		constexpr char Udp = 5; //upd
+		constexpr char Kcp = 6; //upd
+
 		constexpr char Max = 127;
 	}
 
@@ -70,5 +86,3 @@ namespace rpc
 
 // 消息长度 类型 协议 rpcid
 
-
-#endif //GameKeeper_MESSAGESTREAM_H

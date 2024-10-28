@@ -90,7 +90,7 @@ namespace acs
 		int code = XCode::Ok;
 		do
 		{
-			if(!message->GetHead().Del("tar", target))
+			if(!message->GetHead().Del(rpc::Header::forward_tar, target))
 			{
 				code = XCode::CallArgsError;
 				break;
@@ -120,7 +120,7 @@ namespace acs
 			if(message->GetRpcId() != 0)
             {
                 message->SetType(rpc::Type::Response);
-                message->GetHead().Add("code", XCode::NetWorkError);
+                message->GetHead().Add(rpc::Header::code, XCode::NetWorkError);
                 this->mDisComponent->OnMessage(data.release());
 				return;
             }
@@ -199,8 +199,8 @@ namespace acs
 		if(message->GetType() == rpc::Type::Request)
 		{
 			std::string func;
-			message->GetHead().Get("func", func);
-			message->TempHead().Add("func", func);
+			message->GetHead().Get(rpc::Header::func, func);
+			message->TempHead().Add(rpc::Header::func, func);
 			message->TempHead().Add("t", help::Time::NowMil());
 		}
 #endif
@@ -227,15 +227,15 @@ namespace acs
 		if (code != XCode::Ok)
 		{
 			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-			LOG_ERROR("call {} code = {}", message->GetHead().GetStr("func"), desc);
+			LOG_ERROR("call {} code = {}", message->GetHead().GetStr(rpc::Header::func), desc);
 
 			if (message->GetRpcId() == 0)
 			{
 				return XCode::DeleteData;
 			}
 			message->Body()->clear();
-			message->GetHead().Add("code", code);
 			message->SetType(rpc::Type::Response);
+			message->GetHead().Add(rpc::Header::code, code);
 			return this->Send(message->SockId(), message);
 		}
 		return XCode::Ok;

@@ -8,6 +8,7 @@
 #include "UdpComponent.h"
 #include "Rpc/Client/Message.h"
 #include "Entity/Actor/App.h"
+#include "Net/Udp/Common/UdpClient.h"
 #include "Server/Config/CodeConfig.h"
 #include "Server/Component/ThreadComponent.h"
 #include "Rpc/Component/DispatchComponent.h"
@@ -56,28 +57,28 @@ namespace acs
 
 	int UdpComponent::Send(int id, rpc::Packet* message)
 	{
-		std::string address;
-		if(message->GetType() == rpc::Type::Response)
+		if (message->GetType() == rpc::Type::Response)
 		{
-			if(!message->TempHead().Del("udp", address))
+			std::string address;
+			if (!message->TempHead().Del("udp", address))
 			{
 				return XCode::SendMessageFail;
 			}
 			this->mUdpServer->Send(address, message);
 			return XCode::Ok;
 		}
-		udp::Client * udpClient = this->GetClient(id, address);
-		if(udpClient == nullptr)
+
+		udp::IClient* udpClient = this->GetClient(id);
+		if (udpClient == nullptr)
 		{
-			return XCode::Failure;
+			return XCode::SendMessageFail;
 		}
-		udpClient->Send(address, message);
+		udpClient->Send(message);
 		return XCode::Ok;
 	}
 
-	void UdpComponent::OnMessage(int id, rpc::Packet* request, rpc::Packet* response)
+	void UdpComponent::OnMessage(rpc::Packet* request, rpc::Packet* response)
 	{
-		std::string address;
 		int code = XCode::Ok;
 		switch(request->GetType())
 		{
@@ -107,20 +108,21 @@ namespace acs
 				return XCode::Failure;
 			}
 			message->Body()->clear();
-			message->GetHead().Add("code", code);
 			message->SetType(rpc::Type::Response);
+			message->GetHead().Add(rpc::Header::code, code);
 			return this->Send(message->SockId(), message);
 		}
 		return XCode::Ok;
 	}
 
-	udp::Client* UdpComponent::GetClient(int id, std::string & address)
+	udp::Client* UdpComponent::GetClient(int id)
 	{
 		auto iter = this->mClients.find(id);
 		if(iter != this->mClients.end())
 		{
 			return iter->second.get();
 		}
+		std::string address;
 		if(!this->mActor->GetListen(id, "udp", address))
 		{
 			return nullptr;
@@ -134,7 +136,8 @@ namespace acs
 		udp::Client * udpClient = nullptr;
 		Asio::Context & ctx = this->mThread->GetContext();
 		asio::any_io_executor executor = ctx.get_executor();
-		std::unique_ptr<udp::Client> client = std::make_unique<udp::Client>(ctx, this, id);
+		asio_udp::endpoint remote(asio::ip::make_address(address), port);
+		std::unique_ptr<udp::Client> client = std::make_unique<udp::Client>(ctx, this, remote);
 		{
 			udpClient = client.get();
 			this->mClients.emplace(id, std::move(client));

@@ -46,6 +46,6 @@ namespace acs
 		class ProtoComponent * mProto;
 		ServiceMethodRegister mMethodRegister;
 	};
-#define BIND_PLAYER_RPC_METHOD(func) LOG_CHECK_RET_FALSE(this->GetMethodRegistry().Bind(GET_FUNC_NAME(#func), &func, "id"))
-#define BIND_SERVER_RPC_METHOD(func) LOG_CHECK_RET_FALSE(this->GetMethodRegistry().Bind(GET_FUNC_NAME(#func), &func, "app"))
+#define BIND_PLAYER_RPC_METHOD(func) LOG_CHECK_RET_FALSE(this->GetMethodRegistry().Bind(GET_FUNC_NAME(#func), &func, rpc::Header::player_id ))
+#define BIND_SERVER_RPC_METHOD(func) LOG_CHECK_RET_FALSE(this->GetMethodRegistry().Bind(GET_FUNC_NAME(#func), &func, rpc::Header::app_id))
 }

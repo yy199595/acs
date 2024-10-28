@@ -22,6 +22,9 @@
 		},
 		"udp" : {
 			"port" : "${udp}"
+		},
+		"kcp" : {
+			"port" : "${kcp}"
 		}
 	},
 	"master": {

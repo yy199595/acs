@@ -22,7 +22,7 @@
 #include "Net/Lua/LuaSocket.h"
 #include "Net/Network/Tcp/Socket.h"
 #include "Util/Tools/LuaString.h"
-#include "Network/Udp/UdpClient.h"
+#include "Net/Udp/Common/UdpClient.h"
 using namespace Lua;
 namespace acs
 {
