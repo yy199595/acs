@@ -6,36 +6,44 @@
 #include "Util/Tools/String.h"
 #include "Entity/Actor/App.h"
 #include "Log/Common/CommonLogDef.h"
-
+#include "Util/Tools/TimeHelper.h"
 namespace kcp
 {
 	Client::Client(asio::io_context& io,
 			kcp::Client::Component* component, asio_udp::endpoint & remote)
 			: mContext(io), mComponent(component), mSocket(io, asio_udp::endpoint(asio_udp::v4(), 0)),
-			 mRemoteEndpoint(remote)
+			 mRemoteEndpoint(remote), mTimer(io), mSendStream(&mSendBuffer)
 	{
+		this->mKcp = ikcp_create(0x01, this);
+		this->mKcp->output = kcp::OnKcpSend;
+		ikcp_nodelay(this->mKcp, 1, 10, 2, 1);
+		ikcp_wndsize(this->mKcp, KCP_BUFFER_SIZE, KCP_BUFFER_SIZE);
+	}
 
+	void Client::Send(const char* buf, int len)
+	{
+		asio::error_code code;
+		size_t size = this->mSocket.send_to(asio::buffer(buf, len), this->mRemoteEndpoint, 0, code);
+		if(code.value() == Asio::OK)
+		{
+//			CONSOLE_LOG_ERROR("send to [{}:{}] len={}",
+//					this->mRemoteEndpoint.address().to_string(), this->mRemoteEndpoint.port(), size)
+		}
 	}
 
 	void Client::Send(tcp::IProto* message)
 	{
-		asio::post(this->mContext, [this, message]()
-		{
-			std::ostream stream(&this->mSendBuffer);
-			int length = message->OnSendMessage(stream);
-			this->mSocket.async_send_to(this->mSendBuffer.data(), this->mRemoteEndpoint,
-					[this, length, message](const asio::error_code& code, size_t size)
-					{
-						if (code.value() != Asio::OK)
-						{
-							return;
-						}
-						this->mSendBuffer.consume(size);
-						unsigned short port = this->mRemoteEndpoint.port();
-						std::string ip = this->mRemoteEndpoint.address().to_string();
-						//CONSOLE_LOG_ERROR("send:({}:{}) size:{}", ip, port, size);
-					});
-		});
+		message->OnSendMessage(this->mSendStream);
+		int len = (int)this->mSendBuffer.size();
+		const char* msg = asio::buffer_cast<const char*>(this->mSendBuffer.data());
+
+		ikcp_send(this->mKcp, msg, len);
+		this->mSendBuffer.consume(len);
+	}
+
+	void Client::Update(long long ms)
+	{
+		ikcp_update(this->mKcp, (IUINT32)ms);
 	}
 
 	void Client::OnSendMessage()
@@ -50,30 +58,45 @@ namespace kcp
 
 	void Client::StartReceive()
 	{
-		this->mSocket.async_receive_from(asio::buffer(this->mRecvBuffer),
+		this->mSocket.async_receive_from(this->mReceiveBuffer.prepare(KCP_BUFFER_SIZE),
 				this->mLocalEndpoint, [this](const asio::error_code& code, size_t size)
 				{
-					if (code.value() == Asio::OK)
+					if (code.value() != Asio::OK)
 					{
-//						this->mRecvBuffer.commit(size);
-//						std::istream is(&this->mRecvBuffer);
-//						unsigned short port = this->mLocalEndpoint.port();
-//						std::string ip = this->mLocalEndpoint.address().to_string();
-//						//CONSOLE_LOG_ERROR("receive ({}:{}) size={}", ip, port, size)
-//						std::unique_ptr<rpc::Packet> rpcPacket = std::make_unique<rpc::Packet>();
-//						{
-//							tcp::Data::Read(is, rpcPacket->GetProtoHead());
-//							if (rpcPacket->OnRecvMessage(is, rpcPacket->GetProtoHead().Len) == tcp::ReadDone)
-//							{
-//								rpcPacket->SetNet(rpc::Net::Udp);
-//								Asio::Context& ctx = acs::App::GetContext();
-//								rpcPacket->TempHead().Add(rpc::Header::udp_addr, fmt::format("{}:{}", ip, port));
-//								asio::post(ctx, [this, msg = rpcPacket.release()] { this->mComponent->OnMessage(msg, msg); });
-//							}
-//						}
-//						this->mRecvBuffer.consume(size);
+						CONSOLE_LOG_ERROR("code:{}", code.message())
+						return;
 					}
-					asio::post(this->mSocket.get_executor(), [this] { this->StartReceive(); });
+					this->mReceiveBuffer.commit(size);
+					unsigned short port = this->mLocalEndpoint.port();
+					std::string ip = this->mLocalEndpoint.address().to_string();
+
+					std::unique_ptr<char[]> buffer = std::make_unique<char[]>(size);
+					const char * msg = asio::buffer_cast<const char *>(this->mReceiveBuffer.data());
+
+					ikcp_input(this->mKcp, msg, (int)size);
+					int messageLen = ikcp_recv(this->mKcp, buffer.get(), size);
+					//CONSOLE_LOG_DEBUG("client receive message : {}", messageLen);
+					if(messageLen > 0)
+					{
+						std::stringstream ss;
+						ss.write(buffer.get(), messageLen);
+
+						const std::string address = fmt::format("{}:{}", ip, port);
+						std::unique_ptr<rpc::Packet> rpcPacket = std::make_unique<rpc::Packet>();
+						{
+							tcp::Data::Read(ss, rpcPacket->GetProtoHead());
+							if (rpcPacket->OnRecvMessage(ss, rpcPacket->GetProtoHead().Len) == tcp::ReadDone)
+							{
+								rpcPacket->SetNet(rpc::Net::Kcp);
+								Asio::Context& ctx = acs::App::GetContext();
+								rpcPacket->TempHead().Add(rpc::Header::kcp_addr, address);
+								asio::post(ctx, [this, msg = rpcPacket.release()]
+								{ this->mComponent->OnMessage(msg, msg); });
+							}
+						}
+					}
+					this->mReceiveBuffer.consume(size);
+					asio::post(this->mContext, [this] { this->StartReceive(); });
 				});
 	}
 }

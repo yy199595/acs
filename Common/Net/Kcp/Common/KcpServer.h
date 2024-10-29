@@ -5,6 +5,7 @@
 #pragma once
 
 #include "IClient.h"
+#include "KcpSession.h"
 #include "Core/Map/HashMap.h"
 namespace kcp
 {
@@ -14,15 +15,20 @@ namespace kcp
 		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;
 		Server(asio::io_context & io, Component * component, unsigned short port);
 	public:
+		void Update();
 		void StartReceive();
+		bool Send(const std::string & addr, tcp::IProto * message);
 		inline asio::ip::udp::socket & Socket() { return this->mSocket; }
 	private:
+		void OnReceive(size_t size);
+		kcp::Session * GetSession(const std::string & address);
+	private:
 		Component * mComponent;
-		asio::io_context & mContext;
-		asio::streambuf mRecvBuffer;
 		asio::streambuf mSendBuffer;
 		asio::ip::udp::socket mSocket;
 		asio::ip::udp::endpoint mSenderPoint;
-		std::unordered_map<int, asio::ip::udp::endpoint> mClients;
+		std::array<char, KCP_BUFFER_SIZE> mRecvBuffer;
+		std::array<char, KCP_BUFFER_SIZE> mDecodeBuffer;
+		std::unordered_map<std::string, std::unique_ptr<kcp::Session>> mClients;
 	};
 }

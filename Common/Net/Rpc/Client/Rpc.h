@@ -29,6 +29,7 @@ namespace rpc
 		constexpr char* func = "func";
 		constexpr char* code = "code";
 		constexpr char* udp_addr = "udp";
+		constexpr char* kcp_addr = "kcp";
 		constexpr char* sock_id = "sock";
 		constexpr char* player_id = "id";
 		constexpr char* rpc_id = "rpc";

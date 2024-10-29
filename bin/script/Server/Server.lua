@@ -18,13 +18,16 @@ function Main:OnComplete()
 
     local app = require("App")
 
-    local code, res = app:Call(nil, "ChatSystem.OnChat", {
-        user_id = 10004,
-        msg_type = 1,
-        message = "hello"
-    })
+    for i = 1, 10 do
+        coroutine.sleep(200)
+        local code, res = app:Call(nil, "ChatSystem.OnChat", {
+            user_id = 10004,
+            msg_type = 1,
+            message = "hello"
+        })
+        print(string.format("count:%s code:%s", i, code))
+    end
 
-    print(code, res)
 
     --local res = http:Get("https://huwai.pro")
     --table.print(res)
