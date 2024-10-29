@@ -148,7 +148,7 @@ namespace acs
 		}
 		kcp::Client * udpClient = nullptr;
 		Asio::Context & context = acs::App::GetContext();
-		asio_udp::endpoint remote(asio::ip::make_address(address), port);
+		asio_udp::endpoint remote(asio::ip::make_address(ip), port);
 		std::unique_ptr<kcp::Client> client = std::make_unique<kcp::Client>(context, this, remote);
 		{
 			client->StartReceive();
