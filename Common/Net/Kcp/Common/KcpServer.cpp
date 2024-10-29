@@ -3,14 +3,17 @@
 //
 
 #include "KcpServer.h"
+#include "Entity/Actor/App.h"
 #include "Util/Tools/String.h"
 #include "Util/Tools/TimeHelper.h"
 namespace kcp
 {
 	Server::Server(asio::io_context& io, kcp::Server::Component* component, unsigned short port)
-			: mSocket(io, asio::ip::udp::endpoint(asio::ip::udp::v4(), port)), mComponent(component)
+			: mContext(io), mSocket(io, asio::ip::udp::endpoint(asio::ip::udp::v4(), port)),
+			mComponent(component), mTimer(io)
 	{
-
+		this->mTimer.expires_after(std::chrono::milliseconds(KCP_UPDATE_INTERVAL));
+		this->mTimer.async_wait(std::bind(&Server::OnUpdate, this, std::placeholders::_1));
 	}
 
 	void Server::StartReceive()
@@ -28,12 +31,16 @@ namespace kcp
 
 	bool Server::Send(const std::string& addr, tcp::IProto* message)
 	{
-		auto iter = this->mClients.find(addr);
-		if(iter == this->mClients.end())
+		asio::post(this->mContext, [this, addr, message]()
 		{
-			return false;
-		}
-		iter->second->Send(message);
+			auto iter = this->mClients.find(addr);
+			if(iter == this->mClients.end())
+			{
+				delete message;
+				return;
+			}
+			iter->second->Send(message);
+		});
 		return true;
 	}
 
@@ -71,6 +78,13 @@ namespace kcp
 		return kcpSession;
 	}
 
+	void Server::OnUpdate(const asio::error_code& code)
+	{
+		this->Update();
+		this->mTimer.expires_after(std::chrono::milliseconds(KCP_UPDATE_INTERVAL));
+		this->mTimer.async_wait(std::bind(&Server::OnUpdate, this, std::placeholders::_1));
+	}
+
 	void Server::OnReceive(size_t size)
 	{
 		const unsigned short port = this->mSenderPoint.port();
@@ -102,6 +116,8 @@ namespace kcp
 			rpcPacket->SetNet(rpc::Net::Kcp);
 			rpcPacket->TempHead().Add(rpc::Header::kcp_addr, address);
 		}
-		this->mComponent->OnMessage(rpcPacket, rpcPacket);
+		asio::post(acs::App::GetContext(), [this, rpcPacket]() {
+			this->mComponent->OnMessage(rpcPacket, nullptr);
+		});
 	}
 }

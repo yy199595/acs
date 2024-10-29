@@ -33,12 +33,17 @@ namespace kcp
 
 	void Client::Send(tcp::IProto* message)
 	{
-		message->OnSendMessage(this->mSendStream);
-		int len = (int)this->mSendBuffer.size();
-		const char* msg = asio::buffer_cast<const char*>(this->mSendBuffer.data());
-
-		ikcp_send(this->mKcp, msg, len);
-		this->mSendBuffer.consume(len);
+		asio::post(this->mContext, [this, message]()
+		{
+			message->OnSendMessage(this->mSendStream);
+			int len = (int)this->mSendBuffer.size();
+			const char* msg = asio::buffer_cast<const char*>(this->mSendBuffer.data());
+			{
+				ikcp_send(this->mKcp, msg, len);
+				this->mSendBuffer.consume(len);
+			}
+			delete message;
+		});
 	}
 
 	void Client::Update(long long ms)
@@ -90,13 +95,14 @@ namespace kcp
 								rpcPacket->SetNet(rpc::Net::Kcp);
 								Asio::Context& ctx = acs::App::GetContext();
 								rpcPacket->TempHead().Add(rpc::Header::kcp_addr, address);
-								asio::post(ctx, [this, msg = rpcPacket.release()]
-								{ this->mComponent->OnMessage(msg, msg); });
+								asio::post(ctx, [this, msg = rpcPacket.release()] {
+									this->mComponent->OnMessage(msg, msg);
+								});
 							}
 						}
 					}
 					this->mReceiveBuffer.consume(size);
-					asio::post(this->mContext, [this] { this->StartReceive(); });
+					asio::post(acs::App::GetContext(), [this] { this->StartReceive(); });
 				});
 	}
 }

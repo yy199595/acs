@@ -11,7 +11,7 @@
         "Request" : "google.protobuf.Struct"
     },
     "ChatSystem.OnChat": {
-        "Net" : "udp",
+        "Net" : "kcp",
         "Async": true,
         "IsClient": true,
         "Request": "c2s.chat.request"

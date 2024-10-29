@@ -12,6 +12,7 @@
 #include "Kcp/Common/KcpSession.h"
 #include "Server/Config/CodeConfig.h"
 #include "Rpc/Component/DispatchComponent.h"
+#include "Server/Component/ThreadComponent.h"
 
 namespace acs
 {
@@ -35,13 +36,13 @@ namespace acs
 				LOG_CHECK_RET_FALSE(jsonObject1->Get("port",this->mPort));
 				LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
 				LOG_CHECK_RET_FALSE(this->mDispatch = this->GetComponent<DispatchComponent>());
-				Asio::Context & context = acs::App::GetContext();
+				Asio::Context & context = this->GetComponent<ThreadComponent>()->GetContext();
 				{
 					this->mKcpServer = std::make_unique<kcp::Server>(context, this, this->mPort);
 				}
-				this->mKcpServer->StartReceive();
 				const std::string & host = config.Host();
 				LOG_INFO("listen [kcp:{}] ok", this->mPort);
+				asio::post(context, [this]() { this->mKcpServer->StartReceive(); });
 				return this->mApp->AddListen("kcp", fmt::format("{}:{}", host, this->mPort));
 			}
 			return true;
@@ -61,7 +62,6 @@ namespace acs
 		{
 			iter->second->Update(t);
 		}
-		this->mKcpServer->Update();
 	}
 
 	int KcpComponent::Send(int id, rpc::Packet* message)
@@ -75,7 +75,6 @@ namespace acs
 			}
 			if(this->mKcpServer->Send(address, message))
 			{
-				delete message;
 				return XCode::Ok;
 			}
 			return XCode::SendMessageFail;

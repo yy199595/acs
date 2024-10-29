@@ -13,6 +13,7 @@
 using asio_udp = asio::ip::udp;
 constexpr int KCP_TIME_OUT = 20; //xx秒
 constexpr int KCP_BUFFER_SIZE = 1024 * 10;
+constexpr int KCP_UPDATE_INTERVAL = 100;
 
 namespace kcp
 {
