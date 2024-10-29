@@ -23,12 +23,7 @@ namespace kcp
 	void Client::Send(const char* buf, int len)
 	{
 		asio::error_code code;
-		size_t size = this->mSocket.send_to(asio::buffer(buf, len), this->mRemoteEndpoint, 0, code);
-		if(code.value() == Asio::OK)
-		{
-//			CONSOLE_LOG_ERROR("send to [{}:{}] len={}",
-//					this->mRemoteEndpoint.address().to_string(), this->mRemoteEndpoint.port(), size)
-		}
+		this->mSocket.send_to(asio::buffer(buf, len), this->mRemoteEndpoint, 0, code);
 	}
 
 	void Client::Send(tcp::IProto* message)
@@ -36,7 +31,7 @@ namespace kcp
 		asio::post(this->mContext, [this, message]()
 		{
 			message->OnSendMessage(this->mSendStream);
-			int len = (int)this->mSendBuffer.size();
+			const int len = (int)this->mSendBuffer.size();
 			const char* msg = asio::buffer_cast<const char*>(this->mSendBuffer.data());
 			{
 				ikcp_send(this->mKcp, msg, len);
@@ -93,16 +88,15 @@ namespace kcp
 							if (rpcPacket->OnRecvMessage(ss, rpcPacket->GetProtoHead().Len) == tcp::ReadDone)
 							{
 								rpcPacket->SetNet(rpc::Net::Kcp);
-								Asio::Context& ctx = acs::App::GetContext();
 								rpcPacket->TempHead().Add(rpc::Header::kcp_addr, address);
-								asio::post(ctx, [this, msg = rpcPacket.release()] {
-									this->mComponent->OnMessage(msg, msg);
+								asio::post(acs::App::GetContext(), [this, msg = rpcPacket.release()] {
+									this->mComponent->OnMessage(msg, nullptr);
 								});
 							}
 						}
 					}
 					this->mReceiveBuffer.consume(size);
-					asio::post(acs::App::GetContext(), [this] { this->StartReceive(); });
+					asio::post(this->mContext, [this] { this->StartReceive(); });
 				});
 	}
 }

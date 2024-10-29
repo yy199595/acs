@@ -38,6 +38,8 @@ namespace kcp
 		const char* msg = asio::buffer_cast<const char*>(this->mSendBuffer.data());
 		ikcp_send(this->mKcp, msg, len);
 		this->mSendBuffer.consume(len);
+
+		delete message;
 	}
 
 	void Session::Update(long long t)
