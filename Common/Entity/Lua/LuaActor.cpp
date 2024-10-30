@@ -297,17 +297,38 @@ namespace acs
 		return 1;
 	}
 
+	int LuaActor::AddListen(lua_State* lua)
+	{
+		Server* server = App::Inst();
+		if (lua_isnumber(lua, 1))
+		{
+			long long id = luaL_checkinteger(lua, 1);
+			server = App::ActorMgr()->GetServer(id);
+		}
+		std::string name(luaL_checkstring(lua, 2));
+		std::string address(luaL_checkstring(lua, 3));
+		if (server == nullptr)
+		{
+			return 0;
+		}
+		lua_pushboolean(lua, server->AddListen(name, address));
+		return 1;
+	}
+
 	int LuaActor::GetListen(lua_State* lua)
 	{
 		std::string address;
-		long long id = luaL_checkinteger(lua, 1);
-		const std::string name(luaL_checkstring(lua, 2));
-		Server* server = App::ActorMgr()->GetServer(id);
+		Server* server = App::Inst();
+		if(lua_isinteger(lua, 1))
+		{
+			long long id = luaL_checkinteger(lua, 1);
+			server = App::ActorMgr()->GetServer(id);
+		}
 		if (server == nullptr)
 		{
-			LOG_ERROR("not find server : {}", id);
 			return 0;
 		}
+		std::string name(luaL_checkstring(lua, 2));
 		if (!server->GetListen(name, address))
 		{
 			return 0;

@@ -53,7 +53,7 @@ namespace kcp
 		{
 			if(t1 - iter->second->GetLastTime() >= KCP_TIME_OUT)
 			{
-				CONSOLE_LOG_ERROR("remove udp client=>{}", iter->second->GetAddress());
+				CONSOLE_LOG_ERROR("remove kcp client=>{}", iter->second->GetAddress());
 				iter = this->mClients.erase(iter++);
 				continue;
 			}

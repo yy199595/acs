@@ -31,19 +31,22 @@ namespace acs
 			std::unique_ptr<json::r::Value> jsonObject;
 			std::unique_ptr<json::r::Value> jsonObject1;
 			const ServerConfig & config = this->mApp->Config();
+			LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
+			LOG_CHECK_RET_FALSE(this->mDispatch = this->GetComponent<DispatchComponent>());
 			if(config.Get("listen", jsonObject) && jsonObject->Get("kcp",jsonObject1))
 			{
-				LOG_CHECK_RET_FALSE(jsonObject1->Get("port",this->mPort));
-				LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
-				LOG_CHECK_RET_FALSE(this->mDispatch = this->GetComponent<DispatchComponent>());
-				Asio::Context & context = this->GetComponent<ThreadComponent>()->GetContext();
+				if(jsonObject1->Get("port",this->mPort))
 				{
-					this->mKcpServer = std::make_unique<kcp::Server>(context, this, this->mPort);
+					Asio::Context& context = this->GetComponent<ThreadComponent>()->GetContext();
+					{
+						this->mKcpServer = std::make_unique<kcp::Server>(context, this, this->mPort);
+					}
+					const std::string& host = config.Host();
+					LOG_INFO("listen [kcp:{}] ok", this->mPort);
+					asio::post(context, [this]()
+					{ this->mKcpServer->StartReceive(); });
+					return this->mApp->AddListen("kcp", fmt::format("{}:{}", host, this->mPort));
 				}
-				const std::string & host = config.Host();
-				LOG_INFO("listen [kcp:{}] ok", this->mPort);
-				asio::post(context, [this]() { this->mKcpServer->StartReceive(); });
-				return this->mApp->AddListen("kcp", fmt::format("{}:{}", host, this->mPort));
 			}
 			return true;
 		}

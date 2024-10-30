@@ -18,6 +18,7 @@ function Main:OnComplete()
 
     local app = require("App")
     local log = require("Log")
+    print(app:AddListen(nil, "kcp", "127.0.0.1:7787"))
     for i = 1, 10 do
         coroutine.sleep(200)
         local code, res = app:Call(nil, "ChatSystem.OnChat", {
@@ -27,14 +28,6 @@ function Main:OnComplete()
         })
         log.Warning("[%s]  code:%s", i, code)
     end
-
-    coroutine.start(function()
-        local kcp = KcpSocket.New("127.0.0.1:7787")
-        for i = 1, 10 do
-            coroutine.sleep(200)
-            kcp:Send("hello world")
-        end
-    end)
 
 
     --local res = http:Get("https://huwai.pro")

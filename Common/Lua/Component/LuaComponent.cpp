@@ -154,6 +154,7 @@ namespace acs
 		moduleRegistry.AddFunction("GetPath", LuaActor::GetPath);
 		moduleRegistry.AddFunction("NewGuid", LuaActor::NewGuid);
 		moduleRegistry.AddFunction("NewUuid", LuaActor::NewUuid);
+		moduleRegistry.AddFunction("AddListen", LuaActor::AddListen);
 		moduleRegistry.AddFunction("GetListen", LuaActor::GetListen);
 		moduleRegistry.AddFunction("GetConfig", LuaActor::GetConfig);
 		moduleRegistry.AddFunction("GetServers", LuaActor::GetServers);

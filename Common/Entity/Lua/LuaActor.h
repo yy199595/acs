@@ -18,6 +18,7 @@ namespace acs
 		extern int NewUuid(lua_State * l);
 		extern int GetPath(lua_State * l);
 		extern int GetListen(lua_State * l);
+		extern int AddListen(lua_State * l);
 		extern int GetServers(lua_State * l);
 		extern int GetConfig(lua_State * l);
 		extern int HasComponent(lua_State *l);

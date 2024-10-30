@@ -108,4 +108,17 @@ function App:GetPath(key)
     return app.GetPath(key)
 end
 
+---@param id number
+---@param name string
+---@param address string
+function App:AddListen(id, name, address)
+    return app.AddListen(id, name, address)
+end
+
+---@param id number
+---@param name string
+function App:GetListen(id, name)
+    return app.GetListen(id, name)
+end
+
 return App
