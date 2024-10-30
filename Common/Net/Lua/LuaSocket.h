@@ -22,6 +22,12 @@ namespace Lua
 		extern int Send(lua_State*);
 		extern int Close(lua_State*);
 	}
+
+	namespace KcpSock
+	{
+		extern int New(lua_State *);
+		extern int Send(lua_State *);
+	}
 }
 
 

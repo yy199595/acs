@@ -133,16 +133,23 @@ namespace acs
 		{
 			return nullptr;
 		}
-		udp::Client * udpClient = nullptr;
-		Asio::Context & ctx = this->mThread->GetContext();
-		asio::any_io_executor executor = ctx.get_executor();
-		asio_udp::endpoint remote(asio::ip::make_address(ip), port);
-		std::unique_ptr<udp::Client> client = std::make_unique<udp::Client>(ctx, this, remote);
+		try
 		{
-			udpClient = client.get();
-			this->mClients.emplace(id, std::move(client));
-			asio::post(executor, [udpClient]() {udpClient->StartReceive(); });
+			udp::Client * udpClient = nullptr;
+			Asio::Context & ctx = this->mThread->GetContext();
+			asio_udp::endpoint remote(asio::ip::make_address(ip), port);
+			std::unique_ptr<udp::Client> client = std::make_unique<udp::Client>(ctx, this, remote);
+			{
+				udpClient = client.get();
+				this->mClients.emplace(id, std::move(client));
+				asio::post(ctx, [udpClient]() {udpClient->StartReceive(); });
+			}
+			return udpClient;
 		}
-		return udpClient;
+		catch (std::exception & e)
+		{
+			LOG_ERROR("create udp client:{} =>", address, e.what());
+			return nullptr;
+		}
 	}
 }

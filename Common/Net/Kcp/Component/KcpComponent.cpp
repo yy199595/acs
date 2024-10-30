@@ -146,15 +146,23 @@ namespace acs
 		{
 			return nullptr;
 		}
-		kcp::Client * udpClient = nullptr;
-		Asio::Context & context = acs::App::GetContext();
-		asio_udp::endpoint remote(asio::ip::make_address(ip), port);
-		std::unique_ptr<kcp::Client> client = std::make_unique<kcp::Client>(context, this, remote);
+		try
 		{
-			client->StartReceive();
-			udpClient = client.get();
-			this->mClients.emplace(id, std::move(client));
+			kcp::Client * udpClient = nullptr;
+			Asio::Context & context = acs::App::GetContext();
+			asio_udp::endpoint remote(asio::ip::make_address(ip), port);
+			std::unique_ptr<kcp::Client> client = std::make_unique<kcp::Client>(context, this, remote);
+			{
+				client->StartReceive();
+				udpClient = client.get();
+				this->mClients.emplace(id, std::move(client));
+			}
+			return udpClient;
 		}
-		return udpClient;
+		catch(std::exception & e)
+		{
+			LOG_ERROR("create kcp client:{} =>", address, e.what());
+			return nullptr;
+		}
 	}
 }

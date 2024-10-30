@@ -22,7 +22,8 @@
 #include "Net/Lua/LuaSocket.h"
 #include "Net/Network/Tcp/Socket.h"
 #include "Util/Tools/LuaString.h"
-#include "Net/Udp/Common/UdpClient.h"
+#include "Udp/Common/UdpClient.h"
+#include "Kcp/Common/KcpClient.h"
 using namespace Lua;
 namespace acs
 {
@@ -126,6 +127,10 @@ namespace acs
 		classProxyHelper5.PushExtensionFunction("Send", Lua::UdpSock::Send);
 		classProxyHelper5.PushExtensionFunction("Close", Lua::UdpSock::Close);
 
+		Lua::ClassProxyHelper classProxyHelper6(this->mLuaEnv, "KcpSocket");
+		classProxyHelper6.BeginRegister<kcp::Client>();
+		classProxyHelper6.PushExtensionFunction("New", Lua::KcpSock::New);
+		classProxyHelper6.PushExtensionFunction("Send", Lua::KcpSock::Send);
 	}
 
 	bool LuaComponent::LateAwake()

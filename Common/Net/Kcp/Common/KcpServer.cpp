@@ -6,8 +6,6 @@
 #include "Entity/Actor/App.h"
 #include "Util/Tools/String.h"
 #include "Util/Tools/TimeHelper.h"
-
-#include "Util/Tools/BindStream.h"
 namespace kcp
 {
 	Server::Server(asio::io_context& io, kcp::Server::Component* component, unsigned short port)
@@ -74,9 +72,9 @@ namespace kcp
 		kcp::Session* kcpSession = nullptr;
 		std::unique_ptr<kcp::Session> session
 				= std::make_unique<kcp::Session>(this->mSocket, this->mSenderPoint);
-
 		kcpSession = session.get();
 		this->mClients.emplace(address, std::move(session));
+		CONSOLE_LOG_DEBUG("kcp client:{} connect server", address)
 		return kcpSession;
 	}
 
@@ -98,35 +96,17 @@ namespace kcp
 		{
 			return;
 		}
-
 		int len = kcpSession->Decode(this->mRecvBuffer.data(), (int)size, this->mDecodeBuffer);
 		if(len <= 0)
 		{
 			return;
 		}
-
 		rpc::Packet * rpcPacket = new rpc::Packet();
 		{
-			help::BindStream bindStream(this->mDecodeBuffer.data(), len);
-
-			bindStream.Read(rpcPacket->GetProtoHead());
-
-			std::string line;
-			std::string key, value;
-			while(bindStream.GetLine(line))
-			{
-				if(line.empty())
-				{
-					break;
-				}
-				help::Str::Split(line, ':', key, value);
-				rpcPacket->GetHead().Add(key, value);
-			}
-			bindStream.ReadAll(*rpcPacket->Body());
-
 			if(!rpcPacket->Decode(this->mDecodeBuffer.data(), len))
 			{
 				delete rpcPacket;
+				CONSOLE_LOG_ERROR("{}", std::string(this->mRecvBuffer.data(), len))
 				return;
 			}
 			rpcPacket->SetNet(rpc::Net::Kcp);

@@ -5,10 +5,12 @@
 #include"LuaSocket.h"
 #include"Entity/Actor/App.h"
 #include"Util/Tools/String.h"
-#include"Net/Udp/Common/UdpClient.h"
+#include"Udp/Common/UdpClient.h"
 #include"Net/Network/Tcp/Socket.h"
 #include"Lua/Engine/UserDataParameter.h"
-#include"Net/Udp/Component/UdpComponent.h"
+#include"Udp/Component/UdpComponent.h"
+#include"Kcp/Common/KcpClient.h"
+#include"Kcp/Component/KcpComponent.h"
 namespace Lua
 {
 	int TcpSock::Send(lua_State* L)
@@ -186,6 +188,41 @@ namespace Lua
 			return 0;
 		}
 		delete udpClient;
+		lua_pushboolean(L, true);
+		return 1;
+	}
+
+
+	int KcpSock::New(lua_State* L)
+	{
+		std::string ip;
+		unsigned short port = 0;
+		std::string address(luaL_checkstring(L, 1));
+		if(!help::Str::SplitAddr(address, ip, port))
+		{
+			return 0;
+		}
+		Asio::Context & context = acs::App::GetContext();
+		asio::ip::udp::endpoint endpoint(asio::ip::make_address(ip), port);
+		acs::KcpComponent * kcpComponent = acs::App::Get<acs::KcpComponent>();
+		kcp::Client * kcpClient = new kcp::Client(context, kcpComponent, endpoint);
+		{
+			Lua::UserDataParameter::Write(L, kcpClient);
+		}
+		return 1;
+	}
+
+	int KcpSock::Send(lua_State* L)
+	{
+		kcp::Client * kcpClient = Lua::UserDataParameter::Read<kcp::Client*>(L, 1);
+		if(kcpClient == nullptr)
+		{
+			lua_error(L);
+			return 0;
+		}
+		size_t size = 0;
+		const char * message = luaL_checklstring(L, 2, &size);
+		kcpClient->Send(new tcp::TextProto(message, size));
 		lua_pushboolean(L, true);
 		return 1;
 	}
