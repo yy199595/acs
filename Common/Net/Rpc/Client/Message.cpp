@@ -19,10 +19,6 @@ namespace rpc
         return !keys.empty();
     }
 
-
-
-
-
     const std::string& Head::GetStr(const std::string& key) const
     {
         static std::string empty;
@@ -90,6 +86,59 @@ namespace rpc
 	void Packet::Init(const rpc::ProtoHead & protoHead)
 	{
 		this->mProtoHead = protoHead;
+	}
+
+	bool Packet::Decode(const char* message, int len)
+	{
+		if(len <= RPC_PACK_HEAD_LEN)
+		{
+			return false;
+		}
+		std::string data(message, len);
+		memcpy(&mProtoHead, message, RPC_PACK_HEAD_LEN);
+
+		len -= RPC_PACK_HEAD_LEN;
+		if(len != this->mProtoHead.Len)
+		{
+			return false;
+		}
+		size_t count = 0;
+		const char* line_start = message + RPC_PACK_HEAD_LEN;
+		const char* line_end = nullptr;
+		while (true)
+		{
+			line_end = strchr(line_start, '\n');
+
+			if (line_end == NULL) {
+				break;
+			}
+			size_t line_length = line_end - line_start;
+
+			if (line_length == 0) {
+				count++;
+				line_start++;
+				break;
+			}
+
+			const char* colon = strchr(line_start, ':');
+			if (colon != NULL && colon < line_end)
+			{
+				size_t key_length = colon - line_start;
+				size_t value_length = line_end - colon - 1;
+				std::string key(line_start, key_length);
+				std::string value(colon + 1, value_length);
+				this->mHead.Add(key, value);
+				count = count + key_length + value_length + 1;
+			}
+			count++;
+			line_start = line_end + 1;  // 跳过 '\n'
+		}
+		int bodyCount = len - (int)count;
+		if(bodyCount > 0)
+		{
+			this->mBody.assign(line_start, bodyCount);
+		}
+		return true;
 	}
 
     int Packet::OnRecvMessage(std::istream& os, size_t size)

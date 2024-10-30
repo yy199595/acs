@@ -32,6 +32,8 @@ namespace rpc
 		int OnSendMessage(std::ostream& os) final;
 		int OnRecvMessage(std::istream& os, size_t size) final;
 	public:
+		bool Decode(const char * message, int len);
+	public:
 		int GetCode(int code = 1) const;
 		std::unique_ptr<Packet> Clone() const;
 		inline Head& GetHead() { return this->mHead; }

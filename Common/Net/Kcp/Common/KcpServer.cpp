@@ -6,6 +6,8 @@
 #include "Entity/Actor/App.h"
 #include "Util/Tools/String.h"
 #include "Util/Tools/TimeHelper.h"
+
+#include "Util/Tools/BindStream.h"
 namespace kcp
 {
 	Server::Server(asio::io_context& io, kcp::Server::Component* component, unsigned short port)
@@ -103,12 +105,26 @@ namespace kcp
 			return;
 		}
 
-		std::stringstream ss;
-		ss.write(this->mDecodeBuffer.data(), len);
 		rpc::Packet * rpcPacket = new rpc::Packet();
 		{
-			tcp::Data::Read(ss, rpcPacket->GetProtoHead());
-			if (rpcPacket->OnRecvMessage(ss, rpcPacket->GetProtoHead().Len) != tcp::ReadDone)
+			help::BindStream bindStream(this->mDecodeBuffer.data(), len);
+
+			bindStream.Read(rpcPacket->GetProtoHead());
+
+			std::string line;
+			std::string key, value;
+			while(bindStream.GetLine(line))
+			{
+				if(line.empty())
+				{
+					break;
+				}
+				help::Str::Split(line, ':', key, value);
+				rpcPacket->GetHead().Add(key, value);
+			}
+			bindStream.ReadAll(*rpcPacket->Body());
+
+			if(!rpcPacket->Decode(this->mDecodeBuffer.data(), len))
 			{
 				delete rpcPacket;
 				return;

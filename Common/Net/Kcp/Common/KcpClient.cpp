@@ -70,22 +70,17 @@ namespace kcp
 					unsigned short port = this->mLocalEndpoint.port();
 					std::string ip = this->mLocalEndpoint.address().to_string();
 
-					std::unique_ptr<char[]> buffer = std::make_unique<char[]>(size);
 					const char * msg = asio::buffer_cast<const char *>(this->mReceiveBuffer.data());
 
 					ikcp_input(this->mKcp, msg, (int)size);
-					int messageLen = ikcp_recv(this->mKcp, buffer.get(), size);
+					int messageLen = ikcp_recv(this->mKcp, this->mDecodeBuffer.data(), KCP_BUFFER_SIZE);
 					//CONSOLE_LOG_DEBUG("client receive message : {}", messageLen);
 					if(messageLen > 0)
 					{
-						std::stringstream ss;
-						ss.write(buffer.get(), messageLen);
-
 						const std::string address = fmt::format("{}:{}", ip, port);
 						std::unique_ptr<rpc::Packet> rpcPacket = std::make_unique<rpc::Packet>();
 						{
-							tcp::Data::Read(ss, rpcPacket->GetProtoHead());
-							if (rpcPacket->OnRecvMessage(ss, rpcPacket->GetProtoHead().Len) == tcp::ReadDone)
+							if(rpcPacket->Decode(this->mDecodeBuffer.data(), messageLen))
 							{
 								rpcPacket->SetNet(rpc::Net::Kcp);
 								rpcPacket->TempHead().Add(rpc::Header::kcp_addr, address);

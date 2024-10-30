@@ -34,6 +34,7 @@ namespace kcp
 		asio::streambuf mReceiveBuffer;
 		asio_udp::endpoint mRemoteEndpoint;
 		asio_udp::endpoint mLocalEndpoint;
+		std::array<char, KCP_BUFFER_SIZE> mDecodeBuffer;
 		//char mSendBuffer[std::numeric_limits<unsigned short>::max()] = { 0 };
 	};
 }
