@@ -109,8 +109,8 @@ namespace acs
 		{
 			if(methodConfig->SendToClient)
 			{
-				message->SetNet(rpc::Net::Tcp);
 				message->SetSockId(this->mGateId);
+				message->SetNet(methodConfig->Net);
 				message->SetType(rpc::Type::Client);
 			}
 			else
@@ -123,10 +123,10 @@ namespace acs
 					return XCode::AddressAllotFailure;
 				}
 				message->SetSockId(serverId);
+				message->SetNet(methodConfig->Net);
 				message->SetType(rpc::Type::Request);
-				message->SetNet((char)methodConfig->Net);
 			}
-			message->SetProto(rpc::Porto::None);
+			message->SetProto(methodConfig->Proto);
 			message->GetHead().Add(rpc::Header::func , func);
 			message->GetHead().Add(rpc::Header::player_id, this->GetId());
 		}

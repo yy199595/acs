@@ -65,9 +65,9 @@ namespace rpc
 	//网关转发方式
 	namespace Forward
 	{
-		constexpr int Fixed = 0; //固定转发
-		constexpr int Random = 1; //随机分配
-		constexpr int Hash = 2;  //id哈希
+		constexpr char Fixed = 0; //固定转发
+		constexpr char Random = 1; //随机分配
+		constexpr char Hash = 2;  //id哈希
 	}
 
 	//协议头

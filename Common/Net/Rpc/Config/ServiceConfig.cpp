@@ -49,6 +49,27 @@ namespace acs
 			return false;
 		}
 		std::unique_ptr<json::r::Value> value;
+
+		std::unordered_map<std::string, char> NetMap{
+				{ "tcp",   rpc::Net::Tcp },
+				{ "udp",   rpc::Net::Udp },
+				{ "kcp",   rpc::Net::Kcp },
+				{ "Http",  rpc::Net::Http },
+				{ "redis", rpc::Net::Redis },
+		};
+
+		std::unordered_map<std::string, char> ForwardMap{
+				{ "hash",   rpc::Forward::Hash },
+				{ "fixed",  rpc::Forward::Fixed },
+				{ "random", rpc::Forward::Random },
+		};
+
+		std::unordered_map<std::string, char> ProtoMap{
+				{ "json",   rpc::Porto::Json },
+				{ "string",  rpc::Porto::String },
+				{ "protobuf", rpc::Porto::Protobuf },
+		};
+
 		for (const char* key: keys)
 		{
 			if (!this->Get(key, value))
@@ -76,26 +97,13 @@ namespace acs
 				methodConfig->Service = service;
 				methodConfig->Net = rpc::Net::Tcp;
 				methodConfig->SendToClient = false;
-				methodConfig->Proto = rpc::Porto::None;
+				methodConfig->Proto = rpc::Porto::Protobuf;
 				methodConfig->Forward = rpc::Forward::Fixed;
 			}
 			this->mAllServices.insert(methodConfig->Service);
 
-			std::unordered_map<std::string, int> NetMap{
-					{ "tcp",   rpc::Net::Tcp },
-					{ "udp",   rpc::Net::Udp },
-					{ "kcp",   rpc::Net::Kcp },
-					{ "Http",  rpc::Net::Http },
-					{ "redis", rpc::Net::Redis },
-			};
 
-			std::unordered_map<std::string, int> ForwardMap{
-					{ "hash",   rpc::Forward::Hash },
-					{ "fixed",  rpc::Forward::Fixed },
-					{ "random", rpc::Forward::Random },
-			};
-
-			std::string net, forward;
+			std::string net, forward, proto;
 			if (value->Get("Net", net))
 			{
 				auto iter = NetMap.find(net);
@@ -108,7 +116,7 @@ namespace acs
 
 			if (value->Get("Forward", forward))
 			{
-				auto iter = ForwardMap.find(net);
+				auto iter = ForwardMap.find(forward);
 				if (iter == ForwardMap.end())
 				{
 					return false;
@@ -116,11 +124,25 @@ namespace acs
 				methodConfig->Forward = iter->second;
 			}
 
+			if (value->Get("Proto", proto))
+			{
+				auto iter = ProtoMap.find(proto);
+				if (iter == ProtoMap.end())
+				{
+					return false;
+				}
+				methodConfig->Proto = iter->second;
+			}
+
+			if(!value->Get("Request", methodConfig->Request))
+			{
+				methodConfig->Proto = rpc::Porto::None;
+			}
+
 			value->Get("Async", methodConfig->IsAsync);
 			value->Get("IsOpen", methodConfig->IsOpen);
 			value->Get("Record", methodConfig->IsRecord);
 			value->Get("Timeout", methodConfig->Timeout);
-			value->Get("Request", methodConfig->Request);
 			value->Get("Response", methodConfig->Response);
 			value->Get("IsDebug", methodConfig->IsDebug);
 			value->Get("IsClient", methodConfig->IsClient);

@@ -188,9 +188,9 @@ namespace acs
 		}
 		message = std::make_unique<rpc::Packet>();
 		{
-			message->SetProto(rpc::Porto::None);
+			message->SetNet(methodConfig->Net);
 			message->SetType(rpc::Type::Request);
-			message->SetNet((char)methodConfig->Net);
+			message->SetProto(methodConfig->Proto);
 			message->GetHead().Add(rpc::Header::func, func);
 			message->GetHead().Add(rpc::Header::app_id, this->mAppId);
 		}

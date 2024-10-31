@@ -329,14 +329,14 @@ namespace rpc
 		this->mBody.clear();
 		switch (this->mProtoHead.Porto)
 		{
-			case rpc::Porto::String:
-				break;
+			case rpc::Porto::None:
 			case rpc::Porto::Protobuf:
+				this->SetProto(rpc::Porto::Protobuf);
 				return message->SerializeToString(&mBody);
 			case rpc::Porto::Json:
+			case rpc::Porto::String:
 				return pb::util::MessageToJsonString(*message, &mBody).ok();
 		}
-		this->SetProto(rpc::Porto::Protobuf);
 		return message->SerializeToString(&mBody);
 	}
 }

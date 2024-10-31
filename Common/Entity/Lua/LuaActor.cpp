@@ -290,7 +290,7 @@ namespace acs
 		}
 		if (targetServer == nullptr)
 		{
-			luaL_error(lua, "alloctor %s fail", name.c_str());
+			luaL_error(lua, "allocator %s fail", name.c_str());
 			return 0;
 		}
 		lua_pushinteger(lua, targetServer->GetSrvId());

@@ -51,7 +51,7 @@ namespace acs
 		{
 			return code;
 		}
-		if(!message->WriteMessage(rpc::Porto::Protobuf, &request))
+		if(!message->WriteMessage(&request))
 		{
 			return XCode::SerializationFailure;
 		}
@@ -82,7 +82,7 @@ namespace acs
 		{
 			return XCode::MakeTcpRequestFailure;
 		}
-		if(!message->WriteMessage(rpc::Porto::Protobuf, &request))
+		if(!message->WriteMessage(&request))
 		{
 			return XCode::SerializationFailure;
 		}
@@ -139,7 +139,7 @@ namespace acs
 		{
 			return code;
 		}
-		if(!message->WriteMessage(rpc::Porto::Protobuf, &request))
+		if(!message->WriteMessage(&request))
 		{
 			return XCode::SerializationFailure;
 		}
@@ -171,7 +171,6 @@ namespace acs
 		{
 			return code;
 		}
-		message->SetProto(rpc::Type::None);
 		if (!methodConfig->Response.empty())
 		{
 			message->TempHead().Add("res", methodConfig->Response);
@@ -195,7 +194,6 @@ namespace acs
 			{
 				if (!methodConfig->Request.empty())
 				{
-					message->SetProto(rpc::Porto::Protobuf);
 					const std::string& name = methodConfig->Request;
 					pb::Message* request = this->mProto->Read(lua, name, idx);
 					if (request == nullptr)

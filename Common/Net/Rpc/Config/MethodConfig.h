@@ -20,9 +20,9 @@ namespace acs
 	class RpcMethodConfig final : public MethodConfig
 	{
 	public:
-		int Net; //使用的网络
-		int Proto;
-		int Forward;	//转发策略 0固定转发，1随机转发到某一个机器
+		char Net; //使用的网络
+		char Proto;
+		char Forward;	//转发策略 0固定转发，1随机转发到某一个机器
 		bool IsOpen;
         bool IsDebug;
 		bool IsClient;  //是否能被客户端调用

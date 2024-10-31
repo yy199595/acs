@@ -12,6 +12,7 @@
     },
     "ChatSystem.OnChat": {
         "Net" : "kcp",
+        "Proto" : "json",
         "Async": true,
         "IsClient": true,
         "Request": "c2s.chat.request"
