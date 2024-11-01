@@ -152,7 +152,7 @@ namespace math
 	{
 	public:
 		NumberPool() : mIndex(0) { }
-		NumberPool(T start) : mIndex(start) { }
+		explicit NumberPool(T start) : mIndex(start) { }
 	public:
 		inline T BuildNumber()
 		{

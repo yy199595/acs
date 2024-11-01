@@ -10,10 +10,11 @@
 #include "Entity/Component/IComponent.h"
 
 using asio_udp = asio::ip::udp;
-constexpr int UDP_SHORT_COUNT = std::numeric_limits<unsigned short>::max();
+
 
 namespace udp
 {
+	constexpr int BUFFER_COUNT = 1200;
 	class IClient
 	{
 	public:

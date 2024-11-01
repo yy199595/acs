@@ -16,7 +16,7 @@ namespace udp
 
 	void Server::StartReceive()
 	{
-		this->mSocket.async_receive_from(this->mRecvBuffer.prepare(UDP_SHORT_COUNT),
+		this->mSocket.async_receive_from(this->mRecvBuffer.prepare(udp::BUFFER_COUNT),
 				this->mSenderPoint, [this](const asio::error_code& code, size_t size)
 				{
 					if (code.value() != Asio::OK)
@@ -39,7 +39,7 @@ namespace udp
 								rpcPacket->SetNet(rpc::Net::Udp);
 								Asio::Context& ctx = acs::App::GetContext();
 								rpcPacket->TempHead().Add(rpc::Header::udp_addr, fmt::format("{}:{}", ip, port));
-								asio::post(ctx, [this, msg = rpcPacket.release()] { this->mComponent->OnMessage(msg, msg); });
+								asio::post(ctx, [this, msg = rpcPacket.release()] { this->mComponent->OnMessage(msg, nullptr); });
 							}
 						}
 					}

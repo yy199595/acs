@@ -7,8 +7,11 @@ else ()
 endif ()
 
 add_definitions(-w) #忽略警告
+add_definitions(-D ASIO_HAS_CHRONO)
 add_definitions(-D ASIO_STANDALONE)
-
+add_definitions(-D ASIO_HAS_MOVE)
+add_definitions(-D ASIO_HAS_THREADS)
+add_definitions(-D ASIO_HAS_STD_THREAD)
 if (MSVC)
     add_definitions(-D _WIN32_WINNT=0x0601)
     add_compile_options(/W4 /wd4100 /wd4127 /wd4819)

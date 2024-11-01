@@ -17,7 +17,7 @@ namespace kcp
 		void Send(tcp::IProto *message) final;
 		void Send(const char *buf, int len) final;
 		inline long long GetLastTime() const { return this->mLastTime; }
-		int Decode(const char * message, int len, std::array<char, KCP_BUFFER_SIZE> & buffer);
+		int Decode(const char * message, int len, std::array<char, kcp::BUFFER_COUNT> & buffer);
 		inline const std::string & GetAddress() const { return this->mAddress;}
 	private:
 		ikcpcb * mKcp;

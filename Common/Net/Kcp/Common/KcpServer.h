@@ -30,8 +30,8 @@ namespace kcp
 		asio::streambuf mSendBuffer;
 		asio::ip::udp::socket mSocket;
 		asio::ip::udp::endpoint mSenderPoint;
-		std::array<char, KCP_BUFFER_SIZE> mRecvBuffer;
-		std::array<char, KCP_BUFFER_SIZE> mDecodeBuffer;
+		std::array<char, kcp::BUFFER_COUNT> mRecvBuffer;
+		std::array<char, kcp::BUFFER_COUNT> mDecodeBuffer;
 		std::unordered_map<std::string, std::unique_ptr<kcp::Session>> mClients;
 	};
 }

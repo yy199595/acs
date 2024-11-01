@@ -50,7 +50,7 @@ namespace udp
 
 	void Client::StartReceive()
 	{
-		this->mSocket.async_receive_from(this->mRecvBuffer.prepare(UDP_SHORT_COUNT),
+		this->mSocket.async_receive_from(this->mRecvBuffer.prepare(udp::BUFFER_COUNT),
 				this->mLocalEndpoint, [this](const asio::error_code& code, size_t size)
 				{
 					if (code.value() == Asio::OK)

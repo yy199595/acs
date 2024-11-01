@@ -70,10 +70,11 @@ namespace kcp
 			return iter->second.get();
 		}
 		kcp::Session* kcpSession = nullptr;
-		std::unique_ptr<kcp::Session> session
-				= std::make_unique<kcp::Session>(this->mSocket, this->mSenderPoint);
-		kcpSession = session.get();
-		this->mClients.emplace(address, std::move(session));
+		std::unique_ptr<kcp::Session> session = std::make_unique<kcp::Session>(this->mSocket, this->mSenderPoint);
+		{
+			kcpSession = session.get();
+			this->mClients.emplace(address, std::move(session));
+		}
 		CONSOLE_LOG_DEBUG("kcp client:{} connect server", address)
 		return kcpSession;
 	}
@@ -101,19 +102,18 @@ namespace kcp
 		{
 			return;
 		}
-		rpc::Packet * rpcPacket = new rpc::Packet();
+		std::unique_ptr<rpc::Packet> rpcPacket = std::make_unique<rpc::Packet>();
 		{
 			if(!rpcPacket->Decode(this->mDecodeBuffer.data(), len))
 			{
-				delete rpcPacket;
 				CONSOLE_LOG_ERROR("{}", std::string(this->mRecvBuffer.data(), len))
 				return;
 			}
 			rpcPacket->SetNet(rpc::Net::Kcp);
 			rpcPacket->TempHead().Add(rpc::Header::kcp_addr, address);
 		}
-		asio::post(acs::App::GetContext(), [this, rpcPacket]() {
-			this->mComponent->OnMessage(rpcPacket, nullptr);
+		asio::post(acs::App::GetContext(), [this, request = rpcPacket.release()] {
+			this->mComponent->OnMessage(request, nullptr);
 		});
 	}
 }

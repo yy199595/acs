@@ -11,9 +11,9 @@ namespace kcp
 	{
 		this->mKcp = ikcp_create(0x01, this);
 		this->mKcp->output = kcp::OnKcpSend;
-		ikcp_nodelay(this->mKcp, 1, 10, 2, 1);
 		this->mLastTime = help::Time::NowSec();
-		ikcp_wndsize(this->mKcp, KCP_BUFFER_SIZE, KCP_BUFFER_SIZE);
+		ikcp_wndsize(this->mKcp, kcp::BUFFER_COUNT, kcp::BUFFER_COUNT);
+		ikcp_nodelay(this->mKcp, 1, kcp::REFRESH_INTERVAL, kcp::RESEND, 1);
 		this->mAddress = fmt::format("{}:{}", endpoint.address().to_string(), endpoint.port());
 	}
 
@@ -22,12 +22,12 @@ namespace kcp
 		this->mSocket.send_to(asio::buffer(buf, len), this->mRemote);
 	}
 
-	int Session::Decode(const char* message, int len, std::array<char, KCP_BUFFER_SIZE>& buffer)
+	int Session::Decode(const char* message, int len, std::array<char, kcp::BUFFER_COUNT>& buffer)
 	{
 		ikcp_input(this->mKcp, message, len);
 		this->mLastTime = help::Time::NowSec();
 		//LOG_DEBUG("[{}] receive message count={}", this->mAddress, len)
-		return ikcp_recv(this->mKcp, buffer.data(), KCP_BUFFER_SIZE);
+		return ikcp_recv(this->mKcp, buffer.data(), kcp::BUFFER_COUNT);
 	}
 
 	void Session::Send(tcp::IProto* message)
@@ -36,9 +36,10 @@ namespace kcp
 
 		int len = (int)this->mSendBuffer.size();
 		const char* msg = asio::buffer_cast<const char*>(this->mSendBuffer.data());
-		ikcp_send(this->mKcp, msg, len);
-		this->mSendBuffer.consume(len);
-
+		{
+			ikcp_send(this->mKcp, msg, len);
+			this->mSendBuffer.consume(len);
+		}
 		delete message;
 	}
 

@@ -16,8 +16,8 @@ namespace kcp
 	{
 		this->mKcp = ikcp_create(0x01, this);
 		this->mKcp->output = kcp::OnKcpSend;
-		ikcp_nodelay(this->mKcp, 1, 10, 2, 1);
-		ikcp_wndsize(this->mKcp, KCP_BUFFER_SIZE, KCP_BUFFER_SIZE);
+		ikcp_wndsize(this->mKcp, kcp::BUFFER_COUNT, kcp::BUFFER_COUNT);
+		ikcp_nodelay(this->mKcp, 1, kcp::REFRESH_INTERVAL, kcp::RESEND, 1);
 	}
 
 	void Client::Send(const char* buf, int len)
@@ -58,7 +58,7 @@ namespace kcp
 
 	void Client::StartReceive()
 	{
-		this->mSocket.async_receive_from(this->mReceiveBuffer.prepare(KCP_BUFFER_SIZE),
+		this->mSocket.async_receive_from(this->mReceiveBuffer.prepare(kcp::BUFFER_COUNT),
 				this->mLocalEndpoint, [this](const asio::error_code& code, size_t size)
 				{
 					if (code.value() != Asio::OK)
@@ -73,7 +73,7 @@ namespace kcp
 					const char * msg = asio::buffer_cast<const char *>(this->mReceiveBuffer.data());
 
 					ikcp_input(this->mKcp, msg, (int)size);
-					int messageLen = ikcp_recv(this->mKcp, this->mDecodeBuffer.data(), KCP_BUFFER_SIZE);
+					int messageLen = ikcp_recv(this->mKcp, this->mDecodeBuffer.data(), kcp::BUFFER_COUNT);
 					//CONSOLE_LOG_DEBUG("client receive message : {}", messageLen);
 					if(messageLen > 0)
 					{
