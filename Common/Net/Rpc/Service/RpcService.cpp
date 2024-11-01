@@ -81,9 +81,11 @@ namespace acs
 					return XCode::Ok;
 				case rpc::Porto::Json:
 				{
-					const char * data = message.GetBody().c_str();
-					const size_t size = message.GetBody().size();
-					lua::yyjson::write(lua, data, size);
+					const std::string & data = message.GetBody();
+					if(!lua::yyjson::write(lua, data.c_str(), data.size()))
+					{
+						return XCode::ParseJsonFailure;
+					}
 					break;
 				}
 				case rpc::Porto::String:
