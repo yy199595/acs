@@ -18,7 +18,7 @@ function Main:OnComplete()
 
     local app = require("App")
     local log = require("Log")
-    print(app:AddListen(nil, "kcp", "127.0.0.1:10004"))
+    print(app:AddListen(nil, "kcp", "127.0.0.1:7787"))
     for i = 1, 10 do
         coroutine.sleep(200)
         local code, _ = app:Call(nil, "ChatSystem.OnChat", {
