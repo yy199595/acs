@@ -100,6 +100,7 @@ namespace acs
 			case rpc::Type::Logout:
 			{
 				std::string address;
+				code = XCode::Failure;
 				if(request->GetHead().Get(rpc::Header::kcp_addr, address))
 				{
 					this->mKcpServer->RemoveSession(address);
