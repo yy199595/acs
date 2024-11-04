@@ -44,6 +44,19 @@ namespace kcp
 		return true;
 	}
 
+	void Server::RemoveSession(const std::string& address)
+	{
+		asio::post(this->mContext, [this, address]()
+		{
+			auto iter = this->mClients.find(address);
+			if(iter == this->mClients.end())
+			{
+				return;
+			}
+			this->mClients.erase(iter);
+		});
+	}
+
 	void Server::Update()
 	{
 		long long t = help::Time::NowMil();

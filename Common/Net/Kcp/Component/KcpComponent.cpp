@@ -97,6 +97,15 @@ namespace acs
 		int code = XCode::Ok;
 		switch(request->GetType())
 		{
+			case rpc::Type::Logout:
+			{
+				std::string address;
+				if(request->GetHead().Get(rpc::Header::kcp_addr, address))
+				{
+					this->mKcpServer->RemoveSession(address);
+				}
+				break;
+			}
 			case rpc::Type::Request:
 				code = this->OnRequest(request);
 				break;

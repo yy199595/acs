@@ -24,6 +24,12 @@ namespace kcp
 	{
 		asio::error_code code;
 		this->mSocket.send_to(asio::buffer(buf, len), this->mRemoteEndpoint, 0, code);
+		if(code.value() != Asio::OK)
+		{
+			unsigned short port = this->mLocalEndpoint.port();
+			const std::string ip = this->mLocalEndpoint.address().to_string();
+			LOG_ERROR("kcp send [{}:{}] =>{}", ip, port, code.message());
+		}
 	}
 
 	void Client::Send(tcp::IProto* message)

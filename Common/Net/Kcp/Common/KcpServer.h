@@ -16,6 +16,7 @@ namespace kcp
 		Server(asio::io_context & io, Component * component, unsigned short port);
 	public:
 		void StartReceive();
+		void RemoveSession(const std::string & address);
 		bool Send(const std::string & addr, tcp::IProto * message);
 		inline asio::ip::udp::socket & Socket() { return this->mSocket; }
 	private:
