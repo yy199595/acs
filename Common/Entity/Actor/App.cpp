@@ -55,7 +55,7 @@ namespace acs
 	bool App::LoadComponent()
 	{
 		std::string path;
-		if(this->mConfig.GetPath("cluster", path))
+		if (this->mConfig.GetPath("cluster", path))
 		{
 			TextConfig* config = new ClusterConfig();
 			if (!config->LoadConfig(path))
@@ -83,7 +83,8 @@ namespace acs
 		});
 #endif
 		this->mTaskComponent->Start(&App::StartAllComponent, this);
-		if(this->mActorComponent == nullptr) {
+		if (this->mActorComponent == nullptr)
+		{
 			return true;
 		}
 		return this->mActorComponent->AddServer(this);
@@ -150,7 +151,7 @@ namespace acs
 	int App::Run()
 	{
 		srand(help::Time::NowMil());
-		if(!this->LoadLang())
+		if (!this->LoadLang())
 		{
 			return XServerCode::ConfError;
 		}
@@ -213,9 +214,7 @@ namespace acs
 
 					if (logicStartTime - logicSecondTime >= 1000)
 					{
-#ifdef __OS_MAC__
-						this->Hotfix();
-#elif __OS_WIN__
+#if defined(__OS_WIN__) || defined(__OS_WIN__)
 						this->Hotfix();
 #endif
 						this->mTickCount++;
@@ -226,12 +225,12 @@ namespace acs
 						{
 							component->OnSecondUpdate(this->mTickCount);
 						}
-					
-						if((nowTime / 1000) >= this->mNextNewDayTime)
+
+						if ((nowTime / 1000) >= this->mNextNewDayTime)
 						{
 							std::vector<ISystemNewDay*> systemNewDays;
 							this->GetComponents<ISystemNewDay>(systemNewDays);
-							for(ISystemNewDay * systemNewDay : systemNewDays)
+							for (ISystemNewDay* systemNewDay: systemNewDays)
 							{
 								systemNewDay->OnNewDay();
 							}
@@ -318,14 +317,14 @@ namespace acs
 #ifdef __DEBUG__
 		CONSOLE_LOG_ERROR("start close {}", this->Name());
 #else
-        long long t1 = help::Time::NowMil();
+		long long t1 = help::Time::NowMil();
 #endif
-		std::vector<IAppStop *> stopComponent;
+		std::vector<IAppStop*> stopComponent;
 		this->GetComponents<IAppStop>(stopComponent);
 
-		for(IAppStop * component : stopComponent)
+		for (IAppStop* component: stopComponent)
 		{
-            if(component != nullptr)
+			if (component != nullptr)
 			{
 				component->OnAppStop(); //保存数据
 			}
@@ -334,18 +333,18 @@ namespace acs
 		std::vector<IDestroy*> components;
 		this->GetComponents<IDestroy>(components);
 		std::reverse(components.begin(), components.end());
-		for(size_t index = 0; index < components.size(); index++)
+		for (size_t index = 0; index < components.size(); index++)
 		{
 			IDestroy* nextComponent = nullptr;
 			IDestroy* component = components.at(index);
-			if(index < components.size() -1)
+			if (index < components.size() - 1)
 			{
 				nextComponent = components.at(index + 1);
 			}
 			std::string name2("null");
 			float process = (index + 1) / (float)components.size();
-			const std::string & name1 = dynamic_cast<Component*>(component)->GetName();
-			if(nextComponent != nullptr)
+			const std::string& name1 = dynamic_cast<Component*>(component)->GetName();
+			if (nextComponent != nullptr)
 			{
 				name2 = dynamic_cast<Component*>(nextComponent)->GetName();
 			}
@@ -392,7 +391,7 @@ namespace acs
 				LOG_DEBUG("[{}ms] => {}.Start", timer.GetMs(), name);
 			}
 		}
-        startComponents.clear();
+		startComponents.clear();
 		this->mStatus = ServerStatus::Start; //开始帧循环
 		std::vector<IComplete*> completeComponents;
 		this->GetComponents<IComplete>(completeComponents);
@@ -402,7 +401,6 @@ namespace acs
 			Component* component = dynamic_cast<Component*>(complete);
 			const std::string& name = dynamic_cast<Component*>(component)->GetName();
 			const long long timerId = timerComponent->DelayCall(1000 * 10, [component]()
-
 			{
 				LOG_ERROR("{0}.Complete call timeout", component->GetName());
 			});
@@ -413,7 +411,7 @@ namespace acs
 			}
 			timerComponent->CancelTimer(timerId);
 		}
-        completeComponents.clear();
+		completeComponents.clear();
 		this->mStatus = ServerStatus::Ready;
 		long long t = help::Time::NowMil() - this->mStartTime;
 #ifndef __DEBUG__

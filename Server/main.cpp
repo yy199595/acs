@@ -181,13 +181,14 @@ int main(int argc, char** argv)
 	RegisterAll();
 	std::string path;
 	ServerConfig config;
-	CONSOLE_ERROR_RETURN_CODE(os::System::Init(argc, argv), -1);
-#ifdef __DEBUG__
+	os::System::Init(argc, argv);
 	os::System::GetEnv("ID", id);
-#else
-	CONSOLE_ERROR_RETURN_CODE(os::System::GetEnv("ID", id), -1);
-#endif
-	CONSOLE_ERROR_RETURN_CODE(os::System::GetEnv("CONFIG", path), -1);
-	CONSOLE_ERROR_RETURN_CODE(!path.empty() && config.LoadConfig(path), -1);
-	return (new App(id, config))->Run();
+	os::System::GetEnv("CONFIG", path);
+	{
+		if(!config.LoadConfig(path))
+		{
+			return -1;
+		}
+		return (new App(id, config))->Run();
+	}
 }
