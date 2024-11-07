@@ -20,8 +20,8 @@ namespace help
 
 
 		constexpr int MinSecond = 60;
-		constexpr int HourSecond = 3600;
-		constexpr int DaySecond = 86400;
+		constexpr int HourSecond = 60 * 60;
+		constexpr int DaySecond = 60 * 60 * 24;
 
         extern long long ScaleTotalTime;
 

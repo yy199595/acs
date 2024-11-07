@@ -164,8 +164,8 @@ namespace Lua
 	struct PtrProxy
 	{
 	 public:
-		PtrProxy(T* t)
-			: mNativePtr(t), mIsDestory(false)
+		explicit PtrProxy(T* t)
+			: mNativePtr(t), mIsDestory(true)
 		{
 		}
 
@@ -176,6 +176,9 @@ namespace Lua
 
 		~PtrProxy()
 		{
+			if(this->mIsDestory) {
+				delete this->mNativePtr;
+			}
 		}
 
 	 public:
@@ -197,18 +200,14 @@ namespace Lua
 
 		static void Destory(lua_State* lua, int index)
 		{
+			PtrProxy<T>* p = nullptr;
 			if (lua_isuserdata(lua, index))
 			{
-				PtrProxy<T>* p = (PtrProxy<T>*)(lua_touserdata(lua, index));
-				if (p != nullptr)
-				{
-					if (p->mIsDestory)
-					{
-						delete p->mNativePtr;
-						return;
-					}
-					p->~PtrProxy();
-				}
+				p = (PtrProxy<T>*)(lua_touserdata(lua, index));
+			}
+			if(p != nullptr)
+			{
+				p->~PtrProxy();
 			}
 		}
 

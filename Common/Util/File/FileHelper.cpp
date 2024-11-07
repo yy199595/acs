@@ -17,6 +17,7 @@
 
 #pragma warning(disable : 4996)
 
+
 namespace help
 {
 	bool fs::GetFileLine(const std::string& path, size_t& size)
@@ -57,23 +58,21 @@ namespace help
 		{
 			return false;
 		}
-		double fileSize = size;
-		const size_t KB = 1024;
-		const size_t MB = 1024 * 1024;
-		const size_t GB = 1024 * 1024 * 1024;
-		if(fileSize >= GB)
+
+		double fileSize = (double)size;
+		if(fileSize >= help::fs::GB)
 		{
-			double val = fileSize / GB;
+			double val = fileSize / help::fs::GB;
 			str = fmt::format("{:.1f}GB", (float)val);
 		}
-		else if(fileSize >= MB)
+		else if(fileSize >= help::fs::MB)
 		{
-			double val = fileSize / MB;
+			double val = fileSize / help::fs::MB;
 			str = fmt::format("{:.1f}MB", (float)val);
 		}
-		else if(fileSize >= KB)
+		else if(fileSize >= help::fs::KB)
 		{
-			double val = fileSize / KB;
+			double val = fileSize / help::fs::KB;
 			str = fmt::format("{:.1f}KB", (float)val);
 		}
 		else

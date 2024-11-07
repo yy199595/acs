@@ -24,6 +24,10 @@
 #include "Util/Tools/LuaString.h"
 #include "Udp/Common/UdpClient.h"
 #include "Kcp/Common/KcpClient.h"
+#ifdef __ENABLE_OPEN_SSL__
+#include "Util/Ssl/rsa.h"
+#include "Util/Ssl/LuaRsa.h"
+#endif
 using namespace Lua;
 namespace acs
 {
@@ -131,6 +135,14 @@ namespace acs
 		classProxyHelper6.BeginRegister<kcp::Client>();
 		classProxyHelper6.PushExtensionFunction("New", Lua::KcpSock::New);
 		classProxyHelper6.PushExtensionFunction("Send", Lua::KcpSock::Send);
+
+#ifdef __ENABLE_OPEN_SSL__
+		Lua::ClassProxyHelper classProxyHelper7(this->mLuaEnv, "rsa");
+		classProxyHelper7.BeginRegister<ssl::RSAEncryptor>();
+		classProxyHelper7.PushExtensionFunction("New", Lua::rsa::New);
+		classProxyHelper7.PushExtensionFunction("Encode", Lua::rsa::Encode);
+		classProxyHelper7.PushExtensionFunction("Decode", Lua::rsa::Decode);
+#endif
 	}
 
 	bool LuaComponent::LateAwake()

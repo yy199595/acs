@@ -7,6 +7,10 @@ namespace help
 {
     namespace fs
     {
+		constexpr size_t KB = 1024;
+		constexpr size_t MB = 1024 * 1024;
+		constexpr size_t GB = 1024 * 1024 * 1024;
+		
 		extern bool FileIsExist(const std::string &path);
 		extern bool GetFileSize(std::fstream & fs, size_t & size);
 		extern long long GetLastWriteTime(const std::string & path);
