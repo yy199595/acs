@@ -65,6 +65,7 @@ namespace acs
 				code = XCode::CallFunctionNotExist;
 				break;
 			}
+			LOG_DEBUG("call ({}) by {}", fullName, methodConfig->NetName);
 			if(!this->mRpcServices.Has(methodConfig->Service))
 			{
 				code = XCode::CallServiceNotFound;

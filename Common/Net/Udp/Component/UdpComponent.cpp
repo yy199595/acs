@@ -33,18 +33,20 @@ namespace acs
 			const ServerConfig & config = this->mApp->Config();
 			if(config.Get("listen", jsonObject) && jsonObject->Get("udp",jsonObject1))
 			{
-				LOG_CHECK_RET_FALSE(jsonObject1->Get("port",this->mPort));
-				LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
-				LOG_CHECK_RET_FALSE(this->mThread = this->GetComponent<ThreadComponent>())
-				LOG_CHECK_RET_FALSE(this->mDispatch = this->GetComponent<DispatchComponent>());
-				Asio::Context & context = this->mThread->GetContext();
+				if(jsonObject1->Get("port",this->mPort))
 				{
-					this->mUdpServer = std::make_unique<udp::Server>(context, this, this->mPort);
+					LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
+					LOG_CHECK_RET_FALSE(this->mThread = this->GetComponent<ThreadComponent>())
+					LOG_CHECK_RET_FALSE(this->mDispatch = this->GetComponent<DispatchComponent>());
+					Asio::Context& context = this->mThread->GetContext();
+					{
+						this->mUdpServer = std::make_unique<udp::Server>(context, this, this->mPort);
+					}
+					this->mUdpServer->StartReceive();
+					const std::string& host = config.Host();
+					LOG_INFO("listen [udp:{}] ok", this->mPort);
+					return this->mApp->AddListen("udp", fmt::format("{}:{}", host, this->mPort));
 				}
-				this->mUdpServer->StartReceive();
-				const std::string & host = config.Host();
-				LOG_INFO("listen [udp:{}] ok", this->mPort);
-				return this->mApp->AddListen("udp", fmt::format("{}:{}", host, this->mPort));
 			}
 			return true;
 		}

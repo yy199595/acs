@@ -27,7 +27,8 @@
             "WatchComponent",
             "HttpApiComponent",
             "ClientComponent",
-            "KcpComponent"
+            "KcpComponent",
+            "UdpComponent"
         ]
     }
 }

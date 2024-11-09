@@ -42,9 +42,8 @@ namespace acs
 						this->mKcpServer = std::make_unique<kcp::Server>(context, this, this->mPort);
 					}
 					const std::string& host = config.Host();
-					LOG_INFO("listen [kcp:{}] ok", this->mPort);
-					asio::post(context, [this]()
-					{ this->mKcpServer->StartReceive(); });
+					LOG_INFO("kcp listen [{}] ok", this->mPort);
+					asio::post(context, [this]() { this->mKcpServer->StartReceive(); });
 					return this->mApp->AddListen("kcp", fmt::format("{}:{}", host, this->mPort));
 				}
 			}

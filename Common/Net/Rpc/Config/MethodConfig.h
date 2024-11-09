@@ -27,10 +27,13 @@ namespace acs
         bool IsDebug;
 		bool IsClient;  //是否能被客户端调用
 		bool SendToClient;	//消息是否发送到客户端
-		std::string NetName;
 		std::string Request;
 		std::string Response;
 		std::string FullName;
+	public:
+		std::string NetName;
+		std::string ProtoName;
+		std::string ForwardName;
 	};
 
 	class HttpMethodConfig final : public MethodConfig

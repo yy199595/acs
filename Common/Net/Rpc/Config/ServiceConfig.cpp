@@ -102,11 +102,9 @@ namespace acs
 			}
 			this->mAllServices.insert(methodConfig->Service);
 
-
-			std::string net, forward, proto;
-			if (value->Get("Net", net))
+			if (value->Get("Net", methodConfig->NetName))
 			{
-				auto iter = NetMap.find(net);
+				auto iter = NetMap.find(methodConfig->NetName);
 				if (iter == NetMap.end())
 				{
 					return false;
@@ -114,9 +112,9 @@ namespace acs
 				methodConfig->Net = iter->second;
 			}
 
-			if (value->Get("Forward", forward))
+			if (value->Get("Forward", methodConfig->ForwardName))
 			{
-				auto iter = ForwardMap.find(forward);
+				auto iter = ForwardMap.find(methodConfig->ForwardName);
 				if (iter == ForwardMap.end())
 				{
 					return false;
@@ -124,9 +122,9 @@ namespace acs
 				methodConfig->Forward = iter->second;
 			}
 
-			if (value->Get("Proto", proto))
+			if (value->Get("Proto", methodConfig->ProtoName))
 			{
-				auto iter = ProtoMap.find(proto);
+				auto iter = ProtoMap.find(methodConfig->ProtoName);
 				if (iter == ProtoMap.end())
 				{
 					return false;
