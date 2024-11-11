@@ -50,7 +50,6 @@ endif ()
 
 
 include_directories(Libs/protobuf/src)
-include_directories(Libs/spdlog/include)
 include_directories(Libs/asio/include)
 include_directories(Libs/mysql/include)
 include_directories(Libs/leveldb/include)
