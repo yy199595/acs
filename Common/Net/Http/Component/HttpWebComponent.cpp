@@ -119,7 +119,6 @@ namespace acs
 			this->SendResponse(sockId, HttpStatus::UPGRADE_REQUIRED);
 			return;
 		}
-		HttpStatus httpStatus = HttpStatus::OK;
 		const std::string& path = request->GetUrl().Path();
 		//response->Header().Add("Date", help::Time::GetDateGMT());
 		const HttpMethodConfig* httpConfig = HttpConfig::Inst()->GetMethodConfig(path);
