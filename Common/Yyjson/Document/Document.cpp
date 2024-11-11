@@ -132,6 +132,15 @@ namespace json
 		return yyjson_mut_obj_add_bool(this->mDoc, this->mValue, k, v);
 	}
 
+	bool w::Value::Add(const char* k, char v)
+	{
+		if(!this->IsObject())
+		{
+			return false;
+		}
+		return yyjson_mut_obj_add_int(this->mDoc, this->mValue, k, v);
+	}
+
 	bool w::Value::Add(const char* key, size_t v)
 	{
 		return this->Add(key, (long long)v);
@@ -480,6 +489,17 @@ namespace json
 				return false;
 			}
 			v = yyjson_get_int(val);
+			return true;
+		}
+
+		bool Value::Get(const char* k, char& v) const
+		{
+			yyjson_val* val = yyjson_obj_get(this->mValue, k);
+			if (!yyjson_is_int(val))
+			{
+				return false;
+			}
+			v = (char)yyjson_get_int(val);
 			return true;
 		}
 

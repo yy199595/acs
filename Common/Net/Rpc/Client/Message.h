@@ -34,6 +34,10 @@ namespace rpc
 	public:
 		bool Decode(const char * message, int len);
 	public:
+		bool EncodeToJson(std::string & json);
+		bool DecodeFromJson(json::r::Value & value);
+		bool DecodeFromJson(const char * message, int len);
+	public:
 		int GetCode(int code = 1) const;
 		std::unique_ptr<Packet> Clone() const;
 		inline Head& GetHead() { return this->mHead; }
@@ -66,7 +70,6 @@ namespace rpc
 	public:
 		bool ParseMessage(pb::Message* message);
 		bool WriteMessage(const pb::Message* message);
-		bool WriteMessage(char proto, const pb::Message* message);
 	public:
 		bool ParseMessage(json::r::Document* message);
 		bool WriteMessage(json::w::Document* message);

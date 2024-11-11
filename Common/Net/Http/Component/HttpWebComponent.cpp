@@ -116,23 +116,24 @@ namespace acs
 		}
 		if(request->ConstHeader().Has("Upgrade"))
 		{
-			this->Send(sockId, HttpStatus::UPGRADE_REQUIRED);
+			this->SendResponse(sockId, HttpStatus::UPGRADE_REQUIRED);
 			return;
 		}
+		HttpStatus httpStatus = HttpStatus::OK;
 		const std::string& path = request->GetUrl().Path();
 		//response->Header().Add("Date", help::Time::GetDateGMT());
 		const HttpMethodConfig* httpConfig = HttpConfig::Inst()->GetMethodConfig(path);
 		//LOG_DEBUG("[{}:{}]", request->GetUrl().Method(), request->GetUrl().ToStr());
 		if (httpConfig == nullptr)
 		{
-			this->Send(sockId, this->OnNotFound(request, response));
+			this->SendResponse(sockId, this->OnNotFound(request, response));
 			return;
 		}
 		else
 		{
 			if (!httpConfig->Open)
 			{
-				this->Send(sockId, HttpStatus::NOT_FOUND);
+				this->SendResponse(sockId, HttpStatus::NOT_FOUND);
 				return;
 			}
 			if (!request->IsMethod(httpConfig->Type))
@@ -141,10 +142,10 @@ namespace acs
 				{
 					response->Header().Add("Access-Control-Allow-Methods", httpConfig->Type);
 					response->Header().Add("Access-Control-Allow-Headers", httpConfig->Headers);
-					this->Send(sockId, HttpStatus::OK);
+					this->SendResponse(sockId, HttpStatus::OK);
 					return;
 				}
-				this->Send(sockId, HttpStatus::METHOD_NOT_ALLOWED);
+				this->SendResponse(sockId, HttpStatus::METHOD_NOT_ALLOWED);
 				return;
 			}
 			if(!request->IsMethod("GET"))
@@ -152,7 +153,7 @@ namespace acs
 				HttpStatus status = this->CreateHttpData(httpConfig, request);
 				if (status != HttpStatus::OK)
 				{
-					this->Send(sockId, status);
+					this->SendResponse(sockId, status);
 					return;
 				}
 			}
@@ -161,7 +162,7 @@ namespace acs
 			{
 				if(this->AuthToken(httpConfig, request) != HttpStatus::OK)
 				{
-					this->Send(sockId, HttpStatus::UNAUTHORIZED);
+					this->SendResponse(sockId, HttpStatus::UNAUTHORIZED);
 					return;
 				}
 			}
@@ -171,7 +172,7 @@ namespace acs
                 request->GetIp(ip);
                 if(httpConfig->WhiteList.find(ip) == httpConfig->WhiteList.end())
                 {
-                    this->Send(sockId, HttpStatus::NOT_FOUND);
+                    this->SendResponse(sockId, HttpStatus::NOT_FOUND);
                     return;
                 }
             }
@@ -188,7 +189,6 @@ namespace acs
 			const acs::HttpMethodConfig* httpConfig, http::Request* request)
 	{
 		std::string cont_type;
-		//LOG_WARN("{} => {}", httpConfig->Path, request->Header().ToString())
 		if(!request->Header().GetContentType(cont_type))
 		{
 			return HttpStatus::BAD_REQUEST;
@@ -292,7 +292,7 @@ namespace acs
 		std::string ip;
 		request->Header().Get(http::Header::RealIp, ip);
 		LOG_ERROR("[{}:{}] {}", ip, request->GetUrl().Method(), request->ToString());
-		this->Send(request->GetSockId(), HttpStatus::NOT_FOUND);
+		this->SendResponse(request->GetSockId(), HttpStatus::NOT_FOUND);
 	}
 
 	void HttpWebComponent::OnApi(const acs::HttpMethodConfig* httpConfig,
@@ -364,7 +364,7 @@ namespace acs
 			int status = recordComponent->OnRequest(*config, *request);
 			if(status != (int)HttpStatus::OK && status != XCode::Ok)
 			{
-				this->Send(request->GetSockId(), (HttpStatus)status);
+				this->SendResponse(request->GetSockId(), (HttpStatus)status);
 				return;
 			}
 		}
@@ -415,7 +415,7 @@ namespace acs
 		{
 			recordComponent->OnRequestDone(*config, *request, *response);
 		}
-		this->Send(request->GetSockId(), code);
+		this->SendResponse(request->GetSockId(), code);
 	}
 
 	void HttpWebComponent::OnRecord(json::w::Document& document)

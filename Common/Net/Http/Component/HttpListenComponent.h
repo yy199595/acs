@@ -39,11 +39,12 @@ namespace acs
 	public:
 		HttpListenComponent();
 	protected:
-		bool Send(int fd);
 		void ClearClients();
 		bool ReadMessageBody(int id);
 		void StartClose(int id, int) final;
-		bool Send(int fd, HttpStatus code);
+	protected:
+		bool SendResponse(int fd);
+		bool SendResponse(int fd, HttpStatus code);
 	private:
 		bool OnListen(tcp::Socket * socket) final;
 		void OnCloseSocket(int, int code) final;

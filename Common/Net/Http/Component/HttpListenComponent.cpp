@@ -91,7 +91,7 @@ namespace acs
 		}
 	}
 
-	bool HttpListenComponent::Send(int id)
+	bool HttpListenComponent::SendResponse(int id)
 	{
 		http::SessionClient* httpClient = nullptr;
 		if (!this->mHttpClients.Get(id, httpClient))
@@ -102,7 +102,7 @@ namespace acs
 		return httpClient->StartWriter();
 	}
 
-	bool HttpListenComponent::Send(int id, HttpStatus code)
+	bool HttpListenComponent::SendResponse(int id, HttpStatus code)
 	{
 		http::SessionClient* httpClient = nullptr;
 		if (!this->mHttpClients.Get(id, httpClient))

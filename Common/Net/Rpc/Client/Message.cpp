@@ -141,6 +141,62 @@ namespace rpc
 		return true;
 	}
 
+	bool Packet::EncodeToJson(std::string& json)
+	{
+		json::w::Document document;
+		auto headObject = document.AddObject("head");
+		{
+			for(auto iter = this->mHead.Begin(); iter != this->mHead.End(); iter++)
+			{
+				headObject->Add(iter->first.c_str(), iter->second);
+			}
+		}
+		if(this->mBody.empty())
+		{
+			return true;
+		}
+		document.Add("data", this->mBody);
+		document.Add("_t", this->mProtoHead.Type);
+		document.Add("_p", this->mProtoHead.Porto);
+		return true;
+	}
+
+	bool Packet::DecodeFromJson(json::r::Value& document)
+	{
+		std::unique_ptr<json::r::Value> headValue;
+		if(!document.Get("head", headValue))
+		{
+			return false;
+		}
+		std::vector<const char *> keys;
+		if(!headValue->GetKeys(keys))
+		{
+			return false;
+		}
+		for(const char * key : keys)
+		{
+			std::string value;
+			if(headValue->Get(key, value))
+			{
+				this->mHead.Add(key, value);
+			}
+		}
+		document.Get("data", this->mBody);
+		document.Get("_t", this->mProtoHead.Type);
+		document.Get("_p", this->mProtoHead.Porto);
+		return true;
+	}
+
+	bool Packet::DecodeFromJson(const char* message, int len)
+	{
+		json::r::Document document;
+		if(!document.Decode(message, len))
+		{
+			return false;
+		}
+		return this->DecodeFromJson(document);
+	}
+
     int Packet::OnRecvMessage(std::istream& os, size_t size)
     {
 		thread_local static char buffer[128] = {0};
@@ -312,12 +368,6 @@ namespace rpc
 		std::string json;
 		jsonWriter.Encode(&json);
 		return json;
-	}
-
-	bool Packet::WriteMessage(char proto, const pb::Message* message)
-	{
-		this->SetProto(proto);
-		return this->WriteMessage(message);
 	}
 
     bool Packet::WriteMessage(const pb::Message* message)

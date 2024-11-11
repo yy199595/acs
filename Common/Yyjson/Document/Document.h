@@ -34,6 +34,7 @@ namespace json
 		public:
 			bool Add(const char* k, int v);
 			bool Add(const char *k, bool v);
+			bool Add(const char *k, char v);
 			bool Add(const char* key, size_t v);
 			bool Add(const char* key, float value);
 			bool Add(const char* key, double value);
@@ -106,6 +107,7 @@ namespace json
 			size_t GetKeys(std::vector<const char *> & key) const;
 		public:
 			bool Get(const char* k, int& v) const;
+			bool Get(const char* k, char& v) const;
 			bool Get(const char *k, bool & v) const;
 			bool Get(const char* k, long long & v) const;
 			bool Get(const char* k, std::string& v) const;
