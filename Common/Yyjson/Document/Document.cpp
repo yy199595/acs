@@ -132,6 +132,15 @@ namespace json
 		return yyjson_mut_obj_add_bool(this->mDoc, this->mValue, k, v);
 	}
 
+	bool w::Value::AddNull(const char* key)
+	{
+		if(!this->IsObject())
+		{
+			return false;
+		}
+		return yyjson_mut_obj_add_null(this->mDoc, this->mValue, key);
+	}
+
 	bool w::Value::Add(const char* k, char v)
 	{
 		if(!this->IsObject())

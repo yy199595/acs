@@ -32,6 +32,7 @@ namespace json
 			bool PushJson(const std::string & str);
 			bool Push(const char* str, size_t size);
 		public:
+			bool AddNull(const char* key);
 			bool Add(const char* k, int v);
 			bool Add(const char *k, bool v);
 			bool Add(const char *k, char v);
