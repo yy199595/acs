@@ -1,10 +1,12 @@
 
 require("XCode")
+local type = _G.type
 local xpcall = _G.xpcall
 local app = require("App")
 local cor_new = coroutine.create
 local cor_resume = coroutine.resume
 local log_error = require("Log").OnError
+local CODE_OK = XCode.Ok
 local CODE_CALL_FAIL = XCode.CallLuaFunctionFail
 local CODE_NOT_EXIST = XCode.CallFunctionNotExist
 
@@ -15,10 +17,16 @@ local RpcService = { }
 local rpc = function(class, func, request, taskSource)
 	local status, code, response = xpcall(func, log_error, class, request)
 	if not status then
+		code = CODE_CALL_FAIL
 		taskSource:SetRpc(CODE_CALL_FAIL, code)
-	else
-		taskSource:SetRpc(code, response)
 	end
+	if code == nil then
+		code = CODE_OK
+	elseif type(code) == "table" then
+		response = code
+		code = CODE_OK
+	end
+	taskSource:SetRpc(code, response)
 end
 
 local async = function(class, func, task, ...)

@@ -2,18 +2,29 @@
 local app = require("App")
 local Module = require("Module")
 
+local type = _G.type
 local xpcall = xpcall
 local http_services = { }
 local cor_new = coroutine.create
 local cor_resume = coroutine.resume
 local log_error = require("Log").OnError
 
+local CODE_OK = XCode.Ok
+local CODE_CALL_FAIL = XCode.CallLuaFunctionFail
+local CODE_NOT_EXIST = XCode.CallFunctionNotExist
+
 local HttpService = Module()
 
 local context = function(class, func, request, taskSource)
     local status, code, result = xpcall(func, log_error, class, request)
     if not status then
-        code = XCode.CallLuaFunctionFail
+        code = CODE_CALL_FAIL
+    end
+    if type == nil then
+        code = CODE_OK
+    elseif type(code) == "table" then
+        result = code
+        code = CODE_OK
     end
     taskSource:SetHttp(code, result)
 end
@@ -21,11 +32,11 @@ end
 function HttpService:__Invoke(name, request)
     local func = self[name]
     if func == nil then
-        return XCode.CallFunctionNotExist
+        return CODE_NOT_EXIST
     else
         local status, code, response = xpcall(func, log_error, self, request)
         if not status then
-            return XCode.CallLuaFunctionFail
+            return CODE_NOT_EXIST
         end
         return code, response
     end
@@ -34,7 +45,7 @@ end
 function HttpService:__Call(name, request, taskSource)
     local func = self[name]
     if func == nil then
-        taskSource:SetHttp(XCode.CallLuaFunctionFail)
+        taskSource:SetHttp(CODE_NOT_EXIST)
     else
         local co = cor_new(context)
         cor_resume(co, self, func, request, taskSource)

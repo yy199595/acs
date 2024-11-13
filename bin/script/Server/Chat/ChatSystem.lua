@@ -40,7 +40,6 @@ function Chat:Chat(request)
 end
 
 function Chat:Request(request)
-    local json = require("util.json")
     table.print(request)
 end
 

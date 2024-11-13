@@ -302,8 +302,13 @@ namespace acs
 		Server* server = App::Inst();
 		if (lua_isnumber(lua, 1))
 		{
-			long long id = luaL_checkinteger(lua, 1);
+			int id = (int)luaL_checkinteger(lua, 1);
 			server = App::ActorMgr()->GetServer(id);
+			if(server == nullptr)
+			{
+				server = new Server(id, "server");
+				App::ActorMgr()->AddServer(server);
+			}
 		}
 		std::string name(luaL_checkstring(lua, 2));
 		std::string address(luaL_checkstring(lua, 3));
