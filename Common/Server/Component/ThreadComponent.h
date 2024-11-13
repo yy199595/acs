@@ -14,17 +14,15 @@ namespace acs
 	class ThreadComponent final : public Component
 	{
 	public:
-		ThreadComponent() = default;
+		ThreadComponent();
 		~ThreadComponent() final;
 	public:
 		Asio::Context& GetContext();
 		tcp::Socket* CreateSocket();
 		tcp::Socket* CreateSocket(const std::string & addr);
 		tcp::Socket* CreateSocket(const std::string& ip, unsigned short port);
-		void CreateSockets(std::queue<tcp::Socket*> & sockets, int count = 10);
 #ifdef __ENABLE_OPEN_SSL__
 		tcp::Socket* CreateSocket(Asio::ssl::Context & ssl);
-		void CreateSockets(std::queue<tcp::Socket*>& sockets, Asio::ssl::Context& ssl, int count = 10);
 #endif
 	public:
 		void CloseThread();

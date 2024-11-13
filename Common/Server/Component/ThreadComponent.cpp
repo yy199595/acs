@@ -7,6 +7,8 @@
 #include"Util/Tools/TimeHelper.h"
 namespace acs
 {
+	ThreadComponent::ThreadComponent() : mThreadCount(0) { }
+
     bool ThreadComponent::Awake()
 	{
 #ifndef ONLY_MAIN_THREAD
@@ -62,39 +64,6 @@ namespace acs
 		}
 #endif
 	}
-
-	void ThreadComponent::CreateSockets(std::queue<tcp::Socket*>& sockets, int count)
-	{
-#ifdef ONLY_MAIN_THREAD
-		Asio::Context & io = this->mApp->GetContext();
-#else
-		custom::AsioThread * asioThread;
-		this->mNetThreads.Move(asioThread);
-		Asio::Context& io = asioThread->Context();
-#endif
-		for(int index = 0; index < count; index++)
-		{
-			sockets.emplace(new tcp::Socket(io));
-		}
-	}
-
-#ifdef __ENABLE_OPEN_SSL__
-	void ThreadComponent::CreateSockets(std::queue<tcp::Socket*>& sockets, 
-		Asio::ssl::Context& ssl, int count)
-	{
-#ifdef ONLY_MAIN_THREAD
-		Asio::Context& io = this->mApp->GetContext();
-#else
-		custom::AsioThread* asioThread;
-		this->mNetThreads.Move(asioThread);
-		Asio::Context& io = asioThread->Context();
-#endif
-		for (int index = 0; index < count; index++)
-		{
-			sockets.emplace(new tcp::Socket(io, ssl));
-		}
-	}
-#endif
 
 	tcp::Socket * ThreadComponent::CreateSocket()
 	{
