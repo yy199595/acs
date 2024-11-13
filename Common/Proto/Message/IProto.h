@@ -4,6 +4,7 @@
 
 #ifndef APP_IPROTO_H
 #define APP_IPROTO_H
+#include<memory>
 #include<ostream>
 #include<istream>
 #include<string>
