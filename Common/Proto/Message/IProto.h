@@ -8,6 +8,7 @@
 #include<ostream>
 #include<istream>
 #include<string>
+#include<cstring>
 #include<unordered_map>
 #include <utility>
 struct lua_State;
