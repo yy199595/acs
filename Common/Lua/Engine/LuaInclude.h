@@ -165,7 +165,7 @@ namespace Lua
 	{
 	 public:
 		explicit PtrProxy(T* t)
-			: mNativePtr(t), mIsDestory(true)
+			: mNativePtr(t), mIsDestory(false)
 		{
 		}
 
