@@ -1,6 +1,6 @@
 {
     "ChatSystem.Ping": {
-        "Net" : "rpc",
+        "Net" : "tcp",
         "Async": false,
         "IsClient": true
     },
