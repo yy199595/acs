@@ -45,7 +45,6 @@ namespace acs
 	bool CoroutineComponent::Awake()
 	{
 		this->mRunContext = nullptr;
-#ifdef __COR_SHARED_STACK__
 		for (Stack& stack : this->mSharedStack)
 		{
 			stack.co = 0;
@@ -54,7 +53,6 @@ namespace acs
 			memset(stack.p, 0, STACK_SIZE);
 			stack.top = (char*)stack.p + STACK_SIZE;
 		}
-#endif
         return true;
 	}
 

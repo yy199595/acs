@@ -26,14 +26,11 @@ namespace acs
 		coroutine->mFunction = nullptr;
 		coroutine->mState = CorState::Ready;
 		coroutine->mCoroutineId = this->mNumPool.BuildNumber();
-#ifdef __COR_SHARED_STACK__
 		coroutine->sid = coroutine->mCoroutineId & (SHARED_STACK_NUM - 1);
-#else
 		coroutine->mStack.size = STACK_SIZE;
 		coroutine->mStack.p = new char[STACK_SIZE];
 		assert(coroutine->mStack.p);
 		//memset(coroutine->mStack.p, STACK_SIZE, 0);
-#endif
 		this->mCoroutines.emplace(coroutine->mCoroutineId, coroutine);
 		return coroutine;
 	}

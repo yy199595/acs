@@ -32,9 +32,7 @@ namespace acs
 	 public:
 		void Invoke();
 	 public:
-#ifdef 	__COR_SHARED_STACK__
 		int sid;
-#endif
         Stack mStack;
         CorState mState;
         tb_context_t mContext;

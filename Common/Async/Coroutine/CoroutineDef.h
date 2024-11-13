@@ -6,13 +6,9 @@
 #include"Util/Tools/NumberBuilder.h"
 #include"Entity/Component/IComponent.h"
 #include"Context/context.h"
-#ifdef 	__COR_SHARED_STACK__
-#define STACK_SIZE (1024 * 1024)
-#define SHARED_STACK_NUM 1 //共享栈个数
-#else
-#define STACK_SIZE (1024 * 1024)
-#endif
 
+#define STACK_SIZE (1024 * 1024)
+#define SHARED_STACK_NUM 8 //共享栈个数
 
 #define COR_POOL_COUNT 100
 
