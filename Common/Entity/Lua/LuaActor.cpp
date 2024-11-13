@@ -40,11 +40,24 @@ namespace acs
 	{
 		size_t size = 0;
 		json::r::Document document;
-		const char * json = luaL_checklstring(l, 1, &size);
-		if(!document.Decode(json, size))
+		if(lua_isstring(l, 1))
 		{
-			luaL_error(l, "decode json fail");
-			return 0;
+			const char* json = luaL_checklstring(l, 1, &size);
+			if (!document.Decode(json, size))
+			{
+				luaL_error(l, "decode json fail");
+				return 0;
+			}
+		}
+		else if(lua_istable(l, 1))
+		{
+			std::string json;
+			lua::yyjson::read(l, 1, json);
+			if (!document.Decode(json))
+			{
+				luaL_error(l, "decode json fail");
+				return 0;
+			}
 		}
 		ActorComponent * actMgr = App::ActorMgr();
 		Server * server = actMgr->MakeServer(document);
@@ -304,18 +317,14 @@ namespace acs
 		{
 			int id = (int)luaL_checkinteger(lua, 1);
 			server = App::ActorMgr()->GetServer(id);
-			if(server == nullptr)
+			if (server == nullptr)
 			{
-				server = new Server(id, "server");
-				App::ActorMgr()->AddServer(server);
+				luaL_error(lua, "not find server:%d", id);
+				return 0;
 			}
 		}
 		std::string name(luaL_checkstring(lua, 2));
 		std::string address(luaL_checkstring(lua, 3));
-		if (server == nullptr)
-		{
-			return 0;
-		}
 		lua_pushboolean(lua, server->AddListen(name, address));
 		return 1;
 	}

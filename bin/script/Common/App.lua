@@ -121,4 +121,15 @@ function App:GetListen(id, name)
     return app.GetListen(id, name)
 end
 
+---@param id number
+---@param name string
+---@param listens table
+function App:MakeServer(id, name, listen)
+    return app.MakeServer({
+        id = id,
+        name = name,
+        listen = listen
+    })
+end
+
 return App

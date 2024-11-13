@@ -11,19 +11,7 @@ local HOST = "http://127.0.0.1:8088"
 local Main = Module()
 
 function Main:Awake()
-    local str = require("util.str")
 
-    local t1 = os.clock()
-    for i = 1, 100000 do
-        str.format("bool={} int={} str={}", true, 10, "1011")
-    end
-    local t2 = os.clock()
-    for i = 1, 100000 do
-        string.format("bool=%s int=%s str=%s", true, 10, "1011")
-    end
-    local t3 = os.clock()
-
-    print(string.format("====%s  ----------%s", t2 - t1, t3 - t2))
 end
 
 function Main:OnUpdate()
