@@ -31,17 +31,16 @@ namespace acs
 			std::unique_ptr<json::r::Value> jsonObject;
 			std::unique_ptr<json::r::Value> jsonObject1;
 			const ServerConfig & config = this->mApp->Config();
+			LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
+			LOG_CHECK_RET_FALSE(this->mThread = this->GetComponent<ThreadComponent>())
+			LOG_CHECK_RET_FALSE(this->mDispatch = this->GetComponent<DispatchComponent>());
 			if(config.Get("listen", jsonObject) && jsonObject->Get("udp",jsonObject1))
 			{
 				if(jsonObject1->Get("port",this->mPort))
 				{
-					LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
-					LOG_CHECK_RET_FALSE(this->mThread = this->GetComponent<ThreadComponent>())
-					LOG_CHECK_RET_FALSE(this->mDispatch = this->GetComponent<DispatchComponent>());
 					Asio::Context& context = this->mThread->GetContext();
-					{
-						this->mUdpServer = std::make_unique<udp::Server>(context, this, this->mPort);
-					}
+					this->mUdpServer = std::make_unique<udp::Server>(context, this, this->mPort);
+
 					this->mUdpServer->StartReceive();
 					const std::string& host = config.Host();
 					LOG_INFO("listen [udp:{}] ok", this->mPort);

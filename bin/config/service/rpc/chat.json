@@ -1,5 +1,6 @@
 {
     "ChatSystem.Ping": {
+        "Net" : "rpc",
         "Async": false,
         "IsClient": true
     },
@@ -7,6 +8,7 @@
         "Async" : true
     },
     "ChatSystem.Request" : {
+        "Net" : "udp",
         "Async" : true,
         "Request" : "google.protobuf.Struct"
     },
