@@ -239,4 +239,25 @@ namespace http
 	};
 }
 
+namespace http
+{
+	class BinContent : public Content
+	{
+	public:
+		BinContent();
+	private:
+		void WriteToLua(lua_State *l) final;
+		bool OnDecode() final { return true; }
+		int OnWriteBody(std::ostream &os) final;
+		void OnWriteHead(std::ostream &os) final;
+		int OnRecvMessage(std::istream &is, size_t size) final;
+		int ContentLength() final { return (int)this->mBody.size();}
+		http::ContentType GetContentType() const final { return http::ContentType::PB; }
+	public:
+		const std::string & GetContent() const { return this->mBody; }
+	private:
+		std::string mBody;
+	};
+}
+
 #endif //APP_CONTENT_H

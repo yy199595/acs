@@ -29,14 +29,12 @@ namespace acs
 		if (this->mRunContext != nullptr)
 		{
 			this->mRunContext->Invoke();
-#ifdef __COR_SHARED_STACK__
 			int sid = this->mRunContext->sid;
 			Stack& stack = this->mSharedStack[sid];
 			if (stack.co == this->mRunContext->mCoroutineId)
 			{
 				stack.co = 0;
 			}
-#endif
 			this->mCorPool.Push(this->mRunContext);
 		}
 		tb_context_jump(this->mMainContext, nullptr);
@@ -175,7 +173,7 @@ namespace acs
 		TaskContext* coroutine = this->mCorPool.Get(id);
 		if (coroutine == nullptr)
 		{
-			LOG_ERROR("coroutine context is null {}", id);
+			LOG_FATAL("coroutine context is null {}", id);
 			return;
 		}
         char* top = this->mSharedStack[coroutine->sid].top;

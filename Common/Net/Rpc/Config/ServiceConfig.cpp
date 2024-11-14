@@ -54,7 +54,7 @@ namespace acs
 				{ "tcp",   rpc::Net::Tcp },
 				{ "udp",   rpc::Net::Udp },
 				{ "kcp",   rpc::Net::Kcp },
-				{ "Http",  rpc::Net::Http },
+				{ "http",  rpc::Net::Http },
 				{ "redis", rpc::Net::Redis },
 		};
 
@@ -65,8 +65,8 @@ namespace acs
 		};
 
 		std::unordered_map<std::string, char> ProtoMap{
-				{ "json",   rpc::Porto::Json },
-				{ "string",  rpc::Porto::String },
+				{ "json",     rpc::Porto::Json },
+				{ "string",   rpc::Porto::String },
 				{ "protobuf", rpc::Porto::Protobuf },
 		};
 
@@ -132,7 +132,7 @@ namespace acs
 				methodConfig->Proto = iter->second;
 			}
 
-			if(!value->Get("Request", methodConfig->Request))
+			if (!value->Get("Request", methodConfig->Request))
 			{
 				methodConfig->Proto = rpc::Porto::None;
 			}
@@ -145,6 +145,7 @@ namespace acs
 			value->Get("IsDebug", methodConfig->IsDebug);
 			value->Get("IsClient", methodConfig->IsClient);
 			value->Get("SendToClient", methodConfig->SendToClient);
+
 			ClusterConfig::Inst()->GetServerName(service, methodConfig->Server);
 		}
 		return true;
@@ -206,6 +207,14 @@ namespace acs
 			{
 				config->FullName = name;
 				methodConfig = config.get();
+				std::string urlName = help::Str::Tolower(name);
+				size_t pos = urlName.find('.');
+				if (pos != std::string::npos)
+				{
+					urlName[pos] = '/';
+					urlName.insert(0, "/");
+					this->mRpcUrlConfig.emplace(urlName, methodConfig);
+				}
 				this->mRpcMethodConfig.emplace(name, std::move(config));
 			}
 		}
@@ -229,6 +238,12 @@ namespace acs
 	{
 		auto iter = this->mRpcMethodConfig.find(fullName);
 		return iter != this->mRpcMethodConfig.end() ? iter->second.get() : nullptr;
+	}
+
+	const RpcMethodConfig* RpcConfig::GetMethodByUrl(const std::string& url) const
+	{
+		auto iter = this->mRpcUrlConfig.find(url);
+		return iter != this->mRpcUrlConfig.end() ? iter->second : nullptr;
 	}
 }
 

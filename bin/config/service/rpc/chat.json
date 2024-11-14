@@ -1,6 +1,6 @@
 {
     "ChatSystem.Ping": {
-        "Net" : "tcp",
+        "Net" : "http",
         "Async": false,
         "IsClient": true
     },

@@ -11,6 +11,7 @@ namespace http
 	struct Config
 	{
 		bool Auth;
+		bool RpcDebug;
 		std::string Root;
 		std::string Index;
 		std::string Upload;

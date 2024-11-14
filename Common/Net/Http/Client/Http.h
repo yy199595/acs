@@ -109,7 +109,7 @@ namespace http
 
 	enum ContentType
 	{
-		NONE = 0, FROM = 1, JSON = 2, TEXT = 3, FILE = 4, CHUNKED = 5, MULTIPAR = 6, XML = 7
+		NONE = 0, FROM = 1, JSON = 2, TEXT = 3, FILE = 4, CHUNKED = 5, MULTIPAR = 6, XML = 7, PB = 8
 	};
 
 	namespace query

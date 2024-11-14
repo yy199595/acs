@@ -10,7 +10,6 @@
 #include"Rpc/Client/Message.h"
 #include"Cache/Common/LruCache.h"
 #include"Http/Common/ContentType.h"
-
 namespace http
 {
 	class Content;
@@ -31,9 +30,10 @@ namespace http
 
 namespace acs
 {
+	class RpcMethodConfig;
     class HttpMethodConfig;
 	typedef IRequest<HttpMethodConfig, http::Request, http::Response> HttpHandlerComponent;
-    class HttpWebComponent final : public HttpListenComponent, public IServerRecord
+	class HttpWebComponent final : public HttpListenComponent, public IServerRecord
     {
     public:
         HttpWebComponent();
@@ -43,6 +43,7 @@ namespace acs
 		void OnRecord(json::w::Document& document) final;
 	private:
 		bool ReadHttpConfig();
+		void OnApi(const RpcMethodConfig* config, http::Request * request, http::Response * response);
 		void OnApi(const HttpMethodConfig* config, http::Request * request, http::Response * response);
 		void Invoke(const HttpMethodConfig* config, http::Request * request, http::Response * response);
 	private:
@@ -58,9 +59,11 @@ namespace acs
 		http::Config mConfig;
 		http::ContentFactory mFactory;
 		std::vector<std::string> mRoots;
+		class DispatchComponent * mDispatch;
 		class CoroutineComponent * mCorComponent;
 		std::vector<HttpHandlerComponent *> mRecordComponents;
 		std::unordered_map<std::string, std::string> mDefaultHeader;
+		custom::HashMap<std::string, class RpcService *> mRpcServices;
 		custom::HashMap<std::string, class HttpService *> mHttpServices;
 	};
 }

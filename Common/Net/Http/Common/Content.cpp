@@ -14,24 +14,30 @@
 #include "Core/Map/HashMap.h"
 #include "Util/Crypt/Base64Helper.h"
 #include "Util/Tools/Guid.h"
+
 namespace http
 {
 	std::string UrlDecode(const std::string& url)
 	{
 		std::ostringstream decoded;
-		for (size_t i = 0; i < url.size(); ++i) {
-			if (url[i] == '%' && i + 2 < url.size()) {
+		for (size_t i = 0; i < url.size(); ++i)
+		{
+			if (url[i] == '%' && i + 2 < url.size())
+			{
 				std::istringstream hex(url.substr(i + 1, 2));
 				int value;
-				if (hex >> std::hex >> value) {
+				if (hex >> std::hex >> value)
+				{
 					decoded << static_cast<char>(value);
 					i += 2;
 				}
 			}
-			else if (url[i] == '+') {
+			else if (url[i] == '+')
+			{
 				decoded << ' ';
 			}
-			else {
+			else
+			{
 				decoded << url[i];
 			}
 		}
@@ -39,13 +45,13 @@ namespace http
 	}
 
 
-    bool FromContent::OnDecode()
-    {
+	bool FromContent::OnDecode()
+	{
 		std::string encoded = UrlDecode(this->mContent);
 		{
 			std::vector<std::string> result;
 			help::Str::Split(encoded, '&', result);
-			for (const std::string& filed : result)
+			for (const std::string& filed: result)
 			{
 				size_t pos1 = filed.find('=');
 				if (pos1 == std::string::npos)
@@ -64,23 +70,23 @@ namespace http
 				}
 			}
 		}
-        return true;
-    }
+		return true;
+	}
 
 	std::string FromContent::ToStr() const
 	{
 		size_t index = 0;
 		std::stringstream ss;
 		auto iter = this->mParameters.begin();
-		for(; iter != this->mParameters.end(); iter++, index++)
+		for (; iter != this->mParameters.end(); iter++, index++)
 		{
-			const std::string & key = iter->second;
-			if(key == http::query::Permission || key == http::query::UserId || key == http::query::ClubId)
+			const std::string& key = iter->second;
+			if (key == http::query::Permission || key == http::query::UserId || key == http::query::ClubId)
 			{
 				continue;
 			}
 			ss << iter->first << "=" << iter->second;
-			if(index != this->mParameters.size() -1)
+			if (index != this->mParameters.size() - 1)
 			{
 				ss << "&";
 			}
@@ -91,36 +97,36 @@ namespace http
 	void FromContent::WriteToLua(lua_State* lua)
 	{
 		lua_createtable(lua, 0, (int)this->mParameters.size());
-		for(auto iter = this->mParameters.begin(); iter != this->mParameters.end(); iter++)
+		for (auto iter = this->mParameters.begin(); iter != this->mParameters.end(); iter++)
 		{
-			const std::string & key = iter->first;
-			const std::string & value = iter->second;
+			const std::string& key = iter->first;
+			const std::string& value = iter->second;
 			lua_pushlstring(lua, value.c_str(), value.size());
 			lua_setfield(lua, -2, key.c_str());
 		}
 	}
 
-    bool FromContent::Add(const std::string &k, int v)
-    {
-        auto iter = this->mParameters.find(k);
-		if(iter != this->mParameters.end())
+	bool FromContent::Add(const std::string& k, int v)
+	{
+		auto iter = this->mParameters.find(k);
+		if (iter != this->mParameters.end())
 		{
-            return false;
-        }
-        this->mParameters.emplace(k, std::to_string(v));
-        return true;
-    }
+			return false;
+		}
+		this->mParameters.emplace(k, std::to_string(v));
+		return true;
+	}
 
-    bool FromContent::Add(const std::string &k, const std::string &v)
-    {
-        auto iter = this->mParameters.find(k);
-        if(iter != this->mParameters.end())
-        {
-            return false;
-        }
-        this->mParameters.emplace(k, v);
-        return true;
-    }
+	bool FromContent::Add(const std::string& k, const std::string& v)
+	{
+		auto iter = this->mParameters.find(k);
+		if (iter != this->mParameters.end())
+		{
+			return false;
+		}
+		this->mParameters.emplace(k, v);
+		return true;
+	}
 
 	void FromContent::Set(const std::string& k, int v)
 	{
@@ -132,31 +138,31 @@ namespace http
 		this->mParameters[k] = v;
 	}
 
-    bool FromContent::Get(std::vector<std::string> &keys) const
-    {
-        if(this->mParameters.empty())
-        {
-            return false;
-        }
-        keys.reserve(this->mParameters.size());
-        auto iter = this->mParameters.begin();
-        for(; iter != this->mParameters.end(); iter++)
-        {
-            keys.emplace_back(iter->first);
-        }
-        return true;
-    }
+	bool FromContent::Get(std::vector<std::string>& keys) const
+	{
+		if (this->mParameters.empty())
+		{
+			return false;
+		}
+		keys.reserve(this->mParameters.size());
+		auto iter = this->mParameters.begin();
+		for (; iter != this->mParameters.end(); iter++)
+		{
+			keys.emplace_back(iter->first);
+		}
+		return true;
+	}
 
-    bool FromContent::Get(const std::string &key, std::string &value) const
-    {
-        auto iter = this->mParameters.find(key);
-        if(iter == this->mParameters.end())
-        {
-            return false;
-        }
-        value = iter->second;
-        return true;
-    }
+	bool FromContent::Get(const std::string& key, std::string& value) const
+	{
+		auto iter = this->mParameters.find(key);
+		if (iter == this->mParameters.end())
+		{
+			return false;
+		}
+		value = iter->second;
+		return true;
+	}
 
 	bool FromContent::Decode(const std::string& content)
 	{
@@ -164,54 +170,54 @@ namespace http
 		return this->OnDecode();
 	}
 
-    bool FromContent::Get(const std::string& k, int& value) const
-    {
-        auto iter = this->mParameters.find(k);
-        if(iter == this->mParameters.end())
-        {
-            return false;
-        }
-        const std::string & str = iter->second;
-        return help::Math::ToNumber(str, value);
-    }
+	bool FromContent::Get(const std::string& k, int& value) const
+	{
+		auto iter = this->mParameters.find(k);
+		if (iter == this->mParameters.end())
+		{
+			return false;
+		}
+		const std::string& str = iter->second;
+		return help::Math::ToNumber(str, value);
+	}
 
 	bool FromContent::Get(const std::string& k, long long& value) const
 	{
 		auto iter = this->mParameters.find(k);
-		if(iter == this->mParameters.end())
+		if (iter == this->mParameters.end())
 		{
 			return false;
 		}
-		const std::string & str = iter->second;
+		const std::string& str = iter->second;
 		return help::Math::ToNumber(str, value);
 	}
 
-    void FromContent::OnWriteHead(std::ostream &os)
-    {
-        os << http::Header::ContentType << ": " << http::Header::FORM << "\r\n";
-    }
+	void FromContent::OnWriteHead(std::ostream& os)
+	{
+		os << http::Header::ContentType << ": " << http::Header::FORM << "\r\n";
+	}
 
-    int FromContent::OnRecvMessage(std::istream & is, size_t size)
-    {
+	int FromContent::OnRecvMessage(std::istream& is, size_t size)
+	{
 		std::unique_ptr<char[]> buffer(new char[size]);
 		size_t count = is.readsome(buffer.get(), size);
-        this->mContent.assign(buffer.get(), count);
-		if(this->mContent.size() >= 1024)
+		this->mContent.assign(buffer.get(), count);
+		if (this->mContent.size() >= 1024)
 		{
 			return tcp::PacketLong;
 		}
 		return tcp::ReadSomeMessage;
-    }
+	}
 
 	std::string FromContent::Serialize() const
 	{
 		size_t index = 0;
 		std::stringstream ss;
 		auto iter = this->mParameters.begin();
-		for(; iter != this->mParameters.end(); iter++, index++)
+		for (; iter != this->mParameters.end(); iter++, index++)
 		{
 			ss << iter->first << "=" << iter->second;
-			if(index < this->mParameters.size() - 1)
+			if (index < this->mParameters.size() - 1)
 			{
 				ss << "&";
 			}
@@ -222,8 +228,8 @@ namespace http
 
 namespace http
 {
-    int JsonContent::OnRecvMessage(std::istream& is, size_t size)
-    {
+	int JsonContent::OnRecvMessage(std::istream& is, size_t size)
+	{
 		size_t count = 0;
 		char buffer[512] = { 0 };
 		do
@@ -233,14 +239,13 @@ namespace http
 			{
 				this->mJson.append(buffer, count);
 			}
-		} 
-		while (count > 0);		
+		} while (count > 0);
 		return tcp::ReadSomeMessage;
 	}
 
 	void JsonContent::OnWriteHead(std::ostream& os)
 	{
-		if(this->mJson.empty())
+		if (this->mJson.empty())
 		{
 			this->Decode(this->mJson);
 		}
@@ -259,8 +264,8 @@ namespace http
 		lua::yyjson::write(lua, this->mValue);
 	}
 
-    int JsonContent::OnWriteBody(std::ostream &os)
-    {
+	int JsonContent::OnWriteBody(std::ostream& os)
+	{
 		os.write(this->mJson.c_str(), this->mJson.size());
 		return 0;
 	}
@@ -279,8 +284,7 @@ namespace http
 			{
 				this->mXml.append(buffer, count);
 			}
-		} 
-		while (count > 0);
+		} while (count > 0);
 		return tcp::ReadSomeMessage;
 	}
 
@@ -296,7 +300,7 @@ namespace http
 
 	void XMLContent::WriteToLua(lua_State* lua)
 	{
-		
+
 	}
 
 	int XMLContent::OnWriteBody(std::ostream& os)
@@ -321,7 +325,7 @@ namespace http
 
 	int TextContent::OnWriteBody(std::ostream& os)
 	{
-		if(!this->mContent.empty())
+		if (!this->mContent.empty())
 		{
 			//std::cout << this->mContent << std::endl;
 			os.write(this->mContent.c_str(), this->mContent.size());
@@ -339,10 +343,10 @@ namespace http
 	{
 		std::unique_ptr<char[]> buffer = std::make_unique<char[]>(size);
 		size_t count = is.readsome(buffer.get(), size);
-		if(count > 0)
+		if (count > 0)
 		{
 			this->mContent.append(buffer.get(), count);
-			if(this->mContent.size() >= this->mMaxSize)
+			if (this->mContent.size() >= this->mMaxSize)
 			{
 				return tcp::PacketLong;
 			}
@@ -374,7 +378,7 @@ namespace http
 	}
 
 	FileContent::FileContent(std::string t)
-		: mType(std::move(t))
+			: mType(std::move(t))
 	{
 		this->mFileSize = 0;
 		this->mSendSize = 0;
@@ -383,7 +387,7 @@ namespace http
 
 	FileContent::~FileContent()
 	{
-		if(this->mFile.is_open())
+		if (this->mFile.is_open())
 		{
 			this->mFile.close();
 		}
@@ -391,7 +395,7 @@ namespace http
 
 	bool FileContent::OnDecode()
 	{
-		if(this->mFile.is_open())
+		if (this->mFile.is_open())
 		{
 			this->mFile.close();
 		}
@@ -411,9 +415,9 @@ namespace http
 
 	int FileContent::OnRecvMessage(std::istream& is, size_t size)
 	{
-		std::unique_ptr<char []> buff(new char[size]);
+		std::unique_ptr<char[]> buff(new char[size]);
 		size_t count = is.readsome(buff.get(), size);
-		if(count > 0)
+		if (count > 0)
 		{
 			this->mFileSize += count;
 			this->mFile.write(buff.get(), count);
@@ -425,16 +429,16 @@ namespace http
 	bool FileContent::MakeFile(const std::string& path)
 	{
 		std::string director;
-		if(!help::dir::GetDirByPath(path, director))
+		if (!help::dir::GetDirByPath(path, director))
 		{
 			return false;
 		}
-		if(!help::dir::DirectorIsExist(director))
+		if (!help::dir::DirectorIsExist(director))
 		{
 			help::dir::MakeDir(director);
 		}
 		this->mFile.open(path, std::ios::out | std::ios::trunc | std::ios::binary);
-		if(!this->mFile.is_open())
+		if (!this->mFile.is_open())
 		{
 			return false;
 		}
@@ -445,7 +449,7 @@ namespace http
 	bool FileContent::OpenFile(const std::string& path)
 	{
 		this->mFile.open(path, std::ios::in | std::ios::binary);
-		if(!this->mFile.is_open())
+		if (!this->mFile.is_open())
 		{
 			return false;
 		}
@@ -465,7 +469,7 @@ namespace http
 	{
 		thread_local static char buff[1024] = { 0 };
 		size_t size = this->mFile.read(buff, sizeof(buff)).gcount();
-		if(size > 0)
+		if (size > 0)
 		{
 			os.write(buff, size);
 			this->mSendSize += size;
@@ -477,7 +481,7 @@ namespace http
 
 namespace http
 {
-	bool TransferContent::OpenFile(const std::string& path, const std::string & t)
+	bool TransferContent::OpenFile(const std::string& path, const std::string& t)
 	{
 		this->mType = t;
 		this->mPath = path;
@@ -502,7 +506,7 @@ namespace http
 		if (this->mContSize == 0)
 		{
 			std::string lineData;
-			if(!std::getline(buffer, lineData))
+			if (!std::getline(buffer, lineData))
 			{
 				return tcp::ReadDecodeError;
 			}
@@ -510,7 +514,7 @@ namespace http
 			{
 				return tcp::ReadOneLine;
 			}
-			if(!lineData.empty() && lineData.back() == '\r')
+			if (!lineData.empty() && lineData.back() == '\r')
 			{
 				lineData.pop_back();
 			}
@@ -554,7 +558,7 @@ namespace http
 				return 1;
 			}
 		}
-		os  << "0\r\n\r\n";
+		os << "0\r\n\r\n";
 		this->mFile.close();
 		return 0;
 	}
@@ -563,13 +567,13 @@ namespace http
 namespace http
 {
 	MultipartFromContent::MultipartFromContent()
-		: mDone(false), mMaxCount(1024 * 1024 * 5), mReadCount(0)
+			: mDone(false), mMaxCount(1024 * 1024 * 5), mReadCount(0)
 	{
 		this->mLength = 0;
 	}
 
 	bool MultipartFromContent::OnDecode()
-	{		
+	{
 		this->mDone = true;
 		this->mFile.close();
 		return true;
@@ -631,12 +635,12 @@ namespace http
 
 	int MultipartFromContent::OnWriteBody(std::ostream& os)
 	{
-		for (const std::string& value : this->mHeader)
+		for (const std::string& value: this->mHeader)
 		{
 			os << "--" << this->mBoundary << "\r\n";
-			os.write(value.c_str(), value.size());			
+			os.write(value.c_str(), value.size());
 		}
-		
+
 		char buff[1024] = { 0 };
 		while (!this->mFile.eof())
 		{
@@ -646,14 +650,14 @@ namespace http
 			{
 				os.write(buff, len);
 			}
-		}	
+		}
 		os << "\r\n--" << this->mBoundary << "--\r\n";
-	/*	
-			std::stringstream ss;
-			ss << os.rdbuf();
-			std::string str = ss.str();
-			help::fs::WriterFile("./a.json", str);
-		*/
+		/*
+				std::stringstream ss;
+				ss << os.rdbuf();
+				std::string str = ss.str();
+				help::fs::WriterFile("./a.json", str);
+			*/
 		return 0;
 	}
 
@@ -690,11 +694,11 @@ namespace http
 	int MultipartFromContent::OnRecvMessage(std::istream& buffer, size_t size)
 	{
 		this->mReadCount += size;
-		if(this->mMaxCount > 0 && this->mReadCount >= this->mMaxCount)
+		if (this->mMaxCount > 0 && this->mReadCount >= this->mMaxCount)
 		{
 			return tcp::ReadDecodeError;
 		}
-		if(this->mBoundary.empty())
+		if (this->mBoundary.empty())
 		{
 			if (!std::getline(buffer, this->mBoundary))
 			{
@@ -709,13 +713,13 @@ namespace http
 		}
 
 		if (this->mFile.is_open())
-		{			
+		{
 			std::unique_ptr<char[]> buff = std::make_unique<char[]>(size);
 			size_t count = buffer.readsome(buff.get(), size);
 			if (count > 0)
 			{
 				if (strstr(buff.get(), this->mBoundary.c_str()) != NULL)
-				{			
+				{
 					this->mFile.close();
 					return tcp::ReadOneLine;
 				}
@@ -725,14 +729,14 @@ namespace http
 			return tcp::ReadOneLine;
 		}
 
-		std::string line;		
+		std::string line;
 		if (std::getline(buffer, line))
-		{						
+		{
 			if (!line.empty() && line.back() == '\r')
 			{
 				line.pop_back();
 			}
-			
+
 			if (line == this->mBoundary)
 			{
 				return tcp::ReadOneLine;
@@ -758,13 +762,13 @@ namespace http
 				}
 				return tcp::ReadOneLine;
 			}
-			
+
 			if (!this->mFileName.empty())
 			{
 				std::string director;
 				this->mFromData.emplace(this->mFieldName, this->mFileName);
 				this->mPath = fmt::format("{}/{}", this->mDir, this->mFileName);
-				
+
 				if (help::dir::GetDirByPath(this->mPath, director))
 				{
 					help::dir::MakeDir(director);
@@ -776,7 +780,7 @@ namespace http
 				}
 				std::getline(buffer, line);
 				//this->mFileName.clear();
-			}	
+			}
 			else if (!this->mFieldName.empty())
 			{
 				if (!line.empty() && line.back() == '\r')
@@ -790,7 +794,40 @@ namespace http
 				//std::cout << this->mFieldName << ": " << line << std::endl;
 			}
 		}
-		return tcp::ReadOneLine;	
+		return tcp::ReadOneLine;
+	}
+
+	BinContent::BinContent()
+	{
+
+	}
+
+	void BinContent::OnWriteHead(std::ostream& os)
+	{
+		os << http::Header::ContentType << ": " << http::Header::PB << "\r\n";
+		os << http::Header::ContentLength << ": " << this->mBody.size() << "\r\n";
+	}
+
+	int BinContent::OnWriteBody(std::ostream& os)
+	{
+		os.write(this->mBody.c_str(), this->mBody.size());
+		return 0;
+	}
+
+	void BinContent::WriteToLua(lua_State* l)
+	{
+		lua_pushlstring(l, this->mBody.c_str(), this->mBody.size());
+	}
+
+	int BinContent::OnRecvMessage(std::istream& is, size_t size)
+	{
+		std::unique_ptr<char[]> buffer = std::make_unique<char[]>(size);
+		size_t count = is.readsome(buffer.get(), size);
+		if (count > 0)
+		{
+			this->mBody.append(buffer.get(), count);
+		}
+		return tcp::ReadSomeMessage;
 	}
 
 }
