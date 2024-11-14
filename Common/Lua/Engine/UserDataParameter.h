@@ -18,6 +18,11 @@ namespace Lua
 			{
 				assert(false);
 			}
+
+			static void WritePtr(lua_State* lua, T data)
+			{
+				assert(false);
+			}
 		};
 
 		template<typename T>
@@ -76,6 +81,26 @@ namespace Lua
 				}
 				size_t size = sizeof(PtrProxy<T>);
 				new(lua_newuserdata(lua, size))PtrProxy<T>(data);
+				const char* typeName = ClassNameProxy::GetLuaClassName<T>();
+				if (typeName != nullptr)
+				{
+					lua_getglobal(lua, typeName);
+					if (lua_istable(lua, -1))
+					{
+						lua_setmetatable(lua, -2);
+					}
+				}
+			}
+
+			static void WritePtr(lua_State* lua, T* data)
+			{
+				if (data == nullptr)
+				{
+					lua_pushnil(lua);
+					return;
+				}
+				size_t size = sizeof(PtrProxy<T>);
+				new(lua_newuserdata(lua, size))PtrProxy<T>(data, true);
 				const char* typeName = ClassNameProxy::GetLuaClassName<T>();
 				if (typeName != nullptr)
 				{

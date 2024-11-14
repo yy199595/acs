@@ -22,7 +22,6 @@ namespace acs
 		extern int GetServers(lua_State * l);
 		extern int GetConfig(lua_State * l);
 		extern int HasComponent(lua_State *l);
-		extern int AddComponent(lua_State * l);
 		extern int MakeServer(lua_State * l);
 		extern int LuaPushCode(lua_State * l, int code);
 	};

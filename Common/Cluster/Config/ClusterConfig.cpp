@@ -9,18 +9,14 @@ namespace acs
 {
     bool NodeConfig::OnLoadConfig(const json::r::Value &value)
     {
-		this->mServices.clear();
 		this->mComponents.clear();
+		this->mRpcServices.clear();
+		this->mHttpServices.clear();
 		std::vector<std::string> services;
 		std::vector<std::string> components;
-		if(value.Get("Service", services))
-		{
-			this->mServices.insert(services.begin(), services.end());
-		}
-		if(value.Get("Component", components))
-		{
-			this->mComponents.insert(components.begin(), components.end());
-		}
+		value.Get("rpc", this->mRpcServices);
+		value.Get("http", this->mHttpServices);
+		value.Get("component", this->mComponents);
         return true;
     }
 
@@ -33,19 +29,30 @@ namespace acs
         return components.size();
     }
 
-    size_t NodeConfig::GetServices(std::vector<std::string> &services) const
+    size_t NodeConfig::GetRpcServices(std::vector<std::string> &services) const
     {
-        for(const std::string & value : this->mServices)
-        {
-            services.emplace_back(value);
-        }
-        return services.size();
+		services.insert(services.end(), this->mRpcServices.begin(), this->mRpcServices.end());
+		return services.size();
     }
+
+	size_t NodeConfig::GetHttpServices(std::vector<std::string>& services) const
+	{
+		services.insert(services.end(), this->mHttpServices.begin(), this->mHttpServices.end());
+		return services.size();
+	}
 
 	bool NodeConfig::HasService(const std::string& service) const
 	{
-		auto iter = this->mServices.find(service);
-		return iter != this->mServices.end();
+		auto iter = std::find(this->mRpcServices.begin(), this->mRpcServices.end(), service);
+		if(iter == this->mRpcServices.end())
+		{
+			iter = std::find(this->mHttpServices.begin(), this->mHttpServices.end(), service);
+			if(iter == this->mHttpServices.end())
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 }
@@ -71,7 +78,8 @@ namespace acs
 			{
 				nodeConfig->OnLoadConfig(*value);
 				std::vector<std::string> services;
-				nodeConfig->GetServices(services);
+				nodeConfig->GetRpcServices(services);
+				nodeConfig->GetHttpServices(services);
 				for (const std::string& service: services)
 				{
 					this->mServiceNodes[service] = name;

@@ -108,32 +108,34 @@ namespace acs
 	void HttpWebComponent::OnReadHead(http::Request* request, http::Response* response)
 	{
 		int sockId = request->GetSockId();
+		HttpStatus httpStatus = HttpStatus::OK;
 		auto iter = this->mDefaultHeader.begin();
 		for (; iter != this->mDefaultHeader.end(); iter++)
 		{
 			const std::string& key = iter->first;
 			response->Header().Add(key, iter->second);
 		}
-		if(request->ConstHeader().Has("Upgrade"))
+		do
 		{
-			this->SendResponse(sockId, HttpStatus::UPGRADE_REQUIRED);
-			return;
-		}
-		const std::string& path = request->GetUrl().Path();
-		//response->Header().Add("Date", help::Time::GetDateGMT());
-		const HttpMethodConfig* httpConfig = HttpConfig::Inst()->GetMethodConfig(path);
-		//LOG_DEBUG("[{}:{}]", request->GetUrl().Method(), request->GetUrl().ToStr());
-		if (httpConfig == nullptr)
-		{
-			this->SendResponse(sockId, this->OnNotFound(request, response));
-			return;
-		}
-		else
-		{
+			if (request->ConstHeader().Has("Upgrade"))
+			{
+				httpStatus = HttpStatus::UPGRADE_REQUIRED;
+				break;
+			}
+			const std::string& path = request->GetUrl().Path();
+			//response->Header().Add("Date", help::Time::GetDateGMT());
+			const HttpMethodConfig* httpConfig = HttpConfig::Inst()->GetMethodConfig(path);
+			//LOG_DEBUG("[{}:{}]", request->GetUrl().Method(), request->GetUrl().ToStr());
+			if (httpConfig == nullptr)
+			{
+				httpStatus = this->OnNotFound(request, response);
+				break;
+			}
+
 			if (!httpConfig->Open)
 			{
-				this->SendResponse(sockId, HttpStatus::NOT_FOUND);
-				return;
+				httpStatus = HttpStatus::NOT_FOUND;
+				break;
 			}
 			if (!request->IsMethod(httpConfig->Type))
 			{
@@ -141,47 +143,45 @@ namespace acs
 				{
 					response->Header().Add("Access-Control-Allow-Methods", httpConfig->Type);
 					response->Header().Add("Access-Control-Allow-Headers", httpConfig->Headers);
-					this->SendResponse(sockId, HttpStatus::OK);
-					return;
+					break;
 				}
-				this->SendResponse(sockId, HttpStatus::METHOD_NOT_ALLOWED);
-				return;
+				httpStatus = HttpStatus::METHOD_NOT_ALLOWED;
+				break;
 			}
-			if(!request->IsMethod("GET"))
+			if (!request->IsMethod("GET"))
 			{
-				HttpStatus status = this->CreateHttpData(httpConfig, request);
-				if (status != HttpStatus::OK)
-				{
-					this->SendResponse(sockId, status);
-					return;
-				}
+				httpStatus = this->CreateHttpData(httpConfig, request);
+				break;
 			}
 
 			if (this->mConfig.Auth && httpConfig->Auth)
 			{
-				if(this->AuthToken(httpConfig, request) != HttpStatus::OK)
+				if (this->AuthToken(httpConfig, request) != HttpStatus::OK)
 				{
-					this->SendResponse(sockId, HttpStatus::UNAUTHORIZED);
-					return;
+					httpStatus = HttpStatus::UNAUTHORIZED;
+					break;
 				}
 			}
-            if(!httpConfig->WhiteList.empty()) //白名单判断
-            {
-                std::string ip;
-                request->GetIp(ip);
-                if(httpConfig->WhiteList.find(ip) == httpConfig->WhiteList.end())
-                {
-                    this->SendResponse(sockId, HttpStatus::NOT_FOUND);
-                    return;
-                }
-            }
+			if (!httpConfig->WhiteList.empty()) //白名单判断
+			{
+				std::string ip;
+				request->GetIp(ip);
+				if (httpConfig->WhiteList.find(ip) == httpConfig->WhiteList.end())
+				{
+					httpStatus = HttpStatus::NOT_FOUND;
+					break;
+				}
+			}
 			if (request->IsMethod("GET"))
 			{
 				this->OnApi(httpConfig, request, response);
 				return;
 			}
-			this->ReadMessageBody(request->GetSockId());
+			this->ReadMessageBody(sockId);
+			return;
 		}
+		while (false);
+		this->SendResponse(sockId, httpStatus);
 	}
 
 	HttpStatus HttpWebComponent::CreateHttpData(

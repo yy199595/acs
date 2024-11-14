@@ -11,32 +11,43 @@ SetMember(Main, "count", 1)
 proto.Import("record/record.proto")
 
 function Main:Awake()
+    local rsa = rsa.New()
 
 end
 
 function Main:OnComplete()
 
-    local appId = 2
+    local appId = 1
     local app = require("App")
     local log = require("Log")
-    print(app:AddListen(appId, "rpc", "43.143.239.75:7789"))
-    print(app:AddListen(appId, "kcp", "43.143.239.75:7787"))
 
-    local code = app:Call(appId, "ChatSystem.Request", {
-
+    app:MakeServer(appId, "server", {
+        rpc = "43.143.239.75:7789",
+        kcp = "43.143.239.75:7787",
+        udp = "43.143.239.75:7788"
     })
-    print(code)
-    for i = 1, 10 do
-        coroutine.sleep(200)
+
+    for i = 1, 1 do
+        print()
+        coroutine.sleep(100)
         local t1 = os.clock()
-        code, _ = app:Call(appId, "ChatSystem.OnChat", {
+        local code, _ = app:Call(appId, "ChatSystem.OnChat", {
             user_id = 10004,
             msg_type = 1,
             message = "hello"
         })
         local t2 = os.clock()
-
-        log.Warning("(%s)ms [%s]  code:%s", t2 - t1, i, code)
+        log.Info("(kcp)  (%s)ms [%s]  code:%s", t2 - t1, i, code)
+        code = app:Call(appId, "ChatSystem.Request", {
+            name = "xiao",
+            age = 10 + i,
+            index = i
+        })
+        local t3 = os.clock()
+        log.Warning("(udp)  (%s)ms [%s]  code:%s", t3 - t2, i, code)
+        code = app:Call(appId, "ChatSystem.Ping")
+        local t4 = os.clock()
+        log.Error("(tcp)  (%s)ms [%s]  code:%s", t4 - t3, i, code)
     end
 
 

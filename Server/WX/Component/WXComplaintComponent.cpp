@@ -6,7 +6,7 @@
 #include "XCode/XCode.h"
 #include "Util/Tools/TimeHelper.h"
 #include "Util/Tools/Math.h"
-#include "Http/Component/GroupNotifyComponent.h"
+#include "Http/Component/NotifyComponent.h"
 #include "Mongo/Component/MongoComponent.h"
 #include "WX/Define/db.h"
 #include "Http/Common/Content.h"

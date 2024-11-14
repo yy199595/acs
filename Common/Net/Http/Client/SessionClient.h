@@ -23,6 +23,7 @@ namespace http
 		void StartReceiveBody();
 		void StartClose(int code);
 		bool StartWriter(HttpStatus status);
+		bool StartWriter(HttpStatus status, std::unique_ptr<Content> data);
 		void StartReceive(int id, tcp::Socket * socket, int timeout = 10);
 	private:
         void OnReadPause();
@@ -32,10 +33,6 @@ namespace http
 		void OnReadError(const Asio::Code &code) final;
 		void OnReceiveLine(std::istream &is, size_t) final;
         void OnReceiveMessage(std::istream & is, size_t) final;
-	public:
-
-		const http::Request & GetRequest() const { return this->mRequest; }
-		const http::Response & GetResponse() const { return this->mResponse; }
 	private:
 		void Clear();
 		void OnSendMessage() final;

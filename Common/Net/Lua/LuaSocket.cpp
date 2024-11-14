@@ -54,7 +54,7 @@ namespace Lua
 					result.append(buffer.data(), size);
 					std::this_thread::sleep_for(std::chrono::microseconds(1));
 				}
-				while (size > 0 && socket.available() > 0);
+				while (socket.available() > 0);
 			}
 			catch (const std::system_error& code)
 			{
@@ -64,16 +64,6 @@ namespace Lua
 			lua_pushlstring(L, result.c_str(), result.size());
 			return 1;
 		}
-	}
-
-	int TcpSock::Close(lua_State* L)
-	{
-		tcp::Socket* sock = Lua::UserDataParameter::Read<tcp::Socket*>(L, 1);
-		{
-			sock->Close();
-			delete sock;
-		}
-		return 0;
 	}
 
 	int TcpSock::Query(lua_State* L)
@@ -125,14 +115,13 @@ namespace Lua
 					Asio::EndPoint endPoint(address, port);
 					socket->Get().connect(endPoint);
 				}
-				Lua::UserDataParameter::Write(L, socket);
+				Lua::UserDataParameter::UserDataStruct<tcp::Socket*>::WritePtr(L, socket);
 				return 1;
 			}
 			Asio::Resolver resolver(io);
 			Asio::ResolverQuery query(host, std::to_string(port));
 			asio::connect(socket->Get(), resolver.resolve(query));
-
-			Lua::UserDataParameter::Write(L, socket);
+			Lua::UserDataParameter::UserDataStruct<tcp::Socket*>::WritePtr(L, socket);
 			return 1;
 		}
 		catch (const asio::system_error& code)
@@ -153,13 +142,14 @@ namespace Lua
 			luaL_error(L, "decode %s fail", addr.c_str());
 			return 0;
 		}
-		int id = (int)luaL_checkinteger(L, 2);
 		Asio::Context & ctx = acs::App::GetContext();
 		acs::UdpComponent * udpComponent = acs::App::Get<acs::UdpComponent>();
 		asio::ip::udp::endpoint remote(asio::ip::make_address(ip), port);
 		udp::Client * udpClient = new udp::Client(ctx, udpComponent, remote);
-		udpClient->StartReceive();
-		Lua::UserDataParameter::Write(L, udpClient);
+		{
+			udpClient->StartReceive();
+			Lua::UserDataParameter::UserDataStruct<udp::Client*>::WritePtr(L, udpClient);
+		}
 		return 1;
 	}
 
@@ -180,19 +170,6 @@ namespace Lua
 		return 1;
 	}
 
-	int UdpSock::Close(lua_State* L)
-	{
-		udp::Client * udpClient = Lua::UserDataParameter::Read<udp::Client*>(L, 1);
-		if(udpClient == nullptr)
-		{
-			return 0;
-		}
-		delete udpClient;
-		lua_pushboolean(L, true);
-		return 1;
-	}
-
-
 	int KcpSock::New(lua_State* L)
 	{
 		std::string ip;
@@ -207,7 +184,7 @@ namespace Lua
 		acs::KcpComponent * kcpComponent = acs::App::Get<acs::KcpComponent>();
 		kcp::Client * kcpClient = new kcp::Client(context, kcpComponent, endpoint);
 		{
-			Lua::UserDataParameter::Write(L, kcpClient);
+			Lua::UserDataParameter::UserDataStruct<kcp::Client*>::WritePtr(L, kcpClient);
 		}
 		return 1;
 	}

@@ -71,39 +71,6 @@ namespace acs
 		return 1;
 	}
 
-	int LuaActor::AddComponent(lua_State* l)
-	{
-		std::string name = luaL_checkstring(l, 1);
-		Component* component = App::Inst()->GetComponentByName(name);
-		if (component != nullptr)
-		{
-			lua_pushboolean(l, true);
-			return 1;
-		}
-		if (!App::Inst()->AddComponent(name))
-		{
-			LaunchComponent* launchComponent = App::Get<LaunchComponent>();
-			if (launchComponent == nullptr)
-			{
-				luaL_error(l, "not find LaunchComponent");
-				return 0;
-			}
-			if (!launchComponent->AddService(name))
-			{
-				luaL_error(l, "add %s fail", name.c_str());
-				return 0;
-			}
-		}
-		component = App::Inst()->GetComponentByName(name);
-		if (component == nullptr || !component->LateAwake())
-		{
-			return 0;
-		}
-
-		lua_pushboolean(l, true);
-		return 1;
-	}
-
 	int LuaActor::LuaPushCode(lua_State* l, int code)
 	{
 		lua_pushinteger(l, code);

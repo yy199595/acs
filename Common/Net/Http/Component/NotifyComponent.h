@@ -2,8 +2,8 @@
 // Created by yy on 2024/6/23.
 //
 
-#ifndef APP_GROUPNOTIFYCOMPONENT_H
-#define APP_GROUPNOTIFYCOMPONENT_H
+#ifndef APP_NOTIFYCOMPONENT_H
+#define APP_NOTIFYCOMPONENT_H
 #include <unordered_map>
 #include "Entity/Component/Component.h"
 
@@ -50,11 +50,11 @@ namespace notify
 
 namespace acs
 {
-	class GroupNotifyComponent : public Component, public ILuaRegister, public IComplete
+	class NotifyComponent : public Component, public ILuaRegister, public IComplete
 	{
 	public:
-		GroupNotifyComponent();
-		~GroupNotifyComponent() = default;
+		NotifyComponent();
+		~NotifyComponent() = default;
 	public:
 		void SendToWeChat(const std::string & message);
 		void SendToDingDing(const std::string & message);
@@ -72,4 +72,4 @@ namespace acs
 }
 
 
-#endif //APP_GROUPNOTIFYCOMPONENT_H
+#endif //APP_NOTIFYCOMPONENT_H

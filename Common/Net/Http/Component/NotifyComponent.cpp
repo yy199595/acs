@@ -2,7 +2,7 @@
 // Created by yy on 2024/6/23.
 //
 
-#include "GroupNotifyComponent.h"
+#include "NotifyComponent.h"
 #include "HttpComponent.h"
 #include "Entity/Actor/App.h"
 #include "Lua/Engine/ModuleClass.h"
@@ -32,12 +32,12 @@ namespace acs
 		return request;
 	}
 
-	GroupNotifyComponent::GroupNotifyComponent()
+	NotifyComponent::NotifyComponent()
 	{
 		this->mHttp = nullptr;
 	}
 
-	bool GroupNotifyComponent::Awake()
+	bool NotifyComponent::Awake()
 	{
 		std::unique_ptr<json::r::Value> jsonObject;
 		LOG_CHECK_RET_FALSE(this->mApp->Config().Get("notify", jsonObject))
@@ -50,13 +50,13 @@ namespace acs
 		return true;
 	}
 
-	bool GroupNotifyComponent::LateAwake()
+	bool NotifyComponent::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(this->mHttp = this->GetComponent<HttpComponent>())
 		return true;
 	}
 
-	void GroupNotifyComponent::SendToWeChat(const std::string & message)
+	void NotifyComponent::SendToWeChat(const std::string & message)
 	{
 		json::w::Document document;
 		document.Add("content", message);
@@ -69,7 +69,7 @@ namespace acs
 		};
 	}
 
-	void GroupNotifyComponent::SendToWeChat(const notify::Markdown& message)
+	void NotifyComponent::SendToWeChat(const notify::Markdown& message)
 	{
 		if(this->mWxUrl.empty() || this->mHttp == nullptr)
 		{
@@ -94,7 +94,7 @@ namespace acs
 		}
 	}
 
-	void GroupNotifyComponent::SendToWeChat(const notify::TemplateCard& message, bool async)
+	void NotifyComponent::SendToWeChat(const notify::TemplateCard& message, bool async)
 	{
 		if (this->mWxUrl.empty() || this->mHttp == nullptr)
 		{
@@ -117,10 +117,10 @@ namespace acs
 		auto jsonArray = document.AddArray("horizontal_content_list");
 		for (const notify::Data& item: message.data)
 		{
-			auto jsonObejct = jsonArray->AddObject();
+			auto jsonObject = jsonArray->AddObject();
 			{
-				jsonObejct->Add("keyname", item.key);
-				jsonObejct->Add("value", item.value);
+				jsonObject->Add("keyname", item.key);
+				jsonObject->Add("value", item.value);
 			}
 		}
 
@@ -152,7 +152,7 @@ namespace acs
 
 	}
 
-	void GroupNotifyComponent::SendToDingDing(const std::string & message)
+	void NotifyComponent::SendToDingDing(const std::string & message)
 	{
 		json::w::Document document;
 		document.Add("content", message);
@@ -165,7 +165,7 @@ namespace acs
 		};
 	}
 
-	void GroupNotifyComponent::OnLuaRegister(Lua::ModuleClass& luaRegister)
+	void NotifyComponent::OnLuaRegister(Lua::ModuleClass& luaRegister)
 	{
 
 	}

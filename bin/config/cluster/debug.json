@@ -2,20 +2,23 @@
     "excel": {
     },
     "server": {
-        "Service": [
+        "rpc": [
             "NodeSystem",
             "GateSystem",
-            "LogMgr",
             "EventSystem",
-            "Collection",
-            "ResourceMgr",
             "ChatComponent",
-            "FileUpload",
-            "QuickSDK",
-            "Watch",
-            "ChatSystem"
+            "ChatSystem",
+            "GateSystem"
         ],
-        "Component": [
+        "http" : [
+            "Watch",
+            "LogMgr",
+            "QuickSDK",
+            "FileUpload",
+            "ResourceMgr",
+            "Collection"
+        ],
+        "component": [
             "LoggerComponent",
             "ConfigComponent",
             "ActorComponent",

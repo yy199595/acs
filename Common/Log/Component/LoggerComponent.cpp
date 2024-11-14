@@ -18,7 +18,7 @@
 #include "Http/Common/HttpResponse.h"
 #include "Http/Component/HttpComponent.h"
 #endif
-#include "Http/Component/GroupNotifyComponent.h"
+#include "Http/Component/NotifyComponent.h"
 #include "Server/Component/ThreadComponent.h"
 
 namespace acs

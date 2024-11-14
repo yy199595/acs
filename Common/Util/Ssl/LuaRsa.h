@@ -10,7 +10,7 @@ namespace Lua
 {
 	namespace rsa
 	{
-		extern int New(lua_State *);
+		extern int Init(lua_State *);
 		extern int Encode(lua_State *);
 		extern int Decode(lua_State *);
 	}

@@ -61,6 +61,13 @@ namespace http
 		return this->StartWriter();
 	}
 
+	bool SessionClient::StartWriter(HttpStatus status, std::unique_ptr<Content> data)
+	{
+		this->mResponse.SetCode(status);
+		this->mResponse.SetContent(std::move(data));
+		return this->StartWriter();
+	}
+
 	bool SessionClient::StartWriter()
 	{
 		if (this->mSocket == nullptr)

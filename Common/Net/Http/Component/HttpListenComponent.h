@@ -19,6 +19,7 @@ namespace http
 #define MAX_HANDLE_HTTP_COUNT 100
 namespace http
 {
+	class Content;
 	class SessionClient;
 }
 
@@ -45,6 +46,7 @@ namespace acs
 	protected:
 		bool SendResponse(int fd);
 		bool SendResponse(int fd, HttpStatus code);
+		bool SendResponse(int fd, HttpStatus code, std::unique_ptr<http::Content> data);
 	private:
 		bool OnListen(tcp::Socket * socket) final;
 		void OnCloseSocket(int, int code) final;

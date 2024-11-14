@@ -1,6 +1,6 @@
 {
     "client": {
-        "Component" : [
+        "component" : [
             "HttpComponent",
             "ClientComponent"
         ]

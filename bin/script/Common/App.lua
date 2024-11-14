@@ -6,6 +6,7 @@ require("Coroutine")
 local xpcall = _G.xpcall
 local Module = require("Module")
 local log_err = require("Log").Stack
+local http = require("HttpComponent")
 
 local app = require("core.app")
 local config = app.GetConfig()
@@ -130,6 +131,21 @@ function App:MakeServer(id, name, listen)
         name = name,
         listen = listen
     })
+end
+
+---@param id number
+---@param method string
+---@param path string
+---@param head table
+---@param body string
+function App:Do(id, method, path, head, body)
+    local host = self:GetListen(id, "https")
+    if host == nil then
+        error("not find listen:http")
+        return
+    end
+    local url = host .. path
+    return http:Do(method, url, head, body)
 end
 
 return App

@@ -10,18 +10,22 @@
 
 namespace Lua
 {
-	int rsa::New(lua_State* L)
+	int rsa::Init(lua_State* L)
 	{
-		std::string pubKey = luaL_checkstring(L, 1);
-		std::string priKey = luaL_checkstring(L, 2);
-		std::unique_ptr<ssl::RSAEncryptor> rsaEncryptor = std::make_unique<ssl::RSAEncryptor>();
+		ssl::RSAEncryptor* rsaEncryptor = UserDataParameter::Read<ssl::RSAEncryptor*>(L, 1);
+		if (rsaEncryptor == nullptr)
 		{
-			if(!rsaEncryptor->Init(pubKey, priKey))
-			{
-				return 0;
-			}
-			UserDataParameter::Write(L, rsaEncryptor.release());
+			luaL_error(L, "rsa object is null");
+			return 0;
 		}
+		std::string pubKey = luaL_checkstring(L, 2);
+		std::string priKey = luaL_checkstring(L, 3);
+		if (!rsaEncryptor->Init(pubKey, priKey))
+		{
+			lua_pushboolean(L, false);
+			return 0;
+		}
+		lua_pushboolean(L, true);
 		return 1;
 	}
 

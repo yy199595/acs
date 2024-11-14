@@ -42,7 +42,7 @@
 
 #include "Redis/Component/DelayQueueComponent.h"
 #include "WX/Service/WeChat.h"
-#include "Http/Component/GroupNotifyComponent.h"
+#include "Http/Component/NotifyComponent.h"
 
 #include "WX/Component/WXComplaintComponent.h"
 
@@ -130,7 +130,7 @@ void RegisterComponent()
 	REGISTER_COMPONENT(DelayQueueComponent);
 	REGISTER_COMPONENT(WXNoticeComponent);
 
-	REGISTER_COMPONENT(GroupNotifyComponent);
+	REGISTER_COMPONENT(NotifyComponent);
 
 	REGISTER_COMPONENT(WXComplaintComponent);
 

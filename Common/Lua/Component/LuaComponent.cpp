@@ -123,13 +123,11 @@ namespace acs
 		classProxyHelper4.PushExtensionFunction("Send", Lua::TcpSock::Send);
 		classProxyHelper4.PushExtensionFunction("Read", Lua::TcpSock::Read);
 		classProxyHelper4.PushExtensionFunction("Query", Lua::TcpSock::Query);
-		classProxyHelper4.PushExtensionFunction("Close", Lua::TcpSock::Close);
 		classProxyHelper4.PushExtensionFunction("Connect", Lua::TcpSock::Connect);
 
 		Lua::ClassProxyHelper classProxyHelper5(this->mLuaEnv, "UdpSocket");
 		classProxyHelper5.BeginRegister<udp::Client>();
 		classProxyHelper5.PushExtensionFunction("Send", Lua::UdpSock::Send);
-		classProxyHelper5.PushExtensionFunction("Close", Lua::UdpSock::Close);
 
 		Lua::ClassProxyHelper classProxyHelper6(this->mLuaEnv, "KcpSocket");
 		classProxyHelper6.BeginRegister<kcp::Client>();
@@ -139,7 +137,8 @@ namespace acs
 #ifdef __ENABLE_OPEN_SSL__
 		Lua::ClassProxyHelper classProxyHelper7(this->mLuaEnv, "rsa");
 		classProxyHelper7.BeginRegister<ssl::RSAEncryptor>();
-		classProxyHelper7.PushExtensionFunction("New", Lua::rsa::New);
+		classProxyHelper7.PushCtor<ssl::RSAEncryptor>();
+		classProxyHelper7.PushExtensionFunction("Init", Lua::rsa::Init);
 		classProxyHelper7.PushExtensionFunction("Encode", Lua::rsa::Encode);
 		classProxyHelper7.PushExtensionFunction("Decode", Lua::rsa::Decode);
 #endif
@@ -171,8 +170,7 @@ namespace acs
 		moduleRegistry.AddFunction("GetConfig", LuaActor::GetConfig);
 		moduleRegistry.AddFunction("GetServers", LuaActor::GetServers);
 		moduleRegistry.AddFunction("MakeServer", LuaActor::MakeServer);
-		moduleRegistry.AddFunction("HasComponent", LuaActor::HasComponent);
-		moduleRegistry.AddFunction("AddComponent", LuaActor::AddComponent).End("core.app");
+		moduleRegistry.AddFunction("HasComponent", LuaActor::HasComponent).End("core.app");
 
 		moduleRegistry.Start();
 		moduleRegistry.AddFunction("read", lua::yyjson::read_file);
@@ -250,8 +248,8 @@ namespace acs
 	bool LuaComponent::LoadAllFile()
 	{
 		std::vector<std::string> loadModules;
-		std::string work = os::System::WorkPath() + '/';
 		std::unordered_set<std::string> directors;
+		std::string work = os::System::WorkPath() + '/';
 		for (const std::string& path: this->mLuaConfig->Requires())
 		{
 			std::vector<std::string> files;

@@ -39,59 +39,58 @@ namespace acs
 			return false;
 		}
 		std::vector<std::string> components;
-		if (nodeConfig->GetComponents(components) > 0)
-		{
-			for (const std::string& name: components)
-			{
-				if (!this->mApp->HasComponent(name))
-				{
-					if (!this->mApp->AddComponent(name))
-					{
-						LOG_ERROR("add {} error", name);
-						return false;
-					}
-				}
-			}
-		}
-		components.clear();
-		if (nodeConfig->GetServices(components) == 0)
-		{
-			return true;
-		}
-		this->AddComponent();
-		for (const std::string& name: components)
-		{
-			if (!this->AddService(name))
-			{
-				LOG_ERROR("add service {} fail", name);
-				return false;
-			}
-		}
+		std::vector<std::string> rpcService;
+		std::vector<std::string> httpService;
+		nodeConfig->GetComponents(components);
+		nodeConfig->GetRpcServices(rpcService);
+		nodeConfig->GetHttpServices(httpService);
+		LOG_CHECK_RET_FALSE(this->AddComponent(components));
+		LOG_CHECK_RET_FALSE(this->AddRpcService(rpcService));
+		LOG_CHECK_RET_FALSE(this->AddHttpService(httpService));
 		return true;
 	}
 
-	bool LaunchComponent::AddService(const std::string& name)
+	bool LaunchComponent::AddRpcService(const std::vector<std::string> & service)
 	{
-		if (this->mApp->HasComponent(name))
+		const RpcConfig * rpcConfig = RpcConfig::Inst();
+		for(const std::string & name : service)
 		{
-			return true;
-		}
-		if (RpcConfig::Inst()->HasService(name))
-		{
-			//创建实体服务
+			if(!rpcConfig->HasService(name))
+			{
+				LOG_ERROR("not rpc service => ", name);
+				return false;
+			}
+			if (this->mApp->HasComponent(name))
+			{
+				continue;
+			}
 			if (!this->mApp->AddComponent(name))
 			{
 				std::unique_ptr<Component> component(new LuaRpcService());
 				if (!this->mApp->AddComponent(name, std::move(component)))
 				{
-					LOG_ERROR("add physical service [{}] error", name);
+					LOG_ERROR("add rpc service [{}] error", name);
 					return false;
 				}
 			}
-			return true;
 		}
-		if (HttpConfig::Inst()->HasService(name))
+		return true;
+	}
+
+	bool LaunchComponent::AddHttpService(const std::vector<std::string> & service)
+	{
+		const HttpConfig * httpConfig = HttpConfig::Inst();
+		for(const std::string & name : service)
 		{
+			if (this->mApp->HasComponent(name))
+			{
+				continue;
+			}
+			if(!httpConfig->HasService(name))
+			{
+				LOG_ERROR("not http service => {}", name);
+				return false;
+			}
 			if (!this->mApp->AddComponent(name))
 			{
 				std::unique_ptr<Component> component(new LuaHttpService());
@@ -101,16 +100,28 @@ namespace acs
 					return false;
 				}
 			}
-			return true;
 		}
-		return false;
+		return true;
 	}
 
-	void LaunchComponent::AddComponent()
+	bool LaunchComponent::AddComponent(const std::vector<std::string> & components)
 	{
 		this->mApp->AddComponent<HttpComponent>();
 		this->mApp->AddComponent<RouterComponent>();
 		this->mApp->AddComponent<InnerNetComponent>();
 		this->mApp->AddComponent<DispatchComponent>();
+		for (const std::string& name: components)
+		{
+			if(this->mApp->HasComponent(name))
+			{
+				continue;
+			}
+			if (!this->mApp->AddComponent(name))
+			{
+				LOG_ERROR("add {} error", name);
+				return false;
+			}
+		}
+		return true;
 	}
 }

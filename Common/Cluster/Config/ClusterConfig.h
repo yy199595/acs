@@ -21,13 +21,15 @@ namespace acs
     public:
 		bool HasService(const std::string & service) const;
         const std::string & GetName() const { return this->mName;}
-        size_t ServiceCount() const { return this->mServices.size(); }
-		size_t GetServices(std::vector<std::string> & services) const;
+		size_t GetRpcServices(std::vector<std::string> & services) const;
+		size_t GetHttpServices(std::vector<std::string> & services) const;
 		size_t GetComponents(std::vector<std::string> & components) const;
+		size_t ServiceCount() const { return this->mRpcServices.size() + this->mHttpServices.size(); }
     private:
         const std::string mName;
-		std::unordered_set<std::string> mServices;
-		std::unordered_set<std::string> mComponents;
+		std::vector<std::string> mComponents;
+		std::vector<std::string> mRpcServices;
+		std::vector<std::string> mHttpServices;
     };
 }
 

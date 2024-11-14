@@ -13,10 +13,10 @@ namespace acs
     public:
         LaunchComponent() = default;
         ~LaunchComponent() final = default;
-	public:
-		bool AddService(const std::string & name);
 	private:
-		void AddComponent();
+		bool AddComponent(const std::vector<std::string> & service);
+		bool AddRpcService(const std::vector<std::string> & service);
+		bool AddHttpService(const std::vector<std::string> & service);
     private:
         bool Awake() final;
     };

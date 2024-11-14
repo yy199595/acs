@@ -113,6 +113,17 @@ namespace acs
 		return httpClient->StartWriter(code);
 	}
 
+	bool HttpListenComponent::SendResponse(int id, HttpStatus code, std::unique_ptr<http::Content> data)
+	{
+		http::SessionClient* httpClient = nullptr;
+		if (!this->mHttpClients.Get(id, httpClient))
+		{
+			LOG_ERROR("send message to {} fail", id);
+			return false;
+		}
+		return httpClient->StartWriter(code, std::move(data));
+	}
+
 	void HttpListenComponent::ClearClients()
 	{
 		auto iter = this->mHttpClients.Begin();
@@ -120,6 +131,6 @@ namespace acs
 		{
 			delete iter->second;
 		}
-		
+		this->mHttpClients.Clear();
 	}
 }

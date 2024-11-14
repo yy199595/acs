@@ -1,7 +1,7 @@
 local table_insert = table.insert
 
 local app = require("App")
-local jtw = require("auth.jwt")
+local jtw = require("util.jwt")
 local USER_LIST = "user_info_list"
 local ORDER_LIST = "order_list"
 local ACTIVITY_LIST = "activity_list"
