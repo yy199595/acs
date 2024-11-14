@@ -2,6 +2,7 @@
 // Created by zmhy0073 on 2022/10/17.
 //
 
+#include<algorithm>
 #include"ClusterConfig.h"
 #include"Core/System/System.h"
 #include"Server/Config/ServerConfig.h"
