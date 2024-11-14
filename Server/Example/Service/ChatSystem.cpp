@@ -15,7 +15,7 @@ namespace acs
 {
 	bool ChatSystem::OnInit()
 	{
-		BIND_SERVER_RPC_METHOD(ChatSystem::OnChat);
+		BIND_PLAYER_RPC_METHOD(ChatSystem::OnChat);
 		LOG_CHECK_RET_FALSE(this->mGate = this->GetComponent<GateComponent>())
 		return true;
 	}

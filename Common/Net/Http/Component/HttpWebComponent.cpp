@@ -163,7 +163,7 @@ namespace acs
 					this->OnApi(rpcConfig, request, response);
 					return;
 				}
-				response->SetContent(std::make_unique<http::TextContent>());
+				request->SetBody(std::make_unique<http::TextContent>());
 				this->ReadMessageBody(sockId);
 				return;
 			}
