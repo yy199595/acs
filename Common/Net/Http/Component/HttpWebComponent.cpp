@@ -377,21 +377,8 @@ namespace acs
 			}
 		}
 		int sockId = request->GetSockId();
-
-		this->mCorComponent->Start([sockId, this, config, message]()
+		std::function<void(int code)> callback = [message, this, sockId](int code)
 		{
-			int code = XCode::Ok;
-			do
-			{
-				RpcService* logicService = this->mRpcServices.Find(config->Service);
-				if (logicService == nullptr)
-				{
-					code = XCode::CallServiceNotFound;
-					break;
-				}
-				code = logicService->Invoke(config, message);
-			}
-			while (false);
 			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
 			std::unique_ptr<http::JsonContent> jsonContent = std::make_unique<http::JsonContent>();
 			{
@@ -406,7 +393,28 @@ namespace acs
 			}
 			delete message;
 			this->SendResponse(sockId, HttpStatus::OK, std::move(jsonContent));
-		});
+		};
+		int code = XCode::Ok;
+		do
+		{
+			RpcService* logicService = this->mRpcServices.Find(config->Service);
+			if (logicService == nullptr)
+			{
+				code = XCode::CallServiceNotFound;
+				break;
+			}
+			if(config->IsAsync)
+			{
+				this->mCorComponent->Start([logicService, callback, config, message]()
+				{
+					callback(logicService->Invoke(config, message));
+				});
+				return;
+			}
+			code = logicService->Invoke(config, message);
+		}
+		while(false);
+		callback(code);
 	}
 
 	HttpStatus HttpWebComponent::AuthToken(const HttpMethodConfig* config, http::Request* request)
