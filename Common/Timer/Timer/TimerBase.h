@@ -16,9 +16,11 @@ namespace acs
     public:
         virtual void Invoke() = 0;
     public:
-		long long GetTimerId() const { return mTimerId; }
-        long long GetTargetTime() const { return this->mTargetTime; }
-    private:
+		inline long long GetTimerId() const { return mTimerId; }
+        inline long long GetTargetTime() const { return this->mTargetTime; }
+		inline void UpdateTargetTime() { this->mTargetTime += this->mInterval; }
+	protected:
+		long long mInterval;
 		long long mTimerId;
 		long long mTargetTime;
 	};

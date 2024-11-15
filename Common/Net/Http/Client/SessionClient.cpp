@@ -26,6 +26,18 @@ namespace http
 #endif
 	}
 
+	void SessionClient::StartReceiveBody(std::unique_ptr<http::Content> content)
+	{
+		this->mRequest.SetBody(std::move(content));
+#ifdef ONLY_MAIN_THREAD
+		this->ReadSome();
+#else
+		Asio::Socket& sock = this->mSocket->Get();
+		const Asio::Executor& exec = sock.get_executor();
+		asio::post(exec, [this] { this->ReadSome(5); });
+#endif
+	}
+
 	void SessionClient::StartReceive(int sockId, tcp::Socket* socket, int timeout)
 	{
 		assert(sockId > 0);

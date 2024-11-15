@@ -12,7 +12,6 @@ namespace Lua
 		extern int Add(lua_State * lua);
 		extern int Remove(lua_State * lua);
 		extern int AddUpdate(lua_State * lua);
-		extern int AddSecond(lua_State * lua);
 	}
 }
 

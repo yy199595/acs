@@ -7,7 +7,7 @@
 namespace acs
 {
     class TimerComponent final : public Component, public ISystemUpdate,
-								 public ILuaRegister, public IFrameUpdate, public ISecondUpdate
+								 public ILuaRegister, public IFrameUpdate
 	{
 	 public:
 		TimerComponent();
@@ -26,13 +26,11 @@ namespace acs
 	public:
 		bool AddTimer(std::unique_ptr<TimerBase> timer);
 		void AddUpdateTimer(std::unique_ptr<TimerBase> timer);
-		void AddSecondTimer(std::unique_ptr<TimerBase> timer);
 		long long CreateTimer(unsigned int ms, StaticMethod* func);
 	private:
 		bool Awake() final;
 		void OnFrameUpdate() final;
 		void OnSystemUpdate() final;
-		void OnSecondUpdate(int tick) final;
 		bool InvokeTimer(long long timerId);
 		bool AddTimerToWheel(long long timerId);
 		bool AddTimerToWheel(std::unique_ptr<TimerBase> timer);
@@ -45,7 +43,6 @@ namespace acs
 	 private:
 		long long mNextUpdateTime;
 		std::list<long long> mUpdateTimer;
-		std::list<long long> mSecondTimer;
 		std::vector<TimeWheelLayer*> mTimerLayers;
 		std::queue<long long> mLastFrameTriggerTimers;
 		std::unordered_map<long long, std::unique_ptr<TimerBase>> mTimerMap;//所有timer的列表

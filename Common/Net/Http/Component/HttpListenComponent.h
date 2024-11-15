@@ -43,6 +43,7 @@ namespace acs
 		void ClearClients();
 		bool ReadMessageBody(int id);
 		void StartClose(int id, int) final;
+		bool ReadMessageBody(int id, std::unique_ptr<http::Content> data);
 	protected:
 		bool SendResponse(int fd);
 		bool SendResponse(int fd, HttpStatus code);

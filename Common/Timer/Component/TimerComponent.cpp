@@ -40,16 +40,6 @@ namespace acs
 		this->mTimerMap.emplace(timer->mTimerId, std::move(timer));
 	}
 
-	void TimerComponent::AddSecondTimer(std::unique_ptr<TimerBase> timer)
-	{
-		if (timer == nullptr)
-		{
-			return;
-		}
-		this->mSecondTimer.emplace_back(timer->GetTimerId());
-		this->mTimerMap.emplace(timer->mTimerId, std::move(timer));
-	}
-
 	long long TimerComponent::CreateTimer(unsigned int ms, StaticMethod* func)
 	{
 		std::unique_ptr<TimerBase> timerBase(new DelayTimer(ms, func));
@@ -68,7 +58,6 @@ namespace acs
 		luaRegister.AddFunction("Add", Lua::Timer::Add);
 		luaRegister.AddFunction("Del", Lua::Timer::Remove);
 		luaRegister.AddFunction("AddUpdate", Lua::Timer::AddUpdate);
-		luaRegister.AddFunction("AddSecond", Lua::Timer::AddSecond);
 		luaRegister.End("core.timer");
 	}
 
@@ -139,33 +128,24 @@ namespace acs
 			}
 			this->mLastFrameTriggerTimers.pop();
 		}
-		auto iter = this->mUpdateTimer.begin();
-		for(; iter != this->mUpdateTimer.end(); )
+		if(!this->mUpdateTimer.empty())
 		{
-			auto item = this->mTimerMap.find(*iter);
-			if(item == this->mTimerMap.end())
+			long long nowTime = help::Time::NowMil();
+			for (auto iter = this->mUpdateTimer.begin(); iter != this->mUpdateTimer.end();)
 			{
-				this->mUpdateTimer.erase(iter++);
-				continue;
+				auto item = this->mTimerMap.find(*iter);
+				if (item == this->mTimerMap.end())
+				{
+					this->mUpdateTimer.erase(iter++);
+					continue;
+				}
+				if (nowTime >= item->second->GetTargetTime())
+				{
+					item->second->Invoke();
+					item->second->UpdateTargetTime();
+				}
+				iter++;
 			}
-			item->second->Invoke();
-			iter++;
-		}
-	}
-
-	void TimerComponent::OnSecondUpdate(int tick)
-	{
-		auto iter = this->mSecondTimer.begin();
-		for(; iter != this->mSecondTimer.end(); )
-		{
-			auto item = this->mTimerMap.find(*iter);
-			if(item == this->mTimerMap.end())
-			{
-				this->mSecondTimer.erase(iter++);
-				continue;
-			}
-			item->second->Invoke();
-			iter++;
 		}
 	}
 

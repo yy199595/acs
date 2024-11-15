@@ -60,6 +60,17 @@ namespace acs
 		return true;
 	}
 
+	bool HttpListenComponent::ReadMessageBody(int id, std::unique_ptr<http::Content> data)
+	{
+		http::SessionClient* handlerClient = nullptr;
+		if (!this->mHttpClients.Get(id, handlerClient))
+		{
+			return false;
+		}
+		handlerClient->StartReceiveBody(std::move(data));
+		return true;
+	}
+
 	void HttpListenComponent::OnCloseSocket(int id, int code)
 	{
 		//LOG_WARN("close sock id => {}", id);

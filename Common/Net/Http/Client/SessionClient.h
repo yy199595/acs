@@ -20,11 +20,13 @@ namespace http
 		explicit SessionClient(Component * component);
 	 public:
 		bool StartWriter();
-		void StartReceiveBody();
 		void StartClose(int code);
 		bool StartWriter(HttpStatus status);
 		bool StartWriter(HttpStatus status, std::unique_ptr<Content> data);
 		void StartReceive(int id, tcp::Socket * socket, int timeout = 10);
+	public:
+		void StartReceiveBody();
+		void StartReceiveBody(std::unique_ptr<http::Content> content);
 	private:
         void OnReadPause();
 		void ClosetClient(int code);

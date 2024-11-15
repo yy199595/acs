@@ -69,7 +69,8 @@ namespace Lua
 				return 0;
 			}
 		}
-		std::unique_ptr<LuaTimer> luaTimer = MakeTimer(lua, 1, 0);
+		long long ms = luaL_checkinteger(lua, 1);
+		std::unique_ptr<LuaTimer> luaTimer = MakeTimer(lua, 2, ms);
 		if(luaTimer == nullptr)
 		{
 			lua_error(lua);
@@ -78,30 +79,6 @@ namespace Lua
 
 		long long timerId = luaTimer->GetTimerId();
 		timerComponent->AddUpdateTimer(std::move(luaTimer));
-		lua_pushinteger(lua, timerId);
-		return 1;
-	}
-
-	int Timer::AddSecond(lua_State* lua)
-	{
-		static TimerComponent* timerComponent = nullptr;
-		if(timerComponent == nullptr)
-		{
-			timerComponent = App::Get<TimerComponent>();
-			if(timerComponent == nullptr)
-			{
-				luaL_error(lua, "not find TimerComponent");
-				return 0;
-			}
-		}
-		std::unique_ptr<LuaTimer> luaTimer = MakeTimer(lua, 1, 0);
-		if(luaTimer == nullptr)
-		{
-			lua_error(lua);
-			return 0;
-		}
-		long long timerId = luaTimer->GetTimerId();
-		timerComponent->AddSecondTimer(std::move(luaTimer));
 		lua_pushinteger(lua, timerId);
 		return 1;
 	}
