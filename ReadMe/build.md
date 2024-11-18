@@ -7,7 +7,7 @@
 ### Linux
 1. 安装CMake,g++
 2. 执行根目录下build.sh,进入到bin目录
-3. build.sh jemalloc编译jemalloc并使用
+3. build.sh openssl编译openssl并使用，依赖openssl
 4. 单进程启动执行运行app，多线程启动执行./start.bat 
 5. tail -f ./nohup.out查看运行日志
 ### Mac
