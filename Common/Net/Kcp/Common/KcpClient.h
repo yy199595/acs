@@ -21,8 +21,7 @@ namespace kcp
 		void StartReceive() final;
 		void Update(long long ms) final;
 	private:
-		void OnSendMessage();
-		void OnSendMessage(const Asio::Code & code);
+		void OnReceive(const std::string & addr, const char * buf, int size);
 	private:
 		ikcpcb * mKcp;
 		std::ostream mSendStream;

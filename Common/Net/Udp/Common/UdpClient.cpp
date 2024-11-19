@@ -38,16 +38,6 @@ namespace udp
 		});
 	}
 
-	void Client::OnSendMessage()
-	{
-
-	}
-
-	void Client::OnSendMessage(const Asio::Code& code)
-	{
-
-	}
-
 	void Client::StartReceive()
 	{
 		this->mSocket.async_receive_from(this->mRecvBuffer.prepare(udp::BUFFER_COUNT),
@@ -56,27 +46,33 @@ namespace udp
 					if (code.value() == Asio::OK)
 					{
 						this->mRecvBuffer.commit(size);
-						std::istream is(&this->mRecvBuffer);
 						unsigned short port = this->mLocalEndpoint.port();
 						std::string ip = this->mLocalEndpoint.address().to_string();
-						//CONSOLE_LOG_ERROR("receive ({}:{}) size={}", ip, port, size)
-						std::unique_ptr<rpc::Packet> rpcPacket = std::make_unique<rpc::Packet>();
-						{
-							tcp::Data::Read(is, rpcPacket->GetProtoHead());
-							if((size - rpc::RPC_PACK_HEAD_LEN) == rpcPacket->GetProtoHead().Len)
-							{
-								if (rpcPacket->OnRecvMessage(is, rpcPacket->GetProtoHead().Len) == tcp::ReadDone)
-								{
-									rpcPacket->SetNet(rpc::Net::Udp);
-									Asio::Context& ctx = acs::App::GetContext();
-									rpcPacket->TempHead().Add(rpc::Header::udp_addr, fmt::format("{}:{}", ip, port));
-									asio::post(ctx, [this, msg = rpcPacket.release()] { this->mComponent->OnMessage(msg, msg); });
-								}
-							}
-						}
+						std::string address = fmt::format("{}:{}", ip, port);
+
+						this->OnReceive(address, size);
 						this->mRecvBuffer.consume(size);
 					}
 					asio::post(this->mSocket.get_executor(), [this] { this->StartReceive(); });
 				});
+	}
+
+	void Client::OnReceive(const std::string & address, int size)
+	{
+		std::istream is(&this->mRecvBuffer);
+		std::unique_ptr<rpc::Packet> rpcPacket = std::make_unique<rpc::Packet>();
+		{
+			tcp::Data::Read(is, rpcPacket->GetProtoHead());
+			if((size - rpc::RPC_PACK_HEAD_LEN) == rpcPacket->GetProtoHead().Len)
+			{
+				if (rpcPacket->OnRecvMessage(is, rpcPacket->GetProtoHead().Len) == tcp::ReadDone)
+				{
+					rpcPacket->SetNet(rpc::Net::Udp);
+					Asio::Context& ctx = acs::App::GetContext();
+					rpcPacket->TempHead().Add(rpc::Header::udp_addr, address);
+					asio::post(ctx, [this, msg = rpcPacket.release()] { this->mComponent->OnMessage(msg, msg); });
+				}
+			}
+		}
 	}
 }

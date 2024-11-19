@@ -52,16 +52,6 @@ namespace kcp
 		ikcp_update(this->mKcp, (IUINT32)ms);
 	}
 
-	void Client::OnSendMessage()
-	{
-
-	}
-
-	void Client::OnSendMessage(const Asio::Code& code)
-	{
-
-	}
-
 	void Client::StartReceive()
 	{
 		this->mSocket.async_receive_from(this->mReceiveBuffer.prepare(kcp::BUFFER_COUNT),
@@ -84,20 +74,25 @@ namespace kcp
 					if(messageLen > 0)
 					{
 						const std::string address = fmt::format("{}:{}", ip, port);
-						std::unique_ptr<rpc::Packet> rpcPacket = std::make_unique<rpc::Packet>();
-						{
-							if(rpcPacket->Decode(this->mDecodeBuffer.data(), messageLen))
-							{
-								rpcPacket->SetNet(rpc::Net::Kcp);
-								rpcPacket->TempHead().Add(rpc::Header::kcp_addr, address);
-								asio::post(acs::App::GetContext(), [this, msg = rpcPacket.release()] {
-									this->mComponent->OnMessage(msg, nullptr);
-								});
-							}
-						}
+						this->OnReceive(address, this->mDecodeBuffer.data(), messageLen);
 					}
 					this->mReceiveBuffer.consume(size);
 					asio::post(this->mContext, [this] { this->StartReceive(); });
 				});
+	}
+
+	void Client::OnReceive(const std::string& address, const char* buf, int size)
+	{
+		std::unique_ptr<rpc::Packet> rpcPacket = std::make_unique<rpc::Packet>();
+		{
+			if(rpcPacket->Decode(buf, size))
+			{
+				rpcPacket->SetNet(rpc::Net::Kcp);
+				rpcPacket->TempHead().Add(rpc::Header::kcp_addr, address);
+				asio::post(acs::App::GetContext(), [this, msg = rpcPacket.release()] {
+					this->mComponent->OnMessage(msg, nullptr);
+				});
+			}
+		}
 	}
 }
