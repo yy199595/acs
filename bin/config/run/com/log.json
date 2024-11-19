@@ -1,30 +1,30 @@
 {
     "log": [
         {
-            "level" : 1,
             "open" : false,
-            "name" : "debug"
+            "name" : "debug",
+            "level" : "debug"
         },
         {
-            "level" : 2,
             "open" : true,
             "name" : "info",
+            "level" : "info",
             "max_line": 10240,
             "max_size": 104448,
             "path": "${WORK_DIR}/log"
         },
         {
-            "level" : 3,
             "open" : true,
             "name" : "warn",
+            "level" : "warn",
             "max_line": 10240,
             "max_size": 104448,
             "path": "${WORK_DIR}/log"
         },
         {
-            "level" : 4,
             "open" : true,
             "name" : "error",
+            "level" : "error",
             "max_line": 10240,
             "max_size": 104448,
             "path": "${WORK_DIR}/log",
@@ -33,9 +33,9 @@
             "ding" : ""
         },
         {
-            "level" : 5,
             "open" : true,
             "name" : "fatal",
+            "level" : "fatal",
             "max_line": 10240,
             "max_size": 104448,
             "path": "${WORK_DIR}/log",

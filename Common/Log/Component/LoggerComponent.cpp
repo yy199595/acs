@@ -39,6 +39,15 @@ namespace acs
 		os::System::GetEnv("name", name);
 		std::unique_ptr<json::r::Value> jsonArray;
 		this->mThread = this->GetComponent<ThreadComponent>();
+
+		std::unordered_map<std::string, custom::LogLevel> logLevelMap = {
+				{ "debug", custom::LogLevel::Debug, },
+				{ "info", custom::LogLevel::Info, },
+				{ "warn", custom::LogLevel::Warn, },
+				{ "error", custom::LogLevel::Error, },
+				{ "fatal", custom::LogLevel::Fatal, },
+		};
+
 		if (this->mApp->Config().Get("log", jsonArray))
 		{
 			for(size_t  index = 0; index < jsonArray->MemberCount(); index++)
@@ -48,14 +57,18 @@ namespace acs
 				{
 					return false;
 				}
-				int level = 0;
+				std::string level;
 				custom::LogConfig config;
 				config.max_line = 1024 * 10;
 				config.max_line = 1024 * 1024;
 				LOG_CHECK_RET_FALSE(jsonObject->Get("level", level));
 				LOG_CHECK_RET_FALSE(jsonObject->Get("name", config.name))
-
-				config.level = (custom::LogLevel)level;
+				auto iter = logLevelMap.find(level);
+				if(iter == logLevelMap.end())
+				{
+					return false;
+				}
+				config.level = iter->second;
 				jsonObject->Get("wx", config.wx);
 				jsonObject->Get("open", config.open);
 				jsonObject->Get("ding", config.ding);
