@@ -23,7 +23,6 @@ namespace acs
 		void Flush();
 		void DropAllLog();
 		void Flush(const std::string & name);
-		bool StartLogger(const std::string & name);
 		void PushLog(std::unique_ptr<custom::LogInfo> logInfo);
 		void PushLog(const std::string & name, std::unique_ptr<custom::LogInfo> logInfo);
 	private:

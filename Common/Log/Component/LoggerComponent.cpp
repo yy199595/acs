@@ -167,11 +167,6 @@ namespace acs
 		}
 	}
 
-	bool LoggerComponent::StartLogger(const std::string &name)
-	{
-		return this->GetLogger(name)->Start();
-	}
-
 	custom::Logger *LoggerComponent::GetLogger(const std::string &name)
 	{
 		std::lock_guard<std::mutex> lock(this->mMutex);

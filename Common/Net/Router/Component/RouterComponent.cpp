@@ -27,7 +27,7 @@ namespace acs
 		return this->mDisComponent != nullptr;
 	}
 
-	ISender * RouterComponent::GetSender(unsigned int net)
+	ISender * RouterComponent::GetSender(char net)
 	{
 		auto iter = this->mSenders.find(net);
 		return iter == this->mSenders.end() ? nullptr : iter->second;

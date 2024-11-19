@@ -21,10 +21,10 @@ namespace acs
 		int LuaCall(lua_State * lua, int id, std::unique_ptr<rpc::Packet> message);
 	private:
 		bool LateAwake() final;
-		ISender * GetSender(unsigned int net);
+		ISender * GetSender(char net);
 	private:
 		class DispatchComponent * mDisComponent;
-		std::unordered_map<unsigned int, ISender *> mSenders;
+		std::unordered_map<char, ISender *> mSenders;
 	};
 }
 

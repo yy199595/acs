@@ -11,11 +11,11 @@ namespace acs
 	class ISender
 	{
 	public:
-		explicit ISender(int net) : mNet(net) { }
-		int NetType() const { return this->mNet; }
+		explicit ISender(char net) : mNet(net) { }
+		char NetType() const { return this->mNet; }
 		virtual int Send(int id, rpc::Packet * message) = 0;
 	private:
-		int mNet;
+		char mNet;
 	};
 }
 #endif //APP_ISEND_H
