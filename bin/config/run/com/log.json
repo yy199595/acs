@@ -1,9 +1,10 @@
 {
     "log": [
         {
-            "open" : false,
+            "open" : true,
             "name" : "debug",
-            "level" : "debug"
+            "level" : "debug",
+            "console" : true
         },
         {
             "open" : true,
@@ -11,10 +12,12 @@
             "level" : "info",
             "max_line": 10240,
             "max_size": 104448,
+            "console" : true,
             "path": "${WORK_DIR}/log"
         },
         {
             "open" : true,
+            "console" : true,
             "name" : "warn",
             "level" : "warn",
             "max_line": 10240,
@@ -23,6 +26,7 @@
         },
         {
             "open" : true,
+            "console" : true,
             "name" : "error",
             "level" : "error",
             "max_line": 10240,
@@ -34,6 +38,7 @@
         },
         {
             "open" : true,
+            "console" : true,
             "name" : "fatal",
             "level" : "fatal",
             "max_line": 10240,

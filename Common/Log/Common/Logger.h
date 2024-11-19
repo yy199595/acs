@@ -24,6 +24,7 @@ namespace custom
 		int max_line = 0;
 		int max_size = 0;
 		bool open = true;
+		bool console = false;
 		std::string path;
 		std::string name;
 		std::string pem;

@@ -2,12 +2,12 @@
 // Created by yy on 2023/8/12.
 //
 #include"Log/Common/Debug.h"
-#include"ShowOutput.h"
+#include"ConsoleOutput.h"
 #include "Util/Tools/TimeHelper.h"
 
 namespace custom
 {
-	void ShowOutput::Push(Asio::Context &io, const std::string& name, const custom::LogInfo& logInfo)
+	void ConsoleOutput::Push(Asio::Context &io, const std::string& name, const custom::LogInfo& logInfo)
 	{
 		const std::string & file = logInfo.File;
 		const std::string & log = logInfo.Content;

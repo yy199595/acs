@@ -9,9 +9,12 @@
 #include "Log/Lua/LuaLogger.h"
 #include "Util/Tools/TimeHelper.h"
 #include "Log/Output/FileOutput.h"
-#include "Log/Output/ShowOutput.h"
+#ifdef __CONSOLE_LOG__
+#include "Log/Output/ConsoleOutput.h"
+#endif
 #include "Log/Output/WeChatOutput.h"
 #include "Log/Output/MongoOutput.h"
+
 #include "Config/Base/LangConfig.h"
 #ifdef __ENABLE_DING_DING_PUSH
 #include "Http/Common/HttpRequest.h"
@@ -78,6 +81,8 @@ namespace acs
 				jsonObject->Get("mongo", config.mongo);
 				jsonObject->Get("max_size", config.max_size);
 				jsonObject->Get("max_line", config.max_line);
+
+				jsonObject->Get("console", config.console);
 
 				this->mConfig.emplace_back(config);
 			}
@@ -195,6 +200,12 @@ namespace acs
 				fileConfig.Root = fmt::format("{}/{}",config.path, server) ;
 				logger->AddOutput<custom::FileOutput>(fileConfig);
 			}
+#ifdef __CONSOLE_LOG__
+			if(config.console)
+			{
+				logger->AddOutput<custom::ConsoleOutput>();
+			}
+#endif
 			if (!config.wx.empty() && !config.pem.empty())
 			{
 				logger->AddOutput<custom::WeChatOutput>(config.wx, config.pem);

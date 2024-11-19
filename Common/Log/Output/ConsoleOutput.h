@@ -2,15 +2,15 @@
 // Created by yy on 2023/8/12.
 //
 
-#ifndef APP_SHOWOUTPUT_H
-#define APP_SHOWOUTPUT_H
+#ifndef APP_CONSOLEOUTPUT_H
+#define APP_CONSOLEOUTPUT_H
 #include"Log/Common/Logger.h"
 namespace custom
 {
-	class ShowOutput : public IOutput
+	class ConsoleOutput : public IOutput
 	{
 	public:
-		ShowOutput() = default;
+		ConsoleOutput() = default;
 	private:
 		void Flush() final { };
 		void Push(Asio::Context &io, const std::string &name, const custom::LogInfo &logInfo) final;
@@ -18,4 +18,4 @@ namespace custom
 }
 
 
-#endif //APP_SHOWOUTPUT_H
+#endif //APP_CONSOLEOUTPUT_H
