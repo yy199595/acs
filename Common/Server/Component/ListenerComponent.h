@@ -28,7 +28,7 @@ namespace acs
 		explicit ListenerComponent();
 		~ListenerComponent() override;
 	public:
-		bool StopListen();
+		bool StopListen() final;
 		bool StartListen(const ListenConfig & config) final;
 	private:
 		void OnDestroy() final;

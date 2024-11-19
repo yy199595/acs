@@ -57,18 +57,18 @@ namespace acs
 #endif
 #ifdef ONLY_MAIN_THREAD
 		Asio::EndPoint ep(asio::ip::address(), config.Port);
-		while (!listenData->Acceptor->is_open())
+		while (!this->mAcceptor->is_open())
 		{
 			try
 			{
-				listenData->Acceptor->open(ep.protocol());
-				listenData->Acceptor->set_option(asio::ip::tcp::acceptor::reuse_address(true));
-				listenData->Acceptor->bind(ep);
-				listenData->Acceptor->listen();
+				this->mAcceptor->open(ep.protocol());
+				this->mAcceptor->set_option(asio::ip::tcp::acceptor::reuse_address(true));
+				this->mAcceptor->bind(ep);
+				this->mAcceptor->listen();
 			}
 			catch (std::system_error& error)
 			{
-				listenData->Acceptor->close();
+				this->mAcceptor->close();
 				LOG_ERROR("listen [{}] {}", config.Addr, error.what());
 			}
 		}
@@ -148,7 +148,7 @@ namespace acs
 					}
 #endif
 #ifdef ONLY_MAIN_THREAD
-					this->OnAcceptSocket(listenData, sock);
+					this->OnAcceptSocket(sock);
 #else
 					Asio::Context& io = this->mApp->GetContext();
 					asio::post(io, std::bind(&ListenerComponent::OnAcceptSocket, this, sock));
@@ -159,7 +159,7 @@ namespace acs
 					return;
 				}
 #ifdef ONLY_MAIN_THREAD
-				this->AcceptConnect(listenData);
+				this->Accept();
 #else
 				const Asio::Executor& executor = this->mAcceptor->get_executor();
 				asio::post(executor, std::bind(&ListenerComponent::Accept, this));
@@ -179,8 +179,8 @@ namespace acs
 	{
 #ifdef ONLY_MAIN_THREAD
 		Asio::Code code;
-		listenData->Acceptor->close(code);
-		LOG_WARN("stop listen [{}]", listenData->Config.Addr);
+		this->mAcceptor->close(code);
+		LOG_WARN("stop listen [{}]", this->mConfig.Addr);
 		return code.value() == Asio::OK;
 #else
 		custom::ThreadSync<bool> threadSync;

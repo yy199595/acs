@@ -12,6 +12,7 @@
 #include "Server/Config/CodeConfig.h"
 #include "Server/Component/ThreadComponent.h"
 #include "Rpc/Component/DispatchComponent.h"
+#include "Core/Thread/ThreadSync.h"
 
 namespace acs
 {
@@ -26,6 +27,39 @@ namespace acs
 	{
 		this->mActor = this->GetComponent<ActorComponent>();
 		this->mDispatch = this->GetComponent<DispatchComponent>();
+		return true;
+	}
+
+	bool UdpComponent::StopListen()
+	{
+		if (this->mUdpServer == nullptr)
+		{
+			return false;
+		}
+#ifdef ONLY_MAIN_THREAD
+		Asio::Code code;
+		this->mUdpServer->Socket().close(code);
+		if(code.value() != Asio::OK)
+		{
+			return false;
+		}
+#else
+		custom::ThreadSync<bool> threadSync;
+		Asio::Executor executor = this->mUdpServer->Socket().get_executor();
+		{
+			asio::post(executor, [this, &threadSync]()
+			{
+				Asio::Code code;
+				this->mUdpServer->Socket().close(code);
+				threadSync.SetResult(code.value() == Asio::OK);
+			});
+		}
+		if(!threadSync.Wait())
+		{
+			return false;
+		}
+#endif
+		this->mUdpServer.reset(nullptr);
 		return true;
 	}
 

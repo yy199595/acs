@@ -23,6 +23,7 @@ namespace acs
 	private:
 		bool LateAwake() final;
 		void OnFrameUpdate() final;
+		bool StopListen() final;
 		bool StartListen(const acs::ListenConfig &listen) final;
 	private:
 		kcp::IClient * GetClient(int id);

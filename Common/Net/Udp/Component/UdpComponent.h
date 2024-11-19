@@ -23,6 +23,7 @@ namespace acs
 		~UdpComponent() final = default;
 	private:
 		bool LateAwake() final;
+		bool StopListen() final;
 		bool StartListen(const acs::ListenConfig &listen) final;
 	private:
 		udp::Client * GetClient(int id);

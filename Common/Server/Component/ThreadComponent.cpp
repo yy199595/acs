@@ -7,7 +7,13 @@
 #include"Util/Tools/TimeHelper.h"
 namespace acs
 {
-	ThreadComponent::ThreadComponent() : mThreadCount(0) { }
+	ThreadComponent::ThreadComponent()
+	#ifndef ONLY_MAIN_THREAD
+		: mThreadCount(0)
+	#endif
+	{
+
+	}
 
     bool ThreadComponent::Awake()
 	{

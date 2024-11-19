@@ -42,6 +42,7 @@ namespace acs
 	class INetListen
 	{
 	public:
+		virtual bool StopListen() = 0;
 		virtual bool StartListen(const ListenConfig & listen) = 0;
 	};
 }
