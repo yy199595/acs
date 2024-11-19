@@ -49,6 +49,7 @@ namespace rpc
 		inline char GetProto() const { return this->mProtoHead.Porto; }
 		inline ProtoHead & GetProtoHead() { return this->mProtoHead;}
 		inline const Head& ConstTempHead() const {return this->mTempHead;}
+		inline int GetTimeout() const { return this->mTimeout; }
 	public:
 		void Init(const rpc::ProtoHead& protoHead);
 		inline void SetSockId(int id){ this->mSockId = id;}
@@ -56,6 +57,7 @@ namespace rpc
 		inline void SetRpcId(int id){ this->mProtoHead.RpcId = id; }
 		inline void SetType(char type) { this->mProtoHead.Type = type; }
 		inline void SetProto(char proto) { this->mProtoHead.Porto = proto; }
+		inline void SetTimeout(int timeout) { this->mTimeout = timeout; }
 	public:
 		void Clear() final;
 		std::string ToString() final;
@@ -77,6 +79,7 @@ namespace rpc
 		char mNet;
 		Head mHead; //写入socket
 		int mSockId;
+		int mTimeout;
 		Head mTempHead; //不写入socket
 		std::string mBody;
 		rpc::ProtoHead mProtoHead;

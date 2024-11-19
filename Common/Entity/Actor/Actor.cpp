@@ -71,7 +71,7 @@ namespace acs
 		int id = message->SockId();
 		this->mLastTime = help::Time::NowSec();
 		rpc::Packet * result = this->mRouterComponent->Call(id, std::move(message));
-		return result != nullptr ? result->GetCode() : XCode::NetWorkError;
+		return result != nullptr ? result->GetCode() : XCode::NetTimeout;
 	}
 	
 	int Actor::Call(const std::string& func, const pb::Message& request)
@@ -104,7 +104,7 @@ namespace acs
 		rpc::Packet * result = this->mRouterComponent->Call(id, std::move(message));
 		if(result == nullptr)
 		{
-			return XCode::NetWorkError;
+			return XCode::NetTimeout;
 		}
 		if(result->GetCode() == XCode::Ok)
 		{
@@ -126,7 +126,7 @@ namespace acs
 		rpc::Packet * result = this->mRouterComponent->Call(id, std::move(message));
 		if(result == nullptr)
 		{
-			return XCode::NetWorkError;
+			return XCode::NetTimeout;
 		}
 		return result->GetCode();
 	}
@@ -147,7 +147,7 @@ namespace acs
 		rpc::Packet* result = this->mRouterComponent->Call(id, std::move(message));
 		if (result == nullptr)
 		{
-			return XCode::NetWorkError;
+			return XCode::NetTimeout;
 		}
 		code = result->GetCode();
 		if (code == XCode::Ok && !result->ParseMessage(response))

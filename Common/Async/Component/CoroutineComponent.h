@@ -38,7 +38,7 @@ namespace acs
 		bool Awake() final;
 		bool LateAwake() final;
 		void OnSystemUpdate() final;
-		void OnLastFrameUpdate() final;
+		void OnLastFrameUpdate(long long) final;
 		void OnRecord(json::w::Document &document) final;
 	 public:
 		void RunTask(tb_context_t context);

@@ -4,7 +4,7 @@
 
 #ifndef APP_RPCTASKCOMPONENT_H
 #define APP_RPCTASKCOMPONENT_H
-#include"Core/Map/HashMap.h"
+#include<unordered_map>
 #include"Util/Tools/TimeHelper.h"
 #include"Rpc/Async/RpcTaskSource.h"
 #include"Entity/Component/Component.h"
@@ -20,30 +20,38 @@ namespace acs
         typedef IRpcTask<T> * RpcTask;
     public:
         template<typename T1>
-        T1 * AddTask(K k, T1 * task)
+        T1 * AddTask(K k, T1 * task, int timeout = 0)
         {
-			if(!this->mTasks.Add(k, task))
+			auto iter = this->mTasks.find(k);
+			if(iter != this->mTasks.end())
 			{
+				this->mDelTasks.emplace_back(task);
 				LOG_ERROR("add task already exist");
 				return nullptr;
 			}
+			if(timeout > 0)
+			{
+				long long target = help::Time::NowMil() + timeout;
+				this->mTimeouts.emplace(k, target);
+			}
+			this->mTasks.emplace(k, task);
             return task;
         }
 		inline bool OnResponse(K key, T * message);
-		size_t AwaitCount() const { return this->mTasks.Size(); }
+		size_t AwaitCount() const { return this->mTasks.size(); }
 	protected:
-		void OnLastFrameUpdate() final;
-		virtual void OnTaskComplete(K k) { }
+		void OnLastFrameUpdate(long long) final;
+		virtual void OnDelTask(K k) { }
         virtual void OnNotFindResponse(K key, T * message);
     private:
-		std::queue<K> mTimeouts;
 		std::queue<T *> mDelMessages;
 		std::vector<RpcTask> mDelTasks;
-		custom::HashMap<K, RpcTask> mTasks;
+		std::unordered_map<K, RpcTask> mTasks;
+		std::unordered_map<K, long long> mTimeouts;
     };
 
 	template<typename K,typename T, bool Del>
-	void RpcTaskComponent<K, T, Del>::OnLastFrameUpdate()
+	void RpcTaskComponent<K, T, Del>::OnLastFrameUpdate(long long nowMS)
 	{
 		for(RpcTask & task : this->mDelTasks)
 		{
@@ -59,25 +67,53 @@ namespace acs
 			}
 		}
 		this->mDelTasks.clear();
+		if(!this->mTimeouts.empty())
+		{
+			for(auto iter = this->mTimeouts.begin(); iter != this->mTimeouts.end(); )
+			{
+				const K & key = iter->first;
+				long long targetTime = iter->second;
+				if(nowMS >= targetTime)
+				{
+					auto iter1 = this->mTasks.find(key);
+					if (iter1 != this->mTasks.end())
+					{
+						iter1->second->OnResponse(nullptr);
+						this->mDelTasks.emplace_back(iter1->second);
+						this->mTasks.erase(iter1);
+					}
+					this->mTimeouts.erase(iter++);
+					continue;
+				}
+				iter++;
+			}
+		}
 	}
 
     template<typename K,typename T, bool Del>
     inline bool RpcTaskComponent<K, T, Del>::OnResponse(K key, T * message)
 	{
-		RpcTask rpcTask = nullptr;
-		assert(this->mApp->IsMainThread());
-		if(Del)
+		auto iter = this->mTimeouts.find(key);
+		if(iter != this->mTimeouts.end());
+		{
+			this->mTimeouts.erase(iter);
+		}
+		if(Del && message != nullptr)
 		{
 			this->mDelMessages.emplace(message);
 		}
-		if (!this->mTasks.Del(key, rpcTask))
+		auto iter1 = this->mTasks.find(key);
+		if(iter1 == this->mTasks.end())
 		{
 			this->OnNotFindResponse(key, message);
 			return false;
 		}
-		this->OnTaskComplete(key);
-		rpcTask->OnResponse(message);
-		this->mDelTasks.emplace_back(rpcTask);
+		{
+			this->OnDelTask(key);
+			iter1->second->OnResponse(message);
+			this->mDelTasks.emplace_back(iter1->second);
+		}
+		this->mTasks.erase(iter1);
 		return true;
 	}
 

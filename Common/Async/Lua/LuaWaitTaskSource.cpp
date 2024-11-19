@@ -48,7 +48,7 @@ namespace acs
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
 		lua_State* coroutine = lua_tothread(this->mLua, -1);
 		lua_pushinteger(this->mLua, code);
-		if(code == XCode::Ok)
+		if(code == XCode::Ok && response != nullptr)
 		{
 			switch (response->GetProto())
 			{

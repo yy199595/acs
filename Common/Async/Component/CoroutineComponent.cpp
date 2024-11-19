@@ -203,7 +203,7 @@ namespace acs
 			this->RunCoroutine(this->mRunContext);
         }
 	}
-	void CoroutineComponent::OnLastFrameUpdate()
+	void CoroutineComponent::OnLastFrameUpdate(long long)
 	{
 		while (!this->mLastQueues.empty())
 		{

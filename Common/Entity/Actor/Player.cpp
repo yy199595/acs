@@ -130,6 +130,7 @@ namespace acs
 			message->GetHead().Add(rpc::Header::func , func);
 			message->GetHead().Add(rpc::Header::player_id, this->GetId());
 		}
+		message->SetTimeout(methodConfig->Timeout);
 		return XCode::Ok;
 	}
 }

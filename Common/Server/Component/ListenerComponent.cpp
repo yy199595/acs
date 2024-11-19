@@ -18,7 +18,6 @@ namespace acs
 		: mSslCtx(asio::ssl::context::tlsv12)
 #endif
 	{
-		this->mOffsetPort = 0;
 		this->mAcceptor = nullptr;
 		this->mThreadComponent = nullptr;
 	}

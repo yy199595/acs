@@ -36,7 +36,7 @@ namespace acs
 		bool Awake() final;
 #endif
         bool LateAwake() final;
-		void OnTaskComplete(int key) final;
+		void OnDelTask(int key) final;
 		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
 		http::RequestClient * CreateClient(http::Request * request);
 		void OnMessage(http::Request *request, http::Response *response) final;

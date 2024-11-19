@@ -128,7 +128,7 @@ namespace acs
 		for (Component* component: components)
 		{
 #ifdef __DEBUG__
-			timer::ElapsedTimer timer;
+			//timer::ElapsedTimer timer;
 			//LOG_DEBUG("start component => {}", component->GetName())
 #endif
 			if (!component->LateAwake())
@@ -207,7 +207,7 @@ namespace acs
 				{
 					for (IFrameUpdate* component: frameUpdateComponents)
 					{
-						component->OnFrameUpdate();
+						component->OnFrameUpdate(logicStartTime);
 					}
 					long long nowTime = help::Time::NowMil();
 					logicUpdateInterval = (1000 / fps) - (nowTime - logicStartTime);
@@ -242,7 +242,7 @@ namespace acs
 
 					for (ILastFrameUpdate* component: lastFrameUpdateComponents)
 					{
-						component->OnLastFrameUpdate();
+						component->OnLastFrameUpdate(logicStartTime);
 					}
 					logicLastUpdateTime = help::Time::NowMil();
 				}

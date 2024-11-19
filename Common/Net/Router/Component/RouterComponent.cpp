@@ -38,9 +38,11 @@ namespace acs
 		ISender * sender = this->GetSender(message->GetNet());
 		if(sender == nullptr)
 		{
-			lua_pushinteger(lua, XCode::NotFoundActorAddress);
+			luaL_error(lua, "not found server:%d", (int)message->GetNet());
+			lua_pushinteger(lua, XCode::NotFoundSender);
 			return 1;
 		}
+		int timeout = message->GetTimeout();
 		int rpc = this->mDisComponent->BuildRpcId();
 		{
 			message->SetRpcId(rpc);
@@ -51,7 +53,7 @@ namespace acs
 				return 1;
 			}
 		}
-		return this->mDisComponent->AddTask(rpc, new LuaRpcTaskSource(lua, rpc))->Await();
+		return this->mDisComponent->AddTask(rpc, new LuaRpcTaskSource(lua, rpc), timeout)->Await();
 	}
 
 	int RouterComponent::Send(int id, std::unique_ptr<rpc::Packet> message)
@@ -84,7 +86,7 @@ namespace acs
 		{
 			delete message;
 			LOG_ERROR("not find sender {}", message->GetNet());
-			return XCode::SendMessageFail;
+			return XCode::NotFoundSender;
 		}
 		if(sender->Send(id, message) != XCode::Ok)
 		{
@@ -112,6 +114,7 @@ namespace acs
 			LOG_ERROR("send to [{}] fail", id);
 			return nullptr;
 		}
-		return this->mDisComponent->AddTask(taskId, new RpcTaskSource(taskId))->Await();
+		int timeout = message->GetTimeout();
+		return this->mDisComponent->AddTask(taskId, new RpcTaskSource(taskId), timeout)->Await();
 	}
 }

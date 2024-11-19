@@ -12,16 +12,6 @@
 
 namespace acs
 {
-	enum class ListenCode
-	{
-		Ok = 0,
-		Close = 1, //关闭
-		Shield = 2, //拉黑
-		StopListen = 3, //关闭监听
-		SwitchPort = 4, //切换端口
-	};
-
-
 	class ListenerComponent : public Component, public INetListen
 	{
 	public:
@@ -34,7 +24,6 @@ namespace acs
 		void Accept();
 		void OnAcceptSocket(tcp::Socket* sock);
 	private:
-		int mOffsetPort;
 		ListenConfig mConfig;
 #ifdef __ENABLE_OPEN_SSL__
 		Asio::ssl::Context mSslCtx;

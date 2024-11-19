@@ -77,6 +77,7 @@ namespace rpc
 	Packet::Packet()
 	{
 		this->mSockId = 0;
+		this->mTimeout = 0;
 		this->mBody.clear();
 		this->mHead.Clear();
 		this->mNet = rpc::Net::Tcp;

@@ -195,6 +195,7 @@ namespace acs
 			message->GetHead().Add(rpc::Header::app_id, this->mAppId);
 		}
 		message->SetSockId(this->GetSrvId());
+		message->SetTimeout(methodConfig->Timeout);
 		return XCode::Ok;
 	}
 }

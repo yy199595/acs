@@ -118,7 +118,7 @@ namespace acs
 		}
 	}
 
-	void TimerComponent::OnFrameUpdate()
+	void TimerComponent::OnFrameUpdate(long long nowTime)
 	{
 		while(!this->mLastFrameTriggerTimers.empty())
 		{
@@ -130,7 +130,6 @@ namespace acs
 		}
 		if(!this->mUpdateTimer.empty())
 		{
-			long long nowTime = help::Time::NowMil();
 			for (auto iter = this->mUpdateTimer.begin(); iter != this->mUpdateTimer.end();)
 			{
 				auto item = this->mTimerMap.find(*iter);

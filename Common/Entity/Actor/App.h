@@ -40,6 +40,7 @@ namespace acs
 		inline long long StartTime() const { return this->mStartTime; }
 		inline const ServerConfig & Config() const { return mConfig; }
 		inline ServerStatus GetStatus() const { return this->mStatus; }
+		inline int GetTickCount() const { return this->mTickCount; }
 	 public:
 		int Run();
 		void Stop();

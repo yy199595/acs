@@ -157,7 +157,7 @@ namespace acs
 		return httpRpcTask->Await()->Code() == HttpStatus::OK;
 	}
 
-	void HttpComponent::OnTaskComplete(int key)
+	void HttpComponent::OnDelTask(int key)
 	{
 		http::RequestClient * httpClient = nullptr;
 		if(this->mUseClients.Del(key, httpClient))

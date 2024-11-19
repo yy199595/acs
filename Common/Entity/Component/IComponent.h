@@ -45,7 +45,7 @@ namespace acs
 	class IFrameUpdate
 	{
 	public:
-		virtual void OnFrameUpdate() = 0;
+		virtual void OnFrameUpdate(long long) = 0;
 	};
 
 	class ISystemUpdate
@@ -69,7 +69,7 @@ namespace acs
 	class ILastFrameUpdate
 	{
 	public:
-		virtual void OnLastFrameUpdate() = 0;
+		virtual void OnLastFrameUpdate(long long) = 0;
 	};
 
 	class ILuaRegister

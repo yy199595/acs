@@ -14,8 +14,11 @@ namespace acs
 
 	void LuaRpcTaskSource::OnResponse(rpc::Packet * response)
 	{
-		int code = 0;
-		response->GetHead().Get("code", code);
+		int code = XCode::NetTimeout;
+		if(response != nullptr)
+		{
+			response->GetHead().Get("code", code);
+		}
 		this->mTask.SetResult(code, response);
 	}
 }

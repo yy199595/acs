@@ -81,9 +81,8 @@ namespace acs
 		}
 	}
 
-	void KcpComponent::OnFrameUpdate()
+	void KcpComponent::OnFrameUpdate(long long t)
 	{
-		long long t = help::Time::NowMil();
 		auto iter = this->mClients.begin();
 		for(; iter != this->mClients.end(); iter++)
 		{

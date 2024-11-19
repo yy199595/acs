@@ -1,21 +1,21 @@
 {
     "ChatSystem.Ping": {
-        "Net" : "http",
+        "Net" : "tcp",
         "Async": false,
-        "IsClient": true
-    },
-    "ChatSystem.Sleep": {
-        "Async" : true
+        "IsClient": true,
+        "Timeout" : 5000
     },
     "ChatSystem.Request" : {
         "Net" : "udp",
         "Async" : true,
+        "Timeout" : 5000,
         "Request" : "google.protobuf.Struct"
     },
     "ChatSystem.OnChat": {
         "Net" : "kcp",
         "Proto" : "json",
         "Async": true,
+        "Timeout" : 5000,
         "IsClient": true,
         "Request": "c2s.chat.request"
     },
