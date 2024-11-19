@@ -19,6 +19,8 @@ namespace udp
 		bool Send(const std::string & addr, tcp::IProto * message);
 		bool Send(const std::string & ip, unsigned short port, tcp::IProto * message);
 	private:
+		void OnReceive(size_t size);
+	private:
 		Component * mComponent;
 		asio::io_context & mContext;
 		asio::streambuf mRecvBuffer;

@@ -21,6 +21,10 @@ namespace kcp
 		this->mSocket.async_receive_from(asio::buffer(this->mRecvBuffer),
 				this->mSenderPoint, [this](const asio::error_code& code, size_t size)
 				{
+					if(code == asio::error::operation_aborted)
+					{
+						return;
+					}
 					if (code.value() == Asio::OK)
 					{
 						this->OnReceive(size);
