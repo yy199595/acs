@@ -36,6 +36,7 @@ namespace rpc
 		constexpr char* client_id = "cli";
 		constexpr char* forward_tar = "tar";
 		constexpr char* app_id = "app";
+		constexpr char * from_addr = "from_addr";
 	}
 
 	//协议类型

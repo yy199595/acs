@@ -233,6 +233,9 @@ namespace rpc
 				this->mMessage = nullptr;
 				request->SetSockId(this->mSockId);
 			}
+#ifdef __DEBUG__
+			request->TempHead().Add(rpc::Header::from_addr, this->mSocket->GetAddress());
+#endif
 #ifdef ONLY_MAIN_THREAD
 			this->mComponent->OnMessage(request, nullptr);
 #else

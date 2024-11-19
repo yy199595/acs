@@ -58,6 +58,7 @@ namespace acs
 		int code = XCode::Ok;
 		const std::string & fullName = message->ConstHead().GetStr("func");
         const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
+
 		do
 		{
 			if(methodConfig == nullptr)
@@ -65,6 +66,11 @@ namespace acs
 				code = XCode::CallFunctionNotExist;
 				break;
 			}
+#ifdef __DEBUG__
+			std::string fromAddress = "unknown";
+			message->TempHead().Del(rpc::Header::from_addr, fromAddress);
+			LOG_DEBUG("[{}://{}] call ({})", methodConfig->NetName, fromAddress, methodConfig->FullName);
+#endif
 			//LOG_DEBUG("call ({}) by {}", fullName, methodConfig->NetName);
 			if(!this->mRpcServices.Has(methodConfig->Service))
 			{

@@ -44,7 +44,7 @@ function Chat:Chat(request)
 end
 
 function Chat:Request(request)
-    table.print(request)
+    --table.print(request)
 end
 
 function Chat:Ping(request)

@@ -35,8 +35,6 @@ namespace udp
 	{
 		this->mRecvBuffer.commit(size);
 		std::istream is(&this->mRecvBuffer);
-		unsigned short port = this->mSenderPoint.port();
-		std::string ip = this->mSenderPoint.address().to_string();
 		//CONSOLE_LOG_ERROR("receive ({}:{}) size={}", ip, port, size)
 		std::unique_ptr<rpc::Packet> rpcPacket = std::make_unique<rpc::Packet>();
 		{
@@ -50,9 +48,15 @@ namespace udp
 			{
 				return;
 			}
+			unsigned short port = this->mSenderPoint.port();
+			std::string ip = this->mSenderPoint.address().to_string();
+			std::string address = fmt::format("{}:{}", ip, port);
+#ifdef __DEBUG__
+			rpcPacket->TempHead().Add(rpc::Header::from_addr, address);
+#endif
 			rpcPacket->SetNet(rpc::Net::Udp);
 			Asio::Context& ctx = acs::App::GetContext();
-			rpcPacket->TempHead().Add(rpc::Header::udp_addr, fmt::format("{}:{}", ip, port));
+			rpcPacket->TempHead().Add(rpc::Header::udp_addr, address);
 			asio::post(ctx, [this, msg = rpcPacket.release()]{ this->mComponent->OnMessage(msg, nullptr); });
 		}
 		this->mRecvBuffer.consume(size);
