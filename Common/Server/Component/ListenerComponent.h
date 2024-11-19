@@ -22,7 +22,7 @@ namespace acs
 	};
 
 
-	class ListenerComponent : public Component, public IDestroy, public INetListen
+	class ListenerComponent : public Component, public INetListen
 	{
 	public:
 		explicit ListenerComponent();
@@ -30,8 +30,6 @@ namespace acs
 	public:
 		bool StopListen() final;
 		bool StartListen(const ListenConfig & config) final;
-	private:
-		void OnDestroy() final;
 	private:
 		void Accept();
 		void OnAcceptSocket(tcp::Socket* sock);

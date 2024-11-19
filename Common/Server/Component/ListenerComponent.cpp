@@ -195,9 +195,4 @@ namespace acs
 		return threadSync.Wait();
 #endif
 	}
-
-	void ListenerComponent::OnDestroy()
-	{
-		this->StopListen();
-	}
 }

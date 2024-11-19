@@ -8,7 +8,7 @@
 #include "Server/Component/ITcpComponent.h"
 namespace acs
 {
-	class LaunchComponent final : public Component
+	class LaunchComponent final : public Component, public IDestroy
     {
     public:
         LaunchComponent() = default;
@@ -19,6 +19,7 @@ namespace acs
 		bool AddHttpService(const std::vector<std::string> & service);
     private:
         bool Awake() final;
+		void OnDestroy() final;
 		bool LateAwake() final;
 		bool LoadListenConfig();
 	private:

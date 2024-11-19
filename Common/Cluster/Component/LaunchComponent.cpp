@@ -229,4 +229,32 @@ namespace acs
 		}
 		return true;
 	}
+
+	void LaunchComponent::OnDestroy()
+	{
+		for (const ListenConfig& listenConfig: this->mTcpListens)
+		{
+			INetListen* tcpListen = nullptr;
+			switch(listenConfig.ProtoType)
+			{
+				case proto_type::tcp:
+				{
+					std::string name = fmt::format("{}:ListenComponent", listenConfig.Name);
+					tcpListen = this->GetComponent<INetListen>(name);
+					break;
+				}
+				case proto_type::udp:
+				{
+					tcpListen = this->GetComponent<INetListen>(listenConfig.Component);
+					break;
+				}
+			}
+			if(!tcpListen->StopListen())
+			{
+				LOG_ERROR("({}) close [{}] fail", listenConfig.ProtoName, listenConfig.Addr);
+				continue;
+			}
+			LOG_INFO("({}) close [{}] ok", listenConfig.ProtoName, listenConfig.Addr);
+		}
+	}
 }
