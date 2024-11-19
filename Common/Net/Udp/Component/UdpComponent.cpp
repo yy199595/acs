@@ -18,40 +18,32 @@ namespace acs
 	UdpComponent::UdpComponent()
 		: ISender(rpc::Net::Udp)
 	{
-		this->mPort = 0;
 		this->mActor = nullptr;
-		this->mThread = nullptr;
 		this->mDispatch = nullptr;
 	}
 
 	bool UdpComponent::LateAwake()
 	{
+		this->mActor = this->GetComponent<ActorComponent>();
+		this->mDispatch = this->GetComponent<DispatchComponent>();
+		return true;
+	}
+
+	bool UdpComponent::StartListen(const acs::ListenConfig& listen)
+	{
 		try
 		{
-			std::unique_ptr<json::r::Value> jsonObject;
-			std::unique_ptr<json::r::Value> jsonObject1;
-			const ServerConfig & config = this->mApp->Config();
-			LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
-			LOG_CHECK_RET_FALSE(this->mThread = this->GetComponent<ThreadComponent>())
-			LOG_CHECK_RET_FALSE(this->mDispatch = this->GetComponent<DispatchComponent>());
-			if(config.Get("listen", jsonObject) && jsonObject->Get("udp",jsonObject1))
+			Asio::Context& context = this->GetComponent<ThreadComponent>()->GetContext();
 			{
-				if(jsonObject1->Get("port",this->mPort))
-				{
-					Asio::Context& context = this->mThread->GetContext();
-					this->mUdpServer = std::make_unique<udp::Server>(context, this, this->mPort);
-
-					this->mUdpServer->StartReceive();
-					const std::string& host = config.Host();
-					LOG_INFO("listen [udp:{}] ok", this->mPort);
-					return this->mApp->AddListen("udp", fmt::format("{}:{}", host, this->mPort));
-				}
+				int port = listen.Port;
+				this->mUdpServer = std::make_unique<udp::Server>(context, this, port);
 			}
+
+			asio::post(context, [this]() { this->mUdpServer->StartReceive(); });
 			return true;
 		}
-		catch(std::exception & e)
+		catch (std::exception& e)
 		{
-			LOG_ERROR("listen udp:{} =>{}", this->mPort, e.what());
 			return false;
 		}
 	}
@@ -137,8 +129,8 @@ namespace acs
 		try
 		{
 			udp::Client * udpClient = nullptr;
-			Asio::Context & ctx = this->mThread->GetContext();
 			asio_udp::endpoint remote(asio::ip::make_address(ip), port);
+			Asio::Context & ctx = this->GetComponent<ThreadComponent>()->GetContext();
 			std::unique_ptr<udp::Client> client = std::make_unique<udp::Client>(ctx, this, remote);
 			{
 				udpClient = client.get();

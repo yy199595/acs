@@ -39,7 +39,6 @@ namespace acs
         HttpWebComponent();
     private:
 		bool LateAwake() final;
-		bool OnListenOk(const char* name) final;
 		void OnRecord(json::w::Document& document) final;
 	private:
 		bool ReadHttpConfig();

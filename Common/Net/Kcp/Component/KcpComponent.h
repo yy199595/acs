@@ -9,12 +9,13 @@
 #include "Rpc/Interface/ISend.h"
 #include "Kcp/Common/KcpServer.h"
 #include "Entity/Component/Component.h"
+#include "Server/Component/ITcpComponent.h"
 using asio_udp = asio::ip::udp;
 
 namespace acs
 {
 	class KcpComponent : public Component, public ISender, public IRpc<rpc::Packet, rpc::Packet>
-			, public IFrameUpdate
+			, public IFrameUpdate, public INetListen
 	{
 	public:
 		KcpComponent();
@@ -22,6 +23,7 @@ namespace acs
 	private:
 		bool LateAwake() final;
 		void OnFrameUpdate() final;
+		bool StartListen(const acs::ListenConfig &listen) final;
 	private:
 		kcp::IClient * GetClient(int id);
 		void OnMessage(rpc::Packet *request, rpc::Packet *response) final;
@@ -30,7 +32,7 @@ namespace acs
 	private:
 		int OnRequest(rpc::Packet * message);
 	private:
-		int mPort;
+		ListenConfig mConfig;
 		class ActorComponent * mActor;
 		asio::streambuf mReceiveBuffer;
 		asio_udp::endpoint mRemotePoint;

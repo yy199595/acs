@@ -77,38 +77,3 @@ namespace acs
         return iter != this->mCoroutines.end() ? iter->second : nullptr;
 	}
 }
-
-namespace acs
-{
-	CoroutineGroup::CoroutineGroup()
-	{
-        this->mCoroutineId = 0;
-        this->mCorComponent = App::Coroutine();
-	}
-
-    CoroutineGroup::~CoroutineGroup()
-    {
-        if(this->mCoroutineId != 0)
-        {
-            this->mCorComponent->Resume(this->mCoroutineId);
-        }
-    }
-
-    void CoroutineGroup::Add(unsigned int)
-    {
-        
-    }
-
-    void CoroutineGroup::Add(TaskContext* coroutine)
-    {
-        if (coroutine != nullptr)
-        {
-
-        }
-    }
-
-    void CoroutineGroup::WaitComplete()
-    {
-        this->mCorComponent->YieldCoroutine(this->mCoroutineId);
-    }
-}

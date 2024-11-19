@@ -22,7 +22,6 @@ namespace acs
 		size_t size = 0;
 		unsigned int co = 0;
 	};
-	class CoroutineGroup;
 
 	class TaskContext
 	{

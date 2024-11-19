@@ -10,17 +10,20 @@
 #include "Udp/Common/UdpServer.h"
 #include "Udp/Common/UdpClient.h"
 #include "Entity/Component/Component.h"
+#include "Server/Component/ITcpComponent.h"
 using asio_udp = asio::ip::udp;
 
 namespace acs
 {
-	class UdpComponent : public Component, public ISender, public IRpc<rpc::Packet, rpc::Packet>
+	class UdpComponent : public Component, public ISender, public IRpc<rpc::Packet, rpc::Packet>,
+						 public INetListen
 	{
 	public:
 		UdpComponent();
 		~UdpComponent() final = default;
 	private:
 		bool LateAwake() final;
+		bool StartListen(const acs::ListenConfig &listen) final;
 	private:
 		udp::Client * GetClient(int id);
 		void OnMessage(rpc::Packet *request, rpc::Packet *response) final;
@@ -29,9 +32,7 @@ namespace acs
 	private:
 		int OnRequest(rpc::Packet * message);
 	private:
-		int mPort;
 		class ActorComponent * mActor;
-		class ThreadComponent * mThread;
 		asio::streambuf mReceiveBuffer;
 		asio_udp::endpoint mRemotePoint;
 		class DispatchComponent * mDispatch;

@@ -35,21 +35,3 @@ namespace acs
 		std::unordered_map<unsigned int, TaskContext*> mCoroutines;
 	};
 }
-
-namespace acs
-{
-	class CoroutineComponent;
-    class CoroutineGroup : public std::enable_shared_from_this<CoroutineGroup>
-	{
-	 public:
-		explicit CoroutineGroup();
-        ~CoroutineGroup();
-	 public:
-		void WaitComplete();
-		void Add(unsigned int id);
-		void Add(TaskContext * coroutine);
-    private:
-		unsigned int mCoroutineId;
-		CoroutineComponent* mCorComponent;
-	};
-}

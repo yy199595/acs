@@ -4,8 +4,8 @@
 
 #ifndef APP_LAUNCHCOMPONENT_H
 #define APP_LAUNCHCOMPONENT_H
-#include"Entity/Component/Component.h"
-
+#include "Entity/Component/Component.h"
+#include "Server/Component/ITcpComponent.h"
 namespace acs
 {
 	class LaunchComponent final : public Component
@@ -19,6 +19,10 @@ namespace acs
 		bool AddHttpService(const std::vector<std::string> & service);
     private:
         bool Awake() final;
+		bool LateAwake() final;
+		bool LoadListenConfig();
+	private:
+		std::vector<ListenConfig> mTcpListens;
     };
 }
 

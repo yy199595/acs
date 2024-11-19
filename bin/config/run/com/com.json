@@ -13,30 +13,38 @@
     "listen" : {
         "rpc" : {
             "max_conn" : 512,
-            "protocol" : "rpc",
+            "protocol" : "tcp",
             "component" : "InnerNetComponent"
         },
         "gate" : {
             "max_conn" : 1024,
-            "protocol" : "rpc",
+            "protocol" : "tcp",
             "component" : "OuterNetComponent"
         },
         "http" : {
             "max_conn" : 256,
-            "protocol" : "http",
+            "protocol" : "tcp",
             "component" : "HttpWebComponent"
         },
         "https" : {
             "max_conn" : 256,
-            "protocol" : "https",
+            "protocol" : "tcp",
             "component" : "HttpWebComponent",
             "key": "",
             "cert": ""
         },
         "master" : {
             "max_conn" : 128,
-            "protocol" : "http",
+            "protocol" : "tcp",
             "component" : "HttpWebComponent"
+        },
+        "udp" : {
+            "protocol" : "udp",
+            "component" : "UdpComponent"
+        },
+        "kcp" : {
+            "protocol" : "udp",
+            "component" : "KcpComponent"
         }
     },
     "connect": {

@@ -116,10 +116,6 @@ namespace acs
 		return true;
 	}
 
-	bool HttpWebComponent::OnListenOk(const char* name)
-	{
-		return true;
-	}
 
 	void HttpWebComponent::OnReadHead(http::Request* request, http::Response* response)
 	{
