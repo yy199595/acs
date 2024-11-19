@@ -164,10 +164,10 @@ namespace rpc
 		{
 			return;
 		}
-#ifdef __DEBUG__
-		const std::string& address = this->mSocket->GetAddress();
-		CONSOLE_LOG_ERROR("receive {} inner message error : {}", address, code.message());
-#endif
+//#ifdef __DEBUG__
+//		const std::string& address = this->mSocket->GetAddress();
+//		CONSOLE_LOG_ERROR("receive {} inner message error : {}", address, code.message());
+//#endif
 		this->CloseSocket(XCode::NetReadFailure);
 	}
 

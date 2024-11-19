@@ -251,7 +251,7 @@ namespace tcp
 	{
 		if (length <= 0)
 		{
-			CONSOLE_LOG_FATAL("length = {}", length);
+			//CONSOLE_LOG_FATAL("length = {}", length);
 			return;
 		}
 		if (this->mMaxCount > 0 && length >= this->mMaxCount)

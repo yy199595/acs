@@ -132,10 +132,11 @@ namespace acs
 		auto iter = this->mClients.find(id);
 		if(iter != this->mClients.end())
 		{
+			const std::string & address = iter->second->GetAddress();
+			LOG_ERROR("close [{}] code = {}", address, CodeConfig::Inst()->GetDesc(code));
 			this->mClients.erase(iter);
 		}
 		help::InnerLogoutEvent::Trigger(id);
-		LOG_ERROR("close [server:{}] code = {}", id, CodeConfig::Inst()->GetDesc(code));
 	}
 
 	bool InnerNetComponent::OnListen(tcp::Socket * socket)
