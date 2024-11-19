@@ -11,23 +11,24 @@ SetMember(Main, "count", 1)
 
 proto.Import("record/record.proto")
 
+local appId = 0
 local app = require("App")
 function Main:Awake()
 
-    local appId = 1
-
-    app:MakeServer(appId, "server", {
-        rpc = "43.143.239.75:7789",
-        kcp = "43.143.239.75:7787",
-        udp = "43.143.239.75:7788"
-    })
+    --local appId = 1
+    --
+    --app:MakeServer(appId, "server", {
+    --    rpc = "43.143.239.75:7789",
+    --    kcp = "43.143.239.75:7787",
+    --    udp = "43.143.239.75:7788"
+    --})
     local timer = require("core.timer")
-    timer.AddUpdate(300, self, "Update")
+    --timer.AddUpdate(300, self, "Update")
 end
 
 local count = 0
 function Main:Update()
-    print(string.format("==========================%s=========================", count))
+    print(string.format("==========================(%s)=========================", count))
     coroutine.start(function()
         count = count + 1
         for i = 1, 2 do
