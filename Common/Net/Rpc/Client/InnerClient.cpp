@@ -118,6 +118,10 @@ namespace rpc
 
 	void InnerClient::CloseSocket(int code)
 	{
+		if(this->mSockId == 0)
+		{
+			return;
+		}
 		this->mDecodeStatus  = tcp::Decode::None;
 		if (this->mComponent == nullptr)
 		{
@@ -142,20 +146,18 @@ namespace rpc
 #endif
 		}
 
-		if (!this->mSocket->IsClient())
-		{
-			this->mSocket->Close();
-		}
+		this->mSocket->Close();
 		Asio::Socket & socket1 = this->mSocket->Get();
-		asio::post(socket1.get_executor(), [this, code]()
+		asio::post(socket1.get_executor(), [this, sockId = this->mSockId, code]()
 		{
 #ifdef ONLY_MAIN_THREAD
 			this->mComponent->OnCloseSocket(this->mSockId, code);
 #else
 			Asio::Context & t = acs::App::GetContext();
-			asio::post(t, [this, code] { this->mComponent->OnCloseSocket(this->mSockId, code); });
+			asio::post(t, [this, code, sockId] { this->mComponent->OnCloseSocket(sockId, code); });
 #endif
 		});
+		this->mSockId = 0;
 	}
 
 	void InnerClient::OnReadError(const Asio::Code& code)

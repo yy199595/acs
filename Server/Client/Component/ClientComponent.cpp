@@ -43,22 +43,22 @@ namespace acs
 			tcpSocket->Init(ip, port);
 		}
 		int id = index++;
-		rpc::InnerClient * client = new rpc::InnerClient(id, this);
+		std::unique_ptr<rpc::InnerClient> client = std::make_unique<rpc::InnerClient>(id, this);
 		{
 			client->SetSocket(tcpSocket);
-			this->mClientMap.Add(id, client);
+			this->mClientMap.emplace(id, std::move(client));
 		}
 		return id;
 	}
 
 	int ClientComponent::Send(int id, rpc::Packet * message)
 	{
-		rpc::InnerClient * client = nullptr;
-		if(!this->mClientMap.Get(id, client))
+		auto iter = this->mClientMap.find(id);
+		if(iter == this->mClientMap.end())
 		{
 			return XCode::NetWorkError;
 		}
-		client->Send(message);
+		iter->second->Send(message);
 		return XCode::Ok;
 	}
 
@@ -66,6 +66,7 @@ namespace acs
 	{
 		luaRegister.AddFunction("Send", LuaClient::Send);
 		luaRegister.AddFunction("Call", LuaClient::Call);
+		luaRegister.AddFunction("Close", LuaClient::Close);
 		luaRegister.AddFunction("Connect", LuaClient::Connect);
 		luaRegister.End("net.client");
 	}
@@ -86,6 +87,27 @@ namespace acs
 		{
 			delete message;
 		}
+	}
+
+	int ClientComponent::Remove(int id)
+	{
+		auto iter = this->mClientMap.find(id);
+		if(iter == this->mClientMap.end())
+		{
+			return 0;
+		}
+		iter->second->Close();
+		return 1;
+	}
+
+	void ClientComponent::OnCloseSocket(int id, int code)
+	{
+		auto iter = this->mClientMap.find(id);
+		if(iter == this->mClientMap.end())
+		{
+			return;
+		}
+		this->mClientMap.erase(iter);
 	}
 
 	int ClientComponent::OnRequest(rpc::Packet* message)

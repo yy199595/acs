@@ -10,6 +10,10 @@ function Session:Call(func, message)
     return client.Call(self.id, func, message)
 end
 
+function Session:Close()
+    return client.Close(self.id)
+end
+
 return function(address)
     local session = Class(Session)
     session.id = client.Connect(address)

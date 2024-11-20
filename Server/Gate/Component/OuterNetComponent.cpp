@@ -90,6 +90,7 @@ namespace acs
 						}
 					}
 				}
+				break;
 			}
 			default:
 				LOG_ERROR("unknown message {}", message->ToString());
@@ -254,6 +255,7 @@ namespace acs
 			return false;
 		}
 		outerNetClient->StartReceive(socket);
+		LOG_ERROR("[{}] connect gate server", socket->GetAddress())
 		return true;
 	}
 

@@ -1,5 +1,5 @@
 #include"DelayTimer.h"
-
+#include"Log/Common/CommonLogDef.h"
 namespace acs
 {
 	void LuaTimer::Invoke()
@@ -12,7 +12,7 @@ namespace acs
 			{
 				if (lua_pcall(this->mLua, 0, 0, 0) != LUA_OK)
 				{
-					luaL_error(this->mLua, "[call function ] = %s", lua_tostring(this->mLua, -1));
+					LOG_ERROR("{}", lua_tostring(this->mLua, -1));
 				}
 				break;
 			}
@@ -24,7 +24,7 @@ namespace acs
 					lua_pushvalue(this->mLua, -2);
 					if (lua_pcall(this->mLua, 1, 0, 0) != LUA_OK)
 					{
-						luaL_error(this->mLua, "[call function ] = %s", lua_tostring(this->mLua, -1));
+						LOG_ERROR("{}", lua_tostring(this->mLua, -1));
 					}
 				}
 				break;

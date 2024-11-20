@@ -203,7 +203,7 @@ namespace rpc
 
 	bool OuterClient::Send(rpc::Packet* message)
 	{
-		if(this->mSocket == nullptr)
+		if(this->mSockId == 0)
 		{
 			return false;
 		}

@@ -11,6 +11,7 @@ namespace acs
 	{
 		extern int Send(lua_State * l);
 		extern int Call(lua_State * l);
+		extern int Close(lua_State * l);
 		extern int Connect(lua_State * l);
 	}
 }

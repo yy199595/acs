@@ -64,4 +64,14 @@ namespace acs
 		}
 		return 1;
 	}
+
+	int LuaClient::Close(lua_State* l)
+	{
+		int sessionId = (int)luaL_checkinteger(l, 1);
+		ClientComponent * clientComponent = App::Get<ClientComponent>();
+		{
+			clientComponent->Remove(sessionId);
+		}
+		return 0;
+	}
 }

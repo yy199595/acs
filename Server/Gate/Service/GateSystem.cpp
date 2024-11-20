@@ -10,11 +10,13 @@
 #include"Cluster/Config/ClusterConfig.h"
 #include"Server/Config/CodeConfig.h"
 #include"Http/Component/HttpComponent.h"
+#include "Timer/Component/TimerComponent.h"
 #include"Gate/Component/OuterNetComponent.h"
 namespace acs
 {
     GateSystem::GateSystem()
     {
+		this->mTimer = nullptr;
 		this->mActorComponent = nullptr;
         this->mOuterComponent = nullptr;
     }
@@ -29,6 +31,7 @@ namespace acs
 		BIND_PLAYER_RPC_METHOD(GateSystem::Ping);
 		BIND_PLAYER_RPC_METHOD(GateSystem::Login);
 		BIND_PLAYER_RPC_METHOD(GateSystem::Logout);
+		this->mTimer = this->GetComponent<TimerComponent>();
 		this->mActorComponent = this->GetComponent<ActorComponent>();
 		this->mOuterComponent = this->GetComponent<OuterNetComponent>();
 		return true;
@@ -135,14 +138,14 @@ namespace acs
 		for (const int serverId : servers)
 		{
 			if (Server * server = this->mActorComponent->GetServer(serverId))
-			{			
+			{
 				const std::string& name = server->Name();
 				const NodeConfig * nodeConfig = ClusterConfig::Inst()->GetConfig(name);
 				if (nodeConfig != nullptr && nodeConfig->HasService(ComponentFactory::GetName<class LoginSystem>()))
 				{
 					s2s::logout::request request;
 					request.set_user_id(userId);
-					server->Send("LoginSystem.OnLogout", request);
+					server->Send("LoginSystem.Logout", request);
 				}
 			}
 		}

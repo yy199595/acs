@@ -5,7 +5,6 @@
 #ifndef APP_CLIENTCOMPONENT_H
 #define APP_CLIENTCOMPONENT_H
 #include"Rpc/Client/Message.h"
-#include"Core/Map/HashMap.h"
 #include"Rpc/Client/InnerClient.h"
 #include"Rpc/Interface/ISend.h"
 #include"Entity/Component/Component.h"
@@ -18,10 +17,12 @@ namespace acs
 	public:
 		ClientComponent();
 	public:
+		int Remove(int id);
 		int Connect(const std::string & address);
 		int Send(int id, rpc::Packet * message) final;
 	private:
 		bool LateAwake() final;
+		void OnCloseSocket(int id, int code) final;
 		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
 		void OnMessage(rpc::Packet *request, rpc::Packet *response) final;
 	private:
@@ -30,7 +31,7 @@ namespace acs
 		class ProtoComponent * mProto;
 		class LuaComponent * mLuaComponent;
 		class DispatchComponent * mDisComponent;
-		custom::HashMap<int, rpc::InnerClient *> mClientMap;
+		std::unordered_map<int, std::unique_ptr<rpc::InnerClient>> mClientMap;
 
 	};
 }

@@ -22,6 +22,7 @@ namespace acs
 		bool OnInit() final;
 		void OnDisConnect(long long id);
 	 private:
+		class TimerComponent * mTimer;
 		class ActorComponent * mActorComponent;
 		class OuterNetComponent* mOuterComponent;
 	};
