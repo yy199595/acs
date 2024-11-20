@@ -20,6 +20,16 @@ namespace rpc
 		this->mDecodeState = tcp::Decode::None;
 	}
 
+	OuterClient::~OuterClient() noexcept
+	{
+		rpc::Packet * message = nullptr;
+		while(this->mSendMessages.Pop(message))
+		{
+			delete message;
+			message = nullptr;
+		}
+	}
+
 	void OuterClient::Stop(int code)
 	{
 		if(this->mSocket == nullptr)
@@ -161,7 +171,7 @@ namespace rpc
 			this->mComponent->OnCloseSocket(sockId, code);
 #else
 			Asio::Context & t = acs::App::GetContext();
-			t.post([this, code, sockId] { this->mComponent->OnCloseSocket(sockId, code); });
+			asio::post(t, [this, code, sockId] { this->mComponent->OnCloseSocket(sockId, code); });
 #endif
 		});
 

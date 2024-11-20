@@ -1,9 +1,9 @@
 {
-    "LoginSystem.OnLogin": {
+    "LoginSystem.Login": {
         "Async":true,
         "Request": "s2s.login.request"
     },
-    "LoginSystem.OnLogout": {
+    "LoginSystem.Logout": {
         "Async":true,
         "Request": "s2s.logout.request"
     }

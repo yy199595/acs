@@ -94,7 +94,7 @@ namespace acs
     inline bool RpcTaskComponent<K, T, Del>::OnResponse(K key, T * message)
 	{
 		auto iter = this->mTimeouts.find(key);
-		if(iter != this->mTimeouts.end());
+		if(iter != this->mTimeouts.end())
 		{
 			this->mTimeouts.erase(iter);
 		}

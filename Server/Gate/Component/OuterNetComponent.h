@@ -15,12 +15,6 @@ namespace rpc
 {
     class Packet;
 	class InnerClient;
-
-	struct RpcRecord
-	{
-		int rpcId;
-		std::string address;
-	};
 	class OuterClient;
 }
 

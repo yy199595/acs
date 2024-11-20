@@ -15,7 +15,7 @@ namespace rpc
 	 public:
 		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;
 		explicit OuterClient(int id, Component* component);
-		~OuterClient() final = default;
+		~OuterClient() final;
 	 public:
 		void Stop(int code);
 		bool Send(rpc::Packet * message);

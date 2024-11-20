@@ -105,7 +105,7 @@ namespace acs
 			LOG_ERROR("send to [{}] fail", id);
 			return nullptr;
 		}
-
+		int timeout = message->GetTimeout();
 		int taskId = this->mDisComponent->BuildRpcId();
 
 		message->SetRpcId(taskId);
@@ -114,7 +114,6 @@ namespace acs
 			LOG_ERROR("send to [{}] fail", id);
 			return nullptr;
 		}
-		int timeout = message->GetTimeout();
 		return this->mDisComponent->AddTask(taskId, new RpcTaskSource(taskId), timeout)->Await();
 	}
 }

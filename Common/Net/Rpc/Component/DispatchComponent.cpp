@@ -66,11 +66,11 @@ namespace acs
 				code = XCode::CallFunctionNotExist;
 				break;
 			}
-#ifdef __DEBUG__
-			std::string fromAddress = "unknown";
-			message->TempHead().Del(rpc::Header::from_addr, fromAddress);
-			LOG_DEBUG("[{}://{}] call ({})", methodConfig->NetName, fromAddress, methodConfig->FullName);
-#endif
+//#ifdef __DEBUG__
+//			std::string fromAddress = "unknown";
+//			message->TempHead().Del(rpc::Header::from_addr, fromAddress);
+//			LOG_DEBUG("[{}://{}] call ({})", methodConfig->NetName, fromAddress, methodConfig->FullName);
+//#endif
 			//LOG_DEBUG("call ({}) by {}", fullName, methodConfig->NetName);
 			if(!this->mRpcServices.Has(methodConfig->Service))
 			{

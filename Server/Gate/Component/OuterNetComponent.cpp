@@ -57,7 +57,10 @@ namespace acs
 					message->GetHead().Add(rpc::Header::sock_id, id);
 				}
 				message->GetHead().Add(rpc::Header::player_id, playerId);
-
+//#ifdef __DEBUG__
+//				std::string func = message->GetHead().GetStr(rpc::Header::func);
+//				LOG_DEBUG("user({}) call [{}]", playerId, func);
+//#endif
 				if (rpcId > 0)
 				{
 					++this->mWaitCount;
@@ -65,12 +68,12 @@ namespace acs
 					message->TempHead().Add(rpc::Header::rpc_id, rpcId);
 				}
 				int code = this->OnRequest(playerId, message);
-				if(code != XCode::Ok)
+				if(code == XCode::Ok)
 				{
-					this->StartClose(id, code);
 					return;
 				}
-				return;
+				this->StartClose(id, code);
+				break;
 			}
 			case rpc::Type::Response:
 			{
@@ -81,8 +84,10 @@ namespace acs
 					message->SetRpcId(rpcId);
 					if(message->TempHead().Del(rpc::Header::client_id, rpcId))
 					{
-						this->Send(rpcId, message);
-						return;
+						if(this->Send(rpcId, message))
+						{
+							return;
+						}
 					}
 				}
 			}
@@ -313,6 +318,7 @@ namespace acs
 				this->Send(sockId, request.release());
 			}
 		}
+		delete message;
 	}
 
 	bool OuterNetComponent::StopClient(long long userId)

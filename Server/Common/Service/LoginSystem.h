@@ -15,8 +15,8 @@ namespace acs
         LoginSystem();
         ~LoginSystem() override = default;
     private:
-		int OnLogin(long long id, const s2s::login::request & request);
-		int OnLogout(long long id, const s2s::logout::request & request);
+		int Login(long long id, const s2s::login::request & request);
+		int Logout(long long id, const s2s::logout::request & request);
 	private:
 		bool OnInit() final;
 	private:

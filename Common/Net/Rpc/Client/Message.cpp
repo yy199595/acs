@@ -8,6 +8,8 @@
 #include"Util/Tools/String.h"
 namespace rpc
 {
+//	std::mutex mutex;
+//	std::unordered_set<rpc::Packet *> NewMessageSet;
 
     bool Head::GetKeys(std::vector<std::string> &keys) const
     {
@@ -76,12 +78,30 @@ namespace rpc
 
 	Packet::Packet()
 	{
+//		std::lock_guard<std::mutex> lock(mutex);
+//		NewMessageSet.insert(this);
+
 		this->mSockId = 0;
 		this->mTimeout = 0;
 		this->mBody.clear();
 		this->mHead.Clear();
 		this->mNet = rpc::Net::Tcp;
 		memset(&this->mProtoHead, 0, sizeof(this->mProtoHead));
+	}
+
+	Packet::~Packet()
+	{
+//		std::lock_guard<std::mutex> lock(mutex);
+//		auto iter = NewMessageSet.find(this);
+//		if(iter != NewMessageSet.end())
+//		{
+//			NewMessageSet.erase(iter);
+//		}
+//		if(NewMessageSet.size() >= 2000)
+//		{
+//			assert(false);
+//		}
+//		printf("count = %d\n", (int)NewMessageSet.size());
 	}
 
 	void Packet::Init(const rpc::ProtoHead & protoHead)

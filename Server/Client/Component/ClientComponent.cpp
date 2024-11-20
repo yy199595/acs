@@ -72,14 +72,19 @@ namespace acs
 
 	void ClientComponent::OnMessage(rpc::Packet* message, rpc::Packet* response)
 	{
+		int code = XCode::Failure;
 		switch(message->GetType())
 		{
 			case rpc::Type::Request:
 				this->OnRequest(message);
 				break;
 			case rpc::Type::Response:
-				this->mDisComponent->OnMessage(message);
-				return;
+				code = this->mDisComponent->OnMessage(message);
+				break;
+		}
+		if(code != XCode::Ok)
+		{
+			delete message;
 		}
 	}
 
@@ -98,7 +103,6 @@ namespace acs
 			return XCode::CallServiceNotFound;
 		}
 		lua_State * lua = luaModule->GetLuaEnv();
-		std::unique_ptr<rpc::Packet> data(message);
 		luaModule->GetFunction(methodConfig->Method);
 		const std::string & body = message->GetBody();
 

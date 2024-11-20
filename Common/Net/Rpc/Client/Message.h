@@ -29,6 +29,7 @@ namespace rpc
 	{
 	public:
 		Packet();
+		~Packet();
 		int OnSendMessage(std::ostream& os) final;
 		int OnRecvMessage(std::istream& os, size_t size) final;
 	public:

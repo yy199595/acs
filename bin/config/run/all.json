@@ -8,7 +8,7 @@
 		"name": "${name}"
 	},
 	"lua": {
-		"main": "Server"
+		"main": "${lua}"
 	},
 	"listen": {
 		"http": {

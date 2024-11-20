@@ -133,7 +133,7 @@ namespace acs
 		if(iter != this->mClients.end())
 		{
 			const std::string & address = iter->second->GetAddress();
-			LOG_ERROR("close [{}] code = {}", address, CodeConfig::Inst()->GetDesc(code));
+			LOG_WARN("close [{}] code = {}", address, CodeConfig::Inst()->GetDesc(code));
 			this->mClients.erase(iter);
 		}
 		help::InnerLogoutEvent::Trigger(id);

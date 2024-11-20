@@ -25,13 +25,12 @@ namespace acs
 	public:
 		TaskContext * Pop();
 		size_t GetMemory() const;
+		bool Remove(unsigned int id);
 		TaskContext* Get(unsigned int id);
-		void Push(TaskContext * coroutine);
 		size_t GetWaitCount() const;
 		size_t GetCount() const { return this->mCoroutines.size(); }
 	private:
 		math::NumberPool<unsigned int> mNumPool;
-		custom::ArrayPool<TaskContext, 100> mCorPool;
 		std::unordered_map<unsigned int, TaskContext*> mCoroutines;
 	};
 }

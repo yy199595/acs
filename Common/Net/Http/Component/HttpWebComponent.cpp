@@ -182,7 +182,10 @@ namespace acs
 			if (!request->IsMethod("GET"))
 			{
 				httpStatus = this->CreateHttpData(httpConfig, request);
-				break;
+				if(httpStatus != HttpStatus::OK)
+				{
+					break;
+				}
 			}
 
 			if (this->mConfig.Auth && httpConfig->Auth)

@@ -48,7 +48,7 @@ namespace acs
 		int sockId = 0;
 		request.ConstHead().Get("sock", sockId);
 		const std::string & token = request.GetBody();
-		const std::string func("LoginSystem.OnLogin");
+		const std::string func("LoginSystem.Login");
 
 		json::r::Document document;
 		if(!this->mApp->DecodeSign(token, document))
@@ -81,20 +81,21 @@ namespace acs
 		std::vector<int> targetServers;
 		for(const NodeConfig * nodeConfig : configs)
 		{
-			const std::string & name = nodeConfig->GetName();
-			Server * server = this->mActorComponent->Random(name);
-			if(server == nullptr)
+			if (!nodeConfig->HasService(ComponentFactory::GetName<LoginSystem>()))
+			{
+				continue;
+			}
+			const std::string& name = nodeConfig->GetName();
+			Server* server = this->mActorComponent->Random(name);
+			if (server == nullptr)
 			{
 				LOG_ERROR("allot server [{0}] fail", name);
 				return XCode::AddressAllotFailure;
 			}
 			int serverId = server->GetSrvId();
-			if(nodeConfig->HasService(ComponentFactory::GetName<LoginSystem>()))
-			{
-				targetServers.emplace_back(serverId);
-			}
+			targetServers.emplace_back(serverId);
 			player->AddAddr(name, serverId);
-			message.mutable_actors()->insert({name, serverId});
+			message.mutable_actors()->insert({ name, serverId });
 		}
 
 		for(const int & serverId : targetServers)

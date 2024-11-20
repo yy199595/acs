@@ -3,7 +3,7 @@ local json = require("util.json")
 local str_format = string.format
 local timer = require("core.timer")
 local Module = require("Module")
-local client = require("net.client")
+local Session = require("Session")
 local http = require("HttpComponent")
 
 local HOST = "http://127.0.0.1:8088"
@@ -11,39 +11,57 @@ local HOST = "http://127.0.0.1:8088"
 local Main = Module()
 
 function Main:Awake()
-
+    self.count = 0
+    self.accounts = { }
+    self.sessions = { }
+    timer.AddUpdate(500, self, "OnUpdate")
+    for i = 1, 100 do
+        local account = string.format("yjz1995%s", i)
+        table.insert(self.accounts, { account = account, password = "123456 "})
+    end
 end
 
 function Main:OnUpdate()
-    print("=============")
+    for _, session in ipairs(self.sessions) do
+        self.count = self.count + 1
+        coroutine.start(self.CallServer, self, session)
+    end
+    print(string.format("======== [%d] =======", self.count))
 end
 
-function Main:OnComplete()
-    local response = http:Post(str_format("%s/account/login", HOST), {
-        account = "yjz1995",
-        password = "199595yjz."
-    })
-    if response == nil or response.data == nil then
-        log.Error("account login failure")
-        return
-    end
-    local result = response.data
-    local fd = client.Connect(result.address)
-    client.Call(fd, "GateSystem.Login", result.token)
+function Main:CallServer(client)
 
-    client.Call(fd, "ChatSystem.OnChat", {
+    client:Call("ChatSystem.Ping")
+
+    client:Call("ChatSystem.OnChat", {
         msg_type = 1,
         message = "chat on world"
     })
 
-    client.Call(fd, "ChatSystem.OnChat", {
-        user_id = 1,
-        msg_type = 2,
-        message = "chat on private"
-    })
+    client:Call("ChatSystem.Request")
+    self.count = self.count - 1
+end
 
-    coroutine.sleep(1000)
-    --client.Call(fd, "GateSystem.Logout")
+function Main:OnComplete()
+
+    for _, info in pairs(self.accounts) do
+        coroutine.start(function()
+            local response = http:Post(str_format("%s/account/login", HOST), info)
+            if response == nil or response.data == nil then
+                log.Error("account login failure")
+                return
+            end
+
+            local result = response.data
+            local client = Session(result.address)
+
+            local code = client:Call("GateSystem.Login", result.token)
+            if code == XCode.Ok then
+                table.insert(self.sessions, client)
+                log.Warning("user(%s) login [%s] ok", info.account, result.address)
+            end
+        end)
+    end
 end
 
 return Main

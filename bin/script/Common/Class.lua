@@ -1,5 +1,6 @@
 
 local on_new_index = function(class, k, v)
+    print("-------", class, k, v)
     class[k] = v
 end
 
@@ -37,11 +38,9 @@ Class = function(base)
         if type(base) == "string" then
             super = require(base)
         end
-        setmetatable(class, {
-            __index = super,
-            __tostring = to_string,
-            __newindex = on_new_index,
-        })
+        for k, v in pairs(super) do
+            class[k] = v
+        end
     end
     class.SetMember = SetMember
     return class

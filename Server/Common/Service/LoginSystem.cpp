@@ -17,15 +17,15 @@ namespace acs
 
 	bool LoginSystem::OnInit()
 	{
-		BIND_SERVER_RPC_METHOD(LoginSystem::OnLogin);
-		BIND_SERVER_RPC_METHOD(LoginSystem::OnLogout);
+		BIND_SERVER_RPC_METHOD(LoginSystem::Login);
+		BIND_SERVER_RPC_METHOD(LoginSystem::Logout);
 		this->mApp->GetComponents(this->mLoginComponents);
 		this->mActorComponent = this->GetComponent<ActorComponent>();
 		this->mMasterComponent = this->GetComponent<MasterComponent>();
 		return true;
 	}
 
-    int LoginSystem::OnLogin(long long id, const s2s::login::request & request)
+    int LoginSystem::Login(long long id, const s2s::login::request & request)
 	{
 		long long playerId = request.user_id();
 		Player * player = this->mActorComponent->GetPlayer(playerId);
@@ -50,16 +50,16 @@ namespace acs
 		}
 
 		Lua::LuaModule * luaModule = this->GetLuaModule();
-		if(luaModule->HasFunction("_OnLogin"))
+		if(luaModule != nullptr && luaModule->HasFunction("OnLogin"))
 		{
-			luaModule->Await("_OnLogin", playerId);
+			luaModule->Await("OnLogin", playerId);
 		}
 
 		help::PlayerLoginEvent::Trigger(playerId);
 		return XCode::Ok;
 	}
 
-    int LoginSystem::OnLogout(long long id, const s2s::logout::request& request)
+    int LoginSystem::Logout(long long id, const s2s::logout::request& request)
     {
 		long long playerId = request.user_id();
     	this->mActorComponent->DelActor(playerId);
@@ -67,6 +67,14 @@ namespace acs
 		{
 			loginComponent->OnLogout(playerId);
 		}
+
+		Lua::LuaModule * luaModule = this->GetLuaModule();
+		if(luaModule != nullptr && luaModule->HasFunction("OnLogout"))
+		{
+			luaModule->Await("OnLogout", playerId);
+		}
+
+
 		help::PlayerLogoutEvent::Trigger(playerId);
 		return XCode::Ok;
     }

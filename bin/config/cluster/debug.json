@@ -6,13 +6,14 @@
             "NodeSystem",
             "GateSystem",
             "EventSystem",
-            "ChatComponent",
             "ChatSystem",
-            "GateSystem"
+            "LoginSystem",
+            "ChatComponent"
         ],
         "http" : [
             "Watch",
             "LogMgr",
+            "Account",
             "QuickSDK",
             "FileUpload",
             "ResourceMgr",

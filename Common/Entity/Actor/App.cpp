@@ -214,6 +214,11 @@ namespace acs
 
 					if (logicStartTime - logicSecondTime >= 1000)
 					{
+#ifdef __OS_WIN__
+						os::SystemInfo systemInfo;
+						os::System::GetSystemInfo(systemInfo);
+						SetConsoleTitle(fmt::format("{}MB", systemInfo.use_memory / (1024 * 1024)).c_str());
+#endif
 #if defined(__OS_WIN__) || defined(__OS_WIN__)
 						this->Hotfix();
 #endif
@@ -324,10 +329,7 @@ namespace acs
 
 		for (IAppStop* component: stopComponent)
 		{
-			if (component != nullptr)
-			{
-				component->OnAppStop(); //保存数据
-			}
+			component->OnAppStop(); //保存数据
 		}
 
 		std::vector<IDestroy*> components;

@@ -16,34 +16,16 @@ namespace acs
 
 	TaskContext * TaskContextPool::Pop()
 	{
-		TaskContext* coroutine = this->mCorPool.Pop();
-		if (coroutine == nullptr)
+		TaskContext* coroutine  = new TaskContext();
 		{
-			coroutine = new TaskContext();
+			coroutine->mContext = nullptr;
+			coroutine->mFunction = nullptr;
+			coroutine->mState = CorState::Ready;
+			coroutine->mCoroutineId = this->mNumPool.BuildNumber();
+			coroutine->sid = coroutine->mCoroutineId & (SHARED_STACK_NUM - 1);
 		}
-
-		coroutine->mContext = nullptr;
-		coroutine->mFunction = nullptr;
-		coroutine->mState = CorState::Ready;
-		coroutine->mCoroutineId = this->mNumPool.BuildNumber();
-		coroutine->sid = coroutine->mCoroutineId & (SHARED_STACK_NUM - 1);
-		coroutine->mStack.size = STACK_SIZE;
-		coroutine->mStack.p = new char[STACK_SIZE];
-		assert(coroutine->mStack.p);
-		//memset(coroutine->mStack.p, STACK_SIZE, 0);
 		this->mCoroutines.emplace(coroutine->mCoroutineId, coroutine);
 		return coroutine;
-	}
-
-	void TaskContextPool::Push(TaskContext * coroutine)
-	{
-		long long id = coroutine->mCoroutineId;
-		auto iter = this->mCoroutines.find(id);
-		if (iter != this->mCoroutines.end())
-		{
-			this->mCoroutines.erase(iter);
-		}
-		this->mCorPool.Push(coroutine);
 	}
 
 	size_t TaskContextPool::GetWaitCount() const
@@ -75,5 +57,16 @@ namespace acs
 	{
         auto iter = this->mCoroutines.find(id);
         return iter != this->mCoroutines.end() ? iter->second : nullptr;
+	}
+
+	bool TaskContextPool::Remove(unsigned int id)
+	{
+		auto iter = this->mCoroutines.find(id);
+		if(iter == this->mCoroutines.end())
+		{
+			return false;
+		}
+		this->mCoroutines.erase(iter);
+		return true;
 	}
 }

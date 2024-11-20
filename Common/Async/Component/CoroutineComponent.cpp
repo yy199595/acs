@@ -35,7 +35,13 @@ namespace acs
 			{
 				stack.co = 0;
 			}
-			this->mCorPool.Push(this->mRunContext);
+			unsigned int id = this->mRunContext->mCoroutineId;
+			{
+				delete this->mRunContext;
+				this->mCorPool.Remove(id);
+				this->mRunContext = nullptr;
+			}
+
 		}
 		tb_context_jump(this->mMainContext, nullptr);
 	}
