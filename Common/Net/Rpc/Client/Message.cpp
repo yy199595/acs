@@ -7,7 +7,7 @@
 #include"Yyjson/Document/Document.h"
 #include"Util/Tools/String.h"
 
-#define RPC_PACKET_COUNTER 1
+#define RPC_PACKET_COUNTER 0
 
 namespace rpc
 {
