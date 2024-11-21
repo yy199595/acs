@@ -27,7 +27,7 @@ function Main:Awake()
         print(string.format("coroutine:%s rpc_count:%s cpu:%.4f memory:%.4f", self.count, count, osInfo.cpu, user_memory))
     end)
 
-    for i = 1, 20 do
+    for i = 1, 200 do
         local account = string.format("yjz1995%s", i)
         table.insert(self.accounts, { account = account, password = "123456" })
     end
