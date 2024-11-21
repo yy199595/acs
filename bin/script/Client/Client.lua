@@ -12,11 +12,16 @@ local Main = Module()
 
 function Main:Awake()
     self.count = 0
+    self.login_count = 0
     self.accounts = { }
     self.sessions = { }
     timer.AddUpdate(500, self, "OnUpdate")
     timer.AddUpdate(2000, function()
-        print(string.format("coroutine count = %s", self.count))
+        local count = 0
+        for _, player in ipairs(self.sessions) do
+            count = count + player.count
+        end
+        print(string.format("coroutine count(%s) rpc_count[%s]", self.count, count))
     end)
 
     for i = 1, 100 do
@@ -28,6 +33,11 @@ end
 function Main:OnUpdate()
     for index, player in ipairs(self.sessions) do
         if player.close then
+            coroutine.start(function()
+                local sleep = math.random(100, 2000)
+                coroutine.sleep(sleep)
+                self:Login(player)
+            end)
             table.remove(self.sessions, index)
             break
         end
@@ -52,7 +62,7 @@ function Main:CallServer(player)
 
     player.count = player.count + 1
 
-    if player.count >= 10 then
+    if player.count >= player.logout_count then
         local code = client:Call("GateSystem.Logout")
 
         client:Close()
@@ -64,32 +74,33 @@ function Main:CallServer(player)
     self.count = self.count - 1
 end
 
+function Main:Login(info)
+    local response = http:Post(str_format("%s/account/login", HOST), info)
+    if response == nil or response.data == nil then
+        log.Error("account login failure")
+        return
+    end
+
+    local result = response.data
+    local client = Session(result.address)
+    local code = client:Call("GateSystem.Login", result.token)
+    if code == XCode.Ok then
+        table.insert(self.sessions, {
+            count = 0,
+            close = false,
+            account = info,
+            client = client,
+            logout_count = math.random(100, 10000)
+        })
+        self.login_count = self.login_count + 1
+        log.Warning("[%s] user(%s) login [%s] ok", self.login_count, info.account, result.address)
+    end
+end
+
 function Main:OnComplete()
 
-    for i, info in pairs(self.accounts) do
-        coroutine.start(function()
-            coroutine.sleep(i * 20)
-            local response = http:Post(str_format("%s/account/login", HOST), info)
-            if response == nil or response.data == nil then
-                log.Error("account login failure")
-                return
-            end
-
-            local result = response.data
-            local client = Session(result.address)
-
-            local code = client:Call("GateSystem.Login", result.token)
-            if code == XCode.Ok then
-                table.insert(self.sessions, {
-                    index = i,
-                    count = 0,
-                    close = false,
-                    account = info,
-                    client = client,
-                })
-                log.Warning("[%s] user(%s) login [%s] ok", i, info.account, result.address)
-            end
-        end)
+    for _, info in pairs(self.accounts) do
+        coroutine.start(self.Login, self, info)
     end
 end
 

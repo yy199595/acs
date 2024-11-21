@@ -11,19 +11,19 @@ SetMember(Main, "count", 1)
 
 proto.Import("record/record.proto")
 
-local appId = 0
+local appId = nil
 local app = require("App")
 function Main:Awake()
 
-    --local appId = 1
-    --
+
     --app:MakeServer(appId, "server", {
     --    rpc = "43.143.239.75:7789",
     --    kcp = "43.143.239.75:7787",
-    --    udp = "43.143.239.75:7788"
+    --    udp = "43.143.239.75:7788",
+    --    http = "101.34.67.141:80"
     --})
     local timer = require("core.timer")
-    --timer.AddUpdate(300, self, "Update")
+    timer.AddUpdate(400, self, "Update")
 end
 
 local count = 0
@@ -33,24 +33,18 @@ function Main:Update()
         count = count + 1
         for i = 1, 2 do
             coroutine.sleep(100)
-            local t1 = os.clock()
             local code, _ = app:Call(appId, "ChatSystem.OnChat", {
                 user_id = 10004,
                 msg_type = 1,
                 message = "hello"
             })
-            local t2 = os.clock()
-            log.Info("(kcp)  (%s)ms [%s]  code:%s", t2 - t1, i, code)
+
             code = app:Call(appId, "ChatSystem.Request", {
                 name = "xiao",
                 age = 10 + i,
                 index = i
             })
-            local t3 = os.clock()
-            log.Warning("(udp)  (%s)ms [%s]  code:%s", t3 - t2, i, code)
             code = app:Call(appId, "ChatSystem.Ping")
-            local t4 = os.clock()
-            log.Error("(tcp)  (%s)ms [%s]  code:%s", t4 - t3, i, code)
         end
         count = count - 1
     end)
