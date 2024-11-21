@@ -11,6 +11,7 @@ local HOST = "http://127.0.0.1:8088"
 local Main = Module()
 
 function Main:Awake()
+
     self.count = 0
     self.login_count = 0
     self.accounts = { }
@@ -21,7 +22,9 @@ function Main:Awake()
         for _, player in ipairs(self.sessions) do
             count = count + player.count
         end
-        print(string.format("coroutine count(%s) rpc_count[%s]", self.count, count))
+        local osInfo = os.get_system_info()
+        local user_memory = osInfo.use_memory / (1024 * 1024)
+        print(string.format("coroutine:%s rpc_count:%s cpu:%.4f memory:%.4f", self.count, count, osInfo.cpu, user_memory))
     end)
 
     for i = 1, 100 do
@@ -36,7 +39,7 @@ function Main:OnUpdate()
             coroutine.start(function()
                 local sleep = math.random(100, 2000)
                 coroutine.sleep(sleep)
-                self:Login(player)
+                self:Login(player.account)
             end)
             table.remove(self.sessions, index)
             break

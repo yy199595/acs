@@ -24,6 +24,7 @@
 #include "Util/Tools/LuaString.h"
 #include "Udp/Common/UdpClient.h"
 #include "Kcp/Common/KcpClient.h"
+#include "Core/Lua/LuaOs.h"
 #ifdef __ENABLE_OPEN_SSL__
 #include "Util/Ssl/rsa.h"
 #include "Util/Ssl/LuaRsa.h"
@@ -57,6 +58,7 @@ namespace acs
 
 		os.PushMember("dir", os::System::WorkPath());
 		os.PushStaticFunction("setenv", os::System::LuaSetEnv);
+		os.PushExtensionFunction("get_system_info", LuaCore::GetSystemInfo);
 #ifdef __OS_MAC__
 		os.PushMember("platform", std::string("mac"));
 #elif __OS_LINUX__
