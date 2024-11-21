@@ -99,11 +99,7 @@ namespace acs
 
 	int Server::SendMsg(std::unique_ptr<rpc::Packet> message)
 	{
-		if(!this->mRouterComponent->Send(this->GetSrvId(), std::move(message)))
-		{
-			return XCode::SendMessageFail;
-		}
-		return XCode::Ok;
+		return this->mRouterComponent->Send(this->GetSrvId(), std::move(message));
 	}
 
 	void Server::EncodeToJson(std::string * json)

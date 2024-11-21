@@ -6,10 +6,15 @@
 #include"Proto/Include/Message.h"
 #include"Yyjson/Document/Document.h"
 #include"Util/Tools/String.h"
+
+#define RPC_PACKET_COUNTER 1
+
 namespace rpc
 {
-//	std::mutex mutex;
-//	std::unordered_set<rpc::Packet *> NewMessageSet;
+#if RPC_PACKET_COUNTER == 1
+	std::mutex mutex;
+	std::unordered_set<rpc::Packet *> NewMessageSet;
+#endif
 
     bool Head::GetKeys(std::vector<std::string> &keys) const
     {
@@ -78,9 +83,10 @@ namespace rpc
 
 	Packet::Packet()
 	{
-//		std::lock_guard<std::mutex> lock(mutex);
-//		NewMessageSet.insert(this);
-
+#if RPC_PACKET_COUNTER == 1
+		std::lock_guard<std::mutex> lock(mutex);
+		NewMessageSet.insert(this);
+#endif
 		this->mSockId = 0;
 		this->mTimeout = 0;
 		this->mBody.clear();
@@ -91,17 +97,19 @@ namespace rpc
 
 	Packet::~Packet()
 	{
-//		std::lock_guard<std::mutex> lock(mutex);
-//		auto iter = NewMessageSet.find(this);
-//		if(iter != NewMessageSet.end())
-//		{
-//			NewMessageSet.erase(iter);
-//		}
-//		if(NewMessageSet.size() >= 2000)
-//		{
-//			assert(false);
-//		}
-//		printf("count = %d\n", (int)NewMessageSet.size());
+#if RPC_PACKET_COUNTER == 1
+		std::lock_guard<std::mutex> lock(mutex);
+		auto iter = NewMessageSet.find(this);
+		if(iter != NewMessageSet.end())
+		{
+			NewMessageSet.erase(iter);
+		}
+		if(NewMessageSet.size() >= 1000)
+		{
+			//assert(false);
+			printf("count = %d\n", (int)NewMessageSet.size());
+		}
+#endif
 	}
 
 	void Packet::Init(const rpc::ProtoHead & protoHead)
