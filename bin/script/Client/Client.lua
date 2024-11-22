@@ -24,10 +24,10 @@ function Main:Awake()
         end
         local osInfo = os.get_system_info()
         local user_memory = osInfo.use_memory / (1024 * 1024)
-        print(string.format("coroutine:%s rpc_count:%s cpu:%.4f memory:%.4f", self.count, count, osInfo.cpu, user_memory))
+        log.Warning("coroutine:%s rpc_count:%s cpu:%.2f memory:%.2f", self.count, count, osInfo.cpu, user_memory)
     end)
 
-    for i = 1, 200 do
+    for i = 1, 100 do
         local account = string.format("yjz1995%s", i)
         table.insert(self.accounts, { account = account, password = "123456" })
     end
@@ -44,8 +44,10 @@ function Main:OnUpdate()
             table.remove(self.sessions, index)
             break
         end
-        self.count = self.count + 1
-        coroutine.start(self.CallServer, self, player)
+        for i = 1, 10 do
+            self.count = self.count + 1
+            coroutine.start(self.CallServer, self, player)
+        end
     end
 end
 
@@ -56,12 +58,12 @@ function Main:CallServer(player)
 
     client:Call("ChatSystem.Ping")
 
-    client:Call("ChatSystem.OnChat", {
-        msg_type = 1,
-        message = "chat on world"
-    })
+    --client:Call("ChatSystem.OnChat", {
+    --    msg_type = 1,
+    --    message = "chat on world"
+    --})
 
-    client:Call("ChatSystem.Request")
+   -- client:Call("ChatSystem.Request")
 
     player.count = player.count + 1
 

@@ -32,9 +32,9 @@ namespace acs
 		unsigned int mSumCount;
 		unsigned int mWaitCount;
 		math::NumberPool<int> mNumPool;
-		class CoroutineComponent* mTaskComponent;
+		class RouterComponent* mRouterComponent;
 		class OuterNetComponent* mOuterComponent;
-		class RouterComponent * mRouterComponent;
+		class CoroutineComponent* mTaskComponent;
 		custom::HashMap<std::string, RpcService *> mRpcServices;
 	};
 }

@@ -53,12 +53,12 @@ namespace acs
 	template<typename K,typename T, bool Del>
 	void RpcTaskComponent<K, T, Del>::OnLastFrameUpdate(long long nowMS)
 	{
-		for(RpcTask & task : this->mDelTasks)
+		for (RpcTask& task: this->mDelTasks)
 		{
 			delete task;
 		}
-		T * data = nullptr;
-		while(!this->mDelMessages.empty())
+		T* data = nullptr;
+		while (!this->mDelMessages.empty())
 		{
 			data = this->mDelMessages.front();
 			{
@@ -67,27 +67,24 @@ namespace acs
 			}
 		}
 		this->mDelTasks.clear();
-		if(!this->mTimeouts.empty())
+		for (auto iter = this->mTimeouts.begin(); iter != this->mTimeouts.end();)
 		{
-			for(auto iter = this->mTimeouts.begin(); iter != this->mTimeouts.end(); )
+			const K& key = iter->first;
+			long long targetTime = iter->second;
+			if (nowMS >= targetTime)
 			{
-				const K & key = iter->first;
-				long long targetTime = iter->second;
-				if(nowMS >= targetTime)
+				auto iter1 = this->mTasks.find(key);
+				if (iter1 != this->mTasks.end())
 				{
-					auto iter1 = this->mTasks.find(key);
-					if (iter1 != this->mTasks.end())
-					{
-						iter1->second->OnResponse(nullptr);
-						this->mDelTasks.emplace_back(iter1->second);
-						LOG_ERROR("rpc task:{} time out", iter1->first)
-						this->mTasks.erase(iter1);
-					}
-					this->mTimeouts.erase(iter++);
-					continue;
+					iter1->second->OnResponse(nullptr);
+					this->mDelTasks.emplace_back(iter1->second);
+					LOG_ERROR("rpc task:{} time out", iter1->first)
+					this->mTasks.erase(iter1);
 				}
-				iter++;
+				iter = this->mTimeouts.erase(iter);
+				continue;
 			}
+			iter++;
 		}
 	}
 

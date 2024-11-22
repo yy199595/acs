@@ -1,19 +1,16 @@
 {
     "ChatSystem.Ping": {
         "Async": true,
-        "IsClient": true,
-        "Timeout" : 5000
+        "IsClient": true
     },
     "ChatSystem.Request" : {
         "Async" : true,
-        "Timeout" : 5000,
         "IsClient": true,
         "Request" : "google.protobuf.Struct"
     },
     "ChatSystem.OnChat": {
         "Proto" : "json",
         "Async": true,
-        "Timeout" : 5000,
         "IsClient": true,
         "Request": "c2s.chat.request"
     },
