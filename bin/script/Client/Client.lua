@@ -44,26 +44,27 @@ function Main:OnUpdate()
             table.remove(self.sessions, index)
             break
         end
-        for i = 1, 10 do
-            self.count = self.count + 1
-            coroutine.start(self.CallServer, self, player)
-        end
+
+        self.count = self.count + 1
+        coroutine.start(self.CallServer, self, player)
     end
 end
 
 function Main:CallServer(player)
 
     local client = player.client
-    client:Call("GateSystem.Ping")
+    for i = 1, 10 do
+        client:Call("GateSystem.Ping")
 
-    client:Call("ChatSystem.Ping")
+        client:Call("ChatSystem.Ping")
 
-    --client:Call("ChatSystem.OnChat", {
-    --    msg_type = 1,
-    --    message = "chat on world"
-    --})
+        --client:Call("ChatSystem.OnChat", {
+        --    msg_type = 1,
+        --    message = "chat on world"
+        --})
 
-   -- client:Call("ChatSystem.Request")
+        -- client:Call("ChatSystem.Request")
+    end
 
     player.count = player.count + 1
 
