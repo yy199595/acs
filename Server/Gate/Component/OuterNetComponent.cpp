@@ -21,19 +21,18 @@ namespace acs
 		this->mWaitCount = 0;
 		this->mActComponent = nullptr;
 		this->mMaxConnectCount = 500;
-		this->mNetComponent = nullptr;
+		this->mThreadComponent = nullptr;
 	}
 
 	bool OuterNetComponent::LateAwake()
 	{
-		const ServerConfig & config = this->mApp->Config();
-		this->mActComponent = this->GetComponent<ActorComponent>();
-		this->mNetComponent = this->GetComponent<ThreadComponent>();
 		std::unique_ptr<json::r::Value> jsonObject;
-		if(config.Get("connect", jsonObject))
+		if(ServerConfig::Inst()->Get("connect", jsonObject))
 		{
 			jsonObject->Get("outer", this->mMaxConnectCount);
 		}
+		this->mActComponent = this->GetComponent<ActorComponent>();
+		this->mThreadComponent = this->GetComponent<ThreadComponent>();
 		return true;
 	}
 
@@ -173,7 +172,7 @@ namespace acs
 			{
 				return XCode::NotFoundActorAddress;
 			}
-			tcp::Socket* socketProxy = this->mNetComponent->CreateSocket(address);
+			tcp::Socket* socketProxy = this->mThreadComponent->CreateSocket(address);
 			if (socketProxy == nullptr)
 			{
 				LOG_ERROR("create socket fail : {}", address)

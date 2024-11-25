@@ -52,7 +52,7 @@ namespace acs
 		math::NumberPool<int> mNumPool;
 		math::NumberPool<int> mSocketPool;
 		class ActorComponent * mActComponent;
-		class ThreadComponent * mNetComponent;
+		class ThreadComponent * mThreadComponent;
 		custom::ArrayPool<rpc::OuterClient, 100> mClientPools;
 		custom::HashMap<int, long long> mAddressUserMap;  //fd和玩家id的映射表
 		custom::HashMap<long long, int> mUserAddressMap; //验证过的客户端
