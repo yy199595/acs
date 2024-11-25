@@ -37,7 +37,7 @@ namespace acs
 		switch (request.msg_type())
 		{
 			case CHAT_TYPE_WORLD:
-				this->mGate->BroadCast(func, &message);
+				//this->mGate->BroadCast(func, &message);
 				break;
 			case CHAT_TYPE_GUILD:
 				break;
