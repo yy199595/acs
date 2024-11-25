@@ -1,3 +1,6 @@
-port=8080
-ip=101.34.67.141
-nohup ./app --config=./config/run/client.json --count=50 --host=http://$ip:$port &
+
+ulimit -c unlimited
+export COREDUMP_FILENAME=./
+sysctl -w kernel.core_pattern="core.%t"
+
+/app --rpc=7788 --http=8088 --gate=7789 --lua=Client
