@@ -180,10 +180,7 @@ namespace acs
 		}
 		message->GetHead().Del("id");
 		message->SetType(rpc::Type::Request);
-		if(!this->mOuterComponent->SendToPlayer(userId, message))
-		{
-			return XCode::NotFindUser;
-		}
+		this->mOuterComponent->SendToPlayer(userId, message);
 		return XCode::Ok;
 	}
 

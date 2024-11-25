@@ -199,9 +199,15 @@ namespace acs
 		rpc::OuterClient * tcpClient = nullptr;
 		if(!this->mGateClientMap.Get(id, tcpClient))
 		{
+			delete message;
 			return false;
 		}
-		return tcpClient->Send(message);
+		if(!tcpClient->Send(message))
+		{
+			delete message;
+			return false;
+		}
+		return true;
 	}
 
 	bool OuterNetComponent::AddPlayer(long long userId, int sockId)
@@ -278,8 +284,8 @@ namespace acs
 		int socketId = 0;
 		if(!this->mUserAddressMap.Get(userId, socketId))
 		{
-			LOG_ERROR("send message to ({}) fail : {}", userId, message->ToString());
 			delete message;
+			LOG_ERROR("send message to ({}) fail : {}", userId, message->ToString());
 			return false;
 		}
 		LOG_DEBUG("send client({}) : {}", userId, message->ToString());
