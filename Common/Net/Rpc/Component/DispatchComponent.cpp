@@ -94,7 +94,10 @@ namespace acs
 		++this->mWaitCount;
 		int code = XCode::Ok;
 #ifdef __DEBUG__
+		os::SystemInfo systemInfo;
+		os::System::GetSystemInfo(systemInfo);
 		long long start = help::Time::NowMil();
+		long long startMemory = systemInfo.use_memory;
 #endif
 		do
 		{
@@ -109,6 +112,14 @@ namespace acs
 			code = logicService->Invoke(config, message);
 		} while (false);
 #ifdef __DEBUG__
+		os::System::GetSystemInfo(systemInfo);
+		if(startMemory != systemInfo.use_memory)
+		{
+			long long t = help::Time::NowMil() - start;
+			long long use = systemInfo.use_memory - startMemory;
+			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
+			LOG_WARN("({}ms) invoke [{}] code:{} = {}  memory:{}", t, config->FullName, code, desc, use)
+		}
 		long long t = help::Time::NowMil() - start;
 		if (code != XCode::Ok)
 		{
