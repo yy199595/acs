@@ -27,7 +27,7 @@ function Main:Awake()
         log.Warning("coroutine:%s rpc_count:%s cpu:%.2f memory:%.2f", self.count, count, osInfo.cpu, user_memory)
     end)
 
-    for i = 1, 1 do
+    for i = 1, 100 do
         local account = string.format("yjz1995%s", i)
         table.insert(self.accounts, { account = account, password = "123456" })
     end
