@@ -317,13 +317,7 @@ namespace acs
 		{
 			std::unique_ptr<rpc::Packet> request = message->Clone();
 			{
-				rpc::Packet * newMessage = request.release();
-				{
-					if(!this->Send(iter->first, newMessage))
-					{
-						delete newMessage;
-					}
-				}
+				this->Send(iter->first, request.release());
 			}
 		}
 		delete message;
