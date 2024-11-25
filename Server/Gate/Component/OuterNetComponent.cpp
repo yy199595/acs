@@ -43,7 +43,7 @@ namespace acs
 
 	void OuterNetComponent::OnMessage(rpc::Packet * message, rpc::Packet *)
 	{
-		int code = XCode::Ok;
+		int code = XCode::Failure;
 		message->SetNet(rpc::Net::Tcp);
 		switch (message->GetType())
 		{
@@ -79,10 +79,8 @@ namespace acs
 					message->SetRpcId(rpcId);
 					if(message->TempHead().Del(rpc::Header::client_id, rpcId))
 					{
-						if(!this->Send(rpcId, message))
-						{
-							code = XCode::SendMessageFail;
-						}
+						code = XCode::Ok;
+						this->Send(rpcId, message);
 					}
 				}
 				break;
