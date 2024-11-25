@@ -16,14 +16,14 @@ namespace acs
     {
 		this->mActComponent = nullptr;
 		this->mDisComponent = nullptr;
-        this->mNetComponent = nullptr;
+        this->mThreadComponent = nullptr;
     }
 
     bool InnerNetComponent::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(this->mActComponent = this->GetComponent<ActorComponent>())
-		LOG_CHECK_RET_FALSE(this->mNetComponent = this->GetComponent<ThreadComponent>())
 		LOG_CHECK_RET_FALSE(this->mDisComponent = this->GetComponent<DispatchComponent>())
+		LOG_CHECK_RET_FALSE(this->mThreadComponent = this->GetComponent<ThreadComponent>())
 		return true;
 	}
 
@@ -117,17 +117,17 @@ namespace acs
 
     void InnerNetComponent::OnSendFailure(int, rpc::Packet * message)
     {
-		std::unique_ptr<rpc::Packet> data(message);
         if (message->GetType() == rpc::Type::Request)
         {
 			if(message->GetRpcId() != 0)
             {
                 message->SetType(rpc::Type::Response);
                 message->GetHead().Add(rpc::Header::code, XCode::NetWorkError);
-                this->mDisComponent->OnMessage(data.release());
+                this->mDisComponent->OnMessage(message);
 				return;
             }
         }
+		delete message;
     }
 
     void InnerNetComponent::OnCloseSocket(int id, int code)
@@ -174,7 +174,7 @@ namespace acs
 		{
 			return nullptr;
 		}
-		tcp::Socket* socketProxy = this->mNetComponent->CreateSocket(address);
+		tcp::Socket* socketProxy = this->mThreadComponent->CreateSocket(address);
 		if (socketProxy == nullptr)
 		{
 			LOG_ERROR("parse address fail : {}", address)

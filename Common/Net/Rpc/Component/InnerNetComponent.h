@@ -33,8 +33,8 @@ namespace acs
 	private:
 		math::NumberPool<int, 100> mNumPool;
 		class ActorComponent * mActComponent;
-		class ThreadComponent * mNetComponent;
         class DispatchComponent* mDisComponent;
+		class ThreadComponent * mThreadComponent;
 		std::unordered_map<int, std::unique_ptr<rpc::InnerClient>> mClients; //本地客户端(连接别的)
 	};
 }
