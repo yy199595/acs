@@ -34,6 +34,7 @@ namespace acs
 		switch (message->GetType())
 		{
 			case rpc::Type::Logout:
+				code = XCode::Failure;
 				this->StartClose(message->SockId());
 				break;
 			case rpc::Type::Request:
@@ -47,26 +48,28 @@ namespace acs
 				int socketId = 0;
 				if (message->GetHead().Del("#", socketId))
 				{
-					this->Send(socketId, message);
-					return;
+					code = this->Send(socketId, message);
 				}
-#ifdef __DEBUG__
-				std::string func;
-				int code = XCode::Ok;
-				long long startTime = 0;
-				message->GetHead().Get("code", code);
-				const rpc::Head& head = message->ConstTempHead();
-				if(head.Get("func", func) && head.Get("t", startTime))
+				else
 				{
-					if(code != XCode::Ok)
+#ifdef __DEBUG__
+					std::string func;
+					int code = XCode::Ok;
+					long long startTime = 0;
+					message->GetHead().Get("code", code);
+					const rpc::Head& head = message->ConstTempHead();
+					if (head.Get(rpc::Header::func, func) && head.Get("t", startTime))
 					{
-						long long nowTme = help::Time::NowMil();
-						const std::string error = CodeConfig::Inst()->GetDesc(code);
-						LOG_WARN("({}ms) call [{}] code:{}", nowTme - startTime, func, error);
+						if (code != XCode::Ok)
+						{
+							long long nowTme = help::Time::NowMil();
+							const std::string error = CodeConfig::Inst()->GetDesc(code);
+							LOG_WARN("({}ms) call [{}] code:{}", nowTme - startTime, func, error);
+						}
 					}
-				}
 #endif
-				code = this->mDisComponent->OnMessage(message);
+					code = this->mDisComponent->OnMessage(message);
+				}
 				break;
 			}
 			case rpc::Type::Client:

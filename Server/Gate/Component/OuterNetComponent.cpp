@@ -67,12 +67,10 @@ namespace acs
 					message->TempHead().Add(rpc::Header::client_id, id);
 					message->TempHead().Add(rpc::Header::rpc_id, rpcId);
 				}
-				int code = this->OnRequest(playerId, message);
-				if(code == XCode::Ok)
+				if(this->OnRequest(playerId, message) != XCode::Ok)
 				{
-					return;
+					this->StartClose(id, XCode::UnKnowPacket);
 				}
-				this->StartClose(id, code);
 				break;
 			}
 			case rpc::Type::Response:
@@ -112,8 +110,7 @@ namespace acs
 		Player * player = this->mActComponent->GetPlayer(playerId);
 		if(player == nullptr)
 		{
-			this->Forward(this->mApp->GetSrvId(), message);
-			return XCode::Ok;
+			return this->Forward(this->mApp->GetSrvId(), message);
 		}
 
 		int serverId = 0;
