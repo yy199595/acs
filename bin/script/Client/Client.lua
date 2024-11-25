@@ -58,10 +58,10 @@ function Main:CallServer(player)
 
         client:Call("ChatSystem.Ping")
 
-        client:Call("ChatSystem.OnChat", {
-            msg_type = 1,
-            message = "chat on world"
-        })
+        --client:Call("ChatSystem.OnChat", {
+        --    msg_type = 1,
+        --    message = "chat on world"
+        --})
 
         client:Call("ChatSystem.Request")
     end
