@@ -44,6 +44,7 @@ namespace acs
 
 	void OuterNetComponent::OnMessage(rpc::Packet * message, rpc::Packet *)
 	{
+		int code = XCode::Ok;
 		message->SetNet(rpc::Net::Tcp);
 		switch (message->GetType())
 		{
@@ -67,10 +68,7 @@ namespace acs
 					message->TempHead().Add(rpc::Header::client_id, id);
 					message->TempHead().Add(rpc::Header::rpc_id, rpcId);
 				}
-				if(this->OnRequest(playerId, message) != XCode::Ok)
-				{
-					this->StartClose(id, XCode::UnKnowPacket);
-				}
+				code = this->OnRequest(playerId, message);
 				break;
 			}
 			case rpc::Type::Response:
@@ -82,9 +80,9 @@ namespace acs
 					message->SetRpcId(rpcId);
 					if(message->TempHead().Del(rpc::Header::client_id, rpcId))
 					{
-						if(this->Send(rpcId, message))
+						if(!this->Send(rpcId, message))
 						{
-							return;
+							code = XCode::SendMessageFail;
 						}
 					}
 				}
@@ -94,7 +92,10 @@ namespace acs
 				LOG_ERROR("unknown message {}", message->ToString());
 				break;
 		}
-		delete message;
+		if(code != XCode::Ok)
+		{
+			delete message;
+		}
 	}
 
 	int OuterNetComponent::OnRequest(long long playerId, rpc::Packet * message)
