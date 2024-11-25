@@ -266,7 +266,7 @@ namespace acs
 		return true;
 	}
 
-	void ActorComponent::GetServers(std::vector<int>& servers)
+	size_t ActorComponent::GetServers(std::vector<int>& servers)
 	{
 		auto iter = this->mServers.begin();
 		servers.reserve(this->mServers.size());
@@ -278,19 +278,21 @@ namespace acs
 				servers.emplace_back(server->GetSrvId());
 			}
 		}
+		return servers.size();
 	}
 
-	void ActorComponent::GetServers(const std::string& name, std::vector<int>& servers)
+	size_t ActorComponent::GetServers(const std::string& name, std::vector<int>& servers)
 	{
 		auto iter = this->mActorNames.find(name);
 		if(iter == this->mActorNames.end())
 		{
-			return;
+			return 0;
 		}
 		for(long long id : iter->second)
 		{
 			servers.emplace_back((int)id);
 		}
+		return servers.size();
 	}
 
 	bool ActorComponent::GetListen(int id, const std::string& name, std::string& addr)

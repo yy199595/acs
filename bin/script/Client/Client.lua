@@ -27,7 +27,7 @@ function Main:Awake()
         log.Warning("coroutine:%s rpc_count:%s cpu:%.2f memory:%.2f", self.count, count, osInfo.cpu, user_memory)
     end)
 
-    for i = 1, 100 do
+    for i = 1, 1 do
         local account = string.format("yjz1995%s", i)
         table.insert(self.accounts, { account = account, password = "123456" })
     end
@@ -55,15 +55,15 @@ function Main:CallServer(player)
     local client = player.client
     for i = 1, 10 do
         client:Call("GateSystem.Ping")
-
+        --
         client:Call("ChatSystem.Ping")
 
         client:Call("ChatSystem.OnChat", {
-            msg_type = 1,
+            msg_type = math.random(0, 3),
             message = "chat on world"
         })
 
-        --client:Call("ChatSystem.Request")
+        client:Call("ChatSystem.Request")
     end
 
     player.count = player.count + 1

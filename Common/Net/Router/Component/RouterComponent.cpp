@@ -63,12 +63,13 @@ namespace acs
 		{
 			return XCode::NotFoundSender;
 		}
-		if(sender->Send(id, message.get()) != XCode::Ok)
+		rpc::Packet * data = message.release();
+		if(sender->Send(id, data) != XCode::Ok)
 		{
+			delete data;
 			LOG_ERROR("send to {} fail", id);
 			return XCode::SendMessageFail;
 		}
-		message.release();
 		return XCode::Ok;
 	}
 

@@ -28,8 +28,8 @@ namespace acs
 	public:
 		bool AddPlayer(Player * player);
 		bool AddServer(Server * server);
-		void GetServers(std::vector<int>& servers);
-		void GetServers(const std::string &name, std::vector<int>& servers);
+		size_t GetServers(std::vector<int>& servers);
+		size_t GetServers(const std::string &name, std::vector<int>& servers);
 		bool GetListen(int id, const std::string & name, std::string & addr);
 	public:
 		bool UpdateServer(json::r::Value &);

@@ -21,10 +21,10 @@ namespace acs
 		return ClusterConfig::Inst()->GetServerName(name, this->mGateName);
 	}
 
-	bool GateComponent::Send(long long playerId, const std::string & func, const pb::Message& message)
+	bool GateComponent::Send(long long playerId, const std::string& func, const pb::Message& message)
 	{
-		Player * player = this->mActor->GetPlayer(playerId);
-		if(player == nullptr)
+		Player* player = this->mActor->GetPlayer(playerId);
+		if (player == nullptr)
 		{
 			return false;
 		}
@@ -34,22 +34,24 @@ namespace acs
 	void GateComponent::BroadCast(const std::string& func, const pb::Message* data)
 	{
 		this->mGateServers.clear();
-		this->mActor->GetServers(this->mGateName, this->mGateServers);
-
-		for(const int & gateServerId : this->mGateServers)
+		if (this->mActor->GetServers(this->mGateName, this->mGateServers) <= 0)
 		{
-			if(Server * gate = this->mActor->GetServer(gateServerId))
+			return;
+		}
+		std::unique_ptr<rpc::Packet> message = std::make_unique<rpc::Packet>();
+		{
+			message->SetType(rpc::Type::Broadcast);
+			message->SetProto(rpc::Porto::Protobuf);
+			message->GetHead().Add("func", "ChatComponent.OnChat");
 			{
-				std::unique_ptr<rpc::Packet> message = std::make_unique<rpc::Packet>();
-				{
-					message->SetType(rpc::Type::Broadcast);
-					message->SetProto(rpc::Porto::Protobuf);
-					message->GetHead().Add("func", "ChatComponent.OnChat");
-					{
-						message->WriteMessage(data);
-						gate->SendMsg(std::move(message));
-					}
-				}
+				message->WriteMessage(data);
+			}
+		}
+		for (const int& gateServerId: this->mGateServers)
+		{
+			if (Server* gate = this->mActor->GetServer(gateServerId))
+			{
+				gate->SendMsg(message->Clone());
 			}
 		}
 	}
