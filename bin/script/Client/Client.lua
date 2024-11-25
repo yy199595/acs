@@ -24,7 +24,7 @@ function Main:Awake()
         end
         local osInfo = os.get_system_info()
         local user_memory = osInfo.use_memory / (1024 * 1024)
-        --log.Warning("coroutine:%s rpc_count:%s cpu:%.2f memory:%.2f", self.count, count, osInfo.cpu, user_memory)
+        log.Warning("coroutine:%s rpc_count:%s cpu:%.2f memory:%.2f", self.count, count, osInfo.cpu, user_memory)
     end)
 
     for i = 1, 100 do
