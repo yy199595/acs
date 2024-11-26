@@ -1,10 +1,10 @@
 {
     "ChatSystem.Ping": {
-        "Async": true,
+        "Async": false,
         "IsClient": true
     },
     "ChatSystem.OnPing": {
-        "Async": true,
+        "Async": false,
         "IsClient": true
     },
     "ChatSystem.Request" : {
