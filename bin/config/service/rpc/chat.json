@@ -8,13 +8,13 @@
         "IsClient": true
     },
     "ChatSystem.Request" : {
-        "Async" : true,
+        "Async" : false,
         "IsClient": true,
         "Request" : "google.protobuf.Struct"
     },
     "ChatSystem.OnChat": {
         "Proto" : "json",
-        "Async": true,
+        "Async": false,
         "IsClient": true,
         "Request": "c2s.chat.request"
     },
