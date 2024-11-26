@@ -16,8 +16,14 @@ namespace acs
 	bool ChatSystem::OnInit()
 	{
 		BIND_PLAYER_RPC_METHOD(ChatSystem::OnChat);
+		BIND_PLAYER_RPC_METHOD(ChatSystem::OnPing);
 		LOG_CHECK_RET_FALSE(this->mGate = this->GetComponent<GateComponent>())
 		return true;
+	}
+
+	int ChatSystem::OnPing(long long playerId)
+	{
+		return XCode::Ok;
 	}
 
 	int ChatSystem::OnChat(long long playerId, const c2s::chat::request& request)

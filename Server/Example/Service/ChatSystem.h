@@ -14,6 +14,7 @@ namespace acs
 	private:
 		bool OnInit() final;
 	private:
+		int OnPing(long long playerId);
 		int OnChat(long long playerId, const c2s::chat::request & request);
 	private:
 		class GateComponent * mGate;
