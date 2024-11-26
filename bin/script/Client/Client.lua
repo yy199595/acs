@@ -58,10 +58,7 @@ function Main:CallServer(player)
         --
         client:Call("ChatSystem.Ping")
 
-        client:Call("ChatSystem.OnChat", {
-            msg_type = math.random(0, 3),
-            message = "chat on world"
-        })
+        client:Call("ChatSystem.OnChat")
 
         client:Call("ChatSystem.Request")
     end

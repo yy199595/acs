@@ -162,13 +162,13 @@ namespace acs
 			return XCode::NetWorkError;
 		}
 		long long userId = 0;
-		if (!message->GetHead().Get("id", userId))
+		if (!message->GetHead().Get(rpc::Header::player_id, userId))
 		{
 			LOG_ERROR("not find userid forward to client fail");
 			return XCode::CallArgsError;
 		}
-		message->GetHead().Del("id");
 		message->SetType(rpc::Type::Request);
+		message->GetHead().Del(rpc::Header::player_id);
 		this->mOuterComponent->SendToPlayer(userId, message);
 		return XCode::Ok;
 	}
