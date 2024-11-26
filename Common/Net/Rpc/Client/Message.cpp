@@ -7,7 +7,7 @@
 #include"Yyjson/Document/Document.h"
 #include"Util/Tools/String.h"
 
-#define RPC_PACKET_COUNTER 1
+#define RPC_PACKET_COUNTER 0
 #if RPC_PACKET_COUNTER == 1
 #include "Util/Tools/TimeHelper.h"
 #endif
@@ -146,7 +146,7 @@ namespace rpc
 		{
 			line_end = strchr(line_start, '\n');
 
-			if (line_end == NULL) {
+			if (line_end == nullptr) {
 				break;
 			}
 			size_t line_length = line_end - line_start;
@@ -158,7 +158,7 @@ namespace rpc
 			}
 
 			const char* colon = strchr(line_start, ':');
-			if (colon != NULL && colon < line_end)
+			if (colon != nullptr && colon < line_end)
 			{
 				size_t key_length = colon - line_start;
 				size_t value_length = line_end - colon - 1;
