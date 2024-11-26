@@ -60,7 +60,7 @@ function Main:CallServer(player)
 
         client:Call("ChatSystem.OnPing")
 
-        --client:Call("ChatSystem.Request")
+        client:Call("ChatSystem.Request")
     end
 
     player.count = player.count + 1
