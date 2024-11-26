@@ -58,7 +58,7 @@ function Main:CallServer(player)
         --
         client:Call("ChatSystem.Ping")
 
-        client:Call("ChatSystem.OnChat")
+        client:Call("ChatSystem.OnPing")
 
         client:Call("ChatSystem.Request")
     end
