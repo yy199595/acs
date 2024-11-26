@@ -25,6 +25,10 @@ function Chat:Ping()
     return XCode.Ok
 end
 
+function Chat:OnPing()
+    return XCode.Ok
+end
+
 function Chat:Chat(request)
     local nowTime = os.time()
     table.print(request)
