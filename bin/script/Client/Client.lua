@@ -7,7 +7,7 @@ local Session = require("Session")
 local http = require("HttpComponent")
 
 local HOST = "http://127.0.0.1:8088"
-
+local COUNT = os.getenv("count") or 10
 local Main = Module()
 
 function Main:Awake()
@@ -27,7 +27,7 @@ function Main:Awake()
         log.Warning("coroutine:%s rpc_count:%s cpu:%.2f memory:%.2f", self.count, count, osInfo.cpu, user_memory)
     end)
 
-    for i = 1, 2 do
+    for i = 1, COUNT do
         local account = string.format("yjz1995%s", i)
         table.insert(self.accounts, { account = account, password = "123456" })
     end
