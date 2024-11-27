@@ -27,8 +27,9 @@ function Main:Awake()
         local osInfo = os.get_system_info()
         local user_memory = osInfo.use_memory
         local luaMemory = collectgarbage("count")
-        log.Warning("coroutine:%s rpc_count:%s cpu:%.2f memory:%d lua:%d",
-                self.count, count, osInfo.cpu, user_memory - lastUserMemory, luaMemory - lastLuaUserMemory)
+        log.Warning("coroutine:%s rpc_count:%s, memory:%s lua:%s",
+                self.count, count, (user_memory - lastUserMemory), (luaMemory - lastLuaUserMemory))
+
         lastUserMemory = user_memory
         lastLuaUserMemory = luaMemory
     end)
@@ -61,15 +62,15 @@ function Main:CallServer(player)
     local client = player.client
     for i = 1, 10 do
         client:Call("GateSystem.Ping")
-        --
+
         client:Call("ChatSystem.Ping")
 
-        --client:Call("ChatSystem.OnPing")
-        --
-        --client:Call("ChatSystem.OnChat", {
-        --    msg_type = math.random(0, 3),
-        --    message = "hello world"
-        --})
+        client:Call("ChatSystem.OnPing")
+
+        client:Call("ChatSystem.OnChat", {
+            msg_type = math.random(0, 3),
+            message = "hello world"
+        })
     end
 
     player.count = player.count + 1
