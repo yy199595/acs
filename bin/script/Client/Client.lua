@@ -10,6 +10,8 @@ local HOST = "http://127.0.0.1:8088"
 local COUNT = os.getenv("APP_COUNT") or 10
 local Main = Module()
 
+local lastUserMemory = 0
+local lastLuaUserMemory = 0
 function Main:Awake()
 
     self.count = 0
@@ -23,9 +25,12 @@ function Main:Awake()
             count = count + player.count
         end
         local osInfo = os.get_system_info()
-        local luaMemory = collectgarbage("count") / 1024
-        local user_memory = osInfo.use_memory / (1024 * 1024)
-        log.Warning("coroutine:%s rpc_count:%s cpu:%.2f memory:%.2f lua:%.2f", self.count, count, osInfo.cpu, user_memory, luaMemory)
+        local user_memory = osInfo.use_memory
+        local luaMemory = collectgarbage("count")
+        log.Warning("coroutine:%s rpc_count:%s cpu:%.2f memory:%d lua:%d",
+                self.count, count, osInfo.cpu, user_memory - lastUserMemory, luaMemory - lastLuaUserMemory)
+        lastUserMemory = user_memory
+        lastLuaUserMemory = luaMemory
     end)
 
     for i = 1, COUNT do
