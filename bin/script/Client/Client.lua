@@ -27,8 +27,10 @@ function Main:Awake()
         local osInfo = os.get_system_info()
         local user_memory = osInfo.use_memory
         local luaMemory = collectgarbage("count")
-        log.Warning("coroutine:%s rpc_count:%s, memory:%s lua:%s",
-                self.count, count, (user_memory - lastUserMemory), (luaMemory - lastLuaUserMemory))
+        local t2 = (luaMemory - lastLuaUserMemory)
+        local t1 = (user_memory - lastUserMemory) / 1024
+        local t3 = user_memory / 1024
+        log.Warning("coroutine:%s rpc_count:%s, sum:%.2f use:%.2f lua:%.2f", self.count, count, t3, t1, t2)
 
         lastUserMemory = user_memory
         lastLuaUserMemory = luaMemory
