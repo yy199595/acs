@@ -60,7 +60,10 @@ function Main:CallServer(player)
 
         client:Call("ChatSystem.OnPing")
 
-        --client:Call("ChatSystem.Request")
+        client:Call("ChatSystem.OnChat", {
+            msg_type = math.random(0, 3),
+            message = "hello world"
+        })
     end
 
     player.count = player.count + 1
