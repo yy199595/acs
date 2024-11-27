@@ -19,7 +19,6 @@ function Main:Awake()
     timer.AddUpdate(500, self, "OnUpdate")
     timer.AddUpdate(2000, function()
         local count = 0
-        collectgarbage("collect")
         for _, player in ipairs(self.sessions) do
             count = count + player.count
         end
