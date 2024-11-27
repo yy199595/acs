@@ -180,7 +180,8 @@ namespace os
 
 	void System::SetEnv(const std::string& k, const std::string& v)
 	{
-		const std::string key = help::Str::Toupper(k);
+		std::string str = fmt::format("APP_{}", k);
+		const std::string key = help::Str::Toupper(str);
 #if WIN32
 		_putenv_s(key.c_str(), v.c_str());
 #else
