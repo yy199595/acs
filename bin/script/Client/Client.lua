@@ -29,7 +29,7 @@ function Main:Awake()
         local luaMemory = collectgarbage("count")
         local t2 = (luaMemory - lastLuaUserMemory)
         local t1 = (user_memory - lastUserMemory) / 1024
-        local t3 = user_memory / 1024
+        local t3 = user_memory / (1024 * 1024)
         log.Warning("coroutine:%s rpc_count:%s, sum:%.2f use:%.2f lua:%.2f", self.count, count, t3, t1, t2)
 
         lastUserMemory = user_memory
