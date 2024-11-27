@@ -7,7 +7,7 @@ local Session = require("Session")
 local http = require("HttpComponent")
 
 local HOST = "http://127.0.0.1:8088"
-local COUNT = os.getenv("count") or 10
+local COUNT = os.getenv("COUNT") or 10
 local Main = Module()
 
 function Main:Awake()
