@@ -23,8 +23,9 @@ function Main:Awake()
             count = count + player.count
         end
         local osInfo = os.get_system_info()
+        local luaMemory = collectgarbage("count") / 1024
         local user_memory = osInfo.use_memory / (1024 * 1024)
-        log.Warning("coroutine:%s rpc_count:%s cpu:%.2f memory:%.2f", self.count, count, osInfo.cpu, user_memory)
+        log.Warning("coroutine:%s rpc_count:%s cpu:%.2f memory:%.2f lua:%.2f", self.count, count, osInfo.cpu, user_memory, luaMemory)
     end)
 
     for i = 1, COUNT do
