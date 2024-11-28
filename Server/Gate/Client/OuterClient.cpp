@@ -154,18 +154,16 @@ namespace rpc
 		}
 		this->StopTimer();
 		this->mSocket->Close();
-		int sockId = this->mSockId;
 		rpc::Packet * message = nullptr;
 		while(this->mSendMessages.Pop(message))
 		{
 			delete message;
 			message = nullptr;
 		}
-		this->mSockId = 0;
 		this->ClearSendStream();
 		this->ClearRecvStream();
 		Asio::Socket & socket1 = this->mSocket->Get();
-		asio::post(socket1.get_executor(), [this, code, sockId]()
+		asio::post(socket1.get_executor(), [this, code, sockId = this->mSockId]()
 		{
 #ifdef ONLY_MAIN_THREAD
 			this->mComponent->OnCloseSocket(sockId, code);
@@ -174,7 +172,7 @@ namespace rpc
 			asio::post(t, [this, code, sockId] { this->mComponent->OnCloseSocket(sockId, code); });
 #endif
 		});
-
+		this->mSockId = 0;
 	}
 
 	void OuterClient::OnSendMessage()

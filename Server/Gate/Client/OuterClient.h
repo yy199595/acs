@@ -19,6 +19,7 @@ namespace rpc
 	 public:
 		void Stop(int code);
 		bool Send(rpc::Packet * message);
+		inline void SetSockId(int id) { this->mSockId = id; }
 		inline int GetSockId() const { return this->mSockId; }
 		void StartReceive(tcp::Socket * socket, int second = 0);
 	protected:

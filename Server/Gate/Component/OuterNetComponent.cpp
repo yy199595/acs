@@ -239,24 +239,23 @@ namespace acs
 		{
 			return false;
 		}
+		int id = this->mSocketPool.BuildNumber();
 		outerNetClient = this->mClientPools.Pop();
 		if (outerNetClient == nullptr)
 		{
-			int id = this->mSocketPool.BuildNumber();
-			while (this->mGateClientMap.Has(id))
-			{
-				id = this->mSocketPool.BuildNumber();
-			}
 			outerNetClient = new rpc::OuterClient(id, this);
 		}
-		int id = outerNetClient->GetSockId();
+		else
+		{
+			outerNetClient->SetSockId(id);
+		}
 		if (!this->mGateClientMap.Add(id, outerNetClient))
 		{
 			this->mClientPools.Push(outerNetClient);
 			return false;
 		}
 		outerNetClient->StartReceive(socket);
-		LOG_ERROR("[{}] connect gate server", socket->GetAddress())
+		LOG_DEBUG("[{}] connect gate server count:{}", socket->GetAddress(), this->mGateClientMap.Size())
 		return true;
 	}
 
@@ -274,7 +273,7 @@ namespace acs
 		{
 			this->mClientPools.Push(tcpClient);
 		}
-		LOG_WARN("remove client {} code = {}", userId, CodeConfig::Inst()->GetDesc(code));
+		LOG_DEBUG("remove user({}) count:{}", userId, this->mGateClientMap.Size());
 	}
 
     bool OuterNetComponent::SendToPlayer(long long userId, rpc::Packet * message)
