@@ -27,6 +27,7 @@ namespace acs
 	public:
 		int Port;            //监听
 		int MaxConn;        //最大连接数
+		std::string ip;
 		int ProtoType = proto_type::tcp;
 #ifdef __ENABLE_OPEN_SSL__
 		std::string Key;    //私钥

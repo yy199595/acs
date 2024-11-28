@@ -12,19 +12,25 @@
 	},
 	"listen": {
 		"http": {
-			"port": "${http}"
+			"port": "${http}",
+			"ip": "127.0.0.1"
 		},
 		"rpc": {
-			"port": "${rpc}"
+			"port": "${rpc}",
+			"ip": "127.0.0.1"
+
 		},
 		"gate": {
-			"port": "${gate}"
+			"port": "${gate}",
+			"ip": "127.0.0.1"
 		},
 		"udp" : {
-			"port" : "${udp}"
+			"port" : "${udp}",
+			"ip": "127.0.0.1"
 		},
 		"kcp" : {
-			"port" : "${kcp}"
+			"port" : "${kcp}",
+			"ip": "127.0.0.1"
 		}
 	},
 	"master": {

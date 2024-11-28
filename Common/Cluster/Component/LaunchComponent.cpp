@@ -152,6 +152,7 @@ namespace acs
 				listenConfig.Name = key;
 				listenConfig.MaxConn = 0;
 			}
+			jsonData->Get("ip", listenConfig.ip);
 			jsonData->Get("port", listenConfig.Port);
 			jsonData->Get("max_conn", listenConfig.MaxConn);
 			jsonData->Get("protocol", listenConfig.ProtoName);
@@ -169,8 +170,7 @@ namespace acs
 			listenConfig.ProtoType = iter->second;
 			if (listenConfig.Port > 0 && !listenConfig.Component.empty())
 			{
-				const std::string& host = config->Host();
-				listenConfig.Addr = fmt::format("{}://{}:{}", listenConfig.Name, host, listenConfig.Port);
+				listenConfig.Addr = fmt::format("{}://{}:{}", listenConfig.Name, listenConfig.ip, listenConfig.Port);
 				switch(listenConfig.ProtoType)
 				{
 					case proto_type::tcp:
