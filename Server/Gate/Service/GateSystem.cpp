@@ -47,7 +47,7 @@ namespace acs
 			os::System::GetSystemInfo(systemInfo);
 			double use = systemInfo.use_memory / KB;
 			double add = (systemInfo.use_memory - this->mLastMemory) / MB;
-			LOG_INFO("cpu:{:.2f} memory:{:.2f}KB/{:.2f}MB", systemInfo.cpu, add, use);
+			LOG_INFO("cpu:{:.2f}  add:{:.2f}KB  use{:.2f}MB", systemInfo.cpu, add, use);
 
 			this->mLastMemory = systemInfo.use_memory;
 		}
