@@ -14,21 +14,29 @@
         "rpc" : {
             "max_conn" : 512,
             "protocol" : "tcp",
+            "ip": "127.0.0.1",
+            "port": "${rpc}",
             "component" : "InnerNetComponent"
         },
         "gate" : {
             "max_conn" : 1024,
             "protocol" : "tcp",
+            "ip": "127.0.0.1",
+            "port": "${gate}",
             "component" : "OuterNetComponent"
         },
         "http" : {
             "max_conn" : 256,
             "protocol" : "tcp",
+            "ip": "127.0.0.1",
+            "port": "${http}",
             "component" : "HttpWebComponent"
         },
         "https" : {
             "max_conn" : 256,
             "protocol" : "tcp",
+            "ip": "127.0.0.1",
+            "port": "${https}",
             "component" : "HttpWebComponent",
             "key": "",
             "cert": ""
@@ -36,14 +44,20 @@
         "master" : {
             "max_conn" : 128,
             "protocol" : "tcp",
+            "ip": "127.0.0.1",
+            "port": "${master}",
             "component" : "HttpWebComponent"
         },
         "udp" : {
             "protocol" : "udp",
+            "ip": "127.0.0.1",
+            "port": "${udp}",
             "component" : "UdpComponent"
         },
         "kcp" : {
             "protocol" : "udp",
+            "ip": "127.0.0.1",
+            "port": "${kcp}",
             "component" : "KcpComponent"
         }
     },
