@@ -14,6 +14,7 @@ local lastUserMemory = 0
 local lastLuaUserMemory = 0
 function Main:Awake()
 
+
     self.count = 0
     self.login_count = 0
     self.accounts = { }

@@ -9,7 +9,7 @@
 #include"Rpc/Service/RpcService.h"
 namespace acs
 {
-	class GateSystem final : public RpcService
+	class GateSystem final : public RpcService, public ISecondUpdate
 	{
 	 public:
 		GateSystem();
@@ -21,8 +21,9 @@ namespace acs
 		bool Awake() final;
 		bool OnInit() final;
 		void OnDisConnect(long long id);
+		void OnSecondUpdate(int tick) final;
 	 private:
-		class TimerComponent * mTimer;
+		long long mLastMemory;
 		class ActorComponent * mActorComponent;
 		class OuterNetComponent* mOuterComponent;
 	};

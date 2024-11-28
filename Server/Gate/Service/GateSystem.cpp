@@ -16,7 +16,7 @@ namespace acs
 {
     GateSystem::GateSystem()
     {
-		this->mTimer = nullptr;
+		this->mLastMemory = 0;
 		this->mActorComponent = nullptr;
         this->mOuterComponent = nullptr;
     }
@@ -31,11 +31,24 @@ namespace acs
 		BIND_PLAYER_RPC_METHOD(GateSystem::Ping);
 		BIND_PLAYER_RPC_METHOD(GateSystem::Login);
 		BIND_PLAYER_RPC_METHOD(GateSystem::Logout);
-		this->mTimer = this->GetComponent<TimerComponent>();
 		this->mActorComponent = this->GetComponent<ActorComponent>();
 		this->mOuterComponent = this->GetComponent<OuterNetComponent>();
 		return true;
     }
+
+	void GateSystem::OnSecondUpdate(int tick)
+	{
+		if(tick % 2 == 0)
+		{
+			constexpr double KB = 1024.0f;
+			constexpr double MB = 1024.0f;
+
+			os::SystemInfo systemInfo;
+			os::System::GetSystemInfo(systemInfo);
+			long long add = systemInfo.use_memory - this->mLastMemory;
+			LOG_INFO("cpu:{:.2f} memory:{:.2f}KB/{:.2f}MB", (add / MB), (systemInfo.use_memory / KB));
+		}
+	}
 
 	int GateSystem::Ping(long long userId)
 	{
