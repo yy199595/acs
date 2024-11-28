@@ -194,13 +194,14 @@ namespace acs
 
 	bool OuterNetComponent::Send(int id, rpc::Packet * message)
 	{
-		rpc::OuterClient * tcpClient = nullptr;
-		if(!this->mGateClientMap.Get(id, tcpClient))
+		auto iter = this->mGateClientMap.find(id);
+		if(iter == this->mGateClientMap.end())
 		{
 			delete message;
 			return false;
 		}
-		if(!tcpClient->Send(message))
+
+		if(!iter->second->Send(message))
 		{
 			delete message;
 			return false;
@@ -234,28 +235,17 @@ namespace acs
 
 	bool OuterNetComponent::OnListen(tcp::Socket * socket)
 	{
-		rpc::OuterClient* outerNetClient = nullptr;
 		if (this->mApp->GetStatus() < ServerStatus::Start)
 		{
 			return false;
 		}
 		int id = this->mSocketPool.BuildNumber();
-		outerNetClient = this->mClientPools.Pop();
-		if (outerNetClient == nullptr)
+		std::unique_ptr<rpc::OuterClient> outerNetClient = std::make_unique<rpc::OuterClient>(id, this);
 		{
-			outerNetClient = new rpc::OuterClient(id, this);
+			outerNetClient->StartReceive(socket);
+			this->mGateClientMap.emplace(id, std::move(outerNetClient));
 		}
-		else
-		{
-			outerNetClient->SetSockId(id);
-		}
-		if (!this->mGateClientMap.Add(id, outerNetClient))
-		{
-			this->mClientPools.Push(outerNetClient);
-			return false;
-		}
-		outerNetClient->StartReceive(socket);
-		LOG_DEBUG("[{}] connect gate server count:{}", socket->GetAddress(), this->mGateClientMap.Size())
+		LOG_DEBUG("[{}] connect gate server count:{}", socket->GetAddress(), this->mGateClientMap.size())
 		return true;
 	}
 
@@ -267,13 +257,12 @@ namespace acs
 			this->mUserAddressMap.Del(userId);
 			help::OuterLogoutEvent::Trigger(userId);
 		}
-
-		rpc::OuterClient * tcpClient = nullptr;
-		if(this->mGateClientMap.Del(id, tcpClient))
+		auto iter = this->mGateClientMap.find(id);
+		if(iter != this->mGateClientMap.end())
 		{
-			this->mClientPools.Push(tcpClient);
+			this->mGateClientMap.erase(iter);
 		}
-		LOG_DEBUG("remove client({}) count:{}", id, this->mGateClientMap.Size());
+		LOG_DEBUG("remove client({}) count:{}", id, this->mGateClientMap.size());
 	}
 
     bool OuterNetComponent::SendToPlayer(long long userId, rpc::Packet * message)
@@ -291,10 +280,10 @@ namespace acs
 
 	void OuterNetComponent::StartClose(int id, int code)
 	{
-		rpc::OuterClient * tcpClient = nullptr;
-		if(this->mGateClientMap.Get(id, tcpClient))
+		auto iter = this->mGateClientMap.find(id);
+		if(iter != this->mGateClientMap.end())
 		{
-			tcpClient->Stop(code);
+			iter->second->Stop(code);
 		}
 	}
 
@@ -303,7 +292,7 @@ namespace acs
 		std::unique_ptr<json::w::Value> data = document.AddObject("outer");
 		{
 			data->Add("wait", this->mWaitCount);
-			data->Add("client", this->mGateClientMap.Size());
+			data->Add("client", this->mGateClientMap.size());
 			data->Add("sum", this->mNumPool.CurrentNumber());
 		}
     }

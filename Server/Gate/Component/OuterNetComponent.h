@@ -9,13 +9,13 @@
 #include"Core/Queue/Queue.h"
 #include"Log/Common/Logger.h"
 #include"Core/Pool/ArrayPool.h"
+#include"Gate/Client/OuterClient.h"
 #include"Server/Component/ListenerComponent.h"
 
 namespace rpc
 {
     class Packet;
 	class InnerClient;
-	class OuterClient;
 }
 
 namespace acs
@@ -53,12 +53,11 @@ namespace acs
 		math::NumberPool<int> mSocketPool;
 		class ActorComponent * mActComponent;
 		class ThreadComponent * mThreadComponent;
-		custom::ArrayPool<rpc::OuterClient, 100> mClientPools;
 		custom::HashMap<int, long long> mAddressUserMap;  //fd和玩家id的映射表
 		custom::HashMap<long long, int> mUserAddressMap; //验证过的客户端
 		custom::Queue<rpc::Packet *> mBroadCastMessages; //广播消息
-		custom::HashMap<int, rpc::OuterClient *> mGateClientMap;
 		custom::HashMap<int, rpc::InnerClient *> mForwardClientMap; //中转到内网的客户端
+		std::unordered_map<int, std::unique_ptr<rpc::OuterClient>> mGateClientMap;
 	};
 }
 
