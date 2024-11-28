@@ -273,7 +273,7 @@ namespace acs
 		{
 			this->mClientPools.Push(tcpClient);
 		}
-		LOG_DEBUG("remove user({}) count:{}", userId, this->mGateClientMap.Size());
+		LOG_DEBUG("remove client({}) count:{}", id, this->mGateClientMap.Size());
 	}
 
     bool OuterNetComponent::SendToPlayer(long long userId, rpc::Packet * message)
