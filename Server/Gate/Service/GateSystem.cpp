@@ -41,13 +41,13 @@ namespace acs
 		if(tick % 2 == 0)
 		{
 			constexpr double KB = 1024.0f;
-			constexpr double MB = 1024.0f;
+			constexpr double MB = 1024.0f * 1024;
 
 			os::SystemInfo systemInfo;
 			os::System::GetSystemInfo(systemInfo);
 			double use = systemInfo.use_memory / KB;
 			double add = (systemInfo.use_memory - this->mLastMemory) / MB;
-			LOG_INFO("cpu:{:.2f}  add:{:.2f}KB  use{:.2f}MB", systemInfo.cpu, add, use);
+			LOG_INFO("cpu:{:.2f}  add:{:.2f}KB  use:{:.2f}MB", systemInfo.cpu, add, use);
 
 			this->mLastMemory = systemInfo.use_memory;
 		}
