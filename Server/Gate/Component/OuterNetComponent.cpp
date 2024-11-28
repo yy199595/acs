@@ -319,6 +319,7 @@ namespace acs
 			return false;
 		}
 		this->mAddressUserMap.Del(id);
+		this->mActComponent->DelActor(userId);
 		this->StartClose(id, XCode::NetActiveShutdown);
 		return true;
 	}
