@@ -4,6 +4,7 @@
 
 #include"LaunchComponent.h"
 #include"Core/System/System.h"
+#include "Util/Tools/String.h"
 #include"Util/File/FileHelper.h"
 #include"Http/Component/HttpComponent.h"
 #include"Cluster//Config/ClusterConfig.h"
@@ -152,8 +153,17 @@ namespace acs
 				listenConfig.Name = key;
 				listenConfig.MaxConn = 0;
 			}
-			jsonData->Get("ip", listenConfig.ip);
-			jsonData->Get("port", listenConfig.Port);
+			if(jsonData->Get("address", listenConfig.Addr))
+			{
+				std::string ip;
+				unsigned short port = 0;
+				if(help::Str::SplitAddr(listenConfig.Addr, ip, port))
+				{
+					listenConfig.ip = ip;
+					listenConfig.Port = port;
+				}
+			}
+
 			jsonData->Get("max_conn", listenConfig.MaxConn);
 			jsonData->Get("protocol", listenConfig.ProtoName);
 			jsonData->Get("component", listenConfig.Component);
@@ -170,7 +180,6 @@ namespace acs
 			listenConfig.ProtoType = iter->second;
 			if (listenConfig.Port > 0 && !listenConfig.Component.empty())
 			{
-				listenConfig.Addr = fmt::format("{}://{}:{}", listenConfig.Name, listenConfig.ip, listenConfig.Port);
 				switch(listenConfig.ProtoType)
 				{
 					case proto_type::tcp:

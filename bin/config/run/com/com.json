@@ -14,29 +14,25 @@
         "rpc" : {
             "max_conn" : 512,
             "protocol" : "tcp",
-            "ip": "127.0.0.1",
-            "port": "${rpc}",
+            "address": "127.0.0.1:${rpc}",
             "component" : "InnerNetComponent"
         },
         "gate" : {
             "max_conn" : 1024,
             "protocol" : "tcp",
-            "ip": "127.0.0.1",
-            "port": "${gate}",
+            "address": "127.0.0.1:${gate}",
             "component" : "OuterNetComponent"
         },
         "http" : {
             "max_conn" : 256,
             "protocol" : "tcp",
-            "ip": "127.0.0.1",
-            "port": "${http}",
+            "address": "127.0.0.1:${http}",
             "component" : "HttpWebComponent"
         },
         "https" : {
             "max_conn" : 256,
             "protocol" : "tcp",
-            "ip": "127.0.0.1",
-            "port": "${https}",
+            "address": "127.0.0.1:${https}",
             "component" : "HttpWebComponent",
             "key": "",
             "cert": ""
@@ -44,20 +40,17 @@
         "master" : {
             "max_conn" : 128,
             "protocol" : "tcp",
-            "ip": "127.0.0.1",
-            "port": "${master}",
+            "address": "127.0.0.1:${master}",
             "component" : "HttpWebComponent"
         },
         "udp" : {
             "protocol" : "udp",
-            "ip": "127.0.0.1",
-            "port": "${udp}",
+            "address": "127.0.0.1:${udp}",
             "component" : "UdpComponent"
         },
         "kcp" : {
             "protocol" : "udp",
-            "ip": "127.0.0.1",
-            "port": "${kcp}",
+            "port": "127.0.0.1:${kcp}",
             "component" : "KcpComponent"
         }
     },
