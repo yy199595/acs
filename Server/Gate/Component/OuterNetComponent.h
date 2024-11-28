@@ -30,6 +30,7 @@ namespace acs
 		void OnTimeout(int id) final;
 		void StartClose(int id, int code) final;
 		void OnCloseSocket(int id, int code) final;
+		void OnSendFailure(int id, rpc::Packet *message) final;
 	public:
 		bool StopClient(long long userId);
 		void Broadcast(rpc::Packet * message);

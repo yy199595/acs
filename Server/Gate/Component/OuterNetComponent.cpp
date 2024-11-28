@@ -255,6 +255,7 @@ namespace acs
 		if(this->mAddressUserMap.Del(id, userId))
 		{
 			this->mUserAddressMap.Del(userId);
+			this->mActComponent->DelActor(userId);
 			help::OuterLogoutEvent::Trigger(userId);
 		}
 		auto iter = this->mGateClientMap.find(id);
@@ -263,6 +264,19 @@ namespace acs
 			this->mGateClientMap.erase(iter);
 		}
 		LOG_DEBUG("remove client({}) count:{}", id, this->mGateClientMap.size());
+	}
+
+	void OuterNetComponent::OnSendFailure(int id, rpc::Packet* message)
+	{
+		int sockId = 0;
+		if(message->GetHead().Get(rpc::Header::sock_id, sockId))
+		{
+			this->Send(sockId, message);
+		}
+		else
+		{
+			delete message;
+		}
 	}
 
     bool OuterNetComponent::SendToPlayer(long long userId, rpc::Packet * message)
@@ -319,7 +333,6 @@ namespace acs
 			return false;
 		}
 		this->mAddressUserMap.Del(id);
-		this->mActComponent->DelActor(userId);
 		this->StartClose(id, XCode::NetActiveShutdown);
 		return true;
 	}
