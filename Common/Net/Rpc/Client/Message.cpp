@@ -7,18 +7,15 @@
 #include"Yyjson/Document/Document.h"
 #include"Util/Tools/String.h"
 
-#define RPC_PACKET_COUNTER 1
+
 #if RPC_PACKET_COUNTER == 1
 #include "Util/Tools/TimeHelper.h"
 #endif
 namespace rpc
 {
 #if RPC_PACKET_COUNTER == 1
-
-	std::mutex mutex;
-	long long t1 = 0;
-	long long t2 = 1;
-	std::unordered_set<rpc::Packet *> NewMessageSet;
+	std::mutex Packet::mutex;
+	std::unordered_set<rpc::Packet *> Packet::NewMessageSet;
 #endif
 
     bool Head::GetKeys(std::vector<std::string> &keys) const
@@ -110,15 +107,21 @@ namespace rpc
 		{
 			NewMessageSet.erase(iter);
 		}
-		t2 = help::Time::NowSec();
-		if(t2 >= t1)
-		{
-			t1 = help::Time::NowSec() + 2;
-			printf("count = %d\n", (int)NewMessageSet.size());
-		}
-
 #endif
 	}
+
+#if RPC_PACKET_COUNTER == 1
+
+	size_t Packet::PacketCount()
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		for(const Packet * packet : NewMessageSet)
+		{
+
+		}
+		return NewMessageSet.size();
+	}
+#endif
 
 	void Packet::Init(const rpc::ProtoHead & protoHead)
 	{

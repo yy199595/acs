@@ -10,6 +10,12 @@
 #include"Proto/Include/Message.h"
 #include"Proto/Message/IProto.h"
 #include"Yyjson/Document/Document.h"
+
+#define RPC_PACKET_COUNTER 1
+#if RPC_PACKET_COUNTER == 1
+#include <mutex>
+#include <unordered_set>
+#endif
 namespace rpc
 {
 	class Head : public tcp::IProto, public tcp::IHeader
@@ -76,6 +82,14 @@ namespace rpc
 	public:
 		bool ParseMessage(json::r::Document* message);
 		bool WriteMessage(json::w::Document* message);
+#if RPC_PACKET_COUNTER == 1
+		static size_t PacketCount() const;
+#endif
+	private:
+#if RPC_PACKET_COUNTER == 1
+		static std::mutex mutex;
+		static std::unordered_set<rpc::Packet *> NewMessageSet;
+#endif
 	private:
 		char mNet;
 		Head mHead; //写入socket
