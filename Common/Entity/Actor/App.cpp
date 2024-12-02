@@ -219,8 +219,16 @@ namespace acs
 						os::System::GetSystemInfo(systemInfo);
 						SetConsoleTitle(fmt::format("{}MB", systemInfo.use_memory / (1024 * 1024)).c_str());
 #endif
-#if defined(__OS_WIN__) || defined(__OS_WIN__)
+#if defined(__OS_WIN__) || defined(__OS_MAC__)
 						this->Hotfix();
+#endif
+
+#if RPC_PACKET_COUNTER == 1
+						size_t  count = rpc::Packet::PacketCount();
+						if(count > 0)
+						{
+							LOG_WARN("rpc packet count:({})", count);
+						}
 #endif
 						this->mTickCount++;
 						long long costTime = nowTime - logicSecondTime;

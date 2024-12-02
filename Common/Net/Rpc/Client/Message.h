@@ -83,7 +83,7 @@ namespace rpc
 		bool ParseMessage(json::r::Document* message);
 		bool WriteMessage(json::w::Document* message);
 #if RPC_PACKET_COUNTER == 1
-		static size_t PacketCount() const;
+		static size_t PacketCount();
 #endif
 	private:
 #if RPC_PACKET_COUNTER == 1
