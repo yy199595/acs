@@ -7,7 +7,7 @@
 #include"Yyjson/Document/Document.h"
 #include"Util/Tools/String.h"
 
-#define RPC_PACKET_COUNTER 0
+#define RPC_PACKET_COUNTER 1
 #if RPC_PACKET_COUNTER == 1
 #include "Util/Tools/TimeHelper.h"
 #endif
