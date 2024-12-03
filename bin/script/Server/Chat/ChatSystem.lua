@@ -49,6 +49,7 @@ end
 
 function Chat:Request(request)
     --table.print(request)
+    return XCode.Ok
 end
 
 function Chat:Ping(request)

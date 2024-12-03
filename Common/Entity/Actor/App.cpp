@@ -216,8 +216,10 @@ namespace acs
 					{
 #ifdef __OS_WIN__
 						os::SystemInfo systemInfo;
+						constexpr double MB = 1024 * 1024.0f;
 						os::System::GetSystemInfo(systemInfo);
-						SetConsoleTitle(fmt::format("{}MB", systemInfo.use_memory / (1024 * 1024)).c_str());
+						double mb = systemInfo.use_memory / MB;
+						SetConsoleTitle(fmt::format("{:.2f}MB", mb).c_str());
 #endif
 #if defined(__OS_WIN__) || defined(__OS_MAC__)
 						this->Hotfix();

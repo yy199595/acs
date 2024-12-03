@@ -140,39 +140,49 @@ namespace acs
 			return XCode::CallLuaFunctionFail;
 		}
 		message.SetProto(rpc::Porto::None);
-		if (lua_istable(lua, -1))
+		if(!lua_isinteger(lua, -2))
 		{
-			std::string pb;
-			if(message.TempHead().Del("pb", pb))
+			LOG_ERROR("invoke ({}) return code unknown", config->FullName);
+			return XCode::Failure;
+		}
+		switch(lua_type(lua, -1))
+		{
+			case LUA_TTABLE:
 			{
-				MessageEncoder messageEncoder(lua);
-				message.SetProto(rpc::Porto::Protobuf);
-				pb::Message * data = this->mProto->Temp(pb);
-				if(data == nullptr)
+				std::string pb;
+				if(message.TempHead().Del("pb", pb))
 				{
-					return XCode::CreateProtoFailure;
+					MessageEncoder messageEncoder(lua);
+					message.SetProto(rpc::Porto::Protobuf);
+					pb::Message * data = this->mProto->Temp(pb);
+					if(data == nullptr)
+					{
+						return XCode::CreateProtoFailure;
+					}
+					if (!messageEncoder.Encode(*data, -1))
+					{
+						return XCode::ParseMessageError;
+					}
+					message.WriteMessage(data);
 				}
-				if (!messageEncoder.Encode(*data, -1))
+				else
 				{
-					return XCode::ParseMessageError;
+					message.SetProto(rpc::Porto::Json);
+					lua::yyjson::read(lua, -1, *message.Body());
 				}
-				message.WriteMessage(data);
+				break;
 			}
-			else
+			case LUA_TSTRING:
 			{
-				message.SetProto(rpc::Porto::Json);
-				lua::yyjson::read(lua, -1, *message.Body());
+				size_t len = 0;
+				message.Body()->clear();
+				const char* str = lua_tolstring(lua, -1, &len);
+				message.Body()->append(str, len);
+				message.SetProto(rpc::Porto::String);
+				break;
 			}
 		}
-		else if (lua_isstring(lua, -1))
-		{
-			size_t len = 0;
-			message.Body()->clear();
-			const char* str = lua_tolstring(lua, -1, &len);
-			message.Body()->append(str, len);
-			message.SetProto(rpc::Porto::String);
-		}
-		return (int)luaL_checkinteger(lua, -2);
+		return code;
 	}
 
 	int RpcService::AwaitCallLua(const RpcMethodConfig * config, rpc::Packet& message)

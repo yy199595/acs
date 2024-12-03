@@ -18,9 +18,7 @@ function Main:Awake()
 
     --app:MakeServer(appId, "server", {
     --    rpc = "43.143.239.75:7789",
-    --    kcp = "43.143.239.75:7787",
-    --    udp = "43.143.239.75:7788",
-    --    http = "101.34.67.141:80"
+    --    http = "43.143.239.75:80"
     --})
     local timer = require("core.timer")
     timer.AddUpdate(400, self, "Update")
@@ -28,26 +26,28 @@ end
 
 local count = 0
 function Main:Update()
-    print(string.format("==========================(%s)=========================", count))
-    coroutine.start(function()
-        count = count + 1
-        for i = 1, 2 do
-            coroutine.sleep(100)
-            local code, _ = app:Call(appId, "ChatSystem.OnChat", {
-                user_id = 10004,
-                msg_type = 1,
-                message = "hello"
-            })
+    ---print(string.format("==========================(%s)=========================", count))
+    for i = 1, 10 do
+        coroutine.start(function()
+            count = count + 1
+            for i = 1, 2 do
+                local code, _ = app:Call(appId, "ChatSystem.OnChat", {
+                    user_id = 10004,
+                    msg_type = 1,
+                    message = "hello"
+                })
 
-            code = app:Call(appId, "ChatSystem.Request", {
-                name = "xiao",
-                age = 10 + i,
-                index = i
-            })
-            code = app:Call(appId, "ChatSystem.Ping")
-        end
-        count = count - 1
-    end)
+                code = app:Call(appId, "ChatSystem.Request", {
+                    name = "xiao",
+                    age = 10 + i,
+                    index = i
+                })
+                code = app:Call(appId, "ChatSystem.Ping")
+            end
+            count = count - 1
+        end)
+    end
+
 end
 
 function Main:OnComplete()
