@@ -106,7 +106,7 @@ namespace acs
 				LOG_ERROR("call {} server not found", config->FullName);
 				break;
 			}
-			code = logicService->Invoke(config, message);
+			code = XCode::Ok; //logicService->Invoke(config, message);
 		} while (false);
 #ifdef __DEBUG__
 		long long t = help::Time::NowMil() - start;
