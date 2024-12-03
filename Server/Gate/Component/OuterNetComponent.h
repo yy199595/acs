@@ -57,8 +57,8 @@ namespace acs
 		custom::HashMap<int, long long> mAddressUserMap;  //fd和玩家id的映射表
 		custom::HashMap<long long, int> mUserAddressMap; //验证过的客户端
 		custom::Queue<rpc::Packet *> mBroadCastMessages; //广播消息
-		custom::HashMap<int, rpc::InnerClient *> mForwardClientMap; //中转到内网的客户端
 		std::unordered_map<int, std::unique_ptr<rpc::OuterClient>> mGateClientMap;
+		std::unordered_map<int, std::unique_ptr<rpc::InnerClient>> mForwardClientMap;
 	};
 }
 

@@ -160,8 +160,10 @@ namespace acs
 		rpc::InnerClient * tcpClient = nullptr;
 		do
 		{
-			if (this->mForwardClientMap.Get(id, tcpClient))
+			auto iter = this->mForwardClientMap.find(id);
+			if(iter != this->mForwardClientMap.end())
 			{
+				tcpClient = iter->second.get();
 				break;
 			}
 			std::string address;
@@ -176,10 +178,11 @@ namespace acs
 				LOG_ERROR("create socket fail : {}", address)
 				break;
 			}
-			tcpClient = new rpc::InnerClient(id, this);
+			std::unique_ptr<rpc::InnerClient> innerClient = std::make_unique<rpc::InnerClient>(id, this);
 			{
-				tcpClient->SetSocket(socketProxy);
-				this->mForwardClientMap.Add(id, tcpClient);
+				tcpClient = innerClient.get();
+				tcpClient->StartReceive(socketProxy);
+				this->mForwardClientMap.emplace(id, std::move(innerClient));
 			}
 		}
 		while(false);
