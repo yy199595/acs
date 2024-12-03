@@ -7,16 +7,9 @@
 #include"Yyjson/Document/Document.h"
 #include"Util/Tools/String.h"
 
-
-#if RPC_PACKET_COUNTER == 1
-#include "Util/Tools/TimeHelper.h"
-#endif
 namespace rpc
 {
-#if RPC_PACKET_COUNTER == 1
-	std::mutex Packet::mutex;
-	std::unordered_set<rpc::Packet *> Packet::NewMessageSet;
-#endif
+
 
     bool Head::GetKeys(std::vector<std::string> &keys) const
     {
@@ -82,46 +75,6 @@ namespace rpc
         os << '\n';
         return 0;
     }
-
-	Packet::Packet()
-	{
-#if RPC_PACKET_COUNTER == 1
-		std::lock_guard<std::mutex> lock(mutex);
-		NewMessageSet.insert(this);
-#endif
-		this->mSockId = 0;
-		this->mTimeout = 0;
-		this->mBody.clear();
-		this->mHead.Clear();
-		this->mNet = rpc::Net::Tcp;
-		memset(&this->mProtoHead, 0, sizeof(this->mProtoHead));
-	}
-
-	Packet::~Packet()
-	{
-#if RPC_PACKET_COUNTER == 1
-
-		std::lock_guard<std::mutex> lock(mutex);
-		auto iter = NewMessageSet.find(this);
-		if(iter != NewMessageSet.end())
-		{
-			NewMessageSet.erase(iter);
-		}
-#endif
-	}
-
-#if RPC_PACKET_COUNTER == 1
-
-	size_t Packet::PacketCount()
-	{
-		std::lock_guard<std::mutex> lock(mutex);
-		for(const Packet * packet : NewMessageSet)
-		{
-
-		}
-		return NewMessageSet.size();
-	}
-#endif
 
 	void Packet::Init(const rpc::ProtoHead & protoHead)
 	{
@@ -428,5 +381,15 @@ namespace rpc
 				return pb::util::MessageToJsonString(*message, &mBody).ok();
 		}
 		return message->SerializeToString(&mBody);
+	}
+
+	Packet::Packet()
+	{
+		this->mSockId = 0;
+		this->mTimeout = 0;
+		this->mBody.clear();
+		this->mHead.Clear();
+		this->mNet = rpc::Net::Tcp;
+		memset(&this->mProtoHead, 0, sizeof(this->mProtoHead));
 	}
 }

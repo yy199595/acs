@@ -224,7 +224,7 @@ namespace acs
 #endif
 
 #if RPC_PACKET_COUNTER == 1
-						size_t  count = rpc::Packet::PacketCount();
+						size_t  count = rpc::Packet::GetObjectCount();
 						if(count > 0)
 						{
 							LOG_WARN("rpc packet count:({})", count);

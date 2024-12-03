@@ -13,8 +13,7 @@
 
 #define RPC_PACKET_COUNTER 1
 #if RPC_PACKET_COUNTER == 1
-#include <mutex>
-#include <unordered_set>
+#include "Core/Memory/MemoryObject.h"
 #endif
 namespace rpc
 {
@@ -32,10 +31,14 @@ namespace rpc
 	};
 
 	class Packet : public tcp::IProto
+#if RPC_PACKET_COUNTER == 1
+	, public memory::Object
+#endif
 	{
 	public:
 		Packet();
-		~Packet();
+		~Packet() override = default;
+	public:
 		int OnSendMessage(std::ostream& os) final;
 		int OnRecvMessage(std::istream& os, size_t size) final;
 	public:
@@ -82,14 +85,6 @@ namespace rpc
 	public:
 		bool ParseMessage(json::r::Document* message);
 		bool WriteMessage(json::w::Document* message);
-#if RPC_PACKET_COUNTER == 1
-		static size_t PacketCount();
-#endif
-	private:
-#if RPC_PACKET_COUNTER == 1
-		static std::mutex mutex;
-		static std::unordered_set<rpc::Packet *> NewMessageSet;
-#endif
 	private:
 		char mNet;
 		Head mHead; //写入socket
