@@ -78,7 +78,7 @@ namespace acs
 				LOG_ERROR("call {} not exist", methodConfig->Service);
 				break;
 			}
-			if (!methodConfig->IsAsync)
+			//if (!methodConfig->IsAsync)
 			{
 				this->Invoke(methodConfig, message);
 				break;
