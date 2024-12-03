@@ -78,7 +78,7 @@ namespace acs
 				LOG_ERROR("call {} not exist", methodConfig->Service);
 				break;
 			}
-			//if (!methodConfig->IsAsync)
+			if (!methodConfig->IsAsync)
 			{
 				this->Invoke(methodConfig, message);
 				break;
@@ -106,7 +106,7 @@ namespace acs
 				LOG_ERROR("call {} server not found", config->FullName);
 				break;
 			}
-			code = XCode::Ok; //logicService->Invoke(config, message);
+			code = logicService->Invoke(config, message);
 		} while (false);
 #ifdef __DEBUG__
 		long long t = help::Time::NowMil() - start;

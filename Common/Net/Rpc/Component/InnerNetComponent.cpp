@@ -195,7 +195,7 @@ namespace acs
         if (this->mApp->Equal(id)) //发送到本机
         {
 			message->SetSockId(id);
-			Asio::Context & t = this->mApp->GetContext();
+			Asio::Context & t = acs::App::GetContext();
 			t.post([this, message] { this->OnMessage(message, nullptr); });
             return XCode::Ok;
         }
@@ -227,21 +227,24 @@ namespace acs
 
 	int InnerNetComponent::OnRequest(rpc::Packet * message)
 	{
-		int code = this->mDisComponent->OnMessage(message);
-		if (code != XCode::Ok)
-		{
-			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-			LOG_ERROR("call {} code = {}", message->GetHead().GetStr(rpc::Header::func), desc);
+		message->SetType(rpc::Type::Response);
+		this->Send(message->SockId(), message);
 
-			if (message->GetRpcId() == 0)
-			{
-				return XCode::DeleteData;
-			}
-			message->Body()->clear();
-			message->SetType(rpc::Type::Response);
-			message->GetHead().Add(rpc::Header::code, code);
-			return this->Send(message->SockId(), message);
-		}
+//		int code = this->mDisComponent->OnMessage(message);
+//		if (code != XCode::Ok)
+//		{
+//			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
+//			LOG_ERROR("call {} code = {}", message->GetHead().GetStr(rpc::Header::func), desc);
+//
+//			if (message->GetRpcId() == 0)
+//			{
+//				return XCode::DeleteData;
+//			}
+//			message->Body()->clear();
+//			message->SetType(rpc::Type::Response);
+//			message->GetHead().Add(rpc::Header::code, code);
+//			return this->Send(message->SockId(), message);
+//		}
 		return XCode::Ok;
 	}
 }// namespace Sentry
