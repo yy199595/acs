@@ -78,12 +78,13 @@ namespace acs
 				LOG_ERROR("call {} not exist", methodConfig->Service);
 				break;
 			}
-			if (!methodConfig->IsAsync)
-			{
-				this->Invoke(methodConfig, message);
-				break;
-			}
-			this->mTaskComponent->Start(&DispatchComponent::Invoke, this, methodConfig, message);
+			code = XCode::Failure;
+//			if (!methodConfig->IsAsync)
+//			{
+//				this->Invoke(methodConfig, message);
+//				break;
+//			}
+//			this->mTaskComponent->Start(&DispatchComponent::Invoke, this, methodConfig, message);
 		}
 		while(false);
 		return code;
@@ -93,33 +94,33 @@ namespace acs
 	{
 		++this->mWaitCount;
 		int code = XCode::Ok;
-//#ifdef __DEBUG__
-//		long long start = help::Time::NowMil();
-//#endif
-//		do
-//		{
-//			const std::string& service = config->Service;
-//			RpcService* logicService = this->mRpcServices.Find(service);
-//			if (logicService == nullptr)
-//			{
-//				code = XCode::CallServiceNotFound;
-//				LOG_ERROR("call {} server not found", config->FullName);
-//				break;
-//			}
-//			code = logicService->Invoke(config, message);
-//		} while (false);
-//#ifdef __DEBUG__
-//		long long t = help::Time::NowMil() - start;
-//		if (code != XCode::Ok)
-//		{
-//			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-//			//LOG_WARN("({}ms) invoke [{}] code:{} = {}", t, config->FullName, code, desc);
-//		}
-//		else if(t >= 2000)
-//		{
-//			LOG_WARN("({}ms) invoke [{}] too long time", t, config->FullName);
-//		}
-//#endif
+#ifdef __DEBUG__
+		long long start = help::Time::NowMil();
+#endif
+		do
+		{
+			const std::string& service = config->Service;
+			RpcService* logicService = this->mRpcServices.Find(service);
+			if (logicService == nullptr)
+			{
+				code = XCode::CallServiceNotFound;
+				LOG_ERROR("call {} server not found", config->FullName);
+				break;
+			}
+			code = logicService->Invoke(config, message);
+		} while (false);
+#ifdef __DEBUG__
+		long long t = help::Time::NowMil() - start;
+		if (code != XCode::Ok)
+		{
+			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
+			//LOG_WARN("({}ms) invoke [{}] code:{} = {}", t, config->FullName, code, desc);
+		}
+		else if(t >= 2000)
+		{
+			LOG_WARN("({}ms) invoke [{}] too long time", t, config->FullName);
+		}
+#endif
 		--this->mWaitCount;
 		this->mRouterComponent->Send(message->SockId(), code, message);
 	}
