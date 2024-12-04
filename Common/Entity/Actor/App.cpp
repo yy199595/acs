@@ -226,10 +226,10 @@ namespace acs
 						double mb = systemInfo.use_memory / MB;
 						SetConsoleTitle(fmt::format("{:.2f}MB", mb).c_str());
 #endif
-#if defined(__OS_WIN__) || defined(__OS_MAC__)
+//#if defined(__OS_WIN__) || defined(__OS_MAC__)
+//
+//#endif
 						this->Hotfix();
-#endif
-
 #if RPC_PACKET_COUNTER == 1
 						size_t  count = rpc::Packet::GetObjectCount();
 						if(count > 0)
