@@ -117,16 +117,15 @@ namespace acs
 
     void InnerNetComponent::OnSendFailure(int, rpc::Packet * message)
     {
-        if (message->GetType() == rpc::Type::Request)
-        {
-			if(message->GetRpcId() != 0)
-            {
-                message->SetType(rpc::Type::Response);
-                message->GetHead().Add(rpc::Header::code, XCode::NetWorkError);
-                this->mDisComponent->OnMessage(message);
+        if (message->GetType() == rpc::Type::Request && message->GetRpcId() > 0)
+		{
+			message->SetType(rpc::Type::Response);
+			message->GetHead().Add(rpc::Header::code, XCode::NetWorkError);
+			if (this->mDisComponent->OnMessage(message) != XCode::Ok)
+			{
 				return;
-            }
-        }
+			}
+		}
 		delete message;
     }
 

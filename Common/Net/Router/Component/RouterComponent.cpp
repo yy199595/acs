@@ -73,30 +73,35 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	int RouterComponent::Send(int id, int code, rpc::Packet * message)
+	int RouterComponent::Send(int id, int result, rpc::Packet * message)
 	{
-		if(message->GetRpcId() == 0)
+		int code = XCode::Ok;
+		do
+		{
+			if(message->GetRpcId() == 0)
+			{
+				code = XCode::DeleteData;
+				break;
+			}
+			const char net = message->GetNet();
+			ISender * sender = this->GetSender(net);
+			if(sender == nullptr)
+			{
+				LOG_ERROR("not find sender {}", (int)net);
+				code = XCode::NotFoundSender;
+				break;
+			}
+			message->GetHead().Del("app");
+			message->SetType(rpc::Type::Response);
+			message->GetHead().Add(rpc::Header::code, result);
+			code = sender->Send(id, message);
+		}
+		while(false);
+		if(code != XCode::Ok)
 		{
 			delete message;
-			return XCode::Ok;
 		}
-		message->GetHead().Del("app");
-		message->SetType(rpc::Type::Response);
-		message->GetHead().Add(rpc::Header::code, code);
-		ISender * sender = this->GetSender(message->GetNet());
-		if(sender == nullptr)
-		{
-			LOG_ERROR("not find sender {}", message->GetNet());
-			delete message;
-			return XCode::NotFoundSender;
-		}
-		if(sender->Send(id, message) != XCode::Ok)
-		{
-			delete message;
-			LOG_ERROR("send to {} fail", id);
-			return XCode::SendMessageFail;
-		}
-		return XCode::Ok;
+		return code;
 	}
 
 	rpc::Packet * RouterComponent::Call(int id, std::unique_ptr<rpc::Packet> message)
