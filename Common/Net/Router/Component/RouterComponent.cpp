@@ -43,12 +43,14 @@ namespace acs
 			return 1;
 		}
 		int timeout = message->GetTimeout();
+		rpc::Packet * data = message.release();
 		int rpc = this->mDisComponent->BuildRpcId();
 		{
 			message->SetRpcId(rpc);
-			int code = sender->Send(id, message.release());
+			int code = sender->Send(id, data);
 			if(code != XCode::Ok)
 			{
+				delete data;
 				lua_pushinteger(lua, code);
 				return 1;
 			}
@@ -116,8 +118,10 @@ namespace acs
 		int taskId = this->mDisComponent->BuildRpcId();
 
 		message->SetRpcId(taskId);
-		if (sender->Send(id, message.release()) != XCode::Ok)
+		rpc::Packet * data = message.release();
+		if (sender->Send(id, data) != XCode::Ok)
 		{
+			delete data;
 			LOG_ERROR("send to [{}] fail", id);
 			return nullptr;
 		}
