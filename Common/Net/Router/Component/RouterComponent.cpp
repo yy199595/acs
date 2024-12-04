@@ -46,7 +46,7 @@ namespace acs
 		rpc::Packet * data = message.release();
 		int rpc = this->mDisComponent->BuildRpcId();
 		{
-			message->SetRpcId(rpc);
+			data->SetRpcId(rpc);
 			int code = sender->Send(id, data);
 			if(code != XCode::Ok)
 			{
