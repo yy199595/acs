@@ -230,8 +230,8 @@ namespace acs
 		int code = this->mDisComponent->OnMessage(message);
 		if (code != XCode::Ok)
 		{
-			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-			LOG_ERROR("call {} code = {}", message->GetHead().GetStr(rpc::Header::func), desc);
+//			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
+//			LOG_ERROR("call {} code = {}", message->GetHead().GetStr(rpc::Header::func), desc);
 
 			if (message->GetRpcId() == 0)
 			{
