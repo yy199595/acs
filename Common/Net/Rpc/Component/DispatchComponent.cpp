@@ -56,14 +56,6 @@ namespace acs
 	{
 		++this->mSumCount;
 		int code = XCode::Ok;
-#ifdef __ENABLE_MEMORY_CHECK__
-		if(message->GetRpcId() > 0)
-		{
-			os::SystemInfo systemInfo;
-			os::System::GetSystemInfo(systemInfo);
-			message->GetHead().Add("use_memory", systemInfo.use_memory);
-		}
-#endif
 		const std::string & fullName = message->ConstHead().GetStr("func");
         const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
 
@@ -114,7 +106,7 @@ namespace acs
 				LOG_ERROR("call {} server not found", config->FullName);
 				break;
 			}
-			code = logicService->Invoke(config, message);
+			code = XCode::Ok; //= logicService->Invoke(config, message);
 		} while (false);
 #ifdef __DEBUG__
 		long long t = help::Time::NowMil() - start;
@@ -151,22 +143,6 @@ namespace acs
             case rpc::Type::Response:
 			{
 				int rpcId = message->GetRpcId();
-#ifdef __ENABLE_MEMORY_CHECK__
-				if(rpcId > 0)
-				{
-					long long startMemory = 0;
-					os::SystemInfo systemInfo;
-					os::System::GetSystemInfo(systemInfo);
-					message->GetHead().Get("use_memory", startMemory);
-					const std::string & fullName = message->ConstHead().GetStr("func");
-					if(systemInfo.use_memory > startMemory)
-					{
-						double sum = systemInfo.use_memory / (1024 * 1024.0f);
-						double memory = (systemInfo.use_memory - startMemory) / 1024.0f;
-						LOG_INFO("call ({}) use:{:.3f}KB sum:{:.3f}MB", fullName, memory, sum);
-					}
-				}
-#endif
 				this->OnResponse(rpcId, message);
 
 				return XCode::Ok;

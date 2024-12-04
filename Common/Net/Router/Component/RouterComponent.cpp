@@ -81,13 +81,13 @@ namespace acs
 			return XCode::Ok;
 		}
 		message->GetHead().Del("app");
-		message->GetHead().Add("code", code);
 		message->SetType(rpc::Type::Response);
+		message->GetHead().Add(rpc::Header::code, code);
 		ISender * sender = this->GetSender(message->GetNet());
 		if(sender == nullptr)
 		{
-			delete message;
 			LOG_ERROR("not find sender {}", message->GetNet());
+			delete message;
 			return XCode::NotFoundSender;
 		}
 		if(sender->Send(id, message) != XCode::Ok)

@@ -227,7 +227,6 @@ namespace acs
 
 	int InnerNetComponent::OnRequest(rpc::Packet * message)
 	{
-
 		int code = this->mDisComponent->OnMessage(message);
 		if (code != XCode::Ok)
 		{
