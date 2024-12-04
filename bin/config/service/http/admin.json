@@ -2,6 +2,7 @@
 	"/admin/ping": {
 		"Type": "GET",
 		"Async": true,
+		"Auth": false,
 		"Permiss": 100,
 		"Bind": "Admin.Ping",
 		"Desc": "Ping某个服务器进程",
@@ -22,6 +23,7 @@
 	"/admin/all_info": {
 		"Type": "GET",
 		"Async": true,
+		"Auth": false,
 		"Permiss": 20,
 		"Bind": "Admin.AllInfo",
 		"Desc": "查看所有服务器进程信息"

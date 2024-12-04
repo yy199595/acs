@@ -11,7 +11,7 @@
 #include"Proto/Message/IProto.h"
 #include"Yyjson/Document/Document.h"
 
-#define RPC_PACKET_COUNTER 1
+#define RPC_PACKET_COUNTER 0
 #if RPC_PACKET_COUNTER == 1
 #include "Core/Memory/MemoryObject.h"
 #endif

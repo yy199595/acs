@@ -30,21 +30,22 @@ function Main:Update()
     for i = 1, 10 do
         coroutine.start(function()
             count = count + 1
-            for i = 1, 2 do
-                local code, _ = app:Call(appId, "ChatSystem.OnChat", {
-                    user_id = 10004,
-                    msg_type = 1,
-                    message = "hello"
-                })
-                code = app:Call(appId, "ChatSystem.Request", {
-                    name = "xiao",
-                    age = 10 + i,
-                    index = i
-                })
-                code = app:Call(appId, "ChatSystem.Ping")
-                code = app:Call(appId, "GateSystem.Ping")
+            --local code, _ = app:Call(appId, "ChatSystem.OnChat", {
+            --    user_id = 10004,
+            --    msg_type = 1,
+            --    message = "hello"
+            --})
+            --code = app:Call(appId, "ChatSystem.Request", {
+            --    name = "xiao",
+            --    age = 10 + i,
+            --    index = i
+            --})
+            --code = app:Call(appId, "ChatSystem.Ping")
+            --code = app:Call(appId, "GateSystem.Ping")
+            http:Get("http://127.0.0.1:80/admin/hello")
+            http:Get("http://127.0.0.1:80/admin/all_info")
+            http:Get("http://127.0.0.1:80/admin/ping?id=0")
 
-            end
             count = count - 1
         end)
     end
@@ -52,9 +53,6 @@ function Main:Update()
 end
 
 function Main:OnComplete()
-
-
-
 
 
     --local res = http:Get("https://huwai.pro")
