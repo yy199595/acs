@@ -61,7 +61,7 @@ namespace tcp
 				return;
 			}
 #ifdef __ENABLE_OPEN_SSL__
-			if (this->mSocket->IsOpenSsl())
+			if (this->mSocket != nullptr && this->mSocket->IsOpenSsl())
 			{
 				this->mSocket->SslSocket().async_handshake(asio::ssl::stream_base::client,
 						[this](const asio::error_code& err)

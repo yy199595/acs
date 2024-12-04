@@ -194,8 +194,9 @@ namespace acs
         if (this->mApp->Equal(id)) //发送到本机
         {
 			message->SetSockId(id);
-			Asio::Context & t = acs::App::GetContext();
-			t.post([this, message] { this->OnMessage(message, nullptr); });
+			this->OnMessage(message, nullptr);
+//			Asio::Context & t = acs::App::GetContext();
+//			t.post([this, message] { this->OnMessage(message, nullptr); });
             return XCode::Ok;
         }
 #ifdef __DEBUG__

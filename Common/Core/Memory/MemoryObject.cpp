@@ -8,7 +8,7 @@ namespace memory
 	Object::Object()
 	{
 		std::lock_guard<std::mutex> lock(sMutex);
-		sObjects.insert(this);
+		sObjects.emplace(this);
 	}
 
 	Object::~Object()
@@ -25,6 +25,15 @@ namespace memory
 	size_t Object::GetObjectCount()
 	{
 		std::lock_guard<std::mutex> lock(sMutex);
+		size_t index = 0;
+		for (memory::Object * object : sObjects)
+		{
+			index++;
+			if(index >= 40000)
+			{
+				printf("[%d] %p\n", (int)index, object);
+			}
+		}
 		return sObjects.size();
 	}
 
