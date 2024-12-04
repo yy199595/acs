@@ -30,18 +30,18 @@ function Main:Update()
     for i = 1, 20 do
         coroutine.start(function()
             count = count + 1
-            local code = app:Call(appId, "ChatSystem.OnChat", {
+            local code = app:Send(appId, "ChatSystem.OnChat", {
                 user_id = 10004,
                 msg_type = 1,
                 message = "hello"
             })
-            code = app:Call(appId, "ChatSystem.Request", {
+            code = app:Send(appId, "ChatSystem.Request", {
                 name = "xiao",
                 age = 10 + i,
                 index = i
             })
-            code = app:Call(appId, "ChatSystem.Ping")
-            code = app:Call(appId, "GateSystem.Ping")
+            code = app:Send(appId, "ChatSystem.Ping")
+            code = app:Send(appId, "GateSystem.Ping")
             --http:Get("http://127.0.0.1:80/admin/hello")
             --http:Get("http://127.0.0.1:80/admin/all_info")
             --http:Get("http://127.0.0.1:80/admin/ping?id=0")
