@@ -6,8 +6,9 @@ local Module = require("Module")
 local Session = require("Session")
 local http = require("HttpComponent")
 
-local HOST = "http://127.0.0.1:8088"
-local COUNT = os.getenv("APP_COUNT") or 10
+local HOST = "http://43.143.239.75:80"
+--local HOST = "http://127.0.0.1:8088"
+local COUNT = os.getenv("APP_COUNT") or 100
 local Main = Module()
 
 local lastUserMemory = 0
@@ -91,15 +92,20 @@ function Main:CallServer(player)
 end
 
 function Main:Login(info)
+    log.Debug("user(%s) start login", info.account)
     local response = http:Post(str_format("%s/account/login", HOST), info)
     if response == nil or response.data == nil then
         log.Error("account login failure")
         return
     end
-
     local result = response.data
     local client = Session(result.address)
+    local timerId = timer.Add(2000, function()
+        log.Error("user(%s) login [%s] time out", info.account, result.address)
+    end)
     local code = client:Call("GateSystem.Login", result.token)
+    print(code)
+    timer.Del(timerId)
     if code == XCode.Ok then
         table.insert(self.sessions, {
             count = 0,
