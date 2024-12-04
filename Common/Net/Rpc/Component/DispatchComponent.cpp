@@ -161,8 +161,9 @@ namespace acs
 					const std::string & fullName = message->ConstHead().GetStr("func");
 					if(systemInfo.use_memory > startMemory)
 					{
-						double memory = systemInfo.use_memory - startMemory;
-						LOG_INFO("call ({}) memory:{:.3f}", fullName, memory / 1024.0f);
+						double sum = systemInfo.use_memory / (1024 * 1024.0f);
+						double memory = (systemInfo.use_memory - startMemory) / 1024.0f;
+						LOG_INFO("call ({}) use:{:.3f}KB sum:{:.3f}MB", fullName, memory, sum);
 					}
 				}
 #endif

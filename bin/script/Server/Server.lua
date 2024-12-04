@@ -42,6 +42,8 @@ function Main:Update()
                     index = i
                 })
                 code = app:Call(appId, "ChatSystem.Ping")
+                code = app:Call(appId, "GateSystem.Ping")
+
             end
             count = count - 1
         end)

@@ -55,7 +55,7 @@ namespace acs
 	bool App::LoadComponent()
 	{
 		std::string path, cluster;
-		if (this->mConfig.GetPath("cluster", path)) //加载集群配置
+		if (!this->mConfig.GetPath("cluster", path)) //加载集群配置
 		{
 			return false;
 		}
