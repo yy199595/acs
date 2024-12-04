@@ -57,8 +57,8 @@ namespace acs
 					++count;
 					const std::string& json = response->GetBody();
 					lua::yyjson::write(this->mLua, json.c_str(), json.size());
-				}
 					break;
+				}
 				case rpc::Porto::Protobuf:
 				{
 					std::string name;
@@ -72,13 +72,15 @@ namespace acs
 							App::GetProto()->Write(this->mLua, *message1);
 						}
 					}
-				}
 					break;
+				}
 				case rpc::Porto::String:
+				{
 					++count;
 					const std::string& str = response->GetBody();
 					lua_pushlstring(this->mLua, str.c_str(), str.size());
 					break;
+				}
 			}
 		}
 		Lua::Coroutine::Resume(coroutine, this->mLua, count);
