@@ -26,7 +26,7 @@ end
 
 local count = 0
 function Main:Update()
-    ---print(string.format("==========================(%s)=========================", count))
+    --print(string.format("==========================(%s)=========================", count))
     for i = 1, 10 do
         coroutine.start(function()
             count = count + 1
@@ -36,7 +36,6 @@ function Main:Update()
                     msg_type = 1,
                     message = "hello"
                 })
-
                 code = app:Call(appId, "ChatSystem.Request", {
                     name = "xiao",
                     age = 10 + i,

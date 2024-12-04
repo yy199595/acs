@@ -158,7 +158,6 @@ namespace tcp
 		static int LuaGet(lua_State * l);
 		static int LuaToString(lua_State * l);
 		static void WriteLua(lua_State *l, const IHeader & header);
-		static void WriteLua(lua_State *l, const IHeader * header);
 	public:
 		auto End() const { return this->mHeader.end(); }
 		auto Begin() const { return this->mHeader.begin(); }

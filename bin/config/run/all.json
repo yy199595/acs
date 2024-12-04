@@ -34,7 +34,6 @@
 	},
 	"path": {
 		"machine": "",
-		"home": "${WORK_DIR}/config/card/home.json",
-		"cluster": "${WORK_DIR}/config/cluster/debug.json"
+		"home": "${WORK_DIR}/config/card/home.json"
 	}
 }

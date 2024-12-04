@@ -198,7 +198,7 @@ namespace Lua
 			new(lua_newuserdata(lua, sizeof(PtrProxy<T>))) PtrProxy<T>(data, false);
 		}
 
-		static void Destory(lua_State* lua, int index)
+		static void Destroy(lua_State* lua, int index)
 		{
 			PtrProxy<T>* p = nullptr;
 			if (lua_isuserdata(lua, index))

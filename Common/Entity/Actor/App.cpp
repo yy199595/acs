@@ -55,10 +55,15 @@ namespace acs
 	bool App::LoadComponent()
 	{
 		std::string path;
-		if (this->mConfig.GetPath("cluster", path))
+		if (this->mConfig.GetPath("cluster", path)) //加载集群配置
 		{
+			std::string cluster;
+			if(!os::System::GetEnv("cluster", cluster))
+			{
+				return false;
+			}
 			TextConfig* config = new ClusterConfig();
-			if (!config->LoadConfig(path))
+			if (!config->LoadConfig(fmt::format("{}/{}.json", path, cluster)))
 			{
 				return false;
 			}

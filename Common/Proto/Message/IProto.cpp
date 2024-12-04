@@ -94,11 +94,6 @@ namespace tcp
 		Lua::UserDataParameter::UserDataStruct<const IHeader*>::Write(l, &header);
 	}
 
-	void IHeader::WriteLua(lua_State* L, const IHeader * header)
-	{
-		Lua::UserDataParameter::UserDataStruct<const IHeader*>::Write(L, header);
-	}
-
 	int IHeader::LuaGet(lua_State* L)
 	{
 		IHeader* head = Lua::UserDataParameter::Read<IHeader*>(L, 1);

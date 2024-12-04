@@ -81,6 +81,7 @@ namespace os
 		System::SetEnv("id", "0"); //服务器id
 		System::SetEnv("log", "1"); //日志等级
 		System::SetEnv("name", "server"); //集群名称
+		System::SetEnv("cluster", "debug");
 		System::SetEnv("db", "127.0.0.1"); //db地址
 		System::SetEnv("exe",  commandLine[0]);
 		System::SetEnv("config", "./config/run/all.json");
