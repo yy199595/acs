@@ -24,7 +24,7 @@ namespace acs
 
 	bool Admin::Awake()
 	{
-		this->mApp->AddComponent<AdminComponent>();
+		//this->mApp->AddComponent<AdminComponent>();
 		return true;
 	}
 
