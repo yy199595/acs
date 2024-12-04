@@ -56,6 +56,14 @@ namespace acs
 	{
 		++this->mSumCount;
 		int code = XCode::Ok;
+#ifdef __ENABLE_MEMORY_CHECK__
+		if(message->GetRpcId() > 0)
+		{
+			os::SystemInfo systemInfo;
+			os::System::GetSystemInfo(systemInfo);
+			message->GetHead().Add("use_memory", systemInfo.use_memory);
+		}
+#endif
 		const std::string & fullName = message->ConstHead().GetStr("func");
         const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
 
@@ -143,7 +151,23 @@ namespace acs
             case rpc::Type::Response:
 			{
 				int rpcId = message->GetRpcId();
+#ifdef __ENABLE_MEMORY_CHECK__
+				if(rpcId > 0)
+				{
+					long long startMemory = 0;
+					os::SystemInfo systemInfo;
+					os::System::GetSystemInfo(systemInfo);
+					message->GetHead().Get("use_memory", startMemory);
+					const std::string & fullName = message->ConstHead().GetStr("func");
+					if(systemInfo.use_memory > startMemory)
+					{
+						double memory = systemInfo.use_memory - startMemory;
+						LOG_INFO("call ({}) memory:{:.3f}", fullName, memory / 1024.0f);
+					}
+				}
+#endif
 				this->OnResponse(rpcId, message);
+
 				return XCode::Ok;
 			}
 			case rpc::Type::Client:

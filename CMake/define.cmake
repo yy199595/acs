@@ -48,6 +48,8 @@ option(__ENABLE_OPEN_SSL__ "开启openssl" ON)
 option(__MEMOEY_CHECK__ "开启内存检查" OFF)
 option(__ENABLE_OPEN_WOLF_SSL__ "开启wolfssl" OFF)
 
+option(__ENABLE_MEMORY_CHECK__ "开启内存检查" ON)
+
 if (APPLE)
     option(__ENABLE_DING_DING_PUSH "开启钉钉通知" OFF)
 elseif (UNIX)
@@ -68,6 +70,10 @@ add_definitions(-DLOG_LEVEL_OFF=6) #关闭
 
 if (__ENABLE_SYSTEM_DEBUG)
     add_definitions(-D __ENABLE_SYSTEM_DEBUG)
+endif ()
+
+if(__ENABLE_MEMORY_CHECK__)
+    add_definitions(-D __ENABLE_MEMORY_CHECK__)
 endif ()
 
 if (__CONSOLE_LOG__)

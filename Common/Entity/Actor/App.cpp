@@ -54,20 +54,21 @@ namespace acs
 
 	bool App::LoadComponent()
 	{
-		std::string path;
+		std::string path, cluster;
 		if (this->mConfig.GetPath("cluster", path)) //加载集群配置
 		{
-			std::string cluster;
-			if(!os::System::GetEnv("cluster", cluster))
-			{
-				return false;
-			}
-			TextConfig* config = new ClusterConfig();
-			if (!config->LoadConfig(fmt::format("{}/{}.json", path, cluster)))
-			{
-				return false;
-			}
+			return false;
 		}
+		if (!os::System::GetEnv("cluster", cluster))
+		{
+			return false;
+		}
+		TextConfig* config = new ClusterConfig();
+		if (!config->LoadConfig(fmt::format("{}/{}.json", path, cluster)))
+		{
+			return false;
+		}
+
 		this->AddComponent<ThreadComponent>();
 		this->AddComponent<LoggerComponent>();
 		LOG_CHECK_RET_FALSE(this->AddComponent<TimerComponent>());
@@ -226,13 +227,13 @@ namespace acs
 						double mb = systemInfo.use_memory / MB;
 						SetConsoleTitle(fmt::format("{:.2f}MB", mb).c_str());
 #endif
-//#if defined(__OS_WIN__) || defined(__OS_MAC__)
-//
-//#endif
+#if defined(__OS_WIN__) || defined(__OS_MAC__)
 						this->Hotfix();
+#endif
+
 #if RPC_PACKET_COUNTER == 1
-						size_t  count = rpc::Packet::GetObjectCount();
-						if(count > 0)
+						size_t count = rpc::Packet::GetObjectCount();
+						if (count > 0)
 						{
 							LOG_WARN("rpc packet count:({})", count);
 						}
