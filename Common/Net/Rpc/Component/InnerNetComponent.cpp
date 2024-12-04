@@ -247,6 +247,6 @@ namespace acs
 //			message->GetHead().Add(rpc::Header::code, code);
 //			return this->Send(message->SockId(), message);
 //		}
-		return XCode::Ok;
+//		return XCode::Ok;
 	}
 }// namespace Sentry
