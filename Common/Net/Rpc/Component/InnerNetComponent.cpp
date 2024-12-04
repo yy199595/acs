@@ -227,21 +227,26 @@ namespace acs
 
 	int InnerNetComponent::OnRequest(rpc::Packet * message)
 	{
-		int code = this->mDisComponent->OnMessage(message);
-		if (code != XCode::Ok)
-		{
-//			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-//			LOG_ERROR("call {} code = {}", message->GetHead().GetStr(rpc::Header::func), desc);
+		message->SetType(rpc::Type::Response);
+		message->GetHead().Add(rpc::Header::code, XCode::Failure);
 
-			if (message->GetRpcId() == 0)
-			{
-				return XCode::DeleteData;
-			}
-			message->Body()->clear();
-			message->SetType(rpc::Type::Response);
-			message->GetHead().Add(rpc::Header::code, code);
-			return this->Send(message->SockId(), message);
-		}
+		return this->Send(message->SockId(), message);
+
+//		int code = this->mDisComponent->OnMessage(message);
+//		if (code != XCode::Ok)
+//		{
+////			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
+////			LOG_ERROR("call {} code = {}", message->GetHead().GetStr(rpc::Header::func), desc);
+//
+//			if (message->GetRpcId() == 0)
+//			{
+//				return XCode::DeleteData;
+//			}
+//			message->Body()->clear();
+//			message->SetType(rpc::Type::Response);
+//			message->GetHead().Add(rpc::Header::code, code);
+//			return this->Send(message->SockId(), message);
+//		}
 		return XCode::Ok;
 	}
 }// namespace Sentry

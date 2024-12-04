@@ -78,13 +78,12 @@ namespace acs
 				LOG_ERROR("call {} not exist", methodConfig->Service);
 				break;
 			}
-			code = XCode::Failure;
-//			if (!methodConfig->IsAsync)
-//			{
-//				this->Invoke(methodConfig, message);
-//				break;
-//			}
-//			this->mTaskComponent->Start(&DispatchComponent::Invoke, this, methodConfig, message);
+			if (!methodConfig->IsAsync)
+			{
+				this->Invoke(methodConfig, message);
+				break;
+			}
+			this->mTaskComponent->Start(&DispatchComponent::Invoke, this, methodConfig, message);
 		}
 		while(false);
 		return code;
