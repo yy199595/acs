@@ -36,8 +36,8 @@ namespace rpc
 		unsigned int mMaxQps;
 		long long mLastRecvTime;
 		Component * mComponent;
-		rpc::Packet * mMessage;
 		rpc::ProtoHead mProtoHead;
+		std::unique_ptr<rpc::Packet> mMessage;
 		custom::Queue<rpc::Packet *> mSendMessages;
 	};
 }

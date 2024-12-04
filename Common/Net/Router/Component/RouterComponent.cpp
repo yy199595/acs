@@ -93,8 +93,8 @@ namespace acs
 				LOG_ERROR("not find sender {}", (int)net);
 				break;
 			}
-			message->GetHead().Del("app");
 			message->SetType(rpc::Type::Response);
+			message->GetHead().Del(rpc::Header::app_id);
 			message->GetHead().Add(rpc::Header::code, result);
 			code = sender->Send(id, message);
 		}

@@ -11,8 +11,17 @@ namespace rpc
 	InnerClient::InnerClient(int id, Component* component)
 			: Client(rpc::InnerBufferMaxSize), mSockId(id), mComponent(component)
 	{
-		this->mMessage = nullptr;
 		this->mDecodeStatus = tcp::Decode::None;
+	}
+
+	InnerClient::~InnerClient() noexcept
+	{
+		rpc::Packet * message = nullptr;
+		while(this->mSendMessages.Pop(message))
+		{
+			delete message;
+			message = nullptr;
+		}
 	}
 
 	bool InnerClient::Send(rpc::Packet * message)

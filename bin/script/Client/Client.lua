@@ -6,8 +6,8 @@ local Module = require("Module")
 local Session = require("Session")
 local http = require("HttpComponent")
 
-local HOST = "http://43.143.239.75:80"
---local HOST = "http://127.0.0.1:8088"
+--local HOST = "http://43.143.239.75:80"
+local HOST = "http://127.0.0.1:8088"
 local COUNT = os.getenv("APP_COUNT") or 100
 local Main = Module()
 
@@ -32,7 +32,7 @@ function Main:Awake()
         local t2 = (luaMemory - lastLuaUserMemory)
         local t1 = (user_memory - lastUserMemory) / 1024
         local t3 = user_memory / (1024 * 1024)
-        log.Warning("sum:%.2fMB  add:%.2fKB  lua:%.2fKB", t3, t1, t2)
+        --log.Warning("sum:%.2fMB  add:%.2fKB  lua:%.2fKB", t3, t1, t2)
 
         lastUserMemory = user_memory
         lastLuaUserMemory = luaMemory
@@ -104,7 +104,6 @@ function Main:Login(info)
         log.Error("user(%s) login [%s] time out", info.account, result.address)
     end)
     local code = client:Call("GateSystem.Login", result.token)
-    print(code)
     timer.Del(timerId)
     if code == XCode.Ok then
         table.insert(self.sessions, {

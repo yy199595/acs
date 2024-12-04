@@ -77,7 +77,7 @@ namespace acs
 		switch(message->GetType())
 		{
 			case rpc::Type::Request:
-				this->OnRequest(message);
+				code = this->OnRequest(message);
 				break;
 			case rpc::Type::Response:
 				code = this->mDisComponent->OnMessage(message);

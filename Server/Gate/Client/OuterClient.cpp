@@ -104,7 +104,7 @@ namespace rpc
 					this->CloseSocket(XCode::NetBigDataShutdown);
 					return;
 				}
-				this->mMessage = new rpc::Packet();
+				this->mMessage = std::make_unique<rpc::Packet>();
 				{
 					this->mMessage->Init(this->mProtoHead);
 				}
@@ -127,9 +127,8 @@ namespace rpc
 		{
 			return;
 		}
-		rpc::Packet * request = this->mMessage;
+		rpc::Packet * request = this->mMessage.release();
 		{
-			this->mMessage = nullptr;
 			request->SetSockId(this->mSockId);
 		}
 #ifdef __DEBUG__
