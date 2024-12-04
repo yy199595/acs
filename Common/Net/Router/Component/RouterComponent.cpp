@@ -87,8 +87,8 @@ namespace acs
 			ISender * sender = this->GetSender(net);
 			if(sender == nullptr)
 			{
-				LOG_ERROR("not find sender {}", (int)net);
 				code = XCode::NotFoundSender;
+				LOG_ERROR("not find sender {}", (int)net);
 				break;
 			}
 			message->GetHead().Del("app");
