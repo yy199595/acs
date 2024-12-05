@@ -191,23 +191,7 @@ namespace acs
 
     int InnerNetComponent::Send(int id, rpc::Packet * message)
     {
-        if (this->mApp->Equal(id)) //发送到本机
-        {
-			message->SetSockId(id);
-			this->OnMessage(message, nullptr);
-//			Asio::Context & t = acs::App::GetContext();
-//			t.post([this, message] { this->OnMessage(message, nullptr); });
-            return XCode::Ok;
-        }
-#ifdef __DEBUG__
-		if(message->GetType() == rpc::Type::Request)
-		{
-			std::string func;
-			message->GetHead().Get(rpc::Header::func, func);
-			message->TempHead().Add(rpc::Header::func, func);
-			message->TempHead().Add("t", help::Time::NowMil());
-		}
-#endif
+
         rpc::InnerClient * clientSession = this->GetClient(id);
 		if(clientSession == nullptr)
 		{

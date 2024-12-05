@@ -33,7 +33,7 @@ namespace rpc
 		constexpr char* sock_id = "sock";
 		constexpr char* player_id = "id";
 		constexpr char* rpc_id = "rpc";
-		constexpr char* client_id = "cli";
+		constexpr char* client_sock_id = "cli";
 		constexpr char* forward_tar = "tar";
 		constexpr char* app_id = "app";
 		constexpr char * from_addr = "from_addr";
@@ -59,7 +59,7 @@ namespace rpc
 		constexpr char Client = 4; //客户端专用
 		constexpr char Udp = 5; //upd
 		constexpr char Kcp = 6; //upd
-
+		constexpr char Forward = 7;
 		constexpr char Max = 127;
 	}
 

@@ -10,6 +10,7 @@
 #include"Log/Common/Logger.h"
 #include"Core/Pool/ArrayPool.h"
 #include"Gate/Client/OuterClient.h"
+#include"Rpc/Interface/ISend.h"
 #include"Server/Component/ListenerComponent.h"
 
 namespace rpc
@@ -21,7 +22,7 @@ namespace rpc
 namespace acs
 {
 	class OuterNetComponent final : public Component, public ITcpListen,
-		public IRpc<rpc::Packet, rpc::Packet>, public IServerRecord
+									public IRpc<rpc::Packet, rpc::Packet>, public IServerRecord, public ISender
 	{
 	 public:
 		OuterNetComponent();
@@ -34,14 +35,15 @@ namespace acs
 	public:
 		bool StopClient(long long userId);
 		void Broadcast(rpc::Packet * message);
-		bool Send(int id, rpc::Packet * message);
 		bool AddPlayer(long long userId, int sockId);
-		bool Send(int id, int code, rpc::Packet * message);
-		bool SendToPlayer(long long userId, rpc::Packet * message);
 		inline size_t GetPlayerCount() const { return this->mUserAddressMap.Size(); }
+	public:
+		bool SendBySockId(int id, rpc::Packet * message);
+		bool SendByPlayerId(long long playerId, rpc::Packet * message);
+	private:
+		int Send(int id, rpc::Packet *message) final;
 	private:
 		bool LateAwake() final;
-		int Forward(int id, rpc::Packet * message);
 		int OnRequest(long long playerId, rpc::Packet * message);
 		void OnMessage(rpc::Packet * request, rpc::Packet *) final;
 	private:
@@ -51,6 +53,7 @@ namespace acs
 		int mWaitCount;
 		int mMaxConnectCount;
 		math::NumberPool<int> mNumPool;
+		class RouterComponent * mRouter;
 		math::NumberPool<int> mSocketPool;
 		class ActorComponent * mActComponent;
 		class ThreadComponent * mThreadComponent;

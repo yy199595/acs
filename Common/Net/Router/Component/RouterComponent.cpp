@@ -20,7 +20,7 @@ namespace acs
 		this->mApp->GetComponents(senders);
 		for(ISender * sender : senders)
 		{
-			int net = sender->NetType();
+			char net = sender->NetType();
 			this->mSenders.emplace(net, sender);
 		}
 		this->mDisComponent = this->GetComponent<DispatchComponent>();
@@ -58,8 +58,39 @@ namespace acs
 		return this->mDisComponent->AddTask(rpc, new LuaRpcTaskSource(lua, rpc), timeout)->Await();
 	}
 
+	void RouterComponent::OnLastFrameUpdate(long long)
+	{
+		while(!this->mLocalMessages.empty())
+		{
+			std::unique_ptr<rpc::Packet> & message = this->mLocalMessages.front();
+			{
+				rpc::Packet * rpcMessage = message.release();
+				if(this->mDisComponent->OnMessage(rpcMessage) != XCode::Ok)
+				{
+					delete rpcMessage;
+				}
+			}
+			this->mLocalMessages.pop();
+		}
+	}
+
 	int RouterComponent::Send(int id, std::unique_ptr<rpc::Packet> message)
 	{
+#ifdef __DEBUG__
+		if(message->GetType() == rpc::Type::Request)
+		{
+			std::string func;
+			message->GetHead().Get(rpc::Header::func, func);
+			message->TempHead().Add(rpc::Header::func, func);
+			message->TempHead().Add("t", help::Time::NowMil());
+		}
+#endif
+		if(this->mApp->Equal(id))
+		{
+			message->SetSockId(id);
+			this->mLocalMessages.emplace(std::move(message));
+			return XCode::Ok;
+		}
 		ISender * sender = this->GetSender(message->GetNet());
 		if(sender == nullptr)
 		{
@@ -85,18 +116,10 @@ namespace acs
 				code = XCode::DeleteData;
 				break;
 			}
-			const char net = message->GetNet();
-			ISender * sender = this->GetSender(net);
-			if(sender == nullptr)
-			{
-				code = XCode::NotFoundSender;
-				LOG_ERROR("not find sender {}", (int)net);
-				break;
-			}
 			message->SetType(rpc::Type::Response);
 			message->GetHead().Del(rpc::Header::app_id);
 			message->GetHead().Add(rpc::Header::code, result);
-			code = sender->Send(id, message);
+			code = this->Send(id, std::unique_ptr<rpc::Packet>(message));
 		}
 		while(false);
 		if(code != XCode::Ok)

@@ -91,7 +91,10 @@ namespace acs
 			{
 				return XCode::SendMessageFail;
 			}
-			this->mUdpServer->Send(address, message);
+			if(!this->mUdpServer->Send(address, message))
+			{
+				return XCode::SendMessageFail;
+			}
 			return XCode::Ok;
 		}
 

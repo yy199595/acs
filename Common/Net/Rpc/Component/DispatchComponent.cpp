@@ -142,9 +142,13 @@ namespace acs
                 return this->OnRequest(message);
             case rpc::Type::Response:
 			{
-				int rpcId = message->GetRpcId();
-				this->OnResponse(rpcId, message);
-
+				int socketId = 0;
+				if(message->GetHead().Del(rpc::Header::client_sock_id, socketId))
+				{
+					this->mOuterComponent->SendBySockId(socketId, message);
+					return XCode::Ok;
+				}
+				this->OnResponse(message->GetRpcId(), message);
 				return XCode::Ok;
 			}
 			case rpc::Type::Client:
@@ -170,7 +174,7 @@ namespace acs
 		}
 		message->SetType(rpc::Type::Request);
 		message->GetHead().Del(rpc::Header::player_id);
-		this->mOuterComponent->SendToPlayer(userId, message);
+		this->mOuterComponent->SendByPlayerId(userId, message);
 		return XCode::Ok;
 	}
 

@@ -12,13 +12,14 @@
 #include"Server/Component/ThreadComponent.h"
 #include"Rpc/Client/InnerClient.h"
 #include"Core/Event/IEvent.h"
-#include"Rpc/Component/DispatchComponent.h"
+#include"Router/Component/RouterComponent.h"
 
 namespace acs
 {
-	OuterNetComponent::OuterNetComponent()
+	OuterNetComponent::OuterNetComponent() : ISender(rpc::Net::Forward)
 	{
 		this->mWaitCount = 0;
+		this->mRouter = nullptr;
 		this->mActComponent = nullptr;
 		this->mMaxConnectCount = 500;
 		this->mThreadComponent = nullptr;
@@ -31,6 +32,7 @@ namespace acs
 		{
 			jsonObject->Get("outer", this->mMaxConnectCount);
 		}
+		this->mRouter = this->GetComponent<RouterComponent>();
 		this->mActComponent = this->GetComponent<ActorComponent>();
 		this->mThreadComponent = this->GetComponent<ThreadComponent>();
 		return true;
@@ -50,13 +52,11 @@ namespace acs
 			case rpc::Type::Request:
 			{
 				long long playerId = -1;
-				int id = message->SockId();
+				int sock_id = message->SockId();
 				int rpcId = message->GetRpcId();
-				if (!this->mAddressUserMap.Get(id, playerId))
-				{
-					message->GetHead().Add(rpc::Header::sock_id, id);
-				}
+				this->mAddressUserMap.Get(sock_id, playerId);
 				message->GetHead().Add(rpc::Header::player_id, playerId);
+				message->GetHead().Add(rpc::Header::client_sock_id, sock_id);
 //#ifdef __DEBUG__
 //				std::string func = message->GetHead().GetStr(rpc::Header::func);
 //				LOG_DEBUG("user({}) call [{}]", playerId, func);
@@ -64,24 +64,18 @@ namespace acs
 				if (rpcId > 0)
 				{
 					++this->mWaitCount;
-					message->TempHead().Add(rpc::Header::client_id, id);
-					message->TempHead().Add(rpc::Header::rpc_id, rpcId);
 				}
 				code = this->OnRequest(playerId, message);
 				break;
 			}
 			case rpc::Type::Response:
 			{
-				int rpcId = 0;
-				if(message->TempHead().Del(rpc::Header::rpc_id, rpcId))
+				int sockId = 0;
+				--this->mWaitCount;
+				if (message->TempHead().Del(rpc::Header::client_sock_id, sockId))
 				{
-					--this->mWaitCount;
-					message->SetRpcId(rpcId);
-					if(message->TempHead().Del(rpc::Header::client_id, rpcId))
-					{
-						code = XCode::Ok;
-						this->Send(rpcId, message);
-					}
+					code = XCode::Ok;
+					this->SendBySockId(sockId, message);
 				}
 				break;
 			}
@@ -104,58 +98,55 @@ namespace acs
 			LOG_ERROR("call function not exist : {}", fullName)
 			return XCode::CallFunctionNotExist;
 		}
-
+		message->SetNet(rpc::Net::Forward);
+		int serverId = this->mApp->GetSrvId();
 		Player * player = this->mActComponent->GetPlayer(playerId);
-		if(player == nullptr)
+		if(player != nullptr)
 		{
-			return this->Forward(this->mApp->GetSrvId(), message);
-		}
-
-		int serverId = 0;
-		const std::string & name = methodConfig->Server;
-		switch(methodConfig->Forward)
-		{
-			case rpc::Forward::Fixed: //转发到固定机器
-				if (!player->GetServerId(name, serverId))
-				{
-					return XCode::NotFoundServerRpcAddress;
-				}
-				break;
-			case rpc::Forward::Random:
+			const std::string& name = methodConfig->Server;
+			switch (methodConfig->Forward)
 			{
-				Server * server = this->mActComponent->Random(name);
-				if(server == nullptr)
+				case rpc::Forward::Fixed: //转发到固定机器
+					if (!player->GetServerId(name, serverId))
+					{
+						return XCode::NotFoundServerRpcAddress;
+					}
+					break;
+				case rpc::Forward::Random:
 				{
-					return XCode::AddressAllotFailure;
+					Server* server = this->mActComponent->Random(name);
+					if (server == nullptr)
+					{
+						return XCode::AddressAllotFailure;
+					}
+					if (!server->GetAddress(*message, serverId))
+					{
+						return XCode::NotFoundActor;
+					}
+					break;
 				}
-				if(!server->GetAddress(*message, serverId))
+				case rpc::Forward::Hash:
 				{
-					return XCode::NotFoundActor;
+					Server* server = this->mActComponent->Hash(name, playerId);
+					if (server == nullptr)
+					{
+						return XCode::AddressAllotFailure;
+					}
+					if (!server->GetAddress(*message, serverId))
+					{
+						return XCode::NotFoundActor;
+					}
+					break;
 				}
-				break;
+				default:
+				LOG_ERROR("unknown forward {}", message->ToString());
+					return XCode::Failure;
 			}
-			case rpc::Forward::Hash:
-			{
-				Server * server = this->mActComponent->Hash(name, playerId);
-				if(server == nullptr)
-				{
-					return XCode::AddressAllotFailure;
-				}
-				if(!server->GetAddress(*message, serverId))
-				{
-					return XCode::NotFoundActor;
-				}
-				break;
-			}
-			default:
-			LOG_ERROR("unknown forward {}", message->ToString());
-				return XCode::Failure;
 		}
-		return this->Forward(serverId, message);
+		return this->mRouter->Send(serverId, std::unique_ptr<rpc::Packet>(message));
 	}
 
-	//转发到内网
-	int OuterNetComponent::Forward(int id, rpc::Packet * message)
+	int OuterNetComponent::Send(int id, rpc::Packet* message)
 	{
 		rpc::InnerClient * tcpClient = nullptr;
 		do
@@ -195,7 +186,7 @@ namespace acs
 		return tcpClient->Send(message) ? XCode::Ok : XCode::NetWorkError;
 	}
 
-	bool OuterNetComponent::Send(int id, rpc::Packet * message)
+	bool OuterNetComponent::SendBySockId(int id, rpc::Packet * message)
 	{
 		auto iter = this->mGateClientMap.find(id);
 		if(iter == this->mGateClientMap.end())
@@ -220,20 +211,6 @@ namespace acs
 		}
 		this->mAddressUserMap.Add(sockId, userId);
 		return true;
-	}
-
-	bool OuterNetComponent::Send(int id, int code, rpc::Packet * message)
-	{
-		if (message->GetRpcId() == 0)
-		{
-			delete message;
-			return false;
-		}
-		message->Clear();
-		message->SetType(rpc::Type::Response);
-		message->GetHead().Del(rpc::Header::func);
-		message->GetHead().Add(rpc::Header::code, code);
-		return this->Send(message->SockId(), message);
 	}
 
 	bool OuterNetComponent::OnListen(tcp::Socket * socket)
@@ -272,17 +249,18 @@ namespace acs
 	void OuterNetComponent::OnSendFailure(int id, rpc::Packet* message)
 	{
 		int sockId = 0;
-		if(message->GetHead().Get(rpc::Header::sock_id, sockId))
+		std::unique_ptr<rpc::Packet> request(message);
+		message->GetHead().Add(rpc::Header::code, XCode::SendMessageFail);
+		if(message->GetType() == rpc::Type::Request && message->GetRpcId() > 0)
 		{
-			this->Send(sockId, message);
-		}
-		else
-		{
-			delete message;
+			if(message->GetHead().Get(rpc::Header::sock_id, sockId))
+			{
+				this->SendBySockId(sockId, request.release());
+			}
 		}
 	}
 
-    bool OuterNetComponent::SendToPlayer(long long userId, rpc::Packet * message)
+    bool OuterNetComponent::SendByPlayerId(long long userId, rpc::Packet * message)
     {
 		int socketId = 0;
 		if(!this->mUserAddressMap.Get(userId, socketId))
@@ -322,7 +300,7 @@ namespace acs
 		{
 			std::unique_ptr<rpc::Packet> request = message->Clone();
 			{
-				this->Send(iter->first, request.release());
+				this->SendBySockId(iter->first, request.release());
 			}
 		}
 		delete message;
