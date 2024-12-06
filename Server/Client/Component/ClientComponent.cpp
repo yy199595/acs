@@ -58,8 +58,7 @@ namespace acs
 		{
 			return XCode::NetWorkError;
 		}
-		iter->second->Send(message);
-		return XCode::Ok;
+		return iter->second->Send(message) ? XCode::Ok : XCode::SendMessageFail;
 	}
 
 	void ClientComponent::OnLuaRegister(Lua::ModuleClass& luaRegister)

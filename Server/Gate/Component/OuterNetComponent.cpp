@@ -72,7 +72,7 @@ namespace acs
 			{
 				int sockId = 0;
 				--this->mWaitCount;
-				if (message->TempHead().Del(rpc::Header::client_sock_id, sockId))
+				if (message->GetHead().Del(rpc::Header::client_sock_id, sockId))
 				{
 					code = XCode::Ok;
 					this->SendBySockId(sockId, message);
@@ -172,7 +172,7 @@ namespace acs
 			std::unique_ptr<rpc::InnerClient> innerClient = std::make_unique<rpc::InnerClient>(id, this);
 			{
 				tcpClient = innerClient.get();
-				tcpClient->StartReceive(socketProxy);
+				tcpClient->SetSocket(socketProxy);
 				this->mForwardClientMap.emplace(id, std::move(innerClient));
 			}
 		}

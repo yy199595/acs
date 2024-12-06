@@ -48,8 +48,7 @@ namespace rpc
 		this->ReadLength(rpc::RPC_PACK_HEAD_LEN, second);
 #else
 		Asio::Socket & sock = this->mSocket->Get();
-		const Asio::Executor & executor = sock.get_executor();
-		asio::post(executor, [this, second]
+		asio::post(sock.get_executor(), [this, second]
 		{
 			this->ReadLength(rpc::RPC_PACK_HEAD_LEN, second);
 		});
@@ -69,6 +68,7 @@ namespace rpc
 
 	void OuterClient::OnReadError(const Asio::Code& code)
 	{
+		CONSOLE_LOG_ERROR("client({}) {}", this->GetAddress(), code.message())
 		this->CloseSocket(XCode::NetReadFailure);
 	}
 
@@ -87,6 +87,10 @@ namespace rpc
 
     void OuterClient::OnReceiveMessage(std::istream & readStream, size_t size)
 	{
+		if(size <= 0)
+		{
+			return;
+		}
 		switch (this->mDecodeState)
 		{
 			case tcp::Decode::None:

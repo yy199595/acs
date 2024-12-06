@@ -24,7 +24,7 @@ namespace rpc
 	 public:
 		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;
 		explicit InnerClient(int id, Component * component);
-		~InnerClient();
+		~InnerClient() final;
 	public:
 		void Close();
 		bool Send(rpc::Packet * message);

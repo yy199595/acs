@@ -273,7 +273,7 @@ namespace tcp
 		}
 
 		this->StartTimer(timeout, TimeoutFlag::ReadCount);
-		auto callBack = [this](const asio::error_code& code, size_t size)
+		auto callBack = [this, length](const asio::error_code& code, size_t size)
 			{
 				std::istream ss(&this->mRecvBuffer);
 				if (code.value() == Asio::OK)

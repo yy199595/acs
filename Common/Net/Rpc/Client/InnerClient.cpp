@@ -171,15 +171,14 @@ namespace rpc
 
 	void InnerClient::OnReadError(const Asio::Code& code)
 	{
-		if (code == asio::error::operation_aborted)
+		if (code != asio::error::operation_aborted)
 		{
-			return;
+#ifdef __DEBUG__
+			const std::string& address = this->mSocket->GetAddress();
+			CONSOLE_LOG_ERROR("receive {} inner message error : {}", address, code.message());
+#endif
+			this->CloseSocket(XCode::NetReadFailure);
 		}
-//#ifdef __DEBUG__
-//		const std::string& address = this->mSocket->GetAddress();
-//		CONSOLE_LOG_ERROR("receive {} inner message error : {}", address, code.message());
-//#endif
-		this->CloseSocket(XCode::NetReadFailure);
 	}
 
 	bool InnerClient::MakeMessage(const rpc::ProtoHead& header)
@@ -285,8 +284,7 @@ namespace rpc
 		this->ReadLength(rpc::RPC_PACK_HEAD_LEN);
 #else
 		Asio::Socket & sock = this->mSocket->Get();
-		const Asio::Executor & executor = sock.get_executor();
-		asio::post(executor, [this]
+		asio::post(sock.get_executor(), [this]
 		{
 			this->mSocket->SetOption(tcp::OptionType::NoDelay, true);
 			this->mSocket->SetOption(tcp::OptionType::KeepAlive, true);

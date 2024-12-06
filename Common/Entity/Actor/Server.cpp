@@ -105,73 +105,14 @@ namespace acs
 	void Server::EncodeToJson(std::string * json)
 	{
 		json::w::Document jsonWriter;
-		auto iter = this->mListens.begin();
 		jsonWriter.Add("name", this->Name());
 		jsonWriter.Add("id", this->GetSrvId());
 		std::unique_ptr<json::w::Value> data = jsonWriter.AddObject("listen");
-
-		for(; iter != this->mListens.end(); iter++)
+		for(auto iter = this->mListens.begin(); iter != this->mListens.end(); iter++)
 		{
 			data->Add(iter->first.c_str(), iter->second);
 		}
 		jsonWriter.Encode(json);
-	}
-
-	int Server::Get(const std::string& path, json::r::Document* response) const
-	{
-		static HttpComponent* httpComponent = nullptr;
-		if (httpComponent == nullptr)
-		{
-			httpComponent = App::Get<HttpComponent>();
-		}
-		std::string listen;
-		if (!this->GetListen("http", listen))
-		{
-			return XCode::NotFoundActorAddress;
-		}
-		std::string url = fmt::format("http://{}{}", listen, path);
-		std::unique_ptr<http::Request> request = std::make_unique<http::Request>("GET");
-		{
-			if (!request->SetUrl(url))
-			{
-				return XCode::ParseHttpUrlFailure;
-			}
-		}
-		std::unique_ptr<http::TextContent> textData = std::make_unique<http::TextContent>();
-		http::Response* httpResult = httpComponent->Do(std::move(request), std::move(textData));
-		if (httpResult == nullptr || httpResult->Code() != HttpStatus::OK)
-		{
-			return XCode::Failure;
-		}
-
-		const http::TextContent* responseData = httpResult->To<const http::TextContent>();
-		if (responseData == nullptr)
-		{
-			return XCode::Failure;
-		}
-		if (!response->Decode(responseData->Content()))
-		{
-			return XCode::ParseJsonFailure;
-		}
-		int code = XCode::Ok;
-		return response->Get(rpc::Header::code, code) ? code : XCode::Ok;
-	}
-
-	int Server::Post(const std::string& path, json::w::Document& request, json::r::Document* response) const
-	{
-		static HttpComponent * httpComponent = nullptr;
-		if(httpComponent == nullptr)
-		{
-			httpComponent = App::Get<HttpComponent>();
-		}
-		std::string listen;
-		if(!this->GetListen("http", listen))
-		{
-			return XCode::NotFoundActorAddress;
-		}
-		std::string url = fmt::format("http://{}/{}", listen, path);
-		http::Response * httpResult = httpComponent->Post(url, request);
-		return XCode::Ok;
 	}
 
 	int Server::Make(const std::string& func, std::unique_ptr<rpc::Packet>& message) const

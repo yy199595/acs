@@ -12,17 +12,14 @@ namespace acs
 	{
 	public:
 		explicit Server(int id, const std::string & name);
-		bool Equal(long long id) const { return this->GetId() == id; }
-		bool Equal(const std::string & addr) { return this->mRpcAddress == addr; }
+		inline bool Equal(long long id) const { return this->GetId() == id; }
+		inline bool Equal(const std::string & addr) { return this->mRpcAddress == addr; }
 	public:
 		int DisConnect();
 		int SendMsg(std::unique_ptr<rpc::Packet> message);
 		bool GetAddress(const rpc::Packet &request, int &) const final;
 		bool GetListen(const std::string & name, std::string & addr) const;
 		bool AddListen(const std::string & name, const std::string & addr);
-	public:
-		int Get(const std::string &path, json::r::Document * response) const;
-		int Post(const std::string & path, json::w::Document & request, json::r::Document * response) const;
 	private:
 		bool GetListen(int net, std::string & address) const;
 	public:

@@ -8,7 +8,7 @@ local http = require("HttpComponent")
 
 --local HOST = "http://43.143.239.75:80"
 local HOST = "http://127.0.0.1:8088"
-local COUNT = os.getenv("APP_COUNT") or 100
+local COUNT = os.getenv("APP_COUNT") or 1
 local Main = Module()
 
 local lastUserMemory = 0
@@ -84,7 +84,7 @@ function Main:CallServer(player)
 
         client:Close()
         player.close = true
-        print(string.format("user(%s) logout ok", player.account.account))
+        print(string.format("====== user(%s) logout ok ========", player.account.account))
 
     end
 
