@@ -145,6 +145,15 @@ inline std::string FormatFileLine(const char * file, const int line)
 		Debug::Console(log);    									\
 }
 
+#define CONSOLE_LOG_WARN(...) \
+{ \
+		custom::LogInfo log;          \
+		log.Content = fmt::format(__VA_ARGS__);                \
+    	log.Level = custom::LogLevel::Warn;                   \
+		log.File = FormatFileLine(__FILE__, __LINE__);   		\
+		Debug::Console(log);    									\
+}
+
 #define CONSOLE_ERROR_RETURN_CODE(obj, code) \
     if(!(obj)) { CONSOLE_LOG_ERROR(#obj); return code; }    \
 

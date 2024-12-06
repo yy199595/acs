@@ -148,7 +148,12 @@ namespace acs
 				int socketId = 0;
 				if (message->GetHead().Del(rpc::Header::client_sock_id, socketId))
 				{
-					this->mOuterComponent->SendBySockId(socketId, message);
+					int clientRpcId = 0;
+					if(message->GetHead().Del(rpc::Header::rpc_id, clientRpcId))
+					{
+						message->SetRpcId(clientRpcId);
+						this->mOuterComponent->SendBySockId(socketId, message);
+					}
 					return XCode::Ok;
 				}
 				this->OnResponse(message->GetRpcId(), message);

@@ -19,15 +19,16 @@ namespace acs
 	public:
 		int Remove(int id);
 		int Connect(const std::string & address);
-		int Send(int id, rpc::Packet * message) final;
 	private:
 		bool LateAwake() final;
 		void OnCloseSocket(int id, int code) final;
+		int Send(int id, rpc::Packet * message) final;
 		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
 		void OnMessage(rpc::Packet *request, rpc::Packet *response) final;
 	private:
 		int OnRequest(rpc::Packet * request);
 	private:
+		int mIndex;
 		class ProtoComponent * mProto;
 		class LuaComponent * mLuaComponent;
 		class DispatchComponent * mDisComponent;

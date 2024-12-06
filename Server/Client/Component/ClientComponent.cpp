@@ -15,6 +15,7 @@ namespace acs
 {
 	ClientComponent::ClientComponent() : ISender(rpc::Net::Client)
 	{
+		this->mIndex = 0;
 		this->mProto = nullptr;
 		this->mDisComponent = nullptr;
 		this->mLuaComponent = nullptr;
@@ -36,15 +37,12 @@ namespace acs
 		{
 			return -1;
 		}
-		static int index = 1;
+		int id = ++this->mIndex;
 		Asio::Context & context = App::GetContext();
 		tcp::Socket * tcpSocket = new tcp::Socket(context);
-		{
-			tcpSocket->Init(ip, port);
-		}
-		int id = index++;
 		std::unique_ptr<rpc::InnerClient> client = std::make_unique<rpc::InnerClient>(id, this);
 		{
+			tcpSocket->Init(ip, port);
 			client->SetSocket(tcpSocket);
 			this->mClientMap.emplace(id, std::move(client));
 		}

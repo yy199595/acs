@@ -54,8 +54,10 @@ namespace acs
 				long long playerId = -1;
 				int sock_id = message->SockId();
 				int rpcId = message->GetRpcId();
-				this->mAddressUserMap.Get(sock_id, playerId);
-				message->GetHead().Add(rpc::Header::player_id, playerId);
+				if(this->mAddressUserMap.Get(sock_id, playerId))
+				{
+					message->GetHead().Add(rpc::Header::player_id, playerId);
+				}
 				message->GetHead().Add(rpc::Header::client_sock_id, sock_id);
 //#ifdef __DEBUG__
 //				std::string func = message->GetHead().GetStr(rpc::Header::func);
@@ -64,6 +66,8 @@ namespace acs
 				if (rpcId > 0)
 				{
 					++this->mWaitCount;
+					message->SetRpcId(this->mNumPool.BuildNumber());
+					message->GetHead().Add(rpc::Header::rpc_id, rpcId);
 				}
 				code = this->OnRequest(playerId, message);
 				break;
@@ -74,8 +78,13 @@ namespace acs
 				--this->mWaitCount;
 				if (message->GetHead().Del(rpc::Header::client_sock_id, sockId))
 				{
-					code = XCode::Ok;
-					this->SendBySockId(sockId, message);
+					int rpcId = 0;
+					if(message->GetHead().Del(rpc::Header::rpc_id, rpcId))
+					{
+						code = XCode::Ok;
+						message->SetRpcId(rpcId);
+						this->SendBySockId(sockId, message);
+					}
 				}
 				break;
 			}
