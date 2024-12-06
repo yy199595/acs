@@ -20,7 +20,7 @@ function Main:Awake()
     self.login_count = 0
     self.accounts = { }
     self.sessions = { }
-    timer.AddUpdate(500, self, "OnUpdate")
+    timer.AddUpdate(200, self, "OnUpdate")
     timer.AddUpdate(2000, function()
         local count = 0
         for _, player in ipairs(self.sessions) do
@@ -45,20 +45,23 @@ function Main:Awake()
 end
 
 function Main:OnUpdate()
-    for index, player in ipairs(self.sessions) do
-        if player.close then
-            coroutine.start(function()
-                local sleep = math.random(100, 2000)
-                coroutine.sleep(sleep)
-                self:Login(player.account)
-            end)
-            table.remove(self.sessions, index)
-            break
-        end
+    for i = 1, 30 do
+        for index, player in ipairs(self.sessions) do
+            if player.close then
+                coroutine.start(function()
+                    local sleep = math.random(100, 2000)
+                    coroutine.sleep(sleep)
+                    self:Login(player.account)
+                end)
+                table.remove(self.sessions, index)
+                break
+            end
 
-        self.count = self.count + 1
-        coroutine.start(self.CallServer, self, player)
+            self.count = self.count + 1
+            coroutine.start(self.CallServer, self, player)
+        end
     end
+
 end
 
 function Main:CallServer(player)
@@ -111,7 +114,7 @@ function Main:Login(info)
             close = false,
             account = info,
             client = client,
-            logout_count = math.random(100, 10000)
+            logout_count = math.random(10, 100)
         })
         self.login_count = self.login_count + 1
         log.Warning("[%s] user(%s) login [%s] ok", self.login_count, info.account, result.address)

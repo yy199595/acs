@@ -68,8 +68,10 @@ namespace rpc
 
 	void OuterClient::OnReadError(const Asio::Code& code)
 	{
-		CONSOLE_LOG_ERROR("client({}) {}", this->GetAddress(), code.message())
-		this->CloseSocket(XCode::NetReadFailure);
+		if (code != asio::error::operation_aborted)
+		{
+			this->CloseSocket(XCode::NetReadFailure);
+		}
 	}
 
 	inline bool CheckProtoHead(const rpc::ProtoHead & data)
@@ -80,9 +82,8 @@ namespace rpc
 			case rpc::Type::Ping:
 			case rpc::Type::Request:
 				return true;
-			default:
-				return false;
 		}
+		return false;
 	}
 
     void OuterClient::OnReceiveMessage(std::istream & readStream, size_t size)
@@ -194,12 +195,15 @@ namespace rpc
 
 	void OuterClient::OnSendMessage(const asio::error_code& code)
 	{
+		if (code != asio::error::operation_aborted)
+		{
 #ifdef __DEBUG__
-		//CONSOLE_LOG_ERROR(code.message());
-		const std::string& address = this->mSocket->GetAddress();
-		CONSOLE_LOG_ERROR("send {} outer message error", address);
+			//CONSOLE_LOG_ERROR(code.message());
+			const std::string& address = this->mSocket->GetAddress();
+			CONSOLE_LOG_ERROR("send {} outer message error", address);
 #endif
-		this->CloseSocket(XCode::SendMessageFail);
+			this->CloseSocket(XCode::SendMessageFail);
+		}
 	}
 
 	bool OuterClient::Send(rpc::Packet* message)

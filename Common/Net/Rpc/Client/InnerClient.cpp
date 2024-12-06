@@ -100,11 +100,10 @@ namespace rpc
 
 	void InnerClient::OnSendMessage(const Asio::Code& code)
 	{
-		if (code == asio::error::operation_aborted)
+		if (code != asio::error::operation_aborted)
 		{
-			return;
+			this->Connect(5);
 		}
-		this->Connect(5);
 	}
 
 	void InnerClient::OnTimeout(tcp::TimeoutFlag flag)
