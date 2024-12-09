@@ -9,20 +9,17 @@
 #include"Gate/Service/GateSystem.h"
 #include"Entity/Actor/App.h"
 #include"Entity/Actor/Player.h"
-#include"Server/Component/ThreadComponent.h"
-#include"Rpc/Client/InnerClient.h"
 #include"Core/Event/IEvent.h"
 #include"Router/Component/RouterComponent.h"
 
 namespace acs
 {
-	OuterNetComponent::OuterNetComponent() : ISender(rpc::Net::Forward)
+	OuterNetComponent::OuterNetComponent()
 	{
 		this->mWaitCount = 0;
 		this->mRouter = nullptr;
 		this->mActComponent = nullptr;
 		this->mMaxConnectCount = 500;
-		this->mThreadComponent = nullptr;
 	}
 
 	bool OuterNetComponent::LateAwake()
@@ -34,13 +31,20 @@ namespace acs
 		}
 		this->mRouter = this->GetComponent<RouterComponent>();
 		this->mActComponent = this->GetComponent<ActorComponent>();
-		this->mThreadComponent = this->GetComponent<ThreadComponent>();
 		return true;
 	}
 
 	void OuterNetComponent::OnTimeout(int id)
 	{
 		this->OnCloseSocket(id, XCode::NetTimeout);
+	}
+
+	void OuterNetComponent::OnSecondUpdate(int tick)
+	{
+		while(!this->mRemoveClients.empty())
+		{
+			this->mRemoveClients.pop();
+		}
 	}
 
 	void OuterNetComponent::OnMessage(rpc::Packet * message, rpc::Packet *)
@@ -152,47 +156,8 @@ namespace acs
 					return XCode::Failure;
 			}
 		}
-		return this->mRouter->Send(serverId, std::unique_ptr<rpc::Packet>(message));
-	}
-
-	int OuterNetComponent::Send(int id, rpc::Packet* message)
-	{
-		rpc::InnerClient * tcpClient = nullptr;
-		do
-		{
-			auto iter = this->mForwardClientMap.find(id);
-			if(iter != this->mForwardClientMap.end())
-			{
-				tcpClient = iter->second.get();
-				break;
-			}
-			std::string address;
-			static const std::string rpc("rpc");
-			if (!this->mActComponent->GetListen(id, rpc, address))
-			{
-				return XCode::NotFoundActorAddress;
-			}
-			tcp::Socket* socketProxy = this->mThreadComponent->CreateSocket(address);
-			if (socketProxy == nullptr)
-			{
-				LOG_ERROR("create socket fail : {}", address)
-				break;
-			}
-			std::unique_ptr<rpc::InnerClient> innerClient = std::make_unique<rpc::InnerClient>(id, this);
-			{
-				tcpClient = innerClient.get();
-				tcpClient->SetSocket(socketProxy);
-				this->mForwardClientMap.emplace(id, std::move(innerClient));
-			}
-		}
-		while(false);
-
-		if(tcpClient == nullptr)
-		{
-			return XCode::SendMessageFail;
-		}
-		message->SetRpcId(this->mNumPool.BuildNumber());
-		return tcpClient->Send(message) ? XCode::Ok : XCode::NetWorkError;
+		this->mRouter->Send(serverId, std::unique_ptr<rpc::Packet>(message));
+		return XCode::Ok;
 	}
 
 	bool OuterNetComponent::SendBySockId(int id, rpc::Packet * message)
@@ -228,11 +193,12 @@ namespace acs
 		{
 			return false;
 		}
-		int id = this->mSocketPool.BuildNumber();
-		std::unique_ptr<rpc::OuterClient> outerNetClient = std::make_unique<rpc::OuterClient>(id, this);
+
+		int sockId = this->mSocketPool.BuildNumber();
+		std::unique_ptr<rpc::OuterClient> outerNetClient = std::make_unique<rpc::OuterClient>(sockId, this);
 		{
 			outerNetClient->StartReceive(socket);
-			this->mGateClientMap.emplace(id, std::move(outerNetClient));
+			this->mGateClientMap.emplace(sockId, std::move(outerNetClient));
 		}
 		LOG_DEBUG("[{}] connect gate server count:{}", socket->GetAddress(), this->mGateClientMap.size())
 		return true;
@@ -246,11 +212,6 @@ namespace acs
 			this->mUserAddressMap.Del(userId);
 			this->mActComponent->DelActor(userId);
 			help::OuterLogoutEvent::Trigger(userId);
-		}
-		auto iter = this->mGateClientMap.find(id);
-		if(iter != this->mGateClientMap.end())
-		{
-			this->mGateClientMap.erase(iter);
 		}
 		LOG_DEBUG("remove client({}) count:{}", id, this->mGateClientMap.size());
 	}
@@ -271,15 +232,27 @@ namespace acs
 
     bool OuterNetComponent::SendByPlayerId(long long userId, rpc::Packet * message)
     {
-		int socketId = 0;
-		if(!this->mUserAddressMap.Get(userId, socketId))
+		do
 		{
-			delete message;
-			LOG_ERROR("send message to ({}) fail : {}", userId, message->ToString());
-			return false;
+			int socketId = 0;
+			if(!this->mUserAddressMap.Get(userId, socketId))
+			{
+				LOG_ERROR("send message to ({}) fail : {}", userId, message->ToString());
+				break;
+			}
+			auto iter = this->mGateClientMap.find(socketId);
+			if(iter == this->mGateClientMap.end())
+			{
+				break;
+			}
+			if(iter->second->Send(message))
+			{
+				return true;
+			}
 		}
-		LOG_DEBUG("send client({}) : {}", userId, message->ToString());
-		return this->Send(socketId, message);
+		while(false);
+		delete message;
+		return false;
     }
 
 	void OuterNetComponent::StartClose(int id, int code)
@@ -287,7 +260,12 @@ namespace acs
 		auto iter = this->mGateClientMap.find(id);
 		if(iter != this->mGateClientMap.end())
 		{
-			iter->second->Stop(code);
+			std::unique_ptr<rpc::OuterClient> outerClient = std::move(iter->second);
+			{
+				outerClient->Stop(code);
+				this->mGateClientMap.erase(iter);
+				this->mRemoveClients.emplace(std::move(outerClient));
+			}
 		}
 	}
 

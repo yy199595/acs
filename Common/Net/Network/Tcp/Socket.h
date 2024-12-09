@@ -41,6 +41,7 @@ namespace tcp
 		inline bool IsOpen() const { return this->mSocket && this->mSocket->is_open(); }
 	public:
 		inline bool IsOpenSsl() const { return this->mIsOpenSsl; }
+		inline Asio::Context & GetContext() { return this->mContext; }
 #ifdef __ENABLE_OPEN_SSL__
 		inline Asio::ssl::Socket & SslSocket() { return *this->mSslSocket; }
 #endif

@@ -31,11 +31,11 @@ namespace rpc
 		constexpr char* udp_addr = "udp";
 		constexpr char* kcp_addr = "kcp";
 		constexpr char* sock_id = "sock";
-		constexpr char* player_id = "id";
-		constexpr char* rpc_id = "rpc";
+		constexpr char* player_id = "pid";
+		constexpr char* rpc_id = "rid";
 		constexpr char* client_sock_id = "cli";
 		constexpr char* forward_tar = "tar";
-		constexpr char* app_id = "app";
+		constexpr char* app_id = "aid";
 		constexpr char * from_addr = "from_addr";
 	}
 

@@ -63,7 +63,11 @@ namespace acs
 	int GateSystem::Login(const rpc::Packet & request)
 	{
 		int sockId = 0;
-		request.ConstHead().Get("sock", sockId);
+		const rpc::Head & head = request.ConstHead();
+		if(!head.Get(rpc::Header::client_sock_id, sockId))
+		{
+			return XCode::CallArgsError;
+		}
 		const std::string & token = request.GetBody();
 		const std::string func("LoginSystem.Login");
 

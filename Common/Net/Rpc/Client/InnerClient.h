@@ -29,6 +29,9 @@ namespace rpc
 		void Close();
 		bool Send(rpc::Packet * message);
 		void StartReceive(tcp::Socket * socket);
+	public:
+		size_t GetWaitSendCount() const { return this->mSendMessages.size(); }
+		size_t GetWaitResponseCount() const { return this->mWaitResMessages.size(); }
 	 private:
 		void CloseSocket(int code);
 		void OnSendMessage() final;
@@ -39,12 +42,12 @@ namespace rpc
 		void OnSendMessage(const Asio::Code & code) final;
 		void OnReceiveMessage(std::istream & is, size_t) final;
 	private:
-		int mSockId;
+		const int mSockId;
 		int mDecodeStatus;
 		Component * mComponent;
 		rpc::ProtoHead mProtoHead;
 		std::unique_ptr<rpc::Packet> mMessage;
-		custom::Queue<rpc::Packet *> mSendMessages;
-		custom::HashMap<int, rpc::Packet *> mWaitResMessages; //等待返回的服务器消息
+		std::queue<std::unique_ptr<rpc::Packet>> mSendMessages;
+		std::unordered_map<int, std::unique_ptr<rpc::Packet>> mWaitResMessages; //等待返回的服务器消息
 	};
 }// namespace Sentry

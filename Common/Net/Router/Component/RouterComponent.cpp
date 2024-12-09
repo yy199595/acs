@@ -51,10 +51,8 @@ namespace acs
 
 	void RouterComponent::OnSystemUpdate()
 	{
-		size_t index = 0;
-		while(!this->mLocalMessages.empty() && index < 10)
+		while(!this->mLocalMessages.empty())
 		{
-			index++;
 			std::unique_ptr<rpc::Packet> & message = this->mLocalMessages.front();
 			{
 				rpc::Packet * rpcMessage = message.release();
@@ -100,7 +98,7 @@ namespace acs
 		rpc::Packet * data = message.release();
 		if(sender->Send(id, data) != XCode::Ok)
 		{
-			LOG_ERROR("{}", data->ToString());
+			//LOG_ERROR("{}", data->ToString());
 			delete data;
 			return XCode::SendMessageFail;
 		}

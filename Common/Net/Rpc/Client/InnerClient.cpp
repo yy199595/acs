@@ -16,11 +16,9 @@ namespace rpc
 
 	InnerClient::~InnerClient() noexcept
 	{
-		rpc::Packet * message = nullptr;
-		while(this->mSendMessages.Pop(message))
+		while(!this->mSendMessages.empty())
 		{
-			delete message;
-			message = nullptr;
+			this->mSendMessages.pop();
 		}
 	}
 
@@ -45,8 +43,9 @@ namespace rpc
 		Asio::Socket & sock = this->mSocket->Get();
 		asio::post(sock.get_executor(), [this, message]
 		{
-			this->mSendMessages.Push(message);
-			if(this->mSendMessages.Size() == 1)
+			std::unique_ptr<rpc::Packet> sendMessage(message);
+			this->mSendMessages.emplace(std::move(sendMessage));
+			if(this->mSendMessages.size() == 1)
 			{
 				this->Write(*message);
 			}
@@ -57,23 +56,20 @@ namespace rpc
 
 	void InnerClient::OnSendMessage()
 	{
-		rpc::Packet * waitMessage = nullptr;
-		if(this->mSendMessages.Pop(waitMessage))
+		if(!this->mSendMessages.empty())
 		{
-			if (waitMessage->GetType() ==
-				rpc::Type::Request && waitMessage->GetRpcId() != 0)
+			std::unique_ptr<rpc::Packet> waitMessage = std::move(this->mSendMessages.front());
 			{
-				int rpcId = waitMessage->GetRpcId();
-				this->mWaitResMessages.Add(rpcId, waitMessage);
+				if (waitMessage->GetType() == rpc::Type::Request && waitMessage->GetRpcId() != 0)
+				{
+					int rpcId = waitMessage->GetRpcId();
+					this->mWaitResMessages.emplace(rpcId, std::move(waitMessage));
+				}
+				this->mSendMessages.pop();
 			}
-			else
+			if(!this->mSendMessages.empty())
 			{
-				delete waitMessage;
-				waitMessage = nullptr;
-			}
-			if(this->mSendMessages.Front(waitMessage))
-			{
-				this->Write(*waitMessage);
+				this->Write(*this->mSendMessages.front());
 			}
 		}
 	}
@@ -83,11 +79,10 @@ namespace rpc
 		if(result)
 		{
 			this->StopTimer();
-			rpc::Packet * message;
 			this->ClearSendStream();
-			if(this->mSendMessages.Front(message))
+			if(!this->mSendMessages.empty())
 			{
-				this->Write(*message);
+				this->Write(*this->mSendMessages.front());
 			}
 			this->ReadLength(rpc::RPC_PACK_HEAD_LEN);
 			this->mSocket->SetOption(tcp::OptionType::NoDelay, true);
@@ -126,37 +121,41 @@ namespace rpc
 
 	void InnerClient::CloseSocket(int code)
 	{
-		if(this->mSockId == 0)
+		if(!this->mSocket->IsOpen())
 		{
 			return;
 		}
 		this->mDecodeStatus  = tcp::Decode::None;
 		if (this->mComponent == nullptr)
 		{
-			this->mSendMessages.Clear();
-			this->mWaitResMessages.Clear();
+			this->mWaitResMessages.clear();
+			while (!this->mSendMessages.empty())
+			{
+				this->mSendMessages.pop();
+			}
 			return;
 		}
-		auto iter = this->mWaitResMessages.Begin();
-		for (; iter != this->mWaitResMessages.End(); iter++) //发出去没有返回的数据
+		auto iter = this->mWaitResMessages.begin();
+		for (; iter != this->mWaitResMessages.end(); iter++) //发出去没有返回的数据
 		{
-			this->mSendMessages.Push(iter->second);
+			this->mSendMessages.emplace(std::move(iter->second));
 		}
-		rpc::Packet * data = nullptr;
-		this->mWaitResMessages.Clear();
-		while (this->mSendMessages.Pop(data))
+		this->mWaitResMessages.clear();
+		while (!this->mSendMessages.empty())
 		{
+			rpc::Packet * data = this->mSendMessages.front().release();
 #ifdef ONLY_MAIN_THREAD
 			this->mComponent->OnSendFailure(this->mSockId, data);
 #else
 			Asio::Context & t = acs::App::GetContext();
-			t.post([this, data] { this->mComponent->OnSendFailure(this->mSockId, data); });
+			asio::post(t, [this, data] { this->mComponent->OnSendFailure(this->mSockId, data); });
 #endif
+			this->mSendMessages.pop();
 		}
 
 		this->mSocket->Close();
-		Asio::Socket & socket1 = this->mSocket->Get();
-		asio::post(socket1.get_executor(), [this, sockId = this->mSockId, code]()
+		Asio::Context & context = this->mSocket->GetContext();
+		asio::post(context, [this, sockId = this->mSockId, code]()
 		{
 #ifdef ONLY_MAIN_THREAD
 			this->mComponent->OnCloseSocket(this->mSockId, code);
@@ -165,7 +164,6 @@ namespace rpc
 			asio::post(t, [this, code, sockId] { this->mComponent->OnCloseSocket(sockId, code); });
 #endif
 		});
-		this->mSockId = 0;
 	}
 
 	void InnerClient::OnReadError(const Asio::Code& code)
@@ -189,12 +187,13 @@ namespace rpc
 		}
 
 		int rpcId = header.RpcId;
-		rpc::Packet* responseMessage = nullptr;
-		if (!this->mWaitResMessages.Del(rpcId, responseMessage))
+		auto iter = this->mWaitResMessages.find(rpcId);
+		if(iter == this->mWaitResMessages.end())
 		{
 			return false;
 		}
-		this->mMessage.reset(responseMessage);
+		this->mMessage = std::move(iter->second);
+		this->mWaitResMessages.erase(iter);
 		return true;
 	}
 
@@ -249,18 +248,13 @@ namespace rpc
 			this->mComponent->OnMessage(request, nullptr);
 #else
 			Asio::Context & t = acs::App::GetContext();
-			t.post([this, request] { this->mComponent->OnMessage(request, nullptr); });
+			asio::post(t, [this, request] { this->mComponent->OnMessage(request, nullptr); });
 #endif
 		}
 		while(false);
 		this->mDecodeStatus = tcp::Decode::None;
-#ifdef ONLY_MAIN_THREAD
-		this->ReadLength(rpc::RPC_PACK_HEAD_LEN);
-#else
-		Asio::Socket & sock = this->mSocket->Get();
-		const Asio::Executor & executor = sock.get_executor();
-		asio::post(executor, [this] { this->ReadLength(rpc::RPC_PACK_HEAD_LEN); });
-#endif
+		Asio::Context & context = this->mSocket->GetContext();
+		asio::post(context, [this]() { this->ReadLength(rpc::RPC_PACK_HEAD_LEN); });
 	}
 
 	void InnerClient::Close()

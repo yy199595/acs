@@ -38,7 +38,7 @@ namespace rpc
 		Component * mComponent;
 		rpc::ProtoHead mProtoHead;
 		std::unique_ptr<rpc::Packet> mMessage;
-		custom::Queue<rpc::Packet *> mSendMessages;
+		std::queue<std::unique_ptr<rpc::Packet>> mSendMessages;
 	};
 }
 

@@ -112,7 +112,7 @@ namespace tcp
 				return;
 			}
 #ifdef __ENABLE_OPEN_SSL__
-			if (this->mSocket->IsOpenSsl())
+			if (this->mSocket && this->mSocket->IsOpenSsl())
 			{
 				this->mSocket->SslSocket().async_handshake(asio::ssl::stream_base::client,
 						[this](const asio::error_code& err)
@@ -130,7 +130,7 @@ namespace tcp
 
 	void Client::ReadAll(int timeout)
 	{
-		if (!this->mSocket->IsOpen())
+		if (!this->IsOpen())
 		{
 			Asio::Code code(asio::error::not_socket);
 			this->OnReadError(code);
@@ -150,24 +150,29 @@ namespace tcp
 					size = this->mRecvBuffer.size();
 					this->OnReceiveMessage(ss, size);
 				}
-				this->OnReadError(code);
+				if(code != asio::error::operation_aborted)
+				{
+					this->OnReadError(code);
+				}
 			};
-
-#ifdef __ENABLE_OPEN_SSL__
-		if (this->mSocket->IsOpenSsl())
+		if(this->IsOpen())
 		{
-			Asio::ssl::Socket& sock = this->mSocket->SslSocket();
-			asio::async_read(sock, this->mRecvBuffer, asio::transfer_all(), callBack);
-			return;
-		}
+#ifdef __ENABLE_OPEN_SSL__
+			if (this->mSocket->IsOpenSsl())
+			{
+				Asio::ssl::Socket& sock = this->mSocket->SslSocket();
+				asio::async_read(sock, this->mRecvBuffer, asio::transfer_all(), callBack);
+				return;
+			}
 #endif
-		Asio::Socket& sock = this->mSocket->Get();
-		asio::async_read(sock, this->mRecvBuffer, asio::transfer_all(), callBack);
+			Asio::Socket& sock = this->mSocket->Get();
+			asio::async_read(sock, this->mRecvBuffer, asio::transfer_all(), callBack);
+		}
 	}
 
 	void Client::ReadLine(int timeout)
 	{
-		if (!this->mSocket->IsOpen())
+		if (!this->IsOpen())
 		{
 			Asio::Code code(asio::error::not_socket);
 			this->OnReadError(code);
@@ -188,23 +193,29 @@ namespace tcp
 				this->OnReceiveLine(ss, size);
 				return;
 			}
-			this->OnReadError(code);
+			if(code != asio::error::operation_aborted)
+			{
+				this->OnReadError(code);
+			}
 		};
-#ifdef __ENABLE_OPEN_SSL__
-		if (this->mSocket->IsOpenSsl())
+		if(this->IsOpen())
 		{
-			Asio::ssl::Socket& sock = this->mSocket->SslSocket();
-			asio::async_read_until(sock, this->mRecvBuffer, "\r\n", callback);
-			return;
-		}
+#ifdef __ENABLE_OPEN_SSL__
+			if (this->mSocket->IsOpenSsl())
+			{
+				Asio::ssl::Socket& sock = this->mSocket->SslSocket();
+				asio::async_read_until(sock, this->mRecvBuffer, "\r\n", callback);
+				return;
+			}
 #endif
-		Asio::Socket& sock = this->mSocket->Get();
-		asio::async_read_until(sock, this->mRecvBuffer, "\r\n", callback);
+			Asio::Socket& sock = this->mSocket->Get();
+			asio::async_read_until(sock, this->mRecvBuffer, "\r\n", callback);
+		}
 	}
 
 	void Client::ReadSome(int timeout)
 	{
-		if (!this->mSocket->IsOpen())
+		if (!this->IsOpen())
 		{
 			Asio::Code code(asio::error::not_socket);
 			this->OnReadError(code);
@@ -231,20 +242,26 @@ namespace tcp
 				size = this->mRecvBuffer.size();
 				this->OnReceiveMessage(ss, size);
 			}
-			this->OnReadError(code);
+			if(code != asio::error::operation_aborted)
+			{
+				this->OnReadError(code);
+			}
 		};
-#ifdef __ENABLE_OPEN_SSL__
-		if (this->mSocket->IsOpenSsl())
+		if(this->IsOpen())
 		{
-			Asio::ssl::Socket& sock = this->mSocket->SslSocket();
+#ifdef __ENABLE_OPEN_SSL__
+			if (this->mSocket->IsOpenSsl())
+			{
+				Asio::ssl::Socket& sock = this->mSocket->SslSocket();
+				//sock.async_read_some(this->mRecvBuffer.prepare(1024), callBack);
+				asio::async_read(sock, this->mRecvBuffer, asio::transfer_at_least(1), callBack);
+				return;
+			}
+#endif
+			Asio::Socket& sock = this->mSocket->Get();
 			//sock.async_read_some(this->mRecvBuffer.prepare(1024), callBack);
 			asio::async_read(sock, this->mRecvBuffer, asio::transfer_at_least(1), callBack);
-			return;
 		}
-#endif
-		Asio::Socket& sock = this->mSocket->Get();
-		//sock.async_read_some(this->mRecvBuffer.prepare(1024), callBack);
-		asio::async_read(sock, this->mRecvBuffer, asio::transfer_at_least(1), callBack);
 	}
 
 	void Client::ReadLength(int length, int timeout)
@@ -265,7 +282,7 @@ namespace tcp
 			this->OnReceiveMessage(ss, length);
 			return;
 		}
-		if (!this->mSocket->IsOpen())
+		if (!this->IsOpen())
 		{
 			Asio::Code code(asio::error::not_socket);
 			this->OnReadError(code);
@@ -281,34 +298,48 @@ namespace tcp
 					this->OnReceiveMessage(ss, size);
 					return;
 				}
-				this->OnReceiveMessage(ss, size);
-				this->OnReadError(code);
+				//this->OnReceiveMessage(ss, size);
+				if(code != asio::error::operation_aborted)
+				{
+					this->OnReadError(code);
+				}
 			};
-
-#ifdef __ENABLE_OPEN_SSL__
-		if (this->mSocket->IsOpenSsl())
+		if(this->IsOpen())
 		{
-			Asio::ssl::Socket& sock = this->mSocket->SslSocket();
-			asio::async_read(sock, this->mRecvBuffer, asio::transfer_exactly(length), callBack);
-			return;
-		}
+#ifdef __ENABLE_OPEN_SSL__
+			if (this->mSocket->IsOpenSsl())
+			{
+				Asio::ssl::Socket& sock = this->mSocket->SslSocket();
+				asio::async_read(sock, this->mRecvBuffer, asio::transfer_exactly(length), callBack);
+				return;
+			}
 #endif
-		Asio::Socket& sock = this->mSocket->Get();
-		asio::async_read(sock, this->mRecvBuffer, asio::transfer_exactly(length), callBack);
+			Asio::Socket& sock = this->mSocket->Get();
+			asio::async_read(sock, this->mRecvBuffer, asio::transfer_exactly(length), callBack);
+		}
+	}
+
+	bool Client::IsOpen()
+	{
+		if(this->mSocket == nullptr)
+		{
+			return false;
+		}
+		return this->mSocket->IsOpen();
 	}
 
 
 	void Client::Write(tcp::IProto& message, int timeout)
 	{
-		if (!this->mSocket->IsOpen())
+		if (!this->IsOpen())
 		{
 			Asio::Code code(asio::error::not_socket);
 			this->OnSendMessage(code);
 			return;
 		}
 		std::ostream os(&this->mSendBuffer);
-		this->StartTimer(timeout, TimeoutFlag::Write);
 		int length = message.OnSendMessage(os);
+		this->StartTimer(timeout, TimeoutFlag::Write);
 		auto callBack = [this, length, &message](const Asio::Code& code, size_t size)
 		{
 			if (code.value() != Asio::OK)
@@ -323,17 +354,20 @@ namespace tcp
 			}
 			this->OnSendMessage();
 		};
-#ifdef __ENABLE_OPEN_SSL__
-		if (this->mSocket->IsOpenSsl())
+		if(this->IsOpen())
 		{
-			Asio::ssl::Socket& sock = this->mSocket->SslSocket();
-			asio::async_write(sock, this->mSendBuffer, callBack);
-			return;
-		}
+#ifdef __ENABLE_OPEN_SSL__
+			if (this->mSocket->IsOpenSsl())
+			{
+				Asio::ssl::Socket& sock = this->mSocket->SslSocket();
+				asio::async_write(sock, this->mSendBuffer, callBack);
+				return;
+			}
 #endif
 
-		Asio::Socket& sock = this->mSocket->Get();
-		asio::async_write(sock, this->mSendBuffer, callBack);
+			Asio::Socket& sock = this->mSocket->Get();
+			asio::async_write(sock, this->mSendBuffer, callBack);
+		}
 	}
 }
 
@@ -409,7 +443,7 @@ namespace tcp
 	{
 		try
 		{
-			if (!this->mSocket->IsOpen())
+			if (!this->IsOpen())
 			{
 				return false;
 			}
@@ -440,7 +474,7 @@ namespace tcp
 	{
 		try
 		{
-			if (!this->mSocket->IsOpen())
+			if (!this->IsOpen())
 			{
 				return false;
 			}
@@ -469,7 +503,7 @@ namespace tcp
 			int length = 0;
 			do
 			{
-				if (!this->mSocket->IsOpen())
+				if (!this->IsOpen())
 				{
 					return false;
 				}

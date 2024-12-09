@@ -22,11 +22,9 @@ namespace rpc
 
 	OuterClient::~OuterClient() noexcept
 	{
-		rpc::Packet * message = nullptr;
-		while(this->mSendMessages.Pop(message))
+		while(!this->mSendMessages.empty())
 		{
-			delete message;
-			message = nullptr;
+			this->mSendMessages.pop();
 		}
 	}
 
@@ -36,9 +34,8 @@ namespace rpc
 		{
 			return;
 		}
-		Asio::Socket & sock = this->mSocket->Get();
-		const Asio::Executor & executor = sock.get_executor();
-		asio::post(executor, [this, code] { this->CloseSocket(code); });
+		Asio::Context & context = this->mSocket->GetContext();
+		asio::post(context, [this, code] { this->CloseSocket(code); });
 	}
 
 	void OuterClient::StartReceive(tcp::Socket * socket, int second)
@@ -47,8 +44,7 @@ namespace rpc
 #ifdef ONLY_MAIN_THREAD
 		this->ReadLength(rpc::RPC_PACK_HEAD_LEN, second);
 #else
-		Asio::Socket & sock = this->mSocket->Get();
-		asio::post(sock.get_executor(), [this, second]
+		asio::post(this->mSocket->GetContext(), [this, second]
 		{
 			this->ReadLength(rpc::RPC_PACK_HEAD_LEN, second);
 		});
@@ -61,17 +57,13 @@ namespace rpc
 		if(nowTime - this->mLastRecvTime >= 30)
 		{
 			Asio::Context & t = acs::App::GetContext();
-			t.post([this] { this->mComponent->OnTimeout(this->mSockId); });
-			return;
+			asio::post(t, [this] { this->mComponent->OnTimeout(this->mSockId); });
 		}
 	}
 
 	void OuterClient::OnReadError(const Asio::Code& code)
 	{
-		if (code != asio::error::operation_aborted)
-		{
-			this->CloseSocket(XCode::NetReadFailure);
-		}
+		this->CloseSocket(XCode::NetReadFailure);
 	}
 
 	inline bool CheckProtoHead(const rpc::ProtoHead & data)
@@ -115,8 +107,8 @@ namespace rpc
 				}
 				this->mDecodeState = tcp::Decode::MessageBody;
 				this->ReadLength(this->mProtoHead.Len);
-			}
 				break;
+			}
 			case tcp::Decode::MessageBody:
 			{
 				if (this->mMessage->OnRecvMessage(readStream, size) != 0)
@@ -143,7 +135,11 @@ namespace rpc
 		this->mComponent->OnMessage(request, nullptr);
 #else
 		Asio::Context & t = acs::App::GetContext();
-		t.post([this, request] { this->mComponent->OnMessage(request, nullptr); });
+		if(this->mSockId < 0)
+		{
+			CONSOLE_LOG_ERROR("=============")
+		}
+		asio::post(t, [this, request] { this->mComponent->OnMessage(request, nullptr); });
 #endif
 		this->mDecodeState = tcp::Decode::None;
 		this->mLastRecvTime = help::Time::NowSec();
@@ -152,22 +148,21 @@ namespace rpc
 
     void OuterClient::CloseSocket(int code)
 	{
-		if(this->mSockId == 0)
+		if(!this->mSocket->IsOpen())
 		{
 			return;
 		}
 		this->StopTimer();
 		this->mSocket->Close();
-		rpc::Packet * message = nullptr;
-		while(this->mSendMessages.Pop(message))
+		while(!this->mSendMessages.empty())
 		{
-			delete message;
-			message = nullptr;
+			this->mSendMessages.pop();
 		}
-		this->ClearSendStream();
-		this->ClearRecvStream();
-		Asio::Socket & socket1 = this->mSocket->Get();
-		asio::post(socket1.get_executor(), [this, code, sockId = this->mSockId]()
+//		this->ClearSendStream();
+//		this->ClearRecvStream();
+		this->mDecodeState = tcp::Decode::None;
+		Asio::Context & context = this->mSocket->GetContext();
+		asio::post(context, [this, code, sockId = this->mSockId]()
 		{
 #ifdef ONLY_MAIN_THREAD
 			this->mComponent->OnCloseSocket(sockId, code);
@@ -176,39 +171,28 @@ namespace rpc
 			asio::post(t, [this, code, sockId] { this->mComponent->OnCloseSocket(sockId, code); });
 #endif
 		});
-		this->mSockId = 0;
 	}
 
 	void OuterClient::OnSendMessage()
 	{
-		rpc::Packet * message = nullptr;
-		if(this->mSendMessages.Pop(message))
+		if(!this->mSendMessages.empty())
 		{
-			delete message;
-			message = nullptr;
-		}
-		if(this->mSendMessages.Front(message))
-		{
-			this->Write(*message);
+			this->mSendMessages.pop();
+			if(!this->mSendMessages.empty())
+			{
+				this->Write(*this->mSendMessages.front());
+			}
 		}
 	}
 
 	void OuterClient::OnSendMessage(const asio::error_code& code)
 	{
-		if (code != asio::error::operation_aborted)
-		{
-#ifdef __DEBUG__
-			//CONSOLE_LOG_ERROR(code.message());
-			const std::string& address = this->mSocket->GetAddress();
-			CONSOLE_LOG_ERROR("send {} outer message error", address);
-#endif
-			this->CloseSocket(XCode::SendMessageFail);
-		}
+		//this->CloseSocket(XCode::SendMessageFail);
 	}
 
 	bool OuterClient::Send(rpc::Packet* message)
 	{
-		if(this->mSockId == 0)
+		if(this->mSocket == nullptr)
 		{
 			return false;
 		}
@@ -216,12 +200,11 @@ namespace rpc
 #ifdef ONLY_MAIN_THREAD
 		this->Write(*message);
 #else
-		Asio::Socket & sock = this->mSocket->Get();
-		const Asio::Executor & executor = sock.get_executor();
-		asio::post(executor, [this, message]
+		asio::post(this->mSocket->GetContext(), [this, message]
 		{
-			this->mSendMessages.Push(message);
-			if(this->mSendMessages.Size() == 1)
+			std::unique_ptr<rpc::Packet> sendMessage(message);
+			this->mSendMessages.emplace(std::move(sendMessage));
+			if(this->mSendMessages.size() == 1)
 			{
 				this->Write(*message);
 			}

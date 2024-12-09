@@ -19,8 +19,8 @@ namespace custom
 		inline bool Pop(T & value);
 		inline bool Move(T & value);
 		inline bool Front(T & value);
-		inline bool Push(const T & value);
 		inline bool Push(T && value);
+		inline bool Push(const T & value);
 		inline bool Empty() const { return this->mQueue.empty(); }
 		inline size_t Size() const { return this->mQueue.size(); }
 	private:

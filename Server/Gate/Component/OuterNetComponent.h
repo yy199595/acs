@@ -21,8 +21,8 @@ namespace rpc
 
 namespace acs
 {
-	class OuterNetComponent final : public Component, public ITcpListen,
-									public IRpc<rpc::Packet, rpc::Packet>, public IServerRecord, public ISender
+	class OuterNetComponent final : public Component, public ITcpListen, public ISecondUpdate,
+									public IRpc<rpc::Packet, rpc::Packet>, public IServerRecord
 	{
 	 public:
 		OuterNetComponent();
@@ -36,14 +36,12 @@ namespace acs
 		bool StopClient(long long userId);
 		void Broadcast(rpc::Packet * message);
 		bool AddPlayer(long long userId, int sockId);
-		inline size_t GetPlayerCount() const { return this->mUserAddressMap.Size(); }
 	public:
 		bool SendBySockId(int id, rpc::Packet * message);
 		bool SendByPlayerId(long long playerId, rpc::Packet * message);
 	private:
-		int Send(int id, rpc::Packet *message) final;
-	private:
 		bool LateAwake() final;
+		void OnSecondUpdate(int tick) final;
 		int OnRequest(long long playerId, rpc::Packet * message);
 		void OnMessage(rpc::Packet * request, rpc::Packet *) final;
 	private:
@@ -56,12 +54,12 @@ namespace acs
 		class RouterComponent * mRouter;
 		math::NumberPool<int> mSocketPool;
 		class ActorComponent * mActComponent;
-		class ThreadComponent * mThreadComponent;
 		custom::HashMap<int, long long> mAddressUserMap;  //fd和玩家id的映射表
 		custom::HashMap<long long, int> mUserAddressMap; //验证过的客户端
 		custom::Queue<rpc::Packet *> mBroadCastMessages; //广播消息
+		std::queue<std::unique_ptr<rpc::OuterClient>> mRemoveClients;
 		std::unordered_map<int, std::unique_ptr<rpc::OuterClient>> mGateClientMap;
-		std::unordered_map<int, std::unique_ptr<rpc::InnerClient>> mForwardClientMap;
+		//std::unordered_map<int, std::unique_ptr<rpc::InnerClient>> mForwardClientMap;
 	};
 }
 
