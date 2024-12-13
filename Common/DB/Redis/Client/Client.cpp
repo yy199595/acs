@@ -185,7 +185,7 @@ namespace redis
 		}
 	}
 
-	void Client::OnReceiveMessage(std::istream& is, size_t size)
+	void Client::OnReceiveMessage(std::istream& is, size_t size, const Asio::Code &)
 	{
 		if (this->mResponse == nullptr)
 		{

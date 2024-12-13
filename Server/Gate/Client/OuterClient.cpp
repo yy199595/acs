@@ -78,9 +78,9 @@ namespace rpc
 		return false;
 	}
 
-    void OuterClient::OnReceiveMessage(std::istream & readStream, size_t size)
+    void OuterClient::OnReceiveMessage(std::istream & readStream, size_t size, const Asio::Code & code)
 	{
-		if(size <= 0)
+		if(size <= 0 || code.value() != Asio::OK)
 		{
 			return;
 		}

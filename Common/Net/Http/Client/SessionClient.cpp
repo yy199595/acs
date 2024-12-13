@@ -167,7 +167,8 @@ namespace http
 
 	void SessionClient::OnReceiveLine(std::istream& is, size_t size)
 	{
-		this->OnReceiveMessage(is, size);
+		asio::error_code code;
+		this->OnReceiveMessage(is, size, code);
 	}
 
 	void SessionClient::OnReadPause()
@@ -213,7 +214,7 @@ namespace http
 		}
 	}
 
-	void SessionClient::OnReceiveMessage(std::istream& is, size_t size)
+	void SessionClient::OnReceiveMessage(std::istream& is, size_t size, const Asio::Code &)
 	{
 		int flag = this->mRequest.OnRecvMessage(is, size);
 		if (flag > 0)

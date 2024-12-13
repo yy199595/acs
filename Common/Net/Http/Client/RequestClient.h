@@ -27,7 +27,7 @@ namespace http
 		void OnConnect(bool result, int count) final;
 		void OnReadError(const Asio::Code &code) final;
         void OnReceiveLine(std::istream &is, size_t) final;
-        void OnReceiveMessage(std::istream & is, size_t) final;
+        void OnReceiveMessage(std::istream & is, size_t, const Asio::Code &) final;
 	private:
 		void OnSendMessage() final;
 		void OnSendMessage(const asio::error_code &code) final;

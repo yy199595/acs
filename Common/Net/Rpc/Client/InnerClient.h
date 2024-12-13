@@ -40,7 +40,7 @@ namespace rpc
 		bool MakeMessage(const rpc::ProtoHead & header);
 		void OnReadError(const Asio::Code &code) final;
 		void OnSendMessage(const Asio::Code & code) final;
-		void OnReceiveMessage(std::istream & is, size_t) final;
+		void OnReceiveMessage(std::istream & is, size_t, const Asio::Code & code) final;
 	private:
 		const int mSockId;
 		int mDecodeStatus;

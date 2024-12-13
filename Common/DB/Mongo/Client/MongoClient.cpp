@@ -221,7 +221,7 @@ namespace mongo
 		this->Connect(3);
 	}
 
-    void Client::OnReceiveMessage(std::istream & is, size_t size)
+    void Client::OnReceiveMessage(std::istream & is, size_t size, const Asio::Code &)
 	{
 		if (this->mResponse == nullptr)
 		{

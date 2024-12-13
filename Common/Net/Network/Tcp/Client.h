@@ -62,7 +62,7 @@ namespace tcp
 		virtual void OnReadError(const Asio::Code & code) = 0;
 		virtual void OnConnect(bool result, int count) { throw std::logic_error("");}
         virtual void OnReceiveLine(std::istream & readStream, size_t size) {}
-        virtual void OnReceiveMessage(std::istream & readStream, size_t size) {}
+        virtual void OnReceiveMessage(std::istream & readStream, size_t size, const asio::error_code & code) {}
 	protected:
 		virtual void OnSendMessage() { }
 		virtual void OnSendMessage(const Asio::Code & code) {  };

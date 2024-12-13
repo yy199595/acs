@@ -68,16 +68,17 @@ function Main:CallServer(player)
 
     local client = player.client
     for i = 1, 10 do
-        client:Call("GateSystem.Ping")
+        local code1 = client:Call("GateSystem.Ping")
 
-        client:Call("ChatSystem.Ping")
+        local code2 = client:Call("ChatSystem.Ping")
 
-        client:Call("ChatSystem.OnPing")
+        local code3 = client:Call("ChatSystem.OnPing")
 
-        client:Call("ChatSystem.OnChat", {
+        local code4 = client:Call("ChatSystem.OnChat", {
             msg_type = math.random(0, 3),
             message = "hello world"
         })
+
     end
 
     player.count = player.count + 1

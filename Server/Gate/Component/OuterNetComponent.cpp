@@ -111,7 +111,7 @@ namespace acs
 			LOG_ERROR("call function not exist : {}", fullName)
 			return XCode::CallFunctionNotExist;
 		}
-		message->SetNet(rpc::Net::Forward);
+		message->SetNet(rpc::Net::Tcp);
 		int serverId = this->mApp->GetSrvId();
 		Player * player = this->mActComponent->GetPlayer(playerId);
 		if(player != nullptr)

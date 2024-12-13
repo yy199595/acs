@@ -197,10 +197,11 @@ namespace http
 
 	void RequestClient::OnReceiveLine(std::istream &is, size_t size)
 	{
-		this->OnReceiveMessage(is, size);
+		asio::error_code code;
+		this->OnReceiveMessage(is, size, code);
 	}
 
-	void RequestClient::OnReceiveMessage(std::istream &is, size_t size)
+	void RequestClient::OnReceiveMessage(std::istream &is, size_t size, const Asio::Code &)
 	{
 		int flag = this->mResponse->OnRecvMessage(is, size);
 		switch (flag)

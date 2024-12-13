@@ -34,7 +34,7 @@ namespace http
 		void OnTimeout(tcp::TimeoutFlag flag) final;
 		void OnReadError(const Asio::Code &code) final;
 		void OnReceiveLine(std::istream &is, size_t) final;
-        void OnReceiveMessage(std::istream & is, size_t) final;
+        void OnReceiveMessage(std::istream & is, size_t, const Asio::Code &) final;
 	private:
 		void Clear();
 		void OnSendMessage() final;

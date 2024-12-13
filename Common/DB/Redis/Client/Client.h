@@ -33,7 +33,7 @@ namespace redis
 		void OnReadError(const Asio::Code &code) final;
 		void OnSendMessage(const Asio::Code &code) final;
 		void OnReceiveLine(std::istream &readStream, size_t size) final;
-		void OnReceiveMessage(std::istream &readStream, size_t size) final;
+		void OnReceiveMessage(std::istream &readStream, size_t size, const Asio::Code &) final;
 	private:
 		std::string mAddress;
 		Component * mComponent;

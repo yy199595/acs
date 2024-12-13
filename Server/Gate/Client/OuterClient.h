@@ -25,7 +25,7 @@ namespace rpc
 	protected:
 		void OnTimeout(tcp::TimeoutFlag flag) final;
 		void OnReadError(const Asio::Code &code) final;
-        void OnReceiveMessage(std::istream & readStream, size_t) final;
+        void OnReceiveMessage(std::istream & readStream, size_t, const Asio::Code & code) final;
 	private:
         void CloseSocket(int code);
 		void OnSendMessage() final;

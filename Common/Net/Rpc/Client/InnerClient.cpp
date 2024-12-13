@@ -197,8 +197,12 @@ namespace rpc
 		return true;
 	}
 
-	void InnerClient::OnReceiveMessage(std::istream& readStream, size_t size)
+	void InnerClient::OnReceiveMessage(std::istream& readStream, size_t size, const Asio::Code & code)
 	{
+		if(size == 0 || code.value() != Asio::OK)
+		{
+			return;
+		}
 		switch(this->mDecodeStatus)
 		{
 			case tcp::Decode::None:

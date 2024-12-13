@@ -30,7 +30,7 @@ namespace mongo
 		std::unique_ptr<Response> ReadResponse();
 		void OnTimeout(tcp::TimeoutFlag flag) final;
 		void OnReadError(const Asio::Code &code) final;
-		void OnReceiveMessage(std::istream & is, size_t) final;
+		void OnReceiveMessage(std::istream & is, size_t, const Asio::Code &) final;
 		std::unique_ptr<Response> SyncSendMongoCommand(std::unique_ptr<Request> request);
         bool Auth(const std::string & user, const std::string & db, const std::string & pwd);
 		void OnResponse(int code, std::unique_ptr<Request> request, std::unique_ptr<Response> response);

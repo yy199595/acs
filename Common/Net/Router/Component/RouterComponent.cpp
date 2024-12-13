@@ -93,6 +93,7 @@ namespace acs
 		ISender * sender = this->GetSender(message->GetNet());
 		if(sender == nullptr)
 		{
+			LOG_ERROR("not find sender:{}", message->GetNet());
 			return XCode::NotFoundSender;
 		}
 		rpc::Packet * data = message.release();

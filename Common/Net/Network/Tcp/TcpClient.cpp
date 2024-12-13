@@ -142,13 +142,13 @@ namespace tcp
 				std::istream ss(&this->mRecvBuffer);
 				if (code.value() == Asio::OK)
 				{
-					this->OnReceiveMessage(ss, size);
+					this->OnReceiveMessage(ss, size, code);
 					return;
 				}
 				if (this->mRecvBuffer.size() > 0)
 				{
 					size = this->mRecvBuffer.size();
-					this->OnReceiveMessage(ss, size);
+					this->OnReceiveMessage(ss, size, code);
 				}
 				if(code != asio::error::operation_aborted)
 				{
@@ -224,8 +224,9 @@ namespace tcp
 		std::istream ss(&this->mRecvBuffer);
 		if (this->mRecvBuffer.size() > 0)
 		{
+			asio::error_code code;
 			size_t size = this->mRecvBuffer.size();
-			this->OnReceiveMessage(ss, size);
+			this->OnReceiveMessage(ss, size, code);
 			return;
 		}
 		this->StartTimer(timeout, TimeoutFlag::ReadSome);
@@ -234,13 +235,13 @@ namespace tcp
 			std::istream ss(&this->mRecvBuffer);
 			if (code.value() == Asio::OK)
 			{
-				this->OnReceiveMessage(ss, size);
+				this->OnReceiveMessage(ss, size, code);
 				return;
 			}
 			if (this->mRecvBuffer.size() > 0)
 			{
 				size = this->mRecvBuffer.size();
-				this->OnReceiveMessage(ss, size);
+				this->OnReceiveMessage(ss, size, code);
 			}
 			if(code != asio::error::operation_aborted)
 			{
@@ -279,7 +280,8 @@ namespace tcp
 		std::istream ss(&this->mRecvBuffer);
 		if (this->mRecvBuffer.size() >= length)
 		{
-			this->OnReceiveMessage(ss, length);
+			asio::error_code code;
+			this->OnReceiveMessage(ss, length, code);
 			return;
 		}
 		if (!this->IsOpen())
@@ -295,7 +297,7 @@ namespace tcp
 				std::istream ss(&this->mRecvBuffer);
 				if (code.value() == Asio::OK)
 				{
-					this->OnReceiveMessage(ss, size);
+					this->OnReceiveMessage(ss, size, code);
 					return;
 				}
 				//this->OnReceiveMessage(ss, size);
