@@ -19,8 +19,6 @@ namespace rpc
 	 public:
 		void Stop();
 		bool Send(rpc::Packet * message);
-		inline void SetSockId(int id) { this->mSockId = id; }
-		inline int GetSockId() const { return this->mSockId; }
 		void StartReceive(tcp::Socket * socket, int second = 0);
 	protected:
 		void OnTimeout(tcp::TimeoutFlag flag) final;
@@ -32,9 +30,9 @@ namespace rpc
 		void OnSendMessage() final;
 		void OnSendMessage(const asio::error_code &code) final;
 	private:
-		int mSockId;
 		bool mClose;
 		int mDecodeState;
+		const int mSockId;
 		long long mLastRecvTime;
 		Component * mComponent;
 		rpc::ProtoHead mProtoHead;
