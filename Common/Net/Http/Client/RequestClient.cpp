@@ -4,16 +4,13 @@
 #include <regex>
 #include "RequestClient.h"
 #include "Util/Tools/Guid.h"
-#include "Entity/Actor/App.h"
-#include "Http/Component/HttpComponent.h"
 #include "Util/Tools/String.h"
 
 namespace http
 {
-	RequestClient::RequestClient(Component* httpComponent)
-			: tcp::Client(0)
+	RequestClient::RequestClient(Component* httpComponent, Asio::Context & io)
+			: tcp::Client(0), mComponent(httpComponent), mMainContext(io)
 	{
-		this->mComponent = httpComponent;
 	}
 
 	void RequestClient::Do(std::unique_ptr<http::Request> request,
@@ -156,7 +153,7 @@ namespace http
 		{
 			this->mResponse->SetCode(code);
 		}
-		http::Content *httpData = const_cast<http::Content *>(this->mResponse->GetBody());
+		http::Content* httpData = const_cast<http::Content*>(this->mResponse->GetBody());
 		if (httpData != nullptr)
 		{
 			httpData->OnDecode();
@@ -165,8 +162,8 @@ namespace http
 		{
 			return;
 		}
-		http::Request *request = std::move(this->mRequest).release();
-		http::Response *response = std::move(this->mResponse).release();
+		http::Request* request = std::move(this->mRequest).release();
+		http::Response* response = std::move(this->mResponse).release();
 		if (response->Code() != HttpStatus::OK && response->Code() != HttpStatus::FOUND)
 		{
 			//LOG_ERROR("http request : {}", request->ToString())
@@ -176,9 +173,8 @@ namespace http
 #ifdef ONLY_MAIN_THREAD
 		this->mComponent->OnMessage(request, response);
 #else
-		Asio::Context &io = acs::App::GetContext();
-		io.post([this, request, response]
-				{ this->mComponent->OnMessage(request, response); });
+		asio::post(this->mMainContext, [this, request, response]
+		{ this->mComponent->OnMessage(request, response); });
 #endif
 	}
 

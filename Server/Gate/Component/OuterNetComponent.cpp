@@ -34,11 +34,6 @@ namespace acs
 		return true;
 	}
 
-	void OuterNetComponent::OnTimeout(int id)
-	{
-		this->StartClose(id, XCode::NetTimeout);
-	}
-
 	void OuterNetComponent::OnSecondUpdate(int tick)
 	{
 //		while(!this->mRemoveClients.empty())
@@ -195,7 +190,8 @@ namespace acs
 		}
 
 		int sockId = this->mSocketPool.BuildNumber();
-		std::shared_ptr<rpc::OuterClient> outerNetClient = std::make_shared<rpc::OuterClient>(sockId, this);
+		Asio::Context & io = this->mApp->GetContext();
+		std::shared_ptr<rpc::OuterClient> outerNetClient = std::make_shared<rpc::OuterClient>(sockId, this, io);
 		{
 			outerNetClient->StartReceive(socket);
 			this->mGateClientMap.emplace(sockId, outerNetClient);
@@ -206,7 +202,19 @@ namespace acs
 
 	void OuterNetComponent::OnClientError(int id, int code)
 	{
-		this->StartClose(id, code);
+		auto iter = this->mGateClientMap.find(id);
+		if(iter != this->mGateClientMap.end())
+		{
+			this->mGateClientMap.erase(iter);
+		}
+		long long userId = 0;
+		if(this->mAddressUserMap.Del(id, userId))
+		{
+			this->mUserAddressMap.Del(userId);
+			this->mActComponent->DelActor(userId);
+			help::OuterLogoutEvent::Trigger(userId);
+		}
+		LOG_DEBUG("remove client({}) count:{}", id, this->mGateClientMap.size());
 	}
 
 	void OuterNetComponent::OnSendFailure(int id, rpc::Packet* message)

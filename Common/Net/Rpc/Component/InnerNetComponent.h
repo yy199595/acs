@@ -24,6 +24,7 @@ namespace acs
 	protected:
         bool LateAwake() final;
 		bool OnListen(tcp::Socket * socket) final;
+		void OnClientError(int id, int code) final;
 		void OnRecord(json::w::Document & document) final;
 	private:
 		int OnRequest(rpc::Packet * message);

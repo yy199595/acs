@@ -14,7 +14,7 @@ namespace rpc
 	{
 	 public:
 		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;
-		explicit OuterClient(int id, Component* component);
+		explicit OuterClient(int id, Component* component, Asio::Context & main);
 		~OuterClient() final;
 	 public:
 		void Stop();
@@ -38,6 +38,7 @@ namespace rpc
 		long long mLastRecvTime;
 		Component * mComponent;
 		rpc::ProtoHead mProtoHead;
+		Asio::Context & mMainContext;
 		std::unique_ptr<rpc::Packet> mMessage;
 		std::queue<rpc::Packet *> mSendMessages;
 	};

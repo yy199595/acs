@@ -4,13 +4,12 @@
 
 #include"SessionClient.h"
 #include"XCode/XCode.h"
-#include"Entity/Actor/App.h"
 #include"Util/Tools/TimeHelper.h"
 
 namespace http
 {
-	SessionClient::SessionClient(Component* component)
-			: tcp::Client(0), mComponent(component)
+	SessionClient::SessionClient(Component* component, Asio::Context& io)
+			: tcp::Client(0), mComponent(component), mMainContext(io)
 	{
 
 	}
@@ -22,7 +21,8 @@ namespace http
 #else
 		Asio::Socket& sock = this->mSocket->Get();
 		const Asio::Executor& exec = sock.get_executor();
-		asio::post(exec, [this] { this->ReadSome(5); });
+		asio::post(exec, [this]
+		{ this->ReadSome(5); });
 #endif
 	}
 
@@ -34,7 +34,8 @@ namespace http
 #else
 		Asio::Socket& sock = this->mSocket->Get();
 		const Asio::Executor& exec = sock.get_executor();
-		asio::post(exec, [this] { this->ReadSome(5); });
+		asio::post(exec, [this]
+		{ this->ReadSome(5); });
 #endif
 	}
 
@@ -52,7 +53,8 @@ namespace http
 #else
 		Asio::Socket& sock = this->mSocket->Get();
 		const Asio::Executor& exec = sock.get_executor();
-		asio::post(exec, [this, timeout, &sock] { this->ReadLine(timeout); });
+		asio::post(exec, [this, timeout, &sock]
+		{ this->ReadLine(timeout); });
 #endif
 	}
 
@@ -63,7 +65,8 @@ namespace http
 #else
 		Asio::Socket& sock = this->mSocket->Get();
 		const Asio::Executor& exec = sock.get_executor();
-		asio::post(exec, [this, code] { this->ClosetClient(code); });
+		asio::post(exec, [this, code]
+		{ this->ClosetClient(code); });
 #endif
 	}
 
@@ -183,8 +186,7 @@ namespace http
 #ifdef ONLY_MAIN_THREAD
 		this->mComponent->OnReadHead(&this->mRequest, &this->mResponse);
 #else
-		Asio::Context& t = acs::App::GetContext();
-		t.post([this, req = &this->mRequest, res = &this->mResponse]
+		asio::post(this->mMainContext, [this, req = &this->mRequest, res = &this->mResponse]
 		{
 			this->mComponent->OnReadHead(req, res);
 		});
@@ -205,8 +207,7 @@ namespace http
 #ifdef ONLY_MAIN_THREAD
 			this->mComponent->OnMessage(&this->mRequest, &this->mResponse);
 #else
-			Asio::Context& t = acs::App::GetContext();
-			t.post([this, req = &this->mRequest, res = &this->mResponse]
+			asio::post(this->mMainContext, [this, req = &this->mRequest, res = &this->mResponse]
 			{
 				this->mComponent->OnMessage(req, res);
 			});
@@ -214,7 +215,7 @@ namespace http
 		}
 	}
 
-	void SessionClient::OnReceiveMessage(std::istream& is, size_t size, const Asio::Code &)
+	void SessionClient::OnReceiveMessage(std::istream& is, size_t size, const Asio::Code&)
 	{
 		int flag = this->mRequest.OnRecvMessage(is, size);
 		if (flag > 0)
@@ -224,30 +225,30 @@ namespace http
 		}
 		switch (flag)
 		{
-		case tcp::ReadDone:
-			this->OnComplete(HttpStatus::OK);
-			break;
-		case tcp::ReadOneLine:
-			this->ReadLine();
-			break;
-		case tcp::ReadSomeMessage:
-			this->ReadSome();
-			break;
-		case tcp::ReadError:
-			this->OnComplete(HttpStatus::INTERNAL_SERVER_ERROR);
-			break;
-		case tcp::ReadDecodeError:
-			this->OnComplete(HttpStatus::BAD_REQUEST);
-			break;
-		case tcp::ReadPause:
-			this->OnReadPause();
-			break;
-		case tcp::PacketLong:
-			this->OnComplete(HttpStatus::PAYLOAD_TOO_LARGE);
-			break;
-		case tcp::ReadAll:
-			this->ReadAll();
-			break;
+			case tcp::ReadDone:
+				this->OnComplete(HttpStatus::OK);
+				break;
+			case tcp::ReadOneLine:
+				this->ReadLine();
+				break;
+			case tcp::ReadSomeMessage:
+				this->ReadSome();
+				break;
+			case tcp::ReadError:
+				this->OnComplete(HttpStatus::INTERNAL_SERVER_ERROR);
+				break;
+			case tcp::ReadDecodeError:
+				this->OnComplete(HttpStatus::BAD_REQUEST);
+				break;
+			case tcp::ReadPause:
+				this->OnReadPause();
+				break;
+			case tcp::PacketLong:
+				this->OnComplete(HttpStatus::PAYLOAD_TOO_LARGE);
+				break;
+			case tcp::ReadAll:
+				this->ReadAll();
+				break;
 		}
 	}
 

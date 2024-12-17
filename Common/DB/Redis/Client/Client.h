@@ -16,7 +16,7 @@ namespace redis
 	{
 	public:
 		typedef acs::IRpc<Request, Response> Component;
-		Client(tcp::Socket * socket, const Config & config, Component * component);
+		Client(tcp::Socket * socket, const Config & config, Component * component, Asio::Context &);
 	public:
 		bool Start();
 		void StartReceive();
@@ -38,6 +38,7 @@ namespace redis
 		std::string mAddress;
 		Component * mComponent;
 		const redis::Config mConfig;
+		Asio::Context & mMainContext;
 		std::unique_ptr<redis::Request> mRequest;
 		std::unique_ptr<redis::Response> mResponse;
 	};

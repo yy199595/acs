@@ -96,8 +96,9 @@ namespace acs
 			{
 				config.Index = index + 1;
 				timer::ElapsedTimer timer1;
+				Asio::Context & io = this->mApp->GetContext();
 				tcp::Socket * socketProxy = threadComponent->CreateSocket(this->mConfig.Address);
-				mongo::Client * mongoClientContext = new mongo::Client(socketProxy, this, config);
+				mongo::Client * mongoClientContext = new mongo::Client(socketProxy, this, config, io);
 				{
 					if(!mongoClientContext->Start())
 					{

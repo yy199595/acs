@@ -22,7 +22,7 @@ namespace custom
 		std::string mPem;
 		asio::ssl::context mCtx;
 #endif
-		std::unique_ptr<http::RequestClient> mClient;
+		std::shared_ptr<http::RequestClient> mClient;
 	};
 }
 

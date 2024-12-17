@@ -49,8 +49,9 @@ namespace acs
 				timer::ElapsedTimer timer1;
 				redis::Config config = this->mConfig;
 				config.Id = index + 1;
+				Asio::Context & io = this->mApp->GetContext();
 				tcp::Socket * sock = component->CreateSocket(address);
-				redis::Client * redisCommandClient = new redis::Client(sock, config, this);
+				std::shared_ptr<redis::Client> redisCommandClient = std::make_shared<redis::Client>(sock, config, this, io);
 				{
 					if(!redisCommandClient->Start())
 					{
@@ -110,12 +111,11 @@ namespace acs
 
 	std::unique_ptr<redis::Response> RedisComponent::SyncRun(std::unique_ptr<redis::Request> request)
 	{
-		redis::Client * redisCommandClient = nullptr;
 		for(auto iter = this->mClients.begin(); iter != this->mClients.end(); iter++)
 		{
-			redisCommandClient = iter->second;
+			return iter->second->Sync(std::move(request));
 		}
-		return redisCommandClient->Sync(std::move(request));
+		return nullptr;
 	}
 
 	void RedisComponent::OnLuaRegister(Lua::ModuleClass &luaRegister)

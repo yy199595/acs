@@ -28,7 +28,6 @@ namespace acs
 		OuterNetComponent();
 		~OuterNetComponent() final = default;
 	 public:
-		void OnTimeout(int id) final;
 		void StartClose(int id, int code) final;
 	public:
 		bool StopClient(long long userId);
@@ -51,6 +50,7 @@ namespace acs
 	private:
 		int mWaitCount;
 		int mMaxConnectCount;
+
 		math::NumberPool<int> mNumPool;
 		class RouterComponent * mRouter;
 		math::NumberPool<int> mSocketPool;

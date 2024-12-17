@@ -11,7 +11,7 @@ namespace kcp
 	{
 	public:
 		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;
-		explicit Client(asio::io_context & io, Component * component, asio_udp::endpoint & remote);
+		explicit Client(asio::io_context & io, Component * component, asio_udp::endpoint & remote, Asio::Context & main);
 		~Client(){ ikcp_release(this->mKcp); }
 	public:
 		void Send(tcp::IProto * message) final;
@@ -31,6 +31,7 @@ namespace kcp
 		asio::io_context & mContext;
 		asio::streambuf mSendBuffer;
 		asio::streambuf mReceiveBuffer;
+		Asio::Context & mMainContext;
 		asio_udp::endpoint mRemoteEndpoint;
 		asio_udp::endpoint mLocalEndpoint;
 		std::array<char, kcp::BUFFER_COUNT> mDecodeBuffer;

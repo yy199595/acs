@@ -70,7 +70,8 @@ namespace acs
 			Asio::Context& context = this->GetComponent<ThreadComponent>()->GetContext();
 			{
 				int port = listen.Port;
-				this->mKcpServer = std::make_unique<kcp::Server>(context, this, port);
+				Asio::Context& io = this->mApp->GetContext();
+				this->mKcpServer = std::make_unique<kcp::Server>(context, this, port, io);
 			}
 			asio::post(context, [this]() { this->mKcpServer->StartReceive(); });
 			return true;
@@ -185,9 +186,9 @@ namespace acs
 		try
 		{
 			kcp::Client * udpClient = nullptr;
-			Asio::Context & context = acs::App::GetContext();
+			Asio::Context & context = this->mApp->GetContext();
 			asio_udp::endpoint remote(asio::ip::make_address(ip), port);
-			std::unique_ptr<kcp::Client> client = std::make_unique<kcp::Client>(context, this, remote);
+			std::unique_ptr<kcp::Client> client = std::make_unique<kcp::Client>(context, this, remote, context);
 			{
 				client->StartReceive();
 				udpClient = client.get();

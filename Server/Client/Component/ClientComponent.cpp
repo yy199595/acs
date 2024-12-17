@@ -38,9 +38,9 @@ namespace acs
 			return -1;
 		}
 		int id = ++this->mIndex;
-		Asio::Context & context = App::GetContext();
+		Asio::Context & context = this->mApp->GetContext();
 		tcp::Socket * tcpSocket = new tcp::Socket(context);
-		std::shared_ptr<rpc::InnerClient> client = std::make_shared<rpc::InnerClient>(id, this, true);
+		std::shared_ptr<rpc::InnerClient> client = std::make_shared<rpc::InnerClient>(id, this, true, context);
 		{
 			tcpSocket->Init(ip, port);
 			client->StartReceive(tcpSocket);

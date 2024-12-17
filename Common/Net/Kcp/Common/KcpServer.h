@@ -13,7 +13,7 @@ namespace kcp
 	{
 	public:
 		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;
-		Server(asio::io_context & io, Component * component, unsigned short port);
+		Server(asio::io_context & io, Component * component, unsigned short port, Asio::Context & main);
 	public:
 		void StartReceive();
 		void RemoveSession(const std::string & address);
@@ -30,6 +30,7 @@ namespace kcp
 		asio::io_context & mContext;
 		asio::streambuf mSendBuffer;
 		asio::ip::udp::socket mSocket;
+		Asio::Context & mMainContext;
 		asio::ip::udp::endpoint mSenderPoint;
 		std::array<char, kcp::BUFFER_COUNT> mRecvBuffer;
 		std::array<char, kcp::BUFFER_COUNT> mDecodeBuffer;

@@ -9,9 +9,8 @@
 
 namespace redis
 {
-	Client::Client(tcp::Socket* socket, const Config& config, Component* com)
-		: tcp::Client(socket, 0), mConfig(config),
-		  mAddress(config.Address), mComponent(com)
+	Client::Client(tcp::Socket* socket, const Config& config, Component* com, Asio::Context & io)
+		: tcp::Client(socket, 0), mConfig(config), mAddress(config.Address), mComponent(com), mMainContext(io)
 	{
 		this->mRequest = nullptr;
 		this->mResponse = nullptr;
@@ -22,9 +21,9 @@ namespace redis
 #ifdef ONLY_MAIN_THREAD
 		this->ReadLine();
 #else
-		Asio::Socket& sock = this->mSocket->Get();
-		const Asio::Executor& executor = sock.get_executor();
-		asio::post(executor, [this]() { this->ReadLine(); });
+		auto self = this->shared_from_this();
+		Asio::Context & context = this->mSocket->GetContext();
+		asio::post(context, [this, self]() { this->ReadLine(); });
 #endif
 	}
 
@@ -261,8 +260,8 @@ namespace redis
 #ifdef ONLY_MAIN_THREAD
 		this->mComponent->OnMessage(id, this->mRequest.release(), this->mResponse.release());
 #else
-		Asio::Context& t = acs::App::GetContext();
-		t.post([this, req = this->mRequest.release(), id, res = this->mResponse.release()]
+
+		asio::post(this->mMainContext, [this, req = this->mRequest.release(), id, res = this->mResponse.release()]
 		{
 			this->mComponent->OnMessage(id, req, res);
 		});

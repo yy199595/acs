@@ -20,7 +20,7 @@ namespace custom
 		{
 			socket->Init(this->mConfig.Address);
 			this->mCommand = fmt::format("{}.$cmd", this->mConfig.DB);
-			this->mMonClient = std::make_unique<mongo::Client>(socket, this->mConfig);
+			this->mMonClient = std::make_shared<mongo::Client>(socket, this->mConfig, io);
 		}
 		return this->mMonClient->Start(false);
 	}

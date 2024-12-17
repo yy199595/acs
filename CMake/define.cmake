@@ -39,7 +39,7 @@ endif ()
 
 option(__ENABLE_SPD_LOG__ "使用spdlog" OFF)
 
-option(ONLY_MAIN_THREAD "启用单线程模式" ON)
+option(ONLY_MAIN_THREAD "启用单线程模式" OFF)
 option(__NET_ERROR_LOG__ "打印网络层错误" ON)
 
 option(__CONSOLE_LOG__ "控制台打印日志" ON)

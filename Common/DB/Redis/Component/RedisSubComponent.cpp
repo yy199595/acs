@@ -34,8 +34,9 @@ namespace acs
 		const std::string & address = this->mConfig.Address;
 		ThreadComponent* component = this->GetComponent<ThreadComponent>();
 		{
+			Asio::Context & context = this->mApp->GetContext();
 			tcp::Socket * sock = component->CreateSocket(address);
-			this->mClient = new redis::Client(sock, this->mConfig, this);
+			this->mClient = std::make_shared<redis::Client>(sock, this->mConfig, this, context);
 			if(!this->mClient->Start())
 			{
 				LOG_ERROR("start sub redis [{}] fail", address);

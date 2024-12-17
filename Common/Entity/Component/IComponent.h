@@ -104,7 +104,6 @@ namespace acs
 	{
 	public:
         virtual ~IRpc() = default;
-		virtual void OnTimeout(int id) { };
 		virtual void StartClose(int id) { };
 		virtual void StartClose(int id, int) { };
 		virtual void OnConnectOK(int id) { }

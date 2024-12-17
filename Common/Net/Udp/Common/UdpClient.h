@@ -11,7 +11,7 @@ namespace udp
 	{
 	public:
 		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;
-		explicit Client(asio::io_context & io, Component * component, asio_udp::endpoint & remote);
+		explicit Client(asio::io_context & io, Component * component, asio_udp::endpoint & remote, Asio::Context &);
 		~Client() = default;
 	public:
 		void Send(tcp::IProto * message) final;
@@ -21,6 +21,7 @@ namespace udp
 		void OnReceive(const std::string & address, int size);
 	private:
 		Component * mComponent;
+		Asio::Context & mMainContext;
 		asio_udp::socket mSocket;
 		asio::io_context & mContext;
 		asio::streambuf mSendBuffer;

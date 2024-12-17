@@ -104,7 +104,7 @@ namespace Lua
 	{
 		std::string host(luaL_checkstring(L, 1));
 		const int port = (int)luaL_checkinteger(L, 2);
-		Asio::Context& io = acs::App::GetContext();
+		Asio::Context& io = acs::App::Inst()->GetContext();
 		tcp::Socket* socket = new tcp::Socket(io);
 		try
 		{
@@ -142,10 +142,10 @@ namespace Lua
 			luaL_error(L, "decode %s fail", addr.c_str());
 			return 0;
 		}
-		Asio::Context & ctx = acs::App::GetContext();
-		acs::UdpComponent * udpComponent = acs::App::Get<acs::UdpComponent>();
+		Asio::Context& ctx = acs::App::Inst()->GetContext();
 		asio::ip::udp::endpoint remote(asio::ip::make_address(ip), port);
-		udp::Client * udpClient = new udp::Client(ctx, udpComponent, remote);
+		acs::UdpComponent * udpComponent = acs::App::Get<acs::UdpComponent>();
+		udp::Client * udpClient = new udp::Client(ctx, udpComponent, remote, ctx);
 		{
 			udpClient->StartReceive();
 			Lua::UserDataParameter::UserDataStruct<udp::Client*>::WritePtr(L, udpClient);
@@ -179,10 +179,10 @@ namespace Lua
 		{
 			return 0;
 		}
-		Asio::Context & context = acs::App::GetContext();
+		Asio::Context& context = acs::App::Inst()->GetContext();
 		asio::ip::udp::endpoint endpoint(asio::ip::make_address(ip), port);
 		acs::KcpComponent * kcpComponent = acs::App::Get<acs::KcpComponent>();
-		kcp::Client * kcpClient = new kcp::Client(context, kcpComponent, endpoint);
+		kcp::Client * kcpClient = new kcp::Client(context, kcpComponent, endpoint, context);
 		{
 			Lua::UserDataParameter::UserDataStruct<kcp::Client*>::WritePtr(L, kcpClient);
 		}

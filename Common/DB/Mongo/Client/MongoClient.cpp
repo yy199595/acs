@@ -7,7 +7,6 @@
 #include <utility>
 #include"Util/Crypt/md5.h"
 #include"Util/Crypt/sha1.h"
-#include"Entity/Actor/App.h"
 #include"Proto/Bson/base64.h"
 #include"Util/Tools/String.h"
 #include"Mongo/Config/MongoConfig.h"
@@ -60,16 +59,16 @@ namespace mongo
 #endif
 	}
 
-    Client::Client(tcp::Socket * socket,
-			Component * component, const MongoConfig & config)
-		: tcp::Client(socket, 0), mComponent(component), mConfig(config)
+    Client::Client(tcp::Socket * socket, Component * component,
+			const MongoConfig & config, Asio::Context & io)
+		: tcp::Client(socket, 0), mComponent(component), mConfig(config), mMainContext(io)
 	{
 		this->mRequest = nullptr;
 		this->mResponse = nullptr;
 	}
 
-	Client::Client(tcp::Socket * socket, const MongoConfig &  config)
-		: tcp::Client(socket, 0), mComponent(nullptr), mConfig(config)
+	Client::Client(tcp::Socket * socket, const MongoConfig &  config, Asio::Context & io)
+		: tcp::Client(socket, 0), mComponent(nullptr), mConfig(config), mMainContext(io)
 	{
 		this->mRequest = nullptr;
 		this->mResponse = nullptr;
@@ -276,8 +275,7 @@ namespace mongo
 #ifdef ONLY_MAIN_THREAD
 		this->mComponent->OnMessage(id, request.release(), response.release());
 #else
-		Asio::Context & t = acs::App::GetContext();
-		t.post([this, req = request.release(), id, resp = response.release()] {
+		asio::post(this->mMainContext, [this, req = request.release(), id, resp = response.release()] {
 			this->mComponent->OnMessage(id, req, resp);
 		});
 #endif

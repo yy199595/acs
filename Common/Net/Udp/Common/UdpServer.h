@@ -11,7 +11,7 @@ namespace udp
 	{
 	public:
 		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;
-		Server(asio::io_context & io, Component * component, unsigned short port);
+		Server(asio::io_context & io, Component * component, unsigned short port, Asio::Context & main);
 	public:
 		void StartReceive();
 		inline asio::ip::udp::socket & Socket() { return this->mSocket; }
@@ -23,6 +23,7 @@ namespace udp
 	private:
 		Component * mComponent;
 		asio::io_context & mContext;
+		Asio::Context & mMainContext;
 		asio::streambuf mRecvBuffer;
 		asio::streambuf mSendBuffer;
 		asio::ip::udp::socket mSocket;

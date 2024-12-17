@@ -3,14 +3,12 @@
 //
 
 #include "KcpServer.h"
-#include "Entity/Actor/App.h"
 #include "Util/Tools/String.h"
 #include "Util/Tools/TimeHelper.h"
 namespace kcp
 {
-	Server::Server(asio::io_context& io, kcp::Server::Component* component, unsigned short port)
-			: mContext(io), mSocket(io, asio::ip::udp::endpoint(asio::ip::udp::v4(), port)),
-			mComponent(component), mTimer(io)
+	Server::Server(asio::io_context& io, kcp::Server::Component* component, unsigned short port, Asio::Context & main)
+			: mContext(io), mSocket(io, asio::ip::udp::endpoint(asio::ip::udp::v4(), port)), mComponent(component), mTimer(io), mMainContext(main)
 	{
 		this->mTimer.expires_after(std::chrono::milliseconds(KCP_UPDATE_INTERVAL));
 		this->mTimer.async_wait(std::bind(&Server::OnUpdate, this, std::placeholders::_1));
@@ -132,7 +130,7 @@ namespace kcp
 			rpcPacket->SetNet(rpc::Net::Kcp);
 			rpcPacket->TempHead().Add(rpc::Header::kcp_addr, address);
 		}
-		asio::post(acs::App::GetContext(), [this, request = rpcPacket.release()] {
+		asio::post(this->mMainContext, [this, request = rpcPacket.release()] {
 			this->mComponent->OnMessage(request, nullptr);
 		});
 	}

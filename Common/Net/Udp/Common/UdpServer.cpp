@@ -3,13 +3,12 @@
 //
 
 #include "UdpServer.h"
-#include "Entity/Actor/App.h"
 #include "Util/Tools/String.h"
 
 namespace udp
 {
-	Server::Server(asio::io_context& io, udp::Server::Component* component, unsigned short port)
-			: mContext(io), mSocket(io, asio::ip::udp::endpoint(asio::ip::udp::v4(), port)), mComponent(component)
+	Server::Server(asio::io_context& io, udp::Server::Component* component, unsigned short port, Asio::Context & main)
+			: mContext(io), mSocket(io, asio::ip::udp::endpoint(asio::ip::udp::v4(), port)), mComponent(component), mMainContext(main)
 	{
 
 	}
@@ -55,9 +54,8 @@ namespace udp
 			rpcPacket->TempHead().Add(rpc::Header::from_addr, address);
 #endif
 			rpcPacket->SetNet(rpc::Net::Udp);
-			Asio::Context& ctx = acs::App::GetContext();
 			rpcPacket->TempHead().Add(rpc::Header::udp_addr, address);
-			asio::post(ctx, [this, msg = rpcPacket.release()]{ this->mComponent->OnMessage(msg, nullptr); });
+			asio::post(this->mMainContext, [this, msg = rpcPacket.release()]{ this->mComponent->OnMessage(msg, nullptr); });
 		}
 		this->mRecvBuffer.consume(size);
 	}

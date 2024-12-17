@@ -70,7 +70,8 @@ namespace acs
 			Asio::Context& context = this->GetComponent<ThreadComponent>()->GetContext();
 			{
 				int port = listen.Port;
-				this->mUdpServer = std::make_unique<udp::Server>(context, this, port);
+				Asio::Context & main = this->mApp->GetContext();
+				this->mUdpServer = std::make_unique<udp::Server>(context, this, port, main);
 			}
 
 			asio::post(context, [this]() { this->mUdpServer->StartReceive(); });
@@ -166,9 +167,10 @@ namespace acs
 		try
 		{
 			udp::Client * udpClient = nullptr;
+			Asio::Context & main = this->mApp->GetContext();
 			asio_udp::endpoint remote(asio::ip::make_address(ip), port);
 			Asio::Context & ctx = this->GetComponent<ThreadComponent>()->GetContext();
-			std::unique_ptr<udp::Client> client = std::make_unique<udp::Client>(ctx, this, remote);
+			std::unique_ptr<udp::Client> client = std::make_unique<udp::Client>(ctx, this, remote, main);
 			{
 				udpClient = client.get();
 				this->mClients.emplace(id, std::move(client));

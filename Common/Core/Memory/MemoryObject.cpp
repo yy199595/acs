@@ -29,7 +29,7 @@ namespace memory
 		for (memory::Object * object : sObjects)
 		{
 			index++;
-			if(index >= 40000)
+			if(index >= 40000 && index >= sObjects.size() - 10)
 			{
 				printf("[%d] %p\n", (int)index, object);
 			}

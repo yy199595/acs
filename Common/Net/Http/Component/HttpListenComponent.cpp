@@ -30,7 +30,8 @@ namespace acs
 		}
 
 		int sockId = this->mNumPool.BuildNumber();
-		std::shared_ptr<http::SessionClient> handlerClient = std::make_shared<http::SessionClient>(this);
+		Asio::Context & io = this->mApp->GetContext();
+		std::shared_ptr<http::SessionClient> handlerClient = std::make_shared<http::SessionClient>(this, io);
 		{
 			handlerClient->StartReceive(sockId, socket);
 			this->mHttpClients.Add(sockId, handlerClient);
@@ -93,7 +94,8 @@ namespace acs
 		if (this->mWaitSockets.Pop(tcpSocket))
 		{
 			int sockId = this->mNumPool.BuildNumber();
-			std::shared_ptr<http::SessionClient> newClient = std::make_shared<http::SessionClient>(this);
+			Asio::Context & io = this->mApp->GetContext();
+			std::shared_ptr<http::SessionClient> newClient = std::make_shared<http::SessionClient>(this, io);
 			{
 				this->mHttpClients.Add(sockId, newClient);
 				newClient->StartReceive(sockId, tcpSocket, 0);

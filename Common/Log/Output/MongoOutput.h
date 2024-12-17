@@ -18,7 +18,7 @@ namespace custom
 	private:
 		std::string mCommand;
 		mongo::MongoConfig mConfig;
-		std::unique_ptr<mongo::Client> mMonClient;
+		std::shared_ptr<mongo::Client> mMonClient;
 	};
 }
 

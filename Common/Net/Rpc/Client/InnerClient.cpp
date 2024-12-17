@@ -1,16 +1,15 @@
 ﻿#include"InnerClient.h"
 
 #include"XCode/XCode.h"
-#include"Entity/Actor/App.h"
 #include"Rpc/Client/Rpc.h"
 #include"Core/System/System.h"
 #include"Core/Queue/Queue.h"
 
 namespace rpc
 {
-	InnerClient::InnerClient(int id, Component* component, bool client)
+	InnerClient::InnerClient(int id, Component* component, bool client, Asio::Context & io)
 			: Client(rpc::InnerBufferMaxSize), mSockId(id), mComponent(component),
-			  mIsClient(client), mDecodeStatus(tcp::Decode::None)
+			  mIsClient(client), mDecodeStatus(tcp::Decode::None), mMainContext(io)
 	{
 
 	}
@@ -42,8 +41,8 @@ namespace rpc
 			this->Write(*message);
 		}
 #else
-		Asio::Socket & sock = this->mSocket->Get();
-		asio::post(sock.get_executor(), [this, message]
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(this->mSocket->GetContext(), [this, self, message]
 		{
 			this->mSendMessages.emplace(message);
 			if(this->mSendMessages.size() == 1)
@@ -148,17 +147,25 @@ namespace rpc
 			this->mSendMessages.emplace(iter->second);
 		}
 		this->mWaitResMessages.clear();
+#ifdef ONLY_MAIN_THREAD
 		while (!this->mSendMessages.empty())
 		{
 			rpc::Packet* data = this->mSendMessages.front();
-#ifdef ONLY_MAIN_THREAD
 			this->mComponent->OnSendFailure(this->mSockId, data);
-#else
-			Asio::Context & t = acs::App::GetContext();
-			asio::post(t, [this, data] { this->mComponent->OnSendFailure(this->mSockId, data); });
-#endif
 			this->mSendMessages.pop();
 		}
+#else
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(this->mMainContext, [this, self]
+		{
+			while (!this->mSendMessages.empty())
+			{
+				rpc::Packet* data = this->mSendMessages.front();
+				this->mComponent->OnSendFailure(this->mSockId, data);
+				this->mSendMessages.pop();
+			}
+		});
+#endif
 		this->mSocket->Close();
 	}
 
@@ -168,7 +175,11 @@ namespace rpc
 #ifdef ONLY_MAIN_THREAD
 		this->mComponent->OnClientError(this->mSockId, code);
 #else
-
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(this->mMainContext, [self, this, code]()
+		{
+			this->mComponent->OnClientError(this->mSockId, code);
+		});
 #endif
 	}
 
@@ -257,13 +268,13 @@ namespace rpc
 #ifdef ONLY_MAIN_THREAD
 			this->mComponent->OnMessage(request, nullptr);
 #else
-			Asio::Context & t = acs::App::GetContext();
-			asio::post(t, [this, request] { this->mComponent->OnMessage(request, nullptr); });
+			asio::post(this->mMainContext, [this, request] { this->mComponent->OnMessage(request, nullptr); });
 #endif
 		} while (false);
 		this->mDecodeStatus = tcp::Decode::None;
 		Asio::Context& context = this->mSocket->GetContext();
-		asio::post(context, [this]() { this->ReadLength(rpc::RPC_PACK_HEAD_LEN); });
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(context, [this, self]() { this->ReadLength(rpc::RPC_PACK_HEAD_LEN); });
 	}
 
 	void InnerClient::Close()
@@ -273,7 +284,8 @@ namespace rpc
 #else
 		Asio::Socket & sock = this->mSocket->Get();
 		const Asio::Executor & executor = sock.get_executor();
-		asio::post(executor, [this] { this->CloseSocket(XCode::NetActiveShutdown); });
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(executor, [this, self] { this->CloseSocket(); });
 #endif
 	}
 

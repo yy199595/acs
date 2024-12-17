@@ -5,13 +5,11 @@
 #include"OuterClient.h"
 #include"XCode/XCode.h"
 #include"Util/Tools/TimeHelper.h"
-#include"Entity/Actor/App.h"
-#include"Gate/Component/OuterNetComponent.h"
 
 namespace rpc
 {
-	OuterClient::OuterClient(int id, Component * component)
-		: Client(rpc::OuterBufferMaxSize), mSockId(id)
+	OuterClient::OuterClient(int id, Component * component, Asio::Context & main)
+		: Client(rpc::OuterBufferMaxSize), mSockId(id), mMainContext(main)
 	{
 		this->mMaxQps = 0;
 		this->mMessage = nullptr;
@@ -46,7 +44,8 @@ namespace rpc
 #ifdef ONLY_MAIN_THREAD
 		this->ReadLength(rpc::RPC_PACK_HEAD_LEN, second);
 #else
-		asio::post(this->mSocket->GetContext(), [this, second]
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(this->mSocket->GetContext(), [this, self, second]
 		{
 			this->ReadLength(rpc::RPC_PACK_HEAD_LEN, second);
 		});
@@ -58,8 +57,7 @@ namespace rpc
 		long long nowTime = help::Time::NowSec();
 		if(nowTime - this->mLastRecvTime >= 30)
 		{
-			Asio::Context & t = acs::App::GetContext();
-			asio::post(t, [this] { this->mComponent->OnTimeout(this->mSockId); });
+
 		}
 	}
 
@@ -82,7 +80,7 @@ namespace rpc
 
     void OuterClient::OnReceiveMessage(std::istream & readStream, size_t size, const Asio::Code & code)
 	{
-		if(size <= 0 || code.value() != Asio::OK)
+		if (size <= 0 || code.value() != Asio::OK)
 		{
 			return;
 		}
@@ -92,13 +90,13 @@ namespace rpc
 			{
 				tcp::Data::Read(readStream, this->mProtoHead);
 
-				if(!CheckProtoHead(this->mProtoHead))
+				if (!CheckProtoHead(this->mProtoHead))
 				{
 					this->CloseSocket(XCode::UnKnowPacket);
 					return;
 				}
 
-				if(this->mProtoHead.Len >= this->mMaxCount)
+				if (this->mProtoHead.Len >= this->mMaxCount)
 				{
 					this->CloseSocket(XCode::NetBigDataShutdown);
 					return;
@@ -122,26 +120,24 @@ namespace rpc
 				break;
 			}
 		}
-		if(this->mDecodeState != tcp::Decode::Done)
+		if (this->mDecodeState != tcp::Decode::Done)
 		{
 			return;
 		}
-		rpc::Packet * request = this->mMessage.release();
+		rpc::Packet* request = this->mMessage.release();
 		{
 			request->SetSockId(this->mSockId);
 		}
 #ifdef __DEBUG__
-	request->TempHead().Add(rpc::Header::from_addr, this->mSocket->GetAddress());
+		request->TempHead().Add(rpc::Header::from_addr, this->mSocket->GetAddress());
 #endif
 #ifdef ONLY_MAIN_THREAD
 		this->mComponent->OnMessage(request, nullptr);
 #else
-		Asio::Context & t = acs::App::GetContext();
-		if(this->mSockId < 0)
-		{
-			CONSOLE_LOG_ERROR("=============")
-		}
-		asio::post(t, [this, request] { this->mComponent->OnMessage(request, nullptr); });
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(this->mMainContext, [this, self, request] {
+			this->mComponent->OnMessage(request, nullptr);
+		});
 #endif
 		this->mDecodeState = tcp::Decode::None;
 		this->mLastRecvTime = help::Time::NowSec();
@@ -155,15 +151,25 @@ namespace rpc
 			return;
 		}
 		this->StopTimer();
+#ifdef ONLY_MAIN_THREAD
 		while(!this->mSendMessages.empty())
 		{
 			rpc::Packet * message = this->mSendMessages.front();
-#ifdef ONLY_MAIN_THREAD
 			this->mComponent->OnSendFailure(this->mSockId, message);
-#else
-#endif
 			this->mSendMessages.pop();
 		}
+#else
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(this->mMainContext, [this, self]()
+		{
+			while(!this->mSendMessages.empty())
+			{
+				rpc::Packet * message = this->mSendMessages.front();
+				this->mComponent->OnSendFailure(this->mSockId, message);
+				this->mSendMessages.pop();
+			}
+		});
+#endif
 		this->mSocket->Close();
 	}
 
@@ -173,7 +179,10 @@ namespace rpc
 #ifdef ONLY_MAIN_THREAD
 		this->mComponent->OnClientError(this->mSockId, code);
 #else
-
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(this->mMainContext, [this, self, code]() {
+			this->mComponent->OnClientError(this->mSockId, code);
+		});
 #endif
 	}
 
@@ -191,7 +200,7 @@ namespace rpc
 
 	void OuterClient::OnSendMessage(const asio::error_code& code)
 	{
-		//this->CloseSocket(XCode::SendMessageFail);
+		this->CloseSocket(XCode::SendMessageFail);
 	}
 
 	bool OuterClient::Send(rpc::Packet* message)

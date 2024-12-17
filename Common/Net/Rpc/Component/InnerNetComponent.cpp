@@ -125,12 +125,23 @@ namespace acs
 	bool InnerNetComponent::OnListen(tcp::Socket * socket)
 	{
 		int id = this->mNumPool.BuildNumber();
-		std::shared_ptr<rpc::InnerClient> tcpSession = std::make_shared<rpc::InnerClient>(id, this, false);
+		Asio::Context & io = this->mApp->GetContext();
+		std::shared_ptr<rpc::InnerClient> tcpSession = std::make_shared<rpc::InnerClient>(id, this, false, io);
 		{
 			tcpSession->StartReceive(socket);
 			this->mClients.emplace(id, tcpSession);
 		}
 		return true;
+	}
+
+	void InnerNetComponent::OnClientError(int id, int code)
+	{
+		auto iter = this->mClients.find(id);
+		if(iter != this->mClients.end())
+		{
+			this->mClients.erase(iter);
+			help::InnerLogoutEvent::Trigger(id);
+		}
 	}
 
     void InnerNetComponent::StartClose(int id)
@@ -162,7 +173,8 @@ namespace acs
 			LOG_ERROR("parse address fail : {}", address)
 			return nullptr;
 		}
-		std::shared_ptr<rpc::InnerClient> tcpClient = std::make_shared<rpc::InnerClient>(id, this, true);
+		Asio::Context & io = this->mApp->GetContext();
+		std::shared_ptr<rpc::InnerClient> tcpClient = std::make_shared<rpc::InnerClient>(id, this, true, io);
 		{
 			tcpClient->StartReceive(socketProxy);
 			this->mClients.emplace(id, tcpClient);

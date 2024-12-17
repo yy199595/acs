@@ -27,7 +27,7 @@ namespace acs
 		void OnMessage(int, redis::Request *request, redis::Response *response) final;
 	private:
 		redis::Config mConfig;
-		redis::Client * mClient;
+		std::shared_ptr<redis::Client> mClient;
 		std::unordered_map<std::string, int> mChannels;
 	};
 }

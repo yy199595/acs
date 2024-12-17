@@ -16,7 +16,7 @@ namespace http
 	{
 	 public:
 		typedef acs::IRpc<Request, Response> Component;
-		explicit RequestClient(Component * component);
+		explicit RequestClient(Component * component, Asio::Context & io);
 	 public:
 		bool SyncSend(std::unique_ptr<http::Request> request);
 		bool SyncSend(std::unique_ptr<http::Request> request, http::Response & response);
@@ -33,6 +33,7 @@ namespace http
 		void OnSendMessage(const asio::error_code &code) final;
 	 private:
 		Component * mComponent;
+		Asio::Context & mMainContext;
         std::unique_ptr<http::Request> mRequest;
 		std::unique_ptr<http::Response> mResponse;
     };

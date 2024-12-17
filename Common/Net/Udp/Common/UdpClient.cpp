@@ -9,10 +9,8 @@
 
 namespace udp
 {
-	Client::Client(asio::io_context& io,
-			  udp::Client::Component* component, asio_udp::endpoint & remote)
-			: mContext(io), mComponent(component), mSocket(io, asio_udp::endpoint(asio_udp::v4(), 0)),
-			 mRemoteEndpoint(remote)
+	Client::Client(asio::io_context& io, udp::Client::Component* component, asio_udp::endpoint & remote, Asio::Context & main)
+			: mContext(io), mComponent(component), mSocket(io, asio_udp::endpoint(asio_udp::v4(), 0)), mRemoteEndpoint(remote), mMainContext(main)
 	{
 
 	}
@@ -68,9 +66,8 @@ namespace udp
 				if (rpcPacket->OnRecvMessage(is, rpcPacket->GetProtoHead().Len) == tcp::ReadDone)
 				{
 					rpcPacket->SetNet(rpc::Net::Udp);
-					Asio::Context& ctx = acs::App::GetContext();
 					rpcPacket->TempHead().Add(rpc::Header::udp_addr, address);
-					asio::post(ctx, [this, msg = rpcPacket.release()] { this->mComponent->OnMessage(msg, msg); });
+					asio::post(this->mMainContext, [this, msg = rpcPacket.release()] { this->mComponent->OnMessage(msg, msg); });
 				}
 			}
 		}

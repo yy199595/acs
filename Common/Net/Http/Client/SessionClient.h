@@ -17,7 +17,7 @@ namespace http
 	{
 	 public:
 		typedef acs::IRpc<Request, Response> Component;
-		explicit SessionClient(Component * component);
+		explicit SessionClient(Component * component, Asio::Context & io);
 	 public:
 		bool StartWriter();
 		void StartClose(int code);
@@ -45,6 +45,7 @@ namespace http
 		Component * mComponent;
 		http::Request mRequest;
 		http::Response mResponse;
+		Asio::Context & mMainContext;
 	};
 }
 #endif //APP_SESSIONCLIENT_H

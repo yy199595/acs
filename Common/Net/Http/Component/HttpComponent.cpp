@@ -87,7 +87,8 @@ namespace acs
 #else
 		socketProxy = this->mNetComponent->CreateSocket();
 #endif
-		std::shared_ptr<http::RequestClient> httpClient = std::make_shared<http::RequestClient>(this);
+		Asio::Context & main = this->mApp->GetContext();
+		std::shared_ptr<http::RequestClient> httpClient = std::make_shared<http::RequestClient>(this, main);
 		{
 			httpClient->SetSocket(socketProxy);
 		}

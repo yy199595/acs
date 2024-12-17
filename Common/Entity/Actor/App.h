@@ -49,12 +49,12 @@ namespace acs
 		long long MakeGuid();
 		std::string NewUuid();
 		unsigned int StartCoroutine(std::function<void()> && func);
+		inline Asio::Context & GetContext() { return this->mContext; }
         bool OnDelComponent(Component *component) final { return false; }
         inline bool IsMainThread() const { return this->mThreadId == std::this_thread::get_id();}
 	public:
 		template<typename T>
 		static inline T * Get() { return App::Inst()->GetComponent<T>(); }
-		static inline Asio::Context & GetContext() { return App::Inst()->mContext; }
 		static inline ActorComponent * ActorMgr() { return App::Inst()->mActorComponent; }
 		static inline ProtoComponent * GetProto() { return App::Inst()->mMessageComponent; }
 		static inline CoroutineComponent* Coroutine() { return App::Inst()->mTaskComponent; }

@@ -10,9 +10,9 @@
 namespace kcp
 {
 	Client::Client(asio::io_context& io,
-			kcp::Client::Component* component, asio_udp::endpoint & remote)
+			kcp::Client::Component* component, asio_udp::endpoint & remote, Asio::Context & main)
 			: mContext(io), mComponent(component), mSocket(io, asio_udp::endpoint(asio_udp::v4(), 0)),
-			 mRemoteEndpoint(remote), mTimer(io), mSendStream(&mSendBuffer)
+			 mRemoteEndpoint(remote), mTimer(io), mSendStream(&mSendBuffer), mMainContext(main)
 	{
 		this->mKcp = ikcp_create(0x01, this);
 		this->mKcp->output = kcp::OnKcpSend;
@@ -89,7 +89,7 @@ namespace kcp
 			{
 				rpcPacket->SetNet(rpc::Net::Kcp);
 				rpcPacket->TempHead().Add(rpc::Header::kcp_addr, address);
-				asio::post(acs::App::GetContext(), [this, msg = rpcPacket.release()] {
+				asio::post(this->mMainContext, [this, msg = rpcPacket.release()] {
 					this->mComponent->OnMessage(msg, nullptr);
 				});
 			}
