@@ -98,7 +98,7 @@ namespace acs
 				timer::ElapsedTimer timer1;
 				Asio::Context & io = this->mApp->GetContext();
 				tcp::Socket * socketProxy = threadComponent->CreateSocket(this->mConfig.Address);
-				mongo::Client * mongoClientContext = new mongo::Client(socketProxy, this, config, io);
+				std::shared_ptr<mongo::Client> mongoClientContext = std::make_unique<mongo::Client>(socketProxy, this, config, io);
 				{
 					if(!mongoClientContext->Start())
 					{

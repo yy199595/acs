@@ -84,7 +84,7 @@ namespace acs
 		custom::Queue<int> mFreeClients;
 		math::NumberPool<int> mNumberPool;
 		std::queue<std::unique_ptr<mongo::Request>> mRequests;
-		std::unordered_map<int, mongo::Client *> mMongoClients;
+		std::unordered_map<int, std::shared_ptr<mongo::Client>> mMongoClients;
 	};
 }
 
