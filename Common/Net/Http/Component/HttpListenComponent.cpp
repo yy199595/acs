@@ -30,7 +30,7 @@ namespace acs
 		}
 
 		int sockId = this->mNumPool.BuildNumber();
-		http::SessionClient* handlerClient = new http::SessionClient(this);
+		std::shared_ptr<http::SessionClient> handlerClient = std::make_shared<http::SessionClient>(this);
 		{
 			handlerClient->StartReceive(sockId, socket);
 			this->mHttpClients.Add(sockId, handlerClient);
@@ -41,7 +41,7 @@ namespace acs
 
 	void HttpListenComponent::StartClose(int id, int code)
 	{
-		http::SessionClient* handlerClient = nullptr;
+		std::shared_ptr<http::SessionClient> handlerClient;
 		if (!this->mHttpClients.Get(id, handlerClient))
 		{
 			return;
@@ -51,7 +51,7 @@ namespace acs
 
 	bool HttpListenComponent::ReadMessageBody(int id)
 	{
-		http::SessionClient* handlerClient = nullptr;
+		std::shared_ptr<http::SessionClient> handlerClient;
 		if (!this->mHttpClients.Get(id, handlerClient))
 		{
 			return false;
@@ -62,7 +62,7 @@ namespace acs
 
 	bool HttpListenComponent::ReadMessageBody(int id, std::unique_ptr<http::Content> data)
 	{
-		http::SessionClient* handlerClient = nullptr;
+		std::shared_ptr<http::SessionClient> handlerClient;
 		if (!this->mHttpClients.Get(id, handlerClient))
 		{
 			return false;
@@ -71,10 +71,10 @@ namespace acs
 		return true;
 	}
 
-	void HttpListenComponent::OnCloseSocket(int id, int code)
+	void HttpListenComponent::OnClientError(int id, int code)
 	{
 		//LOG_WARN("close sock id => {}", id);
-		http::SessionClient* handlerClient = nullptr;
+		std::shared_ptr<http::SessionClient> handlerClient;
 		if (!this->mHttpClients.Del(id, handlerClient))
 		{
 			LOG_ERROR("not find http client : {} code = {}", id, code);
@@ -89,12 +89,11 @@ namespace acs
 		{
 			this->mFailureCount++;
 		}
-		delete handlerClient;
 		tcp::Socket* tcpSocket = nullptr;
 		if (this->mWaitSockets.Pop(tcpSocket))
 		{
 			int sockId = this->mNumPool.BuildNumber();
-			http::SessionClient* newClient = new http::SessionClient(this);
+			std::shared_ptr<http::SessionClient> newClient = std::make_shared<http::SessionClient>(this);
 			{
 				this->mHttpClients.Add(sockId, newClient);
 				newClient->StartReceive(sockId, tcpSocket, 0);
@@ -104,7 +103,7 @@ namespace acs
 
 	bool HttpListenComponent::SendResponse(int id)
 	{
-		http::SessionClient* httpClient = nullptr;
+		std::shared_ptr<http::SessionClient> httpClient;
 		if (!this->mHttpClients.Get(id, httpClient))
 		{
 			LOG_ERROR("send message to {} fail", id);
@@ -115,7 +114,7 @@ namespace acs
 
 	bool HttpListenComponent::SendResponse(int id, HttpStatus code)
 	{
-		http::SessionClient* httpClient = nullptr;
+		std::shared_ptr<http::SessionClient> httpClient;
 		if (!this->mHttpClients.Get(id, httpClient))
 		{
 			LOG_ERROR("send message to {} fail", id);
@@ -126,7 +125,7 @@ namespace acs
 
 	bool HttpListenComponent::SendResponse(int id, HttpStatus code, std::unique_ptr<http::Content> data)
 	{
-		http::SessionClient* httpClient = nullptr;
+		std::shared_ptr<http::SessionClient> httpClient;
 		if (!this->mHttpClients.Get(id, httpClient))
 		{
 			LOG_ERROR("send message to {} fail", id);
@@ -140,7 +139,7 @@ namespace acs
 		auto iter = this->mHttpClients.Begin();
 		for (; iter != this->mHttpClients.End(); iter++)
 		{
-			delete iter->second;
+			iter->second->StartClose(XCode::Ok);
 		}
 		this->mHttpClients.Clear();
 	}

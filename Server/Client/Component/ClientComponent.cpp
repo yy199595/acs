@@ -40,11 +40,11 @@ namespace acs
 		int id = ++this->mIndex;
 		Asio::Context & context = App::GetContext();
 		tcp::Socket * tcpSocket = new tcp::Socket(context);
-		std::unique_ptr<rpc::InnerClient> client = std::make_unique<rpc::InnerClient>(id, this);
+		std::shared_ptr<rpc::InnerClient> client = std::make_shared<rpc::InnerClient>(id, this, true);
 		{
 			tcpSocket->Init(ip, port);
-			client->SetSocket(tcpSocket);
-			this->mClientMap.emplace(id, std::move(client));
+			client->StartReceive(tcpSocket);
+			this->mClientMap.emplace(id, client);
 		}
 		return id;
 	}
@@ -97,7 +97,7 @@ namespace acs
 		return 1;
 	}
 
-	void ClientComponent::OnCloseSocket(int id, int code)
+	void ClientComponent::OnClientError(int id, int code)
 	{
 		auto iter = this->mClientMap.find(id);
 		if(iter == this->mClientMap.end())

@@ -23,7 +23,7 @@ namespace rpc
 	{
 	 public:
 		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;
-		explicit InnerClient(int id, Component * component);
+		explicit InnerClient(int id, Component * component, bool client);
 		~InnerClient() final;
 	public:
 		void Close();
@@ -33,6 +33,7 @@ namespace rpc
 		size_t GetWaitSendCount() const { return this->mSendMessages.size(); }
 		size_t GetWaitResponseCount() const { return this->mWaitResMessages.size(); }
 	 private:
+		void CloseSocket();
 		void CloseSocket(int code);
 		void OnSendMessage() final;
 		void OnTimeout(tcp::TimeoutFlag flag) final;
@@ -44,10 +45,11 @@ namespace rpc
 	private:
 		const int mSockId;
 		int mDecodeStatus;
+		const bool mIsClient;
 		Component * mComponent;
 		rpc::ProtoHead mProtoHead;
 		std::unique_ptr<rpc::Packet> mMessage;
-		std::queue<std::unique_ptr<rpc::Packet>> mSendMessages;
-		std::unordered_map<int, std::unique_ptr<rpc::Packet>> mWaitResMessages; //等待返回的服务器消息
+		std::queue<rpc::Packet *> mSendMessages;
+		std::unordered_map<int, rpc::Packet *> mWaitResMessages; //等待返回的服务器消息
 	};
 }// namespace Sentry

@@ -24,18 +24,20 @@ namespace rpc
 	{
 		while(!this->mSendMessages.empty())
 		{
+			delete this->mSendMessages.front();
 			this->mSendMessages.pop();
 		}
 	}
 
-	void OuterClient::Stop(int code)
+	void OuterClient::Stop()
 	{
 		if(this->mSocket == nullptr)
 		{
 			return;
 		}
 		Asio::Context & context = this->mSocket->GetContext();
-		asio::post(context, [this, code] { this->CloseSocket(code); });
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(context, [this, self] { this->CloseSocket(); });
 	}
 
 	void OuterClient::StartReceive(tcp::Socket * socket, int second)
@@ -113,7 +115,7 @@ namespace rpc
 			{
 				if (this->mMessage->OnRecvMessage(readStream, size) != 0)
 				{
-					this->CloseSocket(XCode::UnKnowPacket);
+					this->CloseSocket();
 					return;
 				}
 				this->mDecodeState = tcp::Decode::Done;
@@ -146,31 +148,33 @@ namespace rpc
 		this->ReadLength(rpc::RPC_PACK_HEAD_LEN);
 	}
 
-    void OuterClient::CloseSocket(int code)
+    void OuterClient::CloseSocket()
 	{
 		if(!this->mSocket->IsOpen())
 		{
 			return;
 		}
 		this->StopTimer();
-		this->mSocket->Close();
 		while(!this->mSendMessages.empty())
 		{
+			rpc::Packet * message = this->mSendMessages.front();
+#ifdef ONLY_MAIN_THREAD
+			this->mComponent->OnSendFailure(this->mSockId, message);
+#else
+#endif
 			this->mSendMessages.pop();
 		}
-//		this->ClearSendStream();
-//		this->ClearRecvStream();
-		this->mDecodeState = tcp::Decode::None;
-		Asio::Context & context = this->mSocket->GetContext();
-		asio::post(context, [this, code, sockId = this->mSockId]()
-		{
+		this->mSocket->Close();
+	}
+
+	void OuterClient::CloseSocket(int code)
+	{
+		this->CloseSocket();
 #ifdef ONLY_MAIN_THREAD
-			this->mComponent->OnCloseSocket(sockId, code);
+		this->mComponent->OnClientError(this->mSockId, code);
 #else
-			Asio::Context & t = acs::App::GetContext();
-			asio::post(t, [this, code, sockId] { this->mComponent->OnCloseSocket(sockId, code); });
+
 #endif
-		});
 	}
 
 	void OuterClient::OnSendMessage()
@@ -202,8 +206,7 @@ namespace rpc
 #else
 		asio::post(this->mSocket->GetContext(), [this, message]
 		{
-			std::unique_ptr<rpc::Packet> sendMessage(message);
-			this->mSendMessages.emplace(std::move(sendMessage));
+			this->mSendMessages.emplace(message);
 			if(this->mSendMessages.size() == 1)
 			{
 				this->Write(*message);

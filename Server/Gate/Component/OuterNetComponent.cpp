@@ -36,15 +36,15 @@ namespace acs
 
 	void OuterNetComponent::OnTimeout(int id)
 	{
-		this->OnCloseSocket(id, XCode::NetTimeout);
+		this->StartClose(id, XCode::NetTimeout);
 	}
 
 	void OuterNetComponent::OnSecondUpdate(int tick)
 	{
-		while(!this->mRemoveClients.empty())
-		{
-			this->mRemoveClients.pop();
-		}
+//		while(!this->mRemoveClients.empty())
+//		{
+//			this->mRemoveClients.pop();
+//		}
 	}
 
 	void OuterNetComponent::OnMessage(rpc::Packet * message, rpc::Packet *)
@@ -195,25 +195,18 @@ namespace acs
 		}
 
 		int sockId = this->mSocketPool.BuildNumber();
-		std::unique_ptr<rpc::OuterClient> outerNetClient = std::make_unique<rpc::OuterClient>(sockId, this);
+		std::shared_ptr<rpc::OuterClient> outerNetClient = std::make_shared<rpc::OuterClient>(sockId, this);
 		{
 			outerNetClient->StartReceive(socket);
-			this->mGateClientMap.emplace(sockId, std::move(outerNetClient));
+			this->mGateClientMap.emplace(sockId, outerNetClient);
 		}
 		LOG_DEBUG("[{}] connect gate server count:{}", socket->GetAddress(), this->mGateClientMap.size())
 		return true;
 	}
 
-	void OuterNetComponent::OnCloseSocket(int id, int code)
-    {
-		long long userId = 0;
-		if(this->mAddressUserMap.Del(id, userId))
-		{
-			this->mUserAddressMap.Del(userId);
-			this->mActComponent->DelActor(userId);
-			help::OuterLogoutEvent::Trigger(userId);
-		}
-		LOG_DEBUG("remove client({}) count:{}", id, this->mGateClientMap.size());
+	void OuterNetComponent::OnClientError(int id, int code)
+	{
+		this->StartClose(id, code);
 	}
 
 	void OuterNetComponent::OnSendFailure(int id, rpc::Packet* message)
@@ -260,13 +253,17 @@ namespace acs
 		auto iter = this->mGateClientMap.find(id);
 		if(iter != this->mGateClientMap.end())
 		{
-			std::unique_ptr<rpc::OuterClient> outerClient = std::move(iter->second);
-			{
-				outerClient->Stop(code);
-				this->mGateClientMap.erase(iter);
-				this->mRemoveClients.emplace(std::move(outerClient));
-			}
+			iter->second->Stop();
+			this->mGateClientMap.erase(iter);
 		}
+		long long userId = 0;
+		if(this->mAddressUserMap.Del(id, userId))
+		{
+			this->mUserAddressMap.Del(userId);
+			this->mActComponent->DelActor(userId);
+			help::OuterLogoutEvent::Trigger(userId);
+		}
+		LOG_DEBUG("remove client({}) count:{}", id, this->mGateClientMap.size());
 	}
 
     void OuterNetComponent::OnRecord(json::w::Document &document)

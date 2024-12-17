@@ -292,16 +292,5 @@ namespace http
 		this->Clear();
 		this->mSocket->Close();
 		this->mRequest.SetSockId(0);
-		Asio::Socket& sock = this->mSocket->Get();
-		asio::post(sock.get_executor(), [this, code, sockId]()
-		{
-#ifdef ONLY_MAIN_THREAD
-			this->mComponent->OnCloseSocket(sockId, code);
-#else
-			Asio::Context& t = acs::App::GetContext();
-			t.post([this, code, sockId] { this->mComponent->OnCloseSocket(sockId, code); });
-#endif
-		});
-
 	}
 }

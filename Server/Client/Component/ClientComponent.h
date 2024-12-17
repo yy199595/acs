@@ -21,7 +21,7 @@ namespace acs
 		int Connect(const std::string & address);
 	private:
 		bool LateAwake() final;
-		void OnCloseSocket(int id, int code) final;
+		void OnClientError(int id, int code) final;
 		int Send(int id, rpc::Packet * message) final;
 		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
 		void OnMessage(rpc::Packet *request, rpc::Packet *response) final;
@@ -32,7 +32,8 @@ namespace acs
 		class ProtoComponent * mProto;
 		class LuaComponent * mLuaComponent;
 		class DispatchComponent * mDisComponent;
-		std::unordered_map<int, std::unique_ptr<rpc::InnerClient>> mClientMap;
+		std::queue<std::unique_ptr<rpc::InnerClient>> mClientQueue;
+		std::unordered_map<int, std::shared_ptr<rpc::InnerClient>> mClientMap;
 
 	};
 }

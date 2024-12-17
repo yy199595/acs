@@ -50,13 +50,13 @@ namespace acs
 		bool SendResponse(int fd, HttpStatus code, std::unique_ptr<http::Content> data);
 	private:
 		bool OnListen(tcp::Socket * socket) final;
-		void OnCloseSocket(int, int code) final;
+		void OnClientError(int id, int code) final;
 	protected:
 		unsigned int mSuccessCount; //成功次数
 		unsigned int mFailureCount; //失败次数
         math::NumberPool<int> mNumPool;
 		custom::Queue<tcp::Socket *> mWaitSockets;
-		custom::HashMap<int, http::SessionClient *> mHttpClients;
+		custom::HashMap<int, std::shared_ptr<http::SessionClient>> mHttpClients;
 	};
 }
 

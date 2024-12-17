@@ -30,8 +30,6 @@ namespace acs
 	 public:
 		void OnTimeout(int id) final;
 		void StartClose(int id, int code) final;
-		void OnCloseSocket(int id, int code) final;
-		void OnSendFailure(int id, rpc::Packet *message) final;
 	public:
 		bool StopClient(long long userId);
 		void Broadcast(rpc::Packet * message);
@@ -43,6 +41,9 @@ namespace acs
 		bool LateAwake() final;
 		void OnSecondUpdate(int tick) final;
 		int OnRequest(long long playerId, rpc::Packet * message);
+	private:
+		void OnClientError(int id, int code) final;
+		void OnSendFailure(int id, rpc::Packet *message) final;
 		void OnMessage(rpc::Packet * request, rpc::Packet *) final;
 	private:
 		bool OnListen(tcp::Socket * socket) final;
@@ -57,8 +58,7 @@ namespace acs
 		custom::HashMap<int, long long> mAddressUserMap;  //fd和玩家id的映射表
 		custom::HashMap<long long, int> mUserAddressMap; //验证过的客户端
 		custom::Queue<rpc::Packet *> mBroadCastMessages; //广播消息
-		std::queue<std::unique_ptr<rpc::OuterClient>> mRemoveClients;
-		std::unordered_map<int, std::unique_ptr<rpc::OuterClient>> mGateClientMap;
+		std::unordered_map<int, std::shared_ptr<rpc::OuterClient>> mGateClientMap;
 		//std::unordered_map<int, std::unique_ptr<rpc::InnerClient>> mForwardClientMap;
 	};
 }

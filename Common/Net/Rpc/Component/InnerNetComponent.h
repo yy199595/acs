@@ -18,7 +18,6 @@ namespace acs
 		~InnerNetComponent() override = default;
 	 public:
 		void StartClose(int id) final;
-		void OnCloseSocket(int id, int code) final;
 		int Send(int id, rpc::Packet * message) final;
 		void OnSendFailure(int id, rpc::Packet * message) final;
 		void OnMessage(rpc::Packet * message, rpc::Packet *) final;
@@ -31,10 +30,10 @@ namespace acs
 		int OnForward(rpc::Packet * message);
 		rpc::InnerClient * GetClient(int id);
 	private:
+		class ActorComponent * mActor;
+		class ThreadComponent * mThread;
+        class DispatchComponent* mDispatch;
 		math::NumberPool<int, 100> mNumPool;
-		class ActorComponent * mActComponent;
-        class DispatchComponent* mDisComponent;
-		class ThreadComponent * mThreadComponent;
-		std::unordered_map<int, std::unique_ptr<rpc::InnerClient>> mClients; //本地客户端(连接别的)
+		std::unordered_map<int, std::shared_ptr<rpc::InnerClient>> mClients; //本地客户端(连接别的)
 	};
 }

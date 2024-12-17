@@ -108,7 +108,7 @@ namespace acs
 		virtual void StartClose(int id) { };
 		virtual void StartClose(int id, int) { };
 		virtual void OnConnectOK(int id) { }
-		virtual void OnCloseSocket(int id, int code) { };
+		virtual void OnClientError(int id, int code) { };
 		virtual void OnSendFailure(int id, T1 * message) { }
 		virtual void OnMessage(T1* request, T2* response) { };
 		virtual void OnReadHead(T1* request, T2 * response) { }

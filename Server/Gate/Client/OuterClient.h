@@ -17,7 +17,7 @@ namespace rpc
 		explicit OuterClient(int id, Component* component);
 		~OuterClient() final;
 	 public:
-		void Stop(int code);
+		void Stop();
 		bool Send(rpc::Packet * message);
 		inline void SetSockId(int id) { this->mSockId = id; }
 		inline int GetSockId() const { return this->mSockId; }
@@ -27,7 +27,8 @@ namespace rpc
 		void OnReadError(const Asio::Code &code) final;
         void OnReceiveMessage(std::istream & readStream, size_t, const Asio::Code & code) final;
 	private:
-        void CloseSocket(int code);
+        void CloseSocket();
+		void CloseSocket(int code);
 		void OnSendMessage() final;
 		void OnSendMessage(const asio::error_code &code) final;
 	private:
@@ -38,7 +39,7 @@ namespace rpc
 		Component * mComponent;
 		rpc::ProtoHead mProtoHead;
 		std::unique_ptr<rpc::Packet> mMessage;
-		std::queue<std::unique_ptr<rpc::Packet>> mSendMessages;
+		std::queue<rpc::Packet *> mSendMessages;
 	};
 }
 

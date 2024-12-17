@@ -38,7 +38,7 @@ namespace acs
         bool LateAwake() final;
 		void OnDelTask(int key) final;
 		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
-		http::RequestClient * CreateClient(http::Request * request);
+		std::shared_ptr<http::RequestClient> CreateClient(http::Request * request);
 		void OnMessage(http::Request *request, http::Response *response) final;
 	private:
 		math::NumberPool<int> mNumPool;
@@ -47,7 +47,6 @@ namespace acs
 		std::unordered_map<std::string, std::unique_ptr<asio::ssl::context>> mSslContexts;
 #endif
 		std::string mPemPath;
-		custom::ArrayPool<http::RequestClient, 10> mClientPools;
-		custom::HashMap<int, http::RequestClient *> mUseClients;
+		custom::HashMap<int, std::shared_ptr<http::RequestClient>> mUseClients;
 	};
 }

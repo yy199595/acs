@@ -48,10 +48,9 @@ namespace acs
 		return true;
 	}
 
-	http::RequestClient * HttpComponent::CreateClient(http::Request * request)
+	std::shared_ptr<http::RequestClient> HttpComponent::CreateClient(http::Request * request)
 	{
 		tcp::Socket* socketProxy = nullptr;
-		http::RequestClient* httpClient = nullptr;
 #ifdef __ENABLE_OPEN_SSL__
 		if(request->IsHttps())
 		{
@@ -88,12 +87,10 @@ namespace acs
 #else
 		socketProxy = this->mNetComponent->CreateSocket();
 #endif
-		httpClient = this->mClientPools.Pop();
-		if (httpClient == nullptr)
+		std::shared_ptr<http::RequestClient> httpClient = std::make_shared<http::RequestClient>(this);
 		{
-			httpClient = new http::RequestClient(this);
+			httpClient->SetSocket(socketProxy);
 		}
-		httpClient->SetSocket(socketProxy);
 		return httpClient;
 	}
 
@@ -159,10 +156,10 @@ namespace acs
 
 	void HttpComponent::OnDelTask(int key)
 	{
-		http::RequestClient * httpClient = nullptr;
+		std::shared_ptr<http::RequestClient> httpClient;
 		if(this->mUseClients.Del(key, httpClient))
 		{
-			this->mClientPools.Push(httpClient);
+
 		}
 	}
 
@@ -172,7 +169,7 @@ namespace acs
 		const http::Url & url = request->GetUrl();
 		int taskId = this->mNumPool.BuildNumber();
 		std::unique_ptr<http::Response> response = std::make_unique<http::Response>();
-		http::RequestClient * httpAsyncClient = this->CreateClient(request.get());
+		std::shared_ptr<http::RequestClient> httpAsyncClient = this->CreateClient(request.get());
 		//LOG_DEBUG("connect {} server => {}:{}", url.Protocol(), url.Host(), url.Port());
 		{
 			this->mUseClients.Add(taskId, httpAsyncClient);
@@ -186,7 +183,7 @@ namespace acs
 	{
 		request->Header().SetKeepAlive(false);
 		taskId = this->mNumPool.BuildNumber();
-		http::RequestClient * httpAsyncClient = this->CreateClient(request.get());
+		std::shared_ptr<http::RequestClient> httpAsyncClient = this->CreateClient(request.get());
 		//LOG_DEBUG("connect {} server => {}:{}", url.Protocol(), url.Host(), url.Port());
 		{
 			this->mUseClients.Add(taskId, httpAsyncClient);

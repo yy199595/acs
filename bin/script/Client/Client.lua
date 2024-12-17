@@ -8,7 +8,7 @@ local http = require("HttpComponent")
 
 --local HOST = "http://43.143.239.75:80"
 local HOST = "http://127.0.0.1:8088"
-local COUNT = os.getenv("APP_COUNT") or 1
+local COUNT = os.getenv("APP_COUNT") or 10
 local Main = Module()
 
 local lastUserMemory = 0
@@ -40,86 +40,61 @@ function Main:Awake()
 
     for i = 1, COUNT do
         local account = string.format("yjz1995%s", i)
-        table.insert(self.accounts, { account = account, password = "123456" })
+        table.insert(self.accounts, { account = account, password = "123456", count = 0 })
     end
 end
 
 function Main:OnUpdate()
-    for i = 1, 30 do
-        for index, player in ipairs(self.sessions) do
-            if player.close then
-                coroutine.start(function()
-                    local sleep = math.random(100, 2000)
-                    coroutine.sleep(sleep)
-                    self:Login(player.account)
-                end)
-                table.remove(self.sessions, index)
-                break
-            end
-
-            self.count = self.count + 1
-            coroutine.start(self.CallServer, self, player)
+    for i = 1, 10 do
+        for _, info in pairs(self.accounts) do
+            coroutine.start(self.Login, self, info)
         end
     end
-
 end
 
-function Main:CallServer(player)
-
-    local client = player.client
-    for i = 1, 10 do
-        local code1 = client:Call("GateSystem.Ping")
-
-        local code2 = client:Call("ChatSystem.Ping")
-
-        local code3 = client:Call("ChatSystem.OnPing")
-
-        local code4 = client:Call("ChatSystem.OnChat", {
-            msg_type = math.random(0, 3),
-            message = "hello world"
-        })
-
-    end
-
-    player.count = player.count + 1
-
-    if player.count >= player.logout_count then
-        local code = client:Call("GateSystem.Logout")
-
-        client:Close()
-        player.close = true
-        print(string.format("====== user(%s) logout ok ========", player.account.account))
-
-    end
-
-    self.count = self.count - 1
-end
 
 function Main:Login(info)
-    log.Debug("user(%s) start login", info.account)
-    local response = http:Post(str_format("%s/account/login", HOST), info)
-    if response == nil or response.data == nil then
-        log.Error("account login failure")
-        return
+    if info.count == 0 then
+        log.Debug("user(%s) start login", info.account)
+        local response = http:Post(str_format("%s/account/login", HOST), info)
+        if response == nil or response.data == nil then
+            log.Error("account login failure")
+            return
+        end
+        local result = response.data
+        local client = Session(result.address)
+        local timerId = timer.Add(2000, function()
+            log.Error("user(%s) login [%s] time out", info.account, result.address)
+        end)
+        local code = client:Call("GateSystem.Login", result.token)
+        timer.Del(timerId)
+        if code == XCode.Ok then
+            info.client = client
+            info.count = info.count + 1
+            table.insert(self.sessions, info)
+            self.login_count = self.login_count + 1
+            log.Warning("[%s] user(%s) login [%s] ok", self.login_count, info.account, result.address)
+        end
     end
-    local result = response.data
-    local client = Session(result.address)
-    local timerId = timer.Add(2000, function()
-        log.Error("user(%s) login [%s] time out", info.account, result.address)
-    end)
-    local code = client:Call("GateSystem.Login", result.token)
-    timer.Del(timerId)
-    if code == XCode.Ok then
-        table.insert(self.sessions, {
-            count = 0,
-            close = false,
-            account = info,
-            client = client,
-            logout_count = math.random(10, 100)
-        })
-        self.login_count = self.login_count + 1
-        log.Warning("[%s] user(%s) login [%s] ok", self.login_count, info.account, result.address)
+    if info.count > 0 then
+        for i = 1, 10 do
+            local code1 = info.client:Call("GateSystem.Ping")
+            local code2 = info.client:Call("ChatSystem.Ping")
+            local code3 = info.client:Call("ChatSystem.OnPing")
+            local code4 = info.client:Call("ChatSystem.OnChat", {
+                msg_type = math.random(0, 3),
+                message = "hello world"
+            })
+            info.count = info.count + 4
+            print(code1, code2, code3, code4)
+            log.Info("user(%s) call count:%s", info.account, info.count)
+        end
+        info.client:Call("GateSystem.Logout")
+
+        info.client:Close()
+        info.count = 0
     end
+
 end
 
 function Main:OnComplete()

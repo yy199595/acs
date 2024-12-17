@@ -22,7 +22,7 @@ namespace tcp
 namespace tcp
 {
     class IProto;
- 	class Client
+	class Client : public std::enable_shared_from_this<Client>
 	{
 	 public:
 		explicit Client(size_t maxCount);
@@ -32,7 +32,6 @@ namespace tcp
 		void SetSocket(Socket * socket);
 		const std::string & GetAddress() { return this->mSocket->GetAddress();}
 	protected:
-		void ClearBuffer();
 		void ReadAll(int timeout = 0);
 		void Connect(int timeout = 0);
 		void ReadLine(int timeout = 0);
@@ -41,6 +40,7 @@ namespace tcp
 		void Connect(const std::string & host, const std::string & port, int timeout = 0);
 	protected:
 		bool IsOpen();
+		void ClearBuffer();
 		bool SendSync(tcp::IProto & message); //同步发送
 		void Write(tcp::IProto & message, int timeout = 0);
 	protected:

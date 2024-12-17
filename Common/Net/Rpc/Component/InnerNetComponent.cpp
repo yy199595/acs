@@ -14,16 +14,16 @@ namespace acs
     InnerNetComponent::InnerNetComponent()
 		: ISender(rpc::Net::Tcp), mNumPool(10000)
     {
-		this->mActComponent = nullptr;
-		this->mDisComponent = nullptr;
-        this->mThreadComponent = nullptr;
+		this->mActor = nullptr;
+		this->mThread = nullptr;
+		this->mDispatch = nullptr;
     }
 
     bool InnerNetComponent::LateAwake()
 	{
-		LOG_CHECK_RET_FALSE(this->mActComponent = this->GetComponent<ActorComponent>())
-		LOG_CHECK_RET_FALSE(this->mDisComponent = this->GetComponent<DispatchComponent>())
-		LOG_CHECK_RET_FALSE(this->mThreadComponent = this->GetComponent<ThreadComponent>())
+		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
+		LOG_CHECK_RET_FALSE(this->mThread = this->GetComponent<ThreadComponent>())
+		LOG_CHECK_RET_FALSE(this->mDispatch = this->GetComponent<DispatchComponent>())
 		return true;
 	}
 
@@ -62,12 +62,12 @@ namespace acs
 					}
 				}
 #endif
-				code = this->mDisComponent->OnMessage(message);
+				code = this->mDispatch->OnMessage(message);
 				break;
 			}
 			case rpc::Type::Client:
 			case rpc::Type::Broadcast:
-				code = this->mDisComponent->OnMessage(message);
+				code = this->mDispatch->OnMessage(message);
 				break;
 			default:
 				code = XCode::UnKnowPacket;
@@ -114,7 +114,7 @@ namespace acs
 		{
 			message->SetType(rpc::Type::Response);
 			message->GetHead().Add(rpc::Header::code, XCode::NetWorkError);
-			if (this->mDisComponent->OnMessage(message) != XCode::Ok)
+			if (this->mDispatch->OnMessage(message) == XCode::Ok)
 			{
 				return;
 			}
@@ -122,25 +122,13 @@ namespace acs
 		delete message;
     }
 
-    void InnerNetComponent::OnCloseSocket(int id, int code)
-	{
-		auto iter = this->mClients.find(id);
-		if(iter != this->mClients.end())
-		{
-			const std::string & address = iter->second->GetAddress();
-			LOG_WARN("close [{}] code = {}", address, CodeConfig::Inst()->GetDesc(code));
-			this->mClients.erase(iter);
-		}
-		help::InnerLogoutEvent::Trigger(id);
-	}
-
 	bool InnerNetComponent::OnListen(tcp::Socket * socket)
 	{
 		int id = this->mNumPool.BuildNumber();
-		std::unique_ptr<rpc::InnerClient> tcpSession = std::make_unique<rpc::InnerClient>(id, this);
+		std::shared_ptr<rpc::InnerClient> tcpSession = std::make_shared<rpc::InnerClient>(id, this, false);
 		{
 			tcpSession->StartReceive(socket);
-			this->mClients.emplace(id, std::move(tcpSession));
+			this->mClients.emplace(id, tcpSession);
 		}
 		return true;
 	}
@@ -151,6 +139,8 @@ namespace acs
 		if(iter != this->mClients.end())
 		{
 			iter->second->Close();
+			this->mClients.erase(iter);
+			help::InnerLogoutEvent::Trigger(id);
 		}
     }
 
@@ -162,24 +152,22 @@ namespace acs
 			return iter->second.get();
 		}
 		std::string address;
-		if(!this->mActComponent->GetListen(id, "rpc", address))
+		if(!this->mActor->GetListen(id, "rpc", address))
 		{
 			return nullptr;
 		}
-		tcp::Socket* socketProxy = this->mThreadComponent->CreateSocket(address);
+		tcp::Socket* socketProxy = this->mThread->CreateSocket(address);
 		if (socketProxy == nullptr)
 		{
 			LOG_ERROR("parse address fail : {}", address)
 			return nullptr;
 		}
-		rpc::InnerClient * innerClient = nullptr;
-		std::unique_ptr<rpc::InnerClient> tcpClient = std::make_unique<rpc::InnerClient>(id, this);
+		std::shared_ptr<rpc::InnerClient> tcpClient = std::make_shared<rpc::InnerClient>(id, this, true);
 		{
-			innerClient = tcpClient.get();
-			tcpClient->SetSocket(socketProxy);
-			this->mClients.emplace(id, std::move(tcpClient));
+			tcpClient->StartReceive(socketProxy);
+			this->mClients.emplace(id, tcpClient);
 		}
-		return innerClient;
+		return tcpClient.get();
 	}
 
     int InnerNetComponent::Send(int id, rpc::Packet * message)
@@ -204,7 +192,7 @@ namespace acs
 
 	int InnerNetComponent::OnRequest(rpc::Packet * message)
 	{
-		int code = this->mDisComponent->OnMessage(message);
+		int code = this->mDispatch->OnMessage(message);
 		if (code != XCode::Ok)
 		{
 //			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
