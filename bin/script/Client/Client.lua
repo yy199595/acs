@@ -8,7 +8,7 @@ local http = require("HttpComponent")
 
 --local HOST = "http://43.143.239.75:80"
 local HOST = "http://127.0.0.1:8088"
-local COUNT = os.getenv("APP_COUNT") or 10
+local COUNT = os.getenv("APP_COUNT") or 1
 local Main = Module()
 
 local lastUserMemory = 0
@@ -45,13 +45,12 @@ function Main:Awake()
 end
 
 function Main:OnUpdate()
-    for i = 1, 10 do
-        for _, info in pairs(self.accounts) do
-            coroutine.start(self.Login, self, info)
-        end
-    end
+    --for i = 1, 10 do
+    --    for _, info in pairs(self.accounts) do
+    --        coroutine.start(self.Login, self, info)
+    --    end
+    --end
 end
-
 
 function Main:Login(info)
     if info.count == 0 then

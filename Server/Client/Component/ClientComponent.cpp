@@ -43,7 +43,7 @@ namespace acs
 		std::shared_ptr<rpc::InnerClient> client = std::make_shared<rpc::InnerClient>(id, this, true, context);
 		{
 			tcpSocket->Init(ip, port);
-			client->StartReceive(tcpSocket);
+			client->SetSocket(tcpSocket);
 			this->mClientMap.emplace(id, client);
 		}
 		return id;
@@ -94,6 +94,7 @@ namespace acs
 			return 0;
 		}
 		iter->second->Close();
+		this->mClientMap.erase(iter);
 		return 1;
 	}
 

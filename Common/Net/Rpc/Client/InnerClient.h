@@ -43,6 +43,7 @@ namespace rpc
 		void OnSendMessage(const Asio::Code & code) final;
 		void OnReceiveMessage(std::istream & is, size_t, const Asio::Code & code) final;
 	private:
+		bool mClose;
 		const int mSockId;
 		int mDecodeStatus;
 		const bool mIsClient;

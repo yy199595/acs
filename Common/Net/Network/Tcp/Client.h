@@ -39,7 +39,6 @@ namespace tcp
 		void ReadLength(int size, int timeout = 0);
 		void Connect(const std::string & host, const std::string & port, int timeout = 0);
 	protected:
-		bool IsOpen();
 		void ClearBuffer();
 		bool SendSync(tcp::IProto & message); //同步发送
 		void Write(tcp::IProto & message, int timeout = 0);

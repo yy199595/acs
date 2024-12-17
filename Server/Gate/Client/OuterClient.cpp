@@ -9,7 +9,7 @@
 namespace rpc
 {
 	OuterClient::OuterClient(int id, Component * component, Asio::Context & main)
-		: Client(rpc::OuterBufferMaxSize), mSockId(id), mMainContext(main)
+		: Client(rpc::OuterBufferMaxSize), mSockId(id), mMainContext(main), mClose(false)
 	{
 		this->mMaxQps = 0;
 		this->mMessage = nullptr;
@@ -146,8 +146,7 @@ namespace rpc
 
     void OuterClient::CloseSocket()
 	{
-		if(!this->mSocket->IsOpen())
-		{
+		if(this->mClose) {
 			return;
 		}
 		this->StopTimer();
@@ -170,6 +169,7 @@ namespace rpc
 			}
 		});
 #endif
+		this->mClose = true;
 		this->mSocket->Close();
 	}
 

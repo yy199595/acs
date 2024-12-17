@@ -9,7 +9,7 @@ namespace rpc
 {
 	InnerClient::InnerClient(int id, Component* component, bool client, Asio::Context & io)
 			: Client(rpc::InnerBufferMaxSize), mSockId(id), mComponent(component),
-			  mIsClient(client), mDecodeStatus(tcp::Decode::None), mMainContext(io)
+			  mIsClient(client), mDecodeStatus(tcp::Decode::None), mMainContext(io), mClose(false)
 	{
 
 	}
@@ -126,10 +126,10 @@ namespace rpc
 
 	void InnerClient::CloseSocket()
 	{
-		if (!this->mSocket->IsOpen())
-		{
+		if(this->mClose) {
 			return;
 		}
+		long count = this->shared_from_this().use_count();
 		this->mDecodeStatus = tcp::Decode::None;
 		if (this->mComponent == nullptr)
 		{
@@ -166,6 +166,7 @@ namespace rpc
 			}
 		});
 #endif
+		this->mClose = true;
 		this->mSocket->Close();
 	}
 
@@ -178,6 +179,7 @@ namespace rpc
 		std::shared_ptr<Client> self = this->shared_from_this();
 		asio::post(this->mMainContext, [self, this, code]()
 		{
+			long count = this->shared_from_this().use_count();
 			this->mComponent->OnClientError(this->mSockId, code);
 		});
 #endif

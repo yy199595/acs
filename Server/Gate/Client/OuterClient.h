@@ -33,6 +33,7 @@ namespace rpc
 		void OnSendMessage(const asio::error_code &code) final;
 	private:
 		int mSockId;
+		bool mClose;
 		int mDecodeState;
 		unsigned int mMaxQps;
 		long long mLastRecvTime;

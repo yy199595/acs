@@ -176,7 +176,7 @@ namespace acs
 		Asio::Context & io = this->mApp->GetContext();
 		std::shared_ptr<rpc::InnerClient> tcpClient = std::make_shared<rpc::InnerClient>(id, this, true, io);
 		{
-			tcpClient->StartReceive(socketProxy);
+			tcpClient->SetSocket(socketProxy);
 			this->mClients.emplace(id, tcpClient);
 		}
 		return tcpClient.get();
