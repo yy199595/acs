@@ -11,7 +11,6 @@ namespace rpc
 	OuterClient::OuterClient(int id, Component * component, Asio::Context & main)
 		: Client(rpc::OuterBufferMaxSize), mSockId(id), mMainContext(main), mClose(false)
 	{
-		this->mMaxQps = 0;
 		this->mMessage = nullptr;
 		this->mLastRecvTime = 0;
 		this->mComponent = component;
@@ -150,25 +149,11 @@ namespace rpc
 			return;
 		}
 		this->StopTimer();
-#ifdef ONLY_MAIN_THREAD
 		while(!this->mSendMessages.empty())
 		{
-			rpc::Packet * message = this->mSendMessages.front();
-			this->mComponent->OnSendFailure(this->mSockId, message);
+			delete this->mSendMessages.front();
 			this->mSendMessages.pop();
 		}
-#else
-		std::shared_ptr<Client> self = this->shared_from_this();
-		asio::post(this->mMainContext, [this, self]()
-		{
-			while(!this->mSendMessages.empty())
-			{
-				rpc::Packet * message = this->mSendMessages.front();
-				this->mComponent->OnSendFailure(this->mSockId, message);
-				this->mSendMessages.pop();
-			}
-		});
-#endif
 		this->mClose = true;
 		this->mSocket->Close();
 	}

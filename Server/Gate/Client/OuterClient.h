@@ -35,7 +35,6 @@ namespace rpc
 		int mSockId;
 		bool mClose;
 		int mDecodeState;
-		unsigned int mMaxQps;
 		long long mLastRecvTime;
 		Component * mComponent;
 		rpc::ProtoHead mProtoHead;
