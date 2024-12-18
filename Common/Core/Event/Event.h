@@ -15,8 +15,8 @@ namespace help
 	class EventFactory
 	{
 	public:
-		template<typename T>
-		static int Add(T * obj, void (T::*func)(Args ...)) {
+		template<typename T1>
+		static int Add(T1 * obj, void (T1::*func)(Args ...)) {
 			int id = mNumPool.Pop();
 			std::function<void(Args ...)> callback = [obj, func](Args ... args) {
 				(obj->*func)(args...);
