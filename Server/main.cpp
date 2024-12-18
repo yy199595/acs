@@ -171,12 +171,31 @@ void RegisterAll()
 	REGISTER_COMPONENT(MongoMgr);
 	REGISTER_COMPONENT(EventSystem);
 }
-
+#include "core/Ptr/CopyPtr.h"
 int main(int argc, char** argv)
 {
 #ifdef __OS_WIN__
 	//system("chcp 65001 > nul");
 #endif
+	long long t1 = help::Time::NowMil();
+	constexpr int count = 100000;
+	for (int i = 0; i < count; ++i)
+	{
+		custom::shared_ptr<rpc::Packet> message = custom::make_shared<rpc::Packet>();
+		custom::shared_ptr<rpc::Packet> self(message);
+	}
+	long long t2 = help::Time::NowMil();
+
+	for (int i = 0; i < count; ++i)
+	{
+		std::shared_ptr<rpc::Packet> message = std::make_shared<rpc::Packet>();
+		std::shared_ptr<rpc::Packet> self(message);
+	}
+	long long t3 = help::Time::NowMil();
+
+	printf("custom:%d std:%d\n", (int)(t2 - t1), (int)(t3 - t2));
+
+
 	int id = 0;
 	RegisterAll();
 	std::string path;

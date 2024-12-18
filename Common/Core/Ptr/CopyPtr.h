@@ -1,79 +1,117 @@
 #pragma once
-#include<memory>
-namespace custom
-{
+#include <iostream>
+#include <memory>
+#include <utility>
+
+namespace custom {
+
 	template<typename T>
-	class shared_ptr
-	{
+	class shared_ptr {
+	private:
+		struct ControlBlock {
+			T* mPtr;  // 指向对象的指针
+			int mRefCount;  // 引用计数
+
+			explicit ControlBlock(T* ptr)
+					: mPtr(ptr), mRefCount(1) {}
+		};
+
 	public:
-		shared_ptr() : mPtr(nullptr), mRefCount(nullptr) {}
+		// 默认构造函数
+		shared_ptr() : mControlBlock(nullptr) {}
 
+		// 构造函数，接收原始指针
 		explicit shared_ptr(T* ptr) {
-			mPtr = ptr;
-			mRefCount = new int(1);
+			mControlBlock = new ControlBlock(ptr);
 		}
 
+		// 拷贝构造函数
 		shared_ptr(const shared_ptr& other) {
-			mPtr = other.mPtr;
-			mRefCount = other.mRefCount;
-			(*mRefCount)++;
+			mControlBlock = other.mControlBlock;
+			if (mControlBlock) {
+				mControlBlock->mRefCount++;
+			}
 		}
 
+		// 移动构造函数
 		shared_ptr(shared_ptr&& other) noexcept {
-			mPtr = other.mPtr;
-			mRefCount = other.mRefCount;
-			other.mPtr = nullptr;
-			other.mRefCount = nullptr;
+			mControlBlock = other.mControlBlock;
+			other.mControlBlock = nullptr;
 		}
 
-		~shared_ptr() { reset(); }
+		// 析构函数
+		~shared_ptr() {
+			reset();
+		}
 
+		// 拷贝赋值运算符
 		shared_ptr& operator=(const shared_ptr& other) {
 			if (this != &other) {
 				reset();
-				mPtr = other.mPtr;
-				mRefCount = other.mRefCount;
-				(*mRefCount)++;
+				mControlBlock = other.mControlBlock;
+				if (mControlBlock) {
+					mControlBlock->mRefCount++;
+				}
 			}
 			return *this;
 		}
 
+		// 移动赋值运算符
 		shared_ptr& operator=(shared_ptr&& other) noexcept {
 			if (this != &other) {
 				reset();
-				mPtr = other.mPtr;
-				mRefCount = other.mRefCount;
-				other.mPtr = nullptr;
-				other.mRefCount = nullptr;
+				mControlBlock = other.mControlBlock;
+				other.mControlBlock = nullptr;
 			}
 			return *this;
 		}
 
-		T* operator->() { return mPtr; }
+		// 解引用运算符
+		T& operator*() const {
+			return *(mControlBlock->mPtr);
+		}
 
-		T& operator*() { return *mPtr; }
+		// 指针访问运算符
+		T* operator->() const {
+			return mControlBlock->mPtr;
+		}
 
+		// 重置 shared_ptr，减少引用计数
 		void reset() {
-			if (mRefCount != nullptr) {
-				(*mRefCount)--;
-				if (*mRefCount == 0) {
-					delete mPtr;
-					delete mRefCount;
+			if (mControlBlock) {
+				mControlBlock->mRefCount--;
+				if (mControlBlock->mRefCount == 0) {
+					delete mControlBlock->mPtr;
+					delete mControlBlock;
 				}
-				mPtr = nullptr;
-				mRefCount = nullptr;
+				mControlBlock = nullptr;
 			}
 		}
 
+		// 获取原始指针
+		T* get() const {
+			return mControlBlock ? mControlBlock->mPtr : nullptr;
+		}
+
+		// 判断指针是否有效
+		bool is_null() const {
+			return mControlBlock == nullptr;
+		}
+
+		// 获取引用计数
+		int use_count() const {
+			return mControlBlock ? mControlBlock->mRefCount : 0;
+		}
+
 	private:
-		T* mPtr;
-		int* mRefCount;
+		ControlBlock* mControlBlock;  // 控制块，包含指针和引用计数
 	};
 
-	template<typename T, typename ... Args>
-	inline shared_ptr<T> make_shared(Args && ... args)
-	{
+	// make_shared 工厂函数
+	template<typename T, typename... Args>
+	shared_ptr<T> make_shared(Args&&... args) {
 		shared_ptr<T> p(new T(std::forward<Args>(args)...));
-		return std::move(p);
+		return p;
 	}
-}
+
+} // namespace custom
