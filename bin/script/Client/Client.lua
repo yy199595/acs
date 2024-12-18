@@ -45,16 +45,16 @@ function Main:Awake()
 end
 
 function Main:OnUpdate()
-    --for i = 1, 10 do
-    --    for _, info in pairs(self.accounts) do
-    --        coroutine.start(self.Login, self, info)
-    --    end
-    --end
+    for i = 1, 10 do
+        for _, info in pairs(self.accounts) do
+            coroutine.start(self.Login, self, info)
+        end
+    end
 end
 
 function Main:Login(info)
     if info.count == 0 then
-        log.Debug("user(%s) start login", info.account)
+        --log.Debug("user(%s) start login", info.account)
         local response = http:Post(str_format("%s/account/login", HOST), info)
         if response == nil or response.data == nil then
             log.Error("account login failure")
@@ -66,6 +66,7 @@ function Main:Login(info)
             log.Error("user(%s) login [%s] time out", info.account, result.address)
         end)
         local code = client:Call("GateSystem.Login", result.token)
+        print(code)
         timer.Del(timerId)
         if code == XCode.Ok then
             info.client = client
