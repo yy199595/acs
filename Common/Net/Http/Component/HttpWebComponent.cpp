@@ -534,8 +534,8 @@ namespace acs
 			data->Add("success", this->mSuccessCount);
 			data->Add("failure", this->mFailureCount);
 			data->Add("sum", this->mNumPool.CurrentNumber());
-			data->Add("client", (int)this->mHttpClients.Size());
-			data->Add("wait", (int)(this->mWaitSockets.Size() + this->mHttpClients.Size()));
+			data->Add("client", (int)this->mHttpClients.size());
+			data->Add("wait", this->mHttpClients.size());
 		}
 	}
 }

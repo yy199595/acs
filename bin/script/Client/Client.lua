@@ -20,7 +20,7 @@ function Main:Awake()
     self.login_count = 0
     self.accounts = { }
     self.sessions = { }
-    timer.AddUpdate(200, self, "OnUpdate")
+   -- timer.AddUpdate(200, self, "OnUpdate")
     timer.AddUpdate(2000, function()
         local count = 0
         for _, player in ipairs(self.sessions) do
@@ -72,7 +72,7 @@ function Main:Login(info)
             info.count = info.count + 1
             table.insert(self.sessions, info)
             self.login_count = self.login_count + 1
-            log.Info("[%s] user(%s) login [%s] ok", self.login_count, info.account, result.address)
+            --log.Info("[%s] user(%s) login [%s] ok", self.login_count, info.account, result.address)
         else
             log.Error("user(%s) login [%s] fail", info.account)
         end

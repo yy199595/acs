@@ -16,7 +16,7 @@ namespace http
 }
 
 //允许同时处理多少个http请求
-#define MAX_HANDLE_HTTP_COUNT 100
+#define MAX_HANDLE_HTTP_COUNT 0
 namespace http
 {
 	class Content;
@@ -55,8 +55,7 @@ namespace acs
 		unsigned int mSuccessCount; //成功次数
 		unsigned int mFailureCount; //失败次数
         math::NumberPool<int> mNumPool;
-		custom::Queue<tcp::Socket *> mWaitSockets;
-		custom::HashMap<int, std::shared_ptr<http::SessionClient>> mHttpClients;
+		std::unordered_map<int, std::shared_ptr<http::SessionClient>> mHttpClients;
 	};
 }
 
