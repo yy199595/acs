@@ -23,6 +23,7 @@ namespace acs
 		bool LateAwake() final;
 		void OnClientError(int id, int code) final;
 		int Send(int id, rpc::Packet * message) final;
+		void OnSendFailure(int id, rpc::Packet *message) final;
 		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
 		void OnMessage(rpc::Packet *request, rpc::Packet *response) final;
 	private:

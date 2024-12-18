@@ -233,7 +233,7 @@ namespace acs
 
 #if RPC_PACKET_COUNTER == 1
 						size_t count = rpc::Packet::GetObjectCount();
-						if (count > 0)
+						if (count > 100)
 						{
 							LOG_WARN("rpc packet count:({})", count);
 						}

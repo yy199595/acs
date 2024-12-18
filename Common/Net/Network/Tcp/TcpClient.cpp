@@ -58,7 +58,7 @@ namespace tcp
 		{
 			if (code.value() != Asio::OK)
 			{
-				this->OnConnect(false, 1);
+				this->OnConnect(false, this->mConnectCount);
 				return;
 			}
 #ifdef __ENABLE_OPEN_SSL__

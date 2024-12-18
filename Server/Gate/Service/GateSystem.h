@@ -9,23 +9,21 @@
 #include"Rpc/Service/RpcService.h"
 namespace acs
 {
-	class GateSystem final : public RpcService, public ISecondUpdate
+	class GateSystem final : public RpcService
 	{
 	 public:
 		GateSystem();
 	 private:
 		int Ping(long long userId);
-		int Logout(long long userId);
 		int Login(const rpc::Packet & request);
+		int Logout(const rpc::Packet & request);
 	private:
 		bool Awake() final;
 		bool OnInit() final;
-		void OnDisConnect(long long id);
-		void OnSecondUpdate(int tick) final;
+	private:
+		bool AllotServer(std::vector<int> & servers);
 	 private:
-		long long mLastMemory;
 		class ActorComponent * mActorComponent;
-		class OuterNetComponent* mOuterComponent;
 	};
 
 }

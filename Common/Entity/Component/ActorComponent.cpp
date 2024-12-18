@@ -116,9 +116,8 @@ namespace acs
 
 	bool ActorComponent::DelActor(long long id)
 	{
-		if(id == this->mApp->GetId())
+		if(id == 0 || id == this->mApp->GetId())
 		{
-			LOG_WARN("try remove app:{}", id);
 			return false;
 		}
 		auto iter = this->mPlayers.find(id);
@@ -130,7 +129,6 @@ namespace acs
 			{
 				this->mLuaModule->Call(func, id);
 			}
-			delete iter->second;
 			this->mPlayers.erase(iter);
 			return true;
 		}
@@ -217,7 +215,7 @@ namespace acs
 		return server;
 	}
 
-	bool ActorComponent::AddPlayer(Player * player)
+	bool ActorComponent::AddPlayer(std::unique_ptr<Player> player)
 	{
 		long long playerId = player->GetId();
 		if(this->GetPlayer(playerId) != nullptr)
@@ -230,7 +228,7 @@ namespace acs
 		{
 			this->mLuaModule->Call(func, playerId);
 		}
-		this->mPlayers.emplace(playerId, player);
+		this->mPlayers.emplace(playerId, std::move(player));
 		return true;
 	}
 
@@ -368,7 +366,7 @@ namespace acs
 			return iter->second;
 		}
 		auto iter1 = this->mPlayers.find(id);
-		return iter1 != this->mPlayers.end() ? iter1->second : nullptr;
+		return iter1 != this->mPlayers.end() ? iter1->second.get() : nullptr;
 	}
 
 	Server* ActorComponent::GetServer(long long serverId)
@@ -380,6 +378,6 @@ namespace acs
 	Player* ActorComponent::GetPlayer(long long playerId)
 	{
 		auto iter1 = this->mPlayers.find(playerId);
-		return iter1 != this->mPlayers.end() ? iter1->second : nullptr;
+		return iter1 != this->mPlayers.end() ? iter1->second.get() : nullptr;
 	}
 }

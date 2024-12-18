@@ -46,22 +46,22 @@ namespace acs
 			case rpc::Type::Response:
 			{
 
-#ifdef __DEBUG__
-				std::string func;
-				int code = XCode::Ok;
-				long long startTime = 0;
-				message->GetHead().Get("code", code);
-				const rpc::Head& head = message->ConstTempHead();
-				if (head.Get(rpc::Header::func, func) && head.Get("t", startTime))
-				{
-					if (code != XCode::Ok)
-					{
-						long long nowTme = help::Time::NowMil();
-						const std::string error = CodeConfig::Inst()->GetDesc(code);
-						LOG_WARN("({}ms) call [{}] code:{}", nowTme - startTime, func, error);
-					}
-				}
-#endif
+//#ifdef __DEBUG__
+//				std::string func;
+//				int code = XCode::Ok;
+//				long long startTime = 0;
+//				message->GetHead().Get("code", code);
+//				const rpc::Head& head = message->ConstTempHead();
+//				if (head.Get(rpc::Header::func, func) && head.Get("t", startTime))
+//				{
+//					if (code != XCode::Ok)
+//					{
+//						long long nowTme = help::Time::NowMil();
+//						const std::string error = CodeConfig::Inst()->GetDesc(code);
+//						LOG_WARN("({}ms) call [{}] code:{}", nowTme - startTime, func, error);
+//					}
+//				}
+//#endif
 				code = this->mDispatch->OnMessage(message);
 				break;
 			}

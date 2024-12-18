@@ -11,7 +11,7 @@ SetMember(Chat, "count", 0)
 SetMember(Chat, "players", { })
 
 function Chat:OnLogin(userId)
-    log.Debug("玩家%d登录聊天服务", userId)
+    --log.Debug("玩家%d登录聊天服务", userId)
     redis:Run("HSET", "player.chat", userId, os.time())
     mongo:InsertOnce("player.chat", { _id = userId, time = os.time() })
 end

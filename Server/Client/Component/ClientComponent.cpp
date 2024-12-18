@@ -68,6 +68,18 @@ namespace acs
 		luaRegister.End("net.client");
 	}
 
+	void ClientComponent::OnSendFailure(int id, rpc::Packet* message)
+	{
+		if(message->GetType() == rpc::Type::Request && message->GetRpcId() > 0)
+		{
+			message->SetType(rpc::Type::Response);
+			message->GetHead().Add(rpc::Header::code, XCode::SendMessageFail);
+			this->OnMessage(message, nullptr);
+			return;
+		}
+		delete message;
+	}
+
 	void ClientComponent::OnMessage(rpc::Packet* message, rpc::Packet* response)
 	{
 		int code = XCode::Failure;

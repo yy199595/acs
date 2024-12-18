@@ -29,9 +29,6 @@ namespace rpc
 		void Close();
 		bool Send(rpc::Packet * message);
 		void StartReceive(tcp::Socket * socket);
-	public:
-		size_t GetWaitSendCount() const { return this->mSendMessages.size(); }
-		size_t GetWaitResponseCount() const { return this->mWaitResMessages.size(); }
 	 private:
 		void CloseSocket();
 		void CloseSocket(int code);

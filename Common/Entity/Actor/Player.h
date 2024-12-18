@@ -11,10 +11,12 @@ namespace acs
 	class Player : public Actor
 	{
 	public:
-		Player(long long playerId, int gate);
+		Player(long long playerId, int gate, int sockId);
 	public:
-		int GetGateID() const { return this->mGateId; }
+		inline int GetGateID() const { return this->mGateId; }
+		inline int GetClientID() const { return this->mSockId; }
 	public:
+		void Logout();
 		bool OnInit() final;
 		void EncodeToJson(std::string *json) final;
 		bool DelAddr(const std::string & server);
@@ -26,6 +28,7 @@ namespace acs
 		int Make(const std::string &func, std::unique_ptr<rpc::Packet> &request) const final;
 	private:
 		int mGateId;
+		int mSockId;
 		class ActorComponent * mActorComponent;
 		std::unordered_map<std::string, int> mServerAddrs;
 	};

@@ -6,6 +6,7 @@
     },
     "GateSystem.Login": {
         "Async": true,
+        "Auth": false,
         "IsClient": true
     },
     "GateSystem.Logout": {

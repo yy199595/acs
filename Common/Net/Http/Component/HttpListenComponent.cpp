@@ -43,11 +43,10 @@ namespace acs
 	void HttpListenComponent::StartClose(int id, int code)
 	{
 		std::shared_ptr<http::SessionClient> handlerClient;
-		if (!this->mHttpClients.Get(id, handlerClient))
+		if (this->mHttpClients.Del(id, handlerClient))
 		{
-			return;
+			handlerClient->StartClose(code);
 		}
-		handlerClient->StartClose(code);
 	}
 
 	bool HttpListenComponent::ReadMessageBody(int id)
@@ -75,8 +74,7 @@ namespace acs
 	void HttpListenComponent::OnClientError(int id, int code)
 	{
 		//LOG_WARN("close sock id => {}", id);
-		std::shared_ptr<http::SessionClient> handlerClient;
-		if (!this->mHttpClients.Del(id, handlerClient))
+		if (!this->mHttpClients.Del(id))
 		{
 			LOG_ERROR("not find http client : {} code = {}", id, code);
 			return;

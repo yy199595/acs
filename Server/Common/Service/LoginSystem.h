@@ -22,7 +22,6 @@ namespace acs
 	private:
 		std::vector<ILogin *> mLoginComponents;
 		class ActorComponent * mActorComponent;
-		class MasterComponent * mMasterComponent;
 	};
 }
 

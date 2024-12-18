@@ -24,6 +24,7 @@ namespace acs
 		char Proto;
 		char Forward;	//转发策略 0固定转发，1随机转发到某一个机器
 		bool IsOpen;
+		bool IsAuth;
         bool IsDebug;
 		bool IsClient;  //是否能被客户端调用
 		bool SendToClient;	//消息是否发送到客户端

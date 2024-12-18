@@ -26,7 +26,7 @@ namespace acs
 		Server * GetServer(long long serverId);
 		bool HasServer(const std::string & name) const;
 	public:
-		bool AddPlayer(Player * player);
+		bool AddPlayer(std::unique_ptr<Player> player);
 		bool AddServer(Server * server);
 		size_t GetServers(std::vector<int>& servers);
 		size_t GetServers(const std::string &name, std::vector<int>& servers);
@@ -51,7 +51,7 @@ namespace acs
 	private:
 		Lua::LuaModule* mLuaModule;
 		std::unordered_map<long long, Server *> mServers;
-		std::unordered_map<long long, Player *> mPlayers;
+		std::unordered_map<long long, std::unique_ptr<Player>> mPlayers;
 		std::unordered_map<std::string, std::vector<long long>> mActorNames;
 	};
 }

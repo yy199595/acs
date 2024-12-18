@@ -6,13 +6,11 @@
 #include"Entity/Actor/App.h"
 #include"Core/Event/IEvent.h"
 #include"Lua/Module/LuaModule.h"
-#include"Master/Component/MasterComponent.h"
 namespace acs
 {
 	LoginSystem::LoginSystem()
 	{
 		this->mActorComponent = nullptr;
-		this->mMasterComponent = nullptr;
 	}
 
 	bool LoginSystem::OnInit()
@@ -21,61 +19,55 @@ namespace acs
 		BIND_SERVER_RPC_METHOD(LoginSystem::Logout);
 		this->mApp->GetComponents(this->mLoginComponents);
 		this->mActorComponent = this->GetComponent<ActorComponent>();
-		this->mMasterComponent = this->GetComponent<MasterComponent>();
 		return true;
 	}
 
     int LoginSystem::Login(long long id, const s2s::login::request & request)
 	{
+		int gateId = (int)id;
+		int sockId = request.client_id();
 		long long playerId = request.user_id();
-		Player * player = this->mActorComponent->GetPlayer(playerId);
-		if(player == nullptr)
+		if(this->mActorComponent->GetPlayer(playerId) == nullptr)
 		{
-			player = new Player(playerId, (int)id);
-			this->mActorComponent->AddPlayer(player);
-		}
-		for(const auto & actorInfo : request.actors())
-		{
-			int actorId = actorInfo.second;
-			const std::string & name = actorInfo.first;
-			if(!this->mActorComponent->HasServer(actorId))
+			std::unique_ptr<Player> player = std::make_unique<Player>(playerId, gateId, sockId);
 			{
-				if(!this->mMasterComponent->SyncServer(actorId))
+				for (int index = 0; index < request.list_size(); index++)
 				{
-					LOG_ERROR("not find server : {}", actorId);
-					return XCode::NotFoundServerRpcAddress;
+					const auto& serverInfo = request.list(index);
+					player->AddAddr(serverInfo.name(), serverInfo.id());
 				}
 			}
-			player->AddAddr(name, actorId);
+			this->mActorComponent->AddPlayer(std::move(player));
 		}
-
 		Lua::LuaModule * luaModule = this->GetLuaModule();
 		if(luaModule != nullptr && luaModule->HasFunction("OnLogin"))
 		{
 			luaModule->Await("OnLogin", playerId);
 		}
-
-		help::PlayerLoginEvent::Trigger(playerId);
+		help::PlayerLoginEvent::Trigger(playerId, sockId);
 		return XCode::Ok;
 	}
 
     int LoginSystem::Logout(long long id, const s2s::logout::request& request)
     {
 		long long playerId = request.user_id();
-    	this->mActorComponent->DelActor(playerId);
+		Player * player = this->mActorComponent->GetPlayer(playerId);
+		if(player == nullptr)
+		{
+			return XCode::NotFindUser;
+		}
 		for(ILogin * loginComponent : this->mLoginComponents)
 		{
 			loginComponent->OnLogout(playerId);
 		}
-
 		Lua::LuaModule * luaModule = this->GetLuaModule();
 		if(luaModule != nullptr && luaModule->HasFunction("OnLogout"))
 		{
 			luaModule->Await("OnLogout", playerId);
 		}
-
-
-		help::PlayerLogoutEvent::Trigger(playerId);
+		int sockId = player->GetClientID();
+		this->mActorComponent->DelActor(playerId);
+		help::PlayerLogoutEvent::Trigger(playerId, sockId);
 		return XCode::Ok;
     }
 }

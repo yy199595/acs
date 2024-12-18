@@ -11,7 +11,7 @@
 #include"Util/Tools/NumberBuilder.h"
 namespace help
 {
-	template<typename ... Args>
+	template<typename T, typename ... Args>
 	class EventFactory
 	{
 	public:
@@ -52,9 +52,9 @@ namespace help
 		static std::unordered_map<int, std::function<void(Args ...)>> mEvents;
 	};
 
-	template<typename ... Args>
-	help::NumberBuilder<int, 1> EventFactory<Args...>::mNumPool;
-	template<typename ... Args>
-	std::unordered_map<int, std::function<void(Args ...)>> EventFactory<Args...>::mEvents;
+	template<typename T, typename ... Args>
+	help::NumberBuilder<int, 1> EventFactory<T, Args...>::mNumPool;
+	template<typename T, typename ... Args>
+	std::unordered_map<int, std::function<void(Args ...)>> EventFactory<T, Args...>::mEvents;
 }
 #endif //APP_EVENT_H

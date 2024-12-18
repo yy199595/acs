@@ -21,25 +21,20 @@ namespace rpc
 
 namespace acs
 {
-	class OuterNetComponent final : public Component, public ITcpListen, public ISecondUpdate,
+	class OuterNetComponent final : public Component, public ITcpListen,
 									public IRpc<rpc::Packet, rpc::Packet>, public IServerRecord
 	{
 	 public:
 		OuterNetComponent();
 		~OuterNetComponent() final = default;
-	 public:
+	public:
+		void Broadcast(rpc::Packet * message);
 		void StartClose(int id, int code) final;
 	public:
-		bool StopClient(long long userId);
-		void Broadcast(rpc::Packet * message);
-		bool AddPlayer(long long userId, int sockId);
-	public:
 		bool SendBySockId(int id, rpc::Packet * message);
-		bool SendByPlayerId(long long playerId, rpc::Packet * message);
 	private:
 		bool LateAwake() final;
-		void OnSecondUpdate(int tick) final;
-		int OnRequest(long long playerId, rpc::Packet * message);
+		int OnRequest(rpc::Packet * message);
 	private:
 		void OnClientError(int id, int code) final;
 		void OnSendFailure(int id, rpc::Packet *message) final;
@@ -48,15 +43,15 @@ namespace acs
 		bool OnListen(tcp::Socket * socket) final;
 		void OnRecord(json::w::Document & document) final;
 	private:
+		void OnPlayerLogin(long long userId, int sockId);
+		void OnPlayerLogout(long long userId, int sockId);
+	private:
 		int mWaitCount;
 		int mMaxConnectCount;
-
 		math::NumberPool<int> mNumPool;
 		class RouterComponent * mRouter;
 		math::NumberPool<int> mSocketPool;
 		class ActorComponent * mActComponent;
-		custom::HashMap<int, long long> mAddressUserMap;  //fd和玩家id的映射表
-		custom::HashMap<long long, int> mUserAddressMap; //验证过的客户端
 		custom::Queue<rpc::Packet *> mBroadCastMessages; //广播消息
 		std::unordered_map<int, std::shared_ptr<rpc::OuterClient>> mGateClientMap;
 		//std::unordered_map<int, std::unique_ptr<rpc::InnerClient>> mForwardClientMap;

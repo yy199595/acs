@@ -62,18 +62,19 @@ function Main:Login(info)
         end
         local result = response.data
         local client = Session(result.address)
-        local timerId = timer.Add(2000, function()
-            log.Error("user(%s) login [%s] time out", info.account, result.address)
-        end)
+        --local timerId = timer.Add(2000, function()
+        --    log.Error("user(%s) login [%s] time out", info.account, result.address)
+        --end)
         local code = client:Call("GateSystem.Login", result.token)
-        print(code)
-        timer.Del(timerId)
+       -- timer.Del(timerId)
         if code == XCode.Ok then
             info.client = client
             info.count = info.count + 1
             table.insert(self.sessions, info)
             self.login_count = self.login_count + 1
-            log.Warning("[%s] user(%s) login [%s] ok", self.login_count, info.account, result.address)
+            log.Info("[%s] user(%s) login [%s] ok", self.login_count, info.account, result.address)
+        else
+            log.Error("user(%s) login [%s] fail", info.account)
         end
     end
     if info.count > 0 then
@@ -86,11 +87,9 @@ function Main:Login(info)
                 message = "hello world"
             })
             info.count = info.count + 4
-            print(code1, code2, code3, code4)
-            log.Info("user(%s) call count:%s", info.account, info.count)
+           -- log.Info("user(%s) call count:%s", info.account, info.count)
         end
-        info.client:Call("GateSystem.Logout")
-
+        --info.client:Call("GateSystem.Logout")
         info.client:Close()
         info.count = 0
     end

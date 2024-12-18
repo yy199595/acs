@@ -177,15 +177,15 @@ namespace acs
 		{
 			return XCode::NetWorkError;
 		}
-		long long userId = 0;
-		if (!message->GetHead().Get(rpc::Header::player_id, userId))
+		int sockId = 0;
+		if (!message->GetHead().Get(rpc::Header::client_sock_id, sockId))
 		{
 			LOG_ERROR("not find userid forward to client fail");
 			return XCode::CallArgsError;
 		}
 		message->SetType(rpc::Type::Request);
-		message->GetHead().Del(rpc::Header::player_id);
-		this->mOuterComponent->SendByPlayerId(userId, message);
+		message->GetHead().Del(rpc::Header::client_sock_id);
+		this->mOuterComponent->SendBySockId(sockId, message);
 		return XCode::Ok;
 	}
 

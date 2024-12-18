@@ -88,6 +88,7 @@ namespace acs
 				methodConfig->Timeout = 0;
 				methodConfig->IsDebug = false;
 				methodConfig->IsOpen = true;
+				methodConfig->IsAuth = true;
 				methodConfig->Method = func;
 				methodConfig->IsAsync = false;
 				methodConfig->IsRecord = false;
@@ -136,7 +137,7 @@ namespace acs
 			{
 				methodConfig->Proto = rpc::Porto::None;
 			}
-
+			value->Get("Auth", methodConfig->IsAuth);
 			value->Get("Async", methodConfig->IsAsync);
 			value->Get("IsOpen", methodConfig->IsOpen);
 			value->Get("Record", methodConfig->IsRecord);

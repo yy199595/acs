@@ -9,13 +9,13 @@
 #include"Server/Config/ServerConfig.h"
 #include"Rpc/Component/InnerNetComponent.h"
 #include "Util/Tools/TimeHelper.h"
+#include "s2s/s2s.pb.h"
 
 namespace acs
 {
-	Player::Player(long long playerId, int gateId)
-		: Actor(playerId, "Player")
+	Player::Player(long long playerId, int gate, int sockId)
+		: Actor(playerId, "PLayer"), mGateId(gate), mSockId(sockId)
 	{
-		this->mGateId = gateId;
 		this->mActorComponent = App::ActorMgr();
 	}
 
@@ -27,6 +27,20 @@ namespace acs
 			return false;
 		}
 		return true;
+	}
+
+	void Player::Logout()
+	{
+		for (auto iter = this->mServerAddrs.begin(); iter != this->mServerAddrs.end(); iter++)
+		{
+			s2s::logout::request request;
+			request.set_user_id(this->GetId());
+			Server* server = this->mActorComponent->GetServer(iter->second);
+			if (server != nullptr)
+			{
+				server->Send("LoginSystem.Logout", request);
+			}
+		}
 	}
 
 	bool Player::DelAddr(const std::string& server)
@@ -50,7 +64,7 @@ namespace acs
 		if(iter == this->mServerAddrs.end() || iter->second != id)
 		{
 			this->mServerAddrs[server] = id;
-			LOG_DEBUG("player {} add [{}] id: {}", this->GetId(), server, id);
+			//LOG_DEBUG("player {} add [{}] id: {}", this->GetId(), server, id);
 		}
 	}
 
@@ -112,6 +126,7 @@ namespace acs
 				message->SetSockId(this->mGateId);
 				message->SetNet(methodConfig->Net);
 				message->SetType(rpc::Type::Client);
+				message->GetHead().Add(rpc::Header::client_sock_id, this->mSockId);
 			}
 			else
 			{

@@ -9,7 +9,7 @@
 namespace rpc
 {
 	OuterClient::OuterClient(int id, Component * component, Asio::Context & main)
-		: Client(rpc::OuterBufferMaxSize), mSockId(id), mMainContext(main), mClose(false)
+		: Client(rpc::OuterBufferMaxSize), mSockId(id), mMainContext(main), mClose(false), mPlayerId(0)
 	{
 		this->mMessage = nullptr;
 		this->mLastRecvTime = 0;
@@ -56,7 +56,7 @@ namespace rpc
 		long long nowTime = help::Time::NowSec();
 		if(nowTime - this->mLastRecvTime >= 30)
 		{
-
+			this->CloseSocket(XCode::NetTimeout);
 		}
 	}
 
@@ -126,6 +126,9 @@ namespace rpc
 		rpc::Packet* request = this->mMessage.release();
 		{
 			request->SetSockId(this->mSockId);
+			request->GetHead().Add(rpc::Header::player_id, this->mPlayerId);
+			request->GetHead().Add(rpc::Header::rpc_id, request->GetRpcId());
+			request->GetHead().Add(rpc::Header::client_sock_id, this->mSockId);
 		}
 #ifdef __DEBUG__
 		request->TempHead().Add(rpc::Header::from_addr, this->mSocket->GetAddress());
@@ -140,7 +143,9 @@ namespace rpc
 #endif
 		this->mDecodeState = tcp::Decode::None;
 		this->mLastRecvTime = help::Time::NowSec();
-		this->ReadLength(rpc::RPC_PACK_HEAD_LEN);
+		Asio::Context & context = this->mSocket->GetContext();
+		std::shared_ptr<Client> that = this->shared_from_this();
+		asio::post(context, [this, that] { this->ReadLength(rpc::RPC_PACK_HEAD_LEN); });
 	}
 
     void OuterClient::CloseSocket()
@@ -158,28 +163,46 @@ namespace rpc
 		this->mSocket->Close();
 	}
 
+	void OuterClient::SendFirstMessage()
+	{
+		if (!this->mSendMessages.empty())
+		{
+			this->Write(*this->mSendMessages.front());
+		}
+	}
+
 	void OuterClient::CloseSocket(int code)
 	{
-		this->CloseSocket();
+		if(!this->mClose)
+		{
+			this->CloseSocket();
 #ifdef ONLY_MAIN_THREAD
-		this->mComponent->OnClientError(this->mSockId, code);
-#else
-		std::shared_ptr<Client> self = this->shared_from_this();
-		asio::post(this->mMainContext, [this, self, code]() {
 			this->mComponent->OnClientError(this->mSockId, code);
-		});
+#else
+			std::shared_ptr<Client> self = this->shared_from_this();
+			asio::post(this->mMainContext, [this, self, code]() {
+				this->mComponent->OnClientError(this->mSockId, code);
+			});
 #endif
+		}
 	}
 
 	void OuterClient::OnSendMessage()
 	{
-		if(!this->mSendMessages.empty())
+		if (!this->mSendMessages.empty())
 		{
-			this->mSendMessages.pop();
-			if(!this->mSendMessages.empty())
+			rpc::Packet* message = this->mSendMessages.front();
+			if (message->GetType() == rpc::Type::Response)
 			{
-				this->Write(*this->mSendMessages.front());
+				if(message->GetCode() == XCode::CloseSocket)
+				{
+					this->CloseSocket(XCode::CloseSocket);
+					return;
+				}
 			}
+			delete message;
+			this->mSendMessages.pop();
+			this->SendFirstMessage();
 		}
 	}
 
@@ -190,15 +213,12 @@ namespace rpc
 
 	bool OuterClient::Send(rpc::Packet* message)
 	{
-		if(this->mSocket == nullptr)
-		{
-			return false;
-		}
 		LOG_CHECK_RET_FALSE(message);
 #ifdef ONLY_MAIN_THREAD
 		this->Write(*message);
 #else
-		asio::post(this->mSocket->GetContext(), [this, message]
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(this->mSocket->GetContext(), [this, self, message]
 		{
 			this->mSendMessages.emplace(message);
 			if(this->mSendMessages.size() == 1)

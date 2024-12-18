@@ -1,13 +1,22 @@
 syntax = "proto3";
 package s2s;
 
+message server
+{
+    message info
+    {
+        int32 id = 1;
+        string name = 2;
+    }
+}
+
 message login
 {
     message request
     {
         int64 user_id = 1;
-        string gate_addr = 2;
-        map<string, int32> actors = 3;
+        int32 client_id = 2;
+        repeated server.info list = 3;
     }
 }
 

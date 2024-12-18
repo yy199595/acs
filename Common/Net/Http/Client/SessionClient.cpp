@@ -14,15 +14,16 @@ namespace http
 
 	}
 
+	SessionClient::~SessionClient() noexcept = default;
+
 	void SessionClient::StartReceiveBody()
 	{
 #ifdef ONLY_MAIN_THREAD
 		this->ReadSome();
 #else
-		Asio::Socket& sock = this->mSocket->Get();
-		const Asio::Executor& exec = sock.get_executor();
-		asio::post(exec, [this]
-		{ this->ReadSome(5); });
+		Asio::Context & context = this->mSocket->GetContext();
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(context, [this, self] { this->ReadSome(5); });
 #endif
 	}
 
@@ -32,10 +33,9 @@ namespace http
 #ifdef ONLY_MAIN_THREAD
 		this->ReadSome();
 #else
-		Asio::Socket& sock = this->mSocket->Get();
-		const Asio::Executor& exec = sock.get_executor();
-		asio::post(exec, [this]
-		{ this->ReadSome(5); });
+		Asio::Context & context = this->mSocket->GetContext();
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(context, [this, self] { this->ReadSome(5); });
 #endif
 	}
 
@@ -51,10 +51,9 @@ namespace http
 #ifdef ONLY_MAIN_THREAD
 		this->ReadLine(timeout);
 #else
-		Asio::Socket& sock = this->mSocket->Get();
-		const Asio::Executor& exec = sock.get_executor();
-		asio::post(exec, [this, timeout, &sock]
-		{ this->ReadLine(timeout); });
+		Asio::Context & context = this->mSocket->GetContext();
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(context, [this, timeout, self] { this->ReadLine(timeout); });
 #endif
 	}
 
@@ -65,8 +64,8 @@ namespace http
 #else
 		Asio::Socket& sock = this->mSocket->Get();
 		const Asio::Executor& exec = sock.get_executor();
-		asio::post(exec, [this, code]
-		{ this->ClosetClient(code); });
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(exec, [this, code, self] { this->ClosetClient(code); });
 #endif
 	}
 
@@ -123,8 +122,8 @@ namespace http
 #ifdef ONLY_MAIN_THREAD
 		this->Write(this->mResponse);
 #else
-		Asio::Socket& sock = this->mSocket->Get();
-		asio::post(sock.get_executor(), [this]
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(this->mSocket->GetContext(), [this, self]
 		{
 			this->Write(this->mResponse);
 		});
@@ -207,7 +206,8 @@ namespace http
 #ifdef ONLY_MAIN_THREAD
 			this->mComponent->OnMessage(&this->mRequest, &this->mResponse);
 #else
-			asio::post(this->mMainContext, [this, req = &this->mRequest, res = &this->mResponse]
+			std::shared_ptr<Client> self = this->shared_from_this();
+			asio::post(this->mMainContext, [this, self, req = &this->mRequest, res = &this->mResponse]
 			{
 				this->mComponent->OnMessage(req, res);
 			});
@@ -274,9 +274,12 @@ namespace http
 
 	void SessionClient::Clear()
 	{
-		this->mPath = this->mRequest.GetUrl().Path();
+		const http::Url & url = this->mRequest.GetUrl();
+
+		this->mPath = url.Path();
 		this->mPath.append("&");
-		this->mPath.append(this->mRequest.GetUrl().GetQuery().ToStr());
+		this->mPath.append(url.GetQuery().ToStr());
+
 		this->StopTimer();
 		this->ClearBuffer();
 		this->mRequest.Clear();
@@ -291,6 +294,15 @@ namespace http
 			return;
 		}
 		this->Clear();
+#ifdef ONLY_MAIN_THREAD
+		this->mComponent->OnClientError(sockId, code);
+#else
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(this->mMainContext, [this, self, sockId, code]()
+		{
+			this->mComponent->OnClientError(sockId, code);
+		});
+#endif
 		this->mSocket->Close();
 		this->mRequest.SetSockId(0);
 	}

@@ -7,15 +7,16 @@
 
 
 #include"Event.h"
-
+#define DEFINE_STATIC_EVENT(name, ...) struct name : public help::EventFactory<name, __VA_ARGS__> {}
 namespace help
 {
-	struct InnerLogoutEvent : public help::EventFactory<int> {};
-	struct OuterLogoutEvent : public help::EventFactory<long long> {};
-	struct PlayerLoginEvent : public help::EventFactory<long long> {};
-	struct PlayerLogoutEvent : public help::EventFactory<long long> {};
-	struct HttpPushTokenEvent : public help::EventFactory<std::string> { };
+	DEFINE_STATIC_EVENT(InnerLogoutEvent, int);
+	DEFINE_STATIC_EVENT(PlayerLoginEvent, long long, int);
+	DEFINE_STATIC_EVENT(PlayerLogoutEvent, long long, int);
 }
+
+
+
 
 
 #endif //APP_IEVENT_H
