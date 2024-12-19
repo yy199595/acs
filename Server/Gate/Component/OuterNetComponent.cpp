@@ -45,7 +45,7 @@ namespace acs
 			iter->second->BindPlayer(userId);
 			os::System::GetSystemInfo(systemInfo);
 			double mb = (double )systemInfo.use_memory / (1024 * 1024.0f);
-			LOG_DEBUG("[{}] user({}) login ok => {:.3f}", this->mGateClientMap.size(), userId, mb);
+			LOG_DEBUG("[{}] user({}) login ok => {:.3f}MB", this->mGateClientMap.size(), userId, mb);
 		}
 	}
 
