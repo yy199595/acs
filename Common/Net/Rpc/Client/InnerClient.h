@@ -7,18 +7,6 @@ using namespace tcp;
 
 namespace rpc
 {
-	struct AuthInfo
-	{
-	public:
-		int id;
-		std::string user;
-		std::string passwd;
-		std::string local; //本机地址
-	};
-}
-
-namespace rpc
-{
 	class InnerClient : public tcp::Client
 #ifdef __SHARE_PTR_COUNTER__
 			, public memory::Object<InnerClient>

@@ -247,8 +247,9 @@ namespace acs
 							size_t count3 = rpc::OuterClient::GetObjectCount();
 							size_t count4 = http::SessionClient::GetObjectCount();
 							size_t count5 = http::RequestClient::GetObjectCount();
-							LOG_DEBUG("[{:.3f}MB] message:{} inner:{} outer:{} session:{} request:{}",
-									mb, count1, count2, count3, count4, count5)
+							size_t count6 = this->mActorComponent->GetPlayerCount();
+							LOG_DEBUG("[{:.3f}MB] message:{} inner:{} outer:{} session:{} request:{} "
+									  "player:{}", mb, count1, count2, count3, count4, count5, count6)
 						}
 #endif
 						this->mTickCount++;

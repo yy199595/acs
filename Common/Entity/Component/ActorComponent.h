@@ -26,9 +26,12 @@ namespace acs
 		Server * GetServer(long long serverId);
 		bool HasServer(const std::string & name) const;
 	public:
-		bool AddPlayer(std::unique_ptr<Player> player);
+		inline size_t GetPlayerCount() const { return this->mPlayers.size(); }
+		inline size_t GetServerCount() const { return this->mServers.size(); }
+	public:
 		bool AddServer(Server * server);
 		size_t GetServers(std::vector<int>& servers);
+		bool AddPlayer(std::unique_ptr<Player> player);
 		size_t GetServers(const std::string &name, std::vector<int>& servers);
 		bool GetListen(int id, const std::string & name, std::string & addr);
 	public:
