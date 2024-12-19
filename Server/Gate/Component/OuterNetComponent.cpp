@@ -11,7 +11,7 @@
 #include"Entity/Actor/Player.h"
 #include"Core/Event/IEvent.h"
 #include"Router/Component/RouterComponent.h"
-
+#include "Core/System/System.h"
 namespace acs
 {
 	OuterNetComponent::OuterNetComponent()
@@ -41,8 +41,11 @@ namespace acs
 		auto iter = this->mGateClientMap.find(sockId);
 		if(iter != this->mGateClientMap.end())
 		{
+			os::SystemInfo systemInfo;
 			iter->second->BindPlayer(userId);
-			LOG_DEBUG("[{}] user({}) login ok", this->mGateClientMap.size(), userId);
+			os::System::GetSystemInfo(systemInfo);
+			double mb = (double )systemInfo.use_memory / (1024 * 1024.0f);
+			LOG_DEBUG("[{}] user({}) login ok => {:.3f}", this->mGateClientMap.size(), userId, mb);
 		}
 	}
 

@@ -6,8 +6,8 @@ local Module = require("Module")
 local Session = require("Session")
 local http = require("HttpComponent")
 
---local HOST = "http://43.143.239.75:80"
-local HOST = "http://127.0.0.1:8088"
+local HOST = "http://43.143.239.75:80"
+--local HOST = "http://127.0.0.1:8088"
 local COUNT = os.getenv("APP_COUNT") or 1
 local Main = Module()
 
@@ -20,7 +20,7 @@ function Main:Awake()
     self.login_count = 0
     self.accounts = { }
     self.sessions = { }
-   -- timer.AddUpdate(200, self, "OnUpdate")
+    timer.AddUpdate(1000, self, "OnUpdate")
     timer.AddUpdate(2000, function()
         local count = 0
         for _, player in ipairs(self.sessions) do
@@ -70,11 +70,13 @@ function Main:Login(info)
         if code == XCode.Ok then
             info.client = client
             info.count = info.count + 1
+            info.max_count = math.random(500, 10000)
+
             table.insert(self.sessions, info)
             self.login_count = self.login_count + 1
             --log.Info("[%s] user(%s) login [%s] ok", self.login_count, info.account, result.address)
         else
-            log.Error("user(%s) login [%s] fail", info.account)
+            log.Error("user(%s) login [%s] fail", info.account, result.address)
         end
     end
     if info.count > 0 then
@@ -89,9 +91,12 @@ function Main:Login(info)
             info.count = info.count + 4
            -- log.Info("user(%s) call count:%s", info.account, info.count)
         end
+        if info.count >= info.max_count then
+            info.client:Close()
+            info.count = 0
+        end
         --info.client:Call("GateSystem.Logout")
-        info.client:Close()
-        info.count = 0
+
     end
 
 end
