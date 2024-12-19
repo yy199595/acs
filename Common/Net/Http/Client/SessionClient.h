@@ -14,6 +14,9 @@
 namespace http
 {
 	class SessionClient final : public tcp::Client
+#ifdef __SHARE_PTR_COUNTER__
+			, public memory::Object<SessionClient>
+#endif
 	{
 	 public:
 		typedef acs::IRpc<Request, Response> Component;

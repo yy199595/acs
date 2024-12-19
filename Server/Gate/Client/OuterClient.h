@@ -12,6 +12,9 @@ namespace rpc
 {
     // 网关session
  	class OuterClient final : public tcp::Client
+#ifdef __SHARE_PTR_COUNTER__
+			, public memory::Object<OuterClient>
+#endif
 	{
 	 public:
 		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;

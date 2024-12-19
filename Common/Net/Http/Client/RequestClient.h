@@ -13,6 +13,9 @@
 namespace http
 {
 	class RequestClient : public tcp::Client
+#ifdef __SHARE_PTR_COUNTER__
+			, public memory::Object<RequestClient>
+#endif
 	{
 	 public:
 		typedef acs::IRpc<Request, Response> Component;

@@ -20,6 +20,9 @@ namespace rpc
 namespace rpc
 {
 	class InnerClient : public tcp::Client
+#ifdef __SHARE_PTR_COUNTER__
+			, public memory::Object<InnerClient>
+#endif
 	{
 	 public:
 		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;

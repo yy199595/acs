@@ -11,8 +11,7 @@
 #include"Proto/Message/IProto.h"
 #include"Yyjson/Document/Document.h"
 
-#define RPC_PACKET_COUNTER 1
-#if RPC_PACKET_COUNTER == 1
+#ifdef __SHARE_PTR_COUNTER__
 #include "Core/Memory/MemoryObject.h"
 #endif
 namespace rpc
@@ -31,8 +30,8 @@ namespace rpc
 	};
 
 	class Packet : public tcp::IProto
-#if RPC_PACKET_COUNTER == 1
-	, public memory::Object
+#ifdef __SHARE_PTR_COUNTER__
+	, public memory::Object<Packet>
 #endif
 	{
 	public:

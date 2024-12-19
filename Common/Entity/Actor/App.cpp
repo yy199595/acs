@@ -24,6 +24,14 @@
 #include "Cluster/Config/ClusterConfig.h"
 
 #endif
+
+#ifdef __SHARE_PTR_COUNTER__
+#include "Rpc/Client/InnerClient.h"
+#include "Gate/Client/OuterClient.h"
+#include "Http/Client/RequestClient.h"
+#include "Http/Client/SessionClient.h"
+#endif
+
 namespace acs
 {
 	App::App(int id, ServerConfig& config) :
@@ -231,11 +239,16 @@ namespace acs
 						this->Hotfix();
 #endif
 
-#if RPC_PACKET_COUNTER == 1
-						size_t count = rpc::Packet::GetObjectCount();
-						if (count > 100)
+#ifdef __SHARE_PTR_COUNTER__
+						if(this->mTickCount % 3 == 0)
 						{
-							LOG_WARN("rpc packet count:({})", count);
+							size_t count1 = rpc::Packet::GetObjectCount();
+							size_t count2 = rpc::InnerClient::GetObjectCount();
+							size_t count3 = rpc::OuterClient::GetObjectCount();
+							size_t count4 = http::SessionClient::GetObjectCount();
+							size_t count5 = http::RequestClient::GetObjectCount();
+							LOG_DEBUG("[{:.3f}MB] message:{} inner:{} outer:{} session:{} request:{}",
+									mb, count1, count2, count3, count4, count5)
 						}
 #endif
 						this->mTickCount++;

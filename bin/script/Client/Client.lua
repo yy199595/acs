@@ -6,8 +6,8 @@ local Module = require("Module")
 local Session = require("Session")
 local http = require("HttpComponent")
 
-local HOST = "http://43.143.239.75:80"
---local HOST = "http://127.0.0.1:8088"
+--local HOST = "http://43.143.239.75:80"
+local HOST = "http://127.0.0.1:8088"
 local COUNT = os.getenv("APP_COUNT") or 1
 local Main = Module()
 
