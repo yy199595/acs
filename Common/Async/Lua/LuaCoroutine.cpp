@@ -65,7 +65,7 @@ namespace Lua
 
 		const int size = lua_gettop(lua);  // 获取当前栈的大小
 		lua_xmove(lua, coroutine, size - 1);  // 将除去函数外的其他参数移动到协程栈
-		Coroutine::Resume(coroutine, lua, size - 1);
+		//Coroutine::Resume(coroutine, lua, size - 1);
 		return 1;
 	}
 
@@ -86,17 +86,18 @@ namespace Lua
 					size_t size = 0;
 					const char* err = lua_tolstring(lua, -1, &size);
 					std::string errorMsg(err, size);
-
 					// 记录错误信息
 					std::unique_ptr<custom::LogInfo> logInfo = std::make_unique<custom::LogInfo>();
-					logInfo->Level = custom::LogLevel::Error;
-					logInfo->Content = "Error during coroutine resume: " + errorMsg;
-					Debug::Log(std::move(logInfo));
+					{
+						logInfo->Level = custom::LogLevel::Error;
+						logInfo->Content = "Error during coroutine resume: " + errorMsg;
+						Debug::Log(std::move(logInfo));
+					}
 					lua_pop(lua, 1);
 				}
 				if (ret > 0)
 				{
-					lua_pop(lua, ret);
+					lua_pop(cor, ret);
 				}
 				break;
 			}
@@ -104,5 +105,6 @@ namespace Lua
 			LOG_ERROR("coroutine status:{}", code);
 				break;
 		}
+		lua_settop(cor, 0);
 	}
 }

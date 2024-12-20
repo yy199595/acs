@@ -96,8 +96,9 @@ end
 function Main:OnComplete()
 
     for _, info in pairs(self.accounts) do
-        local cor = coroutine.create(self.Login)
-        coroutine.resume(cor, self, info)
+        --local cor = coroutine.create(self.Login)
+        --coroutine.resume(cor, self, info)
+        coroutine.start(self.Login, self, info)
     end
 end
 
