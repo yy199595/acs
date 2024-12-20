@@ -17,18 +17,19 @@ namespace udp
 
 	void Client::Send(tcp::IProto* message)
 	{
-		asio::post(this->mContext, [this, message]()
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(this->mContext, [self, message]()
 		{
-			std::ostream stream(&this->mSendBuffer);
+			std::ostream stream(&self->mSendBuffer);
 			int length = message->OnSendMessage(stream);
-			this->mSocket.async_send_to(this->mSendBuffer.data(), this->mRemoteEndpoint,
-					[this, length, message](const asio::error_code& code, size_t size)
+			self->mSocket.async_send_to(self->mSendBuffer.data(), self->mRemoteEndpoint,
+					[self, length, message](const asio::error_code& code, size_t size)
 					{
 						if (code.value() != Asio::OK)
 						{
 							return;
 						}
-						this->mSendBuffer.consume(size);
+						self->mSendBuffer.consume(size);
 						//unsigned short port = this->mRemoteEndpoint.port();
 						//std::string ip = this->mRemoteEndpoint.address().to_string();
 						//CONSOLE_LOG_ERROR("send:({}:{}) size:{}", ip, port, size);
@@ -38,20 +39,21 @@ namespace udp
 
 	void Client::StartReceive()
 	{
+		std::shared_ptr<Client> self = this->shared_from_this();
 		this->mSocket.async_receive_from(this->mRecvBuffer.prepare(udp::BUFFER_COUNT),
-				this->mLocalEndpoint, [this](const asio::error_code& code, size_t size)
+				this->mLocalEndpoint, [self](const asio::error_code& code, size_t size)
 				{
 					if (code.value() == Asio::OK)
 					{
-						this->mRecvBuffer.commit(size);
-						unsigned short port = this->mLocalEndpoint.port();
-						std::string ip = this->mLocalEndpoint.address().to_string();
+						self->mRecvBuffer.commit(size);
+						unsigned short port = self->mLocalEndpoint.port();
+						std::string ip = self->mLocalEndpoint.address().to_string();
 						std::string address = fmt::format("{}:{}", ip, port);
 
-						this->OnReceive(address, size);
-						this->mRecvBuffer.consume(size);
+						self->OnReceive(address, size);
+						self->mRecvBuffer.consume(size);
 					}
-					asio::post(this->mSocket.get_executor(), [this] { this->StartReceive(); });
+					asio::post(self->mSocket.get_executor(), [self] { self->StartReceive(); });
 				});
 	}
 
@@ -67,7 +69,8 @@ namespace udp
 				{
 					rpcPacket->SetNet(rpc::Net::Udp);
 					rpcPacket->TempHead().Add(rpc::Header::udp_addr, address);
-					asio::post(this->mMainContext, [this, msg = rpcPacket.release()] { this->mComponent->OnMessage(msg, msg); });
+					std::shared_ptr<Client> self = this->shared_from_this();
+					asio::post(this->mMainContext, [self, msg = rpcPacket.release()] { self->mComponent->OnMessage(msg, msg); });
 				}
 			}
 		}

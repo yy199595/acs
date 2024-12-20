@@ -4,6 +4,8 @@
 
 #ifndef APP_MEMORYOBJECT_H
 #define APP_MEMORYOBJECT_H
+
+#ifdef __SHARE_PTR_COUNTER__
 #include<string>
 #include<mutex>
 #include<unordered_set>
@@ -62,6 +64,6 @@ namespace memory
 	std::unordered_set<Object<T>*> Object<T>::sObjects;
 }
 
-
+#endif
 
 #endif //APP_MEMORYOBJECT_H

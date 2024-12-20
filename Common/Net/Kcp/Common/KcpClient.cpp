@@ -14,6 +14,7 @@ namespace kcp
 			: mContext(io), mComponent(component), mSocket(io, asio_udp::endpoint(asio_udp::v4(), 0)),
 			 mRemoteEndpoint(remote), mTimer(io), mSendStream(&mSendBuffer), mMainContext(main)
 	{
+		this->mDecodeBuffer.fill(0);
 		this->mKcp = ikcp_create(0x01, this);
 		this->mKcp->output = kcp::OnKcpSend;
 		ikcp_wndsize(this->mKcp, kcp::BUFFER_COUNT, kcp::BUFFER_COUNT);
@@ -22,26 +23,31 @@ namespace kcp
 
 	void Client::Send(const char* buf, int len)
 	{
-		asio::error_code code;
-		this->mSocket.send_to(asio::buffer(buf, len), this->mRemoteEndpoint, 0, code);
-		if(code.value() != Asio::OK)
+		std::shared_ptr<Client> self = this->shared_from_this();
+		this->mSocket.async_send(asio::buffer(buf, len), [self](const asio::error_code & code, size_t)
 		{
-			unsigned short port = this->mLocalEndpoint.port();
-			const std::string ip = this->mLocalEndpoint.address().to_string();
-			LOG_ERROR("kcp send [{}:{}] =>{}", ip, port, code.message());
-		}
+			if(code.value() != Asio::OK)
+			{
+				unsigned short port = self->mLocalEndpoint.port();
+				const std::string ip = self->mLocalEndpoint.address().to_string();
+				LOG_ERROR("kcp send [{}:{}] =>{}", ip, port, code.message());
+			}
+		});
+		//asio::error_code code;
+		//this->mSocket.send_to(asio::buffer(buf, len), this->mRemoteEndpoint, 0, code);
 	}
 
 	void Client::Send(tcp::IProto* message)
 	{
-		asio::post(this->mContext, [this, message]()
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(this->mContext, [self, message]()
 		{
-			message->OnSendMessage(this->mSendStream);
-			const int len = (int)this->mSendBuffer.size();
-			const char* msg = asio::buffer_cast<const char*>(this->mSendBuffer.data());
+			message->OnSendMessage(self->mSendStream);
+			const int len = (int)self->mSendBuffer.size();
+			const char* msg = asio::buffer_cast<const char*>(self->mSendBuffer.data());
 			{
-				ikcp_send(this->mKcp, msg, len);
-				this->mSendBuffer.consume(len);
+				ikcp_send(self->mKcp, msg, len);
+				self->mSendBuffer.consume(len);
 			}
 			delete message;
 		});
@@ -54,30 +60,31 @@ namespace kcp
 
 	void Client::StartReceive()
 	{
+		std::shared_ptr<Client> self = this->shared_from_this();
 		this->mSocket.async_receive_from(this->mReceiveBuffer.prepare(kcp::BUFFER_COUNT),
-				this->mLocalEndpoint, [this](const asio::error_code& code, size_t size)
+				this->mLocalEndpoint, [self](const asio::error_code& code, size_t size)
 				{
 					if (code.value() != Asio::OK)
 					{
 						CONSOLE_LOG_ERROR("code:{}", code.message())
 						return;
 					}
-					this->mReceiveBuffer.commit(size);
-					unsigned short port = this->mLocalEndpoint.port();
-					std::string ip = this->mLocalEndpoint.address().to_string();
+					self->mReceiveBuffer.commit(size);
+					unsigned short port = self->mLocalEndpoint.port();
+					std::string ip = self->mLocalEndpoint.address().to_string();
 
-					const char * msg = asio::buffer_cast<const char *>(this->mReceiveBuffer.data());
+					const char * msg = asio::buffer_cast<const char *>(self->mReceiveBuffer.data());
 
-					ikcp_input(this->mKcp, msg, (int)size);
-					int messageLen = ikcp_recv(this->mKcp, this->mDecodeBuffer.data(), kcp::BUFFER_COUNT);
+					ikcp_input(self->mKcp, msg, (int)size);
+					int messageLen = ikcp_recv(self->mKcp, self->mDecodeBuffer.data(), kcp::BUFFER_COUNT);
 					//CONSOLE_LOG_DEBUG("client receive message : {}", messageLen);
 					if(messageLen > 0)
 					{
 						const std::string address = fmt::format("{}:{}", ip, port);
-						this->OnReceive(address, this->mDecodeBuffer.data(), messageLen);
+						self->OnReceive(address, self->mDecodeBuffer.data(), messageLen);
 					}
-					this->mReceiveBuffer.consume(size);
-					asio::post(this->mContext, [this] { this->StartReceive(); });
+					self->mReceiveBuffer.consume(size);
+					asio::post(self->mContext, [self] { self->StartReceive(); });
 				});
 	}
 

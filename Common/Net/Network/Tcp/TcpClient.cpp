@@ -54,26 +54,26 @@ namespace tcp
 		Asio::EndPoint endPoint(address, port);
 		Asio::Socket& sock = this->mSocket->Get();
 		std::shared_ptr<Client> self = this->shared_from_this();
-		sock.async_connect(endPoint, [this, self](const Asio::Code& code)
+		sock.async_connect(endPoint, [self](const Asio::Code& code)
 		{
 			if (code.value() != Asio::OK)
 			{
-				this->OnConnect(false, this->mConnectCount);
+				self->OnConnect(false, self->mConnectCount);
 				return;
 			}
 #ifdef __ENABLE_OPEN_SSL__
-			if (this->mSocket != nullptr && this->mSocket->IsOpenSsl())
+			if (self->mSocket != nullptr && self->mSocket->IsOpenSsl())
 			{
-				this->mSocket->SslSocket().async_handshake(asio::ssl::stream_base::client,
-						[this](const asio::error_code& err)
+				self->mSocket->SslSocket().async_handshake(asio::ssl::stream_base::client,
+						[self](const asio::error_code& err)
 						{
-							this->OnConnect(err.value() == Asio::OK, this->mConnectCount);
+							self->OnConnect(err.value() == Asio::OK, self->mConnectCount);
 						});
 				return;
 			}
 #endif
-			this->mConnectCount = 0;
-			this->OnConnect(code.value() == Asio::OK, this->mConnectCount);
+			self->mConnectCount = 0;
+			self->OnConnect(code.value() == Asio::OK, self->mConnectCount);
 		});
 	}
 
@@ -105,19 +105,18 @@ namespace tcp
 			return;
 		}
 		std::shared_ptr<Client> self = this->shared_from_this();
-		asio::async_connect(sock, iterator, [this, iterator, self]
+		asio::async_connect(sock, iterator, [iterator, self]
 				(const asio::error_code& code, const Asio::Resolver::iterator& iter)
 		{
-			this->mConnectCount++;
+			self->mConnectCount++;
 			if (code.value() != Asio::OK)
 			{
 				return;
 			}
 #ifdef __ENABLE_OPEN_SSL__
-			if (this->mSocket && this->mSocket->IsOpenSsl())
+			if (self->mSocket && self->mSocket->IsOpenSsl())
 			{
-				std::shared_ptr<Client> self = this->shared_from_this();
-				this->mSocket->SslSocket().async_handshake(asio::ssl::stream_base::client,
+				self->mSocket->SslSocket().async_handshake(asio::ssl::stream_base::client,
 						[self](const asio::error_code& err)
 						{
 							//CONSOLE_LOG_FATAL("{}", err.message())
@@ -126,8 +125,8 @@ namespace tcp
 				return;
 			}
 #endif
-			this->mConnectCount = 0;
-			this->OnConnect(code.value() == Asio::OK, 0);
+			self->mConnectCount = 0;
+			self->OnConnect(code.value() == Asio::OK, 0);
 		});
 	}
 
@@ -135,22 +134,22 @@ namespace tcp
 	{
 		this->StartTimer(timeout, TimeoutFlag::ReadCount);
 		std::shared_ptr<Client> self = this->shared_from_this();
-		auto callBack = [this, self](const asio::error_code& code, size_t size)
+		auto callBack = [self](const asio::error_code& code, size_t size)
 		{
-			std::istream ss(&this->mRecvBuffer);
+			std::istream ss(&self->mRecvBuffer);
 			if (code.value() == Asio::OK)
 			{
-				this->OnReceiveMessage(ss, size, code);
+				self->OnReceiveMessage(ss, size, code);
 				return;
 			}
-			if (this->mRecvBuffer.size() > 0)
+			if (self->mRecvBuffer.size() > 0)
 			{
-				size = this->mRecvBuffer.size();
-				this->OnReceiveMessage(ss, size, code);
+				size = self->mRecvBuffer.size();
+				self->OnReceiveMessage(ss, size, code);
 			}
 			if (code != asio::error::operation_aborted)
 			{
-				this->OnReadError(code);
+				self->OnReadError(code);
 			}
 		};
 
@@ -170,23 +169,23 @@ namespace tcp
 	{
 		this->StartTimer(timeout, TimeoutFlag::ReadLine);
 		std::shared_ptr<Client> self = this->shared_from_this();
-		auto callback = [this, self](const Asio::Code& code, size_t size)
+		auto callback = [self](const Asio::Code& code, size_t size)
 		{
-			std::istream ss(&this->mRecvBuffer);
+			std::istream ss(&self->mRecvBuffer);
 			if (code.value() == Asio::OK)
 			{
-				this->OnReceiveLine(ss, size);
+				self->OnReceiveLine(ss, size);
 				return;
 			}
-			if (this->mRecvBuffer.size() > 0)
+			if (self->mRecvBuffer.size() > 0)
 			{
-				size = this->mRecvBuffer.size();
-				this->OnReceiveLine(ss, size);
+				size = self->mRecvBuffer.size();
+				self->OnReceiveLine(ss, size);
 				return;
 			}
 			if (code != asio::error::operation_aborted)
 			{
-				this->OnReadError(code);
+				self->OnReadError(code);
 			}
 		};
 
@@ -214,22 +213,22 @@ namespace tcp
 		}
 		this->StartTimer(timeout, TimeoutFlag::ReadSome);
 		std::shared_ptr<Client> self = this->shared_from_this();
-		auto callBack = [this, self](const asio::error_code& code, size_t size)
+		auto callBack = [self](const asio::error_code& code, size_t size)
 		{
-			std::istream ss(&this->mRecvBuffer);
+			std::istream ss(&self->mRecvBuffer);
 			if (code.value() == Asio::OK)
 			{
-				this->OnReceiveMessage(ss, size, code);
+				self->OnReceiveMessage(ss, size, code);
 				return;
 			}
-			if (this->mRecvBuffer.size() > 0)
+			if (self->mRecvBuffer.size() > 0)
 			{
-				size = this->mRecvBuffer.size();
-				this->OnReceiveMessage(ss, size, code);
+				size = self->mRecvBuffer.size();
+				self->OnReceiveMessage(ss, size, code);
 			}
 			if (code != asio::error::operation_aborted)
 			{
-				this->OnReadError(code);
+				self->OnReadError(code);
 			}
 		};
 #ifdef __ENABLE_OPEN_SSL__
@@ -267,18 +266,18 @@ namespace tcp
 		}
 		this->StartTimer(timeout, TimeoutFlag::ReadCount);
 		std::shared_ptr<Client> self = this->shared_from_this();
-		auto callBack = [this, self, length](const asio::error_code& code, size_t size)
+		auto callBack = [self, length](const asio::error_code& code, size_t size)
 		{
-			std::istream ss(&this->mRecvBuffer);
+			std::istream ss(&self->mRecvBuffer);
 			if (code.value() == Asio::OK)
 			{
-				this->OnReceiveMessage(ss, size, code);
+				self->OnReceiveMessage(ss, size, code);
 				return;
 			}
 			//this->OnReceiveMessage(ss, size);
 			if (code != asio::error::operation_aborted)
 			{
-				this->OnReadError(code);
+				self->OnReadError(code);
 			}
 		};
 
@@ -300,19 +299,19 @@ namespace tcp
 		int length = message.OnSendMessage(os);
 		this->StartTimer(timeout, TimeoutFlag::Write);
 		std::shared_ptr<Client> self = this->shared_from_this();
-		auto callBack = [this, self, length, &message](const Asio::Code& code, size_t size)
+		auto callBack = [self, length, &message](const Asio::Code& code, size_t size)
 		{
 			if (code.value() != Asio::OK)
 			{
-				this->OnSendMessage(code);
+				self->OnSendMessage(code);
 				return;
 			}
 			if (length > 0)
 			{
-				this->Write(message, 0);
+				self->Write(message, 0);
 				return;
 			}
-			this->OnSendMessage();
+			self->OnSendMessage();
 		};
 
 #ifdef __ENABLE_OPEN_SSL__
@@ -484,8 +483,9 @@ namespace tcp
 		{
 			asio::error_code code;
 			this->mTimer->cancel(code);
-			this->mTimer = nullptr;
+			this->mTimer.reset();
 		}
+		this->StopUpdate();
 	}
 
 	void Client::StopUpdate()
@@ -494,7 +494,7 @@ namespace tcp
 		{
 			asio::error_code code;
 			this->mUpdateTimer->cancel(code);
-			this->mUpdateTimer = nullptr;
+			this->mUpdateTimer.reset();
 		}
 	}
 
@@ -506,34 +506,38 @@ namespace tcp
 			const Asio::Executor& executor = sock.get_executor();
 			this->mUpdateTimer = std::make_unique<Asio::Timer>(executor);
 		}
+		std::shared_ptr<Client> self = this->shared_from_this();
 		this->mUpdateTimer->expires_after(std::chrono::seconds(timeout));
-		this->mUpdateTimer->async_wait([this, timeout](const Asio::Code& code)
+		this->mUpdateTimer->async_wait([self, timeout](const Asio::Code& code)
 		{
 			if (code.value() == Asio::OK)
 			{
-				this->OnUpdate();
+				self->OnUpdate();
 			}
 			if (code == asio::error::operation_aborted)
 			{
 				return;
 			}
-			this->StartUpdate(timeout);
+			self->StartUpdate(timeout);
 		});
 	}
 
 	void Client::StartTimer(int timeout, TimeoutFlag flag)
 	{
 		if (timeout <= 0) return;
-		Asio::Socket& sock = this->mSocket->Get();
-		const Asio::Executor& executor = sock.get_executor();
-		this->mTimer = std::make_unique<Asio::Timer>(executor);
+		if(this->mTimer == nullptr)
+		{
+			Asio::Socket& sock = this->mSocket->Get();
+			const Asio::Executor& executor = sock.get_executor();
+			this->mTimer = std::make_unique<Asio::Timer>(executor);
+		}
 		std::shared_ptr<Client> self = this->shared_from_this();
 		this->mTimer->expires_after(std::chrono::seconds(timeout));
-		this->mTimer->async_wait([this, self, timeout, flag](const Asio::Code& code)
+		this->mTimer->async_wait([self, timeout, flag](const Asio::Code& code)
 		{
 			if (code.value() == Asio::OK)
 			{
-				this->OnTimeout(flag);
+				self->OnTimeout(flag);
 			}
 		});
 	};

@@ -7,7 +7,7 @@
 
 namespace udp
 {
-	class Client : public IClient
+	class Client : public IClient, public std::enable_shared_from_this<Client>
 	{
 	public:
 		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;
