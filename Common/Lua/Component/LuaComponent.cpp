@@ -225,6 +225,7 @@ namespace acs
 		if(lua_pcall(this->mLuaEnv, 1, 1, 0) != LUA_OK)
 		{
 			LOG_ERROR("{}", lua_tostring(this->mLuaEnv, -1));
+			lua_pop(this->mLuaEnv, 1);
 			return nullptr;
 		}
 
@@ -372,6 +373,7 @@ namespace acs
 		if (lua_pcall(this->mLuaEnv, 1, 1, 0) != LUA_OK)
 		{
 			LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+			lua_pop(this->mLuaEnv, 1);
 			return 0;
 		}
 		return start - this->GetMemorySize();
@@ -386,6 +388,7 @@ namespace acs
 		if (lua_pcall(this->mLuaEnv, 1, 1, 0) != LUA_OK)
 		{
 			LOG_ERROR(lua_tostring(this->mLuaEnv, -1));
+			lua_pop(this->mLuaEnv, 1);
 			return 0;
 		}
 		return lua_tonumber(this->mLuaEnv, -1);

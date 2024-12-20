@@ -80,6 +80,7 @@ namespace Lua
         if (lua_pcall(lua, 1, 1, 0) != 0)
         {
             LOG_ERROR(lua_tostring(lua, -1));
+			lua_pop(lua, 1);
             return nullptr;
         }
         return PtrProxy<WaitLuaTaskSource>::Read(lua, -1);
@@ -109,6 +110,7 @@ namespace Lua
 		if (lua_pcall(lua, 1, 1, 0) != 0)
 		{
 			LOG_ERROR(lua_tostring(lua, -1));
+			lua_pop(lua, 1);
 			return nullptr;
 		}
 		return PtrProxy<WaitLuaTaskSource>::Read(lua, -1);
@@ -133,6 +135,7 @@ namespace Lua
         if (lua_pcall(lua, 1, 1, 0) != 0)
         {
             LOG_ERROR(lua_tostring(lua, -1));
+			lua_pop(lua, 1);
             return nullptr;
         }
         return PtrProxy<WaitLuaTaskSource>::Read(lua, -1);
@@ -151,6 +154,7 @@ namespace Lua
 		if (lua_pcall(lua, 1, 1, 0) != 0)
 		{
 			LOG_ERROR(lua_tostring(lua, -1));
+			lua_pop(lua, 1);
 			return nullptr;
 		}
 		return PtrProxy<WaitLuaTaskSource>::Read(lua, -1);

@@ -50,6 +50,7 @@ namespace Lua
 					if (lua_pcall(lua, sizeof...(Args), 1, 0) != 0)
 					{
 						printf("[lua error ] : %s", lua_tostring(lua, -1));
+						lua_pop(lua, 1);
 					}
 					return Parameter::Read<Ret>(lua, -1);
 				};

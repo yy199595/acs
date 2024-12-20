@@ -40,6 +40,8 @@ namespace acs
 	{
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
         Lua::Coroutine::Resume(lua_tothread(this->mLua, -1), this->mLua, 0);
+		luaL_unref(this->mLua, LUA_REGISTRYINDEX, this->mRef);
+		this->mRef = 0;
 	}
 
 	void LuaWaitTaskSource::SetResult(int code, rpc::Packet * response)
@@ -84,5 +86,7 @@ namespace acs
 			}
 		}
 		Lua::Coroutine::Resume(coroutine, this->mLua, count);
+		luaL_unref(this->mLua, LUA_REGISTRYINDEX, this->mRef);
+		this->mRef = 0;
 	}
 }

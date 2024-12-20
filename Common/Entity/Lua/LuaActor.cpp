@@ -6,7 +6,6 @@
 #include "Lua/Component/LuaComponent.h"
 #include "Cluster/Config/ClusterConfig.h"
 #include "Proto/Component/ProtoComponent.h"
-#include"Cluster/Component/LaunchComponent.h"
 
 namespace acs
 {

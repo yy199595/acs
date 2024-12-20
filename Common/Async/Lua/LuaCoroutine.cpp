@@ -11,13 +11,14 @@ namespace Lua
 {
 	bool Coroutine::IsRunning(lua_State* lua)
 	{
-        if(lua == nullptr)
+		if (lua == nullptr)
 		{
 			return false;
 		}
 		int top = lua_gettop(lua);
 		return top == 1 && lua_isthread(lua, 1);
 	}
+
 	int Coroutine::Sleep(lua_State* lua)
 	{
 		static TimerComponent* timerComponent = nullptr;
@@ -38,7 +39,7 @@ namespace Lua
 		}
 		lua_pushthread(lua);
 		int ms = (int)luaL_checkinteger(lua, 1);
-		LuaWaitTaskSource * luaRpcTaskSource = new LuaWaitTaskSource(lua);
+		LuaWaitTaskSource* luaRpcTaskSource = new LuaWaitTaskSource(lua);
 		timerComponent->DelayCall(ms, [luaRpcTaskSource]()
 		{
 			luaRpcTaskSource->SetResult();
@@ -49,48 +50,59 @@ namespace Lua
 
 	int Coroutine::Start(lua_State* lua)
 	{
-		if(!lua_isfunction(lua, 1))
+		// 确保传入的参数是一个函数
+		if (!lua_isfunction(lua, 1))
 		{
-			luaL_error(lua, "parameter must function");
+			luaL_error(lua, "parameter must be a function");
 			return 0;
 		}
-		lua_State* coroutine = lua_newthread(lua);
-		lua_pushvalue(lua, 1);
-		lua_xmove(lua, coroutine, 1);
-		lua_replace(lua, 1);
 
-		const int size = lua_gettop(lua);
-		lua_xmove(lua, coroutine, size - 1);
-        Coroutine::Resume(coroutine, lua, size -1);
+		// 创建新的协程
+		lua_State* coroutine = lua_newthread(lua);
+
+		lua_pushvalue(lua, 1);
+		lua_xmove(lua, coroutine, 1);  // 将函数从主栈移动到协程栈
+
+		const int size = lua_gettop(lua);  // 获取当前栈的大小
+		lua_xmove(lua, coroutine, size - 1);  // 将除去函数外的其他参数移动到协程栈
+		Coroutine::Resume(coroutine, lua, size - 1);
 		return 1;
 	}
 
-    void Coroutine::Resume(lua_State *cor, lua_State *lua, int args)
-    {
+	void Coroutine::Resume(lua_State* cor, lua_State* lua, int args)
+	{
 		int ret = 0;
-        int code = lua_resume(cor, lua, args, &ret);
-        if(code != LUA_OK && code != LUA_YIELD)
-        {
-			size_t size = 0;
-			const char * str = lua_tolstring(lua, -1, &size);
-			std::unique_ptr<custom::LogInfo> logInfo = std::make_unique<custom::LogInfo>();
+		int code = lua_status(cor);
+		switch (lua_status(cor))
+		{
+			case LUA_OK:
+			LOG_ERROR("Coroutine already finished.");
+				break;
+			case LUA_YIELD:
 			{
-				std::string error(str, size);
-				size_t pos = error.find(".lua");
-				logInfo->Level = custom::LogLevel::Error;
-				if(pos != std::string::npos)
+				code = lua_resume(cor, lua, args, &ret);
+				if (code != LUA_OK && code != LUA_YIELD)
 				{
-					logInfo->Content.append(str, size);
-				}
-				else
-				{
-					std::string path = Lua::LuaDebugStack::GetCurrentStack(cor);
-					logInfo->Content.append(path);
-					logInfo->Content.append(str, size);
-				}
+					size_t size = 0;
+					const char* err = lua_tolstring(lua, -1, &size);
+					std::string errorMsg(err, size);
 
-				Debug::Log(std::move(logInfo));
+					// 记录错误信息
+					std::unique_ptr<custom::LogInfo> logInfo = std::make_unique<custom::LogInfo>();
+					logInfo->Level = custom::LogLevel::Error;
+					logInfo->Content = "Error during coroutine resume: " + errorMsg;
+					Debug::Log(std::move(logInfo));
+					lua_pop(lua, 1);
+				}
+				if (ret > 0)
+				{
+					lua_pop(lua, ret);
+				}
+				break;
 			}
-        }
-    }
+			default:
+			LOG_ERROR("coroutine status:{}", code);
+				break;
+		}
+	}
 }

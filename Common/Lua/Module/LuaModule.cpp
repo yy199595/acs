@@ -133,6 +133,7 @@ namespace Lua
 			return;
 		}
 		error.assign(str);
+		lua_pop(this->mLua, 1);
 	}
 
 	void LuaModule::OnCallError(const std::string & func)

@@ -20,7 +20,7 @@ function Main:Awake()
     self.login_count = 0
     self.accounts = { }
     self.sessions = { }
-    timer.AddUpdate(1000, self, "OnUpdate")
+    --timer.AddUpdate(1000, self, "OnUpdate")
     timer.AddUpdate(2000, function()
         local count = 0
         for _, player in ipairs(self.sessions) do
@@ -74,37 +74,30 @@ function Main:Login(info)
 
             table.insert(self.sessions, info)
             self.login_count = self.login_count + 1
-            --log.Info("[%s] user(%s) login [%s] ok", self.login_count, info.account, result.address)
+            log.Info("[%s] user(%s) login [%s] ok", self.login_count, info.account, result.address)
         else
             log.Error("user(%s) login [%s] fail", info.account, result.address)
+            return
         end
     end
-    if info.count > 0 then
-        for i = 1, 10 do
-            local code1 = info.client:Call("GateSystem.Ping")
-            local code2 = info.client:Call("ChatSystem.Ping")
-            local code3 = info.client:Call("ChatSystem.OnPing")
-            local code4 = info.client:Call("ChatSystem.OnChat", {
-                msg_type = math.random(0, 3),
-                message = "hello world"
-            })
-            info.count = info.count + 4
-           -- log.Info("user(%s) call count:%s", info.account, info.count)
-        end
-        if info.count >= info.max_count then
-            info.client:Close()
-            info.count = 0
-        end
-        --info.client:Call("GateSystem.Logout")
-
+    while true do
+        coroutine.sleep(200)
+        local code1 = info.client:Call("GateSystem.Ping")
+        local code2 = info.client:Call("ChatSystem.Ping")
+        local code3 = info.client:Call("ChatSystem.OnPing")
+        local code4 = info.client:Call("ChatSystem.OnChat", {
+            msg_type = math.random(0, 3),
+            message = "hello world"
+        })
+        print(code1, code2, code3, code4)
     end
-
 end
 
 function Main:OnComplete()
 
     for _, info in pairs(self.accounts) do
-        coroutine.start(self.Login, self, info)
+        local cor = coroutine.create(self.Login)
+        coroutine.resume(cor, self, info)
     end
 end
 

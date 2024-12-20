@@ -35,7 +35,6 @@ namespace acs
 
 	int LuaClient::Call(lua_State* l)
 	{
-        lua_pushthread(l);
 		std::unique_ptr<rpc::Packet> message;
 		int sessionId = (int)luaL_checkinteger(l, 1);
 		const std::string func = luaL_checkstring(l, 2);
@@ -50,6 +49,7 @@ namespace acs
 			lua_pushinteger(l, XCode::NetWorkError);
 			return 1;
 		}
+		lua_pushthread(l);
 		message->SetNet(rpc::Net::Client);
 		return router->LuaCall(l, sessionId, std::move(message));
 	}
