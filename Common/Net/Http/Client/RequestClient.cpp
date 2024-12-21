@@ -25,7 +25,8 @@ namespace http
 #else
 		Asio::Socket& sock = this->mSocket->Get();
 		const Asio::Executor& executor = sock.get_executor();
-		asio::post(executor, [this]
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(executor, [this, self]
 		{
 			const http::Url& url = this->mRequest->GetUrl();
 			this->Connect(url.Host(), url.Port(), this->mRequest->Timeout());
@@ -173,8 +174,8 @@ namespace http
 #ifdef ONLY_MAIN_THREAD
 		this->mComponent->OnMessage(request, response);
 #else
-		asio::post(this->mMainContext, [this, request, response]
-		{ this->mComponent->OnMessage(request, response); });
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(this->mMainContext, [this, self, request, response] { this->mComponent->OnMessage(request, response); });
 #endif
 	}
 
