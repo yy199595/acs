@@ -32,7 +32,7 @@ namespace acs
 
 	int Actor::Send(const std::string& func)
 	{
-		std::unique_ptr<rpc::Packet> message;
+		std::unique_ptr<rpc::Message> message;
 		int code = this->Make(func, message);
 		if(code != XCode::Ok)
 		{
@@ -45,7 +45,7 @@ namespace acs
 
 	int Actor::Send(const std::string& func, const pb::Message& request)
 	{
-		std::unique_ptr<rpc::Packet> message;
+		std::unique_ptr<rpc::Message> message;
 		int code = this->Make(func, message);
 		if(code != XCode::Ok)
 		{
@@ -62,7 +62,7 @@ namespace acs
 
 	int Actor::Call(const std::string& func)
 	{
-		std::unique_ptr<rpc::Packet> message ;
+		std::unique_ptr<rpc::Message> message ;
 		int code = this->Make(func, message);
 		if(code != XCode::Ok)
 		{
@@ -70,13 +70,13 @@ namespace acs
 		}
 		int id = message->SockId();
 		this->mLastTime = help::Time::NowSec();
-		rpc::Packet * result = this->mRouterComponent->Call(id, std::move(message));
+		rpc::Message * result = this->mRouterComponent->Call(id, std::move(message));
 		return result != nullptr ? result->GetCode() : XCode::NetTimeout;
 	}
 	
 	int Actor::Call(const std::string& func, const pb::Message& request)
 	{
-		std::unique_ptr<rpc::Packet> message;
+		std::unique_ptr<rpc::Message> message;
 		int code = this->Make(func, message);
 		if(code != XCode::Ok)
 		{
@@ -88,20 +88,20 @@ namespace acs
 		}
 		int id = message->SockId();
 		this->mLastTime = help::Time::NowSec();
-		const rpc::Packet * result = this->mRouterComponent->Call(id, std::move(message));
+		const rpc::Message * result = this->mRouterComponent->Call(id, std::move(message));
 		return result != nullptr ? result->GetCode() : XCode::NetWorkError;
 	}
 
 	int Actor::Call(const std::string& func, pb::Message * response)
 	{
-		std::unique_ptr<rpc::Packet> message;
+		std::unique_ptr<rpc::Message> message;
 		int code = this->Make(func, message);
 		if(code != XCode::Ok)
 		{
 			return code;
 		}
 		int id = message->SockId();
-		rpc::Packet * result = this->mRouterComponent->Call(id, std::move(message));
+		rpc::Message * result = this->mRouterComponent->Call(id, std::move(message));
 		if(result == nullptr)
 		{
 			return XCode::NetTimeout;
@@ -116,14 +116,14 @@ namespace acs
 		return code;
 	}
 
-	int Actor::Call(std::unique_ptr<rpc::Packet> message)
+	int Actor::Call(std::unique_ptr<rpc::Message> message)
 	{
 		int id = 0;
 		if(!this->GetAddress(*message, id))
 		{
 			return XCode::NotFoundActorAddress;
 		}
-		rpc::Packet * result = this->mRouterComponent->Call(id, std::move(message));
+		rpc::Message * result = this->mRouterComponent->Call(id, std::move(message));
 		if(result == nullptr)
 		{
 			return XCode::NetTimeout;
@@ -133,7 +133,7 @@ namespace acs
 
 	int Actor::Call(const std::string& func, const pb::Message& request, pb::Message * response)
 	{
-		std::unique_ptr<rpc::Packet> message;
+		std::unique_ptr<rpc::Message> message;
 		int code = this->Make(func, message);
 		if (code != XCode::Ok)
 		{
@@ -144,7 +144,7 @@ namespace acs
 			return XCode::SerializationFailure;
 		}
 		int id = message->SockId();
-		rpc::Packet* result = this->mRouterComponent->Call(id, std::move(message));
+		rpc::Message* result = this->mRouterComponent->Call(id, std::move(message));
 		if (result == nullptr)
 		{
 			return XCode::NetTimeout;
@@ -158,7 +158,7 @@ namespace acs
 	}
 
 	int Actor::MakeMessage(lua_State* lua, int idx,
-		const std::string& func, std::unique_ptr<rpc::Packet> & message) const
+		const std::string& func, std::unique_ptr<rpc::Message> & message) const
 	{
 		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
 		if (methodConfig == nullptr)
@@ -215,14 +215,14 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	int Actor::LuaCall(lua_State* lua, std::unique_ptr<rpc::Packet> message)
+	int Actor::LuaCall(lua_State* lua, std::unique_ptr<rpc::Message> message)
 	{
 		int id = message->SockId();
 		this->mLastTime = help::Time::NowSec();
 		return this->mRouterComponent->LuaCall(lua, id, std::move(message));
 	}
 
-	int Actor::LuaSend(lua_State* lua, std::unique_ptr<rpc::Packet> message)
+	int Actor::LuaSend(lua_State* lua, std::unique_ptr<rpc::Message> message)
 	{
 		int id = message->SockId();
 		this->mLastTime = help::Time::NowSec();
@@ -234,7 +234,7 @@ namespace acs
 
 	int Actor::Publish(const std::string& event)
 	{
-		std::unique_ptr<rpc::Packet> message;
+		std::unique_ptr<rpc::Message> message;
 		int code = this->Make("EventSystem.Publish", message);
 		if(code != XCode::Ok)
 		{
@@ -249,7 +249,7 @@ namespace acs
 
 	int Actor::Publish(const std::string& event, json::w::Document& document)
 	{
-		std::unique_ptr<rpc::Packet> message;
+		std::unique_ptr<rpc::Message> message;
 		int code = this->Make("EventSystem.Publish", message);
 		if (code != XCode::Ok)
 		{
@@ -265,7 +265,7 @@ namespace acs
 
 	int Actor::Publish(const std::string& event, char proto, const std::string& data)
 	{
-		std::unique_ptr<rpc::Packet> message;
+		std::unique_ptr<rpc::Message> message;
 		int code = this->Make("EventSystem.Publish", message);
 		if (code != XCode::Ok)
 		{

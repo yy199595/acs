@@ -11,23 +11,23 @@ namespace acs
 	class LuaRpcService;
 
 	class ServiceMethod;
-	class DispatchComponent : public RpcTaskComponent<unsigned int, rpc::Packet>,
+	class DispatchComponent : public RpcTaskComponent<unsigned int, rpc::Message>,
 							  public IServerRecord, public IAppStop
 	{
 	 public:
 		DispatchComponent();
     public:
-		int OnMessage(rpc::Packet * message);
+		int OnMessage(rpc::Message * message);
 		inline int BuildRpcId() { return this->mNumPool.BuildNumber();}
 	private:
 		bool LateAwake() final;
 		void OnAppStop() final;
 		void OnRecord(json::w::Document &document) final;
-		void Invoke(const RpcMethodConfig * config, rpc::Packet * message);
+		void Invoke(const RpcMethodConfig * config, rpc::Message * message);
 	private:
-		int OnClient(rpc::Packet * message);
-		int OnRequest(rpc::Packet * message);
-		int OnBroadcast(rpc::Packet * message);
+		int OnClient(rpc::Message * message);
+		int OnRequest(rpc::Message * message);
+		int OnBroadcast(rpc::Message * message);
     private:
 		unsigned int mSumCount;
 		unsigned int mWaitCount;

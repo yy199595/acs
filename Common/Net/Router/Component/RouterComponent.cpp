@@ -33,7 +33,7 @@ namespace acs
 		return iter == this->mSenders.end() ? nullptr : iter->second;
 	}
 
-	int RouterComponent::LuaCall(lua_State* lua, int id, std::unique_ptr<rpc::Packet> message)
+	int RouterComponent::LuaCall(lua_State* lua, int id, std::unique_ptr<rpc::Message> message)
 	{
 		int timeout = message->GetTimeout();
 		int rpc = this->mDisComponent->BuildRpcId();
@@ -53,9 +53,9 @@ namespace acs
 	{
 		while(!this->mLocalMessages.empty())
 		{
-			std::unique_ptr<rpc::Packet> & message = this->mLocalMessages.front();
+			std::unique_ptr<rpc::Message> & message = this->mLocalMessages.front();
 			{
-				rpc::Packet * rpcMessage = message.release();
+				rpc::Message * rpcMessage = message.release();
 				if(this->mDisComponent->OnMessage(rpcMessage) != XCode::Ok)
 				{
 					delete rpcMessage;
@@ -73,7 +73,7 @@ namespace acs
 		}
 	}
 
-	int RouterComponent::Send(int id, std::unique_ptr<rpc::Packet> message)
+	int RouterComponent::Send(int id, std::unique_ptr<rpc::Message> message)
 	{
 #ifdef __DEBUG__
 		if(message->GetType() == rpc::Type::Request)
@@ -84,19 +84,19 @@ namespace acs
 			message->TempHead().Add("t", help::Time::NowMil());
 		}
 #endif
-//		if(this->mApp->Equal(id))
-//		{
-//			message->SetSockId(id);
-//			this->mLocalMessages.emplace(std::move(message));
-//			return XCode::Ok;
-//		}
+		if(this->mApp->Equal(id))
+		{
+			message->SetSockId(id);
+			this->mLocalMessages.emplace(std::move(message));
+			return XCode::Ok;
+		}
 		ISender * sender = this->GetSender(message->GetNet());
 		if(sender == nullptr)
 		{
 			LOG_ERROR("not find sender:{}", message->GetNet());
 			return XCode::NotFoundSender;
 		}
-		rpc::Packet * data = message.release();
+		rpc::Message * data = message.release();
 		if(sender->Send(id, data) != XCode::Ok)
 		{
 			//LOG_ERROR("{}", data->ToString());
@@ -106,7 +106,7 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	int RouterComponent::Send(int id, int result, rpc::Packet * message)
+	int RouterComponent::Send(int id, int result, rpc::Message * message)
 	{
 		if (message->GetRpcId() == 0)
 		{
@@ -116,10 +116,10 @@ namespace acs
 		message->SetType(rpc::Type::Response);
 		message->GetHead().Del(rpc::Header::app_id);
 		message->GetHead().Add(rpc::Header::code, result);
-		return this->Send(id, std::unique_ptr<rpc::Packet>(message));
+		return this->Send(id, std::unique_ptr<rpc::Message>(message));
 	}
 
-	rpc::Packet * RouterComponent::Call(int id, std::unique_ptr<rpc::Packet> message)
+	rpc::Message * RouterComponent::Call(int id, std::unique_ptr<rpc::Message> message)
 	{
 		int timeout = message->GetTimeout();
 		int taskId = this->mDisComponent->BuildRpcId();

@@ -49,7 +49,7 @@ namespace acs
 		return id;
 	}
 
-	int ClientComponent::Send(int id, rpc::Packet * message)
+	int ClientComponent::Send(int id, rpc::Message * message)
 	{
 		auto iter = this->mClientMap.find(id);
 		if(iter == this->mClientMap.end())
@@ -68,7 +68,7 @@ namespace acs
 		luaRegister.End("net.client");
 	}
 
-	void ClientComponent::OnSendFailure(int id, rpc::Packet* message)
+	void ClientComponent::OnSendFailure(int id, rpc::Message* message)
 	{
 		if(message->GetType() == rpc::Type::Request && message->GetRpcId() > 0)
 		{
@@ -80,7 +80,7 @@ namespace acs
 		delete message;
 	}
 
-	void ClientComponent::OnMessage(rpc::Packet* message, rpc::Packet* response)
+	void ClientComponent::OnMessage(rpc::Message* message, rpc::Message* response)
 	{
 		int code = XCode::Failure;
 		switch(message->GetType())
@@ -120,7 +120,7 @@ namespace acs
 		this->mClientMap.erase(iter);
 	}
 
-	int ClientComponent::OnRequest(rpc::Packet* message)
+	int ClientComponent::OnRequest(rpc::Message* message)
 	{
 		const std::string & func = message->GetHead().GetStr("func");
 		const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(func);

@@ -10,9 +10,9 @@
 namespace acs
 {
 	LuaRpcTaskSource::LuaRpcTaskSource(lua_State* lua, int id)
-		: IRpcTask<rpc::Packet>(id), mTask(lua) { }
+		: IRpcTask<rpc::Message>(id), mTask(lua) { }
 
-	void LuaRpcTaskSource::OnResponse(rpc::Packet * response)
+	void LuaRpcTaskSource::OnResponse(rpc::Message * response)
 	{
 		int code = XCode::NetTimeout;
 		if(response != nullptr)

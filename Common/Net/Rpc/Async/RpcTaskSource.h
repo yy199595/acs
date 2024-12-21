@@ -20,35 +20,35 @@ namespace acs
         int mRpcId;
     };
 
-	class RpcTaskSource : public WaitTaskSourceBase, public IRpcTask<rpc::Packet>
+	class RpcTaskSource : public WaitTaskSourceBase, public IRpcTask<rpc::Message>
     {
     public:
-        explicit RpcTaskSource(int id): IRpcTask<rpc::Packet>(id), mMessage(nullptr) { }
+        explicit RpcTaskSource(int id): IRpcTask<rpc::Message>(id), mMessage(nullptr) { }
     public:
-		inline rpc::Packet * Await();
-		inline void OnResponse(rpc::Packet * response) final;
+		inline rpc::Message * Await();
+		inline void OnResponse(rpc::Message * response) final;
 	private:
-		rpc::Packet * mMessage;
+		rpc::Message * mMessage;
     };
 
-	inline void RpcTaskSource::OnResponse(rpc::Packet* response)
+	inline void RpcTaskSource::OnResponse(rpc::Message* response)
 	{
 		this->mMessage = response;
 		this->ResumeTask();
 	}
 
-	inline rpc::Packet * RpcTaskSource::Await()
+	inline rpc::Message * RpcTaskSource::Await()
 	{
 		this->YieldTask();
 		return this->mMessage;
 	}
 
-	class LuaRpcTaskSource :  public IRpcTask<rpc::Packet>
+	class LuaRpcTaskSource :  public IRpcTask<rpc::Message>
 	{
 	 public:
 		LuaRpcTaskSource(lua_State * lua, int id);
 	 public:
-		void OnResponse(rpc::Packet * response) final;
+		void OnResponse(rpc::Message * response) final;
 		inline int Await() { return this->mTask.Await(); }
 	 private:
 		LuaWaitTaskSource mTask;

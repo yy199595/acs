@@ -10,7 +10,7 @@ namespace udp
 	class Server
 	{
 	public:
-		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;
+		typedef acs::IRpc<rpc::Message, rpc::Message> Component;
 		Server(asio::io_context & io, Component * component, unsigned short port, Asio::Context & main);
 	public:
 		void StartReceive();

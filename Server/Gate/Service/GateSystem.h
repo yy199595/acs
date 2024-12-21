@@ -15,8 +15,8 @@ namespace acs
 		GateSystem();
 	 private:
 		int Ping(long long userId);
-		int Login(const rpc::Packet & request);
-		int Logout(const rpc::Packet & request);
+		int Login(const rpc::Message & request);
+		int Logout(const rpc::Message & request);
 	private:
 		bool Awake() final;
 		bool OnInit() final;

@@ -90,7 +90,7 @@ namespace kcp
 
 	void Client::OnReceive(const std::string& address, const char* buf, int size)
 	{
-		std::unique_ptr<rpc::Packet> rpcPacket = std::make_unique<rpc::Packet>();
+		std::unique_ptr<rpc::Message> rpcPacket = std::make_unique<rpc::Message>();
 		{
 			if(rpcPacket->Decode(buf, size))
 			{

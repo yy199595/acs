@@ -14,7 +14,7 @@ namespace acs
 	class LuaServiceTaskSource
     {
     public:
-		explicit LuaServiceTaskSource(rpc::Packet * packet);
+		explicit LuaServiceTaskSource(rpc::Message * packet);
 		explicit LuaServiceTaskSource(http::Response* message);
 		//~LuaServiceTaskSource() { printf("===================  %p \n", this); }
 	public:
@@ -26,7 +26,7 @@ namespace acs
         int Await();
     private:
         int mCode;
-		rpc::Packet * mRpcData;
+		rpc::Message * mRpcData;
 		http::Response* mHttpData;
 		TaskSource<void> mTaskSource;
 	};

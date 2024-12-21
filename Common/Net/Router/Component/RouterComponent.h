@@ -16,10 +16,10 @@ namespace acs
 	public:
 		RouterComponent();
 	public:
-		int Send(int id, int code, rpc::Packet * message);
-		int Send(int id, std::unique_ptr<rpc::Packet> message);
-		rpc::Packet * Call(int id, std::unique_ptr<rpc::Packet> message);
-		int LuaCall(lua_State * lua, int id, std::unique_ptr<rpc::Packet> message);
+		int Send(int id, int code, rpc::Message * message);
+		int Send(int id, std::unique_ptr<rpc::Message> message);
+		rpc::Message * Call(int id, std::unique_ptr<rpc::Message> message);
+		int LuaCall(lua_State * lua, int id, std::unique_ptr<rpc::Message> message);
 	private:
 		bool LateAwake() final;
 		void OnSystemUpdate() final;
@@ -28,7 +28,7 @@ namespace acs
 	private:
 		class DispatchComponent * mDisComponent;
 		std::unordered_map<char, ISender *> mSenders;
-		std::queue<std::unique_ptr<rpc::Packet>> mLocalMessages;
+		std::queue<std::unique_ptr<rpc::Message>> mLocalMessages;
 	};
 }
 

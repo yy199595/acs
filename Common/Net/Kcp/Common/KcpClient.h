@@ -10,7 +10,7 @@ namespace kcp
 	class Client : public IClient, public std::enable_shared_from_this<Client>
 	{
 	public:
-		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;
+		typedef acs::IRpc<rpc::Message, rpc::Message> Component;
 		explicit Client(asio::io_context & io, Component * component, asio_udp::endpoint & remote, Asio::Context & main);
 		~Client(){ ikcp_release(this->mKcp); }
 	public:

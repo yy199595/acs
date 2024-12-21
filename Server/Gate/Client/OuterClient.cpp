@@ -100,7 +100,7 @@ namespace rpc
 					this->CloseSocket(XCode::NetBigDataShutdown);
 					return;
 				}
-				this->mMessage = std::make_unique<rpc::Packet>();
+				this->mMessage = std::make_unique<rpc::Message>();
 				{
 					this->mMessage->Init(this->mProtoHead);
 				}
@@ -123,7 +123,7 @@ namespace rpc
 		{
 			return;
 		}
-		rpc::Packet* request = this->mMessage.release();
+		rpc::Message* request = this->mMessage.release();
 		{
 			request->SetSockId(this->mSockId);
 			request->GetHead().Add(rpc::Header::player_id, this->mPlayerId);
@@ -191,7 +191,7 @@ namespace rpc
 	{
 		if (!this->mSendMessages.empty())
 		{
-			rpc::Packet* message = this->mSendMessages.front();
+			rpc::Message* message = this->mSendMessages.front();
 			if (message->GetType() == rpc::Type::Response)
 			{
 				if(message->GetCode() == XCode::CloseSocket)
@@ -211,7 +211,7 @@ namespace rpc
 		this->CloseSocket(XCode::SendMessageFail);
 	}
 
-	bool OuterClient::Send(rpc::Packet* message)
+	bool OuterClient::Send(rpc::Message* message)
 	{
 		LOG_CHECK_RET_FALSE(message);
 #ifdef ONLY_MAIN_THREAD

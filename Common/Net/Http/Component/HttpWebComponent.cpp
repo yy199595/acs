@@ -349,7 +349,7 @@ namespace acs
 		std::vector<std::string> keys;
 		request->GetUrl().GetQuery().Get(keys);
 		const http::FromContent& fromContent = request->GetUrl().GetQuery();
-		rpc::Packet* message = new rpc::Packet();
+		rpc::Message* message = new rpc::Message();
 		{
 			std::string value;
 			message->SetNet(rpc::Net::Http);

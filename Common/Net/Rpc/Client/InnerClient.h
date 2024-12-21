@@ -13,12 +13,12 @@ namespace rpc
 #endif
 	{
 	 public:
-		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;
+		typedef acs::IRpc<rpc::Message, rpc::Message> Component;
 		explicit InnerClient(int id, Component * component, bool client, Asio::Context &);
 		~InnerClient() final;
 	public:
 		void Close();
-		bool Send(rpc::Packet * message);
+		bool Send(rpc::Message * message);
 		void StartReceive(tcp::Socket * socket);
 	 private:
 		void CloseSocket();
@@ -38,8 +38,8 @@ namespace rpc
 		Component * mComponent;
 		rpc::ProtoHead mProtoHead;
 		Asio::Context & mMainContext;
-		std::unique_ptr<rpc::Packet> mMessage;
-		std::queue<rpc::Packet *> mSendMessages;
-		std::unordered_map<int, rpc::Packet *> mWaitResMessages; //等待返回的服务器消息
+		std::unique_ptr<rpc::Message> mMessage;
+		std::queue<rpc::Message *> mSendMessages;
+		std::unordered_map<int, rpc::Message *> mWaitResMessages; //等待返回的服务器消息
 	};
 }// namespace Sentry

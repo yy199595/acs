@@ -15,30 +15,30 @@
 
 namespace rpc
 {
-    class Packet;
+    class Message;
 	class InnerClient;
 }
 
 namespace acs
 {
 	class OuterNetComponent final : public Component, public ITcpListen,
-									public IRpc<rpc::Packet, rpc::Packet>, public IServerRecord
+									public IRpc<rpc::Message, rpc::Message>, public IServerRecord
 	{
 	 public:
 		OuterNetComponent();
 		~OuterNetComponent() final = default;
 	public:
-		void Broadcast(rpc::Packet * message);
+		void Broadcast(rpc::Message * message);
 		void StartClose(int id, int code) final;
 	public:
-		bool SendBySockId(int id, rpc::Packet * message);
+		bool SendBySockId(int id, rpc::Message * message);
 	private:
 		bool LateAwake() final;
-		int OnRequest(rpc::Packet * message);
+		int OnRequest(rpc::Message * message);
 	private:
 		void OnClientError(int id, int code) final;
-		void OnSendFailure(int id, rpc::Packet *message) final;
-		void OnMessage(rpc::Packet * request, rpc::Packet *) final;
+		void OnSendFailure(int id, rpc::Message *message) final;
+		void OnMessage(rpc::Message * request, rpc::Message *) final;
 	private:
 		bool OnListen(tcp::Socket * socket) final;
 		void OnRecord(json::w::Document & document) final;
@@ -52,7 +52,7 @@ namespace acs
 		class RouterComponent * mRouter;
 		math::NumberPool<int> mSocketPool;
 		class ActorComponent * mActComponent;
-		custom::Queue<rpc::Packet *> mBroadCastMessages; //广播消息
+		custom::Queue<rpc::Message *> mBroadCastMessages; //广播消息
 		std::unordered_map<int, std::shared_ptr<rpc::OuterClient>> mGateClientMap;
 		//std::unordered_map<int, std::unique_ptr<rpc::InnerClient>> mForwardClientMap;
 	};

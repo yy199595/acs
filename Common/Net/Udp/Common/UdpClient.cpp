@@ -60,7 +60,7 @@ namespace udp
 	void Client::OnReceive(const std::string & address, int size)
 	{
 		std::istream is(&this->mRecvBuffer);
-		std::unique_ptr<rpc::Packet> rpcPacket = std::make_unique<rpc::Packet>();
+		std::unique_ptr<rpc::Message> rpcPacket = std::make_unique<rpc::Message>();
 		{
 			tcp::Data::Read(is, rpcPacket->GetProtoHead());
 			if((size - rpc::RPC_PACK_HEAD_LEN) == rpcPacket->GetProtoHead().Len)

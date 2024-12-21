@@ -15,7 +15,7 @@ namespace acs
 	private:
 		bool OnInit() final;
 	private:
-		int Publish(const rpc::Packet & request);
+		int Publish(const rpc::Message & request);
 	private:
 		class DispatchComponent * mDispatch;
 	};

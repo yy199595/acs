@@ -16,7 +16,7 @@ namespace acs
         this->mCode = XCode::LuaCoroutineWait;
     }
 
-	LuaServiceTaskSource::LuaServiceTaskSource(rpc::Packet* packet)
+	LuaServiceTaskSource::LuaServiceTaskSource(rpc::Message* packet)
 		: mHttpData(nullptr), mRpcData(packet)
 	{
 		this->mCode = XCode::LuaCoroutineWait;

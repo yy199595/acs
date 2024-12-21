@@ -13,7 +13,7 @@ namespace acs
 	public:
 		explicit ISender(char net) : mNet(net) { }
 		char NetType() const { return this->mNet; }
-		virtual int Send(int id, rpc::Packet * message) = 0;
+		virtual int Send(int id, rpc::Message * message) = 0;
 	private:
 		char mNet;
 	};

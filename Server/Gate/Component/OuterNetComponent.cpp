@@ -72,7 +72,7 @@ namespace acs
 		}
 	}
 
-	void OuterNetComponent::OnMessage(rpc::Packet * message, rpc::Packet *)
+	void OuterNetComponent::OnMessage(rpc::Message * message, rpc::Message *)
 	{
 		int code = XCode::Failure;
 		message->SetNet(rpc::Net::Tcp);
@@ -123,7 +123,7 @@ namespace acs
 		}
 	}
 
-	int OuterNetComponent::OnRequest(rpc::Packet * message)
+	int OuterNetComponent::OnRequest(rpc::Message * message)
 	{
 		const std::string& fullName = message->GetHead().GetStr(rpc::Header::func);
 		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
@@ -145,7 +145,7 @@ namespace acs
 				this->StartClose(sockId, XCode::NotFindUser);
 				return XCode::CloseSocket;
 			}
-			this->mRouter->Send(serverId, std::unique_ptr<rpc::Packet>(message));
+			this->mRouter->Send(serverId, std::unique_ptr<rpc::Message>(message));
 			return XCode::Ok;
 		}
 		const std::string& name = methodConfig->Server;
@@ -187,11 +187,11 @@ namespace acs
 			LOG_ERROR("unknown forward {}", message->ToString());
 				return XCode::Failure;
 		}
-		this->mRouter->Send(serverId, std::unique_ptr<rpc::Packet>(message));
+		this->mRouter->Send(serverId, std::unique_ptr<rpc::Message>(message));
 		return XCode::Ok;
 	}
 
-	bool OuterNetComponent::SendBySockId(int id, rpc::Packet * message)
+	bool OuterNetComponent::SendBySockId(int id, rpc::Message * message)
 	{
 		do
 		{
@@ -241,10 +241,10 @@ namespace acs
 		LOG_DEBUG("remove client({}) count:{}", id, this->mGateClientMap.size());
 	}
 
-	void OuterNetComponent::OnSendFailure(int id, rpc::Packet* message)
+	void OuterNetComponent::OnSendFailure(int id, rpc::Message* message)
 	{
 		int sockId = 0;
-		std::unique_ptr<rpc::Packet> request(message);
+		std::unique_ptr<rpc::Message> request(message);
 		message->GetHead().Add(rpc::Header::code, XCode::SendMessageFail);
 		if(message->GetType() == rpc::Type::Request && message->GetRpcId() > 0)
 		{
@@ -276,7 +276,7 @@ namespace acs
 		}
     }
 
-	void OuterNetComponent::Broadcast(rpc::Packet * message)
+	void OuterNetComponent::Broadcast(rpc::Message * message)
 	{
 		message->SetType(rpc::Type::Request);
 		for(auto iter = this->mGateClientMap.begin(); iter != this->mGateClientMap.end(); iter++)
@@ -285,7 +285,7 @@ namespace acs
 			{
 				continue;
 			}
-			std::unique_ptr<rpc::Packet> broadCastMessage = message->Clone();
+			std::unique_ptr<rpc::Message> broadCastMessage = message->Clone();
 			{
 				iter->second->Send(broadCastMessage.release());
 			}

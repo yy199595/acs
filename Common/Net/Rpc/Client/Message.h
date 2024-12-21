@@ -29,14 +29,14 @@ namespace rpc
 		int OnRecvMessage(std::istream& os, size_t size) final;
 	};
 
-	class Packet : public tcp::IProto
+	class Message : public tcp::IProto
 #ifdef __SHARE_PTR_COUNTER__
-	, public memory::Object<Packet>
+	, public memory::Object<Message>
 #endif
 	{
 	public:
-		Packet();
-		~Packet() override = default;
+		Message();
+		~Message() override = default;
 	public:
 		int OnSendMessage(std::ostream& os) final;
 		int OnRecvMessage(std::istream& os, size_t size) final;
@@ -48,7 +48,7 @@ namespace rpc
 		bool DecodeFromJson(const char * message, int len);
 	public:
 		int GetCode(int code = 1) const;
-		std::unique_ptr<Packet> Clone() const;
+		std::unique_ptr<Message> Clone() const;
 		inline Head& GetHead() { return this->mHead; }
 		inline Head& TempHead(){ return this->mTempHead;}
 		inline char GetNet() const{ return this->mNet;}

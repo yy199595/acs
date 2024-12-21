@@ -18,12 +18,12 @@ namespace acs
 		return true;
 	}
 
-	int EventSystem::Publish(const rpc::Packet & request)
+	int EventSystem::Publish(const rpc::Message & request)
 	{
 		std::string channel;
 		const std::string & message = request.GetBody();
 		LOG_ERROR_CHECK_ARGS(request.ConstHead().Get("channel", channel));
-		rpc::Packet * eventMessage = new rpc::Packet();
+		rpc::Message * eventMessage = new rpc::Message();
 		{
 			eventMessage->SetType(rpc::Type::Request);
 			eventMessage->GetHead().Add("func", channel);

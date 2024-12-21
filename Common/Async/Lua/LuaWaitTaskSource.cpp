@@ -43,7 +43,7 @@ namespace acs
 		this->mRef = 0;
 	}
 
-	void LuaWaitTaskSource::SetResult(int code, rpc::Packet * response)
+	void LuaWaitTaskSource::SetResult(int code, rpc::Message * response)
 	{
 		int count = 1;
 		lua_pushinteger(this->mLua, code);

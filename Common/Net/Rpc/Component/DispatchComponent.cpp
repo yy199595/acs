@@ -56,7 +56,7 @@ namespace acs
 		}
 	}
 
-	int DispatchComponent::OnRequest(rpc::Packet* message)
+	int DispatchComponent::OnRequest(rpc::Message* message)
 	{
 		++this->mSumCount;
 		int code = XCode::Ok;
@@ -92,7 +92,7 @@ namespace acs
 		return code;
 	}
 
-	void DispatchComponent::Invoke(const RpcMethodConfig* config, rpc::Packet* message)
+	void DispatchComponent::Invoke(const RpcMethodConfig* config, rpc::Message* message)
 	{
 		++this->mWaitCount;
 		int code = XCode::Ok;
@@ -137,7 +137,7 @@ namespace acs
 		}
 	}
 
-	int DispatchComponent::OnMessage(rpc::Packet* message)
+	int DispatchComponent::OnMessage(rpc::Message* message)
 	{
 		switch (message->GetType())
 		{
@@ -171,7 +171,7 @@ namespace acs
 		return XCode::UnKnowPacket;
 	}
 
-	int DispatchComponent::OnClient(rpc::Packet* message)
+	int DispatchComponent::OnClient(rpc::Message* message)
 	{
 		if (this->mOuterComponent == nullptr)
 		{
@@ -189,7 +189,7 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	int DispatchComponent::OnBroadcast(rpc::Packet* message)
+	int DispatchComponent::OnBroadcast(rpc::Message* message)
 	{
 		if (this->mOuterComponent == nullptr)
 		{

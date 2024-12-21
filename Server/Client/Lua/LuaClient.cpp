@@ -14,7 +14,7 @@ namespace acs
 {
 	int LuaClient::Send(lua_State* l)
 	{
-		std::unique_ptr<rpc::Packet> message;
+		std::unique_ptr<rpc::Message> message;
 		int sessionId = (int)luaL_checkinteger(l, 1);
 		const std::string func = luaL_checkstring(l, 2);
 		if(App::Inst()->MakeMessage(l, 3, func, message) != XCode::Ok)
@@ -35,7 +35,7 @@ namespace acs
 
 	int LuaClient::Call(lua_State* l)
 	{
-		std::unique_ptr<rpc::Packet> message;
+		std::unique_ptr<rpc::Message> message;
 		int sessionId = (int)luaL_checkinteger(l, 1);
 		const std::string func = luaL_checkstring(l, 2);
 		if(App::Inst()->MakeMessage(l, 3, func, message) != XCode::Ok)

@@ -23,9 +23,9 @@ namespace acs
 		void GetActors(std::vector<int> & actors) const;
 		void AddAddr(const std::string & server, int id);
 		bool GetServerId(const std::string & srv, int & id) const;
-		bool GetAddress(const rpc::Packet &request, int & id) const final;
+		bool GetAddress(const rpc::Message &request, int & id) const final;
 	protected:
-		int Make(const std::string &func, std::unique_ptr<rpc::Packet> &request) const final;
+		int Make(const std::string &func, std::unique_ptr<rpc::Message> &request) const final;
 	private:
 		int mGateId;
 		int mSockId;

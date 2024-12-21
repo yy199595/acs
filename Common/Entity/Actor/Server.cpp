@@ -28,7 +28,7 @@ namespace acs
 		return true;
 	}
 
-	bool Server::GetAddress(const rpc::Packet & request, int & id) const
+	bool Server::GetAddress(const rpc::Message & request, int & id) const
 	{
 		id = this->GetSrvId();
 		return true;
@@ -36,7 +36,7 @@ namespace acs
 
 	int Server::DisConnect()
 	{
-		std::unique_ptr<rpc::Packet> message = std::make_unique<rpc::Packet>();
+		std::unique_ptr<rpc::Message> message = std::make_unique<rpc::Message>();
 		{
 			message->SetNet(rpc::Net::Tcp);
 			message->SetType(rpc::Type::Logout);
@@ -97,7 +97,7 @@ namespace acs
 		}
 	}
 
-	int Server::SendMsg(std::unique_ptr<rpc::Packet> message)
+	int Server::SendMsg(std::unique_ptr<rpc::Message> message)
 	{
 		return this->mRouterComponent->Send(this->GetSrvId(), std::move(message));
 	}
@@ -115,7 +115,7 @@ namespace acs
 		jsonWriter.Encode(json);
 	}
 
-	int Server::Make(const std::string& func, std::unique_ptr<rpc::Packet>& message) const
+	int Server::Make(const std::string& func, std::unique_ptr<rpc::Message>& message) const
 	{
 		const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
 		if(methodConfig == nullptr)
@@ -123,7 +123,7 @@ namespace acs
 			LOG_ERROR("not rpc config {}", func);
 			return XCode::NotFoundRpcConfig;
 		}
-		message = std::make_unique<rpc::Packet>();
+		message = std::make_unique<rpc::Message>();
 		{
 			message->SetNet(methodConfig->Net);
 			message->SetType(rpc::Type::Request);

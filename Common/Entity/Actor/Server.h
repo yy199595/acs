@@ -16,8 +16,8 @@ namespace acs
 		inline bool Equal(const std::string & addr) { return this->mRpcAddress == addr; }
 	public:
 		int DisConnect();
-		int SendMsg(std::unique_ptr<rpc::Packet> message);
-		bool GetAddress(const rpc::Packet &request, int &) const final;
+		int SendMsg(std::unique_ptr<rpc::Message> message);
+		bool GetAddress(const rpc::Message &request, int &) const final;
 		bool GetListen(const std::string & name, std::string & addr) const;
 		bool AddListen(const std::string & name, const std::string & addr);
 	private:
@@ -27,7 +27,7 @@ namespace acs
 		void EncodeToJson(std::string *json) final;
 		int GetSrvId() const { return (int)this->GetId(); }
 		const std::string & Address() const { return this->mRpcAddress; }
-		int Make(const std::string &func, std::unique_ptr<rpc::Packet> &request) const final ;
+		int Make(const std::string &func, std::unique_ptr<rpc::Message> &request) const final ;
 	private:
 		long long mAppId;
 		std::string mRpc;

@@ -27,7 +27,7 @@ namespace acs
 		return true;
 	}
 
-    void InnerNetComponent::OnMessage(rpc::Packet * message, rpc::Packet *)
+    void InnerNetComponent::OnMessage(rpc::Message * message, rpc::Message *)
 	{
 		int code = XCode::Ok;
 		message->SetNet(rpc::Net::Tcp);
@@ -80,7 +80,7 @@ namespace acs
 		}
 	}
 
-	int InnerNetComponent::OnForward(rpc::Packet* message)
+	int InnerNetComponent::OnForward(rpc::Message* message)
 	{
 		int target = 0;
 		int code = XCode::Ok;
@@ -108,7 +108,7 @@ namespace acs
 		return XCode::Ok;
 	}
 
-    void InnerNetComponent::OnSendFailure(int, rpc::Packet * message)
+    void InnerNetComponent::OnSendFailure(int, rpc::Message * message)
     {
         if (message->GetType() == rpc::Type::Request && message->GetRpcId() > 0)
 		{
@@ -182,7 +182,7 @@ namespace acs
 		return tcpClient.get();
 	}
 
-    int InnerNetComponent::Send(int id, rpc::Packet * message)
+    int InnerNetComponent::Send(int id, rpc::Message * message)
     {
 
         rpc::InnerClient * clientSession = this->GetClient(id);
@@ -202,7 +202,7 @@ namespace acs
 		}
     }
 
-	int InnerNetComponent::OnRequest(rpc::Packet * message)
+	int InnerNetComponent::OnRequest(rpc::Message * message)
 	{
 		int code = this->mDispatch->OnMessage(message);
 		if (code != XCode::Ok)

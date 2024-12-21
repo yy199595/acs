@@ -31,7 +31,7 @@ namespace acs
 
 		template<typename T>
 		void SetResult(T result);
-		void SetResult(int code, rpc::Packet * response);
+		void SetResult(int code, rpc::Message * response);
 	 private:
 		int mRef;
 		lua_State* mLua;

@@ -91,7 +91,7 @@ namespace acs
 		}
 	}
 
-	int KcpComponent::Send(int id, rpc::Packet* message)
+	int KcpComponent::Send(int id, rpc::Message* message)
 	{
 		if (message->GetType() == rpc::Type::Response)
 		{
@@ -116,7 +116,7 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	void KcpComponent::OnMessage(rpc::Packet* request, rpc::Packet* response)
+	void KcpComponent::OnMessage(rpc::Message* request, rpc::Message* response)
 	{
 		int code = XCode::Ok;
 		switch(request->GetType())
@@ -144,7 +144,7 @@ namespace acs
 		if(code != XCode::Ok) { delete request; }
 	}
 
-	int KcpComponent::OnRequest(rpc::Packet* message)
+	int KcpComponent::OnRequest(rpc::Message* message)
 	{
 		int code = this->mDispatch->OnMessage(message);
 		if (code != XCode::Ok)

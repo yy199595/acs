@@ -76,12 +76,12 @@ namespace rpc
         return 0;
     }
 
-	void Packet::Init(const rpc::ProtoHead & protoHead)
+	void Message::Init(const rpc::ProtoHead & protoHead)
 	{
 		this->mProtoHead = protoHead;
 	}
 
-	bool Packet::Decode(const char* message, int len)
+	bool Message::Decode(const char* message, int len)
 	{
 		if(len <= RPC_PACK_HEAD_LEN)
 		{
@@ -134,7 +134,7 @@ namespace rpc
 		return true;
 	}
 
-	bool Packet::EncodeToJson(std::string& json)
+	bool Message::EncodeToJson(std::string& json)
 	{
 		json::w::Document document;
 		auto headObject = document.AddObject("head");
@@ -154,7 +154,7 @@ namespace rpc
 		return true;
 	}
 
-	bool Packet::DecodeFromJson(json::r::Value& document)
+	bool Message::DecodeFromJson(json::r::Value& document)
 	{
 		std::unique_ptr<json::r::Value> headValue;
 		if(!document.Get("head", headValue))
@@ -180,7 +180,7 @@ namespace rpc
 		return true;
 	}
 
-	bool Packet::DecodeFromJson(const char* message, int len)
+	bool Message::DecodeFromJson(const char* message, int len)
 	{
 		json::r::Document document;
 		if(!document.Decode(message, len))
@@ -190,7 +190,7 @@ namespace rpc
 		return this->DecodeFromJson(document);
 	}
 
-    int Packet::OnRecvMessage(std::istream& os, size_t size)
+    int Message::OnRecvMessage(std::istream& os, size_t size)
     {
 		thread_local static char buffer[128] = {0};
 		if(size < this->mProtoHead.Len)
@@ -228,13 +228,13 @@ namespace rpc
         return tcp::ReadDone;
     }
 
-    int Packet::GetCode(int code) const
+    int Message::GetCode(int code) const
     {
         this->mHead.Get("code", code);
         return code;
     }
 
-    int Packet::OnSendMessage(std::ostream &os)
+    int Message::OnSendMessage(std::ostream &os)
 	{
 		this->mProtoHead.Len = this->mHead.GetLength() + this->mBody.size();
 		tcp::Data::Write<rpc::ProtoHead>(os, this->mProtoHead);
@@ -244,20 +244,20 @@ namespace rpc
 		return 0;
 	}
 
-    void Packet::SetContent(const std::string & content)
+    void Message::SetContent(const std::string & content)
     {
         this->mBody = content;
     }
 
-	void Packet::SetContent(char proto, const std::string& content)
+	void Message::SetContent(char proto, const std::string& content)
 	{
 		this->mBody = content;
 		this->mProtoHead.Porto = proto;
 	}
 
-    std::unique_ptr<Packet> Packet::Clone() const
+    std::unique_ptr<Message> Message::Clone() const
     {
-        std::unique_ptr<Packet> message = std::make_unique<Packet>();
+        std::unique_ptr<Message> message = std::make_unique<Message>();
         {
 			message->SetNet(this->mNet);
 			for(auto iter = this->mHead.Begin(); iter != this->mHead.End(); iter++)
@@ -270,7 +270,7 @@ namespace rpc
         return message;
     }
 
-    bool Packet::ParseMessage(pb::Message* message)
+    bool Message::ParseMessage(pb::Message* message)
 	{
 		switch (this->mProtoHead.Porto)
 		{
@@ -294,7 +294,7 @@ namespace rpc
 		}
 	}
 
-	bool Packet::ParseMessage(json::r::Document* message)
+	bool Message::ParseMessage(json::r::Document* message)
 	{
 		if(this->mProtoHead.Porto != rpc::Porto::Json)
 		{
@@ -308,14 +308,14 @@ namespace rpc
 		return true;
 	}
 
-	bool Packet::WriteMessage(json::w::Document* message)
+	bool Message::WriteMessage(json::w::Document* message)
 	{
 		this->mBody.clear();
 		this->SetProto(rpc::Porto::Json);
 		return message->Encode(&this->mBody);
 	}
 
-	void Packet::Clear()
+	void Message::Clear()
 	{
 		this->mSockId = 0;
 		this->mHead.Clear();
@@ -325,7 +325,7 @@ namespace rpc
 		memset(&this->mProtoHead, 0, sizeof(this->mProtoHead));
 	}
 
-	std::string Packet::ToString()
+	std::string Message::ToString()
 	{
 		json::w::Document jsonWriter;
 		switch(this->mProtoHead.Type)
@@ -363,7 +363,7 @@ namespace rpc
 		return json;
 	}
 
-    bool Packet::WriteMessage(const pb::Message* message)
+    bool Message::WriteMessage(const pb::Message* message)
 	{
 		if (message == nullptr)
 		{
@@ -383,7 +383,7 @@ namespace rpc
 		return message->SerializeToString(&mBody);
 	}
 
-	Packet::Packet()
+	Message::Message()
 	{
 		this->mSockId = 0;
 		this->mTimeout = 0;

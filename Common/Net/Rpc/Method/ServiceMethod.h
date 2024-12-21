@@ -24,7 +24,7 @@ namespace acs
 	using ServiceMethodType33 = int(T::*)(long long, const T1 &, T2 &);
 
 	template<typename T, typename T1>
-	using ServiceMethodType34 = int(T::*)(const T1 &, rpc::Packet &);
+	using ServiceMethodType34 = int(T::*)(const T1 &, rpc::Message &);
 
 	template<typename T, typename T1>
 	using ServiceMethodType4 = int(T::*)(T1 &);
@@ -33,10 +33,10 @@ namespace acs
 	using ServiceMethodType44 = int(T::*)(long long, T1 &);
 
 	template<typename T>
-	using ServiceMethodType6 = int(T::*)(const rpc::Packet & packet);
+	using ServiceMethodType6 = int(T::*)(const rpc::Message & packet);
 
 	template<typename T>
-	using ServiceMethodType7 = int(T::*)(const rpc::Packet& request, rpc::Packet & response);
+	using ServiceMethodType7 = int(T::*)(const rpc::Message& request, rpc::Message & response);
 
 	template<typename T>
 	using ServiceMethodType8 = int(T::*)(const json::r::Document& request);
@@ -68,7 +68,7 @@ namespace acs
 			: mName(std::move(name)) {}
 	 public:
 		virtual bool IsLuaMethod() = 0;
-		virtual int Invoke(rpc::Packet & message) = 0;
+		virtual int Invoke(rpc::Message & message) = 0;
 		const std::string& GetName()
 		{
 			return this->mName;
@@ -92,7 +92,7 @@ namespace acs
 		}
 	 public:
 
-		int Invoke(rpc::Packet & message) final
+		int Invoke(rpc::Message & message) final
 		{
 			if (!this->mHasUserId)
 			{
@@ -129,7 +129,7 @@ namespace acs
 		ServiceMethod2(const std::string name, T* o, ServiceMethodType22<T, T1> func, std::string key)
 			: ServiceMethod(name), _o(o), mHasUserId(true), mKey(std::move(key)), _objfunc(func) { }
 	 public:
-		int Invoke(rpc::Packet & message) override
+		int Invoke(rpc::Message & message) override
 		{
             std::unique_ptr<T1> request = std::make_unique<T1>();
             if(!message.ParseMessage(request.get()))
@@ -175,7 +175,7 @@ namespace acs
 		{
 		}
 	 public:
-		int Invoke(rpc::Packet & message) override
+		int Invoke(rpc::Message & message) override
 		{
             std::unique_ptr<T1> request = std::make_unique<T1>();
             std::unique_ptr<T2> response = std::make_unique<T2>();
@@ -239,7 +239,7 @@ namespace acs
 		{
 		}
 	 public:
-		int Invoke(rpc::Packet & message) override
+		int Invoke(rpc::Message & message) override
 		{
 			std::unique_ptr<T1> response = std::make_unique<T1>();
             if (this->mHasUserId)
@@ -289,7 +289,7 @@ namespace acs
 
 	 public:
 		bool IsLuaMethod() override { return false; };
-		int Invoke(rpc::Packet & message) override
+		int Invoke(rpc::Message & message) override
 		{
 			return (_o->*_func)(message);
 		}
@@ -311,7 +311,7 @@ namespace acs
 
 	public:
 		bool IsLuaMethod() override { return false; };
-		int Invoke(rpc::Packet& message) override
+		int Invoke(rpc::Message& message) override
 		{
 			return (_o->*_func)(message, message);
 		}
@@ -333,7 +333,7 @@ namespace acs
 
 	public:
 		bool IsLuaMethod() override { return false; };
-		int Invoke(rpc::Packet& message) override
+		int Invoke(rpc::Message& message) override
 		{
 			std::unique_ptr<json::r::Document> request = std::make_unique<json::r::Document>();
 			if(!request->Decode(message.GetBody()))
@@ -360,7 +360,7 @@ namespace acs
 
 	public:
 		bool IsLuaMethod() override { return false; };
-		int Invoke(rpc::Packet& message) override
+		int Invoke(rpc::Message& message) override
 		{
 			std::unique_ptr<json::r::Document> request = std::make_unique<json::r::Document>();
 			std::unique_ptr<json::w::Document> response = std::make_unique<json::w::Document>();
@@ -390,7 +390,7 @@ namespace acs
 
 	public:
 		bool IsLuaMethod() override { return false; };
-		int Invoke(rpc::Packet& message) override
+		int Invoke(rpc::Message& message) override
 		{
 			std::unique_ptr<T1> request = std::make_unique<T1>();
 			if(!message.ParseMessage(request.get()))

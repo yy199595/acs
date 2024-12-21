@@ -15,7 +15,7 @@ using asio_udp = asio::ip::udp;
 
 namespace acs
 {
-	class UdpComponent : public Component, public ISender, public IRpc<rpc::Packet, rpc::Packet>,
+	class UdpComponent : public Component, public ISender, public IRpc<rpc::Message, rpc::Message>,
 						 public INetListen
 	{
 	public:
@@ -27,11 +27,11 @@ namespace acs
 		bool StartListen(const acs::ListenConfig &listen) final;
 	private:
 		udp::Client * GetClient(int id);
-		void OnMessage(rpc::Packet *request, rpc::Packet *response) final;
+		void OnMessage(rpc::Message *request, rpc::Message *response) final;
 	public:
-		int Send(int id, rpc::Packet *message) final;
+		int Send(int id, rpc::Message *message) final;
 	private:
-		int OnRequest(rpc::Packet * message);
+		int OnRequest(rpc::Message * message);
 	private:
 		class ActorComponent * mActor;
 		asio::streambuf mReceiveBuffer;

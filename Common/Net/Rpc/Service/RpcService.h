@@ -5,7 +5,7 @@
 #include"Rpc/Method/MethodRegister.h"
 namespace rpc
 {
-    class Packet;
+    class Message;
 };
 namespace Lua
 {
@@ -33,11 +33,11 @@ namespace acs
 	public:
 		Lua::LuaModule * GetLuaModule() { return this->mLuaModule; }
 		const std::string& GetServer() const { return this->mCluster; }
-		int Invoke(const RpcMethodConfig * config, rpc::Packet * message);
+		int Invoke(const RpcMethodConfig * config, rpc::Message * message);
 	private:
-		int CallLua(const RpcMethodConfig * config, rpc::Packet & message);
-		int AwaitCallLua(const RpcMethodConfig * config, rpc::Packet & message);
-		int WriterToLua(const RpcMethodConfig * config, rpc::Packet & message);
+		int CallLua(const RpcMethodConfig * config, rpc::Message & message);
+		int AwaitCallLua(const RpcMethodConfig * config, rpc::Message & message);
+		int WriterToLua(const RpcMethodConfig * config, rpc::Message & message);
 	protected:
 		inline ServiceMethodRegister& GetMethodRegistry() { return this->mMethodRegister; }
 	private:

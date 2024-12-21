@@ -12,7 +12,7 @@
 namespace acs
 {
 	class ClientComponent final : public Component,
-			public IRpc<rpc::Packet, rpc::Packet>, public ISender, public ILuaRegister
+								  public IRpc<rpc::Message, rpc::Message>, public ISender, public ILuaRegister
 	{
 	public:
 		ClientComponent();
@@ -22,12 +22,12 @@ namespace acs
 	private:
 		bool LateAwake() final;
 		void OnClientError(int id, int code) final;
-		int Send(int id, rpc::Packet * message) final;
-		void OnSendFailure(int id, rpc::Packet *message) final;
+		int Send(int id, rpc::Message * message) final;
+		void OnSendFailure(int id, rpc::Message *message) final;
 		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
-		void OnMessage(rpc::Packet *request, rpc::Packet *response) final;
+		void OnMessage(rpc::Message *request, rpc::Message *response) final;
 	private:
-		int OnRequest(rpc::Packet * request);
+		int OnRequest(rpc::Message * request);
 	private:
 		int mIndex;
 		class ProtoComponent * mProto;

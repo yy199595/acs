@@ -89,7 +89,7 @@ namespace acs
 		return true;
 	}
 
-	bool Player::GetAddress(const rpc::Packet& request, int & id) const
+	bool Player::GetAddress(const rpc::Message& request, int & id) const
 	{
 		const std::string & func = request.ConstHead().GetStr("func");
 		const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
@@ -111,7 +111,7 @@ namespace acs
 		jsonWriter.Encode(json);
 	}
 
-	int Player::Make(const std::string& func, std::unique_ptr<rpc::Packet>& message) const
+	int Player::Make(const std::string& func, std::unique_ptr<rpc::Message>& message) const
 	{
 		const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(func);
 		if(methodConfig == nullptr)
@@ -119,7 +119,7 @@ namespace acs
 			LOG_ERROR("not rpc config {}", func);
 			return XCode::NotFoundRpcConfig;
 		}
-		message = std::make_unique<rpc::Packet>();
+		message = std::make_unique<rpc::Message>();
 		{
 			if(methodConfig->SendToClient)
 			{

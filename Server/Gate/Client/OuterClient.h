@@ -17,12 +17,12 @@ namespace rpc
 #endif
 	{
 	 public:
-		typedef acs::IRpc<rpc::Packet, rpc::Packet> Component;
+		typedef acs::IRpc<rpc::Message, rpc::Message> Component;
 		explicit OuterClient(int id, Component* component, Asio::Context & main);
 		~OuterClient() final;
 	 public:
 		void Stop();
-		bool Send(rpc::Packet * message);
+		bool Send(rpc::Message * message);
 		void StartReceive(tcp::Socket * socket, int second = 0);
 		inline void BindPlayer(long long id) { this->mPlayerId = id; }
 		inline long long GetPlayerId() const { return this->mPlayerId; }
@@ -45,8 +45,8 @@ namespace rpc
 		Component * mComponent;
 		rpc::ProtoHead mProtoHead;
 		Asio::Context & mMainContext;
-		std::unique_ptr<rpc::Packet> mMessage;
-		std::queue<rpc::Packet *> mSendMessages;
+		std::unique_ptr<rpc::Message> mMessage;
+		std::queue<rpc::Message *> mSendMessages;
 	};
 }
 

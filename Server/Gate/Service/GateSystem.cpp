@@ -65,7 +65,7 @@ namespace acs
 		return true;
 	}
 
-	int GateSystem::Login(const rpc::Packet & request)
+	int GateSystem::Login(const rpc::Message & request)
 	{
 		int sockId = 0;
 		const rpc::Head & head = request.ConstHead();
@@ -143,7 +143,7 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	int GateSystem::Logout(const rpc::Packet & request)
+	int GateSystem::Logout(const rpc::Message & request)
 	{
 		int sockId = 0;
 		long long userId = 0;

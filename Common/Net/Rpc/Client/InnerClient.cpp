@@ -23,7 +23,7 @@ namespace rpc
 		}
 	}
 
-	bool InnerClient::Send(rpc::Packet* message)
+	bool InnerClient::Send(rpc::Message* message)
 	{
 		if (this->mSocket == nullptr)
 		{
@@ -58,7 +58,7 @@ namespace rpc
 	{
 		if (!this->mSendMessages.empty())
 		{
-			rpc::Packet* waitMessage = this->mSendMessages.front();
+			rpc::Message* waitMessage = this->mSendMessages.front();
 			{
 				if (waitMessage->GetType() == rpc::Type::Request && waitMessage->GetRpcId() != 0)
 				{
@@ -163,7 +163,7 @@ namespace rpc
 		{
 			while (!this->mSendMessages.empty())
 			{
-				rpc::Packet* data = this->mSendMessages.front();
+				rpc::Message* data = this->mSendMessages.front();
 				this->mComponent->OnSendFailure(this->mSockId, data);
 				this->mSendMessages.pop();
 			}
@@ -206,7 +206,7 @@ namespace rpc
 	{
 		if (header.Type != rpc::Type::Response)
 		{
-			this->mMessage = std::make_unique<rpc::Packet>();
+			this->mMessage = std::make_unique<rpc::Message>();
 			return true;
 		}
 
@@ -264,7 +264,7 @@ namespace rpc
 				this->mMessage.reset();
 				break;
 			}
-			rpc::Packet* request = this->mMessage.release();
+			rpc::Message* request = this->mMessage.release();
 			{
 				this->mMessage = nullptr;
 				request->SetSockId(this->mSockId);

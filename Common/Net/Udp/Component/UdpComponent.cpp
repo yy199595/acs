@@ -83,7 +83,7 @@ namespace acs
 		}
 	}
 
-	int UdpComponent::Send(int id, rpc::Packet* message)
+	int UdpComponent::Send(int id, rpc::Message* message)
 	{
 		if (message->GetType() == rpc::Type::Response)
 		{
@@ -108,7 +108,7 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	void UdpComponent::OnMessage(rpc::Packet* request, rpc::Packet* response)
+	void UdpComponent::OnMessage(rpc::Message* request, rpc::Message* response)
 	{
 		int code = XCode::Ok;
 		switch(request->GetType())
@@ -126,7 +126,7 @@ namespace acs
 		if(code != XCode::Ok) { delete request; }
 	}
 
-	int UdpComponent::OnRequest(rpc::Packet* message)
+	int UdpComponent::OnRequest(rpc::Message* message)
 	{
 		int code = this->mDispatch->OnMessage(message);
 		if (code != XCode::Ok)

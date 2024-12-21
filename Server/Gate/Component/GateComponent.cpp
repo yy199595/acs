@@ -38,7 +38,7 @@ namespace acs
 		{
 			return;
 		}
-		std::unique_ptr<rpc::Packet> message = std::make_unique<rpc::Packet>();
+		std::unique_ptr<rpc::Message> message = std::make_unique<rpc::Message>();
 		{
 			message->SetType(rpc::Type::Broadcast);
 			message->SetProto(rpc::Porto::Protobuf);

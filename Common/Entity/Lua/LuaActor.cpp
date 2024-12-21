@@ -107,7 +107,7 @@ namespace acs
 				return LuaActor::LuaPushCode(lua, XCode::NotFoundActor);
 			}
 		}
-		std::unique_ptr<rpc::Packet> message;
+		std::unique_ptr<rpc::Message> message;
 		const std::string func(luaL_checkstring(lua, 2));
 		int code = targetActor->MakeMessage(lua, 3, func, message);
 		if (code != XCode::Ok)
@@ -148,7 +148,7 @@ namespace acs
 		{
 			return LuaActor::LuaPushCode(lua, XCode::NotFindUser);
 		}
-		std::unique_ptr<rpc::Packet> message;
+		std::unique_ptr<rpc::Message> message;
 		int code = targetActor->MakeMessage(lua, 3, func, message);
 		if (code != XCode::Ok)
 		{
@@ -177,7 +177,7 @@ namespace acs
 				return LuaActor::LuaPushCode(lua, XCode::NotFoundActor);
 			}
 		}
-		std::unique_ptr<rpc::Packet> message;
+		std::unique_ptr<rpc::Message> message;
 		std::string channel(luaL_checkstring(lua, 2));
 		const std::string func("EventSystem.Publish");
 		int code = targetActor->MakeMessage(lua, 3, func, message);
