@@ -36,14 +36,12 @@ namespace acs
 	void LuaOssRequestTask::OnResponse(http::Response* response)
 	{
 		int count = 0;
-		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
-		lua_State* coroutine = lua_tothread(this->mLua, -1);
 		if(response != nullptr && response->Code() == HttpStatus::OK)
 		{
 			count++;
 			lua_pushlstring(this->mLua, this->mUrl.c_str(), this->mUrl.size());
 		}
-		Lua::Coroutine::Resume(coroutine, this->mLua, count);
+		Lua::Coroutine::Resume(this->mLua, count);
 		delete response;
 	}
 }

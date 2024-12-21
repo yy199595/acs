@@ -2,6 +2,15 @@
 #include"Log/Common/CommonLogDef.h"
 namespace acs
 {
+	LuaTimer::~LuaTimer() noexcept
+	{
+		luaL_unref(this->mLua, LUA_REGISTRYINDEX, ref);
+		if(this->cor > 0)
+		{
+			luaL_unref(this->mLua, LUA_REGISTRYINDEX, cor);
+		}
+	}
+
 	void LuaTimer::Invoke()
 	{
 		lua_settop(this->mLua, 0);

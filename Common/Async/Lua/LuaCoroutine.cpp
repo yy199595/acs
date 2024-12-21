@@ -48,28 +48,7 @@ namespace Lua
 		return luaRpcTaskSource->Await();
 	}
 
-	int Coroutine::Start(lua_State* lua)
-	{
-		// 确保传入的参数是一个函数
-		if (!lua_isfunction(lua, 1))
-		{
-			luaL_error(lua, "parameter must be a function");
-			return 0;
-		}
-
-		// 创建新的协程
-		lua_State* coroutine = lua_newthread(lua);
-
-		lua_pushvalue(lua, 1);
-		lua_xmove(lua, coroutine, 1);  // 将函数从主栈移动到协程栈
-
-		const int size = lua_gettop(lua);  // 获取当前栈的大小
-		lua_xmove(lua, coroutine, size - 1);  // 将除去函数外的其他参数移动到协程栈
-		//Coroutine::Resume(coroutine, lua, size - 1);
-		return 1;
-	}
-
-	void Coroutine::Resume(lua_State* cor, lua_State* lua, int args)
+	void Coroutine::Resume(lua_State* cor, int args)
 	{
 		int ret = 0;
 		int code = lua_status(cor);
@@ -80,20 +59,17 @@ namespace Lua
 				break;
 			case LUA_YIELD:
 			{
-				code = lua_resume(cor, lua, args, &ret);
+				code = lua_resume(cor, nullptr, args, &ret);
 				if (code != LUA_OK && code != LUA_YIELD)
 				{
-					size_t size = 0;
-					const char* err = lua_tolstring(lua, -1, &size);
-					std::string errorMsg(err, size);
-					// 记录错误信息
+					const char* errorMsg = lua_tostring(cor, -1);
 					std::unique_ptr<custom::LogInfo> logInfo = std::make_unique<custom::LogInfo>();
 					{
 						logInfo->Level = custom::LogLevel::Error;
-						logInfo->Content = "Error during coroutine resume: " + errorMsg;
+						logInfo->Content = fmt::format("Error during coroutine resume: {}", errorMsg);
 						Debug::Log(std::move(logInfo));
 					}
-					lua_pop(lua, 1);
+					lua_pop(cor, 1);
 				}
 				if (ret > 0)
 				{
@@ -105,6 +81,5 @@ namespace Lua
 			LOG_ERROR("coroutine status:{}", code);
 				break;
 		}
-		lua_settop(cor, 0);
 	}
 }

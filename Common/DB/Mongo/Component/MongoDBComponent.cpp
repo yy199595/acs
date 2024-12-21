@@ -48,8 +48,6 @@ namespace acs
 
 	void LuaMongoTask::OnResponse(mongo::Response * response)
 	{
-		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
-		lua_State* coroutine = lua_tothread(this->mLua, -1);
 		if (response != nullptr && response->Document())
 		{
 			std::string json;
@@ -62,7 +60,7 @@ namespace acs
 		{
 			lua_pushnil(this->mLua);
 		}
-		Lua::Coroutine::Resume(coroutine, this->mLua, 1);
+		Lua::Coroutine::Resume(this->mLua, 1);
 	}
 }
 

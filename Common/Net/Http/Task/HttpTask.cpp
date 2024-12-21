@@ -26,13 +26,11 @@ namespace acs
     void LuaHttpRequestTask::OnResponse(http::Response * response)
     {
         int count = 0;
-        lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
-        lua_State* coroutine = lua_tothread(this->mLua, -1);
         if(response != nullptr)
         {
-            count = response->WriteToLua(this->mLua);       
+            count = response->WriteToLua(this->mLua);
         }
-        Lua::Coroutine::Resume(coroutine, this->mLua, count);
+        Lua::Coroutine::Resume(this->mLua, count);
 		delete response;
     }
 

@@ -93,7 +93,6 @@ namespace acs
 		luaRegister2.PushExtensionFunction("SetHttp", LuaServiceTaskSource::SetHttp);
 
 		Lua::ClassProxyHelper luaRegister4(this->mLuaEnv, "coroutine");
-		luaRegister4.PushExtensionFunction("start", Lua::Coroutine::Start);
 		luaRegister4.PushExtensionFunction("sleep", Lua::Coroutine::Sleep);
 
 		Lua::ClassProxyHelper classProxyHelper1(this->mLuaEnv, "Cell");

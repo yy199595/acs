@@ -10,9 +10,8 @@ namespace Lua
     namespace Coroutine
 	{
 		extern int Sleep(lua_State * lua);
-		extern int Start(lua_State * lua);
 		extern bool IsRunning(lua_State * lua);
-		extern void Resume(lua_State * cor, lua_State * lua, int args);
+		extern void Resume(lua_State * cor, int args);
 	}
 }
 

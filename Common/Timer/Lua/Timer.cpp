@@ -13,12 +13,17 @@ namespace Lua
 {
 	std::unique_ptr<LuaTimer> MakeTimer(lua_State * lua, int index, unsigned int ms)
 	{
+		int cor = 0;
 		std::unique_ptr<LuaTimer> luaTimer = nullptr;
 		if(lua_isfunction(lua, index))
 		{
 			lua_pushvalue(lua, index);
 			int ref = luaL_ref(lua, LUA_REGISTRYINDEX);
-			luaTimer = std::make_unique<LuaTimer>(lua, ref, ms);
+			if(lua_pushthread(lua) == 0)
+			{
+				cor = luaL_ref(lua, LUA_REGISTRYINDEX);
+			}
+			luaTimer = std::make_unique<LuaTimer>(lua, ref, ms, cor);
 		}
 		else if(lua_istable(lua, index))
 		{
@@ -26,7 +31,11 @@ namespace Lua
 
 			lua_pushvalue(lua, index);
 			int ref = luaL_ref(lua, LUA_REGISTRYINDEX);
-			luaTimer = std::make_unique<LuaTimer>(lua, ref, method, ms);
+			if(lua_pushthread(lua) == 0)
+			{
+				cor = luaL_ref(lua, LUA_REGISTRYINDEX);
+			}
+			luaTimer = std::make_unique<LuaTimer>(lua, ref, method, ms, cor);
 		}
 		return luaTimer;
 	}

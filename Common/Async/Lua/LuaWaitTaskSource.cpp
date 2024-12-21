@@ -38,8 +38,7 @@ namespace acs
 
 	void LuaWaitTaskSource::SetResult()
 	{
-		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
-        Lua::Coroutine::Resume(lua_tothread(this->mLua, -1), this->mLua, 0);
+        Lua::Coroutine::Resume(this->mLua, 0);
 		luaL_unref(this->mLua, LUA_REGISTRYINDEX, this->mRef);
 		this->mRef = 0;
 	}
@@ -47,8 +46,6 @@ namespace acs
 	void LuaWaitTaskSource::SetResult(int code, rpc::Packet * response)
 	{
 		int count = 1;
-		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
-		lua_State* coroutine = lua_tothread(this->mLua, -1);
 		lua_pushinteger(this->mLua, code);
 		if(code == XCode::Ok && response != nullptr)
 		{
@@ -85,7 +82,7 @@ namespace acs
 				}
 			}
 		}
-		Lua::Coroutine::Resume(coroutine, this->mLua, count);
+		Lua::Coroutine::Resume(this->mLua, count);
 		luaL_unref(this->mLua, LUA_REGISTRYINDEX, this->mRef);
 		this->mRef = 0;
 	}
