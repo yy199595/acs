@@ -34,10 +34,8 @@ namespace acs
 	template<typename T>
 	void LuaWaitTaskSource::SetResult(T result)
 	{
-		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);
-		lua_State* coroutine = lua_tothread(this->mLua, -1);
 		Lua::Parameter::Write(this->mLua, result);
-        Lua::Coroutine::Resume(coroutine, this->mLua, 1);
+        Lua::Coroutine::Resume(this->mLua, 1);
 	}
 }
 #endif //APP_LUAWAITTASKSOURCE_H
