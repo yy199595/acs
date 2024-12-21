@@ -8,10 +8,16 @@
 #include"Lua/Engine/LuaParameter.h"
 #include"Async/Lua/LuaCoroutine.h"
 #include"Rpc/Client/Message.h"
+#ifdef __SHARE_PTR_COUNTER__
+#include "Core/Memory/MemoryObject.h"
+#endif
 namespace acs
 {
 	// 在lua中等待c++协程
 	class LuaWaitTaskSource
+#ifdef __SHARE_PTR_COUNTER__
+	: public memory::Object<LuaWaitTaskSource>
+#endif
 	{
 	public:
 		explicit LuaWaitTaskSource(lua_State* lua);

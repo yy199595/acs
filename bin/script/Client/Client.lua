@@ -59,7 +59,7 @@ function Main:Login(info)
             msg_type = math.random(0, 3),
             message = "hello world"
         })
-        coroutine_sleep(200)
+        coroutine_sleep(100)
         info.count = info.count + 4
     end
 

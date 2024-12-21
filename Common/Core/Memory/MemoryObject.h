@@ -65,5 +65,4 @@ namespace memory
 }
 
 #endif
-
-#endif //APP_MEMORYOBJECT_H
+#endif

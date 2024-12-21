@@ -30,6 +30,8 @@
 #include "Gate/Client/OuterClient.h"
 #include "Http/Client/RequestClient.h"
 #include "Http/Client/SessionClient.h"
+#include "Core/Memory/MemoryObject.h"
+#include "Async/Lua/LuaWaitTaskSource.h"
 #endif
 
 namespace acs
@@ -248,6 +250,7 @@ namespace acs
 							size_t count4 = http::SessionClient::GetObjectCount();
 							size_t count5 = http::RequestClient::GetObjectCount();
 							size_t count6 = this->mActorComponent->GetPlayerCount();
+							size_t count7 = acs::LuaWaitTaskSource::GetObjectCount();
 #ifndef __OS_WIN__
 							os::SystemInfo systemInfo;
 							constexpr double MB = 1024 * 1024.0f;
@@ -255,7 +258,7 @@ namespace acs
 							double mb = (double)systemInfo.use_memory / MB;
 #endif
 							LOG_DEBUG("[{:.3f}MB] message:{} inner:{} outer:{} session:{} request:{} "
-									  "player:{}", mb, count1, count2, count3, count4, count5, count6)
+									  "player:{} task:{}", mb, count1, count2, count3, count4, count5, count6, count7)
 						}
 #endif
 						this->mTickCount++;
