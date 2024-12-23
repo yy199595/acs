@@ -17,16 +17,16 @@ namespace acs
 	 public:
 		DispatchComponent();
     public:
-		int OnMessage(rpc::Message * message);
+		int OnMessage(rpc::Message * message) noexcept;
 		inline int BuildRpcId() { return this->mNumPool.BuildNumber();}
 	private:
 		bool LateAwake() final;
 		void OnAppStop() final;
 		void OnRecord(json::w::Document &document) final;
-		void Invoke(const RpcMethodConfig * config, rpc::Message * message);
+		void Invoke(const RpcMethodConfig * config, rpc::Message * message) noexcept;
 	private:
 		int OnClient(rpc::Message * message);
-		int OnRequest(rpc::Message * message);
+		int OnRequest(rpc::Message * message) noexcept;
 		int OnBroadcast(rpc::Message * message);
     private:
 		unsigned int mSumCount;

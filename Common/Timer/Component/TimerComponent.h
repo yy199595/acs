@@ -29,8 +29,8 @@ namespace acs
 		long long CreateTimer(unsigned int ms, StaticMethod* func);
 	private:
 		bool Awake() final;
-		void OnSystemUpdate() final;
-		void OnFrameUpdate(long long) final;
+		void OnSystemUpdate() noexcept final;
+		void OnFrameUpdate(long long) noexcept final;
 		bool InvokeTimer(long long timerId);
 		bool AddTimerToWheel(long long timerId);
 		bool AddTimerToWheel(std::unique_ptr<TimerBase> timer);

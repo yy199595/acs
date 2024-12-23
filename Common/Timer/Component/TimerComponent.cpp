@@ -72,7 +72,7 @@ namespace acs
 		return false;
 	}
 
-	void TimerComponent::OnSystemUpdate()
+	void TimerComponent::OnSystemUpdate() noexcept
 	{
 		if (this->mNextUpdateTime == 0)
 		{
@@ -118,7 +118,7 @@ namespace acs
 		}
 	}
 
-	void TimerComponent::OnFrameUpdate(long long nowTime)
+	void TimerComponent::OnFrameUpdate(long long nowTime) noexcept
 	{
 		while(!this->mLastFrameTriggerTimers.empty())
 		{

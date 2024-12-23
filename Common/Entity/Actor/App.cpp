@@ -164,7 +164,7 @@ namespace acs
 		this->mTaskComponent->Sleep(ms);
 	}
 
-	int App::Run()
+	int App::Run() noexcept
 	{
 		srand(help::Time::NowMil());
 		if (!this->LoadLang())

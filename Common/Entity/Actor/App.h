@@ -42,7 +42,7 @@ namespace acs
 		inline ServerStatus GetStatus() const { return this->mStatus; }
 		inline int GetTickCount() const { return this->mTickCount; }
 	 public:
-		int Run();
+		int Run() noexcept;
 		void Stop();
 		bool Hotfix();
 		bool LoadLang();

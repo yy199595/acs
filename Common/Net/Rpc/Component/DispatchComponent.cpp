@@ -56,7 +56,7 @@ namespace acs
 		}
 	}
 
-	int DispatchComponent::OnRequest(rpc::Message* message)
+	int DispatchComponent::OnRequest(rpc::Message* message) noexcept
 	{
 		++this->mSumCount;
 		int code = XCode::Ok;
@@ -92,7 +92,7 @@ namespace acs
 		return code;
 	}
 
-	void DispatchComponent::Invoke(const RpcMethodConfig* config, rpc::Message* message)
+	void DispatchComponent::Invoke(const RpcMethodConfig* config, rpc::Message* message) noexcept
 	{
 		++this->mWaitCount;
 		int code = XCode::Ok;
@@ -137,7 +137,7 @@ namespace acs
 		}
 	}
 
-	int DispatchComponent::OnMessage(rpc::Message* message)
+	int DispatchComponent::OnMessage(rpc::Message* message) noexcept
 	{
 		switch (message->GetType())
 		{

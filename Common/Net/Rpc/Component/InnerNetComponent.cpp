@@ -27,7 +27,7 @@ namespace acs
 		return true;
 	}
 
-    void InnerNetComponent::OnMessage(rpc::Message * message, rpc::Message *)
+    void InnerNetComponent::OnMessage(rpc::Message * message, rpc::Message *) noexcept
 	{
 		int code = XCode::Ok;
 		message->SetNet(rpc::Net::Tcp);
@@ -202,7 +202,7 @@ namespace acs
 		}
     }
 
-	int InnerNetComponent::OnRequest(rpc::Message * message)
+	int InnerNetComponent::OnRequest(rpc::Message * message) noexcept
 	{
 		int code = this->mDispatch->OnMessage(message);
 		if (code != XCode::Ok)

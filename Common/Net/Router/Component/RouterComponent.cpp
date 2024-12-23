@@ -49,7 +49,7 @@ namespace acs
 		return this->mDisComponent->AddTask(rpc, new LuaRpcTaskSource(lua, rpc), timeout)->Await();
 	}
 
-	void RouterComponent::OnSystemUpdate()
+	void RouterComponent::OnSystemUpdate() noexcept
 	{
 		while(!this->mLocalMessages.empty())
 		{

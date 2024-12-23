@@ -22,7 +22,7 @@ namespace acs
 		int LuaCall(lua_State * lua, int id, std::unique_ptr<rpc::Message> message);
 	private:
 		bool LateAwake() final;
-		void OnSystemUpdate() final;
+		void OnSystemUpdate() noexcept final;
 		void OnRecord(json::w::Document &document) final;
 		ISender * GetSender(char net);
 	private:

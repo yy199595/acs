@@ -114,7 +114,7 @@ namespace acs
 		this->mRunContext = nullptr;
 	}
 
-	bool CoroutineComponent::YieldCoroutine() const
+	bool CoroutineComponent::YieldCoroutine() const noexcept
 	{
 		assert(this->mRunContext);
 		this->mRunContext->mState = CorState::Suspend;
@@ -122,7 +122,7 @@ namespace acs
 		return true;
 	}
 
-	void CoroutineComponent::Resume(unsigned int id)
+	void CoroutineComponent::Resume(unsigned int id) noexcept
 	{
 		if(!this->mApp->IsMainThread())
 		{
@@ -162,7 +162,7 @@ namespace acs
 		return coroutine;
 	}
 
-	bool CoroutineComponent::YieldCoroutine(unsigned int& mCorId) const
+	bool CoroutineComponent::YieldCoroutine(unsigned int& mCorId) const noexcept
 	{
 		if (this->mRunContext != nullptr)
 		{
@@ -193,7 +193,7 @@ namespace acs
         memcpy(coroutine->mStack.p, coroutine->mContext, coroutine->mStack.size);
     }
 
-	void CoroutineComponent::OnSystemUpdate()
+	void CoroutineComponent::OnSystemUpdate() noexcept
 	{
         while(!this->mResumeContexts.empty())
         {
@@ -209,7 +209,7 @@ namespace acs
 			this->RunCoroutine(this->mRunContext);
         }
 	}
-	void CoroutineComponent::OnLastFrameUpdate(long long)
+	void CoroutineComponent::OnLastFrameUpdate(long long) noexcept
 	{
 		while (!this->mLastQueues.empty())
 		{
