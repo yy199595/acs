@@ -16,6 +16,9 @@ local HOST = "http://127.0.0.1:8088"
 local COUNT = os.getenv("APP_COUNT") or 1
 local Main = Module()
 
+local rpc_count = 0
+local http_count = 0
+
 function Main:Awake()
 
     self.count = 0
@@ -36,6 +39,7 @@ function Main:Login(info)
             log.Error("account login failure")
             return
         end
+        http_count = http_count + 1
         local result = response.data
         local client = Session(result.address)
         local code = client:Call("GateSystem.Login", result.token)
@@ -46,7 +50,8 @@ function Main:Login(info)
 
             tab_insert(self.sessions, info)
             self.login_count = self.login_count + 1
-            log.Info("[%s] user(%s) login [%s] ok", self.login_count, info.account, result.address)
+            log.Info("[%s] user(%s) login [%s] ok rpc:%s http:%s",
+                    self.login_count, info.account, result.address, rpc_count, http_count)
         else
             log.Error("user(%s) login [%s] fail", info.account, result.address)
             return
@@ -62,7 +67,7 @@ function Main:Login(info)
             msg_type = math.random(0, 3),
             message = "hello world"
         })
-        coroutine_sleep(100)
+        rpc_count = rpc_count + 4
         info.count = info.count + 4
     end
 

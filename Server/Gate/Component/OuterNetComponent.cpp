@@ -195,6 +195,10 @@ namespace acs
 	{
 		do
 		{
+			if(message->GetType() == rpc::Type::Response)
+			{
+				--this->mWaitCount;
+			}
 			auto iter = this->mGateClientMap.find(id);
 			if (iter == this->mGateClientMap.end())
 			{
