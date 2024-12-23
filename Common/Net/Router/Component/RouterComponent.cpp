@@ -53,12 +53,11 @@ namespace acs
 	{
 		while(!this->mLocalMessages.empty())
 		{
-			std::unique_ptr<rpc::Message> & message = this->mLocalMessages.front();
+			rpc::Message * message = this->mLocalMessages.front();
 			{
-				rpc::Message * rpcMessage = message.release();
-				if(this->mDisComponent->OnMessage(rpcMessage) != XCode::Ok)
+				if(this->mDisComponent->OnMessage(message) != XCode::Ok)
 				{
-					delete rpcMessage;
+					delete message;
 				}
 			}
 			this->mLocalMessages.pop();
@@ -87,7 +86,7 @@ namespace acs
 		if(this->mApp->Equal(id))
 		{
 			message->SetSockId(id);
-			this->mLocalMessages.emplace(std::move(message));
+			this->mLocalMessages.emplace(message.release());
 			return XCode::Ok;
 		}
 		ISender * sender = this->GetSender(message->GetNet());

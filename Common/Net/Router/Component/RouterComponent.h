@@ -27,8 +27,8 @@ namespace acs
 		ISender * GetSender(char net);
 	private:
 		class DispatchComponent * mDisComponent;
+		std::queue<rpc::Message *> mLocalMessages;
 		std::unordered_map<char, ISender *> mSenders;
-		std::queue<std::unique_ptr<rpc::Message>> mLocalMessages;
 	};
 }
 
