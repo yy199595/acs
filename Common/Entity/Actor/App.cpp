@@ -251,6 +251,8 @@ namespace acs
 							size_t count5 = http::RequestClient::GetObjectCount();
 							size_t count6 = this->mActorComponent->GetPlayerCount();
 							size_t count7 = acs::LuaWaitTaskSource::GetObjectCount();
+							size_t count8 = tcp::Socket::GetObjectCount();
+							size_t count9 = TaskContext::GetObjectCount();
 #ifndef __OS_WIN__
 							os::SystemInfo systemInfo;
 							constexpr double MB = 1024 * 1024.0f;
@@ -258,7 +260,8 @@ namespace acs
 							double mb = (double)systemInfo.use_memory / MB;
 #endif
 							LOG_DEBUG("[{:.3f}MB] message:{} inner:{} outer:{} session:{} request:{} "
-									  "player:{} task:{}", mb, count1, count2, count3, count4, count5, count6, count7)
+									  "player:{} task:{} sock:{} cor:{}", mb, count1, count2, count3,
+									  count4, count5, count6, count7, count8, count9)
 						}
 #endif
 						this->mTickCount++;

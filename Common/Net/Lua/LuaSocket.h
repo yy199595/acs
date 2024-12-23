@@ -29,4 +29,4 @@ namespace Lua
 }
 
 
-#endif //APP_LUAHTTP_H
+#endif

@@ -51,6 +51,7 @@ option(__ENABLE_OPEN_WOLF_SSL__ "开启wolfssl" OFF)
 option(__ENABLE_MEMORY_CHECK__ "开启内存检查" ON)
 
 option(__SHARE_PTR_COUNTER__ "开启指针计算查询" ON)
+option(__MEMORY_POOL_OPERATOR__ "使用重载对象内存池" ON)
 
 if (APPLE)
     option(__ENABLE_DING_DING_PUSH "开启钉钉通知" OFF)
@@ -72,6 +73,10 @@ add_definitions(-DLOG_LEVEL_OFF=6) #关闭
 
 if (__ENABLE_SYSTEM_DEBUG)
     add_definitions(-D __ENABLE_SYSTEM_DEBUG)
+endif ()
+
+if (__MEMORY_POOL_OPERATOR__)
+    add_definitions(-D __MEMORY_POOL_OPERATOR__)
 endif ()
 
 if (__SHARE_PTR_COUNTER__)

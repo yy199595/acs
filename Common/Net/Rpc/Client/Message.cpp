@@ -9,8 +9,33 @@
 
 namespace rpc
 {
+#ifdef __MEMORY_POOL_OPERATOR__
+	 std::mutex Message::sAllocLock;
+	 std::vector<void *> Message::sAllocQueue;
+	void* Message::operator new(std::size_t size)
+	{
+		std::lock_guard<std::mutex> lock(sAllocLock);
+		if(!sAllocQueue.empty())
+		{
+			void * ptr = sAllocQueue.back();
+			sAllocQueue.pop_back();
+			return ptr;
+		}
+		return std::malloc(size);
+	}
 
+	void Message::operator delete(void* ptr) noexcept
+	{
+		std::lock_guard<std::mutex> lock(sAllocLock);
+		if(sAllocQueue.size() >= 100)
+		{
+			std::free(ptr);
+			return;
+		}
+		sAllocQueue.emplace_back(ptr);
+	}
 
+#endif
     bool Head::GetKeys(std::vector<std::string> &keys) const
     {
         auto iter = this->mHeader.begin();

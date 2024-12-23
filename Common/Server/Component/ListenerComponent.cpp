@@ -19,6 +19,7 @@ namespace acs
 #endif
 	{
 		this->mAcceptor = nullptr;
+		this->mTcpListen = nullptr;
 		this->mThreadComponent = nullptr;
 	}
 

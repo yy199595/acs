@@ -1,3 +1,4 @@
+local random = math.random
 local log = require("Log")
 local json = require("util.json")
 local str_format = string.format
@@ -5,6 +6,8 @@ local timer = require("core.timer")
 local Module = require("Module")
 local Session = require("Session")
 local http = require("HttpComponent")
+
+local tab_insert = table.insert
 local coroutine_sleep = coroutine.sleep
 local coroutine_create = coroutine.create
 local coroutine_resume = coroutine.resume
@@ -21,7 +24,7 @@ function Main:Awake()
     self.sessions = { }
     for i = 1, COUNT do
         local account = string.format("yjz1995%s", i)
-        table.insert(self.accounts, { account = account, password = "123456", count = 0 })
+        tab_insert(self.accounts, { account = account, password = "123456", count = 0 })
     end
 end
 
@@ -39,9 +42,9 @@ function Main:Login(info)
         if code == XCode.Ok then
             info.client = client
             info.count = info.count + 1
-            info.max_count = math.random(500, 10000)
+            info.max_count = random(500, 10000)
 
-            table.insert(self.sessions, info)
+            tab_insert(self.sessions, info)
             self.login_count = self.login_count + 1
             log.Info("[%s] user(%s) login [%s] ok", self.login_count, info.account, result.address)
         else

@@ -3,6 +3,13 @@
 #include"CoroutineDef.h"
 #include"Rpc/Method/MethodProxy.h"
 
+#ifdef __MEMORY_POOL_OPERATOR__
+#include <vector>
+#endif
+
+#ifdef __SHARE_PTR_COUNTER__
+#include "Core/Memory/MemoryObject.h"
+#endif
 namespace acs
 {
 	enum class CorState
@@ -24,10 +31,23 @@ namespace acs
 	};
 
 	class TaskContext
+#ifdef __SHARE_PTR_COUNTER__
+	: public memory::Object<TaskContext>
+#endif
 	{
 	 public:
 		explicit TaskContext();
+#ifdef __SHARE_PTR_COUNTER__
+		~TaskContext() final;
+#else
 		~TaskContext();
+#endif
+
+#ifdef __MEMORY_POOL_OPERATOR__
+	public:
+		void * operator new(size_t size);
+		void operator delete (void * ptr);
+#endif
 	 public:
 		void Invoke();
 	 public:
@@ -37,5 +57,9 @@ namespace acs
         tb_context_t mContext;
 		StaticMethod* mFunction;
 		unsigned int mCoroutineId;
+#ifdef __MEMORY_POOL_OPERATOR__
+	private:
+		static std::vector<void *> sAllocArray;
+#endif
     };
 }

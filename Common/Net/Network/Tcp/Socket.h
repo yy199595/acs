@@ -7,6 +7,9 @@
 #include"asio/ssl.hpp"
 #endif
 
+#ifdef __SHARE_PTR_COUNTER__
+#include "Core/Memory/MemoryObject.h"
+#endif
 namespace tcp
 {
 	 enum class OptionType
@@ -24,13 +27,26 @@ namespace tcp
 	 };
 
 	class Socket
+#ifdef __SHARE_PTR_COUNTER__
+			: public memory::Object<Socket>
+#endif
 	{
 	 public:
 		explicit Socket(Asio::Context & io);
 #ifdef __ENABLE_OPEN_SSL__
 		explicit Socket(Asio::Context & io, asio::ssl::context & ssl);
 #endif
+#ifdef __SHARE_PTR_COUNTER__
+		~Socket() final = default;
+#else
 		~Socket() = default;
+#endif
+
+#ifdef __MEMORY_POOL_OPERATOR__
+	public:
+		void * operator new(size_t size);
+		void operator delete (void * ptr);
+#endif
 	 public:
         void Init();
 		void MakeNewSocket();
@@ -66,5 +82,10 @@ namespace tcp
 		std::unique_ptr<Asio::ssl::Socket> mSslSocket;
 #endif
 		std::unique_ptr<Asio::Socket> mSocket;
+#ifdef __MEMORY_POOL_OPERATOR__
+	private:
+		static std::mutex sMutex;
+		static std::vector<void *> sAllocArray;
+#endif
     };
 }

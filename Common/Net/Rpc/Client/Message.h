@@ -36,7 +36,12 @@ namespace rpc
 	{
 	public:
 		Message();
-		~Message() override = default;
+		~Message() final = default;
+#ifdef __MEMORY_POOL_OPERATOR__
+	public:
+		void  operator delete(void * ptr);
+		void * operator new(std::size_t  size);
+#endif
 	public:
 		int OnSendMessage(std::ostream& os) final;
 		int OnRecvMessage(std::istream& os, size_t size) final;
@@ -92,6 +97,11 @@ namespace rpc
 		Head mTempHead; //不写入socket
 		std::string mBody;
 		rpc::ProtoHead mProtoHead;
+#ifdef __MEMORY_POOL_OPERATOR__
+	private:
+		static std::mutex sAllocLock;
+		static std::vector<void *> sAllocQueue;
+#endif
 	};
 }
 

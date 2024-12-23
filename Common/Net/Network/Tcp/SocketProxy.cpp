@@ -2,6 +2,8 @@
 #include"Util/Tools/String.h"
 namespace tcp
 {
+
+
 	Socket::Socket(asio::io_service& thread)
 		: mContext(thread), mIsOpenSsl(false), mIsClient(false)
 	{
@@ -37,6 +39,32 @@ namespace tcp
         }
     }
 
+#ifdef __MEMORY_POOL_OPERATOR__
+	std::mutex Socket::sMutex;
+	std::vector<void *> Socket::sAllocArray;
+	void* Socket::operator new(size_t size)
+	{
+		std::lock_guard<std::mutex> lock(sMutex);
+		if(!sAllocArray.empty())
+		{
+			void * ptr = sAllocArray.back();
+			sAllocArray.pop_back();
+			return ptr;
+		}
+		return std::malloc(size);
+	}
+
+	void Socket::operator delete(void* ptr) noexcept
+	{
+		std::lock_guard<std::mutex> lock(sMutex);
+		if(sAllocArray.size() >= 100)
+		{
+			std::free(ptr);
+			return;
+		}
+		sAllocArray.emplace_back(ptr);
+	}
+#endif
 
 	bool Socket::CanRecvCount(size_t& count)
 	{
