@@ -16,7 +16,7 @@ namespace acs
 		return std::malloc(size);
 	}
 
-	void TaskContext::operator delete(void* ptr) noexcept
+	void TaskContext::operator delete(void* ptr)
 	{
 		if(sAllocArray.size() >= 100)
 		{

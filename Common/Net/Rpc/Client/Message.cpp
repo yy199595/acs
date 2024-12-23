@@ -24,7 +24,7 @@ namespace rpc
 		return std::malloc(size);
 	}
 
-	void Message::operator delete(void* ptr) noexcept
+	void Message::operator delete(void* ptr)
 	{
 		std::lock_guard<std::mutex> lock(sAllocLock);
 		if(sAllocQueue.size() >= 100)

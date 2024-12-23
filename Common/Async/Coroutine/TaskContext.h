@@ -45,8 +45,8 @@ namespace acs
 
 #ifdef __MEMORY_POOL_OPERATOR__
 	public:
-		static void * operator new(size_t size);
-		static void operator delete (void * ptr);
+		void * operator new(size_t size);
+		void operator delete (void * ptr);
 #endif
 	 public:
 		void Invoke();

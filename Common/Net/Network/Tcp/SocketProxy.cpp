@@ -54,7 +54,7 @@ namespace tcp
 		return std::malloc(size);
 	}
 
-	void Socket::operator delete(void* ptr) noexcept
+	void Socket::operator delete(void* ptr)
 	{
 		std::lock_guard<std::mutex> lock(sMutex);
 		if(sAllocArray.size() >= 100)
