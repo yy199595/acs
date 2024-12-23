@@ -44,8 +44,8 @@ namespace tcp
 
 #ifdef __MEMORY_POOL_OPERATOR__
 	public:
-		void * operator new(size_t size);
-		void operator delete (void * ptr);
+		static void * operator new(size_t size);
+		static void operator delete (void * ptr);
 #endif
 	 public:
         void Init();

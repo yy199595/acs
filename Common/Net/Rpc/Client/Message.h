@@ -39,8 +39,8 @@ namespace rpc
 		~Message() final = default;
 #ifdef __MEMORY_POOL_OPERATOR__
 	public:
-		void  operator delete(void * ptr);
-		void * operator new(std::size_t  size);
+		static void  operator delete(void * ptr);
+		static void * operator new(std::size_t  size);
 #endif
 	public:
 		int OnSendMessage(std::ostream& os) final;
