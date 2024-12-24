@@ -62,7 +62,7 @@ namespace acs
 		document.Add("content", message);
 		std::unique_ptr<http::Request> request = acs::Make(this->mWxUrl, document, "text");
 		{
-			this->mHttp->Send(std::move(request), [](http::Response* response)
+			this->mHttp->Send(std::move(request), [](std::unique_ptr<http::Response> response)
 			{
 				CONSOLE_LOG_INFO("{}", response->GetBody()->ToStr());
 			});
@@ -87,7 +87,7 @@ namespace acs
 		document.Add("content", content);
 		auto request = acs::Make(url, document, "markdown");
 		{
-			this->mHttp->Send(std::move(request), [](http::Response* response)
+			this->mHttp->Send(std::move(request), [](std::unique_ptr<http::Response> response)
 			{
 				CONSOLE_LOG_FATAL("{}", response->GetBody()->ToStr());
 			});
@@ -145,7 +145,7 @@ namespace acs
 			this->mHttp->Do(std::move(request));
 			return;
 		}
-		this->mHttp->Send(std::move(request), [](http::Response* response)
+		this->mHttp->Send(std::move(request), [](std::unique_ptr<http::Response> response)
 		{
 
 		});
@@ -158,7 +158,7 @@ namespace acs
 		document.Add("content", message);
 		std::unique_ptr<http::Request> request = acs::Make(this->mDingUrl, document, "text");
 		{
-			this->mHttp->Send(std::move(request), [](http::Response* response)
+			this->mHttp->Send(std::move(request), [](std::unique_ptr<http::Response> response)
 			{
 				CONSOLE_LOG_INFO("{}", response->GetBody()->ToStr());
 			});

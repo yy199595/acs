@@ -59,7 +59,7 @@ namespace acs
 			request->SetContent(http::Header::JSON, message);
 			request->Header().Add(http::Header::Auth, this->mToken);
 		}
-		http::Response * response = this->mHttp->Do(std::move(request));
+		std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request));
 		if(response == nullptr || response->GetBody() == nullptr)
 		{
 			return false;
@@ -110,7 +110,7 @@ namespace acs
 			request->SetTimeout(5);
 			request->Header().Add(http::Header::Auth, this->mToken);
 		}
-		http::Response * response = this->mHttp->Do(std::move(request));
+		std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request));
 		if(response == nullptr || response->GetBody() == nullptr)
 		{
 			return false;

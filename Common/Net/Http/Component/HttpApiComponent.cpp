@@ -21,7 +21,7 @@ namespace acs
 	std::unique_ptr<api::IPHomePlace> HttpApiComponent::GetHomePlace(const std::string& ip) const
 	{
 		std::string url = fmt::format("http://ip-api.com/json/{}?lang=zh-CN", ip);
-		http::Response * response = this->mHttp->Get(url);
+		std::unique_ptr<http::Response> response = this->mHttp->Get(url);
 		if(response == nullptr || response->Code() != HttpStatus::OK)
 		{
 			return nullptr;

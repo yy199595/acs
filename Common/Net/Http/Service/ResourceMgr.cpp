@@ -201,7 +201,7 @@ namespace acs
 	int ResourceMgr::Video(const http::FromContent& request, json::w::Document& response)
 	{
 		HttpComponent* httpComponent = this->GetComponent<HttpComponent>();
-		http::Response* response1 = httpComponent->Get("http://api.yujn.cn/api/zzxjj.php?type=video");
+		std::unique_ptr<http::Response> response1 = httpComponent->Get("http://api.yujn.cn/api/zzxjj.php?type=video");
 		if(response1 == nullptr)
 		{
 			return XCode::Failure;

@@ -28,10 +28,6 @@ namespace rpc
 
 	void OuterClient::Stop()
 	{
-		if(this->mSocket == nullptr)
-		{
-			return;
-		}
 		Asio::Context & context = this->mSocket->GetContext();
 		std::shared_ptr<Client> self = this->shared_from_this();
 		asio::post(context, [this, self] { this->CloseSocket(); });

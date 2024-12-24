@@ -80,7 +80,7 @@ namespace acs
 			CONSOLE_LOG_DEBUG("[response:{}] = {}", request->GetCostTime(), response->ToString());
 		}
 		int rpcId = request->GetRpcId();
-		this->OnResponse(rpcId, response);
+		this->OnResponse(rpcId, std::unique_ptr<redis::Response>(response));
 		delete request;
 
 		if(this->mRequests.empty())
@@ -98,11 +98,11 @@ namespace acs
     bool RedisComponent::Ping()
     {
         std::unique_ptr<redis::Request> request = redis::Request::Make("PING");
-        redis::Response * response = this->Run(std::move(request));
+		std::unique_ptr<redis::Response> response = this->Run(std::move(request));
         return response != nullptr && !response->HasError();
     }
 
-    redis::Response * RedisComponent::Run(std::unique_ptr<redis::Request> request)
+	std::unique_ptr<redis::Response> RedisComponent::Run(std::unique_ptr<redis::Request> request)
     {
 		int taskId = 0;
 		this->Send(std::move(request), taskId);
@@ -205,7 +205,7 @@ namespace acs
 		return true;
 	}
 
-	redis::Response* RedisComponent::CallLua(const acs::RedisLuaData& data)
+	std::unique_ptr<redis::Response> RedisComponent::CallLua(const acs::RedisLuaData& data)
 	{
 		std::unique_ptr<redis::Request> request;
 		if(!this->MakeLuaRequest(data, request))
@@ -222,7 +222,7 @@ namespace acs
 		{
 			return nullptr;
 		}
-		redis::Response * response = this->Run(std::move(request));
+		std::unique_ptr<redis::Response> response = this->Run(std::move(request));
 		if(response == nullptr || response->HasError())
 		{
 			return nullptr;
@@ -322,7 +322,7 @@ namespace acs
 
 	bool RedisComponent::Del(const std::string& key)
 	{
-		redis::Response * response = this->Run("DEL", key);
+		std::unique_ptr<redis::Response> response = this->Run("DEL", key);
 		if(response == nullptr || response->HasError())
 		{
 			return false;

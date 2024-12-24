@@ -33,7 +33,7 @@ namespace acs
 		return lua_yield(this->mLua, 0);
 	}
 
-	void LuaOssRequestTask::OnResponse(http::Response* response)
+	void LuaOssRequestTask::OnResponse(std::unique_ptr<http::Response > response)
 	{
 		int count = 0;
 		if(response != nullptr && response->Code() == HttpStatus::OK)
@@ -42,6 +42,5 @@ namespace acs
 			lua_pushlstring(this->mLua, this->mUrl.c_str(), this->mUrl.size());
 		}
 		Lua::Coroutine::Resume(this->mLua, count);
-		delete response;
 	}
 }

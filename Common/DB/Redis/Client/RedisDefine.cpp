@@ -439,17 +439,12 @@ namespace acs
         return lua_yield(this->mLua, 0);
     }
 
-    void LuaRedisTask::OnResponse(redis::Response * response)
+    void LuaRedisTask::OnResponse(std::unique_ptr<redis::Response> response)
 	{
 		int count = 0;
 		if (response != nullptr)
 		{
 			count = response->WriteToLua(this->mLua);
-		}
-		else
-		{
-			count = 1;
-			lua_pushnil(this->mLua);
 		}
 		Lua::Coroutine::Resume(this->mLua, count);
 	}

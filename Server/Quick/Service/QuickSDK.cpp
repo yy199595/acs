@@ -103,7 +103,7 @@ namespace acs
 		LOG_ERROR_CHECK_ARGS(request.Get("token", token))
 		const std::string host("http://checkuser.quickapi.net/v2/checkUserInfo");
 		const std::string url = fmt::format("{}?token={}&uid={}", host, token, uid);
-		http::Response * response1 = this->mHttp->Get(url);
+		std::unique_ptr<http::Response> response1 = this->mHttp->Get(url);
 		if(response1 == nullptr || response1->Code() != HttpStatus::OK)
 		{
 			return XCode::Failure;

@@ -11,7 +11,7 @@
 
 namespace acs
 {
-    template<typename K,typename T, bool Del = true>
+    template<typename K,typename T>
 	class RpcTaskComponent : public Component, public ILastFrameUpdate
     {
     public:
@@ -37,34 +37,24 @@ namespace acs
 			this->mTasks.emplace(k, task);
             return task;
         }
-		inline bool OnResponse(K key, T * message);
+		inline bool OnResponse(K key, std::unique_ptr<T> message);
 		size_t AwaitCount() const { return this->mTasks.size(); }
 	protected:
 		void OnLastFrameUpdate(long long) final;
 		virtual void OnDelTask(K k) { }
-        virtual void OnNotFindResponse(K key, T * message);
+        virtual void OnNotFindResponse(K key, std::unique_ptr<T> message);
     private:
-		std::queue<T *> mDelMessages;
 		std::vector<RpcTask> mDelTasks;
 		std::unordered_map<K, RpcTask> mTasks;
 		std::unordered_map<K, long long> mTimeouts;
     };
 
-	template<typename K,typename T, bool Del>
-	void RpcTaskComponent<K, T, Del>::OnLastFrameUpdate(long long nowMS)
+	template<typename K,typename T>
+	void RpcTaskComponent<K, T>::OnLastFrameUpdate(long long nowMS)
 	{
 		for (RpcTask& task: this->mDelTasks)
 		{
 			delete task;
-		}
-		T* data = nullptr;
-		while (!this->mDelMessages.empty())
-		{
-			data = this->mDelMessages.front();
-			{
-				delete data;
-				this->mDelMessages.pop();
-			}
 		}
 		this->mDelTasks.clear();
 		for (auto iter = this->mTimeouts.begin(); iter != this->mTimeouts.end();)
@@ -88,35 +78,32 @@ namespace acs
 		}
 	}
 
-    template<typename K,typename T, bool Del>
-    inline bool RpcTaskComponent<K, T, Del>::OnResponse(K key, T * message)
+    template<typename K,typename T>
+    inline bool RpcTaskComponent<K, T>::OnResponse(K key, std::unique_ptr<T> message)
 	{
 		auto iter = this->mTimeouts.find(key);
-		if(iter != this->mTimeouts.end())
+		if (iter != this->mTimeouts.end())
 		{
 			this->mTimeouts.erase(iter);
 		}
-		if(Del && message != nullptr)
-		{
-			this->mDelMessages.emplace(message);
-		}
+
 		auto iter1 = this->mTasks.find(key);
-		if(iter1 == this->mTasks.end())
+		if (iter1 == this->mTasks.end())
 		{
-			this->OnNotFindResponse(key, message);
+			this->OnNotFindResponse(key, std::move(message));
 			return false;
 		}
 		{
 			this->OnDelTask(key);
-			iter1->second->OnResponse(message);
+			iter1->second->OnResponse(std::move(message));
 			this->mDelTasks.emplace_back(iter1->second);
 		}
 		this->mTasks.erase(iter1);
 		return true;
 	}
 
-    template<typename K,typename T, bool Del>
-    void RpcTaskComponent<K, T, Del>::OnNotFindResponse(K k, T * message)
+    template<typename K,typename T>
+    void RpcTaskComponent<K, T>::OnNotFindResponse(K k, std::unique_ptr<T> message)
     {
         LOG_ERROR("{} not find rpc task id({}) ", this->GetName(), k);
     }

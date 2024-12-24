@@ -20,21 +20,21 @@ namespace acs
 	public:
 		explicit MongoTask(int taskId);
     public:
-		inline mongo::Response * Await();
-		inline void OnResponse(mongo::Response * response) final;
+		inline std::unique_ptr<mongo::Response> Await();
+		inline void OnResponse(std::unique_ptr<mongo::Response> response) final;
 	private:
-		mongo::Response * mMessage;
+		std::unique_ptr<mongo::Response> mMessage;
 	};
 
-	inline mongo::Response* MongoTask::Await()
+	inline std::unique_ptr<mongo::Response> MongoTask::Await()
 	{
 		this->YieldTask();
-		return this->mMessage;
+		return std::move(this->mMessage);
 	}
 
-	inline void MongoTask::OnResponse(mongo::Response* response)
+	inline void MongoTask::OnResponse(std::unique_ptr<mongo::Response> response)
 	{
-		this->mMessage = response;
+		this->mMessage = std::move(response);
 		this->ResumeTask();
 	}
 }
@@ -48,7 +48,7 @@ namespace acs
 		~LuaMongoTask() final;
 	public:
 		int Await();
-		void OnResponse(mongo::Response * response) final;
+		void OnResponse(std::unique_ptr<mongo::Response> response) final;
 	private:
 		int mRef;
 		lua_State * mLua;
@@ -65,9 +65,9 @@ namespace acs
 		MongoDBComponent() = default;
 		~MongoDBComponent() final = default;
 	public:
-		mongo::Response * Run(std::unique_ptr<mongo::Request> request);
+		std::unique_ptr<mongo::Response> Run(std::unique_ptr<mongo::Request> request);
 		void LuaSend(std::unique_ptr<mongo::Request> request, int & taskId);
-		mongo::Response * Run(const std::string & db, std::unique_ptr<mongo::Request> request);
+		std::unique_ptr<mongo::Response> Run(const std::string & db, std::unique_ptr<mongo::Request> request);
 	private:
 		bool Awake() final;
 		bool LateAwake() final;

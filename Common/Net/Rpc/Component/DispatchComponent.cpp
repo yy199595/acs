@@ -159,7 +159,8 @@ namespace acs
 						return XCode::Ok;
 					}
 				}
-				this->OnResponse(message->GetRpcId(), message);
+				int rpcId = message->GetRpcId();
+				this->OnResponse(rpcId, std::unique_ptr<rpc::Message>(message));
 				return XCode::Ok;
 			}
 			case rpc::Type::Client:

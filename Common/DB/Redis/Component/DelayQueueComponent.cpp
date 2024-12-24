@@ -25,7 +25,7 @@ namespace acs
 	{
 		long long nowTime = help::Time::NowSec();
 		const std::string name = fmt::format("delay_queue:{}", key);
-		redis::Response * response = this->mRedis->Run("ZRANGEBYSCORE", name, 0, nowTime);
+		std::unique_ptr<redis::Response> response = this->mRedis->Run("ZRANGEBYSCORE", name, 0, nowTime);
 		if(response == nullptr || response->HasError())
 		{
 			return std::vector<std::string>();
@@ -44,7 +44,7 @@ namespace acs
 	int DelayQueueComponent::Del(const std::string& key, const std::string& value)
 	{
 		const std::string name = fmt::format("delay_queue:{}", key);
-		redis::Response * response = this->mRedis->Run("ZREM", name, value);
+		std::unique_ptr<redis::Response> response = this->mRedis->Run("ZREM", name, value);
 		if(response == nullptr || response->HasError())
 		{
 			return XCode::Failure;
@@ -68,7 +68,7 @@ namespace acs
 				request->AddParameter(value);
 			}
 		}
-		redis::Response * response = this->mRedis->Run(std::move(request));
+		std::unique_ptr<redis::Response> response = this->mRedis->Run(std::move(request));
 		if(response == nullptr || response->HasError())
 		{
 			return XCode::Failure;
@@ -80,7 +80,7 @@ namespace acs
 	{
 		long long score = help::Time::NowSec() + second;
 		const std::string name = fmt::format("delay_queue:{}", key);
-		redis::Response * response = this->mRedis->Run("ZADD", name, score, value);
+		std::unique_ptr<redis::Response> response = this->mRedis->Run("ZADD", name, score, value);
 		if(response == nullptr || response->HasError())
 		{
 			return XCode::Failure;
@@ -106,7 +106,7 @@ namespace acs
 				request->AddParameter(member);
 			}
 		}
-		redis::Response * response = this->mRedis->Run(std::move(request));
+		std::unique_ptr<redis::Response> response = this->mRedis->Run(std::move(request));
 		if(response == nullptr || response->HasError())
 		{
 			return XCode::Failure;

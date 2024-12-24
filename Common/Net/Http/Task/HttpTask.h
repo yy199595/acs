@@ -12,42 +12,41 @@ namespace acs
 	class HttpRequestTask : public IRpcTask<http::Response>, protected WaitTaskSourceBase
     {
     public:
-		~HttpRequestTask() final { delete this->mData; }
+		~HttpRequestTask() final = default;
 		explicit HttpRequestTask() : IRpcTask<http::Response>(0), mData(nullptr) { }
     public:
-        inline http::Response * Await();
-		inline void OnResponse(http::Response* response) final;
+        inline std::unique_ptr<http::Response>  Await();
+		inline void OnResponse(std::unique_ptr<http::Response> response) final;
 	private:
-		http::Response * mData;
+		std::unique_ptr<http::Response> mData;
     };
 
-	http::Response* HttpRequestTask::Await()
+	std::unique_ptr<http::Response> HttpRequestTask::Await()
 	{
 		this->YieldTask();
-		return this->mData;
+		return std::move(this->mData);
 	}
 
-	void HttpRequestTask::OnResponse(http::Response* response)
+	void HttpRequestTask::OnResponse(std::unique_ptr<http::Response> response)
 	{
-		this->mData = response;
+		this->mData = std::move(response);
 		this->ResumeTask();
 	}
 
 	class HttpCallbackTask : public IRpcTask<http::Response>
 	{
 	public:
-		explicit HttpCallbackTask(std::function<void(http::Response *)> & cb)
+		explicit HttpCallbackTask(std::function<void(std::unique_ptr<http::Response>)> & cb)
 			: mCallback(cb), IRpcTask<http::Response>(0) { }
 	private:
-		inline void OnResponse(http::Response *response) final;
+		inline void OnResponse(std::unique_ptr<http::Response> response) final;
 	private:
-		std::function<void(http::Response*)> mCallback;
+		std::function<void(std::unique_ptr<http::Response>)> mCallback;
 	};
 
-	inline void HttpCallbackTask::OnResponse(http::Response* response)
+	inline void HttpCallbackTask::OnResponse(std::unique_ptr<http::Response> response)
 	{
-		this->mCallback(response);
-		delete response;
+		this->mCallback(std::move(response));
 	}
 }
 
@@ -61,7 +60,7 @@ namespace acs
         ~LuaHttpRequestTask() final;
     public:     
         int Await();
-        void OnResponse(http::Response  * response) final;
+        void OnResponse(std::unique_ptr<http::Response> response) final;
     private:
         int mRef;
         lua_State * mLua;

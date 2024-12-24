@@ -46,7 +46,7 @@ namespace acs
 		return lua_yield(this->mLua, 0);
 	}
 
-	void LuaMongoTask::OnResponse(mongo::Response * response)
+	void LuaMongoTask::OnResponse(std::unique_ptr<mongo::Response> response)
 	{
 		if (response != nullptr && response->Document())
 		{
@@ -146,8 +146,7 @@ namespace acs
 				CONSOLE_LOG_INFO("[response:{}] = {}", request->GetCostTime(), response->ToString());
 			}
 		}
-		this->OnResponse(taskId, response);
-		delete request;
+		this->OnResponse(taskId, std::unique_ptr<mongo::Response>(response));
 
 		if(this->mRequests.empty())
 		{
@@ -159,9 +158,10 @@ namespace acs
 			this->Send(id, std::move(request1));
 			this->mRequests.pop();
 		}
+		delete request;
 	}
 
-	mongo::Response * MongoDBComponent::Run(std::unique_ptr<mongo::Request> request)
+	std::unique_ptr<mongo::Response> MongoDBComponent::Run(std::unique_ptr<mongo::Request> request)
 	{
 		if (request->collectionName.empty())
 		{
@@ -183,7 +183,7 @@ namespace acs
 		return this->AddTask(taskId, new MongoTask(taskId))->Await();
 	}
 
-	mongo::Response * MongoDBComponent::Run(const std::string & db, std::unique_ptr<mongo::Request> request)
+	std::unique_ptr<mongo::Response> MongoDBComponent::Run(const std::string & db, std::unique_ptr<mongo::Request> request)
 	{
 		int taskId = this->mNumberPool.BuildNumber();
 		{

@@ -1,9 +1,11 @@
 if (MSVC)
+    #add_compile_options(/EHs-) # 添加全局编译选项
     enable_language(C CXX ASM_MASM)
     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /MTd")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
 else ()
     enable_language(C CXX ASM)
+    #add_compile_options(-fno-exceptions) # 添加全局编译选项
 endif ()
 
 add_definitions(-w) #忽略警告

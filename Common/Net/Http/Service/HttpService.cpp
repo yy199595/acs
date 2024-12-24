@@ -91,6 +91,7 @@ namespace acs
 				{
 					LOG_ERROR("{} error:{}", method, err);
 				}
+				lua_pop(lua, 1);
 				return XCode::CallLuaFunctionFail;
 			}
 			int code = (int)luaL_checkinteger(lua, -2);

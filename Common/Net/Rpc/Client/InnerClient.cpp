@@ -25,10 +25,6 @@ namespace rpc
 
 	bool InnerClient::Send(rpc::Message* message)
 	{
-		if (this->mSocket == nullptr)
-		{
-			return false;
-		}
 		LOG_CHECK_RET_FALSE(message);
 		if (message->GetType() == rpc::Type::Response)
 		{
@@ -41,8 +37,9 @@ namespace rpc
 			this->Write(*message);
 		}
 #else
+		Asio::Context & context = this->mSocket->GetContext();
 		std::shared_ptr<Client> self = this->shared_from_this();
-		asio::post(this->mSocket->GetContext(), [this, self, message]
+		asio::post(context, [this, self, message]
 		{
 			this->mSendMessages.emplace(message);
 			if(this->mSendMessages.size() == 1)
@@ -289,10 +286,9 @@ namespace rpc
 #ifdef ONLY_MAIN_THREAD
 		this->CloseSocket();
 #else
-		Asio::Socket & sock = this->mSocket->Get();
-		const Asio::Executor & executor = sock.get_executor();
+		Asio::Context & context = this->mSocket->GetContext();
 		std::shared_ptr<Client> self = this->shared_from_this();
-		asio::post(executor, [this, self] { this->CloseSocket(); });
+		asio::post(context, [this, self] { this->CloseSocket(); });
 #endif
 	}
 

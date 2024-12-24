@@ -15,7 +15,7 @@ namespace acs
         virtual ~IRpcTask() = default;
     public:
         int GetRpcId() { return mRpcId; }
-		virtual void OnResponse(T * response) = 0;
+		virtual void OnResponse(std::unique_ptr<T> response) = 0;
     private:
         int mRpcId;
     };
@@ -25,22 +25,22 @@ namespace acs
     public:
         explicit RpcTaskSource(int id): IRpcTask<rpc::Message>(id), mMessage(nullptr) { }
     public:
-		inline rpc::Message * Await();
-		inline void OnResponse(rpc::Message * response) final;
+		inline std::unique_ptr<rpc::Message> Await();
+		inline void OnResponse(std::unique_ptr<rpc::Message> response) final;
 	private:
-		rpc::Message * mMessage;
+		std::unique_ptr<rpc::Message> mMessage;
     };
 
-	inline void RpcTaskSource::OnResponse(rpc::Message* response)
+	inline void RpcTaskSource::OnResponse(std::unique_ptr<rpc::Message> response)
 	{
-		this->mMessage = response;
+		this->mMessage = std::move(response);
 		this->ResumeTask();
 	}
 
-	inline rpc::Message * RpcTaskSource::Await()
+	inline std::unique_ptr<rpc::Message> RpcTaskSource::Await()
 	{
 		this->YieldTask();
-		return this->mMessage;
+		return std::move(this->mMessage);
 	}
 
 	class LuaRpcTaskSource :  public IRpcTask<rpc::Message>
@@ -48,7 +48,7 @@ namespace acs
 	 public:
 		LuaRpcTaskSource(lua_State * lua, int id);
 	 public:
-		void OnResponse(rpc::Message * response) final;
+		void OnResponse(std::unique_ptr<rpc::Message> response) final;
 		inline int Await() { return this->mTask.Await(); }
 	 private:
 		LuaWaitTaskSource mTask;

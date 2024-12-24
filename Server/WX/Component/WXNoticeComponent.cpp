@@ -72,7 +72,7 @@ namespace acs
 		const std::string host("https://api.weixin.qq.com/cgi-bin/user/info");
 		std::string url = fmt::format("{}?access_token={}&openid={}",
 				host, this->mToken.token, openId);
-		http::Response * response = this->mHttp->Get(url);
+		std::unique_ptr<http::Response> response = this->mHttp->Get(url);
 		if(response == nullptr || response->GetBody() == nullptr)
 		{
 			return;
@@ -97,7 +97,7 @@ namespace acs
 			const std::string host("https://api.weixin.qq.com/cgi-bin/token");
 			const std::string url = fmt::format("{}?&grant_type={}&appid={}&secret={}",
 					host, "client_credential", this->mConfig.app_id, this->mConfig.app_secret);
-			http::Response* response = this->mHttp->Get(url);
+			std::unique_ptr<http::Response> response = this->mHttp->Get(url);
 			if (response == nullptr || response->GetBody() == nullptr)
 			{
 				return false;
@@ -157,7 +157,7 @@ namespace acs
 		message.Add("data", document);
 		const std::string host("https://api.weixin.qq.com/cgi-bin/message/template/send");
 		const std::string url = fmt::format("{}?access_token={}", host, this->mToken.token);
-		http::Response * response = this->mHttp->Post(url, message);
+		std::unique_ptr<http::Response> response = this->mHttp->Post(url, message);
 		if(response == nullptr || response->GetBody() == nullptr)
 		{
 			return false;

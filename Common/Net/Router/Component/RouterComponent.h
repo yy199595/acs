@@ -18,7 +18,7 @@ namespace acs
 	public:
 		int Send(int id, int code, rpc::Message * message);
 		int Send(int id, std::unique_ptr<rpc::Message> message);
-		rpc::Message * Call(int id, std::unique_ptr<rpc::Message> message);
+		std::unique_ptr<rpc::Message> Call(int id, std::unique_ptr<rpc::Message> message);
 		int LuaCall(lua_State * lua, int id, std::unique_ptr<rpc::Message> message);
 	private:
 		bool LateAwake() final;

@@ -36,17 +36,17 @@ namespace acs
         template<typename ... Args>
         void Send(const std::string & cmd, Args&& ... args);
         template<typename ... Args>
-		redis::Response * Run(const std::string & cmd, Args&& ... args);
+		std::unique_ptr<redis::Response> Run(const std::string & cmd, Args&& ... args);
         template<typename ... Args> //同步命令
         std::unique_ptr<redis::Response> SyncRun(const std::string& cmd, Args&& ... args);
 	public:
 		bool Send(const RedisLuaData & data);
 		bool Send(const RedisLuaData & data, int & taskId);
-		redis::Response * CallLua(const RedisLuaData & data);
+		std::unique_ptr<redis::Response> CallLua(const RedisLuaData & data);
 		std::unique_ptr<json::r::Document> Call(const RedisLuaData & data);
 	public:
 		bool Del(const std::string & key);
-		redis::Response * Run(std::unique_ptr<redis::Request> request);
+		std::unique_ptr<redis::Response> Run(std::unique_ptr<redis::Request> request);
         std::unique_ptr<redis::Response> SyncRun(std::unique_ptr<redis::Request> request);
 		bool MakeLuaRequest(const RedisLuaData & data, std::unique_ptr<redis::Request>& request);
 	private:
@@ -71,7 +71,7 @@ namespace acs
 	};
 
     template<typename ... Args>
-	redis::Response * RedisComponent::Run(const std::string & cmd, Args &&...args)
+	std::unique_ptr<redis::Response> RedisComponent::Run(const std::string & cmd, Args &&...args)
     {
         std::unique_ptr<redis::Request> request = std::make_unique<redis::Request>();
 		{

@@ -95,7 +95,7 @@ namespace acs
 		return httpClient;
 	}
 
-	http::Response * HttpComponent::Get(const std::string& url, int second)
+	std::unique_ptr<http::Response> HttpComponent::Get(const std::string& url, int second)
 	{
 		std::unique_ptr<http::Request> request = std::make_unique<http::Request>("GET");
 		if (!request->SetUrl(url))
@@ -104,7 +104,7 @@ namespace acs
 			return nullptr;
 		}
 		request->SetTimeout(second);
-		http::Response* response = this->Do(std::move(request));
+		std::unique_ptr<http::Response> response = this->Do(std::move(request));
 		if (response != nullptr && response->Code() != HttpStatus::OK
 			&& response->Code() != HttpStatus::FOUND)
 		{
@@ -164,7 +164,7 @@ namespace acs
 		}
 	}
 
-	int HttpComponent::Send(std::unique_ptr<http::Request> request, std::function<void(http::Response *)> && cb)
+	int HttpComponent::Send(std::unique_ptr<http::Request> request, std::function<void(std::unique_ptr<http::Response>)> && cb)
 	{
 		request->Header().SetKeepAlive(false);
 		const http::Url & url = request->GetUrl();
@@ -193,7 +193,7 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	http::Response * HttpComponent::Do(std::unique_ptr<http::Request> request)
+	std::unique_ptr<http::Response> HttpComponent::Do(std::unique_ptr<http::Request> request)
 	{
 		std::unique_ptr<http::Response> response = std::make_unique<http::Response>();
 		{
@@ -203,7 +203,7 @@ namespace acs
 		}
 	}
 
-	http::Response* HttpComponent::Do(std::unique_ptr<http::Request> request, std::unique_ptr<http::Content> body)
+	std::unique_ptr<http::Response> HttpComponent::Do(std::unique_ptr<http::Request> request, std::unique_ptr<http::Content> body)
 	{
 		std::unique_ptr<http::Response> response = std::make_unique<http::Response>();
 		{
@@ -214,7 +214,7 @@ namespace acs
 		}
 	}
 
-	http::Response* HttpComponent::Post(const std::string& url, const json::w::Document& document, int second)
+	std::unique_ptr<http::Response> HttpComponent::Post(const std::string& url, const json::w::Document& document, int second)
 	{
 		std::unique_ptr<http::Request> request = std::make_unique<http::Request>("POST");
 		if (!request->SetUrl(url))
@@ -223,7 +223,7 @@ namespace acs
 		}
 		request->SetTimeout(second);
 		request->SetContent(document);
-		http::Response * response = this->Do(std::move(request));
+		std::unique_ptr<http::Response>response = this->Do(std::move(request));
 		if (response != nullptr && response->Code() != HttpStatus::OK)
 		{
 			LOG_ERROR("[POST] {} fail:{}", url, HttpStatusToString(response->Code()))
@@ -231,7 +231,7 @@ namespace acs
 		return response;
 	}
 
-	http::Response * HttpComponent::Post(const std::string& url, const std::string& data, int second)
+	std::unique_ptr<http::Response> HttpComponent::Post(const std::string& url, const std::string& data, int second)
 	{
 		std::unique_ptr<http::Request> request = std::make_unique<http::Request>("POST");
 		if (!request->SetUrl(url))
@@ -240,7 +240,7 @@ namespace acs
 		}
 		request->SetTimeout(second);
 		request->SetContent(http::Header::JSON, data);
-		http::Response * response = this->Do(std::move(request));
+		std::unique_ptr<http::Response> response = this->Do(std::move(request));
 		if (response != nullptr && response->Code() != HttpStatus::OK)
 		{
 			LOG_ERROR("[POST] {} fail:{}", url, HttpStatusToString(response->Code()))
@@ -253,6 +253,6 @@ namespace acs
 		int taskId = 0;
 		delete request;
 		response->Header().Del("t", taskId);
-		this->OnResponse(taskId, response);
+		this->OnResponse(taskId, std::unique_ptr<http::Response>(response));
 	}
 }

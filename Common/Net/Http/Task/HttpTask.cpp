@@ -23,7 +23,7 @@ namespace acs
         }
     }
 
-    void LuaHttpRequestTask::OnResponse(http::Response * response)
+    void LuaHttpRequestTask::OnResponse(std::unique_ptr<http::Response> response)
     {
         int count = 0;
         if(response != nullptr)
@@ -31,7 +31,6 @@ namespace acs
             count = response->WriteToLua(this->mLua);
         }
         Lua::Coroutine::Resume(this->mLua, count);
-		delete response;
     }
 
     int LuaHttpRequestTask::Await()

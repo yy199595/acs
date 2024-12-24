@@ -204,7 +204,7 @@ namespace acs
 		std::unique_ptr<wx::RefundResponse> Refund(const wx::OrderInfo & orderInfo, const std::string & reason);
 		static std::unique_ptr<json::r::Document> DecodeData(const std::string & iv, const std::string & key, const std::string & data);
 	public:
-		http::Response * GetWxCode(const std::string & path);
+		std::unique_ptr<http::Response> GetWxCode(const std::string & path);
 		bool OrderSign(const std::string & prepay_id, json::w::Value * document);
 		std::unique_ptr<wx::TransferResponse> Transfer(const wx::TransferRequest & request);
 	public:

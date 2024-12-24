@@ -75,9 +75,9 @@ namespace redis
 #ifdef ONLY_MAIN_THREAD
 			this->mComponent->OnConnectOK(this->mConfig.Index);
 #else
-			Asio::Socket& sock = this->mSocket->Get();
-			const Asio::Executor& executor = sock.get_executor();
-			asio::post(executor, [this]()
+			Asio::Context & context = this->mSocket->GetContext();
+			std::shared_ptr<tcp::Client> self = this->shared_from_this();
+			asio::post(context, [this, self]()
 			{
 				this->mComponent->OnConnectOK(this->mConfig.Index);
 			});
@@ -115,9 +115,9 @@ namespace redis
 		this->Write(*this->mRequest);
 #else
 		assert(!command->GetCommand().empty());
-		Asio::Socket& sock = this->mSocket->Get();
-		const Asio::Executor& executor = sock.get_executor();
-		asio::post(executor, [this, request = command.release()]
+		Asio::Context & context = this->mSocket->GetContext();
+		std::shared_ptr<tcp::Client> self = this->shared_from_this();
+		asio::post(context, [this, request = command.release()]
 		{
 			this->Write(*request);
 			this->mRequest.reset(request);

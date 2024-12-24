@@ -1,6 +1,5 @@
 local random = math.random
 local log = require("Log")
-local json = require("util.json")
 local str_format = string.format
 local timer = require("core.timer")
 local Module = require("Module")
@@ -58,26 +57,21 @@ function Main:Login(info)
         end
     end
 
-    local size = math.random(10, 30)
-    for i = 1, size do
-        local code1 = info.client:Call("GateSystem.Ping")
-        local code2 = info.client:Call("ChatSystem.Ping")
-        local code3 = info.client:Call("ChatSystem.OnPing")
-        local code4 = info.client:Call("ChatSystem.OnChat", {
-            msg_type = math.random(0, 3),
-            message = "hello world"
-        })
-        rpc_count = rpc_count + 4
-        info.count = info.count + 4
-    end
+    info.client:Call("GateSystem.Ping")
+    info.client:Call("ChatSystem.Ping")
+    info.client:Call("ChatSystem.OnPing")
+    info.client:Call("ChatSystem.OnChat", {
+        msg_type = math.random(0, 3),
+        message = "hello world"
+    })
+    rpc_count = rpc_count + 4
+    info.count = info.count + 4
 
     if info.count >= info.max_count then
         info.client:Close()
         info.count = 0
-    else
-        --log.Debug("user(%s) call count => %s", info.account, info.count)
     end
-
+    coroutine_sleep(200)
     local co = coroutine_create(self.Login)
     coroutine_resume(co, self, info)
 end

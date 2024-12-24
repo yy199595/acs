@@ -23,9 +23,9 @@ namespace acs
 
 	bool ClientComponent::LateAwake()
 	{
-		this->mProto = this->GetComponent<ProtoComponent>();
-		this->mLuaComponent = this->GetComponent<LuaComponent>();
-		this->mDisComponent = this->GetComponent<DispatchComponent>();
+		LOG_CHECK_RET_FALSE(this->mProto = this->GetComponent<ProtoComponent>())
+		LOG_CHECK_RET_FALSE(this->mLuaComponent = this->GetComponent<LuaComponent>())
+		LOG_CHECK_RET_FALSE(this->mDisComponent = this->GetComponent<DispatchComponent>())
 		return true;
 	}
 
@@ -39,12 +39,12 @@ namespace acs
 		}
 		int id = ++this->mIndex;
 		Asio::Context & context = this->mApp->GetContext();
-		tcp::Socket * tcpSocket = new tcp::Socket(context);
+		std::unique_ptr<tcp::Socket> tcpSocket = std::make_unique<tcp::Socket>(context);
 		std::shared_ptr<rpc::InnerClient> client = std::make_shared<rpc::InnerClient>(id, this, true, context);
 		{
 			tcpSocket->Init(ip, port);
-			client->SetSocket(tcpSocket);
-			this->mClientMap.emplace(id, client);
+			client->SetSocket(tcpSocket.release());
+			this->mClientMap.emplace(id, std::move(client));
 		}
 		return id;
 	}
@@ -161,7 +161,11 @@ namespace acs
 				break;
 			}
 		}
-		lua_pcall(lua, count, 1, 0);
+		if(lua_pcall(lua, count, 1, 0) != LUA_OK)
+		{
+			LOG_ERROR("{}", lua_tostring(lua, -1))
+			lua_pop(lua, 1);
+		}
 		return XCode::Ok;
 	}
 }

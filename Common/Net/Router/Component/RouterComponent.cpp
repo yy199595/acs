@@ -51,14 +51,12 @@ namespace acs
 
 	void RouterComponent::OnSystemUpdate() noexcept
 	{
-		while(!this->mLocalMessages.empty())
+		while (!this->mLocalMessages.empty())
 		{
-			rpc::Message * message = this->mLocalMessages.front();
+			rpc::Message* message = this->mLocalMessages.front();
+			if (this->mDisComponent->OnMessage(message) != XCode::Ok)
 			{
-				if(this->mDisComponent->OnMessage(message) != XCode::Ok)
-				{
-					delete message;
-				}
+				delete message;
 			}
 			this->mLocalMessages.pop();
 		}
@@ -118,7 +116,7 @@ namespace acs
 		return this->Send(id, std::unique_ptr<rpc::Message>(message));
 	}
 
-	rpc::Message * RouterComponent::Call(int id, std::unique_ptr<rpc::Message> message)
+	std::unique_ptr<rpc::Message> RouterComponent::Call(int id, std::unique_ptr<rpc::Message> message)
 	{
 		int timeout = message->GetTimeout();
 		int taskId = this->mDisComponent->BuildRpcId();

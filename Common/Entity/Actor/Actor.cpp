@@ -70,7 +70,7 @@ namespace acs
 		}
 		int id = message->SockId();
 		this->mLastTime = help::Time::NowSec();
-		rpc::Message * result = this->mRouterComponent->Call(id, std::move(message));
+		std::unique_ptr<rpc::Message> result = this->mRouterComponent->Call(id, std::move(message));
 		return result != nullptr ? result->GetCode() : XCode::NetTimeout;
 	}
 	
@@ -88,7 +88,7 @@ namespace acs
 		}
 		int id = message->SockId();
 		this->mLastTime = help::Time::NowSec();
-		const rpc::Message * result = this->mRouterComponent->Call(id, std::move(message));
+		std::unique_ptr<rpc::Message> result = this->mRouterComponent->Call(id, std::move(message));
 		return result != nullptr ? result->GetCode() : XCode::NetWorkError;
 	}
 
@@ -101,7 +101,7 @@ namespace acs
 			return code;
 		}
 		int id = message->SockId();
-		rpc::Message * result = this->mRouterComponent->Call(id, std::move(message));
+		std::unique_ptr<rpc::Message> result = this->mRouterComponent->Call(id, std::move(message));
 		if(result == nullptr)
 		{
 			return XCode::NetTimeout;
@@ -123,7 +123,7 @@ namespace acs
 		{
 			return XCode::NotFoundActorAddress;
 		}
-		rpc::Message * result = this->mRouterComponent->Call(id, std::move(message));
+		std::unique_ptr<rpc::Message> result = this->mRouterComponent->Call(id, std::move(message));
 		if(result == nullptr)
 		{
 			return XCode::NetTimeout;
@@ -144,7 +144,7 @@ namespace acs
 			return XCode::SerializationFailure;
 		}
 		int id = message->SockId();
-		rpc::Message* result = this->mRouterComponent->Call(id, std::move(message));
+		std::unique_ptr<rpc::Message> result = this->mRouterComponent->Call(id, std::move(message));
 		if (result == nullptr)
 		{
 			return XCode::NetTimeout;

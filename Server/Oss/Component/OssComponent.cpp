@@ -158,7 +158,7 @@ namespace acs
 			}
 			std::string url = httpRequest->GetUrl().ToStr();
 			std::unique_ptr<http::TextContent> textResponse = std::make_unique<http::TextContent>();
-			http::Response* response = this->mHttp->Do(std::move(httpRequest), std::move(textResponse));
+			std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(httpRequest), std::move(textResponse));
 			if (response == nullptr)
 			{
 				ossResponse->data = "response is null";

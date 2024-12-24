@@ -144,21 +144,21 @@ namespace acs
     public:
         explicit RedisTask(int id);
     public:
-		inline redis::Response * Await();
-		inline void OnResponse(redis::Response * response) final;
+		inline std::unique_ptr<redis::Response> Await();
+		inline void OnResponse(std::unique_ptr<redis::Response> response) final;
     private:
-		redis::Response * mMessage;
+		std::unique_ptr<redis::Response> mMessage;
     };
 
-	inline redis::Response* RedisTask::Await()
+	inline std::unique_ptr<redis::Response> RedisTask::Await()
 	{
 		this->YieldTask();
-		return this->mMessage;
+		return std::move(this->mMessage);
 	}
 
-	inline void RedisTask::OnResponse(redis::Response* response)
+	inline void RedisTask::OnResponse(std::unique_ptr<redis::Response> response)
 	{
-		this->mMessage = response;
+		this->mMessage = std::move(response);
 		this->ResumeTask();
 	}
 
@@ -169,7 +169,7 @@ namespace acs
         ~LuaRedisTask() final;
     public:
         int Await();
-        void OnResponse(redis::Response * response) final;
+        void OnResponse(std::unique_ptr<redis::Response> response) final;
     private:
         int mRef;
         lua_State * mLua;

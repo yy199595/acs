@@ -190,7 +190,7 @@ namespace acs
 		return help::fs::ReadTxtFile(this->mConfig.pay.apiKeyPath, this->mConfig.pay.apiKey);
 	}
 
-	http::Response * WeChatComponent::GetWxCode(const std::string& path)
+	std::unique_ptr<http::Response> WeChatComponent::GetWxCode(const std::string& path)
 	{
 		if (!this->GetAccessToken())
 		{
@@ -230,7 +230,7 @@ namespace acs
 	bool WeChatComponent::DownCertificates()
 	{
 		std::unique_ptr<http::Request> request1 = this->NewRequest("GET", "/v3/certificates");
-		http::Response* response = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonContent>());
+		std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonContent>());
 		if (response == nullptr)
 		{
 			return false;
@@ -287,7 +287,7 @@ namespace acs
 		document.Add("merchant_trade_no", orderId);
 		std::string host("https://api.weixin.qq.com/wxa/sec/order/get_order");
 		std::string url = fmt::format("{}?access_token={}", host, this->mAccessToken.token);
-		http::Response* httpResponse = this->mHttp->Post(url, document);
+		std::unique_ptr<http::Response> httpResponse = this->mHttp->Post(url, document);
 		if (httpResponse == nullptr || httpResponse->GetBody() == nullptr)
 		{
 			return nullptr;
@@ -326,7 +326,7 @@ namespace acs
 		{
 			return nullptr;
 		}
-		http::Response* response2 = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonContent>());
+		std::unique_ptr<http::Response> response2 = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonContent>());
 		if (response2 == nullptr || response2->Code() != HttpStatus::OK)
 		{
 			return nullptr;
@@ -435,7 +435,7 @@ namespace acs
 			std::string url = fmt::format(
 					"https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={}&secret={}",
 					this->mConfig.login.appId, this->mConfig.login.secret);
-			http::Response* response = this->mHttp->Get(url);
+			std::unique_ptr<http::Response> response = this->mHttp->Get(url);
 			if (response == nullptr || response->GetBody() == nullptr)
 			{
 				return false;
@@ -479,7 +479,7 @@ namespace acs
 		document.AddObject("payer")->Add("openid", orderInfo.openId);
 		const std::string host("https://api.weixin.qq.com/wxa/sec/order/upload_shipping_info");
 		const std::string url = fmt::format("{}?access_token={}", host, this->mAccessToken.token);
-		http::Response* httpResponse = this->mHttp->Post(url, document);
+		std::unique_ptr<http::Response> httpResponse = this->mHttp->Post(url, document);
 		if (httpResponse == nullptr || httpResponse->GetBody() == nullptr)
 		{
 			return nullptr;
@@ -517,7 +517,7 @@ namespace acs
 		std::string host("/v3/merchant-service/complaint-notifications");
 		std::unique_ptr<http::Request> request1 = this->NewRequest("GET", host);
 		{
-			http::Response* response = this->mHttp->Do(std::move(request1));
+			std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request1));
 			const http::JsonContent* jsonData = response->To<http::JsonContent>();
 			if (jsonData != nullptr)
 			{
@@ -545,7 +545,7 @@ namespace acs
 		//message.Add("mchid", this->mConfig.pay.mchId);
 		std::unique_ptr<http::Request> request3 = this->NewRequest(host, message);
 		std::unique_ptr<http::JsonContent> response2 = std::make_unique<http::JsonContent>();
-		http::Response* response = this->mHttp->Do(std::move(request3), std::move(response2));
+		std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request3), std::move(response2));
 		if (response == nullptr || response->Code() != HttpStatus::OK)
 		{
 			return false;
@@ -597,7 +597,7 @@ namespace acs
 			return false;
 		}
 		std::unique_ptr<http::JsonContent> response2 = std::make_unique<http::JsonContent>();
-		http::Response* response = this->mHttp->Do(std::move(request1), std::move(response2));
+		std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request1), std::move(response2));
 		if (response == nullptr || response->Code() != HttpStatus::OK)
 		{
 			return false;
@@ -643,7 +643,7 @@ namespace acs
 		{
 			return false;
 		}
-		http::Response* response = this->mHttp->Do(std::move(request1));
+		std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request1));
 		if (response == nullptr || response->Code() != HttpStatus::OK)
 		{
 			return false;
@@ -674,7 +674,7 @@ namespace acs
 		{
 			return nullptr;
 		}
-		http::Response* response = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonContent>());
+		std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonContent>());
 		if (response == nullptr || response->Code() != HttpStatus::OK)
 		{
 			if(response != nullptr)
@@ -727,7 +727,7 @@ namespace acs
 			json::w::Document message;
 			message.Add("code", code);
 			request1->SetContent(message);
-			http::Response* response = this->mHttp->Do(std::move(request1), std::move(responseBody));
+			std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request1), std::move(responseBody));
 			if (response == nullptr || response->Code() != HttpStatus::OK)
 			{
 				return nullptr;
@@ -768,7 +768,7 @@ namespace acs
 			fromData.Add("secret", this->mConfig.login.secret);
 			request1->SetUrl("https://api.weixin.qq.com/sns/jscode2session", fromData);
 		}
-		http::Response* response1 = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonContent>());
+		std::unique_ptr<http::Response> response1 = this->mHttp->Do(std::move(request1), std::make_unique<http::JsonContent>());
 		const http::JsonContent* jsonData = response1->GetBody()->To<const http::JsonContent>();
 		if (jsonData == nullptr)
 		{
@@ -826,7 +826,7 @@ namespace acs
 			request->SetVerifyFile(this->mConfig.pay.publicKeyPath);
 			request->Header().Add("Wechatpay-Serial", this->mConfig.pay.certNumber);
 		}
-		http::Response* response = this->mHttp->Do(std::move(request), std::make_unique<http::JsonContent>());
+		std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request), std::make_unique<http::JsonContent>());
 		if (response == nullptr || response->Code() != HttpStatus::OK)
 		{
 			return nullptr;
@@ -862,7 +862,7 @@ namespace acs
 		{
 			request0->SetUrl(url1);
 			request0->SetContent(document);
-			http::Response* response = this->mHttp->Do(std::move(request0));
+			std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request0));
 			if (response == nullptr || response->Code() != HttpStatus::OK)
 			{
 				return nullptr;
@@ -973,7 +973,7 @@ namespace acs
 		document.Add("sceneDesc", desc);
 		const std::string host("https://api.weixin.qq.com/wxaapi/newtmpl/addtemplate");
 		const std::string url = fmt::format("{}?access_token={}", host, this->mAccessToken.token);
-		http::Response* httpResponse = this->mHttp->Post(url, document);
+		std::unique_ptr<http::Response> httpResponse = this->mHttp->Post(url, document);
 
 		if (httpResponse == nullptr || httpResponse->GetBody() == nullptr)
 		{
@@ -1002,7 +1002,7 @@ namespace acs
 		//POST https://api.weixin.qq.com/wxa/sec/order/set_msg_jump_path?access_token=ACCESS_TOKEN
 		const std::string host("https://api.weixin.qq.com/wxa/sec/order/set_msg_jump_path");
 		const std::string url = fmt::format("{}?access_token={}", host, this->mAccessToken.token);
-		const http::Response* response = this->mHttp->Post(url, request);
+		std::unique_ptr<http::Response> response = this->mHttp->Post(url, request);
 		if (response == nullptr || response->GetBody() == nullptr)
 		{
 			return false;
@@ -1035,7 +1035,7 @@ namespace acs
 		std::unique_ptr<http::Request> request = std::make_unique<http::Request>("GET");
 		{
 			request->SetUrl(url, fromData);
-			http::Response* response = this->mHttp->Do(std::move(request));
+			std::unique_ptr<http::Response> response = this->mHttp->Do(std::move(request));
 			if (response == nullptr || response->Code() != HttpStatus::OK)
 			{
 				return nullptr;
