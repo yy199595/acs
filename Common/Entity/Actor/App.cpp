@@ -245,7 +245,7 @@ namespace acs
 #endif
 
 #ifdef __SHARE_PTR_COUNTER__
-						if(this->mTickCount % 3 == 0)
+						if(this->mTickCount % 2 == 0)
 						{
 							size_t count1 = rpc::Message::GetObjectCount();
 							size_t count2 = rpc::InnerClient::GetObjectCount();
