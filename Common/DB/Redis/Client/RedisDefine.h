@@ -6,6 +6,9 @@
 #include"Rpc/Async/RpcTaskSource.h"
 #include"Proto/Message/IProto.h"
 
+#ifdef __SHARE_PTR_COUNTER__
+#include "Core/Memory/MemoryObject.h"
+#endif
 namespace redis
 {
 	enum class Type
@@ -32,6 +35,9 @@ namespace redis
 namespace redis
 {
 	class Request : public tcp::IProto
+#ifdef __SHARE_PTR_COUNTER__
+			, public memory::Object<Request>
+#endif
 	{
 	public:
 		Request() : mTaskId(0){ }
@@ -90,10 +96,13 @@ namespace redis
 	}
 
 	class Response : public ILuaWrite
+#ifdef __SHARE_PTR_COUNTER__
+			, public memory::Object<Response>
+#endif
 	{
 	public:
 		Response();
-		~Response() { this->Clear(); }
+		~Response() final { this->Clear(); }
 
 	public:
 		bool IsOk();

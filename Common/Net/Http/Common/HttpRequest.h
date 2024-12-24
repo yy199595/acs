@@ -14,10 +14,16 @@
 #include"Http/Common/Content.h"
 #include"Proto/Message/IProto.h"
 
+#ifdef __SHARE_PTR_COUNTER__
+#include "Core/Memory/MemoryObject.h"
+#endif
 struct lua_State;
 namespace http
 {
 	class Request : public tcp::IProto, public ILuaWrite
+#ifdef __SHARE_PTR_COUNTER__
+			, public memory::Object<Request>
+#endif
     {
     public:
 		explicit Request();

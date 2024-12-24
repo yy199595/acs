@@ -13,7 +13,7 @@ namespace acs
     {
     public:
 		~HttpRequestTask() final = default;
-		explicit HttpRequestTask() : IRpcTask<http::Response>(0), mData(nullptr) { }
+		explicit HttpRequestTask() : IRpcTask<http::Response>(0) { }
     public:
         inline std::unique_ptr<http::Response>  Await();
 		inline void OnResponse(std::unique_ptr<http::Response> response) final;

@@ -17,7 +17,9 @@
 #define OP_GET_MORE    2005
 #define OP_DELETE 2006
 #define OP_KILL_CURSORS    2007
-
+#ifdef __SHARE_PTR_COUNTER__
+#include "Core/Memory/MemoryObject.h"
+#endif
 namespace mongo
 {
     class Head
@@ -30,6 +32,9 @@ namespace mongo
     };
 
 	class Request : public tcp::IProto
+#ifdef __SHARE_PTR_COUNTER__
+			, public memory::Object<Request>
+#endif
     {
     public:
 		Request();
@@ -61,6 +66,9 @@ namespace mongo
 	};
 
 	class Response : public tcp::IProto
+#ifdef __SHARE_PTR_COUNTER__
+			, public memory::Object<Response>
+#endif
     {
     public:
 		Response();

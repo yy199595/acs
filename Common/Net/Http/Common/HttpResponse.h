@@ -12,10 +12,16 @@
 #include"Proto/Message/IProto.h"
 #include"Yyjson/Document/Document.h"
 
+#ifdef __SHARE_PTR_COUNTER__
+#include "Core/Memory/MemoryObject.h"
+#endif
 
 namespace http
 {
 	class Response : public tcp::IProto, public ILuaWrite
+#ifdef __SHARE_PTR_COUNTER__
+			, public memory::Object<Response>
+#endif
     {
 	 public:
 		Response();
