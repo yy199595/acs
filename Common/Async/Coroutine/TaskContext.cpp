@@ -31,7 +31,7 @@ namespace acs
 	{
         this->sid = 0;
         this->mCoroutineId = 0;
-        this->mContext = nullptr;
+		this->mContext = nullptr;
         this->mFunction = nullptr;
         memset(&this->mStack, 0, sizeof(Stack));
 	}
@@ -48,7 +48,7 @@ namespace acs
 	{
 		if (this->mStack.p)
 		{
-			free(this->mStack.p);
+			std::free(this->mStack.p);
 			memset(&this->mStack, 0, sizeof(Stack));
 		}
 	}

@@ -124,11 +124,6 @@ namespace acs
 
 	void CoroutineComponent::Resume(unsigned int id) noexcept
 	{
-		if(!this->mApp->IsMainThread())
-		{
-			LOG_FATAL("coroutine id={}", id)
-			return;
-		}
 		TaskContext* coroutine = this->mCorPool.Get(id);
 		if (coroutine == nullptr)
 		{
@@ -186,8 +181,13 @@ namespace acs
 		const size_t size = top - (char*)coroutine->mContext;
         if (coroutine->mStack.size < size)
         {
-            coroutine->mStack.p = (char*)realloc(coroutine->mStack.p, size);
-            assert(coroutine->mStack.p);
+			void * newPtr = std::realloc(coroutine->mStack.p, size);
+			if(newPtr == nullptr)
+			{
+				LOG_ERROR("alloc memory:{} is null", size);
+				return;
+			}
+			coroutine->mStack.p =  (char*)newPtr;
         }
         coroutine->mStack.size = size;
         memcpy(coroutine->mStack.p, coroutine->mContext, coroutine->mStack.size);
