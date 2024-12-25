@@ -8,6 +8,7 @@
 namespace acs
 {
     WaitTaskSourceBase::WaitTaskSourceBase()
+		: mCoroutine(App::Coroutine())
     {
         this->mCorId = 0;
         this->mState = TaskState::TaskReady;
@@ -28,7 +29,7 @@ namespace acs
 				return true;
 			case TaskState::TaskAwait:
 				this->mState = state;
-				App::Coroutine()->Resume(this->mCorId);
+				this->mCoroutine->Resume(this->mCorId);
 				return true;
 			case TaskState::TaskFinish:
 				assert(false);
@@ -42,7 +43,7 @@ namespace acs
 		if(this->mState == TaskState::TaskReady)
         {
             this->mState = TaskState::TaskAwait;
-			App::Coroutine()->YieldCoroutine(this->mCorId);
+			this->mCoroutine->YieldCoroutine(this->mCorId);
             return true;
         }
         return false;

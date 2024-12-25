@@ -26,6 +26,7 @@ namespace acs
 		void OnRecord(json::w::Document &document) final;
 		ISender * GetSender(char net);
 	private:
+		unsigned int mCount;
 		class DispatchComponent * mDisComponent;
 		std::queue<rpc::Message *> mLocalMessages;
 		std::unordered_map<char, ISender *> mSenders;

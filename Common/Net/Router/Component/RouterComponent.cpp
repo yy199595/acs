@@ -11,6 +11,7 @@ namespace acs
 {
 	RouterComponent::RouterComponent()
 	{
+		this->mCount = 0;
         this->mDisComponent = nullptr;
 	}
 
@@ -23,8 +24,9 @@ namespace acs
 			char net = sender->NetType();
 			this->mSenders.emplace(net, sender);
 		}
-		this->mDisComponent = this->GetComponent<DispatchComponent>();
-		return this->mDisComponent != nullptr;
+		LOG_CHECK_RET_FALSE(!this->mSenders.empty())
+		LOG_CHECK_RET_FALSE(this->mDisComponent = this->GetComponent<DispatchComponent>())
+		return true;
 	}
 
 	ISender * RouterComponent::GetSender(char net)
@@ -66,6 +68,8 @@ namespace acs
 	{
 		auto jsonObject = document.AddObject("router");
 		{
+			jsonObject->Add("wait", this->mCount);
+			jsonObject->Add("send", this->mLocalMessages.size());
 			jsonObject->Add("count", this->mLocalMessages.size());
 		}
 	}
@@ -81,6 +85,15 @@ namespace acs
 			message->TempHead().Add("t", help::Time::NowMil());
 		}
 #endif
+		switch(message->GetType())
+		{
+			case rpc::Type::Request:
+				++this->mCount;
+				break;
+			case rpc::Type::Response:
+				--this->mCount;
+				break;
+		}
 		if(this->mApp->Equal(id))
 		{
 			message->SetSockId(id);

@@ -29,6 +29,7 @@ namespace acs
     private:
         TaskState mState;
         unsigned int mCorId;
+		class CoroutineComponent * mCoroutine;
     };
 }
 
