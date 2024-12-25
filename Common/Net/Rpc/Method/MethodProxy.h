@@ -3,10 +3,17 @@
 #include <functional>
 #include <type_traits>
 
+#ifdef __SHARE_PTR_COUNTER__
+#include "Core/Memory/MemoryObject.h"
+#endif
+
 namespace acs
 {
 
 	class StaticMethod
+#ifdef __SHARE_PTR_COUNTER__
+	: public memory::Object<StaticMethod>
+#endif
 	{
 	 public:
 		StaticMethod() = default;
