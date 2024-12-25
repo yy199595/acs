@@ -4,7 +4,9 @@
 #include"Async/Coroutine/CoroutineDef.h"
 #include"Async/Source/TaskSource.h"
 #include"Async/Lua/LuaWaitTaskSource.h"
-
+#ifdef __SHARE_PTR_COUNTER__
+#include "Core/Memory/MemoryObject.h"
+#endif
 namespace acs
 {
     template<typename T>
@@ -21,8 +23,12 @@ namespace acs
     };
 
 	class RpcTaskSource : public WaitTaskSourceBase, public IRpcTask<rpc::Message>
+#ifdef __SHARE_PTR_COUNTER__
+	, public memory::Object<LuaWaitTaskSource>
+#endif
     {
     public:
+
         explicit RpcTaskSource(int id): IRpcTask<rpc::Message>(id), mMessage(nullptr) { }
     public:
 		inline std::unique_ptr<rpc::Message> Await();
@@ -44,6 +50,9 @@ namespace acs
 	}
 
 	class LuaRpcTaskSource :  public IRpcTask<rpc::Message>
+#ifdef __SHARE_PTR_COUNTER__
+	, public memory::Object<LuaWaitTaskSource>
+#endif
 	{
 	 public:
 		LuaRpcTaskSource(lua_State * lua, int id);

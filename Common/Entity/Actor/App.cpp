@@ -260,6 +260,10 @@ namespace acs
 							size_t count11 = http::Response::GetObjectCount();
 							size_t count12 = redis::Request::GetObjectCount();
 							size_t count13 = redis::Response::GetObjectCount();
+
+							size_t count14 = RpcTaskSource::GetObjectCount();
+							size_t count15 = LuaRpcTaskSource::GetObjectCount();
+
 #ifndef __OS_WIN__
 							os::SystemInfo systemInfo;
 							constexpr double MB = 1024 * 1024.0f;
@@ -269,7 +273,7 @@ namespace acs
 							LOG_DEBUG("[{:.3f}MB] message:{} inner:{} outer:{} session:{} request:{} "
 									  "player:{} task:{} sock:{} cor:{}", mb, count1, count2, count3,
 									  count4, count5, count6, count7, count8, count9)
-							LOG_INFO("http_req:{} http_res:{} redis_req:{} redis:res", count10, count11, count12, count13)
+							LOG_INFO("http:{}/{}  redis:{}/{} rpc:{} lua_rpc:{}", count10, count11, count12, count13, count14, count15)
 						}
 #endif
 						this->mTickCount++;
