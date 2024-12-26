@@ -145,7 +145,7 @@ namespace http
 
 	void Response::Json(json::w::Document& document)
 	{
-		std::unique_ptr<http::JsonContent> jsonData(new http::JsonContent());
+		std::unique_ptr<http::JsonContent> jsonData = std::make_unique<http::JsonContent>();
 		{
 			jsonData->Write(document);
 		}
@@ -154,7 +154,7 @@ namespace http
 
 	void Response::SetContent(const std::string & type, const std::string& str)
 	{
-		std::unique_ptr<http::TextContent> customData(new http::TextContent());
+		std::unique_ptr<http::TextContent> customData = std::make_unique<http::TextContent>();
 		{
 			customData->SetContent(type, str.c_str(), str.size());
 		}
@@ -189,7 +189,7 @@ namespace http
 		{
 			help::dir::MakeDir(dir);
 		}
-		std::unique_ptr<http::FileContent> fileData(new http::FileContent());
+		std::unique_ptr<http::FileContent> fileData = std::make_unique<http::FileContent>();
 		{
 			if(!fileData->MakeFile(path))
 			{

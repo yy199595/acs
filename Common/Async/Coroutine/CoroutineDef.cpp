@@ -6,26 +6,23 @@ namespace acs
 {
 	TaskContextPool::~TaskContextPool()
 	{
-        auto iter = this->mCoroutines.begin();
-        for(;iter != this->mCoroutines.end(); iter++)
-        {
-            delete iter->second;
-        }
         this->mCoroutines.clear();
 	}
 
 	TaskContext * TaskContextPool::Pop()
 	{
-		TaskContext* coroutine  = new TaskContext();
+		TaskContext * newCoroutine = nullptr;
+		std::unique_ptr<TaskContext> coroutine  = std::make_unique<TaskContext>();
 		{
+			newCoroutine = coroutine.get();
 			coroutine->mContext = nullptr;
 			coroutine->mFunction = nullptr;
 			coroutine->mState = CorState::Ready;
 			coroutine->mCoroutineId = this->mNumPool.BuildNumber();
 			coroutine->sid = coroutine->mCoroutineId & (SHARED_STACK_NUM - 1);
 		}
-		this->mCoroutines.emplace(coroutine->mCoroutineId, coroutine);
-		return coroutine;
+		this->mCoroutines.emplace(coroutine->mCoroutineId, std::move(coroutine));
+		return newCoroutine;
 	}
 
 	size_t TaskContextPool::GetWaitCount() const
@@ -56,7 +53,7 @@ namespace acs
 	TaskContext * TaskContextPool::Get(unsigned int id)
 	{
         auto iter = this->mCoroutines.find(id);
-        return iter != this->mCoroutines.end() ? iter->second : nullptr;
+        return iter != this->mCoroutines.end() ? iter->second.get(): nullptr;
 	}
 
 	bool TaskContextPool::Remove(unsigned int id)

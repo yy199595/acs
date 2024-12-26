@@ -17,22 +17,30 @@ namespace acs
 		template<typename F, typename T, typename ... Args>
 		inline unsigned int Start(F&& f, T* o, Args&& ... args) noexcept
 		{
-			TaskContext* co = this->MakeContext(
-				NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...));
-			this->Resume(co->mCoroutineId);
-			return co->mCoroutineId;
+			std::unique_ptr<StaticMethod> method = NewMethodProxy(std::forward<F>(f), o, std::forward<Args>(args)...);
+			TaskContext* co = this->MakeContext(std::move(method));
+			if(co == nullptr)
+			{
+				return 0;
+			}
+			return this->Resume(co->mCoroutineId);
 		}
 		inline unsigned int Start(std::function<void()>&& func) noexcept
 		{
-			TaskContext* co = this->MakeContext(
-                    new LambdaMethod(std::move(func)));
-			this->Resume(co->mCoroutineId);
-			return co->mCoroutineId;
+			std::unique_ptr<LambdaMethod> method = std::make_unique<LambdaMethod>(std::move(func));
+			{
+				TaskContext* co = this->MakeContext(std::move(method));
+				if(co == nullptr)
+				{
+					return 0;
+				}
+				return this->Resume(co->mCoroutineId);
+			}
 		}
 	 public:
 		void Sleep(unsigned int ms);
-		void Resume(unsigned int id) noexcept;
 		bool YieldCoroutine()  const noexcept;
+		unsigned int Resume(unsigned int id) noexcept;
 		bool YieldCoroutine(unsigned int& mCorId) const noexcept;
     private:
 		bool Awake() final;
@@ -51,7 +59,7 @@ namespace acs
 	 private:
 		void SaveStack(unsigned int id);
 		void RunCoroutine(TaskContext * coroutine);
-		TaskContext* MakeContext(StaticMethod* func);
+		TaskContext* MakeContext(std::unique_ptr<StaticMethod> func);
     private:
 		TaskContextPool mCorPool;
 		TaskContext* mRunContext;

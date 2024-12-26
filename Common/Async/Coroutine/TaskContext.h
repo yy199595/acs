@@ -24,8 +24,8 @@ namespace acs
 
 	struct Stack
 	{
-		char* p;
-		char* top;
+		char* p = nullptr;
+		char* top = nullptr;
 		size_t size = 0;
 		unsigned int co = 0;
 	};
@@ -55,8 +55,8 @@ namespace acs
         Stack mStack;
         CorState mState;
         tb_context_t mContext;
-		StaticMethod* mFunction;
 		unsigned int mCoroutineId;
+		std::unique_ptr<StaticMethod> mFunction;
 #ifdef __MEMORY_POOL_OPERATOR__
 	private:
 		static std::vector<void *> sAllocArray;

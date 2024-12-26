@@ -33,13 +33,13 @@ namespace acs
         this->mCoroutineId = 0;
 		this->mContext = nullptr;
         this->mFunction = nullptr;
+		this->mState = CorState::Ready;
         memset(&this->mStack, 0, sizeof(Stack));
 	}
 
 	void TaskContext::Invoke()
 	{
 		this->mFunction->run();
-		delete this->mFunction;
 		this->mFunction = nullptr;
 		this->mState = CorState::Finish;
 	}

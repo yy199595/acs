@@ -66,6 +66,7 @@ namespace acs
 	 public:
 		explicit ServiceMethod(std::string name)
 			: mName(std::move(name)) {}
+			virtual ~ServiceMethod() = default;
 	 public:
 		virtual bool IsLuaMethod() = 0;
 		virtual int Invoke(rpc::Message & message) = 0;

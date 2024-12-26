@@ -8,7 +8,7 @@
 #include"Context/context.h"
 
 #define STACK_SIZE (1024 * 1024)
-#define SHARED_STACK_NUM 8 //共享栈个数
+#define SHARED_STACK_NUM 1 //共享栈个数
 
 #define COR_POOL_COUNT 100
 
@@ -31,6 +31,6 @@ namespace acs
 		size_t GetCount() const { return this->mCoroutines.size(); }
 	private:
 		math::NumberPool<unsigned int> mNumPool;
-		std::unordered_map<unsigned int, TaskContext*> mCoroutines;
+		std::unordered_map<unsigned int, std::unique_ptr<TaskContext>> mCoroutines;
 	};
 }

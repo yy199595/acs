@@ -37,11 +37,9 @@ namespace acs
 			}
 			unsigned int id = this->mRunContext->mCoroutineId;
 			{
-				delete this->mRunContext;
 				this->mCorPool.Remove(id);
 				this->mRunContext = nullptr;
 			}
-
 		}
 		tb_context_jump(this->mMainContext, nullptr);
 	}
@@ -111,7 +109,6 @@ namespace acs
 		{
 			this->mRunContext->mContext = from.ctx;
 		}
-		this->mRunContext = nullptr;
 	}
 
 	bool CoroutineComponent::YieldCoroutine() const noexcept
@@ -122,20 +119,20 @@ namespace acs
 		return true;
 	}
 
-	void CoroutineComponent::Resume(unsigned int id) noexcept
+	unsigned int CoroutineComponent::Resume(unsigned int id) noexcept
 	{
 		TaskContext* coroutine = this->mCorPool.Get(id);
 		if (coroutine == nullptr)
 		{
 			LOG_FATAL("try resume context id : {}", id);
-			return;
+			return 0;
 		}
 		switch (coroutine->mState)
 		{
 			case CorState::Ready:
 			case CorState::Suspend:
 				this->mResumeContexts.push(coroutine);
-				break;
+				return coroutine->mCoroutineId;
 			default:
 #ifdef __DEBUG__
 				assert(false);
@@ -144,15 +141,16 @@ namespace acs
 				break;
 #endif
 		}
+		return 0;
 	}
 
-	TaskContext* CoroutineComponent::MakeContext(StaticMethod* func)
+	TaskContext* CoroutineComponent::MakeContext(std::unique_ptr<StaticMethod> func)
 	{
 		TaskContext* coroutine = this->mCorPool.Pop();
 		if (coroutine != nullptr)
 		{
-			coroutine->mFunction = func;
 			coroutine->mState = CorState::Ready;
+			coroutine->mFunction = std::move(func);
 		}
 		return coroutine;
 	}
@@ -170,7 +168,10 @@ namespace acs
 
 	void CoroutineComponent::SaveStack(unsigned int id)
 	{
-		if (id == 0) return;
+		if(id == 0)
+		{
+			return;
+		}
 		TaskContext* coroutine = this->mCorPool.Get(id);
 		if (coroutine == nullptr)
 		{
@@ -187,6 +188,7 @@ namespace acs
 				LOG_ERROR("alloc memory:{} is null", size);
 				return;
 			}
+			memset(newPtr, 0, size);
 			coroutine->mStack.p =  (char*)newPtr;
         }
         coroutine->mStack.size = size;
@@ -197,16 +199,16 @@ namespace acs
 	{
         while(!this->mResumeContexts.empty())
         {
-            this->mRunContext = this->mResumeContexts.front();
+            TaskContext * coroutine = this->mResumeContexts.front();
 			{
 				this->mResumeContexts.pop();
-				if(this->mRunContext == nullptr)
+				if(coroutine == nullptr)
 				{
 					LOG_FATAL("not find task context");
 					continue;
 				}
 			}
-			this->RunCoroutine(this->mRunContext);
+			this->RunCoroutine(coroutine);
         }
 	}
 	void CoroutineComponent::OnLastFrameUpdate(long long) noexcept
