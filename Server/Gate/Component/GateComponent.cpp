@@ -42,7 +42,7 @@ namespace acs
 		{
 			message->SetType(rpc::Type::Broadcast);
 			message->SetProto(rpc::Porto::Protobuf);
-			message->GetHead().Add("func", "ChatComponent.OnChat");
+			message->GetHead().Add(rpc::Header::func, func);
 			{
 				message->WriteMessage(data);
 			}

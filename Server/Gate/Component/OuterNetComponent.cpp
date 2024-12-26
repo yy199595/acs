@@ -248,15 +248,16 @@ namespace acs
 	void OuterNetComponent::OnSendFailure(int id, rpc::Message* message)
 	{
 		int sockId = 0;
-		std::unique_ptr<rpc::Message> request(message);
 		message->GetHead().Add(rpc::Header::code, XCode::SendMessageFail);
 		if(message->GetType() == rpc::Type::Request && message->GetRpcId() > 0)
 		{
 			if(message->GetHead().Get(rpc::Header::sock_id, sockId))
 			{
-				this->SendBySockId(sockId, request.release());
+				this->SendBySockId(sockId, message);
+				return;
 			}
 		}
+		delete message;
 	}
 
 	void OuterNetComponent::StartClose(int id, int code)
