@@ -68,7 +68,6 @@ namespace acs
 			: mName(std::move(name)) {}
 			virtual ~ServiceMethod() = default;
 	 public:
-		virtual bool IsLuaMethod() = 0;
 		virtual int Invoke(rpc::Message & message) = 0;
 		const std::string& GetName()
 		{
@@ -106,11 +105,6 @@ namespace acs
             }
 			return (_o->*_objfunc)(userId);
 		}
-
-		bool IsLuaMethod() override
-		{
-			return false;
-		};
 	 private:
 		T* _o;
 		const bool mHasUserId;
@@ -149,10 +143,6 @@ namespace acs
             }
 			return (_o->*_objfunc)(userId, *request);
 		}
-		bool IsLuaMethod() override
-		{
-			return false;
-		};
 	 private:
 		T* _o;
 		const bool mHasUserId;
@@ -214,10 +204,6 @@ namespace acs
 			}
 			return code;
 		}
-		bool IsLuaMethod() override
-		{
-			return false;
-		};
 	 private:
 		T* _o;
 		const bool mHasUserId;
@@ -266,10 +252,6 @@ namespace acs
 			}
 			return code;
 		}
-		bool IsLuaMethod() override
-		{
-			return false;
-		};
 	 private:
 		T* _o;
 		const bool mHasUserId;
@@ -289,7 +271,6 @@ namespace acs
 		}
 
 	 public:
-		bool IsLuaMethod() override { return false; };
 		int Invoke(rpc::Message & message) override
 		{
 			return (_o->*_func)(message);
@@ -311,7 +292,6 @@ namespace acs
 		}
 
 	public:
-		bool IsLuaMethod() override { return false; };
 		int Invoke(rpc::Message& message) override
 		{
 			return (_o->*_func)(message, message);
@@ -333,7 +313,6 @@ namespace acs
 		}
 
 	public:
-		bool IsLuaMethod() override { return false; };
 		int Invoke(rpc::Message& message) override
 		{
 			std::unique_ptr<json::r::Document> request = std::make_unique<json::r::Document>();
@@ -360,7 +339,6 @@ namespace acs
 		}
 
 	public:
-		bool IsLuaMethod() override { return false; };
 		int Invoke(rpc::Message& message) override
 		{
 			std::unique_ptr<json::r::Document> request = std::make_unique<json::r::Document>();
@@ -390,7 +368,6 @@ namespace acs
 		}
 
 	public:
-		bool IsLuaMethod() override { return false; };
 		int Invoke(rpc::Message& message) override
 		{
 			std::unique_ptr<T1> request = std::make_unique<T1>();
