@@ -188,7 +188,6 @@ namespace acs
 				LOG_ERROR("alloc memory:{} is null", size);
 				return;
 			}
-			memset(newPtr, 0, size);
 			coroutine->mStack.p =  (char*)newPtr;
         }
         coroutine->mStack.size = size;
