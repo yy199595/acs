@@ -19,7 +19,6 @@ namespace acs
 	{
 		this->mProto = nullptr;
 		this->mRouterComponent = nullptr;
-		this->mLastTime = help::Time::NowSec();
 	}
 
 	bool Actor::LateAwake()
@@ -39,7 +38,6 @@ namespace acs
 			return code;
 		}
 		int id = message->SockId();
-		this->mLastTime = help::Time::NowSec();
 		return this->mRouterComponent->Send(id, std::move(message));
 	}
 
@@ -56,7 +54,6 @@ namespace acs
 			return XCode::SerializationFailure;
 		}
 		int id = message->SockId();
-		this->mLastTime = help::Time::NowSec();
 		return this->mRouterComponent->Send(id, std::move(message));
 	}
 
@@ -69,7 +66,6 @@ namespace acs
 			return code;
 		}
 		int id = message->SockId();
-		this->mLastTime = help::Time::NowSec();
 		std::unique_ptr<rpc::Message> result = this->mRouterComponent->Call(id, std::move(message));
 		return result != nullptr ? result->GetCode() : XCode::NetTimeout;
 	}
@@ -87,7 +83,6 @@ namespace acs
 			return XCode::SerializationFailure;
 		}
 		int id = message->SockId();
-		this->mLastTime = help::Time::NowSec();
 		std::unique_ptr<rpc::Message> result = this->mRouterComponent->Call(id, std::move(message));
 		return result != nullptr ? result->GetCode() : XCode::NetWorkError;
 	}
@@ -218,14 +213,12 @@ namespace acs
 	int Actor::LuaCall(lua_State* lua, std::unique_ptr<rpc::Message> message)
 	{
 		int id = message->SockId();
-		this->mLastTime = help::Time::NowSec();
 		return this->mRouterComponent->LuaCall(lua, id, std::move(message));
 	}
 
 	int Actor::LuaSend(lua_State* lua, std::unique_ptr<rpc::Message> message)
 	{
 		int id = message->SockId();
-		this->mLastTime = help::Time::NowSec();
 		int code = this->mRouterComponent->Send(id, std::move(message));
 
 		lua_pushinteger(lua, code);
@@ -242,7 +235,6 @@ namespace acs
 		}
 		int id = message->SockId();
 		message->SetProto(rpc::Porto::String);
-		this->mLastTime = help::Time::NowSec();
 		message->GetHead().Add("channel", event);
 		return this->mRouterComponent->Send(id, std::move(message));
 	}
@@ -257,7 +249,6 @@ namespace acs
 		}
 		int id = message->SockId();
 		message->SetProto(rpc::Porto::Json);
-		this->mLastTime = help::Time::NowSec();
 		message->GetHead().Add("channel", event);
 		message->SetContent(document.JsonString());
 		return this->mRouterComponent->Send(id, std::move(message));
@@ -274,7 +265,6 @@ namespace acs
 		int id = message->SockId();
 		message->SetContent(proto, data);
 		message->SetProto(rpc::Porto::Json);
-		this->mLastTime = help::Time::NowSec();
 		message->GetHead().Add("channel", event);
 		return this->mRouterComponent->Send(id, std::move(message));
 	}

@@ -42,7 +42,6 @@ namespace acs
 	protected:
 		class RouterComponent * mRouterComponent;
 	private:
-		long long mLastTime;
 		const std::string mName;
 		class ProtoComponent * mProto;
 	};
