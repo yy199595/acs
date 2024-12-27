@@ -260,10 +260,12 @@ namespace redis
 #ifdef ONLY_MAIN_THREAD
 		this->mComponent->OnMessage(id, this->mRequest.release(), this->mResponse.release());
 #else
-
-		asio::post(this->mMainContext, [this, req = this->mRequest.release(), id, res = this->mResponse.release()]
+		redis::Request * req = this->mRequest.release();
+		redis::Response * resp = this->mResponse.release();
+		asio::post(this->mMainContext, [this, req, id, resp]
 		{
-			this->mComponent->OnMessage(id, req, res);
+			this->mComponent->OnMessage(id, req, resp);
+			delete req;
 		});
 #endif
 	}

@@ -81,7 +81,6 @@ namespace acs
 		}
 		int rpcId = request->GetRpcId();
 		this->OnResponse(rpcId, std::unique_ptr<redis::Response>(response));
-		delete request;
 
 		if(this->mRequests.empty())
 		{

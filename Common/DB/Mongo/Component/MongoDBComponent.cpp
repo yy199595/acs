@@ -147,7 +147,6 @@ namespace acs
 				CONSOLE_LOG_INFO("[response:{}] = {}", request->GetCostTime(), response->ToString());
 			}
 		}
-		delete request;
 		this->OnResponse(taskId, std::unique_ptr<mongo::Response>(response));
 
 		if(this->mRequests.empty())

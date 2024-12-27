@@ -280,6 +280,7 @@ namespace mongo
 		asio::post(this->mMainContext, [this, self, req, id, resp]
 		{
 			this->mComponent->OnMessage(id, req, resp);
+			delete req;
 		});
 #endif
 	}
