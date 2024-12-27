@@ -147,6 +147,7 @@ namespace acs
 				CONSOLE_LOG_INFO("[response:{}] = {}", request->GetCostTime(), response->ToString());
 			}
 		}
+		delete request;
 		this->OnResponse(taskId, std::unique_ptr<mongo::Response>(response));
 
 		if(this->mRequests.empty())
@@ -159,7 +160,6 @@ namespace acs
 			this->Send(id, std::move(request1));
 			this->mRequests.pop();
 		}
-		delete request;
 	}
 
 	std::unique_ptr<mongo::Response> MongoDBComponent::Run(std::unique_ptr<mongo::Request> request)
