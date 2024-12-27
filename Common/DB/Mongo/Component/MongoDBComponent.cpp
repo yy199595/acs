@@ -12,7 +12,8 @@
 #include"Server/Config/ServerConfig.h"
 #include"Server/Component/ThreadComponent.h"
 
-// db.createUser({ user: 'root', pwd: '199595yjz.', roles: [{ role: 'root', db: 'yjz' }] })
+// use admin 	=>db.createUser({ user: 'root', pwd: '199595yjz.', roles: [{ role: 'root', db: 'yjz' }] })
+// use yjz 		=> db.createUser({ user: 'root', pwd: '199595yjz.', roles: [{ role: 'readWrite', db: 'yjz' }] })
 namespace acs
 {
 	MongoTask::MongoTask(int id)
