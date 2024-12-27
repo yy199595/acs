@@ -14,6 +14,7 @@ namespace udp
 		Server(asio::io_context & io, Component * component, unsigned short port, Asio::Context & main);
 	public:
 		void StartReceive();
+		inline Asio::Context & GetContext() { return this->mContext; }
 		inline asio::ip::udp::socket & Socket() { return this->mSocket; }
 	public:
 		bool Send(const std::string & addr, tcp::IProto * message);

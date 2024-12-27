@@ -497,17 +497,7 @@ namespace acs
 				LOG_ERROR("[{}] {} {}", ip, request->GetUrl().Path(), HttpStatusToString(HttpStatus::NOT_FOUND));
 				break;
 			}
-			os::SystemInfo systemInfo1;
-			os::System::GetSystemInfo(systemInfo1);
 			int logicCode = httpService->Invoke(config, *request, *response);
-
-			os::SystemInfo systemInfo2;
-			os::System::GetSystemInfo(systemInfo2);
-			if(systemInfo1.use_memory != systemInfo2.use_memory)
-			{
-				LOG_INFO("[{}] use memory => {}", config->Path, systemInfo2.use_memory - systemInfo1.use_memory);
-			}
-
 			if (response->GetBody() == nullptr)
 			{
 				json::w::Document document;

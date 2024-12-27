@@ -49,7 +49,7 @@ namespace udp
 			}
 			unsigned short port = this->mSenderPoint.port();
 			std::string ip = this->mSenderPoint.address().to_string();
-			std::string address = fmt::format("{}:{}", ip, port);
+			const std::string address = fmt::format("{}:{}", ip, port);
 #ifdef __DEBUG__
 			rpcPacket->TempHead().Add(rpc::Header::from_addr, address);
 #endif
@@ -78,9 +78,10 @@ namespace udp
 			std::ostream stream(&this->mSendBuffer);
 			int length = message->OnSendMessage(stream);
 			asio::ip::udp::endpoint endpoint(asio::ip::make_address(ip), port);
-			this->mSocket.async_send_to(this->mSendBuffer.data(), endpoint,
-					[this, length, message](const asio::error_code& code, size_t size)
+			this->mSocket.async_send_to(this->mSendBuffer.data(), endpoint, [this, length, message]
+				(const asio::error_code& code, size_t size)
 					{
+						delete message;
 						if (code.value() != Asio::OK)
 						{
 							return;

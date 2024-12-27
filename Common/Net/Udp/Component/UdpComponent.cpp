@@ -45,16 +45,14 @@ namespace acs
 		}
 #else
 		custom::ThreadSync<bool> threadSync;
-		Asio::Executor executor = this->mUdpServer->Socket().get_executor();
+		Asio::Context& context = this->mUdpServer->GetContext();
+		asio::post(context, [this, &threadSync]()
 		{
-			asio::post(executor, [this, &threadSync]()
-			{
-				Asio::Code code;
-				this->mUdpServer->Socket().close(code);
-				threadSync.SetResult(code.value() == Asio::OK);
-			});
-		}
-		if(!threadSync.Wait())
+			Asio::Code code;
+			this->mUdpServer->Socket().close(code);
+			threadSync.SetResult(code.value() == Asio::OK);
+		});
+		if (!threadSync.Wait())
 		{
 			return false;
 		}

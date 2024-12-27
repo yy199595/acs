@@ -147,14 +147,7 @@ namespace rpc
 			this->mSendMessages.emplace(iter->second);
 		}
 		this->mWaitResMessages.clear();
-#ifdef ONLY_MAIN_THREAD
-		while (!this->mSendMessages.empty())
-		{
-			rpc::Packet* data = this->mSendMessages.front();
-			this->mComponent->OnSendFailure(this->mSockId, data);
-			this->mSendMessages.pop();
-		}
-#else
+
 		std::shared_ptr<Client> self = this->shared_from_this();
 		asio::post(this->mMainContext, [this, self]
 		{
@@ -165,7 +158,7 @@ namespace rpc
 				this->mSendMessages.pop();
 			}
 		});
-#endif
+
 		this->mClose = true;
 		this->mSocket->Close();
 	}
@@ -175,15 +168,11 @@ namespace rpc
 		if(!this->mClose)
 		{
 			this->CloseSocket();
-#ifdef ONLY_MAIN_THREAD
-			this->mComponent->OnClientError(this->mSockId, code);
-#else
 			std::shared_ptr<Client> self = this->shared_from_this();
 			asio::post(this->mMainContext, [self, this, code]()
 			{
 				this->mComponent->OnClientError(this->mSockId, code);
 			});
-#endif
 		}
 	}
 
@@ -269,11 +258,7 @@ namespace rpc
 #ifdef __DEBUG__
 			request->TempHead().Add(rpc::Header::from_addr, this->mSocket->GetAddress());
 #endif
-#ifdef ONLY_MAIN_THREAD
-			this->mComponent->OnMessage(request, nullptr);
-#else
-			asio::post(this->mMainContext, [this, request] { this->mComponent->OnMessage(request, nullptr); });
-#endif
+		asio::post(this->mMainContext, [this, request] { this->mComponent->OnMessage(request, nullptr); });
 		} while (false);
 		this->mDecodeStatus = tcp::Decode::None;
 		Asio::Context& context = this->mSocket->GetContext();
@@ -283,23 +268,18 @@ namespace rpc
 
 	void InnerClient::Close()
 	{
-#ifdef ONLY_MAIN_THREAD
-		this->CloseSocket();
-#else
 		Asio::Context & context = this->mSocket->GetContext();
 		std::shared_ptr<Client> self = this->shared_from_this();
 		asio::post(context, [this, self] { this->CloseSocket(); });
-#endif
 	}
 
 	void InnerClient::StartReceive(tcp::Socket* socket)
 	{
 		this->SetSocket(socket);
-#ifdef ONLY_MAIN_THREAD
 		this->mSocket->SetOption(tcp::OptionType::NoDelay, true);
 		this->mSocket->SetOption(tcp::OptionType::KeepAlive, true);
 		this->ReadLength(rpc::RPC_PACK_HEAD_LEN);
-#else
+
 		Asio::Context & context = this->mSocket->GetContext();
 		std::shared_ptr<Client> self = this->shared_from_this();
 		asio::post(context, [this, self]
@@ -308,6 +288,5 @@ namespace rpc
 			this->mSocket->SetOption(tcp::OptionType::KeepAlive, true);
 			this->ReadLength(rpc::RPC_PACK_HEAD_LEN);
 		});
-#endif
 	}
 }

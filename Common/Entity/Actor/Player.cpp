@@ -5,9 +5,7 @@
 #include"Player.h"
 #include"XCode/XCode.h"
 #include"Entity/Actor/App.h"
-#include"Lua/Engine/Define.h"
 #include"Server/Config/ServerConfig.h"
-#include"Rpc/Component/InnerNetComponent.h"
 #include "Util/Tools/TimeHelper.h"
 #include "s2s/s2s.pb.h"
 

@@ -36,15 +36,11 @@ namespace rpc
 	void OuterClient::StartReceive(tcp::Socket * socket, int second)
 	{
 		this->SetSocket(socket);
-#ifdef ONLY_MAIN_THREAD
-		this->ReadLength(rpc::RPC_PACK_HEAD_LEN, second);
-#else
 		std::shared_ptr<Client> self = this->shared_from_this();
 		asio::post(this->mSocket->GetContext(), [this, self, second]
 		{
 			this->ReadLength(rpc::RPC_PACK_HEAD_LEN, second);
 		});
-#endif
 	}
 
 	void OuterClient::OnTimeout(tcp::TimeoutFlag flag)
@@ -129,19 +125,16 @@ namespace rpc
 #ifdef __DEBUG__
 		request->TempHead().Add(rpc::Header::from_addr, this->mSocket->GetAddress());
 #endif
-#ifdef ONLY_MAIN_THREAD
-		this->mComponent->OnMessage(request, nullptr);
-#else
+
 		std::shared_ptr<Client> self = this->shared_from_this();
-		asio::post(this->mMainContext, [this, self, request] {
+		asio::post(this->mMainContext, [this, self, request]
+		{
 			this->mComponent->OnMessage(request, nullptr);
 		});
-#endif
 		this->mDecodeState = tcp::Decode::None;
 		this->mLastRecvTime = help::Time::NowSec();
 		Asio::Context & context = this->mSocket->GetContext();
-		std::shared_ptr<Client> that = this->shared_from_this();
-		asio::post(context, [this, that] { this->ReadLength(rpc::RPC_PACK_HEAD_LEN); });
+		asio::post(context, [this, self] { this->ReadLength(rpc::RPC_PACK_HEAD_LEN); });
 	}
 
     void OuterClient::CloseSocket()
@@ -172,14 +165,10 @@ namespace rpc
 		if(!this->mClose)
 		{
 			this->CloseSocket();
-#ifdef ONLY_MAIN_THREAD
-			this->mComponent->OnClientError(this->mSockId, code);
-#else
 			std::shared_ptr<Client> self = this->shared_from_this();
 			asio::post(this->mMainContext, [this, self, code]() {
 				this->mComponent->OnClientError(this->mSockId, code);
 			});
-#endif
 		}
 	}
 
@@ -210,9 +199,6 @@ namespace rpc
 	bool OuterClient::Send(rpc::Message* message)
 	{
 		LOG_CHECK_RET_FALSE(message);
-#ifdef ONLY_MAIN_THREAD
-		this->Write(*message);
-#else
 		std::shared_ptr<Client> self = this->shared_from_this();
 		asio::post(this->mSocket->GetContext(), [this, self, message]
 		{
@@ -222,7 +208,6 @@ namespace rpc
 				this->Write(*message);
 			}
 		});
-#endif
 		return true;
 	}
 }
