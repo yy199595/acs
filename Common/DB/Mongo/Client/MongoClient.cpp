@@ -43,9 +43,8 @@ namespace mongo
 			return this->StartAuthBySha1();
 		}
 		custom::ThreadSync<bool> threadSync;
-		Asio::Socket& sock = this->mSocket->Get();
-		const Asio::Executor& executor = sock.get_executor();
-		asio::post(executor, [this, &executor, &threadSync]
+		Asio::Context & context = this->mSocket->GetContext();
+		asio::post(context, [this, &threadSync]
 			{
 				if (this->StartAuthBySha1())
 				{
@@ -275,7 +274,11 @@ namespace mongo
 #ifdef ONLY_MAIN_THREAD
 		this->mComponent->OnMessage(id, request.release(), response.release());
 #else
-		asio::post(this->mMainContext, [this, req = request.release(), id, resp = response.release()] {
+		mongo::Request * req = request.release();
+		mongo::Response * resp = response.release();
+		std::shared_ptr<tcp::Client> self = this->shared_from_this();
+		asio::post(this->mMainContext, [this, self, req, id, resp]
+		{
 			this->mComponent->OnMessage(id, req, resp);
 		});
 #endif
@@ -287,9 +290,9 @@ namespace mongo
 		this->mRequest = std::move(request);
 		this->Write(*this->mRequest);
 #else
-		Asio::Socket& sock = this->mSocket->Get();
-		const Asio::Executor& executor = sock.get_executor();
-		asio::post(executor, [this, data = request.release()]
+		Asio::Context & context = this->mSocket->GetContext();
+		std::shared_ptr<tcp::Client> self = this->shared_from_this();
+		asio::post(context, [this, self, data = request.release()]
 		{
 			this->mRequest.reset(data);
 			this->Write(*data);
@@ -373,11 +376,15 @@ namespace mongo
 		}
 		this->mSocket->SetOption(tcp::OptionType::NoDelay, true);
 		this->mSocket->SetOption(tcp::OptionType::KeepAlive, true);
-		if(!this->Auth(this->mConfig.User, "admin", this->mConfig.Password))
+		if(!this->Auth(this->mConfig.User, this->mConfig.DB, this->mConfig.Password))
 		{
-			this->OnResponse(XCode::NetWorkError);
-			return;
+			if(!this->Auth(this->mConfig.User, "admin", this->mConfig.Password))
+			{
+				this->OnResponse(XCode::NetWorkError);
+				return;
+			}
 		}
+
 		this->ClearSendStream();
 		this->ClearRecvStream();
 		if(this->mRequest != nullptr)
@@ -397,7 +404,11 @@ namespace mongo
 		}
 		this->mSocket->SetOption(tcp::OptionType::NoDelay, true);
 		this->mSocket->SetOption(tcp::OptionType::KeepAlive, true);
-		return this->Auth(this->mConfig.User, "admin", this->mConfig.Password);
+		if(!this->Auth(this->mConfig.User, this->mConfig.DB, this->mConfig.Password))
+		{
+			return this->Auth(this->mConfig.User, "admin", this->mConfig.Password);
+		}
+		return true;
 	}
 
 }
