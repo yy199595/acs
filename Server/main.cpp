@@ -38,7 +38,7 @@
 #include "Http/Service/ResourceMgr.h"
 
 #include "Record/Component/RecordComponent.h"
-
+#include "Quick/Component/QuickComponent.h"
 
 #include "Redis/Component/DelayQueueComponent.h"
 #include "WX/Service/WeChat.h"
@@ -138,6 +138,7 @@ void RegisterComponent()
 	REGISTER_COMPONENT(LuaListenComponent);
 	REGISTER_COMPONENT(UdpComponent);
 	REGISTER_COMPONENT(KcpComponent);
+	REGISTER_COMPONENT(QuickComponent);
 }
 
 void RegisterAll()
