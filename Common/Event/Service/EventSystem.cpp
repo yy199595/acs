@@ -26,8 +26,8 @@ namespace acs
 		rpc::Message * eventMessage = new rpc::Message();
 		{
 			eventMessage->SetType(rpc::Type::Request);
-			eventMessage->GetHead().Add("func", channel);
 			eventMessage->SetContent(rpc::Porto::Json, message);
+			eventMessage->GetHead().Add(rpc::Header::func, channel);
 		}
 		if(this->mDispatch->OnMessage(eventMessage) != XCode::Ok)
 		{

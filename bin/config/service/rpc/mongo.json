@@ -33,13 +33,11 @@
     },
     "MongoDB.FindOne": {
         "Async": true,
-        "Timeout" : 2000,
         "Request": "db.mongo.find_one.request",
         "Response": "db.mongo.find_one.response"
     },
     "MongoDB.FindPage": {
         "Async": true,
-        "Timeout" : 2000,
         "Request": "db.mongo.find_page.request",
         "Response": "db.mongo.find_page.response"
     },

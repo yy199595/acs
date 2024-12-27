@@ -74,7 +74,7 @@ function Main:Login(info)
     end
     coroutine_sleep(200)
     local co = coroutine_create(self.Login)
-    coroutine_resume(co, self, info)
+    --coroutine_resume(co, self, info)
 end
 
 function Main:OnComplete()

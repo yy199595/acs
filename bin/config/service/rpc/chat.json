@@ -14,7 +14,7 @@
     },
     "ChatSystem.OnChat": {
         "Proto" : "json",
-        "Async": false,
+        "Async": true,
         "IsClient": true,
         "Request": "c2s.chat.request"
     },

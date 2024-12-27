@@ -11,7 +11,7 @@ function ChatComponent:Awake()
 end
 
 function ChatComponent:OnChat(request)
-    --console.Warning("server call client = %s", json.encode(request))
+    console.Warning("server call client = %s", json.encode(request))
     return XCode.Ok
 end
 

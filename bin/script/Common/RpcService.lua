@@ -19,6 +19,7 @@ local rpc = function(class, func, request, taskSource)
 	if not status then
 		code = CODE_CALL_FAIL
 		taskSource:SetRpc(CODE_CALL_FAIL, code)
+		return
 	end
 	if code == nil then
 		code = CODE_OK

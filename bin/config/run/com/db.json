@@ -29,7 +29,7 @@
         "debug" : false,
         "db": "yjz",
         "user": "root",
-        "passwd": "199595yjz.",
+        "passwd": "",
         "address": "${db}:27017"
     },
     "leveldb": {

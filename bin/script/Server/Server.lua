@@ -42,6 +42,7 @@ function Main:Update()
             })
             code = app:Call(appId, "ChatSystem.Ping")
             code = app:Call(appId, "GateSystem.Ping")
+            mongo:FindOne("demo.player", { _id = 10001})
             --http:Get("http://127.0.0.1:80/admin/hello")
             --http:Get("http://127.0.0.1:80/admin/all_info")
             --http:Get("http://127.0.0.1:80/admin/ping?id=0")
@@ -54,12 +55,11 @@ end
 
 function Main:OnComplete()
 
-
-    --local res = http:Get("https://huwai.pro")
-    --table.print(res)
-    --local oss = require("util.oss")
-    --local url = oss.Upload("C:/Users/64658/Desktop/yy/ace/bin/www/dist/bg.jpg", "10000")
-    --print(url)
+    mongo:InsertOnce("demo.player", {
+        _id = 10001,
+        age = 20,
+        name = "xiaoming"
+    })
 end
 
 return Main

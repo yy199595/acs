@@ -1,6 +1,6 @@
 
 local log = require("Log")
-
+local app = require("App")
 local redis = require("RedisComponent")
 local mongo = require("MongoComponent")
 local RpcService = require("RpcService")
@@ -29,10 +29,10 @@ function Chat:OnPing()
     return XCode.Ok
 end
 
-function Chat:Chat(request)
+function Chat:OnChat(request)
     local nowTime = os.time()
-    table.print(request)
-    local playerId = request.head:Get("id")
+    print(request.head:ToString())
+    local playerId = request.head:Get("pid")
     local redisResponse = redis:Run("HGET", "player.chat", playerId)
 
     if redisResponse ~= nil then
@@ -43,7 +43,7 @@ function Chat:Chat(request)
     end
 
     redis:Run("HSET", "player.chat", playerId, nowTime)
-    --self.app:SendToClient(playerId, "ChatComponent.ChatSystem", request.data)
+    app:Send(playerId, "ChatComponent.OnChat", request.data)
     return XCode.Ok
 end
 
