@@ -48,9 +48,9 @@ namespace acs
 		this->mTickCount = 0;
 		this->mGuidIndex = 0;
 		this->mLastGuidTime = 0;
-		this->mTaskComponent = nullptr;
-		this->mActorComponent = nullptr;
-		this->mMessageComponent = nullptr;
+		this->mActor = nullptr;
+		this->mProto = nullptr;
+		this->mCoroutine = nullptr;
 		this->mStatus = ServerStatus::Init;
 #ifdef __OS_WIN__
 		Debug::Init();
@@ -88,9 +88,9 @@ namespace acs
 		LOG_CHECK_RET_FALSE(this->AddComponent<LaunchComponent>());
 		LOG_CHECK_RET_FALSE(this->AddComponent<CoroutineComponent>());
 
-		this->mActorComponent = this->GetComponent<ActorComponent>();
-		this->mMessageComponent = this->GetComponent<ProtoComponent>();
-		this->mTaskComponent = this->GetComponent<CoroutineComponent>();
+		this->mActor = this->GetComponent<ActorComponent>();
+		this->mProto = this->GetComponent<ProtoComponent>();
+		this->mCoroutine = this->GetComponent<CoroutineComponent>();
 
 		LOG_CHECK_RET_FALSE(this->InitComponent());
 #ifndef __OS_WIN__
@@ -98,15 +98,15 @@ namespace acs
 		this->mSignal.add(SIGTERM);
 		this->mSignal.async_wait([this](const asio::error_code& code, int signal)
 		{
-			this->mTaskComponent->Start(&App::Stop, this);
+			this->mCoroutine->Start(&App::Stop, this);
 		});
 #endif
-		this->mTaskComponent->Start(&App::StartAllComponent, this);
-		if (this->mActorComponent == nullptr)
+		this->mCoroutine->Start(&App::StartAllComponent, this);
+		if (this->mActor == nullptr)
 		{
 			return true;
 		}
-		return this->mActorComponent->AddServer(this);
+		return this->mActor->AddServer(this);
 	}
 
 	bool App::LoadLang()
@@ -137,7 +137,7 @@ namespace acs
 
 	unsigned int App::StartCoroutine(std::function<void()>&& func)
 	{
-		return this->mTaskComponent->Start(std::move(func));
+		return this->mCoroutine->Start(std::move(func));
 	}
 
 	bool App::InitComponent()
@@ -164,7 +164,7 @@ namespace acs
 
 	void App::Sleep(int ms)
 	{
-		this->mTaskComponent->Sleep(ms);
+		this->mCoroutine->Sleep(ms);
 	}
 
 	int App::Run() noexcept

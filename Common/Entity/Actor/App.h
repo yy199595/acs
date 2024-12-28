@@ -55,9 +55,9 @@ namespace acs
 	public:
 		template<typename T>
 		static inline T * Get() { return App::Inst()->GetComponent<T>(); }
-		static inline ActorComponent * ActorMgr() { return App::Inst()->mActorComponent; }
-		static inline ProtoComponent * GetProto() { return App::Inst()->mMessageComponent; }
-		static inline CoroutineComponent* Coroutine() { return App::Inst()->mTaskComponent; }
+		static inline ActorComponent * ActorMgr() { return App::Inst()->mActor; }
+		static inline ProtoComponent * GetProto() { return App::Inst()->mProto; }
+		static inline CoroutineComponent* Coroutine() { return App::Inst()->mCoroutine; }
 #ifdef __ENABLE_OPEN_SSL__
 	public:
 		std::string Sign(json::w::Document & document);
@@ -79,8 +79,8 @@ namespace acs
 		asio::signal_set mSignal;
 		std::thread::id mThreadId;
         const long long mStartTime;
-		ActorComponent * mActorComponent;
-		CoroutineComponent* mTaskComponent;
-		ProtoComponent * mMessageComponent;
+		ActorComponent * mActor;
+		ProtoComponent * mProto;
+		CoroutineComponent* mCoroutine;
     };
 }// namespace Sentry
