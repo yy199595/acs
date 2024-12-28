@@ -35,7 +35,6 @@ namespace Lua
 		void OnCallError(const std::string & func);
 	private:
 		int mRef;
-		bool mIsUpdate;
 		lua_State* mLua;
 		const std::string mName;
 		std::unordered_set<std::string> mCaches;

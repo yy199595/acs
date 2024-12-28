@@ -10,7 +10,7 @@
 namespace Lua
 {
 	LuaModule::LuaModule(lua_State* lua, std::string name, int ref)
-			: mLua(lua), mName(std::move(name)), mRef(ref), mIsUpdate(false)
+			: mLua(lua), mName(std::move(name)), mRef(ref)
 	{
 		this->InitModule();
 	}
@@ -36,7 +36,6 @@ namespace Lua
 			}
 			lua_pop(this->mLua, 1);
 		}
-		this->mIsUpdate = this->mCaches.find("OnUpdate") != this->mCaches.end();
 	}
 
 	void LuaModule::InitModule()
@@ -57,7 +56,6 @@ namespace Lua
 			}
 			lua_pop(this->mLua, 1);
 		}
-		this->mIsUpdate = this->mCaches.find("OnUpdate") != this->mCaches.end();
 	}
 
 	void LuaModule::SetMember(const char* key, long long value)
