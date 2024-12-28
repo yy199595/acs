@@ -1,6 +1,5 @@
 #include"CoroutineDef.h"
 #include"TaskContext.h"
-#include"Entity/Actor/App.h"
 
 namespace acs
 {

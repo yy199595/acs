@@ -4,7 +4,6 @@
 
 #include "ClientComponent.h"
 #include "Yyjson/Lua/ljson.h"
-#include "Util/File/FileHelper.h"
 #include "Util/Tools/String.h"
 #include "Lua/Component/LuaComponent.h"
 #include "Client/Lua/LuaClient.h"

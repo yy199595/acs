@@ -7,7 +7,6 @@
 #include"Core/System/System.h"
 #include"Core/Thread/ThreadSync.h"
 #include"Util/Tools/TimeHelper.h"
-#include "Util/Tools/Math.h"
 #include"Server/Component/ThreadComponent.h"
 
 namespace acs

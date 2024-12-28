@@ -8,7 +8,6 @@
 #include"Core/Event/IEvent.h"
 #include"Common/Service/LoginSystem.h"
 #include"Cluster/Config/ClusterConfig.h"
-#include"Server/Config/CodeConfig.h"
 #include"Gate/Component/OuterNetComponent.h"
 #include "Util/Tools/TimeHelper.h"
 

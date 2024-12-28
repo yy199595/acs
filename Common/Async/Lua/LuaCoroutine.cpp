@@ -1,7 +1,6 @@
 #include"LuaCoroutine.h"
 #include"Entity/Actor/App.h"
 #include"Log/Lua/LuaLogger.h"
-#include"Lua/Engine/LuaDebugStack.h"
 #include"Async/Lua/LuaWaitTaskSource.h"
 #include"Timer/Component/TimerComponent.h"
 

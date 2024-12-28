@@ -6,7 +6,6 @@
 #include "DelayQueueComponent.h"
 #include "Util/Tools/TimeHelper.h"
 #include "Redis/Component/RedisComponent.h"
-#include "Async/Component/CoroutineComponent.h"
 
 namespace acs
 {

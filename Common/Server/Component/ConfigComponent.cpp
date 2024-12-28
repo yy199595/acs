@@ -7,18 +7,8 @@
 #include"Http/Common/ContentType.h"
 #include"Server/Config/ServerConfig.h"
 #include"Rpc/Config/ServiceConfig.h"
-#include"Cluster/Config/ClusterConfig.h"
 #include"Util/File/DirectoryHelper.h"
 #include"Server/Config/CodeConfig.h"
-
-#define LOAD_CONFIG_BY_PATH(cfg, name, T) 						\
-{                                     						\
-	std::string path;										\
-	if(cfg->GetPath(name, path)) 							\
-	{														\
-		LOG_CHECK_RET_FALSE(this->LoadTextConfig<T>(path));	\
-	}														\
-}
 
 namespace acs
 {
