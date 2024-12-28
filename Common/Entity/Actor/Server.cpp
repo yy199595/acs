@@ -80,23 +80,6 @@ namespace acs
 		return true;
 	}
 
-	bool Server::GetListen(int net, std::string& address) const
-	{
-		switch(net)
-		{
-			case rpc::Net::Tcp:
-				return this->GetListen("rpc", address);
-			case rpc::Net::Http:
-				return this->GetListen("http", address);
-			case rpc::Net::Redis:
-				return this->GetListen("redis", address);
-			case rpc::Net::Udp:
-				return this->GetListen("udp", address);
-			default:
-				return false;
-		}
-	}
-
 	int Server::SendMsg(std::unique_ptr<rpc::Message> message)
 	{
 		return this->mRouter->Send(this->GetSrvId(), std::move(message));

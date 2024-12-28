@@ -20,8 +20,6 @@ namespace acs
 		bool GetAddress(const rpc::Message &request, int &) const final;
 		bool GetListen(const std::string & name, std::string & addr) const;
 		bool AddListen(const std::string & name, const std::string & addr);
-	private:
-		bool GetListen(int net, std::string & address) const;
 	public:
 		bool OnInit() final;
 		void EncodeToJson(std::string *json) final;
