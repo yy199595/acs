@@ -18,15 +18,14 @@ namespace acs
 		: Entity(id), mName(std::move(name))
 	{
 		this->mProto = nullptr;
-		this->mRouterComponent = nullptr;
+		this->mRouter = nullptr;
 	}
 
 	bool Actor::LateAwake()
 	{
-		this->mProto = App::GetProto();
-		this->mRouterComponent = App::Get<RouterComponent>();
-		LOG_CHECK_RET_FALSE(this->mRouterComponent != nullptr && this->OnInit());
-		return true;
+		LOG_CHECK_RET_FALSE(this->mProto = App::Get<ProtoComponent>())
+		LOG_CHECK_RET_FALSE(this->mRouter = App::Get<RouterComponent>())
+		return this->OnInit();
 	}
 
 	int Actor::Send(const std::string& func)
@@ -38,7 +37,7 @@ namespace acs
 			return code;
 		}
 		int id = message->SockId();
-		return this->mRouterComponent->Send(id, std::move(message));
+		return this->mRouter->Send(id, std::move(message));
 	}
 
 	int Actor::Send(const std::string& func, const pb::Message& request)
@@ -54,7 +53,7 @@ namespace acs
 			return XCode::SerializationFailure;
 		}
 		int id = message->SockId();
-		return this->mRouterComponent->Send(id, std::move(message));
+		return this->mRouter->Send(id, std::move(message));
 	}
 
 	int Actor::Call(const std::string& func)
@@ -66,7 +65,7 @@ namespace acs
 			return code;
 		}
 		int id = message->SockId();
-		std::unique_ptr<rpc::Message> result = this->mRouterComponent->Call(id, std::move(message));
+		std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, std::move(message));
 		return result != nullptr ? result->GetCode() : XCode::NetTimeout;
 	}
 	
@@ -83,7 +82,7 @@ namespace acs
 			return XCode::SerializationFailure;
 		}
 		int id = message->SockId();
-		std::unique_ptr<rpc::Message> result = this->mRouterComponent->Call(id, std::move(message));
+		std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, std::move(message));
 		return result != nullptr ? result->GetCode() : XCode::NetWorkError;
 	}
 
@@ -96,7 +95,7 @@ namespace acs
 			return code;
 		}
 		int id = message->SockId();
-		std::unique_ptr<rpc::Message> result = this->mRouterComponent->Call(id, std::move(message));
+		std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, std::move(message));
 		if(result == nullptr)
 		{
 			return XCode::NetTimeout;
@@ -118,7 +117,7 @@ namespace acs
 		{
 			return XCode::NotFoundActorAddress;
 		}
-		std::unique_ptr<rpc::Message> result = this->mRouterComponent->Call(id, std::move(message));
+		std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, std::move(message));
 		if(result == nullptr)
 		{
 			return XCode::NetTimeout;
@@ -139,7 +138,7 @@ namespace acs
 			return XCode::SerializationFailure;
 		}
 		int id = message->SockId();
-		std::unique_ptr<rpc::Message> result = this->mRouterComponent->Call(id, std::move(message));
+		std::unique_ptr<rpc::Message> result = this->mRouter->Call(id, std::move(message));
 		if (result == nullptr)
 		{
 			return XCode::NetTimeout;
@@ -213,13 +212,13 @@ namespace acs
 	int Actor::LuaCall(lua_State* lua, std::unique_ptr<rpc::Message> message)
 	{
 		int id = message->SockId();
-		return this->mRouterComponent->LuaCall(lua, id, std::move(message));
+		return this->mRouter->LuaCall(lua, id, std::move(message));
 	}
 
 	int Actor::LuaSend(lua_State* lua, std::unique_ptr<rpc::Message> message)
 	{
 		int id = message->SockId();
-		int code = this->mRouterComponent->Send(id, std::move(message));
+		int code = this->mRouter->Send(id, std::move(message));
 
 		lua_pushinteger(lua, code);
 		return 1;
@@ -236,7 +235,7 @@ namespace acs
 		int id = message->SockId();
 		message->SetProto(rpc::Porto::String);
 		message->GetHead().Add("channel", event);
-		return this->mRouterComponent->Send(id, std::move(message));
+		return this->mRouter->Send(id, std::move(message));
 	}
 
 	int Actor::Publish(const std::string& event, json::w::Document& document)
@@ -251,7 +250,7 @@ namespace acs
 		message->SetProto(rpc::Porto::Json);
 		message->GetHead().Add("channel", event);
 		message->SetContent(document.JsonString());
-		return this->mRouterComponent->Send(id, std::move(message));
+		return this->mRouter->Send(id, std::move(message));
 	}
 
 	int Actor::Publish(const std::string& event, char proto, const std::string& data)
@@ -266,6 +265,6 @@ namespace acs
 		message->SetContent(proto, data);
 		message->SetProto(rpc::Porto::Json);
 		message->GetHead().Add("channel", event);
-		return this->mRouterComponent->Send(id, std::move(message));
+		return this->mRouter->Send(id, std::move(message));
 	}
 }

@@ -41,7 +41,7 @@ namespace acs
 			message->SetNet(rpc::Net::Tcp);
 			message->SetType(rpc::Type::Logout);
 		}
-		return this->mRouterComponent->Send(this->GetSrvId(), std::move(message));
+		return this->mRouter->Send(this->GetSrvId(), std::move(message));
 	}
 
 	bool Server::AddListen(const std::string& name, const std::string& addr)
@@ -99,7 +99,7 @@ namespace acs
 
 	int Server::SendMsg(std::unique_ptr<rpc::Message> message)
 	{
-		return this->mRouterComponent->Send(this->GetSrvId(), std::move(message));
+		return this->mRouter->Send(this->GetSrvId(), std::move(message));
 	}
 
 	void Server::EncodeToJson(std::string * json)

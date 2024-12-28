@@ -40,7 +40,7 @@ namespace acs
 		virtual bool GetAddress(const rpc::Message & request, int & id) const = 0;
 		virtual int Make(const std::string & func, std::unique_ptr<rpc::Message> & request) const = 0;
 	protected:
-		class RouterComponent * mRouterComponent;
+		class RouterComponent * mRouter;
 	private:
 		const std::string mName;
 		class ProtoComponent * mProto;

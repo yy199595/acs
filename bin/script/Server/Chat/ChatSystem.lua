@@ -31,7 +31,7 @@ end
 
 function Chat:OnChat(request)
     local nowTime = os.time()
-    print(request.head:ToString())
+    --print(request.head:ToString())
     local playerId = request.head:Get("pid")
     local redisResponse = redis:Run("HGET", "player.chat", playerId)
 

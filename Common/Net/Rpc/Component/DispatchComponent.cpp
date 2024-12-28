@@ -26,9 +26,9 @@ namespace acs
 	{
 		this->mSumCount = 0;
 		this->mWaitCount = 0;
-		this->mTaskComponent = nullptr;
-		this->mOuterComponent = nullptr;
-		this->mRouterComponent = nullptr;
+		this->mOuter = nullptr;
+		this->mRouter = nullptr;
+		this->mCoroutine = nullptr;
 	}
 
 	bool DispatchComponent::LateAwake()
@@ -41,9 +41,9 @@ namespace acs
 			LOG_CHECK_RET_FALSE(this->mRpcServices.Add(name, rpcService));
 		}
 
-		this->mTaskComponent = App::Coroutine();
-		this->mRouterComponent = this->GetComponent<RouterComponent>();
-		this->mOuterComponent = this->GetComponent<OuterNetComponent>();
+		LOG_CHECK_RET_FALSE(this->mRouter = this->GetComponent<RouterComponent>())
+		LOG_CHECK_RET_FALSE(this->mOuter = this->GetComponent<OuterNetComponent>())
+		LOG_CHECK_RET_FALSE(this->mCoroutine = this->GetComponent<CoroutineComponent>())
 		return true;
 	}
 
@@ -87,7 +87,7 @@ namespace acs
 				this->Invoke(methodConfig, message);
 				break;
 			}
-			this->mTaskComponent->Start(&DispatchComponent::Invoke, this, methodConfig, message);
+			this->mCoroutine->Start(&DispatchComponent::Invoke, this, methodConfig, message);
 		} while (false);
 		return code;
 	}
@@ -124,7 +124,7 @@ namespace acs
 		}
 #endif
 		--this->mWaitCount;
-		this->mRouterComponent->Send(message->SockId(), code, message);
+		this->mRouter->Send(message->SockId(), code, message);
 	}
 
 	void DispatchComponent::OnRecord(json::w::Document& document)
@@ -145,7 +145,7 @@ namespace acs
 				return this->OnRequest(message);
 			case rpc::Type::Response:
 			{
-				if(this->mOuterComponent != nullptr)
+				if(this->mOuter != nullptr)
 				{
 					int socketId = 0;
 					if (message->GetHead().Del(rpc::Header::client_sock_id, socketId))
@@ -154,7 +154,7 @@ namespace acs
 						if (message->GetHead().Del(rpc::Header::rpc_id, clientRpcId))
 						{
 							message->SetRpcId(clientRpcId);
-							this->mOuterComponent->SendBySockId(socketId, message);
+							this->mOuter->SendBySockId(socketId, message);
 						}
 						return XCode::Ok;
 					}
@@ -174,7 +174,7 @@ namespace acs
 
 	int DispatchComponent::OnClient(rpc::Message* message)
 	{
-		if (this->mOuterComponent == nullptr)
+		if (this->mOuter == nullptr)
 		{
 			return XCode::NetWorkError;
 		}
@@ -186,18 +186,18 @@ namespace acs
 		}
 		message->SetType(rpc::Type::Request);
 		message->GetHead().Del(rpc::Header::client_sock_id);
-		this->mOuterComponent->SendBySockId(sockId, message);
+		this->mOuter->SendBySockId(sockId, message);
 		return XCode::Ok;
 	}
 
 	int DispatchComponent::OnBroadcast(rpc::Message* message)
 	{
-		if (this->mOuterComponent == nullptr)
+		if (this->mOuter == nullptr)
 		{
 			return XCode::Failure;
 		}
 		message->SetType(rpc::Type::Request);
-		this->mOuterComponent->Broadcast(message);
+		this->mOuter->Broadcast(message);
 		return XCode::Ok;
 	}
 }// namespace Sentry
