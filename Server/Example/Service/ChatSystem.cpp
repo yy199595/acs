@@ -64,9 +64,8 @@ namespace acs
 
 		std::string json;
 		playerAccountInfo.Encode(json);
-		PlayerAccountInfo newPlayerAccountInfo;
+		std::unique_ptr<PlayerAccountInfo> newPlayerAccountInfo = PlayerAccountInfo::Create(json);
 
-		newPlayerAccountInfo.Decode(json);
 		LOG_INFO("\n{}", help::Str::FormatJson(json))
 		return true;
 	}

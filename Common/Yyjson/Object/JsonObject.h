@@ -93,6 +93,23 @@ namespace json
 		 bool Encode(std::string & json) final;
 		 bool Encode(json::w::Value & document) final;
 	public:
+		static std::unique_ptr<T> Create(const std::string & json)
+		{
+			json::r::Document document;
+			if(!document.Decode(json))
+			{
+				return nullptr;
+			}
+			std::unique_ptr<T> result = std::make_unique<T>();
+			{
+				if(!result->Decode(document))
+				{
+					return nullptr;
+				}
+			}
+			return result;
+		}
+	public:
 
 		template<typename V>
 		static typename std::enable_if<std::is_base_of<IObject, V>::value, bool>::type
