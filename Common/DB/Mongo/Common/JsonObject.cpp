@@ -2,5 +2,5 @@
 
 namespace db
 {
-	std::vector<ValueBase*> Object::values;
+
 }

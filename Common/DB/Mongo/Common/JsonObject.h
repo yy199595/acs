@@ -4,61 +4,131 @@
 
 #ifndef APP_JSONOBJECT_H
 #define APP_JSONOBJECT_H
+#include <unordered_map>
 #include "Yyjson/Document/Document.h"
 namespace db
 {
 	class ValueBase
 	{
 	public:
-		virtual bool Set(json::w::Document & document, void * obj) = 0;
-		virtual bool Get(const json::r::Document & document, void * obj) const = 0;
+		virtual bool Set(json::w::Value & document, const std::string & key, void * obj) = 0;
+		virtual bool Get(const json::r::Value & document, const std::string & key, void * obj) const = 0;
 	};
 
 	template<typename T, typename V>
 	class ValueProxy : public ValueBase
 	{
 	public:
-		ValueProxy(const char * key, V T::*member) : field(member), key(key) { }
+		ValueProxy(V T::*member) : field(member) { }
 	public:
-		bool Set(json::w::Document &document, void *obj) final;
-		bool Get(const json::r::Document &document, void *obj) const final;
+		bool Set(json::w::Value &document, const std::string & key, void *obj) final;
+		bool Get(const json::r::Value &document, const std::string & key, void *obj) const final;
 	private:
 		V T::*field;
-		std::string key;
 	};
+
 	template<typename T, typename V>
-	inline bool ValueProxy<T, V>::Set(json::w::Document& document, void* obj)
+	class ObjectValueProxy : public ValueBase
+	{
+	public:
+		ObjectValueProxy(V T::*member) : field(member) { }
+	public:
+		bool Set(json::w::Value &document, const std::string & key, void *obj) final;
+		bool Get(const json::r::Value &document, const std::string & key, void *obj) const final;
+	private:
+		V T::*field;
+	};
+
+
+
+	template<typename T, typename V>
+	class ObjectArrayValueProxy : public ValueBase
+	{
+	public:
+		ObjectArrayValueProxy(std::vector<V> T::*member) : field(member) { }
+	public:
+		bool Set(json::w::Value &document, const std::string & key, void *obj) final;
+		bool Get(const json::r::Value &document, const std::string & key, void *obj) const final;
+	private:
+		std::vector<V> T::*field;
+	};
+
+	template<typename T, typename V>
+	inline bool ValueProxy<T, V>::Set(json::w::Value& document, const std::string & key, void* obj)
 	{
 		T * inst = (T*)obj;
-		return document.Add(this->key.c_str(), inst->*field);
+		return document.Add(key.c_str(), inst->*field);
 	}
 
 	template<typename T, typename V>
-	inline bool ValueProxy<T, V>::Get(const json::r::Document& document, void* obj) const
+	inline bool ValueProxy<T, V>::Get(const json::r::Value& document, const std::string & key, void* obj) const
 	{
 		T * inst = (T*)obj;
-		return document.Get(this->key.c_str(), inst->*field);
+		return document.Get(key.c_str(), inst->*field);
 	}
 
-
-	class Object
+	class IObject
 	{
 	public:
-		explicit Object(const char * db) : mDB(db) { }
-	public:
-		virtual bool Decode(const std::string & json);
+		virtual bool Decode(const std::string & json) = 0;
 		virtual bool Decode(const json::r::Value & document) = 0;
 	public:
-		virtual bool Encode(std::string & json) const;
-		virtual bool Encode(json::w::Value & document) const = 0;
+		virtual bool Encode(std::string & json) = 0;
+		virtual bool Encode(json::w::Value & document) = 0;
+	};
+
+	template<typename T>
+	class Object : public IObject
+	{
 	public:
-		const std::string & GetDBName() const { return this->mDB; }
+		explicit Object() { }
+		virtual ~Object() = default;
 	public:
-		template<typename T, typename V>
-		static inline void RegisterField(const char * name, V T::*member);
+		 bool Decode(const std::string & json) final;
+		 bool Decode(const json::r::Value & document) final;
+	public:
+		 bool Encode(std::string & json) final;
+		 bool Encode(json::w::Value & document) final;
+	public:
+		static const std::string GetName() { return sDbName; }
+		static void SetName(const std::string & name) { sDbName = name; }
+	public:
+		template<typename V>
+		static bool RegisterField(const char * name, V T::*member)
+		{
+			auto iter = values.find(name);
+			if(iter != values.end())
+			{
+				return false;
+			}
+			values.emplace(name, new ValueProxy<T, V>(member));
+			return true;
+		}
+		template<typename V>
+		static bool RegisterObject(const char * name, V T::*member)
+		{
+			auto iter = values.find(name);
+			if(iter != values.end())
+			{
+				return false;
+			}
+			values.emplace(name, new ObjectValueProxy<T, V>(member));
+			return true;
+		}
+		template<typename V>
+		static bool RegisterField(const char * name, std::vector<V> T::*member)
+		{
+			auto iter = values.find(name);
+			if(iter != values.end())
+			{
+				return false;
+			}
+			values.emplace(name, new ObjectArrayValueProxy<T, V>(member));
+			return true;
+		}
 	private:
-		const std::string mDB;
-		static std::vector<ValueBase *> values;
+		static std::string sDbName;
+		static std::unordered_map<std::string, ValueBase *> values;
 	};
 
 	template<typename T>
@@ -77,12 +147,6 @@ namespace db
 		return data;
 	}
 
-	template<typename T, typename V>
-	inline void Object::RegisterField(const char* name, V T::*member)
-	{
-		values.emplace_back(new ValueProxy<T, V>(name, member));
-	}
-
 	template<typename T>
 	static std::unique_ptr<T> Create(json::r::Value& document)
 	{
@@ -94,7 +158,8 @@ namespace db
 		return data;
 	}
 
-	inline bool Object::Encode(std::string& json) const
+	template<typename T>
+	inline bool Object<T>::Encode(std::string& json)
 	{
 		json::w::Document document;
 		if(!this->Encode(document))
@@ -104,7 +169,8 @@ namespace db
 		return document.Encode(&json);
 	}
 
-	inline bool Object::Decode(const std::string& json)
+	template<typename T>
+	inline bool Object<T>::Decode(const std::string& json)
 	{
 		json::r::Document document;
 		if(!document.Decode(json))
@@ -113,6 +179,103 @@ namespace db
 		}
 		return this->Decode(document);
 	}
+
+	template<typename T>
+	inline bool Object<T>::Decode(const json::r::Value& document)
+	{
+		auto iter = values.begin();
+		for(; iter != values.end(); iter++)
+		{
+			const std::string & key = iter->first;
+			iter->second->Get(document, key, this);
+		}
+		return true;
+	}
+
+	template<typename T>
+	inline bool Object<T>::Encode(json::w::Value& document)
+	{
+		auto iter = values.begin();
+		for(; iter != values.end(); iter++)
+		{
+			const std::string & key = iter->first;
+			iter->second->Set(document, key, this);
+		}
+		return true;
+	}
+
+	template<typename T, typename V>
+	inline bool ObjectValueProxy<T, V>::Set(json::w::Value& document, const std::string& key, void* obj)
+	{
+		std::unique_ptr<json::w::Value> jsonValue = document.AddObject(key.c_str());
+		{
+			T * inst = (T*)obj;
+			return (inst->*field).Encode(*jsonValue);
+		}
+	}
+
+	template<typename T, typename V>
+	inline bool ObjectValueProxy<T, V>::Get(const json::r::Value& document, const std::string& key, void* obj) const
+	{
+		T * inst = (T*)obj;
+		std::unique_ptr<json::r::Value> jsonValue;
+		if(!document.Get(key.c_str(), jsonValue))
+		{
+			return false;
+		}
+		return (inst->*field).Decode(*jsonValue);
+	}
+
+
+	template<typename T, typename V>
+	inline bool ObjectArrayValueProxy<T, V>::Set(json::w::Value& document, const std::string& key, void* obj)
+	{
+		T * inst = (T*)obj;
+		std::unique_ptr<json::w::Value> jsonArray = document.AddArray(key.c_str());
+		{
+			for(V & val : (inst->*field))
+			{
+				std::unique_ptr<json::w::Value> jsonObject = jsonArray->AddObject();
+				if(!val.Encode(*jsonObject))
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	template<typename T, typename V>
+	inline bool ObjectArrayValueProxy<T, V>::Get(const json::r::Value& document, const std::string& key,
+			void* obj) const
+	{
+		T * inst = (T*)obj;
+		std::unique_ptr<json::r::Value> jsonArray;
+		if(!document.Get(key.c_str(), jsonArray) || !jsonArray->IsArray())
+		{
+			return false;
+		}
+		size_t index = 0;
+		std::unique_ptr<json::r::Value> jsonObject;
+		while (jsonArray->Get(index, jsonObject))
+		{
+			index++;
+			V value;
+			if(!value.Decode(*jsonObject))
+			{
+				return false;
+			}
+			(inst->*field).emplace_back(value);
+		}
+		return true;
+	}
+
+	template<typename T>
+	std::string Object<T>::sDbName;
+
+	template<typename T>
+	std::unordered_map<std::string, ValueBase*> Object<T>::values;
+
 }
 
 

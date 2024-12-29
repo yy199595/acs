@@ -7,11 +7,40 @@
 #include"Message/c2s/c2s.pb.h"
 #include"Core/Map/HashMap.h"
 #include"Rpc/Service/RpcService.h"
+
+#include "Mongo/Common/JsonObject.h"
+namespace acs
+{
+	struct LoginInfo : public db::Object<LoginInfo>
+	{
+		std::string ip;
+		long long login_time;
+	};
+
+	struct FriendInfo : public db::Object<FriendInfo>
+	{
+		long long friend_id;
+		long long add_time;
+	};
+
+	struct PlayerAccountInfo : public db::Object<PlayerAccountInfo>
+	{
+		long long user_id;
+		std::string account;
+		std::string password;
+		long long create_time;
+		long long register_time;
+		LoginInfo login_info;
+		std::vector<FriendInfo> friend_list;
+	};
+}
+
 namespace acs
 {
 	class ChatSystem : public RpcService
 	{
 	private:
+		bool Awake() final;
 		bool OnInit() final;
 	private:
 		int OnPing(long long playerId);
