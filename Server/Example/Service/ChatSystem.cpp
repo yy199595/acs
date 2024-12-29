@@ -24,20 +24,21 @@ namespace acs
 
 	bool ChatSystem::Awake()
 	{
+
 		FriendInfo::RegisterField("add_time", &FriendInfo::add_time);
 		FriendInfo::RegisterField("friend_id", &FriendInfo::friend_id);
+
 
 		LoginInfo::RegisterField("ip", &LoginInfo::ip);
 		LoginInfo::RegisterField("login_time", &LoginInfo::login_time);
 
-
-		PlayerAccountInfo::SetName("player_account");
+		PlayerAccountInfo::RegisterField("item_list", &PlayerAccountInfo::item_list);
 		PlayerAccountInfo::RegisterField("user_id", &PlayerAccountInfo::user_id);
 		PlayerAccountInfo::RegisterField("account", &PlayerAccountInfo::account);
 		PlayerAccountInfo::RegisterField("password", &PlayerAccountInfo::password);
 		PlayerAccountInfo::RegisterField("create_time", &PlayerAccountInfo::create_time);
 		PlayerAccountInfo::RegisterField("register_time", &PlayerAccountInfo::register_time);
-		PlayerAccountInfo::RegisterObject("login_info", &PlayerAccountInfo::login_info);
+		PlayerAccountInfo::RegisterField("login_info", &PlayerAccountInfo::login_info);
 		PlayerAccountInfo::RegisterField("friend_list", &PlayerAccountInfo::friend_list);
 
 		PlayerAccountInfo playerAccountInfo;
@@ -47,6 +48,10 @@ namespace acs
 			playerAccountInfo.password = "199595yjz.";
 			playerAccountInfo.create_time = help::Time::NowSec();
 			playerAccountInfo.register_time = help::Time::NowMic();
+
+			playerAccountInfo.item_list.emplace_back(100);
+			playerAccountInfo.item_list.emplace_back(101);
+			playerAccountInfo.item_list.emplace_back(103);
 
 			playerAccountInfo.login_info.ip = "127.0.0.1";
 			playerAccountInfo.login_info.login_time = help::Time::NowMil();

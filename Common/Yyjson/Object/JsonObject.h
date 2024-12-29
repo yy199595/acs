@@ -6,7 +6,7 @@
 #define APP_JSONOBJECT_H
 #include <unordered_map>
 #include "Yyjson/Document/Document.h"
-namespace db
+namespace json
 {
 	class ValueBase
 	{
@@ -19,11 +19,12 @@ namespace db
 	class ValueProxy : public ValueBase
 	{
 	public:
-		ValueProxy(V T::*member) : field(member) { }
+		ValueProxy(V T::*member, bool must) : field(member), mMust(must) { }
 	public:
 		bool Set(json::w::Value &document, const std::string & key, void *obj) final;
 		bool Get(const json::r::Value &document, const std::string & key, void *obj) const final;
 	private:
+		bool mMust;
 		V T::*field;
 	};
 
@@ -31,11 +32,12 @@ namespace db
 	class ObjectValueProxy : public ValueBase
 	{
 	public:
-		ObjectValueProxy(V T::*member) : field(member) { }
+		ObjectValueProxy(V T::*member, bool must) : field(member), mMust(must) { }
 	public:
 		bool Set(json::w::Value &document, const std::string & key, void *obj) final;
 		bool Get(const json::r::Value &document, const std::string & key, void *obj) const final;
 	private:
+		bool mMust;
 		V T::*field;
 	};
 
@@ -45,11 +47,12 @@ namespace db
 	class ObjectArrayValueProxy : public ValueBase
 	{
 	public:
-		ObjectArrayValueProxy(std::vector<V> T::*member) : field(member) { }
+		ObjectArrayValueProxy(std::vector<V> T::*member, bool must) : field(member), mMust(must) { }
 	public:
 		bool Set(json::w::Value &document, const std::string & key, void *obj) final;
 		bool Get(const json::r::Value &document, const std::string & key, void *obj) const final;
 	private:
+		bool mMust;
 		std::vector<V> T::*field;
 	};
 
@@ -64,7 +67,7 @@ namespace db
 	inline bool ValueProxy<T, V>::Get(const json::r::Value& document, const std::string & key, void* obj) const
 	{
 		T * inst = (T*)obj;
-		return document.Get(key.c_str(), inst->*field);
+		return document.Get(key.c_str(), inst->*field) || !this->mMust;
 	}
 
 	class IObject
@@ -90,44 +93,47 @@ namespace db
 		 bool Encode(std::string & json) final;
 		 bool Encode(json::w::Value & document) final;
 	public:
-		static const std::string GetName() { return sDbName; }
-		static void SetName(const std::string & name) { sDbName = name; }
-	public:
+
 		template<typename V>
-		static bool RegisterField(const char * name, V T::*member)
+		static typename std::enable_if<std::is_base_of<IObject, V>::value, bool>::type
+			RegisterField(const char * name, std::vector<V> T::*member, bool must = true)
 		{
 			auto iter = values.find(name);
 			if(iter != values.end())
 			{
 				return false;
 			}
-			values.emplace(name, new ValueProxy<T, V>(member));
+			values.emplace(name, new ObjectArrayValueProxy<T, V>(member, must));
 			return true;
 		}
+
 		template<typename V>
-		static bool RegisterObject(const char * name, V T::*member)
+		static typename std::enable_if<!std::is_base_of<IObject, V>::value, bool>::type
+			RegisterField(const char * name, V T::*member, bool must = true)
 		{
 			auto iter = values.find(name);
 			if(iter != values.end())
 			{
 				return false;
 			}
-			values.emplace(name, new ObjectValueProxy<T, V>(member));
+			values.emplace(name, new ValueProxy<T, V>(member, must));
 			return true;
 		}
+
 		template<typename V>
-		static bool RegisterField(const char * name, std::vector<V> T::*member)
+		static typename std::enable_if<std::is_base_of<IObject, V>::value, bool>::type
+			RegisterField(const char * name, V T::*member, bool must = true)
 		{
 			auto iter = values.find(name);
 			if(iter != values.end())
 			{
 				return false;
 			}
-			values.emplace(name, new ObjectArrayValueProxy<T, V>(member));
+			values.emplace(name, new ObjectValueProxy<T, V>(member, must));
 			return true;
 		}
+
 	private:
-		static std::string sDbName;
 		static std::unordered_map<std::string, ValueBase *> values;
 	};
 
@@ -187,7 +193,10 @@ namespace db
 		for(; iter != values.end(); iter++)
 		{
 			const std::string & key = iter->first;
-			iter->second->Get(document, key, this);
+			if(!iter->second->Get(document, key, this))
+			{
+				return false;
+			}
 		}
 		return true;
 	}
@@ -221,6 +230,10 @@ namespace db
 		std::unique_ptr<json::r::Value> jsonValue;
 		if(!document.Get(key.c_str(), jsonValue))
 		{
+			if(!this->mMust)
+			{
+				return true;
+			}
 			return false;
 		}
 		return (inst->*field).Decode(*jsonValue);
@@ -253,6 +266,10 @@ namespace db
 		std::unique_ptr<json::r::Value> jsonArray;
 		if(!document.Get(key.c_str(), jsonArray) || !jsonArray->IsArray())
 		{
+			if(!this->mMust)
+			{
+				return true;
+			}
 			return false;
 		}
 		size_t index = 0;
@@ -269,9 +286,6 @@ namespace db
 		}
 		return true;
 	}
-
-	template<typename T>
-	std::string Object<T>::sDbName;
 
 	template<typename T>
 	std::unordered_map<std::string, ValueBase*> Object<T>::values;

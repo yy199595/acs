@@ -7,23 +7,22 @@
 #include"Message/c2s/c2s.pb.h"
 #include"Core/Map/HashMap.h"
 #include"Rpc/Service/RpcService.h"
-
-#include "Mongo/Common/JsonObject.h"
+#include "Yyjson/Object/JsonObject.h"
 namespace acs
 {
-	struct LoginInfo : public db::Object<LoginInfo>
+	struct LoginInfo : public json::Object<LoginInfo>
 	{
 		std::string ip;
 		long long login_time;
 	};
 
-	struct FriendInfo : public db::Object<FriendInfo>
+	struct FriendInfo : public json::Object<FriendInfo>
 	{
 		long long friend_id;
 		long long add_time;
 	};
 
-	struct PlayerAccountInfo : public db::Object<PlayerAccountInfo>
+	struct PlayerAccountInfo : public json::Object<PlayerAccountInfo>
 	{
 		long long user_id;
 		std::string account;
@@ -31,6 +30,7 @@ namespace acs
 		long long create_time;
 		long long register_time;
 		LoginInfo login_info;
+		std::vector<int> item_list;
 		std::vector<FriendInfo> friend_list;
 	};
 }
