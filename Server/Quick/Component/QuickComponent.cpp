@@ -53,9 +53,8 @@ namespace acs
 		{
 			return false;
 		}
-		int code = 0;
-		std::string result = content.substr(0, pos);
-		return help::Math::ToNumber(result, code) && code == 0;
+		const std::string ok("1");
+		return content.substr(0, pos) == ok;
 	}
 
 	bool QuickComponent::Decode(const std::string & message, quick::PayNotify & payNotify)
