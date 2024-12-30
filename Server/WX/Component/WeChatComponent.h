@@ -198,7 +198,7 @@ namespace acs
 		bool CreateOrder(wx::OrderInfo * orderInfo);
 		bool CloseOrder(const std::string & orderId);
 		bool CreateComplaintUrl(const std::string& url = "");
-		std::unique_ptr<wx::UserInfo> GetUserInfo(const std::string & code);
+		std::unique_ptr<wx::UserInfo> Login(const std::string & code);
 		std::unique_ptr<wx::OrderInfoResponse> GetOrder(const std::string & orderId);
 		std::unique_ptr<wx::UploadOrderResponse> GetOrderInfo(const std::string & orderId);
 		std::unique_ptr<wx::RefundResponse> Refund(const wx::OrderInfo & orderInfo, const std::string & reason);

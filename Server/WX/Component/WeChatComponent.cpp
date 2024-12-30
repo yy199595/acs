@@ -757,7 +757,7 @@ namespace acs
 		}
 	}
 
-	std::unique_ptr<wx::UserInfo> WeChatComponent::GetUserInfo(const std::string& code)
+	std::unique_ptr<wx::UserInfo> WeChatComponent::Login(const std::string& code)
 	{
 		std::unique_ptr<http::Request> request1 = std::make_unique<http::Request>("GET");
 		{

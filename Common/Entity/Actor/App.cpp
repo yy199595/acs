@@ -35,6 +35,7 @@
 #include "Redis/Client/RedisDefine.h"
 #include "Http/Common/HttpRequest.h"
 #include "Http/Common/HttpResponse.h"
+#include "Mongo/Client/MongoProto.h"
 #endif
 
 namespace acs
@@ -252,7 +253,7 @@ namespace acs
 							size_t count3 = rpc::OuterClient::GetObjectCount();
 							size_t count4 = http::SessionClient::GetObjectCount();
 							size_t count5 = http::RequestClient::GetObjectCount();
-							size_t count6 = this->mActorComponent->GetPlayerCount();
+							size_t count6 = this->mActor->GetPlayerCount();
 							size_t count7 = acs::LuaWaitTaskSource::GetObjectCount();
 							size_t count8 = tcp::Socket::GetObjectCount();
 							size_t count9 = TaskContext::GetObjectCount();
@@ -265,6 +266,9 @@ namespace acs
 							size_t count15 = LuaRpcTaskSource::GetObjectCount();
 							size_t count16 = StaticMethod::GetObjectCount();
 
+							size_t count17 = mongo::Request::GetObjectCount();
+							size_t count18 = mongo::Response::GetObjectCount();
+
 #ifndef __OS_WIN__
 							os::SystemInfo systemInfo;
 							constexpr double MB = 1024 * 1024.0f;
@@ -274,8 +278,8 @@ namespace acs
 							LOG_DEBUG("[{:.3f}MB] message:{} inner:{} outer:{} session:{} request:{} "
 									  "player:{} task:{} sock:{} cor:{}", mb, count1, count2, count3,
 									  count4, count5, count6, count7, count8, count9)
-							LOG_INFO("http:{}=>{}  redis:{}=>{} rpc:{} lua_rpc:{} method:{}",
-									count10, count11, count12, count13, count14, count15, count16)
+							LOG_INFO("http:{}=>{}  redis:{}=>{} rpc:{} lua_rpc:{} mongo:{}=>{} method:{}",
+									count10, count11, count12, count13, count14, count15, count17, count18,  count16)
 						}
 #endif
 						this->mTickCount++;
