@@ -40,9 +40,8 @@ namespace acs
 			const std::string& name = rpcService->GetName();
 			LOG_CHECK_RET_FALSE(this->mRpcServices.Add(name, rpcService));
 		}
-
+		this->mOuter = this->GetComponent<OuterNetComponent>();
 		LOG_CHECK_RET_FALSE(this->mRouter = this->GetComponent<RouterComponent>())
-		LOG_CHECK_RET_FALSE(this->mOuter = this->GetComponent<OuterNetComponent>())
 		LOG_CHECK_RET_FALSE(this->mCoroutine = this->GetComponent<CoroutineComponent>())
 		return true;
 	}
@@ -113,12 +112,12 @@ namespace acs
 		} while (false);
 #ifdef __DEBUG__
 		long long t = help::Time::NowMil() - start;
-		if (code != XCode::Ok)
-		{
-			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-			//LOG_WARN("({}ms) invoke [{}] code:{} = {}", t, config->FullName, code, desc);
-		}
-		else if (t >= 2000)
+//		if (code != XCode::Ok)
+//		{
+//			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
+//			LOG_WARN("({}ms) invoke [{}] code:{} = {}", t, config->FullName, code, desc);
+//		}
+		if (config->Timeout > 0 && t >= config->Timeout)
 		{
 			LOG_WARN("({}ms) invoke [{}] too long time", t, config->FullName);
 		}

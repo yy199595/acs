@@ -1,3 +1,5 @@
+
+require("XCode")
 local random = math.random
 local log = require("Log")
 local str_format = string.format

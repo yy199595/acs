@@ -2,7 +2,10 @@
     "client": {
         "component" : [
             "HttpComponent",
-            "ClientComponent"
+            "ClientComponent",
+            "ActorComponent",
+            "ProtoComponent",
+            "ConfigComponent"
         ]
     }
 }
