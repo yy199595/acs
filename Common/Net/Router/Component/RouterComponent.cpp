@@ -6,6 +6,7 @@
 #include"XCode/XCode.h"
 #include"Entity/Actor/App.h"
 #include"Rpc/Component/DispatchComponent.h"
+#include "Core/Singleton/Singleton.h"
 
 namespace acs
 {
@@ -38,9 +39,9 @@ namespace acs
 	int RouterComponent::LuaCall(lua_State* lua, int id, std::unique_ptr<rpc::Message> message)
 	{
 		int timeout = message->GetTimeout();
-		int rpc = this->mDisComponent->BuildRpcId();
+		int rpcId = this->mDisComponent->BuildRpcId();
 		{
-			message->SetRpcId(rpc);
+			message->SetRpcId(rpcId);
 			int code = this->Send(id, std::move(message));
 			if(code != XCode::Ok)
 			{
@@ -48,7 +49,7 @@ namespace acs
 				return 1;
 			}
 		}
-		return this->mDisComponent->AddTask(rpc, new LuaRpcTaskSource(lua, rpc), timeout)->Await();
+		return this->mDisComponent->AddTask(new LuaRpcTaskSource(lua, rpcId), timeout)->Await();
 	}
 
 	void RouterComponent::OnSystemUpdate() noexcept
@@ -76,15 +77,15 @@ namespace acs
 
 	int RouterComponent::Send(int id, std::unique_ptr<rpc::Message> message)
 	{
-#ifdef __DEBUG__
-		if(message->GetType() == rpc::Type::Request)
-		{
-			std::string func;
-			message->GetHead().Get(rpc::Header::func, func);
-			message->TempHead().Add(rpc::Header::func, func);
-			message->TempHead().Add("t", help::Time::NowMil());
-		}
-#endif
+//#ifdef __DEBUG__
+//		if(message->GetType() == rpc::Type::Request)
+//		{
+//			std::string func;
+//			message->GetHead().Get(rpc::Header::func, func);
+//			message->TempHead().Add(rpc::Header::func, func);
+//			message->TempHead().Add("t", help::Time::NowMil());
+//		}
+//#endif
 		switch(message->GetType())
 		{
 			case rpc::Type::Request:
@@ -132,15 +133,15 @@ namespace acs
 	std::unique_ptr<rpc::Message> RouterComponent::Call(int id, std::unique_ptr<rpc::Message> message)
 	{
 		int timeout = message->GetTimeout();
-		int taskId = this->mDisComponent->BuildRpcId();
+		int rpcId = this->mDisComponent->BuildRpcId();
 		{
-			message->SetRpcId(taskId);
+			message->SetRpcId(rpcId);
 			if (this->Send(id, std::move(message)) != XCode::Ok)
 			{
 				LOG_ERROR("send to [{}] fail", id);
 				return nullptr;
 			}
 		}
-		return this->mDisComponent->AddTask(taskId, new RpcTaskSource(taskId), timeout)->Await();
+		return this->mDisComponent->BuildRpcTask<RpcTaskSource>(rpcId, timeout)->Await();
 	}
 }

@@ -49,6 +49,6 @@ namespace Lua
 		}
 		int taskId = 0;
 		component->LuaSend(std::move(request), taskId);
-		return component->AddTask(taskId, new LuaMongoTask(L, taskId))->Await();
+		return component->AddTask(new LuaMongoTask(L, taskId))->Await();
 	}
 }

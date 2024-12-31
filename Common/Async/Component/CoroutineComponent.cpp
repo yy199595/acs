@@ -66,6 +66,7 @@ namespace acs
 
 	void CoroutineComponent::OnRecord(json::w::Document& document)
 	{
+
 		std::unique_ptr<json::w::Value> data = document.AddObject("coroutine");
 		{
 			data->Add("count", this->mCorPool.GetCount());

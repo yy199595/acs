@@ -105,7 +105,7 @@ namespace acs
     {
 		int taskId = 0;
 		this->Send(std::move(request), taskId);
-		return this->AddTask(taskId, new RedisTask(taskId))->Await();
+		return this->BuildRpcTask<RedisTask>(taskId)->Await();
     }
 
 	std::unique_ptr<redis::Response> RedisComponent::SyncRun(std::unique_ptr<redis::Request> request)

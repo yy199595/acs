@@ -2,8 +2,8 @@
 // Created by zmhy0073 on 2022/6/20.
 //
 
-#ifndef APP_RPCTASKCOMPONENT_H
-#define APP_RPCTASKCOMPONENT_H
+#ifndef APP_RPCCOMPONENT_H
+#define APP_RPCCOMPONENT_H
 #include<unordered_map>
 #include"Util/Tools/TimeHelper.h"
 #include"Rpc/Async/RpcTaskSource.h"
@@ -11,17 +11,19 @@
 
 namespace acs
 {
-    template<typename K,typename T>
-	class RpcTaskComponent : public Component, public ILastFrameUpdate
+    template<typename T>
+	class RpcComponent : public Component, public ILastFrameUpdate
     {
     public:
-        RpcTaskComponent() = default;
-        ~RpcTaskComponent() override = default;
+        RpcComponent() = default;
+        ~RpcComponent() override = default;
         typedef IRpcTask<T> * RpcTask;
     public:
         template<typename T1>
-        T1 * AddTask(K k, T1 * task, int timeout = 0)
+		inline T1 * AddTask(T1 * task, int timeout = 0)
         {
+			int k = task->GetRpcId();
+			assert(k != 0);
 			auto iter = this->mTasks.find(k);
 			if(iter != this->mTasks.end())
 			{
@@ -37,20 +39,28 @@ namespace acs
 			this->mTasks.emplace(k, task);
             return task;
         }
-		inline bool OnResponse(K key, std::unique_ptr<T> message);
+		template<typename T1>
+		inline T1 * BuildRpcTask(int rpcId, int timeout = 0)
+		{
+			T1 * task = new T1(rpcId);
+			return this->AddTask(task, timeout);
+		}
+
+
+		inline bool OnResponse(int key, std::unique_ptr<T> message);
 		size_t AwaitCount() const { return this->mTasks.size(); }
 	protected:
 		void OnLastFrameUpdate(long long) final;
-		virtual void OnDelTask(K k) { }
-        virtual void OnNotFindResponse(K key, std::unique_ptr<T> message);
+		virtual void OnDelTask(int k) { }
+        virtual void OnNotFindResponse(int key, std::unique_ptr<T> message);
     private:
 		std::vector<RpcTask> mDelTasks;
-		std::unordered_map<K, RpcTask> mTasks;
-		std::unordered_map<K, long long> mTimeouts;
+		std::unordered_map<int, RpcTask> mTasks;
+		std::unordered_map<int, long long> mTimeouts;
     };
 
-	template<typename K,typename T>
-	void RpcTaskComponent<K, T>::OnLastFrameUpdate(long long nowMS)
+	template<typename T>
+	void RpcComponent<T>::OnLastFrameUpdate(long long nowMS)
 	{
 		for (RpcTask& task: this->mDelTasks)
 		{
@@ -59,7 +69,7 @@ namespace acs
 		this->mDelTasks.clear();
 		for (auto iter = this->mTimeouts.begin(); iter != this->mTimeouts.end();)
 		{
-			const K& key = iter->first;
+			const int key = iter->first;
 			long long targetTime = iter->second;
 			if (nowMS >= targetTime)
 			{
@@ -78,8 +88,8 @@ namespace acs
 		}
 	}
 
-    template<typename K,typename T>
-    inline bool RpcTaskComponent<K, T>::OnResponse(K key, std::unique_ptr<T> message)
+    template<typename T>
+    inline bool RpcComponent<T>::OnResponse(int key, std::unique_ptr<T> message)
 	{
 		auto iter = this->mTimeouts.find(key);
 		if (iter != this->mTimeouts.end())
@@ -102,12 +112,12 @@ namespace acs
 		return true;
 	}
 
-    template<typename K,typename T>
-    void RpcTaskComponent<K, T>::OnNotFindResponse(K k, std::unique_ptr<T> message)
+    template<typename T>
+    void RpcComponent<T>::OnNotFindResponse(int k, std::unique_ptr<T> message)
     {
         LOG_ERROR("{} not find rpc task id({}) ", this->GetName(), k);
     }
 }
 
 
-#endif //APP_RPCTASKCOMPONENT_H
+#endif //APP_RPCCOMPONENT_H

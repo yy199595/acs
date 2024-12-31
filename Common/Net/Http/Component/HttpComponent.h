@@ -5,7 +5,7 @@
 #endif
 #include"Core/Map/HashMap.h"
 #include"Core/Pool/ArrayPool.h"
-#include"Rpc/Component/RpcTaskComponent.h"
+#include"Rpc/Component/RpcComponent.h"
 namespace http
 {
 	class Content;
@@ -15,14 +15,13 @@ namespace http
 }
 namespace acs
 {
-	class HttpComponent : public RpcTaskComponent<int, http::Response>,
+	class HttpComponent : public RpcComponent<http::Response>,
 			public ILuaRegister, public IRpc<http::Request, http::Response>
 	{
 	 public:
 		HttpComponent();
 	 public:
 		std::unique_ptr<http::Response> Get(const std::string& url, int second = 15);
-		int Download(const std::string & url, const std::string & path);
 		std::unique_ptr<http::Response> Post(const std::string& url, const std::string& data, int second = 15);
 		std::unique_ptr<http::Response> Post(const std::string& url, const json::w::Document & json, int second = 15);
 	public:

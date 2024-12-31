@@ -179,7 +179,7 @@ namespace acs
 			}
 		}
 		this->Send(std::move(request));
-		return this->AddTask(taskId, new MongoTask(taskId))->Await();
+		return this->BuildRpcTask<MongoTask>(taskId)->Await();
 	}
 
 	std::unique_ptr<mongo::Response> MongoDBComponent::Run(const std::string & db, std::unique_ptr<mongo::Request> request)
@@ -190,7 +190,7 @@ namespace acs
 			request->header.requestID = taskId;
 		}
 		this->Send(std::move(request));
-		return this->AddTask(taskId, new MongoTask(taskId))->Await();
+		return this->BuildRpcTask<MongoTask>(taskId)->Await();
 	}
 
 	void MongoDBComponent::LuaSend(std::unique_ptr<mongo::Request> request, int& taskId)

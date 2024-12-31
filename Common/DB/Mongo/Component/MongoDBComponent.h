@@ -11,7 +11,7 @@
 #include"Util/Tools/NumberBuilder.h"
 #include"Mongo/Config/MongoConfig.h"
 #include"Core/Queue/Queue.h"
-#include"Rpc/Component/RpcTaskComponent.h"
+#include"Rpc/Component/RpcComponent.h"
 
 namespace acs
 {
@@ -57,7 +57,7 @@ namespace acs
 
 namespace acs
 {
-    class MongoDBComponent : public RpcTaskComponent<int,mongo::Response>,
+    class MongoDBComponent : public RpcComponent<mongo::Response>,
 			public IRpc<mongo::Request, mongo::Response>,
 			public IDestroy, public IServerRecord, public ILuaRegister
 	{

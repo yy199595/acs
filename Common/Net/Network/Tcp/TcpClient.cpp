@@ -56,11 +56,6 @@ namespace tcp
 		std::shared_ptr<Client> self = this->shared_from_this();
 		sock.async_connect(endPoint, [self](const Asio::Code& code)
 		{
-			if (code.value() != Asio::OK)
-			{
-				self->OnConnect(false, self->mConnectCount);
-				return;
-			}
 #ifdef __ENABLE_OPEN_SSL__
 			if (self->mSocket != nullptr && self->mSocket->IsOpenSsl())
 			{
@@ -72,7 +67,10 @@ namespace tcp
 				return;
 			}
 #endif
-			self->mConnectCount = 0;
+			if (code.value() == Asio::OK)
+			{
+				self->mConnectCount = 0;
+			}
 			self->OnConnect(code.value() == Asio::OK, self->mConnectCount);
 		});
 	}
@@ -91,6 +89,7 @@ namespace tcp
 			this->Connect(timeout);
 			return;
 		}
+		this->mConnectCount++;
 		Asio::Socket& sock = this->mSocket->Get();
 		this->StartTimer(timeout, TimeoutFlag::Connect);
 		const Asio::Executor& executor = sock.get_executor();
@@ -108,11 +107,6 @@ namespace tcp
 		asio::async_connect(sock, iterator, [iterator, self]
 				(const asio::error_code& code, const Asio::Resolver::iterator& iter)
 		{
-			self->mConnectCount++;
-			if (code.value() != Asio::OK)
-			{
-				return;
-			}
 #ifdef __ENABLE_OPEN_SSL__
 			if (self->mSocket && self->mSocket->IsOpenSsl())
 			{
@@ -125,8 +119,11 @@ namespace tcp
 				return;
 			}
 #endif
-			self->mConnectCount = 0;
-			self->OnConnect(code.value() == Asio::OK, 0);
+			if(code.value() == Asio::OK)
+			{
+				self->mConnectCount = 0;
+			}
+			self->OnConnect(code.value() == Asio::OK, self->mConnectCount);
 		});
 	}
 

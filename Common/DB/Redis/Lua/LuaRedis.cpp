@@ -84,7 +84,7 @@ namespace Lua
 		}
 		int id = 0;
 		redisComponent->Send(std::move(request), id);
-        return redisComponent->AddTask(id, new LuaRedisTask(lua, id))->Await();
+        return redisComponent->AddTask(new LuaRedisTask(lua, id))->Await();
     }
 
 	int redis::Call(lua_State* lua)
@@ -120,7 +120,7 @@ namespace Lua
 		int id = 0;
         lua_pushthread(lua);
 		redisComponent->Send(redisLuaData, id);
-        return redisComponent->AddTask(id, new LuaRedisTask(lua, id))->Await();
+        return redisComponent->AddTask(new LuaRedisTask(lua, id))->Await();
     }
 
     int redis::Send(lua_State *lua)

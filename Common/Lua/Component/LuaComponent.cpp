@@ -395,6 +395,10 @@ namespace acs
 
 	void LuaComponent::OnRecord(json::w::Document& document)
 	{
-		document.Add("lua", (int)this->GetMemorySize());
+		std::unique_ptr<json::w::Value> jsonObject = document.AddObject("lua");
+		{
+			document.Add("lua", this->GetMemorySize());
+			document.Add("module", this->mModulePaths.Size());
+		}
 	}
 }

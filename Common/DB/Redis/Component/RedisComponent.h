@@ -4,7 +4,7 @@
 #include"Core/Queue/Queue.h"
 #include"Redis/Client/Client.h"
 #include"Redis/Config/RedisConfig.h"
-#include"Rpc/Component/RpcTaskComponent.h"
+#include"Rpc/Component/RpcComponent.h"
 
 namespace acs
 {
@@ -19,7 +19,7 @@ namespace acs
 {
 	class ThreadComponent;
 
-	class RedisComponent final : public RpcTaskComponent<int, redis::Response>,
+	class RedisComponent final : public RpcComponent<redis::Response>,
 		public ILuaRegister, public IRpc<redis::Request, redis::Response>, public IDestroy, public IServerRecord
 	{
 	 public:

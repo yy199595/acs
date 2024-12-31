@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include"RpcTaskComponent.h"
+#include"RpcComponent.h"
 #include"Rpc/Client/Message.h"
 #include"Rpc/Async/RpcTaskSource.h"
 #include"Rpc/Config/MethodConfig.h"
@@ -11,7 +11,7 @@ namespace acs
 	class LuaRpcService;
 
 	class ServiceMethod;
-	class DispatchComponent : public RpcTaskComponent<unsigned int, rpc::Message>,
+	class DispatchComponent : public RpcComponent<rpc::Message>,
 							  public IServerRecord, public IAppStop
 	{
 	 public:

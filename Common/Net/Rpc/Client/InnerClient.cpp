@@ -38,8 +38,7 @@ namespace rpc
 		}
 #else
 		Asio::Context & context = this->mSocket->GetContext();
-		std::shared_ptr<Client> self = this->shared_from_this();
-		asio::post(context, [this, self, message]
+		asio::post(context, [this, self = this->shared_from_this(), message]
 		{
 			this->mSendMessages.emplace(message);
 			if(this->mSendMessages.size() == 1)
@@ -100,11 +99,9 @@ namespace rpc
 			&& this->mIsClient && !this->mClose)
 		{
 			this->Connect(5);
+			return;
 		}
-		else
-		{
-			this->CloseSocket(XCode::NetSendFailure);
-		}
+		this->CloseSocket(XCode::NetSendFailure);
 	}
 
 	void InnerClient::OnTimeout(tcp::TimeoutFlag flag)
@@ -133,6 +130,11 @@ namespace rpc
 		this->mDecodeStatus = tcp::Decode::None;
 		if (this->mComponent == nullptr)
 		{
+			auto iter = this->mWaitResMessages.begin();
+			for (; iter != this->mWaitResMessages.end(); iter++)
+			{
+				delete iter->second;
+			}
 			this->mWaitResMessages.clear();
 			while (!this->mSendMessages.empty())
 			{
@@ -148,8 +150,7 @@ namespace rpc
 		}
 		this->mWaitResMessages.clear();
 
-		std::shared_ptr<Client> self = this->shared_from_this();
-		asio::post(this->mMainContext, [this, self]
+		asio::post(this->mMainContext, [this, self = this->shared_from_this()]
 		{
 			while (!this->mSendMessages.empty())
 			{

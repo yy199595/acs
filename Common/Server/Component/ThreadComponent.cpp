@@ -7,52 +7,39 @@
 #include"Util/Tools/TimeHelper.h"
 namespace acs
 {
-	ThreadComponent::ThreadComponent()
-	#ifndef ONLY_MAIN_THREAD
-		: mThreadCount(0)
-	#endif
-	{
-
-	}
 
     bool ThreadComponent::Awake()
 	{
-#ifndef ONLY_MAIN_THREAD
-		std::unique_ptr<json::r::Value> jsonObject;
+		int threadCount = 1;
 #ifdef __OS_LINUX__
+		std::unique_ptr<json::r::Value> jsonObject;
+		threadCount = std::thread::hardware_concurrency();
 		if(ServerConfig::Inst()->Get("core", jsonObject))
 		{
-			std::string str = jsonObject->ToString();
-			jsonObject->Get("thread", this->mThreadCount);
+			jsonObject->Get("thread", threadCount);
 		}
-		this->mThreadCount = std::thread::hardware_concurrency();
-#else
-		this->mThreadCount = 1;
 #endif
-		for (int index = 0; index < this->mThreadCount; index++)
+		for (int index = 0; index < threadCount; index++)
 		{
-			custom::AsioThread * t = new custom::AsioThread();
+			std::unique_ptr<custom::AsioThread> t = std::make_unique<custom::AsioThread>();
 			{
 				t->Start(index + 1, "net");
-				this->mNetThreads.Push(t);
+				this->mNetThreads.emplace(std::move(t));
 			}
 		}
-		LOG_INFO("thread count = {}", this->mThreadCount)
-#endif
+		LOG_INFO("thread count = {}", threadCount)
 		return true;
 	}
 
 	void ThreadComponent::CloseThread()
 	{
 #ifndef ONLY_MAIN_THREAD
-		custom::AsioThread * asioThread = nullptr;
-		while(!this->mNetThreads.Empty())
+		while(!this->mNetThreads.empty())
 		{
-			if(this->mNetThreads.TryPop(asioThread))
+			std::unique_ptr<custom::AsioThread> & t = this->mNetThreads.front();
 			{
-				asioThread->Stop();
-				delete asioThread;
-				asioThread = nullptr;
+				t->Stop();
+				this->mNetThreads.pop();
 			}
 		}
 #endif
@@ -64,8 +51,11 @@ namespace acs
 		return this->mApp->GetContext();
 #else
 		custom::AsioThread * asioThread = nullptr;
-		this->mNetThreads.Move(asioThread);
+		std::unique_ptr<custom::AsioThread> t = std::move(this->mNetThreads.front());
 		{
+			asioThread = t.get();
+			this->mNetThreads.pop();
+			this->mNetThreads.emplace(std::move(t));
 			return asioThread->Context();
 		}
 #endif
@@ -77,30 +67,26 @@ namespace acs
 		asio::io_service & io = this->mApp->GetContext();
 		return new tcp::Socket(io);
 #else
-		custom::AsioThread * asioThread;
-		this->mNetThreads.Move(asioThread);
-		Asio::Context& io = asioThread->Context();
+		Asio::Context& io = this->GetContext();
 		return new tcp::Socket(io);
 #endif
 	}
 
 #ifdef __ENABLE_OPEN_SSL__
 
-	tcp::Socket* ThreadComponent::CreateSocket(Asio::ssl::Context& ssl)
+	tcp::Socket * ThreadComponent::CreateSocket(Asio::ssl::Context& ssl)
 	{
 #ifdef ONLY_MAIN_THREAD
 		asio::io_service & io = this->mApp->GetContext();
 		return new tcp::Socket(io, ssl);
 #else
-		custom::AsioThread * asioThread;
-		this->mNetThreads.Move(asioThread);
-		Asio::Context& io = asioThread->Context();
+		Asio::Context& io = this->GetContext();
 		return new tcp::Socket(io, ssl);
 #endif
 	}
 #endif
 
-	tcp::Socket* ThreadComponent::CreateSocket(const std::string& addr)
+	tcp::Socket * ThreadComponent::CreateSocket(const std::string& addr)
 	{
 		std::string ip;
 		unsigned short port = 0;
@@ -123,14 +109,9 @@ namespace acs
 	ThreadComponent::~ThreadComponent() noexcept
 	{
 #ifndef ONLY_MAIN_THREAD
-		custom::AsioThread * asioThread;
-		while(this->mNetThreads.TryPop(asioThread))
-		{
-			asioThread->Stop();
-			delete asioThread;
-			asioThread = nullptr;
-		}
+		this->CloseThread();
 #endif
 	}
+
 
 }

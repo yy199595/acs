@@ -124,37 +124,6 @@ namespace acs
 		luaRegister.End("net.http");
 	}
 
-	int HttpComponent::Download(const std::string& url, const std::string& path)
-	{
-		if (!help::dir::IsValidPath(path))
-		{
-			return XCode::CallArgsError;
-		}
-
-		std::unique_ptr<http::Request> request = std::make_unique<http::Request>("GET");
-		if (!request->SetUrl(url))
-		{
-			LOG_ERROR("parse {} fail", url);
-			return XCode::Failure;
-		}
-
-		HttpRequestTask* httpRpcTask = new HttpRequestTask();
-		std::unique_ptr<http::Response> response = std::make_unique<http::Response>();
-		{
-			if(!response->OpenOrCreateFile(path))
-			{
-				delete httpRpcTask;
-				LOG_ERROR("open or create file : {}", path);
-				return XCode::Failure;
-			}
-
-			int taskId = 0;
-			this->AddTask(taskId, httpRpcTask);
-			this->Send(std::move(request), std::move(response), taskId);
-		}
-		return httpRpcTask->Await()->Code() == HttpStatus::OK;
-	}
-
 	void HttpComponent::OnDelTask(int key)
 	{
 		std::shared_ptr<http::RequestClient> httpClient;
@@ -174,7 +143,7 @@ namespace acs
 		//LOG_DEBUG("connect {} server => {}:{}", url.Protocol(), url.Host(), url.Port());
 		{
 			this->mUseClients.Add(taskId, httpAsyncClient);
-			this->AddTask(taskId, new HttpCallbackTask(cb));
+			this->AddTask(new HttpCallbackTask(taskId, cb));
 			httpAsyncClient->Do(std::move(request), std::move(response), taskId);
 		}
 		return XCode::Ok;
@@ -199,7 +168,7 @@ namespace acs
 		{
 			int taskId = 0;
 			this->Send(std::move(request), std::move(response), taskId);
-			return this->AddTask(taskId, new HttpRequestTask())->Await();
+			return this->BuildRpcTask<HttpRequestTask>(taskId)->Await();
 		}
 	}
 
@@ -210,7 +179,7 @@ namespace acs
 			int taskId = 0;
 			response->SetContent(std::move(body));
 			this->Send(std::move(request), std::move(response), taskId);
-			return this->AddTask(taskId, new HttpRequestTask())->Await();
+			return this->BuildRpcTask<HttpRequestTask>(taskId)->Await();
 		}
 	}
 

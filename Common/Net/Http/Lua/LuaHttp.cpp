@@ -108,7 +108,7 @@ namespace Lua
 		std::unique_ptr<http::Response> response = std::make_unique<http::Response>();
 
 		httpComponent->Send(std::move(request), std::move(response), taskId);
-		return httpComponent->AddTask(taskId, new LuaHttpRequestTask(lua))->Await();
+		return httpComponent->AddTask(new LuaHttpRequestTask(taskId, lua))->Await();
 	}
 
     int HttpClient::Get(lua_State* lua)
@@ -136,7 +136,7 @@ namespace Lua
 		}
 		int taskId = 0;
 		httpComponent->Send(std::move(request), std::move(response), taskId);
-		return httpComponent->AddTask(taskId, new LuaHttpRequestTask(lua))->Await();
+		return httpComponent->AddTask(new LuaHttpRequestTask(taskId, lua))->Await();
 	}
 
 	int HttpClient::Post(lua_State* lua)
@@ -188,7 +188,7 @@ namespace Lua
 #endif
 		int taskId = 0;
 		httpComponent->Send(std::move(request), std::move(response), taskId);
-        return httpComponent->AddTask(taskId, new LuaHttpRequestTask(lua))->Await();
+        return httpComponent->AddTask(new LuaHttpRequestTask(taskId, lua))->Await();
     }
 
 	int HttpClient::Upload(lua_State* lua)
@@ -228,7 +228,7 @@ namespace Lua
 		lua_pushthread(lua);
 		//request->Header().SetKeepAlive(false);
 		httpComponent->Send(std::move(request), std::move(response), taskId);
-		return httpComponent->AddTask(taskId, new LuaHttpRequestTask(lua))->Await();
+		return httpComponent->AddTask(new LuaHttpRequestTask(taskId, lua))->Await();
 	}
 
 	int HttpClient::Download(lua_State* lua)
@@ -261,6 +261,6 @@ namespace Lua
 		//request->Header().Add("User-Agent", "Chrome");
 		//request->Header().Add("Accept-Encoding", "gzip, deflate, br");
         httpComponent->Send(std::move(request), std::move(response), taskId);
-        return httpComponent->AddTask(taskId, new LuaHttpRequestTask(lua))->Await();
+        return httpComponent->AddTask(new LuaHttpRequestTask(taskId, lua))->Await();
 	}
 }

@@ -6,8 +6,8 @@
 
 namespace acs
 {
-    LuaHttpRequestTask::LuaHttpRequestTask(lua_State *lua)
-        : IRpcTask<http::Response>(0), mRef(0), mLua(lua)
+    LuaHttpRequestTask::LuaHttpRequestTask(int id, lua_State *lua)
+        : IRpcTask<http::Response>(id), mRef(0), mLua(lua)
     {
         if(lua_isthread(this->mLua, -1))
         {

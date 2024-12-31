@@ -47,7 +47,7 @@ function Main:Login(info)
         if code == XCode.Ok then
             info.client = client
             info.count = info.count + 1
-            info.max_count = random(500, 10000)
+            info.max_count = random(100, 500)
 
             tab_insert(self.sessions, info)
             self.login_count = self.login_count + 1
@@ -69,7 +69,6 @@ function Main:Login(info)
     })
     rpc_count = rpc_count + 4
     info.count = info.count + 4
-
     if info.count >= info.max_count then
         info.client:Close()
         info.count = 0

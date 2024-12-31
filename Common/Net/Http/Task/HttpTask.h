@@ -13,7 +13,7 @@ namespace acs
     {
     public:
 		~HttpRequestTask() final = default;
-		explicit HttpRequestTask() : IRpcTask<http::Response>(0) { }
+		explicit HttpRequestTask(int id) : IRpcTask<http::Response>(id) { }
     public:
         inline std::unique_ptr<http::Response>  Await();
 		inline void OnResponse(std::unique_ptr<http::Response> response) final;
@@ -36,8 +36,8 @@ namespace acs
 	class HttpCallbackTask : public IRpcTask<http::Response>
 	{
 	public:
-		explicit HttpCallbackTask(std::function<void(std::unique_ptr<http::Response>)> & cb)
-			: mCallback(cb), IRpcTask<http::Response>(0) { }
+		explicit HttpCallbackTask(int id, std::function<void(std::unique_ptr<http::Response>)> & cb)
+			: mCallback(cb), IRpcTask<http::Response>(id) { }
 	private:
 		inline void OnResponse(std::unique_ptr<http::Response> response) final;
 	private:
@@ -56,7 +56,7 @@ namespace acs
     class LuaHttpRequestTask : public IRpcTask<http::Response>
     {
     public:
-        explicit LuaHttpRequestTask(lua_State * lua);
+        explicit LuaHttpRequestTask(int id, lua_State * lua);
         ~LuaHttpRequestTask() final;
     public:     
         int Await();

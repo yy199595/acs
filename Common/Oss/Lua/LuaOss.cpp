@@ -58,9 +58,9 @@ int oss::Upload(lua_State* L)
 		{
 			return 0;
 		}
-		int taskId = 0;
+		int rpcId = 0;
 		const std::string url = request->GetUrl().ToStr();
-		httpComponent->Send(std::move(request), std::move(response1), taskId);
-		return httpComponent->AddTask(taskId, new acs::LuaOssRequestTask(L, url))->Await();
+		httpComponent->Send(std::move(request), std::move(response1), rpcId);
+		return httpComponent->AddTask(new acs::LuaOssRequestTask(rpcId, L, url))->Await();
 	}
 }
