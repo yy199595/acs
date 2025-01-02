@@ -17,7 +17,6 @@
 #include "Gate/Client/OuterClient.h"
 #include "Http/Client/RequestClient.h"
 #include "Http/Client/SessionClient.h"
-#include "Core/Memory/MemoryObject.h"
 #include "Async/Lua/LuaWaitTaskSource.h"
 #include "Redis/Client/RedisDefine.h"
 #include "Http/Common/HttpRequest.h"
