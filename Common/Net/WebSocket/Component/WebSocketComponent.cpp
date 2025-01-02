@@ -8,13 +8,14 @@
 #include "WebSocket/Common/WebSocketMessage.h"
 #include "WebSocket/Client/WebSocketClient.h"
 #include "WebSocket/Client/WebSocketSessionClient.h"
-
+#include "Server/Component/ThreadComponent.h"
 namespace acs
 {
 	WebSocketComponent::WebSocketComponent()
 		: ISender(rpc::Net::Ws)
 	{
-
+		this->mActor = nullptr;
+		this->mThread = nullptr;
 	}
 
 	bool WebSocketComponent::OnListen(tcp::Socket* socket)
@@ -27,6 +28,23 @@ namespace acs
 			sessionClient->StartReceive(socket);
 			this->mSessions.emplace(id, sessionClient);
 		}
+		return true;
+	}
+
+	void WebSocketComponent::Complete()
+	{
+		rpc::Message * rpcMessage = new rpc::Message();
+		{
+			rpcMessage->SetContent("11223344");
+			rpcMessage->GetHead().Add("func", "ChatSystem.Ping");
+			this->Send(this->mApp->GetSrvId(), rpcMessage);
+		}
+	}
+
+	bool WebSocketComponent::LateAwake()
+	{
+		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
+		LOG_CHECK_RET_FALSE(this->mThread = this->GetComponent<ThreadComponent>())
 		return true;
 	}
 
@@ -65,6 +83,20 @@ namespace acs
 			iter1->second->StartWrite(wsMessage.release());
 			return XCode::Ok;
 		}
+		std::string address;
+		if(!this->mActor->GetListen(id, "ws", address))
+		{
+			return XCode::NotFoundActorAddress;
+		}
+		Asio::Context & context = this->mApp->GetContext();
+		tcp::Socket * tcpSocket = this->mThread->CreateSocket();
+		std::shared_ptr<ws::RequestClient> requestClient = std::make_shared<ws::RequestClient>(id, this, context);
+		{
+			tcpSocket->Init(address);
+			requestClient->SetSocket(tcpSocket);
+			this->mClients.emplace(id, requestClient);
+		}
+		requestClient->StartWrite(wsMessage.release());
 		return XCode::SendMessageFail;
 	}
 

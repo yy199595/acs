@@ -73,7 +73,8 @@ namespace ws
 		{
 			head.Add("Connection", "Upgrade");
 			head.Add("Upgrade", "websocket");
-			head.Add("Sec-WebSocket-Accept", secWebSocketAccept);
+			head.Add("Sec-WebSocket-Key", secWebSocketAccept);
+			head.Add("Sec-WebSocket-Version", 13);
 		}
 		this->Write(*this->mHttpRequest);
 	}
@@ -121,7 +122,7 @@ namespace ws
 
 	void RequestClient::OnSendMessage(const Asio::Code& code)
 	{
-		this->Close(XCode::NetSendFailure);
+		this->Connect(5);
 	}
 
 	void RequestClient::OnReceiveLine(std::istream& readStream, size_t size)
@@ -163,6 +164,17 @@ namespace ws
 			case tcp::ReadError:
 				this->Close(XCode::UnKnowPacket);
 				break;
+			case tcp::ReadDone:
+			{
+				ws::Message * request = this->mMessage.release();
+				std::shared_ptr<tcp::Client> self = this->shared_from_this();
+				asio::post(this->mMainContext, [request, this, self, id = this->mSockId]()
+				{
+					this->mComponent->OnMessage(id, request, nullptr);
+				});
+				this->ReadSome();
+				break;
+			}
 			default:
 				this->ReadLength(flag);
 				break;

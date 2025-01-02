@@ -20,6 +20,10 @@ namespace http
 
 	int Url::OnSendMessage(std::ostream& os)
 	{
+		if(this->mPath.empty())
+		{
+			this->mPath = "/";
+		}
 		os << this->mMethod << " " << this->mPath
 			<< " " << this->mVersion << http::CRLF;
 		return 0;
@@ -66,7 +70,7 @@ namespace http
 		this->mVersion = std::move(results[2]);
 		if(this->mMethod.empty() || this->mUrl.empty() || this->mVersion.empty())
 		{
-			LOG_ERROR("line data : {}", lineData);
+			CONSOLE_LOG_ERROR("line data : {}", lineData);
 			return tcp::ReadDecodeError;
 		}
 		size_t pos = this->mUrl.find('?');

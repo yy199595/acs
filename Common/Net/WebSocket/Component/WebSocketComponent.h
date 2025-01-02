@@ -16,18 +16,22 @@ namespace ws
 #include "WebSocket/Common/WebSocketMessage.h"
 namespace acs
 {
-	class WebSocketComponent : public ITcpListen, public ISender,
+	class WebSocketComponent : public ITcpListen, public ISender, public IComplete,
 							   public RpcComponent<ws::Message>, public IRpc<ws::Message, ws::Message>
 	{
 	public:
 		WebSocketComponent();
 	public:
+		void Complete() final;
+		bool LateAwake() final;
 		bool OnListen(tcp::Socket *socket) final;
 		void OnClientError(int id, int code) final;
 		void OnMessage(int, ws::Message *request, ws::Message *response) final;
 	public:
 		int Send(int id, rpc::Message *message) final;
 	private:
+		class ActorComponent * mActor;
+		class ThreadComponent * mThread;
 		math::NumberPool<int> mClientPool;
 		std::unordered_map<int, std::shared_ptr<ws::RequestClient>> mClients;
 		std::unordered_map<int, std::shared_ptr<ws::SessionClient>> mSessions;

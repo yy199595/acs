@@ -51,10 +51,10 @@ namespace http
 					this->mParseState = tcp::Decode::MessageBody;
 					break;
 			}
-//			if(this->mCode != (int)HttpStatus::OK)
-//			{
-//				return tcp::ReadDone;
-//			}
+			if(this->mCode != (int)HttpStatus::OK)
+			{
+				return tcp::ReadDone;
+			}
 			if(this->mBody == nullptr)
 			{
 				std::string content_type;
