@@ -144,21 +144,12 @@ namespace help
 
     std::string Str::RandomString(size_t size)
     {
-		char x = 0;
+		char STR_BUFFER[] = "1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM";
 		std::unique_ptr<char[]> buffer(new char[size]);
 		for(size_t index = 0; index < size; index++)
 		{
-#ifdef __OS_WIN__
-            buffer[index] = std::rand() & 0XFF;
-#else
-            buffer[index] = random() & 0XFF;
-#endif // __OS_WIN__
-
-			x ^= buffer[index];
-		}
-		if(x == 0)
-		{
-			buffer[x] |= 1;
+			size_t rid = random() % sizeof(STR_BUFFER);
+            buffer[rid] = STR_BUFFER[rid];
 		}
 		return std::string(buffer.get(), size);
     }

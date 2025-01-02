@@ -233,7 +233,7 @@ namespace acs
 				return false;
 			}
 			this->mApp->AddListen(listenConfig.Name, listenConfig.Addr);
-			LOG_INFO("({}) listen [{}] ok", listenConfig.ProtoName, listenConfig.Addr);
+			LOG_INFO("({}) listen [{}://{}] ok", listenConfig.ProtoName, listenConfig.Name, listenConfig.Addr);
 		}
 		return true;
 	}

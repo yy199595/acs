@@ -31,11 +31,12 @@ namespace ws
 	private:
 		void Close(int code);
 	private:
-		bool mIsHttp;
 		int mSockId;
 		Component * mComponent;
 		Asio::Context & mMainContext;
 		http::Request * mHttpRequest;
+		http::Response * mHttpResponse;
+		std::unique_ptr<ws::Message> mMessage;
 		std::queue<ws::Message *> mWaitSendMessage;
 	};
 }
