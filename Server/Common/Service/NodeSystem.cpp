@@ -9,6 +9,23 @@
 #include"Lua/Component/LuaComponent.h"
 #include"Log/Component/LoggerComponent.h"
 #include"Server/Component/ConfigComponent.h"
+
+
+#ifdef __SHARE_PTR_COUNTER__
+
+#include "Rpc/Client/InnerClient.h"
+#include "Gate/Client/OuterClient.h"
+#include "Http/Client/RequestClient.h"
+#include "Http/Client/SessionClient.h"
+#include "Core/Memory/MemoryObject.h"
+#include "Async/Lua/LuaWaitTaskSource.h"
+#include "Redis/Client/RedisDefine.h"
+#include "Http/Common/HttpRequest.h"
+#include "Http/Common/HttpResponse.h"
+#include "Mongo/Client/MongoProto.h"
+
+#endif
+
 namespace acs
 {
 	NodeSystem::NodeSystem() : mActComponent(nullptr)
@@ -100,6 +117,50 @@ namespace acs
 			document.Add("use_memory", systemInfo.use_memory);
 			document.Add("max_memory", systemInfo.max_memory);
 
+#ifdef __SHARE_PTR_COUNTER__
+			size_t count1 = rpc::Message::GetObjectCount();
+			size_t count2 = rpc::InnerClient::GetObjectCount();
+			size_t count3 = rpc::OuterClient::GetObjectCount();
+			size_t count10 = http::Request::GetObjectCount();
+			size_t count11 = http::Response::GetObjectCount();
+			size_t count4 = http::SessionClient::GetObjectCount();
+			size_t count5 = http::RequestClient::GetObjectCount();
+			size_t count6 = this->mApp->ActorMgr()->GetPlayerCount();
+			size_t count7 = acs::LuaWaitTaskSource::GetObjectCount();
+
+			size_t count8 = tcp::Socket::GetObjectCount();
+			size_t count9 = TaskContext::GetObjectCount();
+
+			size_t count12 = redis::Request::GetObjectCount();
+			size_t count13 = redis::Response::GetObjectCount();
+			size_t count14 = RpcTaskSource::GetObjectCount();
+			size_t count15 = LuaRpcTaskSource::GetObjectCount();
+
+			size_t count16 = StaticMethod::GetObjectCount();
+			size_t count17 = mongo::Request::GetObjectCount();
+			size_t count18 = mongo::Response::GetObjectCount();
+			std::shared_ptr<json::w::Value> jsonValue = document.AddObject("memory");
+			{
+				jsonValue->Add("rpc_message", count1);
+				jsonValue->Add("inner_client", count2);
+				jsonValue->Add("outer_client", count3);
+				jsonValue->Add("http_client", count5);
+				jsonValue->Add("http_session", count4);
+				jsonValue->Add("http_request", count10);
+				jsonValue->Add("http_response", count11);
+				jsonValue->Add("player_count", count6);
+				jsonValue->Add("lua_wait_task", count7);
+				jsonValue->Add("rpc_task", count14);
+				jsonValue->Add("lua_rpc_task", count15);
+				jsonValue->Add("socket_count", count8);
+				jsonValue->Add("coroutine_count", count9);
+				jsonValue->Add("redis_request", count12);
+				jsonValue->Add("redis_response", count13);
+				jsonValue->Add("method", count16);
+				jsonValue->Add("mongo_request", count17);
+				jsonValue->Add("mongo_response", count18);
+			}
+#endif
 			std::vector<IServerRecord *> records;
 			this->mApp->GetComponents(records);
 			for(IServerRecord * record : records)
