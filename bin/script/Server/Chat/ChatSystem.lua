@@ -25,7 +25,9 @@ function Chat:Ping()
     return XCode.Ok
 end
 
-function Chat:OnPing()
+function Chat:OnPing(request)
+    local playerId = request.head:Get("pid")
+    mongo:FindOne("player.chat", { _id = playerId })
     return XCode.Ok
 end
 

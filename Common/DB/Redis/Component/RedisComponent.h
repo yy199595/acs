@@ -63,7 +63,6 @@ namespace acs
 		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
 	private:
 		redis::Config mConfig;
-		math::NumberPool<int> mNumPool;
 		custom::Queue<int> mFreeClients; //空闲客户端
 		std::unordered_map<std::string, std::string> mLuaMap;
 		std::queue<std::unique_ptr<redis::Request>> mRequests;

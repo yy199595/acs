@@ -176,7 +176,7 @@ namespace rpc
 		document.Add("data", this->mBody);
 		document.Add("_t", this->mProtoHead.Type);
 		document.Add("_p", this->mProtoHead.Porto);
-		return true;
+		return document.Encode(&json);
 	}
 
 	bool Message::DecodeFromJson(json::r::Value& document)

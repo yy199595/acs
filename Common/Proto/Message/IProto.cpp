@@ -57,6 +57,7 @@ namespace tcp
 		return true;
 	}
 
+
 	bool IHeader::IsEqual(const std::string& k, const std::string& v) const
 	{
 		auto iter = this->mHeader.find(k);

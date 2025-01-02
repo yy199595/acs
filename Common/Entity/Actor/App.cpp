@@ -277,11 +277,11 @@ namespace acs
 							os::System::GetSystemInfo(systemInfo);
 							double mb = (double)systemInfo.use_memory / MB;
 #endif
-							LOG_DEBUG("[{:.3f}MB] message:{} inner:{} outer:{} session:{} request:{} "
-									  "player:{} task:{} sock:{} cor:{}", mb, count1, count2, count3,
-									count4, count5, count6, count7, count8, count9)
-							LOG_INFO("http:{}=>{}  redis:{}=>{} rpc:{} lua_rpc:{} mongo:{}=>{} method:{}",
-									count10, count11, count12, count13, count14, count15, count17, count18, count16)
+//							LOG_DEBUG("[{:.3f}MB] message:{} inner:{} outer:{} session:{} request:{} "
+//									  "player:{} task:{} sock:{} cor:{}", mb, count1, count2, count3,
+//									count4, count5, count6, count7, count8, count9)
+//							LOG_INFO("http:{}=>{}  redis:{}=>{} rpc:{} lua_rpc:{} mongo:{}=>{} method:{}",
+//									count10, count11, count12, count13, count14, count15, count17, count18, count16)
 						}
 #endif
 						this->mTickCount++;

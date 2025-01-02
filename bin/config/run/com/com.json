@@ -8,7 +8,8 @@
         "https" : "HttpWebComponent",
         "rpc" : "InnerNetComponent",
         "gate" : "OuterNetComponent",
-        "master" : "HttpWebComponent"
+        "master" : "HttpWebComponent",
+        "ws" : "WebSocketAcceptComponent"
     },
     "listen" : {
         "rpc" : {
@@ -52,6 +53,11 @@
             "protocol" : "udp",
             "port": "127.0.0.1:${kcp}",
             "component" : "KcpComponent"
+        },
+        "ws" : {
+            "protocol" : "tcp",
+            "port": "127.0.0.1:${ws}",
+            "component" : "WebSocketComponent"
         }
     },
     "connect": {

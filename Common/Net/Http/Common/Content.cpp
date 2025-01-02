@@ -341,11 +341,11 @@ namespace http
 
 	int TextContent::OnRecvMessage(std::istream& is, size_t size)
 	{
-		std::unique_ptr<char[]> buffer = std::make_unique<char[]>(size);
-		size_t count = is.readsome(buffer.get(), size);
+		this->mContent.resize(size);
+		char * buffer = const_cast<char*>(this->mContent.c_str());
+		size_t count = is.readsome(buffer, size);
 		if (count > 0)
 		{
-			this->mContent.append(buffer.get(), count);
 			if (this->mContent.size() >= this->mMaxSize)
 			{
 				return tcp::PacketLong;

@@ -60,6 +60,7 @@ namespace rpc
 		constexpr char Udp = 5; //upd
 		constexpr char Kcp = 6; //upd
 		constexpr char Forward = 7;
+		constexpr char Ws = 8;
 		constexpr char Max = 127;
 	}
 

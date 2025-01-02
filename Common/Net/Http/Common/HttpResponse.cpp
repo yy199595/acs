@@ -278,10 +278,6 @@ namespace http
 			this->mHead.OnSendMessage(buffer);
 			this->mParseState = tcp::Decode::MessageBody;
 		}
-		if (code != HttpStatus::OK)
-		{
-			return 0;
-		}
 		if(this->mBody != nullptr)
 		{
 			return this->mBody->OnWriteBody(buffer);

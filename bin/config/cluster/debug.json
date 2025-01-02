@@ -36,7 +36,8 @@
             "KcpComponent",
             "UdpComponent",
             "RedisComponent",
-            "MongoDBComponent"
+            "MongoDBComponent",
+            "WebSocketComponent"
         ]
     }
 }

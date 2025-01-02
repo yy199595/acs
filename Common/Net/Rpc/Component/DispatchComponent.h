@@ -18,7 +18,6 @@ namespace acs
 		DispatchComponent();
     public:
 		int OnMessage(rpc::Message * message) noexcept;
-		inline int BuildRpcId() { return this->mNumPool.BuildNumber();}
 	private:
 		bool LateAwake() final;
 		void OnAppStop() final;
@@ -31,7 +30,6 @@ namespace acs
     private:
 		unsigned int mSumCount;
 		unsigned int mWaitCount;
-		math::NumberPool<int> mNumPool;
 		class RouterComponent* mRouter;
 		class OuterNetComponent* mOuter;
 		class CoroutineComponent* mCoroutine;

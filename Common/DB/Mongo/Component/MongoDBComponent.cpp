@@ -67,6 +67,11 @@ namespace acs
 
 namespace acs
 {
+	MongoDBComponent::MongoDBComponent()
+	{
+
+	}
+
 	bool MongoDBComponent::Awake()
 	{
 		std::unique_ptr<json::r::Value> mongoObject;
@@ -126,15 +131,15 @@ namespace acs
 
 	void MongoDBComponent::OnMessage(int id, mongo::Request * request, mongo::Response * response)
 	{
-		int taskId = 0;
+		int rpcId = 0;
 		if(response == nullptr)
 		{
-			taskId = request->GetRpcId();
+			rpcId = request->GetRpcId();
 			LOG_ERROR("send mongo cmd = {}", request->ToString());
 		}
 		else
 		{
-			taskId = response->RpcId();
+			rpcId = response->RpcId();
 			if(response->GetCode() != 0)
 			{
 				LOG_WARN("mongo request = {}", request->ToString());
@@ -146,7 +151,7 @@ namespace acs
 				CONSOLE_LOG_INFO("[response:{}] = {}", request->GetCostTime(), response->ToString());
 			}
 		}
-		this->OnResponse(taskId, std::unique_ptr<mongo::Response>(response));
+		this->OnResponse(rpcId, std::unique_ptr<mongo::Response>(response));
 
 		if(this->mRequests.empty())
 		{
@@ -167,9 +172,9 @@ namespace acs
 			request->collectionName = this->mCommand;
 		}
 
-		int taskId = this->mNumberPool.BuildNumber();
+		int rpcId = this->BuildRpcId();
 		{
-			request->header.requestID = taskId;
+			request->header.requestID = rpcId;
 			request->dataBase = this->mConfig.DB;
 			size_t pos = request->tab.find('.');
 			if(pos != std::string::npos)
@@ -179,29 +184,29 @@ namespace acs
 			}
 		}
 		this->Send(std::move(request));
-		return this->BuildRpcTask<MongoTask>(taskId)->Await();
+		return this->BuildRpcTask<MongoTask>(rpcId)->Await();
 	}
 
 	std::unique_ptr<mongo::Response> MongoDBComponent::Run(const std::string & db, std::unique_ptr<mongo::Request> request)
 	{
-		int taskId = this->mNumberPool.BuildNumber();
+		int rpcId = this->BuildRpcId();
 		{
 			request->dataBase = db;
-			request->header.requestID = taskId;
+			request->header.requestID = rpcId;
 		}
 		this->Send(std::move(request));
-		return this->BuildRpcTask<MongoTask>(taskId)->Await();
+		return this->BuildRpcTask<MongoTask>(rpcId)->Await();
 	}
 
-	void MongoDBComponent::LuaSend(std::unique_ptr<mongo::Request> request, int& taskId)
+	void MongoDBComponent::LuaSend(std::unique_ptr<mongo::Request> request, int& rpcId)
 	{
 //		if(request->collectionName.empty())
 //		{
 //			request->collectionName = this->mCommand;
 //		}
-		taskId = this->mNumberPool.BuildNumber();
+		rpcId = this->BuildRpcId();
 		{
-			request->header.requestID = taskId;
+			request->header.requestID = rpcId;
 			request->dataBase = this->mConfig.DB;
 		}
 		this->Send(std::move(request));
@@ -234,9 +239,9 @@ namespace acs
 	{
 		std::unique_ptr<json::w::Value> data = document.AddObject("mongo");
 		{
+			data->Add("sum", this->CurrentRpcCount());
 			data->Add("free", this->mFreeClients.Size());
 			data->Add("client", this->mMongoClients.size());
-			data->Add("sum", (int)this->mNumberPool.CurrentNumber());
 			data->Add("wait", this->AwaitCount() + this->mRequests.size());
 		}
 	}

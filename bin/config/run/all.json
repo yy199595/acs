@@ -11,6 +11,9 @@
 		"main": "${lua}"
 	},
 	"listen": {
+		"ws": {
+			"address": "127.0.0.1:${ws}"
+		},
 		"http": {
 			"address": "127.0.0.1:${http}"
 		},

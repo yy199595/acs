@@ -135,29 +135,29 @@ namespace acs
 
 	int HttpComponent::Send(std::unique_ptr<http::Request> request, std::function<void(std::unique_ptr<http::Response>)> && cb)
 	{
+		int rpcId = this->BuildRpcId();
 		request->Header().SetKeepAlive(false);
 		const http::Url & url = request->GetUrl();
-		int taskId = this->mNumPool.BuildNumber();
 		std::unique_ptr<http::Response> response = std::make_unique<http::Response>();
 		std::shared_ptr<http::RequestClient> httpAsyncClient = this->CreateClient(request.get());
 		//LOG_DEBUG("connect {} server => {}:{}", url.Protocol(), url.Host(), url.Port());
 		{
-			this->mUseClients.Add(taskId, httpAsyncClient);
-			this->AddTask(new HttpCallbackTask(taskId, cb));
-			httpAsyncClient->Do(std::move(request), std::move(response), taskId);
+			this->mUseClients.Add(rpcId, httpAsyncClient);
+			this->AddTask(new HttpCallbackTask(rpcId, cb));
+			httpAsyncClient->Do(std::move(request), std::move(response), rpcId);
 		}
 		return XCode::Ok;
 	}
 
-	int HttpComponent::Send(std::unique_ptr<http::Request> request, std::unique_ptr<http::Response> response, int& taskId)
+	int HttpComponent::Send(std::unique_ptr<http::Request> request, std::unique_ptr<http::Response> response, int& rpcId)
 	{
+		rpcId = this->BuildRpcId();
 		request->Header().SetKeepAlive(false);
-		taskId = this->mNumPool.BuildNumber();
 		std::shared_ptr<http::RequestClient> httpAsyncClient = this->CreateClient(request.get());
 		//LOG_DEBUG("connect {} server => {}:{}", url.Protocol(), url.Host(), url.Port());
 		{
-			this->mUseClients.Add(taskId, httpAsyncClient);
-			httpAsyncClient->Do(std::move(request), std::move(response), taskId);
+			this->mUseClients.Add(rpcId, httpAsyncClient);
+			httpAsyncClient->Do(std::move(request), std::move(response), rpcId);
 		}
 		return XCode::Ok;
 	}

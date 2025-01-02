@@ -53,6 +53,8 @@
 #include "Lua/Component/LuaListenComponent.h"
 #include "Udp/Component/UdpComponent.h"
 #include "Kcp/Component/KcpComponent.h"
+
+#include "WebSocket/Component/WebSocketComponent.h"
 #ifdef __ENABLE_MYSQL__
 #include "Mysql/Service/MysqlDB.h"
 #include "Mysql/Component/MysqlDBComponent.h"
@@ -139,6 +141,7 @@ void RegisterComponent()
 	REGISTER_COMPONENT(UdpComponent);
 	REGISTER_COMPONENT(KcpComponent);
 	REGISTER_COMPONENT(QuickComponent);
+	REGISTER_COMPONENT(WebSocketComponent);
 }
 
 void RegisterAll()

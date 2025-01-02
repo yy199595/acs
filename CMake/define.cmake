@@ -52,7 +52,7 @@ option(__ENABLE_OPEN_WOLF_SSL__ "开启wolfssl" OFF)
 
 option(__ENABLE_MEMORY_CHECK__ "开启内存检查" ON)
 
-option(__SHARE_PTR_COUNTER__ "开启指针计算查询" OFF)
+option(__SHARE_PTR_COUNTER__ "开启指针计算查询" ON)
 option(__MEMORY_POOL_OPERATOR__ "使用重载对象内存池" OFF)
 
 if (APPLE)

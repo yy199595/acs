@@ -46,15 +46,17 @@ namespace acs
 			return this->AddTask(task, timeout);
 		}
 
-
 		inline bool OnResponse(int key, std::unique_ptr<T> message);
-		size_t AwaitCount() const { return this->mTasks.size(); }
+		inline size_t AwaitCount() const { return this->mTasks.size(); }
+		inline int BuildRpcId() { return this->mNumberPool.BuildNumber(); }
+		inline int CurrentRpcCount() { return this->mNumberPool.CurrentNumber(); }
 	protected:
 		void OnLastFrameUpdate(long long) final;
 		virtual void OnDelTask(int k) { }
         virtual void OnNotFindResponse(int key, std::unique_ptr<T> message);
     private:
 		std::vector<RpcTask> mDelTasks;
+		math::NumberPool<int> mNumberPool;
 		std::unordered_map<int, RpcTask> mTasks;
 		std::unordered_map<int, long long> mTimeouts;
     };

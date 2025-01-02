@@ -32,9 +32,9 @@ namespace acs
 	{
 		std::unique_ptr<json::w::Value> data = document.AddObject("redis");
 		{
+			data->Add("sum", this->CurrentRpcCount());
 			data->Add("client", this->mClients.size());
 			data->Add("free", this->mFreeClients.Size());
-			data->Add("sum", this->mNumPool.CurrentNumber());
 			data->Add("wait", this->AwaitCount() + this->mRequests.size());
 		}
 	}
@@ -255,11 +255,11 @@ namespace acs
 		return true;
 	}
 
-	void RedisComponent::Send(std::unique_ptr<redis::Request> request, int& id)
+	void RedisComponent::Send(std::unique_ptr<redis::Request> request, int& rpcId)
 	{
-		id = this->mNumPool.BuildNumber();
+		rpcId = this->BuildRpcId();
 		{
-			request->SetRpcId(id);
+			request->SetRpcId(rpcId);
 			this->Send(std::move(request));
 		}
 	}

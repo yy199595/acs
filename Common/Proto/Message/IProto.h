@@ -78,6 +78,7 @@ namespace tcp
 		inline int OnSendMessage(std::ostream &os) final;
 		inline void Clear() final { this->mMessage.clear(); }
 		inline int OnRecvMessage(std::istream &os, size_t size) final;
+		inline const std::string & GetText() const { return this->mMessage; }
 	private:
 		std::string mMessage;
 	};
@@ -90,13 +91,10 @@ namespace tcp
 
 	inline int TextProto::OnRecvMessage(std::istream& os, size_t size)
 	{
-		std::unique_ptr<char[]> buffer = std::make_unique<char[]>(size);
+		this->mMessage.resize(size);
+		char * buffer = const_cast<char*>(this->mMessage.c_str());
 		{
-			size_t count = os.readsome(buffer.get(), size);
-			if(count > 0)
-			{
-				this->mMessage.assign(buffer.get(), count);
-			}
+			os.readsome(buffer, size);
 		}
 		return 0;
 	}

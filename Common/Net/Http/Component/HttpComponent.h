@@ -40,7 +40,6 @@ namespace acs
 		std::shared_ptr<http::RequestClient> CreateClient(http::Request * request);
 		void OnMessage(http::Request *request, http::Response *response) final;
 	private:
-		math::NumberPool<int> mNumPool;
         class ThreadComponent * mNetComponent;
 #ifdef __ENABLE_OPEN_SSL__
 		std::unordered_map<std::string, std::unique_ptr<asio::ssl::context>> mSslContexts;

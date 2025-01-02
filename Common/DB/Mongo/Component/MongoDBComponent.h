@@ -62,7 +62,7 @@ namespace acs
 			public IDestroy, public IServerRecord, public ILuaRegister
 	{
 	public:
-		MongoDBComponent() = default;
+		MongoDBComponent();
 		~MongoDBComponent() final = default;
 	public:
 		std::unique_ptr<mongo::Response> Run(std::unique_ptr<mongo::Request> request);
@@ -82,7 +82,6 @@ namespace acs
 		std::string mCommand;
 		mongo::MongoConfig mConfig;
 		custom::Queue<int> mFreeClients;
-		math::NumberPool<int> mNumberPool;
 		std::queue<std::unique_ptr<mongo::Request>> mRequests;
 		std::unordered_map<int, std::shared_ptr<mongo::Client>> mMongoClients;
 	};
