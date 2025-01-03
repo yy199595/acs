@@ -73,7 +73,7 @@ namespace acs
 		}
 #else
 		custom::ThreadSync<bool> threadSync;
-		io.post([&threadSync, this, config]
+		asio::post(io, [&threadSync, this, config]
 			{
 				Asio::EndPoint ep(asio::ip::address(), config.Port);
 				while (!this->mAcceptor->is_open())
