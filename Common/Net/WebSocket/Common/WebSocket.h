@@ -12,6 +12,8 @@ namespace ws
 	constexpr unsigned char OPCODE_CLOSE = 0x8;
 	constexpr unsigned char OPCODE_PING = 0x9;
 	constexpr unsigned char OPCODE_PONG = 0xA;
+	constexpr unsigned char OPCODE_RPC = 0xB;
+	constexpr unsigned char OPCODE_JSON = 0xC;
 }
 
 #endif //APP_WEBSOCKET_H

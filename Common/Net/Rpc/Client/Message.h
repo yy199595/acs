@@ -50,7 +50,7 @@ namespace rpc
 	public:
 		bool EncodeToJson(std::string & json);
 		bool DecodeFromJson(json::r::Value & value);
-		bool DecodeFromJson(const char * message, int len);
+		bool DecodeFromJson(const char * message, size_t len);
 	public:
 		int GetCode(int code = 1) const;
 		std::unique_ptr<Message> Clone() const;
@@ -77,9 +77,9 @@ namespace rpc
 		std::string ToString() final;
 		std::string* Body() { return &this->mBody; }
 		inline int SockId() const { return this->mSockId; }
-		inline size_t GetSize() const{ return this->mBody.size(); }
 		inline const std::string& GetBody() const{ return this->mBody; }
 		inline void Append(const std::string& data){ this->mBody.append(data); }
+		inline size_t CalcMessageLength() final { return this->mHead.GetLength() + this->mBody.size(); }
 	public:
 		void SetContent(const std::string& content);
 		void SetContent(char proto, const std::string& content);

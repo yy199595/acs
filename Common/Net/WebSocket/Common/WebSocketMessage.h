@@ -17,6 +17,16 @@ namespace ws
 		unsigned int mLength;
 	};
 
+	class Content
+	{
+	public:
+		explicit Content(unsigned char opcode) : mOpCode(opcode) { }
+	public:
+		virtual size_t Length() = 0;
+	private:
+		unsigned char mOpCode;
+	};
+
 	class Message : public tcp::IProto
 	{
 	public:
@@ -26,15 +36,9 @@ namespace ws
 		int OnSendMessage(std::ostream &os) final;
 		int OnRecvMessage(std::istream &os, size_t size) final;
 	public:
-		inline void SetBody(unsigned char opcode) {
-			this->mHeader.mOpCode = opcode;
-		}
-		inline void SetBody(unsigned char opcode, const std::string & message) {
-			this->mHeader.mOpCode = opcode; this->mMessage = message;
-		}
-	public:
 		const Header & GetHeader() const { return this->mHeader; }
 		const std::string & GetMessageBody() const { return this->mMessage; }
+		void SetBody(unsigned char opcode, const std::string & message, bool mask = true);
 	private:
 		Header mHeader;
 		char mMaskingKey[4];

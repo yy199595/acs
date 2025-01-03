@@ -12,7 +12,7 @@
 namespace acs
 {
 	WebSocketComponent::WebSocketComponent()
-		: ISender(rpc::Net::Ws)
+		: ISender(rpc::Net::Ws), mClientPool(SERVER_MAX_COUNT)
 	{
 		this->mActor = nullptr;
 		this->mThread = nullptr;
@@ -33,11 +33,11 @@ namespace acs
 
 	void WebSocketComponent::Complete()
 	{
-		rpc::Message * rpcMessage = new rpc::Message();
+		std::unique_ptr<rpc::Message> rpcMessage = std::make_unique<rpc::Message>();
 		{
 			rpcMessage->SetContent("11223344");
 			rpcMessage->GetHead().Add("func", "ChatSystem.Ping");
-			this->Send(this->mApp->GetSrvId(), rpcMessage);
+			this->Send(this->mApp->GetSrvId(), rpcMessage.release());
 		}
 	}
 
@@ -50,14 +50,8 @@ namespace acs
 
 	void WebSocketComponent::OnMessage(int id, ws::Message* request, ws::Message* response)
 	{
-		LOG_DEBUG("[{}] message = {}", id, request->GetMessageBody())
-		std::unique_ptr<rpc::Message> rpcMessage = std::make_unique<rpc::Message>();
-		{
-			rpcMessage->SetType(rpc::Type::Response);
-			rpcMessage->SetProto(rpc::Porto::String);
-			rpcMessage->SetContent("server response");
-			this->Send(id, rpcMessage.release());
-		}
+		const std::string & message = request->GetMessageBody();
+		LOG_DEBUG("[{}] message = {}", id, message)
 		delete request;
 	}
 

@@ -174,8 +174,8 @@ namespace rpc
 			return true;
 		}
 		document.Add("data", this->mBody);
-		document.Add("_t", this->mProtoHead.Type);
-		document.Add("_p", this->mProtoHead.Porto);
+		document.Add("t", this->mProtoHead.Type);
+		document.Add("p", this->mProtoHead.Porto);
 		return document.Encode(&json);
 	}
 
@@ -200,12 +200,12 @@ namespace rpc
 			}
 		}
 		document.Get("data", this->mBody);
-		document.Get("_t", this->mProtoHead.Type);
-		document.Get("_p", this->mProtoHead.Porto);
+		document.Get("t", this->mProtoHead.Type);
+		document.Get("p", this->mProtoHead.Porto);
 		return true;
 	}
 
-	bool Message::DecodeFromJson(const char* message, int len)
+	bool Message::DecodeFromJson(const char* message, size_t len)
 	{
 		json::r::Document document;
 		if(!document.Decode(message, len))
@@ -217,7 +217,6 @@ namespace rpc
 
     int Message::OnRecvMessage(std::istream& os, size_t size)
     {
-		thread_local static char buffer[128] = {0};
 		if(size < this->mProtoHead.Len)
 		{
 			return tcp::ReadError;
@@ -234,21 +233,12 @@ namespace rpc
 		{
 			return tcp::ReadDone;
 		}
-		this->mBody.reserve(this->mProtoHead.Len);
-        while (this->mProtoHead.Len > 0)
+		this->mBody.resize(this->mProtoHead.Len);
+		char * buffer = const_cast<char*>(this->mBody.c_str());
+		size_t count = os.readsome(buffer, this->mProtoHead.Len);
+		if(count != this->mProtoHead.Len)
 		{
-			len = sizeof(buffer);
-			if(this->mProtoHead.Len < len)
-			{
-				len = this->mProtoHead.Len;
-			}
-			int count = (int)os.readsome(buffer, len);
-			if (count <= 0)
-			{
-				return tcp::ReadError;
-			}
-			this->mProtoHead.Len -= count;
-			this->mBody.append(buffer, count);
+			return tcp::ReadDecodeError;
 		}
         return tcp::ReadDone;
     }

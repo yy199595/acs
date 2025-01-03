@@ -83,4 +83,5 @@ namespace acs
 		}
 		return dynamic_cast<T*>(component);
 	}
+	constexpr int SERVER_MAX_COUNT = 10000;
 }

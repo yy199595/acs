@@ -51,6 +51,7 @@ namespace acs
 		std::unique_ptr<json::r::Value> value;
 
 		std::unordered_map<std::string, char> NetMap{
+				{ "ws",   rpc::Net::Ws },
 				{ "tcp",   rpc::Net::Tcp },
 				{ "udp",   rpc::Net::Udp },
 				{ "kcp",   rpc::Net::Kcp },

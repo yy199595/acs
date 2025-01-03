@@ -3,7 +3,7 @@
 //
 
 #include "WebSocketMessage.h"
-
+#include "Util/Tools/Math.h"
 namespace ws
 {
 
@@ -13,6 +13,7 @@ namespace ws
 	Message::Message()
 	{
 		this->Clear();
+		memset(this->mMaskingKey, 0, sizeof(this->mMaskingKey));
 	}
 
 	void Message::Clear()
@@ -25,7 +26,7 @@ namespace ws
 	{
 		this->mHeader.mFin = true; // 完整帧
 		this->mHeader.mRsv = 0;    // RSV 保持为 0
-		this->mHeader.mMask = false;  // 客户端消息 Mask 位应为 1，服务器发送时可为 0
+		//this->mHeader.mMask = false;  // 客户端消息 Mask 位应为 1，服务器发送时可为 0
 
 		std::unique_ptr<char[]> buffer;
 
@@ -60,10 +61,6 @@ namespace ws
 		if (this->mHeader.mMask)
 		{
 			maskAndLengthByte |= 0x80;
-			for(size_t index = 0; index < this->mMessage.size(); index++)
-			{
-				this->mMessage[index] = this->mMessage[index]  ^ this->mMaskingKey[index % 4];
-			}
 		}
 		maskAndLengthByte |= this->mHeader.mLength;
 		os << maskAndLengthByte;
@@ -82,6 +79,25 @@ namespace ws
 
 		os.write(this->mMessage.c_str(), this->mMessage.size());
 		return 0;
+	}
+
+	void Message::SetBody(unsigned char opcode, const std::string& message, bool mask)
+	{
+		this->mHeader.mMask = mask;
+		this->mHeader.mOpCode = opcode;
+		this->mMessage.assign(message);
+		if(this->mHeader.mMask)
+		{
+			for(size_t index = 0; index < sizeof(this->mMaskingKey); index++)
+			{
+				int num = help::Math::Random<int>(0, sizeof(unsigned char));
+				this->mMaskingKey[index] = static_cast<char>(num);
+			}
+			for(size_t index = 0; index < this->mMessage.size(); index++)
+			{
+				this->mMessage[index] = this->mMessage[index]  ^ this->mMaskingKey[index % 4];
+			}
+		}
 	}
 
 	int Message::OnRecvMessage(std::istream& os, size_t size)
@@ -133,7 +149,6 @@ namespace ws
 						this->mMessage[i] ^= this->mMaskingKey[i % 4];
 					}
 				}
-				this->mMessage[this->mHeader.mLength] = 0;
 				return tcp::ReadDone;
 			}
 

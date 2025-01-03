@@ -9,25 +9,43 @@
 
 #include <openssl/sha.h>
 #include <openssl/bio.h>
+#include "Util/Tools/String.h"
+namespace ws
+{
+	// Base64 编码函数
+	std::string Base64Encode(const unsigned char* input, int length) {
+		BIO* bmem = BIO_new(BIO_s_mem());
+		BIO* b64 = BIO_new(BIO_f_base64());
+		b64 = BIO_push(b64, bmem);
+
+		// 设置为无换行模式
+		BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+		BIO_write(b64, input, length);
+		BIO_flush(b64);
+
+		BUF_MEM* bptr;
+		BIO_get_mem_ptr(b64, &bptr);
+
+		std::string result(bptr->data, bptr->length);
+		BIO_free_all(b64);
+		return result;
+	}
+
+	std::string ComputeWebSocketAccept(const std::string& secWebSocketKey) {
+		const std::string websocketGUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+		std::string keyWithGUID = secWebSocketKey + websocketGUID;
+
+		// 计算 SHA-1 哈希
+		unsigned char sha1Result[SHA_DIGEST_LENGTH];
+		SHA1(reinterpret_cast<const unsigned char*>(keyWithGUID.c_str()), keyWithGUID.size(), sha1Result);
+
+		// 对哈希结果进行 Base64 编码
+		return Base64Encode(sha1Result, SHA_DIGEST_LENGTH);
+	}
+}
 
 namespace ws
 {
-
-	std::string CalculateSecWebSocketAccept(const std::string& key) {
-		std::string input = key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
-
-		unsigned char hash[SHA_DIGEST_LENGTH];
-		SHA1(reinterpret_cast<const unsigned char*>(input.c_str()), input.size(), hash);
-
-		char output[2 * SHA_DIGEST_LENGTH + 1];
-		for (int i = 0; i < SHA_DIGEST_LENGTH; i++) {
-			sprintf(output + 2 * i, "%02x", static_cast<int>(hash[i]));
-		}
-		output[2 * SHA_DIGEST_LENGTH] = '\0';
-
-		return std::string(output);
-	}
-
 	RequestClient::RequestClient(int id, ws::Component* component, Asio::Context& main)
 			: tcp::Client(1024 * 10), mSockId(id), mComponent(component), mMainContext(main)
 	{
@@ -50,12 +68,17 @@ namespace ws
 		{
 			delete this->mWaitSendMessage.front();
 			this->mWaitSendMessage.pop();
-			if(!this->mWaitSendMessage.empty())
+			this->SendFirstMessage();
+		}
+	}
+
+	void RequestClient::SendFirstMessage()
+	{
+		if(!this->mWaitSendMessage.empty())
+		{
+			ws::Message * message = this->mWaitSendMessage.front();
 			{
-				ws::Message * message = this->mWaitSendMessage.front();
-				{
-					this->Write(*message);
-				}
+				this->Write(*message);
 			}
 		}
 	}
@@ -69,7 +92,8 @@ namespace ws
 		}
 		this->mHttpRequest = new http::Request("GET");
 		http::Head & head = this->mHttpRequest->Header();
-		std::string secWebSocketAccept = ws::CalculateSecWebSocketAccept("dGhlIHNhbXBsZSBub25jZQ==");
+		std::string randomKey = help::Str::RandomString(16);
+		std::string secWebSocketAccept = ws::ComputeWebSocketAccept(randomKey);
 		{
 			head.Add("Connection", "Upgrade");
 			head.Add("Upgrade", "websocket");
@@ -139,9 +163,17 @@ namespace ws
 			flag = this->mHttpResponse->OnRecvMessage(readStream, size);
 			if(flag == tcp::ReadDone)
 			{
+				if(this->mHttpResponse->Code() != HttpStatus::SWITCHING_PROTOCOLS)
+				{
+					this->Close(XCode::Failure);
+				}
+				else
+				{
+					this->ReadSome();
+					this->SendFirstMessage();
+				}
 				delete this->mHttpResponse;
 				this->mHttpResponse = nullptr;
-				this->ReadSome();
 				return;
 			}
 		}

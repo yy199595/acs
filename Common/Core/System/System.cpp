@@ -78,7 +78,7 @@ namespace os
 		{
 			commandLine.emplace_back(argv[index]);
 		}
-		System::SetEnv("id", "0"); //服务器id
+		System::SetEnv("id", "1"); //服务器id
 		System::SetEnv("log", "1"); //日志等级
 		System::SetEnv("name", "server"); //集群名称
 		System::SetEnv("cluster", "debug");

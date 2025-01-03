@@ -30,6 +30,7 @@ namespace ws
 		void OnReceiveMessage(std::istream &readStream, size_t size, const asio::error_code &code) final;
 	private:
 		void Close(int code);
+		void SendFirstMessage();
 	private:
 		int mSockId;
 		Component * mComponent;

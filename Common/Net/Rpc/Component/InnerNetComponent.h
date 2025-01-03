@@ -32,9 +32,9 @@ namespace acs
 		rpc::InnerClient * GetClient(int id);
 	private:
 		class ActorComponent * mActor;
+		math::NumberPool<int> mNumPool;
 		class ThreadComponent * mThread;
         class DispatchComponent* mDispatch;
-		math::NumberPool<int, 100> mNumPool;
 		std::unordered_map<int, std::shared_ptr<rpc::InnerClient>> mClients; //本地客户端(连接别的)
 	};
 }

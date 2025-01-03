@@ -144,14 +144,16 @@ namespace help
 
     std::string Str::RandomString(size_t size)
     {
+		std::string result;
+		result.resize(size);
 		static const std::string STR_BUFFER("1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM");
-		std::unique_ptr<char[]> buffer(new char[size]);
 		for(size_t index = 0; index < size; index++)
 		{
-			size_t rid = random() % STR_BUFFER.size();
-            buffer[rid] = STR_BUFFER[rid];
+			size_t max = STR_BUFFER.size();
+			size_t num = help::Math::Random<size_t>(0, max);
+			result[index] = STR_BUFFER[num];
 		}
-		return std::string(buffer.get(), size);
+		return result;
     }
 
     std::string Str::CreateNewToken()

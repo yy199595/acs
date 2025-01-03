@@ -341,15 +341,16 @@ namespace http
 
 	int TextContent::OnRecvMessage(std::istream& is, size_t size)
 	{
-		this->mContent.resize(size);
-		char * buffer = const_cast<char*>(this->mContent.c_str());
-		size_t count = is.readsome(buffer, size);
-		if (count > 0)
+		char buffer[512] = { 0 };
+		size_t count = is.readsome(buffer, sizeof(buffer));
+		while (count > 0)
 		{
+			this->mContent.append(buffer, count);
 			if (this->mContent.size() >= this->mMaxSize)
 			{
 				return tcp::PacketLong;
 			}
+			count = is.readsome(buffer, sizeof(buffer));
 		}
 		return tcp::ReadSomeMessage;
 	}
@@ -609,7 +610,7 @@ namespace http
 		std::stringstream ss;
 		std::string contenType(http::GetContentType(fileType));
 		ss << http::Header::ContentDisposition << ": form-data; ";
-		ss << fmt::format("name=\"{}\"; filename=\"{}\"", k, fileName) << "\r\n";
+		ss << fmt::format(R"(name="{}"; filename="{}")", k, fileName) << "\r\n";
 		ss << http::Header::ContentType << ": " << contenType << "\r\n\r\n";
 
 		this->mHeader.emplace_back(ss.str());
@@ -624,9 +625,9 @@ namespace http
 		{
 			length += size;
 		}
-		for (size_t i = 0; i < this->mHeader.size(); i++)
+		for (const std::string & str : this->mHeader)
 		{
-			length += this->mHeader[i].size();
+			length += str.size();
 			length += (this->mBoundary.size() + 4);
 		}
 		length += (this->mBoundary.size() + 8);

@@ -59,7 +59,7 @@ namespace tcp
 		{
 			return {};
 		}
-
+		virtual size_t CalcMessageLength() { return 0; }
 		virtual int OnSendMessage(std::ostream& os) = 0; //返回剩余要发送的字节数
 		virtual int OnRecvMessage(std::istream& os, size_t size)
 		{
