@@ -84,13 +84,6 @@ namespace acs
 		virtual bool OnHotFix() = 0;
 	};
 
-	template<typename T1, typename T2>
-	class IService
-	{
-	public:
-		virtual int Invoke(const std::string&, const T1 &, T2 &) = 0;
-	};
-
 	template<typename C, typename T1, typename T2>
 	class IRequest
 	{
@@ -121,26 +114,12 @@ namespace acs
 		virtual void OnLogout(long long player) = 0;
 	};
 
-	class IOnRegister
-	{
-	public:
-		virtual void OnRegister(long long userId) = 0;
-	};
-
     class IServerRecord
     {
     public:
         virtual void OnRecord(json::w::Document & document) = 0;
     };
 
-	template<typename T1, typename T2 = T1>
-	class ICustomDisMessage
-	{
-	public:
-		virtual bool OnMessage(T1 * t1, T2 * t) { return false; }
-	};
-
-	class SocketProxy;
 	extern std::string GET_FUNC_NAME(const std::string& fullName);
 }
 
