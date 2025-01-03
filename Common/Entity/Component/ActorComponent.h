@@ -48,6 +48,7 @@ namespace acs
 	private:
 		bool LateAwake() final;
 		bool LoadServerFromFile();
+		void OnPlayerLogout(long long playerId, int);
 		void OnRecord(json::w::Document &document) final;
 		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
 		bool AddRandomActor(const std::string& name, Actor* actor);

@@ -10,9 +10,9 @@
 #include"Log/Common/Logger.h"
 #include"Core/Pool/ArrayPool.h"
 #include"Gate/Client/OuterClient.h"
-#include"Rpc/Interface/ISend.h"
-#include"Server/Component/ListenerComponent.h"
-
+#include "Entity/Component/Component.h"
+#include "Server/Component/ITcpComponent.h"
+#include "Gate/Common/Common.h"
 namespace rpc
 {
     class Message;
@@ -21,20 +21,19 @@ namespace rpc
 
 namespace acs
 {
-	class OuterNetComponent final : public Component, public ITcpListen,
+	class OuterNetComponent final : public Component, public ITcpListen, public IGate,
 									public IRpc<rpc::Message, rpc::Message>, public IServerRecord
 	{
 	 public:
 		OuterNetComponent();
 		~OuterNetComponent() final = default;
 	public:
-		void Broadcast(rpc::Message * message);
 		void StartClose(int id, int code) final;
-	public:
-		bool Send(int id, rpc::Message * message);
 	private:
 		bool LateAwake() final;
-		int OnRequest(rpc::Message * message);
+		void Broadcast(rpc::Message * message) final;
+		int Send(int id, rpc::Message * message) final;
+		inline char GetNet() const final { return rpc::Net::Tcp; }
 	private:
 		void OnClientError(int id, int code) final;
 		void OnSendFailure(int id, rpc::Message *message) final;
@@ -48,10 +47,8 @@ namespace acs
 	private:
 		int mWaitCount;
 		int mMaxConnectCount;
-		math::NumberPool<int> mNumPool;
-		class RouterComponent * mRouter;
+		class GateComponent * mGate;
 		math::NumberPool<int> mSocketPool;
-		class ActorComponent * mActComponent;
 		custom::Queue<rpc::Message *> mBroadCastMessages; //广播消息
 		std::unordered_map<int, std::shared_ptr<rpc::OuterClient>> mGateClientMap;
 		//std::unordered_map<int, std::unique_ptr<rpc::InnerClient>> mForwardClientMap;

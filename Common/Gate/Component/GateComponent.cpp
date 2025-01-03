@@ -1,58 +1,167 @@
 //
 // Created by leyi on 2023/9/11.
 //
-
-#include"GateComponent.h"
-#include"Gate/Service/GateSystem.h"
-#include"Cluster/Config/ClusterConfig.h"
-#include"Entity/Component/ActorComponent.h"
-
+#include "XCode/XCode.h"
+#include "GateComponent.h"
+#include "Entity/Actor/App.h"
+#include "Rpc/Config/MethodConfig.h"
+#include "Entity/Component/ActorComponent.h"
+#include "Router/Component/RouterComponent.h"
 namespace acs
 {
 	GateComponent::GateComponent()
 	{
 		this->mActor = nullptr;
+		this->mRouter = nullptr;
 	}
 
 	bool GateComponent::LateAwake()
 	{
-		this->mActor = this->GetComponent<ActorComponent>();
-		std::string name = ComponentFactory::GetName<GateSystem>();
-		return ClusterConfig::Inst()->GetServerName(name, this->mGateName);
+		std::vector<IGate *> gateComponents;
+		this->mApp->GetComponents(gateComponents);
+		for(IGate * gateComponent : gateComponents)
+		{
+			char net = gateComponent->GetNet();
+			this->mGateComponents.emplace(net, gateComponent);
+		}
+		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
+		LOG_CHECK_RET_FALSE(this->mRouter = this->GetComponent<RouterComponent>())
+		return true;
 	}
 
-	bool GateComponent::Send(long long playerId, const std::string& func, const pb::Message& message)
+	int GateComponent::Send(int id, rpc::Message* message)
 	{
+		char net = message->GetNet();
+		auto iter = this->mGateComponents.find(net);
+		if(iter == this->mGateComponents.end())
+		{
+			delete message;
+			return XCode::NotFoundSender;
+		}
+		if(iter->second->Send(id, message) != XCode::Ok)
+		{
+			delete message;
+			return XCode::SendMessageFail;
+		}
+		return XCode::Ok;
+	}
+
+	void GateComponent::Broadcast(rpc::Message* message)
+	{
+
+	}
+
+	int GateComponent::OnMessage(rpc::Message* message)
+	{
+		int code = XCode::Failure;
+		switch (message->GetType())
+		{
+			case rpc::Type::Request:
+				code = this->OnRequest(message);
+				break;
+			case rpc::Type::Response:
+				code = this->OnResponse(message);
+				break;
+			default:
+				code = XCode::UnKnowPacket;
+			LOG_ERROR("unknown message {}", message->ToString());
+				break;
+		}
+		if (code != XCode::Ok)
+		{
+			delete message;
+			return code;
+		}
+		return XCode::Ok;
+	}
+
+	int GateComponent::OnRequest(rpc::Message* message)
+	{
+		char net = message->GetNet();
+		int sockId = message->SockId();
+		message->SetNet(rpc::Net::Tcp);
+		message->GetHead().Add("n", net);
+		message->SetSource(rpc::Source::Client);
+		message->GetHead().Add(rpc::Header::client_sock_id, sockId);
+		const std::string& fullName = message->GetHead().GetStr(rpc::Header::func);
+		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
+		if (methodConfig == nullptr || !methodConfig->IsClient || !methodConfig->IsOpen)
+		{
+			LOG_ERROR("call function not exist : {}", fullName)
+			return XCode::CallFunctionNotExist;
+		}
+		long long playerId = 0;
+		message->SetNet(rpc::Net::Tcp);
+		int serverId = this->mApp->GetSrvId();
+		message->GetHead().Get(rpc::Header::player_id, playerId);
 		Player* player = this->mActor->GetPlayer(playerId);
 		if (player == nullptr)
 		{
-			return false;
+			if(methodConfig->IsAuth)
+			{
+				return XCode::CloseSocket;
+			}
+			this->mRouter->Send(serverId, std::unique_ptr<rpc::Message>(message));
+			return XCode::Ok;
 		}
-		return player->Send(func, message) == XCode::Ok;
+		const std::string& name = methodConfig->Server;
+		switch (methodConfig->Forward)
+		{
+			case rpc::Forward::Fixed: //转发到固定机器
+				if (!player->GetServerId(name, serverId))
+				{
+					return XCode::NotFoundServerRpcAddress;
+				}
+				break;
+			case rpc::Forward::Random:
+			{
+				Server* server = this->mActor->Random(name);
+				if (server == nullptr)
+				{
+					return XCode::AddressAllotFailure;
+				}
+				if (!server->GetAddress(*message, serverId))
+				{
+					return XCode::NotFoundActor;
+				}
+				break;
+			}
+			case rpc::Forward::Hash:
+			{
+				Server* server = this->mActor->Hash(name, playerId);
+				if (server == nullptr)
+				{
+					return XCode::AddressAllotFailure;
+				}
+				if (!server->GetAddress(*message, serverId))
+				{
+					return XCode::NotFoundActor;
+				}
+				break;
+			}
+			default:
+			LOG_ERROR("unknown forward {}", message->ToString());
+				return XCode::Failure;
+		}
+		this->mRouter->Send(serverId, std::unique_ptr<rpc::Message>(message));
+		return XCode::Ok;
 	}
 
-	void GateComponent::BroadCast(const std::string& func, const pb::Message* data)
+	int GateComponent::OnResponse(rpc::Message* message)
 	{
-		this->mGateServers.clear();
-		if (this->mActor->GetServers(this->mGateName, this->mGateServers) <= 0)
+		int socketId, netType = 0;
+		if (!message->GetHead().Del("n", netType))
 		{
-			return;
+			return XCode::UnKnowPacket;
 		}
-		std::unique_ptr<rpc::Message> message = std::make_unique<rpc::Message>();
+		if (!message->GetHead().Del(rpc::Header::client_sock_id, socketId))
 		{
-			message->SetType(rpc::Type::Broadcast);
-			message->SetProto(rpc::Porto::Protobuf);
-			message->GetHead().Add(rpc::Header::func, func);
-			{
-				message->WriteMessage(data);
-			}
+			return XCode::UnKnowPacket;
 		}
-		for (const int& gateServerId: this->mGateServers)
-		{
-			if (Server* gate = this->mActor->GetServer(gateServerId))
-			{
-				gate->SendMsg(message->Clone());
-			}
-		}
+		message->SetNet((char)netType);
+		message->SetSource(rpc::Source::Server);
+		
+		this->Send(socketId, message);
+		return XCode::Ok;
 	}
 }

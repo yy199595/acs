@@ -95,7 +95,11 @@ namespace acs
 				--this->mCount;
 				break;
 		}
-		if(this->mApp->Equal(id))
+		if(message->GetNet() == rpc::Net::Client)
+		{
+			message->SetSource(rpc::Source::Client);
+		}
+		else if(this->mApp->Equal(id))
 		{
 			message->SetSockId(id);
 			this->mLocalMessages.emplace(message.release());

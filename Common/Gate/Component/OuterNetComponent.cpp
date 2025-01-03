@@ -6,19 +6,19 @@
 #include"Gate/Client/OuterClient.h"
 #include"Server/Config/CodeConfig.h"
 
-#include"Gate/Service/GateSystem.h"
 #include"Entity/Actor/App.h"
 #include"Entity/Actor/Player.h"
 #include"Core/Event/IEvent.h"
-#include"Router/Component/RouterComponent.h"
 #include "Core/System/System.h"
+#include "GateComponent.h"
+#include "XCode/XCode.h"
+
 namespace acs
 {
 	OuterNetComponent::OuterNetComponent()
 	{
+		this->mGate = nullptr;
 		this->mWaitCount = 0;
-		this->mRouter = nullptr;
-		this->mActComponent = nullptr;
 		this->mMaxConnectCount = 500;
 	}
 
@@ -29,10 +29,9 @@ namespace acs
 		{
 			jsonObject->Get("outer", this->mMaxConnectCount);
 		}
-		this->mRouter = this->GetComponent<RouterComponent>();
-		this->mActComponent = this->GetComponent<ActorComponent>();
 		help::PlayerLoginEvent::Add(this, &OuterNetComponent::OnPlayerLogin);
 		help::PlayerLogoutEvent::Add(this, &OuterNetComponent::OnPlayerLogout);
+		LOG_CHECK_RET_FALSE(this->mGate = this->GetComponent<GateComponent>());
 		return true;
 	}
 
@@ -57,160 +56,32 @@ namespace acs
 		if(iter != this->mGateClientMap.end())
 		{
 			this->mGateClientMap.erase(iter);
-			Player * player = this->mActComponent->GetPlayer(userId);
-			if(player != nullptr)
-			{
-				player->Logout();
-				this->mActComponent->DelActor(userId);
-#if __DEBUG__
-				LOG_WARN("[{}] user({}) logout ok", this->mGateClientMap.size(), userId);
-#endif
-			}
 		}
 	}
 
 	void OuterNetComponent::OnMessage(rpc::Message * message, rpc::Message *)
 	{
-		int code = XCode::Failure;
-		message->SetNet(rpc::Net::Tcp);
-		switch (message->GetType())
+		int code = this->mGate->OnMessage(message);
+		if(code != XCode::Ok)
 		{
-			case rpc::Type::Request:
-			{
-//#ifdef __DEBUG__
-//				std::string func = message->GetHead().GetStr(rpc::Header::func);
-//				LOG_DEBUG("user({}) call [{}]", playerId, func);
-//#endif
-				if (message->GetRpcId() > 0)
-				{
-					++this->mWaitCount;
-					message->SetRpcId(this->mNumPool.BuildNumber());
-				}
-				code = this->OnRequest(message);
-				break;
-			}
-			case rpc::Type::Response:
-			{
-				int sockId = 0;
-				--this->mWaitCount;
-				if (message->GetHead().Del(rpc::Header::client_sock_id, sockId))
-				{
-					int rpcId = 0;
-					if (message->GetHead().Del(rpc::Header::rpc_id, rpcId))
-					{
-						code = XCode::Ok;
-						message->SetRpcId(rpcId);
-						this->Send(sockId, message);
-					}
-				}
-				break;
-			}
-			default:
-			LOG_ERROR("unknown message {}", message->ToString());
-				break;
-		}
-		if (code != XCode::Ok)
-		{
-			this->StartClose(message->SockId(), code);
-#ifdef __DEBUG__
-			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-			//LOG_WARN("{}\n desc={}", message->ToString(), desc);
-#endif
-			delete message;
+			int sockId = message->SockId();
+			this->StartClose(sockId, code);
 		}
 	}
 
-	int OuterNetComponent::OnRequest(rpc::Message * message)
+	int OuterNetComponent::Send(int id, rpc::Message * message)
 	{
-		const std::string& fullName = message->GetHead().GetStr(rpc::Header::func);
-		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
-		if (methodConfig == nullptr || !methodConfig->IsClient || !methodConfig->IsOpen)
+		if (message->GetType() == rpc::Type::Response)
 		{
-			LOG_ERROR("call function not exist : {}", fullName)
-			return XCode::CallFunctionNotExist;
+			--this->mWaitCount;
 		}
-		long long playerId = 0;
-		message->SetNet(rpc::Net::Tcp);
-		int serverId = this->mApp->GetSrvId();
-		message->GetHead().Get(rpc::Header::player_id, playerId);
-		Player* player = this->mActComponent->GetPlayer(playerId);
-		if (player == nullptr)
+		auto iter = this->mGateClientMap.find(id);
+		if (iter == this->mGateClientMap.end())
 		{
-			if(methodConfig->IsAuth)
-			{
-				int sockId = message->SockId();
-				this->StartClose(sockId, XCode::NotFindUser);
-				return XCode::CloseSocket;
-			}
-			this->mRouter->Send(serverId, std::unique_ptr<rpc::Message>(message));
-			return XCode::Ok;
+			return XCode::SendMessageFail;
 		}
-		const std::string& name = methodConfig->Server;
-		switch (methodConfig->Forward)
-		{
-			case rpc::Forward::Fixed: //转发到固定机器
-				if (!player->GetServerId(name, serverId))
-				{
-					return XCode::NotFoundServerRpcAddress;
-				}
-				break;
-			case rpc::Forward::Random:
-			{
-				Server* server = this->mActComponent->Random(name);
-				if (server == nullptr)
-				{
-					return XCode::AddressAllotFailure;
-				}
-				if (!server->GetAddress(*message, serverId))
-				{
-					return XCode::NotFoundActor;
-				}
-				break;
-			}
-			case rpc::Forward::Hash:
-			{
-				Server* server = this->mActComponent->Hash(name, playerId);
-				if (server == nullptr)
-				{
-					return XCode::AddressAllotFailure;
-				}
-				if (!server->GetAddress(*message, serverId))
-				{
-					return XCode::NotFoundActor;
-				}
-				break;
-			}
-			default:
-			LOG_ERROR("unknown forward {}", message->ToString());
-				return XCode::Failure;
-		}
-		this->mRouter->Send(serverId, std::unique_ptr<rpc::Message>(message));
+		iter->second->Send(message);
 		return XCode::Ok;
-	}
-
-	bool OuterNetComponent::Send(int id, rpc::Message * message)
-	{
-		do
-		{
-			if(message->GetType() == rpc::Type::Response)
-			{
-				--this->mWaitCount;
-			}
-			auto iter = this->mGateClientMap.find(id);
-			if (iter == this->mGateClientMap.end())
-			{
-				break;
-			}
-			if (iter->second->Send(message))
-			{
-				return true;
-			}
-		} while (false);
-//#if __DEBUG__
-//		LOG_ERROR("send to client({}) =>{}", id, message->ToString())
-//#endif
-		delete message;
-		return false;
 	}
 
 	bool OuterNetComponent::OnListen(tcp::Socket * socket)
@@ -274,7 +145,6 @@ namespace acs
 		{
 			data->Add("wait", this->mWaitCount);
 			data->Add("client", this->mGateClientMap.size());
-			data->Add("sum", this->mNumPool.CurrentNumber());
 		}
     }
 

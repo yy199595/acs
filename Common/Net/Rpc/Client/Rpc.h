@@ -78,6 +78,14 @@ namespace rpc
 		constexpr char Max = std::numeric_limits<char>::max();
 	}
 
+	//消息源
+	namespace Source
+	{
+		constexpr char None = 0;
+		constexpr char Client = 1;
+		constexpr char Server = 2;
+	}
+
 	//协议头
 	struct ProtoHead
 	{
@@ -85,6 +93,7 @@ namespace rpc
 		unsigned short Len = 0; //协议包长度
 		char Type = rpc::Type::None; //协议类型
 		char Porto = rpc::Porto::None; //使用的通信协议
+		char Source = rpc::Source::None;
 		int RpcId = 0; // rpcId
 	};
 

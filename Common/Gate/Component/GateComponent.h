@@ -4,8 +4,9 @@
 
 #ifndef APP_GATECOMPONENT_H
 #define APP_GATECOMPONENT_H
-#include"Proto/Include/Message.h"
-#include"Entity/Component/Component.h"
+#include "Rpc/Client/Message.h"
+#include "Gate/Common/Common.h"
+#include "Entity/Component/Component.h"
 namespace acs
 {
 	class GateComponent final : public Component
@@ -14,14 +15,18 @@ namespace acs
 		GateComponent();
 		~GateComponent() override = default;
 	public:
-		void BroadCast(const std::string & func, const pb::Message * message = nullptr);
-		bool Send(long long playerId, const std::string & func, const pb::Message & message);
+		int OnMessage(rpc::Message * request);
+		int Send(int id, rpc::Message * message);
+		void Broadcast(rpc::Message * message);
 	private:
 		bool LateAwake() final;
+		int OnRequest(rpc::Message * message);
+		int OnResponse(rpc::Message * message);
 	private:
-		std::string mGateName;
+		math::NumberPool<int> mNumPool;
 		class ActorComponent * mActor;
-		std::vector<int> mGateServers;
+		class RouterComponent * mRouter;
+		std::unordered_map<char, IGate *> mGateComponents;
 	};
 }
 

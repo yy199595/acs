@@ -22,7 +22,7 @@ namespace rpc
 		~OuterClient() final;
 	 public:
 		void Stop();
-		bool Send(rpc::Message * message);
+		void Send(rpc::Message * message);
 		void StartReceive(tcp::Socket * socket, int second = 0);
 		inline void BindPlayer(long long id) { this->mPlayerId = id; }
 		inline long long GetPlayerId() const { return this->mPlayerId; }

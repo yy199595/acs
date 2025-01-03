@@ -1,11 +1,10 @@
 #include"ActorComponent.h"
 #include"Lua/Engine/ModuleClass.h"
 #include"Entity/Lua/LuaActor.h"
-#include"Util/Tools/String.h"
 #include"Server/Config/ServerConfig.h"
 #include"Lua/Component/LuaComponent.h"
 #include"Cluster/Config/ClusterConfig.h"
-
+#include "Core/Event/IEvent.h"
 namespace acs
 {
 
@@ -23,7 +22,13 @@ namespace acs
 			const std::string & name = this->GetName();
 			this->mLuaModule = luaComponent->LoadModule(name);
 		}
+		help::PlayerLogoutEvent::Add(this, &ActorComponent::OnPlayerLogout);
 		return this->LoadServerFromFile();
+	}
+
+	void ActorComponent::OnPlayerLogout(long long playerId, int)
+	{
+		this->DelActor(playerId);
 	}
 
 	bool ActorComponent::LoadServerFromFile()

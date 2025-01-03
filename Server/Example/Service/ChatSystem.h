@@ -47,6 +47,7 @@ namespace acs
 		int OnChat(long long playerId, const c2s::chat::request & request);
 	private:
 		class GateComponent * mGate;
+		class ActorComponent * mActor;
 		custom::HashMap<long long, long long> mChatTime;
 	};
 }

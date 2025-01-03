@@ -61,6 +61,7 @@ namespace rpc
 		inline int GetRpcId() const{return this->mProtoHead.RpcId;}
 		inline char GetType() const { return this->mProtoHead.Type;}
 		inline char GetProto() const { return this->mProtoHead.Porto; }
+		inline char GetSource() const { return this->mProtoHead.Source; }
 		inline ProtoHead & GetProtoHead() { return this->mProtoHead;}
 		inline const Head& ConstTempHead() const {return this->mTempHead;}
 		inline int GetTimeout() const { return this->mTimeout; }
@@ -71,6 +72,7 @@ namespace rpc
 		inline void SetRpcId(int id){ this->mProtoHead.RpcId = id; }
 		inline void SetType(char type) { this->mProtoHead.Type = type; }
 		inline void SetProto(char proto) { this->mProtoHead.Porto = proto; }
+		inline void SetSource(char source) { this->mProtoHead.Source = source; }
 		inline void SetTimeout(int timeout) { this->mTimeout = timeout; }
 	public:
 		void Clear() final;

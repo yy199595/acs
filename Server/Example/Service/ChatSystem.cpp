@@ -6,7 +6,7 @@
 #include"Util/Tools/TimeHelper.h"
 #include"Gate/Service/GateSystem.h"
 #include"Gate/Component/GateComponent.h"
-
+#include "Entity/Component/ActorComponent.h"
 #include "Util/Tools/String.h"
 constexpr int CHAT_TYPE_WORLD = 1;
 constexpr int CHAT_TYPE_PRIVATE = 2;
@@ -19,6 +19,7 @@ namespace acs
 		BIND_PLAYER_RPC_METHOD(ChatSystem::OnChat);
 		BIND_PLAYER_RPC_METHOD(ChatSystem::OnPing);
 		LOG_CHECK_RET_FALSE(this->mGate = this->GetComponent<GateComponent>())
+		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
 		return true;
 	}
 
@@ -78,6 +79,11 @@ namespace acs
 	int ChatSystem::OnChat(long long playerId, const c2s::chat::request& request)
 	{
 		long long lastTime = 0;
+		Player * player = this->mActor->GetPlayer(playerId);
+		if(player == nullptr)
+		{
+			return XCode::NotFindUser;
+		}
 		this->mChatTime.Get(playerId, lastTime);
 		long long nowTime = help::Time::NowSec();
 		if (nowTime - lastTime < 1)
@@ -92,13 +98,20 @@ namespace acs
 		switch (request.msg_type())
 		{
 			case CHAT_TYPE_WORLD:
-				this->mGate->BroadCast(func, &message);
+				// TODO 广播
 				break;
 			case CHAT_TYPE_GUILD:
 				break;
 			case CHAT_TYPE_PRIVATE:
-				this->mGate->Send(request.user_id(), func, message);
+			{
+				long long targetId = request.user_id();
+				Player * targetPlayer = this->mActor->GetPlayer(targetId);
+				if(targetPlayer != nullptr)
+				{
+					targetPlayer->Send(func, message);
+				}
 				break;
+			}
 			default:
 				return XCode::CallArgsError;
 		}

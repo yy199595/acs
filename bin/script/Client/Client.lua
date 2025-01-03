@@ -59,7 +59,6 @@ function Main:Login(info)
         end
     end
     http:Get(str_format("%s/admin/info", HOST))
-
     info.client:Call("GateSystem.Ping")
     info.client:Call("ChatSystem.Ping")
     info.client:Call("ChatSystem.OnPing")

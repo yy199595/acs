@@ -30,8 +30,8 @@ namespace acs
     private:
 		unsigned int mSumCount;
 		unsigned int mWaitCount;
+		class GateComponent* mGate;
 		class RouterComponent* mRouter;
-		class OuterNetComponent* mOuter;
 		class CoroutineComponent* mCoroutine;
 		custom::HashMap<std::string, RpcService *> mRpcServices;
 	};

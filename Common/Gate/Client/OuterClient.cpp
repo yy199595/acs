@@ -196,9 +196,8 @@ namespace rpc
 		this->CloseSocket(XCode::SendMessageFail);
 	}
 
-	bool OuterClient::Send(rpc::Message* message)
+	void OuterClient::Send(rpc::Message* message)
 	{
-		LOG_CHECK_RET_FALSE(message);
 		std::shared_ptr<Client> self = this->shared_from_this();
 		asio::post(this->mSocket->GetContext(), [this, self, message]
 		{
@@ -208,6 +207,5 @@ namespace rpc
 				this->Write(*message);
 			}
 		});
-		return true;
 	}
 }
