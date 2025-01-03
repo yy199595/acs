@@ -33,6 +33,7 @@ namespace acs
 		class ActorComponent * mActor;
 		class ThreadComponent * mThread;
 		math::NumberPool<int> mClientPool;
+		class DispatchComponent * mDispatch;
 		std::unordered_map<int, std::shared_ptr<ws::RequestClient>> mClients;
 		std::unordered_map<int, std::shared_ptr<ws::SessionClient>> mSessions;
 	};

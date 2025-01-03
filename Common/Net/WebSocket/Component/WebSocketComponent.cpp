@@ -9,6 +9,7 @@
 #include "WebSocket/Client/WebSocketClient.h"
 #include "WebSocket/Client/WebSocketSessionClient.h"
 #include "Server/Component/ThreadComponent.h"
+#include "Rpc/Component/DispatchComponent.h"
 namespace acs
 {
 	WebSocketComponent::WebSocketComponent()
@@ -16,6 +17,7 @@ namespace acs
 	{
 		this->mActor = nullptr;
 		this->mThread = nullptr;
+		this->mDispatch = nullptr;
 	}
 
 	bool WebSocketComponent::OnListen(tcp::Socket* socket)
@@ -45,14 +47,27 @@ namespace acs
 	{
 		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
 		LOG_CHECK_RET_FALSE(this->mThread = this->GetComponent<ThreadComponent>())
+		LOG_CHECK_RET_FALSE(this->mDispatch = this->GetComponent<DispatchComponent>())
 		return true;
 	}
 
 	void WebSocketComponent::OnMessage(int id, ws::Message* request, ws::Message* response)
 	{
+		rpc::Message * rpcMessage = new rpc::Message();
 		const std::string & message = request->GetMessageBody();
+		{
+			rpcMessage->SetNet(rpc::Net::Ws);
+			if(rpcMessage->Decode(message.c_str(), (int)message.size()))
+			{
+				if(this->mDispatch->OnMessage(rpcMessage) == XCode::Ok)
+				{
+					return;
+				}
+			}
+		}
 		LOG_DEBUG("[{}] message = {}", id, message)
 		delete request;
+		delete rpcMessage;
 	}
 
 	int WebSocketComponent::Send(int id, rpc::Message* message)

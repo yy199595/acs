@@ -17,7 +17,7 @@ namespace http
 
 namespace ws
 {
-	typedef acs::IRpc<Message, Message> Component;
+	typedef acs::IRpc<ws::Message, ws::Message> Component;
 	class SessionClient : public tcp::Client
 	{
 	public:

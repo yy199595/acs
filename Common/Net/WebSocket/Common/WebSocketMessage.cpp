@@ -13,13 +13,13 @@ namespace ws
 	Message::Message()
 	{
 		this->Clear();
-		memset(this->mMaskingKey, 0, sizeof(this->mMaskingKey));
 	}
 
 	void Message::Clear()
 	{
 		this->mMessage.clear();
 		memset(&this->mHeader, 0, sizeof(Header));
+		memset(this->mMaskingKey, 0, sizeof(this->mMaskingKey));
 	}
 
 	int Message::OnSendMessage(std::ostream& os)
@@ -135,6 +135,10 @@ namespace ws
 				memset(this->mMaskingKey, 0, 4);
 				os.readsome(this->mMaskingKey, 4);
 			}
+		}
+		else if(size != this->mHeader.mLength)
+		{
+			return tcp::ReadError;
 		}
 		else
 		{

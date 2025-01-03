@@ -7,6 +7,7 @@
 #include"Log/Common/CommonLogDef.h"
 namespace rpc
 {
+
 	//消息类型
     namespace Type
     {
@@ -20,6 +21,7 @@ namespace rpc
 		constexpr char SubPublish = 7; //发布订阅消息
 		constexpr char Logout = 8;     //退出消息
 		constexpr char Client = 9; 	  //服务器发到客户端的消息
+		// 自定义扩展
         constexpr char Max = 127;
     };
 
@@ -47,7 +49,8 @@ namespace rpc
 		constexpr char String = 2;
 		constexpr char Protobuf = 3;
 		constexpr char Bson = 4;
-		constexpr char Max = 127;
+		// 自定义扩展
+		constexpr char Max = std::numeric_limits<char>::max();
     };
 
 	//网络类型
@@ -61,7 +64,8 @@ namespace rpc
 		constexpr char Kcp = 6; //upd
 		constexpr char Forward = 7;
 		constexpr char Ws = 8;
-		constexpr char Max = 127;
+		// 自定义扩展
+		constexpr char Max = std::numeric_limits<char>::max();
 	}
 
 	//网关转发方式
@@ -70,6 +74,8 @@ namespace rpc
 		constexpr char Fixed = 0; //固定转发
 		constexpr char Random = 1; //随机分配
 		constexpr char Hash = 2;  //id哈希
+		// 自定义扩展
+		constexpr char Max = std::numeric_limits<char>::max();
 	}
 
 	//协议头
