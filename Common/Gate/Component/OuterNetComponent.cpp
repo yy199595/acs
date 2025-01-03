@@ -100,7 +100,7 @@ namespace acs
 					{
 						code = XCode::Ok;
 						message->SetRpcId(rpcId);
-						this->SendBySockId(sockId, message);
+						this->Send(sockId, message);
 					}
 				}
 				break;
@@ -188,7 +188,7 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	bool OuterNetComponent::SendBySockId(int id, rpc::Message * message)
+	bool OuterNetComponent::Send(int id, rpc::Message * message)
 	{
 		do
 		{
@@ -250,7 +250,7 @@ namespace acs
 		{
 			if(message->GetHead().Get(rpc::Header::sock_id, sockId))
 			{
-				this->SendBySockId(sockId, message);
+				this->Send(sockId, message);
 				return;
 			}
 		}

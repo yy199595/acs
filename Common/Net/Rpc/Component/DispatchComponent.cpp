@@ -153,7 +153,7 @@ namespace acs
 						if (message->GetHead().Del(rpc::Header::rpc_id, clientRpcId))
 						{
 							message->SetRpcId(clientRpcId);
-							this->mOuter->SendBySockId(socketId, message);
+							this->mOuter->Send(socketId, message);
 						}
 						return XCode::Ok;
 					}
@@ -185,7 +185,7 @@ namespace acs
 		}
 		message->SetType(rpc::Type::Request);
 		message->GetHead().Del(rpc::Header::client_sock_id);
-		this->mOuter->SendBySockId(sockId, message);
+		this->mOuter->Send(sockId, message);
 		return XCode::Ok;
 	}
 

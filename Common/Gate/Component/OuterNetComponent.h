@@ -31,7 +31,7 @@ namespace acs
 		void Broadcast(rpc::Message * message);
 		void StartClose(int id, int code) final;
 	public:
-		bool SendBySockId(int id, rpc::Message * message);
+		bool Send(int id, rpc::Message * message);
 	private:
 		bool LateAwake() final;
 		int OnRequest(rpc::Message * message);
