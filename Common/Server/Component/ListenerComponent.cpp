@@ -100,7 +100,7 @@ namespace acs
 		}
 #endif
 		this->mConfig = config;
-		io.post(std::bind(&ListenerComponent::Accept, this));
+		asio::post(io, [this] { this->Accept(); });
 		return true;
 	}
 
@@ -150,7 +150,7 @@ namespace acs
 					this->OnAcceptSocket(sock);
 #else
 					Asio::Context& io = this->mApp->GetContext();
-					asio::post(io, std::bind(&ListenerComponent::OnAcceptSocket, this, sock));
+					asio::post(io, [this, sock] { this->OnAcceptSocket(sock); });
 #endif			
 				} while (false);
 				if(this->mAcceptor == nullptr)
@@ -161,7 +161,7 @@ namespace acs
 				this->Accept();
 #else
 				const Asio::Executor& executor = this->mAcceptor->get_executor();
-				asio::post(executor, std::bind(&ListenerComponent::Accept, this));
+				asio::post(executor, [this] { this->Accept(); });
 #endif
 			});
 	}

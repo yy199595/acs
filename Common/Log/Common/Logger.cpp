@@ -99,7 +99,7 @@ namespace custom
 			}
 			threadSync.SetResult(true);
 			this->mTimer.expires_after(std::chrono::seconds(this->mSaveTime));
-			this->mTimer.async_wait(std::bind(&Logger::OnTimer, this, std::placeholders::_1));
+			this->mTimer.async_wait([this](auto && PH1) { OnTimer(std::forward<decltype(PH1)>(PH1)); });
 		});
 		return threadSync.Wait();
 #endif
@@ -117,7 +117,7 @@ namespace custom
 			}
 		}
 		this->mTimer.expires_after(std::chrono::seconds(this->mSaveTime));
-		this->mTimer.async_wait(std::bind(&Logger::OnTimer, this, std::placeholders::_1));
+		this->mTimer.async_wait([this](auto && PH1) { OnTimer(std::forward<decltype(PH1)>(PH1)); });
 	}
 
 	void Logger::Push(std::unique_ptr<LogInfo> log)

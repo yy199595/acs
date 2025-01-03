@@ -11,7 +11,7 @@ namespace kcp
 			: mContext(io), mSocket(io, asio::ip::udp::endpoint(asio::ip::udp::v4(), port)), mComponent(component), mTimer(io), mMainContext(main)
 	{
 		this->mTimer.expires_after(std::chrono::milliseconds(KCP_UPDATE_INTERVAL));
-		this->mTimer.async_wait(std::bind(&Server::OnUpdate, this, std::placeholders::_1));
+		this->mTimer.async_wait([this](auto && PH1) { OnUpdate(std::forward<decltype(PH1)>(PH1)); });
 	}
 
 	void Server::StartReceive()
@@ -98,7 +98,7 @@ namespace kcp
 	{
 		this->Update();
 		this->mTimer.expires_after(std::chrono::milliseconds(KCP_UPDATE_INTERVAL));
-		this->mTimer.async_wait(std::bind(&Server::OnUpdate, this, std::placeholders::_1));
+		this->mTimer.async_wait([this](auto && PH1) { OnUpdate(std::forward<decltype(PH1)>(PH1)); });
 	}
 
 	void Server::OnReceive(size_t size)
