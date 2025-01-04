@@ -30,12 +30,6 @@ namespace acs
 		return true;
 	}
 
-	rpc::IInnerSender * RouterComponent::GetInnerComponent(char net)
-	{
-		auto iter = this->mSenders.find(net);
-		return iter == this->mSenders.end() ? nullptr : iter->second;
-	}
-
 	int RouterComponent::LuaCall(lua_State* lua, int id, std::unique_ptr<rpc::Message> message)
 	{
 		int timeout = message->GetTimeout();
@@ -95,7 +89,8 @@ namespace acs
 				--this->mCount;
 				break;
 		}
-		if(message->GetNet() == rpc::Net::Client)
+		char net = message->GetNet();
+		if(net == rpc::Net::Client)
 		{
 			message->SetSource(rpc::Source::Client);
 		}
@@ -105,14 +100,15 @@ namespace acs
 			this->mLocalMessages.emplace(message.release());
 			return XCode::Ok;
 		}
-		rpc::IInnerSender * sender = this->GetInnerComponent(message->GetNet());
-		if(sender == nullptr)
+		auto iter = this->mSenders.find(net);
+		if(iter == this->mSenders.end())
 		{
-			LOG_ERROR("not find sender:{}", message->GetNet());
+			LOG_ERROR("not find sender:{}", net);
 			return XCode::NotFoundSender;
 		}
+
 		rpc::Message * data = message.release();
-		if(sender->Send(id, data) != XCode::Ok)
+		if(iter->second->Send(id, data) != XCode::Ok)
 		{
 			//LOG_ERROR("{}", data->ToString());
 			delete data;

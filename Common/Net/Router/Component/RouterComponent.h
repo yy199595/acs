@@ -24,7 +24,6 @@ namespace acs
 		bool LateAwake() final;
 		void OnSystemUpdate() noexcept final;
 		void OnRecord(json::w::Document &document) final;
-		rpc::IInnerSender * GetInnerComponent(char net);
 	private:
 		unsigned int mCount;
 		class DispatchComponent * mDisComponent;
