@@ -14,7 +14,7 @@
 #ifdef __SHARE_PTR_COUNTER__
 
 #include "Rpc/Client/InnerClient.h"
-#include "Gate/Client/OuterClient.h"
+#include "Rpc/Client/OuterClient.h"
 #include "Http/Client/RequestClient.h"
 #include "Http/Client/SessionClient.h"
 #include "Async/Lua/LuaWaitTaskSource.h"

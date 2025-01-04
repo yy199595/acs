@@ -5,7 +5,6 @@
 #ifndef APP_GATECOMPONENT_H
 #define APP_GATECOMPONENT_H
 #include "Rpc/Client/Message.h"
-#include "Gate/Common/Common.h"
 #include "Entity/Component/Component.h"
 namespace acs
 {
@@ -26,7 +25,7 @@ namespace acs
 		math::NumberPool<int> mNumPool;
 		class ActorComponent * mActor;
 		class RouterComponent * mRouter;
-		std::unordered_map<char, IGate *> mGateComponents;
+		std::unordered_map<char, rpc::IOuterSender *> mOuterComponents;
 	};
 }
 

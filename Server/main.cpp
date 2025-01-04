@@ -7,7 +7,7 @@
 #include "Proto/Component/ProtoComponent.h"
 
 #include "Rpc/Component/InnerNetComponent.h"
-#include "Gate/Component/OuterNetComponent.h"
+#include "Rpc/Component/OuterNetComponent.h"
 #include "Rpc/Component/DispatchComponent.h"
 
 #include "Http/Component/HttpComponent.h"
@@ -54,7 +54,8 @@
 #include "Udp/Component/UdpComponent.h"
 #include "Kcp/Component/KcpComponent.h"
 
-#include "WebSocket/Component/WebSocketComponent.h"
+#include "WebSocket/Component/InnerWebSocketComponent.h"
+#include "WebSocket/Component/OuterWebSocketComponent.h"
 #ifdef __ENABLE_MYSQL__
 #include "Mysql/Service/MysqlDB.h"
 #include "Mysql/Component/MysqlDBComponent.h"
@@ -141,7 +142,8 @@ void RegisterComponent()
 	REGISTER_COMPONENT(UdpComponent);
 	REGISTER_COMPONENT(KcpComponent);
 	REGISTER_COMPONENT(QuickComponent);
-	REGISTER_COMPONENT(WebSocketComponent);
+	REGISTER_COMPONENT(InnerWebSocketComponent);
+	REGISTER_COMPONENT(OuterWebSocketComponent);
 }
 
 void RegisterAll()
@@ -181,6 +183,7 @@ int main(int argc, char** argv)
 #ifdef __OS_WIN__
 	//system("chcp 65001 > nul");
 #endif
+
 	int id = 0;
 	RegisterAll();
 	std::string path;

@@ -108,4 +108,28 @@ namespace rpc
 }
 
 
+
+namespace rpc
+{
+	class IInnerSender //内网接口
+	{
+	public:
+		IInnerSender() = default;
+		virtual ~IInnerSender() = default;
+	public:
+		virtual char GetNet() const = 0;
+		virtual int Send(int id, rpc::Message* message) = 0;
+	};
+
+	class IOuterSender //外网接口
+	{
+	public:
+		virtual char GetNet() const = 0;
+		virtual int Send(int id, rpc::Message* message) = 0;
+		virtual void Broadcast(rpc::Message* message) = 0;
+	};
+}
+
+
+
 #endif //APP_MESSAGE_H

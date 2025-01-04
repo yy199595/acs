@@ -6,7 +6,6 @@
 #include <array>
 #include "asio.hpp"
 #include "Rpc/Client/Message.h"
-#include "Rpc/Interface/ISend.h"
 #include "Kcp/Common/KcpServer.h"
 #include "Entity/Component/Component.h"
 #include "Server/Component/ITcpComponent.h"
@@ -14,7 +13,7 @@ using asio_udp = asio::ip::udp;
 
 namespace acs
 {
-	class KcpComponent : public Component, public ISender, public IRpc<rpc::Message, rpc::Message>
+	class KcpComponent : public Component, public rpc::IInnerSender, public IRpc<rpc::Message, rpc::Message>
 			, public IFrameUpdate, public INetListen
 	{
 	public:
@@ -30,6 +29,7 @@ namespace acs
 		void OnMessage(rpc::Message *request, rpc::Message *response) final;
 	public:
 		int Send(int id, rpc::Message *message) final;
+		char GetNet() const final { return rpc::Net::Kcp; }
 	private:
 		int OnRequest(rpc::Message * message);
 	private:

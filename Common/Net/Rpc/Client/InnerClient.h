@@ -24,6 +24,7 @@ namespace rpc
 		void CloseSocket();
 		void CloseSocket(int code);
 		void OnSendMessage() final;
+		void AddToSendQueue(rpc::Message * message);
 		void OnTimeout(tcp::TimeoutFlag flag) final;
 		void OnConnect(bool result, int count) final;
 		bool MakeMessage(const rpc::ProtoHead & header);

@@ -14,14 +14,15 @@ namespace http
 }
 namespace ws
 {
-	typedef acs::IRpc<Message, Message> Component;
+	typedef acs::IRpc<rpc::Message, rpc::Message> Component;
 	class RequestClient : public tcp::Client
 	{
 	public:
 		RequestClient(int id, Component * component, Asio::Context & main);
 	public:
-		void StartWrite(ws::Message * message);
+		void StartWrite(rpc::Message * message);
 	private:
+		void OnUpdate() final;
 		void OnSendMessage() final;
 		void OnConnect(bool result, int count) final;
 		void OnReadError(const Asio::Code &code) final;
@@ -34,11 +35,12 @@ namespace ws
 	private:
 		int mSockId;
 		Component * mComponent;
+		std::stringstream mStream;
 		Asio::Context & mMainContext;
 		http::Request * mHttpRequest;
 		http::Response * mHttpResponse;
 		std::unique_ptr<ws::Message> mMessage;
-		std::queue<ws::Message *> mWaitSendMessage;
+		std::queue<std::unique_ptr<ws::Message>> mWaitSendMessage;
 	};
 }
 

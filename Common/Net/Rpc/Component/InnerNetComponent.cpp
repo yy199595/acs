@@ -12,7 +12,7 @@ namespace acs
 {
 
     InnerNetComponent::InnerNetComponent()
-		: ISender(rpc::Net::Tcp), mNumPool(SERVER_MAX_COUNT)
+		: mNumPool(SERVER_MAX_COUNT)
     {
 		this->mActor = nullptr;
 		this->mThread = nullptr;

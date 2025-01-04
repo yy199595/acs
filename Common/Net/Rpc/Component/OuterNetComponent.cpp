@@ -1,17 +1,15 @@
 //
 // Created by mac on 2021/11/28.
 //
-
+#include "XCode/XCode.h"
 #include"OuterNetComponent.h"
-#include"Gate/Client/OuterClient.h"
+#include"Rpc/Client/OuterClient.h"
 #include"Server/Config/CodeConfig.h"
 
 #include"Entity/Actor/App.h"
-#include"Entity/Actor/Player.h"
 #include"Core/Event/IEvent.h"
 #include "Core/System/System.h"
-#include "GateComponent.h"
-#include "XCode/XCode.h"
+#include "Gate/Component/GateComponent.h"
 
 namespace acs
 {

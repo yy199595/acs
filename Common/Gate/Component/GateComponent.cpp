@@ -17,12 +17,12 @@ namespace acs
 
 	bool GateComponent::LateAwake()
 	{
-		std::vector<IGate *> gateComponents;
+		std::vector<rpc::IOuterSender *> gateComponents;
 		this->mApp->GetComponents(gateComponents);
-		for(IGate * gateComponent : gateComponents)
+		for(rpc::IOuterSender * gateComponent : gateComponents)
 		{
 			char net = gateComponent->GetNet();
-			this->mGateComponents.emplace(net, gateComponent);
+			this->mOuterComponents.emplace(net, gateComponent);
 		}
 		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
 		LOG_CHECK_RET_FALSE(this->mRouter = this->GetComponent<RouterComponent>())
@@ -32,8 +32,8 @@ namespace acs
 	int GateComponent::Send(int id, rpc::Message* message)
 	{
 		char net = message->GetNet();
-		auto iter = this->mGateComponents.find(net);
-		if(iter == this->mGateComponents.end())
+		auto iter = this->mOuterComponents.find(net);
+		if(iter == this->mOuterComponents.end())
 		{
 			delete message;
 			return XCode::NotFoundSender;
@@ -78,11 +78,10 @@ namespace acs
 	int GateComponent::OnRequest(rpc::Message* message)
 	{
 		char net = message->GetNet();
-		int sockId = message->SockId();
 		message->SetNet(rpc::Net::Tcp);
 		message->GetHead().Add("n", net);
 		message->SetSource(rpc::Source::Client);
-		message->GetHead().Add(rpc::Header::client_sock_id, sockId);
+		assert(message->GetHead().Has(rpc::Header::client_sock_id));
 		const std::string& fullName = message->GetHead().GetStr(rpc::Header::func);
 		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
 		if (methodConfig == nullptr || !methodConfig->IsClient || !methodConfig->IsOpen)
@@ -160,7 +159,7 @@ namespace acs
 		}
 		message->SetNet((char)netType);
 		message->SetSource(rpc::Source::Server);
-		
+
 		this->Send(socketId, message);
 		return XCode::Ok;
 	}

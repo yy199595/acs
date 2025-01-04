@@ -12,7 +12,7 @@
 #include "Rpc/Component/DispatchComponent.h"
 namespace acs
 {
-	ClientComponent::ClientComponent() : ISender(rpc::Net::Client)
+	ClientComponent::ClientComponent()
 	{
 		this->mIndex = 0;
 		this->mProto = nullptr;

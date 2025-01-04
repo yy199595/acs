@@ -18,12 +18,11 @@ namespace acs
 		int Login(const rpc::Message & request);
 		int Logout(const rpc::Message & request);
 	private:
-		bool Awake() final;
 		bool OnInit() final;
 	private:
 		bool AllotServer(std::vector<int> & servers);
 	 private:
-		class ActorComponent * mActorComponent;
+		class ActorComponent * mActor;
 	};
 
 }

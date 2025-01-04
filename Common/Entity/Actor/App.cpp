@@ -44,7 +44,12 @@ namespace acs
 		Debug::Init();
 #endif
 #ifdef __ENABLE_OPEN_SSL__
-		aes::Init();
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+		OpenSSL_add_all_algorithms();
+    	ERR_load_crypto_strings();
+#else
+		OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CONFIG, nullptr);
+#endif
 #endif
 
 #ifdef __ENABLE_OPEN_WOLF_SSL__

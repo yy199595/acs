@@ -7,7 +7,10 @@
 #include <string>
 namespace aes
 {
-	extern void Init();
+	extern bool Encode(const std::string & key, const std::string & input, std::string & output);
+	extern bool Decode(const std::string & key, const std::string & input, std::string & output);
+
+
 	extern std::string Create(const std::string& payload, const std::string& secret);
 	extern bool Verify(const std::string& jwt, const std::string& secret, std::string & payload);
 	extern std::string Aes256GcmDecode(const std::string &ciphertext,

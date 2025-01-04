@@ -18,11 +18,11 @@ namespace acs
 
 	bool RouterComponent::LateAwake()
 	{
-		std::vector<ISender*> senders;
+		std::vector<rpc::IInnerSender*> senders;
 		this->mApp->GetComponents(senders);
-		for(ISender * sender : senders)
+		for(rpc::IInnerSender * sender : senders)
 		{
-			char net = sender->NetType();
+			char net = sender->GetNet();
 			this->mSenders.emplace(net, sender);
 		}
 		LOG_CHECK_RET_FALSE(!this->mSenders.empty())
@@ -30,7 +30,7 @@ namespace acs
 		return true;
 	}
 
-	ISender * RouterComponent::GetSender(char net)
+	rpc::IInnerSender * RouterComponent::GetInnerComponent(char net)
 	{
 		auto iter = this->mSenders.find(net);
 		return iter == this->mSenders.end() ? nullptr : iter->second;
@@ -105,7 +105,7 @@ namespace acs
 			this->mLocalMessages.emplace(message.release());
 			return XCode::Ok;
 		}
-		ISender * sender = this->GetSender(message->GetNet());
+		rpc::IInnerSender * sender = this->GetInnerComponent(message->GetNet());
 		if(sender == nullptr)
 		{
 			LOG_ERROR("not find sender:{}", message->GetNet());

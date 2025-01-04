@@ -42,6 +42,7 @@ namespace acs
 		this->mTcpListen = this->GetComponent<ITcpListen>(config.Component);
 		if(this->mTcpListen == nullptr)
 		{
+			LOG_ERROR("not find listen => {}", config.Component);
 			return false;
 		}
 		this->mAcceptor = std::make_unique<Asio::Acceptor>(io);

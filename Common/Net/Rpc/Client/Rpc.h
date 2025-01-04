@@ -14,13 +14,14 @@ namespace rpc
         constexpr char None = 0;
 		constexpr char Auth = 1;       //验证身份消息
 		constexpr char Ping = 2;       //
-		constexpr char Request = 3;    //请求消息
-		constexpr char Response = 4;   //请求的返回
-		constexpr char Forward = 5;    //内网通过网关转发到客户端的消息
-		constexpr char Broadcast = 6;  //内网广播到网关的消息
-		constexpr char SubPublish = 7; //发布订阅消息
-		constexpr char Logout = 8;     //退出消息
-		constexpr char Client = 9; 	  //服务器发到客户端的消息
+		constexpr char Pong = 3;       //
+		constexpr char Request = 4;    //请求消息
+		constexpr char Response = 5;   //请求的返回
+		constexpr char Forward = 6;    //内网通过网关转发到客户端的消息
+		constexpr char Broadcast = 7;  //内网广播到网关的消息
+		constexpr char SubPublish = 8; //发布订阅消息
+		constexpr char Logout = 9;     //退出消息
+		constexpr char Client = 10; 	  //服务器发到客户端的消息
 		// 自定义扩展
         constexpr char Max = 127;
     };

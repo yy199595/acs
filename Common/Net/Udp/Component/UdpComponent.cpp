@@ -17,7 +17,6 @@
 namespace acs
 {
 	UdpComponent::UdpComponent()
-		: ISender(rpc::Net::Udp)
 	{
 		this->mActor = nullptr;
 		this->mDispatch = nullptr;

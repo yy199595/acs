@@ -104,12 +104,20 @@ namespace ws
 	{
 		if(this->mHeader.mLength == 0)
 		{
+			if(size < 2)
+			{
+				return tcp::ReadSomeMessage;
+			}
 			int value = os.get();
 			int value2 = os.get();
 			this->mHeader.mFin = (value & 0x80) != 0;
 			this->mHeader.mOpCode = value & 0x0F;
 			this->mHeader.mMask = (value2 & 0x80) != 0;
 			this->mHeader.mLength = value2 & 0x7F;
+			if(!this->mHeader.mFin) //只支持完整包
+			{
+				return tcp::ReadDecodeError;
+			}
 			switch (this->mHeader.mLength)
 			{
 				case 126:
@@ -139,6 +147,10 @@ namespace ws
 		else if(size != this->mHeader.mLength)
 		{
 			return tcp::ReadError;
+		}
+		else if(this->mHeader.mLength > ws::MESSAGE_MAX_COUNT)
+		{
+			return tcp::PacketLong;
 		}
 		else
 		{

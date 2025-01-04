@@ -8,33 +8,27 @@
 #include"Core/Event/IEvent.h"
 #include"Common/Service/LoginSystem.h"
 #include"Cluster/Config/ClusterConfig.h"
-#include"Gate/Component/OuterNetComponent.h"
 #include "Util/Tools/TimeHelper.h"
 
 namespace acs
 {
     GateSystem::GateSystem()
     {
-		this->mActorComponent = nullptr;
+		this->mActor = nullptr;
     }
-	bool GateSystem::Awake()
-	{
-		this->mApp->AddComponent<OuterNetComponent>();
-		return true;
-	}
 
     bool GateSystem::OnInit()
     {
 		BIND_PLAYER_RPC_METHOD(GateSystem::Ping);
 		BIND_PLAYER_RPC_METHOD(GateSystem::Login);
 		BIND_PLAYER_RPC_METHOD(GateSystem::Logout);
-		this->mActorComponent = this->GetComponent<ActorComponent>();
+		this->mActor = this->GetComponent<ActorComponent>();
 		return true;
     }
 
 	int GateSystem::Ping(long long userId)
 	{
-		if(!this->mActorComponent->HasPlayer(userId))
+		if(!this->mActor->HasPlayer(userId))
 		{
 			return XCode::NotFindUser;
 		}
@@ -52,7 +46,7 @@ namespace acs
 			if (nodeConfig->HasService(Name))
 			{
 				const std::string& name = nodeConfig->GetName();
-				Server* server = this->mActorComponent->Random(name);
+				Server* server = this->mActor->Random(name);
 				if (server == nullptr)
 				{
 					LOG_ERROR("allot server [{0}] fail", name);
@@ -87,7 +81,7 @@ namespace acs
 		{
 			return XCode::TokenExpTime;
 		}
-		Player * oldPlayer = this->mActorComponent->GetPlayer(userId);
+		Player * oldPlayer = this->mActor->GetPlayer(userId);
 		if(oldPlayer != nullptr)
 		{
 			return XCode::NotFindUser;
@@ -111,7 +105,7 @@ namespace acs
 			}
 			for(const int allotId : servers)
 			{
-				Server * server = this->mActorComponent->GetServer(allotId);
+				Server * server = this->mActor->GetServer(allotId);
 				if(server == nullptr)
 				{
 					return XCode::NotFoundActor;
@@ -125,7 +119,7 @@ namespace acs
 
 			for(const int allotId : servers)
 			{
-				Server * server = this->mActorComponent->GetServer(allotId);
+				Server * server = this->mActor->GetServer(allotId);
 				if(server != nullptr && allotId != serverId)
 				{
 					if(server->Call("LoginSystem.Login", message) != XCode::Ok)
@@ -137,7 +131,7 @@ namespace acs
 			}
 		}
 		help::PlayerLoginEvent::Trigger(userId, sockId);
-		this->mActorComponent->AddPlayer(std::move(player));
+		this->mActor->AddPlayer(std::move(player));
 		//LOG_INFO("user:({}) login to gate successful", userId);
 		return XCode::Ok;
 	}
@@ -153,7 +147,7 @@ namespace acs
 			return XCode::CallArgsError;
 		}
 		head.Get(rpc::Header::player_id, userId);
-		Player * player = this->mActorComponent->GetPlayer(userId);
+		Player * player = this->mActor->GetPlayer(userId);
 		if(player == nullptr)
 		{
 			LOG_ERROR("not find player_id:{}", userId);

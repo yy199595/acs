@@ -35,6 +35,7 @@ namespace rpc
 		void SendFirstMessage();
 		void CloseSocket(int code);
 		void OnSendMessage() final;
+		void AddToSendQueue(rpc::Message * message);
 		void OnSendMessage(const asio::error_code &code) final;
 	private:
 		bool mClose;

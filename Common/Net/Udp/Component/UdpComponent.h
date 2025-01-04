@@ -6,7 +6,6 @@
 #include <array>
 #include "asio.hpp"
 #include "Rpc/Client/Message.h"
-#include "Rpc/Interface/ISend.h"
 #include "Udp/Common/UdpServer.h"
 #include "Udp/Common/UdpClient.h"
 #include "Entity/Component/Component.h"
@@ -15,7 +14,7 @@ using asio_udp = asio::ip::udp;
 
 namespace acs
 {
-	class UdpComponent : public Component, public ISender, public IRpc<rpc::Message, rpc::Message>,
+	class UdpComponent : public Component, public rpc::IInnerSender, public IRpc<rpc::Message, rpc::Message>,
 						 public INetListen
 	{
 	public:
@@ -30,6 +29,7 @@ namespace acs
 		void OnMessage(rpc::Message *request, rpc::Message *response) final;
 	public:
 		int Send(int id, rpc::Message *message) final;
+		char GetNet() const final { return rpc::Net::Udp; }
 	private:
 		int OnRequest(rpc::Message * message);
 	private:

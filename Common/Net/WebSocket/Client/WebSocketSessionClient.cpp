@@ -50,6 +50,7 @@ namespace ws
 	SessionClient::SessionClient(int id, Component * component, Asio::Context & main)
 		: tcp::Client(1024 * 10), mSockId(id), mIsHttp(true), mComponent(component), mMainContext(main)
 	{
+		this->mPlayerId = 0;
 		this->mHttpRequest = nullptr;
 	}
 
@@ -57,6 +58,13 @@ namespace ws
 	{
 		delete this->mHttpRequest;
 		printf("===========\n");
+	}
+
+	void SessionClient::Stop()
+	{
+		Asio::Context & context = this->mSocket->GetContext();
+		std::shared_ptr<Client> self = this->shared_from_this();
+		asio::post(context, [self, this]() { this->Close(XCode::CloseSocket); });
 	}
 
 	void SessionClient::StartReceive(tcp::Socket* tcpSocket)
@@ -67,16 +75,19 @@ namespace ws
 		asio::post(context, [self, this]() { this->ReadLine(); });
 	}
 
-	void SessionClient::StartWrite(ws::Message* message)
+	void SessionClient::StartWrite(rpc::Message* message)
 	{
 		Asio::Context & context = this->mSocket->GetContext();
 		asio::post(context, [this, self = this->shared_from_this(), message] ()
 		{
-			this->mWaitSendMessage.emplace(message);
-			if(this->mWaitSendMessage.size() == 1)
+			this->mStream.str("");
+			std::unique_ptr<ws::Message> wsMessage = std::make_unique<ws::Message>();
 			{
-				this->Write(*message);
+				message->OnSendMessage(this->mStream);
+				wsMessage->SetBody(ws::OPCODE_BIN, this->mStream.str(), false);
 			}
+			this->AddToSendQueue(std::move(wsMessage));
+			delete message;
 		});
 	}
 
@@ -130,6 +141,9 @@ namespace ws
 			case tcp::ReadError:
 				this->Close(XCode::UnKnowPacket);
 				break;
+			case tcp::PacketLong:
+				this->Close(XCode::NetBigDataShutdown);
+				break;
 			default:
 				this->ReadLength(flag);
 				break;
@@ -143,12 +157,11 @@ namespace ws
 			case ws::OPCODE_BIN:
 			case ws::OPCODE_TEXT:
 			{
-				ws::Message * request = this->mMessage.release();
-				std::shared_ptr<Client> self = this->shared_from_this();
-				asio::post(this->mMainContext, [self, this, request]()
+				if(!this->OnMessage())
 				{
-					this->mComponent->OnMessage(this->mSockId, request, nullptr);
-				});
+					this->Close(XCode::UnKnowPacket);
+					return;
+				}
 				this->StartReceiveWebSocket();
 				break;
 			}
@@ -156,11 +169,62 @@ namespace ws
 				this->Close(XCode::Ok);
 				break;
 			case ws::OPCODE_PING:
+				this->OnPing();
 				break;
 			default:
 				this->Close(XCode::UnKnowPacket);
 				break;
 		}
+	}
+
+	void SessionClient::OnPing()
+	{
+		std::unique_ptr<ws::Message> pongMessage = std::make_unique<ws::Message>();
+		{
+			std::string message("pong");
+			pongMessage->SetBody(ws::OPCODE_PONG, message);
+			this->AddToSendQueue(std::move(pongMessage));
+		}
+	}
+
+	bool SessionClient::OnMessage()
+	{
+		std::shared_ptr<Client> self = this->shared_from_this();
+		const std::string & message = this->mMessage->GetMessageBody();
+		std::unique_ptr<rpc::Message> request = std::make_unique<rpc::Message>();
+		switch(this->mMessage->GetHeader().mOpCode)
+		{
+			case ws::OPCODE_BIN:
+			{
+				if(!request->Decode(message.c_str(), (int)message.size()))
+				{
+					return false;
+				}
+				break;
+			}
+			case ws::OPCODE_TEXT:
+			{
+				if(!request->DecodeFromJson(message.c_str(), message.size()))
+				{
+					return false;
+				}
+				break;
+			}
+		}
+
+		request->SetNet(rpc::Net::Ws);
+		request->SetSockId(this->mSockId);
+		if(this->mPlayerId > 0)
+		{
+			request->GetHead().Add(rpc::Header::player_id, this->mPlayerId);
+		}
+		request->GetHead().Add(rpc::Header::client_sock_id, this->mSockId);
+		asio::post(this->mMainContext, [self, this, req = request.release()]
+		{
+			this->mComponent->OnMessage(this->mSockId, req, nullptr);
+		});
+		this->mMessage->Clear();
+		return true;
 	}
 
 	void SessionClient::Close(int code)
@@ -172,17 +236,19 @@ namespace ws
 
 		this->StopTimer();
 		this->mSocket->Close();
-		std::shared_ptr<Client> self = this->shared_from_this();
-		asio::post(this->mMainContext, [self, this, code, id = this->mSockId]()
+		while(!this->mWaitSendMessage.empty())
 		{
-			while(!this->mWaitSendMessage.empty())
+			this->mWaitSendMessage.pop();
+		}
+		if(code != XCode::CloseSocket)
+		{
+			std::shared_ptr<Client> self = this->shared_from_this();
+			asio::post(this->mMainContext, [self, this, code, id = this->mSockId]()
 			{
-				ws::Message * message = this->mWaitSendMessage.front();
-				this->mComponent->OnSendFailure(id, message);
-				this->mWaitSendMessage.pop();
-			}
-			this->mComponent->OnClientError(id, code);
-		});
+
+				this->mComponent->OnClientError(id, code);
+			});
+		}
 		this->mSockId = 0;
 	}
 
@@ -220,6 +286,7 @@ namespace ws
 			}
 		}
 		this->mIsHttp = false;
+		this->StartUpdate(30);
 		this->StartReceiveWebSocket();
 		CONSOLE_LOG_ERROR("[{}] connect ok", this->mSocket->GetAddress())
 		return true;
@@ -231,19 +298,29 @@ namespace ws
 		this->ReadSome();
 	}
 
+	void SessionClient::OnUpdate()
+	{
+
+	}
+
 	void SessionClient::OnSendMessage()
 	{
 		if(!this->mWaitSendMessage.empty())
 		{
-			delete this->mWaitSendMessage.front();
 			this->mWaitSendMessage.pop();
 			if(!this->mWaitSendMessage.empty())
 			{
-				ws::Message * message = this->mWaitSendMessage.front();
-				{
-					this->Write(*message);
-				}
+				this->Write(*this->mWaitSendMessage.front());
 			}
+		}
+	}
+
+	void SessionClient::AddToSendQueue(std::unique_ptr<ws::Message> message)
+	{
+		this->mWaitSendMessage.emplace(std::move(message));
+		if(this->mWaitSendMessage.size() == 1)
+		{
+			this->Write(*this->mWaitSendMessage.front());
 		}
 	}
 

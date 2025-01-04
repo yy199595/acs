@@ -4,9 +4,9 @@
 
 #ifndef APP_ROUTERCOMPONENT_H
 #define APP_ROUTERCOMPONENT_H
-#include<queue>
-#include"Rpc/Interface/ISend.h"
-#include"Entity/Component/Component.h"
+#include <queue>
+#include "Rpc/Client/Message.h"
+#include "Entity/Component/Component.h"
 struct lua_State;
 namespace acs
 {
@@ -24,12 +24,12 @@ namespace acs
 		bool LateAwake() final;
 		void OnSystemUpdate() noexcept final;
 		void OnRecord(json::w::Document &document) final;
-		ISender * GetSender(char net);
+		rpc::IInnerSender * GetInnerComponent(char net);
 	private:
 		unsigned int mCount;
 		class DispatchComponent * mDisComponent;
 		std::queue<rpc::Message *> mLocalMessages;
-		std::unordered_map<char, ISender *> mSenders;
+		std::unordered_map<char, rpc::IInnerSender *> mSenders;
 	};
 }
 

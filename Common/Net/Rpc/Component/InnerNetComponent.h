@@ -2,7 +2,6 @@
 #include"Core/Map/HashMap.h"
 #include"Core/Queue/Queue.h"
 #include"Rpc/Client/Message.h"
-#include"Rpc/Interface/ISend.h"
 #include"Core/Set/HashSet.h"
 #include"Rpc/Client/InnerClient.h"
 #include"Server/Component/ListenerComponent.h"
@@ -11,16 +10,18 @@ namespace acs
 {
 	// 管理内网rpc的session
 	class InnerNetComponent : public Component, public ITcpListen,
-							  public IRpc<rpc::Message, rpc::Message>, public IServerRecord, public ISender
+		public IRpc<rpc::Message, rpc::Message>, public IServerRecord, public rpc::IInnerSender
 	{
 	 public:
 		InnerNetComponent();
 		~InnerNetComponent() override = default;
 	 public:
 		void StartClose(int id) final;
-		int Send(int id, rpc::Message * message) final;
 		void OnSendFailure(int id, rpc::Message * message) final;
 		void OnMessage(rpc::Message * message, rpc::Message *) noexcept final ;
+	private:
+		int Send(int id, rpc::Message * message) final;
+		char GetNet() const final { return rpc::Net::Tcp; }
 	protected:
         bool LateAwake() final;
 		bool OnListen(tcp::Socket * socket) final;

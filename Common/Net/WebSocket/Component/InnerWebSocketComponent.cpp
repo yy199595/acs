@@ -4,7 +4,7 @@
 
 #include "XCode/XCode.h"
 #include "Entity/Actor/App.h"
-#include "WebSocketComponent.h"
+#include "InnerWebSocketComponent.h"
 #include "WebSocket/Common/WebSocketMessage.h"
 #include "WebSocket/Client/WebSocketClient.h"
 #include "WebSocket/Client/WebSocketSessionClient.h"
@@ -12,15 +12,15 @@
 #include "Rpc/Component/DispatchComponent.h"
 namespace acs
 {
-	WebSocketComponent::WebSocketComponent()
-		: ISender(rpc::Net::Ws), mClientPool(SERVER_MAX_COUNT)
+	InnerWebSocketComponent::InnerWebSocketComponent()
+		: mClientPool(SERVER_MAX_COUNT)
 	{
 		this->mActor = nullptr;
 		this->mThread = nullptr;
 		this->mDispatch = nullptr;
 	}
 
-	bool WebSocketComponent::OnListen(tcp::Socket* socket)
+	bool InnerWebSocketComponent::OnListen(tcp::Socket* socket)
 	{
 		int id = this->mClientPool.BuildNumber();
 		Asio::Context & io = this->mApp->GetContext();
@@ -33,7 +33,7 @@ namespace acs
 		return true;
 	}
 
-	void WebSocketComponent::Complete()
+	void InnerWebSocketComponent::Complete()
 	{
 		std::unique_ptr<rpc::Message> rpcMessage = std::make_unique<rpc::Message>();
 		{
@@ -43,7 +43,7 @@ namespace acs
 		}
 	}
 
-	bool WebSocketComponent::LateAwake()
+	bool InnerWebSocketComponent::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
 		LOG_CHECK_RET_FALSE(this->mThread = this->GetComponent<ThreadComponent>())
@@ -51,45 +51,28 @@ namespace acs
 		return true;
 	}
 
-	void WebSocketComponent::OnMessage(int id, ws::Message* request, ws::Message* response)
+	void InnerWebSocketComponent::OnMessage(int id, rpc::Message* request, rpc::Message* response)
 	{
-		rpc::Message * rpcMessage = new rpc::Message();
-		const std::string & message = request->GetMessageBody();
+		if (this->mDispatch->OnMessage(request) == XCode::Ok)
 		{
-			rpcMessage->SetNet(rpc::Net::Ws);
-			if(rpcMessage->Decode(message.c_str(), (int)message.size()))
-			{
-				if(this->mDispatch->OnMessage(rpcMessage) == XCode::Ok)
-				{
-					return;
-				}
-			}
+			return;
 		}
-		LOG_DEBUG("[{}] message = {}", id, message)
+		LOG_DEBUG("[{}] message = {}", id, request->ToString())
 		delete request;
-		delete rpcMessage;
 	}
 
-	int WebSocketComponent::Send(int id, rpc::Message* message)
+	int InnerWebSocketComponent::Send(int id, rpc::Message* message)
 	{
-		std::unique_ptr<ws::Message> wsMessage = std::make_unique<ws::Message>();
-		{
-			std::string json;
-			message->EncodeToJson(json);
-			wsMessage->SetBody(ws::OPCODE_TEXT, json);
-		}
 		auto iter = this->mSessions.find(id);
 		if(iter != this->mSessions.end())
 		{
-			delete message;
-			iter->second->StartWrite(wsMessage.release());
+			iter->second->StartWrite(message);
 			return XCode::Ok;
 		}
 		auto iter1 = this->mClients.find(id);
 		if(iter1 != this->mClients.end())
 		{
-			delete message;
-			iter1->second->StartWrite(wsMessage.release());
+			iter1->second->StartWrite(message);
 			return XCode::Ok;
 		}
 		std::string address;
@@ -105,11 +88,11 @@ namespace acs
 			requestClient->SetSocket(tcpSocket);
 			this->mClients.emplace(id, requestClient);
 		}
-		requestClient->StartWrite(wsMessage.release());
+		requestClient->StartWrite(message);
 		return XCode::SendMessageFail;
 	}
 
-	void WebSocketComponent::OnClientError(int id, int code)
+	void InnerWebSocketComponent::OnClientError(int id, int code)
 	{
 		auto iter = this->mSessions.find(id);
 		if(iter != this->mSessions.end())

@@ -17,7 +17,6 @@
 namespace acs
 {
 	KcpComponent::KcpComponent()
-		: ISender(rpc::Net::Kcp)
 	{
 		this->mActor = nullptr;
 		this->mDispatch = nullptr;

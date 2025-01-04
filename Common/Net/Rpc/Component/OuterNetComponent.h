@@ -5,14 +5,14 @@
 #ifndef GAMEKEEPER_GATECLIENTCOMPONENT_H
 #define GAMEKEEPER_GATECLIENTCOMPONENT_H
 
-#include"Core/Map/HashMap.h"
-#include"Core/Queue/Queue.h"
-#include"Log/Common/Logger.h"
-#include"Core/Pool/ArrayPool.h"
-#include"Gate/Client/OuterClient.h"
+#include "Core/Map/HashMap.h"
+#include "Core/Queue/Queue.h"
+#include "Log/Common/Logger.h"
+#include "Core/Pool/ArrayPool.h"
+#include "Rpc//Client/OuterClient.h"
 #include "Entity/Component/Component.h"
 #include "Server/Component/ITcpComponent.h"
-#include "Gate/Common/Common.h"
+
 namespace rpc
 {
     class Message;
@@ -21,7 +21,7 @@ namespace rpc
 
 namespace acs
 {
-	class OuterNetComponent final : public Component, public ITcpListen, public IGate,
+	class OuterNetComponent final : public Component, public ITcpListen, public rpc::IOuterSender,
 									public IRpc<rpc::Message, rpc::Message>, public IServerRecord
 	{
 	 public:

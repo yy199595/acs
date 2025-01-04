@@ -66,9 +66,22 @@ namespace ws
 		}
 		else if(!this->mWaitSendMessage.empty())
 		{
-			delete this->mWaitSendMessage.front();
 			this->mWaitSendMessage.pop();
 			this->SendFirstMessage();
+		}
+	}
+
+	void RequestClient::OnUpdate()
+	{
+		std::unique_ptr<ws::Message> pingMessage = std::make_unique<ws::Message>();
+		{
+			std::string message("ping");
+			pingMessage->SetBody(ws::OPCODE_PING, message);
+			this->mWaitSendMessage.emplace(std::move(pingMessage));
+			if(this->mWaitSendMessage.size() == 1)
+			{
+				this->Write(*this->mWaitSendMessage.front());
+			}
 		}
 	}
 
@@ -76,10 +89,7 @@ namespace ws
 	{
 		if(!this->mWaitSendMessage.empty())
 		{
-			ws::Message * message = this->mWaitSendMessage.front();
-			{
-				this->Write(*message);
-			}
+			this->Write(*this->mWaitSendMessage.front());
 		}
 	}
 
@@ -112,30 +122,36 @@ namespace ws
 
 		this->StopTimer();
 		this->mSocket->Close();
+		while(!this->mWaitSendMessage.empty())
+		{
+			this->mWaitSendMessage.pop();
+		}
 		std::shared_ptr<Client> self = this->shared_from_this();
 		asio::post(this->mMainContext, [self, this, code, id = this->mSockId]()
 		{
-			while(!this->mWaitSendMessage.empty())
-			{
-				ws::Message * message = this->mWaitSendMessage.front();
-				this->mComponent->OnSendFailure(id, message);
-				this->mWaitSendMessage.pop();
-			}
 			this->mComponent->OnClientError(id, code);
 		});
 		this->mSockId = 0;
 	}
 
-	void RequestClient::StartWrite(ws::Message* message)
+	void RequestClient::StartWrite(rpc::Message* message)
 	{
 		Asio::Context & context = this->mSocket->GetContext();
 		asio::post(context, [this, self = this->shared_from_this(), message] ()
 		{
-			this->mWaitSendMessage.emplace(message);
+			this->mStream.str("");
+			std::unique_ptr<ws::Message> wsMessage = std::make_unique<ws::Message>();
+			{
+				message->OnSendMessage(this->mStream);
+				wsMessage->SetBody(ws::OPCODE_BIN, this->mStream.str(), true);
+			}
+
+			this->mWaitSendMessage.emplace(std::move(wsMessage));
 			if(this->mWaitSendMessage.size() == 1)
 			{
-				this->Write(*message);
+				this->Write(*this->mWaitSendMessage.front());
 			}
+			delete message;
 		});
 	}
 
@@ -171,6 +187,7 @@ namespace ws
 				{
 					this->ReadSome();
 					this->SendFirstMessage();
+					this->StartUpdate(ws::PING_TIME);
 				}
 				delete this->mHttpResponse;
 				this->mHttpResponse = nullptr;
@@ -196,14 +213,26 @@ namespace ws
 			case tcp::ReadError:
 				this->Close(XCode::UnKnowPacket);
 				break;
+			case tcp::PacketLong:
+				this->Close(XCode::NetBigDataShutdown);
+				break;
 			case tcp::ReadDone:
 			{
-				ws::Message * request = this->mMessage.release();
-				std::shared_ptr<tcp::Client> self = this->shared_from_this();
-				asio::post(this->mMainContext, [request, this, self, id = this->mSockId]()
+				std::shared_ptr<Client> self = this->shared_from_this();
+				const std::string & message = this->mMessage->GetMessageBody();
+				std::unique_ptr<rpc::Message> request = std::make_unique<rpc::Message>();
+				if(!request->Decode(message.c_str(), (int)message.size()))
 				{
-					this->mComponent->OnMessage(id, request, nullptr);
+					this->Close(XCode::UnKnowPacket);
+					return;
+				}
+				request->SetNet(rpc::Net::Ws);
+				request->SetSockId(this->mSockId);
+				asio::post(this->mMainContext, [self, this, req = request.release()]
+				{
+					this->mComponent->OnMessage(this->mSockId, req, nullptr);
 				});
+				this->mMessage->Clear();
 				this->ReadSome();
 				break;
 			}

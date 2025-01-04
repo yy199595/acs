@@ -9,7 +9,7 @@
         "rpc" : "InnerNetComponent",
         "gate" : "OuterNetComponent",
         "master" : "HttpWebComponent",
-        "ws" : "WebSocketAcceptComponent"
+        "ws" : "OuterWebSocketComponent"
     },
     "listen" : {
         "rpc" : {
@@ -57,7 +57,7 @@
         "ws" : {
             "protocol" : "tcp",
             "port": "127.0.0.1:${ws}",
-            "component" : "WebSocketComponent"
+            "component" : "OuterWebSocketComponent"
         }
     },
     "connect": {

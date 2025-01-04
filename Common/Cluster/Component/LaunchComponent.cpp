@@ -152,11 +152,11 @@ namespace acs
 				listenConfig.Name = key;
 				listenConfig.MaxConn = 0;
 			}
-			if(jsonData->Get("address", listenConfig.Addr))
+			if (jsonData->Get("address", listenConfig.Addr))
 			{
 				std::string ip;
 				unsigned short port = 0;
-				if(help::Str::SplitAddr(listenConfig.Addr, ip, port))
+				if (help::Str::SplitAddr(listenConfig.Addr, ip, port))
 				{
 					listenConfig.ip = ip;
 					listenConfig.Port = port;
@@ -171,7 +171,7 @@ namespace acs
 			jsonData->Get("cert", listenConfig.Cert);
 #endif
 			auto iter = ProtocolTypeMap.find(listenConfig.ProtoName);
-			if(iter == ProtocolTypeMap.end())
+			if (iter == ProtocolTypeMap.end())
 			{
 				LOG_ERROR("not find proto:{}", listenConfig.ProtoName)
 				return false;
@@ -179,27 +179,14 @@ namespace acs
 			listenConfig.ProtoType = iter->second;
 			if (listenConfig.Port > 0 && !listenConfig.Component.empty())
 			{
-				switch(listenConfig.ProtoType)
+				this->mApp->AddComponent(listenConfig.Component);
+				if (listenConfig.ProtoType == proto_type::tcp)
 				{
-					case proto_type::tcp:
+					auto listenerComponent = std::make_unique<ListenerComponent>();
+					std::string name = fmt::format("{}:ListenComponent", listenConfig.Name);
+					if (!this->mApp->AddComponent(name, std::move(listenerComponent)))
 					{
-						std::unique_ptr<ListenerComponent> listenerComponent = std::make_unique<ListenerComponent>();
-						{
-							std::string name = fmt::format("{}:ListenComponent", listenConfig.Name);
-							if (!this->mApp->AddComponent(name, std::move(listenerComponent)))
-							{
-								return false;
-							}
-						}
-						break;
-					}
-					case proto_type::udp:
-					{
-						if(!this->mApp->HasComponent(listenConfig.Component))
-						{
-							this->mApp->AddComponent(listenConfig.Component);
-						}
-						break;
+						return false;
 					}
 				}
 				this->mTcpListens.emplace_back(listenConfig);
@@ -229,7 +216,7 @@ namespace acs
 			}
 			if (tcpListen == nullptr || !tcpListen->StartListen(listenConfig))
 			{
-				LOG_ERROR("({}) listen [{}] fail", listenConfig.ProtoName, listenConfig.Addr);
+				LOG_ERROR("({}) listen [{}://{}] fail", listenConfig.ProtoName, listenConfig.Name, listenConfig.Addr);
 				return false;
 			}
 			this->mApp->AddListen(listenConfig.Name, listenConfig.Addr);

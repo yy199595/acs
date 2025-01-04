@@ -57,18 +57,6 @@ namespace rpc
 		this->CloseSocket(XCode::NetReadFailure);
 	}
 
-	inline bool CheckProtoHead(const rpc::ProtoHead & data)
-	{
-		switch (data.Type)
-		{
-			case rpc::Type::Auth:
-			case rpc::Type::Ping:
-			case rpc::Type::Request:
-				return true;
-		}
-		return false;
-	}
-
     void OuterClient::OnReceiveMessage(std::istream & readStream, size_t size, const Asio::Code & code)
 	{
 		if (size <= 0 || code.value() != Asio::OK)
@@ -80,13 +68,6 @@ namespace rpc
 			case tcp::Decode::None:
 			{
 				tcp::Data::Read(readStream, this->mProtoHead);
-
-				if (!CheckProtoHead(this->mProtoHead))
-				{
-					this->CloseSocket(XCode::UnKnowPacket);
-					return;
-				}
-
 				if (this->mProtoHead.Len >= this->mMaxCount)
 				{
 					this->CloseSocket(XCode::NetBigDataShutdown);
@@ -119,21 +100,43 @@ namespace rpc
 		{
 			request->SetSockId(this->mSockId);
 			request->GetHead().Add(rpc::Header::player_id, this->mPlayerId);
-			request->GetHead().Add(rpc::Header::rpc_id, request->GetRpcId());
 			request->GetHead().Add(rpc::Header::client_sock_id, this->mSockId);
 		}
+		switch(request->GetType())
+		{
+			case rpc::Type::Ping:
+			{
+				rpc::Message * pongMessage = new rpc::Message();
+				{
+					pongMessage->SetType(rpc::Type::Pong);
+					this->AddToSendQueue(pongMessage);
+				}
+				break;
+			}
+			case rpc::Type::Request:
+			{
 #ifdef __DEBUG__
-		request->TempHead().Add(rpc::Header::from_addr, this->mSocket->GetAddress());
+				request->TempHead().Add(rpc::Header::from_addr, this->mSocket->GetAddress());
 #endif
 
-		std::shared_ptr<Client> self = this->shared_from_this();
-		asio::post(this->mMainContext, [this, self, request]
-		{
-			this->mComponent->OnMessage(request, nullptr);
-		});
+				std::shared_ptr<Client> self = this->shared_from_this();
+				asio::post(this->mMainContext, [this, self, request]
+				{
+					this->mComponent->OnMessage(request, nullptr);
+				});
+				break;
+			}
+			default:
+			{
+				this->CloseSocket(XCode::UnKnowPacket);
+				return;
+			}
+		}
+
 		this->mDecodeState = tcp::Decode::None;
 		this->mLastRecvTime = help::Time::NowSec();
 		Asio::Context & context = this->mSocket->GetContext();
+		std::shared_ptr<Client> self = this->shared_from_this();
 		asio::post(context, [this, self] { this->ReadLength(rpc::RPC_PACK_HEAD_LEN); });
 	}
 
@@ -201,11 +204,16 @@ namespace rpc
 		std::shared_ptr<Client> self = this->shared_from_this();
 		asio::post(this->mSocket->GetContext(), [this, self, message]
 		{
-			this->mSendMessages.emplace(message);
-			if(this->mSendMessages.size() == 1)
-			{
-				this->Write(*message);
-			}
+			this->AddToSendQueue(message);
 		});
+	}
+
+	void OuterClient::AddToSendQueue(rpc::Message* message)
+	{
+		this->mSendMessages.emplace(message);
+		if(this->mSendMessages.size() == 1)
+		{
+			this->Write(*message);
+		}
 	}
 }
