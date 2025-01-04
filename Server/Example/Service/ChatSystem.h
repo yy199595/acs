@@ -20,6 +20,7 @@ namespace acs
 	{
 		long long friend_id;
 		long long add_time;
+		std::vector<FriendInfo> friend_list;
 	};
 
 	struct PlayerAccountInfo : public json::Object<PlayerAccountInfo>

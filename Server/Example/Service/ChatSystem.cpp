@@ -28,6 +28,7 @@ namespace acs
 
 		FriendInfo::RegisterField("add_time", &FriendInfo::add_time);
 		FriendInfo::RegisterField("friend_id", &FriendInfo::friend_id);
+		FriendInfo::RegisterField("friend_list", &FriendInfo::friend_list);
 
 
 		LoginInfo::RegisterField("ip", &LoginInfo::ip);
@@ -57,8 +58,15 @@ namespace acs
 			playerAccountInfo.login_info.ip = "127.0.0.1";
 			playerAccountInfo.login_info.login_time = help::Time::NowMil();
 
+			FriendInfo friendInfo1;
+			friendInfo1.friend_id = 10002;
+			friendInfo1.add_time = help::Time::NowSec();
+
 			FriendInfo friendInfo;
 			friendInfo.friend_id = 10001;
+			friendInfo.friend_list.emplace_back(friendInfo);
+			friendInfo.friend_list.emplace_back(friendInfo1);
+
 			friendInfo.add_time = help::Time::NowSec();
 			playerAccountInfo.friend_list.emplace_back(friendInfo);
 		}
