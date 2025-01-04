@@ -149,8 +149,8 @@ namespace help
 		static const std::string STR_BUFFER("1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM");
 		for(size_t index = 0; index < size; index++)
 		{
-			size_t max = STR_BUFFER.size();
-			size_t num = help::Math::Random<size_t>(0, max);
+			int max = (int)STR_BUFFER.size();
+			int num = help::Math::Random<int>(0, max);
 			result[index] = STR_BUFFER[num];
 		}
 		return result;
