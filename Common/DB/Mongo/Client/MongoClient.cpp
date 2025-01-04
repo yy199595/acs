@@ -6,7 +6,12 @@
 #include"XCode/XCode.h"
 #include <utility>
 #include"Util/Crypt/md5.h"
-#include"Util/Crypt/sha1.h"
+#ifdef __MONGO_DB_AUTH_SHA256__
+#include"Util/Crypt/sha256.h"
+#else
+#include "Util/Crypt/sha1.h"
+#endif
+
 #include"Proto/Bson/base64.h"
 #include"Util/Tools/String.h"
 #include"Mongo/Config/MongoConfig.h"
@@ -18,13 +23,23 @@ namespace mongo
     std::string SaltPassword(std::string & pwd, std::string salt, int iter)
     {
         salt = salt + '\0' + '\0' + '\0' + '\1';
-        std::string output = help::Sha1::GetHMacHash(pwd, salt);
+#ifdef __MONGO_DB_AUTH_SHA256__
+        std::string output = help::Sha256::GetHMacHash(pwd, salt);
         std::string inter(output);
         for(int index = 2; index <= iter; index++)
         {
-            inter = help::Sha1::GetHMacHash(pwd, inter);
-            output = help::Sha1::XorString(output, inter);
+            inter = help::Sha256::GetHMacHash(pwd, inter);
+            output = help::Sha256::XorString(output, inter);
         }
+#else
+		std::string output = help::Sha1::GetHMacHash(pwd, salt);
+		std::string inter(output);
+		for(int index = 2; index <= iter; index++)
+		{
+			inter = help::Sha1::GetHMacHash(pwd, inter);
+			output = help::Sha1::XorString(output, inter);
+		}
+#endif
         return output;
     }
 
@@ -121,7 +136,11 @@ namespace mongo
         request1->collectionName = db + ".$cmd";
         request1->document.Add("saslStart", 1);
         request1->document.Add("autoAuthorize", 1);
-        request1->document.Add("mechanism", "SCRAM-SHA-1");
+#ifdef __MONGO_DB_AUTH_SHA256__
+        request1->document.Add("mechanism", "SCRAM-SHA-256");
+#else
+		request1->document.Add("mechanism", "SCRAM-SHA-1");
+#endif
         request1->document.Add("payload", payload);
 
         std::unique_ptr<Response> response1 = this->SyncSendMongoCommand(std::move(request1));
@@ -148,22 +167,34 @@ namespace mongo
         int iterations = std::stoi(std::string(ret[2].c_str() + 2, ret[2].size() - 2));
 
         std::string without_proof = "c=biws,r=" + rnonce;
-        std::string pbkdf2_key = help::md5::SumHex(
+        std::string pbkdf2_key = help::md5::GetMd5(
                 fmt::format("{0}:mongo:{1}", user, pwd));
         std::string salted_pass = SaltPassword(pbkdf2_key,
                                                _bson::base64::decode(salt), iterations);
 
-        std::string client_key = help::Sha1::GetHMacHash(salted_pass, "Client Key");
-        std::string stored_key = help::Sha1::GetHash(client_key);
+#ifdef __MONGO_DB_AUTH_SHA256__
+        std::string client_key = help::Sha256::GetHMacHash(salted_pass, "Client Key");
+        std::string stored_key = help::Sha256::GetHash(client_key);
 
         std::string auth_msg = firstBare + ',' + parsedSource + ',' + without_proof;
-        std::string client_sin = help::Sha1::GetHMacHash(stored_key, auth_msg);
-        std::string client_key_xor_sig = help::Sha1::XorString(client_key, client_sin);
+        std::string client_sin = help::Sha256::GetHMacHash(stored_key, auth_msg);
+        std::string client_key_xor_sig = help::Sha256::XorString(client_key, client_sin);
         std::string client_proof = std::string("p=") + _bson::base64::encode(client_key_xor_sig);
         std::string client_final = _bson::base64::encode(without_proof + "," + client_proof);
-        std::string server_key = help::Sha1::GetHMacHash(salted_pass, "Server Key");
-        std::string server_sig = _bson::base64::encode(help::Sha1::GetHMacHash(server_key, auth_msg));
+        std::string server_key = help::Sha256::GetHMacHash(salted_pass, "Server Key");
+        std::string server_sig = _bson::base64::encode(help::Sha256::GetHMacHash(server_key, auth_msg));
+#else
+		std::string client_key = help::Sha1::GetHMacHash(salted_pass, "Client Key");
+		std::string stored_key = help::Sha1::GetHash(client_key);
 
+		std::string auth_msg = firstBare + ',' + parsedSource + ',' + without_proof;
+		std::string client_sin = help::Sha1::GetHMacHash(stored_key, auth_msg);
+		std::string client_key_xor_sig = help::Sha1::XorString(client_key, client_sin);
+		std::string client_proof = std::string("p=") + _bson::base64::encode(client_key_xor_sig);
+		std::string client_final = _bson::base64::encode(without_proof + "," + client_proof);
+		std::string server_key = help::Sha1::GetHMacHash(salted_pass, "Server Key");
+		std::string server_sig = _bson::base64::encode(help::Sha1::GetHMacHash(server_key, auth_msg));
+#endif
 
         std::unique_ptr<mongo::Request> request2 = std::make_unique<mongo::Request>();
 		{

@@ -55,6 +55,15 @@ option(__ENABLE_MEMORY_CHECK__ "开启内存检查" ON)
 option(__SHARE_PTR_COUNTER__ "开启指针计算查询" ON)
 option(__MEMORY_POOL_OPERATOR__ "使用重载对象内存池" OFF)
 
+option(__MONGO_DB_AUTH_SHA256__ "mongodb使用sha256认证" ON)
+
+if (__MONGO_DB_AUTH_SHA256__)
+    message("mongodb使用sha256认证")
+    add_definitions(-D __MONGO_DB_AUTH_SHA256__)
+else ()
+    message("mongodb使用sha1认证")
+endif ()
+
 if (APPLE)
     option(__ENABLE_DING_DING_PUSH "开启钉钉通知" OFF)
 elseif (UNIX)

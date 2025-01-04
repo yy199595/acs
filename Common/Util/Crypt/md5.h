@@ -68,7 +68,6 @@ namespace help
     namespace md5
     {
         extern std::string GetMd5(ifstream &in);
-		extern std::string SumHex(const std::string & key);
 		extern std::string GetMd5(const std::string & str);
         extern std::string GetMd5(const char * str, size_t size);
     }

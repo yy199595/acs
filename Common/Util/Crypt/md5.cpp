@@ -1,5 +1,4 @@
 #include"md5.h"
-#include"Util/Crypt/Src/md5.h"
 
 #include<regex>
 #include<cstring>
@@ -382,23 +381,4 @@ namespace help
         MD5 md5(str, size);
         return md5.toString();
     }
-
-	std::string md5::SumHex(const std::string& key)
-	{
-		//const std::string key1("440069e08fdef11byjzaca507f07fe9e6713643245318aa39d1");
-		std::string result;
-		char buffer[16] = {0};
-		std::regex regex1(".");
-		::md5(key.c_str(), key.size(), buffer);
-
-		std::string target(buffer, 16);
-		auto begin = std::sregex_iterator(target.begin(), target.end(), regex1);
-		for(auto iter = begin; iter != std::sregex_iterator(); iter++)
-		{
-			char temp[10] = {0};
-			unsigned char cc = iter->str()[0];
-			result.append(temp, sprintf(temp, "%02x", (int)cc));
-		}
-		return result;
-	}
 }
