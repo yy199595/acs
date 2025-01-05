@@ -131,5 +131,40 @@ namespace rpc
 }
 
 
+namespace tcp
+{
+	namespace Data
+	{
+		inline void Read(const char * buffer, rpc::ProtoHead & head)
+		{
+			int offset = sizeof(head.Len);
+			memcpy(&head.Len, buffer, sizeof(head.Len));
+			{
+				head.Type = buffer[offset++];
+				head.Porto = buffer[offset++];
+				head.Source = buffer[offset++];
+			}
+			memcpy(&head.RpcId, buffer + offset, sizeof(head.RpcId));
+		}
+		template<> inline void Read(std::istream& os, rpc::ProtoHead& value)
+		{
+			os.readsome((char *)&value.Len, sizeof(value.Len));
+			{
+				value.Type = (char)os.get();
+				value.Porto = (char)os.get();
+				value.Source = (char)os.get();
+			}
+			os.readsome((char *)&value.RpcId, sizeof(value.RpcId));
+		}
+
+		template<> inline void Write(std::ostream& is, const rpc::ProtoHead & value)
+		{
+			is.write((char*)&value.Len, sizeof(value.Len));
+			is << value.Type << value.Porto << value.Source;
+			is.write((char*)&value.RpcId, sizeof(value.RpcId));
+		}
+	}
+}
+
 
 #endif //APP_MESSAGE_H

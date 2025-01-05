@@ -112,9 +112,8 @@ namespace rpc
 		{
 			return false;
 		}
-		std::string data(message, len);
-		memcpy(&mProtoHead, message, RPC_PACK_HEAD_LEN);
 
+		tcp::Data::Read(message, this->mProtoHead);
 		len -= RPC_PACK_HEAD_LEN;
 		if(len != this->mProtoHead.Len)
 		{

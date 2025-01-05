@@ -86,21 +86,23 @@ namespace rpc
 		constexpr char Client = 1;
 		constexpr char Server = 2;
 	}
-
+	typedef unsigned short ProtoLenType;
+//pragma pack(1)
 	//协议头
 	struct ProtoHead
 	{
 	public:
-		unsigned short Len = 0; //协议包长度
+		ProtoLenType Len = 0; //协议包长度
 		char Type = rpc::Type::None; //协议类型
 		char Porto = rpc::Porto::None; //使用的通信协议
-		char Source = rpc::Source::None;
+		char Source = rpc::Source::None; //消息源
 		int RpcId = 0; // rpcId
 	};
 
 	constexpr int OuterBufferMaxSize = 4096; //外网数据包大小限制
-	constexpr int RPC_PACK_HEAD_LEN = sizeof(ProtoHead);
+	constexpr int RPC_PACK_HEAD_LEN = sizeof(ProtoLenType) + sizeof(char) * 3 + sizeof(int);
 	constexpr int InnerBufferMaxSize = std::numeric_limits<unsigned short>::max() - sizeof(rpc::ProtoHead);
+//#pragma pack()
 }
 
 // 消息长度 类型 协议 rpcid
