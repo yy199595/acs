@@ -7,7 +7,6 @@
 #include"Gate/Service/GateSystem.h"
 #include"Gate/Component/GateComponent.h"
 #include "Entity/Component/ActorComponent.h"
-#include "Util/Tools/String.h"
 constexpr int CHAT_TYPE_WORLD = 1;
 constexpr int CHAT_TYPE_PRIVATE = 2;
 constexpr int CHAT_TYPE_GUILD = 3;
@@ -25,6 +24,7 @@ namespace acs
 
 	bool ChatSystem::Awake()
 	{
+		REGISTER_JSON_CLASS_FIELD(FriendInfo, add_time);
 
 		FriendInfo::RegisterField("add_time", &FriendInfo::add_time);
 		FriendInfo::RegisterField("friend_id", &FriendInfo::friend_id);
