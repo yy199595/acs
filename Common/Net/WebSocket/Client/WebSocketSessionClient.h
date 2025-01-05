@@ -26,6 +26,7 @@ namespace ws
 	public:
 		void Stop();
 		void StartWrite(rpc::Message * message);
+		void StartWrite(ws::Message * message);
 		void StartReceive(tcp::Socket * tcpSocket);
 	private:
 		void OnUpdate() final;

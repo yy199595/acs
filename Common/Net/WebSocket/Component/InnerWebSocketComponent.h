@@ -13,7 +13,7 @@ namespace ws
 
 #include "Rpc/Component/RpcComponent.h"
 #include "Server/Component/ITcpComponent.h"
-#include "WebSocket/Common/WebSocketMessage.h"
+
 namespace acs
 {
 	class InnerWebSocketComponent : public ITcpListen, public rpc::IInnerSender, public IComplete,
@@ -28,6 +28,8 @@ namespace acs
 		void OnClientError(int id, int code) final;
 		void OnMessage(int, rpc::Message *request, rpc::Message *response) final;
 	public:
+		int Create(const std::string & address);
+		int Send(int id, ws::Message * message);
 		int Send(int id, rpc::Message *message) final;
 		char GetNet() const final { return rpc::Net::Ws; }
 	private:

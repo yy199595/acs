@@ -75,7 +75,6 @@ namespace acs
 		playerAccountInfo.Encode(json);
 		std::unique_ptr<PlayerAccountInfo> newPlayerAccountInfo = PlayerAccountInfo::Create(json);
 
-		LOG_INFO("\n{}", help::Str::FormatJson(json))
 		return true;
 	}
 

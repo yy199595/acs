@@ -91,6 +91,16 @@ namespace ws
 		});
 	}
 
+	void SessionClient::StartWrite(ws::Message* message)
+	{
+		Asio::Context & context = this->mSocket->GetContext();
+		asio::post(context, [this, self = this->shared_from_this(), message] ()
+		{
+			this->AddToSendQueue(std::unique_ptr<ws::Message>(message));
+		});
+	}
+
+
 	void SessionClient::OnReceiveLine(std::istream& readStream, size_t size)
 	{
 		asio::error_code code;

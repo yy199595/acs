@@ -20,6 +20,7 @@ namespace ws
 	public:
 		RequestClient(int id, Component * component, Asio::Context & main);
 	public:
+		void StartWrite(ws::Message * message);
 		void StartWrite(rpc::Message * message);
 	private:
 		void OnUpdate() final;
@@ -32,6 +33,7 @@ namespace ws
 	private:
 		void Close(int code);
 		void SendFirstMessage();
+		void AddToSendQueue(std::unique_ptr<ws::Message> message);
 	private:
 		int mSockId;
 		Component * mComponent;

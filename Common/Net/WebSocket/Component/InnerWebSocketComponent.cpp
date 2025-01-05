@@ -92,6 +92,39 @@ namespace acs
 		return XCode::SendMessageFail;
 	}
 
+	int InnerWebSocketComponent::Send(int id, ws::Message* message)
+	{
+		auto iter = this->mSessions.find(id);
+		if(iter != this->mSessions.end())
+		{
+			iter->second->StartWrite(message);
+			return XCode::Ok;
+		}
+		auto iter1 = this->mClients.find(id);
+		if(iter1 == this->mClients.end())
+		{
+			return XCode::SendMessageFail;
+		}
+		iter1->second->StartWrite(message);
+		return XCode::Ok;
+	}
+
+
+	int InnerWebSocketComponent::Create(const std::string& address)
+	{
+		int id = this->mClientPool.BuildNumber();
+		Asio::Context & context = this->mApp->GetContext();
+		tcp::Socket * tcpSocket = this->mThread->CreateSocket();
+		std::shared_ptr<ws::RequestClient> requestClient = std::make_shared<ws::RequestClient>(id, this, context);
+		{
+			tcpSocket->Init(address);
+			requestClient->SetSocket(tcpSocket);
+			this->mClients.emplace(id, requestClient);
+		}
+		return id;
+	}
+
+
 	void InnerWebSocketComponent::OnClientError(int id, int code)
 	{
 		auto iter = this->mSessions.find(id);

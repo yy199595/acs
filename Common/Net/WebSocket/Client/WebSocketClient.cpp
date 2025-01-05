@@ -134,6 +134,26 @@ namespace ws
 		this->mSockId = 0;
 	}
 
+	void RequestClient::StartWrite(ws::Message* message)
+	{
+		Asio::Context & context = this->mSocket->GetContext();
+		asio::post(context, [this, self = this->shared_from_this(), message] ()
+		{
+			std::unique_ptr<ws::Message> wsMessage(message);
+			this->AddToSendQueue(std::move(wsMessage));
+		});
+
+	}
+
+	void RequestClient::AddToSendQueue(std::unique_ptr<ws::Message> wsMessage)
+	{
+		this->mWaitSendMessage.emplace(std::move(wsMessage));
+		if(this->mWaitSendMessage.size() == 1)
+		{
+			this->Write(*this->mWaitSendMessage.front());
+		}
+	}
+
 	void RequestClient::StartWrite(rpc::Message* message)
 	{
 		Asio::Context & context = this->mSocket->GetContext();
@@ -145,12 +165,7 @@ namespace ws
 				message->OnSendMessage(this->mStream);
 				wsMessage->SetBody(ws::OPCODE_BIN, this->mStream.str(), true);
 			}
-
-			this->mWaitSendMessage.emplace(std::move(wsMessage));
-			if(this->mWaitSendMessage.size() == 1)
-			{
-				this->Write(*this->mWaitSendMessage.front());
-			}
+			this->AddToSendQueue(std::move(wsMessage));
 			delete message;
 		});
 	}
