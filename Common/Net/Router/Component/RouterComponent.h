@@ -5,7 +5,7 @@
 #ifndef APP_ROUTERCOMPONENT_H
 #define APP_ROUTERCOMPONENT_H
 #include <queue>
-#include "Rpc/Client/Message.h"
+#include "Rpc/Common/Message.h"
 #include "Entity/Component/Component.h"
 struct lua_State;
 namespace acs

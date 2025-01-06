@@ -2,13 +2,13 @@
 // Created by mac on 2021/11/28.
 //
 
-#include"OuterClient.h"
+#include"OuterTcpClient.h"
 #include"XCode/XCode.h"
 #include"Util/Tools/TimeHelper.h"
 
 namespace rpc
 {
-	OuterClient::OuterClient(int id, Component * component, Asio::Context & main)
+	OuterTcpClient::OuterTcpClient(int id, Component * component, Asio::Context & main)
 		: Client(rpc::OuterBufferMaxSize), mSockId(id), mMainContext(main), mClose(false), mPlayerId(0)
 	{
 		this->mMessage = nullptr;
@@ -17,7 +17,7 @@ namespace rpc
 		this->mDecodeState = tcp::Decode::None;
 	}
 
-	OuterClient::~OuterClient() noexcept
+	OuterTcpClient::~OuterTcpClient() noexcept
 	{
 		while(!this->mSendMessages.empty())
 		{
@@ -26,14 +26,14 @@ namespace rpc
 		}
 	}
 
-	void OuterClient::Stop()
+	void OuterTcpClient::Stop()
 	{
 		Asio::Context & context = this->mSocket->GetContext();
 		std::shared_ptr<Client> self = this->shared_from_this();
 		asio::post(context, [this, self] { this->CloseSocket(); });
 	}
 
-	void OuterClient::StartReceive(tcp::Socket * socket, int second)
+	void OuterTcpClient::StartReceive(tcp::Socket * socket, int second)
 	{
 		this->SetSocket(socket);
 		std::shared_ptr<Client> self = this->shared_from_this();
@@ -43,7 +43,7 @@ namespace rpc
 		});
 	}
 
-	void OuterClient::OnTimeout(tcp::TimeoutFlag flag)
+	void OuterTcpClient::OnTimeout(tcp::TimeoutFlag flag)
 	{
 		long long nowTime = help::Time::NowSec();
 		if(nowTime - this->mLastRecvTime >= 30)
@@ -52,12 +52,12 @@ namespace rpc
 		}
 	}
 
-	void OuterClient::OnReadError(const Asio::Code& code)
+	void OuterTcpClient::OnReadError(const Asio::Code& code)
 	{
 		this->CloseSocket(XCode::NetReadFailure);
 	}
 
-    void OuterClient::OnReceiveMessage(std::istream & readStream, size_t size, const Asio::Code & code)
+    void OuterTcpClient::OnReceiveMessage(std::istream & readStream, size_t size, const Asio::Code & code)
 	{
 		if (size <= 0 || code.value() != Asio::OK)
 		{
@@ -140,7 +140,7 @@ namespace rpc
 		asio::post(context, [this, self] { this->ReadLength(rpc::RPC_PACK_HEAD_LEN); });
 	}
 
-    void OuterClient::CloseSocket()
+    void OuterTcpClient::CloseSocket()
 	{
 		if(this->mClose) {
 			return;
@@ -155,7 +155,7 @@ namespace rpc
 		this->mSocket->Close();
 	}
 
-	void OuterClient::SendFirstMessage()
+	void OuterTcpClient::SendFirstMessage()
 	{
 		if (!this->mSendMessages.empty())
 		{
@@ -163,7 +163,7 @@ namespace rpc
 		}
 	}
 
-	void OuterClient::CloseSocket(int code)
+	void OuterTcpClient::CloseSocket(int code)
 	{
 		if(!this->mClose)
 		{
@@ -175,7 +175,7 @@ namespace rpc
 		}
 	}
 
-	void OuterClient::OnSendMessage(size_t size)
+	void OuterTcpClient::OnSendMessage(size_t size)
 	{
 		if (!this->mSendMessages.empty())
 		{
@@ -194,12 +194,12 @@ namespace rpc
 		}
 	}
 
-	void OuterClient::OnSendMessage(const asio::error_code& code)
+	void OuterTcpClient::OnSendMessage(const asio::error_code& code)
 	{
 		this->CloseSocket(XCode::SendMessageFail);
 	}
 
-	void OuterClient::Send(rpc::Message* message)
+	void OuterTcpClient::Send(rpc::Message* message)
 	{
 		std::shared_ptr<Client> self = this->shared_from_this();
 		asio::post(this->mSocket->GetContext(), [this, self, message]
@@ -208,7 +208,7 @@ namespace rpc
 		});
 	}
 
-	void OuterClient::AddToSendQueue(rpc::Message* message)
+	void OuterTcpClient::AddToSendQueue(rpc::Message* message)
 	{
 		this->mSendMessages.emplace(message);
 		if(this->mSendMessages.size() == 1)

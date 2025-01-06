@@ -8,7 +8,7 @@
 #include"Core/Queue/Queue.h"
 
 #ifdef __SHARE_PTR_COUNTER__
-#include "Rpc/Client/Message.h"
+#include "Rpc/Common/Message.h"
 #endif
 namespace tcp
 {

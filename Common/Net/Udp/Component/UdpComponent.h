@@ -5,7 +5,7 @@
 #pragma once;
 #include <array>
 #include "asio.hpp"
-#include "Rpc/Client/Message.h"
+#include "Rpc/Common/Message.h"
 #include "Udp/Common/UdpServer.h"
 #include "Udp/Common/UdpClient.h"
 #include "Entity/Component/Component.h"

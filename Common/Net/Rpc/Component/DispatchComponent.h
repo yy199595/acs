@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include"RpcComponent.h"
-#include"Rpc/Client/Message.h"
+#include"Rpc/Common/Message.h"
 #include"Rpc/Async/RpcTaskSource.h"
 #include"Rpc/Config/MethodConfig.h"
 #include"Log/Common/Logger.h"

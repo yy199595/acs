@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include"Lua/Engine/Define.h"
-#include"Rpc/Client/Message.h"
+#include"Rpc/Common/Message.h"
 #include"Async/Coroutine/CoroutineDef.h"
 #include"Async/Source/TaskSource.h"
 #include"Async/Lua/LuaWaitTaskSource.h"

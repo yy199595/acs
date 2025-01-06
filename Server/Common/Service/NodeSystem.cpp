@@ -13,8 +13,8 @@
 
 #ifdef __SHARE_PTR_COUNTER__
 
-#include "Rpc/Client/InnerClient.h"
-#include "Rpc/Client/OuterClient.h"
+#include "Rpc/Client/InnerTcpClient.h"
+#include "Rpc/Client/OuterTcpClient.h"
 #include "Http/Client/RequestClient.h"
 #include "Http/Client/SessionClient.h"
 #include "Async/Lua/LuaWaitTaskSource.h"
@@ -118,8 +118,8 @@ namespace acs
 
 #ifdef __SHARE_PTR_COUNTER__
 			size_t count1 = rpc::Message::GetObjectCount();
-			size_t count2 = rpc::InnerClient::GetObjectCount();
-			size_t count3 = rpc::OuterClient::GetObjectCount();
+			size_t count2 = rpc::InnerTcpClient::GetObjectCount();
+			size_t count3 = rpc::OuterTcpClient::GetObjectCount();
 			size_t count10 = http::Request::GetObjectCount();
 			size_t count11 = http::Response::GetObjectCount();
 			size_t count4 = http::SessionClient::GetObjectCount();

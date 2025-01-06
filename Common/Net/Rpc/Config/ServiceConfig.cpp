@@ -1,5 +1,5 @@
 ﻿#include "ServiceConfig.h"
-#include"Rpc/Client/Message.h"
+#include"Rpc/Common/Message.h"
 #include"Util/Tools/String.h"
 #include"Cluster/Config/ClusterConfig.h"
 #include "Util/File/FileHelper.h"

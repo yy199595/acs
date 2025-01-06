@@ -4,7 +4,7 @@
 
 #ifndef APP_ICLIENT_H
 #define APP_ICLIENT_H
-#include "Rpc/Client/Message.h"
+#include "Rpc/Common/Message.h"
 #include "Net/Network/Tcp/Asio.h"
 #include "Proto/Message/IProto.h"
 #include "Entity/Component/IComponent.h"

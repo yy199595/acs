@@ -5,15 +5,12 @@
 #include"Timer/Timer/ElapsedTimer.h"
 
 #ifdef __DEBUG__
-
-#include"Server/Config/CodeConfig.h"
 #include"Proto/Component/ProtoComponent.h"
-
 #endif
 
 #include"XCode/XCode.h"
 #include"Entity/Actor/App.h"
-#include"Rpc/Client/Message.h"
+#include"Rpc/Common/Message.h"
 #include"Rpc/Service/RpcService.h"
 #include"Gate/Component/GateComponent.h"
 #include"Router/Component/RouterComponent.h"

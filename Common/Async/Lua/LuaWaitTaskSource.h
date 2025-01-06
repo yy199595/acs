@@ -7,7 +7,7 @@
 
 #include"Lua/Engine/LuaParameter.h"
 #include"Async/Lua/LuaCoroutine.h"
-#include"Rpc/Client/Message.h"
+#include"Rpc/Common/Message.h"
 #ifdef __SHARE_PTR_COUNTER__
 #include "Core/Memory/MemoryObject.h"
 #endif

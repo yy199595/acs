@@ -6,7 +6,7 @@
 #include "Util/Tools/String.h"
 #include "Message/c2s/c2s.pb.h"
 #include "UdpComponent.h"
-#include "Rpc/Client/Message.h"
+#include "Rpc/Common/Message.h"
 #include "Entity/Actor/App.h"
 #include "Net/Udp/Common/UdpClient.h"
 #include "Server/Config/CodeConfig.h"

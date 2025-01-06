@@ -5,7 +5,7 @@
 #ifndef APP_ACTOR_H
 #define APP_ACTOR_H
 #include"Entity/Unit/Entity.h"
-#include"Rpc/Client/Message.h"
+#include"Rpc/Common/Message.h"
 struct lua_State;
 namespace acs
 {

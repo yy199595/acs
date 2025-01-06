@@ -126,7 +126,7 @@ namespace acs
 	{
 		int id = this->mNumPool.BuildNumber();
 		Asio::Context & io = this->mApp->GetContext();
-		std::shared_ptr<rpc::InnerClient> tcpSession = std::make_shared<rpc::InnerClient>(id, this, false, io);
+		std::shared_ptr<rpc::InnerTcpClient> tcpSession = std::make_shared<rpc::InnerTcpClient>(id, this, false, io);
 		{
 			tcpSession->StartReceive(socket);
 			this->mClients.emplace(id, tcpSession);
@@ -155,7 +155,7 @@ namespace acs
 		}
     }
 
-	rpc::InnerClient * InnerTcpComponent::GetClient(int id)
+	rpc::InnerTcpClient * InnerTcpComponent::GetClient(int id)
 	{
 		auto iter = this->mClients.find(id);
 		if(iter != this->mClients.end())
@@ -174,7 +174,7 @@ namespace acs
 			return nullptr;
 		}
 		Asio::Context & io = this->mApp->GetContext();
-		std::shared_ptr<rpc::InnerClient> tcpClient = std::make_shared<rpc::InnerClient>(id, this, true, io);
+		std::shared_ptr<rpc::InnerTcpClient> tcpClient = std::make_shared<rpc::InnerTcpClient>(id, this, true, io);
 		{
 			tcpClient->SetSocket(socketProxy);
 			this->mClients.emplace(id, tcpClient);
@@ -185,7 +185,7 @@ namespace acs
     int InnerTcpComponent::Send(int id, rpc::Message * message)
     {
 
-        rpc::InnerClient * clientSession = this->GetClient(id);
+        rpc::InnerTcpClient * clientSession = this->GetClient(id);
 		if(clientSession == nullptr)
 		{
 			LOG_ERROR("not find id : {}", id);

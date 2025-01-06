@@ -7,7 +7,7 @@
 
 #include"Http/Common/Config.h"
 #include"HttpListenComponent.h"
-#include"Rpc/Client/Message.h"
+#include"Rpc/Common/Message.h"
 #include"Cache/Common/LruCache.h"
 #include"Http/Common/ContentType.h"
 namespace http

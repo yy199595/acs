@@ -6,7 +6,7 @@
 #include "Util/Tools/String.h"
 #include "Message/c2s/c2s.pb.h"
 #include "KcpComponent.h"
-#include "Rpc/Client/Message.h"
+#include "Rpc/Common/Message.h"
 #include "Entity/Actor/App.h"
 #include "Kcp/Common/KcpClient.h"
 #include "Server/Config/CodeConfig.h"

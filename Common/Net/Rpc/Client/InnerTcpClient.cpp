@@ -1,20 +1,20 @@
-﻿#include"InnerClient.h"
+﻿#include"InnerTcpClient.h"
 
 #include"XCode/XCode.h"
-#include"Rpc/Client/Rpc.h"
+#include"Net/Rpc/Common/Rpc.h"
 #include"Core/System/System.h"
 #include"Core/Queue/Queue.h"
 
 namespace rpc
 {
-	InnerClient::InnerClient(int id, Component* component, bool client, Asio::Context & io)
+	InnerTcpClient::InnerTcpClient(int id, Component* component, bool client, Asio::Context & io)
 			: Client(rpc::InnerBufferMaxSize), mSockId(id), mComponent(component),
 			  mIsClient(client), mDecodeStatus(tcp::Decode::None), mMainContext(io), mClose(false)
 	{
 
 	}
 
-	InnerClient::~InnerClient() noexcept
+	InnerTcpClient::~InnerTcpClient() noexcept
 	{
 		while (!this->mSendMessages.empty())
 		{
@@ -23,7 +23,7 @@ namespace rpc
 		}
 	}
 
-	bool InnerClient::Send(rpc::Message* message)
+	bool InnerTcpClient::Send(rpc::Message* message)
 	{
 		LOG_CHECK_RET_FALSE(message);
 		if (message->GetType() == rpc::Type::Response)
@@ -46,7 +46,7 @@ namespace rpc
 		return true;
 	}
 
-	void InnerClient::OnSendMessage(size_t size)
+	void InnerTcpClient::OnSendMessage(size_t size)
 	{
 		if (!this->mSendMessages.empty())
 		{
@@ -70,7 +70,7 @@ namespace rpc
 		}
 	}
 
-	void InnerClient::OnConnect(bool result, int count)
+	void InnerTcpClient::OnConnect(bool result, int count)
 	{
 		if (result)
 		{
@@ -89,7 +89,7 @@ namespace rpc
 		this->CloseSocket(XCode::NetConnectFailure);
 	}
 
-	void InnerClient::OnSendMessage(const Asio::Code& code)
+	void InnerTcpClient::OnSendMessage(const Asio::Code& code)
 	{
 		if (code != asio::error::operation_aborted
 			&& this->mIsClient && !this->mClose)
@@ -100,7 +100,7 @@ namespace rpc
 		this->CloseSocket(XCode::NetSendFailure);
 	}
 
-	void InnerClient::OnTimeout(tcp::TimeoutFlag flag)
+	void InnerTcpClient::OnTimeout(tcp::TimeoutFlag flag)
 	{
 		switch (flag)
 		{
@@ -118,7 +118,7 @@ namespace rpc
 		}
 	}
 
-	void InnerClient::CloseSocket()
+	void InnerTcpClient::CloseSocket()
 	{
 		if(this->mClose) {
 			return;
@@ -160,7 +160,7 @@ namespace rpc
 		this->mSocket->Close();
 	}
 
-	void InnerClient::CloseSocket(int code)
+	void InnerTcpClient::CloseSocket(int code)
 	{
 		if(!this->mClose)
 		{
@@ -173,7 +173,7 @@ namespace rpc
 		}
 	}
 
-	void InnerClient::OnReadError(const Asio::Code& code)
+	void InnerTcpClient::OnReadError(const Asio::Code& code)
 	{
 		if (code != asio::error::operation_aborted)
 		{
@@ -185,7 +185,7 @@ namespace rpc
 		}
 	}
 
-	bool InnerClient::MakeMessage(const rpc::ProtoHead& header)
+	bool InnerTcpClient::MakeMessage(const rpc::ProtoHead& header)
 	{
 		if (header.Type != rpc::Type::Response)
 		{
@@ -204,7 +204,7 @@ namespace rpc
 		return true;
 	}
 
-	void InnerClient::OnReceiveMessage(std::istream& readStream, size_t size, const Asio::Code& code)
+	void InnerTcpClient::OnReceiveMessage(std::istream& readStream, size_t size, const Asio::Code& code)
 	{
 		if (size == 0 || code.value() != Asio::OK)
 		{
@@ -282,7 +282,7 @@ namespace rpc
 		asio::post(context, [this, self]() { this->ReadLength(rpc::RPC_PACK_HEAD_LEN); });
 	}
 
-	void InnerClient::AddToSendQueue(rpc::Message* message)
+	void InnerTcpClient::AddToSendQueue(rpc::Message* message)
 	{
 		this->mSendMessages.emplace(message);
 		if(this->mSendMessages.size() == 1)
@@ -291,14 +291,14 @@ namespace rpc
 		}
 	}
 
-	void InnerClient::Close()
+	void InnerTcpClient::Close()
 	{
 		Asio::Context & context = this->mSocket->GetContext();
 		std::shared_ptr<Client> self = this->shared_from_this();
 		asio::post(context, [this, self] { this->CloseSocket(); });
 	}
 
-	void InnerClient::StartReceive(tcp::Socket* socket)
+	void InnerTcpClient::StartReceive(tcp::Socket* socket)
 	{
 		this->SetSocket(socket);
 		this->mSocket->SetOption(tcp::OptionType::NoDelay, true);

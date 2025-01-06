@@ -9,14 +9,14 @@
 #include "Core/Queue/Queue.h"
 #include "Log/Common/Logger.h"
 #include "Core/Pool/ArrayPool.h"
-#include "Rpc//Client/OuterClient.h"
+#include "Rpc//Client/OuterTcpClient.h"
 #include "Entity/Component/Component.h"
 #include "Server/Component/ITcpComponent.h"
 
 namespace rpc
 {
     class Message;
-	class InnerClient;
+	class InnerTcpClient;
 }
 
 namespace acs
@@ -50,7 +50,7 @@ namespace acs
 		class GateComponent * mGate;
 		math::NumberPool<int> mSocketPool;
 		custom::Queue<rpc::Message *> mBroadCastMessages; //广播消息
-		std::unordered_map<int, std::shared_ptr<rpc::OuterClient>> mGateClientMap;
+		std::unordered_map<int, std::shared_ptr<rpc::OuterTcpClient>> mGateClientMap;
 		//std::unordered_map<int, std::unique_ptr<rpc::InnerClient>> mForwardClientMap;
 	};
 }

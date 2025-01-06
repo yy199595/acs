@@ -4,22 +4,22 @@
 
 #ifndef GAMEKEEPER_RPCPROXYCLIENT_H
 #define GAMEKEEPER_RPCPROXYCLIENT_H
-#include"Rpc/Client/Message.h"
+#include"Rpc/Common/Message.h"
 #include"Network/Tcp/Client.h"
 #include"Entity/Component/IComponent.h"
 
 namespace rpc
 {
     // 网关session
- 	class OuterClient final : public tcp::Client
+ 	class OuterTcpClient final : public tcp::Client
 #ifdef __SHARE_PTR_COUNTER__
-			, public memory::Object<OuterClient>
+			, public memory::Object<OuterTcpClient>
 #endif
 	{
 	 public:
 		typedef acs::IRpc<rpc::Message, rpc::Message> Component;
-		explicit OuterClient(int id, Component* component, Asio::Context & main);
-		~OuterClient() final;
+		explicit OuterTcpClient(int id, Component* component, Asio::Context & main);
+		~OuterTcpClient() final;
 	 public:
 		void Stop();
 		void Send(rpc::Message * message);

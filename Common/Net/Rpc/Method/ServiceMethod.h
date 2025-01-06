@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include"XCode/XCode.h"
-#include"Rpc/Client/Message.h"
+#include"Rpc/Common/Message.h"
 
 using namespace google::protobuf;
 namespace acs

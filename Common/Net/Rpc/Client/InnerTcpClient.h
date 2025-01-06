@@ -1,21 +1,21 @@
 ﻿#pragma once
 #include"Core/Map/HashMap.h"
-#include"Rpc/Client/Message.h"
+#include"Rpc/Common/Message.h"
 #include"Network/Tcp/Client.h"
 #include"Entity/Component/IComponent.h"
 using namespace tcp;
 
 namespace rpc
 {
-	class InnerClient : public tcp::Client
+	class InnerTcpClient : public tcp::Client
 #ifdef __SHARE_PTR_COUNTER__
-			, public memory::Object<InnerClient>
+			, public memory::Object<InnerTcpClient>
 #endif
 	{
 	 public:
 		typedef acs::IRpc<rpc::Message, rpc::Message> Component;
-		explicit InnerClient(int id, Component * component, bool client, Asio::Context &);
-		~InnerClient() final;
+		explicit InnerTcpClient(int id, Component * component, bool client, Asio::Context &);
+		~InnerTcpClient() final;
 	public:
 		void Close();
 		bool Send(rpc::Message * message);

@@ -4,7 +4,7 @@
 
 #ifndef APP_WSCLIENTCOMPONENT_H
 #define APP_WSCLIENTCOMPONENT_H
-#include"Rpc/Client/Message.h"
+#include"Rpc/Common/Message.h"
 #include"Entity/Component/Component.h"
 #include"WebSocket/Client/WebSocketClient.h"
 

@@ -4,7 +4,7 @@
 #include<string>
 #include"LuaClient.h"
 #include"XCode/XCode.h"
-#include"Rpc/Client/Message.h"
+#include"Rpc/Common/Message.h"
 #include"Lua/Engine/Define.h"
 #include"Entity/Actor/App.h"
 #include"Router/Component/RouterComponent.h"

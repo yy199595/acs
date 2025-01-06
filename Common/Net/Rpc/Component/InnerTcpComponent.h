@@ -1,9 +1,9 @@
 ﻿#pragma once
 #include"Core/Map/HashMap.h"
 #include"Core/Queue/Queue.h"
-#include"Rpc/Client/Message.h"
+#include"Rpc/Common/Message.h"
 #include"Core/Set/HashSet.h"
-#include"Rpc/Client/InnerClient.h"
+#include"Rpc/Client/InnerTcpClient.h"
 #include"Server/Component/ListenerComponent.h"
 struct lua_State;
 namespace acs
@@ -30,12 +30,12 @@ namespace acs
 	private:
 		int OnRequest(rpc::Message * message) noexcept;
 		int OnForward(rpc::Message * message);
-		rpc::InnerClient * GetClient(int id);
+		rpc::InnerTcpClient * GetClient(int id);
 	private:
 		class ActorComponent * mActor;
 		math::NumberPool<int> mNumPool;
 		class ThreadComponent * mThread;
         class DispatchComponent* mDispatch;
-		std::unordered_map<int, std::shared_ptr<rpc::InnerClient>> mClients; //本地客户端(连接别的)
+		std::unordered_map<int, std::shared_ptr<rpc::InnerTcpClient>> mClients; //本地客户端(连接别的)
 	};
 }

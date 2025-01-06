@@ -4,7 +4,7 @@
 
 #ifndef APP_MESSAGE_H
 #define APP_MESSAGE_H
-#include"Rpc.h"
+#include"Net/Rpc/Common/Rpc.h"
 #include<string>
 #include<unordered_map>
 #include"Proto/Include/Message.h"

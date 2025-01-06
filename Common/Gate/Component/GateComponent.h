@@ -4,7 +4,7 @@
 
 #ifndef APP_GATECOMPONENT_H
 #define APP_GATECOMPONENT_H
-#include "Rpc/Client/Message.h"
+#include "Rpc/Common/Message.h"
 #include "Entity/Component/Component.h"
 namespace acs
 {
