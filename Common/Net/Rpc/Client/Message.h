@@ -174,6 +174,7 @@ namespace tcp
 				buffer[offset++] = value.Source;
 			}
 			tcp::Data::Write(buffer + offset, value.RpcId);
+			is.write(buffer, rpc::RPC_PACK_HEAD_LEN);
 		}
 	}
 }
