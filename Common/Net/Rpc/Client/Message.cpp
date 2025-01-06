@@ -251,7 +251,7 @@ namespace rpc
     int Message::OnSendMessage(std::ostream &os)
 	{
 		this->mProtoHead.Len = this->mHead.GetLength() + this->mBody.size();
-		tcp::Data::Write<rpc::ProtoHead>(os, this->mProtoHead);
+		tcp::Data::Write(os, this->mProtoHead);
 
 		this->mHead.OnSendMessage(os);
 		os.write(this->mBody.c_str(), this->mBody.size());

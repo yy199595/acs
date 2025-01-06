@@ -57,7 +57,7 @@ include_directories(Libs/fmt/include)
 
 #公共组件
 include_directories(${PROJECT_SOURCE_DIR}/Gen)
-include_directories(${PROJECT_SOURCE_DIR}/Client)
+include_directories(${PROJECT_SOURCE_DIR}/Robot)
 
 include_directories(${PROJECT_SOURCE_DIR}/Gen/Message)
 
@@ -80,7 +80,7 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/Libs/protobuf/cmake ${PROJECT_SOURCE_DIR}
 file(GLOB_RECURSE src_proto "Gen/*.cpp" "Gen/*.cc")
 file(GLOB_RECURSE src_common "Common/*.cpp" "Common/*.c")
 file(GLOB_RECURSE src_server "Server/*.c" "Server/*.cpp")
-file(GLOB_RECURSE src_client "Client/*.c" "Client/*.cpp")
+file(GLOB_RECURSE src_client "Robot/*.c" "Robot/*.cpp")
 
 list(APPEND build_files ${asm_file} ${src_common})
 list(APPEND build_files ${src_proto} ${src_server} ${src_client})
@@ -91,7 +91,7 @@ if (MSVC) #创建vs目录
     file(GLOB_RECURSE file_cmake "CMake/*.cmake")
     file(GLOB_RECURSE file_proto "Gen/*.h" "Gen/*.hpp")
     file(GLOB_RECURSE file_server "Server/*.h" "Server/*.hpp")
-    file(GLOB_RECURSE file_client "Client/*.h" "Client/*.hpp")
+    file(GLOB_RECURSE file_client "Robot/*.h" "Robot/*.hpp")
     file(GLOB_RECURSE file_common "Common/*.h" "Common/*.hpp")
     #file(GLOB_RECURSE file_lib "Libs/*.h" "Libs/*.hpp" "Libs/*.c" "Libs/*.cpp")
     file(GLOB_RECURSE file_bin "bin/*.csv" "bin/*.json" "bin/*.lua" "bin/*.proto" "bin/*.html")

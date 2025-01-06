@@ -22,7 +22,7 @@
             "max_conn" : 1024,
             "protocol" : "tcp",
             "address": "127.0.0.1:${gate}",
-            "component" : "OuterNetComponent"
+            "component" : "OuterWebSocketComponent"
         },
         "http" : {
             "max_conn" : 256,
@@ -57,7 +57,7 @@
         "ws" : {
             "protocol" : "tcp",
             "port": "127.0.0.1:${ws}",
-            "component" : "OuterWebSocketComponent"
+            "component" : "InnerWebSocketComponent"
         }
     },
     "connect": {

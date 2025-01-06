@@ -308,6 +308,7 @@ namespace json
 	std::unordered_map<std::string, ValueBase*> Object<T>::values;
 
 }
-#define REGISTER_JSON_CLASS_FIELD(T, name) T::RegisterField(#name, &T::name)
+
+#define REGISTER_JSON_CLASS_FIELD(T, field) T::RegisterField(#field, &T::field)
 
 #endif //APP_JSONOBJECT_H

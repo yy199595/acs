@@ -13,7 +13,7 @@ namespace acs
 	RouterComponent::RouterComponent()
 	{
 		this->mCount = 0;
-        this->mDisComponent = nullptr;
+        this->mDispatch = nullptr;
 	}
 
 	bool RouterComponent::LateAwake()
@@ -26,14 +26,14 @@ namespace acs
 			this->mSenders.emplace(net, sender);
 		}
 		LOG_CHECK_RET_FALSE(!this->mSenders.empty())
-		LOG_CHECK_RET_FALSE(this->mDisComponent = this->GetComponent<DispatchComponent>())
+		LOG_CHECK_RET_FALSE(this->mDispatch = this->GetComponent<DispatchComponent>())
 		return true;
 	}
 
 	int RouterComponent::LuaCall(lua_State* lua, int id, std::unique_ptr<rpc::Message> message)
 	{
 		int timeout = message->GetTimeout();
-		int rpcId = this->mDisComponent->BuildRpcId();
+		int rpcId = this->mDispatch->BuildRpcId();
 		{
 			message->SetRpcId(rpcId);
 			int code = this->Send(id, std::move(message));
@@ -43,7 +43,7 @@ namespace acs
 				return 1;
 			}
 		}
-		return this->mDisComponent->AddTask(new LuaRpcTaskSource(lua, rpcId), timeout)->Await();
+		return this->mDispatch->AddTask(new LuaRpcTaskSource(lua, rpcId), timeout)->Await();
 	}
 
 	void RouterComponent::OnSystemUpdate() noexcept
@@ -51,7 +51,7 @@ namespace acs
 		while (!this->mLocalMessages.empty())
 		{
 			rpc::Message* message = this->mLocalMessages.front();
-			if (this->mDisComponent->OnMessage(message) != XCode::Ok)
+			if (this->mDispatch->OnMessage(message) != XCode::Ok)
 			{
 				delete message;
 			}
@@ -133,7 +133,7 @@ namespace acs
 	std::unique_ptr<rpc::Message> RouterComponent::Call(int id, std::unique_ptr<rpc::Message> message)
 	{
 		int timeout = message->GetTimeout();
-		int rpcId = this->mDisComponent->BuildRpcId();
+		int rpcId = this->mDispatch->BuildRpcId();
 		{
 			message->SetRpcId(rpcId);
 			if (this->Send(id, std::move(message)) != XCode::Ok)
@@ -142,6 +142,6 @@ namespace acs
 				return nullptr;
 			}
 		}
-		return this->mDisComponent->BuildRpcTask<RpcTaskSource>(rpcId, timeout)->Await();
+		return this->mDispatch->BuildRpcTask<RpcTaskSource>(rpcId, timeout)->Await();
 	}
 }

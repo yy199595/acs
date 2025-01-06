@@ -18,6 +18,7 @@ namespace acs
 
 	struct FriendInfo : public json::Object<FriendInfo>
 	{
+		int id;
 		long long friend_id;
 		long long add_time;
 		std::vector<FriendInfo> friend_list;
@@ -47,7 +48,6 @@ namespace acs
 		int OnPing(long long playerId);
 		int OnChat(long long playerId, const c2s::chat::request & request);
 	private:
-		class GateComponent * mGate;
 		class ActorComponent * mActor;
 		custom::HashMap<long long, long long> mChatTime;
 	};

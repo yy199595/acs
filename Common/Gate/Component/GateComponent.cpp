@@ -13,32 +13,20 @@ namespace acs
 	{
 		this->mActor = nullptr;
 		this->mRouter = nullptr;
+		this->mOuterComponent = nullptr;
 	}
 
 	bool GateComponent::LateAwake()
 	{
-		std::vector<rpc::IOuterSender *> gateComponents;
-		this->mApp->GetComponents(gateComponents);
-		for(rpc::IOuterSender * gateComponent : gateComponents)
-		{
-			char net = gateComponent->GetNet();
-			this->mOuterComponents.emplace(net, gateComponent);
-		}
 		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
 		LOG_CHECK_RET_FALSE(this->mRouter = this->GetComponent<RouterComponent>())
+		LOG_CHECK_RET_FALSE(this->mOuterComponent = this->mApp->GetComponent<rpc::IOuterSender>())
 		return true;
 	}
 
 	int GateComponent::Send(int id, rpc::Message* message)
 	{
-		char net = message->GetNet();
-		auto iter = this->mOuterComponents.find(net);
-		if(iter == this->mOuterComponents.end())
-		{
-			delete message;
-			return XCode::NotFoundSender;
-		}
-		if(iter->second->Send(id, message) != XCode::Ok)
+		if(this->mOuterComponent->Send(id, message) != XCode::Ok)
 		{
 			delete message;
 			return XCode::SendMessageFail;

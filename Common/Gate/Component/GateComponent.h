@@ -22,10 +22,10 @@ namespace acs
 		int OnRequest(rpc::Message * message);
 		int OnResponse(rpc::Message * message);
 	private:
-		math::NumberPool<int> mNumPool;
 		class ActorComponent * mActor;
+		math::NumberPool<int> mNumPool;
 		class RouterComponent * mRouter;
-		std::unordered_map<char, rpc::IOuterSender *> mOuterComponents;
+		rpc::IOuterSender * mOuterComponent;
 	};
 }
 

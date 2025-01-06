@@ -5,7 +5,6 @@
 #include"ChatSystem.h"
 #include"Util/Tools/TimeHelper.h"
 #include"Gate/Service/GateSystem.h"
-#include"Gate/Component/GateComponent.h"
 #include "Entity/Component/ActorComponent.h"
 constexpr int CHAT_TYPE_WORLD = 1;
 constexpr int CHAT_TYPE_PRIVATE = 2;
@@ -17,19 +16,15 @@ namespace acs
 	{
 		BIND_PLAYER_RPC_METHOD(ChatSystem::OnChat);
 		BIND_PLAYER_RPC_METHOD(ChatSystem::OnPing);
-		LOG_CHECK_RET_FALSE(this->mGate = this->GetComponent<GateComponent>())
 		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
 		return true;
 	}
 
 	bool ChatSystem::Awake()
 	{
-		REGISTER_JSON_CLASS_FIELD(FriendInfo, add_time);
-
 		FriendInfo::RegisterField("add_time", &FriendInfo::add_time);
 		FriendInfo::RegisterField("friend_id", &FriendInfo::friend_id);
 		FriendInfo::RegisterField("friend_list", &FriendInfo::friend_list);
-
 
 		LoginInfo::RegisterField("ip", &LoginInfo::ip);
 		LoginInfo::RegisterField("login_time", &LoginInfo::login_time);

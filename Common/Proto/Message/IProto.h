@@ -118,7 +118,7 @@ namespace tcp
 		}
 
 		template<typename T>
-		inline void Write(std::ostream& is, const T value)
+		inline void Write(std::ostream& is, const T&value)
 		{
 			char byteArr[sizeof(T)] = { 0 };
 			memcpy(byteArr, &value, sizeof(T));
