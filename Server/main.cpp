@@ -6,8 +6,8 @@
 #include "Server/Component/ThreadComponent.h"
 #include "Proto/Component/ProtoComponent.h"
 
-#include "Rpc/Component/InnerNetComponent.h"
-#include "Rpc/Component/OuterNetComponent.h"
+#include "Rpc/Component/InnerTcpComponent.h"
+#include "Rpc/Component/OuterTcpComponent.h"
 #include "Rpc/Component/DispatchComponent.h"
 
 #include "Http/Component/HttpComponent.h"
@@ -33,7 +33,7 @@
 
 #include "WX/Component/WeChatComponent.h"
 
-#include "Client/Component/ClientComponent.h"
+#include "Client/Component/TcpClientComponent.h"
 #include "Web/Service/LogMgr.h"
 #include "Http/Service/ResourceMgr.h"
 
@@ -86,6 +86,8 @@
 #include "Web/Service/MongoMgr.h"
 
 #include "Event/Service/EventSystem.h"
+
+#include "Client/Component/WsClientComponent.h"
 using namespace acs;
 
 void RegisterComponent()
@@ -98,13 +100,13 @@ void RegisterComponent()
 
 	REGISTER_COMPONENT(LaunchComponent);
 	REGISTER_COMPONENT(RouterComponent);
-	REGISTER_COMPONENT(InnerNetComponent);
+	REGISTER_COMPONENT(InnerTcpComponent);
 	REGISTER_COMPONENT(MasterComponent);
 	REGISTER_COMPONENT(DispatchComponent);
 	REGISTER_COMPONENT(ConfigComponent);
 
 	REGISTER_COMPONENT(GateComponent);
-	REGISTER_COMPONENT(OuterNetComponent);
+	REGISTER_COMPONENT(OuterTcpComponent);
 
 	REGISTER_COMPONENT(RedisSubComponent);
 	REGISTER_COMPONENT(RedisComponent);
@@ -122,7 +124,7 @@ void RegisterComponent()
 	REGISTER_COMPONENT(LoggerComponent);
 	REGISTER_COMPONENT(HttpWebComponent);
 	REGISTER_COMPONENT(HttpApiComponent);
-	REGISTER_COMPONENT(ClientComponent);
+	REGISTER_COMPONENT(TcpClientComponent);
 	REGISTER_COMPONENT(ListenerComponent);
 
 	REGISTER_COMPONENT(WeChatComponent);
@@ -144,6 +146,7 @@ void RegisterComponent()
 	REGISTER_COMPONENT(QuickComponent);
 	REGISTER_COMPONENT(InnerWebSocketComponent);
 	REGISTER_COMPONENT(OuterWebSocketComponent);
+	REGISTER_COMPONENT(WsClientComponent);
 }
 
 void RegisterAll()
@@ -184,6 +187,11 @@ int main(int argc, char** argv)
 	//system("chcp 65001 > nul");
 #endif
 
+	unsigned short num1 = 0;
+	unsigned short num = 140;
+	char buffer[sizeof(num)] = { 0};
+	tcp::Data::Write(buffer, num);
+	tcp::Data::Read(buffer, num1);
 	int id = 0;
 	RegisterAll();
 	std::string path;

@@ -46,7 +46,7 @@ namespace rpc
 		return true;
 	}
 
-	void InnerClient::OnSendMessage()
+	void InnerClient::OnSendMessage(size_t size)
 	{
 		if (!this->mSendMessages.empty())
 		{

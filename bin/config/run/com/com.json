@@ -6,23 +6,23 @@
     "net" : {
         "http" : "HttpWebComponent",
         "https" : "HttpWebComponent",
-        "rpc" : "InnerNetComponent",
-        "gate" : "OuterNetComponent",
+        "rpc" : "InnerTcpComponent",
+        "gate" : "OuterTcpComponent",
         "master" : "HttpWebComponent",
-        "ws" : "OuterWebSocketComponent"
+        "ws" : "InnerWebSocketComponent"
     },
     "listen" : {
         "rpc" : {
             "max_conn" : 512,
             "protocol" : "tcp",
             "address": "127.0.0.1:${rpc}",
-            "component" : "InnerNetComponent"
+            "component" : "InnerTcpComponent"
         },
         "gate" : {
             "max_conn" : 1024,
             "protocol" : "tcp",
             "address": "127.0.0.1:${gate}",
-            "component" : "OuterWebSocketComponent"
+            "component" : "OuterTcpComponent"
         },
         "http" : {
             "max_conn" : 256,

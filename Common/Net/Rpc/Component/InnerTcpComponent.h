@@ -9,12 +9,12 @@ struct lua_State;
 namespace acs
 {
 	// 管理内网rpc的session
-	class InnerNetComponent : public Component, public ITcpListen,
-		public IRpc<rpc::Message, rpc::Message>, public IServerRecord, public rpc::IInnerSender
+	class InnerTcpComponent : public Component, public ITcpListen,
+							  public IRpc<rpc::Message, rpc::Message>, public IServerRecord, public rpc::IInnerSender
 	{
 	 public:
-		InnerNetComponent();
-		~InnerNetComponent() override = default;
+		InnerTcpComponent();
+		~InnerTcpComponent() override = default;
 	 public:
 		void StartClose(int id) final;
 		void OnSendFailure(int id, rpc::Message * message) final;

@@ -53,7 +53,7 @@ namespace ws
 		this->mHttpResponse = nullptr;
 	}
 
-	void RequestClient::OnSendMessage()
+	void RequestClient::OnSendMessage(size_t size)
 	{
 		if(this->mHttpRequest != nullptr)
 		{
@@ -110,7 +110,17 @@ namespace ws
 			head.Add("Sec-WebSocket-Key", secWebSocketAccept);
 			head.Add("Sec-WebSocket-Version", 13);
 		}
+		this->ClearSendStream();
 		this->Write(*this->mHttpRequest);
+	}
+
+	void RequestClient::Close()
+	{
+		Asio::Context & context = this->mSocket->GetContext();
+		asio::post(context, [this, self = this->shared_from_this()] ()
+		{
+			this->Close(XCode::CloseSocket);
+		});
 	}
 
 	void RequestClient::Close(int code)
@@ -122,19 +132,24 @@ namespace ws
 
 		this->StopTimer();
 		this->mSocket->Close();
+		this->ClearSendStream();
+		this->ClearRecvStream();
 		while(!this->mWaitSendMessage.empty())
 		{
 			this->mWaitSendMessage.pop();
 		}
-		std::shared_ptr<Client> self = this->shared_from_this();
-		asio::post(this->mMainContext, [self, this, code, id = this->mSockId]()
+		if(code != XCode::CloseSocket)
 		{
-			this->mComponent->OnClientError(id, code);
-		});
+			std::shared_ptr<Client> self = this->shared_from_this();
+			asio::post(this->mMainContext, [self, this, code, id = this->mSockId]()
+			{
+				this->mComponent->OnClientError(id, code);
+			});
+		}
 		this->mSockId = 0;
 	}
 
-	void RequestClient::StartWrite(ws::Message* message)
+	void RequestClient::Send(ws::Message* message)
 	{
 		Asio::Context & context = this->mSocket->GetContext();
 		asio::post(context, [this, self = this->shared_from_this(), message] ()
@@ -154,7 +169,7 @@ namespace ws
 		}
 	}
 
-	void RequestClient::StartWrite(rpc::Message* message)
+	void RequestClient::Send(rpc::Message* message)
 	{
 		Asio::Context & context = this->mSocket->GetContext();
 		asio::post(context, [this, self = this->shared_from_this(), message] ()

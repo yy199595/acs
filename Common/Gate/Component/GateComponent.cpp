@@ -18,6 +18,8 @@ namespace acs
 
 	bool GateComponent::LateAwake()
 	{
+		std::vector<rpc::IOuterSender *> outerSenders;
+		LOG_CHECK_RET_FALSE(this->mApp->GetComponents(outerSenders) == 1);
 		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
 		LOG_CHECK_RET_FALSE(this->mRouter = this->GetComponent<RouterComponent>())
 		LOG_CHECK_RET_FALSE(this->mOuterComponent = this->mApp->GetComponent<rpc::IOuterSender>())

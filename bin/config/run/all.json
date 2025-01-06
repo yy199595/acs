@@ -18,7 +18,8 @@
 			"address": "127.0.0.1:${http}"
 		},
 		"gate": {
-			"address": "127.0.0.1:${gate}"
+			"address": "127.0.0.1:${gate}",
+			"component" : "OuterWebSocketComponent"
 		}
 	},
 	"master": {

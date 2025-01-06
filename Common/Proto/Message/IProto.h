@@ -9,13 +9,13 @@
 #include<istream>
 #include<string>
 #include<cstring>
+#include<cstdint>
 #include<unordered_map>
 #include <utility>
 struct lua_State;
 
 namespace tcp
 {
-
 	constexpr int ReadDone = 0;
 	constexpr int ReadOneLine = -1; //读一行
 	constexpr int ReadSomeMessage = -2; //读一些
@@ -109,6 +109,27 @@ namespace tcp
 			char Buffer[sizeof(T)] = { 0 };
 		};
 
+		inline bool IsBitEnDian()
+		{
+			return (*(uint16_t*)"\x01\x00" != 0x0001);
+		}
+
+		// 转换成大端
+		template<typename T>
+		inline T ToBigEnDian(const T value)
+		{
+			if(IsBitEnDian())
+			{
+				return value;
+			}
+			// 如果是小端，进行字节序转换
+			T result = 0;
+			for (size_t i = 0; i < sizeof(T); ++i) {
+				result |= ((value >> (i * 8)) & 0xFF) << ((sizeof(T) - 1 - i) * 8);
+			}
+			return result;
+		}
+
 		template<typename T>
 		inline void Read(std::istream& os, T& value)
 		{
@@ -123,6 +144,25 @@ namespace tcp
 			char byteArr[sizeof(T)] = { 0 };
 			memcpy(byteArr, &value, sizeof(T));
 			is.write(byteArr, sizeof(T));
+		}
+
+		template<typename T>
+		inline void Read(const char * buffer, T & value)
+		{
+			value = 0;
+			size_t size = sizeof(T); // 获取类型 T 的字节大小
+
+			for (size_t i = 0; i < size; ++i) {
+				value |= (static_cast<T>(static_cast<unsigned char>(buffer[i])) << ((size - 1 - i) * 8));
+			}
+		}
+		template<typename T>
+		inline void Write(char * buffer, const T&value)
+		{
+			size_t size = sizeof(T); // 获取类型 T 的字节大小
+			for (size_t i = 0; i < size; ++i) {
+				buffer[i] = static_cast<char>((value >> ((size - 1 - i) * 8)) & 0xFF);
+			}
 		}
 
 		inline void Write(std::ostream& os, const std::string& value)
@@ -140,6 +180,8 @@ namespace tcp
 				os.write(str, size);
 			}
 		}
+
+
 	}
 
 	class IHeader

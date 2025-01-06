@@ -16,13 +16,12 @@ namespace ws
 
 namespace acs
 {
-	class InnerWebSocketComponent : public ITcpListen, public rpc::IInnerSender, public IComplete,
+	class InnerWebSocketComponent : public ITcpListen, public rpc::IInnerSender,
 									public RpcComponent<rpc::Message>, public IRpc<rpc::Message, rpc::Message>
 	{
 	public:
 		InnerWebSocketComponent();
 	public:
-		void Complete() final;
 		bool LateAwake() final;
 		bool OnListen(tcp::Socket *socket) final;
 		void OnClientError(int id, int code) final;

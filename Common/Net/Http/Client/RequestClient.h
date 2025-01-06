@@ -32,7 +32,7 @@ namespace http
         void OnReceiveLine(std::istream &is, size_t) final;
         void OnReceiveMessage(std::istream & is, size_t, const Asio::Code &) final;
 	private:
-		void OnSendMessage() final;
+		void OnSendMessage(size_t size) final;
 		void OnSendMessage(const asio::error_code &code) final;
 	 private:
 		Component * mComponent;

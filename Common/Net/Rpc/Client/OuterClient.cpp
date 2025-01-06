@@ -175,7 +175,7 @@ namespace rpc
 		}
 	}
 
-	void OuterClient::OnSendMessage()
+	void OuterClient::OnSendMessage(size_t size)
 	{
 		if (!this->mSendMessages.empty())
 		{

@@ -33,16 +33,6 @@ namespace acs
 		return true;
 	}
 
-	void InnerWebSocketComponent::Complete()
-	{
-		std::unique_ptr<rpc::Message> rpcMessage = std::make_unique<rpc::Message>();
-		{
-			rpcMessage->SetContent("11223344");
-			rpcMessage->GetHead().Add("func", "ChatSystem.Ping");
-			this->Send(this->mApp->GetSrvId(), rpcMessage.release());
-		}
-	}
-
 	bool InnerWebSocketComponent::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
@@ -66,13 +56,13 @@ namespace acs
 		auto iter = this->mSessions.find(id);
 		if(iter != this->mSessions.end())
 		{
-			iter->second->StartWrite(message);
+			iter->second->Send(message);
 			return XCode::Ok;
 		}
 		auto iter1 = this->mClients.find(id);
 		if(iter1 != this->mClients.end())
 		{
-			iter1->second->StartWrite(message);
+			iter1->second->Send(message);
 			return XCode::Ok;
 		}
 		std::string address;
@@ -88,7 +78,7 @@ namespace acs
 			requestClient->SetSocket(tcpSocket);
 			this->mClients.emplace(id, requestClient);
 		}
-		requestClient->StartWrite(message);
+		requestClient->Send(message);
 		return XCode::SendMessageFail;
 	}
 
@@ -97,7 +87,7 @@ namespace acs
 		auto iter = this->mSessions.find(id);
 		if(iter != this->mSessions.end())
 		{
-			iter->second->StartWrite(message);
+			iter->second->Send(message);
 			return XCode::Ok;
 		}
 		auto iter1 = this->mClients.find(id);
@@ -105,7 +95,7 @@ namespace acs
 		{
 			return XCode::SendMessageFail;
 		}
-		iter1->second->StartWrite(message);
+		iter1->second->Send(message);
 		return XCode::Ok;
 	}
 

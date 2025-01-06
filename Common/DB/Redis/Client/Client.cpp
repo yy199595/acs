@@ -126,7 +126,7 @@ namespace redis
 
 	}
 
-	void Client::OnSendMessage()
+	void Client::OnSendMessage(size_t size)
 	{
 		this->ReadLine();
 		//LOG_WARN("redis cmd : {}", this->mRequest->ToString());

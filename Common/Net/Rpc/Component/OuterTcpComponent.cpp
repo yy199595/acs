@@ -2,7 +2,7 @@
 // Created by mac on 2021/11/28.
 //
 #include "XCode/XCode.h"
-#include"OuterNetComponent.h"
+#include"OuterTcpComponent.h"
 #include"Rpc/Client/OuterClient.h"
 #include"Server/Config/CodeConfig.h"
 
@@ -13,27 +13,27 @@
 
 namespace acs
 {
-	OuterNetComponent::OuterNetComponent()
+	OuterTcpComponent::OuterTcpComponent()
 	{
 		this->mGate = nullptr;
 		this->mWaitCount = 0;
 		this->mMaxConnectCount = 500;
 	}
 
-	bool OuterNetComponent::LateAwake()
+	bool OuterTcpComponent::LateAwake()
 	{
 		std::unique_ptr<json::r::Value> jsonObject;
 		if(ServerConfig::Inst()->Get("connect", jsonObject))
 		{
 			jsonObject->Get("outer", this->mMaxConnectCount);
 		}
-		help::PlayerLoginEvent::Add(this, &OuterNetComponent::OnPlayerLogin);
-		help::PlayerLogoutEvent::Add(this, &OuterNetComponent::OnPlayerLogout);
+		help::PlayerLoginEvent::Add(this, &OuterTcpComponent::OnPlayerLogin);
+		help::PlayerLogoutEvent::Add(this, &OuterTcpComponent::OnPlayerLogout);
 		LOG_CHECK_RET_FALSE(this->mGate = this->GetComponent<GateComponent>());
 		return true;
 	}
 
-	void OuterNetComponent::OnPlayerLogin(long long userId, int sockId)
+	void OuterTcpComponent::OnPlayerLogin(long long userId, int sockId)
 	{
 		auto iter = this->mGateClientMap.find(sockId);
 		if(iter != this->mGateClientMap.end())
@@ -48,7 +48,7 @@ namespace acs
 		}
 	}
 
-	void OuterNetComponent::OnPlayerLogout(long long userId, int sockId)
+	void OuterTcpComponent::OnPlayerLogout(long long userId, int sockId)
 	{
 		auto iter = this->mGateClientMap.find(sockId);
 		if(iter != this->mGateClientMap.end())
@@ -57,7 +57,7 @@ namespace acs
 		}
 	}
 
-	void OuterNetComponent::OnMessage(rpc::Message * message, rpc::Message *)
+	void OuterTcpComponent::OnMessage(rpc::Message * message, rpc::Message *)
 	{
 		int code = this->mGate->OnMessage(message);
 		if(code != XCode::Ok)
@@ -67,7 +67,7 @@ namespace acs
 		}
 	}
 
-	int OuterNetComponent::Send(int id, rpc::Message * message)
+	int OuterTcpComponent::Send(int id, rpc::Message * message)
 	{
 		if (message->GetType() == rpc::Type::Response)
 		{
@@ -82,7 +82,7 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	bool OuterNetComponent::OnListen(tcp::Socket * socket)
+	bool OuterTcpComponent::OnListen(tcp::Socket * socket)
 	{
 		if (this->mApp->GetStatus() < ServerStatus::Start)
 		{
@@ -100,7 +100,7 @@ namespace acs
 		return true;
 	}
 
-	void OuterNetComponent::OnClientError(int id, int code)
+	void OuterTcpComponent::OnClientError(int id, int code)
 	{
 		auto iter = this->mGateClientMap.find(id);
 		if(iter != this->mGateClientMap.end())
@@ -111,7 +111,7 @@ namespace acs
 		LOG_DEBUG("remove client({}) count:{}", id, this->mGateClientMap.size());
 	}
 
-	void OuterNetComponent::OnSendFailure(int id, rpc::Message* message)
+	void OuterTcpComponent::OnSendFailure(int id, rpc::Message* message)
 	{
 		int sockId = 0;
 		message->GetHead().Add(rpc::Header::code, XCode::SendMessageFail);
@@ -126,7 +126,7 @@ namespace acs
 		delete message;
 	}
 
-	void OuterNetComponent::StartClose(int id, int code)
+	void OuterTcpComponent::StartClose(int id, int code)
 	{
 		auto iter = this->mGateClientMap.find(id);
 		if(iter != this->mGateClientMap.end())
@@ -137,7 +137,7 @@ namespace acs
 		}
 	}
 
-    void OuterNetComponent::OnRecord(json::w::Document &document)
+    void OuterTcpComponent::OnRecord(json::w::Document &document)
     {
 		std::unique_ptr<json::w::Value> data = document.AddObject("outer");
 		{
@@ -146,7 +146,7 @@ namespace acs
 		}
     }
 
-	void OuterNetComponent::Broadcast(rpc::Message * message)
+	void OuterTcpComponent::Broadcast(rpc::Message * message)
 	{
 		message->SetType(rpc::Type::Request);
 		for(auto iter = this->mGateClientMap.begin(); iter != this->mGateClientMap.end(); iter++)

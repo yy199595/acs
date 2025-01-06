@@ -21,12 +21,12 @@ namespace rpc
 
 namespace acs
 {
-	class OuterNetComponent final : public Component, public ITcpListen, public rpc::IOuterSender,
+	class OuterTcpComponent final : public Component, public ITcpListen, public rpc::IOuterSender,
 									public IRpc<rpc::Message, rpc::Message>, public IServerRecord
 	{
 	 public:
-		OuterNetComponent();
-		~OuterNetComponent() final = default;
+		OuterTcpComponent();
+		~OuterTcpComponent() final = default;
 	public:
 		void StartClose(int id, int code) final;
 	private:

@@ -252,7 +252,7 @@ namespace http
 		}
 	}
 
-	void SessionClient::OnSendMessage()
+	void SessionClient::OnSendMessage(size_t size)
 	{
 		if (this->mResponse.Header().KeepAlive())
 		{

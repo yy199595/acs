@@ -10,7 +10,7 @@
 #include"Rpc/Service/LuaRpcService.h"
 #include"Http//Service/LuaHttpService.h"
 #include"Lua/Component/LuaComponent.h"
-#include"Rpc/Component/InnerNetComponent.h"
+#include"Rpc/Component/InnerTcpComponent.h"
 #include"Rpc/Component/DispatchComponent.h"
 #include"Router/Component/RouterComponent.h"
 
@@ -106,7 +106,7 @@ namespace acs
 	{
 		this->mApp->AddComponent<HttpComponent>();
 		this->mApp->AddComponent<RouterComponent>();
-		this->mApp->AddComponent<InnerNetComponent>();
+		this->mApp->AddComponent<InnerTcpComponent>();
 		this->mApp->AddComponent<DispatchComponent>();
 		for (const std::string& name: components)
 		{

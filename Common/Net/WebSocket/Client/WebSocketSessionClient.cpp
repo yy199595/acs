@@ -75,7 +75,7 @@ namespace ws
 		asio::post(context, [self, this]() { this->ReadLine(); });
 	}
 
-	void SessionClient::StartWrite(rpc::Message* message)
+	void SessionClient::Send(rpc::Message* message)
 	{
 		Asio::Context & context = this->mSocket->GetContext();
 		asio::post(context, [this, self = this->shared_from_this(), message] ()
@@ -91,7 +91,7 @@ namespace ws
 		});
 	}
 
-	void SessionClient::StartWrite(ws::Message* message)
+	void SessionClient::Send(ws::Message* message)
 	{
 		Asio::Context & context = this->mSocket->GetContext();
 		asio::post(context, [this, self = this->shared_from_this(), message] ()
@@ -246,6 +246,8 @@ namespace ws
 
 		this->StopTimer();
 		this->mSocket->Close();
+		this->ClearSendStream();
+		this->ClearRecvStream();
 		while(!this->mWaitSendMessage.empty())
 		{
 			this->mWaitSendMessage.pop();
@@ -313,7 +315,7 @@ namespace ws
 
 	}
 
-	void SessionClient::OnSendMessage()
+	void SessionClient::OnSendMessage(size_t size)
 	{
 		if(!this->mWaitSendMessage.empty())
 		{

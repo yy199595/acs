@@ -40,6 +40,7 @@ namespace ws
 		const std::string & GetMessageBody() const { return this->mMessage; }
 		void SetBody(unsigned char opcode, const std::string & message, bool mask = true);
 	private:
+		size_t mOffset;
 		Header mHeader;
 		char mMaskingKey[4];
 		std::string mMessage;

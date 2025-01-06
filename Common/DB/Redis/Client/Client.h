@@ -27,8 +27,8 @@ namespace redis
 		std::unique_ptr<Response> ReadResponse(std::unique_ptr<Request> command);
 	private:
 		void OnResponse();
-		void OnSendMessage() final;
 		void OnReceiveOnce(int len);
+		void OnSendMessage(size_t size) final;
 		bool InitRedisClient(const std::string& pwd);
 		void OnReadError(const Asio::Code &code) final;
 		void OnSendMessage(const Asio::Code &code) final;

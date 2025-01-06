@@ -20,11 +20,12 @@ namespace ws
 	public:
 		RequestClient(int id, Component * component, Asio::Context & main);
 	public:
-		void StartWrite(ws::Message * message);
-		void StartWrite(rpc::Message * message);
+		void Close();
+		void Send(ws::Message * message);
+		void Send(rpc::Message * message);
 	private:
 		void OnUpdate() final;
-		void OnSendMessage() final;
+		void OnSendMessage(size_t size) final;
 		void OnConnect(bool result, int count) final;
 		void OnReadError(const Asio::Code &code) final;
 		void OnSendMessage(const Asio::Code &code) final;

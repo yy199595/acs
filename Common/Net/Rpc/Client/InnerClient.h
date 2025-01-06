@@ -23,7 +23,7 @@ namespace rpc
 	 private:
 		void CloseSocket();
 		void CloseSocket(int code);
-		void OnSendMessage() final;
+		void OnSendMessage(size_t size) final;
 		void AddToSendQueue(rpc::Message * message);
 		void OnTimeout(tcp::TimeoutFlag flag) final;
 		void OnConnect(bool result, int count) final;

@@ -111,7 +111,7 @@ namespace http
 		this->Write(*this->mRequest);
 	}
 
-	void RequestClient::OnSendMessage()
+	void RequestClient::OnSendMessage(size_t size)
 	{
 		this->ReadLine(this->mRequest->Timeout());
 	}

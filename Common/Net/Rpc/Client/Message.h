@@ -138,30 +138,42 @@ namespace tcp
 		inline void Read(const char * buffer, rpc::ProtoHead & head)
 		{
 			int offset = sizeof(head.Len);
-			memcpy(&head.Len, buffer, sizeof(head.Len));
+			tcp::Data::Read(buffer, head.Len);
 			{
 				head.Type = buffer[offset++];
 				head.Porto = buffer[offset++];
 				head.Source = buffer[offset++];
 			}
-			memcpy(&head.RpcId, buffer + offset, sizeof(head.RpcId));
+			tcp::Data::Read(buffer + offset, head.RpcId);
 		}
 		template<> inline void Read(std::istream& os, rpc::ProtoHead& value)
 		{
-			os.readsome((char *)&value.Len, sizeof(value.Len));
+			char buffer[rpc::RPC_PACK_HEAD_LEN] = { 0 };
+			os.readsome(buffer, rpc::RPC_PACK_HEAD_LEN);
+
+			int offset = sizeof(value.Len);
+			tcp::Data::Read(buffer, value.Len);
 			{
-				value.Type = (char)os.get();
-				value.Porto = (char)os.get();
-				value.Source = (char)os.get();
+				value.Type = buffer[offset++];
+				value.Porto = buffer[offset++];
+				value.Source = buffer[offset++];
 			}
-			os.readsome((char *)&value.RpcId, sizeof(value.RpcId));
+			tcp::Data::Read(buffer + offset, value.RpcId);
+
 		}
 
 		template<> inline void Write(std::ostream& is, const rpc::ProtoHead & value)
 		{
-			is.write((char*)&value.Len, sizeof(value.Len));
-			is << value.Type << value.Porto << value.Source;
-			is.write((char*)&value.RpcId, sizeof(value.RpcId));
+			char buffer[rpc::RPC_PACK_HEAD_LEN] = { 0 };
+
+			int offset = sizeof(value.Len);
+			tcp::Data::Write(buffer, value.Len);
+			{
+				buffer[offset++] = value.Type;
+				buffer[offset++] = value.Porto;
+				buffer[offset++] = value.Source;
+			}
+			tcp::Data::Write(buffer + offset, value.RpcId);
 		}
 	}
 }

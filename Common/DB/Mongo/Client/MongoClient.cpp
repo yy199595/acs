@@ -74,21 +74,21 @@ namespace mongo
 	}
 
     Client::Client(tcp::Socket * socket, Component * component,
-			const MongoConfig & config, Asio::Context & io)
-		: tcp::Client(socket, 0), mComponent(component), mConfig(config), mMainContext(io)
+			MongoConfig config, Asio::Context & io)
+		: tcp::Client(socket, 0), mComponent(component), mConfig(std::move(config)), mMainContext(io)
 	{
 		this->mRequest = nullptr;
 		this->mResponse = nullptr;
 	}
 
-	Client::Client(tcp::Socket * socket, const MongoConfig &  config, Asio::Context & io)
-		: tcp::Client(socket, 0), mComponent(nullptr), mConfig(config), mMainContext(io)
+	Client::Client(tcp::Socket * socket, MongoConfig  config, Asio::Context & io)
+		: tcp::Client(socket, 0), mComponent(nullptr), mConfig(std::move(config)), mMainContext(io)
 	{
 		this->mRequest = nullptr;
 		this->mResponse = nullptr;
 	}
 
-	void Client::OnSendMessage()
+	void Client::OnSendMessage(size_t size)
 	{
 		this->ReadLength(sizeof(Head));
 //		if(this->mSendMessages.Size() >= 10)

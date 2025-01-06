@@ -25,12 +25,12 @@ namespace ws
 		~SessionClient() final;
 	public:
 		void Stop();
-		void StartWrite(rpc::Message * message);
-		void StartWrite(ws::Message * message);
+		void Send(rpc::Message * message);
+		void Send(ws::Message * message);
 		void StartReceive(tcp::Socket * tcpSocket);
 	private:
 		void OnUpdate() final;
-		void OnSendMessage() final;
+		void OnSendMessage(size_t size) final;
 		void OnReadError(const Asio::Code &code) final;
 		void OnSendMessage(const Asio::Code &code) final;
 		void OnReceiveLine(std::istream &readStream, size_t size) final;

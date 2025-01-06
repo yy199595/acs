@@ -16,8 +16,8 @@ namespace mongo
 	{
 	 public:
 		typedef acs::IRpc<Request, Response> Component;
-		Client(tcp::Socket * socket, const MongoConfig & config, Asio::Context & io);
-		Client(tcp::Socket * socket, Component * component, const MongoConfig& config, Asio::Context & io);
+		Client(tcp::Socket * socket, MongoConfig  config, Asio::Context & io);
+		Client(tcp::Socket * socket, Component * component, MongoConfig  config, Asio::Context & io);
 	public:
         void Stop();
 		bool Start(bool async = true);
@@ -35,7 +35,7 @@ namespace mongo
         bool Auth(const std::string & user, const std::string & db, const std::string & pwd);
 		void OnResponse(int code, std::unique_ptr<Request> request, std::unique_ptr<Response> response);
 	private:
-		void OnSendMessage() final;
+		void OnSendMessage(size_t size) final;
 		void OnConnect(bool result, int count) final;
 		void OnSendMessage(const asio::error_code &code) final;
 	private:

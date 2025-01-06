@@ -2,7 +2,7 @@
 // Created by leyi on 2023/9/11.
 //
 
-#include "ClientComponent.h"
+#include "WsClientComponent.h"
 #include "Yyjson/Lua/ljson.h"
 #include "Util/Tools/String.h"
 #include "Lua/Component/LuaComponent.h"
@@ -12,7 +12,7 @@
 #include "Rpc/Component/DispatchComponent.h"
 namespace acs
 {
-	ClientComponent::ClientComponent()
+	WsClientComponent::WsClientComponent()
 	{
 		this->mIndex = 0;
 		this->mProto = nullptr;
@@ -20,7 +20,7 @@ namespace acs
 		this->mLuaComponent = nullptr;
 	}
 
-	bool ClientComponent::LateAwake()
+	bool WsClientComponent::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(this->mProto = this->GetComponent<ProtoComponent>())
 		LOG_CHECK_RET_FALSE(this->mLuaComponent = this->GetComponent<LuaComponent>())
@@ -28,7 +28,7 @@ namespace acs
 		return true;
 	}
 
-	int ClientComponent::Connect(const std::string& address)
+	int WsClientComponent::Connect(const std::string& address)
 	{
 		std::string ip;
 		unsigned short port = 0;
@@ -39,7 +39,7 @@ namespace acs
 		int id = ++this->mIndex;
 		Asio::Context & context = this->mApp->GetContext();
 		std::unique_ptr<tcp::Socket> tcpSocket = std::make_unique<tcp::Socket>(context);
-		std::shared_ptr<rpc::InnerClient> client = std::make_shared<rpc::InnerClient>(id, this, true, context);
+		std::shared_ptr<ws::RequestClient> client = std::make_shared<ws::RequestClient>(id, this, context);
 		{
 			tcpSocket->Init(ip, port);
 			client->SetSocket(tcpSocket.release());
@@ -48,26 +48,27 @@ namespace acs
 		return id;
 	}
 
-	int ClientComponent::Send(int id, rpc::Message * message)
+	int WsClientComponent::Send(int id, rpc::Message * message)
 	{
 		auto iter = this->mClientMap.find(id);
 		if(iter == this->mClientMap.end())
 		{
 			return XCode::NetWorkError;
 		}
-		return iter->second->Send(message) ? XCode::Ok : XCode::SendMessageFail;
+		iter->second->Send(message);
+		return XCode::Ok;
 	}
 
-	void ClientComponent::OnLuaRegister(Lua::ModuleClass& luaRegister)
+	void WsClientComponent::OnLuaRegister(Lua::ModuleClass& luaRegister)
 	{
-		luaRegister.AddFunction("Send", LuaClient::Send);
-		luaRegister.AddFunction("Call", LuaClient::Call);
-		luaRegister.AddFunction("Close", LuaClient::Close);
-		luaRegister.AddFunction("Connect", LuaClient::Connect);
+		luaRegister.AddFunction("Send", LuaWsClient::Send);
+		luaRegister.AddFunction("Call", LuaWsClient::Call);
+		luaRegister.AddFunction("Close", LuaWsClient::Close);
+		luaRegister.AddFunction("Connect", LuaWsClient::Connect);
 		luaRegister.End("net.client");
 	}
 
-	void ClientComponent::OnSendFailure(int id, rpc::Message* message)
+	void WsClientComponent::OnSendFailure(int id, rpc::Message* message)
 	{
 		if(message->GetType() == rpc::Type::Request && message->GetRpcId() > 0)
 		{
@@ -79,7 +80,7 @@ namespace acs
 		delete message;
 	}
 
-	void ClientComponent::OnMessage(rpc::Message* message, rpc::Message* response)
+	void WsClientComponent::OnMessage(rpc::Message* message, rpc::Message* response)
 	{
 		int code = XCode::Failure;
 		switch(message->GetType())
@@ -97,7 +98,7 @@ namespace acs
 		}
 	}
 
-	int ClientComponent::Remove(int id)
+	int WsClientComponent::Remove(int id)
 	{
 		auto iter = this->mClientMap.find(id);
 		if(iter == this->mClientMap.end())
@@ -109,7 +110,7 @@ namespace acs
 		return 1;
 	}
 
-	void ClientComponent::OnClientError(int id, int code)
+	void WsClientComponent::OnClientError(int id, int code)
 	{
 		auto iter = this->mClientMap.find(id);
 		if(iter == this->mClientMap.end())
@@ -119,7 +120,7 @@ namespace acs
 		this->mClientMap.erase(iter);
 	}
 
-	int ClientComponent::OnRequest(rpc::Message* message)
+	int WsClientComponent::OnRequest(rpc::Message* message)
 	{
 		const std::string & func = message->GetHead().GetStr("func");
 		const RpcMethodConfig * methodConfig = RpcConfig::Inst()->GetMethodConfig(func);

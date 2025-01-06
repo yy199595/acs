@@ -2,19 +2,19 @@
 // Created by leyi on 2023/9/11.
 //
 
-#ifndef APP_CLIENTCOMPONENT_H
-#define APP_CLIENTCOMPONENT_H
+#ifndef APP_WSCLIENTCOMPONENT_H
+#define APP_WSCLIENTCOMPONENT_H
 #include"Rpc/Client/Message.h"
-#include"Rpc/Client/InnerClient.h"
 #include"Entity/Component/Component.h"
+#include"WebSocket/Client/WebSocketClient.h"
 
 namespace acs
 {
-	class ClientComponent final : public Component,
-								  public IRpc<rpc::Message, rpc::Message>, public rpc::IInnerSender, public ILuaRegister
+	class WsClientComponent final : public Component,
+									 public IRpc<rpc::Message, rpc::Message>, public rpc::IInnerSender, public ILuaRegister
 	{
 	public:
-		ClientComponent();
+		WsClientComponent();
 	public:
 		int Remove(int id);
 		int Connect(const std::string & address);
@@ -34,11 +34,11 @@ namespace acs
 		class ProtoComponent * mProto;
 		class LuaComponent * mLuaComponent;
 		class DispatchComponent * mDisComponent;
-		std::queue<std::unique_ptr<rpc::InnerClient>> mClientQueue;
-		std::unordered_map<int, std::shared_ptr<rpc::InnerClient>> mClientMap;
+		std::queue<std::unique_ptr<ws::RequestClient>> mClientQueue;
+		std::unordered_map<int, std::shared_ptr<ws::RequestClient>> mClientMap;
 
 	};
 }
 
 
-#endif //APP_CLIENTCOMPONENT_H
+#endif //APP_WSCLIENTCOMPONENT_H

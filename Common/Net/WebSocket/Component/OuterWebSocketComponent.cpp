@@ -61,7 +61,7 @@ namespace acs
 		auto iter = this->mSessions.find(id);
 		if(iter != this->mSessions.end())
 		{
-			iter->second->StartWrite(message);
+			iter->second->Send(message);
 			return XCode::Ok;
 		}
 		return XCode::SendMessageFail;

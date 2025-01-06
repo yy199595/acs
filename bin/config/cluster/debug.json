@@ -27,17 +27,15 @@
             "ActorComponent",
             "GateComponent",
             "ProtoComponent",
-            "ClientComponent",
             "HttpWebComponent",
             "WXNoticeComponent",
             "WatchComponent",
             "HttpApiComponent",
-            "ClientComponent",
             "KcpComponent",
             "UdpComponent",
             "RedisComponent",
             "MongoDBComponent",
-            "OuterWebSocketComponent"
+            "WsClientComponent"
         ]
     }
 }

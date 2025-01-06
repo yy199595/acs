@@ -1,5 +1,5 @@
 ﻿
-#include"InnerNetComponent.h"
+#include"InnerTcpComponent.h"
 #include"XCode/XCode.h"
 #include"Entity/Actor/App.h"
 #include"Core/System/System.h"
@@ -11,7 +11,7 @@
 namespace acs
 {
 
-    InnerNetComponent::InnerNetComponent()
+    InnerTcpComponent::InnerTcpComponent()
 		: mNumPool(SERVER_MAX_COUNT)
     {
 		this->mActor = nullptr;
@@ -19,7 +19,7 @@ namespace acs
 		this->mDispatch = nullptr;
     }
 
-    bool InnerNetComponent::LateAwake()
+    bool InnerTcpComponent::LateAwake()
 	{
 		LOG_CHECK_RET_FALSE(this->mActor = this->GetComponent<ActorComponent>())
 		LOG_CHECK_RET_FALSE(this->mThread = this->GetComponent<ThreadComponent>())
@@ -27,7 +27,7 @@ namespace acs
 		return true;
 	}
 
-    void InnerNetComponent::OnMessage(rpc::Message * message, rpc::Message *) noexcept
+    void InnerTcpComponent::OnMessage(rpc::Message * message, rpc::Message *) noexcept
 	{
 		int code = XCode::Ok;
 		message->SetNet(rpc::Net::Tcp);
@@ -80,7 +80,7 @@ namespace acs
 		}
 	}
 
-	int InnerNetComponent::OnForward(rpc::Message* message)
+	int InnerTcpComponent::OnForward(rpc::Message* message)
 	{
 		int target = 0;
 		int code = XCode::Ok;
@@ -108,7 +108,7 @@ namespace acs
 		return XCode::Ok;
 	}
 
-    void InnerNetComponent::OnSendFailure(int, rpc::Message * message)
+    void InnerTcpComponent::OnSendFailure(int, rpc::Message * message)
     {
         if (message->GetType() == rpc::Type::Request && message->GetRpcId() > 0)
 		{
@@ -122,7 +122,7 @@ namespace acs
 		delete message;
     }
 
-	bool InnerNetComponent::OnListen(tcp::Socket * socket)
+	bool InnerTcpComponent::OnListen(tcp::Socket * socket)
 	{
 		int id = this->mNumPool.BuildNumber();
 		Asio::Context & io = this->mApp->GetContext();
@@ -134,7 +134,7 @@ namespace acs
 		return true;
 	}
 
-	void InnerNetComponent::OnClientError(int id, int code)
+	void InnerTcpComponent::OnClientError(int id, int code)
 	{
 		auto iter = this->mClients.find(id);
 		if(iter != this->mClients.end())
@@ -144,7 +144,7 @@ namespace acs
 		}
 	}
 
-    void InnerNetComponent::StartClose(int id)
+    void InnerTcpComponent::StartClose(int id)
     {
 		auto iter = this->mClients.find(id);
 		if(iter != this->mClients.end())
@@ -155,7 +155,7 @@ namespace acs
 		}
     }
 
-	rpc::InnerClient * InnerNetComponent::GetClient(int id)
+	rpc::InnerClient * InnerTcpComponent::GetClient(int id)
 	{
 		auto iter = this->mClients.find(id);
 		if(iter != this->mClients.end())
@@ -182,7 +182,7 @@ namespace acs
 		return tcpClient.get();
 	}
 
-    int InnerNetComponent::Send(int id, rpc::Message * message)
+    int InnerTcpComponent::Send(int id, rpc::Message * message)
     {
 
         rpc::InnerClient * clientSession = this->GetClient(id);
@@ -194,7 +194,7 @@ namespace acs
         return clientSession->Send(message) ? XCode::Ok : XCode::SendMessageFail;
     }
 
-    void InnerNetComponent::OnRecord(json::w::Document &document)
+    void InnerTcpComponent::OnRecord(json::w::Document &document)
     {
 		std::unique_ptr<json::w::Value> data = document.AddObject("inner");
 		{
@@ -202,7 +202,7 @@ namespace acs
 		}
     }
 
-	int InnerNetComponent::OnRequest(rpc::Message * message) noexcept
+	int InnerTcpComponent::OnRequest(rpc::Message * message) noexcept
 	{
 		int code = this->mDispatch->OnMessage(message);
 		if (code != XCode::Ok)

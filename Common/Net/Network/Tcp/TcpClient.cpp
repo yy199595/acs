@@ -308,7 +308,7 @@ namespace tcp
 				self->Write(message, 0);
 				return;
 			}
-			self->OnSendMessage();
+			self->OnSendMessage(size);
 		};
 
 #ifdef __ENABLE_OPEN_SSL__

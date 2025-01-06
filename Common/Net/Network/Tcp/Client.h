@@ -66,7 +66,7 @@ namespace tcp
         virtual void OnReceiveLine(std::istream & readStream, size_t size) {}
         virtual void OnReceiveMessage(std::istream & readStream, size_t size, const asio::error_code & code) {}
 	protected:
-		virtual void OnSendMessage() { }
+		virtual void OnSendMessage(size_t size) { }
 		virtual void OnSendMessage(const Asio::Code & code) {  };
 	protected:
 		const size_t mMaxCount;

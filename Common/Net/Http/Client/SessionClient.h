@@ -41,7 +41,7 @@ namespace http
         void OnReceiveMessage(std::istream & is, size_t, const Asio::Code &) final;
 	private:
 		void Clear();
-		void OnSendMessage() final;
+		void OnSendMessage(size_t size) final;
         void OnSendMessage(const asio::error_code &code) final;
 	public:
 		std::string mPath;
