@@ -16,7 +16,7 @@ namespace ws
 #include "WebSocket/Common/WebSocketMessage.h"
 namespace acs
 {
-	class OuterWebSocketComponent : public ITcpListen, public rpc::IOuterSender,
+	class OuterWebSocketComponent : public ITcpListen, public rpc::IOuterSender, public IServerRecord,
 							 public RpcComponent<rpc::Message>, public IRpc<rpc::Message, rpc::Message>
 	{
 	public:
@@ -31,9 +31,11 @@ namespace acs
 		int Send(int id, rpc::Message *message) final;
 		char GetNet() const final { return rpc::Net::Ws; }
 	private:
+		void OnRecord(json::w::Document &document) final;
 		void OnPlayerLogin(long long userId, int sockId);
 		void OnPlayerLogout(long long userId, int sockId);
 	private:
+		unsigned int mSumCount;
 		class GateComponent * mGate;
 		math::NumberPool<int> mClientPool;
 		std::unordered_map<int, std::shared_ptr<ws::SessionClient>> mSessions;

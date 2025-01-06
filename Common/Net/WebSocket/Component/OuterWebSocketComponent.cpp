@@ -17,6 +17,7 @@ namespace acs
 			: mClientPool(SERVER_MAX_COUNT)
 	{
 		this->mGate = nullptr;
+		this->mSumCount = 0;
 	}
 
 	bool OuterWebSocketComponent::OnListen(tcp::Socket* socket)
@@ -43,6 +44,7 @@ namespace acs
 
 	void OuterWebSocketComponent::OnMessage(int id, rpc::Message* request, rpc::Message* response)
 	{
+		++this->mSumCount;
 		int code = this->mGate->OnMessage(request);
 		if(code != XCode::Ok)
 		{
@@ -97,6 +99,15 @@ namespace acs
 		{
 			iter->second->Stop();
 			this->mSessions.erase(iter);
+		}
+	}
+
+	void OuterWebSocketComponent::OnRecord(json::w::Document& document)
+	{
+		std::unique_ptr<json::w::Value> jsonObject = document.AddObject("ws");
+		{
+			jsonObject->Add("sum", this->mSumCount);
+			jsonObject->Add("client", this->mSessions.size());
 		}
 	}
 }
