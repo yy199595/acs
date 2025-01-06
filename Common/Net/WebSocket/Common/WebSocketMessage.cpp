@@ -37,17 +37,17 @@ namespace ws
 		}
 		else if (this->mMessage.size() <= USHORT_COUNT)
 		{
-			buffer = std::make_unique<char[]>(2);  // 使用 2 个字节表示长度
 			this->mHeader.mLength = 126;
+			buffer = std::make_unique<char[]>(2);  // 使用 2 个字节表示长度
 			unsigned short size = this->mMessage.size();
-			tcp::Data::Write(buffer.get(), size);
+			tcp::Data::Write<unsigned short >(buffer.get(), size);
 		}
 		else
 		{
-			buffer = std::make_unique<char[]>(8);  // 使用 8 个字节表示长度
 			this->mHeader.mLength = 127;
+			buffer = std::make_unique<char[]>(8);  // 使用 8 个字节表示长度
 			unsigned long long size = this->mMessage.size();
-			tcp::Data::Write(buffer.get(), size);
+			tcp::Data::Write<unsigned long long>(buffer.get(), size);
 		}
 
 		// 构建第一个字节 (FIN + RSV + Opcode)
@@ -65,10 +65,7 @@ namespace ws
 		}
 		maskAndLengthByte |= this->mHeader.mLength;
 		os << maskAndLengthByte;
-		if(this->mHeader.mMask)
-		{
-			os.write(this->mMaskingKey, 4);
-		}
+
 		if (this->mHeader.mLength == 126)
 		{
 			os.write(buffer.get(), 2);
@@ -77,7 +74,10 @@ namespace ws
 		{
 			os.write(buffer.get(), 8);
 		}
-
+		if(this->mHeader.mMask)
+		{
+			os.write(this->mMaskingKey, 4);
+		}
 		os.write(this->mMessage.c_str(), this->mMessage.size());
 		return 0;
 	}

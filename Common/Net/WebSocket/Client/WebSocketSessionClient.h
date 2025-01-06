@@ -28,6 +28,7 @@ namespace ws
 		void Send(rpc::Message * message);
 		void Send(ws::Message * message);
 		void StartReceive(tcp::Socket * tcpSocket);
+		inline void BindPlayerID(long long id) { this->mPlayerId = id; }
 	private:
 		void OnUpdate() final;
 		void OnSendMessage(size_t size) final;

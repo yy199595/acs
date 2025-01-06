@@ -31,6 +31,9 @@ namespace acs
 		int Send(int id, rpc::Message *message) final;
 		char GetNet() const final { return rpc::Net::Ws; }
 	private:
+		void OnPlayerLogin(long long userId, int sockId);
+		void OnPlayerLogout(long long userId, int sockId);
+	private:
 		class GateComponent * mGate;
 		math::NumberPool<int> mClientPool;
 		std::unordered_map<int, std::shared_ptr<ws::SessionClient>> mSessions;

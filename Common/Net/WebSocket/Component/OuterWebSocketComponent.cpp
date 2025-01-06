@@ -9,6 +9,7 @@
 #include "WebSocket/Common/WebSocketMessage.h"
 #include "WebSocket/Client/WebSocketClient.h"
 #include "WebSocket/Client/WebSocketSessionClient.h"
+#include "Core/Event/IEvent.h"
 
 namespace acs
 {
@@ -31,8 +32,11 @@ namespace acs
 		return true;
 	}
 
+
 	bool OuterWebSocketComponent::LateAwake()
 	{
+		help::PlayerLoginEvent::Add(this, &OuterWebSocketComponent::OnPlayerLogin);
+		help::PlayerLogoutEvent::Add(this, &OuterWebSocketComponent::OnPlayerLogout);
 		LOG_CHECK_RET_FALSE(this->mGate = this->GetComponent<GateComponent>())
 		return true;
 	}
@@ -74,6 +78,25 @@ namespace acs
 		{
 			this->mSessions.erase(iter);
 			LOG_WARN("remove ws client id:{} code=>{}", id, code);
+		}
+	}
+
+	void OuterWebSocketComponent::OnPlayerLogin(long long userId, int sockId)
+	{
+		auto iter = this->mSessions.find(sockId);
+		if(iter != this->mSessions.end())
+		{
+			iter->second->BindPlayerID(userId);
+		}
+	}
+
+	void OuterWebSocketComponent::OnPlayerLogout(long long userId, int sockId)
+	{
+		auto iter = this->mSessions.find(sockId);
+		if(iter != this->mSessions.end())
+		{
+			iter->second->Stop();
+			this->mSessions.erase(iter);
 		}
 	}
 }

@@ -180,8 +180,8 @@ namespace ws
 				message->OnSendMessage(this->mStream);
 				wsMessage->SetBody(ws::OPCODE_BIN, this->mStream.str(), true);
 			}
-			this->AddToSendQueue(std::move(wsMessage));
 			delete message;
+			this->AddToSendQueue(std::move(wsMessage));
 		});
 	}
 
@@ -260,7 +260,7 @@ namespace ws
 				request->SetSockId(this->mSockId);
 				asio::post(this->mMainContext, [self, this, req = request.release()]
 				{
-					this->mComponent->OnMessage(this->mSockId, req, nullptr);
+					this->mComponent->OnMessage(req, nullptr);
 				});
 				this->mMessage->Clear();
 				this->ReadSome();

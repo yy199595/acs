@@ -74,6 +74,15 @@ namespace acs
 		assert(message->GetHead().Has(rpc::Header::client_sock_id));
 		const std::string& fullName = message->GetHead().GetStr(rpc::Header::func);
 		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
+		switch(this->mOuterComponent->GetNet())
+		{
+			case rpc::Net::Ws:
+			LOG_DEBUG("[ws:{}] call =>{}", message->SockId(), fullName);
+				break;
+			case rpc::Net::Tcp:
+			LOG_DEBUG("[tcp:{}] call =>{}", message->SockId(), fullName);
+				break;
+		}
 		if (methodConfig == nullptr || !methodConfig->IsClient || !methodConfig->IsOpen)
 		{
 			LOG_ERROR("call function not exist : {}", fullName)
