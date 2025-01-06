@@ -7,6 +7,9 @@
 #include "Rpc/Config/MethodConfig.h"
 #include "Entity/Component/ActorComponent.h"
 #include "Router/Component/RouterComponent.h"
+#ifdef __DEBUG__
+#include "Util/Tools/TimeHelper.h"
+#endif
 namespace acs
 {
 	GateComponent::GateComponent()
@@ -43,18 +46,34 @@ namespace acs
 
 	int GateComponent::OnMessage(rpc::Message* message)
 	{
+#ifdef __DEBUG__
+		rpc::Head& head = message->GetHead();
+		long long nowTime = help::Time::NowMil();
+#endif
 		int code = XCode::Failure;
 		switch (message->GetType())
 		{
 			case rpc::Type::Request:
+#ifdef __DEBUG__
+				head.Add("t1", nowTime);
+#endif
 				code = this->OnRequest(message);
 				break;
 			case rpc::Type::Response:
+			{
+#ifdef __DEBUG__
+				std::string func;
+				long long startTime = 0;
+				head.Get("t1", startTime);
+				head.Get(rpc::Header::func, func);
+				LOG_INFO("call [{}] use time => {}ms", func, nowTime - startTime);
+#endif
+			}
 				code = this->OnResponse(message);
 				break;
 			default:
 				code = XCode::UnKnowPacket;
-			LOG_ERROR("unknown message {}", message->ToString());
+				LOG_ERROR("unknown message {}", message->ToString());
 				break;
 		}
 		if (code != XCode::Ok)
@@ -74,15 +93,6 @@ namespace acs
 		assert(message->GetHead().Has(rpc::Header::client_sock_id));
 		const std::string& fullName = message->GetHead().GetStr(rpc::Header::func);
 		const RpcMethodConfig* methodConfig = RpcConfig::Inst()->GetMethodConfig(fullName);
-		switch(this->mOuterComponent->GetNet())
-		{
-			case rpc::Net::Ws:
-			LOG_DEBUG("[ws:{}] call =>{}", message->SockId(), fullName);
-				break;
-			case rpc::Net::Tcp:
-			LOG_DEBUG("[tcp:{}] call =>{}", message->SockId(), fullName);
-				break;
-		}
 		if (methodConfig == nullptr || !methodConfig->IsClient || !methodConfig->IsOpen)
 		{
 			LOG_ERROR("call function not exist : {}", fullName)
