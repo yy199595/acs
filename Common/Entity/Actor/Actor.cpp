@@ -27,19 +27,19 @@ namespace acs
 		return this->OnInit();
 	}
 
-	int Actor::Send(const std::string& func)
+	int Actor::Send(const std::string& func) const
 	{
 		std::unique_ptr<rpc::Message> message;
-		int code = this->Make(func, message);
+		const int code = this->Make(func, message);
 		if(code != XCode::Ok)
 		{
 			return code;
 		}
-		int id = message->SockId();
+		const int id = message->SockId();
 		return this->mRouter->Send(id, std::move(message));
 	}
 
-	int Actor::Send(const std::string& func, const pb::Message& request)
+	int Actor::Send(const std::string& func, const pb::Message& request) const
 	{
 		std::unique_ptr<rpc::Message> message;
 		int code = this->Make(func, message);
@@ -55,7 +55,7 @@ namespace acs
 		return this->mRouter->Send(id, std::move(message));
 	}
 
-	int Actor::Call(const std::string& func)
+	int Actor::Call(const std::string& func) const
 	{
 		std::unique_ptr<rpc::Message> message ;
 		int code = this->Make(func, message);
@@ -68,7 +68,7 @@ namespace acs
 		return result != nullptr ? result->GetCode() : XCode::NetTimeout;
 	}
 	
-	int Actor::Call(const std::string& func, const pb::Message& request)
+	int Actor::Call(const std::string& func, const pb::Message& request) const
 	{
 		std::unique_ptr<rpc::Message> message;
 		int code = this->Make(func, message);
@@ -85,7 +85,7 @@ namespace acs
 		return result != nullptr ? result->GetCode() : XCode::NetWorkError;
 	}
 
-	int Actor::Call(const std::string& func, pb::Message * response)
+	int Actor::Call(const std::string& func, pb::Message * response) const
 	{
 		std::unique_ptr<rpc::Message> message;
 		int code = this->Make(func, message);
@@ -208,13 +208,13 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	int Actor::LuaCall(lua_State* lua, std::unique_ptr<rpc::Message> message)
+	int Actor::LuaCall(lua_State* lua, std::unique_ptr<rpc::Message> message) const
 	{
 		int id = message->SockId();
 		return this->mRouter->LuaCall(lua, id, std::move(message));
 	}
 
-	int Actor::LuaSend(lua_State* lua, std::unique_ptr<rpc::Message> message)
+	int Actor::LuaSend(lua_State* lua, std::unique_ptr<rpc::Message> message) const
 	{
 		int id = message->SockId();
 		int code = this->mRouter->Send(id, std::move(message));
@@ -223,7 +223,7 @@ namespace acs
 		return 1;
 	}
 
-	int Actor::Publish(const std::string& event)
+	int Actor::Publish(const std::string& event) const
 	{
 		std::unique_ptr<rpc::Message> message;
 		int code = this->Make("EventSystem.Publish", message);
@@ -237,7 +237,7 @@ namespace acs
 		return this->mRouter->Send(id, std::move(message));
 	}
 
-	int Actor::Publish(const std::string& event, json::w::Document& document)
+	int Actor::Publish(const std::string& event, json::w::Document& document) const
 	{
 		std::unique_ptr<rpc::Message> message;
 		int code = this->Make("EventSystem.Publish", message);
@@ -252,7 +252,7 @@ namespace acs
 		return this->mRouter->Send(id, std::move(message));
 	}
 
-	int Actor::Publish(const std::string& event, char proto, const std::string& data)
+	int Actor::Publish(const std::string& event, char proto, const std::string& data) const
 	{
 		std::unique_ptr<rpc::Message> message;
 		int code = this->Make("EventSystem.Publish", message);

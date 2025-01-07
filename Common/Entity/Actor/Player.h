@@ -8,7 +8,7 @@
 
 namespace acs
 {
-	class Player : public Actor
+	class Player final : public Actor
 	{
 	public:
 		Player(long long playerId, int gate, int sockId);

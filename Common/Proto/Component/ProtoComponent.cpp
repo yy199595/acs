@@ -279,7 +279,7 @@ namespace acs
 	{
 		std::queue<std::string> files;
 		auto iter = this->mFiles.begin();
-		for(; iter != this->mFiles.end(); iter++)
+		for(; iter != this->mFiles.end(); ++iter)
 		{
 			files.push(iter->first);
 		}

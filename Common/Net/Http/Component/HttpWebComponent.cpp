@@ -269,10 +269,9 @@ namespace acs
 			response->File(http::Header::HTML, this->mConfig.Index);
 			return HttpStatus::OK;
 		}
-		std::string filePath;
 		for (const std::string& dir: this->mRoots)
 		{
-			filePath = fmt::format("{}/{}", dir, path);
+			std::string filePath = fmt::format("{}/{}", dir, path);
 			if (!help::fs::FileIsExist(filePath))
 			{
 				continue;

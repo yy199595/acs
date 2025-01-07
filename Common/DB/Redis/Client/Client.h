@@ -12,7 +12,7 @@
 
 namespace redis
 {
-	class Client : public tcp::Client
+	class Client final : public tcp::Client
 	{
 	public:
 		typedef acs::IRpc<Request, Response> Component;
@@ -24,7 +24,7 @@ namespace redis
 		std::unique_ptr<Response> Sync(std::unique_ptr<Request> command);
 	protected:
 		void OnConnect(bool result, int count) final;
-		std::unique_ptr<Response> ReadResponse(std::unique_ptr<Request> command);
+		std::unique_ptr<Response> ReadResponse(const std::unique_ptr<Request>& command);
 	private:
 		void OnResponse();
 		void OnReceiveOnce(int len);

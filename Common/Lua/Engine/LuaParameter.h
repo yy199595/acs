@@ -9,13 +9,13 @@
 namespace Parameter
 {
     template<typename T>
-    inline typename std::enable_if<std::is_enum<T>::value, T>::type Read(lua_State *lua, int index)
+    inline std::enable_if_t<std::is_enum<T>::value, T> Read(lua_State *lua, int index)
     {
         return (T) lua_tointeger(lua, index);
     }
 
     template<typename T>
-    inline typename std::enable_if<std::is_enum<T>::value, void>::type Write(lua_State *lua, T data)
+    inline std::enable_if_t<std::is_enum<T>::value, void> Write(lua_State *lua, T data)
     {
         lua_pushinteger(lua, (int) data);
     }
@@ -43,7 +43,7 @@ namespace Lua
 	{
 		//普通数据类型
 		template<typename T>
-		inline typename std::enable_if<CommonParameter::IsCommonParameter<T>::value, void>::type
+		inline std::enable_if_t<CommonParameter::IsCommonParameter<T>::value, void>
 		Write(lua_State* lua, T data)
 		{
 			typedef typename ConstParameter::ConstProxy<T>::Type Type;
@@ -51,21 +51,21 @@ namespace Lua
 		}
 
 		template<typename T>
-		inline typename std::enable_if<CommonParameter::IsCommonParameter<T>::value, T>::type
+		inline std::enable_if_t<CommonParameter::IsCommonParameter<T>::value, T>
 		Read(lua_State* lua, int index)
 		{
 			return CommonParameter::Read<T>(lua, index);
 		}
 
 		template<typename T>
-		inline typename std::enable_if<std::is_enum<T>::value, void>::type
+		inline std::enable_if_t<std::is_enum<T>::value, void>
 		Write(lua_State* lua, T data)
 		{
 			CommonParameter::Write<int>(lua, (int)data);
 		}
 
 		template<typename T>
-		inline typename std::enable_if<std::is_enum<T>::value, T>::type
+		inline std::enable_if_t<std::is_enum<T>::value, T>
 		Read(lua_State* lua, int index)
 		{
 			return (T)CommonParameter::Read<int>(lua, index);
@@ -76,14 +76,14 @@ namespace Lua
 	{
 		//容器数据类型
 		template<typename T>
-		inline typename std::enable_if<ContainerParameter::IsContainerParameter<T>::value, void>::type
+		inline std::enable_if_t<ContainerParameter::IsContainerParameter<T>::value, void>
 		Write(lua_State* lua, T data)
 		{
 			ContainerParameter::Write<T>(lua, data);
 		}
 
 		template<typename T>
-		inline typename std::enable_if<ContainerParameter::IsContainerParameter<T>::value, T>::type
+		inline std::enable_if_t<ContainerParameter::IsContainerParameter<T>::value, T>
 		Read(lua_State* lua, int index)
 		{
 			return ContainerParameter::Read<T>(lua, index);
@@ -94,7 +94,7 @@ namespace Lua
 	{
 		//函数数据类型
 		template<typename T>
-		inline typename std::enable_if<FunctionParameter::IsFunctionParameter<T>::value, T>::type
+		inline std::enable_if_t<FunctionParameter::IsFunctionParameter<T>::value, T>
 		Read(lua_State* lua, int index)
 		{
 			assert(lua_isfunction(lua, index));
@@ -102,7 +102,7 @@ namespace Lua
 		}
 
 		template<typename T>
-		inline typename std::enable_if<FunctionParameter::IsFunctionParameter<T>::value, void>::type
+		inline std::enable_if_t<FunctionParameter::IsFunctionParameter<T>::value, void>
 		Write(lua_State* lua, T data)
 		{
 		}
@@ -112,7 +112,7 @@ namespace Lua
 	{
 		// user data类型
 		template<typename T>
-		inline typename std::enable_if<UserDataParameter::IsUserDataParameter<T>::value, T>::type
+		inline std::enable_if_t<UserDataParameter::IsUserDataParameter<T>::value, T>
 		Read(lua_State* lua, int index)
 		{
 			assert(lua_isuserdata(lua, index));
@@ -120,7 +120,7 @@ namespace Lua
 		}
 
 		template<typename T>
-		inline typename std::enable_if<UserDataParameter::IsUserDataParameter<T>::value, void>::type
+		inline std::enable_if_t<UserDataParameter::IsUserDataParameter<T>::value, void>
 		Write(lua_State* lua, T data)
 		{
 			UserDataParameter::Write<T>(lua, data);

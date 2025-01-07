@@ -12,7 +12,7 @@
 
 namespace http
 {
-	class RequestClient : public tcp::Client
+	class RequestClient final : public tcp::Client
 #ifdef __SHARE_PTR_COUNTER__
 			, public memory::Object<RequestClient>
 #endif
@@ -21,8 +21,8 @@ namespace http
 		typedef acs::IRpc<Request, Response> Component;
 		explicit RequestClient(Component * component, Asio::Context & io);
 	 public:
-		bool SyncSend(std::unique_ptr<http::Request> request);
-		bool SyncSend(std::unique_ptr<http::Request> request, http::Response & response);
+		bool SyncSend(const std::unique_ptr<http::Request>& request);
+		bool SyncSend(const std::unique_ptr<http::Request>& request, http::Response & response);
 		void Do(std::unique_ptr<http::Request> request, std::unique_ptr<http::Response> response, int taskId);
 	 private:
         void OnComplete(HttpStatus code);

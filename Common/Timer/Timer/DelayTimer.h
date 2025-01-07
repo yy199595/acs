@@ -5,7 +5,7 @@
 #include"Rpc/Method/MethodProxy.h"
 namespace acs
 {
-	class DelayTimer : public TimerBase
+	class DelayTimer final : public TimerBase
 	{
 	public:
 		DelayTimer(long long ms, StaticMethod * func)

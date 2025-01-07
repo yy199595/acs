@@ -83,8 +83,7 @@ namespace acs
 
     bool ConfigComponent::OnHotFix()
     {
-        auto iter = this->mConfigs.begin();
-        for(; iter != this->mConfigs.end(); iter++)
+	    for(auto iter = this->mConfigs.begin(); iter != this->mConfigs.end(); ++iter)
         {
             if(!iter->second->ReloadConfig())
             {

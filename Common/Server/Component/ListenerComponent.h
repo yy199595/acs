@@ -12,7 +12,7 @@
 
 namespace acs
 {
-	class ListenerComponent : public Component, public INetListen
+	class ListenerComponent final : public Component, public INetListen
 	{
 	public:
 		explicit ListenerComponent();

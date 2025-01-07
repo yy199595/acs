@@ -8,13 +8,12 @@
 #include<mutex>
 #include"Core/Map/HashMap.h"
 #include"Log/Common/Logger.h"
-#include"Core/Thread/AsioThread.h"
 #include"Entity/Component/Component.h"
 
 namespace acs
 {
-	class LoggerComponent : public Component,
-							public ILuaRegister, public IDestroy
+	class LoggerComponent final : public Component,
+	                              public ILuaRegister, public IDestroy
 	{
 	public:
 		LoggerComponent();

@@ -8,11 +8,11 @@
 
 namespace acs
 {
-	class WeChat : public HttpService
+	class WeChat final : public HttpService
 	{
 	public:
 		WeChat();
-		~WeChat() = default;
+		~WeChat() final = default;
 	private:
 		bool OnInit() final;
 	private:

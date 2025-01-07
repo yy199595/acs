@@ -45,7 +45,7 @@ namespace acs
 		int Run() noexcept;
 		void Stop();
 		bool Hotfix();
-		bool LoadLang();
+		bool LoadLang() const;
 		long long MakeGuid();
 		std::string NewUuid();
 		unsigned int StartCoroutine(std::function<void()> && func);

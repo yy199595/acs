@@ -137,10 +137,10 @@ namespace acs
 #ifdef __ENABLE_OPEN_SSL__
 					if (sock->IsOpenSsl())
 					{
-						Asio::Code code;
+						Asio::Code code1;
 						Asio::ssl::Socket& ssl = sock->SslSocket();
-						ssl.handshake(asio::ssl::stream_base::server, code);
-						if (code.value() != Asio::OK)
+						ssl.handshake(asio::ssl::stream_base::server, code1);
+						if (code1.value() != Asio::OK)
 						{
 							sock->Destory();
 							break;

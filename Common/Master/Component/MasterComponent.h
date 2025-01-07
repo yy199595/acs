@@ -4,12 +4,11 @@
 
 #ifndef APP_MASTERCOMPONENT_H
 #define APP_MASTERCOMPONENT_H
-#include"Core/Map/HashMap.h"
 #include"Entity/Component/Component.h"
 namespace acs
 {
 	class Server;
-	class MasterComponent : public Component, public IComplete
+	class MasterComponent final : public Component, public IComplete
 	{
 	public:
 		MasterComponent();

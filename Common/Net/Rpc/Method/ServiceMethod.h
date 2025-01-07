@@ -78,7 +78,7 @@ namespace acs
 	};
 
 	template<typename T>
-	class ServiceMethod1 : public ServiceMethod
+	class ServiceMethod1 final : public ServiceMethod
 	{
 	 public:
 		ServiceMethod1(const std::string name, T* o, ServiceMethodType1<T> func, std::string key)
@@ -113,7 +113,7 @@ namespace acs
 		ServiceMethodType11<T> _objfunc;
 	};
 	template<typename T, typename T1>
-	class ServiceMethod2 : public ServiceMethod
+	class ServiceMethod2 final : public ServiceMethod
 	{
 	 public:
 		ServiceMethod2(const std::string name, T* o, ServiceMethodType2<T, T1> func, std::string key)
@@ -152,7 +152,7 @@ namespace acs
 	};
 
 	template<typename T, typename T1, typename T2>
-	class ServiceMethod3 : public ServiceMethod
+	class ServiceMethod3 final : public ServiceMethod
 	{
 	 public:
 		typedef int(T::*ServerFunc)(long long, const T1&, T2&);
@@ -213,7 +213,7 @@ namespace acs
 	};
 
 	template<typename T, typename T1>
-	class ServiceMethod4 : public ServiceMethod
+	class ServiceMethod4 final : public ServiceMethod
 	{
 	 public:
 		ServiceMethod4(const std::string name, T* o, ServiceMethodType4<T, T1> func, std::string key)
@@ -261,7 +261,7 @@ namespace acs
 	};
 
 	template<typename T>
-	class ServiceMethod6 : public ServiceMethod
+	class ServiceMethod6 final : public ServiceMethod
 	{
 	 public:
 		ServiceMethod6(const std::string name, T* o, ServiceMethodType6<T> func, std::string key)
@@ -282,7 +282,7 @@ namespace acs
 	};
 
 	template<typename T>
-	class ServiceMethod7 : public ServiceMethod
+	class ServiceMethod7 final : public ServiceMethod
 	{
 	public:
 		ServiceMethod7(const std::string name, T* o, ServiceMethodType7<T> func, std::string key)
@@ -303,7 +303,7 @@ namespace acs
 	};
 
 	template<typename T>
-	class ServiceMethod8 : public ServiceMethod
+	class ServiceMethod8 final : public ServiceMethod
 	{
 	public:
 		ServiceMethod8(const std::string name, T* o, ServiceMethodType8<T> func, std::string key)
@@ -329,7 +329,7 @@ namespace acs
 	};
 
 	template<typename T>
-	class ServiceMethod9 : public ServiceMethod
+	class ServiceMethod9 final : public ServiceMethod
 	{
 	public:
 		ServiceMethod9(const std::string name, T* o, ServiceMethodType9<T> func, std::string key)
@@ -358,7 +358,7 @@ namespace acs
 	};
 
 	template<typename T, typename T1>
-	class ServiceMethod34 : public ServiceMethod
+	class ServiceMethod34 final : public ServiceMethod
 	{
 	public:
 		ServiceMethod34(const std::string name, T* o, ServiceMethodType34<T, T1> func, std::string key)

@@ -24,7 +24,7 @@ namespace custom
 	{
 		auto iter = this->mCache.begin();
 		long long nowTime = help::Time::NowSec();
-		for(; iter != this->mCache.end();)
+		while(iter != this->mCache.end())
 		{
 			if(nowTime >= std::get<0>(iter->second))
 			{

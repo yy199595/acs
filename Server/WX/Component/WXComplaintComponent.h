@@ -44,7 +44,7 @@ namespace acs
 {
 
 	//微信投诉组件
-	class WXComplaintComponent : public Component
+	class WXComplaintComponent final : public Component
 	{
 		struct LangText
 		{

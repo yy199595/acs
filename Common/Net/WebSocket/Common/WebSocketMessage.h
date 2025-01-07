@@ -27,7 +27,7 @@ namespace ws
 		unsigned char mOpCode;
 	};
 
-	class Message : public tcp::IProto
+	class Message final : public tcp::IProto
 	{
 	public:
 		Message();

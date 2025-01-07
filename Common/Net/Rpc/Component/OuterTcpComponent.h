@@ -5,10 +5,7 @@
 #ifndef GAMEKEEPER_GATECLIENTCOMPONENT_H
 #define GAMEKEEPER_GATECLIENTCOMPONENT_H
 
-#include "Core/Map/HashMap.h"
 #include "Core/Queue/Queue.h"
-#include "Log/Common/Logger.h"
-#include "Core/Pool/ArrayPool.h"
 #include "Rpc//Client/OuterTcpClient.h"
 #include "Entity/Component/Component.h"
 #include "Server/Component/ITcpComponent.h"

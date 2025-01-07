@@ -185,7 +185,7 @@ namespace http
 namespace acs
 {
 	//微信登录，支付组件
-	class WeChatComponent : public Component, public IStart
+	class WeChatComponent final : public Component, public IStart
 	{
 	public:
 		WeChatComponent();

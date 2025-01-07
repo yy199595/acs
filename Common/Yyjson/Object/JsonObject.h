@@ -112,7 +112,7 @@ namespace json
 	public:
 
 		template<typename V>
-		static typename std::enable_if<std::is_base_of<IObject, V>::value, bool>::type
+		static std::enable_if_t<std::is_base_of<IObject, V>::value, bool>
 			RegisterField(const char * name, std::vector<V> T::*member, bool must = true)
 		{
 			auto iter = values.find(name);
@@ -125,7 +125,7 @@ namespace json
 		}
 
 		template<typename V>
-		static typename std::enable_if<!std::is_base_of<IObject, V>::value, bool>::type
+		static std::enable_if_t<!std::is_base_of<IObject, V>::value, bool>
 			RegisterField(const char * name, V T::*member, bool must = true)
 		{
 			auto iter = values.find(name);
@@ -138,7 +138,7 @@ namespace json
 		}
 
 		template<typename V>
-		static typename std::enable_if<std::is_base_of<IObject, V>::value, bool>::type
+		static std::enable_if_t<std::is_base_of<IObject, V>::value, bool>
 			RegisterField(const char * name, V T::*member, bool must = true)
 		{
 			auto iter = values.find(name);

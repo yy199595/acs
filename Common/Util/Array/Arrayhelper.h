@@ -61,7 +61,7 @@ namespace help
 		inline typename List::iterator Find(const List & source, const T & value)
 		{
 			auto iter = source.begin();
-			for(; iter != source.end(); iter++)
+			for(; iter != source.end(); ++iter)
 			{
 				if((*iter) == value)
 				{
@@ -75,7 +75,7 @@ namespace help
 		inline bool Remove(List & source, const T & value)
 		{
 			auto iter = source.begin();
-			for(; iter != source.end(); iter++)
+			for(; iter != source.end(); ++iter)
 			{
 				if ((*iter) == value)
 				{

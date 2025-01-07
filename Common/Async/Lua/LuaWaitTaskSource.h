@@ -14,7 +14,7 @@
 namespace acs
 {
 	// 在lua中等待c++协程
-	class LuaWaitTaskSource
+	class LuaWaitTaskSource final
 #ifdef __SHARE_PTR_COUNTER__
 	: public memory::Object<LuaWaitTaskSource>
 #endif
@@ -22,7 +22,7 @@ namespace acs
 	public:
 		explicit LuaWaitTaskSource(lua_State* lua);
 
-		~LuaWaitTaskSource();
+		~LuaWaitTaskSource() final;
 
 	public:
 		int Await();

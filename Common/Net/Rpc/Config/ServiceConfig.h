@@ -20,7 +20,7 @@ namespace acs
 	};
 
 
-    class RpcConfig : public InterfaceConfig, public ConstSingleton<RpcConfig>
+    class RpcConfig final : public InterfaceConfig, public ConstSingleton<RpcConfig>
     {
     public:
         RpcConfig() : InterfaceConfig("RpcConfig") { }
@@ -41,7 +41,7 @@ namespace acs
         std::unordered_map<std::string, std::unique_ptr<RpcMethodConfig>> mRpcMethodConfig;
     };
 
-    class HttpConfig : public InterfaceConfig , public Singleton<HttpConfig>
+    class HttpConfig final : public InterfaceConfig , public Singleton<HttpConfig>
     {
     public:
         HttpConfig() : InterfaceConfig("HttpConfig") { }

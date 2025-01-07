@@ -64,7 +64,7 @@ namespace kcp
 		long long t = help::Time::NowMil();
 		long long t1 = help::Time::NowSec();
 		auto iter = this->mClients.begin();
-		for(; iter != this->mClients.end();)
+		while(iter != this->mClients.end())
 		{
 			if(t1 - iter->second->GetLastTime() >= KCP_TIME_OUT)
 			{

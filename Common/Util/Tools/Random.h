@@ -12,7 +12,7 @@ namespace help
 	namespace Rand
 	{
 		template<typename T>
-		inline typename std::enable_if<std::is_integral<T>::value, T>::type Random()
+		inline std::enable_if_t<std::is_integral<T>::value, T> Random()
 		{
 			std::random_device rd;
 			std::mt19937 gen(rd());
@@ -21,7 +21,7 @@ namespace help
 		}
 
 		template<typename T>
-		inline typename std::enable_if<std::is_integral<T>::value, T>::type Random(const T min, const T max)
+		inline std::enable_if_t<std::is_integral<T>::value, T> Random(const T min, const T max)
 		{
 			if (min == max)
 			{
@@ -34,7 +34,7 @@ namespace help
 		}
 
 		template<typename T>
-		inline typename std::enable_if<std::is_floating_point<T>::value, T>::type Random()
+		inline std::enable_if_t<std::is_floating_point<T>::value, T> Random()
 		{
 			std::random_device rd;
 			std::mt19937 gen(rd());
@@ -43,7 +43,7 @@ namespace help
 		}
 
 		template<typename T>
-		inline typename std::enable_if<std::is_floating_point<T>::value, T>::type Random(const T min, const T max)
+		inline std::enable_if_t<std::is_floating_point<T>::value, T> Random(const T min, const T max)
 		{
 			std::random_device rd;
 			std::mt19937 gen(rd());

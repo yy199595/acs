@@ -51,7 +51,7 @@ namespace oss
 
 namespace acs
 {
-	class OssComponent : public Component, public IComplete, public ILuaRegister
+	class OssComponent final : public Component, public IComplete, public ILuaRegister
 	{
 	public:
 		OssComponent();

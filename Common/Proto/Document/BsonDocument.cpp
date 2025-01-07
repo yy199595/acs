@@ -100,7 +100,7 @@ namespace bson
         }
 
 
-		bool Document::Get(const char* key, std::vector<std::string>& document)
+		bool Document::Get(const char* key, std::vector<std::string>& document) const
 		{
 			_bson::bsonelement element = this->mObject.getField(key);
 			if (element.type() != _bson::BSONType::Array)
@@ -108,24 +108,24 @@ namespace bson
 				return false;
 			}
 
-			for(const _bson::bsonelement & element : element.Array())
+			for(const _bson::bsonelement & element1 : element.Array())
 			{
-				switch(element.type())
+				switch(element1.type())
 				{
 					case _bson::BSONType::String:
-						document.emplace_back(element.String());
+						document.emplace_back(element1.String());
 						break;
 					case _bson::BSONType::BinData:
 					{
 						int len = 0;
-						const char* bin = element.binData(len);
+						const char* bin = element1.binData(len);
 						document.emplace_back(bin, len);
 						break;
 					}
 					case _bson::BSONType::Object:
 					{
 						std::string json;
-						bson::Reader::Document doc(element.object());
+						bson::Reader::Document doc(element1.object());
 						doc.WriterToJson(&json);
 						document.emplace_back(json);
 						break;
@@ -137,7 +137,7 @@ namespace bson
 			return true;
 		}
 
-		bool Document::Get(const char* key, std::vector<_bson::bsonelement>& document)
+		bool Document::Get(const char* key, std::vector<_bson::bsonelement>& document) const
 		{
 			_bson::bsonelement element = this->mObject.getField(key);
 			if (element.type() != _bson::BSONType::Object)
@@ -148,7 +148,7 @@ namespace bson
 			return true;
 		}
 
-		bool Document::Get(const char* key, std::vector<std::unique_ptr<Document>>& document)
+		bool Document::Get(const char* key, std::vector<std::unique_ptr<Document>>& document) const
 		{
 			_bson::bsonelement element = this->mObject.getField(key);
 			if(element.type() != _bson::BSONType::Array)
@@ -168,7 +168,7 @@ namespace bson
 		}
 
 
-		bool Document::Get(const char* key, std::unique_ptr<Document>& document)
+		bool Document::Get(const char* key, std::unique_ptr<Document>& document) const
 		{
 			_bson::bsonelement element = this->mObject.getField(key);
 			if (element.type() != _bson::BSONType::Object)
@@ -537,11 +537,10 @@ namespace bson
         bool Document::WriterToJson(std::string * jsonStr)
         {
             json::w::Document jsonWriter;
-			_bson::bsonelement bsonelement;
-			_bson::bsonobjiterator bsonobjiterator(this->mObject);
+            _bson::bsonobjiterator bsonobjiterator(this->mObject);
 			while(bsonobjiterator.more())
 			{
-				bsonelement = bsonobjiterator.next();
+				_bson::bsonelement bsonelement = bsonobjiterator.next();
 				this->WriterToJson(bsonelement, jsonWriter);
 			}
             return jsonWriter.Encode(jsonStr, true) > 0;

@@ -15,22 +15,22 @@ namespace acs
 		explicit Actor(long long id, std::string name);
 	 public:
 		bool LateAwake() final;
-		int Send(const std::string& func);
+		int Send(const std::string& func) const;
 		const std::string & Name() const { return this->mName; }
-		int Send(const std::string& func, const pb::Message& request);
+		int Send(const std::string& func, const pb::Message& request) const;
 	 public:
-		int Call(const std::string & func);
+		int Call(const std::string & func) const;
 		int Call(std::unique_ptr<rpc::Message> request);
-		int Call(const std::string & func, pb::Message * response);
-		int Call(const std::string & func, const pb::Message & request);
+		int Call(const std::string & func, pb::Message * response) const;
+		int Call(const std::string & func, const pb::Message & request) const;
 		int Call(const std::string & func, const pb::Message & request, pb::Message * response);
 	public:
-		int Publish(const std::string & event);
-		int Publish(const std::string & event, json::w::Document & document);
-		int Publish(const std::string & event, char proto, const std::string & data);
+		int Publish(const std::string & event) const;
+		int Publish(const std::string & event, json::w::Document & document) const;
+		int Publish(const std::string & event, char proto, const std::string & data) const;
 	public:
-		int LuaSend(lua_State * lua, std::unique_ptr<rpc::Message>);
-		int LuaCall(lua_State * lua, std::unique_ptr<rpc::Message>);
+		int LuaSend(lua_State * lua, std::unique_ptr<rpc::Message>) const;
+		int LuaCall(lua_State * lua, std::unique_ptr<rpc::Message>) const;
 		int MakeMessage(lua_State * lua, int idx, const std::string & func, std::unique_ptr<rpc::Message> &) const;
 	 public:
 		virtual bool OnInit() = 0;

@@ -162,7 +162,7 @@ namespace Lua
 				int top = lua_gettop(lua);
 				typedef typename std::unordered_map<Key, Value>::iterator MapIterator;
 				MapIterator iter = data.begin();
-				for (; iter != data.end(); iter++)
+				for (; iter != data.end(); ++iter)
 				{
 					Parameter::Write<Key>(lua, iter->first);
 					Parameter::Write<Value>(lua, iter->second);
@@ -190,7 +190,7 @@ namespace Lua
 				int top = lua_gettop(lua);
 				typedef typename std::unordered_map<Key, Value>::iterator MapIterator;
 				MapIterator iter = data.begin();
-				for (; iter != data.end(); iter++)
+				for (; iter != data.end(); ++iter)
 				{
 					Parameter::Write<Key>(lua, iter->first);
 					Parameter::Write<Value>(lua, iter->second);
@@ -218,7 +218,7 @@ namespace Lua
 				int top = lua_gettop(lua);
 				typedef typename std::unordered_map<Key, Value>::iterator MapIterator;
 				MapIterator iter = data->begin();
-				for (; iter != data->end(); iter++)
+				for (; iter != data->end(); ++iter)
 				{
 					Parameter::Write<Key>(lua, iter->first);
 					Parameter::Write<Value>(lua, iter->second);
@@ -256,7 +256,7 @@ namespace Lua
 				int top = lua_gettop(lua);
 				typedef typename std::map<Key, Value>::iterator MapIterator;
 				MapIterator iter = data.begin();
-				for (; iter != data.end(); iter++)
+				for (; iter != data.end(); ++iter)
 				{
 					Parameter::Write<Key>(lua, iter->first);
 					Parameter::Write<Value>(lua, iter->second);
@@ -295,7 +295,7 @@ namespace Lua
 				int top = lua_gettop(lua);
 				typedef typename std::map<Key, Value>::iterator MapIterator;
 				MapIterator iter = data.begin();
-				for (; iter != data.end(); iter++)
+				for (; iter != data.end(); ++iter)
 				{
 					Parameter::Write<Key>(lua, iter->first);
 					Parameter::Write<Value>(lua, iter->second);
@@ -335,7 +335,7 @@ namespace Lua
 				int top = lua_gettop(lua);
 				typedef typename std::map<Key, Value>::iterator MapIterator;
 				MapIterator iter = data->begin();
-				for (; iter != data->end(); iter++)
+				for (; iter != data->end(); ++iter)
 				{
 					Parameter::Write<Key>(lua, iter->first);
 					Parameter::Write<Value>(lua, iter->second);

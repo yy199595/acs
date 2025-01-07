@@ -78,7 +78,7 @@ namespace http
 		size_t index = 0;
 		std::stringstream ss;
 		auto iter = this->mParameters.begin();
-		for (; iter != this->mParameters.end(); iter++, index++)
+		for (; iter != this->mParameters.end(); ++iter, index++)
 		{
 			const std::string& key = iter->second;
 			if (key == http::query::Permission || key == http::query::UserId || key == http::query::ClubId)
@@ -97,7 +97,7 @@ namespace http
 	void FromContent::WriteToLua(lua_State* lua)
 	{
 		lua_createtable(lua, 0, (int)this->mParameters.size());
-		for (auto iter = this->mParameters.begin(); iter != this->mParameters.end(); iter++)
+		for (auto iter = this->mParameters.begin(); iter != this->mParameters.end(); ++iter)
 		{
 			const std::string& key = iter->first;
 			const std::string& value = iter->second;
@@ -146,7 +146,7 @@ namespace http
 		}
 		keys.reserve(this->mParameters.size());
 		auto iter = this->mParameters.begin();
-		for (; iter != this->mParameters.end(); iter++)
+		for (; iter != this->mParameters.end(); ++iter)
 		{
 			keys.emplace_back(iter->first);
 		}
@@ -214,7 +214,7 @@ namespace http
 		size_t index = 0;
 		std::stringstream ss;
 		auto iter = this->mParameters.begin();
-		for (; iter != this->mParameters.end(); iter++, index++)
+		for (; iter != this->mParameters.end(); ++iter, index++)
 		{
 			ss << iter->first << "=" << iter->second;
 			if (index < this->mParameters.size() - 1)

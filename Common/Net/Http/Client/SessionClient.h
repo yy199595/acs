@@ -21,7 +21,7 @@ namespace http
 	 public:
 		typedef acs::IRpc<Request, Response> Component;
 		explicit SessionClient(Component * component, Asio::Context & io);
-		~SessionClient();
+		~SessionClient() final;
 	 public:
 		bool StartWriter();
 		void StartClose(int code);

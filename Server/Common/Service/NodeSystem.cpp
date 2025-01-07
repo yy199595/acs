@@ -68,7 +68,7 @@ namespace acs
 		Server * newServer = this->mActComponent->MakeServer(document);
 		LOG_ERROR_RETURN_CODE(newServer != nullptr, XCode::CallArgsError);
 		LOG_DEBUG("add new server : {}", newServer->Name());
-		this->mActComponent->AddServer(std::move(newServer));
+		this->mActComponent->AddServer(newServer);
 		return XCode::Ok;
 	}
 

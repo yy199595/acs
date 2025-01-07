@@ -5,12 +5,11 @@
 #ifndef APP_ROOMCOMPONENT_H
 #define APP_ROOMCOMPONENT_H
 #include <unordered_map>
-#include <unordered_set>
 #include "Room/Common/Room.h"
 #include "Entity/Component/Component.h"
 namespace acs
 {
-	class RoomComponent : public Component
+	class RoomComponent final : public Component
 	{
 	public:
 		RoomComponent();

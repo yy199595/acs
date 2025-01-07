@@ -64,8 +64,8 @@ namespace lua
 			lua_pushnil(L);
 			while (lua_next(L, index) != 0)
 			{
-				const char* key = lua_tostring(L, -2);
-				encode_once(L, -1, key, docObj);
+				const char* k = lua_tostring(L, -2);
+				encode_once(L, -1, k, docObj);
 				lua_pop(L, 1);
 			}
 			break;

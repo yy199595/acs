@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cassert>
+#include <utility>
 
 #define NOINLINE_DECL
 
@@ -8,8 +9,8 @@ namespace _bson {
 
     class MsgAssertionException : public std::exception {
     public:
-        MsgAssertionException(unsigned, std::string _s) : s(_s) {}
-        ~MsgAssertionException() throw() { }
+        MsgAssertionException(unsigned, std::string _s) : s(std::move(_s)) {}
+        ~MsgAssertionException() throw() override { }
         const std::string s;
         virtual const char * what() const throw() { return s.c_str();  }
     };

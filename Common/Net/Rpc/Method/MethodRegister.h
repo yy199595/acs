@@ -31,7 +31,7 @@ namespace acs
 		}
 
 		template<typename T, typename T1>
-		inline typename std::enable_if<std::is_base_of<Message, T1>::value, bool>::type
+		inline std::enable_if_t<std::is_base_of<Message, T1>::value, bool>
 		Bind(std::string name, ServiceMethodType2<T, T1> func, const std::string key)
 		{
 			T * component = this->mComponent->Cast<T>();
@@ -39,7 +39,7 @@ namespace acs
 		}
 
 		template<typename T, typename T1>
-		inline typename std::enable_if<std::is_base_of<Message, T1>::value, bool>::type
+		inline std::enable_if_t<std::is_base_of<Message, T1>::value, bool>
 		Bind(std::string name, ServiceMethodType22<T, T1> func, const std::string key)
 		{
 			T * component = this->mComponent->Cast<T>();
@@ -47,8 +47,8 @@ namespace acs
 		}
 
 		template<typename T, typename T1, typename T2>
-		inline typename std::enable_if<std::is_base_of<Message, T1>::value
-			&& std::is_base_of<Message, T1>::value, bool>::type
+		inline std::enable_if_t<std::is_base_of<Message, T1>::value
+		                      && std::is_base_of<Message, T1>::value, bool>
 		Bind(std::string name, ServiceMethodType3<T, T1, T2> func, const std::string key)
 		{
 			T * component = this->mComponent->Cast<T>();
@@ -56,8 +56,8 @@ namespace acs
 		}
 
 		template<typename T, typename T1, typename T2>
-		inline typename std::enable_if<std::is_base_of<Message, T1>::value
-			&& std::is_base_of<Message, T1>::value, bool>::type
+		inline std::enable_if_t<std::is_base_of<Message, T1>::value
+		                      && std::is_base_of<Message, T1>::value, bool>
 		Bind(std::string name, ServiceMethodType33<T, T1, T2> func, const std::string key)
 		{
 			T * component = this->mComponent->Cast<T>();
@@ -65,7 +65,7 @@ namespace acs
 		}
 
 		template<typename T, typename T1>
-		inline typename std::enable_if<std::is_base_of<Message, T1>::value, bool>::type
+		inline std::enable_if_t<std::is_base_of<Message, T1>::value, bool>
 		Bind(std::string name, ServiceMethodType4<T, T1> func, const std::string key)
 		{
 			T * component = this->mComponent->Cast<T>();
@@ -73,7 +73,7 @@ namespace acs
 		}
 
 		template<typename T, typename T1>
-		inline typename std::enable_if<std::is_base_of<Message, T1>::value, bool>::type
+		inline std::enable_if_t<std::is_base_of<Message, T1>::value, bool>
 		Bind(std::string name, ServiceMethodType44<T, T1> func, const std::string key)
 		{
 			T * component = this->mComponent->Cast<T>();

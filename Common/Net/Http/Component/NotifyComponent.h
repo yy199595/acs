@@ -4,7 +4,6 @@
 
 #ifndef APP_NOTIFYCOMPONENT_H
 #define APP_NOTIFYCOMPONENT_H
-#include <unordered_map>
 #include "Entity/Component/Component.h"
 
 namespace notify
@@ -50,11 +49,11 @@ namespace notify
 
 namespace acs
 {
-	class NotifyComponent : public Component, public ILuaRegister, public IComplete
+	class NotifyComponent final : public Component, public ILuaRegister, public IComplete
 	{
 	public:
 		NotifyComponent();
-		~NotifyComponent() = default;
+		~NotifyComponent() final = default;
 	public:
 		void SendToWeChat(const std::string & message);
 		void SendToDingDing(const std::string & message);

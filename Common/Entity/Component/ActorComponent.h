@@ -14,7 +14,7 @@ namespace Lua
 };
 namespace acs
 {
-	class ActorComponent : public Component, public IServerRecord, public ILuaRegister
+	class ActorComponent final : public Component, public IServerRecord, public ILuaRegister
 	{
 	public:
 		ActorComponent();

@@ -4,21 +4,17 @@
 
 #ifndef APP_CONTENT_H
 #define APP_CONTENT_H
-#include<iostream>
 #include<fstream>
-#include<queue>
-#include<cstdio>
 #include<unordered_map>
 #include <utility>
 #include "IContent.h"
 #include"Proto/Message/IProto.h"
-#include "Core/Map/HashMap.h"
 #include"XML/Document/XDocument.h"
 #include<Yyjson/Document/Document.h>
 
 namespace http
 {
-    class FromContent : public Content
+    class FromContent final : public Content
     {
     public:
         inline void Clear() { this->mParameters.clear(); }
@@ -55,7 +51,7 @@ namespace http
 
 namespace http
 {
-    class JsonContent : public Content, public json::r::Document
+    class JsonContent final : public Content, public json::r::Document
     {
 	public:
 		explicit JsonContent() = default;
@@ -81,7 +77,7 @@ namespace http
 
 namespace http
 {
-	class XMLContent : public Content, public xml::XDocument
+	class XMLContent final : public Content, public xml::XDocument
 	{
 	public:
 		explicit XMLContent() = default;
@@ -105,7 +101,7 @@ namespace http
 
 namespace http
 {
-	class TextContent : public Content
+	class TextContent final : public Content
 	{
 	public:
 		explicit TextContent() : mMaxSize(1024 * 500) { }
@@ -137,7 +133,7 @@ namespace http
 
 namespace http
 {
-	class FileContent : public Content
+	class FileContent final : public Content
 	{
 	public:
 		FileContent();
@@ -171,7 +167,7 @@ namespace http
 
 namespace http
 {
-	class TransferContent : public Content
+	class TransferContent final : public Content
 	{
 	public:
 		TransferContent() : mContSize(0) { }
@@ -197,7 +193,7 @@ namespace http
 
 namespace http
 {
-	class MultipartFromContent : public Content
+	class MultipartFromContent final : public Content
 	{
 	public:
 		MultipartFromContent();
@@ -241,7 +237,7 @@ namespace http
 
 namespace http
 {
-	class BinContent : public Content
+	class BinContent final : public Content
 	{
 	public:
 		BinContent();

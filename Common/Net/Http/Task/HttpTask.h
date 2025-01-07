@@ -9,7 +9,7 @@
 
 namespace acs
 {
-	class HttpRequestTask : public IRpcTask<http::Response>, protected WaitTaskSourceBase
+	class HttpRequestTask final : public IRpcTask<http::Response>, protected WaitTaskSourceBase
     {
     public:
 		~HttpRequestTask() final = default;
@@ -33,7 +33,7 @@ namespace acs
 		this->ResumeTask();
 	}
 
-	class HttpCallbackTask : public IRpcTask<http::Response>
+	class HttpCallbackTask final : public IRpcTask<http::Response>
 	{
 	public:
 		explicit HttpCallbackTask(int id, std::function<void(std::unique_ptr<http::Response>)> & cb)
@@ -53,7 +53,7 @@ namespace acs
 namespace acs
 {
     class HttpRequestClient;
-    class LuaHttpRequestTask : public IRpcTask<http::Response>
+    class LuaHttpRequestTask final : public IRpcTask<http::Response>
     {
     public:
         explicit LuaHttpRequestTask(int id, lua_State * lua);

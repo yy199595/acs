@@ -24,20 +24,20 @@ namespace admin
 
 namespace acs
 {
-	class AdminComponent : public Component, public IComplete
+	class AdminComponent final : public Component, public IComplete
 	{
 	public:
 		AdminComponent();
 		~AdminComponent() final = default;
 	public:
 		std::unique_ptr<admin::UserInfo> GetUserInfo(int userId);
-		std::unique_ptr<admin::UserInfo> GetUserInfo(const std::string & account);
+		std::unique_ptr<admin::UserInfo> GetUserInfo(const std::string & account) const;
 	public:
-		int InsertUser(admin::UserInfo & userInfo);
-		int UpdateUser(int userId, json::w::Document & document);
+		int InsertUser(admin::UserInfo & userInfo) const;
+		int UpdateUser(int userId, json::w::Document & document) const;
 	public:
-		int Remove(int userId);
-		int List(int page, json::w::Document & response);
+		int Remove(int userId) const;
+		int List(int page, json::w::Document & response) const;
 	private:
 		void Complete() final;
 		bool LateAwake() final;

@@ -28,8 +28,7 @@ namespace jwt
 	std::string base64_decode(const std::string& input)
 	{
 		BIO* bio, * b64;
-		char buffer[512];
-		memset(buffer, 0, sizeof(buffer));
+		char buffer[512] = { 0 };
 		b64 = BIO_new(BIO_f_base64());
 		BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
 		bio = BIO_new_mem_buf(input.c_str(), static_cast<int>(input.length()));

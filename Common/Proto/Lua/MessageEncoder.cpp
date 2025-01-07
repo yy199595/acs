@@ -139,13 +139,13 @@ namespace acs
 				pb::Message* submessage = reflection->MutableMessage(&message, field);
 				if (submessage->GetTypeName() == "google.protobuf.Any")
 				{
-					pb::Message * message = Lua::PtrProxy<pb::Message>::Read(this->mLua, index);
-					if (message == nullptr)
+					pb::Message * message1 = Lua::PtrProxy<pb::Message>::Read(this->mLua, index);
+					if (message1 == nullptr)
 					{
 						return false;
 					}
-					std::unique_ptr<pb::Message> pb(message);
-					dynamic_cast<pb::Any*>(submessage)->PackFrom(*message);
+					std::unique_ptr<pb::Message> pb(message1);
+					dynamic_cast<pb::Any*>(submessage)->PackFrom(*message1);
 					return true;
 				}
 

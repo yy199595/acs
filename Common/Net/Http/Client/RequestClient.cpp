@@ -34,7 +34,7 @@ namespace http
 #endif
 	}
 
-	bool RequestClient::SyncSend(std::unique_ptr<http::Request> request)
+	bool RequestClient::SyncSend(const std::unique_ptr<http::Request>& request)
 	{
 		const http::Url& url = request->GetUrl();
 		if (!this->ConnectSync(url.Host(), url.Port()))
@@ -44,7 +44,7 @@ namespace http
 		return this->SendSync(*request);
 	}
 
-	bool RequestClient::SyncSend(std::unique_ptr<http::Request> request, http::Response& response)
+	bool RequestClient::SyncSend(const std::unique_ptr<http::Request>& request, http::Response& response)
 	{
 		const http::Url& url = request->GetUrl();
 		if (!this->ConnectSync(url.Host(), url.Port()))

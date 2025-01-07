@@ -116,7 +116,7 @@ namespace json
 			yyjson_mut_val* mValue;
 		};
 
-		class Document : public Value
+		class Document final : public Value
 		{
 		public:
 			explicit Document(bool array = false);

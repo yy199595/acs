@@ -17,8 +17,8 @@ namespace acs
 {
 
 	class TaskContext;
-    class TaskContextPool
-	{
+    class TaskContextPool final
+    {
 	public:
 		explicit TaskContextPool() = default;
 		virtual ~TaskContextPool();

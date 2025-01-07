@@ -99,7 +99,7 @@ namespace http
 			{
 				this->mPath = "/";
 			}
-			if (0 == this->mPort.length())
+			if (this->mPort.empty())
 			{
 				this->mPort = this->IsHttps() ? "443" : "80";
 			}

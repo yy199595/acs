@@ -4,7 +4,6 @@
 
 #ifndef APP_WATCH_H
 #define APP_WATCH_H
-#include "Core/Process/Process.h"
 #include "Http/Service/HttpService.h"
 namespace acs
 {
@@ -12,7 +11,7 @@ namespace acs
 	{
 	public:
 		Watch();
-		~Watch() = default;
+		~Watch() final = default;
 	private:
 		bool OnInit() final;
 	private:

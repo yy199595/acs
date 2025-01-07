@@ -31,7 +31,7 @@ namespace mongo
         int opCode;
     };
 
-	class Request : public tcp::IProto
+	class Request final : public tcp::IProto
 #ifdef __SHARE_PTR_COUNTER__
 			, public memory::Object<Request>
 #endif
@@ -65,7 +65,7 @@ namespace mongo
 		bson::Writer::Document document;
 	};
 
-	class Response : public tcp::IProto
+	class Response final : public tcp::IProto
 #ifdef __SHARE_PTR_COUNTER__
 			, public memory::Object<Response>
 #endif

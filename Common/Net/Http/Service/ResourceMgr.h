@@ -5,11 +5,10 @@
 #ifndef APP_RESOURCEMGR_H
 #define APP_RESOURCEMGR_H
 #include "HttpService.h"
-#include "Core/Map/HashMap.h"
 
 namespace acs
 {
-	class ResourceMgr : public HttpService
+	class ResourceMgr final : public HttpService
 	{
 	public:
 		ResourceMgr() = default;

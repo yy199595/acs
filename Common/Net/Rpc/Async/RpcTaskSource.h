@@ -22,7 +22,7 @@ namespace acs
         int mRpcId;
     };
 
-	class RpcTaskSource : public WaitTaskSourceBase, public IRpcTask<rpc::Message>
+	class RpcTaskSource final : public WaitTaskSourceBase, public IRpcTask<rpc::Message>
 #ifdef __SHARE_PTR_COUNTER__
 	, public memory::Object<LuaWaitTaskSource>
 #endif
@@ -49,7 +49,7 @@ namespace acs
 		return std::move(this->mMessage);
 	}
 
-	class LuaRpcTaskSource :  public IRpcTask<rpc::Message>
+	class LuaRpcTaskSource  final:  public IRpcTask<rpc::Message>
 #ifdef __SHARE_PTR_COUNTER__
 	, public memory::Object<LuaWaitTaskSource>
 #endif

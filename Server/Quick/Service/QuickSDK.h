@@ -9,7 +9,7 @@
 
 namespace acs
 {
-	class QuickSDK : public HttpService
+	class QuickSDK final : public HttpService
 	{
 	public:
 		QuickSDK();

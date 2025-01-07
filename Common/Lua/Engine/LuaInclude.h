@@ -121,35 +121,35 @@ namespace Lua
 	namespace Parameter
 	{
 		template<typename T>
-		inline typename std::enable_if<CommonParameter::IsCommonParameter<T>::value, T>::type
+		inline std::enable_if_t<CommonParameter::IsCommonParameter<T>::value, T>
 		Read(lua_State* lua, int index);
 
 		template<typename T>
-		inline typename std::enable_if<CommonParameter::IsCommonParameter<T>::value, void>::type
+		inline std::enable_if_t<CommonParameter::IsCommonParameter<T>::value, void>
 		Write(lua_State* lua, T data);
 
 		template<typename T>
-		inline typename std::enable_if<ContainerParameter::IsContainerParameter<T>::value, T>::type
+		inline std::enable_if_t<ContainerParameter::IsContainerParameter<T>::value, T>
 		Read(lua_State* lua, int index);
 
 		template<typename T>
-		inline typename std::enable_if<ContainerParameter::IsContainerParameter<T>::value, void>::type
+		inline std::enable_if_t<ContainerParameter::IsContainerParameter<T>::value, void>
 		Write(lua_State* lua, T data);
 
 		template<typename T>
-		inline typename std::enable_if<FunctionParameter::IsFunctionParameter<T>::value, T>::type
+		inline std::enable_if_t<FunctionParameter::IsFunctionParameter<T>::value, T>
 		Read(lua_State* lua, int index);
 
 		template<typename T>
-		inline typename std::enable_if<FunctionParameter::IsFunctionParameter<T>::value, void>::type
+		inline std::enable_if_t<FunctionParameter::IsFunctionParameter<T>::value, void>
 		Write(lua_State* lua, T data);
 
 		template<typename T>
-		inline typename std::enable_if<UserDataParameter::IsUserDataParameter<T>::value, T>::type
+		inline std::enable_if_t<UserDataParameter::IsUserDataParameter<T>::value, T>
 		Read(lua_State* lua, int index);
 
 		template<typename T>
-		inline typename std::enable_if<UserDataParameter::IsUserDataParameter<T>::value, void>::type
+		inline std::enable_if_t<UserDataParameter::IsUserDataParameter<T>::value, void>
 		Write(lua_State* lua, T data);
 
 		template<typename T, typename... Args>

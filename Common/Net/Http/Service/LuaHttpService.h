@@ -7,7 +7,7 @@
 #include"HttpService.h"
 namespace acs
 {
-    class LuaHttpService : public HttpService
+    class LuaHttpService final : public HttpService
     {
     private:
 		bool OnInit() final { return this->GetLuaModule() != nullptr; }

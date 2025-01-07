@@ -9,7 +9,7 @@
 
 namespace acs
 {
-	class PlayerSystem : public RpcService
+	class PlayerSystem  final: public RpcService
 	{
 	public:
 		PlayerSystem() = default;

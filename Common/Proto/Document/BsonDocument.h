@@ -108,13 +108,13 @@ namespace bson
 
 			int Length() const { return this->mObject.objsize(); }
 
-			bool Get(const char * key, std::unique_ptr<Document> & document);
+			bool Get(const char * key, std::unique_ptr<Document> & document) const;
 
-			bool Get(const char * key, std::vector<std::unique_ptr<Document>> & document);
+			bool Get(const char * key, std::vector<std::unique_ptr<Document>> & document) const;
 
-			bool Get(const char * key, std::vector<std::string> & document);
+			bool Get(const char * key, std::vector<std::string> & document) const;
 
-			bool Get(const char * key, std::vector<_bson::bsonelement> & document);
+			bool Get(const char * key, std::vector<_bson::bsonelement> & document) const;
 
 			int GetLength() const { return this->mObject.objsize(); }
 

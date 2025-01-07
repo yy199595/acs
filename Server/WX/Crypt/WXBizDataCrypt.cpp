@@ -1,12 +1,10 @@
 #include "WXBizDataCrypt.h"
 
-#include <string.h>
-#include <stdlib.h>
+#include <cstring>
 
 #include <string>
 
 #include "openssl/aes.h"
-#include "openssl/sha.h"
 #include "openssl/evp.h"
 
 

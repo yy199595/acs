@@ -102,7 +102,7 @@ namespace acs
 		return this->mActor->AddServer(this);
 	}
 
-	bool App::LoadLang()
+	bool App::LoadLang() const
 	{
 		std::string path;
 		if (!this->mConfig.GetPath("lang", path))

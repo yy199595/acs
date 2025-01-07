@@ -15,7 +15,7 @@ namespace http
 namespace acs
 {
 	class HttpMethodConfig;
-	class RecordComponent : public Component, public IComplete, public IRequest<HttpMethodConfig, http::Request, http::Response>
+	class RecordComponent final : public Component, public IComplete, public IRequest<HttpMethodConfig, http::Request, http::Response>
 	{
 	public:
 		RecordComponent();

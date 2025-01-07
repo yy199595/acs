@@ -12,7 +12,7 @@
 namespace acs
 {
 	//服务器注册服务
-	class Master : public HttpService, public ISecondUpdate
+	class Master final : public HttpService, public ISecondUpdate
 	{
 	 public:
 		Master();

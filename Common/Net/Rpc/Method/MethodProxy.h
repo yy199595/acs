@@ -24,7 +24,7 @@ namespace acs
 		virtual void run() = 0;
 	};
 
-	class LambdaMethod : public StaticMethod
+	class LambdaMethod final : public StaticMethod
 	{
 	 public:
 		explicit LambdaMethod(std::function<void(void)>&& func)
@@ -41,7 +41,7 @@ namespace acs
 	};
 
 	template<typename F, typename T>
-	class StaticMethod0 : public StaticMethod
+	class StaticMethod0 final : public StaticMethod
 	{
 	 public:
 		StaticMethod0(F&& f, T* o)
@@ -77,12 +77,12 @@ namespace acs
 	 private:
 		T* _o;
 		F _func;
-		typename std::remove_reference<P>::type _p;
+		std::remove_reference_t<P> _p;
 
 	};
 
 	template<typename F, typename T, typename P1, typename P2>
-	class StaticMethod2 : public StaticMethod
+	class StaticMethod2 final : public StaticMethod
 	{
 	 public:
 		StaticMethod2(F&& f, T* o, P1&& p1, P2&& p2)
@@ -101,13 +101,13 @@ namespace acs
 	 private:
 		T* _o;
 		F _func;
-		typename std::remove_reference<P1>::type _p1;
-		typename std::remove_reference<P2>::type _p2;
+		std::remove_reference_t<P1> _p1;
+		std::remove_reference_t<P2> _p2;
 
 	};
 
 	template<typename F, typename T, typename P1, typename P2, typename P3>
-	class StaticMethod3 : public StaticMethod
+	class StaticMethod3 final : public StaticMethod
 	{
 	 public:
 		StaticMethod3(F&& f, T* o, P1&& p1, P2&& p2, P3&& p3)
@@ -125,9 +125,9 @@ namespace acs
 	 private:
 		T* _o;
 		F _func;
-		typename std::remove_reference<P1>::type _p1;
-		typename std::remove_reference<P2>::type _p2;
-		typename std::remove_reference<P3>::type _p3;
+		std::remove_reference_t<P1> _p1;
+		std::remove_reference_t<P2> _p2;
+		std::remove_reference_t<P3> _p3;
 
 	};
 

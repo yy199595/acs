@@ -2,7 +2,7 @@
 #include"RpcService.h"
 namespace acs
 {
-	class LuaRpcService : public RpcService, public ILogin
+	class LuaRpcService final : public RpcService, public ILogin
 	{
 	private:
 		void OnLogin(long long playerId) final;

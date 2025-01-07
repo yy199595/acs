@@ -24,7 +24,7 @@ namespace http
 
 namespace http
 {
-	class Head : public tcp::IProto, public tcp::IHeader
+	class Head final : public tcp::IProto, public tcp::IHeader
     {
     public:
         Head();

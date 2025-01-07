@@ -8,7 +8,7 @@
 
 namespace acs
 {
-	class MongoMgr : public HttpService
+	class MongoMgr final : public HttpService
 	{
 	public:
 		MongoMgr();

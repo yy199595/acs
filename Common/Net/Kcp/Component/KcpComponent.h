@@ -3,18 +3,17 @@
 //
 
 #pragma once
-#include <array>
 #include "asio.hpp"
-#include "Rpc/Common/Message.h"
-#include "Kcp/Common/KcpServer.h"
 #include "Entity/Component/Component.h"
+#include "Kcp/Common/KcpServer.h"
+#include "Rpc/Common/Message.h"
 #include "Server/Component/ITcpComponent.h"
 using asio_udp = asio::ip::udp;
 
 namespace acs
 {
-	class KcpComponent : public Component, public rpc::IInnerSender, public IRpc<rpc::Message, rpc::Message>
-			, public IFrameUpdate, public INetListen
+	class KcpComponent final : public Component, public rpc::IInnerSender, public IRpc<rpc::Message, rpc::Message>
+	                           , public IFrameUpdate, public INetListen
 	{
 	public:
 		KcpComponent();

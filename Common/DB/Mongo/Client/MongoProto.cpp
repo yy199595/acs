@@ -161,12 +161,12 @@ namespace mongo
 		}
 		if(this->mDecodeState == tcp::Decode::MessageBody)
 		{
-			static thread_local char buffer[256] = { 0 };
-			size_t size = os.readsome(buffer, sizeof(buffer));
-			while(size > 0)
+			char buffer[256] = { 0 };
+			size_t count = os.readsome(buffer, sizeof(buffer));
+			while(count > 0)
 			{
-				this->mBuffer.append(buffer, size);
-				size = os.readsome(buffer, sizeof(buffer));
+				this->mBuffer.append(buffer, count);
+				count = os.readsome(buffer, sizeof(buffer));
 			}
 			const char * bson = this->mBuffer.c_str();
 			this->mDocument = std::make_unique<bson::Reader::Document>(bson);

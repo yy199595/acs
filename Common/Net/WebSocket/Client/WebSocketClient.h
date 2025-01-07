@@ -15,7 +15,7 @@ namespace http
 namespace ws
 {
 	typedef acs::IRpc<rpc::Message, rpc::Message> Component;
-	class RequestClient : public tcp::Client
+	class RequestClient final : public tcp::Client
 	{
 	public:
 		RequestClient(int id, Component * component, Asio::Context & main);

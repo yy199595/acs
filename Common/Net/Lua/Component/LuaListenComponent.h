@@ -8,7 +8,7 @@
 
 namespace acs
 {
-	class LuaListenComponent : public Component, public ITcpListen
+	class LuaListenComponent final : public Component, public ITcpListen
 	{
 	public:
 		LuaListenComponent();

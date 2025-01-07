@@ -8,7 +8,7 @@
 #include "MongoComponent.h"
 namespace acs
 {
-	class MongoProxyComponent : public Component
+	class MongoProxyComponent final : public Component
 	{
 	public:
 		MongoProxyComponent() : mMongo(nullptr) { }

@@ -18,9 +18,9 @@
 
 namespace http
 {
-	class Response : public tcp::IProto, public ILuaWrite
+	class Response final : public tcp::IProto, public ILuaWrite
 #ifdef __SHARE_PTR_COUNTER__
-			, public memory::Object<Response>
+	                       , public memory::Object<Response>
 #endif
     {
 	 public:

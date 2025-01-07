@@ -11,7 +11,7 @@ struct lua_State;
 namespace acs
 {
 	class Server;
-	class RouterComponent : public Component, public ISystemUpdate, public IServerRecord
+	class RouterComponent final : public Component, public ISystemUpdate, public IServerRecord
 	{
 	public:
 		RouterComponent();

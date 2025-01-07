@@ -30,7 +30,7 @@ namespace acs
 		unsigned int co = 0;
 	};
 
-	class TaskContext
+	class TaskContext final
 #ifdef __SHARE_PTR_COUNTER__
 	: public memory::Object<TaskContext>
 #endif

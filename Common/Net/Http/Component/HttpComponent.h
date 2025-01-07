@@ -15,8 +15,8 @@ namespace http
 }
 namespace acs
 {
-	class HttpComponent : public RpcComponent<http::Response>,
-			public ILuaRegister, public IRpc<http::Request, http::Response>
+	class HttpComponent final : public RpcComponent<http::Response>,
+	                            public ILuaRegister, public IRpc<http::Request, http::Response>
 	{
 	 public:
 		HttpComponent();

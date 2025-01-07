@@ -69,7 +69,7 @@ namespace tcp
 		long long mStartTime;
 	};
 
-	class TextProto : public IProto
+	class TextProto final : public IProto
 	{
 	public:
 		explicit TextProto(std::string  msg) : mMessage(std::move(msg)) { }

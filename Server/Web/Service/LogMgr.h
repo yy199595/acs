@@ -8,7 +8,7 @@
 
 namespace acs
 {
-	class LogMgr : public HttpService
+	class LogMgr final : public HttpService
 	{
 	public:
 		LogMgr() = default;

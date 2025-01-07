@@ -4,18 +4,16 @@
 
 #ifndef APP_MONGODBCOMPONENT_H
 #define APP_MONGODBCOMPONENT_H
-#include"Util/Tools/NumberBuilder.h"
 #include"Mongo/Client/MongoProto.h"
 #include"Mongo/Client/MongoClient.h"
 #include"Proto/Document/BsonDocument.h"
-#include"Util/Tools/NumberBuilder.h"
 #include"Mongo/Config/MongoConfig.h"
 #include"Core/Queue/Queue.h"
 #include"Rpc/Component/RpcComponent.h"
 
 namespace acs
 {
-	class MongoTask : public IRpcTask<mongo::Response>, protected WaitTaskSourceBase
+	class MongoTask final : public IRpcTask<mongo::Response>, protected WaitTaskSourceBase
 	{
 	public:
 		explicit MongoTask(int taskId);
@@ -41,7 +39,7 @@ namespace acs
 
 namespace acs
 {
-	class LuaMongoTask : public IRpcTask<mongo::Response>
+	class LuaMongoTask final : public IRpcTask<mongo::Response>
 	{
 	public:
 		LuaMongoTask(lua_State * lua, int id);
@@ -57,7 +55,7 @@ namespace acs
 
 namespace acs
 {
-    class MongoDBComponent : public RpcComponent<mongo::Response>,
+    class MongoDBComponent final : public RpcComponent<mongo::Response>,
 			public IRpc<mongo::Request, mongo::Response>,
 			public IDestroy, public IServerRecord, public ILuaRegister
 	{

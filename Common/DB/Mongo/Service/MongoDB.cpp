@@ -502,9 +502,9 @@ namespace acs
 			LOG_ERROR("query error = {}", error);
 			return XCode::FindMongoDocumentFail;
 		}
-		for(const std::string & json : results)
+		for(const std::string & json1 : results)
 		{
-			response.add_jsons(json);
+			response.add_jsons(json1);
 		}
         return XCode::Ok;
     }

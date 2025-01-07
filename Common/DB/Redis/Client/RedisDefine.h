@@ -34,7 +34,7 @@ namespace redis
 
 namespace redis
 {
-	class Request : public tcp::IProto
+	class Request final : public tcp::IProto
 #ifdef __SHARE_PTR_COUNTER__
 			, public memory::Object<Request>
 #endif
@@ -95,14 +95,14 @@ namespace redis
 		Request::Encode(self, std::forward<Args>(args)...);
 	}
 
-	class Response : public ILuaWrite
+	class Response final : public ILuaWrite
 #ifdef __SHARE_PTR_COUNTER__
 			, public memory::Object<Response>
 #endif
 	{
 	public:
 		Response();
-		~Response() { this->Clear(); }
+		~Response() final { this->Clear(); }
 
 	public:
 		bool IsOk();
@@ -148,7 +148,7 @@ namespace redis
 
 namespace acs
 {
-	class RedisTask : public acs::IRpcTask<redis::Response>, protected WaitTaskSourceBase
+	class RedisTask final : public acs::IRpcTask<redis::Response>, protected WaitTaskSourceBase
     {
     public:
         explicit RedisTask(int id);

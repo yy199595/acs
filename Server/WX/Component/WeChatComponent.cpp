@@ -77,14 +77,13 @@ namespace wx
 
 	bool RsaPublicEncode(const std::string& cert_file, const std::string& plaintext, std::string& output)
 	{
-		X509* cert;
 		FILE* cert_fp = fopen(cert_file.c_str(), "r");
 		if (cert_fp == nullptr)
 		{
 			return false;
 		}
 
-		cert = PEM_read_X509(cert_fp, nullptr, nullptr, nullptr);
+		X509* cert = PEM_read_X509(cert_fp, nullptr, nullptr, nullptr);
 		fclose(cert_fp);
 		if (cert == nullptr)
 		{

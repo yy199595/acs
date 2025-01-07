@@ -28,7 +28,7 @@ namespace api
 
 namespace acs
 {
-	class HttpApiComponent : public Component, public IComplete
+	class HttpApiComponent final : public Component, public IComplete
 	{
 	public:
 		HttpApiComponent();

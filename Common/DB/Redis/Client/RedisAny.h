@@ -20,11 +20,11 @@ namespace redis
         const T * Cast() const { return static_cast<const T *>(this);}
 	};
 
-	class Number : public Any
+	class Number final : public Any
 	{
 	 public:
-		Number(int value);
-		Number(long long value);
+		explicit Number(int value);
+		explicit Number(long long value);
 	 public:
 		void Write(std::iostream &io) final;
 		bool IsNumber() const final { return true; }
@@ -38,8 +38,8 @@ namespace redis
 	{
 	 public:
 		String();
-		String(const size_t size);
-		String(const std::string & value);
+		explicit String(size_t size);
+		explicit String(const std::string & value);
 		String(const char * str, size_t size);
 	 public:
 		void Write(std::iostream &io) final;

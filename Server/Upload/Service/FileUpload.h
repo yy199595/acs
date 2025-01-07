@@ -18,11 +18,11 @@ namespace upload
 
 namespace acs
 {
-	class FileUpload : public HttpService
+	class FileUpload final : public HttpService
 	{
 	public:
 		FileUpload();
-		~FileUpload() = default;
+		~FileUpload() final = default;
 	private:
 		bool Awake() final;
 		bool OnInit() final;

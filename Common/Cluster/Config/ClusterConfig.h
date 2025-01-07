@@ -35,7 +35,7 @@ namespace acs
 
 namespace acs
 {
-    class ClusterConfig : public JsonConfig, public ConstSingleton<ClusterConfig>
+    class ClusterConfig final : public JsonConfig, public ConstSingleton<ClusterConfig>
     {
     public:
         ClusterConfig() : JsonConfig("ClusterConfig") { }

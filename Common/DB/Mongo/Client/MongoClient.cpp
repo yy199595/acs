@@ -332,7 +332,7 @@ namespace mongo
 #endif
 	}
 
-	bool Client::SyncSend(std::unique_ptr<Request> request, mongo::Response& response)
+	bool Client::SyncSend(const std::unique_ptr<Request>& request, mongo::Response& response)
 	{
 		if(!this->SendSync(*request))
 		{
@@ -370,7 +370,7 @@ namespace mongo
 		return response;
 	}
 
-	std::unique_ptr<Response> Client::SyncSendMongoCommand(std::unique_ptr<Request> request)
+	std::unique_ptr<Response> Client::SyncSendMongoCommand(const std::unique_ptr<Request>& request)
 	{
 		if(!this->SendSync(*request))
 		{

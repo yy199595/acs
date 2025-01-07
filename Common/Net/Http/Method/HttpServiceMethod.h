@@ -325,8 +325,8 @@ namespace acs
 				std::unique_ptr<json::w::Value> data = document2->AddObject("data");
 				if (fromData == nullptr)
 				{
-					const http::FromContent& fromData = request.GetUrl().GetQuery();
-					code = (this->mObj->*mFunction)(fromData, *data);
+					const http::FromContent& fromData1 = request.GetUrl().GetQuery();
+					code = (this->mObj->*mFunction)(fromData1, *data);
 					break;
 				}
 				if (body->GetContentType() != http::ContentType::FROM)

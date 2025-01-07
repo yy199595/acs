@@ -12,7 +12,7 @@
 
 namespace mongo
 {
-	class Client : public tcp::Client
+	class Client final : public tcp::Client
 	{
 	 public:
 		typedef acs::IRpc<Request, Response> Component;
@@ -22,7 +22,7 @@ namespace mongo
         void Stop();
 		bool Start(bool async = true);
 		void SendMongoCommand(std::unique_ptr<Request> request);
-		bool SyncSend(std::unique_ptr<Request> request, mongo::Response & response);
+		bool SyncSend(const std::unique_ptr<Request>& request, mongo::Response & response);
 		std::unique_ptr<mongo::Response> SyncMongoCommand(std::unique_ptr<Request> request);
 	private:
 		bool StartAuthBySha1();
@@ -31,7 +31,7 @@ namespace mongo
 		void OnTimeout(tcp::TimeoutFlag flag) final;
 		void OnReadError(const Asio::Code &code) final;
 		void OnReceiveMessage(std::istream & is, size_t, const Asio::Code &) final;
-		std::unique_ptr<Response> SyncSendMongoCommand(std::unique_ptr<Request> request);
+		std::unique_ptr<Response> SyncSendMongoCommand(const std::unique_ptr<Request>& request);
         bool Auth(const std::string & user, const std::string & db, const std::string & pwd);
 		void OnResponse(int code, std::unique_ptr<Request> request, std::unique_ptr<Response> response);
 	private:

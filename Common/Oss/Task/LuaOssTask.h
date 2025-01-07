@@ -10,7 +10,7 @@
 
 namespace acs
 {
-	class LuaOssRequestTask : public IRpcTask<http::Response>
+	class LuaOssRequestTask final : public IRpcTask<http::Response>
 	{
 	public:
 		explicit LuaOssRequestTask(int id, lua_State * lua, std::string url);

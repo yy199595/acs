@@ -5,14 +5,13 @@
 #ifndef APP_REDISSUBCOMPONENT_H
 #define APP_REDISSUBCOMPONENT_H
 #include"Redis/Client/Client.h"
-#include"Yyjson/Document/Document.h"
 #include"Redis/Config/RedisConfig.h"
 #include"Entity/Component/Component.h"
 
 
 namespace acs
 {
-	class RedisSubComponent : public Component, public IRpc<redis::Request, redis::Response>
+	class RedisSubComponent final : public Component, public IRpc<redis::Request, redis::Response>
 	{
 	public:
 		RedisSubComponent();

@@ -14,8 +14,8 @@ namespace acs
 
         bool JumpNextLayer();
 		std::queue<long long> & GetTimerQueue();
-		const int GetLayerId() { return this->mLayerId;}
-		const size_t GetLayerIndex() { return this->mCurIndex;}
+		int GetLayerId() const { return this->mLayerId;}
+		size_t GetLayerIndex() const { return this->mCurIndex;}
     private:
         const int mMin;
         const int mMax;

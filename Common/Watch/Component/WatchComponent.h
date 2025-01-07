@@ -8,11 +8,11 @@
 #include "Entity/Component/Component.h"
 namespace acs
 {
-	class WatchComponent : public Component, public ISecondUpdate
+	class WatchComponent final : public Component, public ISecondUpdate
 	{
 	public:
 		WatchComponent();
-		~WatchComponent() = default;
+		~WatchComponent() final = default;
 	private:
 		void OnSecondUpdate(int tick) final;
 	public:

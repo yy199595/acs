@@ -9,7 +9,7 @@
 #include"Rpc/Service/RpcService.h"
 namespace acs
 {
-    class LoginSystem : public RpcService
+    class LoginSystem final : public RpcService
     {
     public:
         LoginSystem();

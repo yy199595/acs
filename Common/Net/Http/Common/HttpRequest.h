@@ -20,9 +20,9 @@
 struct lua_State;
 namespace http
 {
-	class Request : public tcp::IProto, public ILuaWrite
+	class Request final : public tcp::IProto, public ILuaWrite
 #ifdef __SHARE_PTR_COUNTER__
-			, public memory::Object<Request>
+	                      , public memory::Object<Request>
 #endif
     {
     public:

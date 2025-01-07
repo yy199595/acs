@@ -122,8 +122,7 @@ namespace acs
 
     void ClusterConfig::GetServers(std::vector<std::string>& list) const
     {
-        auto iter = this->mNodeConfigs.begin();
-        for (; iter != this->mNodeConfigs.end(); iter++)
+	    for (auto iter = this->mNodeConfigs.begin(); iter != this->mNodeConfigs.end(); ++iter)
         {
             if (iter->second->ServiceCount() > 0)
             {
@@ -134,8 +133,7 @@ namespace acs
 
     size_t ClusterConfig::GetNodeConfigs(std::vector<const NodeConfig *> &nodes) const
     {
-        auto iter = this->mNodeConfigs.begin();
-        for(; iter != this->mNodeConfigs.end(); iter++)
+	    for(auto iter = this->mNodeConfigs.begin(); iter != this->mNodeConfigs.end(); ++iter)
         {
             nodes.emplace_back(iter->second.get());
         }

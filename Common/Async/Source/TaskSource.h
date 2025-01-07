@@ -7,7 +7,7 @@
 #include"WaitTaskSourceBase.h"
 namespace acs
 {
-    class LoopTaskSource : public WaitTaskSourceBase
+    class LoopTaskSource final : public WaitTaskSourceBase
     {
     public:
         void Await() {this->YieldTask();}
@@ -15,7 +15,7 @@ namespace acs
     };
 
     template<typename T>
-    class TaskSource : public WaitTaskSourceBase
+    class TaskSource final : public WaitTaskSourceBase
     {
     public:
         const T & Await();

@@ -212,7 +212,7 @@ namespace redis
 #endif
 	}
 
-	std::unique_ptr<redis::Response> Client::ReadResponse(std::unique_ptr<redis::Request> request)
+	std::unique_ptr<redis::Response> Client::ReadResponse(const std::unique_ptr<redis::Request>& request)
 	{
 		std::unique_ptr<redis::Response> redisResponse = std::make_unique<redis::Response>();
 		if (!this->SendSync(*request))

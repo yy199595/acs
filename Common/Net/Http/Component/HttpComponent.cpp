@@ -54,18 +54,17 @@ namespace acs
 #ifdef __ENABLE_OPEN_SSL__
 		if(request->IsHttps())
 		{
-			std::unique_ptr<asio::ssl::context> context;
 			const std::string & path = request->GetVerifyFile();
 			const std::string & fullPath = path.empty() ? this->mPemPath : path;
 			auto iter = this->mSslContexts.find(fullPath);
 			if(iter == this->mSslContexts.end())
 			{
 				Asio::Code code;
-				context = std::make_unique<asio::ssl::context>(asio::ssl::context::sslv23);
 				//context->set_options(asio::ssl::context::default_workarounds | asio::ssl::context::no_sslv2 |asio::ssl::context::single_dh_use);
 				{
+					std::unique_ptr<asio::ssl::context> context = std::make_unique<asio::ssl::context>(asio::ssl::context::sslv23);
 					//context->set_verify_mode(asio::ssl::verify_none);
-					auto val = context->load_verify_file(fullPath, code);
+					context->load_verify_file(fullPath, code);
 					if(code.value() != Asio::OK)
 					{
 						LOG_ERROR("load ssh : {}", fullPath);

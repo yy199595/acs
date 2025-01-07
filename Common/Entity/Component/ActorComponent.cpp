@@ -273,7 +273,7 @@ namespace acs
 	{
 		auto iter = this->mServers.begin();
 		servers.reserve(this->mServers.size());
-		for(; iter != this->mServers.end(); iter++)
+		for(; iter != this->mServers.end(); ++iter)
 		{
 			const Server * server = iter->second;
 			if(ClusterConfig::Inst()->GetConfig(server->Name()) != nullptr)
@@ -311,8 +311,7 @@ namespace acs
 	int ActorComponent::Broadcast(const std::string& func)
 	{
 		int count = 0;
-		auto iter = this->mServers.begin();
-		for(; iter != this->mServers.end(); iter++)
+		for(auto iter = this->mServers.begin(); iter != this->mServers.end(); ++iter)
 		{
 			Server * server = iter->second;
 			if(server->Send(func) == XCode::Ok)
@@ -326,8 +325,7 @@ namespace acs
 	int ActorComponent::Broadcast(const std::string& func, const pb::Message& message)
 	{
 		int count = 0;
-		auto iter = this->mServers.begin();
-		for(; iter != this->mServers.end(); iter++)
+		for(auto iter = this->mServers.begin(); iter != this->mServers.end(); ++iter)
 		{
 			//if(!this->mApp->Equal(iter->first))
 			{

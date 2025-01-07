@@ -34,7 +34,7 @@ namespace quick
 
 namespace acs
 {
-	class QuickComponent : public Component
+	class QuickComponent final : public Component
 	{
 	public:
 		QuickComponent();

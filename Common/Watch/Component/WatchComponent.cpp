@@ -7,15 +7,12 @@
 namespace acs
 {
 	WatchComponent::WatchComponent()
-	{
-
-	}
+	= default;
 
 	void WatchComponent::OnSecondUpdate(int tick)
 	{
-		for (size_t index = 0; index < this->mProcess.size(); index++)
+		for (auto & process : this->mProcess)
 		{
-			os::Process& process = this->mProcess[index];
 			if (!process.IsRunning() && !process.Run())
 			{
 				LOG_ERROR("restart process error");

@@ -42,21 +42,21 @@ namespace acs
 		this->mMongo->SetIndex(mongo_tab::ADMIN_LIST, "user_id", 1, true);
 	}
 
-	int AdminComponent::UpdateUser(int userId, json::w::Document& document)
+	int AdminComponent::UpdateUser(int userId, json::w::Document& document) const
 	{
 		json::w::Document filter;
 		filter.Add("user_id", userId);
 		return this->mMongo->Update(mongo_tab::ADMIN_LIST, filter, document);
 	}
 
-	int AdminComponent::Remove(int userId)
+	int AdminComponent::Remove(int userId) const
 	{
 		json::w::Document filter;
 		filter.Add("user_id", userId);
 		return this->mMongo->Remove(mongo_tab::ADMIN_LIST, filter, 1);
 	}
 
-	int AdminComponent::List(int page, json::w::Document& response)
+	int AdminComponent::List(int page, json::w::Document& response) const
 	{
 		json::w::Document filter;
 		db::mongo::find_page::request request;
@@ -89,7 +89,7 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	int AdminComponent::InsertUser(admin::UserInfo & userInfo)
+	int AdminComponent::InsertUser(admin::UserInfo & userInfo) const
 	{
 		json::w::Document document;
 		userInfo.user_id = this->mMongo->Inc("admin_id");
@@ -118,7 +118,7 @@ namespace acs
 		return AdminComponent::Decode(*response);
 	}
 
-	std::unique_ptr<admin::UserInfo> AdminComponent::GetUserInfo(const std::string& account)
+	std::unique_ptr<admin::UserInfo> AdminComponent::GetUserInfo(const std::string& account) const
 	{
 		json::w::Document filter;
 		filter.Add("_id", account);
@@ -165,6 +165,6 @@ namespace acs
 		{
 			return nullptr;
 		}
-		return this->Decode(document);
+		return acs::AdminComponent::Decode(document);
 	}
 }

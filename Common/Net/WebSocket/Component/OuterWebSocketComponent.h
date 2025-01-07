@@ -13,10 +13,10 @@ namespace ws
 
 #include "Rpc/Component/RpcComponent.h"
 #include "Server/Component/ITcpComponent.h"
-#include "WebSocket/Common/WebSocketMessage.h"
+
 namespace acs
 {
-	class OuterWebSocketComponent : public ITcpListen, public rpc::IOuterSender, public IServerRecord,
+	class OuterWebSocketComponent final : public ITcpListen, public rpc::IOuterSender, public IServerRecord,
 							 public RpcComponent<rpc::Message>, public IRpc<rpc::Message, rpc::Message>
 	{
 	public:

@@ -193,7 +193,7 @@ namespace _bson {
         q(log() << sz << endl);
         const char *end = p + sz - 1;
         p += 4;
-        while (1) {
+        while (true) {
             const char *elem = p;
             const char *nul = ++p + name_sz;
             q(log() << "type " << (int)*elem << endl;)
@@ -214,7 +214,7 @@ namespace _bson {
             }
             // else, mismatch.  skip to next
             q(log() << "skip ahead:" << p << endl;)
-                while (1) {
+                while (true) {
                 if ((*p++ == 0))   // both the loop unwinding here, and the use of 
                     break;                          // unlikely(), made a measurable difference in a 
                 if ((*p++ == 0))   // quick ad hoc test (gcc 4.2.1)
@@ -427,7 +427,7 @@ namespace _bson {
         s << (isArray ? "[ " : "{ ");
         bsonobjiterator i(*this);
         bool first = true;
-        while (1) {
+        while (true) {
             massert(10327, "Object does not end with EOO", i.moreWithEOO());
             bsonelement e = i.next(true);
             massert(10328, "Invalid element size", e.size() > 0);

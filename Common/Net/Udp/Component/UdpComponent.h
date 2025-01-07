@@ -3,7 +3,6 @@
 //
 
 #pragma once;
-#include <array>
 #include "asio.hpp"
 #include "Rpc/Common/Message.h"
 #include "Udp/Common/UdpServer.h"
@@ -14,7 +13,7 @@ using asio_udp = asio::ip::udp;
 
 namespace acs
 {
-	class UdpComponent : public Component, public rpc::IInnerSender, public IRpc<rpc::Message, rpc::Message>,
+	class UdpComponent final : public Component, public rpc::IInnerSender, public IRpc<rpc::Message, rpc::Message>,
 						 public INetListen
 	{
 	public:

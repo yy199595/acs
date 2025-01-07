@@ -26,16 +26,14 @@
 // 加密数据
 std::string aes::Create(const std::string& data, const std::string& key)
 {
-	EVP_CIPHER_CTX* ctx;
 	unsigned char iv[EVP_MAX_IV_LENGTH];
 	unsigned char* outbuf;
 	int outlen;
-	int len;
 	std::string encrypted_data;
 
 
 	// 初始化加密上下文
-	ctx = EVP_CIPHER_CTX_new();
+	EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
 	if (!ctx)
 	{
 		return "";
@@ -49,7 +47,7 @@ std::string aes::Create(const std::string& data, const std::string& key)
 	}
 
 	// 初始化加密
-	if (!EVP_EncryptInit_ex(ctx, CIPHER, NULL, reinterpret_cast<const unsigned char*>(key.c_str()), iv))
+	if (!EVP_EncryptInit_ex(ctx, CIPHER, nullptr, reinterpret_cast<const unsigned char*>(key.c_str()), iv))
 	{
 		EVP_CIPHER_CTX_free(ctx);
 		return "";
@@ -66,7 +64,7 @@ std::string aes::Create(const std::string& data, const std::string& key)
 		return "";
 	}
 
-	len = outlen;
+	int len = outlen;
 
 	// 结束加密
 	if (!EVP_EncryptFinal_ex(ctx, outbuf + len, &outlen))
@@ -109,7 +107,7 @@ bool aes::Verify(const std::string& text, const std::string& key, std::string& p
 	}
 
 	// 初始化解密
-	if (!EVP_DecryptInit_ex(ctx, CIPHER, NULL, reinterpret_cast<const unsigned char*>(key.c_str()), iv))
+	if (!EVP_DecryptInit_ex(ctx, CIPHER, nullptr, reinterpret_cast<const unsigned char*>(key.c_str()), iv))
 	{
 		EVP_CIPHER_CTX_free(ctx);
 		return false;
@@ -169,9 +167,9 @@ std::string aes::Aes256GcmDecode(const std::string& ciphertext,
 	}
 
 	// 初始化解密器并设置密钥、IV和操作模式
-	if (EVP_DecryptInit_ex(ctx, EVP_aes_256_gcm(), NULL, NULL, NULL) != 1
-		|| EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN, iv.size(), NULL) != 1
-		|| EVP_DecryptInit_ex(ctx, NULL, NULL, reinterpret_cast<const unsigned char*>(key.c_str()),
+	if (EVP_DecryptInit_ex(ctx, EVP_aes_256_gcm(), nullptr, nullptr, nullptr) != 1
+		|| EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN, iv.size(), nullptr) != 1
+		|| EVP_DecryptInit_ex(ctx, nullptr, nullptr, reinterpret_cast<const unsigned char*>(key.c_str()),
 			reinterpret_cast<const unsigned char*>(iv.c_str())) != 1)
 	{
 		EVP_CIPHER_CTX_free(ctx);
@@ -180,7 +178,7 @@ std::string aes::Aes256GcmDecode(const std::string& ciphertext,
 
 	// 添加附加的认证数据（AAD）
 	if (!aad.empty() &&
-		EVP_DecryptUpdate(ctx, NULL, &len, reinterpret_cast<const unsigned char*>(aad.c_str()), aad.size()) != 1)
+		EVP_DecryptUpdate(ctx, nullptr, &len, reinterpret_cast<const unsigned char*>(aad.c_str()), aad.size()) != 1)
 	{
 		EVP_CIPHER_CTX_free(ctx);
 		return "";
