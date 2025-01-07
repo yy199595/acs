@@ -203,13 +203,15 @@ end
 ---@param tab string
 ---@param name string
 ---@param unique boolean
+---@param sort number
 ---@return number
-function MongoComponent:SetIndex(tab, name, unique)
+function MongoComponent:SetIndex(tab, name, sort, unique)
     assert(type(tab) == "string")
     local session = self:GetActorId()
     return app:Call(session, "MongoDB.SetIndex", {
         tab = tab,
         key = name,
+        sort = sort or 1,
         unique = unique or false
     })
 end

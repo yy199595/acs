@@ -67,11 +67,6 @@ namespace acs
 
 namespace acs
 {
-	MongoDBComponent::MongoDBComponent()
-	{
-
-	}
-
 	bool MongoDBComponent::Awake()
 	{
 		std::unique_ptr<json::r::Value> mongoObject;

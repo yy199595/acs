@@ -68,7 +68,7 @@ namespace rpc
 			case tcp::Decode::None:
 			{
 				tcp::Data::Read(readStream, this->mProtoHead);
-				if (this->mProtoHead.Len >= this->mMaxCount)
+				if (this->mProtoHead.Len >= rpc::OuterBufferMaxSize)
 				{
 					this->CloseSocket(XCode::NetBigDataShutdown);
 					return;
@@ -77,7 +77,18 @@ namespace rpc
 				{
 					this->mMessage->Init(this->mProtoHead);
 				}
+				size_t readCount = 0;
 				this->mDecodeState = tcp::Decode::MessageBody;
+				if(this->mSocket->CanRecvCount(readCount))
+				{
+					this->CloseSocket(XCode::NetReadFailure);
+					return;
+				}
+				if(readCount < this->mProtoHead.Len)
+				{
+					this->CloseSocket(XCode::NetReadFailure);
+					return;
+				}
 				this->ReadLength(this->mProtoHead.Len);
 				break;
 			}

@@ -3,7 +3,7 @@
 #include<regex>
 #include<sstream>
 #include <codecvt>
-#include"Math.h"
+#include"Random.h"
 namespace help
 {
     std::string Str::EmptyStr;
@@ -150,7 +150,7 @@ namespace help
 		for(size_t index = 0; index < size; index++)
 		{
 			int max = (int)STR_BUFFER.size();
-			int num = help::Math::Random<int>(0, max);
+			int num = help::Rand::Random<int>(0, max);
 			result[index] = STR_BUFFER[num];
 		}
 		return result;
@@ -158,7 +158,7 @@ namespace help
 
     std::string Str::CreateNewToken()
     {
-        const int size = Math::Random<int>(30, 100);
+        const int size = help::Rand::Random<int>(30, 100);
         return md5::GetMd5(RandomString(size));
     }
 }// namespace StringHelper

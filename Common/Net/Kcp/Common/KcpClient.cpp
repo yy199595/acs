@@ -4,7 +4,6 @@
 
 #include "KcpClient.h"
 #include "Util/Tools/String.h"
-#include "Entity/Actor/App.h"
 #include "Log/Common/CommonLogDef.h"
 #include "Util/Tools/TimeHelper.h"
 namespace kcp

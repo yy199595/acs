@@ -11,7 +11,7 @@ namespace acs
 	class MessageDecoder //转lua
 	{
 	 public:
-		MessageDecoder(lua_State * lua);
+		explicit MessageDecoder(lua_State * lua);
 		MessageDecoder(lua_State * lua, ProtoComponent * component);
 		bool Decode(const pb::Message & message);
 	 private:

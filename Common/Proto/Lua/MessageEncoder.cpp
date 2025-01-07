@@ -7,8 +7,8 @@
 namespace acs
 {
 	MessageEncoder::MessageEncoder(lua_State* lua)
+		: mLua(lua)
 	{
-		this->mLua = lua;
 	}
 
 	bool MessageEncoder::Encode(pb::Message & message, int index)

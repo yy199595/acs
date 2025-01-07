@@ -62,7 +62,7 @@ namespace acs
 			public IDestroy, public IServerRecord, public ILuaRegister
 	{
 	public:
-		MongoDBComponent();
+		MongoDBComponent() = default;
 		~MongoDBComponent() final = default;
 	public:
 		std::unique_ptr<mongo::Response> Run(std::unique_ptr<mongo::Request> request);

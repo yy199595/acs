@@ -20,8 +20,8 @@ function Main:Awake()
     --    rpc = "43.143.239.75:7789",
     --    http = "43.143.239.75:80"
     --})
-    local timer = require("core.timer")
-    timer.AddUpdate(400, self, "Update")
+    --local timer = require("core.timer")
+    --timer.AddUpdate(400, self, "Update")
 end
 
 local count = 0
@@ -55,11 +55,12 @@ end
 
 function Main:OnComplete()
 
-    mongo:InsertOnce("demo.player", {
+    print(mongo:SetIndex("demo.player", "account", 1, false))
+    print(mongo:InsertOnce("demo.player", {
         _id = 10001,
         age = 20,
         name = "xiaoming"
-    })
+    }))
 end
 
 return Main

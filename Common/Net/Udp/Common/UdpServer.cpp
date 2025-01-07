@@ -34,7 +34,6 @@ namespace udp
 	{
 		this->mRecvBuffer.commit(size);
 		std::istream is(&this->mRecvBuffer);
-		//CONSOLE_LOG_ERROR("receive ({}:{}) size={}", ip, port, size)
 		std::unique_ptr<rpc::Message> rpcPacket = std::make_unique<rpc::Message>();
 		{
 			tcp::Data::Read(is, rpcPacket->GetProtoHead());

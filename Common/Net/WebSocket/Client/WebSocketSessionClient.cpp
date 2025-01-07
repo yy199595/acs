@@ -145,7 +145,7 @@ namespace ws
 			case tcp::ReadOneLine:
 				this->ReadLine();
 				break;
-			case tcp::ReadSome:
+			case tcp::ReadSomeMessage:
 				this->ReadSome();
 				break;
 			case tcp::ReadError:

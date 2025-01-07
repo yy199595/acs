@@ -261,6 +261,7 @@ namespace tcp
 			this->OnReceiveMessage(ss, length, code);
 			return;
 		}
+
 		this->StartTimer(timeout, TimeoutFlag::ReadCount);
 		std::shared_ptr<Client> self = this->shared_from_this();
 		auto callBack = [self, length](const asio::error_code& code, size_t size)

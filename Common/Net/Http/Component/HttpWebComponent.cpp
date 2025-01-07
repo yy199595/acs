@@ -5,7 +5,6 @@
 #include"HttpWebComponent.h"
 #include"Entity/Actor/App.h"
 #include"Core/System/System.h"
-#include"Rpc/Config/ServiceConfig.h"
 #include"Http/Client/SessionClient.h"
 #include"Http/Service/HttpService.h"
 #include"Util/File/DirectoryHelper.h"
@@ -15,7 +14,6 @@
 #include"Lua/Engine/ModuleClass.h"
 #include "Rpc/Component/DispatchComponent.h"
 
-#include "Rpc/Service/RpcService.h"
 namespace acs
 {
 	HttpWebComponent::HttpWebComponent()
@@ -50,14 +48,6 @@ namespace acs
 		{
 			const std::string& name = httpService->GetName();
 			this->mHttpServices.Add(name, httpService);
-		}
-
-		std::vector<RpcService*> rpcServices;
-		this->mApp->GetComponents(rpcServices);
-		for (RpcService* rpcService: rpcServices)
-		{
-			const std::string& name = rpcService->GetName();
-			this->mRpcServices.Add(name, rpcService);
 		}
 
 		this->mCorComponent = App::Coroutine();
@@ -147,17 +137,6 @@ namespace acs
 				{
 					httpStatus = HttpStatus::NOT_FOUND;
 					break;
-				}
-				const RpcMethodConfig* rpcConfig = RpcConfig::Inst()->GetMethodByUrl(path);
-				if (rpcConfig == nullptr)
-				{
-					httpStatus = HttpStatus::NOT_FOUND;
-					break;
-				}
-				if (request->IsMethod("GET"))
-				{
-					this->OnApi(rpcConfig, request, response);
-					return;
 				}
 				this->ReadMessageBody(sockId, std::make_unique<http::TextContent>());
 				return;
@@ -321,12 +300,6 @@ namespace acs
 			this->OnApi(httpConfig, request, response);
 			return;
 		}
-		const RpcMethodConfig * rpcMethodConfig = RpcConfig::Inst()->GetMethodByUrl(path);
-		if(rpcMethodConfig != nullptr)
-		{
-			this->OnApi(rpcMethodConfig, request, response);
-			return;
-		}
 		std::string ip;
 		request->Header().Get(http::Header::RealIp, ip);
 		LOG_ERROR("[{}:{}] {}", ip, request->GetUrl().Method(), request->ToString());
@@ -342,77 +315,6 @@ namespace acs
 			return;
 		}
 		this->mCorComponent->Start(&HttpWebComponent::Invoke, this, httpConfig, request, response);
-	}
-
-	void HttpWebComponent::OnApi(const acs::RpcMethodConfig* config, http::Request* request, http::Response* response)
-	{
-		std::vector<std::string> keys;
-		request->GetUrl().GetQuery().Get(keys);
-		const http::FromContent& fromContent = request->GetUrl().GetQuery();
-		rpc::Message* message = new rpc::Message();
-		{
-			std::string value;
-			message->SetNet(rpc::Net::Http);
-			message->SetType(rpc::Type::Request);
-			for (const std::string& key: keys)
-			{
-				if (fromContent.Get(key, value))
-				{
-					message->GetHead().Add(key, value);
-				}
-			}
-			message->SetSockId(request->GetSockId());
-			message->GetHead().Add(rpc::Header::func, config->FullName);
-		}
-		const http::Content* content = request->GetBody();
-		if (config->Proto > rpc::Porto::None && content != nullptr)
-		{
-			message->SetProto(rpc::Porto::Json);
-			const http::TextContent* textContent = content->To<const http::TextContent>();
-			if (textContent != nullptr)
-			{
-				message->Body()->assign(textContent->Content());
-			}
-		}
-		int sockId = request->GetSockId();
-		std::function<void(int code)> callback = [message, this, sockId](int code)
-		{
-			const std::string& desc = CodeConfig::Inst()->GetDesc(code);
-			std::unique_ptr<http::JsonContent> jsonContent = std::make_unique<http::JsonContent>();
-			{
-				json::w::Document document;
-				document.Add("code", code);
-				document.Add("message", desc);
-				if (message->GetBody().length() > 0)
-				{
-					document.AddJson("data", message->GetBody());
-				}
-				jsonContent->Write(document);
-			}
-			delete message;
-			this->SendResponse(sockId, HttpStatus::OK, std::move(jsonContent));
-		};
-		int code = XCode::Ok;
-		do
-		{
-			RpcService* logicService = this->mRpcServices.Find(config->Service);
-			if (logicService == nullptr)
-			{
-				code = XCode::CallServiceNotFound;
-				break;
-			}
-			if(config->IsAsync)
-			{
-				this->mCorComponent->Start([logicService, callback, config, message]()
-				{
-					callback(logicService->Invoke(config, message));
-				});
-				return;
-			}
-			code = logicService->Invoke(config, message);
-		}
-		while(false);
-		callback(code);
 	}
 
 	HttpStatus HttpWebComponent::AuthToken(const HttpMethodConfig* config, http::Request* request)

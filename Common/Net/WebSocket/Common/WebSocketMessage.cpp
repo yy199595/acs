@@ -3,7 +3,7 @@
 //
 
 #include "WebSocketMessage.h"
-#include "Util/Tools/Math.h"
+#include "Util/Tools/Random.h"
 namespace ws
 {
 
@@ -91,7 +91,7 @@ namespace ws
 		{
 			for(size_t index = 0; index < sizeof(this->mMaskingKey); index++)
 			{
-				int num = help::Math::Random<int>(0, sizeof(unsigned char));
+				int num = help::Rand::Random<int>(0, sizeof(unsigned char));
 				this->mMaskingKey[index] = static_cast<char>(num);
 			}
 			for(size_t index = 0; index < this->mMessage.size(); index++)
@@ -174,12 +174,14 @@ namespace ws
 			this->mMessage.resize(this->mHeader.mLength);
 		}
 
+		int maxReadCount = this->mHeader.mLength - this->mOffset;
 		char* buffer = const_cast<char*>(this->mMessage.c_str());
-		size_t count = os.readsome(buffer, this->mHeader.mLength);
+		size_t count = os.readsome(buffer, maxReadCount);
 		while(count > 0)
 		{
 			this->mOffset += count;
-			count = os.readsome(buffer + this->mOffset, this->mHeader.mLength);
+			maxReadCount = this->mHeader.mLength - this->mOffset;
+			count = os.readsome(buffer + this->mOffset, maxReadCount);
 		}
 		size_t len = this->mHeader.mLength - this->mOffset;
 		if(len == 0)
@@ -191,6 +193,6 @@ namespace ws
 				}
 			}
 		}
-		return (int)len;
+		return tcp::ReadSomeMessage;
 	}
 }

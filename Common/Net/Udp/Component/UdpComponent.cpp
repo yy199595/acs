@@ -163,17 +163,15 @@ namespace acs
 		}
 		try
 		{
-			udp::Client * udpClient = nullptr;
 			Asio::Context & main = this->mApp->GetContext();
 			asio_udp::endpoint remote(asio::ip::make_address(ip), port);
 			Asio::Context & ctx = this->GetComponent<ThreadComponent>()->GetContext();
-			std::unique_ptr<udp::Client> client = std::make_unique<udp::Client>(ctx, this, remote, main);
+			std::shared_ptr<udp::Client> client = std::make_shared<udp::Client>(ctx, this, remote, main);
 			{
-				udpClient = client.get();
-				this->mClients.emplace(id, std::move(client));
-				asio::post(ctx, [udpClient]() {udpClient->StartReceive(); });
+				this->mClients.emplace(id, client);
+				asio::post(ctx, [client]() { client->StartReceive(); });
 			}
-			return udpClient;
+			return client.get();
 		}
 		catch (std::exception & e)
 		{

@@ -141,8 +141,8 @@ namespace acs
 					{
 						long long value = sqlite3_column_int64(stmt, index);
 						document.Add(key, value);
-					}
 						break;
+					}
 					case SQLITE_FLOAT:
 					{
 						double value = sqlite3_column_double(stmt, index);
