@@ -68,8 +68,8 @@ namespace udp
 				if (rpcPacket->OnRecvMessage(is, rpcPacket->GetProtoHead().Len) == tcp::ReadDone)
 				{
 					rpcPacket->SetNet(rpc::Net::Udp);
-					rpcPacket->TempHead().Add(rpc::Header::udp_addr, address);
 					std::shared_ptr<Client> self = this->shared_from_this();
+					rpcPacket->TempHead().Add(rpc::Header::from_addr, address);
 					asio::post(this->mMainContext, [self, msg = rpcPacket.release()] { self->mComponent->OnMessage(msg, msg); });
 				}
 			}

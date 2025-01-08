@@ -53,7 +53,7 @@ namespace udp
 			rpcPacket->TempHead().Add(rpc::Header::from_addr, address);
 #endif
 			rpcPacket->SetNet(rpc::Net::Udp);
-			rpcPacket->TempHead().Add(rpc::Header::udp_addr, address);
+			rpcPacket->TempHead().Add(rpc::Header::from_addr, address);
 			asio::post(this->mMainContext, [this, msg = rpcPacket.release()]{ this->mComponent->OnMessage(msg, nullptr); });
 		}
 		this->mRecvBuffer.consume(size);

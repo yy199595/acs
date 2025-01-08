@@ -95,7 +95,7 @@ namespace acs
 		if (message->GetType() == rpc::Type::Response)
 		{
 			std::string address;
-			if (!message->TempHead().Del(rpc::Header::kcp_addr, address))
+			if (!message->TempHead().Del(rpc::Header::from_addr, address))
 			{
 				return XCode::SendMessageFail;
 			}
@@ -124,7 +124,7 @@ namespace acs
 			{
 				std::string address;
 				code = XCode::Failure;
-				if(request->GetHead().Get(rpc::Header::kcp_addr, address))
+				if(request->GetHead().Get(rpc::Header::from_addr, address))
 				{
 					this->mKcpServer->RemoveSession(address);
 				}

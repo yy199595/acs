@@ -128,7 +128,7 @@ namespace kcp
 			rpcPacket->TempHead().Add(rpc::Header::from_addr, address);
 #endif
 			rpcPacket->SetNet(rpc::Net::Kcp);
-			rpcPacket->TempHead().Add(rpc::Header::kcp_addr, address);
+			rpcPacket->TempHead().Add(rpc::Header::from_addr, address);
 		}
 		asio::post(this->mMainContext, [this, request = rpcPacket.release()] {
 			this->mComponent->OnMessage(request, nullptr);
