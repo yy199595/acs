@@ -5,30 +5,34 @@
 #include "KcpServer.h"
 #include "Util/Tools/String.h"
 #include "Util/Tools/TimeHelper.h"
+
 namespace kcp
 {
-	Server::Server(asio::io_context& io, kcp::Server::Component* component, unsigned short port, Asio::Context & main)
-			: mContext(io), mSocket(io, asio::ip::udp::endpoint(asio::ip::udp::v4(), port)), mComponent(component), mTimer(io), mMainContext(main)
+	Server::Server(asio::io_context& io, kcp::Server::Component* component, unsigned short port, Asio::Context& main)
+			: mContext(io), mSocket(io, asio::ip::udp::endpoint(asio::ip::udp::v4(), port)), mComponent(component),
+			  mTimer(io), mMainContext(main)
 	{
 		this->mTimer.expires_after(std::chrono::milliseconds(KCP_UPDATE_INTERVAL));
-		this->mTimer.async_wait([this](auto && PH1) { OnUpdate(std::forward<decltype(PH1)>(PH1)); });
+		this->mTimer.async_wait([this](auto&& PH1)
+		{ OnUpdate(std::forward<decltype(PH1)>(PH1)); });
 	}
 
 	void Server::StartReceive()
 	{
+		auto callback = [this](const asio::error_code& code, size_t size)
+		{
+			if (code.value() == Asio::OK)
+			{
+				this->OnReceive(size);
+			}
+			else if (code == asio::error::operation_aborted)
+			{
+				return;
+			}
+			this->StartReceive();
+		};
 		this->mSocket.async_receive_from(asio::buffer(this->mRecvBuffer),
-				this->mSenderPoint, [this](const asio::error_code& code, size_t size)
-				{
-					if(code == asio::error::operation_aborted)
-					{
-						return;
-					}
-					if (code.value() == Asio::OK)
-					{
-						this->OnReceive(size);
-					}
-					this->StartReceive();
-				});
+				this->mSenderPoint, callback);
 	}
 
 	bool Server::Send(const std::string& addr, tcp::IProto* message)
@@ -36,7 +40,7 @@ namespace kcp
 		asio::post(this->mContext, [this, addr, message]()
 		{
 			auto iter = this->mClients.find(addr);
-			if(iter == this->mClients.end())
+			if (iter == this->mClients.end())
 			{
 				delete message;
 				return;
@@ -51,7 +55,7 @@ namespace kcp
 		asio::post(this->mContext, [this, address]()
 		{
 			auto iter = this->mClients.find(address);
-			if(iter == this->mClients.end())
+			if (iter == this->mClients.end())
 			{
 				return;
 			}
@@ -64,9 +68,9 @@ namespace kcp
 		long long t = help::Time::NowMil();
 		long long t1 = help::Time::NowSec();
 		auto iter = this->mClients.begin();
-		while(iter != this->mClients.end())
+		while (iter != this->mClients.end())
 		{
-			if(t1 - iter->second->GetLastTime() >= KCP_TIME_OUT)
+			if (t1 - iter->second->GetLastTime() >= KCP_TIME_OUT)
 			{
 				CONSOLE_LOG_ERROR("remove kcp client=>{}", iter->second->GetAddress());
 				iter = this->mClients.erase(iter++);
@@ -98,7 +102,8 @@ namespace kcp
 	{
 		this->Update();
 		this->mTimer.expires_after(std::chrono::milliseconds(KCP_UPDATE_INTERVAL));
-		this->mTimer.async_wait([this](auto && PH1) { OnUpdate(std::forward<decltype(PH1)>(PH1)); });
+		this->mTimer.async_wait([this](auto&& PH1)
+		{ OnUpdate(std::forward<decltype(PH1)>(PH1)); });
 	}
 
 	void Server::OnReceive(size_t size)
@@ -107,19 +112,19 @@ namespace kcp
 		std::string ip = this->mSenderPoint.address().to_string();
 		const std::string address = fmt::format("{}:{}", ip, port);
 
-		kcp::Session * kcpSession = this->GetSession(address);
-		if(kcpSession == nullptr)
+		kcp::Session* kcpSession = this->GetSession(address);
+		if (kcpSession == nullptr)
 		{
 			return;
 		}
 		int len = kcpSession->Decode(this->mRecvBuffer.data(), (int)size, this->mDecodeBuffer);
-		if(len <= 0)
+		if (len <= 0)
 		{
 			return;
 		}
 		std::unique_ptr<rpc::Message> rpcPacket = std::make_unique<rpc::Message>();
 		{
-			if(!rpcPacket->Decode(this->mDecodeBuffer.data(), len))
+			if (!rpcPacket->Decode(this->mDecodeBuffer.data(), len))
 			{
 				CONSOLE_LOG_ERROR("{}", std::string(this->mRecvBuffer.data(), len))
 				return;
@@ -130,7 +135,8 @@ namespace kcp
 			rpcPacket->SetNet(rpc::Net::Kcp);
 			rpcPacket->TempHead().Add(rpc::Header::from_addr, address);
 		}
-		asio::post(this->mMainContext, [this, request = rpcPacket.release()] {
+		asio::post(this->mMainContext, [this, request = rpcPacket.release()]
+		{
 			this->mComponent->OnMessage(request, nullptr);
 		});
 	}

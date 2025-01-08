@@ -15,19 +15,19 @@ namespace udp
 
 	void Server::StartReceive()
 	{
-		this->mSocket.async_receive_from(this->mRecvBuffer.prepare(udp::BUFFER_COUNT),
-				this->mSenderPoint, [this](const asio::error_code& code, size_t size)
-				{
-					if (code == asio::error::operation_aborted)
-					{
-						return;
-					}
-					if (code.value() == Asio::OK)
-					{
-						this->OnReceive(size);
-					}
-					asio::post(this->mContext, [this] { this->StartReceive(); });
-				});
+		auto callback = [this](const asio::error_code& code, size_t size) {
+
+			if (code.value() == Asio::OK)
+			{
+				this->OnReceive(size);
+			}
+			if (code == asio::error::operation_aborted)
+			{
+				return;
+			}
+			asio::post(this->mContext, [this] { this->StartReceive(); });
+		};
+		this->mSocket.async_receive_from(this->mRecvBuffer.prepare(udp::BUFFER_COUNT),this->mSenderPoint, callback);
 	}
 
 	void Server::OnReceive(size_t size)
@@ -76,20 +76,16 @@ namespace udp
 		{
 			std::ostream stream(&this->mSendBuffer);
 			int length = message->OnSendMessage(stream);
+			auto callback = [this, length, message](const asio::error_code& code, size_t size) {
+				delete message;
+				if (code.value() != Asio::OK)
+				{
+					return;
+				}
+				this->mSendBuffer.consume(size);
+			};
 			asio::ip::udp::endpoint endpoint(asio::ip::make_address(ip), port);
-			this->mSocket.async_send_to(this->mSendBuffer.data(), endpoint, [this, length, message]
-				(const asio::error_code& code, size_t size)
-					{
-						delete message;
-						if (code.value() != Asio::OK)
-						{
-							return;
-						}
-						this->mSendBuffer.consume(size);
-						//unsigned short port = this->mRemoteEndpoint.port();
-						//std::string ip = this->mRemoteEndpoint.address().to_string();
-						//CONSOLE_LOG_ERROR("send:({}:{}) size:{}", ip, port, size);
-					});
+			this->mSocket.async_send_to(this->mSendBuffer.data(), endpoint, callback);
 		});
 		return true;
 	}
