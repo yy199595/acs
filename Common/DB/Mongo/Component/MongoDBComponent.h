@@ -45,7 +45,7 @@ namespace acs
 		LuaMongoTask(lua_State * lua, int id);
 		~LuaMongoTask() final;
 	public:
-		int Await();
+		int Await() noexcept;
 		void OnResponse(std::unique_ptr<mongo::Response> response) noexcept final;
 	private:
 		int mRef;

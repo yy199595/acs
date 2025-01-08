@@ -35,7 +35,7 @@ namespace rpc
 #endif
 	{
 	public:
-		Message();
+		Message() noexcept;
 		~Message() final = default;
 #ifdef __MEMORY_POOL_OPERATOR__
 	public:

@@ -397,7 +397,7 @@ namespace rpc
 		return message->SerializeToString(&mBody);
 	}
 
-	Message::Message()
+	Message::Message() noexcept
 	{
 		this->mSockId = 0;
 		this->mTimeout = 0;

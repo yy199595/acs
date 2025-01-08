@@ -36,7 +36,7 @@ namespace acs
 		}
 	}
 
-	int LuaMongoTask::Await()
+	int LuaMongoTask::Await() noexcept
 	{
 		if(this->mRef == 0)
 		{
