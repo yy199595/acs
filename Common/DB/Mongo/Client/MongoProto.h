@@ -22,7 +22,7 @@
 #endif
 namespace mongo
 {
-    class Head
+    class Head final
     {
     public:
         int messageLength;

@@ -8,7 +8,7 @@
 namespace acs
 {
 	// redis消息队列
-	class DelayQueueComponent : public Component
+	class DelayQueueComponent final : public Component
 	{
 	public:
 		DelayQueueComponent();

@@ -24,7 +24,7 @@ namespace Lua
 	public:
 		bool GetFunction(const std::string& name);
 		bool HasFunction(const std::string & name);
-		bool GetMetaFunction(const std::string & name);
+		bool GetMetaFunction(const std::string & name) noexcept;
 	public:
 		void SpliteError(std::string & error);
 		void SetMember(const char* key, long long value);

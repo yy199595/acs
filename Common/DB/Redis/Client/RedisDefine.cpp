@@ -429,7 +429,7 @@ namespace acs
         }
     }
 
-    int LuaRedisTask::Await()
+    int LuaRedisTask::Await() noexcept
     {
         if(this->mRef == 0)
         {
@@ -439,7 +439,7 @@ namespace acs
         return lua_yield(this->mLua, 0);
     }
 
-    void LuaRedisTask::OnResponse(std::unique_ptr<redis::Response> response)
+    void LuaRedisTask::OnResponse(std::unique_ptr<redis::Response> response) noexcept
 	{
 		int count = 0;
 		if (response != nullptr)

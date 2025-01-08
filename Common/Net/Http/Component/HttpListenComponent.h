@@ -49,7 +49,7 @@ namespace acs
 		bool SendResponse(int fd, HttpStatus code);
 		bool SendResponse(int fd, HttpStatus code, std::unique_ptr<http::Content> data);
 	private:
-		bool OnListen(tcp::Socket * socket) final;
+		bool OnListen(tcp::Socket * socket) noexcept final;
 		void OnClientError(int id, int code) final;
 	protected:
 		unsigned int mSuccessCount; //成功次数

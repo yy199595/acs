@@ -18,7 +18,7 @@ namespace acs
 		this->mState = TaskState::TaskReady;
 	}
 
-    bool WaitTaskSourceBase::ResumeTask(TaskState state)
+    bool WaitTaskSourceBase::ResumeTask(TaskState state) noexcept
 	{
 		switch (this->mState)
 		{
@@ -36,7 +36,7 @@ namespace acs
 		return false;
 	}
 
-    bool WaitTaskSourceBase::YieldTask()
+    bool WaitTaskSourceBase::YieldTask() noexcept
     {
 		if(this->mState == TaskState::TaskReady)
         {

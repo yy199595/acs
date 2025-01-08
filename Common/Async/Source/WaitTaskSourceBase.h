@@ -24,8 +24,8 @@ namespace acs
         TaskState GetState() const { return this->mState; }
         bool IsComplete() { return this->mState == TaskState::TaskFinish;}
     protected:
-        bool YieldTask();
-        bool ResumeTask(TaskState state = TaskState::TaskFinish);
+        bool YieldTask() noexcept;
+        bool ResumeTask(TaskState state = TaskState::TaskFinish) noexcept;
     private:
         TaskState mState;
         unsigned int mCorId;

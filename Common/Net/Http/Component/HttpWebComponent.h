@@ -40,15 +40,14 @@ namespace acs
 		void OnRecord(json::w::Document& document) final;
 	private:
 		bool ReadHttpConfig();
-		void OnApi(const HttpMethodConfig* config, http::Request * request, http::Response * response);
-		void Invoke(const HttpMethodConfig* config, http::Request * request, http::Response * response);
+		void OnReadHead(http::Request *request, http::Response *response) noexcept final;
+		void OnMessage(http::Request * request, http::Response * response) noexcept final;
+		void OnApi(const HttpMethodConfig* config, http::Request * request, http::Response * response) noexcept;
+		void Invoke(const HttpMethodConfig* config, http::Request * request, http::Response * response) noexcept;
 	private:
-		void OnReadHead(http::Request *request, http::Response *response) final;
-		void OnMessage(http::Request * request, http::Response * response) final;
-	private:
-		HttpStatus OnNotFound(http::Request* request, http::Response* response);
-		HttpStatus AuthToken(const HttpMethodConfig* config, http::Request *request);
-		HttpStatus CreateHttpData(const HttpMethodConfig* config, http::Request * request);
+		HttpStatus OnNotFound(http::Request* request, http::Response* response) noexcept;
+		HttpStatus AuthToken(const HttpMethodConfig* config, http::Request *request) noexcept;
+		HttpStatus CreateHttpData(const HttpMethodConfig* config, http::Request * request) noexcept;
 	public:
 		bool AddRootDirector(const std::string & dir);
 	private:

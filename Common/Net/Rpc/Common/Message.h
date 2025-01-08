@@ -16,7 +16,7 @@
 #endif
 namespace rpc
 {
-	class Head : public tcp::IProto, public tcp::IHeader
+	class Head final : public tcp::IProto, public tcp::IHeader
 	{
 	public:
 		bool GetKeys(std::vector<std::string>& keys) const;
@@ -29,7 +29,7 @@ namespace rpc
 		int OnRecvMessage(std::istream& os, size_t size) final;
 	};
 
-	class Message : public tcp::IProto
+	class Message final : public tcp::IProto
 #ifdef __SHARE_PTR_COUNTER__
 	, public memory::Object<Message>
 #endif
@@ -117,16 +117,16 @@ namespace rpc
 		IInnerSender() = default;
 		virtual ~IInnerSender() = default;
 	public:
-		virtual char GetNet() const = 0;
-		virtual int Send(int id, rpc::Message* message) = 0;
+		virtual char GetNet() const noexcept = 0;
+		virtual int Send(int id, rpc::Message* message) noexcept = 0;
 	};
 
 	class IOuterSender //外网接口
 	{
 	public:
-		virtual char GetNet() const = 0;
-		virtual int Send(int id, rpc::Message* message) = 0;
-		virtual void Broadcast(rpc::Message* message) = 0;
+		virtual char GetNet() const noexcept = 0;
+		virtual int Send(int id, rpc::Message* message) noexcept = 0;
+		virtual void Broadcast(rpc::Message* message) noexcept = 0;
 	};
 }
 

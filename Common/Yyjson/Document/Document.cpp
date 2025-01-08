@@ -435,7 +435,7 @@ namespace json
 			return result;
 		}
 
-		bool Document::Encode(std::string* json, bool pretty) const
+		bool Document::Encode(std::string* json, bool pretty) const noexcept
 		{
 			size_t data_len;
 			bool result = true;
@@ -774,7 +774,7 @@ namespace json
 {
 	namespace r
 	{
-		bool Document::FromFile(const std::string& path)
+		bool Document::FromFile(const std::string& path) noexcept
 		{
 			yyjson_read_err readErr;
 			if (this->mDoc != nullptr)
@@ -791,7 +791,7 @@ namespace json
 			return true;
 		}
 
-		bool Document::Decode(const std::string& json)
+		bool Document::Decode(const std::string& json) noexcept
 		{
 			if (json.empty())
 			{
@@ -811,7 +811,7 @@ namespace json
 			this->mDoc = doc;
 		}
 
-		bool Document::Decode(const char* str, size_t size)
+		bool Document::Decode(const char* str, size_t size) noexcept
 		{
 			yyjson_read_err err;
 			if (this->mDoc != nullptr)

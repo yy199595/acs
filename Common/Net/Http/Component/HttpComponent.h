@@ -38,7 +38,7 @@ namespace acs
 		void OnDelTask(int key) final;
 		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
 		std::shared_ptr<http::RequestClient> CreateClient(http::Request * request);
-		void OnMessage(http::Request *request, http::Response *response) final;
+		void OnMessage(http::Request *request, http::Response *response) noexcept final;
 	private:
         class ThreadComponent * mNetComponent;
 #ifdef __ENABLE_OPEN_SSL__

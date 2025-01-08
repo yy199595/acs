@@ -15,19 +15,19 @@ namespace acs
 		~HttpRequestTask() final = default;
 		explicit HttpRequestTask(int id) : IRpcTask<http::Response>(id) { }
     public:
-        inline std::unique_ptr<http::Response>  Await();
-		inline void OnResponse(std::unique_ptr<http::Response> response) final;
+        inline std::unique_ptr<http::Response> Await() noexcept;
+		inline void OnResponse(std::unique_ptr<http::Response> response) noexcept final;
 	private:
 		std::unique_ptr<http::Response> mData;
     };
 
-	std::unique_ptr<http::Response> HttpRequestTask::Await()
+	std::unique_ptr<http::Response> HttpRequestTask::Await() noexcept
 	{
 		this->YieldTask();
 		return std::move(this->mData);
 	}
 
-	void HttpRequestTask::OnResponse(std::unique_ptr<http::Response> response)
+	void HttpRequestTask::OnResponse(std::unique_ptr<http::Response> response) noexcept
 	{
 		this->mData = std::move(response);
 		this->ResumeTask();
@@ -39,12 +39,12 @@ namespace acs
 		explicit HttpCallbackTask(int id, std::function<void(std::unique_ptr<http::Response>)> & cb)
 			: mCallback(cb), IRpcTask<http::Response>(id) { }
 	private:
-		inline void OnResponse(std::unique_ptr<http::Response> response) final;
+		inline void OnResponse(std::unique_ptr<http::Response> response) noexcept final;
 	private:
 		std::function<void(std::unique_ptr<http::Response>)> mCallback;
 	};
 
-	inline void HttpCallbackTask::OnResponse(std::unique_ptr<http::Response> response)
+	inline void HttpCallbackTask::OnResponse(std::unique_ptr<http::Response> response) noexcept
 	{
 		this->mCallback(std::move(response));
 	}
@@ -59,8 +59,8 @@ namespace acs
         explicit LuaHttpRequestTask(int id, lua_State * lua);
         ~LuaHttpRequestTask() final;
     public:     
-        int Await();
-        void OnResponse(std::unique_ptr<http::Response> response) final;
+        int Await() noexcept;
+        void OnResponse(std::unique_ptr<http::Response> response) noexcept final;
     private:
         int mRef;
         lua_State * mLua;

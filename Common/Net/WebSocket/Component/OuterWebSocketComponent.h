@@ -23,13 +23,13 @@ namespace acs
 		OuterWebSocketComponent();
 	public:
 		bool LateAwake() final;
-		bool OnListen(tcp::Socket *socket) final;
 		void OnClientError(int id, int code) final;
-		void OnMessage(int, rpc::Message *request, rpc::Message *response) final;
+		bool OnListen(tcp::Socket *socket) noexcept final;
+		void OnMessage(int, rpc::Message *request, rpc::Message *response) noexcept final;
 	public:
-		void Broadcast(rpc::Message *message) final;
-		int Send(int id, rpc::Message *message) final;
-		char GetNet() const final { return rpc::Net::Ws; }
+		void Broadcast(rpc::Message *message) noexcept final;
+		int Send(int id, rpc::Message *message) noexcept final;
+		char GetNet() const noexcept final { return rpc::Net::Ws; }
 	private:
 		void OnRecord(json::w::Document &document) final;
 		void OnPlayerLogin(long long userId, int sockId);

@@ -23,7 +23,7 @@ namespace acs
 		}
 	}
 
-	int LuaOssRequestTask::Await()
+	int LuaOssRequestTask::Await() noexcept
 	{
 		if(this->mRef == 0)
 		{
@@ -33,7 +33,7 @@ namespace acs
 		return lua_yield(this->mLua, 0);
 	}
 
-	void LuaOssRequestTask::OnResponse(std::unique_ptr<http::Response > response)
+	void LuaOssRequestTask::OnResponse(std::unique_ptr<http::Response > response) noexcept
 	{
 		int count = 0;
 		if(response != nullptr && response->Code() == HttpStatus::OK)

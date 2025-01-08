@@ -216,7 +216,7 @@ namespace acs
 		return response;
 	}
 
-	void HttpComponent::OnMessage(http::Request* request, http::Response* response)
+	void HttpComponent::OnMessage(http::Request* request, http::Response* response) noexcept
 	{
 		int taskId = 0;
 		delete request;

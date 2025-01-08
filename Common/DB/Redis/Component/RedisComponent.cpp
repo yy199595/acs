@@ -67,7 +67,7 @@ namespace acs
 		return this->LoadRedisScript(this->mConfig.Script);
 	}
 
-	void RedisComponent::OnMessage(int id, redis::Request * request, redis::Response * response)
+	void RedisComponent::OnMessage(int id, redis::Request * request, redis::Response * response) noexcept
 	{
 		if (response->HasError())
 		{
@@ -101,14 +101,14 @@ namespace acs
         return response != nullptr && !response->HasError();
     }
 
-	std::unique_ptr<redis::Response> RedisComponent::Run(std::unique_ptr<redis::Request> request)
+	std::unique_ptr<redis::Response> RedisComponent::Run(std::unique_ptr<redis::Request> request) noexcept
     {
 		int taskId = 0;
 		this->Send(std::move(request), taskId);
 		return this->BuildRpcTask<RedisTask>(taskId)->Await();
     }
 
-	std::unique_ptr<redis::Response> RedisComponent::SyncRun(std::unique_ptr<redis::Request> request)
+	std::unique_ptr<redis::Response> RedisComponent::SyncRun(std::unique_ptr<redis::Request> request) noexcept
 	{
 		for(auto iter = this->mClients.begin(); iter != this->mClients.end(); iter++)
 		{
@@ -181,7 +181,7 @@ namespace acs
 		return true;
 	}
 
-	bool RedisComponent::Send(const acs::RedisLuaData& data)
+	bool RedisComponent::Send(const acs::RedisLuaData& data) noexcept
 	{
 		std::unique_ptr<redis::Request> request;
 		if (!this->MakeLuaRequest(data, request))
@@ -193,7 +193,7 @@ namespace acs
 		return true;
 	}
 
-	bool RedisComponent::Send(const acs::RedisLuaData& data, int& taskId)
+	bool RedisComponent::Send(const acs::RedisLuaData& data, int& taskId) noexcept
 	{
 		std::unique_ptr<redis::Request> request;
 		if (!this->MakeLuaRequest(data, request))
@@ -264,7 +264,7 @@ namespace acs
 		}
 	}
 
-	void RedisComponent::Send(int id, std::unique_ptr<redis::Request> request)
+	void RedisComponent::Send(int id, std::unique_ptr<redis::Request> request) noexcept
 	{
 		auto iter = this->mClients.find(id);
 		if(iter == this->mClients.end())

@@ -23,14 +23,14 @@ namespace acs
 		InnerWebSocketComponent();
 	public:
 		bool LateAwake() final;
-		bool OnListen(tcp::Socket *socket) final;
 		void OnClientError(int id, int code) final;
-		void OnMessage(int, rpc::Message *request, rpc::Message *response) final;
+		bool OnListen(tcp::Socket *socket) noexcept final;
+		void OnMessage(int, rpc::Message *request, rpc::Message *response) noexcept final;
 	public:
 		int Create(const std::string & address);
-		int Send(int id, ws::Message * message);
-		int Send(int id, rpc::Message *message) final;
-		char GetNet() const final { return rpc::Net::Ws; }
+		int Send(int id, ws::Message * message) noexcept;
+		int Send(int id, rpc::Message *message) noexcept final;
+		char GetNet() const noexcept final { return rpc::Net::Ws; }
 	private:
 		class ActorComponent * mActor;
 		class ThreadComponent * mThread;

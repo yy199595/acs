@@ -2,7 +2,7 @@
 #include"Lua/Module/LuaModule.h"
 namespace acs
 {
-	void LuaRpcService::OnLogin(long long playerId)
+	void LuaRpcService::OnLogin(long long playerId) noexcept
 	{
 		static const std::string func("_OnLogin");
 		Lua::LuaModule * luaModule = this->GetLuaModule();
@@ -12,7 +12,7 @@ namespace acs
 		}
 	}
 
-	void LuaRpcService::OnLogout(long long playerId)
+	void LuaRpcService::OnLogout(long long playerId) noexcept
 	{
 		static const std::string func("_OnLogout");
 		Lua::LuaModule * luaModule = this->GetLuaModule();

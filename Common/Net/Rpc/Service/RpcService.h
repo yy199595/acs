@@ -33,11 +33,11 @@ namespace acs
 	public:
 		Lua::LuaModule * GetLuaModule() { return this->mLuaModule; }
 		const std::string& GetServer() const { return this->mCluster; }
-		int Invoke(const RpcMethodConfig * config, rpc::Message * message);
+		int Invoke(const RpcMethodConfig * config, rpc::Message * message) noexcept;
 	private:
-		int CallLua(const RpcMethodConfig * config, rpc::Message & message);
-		int AwaitCallLua(const RpcMethodConfig * config, rpc::Message & message);
-		int WriterToLua(const RpcMethodConfig * config, rpc::Message & message);
+		int CallLua(const RpcMethodConfig * config, rpc::Message & message) noexcept;
+		int WriterToLua(const RpcMethodConfig * config, rpc::Message & message) noexcept;
+		int AwaitCallLua(const RpcMethodConfig * config, rpc::Message & message) noexcept;
 	protected:
 		inline ServiceMethodRegister& GetMethodRegistry() { return this->mMethodRegister; }
 	private:

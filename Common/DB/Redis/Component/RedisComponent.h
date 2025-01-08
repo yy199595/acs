@@ -34,24 +34,24 @@ namespace acs
 		bool Lock(const std::string & key, int timeout = 5);
 	public:
         template<typename ... Args>
-        void Send(const std::string & cmd, Args&& ... args);
+        void Send(const std::string & cmd, Args&& ... args) noexcept;
         template<typename ... Args>
-		std::unique_ptr<redis::Response> Run(const std::string & cmd, Args&& ... args);
+		std::unique_ptr<redis::Response> Run(const std::string & cmd, Args&& ... args) noexcept;
         template<typename ... Args> //同步命令
-        std::unique_ptr<redis::Response> SyncRun(const std::string& cmd, Args&& ... args);
+        std::unique_ptr<redis::Response> SyncRun(const std::string& cmd, Args&& ... args) noexcept;
 	public:
-		bool Send(const RedisLuaData & data);
-		bool Send(const RedisLuaData & data, int & taskId);
+		bool Send(const RedisLuaData & data) noexcept;
+		bool Send(const RedisLuaData & data, int & taskId) noexcept;
 		std::unique_ptr<redis::Response> CallLua(const RedisLuaData & data);
 		std::unique_ptr<json::r::Document> Call(const RedisLuaData & data);
 	public:
 		bool Del(const std::string & key);
-		std::unique_ptr<redis::Response> Run(std::unique_ptr<redis::Request> request);
-        std::unique_ptr<redis::Response> SyncRun(std::unique_ptr<redis::Request> request);
+		std::unique_ptr<redis::Response> Run(std::unique_ptr<redis::Request> request) noexcept;
+        std::unique_ptr<redis::Response> SyncRun(std::unique_ptr<redis::Request> request) noexcept;
 		bool MakeLuaRequest(const RedisLuaData & data, std::unique_ptr<redis::Request>& request);
 	private:
-		void Send(int id, std::unique_ptr<redis::Request> request);
-		void OnMessage(int id, redis::Request * request, redis::Response * response) final;
+		void Send(int id, std::unique_ptr<redis::Request> request) noexcept;
+		void OnMessage(int id, redis::Request * request, redis::Response * response) noexcept final;
 	private:
 		bool LoadRedisScript(const std::string & dir);
 		bool OnLoadScript(const std::string & name, const std::string &md5);
@@ -70,7 +70,7 @@ namespace acs
 	};
 
     template<typename ... Args>
-	std::unique_ptr<redis::Response> RedisComponent::Run(const std::string & cmd, Args &&...args)
+	std::unique_ptr<redis::Response> RedisComponent::Run(const std::string & cmd, Args &&...args) noexcept
     {
         std::unique_ptr<redis::Request> request = std::make_unique<redis::Request>();
 		{
@@ -81,7 +81,7 @@ namespace acs
     }
 
     template<typename ...Args>
-    inline std::unique_ptr<redis::Response> RedisComponent::SyncRun(const std::string& cmd, Args && ...args)
+    inline std::unique_ptr<redis::Response> RedisComponent::SyncRun(const std::string& cmd, Args && ...args) noexcept
     {
         std::unique_ptr<redis::Request> request = std::make_unique<redis::Request>();
 		{
@@ -92,7 +92,7 @@ namespace acs
     }
 
     template<typename ... Args>
-	void RedisComponent::Send(const std::string &cmd, Args &&...args)
+	void RedisComponent::Send(const std::string &cmd, Args &&...args) noexcept
     {
 		std::unique_ptr<redis::Request> request = redis::Request::Make(cmd, std::forward<Args>(args)...);
 		{

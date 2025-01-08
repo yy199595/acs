@@ -48,7 +48,7 @@ namespace acs
 		return id;
 	}
 
-	int WsClientComponent::Send(int id, rpc::Message * message)
+	int WsClientComponent::Send(int id, rpc::Message * message) noexcept
 	{
 		auto iter = this->mClientMap.find(id);
 		if(iter == this->mClientMap.end())
@@ -80,7 +80,7 @@ namespace acs
 		delete message;
 	}
 
-	void WsClientComponent::OnMessage(rpc::Message* message, rpc::Message* response)
+	void WsClientComponent::OnMessage(rpc::Message* message, rpc::Message* response) noexcept
 	{
 		int code = XCode::Failure;
 		switch(message->GetType())

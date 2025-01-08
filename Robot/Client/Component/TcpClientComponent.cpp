@@ -48,7 +48,7 @@ namespace acs
 		return id;
 	}
 
-	int TcpClientComponent::Send(int id, rpc::Message * message)
+	int TcpClientComponent::Send(int id, rpc::Message * message) noexcept
 	{
 		auto iter = this->mClientMap.find(id);
 		if(iter == this->mClientMap.end())
@@ -79,7 +79,7 @@ namespace acs
 		delete message;
 	}
 
-	void TcpClientComponent::OnMessage(rpc::Message* message, rpc::Message* response)
+	void TcpClientComponent::OnMessage(rpc::Message* message, rpc::Message* response) noexcept
 	{
 		int code = XCode::Failure;
 		switch(message->GetType())

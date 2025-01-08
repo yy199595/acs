@@ -28,15 +28,15 @@ namespace acs
 		void StartClose(int id, int code) final;
 	private:
 		bool LateAwake() final;
-		void Broadcast(rpc::Message * message) final;
-		int Send(int id, rpc::Message * message) final;
-		inline char GetNet() const final { return rpc::Net::Tcp; }
+		void Broadcast(rpc::Message * message) noexcept final;
+		int Send(int id, rpc::Message * message) noexcept final;
+		inline char GetNet() const noexcept final { return rpc::Net::Tcp; }
 	private:
 		void OnClientError(int id, int code) final;
 		void OnSendFailure(int id, rpc::Message *message) final;
-		void OnMessage(rpc::Message * request, rpc::Message *) final;
+		void OnMessage(rpc::Message * request, rpc::Message *) noexcept final;
 	private:
-		bool OnListen(tcp::Socket * socket) final;
+		bool OnListen(tcp::Socket * socket) noexcept final;
 		void OnRecord(json::w::Document & document) final;
 	private:
 		void OnPlayerLogin(long long userId, int sockId);

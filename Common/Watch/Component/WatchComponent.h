@@ -14,7 +14,7 @@ namespace acs
 		WatchComponent();
 		~WatchComponent() final = default;
 	private:
-		void OnSecondUpdate(int tick) final;
+		void OnSecondUpdate(int tick) noexcept final;
 	public:
 		bool CloseProcess(long long pid);
 		bool RestartProcess(long long pid);

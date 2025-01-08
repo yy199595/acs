@@ -51,7 +51,7 @@ namespace acs
 		inline int BuildRpcId() { return this->mNumberPool.BuildNumber(); }
 		inline int CurrentRpcCount() { return this->mNumberPool.CurrentNumber(); }
 	protected:
-		void OnLastFrameUpdate(long long) final;
+		void OnLastFrameUpdate(long long) noexcept final;
 		virtual void OnDelTask(int k) { }
         virtual void OnNotFindResponse(int key, std::unique_ptr<T> message);
     private:
@@ -62,7 +62,7 @@ namespace acs
     };
 
 	template<typename T>
-	void RpcComponent<T>::OnLastFrameUpdate(long long nowMS)
+	void RpcComponent<T>::OnLastFrameUpdate(long long nowMS) noexcept
 	{
 		for (RpcTask& task: this->mDelTasks)
 		{

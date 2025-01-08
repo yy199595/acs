@@ -23,7 +23,7 @@ namespace acs
 		bool Awake() final;
 		bool LateAwake() final;
 		void OnConnectOK(int id) final;
-		void OnMessage(int, redis::Request *request, redis::Response *response) final;
+		void OnMessage(int, redis::Request *request, redis::Response *response) noexcept final;
 	private:
 		redis::Config mConfig;
 		std::shared_ptr<redis::Client> mClient;

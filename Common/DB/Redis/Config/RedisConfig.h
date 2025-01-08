@@ -10,7 +10,7 @@
 #include<unordered_map>
 namespace redis
 {
-    struct Config
+    struct Config final
     {
     public:
 		int Id;

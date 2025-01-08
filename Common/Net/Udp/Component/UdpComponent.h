@@ -25,12 +25,12 @@ namespace acs
 		bool StartListen(const acs::ListenConfig &listen) final;
 	private:
 		udp::Client * GetClient(int id);
-		void OnMessage(rpc::Message *request, rpc::Message *response) final;
+		void OnMessage(rpc::Message *request, rpc::Message *response) noexcept final;
 	public:
-		int Send(int id, rpc::Message *message) final;
-		char GetNet() const final { return rpc::Net::Udp; }
+		int Send(int id, rpc::Message *message) noexcept final;
+		char GetNet() const noexcept final { return rpc::Net::Udp; }
 	private:
-		int OnRequest(rpc::Message * message);
+		int OnRequest(rpc::Message * message) noexcept;
 	private:
 		class ActorComponent * mActor;
 		asio::streambuf mReceiveBuffer;

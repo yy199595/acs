@@ -24,7 +24,7 @@ namespace acs
 		return this->mRedis != nullptr && this->mActorComponent != nullptr;
 	}
 
-	void Master::OnSecondUpdate(int tick)
+	void Master::OnSecondUpdate(int tick) noexcept
 	{
 		if (tick % 10 != 0) return;
 

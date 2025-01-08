@@ -107,7 +107,7 @@ namespace acs
 	}
 
 
-	void HttpWebComponent::OnReadHead(http::Request* request, http::Response* response)
+	void HttpWebComponent::OnReadHead(http::Request* request, http::Response* response) noexcept
 	{
 		int sockId = request->GetSockId();
 		HttpStatus httpStatus = HttpStatus::OK;
@@ -197,7 +197,7 @@ namespace acs
 	}
 
 	HttpStatus HttpWebComponent::CreateHttpData(
-			const acs::HttpMethodConfig* httpConfig, http::Request* request)
+			const acs::HttpMethodConfig* httpConfig, http::Request* request) noexcept
 	{
 		std::string cont_type;
 		if (!request->Header().GetContentType(cont_type))
@@ -261,7 +261,7 @@ namespace acs
 		return HttpStatus::OK;
 	}
 
-	HttpStatus HttpWebComponent::OnNotFound(http::Request* request, http::Response* response)
+	HttpStatus HttpWebComponent::OnNotFound(http::Request* request, http::Response* response) noexcept
 	{
 		const std::string& path = request->GetUrl().Path();
 		if (path == "/" && !this->mConfig.Index.empty())
@@ -289,7 +289,7 @@ namespace acs
 		return HttpStatus::NOT_FOUND;
 	}
 
-	void HttpWebComponent::OnMessage(http::Request* request, http::Response* response)
+	void HttpWebComponent::OnMessage(http::Request* request, http::Response* response) noexcept
 	{
 		const std::string& path = request->GetUrl().Path();
 		//LOG_INFO("[{}] {}", path, request->GetBody()->ToStr())
@@ -306,7 +306,7 @@ namespace acs
 	}
 
 	void HttpWebComponent::OnApi(const acs::HttpMethodConfig* httpConfig,
-			http::Request* request, http::Response* response)
+			http::Request* request, http::Response* response) noexcept
 	{
 		if (!httpConfig->IsAsync)
 		{
@@ -316,7 +316,7 @@ namespace acs
 		this->mCorComponent->Start(&HttpWebComponent::Invoke, this, httpConfig, request, response);
 	}
 
-	HttpStatus HttpWebComponent::AuthToken(const HttpMethodConfig* config, http::Request* request)
+	HttpStatus HttpWebComponent::AuthToken(const HttpMethodConfig* config, http::Request* request) noexcept
 	{
 		std::string token;
 		http::Head& head = request->Header();
@@ -366,7 +366,7 @@ namespace acs
 		return HttpStatus::OK;
 	}
 
-	void HttpWebComponent::Invoke(const HttpMethodConfig* config, http::Request* request, http::Response* response)
+	void HttpWebComponent::Invoke(const HttpMethodConfig* config, http::Request* request, http::Response* response) noexcept
 	{
 		HttpStatus code = HttpStatus::OK;
 		for (HttpHandlerComponent* recordComponent: this->mRecordComponents)

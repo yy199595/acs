@@ -21,7 +21,7 @@ namespace acs
 		this->mFailureCount = 0;
 	}
 
-	bool HttpListenComponent::OnListen(tcp::Socket* socket)
+	bool HttpListenComponent::OnListen(tcp::Socket* socket) noexcept
 	{
 		int sockId = this->mNumPool.BuildNumber();
 		Asio::Context & io = this->mApp->GetContext();

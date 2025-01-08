@@ -42,34 +42,39 @@ namespace acs
 		virtual void OnJoin(int id) = 0;
 	};
 
+	//每帧调用
 	class IFrameUpdate
 	{
 	public:
-		virtual void OnFrameUpdate(long long) = 0;
+		virtual void OnFrameUpdate(long long) noexcept = 0;
 	};
 
+	//每次循环调用
 	class ISystemUpdate
 	{
 	public:
-		virtual void OnSystemUpdate() = 0;
+		virtual void OnSystemUpdate() noexcept = 0;
 	};
 
+	//每秒调用
 	class ISecondUpdate
 	{
 	public:
-		virtual void OnSecondUpdate(int tick) = 0;
+		virtual void OnSecondUpdate(int tick) noexcept = 0;
 	};
 
+	//新一天调用
 	class ISystemNewDay
 	{
 	public:
 		virtual void OnNewDay() = 0;
 	};
 
+	//下一帧调用
 	class ILastFrameUpdate
 	{
 	public:
-		virtual void OnLastFrameUpdate(long long) = 0;
+		virtual void OnLastFrameUpdate(long long) noexcept = 0;
 	};
 
 	class ILuaRegister
@@ -78,6 +83,7 @@ namespace acs
 		virtual void OnLuaRegister(Lua::ModuleClass& luaRegister) = 0;
 	};
 
+	// 热重载调用
 	class IHotfix
 	{
 	public:
@@ -102,16 +108,16 @@ namespace acs
 		virtual void OnConnectOK(int id) { }
 		virtual void OnClientError(int id, int code) { };
 		virtual void OnSendFailure(int id, T1 * message) { }
-		virtual void OnMessage(T1* request, T2* response) { };
-		virtual void OnReadHead(T1* request, T2 * response) { }
-		virtual void OnMessage(int, T1* request, T2* response) { };
+		virtual void OnMessage(T1* request, T2* response) noexcept { };
+		virtual void OnReadHead(T1* request, T2 * response) noexcept { }
+		virtual void OnMessage(int, T1* request, T2* response) noexcept { };
 	};
 
 	class ILogin
 	{
 	public:
-		virtual void OnLogin(long long player) = 0;
-		virtual void OnLogout(long long player) = 0;
+		virtual void OnLogin(long long player) noexcept = 0;
+		virtual void OnLogout(long long player) noexcept = 0;
 	};
 
     class IServerRecord
@@ -129,14 +135,15 @@ namespace math
 	class NumberPool
 	{
 	public:
-		NumberPool() : mIndex(0) { }
-		explicit NumberPool(T start) : mIndex(start) { }
+		NumberPool() : mIndex(0), mCount(0) { }
+		explicit NumberPool(T start) : mIndex(start), mCount(0) { }
 	public:
-		inline T BuildNumber()
+		inline T BuildNumber() noexcept
 		{
 			++this->mIndex;
 			if(this->mIndex >= this->MaxNum)
 			{
+				++ this->mCount;
 				this->mIndex = 1;
 			}
 			return this->mIndex;
@@ -144,6 +151,7 @@ namespace math
 		inline T CurrentNumber() const { return this->mIndex; }
 	private:
 		T mIndex;
+		int mCount;
 		T MaxNum = std::numeric_limits<T>::max() - limit;
 	};
 }

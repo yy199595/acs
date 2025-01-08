@@ -23,7 +23,7 @@ namespace acs
         }
     }
 
-    void LuaHttpRequestTask::OnResponse(std::unique_ptr<http::Response> response)
+    void LuaHttpRequestTask::OnResponse(std::unique_ptr<http::Response> response) noexcept
     {
         int count = 0;
         if(response != nullptr)
@@ -33,7 +33,7 @@ namespace acs
         Lua::Coroutine::Resume(this->mLua, count);
     }
 
-    int LuaHttpRequestTask::Await()
+    int LuaHttpRequestTask::Await() noexcept
     {
         if(this->mRef == 0)
         {

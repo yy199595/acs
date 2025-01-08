@@ -22,7 +22,7 @@ namespace acs
 		this->mCode = XCode::LuaCoroutineWait;
 	}
 
-    int LuaServiceTaskSource::Await()
+    int LuaServiceTaskSource::Await() noexcept
     {
         if(this->mCode == XCode::LuaCoroutineWait) 
 		{
@@ -31,7 +31,7 @@ namespace acs
         return this->mCode;
     }
 
-	void LuaServiceTaskSource::WriteRpcResponse(lua_State* lua)
+	void LuaServiceTaskSource::WriteRpcResponse(lua_State* lua) noexcept
 	{
 		this->mRpcData->SetProto(rpc::Porto::None);
 		this->mCode = (int)luaL_checkinteger(lua, 2);
@@ -74,7 +74,7 @@ namespace acs
 		}
 	}
 
-	int LuaServiceTaskSource::SetRpc(lua_State* lua)
+	int LuaServiceTaskSource::SetRpc(lua_State* lua) noexcept
 	{
 		LuaServiceTaskSource* luaServiceTaskSource =
 			Lua::UserDataParameter::Read<LuaServiceTaskSource*>(lua, 1);
@@ -87,7 +87,7 @@ namespace acs
 
 namespace acs
 {
-	int LuaServiceTaskSource::SetHttp(lua_State* lua)
+	int LuaServiceTaskSource::SetHttp(lua_State* lua) noexcept
 	{
 		LuaServiceTaskSource* luaServiceTaskSource =
 			Lua::UserDataParameter::Read<LuaServiceTaskSource*>(lua, 1);

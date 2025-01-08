@@ -106,7 +106,7 @@ namespace acs
 		return count;
 	}
 
-	void RedisSubComponent::OnMessage(int, redis::Request* request, redis::Response* response)
+	void RedisSubComponent::OnMessage(int, redis::Request* request, redis::Response* response) noexcept
 	{
 		do
 		{

@@ -16,8 +16,8 @@ namespace acs
         explicit IRpcTask(int id) :mRpcId(id){ }
         virtual ~IRpcTask() = default;
     public:
-        int GetRpcId() { return mRpcId; }
-		virtual void OnResponse(std::unique_ptr<T> response) = 0;
+        inline int GetRpcId() noexcept { return mRpcId; }
+		virtual void OnResponse(std::unique_ptr<T> response) noexcept = 0;
     private:
         int mRpcId;
     };
@@ -31,19 +31,19 @@ namespace acs
 
         explicit RpcTaskSource(int id): IRpcTask<rpc::Message>(id), mMessage(nullptr) { }
     public:
-		inline std::unique_ptr<rpc::Message> Await();
-		inline void OnResponse(std::unique_ptr<rpc::Message> response) final;
+		inline std::unique_ptr<rpc::Message> Await() noexcept;
+		inline void OnResponse(std::unique_ptr<rpc::Message> response) noexcept final;
 	private:
 		std::unique_ptr<rpc::Message> mMessage;
     };
 
-	inline void RpcTaskSource::OnResponse(std::unique_ptr<rpc::Message> response)
+	inline void RpcTaskSource::OnResponse(std::unique_ptr<rpc::Message> response) noexcept
 	{
 		this->mMessage = std::move(response);
 		this->ResumeTask();
 	}
 
-	inline std::unique_ptr<rpc::Message> RpcTaskSource::Await()
+	inline std::unique_ptr<rpc::Message> RpcTaskSource::Await() noexcept
 	{
 		this->YieldTask();
 		return std::move(this->mMessage);
@@ -57,8 +57,8 @@ namespace acs
 	 public:
 		LuaRpcTaskSource(lua_State * lua, int id);
 	 public:
-		void OnResponse(std::unique_ptr<rpc::Message> response) final;
-		inline int Await() { return this->mTask.Await(); }
+		inline int Await() noexcept { return this->mTask.Await(); }
+		void OnResponse(std::unique_ptr<rpc::Message> response) noexcept final;
 	 private:
 		LuaWaitTaskSource mTask;
 	};

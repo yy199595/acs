@@ -18,7 +18,7 @@ namespace acs
 		Master();
 	private:
 		bool OnInit() final;
-		void OnSecondUpdate(int tick) final;
+		void OnSecondUpdate(int tick) noexcept final;
 	 private:
 		void OnDisConnect(int id);
 		int Del(const http::FromContent & request, json::w::Value & res);

@@ -81,7 +81,7 @@ namespace acs
 		}
 	}
 
-	void KcpComponent::OnFrameUpdate(long long t)
+	void KcpComponent::OnFrameUpdate(long long t) noexcept
 	{
 		auto iter = this->mClients.begin();
 		for(; iter != this->mClients.end(); iter++)
@@ -90,7 +90,7 @@ namespace acs
 		}
 	}
 
-	int KcpComponent::Send(int id, rpc::Message* message)
+	int KcpComponent::Send(int id, rpc::Message* message) noexcept
 	{
 		if (message->GetType() == rpc::Type::Response)
 		{
@@ -115,7 +115,7 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	void KcpComponent::OnMessage(rpc::Message* request, rpc::Message* response)
+	void KcpComponent::OnMessage(rpc::Message* request, rpc::Message* response) noexcept
 	{
 		int code = XCode::Ok;
 		switch(request->GetType())

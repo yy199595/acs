@@ -40,10 +40,10 @@ namespace acs
 		HttpServiceRegister & GetRegister() { return this->mServiceRegister;}
 	public:
 		Lua::LuaModule * GetLuaModule() { return this->mLuaModule; }
-		int Invoke(const HttpMethodConfig * config, const http::Request &, http::Response &);
+		int Invoke(const HttpMethodConfig * config, const http::Request &, http::Response &) noexcept;
 	private:
-		int CallLua(const std::string & method, const http::Request & request, http::Response & response);
-		int AwaitCallLua(const std::string & method, const http::Request & request, http::Response & response);
+		int CallLua(const std::string & method, const http::Request & request, http::Response & response) noexcept;
+		int AwaitCallLua(const std::string & method, const http::Request & request, http::Response & response) noexcept;
 	private:
 		Lua::LuaModule * mLuaModule;
 		HttpServiceRegister mServiceRegister;

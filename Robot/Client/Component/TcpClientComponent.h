@@ -23,10 +23,10 @@ namespace acs
 		void OnClientError(int id, int code) final;
 		void OnSendFailure(int id, rpc::Message *message) final;
 		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
-		void OnMessage(rpc::Message *request, rpc::Message *response) final;
+		void OnMessage(rpc::Message *request, rpc::Message *response) noexcept final;
 	private:
-		int Send(int id, rpc::Message * message) final;
-		char GetNet() const final { return rpc::Net::Client; }
+		int Send(int id, rpc::Message * message) noexcept final;
+		char GetNet() const noexcept final { return rpc::Net::Client; }
 	private:
 		int OnRequest(rpc::Message * request);
 	private:

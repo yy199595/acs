@@ -133,7 +133,7 @@ namespace json
 		public:
 			std::string JsonString(bool pretty = false) const;
 
-			bool Encode(std::string* json, bool pretty = false) const;
+			bool Encode(std::string* json, bool pretty = false) const noexcept;
 
 		private:
 		};
@@ -244,11 +244,11 @@ namespace json
 		public:
 			void SetDoc(yyjson_doc* doc);
 
-			bool Decode(const std::string& json);
+			bool Decode(const std::string& json) noexcept;
 
-			bool FromFile(const std::string& path);
+			bool FromFile(const std::string& path) noexcept;
 
-			bool Decode(const char* str, size_t size);
+			bool Decode(const char* str, size_t size) noexcept;
 
 			yyjson_doc* GetDoc()
 			{

@@ -9,7 +9,7 @@ namespace acs
 	WatchComponent::WatchComponent()
 	= default;
 
-	void WatchComponent::OnSecondUpdate(int tick)
+	void WatchComponent::OnSecondUpdate(int tick) noexcept
 	{
 		for (auto & process : this->mProcess)
 		{

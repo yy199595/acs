@@ -46,7 +46,7 @@ namespace acs
 		return lua_yield(this->mLua, 0);
 	}
 
-	void LuaMongoTask::OnResponse(std::unique_ptr<mongo::Response> response)
+	void LuaMongoTask::OnResponse(std::unique_ptr<mongo::Response> response) noexcept
 	{
 		if (response != nullptr && response->Document())
 		{
@@ -124,7 +124,7 @@ namespace acs
 		this->mMongoClients.clear();
     }
 
-	void MongoDBComponent::OnMessage(int id, mongo::Request * request, mongo::Response * response)
+	void MongoDBComponent::OnMessage(int id, mongo::Request * request, mongo::Response * response) noexcept
 	{
 		int rpcId = 0;
 		if(response == nullptr)

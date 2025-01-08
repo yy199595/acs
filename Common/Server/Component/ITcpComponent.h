@@ -13,7 +13,7 @@ namespace acs
 	class ITcpListen
 	{
 	public:
-		virtual bool OnListen(tcp::Socket* socket) = 0;
+		virtual bool OnListen(tcp::Socket* socket) noexcept = 0;
 	};
 
 	namespace proto_type

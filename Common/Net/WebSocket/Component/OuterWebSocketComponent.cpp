@@ -20,7 +20,7 @@ namespace acs
 		this->mSumCount = 0;
 	}
 
-	bool OuterWebSocketComponent::OnListen(tcp::Socket* socket)
+	bool OuterWebSocketComponent::OnListen(tcp::Socket* socket) noexcept
 	{
 		int id = this->mClientPool.BuildNumber();
 		Asio::Context & io = this->mApp->GetContext();
@@ -42,7 +42,7 @@ namespace acs
 		return true;
 	}
 
-	void OuterWebSocketComponent::OnMessage(int id, rpc::Message* request, rpc::Message* response)
+	void OuterWebSocketComponent::OnMessage(int id, rpc::Message* request, rpc::Message* response) noexcept
 	{
 		++this->mSumCount;
 		int code = this->mGate->OnMessage(request);
@@ -57,12 +57,12 @@ namespace acs
 		}
 	}
 
-	void OuterWebSocketComponent::Broadcast(rpc::Message* message)
+	void OuterWebSocketComponent::Broadcast(rpc::Message* message) noexcept
 	{
 
 	}
 
-	int OuterWebSocketComponent::Send(int id, rpc::Message* message)
+	int OuterWebSocketComponent::Send(int id, rpc::Message* message) noexcept
 	{
 		auto iter = this->mSessions.find(id);
 		if(iter != this->mSessions.end())

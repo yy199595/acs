@@ -80,7 +80,7 @@ namespace acs
 		}
 	}
 
-	int InnerTcpComponent::OnForward(rpc::Message* message)
+	int InnerTcpComponent::OnForward(rpc::Message* message) noexcept
 	{
 		int target = 0;
 		int code = XCode::Ok;
@@ -122,7 +122,7 @@ namespace acs
 		delete message;
     }
 
-	bool InnerTcpComponent::OnListen(tcp::Socket * socket)
+	bool InnerTcpComponent::OnListen(tcp::Socket * socket) noexcept
 	{
 		int id = this->mNumPool.BuildNumber();
 		Asio::Context & io = this->mApp->GetContext();
@@ -182,7 +182,7 @@ namespace acs
 		return tcpClient.get();
 	}
 
-    int InnerTcpComponent::Send(int id, rpc::Message * message)
+    int InnerTcpComponent::Send(int id, rpc::Message * message) noexcept
     {
 
         rpc::InnerTcpClient * clientSession = this->GetClient(id);

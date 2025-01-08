@@ -19,7 +19,7 @@ namespace acs
 		explicit MongoTask(int taskId);
     public:
 		inline std::unique_ptr<mongo::Response> Await();
-		inline void OnResponse(std::unique_ptr<mongo::Response> response) final;
+		inline void OnResponse(std::unique_ptr<mongo::Response> response) noexcept final;
 	private:
 		std::unique_ptr<mongo::Response> mMessage;
 	};
@@ -30,7 +30,7 @@ namespace acs
 		return std::move(this->mMessage);
 	}
 
-	inline void MongoTask::OnResponse(std::unique_ptr<mongo::Response> response)
+	inline void MongoTask::OnResponse(std::unique_ptr<mongo::Response> response) noexcept
 	{
 		this->mMessage = std::move(response);
 		this->ResumeTask();
@@ -46,7 +46,7 @@ namespace acs
 		~LuaMongoTask() final;
 	public:
 		int Await();
-		void OnResponse(std::unique_ptr<mongo::Response> response) final;
+		void OnResponse(std::unique_ptr<mongo::Response> response) noexcept final;
 	private:
 		int mRef;
 		lua_State * mLua;
@@ -72,7 +72,7 @@ namespace acs
 		void OnDestroy() final;
 		void OnRecord(json::w::Document &document) final;
 		void OnLuaRegister(Lua::ModuleClass &luaRegister) final;
-		void OnMessage(int id, mongo::Request * request, mongo::Response * message) final;
+		void OnMessage(int id, mongo::Request * request, mongo::Response * message) noexcept final;
 	private:
 		void Send(std::unique_ptr<mongo::Request> request);
 		void Send(int id, std::unique_ptr<mongo::Request> request);

@@ -99,7 +99,7 @@ namespace Lua
 		return false;
 	}
 
-	bool LuaModule::GetMetaFunction(const std::string& name)
+	bool LuaModule::GetMetaFunction(const std::string& name) noexcept
 	{
 		lua_settop(this->mLua, 0);
 		lua_rawgeti(this->mLua, LUA_REGISTRYINDEX, this->mRef);

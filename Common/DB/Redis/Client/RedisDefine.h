@@ -153,19 +153,19 @@ namespace acs
     public:
         explicit RedisTask(int id);
     public:
-		inline std::unique_ptr<redis::Response> Await();
-		inline void OnResponse(std::unique_ptr<redis::Response> response) final;
+		inline std::unique_ptr<redis::Response> Await() noexcept;
+		inline void OnResponse(std::unique_ptr<redis::Response> response) noexcept final;
     private:
 		std::unique_ptr<redis::Response> mMessage;
     };
 
-	inline std::unique_ptr<redis::Response> RedisTask::Await()
+	inline std::unique_ptr<redis::Response> RedisTask::Await() noexcept
 	{
 		this->YieldTask();
 		return std::move(this->mMessage);
 	}
 
-	inline void RedisTask::OnResponse(std::unique_ptr<redis::Response> response)
+	inline void RedisTask::OnResponse(std::unique_ptr<redis::Response> response) noexcept
 	{
 		this->mMessage = std::move(response);
 		this->ResumeTask();
@@ -177,8 +177,8 @@ namespace acs
         LuaRedisTask(lua_State * lua, int id);
         ~LuaRedisTask() final;
     public:
-        int Await();
-        void OnResponse(std::unique_ptr<redis::Response> response) final;
+        int Await() noexcept;
+        void OnResponse(std::unique_ptr<redis::Response> response) noexcept final;
     private:
         int mRef;
         lua_State * mLua;

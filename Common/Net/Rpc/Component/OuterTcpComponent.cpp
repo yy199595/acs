@@ -57,7 +57,7 @@ namespace acs
 		}
 	}
 
-	void OuterTcpComponent::OnMessage(rpc::Message * message, rpc::Message *)
+	void OuterTcpComponent::OnMessage(rpc::Message * message, rpc::Message *) noexcept
 	{
 		int code = this->mGate->OnMessage(message);
 		if(code != XCode::Ok)
@@ -67,7 +67,7 @@ namespace acs
 		}
 	}
 
-	int OuterTcpComponent::Send(int id, rpc::Message * message)
+	int OuterTcpComponent::Send(int id, rpc::Message * message) noexcept
 	{
 		if (message->GetType() == rpc::Type::Response)
 		{
@@ -82,7 +82,7 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	bool OuterTcpComponent::OnListen(tcp::Socket * socket)
+	bool OuterTcpComponent::OnListen(tcp::Socket * socket) noexcept
 	{
 		if (this->mApp->GetStatus() < ServerStatus::Start)
 		{
@@ -146,7 +146,7 @@ namespace acs
 		}
     }
 
-	void OuterTcpComponent::Broadcast(rpc::Message * message)
+	void OuterTcpComponent::Broadcast(rpc::Message * message) noexcept
 	{
 		message->SetType(rpc::Type::Request);
 		for(auto iter = this->mGateClientMap.begin(); iter != this->mGateClientMap.end(); iter++)

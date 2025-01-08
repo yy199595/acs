@@ -48,8 +48,8 @@ namespace acs
     template<> class TaskSource<void> : public WaitTaskSourceBase
     {
     public:
-        void Await() {this->YieldTask();}
-        bool SetResult() { return this->ResumeTask();}
+        void Await() noexcept { this->YieldTask();}
+        bool SetResult() noexcept { return this->ResumeTask();}
     };
 }
 

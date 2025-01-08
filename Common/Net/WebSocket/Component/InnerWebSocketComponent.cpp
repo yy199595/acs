@@ -20,7 +20,7 @@ namespace acs
 		this->mDispatch = nullptr;
 	}
 
-	bool InnerWebSocketComponent::OnListen(tcp::Socket* socket)
+	bool InnerWebSocketComponent::OnListen(tcp::Socket* socket) noexcept
 	{
 		int id = this->mClientPool.BuildNumber();
 		Asio::Context & io = this->mApp->GetContext();
@@ -41,7 +41,7 @@ namespace acs
 		return true;
 	}
 
-	void InnerWebSocketComponent::OnMessage(int id, rpc::Message* request, rpc::Message* response)
+	void InnerWebSocketComponent::OnMessage(int id, rpc::Message* request, rpc::Message* response) noexcept
 	{
 		if (this->mDispatch->OnMessage(request) == XCode::Ok)
 		{
@@ -51,7 +51,7 @@ namespace acs
 		delete request;
 	}
 
-	int InnerWebSocketComponent::Send(int id, rpc::Message* message)
+	int InnerWebSocketComponent::Send(int id, rpc::Message* message) noexcept
 	{
 		auto iter = this->mSessions.find(id);
 		if(iter != this->mSessions.end())
@@ -82,7 +82,7 @@ namespace acs
 		return XCode::SendMessageFail;
 	}
 
-	int InnerWebSocketComponent::Send(int id, ws::Message* message)
+	int InnerWebSocketComponent::Send(int id, ws::Message* message) noexcept
 	{
 		auto iter = this->mSessions.find(id);
 		if(iter != this->mSessions.end())

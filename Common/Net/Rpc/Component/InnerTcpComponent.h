@@ -17,16 +17,16 @@ namespace acs
 		void OnSendFailure(int id, rpc::Message * message) final;
 		void OnMessage(rpc::Message * message, rpc::Message *) noexcept final ;
 	private:
-		int Send(int id, rpc::Message * message) final;
-		char GetNet() const final { return rpc::Net::Tcp; }
+		int Send(int id, rpc::Message * message) noexcept final;
+		char GetNet()  const noexcept final { return rpc::Net::Tcp; }
 	protected:
         bool LateAwake() final;
-		bool OnListen(tcp::Socket * socket) final;
 		void OnClientError(int id, int code) final;
 		void OnRecord(json::w::Document & document) final;
+		bool OnListen(tcp::Socket * socket) noexcept final;
 	private:
 		int OnRequest(rpc::Message * message) noexcept;
-		int OnForward(rpc::Message * message);
+		int OnForward(rpc::Message * message) noexcept;
 		rpc::InnerTcpClient * GetClient(int id);
 	private:
 		class ActorComponent * mActor;

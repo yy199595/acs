@@ -21,14 +21,14 @@ namespace acs
 	private:
 		bool LateAwake() final;
 		bool StopListen() final;
-		void OnFrameUpdate(long long) final;
+		void OnFrameUpdate(long long) noexcept final;
 		bool StartListen(const acs::ListenConfig &listen) final;
 	private:
 		kcp::IClient * GetClient(int id);
-		void OnMessage(rpc::Message *request, rpc::Message *response) final;
+		void OnMessage(rpc::Message *request, rpc::Message *response) noexcept final;
 	public:
-		int Send(int id, rpc::Message *message) final;
-		char GetNet() const final { return rpc::Net::Kcp; }
+		int Send(int id, rpc::Message *message) noexcept final;
+		char GetNet() const noexcept final { return rpc::Net::Kcp; }
 	private:
 		int OnRequest(rpc::Message * message);
 	private:

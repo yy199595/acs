@@ -49,7 +49,7 @@ namespace acs
 		return true;
 	}
 
-	int RpcService::Invoke(const RpcMethodConfig * methodConfig, rpc::Message * message)
+	int RpcService::Invoke(const RpcMethodConfig * methodConfig, rpc::Message * message) noexcept
 	{
 		const std::string & method = methodConfig->Method;
 		if(this->mLuaModule != nullptr && this->mLuaModule->HasFunction(method))
@@ -65,7 +65,7 @@ namespace acs
 		return target == nullptr ? XCode::CallFunctionNotExist : target->Invoke(*message);
 	}
 
-	int RpcService::WriterToLua(const RpcMethodConfig * config, rpc::Message & message)
+	int RpcService::WriterToLua(const RpcMethodConfig * config, rpc::Message & message) noexcept
 	{
 		lua_State* lua = this->mLuaModule->GetLuaEnv();
 		lua_pushlstring(lua, config->Method.c_str(), config->Method.size());
@@ -122,7 +122,7 @@ namespace acs
 		return XCode::Ok;
 	}
 
-	int RpcService::CallLua(const RpcMethodConfig * config, rpc::Message & message)
+	int RpcService::CallLua(const RpcMethodConfig * config, rpc::Message & message) noexcept
 	{
 		this->mLuaModule->GetMetaFunction("__Invoke");
 		lua_State* lua = this->mLuaModule->GetLuaEnv();
@@ -185,7 +185,7 @@ namespace acs
 		return code;
 	}
 
-	int RpcService::AwaitCallLua(const RpcMethodConfig * config, rpc::Message& message)
+	int RpcService::AwaitCallLua(const RpcMethodConfig * config, rpc::Message& message) noexcept
 	{
 		this->mLuaModule->GetMetaFunction("__Call");
 		lua_State* lua = this->mLuaModule->GetLuaEnv();

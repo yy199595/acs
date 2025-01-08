@@ -50,7 +50,6 @@
 #include "Watch/Component/WatchComponent.h"
 
 #include "Http/Component/HttpApiComponent.h"
-#include "Lua/Component/LuaListenComponent.h"
 #include "Udp/Component/UdpComponent.h"
 #include "Kcp/Component/KcpComponent.h"
 
@@ -140,7 +139,6 @@ void RegisterComponent()
 	REGISTER_COMPONENT(WXComplaintComponent);
 
 	REGISTER_COMPONENT(WatchComponent);
-	REGISTER_COMPONENT(LuaListenComponent);
 	REGISTER_COMPONENT(UdpComponent);
 	REGISTER_COMPONENT(KcpComponent);
 	REGISTER_COMPONENT(QuickComponent);

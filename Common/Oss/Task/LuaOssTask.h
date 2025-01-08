@@ -16,8 +16,8 @@ namespace acs
 		explicit LuaOssRequestTask(int id, lua_State * lua, std::string url);
 		~LuaOssRequestTask() final;
 	public:
-		int Await();
-		void OnResponse(std::unique_ptr<http::Response > response) final;
+		int Await() noexcept;
+		void OnResponse(std::unique_ptr<http::Response > response) noexcept final;
 	private:
 		int mRef;
 		lua_State * mLua;

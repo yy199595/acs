@@ -60,7 +60,7 @@ namespace acs
 		}
 	}
 
-	int HttpService::Invoke(const HttpMethodConfig * config, const http::Request& request, http::Response& response)
+	int HttpService::Invoke(const HttpMethodConfig * config, const http::Request& request, http::Response& response) noexcept
 	{
 		const std::string & method = config->Method;		
 		if(this->mLuaModule != nullptr && this->mLuaModule->HasFunction(method))
@@ -75,7 +75,7 @@ namespace acs
 		return target == nullptr ? XCode::CallFunctionNotExist : target->Invoke(request, response);
 	}
 
-	int HttpService::CallLua(const std::string & method, const http::Request& request, http::Response& response)
+	int HttpService::CallLua(const std::string & method, const http::Request& request, http::Response& response) noexcept
 	{
 		this->mLuaModule->GetMetaFunction("__Invoke");
 		lua_State * lua = this->mLuaModule->GetLuaEnv();
@@ -115,7 +115,7 @@ namespace acs
 		}
 	}
 
-	int HttpService::AwaitCallLua(const std::string & method, const http::Request& request, http::Response& response)
+	int HttpService::AwaitCallLua(const std::string & method, const http::Request& request, http::Response& response) noexcept
 	{
 		if(!this->mLuaModule->GetMetaFunction("__Call"))
 		{

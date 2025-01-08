@@ -18,12 +18,12 @@ namespace acs
 		explicit LuaServiceTaskSource(http::Response* message);
 		//~LuaServiceTaskSource() { printf("===================  %p \n", this); }
 	public:
-		static int SetRpc(lua_State * lua);
-        static int SetHttp(lua_State* lua);
+		static int SetRpc(lua_State * lua) noexcept;
+        static int SetHttp(lua_State* lua) noexcept;
 	private:
-		void WriteRpcResponse(lua_State * lua);
+		void WriteRpcResponse(lua_State * lua) noexcept;
     public:
-        int Await();
+        int Await() noexcept;
     private:
         int mCode;
 		rpc::Message * mRpcData;
