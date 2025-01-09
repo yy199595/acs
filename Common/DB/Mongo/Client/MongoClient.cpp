@@ -6,11 +6,8 @@
 #include"XCode/XCode.h"
 #include <utility>
 #include"Util/Crypt/md5.h"
-#ifdef __MONGO_DB_AUTH_SHA256__
-#include"Util/Crypt/sha256.h"
-#else
+
 #include "Util/Crypt/sha1.h"
-#endif
 
 #include"Proto/Bson/base64.h"
 #include"Util/Tools/String.h"
@@ -23,15 +20,7 @@ namespace mongo
     std::string SaltPassword(std::string & pwd, std::string salt, int iter)
     {
         salt = salt + '\0' + '\0' + '\0' + '\1';
-#ifdef __MONGO_DB_AUTH_SHA256__
-        std::string output = help::Sha256::GetHMacHash(pwd, salt);
-        std::string inter(output);
-        for(int index = 2; index <= iter; index++)
-        {
-            inter = help::Sha256::GetHMacHash(pwd, inter);
-            output = help::Sha256::XorString(output, inter);
-        }
-#else
+
 		std::string output = help::Sha1::GetHMacHash(pwd, salt);
 		std::string inter(output);
 		for(int index = 2; index <= iter; index++)
@@ -39,7 +28,6 @@ namespace mongo
 			inter = help::Sha1::GetHMacHash(pwd, inter);
 			output = help::Sha1::XorString(output, inter);
 		}
-#endif
         return output;
     }
 
@@ -172,18 +160,6 @@ namespace mongo
         std::string salted_pass = SaltPassword(pbkdf2_key,
                                                _bson::base64::decode(salt), iterations);
 
-#ifdef __MONGO_DB_AUTH_SHA256__
-        std::string client_key = help::Sha256::GetHMacHash(salted_pass, "Client Key");
-        std::string stored_key = help::Sha256::GetHash(client_key);
-
-        std::string auth_msg = firstBare + ',' + parsedSource + ',' + without_proof;
-        std::string client_sin = help::Sha256::GetHMacHash(stored_key, auth_msg);
-        std::string client_key_xor_sig = help::Sha256::XorString(client_key, client_sin);
-        std::string client_proof = std::string("p=") + _bson::base64::encode(client_key_xor_sig);
-        std::string client_final = _bson::base64::encode(without_proof + "," + client_proof);
-        std::string server_key = help::Sha256::GetHMacHash(salted_pass, "Server Key");
-        std::string server_sig = _bson::base64::encode(help::Sha256::GetHMacHash(server_key, auth_msg));
-#else
 		std::string client_key = help::Sha1::GetHMacHash(salted_pass, "Client Key");
 		std::string stored_key = help::Sha1::GetHash(client_key);
 
@@ -194,7 +170,6 @@ namespace mongo
 		std::string client_final = _bson::base64::encode(without_proof + "," + client_proof);
 		std::string server_key = help::Sha1::GetHMacHash(salted_pass, "Server Key");
 		std::string server_sig = _bson::base64::encode(help::Sha1::GetHMacHash(server_key, auth_msg));
-#endif
 
         std::unique_ptr<mongo::Request> request2 = std::make_unique<mongo::Request>();
 		{
@@ -205,7 +180,7 @@ namespace mongo
 			request2->document.Add("conversationId", conversationId);
 			request2->document.Add("payload", client_final);
 		}
-        std::unique_ptr<Response> response2 = this->SyncSendMongoCommand(std::move(request2));
+        std::unique_ptr<Response> response2 = this->SyncSendMongoCommand(request2);
         if(response2 == nullptr || response2->Document() == nullptr)
 		{
 			return false;
@@ -230,7 +205,7 @@ namespace mongo
 			request3->document.Add("payload", "");
 		}
 
-        std::unique_ptr<Response> response3 = this->SyncSendMongoCommand(std::move(request3));
+        std::unique_ptr<Response> response3 = this->SyncSendMongoCommand(request3);
 
 		if(response3 == nullptr || response3->Document() == nullptr)
 		{
@@ -363,7 +338,7 @@ namespace mongo
 		const Asio::Executor & executor = sock.get_executor();
 		asio::post(executor, [this, &request, &response, &threadSync]
 		{
-			response = this->SyncSendMongoCommand(std::move(request));
+			response = this->SyncSendMongoCommand(request);
 			threadSync.SetResult(true);
 		});
 		threadSync.Wait();

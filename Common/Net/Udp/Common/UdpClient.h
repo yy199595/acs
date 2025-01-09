@@ -18,7 +18,7 @@ namespace udp
 		inline asio_udp::socket & Socket() { return this->mSocket; }
 	public:
 		void StartReceive() final;
-		void OnReceive(const std::string & address, int size);
+		void OnReceive(const std::string & address, size_t size);
 	private:
 		Component * mComponent;
 		Asio::Context & mMainContext;

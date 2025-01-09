@@ -22,42 +22,39 @@ namespace udp
 		{
 			std::ostream stream(&self->mSendBuffer);
 			int length = message->OnSendMessage(stream);
-			self->mSocket.async_send_to(self->mSendBuffer.data(), self->mRemoteEndpoint,
-					[self, length, message](const asio::error_code& code, size_t size)
-					{
-						if (code.value() != Asio::OK)
-						{
-							return;
-						}
-						self->mSendBuffer.consume(size);
-						//unsigned short port = this->mRemoteEndpoint.port();
-						//std::string ip = this->mRemoteEndpoint.address().to_string();
-						//CONSOLE_LOG_ERROR("send:({}:{}) size:{}", ip, port, size);
-					});
+			auto callback = [self, length, message](const asio::error_code& code, size_t size)
+			{
+				delete message;
+				if (code.value() == Asio::OK)
+				{
+					self->mSendBuffer.consume(size);
+				}
+			};
+			self->mSocket.async_send_to(self->mSendBuffer.data(), self->mRemoteEndpoint, callback);
 		});
 	}
 
 	void Client::StartReceive()
 	{
 		std::shared_ptr<Client> self = this->shared_from_this();
-		this->mSocket.async_receive_from(this->mRecvBuffer.prepare(udp::BUFFER_COUNT),
-				this->mLocalEndpoint, [self](const asio::error_code& code, size_t size)
-				{
-					if (code.value() == Asio::OK)
-					{
-						self->mRecvBuffer.commit(size);
-						unsigned short port = self->mLocalEndpoint.port();
-						std::string ip = self->mLocalEndpoint.address().to_string();
-						std::string address = fmt::format("{}:{}", ip, port);
+		auto callback = [self](const asio::error_code& code, size_t size) {
+			if (code.value() == Asio::OK)
+			{
+				self->mRecvBuffer.commit(size);
+				unsigned short port = self->mLocalEndpoint.port();
+				std::string ip = self->mLocalEndpoint.address().to_string();
+				std::string address = fmt::format("{}:{}", ip, port);
 
-						self->OnReceive(address, size);
-						self->mRecvBuffer.consume(size);
-					}
-					asio::post(self->mSocket.get_executor(), [self] { self->StartReceive(); });
-				});
+				self->OnReceive(address, size);
+				self->mRecvBuffer.consume(size);
+			}
+			asio::post(self->mSocket.get_executor(), [self] { self->StartReceive(); });
+		};
+		this->mSocket.async_receive_from(this->mRecvBuffer.prepare(udp::BUFFER_COUNT),
+				this->mLocalEndpoint, callback);
 	}
 
-	void Client::OnReceive(const std::string & address, int size)
+	void Client::OnReceive(const std::string & address, size_t size)
 	{
 		std::istream is(&this->mRecvBuffer);
 		std::unique_ptr<rpc::Message> rpcPacket = std::make_unique<rpc::Message>();

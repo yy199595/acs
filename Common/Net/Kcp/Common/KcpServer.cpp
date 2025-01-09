@@ -13,8 +13,7 @@ namespace kcp
 			  mTimer(io), mMainContext(main)
 	{
 		this->mTimer.expires_after(std::chrono::milliseconds(KCP_UPDATE_INTERVAL));
-		this->mTimer.async_wait([this](auto&& PH1)
-		{ OnUpdate(std::forward<decltype(PH1)>(PH1)); });
+		this->mTimer.async_wait([this](auto&& PH1){ this->OnUpdate(std::forward<decltype(PH1)>(PH1)); });
 	}
 
 	void Server::StartReceive()
