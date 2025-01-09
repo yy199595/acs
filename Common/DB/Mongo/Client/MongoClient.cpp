@@ -2,13 +2,12 @@
 // Created by mac on 2022/5/18.
 //
 
+
+#include "md5.h"
 #include"MongoClient.h"
 #include"XCode/XCode.h"
 #include <utility>
-#include"Util/Crypt/md5.h"
-
 #include "Util/Crypt/sha1.h"
-
 #include"Proto/Bson/base64.h"
 #include"Util/Tools/String.h"
 #include"Mongo/Config/MongoConfig.h"
@@ -17,13 +16,32 @@
 
 namespace mongo
 {
-    std::string SaltPassword(std::string & pwd, std::string salt, int iter)
+
+	std::string SumHex(const std::string& key)
+	{
+		std::string result;
+		char buffer[16] = {0};
+		std::regex regex1(".");
+		::md5(key.c_str(), key.size(), buffer);
+
+		std::string target(buffer, 16);
+		auto begin = std::sregex_iterator(target.begin(), target.end(), regex1);
+		for(auto iter = begin; iter != std::sregex_iterator(); iter++)
+		{
+			char temp[10] = {0};
+			unsigned char cc = iter->str()[0];
+			result.append(temp, sprintf(temp, "%02x", (int)cc));
+		}
+		return result;
+	}
+
+    std::string SaltPassword(std::string & pwd, std::string salt, int iterations)
     {
         salt = salt + '\0' + '\0' + '\0' + '\1';
 
 		std::string output = help::Sha1::GetHMacHash(pwd, salt);
 		std::string inter(output);
-		for(int index = 2; index <= iter; index++)
+		for(int index = 2; index <= iterations; index++)
 		{
 			inter = help::Sha1::GetHMacHash(pwd, inter);
 			output = help::Sha1::XorString(output, inter);
@@ -124,14 +142,12 @@ namespace mongo
         request1->collectionName = db + ".$cmd";
         request1->document.Add("saslStart", 1);
         request1->document.Add("autoAuthorize", 1);
-#ifdef __MONGO_DB_AUTH_SHA256__
-        request1->document.Add("mechanism", "SCRAM-SHA-256");
-#else
+
 		request1->document.Add("mechanism", "SCRAM-SHA-1");
-#endif
+
         request1->document.Add("payload", payload);
 
-        std::unique_ptr<Response> response1 = this->SyncSendMongoCommand(std::move(request1));
+        std::unique_ptr<Response> response1 = this->SyncSendMongoCommand(request1);
 		if(response1 == nullptr || response1->Document() == nullptr)
 		{
 			return false;
@@ -155,10 +171,10 @@ namespace mongo
         int iterations = std::stoi(std::string(ret[2].c_str() + 2, ret[2].size() - 2));
 
         std::string without_proof = "c=biws,r=" + rnonce;
-        std::string pbkdf2_key = help::md5::GetMd5(
-                fmt::format("{0}:mongo:{1}", user, pwd));
+        std::string pbkdf2_key = SumHex(fmt::format("{0}:mongo:{1}", user, pwd));
         std::string salted_pass = SaltPassword(pbkdf2_key,
                                                _bson::base64::decode(salt), iterations);
+
 
 		std::string client_key = help::Sha1::GetHMacHash(salted_pass, "Client Key");
 		std::string stored_key = help::Sha1::GetHash(client_key);
@@ -189,6 +205,7 @@ namespace mongo
         bson::Reader::Document * document2 = response2->Document();
         if(!document2->Get("payload", parsedSource))
         {
+			CONSOLE_LOG_ERROR("{}", response2->ToJson());
             return false;
         }
         bool done = false;
