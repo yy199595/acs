@@ -70,6 +70,6 @@ namespace custom
 			request->collectionName = this->mCommand;
 		}
 		mongo::Response response;
-		this->mMonClient->SyncSend(std::move(request), response);
+		this->mMonClient->SyncSend(request, response);
 	}
 }
