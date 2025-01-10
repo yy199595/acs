@@ -66,6 +66,7 @@ namespace acs
 		};
 
 		std::unordered_map<std::string, char> ProtoMap{
+				{ "lua",     rpc::Porto::Lua },
 				{ "json",     rpc::Porto::Json },
 				{ "string",   rpc::Porto::String },
 				{ "protobuf", rpc::Porto::Protobuf },

@@ -16,11 +16,11 @@ namespace custom
 
 	bool MongoOutput::Start(Asio::Context& io)
 	{
-		tcp::Socket * socket = new tcp::Socket(io);
+		std::unique_ptr<tcp::Socket> socket = std::make_unique<tcp::Socket>(io);
 		{
 			socket->Init(this->mConfig.Address);
 			this->mCommand = fmt::format("{}.$cmd", this->mConfig.DB);
-			this->mMonClient = std::make_shared<mongo::Client>(socket, this->mConfig, io);
+			this->mMonClient = std::make_shared<mongo::Client>(socket.release(), this->mConfig, io);
 		}
 		return this->mMonClient->Start(false);
 	}

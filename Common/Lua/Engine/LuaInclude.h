@@ -114,6 +114,7 @@ namespace Lua
 		lua_pushcfunction(lua, func);
 		lua_setglobal(lua, name);
 	}
+
 }
 
 namespace Lua

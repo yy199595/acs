@@ -150,7 +150,7 @@ namespace tcp
 #endif
 	}
 
-	void Socket::Destory()
+	void Socket::Destroy()
 	{
 		this->Close();
 		delete this;

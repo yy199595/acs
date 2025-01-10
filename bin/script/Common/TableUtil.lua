@@ -1,4 +1,5 @@
 
+local str_format = string.format
 local table_insert = table.insert
 
 function table.print(t)
@@ -46,7 +47,7 @@ function table.tostring(t)
         end
     end
     if (type(t) == "table") then
-        table_insert(buffer,tostring(t) .. " {")
+        table_insert(buffer,tostring(t) .. "\n{")
         sub_print_r(t, "  ")
         table_insert(buffer,"}")
     else
@@ -64,26 +65,33 @@ function table.is_array(t)
     return count == #t;
 end
 
-function table.serialize(t, indent)
-    indent = indent or 0
-    local result = "{\n"
-    local padding = string.rep("  ", indent)  -- 每一层缩进两个空格
+function table.serialize(t)
+    local result = "{"
     local is_array = table.is_array(t)
 
     for k, v in pairs(t) do
         local key, value
         if is_array then
             -- 如果是数组，只输出值
-            value = (type(v) == "table") and table.serialize(v, indent + 1) or (type(v) == "string" and string.format("%q", v) or tostring(v))
-            result = result .. padding .. "  " .. value .. ",\n"
+            value = (type(v) == "table") and table.serialize(v) or (type(v) == "string" and str_format("%q", v) or tostring(v))
+            result = result .. value .. ","
         else
             -- 如果是键值对表，输出键和值
-            key = (type(k) == "string") and string.format("[%q]", k) or string.format("[%s]", k)
-            value = (type(v) == "table") and table.serialize(v, indent + 1) or (type(v) == "string" and string.format("%q", v) or tostring(v))
-            result = result .. padding .. "  " .. key .. " = " .. value .. ",\n"
+            key = (type(k) == "string") and str_format("[%q]", k) or str_format("[%s]", k)
+            value = (type(v) == "table") and table.serialize(v) or (type(v) == "string" and str_format("%q", v) or tostring(v))
+            result = result .. "  " .. key .. "=" .. value .. ","
         end
     end
 
-    result = result .. padding .. "}"
+    result = result .. "}"
     return result
+end
+
+function table.deserialize(str)
+    local code = "return " .. str
+    local ok, result = pcall(load, code)
+    if not ok then
+        return nil
+    end
+    return result()
 end

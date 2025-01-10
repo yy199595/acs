@@ -12,7 +12,7 @@ namespace acs
 {
     MongoDB::MongoDB()
     {
-        this->mMongoComponent = nullptr;
+        this->mMongo = nullptr;
     }
 
     bool MongoDB::Awake()
@@ -39,8 +39,8 @@ namespace acs
 		BIND_SERVER_RPC_METHOD(MongoDB::Databases);
 		BIND_SERVER_RPC_METHOD(MongoDB::Collections);
 		BIND_SERVER_RPC_METHOD(MongoDB::FindAndModify);
-		this->mMongoComponent = this->GetComponent<MongoDBComponent>();
-		return this->mMongoComponent != nullptr;
+		LOG_CHECK_RET_FALSE(this->mMongo = this->GetComponent<MongoDBComponent>())
+		return true;
     }
 
 	int MongoDB::Databases(com::array::string& response)
@@ -53,7 +53,7 @@ namespace acs
 			request1->collectionName = "admin.$cmd";
 			request1->document.Add("listDatabases", doc1);
 		}
-		std::unique_ptr<mongo::Response> mongoResponse = this->mMongoComponent->Run(std::move(request1));
+		std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(request1));
 		LOG_ERROR_RETURN_CODE(mongoResponse && mongoResponse->Document(), XCode::Failure);
 
 		std::vector<std::unique_ptr<bson::Reader::Document>> results;
@@ -83,7 +83,7 @@ namespace acs
 			}
 			message->document.Add("listCollections", doc1);
 		}
-		std::unique_ptr<mongo::Response> mongoResponse = this->mMongoComponent->Run(std::move(message));
+		std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(message));
 		LOG_ERROR_RETURN_CODE(mongoResponse && mongoResponse->Document(), XCode::Failure);
 
 		bson::Reader::Document* readDocument = mongoResponse->Document();
@@ -123,7 +123,7 @@ namespace acs
 		mongoRequest->document.Add("update", update);
 		mongoRequest->document.Add("upsert", true);
 		mongoRequest->document.Add("new", true);
-		std::unique_ptr<mongo::Response> mongoResponse = this->mMongoComponent->Run(std::move(mongoRequest));
+		std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
 		if (mongoResponse == nullptr || mongoResponse->Document() == nullptr)
 		{
 			return XCode::FindMongoDocumentFail;
@@ -175,7 +175,7 @@ namespace acs
 		bson::Writer::Document options;
 		options.Add("returnDocument", "after");
 		mongoRequest->document.Add("options", options);
-		std::unique_ptr<mongo::Response> mongoResponse = this->mMongoComponent->Run(std::move(mongoRequest));
+		std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
 		if(mongoResponse == nullptr || mongoResponse->Document() == nullptr)
 		{
 			return XCode::Failure;
@@ -204,7 +204,7 @@ namespace acs
         {
             return XCode::CallArgsError;
         }
-		std::unique_ptr<mongo::Response> mongoResponse = this->mMongoComponent->Run(std::move(mongoRequest));
+		std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
         if (mongoResponse != nullptr && mongoResponse->Document() != nullptr)
         {
 			mongoResponse->Document()->WriterToJson(response.mutable_json());
@@ -234,7 +234,7 @@ namespace acs
 			}
 			mongoRequest->GetCollection("insert", tab).Insert(documents);
 		}
-		std::unique_ptr<mongo::Response> mongoResponse = this->mMongoComponent->Run(std::move(mongoRequest));
+		std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
 		if(mongoResponse == nullptr ||  mongoResponse->Document() == nullptr)
 		{
 			return XCode::Failure;
@@ -262,7 +262,7 @@ namespace acs
 			return XCode::CallArgsError;
 		}
 		int count = 0;
-		std::unique_ptr<mongo::Response> mongoResponse = this->mMongoComponent->Run(std::move(mongoRequest));
+		std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
 		LOG_ERROR_RETURN_CODE(mongoResponse && mongoResponse->Document(), XCode::Failure);
 		if (mongoResponse->Document()->Get("n", count))
 		{
@@ -325,7 +325,7 @@ namespace acs
 			updates.Add(updateInfo);
 		}
 		mongoRequest->document.Add("updates", updates);
-		std::unique_ptr<mongo::Response> mongoResponse = this->mMongoComponent->Run(std::move(mongoRequest));
+		std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
 		LOG_ERROR_RETURN_CODE(mongoResponse && mongoResponse->Document(), XCode::UpdateMongoDocumentFail);
 
 		int count = 0;
@@ -349,7 +349,7 @@ namespace acs
 		{
 			return XCode::CallArgsError;
 		}
-		std::unique_ptr<mongo::Response> mongoResponse= this->mMongoComponent->Run(std::move(commandRequest));
+		std::unique_ptr<mongo::Response> mongoResponse= this->mMongo->Run(std::move(commandRequest));
 		if(mongoResponse == nullptr || mongoResponse->Document() == nullptr)
 		{
 			return XCode::Failure;
@@ -378,7 +378,7 @@ namespace acs
 			}
 			mongoRequest->document.Add("projection", mode);
 		}
-		std::unique_ptr<mongo::Response> mongoResponse = this->mMongoComponent->Run(std::move(mongoRequest));
+		std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
 		LOG_ERROR_RETURN_CODE(mongoResponse && mongoResponse->Document(), XCode::Failure);
 
 		bson::Reader::Document * readDocument = mongoResponse->Document();
@@ -437,7 +437,7 @@ namespace acs
 			mongoRequest->document.Add("projection", mode);
 		}
 
-		std::unique_ptr<mongo::Response> mongoResponse = this->mMongoComponent->Run(std::move(mongoRequest));
+		std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
 		LOG_ERROR_RETURN_CODE(mongoResponse && mongoResponse->Document(), XCode::Failure);
 
 		bson::Reader::Document* readDocument = mongoResponse->Document();
@@ -486,7 +486,7 @@ namespace acs
 			}
 			mongoRequest->document.Add("projection", mode);
 		}
-		std::unique_ptr<mongo::Response> mongoResponse = this->mMongoComponent->Run(std::move(mongoRequest));
+		std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
 		LOG_ERROR_RETURN_CODE(mongoResponse && mongoResponse->Document(), XCode::FindMongoDocumentFail);
 
 		bson::Reader::Document * readDocument = mongoResponse->Document();
@@ -522,7 +522,7 @@ namespace acs
 				mongoRequest->Query(document);
 			}
 		}
-		std::unique_ptr<mongo::Response> mongoResponse = this->mMongoComponent->Run(std::move(mongoRequest));
+		std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
 		LOG_ERROR_RETURN_CODE(mongoResponse && mongoResponse->Document(), XCode::Failure);
 
 		int count = 0;
@@ -555,7 +555,7 @@ namespace acs
 		{
 			return XCode::CallArgsError;
 		}
-		std::unique_ptr<mongo::Response> mongoResponse = this->mMongoComponent->Run(std::move(mongoRequest));
+		std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
 		LOG_ERROR_RETURN_CODE(mongoResponse && mongoResponse->Document(), XCode::UpdateMongoDocumentFail);
 
         int count = 0;
@@ -607,7 +607,7 @@ namespace acs
 			mongoRequest->document.Add("cursor", cursor);
 			mongoRequest->document.Add("pipeline", pipeline);
 		}
-		std::unique_ptr<mongo::Response> mongoResponse = this->mMongoComponent->Run(std::move(mongoRequest));
+		std::unique_ptr<mongo::Response> mongoResponse = this->mMongo->Run(std::move(mongoRequest));
 		std::unique_ptr<bson::Reader::Document> document1;
 		LOG_ERROR_RETURN_CODE(mongoResponse->Document()->Get("cursor", document1), XCode::FindMongoDocumentFail);
 

@@ -113,65 +113,66 @@ namespace acs
 		}
 		tcp::Socket* sock = nullptr;
 #ifdef __ENABLE_OPEN_SSL__
-		if(!this->mConfig.Cert.empty())
+		if (!this->mConfig.Cert.empty())
 		{
 			sock = this->mThreadComponent->CreateSocket(this->mSslCtx);
 		}
 #endif
-		if(this->mConfig.Cert.empty())
+		if (this->mConfig.Cert.empty())
 		{
 			sock = this->mThreadComponent->CreateSocket();
 		}
 
-		this->mAcceptor->async_accept(sock->Get(), [sock, this](const Asio::Code& code)
+		auto callback = [this, sock](const Asio::Code& code)
+		{
+			do
 			{
-				do
+				if (code.value() != Asio::OK)
 				{
-					
-					if (code.value() != Asio::OK)
+					sock->Destroy();
+					break;
+				}
+				sock->Init();
+#ifdef __ENABLE_OPEN_SSL__
+				if (sock->IsOpenSsl())
+				{
+					Asio::Code code1;
+					Asio::ssl::Socket& ssl = sock->SslSocket();
+					ssl.handshake(asio::ssl::stream_base::server, code1);
+					if (code1.value() != Asio::OK)
 					{
-						sock->Destory();
+						sock->Destroy();
 						break;
 					}
-					sock->Init();
-#ifdef __ENABLE_OPEN_SSL__
-					if (sock->IsOpenSsl())
-					{
-						Asio::Code code1;
-						Asio::ssl::Socket& ssl = sock->SslSocket();
-						ssl.handshake(asio::ssl::stream_base::server, code1);
-						if (code1.value() != Asio::OK)
-						{
-							sock->Destory();
-							break;
-						}
-					}
-#endif
-#ifdef ONLY_MAIN_THREAD
-					this->OnAcceptSocket(sock);
-#else
-					Asio::Context& io = this->mApp->GetContext();
-					asio::post(io, [this, sock] { this->OnAcceptSocket(sock); });
-#endif			
-				} while (false);
-				if(this->mAcceptor == nullptr)
-				{
-					return;
 				}
-#ifdef ONLY_MAIN_THREAD
-				this->Accept();
-#else
-				const Asio::Executor& executor = this->mAcceptor->get_executor();
-				asio::post(executor, [this] { this->Accept(); });
 #endif
-			});
+#ifdef ONLY_MAIN_THREAD
+				this->OnAcceptSocket(sock);
+#else
+				Asio::Context& io = this->mApp->GetContext();
+				asio::post(io, [this, sock] { this->OnAcceptSocket(sock); });
+#endif
+			} while (false);
+			if (this->mAcceptor == nullptr)
+			{
+				return;
+			}
+#ifdef ONLY_MAIN_THREAD
+			this->Accept();
+#else
+			const Asio::Executor& executor = this->mAcceptor->get_executor();
+			asio::post(executor, [this] { this->Accept(); });
+#endif
+		};
+
+		this->mAcceptor->async_accept(sock->Get(), callback);
 	}
 
 	void ListenerComponent::OnAcceptSocket(tcp::Socket* sock)
 	{
 		if (!this->mTcpListen->OnListen(sock))
 		{
-			sock->Destory();
+			sock->Destroy();
 		}
 	}
 

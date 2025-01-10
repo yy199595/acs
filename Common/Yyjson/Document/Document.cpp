@@ -759,6 +759,7 @@ namespace json
 				return -1;
 			}
 			yyjson_obj_iter iter;
+			keys.reserve(this->MemberCount());
 			yyjson_obj_iter_init(this->mValue, &iter);
 			keys.reserve(yyjson_obj_size(this->mValue));
 			while (yyjson_val* k = yyjson_obj_iter_next(&iter))

@@ -25,6 +25,7 @@
 #include "Udp/Common/UdpClient.h"
 #include "Kcp/Common/KcpClient.h"
 #include "Core/Lua/LuaOs.h"
+#include "Proto/Lua/Bson.h"
 #ifdef __ENABLE_OPEN_SSL__
 #include "Util/Ssl/rsa.h"
 #include "Util/Ssl/LuaRsa.h"
@@ -178,6 +179,11 @@ namespace acs
 		moduleRegistry.AddFunction("encode", lua::yyjson::encode);
 		moduleRegistry.AddFunction("pretty", lua::yyjson::pretty);
 		moduleRegistry.AddFunction("decode", lua::yyjson::decode).End("util.json");
+
+		moduleRegistry.Start();
+		moduleRegistry.AddFunction("encode", lua::lbson::encode);
+		moduleRegistry.AddFunction("decode", lua::lbson::decode).End("util.bson");
+
 
 		moduleRegistry.Start();
 		moduleRegistry.AddFunction("ToString", Lua::md5::ToString).End("util.md5");

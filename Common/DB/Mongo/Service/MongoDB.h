@@ -39,7 +39,7 @@ namespace acs
 		int UpdateData(const db::mongo::update & request, bool upsert, db::mongo::response& response);
 	private:
         std::string mBuffer;
-		class MongoDBComponent * mMongoComponent;
+		class MongoDBComponent * mMongo;
     };
 }
 

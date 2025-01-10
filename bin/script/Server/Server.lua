@@ -42,7 +42,7 @@ function Main:Update()
             })
             code = app:Call(appId, "ChatSystem.Ping")
             code = app:Call(appId, "GateSystem.Ping")
-            mongo:FindOne("demo.player", { _id = 10001})
+            mongo:FindOne("demo.player", { _id = 10001 })
             --http:Get("http://127.0.0.1:80/admin/hello")
             --http:Get("http://127.0.0.1:80/admin/all_info")
             --http:Get("http://127.0.0.1:80/admin/ping?id=0")
@@ -55,12 +55,42 @@ end
 
 function Main:OnComplete()
 
-    print(mongo:SetIndex("demo.player", "account", 1, false))
-    print(mongo:InsertOnce("demo.player", {
-        _id = 10001,
-        age = 20,
-        name = "xiaoming"
-    }))
+    local bson = require("util.bson")
+    local json = require("util.json")
+
+    local request = {
+        func = "ChatSystem.OnChat",
+        player_id = 10000999,
+        name = "xiaoming",
+        friend_list = {
+            {
+                id = 1001,
+                name = "xiaozhang"
+            },
+            {
+                id = 1002,
+                name = "xiaohua"
+            }
+        },
+        sex = true,
+        list = { 1, 2, 3, 44, 5 }
+    }
+
+    local sum = 100000
+    local str1 = bson.encode(request)
+    local str2 = json.encode(request)
+    local t1 = os.clock()
+    for i = 1, sum do
+        --local str = bson.encode(request)
+       bson.decode(str1)
+    end
+    local t2 = os.clock()
+    for i = 1, sum do
+        --local str = json.encode(request)
+        json.decode(str2)
+    end
+    local t3 = os.clock()
+    print(string.format("[%s]bson=%s  [%s]json=%s", #str1, t2- t1, #str2, t3 - t2))
 end
 
 return Main

@@ -152,10 +152,20 @@ namespace http
 			lua_rawset(lua, -3);
 		}
 		{
+			long long playerId = 0;
 			lua_pushstring(lua, "query");
 			const http::FromContent& fromData = this->mUrl.GetQuery();
-			(const_cast<http::FromContent&>(fromData)).WriteToLua(lua);
-			lua_rawset(lua, -3);
+			if(fromData.Size() > 0)
+			{
+				(const_cast<http::FromContent&>(fromData)).WriteToLua(lua);
+				lua_rawset(lua, -3);
+			}
+			if(fromData.Get(http::query::UserId, playerId))
+			{
+				lua_pushstring(lua, "userId");
+				lua_pushinteger(lua, playerId);
+				lua_rawset(lua, -3);
+			}
 		}
 		{
 			lua_pushstring(lua, "data");

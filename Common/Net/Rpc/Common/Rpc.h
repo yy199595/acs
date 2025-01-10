@@ -46,7 +46,7 @@ namespace rpc
 		constexpr char Json = 1;
 		constexpr char String = 2;
 		constexpr char Protobuf = 3;
-		constexpr char Bson = 4;
+		constexpr char Lua = 4;
 		// 自定义扩展
 		constexpr char Max = std::numeric_limits<char>::max();
     };

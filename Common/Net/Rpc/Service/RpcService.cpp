@@ -14,6 +14,12 @@ namespace acs
 		return fullName.substr(pos + 2);
 	}
 
+	inline void lua_push_table_field(lua_State *lua, const char * name, long long value)
+	{
+		lua_pushinteger(lua, value);
+		lua_setfield(lua, -2, name);
+	}
+
 	RpcService::RpcService()
 		: mMethodRegister(this)
 	{
@@ -30,7 +36,7 @@ namespace acs
 		{
 			LOG_WARN("{} not find cluster config", name);
 		}
-		LuaComponent * luaComponent = this->GetComponent<LuaComponent>();
+		auto * luaComponent = this->GetComponent<LuaComponent>();
 		if(luaComponent != nullptr)
 		{
 			this->mLuaModule = luaComponent->LoadModule(name);
@@ -67,13 +73,30 @@ namespace acs
 
 	int RpcService::WriterToLua(const RpcMethodConfig * config, rpc::Message & message) noexcept
 	{
+		const rpc::Head & head = message.ConstHead();
 		lua_State* lua = this->mLuaModule->GetLuaEnv();
 		lua_pushlstring(lua, config->Method.c_str(), config->Method.size());
-		lua_createtable(lua, 0, 2);
+		lua_createtable(lua, 0, 3);
 		{
-			tcp::IHeader::WriteLua(lua, message.GetHead());
+			tcp::IHeader::WriteLua(lua, head);
 			{
 				lua_setfield(lua, -2, "head");
+			}
+			if(config->IsClient)
+			{
+				long long playerId = 0;
+				if(head.Get(rpc::Header::player_id, playerId))
+				{
+					lua_push_table_field(lua, "playerId", playerId);
+				}
+			}
+			else
+			{
+				long long appId = 0;
+				if(head.Get(rpc::Header::app_id, appId))
+				{
+					lua_push_table_field(lua, "appId", appId);
+				}
 			}
 			switch (message.GetProto())
 			{

@@ -26,7 +26,7 @@ function Chat:Ping()
 end
 
 function Chat:OnPing(request)
-    local playerId = request.head:Get("pid")
+    local playerId = request.playerId
     mongo:FindOne("player.chat", { _id = playerId })
     return XCode.Ok
 end
@@ -34,7 +34,7 @@ end
 function Chat:OnChat(request)
     local nowTime = os.time()
     --print(request.head:ToString())
-    local playerId = request.head:Get("pid")
+    local playerId = request.playerId
     local redisResponse = redis:Run("HGET", "player.chat", playerId)
 
     if redisResponse ~= nil then

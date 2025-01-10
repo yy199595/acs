@@ -56,16 +56,15 @@ namespace tcp
 		inline Asio::Socket & Get() { return *this->mSocket; }
 		inline bool IsOpen() const { return this->mSocket && this->mSocket->is_open(); }
 	public:
+		bool SetOption(OptionType type, bool val);
 		inline bool IsOpenSsl() const { return this->mIsOpenSsl; }
 		inline Asio::Context & GetContext() { return this->mContext; }
 #ifdef __ENABLE_OPEN_SSL__
 		inline Asio::ssl::Socket & SslSocket() { return *this->mSslSocket; }
 #endif
-	public:
-		bool SetOption(OptionType type, bool val);
     public:
         void Close();
-		void Destory();
+		void Destroy();
 		inline std::string & GetIp() { return this->mIp;}
 		unsigned short GetPort() const { return this->mPort;}
 		inline bool IsClient() const { return this->mIsClient; }
